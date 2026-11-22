@@ -9,17 +9,20 @@ open CategoryTheory AlgebraicGeometry
 
 namespace GlobalTheory
 
-theorem eq_of_minimalPrimes_le_of_isDomain_localization {A : Type} [CommRing A]
+theorem eq_of_minimalPrimes_le_of_isDomain_localization
+    {A : Type} [CommRing A]
     (hA : ∀ (P : Ideal A) [P.IsPrime], IsDomain (Localization.AtPrime P))
-    {P p q : Ideal A} [P.IsPrime] (hp : p ∈ minimalPrimes A) (hq : q ∈ minimalPrimes A)
-    (hpP : p ≤ P) (hqP : q ≤ P) : p = q := by
+    {P p q : Ideal A} [P.IsPrime]
+    (hp : p ∈ minimalPrimes A) (hq : q ∈ minimalPrimes A) (hpP : p ≤ P) (hqP : q ≤ P)
+    : p = q := by
   haveI := hA P
   let K := RingHom.ker (algebraMap A (Localization.AtPrime P))
   have hK : K.IsPrime := RingHom.ker_isPrime _
   have hle : ∀ Q : Ideal A, Q.IsPrime → Q ≤ P → K ≤ Q := by
     intro Q hQ hQP
-    have h := IsLocalization.under_map_of_isPrime_disjoint P.primeCompl (Localization.AtPrime P) hQ
-      (Set.disjoint_left.2 fun x hx hxQ ↦ hx (hQP hxQ))
+    have h :=
+      IsLocalization.under_map_of_isPrime_disjoint P.primeCompl (Localization.AtPrime P) hQ
+        (Set.disjoint_left.2 fun x hx hxQ ↦ hx (hQP hxQ))
     rw [← h]
     intro x hx
     rw [RingHom.mem_ker] at hx
@@ -28,12 +31,15 @@ theorem eq_of_minimalPrimes_le_of_isDomain_localization {A : Type} [CommRing A]
   have h2 : K = q := le_antisymm (hle q hq.1.1 hqP) (hq.2 ⟨hK, bot_le⟩ (hle q hq.1.1 hqP))
   exact h1.symm.trans h2
 
-theorem isOpen_zeroLocus_of_mem_minimalPrimes {A : Type} [CommRing A] [IsNoetherianRing A]
+theorem isOpen_zeroLocus_of_mem_minimalPrimes
+    {A : Type} [CommRing A] [IsNoetherianRing A]
     (hA : ∀ (P : Ideal A) [P.IsPrime], IsDomain (Localization.AtPrime P))
-    {p : Ideal A} (hp : p ∈ minimalPrimes A) : IsOpen (PrimeSpectrum.zeroLocus (p : Set A)) := by
+    {p : Ideal A} (hp : p ∈ minimalPrimes A)
+    : IsOpen (PrimeSpectrum.zeroLocus (p : Set A)) := by
   have hfin := (minimalPrimes.finite_of_isNoetherianRing A).subset (Set.diff_subset (t := {p}))
-  have heq : (PrimeSpectrum.zeroLocus (p : Set A))ᶜ =
-      ⋃ q ∈ minimalPrimes A \ {p}, PrimeSpectrum.zeroLocus (q : Set A) := by
+  have heq
+      : (PrimeSpectrum.zeroLocus (p : Set A))ᶜ
+        = ⋃ q ∈ minimalPrimes A \ {p}, PrimeSpectrum.zeroLocus (q : Set A) := by
     ext x
     simp only [Set.mem_compl_iff, PrimeSpectrum.mem_zeroLocus, SetLike.coe_subset_coe,
       Set.mem_iUnion, Set.mem_diff, Set.mem_singleton_iff, exists_prop]
@@ -52,23 +58,22 @@ end GlobalTheory
 
 namespace GlobalTheory
 
-theorem isOpenImmersion_spec_of_quasiFinite_of_normal {A B : Type} [CommRing A] [CommRing B]
-    [IsDomain B] [IsNoetherianRing A] (φ : A →+* B)
+theorem isOpenImmersion_spec_of_quasiFinite_of_normal
+    {A B : Type} [CommRing A] [CommRing B] [IsDomain B] [IsNoetherianRing A]
+    (φ : A →+* B)
     (hA : ∀ (𝔭 : Ideal A) [𝔭.IsPrime],
       IsDomain (Localization.AtPrime 𝔭) ∧ IsIntegrallyClosed (Localization.AtPrime 𝔭))
     (hφ : φ.FiniteType) (hqf : LocallyQuasiFinite (Spec.map (CommRingCat.ofHom φ)))
-    (hV : ∃ V : (Spec (CommRingCat.of B)).Opens, Nonempty V ∧
-      IsOpenImmersion (V.ι ≫ Spec.map (CommRingCat.ofHom φ))) :
-    IsOpenImmersion (Spec.map (CommRingCat.ofHom φ)) := by
+    (hV : ∃ V : (Spec (CommRingCat.of B)).Opens,
+      Nonempty V ∧ IsOpenImmersion (V.ι ≫ Spec.map (CommRingCat.ofHom φ)))
+    : IsOpenImmersion (Spec.map (CommRingCat.ofHom φ)) := by
   obtain ⟨V, hVne, hVo⟩ := hV
   set f := Spec.map (CommRingCat.ofHom φ) with hf
-  have hAd : ∀ (P : Ideal A) [P.IsPrime], IsDomain (Localization.AtPrime P) :=
-    fun P _ ↦ (hA P).1
+  have hAd : ∀ (P : Ideal A) [P.IsPrime], IsDomain (Localization.AtPrime P) := fun P _ ↦ (hA P).1
   have hft : LocallyOfFiniteType f :=
     (HasRingHomProperty.Spec_iff (P := @LocallyOfFiniteType)).mpr hφ
   let η := genericPoint (Spec (CommRingCat.of B))
-  have hηV : η ∈ V :=
-    ((genericPoint_spec _).mem_open_set_iff V.isOpen).mpr (by simpa using hVne)
+  have hηV : η ∈ V := ((genericPoint_spec _).mem_open_set_iff V.isOpen).mpr (by simpa using hVne)
   let y₀ : PrimeSpectrum A := f η
   have hsp : ∀ x, y₀ ⤳ f x := fun x ↦ (genericPoint_specializes x).map f.continuous
 
@@ -107,8 +112,9 @@ theorem isOpenImmersion_spec_of_quasiFinite_of_normal {A B : Type} [CommRing A] 
     let x : PrimeSpectrum A := Z.ι z
     have hloc : IsLocalization.AtPrime ((Spec.structureSheaf A).presheaf.stalk x) x.asIdeal :=
       StructureSheaf.IsLocalization.to_stalk A x
-    have e₂ := IsLocalization.algEquiv x.asIdeal.primeCompl
-      ((Spec.structureSheaf A).presheaf.stalk x) (Localization.AtPrime x.asIdeal)
+    have e₂ :=
+      IsLocalization.algEquiv x.asIdeal.primeCompl ((Spec.structureSheaf A).presheaf.stalk x)
+        (Localization.AtPrime x.asIdeal)
     haveI := (hA x.asIdeal).2
     have hic : IsIntegrallyClosed ((Spec.structureSheaf A).presheaf.stalk x) :=
       IsIntegrallyClosed.of_equiv e₂.symm.toRingEquiv

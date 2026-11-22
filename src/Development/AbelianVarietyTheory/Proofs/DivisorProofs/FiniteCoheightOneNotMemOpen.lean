@@ -33,16 +33,18 @@ public import ReciprocityTheory.AnalyticForms.PotentialTheory.ProjectiveLinePart
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Set Filter Topology MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 open ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.R
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.Points GlobalTheory.CechPic GlobalTheory.ChartGlue GlobalTheory.Mix
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.Points GlobalTheory.CechPic
+  GlobalTheory.ChartGlue GlobalTheory.Mix
 
 namespace GlobalTheory.Mix
 
-theorem finite_coheight_one_notMem_open : ∀ (X : Scheme.{0}) [IsIntegral X]
-    [AlgebraicGeometry.IsNoetherian X] (U : X.Opens), genericPoint X ∈ U →
-    {z : X | Order.coheight z = 1 ∧ z ∉ U}.Finite := by
+theorem finite_coheight_one_notMem_open
+    : ∀ (X : Scheme.{0}) [IsIntegral X] [AlgebraicGeometry.IsNoetherian X] (U : X.Opens),
+      genericPoint X ∈ U → {z : X | Order.coheight z = 1 ∧ z ∉ U}.Finite := by
   intro X _ _ U hU
   classical
   obtain ⟨S, hS, hc, hi, hUn⟩ :=
@@ -61,8 +63,8 @@ theorem finite_coheight_one_notMem_open : ∀ (X : Scheme.{0}) [IsIntegral X]
     have hm : (hi T hT).genericPoint ∈ (U : Set X)ᶜ := hUn.ge (mem_sUnion.2 ⟨T, hT, hg.mem⟩)
     exact hm (e' ▸ hU)
   by_contra hne
-  have h₃ := Order.coheight_add_one_le (lt_of_le_not_ge h₁ fun e =>
-    hne (Specializes.antisymm h₁ e).eq)
+  have h₃ :=
+    Order.coheight_add_one_le (lt_of_le_not_ge h₁ fun e => hne (Specializes.antisymm h₁ e).eq)
   have h₄ := Order.coheight_add_one_le h₂
   rw [hz1] at h₃
   have h₅ : (1 : ℕ∞) + 1 ≤ 1 := (add_le_add_left (le_add_self.trans h₄) 1).trans h₃

@@ -4,19 +4,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.QuadraticEx
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Two
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Two
 open scoped Pointwise
 
-theorem UpperTheory.V.Two.extTwo :
-    ∀ (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] (U V : Subgroup Γ) (S : Set Γ) (h : U ≤ V) (σ : Γ) (hσ : σ ∈ V) (h2 : σ * σ ∈ U), IsOpen (U.subgroupOf V : Set V) → U.relIndex V = 2 → σ ∉ U → (∀ s ∈ S, s ∈ V → s ∈ U) →
-      ∀ φ ∈ CharOff U S 2, (∀ u u' : U, u'.1 = σ⁻¹ * u.1 * σ → φ u' = φ u) → φ ⟨σ * σ, h2⟩ = 0 →
-      ∃ ψ ∈ CharOff V S 2, ψ ⟨σ, hσ⟩ = 0 ∧ ∀ u : U, ψ ⟨u.1, h u.2⟩ = φ u := by
+theorem UpperTheory.V.Two.extTwo
+    : ∀ (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] (U V : Subgroup Γ)
+        (S : Set Γ) (h : U ≤ V) (σ : Γ) (hσ : σ ∈ V) (h2 : σ * σ ∈ U),
+      IsOpen (U.subgroupOf V : Set V) → U.relIndex V = 2 → σ ∉ U → (∀ s ∈ S, s ∈ V → s ∈ U)
+        → ∀ φ ∈ CharOff U S 2,
+          (∀ u u' : U, u'.1 = σ⁻¹ * u.1 * σ → φ u' = φ u) → φ ⟨σ * σ, h2⟩ = 0
+            → ∃ ψ ∈ CharOff V S 2, ψ ⟨σ, hσ⟩ = 0 ∧ ∀ u : U, ψ ⟨u.1, h u.2⟩ = φ u := by
   intro Γ _ _ _ U V S h σ hσ h2 hopen hidx hσU hS φ hφ hinv hσσ
   classical
   obtain ⟨hlc, hadd, hoff⟩ := hφ
   have key : ∀ a b : Γ, a ∈ V → b ∈ V → (a * b ∈ U ↔ (a ∈ U ↔ b ∈ U)) := by
     intro a b ha hb
-    have := Subgroup.mul_mem_iff_of_index_two (H := U.subgroupOf V) hidx (a := ⟨a, ha⟩) (b := ⟨b, hb⟩)
+    have :=
+      Subgroup.mul_mem_iff_of_index_two (H := U.subgroupOf V) hidx (a := ⟨a, ha⟩) (b := ⟨b, hb⟩)
     simpa only [Subgroup.mem_subgroupOf, Subgroup.coe_mul] using this
   have hσi : σ⁻¹ ∉ U := fun hh => hσU (by simpa using U.inv_mem hh)
   let Φ : Γ → ZMod 2 := fun g => if hg : g ∈ U then φ ⟨g, hg⟩ else 0
@@ -25,8 +31,7 @@ theorem UpperTheory.V.Two.extTwo :
     intro a b ha hb
     rw [hΦ a ha, hΦ b hb, hΦ _ (U.mul_mem ha hb), ← hadd]
     rfl
-  have hR : ∀ a, a ∈ V → a ∉ U → a * σ ∈ U := fun a ha haU =>
-    (key a σ ha hσ).2 (by simp [haU, hσU])
+  have hR : ∀ a, a ∈ V → a ∉ U → a * σ ∈ U := fun a ha haU => (key a σ ha hσ).2 (by simp [haU, hσU])
   have hL : ∀ a, a ∈ V → a ∉ U → σ⁻¹ * a ∈ U := fun a ha haU =>
     (key σ⁻¹ a (V.inv_mem hσ) ha).2 (by simp [haU, hσi])
   have hconj : ∀ a, a ∈ U → σ⁻¹ * a * σ ∈ U := by
@@ -51,14 +56,16 @@ theorem UpperTheory.V.Two.extTwo :
     · have hab : (a * b).1 ∉ U := fun hh => hb ((hk.1 hh).1 ha)
       rw [hψU a ha, hψN b hb, hψN _ hab, ← hΦadd _ _ ha (hR _ b.2 hb), Subgroup.coe_mul, mul_assoc]
     · have hab : (a * b).1 ∉ U := fun hh => ha ((hk.1 hh).2 hb)
-      rw [hψN a ha, hψU b hb, hψN _ hab, ← hΦconj _ hb, ← hΦadd _ _ (hR _ a.2 ha) (hconj _ hb), Subgroup.coe_mul]
+      rw [hψN a ha, hψU b hb, hψN _ hab, ← hΦconj _ hb, ← hΦadd _ _ (hR _ a.2 ha) (hconj _ hb),
+        Subgroup.coe_mul]
       congr 1
       group
     · have hab : (a * b).1 ∈ U := hk.2 (by simp [ha, hb])
       have e1 : Φ (b.1 * σ) = Φ (σ⁻¹ * b.1) := by
         rw [← hΦconj _ (hR _ b.2 hb), show σ⁻¹ * (b.1 * σ) * σ = (σ⁻¹ * b.1) * (σ * σ) by group,
           hΦadd _ _ (hL _ b.2 hb) h2, hΦσ, add_zero]
-      rw [hψN a ha, hψN b hb, hψU _ hab, e1, ← hΦadd _ _ (hR _ a.2 ha) (hL _ b.2 hb), Subgroup.coe_mul]
+      rw [hψN a ha, hψN b hb, hψU _ hab, e1, ← hΦadd _ _ (hR _ a.2 ha) (hL _ b.2 hb),
+        Subgroup.coe_mul]
       congr 1
       group
   have hφ1 : φ 1 = 0 := by
@@ -71,8 +78,12 @@ theorem UpperTheory.V.Two.extTwo :
       hopen.inter (hO.preimage continuous_subtype_val)
     rw [IsLocallyConstant.iff_exists_open]
     intro x
-    refine ⟨(fun y => x⁻¹ * y) ⁻¹' ((U.subgroupOf V : Set V) ∩ Subtype.val ⁻¹' O),
-      hW.preimage (continuous_const.mul continuous_id), ?_, ?_⟩
+    refine ⟨
+      (fun y => x⁻¹ * y) ⁻¹' ((U.subgroupOf V : Set V) ∩ Subtype.val ⁻¹' O),
+      hW.preimage (continuous_const.mul continuous_id),
+      ?_,
+      ?_
+    ⟩
     · have h1 : (1 : U) ∈ Subtype.val ⁻¹' O := by rw [hOe]; exact hφ1
       simp only [Set.mem_preimage, inv_mul_cancel]
       exact ⟨(U.subgroupOf V).one_mem, h1⟩

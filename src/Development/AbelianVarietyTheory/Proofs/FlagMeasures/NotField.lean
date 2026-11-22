@@ -144,7 +144,14 @@ lemma unit_of {T : F} (hT : T ∈ 𝒪[F]) (u : 𝒪[F]) (h : (u : F) * T = 1) :
 
 end
 
-theorem exists_coord : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r k : ℕ) (P : LocNG.FPair H r), Module.finrank E V = k + 2 * r + 1 → P.RelG (LocNG.theta M) → ∃ S : Frames M.L r k, Nonempty (Coord P S) := by
+theorem exists_coord
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
+      M.OK
+        → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r k : ℕ)
+            (P : LocNG.FPair H r),
+          Module.finrank E V = k + 2 * r + 1 → P.RelG (LocNG.theta M)
+            → ∃ S : Frames M.L r k, Nonempty (Coord P S) := by
   intro F _ _ _ E _ _ _ _ M hOK V _ _ H r k P hrank hrel
   have := hOK.loc
   have : Nontrivial E := nontriv M.L
@@ -158,11 +165,13 @@ theorem exists_coord : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpa
     | none =>
       obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible 𝒪[F]
       exact ⟨ϖ, hϖ, fun g hg => by cases hg⟩
-    | some g =>
-      exact ⟨g.q, g.q_irr, fun g' hg => by cases hg; rfl⟩
+    | some g => exact ⟨g.q, g.q_irr, fun g' hg => by cases hg; rfl⟩
   let bs : Module.Basis (Fin (k + 2 * r + 1)) E V := Module.finBasisOfFinrankEq E V hrank
-  have hZ : (Matrix.of fun a c => hf M.L (Matrix.of fun i j => H.h (bs i) (bs j))
-      (bs.equivFun (P.B.f c)) (bs.equivFun (P.A.f a))) = H.Zhat P.A.f P.B.f := by
+  have hZ
+      : (Matrix.of fun a c =>
+          hf M.L (Matrix.of fun i j => H.h (bs i) (bs j)) (bs.equivFun (P.B.f c))
+            (bs.equivFun (P.A.f a)))
+        = H.Zhat P.A.f P.B.f := by
     ext a c
     simp only [Matrix.of_apply, hf_basis]
     rfl
@@ -175,53 +184,59 @@ theorem exists_coord : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpa
   have hG' := hG
   unfold LocNG.FPair.Gv HermSp.Gdet HermSp.normE at hG'
   rw [← hD1, ← hD0, ← hZ] at hG'
-  let S : Frames M.L r k :=
-    { ϖ := ϖ
-      ϖ_irr := hϖ
-      Hm := Matrix.of fun i j => H.h (bs i) (bs j)
-      herm := hermND H bs
-      T := Units.mk0 P.A.T hA0
-      T' := Units.mk0 P.B.T hB0
-      f := fun a => bs.equivFun (P.A.f a)
-      f' := fun a => bs.equivFun (P.B.f a)
-      es := fun j => bs.equivFun (P.A.es j)
-      es' := fun j => bs.equivFun (P.B.es j)
-      gram := fun a c => by
-        rw [hf_basis, gram_eq]
-        rfl
-      gram' := fun a c => by
-        rw [hf_basis, gram_eq]
-        rfl
-      dual := fun a j => by rw [hf_basis, dual_eq]
-      dual' := fun a j => by rw [hf_basis, dual_eq]
-      iso := fun i j => by rw [hf_basis, P.A.h_ss]
-      iso' := fun i j => by rw [hf_basis, P.B.h_ss]
-      w := w
-      relevant := fun a c => by
-        rw [hf_basis, ← hw a c]
-        have hsq : ((-1 : E) ^ (r - (c : ℕ))) * (-1) ^ (r - (c : ℕ)) = 1 := by
-          rw [← mul_pow]
-          simp
-        show H.h (P.B.f c) (P.A.f a) =
-          (-1) ^ (r - (c : ℕ)) * H.h (P.B.f c) (P.A.f a) * (-1) ^ (r - (c : ℕ))
-        linear_combination (-(H.h (P.B.f c) (P.A.f a))) * hsq
-      G_ne := hG'
-      gg := M.split.isSome
-      gg_ok := by
-        intro hgg
-        obtain ⟨g, hg⟩ := Option.isSome_iff_exists.mp hgg
-        obtain ⟨⟨u, v, hu, hv⟩, -⟩ := hsp g hg
-        exact ⟨not_field M.L g, unit_of hAT u hu, unit_of hBT v hv⟩ }
-  refine ⟨S, ⟨{ e := bs.equivFun
-                h_eq := fun x y => hf_basis H bs x y
-                f_eq := fun a => rfl
-                f'_eq := fun a => rfl
-                es_eq := fun a => rfl
-                es'_eq := fun a => rfl
-                T_eq := rfl
-                T'_eq := rfl
-                gg_none := fun h => ?_
-                gg_some := fun g hg => ⟨?_, hϖs g hg⟩ }⟩⟩
+  let S : Frames M.L r k := {
+    ϖ := ϖ
+    ϖ_irr := hϖ
+    Hm := Matrix.of fun i j => H.h (bs i) (bs j)
+    herm := hermND H bs
+    T := Units.mk0 P.A.T hA0
+    T' := Units.mk0 P.B.T hB0
+    f := fun a => bs.equivFun (P.A.f a)
+    f' := fun a => bs.equivFun (P.B.f a)
+    es := fun j => bs.equivFun (P.A.es j)
+    es' := fun j => bs.equivFun (P.B.es j)
+    gram := fun a c => by
+      rw [hf_basis, gram_eq]
+      rfl
+    gram' := fun a c => by
+      rw [hf_basis, gram_eq]
+      rfl
+    dual := fun a j => by rw [hf_basis, dual_eq]
+    dual' := fun a j => by rw [hf_basis, dual_eq]
+    iso := fun i j => by rw [hf_basis, P.A.h_ss]
+    iso' := fun i j => by rw [hf_basis, P.B.h_ss]
+    w := w
+    relevant := fun a c => by
+      rw [hf_basis, ← hw a c]
+      have hsq : ((-1 : E) ^ (r - (c : ℕ))) * (-1) ^ (r - (c : ℕ)) = 1 := by
+        rw [← mul_pow]
+        simp
+      show H.h (P.B.f c) (P.A.f a) =
+        (-1) ^ (r - (c : ℕ)) * H.h (P.B.f c) (P.A.f a) * (-1) ^ (r - (c : ℕ))
+      linear_combination (-(H.h (P.B.f c) (P.A.f a))) * hsq
+    G_ne := hG'
+    gg := M.split.isSome
+    gg_ok := by
+      intro hgg
+      obtain ⟨g, hg⟩ := Option.isSome_iff_exists.mp hgg
+      obtain ⟨⟨u, v, hu, hv⟩, -⟩ := hsp g hg
+      exact ⟨not_field M.L g, unit_of hAT u hu, unit_of hBT v hv⟩
+  }
+  refine ⟨
+    S,
+    ⟨{
+      e := bs.equivFun
+      h_eq := fun x y => hf_basis H bs x y
+      f_eq := fun a => rfl
+      f'_eq := fun a => rfl
+      es_eq := fun a => rfl
+      es'_eq := fun a => rfl
+      T_eq := rfl
+      T'_eq := rfl
+      gg_none := fun h => ?_
+      gg_some := fun g hg => ⟨?_, hϖs g hg⟩
+    }⟩
+  ⟩
   · show M.split.isSome = false
     rw [h]
     rfl

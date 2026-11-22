@@ -11,7 +11,8 @@ public import Formalism.GL3MeanSquares.PrimeCountAsymptoticInProgressions
 
 @[expose] public section
 
-open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2 Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
+open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2
+  Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
 
 namespace QH
 
@@ -57,7 +58,8 @@ private lemma exp_sqrt_le {c : ℝ} (hc : 0 < c) {x : ℝ} (hx : 1 < x) :
   rw [neg_mul, Real.exp_neg, div_div, inv_le_comm₀ (Real.exp_pos _) (by positivity), inv_div]
   exact hexp
 
-private noncomputable def aChi {N : ℕ} (χ : DirichletCharacter ℂ N) (n : ℕ) : ℂ := ((vonMangoldt n : ℝ) : ℂ) * χ (n : ZMod N)
+private noncomputable def aChi {N : ℕ} (χ : DirichletCharacter ℂ N) (n : ℕ) : ℂ :=
+  ((vonMangoldt n : ℝ) : ℂ) * χ (n : ZMod N)
 
 private lemma psi0_bound {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) :
     ∃ K x₁ : ℝ, 1 < x₁ ∧ ∀ t : ℝ, x₁ ≤ t → ‖PI.psi0 χ t‖ ≤ K * t / Real.log t ^ 2 := by
@@ -188,20 +190,29 @@ private lemma one_apply_of_primitive {N : ℕ} [NeZero N] {χ : DirichletCharact
     exact this.symm
   subst hN
   exact MulChar.one_apply (isUnit_of_subsingleton _)
-private theorem l21a {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (hp : χ.IsPrimitive) (y : ℝ) (hy : 1 ≤ y) :
-    IntegrableOn (fun u : ℝ => PI.psi0 χ u / (u : ℂ) ^ 2) (Set.Ioi y) ∧
-      G0 χ y = -(y : ℂ) * ∫ u in Set.Ioi y, PI.psi0 χ u / (u : ℂ) ^ 2 := by
+private theorem l21a
+    {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (hp : χ.IsPrimitive) (y : ℝ) (hy : 1 ≤ y)
+    : IntegrableOn (fun u : ℝ => PI.psi0 χ u / (u : ℂ) ^ 2) (Set.Ioi y)
+      ∧ G0 χ y = -(y : ℂ) * ∫ u in Set.Ioi y, PI.psi0 χ u / (u : ℂ) ^ 2 := by
   have hint := psi_zero_div_sq_integrable χ y hy
   refine ⟨hint, ?_⟩
-  have hlim : Tendsto (fun U => ∫ u in y..U, PI.psi0 χ u / (u:ℂ)^2) atTop
-      (𝓝 (∫ u in Set.Ioi y, PI.psi0 χ u / (u:ℂ)^2)) :=
+  have hlim : Tendsto
+      (fun U => ∫ u in y..U, PI.psi0 χ u / (u:ℂ)^2)
+      atTop (𝓝 (∫ u in Set.Ioi y, PI.psi0 χ u / (u:ℂ)^2)) :=
     intervalIntegral_tendsto_integral_Ioi y hint tendsto_id
   by_cases h : χ = 1
-  · obtain ⟨I, hI, hG⟩ := Formalism.HermitianLattices.GL2PrimeSums.smoothedRemainderRealIntegralFormula (fun n => vonMangoldt n)
-      Formalism.HermitianLattices.GL2a2.psi_zero_integral_constant y hy
+  · obtain ⟨I, hI, hG⟩ :=
+      Formalism.HermitianLattices.GL2PrimeSums.smoothedRemainderRealIntegralFormula
+        (fun n => vonMangoldt n)
+        Formalism.HermitianLattices.GL2a2.psi_zero_integral_constant y hy
     have hone := one_apply_of_primitive hp h
-    have hfun : (fun u : ℝ => PI.psi0 χ u / (u:ℂ)^2) =
-        fun u => (((Formalism.HermitianLattices.GL2PrimeSums.psumR (fun n => vonMangoldt n) u - u) / u ^ 2 : ℝ) : ℂ) := by
+    have hfun
+        : (fun u : ℝ => PI.psi0 χ u / (u : ℂ) ^ 2)
+          = fun u =>
+            (((Formalism.HermitianLattices.GL2PrimeSums.psumR (fun n => vonMangoldt n) u - u)
+                  / u ^ 2
+                : ℝ)
+              : ℂ) := by
       funext u
       simp only [PI.psi0, if_pos h, hone, mul_one, Formalism.HermitianLattices.GL2PrimeSums.psumR]
       push_cast
@@ -213,18 +224,22 @@ private theorem l21a {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (hp : 
     rw [tendsto_nhds_unique hlim hlim2, gChi_one h, hG]
     push_cast
     ring
-  · obtain ⟨I, hI, hG⟩ := Formalism.HermitianLattices.GL2PrimeSums.smoothedRemainderIntegralFormula (aChi χ) (-(logDerivLAtOne χ)) (series_aChi h) y hy
-    have hfun : (fun u : ℝ => Formalism.HermitianLattices.GL2PrimeSums.psum (aChi χ) u / (u:ℂ)^2) =
-        fun u => PI.psi0 χ u / (u:ℂ)^2 := by
+  · obtain ⟨I, hI, hG⟩ :=
+      Formalism.HermitianLattices.GL2PrimeSums.smoothedRemainderIntegralFormula (aChi χ)
+        (-(logDerivLAtOne χ)) (series_aChi h) y hy
+    have hfun
+        : (fun u : ℝ => Formalism.HermitianLattices.GL2PrimeSums.psum (aChi χ) u / (u : ℂ) ^ 2)
+          = fun u => PI.psi0 χ u / (u : ℂ) ^ 2 := by
       funext u
       simp [Formalism.HermitianLattices.GL2PrimeSums.psum, PI.psi0, aChi, h]
     rw [hfun] at hI
     rw [tendsto_nhds_unique hlim hI, gChi_ne h, hG]
 end
 
-theorem g_integral :
-    ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N), χ.IsPrimitive → ∀ y : ℝ, 1 ≤ y →
-      G0 χ y = -(y : ℂ) * ∫ u in Set.Ioi y, PI.psi0 χ u / (u : ℂ) ^ 2 := by
+theorem g_integral
+    : ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N),
+      χ.IsPrimitive
+        → ∀ y : ℝ, 1 ≤ y → G0 χ y = -(y : ℂ) * ∫ u in Set.Ioi y, PI.psi0 χ u / (u : ℂ) ^ 2 := by
   intro N _ χ hp y hy
   exact (l21a χ hp y hy).2
 

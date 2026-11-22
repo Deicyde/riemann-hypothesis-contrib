@@ -13,8 +13,8 @@ namespace PositivityTheory.Rg.Sw.WR.T
 
 open PositivityTheory.Rg.Sw
 
-theorem cls_shift {n : ℕ} (s z : ℂ) (p q : ℕ) (R : MvPolynomial (Bool × Fin n × Fin n) ℂ) (y : E n) :
-    ((dP y : ℝ) : ℂ) ^ (-z) * cls s 0 p q R y = cls s z p q R y := by
+theorem cls_shift {n : ℕ} (s z : ℂ) (p q : ℕ) (R : MvPolynomial (Bool × Fin n × Fin n) ℂ) (y : E n)
+    : ((dP y : ℝ) : ℂ) ^ (-z) * cls s 0 p q R y = cls s z p q R y := by
   simp only [cls, neg_zero, Complex.cpow_zero, one_mul]
   ring
 
@@ -34,10 +34,11 @@ theorem wr_of : Gauss → ClsBound → ClsGain → IBP → Integr → Dens → W
   generalize (Finset.univ.filter fun a => ε a = true).card = p at hR
   generalize (Finset.univ.filter fun a => ε a = false).card = q at hR
   obtain ⟨-, hint⟩ := hI n
-  obtain ⟨g, hgc, hgd, hgv⟩ := hD m n ε c t hc ht P (n ^ 2 + 1) (by
-    push_cast
-    have : (0 : ℝ) ≤ m := Nat.cast_nonneg m
-    linarith)
+  obtain ⟨g, hgc, hgd, hgv⟩ :=
+    hD m n ε c t hc ht P (n ^ 2 + 1) (by
+      push_cast
+      have : (0 : ℝ) ≤ m := Nat.cast_nonneg m
+      linarith)
   refine ⟨g, hgc, hgd, fun β hβ => ?_⟩
   have hGN := fun N => hGain n s hs p q N R
   choose J a G hGc hGb hGeq using hGN
@@ -46,7 +47,8 @@ theorem wr_of : Gauss → ClsBound → ClsGain → IBP → Integr → Dens → W
     have := hCG N j y
     rwa [neg_div] at this
   set KK : ℂ := (-1) ^ n * ((-(Complex.I * t)) ^ n * (herm β).det)⁻¹ with hKK
-  let Fj : (N : ℕ) → Fin (J N) → ℂ → ℂ := fun N j z => ∫ y, ((dP y : ℝ) : ℂ) ^ (-z) * G N j y * chr t β y
+  let Fj : (N : ℕ) → Fin (J N) → ℂ → ℂ := fun N j z =>
+    ∫ y, ((dP y : ℝ) : ℂ) ^ (-z) * G N j y * chr t β y
   let WN : ℕ → ℂ → ℂ := fun N z => KK ^ N * ∑ j, (a N j).eval z * Fj N j z
   let U : ℕ → Set ℂ := fun N => {z : ℂ | (n : ℝ) ^ 2 / 2 < z.re + ((p + q + N : ℕ) : ℝ) / 2}
   let orig : ℂ → ℂ := fun z => ∫ y, ((dP y : ℝ) : ℂ) ^ (-z) * secN ε c t P (herm y) * chr t β y
@@ -58,11 +60,14 @@ theorem wr_of : Gauss → ClsBound → ClsGain → IBP → Integr → Dens → W
     exact (a N j).differentiable.differentiableOn.mul
       (holo hI t β (hGc N j) (((p + q + N : ℕ) : ℝ) / 2) (CG N) (hCG' N j))
 
-  have hsum : ∀ N z, (n : ℝ) ^ 2 / 2 < z.re + ((p + q + N : ℕ) : ℝ) / 2 →
-      ∫ y, (Delta^[N] (cls s z p q R)) y * chr t β y = ∑ j, (a N j).eval z * Fj N j z := by
+  have hsum
+      : ∀ N z,
+        (n : ℝ) ^ 2 / 2 < z.re + ((p + q + N : ℕ) : ℝ) / 2
+          → ∫ y, (Delta^[N] (cls s z p q R)) y * chr t β y = ∑ j, (a N j).eval z * Fj N j z := by
     intro N z hz
-    have e : (fun y => (Delta^[N] (cls s z p q R)) y * chr t β y) =
-        fun y => ∑ j, (a N j).eval z * (((dP y : ℝ) : ℂ) ^ (-z) * G N j y * chr t β y) := by
+    have e
+        : (fun y => (Delta^[N] (cls s z p q R)) y * chr t β y)
+          = fun y => ∑ j, (a N j).eval z * (((dP y : ℝ) : ℂ) ^ (-z) * G N j y * chr t β y) := by
       funext y
       rw [hGeq N z y, Finset.mul_sum, Finset.sum_mul]
       refine Finset.sum_congr rfl fun j _ => by ring
@@ -71,15 +76,17 @@ theorem wr_of : Gauss → ClsBound → ClsGain → IBP → Integr → Dens → W
     rw [integral_const_mul]
   have hbig : ∀ N z, (n : ℝ) ^ 2 / 2 < z.re → WN N z = orig z := by
     intro N z hz
-    have e1 : (fun y => ((dP y : ℝ) : ℂ) ^ (-z) * secN ε c t P (herm y) * chr t β y) =
-        fun y => cls s z p q R y * chr t β y := by
+    have e1
+        : (fun y => ((dP y : ℝ) : ℂ) ^ (-z) * secN ε c t P (herm y) * chr t β y)
+          = fun y => cls s z p q R y * chr t β y := by
       funext y
       rw [hR y, ← cls_shift s z]
     have hpq : (0 : ℝ) ≤ ((p : ℝ) + q) / 2 := by positivity
     have good : Good (cls s z p q R) := by
       refine ⟨(hB n s hs p q R z).1, fun L => ?_⟩
       obtain ⟨C, hC⟩ := (hB n s hs p q R z).2 L
-      exact ⟨fun y => C * dP y ^ (-(z.re + ((p : ℝ) + q) / 2)), (hint _ (by linarith)).const_mul C, hC⟩
+      exact
+        ⟨fun y => C * dP y ^ (-(z.re + ((p : ℝ) + q) / 2)), (hint _ (by linarith)).const_mul C, hC⟩
     have hz' : (n : ℝ) ^ 2 / 2 < z.re + ((p + q + N : ℕ) : ℝ) / 2 := by
       have : (0 : ℝ) ≤ ((p + q + N : ℕ) : ℝ) / 2 := by positivity
       linarith
@@ -97,19 +104,20 @@ theorem wr_of : Gauss → ClsBound → ClsGain → IBP → Integr → Dens → W
       ext z
       simp only [U, Set.mem_ofPred_eq]
       constructor <;> intro h <;> linarith
-    have hpre : IsPreconnected (U N) := by
-      rw [hU]; exact (convex_halfSpace_re_gt _).isPreconnected
+    have hpre : IsPreconnected (U N) := by rw [hU]; exact (convex_halfSpace_re_gt _).isPreconnected
     set z1 : ℂ := (((n : ℝ) ^ 2 / 2 + 1 : ℝ) : ℂ) with hz1
     have hz1re : z1.re = (n : ℝ) ^ 2 / 2 + 1 := by rw [hz1, Complex.ofReal_re]
     have hz1U : z1 ∈ U N := by
       simp only [U, Set.mem_ofPred_eq, hz1re]
       have : (0 : ℝ) ≤ ((p + q + N : ℕ) : ℝ) / 2 := by positivity
       linarith
-    have hO : IsOpen {z : ℂ | (n : ℝ) ^ 2 / 2 < z.re} := isOpen_lt continuous_const Complex.continuous_re
+    have hO : IsOpen {z : ℂ | (n : ℝ) ^ 2 / 2 < z.re} :=
+      isOpen_lt continuous_const Complex.continuous_re
     have hz1O : z1 ∈ {z : ℂ | (n : ℝ) ^ 2 / 2 < z.re} := by
       simp only [Set.mem_ofPred_eq, hz1re]; linarith
     have hev : WN N =ᶠ[𝓝 z1] WN N' :=
-      Filter.eventuallyEq_of_mem (hO.mem_nhds hz1O) fun z hz => (hbig N z hz).trans (hbig N' z hz).symm
+      Filter.eventuallyEq_of_mem (hO.mem_nhds hz1O) fun z hz =>
+        (hbig N z hz).trans (hbig N' z hz).symm
     exact hA.eqOn_of_preconnected_of_eventuallyEq hA' hpre hz1U hev
   have agree' : ∀ N N' z, z ∈ U N → z ∈ U N' → WN N z = WN N' z := by
     intro N N' z hz hz'
@@ -128,10 +136,13 @@ theorem wr_of : Gauss → ClsBound → ClsGain → IBP → Integr → Dens → W
   refine ⟨fun z => WN (Nf z) z, ?_, ⟨(n : ℝ) ^ 2 / 2, fun z hz => ⟨?_, ?_⟩⟩, ?_⟩
   · intro z0
     have hev : (fun z => WN (Nf z) z) =ᶠ[𝓝 z0] WN (Nf z0) :=
-      Filter.eventuallyEq_of_mem ((hUopen (Nf z0)).mem_nhds (hNf z0)) fun z hz => agree' _ _ z (hNf z) hz
-    exact (((hWdiff (Nf z0)).differentiableAt ((hUopen (Nf z0)).mem_nhds (hNf z0)))).congr_of_eventuallyEq hev
-  · have e2 : (fun y => ((dP y : ℝ) : ℂ) ^ (-z) * secN ε c t P (herm y) * chr t β y) =
-        fun y => ((dP y : ℝ) : ℂ) ^ (-z) * cls s 0 p q R y * chr t β y := by
+      Filter.eventuallyEq_of_mem ((hUopen (Nf z0)).mem_nhds (hNf z0)) fun z hz =>
+        agree' _ _ z (hNf z) hz
+    exact (((hWdiff (Nf z0)).differentiableAt
+      ((hUopen (Nf z0)).mem_nhds (hNf z0)))).congr_of_eventuallyEq hev
+  · have e2
+        : (fun y => ((dP y : ℝ) : ℂ) ^ (-z) * secN ε c t P (herm y) * chr t β y)
+          = fun y => ((dP y : ℝ) : ℂ) ^ (-z) * cls s 0 p q R y * chr t β y := by
       funext y; rw [hR y]
     rw [e2]
     obtain ⟨C, hC⟩ := (hB n s hs p q R 0).2 []
@@ -149,11 +160,12 @@ theorem wr_of : Gauss → ClsBound → ClsGain → IBP → Integr → Dens → W
     show WN (Nf 0) 0 = _
     rw [hN0, hgv β hβ]
     have hfun : (fun y => secN ε c t P (herm y)) = cls s 0 p q R := funext hR
-    rw [hfun, hsum (n ^ 2 + 1) 0 (by
-      simp only [Complex.zero_re, zero_add]
-      push_cast
-      have : (0 : ℝ) ≤ (p : ℝ) + q := by positivity
-      linarith)]
+    rw [hfun,
+      hsum (n ^ 2 + 1) 0 (by
+        simp only [Complex.zero_re, zero_add]
+        push_cast
+        have : (0 : ℝ) ≤ (p : ℝ) + q := by positivity
+        linarith)]
     show KK ^ (n ^ 2 + 1) * _ = _
     rw [hKK]
     ring

@@ -13,11 +13,12 @@ open scoped nonZeroDivisors
 
 namespace GlobalTheory.CompanionTheory.PartialZeta
 
-theorem moduleSection_mem_standardOpenSubgroup {F : Type} [Field F] [NumberField F]
-    (w : InfinitePlace F) (t : {r : ℝ // 0 < r}) :
-    moduleSection w t ∈ standardOpenSubgroup F := by
-  have h1 : ∀ s : {r : ℝ // 0 < r}, ∀ v : IsDedekindDomain.HeightOneSpectrum (𝓞 F),
-      ((moduleSection w s : IdeleGroup F) : AdeleRing (𝓞 F) F).2 v = 1 := by
+theorem moduleSection_mem_standardOpenSubgroup
+    {F : Type} [Field F] [NumberField F] (w : InfinitePlace F) (t : {r : ℝ // 0 < r})
+    : moduleSection w t ∈ standardOpenSubgroup F := by
+  have h1
+      : ∀ s : {r : ℝ // 0 < r}, ∀ v : IsDedekindDomain.HeightOneSpectrum (𝓞 F),
+        ((moduleSection w s : IdeleGroup F) : AdeleRing (𝓞 F) F).2 v = 1 := by
     intro s v
     rw [← coe_finiteProj]
     simp [moduleSection, finiteProj_infiniteEmbedding]
@@ -27,12 +28,12 @@ theorem moduleSection_mem_standardOpenSubgroup {F : Type} [Field F] [NumberField
   · rw [h1]; exact one_mem _
   · rw [← map_inv, h1]; exact one_mem _
 
-theorem differentiableOn_continuedLFunction :
-    ∀ (F : Type) [Field F] [NumberField F] (χ : HeckeCharacter F),
-      standardOpenSubgroup F ≤ χ.toIdele.ker →
-        DifferentiableOn ℂ χ.continuedLFunction {1}ᶜ := by
+theorem differentiableOn_continuedLFunction
+    : ∀ (F : Type) [Field F] [NumberField F] (χ : HeckeCharacter F),
+      standardOpenSubgroup F ≤ χ.toIdele.ker → DifferentiableOn ℂ χ.continuedLFunction {1}ᶜ := by
   intro F _ _ χ hU
-  by_cases h : ∃ τ : ℝ, ∀ x : IdeleGroup F,
+  by_cases h
+    : ∃ τ : ℝ, ∀ x : IdeleGroup F,
       (χ.toIdele x : ℂ) = ((ideleModule F x : ℝ) : ℂ) ^ ((τ : ℂ) * Complex.I)
   · obtain ⟨τ, hτ⟩ := h
     let w : InfinitePlace F := Classical.arbitrary _

@@ -13,10 +13,10 @@ open MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G
 
 def PlaceCentredSum.Statement : Prop :=
   ∀ (L K : Type) [Field L] [NumberField L] [Field K] [NumberField K] [Algebra L K]
-    (O : Subalgebra ℤ L) (m : Ideal O) (t : L),
+      (O : Subalgebra ℤ L) (m : Ideal O) (t : L),
     ∑ᶠ v ∈ {v : FinitePlace K | AbsCentredAt O m fun u ↦ v (algebraMap L K u)},
-        -Real.log (v (algebraMap L K t)) =
-      Module.finrank L K *
-        ∑ᶠ w ∈ {w : FinitePlace L | AbsCentredAt O m fun u ↦ w u}, -Real.log (w t)
+        -Real.log (v (algebraMap L K t))
+      = Module.finrank L K
+        * ∑ᶠ w ∈ {w : FinitePlace L | AbsCentredAt O m fun u ↦ w u}, -Real.log (w t)
 
 end GroundTheory.Heights₂.Heights

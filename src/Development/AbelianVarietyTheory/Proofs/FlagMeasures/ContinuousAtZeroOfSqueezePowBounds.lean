@@ -10,11 +10,18 @@ open scoped ENNReal NNReal
 
 namespace GlobalTheory
 
-theorem squeeze_continuousAt_zero (V : Type) [NormedAddCommGroup V] [NormedSpace ℝ V] (d : ℕ)
-    (f : V → ℝ≥0∞) (c : ℝ≥0∞) (hc : c ≠ ⊤)
-    (h : ∀ ε : ℝ, 0 < ε → ε < 1 → ∃ η : ℝ, 0 < η ∧ ∀ x : V, ‖x‖ < η →
-      ENNReal.ofReal ((1 + ε)⁻¹ ^ d) * c ≤ f x ∧ f x ≤ ENNReal.ofReal (((1 + ε) / (1 - ε)) ^ d) * c) :
-    f 0 = c ∧ ContinuousAt f 0 := by
+theorem squeeze_continuousAt_zero
+    (V : Type) [NormedAddCommGroup V] [NormedSpace ℝ V]
+    (d : ℕ) (f : V → ℝ≥0∞) (c : ℝ≥0∞) (hc : c ≠ ⊤)
+    (h : ∀ ε : ℝ,
+      0 < ε → ε < 1
+        → ∃ η : ℝ,
+          0 < η
+            ∧ ∀ x : V,
+              ‖x‖ < η
+                → ENNReal.ofReal ((1 + ε)⁻¹ ^ d) * c ≤ f x
+                  ∧ f x ≤ ENNReal.ofReal (((1 + ε) / (1 - ε)) ^ d) * c)
+    : f 0 = c ∧ ContinuousAt f 0 := by
   have h1 : Tendsto (fun ε : ℝ => (1 + ε)⁻¹ ^ d) (𝓝 0) (𝓝 1) := by
     have : ContinuousAt (fun ε : ℝ => (1 + ε)⁻¹ ^ d) 0 :=
       ((continuous_const.add continuous_id).continuousAt.inv₀ (by
@@ -24,7 +31,8 @@ theorem squeeze_continuousAt_zero (V : Type) [NormedAddCommGroup V] [NormedSpace
   have h2 : Tendsto (fun ε : ℝ => ((1 + ε) / (1 - ε)) ^ d) (𝓝 0) (𝓝 1) := by
     have : ContinuousAt (fun ε : ℝ => ((1 + ε) / (1 - ε)) ^ d) 0 :=
       ((continuous_const.add continuous_id).continuousAt.div
-        (continuous_const.sub continuous_id).continuousAt (by
+        (continuous_const.sub continuous_id).continuousAt
+        (by
           change (1 - 0 : ℝ) ≠ 0
           simpa only [sub_zero] using (one_ne_zero : (1 : ℝ) ≠ 0))).pow d
     simpa using this.tendsto

@@ -8,9 +8,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EigRank
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField IsLocalRing
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField IsLocalRing
 open scoped CategoryTheory.Obj Matrix TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.PullbackSections (TanM tv)
 open GlobalTheory.KS (rsT pbT C1 IsCoc IsCob)
 open GlobalTheory.LogKS (IsField)
@@ -24,9 +27,12 @@ namespace GlobalTheory.BalProjOpen
 
 open GlobalTheory.BalProj
 
-theorem eigSp_eq_range {O k : Type} [Field k] {n : ℕ} (B : O → Matrix (Fin n) (Fin n) k) (χ : O → k)
-    (P : Matrix (Fin n) (Fin n) k) (hP : ∀ a, P * B a = χ a • P) (hfix : ∀ c ∈ eigSp B χ, c ᵥ* P = c) :
-    eigSp B χ = LinearMap.range (Matrix.vecMulLinear P) := by
+theorem eigSp_eq_range
+    {O k : Type} [Field k]
+    {n : ℕ} (B : O → Matrix (Fin n) (Fin n) k)
+    (χ : O → k) (P : Matrix (Fin n) (Fin n) k)
+    (hP : ∀ a, P * B a = χ a • P) (hfix : ∀ c ∈ eigSp B χ, c ᵥ* P = c)
+    : eigSp B χ = LinearMap.range (Matrix.vecMulLinear P) := by
   ext c
   constructor
   · intro hc
@@ -35,21 +41,27 @@ theorem eigSp_eq_range {O k : Type} [Field k] {n : ℕ} (B : O → Matrix (Fin n
     show (d ᵥ* P) ᵥ* B a = χ a • (d ᵥ* P)
     rw [Matrix.vecMul_vecMul, hP a, Matrix.vecMul_smul]
 
-theorem finrank_range_eq_trace {k : Type} [Field k] {n : ℕ} (P : Matrix (Fin n) (Fin n) k) (hP : P * P = P) :
-    (Module.finrank k (LinearMap.range (Matrix.vecMulLinear P)) : k) = P.trace := by
+theorem finrank_range_eq_trace
+    {k : Type} [Field k] {n : ℕ} (P : Matrix (Fin n) (Fin n) k) (hP : P * P = P)
+    : (Module.finrank k (LinearMap.range (Matrix.vecMulLinear P)) : k) = P.trace := by
   have h1 : Matrix.vecMulLinear P = Matrix.toLin' Pᵀ := by
     ext c i
     simp [Matrix.mulVec_transpose]
   have hi : IsIdempotentElem (Matrix.toLin' Pᵀ) := by
     show Matrix.toLin' Pᵀ * Matrix.toLin' Pᵀ = Matrix.toLin' Pᵀ
     rw [Module.End.mul_eq_comp, ← Matrix.toLin'_mul, ← Matrix.transpose_mul, hP]
-  rw [h1, ← (LinearMap.IsIdempotentElem.isProj_range _ hi).trace, Matrix.trace_toLin'_eq, Matrix.trace_transpose]
+  rw [h1, ← (LinearMap.IsIdempotentElem.isProj_range _ hi).trace, Matrix.trace_toLin'_eq,
+    Matrix.trace_transpose]
 
-theorem eigRank_cast_eq_trace {O R k : Type} [CommRing O] [CommRing R] [Field k] (φ : R →+* k) {n : ℕ}
-    (A : O → Matrix (Fin n) (Fin n) R) (hmul : ∀ a b, A (a * b) = A a * A b) (χ : O → R)
-    {J : Type} [Fintype J] (f : J → R) (b : J → O) (h1 : ∑ i, f i * χ (b i) = 1)
-    (h2 : ∀ a, ∑ i, f i • A (a * b i) = χ a • ∑ i, f i • A (b i)) :
-    (eigRank φ A χ : k) = φ (∑ i, f i • A (b i)).trace := by
+theorem eigRank_cast_eq_trace
+    {O R k : Type} [CommRing O] [CommRing R] [Field k]
+    (φ : R →+* k)
+    {n : ℕ} (A : O → Matrix (Fin n) (Fin n) R) (hmul : ∀ a b, A (a * b) = A a * A b)
+    (χ : O → R)
+    {J : Type} [Fintype J]
+    (f : J → R) (b : J → O)
+    (h1 : ∑ i, f i * χ (b i) = 1) (h2 : ∀ a, ∑ i, f i • A (a * b i) = χ a • ∑ i, f i • A (b i))
+    : (eigRank φ A χ : k) = φ (∑ i, f i • A (b i)).trace := by
   set P := ∑ i, f i • A (b i) with hPdef
   have hPA : ∀ a, P * A a = χ a • P := by
     intro a
@@ -71,24 +83,30 @@ theorem eigRank_cast_eq_trace {O R k : Type} [CommRing O] [CommRing R] [Field k]
     have : Pb = ∑ i, φ (f i) • (A (b i)).map φ := by
       ext i j
       set_option synthInstance.maxHeartbeats 100000 in
-        simp [Pb, hPdef, Matrix.sum_apply, map_sum]
+      simp [Pb, hPdef, Matrix.sum_apply, map_sum]
     rw [this, Matrix.vecMul_sum]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp_rw [Matrix.vecMul_smul, hc _, smul_smul, ← Finset.sum_smul, ← map_mul, ← map_sum, h1, map_one, one_smul]
+    simp_rw [Matrix.vecMul_smul, hc _, smul_smul, ← Finset.sum_smul, ← map_mul, ← map_sum, h1, map_one, one_smul]
   have hPbPb : Pb * Pb = Pb := by rw [← Matrix.map_mul, hPP]
   unfold eigRank
   rw [eigSp_eq_range _ _ Pb hPbA hfix, finrank_range_eq_trace Pb hPbPb]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [Pb, Matrix.trace, map_sum]
+  simp [Pb, Matrix.trace, map_sum]
 
-theorem isOpen_eigRank_eq_of_datum {O R K : Type} [CommRing O] [CommRing R] [Field K] [CharZero K] (j : K →+* R)
-    {n : ℕ} (A : O → Matrix (Fin n) (Fin n) R) (hmul : ∀ a b, A (a * b) = A a * A b) (χ : O → R)
-    {J : Type} [Fintype J] (f : J → R) (b : J → O) (h1 : ∑ i, f i * χ (b i) = 1)
-    (h2 : ∀ a, ∑ i, f i • A (a * b i) = χ a • ∑ i, f i • A (b i)) (N : ℕ) :
-    IsOpen {𝔭 : PrimeSpectrum R | eigRank (algebraMap R 𝔭.asIdeal.ResidueField) A χ = N} := by
+theorem isOpen_eigRank_eq_of_datum
+    {O R K : Type} [CommRing O] [CommRing R] [Field K] [CharZero K]
+    (j : K →+* R)
+    {n : ℕ} (A : O → Matrix (Fin n) (Fin n) R) (hmul : ∀ a b, A (a * b) = A a * A b)
+    (χ : O → R)
+    {J : Type} [Fintype J]
+    (f : J → R) (b : J → O)
+    (h1 : ∑ i, f i * χ (b i) = 1) (h2 : ∀ a, ∑ i, f i • A (a * b i) = χ a • ∑ i, f i • A (b i))
+    (N : ℕ)
+    : IsOpen {𝔭 : PrimeSpectrum R | eigRank (algebraMap R 𝔭.asIdeal.ResidueField) A χ = N} := by
   set t := (∑ i, f i • A (b i)).trace with ht
-  have key : ∀ (𝔭 : PrimeSpectrum R) (M : ℕ),
-      eigRank (algebraMap R 𝔭.asIdeal.ResidueField) A χ = M ↔ t - M ∈ 𝔭.asIdeal := by
+  have key
+      : ∀ (𝔭 : PrimeSpectrum R) (M : ℕ),
+        eigRank (algebraMap R 𝔭.asIdeal.ResidueField) A χ = M ↔ t - M ∈ 𝔭.asIdeal := by
     intro 𝔭 M
     haveI : CharZero 𝔭.asIdeal.ResidueField :=
       (RingHom.charZero_iff ((algebraMap R 𝔭.asIdeal.ResidueField).comp j).injective).1 inferInstance
@@ -98,26 +116,33 @@ theorem isOpen_eigRank_eq_of_datum {O R K : Type} [CommRing O] [CommRing R] [Fie
     intro 𝔭
     unfold eigRank
     exact (Submodule.finrank_le _).trans (by simp)
-  have hset : {𝔭 : PrimeSpectrum R | eigRank (algebraMap R 𝔭.asIdeal.ResidueField) A χ = N} =
-      (⋃ M ∈ (Finset.range (n + 1)).filter (· ≠ N), PrimeSpectrum.zeroLocus {t - (M : R)})ᶜ := by
-    ext 𝔭
-    simp only [Set.mem_setOf_eq, Set.mem_compl_iff, Set.mem_iUnion, Finset.mem_filter, Finset.mem_range,
-      PrimeSpectrum.mem_zeroLocus, Set.singleton_subset_iff, SetLike.mem_coe, exists_prop, not_exists, not_and]
-    constructor
-    · intro h M hM hM'
-      exact hM.2 (((key 𝔭 M).2 hM').symm.trans h)
-    · intro h
-      by_contra hne
-      exact h _ ⟨Nat.lt_succ_of_le (hle 𝔭), hne⟩ ((key 𝔭 _).1 rfl)
+  have hset
+      : {𝔭 : PrimeSpectrum R | eigRank (algebraMap R 𝔭.asIdeal.ResidueField) A χ = N}
+        = (⋃ M ∈ (Finset.range (n + 1)).filter (· ≠ N), PrimeSpectrum.zeroLocus {t - (M : R)})ᶜ :=
+    by
+      ext 𝔭
+      simp only [Set.mem_setOf_eq, Set.mem_compl_iff, Set.mem_iUnion, Finset.mem_filter,
+        Finset.mem_range, PrimeSpectrum.mem_zeroLocus, Set.singleton_subset_iff, SetLike.mem_coe,
+        exists_prop, not_exists, not_and]
+      constructor
+      · intro h M hM hM'
+        exact hM.2 (((key 𝔭 M).2 hM').symm.trans h)
+      · intro h
+        by_contra hne
+        exact h _ ⟨Nat.lt_succ_of_le (hle 𝔭), hne⟩ ((key 𝔭 _).1 rfl)
   rw [hset]
   exact (isClosed_biUnion_finset fun M _ => PrimeSpectrum.isClosed_zeroLocus _).isOpen_compl
 
-theorem exists_datum {E : Type} [Field E] [NumberField E] (F : IntermediateField ℚ ℂ)
-    (hF : ∀ (τ : E →+* ℂ) (a : E), τ a ∈ F) (R : Type) [CommRing R] (iF : F →+* R) (n : ℕ)
-    (A : 𝓞 E → Matrix (Fin n) (Fin n) R) (hadd : ∀ a b, A (a + b) = A a + A b) (τ : E →+* ℂ) :
-    ∃ (J : Type) (_ : Fintype J) (f : J → R) (b : J → 𝓞 E),
-      ∑ i, f i * embR F hF iF τ (b i) = 1 ∧
-      ∀ a, ∑ i, f i • A (a * b i) = embR F hF iF τ a • ∑ i, f i • A (b i) := by
+theorem exists_datum
+    {E : Type} [Field E] [NumberField E]
+    (F : IntermediateField ℚ ℂ) (hF : ∀ (τ : E →+* ℂ) (a : E), τ a ∈ F)
+    (R : Type) [CommRing R]
+    (iF : F →+* R)
+    (n : ℕ) (A : 𝓞 E → Matrix (Fin n) (Fin n) R) (hadd : ∀ a b, A (a + b) = A a + A b)
+    (τ : E →+* ℂ)
+    : ∃ (J : Type) (_ : Fintype J) (f : J → R) (b : J → 𝓞 E),
+      ∑ i, f i * embR F hF iF τ (b i) = 1
+        ∧ ∀ a, ∑ i, f i • A (a * b i) = embR F hF iF τ a • ∑ i, f i • A (b i) := by
   classical
   set bO := RingOfIntegers.basis E
   set bE := integralBasis E
@@ -148,8 +173,8 @@ theorem exists_datum {E : Type} [Field E] [NumberField E] (F : IntermediateField
     rw [← sub_eq_zero]
     refine hnd.1 _ fun y => ?_
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [Algebra.traceForm_apply, sub_mul, map_sub, _root_.one_mul, Finset.sum_mul, map_sum, sub_eq_zero,
-      Algebra.trace_eq_matrix_trace bE y, Matrix.trace]
+      rw [Algebra.traceForm_apply, sub_mul, map_sub, _root_.one_mul, Finset.sum_mul, map_sum,
+        sub_eq_zero, Algebra.trace_eq_matrix_trace bE y, Matrix.trace]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [Matrix.diag, Algebra.leftMulMatrix_eq_repr_mul, hrep]
     congr 1
@@ -173,29 +198,38 @@ theorem exists_datum {E : Type} [Field E] [NumberField E] (F : IntermediateField
   set_option synthInstance.maxHeartbeats 100000 in
     · simp_rw [hg, ← map_mul, ← map_sum, ← hbE, hA, map_one]
   · intro a
-    calc ∑ i, g (d i) • A (a * bO i)
-        = ∑ i, ∑ j, (g (d i) * ((bO.repr (a * bO i) j : ℤ) : R)) • A (bO j) := by
-          refine Finset.sum_congr rfl fun i _ => ?_
-          rw [hexp (a * bO i), Finset.smul_sum]
-          refine Finset.sum_congr rfl fun j _ => ?_
-          rw [← smul_smul, Int.cast_smul_eq_zsmul]
+    calc
+      ∑ i, g (d i) • A (a * bO i)
+          = ∑ i, ∑ j, (g (d i) * ((bO.repr (a * bO i) j : ℤ) : R)) • A (bO j) := by
+        refine Finset.sum_congr rfl fun i _ => ?_
+        rw [hexp (a * bO i), Finset.smul_sum]
+        refine Finset.sum_congr rfl fun j _ => ?_
+        rw [← smul_smul, Int.cast_smul_eq_zsmul]
       _ = ∑ j, (∑ i, g (d i) * ((bO.repr (a * bO i) j : ℤ) : R)) • A (bO j) := by
-          rw [Finset.sum_comm]
-          simp_rw [Finset.sum_smul]
+        rw [Finset.sum_comm]
+        simp_rw [Finset.sum_smul]
       _ = ∑ j, (embR F hF iF τ a * g (d j)) • A (bO j) := by
-          refine Finset.sum_congr rfl fun j _ => ?_
-          congr 1
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [hg, ← map_mul, ← hB a j, map_sum]
-          refine Finset.sum_congr rfl fun i _ => ?_
-          rw [map_mul g, map_intCast g, _root_.mul_comm]
+        refine Finset.sum_congr rfl fun j _ => ?_
+        congr 1
+        set_option synthInstance.maxHeartbeats 100000 in
+          rw [hg, ← map_mul, ← hB a j, map_sum]
+        refine Finset.sum_congr rfl fun i _ => ?_
+        rw [map_mul g, map_intCast g, _root_.mul_comm]
       _ = _ := by
-          rw [Finset.smul_sum]
-          simp_rw [smul_smul]
+        rw [Finset.smul_sum]
+        simp_rw [smul_smul]
 
-theorem isOpen_eigRank_eq : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] (F : IntermediateField ℚ ℂ) (hF : ∀ (τ : E →+* ℂ) (a : E), τ a ∈ F) (R : Type) [CommRing R] (iF : F →+* R) (n : ℕ) (A : 𝓞 E → Matrix (Fin n) (Fin n) R), A 1 = 1 → (∀ a b, A (a + b) = A a + A b) → (∀ a b, A (a * b) = A a * A b) → ∀ (τ : E →+* ℂ) (N : ℕ), IsOpen {𝔭 : PrimeSpectrum R | GlobalTheory.BalProj.eigRank (algebraMap R 𝔭.asIdeal.ResidueField) A (GlobalTheory.BalProj.embR F hF iF τ) = N} := by
-  intro E _ _ _ F hF R _ iF n A h1 hadd hmul τ N
-  obtain ⟨J, _, f, b, hf1, hf2⟩ := exists_datum F hF R iF n A hadd τ
-  exact isOpen_eigRank_eq_of_datum iF A hmul _ f b hf1 hf2 N
+theorem isOpen_eigRank_eq
+    : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] (F : IntermediateField ℚ ℂ)
+        (hF : ∀ (τ : E →+* ℂ) (a : E), τ a ∈ F) (R : Type) [CommRing R] (iF : F →+* R) (n : ℕ)
+        (A : 𝓞 E → Matrix (Fin n) (Fin n) R),
+      A 1 = 1 → (∀ a b, A (a + b) = A a + A b) → (∀ a b, A (a * b) = A a * A b)
+        → ∀ (τ : E →+* ℂ) (N : ℕ),
+          IsOpen
+            {𝔭 : PrimeSpectrum R | GlobalTheory.BalProj.eigRank (algebraMap R 𝔭.asIdeal.ResidueField) A (GlobalTheory.BalProj.embR F hF iF τ) = N} :=
+  by
+    intro E _ _ _ F hF R _ iF n A h1 hadd hmul τ N
+    obtain ⟨J, _, f, b, hf1, hf2⟩ := exists_datum F hF R iF n A hadd τ
+    exact isOpen_eigRank_eq_of_datum iF A hmul _ f b hf1 hf2 N
 
 end GlobalTheory.BalProjOpen

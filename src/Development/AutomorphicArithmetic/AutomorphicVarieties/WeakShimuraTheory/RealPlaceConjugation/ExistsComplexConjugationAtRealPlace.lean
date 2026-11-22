@@ -5,17 +5,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PublishedTh
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Two
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws UpperTheory.V.Two
 open scoped Classical
 
-theorem UpperTheory.V.Ws.exists_complexConjugation_at_realPlace :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (w : InfinitePlace F), w.IsReal → ∃ c : G F Ω, IsCCAt w c := by
+theorem UpperTheory.V.Ws.exists_complexConjugation_at_realPlace
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+        (w : InfinitePlace F),
+      w.IsReal → ∃ c : G F Ω, IsCCAt w c := by
   intro F Ω _ _ _ _ _ w hw
   let φ : F →+* ℂ := w.embedding
   have hreal : ∀ x : F, starRingEnd ℂ (φ x) = φ x := by
     intro x
-    have h := congrArg (fun ψ : F →+* ℂ => ψ x)
-      (NumberField.ComplexEmbedding.isReal_iff.mp (NumberField.InfinitePlace.isReal_iff.mp hw))
+    have h :=
+      congrArg
+        (fun ψ : F →+* ℂ => ψ x)
+        (NumberField.ComplexEmbedding.isReal_iff.mp (NumberField.InfinitePlace.isReal_iff.mp hw))
     simpa using h
   letI : Algebra F ℂ := φ.toAlgebra
   have halg : ∀ x : F, algebraMap F ℂ x = φ x := fun x => rfl
@@ -23,21 +29,23 @@ theorem UpperTheory.V.Ws.exists_complexConjugation_at_realPlace :
   haveI : Normal F Ω := IsAlgClosure.normal F Ω
   let j : Ω →ₐ[F] ℂ := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   let E : IntermediateField F ℂ := j.fieldRange
   let e : Ω ≃ₐ[F] E := AlgEquiv.ofInjectiveField j
   haveI : Normal F E := Normal.of_algEquiv e
-  let cj : ℂ →ₐ[F] ℂ :=
-    { (starRingEnd ℂ : ℂ →+* ℂ) with
-      commutes' := fun x => by
-        show starRingEnd ℂ (algebraMap F ℂ x) = algebraMap F ℂ x
-        rw [halg]; exact hreal x }
+  let cj : ℂ →ₐ[F] ℂ := {
+    (starRingEnd ℂ : ℂ →+* ℂ) with
+    commutes' := fun x => by
+      show starRingEnd ℂ (algebraMap F ℂ x) = algebraMap F ℂ x
+      rw [halg]
+      exact hreal x
+  }
   have hrange : (cj.comp E.val).fieldRange = E := AlgHom.fieldRange_of_normal _
   have hmem : ∀ y : Ω, starRingEnd ℂ (j y) ∈ E := by
     intro y
-    have h1 : (cj.comp E.val) (e y) ∈ (cj.comp E.val).fieldRange := AlgHom.mem_fieldRange.mpr ⟨e y, rfl⟩
+    have h1 : (cj.comp E.val) (e y) ∈ (cj.comp E.val).fieldRange :=
+      AlgHom.mem_fieldRange.mpr ⟨e y, rfl⟩
     rw [hrange] at h1
     have h2 : ((e y : E) : ℂ) = j y := rfl
     simpa [cj, h2] using h1

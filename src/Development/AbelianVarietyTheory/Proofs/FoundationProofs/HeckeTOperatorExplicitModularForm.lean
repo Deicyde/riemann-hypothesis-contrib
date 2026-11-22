@@ -28,9 +28,12 @@ lemma isBoundedAt_finsetSum_heckeT {c : OnePoint ℝ} {k : ℤ} {ι : Type*} (s 
     rw [Finset.sum_insert ha]
     exact (h a (Finset.mem_insert_self a s)).add (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
 
-theorem heckeT_modularForm : ∀ (N l q : ℕ) (k : ℤ) (σ : SL(2, ℤ)), 0 < N → q.Prime → ¬ q ∣ N * l →
-    GlobalTheory.Hk.IsDia N l q σ → ∀ f : ModularForm (GlobalTheory.Hk.lev N l) k,
-    ∃ g : ModularForm (GlobalTheory.Hk.lev N l) k, ⇑g = GlobalTheory.Hk.heckeT k q σ ⇑f := by
+theorem heckeT_modularForm
+    : ∀ (N l q : ℕ) (k : ℤ) (σ : SL(2, ℤ)),
+      0 < N → q.Prime → ¬ q ∣ N * l → GlobalTheory.Hk.IsDia N l q σ
+        → ∀ f : ModularForm (GlobalTheory.Hk.lev N l) k,
+          ∃ g : ModularForm (GlobalTheory.Hk.lev N l) k,
+            ⇑g = GlobalTheory.Hk.heckeT k q σ ⇑f := by
   intro N l q k σ hN hq hql hσ f
   have hq0 : 0 < q := hq.pos
   have hl : 0 < l := by
@@ -39,7 +42,8 @@ theorem heckeT_modularForm : ∀ (N l q : ℕ) (k : ℤ) (σ : SL(2, ℤ)), 0 < 
     · exact h
   have hinv : ∀ γ ∈ lev N l, (⇑f : ℍ → ℂ) ∣[k] γ = ⇑f := fun γ hγ =>
     f.slash_action_eq' _ ⟨γ, hγ, rfl⟩
-  refine ⟨{ toFun := heckeT k q σ ⇑f, slash_action_eq' := ?_, holo' := ?_, bdd_at_cusps' := ?_ }, rfl⟩
+  refine
+    ⟨{ toFun := heckeT k q σ ⇑f, slash_action_eq' := ?_, holo' := ?_, bdd_at_cusps' := ?_ }, rfl⟩
   · rintro _ ⟨A, (hA : A ∈ lev N l), rfl⟩
     exact GlobalTheory.T.heckeT_slash_eq_of_slash_eq N l q k σ ⇑f hN hq hql hσ hinv A hA
   · exact (GlobalTheory.T.mdifferentiable_heckeOperatorsExplicit q k σ ⇑f hq0 f.holo').2.2
@@ -50,12 +54,14 @@ theorem heckeT_modularForm : ∀ (N l q : ℕ) (k : ℤ) (σ : SL(2, ℤ)), 0 < 
     unfold heckeT
     rw [hsum, hv]
     refine OnePoint.IsBoundedAt.add (isBoundedAt_finsetSum_heckeT _ _ fun j _ => ?_) ?_
-    · exact GlobalTheory.T.slash_rat_isBoundedAt_gamma1InterGamma0Level N l k _ hN hl (by simp [Matrix.det_fin_two_of]; exact_mod_cast hq0) f c hc
+    · exact GlobalTheory.T.slash_rat_isBoundedAt_gamma1InterGamma0Level N l k _ hN hl
+        (by simp [Matrix.det_fin_two_of]; exact_mod_cast hq0) f c hc
     · set D := Matrix.GeneralLinearGroup.mkOfDetNeZero !![(q : ℚ), 0; 0, 1]
           (by simp [Matrix.det_fin_two_of]; exact_mod_cast hq0.ne') with hD
-      have e : ((⇑f ∣[k] σ) ∣[k] Matrix.GeneralLinearGroup.map (Rat.castHom ℝ) D)
-          = ⇑f ∣[k] Matrix.GeneralLinearGroup.map (Rat.castHom ℝ)
-              (Matrix.SpecialLinearGroup.mapGL ℚ σ * D) := by
+      have e
+          : ((⇑f ∣[k] σ) ∣[k] Matrix.GeneralLinearGroup.map (Rat.castHom ℝ) D)
+            = ⇑f ∣[k] Matrix.GeneralLinearGroup.map (Rat.castHom ℝ)
+                (Matrix.SpecialLinearGroup.mapGL ℚ σ * D) := by
         rw [map_mul, SlashAction.slash_mul, SL_slash]
         congr 2
         ext i j

@@ -11,14 +11,20 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Charact
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pass GlobalTheory.Cut
-open GlobalTheory.IndefiniteRowSideFullHecke.CongruenceModuleMatrices GlobalTheory.ConsExists GlobalTheory.SpanRing
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pass GlobalTheory.Cut
+open GlobalTheory.IndefiniteRowSideFullHecke.CongruenceModuleMatrices GlobalTheory.ConsExists
+  GlobalTheory.SpanRing
 
 namespace GlobalTheory
 
-theorem localSubalgebra_eval_sub_mem_maximalIdeal {X O : Type} [CommRing O] [IsLocalRing O]
-    (T : Subalgebra O (X → O)) [IsLocalRing T] {f : X → O} (hf : f ∈ T) (x y : X) :
-    f x - f y ∈ IsLocalRing.maximalIdeal O := by
+theorem localSubalgebra_eval_sub_mem_maximalIdeal
+    {X O : Type} [CommRing O] [IsLocalRing O]
+    (T : Subalgebra O (X → O)) [IsLocalRing T]
+    {f : X → O} (hf : f ∈ T)
+    (x y : X)
+    : f x - f y ∈ IsLocalRing.maximalIdeal O := by
   classical
   haveI : (IsLocalRing.maximalIdeal O).IsMaximal := IsLocalRing.maximalIdeal.isMaximal O
   letI : Field (O ⧸ IsLocalRing.maximalIdeal O) := Ideal.Quotient.field _
@@ -39,11 +45,21 @@ theorem localSubalgebra_eval_sub_mem_maximalIdeal {X O : Type} [CommRing O] [IsL
   rw [hker y, ← hker x, RingHom.mem_ker, hψ, Ideal.Quotient.eq_zero_iff_mem] at hg
   simpa using hg
 
-theorem hensel_roots_of_local_family : ∀ {X O : Type} [CommRing O] [IsDomain O] [IsLocalRing O] [HenselianRing O (IsLocalRing.maximalIdeal O)] {t : ℕ} (T : Subalgebra O (X → O)), IsLocalRing T → ∀ (P : X → Polynomial O), (∀ j, (fun x => (P x).coeff j) ∈ T) → (∀ x, (P x).Monic ∧ (P x).natDegree = t) → ∀ (π : X) (d : Fin t → O), (∀ a b, a ≠ b → IsUnit (d a - d b)) → P π = ∏ c, (Polynomial.X - Polynomial.C (d c)) → ∀ x, ∃ β : Fin t → O, Function.Injective β ∧ P x = ∏ c, (Polynomial.X - Polynomial.C (β c)) := by
+theorem hensel_roots_of_local_family
+    : ∀ {X O : Type} [CommRing O] [IsDomain O] [IsLocalRing O]
+        [HenselianRing O (IsLocalRing.maximalIdeal O)] {t : ℕ} (T : Subalgebra O (X → O)),
+      IsLocalRing T
+        → ∀ (P : X → Polynomial O),
+          (∀ j, (fun x => (P x).coeff j) ∈ T) → (∀ x, (P x).Monic ∧ (P x).natDegree = t)
+            → ∀ (π : X) (d : Fin t → O),
+              (∀ a b, a ≠ b → IsUnit (d a - d b)) → P π = ∏ c, (Polynomial.X - Polynomial.C (d c))
+                → ∀ x, ∃ β : Fin t → O,
+                  Function.Injective β ∧ P x = ∏ c, (Polynomial.X - Polynomial.C (β c)) := by
   classical
   intro X O _ _ _ _ t T hT P hcoeff hdeg π d hd hπ x
-  have hmap : (P x).map (Ideal.Quotient.mk (IsLocalRing.maximalIdeal O)) =
-      (P π).map (Ideal.Quotient.mk (IsLocalRing.maximalIdeal O)) := by
+  have hmap
+      : (P x).map (Ideal.Quotient.mk (IsLocalRing.maximalIdeal O))
+        = (P π).map (Ideal.Quotient.mk (IsLocalRing.maximalIdeal O)) := by
     ext j
     simp only [Polynomial.coeff_map]
     rw [Ideal.Quotient.eq]
@@ -72,7 +88,8 @@ theorem hensel_roots_of_local_family : ∀ {X O : Type} [CommRing O] [IsDomain O
     have hmem : d b - d a ∈ IsLocalRing.maximalIdeal O := by
       have := Ideal.sub_mem _ (hβm a) (hβm b)
       rw [hab] at this
-      convert this using 1; ring
+      convert this using 1
+      ring
     exact (IsLocalRing.mem_maximalIdeal _).mp hmem (hd b a (Ne.symm hne))
   refine ⟨β, hinj, ?_⟩
   have hx0 : P x ≠ 0 := (hdeg x).1.ne_zero

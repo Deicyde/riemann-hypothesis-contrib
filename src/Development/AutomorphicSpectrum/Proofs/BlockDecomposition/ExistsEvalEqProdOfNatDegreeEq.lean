@@ -8,10 +8,11 @@ namespace GlobalTheory.CompanionTheory.AicSplit
 
 open Polynomial
 
-theorem exists_eval_eq_prod_of_natDegree_eq {B : Type} [CommRing B]
-    (hB : ∀ p : Polynomial B, p.Monic → 0 < p.natDegree → ∃ a, p.eval a = 0) (d : ℕ) :
-    ∀ P : Polynomial B, P.Monic → P.natDegree = d →
-      ∃ b : Fin d → B, ∀ a : B, P.eval a = ∏ j, (a - b j) := by
+theorem exists_eval_eq_prod_of_natDegree_eq
+    {B : Type} [CommRing B]
+    (hB : ∀ p : Polynomial B, p.Monic → 0 < p.natDegree → ∃ a, p.eval a = 0) (d : ℕ)
+    : ∀ P : Polynomial B,
+      P.Monic → P.natDegree = d → ∃ b : Fin d → B, ∀ a : B, P.eval a = ∏ j, (a - b j) := by
   induction d with
   | zero =>
     intro P hP hd
@@ -28,8 +29,7 @@ theorem exists_eval_eq_prod_of_natDegree_eq {B : Type} [CommRing B]
       rw [h0, natDegree_zero] at hd
       omega
     · obtain ⟨a0, ha0⟩ := hB P hP (by rw [hd]; exact Nat.succ_pos d)
-      have hroot : (X - C a0) * (P /ₘ (X - C a0)) = P :=
-        mul_divByMonic_eq_iff_isRoot.mpr ha0
+      have hroot : (X - C a0) * (P /ₘ (X - C a0)) = P := mul_divByMonic_eq_iff_isRoot.mpr ha0
       have hQ : (P /ₘ (X - C a0)).Monic :=
         Monic.of_mul_monic_left (monic_X_sub_C a0) (by rw [hroot]; exact hP)
       have hQd : (P /ₘ (X - C a0)).natDegree = d := by

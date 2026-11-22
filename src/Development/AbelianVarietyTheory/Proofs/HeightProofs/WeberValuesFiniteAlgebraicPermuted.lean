@@ -16,16 +16,24 @@ namespace GlobalTheory.FieldSize
 theorem weberSet_finite (L : PeriodPair) {n : ℕ} (hn : 0 < n) : (weberSet L n).Finite := by
   have hn0 : (n : ℂ) ≠ 0 := Nat.cast_ne_zero.2 hn.ne'
   have hnZ : (0 : ℤ) < n := by exact_mod_cast hn
-  let f : ℤ × ℤ → ℂ := fun s => L.g₂ * L.g₃ / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) *
-    L.weierstrassP ((s.1 * L.ω₁ + s.2 * L.ω₂) / n)
+  let f : ℤ × ℤ → ℂ := fun s =>
+    L.g₂ * L.g₃ / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) * L.weierstrassP ((s.1 * L.ω₁ + s.2 * L.ω₂) / n)
   refine Set.Finite.insert _
     ((((Set.finite_Ico (0 : ℤ) n).prod (Set.finite_Ico (0 : ℤ) n)).image f).subset ?_)
   rintro _ ⟨z, hz, -, rfl⟩
   obtain ⟨a, b, rfl⟩ := PeriodPair.mem_lattice.1 hz
-  refine ⟨(a % n, b % n), ⟨⟨Int.emod_nonneg _ hnZ.ne', Int.emod_lt_of_pos _ hnZ⟩,
-    ⟨Int.emod_nonneg _ hnZ.ne', Int.emod_lt_of_pos _ hnZ⟩⟩, ?_⟩
-  have e : (a * L.ω₁ + b * L.ω₂) / n = (((a % n : ℤ) : ℂ) * L.ω₁ + ((b % n : ℤ) : ℂ) * L.ω₂) / n +
-      (((a / n : ℤ) : ℂ) * L.ω₁ + ((b / n : ℤ) : ℂ) * L.ω₂) := by
+  refine ⟨
+    (a % n, b % n),
+    ⟨
+      ⟨Int.emod_nonneg _ hnZ.ne', Int.emod_lt_of_pos _ hnZ⟩,
+      ⟨Int.emod_nonneg _ hnZ.ne', Int.emod_lt_of_pos _ hnZ⟩
+    ⟩,
+    ?_
+  ⟩
+  have e
+      : (a * L.ω₁ + b * L.ω₂) / n
+        = (((a % n : ℤ) : ℂ) * L.ω₁ + ((b % n : ℤ) : ℂ) * L.ω₂) / n
+          + (((a / n : ℤ) : ℂ) * L.ω₁ + ((b / n : ℤ) : ℂ) * L.ω₂) := by
     have a1 : ((a % n : ℤ) : ℂ) + n * ((a / n : ℤ) : ℂ) = a := by
       exact_mod_cast Int.emod_add_mul_ediv a n
     have a2 : ((b % n : ℤ) : ℂ) + n * ((b / n : ℤ) : ℂ) = b := by
@@ -36,12 +44,17 @@ theorem weberSet_finite (L : PeriodPair) {n : ℕ} (hn : 0 < n) : (weberSet L n)
   simp only [f]
   rw [e, L.weierstrassP_add_coe _ ⟨_, PeriodPair.mem_lattice.2 ⟨_, _, rfl⟩⟩]
 
-theorem exists_map_weber_eq (L : PeriodPair) (n : ℕ) (h2 : L.g₂ ≠ 0) (h3 : L.g₃ ≠ 0) (τ : ℂ ≃+* ℂ)
+theorem exists_map_weber_eq
+    (L : PeriodPair)
+    (n : ℕ)
+    (h2 : L.g₂ ≠ 0) (h3 : L.g₃ ≠ 0)
+    (τ : ℂ ≃+* ℂ)
     (hτ : τ (L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2)) = L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2))
-    (t : ℂ) (hnt : (n : ℂ) * t ∈ L.lattice) (ht : t ∉ L.lattice) :
-    ∃ t', (n : ℂ) * t' ∈ L.lattice ∧ t' ∉ L.lattice ∧
-      τ (L.g₂ * L.g₃ / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) * L.weierstrassP t) =
-        L.g₂ * L.g₃ / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) * L.weierstrassP t' := by
+    (t : ℂ) (hnt : (n : ℂ) * t ∈ L.lattice) (ht : t ∉ L.lattice)
+    : ∃ t',
+      (n : ℂ) * t' ∈ L.lattice ∧ t' ∉ L.lattice
+        ∧ τ (L.g₂ * L.g₃ / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) * L.weierstrassP t)
+          = L.g₂ * L.g₃ / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) * L.weierstrassP t' := by
   have hD := g₂_cube_sub_g₃_sq_ne_zero L
   set J := L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) with hJ
   set u := L.g₂ * L.g₃ / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) with hu
@@ -63,10 +76,8 @@ theorem exists_map_weber_eq (L : PeriodPair) (n : ℕ) (h2 : L.g₂ ≠ 0) (h3 :
     rw [H.g₃_eq, show (m ^ 6)⁻¹ = ((m ^ 2)⁻¹) ^ 3 by ring, hmu, hJ1, hu, hJ]
     generalize L.g₂ ^ 3 - 27 * L.g₃ ^ 2 = D
     ring
-  have f2 : L'.g₂ = τ L'.g₂ := by
-    rw [e2]; simp [hτ, map_ofNat]
-  have f3 : L'.g₃ = τ L'.g₃ := by
-    rw [e3]; simp [hτ, map_ofNat]
+  have f2 : L'.g₂ = τ L'.g₂ := by rw [e2]; simp [hτ, map_ofNat]
+  have f3 : L'.g₃ = τ L'.g₃ := by rw [e3]; simp [hτ, map_ofNat]
   obtain ⟨s, -, hc⟩ := GlobalTheory.ConjPoint.exists_conjEquiv f2 f3
   obtain ⟨w, hw⟩ := latticePoint_surjective L' (s (latticePoint L' (m * t)))
   obtain ⟨t', rfl⟩ : ∃ t', w = m * t' := ⟨m⁻¹ * w, by field_simp⟩
@@ -78,7 +89,20 @@ theorem exists_map_weber_eq (L : PeriodPair) (n : ℕ) (h2 : L.g₂ ≠ 0) (h3 :
   rw [H.weierstrassP_mul, H.weierstrassP_mul, hmu] at h5
   exact h5.symm
 
-theorem weberSet_finite_algebraic_permuted : ∀ (L : PeriodPair) (n : ℕ), 0 < n → L.g₂ ≠ 0 → L.g₃ ≠ 0 → (weberSet L n).Finite ∧ (IsAlgebraic ℚ (L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2)) → ∀ w ∈ weberSet L n, IsAlgebraic ℚ w) ∧ ∀ τ : ℂ ≃+* ℂ, τ (L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2)) = (L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2)) → ∀ t, (n : ℂ) * t ∈ L.lattice → t ∉ L.lattice → ∃ t', (n : ℂ) * t' ∈ L.lattice ∧ t' ∉ L.lattice ∧ τ (L.g₂ * L.g₃ / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) * L.weierstrassP t) = (L.g₂ * L.g₃ / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) * L.weierstrassP t') := by
+theorem weberSet_finite_algebraic_permuted
+    : ∀ (L : PeriodPair) (n : ℕ),
+      0 < n → L.g₂ ≠ 0 → L.g₃ ≠ 0
+        → (weberSet L n).Finite
+          ∧ (IsAlgebraic ℚ (L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2))
+            → ∀ w ∈ weberSet L n, IsAlgebraic ℚ w)
+          ∧ ∀ τ : ℂ ≃+* ℂ,
+            τ (L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2)) = (L.g₂ ^ 3 / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2))
+              → ∀ t,
+                (n : ℂ) * t ∈ L.lattice → t ∉ L.lattice
+                  → ∃ t',
+                    (n : ℂ) * t' ∈ L.lattice ∧ t' ∉ L.lattice
+                      ∧ τ (L.g₂ * L.g₃ / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) * L.weierstrassP t)
+                        = (L.g₂ * L.g₃ / (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) * L.weierstrassP t') := by
   intro L n hn h2 h3
   have hn0 : (n : ℂ) ≠ 0 := Nat.cast_ne_zero.2 hn.ne'
   refine ⟨weberSet_finite L hn, fun hj => ?_, exists_map_weber_eq L n h2 h3⟩

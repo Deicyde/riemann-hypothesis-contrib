@@ -112,9 +112,10 @@ set_option maxHeartbeats 800000 in
 theorem orbProd : OrbProd := by
   intro I G T _ _ Gv Tv _ _ K U C₀ C P Q ι ιv θ θv f fv δ hι hθ hf hinv hδ S hS hout
   classical
-  have hR : ∀ v : S, ∃ R : Finset (Gv v),
-      (∀ a ∈ R, ∀ b ∈ R, ∀ t, ∀ u ∈ U v, b = ιv v t * a * u → a = b) ∧
-      ∀ y, fv v (y⁻¹ * P.p v δ * θv v y) ≠ 0 → ∃ t, ∃ s ∈ R, ∃ u ∈ U v, y = ιv v t * s * u :=
+  have hR
+      : ∀ v : S, ∃ R : Finset (Gv v),
+        (∀ a ∈ R, ∀ b ∈ R, ∀ t, ∀ u ∈ U v, b = ιv v t * a * u → a = b)
+          ∧ ∀ y, fv v (y⁻¹ * P.p v δ * θv v y) ≠ 0 → ∃ t, ∃ s ∈ R, ∃ u ∈ U v, y = ιv v t * s * u :=
     fun v => thin (ιv v) (θv v) (U v) (fv v) (P.p v δ) (hS v v.2)
   choose R hRd hRc using hR
   choose x hx1 hx2 using fun c : ((v : S) → Gv v) => glue P S c
@@ -131,8 +132,10 @@ theorem orbProd : OrbProd := by
     obtain ⟨hK, -, -, h1, -⟩ := hout v hvn.2
     simp only [map_mul, map_inv, hθ]
     rw [hinv v _ (hK hvn.1), h1]
-  have hcov : ∀ y, f (y⁻¹ * δ * θ y) ≠ 0 →
-      ∃ t, ∃ c ∈ Fintype.piFinset R, ∃ u ∈ P.box U, y = ι t * x c * u := by
+  have hcov
+      : ∀ y,
+        f (y⁻¹ * δ * θ y) ≠ 0
+          → ∃ t, ∃ c ∈ Fintype.piFinset R, ∃ u ∈ P.box U, y = ι t * x c * u := by
     intro y hy
     have hloc : ∀ v, fv v ((P.p v y)⁻¹ * P.p v δ * θv v (P.p v y)) ≠ 0 := by
       intro v h0
@@ -140,23 +143,29 @@ theorem orbProd : OrbProd := by
       rw [hf]
       refine finprod_eq_zero _ v ?_ (hsupp y)
       simpa only [map_mul, map_inv, hθ] using h0
-    have hA : ∀ v : S, ∃ tv, ∃ s ∈ R v, ∃ uv ∈ U v, P.p v y = ιv v tv * s * uv :=
-      fun v => hRc v (P.p v y) (hloc v)
+    have hA : ∀ v : S, ∃ tv, ∃ s ∈ R v, ∃ uv ∈ U v, P.p v y = ιv v tv * s * uv := fun v =>
+      hRc v (P.p v y) (hloc v)
     choose tS c hc uS huS heS using hA
-    have hB : ∀ v, v ∉ S → ∃ tv, ∃ uv ∈ U v, P.p v y = ιv v tv * uv :=
-      fun v hv => (hout v hv).2.2.2.2 _ (hloc v)
+    have hB : ∀ v, v ∉ S → ∃ tv, ∃ uv ∈ U v, P.p v y = ιv v tv * uv := fun v hv =>
+      (hout v hv).2.2.2.2 _ (hloc v)
     let tv : (v : I) → Tv v := fun v =>
-      if hv : v ∈ S then tS ⟨v, hv⟩ else if P.p v y ∈ K v then 1 else (hB v hv).choose
-    obtain ⟨t, ht⟩ := Q.surj tv (by
-      have hae := P.ae y
-      rw [Filter.eventually_cofinite] at hae ⊢
-      refine (hae.union S.finite_toSet).subset ?_
-      intro v hv
-      by_contra hvn
-      simp only [Set.mem_union, Set.mem_setOf_eq, Finset.mem_coe, not_or, not_not] at hvn
-      apply hv
-      simp only [tv, dif_neg hvn.2, if_pos hvn.1]
-      exact (C₀ v).one_mem)
+      if hv : v ∈ S then
+        tS ⟨v, hv⟩
+      else if P.p v y ∈ K v then
+        1
+      else
+        (hB v hv).choose
+    obtain ⟨t, ht⟩ :=
+      Q.surj tv (by
+        have hae := P.ae y
+        rw [Filter.eventually_cofinite] at hae ⊢
+        refine (hae.union S.finite_toSet).subset ?_
+        intro v hv
+        by_contra hvn
+        simp only [Set.mem_union, Set.mem_setOf_eq, Finset.mem_coe, not_or, not_not] at hvn
+        apply hv
+        simp only [tv, dif_neg hvn.2, if_pos hvn.1]
+        exact (C₀ v).one_mem)
     refine ⟨t, c, Fintype.mem_piFinset.2 hc, (ι t * x c)⁻¹ * y, ?_, by group⟩
     rw [mem_box]
     intro v
@@ -177,14 +186,15 @@ theorem orbProd : OrbProd := by
           exact euv
         rw [e3]
         exact huv
-  have hdist : ∀ c ∈ Fintype.piFinset R, ∀ c' ∈ Fintype.piFinset R, ∀ t, ∀ u ∈ P.box U,
-      x c' = ι t * x c * u → c = c' := by
+  have hdist
+      : ∀ c ∈ Fintype.piFinset R, ∀ c' ∈ Fintype.piFinset R, ∀ t, ∀ u ∈ P.box U,
+        x c' = ι t * x c * u → c = c' := by
     intro c hc c' hc' t u hu e
     funext v
     have e' := congrArg (P.p v) e
     rw [map_mul, map_mul, hι, hx1, hx1] at e'
-    exact hRd v (c v) (Fintype.mem_piFinset.1 hc v) (c' v) (Fintype.mem_piFinset.1 hc' v)
-      (Q.p v t) (P.p v u) ((mem_box P U u).1 hu v) e'
+    exact hRd v (c v) (Fintype.mem_piFinset.1 hc v) (c' v) (Fintype.mem_piFinset.1 hc' v) (Q.p v t)
+      (P.p v u) ((mem_box P U u).1 hu v) e'
   have hfinv : ∀ u ∈ P.box U, ∀ g, f (u⁻¹ * g * θ u) = f g := by
     intro u hu g
     rw [hf, hf]
@@ -193,40 +203,45 @@ theorem orbProd : OrbProd := by
     exact hinv v _ ((mem_box P U u).1 hu v) _
   have hδg : ∀ t, (ι t)⁻¹ * δ * θ (ι t) = δ := by
     intro t
-    have h1 := P.inj ((ι t)⁻¹ * δ * θ (ι t) * δ⁻¹) (fun v => by
-      simp only [map_mul, map_inv, hθ, hι]
-      rw [hδ v (Q.p v t)]
-      simp)
+    have h1 :=
+      P.inj ((ι t)⁻¹ * δ * θ (ι t) * δ⁻¹) (fun v => by
+        simp only [map_mul, map_inv, hθ, hι]
+        rw [hδ v (Q.p v t)]
+        simp)
     exact mul_inv_eq_one.1 h1
-  have hglob := orbReps T G ι (Q.box C) θ (P.box U) f δ hfinv hδg _ (Fintype.piFinset R) x
-    hdist hcov
+  have hglob :=
+    orbReps T G ι (Q.box C) θ (P.box U) f δ hfinv hδg _ (Fintype.piFinset R) x hdist hcov
   refine ⟨?_, ?_⟩
   · unfold FinOrb
     refine ⟨(Fintype.piFinset R).image x, fun y hy => ?_⟩
     obtain ⟨t, c, hc, u, hu, e⟩ := hcov y hy
     exact ⟨t, x c, Finset.mem_image_of_mem _ hc, u, hu, e⟩
   · rw [hglob]
-    have hloc : ∏ v ∈ S, orb (ιv v) (C v) (θv v) (U v) (fv v) (P.p v δ) =
-        ∏ v : S, ∑ s ∈ R v, ((Subgroup.comap (ιv v)
-          (stabilizer (Gv v) (s : Gv v ⧸ U v))).relIndex (C v) : ℂ) *
-            fv v (s⁻¹ * P.p v δ * θv v s) := by
+    have hloc
+        : ∏ v ∈ S, orb (ιv v) (C v) (θv v) (U v) (fv v) (P.p v δ)
+          = ∏ v : S, ∑ s ∈ R v, ((Subgroup.comap (ιv v)
+              (stabilizer (Gv v) (s : Gv v ⧸ U v))).relIndex (C v) : ℂ) *
+                fv v (s⁻¹ * P.p v δ * θv v s) := by
       rw [← Finset.prod_coe_sort]
       refine Finset.prod_congr rfl (fun v _ => ?_)
-      exact orbReps (Tv v) (Gv v) (ιv v) (C v) (θv v) (U v) (fv v) (P.p v δ) (hinv v) (hδ v)
-        (Gv v) (R v) id (hRd v) (hRc v)
+      exact orbReps (Tv v) (Gv v) (ιv v) (C v) (θv v) (U v) (fv v) (P.p v δ) (hinv v) (hδ v) (Gv v)
+        (R v) id (hRd v) (hRc v)
     rw [hloc, Finset.prod_univ_sum]
     refine Finset.sum_congr rfl (fun c hc => ?_)
     rw [Finset.prod_mul_distrib]
     congr 1
-    · have hA : Subgroup.comap ι (stabilizer G ((x c : G) : G ⧸ P.box U)) =
-          Q.box (fun v => Subgroup.comap (ιv v)
-            (stabilizer (Gv v) ((P.p v (x c) : Gv v) : Gv v ⧸ U v))) := by
+    · have hA
+          : Subgroup.comap ι (stabilizer G ((x c : G) : G ⧸ P.box U))
+            = Q.box (fun v =>
+              Subgroup.comap (ιv v) (stabilizer (Gv v) ((P.p v (x c) : Gv v) : Gv v ⧸ U v))) := by
         ext t
         rw [Subgroup.mem_comap, mem_stab, mem_box, mem_box]
         refine forall_congr' (fun v => ?_)
         rw [Subgroup.mem_comap, mem_stab, map_mul, map_mul, map_inv, hι]
-      have hCA : ∀ v ∉ S, C v ≤ Subgroup.comap (ιv v)
-          (stabilizer (Gv v) ((P.p v (x c) : Gv v) : Gv v ⧸ U v)) := by
+      have hCA
+          : ∀ v ∉ S,
+            C v
+              ≤ Subgroup.comap (ιv v) (stabilizer (Gv v) ((P.p v (x c) : Gv v) : Gv v ⧸ U v)) := by
         intro v hv a ha
         rw [Subgroup.mem_comap, mem_stab, hx2 c v hv]
         simpa using (hout v hv).2.2.1 (Subgroup.mem_map_of_mem _ ha)

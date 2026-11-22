@@ -15,42 +15,43 @@ namespace GlobalTheory.Cris.ExpBij
 variable {B : Type} [CommRing B] {J : Ideal B}
 
 def dpFil (δ : DividedPowers J) (m : ℕ) : Ideal B :=
-  Ideal.span {x | ∃ l : List (ℕ × B), (∀ p ∈ l, p.2 ∈ J) ∧ m ≤ (l.map Prod.fst).sum ∧
-    x = (l.map fun p ↦ δ.dpow p.1 p.2).prod}
+  Ideal.span
+    {x | ∃ l : List (ℕ × B), (∀ p ∈ l, p.2 ∈ J) ∧ m ≤ (l.map Prod.fst).sum ∧
+      x = (l.map fun p ↦ δ.dpow p.1 p.2).prod}
 
 variable (δ : DividedPowers J)
-
 
 set_option autoImplicit false in
 open DividedPowers in
 variable {B : Type} [CommRing B] {J : Ideal B} in
 variable (δ : DividedPowers J) in
-theorem _root_.GlobalTheory.Cris.ExpBij.dpFil_anti {m n : ℕ} (h : m ≤ n) :
-    _root_.GlobalTheory.Cris.ExpBij.dpFil δ n ≤ _root_.GlobalTheory.Cris.ExpBij.dpFil δ m := by
+theorem _root_.GlobalTheory.Cris.ExpBij.dpFil_anti {m n : ℕ} (h : m ≤ n)
+    : _root_.GlobalTheory.Cris.ExpBij.dpFil δ n ≤ _root_.GlobalTheory.Cris.ExpBij.dpFil δ m := by
   refine Ideal.span_mono ?_
   rintro x ⟨l, hl, hs, rfl⟩
   exact ⟨l, hl, h.trans hs, rfl⟩
 
-
 set_option autoImplicit false in
 open DividedPowers in
 variable {B : Type} [CommRing B] {J : Ideal B} in
 variable (δ : DividedPowers J) in
-theorem _root_.GlobalTheory.Cris.ExpBij.mem_dpFil_zero (a : B) : a ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ 0 := by
+theorem _root_.GlobalTheory.Cris.ExpBij.mem_dpFil_zero (a : B)
+    : a ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ 0 := by
   have h1 : (1 : B) ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ 0 :=
     Ideal.subset_span ⟨[], by simp, by simp, by simp⟩
   simpa using Ideal.mul_mem_left _ a h1
 
-
 set_option autoImplicit false in
 open DividedPowers in
 variable {B : Type} [CommRing B] {J : Ideal B} in
 variable (δ : DividedPowers J) in
-theorem _root_.GlobalTheory.Cris.ExpBij.mul_mem_dpFil {m n : ℕ} {a b : B} (ha : a ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ m)
-    (hb : b ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ n) :
-    a * b ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ (m + n) := by
-  have key : _root_.GlobalTheory.Cris.ExpBij.dpFil δ m * _root_.GlobalTheory.Cris.ExpBij.dpFil δ n ≤
-      _root_.GlobalTheory.Cris.ExpBij.dpFil δ (m + n) := by
+theorem _root_.GlobalTheory.Cris.ExpBij.mul_mem_dpFil
+    {m n : ℕ} {a b : B} (ha : a ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ m)
+    (hb : b ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ n)
+    : a * b ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ (m + n) := by
+  have key
+      : _root_.GlobalTheory.Cris.ExpBij.dpFil δ m * _root_.GlobalTheory.Cris.ExpBij.dpFil δ n
+        ≤ _root_.GlobalTheory.Cris.ExpBij.dpFil δ (m + n) := by
     unfold _root_.GlobalTheory.Cris.ExpBij.dpFil
     rw [Ideal.span_mul_span']
     refine Ideal.span_mono ?_
@@ -64,34 +65,33 @@ theorem _root_.GlobalTheory.Cris.ExpBij.mul_mem_dpFil {m n : ℕ} {a b : B} (ha 
     · simp [List.map_append, List.prod_append]
   exact key (Ideal.mul_mem_mul ha hb)
 
-
 set_option autoImplicit false in
 open DividedPowers in
 variable {B : Type} [CommRing B] {J : Ideal B} in
 variable (δ : DividedPowers J) in
-theorem _root_.GlobalTheory.Cris.ExpBij.pow_mem_dpFil {m : ℕ} {a : B} (ha : a ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ m)
-    (n : ℕ) : a ^ n ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ (n * m) := by
+theorem _root_.GlobalTheory.Cris.ExpBij.pow_mem_dpFil
+    {m : ℕ} {a : B} (ha : a ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ m) (n : ℕ)
+    : a ^ n ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ (n * m) := by
   induction n with
   | zero => simpa using _root_.GlobalTheory.Cris.ExpBij.mem_dpFil_zero δ (1 : B)
   | succ n ih =>
     rw [pow_succ, Nat.succ_mul]
     exact _root_.GlobalTheory.Cris.ExpBij.mul_mem_dpFil δ ih ha
 
-
 set_option autoImplicit false in
 open DividedPowers in
 variable {B : Type} [CommRing B] {J : Ideal B} in
 variable (δ : DividedPowers J) in
-theorem _root_.GlobalTheory.Cris.ExpBij.dpow_mem_dpFil {a : B} (ha : a ∈ J) (n : ℕ) :
-    δ.dpow n a ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ n :=
+theorem _root_.GlobalTheory.Cris.ExpBij.dpow_mem_dpFil {a : B} (ha : a ∈ J) (n : ℕ)
+    : δ.dpow n a ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ n :=
   Ideal.subset_span ⟨[(n, a)], by simpa using ha, by simp, by simp⟩
 
-
 set_option autoImplicit false in
 open DividedPowers in
 variable {B : Type} [CommRing B] {J : Ideal B} in
 variable (δ : DividedPowers J) in
-theorem _root_.GlobalTheory.Cris.ExpBij.dpFil_le {m : ℕ} (hm : 1 ≤ m) : _root_.GlobalTheory.Cris.ExpBij.dpFil δ m ≤ J := by
+theorem _root_.GlobalTheory.Cris.ExpBij.dpFil_le {m : ℕ} (hm : 1 ≤ m)
+    : _root_.GlobalTheory.Cris.ExpBij.dpFil δ m ≤ J := by
   refine Ideal.span_le.2 ?_
   rintro x ⟨l, hl, hs, rfl⟩
   have hex : ∃ p ∈ l, p.1 ≠ 0 := by
@@ -103,31 +103,33 @@ theorem _root_.GlobalTheory.Cris.ExpBij.dpFil_le {m : ℕ} (hm : 1 ≤ m) : _roo
       exact h p hp
     omega
   obtain ⟨p, hp, hp0⟩ := hex
-  obtain ⟨c, hc⟩ := List.dvd_prod (List.mem_map.2 ⟨p, hp, rfl⟩ :
-    δ.dpow p.1 p.2 ∈ l.map fun p ↦ δ.dpow p.1 p.2)
+  obtain ⟨c, hc⟩ :=
+    List.dvd_prod (List.mem_map.2 ⟨p, hp, rfl⟩ : δ.dpow p.1 p.2 ∈ l.map fun p ↦ δ.dpow p.1 p.2)
   rw [SetLike.mem_coe, hc]
   exact J.mul_mem_right _ (δ.dpow_mem hp0 (hl p hp))
 
-
 set_option autoImplicit false in
 open DividedPowers in
 variable {B : Type} [CommRing B] {J : Ideal B} in
 variable (δ : DividedPowers J) in
-theorem _root_.GlobalTheory.Cris.ExpBij.mem_dpFil_one {a : B} (ha : a ∈ J) : a ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ 1 := by
+theorem _root_.GlobalTheory.Cris.ExpBij.mem_dpFil_one {a : B} (ha : a ∈ J)
+    : a ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ 1 := by
   have h := _root_.GlobalTheory.Cris.ExpBij.dpow_mem_dpFil δ ha 1
   rwa [δ.dpow_one ha] at h
 
-
 set_option autoImplicit false in
 open DividedPowers in
 variable {B : Type} [CommRing B] {J : Ideal B} in
 variable (δ : DividedPowers J) in
-theorem _root_.GlobalTheory.Cris.ExpBij.dpow_mem_dpFil_mul {m : ℕ} (hm : 1 ≤ m) {a : B}
-    (ha : a ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ m) (n : ℕ) :
-    δ.dpow n a ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ (n * m) := by
-  have hgen : ∀ l : List (ℕ × B), (∀ p ∈ l, p.2 ∈ J) → ∀ n,
-      δ.dpow n (l.map fun p ↦ δ.dpow p.1 p.2).prod ∈
-        _root_.GlobalTheory.Cris.ExpBij.dpFil δ (n * (l.map Prod.fst).sum) := by
+theorem _root_.GlobalTheory.Cris.ExpBij.dpow_mem_dpFil_mul
+    {m : ℕ} (hm : 1 ≤ m) {a : B} (ha : a ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ m) (n : ℕ)
+    : δ.dpow n a ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ (n * m) := by
+  have hgen
+      : ∀ l : List (ℕ × B),
+        (∀ p ∈ l, p.2 ∈ J)
+          → ∀ n,
+            δ.dpow n (l.map fun p ↦ δ.dpow p.1 p.2).prod
+              ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ (n * (l.map Prod.fst).sum) := by
     intro l
     induction l with
     | nil =>
@@ -143,18 +145,20 @@ theorem _root_.GlobalTheory.Cris.ExpBij.dpow_mem_dpFil_mul {m : ℕ} (hm : 1 ≤
       · rw [hk, δ.dpow_zero hp, one_mul, zero_add]
         exact ih hl' n
       · rw [mul_comm (δ.dpow p.1 p.2), δ.dpow_mul (δ.dpow_mem hk hp), δ.dpow_comp hk hp]
-        have hy : (l.map fun q ↦ δ.dpow q.1 q.2).prod ∈
-            _root_.GlobalTheory.Cris.ExpBij.dpFil δ (l.map Prod.fst).sum :=
+        have hy
+            : (l.map fun q ↦ δ.dpow q.1 q.2).prod
+              ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ (l.map Prod.fst).sum :=
           Ideal.subset_span ⟨l, hl', le_rfl, rfl⟩
         have h1 := _root_.GlobalTheory.Cris.ExpBij.pow_mem_dpFil δ hy n
-        have h2 : (↑(n.uniformBell p.1) : B) * δ.dpow (n * p.1) p.2 ∈
-            _root_.GlobalTheory.Cris.ExpBij.dpFil δ (n * p.1) :=
+        have h2
+            : (↑(n.uniformBell p.1) : B) * δ.dpow (n * p.1) p.2
+              ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ (n * p.1) :=
           Ideal.mul_mem_left _ _ (_root_.GlobalTheory.Cris.ExpBij.dpow_mem_dpFil δ hp _)
         have h3 := _root_.GlobalTheory.Cris.ExpBij.mul_mem_dpFil δ h1 h2
         rw [show n * (p.1 + (l.map Prod.fst).sum) = n * (l.map Prod.fst).sum + n * p.1 by ring]
         exact h3
-  have hJ : ∀ x ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ m, x ∈ J :=
-    fun x hx => _root_.GlobalTheory.Cris.ExpBij.dpFil_le δ hm hx
+  have hJ : ∀ x ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ m, x ∈ J := fun x hx =>
+    _root_.GlobalTheory.Cris.ExpBij.dpFil_le δ hm hx
   revert n
   unfold _root_.GlobalTheory.Cris.ExpBij.dpFil at ha
   induction ha using Submodule.span_induction with
@@ -183,14 +187,15 @@ theorem _root_.GlobalTheory.Cris.ExpBij.dpow_mem_dpFil_mul {m : ℕ} (hm : 1 ≤
 
 variable {δ}
 
-
 set_option autoImplicit false in
 open DividedPowers in
 variable {B : Type} [CommRing B] {J : Ideal B} in
 variable (δ : DividedPowers J) in
 variable {δ} in
-theorem _root_.GlobalTheory.Cris.ExpBij.dpExp_bijOn : ∀ (B : Type) [CommRing B] (J : Ideal B) (δ : DividedPowers J),
-    _root_.GlobalTheory.Cris.IsNilDP δ → Set.BijOn (_root_.GlobalTheory.Cris.dpExp δ) (J : Set B) {u | u - 1 ∈ J} := by
+theorem _root_.GlobalTheory.Cris.ExpBij.dpExp_bijOn
+    : ∀ (B : Type) [CommRing B] (J : Ideal B) (δ : DividedPowers J),
+      _root_.GlobalTheory.Cris.IsNilDP δ
+        → Set.BijOn (_root_.GlobalTheory.Cris.dpExp δ) (J : Set B) {u | u - 1 ∈ J} := by
   intro B _ J δ hδ
   obtain ⟨N, hN⟩ := id hδ
   have hbot : _root_.GlobalTheory.Cris.ExpBij.dpFil δ N = ⊥ := by
@@ -200,10 +205,17 @@ theorem _root_.GlobalTheory.Cris.ExpBij.dpExp_bijOn : ∀ (B : Type) [CommRing B
     exact hN l hl hs
   have hvan : ∀ a ∈ J, ∀ n, N ≤ n → δ.dpow n a = 0 := fun a ha n hn => by
     simpa using hN [(n, a)] (by simpa using ha) (by simpa using hn)
-  have hexp : ∀ a ∈ J, _root_.GlobalTheory.Cris.dpExp δ a = ∑ n ∈ Finset.range (N + 2), δ.dpow n a :=
-    fun a ha => _root_.GlobalTheory.Cris.dpExp_eq_sum_range_of_vanish δ a (N + 2) fun n hn => hvan a ha n (by omega)
-  have hkey : ∀ k, 1 ≤ k → ∀ c ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ k,
-      _root_.GlobalTheory.Cris.dpExp δ c - 1 - c ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ (k + 1) := by
+  have hexp
+      : ∀ a ∈ J,
+        _root_.GlobalTheory.Cris.dpExp δ a = ∑ n ∈ Finset.range (N + 2), δ.dpow n a := fun a ha =>
+    _root_.GlobalTheory.Cris.dpExp_eq_sum_range_of_vanish δ a (N + 2) fun n hn =>
+      hvan a ha n (by omega)
+  have hkey
+      : ∀ k,
+        1 ≤ k
+          → ∀ c ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ k,
+            _root_.GlobalTheory.Cris.dpExp δ c - 1 - c
+              ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ (k + 1) := by
     intro k hk c hc
     have hcJ := _root_.GlobalTheory.Cris.ExpBij.dpFil_le δ hk hc
     rw [hexp c hcJ, Finset.sum_range_succ', Finset.sum_range_succ', δ.dpow_zero hcJ]
@@ -233,7 +245,8 @@ theorem _root_.GlobalTheory.Cris.ExpBij.dpExp_bijOn : ∀ (B : Type) [CommRing B
           have h := neg_mem (hkey k hk c ih)
           rw [h1] at h
           simpa using h
-      have hc' := _root_.GlobalTheory.Cris.ExpBij.dpFil_anti δ (Nat.le_succ N) (hall (N + 1) (by omega))
+      have hc' :=
+        _root_.GlobalTheory.Cris.ExpBij.dpFil_anti δ (Nat.le_succ N) (hall (N + 1) (by omega))
       rw [hbot] at hc'
       exact (Submodule.mem_bot _).1 hc'
     have hsum : _root_.GlobalTheory.Cris.dpExp δ (b + -a) = 1 := by
@@ -242,7 +255,12 @@ theorem _root_.GlobalTheory.Cris.ExpBij.dpExp_bijOn : ∀ (B : Type) [CommRing B
     exact (add_neg_eq_zero.1 (hzero (b + -a) (J.add_mem hb (J.neg_mem ha)) hsum)).symm
   · intro u hu
     have hu' : u - 1 ∈ J := hu
-    have happrox : ∀ k, 1 ≤ k → ∃ a ∈ J, _root_.GlobalTheory.Cris.dpExp δ a - u ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ k := by
+    have happrox
+        : ∀ k,
+          1 ≤ k
+            → ∃ a ∈ J,
+              _root_.GlobalTheory.Cris.dpExp δ a - u
+                ∈ _root_.GlobalTheory.Cris.ExpBij.dpFil δ k := by
       intro k hk
       induction k, hk using Nat.le_induction with
       | base =>
@@ -259,9 +277,11 @@ theorem _root_.GlobalTheory.Cris.ExpBij.dpExp_bijOn : ∀ (B : Type) [CommRing B
         refine ⟨a + -d, J.add_mem ha (J.neg_mem hdJ), ?_⟩
         have hr := hkey k hk (-d) (neg_mem hd)
         rw [hδ.dpExp_add_eq_mul ha (J.neg_mem hdJ)]
-        have hid : _root_.GlobalTheory.Cris.dpExp δ a * _root_.GlobalTheory.Cris.dpExp δ (-d) - u =
-            -((_root_.GlobalTheory.Cris.dpExp δ a - 1) * d) +
-              _root_.GlobalTheory.Cris.dpExp δ a * (_root_.GlobalTheory.Cris.dpExp δ (-d) - 1 - -d) := by
+        have hid
+            : _root_.GlobalTheory.Cris.dpExp δ a * _root_.GlobalTheory.Cris.dpExp δ (-d) - u
+              = -((_root_.GlobalTheory.Cris.dpExp δ a - 1) * d)
+                + _root_.GlobalTheory.Cris.dpExp δ a
+                  * (_root_.GlobalTheory.Cris.dpExp δ (-d) - 1 - -d) := by
           rw [hd_eq]
           ring
         rw [hid]

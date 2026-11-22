@@ -7,18 +7,22 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.EtaleEmpty
 
 @[expose] public section
 
-open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
+open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates
+  ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
 open scoped ENNReal ContDiff
 
 namespace GlobalTheory.OTY
 
-theorem nonempty_cover : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y] [T2Space Y]
-    [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] [CompactSpace Y]
-    (ι La : Type) [AddCommGroup La] (A : WeightedAtlas n Y ι La), Nonempty (Cover A) := by
+theorem nonempty_cover
+    : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y]
+        [MeasurableSpace Y] [BorelSpace Y] [CompactSpace Y] (ι La : Type) [AddCommGroup La]
+        (A : WeightedAtlas n Y ι La),
+      Nonempty (Cover A) := by
   intro n Y _ _ _ _ _ _ ι La _ A
   classical
-  have hε : ∀ x : Y, ∃ ε > 0, ball (A.chart (A.pick x) x) ε ⊆ (A.chart (A.pick x)).target :=
-    fun x => Metric.isOpen_iff.1 (A.chart (A.pick x)).open_target _
+  have hε
+      : ∀ x : Y, ∃ ε > 0, ball (A.chart (A.pick x) x) ε ⊆ (A.chart (A.pick x)).target := fun x =>
+    Metric.isOpen_iff.1 (A.chart (A.pick x)).open_target _
       ((A.chart (A.pick x)).map_source (A.mem_pick x))
   choose ε hε0 hεb using hε
   let b : ∀ x : Y, ContDiffBump (A.chart (A.pick x) x) := fun x =>
@@ -46,14 +50,15 @@ theorem nonempty_cover : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y] [T2Space 
   have hUo : ∀ x, IsOpen (U x) := fun x =>
     (A.chart (A.pick x)).continuousOn.isOpen_inter_preimage (A.chart (A.pick x)).open_source
       isOpen_ball
-  have hUx : ∀ x, x ∈ U x := fun x => ⟨A.mem_pick x, by exact Set.mem_preimage.mpr (mem_ball_self (by linarith [hε0 x]))⟩
+  have hUx : ∀ x, x ∈ U x := fun x =>
+    ⟨A.mem_pick x, by exact Set.mem_preimage.mpr (mem_ball_self (by linarith [hε0 x]))⟩
   have hUpos : ∀ x y, y ∈ U x → 0 < β x y := by
     rintro x y ⟨hy, hyb⟩
     show 0 < A.chiC _ _ y
     rw [A.chiC_of_mem hy]
     exact (b x).pos_of_mem_ball hyb
-  obtain ⟨t, ht⟩ := isCompact_univ.elim_finite_subcover U hUo
-    (fun y _ => Set.mem_iUnion.2 ⟨y, hUx y⟩)
+  obtain ⟨t, ht⟩ :=
+    isCompact_univ.elim_finite_subcover U hUo (fun y _ => Set.mem_iUnion.2 ⟨y, hUx y⟩)
   let pt : Fin t.card → Y := fun a => (t.equivFin.symm a).1
   let S : Y → ℝ := fun y => ∑ a, β (pt a) y
   have hS : ∀ y, 0 < S y := by
@@ -61,8 +66,7 @@ theorem nonempty_cover : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y] [T2Space 
     obtain ⟨x, hxt, hyx⟩ := Set.mem_iUnion₂.1 (ht (Set.mem_univ y))
     have hpt : pt (t.equivFin ⟨x, hxt⟩) = x := by simp [pt]
     have h1 : β (pt (t.equivFin ⟨x, hxt⟩)) y ≤ S y :=
-      Finset.single_le_sum (f := fun a => β (pt a) y) (fun a _ => hβ0 (pt a) y)
-        (Finset.mem_univ _)
+      Finset.single_le_sum (f := fun a => β (pt a) y) (fun a _ => hβ0 (pt a) y) (Finset.mem_univ _)
     rw [hpt] at h1
     linarith [hUpos x y hyx]
   have hSs : A.SmoothFn S := by
@@ -81,7 +85,8 @@ theorem nonempty_cover : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y] [T2Space 
     smooth := ?_
     supp := ?_
     nonneg := fun a y => div_nonneg (hβ0 _ y) (hS y).le
-    sum_one := fun y => by rw [← Finset.sum_div]; exact div_self (hS y).ne' }⟩
+    sum_one := fun y => by rw [← Finset.sum_div]; exact div_self (hS y).ne'
+  }⟩
   · intro a j v hv
     exact ((hβs (pt a) j v hv).div (hSs j v hv) (hS _).ne')
   · intro a

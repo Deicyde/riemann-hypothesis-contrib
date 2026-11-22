@@ -6,21 +6,23 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsSmu
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj
+open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
+  Formalism.L2.Pj
 open scoped Matrix nonZeroDivisors
 
 namespace GlobalTheory
 
-theorem herm_comb_eq_zero_of_iso {E : Type} [Field E] [NumberField E] [IsCMField E] {r ρ : ℕ}
-    (G : Matrix (Fin r) (Fin r) E) (e : Fin ρ → Fin r → E)
-    (h : ∀ a b, herm G (e a) (e b) = 0) (u v : Fin ρ → E) :
-    herm G (∑ i, u i • e i) (∑ j, v j • e j) = 0 := by
-  have key : herm G (∑ i, u i • e i) (∑ j, v j • e j)
-      = ∑ i, ∑ j, u i * cc (v j) * herm G (e i) (e j) := by
+theorem herm_comb_eq_zero_of_iso
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {r ρ : ℕ} (G : Matrix (Fin r) (Fin r) E) (e : Fin ρ → Fin r → E)
+    (h : ∀ a b, herm G (e a) (e b) = 0) (u v : Fin ρ → E)
+    : herm G (∑ i, u i • e i) (∑ j, v j • e j) = 0 := by
+  have key
+      : herm G (∑ i, u i • e i) (∑ j, v j • e j)
+        = ∑ i, ∑ j, u i * cc (v j) * herm G (e i) (e j) := by
     have h1 : ∀ (y : Fin r → E), herm G (∑ i, u i • e i) y = ∑ i, u i * herm G (e i) y := by
       intro y
-      simp only [herm, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.mul_sum,
-        Finset.sum_mul]
+      simp only [herm, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.mul_sum, Finset.sum_mul]
       rw [Finset.sum_comm (s := (Finset.univ : Finset (Fin ρ)))]
       refine Finset.sum_congr rfl fun a _ => ?_
       rw [Finset.sum_comm]
@@ -29,7 +31,7 @@ theorem herm_comb_eq_zero_of_iso {E : Type} [Field E] [NumberField E] [IsCMField
       intro x
       set_option synthInstance.maxHeartbeats 100000 in
         simp only [herm, cc, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul,
-        Finset.mul_sum]
+          Finset.mul_sum]
       rw [Finset.sum_comm (s := (Finset.univ : Finset (Fin ρ)))]
       refine Finset.sum_congr rfl fun a _ => ?_
       rw [Finset.sum_comm]
@@ -38,8 +40,13 @@ theorem herm_comb_eq_zero_of_iso {E : Type} [Field E] [NumberField E] [IsCMField
   rw [key]
   simp [h]
 
-theorem exists_cusp_pseudoBasis :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r ρ : ℕ) (X : Data E r) (cu₀ : FJ.CuspFD X ρ), ∃ (cu : FJ.CuspFD X ρ) (P : Matrix (Fin ρ) (Fin ρ) E) (cc' : Fin ρ → FractionalIdeal (𝓞 E)⁰ E), IsUnit P.det ∧ (∀ a, cu₀.e a = ∑ b, P a b • cu.e b) ∧ (∀ b, cc' b ≠ 0) ∧ (∀ a : Fin ρ → E, (∑ b, a b • cu.e b) ∈ X.Λ ↔ ∀ b, a b ∈ cc' b) := by
+theorem exists_cusp_pseudoBasis
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r ρ : ℕ) (X : Data E r)
+        (cu₀ : FJ.CuspFD X ρ),
+      ∃ (cu : FJ.CuspFD X ρ) (P : Matrix (Fin ρ) (Fin ρ) E)
+          (cc' : Fin ρ → FractionalIdeal (𝓞 E)⁰ E),
+        IsUnit P.det ∧ (∀ a, cu₀.e a = ∑ b, P a b • cu.e b) ∧ (∀ b, cc' b ≠ 0)
+          ∧ (∀ a : Fin ρ → E, (∑ b, a b • cu.e b) ∈ X.Λ ↔ ∀ b, a b ∈ cc' b) := by
   intro E _ _ _ r ρ X cu₀
   classical
   let T : (Fin ρ → E) →ₗ[E] (Fin r → E) := Fintype.linearCombination E cu₀.e
@@ -64,16 +71,24 @@ theorem exists_cusp_pseudoBasis :
     have hm : algebraMap (𝓞 E) E c • w ∈ L := by
       rw [hL, map_smul, algebraMap_smul]
       exact hcw
-    have := Submodule.smul_mem (Submodule.span E (L : Set (Fin ρ → E))) (algebraMap (𝓞 E) E c)⁻¹
-      (Submodule.subset_span hm)
+    have :=
+      Submodule.smul_mem (Submodule.span E (L : Set (Fin ρ → E))) (algebraMap (𝓞 E) E c)⁻¹
+        (Submodule.subset_span hm)
     rwa [smul_smul, inv_mul_cancel₀ hcE, one_smul] at this
   obtain ⟨s, e, c, hc, hmem, -⟩ := exists_pseudoBasis_adapted E ρ L ⊤ hfg hsp
   have hsum : ∀ a : Fin ρ → E, ∑ b, a b • T (e b) = T (∑ b, a b • e b) := by
     intro a
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul]
-  refine ⟨⟨fun b => T (e b), e.linearIndependent.map' T (LinearMap.ker_eq_bot.2 hinj), ?_⟩,
-    (e.toMatrix (Pi.basisFun E (Fin ρ)))ᵀ, c, ?_, ?_, hc, ?_⟩
+    simp only [map_sum, map_smul]
+  refine ⟨
+    ⟨fun b => T (e b), e.linearIndependent.map' T (LinearMap.ker_eq_bot.2 hinj), ?_⟩,
+    (e.toMatrix (Pi.basisFun E (Fin ρ)))ᵀ,
+    c,
+    ?_,
+    ?_,
+    hc,
+    ?_
+  ⟩
   · intro a b
     simp only [hT]
     exact herm_comb_eq_zero_of_iso _ _ cu₀.iso _ _

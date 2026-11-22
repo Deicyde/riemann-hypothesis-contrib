@@ -21,8 +21,10 @@ theorem cycloDist : CycloDistStatement := by
     rw [← Polynomial.C_1, Polynomial.natDegree_X_add_C]; exact one_ne_zero
   have hPmon : ((Polynomial.cyclotomic (l ^ (s + 1)) ℤ).comp (Polynomial.X + 1)).Monic :=
     (Polynomial.cyclotomic.monic _ ℤ).comp hXmon hXdeg
-  have hQ : (Polynomial.cyclotomic (l ^ (s + 1)) O).comp (Polynomial.X + 1) =
-      ((Polynomial.cyclotomic (l ^ (s + 1)) ℤ).comp (Polynomial.X + 1)).map (Int.castRingHom O) := by
+  have hQ
+      : (Polynomial.cyclotomic (l ^ (s + 1)) O).comp (Polynomial.X + 1)
+        = ((Polynomial.cyclotomic (l ^ (s + 1)) ℤ).comp (Polynomial.X + 1)).map
+          (Int.castRingHom O) := by
     simp [Polynomial.map_comp]
   rw [hQ]
   refine { mem := fun {n} hn => ?_, monic := hPmon.map _ }

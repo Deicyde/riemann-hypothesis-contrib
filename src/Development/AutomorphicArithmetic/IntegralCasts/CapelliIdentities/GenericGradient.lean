@@ -4,38 +4,42 @@ public import Mathlib
 
 @[expose] public section
 
-noncomputable def UpperTheory.Reformulated.B.Qf34.genericGradient :
-    {n : ℕ} →
-      (J : Ideal (MvPolynomial (Fin n) ℂ)) → MvPolynomial (Fin n) ℂ → Fin n → FractionRing (MvPolynomial (Fin n) ℂ ⧸ J) :=
-    fun {n : ℕ} (J : Ideal (MvPolynomial (Fin n) ℂ)) (f : MvPolynomial (Fin n) ℂ) (l : Fin n) ↦
-      (Algebra.algebraMap (MvPolynomial (Fin n) ℂ ⧸ J) (FractionRing (MvPolynomial (Fin n) ℂ ⧸ J)) :
-          MvPolynomial (Fin n) ℂ ⧸ J → FractionRing (MvPolynomial (Fin n) ℂ ⧸ J))
-        ((Ideal.Quotient.mk J : MvPolynomial (Fin n) ℂ → MvPolynomial (Fin n) ℂ ⧸ J)
-          ((MvPolynomial.pderiv l : MvPolynomial (Fin n) ℂ → MvPolynomial (Fin n) ℂ) f))
+noncomputable def UpperTheory.Reformulated.B.Qf34.genericGradient
+    : {n : ℕ} → (J : Ideal (MvPolynomial (Fin n) ℂ)) → MvPolynomial (Fin n) ℂ → Fin n
+      → FractionRing (MvPolynomial (Fin n) ℂ ⧸ J) :=
+  fun {n : ℕ} (J : Ideal (MvPolynomial (Fin n) ℂ)) (f : MvPolynomial (Fin n) ℂ) (l : Fin n) ↦
+    (Algebra.algebraMap (MvPolynomial (Fin n) ℂ ⧸ J) (FractionRing (MvPolynomial (Fin n) ℂ ⧸ J))
+        : MvPolynomial (Fin n) ℂ ⧸ J → FractionRing (MvPolynomial (Fin n) ℂ ⧸ J))
+      ((Ideal.Quotient.mk J : MvPolynomial (Fin n) ℂ → MvPolynomial (Fin n) ℂ ⧸ J)
+        ((MvPolynomial.pderiv l : MvPolynomial (Fin n) ℂ → MvPolynomial (Fin n) ℂ) f))
 
-noncomputable def UpperTheory.Reformulated.B.Qf34.Statement :
-    Prop :=
-    ∀ (n : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ)) [J.IsPrime] (ι : Type) [Fintype ι] (f : ι → MvPolynomial (Fin n) ℂ),
-      (∀ (i : ι), f i ∈ J) →
-        Submodule.span (FractionRing (MvPolynomial (Fin n) ℂ ⧸ J)) (Set.range (UpperTheory.Reformulated.B.Qf34.genericGradient J ∘ f)) =
-            Submodule.span (FractionRing (MvPolynomial (Fin n) ℂ ⧸ J))
-              (UpperTheory.Reformulated.B.Qf34.genericGradient J '' (↑J : Set (MvPolynomial (Fin n) ℂ))) →
-          ∃ s ∉ J, ∀ p ∈ J, s * p ∈ Ideal.span (Set.range f)
+noncomputable def UpperTheory.Reformulated.B.Qf34.Statement : Prop :=
+  ∀ (n : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ)) [J.IsPrime] (ι : Type) [Fintype ι]
+      (f : ι → MvPolynomial (Fin n) ℂ),
+    (∀ (i : ι), f i ∈ J)
+      → Submodule.span (FractionRing (MvPolynomial (Fin n) ℂ ⧸ J))
+          (Set.range (UpperTheory.Reformulated.B.Qf34.genericGradient J ∘ f))
+        = Submodule.span (FractionRing (MvPolynomial (Fin n) ℂ ⧸ J))
+          (UpperTheory.Reformulated.B.Qf34.genericGradient J '' (↑J : Set (MvPolynomial (Fin n) ℂ)))
+      → ∃ s ∉ J, ∀ p ∈ J, s * p ∈ Ideal.span (Set.range f)
 
 open MvPolynomial in
-private theorem UpperTheory.Reformulated.B.Qf34.taylor {k B : Type*} [CommRing k] [CommRing B] [Algebra k B]
-    {n : ℕ} (φ ψ : MvPolynomial (Fin n) k →ₐ[k] B)
-    (h : ∀ p q, (φ p - ψ p) * (φ q - ψ q) = 0) (p : MvPolynomial (Fin n) k) :
-    φ p - ψ p = ∑ l, φ (pderiv l p) * (φ (X l) - ψ (X l)) := by
+private theorem UpperTheory.Reformulated.B.Qf34.taylor
+    {k B : Type*} [CommRing k] [CommRing B] [Algebra k B]
+    {n : ℕ} (φ ψ : MvPolynomial (Fin n) k →ₐ[k] B) (h : ∀ p q, (φ p - ψ p) * (φ q - ψ q) = 0)
+    (p : MvPolynomial (Fin n) k)
+    : φ p - ψ p = ∑ l, φ (pderiv l p) * (φ (X l) - ψ (X l)) := by
   induction p using MvPolynomial.induction_on with
   | C a => simp [MvPolynomial.algHom_C]
   | add p q hp hq =>
     simp only [map_add (f := _), add_mul, Finset.sum_add_distrib, ← hp, ← hq]
     ring
   | mul_X p i hp =>
-    have e : ∀ l, φ (pderiv l (p * X i)) * (φ (X l) - ψ (X l)) =
-        φ (X i) * (φ (pderiv l p) * (φ (X l) - ψ (X l))) +
-          (if l = i then φ p * (φ (X i) - ψ (X i)) else 0) := by
+    have e
+        : ∀ l,
+          φ (pderiv l (p * X i)) * (φ (X l) - ψ (X l))
+            = φ (X i) * (φ (pderiv l p) * (φ (X l) - ψ (X l)))
+              + (if l = i then φ p * (φ (X i) - ψ (X i)) else 0) := by
       intro l
       rw [pderiv_mul, map_add (f := _), map_mul, map_mul]
       split_ifs with hl
@@ -49,20 +53,22 @@ private theorem UpperTheory.Reformulated.B.Qf34.taylor {k B : Type*} [CommRing k
     linear_combination - h p (X i)
 
 open MvPolynomial in
-private theorem UpperTheory.Reformulated.B.Qf34.sq_zero_case {k B K ι : Type*} [CommRing k] [CommRing B]
-    [Algebra k B] [CommRing K] [Algebra k K] [Fintype ι] {n : ℕ}
+private theorem UpperTheory.Reformulated.B.Qf34.sq_zero_case
+    {k B K ι : Type*} [CommRing k] [CommRing B] [Algebra k B] [CommRing K] [Algebra k K] [Fintype ι]
+    {n : ℕ}
     (π : B →ₐ[k] K) (σ : K →ₐ[k] B) (hσ : ∀ x, π (σ x) = x)
     (hsq : ∀ a b, π a = 0 → π b = 0 → a * b = 0)
     (φ : MvPolynomial (Fin n) k →ₐ[k] B) (p : MvPolynomial (Fin n) k)
     (f : ι → MvPolynomial (Fin n) k) (c : ι → K) (hp : π (φ p) = 0) (hf : ∀ i, π (φ (f i)) = 0)
-    (hc : ∀ l, π (φ (pderiv l p)) = ∑ i, c i * π (φ (pderiv l (f i)))) :
-    φ p = ∑ i, σ (c i) * φ (f i) := by
+    (hc : ∀ l, π (φ (pderiv l p)) = ∑ i, c i * π (φ (pderiv l (f i))))
+    : φ p = ∑ i, σ (c i) * φ (f i) := by
   have hd : ∀ q, π (φ q - (σ.comp (π.comp φ)) q) = 0 := by
     intro q
     simp [hσ]
-  have ht := UpperTheory.Reformulated.B.Qf34.taylor φ (σ.comp (π.comp φ)) fun p q => hsq _ _ (hd p) (hd q)
-  have ht' : ∀ q, π (φ q) = 0 →
-      φ q = ∑ l, φ (pderiv l q) * (φ (X l) - (σ.comp (π.comp φ)) (X l)) := by
+  have ht :=
+    UpperTheory.Reformulated.B.Qf34.taylor φ (σ.comp (π.comp φ)) fun p q => hsq _ _ (hd p) (hd q)
+  have ht'
+      : ∀ q, π (φ q) = 0 → φ q = ∑ l, φ (pderiv l q) * (φ (X l) - (σ.comp (π.comp φ)) (X l)) := by
     intro q hq
     rw [← ht q]
     simp [hq]
@@ -76,13 +82,15 @@ private theorem UpperTheory.Reformulated.B.Qf34.sq_zero_case {k B K ι : Type*} 
   simp [hσ, hc]
 
 open MvPolynomial in
-private theorem UpperTheory.Reformulated.B.Qf34.mem_sup_sq {k A K ι : Type*} [CommRing k] [CommRing A]
-    [Algebra k A] [CommRing K] [Algebra k K] [Algebra.FormallySmooth k K] [Fintype ι] {n : ℕ}
+private theorem UpperTheory.Reformulated.B.Qf34.mem_sup_sq
+    {k A K ι : Type*} [CommRing k] [CommRing A] [Algebra k A] [CommRing K] [Algebra k K]
+    [Algebra.FormallySmooth k K] [Fintype ι]
+    {n : ℕ}
     (π : A →ₐ[k] K) (hπ : Function.Surjective π)
     (φ : MvPolynomial (Fin n) k →ₐ[k] A) (p : MvPolynomial (Fin n) k)
     (f : ι → MvPolynomial (Fin n) k) (c : ι → K) (hp : π (φ p) = 0) (hf : ∀ i, π (φ (f i)) = 0)
-    (hc : ∀ l, π (φ (pderiv l p)) = ∑ i, c i * π (φ (pderiv l (f i)))) :
-    φ p ∈ Ideal.span (Set.range fun i => φ (f i)) ⊔ RingHom.ker π * RingHom.ker π := by
+    (hc : ∀ l, π (φ (pderiv l p)) = ∑ i, c i * π (φ (pderiv l (f i))))
+    : φ p ∈ Ideal.span (Set.range fun i => φ (f i)) ⊔ RingHom.ker π * RingHom.ker π := by
   set m : Ideal A := RingHom.ker π with hm
   let π' : (A ⧸ m * m) →ₐ[k] K := Ideal.Quotient.liftₐ (m * m) π fun a ha => Ideal.mul_le_left ha
   have hπ' : ∀ a, π' (Ideal.Quotient.mk _ a) = π a := fun a => rfl
@@ -103,8 +111,9 @@ private theorem UpperTheory.Reformulated.B.Qf34.mem_sup_sq {k A K ι : Type*} [C
   let σ := Algebra.FormallySmooth.liftOfSurjective (AlgHom.id k K) π' hs hn
   have hσ : ∀ x, π' (σ x) = x :=
     Algebra.FormallySmooth.liftOfSurjective_apply (AlgHom.id k K) π' hs hn
-  have key := UpperTheory.Reformulated.B.Qf34.sq_zero_case π' σ hσ hsq ((Ideal.Quotient.mkₐ k (m * m)).comp φ)
-    p f c hp hf hc
+  have key :=
+    UpperTheory.Reformulated.B.Qf34.sq_zero_case π' σ hσ hsq ((Ideal.Quotient.mkₐ k (m * m)).comp φ)
+      p f c hp hf hc
   choose a ha using fun i => Ideal.Quotient.mk_surjective (I := m * m) (σ (c i))
   have h2 : φ p - ∑ i, a i * φ (f i) ∈ m * m := by
     set_option synthInstance.maxHeartbeats 100000 in
@@ -114,8 +123,7 @@ private theorem UpperTheory.Reformulated.B.Qf34.mem_sup_sq {k A K ι : Type*} [C
   refine Submodule.add_mem_sup (Ideal.sum_mem _ fun i _ => ?_) h2
   exact Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨i, rfl⟩)
 
-theorem UpperTheory.Reformulated.B.Qf34.proof :
-    UpperTheory.Reformulated.B.Qf34.Statement := by
+theorem UpperTheory.Reformulated.B.Qf34.proof : UpperTheory.Reformulated.B.Qf34.Statement := by
   intro n J _ ι _ f hf hspan
   let R := MvPolynomial (Fin n) ℂ
   let K := FractionRing (R ⧸ J)
@@ -151,17 +159,20 @@ theorem UpperTheory.Reformulated.B.Qf34.proof :
     conv_lhs => rw [← Localization.AtPrime.map_eq_maximalIdeal]
     rw [Ideal.map_le_iff_le_comap]
     intro p hp
-    have hmem : UpperTheory.Reformulated.B.Qf34.genericGradient J p ∈
-        Submodule.span K (Set.range (UpperTheory.Reformulated.B.Qf34.genericGradient J ∘ f)) := by
+    have hmem
+        : UpperTheory.Reformulated.B.Qf34.genericGradient J p ∈ Submodule.span K
+          (Set.range (UpperTheory.Reformulated.B.Qf34.genericGradient J ∘ f)) := by
       rw [hspan]
       exact Submodule.subset_span ⟨p, hp, rfl⟩
     obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun K).mp hmem
-    have := UpperTheory.Reformulated.B.Qf34.mem_sup_sq π hπ φ p f c (by rw [hπφ, hg0]; exact hp)
-      (fun i => by rw [hπφ, hg0]; exact hf i) (fun l => by
-        have h := congrFun hc l
-        rw [Finset.sum_apply] at h
-        simp only [hπφ]
-        exact h.symm)
+    have :=
+      UpperTheory.Reformulated.B.Qf34.mem_sup_sq π hπ φ p f c (by rw [hπφ, hg0]; exact hp)
+        (fun i => by rw [hπφ, hg0]; exact hf i)
+        (fun l => by
+          have h := congrFun hc l
+          rw [Finset.sum_apply] at h
+          simp only [hπφ]
+          exact h.symm)
     rw [hker] at this
     rw [Ideal.mem_comap, Ideal.map_span, ← Set.range_comp, smul_eq_mul]
     exact this

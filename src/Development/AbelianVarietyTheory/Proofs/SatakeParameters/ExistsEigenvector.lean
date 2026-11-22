@@ -7,36 +7,40 @@ public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.
 
 namespace GlobalTheory.ExistsEigenvector
 
-theorem exists_eigenvector {G V W ι : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W] [Fintype ι] {ρ : Representation ℂ G V}
-    (hρ : GlobalTheory.PRep.IsSmooth ρ) {K : Subgroup G} (hK : IsCompact (K : Set G)) {U : Set G} (hU : IsOpen U)
-    (h1 : (1 : G) ∈ U) (θ : G → ℂ) (hθ : ∀ g ∈ U, g ∈ K → θ g = 1)
-    (hmul : ∀ a ∈ K, ∀ b ∈ K, θ (a * b) = θ a * θ b) (T : ι → V →ₗ[ℂ] W) (y : ι → V)
-    (hne : ∑ i, T i (y i) ≠ 0) (heq : ∀ k ∈ K, ∑ i, T i (ρ k (y i)) = θ k • ∑ i, T i (y i)) :
-    ∃ v : V, v ≠ 0 ∧ ∀ h ∈ K, ρ h v = θ h • v := by
+theorem exists_eigenvector
+    {G V W ι : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V]
+    [Module ℂ V] [AddCommGroup W] [Module ℂ W] [Fintype ι]
+    {ρ : Representation ℂ G V} (hρ : GlobalTheory.PRep.IsSmooth ρ)
+    {K : Subgroup G} (hK : IsCompact (K : Set G))
+    {U : Set G} (hU : IsOpen U) (h1 : (1 : G) ∈ U)
+    (θ : G → ℂ) (hθ : ∀ g ∈ U, g ∈ K → θ g = 1) (hmul : ∀ a ∈ K, ∀ b ∈ K, θ (a * b) = θ a * θ b)
+    (T : ι → V →ₗ[ℂ] W) (y : ι → V)
+    (hne : ∑ i, T i (y i) ≠ 0) (heq : ∀ k ∈ K, ∑ i, T i (ρ k (y i)) = θ k • ∑ i, T i (y i))
+    : ∃ v : V, v ≠ 0 ∧ ∀ h ∈ K, ρ h v = θ h • v := by
   classical
   have hone : θ 1 = 1 := hθ 1 h1 K.one_mem
   have hθne : ∀ a ∈ K, θ a ≠ 0 := fun a ha h0 => by
     have := hmul a ha a⁻¹ (K.inv_mem ha)
     rw [mul_inv_cancel, hone, h0, zero_mul] at this
     exact one_ne_zero this
-  let H : Subgroup K :=
-    { carrier := {k | θ k = 1 ∧ ∀ i, ρ k (y i) = y i}
-      mul_mem' := by
-        rintro a b ⟨ha, ha'⟩ ⟨hb, hb'⟩
-        refine ⟨?_, fun i => ?_⟩
-        · rw [Subgroup.coe_mul, hmul _ a.2 _ b.2, ha, hb, one_mul]
-        · rw [Subgroup.coe_mul, map_mul, Module.End.mul_apply, hb', ha']
-      one_mem' := ⟨hone, fun i => by simp⟩
-      inv_mem' := by
-        rintro a ⟨ha, ha'⟩
-        refine ⟨?_, fun i => ?_⟩
-        · have := hmul _ a.2 _ (K.inv_mem a.2)
-          rw [mul_inv_cancel, hone, ha, one_mul] at this
-          exact this.symm
-        · conv_lhs => rw [← ha' i]
-          rw [← Module.End.mul_apply, ← map_mul]
-          simp }
+  let H : Subgroup K := {
+    carrier := {k | θ k = 1 ∧ ∀ i, ρ k (y i) = y i}
+    mul_mem' := by
+      rintro a b ⟨ha, ha'⟩ ⟨hb, hb'⟩
+      refine ⟨?_, fun i => ?_⟩
+      · rw [Subgroup.coe_mul, hmul _ a.2 _ b.2, ha, hb, one_mul]
+      · rw [Subgroup.coe_mul, map_mul, Module.End.mul_apply, hb', ha']
+    one_mem' := ⟨hone, fun i => by simp⟩
+    inv_mem' := by
+      rintro a ⟨ha, ha'⟩
+      refine ⟨?_, fun i => ?_⟩
+      · have := hmul _ a.2 _ (K.inv_mem a.2)
+        rw [mul_inv_cancel, hone, ha, one_mul] at this
+        exact this.symm
+      · conv_lhs => rw [← ha' i]
+        rw [← Module.End.mul_apply, ← map_mul]
+        simp
+  }
   have hHo : IsOpen (H : Set K) := by
     have ho : IsOpen ((fun k : K => (k : G)) ⁻¹' (U ∩ ⋂ i, {g : G | ρ g (y i) = y i})) :=
       (hU.inter (isOpen_iInter_of_finite fun i => hρ (y i))).preimage continuous_subtype_val

@@ -4,14 +4,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DgMatOne
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.BCT.CtLevel
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+  GlobalTheory.BCT.CtLevel
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.BCT.HintInv
 
-theorem rStab_comp_equiv {H : Type} [Group H] (φ : H ≃* H) (u : H → ℂ) :
-    rStab (u ∘ φ) = (rStab u).comap (φ : H →* H) := by
+theorem rStab_comp_equiv {H : Type} [Group H] (φ : H ≃* H) (u : H → ℂ)
+    : rStab (u ∘ φ) = (rStab u).comap (φ : H →* H) := by
   ext k
   simp only [Subgroup.mem_comap, MulEquiv.coe_toMonoidHom]
   show (∀ x, u (φ (x * k)) = u (φ x)) ↔ ∀ x, u (x * φ k) = u x
@@ -20,10 +22,12 @@ theorem rStab_comp_equiv {H : Type} [Group H] (φ : H ≃* H) (u : H → ℂ) :
     have := h (φ.symm x)
     simpa using this
   · intro h x
-    rw [map_mul]; exact h _
+    rw [map_mul]
+    exact h _
 
-theorem hint_comp_equiv {H : Type} [Group H] (K : Subgroup H) (φ : H ≃* H) (hK : K.map (φ : H →* H) = K)
-    (u : H → ℂ) : hint K (u ∘ φ) = hint K u := by
+theorem hint_comp_equiv
+    {H : Type} [Group H] (K : Subgroup H) (φ : H ≃* H) (hK : K.map (φ : H →* H) = K) (u : H → ℂ)
+    : hint K (u ∘ φ) = hint K u := by
   set S := rStab u ⊓ K with hS
   have hS' : rStab (u ∘ φ) ⊓ K = S.comap (φ : H →* H) := by
     rw [rStab_comp_equiv, hS, Subgroup.comap_inf]
@@ -37,7 +41,8 @@ theorem hint_comp_equiv {H : Type} [Group H] (K : Subgroup H) (φ : H ≃* H) (h
   congr 1
   let e : H ⧸ S.comap (φ : H →* H) ≃ H ⧸ S :=
     Quotient.congr φ.toEquiv (fun a b => by
-      simp only [QuotientGroup.leftRel_apply, Subgroup.mem_comap, MulEquiv.coe_toMonoidHom, map_mul, map_inv]
+      simp only [QuotientGroup.leftRel_apply, Subgroup.mem_comap, MulEquiv.coe_toMonoidHom, map_mul,
+        map_inv]
       rfl)
   rw [← finsum_comp_equiv e]
   refine finsum_congr fun q => ?_
@@ -52,21 +57,26 @@ section Integral
 
 variable {L : Type} [Field L] {a b : ℕ}
 
-theorem entries_of_mem_GLint {O : Subring L} {A : GL (Fin a) L} (hA : A ∈ GLint (Fin a) O) (i j : Fin a) :
-    A.val i j ∈ O ∧ (A⁻¹).val i j ∈ O := by
+theorem entries_of_mem_GLint
+    {O : Subring L} {A : GL (Fin a) L} (hA : A ∈ GLint (Fin a) O) (i j : Fin a)
+    : A.val i j ∈ O ∧ (A⁻¹).val i j ∈ O := by
   obtain ⟨y, rfl⟩ := hA
   rw [← map_inv]
   exact ⟨(y.val i j).2, ((y⁻¹).val i j).2⟩
 
-theorem mul_mul_mem {O : Subring L} {P : Matrix (Fin a) (Fin a) L} {X : Matrix (Fin a) (Fin b) L}
-    {Q : Matrix (Fin b) (Fin b) L} (hP : ∀ i j, P i j ∈ O) (hX : ∀ i j, X i j ∈ O) (hQ : ∀ i j, Q i j ∈ O)
-    (i : Fin a) (j : Fin b) : (P * X * Q) i j ∈ O := by
+theorem mul_mul_mem
+    {O : Subring L} {P : Matrix (Fin a) (Fin a) L} {X : Matrix (Fin a) (Fin b) L}
+    {Q : Matrix (Fin b) (Fin b) L}
+    (hP : ∀ i j, P i j ∈ O) (hX : ∀ i j, X i j ∈ O) (hQ : ∀ i j, Q i j ∈ O)
+    (i : Fin a) (j : Fin b)
+    : (P * X * Q) i j ∈ O := by
   rw [Matrix.mul_apply]
   refine Subring.sum_mem _ fun l _ => Subring.mul_mem _ ?_ (hQ l j)
   rw [Matrix.mul_apply]
   exact Subring.sum_mem _ fun k _ => Subring.mul_mem _ (hP i k) (hX k l)
 
-def lrEquiv (A : GL (Fin a) L) (B : GL (Fin b) L) : Matrix (Fin a) (Fin b) L ≃+ Matrix (Fin a) (Fin b) L where
+def lrEquiv (A : GL (Fin a) L) (B : GL (Fin b) L)
+    : Matrix (Fin a) (Fin b) L ≃+ Matrix (Fin a) (Fin b) L where
   toFun X := A.val * X * B.val
   invFun X := (A⁻¹).val * X * (B⁻¹).val
   left_inv X := by
@@ -81,18 +91,24 @@ def lrEquiv (A : GL (Fin a) L) (B : GL (Fin b) L) : Matrix (Fin a) (Fin b) L ≃
 
 end Integral
 
-theorem map_intMat {E : Type} [Field E] [NumberField E] [IsCMField E] (a b : ℕ) (w : Pl E) (A : GLw a w) (B : GLw b w)
-    (hA : A ∈ GlobalTheory.LFun.KGL w (n := a)) (hB : B ∈ GlobalTheory.LFun.KGL w (n := b)) :
-    (intMat a b w).map ((lrEquiv A B).toMultiplicative : _ →* _) = intMat a b w := by
-  have hint' : ∀ X : Matrix (Fin a) (Fin b) (w.adicCompletion E),
-      (∀ i j, Valued.v (X i j) ≤ 1) ↔ ∀ i j, X i j ∈ Ov E w := fun X =>
-    forall_congr' fun i => forall_congr' fun j => (HeightOneSpectrum.mem_adicCompletionIntegers _ _ _).symm
+theorem map_intMat
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    (a b : ℕ) (w : Pl E) (A : GLw a w) (B : GLw b w)
+    (hA : A ∈ GlobalTheory.LFun.KGL w (n := a)) (hB : B ∈ GlobalTheory.LFun.KGL w (n := b))
+    : (intMat a b w).map ((lrEquiv A B).toMultiplicative : _ →* _) = intMat a b w := by
+  have hint'
+      : ∀ X : Matrix (Fin a) (Fin b) (w.adicCompletion E),
+        (∀ i j, Valued.v (X i j) ≤ 1) ↔ ∀ i j, X i j ∈ Ov E w := fun X =>
+    forall_congr' fun i =>
+      forall_congr' fun j => (HeightOneSpectrum.mem_adicCompletionIntegers _ _ _).symm
   have hA1 := fun i j => (entries_of_mem_GLint hA i j).1
   have hA2 := fun i j => (entries_of_mem_GLint hA i j).2
   have hB1 := fun i j => (entries_of_mem_GLint hB i j).1
   have hB2 := fun i j => (entries_of_mem_GLint hB i j).2
-  have key : ∀ (P : GLw a w) (Q : GLw b w), (∀ i j, P.val i j ∈ Ov E w) → (∀ i j, Q.val i j ∈ Ov E w) →
-      (intMat a b w).map ((lrEquiv P Q).toMultiplicative : _ →* _) ≤ intMat a b w := by
+  have key
+      : ∀ (P : GLw a w) (Q : GLw b w),
+        (∀ i j, P.val i j ∈ Ov E w) → (∀ i j, Q.val i j ∈ Ov E w)
+          → (intMat a b w).map ((lrEquiv P Q).toMultiplicative : _ →* _) ≤ intMat a b w := by
     intro P Q hP hQ
     rw [intMat, MonoidHom.map_closure, Subgroup.closure_le]
     rintro _ ⟨X, hX, rfl⟩
@@ -105,16 +121,19 @@ theorem map_intMat {E : Type} [Field E] [NumberField E] [IsCMField E] (a b : ℕ
   intro X hX
   refine ⟨(lrEquiv A⁻¹ B⁻¹).toMultiplicative X, h2 ⟨X, hX, rfl⟩, ?_⟩
   show Multiplicative.ofAdd (A.val * ((A⁻¹).val * Multiplicative.toAdd X * (B⁻¹).val) * B.val) = X
-  rw [show A.val * ((A⁻¹).val * Multiplicative.toAdd X * (B⁻¹).val) * B.val = Multiplicative.toAdd X from
+  rw [show A.val * ((A⁻¹).val * Multiplicative.toAdd X * (B⁻¹).val) * B.val
+      = Multiplicative.toAdd X from
     (lrEquiv A B).right_inv _]
   rfl
 
-theorem hint_intMat_mul_mul :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (a b : ℕ) (w : Pl E)
-    (u : Multiplicative (Matrix (Fin a) (Fin b) (w.adicCompletion E)) → ℂ) (A : GLw a w) (B : GLw b w),
-    A ∈ GlobalTheory.LFun.KGL w (n := a) → B ∈ GlobalTheory.LFun.KGL w (n := b) →
-    hint (intMat a b w) (fun X => u (Multiplicative.ofAdd (A.val * Multiplicative.toAdd X * B.val))) =
-      hint (intMat a b w) u := by
+theorem hint_intMat_mul_mul
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (a b : ℕ) (w : Pl E)
+        (u : Multiplicative (Matrix (Fin a) (Fin b) (w.adicCompletion E)) → ℂ) (A : GLw a w)
+        (B : GLw b w),
+      A ∈ GlobalTheory.LFun.KGL w (n := a) → B ∈ GlobalTheory.LFun.KGL w (n := b)
+        → hint (intMat a b w)
+            (fun X => u (Multiplicative.ofAdd (A.val * Multiplicative.toAdd X * B.val)))
+          = hint (intMat a b w) u := by
   intro E _ _ _ a b w u A B hA hB
   exact hint_comp_equiv (intMat a b w) (lrEquiv A B).toMultiplicative (map_intMat a b w A B hA hB) u
 

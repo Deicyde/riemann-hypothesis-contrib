@@ -31,8 +31,10 @@ attribute [local instance 2000] Rep.hV2
 
 noncomputable section
 
-theorem isOpen_ker_ρ {k G : Type*} [CommRing k] [Group G] [TopologicalSpace G] (A : Rep k G) [IsDiscreteRep A]
-    [Finite A] : IsOpen ((A.ρ.ker : Subgroup G) : Set G) := by
+theorem isOpen_ker_ρ
+    {k G : Type*} [CommRing k] [Group G] [TopologicalSpace G]
+    (A : Rep k G) [IsDiscreteRep A] [Finite A]
+    : IsOpen ((A.ρ.ker : Subgroup G) : Set G) := by
   have e : ((A.ρ.ker : Subgroup G) : Set G) = ⋂ a : A, (stabilizer A.ρ a : Set G) := by
     ext g
     simp only [SetLike.mem_coe, MonoidHom.mem_ker, Set.mem_iInter]

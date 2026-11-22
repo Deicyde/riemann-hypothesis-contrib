@@ -11,17 +11,30 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.EtaleLif
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris DividedPowers GlobalTheory.PDA CrystallineSemistableComparison CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Pb.Site
+open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris DividedPowers GlobalTheory.PDA
+  CrystallineSemistableComparison CrystallineSemistableComparison.Pb
+  CrystallineSemistableComparison.Pb.Site
 
 namespace GlobalTheory.CompanionTheory.SiteTr
 
-theorem tr_tf : ∀ {B : Type} [CommRing B] {J : Ideal B} (δ : DividedPowers J) (l s : ℕ) (δ' : DividedPowers (((pq B).ext J).map (Ideal.Quotient.mk (fil (eta δ) (max s 1))))), IsDPMorphism (eta δ) δ' (Ideal.Quotient.mk (fil (eta δ) (max s 1))) → fil δ s = ⊥ → (∀ (r : ℕ) (x : B), (l : B) * x ∈ fil δ r → x ∈ fil δ r) → fil δ' s = ⊥ ∧ (∀ (r : ℕ) (x : (pq B).P ⧸ fil (eta δ) (max s 1)), (l : (pq B).P ⧸ fil (eta δ) (max s 1)) * x ∈ fil δ' r → x ∈ fil δ' r) ∧ IsNilpotent (((pq B).ext J).map (Ideal.Quotient.mk (fil (eta δ) (max s 1)))) := by
+theorem tr_tf
+    : ∀ {B : Type} [CommRing B] {J : Ideal B} (δ : DividedPowers J) (l s : ℕ)
+        (δ' : DividedPowers (((pq B).ext J).map (Ideal.Quotient.mk (fil (eta δ) (max s 1))))),
+      IsDPMorphism (eta δ) δ' (Ideal.Quotient.mk (fil (eta δ) (max s 1))) → fil δ s = ⊥
+        → (∀ (r : ℕ) (x : B), (l : B) * x ∈ fil δ r → x ∈ fil δ r)
+        → fil δ' s = ⊥
+          ∧ (∀ (r : ℕ) (x : (pq B).P ⧸ fil (eta δ) (max s 1)),
+            (l : (pq B).P ⧸ fil (eta δ) (max s 1)) * x ∈ fil δ' r → x ∈ fil δ' r)
+          ∧ IsNilpotent (((pq B).ext J).map (Ideal.Quotient.mk (fil (eta δ) (max s 1)))) := by
   intro B _ J δ l s δ' hδ' hs ht
-  obtain ⟨-, hanti, h0, crit⟩ := GlobalTheory.T.divided_power_polynomial_filtration δ (pq B) (eta δ) (eta_std δ)
+  obtain ⟨-, hanti, h0, crit⟩ :=
+    GlobalTheory.T.divided_power_polynomial_filtration δ (pq B) (eta δ) (eta_std δ)
   have hanti' : ∀ a c, a ≤ c → fil (eta δ) c ≤ fil (eta δ) a := fun a c h =>
     GlobalTheory.Cris.ExpBij.dpFil_anti (eta δ) h
-  have hmap : ∀ r, fil δ' r = (fil (eta δ) r).map (Ideal.Quotient.mk (fil (eta δ) (max s 1))) := fun r =>
-    le_antisymm (FubiniStudyChowHeightFormula₂.Adr.Fil.fil_le_map_fil _ _ (eta δ) _ _ δ' _ hδ' rfl r)
+  have hmap
+      : ∀ r, fil δ' r = (fil (eta δ) r).map (Ideal.Quotient.mk (fil (eta δ) (max s 1))) := fun r =>
+    le_antisymm
+      (FubiniStudyChowHeightFormula₂.Adr.Fil.fil_le_map_fil _ _ (eta δ) _ _ δ' _ hδ' rfl r)
       (FubiniStudyChowHeightFormula₂.Adr.Fil.map_fil_le (eta δ) δ' _ hδ' r)
   have htop : fil δ' (max s 1) = ⊥ := by rw [hmap, Ideal.map_quotient_self]
   refine ⟨?_, ?_, ?_⟩
@@ -38,8 +51,10 @@ theorem tr_tf : ∀ {B : Type} [CommRing B] {J : Ideal B} (δ : DividedPowers J)
       rw [hmap, e, Ideal.map_quotient_self]
   · intro r x hx
     obtain ⟨z, rfl⟩ := Ideal.Quotient.mk_surjective x
-    have key : ∀ y : (pq B).P, Ideal.Quotient.mk (fil (eta δ) (max s 1)) y ∈ fil δ' r ↔
-        y ∈ fil (eta δ) (min r (max s 1)) := by
+    have key
+        : ∀ y : (pq B).P,
+          Ideal.Quotient.mk (fil (eta δ) (max s 1)) y ∈ fil δ' r
+            ↔ y ∈ fil (eta δ) (min r (max s 1)) := by
       intro y
       rw [hmap, Ideal.mem_quotient_iff_mem_sup]
       rcases le_total r (max s 1) with h | h
@@ -52,7 +67,8 @@ theorem tr_tf : ∀ {B : Type} [CommRing B] {J : Ideal B} (δ : DividedPowers J)
     have e : (pq B).e.repr ((l : (pq B).P) * z) k = (l : B) * (pq B).e.repr z k := by
       rw [← nsmul_eq_mul, map_nsmul, Finsupp.smul_apply, nsmul_eq_mul]
     rwa [e] at h1
-  · have hp : ∀ n, (((pq B).ext J).map (Ideal.Quotient.mk (fil (eta δ) (max s 1)))) ^ n ≤ fil δ' n := by
+  · have hp
+        : ∀ n, (((pq B).ext J).map (Ideal.Quotient.mk (fil (eta δ) (max s 1)))) ^ n ≤ fil δ' n := by
       intro n
       induction n with
       | zero =>
@@ -61,7 +77,8 @@ theorem tr_tf : ∀ {B : Type} [CommRing B] {J : Ideal B} (δ : DividedPowers J)
       | succ n ih =>
         rw [pow_succ]
         exact Ideal.mul_le.2 fun a ha b hb =>
-          GlobalTheory.Cris.ExpBij.mul_mem_dpFil δ' (ih ha) (GlobalTheory.Cris.ExpBij.mem_dpFil_one δ' hb)
+          GlobalTheory.Cris.ExpBij.mul_mem_dpFil δ' (ih ha)
+            (GlobalTheory.Cris.ExpBij.mem_dpFil_one δ' hb)
     exact ⟨max s 1, le_bot_iff.1 ((hp _).trans htop.le)⟩
 
 end GlobalTheory.CompanionTheory.SiteTr

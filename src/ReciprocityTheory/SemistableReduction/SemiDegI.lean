@@ -14,8 +14,8 @@ open scoped ComplexOrder
 def hypG {K : Type} [Field K] {r : ℕ} (j p : Fin r) : Matrix (Fin r) (Fin r) K :=
   Matrix.of fun a b => (if a = j ∧ b = p then 1 else 0) + (if a = p ∧ b = j then 1 else 0)
 
-def hypForm {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) (j p : Fin r) :
-    HermForm K r where
+def hypForm {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) (j p : Fin r)
+    : HermForm K r where
   c := S.c
   c_invol := S.c_invol
   c_emb := S.c_emb
@@ -25,11 +25,14 @@ def hypForm {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) (j
     rw [add_comm]
     congr 1 <;> simp only [and_comm]
 
-theorem hypForm_h {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) (j p : Fin r)
-    (x y : Fin r → K) : (hypForm S j p).h x y = S.c (x j) * y p + S.c (x p) * y j := by
+theorem hypForm_h
+    {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K r) (j p : Fin r) (x y : Fin r → K)
+    : (hypForm S j p).h x y = S.c (x j) * y p + S.c (x p) * y j := by
   rw [HermForm.h]
-  have e : ∀ a, ∑ b, (hypForm S j p).c (x a) * (hypForm S j p).G a b * y b =
-      (if a = j then S.c (x a) * y p else 0) + (if a = p then S.c (x a) * y j else 0) := by
+  have e
+      : ∀ a,
+        ∑ b, (hypForm S j p).c (x a) * (hypForm S j p).G a b * y b
+          = (if a = j then S.c (x a) * y p else 0) + (if a = p then S.c (x a) * y j else 0) := by
     intro a
     simp only [hypForm, hypG, Matrix.of_apply, mul_add, add_mul, Finset.sum_add_distrib]
     congr 1
@@ -38,21 +41,24 @@ theorem hypForm_h {K : Type} [Field K] [NumberField K] {r : ℕ} (S : HermForm K
   rw [Finset.sum_congr rfl fun a _ => e a]
   simp [Finset.sum_add_distrib]
 
-theorem abs_norm_neg {K : Type} [Field K] [NumberField K] (z : K) :
-    |((Algebra.norm ℚ (-z) : ℚ) : ℝ)| = |((Algebra.norm ℚ z : ℚ) : ℝ)| := by
+theorem abs_norm_neg {K : Type} [Field K] [NumberField K] (z : K)
+    : |((Algebra.norm ℚ (-z) : ℚ) : ℝ)| = |((Algebra.norm ℚ z : ℚ) : ℝ)| := by
   rw [neg_eq_neg_one_mul, map_mul, Rat.cast_mul, abs_mul]
   have h1 : (-1 : K) = algebraMap ℚ K (-1) := by simp
   rw [h1, Algebra.norm_algebraMap]
   simp
 
-theorem top_le_zero (hN : IntegralIndexStatement) {K : Type} [Field K] [NumberField K] {r : ℕ}
+theorem top_le_zero
+    (hN : IntegralIndexStatement)
+    {K : Type} [Field K] [NumberField K]
+    {r : ℕ}
     (S : HermForm K r) (j p : Fin r) (hjp : (j : ℕ) < p) (Gj Gp : Submodule (𝓞 K) (Fin r → K))
     (hGj : Gj.FG) (hGp : Gp.FG) (hj : ∀ x ∈ Gj, IsAt j x) (hp : ∀ x ∈ Gp, IsAt p x)
-    (hpair : ∀ x ∈ Gj, ∀ y ∈ Gp, IsIntegralElt (S.c (x j) * y p))
-    (x0 y : Fin r → K) (hx0 : x0 ∈ Gj) (hx0j : x0 j ≠ 0) (hy : y ∈ Gp) (hyp : y p ≠ 0)
-    (δ : (K →+* ℂ) → Fin r → ℝ) (d : ℝ) (hd : 0 < d) (hδj : ∀ σ, δ σ j = d)
-    (hδp : ∀ σ, δ σ p = d⁻¹) (h0 : latDeg (diagMet δ) Gj ![x0] = 0) :
-    latDeg (diagMet δ) Gp ![y] ≤ 0 := by
+    (hpair : ∀ x ∈ Gj, ∀ y ∈ Gp, IsIntegralElt (S.c (x j) * y p)) (x0 y : Fin r → K) (hx0 : x0 ∈ Gj)
+    (hx0j : x0 j ≠ 0) (hy : y ∈ Gp) (hyp : y p ≠ 0) (δ : (K →+* ℂ) → Fin r → ℝ)
+    (d : ℝ) (hd : 0 < d) (hδj : ∀ σ, δ σ j = d) (hδp : ∀ σ, δ σ p = d⁻¹)
+    (h0 : latDeg (diagMet δ) Gj ![x0] = 0)
+    : latDeg (diagMet δ) Gp ![y] ≤ 0 := by
   have hjp' : j ≠ p := fun h => by rw [h] at hjp; omega
   have hx0p : x0 p = 0 := hj x0 hx0 p (Ne.symm hjp')
   have hyj : y j = 0 := hp y hy j hjp'
@@ -94,8 +100,9 @@ theorem top_le_zero (hN : IntegralIndexStatement) {K : Type} [Field K] [NumberFi
         intro s t hst
         have h1 := congr_fun hst j
         have h2 := congr_fun hst p
-        simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply, hx0p, hyj,
-          mul_zero, add_zero, zero_add] at h1 h2
+        simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply, hx0p, hyj, mul_zero,
+            add_zero, zero_add]
+          at h1 h2
         exact ⟨(mul_eq_zero.1 h1).resolve_right hx0j, (mul_eq_zero.1 h2).resolve_right hyp⟩
       · intro z hz
         obtain ⟨z1, hz1, z2, hz2, rfl⟩ := Submodule.mem_sup.1 hz
@@ -125,12 +132,11 @@ theorem top_le_zero (hN : IntegralIndexStatement) {K : Type} [Field K] [NumberFi
       refine isIntegralElt_add (hpair z1 hz1 w2 hw2) ?_
       have := isIntegralElt_c S (hpair w1 hw1 z2 hz2)
       rwa [map_mul, S.c_invol, mul_comm] at this
-    have hgram : hGram (hypForm S j p) ![x0, y] =
-        !![0, S.c (x0 j) * y p; S.c (y p) * x0 j, 0] := by
+    have hgram : hGram (hypForm S j p) ![x0, y] = !![0, S.c (x0 j) * y p; S.c (y p) * x0 j, 0] := by
       ext a b
-      fin_cases a <;> fin_cases b <;>
-        simp [hGram, hypForm_h, hx0p, hyj]
-    have hdet : (hGram (hypForm S j p) ![x0, y]).det = -((S.c (x0 j) * y p) * (S.c (y p) * x0 j)) := by
+      fin_cases a <;> fin_cases b <;> simp [hGram, hypForm_h, hx0p, hyj]
+    have hdet
+        : (hGram (hypForm S j p) ![x0, y]).det = -((S.c (x0 j) * y p) * (S.c (y p) * x0 j)) := by
       rw [hgram, Matrix.det_fin_two_of]
       ring
     have hcx : S.c (x0 j) ≠ 0 := fun h => hx0j (S.c.injective (by rw [h, map_zero]))

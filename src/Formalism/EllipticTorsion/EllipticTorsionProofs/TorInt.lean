@@ -71,7 +71,8 @@ namespace Formalism.ELL
 
 open WeierstrassCurve
 
-theorem torsionIntegral_of (h : Formalism.ELL.FormalGroupPointsTorsionFree.{u}) : Formalism.ELL.TorsionIntegral.{u} := by
+theorem torsionIntegral_of (h : Formalism.ELL.FormalGroupPointsTorsionFree.{u})
+    : Formalism.ELL.TorsionIntegral.{u} := by
   intro K _ _ W hW hΔ n hn x y hxy hnP
   have hx : ‖x‖ ≤ 1 := by
     by_contra hx

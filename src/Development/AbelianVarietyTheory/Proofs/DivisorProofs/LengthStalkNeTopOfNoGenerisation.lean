@@ -11,12 +11,13 @@ open CategoryTheory AlgebraicGeometry TopologicalSpace GlobalTheory
 
 namespace GlobalTheory
 
-theorem isFiniteLength_localized_of_minimal_prime {A B M N : Type*} [CommRing A] [CommRing B]
-    [IsNoetherianRing A] [Algebra A B] (p : Ideal A) [p.IsPrime] [IsLocalization.AtPrime B p]
-    [AddCommGroup M] [Module A M] [Module.Finite A M] [AddCommGroup N] [Module A N] [Module B N]
-    [IsScalarTower A B N] (f : M →ₗ[A] N) [IsLocalizedModule p.primeCompl f]
-    (h : ∀ q : Ideal A, q.IsPrime → Module.annihilator A M ≤ q → q ≤ p → q = p) :
-    IsFiniteLength B N := by
+theorem isFiniteLength_localized_of_minimal_prime
+    {A B M N : Type*} [CommRing A] [CommRing B] [IsNoetherianRing A] [Algebra A B]
+    (p : Ideal A) [p.IsPrime] [IsLocalization.AtPrime B p] [AddCommGroup M] [Module A M]
+    [Module.Finite A M] [AddCommGroup N] [Module A N] [Module B N] [IsScalarTower A B N]
+    (f : M →ₗ[A] N) [IsLocalizedModule p.primeCompl f]
+    (h : ∀ q : Ideal A, q.IsPrime → Module.annihilator A M ≤ q → q ≤ p → q = p)
+    : IsFiniteLength B N := by
   have : IsNoetherianRing B := IsLocalization.isNoetherianRing p.primeCompl B inferInstance
   have : Module.Finite B N := Module.Finite.of_isLocalizedModule p.primeCompl f
   have : IsLocalRing B := IsLocalization.AtPrime.isLocalRing B p
@@ -41,16 +42,18 @@ theorem isFiniteLength_localized_of_minimal_prime {A B M N : Type*} [CommRing A]
       rw [← IsLocalization.map_under p.primeCompl B Q', h3,
         IsLocalization.AtPrime.map_eq_maximalIdeal]
     have h5 : Q'.IsMaximal := h4 ▸ IsLocalRing.maximalIdeal.isMaximal B
-    have h6 := Ideal.map_eq_top_or_isMaximal_of_surjective
-      (Ideal.Quotient.mk (Module.annihilator B N)) Ideal.Quotient.mk_surjective h5
+    have h6 :=
+      Ideal.map_eq_top_or_isMaximal_of_surjective (Ideal.Quotient.mk (Module.annihilator B N))
+        Ideal.Quotient.mk_surjective h5
     rw [Ideal.map_comap_of_surjective _ Ideal.Quotient.mk_surjective] at h6
     exact h6.resolve_left hQ.ne_top
   exact isFiniteLength_of_isArtinianRing_annihilator
 
-theorem QCoh.length_stalk_ne_top_of_no_generisation (X : Scheme.{0}) [IsLocallyNoetherian X]
-    (F : X.Modules) [GlobalTheory.QCoh.IsFiniteQC F] (w : X)
-    (h : ∀ y ∈ GlobalTheory.QCoh.support F, w ∈ closure ({y} : Set X) → y = w) :
-    Module.length (X.presheaf.stalk w) (F.presheaf.stalk w :) ≠ ⊤ := by
+theorem QCoh.length_stalk_ne_top_of_no_generisation
+    (X : Scheme.{0}) [IsLocallyNoetherian X]
+    (F : X.Modules) [GlobalTheory.QCoh.IsFiniteQC F]
+    (w : X) (h : ∀ y ∈ GlobalTheory.QCoh.support F, w ∈ closure ({y} : Set X) → y = w)
+    : Module.length (X.presheaf.stalk w) (F.presheaf.stalk w :) ≠ ⊤ := by
   obtain ⟨U, hU, hx⟩ := QCoh.exists_affine_mem w
   obtain ⟨x, rfl⟩ : ∃ x' : U, x' = w := ⟨⟨w, hx⟩, rfl⟩
   have := hU.isLocalization_stalk x
@@ -58,8 +61,8 @@ theorem QCoh.length_stalk_ne_top_of_no_generisation (X : Scheme.{0}) [IsLocallyN
   have := QCoh.finite_sections F hU
   have : IsNoetherianRing Γ(X, U) := IsLocallyNoetherian.component_noetherian ⟨U, hU⟩
   rw [Module.length_ne_top_iff]
-  refine isFiniteLength_localized_of_minimal_prime (hU.primeIdealOf x).asIdeal
-    (QCoh.germLinear F x) fun q hq h1 h2 => ?_
+  refine isFiniteLength_localized_of_minimal_prime (hU.primeIdealOf x).asIdeal (QCoh.germLinear F x)
+    fun q hq h1 h2 => ?_
   let P : PrimeSpectrum Γ(X, U) := ⟨q, hq⟩
   have hP : hU.fromSpec P ∈ QCoh.support F := by
     have : P ∈ Module.support Γ(X, U) Γ(F, U) := Module.mem_support_iff_of_finite.2 h1

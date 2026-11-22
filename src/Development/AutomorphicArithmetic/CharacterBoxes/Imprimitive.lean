@@ -6,9 +6,10 @@ public import Formalism.SharpRestriction.RamificationFrobenius.TotientGaloisClas
 
 open Formalism.HC
 
-theorem UpperTheory.Top.imprimitive :
-    ZeroFreeAll → ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N) (s : ℂ), 1 / 2 < s.re → (χ ≠ 1 ∨ s ≠ 1) →
-      DirichletCharacter.LFunction χ s ≠ 0 := by
+theorem UpperTheory.Top.imprimitive
+    : ZeroFreeAll
+      → ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N) (s : ℂ),
+        1 / 2 < s.re → (χ ≠ 1 ∨ s ≠ 1) → DirichletCharacter.LFunction χ s ≠ 0 := by
   intro h N _ χ s hs hχs
   haveI : NeZero χ.conductor := (PChar.of χ).ne
   have hL : DirichletCharacter.LFunction χ.primitiveCharacter s ≠ 0 := h (PChar.of χ) trivial s hs
@@ -19,7 +20,8 @@ theorem UpperTheory.Top.imprimitive :
       apply hχ
       rw [← χ.changeLevel_primitiveCharacter, h1, DirichletCharacter.changeLevel_one]
     · exact Or.inr hs1
-  have hrw := DirichletCharacter.LFunction_changeLevel χ.conductor_dvd_level χ.primitiveCharacter hχ'
+  have hrw :=
+    DirichletCharacter.LFunction_changeLevel χ.conductor_dvd_level χ.primitiveCharacter hχ'
   rw [χ.changeLevel_primitiveCharacter] at hrw
   rw [hrw]
   refine mul_ne_zero hL (Finset.prod_ne_zero_iff.mpr fun p hp => ?_)
@@ -32,7 +34,8 @@ theorem UpperTheory.Top.imprimitive :
     exact Real.rpow_lt_one_of_one_lt_of_neg (by exact_mod_cast hp'.one_lt) (by linarith)
   have hn : ‖χ.primitiveCharacter p * (p : ℂ) ^ (-s)‖ < 1 := by
     rw [norm_mul]
-    calc ‖χ.primitiveCharacter (p : ZMod χ.conductor)‖ * ‖(p : ℂ) ^ (-s)‖
+    calc
+      ‖χ.primitiveCharacter (p : ZMod χ.conductor)‖ * ‖(p : ℂ) ^ (-s)‖
         ≤ 1 * ‖(p : ℂ) ^ (-s)‖ := by gcongr
       _ < 1 := by simpa using h2
   rw [key, norm_one] at hn

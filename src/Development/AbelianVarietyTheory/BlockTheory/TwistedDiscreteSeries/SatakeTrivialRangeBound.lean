@@ -17,14 +17,15 @@ def InTrivialRange (q : ℕ) {n : ℕ} (α : Fin n → ℂˣ) : Prop :=
 
 def SatakeTrivialBound : Prop :=
   ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (n : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin n) k) V)
-    (α : Fin n → ℂˣ),
-    IsSmooth π → π.IsIrreducible → IsUnitarisable π → IsSpherical π → HasSatake π α →
-      InTrivialRange (resCard k) α
+      (n : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin n) k) V)
+      (α : Fin n → ℂˣ),
+    IsSmooth π → π.IsIrreducible → IsUnitarisable π → IsSpherical π → HasSatake π α
+      → InTrivialRange (resCard k) α
 
 section Hecke
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
   {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
 
 end Hecke

@@ -16,14 +16,21 @@ open scoped NNReal
 
 namespace GlobalTheory.K5
 
-theorem small_traces_subgroup : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
-    p ≠ 2 → IsClo p Ω → ∀ (T : Tower p Ω) (H : Subgroup (Gal p Ω)), H ≤ ⨅ n, Gn T n →
-    ∀ (S : Finset Ω) (j : ℕ), 1 ≤ j → ∃ (y : Ω) (E : Finset (Gal p Ω)), IsInt (p := p) y ∧
-      (∀ g ∈ E, g ∈ H) ∧ (∀ h ∈ H, ∃! g, g ∈ E ∧ h y = g y ∧ ∀ s ∈ S, h s = g s) ∧
-      ∑ g ∈ E, g y = T.ζ j - 1 := by
+theorem small_traces_subgroup
+    : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
+      p ≠ 2 → IsClo p Ω
+        → ∀ (T : Tower p Ω) (H : Subgroup (Gal p Ω)),
+          H ≤ ⨅ n, Gn T n
+            → ∀ (S : Finset Ω) (j : ℕ),
+              1 ≤ j
+                → ∃ (y : Ω) (E : Finset (Gal p Ω)),
+                  IsInt (p := p) y ∧ (∀ g ∈ E, g ∈ H)
+                    ∧ (∀ h ∈ H, ∃! g, g ∈ E ∧ h y = g y ∧ ∀ s ∈ S, h s = g s)
+                    ∧ ∑ g ∈ E, g y = T.ζ j - 1 := by
   intro p _ Ω _ _ hp2 hclo T H hH S j hj
   classical
-  obtain ⟨v, hvint, hvgal, -, hv1, hsep⟩ := GlobalTheory.T.exists_valuation_almostEtale_towerFixer p Ω hp2 hclo T
+  obtain ⟨v, hvint, hvgal, -, hv1, hsep⟩ :=
+    GlobalTheory.T.exists_valuation_almostEtale_towerFixer p Ω hp2 hclo T
   obtain ⟨U, -, hUfin, hUS, hUsep⟩ := hsep S
   let K : Subgroup (Gal p Ω) := ⨅ n, Gn T n
   let H' : Subgroup ↥K := H.subgroupOf K
@@ -39,12 +46,17 @@ theorem small_traces_subgroup : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field 
     have hm : ((h : ↥K) : Gal p Ω) ∈ Gn T j := (Subgroup.mem_iInf.mp (h : ↥K).2) j
     have h1 : ((h : ↥K) : Gal p Ω) (T.ζ j) = T.ζ j := ((Basic.mem_gn T j _).mp hm).1
     rw [hsmul, map_sub, map_one, h1]
-  have hve : v (T.ζ j - 1) < 1 := (GlobalTheory.T.valuation_tower_zeta_sub_one p Ω hp2 T v hv1 j hj).1
-  obtain ⟨y₀, hy₀, hy₀le, htr⟩ := GlobalTheory.T.exists_integer_cosetRepresentativeTrace_eq_of_lt_one Ω v ↥H' hinv U' hU'sep (T.ζ j - 1) hfixζ hve
+  have hve : v (T.ζ j - 1) < 1 :=
+    (GlobalTheory.T.valuation_tower_zeta_sub_one p Ω hp2 T v hv1 j hj).1
+  obtain ⟨y₀, hy₀, hy₀le, htr⟩ :=
+    GlobalTheory.T.exists_integer_cosetRepresentativeTrace_eq_of_lt_one Ω v ↥H' hinv U' hU'sep
+      (T.ζ j - 1) hfixζ hve
   have hS : ∀ s ∈ S, s ∈ Fix Ω U' := fun s hs g =>
     hUS s hs ⟨((g : ↥H') : ↥K), Subgroup.mem_subgroupOf.mp g.2⟩
-  obtain ⟨y, D, E', hy, huniq, hsum⟩ := GlobalTheory.T.exists_reps_of_cosetRepresentativeTrace Ω ↥H' U' S hS y₀ hy₀
-  let ι : ↥H' ↪ Gal p Ω := ⟨fun h => ((h : ↥K) : Gal p Ω), fun a b hab => Subtype.ext (Subtype.ext hab)⟩
+  obtain ⟨y, D, E', hy, huniq, hsum⟩ :=
+    GlobalTheory.T.exists_reps_of_cosetRepresentativeTrace Ω ↥H' U' S hS y₀ hy₀
+  let ι : ↥H' ↪ Gal p Ω :=
+    ⟨fun h => ((h : ↥K) : Gal p Ω), fun a b hab => Subtype.ext (Subtype.ext hab)⟩
   have hιH : ∀ h : ↥H', ι h ∈ H := fun h => Subgroup.mem_subgroupOf.mp h.2
   have hιs : ∀ (h : ↥H') (x : Ω), ι h x = h • x := fun _ _ => rfl
   have hy₀int : IsInt (p := p) y₀ := (hvint y₀).mp hy₀le

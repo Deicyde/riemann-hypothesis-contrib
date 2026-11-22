@@ -12,8 +12,10 @@ open GlobalTheory.WeilM GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHeck
 
 namespace GlobalTheory.CMTraceZero
 
-theorem exists_ne_zero_conj_neg : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (B : Base F E),
-    B.IsGood σ → ∃ ξ₀ : E, ξ₀ ≠ 0 ∧ σ ξ₀ = -ξ₀ := by
+theorem exists_ne_zero_conj_neg
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (B : Base F E),
+      B.IsGood σ → ∃ ξ₀ : E, ξ₀ ≠ 0 ∧ σ ξ₀ = -ξ₀ := by
   intro F E _ _ _ _ _ σ B hB
   obtain ⟨_, hc, _, hτ⟩ := hB.cm
   obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance

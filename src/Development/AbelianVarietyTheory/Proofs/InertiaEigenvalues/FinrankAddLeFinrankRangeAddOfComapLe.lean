@@ -8,7 +8,13 @@ open TensorProduct Module
 
 namespace GlobalTheory
 
-theorem finrank_add_le_finrank_range_add_of_comap_le : ∀ (k : Type) [Field k] (E A M : Type) [AddCommGroup E] [Module k E] [AddCommGroup A] [Module k A] [AddCommGroup M] [Module k M] (π : E →ₗ[k] A) (ν : E →ₗ[k] M) (Z : Submodule k A) (R U : Submodule k M) [FiniteDimensional k ↥(LinearMap.range π)] [FiniteDimensional k ↥U], Z ≤ LinearMap.range π → R ≤ U → U ≤ LinearMap.range ν → (∀ e, π e ∈ Z → ν e ∈ R) → finrank k ↥Z + finrank k ↥U ≤ finrank k ↥(LinearMap.range π) + finrank k ↥R := by
+theorem finrank_add_le_finrank_range_add_of_comap_le
+    : ∀ (k : Type) [Field k] (E A M : Type) [AddCommGroup E] [Module k E] [AddCommGroup A]
+        [Module k A] [AddCommGroup M] [Module k M] (π : E →ₗ[k] A) (ν : E →ₗ[k] M)
+        (Z : Submodule k A) (R U : Submodule k M) [FiniteDimensional k ↥(LinearMap.range π)]
+        [FiniteDimensional k ↥U],
+      Z ≤ LinearMap.range π → R ≤ U → U ≤ LinearMap.range ν → (∀ e, π e ∈ Z → ν e ∈ R)
+        → finrank k ↥Z + finrank k ↥U ≤ finrank k ↥(LinearMap.range π) + finrank k ↥R := by
   intro k _ E A M _ _ _ _ _ _ π ν Z R U _ _ hZ hRU hU hmap
   set Q := LinearMap.range π with hQ
   set Z' : Submodule k Q := Z.comap Q.subtype
@@ -28,7 +34,8 @@ theorem finrank_add_le_finrank_range_add_of_comap_le : ∀ (k : Type) [Field k] 
     exact congrArg R'.mkQ hu
   have hker : LinearMap.ker g ≤ LinearMap.ker f := by
     intro x hx
-    have h0 : Submodule.Quotient.mk (p := Z') (π.rangeRestrict (x : E)) = 0 := LinearMap.mem_ker.mp hx
+    have h0 : Submodule.Quotient.mk (p := Z') (π.rangeRestrict (x : E)) = 0 :=
+      LinearMap.mem_ker.mp hx
     have hx' : π (x : E) ∈ Z := (Submodule.Quotient.mk_eq_zero (p := Z')).mp h0
     have hy : ν (x : E) ∈ R := hmap _ hx'
     rw [LinearMap.mem_ker]

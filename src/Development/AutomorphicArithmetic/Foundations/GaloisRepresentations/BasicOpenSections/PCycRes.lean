@@ -58,33 +58,36 @@ private lemma co_eq (q : ℕ) {n : ℕ} (j : Fin (n + 1)) :
   · have h' : Odd (j : ℕ) := Nat.not_even_iff_odd.1 h
     simp [h, h'.neg_one_pow]
 
-theorem UpperTheory.Gal.Mod.cycRes :
-    WtVal → CycRes := by
+theorem UpperTheory.Gal.Mod.cycRes : WtVal → CycRes := by
   intro hW p q n Y π T w hOne hPt V _ _ _ _ _ hp y hgen φ hφ y₀
   classical
   have hv := fun j => hW p Y (T j) (w j) (hOne j) V hp y
   haveI : ∀ j, Finite ((T j).Sec y) := fun j => (hv j).1
   letI : ∀ j, Fintype ((T j).Sec y) := fun j => Fintype.ofFinite _
-  have hA := hPt V hp y hgen φ hφ (fun j => (T j).Sec y) (fun j => id)
-    (fun j => Function.bijective_id)
+  have hA :=
+    hPt V hp y hgen φ hφ (fun j => (T j).Sec y) (fun j => id) (fun j => Function.bijective_id)
   have hc := congrArg (Multiset.count y₀) hA
   simp only [crystallineComparison.pts, Multiset.count_sum', Multiset.count_nsmul, id] at hc
-  have key : ∀ j : Fin (n + 1),
-      ∑ᶠ z ∈ {z : gp (IsLocalRing.ResidueField V) ⟶ (T j).Z | z ≫ (T j).p = resPt V ≫ y ∧
-        (twist φ Y)^[n - j] (z ≫ (T j).r) = y₀}, w j _ z =
-      (Multiset.count y₀ (Finset.univ.val.map fun i : (T j).Sec y =>
-        (twist φ Y)^[n - j] (resPt V ≫ i.1 ≫ (T j).r)) : ℤ) := by
+  have key
+      : ∀ j : Fin (n + 1),
+        ∑ᶠ z ∈ {z : gp (IsLocalRing.ResidueField V) ⟶ (T j).Z | z ≫ (T j).p = resPt V ≫ y ∧
+          (twist φ Y)^[n - j] (z ≫ (T j).r) = y₀}, w j _ z
+          = (Multiset.count y₀
+              (Finset.univ.val.map fun i : (T j).Sec y =>
+                (twist φ Y)^[n - j] (resPt V ≫ i.1 ≫ (T j).r))
+            : ℤ) := by
     intro j
-    rw [finsum_fib (fun i : (T j).Sec y => resPt V ≫ i.1)
+    rw [finsum_fib
+      (fun i : (T j).Sec y => resPt V ≫ i.1)
       {z : gp (IsLocalRing.ResidueField V) ⟶ (T j).Z | z ≫ (T j).p = resPt V ≫ y ∧
-        (twist φ Y)^[n - j] (z ≫ (T j).r) = y₀} (w j _)
+        (twist φ Y)^[n - j] (z ≫ (T j).r) = y₀}
+      (w j _)
       (fun z hz => (hv j).2 z hz.1)]
     congr 1
     rw [Multiset.count_map, Nat.card_eq_fintype_card, Fintype.card_subtype, Finset.card_def,
       Finset.filter_val]
     refine congrArg Multiset.card (Multiset.filter_congr fun i _ => ?_)
-    have h1 : (resPt V ≫ i.1) ≫ (T j).p = resPt V ≫ y := by
-      rw [Category.assoc, i.2]
+    have h1 : (resPt V ≫ i.1) ≫ (T j).p = resPt V ≫ y := by rw [Category.assoc, i.2]
     simp only [Set.mem_setOf_eq, h1, true_and, Category.assoc]
     exact eq_comm
   simp only [key, co_eq, sub_mul, Finset.sum_sub_distrib]

@@ -12,18 +12,25 @@ open Module
 
 variable {k : Type} [Field k] {R : Type} [CommRing R] [Algebra k R]
 
-theorem dex_block_frame (I : Ideal R) [I.IsMaximal] {L : Type} [Fintype L] (b : Basis L k (R ⧸ I))
-    {W : Type} [AddCommGroup W] [Module R W] [Module k W] [IsScalarTower k R W] [FiniteDimensional k W]
-    (hW : ∀ z ∈ I, ∀ y : W, z • y = 0) (N : W →ₗ[R] W) (hN : IsNilpotent N) (v : W) :
-    ∃ (ι : Type) (_ : Fintype ι) (l s : ι → ℕ) (β : Basis (L × Σ a : ι, Fin (l a)) k W),
-      (∀ a, 0 < l a) ∧ (∀ a, s a ≤ l a) ∧
-      (∀ (z : R) (p : L) (j : Σ a : ι, Fin (l a)),
-        z • β (p, j) = ∑ q, (b.repr (Ideal.Quotient.mk I z * b p) q) • β (q, j)) ∧
-      (∀ (p : L) (a : ι) (i : Fin (l a)), N (β (p, ⟨a, i⟩)) =
-        if h : (i : ℕ) + 1 < l a then β (p, ⟨a, ⟨i + 1, h⟩⟩) else 0) ∧
-      v = ∑ p, ∑ a, (if h : s a < l a then b.repr 1 p • β (p, ⟨a, ⟨s a, h⟩⟩) else 0) ∧
-      ∀ A : W →ₗ[R] W, A ∘ₗ N = N ∘ₗ A → ∀ (p : L) (a : ι) (i : Fin (l a)), (i : ℕ) < s a →
-        β.repr (A v) (p, ⟨a, i⟩) = 0 := by
+theorem dex_block_frame
+    (I : Ideal R) [I.IsMaximal]
+    {L : Type} [Fintype L]
+    (b : Basis L k (R ⧸ I))
+    {W : Type}
+    [AddCommGroup W] [Module R W] [Module k W] [IsScalarTower k R W] [FiniteDimensional k W]
+    (hW : ∀ z ∈ I, ∀ y : W, z • y = 0)
+    (N : W →ₗ[R] W) (hN : IsNilpotent N)
+    (v : W)
+    : ∃ (ι : Type) (_ : Fintype ι) (l s : ι → ℕ) (β : Basis (L × Σ a : ι, Fin (l a)) k W),
+      (∀ a, 0 < l a) ∧ (∀ a, s a ≤ l a)
+        ∧ (∀ (z : R) (p : L) (j : Σ a : ι, Fin (l a)),
+          z • β (p, j) = ∑ q, (b.repr (Ideal.Quotient.mk I z * b p) q) • β (q, j))
+        ∧ (∀ (p : L) (a : ι) (i : Fin (l a)),
+          N (β (p, ⟨a, i⟩)) = if h : (i : ℕ) + 1 < l a then β (p, ⟨a, ⟨i + 1, h⟩⟩) else 0)
+        ∧ v = ∑ p, ∑ a, (if h : s a < l a then b.repr 1 p • β (p, ⟨a, ⟨s a, h⟩⟩) else 0)
+        ∧ ∀ A : W →ₗ[R] W,
+          A ∘ₗ N = N ∘ₗ A
+            → ∀ (p : L) (a : ι) (i : Fin (l a)), (i : ℕ) < s a → β.repr (A v) (p, ⟨a, i⟩) = 0 := by
   letI : Field (R ⧸ I) := Ideal.Quotient.field I
   have hT : Module.IsTorsionBySet R W I := fun y z => hW z z.2 y
   letI : Module (R ⧸ I) W := hT.module
@@ -33,13 +40,14 @@ theorem dex_block_frame (I : Ideal R) [I.IsMaximal] {L : Type} [Fintype L] (b : 
     have : c • Ideal.Quotient.mk I z = Ideal.Quotient.mk I (c • z) := (map_smul (Ideal.Quotient.mkₐ k I) c z).symm
     rw [this, hmk, hmk, smul_assoc]⟩
   haveI : FiniteDimensional (R ⧸ I) W := Module.Finite.of_restrictScalars_finite k (R ⧸ I) W
-  let toE : (W →ₗ[R] W) → (W →ₗ[R ⧸ I] W) := fun f =>
-    { toFun := f
-      map_add' := f.map_add
-      map_smul' := fun c y => by
-        obtain ⟨z, rfl⟩ := Ideal.Quotient.mk_surjective c
-        simp only [RingHom.id_apply, hmk]
-        exact f.map_smul z y }
+  let toE : (W →ₗ[R] W) → (W →ₗ[R ⧸ I] W) := fun f => {
+    toFun := f
+    map_add' := f.map_add
+    map_smul' := fun c y => by
+      obtain ⟨z, rfl⟩ := Ideal.Quotient.mk_surjective c
+      simp only [RingHom.id_apply, hmk]
+      exact f.map_smul z y
+  }
   have htoE : ∀ f y, toE f y = f y := fun f y => rfl
   have hNE : IsNilpotent (toE N) := by
     obtain ⟨m, hm⟩ := hN
@@ -53,7 +61,9 @@ theorem dex_block_frame (I : Ideal R) [I.IsMaximal] {L : Type} [Fintype L] (b : 
   refine ⟨ι, inferInstance, l, s, b.smulTower B, hl, hs, ?_, ?_, ?_, ?_⟩
   · intro z p j
     rw [Basis.smulTower_apply]
-    calc z • (b p • B j) = (Ideal.Quotient.mk I z) • (b p • B j) := rfl
+    calc
+      z • (b p • B j)
+        = (Ideal.Quotient.mk I z) • (b p • B j) := rfl
       _ = (Ideal.Quotient.mk I z * b p) • B j := by rw [smul_smul]
       _ = (∑ q, b.repr (Ideal.Quotient.mk I z * b p) q • b q) • B j := by rw [b.sum_repr]
       _ = ∑ q, (b.repr (Ideal.Quotient.mk I z * b p) q) • (b.smulTower B) (q, j) := by
@@ -72,7 +82,9 @@ theorem dex_block_frame (I : Ideal R) [I.IsMaximal] {L : Type} [Fintype L] (b : 
     refine Finset.sum_congr rfl fun a _ => ?_
     by_cases h : s a < l a
     · simp only [h, dif_pos, Basis.smulTower_apply]
-      calc B ⟨a, ⟨s a, h⟩⟩ = (1 : R ⧸ I) • B ⟨a, ⟨s a, h⟩⟩ := (one_smul _ _).symm
+      calc
+        B ⟨a, ⟨s a, h⟩⟩
+          = (1 : R ⧸ I) • B ⟨a, ⟨s a, h⟩⟩ := (one_smul _ _).symm
         _ = (∑ p, b.repr 1 p • b p) • B ⟨a, ⟨s a, h⟩⟩ := by rw [b.sum_repr]
         _ = ∑ p, b.repr 1 p • (b p • B ⟨a, ⟨s a, h⟩⟩) := by
           rw [Finset.sum_smul]

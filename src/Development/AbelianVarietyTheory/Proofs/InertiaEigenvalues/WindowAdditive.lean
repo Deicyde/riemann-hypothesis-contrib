@@ -6,10 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory.PMonE
 
-theorem window_additive (q : ℝ) (hq : 2 ≤ q) (r : ℤ) (α f : ℤ → ℝ) (hα : Antitone α)
-    (hf : ∀ J, f (J + 1) - f J = (α J - α (J + 1)) * (q ^ (r - J) - 1)) :
-    (∀ J, J ≤ r → f J + α J ≤ f r + α r) ∧
-    (∀ J, r + 1 ≤ J → f J - α J / 2 ≤ f r - α (r + 1) / 2) := by
+theorem window_additive
+    (q : ℝ) (hq : 2 ≤ q)
+    (r : ℤ) (α f : ℤ → ℝ)
+    (hα : Antitone α) (hf : ∀ J, f (J + 1) - f J = (α J - α (J + 1)) * (q ^ (r - J) - 1))
+    : (∀ J, J ≤ r → f J + α J ≤ f r + α r)
+      ∧ (∀ J, r + 1 ≤ J → f J - α J / 2 ≤ f r - α (r + 1) / 2) := by
   have hd : ∀ J, 0 ≤ α J - α (J + 1) := fun J => sub_nonneg.2 (hα (by omega))
   have hq1 : (1 : ℝ) ≤ q := by linarith
   constructor
@@ -37,7 +39,21 @@ theorem window_additive (q : ℝ) (hq : 2 ≤ q) (r : ℤ) (α f : ℤ → ℝ) 
       have h4 : q⁻¹ ≤ (2 : ℝ)⁻¹ := inv_anti₀ (by norm_num) hq
       nlinarith [mul_nonneg h2 (show 0 ≤ 2⁻¹ - q ^ (r - n) by linarith)]
 
-theorem window_ineq : ∀ (p h : ℕ), 1 < p → 0 < h → ∀ a ρ : ℤ → ℝ, (∀ J, 0 < a J) → (∀ J, 0 < ρ J) → Antitone a → a 0 < p * a ((h : ℤ) - 1) → (∀ J, a (J + h) = a J / p) → (∀ J, ρ (J + h) = ρ J ^ ((p : ℝ) ^ h)⁻¹) → (∀ J, a (J + 1) * ρ (J + 1) ^ ((p : ℝ) ^ J) = a J * ρ J ^ ((p : ℝ) ^ J)) → ∀ r : ℕ, r < h → ∀ J : ℤ, a J * ρ J ^ ((p : ℝ) ^ r) ≤ a r * ρ r ^ ((p : ℝ) ^ r) ∧ (J < 0 → a J * ρ J ^ ((p : ℝ) ^ r) < a r * ρ r ^ ((p : ℝ) ^ r)) ∧ (J ≤ -(h : ℤ) → a J * ρ J ^ ((p : ℝ) ^ r) ≤ a r * ρ r ^ ((p : ℝ) ^ r) / p) ∧ (3 * (h : ℤ) ≤ J → a J * ρ J ^ ((p : ℝ) ^ r) ≤ a r * ρ r ^ ((p : ℝ) ^ r) / p) := by
+theorem window_ineq
+    : ∀ (p h : ℕ),
+      1 < p → 0 < h
+        → ∀ a ρ : ℤ → ℝ,
+          (∀ J, 0 < a J) → (∀ J, 0 < ρ J) → Antitone a → a 0 < p * a ((h : ℤ) - 1)
+            → (∀ J, a (J + h) = a J / p) → (∀ J, ρ (J + h) = ρ J ^ ((p : ℝ) ^ h)⁻¹)
+            → (∀ J, a (J + 1) * ρ (J + 1) ^ ((p : ℝ) ^ J) = a J * ρ J ^ ((p : ℝ) ^ J))
+            → ∀ r : ℕ,
+              r < h
+                → ∀ J : ℤ,
+                  a J * ρ J ^ ((p : ℝ) ^ r) ≤ a r * ρ r ^ ((p : ℝ) ^ r)
+                    ∧ (J < 0 → a J * ρ J ^ ((p : ℝ) ^ r) < a r * ρ r ^ ((p : ℝ) ^ r))
+                    ∧ (J ≤ -(h : ℤ) → a J * ρ J ^ ((p : ℝ) ^ r) ≤ a r * ρ r ^ ((p : ℝ) ^ r) / p)
+                    ∧ (3 * (h : ℤ) ≤ J
+                      → a J * ρ J ^ ((p : ℝ) ^ r) ≤ a r * ρ r ^ ((p : ℝ) ^ r) / p) := by
   intro p h hp hh a ρ ha hρ hanti hlt hper _ hrel r hr J
   have hp2 : (2 : ℝ) ≤ p := by exact_mod_cast hp
   have hp0 : (0 : ℝ) < p := by linarith
@@ -63,11 +79,10 @@ theorem window_ineq : ∀ (p h : ℕ), 1 < p → 0 < h → ∀ a ρ : ℤ → �
     intro J
     simp only [hαdef]
     rw [hper, Real.log_div (ha J).ne' hp0.ne']
-  have hdiv : f J ≤ f r - Real.log p →
-      a J * ρ J ^ ((p : ℝ) ^ r) ≤ a r * ρ r ^ ((p : ℝ) ^ r) / p := by
+  have hdiv
+      : f J ≤ f r - Real.log p → a J * ρ J ^ ((p : ℝ) ^ r) ≤ a r * ρ r ^ ((p : ℝ) ^ r) / p := by
     intro H
-    rw [← Real.log_le_log_iff (hpos J) (div_pos (hpos r) hp0),
-      Real.log_div (hpos r).ne' hp0.ne']
+    rw [← Real.log_le_log_iff (hpos J) (div_pos (hpos r) hp0), Real.log_div (hpos r).ne' hp0.ne']
     exact H
   have hr0 : α r ≤ α 0 := hα (by omega)
   refine ⟨?_, ?_, ?_, ?_⟩

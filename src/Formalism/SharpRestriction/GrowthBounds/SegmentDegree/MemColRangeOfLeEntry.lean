@@ -10,19 +10,22 @@ open MvPolynomial
 
 namespace Formalism.MainNotions.SelectionLemmas.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas Formalism.MainNotions.G.Joints.StandardMonomialSpace
+open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas
+  Formalism.MainNotions.G.Joints.StandardMonomialSpace
 
 section Abs2
 
 variable {R : Type} [CommRing R] {N r : ℕ}
 
-theorem colStep_same (c : ℤ) (h : ℕ) (x : Fin r → MvPolynomial (Fin N × Fin r) R)
-    (Kf : Finset (Fin r) → MvPolynomial (Fin N × Fin r) R) : colStep c h h x Kf = Kf := by
+theorem colStep_same
+    (c : ℤ) (h : ℕ) (x : Fin r → MvPolynomial (Fin N × Fin r) R)
+    (Kf : Finset (Fin r) → MvPolynomial (Fin N × Fin r) R)
+    : colStep c h h x Kf = Kf := by
   unfold colStep
   rw [if_neg (lt_irrefl _), if_neg (lt_irrefl _)]
 
-theorem Kcol_const (ν : Fin (N + 1) → Fin r → ℤ) (c : ℤ) :
-    ∀ j ≤ N, (∀ i < j, colH (stg ν i) c = colH (stg ν (i + 1)) c) → Kcol R ν c j = extOne := by
+theorem Kcol_const (ν : Fin (N + 1) → Fin r → ℤ) (c : ℤ)
+    : ∀ j ≤ N, (∀ i < j, colH (stg ν i) c = colH (stg ν (i + 1)) c) → Kcol R ν c j = extOne := by
   intro j
   induction j with
   | zero => intro _ _; rw [Kcol]
@@ -31,21 +34,23 @@ theorem Kcol_const (ν : Fin (N + 1) → Fin r → ℤ) (c : ℤ) :
     rw [Kcol_succ ν c j (by omega), h j (by omega), colStep_same]
     exact ih (by omega) fun i hi => h i (by omega)
 
-def cutPath (n0 : ℕ) (ν : Fin (N + 1) → Fin r → ℤ) : Fin (N + 1) → Fin r → ℤ := fun i => stg ν (min i.val n0)
+def cutPath (n0 : ℕ) (ν : Fin (N + 1) → Fin r → ℤ) : Fin (N + 1) → Fin r → ℤ := fun i =>
+  stg ν (min i.val n0)
 
-theorem stg_cut (n0 : ℕ) (ν : Fin (N + 1) → Fin r → ℤ) (i : ℕ) (hi : i ≤ N) :
-    stg (cutPath n0 ν) i = stg ν (min i n0) := by
+theorem stg_cut (n0 : ℕ) (ν : Fin (N + 1) → Fin r → ℤ) (i : ℕ) (hi : i ≤ N)
+    : stg (cutPath n0 ν) i = stg ν (min i n0) := by
   have : i < N + 1 := by omega
   simp [stg, cutPath, this]
 
-theorem Kcol_cut (n0 : ℕ) (ν : Fin (N + 1) → Fin r → ℤ) (c : ℤ) :
-    ∀ j ≤ N, Kcol R (cutPath n0 ν) c j = Kcol R ν c (min j n0) := by
+theorem Kcol_cut (n0 : ℕ) (ν : Fin (N + 1) → Fin r → ℤ) (c : ℤ)
+    : ∀ j ≤ N, Kcol R (cutPath n0 ν) c j = Kcol R ν c (min j n0) := by
   intro j
   induction j with
   | zero => intro _; rw [Nat.zero_min, Kcol, Kcol]
   | succ j ih =>
     intro hj
-    rw [Kcol_succ _ c j (by omega), stg_cut n0 ν j (by omega), stg_cut n0 ν (j + 1) hj, ih (by omega)]
+    rw [Kcol_succ _ c j (by omega), stg_cut n0 ν j (by omega), stg_cut n0 ν (j + 1) hj,
+      ih (by omega)]
     by_cases h : j + 1 ≤ n0
     · rw [min_eq_left h, min_eq_left (by omega : j ≤ n0), Kcol_succ ν c j (by omega)]
     · rw [min_eq_right (by omega : n0 ≤ j + 1), min_eq_right (by omega : n0 ≤ j), colStep_same]
@@ -67,14 +72,16 @@ theorem colH_anti (μ : Fin r → ℤ) {c c' : ℤ} (h : c ≤ c') : colH μ c' 
 structure PlHyp (n0 : ℕ) (be : ℤ) (ν : Fin (N + 1) → Fin r → ℤ) : Prop where
   rng : ∀ i ≤ N, ∀ m, 0 ≤ stg ν i m ∧ stg ν i m ≤ be
   fin : ∀ m, stg ν N m = be
-  up : ∀ t < r, ∀ c, colH (stg ν (n0 + t)) c ≤ colH (stg ν (n0 + t + 1)) c ∧
-    colH (stg ν (n0 + t + 1)) c ≤ colH (stg ν (n0 + t)) c + 1
+  up
+    : ∀ t < r, ∀ c,
+      colH (stg ν (n0 + t)) c ≤ colH (stg ν (n0 + t + 1)) c
+        ∧ colH (stg ν (n0 + t + 1)) c ≤ colH (stg ν (n0 + t)) c + 1
 
 def mT (t : ℕ) (ht : t < r) : Fin r := ⟨r - 1 - t, by omega⟩
 
-theorem riseA_succ_pos (n0 : ℕ) (ν : Fin (N + 1) → Fin r → ℤ) (c : ℤ) (t : ℕ) (ht : t < r)
-    (hr : rises ν c (n0 + t)) :
-    riseA n0 ν c (t + 1) = insert (mT t ht) (riseA n0 ν c t) ∧ mT t ht ∉ riseA n0 ν c t := by
+theorem riseA_succ_pos
+    (n0 : ℕ) (ν : Fin (N + 1) → Fin r → ℤ) (c : ℤ) (t : ℕ) (ht : t < r) (hr : rises ν c (n0 + t))
+    : riseA n0 ν c (t + 1) = insert (mT t ht) (riseA n0 ν c t) ∧ mT t ht ∉ riseA n0 ν c t := by
   classical
   have hmt : r - 1 - (mT t ht).val = t := by simp only [mT]; omega
   constructor
@@ -86,17 +93,22 @@ theorem riseA_succ_pos (n0 : ℕ) (ν : Fin (N + 1) → Fin r → ℤ) (c : ℤ)
       · left
         apply Fin.ext
         have := m.isLt
-        simp only [mT]; omega
+        simp only [mT]
+        omega
       · exact Or.inr ⟨by omega, h2⟩
     · rintro (h | ⟨h1, h2⟩)
       · subst h
-        rw [hmt]; exact ⟨by omega, hr⟩
+        rw [hmt]
+        exact ⟨by omega, hr⟩
       · exact ⟨by omega, h2⟩
   · simp only [riseA, Finset.mem_filter, Finset.mem_univ, true_and, not_and]
-    intro h; rw [hmt] at h; omega
+    intro h
+    rw [hmt] at h
+    omega
 
-theorem riseA_succ_neg (n0 : ℕ) (ν : Fin (N + 1) → Fin r → ℤ) (c : ℤ) (t : ℕ)
-    (hr : ¬ rises ν c (n0 + t)) : riseA n0 ν c (t + 1) = riseA n0 ν c t := by
+theorem riseA_succ_neg
+    (n0 : ℕ) (ν : Fin (N + 1) → Fin r → ℤ) (c : ℤ) (t : ℕ) (hr : ¬ rises ν c (n0 + t))
+    : riseA n0 ν c (t + 1) = riseA n0 ν c t := by
   classical
   ext m
   simp only [riseA, Finset.mem_filter, Finset.mem_univ, true_and]
@@ -108,15 +120,16 @@ theorem riseA_succ_neg (n0 : ℕ) (ν : Fin (N + 1) → Fin r → ℤ) (c : ℤ)
   · rintro ⟨h1, h2⟩
     exact ⟨by omega, h2⟩
 
-theorem card_riseA {n0 : ℕ} {be : ℤ} {ν : Fin (N + 1) → Fin r → ℤ} (H : PlHyp n0 be ν) (c : ℤ) :
-    ∀ t ≤ r, colH (stg ν n0) c + (riseA n0 ν c t).card = colH (stg ν (n0 + t)) c := by
+theorem card_riseA {n0 : ℕ} {be : ℤ} {ν : Fin (N + 1) → Fin r → ℤ} (H : PlHyp n0 be ν) (c : ℤ)
+    : ∀ t ≤ r, colH (stg ν n0) c + (riseA n0 ν c t).card = colH (stg ν (n0 + t)) c := by
   classical
   intro t
   induction t with
   | zero =>
     intro _
     have : riseA n0 ν c 0 = ∅ := by simp [riseA]
-    rw [this]; simp
+    rw [this]
+    simp
   | succ t ih =>
     intro ht
     have htr : t < r := by omega
@@ -138,8 +151,9 @@ theorem pEnd_eq (ν : Fin (N + 1) → Fin r → ℤ) : pEnd ν = stg ν N := by
   rw [← stg_eq ν N (by omega)]
   rfl
 
-theorem Ican_eq [NeZero r] {n0 : ℕ} {be : ℤ} {ν : Fin (N + 1) → Fin r → ℤ} (H : PlHyp n0 be ν) (c : ℤ) :
-    Ican ν c = if 1 ≤ c ∧ c ≤ be then Finset.univ else ∅ := by
+theorem Ican_eq
+    [NeZero r] {n0 : ℕ} {be : ℤ} {ν : Fin (N + 1) → Fin r → ℤ} (H : PlHyp n0 be ν) (c : ℤ)
+    : Ican ν c = if 1 ≤ c ∧ c ≤ be then Finset.univ else ∅ := by
   classical
   have hbe : 0 ≤ be := by
     have := (H.rng N le_rfl 0).1
@@ -156,36 +170,43 @@ theorem Ican_eq [NeZero r] {n0 : ℕ} {be : ℤ} {ν : Fin (N + 1) → Fin r →
   · rw [if_neg h1, if_neg (fun h => h1 h.1), colH_all fun m => by rw [H.fin]; omega]
     exact Finset.filter_false_of_mem fun m _ => by have := m.isLt; omega
 
-def Icut (n0 : ℕ) (ν : Fin (N + 1) → Fin r → ℤ) : ℤ → Finset (Fin r) := fun c => Ican ν c \ riseA n0 ν c r
+def Icut (n0 : ℕ) (ν : Fin (N + 1) → Fin r → ℤ) : ℤ → Finset (Fin r) := fun c =>
+  Ican ν c \ riseA n0 ν c r
 
-theorem Kcol_inactive {n0 : ℕ} {be : ℤ} {ν : Fin (N + 1) → Fin r → ℤ} (H : PlHyp n0 be ν) (c : ℤ)
-    (hc : ¬ (1 ≤ c ∧ c ≤ be)) (j : ℕ) (hj : j ≤ N) : Kcol R ν c j = extOne := by
+theorem Kcol_inactive
+    {n0 : ℕ} {be : ℤ} {ν : Fin (N + 1) → Fin r → ℤ} (H : PlHyp n0 be ν)
+    (c : ℤ) (hc : ¬(1 ≤ c ∧ c ≤ be))
+    (j : ℕ) (hj : j ≤ N)
+    : Kcol R ν c j = extOne := by
   apply Kcol_const ν c j hj
   intro i hi
   by_cases h1 : 1 ≤ c
-  · have h2 : be < c := by
-      by_contra h; exact hc ⟨h1, by omega⟩
+  · have h2 : be < c := by by_contra h; exact hc ⟨h1, by omega⟩
     rw [colH_none fun m => lt_of_le_of_lt (H.rng i (by omega) m).2 h2,
       colH_none fun m => lt_of_le_of_lt (H.rng (i + 1) (by omega) m).2 h2]
   · rw [colH_all fun m => le_trans (by omega) (H.rng i (by omega) m).1,
       colH_all fun m => le_trans (by omega) (H.rng (i + 1) (by omega) m).1]
 
-theorem extOne_empty {P : Type} [CommRing P] : (extOne (n := r) (P := P) ∅) = 1 := by
-  simp [extOne]
+theorem extOne_empty {P : Type} [CommRing P] : (extOne (n := r) (P := P) ∅) = 1 := by simp [extOne]
 
-theorem mem_colRange_of_le_entry (μ : Fin (N + 1) → Fin r → ℤ) (i : Fin (N + 1)) (m : Fin r) {c : ℤ} (h1 : 0 ≤ c)
-    (h2 : c ≤ μ i m) : c ∈ colRange μ := by
+theorem mem_colRange_of_le_entry
+    (μ : Fin (N + 1) → Fin r → ℤ) (i : Fin (N + 1)) (m : Fin r)
+    {c : ℤ} (h1 : 0 ≤ c) (h2 : c ≤ μ i m)
+    : c ∈ colRange μ := by
   unfold colRange
   have hT : |μ i m| ≤ ∑ i, ∑ m, |μ i m| := by
-    refine le_trans ?_ (Finset.single_le_sum (f := fun i => ∑ m, |μ i m|)
-      (fun i _ => Finset.sum_nonneg fun m _ => abs_nonneg _) (Finset.mem_univ i))
+    refine le_trans ?_
+      (Finset.single_le_sum
+        (f := fun i => ∑ m, |μ i m|)
+        (fun i _ => Finset.sum_nonneg fun m _ => abs_nonneg _)
+        (Finset.mem_univ i))
     exact Finset.single_le_sum (f := fun m => |μ i m|) (fun m _ => abs_nonneg _) (Finset.mem_univ m)
   have := le_abs_self (μ i m)
   simp only [Finset.mem_Icc]
   constructor <;> omega
 
-theorem Psi_full [NeZero r] {n0 : ℕ} {be : ℤ} {ν : Fin (N + 1) → Fin r → ℤ} (H : PlHyp n0 be ν) :
-    Psi R ν (Ican ν) = ∏ c ∈ Finset.Icc 1 be, Kcol R ν c N Finset.univ := by
+theorem Psi_full [NeZero r] {n0 : ℕ} {be : ℤ} {ν : Fin (N + 1) → Fin r → ℤ} (H : PlHyp n0 be ν)
+    : Psi R ν (Ican ν) = ∏ c ∈ Finset.Icc 1 be, Kcol R ν c N Finset.univ := by
   classical
   unfold Psi
   symm
@@ -196,7 +217,8 @@ theorem Psi_full [NeZero r] {n0 : ℕ} {be : ℤ} {ν : Fin (N + 1) → Fin r �
     have := H.fin 0
     rw [← stg_eq ν N (by omega)] at this
     have h' : ν (Fin.last N) 0 = be := this
-    rw [h']; exact hc.2
+    rw [h']
+    exact hc.2
   rw [← Finset.prod_subset hsub]
   · refine Finset.prod_congr rfl fun c hc => ?_
     rw [Finset.mem_Icc] at hc
@@ -205,12 +227,16 @@ theorem Psi_full [NeZero r] {n0 : ℕ} {be : ℤ} {ν : Fin (N + 1) → Fin r �
     rw [Finset.mem_Icc] at hc
     rw [Ican_eq H, if_neg hc, Kcol_inactive H c hc N le_rfl, extOne_empty]
 
-theorem Psi_cut [NeZero r] {n0 : ℕ} (hN : n0 + r = N) {be : ℤ} {ν : Fin (N + 1) → Fin r → ℤ} (H : PlHyp n0 be ν) :
-    Psi R (cutPath n0 ν) (Icut n0 ν) = ∏ c ∈ Finset.Icc 1 be, Kcol R ν c n0 (Finset.univ \ riseA n0 ν c r) := by
+theorem Psi_cut
+    [NeZero r] {n0 : ℕ} (hN : n0 + r = N) {be : ℤ} {ν : Fin (N + 1) → Fin r → ℤ} (H : PlHyp n0 be ν)
+    : Psi R (cutPath n0 ν) (Icut n0 ν)
+      = ∏ c ∈ Finset.Icc 1 be, Kcol R ν c n0 (Finset.univ \ riseA n0 ν c r) := by
   classical
   unfold Psi
-  have hterm : ∀ c, Kcol R (cutPath n0 ν) c N (Icut n0 ν c) =
-      if 1 ≤ c ∧ c ≤ be then Kcol R ν c n0 (Finset.univ \ riseA n0 ν c r) else 1 := by
+  have hterm
+      : ∀ c,
+        Kcol R (cutPath n0 ν) c N (Icut n0 ν c)
+          = if 1 ≤ c ∧ c ≤ be then Kcol R ν c n0 (Finset.univ \ riseA n0 ν c r) else 1 := by
     intro c
     rw [Kcol_cut n0 ν c N le_rfl, min_eq_right (by omega : n0 ≤ N)]
     unfold Icut
@@ -234,35 +260,44 @@ theorem Psi_cut [NeZero r] {n0 : ℕ} (hN : n0 + r = N) {be : ℤ} {ν : Fin (N 
     by_contra hge
     apply hout
     refine mem_colRange_of_le_entry (cutPath n0 ν) ⟨i, by omega⟩ m (by omega) ?_
-    have : cutPath n0 ν ⟨i, by omega⟩ m = stg ν i m := by
-      simp [cutPath, min_eq_left hi]
-    rw [this]; omega
+    have : cutPath n0 ν ⟨i, by omega⟩ m = stg ν i m := by simp [cutPath, min_eq_left hi]
+    rw [this]
+    omega
   have h0 : colH (stg ν n0) c = 0 := colH_none (hlow n0 le_rfl)
   have hcard := card_riseA H c r le_rfl
   rw [h0, hN, colH_all fun m => by rw [H.fin]; exact hc.2, zero_add] at hcard
   have hall : riseA n0 ν c r = Finset.univ := by
     apply Finset.eq_univ_of_card
     rw [hcard, Fintype.card_fin]
-  rw [hall, Finset.sdiff_self, Kcol_const ν c n0 (by omega) fun i hi => by
-    rw [colH_none (hlow i (by omega)), colH_none (hlow (i + 1) (by omega))], extOne_empty]
+  rw [hall, Finset.sdiff_self,
+    Kcol_const ν c n0 (by omega) fun i hi => by
+      rw [colH_none (hlow i (by omega)), colH_none (hlow (i + 1) (by omega))],
+    extOne_empty]
 
-theorem kill_Psi [NeZero r] {n0 : ℕ} (hN : n0 + r = N) {be : ℤ} {ν : Fin (N + 1) → Fin r → ℤ} (H : PlHyp n0 be ν) :
-    ∃ e : ℕ, kill (offN n0) (Psi R ν (Ican ν)) =
-      (-1) ^ e * (∏ c ∈ Finset.Icc 1 be, ∏ m ∈ riseA n0 ν c r, MvPolynomial.X (tauI n0 hN m, m)) *
-        Psi R (cutPath n0 ν) (Icut n0 ν) := by
+theorem kill_Psi
+    [NeZero r] {n0 : ℕ} (hN : n0 + r = N) {be : ℤ} {ν : Fin (N + 1) → Fin r → ℤ} (H : PlHyp n0 be ν)
+    : ∃ e : ℕ,
+      kill (offN n0) (Psi R ν (Ican ν))
+        = (-1) ^ e * (∏ c ∈ Finset.Icc 1 be, ∏ m ∈ riseA n0 ν c r, MvPolynomial.X (tauI n0 hN m, m))
+          * Psi R (cutPath n0 ν) (Icut n0 ν) := by
   classical
   rw [Psi_full H, Psi_cut hN H, map_prod]
-  have hcol : ∀ c ∈ Finset.Icc 1 be, ∃ e : ℕ, kill (offN n0) (Kcol R ν c N Finset.univ) =
-      (-1) ^ e * (∏ m ∈ riseA n0 ν c r, MvPolynomial.X (tauI n0 hN m, m)) *
-        Kcol R ν c n0 (Finset.univ \ riseA n0 ν c r) := by
+  have hcol
+      : ∀ c ∈ Finset.Icc 1 be, ∃ e : ℕ,
+        kill (offN n0) (Kcol R ν c N Finset.univ)
+          = (-1) ^ e * (∏ m ∈ riseA n0 ν c r, MvPolynomial.X (tauI n0 hN m, m))
+            * Kcol R ν c n0 (Finset.univ \ riseA n0 ν c r) := by
     intro c hc
     rw [Finset.mem_Icc] at hc
-    have := kill_Kcol_tau (R := R) n0 hN ν c hc.1 (fun t ht => (H.up t ht c).1) r le_rfl Finset.univ
-      (Finset.subset_univ _)
+    have :=
+      kill_Kcol_tau (R := R) n0 hN ν c hc.1
+        (fun t ht => (H.up t ht c).1)
+        r le_rfl Finset.univ (Finset.subset_univ _)
     rwa [hN] at this
   choose! e he using hcol
   refine ⟨∑ c ∈ Finset.Icc 1 be, e c, ?_⟩
-  rw [Finset.prod_congr rfl he, Finset.prod_mul_distrib, Finset.prod_mul_distrib, Finset.prod_pow_eq_pow_sum]
+  rw [Finset.prod_congr rfl he, Finset.prod_mul_distrib, Finset.prod_mul_distrib,
+    Finset.prod_pow_eq_pow_sum]
 
 end Abs2
 

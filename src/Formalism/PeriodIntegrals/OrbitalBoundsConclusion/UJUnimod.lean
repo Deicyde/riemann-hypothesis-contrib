@@ -5,5 +5,5 @@ public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.ModularCharacterEqOneO
 
 @[expose] public section
 
-theorem unitary_unimodular_right_inv : PI.UJUnimod.UJRightInv :=
-  fun n ε => ⟨fun g => Formalism.REAL.indefinite_unitary_unimodular n ε g⟩
+theorem unitary_unimodular_right_inv : PI.UJUnimod.UJRightInv := fun n ε =>
+  ⟨fun g => Formalism.REAL.indefinite_unitary_unimodular n ε g⟩

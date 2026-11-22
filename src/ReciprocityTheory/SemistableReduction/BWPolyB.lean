@@ -8,13 +8,15 @@ namespace ReciprocityTheory.MultiplicativeHeights
 
 open Polynomial
 
-theorem bwp_ext_poly {σ : Type*} [Fintype σ] [DecidableEq σ] (k : ℕ) (g D : (σ → ℂ) → ℂ)
-    (w : σ → ℂ) (hw : ∀ z, {s : ℂ | D (z + s • w) = 0}.Finite)
+theorem bwp_ext_poly
+    {σ : Type*} [Fintype σ] [DecidableEq σ]
+    (k : ℕ)
+    (g D : (σ → ℂ) → ℂ) (w : σ → ℂ) (hw : ∀ z, {s : ℂ | D (z + s • w) = 0}.Finite)
     (hD : ∀ z v, D z ≠ 0 → {t : ℂ | D (z + t • v) = 0}.Finite)
-    (hL : ∀ z v, {t : ℂ | D (z + t • v) = 0}.Finite → ∃ Q : ℂ[X], Q.natDegree ≤ k ∧
-      ∀ t, D (z + t • v) ≠ 0 → g (z + t • v) = Q.eval t) :
-    ∃ F : MvPolynomial σ ℂ, ∀ z, D z ≠ 0 → g z = MvPolynomial.eval z F := by
-
+    (hL : ∀ z v,
+      {t : ℂ | D (z + t • v) = 0}.Finite
+        → ∃ Q : ℂ[X], Q.natDegree ≤ k ∧ ∀ t, D (z + t • v) ≠ 0 → g (z + t • v) = Q.eval t)
+    : ∃ F : MvPolynomial σ ℂ, ∀ z, D z ≠ 0 → g z = MvPolynomial.eval z F := by
   have hw' := fun y => hL y w (hw y)
   choose Qw hQd hQ using hw'
 
@@ -26,7 +28,8 @@ theorem bwp_ext_poly {σ : Type*} [Fintype σ] [DecidableEq σ] (k : ℕ) (g D :
     set z : σ → ℂ := Function.update y m 0
     set e : σ → ℂ := Pi.single m 1
     have hupd : ∀ t, Function.update y m t = z + t • e := by
-      intro t; ext i
+      intro t
+      ext i
       by_cases hi : i = m
       · subst hi; simp [z, e]
       · simp [z, e, Function.update_apply, hi, Pi.single_apply]
@@ -42,8 +45,10 @@ theorem bwp_ext_poly {σ : Type*} [Fintype σ] [DecidableEq σ] (k : ℕ) (g D :
       · simp
       · exact hPd _ _ h
 
-    have key : ∀ S : Finset ℂ, S.card = k + 1 → (∀ c ∈ S, D (z + c • w) ≠ 0) →
-        ∀ t, (∀ c ∈ S, D ((z + t • e) + c • w) ≠ 0) → G (z + t • e) = (R S).eval t := by
+    have key
+        : ∀ S : Finset ℂ,
+          S.card = k + 1 → (∀ c ∈ S, D (z + c • w) ≠ 0)
+            → ∀ t, (∀ c ∈ S, D ((z + t • e) + c • w) ≠ 0) → G (z + t • e) = (R S).eval t := by
       intro S hS hSz t ht
       simp only [G, R]
       rw [bwp_eval_eq_lagrange S (Qw (z + t • e)) k hS (hQd _) 0, Polynomial.eval_finsetSum]
@@ -52,20 +57,21 @@ theorem bwp_ext_poly {σ : Type*} [Fintype σ] [DecidableEq σ] (k : ℕ) (g D :
       congr 1
       simp only [Pc, dif_neg (hSz c hc)]
       rw [← hP _ _ (hSz c hc) t (by rw [add_right_comm]; exact ht c hc), add_right_comm]
-    have hbad : ∀ S : Finset ℂ, (∀ c ∈ S, D (z + c • w) ≠ 0) →
-        {t : ℂ | ∃ c ∈ S, D ((z + t • e) + c • w) = 0}.Finite := by
+    have hbad
+        : ∀ S : Finset ℂ,
+          (∀ c ∈ S, D (z + c • w) ≠ 0) → {t : ℂ | ∃ c ∈ S, D ((z + t • e) + c • w) = 0}.Finite := by
       intro S hSz
-      have : {t : ℂ | ∃ c ∈ S, D ((z + t • e) + c • w) = 0} =
-          ⋃ c ∈ S, {t : ℂ | D ((z + c • w) + t • e) = 0} := by
+      have : {t : ℂ | ∃ c ∈ S, D ((z + t • e) + c • w) = 0}
+          = ⋃ c ∈ S, {t : ℂ | D ((z + c • w) + t • e) = 0} := by
         ext t; simp [add_right_comm]
       rw [this]
       exact Set.Finite.biUnion S.finite_toSet (fun c hc => hD _ e (hSz c hc))
     obtain ⟨S0, hS0, hS0z⟩ := bwp_exists_nodes {s | D (z + s • w) = 0} (hw z) k
     refine ⟨R S0, hRdeg S0, fun t0 => ?_⟩
     rw [hupd]
-    obtain ⟨S1, hS1, hS1z⟩ := bwp_exists_nodes
-      ({s | D (z + s • w) = 0} ∪ {s | D ((z + t0 • e) + s • w) = 0})
-      ((hw z).union (hw (z + t0 • e))) k
+    obtain ⟨S1, hS1, hS1z⟩ :=
+      bwp_exists_nodes ({s | D (z + s • w) = 0} ∪ {s | D ((z + t0 • e) + s • w) = 0})
+        ((hw z).union (hw (z + t0 • e))) k
     have hS1a : ∀ c ∈ S1, D (z + c • w) ≠ 0 := fun c hc h => hS1z c hc (Or.inl h)
     have hS1b : ∀ c ∈ S1, D ((z + t0 • e) + c • w) ≠ 0 := fun c hc h => hS1z c hc (Or.inr h)
     have hS0a : ∀ c ∈ S0, D (z + c • w) ≠ 0 := fun c hc h => hS0z c hc h

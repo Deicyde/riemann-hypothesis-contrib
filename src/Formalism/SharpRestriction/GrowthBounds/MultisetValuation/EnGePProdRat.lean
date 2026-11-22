@@ -12,13 +12,14 @@ namespace Formalism.MainNotions.FormalGroupSystem.Pf
 
 open Formalism.MainNotions.G Formalism.BasicNotions Finset
 
-attribute [local instance] Formalism.MainNotions.G.GAtP.ringO Formalism.MainNotions.G.GAtP.domO Formalism.MainNotions.G.GAtP.dvrO Formalism.MainNotions.G.GAtP.fieldK
+attribute [local instance]
+  Formalism.MainNotions.G.GAtP.ringO Formalism.MainNotions.G.GAtP.domO
+  Formalism.MainNotions.G.GAtP.dvrO Formalism.MainNotions.G.GAtP.fieldK
   Formalism.MainNotions.G.GAtP.algOK
 
 variable {p : ℕ} [Fact p.Prime] {X : Sys p} (Y : Pend X)
 
-theorem en_p_mem : (p : Y.Kc) ∈ Y.Oc := by
-  exact natCast_mem Y.Oc p
+theorem en_p_mem : (p : Y.Kc) ∈ Y.Oc := by exact natCast_mem Y.Oc p
 
 theorem en_ppow_mem (N : ℤ) (hN : 0 ≤ N) : (p : Y.Kc) ^ N ∈ Y.Oc := by
   lift N to ℕ using hN
@@ -45,8 +46,8 @@ theorem en_geC_one : Y.geC 1 0 := by
   have h'' : a ≤ 0 := by exact_mod_cast h'
   exact en_ppow_mem Y (-a) (by omega)
 
-theorem en_geC_mul_rat {x y : Y.Kc} (q1 q2 : ℚ) (hx : Y.geC x q1) (hy : Y.geC y q2) :
-    Y.geC (x * y) ((q1 + q2 : ℚ) : ℝ) := by
+theorem en_geC_mul_rat {x y : Y.Kc} (q1 q2 : ℚ) (hx : Y.geC x q1) (hy : Y.geC y q2)
+    : Y.geC (x * y) ((q1 + q2 : ℚ) : ℝ) := by
   intro a b hb hab
   have hp := pKc_ne Y
   have hM0 : 0 < q1.den * q2.den := Nat.mul_pos q1.den_pos q2.den_pos
@@ -72,11 +73,15 @@ theorem en_geC_mul_rat {x y : Y.Kc} (q1 q2 : ℚ) (hx : Y.geC x q1) (hy : Y.geC 
       have hM' : (0 : ℝ) ≤ (q1.den : ℝ) * q2.den := by positivity
       nlinarith
     exact_mod_cast h'
-  have key : ((x * y) ^ b * (p : Y.Kc) ^ (-a)) ^ (q1.den * q2.den) =
-      (x ^ (b * (q1.den * q2.den)) * (p : Y.Kc) ^ (-a1)) * (y ^ (b * (q1.den * q2.den)) * (p : Y.Kc) ^ (-a2)) *
-        (p : Y.Kc) ^ (a1 + a2 - a * ((q1.den * q2.den : ℕ) : ℤ)) := by
-    have h1 : ((p : Y.Kc) ^ (-a)) ^ (q1.den * q2.den) =
-        (p : Y.Kc) ^ (-a1) * (p : Y.Kc) ^ (-a2) * (p : Y.Kc) ^ (a1 + a2 - a * ((q1.den * q2.den : ℕ) : ℤ)) := by
+  have key
+      : ((x * y) ^ b * (p : Y.Kc) ^ (-a)) ^ (q1.den * q2.den)
+        = (x ^ (b * (q1.den * q2.den)) * (p : Y.Kc) ^ (-a1))
+          * (y ^ (b * (q1.den * q2.den)) * (p : Y.Kc) ^ (-a2))
+          * (p : Y.Kc) ^ (a1 + a2 - a * ((q1.den * q2.den : ℕ) : ℤ)) := by
+    have h1
+        : ((p : Y.Kc) ^ (-a)) ^ (q1.den * q2.den)
+          = (p : Y.Kc) ^ (-a1) * (p : Y.Kc) ^ (-a2)
+            * (p : Y.Kc) ^ (a1 + a2 - a * ((q1.den * q2.den : ℕ) : ℤ)) := by
       rw [← zpow_natCast, ← zpow_mul, ← zpow_add₀ hp, ← zpow_add₀ hp]
       congr 1
       push_cast
@@ -87,11 +92,13 @@ theorem en_geC_mul_rat {x y : Y.Kc} (q1 q2 : ℚ) (hx : Y.geC x q1) (hy : Y.geC 
   rw [key]
   exact Y.Oc.mul_mem (Y.Oc.mul_mem hx' hy') (en_ppow_mem Y _ (by omega))
 
-theorem en_geC_sum {α : Type} (s : Finset α) (f : α → Y.Kc) (g : ℝ) (h : ∀ i ∈ s, Y.geC (f i) g) :
-    Y.geC (∑ i ∈ s, f i) g := by
-  exact Finset.sum_induction f (fun x => Y.geC x g) (fun _ _ ha hb => geC_add Y ha hb) (geC_zero Y g) h
+theorem en_geC_sum {α : Type} (s : Finset α) (f : α → Y.Kc) (g : ℝ) (h : ∀ i ∈ s, Y.geC (f i) g)
+    : Y.geC (∑ i ∈ s, f i) g := by
+  exact
+    Finset.sum_induction f (fun x => Y.geC x g) (fun _ _ ha hb => geC_add Y ha hb) (geC_zero Y g) h
 
-def geP {τ : Type} (a : MvPolynomial τ Y.Kc) (g : ℝ) : Prop := ∀ n, Y.geC (AddMonoidAlgebra.coeff a n) g
+def geP {τ : Type} (a : MvPolynomial τ Y.Kc) (g : ℝ) : Prop :=
+  ∀ n, Y.geC (AddMonoidAlgebra.coeff a n) g
 
 theorem valuation_coeff_one_nonneg {τ : Type} : geP Y (1 : MvPolynomial τ Y.Kc) 0 := by
   classical
@@ -101,15 +108,18 @@ theorem valuation_coeff_one_nonneg {τ : Type} : geP Y (1 : MvPolynomial τ Y.Kc
   · exact en_geC_one Y
   · exact geC_zero Y 0
 
-theorem valuation_coeff_ge_mul_rat {τ : Type} {a b : MvPolynomial τ Y.Kc} (q1 q2 : ℚ) (ha : geP Y a q1) (hb : geP Y b q2) :
-    geP Y (a * b) ((q1 + q2 : ℚ) : ℝ) := by
+theorem valuation_coeff_ge_mul_rat
+    {τ : Type} {a b : MvPolynomial τ Y.Kc} (q1 q2 : ℚ) (ha : geP Y a q1) (hb : geP Y b q2)
+    : geP Y (a * b) ((q1 + q2 : ℚ) : ℝ) := by
   classical
   intro n
   rw [MvPolynomial.coeff_mul]
   exact en_geC_sum Y _ _ _ fun x _ => en_geC_mul_rat Y q1 q2 (ha x.1) (hb x.2)
 
-theorem valuation_coeff_ge_prod_rat {τ α : Type} (s : Finset α) (a : α → MvPolynomial τ Y.Kc) (q : α → ℚ)
-    (h : ∀ i ∈ s, geP Y (a i) (q i)) : geP Y (∏ i ∈ s, a i) ((∑ i ∈ s, q i : ℚ) : ℝ) := by
+theorem valuation_coeff_ge_prod_rat
+    {τ α : Type}
+    (s : Finset α) (a : α → MvPolynomial τ Y.Kc) (q : α → ℚ) (h : ∀ i ∈ s, geP Y (a i) (q i))
+    : geP Y (∏ i ∈ s, a i) ((∑ i ∈ s, q i : ℚ) : ℝ) := by
   classical
   revert h
   refine Finset.induction_on s ?_ ?_
@@ -120,14 +130,16 @@ theorem valuation_coeff_ge_prod_rat {τ α : Type} (s : Finset α) (a : α → M
     exact valuation_coeff_ge_mul_rat Y _ _ (h i (Finset.mem_insert_self i t))
       (ih fun k hk => h k (Finset.mem_insert_of_mem hk))
 
-theorem valuation_coeff_ge_sum {τ α : Type} (s : Finset α) (a : α → MvPolynomial τ Y.Kc) (g : ℝ) (h : ∀ i ∈ s, geP Y (a i) g) :
-    geP Y (∑ i ∈ s, a i) g := by
+theorem valuation_coeff_ge_sum
+    {τ α : Type} (s : Finset α) (a : α → MvPolynomial τ Y.Kc) (g : ℝ) (h : ∀ i ∈ s, geP Y (a i) g)
+    : geP Y (∑ i ∈ s, a i) g := by
   intro n
   rw [MvPolynomial.coeff_sum]
   exact en_geC_sum Y _ _ _ fun i hi => h i hi n
 
-theorem valuation_coeff_ge_smul {τ : Type} {a : MvPolynomial τ Y.Kc} {g : ℝ} {c : Y.Kc} (hc : c ∈ Y.Oc) (h : geP Y a g) :
-    geP Y (c • a) g := by
+theorem valuation_coeff_ge_smul
+    {τ : Type} {a : MvPolynomial τ Y.Kc} {g : ℝ} {c : Y.Kc} (hc : c ∈ Y.Oc) (h : geP Y a g)
+    : geP Y (c • a) g := by
   intro n
   rw [MvPolynomial.coeff_smul, smul_eq_mul]
   exact geC_mul_Oc Y (h n) hc

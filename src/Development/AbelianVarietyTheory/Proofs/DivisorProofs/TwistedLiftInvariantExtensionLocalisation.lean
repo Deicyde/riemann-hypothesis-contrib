@@ -9,14 +9,17 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem twisted_lift_to_localisation (A B A₂ : Type) [CommRing A] [IsLocalRing A] [CommRing B] [Algebra A B]
-    [CommRing A₂] [IsLocalRing A₂] (G : Type) [Group G] [Finite G] [MulSemiringAction G B]
-    [SMulCommClass G A B] [Algebra.IsInvariant A B G] (f : B →+* A₂) :
-    IsLocalHom (f.comp (algebraMap A B)) → (∀ y : A₂, ∃ b s : B, IsUnit (f s) ∧ y * f s = f b) →
-    (∀ b : B, f b = 0 → ∃ s : B, IsUnit (f s) ∧ s * b = 0) →
-    ∀ (V' : Type) [CommRing V'] [IsLocalRing V'] (e₁ : A →+* V') (β : B →+* V'),
-      IsLocalHom e₁ → β.comp (algebraMap A B) = e₁ →
-      ∃ ev₂ : A₂ →+* V', IsLocalHom ev₂ ∧ ev₂.comp (f.comp (algebraMap A B)) = e₁ := by
+theorem twisted_lift_to_localisation
+    (A B A₂ : Type)
+    [CommRing A] [IsLocalRing A] [CommRing B] [Algebra A B] [CommRing A₂] [IsLocalRing A₂]
+    (G : Type)
+    [Group G] [Finite G] [MulSemiringAction G B] [SMulCommClass G A B] [Algebra.IsInvariant A B G]
+    (f : B →+* A₂)
+    : IsLocalHom (f.comp (algebraMap A B)) → (∀ y : A₂, ∃ b s : B, IsUnit (f s) ∧ y * f s = f b)
+      → (∀ b : B, f b = 0 → ∃ s : B, IsUnit (f s) ∧ s * b = 0)
+      → ∀ (V' : Type) [CommRing V'] [IsLocalRing V'] (e₁ : A →+* V') (β : B →+* V'),
+        IsLocalHom e₁ → β.comp (algebraMap A B) = e₁
+          → ∃ ev₂ : A₂ →+* V', IsLocalHom ev₂ ∧ ev₂.comp (f.comp (algebraMap A B)) = e₁ := by
   intro hfl hsurj hker V' _ _ e₁ β he₁ hβ
   set q : Ideal B := (maximalIdeal A₂).comap f with hq
   set c : Ideal B := (maximalIdeal V').comap β with hc

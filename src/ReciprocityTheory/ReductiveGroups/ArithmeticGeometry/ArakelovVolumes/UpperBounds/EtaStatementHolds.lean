@@ -7,7 +7,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.Up.EtaPf
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory
+  Topology
 open scoped ContDiff
 
 private lemma fderiv_const_mul_apply {n : ℕ} (t : ℝ) (g : V n → ℂ) (y : V n) (v : V n) :
@@ -65,8 +67,9 @@ theorem eta_holds {E : Type} [Field E] [NumberField E] [IsCMField E] : EtaStatem
     exact Xa.rr_le
   have h1 := h (1 + Xa.c1 / Xa.a1) ht0 htr x0 hx0 z hzd ξ
   have h2 := Xa.base_psi_levi_lower_bound x0 hx0 z hzd ξ
-  have h3 := IW.leviM_comb (X := X) (x0 := x0) (ho := ho) (hz := hz) (la1 := Xa.Fp) (la2 := Xa.L)
-    (k := nd X) (ξ := ξ)
+  have h3 :=
+    IW.leviM_comb (X := X) (x0 := x0) (ho := ho) (hz := hz) (la1 := Xa.Fp) (la2 := Xa.L) (k := nd X)
+      (ξ := ξ)
   have h4 := leviM_const_mul X Xa.ps0 (1 + Xa.c1 / Xa.a1) x0 z ξ
   have h5 := mul_le_mul_of_nonneg_left h2 ht0
   rw [h3] at h1

@@ -10,12 +10,14 @@ open Formalism.REAL Finset
 
 namespace GlobalTheory.CapelliNegT
 
-
 open Finset in
-theorem _root_.GlobalTheory.CapelliNegT.glRel_negT_and_qdet :
-    ∀ (A : Type) [Ring A] [Algebra ℂ A] (n : ℕ) (E : Fin n → Fin n → A), _root_.Formalism.REAL.GlRel E →
-      _root_.Formalism.REAL.GlRel (fun a b => -E b a) ∧
-        ∀ u : ℂ, _root_.Formalism.REAL.qdet (fun a b => -E b a) u = ((-1 : ℂ) ^ n) • _root_.Formalism.REAL.qdet E ((n : ℂ) - 1 - u) := by
+theorem _root_.GlobalTheory.CapelliNegT.glRel_negT_and_qdet
+    : ∀ (A : Type) [Ring A] [Algebra ℂ A] (n : ℕ) (E : Fin n → Fin n → A),
+      _root_.Formalism.REAL.GlRel E
+        → _root_.Formalism.REAL.GlRel (fun a b => - E b a)
+          ∧ ∀ u : ℂ,
+            _root_.Formalism.REAL.qdet (fun a b => - E b a) u
+              = ((-1 : ℂ) ^ n) • _root_.Formalism.REAL.qdet E ((n : ℂ) - 1 - u) := by
   intro A _ _ n E hE
   refine ⟨?_, fun u => ?_⟩
   · unfold _root_.Formalism.REAL.GlRel at hE ⊢
@@ -29,8 +31,10 @@ theorem _root_.GlobalTheory.CapelliNegT.glRel_negT_and_qdet :
       have key : _root_.PI.RowForm := _root_.quantum_minor_row_form
       unfold _root_.PI.RowForm at key
       exact key A n n E hE id id v
-    have hM : ∀ (x : ℂ) (a b : Fin n),
-        _root_.Formalism.REAL.Tm (fun a b => -E b a) x a b = -_root_.Formalism.REAL.Tm E (-x) b a := by
+    have hM
+        : ∀ (x : ℂ) (a b : Fin n),
+          _root_.Formalism.REAL.Tm (fun a b => - E b a) x a b
+            = - _root_.Formalism.REAL.Tm E (-x) b a := by
       intro x a b
       unfold _root_.Formalism.REAL.Tm
       by_cases h : a = b
@@ -39,9 +43,10 @@ theorem _root_.GlobalTheory.CapelliNegT.glRel_negT_and_qdet :
         abel
       · simp only [h, Ne.symm h, if_false]
         abel
-    have hneg : ∀ g : Fin n → A, (List.ofFn fun k => -g k).prod = (-1) ^ n * (List.ofFn g).prod := by
+    have hneg
+        : ∀ g : Fin n → A, (List.ofFn fun k => - g k).prod = (-1) ^ n * (List.ofFn g).prod := by
       intro g
-      have hl : (List.ofFn fun k => -g k) = (List.ofFn g).map Neg.neg := by
+      have hl : (List.ofFn fun k => - g k) = (List.ofFn g).map Neg.neg := by
         rw [List.map_ofFn]
         rfl
       rw [hl, List.prod_map_neg, List.length_ofFn]

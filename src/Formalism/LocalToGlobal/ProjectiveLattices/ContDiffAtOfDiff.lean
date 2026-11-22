@@ -10,7 +10,8 @@ noncomputable section
 
 namespace Formalism.L2.Pj.I2FramePointLemmas
 
-open ReciprocityTheory.ChartRestriction.G.I2 ReciprocityTheory.ChartRestriction.G.PullbackSections NumberField
+open ReciprocityTheory.ChartRestriction.G.I2 ReciprocityTheory.ChartRestriction.G.PullbackSections
+  NumberField
 open scoped ContDiff
 
 section Deriv
@@ -46,8 +47,10 @@ theorem jbound_pos (X : PT E) {dg : ℕ} (P : Par X dg) (n : ℕ) : 0 < P.Jbound
   have h6 : (0 : ℝ) < 6 * (2 * (dstar (E := E) P.m : ℝ)) ^ ((dstar (E := E) P.m : ℝ) / 2) :=
     mul_pos (by norm_num) hB
   unfold Par.Jbound
-  exact mul_pos (mul_pos (mul_pos (pow_pos (by norm_num) _) (pow_pos (inv_pos.2 h6) _))
-    (pow_pos (by norm_num) _)) (Real.exp_pos _)
+  exact mul_pos
+    (mul_pos (mul_pos (pow_pos (by norm_num) _) (pow_pos (inv_pos.2 h6) _))
+      (pow_pos (by norm_num) _))
+    (Real.exp_pos _)
 
 end Log
 

@@ -12,7 +12,8 @@ public import Formalism.SharpRestriction.CuspSpanNormBounds.UnimodularSchurMeasu
 
 noncomputable section
 
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.L2.SG.HidaSetting
 open scoped InnerProductSpace TensorProduct Classical ENNReal
 open Matrix
 
@@ -34,7 +35,9 @@ def HinfS (S : Set (Fin I.n → I.E)) : Subgroup I.Ginf where
   inv_mem' := by
     intro s hs v x hx
     have e1 : uMat (s⁻¹ v) * uMat (s v) = 1 := by simp [uMat]
-    calc uMat (s⁻¹ v) *ᵥ rv I v x = uMat (s⁻¹ v) *ᵥ (uMat (s v) *ᵥ rv I v x) := by rw [hs v x hx]
+    calc
+      uMat (s⁻¹ v) *ᵥ rv I v x
+        = uMat (s⁻¹ v) *ᵥ (uMat (s v) *ᵥ rv I v x) := by rw [hs v x hx]
       _ = rv I v x := by rw [Matrix.mulVec_mulVec, e1, Matrix.one_mulVec]
 
 def HfinS (S : Set (Fin I.n → I.E)) : Subgroup I.Gf where
@@ -49,7 +52,9 @@ def HfinS (S : Set (Fin I.n → I.E)) : Subgroup I.Gf where
   inv_mem' := by
     intro a ha y hy
     have e1 : I.fmat a⁻¹ * I.fmat a = 1 := by simp [AutInst.fmat]
-    calc I.fmat a⁻¹ *ᵥ incl I y = I.fmat a⁻¹ *ᵥ (I.fmat a *ᵥ incl I y) := by rw [ha y hy]
+    calc
+      I.fmat a⁻¹ *ᵥ incl I y
+        = I.fmat a⁻¹ *ᵥ (I.fmat a *ᵥ incl I y) := by rw [ha y hy]
       _ = incl I y := by rw [Matrix.mulVec_mulVec, e1, Matrix.one_mulVec]
 
 def Sfin {r : ℕ} (e : Fin r → Fin I.n → I.E) (z : Fin I.n → I.E) : Set I.Gf :=
@@ -68,7 +73,8 @@ def fixSet : Set (Fin X.B.I.n → X.B.I.E) := Set.range X.eR ∪ Set.range X.fR 
 abbrev Hinf : Subgroup X.B.I.Ginf := HinfS X.B.I (fixSet X u)
 abbrev Hfin : Subgroup X.B.I.Gf := HfinS X.B.I (fixSet X u)
 
-def Gam : Subgroup X.B.I.GA := Formalism.MainNotions.LeviCoordinates.rr_GF X.B.I ⊓ (Hinf X u).prod (Hfin X u)
+def Gam : Subgroup X.B.I.GA :=
+  Formalism.MainNotions.LeviCoordinates.rr_GF X.B.I ⊓ (Hinf X u).prod (Hfin X u)
 
 def iotaI : Gam X u →* Hinf X u :=
   MonoidHom.codRestrict ((MonoidHom.fst _ _).comp (Gam X u).subtype) (Hinf X u)
@@ -128,11 +134,12 @@ theorem chi2_apply_one (hK : X.LevelSubgroupCharacter) : X.chi2 1 = 1 := by
   exact mul_left_cancel₀ h0 (h1.symm.trans (mul_one _).symm)
 
 def psiK (hK : X.LevelSubgroupCharacter) : Ku X u hK →* ℂˣ where
-  toFun h := Units.mk0 (X.chi2 ((X.xu u)⁻¹ * ((h : Hfin X u) : X.B.I.Gf) * X.xu u)) (by
-    intro h0
-    have hn := hK.2.2.2.2 _ h.2
-    rw [h0, norm_zero] at hn
-    exact zero_ne_one hn)
+  toFun h :=
+    Units.mk0 (X.chi2 ((X.xu u)⁻¹ * ((h : Hfin X u) : X.B.I.Gf) * X.xu u)) (by
+      intro h0
+      have hn := hK.2.2.2.2 _ h.2
+      rw [h0, norm_zero] at hn
+      exact zero_ne_one hn)
   map_one' := by
     ext
     simpa using chi2_apply_one X hK
@@ -151,69 +158,93 @@ def Cu (hK : X.LevelSubgroupCharacter) : Submodule ℂ (X.Vpi u →ₗ[ℂ] (Hin
 def SfinU : Set X.B.I.Gf := Sfin X.B.I X.eR (X.zR u)
 
 def Srat : Subgroup X.B.I.GA :=
-  Formalism.MainNotions.LeviCoordinates.rr_GF X.B.I ⊓ Subgroup.closure {y | y.1 ∈ X.SinfU u ∧ y.2 ∈ SfinU X u}
+  Formalism.MainNotions.LeviCoordinates.rr_GF X.B.I
+    ⊓ Subgroup.closure {y | y.1 ∈ X.SinfU u ∧ y.2 ∈ SfinU X u}
 
 def SGroup : Prop :=
-  ((Subgroup.closure {y : X.B.I.GA | y.1 ∈ X.SinfU u ∧ y.2 ∈ SfinU X u} : Subgroup X.B.I.GA) :
-    Set X.B.I.GA) = {y | y.1 ∈ X.SinfU u ∧ y.2 ∈ SfinU X u}
+  ((Subgroup.closure {y : X.B.I.GA | y.1 ∈ X.SinfU u ∧ y.2 ∈ SfinU X u} : Subgroup X.B.I.GA)
+      : Set X.B.I.GA)
+    = {y | y.1 ∈ X.SinfU u ∧ y.2 ∈ SfinU X u}
 
 def IsDec (y : X.B.I.Gf) (n : X.B.I.Gf) (h : Hfin X u) (k : X.B.I.Gf) : Prop :=
   n ∈ X.NfinU u ∧ k ∈ X.K2 ∧ y = n * (h : X.B.I.Gf) * X.xu u * k
 
-def phVal (hK : X.LevelSubgroupCharacter) (T : Cu X u hK) (yinf : X.B.I.Ginf) (n : X.B.I.Gf) (h : Hfin X u)
-    (k : X.B.I.Gf) : ℂ :=
+def phVal
+    (hK : X.LevelSubgroupCharacter) (T : Cu X u hK)
+    (yinf : X.B.I.Ginf) (n : X.B.I.Gf) (h : Hfin X u) (k : X.B.I.Gf)
+    : ℂ :=
   X.psiFinU u n * X.chi2 k * (T : X.Vpi u →ₗ[ℂ] (Hinf X u × Hfin X u → ℂ)) (X.Wu u yinf) (1, h)
 
 def Ph (hK : X.LevelSubgroupCharacter) (T : Cu X u hK) (y : X.B.I.GA) : ℂ :=
   if hd : ∃ n h k, IsDec X u y.2 n h k then
     phVal X u hK T y.1 hd.choose hd.choose_spec.choose hd.choose_spec.choose_spec.choose
-  else 0
+  else
+    0
 
 def PhWellDef (hK : X.LevelSubgroupCharacter) : Prop :=
   ∀ (T : Cu X u hK) (yinf : X.B.I.Ginf) (yf n n' k k' : X.B.I.Gf) (h h' : Hfin X u),
-    IsDec X u yf n h k → IsDec X u yf n' h' k' → phVal X u hK T yinf n h k = phVal X u hK T yinf n' h' k'
+    IsDec X u yf n h k → IsDec X u yf n' h' k'
+      → phVal X u hK T yinf n h k = phVal X u hK T yinf n' h' k'
 
 def PhProps (hK : X.LevelSubgroupCharacter) : Prop :=
-  ∀ T : Cu X u hK, Measurable (Ph X u hK T) ∧
-    (∀ γ ∈ Srat X u, ∀ y, Ph X u hK T (γ * y) = Ph X u hK T y) ∧
-    (∀ y, ∀ κ ∈ X.K2, Ph X u hK T (y * (1, κ)) = X.chi2 κ * Ph X u hK T y) ∧
-    ∀ y, Integrable (fun z => X.ph z * Ph X u hK T (y * (z, 1))) (Formalism.L2.SG.ProjRows.muInf X.B.I) ∧
-      ∫ z, X.ph z * Ph X u hK T (y * (z, 1)) ∂(Formalism.L2.SG.ProjRows.muInf X.B.I) = Ph X u hK T y
+  ∀ T : Cu X u hK,
+    Measurable (Ph X u hK T) ∧ (∀ γ ∈ Srat X u, ∀ y, Ph X u hK T (γ * y) = Ph X u hK T y)
+      ∧ (∀ y, ∀ κ ∈ X.K2, Ph X u hK T (y * (1, κ)) = X.chi2 κ * Ph X u hK T y)
+      ∧ ∀ y,
+        Integrable
+            (fun z => X.ph z * Ph X u hK T (y * (z, 1)))
+            (Formalism.L2.SG.ProjRows.muInf X.B.I)
+          ∧ ∫ z, X.ph z * Ph X u hK T (y * (z, 1)) ∂(Formalism.L2.SG.ProjRows.muInf X.B.I)
+            = Ph X u hK T y
 
 def Pser (hK : X.LevelSubgroupCharacter) (Dt : Set X.B.I.GA) (T : Cu X u hK) (x : X.B.I.GA) : ℂ :=
   Formalism.L2.SG.PoincareSeriesSquareIntegrable.poinc Dt (Ph X u hK T) x
 
 def IsReps (Dt : Set X.B.I.GA) : Prop :=
-  Formalism.L2.SG.FoldBound.IsRightTransversal (Formalism.MainNotions.LeviCoordinates.rr_GF X.B.I) (Srat X u) Dt
+  Formalism.L2.SG.FoldBound.IsRightTransversal (Formalism.MainNotions.LeviCoordinates.rr_GF X.B.I)
+    (Srat X u) Dt
 
-def PuFun (hK : X.LevelSubgroupCharacter) (Dt : Set X.B.I.GA) (T : Cu X u hK) : X.B.I.L2 X.B.μf X.B.fund :=
+def PuFun (hK : X.LevelSubgroupCharacter) (Dt : Set X.B.I.GA) (T : Cu X u hK)
+    : X.B.I.L2 X.B.μf X.B.fund :=
   if hm : MemLp (Pser X u hK Dt T) 2 ((X.B.I.muA X.B.μf).restrict X.B.fund) then hm.toLp _ else 0
 
 def IFinite (hK : X.LevelSubgroupCharacter) : Prop :=
-  (∃ Fs : Set X.B.I.GA, IsFundamentalDomain (Srat X u) Fs (X.B.I.muA X.B.μf)) ∧
-  ∀ (T : Cu X u hK) (Ω : Set X.B.I.GA), IsCompact Ω → ∀ Fs : Set X.B.I.GA,
-    IsFundamentalDomain (Srat X u) Fs (X.B.I.muA X.B.μf) →
-      Formalism.L2.SG.PoincareSeriesSquareIntegrable.multiplicityLIntegral (X.B.I.muA X.B.μf) (Formalism.MainNotions.LeviCoordinates.rr_GF X.B.I) Ω Fs (Ph X u hK T) < ⊤
+  (∃ Fs : Set X.B.I.GA, IsFundamentalDomain (Srat X u) Fs (X.B.I.muA X.B.μf))
+    ∧ ∀ (T : Cu X u hK) (Ω : Set X.B.I.GA),
+      IsCompact Ω
+        → ∀ Fs : Set X.B.I.GA,
+          IsFundamentalDomain (Srat X u) Fs (X.B.I.muA X.B.μf)
+            → Formalism.L2.SG.PoincareSeriesSquareIntegrable.multiplicityLIntegral
+                (X.B.I.muA X.B.μf) (Formalism.MainNotions.LeviCoordinates.rr_GF X.B.I) Ω Fs
+                (Ph X u hK T)
+              < ⊤
 
 def InHH (hK : X.LevelSubgroupCharacter) : Prop :=
-  ∀ (T : Cu X u hK) (Dt : Set X.B.I.GA), IsReps X u Dt →
-    (∀ x, Summable fun δ : Dt => ‖Ph X u hK T ((δ : X.B.I.GA) * x)‖) ∧
-    (∀ Dt', IsReps X u Dt' → Pser X u hK Dt' T = Pser X u hK Dt T) ∧
-    MemLp (Pser X u hK Dt T) 2 ((X.B.I.muA X.B.μf).restrict X.B.fund) ∧
-    X.B.Re (X.Rph (PuFun X u hK Dt T)) = PuFun X u hK Dt T
+  ∀ (T : Cu X u hK) (Dt : Set X.B.I.GA),
+    IsReps X u Dt
+      → (∀ x, Summable fun δ : Dt => ‖Ph X u hK T ((δ : X.B.I.GA) * x)‖)
+        ∧ (∀ Dt', IsReps X u Dt' → Pser X u hK Dt' T = Pser X u hK Dt T)
+        ∧ MemLp (Pser X u hK Dt T) 2 ((X.B.I.muA X.B.μf).restrict X.B.fund)
+        ∧ X.B.Re (X.Rph (PuFun X u hK Dt T)) = PuFun X u hK Dt T
 
 def PuLinear (hK : X.LevelSubgroupCharacter) (Dt : Set X.B.I.GA) : Prop :=
-  IsReps X u Dt → InHH X u hK →
-  (∀ T T' : Cu X u hK, PuFun X u hK Dt (T + T') = PuFun X u hK Dt T + PuFun X u hK Dt T') ∧
-    ∀ (c : ℂ) (T : Cu X u hK), PuFun X u hK Dt (c • T) = c • PuFun X u hK Dt T
+  IsReps X u Dt → InHH X u hK
+    → (∀ T T' : Cu X u hK, PuFun X u hK Dt (T + T') = PuFun X u hK Dt T + PuFun X u hK Dt T')
+      ∧ ∀ (c : ℂ) (T : Cu X u hK), PuFun X u hK Dt (c • T) = c • PuFun X u hK Dt T
 
 abbrev HHX : Submodule ℂ (X.B.I.L2 X.B.μf X.B.fund) := Formalism.L2.SG.RowsDef.HHB X.B X.Rph
 
-def Pu (hK : X.LevelSubgroupCharacter) (Dt : Set X.B.I.GA) (hD : IsReps X u Dt) (hin : InHH X u hK)
-    (hlin : PuLinear X u hK Dt) : Cu X u hK →ₗ[ℂ] HHX X where
-  toFun T := ⟨PuFun X u hK Dt T, by
-    refine ⟨PuFun X u hK Dt T, ?_⟩
-    exact (hin T Dt hD).2.2.2⟩
+def Pu
+    (hK : X.LevelSubgroupCharacter)
+    (Dt : Set X.B.I.GA) (hD : IsReps X u Dt)
+    (hin : InHH X u hK) (hlin : PuLinear X u hK Dt)
+    : Cu X u hK →ₗ[ℂ] HHX X where
+  toFun T := ⟨
+    PuFun X u hK Dt T,
+    by
+      refine ⟨PuFun X u hK Dt T, ?_⟩
+      exact (hin T Dt hD).2.2.2
+  ⟩
   map_add' T T' := by
     ext1
     exact (hlin hD hin).1 T T'
@@ -223,23 +254,23 @@ def Pu (hK : X.LevelSubgroupCharacter) (Dt : Set X.B.I.GA) (hD : IsReps X u Dt) 
 
 theorem one_mem_level_subgroup : (1 : X.B.I.Gf) ∈ X.K2 := by
   have h1 : X.B.I.fmat 1 = 1 := by simp [AutInst.fmat]
-  simp only [HidaSetting.K2, K2set, K2cong, InMod, Set.mem_setOf_eq, h1, sub_self, Matrix.zero_mulVec,
-    Submodule.zero_mem, implies_true, and_true]
-  first
-  | simp [AutInst.Kset]
-  | exact (Formalism.UG.stabGL X.B.I.Lf).one_mem
+  simp only [HidaSetting.K2, K2set, K2cong, InMod, Set.mem_setOf_eq, h1, sub_self,
+    Matrix.zero_mulVec, Submodule.zero_mem, implies_true, and_true]
+  first | simp [AutInst.Kset] | exact (Formalism.UG.stabGL X.B.I.Lf).one_mem
 
 def frameOrthogonalLattice : Set (VA X.B.I) :=
   {y | y ∈ X.B.I.Lf ∧ ∀ a, hA X.B.I (incl X.B.I (X.eR a)) y = 0 ∧ hA X.B.I (incl X.B.I (X.fR a)) y = 0 ∧
     hA X.B.I (incl X.B.I (X.zR u)) y = 0}
 
 def IsLevelTwoCongruentAt (x : X.B.I.Gf) : Prop :=
-  (∀ a : Fin D.R.rS, ∃ c : ℕ, Nat.Coprime c X.B.g ∧
-      InMod X.B.I X.B.g (X.e0 '' {b | b.1 < a.1}) ((c : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F) • ((X.B.I.fmat x - 1) *ᵥ X.e0 a))) ∧
-    (∃ c : ℕ, Nat.Coprime c X.B.g ∧
-      InMod X.B.I X.B.g (Set.range X.e0) ((c : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F) • ((X.B.I.fmat x - 1) *ᵥ X.z0))) ∧
-    ∀ i : Fin D.R.k, ∃ c : ℕ, Nat.Coprime c X.B.g ∧
-      InMod X.B.I X.B.g (Set.range X.e0 ∪ X.bw '' {j | j.1 < i.1})
+  (∀ a : Fin D.R.rS, ∃ c : ℕ,
+      Nat.Coprime c X.B.g ∧ InMod X.B.I X.B.g (X.e0 '' {b | b.1 < a.1})
+        ((c : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F) • ((X.B.I.fmat x - 1) *ᵥ X.e0 a)))
+    ∧ (∃ c : ℕ,
+      Nat.Coprime c X.B.g ∧ InMod X.B.I X.B.g (Set.range X.e0)
+        ((c : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F) • ((X.B.I.fmat x - 1) *ᵥ X.z0)))
+    ∧ ∀ i : Fin D.R.k, ∃ c : ℕ,
+      Nat.Coprime c X.B.g ∧ InMod X.B.I X.B.g (Set.range X.e0 ∪ X.bw '' {j | j.1 < i.1})
         ((c : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F) • ((X.B.I.fmat x - 1) *ᵥ X.bw i))
 
 def HaarTransversal : Set (Hfin X u) :=
@@ -257,10 +288,11 @@ def NOinf : Set X.B.I.Ginf :=
 def c0X (FdN : Set X.B.I.Ginf) : ℝ :=
   X.volK2 * (X.muN u FdN).toReal * (X.muH u Set.univ).toReal / (Module.finrank ℂ (X.Vpi u) : ℝ)
 
-def Kform (u' : D.what₂.Word) (hK : X.LevelSubgroupCharacter) (Dt Dt' : Set X.B.I.GA) (FdN FdN' : Set X.B.I.Ginf) (T : Cu X u hK)
-    (T' : Cu X u' hK) : ℂ :=
-  ((Real.sqrt (c0X X u FdN * c0X X u' FdN'))⁻¹ : ℝ) *
-    ⟪PuFun X u hK Dt T, PuFun X u' hK Dt' T'⟫_ℂ
+def Kform
+    (u' : D.what₂.Word) (hK : X.LevelSubgroupCharacter)
+    (Dt Dt' : Set X.B.I.GA) (FdN FdN' : Set X.B.I.Ginf) (T : Cu X u hK) (T' : Cu X u' hK)
+    : ℂ :=
+  ((Real.sqrt (c0X X u FdN * c0X X u' FdN'))⁻¹ : ℝ) * ⟪PuFun X u hK Dt T, PuFun X u' hK Dt' T'⟫_ℂ
 
 end PoincareSetting
 

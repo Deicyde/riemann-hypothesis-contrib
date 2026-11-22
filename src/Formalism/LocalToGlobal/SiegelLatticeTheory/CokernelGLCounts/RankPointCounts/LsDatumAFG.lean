@@ -19,8 +19,8 @@ section FG
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
 
-private theorem isNoetherianRing_locE_O' (L : LocE F E) [IsNonarchimedeanLocalField F] [CharZero F] :
-    IsNoetherianRing L.O := by
+private theorem isNoetherianRing_locE_O' (L : LocE F E) [IsNonarchimedeanLocalField F] [CharZero F]
+    : IsNoetherianRing L.O := by
   classical
   haveI : IsReduced E := L.reduced
   haveI : Module.Free F E := L.free
@@ -63,7 +63,8 @@ private theorem isNoetherianRing_locE_O' (L : LocE F E) [IsNonarchimedeanLocalFi
     intro i
     haveI : Algebra.IsAlgebraic 𝒪[F] F := IsLocalization.isAlgebraic F (nonZeroDivisors 𝒪[F])
     haveI : Algebra.IsAlgebraic 𝒪[F] E := Algebra.IsAlgebraic.trans 𝒪[F] F E
-    obtain ⟨c, hc, hci⟩ := (Algebra.IsAlgebraic.isAlgebraic (R := 𝒪[F]) (b i)).exists_integral_multiple
+    obtain ⟨c, hc, hci⟩ :=
+      (Algebra.IsAlgebraic.isAlgebraic (R := 𝒪[F]) (b i)).exists_integral_multiple
     refine ⟨(c : F), by exact_mod_cast hc, (L.O_def _).2 ?_⟩
     rwa [Algebra.smul_def, hA] at hci
   choose c hc0 hcO using hsc
@@ -75,19 +76,20 @@ private theorem isNoetherianRing_locE_O' (L : LocE F E) [IsNonarchimedeanLocalFi
     rw [Algebra.smul_def, Subring.coe_mul, ← hA]
     rfl
   let B : Fin 2 → E := fun i => algebraMap F E (c i) * b i
-  let g : L.O →ₗ[𝒪[F]] (Fin 2 → E) :=
-    { toFun := fun x i => (x : E) * B i + L.cj ((x : E) * B i)
-      map_add' := by
-        intro x y
-        funext i
-        simp only [Subring.coe_add, add_mul, map_add (f := _), Pi.add_apply]
-        ring
-      map_smul' := by
-        intro a x
-        funext i
-        simp only [RingHom.id_apply, Pi.smul_apply]
-        rw [hsm, Algebra.smul_def, hA]
-        simp only [mul_assoc, hcjA, mul_add] }
+  let g : L.O →ₗ[𝒪[F]] (Fin 2 → E) := {
+    toFun := fun x i => (x : E) * B i + L.cj ((x : E) * B i)
+    map_add' := by
+      intro x y
+      funext i
+      simp only [Subring.coe_add, add_mul, map_add (f := _), Pi.add_apply]
+      ring
+    map_smul' := by
+      intro a x
+      funext i
+      simp only [RingHom.id_apply, Pi.smul_apply]
+      rw [hsm, Algebra.smul_def, hA]
+      simp only [mul_assoc, hcjA, mul_add]
+  }
   let N : Submodule 𝒪[F] (Fin 2 → E) :=
     Submodule.span 𝒪[F] (Set.range fun i : Fin 2 => Pi.single i (1 : E))
   haveI : IsNoetherian 𝒪[F] N := isNoetherian_span_of_finite 𝒪[F] (Set.finite_range _)
@@ -118,8 +120,9 @@ private theorem isNoetherianRing_locE_O' (L : LocE F E) [IsNonarchimedeanLocalFi
       exact ((IsUnit.mk0 _ (hc0 i)).map (algebraMap F E)).mul_right_eq_zero.1 h
     have hall : ∀ w, ((x : E) - y) * w + L.cj (((x : E) - y) * w) = 0 := by
       intro w
-      let τ : E →ₗ[F] E := LinearMap.mulLeft F ((x : E) - y) +
-        (L.cj.toLinearMap).comp (LinearMap.mulLeft F ((x : E) - y))
+      let τ : E →ₗ[F] E :=
+        LinearMap.mulLeft F ((x : E) - y)
+          + (L.cj.toLinearMap).comp (LinearMap.mulLeft F ((x : E) - y))
       have hτ : τ = 0 := b.ext (fun i => by simpa [τ] using hb i)
       simpa [τ] using LinearMap.congr_fun hτ w
     exact Subtype.ext (sub_eq_zero.1 (hnd _ hall))

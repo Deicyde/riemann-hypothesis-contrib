@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.OddThetaF
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators Topology
 open Filter
 
@@ -50,9 +52,18 @@ lemma isIntegral_of_eq {u j : ℂ} (hj : IsIntegral ℤ j) (h : (u ^ 12 + 16) ^ 
   simp only [map_sub, map_pow, map_add (f := _), map_mul, Polynomial.aeval_X, Polynomial.aeval_C, map_ofNat]
   exact sub_eq_zero.2 h
 
-theorem value_half_period : ∀ (Λ : AddSubgroup ℂ), (∃ w₁ w₂ : ℂ, LinearIndependent ℝ ![w₁, w₂] ∧ Λ = AddSubgroup.closure {w₁, w₂}) → TaylorLogMetric.discr Λ = 1 → IsIntegral ℤ (1728 * g2 Λ ^ 3) → ∀ t, 2 * t ∈ Λ → t ∉ Λ → U1 Λ t (sgStar Λ) 0 ≠ 0 ∧ IsIntegral ℤ (U1 Λ t (sgStar Λ) 0) ∧ U1 Λ t (sgStar Λ) 0 ^ 8 = 16 * (g2 Λ - 3 * wpF Λ t ^ 2) ∧ 4 * wpF Λ t ^ 3 - g2 Λ * wpF Λ t - g3 Λ = 0 := by
+theorem value_half_period
+    : ∀ (Λ : AddSubgroup ℂ),
+      (∃ w₁ w₂ : ℂ, LinearIndependent ℝ ![w₁, w₂] ∧ Λ = AddSubgroup.closure {w₁, w₂})
+        → TaylorLogMetric.discr Λ = 1 → IsIntegral ℤ (1728 * g2 Λ ^ 3)
+        → ∀ t,
+          2 * t ∈ Λ → t ∉ Λ
+            → U1 Λ t (sgStar Λ) 0 ≠ 0 ∧ IsIntegral ℤ (U1 Λ t (sgStar Λ) 0)
+              ∧ U1 Λ t (sgStar Λ) 0 ^ 8 = 16 * (g2 Λ - 3 * wpF Λ t ^ 2)
+              ∧ 4 * wpF Λ t ^ 3 - g2 Λ * wpF Λ t - g3 Λ = 0 := by
   intro Λ hΛ hΔ hj t h2 ht
-  obtain ⟨⟨hd, hd1, hodd, hU⟩, hzero, -, hwp, -⟩ := GlobalTheory.T.oddThetaFunction_existence_uniqueness Λ hΛ
+  obtain ⟨⟨hd, hd1, hodd, hU⟩, hzero, -, hwp, -⟩ :=
+    GlobalTheory.T.oddThetaFunction_existence_uniqueness Λ hΛ
   obtain ⟨w₁, w₂, hli, hΛ⟩ := hΛ
   let L : PeriodPair := ⟨w₁, w₂, hli⟩
   have hL : ∀ z, z ∈ Λ ↔ z ∈ L.lattice := fun z => by
@@ -71,37 +82,46 @@ theorem value_half_period : ∀ (Λ : AddSubgroup ℂ), (∃ w₁ w₂ : ℂ, Li
     simp
   set k : ℂ := (Real.pi : ℂ) * (starRingEnd ℂ) t / (area Λ : ℂ) with hk
   have hsys := GlobalTheory.weierstrass_system_add_const L t (z := 0) (by simpa using htL)
-  have key := second_order (f := fun z => L.weierstrassP (z + t) - L.weierstrassP t)
-    (f' := fun z => L.derivWeierstrassP (z + t))
-    (a := fun z => sgStar Λ (z + t) ^ 2 * sgStar Λ t ^ 2) (s := sgStar Λ)
-    (b := fun z => Complex.exp (2 * k * z + 2 * k * t))
-    (hsys.mono fun z hz => hz.1.sub_const _) hsys.self_of_nhds.2 (by simp) (by simpa using hP')
-    (by fun_prop) hd (by fun_prop) ((hzero 0).2 Λ.zero_mem) hd1 (by
-      filter_upwards [(continuous_add_const t).continuousAt.eventually
-        (GlobalTheory.eventually_notMem_periodLattice L (z := 0 + t) (by simpa using htL))] with z hz
-      have hz' : z + t ∉ Λ := fun h => hz ((hL _).1 h)
-      have e1 := hwp (z + t) t hz' ht
-      rw [(hw _ hz').1, (hw t ht).1] at e1
-      have e2 := hU (2 * t) h2 z
-      rw [if_neg (by simpa using ht)] at e2
-      have e3 : -(Real.pi : ℂ) * z * (starRingEnd ℂ) (2 * t) / (area Λ : ℂ) -
-          (Real.pi : ℂ) * (2 * t) * (starRingEnd ℂ) (2 * t) / (2 * (area Λ : ℂ)) =
-          -(2 * k * z + 2 * k * t) := by
-        rw [hk, map_mul, map_ofNat]; ring
-      simp only [U1] at e2
-      rw [e3, Complex.exp_neg] at e2
-      have e4 : z + t + t = z + 2 * t := by ring
-      rw [e1, e4, add_sub_cancel_right]
-      have e5 := Complex.exp_ne_zero (2 * k * z + 2 * k * t)
-      rw [mul_inv_eq_iff_eq_mul₀ e5] at e2
-      rw [e2]; ring)
+  have key :=
+    second_order
+      (f := fun z => L.weierstrassP (z + t) - L.weierstrassP t)
+      (f' := fun z => L.derivWeierstrassP (z + t))
+      (a := fun z => sgStar Λ (z + t) ^ 2 * sgStar Λ t ^ 2)
+      (s := sgStar Λ)
+      (b := fun z => Complex.exp (2 * k * z + 2 * k * t))
+      (hsys.mono fun z hz => hz.1.sub_const _) hsys.self_of_nhds.2 (by simp) (by simpa using hP')
+      (by fun_prop) hd (by fun_prop) ((hzero 0).2 Λ.zero_mem) hd1
+      (by
+        filter_upwards [(continuous_add_const t).continuousAt.eventually
+          (GlobalTheory.eventually_notMem_periodLattice L (z := 0 + t) (by simpa using htL))] with z hz
+        have hz' : z + t ∉ Λ := fun h => hz ((hL _).1 h)
+        have e1 := hwp (z + t) t hz' ht
+        rw [(hw _ hz').1, (hw t ht).1] at e1
+        have e2 := hU (2 * t) h2 z
+        rw [if_neg (by simpa using ht)] at e2
+        have e3
+            : -(Real.pi : ℂ) * z * (starRingEnd ℂ) (2 * t) / (area Λ : ℂ)
+                - (Real.pi : ℂ) * (2 * t) * (starRingEnd ℂ) (2 * t) / (2 * (area Λ : ℂ))
+              = -(2 * k * z + 2 * k * t) := by
+          rw [hk, map_mul, map_ofNat]; ring
+        simp only [U1] at e2
+        rw [e3, Complex.exp_neg] at e2
+        have e4 : z + t + t = z + 2 * t := by ring
+        rw [e1, e4, add_sub_cancel_right]
+        have e5 := Complex.exp_ne_zero (2 * k * z + 2 * k * t)
+        rw [mul_inv_eq_iff_eq_mul₀ e5] at e2
+        rw [e2]
+        ring)
   simp only [zero_add, mul_zero] at key
   rw [← (hw t ht).1, ← hg2] at key
   have hu : U1 Λ t (sgStar Λ) 0 ^ 4 * Complex.exp (2 * k * t) = sgStar Λ t ^ 4 := by
     simp only [U1, zero_add]
     rw [mul_pow, mul_assoc, ← Complex.exp_nat_mul, ← Complex.exp_add]
-    have : ((4 : ℕ) : ℂ) * (-(Real.pi : ℂ) * 0 * (starRingEnd ℂ) t / (area Λ : ℂ) -
-      (Real.pi : ℂ) * t * (starRingEnd ℂ) t / (2 * (area Λ : ℂ))) + 2 * k * t = 0 := by
+    have : ((4 : ℕ) : ℂ)
+            * (-(Real.pi : ℂ) * 0 * (starRingEnd ℂ) t / (area Λ : ℂ)
+              - (Real.pi : ℂ) * t * (starRingEnd ℂ) t / (2 * (area Λ : ℂ)))
+          + 2 * k * t
+        = 0 := by
       rw [hk]; push_cast; ring
     rw [this, Complex.exp_zero, mul_one]
   set u := U1 Λ t (sgStar Λ) 0
@@ -111,13 +131,14 @@ theorem value_half_period : ∀ (Λ : AddSubgroup ℂ), (∃ w₁ w₂ : ℂ, Li
     linear_combination 2 * key + (12 * e ^ 2 - g2 Λ) * hu
   have hD : (12 * e ^ 2 - g2 Λ) ^ 2 * (g2 Λ - 3 * e ^ 2) = 1 := by
     have h3 : g3 Λ = 4 * e ^ 3 - g2 Λ * e := by linear_combination -hcub
-    rw [← hΔ, TaylorLogMetric.discr, h3]; ring
+    rw [← hΔ, TaylorLogMetric.discr, h3]
+    ring
   have h8 : u ^ 8 = 16 * (g2 Λ - 3 * e ^ 2) := by
     linear_combination (-u ^ 8) * hD +
       (g2 Λ - 3 * e ^ 2) * ((12 * e ^ 2 - g2 Λ) * u ^ 4 + 4) * h4
   refine ⟨fun h => by simp [h] at h4, isIntegral_of_eq hj ?_, h8, hcub⟩
-  have h5 : u ^ 12 + 16 = 12 * g2 Λ * u ^ 4 := by
-    linear_combination u ^ 4 * h8 - 4 * h4
-  rw [h5]; ring
+  have h5 : u ^ 12 + 16 = 12 * g2 Λ * u ^ 4 := by linear_combination u ^ 4 * h8 - 4 * h4
+  rw [h5]
+  ring
 
 end GlobalTheory.HalfPeriodValue

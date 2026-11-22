@@ -15,24 +15,32 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.UU
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.AbLaw GlobalTheory.UU
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 noncomputable section
 namespace GlobalTheory.UU.PointImage
 
-def levelHom {R W : Type} [CommRing R] [CommRing W] (f : R →+* W) (I : Ideal R) (n : ℕ) :
-    R ⧸ I ^ n →+* W ⧸ (I.map f) ^ n :=
+def levelHom {R W : Type} [CommRing R] [CommRing W] (f : R →+* W) (I : Ideal R) (n : ℕ)
+    : R ⧸ I ^ n →+* W ⧸ (I.map f) ^ n :=
   Ideal.quotientMap _ f (by rw [← Ideal.map_pow]; exact Ideal.le_comap_map)
 
-theorem isPushout_level {R W : Type} [CommRing R] [CommRing W] (f : R →+* W) (I : Ideal R) (n : ℕ) :
-    IsPushout (CommRingCat.ofHom f) (CommRingCat.ofHom (Ideal.Quotient.mk (I ^ n)))
-      (CommRingCat.ofHom (Ideal.Quotient.mk ((I.map f) ^ n))) (CommRingCat.ofHom (levelHom f I n)) := by
-  have w : CommRingCat.ofHom f ≫ CommRingCat.ofHom (Ideal.Quotient.mk ((I.map f) ^ n)) =
-      CommRingCat.ofHom (Ideal.Quotient.mk (I ^ n)) ≫ CommRingCat.ofHom (levelHom f I n) := rfl
-  have hk : ∀ s : PushoutCocone (CommRingCat.ofHom f) (CommRingCat.ofHom (Ideal.Quotient.mk (I ^ n))),
-      ∀ a ∈ (I.map f) ^ n, s.inl.hom a = 0 := by
+theorem isPushout_level {R W : Type} [CommRing R] [CommRing W] (f : R →+* W) (I : Ideal R) (n : ℕ)
+    : IsPushout (CommRingCat.ofHom f) (CommRingCat.ofHom (Ideal.Quotient.mk (I ^ n)))
+      (CommRingCat.ofHom (Ideal.Quotient.mk ((I.map f) ^ n)))
+      (CommRingCat.ofHom (levelHom f I n)) := by
+  have w
+      : CommRingCat.ofHom f ≫ CommRingCat.ofHom (Ideal.Quotient.mk ((I.map f) ^ n))
+        = CommRingCat.ofHom (Ideal.Quotient.mk (I ^ n)) ≫ CommRingCat.ofHom (levelHom f I n) :=
+    rfl
+  have hk
+      : ∀ s : PushoutCocone (CommRingCat.ofHom f) (CommRingCat.ofHom (Ideal.Quotient.mk (I ^ n))),
+        ∀ a ∈ (I.map f) ^ n,
+          s.inl.hom a = 0 := by
     intro s a ha
     rw [← Ideal.map_pow] at ha
     have : (I ^ n).map f ≤ RingHom.ker s.inl.hom := by
@@ -43,9 +51,14 @@ theorem isPushout_level {R W : Type} [CommRing R] [CommRing W] (f : R →+* W) (
       rw [Ideal.Quotient.eq_zero_iff_mem.mpr hy, map_zero] at h
       exact h
     exact this ha
-  refine ⟨⟨w⟩, ⟨PushoutCocone.IsColimit.mk w
-    (fun s => CommRingCat.ofHom (Ideal.Quotient.lift _ s.inl.hom (hk s))) (fun s => rfl)
-    (fun s => ?_) (fun s m h _ => ?_)⟩⟩
+  refine ⟨
+    ⟨w⟩,
+    ⟨PushoutCocone.IsColimit.mk w
+      (fun s => CommRingCat.ofHom (Ideal.Quotient.lift _ s.inl.hom (hk s)))
+      (fun s => rfl)
+      (fun s => ?_)
+      (fun s m h _ => ?_)⟩
+  ⟩
   · apply CommRingCat.hom_ext
     apply Ideal.Quotient.ringHom_ext
     exact congrArg CommRingCat.Hom.hom s.condition
@@ -53,9 +66,10 @@ theorem isPushout_level {R W : Type} [CommRing R] [CommRing W] (f : R →+* W) (
     apply Ideal.Quotient.ringHom_ext
     exact congrArg CommRingCat.Hom.hom h
 
-theorem isPullback_level {R W : Type} [CommRing R] [CommRing W] (f : R →+* W) (I : Ideal R) (e : ℕ) :
-    IsPullback (adicLevelι (I.map f) (e + 1)) (Spec.map (CommRingCat.ofHom (levelHom f I (e + 1))))
-      (Spec.map (CommRingCat.ofHom f)) (thick R I e) :=
+theorem isPullback_level {R W : Type} [CommRing R] [CommRing W] (f : R →+* W) (I : Ideal R) (e : ℕ)
+    : IsPullback (adicLevelι (I.map f) (e + 1))
+      (Spec.map (CommRingCat.ofHom (levelHom f I (e + 1)))) (Spec.map (CommRingCat.ofHom f))
+      (thick R I e) :=
   isPullback_SpecMap_of_isPushout _ _ _ _ (isPushout_level f I (e + 1))
 
 theorem thick_mono' (R : Type) [CommRing R] (I : Ideal R) (e : ℕ) : Mono (thick R I e) := by
@@ -63,21 +77,23 @@ theorem thick_mono' (R : Type) [CommRing R] (I : Ideal R) (e : ℕ) : Mono (thic
     IsClosedImmersion.spec_of_surjective _ Ideal.Quotient.mk_surjective
   infer_instance
 
-theorem existsUnique_image {R W : Type} [CommRing R] [CommRing W] [IsLocalRing W] (f : R →+* W)
-    (I : Ideal R) [IsAdicComplete (I.map f) W] {G B : Scheme.{0}}
-    (pG : G ⟶ Spec (CommRingCat.of R)) (pB : B ⟶ Spec (CommRingCat.of R))
-    {P : ℕ → Scheme.{0}} (fst : ∀ e, P e ⟶ G)
-    (snd : ∀ e, P e ⟶ Spec (CommRingCat.of (R ⧸ I ^ (e + 1))))
-    (hP : ∀ e, IsPullback (fst e) (snd e) pG (thick R I e))
-    (τ : ∀ e, P e ⟶ P (e + 1)) (hm : ∀ e, τ e ≫ fst (e + 1) = fst e)
-    (φ : ∀ e, P e ⟶ B) (hφ : ∀ e, φ e ≫ pB = snd e ≫ thick R I e)
-    (hc : ∀ e, τ e ≫ φ (e + 1) = φ e)
-    (x : Spec (CommRingCat.of W) ⟶ G) (hx : x ≫ pG = Spec.map (CommRingCat.ofHom f)) :
-    ∃! b : Spec (CommRingCat.of W) ⟶ B, b ≫ pB = Spec.map (CommRingCat.ofHom f) ∧
-      ∀ (e : ℕ) (Z : Scheme.{0}) (r : Z ⟶ Spec (CommRingCat.of W)) (xe : Z ⟶ P e),
-        xe ≫ fst e = r ≫ x → xe ≫ φ e = r ≫ b := by
-  have hw : ∀ e, (adicLevelι (I.map f) (e + 1) ≫ x) ≫ pG =
-      Spec.map (CommRingCat.ofHom (levelHom f I (e + 1))) ≫ thick R I e := fun e => by
+theorem existsUnique_image
+    {R W : Type} [CommRing R] [CommRing W] [IsLocalRing W]
+    (f : R →+* W) (I : Ideal R) [IsAdicComplete (I.map f) W]
+    {G B : Scheme.{0}} (pG : G ⟶ Spec (CommRingCat.of R)) (pB : B ⟶ Spec (CommRingCat.of R))
+    {P : ℕ → Scheme.{0}}
+    (fst : ∀ e, P e ⟶ G) (snd : ∀ e, P e ⟶ Spec (CommRingCat.of (R ⧸ I ^ (e + 1))))
+    (hP : ∀ e, IsPullback (fst e) (snd e) pG (thick R I e)) (τ : ∀ e, P e ⟶ P (e + 1))
+    (hm : ∀ e, τ e ≫ fst (e + 1) = fst e) (φ : ∀ e, P e ⟶ B)
+    (hφ : ∀ e, φ e ≫ pB = snd e ≫ thick R I e) (hc : ∀ e, τ e ≫ φ (e + 1) = φ e)
+    (x : Spec (CommRingCat.of W) ⟶ G) (hx : x ≫ pG = Spec.map (CommRingCat.ofHom f))
+    : ∃! b : Spec (CommRingCat.of W) ⟶ B, b ≫ pB = Spec.map (CommRingCat.ofHom f) ∧
+        ∀ (e : ℕ) (Z : Scheme.{0}) (r : Z ⟶ Spec (CommRingCat.of W)) (xe : Z ⟶ P e),
+          xe ≫ fst e = r ≫ x → xe ≫ φ e = r ≫ b := by
+  have hw
+      : ∀ e,
+        (adicLevelι (I.map f) (e + 1) ≫ x) ≫ pG
+          = Spec.map (CommRingCat.ofHom (levelHom f I (e + 1))) ≫ thick R I e := fun e => by
     rw [← (isPullback_level f I e).w, Category.assoc, hx]
   choose y hy hy2 using fun e => (hP e).exists_lift _ _ (hw e)
   have hmono : ∀ e, Mono (fst e) := fun e =>
@@ -85,13 +101,13 @@ theorem existsUnique_image {R W : Type} [CommRing R] [CommRing W] [IsLocalRing W
   have hfam : IsAdicFamily (I.map f) (fun e => y e ≫ φ e) := by
     intro e
     have : adicLevelMap (I.map f) (Nat.le_succ (e + 1)) ≫ y (e + 1) = y e ≫ τ e := by
-      rw [← cancel_mono (fst (e + 1)), Category.assoc, hy,
-        adicLevelMap_ι_assoc, Category.assoc, hm, hy]
+      rw [← cancel_mono (fst (e + 1)), Category.assoc, hy, adicLevelMap_ι_assoc, Category.assoc, hm,
+        hy]
     change _ ≫ y (e + 1) ≫ φ (e + 1) = y e ≫ φ e
     rw [← hc e, ← Category.assoc, this, Category.assoc]
-  obtain ⟨g, ⟨hg, hg'⟩, hu⟩ := existsUnique_over_of_isAdicFamily (Spec.map (CommRingCat.ofHom f))
-    pB hfam (fun e => by
-      rw [(isPullback_level f I e).w, ← hy2, Category.assoc, hφ, Category.assoc])
+  obtain ⟨g, ⟨hg, hg'⟩, hu⟩ :=
+    existsUnique_over_of_isAdicFamily (Spec.map (CommRingCat.ofHom f)) pB hfam
+      (fun e => by rw [(isPullback_level f I e).w, ← hy2, Category.assoc, hφ, Category.assoc])
   refine ⟨g, ⟨hg, fun e Z r xe h => ?_⟩, fun b hb => ?_⟩
   · have hr : r ≫ Spec.map (CommRingCat.ofHom f) = (xe ≫ snd e) ≫ thick R I e := by
       rw [← hx, ← Category.assoc, ← h, Category.assoc, (hP e).w, Category.assoc]

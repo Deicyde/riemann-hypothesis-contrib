@@ -5,14 +5,14 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.CommonEigenvectorInInvariantComplexSubspace.exists_common_eigenvector :
-    ∀ {ι M : Type} [inst : AddCommGroup M]
-    [inst_1 : _root_.Module ℂ M] [FiniteDimensional ℂ M] (f : ι → Module.End ℂ M),
-    (∀ (i j : ι), f i * f j = f j * f i) →
-      ∀ (W : Submodule ℂ M),
-        W ≠ ⊥ →
-          (∀ (i : ι), ∀ y ∈ W, (f i : M → M) y ∈ W) →
-            ∃ y ∈ W, y ≠ (0 : M) ∧ ∀ (i : ι), ∃ (c : ℂ), (f i : M → M) y = c • y := by
+theorem
+    UpperTheory.Reformulated.B.CommonEigenvectorInInvariantComplexSubspace.exists_common_eigenvector
+    : ∀ {ι M : Type} [inst : AddCommGroup M] [inst_1 : _root_.Module ℂ M] [FiniteDimensional ℂ M]
+        (f : ι → Module.End ℂ M),
+      (∀ (i j : ι), f i * f j = f j * f i)
+        → ∀ (W : Submodule ℂ M),
+          W ≠ ⊥ → (∀ (i : ι), ∀ y ∈ W, (f i : M → M) y ∈ W)
+            → ∃ y ∈ W, y ≠ (0 : M) ∧ ∀ (i : ι), ∃ (c : ℂ), (f i : M → M) y = c • y := by
   intro ι M _ _ _ f hc W hW hinv
   obtain ⟨V, ⟨hVW, hV0, hVinv⟩, hmin⟩ :=
     (wellFounded_lt (α := Submodule ℂ M)).has_min
@@ -30,8 +30,7 @@ theorem UpperTheory.Reformulated.B.CommonEigenvectorInInvariantComplexSubspace.e
   by_contra hne
   refine hmin (V ⊓ (f i).eigenspace c) ⟨inf_le_left.trans hVW, ?_, ?_⟩ ?_
   · intro h
-    have hm : (v : M) ∈ V ⊓ (f i).eigenspace c :=
-      ⟨v.2, Module.End.mem_eigenspace_iff.mpr hv1⟩
+    have hm : (v : M) ∈ V ⊓ (f i).eigenspace c := ⟨v.2, Module.End.mem_eigenspace_iff.mpr hv1⟩
     rw [h] at hm
     exact hv0 ((Submodule.mem_bot ℂ).mp hm)
   · intro j z hz

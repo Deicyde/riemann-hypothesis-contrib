@@ -138,17 +138,27 @@ lemma isCompact_nsq {κ : Type} [Fintype κ] (C : ℝ) : IsCompact {w : κ → �
 
 end GlobalTheory.ClassFin.OrbitProper
 
-
 open GlobalTheory.ClassFin.OrbitProper in
-theorem GlobalTheory.ClassFin.orbit_proper_of_isClosed : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (m : ℕ) (d : Fin m → ℕ) (v : TIdx ι d → ℂ), IsClosed (orb d v) → ∀ C : ℝ, ∃ C' : ℝ, ∀ y : Matrix ι ι ℂ, y.det = 1 → nsq (act d v y) ≤ C → ∃ h : Matrix ι ι ℂ, h.det = 1 ∧ act d v h = v ∧ ∀ i j, ‖(h * y) i j‖ ≤ C' := by
+theorem GlobalTheory.ClassFin.orbit_proper_of_isClosed
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (m : ℕ) (d : Fin m → ℕ) (v : TIdx ι d → ℂ),
+      IsClosed (orb d v)
+        → ∀ C : ℝ, ∃ C' : ℝ, ∀ y : Matrix ι ι ℂ,
+          y.det = 1 → nsq (act d v y) ≤ C
+            → ∃ h : Matrix ι ι ℂ, h.det = 1 ∧ act d v h = v ∧ ∀ i j, ‖(h * y) i j‖ ≤ C' := by
   intro ι _ _ m d v hX C
   have hK : IsCompact (orb d v ∩ {w | nsq w ≤ C}) := (isCompact_nsq C).inter_left hX
   have key : ∃ N : ℝ, orb d v ∩ {w | nsq w ≤ C} ⊆ act d v '' box ι N := by
-    refine hK.induction_on (p := fun s => ∃ N : ℝ, s ⊆ act d v '' box ι N) ⟨0, Set.empty_subset _⟩
-      (fun s t hst ⟨N, hN⟩ => ⟨N, hst.trans hN⟩) ?_ ?_
+    refine hK.induction_on
+      (p := fun s => ∃ N : ℝ, s ⊆ act d v '' box ι N)
+      ⟨0, Set.empty_subset _⟩
+      (fun s t hst ⟨N, hN⟩ => ⟨N, hst.trans hN⟩)
+      ?_ ?_
     · rintro s t ⟨N, hN⟩ ⟨M, hM⟩
-      exact ⟨max N M, Set.union_subset (hN.trans (Set.image_mono (box_mono (le_max_left _ _))))
-        (hM.trans (Set.image_mono (box_mono (le_max_right _ _))))⟩
+      exact ⟨
+        max N M,
+        Set.union_subset (hN.trans (Set.image_mono (box_mono (le_max_left _ _))))
+          (hM.trans (Set.image_mono (box_mono (le_max_right _ _))))
+      ⟩
     · intro w hw
       obtain ⟨O, hO, hwO, N, hN⟩ := locally_box d v hX w hw.1
       refine ⟨O ∩ orb d v, ?_, N, hN⟩

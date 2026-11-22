@@ -9,14 +9,21 @@ namespace GlobalTheory.Proof.DoubleCosetCountGlobalInterpolation
 
 open GlobalTheory.IndefiniteRowSideFullHecke.StabiliserCardinality
 
-theorem card_fiber_mul_card_stab {G : Type} [Group G] (Γ U K : Subgroup G) (hUK : U ≤ K)
-    (hfree : ∀ x : G, stab Γ U x = ⊥) (y : G) :
-    Nat.card {d : DoubleCoset.Quotient (Γ : Set G) (U : Set G) //
-        DoubleCoset.mk Γ K d.out = DoubleCoset.mk Γ K y} * Nat.card (stab Γ K y) =
-      U.relIndex K := by
-  have hex : ∀ d : {d : DoubleCoset.Quotient (Γ : Set G) (U : Set G) //
-        DoubleCoset.mk Γ K d.out = DoubleCoset.mk Γ K y},
-      ∃ k : K, DoubleCoset.mk Γ U (y * k) = d.1 := by
+theorem card_fiber_mul_card_stab
+    {G : Type} [Group G]
+    (Γ U K : Subgroup G) (hUK : U ≤ K) (hfree : ∀ x : G, stab Γ U x = ⊥)
+    (y : G)
+    : Nat.card
+          {d : DoubleCoset.Quotient (Γ : Set G) (U : Set G)
+            // DoubleCoset.mk Γ K d.out = DoubleCoset.mk Γ K y}
+        * Nat.card (stab Γ K y)
+      = U.relIndex K := by
+  have hex
+      : ∀ d
+          : {d : DoubleCoset.Quotient (Γ : Set G) (U : Set G)
+            // DoubleCoset.mk Γ K d.out = DoubleCoset.mk Γ K y},
+        ∃ k : K,
+          DoubleCoset.mk Γ U (y * k) = d.1 := by
     rintro ⟨d, hd⟩
     obtain ⟨a, ha, k, hk, h⟩ := (@DoubleCoset.eq _ _ Γ K _ _).1 hd.symm
     refine ⟨⟨k, hk⟩, ?_⟩
@@ -25,8 +32,9 @@ theorem card_fiber_mul_card_stab {G : Type} [Group G] (Γ U K : Subgroup G) (hUK
   choose κ hκ using hex
   rw [← Nat.card_prod, Subgroup.relIndex, Subgroup.index]
   refine Nat.card_congr (Equiv.ofBijective
-    (fun p => ((⟨y⁻¹ * p.2.1 * y, ((mem_stab Γ K y _).1 p.2.2).2⟩ * κ p.1 : K) :
-      K ⧸ U.subgroupOf K)) ⟨?_, ?_⟩)
+    (fun p =>
+      ((⟨y⁻¹ * p.2.1 * y, ((mem_stab Γ K y _).1 p.2.2).2⟩ * κ p.1 : K) : K ⧸ U.subgroupOf K))
+    ⟨?_, ?_⟩)
   · rintro ⟨d, s, hs⟩ ⟨e, t, ht⟩ h
     have hs' := ((mem_stab Γ K y _).1 hs).1
     have ht' := ((mem_stab Γ K y _).1 ht).1
@@ -36,7 +44,8 @@ theorem card_fiber_mul_card_stab {G : Type} [Group G] (Γ U K : Subgroup G) (hUK
     have hde : d = e := by
       apply Subtype.ext
       rw [← hκ d, ← hκ e]
-      exact (@DoubleCoset.eq _ _ Γ U _ _).2 ⟨t⁻¹ * s, Γ.mul_mem (Γ.inv_mem ht') hs', _, h1, by group⟩
+      exact (@DoubleCoset.eq _ _ Γ U _ _).2
+        ⟨t⁻¹ * s, Γ.mul_mem (Γ.inv_mem ht') hs', _, h1, by group⟩
     subst hde
     have h2 : s⁻¹ * t ∈ stab Γ U (y * κ d) := by
       refine (mem_stab Γ U _ _).2 ⟨Γ.mul_mem (Γ.inv_mem hs') ht', ?_⟩
@@ -49,8 +58,9 @@ theorem card_fiber_mul_card_stab {G : Type} [Group G] (Γ U K : Subgroup G) (hUK
     induction q using QuotientGroup.induction_on with
     | H k =>
       have hd : DoubleCoset.mk Γ K (DoubleCoset.mk Γ U (y * k)).out = DoubleCoset.mk Γ K y := by
-        obtain ⟨a, ha, u, hu, h⟩ := (@DoubleCoset.eq _ _ Γ U _ _).1
-          (DoubleCoset.out_eq' (H := Γ) (K := U) (DoubleCoset.mk Γ U (y * k))).symm
+        obtain ⟨a, ha, u, hu, h⟩ :=
+          (@DoubleCoset.eq _ _ Γ U _ _).1
+            (DoubleCoset.out_eq' (H := Γ) (K := U) (DoubleCoset.mk Γ U (y * k))).symm
         symm
         exact (@DoubleCoset.eq _ _ Γ K _ _).2
           ⟨a, ha, k * u, K.mul_mem k.2 (hUK hu), h.trans (by group)⟩
@@ -73,8 +83,10 @@ theorem card_fiber_mul_card_stab {G : Type} [Group G] (Γ U K : Subgroup G) (hUK
 theorem doubleCosetCount : DoubleCosetCount := by
   intro G _ Γ U K hUK hfi _ hfin hfree rep hrep
   have hne : U.relIndex K ≠ 0 := hfi.index_ne_zero
-  let π : DoubleCoset.Quotient (Γ : Set G) (U : Set G) →
-      DoubleCoset.Quotient (Γ : Set G) (K : Set G) := fun d => DoubleCoset.mk Γ K d.out
+  let π
+      : DoubleCoset.Quotient (Γ : Set G) (U : Set G)
+        → DoubleCoset.Quotient (Γ : Set G) (K : Set G) := fun d =>
+    DoubleCoset.mk Γ K d.out
   have key : ∀ c, Nat.card {d // π d = c} * Nat.card (stab Γ K (rep c)) = U.relIndex K := by
     intro c
     have := card_fiber_mul_card_stab Γ U K hUK hfree (rep c)

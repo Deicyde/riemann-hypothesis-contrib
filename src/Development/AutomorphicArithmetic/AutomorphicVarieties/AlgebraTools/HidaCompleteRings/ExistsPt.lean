@@ -7,13 +7,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open IsLocalRing UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite UpperTheory.V.HV UpperTheory.V.Alg
+open IsLocalRing UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite UpperTheory.V.HV
+  UpperTheory.V.Alg
 
 section SlopeTestRemainingChoices
 
 open Polynomial
 
-private theorem exPt_intIff {l : ℕ} [Fact l.Prime] (x : PadicAlgCl l) : IsIntegral ℤ_[l] x ↔ ‖x‖ ≤ 1 := by
+private theorem exPt_intIff {l : ℕ} [Fact l.Prime] (x : PadicAlgCl l)
+    : IsIntegral ℤ_[l] x ↔ ‖x‖ ≤ 1 := by
   have hi : IsIntegral ℚ_[l] x := Algebra.IsIntegral.isIntegral x
   have h0 : ‖x‖ = spectralValue (minpoly ℚ_[l] x) := rfl
   rw [h0, spectralValue_le_one_iff (minpoly.monic hi)]
@@ -29,8 +31,11 @@ private theorem exPt_intIff {l : ℕ} [Fact l.Prime] (x : PadicAlgCl l) : IsInte
 
 end SlopeTestRemainingChoices
 
-private theorem exPt_coef {l : ℕ} [Fact l.Prime] (c : Coef l) (s : Finset (PadicAlgCl l))
-    (hs : ∀ x ∈ s, IsIntegral ℤ_[l] x) : ∃ c' : Coef l, c.O ≤ c'.O ∧ ∀ x ∈ s, x ∈ c'.O := by
+private theorem exPt_coef
+    {l : ℕ} [Fact l.Prime]
+    (c : Coef l)
+    (s : Finset (PadicAlgCl l)) (hs : ∀ x ∈ s, IsIntegral ℤ_[l] x)
+    : ∃ c' : Coef l, c.O ≤ c'.O ∧ ∀ x ∈ s, x ∈ c'.O := by
   classical
   induction s using Finset.induction_on with
   | empty => exact ⟨c, le_rfl, by simp⟩
@@ -42,8 +47,9 @@ private theorem exPt_coef {l : ℕ} [Fact l.Prime] (c : Coef l) (s : Finset (Pad
     · exact he'
     · exact he (hd' x hx)
 
-private theorem exPt_nonunit {l : ℕ} [Fact l.Prime] (c : Coef l) (x : c.O) (hx : ‖(x : PadicAlgCl l)‖ < 1) :
-    ¬ IsUnit x := by
+private theorem exPt_nonunit
+    {l : ℕ} [Fact l.Prime] (c : Coef l) (x : c.O) (hx : ‖(x : PadicAlgCl l)‖ < 1)
+    : ¬ IsUnit x := by
   intro hu
   obtain ⟨w, hw⟩ := hu.exists_right_inv
   have hi : IsIntegral ℤ_[l] (w : PadicAlgCl l) :=
@@ -54,10 +60,15 @@ private theorem exPt_nonunit {l : ℕ} [Fact l.Prime] (c : Coef l) (x : c.O) (hx
   rw [norm_mul, norm_one] at h3
   nlinarith [norm_nonneg (x : PadicAlgCl l), norm_nonneg (w : PadicAlgCl l)]
 
-private theorem exPt_ev (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [CharZero O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] {R σ : Type} [CommRing R] [Finite σ] (f : R →+* O)
-    (a : σ → O) (ha : ∀ i, ¬ IsUnit (a i)) :
-    ∃ G : MvPowerSeries σ R →+* O, (∀ r, G (MvPowerSeries.C r) = f r) ∧ ∀ i, G (MvPowerSeries.X i) = a i := by
+private theorem exPt_ev
+    (l : ℕ) [Fact l.Prime]
+    (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CharZero O] [Algebra ℤ_[l] O]
+    [Module.Finite ℤ_[l] O]
+    {R σ : Type} [CommRing R] [Finite σ]
+    (f : R →+* O)
+    (a : σ → O) (ha : ∀ i, ¬ IsUnit (a i))
+    : ∃ G : MvPowerSeries σ R →+* O,
+      (∀ r, G (MvPowerSeries.C r) = f r) ∧ ∀ i, G (MvPowerSeries.X i) = a i := by
   haveI : IsAdicComplete (maximalIdeal O) O := (UpperTheory.V.abelian₂.dvr_finite l O).1
   obtain ⟨F, ⟨hC, hX⟩, -⟩ := co_ev O O O σ (AlgHom.id _ _) a ha
   refine ⟨(F : MvPowerSeries σ O →+* O).comp (MvPowerSeries.map f), fun r => ?_, fun i => ?_⟩
@@ -65,17 +76,23 @@ private theorem exPt_ev (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDoma
     rfl
   · rw [RingHom.comp_apply, MvPowerSeries.map_X, RingHom.coe_coe, hX]
 
-theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.existsPt :
-    ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) (σ : Type) [Finite σ] (z : σ → PadicAlgCl l), (∀ i, ‖z i‖ < 1) → ∃ (c' : Coef l) (y : MvPowerSeries σ c.O →ₐ[c.O] PadicAlgCl l), c.O ≤ c'.O ∧ (∀ f, y f ∈ c'.O) ∧ ∀ i, y (MvPowerSeries.X i) = z i := by
+theorem UpperTheory.V.AlgebraTools.AnnihilatorQuotientFinite.existsPt
+    : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) (σ : Type) [Finite σ] (z : σ → PadicAlgCl l),
+      (∀ i, ‖z i‖ < 1)
+        → ∃ (c' : Coef l) (y : MvPowerSeries σ c.O →ₐ[c.O] PadicAlgCl l),
+          c.O ≤ c'.O ∧ (∀ f, y f ∈ c'.O) ∧ ∀ i, y (MvPowerSeries.X i) = z i := by
   intro l _ c σ _ z hz
   classical
   haveI := Fintype.ofFinite σ
-  obtain ⟨c', hc, hm⟩ := exPt_coef c (Finset.univ.image z) fun x hx => by
-    obtain ⟨i, -, rfl⟩ := Finset.mem_image.1 hx
-    exact (exPt_intIff _).2 (hz i).le
+  obtain ⟨c', hc, hm⟩ :=
+    exPt_coef c (Finset.univ.image z) fun x hx => by
+      obtain ⟨i, -, rfl⟩ := Finset.mem_image.1 hx
+      exact (exPt_intIff _).2 (hz i).le
   have hm' : ∀ i, z i ∈ c'.O := fun i => hm _ (Finset.mem_image_of_mem _ (Finset.mem_univ i))
-  obtain ⟨G, hC, hX⟩ := exPt_ev l c'.O (Subalgebra.inclusion hc).toRingHom (fun i => ⟨z i, hm' i⟩)
-    fun i => exPt_nonunit c' _ (hz i)
+  obtain ⟨G, hC, hX⟩ :=
+    exPt_ev l c'.O (Subalgebra.inclusion hc).toRingHom
+      (fun i => ⟨z i, hm' i⟩)
+      fun i => exPt_nonunit c' _ (hz i)
   refine ⟨c', ⟨c'.O.val.toRingHom.comp G, fun r => ?_⟩, hc, fun f => (G f).2, fun i => ?_⟩
   · exact congrArg Subtype.val (hC r)
   · exact congrArg Subtype.val (hX i)

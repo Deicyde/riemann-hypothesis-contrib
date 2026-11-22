@@ -29,8 +29,8 @@ lemma tst_exp_hasSum {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) :
     HasSum (fun j : ℕ => ((j.factorial : ℂ)⁻¹) • X ^ j) (NormedSpace.exp X) := by
   exact tst_exp_hasSum_linfty X
 
-private theorem exp_entry_lemma_2 {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) (j l : Fin n) :
-    HasDerivAt (fun t : ℝ => NormedSpace.exp ((t : ℂ) • X) j l) (X j l) 0 := by
+private theorem exp_entry_lemma_2 {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) (j l : Fin n)
+    : HasDerivAt (fun t : ℝ => NormedSpace.exp ((t : ℂ) • X) j l) (X j l) 0 := by
   letI : NormedRing (Matrix (Fin n) (Fin n) ℂ) := Matrix.linftyOpNormedRing
   letI : NormedAlgebra ℂ (Matrix (Fin n) (Fin n) ℂ) := Matrix.linftyOpNormedAlgebra
   have hE := hasDerivAt_exp_smul_const (𝕂 := ℂ) X ((0 : ℝ) : ℂ)
@@ -39,11 +39,12 @@ private theorem exp_entry_lemma_2 {n : ℕ} (X : Matrix (Fin n) (Fin n) ℂ) (j 
       (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin n => Fin n → ℂ) j)
   have h2 := (L.hasFDerivAt.comp_hasDerivAt _ hE).comp_ofReal
   simp only [L, Function.comp_apply, ContinuousLinearMap.comp_apply, ContinuousLinearMap.proj_apply,
-    Complex.ofReal_zero, zero_smul, NormedSpace.exp_zero, one_mul] at h2
+      Complex.ofReal_zero, zero_smul, NormedSpace.exp_zero, one_mul]
+    at h2
   exact h2
 
-private theorem smul_mulVec_lemma {n : ℕ} (c : ℂ) (M : Matrix (Fin n) (Fin n) ℂ) (v : Fin n → ℂ) :
-    (c • M) *ᵥ v = c • (M *ᵥ v) := by
+private theorem smul_mulVec_lemma {n : ℕ} (c : ℂ) (M : Matrix (Fin n) (Fin n) ℂ) (v : Fin n → ℂ)
+    : (c • M) *ᵥ v = c • (M *ᵥ v) := by
   ext x
   simp [Matrix.mulVec, dotProduct, Finset.mul_sum, mul_assoc]
 
@@ -204,11 +205,12 @@ lemma tst_lie {k r : ℕ} (i : Fin (r + 1)) (a b : Fin (mdim k r i)) :
       simp only [hpart2, hinv]
       rw [smul_mulVec_lemma, Matrix.add_mulVec, h1, h2, add_zero, smul_zero]
 
-private theorem gamma_lemma_3 {k r : ℕ} (g X : Mx k r) :
-    HasDerivAt (fun t : ℝ => g * NormedSpace.exp ((t : ℂ) • X)) (g * X) 0 := by
+private theorem gamma_lemma_3 {k r : ℕ} (g X : Mx k r)
+    : HasDerivAt (fun t : ℝ => g * NormedSpace.exp ((t : ℂ) • X)) (g * X) 0 := by
   refine hasDerivAt_pi.2 fun m => hasDerivAt_pi.2 fun l => ?_
   simp only [Matrix.mul_apply]
-  have hs := HasDerivAt.sum (u := Finset.univ) fun j _ => (exp_entry_lemma_2 X j l).const_mul (g m j)
+  have hs :=
+    HasDerivAt.sum (u := Finset.univ) fun j _ => (exp_entry_lemma_2 X j l).const_mul (g m j)
   convert hs using 1
   ext y
   simp [Finset.sum_apply]
@@ -260,9 +262,17 @@ theorem elementary_generator_preserves_test : EabTest := by
   · intro g₀ hg₀
     obtain ⟨U, F, hU, hg₀U, hF, hfF⟩ := hs g₀ hg₀
     have hd := hF.fderiv_of_isOpen (m := ∞) hU withTop_enat_infty_add_one_le_infty
-    refine ⟨U, fun g => fderiv ℝ F g (g * hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)) +
-      Complex.I • fderiv ℝ F g (g * hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)),
-      hU, hg₀U, ?_, ?_⟩
+    refine ⟨
+      U,
+      fun g =>
+        fderiv ℝ F g (g * hpart1 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1))
+          + Complex.I
+            • fderiv ℝ F g (g * hpart2 (Hpk k r) (Matrix.single (posL k r i a) (posL k r i b) 1)),
+      hU,
+      hg₀U,
+      ?_,
+      ?_
+    ⟩
     · exact (hd.clm_apply (mulRightRealCLM _).contDiff.contDiffOn).add
         ((hd.clm_apply (mulRightRealCLM _).contDiff.contDiffOn).const_smul Complex.I)
     · intro g hg hgG
@@ -270,8 +280,8 @@ theorem elementary_generator_preserves_test : EabTest := by
       rw [tst_rdV_eq f F U g _ hU hg hgG hF hfF h1, tst_rdV_eq f F U g _ hU hg hgG hF hfF h2]
   · intro g hg hgK
     show RdV _ f g + Complex.I • RdV _ f g = 0
-    rw [tst_rdV_zero f K hK.isClosed hKf _ h1 g hg hgK, tst_rdV_zero f K hK.isClosed hKf _ h2 g hg hgK,
-      smul_zero, add_zero]
+    rw [tst_rdV_zero f K hK.isClosed hKf _ h1 g hg hgK,
+      tst_rdV_zero f K hK.isClosed hKf _ h2 g hg hgK, smul_zero, add_zero]
 
 lemma tst_cd_star {k r : ℕ} {φ : Mx k r → ℂ} (h : ContDiff ℝ ∞ φ) : ContDiff ℝ ∞ (fun g => star (φ g)) := by
   have h2 := (Complex.conjCLE.contDiff (n := ∞)).comp h
@@ -290,10 +300,14 @@ lemma tst_mul_test {k r : ℕ} {i : Fin (r + 1)} (φ ψ : Mx k r → ℂ) (hφ :
   show ψ g * f g = φ g * F g
   rw [hψ g hgG, hfF g hgU' hgG]
 
-def yExt (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (i : Fin (r + 1)) (c : Fin (mdim k r i)) (g : Mx k r) : ℂ :=
+def yExt
+    (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (i : Fin (r + 1)) (c : Fin (mdim k r i)) (g : Mx k r)
+    : ℂ :=
   ∑ l, Hpk k r (posL k r i c) l * star (∑ m, star ((Hpk k r *ᵥ fvec k r z i) m) * g m l)
 
-def bExt (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (i : Fin (r + 1)) (c : Fin (mdim k r i)) (g : Mx k r) : ℂ :=
+def bExt
+    (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (i : Fin (r + 1)) (c : Fin (mdim k r i)) (g : Mx k r)
+    : ℂ :=
   ∑ j, star (fvec k r z i j) * ∑ l, Hpk k r j l * g l (posL k r i c)
 
 lemma tst_yExt_cd (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (i : Fin (r + 1)) (c : Fin (mdim k r i)) :
@@ -332,14 +346,30 @@ lemma tst_ybv_eq {k r : ℕ} (z : Fin (2 * r + k + 1) → ℂ) (i : Fin (r + 1))
 
 theorem multiplication_preserves_test : MulTest := by
   intro k r z i c f hf
-  exact ⟨tst_mul_test (yExt k r z i c) (fun g => yv k r z i g c) (tst_yExt_cd k r z i c)
-      (fun g hg => tst_yv_eq z i c hg) f hf,
-    tst_mul_test (fun g => star (yExt k r z i c g)) (fun g => star (yv k r z i g c))
-      (tst_cd_star (tst_yExt_cd k r z i c)) (fun g hg => congrArg star (tst_yv_eq z i c hg)) f hf,
-    tst_mul_test (bExt k r z i c) (fun g => ybv k r z i g c) (tst_bExt_cd k r z i c)
-      (fun g _ => tst_ybv_eq z i c g) f hf,
-    tst_mul_test (fun g => star (bExt k r z i c g)) (fun g => star (ybv k r z i g c))
-      (tst_cd_star (tst_bExt_cd k r z i c)) (fun g _ => congrArg star (tst_ybv_eq z i c g)) f hf⟩
+  exact ⟨
+    tst_mul_test (yExt k r z i c)
+      (fun g => yv k r z i g c)
+      (tst_yExt_cd k r z i c)
+      (fun g hg => tst_yv_eq z i c hg)
+      f hf,
+    tst_mul_test
+      (fun g => star (yExt k r z i c g))
+      (fun g => star (yv k r z i g c))
+      (tst_cd_star (tst_yExt_cd k r z i c))
+      (fun g hg => congrArg star (tst_yv_eq z i c hg))
+      f hf,
+    tst_mul_test (bExt k r z i c)
+      (fun g => ybv k r z i g c)
+      (tst_bExt_cd k r z i c)
+      (fun g _ => tst_ybv_eq z i c g)
+      f hf,
+    tst_mul_test
+      (fun g => star (bExt k r z i c g))
+      (fun g => star (ybv k r z i g c))
+      (tst_cd_star (tst_bExt_cd k r z i c))
+      (fun g _ => congrArg star (tst_ybv_eq z i c g))
+      f hf
+  ⟩
 
 lemma tst_glev_closed (k r : ℕ) (i : Fin (r + 1)) : IsClosed (Glev k r i) := by
   have h1 : IsClosed {g : Mx k r | gᴴ * Hpk k r * g = Hpk k r} :=

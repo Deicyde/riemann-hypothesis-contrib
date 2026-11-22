@@ -22,8 +22,9 @@ section Abstract
 
 variable {F : Type*} [Field F]
 
-theorem eq_mul_inv_pow {x T L W : F} {n m : ℕ} (hT : T ≠ 0) (hL : L ≠ 0) (h : x * (T ^ n * L ^ m) = W) :
-    x = W * T⁻¹ ^ n * L⁻¹ ^ m := by
+theorem eq_mul_inv_pow
+    {x T L W : F} {n m : ℕ} (hT : T ≠ 0) (hL : L ≠ 0) (h : x * (T ^ n * L ^ m) = W)
+    : x = W * T⁻¹ ^ n * L⁻¹ ^ m := by
   rw [← h, inv_pow, inv_pow]
   field_simp
 
@@ -35,8 +36,8 @@ local notation "ιB" =>
   ACris.iotaB (untilt_epsilon (p := l)) untilt_frobeniusEquiv_symm_epsilon_ne_one
 
 set_option maxHeartbeats 1600000 in
-theorem iotaB_padic (q : ℚ_[l]) :
-    ιB (algebraMap ℚ_[l] (ACris.BCris (untilt_epsilon (p := l))) q) = qQ l q :=
+theorem iotaB_padic (q : ℚ_[l])
+    : ιB (algebraMap ℚ_[l] (ACris.BCris (untilt_epsilon (p := l))) q) = qQ l q :=
   ACris.iotaB_algebraMap_padic_bdRPlus _ _ q
 
 set_option maxHeartbeats 1600000 in
@@ -44,31 +45,33 @@ theorem iotaB_periodTCris : ιB (ACris.periodTCris (untilt_epsilon (p := l))) = 
   ACris.iotaB_periodTCris _ _
 
 set_option maxHeartbeats 1600000 in
-theorem σD_iotaB (g : K.fixingSubgroup) (x : ACris.BCris (untilt_epsilon (p := l))) :
-    σD g.1 (ιB x) = ιB (ACris.galB _ (IntermediateField.fixingSubgroupEquiv K g) x) :=
+theorem σD_iotaB (g : K.fixingSubgroup) (x : ACris.BCris (untilt_epsilon (p := l)))
+    : σD g.1 (ιB x) = ιB (ACris.galB _ (IntermediateField.fixingSubgroupEquiv K g) x) :=
   (ACris.iotaB_galB _ _ (IntermediateField.fixingSubgroupEquiv K g) x).symm
 
 set_option maxHeartbeats 1600000 in
-theorem iotaB_acris (a : ACris.ACris ℂ_[l] l) :
-    ιB (algebraMap (ACris.BCrisPlus ℂ_[l] l) (ACris.BCris (untilt_epsilon (p := l)))
-      (algebraMap (ACris.ACris ℂ_[l] l) (ACris.BCrisPlus ℂ_[l] l) a)) = iC l a :=
+theorem iotaB_acris (a : ACris.ACris ℂ_[l] l)
+    : ιB (algebraMap (ACris.BCrisPlus ℂ_[l] l) (ACris.BCris (untilt_epsilon (p := l)))
+        (algebraMap (ACris.ACris ℂ_[l] l) (ACris.BCrisPlus ℂ_[l] l) a))
+      = iC l a :=
   (ACris.iotaB_algebraMap _ _ _).trans (congrArg _ (ACris.iotaPlus_algebraMap a))
 
 theorem l_ne : ((l : BdR l)) ≠ 0 := by
   rw [← map_natCast (qQ l)]
   exact (map_ne_zero _).2 (Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero)
 
-theorem inv_mem_range {R F : Type*} [CommRing R] [Field F] (f : R →+* F) {u : R} (hu : IsUnit u) :
-    (f u)⁻¹ ∈ f.range := by
+theorem inv_mem_range {R F : Type*} [CommRing R] [Field F] (f : R →+* F) {u : R} (hu : IsUnit u)
+    : (f u)⁻¹ ∈ f.range := by
   obtain ⟨v, rfl⟩ := hu
   exact ⟨↑v⁻¹, map_units_inv (f : R →* F) v⟩
 
 set_option maxHeartbeats 1600000 in
 theorem linv_mem_range : ((l : BdR l))⁻¹ ∈ (ιB).range := by
   have hu : IsUnit ((l : ACris.BCris (untilt_epsilon (p := l)))) := by
-    have := (IsLocalization.Away.algebraMap_isUnit (S := ACris.BCrisPlus ℂ_[l] l)
-      (l : ACris.ACris ℂ_[l] l)).map
-      (algebraMap (ACris.BCrisPlus ℂ_[l] l) (ACris.BCris (untilt_epsilon (p := l))))
+    have :=
+      (IsLocalization.Away.algebraMap_isUnit (S := ACris.BCrisPlus ℂ_[l] l)
+          (l : ACris.ACris ℂ_[l] l)).map
+        (algebraMap (ACris.BCrisPlus ℂ_[l] l) (ACris.BCris (untilt_epsilon (p := l))))
     rw [map_natCast] at this
     rwa [map_natCast] at this
   have h := inv_mem_range ιB hu
@@ -89,12 +92,20 @@ theorem tinv_mem_bcr : (tQ l)⁻¹ ∈ Bcr l := Subring.subset_closure (Or.inr (
 set_option maxHeartbeats 1600000 in
 theorem range_le_bcr : (ιB).range ≤ Bcr l := by
   rintro _ ⟨u, rfl⟩
-  obtain ⟨w, n, m, h⟩ := exists_mul_eq_of_away_away (ACris.iota ℂ_[l] l) (ACris.iotaPlus ℂ_[l] l)
-    (fun a => ACris.iotaPlus_algebraMap a) (algebraMap (BdRp l) (BdR l)) ιB
-    (fun x => ACris.iotaB_algebraMap _ _ x) u
-  have e1 : algebraMap (BdRp l) (BdR l) (ACris.iotaPlus ℂ_[l] l
-      (algebraMap (ACris.ACris ℂ_[l] l) (ACris.BCrisPlus ℂ_[l] l) (ACris.periodT (untilt_epsilon (p := l)))) ^ n *
-      ACris.iota ℂ_[l] l (l : ACris.ACris ℂ_[l] l) ^ m) = tQ l ^ n * (l : BdR l) ^ m := by
+  obtain ⟨w, n, m, h⟩ :=
+    exists_mul_eq_of_away_away (ACris.iota ℂ_[l] l) (ACris.iotaPlus ℂ_[l] l)
+      (fun a => ACris.iotaPlus_algebraMap a)
+      (algebraMap (BdRp l) (BdR l)) ιB
+      (fun x => ACris.iotaB_algebraMap _ _ x)
+      u
+  have e1
+      : algebraMap (BdRp l) (BdR l)
+          (ACris.iotaPlus ℂ_[l] l
+                (algebraMap (ACris.ACris ℂ_[l] l) (ACris.BCrisPlus ℂ_[l] l)
+                  (ACris.periodT (untilt_epsilon (p := l))))
+              ^ n
+            * ACris.iota ℂ_[l] l (l : ACris.ACris ℂ_[l] l) ^ m)
+        = tQ l ^ n * (l : BdR l) ^ m := by
     rw [ACris.iotaPlus_algebraMap, map_mul, map_pow, map_pow, map_natCast, map_natCast]
     rfl
   rw [e1] at h

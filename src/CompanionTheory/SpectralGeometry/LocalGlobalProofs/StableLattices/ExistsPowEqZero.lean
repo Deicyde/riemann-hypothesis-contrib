@@ -19,11 +19,12 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.KWeightMajor
 
-variable {n : ℕ} {ε : Fin n → Bool} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+variable
+  {n : ℕ} {ε : Fin n → Bool} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
   {E : Fin n → Fin n → Module.End ℂ V}
 
-def shift (μ : Fin n → ℝ) (a b : Fin n) (k : ℕ) : Fin n → ℝ :=
-  fun c => μ c + k * ((if c = a then 1 else 0) - (if c = b then 1 else 0))
+def shift (μ : Fin n → ℝ) (a b : Fin n) (k : ℕ) : Fin n → ℝ := fun c =>
+  μ c + k * ((if c = a then 1 else 0) - (if c = b then 1 else 0))
 
 lemma isWeight_pow (hF : KRel ε E) {a b : Fin n} (he : ε a = ε b) {μ : Fin n → ℝ} {z : V}
     (hz : IsWeight E μ z) (k : ℕ) : IsWeight E (shift μ a b k) ((E a b ^ k) z) := by
@@ -426,85 +427,99 @@ theorem wtMajor_of (hlow : CompanionTheory.D.DSIC.LowSpan) : CompanionTheory.D.L
   intro n ε V _ _ E hF hU hLF μ s x hx0 hxw hcas
   classical
   obtain ⟨S, hSfd, hSst, hxS⟩ := hLF x
-  have main : ∀ (N : ℕ) (T : Submodule ℂ V), Module.finrank ℂ T = N → FiniteDimensional ℂ T →
-      KStab ε E T → (∀ v ∈ T, CasK ε E v = s • v) → x ∈ T →
-      ∃ ν y, y ≠ 0 ∧ KHighest ε E ν y ∧
-        s = ↑(PI.UpqRep.nsq (ν + PI.UpqRep.rhoC ε) - PI.UpqRep.nsq (PI.UpqRep.rhoC ε)) ∧
-        (∀ c d : Fin n, c < d → ε c = ε d → ν d ≤ ν c) ∧
-        ∀ w : Equiv.Perm (Fin n), (∀ c, ε (w c) = ε c) → PI.UpqRep.CDom ε (μ ∘ w) ν := by
+  have main
+      : ∀ (N : ℕ) (T : Submodule ℂ V),
+        Module.finrank ℂ T = N → FiniteDimensional ℂ T → KStab ε E T → (∀ v ∈ T, CasK ε E v = s • v)
+          → x ∈ T
+          → ∃ ν y,
+            y ≠ 0 ∧ KHighest ε E ν y
+              ∧ s = ↑(PI.UpqRep.nsq (ν + PI.UpqRep.rhoC ε) - PI.UpqRep.nsq (PI.UpqRep.rhoC ε))
+              ∧ (∀ c d : Fin n, c < d → ε c = ε d → ν d ≤ ν c)
+              ∧ ∀ w : Equiv.Perm (Fin n), (∀ c, ε (w c) = ε c) → PI.UpqRep.CDom ε (μ ∘ w) ν := by
     intro N
     induction N using Nat.strong_induction_on with
     | _ N ih =>
-    intro T hN hTfd hTst hTcas hxT
-    haveI : FiniteDimensional ℂ T := hTfd
-    have hTne : T ≠ ⊥ := by
-      intro h
-      rw [h] at hxT
-      exact hx0 ((Submodule.mem_bot ℂ).mp hxT)
-    obtain ⟨y, hyT, hy0, ν, hyH⟩ := Formalism.REAL.highestWeightExists_holds V n ε E T hTfd hF hU hTst hTne
-    obtain ⟨L, hLT, hyL, hLst, -, hLdom, -⟩ := hlow n ε V E ν y T hF hU hy0 hyH hTfd hTst hyT
-    haveI : FiniteDimensional ℂ L := Submodule.finiteDimensional_of_le hLT
-    obtain ⟨xL, hxL, xp, hxp, hxsplit⟩ := Submodule.exists_add_mem_mem_orthogonal (K := L) x
-    have hLpst := kstab_orthogonal hU hLst
-    have hsplit : ∀ (A : Module.End ℂ V) (c : ℂ), (∀ v ∈ L, A v ∈ L) → (∀ v ∈ Lᗮ, A v ∈ Lᗮ) →
-        A x = c • x → A xL = c • xL := by
-      intro A c hAL hAp hAx
-      have h1 : A xL - c • xL ∈ L := L.sub_mem (hAL _ hxL) (L.smul_mem _ hxL)
-      have h0 : A xL + A xp = c • xL + c • xp := by
-        rw [← map_add (f := _), ← smul_add, ← hxsplit, hAx]
-      have h2 : A xL - c • xL = -(A xp - c • xp) := by
-        rw [neg_sub, sub_eq_sub_iff_add_eq_add, add_comm (c • xp)]
-        exact h0
-      have h3 : A xL - c • xL ∈ Lᗮ := by
-        rw [h2]
-        exact Lᗮ.neg_mem (Lᗮ.sub_mem (hAp _ hxp) (Lᗮ.smul_mem _ hxp))
-      exact sub_eq_zero.mp (inner_self_eq_zero.mp (Submodule.inner_right_of_mem_orthogonal h1 h3))
-    by_cases hxL0 : xL = 0
-    · have hxp' : x ∈ Lᗮ := by rw [hxsplit, hxL0, zero_add]; exact hxp
-      have hlt : T ⊓ Lᗮ < T := by
-        refine lt_of_le_of_ne inf_le_left fun h => hy0 ?_
-        have hy' : y ∈ T ⊓ Lᗮ := by rw [h]; exact hyT
-        exact inner_self_eq_zero.mp
-          (Submodule.inner_right_of_mem_orthogonal hyL (Submodule.mem_inf.mp hy').2)
-      have hlt' := Submodule.finrank_lt_finrank_of_lt hlt
-      refine ih _ (hN ▸ hlt') (T ⊓ Lᗮ) rfl (Submodule.finiteDimensional_of_le inf_le_left) ?_ ?_
-        (Submodule.mem_inf.mpr ⟨hxT, hxp'⟩)
-      · intro a b hab v hv
-        exact Submodule.mem_inf.mpr ⟨hTst a b hab v (Submodule.mem_inf.mp hv).1,
-          hLpst a b hab v (Submodule.mem_inf.mp hv).2⟩
-      · intro v hv
-        exact hTcas v (Submodule.mem_inf.mp hv).1
-    · have hxLw : IsWeight E μ xL := fun a =>
-        hsplit (E a a) (μ a) (fun v hv => hLst a a rfl v hv) (fun v hv => hLpst a a rfl v hv) (hxw a)
-      have hform := casK_apply_eq_of_kHighest hF hyH
-      rw [hTcas y hyT] at hform
-      have hs : s = ↑(PI.UpqRep.nsq (ν + PI.UpqRep.rhoC ε) - PI.UpqRep.nsq (PI.UpqRep.rhoC ε)) :=
-        smul_left_injective ℂ hy0 hform
-      refine ⟨ν, y, hy0, hyH, hs, ?_, ?_⟩
-      · intro c d hcd he
-        have hid := norm_identity hF hU he hyH.1
-        rw [hyH.2 c d hcd he, norm_zero] at hid
-        have hy2 : 0 < ‖y‖ ^ 2 := pow_pos (norm_pos_iff.mpr hy0) 2
-        nlinarith [sq_nonneg ‖E d c y‖]
-      · intro w hεw
-        obtain ⟨z', hz'L, hz'0, hz'⟩ := perm_weight hF hU hLst _ w rfl hεw hxL hxL0 hxLw
-        exact hLdom _ z' hz'L hz'0 hz'
+      intro T hN hTfd hTst hTcas hxT
+      haveI : FiniteDimensional ℂ T := hTfd
+      have hTne : T ≠ ⊥ := by
+        intro h
+        rw [h] at hxT
+        exact hx0 ((Submodule.mem_bot ℂ).mp hxT)
+      obtain ⟨y, hyT, hy0, ν, hyH⟩ :=
+        Formalism.REAL.highestWeightExists_holds V n ε E T hTfd hF hU hTst hTne
+      obtain ⟨L, hLT, hyL, hLst, -, hLdom, -⟩ := hlow n ε V E ν y T hF hU hy0 hyH hTfd hTst hyT
+      haveI : FiniteDimensional ℂ L := Submodule.finiteDimensional_of_le hLT
+      obtain ⟨xL, hxL, xp, hxp, hxsplit⟩ := Submodule.exists_add_mem_mem_orthogonal (K := L) x
+      have hLpst := kstab_orthogonal hU hLst
+      have hsplit
+          : ∀ (A : Module.End ℂ V) (c : ℂ),
+            (∀ v ∈ L, A v ∈ L) → (∀ v ∈ Lᗮ, A v ∈ Lᗮ) → A x = c • x → A xL = c • xL := by
+        intro A c hAL hAp hAx
+        have h1 : A xL - c • xL ∈ L := L.sub_mem (hAL _ hxL) (L.smul_mem _ hxL)
+        have h0 : A xL + A xp = c • xL + c • xp := by
+          rw [← map_add (f := _), ← smul_add, ← hxsplit, hAx]
+        have h2 : A xL - c • xL = -(A xp - c • xp) := by
+          rw [neg_sub, sub_eq_sub_iff_add_eq_add, add_comm (c • xp)]
+          exact h0
+        have h3 : A xL - c • xL ∈ Lᗮ := by
+          rw [h2]
+          exact Lᗮ.neg_mem (Lᗮ.sub_mem (hAp _ hxp) (Lᗮ.smul_mem _ hxp))
+        exact sub_eq_zero.mp (inner_self_eq_zero.mp (Submodule.inner_right_of_mem_orthogonal h1 h3))
+      by_cases hxL0 : xL = 0
+      · have hxp' : x ∈ Lᗮ := by rw [hxsplit, hxL0, zero_add]; exact hxp
+        have hlt : T ⊓ Lᗮ < T := by
+          refine lt_of_le_of_ne inf_le_left fun h => hy0 ?_
+          have hy' : y ∈ T ⊓ Lᗮ := by rw [h]; exact hyT
+          exact inner_self_eq_zero.mp (Submodule.inner_right_of_mem_orthogonal hyL
+            (Submodule.mem_inf.mp hy').2)
+        have hlt' := Submodule.finrank_lt_finrank_of_lt hlt
+        refine ih _ (hN ▸ hlt') (T ⊓ Lᗮ) rfl (Submodule.finiteDimensional_of_le inf_le_left) ?_ ?_
+          (Submodule.mem_inf.mpr ⟨hxT, hxp'⟩)
+        · intro a b hab v hv
+          exact Submodule.mem_inf.mpr ⟨
+            hTst a b hab v (Submodule.mem_inf.mp hv).1,
+            hLpst a b hab v (Submodule.mem_inf.mp hv).2
+          ⟩
+        · intro v hv
+          exact hTcas v (Submodule.mem_inf.mp hv).1
+      · have hxLw : IsWeight E μ xL := fun a =>
+          hsplit (E a a) (μ a)
+            (fun v hv => hLst a a rfl v hv)
+            (fun v hv => hLpst a a rfl v hv)
+            (hxw a)
+        have hform := casK_apply_eq_of_kHighest hF hyH
+        rw [hTcas y hyT] at hform
+        have hs : s = ↑(PI.UpqRep.nsq (ν + PI.UpqRep.rhoC ε) - PI.UpqRep.nsq (PI.UpqRep.rhoC ε)) :=
+          smul_left_injective ℂ hy0 hform
+        refine ⟨ν, y, hy0, hyH, hs, ?_, ?_⟩
+        · intro c d hcd he
+          have hid := norm_identity hF hU he hyH.1
+          rw [hyH.2 c d hcd he, norm_zero] at hid
+          have hy2 : 0 < ‖y‖ ^ 2 := pow_pos (norm_pos_iff.mpr hy0) 2
+          nlinarith [sq_nonneg ‖E d c y‖]
+        · intro w hεw
+          obtain ⟨z', hz'L, hz'0, hz'⟩ := perm_weight hF hU hLst _ w rfl hεw hxL hxL0 hxLw
+          exact hLdom _ z' hz'L hz'0 hz'
   let T0 : Submodule ℂ V := S ⊓ LinearMap.ker (CasK ε E - s • (1 : Module.End ℂ V))
   have hT0cas : ∀ v ∈ T0, CasK ε E v = s • v := by
     intro v hv
     have h := (Submodule.mem_inf.mp hv).2
-    rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply, sub_eq_zero] at h
+    rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply,
+        sub_eq_zero]
+      at h
     exact h
   have hT0st : KStab ε E T0 := by
     intro a b hab v hv
     refine Submodule.mem_inf.mpr ⟨hSst a b hab v (Submodule.mem_inf.mp hv).1, ?_⟩
-    rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply, sub_eq_zero]
+    rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply,
+      sub_eq_zero]
     have hc := congrArg (fun T : Module.End ℂ V => T v) (casK_mul_comm_of_eq_sign hF hab)
     simp only [Module.End.mul_apply] at hc
     rw [hc, hT0cas v hv, map_smul]
   have hxT0 : x ∈ T0 := by
     refine Submodule.mem_inf.mpr ⟨hxS, ?_⟩
-    rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply, sub_eq_zero]
+    rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply,
+      sub_eq_zero]
     exact hcas
   exact main _ T0 rfl (Submodule.finiteDimensional_of_le inf_le_left) hT0st hT0cas hxT0
 

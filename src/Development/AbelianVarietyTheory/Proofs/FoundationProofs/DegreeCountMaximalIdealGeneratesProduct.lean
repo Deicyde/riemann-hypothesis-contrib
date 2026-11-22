@@ -9,23 +9,30 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem degree_count_generates : ∀ (k A : Type) [Field k] [IsAlgClosed k] [CharZero k] [CommRing A] [IsDedekindDomain A] [Algebra k A] [Algebra.FiniteType k A] (N : ℕ) (I : Type) [Fintype I] (D P₀ P : Ideal A) (Q Q' : I → Ideal A) (f₀ f : A), P₀.IsMaximal → P.IsMaximal → (∀ i, (Q i).IsMaximal) → (∀ i, (Q' i).IsMaximal) → Function.Injective Q' → (∀ i, Q' i ≠ P) → (∀ i, ¬ D ≤ Q' i) → ¬ D ≤ P →
- f₀ ≠ 0 → f ≠ 0 → Ideal.span {f₀} = P₀ * D * ∏ i, Q i ^ N → f ∈ D → f ∈ P → (∀ i, f ∈ Q' i ^ N) → Module.finrank k (A ⧸ Ideal.span {f}) ≤ Module.finrank k (A ⧸ Ideal.span {f₀}) →
- Ideal.span {f} = P * D * ∏ i, Q' i ^ N := by
-  intro k A _ _ _ _ _ _ _ N I _ D P₀ P Q Q' f₀ f hP₀ hP hQ hQ' hinj hQ'P hDQ' hDP hf₀ hf hspan hfD hfP hfQ' hdeg
+theorem degree_count_generates
+    : ∀ (k A : Type) [Field k] [IsAlgClosed k] [CharZero k] [CommRing A] [IsDedekindDomain A]
+        [Algebra k A] [Algebra.FiniteType k A] (N : ℕ) (I : Type) [Fintype I] (D P₀ P : Ideal A)
+        (Q Q' : I → Ideal A) (f₀ f : A),
+      P₀.IsMaximal → P.IsMaximal → (∀ i, (Q i).IsMaximal) → (∀ i, (Q' i).IsMaximal)
+        → Function.Injective Q' → (∀ i, Q' i ≠ P) → (∀ i, ¬ D ≤ Q' i) → ¬ D ≤ P → f₀ ≠ 0 → f ≠ 0
+        → Ideal.span {f₀} = P₀ * D * ∏ i, Q i ^ N → f ∈ D → f ∈ P → (∀ i, f ∈ Q' i ^ N)
+        → Module.finrank k (A ⧸ Ideal.span {f}) ≤ Module.finrank k (A ⧸ Ideal.span {f₀})
+        → Ideal.span {f} = P * D * ∏ i, Q' i ^ N := by
+  intro k A _ _ _ _ _ _ _ N I _ D P₀ P Q Q' f₀ f hP₀ hP hQ hQ' hinj hQ'P hDQ' hDP hf₀ hf hspan hfD
+    hfP hfQ' hdeg
   obtain ⟨_hfin, hmax, hmul, hle⟩ := GlobalTheory.T.dedekind_finiteType_ideal_codimension k A
-  have hPne : P ≠ ⊥ := by
-    intro h; apply hf; rw [h] at hfP; simpa using hfP
+  have hPne : P ≠ ⊥ := by intro h; apply hf; rw [h] at hfP; simpa using hfP
   have hmaxne : ∀ M : Ideal A, M.IsMaximal → M ≠ ⊥ := by
     intro M hM h
     subst h
     exact hPne (hM.eq_of_le hP.ne_top bot_le).symm
-  have hDne : D ≠ ⊥ := by
-    intro h; exact hDP (h ▸ bot_le)
+  have hDne : D ≠ ⊥ := by intro h; exact hDP (h ▸ bot_le)
   have hprodne : ∀ (s : Finset I) (g : I → Ideal A), (∀ i, g i ≠ ⊥) → (∏ i ∈ s, g i) ≠ ⊥ := by
     intro s g hg
     rw [← Ideal.zero_eq_bot, Finset.prod_ne_zero_iff]
-    intro i _; rw [Ideal.zero_eq_bot]; exact hg i
+    intro i _
+    rw [Ideal.zero_eq_bot]
+    exact hg i
   have hpowne : ∀ (M : Ideal A) (n : ℕ), M ≠ ⊥ → M ^ n ≠ ⊥ := by
     intro M n hM
     rw [← Ideal.zero_eq_bot] at hM ⊢
@@ -43,24 +50,28 @@ theorem degree_count_generates : ∀ (k A : Type) [Field k] [IsAlgClosed k] [Cha
     | zero => rw [pow_zero, Ideal.one_eq_top, htop]
     | succ n ih =>
       rw [pow_succ, hmul _ _ (hpowne M n (hmaxne M hM)) (hmaxne M hM), ih, (hmax M hM).1]
-  have hprod : ∀ (s : Finset I) (g : I → Ideal A), (∀ i, g i ≠ ⊥) →
-      Module.finrank k (A ⧸ ∏ i ∈ s, g i) = ∑ i ∈ s, Module.finrank k (A ⧸ g i) := by
+  have hprod
+      : ∀ (s : Finset I) (g : I → Ideal A),
+        (∀ i, g i ≠ ⊥)
+          → Module.finrank k (A ⧸ ∏ i ∈ s, g i) = ∑ i ∈ s, Module.finrank k (A ⧸ g i) := by
     intro s g hg
     classical
     induction s using Finset.induction_on with
     | empty => rw [Finset.prod_empty, Finset.sum_empty, Ideal.one_eq_top, htop]
     | insert a s ha ih =>
       rw [Finset.prod_insert ha, Finset.sum_insert ha, hmul _ _ (hg a) (hprodne s g hg), ih]
-  have hPowProd : ∀ (R : I → Ideal A), (∀ i, (R i).IsMaximal) →
-      Module.finrank k (A ⧸ ∏ i, R i ^ N) = N * Fintype.card I := by
+  have hPowProd
+      : ∀ (R : I → Ideal A),
+        (∀ i, (R i).IsMaximal) → Module.finrank k (A ⧸ ∏ i, R i ^ N) = N * Fintype.card I := by
     intro R hR
     rw [hprod _ _ (fun i => hpowne _ _ (hmaxne _ (hR i)))]
     simp only [hpow _ _ (hR _), Finset.sum_const, Finset.card_univ, smul_eq_mul]
     ring
-  have hPowNe : ∀ (R : I → Ideal A), (∀ i, (R i).IsMaximal) → (∏ i, R i ^ N) ≠ ⊥ :=
-    fun R hR => hprodne _ _ (fun i => hpowne _ _ (hmaxne _ (hR i)))
-  have h0 : Module.finrank k (A ⧸ Ideal.span {f₀}) =
-      1 + Module.finrank k (A ⧸ D) + N * Fintype.card I := by
+  have hPowNe : ∀ (R : I → Ideal A), (∀ i, (R i).IsMaximal) → (∏ i, R i ^ N) ≠ ⊥ := fun R hR =>
+    hprodne _ _ (fun i => hpowne _ _ (hmaxne _ (hR i)))
+  have h0
+      : Module.finrank k (A ⧸ Ideal.span {f₀})
+        = 1 + Module.finrank k (A ⧸ D) + N * Fintype.card I := by
     rw [hspan, hmul _ _ (hmulne _ _ (hmaxne _ hP₀) hDne) (hPowNe Q hQ),
       hmul _ _ (hmaxne _ hP₀) hDne, (hmax _ hP₀).1, hPowProd Q hQ]
   have hcop_max : ∀ M M' : Ideal A, M.IsMaximal → M'.IsMaximal → M ≠ M' → IsCoprime M M' := by
@@ -91,7 +102,8 @@ theorem degree_count_generates : ∀ (k A : Type) [Field k] [IsAlgClosed k] [Cha
   apply hle _ _ _ (Ideal.le_of_dvd hJ)
   · rw [hmul _ _ (hmulne _ _ hPne hDne) (hPowNe Q' hQ'), hmul _ _ hPne hDne, (hmax _ hP).1,
       hPowProd Q' hQ']
-    rw [h0] at hdeg; exact hdeg
+    rw [h0] at hdeg
+    exact hdeg
   · rw [Ne, Ideal.span_singleton_eq_bot]; exact hf
 
 end GlobalTheory

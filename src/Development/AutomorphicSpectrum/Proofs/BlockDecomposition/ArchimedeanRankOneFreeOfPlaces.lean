@@ -8,9 +8,11 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ComplexC
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
-open GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.WeilSiegel.Free GlobalTheory.CompanionTheory.WeilSiegel.Inf0 GlobalTheory.CompanionTheory.SW.BB
+open GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.WeilSiegel.Free
+  GlobalTheory.CompanionTheory.WeilSiegel.Inf0 GlobalTheory.CompanionTheory.SW.BB
 
 noncomputable section
 
@@ -18,21 +20,26 @@ namespace GlobalTheory.CompanionTheory.WeilSiegel.Inf0.FreeVec
 
 open GlobalTheory.CompanionTheory.SiegelND.Integ.Arch.CoordCM
 
-theorem real_indep {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {σ : E →ₐ[F] E} (h : IsCMExt F E σ) (b : Module.Basis (Fin 2) F E) (τ : E →+* ℂ) (s t : ℝ)
-    (hst : (s : ℂ) * τ (b 0) + (t : ℂ) * τ (b 1) = 0) : s = 0 ∧ t = 0 := by
+theorem real_indep
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {σ : E →ₐ[F] E} (h : IsCMExt F E σ)
+    (b : Module.Basis (Fin 2) F E) (τ : E →+* ℂ) (s t : ℝ)
+    (hst : (s : ℂ) * τ (b 0) + (t : ℂ) * τ (b 1) = 0)
+    : s = 0 ∧ t = 0 := by
   obtain ⟨θ₀, hθ₀⟩ := exists_moved h
   have hb0 : b 0 ≠ 0 := b.ne_zero 0
   obtain ⟨θ, hθ⟩ : ∃ θ : E, θ * b 0 = b 1 := ⟨b 1 / b 0, div_mul_cancel₀ _ hb0⟩
   have hmoved : σ θ ≠ θ := by
     intro hfix
     apply hθ₀
-    obtain ⟨A, B, hAB⟩ : ∃ A B : F,
-        θ₀ * b 0 = algebraMap F E A * b 0 + algebraMap F E B * b 1 :=
-      ⟨_, _, by
+    obtain ⟨A, B, hAB⟩ : ∃ A B : F, θ₀ * b 0 = algebraMap F E A * b 0 + algebraMap F E B * b 1 := ⟨
+      _,
+      _,
+      by
         have := b.sum_repr (θ₀ * b 0)
         rw [Fin.sum_univ_two, Algebra.smul_def, Algebra.smul_def] at this
-        exact this.symm⟩
+        exact this.symm
+    ⟩
     have h1 : θ₀ = algebraMap F E A + algebraMap F E B * θ := by
       apply mul_right_cancel₀ hb0
       rw [add_mul, mul_assoc, hθ]
@@ -47,22 +54,34 @@ theorem real_indep {F E : Type} [Field F] [NumberField F] [Field E] [NumberField
     exact hst
   have hi := congrArg Complex.im h2
   simp only [Complex.add_im, Complex.ofReal_im, Complex.mul_im, Complex.ofReal_re, zero_add,
-    zero_mul, add_zero, Complex.zero_im] at hi
+      zero_mul, add_zero, Complex.zero_im]
+    at hi
   have ht : t = 0 := (mul_eq_zero.1 hi).resolve_right him
   subst ht
   refine ⟨?_, rfl⟩
   simpa using h2
 
-theorem eq_coord {F E R : Type} [Field F] [Field E] [Algebra F E] [CommRing R] [Algebra F R]
-    (b : Module.Basis (Fin 2) F E) (y : R ⊗[F] E) :
-    y = (Algebra.TensorProduct.basis R b).repr y 0 ⊗ₜ[F] b 0 +
-      (Algebra.TensorProduct.basis R b).repr y 1 ⊗ₜ[F] b 1 := by
+theorem eq_coord
+    {F E R : Type} [Field F] [Field E] [Algebra F E] [CommRing R] [Algebra F R]
+    (b : Module.Basis (Fin 2) F E) (y : R ⊗[F] E)
+    : y
+      = (Algebra.TensorProduct.basis R b).repr y 0 ⊗ₜ[F] b 0
+        + (Algebra.TensorProduct.basis R b).repr y 1 ⊗ₜ[F] b 1 := by
   conv_lhs => rw [← (Algebra.TensorProduct.basis R b).sum_repr y]
   rw [Fin.sum_univ_two, Algebra.TensorProduct.basis_apply, Algebra.TensorProduct.basis_apply,
     TensorProduct.smul_tmul', TensorProduct.smul_tmul']
   simp
 
-theorem linearIndependent_of_xw_ne_zero : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M d : ℕ) (b : Module.Basis (Fin d) F E) (ρ : InfinitePlace F → (F →+* ℝ)) (e : Ainf F ≃+* (InfinitePlace F → ℝ)), (∀ w x, ((ρ w x : ℝ) : ℂ) = w.embedding x) → IsHomeomorph e → (∀ x w, e (algebraMap F (Ainf F) x) w = ρ w x) → ∀ X : Fin 1 → Fin M → Ainf F ⊗[F] E, (∀ w, xw e b X w ≠ 0) → LinearIndependent (Ainf F ⊗[F] E) X := by
+theorem linearIndependent_of_xw_ne_zero
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (M d : ℕ) (b : Module.Basis (Fin d) F E) (ρ : InfinitePlace F → (F →+* ℝ))
+            (e : Ainf F ≃+* (InfinitePlace F → ℝ)),
+          (∀ w x, ((ρ w x : ℝ) : ℂ) = w.embedding x) → IsHomeomorph e
+            → (∀ x w, e (algebraMap F (Ainf F) x) w = ρ w x)
+            → ∀ X : Fin 1 → Fin M → Ainf F ⊗[F] E,
+              (∀ w, xw e b X w ≠ 0) → LinearIndependent (Ainf F ⊗[F] E) X := by
   intro F E _ _ _ _ _ σ h M d b ρ e hρ he hx X hX
   classical
   haveI : Module.Finite F E := Module.finite_of_finrank_pos (by rw [h.2.2.1]; norm_num)
@@ -75,17 +94,19 @@ theorem linearIndependent_of_xw_ne_zero : ∀ (F E : Type) [Field F] [NumberFiel
     letI : Algebra F ℂ := w.embedding.toAlgebra
     let t : E →ₐ[F] ℂ := (by
       refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-      solve_by_elim* (maxDepth := 2) only [*,
-        @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+      solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
         @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
     exact ⟨t, fun x => t.commutes x⟩
   choose τ hτ using hex
   obtain ⟨Θ, hΘ⟩ := exists_hom e τ (fun x w => by rw [hx, hρ, hτ])
-  have key : ∀ (y : Ainf F ⊗[F] E) (w : InfinitePlace F), Θ y w = 0 →
-      ∀ k, e ((Algebra.TensorProduct.basis (Ainf F) b).repr y k) w = 0 := by
+  have key
+      : ∀ (y : Ainf F ⊗[F] E) (w : InfinitePlace F),
+        Θ y w = 0 → ∀ k, e ((Algebra.TensorProduct.basis (Ainf F) b).repr y k) w = 0 := by
     intro y w hy k
-    have h1 : Θ y w = (e ((Algebra.TensorProduct.basis (Ainf F) b).repr y 0) w : ℂ) * τ w (b 0) +
-        (e ((Algebra.TensorProduct.basis (Ainf F) b).repr y 1) w : ℂ) * τ w (b 1) := by
+    have h1
+        : Θ y w
+          = (e ((Algebra.TensorProduct.basis (Ainf F) b).repr y 0) w : ℂ) * τ w (b 0)
+            + (e ((Algebra.TensorProduct.basis (Ainf F) b).repr y 1) w : ℂ) * τ w (b 1) := by
       conv_lhs => rw [eq_coord b y, map_add (f := _), Pi.add_apply, hΘ, hΘ]
     rw [hy] at h1
     obtain ⟨h0, h1'⟩ := real_indep h b (τ w) _ _ h1.symm

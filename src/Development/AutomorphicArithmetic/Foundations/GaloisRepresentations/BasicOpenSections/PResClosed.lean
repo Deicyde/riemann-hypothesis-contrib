@@ -22,9 +22,13 @@ theorem resClosed : ResClosed := by
     rw [hQm.degree_map, hdeg]
     exact hpos.ne'
   obtain ⟨x, hx⟩ := IsAlgClosed.exists_root (Q.map (algebraMap V (FractionRing V))) hdeg'
-  have hint : IsIntegral V x := ⟨Q, hQm, by
-    rw [Polynomial.IsRoot.def, Polynomial.eval_map] at hx
-    exact hx⟩
+  have hint : IsIntegral V x := ⟨
+    Q,
+    hQm,
+    by
+      rw [Polynomial.IsRoot.def, Polynomial.eval_map] at hx
+      exact hx
+  ⟩
   obtain ⟨y, rfl⟩ := (IsIntegrallyClosed.isIntegral_iff (K := FractionRing V)).1 hint
   have hy : Q.eval y = 0 := by
     apply IsFractionRing.injective V (FractionRing V)

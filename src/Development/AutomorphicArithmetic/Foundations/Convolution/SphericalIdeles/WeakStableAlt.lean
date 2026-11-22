@@ -17,12 +17,18 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 open MeasureTheory NumberField IsDedekindDomain Filter
 open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
-open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.T GlobalTheory.CuspRep Formalism.L2.Host Formalism.ConjugateSelfDual UpperTheory.V.Published UpperTheory.CBC
+open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.T GlobalTheory.CuspRep
+  Formalism.L2.Host Formalism.ConjugateSelfDual UpperTheory.V.Published UpperTheory.CBC
 
-private theorem weak_same {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsGalois F E]
-    [_root_.NumberField.IsTotallyComplex F] [_root_.NumberField.IsTotallyComplex E] {n : ℕ} (hp : (Module.finrank F E).Prime) (π : CuspSub F n)
-    {sat sat' : Pl E → Multiset ℂˣ → Prop} (H : WeakBC (CG.mk π).HasSat sat) (H' : WeakBC (CG.mk π).HasSat sat') :
-    ∀ᶠ w : Pl E in cofinite, ∃ B, sat w B ∧ sat' w B := by
+private theorem weak_same
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsGalois F E]
+    [_root_.NumberField.IsTotallyComplex F] [_root_.NumberField.IsTotallyComplex E]
+    {n : ℕ}
+    (hp : (Module.finrank F E).Prime)
+    (π : CuspSub F n)
+    {sat sat' : Pl E → Multiset ℂˣ → Prop}
+    (H : WeakBC (CG.mk π).HasSat sat) (H' : WeakBC (CG.mk π).HasSat sat')
+    : ∀ᶠ w : Pl E in cofinite, ∃ B, sat w B ∧ sat' w B := by
   have hN := (places F E hp).2.2.2.2.1
   filter_upwards [H, H'] with w a b
   have hw : normV w = normV (w.under (𝓞 F)) ^ resDeg F w := by
@@ -32,8 +38,8 @@ private theorem weak_same {F E : Type} [Field F] [NumberField F] [Field E] [Numb
   obtain rfl := hB.unique hC
   exact ⟨_, hB', hC'⟩
 
-theorem UpperTheory.ConvolutionTheory.Sph.weakStable :
-    UpperTheory.ConvolutionTheory.Sph.WeakStable := by
+theorem UpperTheory.ConvolutionTheory.Sph.weakStable
+    : UpperTheory.ConvolutionTheory.Sph.WeakStable := by
   intro K M _ _ _ _ _ _ _ _ hp n hn π P hW
   refine ⟨?_, fun v => ?_, fun w => ?_⟩
   · haveI : Fact (Module.finrank K M).Prime := ⟨hp⟩

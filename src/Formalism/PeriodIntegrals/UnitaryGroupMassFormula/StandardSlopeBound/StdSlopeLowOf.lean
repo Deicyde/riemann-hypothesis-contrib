@@ -22,7 +22,8 @@ theorem sumNuZero {N : ℕ} (ν : Fin N → ℕ) : N = 0 → ∑ s, ν s = 0 := 
   rintro rfl
   simp
 
-theorem stdSlopeLow_of (hT2 : NablaGramLow) (hT3 : GramDual) (hT4 : NablaBasis) : PI.StdSlopeLow := by
+theorem stdSlopeLow_of (hT2 : NablaGramLow) (hT3 : GramDual) (hT4 : NablaBasis)
+    : PI.StdSlopeLow := by
   intro N ν μ hν ⟨r, e, hr, hμ⟩
   obtain ⟨r', ⟨e'⟩⟩ := hT4 N ν
   obtain ⟨hrr, hdet⟩ := hT3 N ν r r' e e' hν
@@ -31,7 +32,8 @@ theorem stdSlopeLow_of (hT2 : NablaGramLow) (hT3 : GramDual) (hT4 : NablaBasis) 
   have hpos := hwNormPos ν
   have hNpow := natPowPos N (∑ s, ν s) (sumNuZero ν)
   have hPpos : (0 : ℚ) < ((∏ s, (ν s).factorial : ℕ) : ℚ) := by
-    exact_mod_cast Nat.pos_of_ne_zero (Finset.prod_ne_zero_iff.mpr fun s _ => Nat.factorial_ne_zero _)
+    exact_mod_cast Nat.pos_of_ne_zero (Finset.prod_ne_zero_iff.mpr fun s _ =>
+      Nat.factorial_ne_zero _)
   set h := fockQ (hw ℚ le_rfl ν) (hw ℚ le_rfl ν) with hh
   set A : ℚ := ((∏ s, (ν s).factorial : ℕ) : ℚ) / ((N : ℚ) ^ (∑ s, ν s) * h) with hAdef
   have hA : 0 < A := div_pos hPpos (mul_pos hNpow hpos)
@@ -46,7 +48,9 @@ theorem stdSlopeLow_of (hT2 : NablaGramLow) (hT3 : GramDual) (hT4 : NablaBasis) 
   have hDr : (0 : ℝ) < (D : ℝ) := by exact_mod_cast hDpos
   have hDler : (D : ℝ) ≤ ((A : ℝ) ^ r)⁻¹ := by exact_mod_cast hDle
   have hlog : Real.log (D : ℝ) ≤ -((r : ℝ) * Real.log (A : ℝ)) := by
-    calc Real.log (D : ℝ) ≤ Real.log (((A : ℝ) ^ r)⁻¹) := Real.log_le_log hDr hDler
+    calc
+      Real.log (D : ℝ)
+        ≤ Real.log (((A : ℝ) ^ r)⁻¹) := Real.log_le_log hDr hDler
       _ = -((r : ℝ) * Real.log (A : ℝ)) := by rw [Real.log_inv, Real.log_pow]
   have hrpos : (0 : ℝ) < r := by exact_mod_cast hr
   have hlogA : Real.log (A : ℝ) = -((∑ l, (ν l : ℝ)) * Real.log N + Real.log (cNu ν)) := by

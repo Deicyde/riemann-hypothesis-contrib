@@ -13,18 +13,19 @@ def WinC (c s : ℝ) (B : Multiset ℂ) : Prop :=
 
 def Win (q : ℕ) (wt : ℝ) (B : Multiset ℂ) : Prop := WinC ((q : ℝ) ^ (wt / 2)) (Real.sqrt q) B
 
-theorem WinC.map_mul {c s : ℝ} {B : Multiset ℂ} (h : WinC c s B) {u : ℂ} (hu : u ≠ 0) :
-    WinC (‖u‖ * c) s (B.map (u * ·)) := by
+theorem WinC.map_mul {c s : ℝ} {B : Multiset ℂ} (h : WinC c s B) {u : ℂ} (hu : u ≠ 0)
+    : WinC (‖u‖ * c) s (B.map (u * ·)) := by
   have h0 : 0 < ‖u‖ := norm_pos_iff.2 hu
   refine ⟨fun b hb => ?_, ?_⟩
   · obtain ⟨a, ha, rfl⟩ := Multiset.mem_map.1 hb
     obtain ⟨h1, h2⟩ := h.1 a ha
     rw [norm_mul]
     constructor <;> nlinarith
-  · rw [Multiset.prod_map_mul, Multiset.map_const', Multiset.prod_replicate, Multiset.map_id', norm_mul, norm_pow, h.2,
-      Multiset.card_map, mul_pow]
+  · rw [Multiset.prod_map_mul, Multiset.map_const', Multiset.prod_replicate, Multiset.map_id',
+      norm_mul, norm_pow, h.2, Multiset.card_map, mul_pow]
 
-theorem WinC.map_inv {c s : ℝ} {B : Multiset ℂ} (h : WinC c s B) (hc : 0 < c) (hs : 0 < s) : WinC c⁻¹ s (B.map (·⁻¹)) := by
+theorem WinC.map_inv {c s : ℝ} {B : Multiset ℂ} (h : WinC c s B) (hc : 0 < c) (hs : 0 < s)
+    : WinC c⁻¹ s (B.map (·⁻¹)) := by
   obtain ⟨h1, h2⟩ := h
   refine ⟨fun x hx => ?_, ?_⟩
   · obtain ⟨b, hb, rfl⟩ := Multiset.mem_map.mp hx
@@ -37,18 +38,17 @@ theorem WinC.map_inv {c s : ℝ} {B : Multiset ℂ} (h : WinC c s B) (hc : 0 < c
     rw [norm_inv]
     constructor
     · rw [← sub_pos]
-      have e : s * ‖b‖⁻¹ - c⁻¹ = (s * c - ‖b‖) / (‖b‖ * c) := by
-        field_simp
+      have e : s * ‖b‖⁻¹ - c⁻¹ = (s * c - ‖b‖) / (‖b‖ * c) := by field_simp
       rw [e]
       exact div_pos (by linarith) (mul_pos hbpos hc)
     · rw [← sub_pos]
-      have e : s * c⁻¹ - ‖b‖⁻¹ = (s * ‖b‖ - c) / (‖b‖ * c) := by
-        field_simp
+      have e : s * c⁻¹ - ‖b‖⁻¹ = (s * ‖b‖ - c) / (‖b‖ * c) := by field_simp
       rw [e]
       exact div_pos (by linarith) (mul_pos hbpos hc)
   · rw [Multiset.prod_map_inv, Multiset.map_id', norm_inv, h2, Multiset.card_map, inv_pow]
 
-theorem WinC.exists_le {c s : ℝ} {B : Multiset ℂ} (h : WinC c s B) (hc : 0 < c) (hB : B ≠ 0) : ∃ b ∈ B, ‖b‖ ≤ c := by
+theorem WinC.exists_le {c s : ℝ} {B : Multiset ℂ} (h : WinC c s B) (hc : 0 < c) (hB : B ≠ 0)
+    : ∃ b ∈ B, ‖b‖ ≤ c := by
   by_contra hcon
   push_neg at hcon
   have key : ∀ C : Multiset ℂ, C ≠ 0 → (∀ b ∈ C, c < ‖b‖) → c ^ C.card < ‖C.prod‖ := by
@@ -72,27 +72,33 @@ theorem WinC.exists_le {c s : ℝ} {B : Multiset ℂ} (h : WinC c s B) (hc : 0 <
   rw [h.2] at hlt
   exact lt_irrefl _ hlt
 
-theorem WinC.sum_le {c s : ℝ} {B : Multiset ℂ} (h : WinC c s B) (hc : 0 < c) {n : ℕ} (hn : B.card = n + 1) :
-    ‖B.sum‖ ≤ n * (s * c) + c := by
-  obtain ⟨b0, hb0, hle⟩ := h.exists_le hc (by
-    rintro rfl
-    simp at hn)
+theorem WinC.sum_le
+    {c s : ℝ} {B : Multiset ℂ} (h : WinC c s B) (hc : 0 < c) {n : ℕ} (hn : B.card = n + 1)
+    : ‖B.sum‖ ≤ n * (s * c) + c := by
+  obtain ⟨b0, hb0, hle⟩ :=
+    h.exists_le hc (by
+      rintro rfl
+      simp at hn)
   obtain ⟨B', rfl⟩ := Multiset.exists_cons_of_mem hb0
   rw [Multiset.card_cons] at hn
   have hB' : B'.card = n := by omega
   have hsum : ‖B'.sum‖ ≤ n * (s * c) := by
     refine (norm_multiset_sum_le _).trans ?_
-    have hs' := Multiset.sum_le_card_nsmul (B'.map fun x => ‖x‖) (s * c) (by
-      intro x hx
-      obtain ⟨b, hb, rfl⟩ := Multiset.mem_map.mp hx
-      exact (h.1 b (Multiset.mem_cons_of_mem hb)).2.le)
+    have hs' :=
+      Multiset.sum_le_card_nsmul (B'.map fun x => ‖x‖) (s * c) (by
+        intro x hx
+        obtain ⟨b, hb, rfl⟩ := Multiset.mem_map.mp hx
+        exact (h.1 b (Multiset.mem_cons_of_mem hb)).2.le)
     rw [Multiset.card_map, hB', nsmul_eq_mul] at hs'
     exact hs'
   rw [Multiset.sum_cons]
-  calc ‖b0 + B'.sum‖ ≤ ‖b0‖ + ‖B'.sum‖ := norm_add_le _ _
+  calc
+    ‖b0 + B'.sum‖
+      ≤ ‖b0‖ + ‖B'.sum‖ := norm_add_le _ _
     _ ≤ n * (s * c) + c := by linarith
 
-theorem Win.inv {q : ℕ} (hq : 0 < q) {wt : ℝ} {B : Multiset ℂ} (h : Win q (-wt) B) : Win q wt (B.map (·⁻¹)) := by
+theorem Win.inv {q : ℕ} (hq : 0 < q) {wt : ℝ} {B : Multiset ℂ} (h : Win q (-wt) B)
+    : Win q wt (B.map (·⁻¹)) := by
   unfold Win at *
   have hq' : (0 : ℝ) < q := by exact_mod_cast hq
   have e : ((q : ℝ) ^ (-wt / 2))⁻¹ = (q : ℝ) ^ (wt / 2) := by

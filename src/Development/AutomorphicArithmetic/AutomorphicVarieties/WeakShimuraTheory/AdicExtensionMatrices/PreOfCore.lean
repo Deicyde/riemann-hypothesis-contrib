@@ -6,19 +6,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws
 
-private theorem isGSp_map' {R R' : Type} [CommRing R] [CommRing R'] (f : R →+* R') {ν : R} {X : M4 R}
-    (h : IsGSp ν X) : IsGSp (f ν) (X.map f) := by
+private theorem isGSp_map'
+    {R R' : Type} [CommRing R] [CommRing R'] (f : R →+* R') {ν : R} {X : M4 R} (h : IsGSp ν X)
+    : IsGSp (f ν) (X.map f) := by
   unfold IsGSp at *
   ext i j
   have := congrArg f (congrFun (congrFun h i) j)
   set_option synthInstance.maxHeartbeats 100000 in
-    simpa [Matrix.mul_apply, adj_apply, Matrix.one_apply, map_sum, apply_ite f] using this
+  simpa [Matrix.mul_apply, adj_apply, Matrix.one_apply, map_sum, apply_ite f] using this
 
 open Classical in
-theorem UpperTheory.V.Ws.sxPreOfCore :
-    ∀ {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] {Φ : Fr O Γ} {Λ : Type} [CommRing Λ] [IsLocalRing Λ] {a : O →+* Λ}, (∀ v, ∀ s ∈ Φ.Mu v, s ∈ Φ.Gv v) → Core Φ a → Nonempty (Pre Φ a) := by
+theorem UpperTheory.V.Ws.sxPreOfCore
+    : ∀ {O Γ : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] {Φ : Fr O Γ} {Λ : Type}
+        [CommRing Λ] [IsLocalRing Λ] {a : O →+* Λ},
+      (∀ v, ∀ s ∈ Φ.Mu v, s ∈ Φ.Gv v) → Core Φ a → Nonempty (Pre Φ a) := by
   intro O Γ _ _ _ Φ Λ _ _ a hMu X
   obtain ⟨A, cA, aA, n, hft, hgen, hfl, huniv⟩ := sxChart X.D
   letI aBA : Algebra X.B A := ((algebraMap X.A A).comp (algebraMap X.B X.A)).toAlgebra
@@ -30,13 +34,35 @@ theorem UpperTheory.V.Ws.sxPreOfCore :
     rw [hB, hL, ← IsScalarTower.algebraMap_apply Λ X.B X.A]
   let P : PD Φ.ι Γ A := ⟨mapRep (algebraMap X.A A) X.D.r, n⟩
   have hr : ∀ g, P.r g = (X.D.r g).map (algebraMap X.A A) := fun _ => rfl
-  have hψ : ∀ v i (s : Φ.Gv v), P.ψ v i s = algebraMap X.A A (X.D.ψ v i s) := fun v i s => hfl.char v i s
-  refine ⟨{ A := A, B := X.B, ft := X.ft.trans hft, P := P, pair := ?_, cont := ?_, gen := ?_, cp := X.cp,
-            cp_map := ?_, cp_cont := X.cp_cont, cp_red := X.cp_red,
-            ψ := fun v i s => if h : s ∈ Φ.Gv v then X.ψ v i ⟨s, h⟩ else 0,
-            ψ_map := ?_, ψ_cont := ?_, ψ_red := ?_, genB := ?_, univ := ?_ }⟩
-  · refine ⟨fun g => isGSp_map' (algebraMap X.A A) (X.rep.mult g), fun g hg => ?_, ?_, hfl.low, hfl.flag,
-      fun v s hs i => ?_⟩
+  have hψ : ∀ v i (s : Φ.Gv v), P.ψ v i s = algebraMap X.A A (X.D.ψ v i s) := fun v i s =>
+    hfl.char v i s
+  refine ⟨{
+    A := A
+    B := X.B
+    ft := X.ft.trans hft
+    P := P
+    pair := ?_
+    cont := ?_
+    gen := ?_
+    cp := X.cp
+    cp_map := ?_
+    cp_cont := X.cp_cont
+    cp_red := X.cp_red
+    ψ := fun v i s => if h : s ∈ Φ.Gv v then X.ψ v i ⟨s, h⟩ else 0
+    ψ_map := ?_
+    ψ_cont := ?_
+    ψ_red := ?_
+    genB := ?_
+    univ := ?_
+  }⟩
+  · refine ⟨
+      fun g => isGSp_map' (algebraMap X.A A) (X.rep.mult g),
+      fun g hg => ?_,
+      ?_,
+      hfl.low,
+      hfl.flag,
+      fun v s hs i => ?_
+    ⟩
     · rw [hr, X.rep.kill g hg, Matrix.map_one _ (map_zero _) (map_one _)]
     · rw [hr]
       exact X.rep.nrm.map (map_zero _)
@@ -51,7 +77,9 @@ theorem UpperTheory.V.Ws.sxPreOfCore :
       Set.range fun x : Φ.ι × Fin 4 × Fin 4 => P.n x.1 x.2.1 x.2.2) with hS
     have h0 : ∀ x : X.A, algebraMap X.A A x ∈ S := by
       intro x
-      have hx : x ∈ Algebra.adjoin X.B (Set.range fun x : Γ × Fin 4 × Fin 4 => X.D.r x.1 x.2.1 x.2.2) := by
+      have hx
+          : x ∈ Algebra.adjoin X.B
+            (Set.range fun x : Γ × Fin 4 × Fin 4 => X.D.r x.1 x.2.1 x.2.2) := by
         rw [X.gen]; trivial
       induction hx using Algebra.adjoin_induction with
       | mem x hx =>
@@ -61,7 +89,8 @@ theorem UpperTheory.V.Ws.sxPreOfCore :
       | add x y _ _ hx hy => rw [map_add (f := _)]; exact S.add_mem hx hy
       | mul x y _ _ hx hy => rw [map_mul]; exact S.mul_mem hx hy
     rintro x -
-    have hx : x ∈ Algebra.adjoin X.A (Set.range fun x : Φ.ι × Fin 4 × Fin 4 => n x.1 x.2.1 x.2.2) := by
+    have hx
+        : x ∈ Algebra.adjoin X.A (Set.range fun x : Φ.ι × Fin 4 × Fin 4 => n x.1 x.2.1 x.2.2) := by
       rw [hgen]; trivial
     induction hx using Algebra.adjoin_induction with
     | mem x hx => exact Algebra.subset_adjoin (Or.inr hx)

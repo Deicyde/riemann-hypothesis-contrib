@@ -5,8 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 open GlobalTheory.IwLevel (InSub IsIsogDeg)
 open GlobalTheory.AbDual (evc IsAdditive swap)
 attribute [local instance] Ideal.Quotient.field
@@ -37,8 +40,8 @@ private lemma exists_algHom {κ B C : Type} [Field κ] [CommRing B] [CommRing C]
     exact hf
   exact ⟨{ toRingHom := φ.hom, commutes' := fun r => RingHom.congr_fun hφ r }, rfl⟩
 
-private noncomputable def ptOf {κ B : Type} [Field κ] [CommRing B] [Algebra κ B] (ε : B →ₐ[κ] κ) :
-    𝟙_ (Over (Sp κ)) ⟶ algPt κ B :=
+private noncomputable def ptOf {κ B : Type} [Field κ] [CommRing B] [Algebra κ B] (ε : B →ₐ[κ] κ)
+    : 𝟙_ (Over (Sp κ)) ⟶ algPt κ B :=
   Over.homMk (spMap ε.toRingHom) (by
     show spMap ε.toRingHom ≫ spMap (algebraMap κ B) = 𝟙 _
     rw [spMap_comp', ← spMap_id']
@@ -64,13 +67,13 @@ private lemma ptOf_inj {κ B : Type} [Field κ] [CommRing B] [Algebra κ B] {ε 
 
 end UpperTheory.Gal.crystallineComparison.Mod
 
-theorem UpperTheory.Gal.crystallineComparison.Mod.repHomog_of :
-    RepHomog := by
+theorem UpperTheory.Gal.crystallineComparison.Mod.repHomog_of : RepHomog := by
   intro κ _ A _ P hSub B _ _ i hmono hiff
   haveI : Mono i := hmono
   refine ⟨?_, ?_⟩
   · refine Nat.card_congr (Equiv.ofBijective
-      (fun ε => (⟨ptOf ε ≫ i, (hiff _ _).1 ⟨_, rfl⟩⟩ : { g // P (𝟙_ (Over (Sp κ))) g })) ⟨?_, ?_⟩)
+      (fun ε => (⟨ptOf ε ≫ i, (hiff _ _).1 ⟨_, rfl⟩⟩ : {g // P (𝟙_ (Over (Sp κ))) g}))
+      ⟨?_, ?_⟩)
     · intro a b h
       apply ptOf_inj
       exact (cancel_mono i).1 (congrArg Subtype.val h)

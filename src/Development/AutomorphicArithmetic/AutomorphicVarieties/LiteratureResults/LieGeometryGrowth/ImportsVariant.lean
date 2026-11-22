@@ -18,6 +18,6 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 open UpperTheory.V.Lit.Geo
 
-theorem UpperTheory.V.Lit.Geo.g2 :
-    G2 :=
-  Cs.galois_twist_preserves_siegel_bound Cs.lamEx Cs.descEx Cs.descFun Cs.rapidAll Cs.corrSz Cs.decP Cs.decK Cs.loc Cs.geoSum Cs.geoRet Cs.supp
+theorem UpperTheory.V.Lit.Geo.g2 : G2 :=
+  Cs.galois_twist_preserves_siegel_bound Cs.lamEx Cs.descEx Cs.descFun Cs.rapidAll Cs.corrSz Cs.decP
+    Cs.decK Cs.loc Cs.geoSum Cs.geoRet Cs.supp

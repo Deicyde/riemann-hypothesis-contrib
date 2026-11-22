@@ -11,13 +11,15 @@ open scoped ContDiff ENNReal
 
 noncomputable section
 
-theorem smoothR_const {M : Type*} [TopologicalSpace M] (n : ℕ) (z : M → V n) (c : ℝ) :
-    SmoothR n z (fun _ => c) := by
+theorem smoothR_const {M : Type*} [TopologicalSpace M] (n : ℕ) (z : M → V n) (c : ℝ)
+    : SmoothR n z (fun _ => c) := by
   exact fun _ _ => contDiffOn_const
 
-theorem smoothR_prod {M : Type*} [TopologicalSpace M] (n : ℕ) (z : M → V n) {ι : Type*}
-    (s : Finset ι) (f : ι → M → ℝ) (hf : ∀ i ∈ s, SmoothR n z (f i)) :
-    SmoothR n z (fun x => ∏ i ∈ s, f i x) := by
+theorem smoothR_prod
+    {M : Type*} [TopologicalSpace M]
+    (n : ℕ) (z : M → V n)
+    {ι : Type*} (s : Finset ι) (f : ι → M → ℝ) (hf : ∀ i ∈ s, SmoothR n z (f i))
+    : SmoothR n z (fun x => ∏ i ∈ s, f i x) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using smoothR_const n z 1
@@ -27,9 +29,11 @@ theorem smoothR_prod {M : Type*} [TopologicalSpace M] (n : ℕ) (z : M → V n) 
     have h3 := SmoothR.mul n z _ _ h1 h2
     simpa [Finset.prod_insert ha] using h3
 
-theorem smoothR_sum {M : Type*} [TopologicalSpace M] (n : ℕ) (z : M → V n) {ι : Type*}
-    (s : Finset ι) (f : ι → M → ℝ) (hf : ∀ i ∈ s, SmoothR n z (f i)) :
-    SmoothR n z (fun x => ∑ i ∈ s, f i x) := by
+theorem smoothR_sum
+    {M : Type*} [TopologicalSpace M]
+    (n : ℕ) (z : M → V n)
+    {ι : Type*} (s : Finset ι) (f : ι → M → ℝ) (hf : ∀ i ∈ s, SmoothR n z (f i))
+    : SmoothR n z (fun x => ∑ i ∈ s, f i x) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using smoothR_const n z 0
@@ -39,11 +43,14 @@ theorem smoothR_sum {M : Type*} [TopologicalSpace M] (n : ℕ) (z : M → V n) {
     have h3 := SmoothR.add n z _ _ h1 h2
     simpa [Finset.sum_insert ha] using h3
 
-theorem exists_chart_bump {M : Type*} [TopologicalSpace M] [T2Space M] (n : ℕ) (z : M → V n)
-    (hz : IsLocalHomeomorph z) (U : Set M) (hU : IsOpen U) (x : M) (hx : x ∈ U) :
-    ∃ (e : OpenPartialHomeomorph M (V n)) (ψ : M → ℝ),
-      IsChart n z e ∧ SmoothR n z ψ ∧ HasCompactSupport ψ ∧ tsupport ψ ⊆ e.source ∩ U ∧
-      (∀ y, 0 ≤ ψ y ∧ ψ y ≤ 1) ∧ ∀ᶠ y in 𝓝 x, ψ y = 1 := by
+theorem exists_chart_bump
+    {M : Type*} [TopologicalSpace M] [T2Space M]
+    (n : ℕ) (z : M → V n) (hz : IsLocalHomeomorph z)
+    (U : Set M) (hU : IsOpen U)
+    (x : M) (hx : x ∈ U)
+    : ∃ (e : OpenPartialHomeomorph M (V n)) (ψ : M → ℝ),
+      IsChart n z e ∧ SmoothR n z ψ ∧ HasCompactSupport ψ ∧ tsupport ψ ⊆ e.source ∩ U
+        ∧ (∀ y, 0 ≤ ψ y ∧ ψ y ≤ 1) ∧ ∀ᶠ y in 𝓝 x, ψ y = 1 := by
   have hz' : ∀ y, ∃ e : OpenPartialHomeomorph M (V n), y ∈ e.source ∧ z = e := hz
   obtain ⟨e, hxe, hze⟩ := hz' x
   have he : IsChart n z e := fun y _ => congrFun hze y
@@ -64,13 +71,20 @@ theorem exists_chart_bump {M : Type*} [TopologicalSpace M] [T2Space M] (n : ℕ)
     rw [Function.mem_support] at hy
     by_cases hys : y ∈ e.source
     · have h1 : φ (e y) ≠ 0 := by simpa [ψ, Set.indicator_of_mem hys] using hy
-      have h2 : e y ∈ Metric.ball (e x) r := by
-        rw [← φ.support_eq]; exact h1
+      have h2 : e y ∈ Metric.ball (e x) r := by rw [← φ.support_eq]; exact h1
       exact ⟨e y, Metric.ball_subset_closedBall h2, e.left_inv hys⟩
     · exact absurd (by simp [ψ, Set.indicator_apply, hys]) hy
   have htsK : tsupport ψ ⊆ K := closure_minimal hsupp hKc.isClosed
-  refine ⟨e, ψ, he, ?_, hKc.of_isClosed_subset (isClosed_tsupport _) htsK, htsK.trans hKs,
-    fun y => ?_, ?_⟩
+  refine ⟨
+    e,
+    ψ,
+    he,
+    ?_,
+    hKc.of_isClosed_subset (isClosed_tsupport _) htsK,
+    htsK.trans hKs,
+    fun y => ?_,
+    ?_
+  ⟩
   · intro e' he' w hw
     refine ContDiffAt.contDiffWithinAt ?_
     by_cases hys : e'.symm w ∈ e.source
@@ -101,16 +115,21 @@ theorem exists_chart_bump {M : Type*} [TopologicalSpace M] [T2Space M] (n : ℕ)
     simp only [ψ, Set.indicator_of_mem hy.1]
     exact φ.one_of_mem_closedBall (Metric.ball_subset_closedBall hy.2)
 
-theorem exists_chart_partition {M : Type*} [TopologicalSpace M] [T2Space M] (n : ℕ) (z : M → V n) (hz : IsLocalHomeomorph z) (K U : Set M) (hK : IsCompact K) (hU : IsOpen U) (hKU : K ⊆ U) :
-    ∃ (N : ℕ) (e : Fin N → OpenPartialHomeomorph M (V n)) (χ : Fin N → M → ℝ),
-      (∀ i, IsChart n z (e i)) ∧ (∀ i, SmoothR n z (χ i)) ∧ (∀ i, HasCompactSupport (χ i)) ∧
-      (∀ i, tsupport (χ i) ⊆ (e i).source ∩ U) ∧ (∀ i x, 0 ≤ χ i x) ∧
-      (∀ x, ∑ i, χ i x ≤ 1) ∧ (∀ x ∈ K, ∑ i, χ i x = 1) := by
+theorem exists_chart_partition
+    {M : Type*} [TopologicalSpace M] [T2Space M]
+    (n : ℕ) (z : M → V n) (hz : IsLocalHomeomorph z)
+    (K U : Set M) (hK : IsCompact K) (hU : IsOpen U) (hKU : K ⊆ U)
+    : ∃ (N : ℕ) (e : Fin N → OpenPartialHomeomorph M (V n)) (χ : Fin N → M → ℝ),
+      (∀ i, IsChart n z (e i)) ∧ (∀ i, SmoothR n z (χ i)) ∧ (∀ i, HasCompactSupport (χ i))
+        ∧ (∀ i, tsupport (χ i) ⊆ (e i).source ∩ U) ∧ (∀ i x, 0 ≤ χ i x) ∧ (∀ x, ∑ i, χ i x ≤ 1)
+        ∧ (∀ x ∈ K, ∑ i, χ i x = 1) := by
   classical
   have hz' : ∀ y, ∃ e : OpenPartialHomeomorph M (V n), y ∈ e.source ∧ z = e := hz
-  have H : ∀ x, ∃ (e : OpenPartialHomeomorph M (V n)) (ψ : M → ℝ), x ∈ U →
-      IsChart n z e ∧ SmoothR n z ψ ∧ HasCompactSupport ψ ∧ tsupport ψ ⊆ e.source ∩ U ∧
-      (∀ y, 0 ≤ ψ y ∧ ψ y ≤ 1) ∧ ∀ᶠ y in 𝓝 x, ψ y = 1 := by
+  have H
+      : ∀ x, ∃ (e : OpenPartialHomeomorph M (V n)) (ψ : M → ℝ),
+        x ∈ U
+          → IsChart n z e ∧ SmoothR n z ψ ∧ HasCompactSupport ψ ∧ tsupport ψ ⊆ e.source ∩ U
+            ∧ (∀ y, 0 ≤ ψ y ∧ ψ y ≤ 1) ∧ ∀ᶠ y in 𝓝 x, ψ y = 1 := by
     intro x
     by_cases hx : x ∈ U
     · obtain ⟨e, ψ, h⟩ := exists_chart_bump n z hz U hU x hx
@@ -118,34 +137,48 @@ theorem exists_chart_partition {M : Type*} [TopologicalSpace M] [T2Space M] (n :
     · obtain ⟨e0, -, -⟩ := hz' x
       exact ⟨e0, fun _ => 0, fun h => absurd h hx⟩
   choose e ψ hψ using H
-  obtain ⟨t, htK, hcov⟩ := hK.elim_nhds_subcover (fun x => {y | ψ x y = 1})
-    (fun x hx => (hψ x (hKU hx)).2.2.2.2.2)
+  obtain ⟨t, htK, hcov⟩ :=
+    hK.elim_nhds_subcover (fun x => {y | ψ x y = 1}) (fun x hx => (hψ x (hKU hx)).2.2.2.2.2)
   let g : Fin t.card → M := fun i => (t.equivFin.symm i : M)
   have hgU : ∀ i, g i ∈ U := fun i => hKU (htK _ (t.equivFin.symm i).2)
   have P := fun i => hψ (g i) (hgU i)
   have h1 : ∀ j, SmoothR n z (fun y => 1 - ψ (g j) y) := by
     intro j
-    have h2 := SmoothR.add n z _ _ (smoothR_const n z 1)
-      (SmoothR.mul n z _ _ (smoothR_const n z (-1)) (P j).2.1)
+    have h2 :=
+      SmoothR.add n z _ _ (smoothR_const n z 1)
+        (SmoothR.mul n z _ _ (smoothR_const n z (-1)) (P j).2.1)
     have h3 : (fun y => 1 - ψ (g j) y) = fun y => 1 + (-1) * ψ (g j) y := by funext y; ring
-    rw [h3]; exact h2
-  have hsum : ∀ y, ∑ i, ψ (g i) y * ∏ j ∈ Finset.univ.filter (fun j => j < i), (1 - ψ (g j) y) =
-      1 - ∏ i, (1 - ψ (g i) y) := by
+    rw [h3]
+    exact h2
+  have hsum
+      : ∀ y,
+        ∑ i, ψ (g i) y * ∏ j ∈ Finset.univ.filter (fun j => j < i), (1 - ψ (g j) y)
+          = 1 - ∏ i, (1 - ψ (g i) y) := by
     intro y
     have h4 := Finset.prod_one_sub_ordered (Finset.univ : Finset (Fin t.card)) (fun i => ψ (g i) y)
     beta_reduce at h4
     linarith
-  have hprod : ∀ y, 0 ≤ ∏ i, (1 - ψ (g i) y) :=
-    fun y => Finset.prod_nonneg fun j _ => sub_nonneg.2 ((P j).2.2.2.2.1 y).2
-  refine ⟨t.card, fun i => e (g i),
+  have hprod : ∀ y, 0 ≤ ∏ i, (1 - ψ (g i) y) := fun y =>
+    Finset.prod_nonneg fun j _ => sub_nonneg.2 ((P j).2.2.2.2.1 y).2
+  refine ⟨
+    t.card,
+    fun i => e (g i),
     fun i y => ψ (g i) y * ∏ j ∈ Finset.univ.filter (fun j => j < i), (1 - ψ (g j) y),
-    fun i => (P i).1, fun i => ?_, fun i => ?_, fun i => ?_, fun i x => ?_, fun x => ?_,
-    fun x hx => ?_⟩
+    fun i => (P i).1,
+    fun i => ?_,
+    fun i => ?_,
+    fun i => ?_,
+    fun i x => ?_,
+    fun x => ?_,
+    fun x hx => ?_
+  ⟩
   · exact SmoothR.mul n z _ _ (P i).2.1
-      (smoothR_prod n z (Finset.univ.filter (fun j => j < i)) (fun j y => 1 - ψ (g j) y)
+      (smoothR_prod n z (Finset.univ.filter (fun j => j < i))
+        (fun j y => 1 - ψ (g j) y)
         (fun j _ => h1 j))
   · exact HasCompactSupport.mul_right
-      (f' := fun y => ∏ j ∈ Finset.univ.filter (fun j => j < i), (1 - ψ (g j) y)) (P i).2.2.1
+      (f' := fun y => ∏ j ∈ Finset.univ.filter (fun j => j < i), (1 - ψ (g j) y))
+      (P i).2.2.1
   · exact tsupport_mul_subset_left.trans (P i).2.2.2.1
   · exact mul_nonneg ((P i).2.2.2.2.1 x).1
       (Finset.prod_nonneg fun j _ => sub_nonneg.2 ((P j).2.2.2.2.1 x).2)
@@ -160,19 +193,27 @@ theorem exists_chart_partition {M : Type*} [TopologicalSpace M] [T2Space M] (n :
       rw [hi, hx', sub_self]
     rw [h0, sub_zero]
 
-theorem exists_cutoff {M : Type*} [TopologicalSpace M] [T2Space M] (n : ℕ) (z : M → V n) (hz : IsLocalHomeomorph z) (K U : Set M) (hK : IsCompact K) (hU : IsOpen U) (hKU : K ⊆ U) :
-    ∃ η : M → ℝ, SmoothR n z η ∧ HasCompactSupport η ∧ tsupport η ⊆ U ∧
-      (∀ x, 0 ≤ η x ∧ η x ≤ 1) ∧ ∀ x ∈ K, η x = 1 := by
+theorem exists_cutoff
+    {M : Type*} [TopologicalSpace M] [T2Space M]
+    (n : ℕ) (z : M → V n) (hz : IsLocalHomeomorph z)
+    (K U : Set M) (hK : IsCompact K) (hU : IsOpen U) (hKU : K ⊆ U)
+    : ∃ η : M → ℝ,
+      SmoothR n z η ∧ HasCompactSupport η ∧ tsupport η ⊆ U ∧ (∀ x, 0 ≤ η x ∧ η x ≤ 1)
+        ∧ ∀ x ∈ K, η x = 1 := by
   obtain ⟨N, e, χ, he, hs, hc, hts, h0, h1, hK1⟩ := exists_chart_partition n z hz K U hK hU hKU
   have hS : tsupport (fun x => ∑ i, χ i x) ⊆ ⋃ i, tsupport (χ i) := by
     refine closure_minimal ?_ (isClosed_iUnion_of_finite fun i => isClosed_tsupport _)
     intro x hx
     obtain ⟨i, _, hi⟩ := Finset.exists_ne_zero_of_sum_ne_zero hx
     exact Set.mem_iUnion.2 ⟨i, subset_tsupport _ hi⟩
-  refine ⟨fun x => ∑ i, χ i x, smoothR_sum n z Finset.univ χ (fun i _ => hs i),
+  refine ⟨
+    fun x => ∑ i, χ i x,
+    smoothR_sum n z Finset.univ χ (fun i _ => hs i),
     (isCompact_iUnion fun i => hc i).of_isClosed_subset (isClosed_tsupport _) hS,
     hS.trans (Set.iUnion_subset fun i => (hts i).trans Set.inter_subset_right),
-    fun x => ⟨Finset.sum_nonneg (fun i _ => h0 i x), h1 x⟩, hK1⟩
+    fun x => ⟨Finset.sum_nonneg (fun i _ => h0 i x), h1 x⟩,
+    hK1
+  ⟩
 
 end
 

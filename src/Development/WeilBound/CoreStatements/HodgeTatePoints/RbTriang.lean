@@ -14,28 +14,34 @@ open scoped Matrix
 
 namespace PositivityTheory.HtPt.Rb
 
-theorem triang_strong (C : Type) [Field C] (v : Valuation C NNReal) (R : Type) [CommRing R]
-    [Algebra R C] (hv : v.Integers R) (n : ℕ) (L : Submodule R (Fin n → R)) (hL : L.FG) :
-    ∃ d : Fin n → R, (∀ i c, c ∈ Ideal.span {d i} ↔ ∃ l ∈ L, (∀ j, j < i → l j = 0) ∧ l i = c) ∧
-      HasLen v R ((Fin n → R) ⧸ L) (∏ i, v (algebraMap R C (d i))) := by
+theorem triang_strong
+    (C : Type) [Field C]
+    (v : Valuation C NNReal)
+    (R : Type) [CommRing R] [Algebra R C]
+    (hv : v.Integers R)
+    (n : ℕ) (L : Submodule R (Fin n → R)) (hL : L.FG)
+    : ∃ d : Fin n → R,
+      (∀ i c, c ∈ Ideal.span {d i} ↔ ∃ l ∈ L, (∀ j, j < i → l j = 0) ∧ l i = c)
+        ∧ HasLen v R ((Fin n → R) ⧸ L) (∏ i, v (algebraMap R C (d i))) := by
   classical
   haveI : IsDomain R := hv.hom_inj.isDomain
   haveI : ValuationRing R := ValuationRing.of_integers v hv
   obtain ⟨m, w, hw⟩ := Submodule.fg_iff_exists_fin_generating_family.1 hL
   let ψ : (Fin m → R) →ₗ[R] (Fin n → R) := Fintype.linearCombination R w
   have hψ : LinearMap.range ψ = L := by rw [Fintype.range_linearCombination, hw]
-  have key : ∀ i : Fin n, ∃ d : R,
-      ∀ c, c ∈ Ideal.span {d} ↔ ∃ l ∈ L, (∀ j, j < i → l j = 0) ∧ l i = c := by
+  have key
+      : ∀ i : Fin n, ∃ d : R, ∀ c,
+        c ∈ Ideal.span {d} ↔ ∃ l ∈ L, (∀ j, j < i → l j = 0) ∧ l i = c := by
     intro i
     let π : (Fin n → R) →ₗ[R] ({j : Fin n // j < i} → R) := LinearMap.funLeft R R Subtype.val
-    have h1 := comap_fg_of_valuationRing R (Fin m) {j : Fin n // j < i} (π ∘ₗ ψ) ⊥
-      Submodule.fg_bot
-    have h2 : Ideal.FG (R := R) (((⊥ : Submodule R _).comap (π ∘ₗ ψ)).map
-        (LinearMap.proj i ∘ₗ ψ)) := h1.map _
+    have h1 := comap_fg_of_valuationRing R (Fin m) {j : Fin n // j < i} (π ∘ₗ ψ) ⊥ Submodule.fg_bot
+    have h2
+        : Ideal.FG (R := R) (((⊥ : Submodule R _).comap (π ∘ₗ ψ)).map (LinearMap.proj i ∘ₗ ψ)) :=
+      h1.map _
     obtain ⟨d, hd⟩ := (IsBezout.isPrincipal_of_FG _ h2).principal
     refine ⟨d, fun c => ?_⟩
-    have : Ideal.span {d} = ((⊥ : Submodule R _).comap (π ∘ₗ ψ)).map
-        (LinearMap.proj i ∘ₗ ψ) := hd.symm
+    have : Ideal.span {d} = ((⊥ : Submodule R _).comap (π ∘ₗ ψ)).map (LinearMap.proj i ∘ₗ ψ) :=
+      hd.symm
     rw [this]
     constructor
     · rintro ⟨a, ha, rfl⟩
@@ -52,8 +58,7 @@ theorem triang_strong (C : Type) [Field C] (v : Valuation C NNReal) (R : Type) [
   refine ⟨d, hd, ?_⟩
   choose u huL hu0 hud using fun i => (hd i (d i)).1 (Ideal.mem_span_singleton_self _)
   let X : Matrix (Fin n) (Fin n) R := Matrix.of fun j i => u i j
-  have hcol : ∀ i, u i ∈ LinearMap.range X.mulVecLin := fun i =>
-    ⟨Pi.single i 1, by ext j; simp [X]⟩
+  have hcol : ∀ i, u i ∈ LinearMap.range X.mulVecLin := fun i => ⟨Pi.single i 1, by ext j; simp [X]⟩
   have hrange : LinearMap.range X.mulVecLin = L := by
     apply le_antisymm
     · rintro _ ⟨a, rfl⟩
@@ -62,8 +67,9 @@ theorem triang_strong (C : Type) [Field C] (v : Valuation C NNReal) (R : Type) [
         simp [X, Matrix.mulVec, dotProduct, Finset.sum_apply, mul_comm]
       rw [this]
       exact L.sum_mem fun i _ => L.smul_mem _ (huL i)
-    · have hind : ∀ t : ℕ, ∀ l ∈ L, (∀ j : Fin n, (j : ℕ) + t < n → l j = 0) →
-          l ∈ LinearMap.range X.mulVecLin := by
+    · have hind
+          : ∀ t : ℕ, ∀ l ∈ L,
+            (∀ j : Fin n, (j : ℕ) + t < n → l j = 0) → l ∈ LinearMap.range X.mulVecLin := by
         intro t
         induction t with
         | zero =>
@@ -76,15 +82,17 @@ theorem triang_strong (C : Type) [Field C] (v : Valuation C NNReal) (R : Type) [
           by_cases ht : t < n
           · let i : Fin n := ⟨n - 1 - t, by omega⟩
             have hi : (i : ℕ) = n - 1 - t := rfl
-            have hlow : ∀ j, j < i → l j = 0 := fun j hj => h0 j (by
-              have := Fin.lt_def.1 hj
-              omega)
+            have hlow : ∀ j, j < i → l j = 0 := fun j hj =>
+              h0 j (by
+                have := Fin.lt_def.1 hj
+                omega)
             obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.1 ((hd i (l i)).2 ⟨l, hl, hlow, rfl⟩)
-            have h3 := ih (l - c • u i) (L.sub_mem hl (L.smul_mem _ (huL i))) (fun j hj => by
-              rcases lt_or_eq_of_le (show j ≤ i from Fin.le_def.2 (by omega)) with h | h
-              · simp [hlow j h, hu0 i j h]
-              · subst h
-                simp [hud, hc])
+            have h3 :=
+              ih (l - c • u i) (L.sub_mem hl (L.smul_mem _ (huL i))) (fun j hj => by
+                rcases lt_or_eq_of_le (show j ≤ i from Fin.le_def.2 (by omega)) with h | h
+                · simp [hlow j h, hu0 i j h]
+                · subst h
+                  simp [hud, hc])
             have h4 := Submodule.add_mem _ h3 (Submodule.smul_mem _ c (hcol i))
             simpa using h4
           · exact ih l hl fun j hj => by omega

@@ -6,17 +6,16 @@ public import Mathlib
 
 namespace GlobalTheory
 
-private theorem exists_equivariant_projection_onto_invariant_submodule {G M : Type} [Group G] [Fintype G] [AddCommGroup M]
-    [Module ℂ M] (S W : Submodule ℂ M) (π : G → Module.End ℂ M)
-    (h1 : ∀ v ∈ S, π 1 v = v)
-    (hmul : ∀ g h, ∀ v ∈ S, π (g * h) v = π h (π g v))
-    (hWS : W ≤ S) (hW : ∀ g, ∀ w ∈ W, π g w ∈ W) :
-    ∃ P : M →ₗ[ℂ] M, (∀ x, P x ∈ W) ∧ (∀ w ∈ W, P w = w) ∧
-      (∀ g, ∀ x ∈ S, P (π g x) = π g (P x)) := by
+private theorem exists_equivariant_projection_onto_invariant_submodule
+    {G M : Type} [Group G] [Fintype G] [AddCommGroup M] [Module ℂ M]
+    (S W : Submodule ℂ M) (π : G → Module.End ℂ M)
+    (h1 : ∀ v ∈ S, π 1 v = v) (hmul : ∀ g h, ∀ v ∈ S, π (g * h) v = π h (π g v))
+    (hWS : W ≤ S) (hW : ∀ g, ∀ w ∈ W, π g w ∈ W)
+    : ∃ P : M →ₗ[ℂ] M,
+      (∀ x, P x ∈ W) ∧ (∀ w ∈ W, P w = w) ∧ (∀ g, ∀ x ∈ S, P (π g x) = π g (P x)) := by
   classical
   obtain ⟨q, hq⟩ := Submodule.exists_isCompl W
-  refine ⟨(Fintype.card G : ℂ)⁻¹ • ∑ g, π g⁻¹ ∘ₗ W.projection q hq ∘ₗ π g,
-    ?_, ?_, ?_⟩
+  refine ⟨(Fintype.card G : ℂ)⁻¹ • ∑ g, π g⁻¹ ∘ₗ W.projection q hq ∘ₗ π g, ?_, ?_, ?_⟩
   · intro x
     simp only [LinearMap.smul_apply, LinearMap.sum_apply, LinearMap.comp_apply]
     exact W.smul_mem _ (W.sum_mem fun g _ => hW _ _ (Submodule.projection_apply_mem _ _))
@@ -37,24 +36,27 @@ private theorem exists_equivariant_projection_onto_invariant_submodule {G M : Ty
     rw [← hmul _ _ x hx, ← hmul _ h _ (hWS (Submodule.projection_apply_mem _ _))]
     simp only [mul_inv_rev, inv_mul_cancel_right]
 
-theorem mem_span_killed_union_averages {G M : Type} [Group G] [Fintype G] [AddCommGroup M]
-    [Module ℂ M] (S : Submodule ℂ M) (π : G → Module.End ℂ M)
-    (hS : ∀ g, ∀ v ∈ S, π g v ∈ S) (h1 : ∀ v ∈ S, π 1 v = v)
-    (hmul : ∀ g h, ∀ v ∈ S, π (g * h) v = π h (π g v))
+theorem mem_span_killed_union_averages
+    {G M : Type} [Group G] [Fintype G] [AddCommGroup M] [Module ℂ M]
+    (S : Submodule ℂ M) (π : G → Module.End ℂ M) (hS : ∀ g, ∀ v ∈ S, π g v ∈ S)
+    (h1 : ∀ v ∈ S, π 1 v = v) (hmul : ∀ g h, ∀ v ∈ S, π (g * h) v = π h (π g v))
     (C : Set (G → ℂ)) (hC : ∀ c ∈ C, ∀ x : G, (fun g => c (x * g * x⁻¹)) ∈ C)
-    (v : M) (hv : v ∈ S) :
-    v ∈ Submodule.span ℂ ({w | w ∈ S ∧ ∀ c ∈ C, ∑ g, c g • π g w = 0} ∪
-      {u | ∃ c ∈ C, ∃ w ∈ S, u = ∑ g, c g • π g w}) := by
+    (v : M) (hv : v ∈ S)
+    : v ∈ Submodule.span ℂ
+      ({w | w ∈ S ∧ ∀ c ∈ C, ∑ g, c g • π g w = 0}
+        ∪ {u | ∃ c ∈ C, ∃ w ∈ S, u = ∑ g, c g • π g w}) := by
   classical
   have hAS : ∀ (c : G → ℂ), ∀ w ∈ S, ∑ g, c g • π g w ∈ S := fun c w hw =>
     S.sum_mem fun g _ => S.smul_mem _ (hS g w hw)
   have hWS : Submodule.span ℂ {u | ∃ c ∈ C, ∃ w ∈ S, u = ∑ g, c g • π g w} ≤ S :=
     Submodule.span_le.2 (by rintro u ⟨c, -, w, hw, rfl⟩; exact hAS c w hw)
-  have hWst : ∀ h, ∀ u ∈ Submodule.span ℂ {u | ∃ c ∈ C, ∃ w ∈ S, u = ∑ g, c g • π g w},
-      π h u ∈ Submodule.span ℂ {u | ∃ c ∈ C, ∃ w ∈ S, u = ∑ g, c g • π g w} := by
+  have hWst
+      : ∀ h, ∀ u ∈ Submodule.span ℂ {u | ∃ c ∈ C, ∃ w ∈ S, u = ∑ g, c g • π g w},
+        π h u ∈ Submodule.span ℂ {u | ∃ c ∈ C, ∃ w ∈ S, u = ∑ g, c g • π g w} := by
     intro h u hu
-    have hle : Submodule.span ℂ {u | ∃ c ∈ C, ∃ w ∈ S, u = ∑ g, c g • π g w} ≤
-        (Submodule.span ℂ {u | ∃ c ∈ C, ∃ w ∈ S, u = ∑ g, c g • π g w}).comap (π h) := by
+    have hle
+        : Submodule.span ℂ {u | ∃ c ∈ C, ∃ w ∈ S, u = ∑ g, c g • π g w}
+          ≤ (Submodule.span ℂ {u | ∃ c ∈ C, ∃ w ∈ S, u = ∑ g, c g • π g w}).comap (π h) := by
       refine Submodule.span_le.2 ?_
       rintro u ⟨c, hc, w, hw, rfl⟩
       rw [SetLike.mem_coe, Submodule.mem_comap]
@@ -67,18 +69,20 @@ theorem mem_span_killed_union_averages {G M : Type} [Group G] [Fintype G] [AddCo
       rw [show h * (h⁻¹ * g * h) * h⁻¹ = g by group, ← hmul _ _ w hw, ← hmul _ _ w hw,
         show g * h = h * (h⁻¹ * g * h) by group]
     exact hle hu
-  obtain ⟨P, hPW, hPid, hPc⟩ := exists_equivariant_projection_onto_invariant_submodule S _ π h1 hmul hWS hWst
+  obtain ⟨P, hPW, hPid, hPc⟩ :=
+    exists_equivariant_projection_onto_invariant_submodule S _ π h1 hmul hWS hWst
   have hPv : P v ∈ S := hWS (hPW v)
   have hPc' : ∀ g, P (π g v) = π g (P v) := fun g => hPc g v hv
   have hkill : v - P v ∈ {w | w ∈ S ∧ ∀ c ∈ C, ∑ g, c g • π g w = 0} := by
     refine ⟨S.sub_mem hv hPv, fun c hc => ?_⟩
     have hA : ∑ g, c g • π g (P v) = P (∑ g, c g • π g v) := by
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smul, hPc']
+      simp only [map_sum, map_smul, hPc']
     simp only [map_sub, smul_sub, Finset.sum_sub_distrib, hA]
     rw [hPid _ (Submodule.subset_span ⟨c, hc, v, hv, rfl⟩), sub_self]
-  have hsum := Submodule.add_mem _ (Submodule.subset_span (Set.mem_union_left _ hkill))
-    (Submodule.span_mono Set.subset_union_right (hPW v))
+  have hsum :=
+    Submodule.add_mem _ (Submodule.subset_span (Set.mem_union_left _ hkill))
+      (Submodule.span_mono Set.subset_union_right (hPW v))
   rwa [sub_add_cancel] at hsum
 
 end GlobalTheory

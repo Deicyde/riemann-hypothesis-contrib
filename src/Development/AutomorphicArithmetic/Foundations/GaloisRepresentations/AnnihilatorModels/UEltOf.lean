@@ -5,15 +5,17 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 open GlobalTheory.IwLevel (InSub IsIsogDeg)
 open GlobalTheory.AbDual (evc IsAdditive swap)
 attribute [local instance] Ideal.Quotient.field
 open UpperTheory.Gal.crystallineComparison UpperTheory.Gal.crystallineComparison.Mod
 
-theorem UpperTheory.Gal.crystallineComparison.Mod.uElt_of :
-    UElt := by
+theorem UpperTheory.Gal.crystallineComparison.Mod.uElt_of : UElt := by
   intro p _ D r w hw huw e
   have hpr : Prime (p : ℤ) := Nat.prime_iff_prime_int.mp (Fact.out : Nat.Prime p)
   have hbb : ∀ x : 𝓞 D.F, D.bar (D.bar x) = x := by
@@ -26,7 +28,8 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.uElt_of :
   set ub : Ideal (𝓞 D.F) := Ideal.span {(p : 𝓞 D.F), D.bar D.ω - (r : 𝓞 D.F)} with hub
   have hmap : Ideal.map D.bar (uIdeal D r) = ub := by
     simp [uIdeal, Ideal.map_span, Set.image_pair, hub]
-  have hc : (D.ω - (r : 𝓞 D.F)) * (D.bar D.ω - r) = (r : 𝓞 D.F) ^ 2 - (D.tr : 𝓞 D.F) * r + D.nm := by
+  have hc
+      : (D.ω - (r : 𝓞 D.F)) * (D.bar D.ω - r) = (r : 𝓞 D.F) ^ 2 - (D.tr : 𝓞 D.F) * r + D.nm := by
     linear_combination D.nm_eq - (r : 𝓞 D.F) * D.tr_eq
   have hdvd : (p : ℤ) ∣ r ^ 2 - D.tr * r + D.nm := by
     by_contra hnd
@@ -39,7 +42,8 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.uElt_of :
     have key : (1 : 𝓞 D.F) = (a : 𝓞 D.F) * p + (b : 𝓞 D.F) * ((D.ω - r) * (D.bar D.ω - r)) := by
       linear_combination -h2 - (b : 𝓞 D.F) * hc
     rw [key]
-    exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ hp) (Ideal.mul_mem_left _ _ (Ideal.mul_mem_right _ _ hs))
+    exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ hp)
+      (Ideal.mul_mem_left _ _ (Ideal.mul_mem_right _ _ hs))
   have hprod : uIdeal D r * ub ≤ Ideal.span {(p : 𝓞 D.F)} := by
     obtain ⟨k, hk⟩ := hdvd
     show Ideal.span {(p : 𝓞 D.F), D.ω - (r : 𝓞 D.F)} * ub ≤ _
@@ -60,12 +64,16 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.uElt_of :
     have hdiff : D.ω - D.bar D.ω ∈ uIdeal D r ⊔ ub := by
       have : D.ω - D.bar D.ω = (D.ω - r) - (D.bar D.ω - r) := by ring
       rw [this]
-      exact Ideal.sub_mem _ (Ideal.mem_sup_left hs) (Ideal.mem_sup_right (Ideal.subset_span (by simp)))
+      exact Ideal.sub_mem _ (Ideal.mem_sup_left hs)
+        (Ideal.mem_sup_right (Ideal.subset_span (by simp)))
     have hpm : (p : 𝓞 D.F) ∈ uIdeal D r ⊔ ub := Ideal.mem_sup_left hp
-    have key : (1 : 𝓞 D.F) = (a : 𝓞 D.F) * p + (b : 𝓞 D.F) * ((D.ω - D.bar D.ω) * (D.ω - D.bar D.ω)) := by
+    have key
+        : (1 : 𝓞 D.F)
+          = (a : 𝓞 D.F) * p + (b : 𝓞 D.F) * ((D.ω - D.bar D.ω) * (D.ω - D.bar D.ω)) := by
       linear_combination -h2 - (b : 𝓞 D.F) * (D.ω + D.bar D.ω + D.tr) * D.tr_eq + 4 * (b : 𝓞 D.F) * D.nm_eq
     rw [key]
-    exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ hpm) (Ideal.mul_mem_left _ _ (Ideal.mul_mem_left _ _ hdiff))
+    exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ hpm)
+      (Ideal.mul_mem_left _ _ (Ideal.mul_mem_left _ _ hdiff))
   have hcopE : uIdeal D r ^ e ⊔ ub ^ e = ⊤ :=
     Ideal.isCoprime_iff_sup_eq.mp ((Ideal.isCoprime_iff_sup_eq.mpr hsup).pow)
   have hle : uIdeal D r ^ e * ub ^ e ≤ Ideal.span {(p : 𝓞 D.F) ^ e} := by

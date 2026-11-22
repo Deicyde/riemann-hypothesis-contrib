@@ -19,8 +19,11 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsRep
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest
+  GlobalTheory.RowClaim
 open Formalism.L2.Host (HChar)
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -33,10 +36,16 @@ namespace GlobalTheory.SplitInduct
 
 open GlobalTheory.IdemModTwo GlobalTheory.SplitIdem
 
-theorem induct_suppSplit : ∀ {D : D7} (V : HSp D) (N : ℕ) (Q : GA D V → Prop), Q 1 → (∀ x y, Q x → Q y → Q (x * y)) →
-    (∀ (e : AE D) (P : Pl D.host.E), Formalism.L2.NTheta.IsIdemAt e P → ((N : ℕ) : 𝓞 D.host.E) ∉ P.asIdeal →
-      ∀ x ∈ GfC V, Formalism.L2.Theta.SuppAt e V x → Q x) →
-    ∀ g ∈ GfC V, GlobalTheory.UnRep.SuppSplit (GlobalTheory.Member.cF D) N ((finHom V) g : Matrix (Fin V.rank) (Fin V.rank) _) → Q g := by
+theorem induct_suppSplit
+    : ∀ {D : D7} (V : HSp D) (N : ℕ) (Q : GA D V → Prop),
+      Q 1 → (∀ x y, Q x → Q y → Q (x * y))
+        → (∀ (e : AE D) (P : Pl D.host.E),
+          Formalism.L2.NTheta.IsIdemAt e P → ((N : ℕ) : 𝓞 D.host.E) ∉ P.asIdeal
+            → ∀ x ∈ GfC V, Formalism.L2.Theta.SuppAt e V x → Q x)
+        → ∀ g ∈ GfC V,
+          GlobalTheory.UnRep.SuppSplit (GlobalTheory.Member.cF D) N
+              ((finHom V) g : Matrix (Fin V.rank) (Fin V.rank) _)
+            → Q g := by
   classical
   intro D V N Q h1 hmul hloc g hg hs
   obtain ⟨e₀, he1, he2, he3, he4⟩ := hs
@@ -51,14 +60,17 @@ theorem induct_suppSplit : ∀ {D : D7} (V : HSp D) (N : ℕ) (Q : GA D V → Pr
     · rw [GlobalTheory.LocalApprox.evalV_indA_of_notMem _ hw]
       by_contra h
       exact hw (he2.mem_toFinset.2 h)
-  have hsupp : ∀ i j, GlobalTheory.LocalApprox.idemE D he2.toFinset * (Formalism.L2.Theta.mt V g - 1) i j =
-      (Formalism.L2.Theta.mt V g - 1) i j := by
+  have hsupp
+      : ∀ i j,
+        GlobalTheory.LocalApprox.idemE D he2.toFinset * (Formalism.L2.Theta.mt V g - 1) i j
+          = (Formalism.L2.Theta.mt V g - 1) i j := by
     intro i j
     have e0 : GlobalTheory.LocalApprox.idemE D he2.toFinset = fj D e₀ := (congrArg (fj D) heS).symm
     rw [e0]
     refine GlobalTheory.UnitarySplit.parts_inj D _ _ ?_ ?_
     · have h5 : infPart D ((Formalism.L2.Theta.mt V g - 1) i j) = 0 := by
-        have h6 : (Formalism.L2.Theta.mt V g).map (infPart D) = 1 := congrArg Units.val (show infHom V g = 1 from hg)
+        have h6 : (Formalism.L2.Theta.mt V g).map (infPart D) = 1 :=
+          congrArg Units.val (show infHom V g = 1 from hg)
         have h7 := congrFun (congrFun h6 i) j
         rw [Matrix.sub_apply, RingHom.map_sub, sub_eq_zero]
         refine h7.trans ?_
@@ -88,8 +100,10 @@ theorem induct_suppSplit : ∀ {D : D7} (V : HSp D) (N : ℕ) (Q : GA D V → Pr
     refine GlobalTheory.LocalApprox.af_ext _ fun w => ?_
     by_cases hw : w = v
     · subst hw
-      rw [evalV_singleV_same, GlobalTheory.LocalApprox.evalV_indA_of_mem _ (Finset.mem_singleton_self _)]
-    · rw [evalV_singleV_ne _ v _ hw, GlobalTheory.LocalApprox.evalV_indA_of_notMem _ (Finset.notMem_singleton.2 hw)]
+      rw [evalV_singleV_same,
+        GlobalTheory.LocalApprox.evalV_indA_of_mem _ (Finset.mem_singleton_self _)]
+    · rw [evalV_singleV_ne _ v _ hw,
+        GlobalTheory.LocalApprox.evalV_indA_of_notMem _ (Finset.notMem_singleton.2 hw)]
   have hv : ∀ v ∈ he2.toFinset, Q (GlobalTheory.LocalApprox.cutAt V g {v}) := by
     intro v hvS
     have hv' := he3 v (he2.mem_toFinset.1 hvS)
@@ -103,15 +117,17 @@ theorem induct_suppSplit : ∀ {D : D7} (V : HSp D) (N : ℕ) (Q : GA D V → Pr
     · intro i j
       rw [he.2.2, hpl v]
       exact GlobalTheory.LocalApprox.cutAt_supp V g {v} i j
-  have key : ∀ s : Finset (IsDedekindDomain.HeightOneSpectrum (𝓞 D.host.F)), s ⊆ he2.toFinset →
-      Q (GlobalTheory.LocalApprox.cutAt V g s) := by
+  have key
+      : ∀ s : Finset (IsDedekindDomain.HeightOneSpectrum (𝓞 D.host.F)),
+        s ⊆ he2.toFinset → Q (GlobalTheory.LocalApprox.cutAt V g s) := by
     intro s
     induction s using Finset.cons_induction with
     | empty => intro _; rw [GlobalTheory.LocalApprox.cutAt_empty]; exact h1
     | cons v s h ih =>
       intro hsub
       rw [GlobalTheory.LocalApprox.cutAt_cons]
-      exact hmul _ _ (hv v (hsub (Finset.mem_cons_self _ _))) (ih ((Finset.subset_cons h).trans hsub))
+      exact hmul _ _ (hv v (hsub (Finset.mem_cons_self _ _)))
+        (ih ((Finset.subset_cons h).trans hsub))
   rw [← hgS]
   exact key _ subset_rfl
 

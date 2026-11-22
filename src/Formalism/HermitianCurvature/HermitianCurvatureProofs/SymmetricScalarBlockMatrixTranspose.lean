@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MulDiag
 
 @[expose] public section
 
-open Matrix Formalism.FourierDecayAlt Formalism.FourierDecayAlt.U Formalism.REAL Formalism.QuantumDeterminants
+open Matrix Formalism.FourierDecayAlt Formalism.FourierDecayAlt.U Formalism.REAL
+  Formalism.QuantumDeterminants
 
 noncomputable section
 
@@ -81,11 +82,16 @@ lemma wMat_sq (d : ℕ) : G.wMat d * G.wMat d = 1 := by
 
 theorem hpkBlocks : HpkBlocks := by
   intro k j ρ
-  apply mat_ext_eB; intro x y
+  apply mat_ext_eB
+  intro x y
   rw [block3_apply]
-  rcases x with (x|x)|x <;> rcases y with (y|y)|y <;>
-    (have hx := x.isLt; have hy := y.isLt
-     simp [Hpk, G.wMat, Fin.ext_iff, eB_ll, eB_lr, eB_r, Fin.val_rev] <;> split_ifs <;> first | rfl | omega)
+  rcases x with (x | x) | x <;> rcases y with (y | y) | y
+    <;> (
+      have hx := x.isLt
+      have hy := y.isLt
+      simp [Hpk, G.wMat, Fin.ext_iff, eB_ll, eB_lr, eB_r, Fin.val_rev] <;> split_ifs
+        <;> first | rfl | omega
+    )
 
 lemma block3_congr {A11 ToralGalois : Matrix (Fin j) (Fin j) ℂ} {A12 cocyclesToWachVectorsExponent : Matrix (Fin j) (Fin (2 * ρ + k + 1)) ℂ}
     {A13 B13 : Matrix (Fin j) (Fin j) ℂ} {A21 B21 : Matrix (Fin (2 * ρ + k + 1)) (Fin j) ℂ} {A22 B22 : B.Mat k ρ}
@@ -108,39 +114,53 @@ theorem sliceMem : SliceMem := by
     have hu : IsUnit Zᴴ.det := by
       rw [det_conjTranspose]; exact isUnit_iff_ne_zero.mpr (star_ne_zero.mpr hZ)
     show (mMap k j ρ Z γ)ᴴ * Hpk k (j + ρ) * mMap k j ρ Z γ = Hpk k (j + ρ)
-    rw [hpkBlocks k j ρ]; unfold mMap
+    rw [hpkBlocks k j ρ]
+    unfold mMap
     rw [block3_conjTranspose, block3_mul, block3_mul]
-    refine block3_congr ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ <;>
-      simp [Matrix.mul_assoc, wMat_ct, Matrix.conjTranspose_nonsing_inv, wMat_sq_assoc, hγ', Matrix.nonsing_inv_mul _ hZu, Matrix.mul_nonsing_inv _ hu,
+    refine block3_congr ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_
+      <;> simp [Matrix.mul_assoc, wMat_ct, Matrix.conjTranspose_nonsing_inv, wMat_sq_assoc, hγ',
+        Matrix.nonsing_inv_mul _ hZu, Matrix.mul_nonsing_inv _ hu,
         Matrix.mul_nonsing_inv_cancel_left _ _ hu, Matrix.nonsing_inv_mul_cancel_left _ _ hZu]
   · intro q hq
     have hqu : IsUnit q.det := isUnit_iff_ne_zero.mpr hq
     have hu : IsUnit qᴴ.det := by
       rw [det_conjTranspose]; exact isUnit_iff_ne_zero.mpr (star_ne_zero.mpr hq)
     show (muP k j ρ q)ᴴ * Hpk k (j + ρ) * muP k j ρ q = Hpk k (j + ρ)
-    rw [hpkBlocks k j ρ]; unfold muP
+    rw [hpkBlocks k j ρ]
+    unfold muP
     rw [block3_conjTranspose, block3_mul, block3_mul]
-    refine block3_congr ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ <;>
-      simp [Matrix.mul_assoc, wMat_ct, Matrix.conjTranspose_nonsing_inv, wMat_sq_assoc, Matrix.nonsing_inv_mul _ hqu, Matrix.mul_nonsing_inv _ hu,
+    refine block3_congr ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_
+      <;> simp [Matrix.mul_assoc, wMat_ct, Matrix.conjTranspose_nonsing_inv, wMat_sq_assoc,
+        Matrix.nonsing_inv_mul _ hqu, Matrix.mul_nonsing_inv _ hu,
         Matrix.mul_nonsing_inv_cancel_left _ _ hu, Matrix.nonsing_inv_mul_cancel_left _ _ hqu]
   · intro y hy
     have hy' : yᴴ * Hpk k ρ * y = Hpk k ρ := hy
     show (embG k j ρ y)ᴴ * Hpk k (j + ρ) * embG k j ρ y = Hpk k (j + ρ)
-    rw [hpkBlocks k j ρ]; unfold embG
+    rw [hpkBlocks k j ρ]
+    unfold embG
     rw [block3_conjTranspose, block3_mul, block3_mul]
     refine block3_congr ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ <;> simp [hy']
 
 section blocks
 variable (M : B.Mat k (j + ρ))
-def b11 : Matrix (Fin j) (Fin j) ℂ := Matrix.of fun a b => M (eB k j ρ (Sum.inl (Sum.inl a))) (eB k j ρ (Sum.inl (Sum.inl b)))
-def b12 : Matrix (Fin j) (Fin (2 * ρ + k + 1)) ℂ := Matrix.of fun a b => M (eB k j ρ (Sum.inl (Sum.inl a))) (eB k j ρ (Sum.inl (Sum.inr b)))
-def b13 : Matrix (Fin j) (Fin j) ℂ := Matrix.of fun a b => M (eB k j ρ (Sum.inl (Sum.inl a))) (eB k j ρ (Sum.inr b))
-def b21 : Matrix (Fin (2 * ρ + k + 1)) (Fin j) ℂ := Matrix.of fun a b => M (eB k j ρ (Sum.inl (Sum.inr a))) (eB k j ρ (Sum.inl (Sum.inl b)))
-def b22 : B.Mat k ρ := Matrix.of fun a b => M (eB k j ρ (Sum.inl (Sum.inr a))) (eB k j ρ (Sum.inl (Sum.inr b)))
-def b23 : Matrix (Fin (2 * ρ + k + 1)) (Fin j) ℂ := Matrix.of fun a b => M (eB k j ρ (Sum.inl (Sum.inr a))) (eB k j ρ (Sum.inr b))
-def b31 : Matrix (Fin j) (Fin j) ℂ := Matrix.of fun a b => M (eB k j ρ (Sum.inr a)) (eB k j ρ (Sum.inl (Sum.inl b)))
-def b32 : Matrix (Fin j) (Fin (2 * ρ + k + 1)) ℂ := Matrix.of fun a b => M (eB k j ρ (Sum.inr a)) (eB k j ρ (Sum.inl (Sum.inr b)))
-def b33 : Matrix (Fin j) (Fin j) ℂ := Matrix.of fun a b => M (eB k j ρ (Sum.inr a)) (eB k j ρ (Sum.inr b))
+def b11 : Matrix (Fin j) (Fin j) ℂ :=
+  Matrix.of fun a b => M (eB k j ρ (Sum.inl (Sum.inl a))) (eB k j ρ (Sum.inl (Sum.inl b)))
+def b12 : Matrix (Fin j) (Fin (2 * ρ + k + 1)) ℂ :=
+  Matrix.of fun a b => M (eB k j ρ (Sum.inl (Sum.inl a))) (eB k j ρ (Sum.inl (Sum.inr b)))
+def b13 : Matrix (Fin j) (Fin j) ℂ :=
+  Matrix.of fun a b => M (eB k j ρ (Sum.inl (Sum.inl a))) (eB k j ρ (Sum.inr b))
+def b21 : Matrix (Fin (2 * ρ + k + 1)) (Fin j) ℂ :=
+  Matrix.of fun a b => M (eB k j ρ (Sum.inl (Sum.inr a))) (eB k j ρ (Sum.inl (Sum.inl b)))
+def b22 : B.Mat k ρ :=
+  Matrix.of fun a b => M (eB k j ρ (Sum.inl (Sum.inr a))) (eB k j ρ (Sum.inl (Sum.inr b)))
+def b23 : Matrix (Fin (2 * ρ + k + 1)) (Fin j) ℂ :=
+  Matrix.of fun a b => M (eB k j ρ (Sum.inl (Sum.inr a))) (eB k j ρ (Sum.inr b))
+def b31 : Matrix (Fin j) (Fin j) ℂ :=
+  Matrix.of fun a b => M (eB k j ρ (Sum.inr a)) (eB k j ρ (Sum.inl (Sum.inl b)))
+def b32 : Matrix (Fin j) (Fin (2 * ρ + k + 1)) ℂ :=
+  Matrix.of fun a b => M (eB k j ρ (Sum.inr a)) (eB k j ρ (Sum.inl (Sum.inr b)))
+def b33 : Matrix (Fin j) (Fin j) ℂ :=
+  Matrix.of fun a b => M (eB k j ρ (Sum.inr a)) (eB k j ρ (Sum.inr b))
 
 lemma block3_eta : M = blk3 (b11 M) (b12 M) (b13 M) (b21 M) (b22 M) (b23 M) (b31 M) (b32 M) (b33 M) := by
   apply mat_ext_eB; intro x y; rw [block3_apply]
@@ -427,10 +447,13 @@ theorem lowWSpec : LowWSpec := by
         simp [this, hs, ne_of_gt h]
   · rintro ⟨v, rfl⟩
     rw [lower_iff, lower_iff]
-    refine ⟨⟨fun i => by simp [lowW_apply], fun a b hab => ?_⟩,
-      ⟨fun i => by simp [permutationMatrix_conj_apply, lowW_apply], fun a b hab => ?_⟩⟩
+    refine ⟨
+      ⟨fun i => by simp [lowW_apply], fun a b hab => ?_⟩,
+      ⟨fun i => by simp [permutationMatrix_conj_apply, lowW_apply], fun a b hab => ?_⟩
+    ⟩
     · rw [kL_lt] at hab; simp [lowW_apply, ne_of_lt hab, not_lt.mpr hab.le]
-    · rw [kL_lt] at hab; rw [permutationMatrix_conj_apply, lowW_apply]
+    · rw [kL_lt] at hab
+      rw [permutationMatrix_conj_apply, lowW_apply]
       simp [σ.injective.ne (ne_of_lt hab), not_lt.mpr hab.le]
 
 lemma upper_eq {u : Matrix (Fin p) (Fin p) ℂ} (hu : uniK (kU p) u) : u = G.upper (fun q => u q.1.1 q.1.2) := by
@@ -535,10 +558,12 @@ theorem charBlock : CharBlock := by
     congr 2
     unfold cornerA
     by_cases hps : 0 < s ∧ 0 < p
-    · rw [dite_eq_left hps, dite_eq_left hps, Matrix.mul_apply, Finset.sum_eq_single ⟨p - 1, by omega⟩]
+    · rw [dite_eq_left hps, dite_eq_left hps, Matrix.mul_apply,
+        Finset.sum_eq_single ⟨p - 1, by omega⟩]
       · rw [hlh.1, mul_one]; rfl
       · intro c _ hc
-        have : c.val < p - 1 := by have := c.isLt; have : c.val ≠ p - 1 := fun e => hc (Fin.ext e); omega
+        have : c.val < p - 1 := by
+          have := c.isLt; have : c.val ≠ p - 1 := fun e => hc (Fin.ext e); omega
         rw [hlh.2 c ⟨p - 1, by omega⟩ (kL_lt.mpr (Fin.lt_def.mpr this)), mul_zero]
       · simp
     · rw [dite_eq_right hps, dite_eq_right hps]
@@ -548,10 +573,12 @@ theorem charBlock : CharBlock := by
     congr 2
     unfold cornerB
     by_cases hps : 0 < s ∧ 0 < p
-    · rw [dite_eq_left hps, dite_eq_left hps, transpose_apply, Matrix.mul_apply, Finset.sum_eq_single ⟨p - 1, by omega⟩]
+    · rw [dite_eq_left hps, dite_eq_left hps, transpose_apply, Matrix.mul_apply,
+        Finset.sum_eq_single ⟨p - 1, by omega⟩]
       · rw [huh.1, one_mul]; rfl
       · intro c _ hc
-        have : c.val < p - 1 := by have := c.isLt; have : c.val ≠ p - 1 := fun e => hc (Fin.ext e); omega
+        have : c.val < p - 1 := by
+          have := c.isLt; have : c.val ≠ p - 1 := fun e => hc (Fin.ext e); omega
         rw [huh.2 ⟨p - 1, by omega⟩ c (kU_lt.mpr (Fin.lt_def.mpr this)), zero_mul]
       · simp
     · rw [dite_eq_right hps, dite_eq_right hps]

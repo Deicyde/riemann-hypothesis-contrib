@@ -22,8 +22,11 @@ public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.TrivialPolari
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry TensorProduct Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  TensorProduct Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -31,14 +34,18 @@ open GlobalTheory.CompanionTheory.Ar.GR
 
 namespace GlobalTheory.CompanionTheory.Ar.GR.Top
 
-theorem pt_eq_one_of_g_zero : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R]
-    (P : Out.PolAV (Spec (CommRingCat.of R))), P.g = 0 → ∀ z : sp (R₀ := R) R ⟶ P.A, z = 1 :=
+theorem pt_eq_one_of_g_zero
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R]
+        (P : Out.PolAV (Spec (CommRingCat.of R))),
+      P.g = 0 → ∀ z : sp (R₀ := R) R ⟶ P.A, z = 1 :=
   GlobalTheory.T.trivial_polarized_abelian_point_eq_one
 
-theorem exists_cp (p : ℕ) [hp : Fact p.Prime] {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
-    {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C] (hv : v.Integers R)
-    (hpv : v (p : C) < 1) :
-    ∃ cp : R, v (algebraMap R C cp) ^ (p - 1) = v (algebraMap R C (p : R)) := by
+theorem exists_cp
+    (p : ℕ) [hp : Fact p.Prime]
+    {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
+    {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C]
+    (hv : v.Integers R) (hpv : v (p : C) < 1)
+    : ∃ cp : R, v (algebraMap R C cp) ^ (p - 1) = v (algebraMap R C (p : R)) := by
   have h1 : 0 < p - 1 := Nat.sub_pos_of_lt hp.out.one_lt
   obtain ⟨c, hc⟩ := IsAlgClosed.exists_pow_nat_eq (p : C) h1
   have hle : v c ≤ 1 := by
@@ -50,9 +57,12 @@ theorem exists_cp (p : ℕ) [hp : Fact p.Prime] {C : Type} [Field C] [IsAlgClose
   obtain ⟨r, hr⟩ := hv.exists_of_le_one hle
   exact ⟨r, by rw [hr, ← v.map_pow, hc, map_natCast (algebraMap R C)]⟩
 
-theorem hopf_carrier_g_zero {p : ℕ} [Fact p.Prime] {C : Type} [Field C] {R : Type} [CommRing R]
-    [Algebra R C] (AA : ReciprocityTheory.PGsh.L2.HopfOrder (C := C) R (Nb p 0)) :
-    AA.carrier = ReciprocityTheory.PGsh.L2.intFun R (Nb p 0) := by
+theorem hopf_carrier_g_zero
+    {p : ℕ} [Fact p.Prime]
+    {C : Type} [Field C]
+    {R : Type} [CommRing R] [Algebra R C]
+    (AA : ReciprocityTheory.PGsh.L2.HopfOrder (C := C) R (Nb p 0))
+    : AA.carrier = ReciprocityTheory.PGsh.L2.intFun R (Nb p 0) := by
   let _ : Unique (Nb p 0) := Pi.uniqueOfIsEmpty _
   refine le_antisymm AA.le_int fun f hf => ?_
   obtain ⟨r, hr⟩ := hf default
@@ -63,9 +73,14 @@ theorem hopf_carrier_g_zero {p : ℕ} [Fact p.Prime] {C : Type} [Field C] {R : T
   rw [this]
   exact AA.carrier.smul_mem r AA.one_mem
 
-theorem torsFun_one_eq {p : ℕ} [Fact p.Prime] {C : Type} [Field C] {R : Type} [CommRing R]
-    [Algebra R C] {G : Over (Spec (CommRingCat.of R))} [GrpObj G] (T : TorsRep G p) :
-    torsFun C T (fun _ : Nb p 0 => (1 : sp (R₀ := R) R ⟶ G)) = ReciprocityTheory.PGsh.L2.intFun R (Nb p 0) := by
+theorem torsFun_one_eq
+    {p : ℕ} [Fact p.Prime]
+    {C : Type} [Field C]
+    {R : Type} [CommRing R] [Algebra R C]
+    {G : Over (Spec (CommRingCat.of R))} [GrpObj G]
+    (T : TorsRep G p)
+    : torsFun C T (fun _ : Nb p 0 => (1 : sp (R₀ := R) R ⟶ G))
+      = ReciprocityTheory.PGsh.L2.intFun R (Nb p 0) := by
   let _ : Unique (Nb p 0) := Pi.uniqueOfIsEmpty _
   obtain ⟨φ₀, hφ₀, -⟩ := T.univ R (1 : sp (R₀ := R) R ⟶ G) (one_pow p)
   ext f
@@ -90,7 +105,8 @@ theorem main : HodgeTateDatumStatement := by
   haveI : IsAdicComplete (Ideal.span {(p : R)}) R := hcomp
   haveI : IsCommMonObj P.A := P.isAb.comm
   have hT : Nonempty (TorsRep P.A p) :=
-    GlobalTheory.T.abelian_scheme_torsion_representation R p (Fact.out : p.Prime).one_le P.A P.L P.isAb P.isLB P.ample
+    GlobalTheory.T.abelian_scheme_torsion_representation R p (Fact.out : p.Prime).one_le P.A P.L
+      P.isAb P.isLB P.ample
   refine ⟨hT, ?_⟩
   rcases Nat.eq_zero_or_pos P.g with hg | hg
   · obtain ⟨cp, hcp⟩ := exists_cp p hv hp
@@ -109,7 +125,8 @@ theorem main : HodgeTateDatumStatement := by
       | add x y hx hy => rw [map_add (f := _), map_add (f := _), hx, hy]
     obtain ⟨H⟩ := GlobalTheory.ChF.htd_dim_zero p C v R hv ℤ cp
     rw [← hg] at H
-    obtain ⟨hS', H', -⟩ := GlobalTheory.T.hodge_tate_datum_reduce_scalars p P.g C v R (ℤ_[p] ⊗[ℤ] ℤ) (sigE p ℤ) cp hS H
+    obtain ⟨hS', H', -⟩ :=
+      GlobalTheory.T.hodge_tate_datum_reduce_scalars p P.g C v R (ℤ_[p] ⊗[ℤ] ℤ) (sigE p ℤ) cp hS H
     have h1 := pt_eq_one_of_g_zero R P hg
     revert H'
     rw [hg]
@@ -130,7 +147,8 @@ theorem main : HodgeTateDatumStatement := by
     choose α hα using hα
     obtain ⟨cp, hS, H, S, pt, -, -, -, -, -, hpt, hAA, -⟩ :=
       GlobalTheory.T.formal_group_chart_family p C v R hv P hg P.g rfl ℤ o F X hX α hα
-    obtain ⟨hS', H', hAA', -⟩ := GlobalTheory.T.hodge_tate_datum_reduce_scalars p P.g C v R (ℤ_[p] ⊗[ℤ] ℤ) (sigE p ℤ) cp hS H
+    obtain ⟨hS', H', hAA', -⟩ :=
+      GlobalTheory.T.hodge_tate_datum_reduce_scalars p P.g C v R (ℤ_[p] ⊗[ℤ] ℤ) (sigE p ℤ) cp hS H
     exact ⟨cp, hS', H', pt, hpt, fun T => by rw [hAA']; exact hAA T⟩
 
 end GlobalTheory.CompanionTheory.Ar.GR.Top

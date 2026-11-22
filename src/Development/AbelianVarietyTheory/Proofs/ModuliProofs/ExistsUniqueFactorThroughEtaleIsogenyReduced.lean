@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.IsReduce
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 open GlobalTheory.HkFam
 
@@ -36,7 +38,14 @@ lemma ext_of_geometricPoints {T X Z : Scheme.{0}} [IsReduced T] (q : X ⟶ Z) [I
   refine Sigma.hom_ext _ _ fun t => ?_
   simpa only [pts, Sigma.ι_desc_assoc] using H (K t) _
 
-theorem exists_unique_factor : ∀ (S : Scheme.{0}) [IsReduced S] (A B B' : Over S) [GrpObj A] [GrpObj B] [GrpObj B'] (ψ : A ⟶ B) (g : A ⟶ B'), IsAbelianScheme A → IsAbelianScheme B → IsSeparated B'.hom → IsMonHom ψ → IsFinite ψ.left → Etale ψ.left → Surjective ψ.left → IsMonHom g → (∀ (k : Type) [Field k] [IsAlgClosed k] (t : Sp k ⟶ S) (x : Over.mk t ⟶ A), x ≫ ψ = 1 → x ≫ g = 1) → ∃ g' : B ⟶ B', IsMonHom g' ∧ ψ ≫ g' = g ∧ ∀ g'' : B ⟶ B', ψ ≫ g'' = g → g'' = g' := by
+theorem exists_unique_factor
+    : ∀ (S : Scheme.{0}) [IsReduced S] (A B B' : Over S) [GrpObj A] [GrpObj B] [GrpObj B']
+        (ψ : A ⟶ B) (g : A ⟶ B'),
+      IsAbelianScheme A → IsAbelianScheme B → IsSeparated B'.hom → IsMonHom ψ → IsFinite ψ.left
+        → Etale ψ.left → Surjective ψ.left → IsMonHom g
+        → (∀ (k : Type) [Field k] [IsAlgClosed k] (t : Sp k ⟶ S) (x : Over.mk t ⟶ A),
+          x ≫ ψ = 1 → x ≫ g = 1)
+        → ∃ g' : B ⟶ B', IsMonHom g' ∧ ψ ≫ g' = g ∧ ∀ g'' : B ⟶ B', ψ ≫ g'' = g → g'' = g' := by
   intro S _ A B B' _ _ _ ψ g _ _ hsep hψ hfin het hsurj hg H
 
   let T : Over S := pullback ψ η[B]
@@ -58,12 +67,17 @@ theorem exists_unique_factor : ∀ (S : Scheme.{0}) [IsReduced S] (A B B' : Over
     intro k _ _ x
     let xo : Over.mk (x ≫ T.hom) ⟶ T := Over.homMk x
     have e1 : (xo ≫ i) ≫ ψ = 1 := by
-      rw [Category.assoc, hker.w, ← Category.assoc, Hom.one_def, toUnit_unique (xo ≫ toUnit T) (toUnit _)]
+      rw [Category.assoc, hker.w, ← Category.assoc, Hom.one_def,
+        toUnit_unique (xo ≫ toUnit T) (toUnit _)]
     have e3 : xo ≫ (i ≫ g) = xo ≫ (toUnit T ≫ η[B']) := by
       rw [← Category.assoc, H k (x ≫ T.hom) (xo ≫ i) e1, Hom.one_def, ← Category.assoc,
         toUnit_unique (xo ≫ toUnit T) (toUnit _)]
     simpa only [xo, Over.comp_left, Over.homMk_left] using congrArg CommaMorphism.left e3
-  have := hψ; have := hg; have := hfin; have := het; have := hsurj
+  have := hψ
+  have := hg
+  have := hfin
+  have := het
+  have := hsurj
   obtain ⟨β, hβ, hψβ⟩ := FlatQuotient.exists_desc ψ i g hker hf
   have : Epi ψ := FlatQuotient.epi_of_flat_surjective ψ
   exact ⟨β, hβ, hψβ, fun g'' h'' => (cancel_epi ψ).1 (h''.trans hψβ.symm)⟩

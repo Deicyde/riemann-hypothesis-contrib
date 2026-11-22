@@ -11,27 +11,29 @@ namespace GlobalTheory.CompanionTheory.CartanMove
 
 variable {G G' : Type} [Group G] [Group G']
 
-theorem closure_symm_eq (e : G ≃* G') {l : ℕ} (t' : Fin l → G') :
-    Submonoid.closure (Set.range fun j => e.symm (t' j)) =
-      (Submonoid.closure (Set.range t')).map e.symm.toMonoidHom := by
+theorem closure_symm_eq (e : G ≃* G') {l : ℕ} (t' : Fin l → G')
+    : Submonoid.closure (Set.range fun j => e.symm (t' j))
+      = (Submonoid.closure (Set.range t')).map e.symm.toMonoidHom := by
   rw [MonoidHom.map_mclosure, ← Set.range_comp]
   rfl
 
-theorem apply_mem_closure (e : G ≃* G') {l : ℕ} (t' : Fin l → G') {s : G}
-    (hs : s ∈ Submonoid.closure (Set.range fun j => e.symm (t' j))) :
-    e s ∈ Submonoid.closure (Set.range t') := by
+theorem apply_mem_closure
+    (e : G ≃* G')
+    {l : ℕ} (t' : Fin l → G')
+    {s : G} (hs : s ∈ Submonoid.closure (Set.range fun j => e.symm (t' j)))
+    : e s ∈ Submonoid.closure (Set.range t') := by
   rw [closure_symm_eq] at hs
   obtain ⟨x, hx, rfl⟩ := hs
   simpa using hx
 
-theorem symm_mem_closure (e : G ≃* G') {l : ℕ} (t' : Fin l → G') {s : G'}
-    (hs : s ∈ Submonoid.closure (Set.range t')) :
-    e.symm s ∈ Submonoid.closure (Set.range fun j => e.symm (t' j)) := by
+theorem symm_mem_closure
+    (e : G ≃* G') {l : ℕ} (t' : Fin l → G') {s : G'} (hs : s ∈ Submonoid.closure (Set.range t'))
+    : e.symm s ∈ Submonoid.closure (Set.range fun j => e.symm (t' j)) := by
   rw [closure_symm_eq]
   exact ⟨s, hs, rfl⟩
 
-theorem isCartan_comap (e : G ≃* G') {K' : Subgroup G'} {d l : ℕ} (h : IsCartan K' d l) :
-    IsCartan (K'.comap e.toMonoidHom) d l := by
+theorem isCartan_comap (e : G ≃* G') {K' : Subgroup G'} {d l : ℕ} (h : IsCartan K' d l)
+    : IsCartan (K'.comap e.toMonoidHom) d l := by
   obtain ⟨c', t', h1, h2, h3, h4⟩ := h
   have hmem : ∀ {x : G'}, x ∈ K' → e.symm x ∈ K'.comap e.toMonoidHom := fun {x} hx => by
     simpa [Subgroup.mem_comap] using hx
@@ -46,8 +48,8 @@ theorem isCartan_comap (e : G ≃* G') {K' : Subgroup G'} {d l : ℕ} (h : IsCar
     apply e.injective
     simpa [map_mul] using hg
   · intro s hs s' hs' k hk
-    obtain ⟨a, ha, b, hb, hab⟩ := h4 (e s) (apply_mem_closure e t' hs) (e s')
-      (apply_mem_closure e t' hs') (e k) hk
+    obtain ⟨a, ha, b, hb, hab⟩ :=
+      h4 (e s) (apply_mem_closure e t' hs) (e s') (apply_mem_closure e t' hs') (e k) hk
     refine ⟨e.symm a, hmem ha, e.symm b, hmem hb, ?_⟩
     apply e.injective
     simpa [map_mul] using hab
@@ -55,7 +57,9 @@ theorem isCartan_comap (e : G ≃* G') {K' : Subgroup G'} {d l : ℕ} (h : IsCar
 theorem stMove : StMove := by
   intro G G' _ _ _ _ e h U hU
   have hopen : IsOpen ((U.map e.toMulEquiv.toMonoidHom : Subgroup G') : Set G') := by
-    have : ((U.map e.toMulEquiv.toMonoidHom : Subgroup G') : Set G') = e.toHomeomorph '' (U : Set G) := rfl
+    have : ((U.map e.toMulEquiv.toMonoidHom : Subgroup G') : Set G')
+        = e.toHomeomorph '' (U : Set G) :=
+      rfl
     rw [this]
     exact e.toHomeomorph.isOpenMap _ hU
   obtain ⟨K', hK'U, hoK', hcK', d, l, hC⟩ := h _ hopen

@@ -16,8 +16,13 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.RiemannFo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.PullbackSections Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1 GlobalTheory.AnVal GlobalTheory.BlockTh GlobalTheory.EtaAn
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.PullbackSections Formalism.L2.Pj
+  Formalism.MainNotions.ModuliIntegralCharts.H1 GlobalTheory.AnVal GlobalTheory.BlockTh
+  GlobalTheory.EtaAn
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.OrthoPeriodTorus
@@ -26,10 +31,12 @@ section
 
 open ReciprocityTheory.ChartRestriction.G.FD
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : FD.Data E r) (x : FD.Frame X.Ψ r)
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : FD.Data E r) (x : FD.Frame X.Ψ r)
 
-theorem perFr_add (v w : Fin r → E) (τ : E →+* ℂ) (i : ℕ) :
-    Formalism.L2.Pj.perFr X x (v + w) τ i = Formalism.L2.Pj.perFr X x v τ i + Formalism.L2.Pj.perFr X x w τ i := by
+theorem perFr_add (v w : Fin r → E) (τ : E →+* ℂ) (i : ℕ)
+    : Formalism.L2.Pj.perFr X x (v + w) τ i
+      = Formalism.L2.Pj.perFr X x v τ i + Formalism.L2.Pj.perFr X x w τ i := by
   have he : ∀ ρ : E →+* ℂ, Data.emb ρ (v + w) = Data.emb ρ v + Data.emb ρ w := by
     intro ρ
     funext a
@@ -43,14 +50,13 @@ theorem perFr_add (v w : Fin r → E) (τ : E →+* ℂ) (i : ℕ) :
   · simp
   · simp
 
-theorem perFr_smul (α : E) (v : Fin r → E) (τ : E →+* ℂ) (i : ℕ) :
-    Formalism.L2.Pj.perFr X x (α • v) τ i = τ α * Formalism.L2.Pj.perFr X x v τ i := by
+theorem perFr_smul (α : E) (v : Fin r → E) (τ : E →+* ℂ) (i : ℕ)
+    : Formalism.L2.Pj.perFr X x (α • v) τ i = τ α * Formalism.L2.Pj.perFr X x v τ i := by
   have he : ∀ ρ : E →+* ℂ, Data.emb ρ (α • v) = ρ α • Data.emb ρ v := by
     intro ρ
     funext a
     simp [Data.emb]
-  have hc : (starRingEnd ℂ) ((conjEmb τ) α) = τ α := by
-    simp [conjEmb]
+  have hc : (starRingEnd ℂ) ((conjEmb τ) α) = τ α := by simp [conjEmb]
   unfold Formalism.L2.Pj.perFr
   rw [he, he]
   split_ifs
@@ -62,13 +68,21 @@ theorem perFr_smul (α : E) (v : Fin r → E) (τ : E →+* ℂ) (i : ℕ) :
   · simp
   · simp
 
-theorem norm_sq_eq_Hf {J : Type} [Fintype J] (v : EuclideanSpace ℂ J) : ‖v‖ ^ 2 = (I2.Hf v v).re := by
+theorem norm_sq_eq_Hf {J : Type} [Fintype J] (v : EuclideanSpace ℂ J)
+    : ‖v‖ ^ 2 = (I2.Hf v v).re := by
   rw [EuclideanSpace.norm_sq_eq]
   simp only [I2.Hf, Complex.mul_conj, Complex.re_sum, Complex.ofReal_re, Complex.normSq_eq_norm_sq]
 
 end
 
-theorem isTorusAt_of_isTorusOf : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (r : ℕ) (U : Unf Xo c σ r) (k : U.Comp) (x : (U.X k).dom) (W : UnfAt U k x) (Wu : UnitAt W) (T : I2.PT E) (ψ : (Fin W.g → ℂ) ≃ₗ[ℂ] I2.Vsp T.dim), GoodEmb c σ → IsUnf U → (U.X k).IsOrtho x.1 → IsTorusOf (W.F.Di (W.ik k)) (fun j => relab c σ (W.e j).1) W.Pm Wu.Hm T ψ → I2.IsTorusAt (U.X k) x.1 T ∧ T.r = r ∧ ∀ th, T.ph th = I2.phiFD (U.X k) th x.1 := by
+theorem isTorusAt_of_isTorusOf
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
+        (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (r : ℕ)
+        (U : Unf Xo c σ r) (k : U.Comp) (x : (U.X k).dom) (W : UnfAt U k x) (Wu : UnitAt W)
+        (T : I2.PT E) (ψ : (Fin W.g → ℂ) ≃ₗ[ℂ] I2.Vsp T.dim),
+      GoodEmb c σ → IsUnf U → (U.X k).IsOrtho x.1
+        → IsTorusOf (W.F.Di (W.ik k)) (fun j => relab c σ (W.e j).1) W.Pm Wu.Hm T ψ
+        → I2.IsTorusAt (U.X k) x.1 T ∧ T.r = r ∧ ∀ th, T.ph th = I2.phiFD (U.X k) th x.1 := by
   intro E _ _ _ H Dw l Xo c σ r U k x W Wu T ψ hg hu ho ht
   classical
   have hU := hu
@@ -111,16 +125,18 @@ theorem isTorusAt_of_isTorusOf : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
   let fwd : (Σ τ : E →+* ℂ, Fin (Dw.mult τ)) → (U.X k).Ψ × Fin r := fun s =>
     if h : relab c σ s.1 ∈ (U.X k).Ψ then
       (⟨relab c σ s.1, h⟩, ⟨(U.X k).p0 + s.2, by have := s.2.isLt; have := hmultP _ h; omega⟩)
-    else
-      (⟨conjEmb (relab c σ s.1), hconjMem _ h⟩,
-        ⟨(U.X k).p0 - 1 - s.2, by have := s.2.isLt; have := hmultN _ h; omega⟩)
+    else (
+      ⟨conjEmb (relab c σ s.1), hconjMem _ h⟩,
+      ⟨(U.X k).p0 - 1 - s.2, by have := s.2.isLt; have := hmultN _ h; omega⟩
+    )
   have hfwd : Function.Bijective fwd := by
     constructor
     · rintro ⟨τ1, i1⟩ ⟨τ2, i2⟩ heq
       have hi1 := i1.isLt
       have hi2 := i2.isLt
       by_cases h1 : relab c σ τ1 ∈ (U.X k).Ψ <;> by_cases h2 : relab c σ τ2 ∈ (U.X k).Ψ
-      · simp only [fwd, dif_pos h1, dif_pos h2, Prod.mk.injEq, Subtype.mk.injEq, Fin.mk.injEq] at heq
+      · simp only [fwd, dif_pos h1, dif_pos h2, Prod.mk.injEq, Subtype.mk.injEq, Fin.mk.injEq]
+          at heq
         obtain ⟨he1, he2⟩ := heq
         obtain rfl := hbij.1 he1
         obtain rfl : i1 = i2 := Fin.ext (by omega)
@@ -131,7 +147,8 @@ theorem isTorusAt_of_isTorusOf : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
       · simp only [fwd, dif_neg h1, dif_pos h2, Prod.mk.injEq, Fin.mk.injEq] at heq
         have := hmultN _ h1
         omega
-      · simp only [fwd, dif_neg h1, dif_neg h2, Prod.mk.injEq, Subtype.mk.injEq, Fin.mk.injEq] at heq
+      · simp only [fwd, dif_neg h1, dif_neg h2, Prod.mk.injEq, Subtype.mk.injEq, Fin.mk.injEq]
+          at heq
         obtain ⟨he1, he2⟩ := heq
         have hρ : relab c σ τ1 = relab c σ τ2 := by
           have h3 := congrArg conjEmb he1
@@ -162,7 +179,8 @@ theorem isTorusAt_of_isTorusOf : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
         · show (U.X k).p0 - 1 - ((U.X k).p0 - 1 - (t : ℕ)) = t
           omega
   let idx : Fin W.g ≃ (U.X k).Ψ × Fin r := W.e.trans (Equiv.ofBijective fwd hfwd)
-  have hP : ∀ a j, W.Pm a j = GlobalTheory.RiemMaj.pc (U.X k) x.1 (W.φ k a : Fin r → E) (idx j) := by
+  have hP
+      : ∀ a j, W.Pm a j = GlobalTheory.RiemMaj.pc (U.X k) x.1 (W.φ k a : Fin r → E) (idx j) := by
     intro a j
     rw [W.pm_eq a j]
     show _ = GlobalTheory.RiemMaj.pc (U.X k) x.1 _ (fwd (W.e j))
@@ -183,21 +201,30 @@ theorem isTorusAt_of_isTorusOf : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
       simp only [fwd, dif_neg h]
       unfold Formalism.L2.Pj.perFr GlobalTheory.RiemMaj.pc
       simp only [dif_neg h, dif_pos hc, dif_pos hlt, hlt', if_true]
-  have him : ∀ a b, (hermForm Wu.Hm (W.Pm a) (W.Pm b)).im =
-      ((Algebra.trace ℚ E (-(U.X k).ξ0 * ReciprocityTheory.ChartRestriction.G.FD.herm (U.X k).Gm (W.φ k a : Fin r → E) (W.φ k b)) : ℚ) : ℝ) := by
+  have him
+      : ∀ a b,
+        (hermForm Wu.Hm (W.Pm a) (W.Pm b)).im
+          = ((Algebra.trace ℚ E
+                (-(U.X k).ξ0 * ReciprocityTheory.ChartRestriction.G.FD.herm (U.X k).Gm
+                  (W.φ k a : Fin r → E) (W.φ k b))
+              : ℚ)
+            : ℝ) := by
     intro a b
     rw [Wu.c1 a b]
     exact_mod_cast W.isom k a b
-  have hcore := GlobalTheory.RiemMaj.core (U.X k) x.2 idx (fun a => (W.φ k a : Fin r → E)) W.Pm hP
-    W.per.2.2.2.1 Wu.Hm Wu.pos him
+  have hcore :=
+    GlobalTheory.RiemMaj.core (U.X k) x.2 idx
+      (fun a => (W.φ k a : Fin r → E))
+      W.Pm hP W.per.2.2.2.1 Wu.Hm Wu.pos him
   let per : (Fin r → E) → Fin W.g → ℂ := fun v j =>
     Formalism.L2.Pj.perFr (U.X k) x.1 v (relab c σ (W.e j).1) (W.e j).2
   have per_add : ∀ v w, per (v + w) = per v + per w := fun v w =>
     funext fun j => perFr_add (U.X k) x.1 v w _ _
-  let φ : (Fin r → E) →+ I2.Vsp T.dim := AddMonoidHom.mk' (fun v => ψ (per v)) (by
-    intro v w
-    show ψ (per (v + w)) = ψ (per v) + ψ (per w)
-    rw [per_add, map_add (f := _)])
+  let φ : (Fin r → E) →+ I2.Vsp T.dim :=
+    AddMonoidHom.mk' (fun v => ψ (per v)) (by
+      intro v w
+      show ψ (per (v + w)) = ψ (per v) + ψ (per w)
+      rw [per_add, map_add (f := _)])
   have hφa : ∀ a, φ (W.φ k a : Fin r → E) = ψ (W.Pm a) := by
     intro a
     show ψ (per _) = _
@@ -232,7 +259,13 @@ theorem isTorusAt_of_isTorusOf : ∀ (E : Type) [Field E] [NumberField E] [IsCMF
       rw [hφa, hφa, hHf, him a b, neg_mul, map_neg]
       push_cast
       ring
-  refine ⟨hTA, ?_, fun th => (ReciprocityTheory.ChartRestriction.G.I2.TorusAtPf.torusAtLa1_holds E r (U.X k) x.1 x.2 T hTA).2 th⟩
+  refine ⟨
+    hTA,
+    ?_,
+    fun th =>
+      (ReciprocityTheory.ChartRestriction.G.I2.TorusAtPf.torusAtLa1_holds E r (U.X k) x.1 x.2 T
+        hTA).2 th
+  ⟩
   rw [hTr, hsig.1, hsig.2]
   exact hr.symm
 

@@ -12,8 +12,8 @@ namespace Formalism.FourierDecayAlt.P.PartialDerivativeAlgebra
 
 variable {N : ℕ}
 
-theorem pd_mono {a b : ℕ} (hab : a ≤ b) {P : Matrix (Fin N) (Fin N) ℂ → ℂ} (h : U.IsPolyDeg a P) :
-    U.IsPolyDeg b P := by
+theorem pd_mono {a b : ℕ} (hab : a ≤ b) {P : Matrix (Fin N) (Fin N) ℂ → ℂ} (h : U.IsPolyDeg a P)
+    : U.IsPolyDeg b P := by
   obtain ⟨q, hq, hP⟩ := h
   exact ⟨q, hq.trans hab, hP⟩
 
@@ -27,65 +27,77 @@ theorem pd_entry (i j : Fin N) : U.IsPolyDeg 1 (fun g : Matrix (Fin N) (Fin N) �
   · exact (MvPolynomial.totalDegree_X _).le
   · simp
 
-theorem pd_star_entry (i j : Fin N) : U.IsPolyDeg 1 (fun g : Matrix (Fin N) (Fin N) ℂ => star (g i j)) := by
+theorem pd_star_entry (i j : Fin N)
+    : U.IsPolyDeg 1 (fun g : Matrix (Fin N) (Fin N) ℂ => star (g i j)) := by
   refine ⟨MvPolynomial.X (Sum.inr (i, j)), ?_, fun g => ?_⟩
   · exact (MvPolynomial.totalDegree_X _).le
   · simp
 
-theorem pd_add {a : ℕ} {P Q : Matrix (Fin N) (Fin N) ℂ → ℂ} (hP : U.IsPolyDeg a P) (hQ : U.IsPolyDeg a Q) :
-    U.IsPolyDeg a (fun g => P g + Q g) := by
+theorem pd_add
+    {a : ℕ} {P Q : Matrix (Fin N) (Fin N) ℂ → ℂ} (hP : U.IsPolyDeg a P) (hQ : U.IsPolyDeg a Q)
+    : U.IsPolyDeg a (fun g => P g + Q g) := by
   obtain ⟨p, hp, hpP⟩ := hP
   obtain ⟨q, hq, hqQ⟩ := hQ
   refine ⟨p + q, (MvPolynomial.totalDegree_add p q).trans (max_le hp hq), fun g => ?_⟩
   dsimp only
   rw [hpP g, hqQ g, MvPolynomial.eval_add]
 
-theorem pd_mul {a b : ℕ} {P Q : Matrix (Fin N) (Fin N) ℂ → ℂ} (hP : U.IsPolyDeg a P) (hQ : U.IsPolyDeg b Q) :
-    U.IsPolyDeg (a + b) (fun g => P g * Q g) := by
+theorem pd_mul
+    {a b : ℕ} {P Q : Matrix (Fin N) (Fin N) ℂ → ℂ} (hP : U.IsPolyDeg a P) (hQ : U.IsPolyDeg b Q)
+    : U.IsPolyDeg (a + b) (fun g => P g * Q g) := by
   obtain ⟨p, hp, hpP⟩ := hP
   obtain ⟨q, hq, hqQ⟩ := hQ
   refine ⟨p * q, (MvPolynomial.totalDegree_mul p q).trans (Nat.add_le_add hp hq), fun g => ?_⟩
   dsimp only
   rw [hpP g, hqQ g, MvPolynomial.eval_mul]
 
-theorem pd_sub {a : ℕ} {P Q : Matrix (Fin N) (Fin N) ℂ → ℂ} (hP : U.IsPolyDeg a P) (hQ : U.IsPolyDeg a Q) :
-    U.IsPolyDeg a (fun g => P g - Q g) := by
+theorem pd_sub
+    {a : ℕ} {P Q : Matrix (Fin N) (Fin N) ℂ → ℂ} (hP : U.IsPolyDeg a P) (hQ : U.IsPolyDeg a Q)
+    : U.IsPolyDeg a (fun g => P g - Q g) := by
   obtain ⟨p, hp, hpP⟩ := hP
   obtain ⟨q, hq, hqQ⟩ := hQ
   refine ⟨p - q, (MvPolynomial.totalDegree_sub p q).trans (max_le hp hq), fun g => ?_⟩
   dsimp only
   rw [hpP g, hqQ g, MvPolynomial.eval_sub]
 
-theorem pd_sum {ι : Type*} (s : Finset ι) {a : ℕ} {P : ι → Matrix (Fin N) (Fin N) ℂ → ℂ}
-    (h : ∀ i ∈ s, U.IsPolyDeg a (P i)) : U.IsPolyDeg a (fun g => ∑ i ∈ s, P i g) := by
+theorem pd_sum
+    {ι : Type*} (s : Finset ι)
+    {a : ℕ} {P : ι → Matrix (Fin N) (Fin N) ℂ → ℂ} (h : ∀ i ∈ s, U.IsPolyDeg a (P i))
+    : U.IsPolyDeg a (fun g => ∑ i ∈ s, P i g) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using pd_const (N := N) 0 a
   | insert x s hx ih =>
-    have h1 := pd_add (h x (Finset.mem_insert_self x s))
-      (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
+    have h1 :=
+      pd_add (h x (Finset.mem_insert_self x s)) (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
     simpa [Finset.sum_insert hx] using h1
 
-theorem pd_prod {ι : Type*} (s : Finset ι) {a : ℕ} {P : ι → Matrix (Fin N) (Fin N) ℂ → ℂ}
-    (h : ∀ i ∈ s, U.IsPolyDeg a (P i)) : U.IsPolyDeg (s.card * a) (fun g => ∏ i ∈ s, P i g) := by
+theorem pd_prod
+    {ι : Type*} (s : Finset ι)
+    {a : ℕ} {P : ι → Matrix (Fin N) (Fin N) ℂ → ℂ} (h : ∀ i ∈ s, U.IsPolyDeg a (P i))
+    : U.IsPolyDeg (s.card * a) (fun g => ∏ i ∈ s, P i g) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using pd_const (N := N) 1 0
   | insert x s hx ih =>
-    have h1 := pd_mul (h x (Finset.mem_insert_self x s))
-      (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
+    have h1 :=
+      pd_mul (h x (Finset.mem_insert_self x s)) (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
     have hc : (insert x s).card * a = a + s.card * a := by
       rw [Finset.card_insert_of_notMem hx]; ring
     rw [hc]
     simpa [Finset.prod_insert hx] using h1
 
-theorem pd_det {l : ℕ} (M : Matrix (Fin N) (Fin N) ℂ → Matrix (Fin l) (Fin l) ℂ)
-    (h : ∀ a b, U.IsPolyDeg 1 (fun g => M g a b)) : U.IsPolyDeg l (fun g => (M g).det) := by
-  have key : ∀ σ ∈ (Finset.univ : Finset (Equiv.Perm (Fin l))),
-      U.IsPolyDeg l (fun g => ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ i, M g (σ i) i) := by
+theorem pd_det
+    {l : ℕ} (M : Matrix (Fin N) (Fin N) ℂ → Matrix (Fin l) (Fin l) ℂ)
+    (h : ∀ a b, U.IsPolyDeg 1 (fun g => M g a b))
+    : U.IsPolyDeg l (fun g => (M g).det) := by
+  have key
+      : ∀ σ ∈ (Finset.univ : Finset (Equiv.Perm (Fin l))),
+        U.IsPolyDeg l (fun g => ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ i, M g (σ i) i) := by
     intro σ _
-    have h1 := pd_mul (pd_const (N := N) ((Equiv.Perm.sign σ : ℤ) : ℂ) 0)
-      (pd_prod (Finset.univ : Finset (Fin l)) (fun i _ => h (σ i) i))
+    have h1 :=
+      pd_mul (pd_const (N := N) ((Equiv.Perm.sign σ : ℤ) : ℂ) 0)
+        (pd_prod (Finset.univ : Finset (Fin l)) (fun i _ => h (σ i) i))
     refine pd_mono ?_ h1
     simp
   have h2 := pd_sum _ key
@@ -104,30 +116,38 @@ theorem gram_function_last_minor : C6.GfDlast := by
     mul_nonneg (mul_nonneg hz hz') (Complex.normSq_nonneg _)
   linarith
 
-private theorem isPolyDeg_one_mulVec_apply {M : ℕ} (v : Fin M → ℂ) (j : Fin M) :
-    U.IsPolyDeg 1 (fun g : Matrix (Fin M) (Fin M) ℂ => Matrix.mulVec g v j) := by
-  have h := pd_sum (N := M) (Finset.univ : Finset (Fin M))
-    (P := fun m g => g j m * v m) (a := 1 + 0)
-    (fun m _ => pd_mul (pd_entry j m) (pd_const (v m) 0))
+private theorem isPolyDeg_one_mulVec_apply {M : ℕ} (v : Fin M → ℂ) (j : Fin M)
+    : U.IsPolyDeg 1 (fun g : Matrix (Fin M) (Fin M) ℂ => Matrix.mulVec g v j) := by
+  have h :=
+    pd_sum (N := M) (Finset.univ : Finset (Fin M))
+      (P := fun m g => g j m * v m)
+      (a := 1 + 0)
+      (fun m _ => pd_mul (pd_entry j m) (pd_const (v m) 0))
   simpa [Matrix.mulVec, dotProduct] using h
 
-theorem zhat_pd (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (a b : Fin (r + 1)) :
-    U.IsPolyDeg 1 (fun g => Zhat k r z z' g a b) := by
-  have hH : ∀ i, U.IsPolyDeg 1
-      (fun g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ =>
-        Matrix.mulVec (Hpk k r) (Matrix.mulVec g (fvec k r z' b)) i) := by
+theorem zhat_pd (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (a b : Fin (r + 1))
+    : U.IsPolyDeg 1 (fun g => Zhat k r z z' g a b) := by
+  have hH
+      : ∀ i,
+        U.IsPolyDeg 1 (fun g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ =>
+          Matrix.mulVec (Hpk k r) (Matrix.mulVec g (fvec k r z' b)) i) := by
     intro i
-    have h := pd_sum (Finset.univ : Finset (Fin (2 * r + k + 1)))
-      (P := fun j g => Hpk k r i j * Matrix.mulVec g (fvec k r z' b) j) (a := 0 + 1)
-      (fun j _ => pd_mul (pd_const (Hpk k r i j) 0) (isPolyDeg_one_mulVec_apply _ j))
+    have h :=
+      pd_sum (Finset.univ : Finset (Fin (2 * r + k + 1)))
+        (P := fun j g => Hpk k r i j * Matrix.mulVec g (fvec k r z' b) j)
+        (a := 0 + 1)
+        (fun j _ => pd_mul (pd_const (Hpk k r i j) 0) (isPolyDeg_one_mulVec_apply _ j))
     simpa [Matrix.mulVec, dotProduct] using h
-  have h := pd_sum (Finset.univ : Finset (Fin (2 * r + k + 1)))
-    (P := fun i g => star (fvec k r z a i) * Matrix.mulVec (Hpk k r) (Matrix.mulVec g (fvec k r z' b)) i) (a := 0 + 1)
-    (fun i _ => pd_mul (pd_const _ 0) (hH i))
+  have h :=
+    pd_sum (Finset.univ : Finset (Fin (2 * r + k + 1)))
+      (P := fun i g =>
+        star (fvec k r z a i) * Matrix.mulVec (Hpk k r) (Matrix.mulVec g (fvec k r z' b)) i)
+      (a := 0 + 1)
+      (fun i _ => pd_mul (pd_const _ 0) (hH i))
   simpa [Zhat, herm, dotProduct] using h
 
-private theorem isPolyDeg_star' {M a : ℕ} {P : Matrix (Fin M) (Fin M) ℂ → ℂ} (h : U.IsPolyDeg a P) :
-    U.IsPolyDeg a (fun g => star (P g)) := by
+private theorem isPolyDeg_star' {M a : ℕ} {P : Matrix (Fin M) (Fin M) ℂ → ℂ} (h : U.IsPolyDeg a P)
+    : U.IsPolyDeg a (fun g => star (P g)) := by
   obtain ⟨q, hq, hP⟩ := h
   refine ⟨rename Sum.swap (map (starRingEnd ℂ) q), ?_, fun g => ?_⟩
   · have hm : (map (starRingEnd ℂ) q).totalDegree ≤ q.totalDegree := by
@@ -141,31 +161,36 @@ private theorem isPolyDeg_star' {M a : ℕ} {P : Matrix (Fin M) (Fin M) ℂ → 
     funext x
     rcases x with x | x <;> simp
 
-theorem zhat_star_pd (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (a b : Fin (r + 1)) :
-    U.IsPolyDeg 1 (fun g => star (Zhat k r z z' g a b)) := by
+theorem zhat_star_pd (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (a b : Fin (r + 1))
+    : U.IsPolyDeg 1 (fun g => star (Zhat k r z z' g a b)) := by
   exact isPolyDeg_star' (zhat_pd k r z z' a b)
 
 theorem minor_polynomial_property : C6.DminPoly := by
   intro k r z z' l
-  exact pd_det (fun g => (Zhat k r z z' g).submatrix (Fin.castLE (Nat.le_of_lt_succ l.isLt))
-    (Fin.castLE (Nat.le_of_lt_succ l.isLt))) (fun a b => zhat_pd k r z z' _ _)
+  exact pd_det
+    (fun g =>
+      (Zhat k r z z' g).submatrix (Fin.castLE (Nat.le_of_lt_succ l.isLt))
+        (Fin.castLE (Nat.le_of_lt_succ l.isLt)))
+    (fun a b => zhat_pd k r z z' _ _)
 
-theorem dmin_star_pd (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (l : Fin (r + 2)) :
-    U.IsPolyDeg l.val (fun g => star (Dmin k r z z' g l)) := by
+theorem dmin_star_pd (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (l : Fin (r + 2))
+    : U.IsPolyDeg l.val (fun g => star (Dmin k r z z' g l)) := by
   exact isPolyDeg_star' (minor_polynomial_property k r z z' l)
 
 theorem gram_function_polynomial : C6.GfPoly := by
   intro k r z z'
-  have hL := pd_mul (minor_polynomial_property k r z z' (Fin.last (r + 1)))
-    (dmin_star_pd k r z z' (Fin.last (r + 1)))
-  have hR0 := pd_mul (minor_polynomial_property k r z z' ⟨r, by omega⟩)
-    (dmin_star_pd k r z z' ⟨r, by omega⟩)
+  have hL :=
+    pd_mul (minor_polynomial_property k r z z' (Fin.last (r + 1)))
+      (dmin_star_pd k r z z' (Fin.last (r + 1)))
+  have hR0 :=
+    pd_mul (minor_polynomial_property k r z z' ⟨r, by omega⟩) (dmin_star_pd k r z z' ⟨r, by omega⟩)
   have hR := pd_mul (pd_const (((Tz k r z * Tz k r z' : ℝ)) : ℂ) 0) hR0
-  have hL' : U.IsPolyDeg (2 * r + 2) (fun g => Dmin k r z z' g (Fin.last (r + 1)) *
-      star (Dmin k r z z' g (Fin.last (r + 1)))) :=
+  have hL' : U.IsPolyDeg (2 * r + 2)
+      (fun g => Dmin k r z z' g (Fin.last (r + 1)) * star (Dmin k r z z' g (Fin.last (r + 1)))) :=
     pd_mono (by simp; omega) hL
-  have hR' : U.IsPolyDeg (2 * r + 2) (fun g => ((Tz k r z * Tz k r z' : ℝ) : ℂ) *
-      (Dmin k r z z' g ⟨r, by omega⟩ * star (Dmin k r z z' g ⟨r, by omega⟩))) :=
+  have hR' : U.IsPolyDeg (2 * r + 2) (fun g =>
+      ((Tz k r z * Tz k r z' : ℝ) : ℂ)
+        * (Dmin k r z z' g ⟨r, by omega⟩ * star (Dmin k r z z' g ⟨r, by omega⟩))) :=
     pd_mono (by simp; omega) hR
   have h := pd_sub hL' hR'
   convert h using 2 with g

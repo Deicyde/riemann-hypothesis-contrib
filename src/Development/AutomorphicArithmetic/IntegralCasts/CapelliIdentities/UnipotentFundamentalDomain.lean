@@ -4,16 +4,17 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.UnipotentFundamentalDomain.val_two :
-    ∀ (K : Type) [inst : Field K] [inst_1 : NumberField K],
-    Module.finrank ℚ K ≤ (2 : ℕ) →
-      ∀ (P Q : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers K)),
-        P ≠ Q →
-          Ideal.under ℤ P.asIdeal = Ideal.under ℤ Q.asIdeal →
-            (Valued.v : IsDedekindDomain.HeightOneSpectrum.adicCompletion K P → WithZero (Multiplicative ℤ))
-                (↑((Ideal.absNorm : Ideal (NumberField.RingOfIntegers K) → ℕ) P.asIdeal) :
-                  IsDedekindDomain.HeightOneSpectrum.adicCompletion K P) =
-              WithZero.exp (-1 : ℤ) := by
+theorem UpperTheory.Reformulated.B.UnipotentFundamentalDomain.val_two
+    : ∀ (K : Type) [inst : Field K] [inst_1 : NumberField K],
+      Module.finrank ℚ K ≤ (2 : ℕ)
+        → ∀ (P Q : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers K)),
+          P ≠ Q → Ideal.under ℤ P.asIdeal = Ideal.under ℤ Q.asIdeal
+            → (Valued.v
+                  : IsDedekindDomain.HeightOneSpectrum.adicCompletion K P
+                    → WithZero (Multiplicative ℤ))
+                (↑((Ideal.absNorm : Ideal (NumberField.RingOfIntegers K) → ℕ) P.asIdeal)
+                  : IsDedekindDomain.HeightOneSpectrum.adicCompletion K P)
+              = WithZero.exp (-1 : ℤ) := by
   intro K _ _ hn P Q hPQ hunder
   have hPm : P.asIdeal.IsMaximal := P.isMaximal
   have hQm : Q.asIdeal.IsMaximal := Q.isMaximal
@@ -44,10 +45,13 @@ theorem UpperTheory.Reformulated.B.UnipotentFundamentalDomain.val_two :
   have hpQ : (p : NumberField.RingOfIntegers K) ∈ Q.asIdeal := by
     rw [hunder] at hpI
     simpa [Ideal.under_def, Ideal.mem_comap] using hpI
-  have hnorm : Ideal.absNorm (Ideal.span {(p : NumberField.RingOfIntegers K)}) =
-      p ^ Module.finrank ℚ K := by
-    have h : (p : NumberField.RingOfIntegers K) =
-        algebraMap ℤ (NumberField.RingOfIntegers K) (p : ℤ) := by simp
+  have hnorm
+      : Ideal.absNorm (Ideal.span {(p : NumberField.RingOfIntegers K)})
+        = p ^ Module.finrank ℚ K := by
+    have h
+        : (p : NumberField.RingOfIntegers K)
+          = algebraMap ℤ (NumberField.RingOfIntegers K) (p : ℤ) := by
+      simp
     rw [Ideal.absNorm_span_singleton, h, Algebra.norm_algebraMap, Int.natAbs_pow,
       Int.natAbs_natCast, NumberField.RingOfIntegers.rank]
   have hdvd : P.asIdeal * Q.asIdeal ∣ Ideal.span {(p : NumberField.RingOfIntegers K)} := by
@@ -55,16 +59,20 @@ theorem UpperTheory.Reformulated.B.UnipotentFundamentalDomain.val_two :
     exact le_inf ((Ideal.span_singleton_le_iff_mem _).2 hpP)
       ((Ideal.span_singleton_le_iff_mem _).2 hpQ)
   obtain ⟨J, hJ⟩ := hdvd
-  have hprod : p ^ Module.finrank ℚ K =
-      Ideal.absNorm P.asIdeal * Ideal.absNorm Q.asIdeal * Ideal.absNorm J := by
+  have hprod
+      : p ^ Module.finrank ℚ K
+        = Ideal.absNorm P.asIdeal * Ideal.absNorm Q.asIdeal * Ideal.absNorm J := by
     rw [← hnorm, hJ, map_mul, map_mul]
-  obtain ⟨a, -, ha⟩ := (Nat.dvd_prime_pow hp).1
-    (Dvd.intro _ (by rw [hprod, mul_assoc]) : Ideal.absNorm P.asIdeal ∣ p ^ Module.finrank ℚ K)
-  obtain ⟨b, -, hb⟩ := (Nat.dvd_prime_pow hp).1
-    (Dvd.intro _ (by rw [hprod, mul_comm (Ideal.absNorm P.asIdeal), mul_assoc]) :
-      Ideal.absNorm Q.asIdeal ∣ p ^ Module.finrank ℚ K)
-  obtain ⟨c, -, hc⟩ := (Nat.dvd_prime_pow hp).1
-    (Dvd.intro_left _ hprod.symm : Ideal.absNorm J ∣ p ^ Module.finrank ℚ K)
+  obtain ⟨a, -, ha⟩ :=
+    (Nat.dvd_prime_pow hp).1
+      (Dvd.intro _ (by rw [hprod, mul_assoc]) : Ideal.absNorm P.asIdeal ∣ p ^ Module.finrank ℚ K)
+  obtain ⟨b, -, hb⟩ :=
+    (Nat.dvd_prime_pow hp).1
+      (Dvd.intro _ (by rw [hprod, mul_comm (Ideal.absNorm P.asIdeal), mul_assoc])
+        : Ideal.absNorm Q.asIdeal ∣ p ^ Module.finrank ℚ K)
+  obtain ⟨c, -, hc⟩ :=
+    (Nat.dvd_prime_pow hp).1
+      (Dvd.intro_left _ hprod.symm : Ideal.absNorm J ∣ p ^ Module.finrank ℚ K)
   have ha0 : a ≠ 0 := by
     rintro rfl
     rw [pow_zero, Ideal.absNorm_eq_one_iff] at ha
@@ -80,8 +88,7 @@ theorem UpperTheory.Reformulated.B.UnipotentFundamentalDomain.val_two :
   have ha1 : a = 1 := by omega
   have hc0 : c = 0 := by omega
   have hNP : Ideal.absNorm P.asIdeal = p := by rw [ha, ha1, pow_one]
-  have hJtop : J = ⊤ := by
-    rw [← Ideal.absNorm_eq_one_iff, hc, hc0, pow_zero]
+  have hJtop : J = ⊤ := by rw [← Ideal.absNorm_eq_one_iff, hc, hc0, pow_zero]
   have hspan : Ideal.span {(p : NumberField.RingOfIntegers K)} = P.asIdeal * Q.asIdeal := by
     rw [hJ, hJtop, Ideal.mul_top]
   have hp0 : (p : NumberField.RingOfIntegers K) ≠ 0 := by
@@ -92,8 +99,8 @@ theorem UpperTheory.Reformulated.B.UnipotentFundamentalDomain.val_two :
   have h1 : P.intValuation (p : NumberField.RingOfIntegers K) ≤ WithZero.exp (-((1 : ℕ) : ℤ)) := by
     rw [IsDedekindDomain.HeightOneSpectrum.intValuation_le_pow_iff_dvd, hspan, pow_one]
     exact Dvd.intro _ rfl
-  have h2 : ¬ P.intValuation (p : NumberField.RingOfIntegers K) ≤
-      WithZero.exp (-((2 : ℕ) : ℤ)) := by
+  have h2
+      : ¬ P.intValuation (p : NumberField.RingOfIntegers K) ≤ WithZero.exp (-((2 : ℕ) : ℤ)) := by
     rw [IsDedekindDomain.HeightOneSpectrum.intValuation_le_pow_iff_dvd, hspan, pow_two]
     intro h
     have h3 : P.asIdeal ∣ Q.asIdeal := (mul_dvd_mul_iff_left P.ne_bot).1 h
@@ -104,7 +111,8 @@ theorem UpperTheory.Reformulated.B.UnipotentFundamentalDomain.val_two :
     congr 1
     omega
   rw [hNP]
-  have key := IsDedekindDomain.HeightOneSpectrum.valuedAdicCompletion_eq_valuation (K := K) P
-    (p : NumberField.RingOfIntegers K)
+  have key :=
+    IsDedekindDomain.HeightOneSpectrum.valuedAdicCompletion_eq_valuation (K := K) P
+      (p : NumberField.RingOfIntegers K)
   rw [IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap, hval] at key
   simpa using key

@@ -4,18 +4,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.DiscreteSum GlobalTheory.AutMult GroundTheory.Automorphic
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.DiscreteSum GlobalTheory.AutMult
+  GroundTheory.Automorphic
 
-theorem UpperTheory.V.KernelIndexFullLattice.absCompact_holds :
-    UpperTheory.V.KernelIndexFullLattice.AbsCompact := by
+theorem UpperTheory.V.KernelIndexFullLattice.absCompact_holds
+    : UpperTheory.V.KernelIndexFullLattice.AbsCompact := by
   intro G G₁ H L _ _ _ _ _ _ _ _ _ _ _ _ _ π ν _ _ ρ W hW J r hr hρ hJ hcpt
   have hmem : ∀ h, J h ∈ W := by
     intro h
     rw [← hJ]
     exact ⟨h, rfl⟩
-  let Φ : H →ₗᵢ[ℂ] W :=
-    { toLinearMap := (J.toLinearMap).codRestrict W hmem
-      norm_map' := fun h => J.norm_map h }
+  let Φ : H →ₗᵢ[ℂ] W := {
+    toLinearMap := (J.toLinearMap).codRestrict W hmem
+    norm_map' := fun h => J.norm_map h
+  }
   have hΦsurj : Function.Surjective Φ := by
     intro w
     have hw : (w : L) ∈ J.range := by
@@ -48,13 +50,15 @@ theorem UpperTheory.V.KernelIndexFullLattice.absCompact_holds :
       obtain ⟨g, rfl⟩ := hr g₁
       show Ψ.symm (S (Ψ (π (r g) h))) = π (r g) (Ψ.symm (S (Ψ h)))
       have e1 : S (Ψ h) = Ψ (Ψ.symm (S (Ψ h))) := (Ψ.apply_symm_apply _).symm
-      calc Ψ.symm (S (Ψ (π (r g) h))) = Ψ.symm (S (hW.rep g (Ψ h))) := by rw [hrep]
+      calc
+        Ψ.symm (S (Ψ (π (r g) h)))
+          = Ψ.symm (S (hW.rep g (Ψ h))) := by rw [hrep]
         _ = Ψ.symm (hW.rep g (S (Ψ h))) := by rw [hS]
         _ = Ψ.symm (hW.rep g (Ψ (Ψ.symm (S (Ψ h))))) := by rw [← e1]
         _ = π (r g) (Ψ.symm (S (Ψ h))) := by rw [hrep, LinearIsometryEquiv.symm_apply_apply]
     have hc := UnitaryRep.comp_integrated_of_mem_intertwiners π ν hT (UnitaryRep.ccToL1 ν f)
     have hc' := congrArg (fun Q => Q (Ψ.symm x)) hc
-    simp only [T, ContinuousLinearMap.comp_apply, hΨc, hΨi,
-      LinearIsometryEquiv.apply_symm_apply] at hc' ⊢
+    simp only [T, ContinuousLinearMap.comp_apply, hΨc, hΨi, LinearIsometryEquiv.apply_symm_apply]
+      at hc' ⊢
     rw [← hc', LinearIsometryEquiv.apply_symm_apply]
   · simpa [hΨc, hΨi] using hf

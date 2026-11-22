@@ -13,7 +13,6 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.O
 
 namespace GlobalTheory
 
-theorem laws3 : Laws3 :=
-  ⟨gtBaseChange, CubePf.cubePull⟩
+theorem laws3 : Laws3 := ⟨gtBaseChange, CubePf.cubePull⟩
 
 end GlobalTheory

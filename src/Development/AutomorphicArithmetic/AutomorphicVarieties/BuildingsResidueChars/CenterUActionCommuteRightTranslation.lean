@@ -7,17 +7,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsRe
 
 @[expose] public section
 
-open NumberField NumberField.mixedEmbedding Matrix MeasureTheory GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm UpperTheory.V.Af.Fin
+open NumberField NumberField.mixedEmbedding Matrix MeasureTheory GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm UpperTheory.V.Af.Fin
 open scoped TensorProduct
 attribute [local instance 100] LieRing.ofAssociativeRing
 
-theorem UpperTheory.centerU_action_commute_rightTranslation :
-    ∀ (K : Type) [Field K] [NumberField K] (n : ℕ), ∀ z ∈ (isExpLieAlgebra K n).centerU, ∀ g, Commute (uAction z) (rt (K := K) (n := n) g) := by
+theorem UpperTheory.centerU_action_commute_rightTranslation
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ), ∀ z ∈ (isExpLieAlgebra K n).centerU, ∀ g,
+      Commute (uAction z) (rt (K := K) (n := n) g) := by
   intro K _ _ n z hz g
   obtain ⟨ι, hι, ⟨D⟩⟩ := UpperTheory.exists_idempotent_decomposition_mixedSpace K
   have hinf : Commute (uAction z) (rtInf (archPart g)) := by
-    have hsub : Algebra.adjoin ℂ {x | ∃ τ u, x = capOp D n τ u} ≤
-        Subalgebra.centralizer ℂ {rtInf (archPart g)} := by
+    have hsub
+        : Algebra.adjoin ℂ {x | ∃ τ u, x = capOp D n τ u}
+          ≤ Subalgebra.centralizer ℂ {rtInf (archPart g)} := by
       rw [Algebra.adjoin_le_iff]
       rintro x ⟨τ, u, rfl⟩
       rw [SetLike.mem_coe, Subalgebra.mem_centralizer_iff]

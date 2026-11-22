@@ -44,9 +44,12 @@ lemma exists_pow_mul_mem_annihilatorIdeal (F : X.Modules) [F.IsQuasicoherent] {U
   change (f ^ s.sup e * a) • m = 0
   rw [← Nat.sub_add_cancel hle, pow_add, mul_assoc, mul_smul, mul_smul, he m hm, smul_zero]
 
-theorem map_annihilatorIdeal_basicOpen (F : X.Modules) [F.IsQuasicoherent] {U : X.Opens}
-    (hU : IsAffineOpen U) [Module.Finite Γ(X, U) Γ(F, U)] (f : Γ(X, U)) :
-    (annihilatorIdeal F U).map (resO (X.basicOpen_le f)) = annihilatorIdeal F (X.basicOpen f) := by
+theorem map_annihilatorIdeal_basicOpen
+    (F : X.Modules) [F.IsQuasicoherent]
+    {U : X.Opens} (hU : IsAffineOpen U) [Module.Finite Γ(X, U) Γ(F, U)]
+    (f : Γ(X, U))
+    : (annihilatorIdeal F U).map (resO (X.basicOpen_le f))
+      = annihilatorIdeal F (X.basicOpen f) := by
   have hunit : IsUnit (resO (X.basicOpen_le f) f) := X.toRingedSpace.isUnit_res_basicOpen f
   apply le_antisymm
   · rw [Ideal.map_le_iff_le_comap]
@@ -62,12 +65,13 @@ theorem map_annihilatorIdeal_basicOpen (F : X.Modules) [F.IsQuasicoherent] {U : 
     have := hU.isLocalization_basicOpen f
     obtain ⟨⟨a, ⟨_, k, rfl⟩⟩, hab⟩ := IsLocalization.surj (Submonoid.powers f) b
     change b * resO (X.basicOpen_le f) (f ^ k) = resO (X.basicOpen_le f) a at hab
-    obtain ⟨E, hE⟩ := exists_pow_mul_mem_annihilatorIdeal F hU f a (fun m => by
-      rw [resF_smul, ← hab, mul_smul, hb])
-    have hmem : resO (X.basicOpen_le f) (f ^ E * a) ∈
-        (annihilatorIdeal F U).map (resO (X.basicOpen_le f)) := Ideal.mem_map_of_mem _ hE
-    have hu : IsUnit (resO (X.basicOpen_le f) (f ^ (E + k))) := by
-      rw [map_pow]; exact hunit.pow _
+    obtain ⟨E, hE⟩ :=
+      exists_pow_mul_mem_annihilatorIdeal F hU f a (fun m => by rw [resF_smul, ← hab, mul_smul, hb])
+    have hmem
+        : resO (X.basicOpen_le f) (f ^ E * a)
+          ∈ (annihilatorIdeal F U).map (resO (X.basicOpen_le f)) :=
+      Ideal.mem_map_of_mem _ hE
+    have hu : IsUnit (resO (X.basicOpen_le f) (f ^ (E + k))) := by rw [map_pow]; exact hunit.pow _
     have hb' : b = resO (X.basicOpen_le f) (f ^ E * a) * ↑hu.unit⁻¹ := by
       rw [Units.eq_mul_inv_iff_mul_eq, IsUnit.unit_spec, pow_add, map_mul, map_mul, ← hab]
       ring
@@ -81,9 +85,10 @@ def annihilatorIdealSheaf (F : X.Modules) (hF : IsCoherent F) : X.IdealSheafData
     have := hF.2 U U.2
     exact map_annihilatorIdeal_basicOpen F U.2 f
 
-theorem support_annihilatorIdealSheaf_subset (F : X.Modules) (hF : IsCoherent F) {T : Set X}
-    (hT : IsClosed T) (hFT : Scheme.Modules.SupportedIn F T) :
-    ((annihilatorIdealSheaf F hF).support : Set X) ⊆ T := by
+theorem support_annihilatorIdealSheaf_subset
+    (F : X.Modules) (hF : IsCoherent F)
+    {T : Set X} (hT : IsClosed T) (hFT : Scheme.Modules.SupportedIn F T)
+    : ((annihilatorIdealSheaf F hF).support : Set X) ⊆ T := by
   intro x hx
   by_contra hxT
   have := hF.1
@@ -93,14 +98,16 @@ theorem support_annihilatorIdealSheaf_subset (F : X.Modules) (hF : IsCoherent F)
   have := hF.2 U U.2
   let V : X.Opens := ⟨Tᶜ, hT.isOpen_compl⟩
   obtain ⟨f, hfV, hxf⟩ := U.2.exists_basicOpen_le (V := V) ⟨x, hxT⟩ hxU
-  obtain ⟨E, hE⟩ := exists_pow_mul_mem_annihilatorIdeal F U.2 f 1 (fun m =>
-    hFT _ (Set.disjoint_left.2 fun y hy hyT => hfV hy hyT) _)
+  obtain ⟨E, hE⟩ :=
+    exists_pow_mul_mem_annihilatorIdeal F U.2 f 1
+      (fun m => hFT _ (Set.disjoint_left.2 fun y hy hyT => hfV hy hyT) _)
   rw [mul_one] at hE
   have hE' : f ^ (E + 1) ∈ (annihilatorIdealSheaf F hF).ideal U := by
     rw [pow_succ]; exact Ideal.mul_mem_right _ _ hE
   have hx' : x ∈ (annihilatorIdealSheaf F hF).support := hx
   rw [Scheme.IdealSheafData.mem_support_iff_of_mem (show x ∈ U.1 from hxU),
-    Scheme.mem_zeroLocus_iff] at hx'
+      Scheme.mem_zeroLocus_iff]
+    at hx'
   exact hx' _ hE' (by rwa [Scheme.basicOpen_pow _ _ (Nat.succ_pos E)])
 
 end

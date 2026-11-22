@@ -8,45 +8,53 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 
 noncomputable section
 
-open Formalism.L2.SG.LocalCountModules.LocCntCommon Formalism.L2.SG.LocalCountModules.LocCnt0LAlg Formalism.L2.SG.LocalCountModules.UnramifiedPairingLinear
+open Formalism.L2.SG.LocalCountModules.LocCntCommon Formalism.L2.SG.LocalCountModules.LocCnt0LAlg
+  Formalism.L2.SG.LocalCountModules.UnramifiedPairingLinear
 
 namespace Formalism.L2.SG.LocalCountModules.UnramifiedPairingAlgebraic
 
 variable {E : Type} [CommRing E] (O : Subring E) (cj : E →+* E) {r : ℕ}
 
-theorem card_of_constr (hO : ∀ x ∈ O, cj x ∈ O) (t t' : O)
-    (Z₁ Z₂ : Matrix (Fin (r + 1)) (Fin (r + 1)) O)
+theorem card_of_constr
+    (hO : ∀ x ∈ O, cj x ∈ O) (t t' : O) (Z₁ Z₂ : Matrix (Fin (r + 1)) (Fin (r + 1)) O)
     (hu₁ : IsUnit (Z₁.map O.subtype).det) (hu₂ : IsUnit (Z₂.map O.subtype).det)
     (hη₂ : EtaNZD O cj Z₂ (t : E) (t' : E))
-    (hf' : ∀ θ ∈ ThetaC O cj (Z₁.map O.subtype) (Z₂.map O.subtype) t t',
-      ∃ p : PairSet O cj hO Z₁ Z₂, (∀ m, θ (iL O cj hO Z₁ t t' m) = iL O cj hO Z₂ t t' (p.1.1 m)) ∧
-        ∀ m, θ (iR O cj hO Z₁ t t' m) = iR O cj hO Z₂ t t' (p.1.2 m))
-    (hb' : ∀ p : PairSet O cj hO Z₁ Z₂, ∃ θ ∈ ThetaC O cj (Z₁.map O.subtype) (Z₂.map O.subtype) t t',
-      (∀ m, θ (iL O cj hO Z₁ t t' m) = iL O cj hO Z₂ t t' (p.1.1 m)) ∧
-        ∀ m, θ (iR O cj hO Z₁ t t' m) = iR O cj hO Z₂ t t' (p.1.2 m)) :
-    Nat.card (ThetaC O cj (Z₁.map O.subtype) (Z₂.map O.subtype) t t') =
-      Nat.card (PairSet O cj hO Z₁ Z₂) := by
+    (hf'
+      : ∀ θ ∈ ThetaC O cj (Z₁.map O.subtype) (Z₂.map O.subtype) t t', ∃ p : PairSet O cj hO Z₁ Z₂,
+        (∀ m, θ (iL O cj hO Z₁ t t' m) = iL O cj hO Z₂ t t' (p.1.1 m))
+          ∧ ∀ m, θ (iR O cj hO Z₁ t t' m) = iR O cj hO Z₂ t t' (p.1.2 m))
+    (hb'
+      : ∀ p : PairSet O cj hO Z₁ Z₂, ∃ θ ∈ ThetaC O cj (Z₁.map O.subtype) (Z₂.map O.subtype) t t',
+        (∀ m, θ (iL O cj hO Z₁ t t' m) = iL O cj hO Z₂ t t' (p.1.1 m))
+          ∧ ∀ m, θ (iR O cj hO Z₁ t t' m) = iR O cj hO Z₂ t t' (p.1.2 m))
+    : Nat.card (ThetaC O cj (Z₁.map O.subtype) (Z₂.map O.subtype) t t')
+      = Nat.card (PairSet O cj hO Z₁ Z₂) := by
   choose F hF using hf'
   choose G hGmem hG using hb'
-  have lamP : ∀ (q : PairSet O cj hO Z₁ Z₂) (m : MbMod Z₁),
-      lamLQ O Z₂ hu₂ (q.1.1 m) = lamLQ O Z₁ hu₁ m := by
+  have lamP
+      : ∀ (q : PairSet O cj hO Z₁ Z₂) (m : MbMod Z₁),
+        lamLQ O Z₂ hu₂ (q.1.1 m) = lamLQ O Z₁ hu₁ m := by
     intro q m
     obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ m
     obtain ⟨y₂, hy₂⟩ := Submodule.Quotient.mk_surjective _ (q.1.1 (Submodule.Quotient.mk y))
     rw [← hy₂, lamLQ_mk, lamLQ_mk]
     exact lam_keep O hu₁ hu₂ (q.1.1 : MbMod Z₁ →ₗ[O] MbMod Z₂) q.2.1.1 y y₂ hy₂.symm
-  have lamQ : ∀ (q : PairSet O cj hO Z₁ Z₂) (m : MbMod (cjT O cj hO Z₁)),
-      lamSQ O cj hO Z₂ hu₂ (q.1.2 m) = lamSQ O cj hO Z₁ hu₁ m := by
+  have lamQ
+      : ∀ (q : PairSet O cj hO Z₁ Z₂) (m : MbMod (cjT O cj hO Z₁)),
+        lamSQ O cj hO Z₂ hu₂ (q.1.2 m) = lamSQ O cj hO Z₁ hu₁ m := by
     intro q m
     obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ m
     obtain ⟨y₂, hy₂⟩ := Submodule.Quotient.mk_surjective _ (q.1.2 (Submodule.Quotient.mk y))
     rw [← hy₂, lamSQ_mk, lamSQ_mk]
     exact q.2.2.1 y y₂ hy₂.symm
-  let f : ↥(ThetaC O cj (Z₁.map O.subtype) (Z₂.map O.subtype) (t : E) (t' : E)) →
-      PairSet O cj hO Z₁ Z₂ := fun θ => F θ.1 θ.2
-  let g : PairSet O cj hO Z₁ Z₂ →
-      ↥(ThetaC O cj (Z₁.map O.subtype) (Z₂.map O.subtype) (t : E) (t' : E)) :=
-    fun p => ⟨G p, hGmem p⟩
+  let f
+      : ↥(ThetaC O cj (Z₁.map O.subtype) (Z₂.map O.subtype) (t : E) (t' : E))
+        → PairSet O cj hO Z₁ Z₂ := fun θ =>
+    F θ.1 θ.2
+  let g
+      : PairSet O cj hO Z₁ Z₂
+        → ↥(ThetaC O cj (Z₁.map O.subtype) (Z₂.map O.subtype) (t : E) (t' : E)) := fun p =>
+    ⟨G p, hGmem p⟩
   have hfi : Function.Injective f := by
     intro θ θ' hθ
     apply Subtype.ext
@@ -54,8 +62,8 @@ theorem card_of_constr (hO : ∀ x ∈ O, cj x ∈ O) (t t' : O)
     intro x
     obtain ⟨v, rfl⟩ := Submodule.Quotient.mk_surjective _ x
     have hv : v = Sum.elim (v ∘ Sum.inl) (v ∘ Sum.inr) := (Sum.elim_comp_inl_inr v).symm
-    rw [hv, mk_elim O cj hO Z₁ t t', map_add (f := _), map_add (f := _), (hF θ.1 θ.2).1, (hF θ.1 θ.2).2,
-      (hF θ'.1 θ'.2).1, (hF θ'.1 θ'.2).2]
+    rw [hv, mk_elim O cj hO Z₁ t t', map_add (f := _), map_add (f := _), (hF θ.1 θ.2).1,
+      (hF θ.1 θ.2).2, (hF θ'.1 θ'.2).1, (hF θ'.1 θ'.2).2]
     change f θ = f θ' at hθ
     simp only [f] at hθ
     rw [hθ]
@@ -79,22 +87,29 @@ theorem card_of_constr (hO : ∀ x ∈ O, cj x ∈ O) (t t' : O)
   obtain ⟨e, he⟩ := Function.Embedding.schroeder_bernstein hfi hgi
   exact Nat.card_congr (Equiv.ofBijective e he)
 
-theorem bwd0 (hcj : ∀ x, cj (cj x) = x) (hO : ∀ x ∈ O, cj x ∈ O) (t t' : O)
-    (ht : cj (t : E) = t) (ht' : cj (t' : E) = t') {Z₁ Z₂ : Matrix (Fin (r + 1)) (Fin (r + 1)) O}
-    (hu₁ : IsUnit (Z₁.map O.subtype).det) (hu₂ : IsUnit (Z₂.map O.subtype).det)
-    (hκ₁ : (Z₁.map O.subtype)⁻¹ (Fin.last r) (Fin.last r) = 0)
+theorem bwd0
+    (hcj : ∀ x, cj (cj x) = x)
+    (hO : ∀ x ∈ O, cj x ∈ O)
+    (t t' : O) (ht : cj (t : E) = t) (ht' : cj (t' : E) = t')
+    {Z₁ Z₂ : Matrix (Fin (r + 1)) (Fin (r + 1)) O} (hu₁ : IsUnit (Z₁.map O.subtype).det)
+    (hu₂ : IsUnit (Z₂.map O.subtype).det) (hκ₁ : (Z₁.map O.subtype)⁻¹ (Fin.last r) (Fin.last r) = 0)
     (hκ₂ : (Z₂.map O.subtype)⁻¹ (Fin.last r) (Fin.last r) = 0)
     (hG₁ : IsUnit (gramC cj (Z₁.map O.subtype) t t').det)
-    (hG₂ : IsUnit (gramC cj (Z₂.map O.subtype) t t').det) (p : PairSet O cj hO Z₁ Z₂) :
-    ∃ θ ∈ ThetaC O cj (Z₁.map O.subtype) (Z₂.map O.subtype) t t',
-      (∀ m, θ (iL O cj hO Z₁ t t' m) = iL O cj hO Z₂ t t' (p.1.1 m)) ∧
-        ∀ m, θ (iR O cj hO Z₁ t t' m) = iR O cj hO Z₂ t t' (p.1.2 m) := by
-  refine ⟨thetaP O cj hcj hO t t' hu₁ hu₂ hκ₁ hκ₂ p,
-    thetaP_mem O cj hcj hO t t' ht ht' hu₁ hu₂ hκ₁ hκ₂ hG₁ hG₂ p, ?_, ?_⟩
+    (hG₂ : IsUnit (gramC cj (Z₂.map O.subtype) t t').det) (p : PairSet O cj hO Z₁ Z₂)
+    : ∃ θ ∈ ThetaC O cj (Z₁.map O.subtype) (Z₂.map O.subtype) t t',
+      (∀ m, θ (iL O cj hO Z₁ t t' m) = iL O cj hO Z₂ t t' (p.1.1 m))
+        ∧ ∀ m, θ (iR O cj hO Z₁ t t' m) = iR O cj hO Z₂ t t' (p.1.2 m) := by
+  refine ⟨
+    thetaP O cj hcj hO t t' hu₁ hu₂ hκ₁ hκ₂ p,
+    thetaP_mem O cj hcj hO t t' ht ht' hu₁ hu₂ hκ₁ hκ₂ hG₁ hG₂ p,
+    ?_,
+    ?_
+  ⟩
   · intro m
     obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ m
-    have hy : p.1.1 (Submodule.Quotient.mk y) =
-        Submodule.Quotient.mk (liftOf O (p.1.1 : MbMod Z₁ →ₗ[O] MbMod Z₂) y) :=
+    have hy
+        : p.1.1 (Submodule.Quotient.mk y)
+          = Submodule.Quotient.mk (liftOf O (p.1.1 : MbMod Z₁ →ₗ[O] MbMod Z₂) y) :=
       (liftOf_spec O _ y).symm
     rw [iL_mk, hy, iL_mk]
     simp only [thetaP, thetaOf]
@@ -104,9 +119,10 @@ theorem bwd0 (hcj : ∀ x, cj (cj x) = x) (hO : ∀ x ∈ O, cj x ∈ O) (t t' :
     cases i <;> simp <;> exact congrFun (map_zero _) _
   · intro m
     obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ m
-    have hy : p.1.2 (Submodule.Quotient.mk y) =
-        Submodule.Quotient.mk
-          (liftOf O (p.1.2 : MbMod (cjT O cj hO Z₁) →ₗ[O] MbMod (cjT O cj hO Z₂)) y) :=
+    have hy
+        : p.1.2 (Submodule.Quotient.mk y)
+          = Submodule.Quotient.mk (liftOf O
+            (p.1.2 : MbMod (cjT O cj hO Z₁) →ₗ[O] MbMod (cjT O cj hO Z₂)) y) :=
       (liftOf_spec O _ y).symm
     rw [iR_mk, hy, iR_mk]
     simp only [thetaP, thetaOf]

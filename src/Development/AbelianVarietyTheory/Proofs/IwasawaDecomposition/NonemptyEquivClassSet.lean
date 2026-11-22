@@ -47,7 +47,11 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.LevelHype
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.L2.Geo GlobalTheory.Toroidal GlobalTheory.TrueGeo GlobalTheory.ShFam Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.Member
+open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.L2.Geo
+  GlobalTheory.Toroidal GlobalTheory.TrueGeo GlobalTheory.ShFam Formalism.BasicNotions.TH
+  Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.Member
 open scoped TensorProduct Matrix
 
 noncomputable section
@@ -60,8 +64,9 @@ variable {D : D7}
 
 section Comp
 
-variable {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
-  {σ : c.F →+* ℂ} {V : HSp D} {r : ℕ}
+variable
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l} {σ : c.F →+* ℂ} {V : HSp D} {r : ℕ}
 
 end Comp
 
@@ -73,8 +78,9 @@ section Classes
 
 open GlobalTheory.Mass Formalism.IndefR.Lev Formalism.L2.DIV
 
-variable {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
-  {σ : c.F →+* ℂ} {V : HSp D} {r : ℕ}
+variable
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l} {σ : c.F →+* ℂ} {V : HSp D} {r : ℕ}
 
 end Classes
 
@@ -82,11 +88,13 @@ section Local
 
 open Formalism.UG GlobalTheory.LatticeStabLocal Formalism.L2.Herm
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {n : ℕ}
-  (Λ : Submodule (𝓞 E) (Fin n → E))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {n : ℕ} (Λ : Submodule (𝓞 E) (Fin n → E))
 
-theorem mem_hatL_iff [Module.Finite (𝓞 E) Λ] (z : Fin n → E ⊗[F] FiniteAdeleRing (𝓞 F) F) :
-    z ∈ hatL (F := F) Λ ↔ ∀ v : HeightOneSpectrum (𝓞 F), (fun i => prV (E := E) v (z i)) ∈ locL v Λ :=
+theorem mem_hatL_iff [Module.Finite (𝓞 E) Λ] (z : Fin n → E ⊗[F] FiniteAdeleRing (𝓞 F) F)
+    : z ∈ hatL (F := F) Λ
+      ↔ ∀ v : HeightOneSpectrum (𝓞 F), (fun i => prV (E := E) v (z i)) ∈ locL v Λ :=
   mem_latS_adele_iff Λ z
 
 end Local
@@ -95,8 +103,11 @@ section LocalLevel
 
 open Formalism.UG GlobalTheory.LatticeStabLocal Formalism.L2.Herm
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
-  (hc : CMData F E) (S : HSpace E) (gp : Fin 2 → ℕ) (Λ : Submodule (𝓞 E) (Fin S.rank → E))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+  (hc : CMData F E)
+  (S : HSpace E)
+  (gp : Fin 2 → ℕ) (Λ : Submodule (𝓞 E) (Fin S.rank → E))
 
 variable {hc S gp Λ}
 

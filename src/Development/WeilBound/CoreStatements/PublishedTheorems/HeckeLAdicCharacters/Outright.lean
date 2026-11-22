@@ -9,6 +9,7 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LubinTat
 namespace HodgeLocalDeRhamField.HLdR
 
 theorem field_outright : GlobalTheory.Published.HeckeLAdicCharacterDeRham :=
-  PositivityTheory.SecR.Hladr2.field_of_leaves @GlobalTheory.CompanionTheory.LTPer.Tilt.tilt_period @GlobalTheory.T.lubin_tate_period_not_filtered
+  PositivityTheory.SecR.Hladr2.field_of_leaves @GlobalTheory.CompanionTheory.LTPer.Tilt.tilt_period
+    @GlobalTheory.T.lubin_tate_period_not_filtered
 
 end HodgeLocalDeRhamField.HLdR

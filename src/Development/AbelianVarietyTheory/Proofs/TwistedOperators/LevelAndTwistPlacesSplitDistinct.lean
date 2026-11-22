@@ -9,9 +9,12 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Unramifie
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
-open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult
+  Formalism.IndefR.Datum Formalism.IndefR.Cx
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.LiftRows
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -21,10 +24,11 @@ open Classical
 
 namespace GlobalTheory.TwistTypePlaces
 
-theorem card_quot_of_two {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (hr : Module.finrank F E = 2) (P : HeightOneSpectrum (𝓞 E))
-    (h2 : (Ideal.primesOver (P.under (𝓞 F)).asIdeal (𝓞 E)).ncard = 2) :
-    Nat.card (𝓞 E ⧸ P.asIdeal) = Ideal.absNorm (P.under (𝓞 F)).asIdeal := by
+theorem card_quot_of_two
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (hr : Module.finrank F E = 2)
+    (P : HeightOneSpectrum (𝓞 E)) (h2 : (Ideal.primesOver (P.under (𝓞 F)).asIdeal (𝓞 E)).ncard = 2)
+    : Nat.card (𝓞 E ⧸ P.asIdeal) = Ideal.absNorm (P.under (𝓞 F)).asIdeal := by
   classical
   set p := (P.under (𝓞 F)).asIdeal with hp
   have hp0 : p ≠ ⊥ := (P.under (𝓞 F)).ne_bot
@@ -33,7 +37,9 @@ theorem card_quot_of_two {F E : Type} [Field F] [NumberField F] [Field E] [Numbe
   have hsum := Ideal.sum_ramification_inertia (𝓞 E) F E (p := p) hp0
   have hcard : (IsDedekindDomain.primesOverFinset p (𝓞 E)).card = 2 := by
     rw [← h2, ← IsDedekindDomain.coe_primesOverFinset hp0 (𝓞 E), Set.ncard_coe_finset]
-  have hle : ∀ Q ∈ IsDedekindDomain.primesOverFinset p (𝓞 E), 1 ≤ p.ramificationIdx' Q * p.inertiaDeg' Q := by
+  have hle
+      : ∀ Q ∈ IsDedekindDomain.primesOverFinset p (𝓞 E),
+        1 ≤ p.ramificationIdx' Q * p.inertiaDeg' Q := by
     intro Q hQ
     obtain ⟨hQp, hQl⟩ := (IsDedekindDomain.mem_primesOverFinset_iff hp0 (𝓞 E)).1 hQ
     have h1 : 0 < p.inertiaDeg' Q := Ideal.inertiaDeg'_pos p Q
@@ -53,15 +59,18 @@ end GlobalTheory.TwistTypePlaces
 
 namespace GlobalTheory.TwistTypePlaces
 
-theorem under_conjPl {D : D7} (P : Pl D.host.E) :
-    (conjPl P).under (𝓞 D.host.F) = P.under (𝓞 D.host.F) := by
-  have hfix : ∀ x : 𝓞 D.host.F,
-      Formalism.DivisionValues.cO D.host.E (algebraMap (𝓞 D.host.F) (𝓞 D.host.E) x) = algebraMap (𝓞 D.host.F) (𝓞 D.host.E) x := by
+theorem under_conjPl {D : D7} (P : Pl D.host.E)
+    : (conjPl P).under (𝓞 D.host.F) = P.under (𝓞 D.host.F) := by
+  have hfix
+      : ∀ x : 𝓞 D.host.F,
+        Formalism.DivisionValues.cO D.host.E (algebraMap (𝓞 D.host.F) (𝓞 D.host.E) x)
+          = algebraMap (𝓞 D.host.F) (𝓞 D.host.E) x := by
     intro x
     apply RingOfIntegers.ext
     show star ((algebraMap (𝓞 D.host.F) (𝓞 D.host.E) x : 𝓞 D.host.E) : D.host.E) = _
     exact (D.sp.cm.fixed _).2 ⟨(x : D.host.F), rfl⟩
-  have hinv : ∀ z, Formalism.DivisionValues.cO D.host.E (Formalism.DivisionValues.cO D.host.E z) = z :=
+  have hinv
+      : ∀ z, Formalism.DivisionValues.cO D.host.E (Formalism.DivisionValues.cO D.host.E z) = z :=
     fun z => RingOfIntegers.ext (star_star (z : D.host.E))
   apply HeightOneSpectrum.ext
   ext x
@@ -75,15 +84,17 @@ theorem under_conjPl {D : D7} (P : Pl D.host.E) :
   · intro h
     exact ⟨_, h, hfix x⟩
 
-theorem natCast_mem_conjPl {D : D7} (P : Pl D.host.E) (n : ℕ) (h : (n : 𝓞 D.host.E) ∈ P.asIdeal) :
-    (n : 𝓞 D.host.E) ∈ (conjPl P).asIdeal := by
+theorem natCast_mem_conjPl {D : D7} (P : Pl D.host.E) (n : ℕ) (h : (n : 𝓞 D.host.E) ∈ P.asIdeal)
+    : (n : 𝓞 D.host.E) ∈ (conjPl P).asIdeal := by
   have := Ideal.mem_map_of_mem (Formalism.DivisionValues.cO D.host.E) h
   rwa [map_natCast] at this
 
-theorem ncard_primesOver_two {D : D7} (P : Pl D.host.E) (h : conjPl P ≠ P) :
-    (Ideal.primesOver (P.under (𝓞 D.host.F)).asIdeal (𝓞 D.host.E)).ncard = 2 := by
+theorem ncard_primesOver_two {D : D7} (P : Pl D.host.E) (h : conjPl P ≠ P)
+    : (Ideal.primesOver (P.under (𝓞 D.host.F)).asIdeal (𝓞 D.host.E)).ncard = 2 := by
   rw [GlobalTheory.QuadSignLocal.ncard_primesOver]
-  have hs : {u : HeightOneSpectrum (𝓞 D.host.E) | u.under (𝓞 D.host.F) = P.under (𝓞 D.host.F)} = {P, conjPl P} := by
+  have hs
+      : {u : HeightOneSpectrum (𝓞 D.host.E) | u.under (𝓞 D.host.F) = P.under (𝓞 D.host.F)}
+        = {P, conjPl P} := by
     ext u
     simp only [Set.mem_ofPred_eq, Set.mem_insert_iff, Set.mem_singleton_iff]
     constructor
@@ -93,8 +104,11 @@ theorem ncard_primesOver_two {D : D7} (P : Pl D.host.E) (h : conjPl P ≠ P) :
       · exact under_conjPl P
   rw [hs, Set.ncard_pair h.symm]
 
-theorem natCast_not_mem_of_card {E : Type} [Field E] [NumberField E] (PP : Pl E) {q g : ℕ} (hq : q.Prime) (hg : g.Prime)
-    (hc : Nat.card (kP PP) = q) (hne : q ≠ g) : ((g : ℕ) : 𝓞 E) ∉ PP.asIdeal := by
+theorem natCast_not_mem_of_card
+    {E : Type} [Field E] [NumberField E]
+    (PP : Pl E)
+    {q g : ℕ} (hq : q.Prime) (hg : g.Prime) (hc : Nat.card (kP PP) = q) (hne : q ≠ g)
+    : ((g : ℕ) : 𝓞 E) ∉ PP.asIdeal := by
   intro hm
   have hnt : Nontrivial (kP PP) := Ideal.Quotient.nontrivial_iff.2 PP.isPrime.ne_top
   have hq0 : ((q : ℕ) : kP PP) = 0 := by
@@ -114,7 +128,25 @@ end GlobalTheory.TwistTypePlaces
 
 namespace GlobalTheory.TwistTypePlaces
 
-theorem places_split : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A), GlobalTheory.Hk3.Core R F → ∀ t : T, Disjoint R.Pg (R.Q t) ∧ Set.InjOn (fun PP : Pl D.host.E => (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP)) ↑(R.Pg ∪ R.Q t) ∧ ∀ PP ∈ R.Pg ∪ R.Q t, (Ideal.primesOver ((_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP)).asIdeal (𝓞 D.host.E)).ncard = 2 ∧ Nat.card (kP PP) = Ideal.absNorm ((_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP)).asIdeal := by
+theorem places_split
+    : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
+        {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
+        [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (F : Face D A),
+      GlobalTheory.Hk3.Core R F
+        → ∀ t : T,
+          Disjoint R.Pg (R.Q t)
+            ∧ Set.InjOn
+              (fun PP : Pl D.host.E =>
+                (_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP))
+              ↑(R.Pg ∪ R.Q t)
+            ∧ ∀ PP ∈ R.Pg ∪ R.Q t,
+              (Ideal.primesOver
+                    ((_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F) PP)).asIdeal
+                    (𝓞 D.host.E)).ncard
+                  = 2
+                ∧ Nat.card (kP PP)
+                  = Ideal.absNorm ((_root_.IsDedekindDomain.HeightOneSpectrum.under (𝓞 D.host.F)
+                    PP)).asIdeal := by
   intro D G _ _ Pl0 T A Ks _ _ _ R F hC t
   have hL := hC.lev
   have hPg := hL.Pg
@@ -139,7 +171,8 @@ theorem places_split : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Ty
   have hnc : ∀ PP ∈ R.Pg ∪ R.Q t, ∀ PP' ∈ R.Pg ∪ R.Q t, PP' ≠ conjPl PP := by
     intro PP h PP' h' e
     rcases Finset.mem_union.1 h with h | h <;> rcases Finset.mem_union.1 h' with h' | h'
-    · exact GlobalTheory.TypePlaces.not_isConjPl R.C.P R.Pg hPg PP h PP' h' (GlobalTheory.GoodPrimes.isConjPl_iff.2 e)
+    · exact GlobalTheory.TypePlaces.not_isConjPl R.C.P R.Pg hPg PP h PP' h'
+        (GlobalTheory.GoodPrimes.isConjPl_iff.2 e)
     · exact cross PP h PP' h' e
     · refine cross PP' h' PP h ?_
       rw [e, Formalism.DivisionValues.ValuationRepresentative.conjPl_conjPl]

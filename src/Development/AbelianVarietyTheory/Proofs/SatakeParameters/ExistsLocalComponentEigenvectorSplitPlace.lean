@@ -12,24 +12,32 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IrreducibleA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU GlobalTheory.CuspRep GlobalTheory.PRep
+open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU
+  GlobalTheory.CuspRep GlobalTheory.PRep
 
 noncomputable section
 
 namespace GlobalTheory.SplitEigen
 
-theorem exists_eigen_of_mem_iSup {G V U ι : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup U]
-    [Module ℂ U] (ρ : Representation ℂ G V) (σ : Representation ℂ G U) (hσ : σ.IsIrreducible)
-    (f : ι → U →ₗ[ℂ] V) (hf : ∀ i g u, f i (σ g u) = ρ g (f i u)) (K : Set G) (c : G → ℂ) (φ : V) (h0 : φ ≠ 0)
-    (hK : ∀ k ∈ K, ρ k φ = c k • φ) (hφ : φ ∈ ⨆ i, LinearMap.range (f i)) :
-    ∃ v : U, v ≠ 0 ∧ ∀ k ∈ K, σ k v = c k • v := by
+theorem exists_eigen_of_mem_iSup
+    {G V U ι : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup U] [Module ℂ U]
+    (ρ : Representation ℂ G V)
+    (σ : Representation ℂ G U) (hσ : σ.IsIrreducible)
+    (f : ι → U →ₗ[ℂ] V) (hf : ∀ i g u, f i (σ g u) = ρ g (f i u))
+    (K : Set G) (c : G → ℂ) (φ : V)
+    (h0 : φ ≠ 0) (hK : ∀ k ∈ K, ρ k φ = c k • φ) (hφ : φ ∈ ⨆ i, LinearMap.range (f i))
+    : ∃ v : U, v ≠ 0 ∧ ∀ k ∈ K, σ k v = c k • v := by
   classical
   obtain ⟨s, hs⟩ := Submodule.mem_iSup_iff_exists_finset.1 hφ
-  have key : ∀ s : Finset ι, ∀ W : Submodule ℂ V, (∀ g, ∀ x ∈ W, ρ g x ∈ W) → φ ∉ W →
-      φ ∈ W ⊔ ⨆ i ∈ s, LinearMap.range (f i) → ∃ v : U, v ≠ 0 ∧ ∀ k ∈ K, σ k v = c k • v := by
+  have key
+      : ∀ s : Finset ι, ∀ W : Submodule ℂ V,
+        (∀ g, ∀ x ∈ W, ρ g x ∈ W) → φ ∉ W → φ ∈ W ⊔ ⨆ i ∈ s, LinearMap.range (f i)
+          → ∃ v : U, v ≠ 0 ∧ ∀ k ∈ K, σ k v = c k • v := by
     intro s
     induction s using Finset.induction_on with
     | empty => intro W _ h1 h2; exact absurd (by simpa using h2) h1
@@ -60,7 +68,20 @@ theorem exists_eigen_of_mem_iSup {G V U ι : Type} [Group G] [AddCommGroup V] [M
         exact Submodule.add_mem_sup (hW g x hx) ⟨_, rfl⟩
   exact key s ⊥ (fun g x hx => by simp_all) (by simpa using h0) (by simpa using hs)
 
-theorem exists_locComp_eigen : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (U : Submodule ℂ (UA E n → ℂ)), IsAutRepU U → ∀ w, IsSplitAt w → ∀ (J : Subgroup (GL (Fin n) (w.adicCompletion E))), IsOpen (J : Set (GL (Fin n) (w.adicCompletion E))) → IsCompact (J : Set (GL (Fin n) (w.adicCompletion E))) → ∀ (χ : J →* ℂˣ) (φ : UA E n → ℂ), φ ∈ U → φ ≠ 0 → (∀ x ∈ locU n w, ∀ hx : cLoc w x ∈ J, RU E n x φ = (χ ⟨_, hx⟩ : ℂ) • φ) → ∃ σ : SmIrr (GL (Fin n) (w.adicCompletion E)), IsCompAlong U (locU n w) ((cLoc w).comp (locU n w).subtype) σ.ρ ∧ ∃ v : σ.V, v ≠ 0 ∧ ∀ g : J, σ.ρ g v = (χ g : ℂ) • v := by
+theorem exists_locComp_eigen
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (U : Submodule ℂ (UA E n → ℂ)),
+      IsAutRepU U
+        → ∀ w,
+          IsSplitAt w
+            → ∀ (J : Subgroup (GL (Fin n) (w.adicCompletion E))),
+              IsOpen (J : Set (GL (Fin n) (w.adicCompletion E)))
+                → IsCompact (J : Set (GL (Fin n) (w.adicCompletion E)))
+                → ∀ (χ : J →* ℂˣ) (φ : UA E n → ℂ),
+                  φ ∈ U → φ ≠ 0
+                    → (∀ x ∈ locU n w, ∀ hx : cLoc w x ∈ J, RU E n x φ = (χ ⟨_, hx⟩ : ℂ) • φ)
+                    → ∃ σ : SmIrr (GL (Fin n) (w.adicCompletion E)),
+                      IsCompAlong U (locU n w) ((cLoc w).comp (locU n w).subtype) σ.ρ
+                        ∧ ∃ v : σ.V, v ≠ 0 ∧ ∀ g : J, σ.ρ g v = (χ g : ℂ) • v := by
   classical
   intro E _ _ _ n U hU w hw J _ _ χ φ hφ h0 hχ
   let π : AutSub E n := ⟨U, hU⟩
@@ -73,28 +94,35 @@ theorem exists_locComp_eigen : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
   have hp : p = e.toMulEquiv.toMonoidHom := MonoidHom.ext fun x => (he x).symm
   let σ' : Representation ℂ (locU n w) σ.V := σ.ρ.comp p
   have hirr : σ'.IsIrreducible := by
-    change Representation.IsIrreducible (σ.ρ.comp p); rw [hp]; exact GlobalTheory.CuspMult.isIrreducible_comp_mulEquiv σ.ρ e.toMulEquiv σ.irred
+    change Representation.IsIrreducible (σ.ρ.comp p)
+    rw [hp]
+    exact GlobalTheory.CuspMult.isIrreducible_comp_mulEquiv σ.ρ e.toMulEquiv σ.irred
   refine ⟨σ, hσ, ?_⟩
   obtain ⟨-, f, hf0, hfm, hf⟩ := hσ
   let F : σ'.IntertwiningMap (π.rep.comp (locU n w).subtype) :=
     ⟨f.codRestrict π.V hfm, fun x => LinearMap.ext fun v => Subtype.ext (hf x v)⟩
   have hF0 : F ≠ 0 := fun h =>
     hf0 (LinearMap.ext fun v => congrArg Subtype.val (DFunLike.congr_fun h v))
-  have hsup := (GlobalTheory.CuspRep.CompUniq.isotypic (UA E n) (locU n w) π.V σ.V σ.V π.rep (locU n w).subtype
-    σ' σ' π.isIrreducible_rep hirr hirr (fun g => ⟨r g, fun y => hr2 g y⟩) F hF0).1
+  have hsup :=
+    (GlobalTheory.CuspRep.CompUniq.isotypic (UA E n) (locU n w) π.V σ.V σ.V π.rep (locU n w).subtype
+      σ' σ' π.isIrreducible_rep hirr hirr
+      (fun g => ⟨r g, fun y => hr2 g y⟩)
+      F hF0).1
   let c : locU n w → ℂ := fun k => if h : cLoc w (k : UA E n) ∈ J then (χ ⟨_, h⟩ : ℂ) else 0
-  obtain ⟨v, hv0, hv⟩ := exists_eigen_of_mem_iSup (π.rep.comp (locU n w).subtype) σ' hirr
-    (fun h : σ'.IntertwiningMap (π.rep.comp (locU n w).subtype) => h.toLinearMap)
-    (fun h g u => LinearMap.congr_fun (h.isIntertwining' g) u)
-    {k | cLoc w (k : UA E n) ∈ J} c ⟨φ, hφ⟩
-    (fun h => h0 (congrArg Subtype.val h))
-    (fun k hk => Subtype.ext (by
-      change RU E n (k : UA E n) φ = c k • φ
-      show RU E n (k : UA E n) φ = (if h : cLoc w (k : UA E n) ∈ J then (χ ⟨_, h⟩ : ℂ) else 0) • φ
-      have hk' : cLoc w (k : UA E n) ∈ J := hk
-      rw [dif_pos hk']
-      exact hχ _ k.2 hk'))
-    (hsup ▸ Submodule.mem_top)
+  obtain ⟨v, hv0, hv⟩ :=
+    exists_eigen_of_mem_iSup (π.rep.comp (locU n w).subtype) σ' hirr
+      (fun h : σ'.IntertwiningMap (π.rep.comp (locU n w).subtype) => h.toLinearMap)
+      (fun h g u => LinearMap.congr_fun (h.isIntertwining' g) u)
+      {k | cLoc w (k : UA E n) ∈ J} c ⟨φ, hφ⟩
+      (fun h => h0 (congrArg Subtype.val h))
+      (fun k hk =>
+        Subtype.ext (by
+          change RU E n (k : UA E n) φ = c k • φ
+          show RU E n (k : UA E n) φ = (if h : cLoc w (k : UA E n) ∈ J then (χ ⟨_, h⟩ : ℂ) else 0) • φ
+          have hk' : cLoc w (k : UA E n) ∈ J := hk
+          rw [dif_pos hk']
+          exact hχ _ k.2 hk'))
+      (hsup ▸ Submodule.mem_top)
   refine ⟨v, hv0, fun g => ?_⟩
   have hk : cLoc w ((e.symm g : locU n w) : UA E n) ∈ J := by rw [hcl]; exact g.2
   have h1 := hv (e.symm g) hk

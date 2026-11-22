@@ -7,18 +7,22 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Exists
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc
 open scoped Formalism.Per NNReal
 
 namespace GlobalTheory.BSP
 
-theorem bezout_Ep_derivative : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K), ∃ (c : ℕ) (a b : Polynomial (Wq l bk.a)),
-    a * bk.Ep + b * Polynomial.derivative bk.Ep = Polynomial.C ((l : Wq l bk.a) ^ c) := by
+theorem bezout_Ep_derivative
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K), ∃ (c : ℕ) (a b : Polynomial (Wq l bk.a)),
+      a * bk.Ep + b * Polynomial.derivative bk.Ep = Polynomial.C ((l : Wq l bk.a) ^ c) := by
   intro l _ K bk
   haveI : CharZero (Wq l bk.a) := GlobalTheory.charZero_wittVector_of_field l (Fq l bk.a)
   have hirr : Irreducible (l : Wq l bk.a) := WittVector.irreducible l (k := Fq l bk.a)
   have hprime : Prime (l : Wq l bk.a) := hirr.prime
-  have hP : (Ideal.span {(l : Wq l bk.a)}).IsPrime := (Ideal.span_singleton_prime hprime.ne_zero).2 hprime
+  have hP : (Ideal.span {(l : Wq l bk.a)}).IsPrime :=
+    (Ideal.span_singleton_prime hprime.ne_zero).2 hprime
   have hE : bk.Ep.IsEisensteinAt (Ideal.span {(l : Wq l bk.a)}) := by
     refine ⟨?_, ?_, ?_⟩
     · rw [bk.monic.leadingCoeff, Ideal.mem_span_singleton]
@@ -42,15 +46,20 @@ theorem bezout_Ep_derivative : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk :
   set A := IsLocalization.integerNormalization (nonZeroDivisors (Wq l bk.a)) a
   set B := IsLocalization.integerNormalization (nonZeroDivisors (Wq l bk.a)) b
   have hd : d₁ * d₂ ≠ 0 := mul_ne_zero (nonZeroDivisors.ne_zero hd₁) (nonZeroDivisors.ne_zero hd₂)
-  have key : Polynomial.C d₂ * A * bk.Ep + Polynomial.C d₁ * B * Polynomial.derivative bk.Ep =
-      Polynomial.C (d₁ * d₂) := by
-    apply Polynomial.map_injective (algebraMap (Wq l bk.a) F) (IsFractionRing.injective (Wq l bk.a) F)
-    simp only [Polynomial.map_add (f := _), Polynomial.map_mul, Polynomial.map_C, hA, hB, Polynomial.derivative_map]
+  have key
+      : Polynomial.C d₂ * A * bk.Ep + Polynomial.C d₁ * B * Polynomial.derivative bk.Ep
+        = Polynomial.C (d₁ * d₂) := by
+    apply Polynomial.map_injective (algebraMap (Wq l bk.a) F)
+      (IsFractionRing.injective (Wq l bk.a) F)
+    simp only [Polynomial.map_add (f := _), Polynomial.map_mul, Polynomial.map_C, hA, hB,
+      Polynomial.derivative_map]
     simp only [Algebra.smul_def, Polynomial.algebraMap_apply, map_mul, Polynomial.C_mul]
     linear_combination (Polynomial.C (algebraMap (Wq l bk.a) F d₁) * Polynomial.C (algebraMap (Wq l bk.a) F d₂)) * hab
   obtain ⟨m, u, hu⟩ := WittVector.exists_eq_pow_p_mul' (p := l) (k := Fq l bk.a) (d₁ * d₂) hd
-  refine ⟨m, Polynomial.C ((↑u⁻¹ : Wq l bk.a) * d₂) * A, Polynomial.C ((↑u⁻¹ : Wq l bk.a) * d₁) * B, ?_⟩
-  have : Polynomial.C ((l : Wq l bk.a) ^ m) = Polynomial.C (↑u⁻¹ : Wq l bk.a) * Polynomial.C (d₁ * d₂) := by
+  refine
+    ⟨m, Polynomial.C ((↑u⁻¹ : Wq l bk.a) * d₂) * A, Polynomial.C ((↑u⁻¹ : Wq l bk.a) * d₁) * B, ?_⟩
+  have : Polynomial.C ((l : Wq l bk.a) ^ m)
+      = Polynomial.C (↑u⁻¹ : Wq l bk.a) * Polynomial.C (d₁ * d₂) := by
     rw [hu, ← Polynomial.C_mul]
     congr 1
     rw [mul_comm, mul_assoc, Units.mul_inv, mul_one]

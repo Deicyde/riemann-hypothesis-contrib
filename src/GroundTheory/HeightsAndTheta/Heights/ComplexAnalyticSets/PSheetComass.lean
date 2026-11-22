@@ -19,17 +19,20 @@ noncomputable section
 
 namespace SheetComassAlt
 
-theorem sheetJac_eq_norm_det {n d : ℕ} (s : (Fin d → ℂ) → Fin n → ℂ) (y : Fin d → ℂ)
-    (hs : DifferentiableAt ℂ s y) :
-    sheetJac s y = ‖((ReciprocityTheory.AnForm.A.jacC s y)ᴴ * ReciprocityTheory.AnForm.A.jacC s y).det‖ := by
+theorem sheetJac_eq_norm_det
+    {n d : ℕ} (s : (Fin d → ℂ) → Fin n → ℂ) (y : Fin d → ℂ) (hs : DifferentiableAt ℂ s y)
+    : sheetJac s y
+      = ‖((ReciprocityTheory.AnForm.A.jacC s y)ᴴ * ReciprocityTheory.AnForm.A.jacC s y).det‖ := by
   set S : EuclideanSpace ℂ (Fin d) →ₗ[ℂ] EuclideanSpace ℂ (Fin n) :=
     (WithLp.linearEquiv 2 ℂ (Fin n → ℂ)).symm.toLinearMap ∘ₗ
       ((fderiv ℂ s y : (Fin d → ℂ) →L[ℂ] (Fin n → ℂ)) : (Fin d → ℂ) →ₗ[ℂ] (Fin n → ℂ)) ∘ₗ
         (WithLp.linearEquiv 2 ℂ (Fin d → ℂ)).toLinearMap with hS
   have hR : fderiv ℝ s y = (fderiv ℂ s y).restrictScalars ℝ := hs.fderiv_restrictScalars ℝ
-  have e : (WithLp.linearEquiv 2 ℝ (Fin n → ℂ)).symm.toLinearMap ∘ₗ
-      ((fderiv ℝ s y : (Fin d → ℂ) →L[ℝ] (Fin n → ℂ)) : (Fin d → ℂ) →ₗ[ℝ] (Fin n → ℂ)) ∘ₗ
-        (WithLp.linearEquiv 2 ℝ (Fin d → ℂ)).toLinearMap = S.restrictScalars ℝ := by
+  have e
+      : (WithLp.linearEquiv 2 ℝ (Fin n → ℂ)).symm.toLinearMap
+          ∘ₗ ((fderiv ℝ s y : (Fin d → ℂ) →L[ℝ] (Fin n → ℂ)) : (Fin d → ℂ) →ₗ[ℝ] (Fin n → ℂ))
+          ∘ₗ (WithLp.linearEquiv 2 ℝ (Fin d → ℂ)).toLinearMap
+        = S.restrictScalars ℝ := by
     ext v : 1
     simp [hS, hR]
   rw [sheetJac, e, FrameJacobianSumAlt.areaJacobian_restrictScalars,
@@ -45,9 +48,10 @@ theorem SheetComass.proof : SheetComass.Statement := by
   choose U hUo hZU hφU using hφ
   have hK : IsCompact (zeroSet J ∩ Metric.closedBall (0 : Fin n → ℂ) R) :=
     (isCompact_closedBall (0 : Fin n → ℂ) R).inter_left (SheetSumMeasurable.isClosed_zeroSet J)
-  obtain ⟨c, hc, hb⟩ := TubeFormComparison.exists_hessC_bound φ _ hK U hUo
-    (fun i => Set.inter_subset_left.trans (hZU i))
-    (fun i => (hφU i).of_le (WithTop.coe_le_coe.2 le_top))
+  obtain ⟨c, hc, hb⟩ :=
+    TubeFormComparison.exists_hessC_bound φ _ hK U hUo
+      (fun i => Set.inter_subset_left.trans (hZU i))
+      (fun i => (hφU i).of_le (WithTop.coe_le_coe.2 le_top))
   refine ⟨(d.factorial : ℝ) * (2 / Real.pi) ^ d * (3 ^ d * c ^ d), fun x hx s hs => ?_⟩
   obtain ⟨V, hV, hyV, hsd, hsx, -, -⟩ := hs
   have hsa : AnalyticAt ℂ s (A *ᵥ x) :=
@@ -65,19 +69,24 @@ theorem SheetComass.proof : SheetComass.Statement := by
     rw [hsx] at h
     rw [hBJ]
     exact h
-  have hle : ∀ k, ((fun _ : Fin d => (c : ℂ) • (Bᴴ * B)) k -
-      (fun k => hessC (φ k ∘ s) (A *ᵥ x)) k).PosSemidef := fun k => by
-    have e : (c : ℂ) • (Bᴴ * B) - Bᴴ * hessC (φ k) x * B =
-        Bᴴ * (-hessC (φ k) x + (c : ℂ) • 1) * B := by
-      simp only [Matrix.mul_add, Matrix.add_mul, Matrix.mul_neg, Matrix.neg_mul,
-        Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_one]
+  have hle
+      : ∀ k,
+        ((fun _ : Fin d => (c : ℂ) • (Bᴴ * B)) k
+          - (fun k => hessC (φ k ∘ s) (A *ᵥ x)) k).PosSemidef := fun k => by
+    have e
+        : (c : ℂ) • (Bᴴ * B) - Bᴴ * hessC (φ k) x * B
+          = Bᴴ * (- hessC (φ k) x + (c : ℂ) • 1) * B := by
+      simp only [Matrix.mul_add, Matrix.add_mul, Matrix.mul_neg, Matrix.neg_mul, Matrix.mul_smul,
+        Matrix.smul_mul, Matrix.mul_one]
       abel
     simp only [hA, e]
     exact (hb k x hx).2.conjTranspose_mul_mul_same B
-  have hge : ∀ k, ((fun k => hessC (φ k ∘ s) (A *ᵥ x)) k +
-      (fun _ : Fin d => (c : ℂ) • (Bᴴ * B)) k).PosSemidef := fun k => by
-    have e : Bᴴ * hessC (φ k) x * B + (c : ℂ) • (Bᴴ * B) =
-        Bᴴ * (hessC (φ k) x + (c : ℂ) • 1) * B := by
+  have hge
+      : ∀ k,
+        ((fun k => hessC (φ k ∘ s) (A *ᵥ x)) k
+          + (fun _ : Fin d => (c : ℂ) • (Bᴴ * B)) k).PosSemidef := fun k => by
+    have e
+        : Bᴴ * hessC (φ k) x * B + (c : ℂ) • (Bᴴ * B) = Bᴴ * (hessC (φ k) x + (c : ℂ) • 1) * B := by
       simp only [Matrix.mul_add, Matrix.add_mul, Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_one]
     simp only [hA, e]
     exact (hb k x hx).1.conjTranspose_mul_mul_same B
@@ -95,7 +104,8 @@ theorem SheetComass.proof : SheetComass.Statement := by
   have hre : (((c : ℂ) ^ d * (Bᴴ * B).det).re) ≤ c ^ d * sheetJac s (A *ᵥ x) := by
     refine (Complex.re_le_norm _).trans (le_of_eq ?_)
     rw [norm_mul, norm_pow, Complex.norm_real, Real.norm_of_nonneg hc, hdet]
-  have hm : |(mdisc fun k => hessC (φ k ∘ s) (A *ᵥ x)).re| ≤ 3 ^ d * (c ^ d * sheetJac s (A *ᵥ x)) :=
+  have hm
+      : |(mdisc fun k => hessC (φ k ∘ s) (A *ᵥ x)).re| ≤ 3 ^ d * (c ^ d * sheetJac s (A *ᵥ x)) :=
     (Complex.abs_re_le_norm _).trans (key.trans (mul_le_mul_of_nonneg_left hre (by positivity)))
   unfold maDens
   rw [abs_mul, abs_of_nonneg (by positivity), mul_assoc _ (3 ^ d * c ^ d), mul_assoc (3 ^ d)]

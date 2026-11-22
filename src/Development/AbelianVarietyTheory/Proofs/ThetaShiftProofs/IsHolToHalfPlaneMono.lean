@@ -9,13 +9,17 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped LaurentSeries
 
 namespace GlobalTheory.HolomorphicArc
 
-theorem map_nsmul_eq_pow {L G : Type} [AddCommGroup L] [Group G] (f : L → G) (hf : ∀ a c, f (a + c) = f a * f c)
-    (n : ℕ) (a : L) : f (n • a) = f a ^ n := by
+theorem map_nsmul_eq_pow
+    {L G : Type} [AddCommGroup L] [Group G]
+    (f : L → G) (hf : ∀ a c, f (a + c) = f a * f c)
+    (n : ℕ) (a : L)
+    : f (n • a) = f a ^ n := by
   induction n with
   | zero =>
     have h := hf 0 0
@@ -34,10 +38,11 @@ theorem nsmul_mem (v : D.La) : l.M • v ∈ l.Mb • (⊤ : Submodule (𝓞 E) 
   rw [← Nat.cast_smul_eq_nsmul (𝓞 E)]
   exact Submodule.smul_mem_smul h' Submodule.mem_top
 
-theorem over_of_generic {S : Scheme.{0}} {k : Type} [CommRing k] (s : S ⟶ Sp k) (σ : k →+* ℂ)
-    (R : Subalgebra ℂ ℂ⸨X⸩) (y : Sp R ⟶ S) (ev : R →ₐ[ℂ] ℂ)
-    (h : (spMap R.val.toRingHom ≫ y) ≫ s = spMap ((algebraMap ℂ ℂ⸨X⸩).comp σ)) :
-    (spMap ev.toRingHom ≫ y) ≫ s = spMap σ := by
+theorem over_of_generic
+    {S : Scheme.{0}} {k : Type} [CommRing k]
+    (s : S ⟶ Sp k) (σ : k →+* ℂ) (R : Subalgebra ℂ ℂ⸨X⸩) (y : Sp R ⟶ S)
+    (ev : R →ₐ[ℂ] ℂ) (h : (spMap R.val.toRingHom ≫ y) ≫ s = spMap ((algebraMap ℂ ℂ⸨X⸩).comp σ))
+    : (spMap ev.toRingHom ≫ y) ≫ s = spMap σ := by
   obtain ⟨φ, hφ⟩ := Spec.map_surjective (y ≫ s)
   have h₁ : y ≫ s = spMap φ.hom := hφ.symm
   rw [Category.assoc, h₁, ← spMap_comp] at h ⊢
@@ -47,14 +52,19 @@ theorem over_of_generic {S : Scheme.{0}} {k : Type} [CommRing k] (s : S ⟶ Sp k
   have h₃ : φ.hom x = algebraMap ℂ R (σ x) := Subtype.ext (DFunLike.congr_fun h₂ x)
   exact (congrArg ev h₃).trans (ev.commutes _)
 
-theorem isHolTo_halfPlane_mono {X : Scheme.{0}} {y : ℂ → (Sp ℂ ⟶ X)} {T T' : ℝ} (h : T ≤ T')
-    (hol : IsHolTo {w : ℂ | T < w.im} y) : IsHolTo {w : ℂ | T' < w.im} y := by
+theorem isHolTo_halfPlane_mono
+    {X : Scheme.{0}} {y : ℂ → (Sp ℂ ⟶ X)} {T T' : ℝ}
+    (h : T ≤ T') (hol : IsHolTo {w : ℂ | T < w.im} y)
+    : IsHolTo {w : ℂ | T' < w.im} y := by
   intro U f
-  have e : {b | b ∈ {w : ℂ | T' < w.im} ∧ ⊤ ≤ y b ⁻¹ᵁ U} =
-      {w : ℂ | T' < w.im} ∩ {b | b ∈ {w : ℂ | T < w.im} ∧ ⊤ ≤ y b ⁻¹ᵁ U} :=
+  have e
+      : {b | b ∈ {w : ℂ | T' < w.im} ∧ ⊤ ≤ y b ⁻¹ᵁ U}
+        = {w : ℂ | T' < w.im} ∩ {b | b ∈ {w : ℂ | T < w.im} ∧ ⊤ ≤ y b ⁻¹ᵁ U} :=
     Set.ext fun b => ⟨fun hb => ⟨hb.1, h.trans_lt hb.1, hb.2⟩, fun hb => ⟨hb.1, hb.2.2⟩⟩
   rw [e]
-  exact ⟨(isOpen_lt continuous_const Complex.continuous_im).inter (hol U f).1,
-    (hol U f).2.mono Set.inter_subset_right⟩
+  exact ⟨
+    (isOpen_lt continuous_const Complex.continuous_im).inter (hol U f).1,
+    (hol U f).2.mono Set.inter_subset_right
+  ⟩
 
 end GlobalTheory.HolomorphicArc

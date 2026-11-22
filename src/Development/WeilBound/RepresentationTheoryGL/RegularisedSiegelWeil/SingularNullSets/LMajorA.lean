@@ -13,11 +13,16 @@ namespace PositivityTheory.Rg.Rsw.L.LMajor
 open Metric
 open scoped ContDiff
 
-theorem schMajor {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V] {k : ℕ}
-    (f : Fin k → SchwartzMap V ℂ) :
-    ∃ F₀ : SchwartzMap V ℂ, (∀ y, 0 ≤ (F₀ y).re ∧ (F₀ y).im = 0) ∧
-      ∀ ε : ℝ, 0 < ε → ∃ c : V → ℂ, c.HasTemperateGrowth ∧ HasCompactSupport c ∧
-        ∀ i y, ‖f i y‖ * ‖1 - c y‖ ≤ ε * (F₀ y).re := by
+theorem schMajor
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
+    {k : ℕ} (f : Fin k → SchwartzMap V ℂ)
+    : ∃ F₀ : SchwartzMap V ℂ,
+      (∀ y, 0 ≤ (F₀ y).re ∧ (F₀ y).im = 0)
+        ∧ ∀ ε : ℝ,
+          0 < ε
+            → ∃ c : V → ℂ,
+              c.HasTemperateGrowth ∧ HasCompactSupport c
+                ∧ ∀ i y, ‖f i y‖ * ‖1 - c y‖ ≤ ε * (F₀ y).re := by
   classical
   set e : V ≃L[ℝ] EuclideanSpace ℝ (Fin (Module.finrank ℝ V)) := toEuclidean with he
   set q : V → ℝ := fun y => ‖e y‖ ^ 2 with hqdef
@@ -36,7 +41,8 @@ theorem schMajor {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDi
       nlinarith [sq_nonneg (‖e y‖ - 1), norm_nonneg (e y)]
     rw [pow_one]
     exact h1.trans (mul_le_mul_of_nonneg_left h2 (norm_nonneg _))
-  have hqA : ∀ y, q y ≤ ‖(e : V →L[ℝ] EuclideanSpace ℝ (Fin (Module.finrank ℝ V)))‖ ^ 2 * ‖y‖ ^ 2 := by
+  have hqA
+      : ∀ y, q y ≤ ‖(e : V →L[ℝ] EuclideanSpace ℝ (Fin (Module.finrank ℝ V)))‖ ^ 2 * ‖y‖ ^ 2 := by
     intro y
     rw [hqy, ← mul_pow]
     have := (e : V →L[ℝ] EuclideanSpace ℝ (Fin (Module.finrank ℝ V))).le_opNorm y
@@ -73,8 +79,11 @@ theorem schMajor {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDi
     have hqn : |q y - (⌊q y⌋₊ : ℝ)| ≤ 1 := by
       have h1 := Nat.floor_le (hq0 y)
       have h2 := Nat.lt_floor_add_one (q y)
-      rw [abs_le]; constructor <;> linarith
-    calc ‖f i y‖ * ‖1 - c y‖ ≤ ‖f i y‖ := mul_le_of_le_one_right (norm_nonneg _) h1c
+      rw [abs_le]
+      constructor <;> linarith
+    calc
+      ‖f i y‖ * ‖1 - c y‖
+        ≤ ‖f i y‖ := mul_le_of_le_one_right (norm_nonneg _) h1c
       _ ≤ ε * b ⌊q y⌋₊ := hN i y hqN
       _ ≤ ε * (F₀ y).re := by rw [hF]; exact mul_le_mul_of_nonneg_left (hhb _ _ hqn) hε.le
 

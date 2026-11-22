@@ -143,7 +143,8 @@ lemma sec_inj : Function.Injective (sec Fr) := by
   exact Subtype.ext hab
 
 noncomputable def pre (L : Submodule M.L.O (H.Wb Fr.f)) : Submodule M.L.O V :=
-  (L.comap ((H.mkW Fr.f).restrictScalars M.L.O)).map ((H.perp (H.X Fr.f)).subtype.restrictScalars M.L.O)
+  (L.comap ((H.mkW Fr.f).restrictScalars M.L.O)).map
+    ((H.perp (H.X Fr.f)).subtype.restrictScalars M.L.O)
 
 lemma mem_pre (L : Submodule M.L.O (H.Wb Fr.f)) (v : V) :
     v ∈ pre Fr L ↔ ∃ hv : v ∈ H.perp (H.X Fr.f), H.mkW Fr.f ⟨v, hv⟩ ∈ L := by
@@ -406,14 +407,27 @@ lemma isInner_iff (hcj : ∀ x ∈ M.L.O, M.L.cj x ∈ M.L.O) (hpir : IsPrincipa
 
 end Transport
 
-theorem transport : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r k : ℕ) (P : LocNG.FPair H r), ∀ (S : Frames M.L r k) (c : Coord P S), Function.Injective (c.inn P.B.f) ∧ (∀ L, P.B.IsInner L ↔ S.IsInner S.f' S.es' (c.inn P.B.f L)) ∧ (∀ A, S.IsInner S.f' S.es' A → ∃ L, A = c.inn P.B.f L) ∧ ∀ L, c.lat (P.B.LamStd L) = S.stdLat S.f' S.es' (c.inn P.B.f L) := by
+theorem transport
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
+      M.OK
+        → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r k : ℕ)
+            (P : LocNG.FPair H r),
+          ∀ (S : Frames M.L r k) (c : Coord P S),
+            Function.Injective (c.inn P.B.f)
+              ∧ (∀ L, P.B.IsInner L ↔ S.IsInner S.f' S.es' (c.inn P.B.f L))
+              ∧ (∀ A, S.IsInner S.f' S.es' A → ∃ L, A = c.inn P.B.f L)
+              ∧ ∀ L, c.lat (P.B.LamStd L) = S.stdLat S.f' S.es' (c.inn P.B.f L) := by
   intro F _ _ _ E _ _ _ _ M hM V _ _ H r k P S c
   letI := hM.loc
   letI := hM.char0
   have hO := GlobalTheory.UnramOrder.order_facts M.L S.ϖ S.ϖ_irr
   have hT : P.B.T ≠ 0 := by rw [← c.T'_eq]; exact S.T'.ne_zero
-  exact ⟨inn_inj P.B c,
+  exact ⟨
+    inn_inj P.B c,
     isInner_iff P.B c S.f' S.es' (fun x hx => (hO.2.1 x hx).1) hO.2.2.2.1 hT c.f'_eq c.es'_eq,
-    inn_surj P.B c S.f' S.es' c.f'_eq, lat_lamStd P.B c S.f' S.es' c.f'_eq c.es'_eq⟩
+    inn_surj P.B c S.f' S.es' c.f'_eq,
+    lat_lamStd P.B c S.f' S.es' c.f'_eq c.es'_eq
+  ⟩
 
 end GlobalTheory.HL.CoordInnerSnd

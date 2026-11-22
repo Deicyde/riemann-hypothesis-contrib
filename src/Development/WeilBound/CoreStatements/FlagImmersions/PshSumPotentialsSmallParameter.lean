@@ -9,7 +9,8 @@ noncomputable section
 
 namespace RootFieldNumerics.A1
 
-open ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P Filter Topology GlobalTheory.CompanionTheory.Ar.PB
+open ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P Filter Topology
+  GlobalTheory.CompanionTheory.Ar.PB
 
 theorem scale_le {s : ℝ} (hs : 0 < s) (h1 : s ≤ 1) : Real.exp (-(s ^ 2)⁻¹) ≤ s := by
   have h := Real.one_sub_inv_le_log_of_pos hs
@@ -18,11 +19,13 @@ theorem scale_le {s : ℝ} (hs : 0 < s) (h1 : s ≤ 1) : Real.exp (-(s ^ 2)⁻¹
   have hl : -(s ^ 2)⁻¹ ≤ Real.log s := by
     rw [e]
     nlinarith [sq_nonneg (s⁻¹ - 1 / 2)]
-  calc Real.exp (-(s ^ 2)⁻¹) ≤ Real.exp (Real.log s) := Real.exp_le_exp.2 hl
+  calc
+    Real.exp (-(s ^ 2)⁻¹)
+      ≤ Real.exp (Real.log s) := Real.exp_le_exp.2 hl
     _ = s := Real.exp_log hs
 
-theorem epsT_scale (C : ℝ) {s : ℝ} (hs : 0 < s) :
-    epsT C (Real.exp (-(s ^ 2)⁻¹)) = -(2 * C) * (s * Real.log s) * s := by
+theorem epsT_scale (C : ℝ) {s : ℝ} (hs : 0 < s)
+    : epsT C (Real.exp (-(s ^ 2)⁻¹)) = -(2 * C) * (s * Real.log s) * s := by
   have h1 : Real.log (1 / Real.exp (-(s ^ 2)⁻¹)) = (s ^ 2)⁻¹ := by
     rw [one_div, ← Real.exp_neg, neg_neg, Real.log_exp]
   have h2 : Real.log ((s ^ 2)⁻¹) = -(2 * Real.log s) := by
@@ -34,8 +37,8 @@ theorem epsT_scale (C : ℝ) {s : ℝ} (hs : 0 < s) :
   have hs2 : s ^ 2 ≠ 0 := by positivity
   field_simp
 
-theorem epsT_small (C ε : ℝ) (hε : 0 < ε) :
-    ∃ s₀ > (0 : ℝ), ∀ s, 0 < s → s ≤ s₀ → |epsT C (Real.exp (-(s ^ 2)⁻¹))| ≤ ε * s := by
+theorem epsT_small (C ε : ℝ) (hε : 0 < ε)
+    : ∃ s₀ > (0 : ℝ), ∀ s, 0 < s → s ≤ s₀ → |epsT C (Real.exp (-(s ^ 2)⁻¹))| ≤ ε * s := by
   have hc : ContinuousAt (fun x : ℝ => -(2 * C) * (x * Real.log x)) 0 :=
     (continuous_const.mul Real.continuous_mul_log).continuousAt
   obtain ⟨δ, hδ, h⟩ := Metric.continuousAt_iff.1 hc ε hε
@@ -45,11 +48,23 @@ theorem epsT_small (C ε : ℝ) (hε : 0 < ε) :
   rw [epsT_scale C hs, abs_mul, abs_of_pos hs]
   exact mul_le_mul_of_nonneg_right this.le hs.le
 
-theorem potT_potential {e : ℕ} {σ : Type} (S : AnSys e σ) (a : σ) {t : ℝ} (h0 : 0 < t) (h1 : t ≤ S.t₀) :
-    IsPotential S.A (S.potT a t) :=
+theorem potT_potential
+    {e : ℕ} {σ : Type} (S : AnSys e σ) (a : σ) {t : ℝ} (h0 : 0 < t) (h1 : t ≤ S.t₀)
+    : IsPotential S.A (S.potT a t) :=
   isPotentialAdd _ _ _ (S.sing a).1 (isPotential_ofFun _ _ ((S.reg a).2.2 t h0 h1).1)
 
-theorem psh_sum_potentials_small_parameter : ∀ (e : ℕ) (σ : Type) [Fintype σ] (S : AnSys e σ) (Fl : Set σ) (a' : σ) (c₀ abelian₂ : ℝ), 0 < c₀ → (∀ a ∈ Fl, ∀ t, IsPsh S.A ((S.potT a t).rsmul (-1)) ∧ IsPsh S.A (S.potT a t)) → (∀ t, IsPsh S.A (S.potT a' t + S.Θ.rsmul (-c₀))) → a' ∉ Fl → ∃ s₀ > (0 : ℝ), ∀ s, 0 < s → s ≤ s₀ → Real.exp (-(s ^ 2)⁻¹) ≤ S.t₀ ∧ ∀ c : σ → ℝ, c a' = s → ∑ a, |c a| ≤ abelian₂ → (∀ a ∉ Fl, 0 ≤ c a) → IsPsh S.A (sumPot c (fun a => S.potT a (Real.exp (-(s ^ 2)⁻¹))) + S.Θ.rsmul (-(s * c₀ / 2))) := by
+theorem psh_sum_potentials_small_parameter
+    : ∀ (e : ℕ) (σ : Type) [Fintype σ] (S : AnSys e σ) (Fl : Set σ) (a' : σ) (c₀ abelian₂ : ℝ),
+      0 < c₀ → (∀ a ∈ Fl, ∀ t, IsPsh S.A ((S.potT a t).rsmul (-1)) ∧ IsPsh S.A (S.potT a t))
+        → (∀ t, IsPsh S.A (S.potT a' t + S.Θ.rsmul (-c₀))) → a' ∉ Fl
+        → ∃ s₀ > (0 : ℝ), ∀ s,
+          0 < s → s ≤ s₀
+            → Real.exp (-(s ^ 2)⁻¹) ≤ S.t₀
+              ∧ ∀ c : σ → ℝ,
+                c a' = s → ∑ a, |c a| ≤ abelian₂ → (∀ a ∉ Fl, 0 ≤ c a)
+                  → IsPsh S.A
+                    (sumPot c (fun a => S.potT a (Real.exp (-(s ^ 2)⁻¹)))
+                      + S.Θ.rsmul (-(s * c₀ / 2))) := by
   classical
   intro e σ _ S Fl a' c₀ abelian₂ hc₀ hFl ha' hna'
   have ht0 : 0 < S.t₀ := (S.reg a').1
@@ -99,14 +114,15 @@ theorem psh_sum_potentials_small_parameter : ∀ (e : ℕ) (σ : Type) [Fintype 
     rw [dl_add_rsmul (hpot a') S.potΘ _ j hy w] at n1
     linarith
   rw [← Finset.add_sum_erase _ _ (Finset.mem_univ a')]
-  have hrest : -(∑ a, |c a|) * E * θ ≤
-      ∑ a ∈ Finset.univ.erase a', c a * dl S.A (S.potT a t) j y w := by
-    calc -(∑ a, |c a|) * E * θ = -(∑ a, |c a| * E * θ) := by
-          rw [neg_mul, neg_mul, Finset.sum_mul, Finset.sum_mul]
+  have hrest
+      : -(∑ a, |c a|) * E * θ ≤ ∑ a ∈ Finset.univ.erase a', c a * dl S.A (S.potT a t) j y w := by
+    calc
+      -(∑ a, |c a|) * E * θ
+        = -(∑ a, |c a| * E * θ) := by rw [neg_mul, neg_mul, Finset.sum_mul, Finset.sum_mul]
       _ ≤ -(∑ a ∈ Finset.univ.erase a', |c a| * E * θ) := by
-          refine neg_le_neg (Finset.sum_le_sum_of_subset_of_nonneg (Finset.erase_subset _ _) ?_)
-          intro a _ _
-          exact mul_nonneg (mul_nonneg (abs_nonneg _) hE0) hθ
+        refine neg_le_neg (Finset.sum_le_sum_of_subset_of_nonneg (Finset.erase_subset _ _) ?_)
+        intro a _ _
+        exact mul_nonneg (mul_nonneg (abs_nonneg _) hE0) hθ
       _ = ∑ a ∈ Finset.univ.erase a', -(|c a| * E * θ) := by rw [Finset.sum_neg_distrib]
       _ ≤ _ := Finset.sum_le_sum fun a _ => hterm a
   have hA : c a' * dl S.A (S.potT a' t) j y w ≥ s * (c₀ * θ) := by
@@ -118,10 +134,10 @@ theorem psh_sum_potentials_small_parameter : ∀ (e : ℕ) (σ : Type) [Fintype 
       mul_le_mul (hsum.trans (le_abs_self _)) hE hE0 (abs_nonneg _)
     have h2 : |abelian₂| * (c₀ / (2 * (|abelian₂| + 1)) * s) ≤ s * c₀ / 2 := by
       have hL1 : 0 < |abelian₂| + 1 := by positivity
-      rw [show |abelian₂| * (c₀ / (2 * (|abelian₂| + 1)) * s) = (s * c₀ / 2) * (|abelian₂| / (|abelian₂| + 1)) by
+      rw [show |abelian₂| * (c₀ / (2 * (|abelian₂| + 1)) * s)
+          = (s * c₀ / 2) * (|abelian₂| / (|abelian₂| + 1)) by
         field_simp]
-      have hq : |abelian₂| / (|abelian₂| + 1) ≤ 1 := by
-        rw [div_le_one hL1]; linarith
+      have hq : |abelian₂| / (|abelian₂| + 1) ≤ 1 := by rw [div_le_one hL1]; linarith
       have : 0 ≤ s * c₀ / 2 := by positivity
       nlinarith
     linarith

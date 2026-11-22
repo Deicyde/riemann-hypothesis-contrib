@@ -5,23 +5,28 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaussSumFil
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd GlobalTheory.HilbertThetaSeries
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd
+  GlobalTheory.HilbertThetaSeries
 open scoped Matrix
 
 namespace GlobalTheory.HilbertThetaSeries.IsoP
 
 variable {F : Type} [Field F] {κ : Type} [Fintype κ] [DecidableEq κ]
 
-theorem pow_eq_one {p : ℕ} {S : Matrix κ κ ℤ} (h : ∑ i ∈ Finset.range p, S ^ i = 0) : S ^ p = 1 := by
+theorem pow_eq_one {p : ℕ} {S : Matrix κ κ ℤ} (h : ∑ i ∈ Finset.range p, S ^ i = 0)
+    : S ^ p = 1 := by
   have := geom_sum_mul S p
   rw [h, zero_mul] at this
   exact (sub_eq_zero.mp this.symm)
 
-theorem map_pow_eq (S : Matrix κ κ ℤ) (n : ℕ) : (S.map (Int.cast : ℤ → F)) ^ n = (S ^ n).map (Int.cast : ℤ → F) := by
+theorem map_pow_eq (S : Matrix κ κ ℤ) (n : ℕ)
+    : (S.map (Int.cast : ℤ → F)) ^ n = (S ^ n).map (Int.cast : ℤ → F) := by
   show ((Int.castRingHom F).mapMatrix S) ^ n = (Int.castRingHom F).mapMatrix (S ^ n)
   rw [map_pow]
 
-theorem iter_eq (A : Matrix κ κ F) (n : ℕ) (x : κ → F) : (fun x => A *ᵥ x)^[n] x = (A ^ n) *ᵥ x := by
+theorem iter_eq (A : Matrix κ κ F) (n : ℕ) (x : κ → F)
+    : (fun x => A *ᵥ x)^[n] x = (A ^ n) *ᵥ x := by
   induction n with
   | zero => simp
   | succ n ih => rw [Function.iterate_succ_apply', ih, pow_succ', Matrix.mulVec_mulVec]
@@ -29,24 +34,29 @@ theorem iter_eq (A : Matrix κ κ F) (n : ℕ) (x : κ → F) : (fun x => A *ᵥ
 theorem mem_LL (x : κ → F) : x ∈ LL F κ ↔ ∀ i, x i ∈ integralClosure ℤ F := by
   simp [LL, AddSubgroup.mem_pi]
 
-theorem mulVec_LL (M : Matrix κ κ ℤ) {x : κ → F} (hx : x ∈ LL F κ) : (M.map (Int.cast : ℤ → F)) *ᵥ x ∈ LL F κ := by
+theorem mulVec_LL (M : Matrix κ κ ℤ) {x : κ → F} (hx : x ∈ LL F κ)
+    : (M.map (Int.cast : ℤ → F)) *ᵥ x ∈ LL F κ := by
   rw [mem_LL] at hx ⊢
   intro i
   simp only [Matrix.mulVec, dotProduct, Matrix.map_apply]
   exact Subalgebra.sum_mem _ fun j _ => Subalgebra.mul_mem _ (Subalgebra.intCast_mem _ _) (hx j)
 
-theorem mulVec_aL (M : Matrix κ κ ℤ) (a : F) {x : κ → F} (hx : x ∈ aL κ a) : (M.map (Int.cast : ℤ → F)) *ᵥ x ∈ aL κ a := by
+theorem mulVec_aL (M : Matrix κ κ ℤ) (a : F) {x : κ → F} (hx : x ∈ aL κ a)
+    : (M.map (Int.cast : ℤ → F)) *ᵥ x ∈ aL κ a := by
   simp only [aL, AddSubgroup.mem_map] at hx ⊢
   obtain ⟨y, hy, rfl⟩ := hx
   refine ⟨_, mulVec_LL M hy, ?_⟩
   simp [Matrix.mulVec_smul]
 
-theorem pow_mulVec_fix (A : Matrix κ κ F) {x : κ → F} (hx : A *ᵥ x = x) (n : ℕ) : (A ^ n) *ᵥ x = x := by
+theorem pow_mulVec_fix (A : Matrix κ κ F) {x : κ → F} (hx : A *ᵥ x = x) (n : ℕ)
+    : (A ^ n) *ᵥ x = x := by
   induction n with
   | zero => simp
   | succ n ih => rw [pow_succ, ← Matrix.mulVec_mulVec, hx, ih]
 
-theorem prime_not_dvd_of_neg_one_pow_mul_modEq_one {p : ℕ} (hp : p.Prime) {t : ℕ} {k : ℕ} (h : (-1) ^ k * (t : ℤ) ≡ 1 [ZMOD p]) : ¬ (p : ℤ) ∣ t := by
+theorem prime_not_dvd_of_neg_one_pow_mul_modEq_one
+    {p : ℕ} (hp : p.Prime) {t : ℕ} {k : ℕ} (h : (-1) ^ k * (t : ℤ) ≡ 1 [ZMOD p])
+    : ¬ (p : ℤ) ∣ t := by
   intro hd
   have h2 := Int.modEq_iff_dvd.mp h
   have h3 : (p : ℤ) ∣ 1 := by
@@ -55,19 +65,39 @@ theorem prime_not_dvd_of_neg_one_pow_mul_modEq_one {p : ℕ} (hp : p.Prime) {t :
   have h5 : p ∣ 1 := by exact_mod_cast h3
   exact hp.not_dvd_one h5
 
-private theorem sum_pow_map_intCast_eq_zero {F : Type} [Field F] {κ : Type} [Fintype κ] [DecidableEq κ]
-    {p : ℕ} {S : Matrix κ κ ℤ} (cyc : ∑ i ∈ Finset.range p, S ^ i = 0) :
-    ∑ i ∈ Finset.range p, (S.map (Int.cast : ℤ → F)) ^ i = 0 := by
+private theorem sum_pow_map_intCast_eq_zero
+    {F : Type} [Field F]
+    {κ : Type} [Fintype κ] [DecidableEq κ]
+    {p : ℕ} {S : Matrix κ κ ℤ} (cyc : ∑ i ∈ Finset.range p, S ^ i = 0)
+    : ∑ i ∈ Finset.range p, (S.map (Int.cast : ℤ → F)) ^ i = 0 := by
   simp only [map_pow_eq]
   have e := congrArg (Int.castRingHom F).mapMatrix cyc
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, map_zero] at e
   exact e
 
-theorem isometry_order_p : ∀ (F : Type) [Field F] [NumberField F] (p : ℕ), p.Prime → ∀ (κ : Type) [Fintype κ] [DecidableEq κ] (G S : Matrix κ κ ℤ) (t : ℕ), LatD p G S t → (∀ x y : κ → F, BF G ((S.map (Int.cast : ℤ → F)) *ᵥ x) ((S.map (Int.cast : ℤ → F)) *ᵥ y) = BF G x y ∧ QF G ((S.map (Int.cast : ℤ → F)) *ᵥ x) = QF G x) ∧ (∀ x : κ → F, (fun x => (S.map (Int.cast : ℤ → F)) *ᵥ x)^[p] x = x ∧ ((S.map (Int.cast : ℤ → F)) *ᵥ x = x → x = 0) ∧ ((S.map (Int.cast : ℤ → F)) *ᵥ x ∈ dualL F G ↔ x ∈ dualL F G) ∧ ∀ a : F, ((S.map (Int.cast : ℤ → F)) *ᵥ x ∈ aL κ a ↔ x ∈ aL κ a)) ∧ (∀ (N : ℕ) (x : κ → F), 0 < N → N.Coprime p → x ∈ aL κ (N : F)⁻¹ → (S.map (Int.cast : ℤ → F)) *ᵥ x - x ∈ aL κ (N : F) → x ∈ aL κ (N : F)) ∧ ¬ (p : ℤ) ∣ t := by
+theorem isometry_order_p
+    : ∀ (F : Type) [Field F] [NumberField F] (p : ℕ),
+      p.Prime
+        → ∀ (κ : Type) [Fintype κ] [DecidableEq κ] (G S : Matrix κ κ ℤ) (t : ℕ),
+          LatD p G S t
+            → (∀ x y : κ → F,
+                BF G ((S.map (Int.cast : ℤ → F)) *ᵥ x) ((S.map (Int.cast : ℤ → F)) *ᵥ y) = BF G x y
+                  ∧ QF G ((S.map (Int.cast : ℤ → F)) *ᵥ x) = QF G x)
+              ∧ (∀ x : κ → F,
+                (fun x => (S.map (Int.cast : ℤ → F)) *ᵥ x)^[p] x = x
+                  ∧ ((S.map (Int.cast : ℤ → F)) *ᵥ x = x → x = 0)
+                  ∧ ((S.map (Int.cast : ℤ → F)) *ᵥ x ∈ dualL F G ↔ x ∈ dualL F G)
+                  ∧ ∀ a : F, ((S.map (Int.cast : ℤ → F)) *ᵥ x ∈ aL κ a ↔ x ∈ aL κ a))
+              ∧ (∀ (N : ℕ) (x : κ → F),
+                0 < N → N.Coprime p → x ∈ aL κ (N : F)⁻¹
+                  → (S.map (Int.cast : ℤ → F)) *ᵥ x - x ∈ aL κ (N : F)
+                  → x ∈ aL κ (N : F))
+              ∧ ¬ (p : ℤ) ∣ t := by
   intro F _ _ p hp κ _ _ G S t hL
   obtain ⟨_, _, iso, cyc, _, cong⟩ := hL
-  have hφ : ∀ M : Matrix κ κ ℤ, M.map (Int.cast : ℤ → F) = (Int.castRingHom F).mapMatrix M := fun _ => rfl
+  have hφ : ∀ M : Matrix κ κ ℤ, M.map (Int.cast : ℤ → F) = (Int.castRingHom F).mapMatrix M :=
+    fun _ => rfl
   have hsum0 := sum_pow_map_intCast_eq_zero (F := F) cyc
   set S' : Matrix κ κ F := S.map (Int.cast : ℤ → F) with hS'
   have hpow : S' ^ p = 1 := by
@@ -90,9 +120,15 @@ theorem isometry_order_p : ∀ (F : Type) [Field F] [NumberField F] (p : ℕ), p
     unfold BF
     rw [← Matrix.vecMul_transpose S' x, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec,
       Matrix.mulVec_mulVec, key]
-  have memD : ∀ y : κ → F, y ∈ dualL F G ↔ ∀ l ∈ LL F κ, ∃ n : ℤ, Algebra.trace ℚ F (BF G y l) = n :=
+  have memD
+      : ∀ y : κ → F, y ∈ dualL F G ↔ ∀ l ∈ LL F κ, ∃ n : ℤ, Algebra.trace ℚ F (BF G y l) = n :=
     fun _ => Iff.rfl
-  refine ⟨fun x y => ⟨hBF x y, ?_⟩, fun x => ⟨?_, ?_, ?_, ?_⟩, ?_, prime_not_dvd_of_neg_one_pow_mul_modEq_one hp cong⟩
+  refine ⟨
+    fun x y => ⟨hBF x y, ?_⟩,
+    fun x => ⟨?_, ?_, ?_, ?_⟩,
+    ?_,
+    prime_not_dvd_of_neg_one_pow_mul_modEq_one hp cong
+  ⟩
   · unfold QF
     rw [hBF]
   · rw [iter_eq, hpow, Matrix.one_mulVec]
@@ -155,8 +191,30 @@ theorem isometry_order_p : ∀ (F : Type) [Field F] [NumberField F] (p : ℕ), p
 
 end GlobalTheory.HilbertThetaSeries.IsoP
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd GlobalTheory.HilbertThetaSeries
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd
+  GlobalTheory.HilbertThetaSeries
 open scoped Matrix
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.intMatrix_isometry_prime_order_lattice_stability : ∀ (F : Type) [Field F] [NumberField F] (p : ℕ), p.Prime → ∀ (κ : Type) [Fintype κ] [DecidableEq κ] (G S : Matrix κ κ ℤ) (t : ℕ), LatD p G S t → (∀ x y : κ → F, BF G ((S.map (Int.cast : ℤ → F)) *ᵥ x) ((S.map (Int.cast : ℤ → F)) *ᵥ y) = BF G x y ∧ QF G ((S.map (Int.cast : ℤ → F)) *ᵥ x) = QF G x) ∧ (∀ x : κ → F, (fun x => (S.map (Int.cast : ℤ → F)) *ᵥ x)^[p] x = x ∧ ((S.map (Int.cast : ℤ → F)) *ᵥ x = x → x = 0) ∧ ((S.map (Int.cast : ℤ → F)) *ᵥ x ∈ dualL F G ↔ x ∈ dualL F G) ∧ ∀ a : F, ((S.map (Int.cast : ℤ → F)) *ᵥ x ∈ aL κ a ↔ x ∈ aL κ a)) ∧ (∀ (N : ℕ) (x : κ → F), 0 < N → N.Coprime p → x ∈ aL κ (N : F)⁻¹ → (S.map (Int.cast : ℤ → F)) *ᵥ x - x ∈ aL κ (N : F) → x ∈ aL κ (N : F)) ∧ ¬ (p : ℤ) ∣ t := by
-  first | exact @GlobalTheory.HilbertThetaSeries.IsoP.isometry_order_p | exact GlobalTheory.HilbertThetaSeries.IsoP.isometry_order_p | (intros; apply GlobalTheory.HilbertThetaSeries.IsoP.isometry_order_p <;> assumption)
+theorem _root_.GlobalTheory.T.intMatrix_isometry_prime_order_lattice_stability
+    : ∀ (F : Type) [Field F] [NumberField F] (p : ℕ),
+      p.Prime
+        → ∀ (κ : Type) [Fintype κ] [DecidableEq κ] (G S : Matrix κ κ ℤ) (t : ℕ),
+          LatD p G S t
+            → (∀ x y : κ → F,
+                BF G ((S.map (Int.cast : ℤ → F)) *ᵥ x) ((S.map (Int.cast : ℤ → F)) *ᵥ y) = BF G x y
+                  ∧ QF G ((S.map (Int.cast : ℤ → F)) *ᵥ x) = QF G x)
+              ∧ (∀ x : κ → F,
+                (fun x => (S.map (Int.cast : ℤ → F)) *ᵥ x)^[p] x = x
+                  ∧ ((S.map (Int.cast : ℤ → F)) *ᵥ x = x → x = 0)
+                  ∧ ((S.map (Int.cast : ℤ → F)) *ᵥ x ∈ dualL F G ↔ x ∈ dualL F G)
+                  ∧ ∀ a : F, ((S.map (Int.cast : ℤ → F)) *ᵥ x ∈ aL κ a ↔ x ∈ aL κ a))
+              ∧ (∀ (N : ℕ) (x : κ → F),
+                0 < N → N.Coprime p → x ∈ aL κ (N : F)⁻¹
+                  → (S.map (Int.cast : ℤ → F)) *ᵥ x - x ∈ aL κ (N : F)
+                  → x ∈ aL κ (N : F))
+              ∧ ¬ (p : ℤ) ∣ t := by
+  first
+  | exact @GlobalTheory.HilbertThetaSeries.IsoP.isometry_order_p
+  | exact GlobalTheory.HilbertThetaSeries.IsoP.isometry_order_p
+  | (intros; apply GlobalTheory.HilbertThetaSeries.IsoP.isometry_order_p <;> assumption)

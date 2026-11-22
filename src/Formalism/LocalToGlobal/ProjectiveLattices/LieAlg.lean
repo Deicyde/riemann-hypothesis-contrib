@@ -10,11 +10,13 @@ namespace Formalism.L2.Pj.LieAlg
 
 open Submodule
 
-variable {V K : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K]
-  [IsFractionRing V K]
+variable
+  {V K : Type}
+  [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K] [IsFractionRing V K]
 
-theorem exists_divisor (s : Finset K) : ∃ t : K, (t = 0 → ∀ x ∈ s, x = 0) ∧ (t = 0 ∨ t ∈ s) ∧
-    ∀ x ∈ s, ∃ r : V, x = algebraMap V K r * t := by
+theorem exists_divisor (s : Finset K)
+    : ∃ t : K,
+      (t = 0 → ∀ x ∈ s, x = 0) ∧ (t = 0 ∨ t ∈ s) ∧ ∀ x ∈ s, ∃ r : V, x = algebraMap V K r * t := by
   classical
   induction s using Finset.induction_on with
   | empty => exact ⟨0, by simp, Or.inl rfl, by simp⟩
@@ -38,7 +40,8 @@ theorem exists_divisor (s : Finset K) : ∃ t : K, (t = 0 → ∀ x ∈ s, x = 0
         rcases Finset.mem_insert.1 hx with hx | hx
         · exact ⟨0, by simp [hx, haz]⟩
         · exact hdiv x hx
-      · rcases (ValuationRing.iff_isInteger_or_isInteger V K).1 inferInstance (a / t) with ⟨r, hr⟩ | ⟨r, hr⟩
+      · rcases (ValuationRing.iff_isInteger_or_isInteger V K).1 inferInstance (a / t) with
+          ⟨r, hr⟩ | ⟨r, hr⟩
         · refine ⟨t, fun h => absurd h ht, hts', fun x hx => ?_⟩
           rcases Finset.mem_insert.1 hx with hx | hx
           · exact ⟨r, by rw [hx, hr]; field_simp⟩
@@ -72,14 +75,18 @@ def tailZero (m : ℕ) (i : Fin m) : Submodule V (Fin m → K) where
   zero_mem' j _ := rfl
   smul_mem' r α ha j hj := by simp [ha j hj]
 
-theorem herm (m : ℕ) (Λ : Submodule V (Fin m → K)) (hfg : Λ.FG)
-    (hne : ∀ i : Fin m, ∃ α ∈ Λ, (∀ j, i < j → α j = 0) ∧ α i ≠ 0) :
-    ∃ β : Fin m → (Fin m → K), (∀ i, β i ∈ Λ) ∧ (∀ i j, i < j → β i j = 0) ∧ (∀ i, β i i ≠ 0) ∧
-      ∀ α ∈ Λ, ∃! r : Fin m → V, α = ∑ i, r i • β i := by
+theorem herm
+    (m : ℕ) (Λ : Submodule V (Fin m → K))
+    (hfg : Λ.FG) (hne : ∀ i : Fin m, ∃ α ∈ Λ, (∀ j, i < j → α j = 0) ∧ α i ≠ 0)
+    : ∃ β : Fin m → (Fin m → K),
+      (∀ i, β i ∈ Λ) ∧ (∀ i j, i < j → β i j = 0) ∧ (∀ i, β i i ≠ 0)
+        ∧ ∀ α ∈ Λ, ∃! r : Fin m → V, α = ∑ i, r i • β i := by
   classical
   haveI : IsNoetherian V Λ := isNoetherian_of_fg_of_noetherian Λ hfg
-  have key : ∀ i : Fin m, ∃ b : Fin m → K, b ∈ Λ ∧ (∀ j, i < j → b j = 0) ∧ b i ≠ 0 ∧
-      ∀ α ∈ Λ, (∀ j, i < j → α j = 0) → ∃ c : V, α i = c • b i := by
+  have key
+      : ∀ i : Fin m, ∃ b : Fin m → K,
+        b ∈ Λ ∧ (∀ j, i < j → b j = 0) ∧ b i ≠ 0
+          ∧ ∀ α ∈ Λ, (∀ j, i < j → α j = 0) → ∃ c : V, α i = c • b i := by
     intro i
     let I : Submodule V K := (Λ ⊓ tailZero (V := V) (K := K) m i).map (LinearMap.proj i)
     have hIfg : I.FG := by
@@ -131,8 +138,9 @@ theorem herm (m : ℕ) (Λ : Submodule V (Fin m → K)) (hfg : Λ.FG)
       · rw [hgt j h, zero_smul]
     · intro h
       exact absurd (Finset.mem_univ i) h
-  have exist : ∀ k : ℕ, ∀ α ∈ Λ, (∀ j : Fin m, k ≤ j.val → α j = 0) →
-      ∃ r : Fin m → V, α = ∑ i, r i • β i := by
+  have exist
+      : ∀ k : ℕ, ∀ α ∈ Λ,
+        (∀ j : Fin m, k ≤ j.val → α j = 0) → ∃ r : Fin m → V, α = ∑ i, r i • β i := by
     intro k
     induction k with
     | zero =>
@@ -145,15 +153,17 @@ theorem herm (m : ℕ) (Λ : Submodule V (Fin m → K)) (hfg : Λ.FG)
       by_cases hk : k < m
       · let i : Fin m := ⟨k, hk⟩
         obtain ⟨c, hc⟩ := hβc i α hα (fun j hj => hz j (by have h6 : k < j.val := hj; omega))
-        obtain ⟨r, hr⟩ := ih (α - c • β i) (Λ.sub_mem hα (Λ.smul_mem c (hβΛ i))) (by
-          intro j hj
-          simp only [Pi.sub_apply, Pi.smul_apply]
-          rcases Nat.eq_or_lt_of_le hj with h | h
-          · have h7 : j = i := Fin.ext h.symm
-            rw [h7, hc, sub_self]
-          · rw [hz j h, hβz i j (show i < j from h), smul_zero, sub_zero])
+        obtain ⟨r, hr⟩ :=
+          ih (α - c • β i) (Λ.sub_mem hα (Λ.smul_mem c (hβΛ i))) (by
+            intro j hj
+            simp only [Pi.sub_apply, Pi.smul_apply]
+            rcases Nat.eq_or_lt_of_le hj with h | h
+            · have h7 : j = i := Fin.ext h.symm
+              rw [h7, hc, sub_self]
+            · rw [hz j h, hβz i j (show i < j from h), smul_zero, sub_zero])
         have hs : ∑ j, (Pi.single i c : Fin m → V) j • β j = c • β i := by
-          rw [Finset.sum_eq_single i (fun j _ hj => by rw [Pi.single_eq_of_ne hj, zero_smul]) (by simp),
+          rw [Finset.sum_eq_single i (fun j _ hj => by rw [Pi.single_eq_of_ne hj, zero_smul]) (by
+              simp),
             Pi.single_eq_same]
         refine ⟨r + Pi.single i c, ?_⟩
         rw [sub_eq_iff_eq_add] at hr
@@ -164,20 +174,24 @@ theorem herm (m : ℕ) (Λ : Submodule V (Fin m → K)) (hfg : Λ.FG)
   intro α hα
   obtain ⟨r, hr⟩ := exist m α hα (fun j hj => absurd j.isLt (not_lt.2 hj))
   refine ⟨r, hr, fun r' hr' => ?_⟩
-  have h8 := indep (r' - r) (by
-    simp only [Pi.sub_apply, sub_smul, Finset.sum_sub_distrib]
-    rw [← hr, ← hr', sub_self])
+  have h8 :=
+    indep (r' - r) (by
+      simp only [Pi.sub_apply, sub_smul, Finset.sum_sub_distrib]
+      rw [← hr, ← hr', sub_self])
   exact sub_eq_zero.1 h8
 
-theorem eig_basis {n m : ℕ} {ι : Type} (L : ι → (Fin n → V) →ₗ[V] (Fin n → V)) (χ : ι → V)
-    (M : ι → (Fin n → K) →ₗ[K] (Fin n → K))
+theorem eig_basis
+    {n m : ℕ} {ι : Type}
+    (L : ι → (Fin n → V) →ₗ[V] (Fin n → V)) (χ : ι → V) (M : ι → (Fin n → K) →ₗ[K] (Fin n → K))
     (hM : ∀ a c, M a (fun j => algebraMap V K (c j)) = fun j => algebraMap V K (L a c j))
     (v : Fin m → (Fin n → K)) (hv : ∀ a i, M a (v i) = algebraMap V K (χ a) • v i)
-    (hb : ∀ w, (∀ a, M a w = algebraMap V K (χ a) • w) → ∃! cf : Fin m → K, w = ∑ i, cf i • v i) :
-    ∃ b : Fin m → (Fin n → V), (∀ a i, L a (b i) = χ a • b i) ∧
-      (∀ c, (∀ a, L a c = χ a • c) → ∃! r : Fin m → V, c = ∑ i, r i • b i) ∧
-      ∀ i, ∃ cf : Fin m → K, cf i ≠ 0 ∧ (∀ j, i < j → cf j = 0) ∧
-        (fun j => algebraMap V K (b i j)) = ∑ j, cf j • v j := by
+    (hb : ∀ w, (∀ a, M a w = algebraMap V K (χ a) • w) → ∃! cf : Fin m → K, w = ∑ i, cf i • v i)
+    : ∃ b : Fin m → (Fin n → V),
+      (∀ a i, L a (b i) = χ a • b i)
+        ∧ (∀ c, (∀ a, L a c = χ a • c) → ∃! r : Fin m → V, c = ∑ i, r i • b i)
+        ∧ ∀ i, ∃ cf : Fin m → K,
+          cf i ≠ 0 ∧ (∀ j, i < j → cf j = 0)
+            ∧ (fun j => algebraMap V K (b i j)) = ∑ j, cf j • v j := by
   classical
   let emb : (Fin n → V) → (Fin n → K) := fun c j => algebraMap V K (c j)
   have embinj : Function.Injective emb := fun c c' h =>
@@ -186,34 +200,39 @@ theorem eig_basis {n m : ℕ} {ι : Type} (L : ι → (Fin n → V) →ₗ[V] (F
   have embsmul : ∀ (r : V) c, emb (r • c) = algebraMap V K r • emb c := fun r c =>
     funext fun j => by simp [emb]
   have embM : ∀ a c, M a (emb c) = emb (L a c) := fun a c => hM a c
-  let E : Submodule V (Fin n → V) :=
-    { carrier := {c | ∀ a, L a c = χ a • c}
-      add_mem' := fun {c c'} hc hc' a => by
-        simp only [Set.mem_setOf_eq] at hc hc' ⊢
-        rw [map_add (f := _), hc a, hc' a, smul_add]
-      zero_mem' := fun a => by simp
-      smul_mem' := fun r c hc a => by
-        simp only [Set.mem_setOf_eq] at hc ⊢
-        rw [map_smul, hc a, smul_comm] }
+  let E : Submodule V (Fin n → V) := {
+    carrier := {c | ∀ a, L a c = χ a • c}
+    add_mem' := fun {c c'} hc hc' a => by
+      simp only [Set.mem_setOf_eq] at hc hc' ⊢
+      rw [map_add (f := _), hc a, hc' a, smul_add]
+    zero_mem' := fun a => by simp
+    smul_mem' := fun r c hc a => by
+      simp only [Set.mem_setOf_eq] at hc ⊢
+      rw [map_smul, hc a, smul_comm]
+  }
   have memE : ∀ c, c ∈ E ↔ ∀ a, L a c = χ a • c := fun c => Iff.rfl
   have eigK : ∀ c ∈ E, ∀ a, M a (emb c) = algebraMap V K (χ a) • emb c := fun c hc a => by
     rw [embM, (memE c).1 hc a, embsmul]
   have hco : ∀ c : E, ∃! cf : Fin m → K, emb c = ∑ i, cf i • v i := fun c => hb _ (eigK c c.2)
   choose g spec hgu using hco
-  let f : E →ₗ[V] (Fin m → K) :=
-    { toFun := g
-      map_add' := fun c c' => (hgu (c + c') _ (by
+  let f : E →ₗ[V] (Fin m → K) := {
+    toFun := g
+    map_add' := fun c c' =>
+      (hgu (c + c') _ (by
         rw [Submodule.coe_add, embadd, spec c, spec c', ← Finset.sum_add_distrib]
         refine Finset.sum_congr rfl fun i _ => ?_
         rw [Pi.add_apply, add_smul])).symm
-      map_smul' := fun r c => (hgu (r • c) _ (by
+    map_smul' := fun r c =>
+      (hgu (r • c) _ (by
         rw [Submodule.coe_smul, embsmul, spec c, Finset.smul_sum]
         refine Finset.sum_congr rfl fun i _ => ?_
         rw [RingHom.id_apply, Pi.smul_apply, smul_smul]
         congr 1
-        exact (Algebra.smul_def _ _).symm)).symm }
+        exact (Algebra.smul_def _ _).symm)).symm
+  }
   have fspec : ∀ c : E, emb c = ∑ i, f c i • v i := spec
-  have finj : Function.Injective f := fun x y h => Subtype.ext (embinj (by rw [fspec x, fspec y, h]))
+  have finj : Function.Injective f := fun x y h =>
+    Subtype.ext (embinj (by rw [fspec x, fspec y, h]))
   have hfg : (LinearMap.range f).FG := by
     rw [LinearMap.range_eq_map]
     exact (IsNoetherian.noetherian (⊤ : Submodule V E)).map f
@@ -225,12 +244,13 @@ theorem eig_basis {n m : ℕ} {ι : Type} (L : ι → (Fin n → V) →ₗ[V] (F
       funext j
       show algebraMap V K (c j) = _
       rw [hc j, Algebra.smul_def, Pi.smul_apply, smul_eq_mul]
-    have hcE : c ∈ E := fun a => embinj (by
-      rw [← embM, hcv, map_smul, hv, embsmul, hcv, smul_comm])
-    have hfc : f ⟨c, hcE⟩ = Pi.single i (algebraMap V K (d : V)) := (hgu ⟨c, hcE⟩ _ (by
-      show emb c = _
-      rw [hcv, Finset.sum_eq_single i (fun j _ hj => by rw [Pi.single_eq_of_ne hj, zero_smul]) (by simp),
-        Pi.single_eq_same])).symm
+    have hcE : c ∈ E := fun a => embinj (by rw [← embM, hcv, map_smul, hv, embsmul, hcv, smul_comm])
+    have hfc : f ⟨c, hcE⟩ = Pi.single i (algebraMap V K (d : V)) :=
+      (hgu ⟨c, hcE⟩ _ (by
+        show emb c = _
+        rw [hcv,
+          Finset.sum_eq_single i (fun j _ hj => by rw [Pi.single_eq_of_ne hj, zero_smul]) (by simp),
+          Pi.single_eq_same])).symm
     refine ⟨f ⟨c, hcE⟩, ⟨⟨c, hcE⟩, rfl⟩, fun j hj => ?_, ?_⟩
     · rw [hfc, Pi.single_eq_of_ne (ne_of_gt hj)]
     · rw [hfc, Pi.single_eq_same]
@@ -240,7 +260,8 @@ theorem eig_basis {n m : ℕ} {ι : Type} (L : ι → (Fin n → V) →ₗ[V] (F
   choose e he using hβΛ
   refine ⟨fun i => (e i : Fin n → V), fun a i => (e i).2 a, ?_, ?_⟩
   · intro c hc
-    have key : ∀ r' : Fin m → V, c = ∑ i, r' i • (e i : Fin n → V) ↔ f ⟨c, hc⟩ = ∑ i, r' i • β i := by
+    have key
+        : ∀ r' : Fin m → V, c = ∑ i, r' i • (e i : Fin n → V) ↔ f ⟨c, hc⟩ = ∑ i, r' i • β i := by
       intro r'
       have hsum : ((∑ i, r' i • e i : E) : Fin n → V) = ∑ i, r' i • (e i : Fin n → V) := by simp
       have hf : f (∑ i, r' i • e i) = ∑ i, r' i • β i := by simp [map_sum, map_smul, he]
@@ -262,10 +283,11 @@ theorem eig_basis {n m : ℕ} {ι : Type} (L : ι → (Fin n → V) →ₗ[V] (F
     rw [he i] at h9
     exact h9
 
-theorem tri_basis {n m : ℕ} (P : (Fin n → K) → Prop) (v : Fin m → (Fin n → K))
+theorem tri_basis
+    {n m : ℕ} (P : (Fin n → K) → Prop) (v : Fin m → (Fin n → K))
     (hb : ∀ w, P w → ∃! cf : Fin m → K, w = ∑ i, cf i • v i) (C : Fin m → Fin m → K)
-    (hCz : ∀ i j, i < j → C i j = 0) (hCd : ∀ i, C i i ≠ 0) :
-    ∀ w, P w → ∃! d : Fin m → K, w = ∑ i, d i • ∑ j, C i j • v j := by
+    (hCz : ∀ i j, i < j → C i j = 0) (hCd : ∀ i, C i i ≠ 0)
+    : ∀ w, P w → ∃! d : Fin m → K, w = ∑ i, d i • ∑ j, C i j • v j := by
   classical
   let A : Matrix (Fin m) (Fin m) K := Matrix.of C
   have hA : A.IsLowerTriangular := fun i j h => hCz i j h
@@ -273,9 +295,11 @@ theorem tri_basis {n m : ℕ} (P : (Fin n → K) → Prop) (v : Fin m → (Fin n
     rw [Matrix.det_of_lowerTriangular A hA]
     exact Finset.prod_ne_zero_iff.2 (fun i _ => hCd i)
   have hu : IsUnit A.det := isUnit_iff_ne_zero.2 hdet
-  have expand : ∀ d : Fin m → K, ∑ i, d i • ∑ j, C i j • v j = ∑ j, (Matrix.vecMul d A) j • v j := by
+  have expand
+      : ∀ d : Fin m → K, ∑ i, d i • ∑ j, C i j • v j = ∑ j, (Matrix.vecMul d A) j • v j := by
     intro d
-    simp only [Matrix.vecMul, dotProduct, A, Matrix.of_apply, Finset.smul_sum, smul_smul, Finset.sum_smul]
+    simp only [Matrix.vecMul, dotProduct, A, Matrix.of_apply, Finset.smul_sum, smul_smul,
+      Finset.sum_smul]
     exact Finset.sum_comm
   intro w hw
   obtain ⟨cf, hcf, huniq⟩ := hb w hw

@@ -8,8 +8,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeckeAlgebr
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial ValuativeRel IsLocalRing Filter
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.UnitaryBC
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial ValuativeRel
+  IsLocalRing Filter
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.SmGL GlobalTheory.SplitWeil
+  GlobalTheory.UnitaryBC
 open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj)
 open UpperTheory.V.HV (Coef)
 open UpperTheory.V.Hi UpperTheory.V.Hi.CaseU
@@ -23,12 +27,16 @@ set_option synthInstance.maxHeartbeats 200000
 
 namespace UpperTheory.V.Z.Desc.V0
 
-private theorem ePart_zero {G R W : Type} [Group G] [CommRing R] [AddCommGroup W] [Module R W] (ρ : Representation R G W) :
-    ePart ρ 0 0 = ⊤ := by
+private theorem ePart_zero
+    {G R W : Type} [Group G] [CommRing R] [AddCommGroup W] [Module R W] (ρ : Representation R G W)
+    : ePart ρ 0 0 = ⊤ := by
   simp [ePart, opE]
 
-private theorem card_not_dvd {l : ℕ} [Fact l.Prime] {L Ω : Type} [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω]
-    [IsAlgClosure L Ω] (s : HidaSetting l L Ω) (j : ℕ) : ¬ l ∣ Nat.card 𝓀[(s.w s.v0).adicCompletion L] ^ j := by
+private theorem card_not_dvd
+    {l : ℕ} [Fact l.Prime]
+    {L Ω : Type} [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω]
+    (s : HidaSetting l L Ω) (j : ℕ)
+    : ¬ l ∣ Nat.card 𝓀[(s.w s.v0).adicCompletion L] ^ j := by
   have hl : l.Prime := Fact.out
   have hw : (s.w s.v0).under (𝓞 (Lp L)) = s.v0 := by
     ext x
@@ -53,7 +61,7 @@ private theorem card_not_dvd {l : ℕ} [Fact l.Prime] {L Ω : Type} [Field L] [N
     exact he
   intro h
   rw [hq] at h
-  exact s.p_ne ((Nat.prime_dvd_prime_iff_eq hl s.p_prime).1 (hl.dvd_of_dvd_pow (hl.dvd_of_dvd_pow h))).symm
-
+  exact s.p_ne ((Nat.prime_dvd_prime_iff_eq hl s.p_prime).1
+    (hl.dvd_of_dvd_pow (hl.dvd_of_dvd_pow h))).symm
 
 end UpperTheory.V.Z.Desc.V0

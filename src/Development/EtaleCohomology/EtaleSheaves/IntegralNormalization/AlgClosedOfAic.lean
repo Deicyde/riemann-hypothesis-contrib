@@ -9,20 +9,24 @@ open CategoryTheory Limits AlgebraicGeometry LateralTheory.E.t_E2Cut Polynomial
 
 namespace LateralTheory.E.NormPf.FFPf
 
-theorem algClosed_of_aic (R K : Type) [CommRing R] [IsDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
-    (h : GlobalTheory.EtC.AIC R) : IsAlgClosed K := by
+theorem algClosed_of_aic
+    (R K : Type) [CommRing R] [IsDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+    (h : GlobalTheory.EtC.AIC R)
+    : IsAlgClosed K := by
   classical
   apply IsAlgClosed.of_exists_root
   intro p hp hirr
   have hd : 0 < p.natDegree := Irreducible.natDegree_pos hirr
-  obtain ⟨b, hb⟩ := IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors R)
-    ((Finset.range (p.natDegree + 1)).image p.coeff)
+  obtain ⟨b, hb⟩ :=
+    IsLocalization.exist_integer_multiples_of_finset (nonZeroDivisors R)
+      ((Finset.range (p.natDegree + 1)).image p.coeff)
   set d : K := algebraMap R K b with hdd
   have hd0 : d ≠ 0 := IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors b.2
   have hint : ∀ i, ∃ r : R, algebraMap R K r = p.coeff i * d := by
     intro i
     by_cases hi : i ≤ p.natDegree
-    · obtain ⟨r, hr⟩ := hb (p.coeff i) (Finset.mem_image.mpr ⟨i, Finset.mem_range.mpr (by omega), rfl⟩)
+    · obtain ⟨r, hr⟩ :=
+        hb (p.coeff i) (Finset.mem_image.mpr ⟨i, Finset.mem_range.mpr (by omega), rfl⟩)
       refine ⟨r, ?_⟩
       rw [hr, Algebra.smul_def, mul_comm]
     · exact ⟨0, by rw [coeff_eq_zero_of_natDegree_lt (by omega)]; simp⟩
@@ -52,7 +56,8 @@ theorem algClosed_of_aic (R K : Type) [CommRing R] [IsDomain R] [Field K] [Algeb
 theorem ffAlg : FFAlg := by
   intro Z _ hZ
   obtain ⟨x⟩ := (inferInstance : Nonempty Z)
-  obtain ⟨_, ⟨V, hV, rfl⟩, hxV, -⟩ := Z.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ x) isOpen_univ
+  obtain ⟨_, ⟨V, hV, rfl⟩, hxV, -⟩ :=
+    Z.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ x) isOpen_univ
   have : Nonempty V := ⟨⟨x, hxV⟩⟩
   have := functionField_isFractionRing_of_isAffineOpen Z V hV
   exact algClosed_of_aic Γ(Z, V) Z.functionField (hZ.2 V hV ⟨x, hxV⟩)

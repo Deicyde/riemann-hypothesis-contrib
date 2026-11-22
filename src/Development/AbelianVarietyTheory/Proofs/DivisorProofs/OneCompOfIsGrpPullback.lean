@@ -11,7 +11,8 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.CxPts GlobalTheory.VB
 open Limits (pullback)
 open MonoidalCategory CartesianMonoidalCategory MonObj
@@ -21,9 +22,10 @@ namespace GlobalTheory.PPAS
 
 variable {S S' : Scheme.{0}}
 
-theorem one_comp_of_isGrpPullback {A : Over S} {A' : Over S'} [GrpObj A] [GrpObj A'] {f : S' ⟶ S}
-    {φ : A'.left ⟶ A.left} (h : IsGrpPullback A' A f φ) :
-    (1 : A' ⟶ A').left ≫ φ = φ ≫ (1 : A ⟶ A).left := by
+theorem one_comp_of_isGrpPullback
+    {A : Over S} {A' : Over S'} [GrpObj A] [GrpObj A']
+    {f : S' ⟶ S} {φ : A'.left ⟶ A.left} (h : IsGrpPullback A' A f φ)
+    : (1 : A' ⟶ A').left ≫ φ = φ ≫ (1 : A ⟶ A).left := by
   have e := congrArg (fun z => z.left) (map_one (pushHom h A'))
   let g : Over.mk (A'.hom ≫ f) ⟶ A := Over.homMk φ h.1.w
   have e2 : g ≫ (1 : A ⟶ A) = 1 := by simp

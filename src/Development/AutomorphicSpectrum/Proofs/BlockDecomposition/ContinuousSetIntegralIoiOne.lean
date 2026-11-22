@@ -203,35 +203,43 @@ lemma Λ₀_eq_tails (P : WeakFEPair ℂ) (s : ℂ) :
   rw [hsplit, hA, hB]
   exact add_comm _ _
 
-theorem weakFEPair_continuous_Λ₀ {X : Type*} [TopologicalSpace X] (P : X → WeakFEPair ℂ) (k : ℝ)
-    (hk : ∀ p, (P p).k = k) (ε : ℂ) (hε : ∀ p, (P p).ε = ε)
+theorem weakFEPair_continuous_Λ₀
+    {X : Type*} [TopologicalSpace X]
+    (P : X → WeakFEPair ℂ) (k : ℝ) (hk : ∀ p, (P p).k = k)
+    (ε : ℂ) (hε : ∀ p, (P p).ε = ε)
     (hf : ContinuousOn (fun q : X × ℝ ↦ (P q.1).f q.2) (Set.univ ×ˢ Set.Ioi 0))
     (hg : ContinuousOn (fun q : X × ℝ ↦ (P q.1).g q.2) (Set.univ ×ˢ Set.Ioi 0))
     (hf₀ : Continuous fun p ↦ (P p).f₀) (hg₀ : Continuous fun p ↦ (P p).g₀)
-    (hbd : ∀ p₀ : X, ∀ r : ℝ, ∃ U ∈ 𝓝 p₀, ∃ M : ℝ, ∀ p ∈ U, ∀ x : ℝ, 1 ≤ x →
-      ‖(P p).f x - (P p).f₀‖ ≤ M * x ^ (-r) ∧ ‖(P p).g x - (P p).g₀‖ ≤ M * x ^ (-r)) :
-    Continuous fun q : ℂ × X ↦ (P q.2).Λ₀ q.1 := by
+    (hbd : ∀ p₀ : X, ∀ r : ℝ, ∃ U ∈ 𝓝 p₀, ∃ M : ℝ, ∀ p ∈ U, ∀ x : ℝ,
+      1 ≤ x → ‖(P p).f x - (P p).f₀‖ ≤ M * x ^ (-r) ∧ ‖(P p).g x - (P p).g₀‖ ≤ M * x ^ (-r))
+    : Continuous fun q : ℂ × X ↦ (P q.2).Λ₀ q.1 := by
   have h1 : Continuous fun q : ℂ × X ↦
       ∫ x in Ioi (1 : ℝ), (x : ℂ) ^ (q.1 - 1) * ((P q.2).f x - (P q.2).f₀) :=
-    GlobalTheory.CompanionTheory.EisRk1Cont.continuous_mellinTail (fun p x ↦ (P p).f x - (P p).f₀)
+    GlobalTheory.CompanionTheory.EisRk1Cont.continuous_mellinTail
+      (fun p x ↦ (P p).f x - (P p).f₀)
       (hf.sub (hf₀.comp continuous_fst).continuousOn)
       (fun p₀ r ↦ by
         obtain ⟨U, hU, M, hM⟩ := hbd p₀ r
         exact ⟨U, hU, M, fun p hp x hx ↦ (hM p hp x hx).1⟩)
   have h2 : Continuous fun q : ℂ × X ↦
       ∫ x in Ioi (1 : ℝ), (x : ℂ) ^ (q.1 - 1) * ((P q.2).g x - (P q.2).g₀) :=
-    GlobalTheory.CompanionTheory.EisRk1Cont.continuous_mellinTail (fun p x ↦ (P p).g x - (P p).g₀)
+    GlobalTheory.CompanionTheory.EisRk1Cont.continuous_mellinTail
+      (fun p x ↦ (P p).g x - (P p).g₀)
       (hg.sub (hg₀.comp continuous_fst).continuousOn)
       (fun p₀ r ↦ by
         obtain ⟨U, hU, M, hM⟩ := hbd p₀ r
         exact ⟨U, hU, M, fun p hp x hx ↦ (hM p hp x hx).2⟩)
   have h3 : Continuous fun q : ℂ × X ↦ ((k : ℂ) - q.1, q.2) := by fun_prop
   have h4 := h2.comp h3
-  have heq : (fun q : ℂ × X ↦ (P q.2).Λ₀ q.1) = fun q ↦
-      (∫ x in Ioi (1 : ℝ), (x : ℂ) ^ (q.1 - 1) * ((P q.2).f x - (P q.2).f₀)) +
-        ε * ∫ x in Ioi (1 : ℝ), (x : ℂ) ^ (((k : ℂ) - q.1) - 1) * ((P q.2).g x - (P q.2).g₀) := by
-    funext q
-    rw [GlobalTheory.CompanionTheory.EisRk1Cont.Λ₀_eq_tails, hk, hε]
+  have heq
+      : (fun q : ℂ × X ↦ (P q.2).Λ₀ q.1)
+        = fun q ↦
+          (∫ x in Ioi (1 : ℝ), (x : ℂ) ^ (q.1 - 1) * ((P q.2).f x - (P q.2).f₀))
+            + ε
+              * ∫ x in Ioi (1 : ℝ), (x : ℂ) ^ (((k : ℂ) - q.1) - 1) * ((P q.2).g x - (P q.2).g₀) :=
+    by
+      funext q
+      rw [GlobalTheory.CompanionTheory.EisRk1Cont.Λ₀_eq_tails, hk, hε]
   rw [heq]
   exact h1.add (continuous_const.mul h4)
 

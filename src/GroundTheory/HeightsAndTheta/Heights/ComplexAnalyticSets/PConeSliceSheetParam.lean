@@ -21,33 +21,42 @@ noncomputable section
 
 namespace ConeSliceSheetParam
 
-theorem eval_sup_span {n : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} {f : MvPolynomial (Fin n) ℂ}
-    {x : Fin n → ℂ} (hJ : ∀ q ∈ J, eval x q = 0) (hf : eval x f = 0) :
-    ∀ q ∈ J ⊔ Ideal.span {f}, eval x q = 0 := by
+theorem eval_sup_span
+    {n : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} {f : MvPolynomial (Fin n) ℂ} {x : Fin n → ℂ}
+    (hJ : ∀ q ∈ J, eval x q = 0) (hf : eval x f = 0)
+    : ∀ q ∈ J ⊔ Ideal.span {f}, eval x q = 0 := by
   intro q hq
   have hle : J ⊔ Ideal.span {f} ≤ RingHom.ker (eval x) :=
-    sup_le (fun q hq => RingHom.mem_ker.2 (hJ q hq))
+    sup_le
+      (fun q hq => RingHom.mem_ker.2 (hJ q hq))
       (Ideal.span_le.2 (Set.singleton_subset_iff.2 (RingHom.mem_ker.2 hf)))
   exact RingHom.mem_ker.1 (hle hq)
 
-theorem eval_smul_of_isHomogIdeal {n : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} (hJ : IsHomogIdeal J)
-    {x : Fin n → ℂ} (hx : ∀ q ∈ J, eval x q = 0) (t : ℂ) : ∀ q ∈ J, eval (t • x) q = 0 := by
+theorem eval_smul_of_isHomogIdeal
+    {n : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} (hJ : IsHomogIdeal J)
+    {x : Fin n → ℂ} (hx : ∀ q ∈ J, eval x q = 0)
+    (t : ℂ)
+    : ∀ q ∈ J, eval (t • x) q = 0 := by
   intro q hq
   set_option synthInstance.maxHeartbeats 100000 in
     rw [← sum_homogeneousComponent q, map_sum]
   refine Finset.sum_eq_zero fun i _ => ?_
-  rw [eval_smul_of_isHomogeneous (homogeneousComponent_isHomogeneous i q), hx _ (hJ q hq i), mul_zero]
+  rw [eval_smul_of_isHomogeneous (homogeneousComponent_isHomogeneous i q), hx _ (hJ q hq i),
+    mul_zero]
 
-theorem eval_linForm_smul {n : ℕ} (ℓ : Fin n → ℂ) (t : ℂ) (x : Fin n → ℂ) :
-    eval (t • x) (linForm ℓ) = t * eval x (linForm ℓ) := by
+theorem eval_linForm_smul {n : ℕ} (ℓ : Fin n → ℂ) (t : ℂ) (x : Fin n → ℂ)
+    : eval (t • x) (linForm ℓ) = t * eval x (linForm ℓ) := by
   rw [eval_smul_of_isHomogeneous (SliceIdeal.isHomogeneous_linForm ℓ), pow_one]
 
-theorem slice_isPrime {n : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} {ℓ : Fin n → ℂ} (hJ : IsProjPrime J)
-    (hℓ : linForm ℓ ∉ J) : (J ⊔ Ideal.span {linForm ℓ - 1}).IsPrime := by
+theorem slice_isPrime
+    {n : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} {ℓ : Fin n → ℂ}
+    (hJ : IsProjPrime J) (hℓ : linForm ℓ ∉ J)
+    : (J ⊔ Ideal.span {linForm ℓ - 1}).IsPrime := by
   have hP := hJ.isPrime
-  have hdeh : ∀ (G : MvPolynomial (Fin n) ℂ) (d : ℕ), G.IsHomogeneous d →
-      G ∈ J ⊔ Ideal.span {linForm ℓ - 1} → G ∈ J :=
-    fun G d hG hm => ChartDehomog.proof ℂ n J ℓ G d hP hJ.isHomog hℓ hG hm
+  have hdeh
+      : ∀ (G : MvPolynomial (Fin n) ℂ) (d : ℕ),
+        G.IsHomogeneous d → G ∈ J ⊔ Ideal.span {linForm ℓ - 1} → G ∈ J := fun G d hG hm =>
+    ChartDehomog.proof ℂ n J ℓ G d hP hJ.isHomog hℓ hG hm
   have hspan : Ideal.span {linForm ℓ - 1} ≤ J ⊔ Ideal.span {linForm ℓ - 1} := le_sup_right
   refine Ideal.isPrime_iff.mpr ⟨fun htop => ?_, fun {a b} hab => ?_⟩
   · exact hP.ne_top ((Ideal.eq_top_iff_one J).mpr
@@ -57,8 +66,9 @@ theorem slice_isPrime {n : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} {ℓ : Fi
   have hAB : A * B ∈ J ⊔ Ideal.span {linForm ℓ - 1} := by
     have h : A * B = (A - a) * B + a * (B - b) + a * b := by ring
     rw [h]
-    exact Ideal.add_mem _ (Ideal.add_mem _ (hspan (Ideal.mul_mem_right _ _ hAa))
-      (hspan (Ideal.mul_mem_left _ _ hBb))) hab
+    exact Ideal.add_mem _
+      (Ideal.add_mem _ (hspan (Ideal.mul_mem_right _ _ hAa)) (hspan (Ideal.mul_mem_left _ _ hBb)))
+      hab
   rcases hP.mem_or_mem (hdeh _ _ (hA'.mul hB') hAB) with h | h
   · left
     have e : a = A - (A - a) := by ring
@@ -71,10 +81,9 @@ theorem slice_isPrime {n : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} {ℓ : Fi
 
 end ConeSliceSheetParam
 
-
 open ConeSliceSheetParam in
-theorem ConeSliceSheetParam.proof (hCov : DiscriminantSheetCover.Statement) :
-    ConeSliceSheetParam.Statement := by
+theorem ConeSliceSheetParam.proof (hCov : DiscriminantSheetCover.Statement)
+    : ConeSliceSheetParam.Statement := by
   classical
   intro n e h J ℓ A hJ hdim hℓ hA
   have hP := hJ.isPrime
@@ -100,8 +109,7 @@ theorem ConeSliceSheetParam.proof (hCov : DiscriminantSheetCover.Statement) :
     change h.matᵀ *ᵥ (t • (M *ᵥ v)) = t • v
     rw [mulVec_smul, mulVec_mulVec, hM, mul_nonsing_inv _ hdet, one_mulVec]
   refine ⟨U, D, N, s, hUD, hdisj, hnull, hfib, ?_, ?_, ?_⟩
-  ·
-    rintro ⟨⟨k, j⟩, y, t⟩ ⟨hy, ht⟩ ⟨⟨k', j'⟩, y', t'⟩ ⟨hy', ht'⟩ heq
+  · rintro ⟨⟨k, j⟩, y, t⟩ ⟨hy, ht⟩ ⟨⟨k', j'⟩, y', t'⟩ ⟨hy', ht'⟩ heq
     simp only at hy ht hy' ht' heq
     have hv := congrArg h.pointOf heq
     rw [hpt, hpt] at hv
@@ -120,14 +128,12 @@ theorem ConeSliceSheetParam.proof (hCov : DiscriminantSheetCover.Statement) :
     have hjj : j = j' := (hfib k y ((hUD k).2.2.1 hy)).2.1 hss
     subst hjj
     rfl
-  ·
-    rintro z ⟨⟨⟨k, j⟩, y, t⟩, ⟨hy, ht⟩, rfl⟩
+  · rintro z ⟨⟨⟨k, j⟩, y, t⟩, ⟨hy, ht⟩, rfl⟩
     simp only at hy ht
     intro q hq
     rw [hpt]
     exact eval_smul_of_isHomogIdeal hJ.isHomog (hslice _ (hval k j y ((hUD k).2.2.1 hy)).1).1 t q hq
-  ·
-    obtain ⟨δ, G, hG, hGf⟩ := SliceIdeal.exists_homogeneous_sub_mem ℓ (pullback A P)
+  · obtain ⟨δ, G, hG, hGf⟩ := SliceIdeal.exists_homogeneous_sub_mem ℓ (pullback A P)
     have hGJ : G ∉ J := by
       intro hGm
       apply hP0
@@ -140,16 +146,18 @@ theorem ConeSliceSheetParam.proof (hCov : DiscriminantSheetCover.Statement) :
       change (Ideal.Quotient.mkₐ ℂ J') (pullback A P) = 0
       rw [Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.eq_zero_iff_mem]
       exact hm
-    have hZ1 := NullSmaller.proof n (e + 1) (J ⊔ Ideal.span {linForm ℓ})
-      (MassFinite.dim_sup_lt J hP hdim _ hℓ)
-    have hZ2 := NullSmaller.proof n (e + 1) (J ⊔ Ideal.span {G})
-      (MassFinite.dim_sup_lt J hP hdim _ hGJ)
+    have hZ1 :=
+      NullSmaller.proof n (e + 1) (J ⊔ Ideal.span {linForm ℓ})
+        (MassFinite.dim_sup_lt J hP hdim _ hℓ)
+    have hZ2 :=
+      NullSmaller.proof n (e + 1) (J ⊔ Ideal.span {G}) (MassFinite.dim_sup_lt J hP hdim _ hGJ)
     set F := fun q : (Σ k, Fin (N k)) × (Fin e → ℂ) × ℂ =>
       q.2.2 • WithLp.toLp 2 (M *ᵥ s q.1.1 q.1.2 q.2.1) with hF
     let L := LinearMap.toContinuousLinearMap (Matrix.toEuclideanLin M)
-    have hsub : {z : EuclideanSpace ℂ (Fin n) | ∀ q ∈ J, eval (h.pointOf z) q = 0} \
-        F '' {q | q.2.1 ∈ D q.1.1 ∧ q.2.2 ≠ 0} ⊆
-        L '' (zeroSetEuc (J ⊔ Ideal.span {linForm ℓ}) ∪ zeroSetEuc (J ⊔ Ideal.span {G})) := by
+    have hsub
+        : {z : EuclideanSpace ℂ (Fin n) | ∀ q ∈ J, eval (h.pointOf z) q = 0}
+            \ F '' {q | q.2.1 ∈ D q.1.1 ∧ q.2.2 ≠ 0}
+          ⊆ L '' (zeroSetEuc (J ⊔ Ideal.span {linForm ℓ}) ∪ zeroSetEuc (J ⊔ Ideal.span {G})) := by
       rintro z ⟨hzC, hzF⟩
       set p := h.pointOf z with hp
       have hzp : L (WithLp.toLp 2 p) = z := by
@@ -184,12 +192,13 @@ theorem ConeSliceSheetParam.proof (hCov : DiscriminantSheetCover.Statement) :
         rw [hpx, eval_smul_of_isHomogeneous hG, hGx, MassFinite.eval_pullback, hPy, mul_zero]
     refine measure_mono_null hsub ?_
     refine le_antisymm ?_ zero_le
-    calc Measure.hausdorffMeasure ((2 * (e + 1) : ℕ) : ℝ)
-          (L '' (zeroSetEuc (J ⊔ Ideal.span {linForm ℓ}) ∪ zeroSetEuc (J ⊔ Ideal.span {G})))
-        ≤ (‖L‖₊ : ENNReal) ^ (((2 * (e + 1) : ℕ) : ℝ)) *
-            Measure.hausdorffMeasure ((2 * (e + 1) : ℕ) : ℝ)
+    calc
+      Measure.hausdorffMeasure ((2 * (e + 1) : ℕ) : ℝ)
+            (L '' (zeroSetEuc (J ⊔ Ideal.span {linForm ℓ}) ∪ zeroSetEuc (J ⊔ Ideal.span {G})))
+          ≤ (‖L‖₊ : ENNReal) ^ (((2 * (e + 1) : ℕ) : ℝ))
+            * Measure.hausdorffMeasure ((2 * (e + 1) : ℕ) : ℝ)
               (zeroSetEuc (J ⊔ Ideal.span {linForm ℓ}) ∪ zeroSetEuc (J ⊔ Ideal.span {G})) :=
-          L.lipschitz.hausdorffMeasure_image_le (Nat.cast_nonneg _) _
+        L.lipschitz.hausdorffMeasure_image_le (Nat.cast_nonneg _) _
       _ = 0 := by rw [measure_union_null hZ1 hZ2, mul_zero]
 
 end

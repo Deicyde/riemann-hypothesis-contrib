@@ -16,8 +16,8 @@ namespace Formalism.FourierDecayAlt.P.PhaseFunctionDerivatives
 
 open Formalism.FourierDecayAlt.G
 
-theorem phase_function_eq_sum_add_prod_inv {n : ℕ} (D' : ℂ) :
-    g0 (n := n) D' = (fun x => ∑ k, x k) + D' • (fun x : Fin n → ℂ => ∏ k, (x k)⁻¹) := by
+theorem phase_function_eq_sum_add_prod_inv {n : ℕ} (D' : ℂ)
+    : g0 (n := n) D' = (fun x => ∑ k, x k) + D' • (fun x : Fin n → ℂ => ∏ k, (x k)⁻¹) := by
   funext x
   simp [g0, div_eq_mul_inv, Finset.prod_inv_distrib]
 
@@ -26,32 +26,33 @@ theorem a_isOpen (n : ℕ) : IsOpen {x : Fin n → ℂ | ∀ k, x k ≠ 0} := by
   rw [this]
   exact isOpen_iInter_of_finite fun k => isOpen_ne_fun (continuous_apply k) continuous_const
 
-theorem a_contDiffAt_inv {n : ℕ} (N : WithTop ℕ∞) (k : Fin n) (x : Fin n → ℂ) (hx : x k ≠ 0) :
-    ContDiffAt ℂ N (fun y : Fin n → ℂ => (y k)⁻¹) x :=
+theorem a_contDiffAt_inv {n : ℕ} (N : WithTop ℕ∞) (k : Fin n) (x : Fin n → ℂ) (hx : x k ≠ 0)
+    : ContDiffAt ℂ N (fun y : Fin n → ℂ => (y k)⁻¹) x :=
   ((contDiff_apply ℂ (fun _ => ℂ) k).contDiffAt).inv hx
 
-theorem a_norm_proj_le {n : ℕ} (k : Fin n) :
-    ‖(ContinuousLinearMap.proj k : (Fin n → ℂ) →L[ℂ] ℂ)‖ ≤ 1 :=
-  ContinuousLinearMap.opNorm_le_bound _ zero_le_one fun v => by
-    simpa using norm_le_pi_norm v k
+theorem a_norm_proj_le {n : ℕ} (k : Fin n)
+    : ‖(ContinuousLinearMap.proj k : (Fin n → ℂ) →L[ℂ] ℂ)‖ ≤ 1 :=
+  ContinuousLinearMap.opNorm_le_bound _ zero_le_one fun v => by simpa using norm_le_pi_norm v k
 
-theorem norm_iteratedFDeriv_inv (c : ℕ) (w : ℂ) (hw : w ≠ 0) :
-    ‖iteratedFDeriv ℂ c (Inv.inv : ℂ → ℂ) w‖ = c.factorial * (‖w‖⁻¹ * ‖w‖⁻¹ ^ c) := by
+theorem norm_iteratedFDeriv_inv (c : ℕ) (w : ℂ) (hw : w ≠ 0)
+    : ‖iteratedFDeriv ℂ c (Inv.inv : ℂ → ℂ) w‖ = c.factorial * (‖w‖⁻¹ * ‖w‖⁻¹ ^ c) := by
   rw [norm_iteratedFDeriv_eq_norm_iteratedDeriv, iteratedDeriv_eq_iterate, iter_deriv_inv,
     zpow_sub₀ hw, _root_.zpow_neg_one, zpow_natCast]
   simp [div_eq_mul_inv]
 
-theorem a_norm_inv {n : ℕ} (c : ℕ) (k : Fin n) (x : Fin n → ℂ) (hx : x k ≠ 0) :
-    ‖iteratedFDeriv ℂ c (fun y : Fin n → ℂ => (y k)⁻¹) x‖ ≤ c.factorial * (‖x k‖⁻¹ * ‖x k‖⁻¹ ^ c) := by
+theorem a_norm_inv {n : ℕ} (c : ℕ) (k : Fin n) (x : Fin n → ℂ) (hx : x k ≠ 0)
+    : ‖iteratedFDeriv ℂ c (fun y : Fin n → ℂ => (y k)⁻¹) x‖
+      ≤ c.factorial * (‖x k‖⁻¹ * ‖x k‖⁻¹ ^ c) := by
   have hs : IsOpen ({0}ᶜ : Set ℂ) := isOpen_compl_singleton
   obtain ⟨g, hg⟩ : ∃ g : (Fin n → ℂ) →L[ℂ] ℂ, g = ContinuousLinearMap.proj k := ⟨_, rfl⟩
   have hgx : g x = x k := by rw [hg]; rfl
   have hs' : IsOpen (g ⁻¹' ({0}ᶜ : Set ℂ)) := hs.preimage g.continuous
   have hmem : g x ∈ ({0}ᶜ : Set ℂ) := by rw [hgx]; simpa using hx
-  have hcd : ContDiffOn ℂ c (Inv.inv : ℂ → ℂ) {0}ᶜ :=
-    fun w hw => (contDiffAt_inv ℂ (by simpa using hw)).contDiffWithinAt
-  have h := g.iteratedFDerivWithin_comp_right hcd hs.uniqueDiffOn hs'.uniqueDiffOn (x := x) hmem
-    (i := c) le_rfl
+  have hcd : ContDiffOn ℂ c (Inv.inv : ℂ → ℂ) {0}ᶜ := fun w hw =>
+    (contDiffAt_inv ℂ (by simpa using hw)).contDiffWithinAt
+  have h :=
+    g.iteratedFDerivWithin_comp_right hcd hs.uniqueDiffOn hs'.uniqueDiffOn (x := x) hmem (i := c)
+      le_rfl
   rw [iteratedFDerivWithin_of_isOpen c hs' hmem, iteratedFDerivWithin_of_isOpen c hs hmem] at h
   have h2 : (fun y : Fin n → ℂ => (y k)⁻¹) = Inv.inv ∘ g := by rw [hg]; rfl
   rw [h2, h]
@@ -61,26 +62,25 @@ theorem a_norm_inv {n : ℕ} (c : ℕ) (k : Fin n) (x : Fin n → ℂ) (hx : x k
     Finset.prod_le_one₀ (fun _ _ => norm_nonneg _) (fun _ _ => hg ▸ a_norm_proj_le k)
   exact mul_le_of_le_one_right (by positivity) h3
 
-theorem a_lin_zero {n : ℕ} (j : ℕ) (hj : 1 ≤ j) (x : Fin n → ℂ) :
-    iteratedFDeriv ℂ (j + 1) (fun x : Fin n → ℂ => ∑ k, x k) x = 0 := by
+theorem a_lin_zero {n : ℕ} (j : ℕ) (hj : 1 ≤ j) (x : Fin n → ℂ)
+    : iteratedFDeriv ℂ (j + 1) (fun x : Fin n → ℂ => ∑ k, x k) x = 0 := by
   obtain ⟨L, hL⟩ : ∃ L : (Fin n → ℂ) →L[ℂ] ℂ, L = ∑ k, ContinuousLinearMap.proj k := ⟨_, rfl⟩
-  have h : (fun x : Fin n → ℂ => ∑ k, x k) = L := by
-    funext y; rw [hL]; simp
+  have h : (fun x : Fin n → ℂ => ∑ k, x k) = L := by funext y; rw [hL]; simp
   rw [h, iteratedFDeriv_succ_eq_comp_right]
-  have h2 : (fun y => fderiv ℂ (L : (Fin n → ℂ) → ℂ) y) = fun _ => L := by
-    funext y; exact L.fderiv
+  have h2 : (fun y => fderiv ℂ (L : (Fin n → ℂ) → ℂ) y) = fun _ => L := by funext y; exact L.fderiv
   rw [h2, Function.comp_apply, iteratedFDeriv_const_of_ne (by omega)]
   simp
 
-theorem a_contDiffAt_prod {n : ℕ} (N : WithTop ℕ∞) (x : Fin n → ℂ) (hx : ∀ k, x k ≠ 0) :
-    ContDiffAt ℂ N (fun y : Fin n → ℂ => ∏ k, (y k)⁻¹) x :=
+theorem a_contDiffAt_prod {n : ℕ} (N : WithTop ℕ∞) (x : Fin n → ℂ) (hx : ∀ k, x k ≠ 0)
+    : ContDiffAt ℂ N (fun y : Fin n → ℂ => ∏ k, (y k)⁻¹) x :=
   contDiffAt_prod fun k _ => a_contDiffAt_inv N k x (hx k)
 
 theorem a_contDiff_lin {n : ℕ} (N : WithTop ℕ∞) : ContDiff ℂ N (fun x : Fin n → ℂ => ∑ k, x k) :=
   ContDiff.sum fun k _ => contDiff_apply ℂ (fun _ => ℂ) k
 
-theorem contDiffAt_phase_function {n : ℕ} (N : WithTop ℕ∞) (D' : ℂ) (x : Fin n → ℂ) (hx : ∀ k, x k ≠ 0) :
-    ContDiffAt ℂ N (g0 D') x := by
+theorem contDiffAt_phase_function
+    {n : ℕ} (N : WithTop ℕ∞) (D' : ℂ) (x : Fin n → ℂ) (hx : ∀ k, x k ≠ 0)
+    : ContDiffAt ℂ N (g0 D') x := by
   rw [phase_function_eq_sum_add_prod_inv]
   exact (a_contDiff_lin N).contDiffAt.add ((a_contDiffAt_prod N x hx).const_smul D')
 
@@ -88,18 +88,18 @@ noncomputable def a_cst (n N : ℕ) : ℝ :=
   ∑ p ∈ (univ : Finset (Fin n)).sym N, ((p : Multiset (Fin n)).countPerms : ℝ) *
     ∏ k, ((Multiset.count k (p : Multiset (Fin n))).factorial : ℝ)
 
-theorem a_cst_nonneg (n N : ℕ) : 0 ≤ a_cst n N :=
-  Finset.sum_nonneg fun _ _ => by positivity
+theorem a_cst_nonneg (n N : ℕ) : 0 ≤ a_cst n N := Finset.sum_nonneg fun _ _ => by positivity
 
-theorem a_prod_bound {n : ℕ} (N : ℕ) (x : Fin n → ℂ) (hx : ∀ k, x k ≠ 0) (b : ℝ)
-    (hb : ∀ k, ‖x k‖⁻¹ ≤ b) :
-    ‖iteratedFDeriv ℂ N (fun y : Fin n → ℂ => ∏ k, (y k)⁻¹) x‖ ≤
-      a_cst n N * ((∏ k, ‖x k‖⁻¹) * b ^ N) := by
+theorem a_prod_bound
+    {n : ℕ} (N : ℕ) (x : Fin n → ℂ) (hx : ∀ k, x k ≠ 0) (b : ℝ) (hb : ∀ k, ‖x k‖⁻¹ ≤ b)
+    : ‖iteratedFDeriv ℂ N (fun y : Fin n → ℂ => ∏ k, (y k)⁻¹) x‖
+      ≤ a_cst n N * ((∏ k, ‖x k‖⁻¹) * b ^ N) := by
   have hS := a_isOpen n
   have hxS : x ∈ {x : Fin n → ℂ | ∀ k, x k ≠ 0} := hx
   rw [← iteratedFDerivWithin_of_isOpen N hS hxS]
-  have hcd : ∀ k ∈ (univ : Finset (Fin n)),
-      ContDiffOn ℂ N (fun y : Fin n → ℂ => (y k)⁻¹) {x : Fin n → ℂ | ∀ k, x k ≠ 0} :=
+  have hcd
+      : ∀ k ∈ (univ : Finset (Fin n)),
+        ContDiffOn ℂ N (fun y : Fin n → ℂ => (y k)⁻¹) {x : Fin n → ℂ | ∀ k, x k ≠ 0} :=
     fun k _ y hy => (a_contDiffAt_inv N k y (hy k)).contDiffWithinAt
   refine (norm_iteratedFDerivWithin_prod_le hcd hS.uniqueDiffOn hxS le_rfl).trans ?_
   rw [a_cst, Finset.sum_mul]
@@ -109,28 +109,30 @@ theorem a_prod_bound {n : ℕ} (N : ℕ) (x : Fin n → ℂ) (hx : ∀ k, x k �
   have hcard : ∑ k, Multiset.count k (p : Multiset (Fin n)) = N := by
     rw [Multiset.sum_count_eq_card (fun a _ => Finset.mem_univ a)]
     exact p.2
-  calc ∏ k, ‖iteratedFDerivWithin ℂ (Multiset.count k (p : Multiset (Fin n)))
-          (fun y : Fin n → ℂ => (y k)⁻¹) {x : Fin n → ℂ | ∀ k, x k ≠ 0} x‖
-      ≤ ∏ k, (((Multiset.count k (p : Multiset (Fin n))).factorial : ℝ) *
-          (‖x k‖⁻¹ * b ^ (Multiset.count k (p : Multiset (Fin n))))) := by
-        refine Finset.prod_le_prod₀ (fun _ _ => norm_nonneg _) fun k _ => ?_
-        rw [iteratedFDerivWithin_of_isOpen _ hS hxS]
-        refine (a_norm_inv _ k x (hx k)).trans ?_
-        gcongr
-        exact hb k
+  calc
+    ∏ k, ‖iteratedFDerivWithin ℂ (Multiset.count k (p : Multiset (Fin n)))
+       (fun y : Fin n → ℂ => (y k)⁻¹) {x : Fin n → ℂ | ∀ k, x k ≠ 0} x‖
+        ≤ ∏ k, (((Multiset.count k (p : Multiset (Fin n))).factorial : ℝ) *
+            (‖x k‖⁻¹ * b ^ (Multiset.count k (p : Multiset (Fin n))))) := by
+      refine Finset.prod_le_prod₀ (fun _ _ => norm_nonneg _) fun k _ => ?_
+      rw [iteratedFDerivWithin_of_isOpen _ hS hxS]
+      refine (a_norm_inv _ k x (hx k)).trans ?_
+      gcongr
+      exact hb k
     _ = _ := by
-        rw [Finset.prod_mul_distrib, Finset.prod_mul_distrib, Finset.prod_pow_eq_pow_sum, hcard]
+      rw [Finset.prod_mul_distrib, Finset.prod_mul_distrib, Finset.prod_pow_eq_pow_sum, hcard]
 
-theorem a_fderiv_single {n : ℕ} (D' : ℂ) (x : Fin n → ℂ) (hx : ∀ k, x k ≠ 0) (k : Fin n) :
-    fderiv ℂ (g0 D') x (Pi.single k 1) = dg0 D' x k := by
-  have hd : DifferentiableAt ℂ (g0 D') x := (contDiffAt_phase_function 1 D' x hx).differentiableAt (by norm_num)
+theorem a_fderiv_single {n : ℕ} (D' : ℂ) (x : Fin n → ℂ) (hx : ∀ k, x k ≠ 0) (k : Fin n)
+    : fderiv ℂ (g0 D') x (Pi.single k 1) = dg0 D' x k := by
+  have hd : DifferentiableAt ℂ (g0 D') x :=
+    (contDiffAt_phase_function 1 D' x hx).differentiableAt (by norm_num)
   have h1 : HasFDerivAt (g0 D') (fderiv ℂ (g0 D') x) (Function.update x k (x k)) := by
     rw [Function.update_eq_self]; exact hd.hasFDerivAt
   have h2 := h1.comp_hasDerivAt (x k) (hasDerivAt_update x k (x k))
   exact h2.unique ((phase_function_deriv n D' x hx).1 k)
 
-theorem a_fderiv_apply {n : ℕ} (D' : ℂ) (x : Fin n → ℂ) (hx : ∀ k, x k ≠ 0) (v : Fin n → ℂ) :
-    fderiv ℂ (g0 D') x v = ∑ k, v k * dg0 D' x k := by
+theorem a_fderiv_apply {n : ℕ} (D' : ℂ) (x : Fin n → ℂ) (hx : ∀ k, x k ≠ 0) (v : Fin n → ℂ)
+    : fderiv ℂ (g0 D') x v = ∑ k, v k * dg0 D' x k := by
   conv_lhs => rw [pi_eq_sum_univ v]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
@@ -157,28 +159,31 @@ theorem phase_relative_deriv : Formalism.FourierDecayAlt.G.PhaseFunctionRelative
   · refine ContinuousLinearMap.opNorm_le_bound _ (by positivity) fun v => ?_
     rw [a_fderiv_apply D' x hx]
     refine (norm_sum_le _ _).trans ?_
-    calc ∑ k, ‖v k * dg0 D' x k‖ ≤ ∑ _k : Fin (m + 1), ‖v‖ * ‖dg0 D' x‖ := by
-          refine Finset.sum_le_sum fun k _ => ?_
-          rw [norm_mul]
-          exact mul_le_mul (norm_le_pi_norm v k) (norm_le_pi_norm _ k) (norm_nonneg _) (norm_nonneg _)
+    calc
+      ∑ k, ‖v k * dg0 D' x k‖ ≤ ∑ _k : Fin (m + 1), ‖v‖ * ‖dg0 D' x‖ := by
+        refine Finset.sum_le_sum fun k _ => ?_
+        rw [norm_mul]
+        exact mul_le_mul (norm_le_pi_norm v k) (norm_le_pi_norm _ k) (norm_nonneg _) (norm_nonneg _)
       _ = ((m : ℝ) + 1) * ‖dg0 D' x‖ * ‖v‖ := by
-          simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
-          push_cast
-          ring
+        simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+        push_cast
+        ring
   · have hx : ∀ k, x k ≠ 0 := fun k h => by
       have := hxr k
       rw [h, norm_zero] at this
       linarith
-    obtain ⟨k0, -, hk0⟩ := Finset.exists_min_image (univ : Finset (Fin (m + 1))) (fun k => ‖x k‖)
-      ⟨0, Finset.mem_univ _⟩
+    obtain ⟨k0, -, hk0⟩ :=
+      Finset.exists_min_image (univ : Finset (Fin (m + 1))) (fun k => ‖x k‖) ⟨0, Finset.mem_univ _⟩
     have hpos : ∀ k, 0 < ‖x k‖ := fun k => norm_pos_iff.2 (hx k)
-    have hb : ∀ k, ‖x k‖⁻¹ ≤ ‖x k0‖⁻¹ := fun k =>
-      inv_anti₀ (hpos k0) (hk0 k (Finset.mem_univ k))
-    have h1 : iteratedFDeriv ℂ (j + 1) (g0 D') x =
-        D' • iteratedFDeriv ℂ (j + 1) (fun y : Fin (m + 1) → ℂ => ∏ k, (y k)⁻¹) x := by
+    have hb : ∀ k, ‖x k‖⁻¹ ≤ ‖x k0‖⁻¹ := fun k => inv_anti₀ (hpos k0) (hk0 k (Finset.mem_univ k))
+    have h1
+        : iteratedFDeriv ℂ (j + 1) (g0 D') x
+          = D' • iteratedFDeriv ℂ (j + 1) (fun y : Fin (m + 1) → ℂ => ∏ k, (y k)⁻¹) x := by
       have hsm : ContDiffAt ℂ ((j + 1 : ℕ) : WithTop ℕ∞)
-          (D' • fun y : Fin (m + 1) → ℂ => ∏ k, (y k)⁻¹) x := (a_contDiffAt_prod _ x hx).const_smul D'
-      rw [phase_function_eq_sum_add_prod_inv, iteratedFDeriv_add_apply (a_contDiff_lin _).contDiffAt hsm, a_lin_zero j hj, zero_add,
+          (D' • fun y : Fin (m + 1) → ℂ => ∏ k, (y k)⁻¹) x :=
+        (a_contDiffAt_prod _ x hx).const_smul D'
+      rw [phase_function_eq_sum_add_prod_inv,
+        iteratedFDeriv_add_apply (a_contDiff_lin _).contDiffAt hsm, a_lin_zero j hj, zero_add,
         iteratedFDeriv_const_smul_apply (a_contDiffAt_prod _ x hx)]
     rw [h1, norm_smul]
     have h2 := a_prod_bound (j + 1) x hx _ hb
@@ -195,15 +200,15 @@ theorem phase_relative_deriv : Formalism.FourierDecayAlt.G.PhaseFunctionRelative
       rw [inv_pow]
       exact inv_anti₀ (by positivity) (pow_le_pow_left₀ hr.le (hxr k0) j)
     have hc := a_cst_nonneg (m + 1) (j + 1)
-    calc ‖D'‖ * ‖iteratedFDeriv ℂ (j + 1) (fun y : Fin (m + 1) → ℂ => ∏ k, (y k)⁻¹) x‖
-        ≤ ‖D'‖ * (a_cst (m + 1) (j + 1) * ((∏ k, ‖x k‖⁻¹) * ‖x k0‖⁻¹ ^ (j + 1))) :=
-          mul_le_mul_of_nonneg_left h2 (norm_nonneg _)
+    calc
+      ‖D'‖ * ‖iteratedFDeriv ℂ (j + 1) (fun y : Fin (m + 1) → ℂ => ∏ k, (y k)⁻¹) x‖
+          ≤ ‖D'‖ * (a_cst (m + 1) (j + 1) * ((∏ k, ‖x k‖⁻¹) * ‖x k0‖⁻¹ ^ (j + 1))) :=
+        mul_le_mul_of_nonneg_left h2 (norm_nonneg _)
       _ = a_cst (m + 1) (j + 1) * (‖D'‖ * ((∏ k, ‖x k‖⁻¹) * ‖x k0‖⁻¹)) * ‖x k0‖⁻¹ ^ j := by ring
       _ ≤ a_cst (m + 1) (j + 1) * (1 + ‖dg0 D' x‖) * (r ^ j)⁻¹ := by
-          have h5 : 0 ≤ ‖D'‖ * ((∏ k, ‖x k‖⁻¹) * ‖x k0‖⁻¹) := by positivity
-          have h6 : 0 ≤ ‖x k0‖⁻¹ ^ j := by positivity
-          exact mul_le_mul (mul_le_mul_of_nonneg_left h3 hc) h4 h6
-            (mul_nonneg hc (h5.trans h3))
+        have h5 : 0 ≤ ‖D'‖ * ((∏ k, ‖x k‖⁻¹) * ‖x k0‖⁻¹) := by positivity
+        have h6 : 0 ≤ ‖x k0‖⁻¹ ^ j := by positivity
+        exact mul_le_mul (mul_le_mul_of_nonneg_left h3 hc) h4 h6 (mul_nonneg hc (h5.trans h3))
 
 end Formalism.FourierDecayAlt.P
 
@@ -228,8 +233,8 @@ theorem b_pow_sub_one (ω : ℂ) (hω : ‖ω‖ = 1) (i : ℕ) : ‖ω ^ i - 1�
     push_cast
     linarith
 
-theorem b_root_sep (s : ℕ) (hs : 0 < s) (z z' : ℂ) (hz : z ≠ 0) (h : z' ^ s = z ^ s) (hne : z' ≠ z) :
-    ‖z‖ ≤ s * ‖z' - z‖ := by
+theorem b_root_sep (s : ℕ) (hs : 0 < s) (z z' : ℂ) (hz : z ≠ 0) (h : z' ^ s = z ^ s) (hne : z' ≠ z)
+    : ‖z‖ ≤ s * ‖z' - z‖ := by
   obtain ⟨ω, hω⟩ : ∃ ω, ω = z' / z := ⟨_, rfl⟩
   have hz' : z' = ω * z := by rw [hω]; field_simp
   have hzs : z ^ s ≠ 0 := pow_ne_zero _ hz
@@ -245,11 +250,13 @@ theorem b_root_sep (s : ℕ) (hs : 0 < s) (z z' : ℂ) (hz : z ≠ 0) (h : z' ^ 
     have := mul_geom_sum ω s
     rw [hω1, sub_self] at this
     exact (mul_eq_zero.1 this).resolve_left hωne
-  have h1 : (s : ℂ) = -∑ i ∈ range s, (ω ^ i - 1) := by
+  have h1 : (s : ℂ) = - ∑ i ∈ range s, (ω ^ i - 1) := by
     rw [Finset.sum_sub_distrib, hsum]
     simp
   have h2 : (s : ℝ) ≤ ∑ i ∈ range s, (s : ℝ) * ‖ω - 1‖ := by
-    calc (s : ℝ) = ‖(s : ℂ)‖ := by simp
+    calc
+      (s : ℝ)
+        = ‖(s : ℂ)‖ := by simp
       _ = ‖∑ i ∈ range s, (ω ^ i - 1)‖ := by rw [h1, norm_neg]
       _ ≤ ∑ i ∈ range s, ‖ω ^ i - 1‖ := norm_sum_le _ _
       _ ≤ ∑ i ∈ range s, (s : ℝ) * ‖ω - 1‖ := by
@@ -266,27 +273,32 @@ theorem b_root_sep (s : ℕ) (hs : 0 < s) (z z' : ℂ) (hz : z ≠ 0) (h : z' ^ 
   rw [h4, norm_mul, ← mul_assoc]
   exact le_mul_of_one_le_left (norm_nonneg _) h3
 
-theorem b_differentiableAt {n : ℕ} (D' : ℂ) (x : Fin n → ℂ) (hx : ∀ k, x k ≠ 0) :
-    DifferentiableAt ℂ (g0 D') x := by
+theorem b_differentiableAt {n : ℕ} (D' : ℂ) (x : Fin n → ℂ) (hx : ∀ k, x k ≠ 0)
+    : DifferentiableAt ℂ (g0 D') x := by
   have hP : (∏ k, x k) ≠ 0 := Finset.prod_ne_zero_iff.mpr fun k _ => hx k
   unfold g0
   fun_prop (disch := assumption)
 
-theorem b_near (m : ℕ) (δ : ℝ) (hδ : 0 < δ) (z : ℂ) (hz : 100 * ((m : ℝ) + 2) * δ ≤ ‖z‖)
-    (x : Fin (m + 1) → ℂ) (hx : ∀ k, ‖x k - z‖ ≤ 2 * δ) (hx0 : ∀ k, x k ≠ 0) (k : Fin (m + 1)) :
-    ‖x k - z‖ ≤ 6 * ‖z‖ * ‖dg0 (z ^ (m + 2)) x‖ := by
+theorem b_near
+    (m : ℕ)
+    (δ : ℝ) (hδ : 0 < δ)
+    (z : ℂ) (hz : 100 * ((m : ℝ) + 2) * δ ≤ ‖z‖)
+    (x : Fin (m + 1) → ℂ) (hx : ∀ k, ‖x k - z‖ ≤ 2 * δ) (hx0 : ∀ k, x k ≠ 0)
+    (k : Fin (m + 1))
+    : ‖x k - z‖ ≤ 6 * ‖z‖ * ‖dg0 (z ^ (m + 2)) x‖ := by
   have hm0 : (0 : ℝ) ≤ m := Nat.cast_nonneg m
   have hs : (0 : ℝ) < (m : ℝ) + 2 := by linarith
   have hzpos : 0 < ‖z‖ := lt_of_lt_of_le (by positivity) hz
   have hz0 : z ≠ 0 := norm_pos_iff.1 hzpos
   have hD : z ^ (m + 2) ≠ 0 := pow_ne_zero _ hz0
-  have hδz : 2 * δ ≤ ‖z‖ / (50 * ((m : ℝ) + 2)) := by
-    rw [le_div_iff₀ (by positivity)]; linarith
+  have hδz : 2 * δ ≤ ‖z‖ / (50 * ((m : ℝ) + 2)) := by rw [le_div_iff₀ (by positivity)]; linarith
   obtain ⟨η₀, hη₀⟩ : ∃ η₀, η₀ = ‖dg0 (z ^ (m + 2)) x‖ := ⟨_, rfl⟩
   rw [← hη₀]
   have hη₀0 : 0 ≤ η₀ := hη₀ ▸ norm_nonneg _
   rcases le_or_gt (1 / (16 * ((m : ℝ) + 2))) η₀ with hbig | hsmall
-  · calc ‖x k - z‖ ≤ ‖z‖ / (50 * ((m : ℝ) + 2)) := (hx k).trans hδz
+  · calc
+      ‖x k - z‖
+        ≤ ‖z‖ / (50 * ((m : ℝ) + 2)) := (hx k).trans hδz
       _ ≤ 6 * ‖z‖ * (1 / (16 * ((m : ℝ) + 2))) := by
         rw [div_le_iff₀ (by positivity)]
         field_simp
@@ -305,8 +317,9 @@ theorem b_near (m : ℕ) (δ : ℝ) (hδ : 0 < δ) (z : ℂ) (hz : 100 * ((m : �
       refine h8.trans ?_
       apply one_div_le_one_div_of_le (by positivity)
       linarith
-    obtain ⟨z', hz', hxz'⟩ := G1.gradSmall6 m _ hD x hx0 (η₀ + d) (by linarith) h4
-      (fun k => lt_of_le_of_lt (hη₀ ▸ norm_le_pi_norm _ k) (by linarith))
+    obtain ⟨z', hz', hxz'⟩ :=
+      G1.gradSmall6 m _ hD x hx0 (η₀ + d) (by linarith) h4
+        (fun k => lt_of_le_of_lt (hη₀ ▸ norm_le_pi_norm _ k) (by linarith))
     have hnz' : ‖z'‖ = ‖z‖ := by
       have : ‖z'‖ ^ (m + 2) = ‖z‖ ^ (m + 2) := by rw [← norm_pow, hz', norm_pow]
       exact (pow_left_inj₀ (norm_nonneg _) (norm_nonneg _) (by omega)).1 this
@@ -315,14 +328,16 @@ theorem b_near (m : ℕ) (δ : ℝ) (hδ : 0 < δ) (z : ℂ) (hz : 100 * ((m : �
       have hsep := b_root_sep (m + 2) (by omega) z z' hz0 hz' hne
       have h5 : ‖z' - z‖ ≤ ‖x k - z‖ + ‖x k - z'‖ := by
         have : z' - z = (x k - z) - (x k - z') := by ring
-        rw [this]; exact norm_sub_le _ _
+        rw [this]
+        exact norm_sub_le _ _
       have h6 := hxz' k
       rw [hnz'] at h6
       have h7 : 6 * (η₀ + d) * ‖z‖ ≤ 6 * (1 / (8 * ((m : ℝ) + 2))) * ‖z‖ := by gcongr
       have h9 : ‖z' - z‖ ≤ ‖z‖ / (50 * ((m : ℝ) + 2)) + 6 * (1 / (8 * ((m : ℝ) + 2))) * ‖z‖ := by
         linarith [hx k]
-      have h10 : ((m + 2 : ℕ) : ℝ) * (‖z‖ / (50 * ((m : ℝ) + 2)) + 6 * (1 / (8 * ((m : ℝ) + 2))) * ‖z‖)
-          = (77 / 100) * ‖z‖ := by
+      have h10
+          : ((m + 2 : ℕ) : ℝ) * (‖z‖ / (50 * ((m : ℝ) + 2)) + 6 * (1 / (8 * ((m : ℝ) + 2))) * ‖z‖)
+            = (77 / 100) * ‖z‖ := by
         push_cast
         field_simp
         norm_num
@@ -352,28 +367,36 @@ theorem phase_near_critical : Formalism.FourierDecayAlt.G.PhaseFunctionNearCriti
   have hzpos : 0 < ‖z‖ := lt_of_lt_of_le (by positivity) hz
   have hzR' : ‖z‖ ≤ |Rz| := hzR.trans (le_abs_self _)
   have hδz : 4 * δ ≤ ‖z‖ / 2 := by nlinarith
-  have hball : ∀ x ∈ Metric.ball (fun _ : Fin (m + 1) => z) (2 * (2 * δ)), ∀ k,
-      ‖z‖ / 2 ≤ ‖x k‖ ∧ ‖x k‖ ≤ 2 * ‖z‖ := by
+  have hball
+      : ∀ x ∈ Metric.ball (fun _ : Fin (m + 1) => z) (2 * (2 * δ)), ∀ k,
+        ‖z‖ / 2 ≤ ‖x k‖ ∧ ‖x k‖ ≤ 2 * ‖z‖ := by
     intro x hx k
     rw [mem_ball_iff_norm] at hx
     have h1 : ‖x k - z‖ ≤ ‖x - fun _ => z‖ := norm_le_pi_norm (x - fun _ => z) k
     have h2 : ‖z‖ - ‖x k - z‖ ≤ ‖x k‖ := by
       have : ‖z‖ ≤ ‖x k‖ + ‖x k - z‖ := by
         have e : z = x k - (x k - z) := by ring
-        calc ‖z‖ = ‖x k - (x k - z)‖ := by rw [← e]
+        calc
+          ‖z‖
+            = ‖x k - (x k - z)‖ := by rw [← e]
           _ ≤ _ := norm_sub_le _ _
       linarith
     have h3 : ‖x k‖ ≤ ‖z‖ + ‖x k - z‖ := by
       have e : x k = z + (x k - z) := by ring
-      calc ‖x k‖ = ‖z + (x k - z)‖ := by rw [← e]
+      calc
+        ‖x k‖
+          = ‖z + (x k - z)‖ := by rw [← e]
         _ ≤ _ := norm_add_le _ _
     constructor <;> linarith
   have hne : ∀ x ∈ Metric.ball (fun _ : Fin (m + 1) => z) (2 * (2 * δ)), ∀ k, x k ≠ 0 := by
     intro x hx k
     have := (hball x hx k).1
     exact norm_pos_iff.1 (by linarith)
-  refine ⟨fun x hx => ⟨hne x hx, ?_⟩, fun x hx => (PhaseFunctionDerivatives.b_differentiableAt _ x (hne x hx)).differentiableWithinAt,
-    ?_⟩
+  refine ⟨
+    fun x hx => ⟨hne x hx, ?_⟩,
+    fun x hx => (PhaseFunctionDerivatives.b_differentiableAt _ x (hne x hx)).differentiableWithinAt,
+    ?_
+  ⟩
   · unfold g0
     have h1 : ‖∑ k, x k‖ ≤ 2 * ((m : ℝ) + 1) * ‖z‖ := by
       refine (norm_sum_le _ _).trans ?_
@@ -382,17 +405,24 @@ theorem phase_near_critical : Formalism.FourierDecayAlt.G.PhaseFunctionNearCriti
       linarith
     have h2 : (‖z‖ / 2) ^ (m + 1) ≤ ‖∏ k, x k‖ := by
       rw [norm_prod]
-      have := Finset.prod_le_prod₀ (s := Finset.univ) (f := fun _ : Fin (m + 1) => ‖z‖ / 2)
-        (g := fun k => ‖x k‖) (fun _ _ => by positivity) (fun k _ => (hball x hx k).1)
+      have :=
+        Finset.prod_le_prod₀ (s := Finset.univ)
+          (f := fun _ : Fin (m + 1) => ‖z‖ / 2)
+          (g := fun k => ‖x k‖)
+          (fun _ _ => by positivity)
+          (fun k _ => (hball x hx k).1)
       rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin] at this
       exact this
     have h3 : ‖z ^ (m + 2) / ∏ k, x k‖ ≤ 2 ^ (m + 1) * ‖z‖ := by
       rw [norm_div, norm_pow, div_le_iff₀ (lt_of_lt_of_le (by positivity) h2)]
-      calc ‖z‖ ^ (m + 2) = 2 ^ (m + 1) * ‖z‖ * (‖z‖ / 2) ^ (m + 1) := by
-            rw [div_pow]; field_simp; ring
+      calc
+        ‖z‖ ^ (m + 2)
+          = 2 ^ (m + 1) * ‖z‖ * (‖z‖ / 2) ^ (m + 1) := by rw [div_pow]; field_simp; ring
         _ ≤ _ := by gcongr
     refine (norm_add_le _ _).trans ?_
-    have h4 : (2 * ((m : ℝ) + 1) + 2 ^ (m + 1) + 6) * ‖z‖ ≤ (2 * ((m : ℝ) + 1) + 2 ^ (m + 1) + 6) * |Rz| := by
+    have h4
+        : (2 * ((m : ℝ) + 1) + 2 ^ (m + 1) + 6) * ‖z‖
+          ≤ (2 * ((m : ℝ) + 1) + 2 ^ (m + 1) + 6) * |Rz| := by
       gcongr
     nlinarith
   · intro x hx
@@ -421,8 +451,8 @@ namespace Formalism.FourierDecayAlt.P.PhaseFunctionDerivatives
 
 open Formalism.FourierDecayAlt.G
 
-theorem c_le (a : ℝ) (ha : 0 ≤ a) (E' : ℕ) (d A : ℝ) (hd : 0 ≤ d) (hA : (E' : ℝ) + d + 1 ≤ A) :
-    (1 + a) ^ E' * (max 1 a) ^ (-A) ≤ 2 ^ ((E' : ℝ) + d + 1) * (1 + a) ^ (-(d + 1)) := by
+theorem c_le (a : ℝ) (ha : 0 ≤ a) (E' : ℕ) (d A : ℝ) (hd : 0 ≤ d) (hA : (E' : ℝ) + d + 1 ≤ A)
+    : (1 + a) ^ E' * (max 1 a) ^ (-A) ≤ 2 ^ ((E' : ℝ) + d + 1) * (1 + a) ^ (-(d + 1)) := by
   have hM1 : (1 : ℝ) ≤ max 1 a := le_max_left _ _
   have h1a : (0 : ℝ) < 1 + a := by linarith
   have hM2 : (1 + a) / 2 ≤ max 1 a := by
@@ -432,45 +462,57 @@ theorem c_le (a : ℝ) (ha : 0 ≤ a) (E' : ℕ) (d A : ℝ) (hd : 0 ≤ d) (hA 
   obtain ⟨p, hp⟩ : ∃ p : ℝ, p = (E' : ℝ) + d + 1 := ⟨_, rfl⟩
   have hp0 : 0 ≤ p := by rw [hp]; positivity
   rw [← hp] at hA ⊢
-  have s1 : (max 1 a) ^ (-A) ≤ (max 1 a) ^ (-p) := Real.rpow_le_rpow_of_exponent_le hM1 (by linarith)
+  have s1 : (max 1 a) ^ (-A) ≤ (max 1 a) ^ (-p) :=
+    Real.rpow_le_rpow_of_exponent_le hM1 (by linarith)
   have s2 : (max 1 a) ^ (-p) ≤ ((1 + a) / 2) ^ (-p) :=
     Real.rpow_le_rpow_of_nonpos (by positivity) hM2 (by linarith)
   have s3 : ((1 + a) / 2) ^ (-p) = 2 ^ p * (1 + a) ^ (-p) := by
-    rw [Real.div_rpow h1a.le (by norm_num), Real.rpow_neg (by norm_num : (0 : ℝ) ≤ 2), div_inv_eq_mul, mul_comm]
+    rw [Real.div_rpow h1a.le (by norm_num), Real.rpow_neg (by norm_num : (0 : ℝ) ≤ 2),
+      div_inv_eq_mul, mul_comm]
   have s4 : (1 + a) ^ E' * (1 + a) ^ (-p) = (1 + a) ^ (-(d + 1)) := by
     rw [← Real.rpow_natCast, ← Real.rpow_add h1a]; congr 1; rw [hp]; ring
-  calc (1 + a) ^ E' * (max 1 a) ^ (-A) ≤ (1 + a) ^ E' * (2 ^ p * (1 + a) ^ (-p)) := by
-        apply mul_le_mul_of_nonneg_left _ (by positivity)
-        rw [← s3]; exact s1.trans s2
+  calc
+    (1 + a) ^ E' * (max 1 a) ^ (-A) ≤ (1 + a) ^ E' * (2 ^ p * (1 + a) ^ (-p)) := by
+      apply mul_le_mul_of_nonneg_left _ (by positivity)
+      rw [← s3]
+      exact s1.trans s2
     _ = 2 ^ p * ((1 + a) ^ E' * (1 + a) ^ (-p)) := by ring
     _ = _ := by rw [s4]
 
-theorem c_scale (a τ : ℝ) (ha : 1 ≤ a) (hτ : 1 ≤ τ) (E' : ℕ) (A : ℝ) :
-    (1 + τ * a) ^ E' * (max 1 (τ * a)) ^ (-A) ≤
-      τ ^ ((E' : ℝ) - A) * ((1 + a) ^ E' * (max 1 a) ^ (-A)) := by
+theorem c_scale (a τ : ℝ) (ha : 1 ≤ a) (hτ : 1 ≤ τ) (E' : ℕ) (A : ℝ)
+    : (1 + τ * a) ^ E' * (max 1 (τ * a)) ^ (-A)
+      ≤ τ ^ ((E' : ℝ) - A) * ((1 + a) ^ E' * (max 1 a) ^ (-A)) := by
   have hτ0 : 0 < τ := by linarith
   have ha0 : 0 < a := by linarith
   have h1 : 1 ≤ τ * a := by nlinarith
-  rw [max_eq_right h1, max_eq_right ha, Real.mul_rpow hτ0.le ha0.le, Real.rpow_sub hτ0, Real.rpow_natCast,
-    Real.rpow_neg hτ0.le]
-  have h2 : (1 + τ * a) ^ E' ≤ (τ * (1 + a)) ^ E' := pow_le_pow_left₀ (by positivity) (by nlinarith) _
+  rw [max_eq_right h1, max_eq_right ha, Real.mul_rpow hτ0.le ha0.le, Real.rpow_sub hτ0,
+    Real.rpow_natCast, Real.rpow_neg hτ0.le]
+  have h2 : (1 + τ * a) ^ E' ≤ (τ * (1 + a)) ^ E' :=
+    pow_le_pow_left₀ (by positivity) (by nlinarith) _
   rw [mul_pow] at h2
   have h3 : 0 ≤ (τ ^ A)⁻¹ * a ^ (-A) := by positivity
-  calc (1 + τ * a) ^ E' * ((τ ^ A)⁻¹ * a ^ (-A))
+  calc
+    (1 + τ * a) ^ E' * ((τ ^ A)⁻¹ * a ^ (-A))
       ≤ (τ ^ E' * (1 + a) ^ E') * ((τ ^ A)⁻¹ * a ^ (-A)) := mul_le_mul_of_nonneg_right h2 h3
     _ = _ := by rw [div_eq_mul_inv]; ring
 
-theorem c_general {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
-    [MeasurableSpace E] [BorelSpace E] (ν : Measure E) [ν.IsAddHaarMeasure] (κ : NNReal) (E' : ℕ) :
-    ∃ C : ℝ, ∀ A : ℝ, (E' : ℝ) + (Module.finrank ℝ E : ℝ) + 1 ≤ A →
-      Integrable (fun y : E => (1 + ‖y‖) ^ E' * (max 1 ‖y‖) ^ (-A)) (κ • ν) ∧
-      ∫ y : E, (1 + ‖y‖) ^ E' * (max 1 ‖y‖) ^ (-A) ∂(κ • ν) ≤ C ∧
-      ∀ τ : ℝ, 1 ≤ τ →
-        ∫ y in {y : E | τ ≤ ‖y‖}, (1 + ‖y‖) ^ E' * (max 1 ‖y‖) ^ (-A) ∂(κ • ν) ≤
-          C * τ ^ ((E' : ℝ) + (Module.finrank ℝ E : ℝ) - A) := by
+theorem c_general
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+    [BorelSpace E]
+    (ν : Measure E) [ν.IsAddHaarMeasure]
+    (κ : NNReal) (E' : ℕ)
+    : ∃ C : ℝ, ∀ A : ℝ,
+      (E' : ℝ) + (Module.finrank ℝ E : ℝ) + 1 ≤ A
+        → Integrable (fun y : E => (1 + ‖y‖) ^ E' * (max 1 ‖y‖) ^ (-A)) (κ • ν)
+          ∧ ∫ y : E, (1 + ‖y‖) ^ E' * (max 1 ‖y‖) ^ (-A) ∂(κ • ν) ≤ C
+          ∧ ∀ τ : ℝ,
+            1 ≤ τ
+              → ∫ y in {y : E | τ ≤ ‖y‖}, (1 + ‖y‖) ^ E' * (max 1 ‖y‖) ^ (-A) ∂(κ • ν)
+                ≤ C * τ ^ ((E' : ℝ) + (Module.finrank ℝ E : ℝ) - A) := by
   obtain ⟨d, hd⟩ : ∃ d : ℝ, d = (Module.finrank ℝ E : ℝ) := ⟨_, rfl⟩
   have hd0 : 0 ≤ d := hd ▸ Nat.cast_nonneg _
-  obtain ⟨G, hG⟩ : ∃ G : E → ℝ, G = fun y => 2 ^ ((E' : ℝ) + d + 1) * (1 + ‖y‖) ^ (-(d + 1)) := ⟨_, rfl⟩
+  obtain ⟨G, hG⟩ : ∃ G : E → ℝ, G = fun y => 2 ^ ((E' : ℝ) + d + 1) * (1 + ‖y‖) ^ (-(d + 1)) :=
+    ⟨_, rfl⟩
   have hGi : Integrable G ν := by
     rw [hG]; exact (integrable_one_add_norm (by rw [← hd]; linarith)).const_mul _
   have hG0 : ∀ y, 0 ≤ G y := fun y => by rw [hG]; positivity
@@ -483,23 +525,26 @@ theorem c_general {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteD
     rw [hF, hG]; exact c_le ‖y‖ (norm_nonneg _) E' d A hd0 hA
   have hFm : Measurable F := by rw [hF]; fun_prop
   have hFi : Integrable F ν :=
-    hGi.mono' hFm.aestronglyMeasurable (Filter.Eventually.of_forall fun y => by
-      rw [Real.norm_of_nonneg (hF0 y)]; exact hFG y)
+    hGi.mono' hFm.aestronglyMeasurable
+      (Filter.Eventually.of_forall fun y => by rw [Real.norm_of_nonneg (hF0 y)]; exact hFG y)
   refine ⟨hFi.smul_measure_nnreal, ?_, fun τ hτ => ?_⟩
   · rw [integral_smul_nnreal_measure, NNReal.smul_def, smul_eq_mul]
     exact mul_le_mul_of_nonneg_left (integral_mono hFi hGi hFG) κ.coe_nonneg
   · have hτ0 : 0 < τ := by linarith
     have hS : MeasurableSet {y : E | τ ≤ ‖y‖} := measurableSet_le measurable_const measurable_norm
-    rw [Measure.restrict_smul, integral_smul_nnreal_measure, NNReal.smul_def, smul_eq_mul, mul_assoc]
+    rw [Measure.restrict_smul, integral_smul_nnreal_measure, NNReal.smul_def, smul_eq_mul,
+      mul_assoc]
     apply mul_le_mul_of_nonneg_left _ κ.coe_nonneg
     rw [← integral_indicator hS]
     have key := Measure.integral_comp_smul ν ({y : E | τ ≤ ‖y‖}.indicator F) τ
     rw [abs_of_pos (by positivity), smul_eq_mul] at key
-    have key2 : ∫ y, {y : E | τ ≤ ‖y‖}.indicator F y ∂ν =
-        τ ^ Module.finrank ℝ E * ∫ w, {y : E | τ ≤ ‖y‖}.indicator F (τ • w) ∂ν := by
+    have key2
+        : ∫ y, {y : E | τ ≤ ‖y‖}.indicator F y ∂ν
+          = τ ^ Module.finrank ℝ E * ∫ w, {y : E | τ ≤ ‖y‖}.indicator F (τ • w) ∂ν := by
       rw [key]; field_simp
     have bd : ∫ w, {y : E | τ ≤ ‖y‖}.indicator F (τ • w) ∂ν ≤ ∫ w, τ ^ ((E' : ℝ) - A) * G w ∂ν := by
-      refine integral_mono_of_nonneg (Filter.Eventually.of_forall fun w => Set.indicator_nonneg (fun y _ => hF0 y) _)
+      refine integral_mono_of_nonneg
+        (Filter.Eventually.of_forall fun w => Set.indicator_nonneg (fun y _ => hF0 y) _)
         (hGi.const_mul _) (Filter.Eventually.of_forall fun w => ?_)
       have hpos : 0 ≤ τ ^ ((E' : ℝ) - A) := by positivity
       by_cases hw : τ ≤ ‖τ • w‖
@@ -515,12 +560,14 @@ theorem c_general {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteD
         exact mul_nonneg hpos (hG0 w)
     rw [integral_const_mul] at bd
     rw [key2]
-    calc τ ^ Module.finrank ℝ E * ∫ w, {y : E | τ ≤ ‖y‖}.indicator F (τ • w) ∂ν
-        ≤ τ ^ Module.finrank ℝ E * (τ ^ ((E' : ℝ) - A) * ∫ w, G w ∂ν) :=
-          mul_le_mul_of_nonneg_left bd (by positivity)
+    calc
+      τ ^ Module.finrank ℝ E * ∫ w, {y : E | τ ≤ ‖y‖}.indicator F (τ • w) ∂ν
+          ≤ τ ^ Module.finrank ℝ E * (τ ^ ((E' : ℝ) - A) * ∫ w, G w ∂ν) :=
+        mul_le_mul_of_nonneg_left bd (by positivity)
       _ = (∫ w, G w ∂ν) * τ ^ ((E' : ℝ) + d - A) := by
-          rw [← Real.rpow_natCast, ← hd, ← mul_assoc, ← Real.rpow_add hτ0, mul_comm]
-          congr 2; ring
+        rw [← Real.rpow_natCast, ← hd, ← mul_assoc, ← Real.rpow_add hτ0, mul_comm]
+        congr 2
+        ring
 
 end Formalism.FourierDecayAlt.P.PhaseFunctionDerivatives
 
@@ -534,8 +581,9 @@ theorem majorant_y : Formalism.FourierDecayAlt.G.MajorantY := by
     rw [G7.finrank_pi, (dimension_count (m + 2)).1]
     push_cast [Nat.add_sub_cancel]
     simp
-  have h := PhaseFunctionDerivatives.c_general (volume : Measure (UT (m + 2) → ℂ))
-    ((Real.toNNReal (‖β‖ / (2 * Real.pi))) ^ Fintype.card (UT (m + 2))) E'
+  have h :=
+    PhaseFunctionDerivatives.c_general (volume : Measure (UT (m + 2) → ℂ))
+      ((Real.toNNReal (‖β‖ / (2 * Real.pi))) ^ Fintype.card (UT (m + 2))) E'
   rw [hfr, ← G7.muPi_eq] at h
   exact h
 
@@ -551,20 +599,22 @@ namespace Formalism.FourierDecayAlt.P.PhaseFunctionDerivatives
 
 open Formalism.FourierDecayAlt.G
 
-theorem d_continuous_tri (m : ℕ) (x : Fin (m + 1) → ℂ) :
-    Continuous (fun y : UT (m + 2) → ℂ => triXY x y) := by
+theorem d_continuous_tri (m : ℕ) (x : Fin (m + 1) → ℂ)
+    : Continuous (fun y : UT (m + 2) → ℂ => triXY x y) := by
   unfold triXY
   exact continuous_const.add (G7.continuous_strictUpper _)
 
-theorem d_continuous_red (m : ℕ) (x : Fin (m + 1) → ℂ) :
-    Continuous (fun y : UT (m + 2) → ℂ => redOf m (x, y)) := by
+theorem d_continuous_red (m : ℕ) (x : Fin (m + 1) → ℂ)
+    : Continuous (fun y : UT (m + 2) → ℂ => redOf m (x, y)) := by
   have h : ∀ i j, Continuous (fun y : UT (m + 2) → ℂ => triXY x y i j) := fun i j =>
     (d_continuous_tri m x).matrix_elem i j
   unfold redOf
-  exact Continuous.prodMk (h _ _) (Continuous.prodMk (continuous_pi fun k => h _ _)
-    (Continuous.prodMk (continuous_pi fun q => h _ _) (continuous_pi fun i => h _ _)))
+  exact Continuous.prodMk (h _ _)
+    (Continuous.prodMk (continuous_pi fun k => h _ _)
+      (Continuous.prodMk (continuous_pi fun q => h _ _) (continuous_pi fun i => h _ _)))
 
-noncomputable def d_M (m : ℕ) (t : ℂ) (x : Fin (m + 1) → ℂ) (q : ℂ × (UT (m + 2) → ℂ)) : Mat (m + 1 + 1) :=
+noncomputable def d_M (m : ℕ) (t : ℂ) (x : Fin (m + 1) → ℂ) (q : ℂ × (UT (m + 2) → ℂ))
+    : Mat (m + 1 + 1) :=
   Mcoord t (strictUpper (redOf m (x, q.2)).2.2.1) (redOf m (x, q.2)).2.2.2
     (Fin.cons q.1 (redOf m (x, q.2)).2.1) (redOf m (x, q.2)).1
 
@@ -587,8 +637,9 @@ theorem d_continuous_M (m : ℕ) (t : ℂ) (x : Fin (m + 1) → ℂ) : Continuou
   exact G7.continuous_blk (continuous_const.matrix_mul (continuous_const.add hX))
     (Continuous.matrix_mulVec continuous_const hB) hρ (continuous_fst.comp hred)
 
-theorem d_MXY_eq (m : ℕ) (D t : ℂ) (x : Fin (m + 1) → ℂ) (y : UT (m + 2) → ℂ) :
-    MXY m D t (x, y) = d_M m t x (rhoXY m D t (x, y), y) := rfl
+theorem d_MXY_eq (m : ℕ) (D t : ℂ) (x : Fin (m + 1) → ℂ) (y : UT (m + 2) → ℂ)
+    : MXY m D t (x, y) = d_M m t x (rhoXY m D t (x, y), y) :=
+  rfl
 
 theorem d_continuous_cutM {s : ℕ} (τ : ℝ) : Continuous (cutM (s := s) τ) := by
   unfold cutM chi0
@@ -597,10 +648,14 @@ theorem d_continuous_cutM {s : ℕ} (τ : ℝ) : Continuous (cutM (s := s) τ) :
   have h : Continuous fun Z : Mat s => Z i j := (continuous_apply j).comp (continuous_apply i)
   exact continuous_const.sub ((h.norm.pow 2).div_const _)
 
-theorem d_entries {m : ℕ} (t σ ρ₁ : ℂ) (ρ' : Fin m → ℂ) (x : UT (m + 1) → ℂ) (B : Fin (m + 1) → ℂ) (T : ℝ)
-    (hT : 0 ≤ T) (h : ∀ i j, ‖Mcoord t (strictUpper x) B (Fin.cons ρ₁ ρ') σ i j‖ ≤ T) :
-    (∀ i j, ‖strictUpper x i j‖ ≤ T) ∧ (∀ i, ‖B i‖ ≤ T) ∧ ‖ρ₁‖ ≤ T ∧ (∀ k, ‖ρ' k‖ ≤ T) ∧ ‖σ‖ ≤ T := by
-  obtain ⟨Z, hZd⟩ : ∃ Z : Mat (m + 1 + 1), Z = Mcoord t (strictUpper x) B (Fin.cons ρ₁ ρ') σ := ⟨_, rfl⟩
+theorem d_entries
+    {m : ℕ}
+    (t σ ρ₁ : ℂ) (ρ' : Fin m → ℂ) (x : UT (m + 1) → ℂ) (B : Fin (m + 1) → ℂ) (T : ℝ)
+    (hT : 0 ≤ T) (h : ∀ i j, ‖Mcoord t (strictUpper x) B (Fin.cons ρ₁ ρ') σ i j‖ ≤ T)
+    : (∀ i j, ‖strictUpper x i j‖ ≤ T) ∧ (∀ i, ‖B i‖ ≤ T) ∧ ‖ρ₁‖ ≤ T ∧ (∀ k, ‖ρ' k‖ ≤ T)
+      ∧ ‖σ‖ ≤ T := by
+  obtain ⟨Z, hZd⟩ : ∃ Z : Mat (m + 1 + 1), Z = Mcoord t (strictUpper x) B (Fin.cons ρ₁ ρ') σ :=
+    ⟨_, rfl⟩
   have hZ : ‖Z‖ ≤ T := by
     rw [pi_norm_le_iff_of_nonneg hT]
     intro i
@@ -623,8 +678,8 @@ theorem d_entries {m : ℕ} (t σ ρ₁ : ℂ) (ρ' : Fin m → ℂ) (x : UT (m 
   · have := h (Fin.last (m + 1)) (Fin.last (m + 1))
     rwa [Mcoord, G2.blk_ll] at this
 
-theorem d_cutM_entries {s : ℕ} (τ : ℝ) (hτ : 0 < τ) (Z : Mat s) (hne : cutM τ Z ≠ 0) (i j : Fin s) :
-    ‖Z i j‖ ≤ 2 * τ := by
+theorem d_cutM_entries {s : ℕ} (τ : ℝ) (hτ : 0 < τ) (Z : Mat s) (hne : cutM τ Z ≠ 0) (i j : Fin s)
+    : ‖Z i j‖ ≤ 2 * τ := by
   by_contra hlt
   push Not at hlt
   apply hne
@@ -650,8 +705,9 @@ theorem d_ampCrit_of (hC : CofLowerR) (hDet : DetMXY) : AmpCritContinuous := by
       ((continuous_fst.comp (continuous_snd.comp (continuous_snd.comp hred))).prodMk
         (continuous_snd.comp (continuous_snd.comp (continuous_snd.comp hred))))
   have hthr : 0 < c₀ * ‖t‖ ^ ε := mul_pos hc₀ (Real.rpow_pos_of_pos htn _)
-  have hvan : ∀ y : UT (m + 2) → ℂ, ‖cofXY m t (fun _ => z, y)‖ < c₀ * ‖t‖ ^ ε →
-      ampIn β m ε Φ D t (fun _ => z, y) = 0 := by
+  have hvan
+      : ∀ y : UT (m + 2) → ℂ,
+        ‖cofXY m t (fun _ => z, y)‖ < c₀ * ‖t‖ ^ ε → ampIn β m ε Φ D t (fun _ => z, y) = 0 := by
     intro y hy
     by_cases hc : cofXY m t (fun _ => z, y) = 0
     · simp [ampIn, amp, hc]
@@ -659,15 +715,22 @@ theorem d_ampCrit_of (hC : CofLowerR) (hDet : DetMXY) : AmpCritContinuous := by
         by_contra hne
         have hent := d_cutM_entries _ hτ0 _ hne
         obtain ⟨e1, e2, e3, e4, e5⟩ := d_entries t _ _ _ _ _ (2 * ‖t‖ ^ (-ε)) (by positivity) hent
-        have hc' : Cof (strictUpper (redOf m (fun _ => z, y)).2.2.1) (redOf m (fun _ => z, y)).2.2.2 t ≠ 0 := hc
-        have hrel : t ^ (m + 1) * (redOf m (fun _ => z, y)).1 =
-            D + Cof (strictUpper (redOf m (fun _ => z, y)).2.2.1) (redOf m (fun _ => z, y)).2.2.2 t *
-              rhoXY m D t (fun _ => z, y) +
-              R0 (strictUpper (redOf m (fun _ => z, y)).2.2.1) (redOf m (fun _ => z, y)).2.2.2
-                (redOf m (fun _ => z, y)).2.1 t := by
+        have hc'
+            : Cof (strictUpper (redOf m (fun _ => z, y)).2.2.1) (redOf m (fun _ => z, y)).2.2.2 t
+              ≠ 0 :=
+          hc
+        have hrel
+            : t ^ (m + 1) * (redOf m (fun _ => z, y)).1
+              = D
+                + Cof (strictUpper (redOf m (fun _ => z, y)).2.2.1) (redOf m (fun _ => z, y)).2.2.2
+                    t
+                  * rhoXY m D t (fun _ => z, y)
+                + R0 (strictUpper (redOf m (fun _ => z, y)).2.2.1) (redOf m (fun _ => z, y)).2.2.2
+                  (redOf m (fun _ => z, y)).2.1 t := by
           rw [rhoXY, rho1, mul_div_cancel₀ _ hc']
           ring
-        have := hlow ε hε hε' D hD t ht htt _ _ _ _ _ (G7.isStrictUpper_strictUpper _) e1 e2 e3 e4 e5 hrel
+        have :=
+          hlow ε hε hε' D hD t ht htt _ _ _ _ _ (G7.isStrictUpper_strictUpper _) e1 e2 e3 e4 e5 hrel
         exact absurd hy (not_lt.2 this)
       simp [ampIn, amp, cutPhi, hcut]
   rw [continuous_iff_continuousAt]
@@ -685,7 +748,8 @@ theorem d_ampCrit_of (hC : CofLowerR) (hDet : DetMXY) : AmpCritContinuous := by
         ((G7.continuous_remainder m t).comp (continuous_snd.comp hred))).continuousAt
     have hM : ContinuousAt (fun y' : UT (m + 2) → ℂ => MXY m D t (fun _ => z, y')) y := by
       simp only [d_MXY_eq]
-      exact ContinuousAt.comp (f := fun y' : UT (m + 2) → ℂ => (rhoXY m D t (fun _ => z, y'), y'))
+      exact ContinuousAt.comp
+        (f := fun y' : UT (m + 2) → ℂ => (rhoXY m D t (fun _ => z, y'), y'))
         (d_continuous_M m t (fun _ => z)).continuousAt (hrho.prodMk continuousAt_id)
     have hΦc : ContinuousAt Φ (MXY m D t (fun _ => z, y)) :=
       (hΦ _ ⟨D, hD, (hDet m D t _ hc).symm⟩).1.continuousAt
@@ -695,12 +759,14 @@ theorem d_ampCrit_of (hC : CofLowerR) (hDet : DetMXY) : AmpCritContinuous := by
     have hinv : ContinuousAt (fun y' : UT (m + 2) → ℂ => (‖cofXY m t (fun _ => z, y')‖ ^ 2)⁻¹) y :=
       ContinuousAt.inv₀ (hcof.norm.pow 2).continuousAt (by simpa using hc)
     unfold ampIn amp cutPhi
-    refine ContinuousAt.smul (ContinuousAt.mul ((G7.continuous_psi β).continuousAt.comp hg)
-      (Complex.continuous_ofReal.continuousAt.comp hinv)) (ContinuousAt.smul ?_
+    refine ContinuousAt.smul
+      (ContinuousAt.mul ((G7.continuous_psi β).continuousAt.comp hg)
+        (Complex.continuous_ofReal.continuousAt.comp hinv))
+      (ContinuousAt.smul ?_
         (ContinuousAt.comp (f := fun y' : UT (m + 2) → ℂ => MXY m D t (fun _ => z, y')) hΦc hM))
-    exact Complex.continuous_ofReal.continuousAt.comp
-      (ContinuousAt.comp (f := fun y' : UT (m + 2) → ℂ => MXY m D t (fun _ => z, y'))
-        (d_continuous_cutM _).continuousAt hM)
+    exact Complex.continuous_ofReal.continuousAt.comp (ContinuousAt.comp
+      (f := fun y' : UT (m + 2) → ℂ => MXY m D t (fun _ => z, y'))
+      (d_continuous_cutM _).continuousAt hM)
 
 end Formalism.FourierDecayAlt.P.PhaseFunctionDerivatives
 

@@ -39,15 +39,16 @@ theorem pow_add_inv_pow_mem {w : Qb} (hw : w ≠ 0) (k : ℕ) : w ^ k + w⁻¹ ^
     | succ n ih =>
       refine ⟨ih.2, ?_⟩
       have h1 : w * w⁻¹ = 1 := mul_inv_cancel₀ hw
-      have e : w ^ (n + 1 + 1) + w⁻¹ ^ (n + 1 + 1) =
-          (w + w⁻¹) * (w ^ (n + 1) + w⁻¹ ^ (n + 1)) - (w ^ n + w⁻¹ ^ n) := by
+      have e
+          : w ^ (n + 1 + 1) + w⁻¹ ^ (n + 1 + 1)
+            = (w + w⁻¹) * (w ^ (n + 1) + w⁻¹ ^ (n + 1)) - (w ^ n + w⁻¹ ^ n) := by
         linear_combination (-(w ^ n + w⁻¹ ^ n)) * h1
       rw [e]
       exact sub_mem (mul_mem (IntermediateField.mem_adjoin_simple_self ℚ _) ih.2) ih.1
   exact (key k).1
 
-theorem cycQplus_eq {N : ℕ} [NeZero N] {w : Qb} (hw : IsPrimitiveRoot w N) :
-    cycQplus N = ℚ⟮w + w⁻¹⟯ := by
+theorem cycQplus_eq {N : ℕ} [NeZero N] {w : Qb} (hw : IsPrimitiveRoot w N)
+    : cycQplus N = ℚ⟮w + w⁻¹⟯ := by
   have hw0 : w ≠ 0 := hw.ne_zero (NeZero.ne N)
   apply le_antisymm
   · show adjoin ℚ ((fun z => z + z⁻¹) '' mus N) ≤ _
@@ -58,7 +59,8 @@ theorem cycQplus_eq {N : ℕ} [NeZero N] {w : Qb} (hw : IsPrimitiveRoot w N) :
     rw [← inv_pow]
     exact pow_add_inv_pow_mem hw0 i
   · rw [IntermediateField.adjoin_simple_le_iff]
-    exact IntermediateField.subset_adjoin ℚ ((fun z : Qb => z + z⁻¹) '' mus N) ⟨w, hw.pow_eq_one, rfl⟩
+    exact IntermediateField.subset_adjoin ℚ ((fun z : Qb => z + z⁻¹) '' mus N)
+      ⟨w, hw.pow_eq_one, rfl⟩
 
 theorem cycQ_eq {N : ℕ} [NeZero N] {w : Qb} (hw : IsPrimitiveRoot w N) : cycQ N = ℚ⟮w⟯ := by
   apply le_antisymm
@@ -78,45 +80,45 @@ section Layer
 
 variable {e q d : ℕ} {L : Type} [Field L] [NumberField L] {ζ a b : L}
 
-theorem map_a_sq (h : IsLayer (e + 2) q d ζ a b) (φ : L →ₐ[ℚ] Qb) :
-    φ a ^ 2 = ((-(q : ℤ) : ℤ) : Qb) := by
+theorem map_a_sq (h : IsLayer (e + 2) q d ζ a b) (φ : L →ₐ[ℚ] Qb)
+    : φ a ^ 2 = ((-(q : ℤ) : ℤ) : Qb) := by
   rw [← map_pow, h.2.1]
   simp
 
-theorem map_b_sq (h : IsLayer (e + 2) q d ζ a b) (φ : L →ₐ[ℚ] Qb) :
-    φ b ^ 2 = ((-(d : ℤ) : ℤ) : Qb) := by
+theorem map_b_sq (h : IsLayer (e + 2) q d ζ a b) (φ : L →ₐ[ℚ] Qb)
+    : φ b ^ 2 = ((-(d : ℤ) : ℤ) : Qb) := by
   rw [← map_pow, h.2.2.1]
   simp
 
-theorem map_zeta (h : IsLayer (e + 2) q d ζ a b) (φ : L →ₐ[ℚ] Qb) :
-    IsPrimitiveRoot (φ ζ) (2 ^ (e + 2)) := h.1.map_of_injective (f := φ) (RingHom.injective φ.toRingHom)
+theorem map_zeta (h : IsLayer (e + 2) q d ζ a b) (φ : L →ₐ[ℚ] Qb)
+    : IsPrimitiveRoot (φ ζ) (2 ^ (e + 2)) :=
+  h.1.map_of_injective (f := φ) (RingHom.injective φ.toRingHom)
 
-private theorem adjoin_union_eq_sup {E : Type*} [Field E] [Algebra ℚ E] (S T : Set E) :
-    adjoin ℚ (S ∪ T) = adjoin ℚ S ⊔ adjoin ℚ T :=
+private theorem adjoin_union_eq_sup {E : Type*} [Field E] [Algebra ℚ E] (S T : Set E)
+    : adjoin ℚ (S ∪ T) = adjoin ℚ S ⊔ adjoin ℚ T :=
   IntermediateField.gc.l_sup
 
-theorem map_hostE (h : IsLayer (e + 2) q d ζ a b) (φ : L →ₐ[ℚ] Qb) :
-    (hostE ζ a b).map φ = EQ e q d := by
+theorem map_hostE (h : IsLayer (e + 2) q d ζ a b) (φ : L →ₐ[ℚ] Qb)
+    : (hostE ζ a b).map φ = EQ e q d := by
   rw [show hostE ζ a b = adjoin ℚ ({a, b} ∪ {ζ + ζ⁻¹}) from (adjoin_union_eq_sup _ _).symm,
-    IntermediateField.adjoin_map, Set.image_union, Set.image_insert_eq, Set.image_singleton, Set.image_singleton,
-    map_add, map_inv₀, adjoin_union_eq_sup, adjoin_pair_eq_sup]
+    IntermediateField.adjoin_map, Set.image_union, Set.image_insert_eq, Set.image_singleton,
+    Set.image_singleton, map_add, map_inv₀, adjoin_union_eq_sup, adjoin_pair_eq_sup]
   show _ = sqQ (-(q : ℤ)) ⊔ sqQ (-(d : ℤ)) ⊔ cycQplus (2 ^ (e + 2))
   rw [sqQ_eq (map_a_sq h φ), sqQ_eq (map_b_sq h φ), cycQplus_eq (map_zeta h φ)]
 
-theorem exists_layer_emb (f : hostE ζ a b →ₐ[ℚ] Qb) :
-    ∃ φ : L →ₐ[ℚ] Qb, ∀ x : hostE ζ a b, φ (x : L) = f x := by
+theorem exists_layer_emb (f : hostE ζ a b →ₐ[ℚ] Qb)
+    : ∃ φ : L →ₐ[ℚ] Qb, ∀ x : hostE ζ a b, φ (x : L) = f x := by
   letI : Algebra (hostE ζ a b) Qb := f.toRingHom.toAlgebra
   haveI : FiniteDimensional (hostE ζ a b) L := FiniteDimensional.right ℚ (hostE ζ a b) L
   haveI : Algebra.IsAlgebraic (hostE ζ a b) L := Algebra.IsAlgebraic.of_finite (hostE ζ a b) L
   let ψ : L →ₐ[hostE ζ a b] Qb := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   exact ⟨ψ.toRingHom.toRatAlgHom, fun x => ψ.commutes x⟩
 
-theorem range_hostE (h : IsLayer (e + 2) q d ζ a b) (f : hostE ζ a b →ₐ[ℚ] Qb) :
-    f.fieldRange = EQ e q d := by
+theorem range_hostE (h : IsLayer (e + 2) q d ζ a b) (f : hostE ζ a b →ₐ[ℚ] Qb)
+    : f.fieldRange = EQ e q d := by
   obtain ⟨φ, hφ⟩ := exists_layer_emb f
   rw [← map_hostE h φ]
   ext y
@@ -127,17 +129,19 @@ theorem range_hostE (h : IsLayer (e + 2) q d ζ a b) (f : hostE ζ a b →ₐ[�
   · rintro ⟨x, hx, rfl⟩
     exact ⟨⟨x, hx⟩, (hφ ⟨x, hx⟩).symm⟩
 
-theorem mem_EQ (h : IsLayer (e + 2) q d ζ a b) (f : hostE ζ a b →ₐ[ℚ] Qb) (x : hostE ζ a b) :
-    f x ∈ EQ e q d := by
+theorem mem_EQ (h : IsLayer (e + 2) q d ζ a b) (f : hostE ζ a b →ₐ[ℚ] Qb) (x : hostE ζ a b)
+    : f x ∈ EQ e q d := by
   rw [← range_hostE h f]
   exact AlgHom.mem_fieldRange.mpr ⟨x, rfl⟩
 
 def jOf (h : IsLayer (e + 2) q d ζ a b) (f : hostE ζ a b →ₐ[ℚ] Qb) : hostE ζ a b ≃ₐ[ℚ] EQ e q d :=
-  AlgEquiv.ofBijective (f.codRestrict (EQ e q d).toSubalgebra (mem_EQ h f))
-    ⟨fun x y hxy => f.toRingHom.injective (congrArg Subtype.val hxy), fun y => by
+  AlgEquiv.ofBijective (f.codRestrict (EQ e q d).toSubalgebra (mem_EQ h f)) ⟨
+    fun x y hxy => f.toRingHom.injective (congrArg Subtype.val hxy),
+    fun y => by
       have hy : (y : Qb) ∈ f.fieldRange := by rw [range_hostE h f]; exact y.2
       obtain ⟨x, hx⟩ := hy
-      exact ⟨x, Subtype.ext hx⟩⟩
+      exact ⟨x, Subtype.ext hx⟩
+  ⟩
 
 end Layer
 

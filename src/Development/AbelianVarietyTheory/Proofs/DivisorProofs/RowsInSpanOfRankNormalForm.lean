@@ -12,16 +12,18 @@ open ValuativeRel Matrix
 
 namespace GlobalTheory
 
-theorem rows_mem_span_of_isUnit_mul (K : Type) [Field K] (A D : Type) [Fintype A] [DecidableEq A]
-    [Fintype D] [DecidableEq D] (r : ℕ) (X : Matrix A D K) (H : Matrix (Fin r) A K)
-    (Q : Matrix D (Fin r) K) (hX : X.rank ≤ r) (hU : IsUnit (H * X * Q)) :
-    ∀ i, ∃ s : Fin r → K, X i = s ᵥ* (H * X) := by
+theorem rows_mem_span_of_isUnit_mul
+    (K : Type) [Field K]
+    (A D : Type) [Fintype A] [DecidableEq A] [Fintype D] [DecidableEq D]
+    (r : ℕ)
+    (X : Matrix A D K) (H : Matrix (Fin r) A K) (Q : Matrix D (Fin r) K)
+    (hX : X.rank ≤ r) (hU : IsUnit (H * X * Q))
+    : ∀ i, ∃ s : Fin r → K, X i = s ᵥ* (H * X) := by
   intro i
   have hle : Submodule.span K (Set.range (H * X)) ≤ Submodule.span K (Set.range X) := by
     rw [Submodule.span_le]
     rintro _ ⟨j, rfl⟩
-    have : (H * X) j = ∑ a, H j a • X a := by
-      ext d; simp [Matrix.mul_apply, Finset.sum_apply]
+    have : (H * X) j = ∑ a, H j a • X a := by ext d; simp [Matrix.mul_apply, Finset.sum_apply]
     rw [this]
     exact Submodule.sum_mem _ fun a _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, rfl⟩)
   have h1 : r ≤ (H * X).rank := by

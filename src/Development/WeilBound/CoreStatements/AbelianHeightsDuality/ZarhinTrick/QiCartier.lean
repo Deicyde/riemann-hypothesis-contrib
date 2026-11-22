@@ -17,12 +17,13 @@ variable {K H : Type} [Field K] [CommRing H] [Algebra K H]
 
 theorem qc_stable [FiniteDimensional K H] (I : Ideal H) : ∃ k : ℕ, ∀ j, k ≤ j → I ^ j = I ^ k := by
   haveI : IsArtinianRing H := IsArtinianRing.of_finite K H
-  let f : ℕ →o (Ideal H)ᵒᵈ := ⟨fun n => OrderDual.toDual (I ^ n), fun _ _ hab => Ideal.pow_le_pow_right hab⟩
+  let f : ℕ →o (Ideal H)ᵒᵈ :=
+    ⟨fun n => OrderDual.toDual (I ^ n), fun _ _ hab => Ideal.pow_le_pow_right hab⟩
   obtain ⟨n, hn⟩ := IsArtinian.monotone_stabilizes f
   exact ⟨n, fun j hj => congrArg OrderDual.ofDual (hn j hj).symm⟩
 
-theorem qc_functional (ε : H →ₐ[K] K) {x : H} (hx : x ∈ RingHom.ker ε) (hx2 : x ∉ RingHom.ker ε ^ 2) :
-    ∃ l : H →ₗ[K] K, l 1 = 0 ∧ (∀ y ∈ RingHom.ker ε ^ 2, l y = 0) ∧ l x = 1 := by
+theorem qc_functional (ε : H →ₐ[K] K) {x : H} (hx : x ∈ RingHom.ker ε) (hx2 : x ∉ RingHom.ker ε ^ 2)
+    : ∃ l : H →ₗ[K] K, l 1 = 0 ∧ (∀ y ∈ RingHom.ker ε ^ 2, l y = 0) ∧ l x = 1 := by
   let W : Submodule K H := Submodule.span K {(1 : H)} ⊔ (RingHom.ker ε ^ 2).restrictScalars K
   have hxW : x ∉ W := by
     intro h
@@ -50,32 +51,38 @@ theorem qc_functional (ε : H →ₐ[K] K) {x : H} (hx : x ∈ RingHom.ker ε) (
     simp [hW y (Submodule.mem_sup_right hy)]
   · simp [hf]
 
-theorem qc_leib (ε : H →ₐ[K] K) (l : H →ₗ[K] K) (h1 : l 1 = 0) (h2 : ∀ y ∈ RingHom.ker ε ^ 2, l y = 0)
-    (a b : H) : l (a * b) = ε a * l b + l a * ε b := by
+theorem qc_leib
+    (ε : H →ₐ[K] K) (l : H →ₗ[K] K) (h1 : l 1 = 0) (h2 : ∀ y ∈ RingHom.ker ε ^ 2, l y = 0) (a b : H)
+    : l (a * b) = ε a * l b + l a * ε b := by
   have ha : a - algebraMap K H (ε a) ∈ RingHom.ker ε := by simp [RingHom.mem_ker]
   have hb : b - algebraMap K H (ε b) ∈ RingHom.ker ε := by simp [RingHom.mem_ker]
   have hab : l ((a - algebraMap K H (ε a)) * (b - algebraMap K H (ε b))) = 0 :=
     h2 _ (by rw [pow_two]; exact Ideal.mul_mem_mul ha hb)
-  have e : a * b = (a - algebraMap K H (ε a)) * (b - algebraMap K H (ε b)) + ε a • b + ε b • a -
-      (ε a * ε b) • (1 : H) := by
+  have e
+      : a * b
+        = (a - algebraMap K H (ε a)) * (b - algebraMap K H (ε b)) + ε a • b + ε b • a
+          - (ε a * ε b) • (1 : H) := by
     simp only [Algebra.smul_def, map_mul, mul_one]
     ring
   rw [e, map_sub, map_add (f := _), map_add (f := _), hab, map_smul, map_smul, map_smul, h1]
   simp only [smul_eq_mul, mul_zero, sub_zero, zero_add]
   ring
 
-theorem aug_le_sq {K H : Type} [Field K] [CharZero K] [CommRing H] [Algebra K H] [FiniteDimensional K H]
-    (Δ : H →ₐ[K] H ⊗[K] H) (ε : H →ₐ[K] K) (hL : CounitL Δ ε) (hR : CounitR Δ ε) :
-    RingHom.ker ε ≤ RingHom.ker ε ^ 2 := by
+theorem aug_le_sq
+    {K H : Type} [Field K] [CharZero K] [CommRing H] [Algebra K H] [FiniteDimensional K H]
+    (Δ : H →ₐ[K] H ⊗[K] H) (ε : H →ₐ[K] K) (hL : CounitL Δ ε) (hR : CounitR Δ ε)
+    : RingHom.ker ε ≤ RingHom.ker ε ^ 2 := by
   classical
   intro x hx
   by_contra hx2
   obtain ⟨l, hl1, hl2, hlx⟩ := qc_functional ε hx hx2
   let Φ : H ⊗[K] H →ₗ[K] H := (TensorProduct.rid K H).toLinearMap ∘ₗ LinearMap.lTensor H l
   let mR : H ⊗[K] H →ₐ[K] H :=
-    (Algebra.TensorProduct.lmul' K).comp (Algebra.TensorProduct.map (AlgHom.id K H) ((Algebra.ofId K H).comp ε))
+    (Algebra.TensorProduct.lmul' K).comp
+      (Algebra.TensorProduct.map (AlgHom.id K H) ((Algebra.ofId K H).comp ε))
   let mL : H ⊗[K] H →ₐ[K] H :=
-    (Algebra.TensorProduct.lmul' K).comp (Algebra.TensorProduct.map ((Algebra.ofId K H).comp ε) (AlgHom.id K H))
+    (Algebra.TensorProduct.lmul' K).comp
+      (Algebra.TensorProduct.map ((Algebra.ofId K H).comp ε) (AlgHom.id K H))
   have hΦ : ∀ s t : H ⊗[K] H, Φ (s * t) = mR s * Φ t + Φ s * mR t := by
     intro s t
     induction s using TensorProduct.induction_on with
@@ -84,10 +91,11 @@ theorem aug_le_sq {K H : Type} [Field K] [CharZero K] [CommRing H] [Algebra K H]
       induction t using TensorProduct.induction_on with
       | zero => simp
       | tmul b₁ b₂ =>
-        simp only [Φ, mR, Algebra.TensorProduct.tmul_mul_tmul, LinearMap.comp_apply, LinearMap.lTensor_tmul,
-          LinearEquiv.coe_coe, TensorProduct.rid_tmul, AlgHom.comp_apply, Algebra.TensorProduct.map_tmul,
-          AlgHom.coe_id, id_eq, Algebra.TensorProduct.lmul'_apply_tmul, Algebra.ofId_apply,
-          qc_leib ε l hl1 hl2, Algebra.smul_def, map_add, map_mul]
+        simp only [Φ, mR, Algebra.TensorProduct.tmul_mul_tmul, LinearMap.comp_apply,
+          LinearMap.lTensor_tmul, LinearEquiv.coe_coe, TensorProduct.rid_tmul, AlgHom.comp_apply,
+          Algebra.TensorProduct.map_tmul, AlgHom.coe_id, id_eq,
+          Algebra.TensorProduct.lmul'_apply_tmul, Algebra.ofId_apply, qc_leib ε l hl1 hl2,
+          Algebra.smul_def, map_add, map_mul]
         ring
       | add t₁ t₂ h₁ h₂ => simp only [mul_add, map_add (f := _), h₁, h₂]; ring
     | add s₁ s₂ h₁ h₂ => simp only [add_mul, map_add (f := _), h₁, h₂]; ring
@@ -96,9 +104,9 @@ theorem aug_le_sq {K H : Type} [Field K] [CharZero K] [CommRing H] [Algebra K H]
     induction t using TensorProduct.induction_on with
     | zero => simp
     | tmul a b =>
-      simp only [Φ, mL, LinearMap.comp_apply, LinearMap.lTensor_tmul, LinearEquiv.coe_coe, TensorProduct.rid_tmul,
-        AlgHom.comp_apply, Algebra.TensorProduct.map_tmul, AlgHom.coe_id, id_eq,
-        Algebra.TensorProduct.lmul'_apply_tmul, Algebra.ofId_apply, map_smul, smul_eq_mul]
+      simp only [Φ, mL, LinearMap.comp_apply, LinearMap.lTensor_tmul, LinearEquiv.coe_coe,
+        TensorProduct.rid_tmul, AlgHom.comp_apply, Algebra.TensorProduct.map_tmul, AlgHom.coe_id,
+        id_eq, Algebra.TensorProduct.lmul'_apply_tmul, Algebra.ofId_apply, map_smul, smul_eq_mul]
       rw [← Algebra.smul_def, map_smul, smul_eq_mul, mul_comm]
     | add s t h₁ h₂ => simp only [map_add (f := _), h₁, h₂]
   have hRa : ∀ a, mR (Δ a) = a := fun a => DFunLike.congr_fun hR a
@@ -148,7 +156,9 @@ theorem aug_le_sq {K H : Type} [Field K] [CharZero K] [CommRing H] [Algebra K H]
   rw [hDpow (M + 1)] at h1
   let π := Ideal.Quotient.mk (RingHom.ker ε ^ (k + 2))
   have hu1 : IsUnit (π ((((M + 1 : ℕ) : H)) + 1)) := by
-    have e : π ((((M + 1 : ℕ) : H)) + 1) = algebraMap K (H ⧸ RingHom.ker ε ^ (k + 2)) ((M + 2 : ℕ) : K) := by
+    have e
+        : π ((((M + 1 : ℕ) : H)) + 1)
+          = algebraMap K (H ⧸ RingHom.ker ε ^ (k + 2)) ((M + 2 : ℕ) : K) := by
       simp only [map_add (f := _), map_natCast, map_one]
       push_cast
       ring
@@ -162,8 +172,10 @@ theorem aug_le_sq {K H : Type} [Field K] [CharZero K] [CommRing H] [Algebra K H]
       ⟨k + 2, by rw [← map_pow, Ideal.Quotient.eq_zero_iff_mem]; exact Ideal.pow_mem_pow hm _⟩
     have := hnil.isUnit_one_add
     rwa [map_sub, map_one, add_sub_cancel] at this
-  have h0 : π ((((M + 1 : ℕ) : H) + 1) * x ^ (M + 1) * D x) = 0 := Ideal.Quotient.eq_zero_iff_mem.2 h1
-  rw [map_mul, map_mul, hu2.mul_left_eq_zero, hu1.mul_right_eq_zero, Ideal.Quotient.eq_zero_iff_mem] at h0
+  have h0 : π ((((M + 1 : ℕ) : H) + 1) * x ^ (M + 1) * D x) = 0 :=
+    Ideal.Quotient.eq_zero_iff_mem.2 h1
+  rw [map_mul, map_mul, hu2.mul_left_eq_zero, hu1.mul_right_eq_zero, Ideal.Quotient.eq_zero_iff_mem]
+    at h0
   exact hmin (M + 1) (by omega) h0
 
 end PositivityTheory.PrwZar.Qi

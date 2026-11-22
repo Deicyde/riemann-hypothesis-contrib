@@ -9,8 +9,10 @@ noncomputable section
 namespace PositivityTheory.ThKEst
 
 open scoped TensorProduct NNReal ENNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
 
 namespace ExponentialLineGeneration
 
@@ -20,8 +22,9 @@ section Banach
 
 variable {A : Type*} [NormedRing A] [NormedAlgebra ℝ A] [CompleteSpace A]
 
-theorem exists_deriv {g : ℝ → A} (hc : Continuous g) (h0 : g 0 = 1) (ha : ∀ s t, g (s + t) = g s * g t) :
-    ∃ Y : A, ∀ t, HasDerivAt g (g t * Y) t := by
+theorem exists_deriv
+    {g : ℝ → A} (hc : Continuous g) (h0 : g 0 = 1) (ha : ∀ s t, g (s + t) = g s * g t)
+    : ∃ Y : A, ∀ t, HasDerivAt g (g t * Y) t := by
   let G : ℝ → A := fun t => ∫ s in (0 : ℝ)..t, g s
   have hG : ∀ t, HasDerivAt G (g t) t := fun t => (hc.integral_hasStrictDerivAt 0 t).hasDerivAt
   have hG0 : G 0 = 0 := intervalIntegral.integral_same
@@ -39,9 +42,11 @@ theorem exists_deriv {g : ℝ → A} (hc : Continuous g) (h0 : g 0 = 1) (ha : �
     intro t
     have e1 : g t * G h = ∫ s in (0 : ℝ)..h, g (t + s) := by
       simp only [ha]
-      exact ((ContinuousLinearMap.mul ℝ A (g t)).intervalIntegral_comp_comm (hc.intervalIntegrable 0 h)).symm
+      exact ((ContinuousLinearMap.mul ℝ A (g t)).intervalIntegral_comp_comm
+        (hc.intervalIntegrable 0 h)).symm
     rw [e1, intervalIntegral.integral_comp_add_left, add_zero]
-    exact (intervalIntegral.integral_interval_sub_left (hc.intervalIntegrable _ _) (hc.intervalIntegrable _ _)).symm
+    exact (intervalIntegral.integral_interval_sub_left (hc.intervalIntegrable _ _)
+      (hc.intervalIntegrable _ _)).symm
   have e : g = fun t => (G (t + h) - G t) * u := by
     funext t
     rw [← key, mul_assoc, hv', mul_one]
@@ -52,13 +57,15 @@ theorem exists_deriv {g : ℝ → A} (hc : Continuous g) (h0 : g 0 = 1) (ha : �
   rw [e2]
   exact d.congr_of_eventuallyEq (Eventually.of_forall fun s => congrFun e s)
 
-theorem exists_exp {g : ℝ → A} (hc : Continuous g) (h0 : g 0 = 1) (ha : ∀ s t, g (s + t) = g s * g t) :
-    ∃ Y : A, HasDerivAt g Y 0 ∧ ∀ t, g t = NormedSpace.exp (t • Y) := by
+theorem exists_exp
+    {g : ℝ → A} (hc : Continuous g) (h0 : g 0 = 1) (ha : ∀ s t, g (s + t) = g s * g t)
+    : ∃ Y : A, HasDerivAt g Y 0 ∧ ∀ t, g t = NormedSpace.exp (t • Y) := by
   obtain ⟨Y, hY⟩ := exists_deriv hc h0 ha
   refine ⟨Y, by simpa [h0] using hY 0, fun t => ?_⟩
   have d : ∀ s : ℝ, HasDerivAt (fun s : ℝ => g s * NormedSpace.exp ((t - s) • Y)) 0 s := by
     intro s
-    have d1 := (hasDerivAt_exp_smul_const' (𝕂 := ℝ) Y (t - s)).scomp s ((hasDerivAt_id s).const_sub t)
+    have d1 :=
+      (hasDerivAt_exp_smul_const' (𝕂 := ℝ) Y (t - s)).scomp s ((hasDerivAt_id s).const_sub t)
     have d2 := (hY s).mul d1
     refine d2.congr_deriv ?_
     simp [mul_assoc]
@@ -68,24 +75,31 @@ theorem exists_exp {g : ℝ → A} (hc : Continuous g) (h0 : g 0 = 1) (ha : ∀ 
 end Banach
 
 set_option backward.isDefEq.respectTransparency false in
-theorem mat_exp {d : ℕ} {g : ℝ → Matrix (Fin d) (Fin d) ℂ} (hc : Continuous g) (h0 : g 0 = 1)
-    (ha : ∀ s t, g (s + t) = g s * g t) :
-    ∃ Y : Matrix (Fin d) (Fin d) ℂ, (∀ i j, HasDerivAt (fun t => g t i j) (Y i j) 0) ∧
-      ∀ t : ℝ, g t = NormedSpace.exp ((t : ℂ) • Y) := by
+theorem mat_exp
+    {d : ℕ} {g : ℝ → Matrix (Fin d) (Fin d) ℂ}
+    (hc : Continuous g) (h0 : g 0 = 1) (ha : ∀ s t, g (s + t) = g s * g t)
+    : ∃ Y : Matrix (Fin d) (Fin d) ℂ,
+      (∀ i j, HasDerivAt (fun t => g t i j) (Y i j) 0)
+        ∧ ∀ t : ℝ, g t = NormedSpace.exp ((t : ℂ) • Y) := by
   open scoped Matrix.Norms.Operator in
   obtain ⟨Y, h1, h2⟩ := exists_exp (A := Matrix (Fin d) (Fin d) ℂ) hc h0 ha
   refine ⟨Y, fun i j => ?_, fun t => ?_⟩
-  · exact (LinearMap.toContinuousLinearMap (Matrix.entryLinearMap ℝ ℂ i j :
-      Matrix (Fin d) (Fin d) ℂ →ₗ[ℝ] ℂ)).hasFDerivAt.comp_hasDerivAt (0 : ℝ) h1
+  · exact (LinearMap.toContinuousLinearMap
+      (Matrix.entryLinearMap ℝ ℂ i j
+        : Matrix (Fin d) (Fin d) ℂ →ₗ[ℝ] ℂ)).hasFDerivAt.comp_hasDerivAt (0 : ℝ) h1
   · rw [h2 t, Complex.coe_smul]
 
-theorem lie_of_unitary {d : ℕ} {g : ℝ → Matrix (Fin d) (Fin d) ℂ} {J Y : Matrix (Fin d) (Fin d) ℂ} (h0 : g 0 = 1)
-    (hd : ∀ i j, HasDerivAt (fun t => g t i j) (Y i j) 0) (hu : ∀ t, (g t)ᵀ * J * (g t).map star = J) :
-    Yᵀ * J + J * Y.map star = 0 := by
+theorem lie_of_unitary
+    {d : ℕ} {g : ℝ → Matrix (Fin d) (Fin d) ℂ} {J Y : Matrix (Fin d) (Fin d) ℂ}
+    (h0 : g 0 = 1) (hd : ∀ i j, HasDerivAt (fun t => g t i j) (Y i j) 0)
+    (hu : ∀ t, (g t)ᵀ * J * (g t).map star = J)
+    : Yᵀ * J + J * Y.map star = 0 := by
   ext i j
-  have d1 : HasDerivAt (fun t => ∑ l, (∑ k, g t k i * J k l) * star (g t l j))
+  have d1 : HasDerivAt
+      (fun t => ∑ l, (∑ k, g t k i * J k l) * star (g t l j))
       (∑ l, ((∑ k, Y k i * J k l) * star (g 0 l j) + (∑ k, g 0 k i * J k l) * star (Y l j))) 0 :=
-    HasDerivAt.fun_sum fun l _ => (HasDerivAt.fun_sum fun k _ => (hd k i).mul_const (J k l)).fun_mul (hd l j).star
+    HasDerivAt.fun_sum fun l _ =>
+      (HasDerivAt.fun_sum fun k _ => (hd k i).mul_const (J k l)).fun_mul (hd l j).star
   have e : (fun t => ∑ l, (∑ k, g t k i * J k l) * star (g t l j)) = fun _ => J i j := by
     funext t
     rw [← congrFun (congrFun (hu t) i) j]
@@ -95,20 +109,24 @@ theorem lie_of_unitary {d : ℕ} {g : ℝ → Matrix (Fin d) (Fin d) ℂ} {J Y :
   have e1 : (Yᵀ * J * (g 0).map star + (g 0)ᵀ * J * Y.map star) i j = 0 := by
     rw [← z, Finset.sum_add_distrib]
     simp only [Matrix.add_apply, Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply]
-  rwa [h0, Matrix.map_one _ (star_zero _) (star_one _), Matrix.mul_one, Matrix.transpose_one, Matrix.one_mul] at e1
+  rwa [h0, Matrix.map_one _ (star_zero _) (star_one _), Matrix.mul_one, Matrix.transpose_one,
+      Matrix.one_mul]
+    at e1
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
-theorem piInf_tmul' {w : InfinitePlace F} (τ : EmbOver E w) (a : AF F) (x : E) :
-    piInf τ (a ⊗ₜ[F] x) = InfinitePlace.Completion.extensionEmbedding w (a.1 w) * τ.1 x := by
+theorem piInf_tmul' {w : InfinitePlace F} (τ : EmbOver E w) (a : AF F) (x : E)
+    : piInf τ (a ⊗ₜ[F] x) = InfinitePlace.Completion.extensionEmbedding w (a.1 w) * τ.1 x := by
   change infEmb τ (evInf F w a ⊗ₜ[F] x) = _
   rw [infEmb_tmul]
   rfl
 
 theorem continuous_piInf {w : InfinitePlace F} (τ : EmbOver E w) : Continuous (piInf τ) := by
   refine IsModuleTopology.continuous_of_ringHom (R := AF F) (piInf τ) ?_
-  have h : ⇑((piInf τ).comp (algebraMap (AF F) (AE F E))) =
-      fun a : AF F => InfinitePlace.Completion.extensionEmbedding w (a.1 w) := by
+  have h
+      : ⇑((piInf τ).comp (algebraMap (AF F) (AE F E)))
+        = fun a : AF F => InfinitePlace.Completion.extensionEmbedding w (a.1 w) := by
     funext a
     change piInf τ (a ⊗ₜ[F] (1 : E)) = _
     rw [piInf_tmul', map_one, mul_one]
@@ -116,8 +134,8 @@ theorem continuous_piInf {w : InfinitePlace F} (τ : EmbOver E w) : Continuous (
   exact (InfinitePlace.Completion.isometry_extensionEmbedding w).continuous.comp
     ((continuous_apply w).comp continuous_fst)
 
-theorem piInf_cA (h : IsCMExt F E σ) {w : InfinitePlace F} (τ : EmbOver E w) (z : AE F E) :
-    piInf τ (cA σ z) = star (piInf τ z) := by
+theorem piInf_cA (h : IsCMExt F E σ) {w : InfinitePlace F} (τ : EmbOver E w) (z : AE F E)
+    : piInf τ (cA σ z) = star (piInf τ z) := by
   have hw : w.IsReal := h.1.isReal w
   induction z using TensorProduct.induction_on with
   | zero => simp only [map_zero, star_zero]
@@ -128,21 +146,26 @@ theorem piInf_cA (h : IsCMExt F E σ) {w : InfinitePlace F} (τ : EmbOver E w) (
       ← InfinitePlace.Completion.extensionEmbeddingOfIsReal_apply hw]
     rw [Complex.star_def, Complex.conj_ofReal]
 
-theorem map_incM {w : InfinitePlace F} (τ : EmbOver E w) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) :
-    (incM F J).map (piInf τ) = J.map τ.1 := by
+theorem map_incM {w : InfinitePlace F} (τ : EmbOver E w) {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+    : (incM F J).map (piInf τ) = J.map τ.1 := by
   ext i j
-  exact (piInf_tmul' τ 1 (J i j)).trans (by rw [show (1 : AF F).1 w = 1 from rfl, map_one, one_mul]; rfl)
+  exact (piInf_tmul' τ 1 (J i j)).trans
+    (by rw [show (1 : AF F).1 w = 1 from rfl, map_one, one_mul]; rfl)
 
 end ExponentialLineGeneration
 
 open ExponentialLineGeneration in
 theorem lineGen_of : LineGen := by
   intro F E _ _ _ _ _ σ h τ d W _ γ hγ
-  have main : ∀ w, ∃ Y : Matrix (Fin d) (Fin d) ℂ,
-      Yᵀ * W.J.map (τ w).1 + W.J.map (τ w).1 * Y.map star = 0 ∧
-      ∀ t : ℝ, (mat (γ (Multiplicative.ofAdd t))).map (piInf (τ w)) = NormedSpace.exp ((t : ℂ) • Y) := by
+  have main
+      : ∀ w, ∃ Y : Matrix (Fin d) (Fin d) ℂ,
+        Yᵀ * W.J.map (τ w).1 + W.J.map (τ w).1 * Y.map star = 0
+          ∧ ∀ t : ℝ,
+            (mat (γ (Multiplicative.ofAdd t))).map (piInf (τ w))
+              = NormedSpace.exp ((t : ℂ) • Y) := by
     intro w
-    let g : ℝ → Matrix (Fin d) (Fin d) ℂ := fun t => (mat (γ (Multiplicative.ofAdd t))).map (piInf (τ w))
+    let g : ℝ → Matrix (Fin d) (Fin d) ℂ := fun t =>
+      (mat (γ (Multiplicative.ofAdd t))).map (piInf (τ w))
     have hm : Continuous (mat : UA σ W.J → Matrix (Fin d) (Fin d) (AE F E)) :=
       Units.continuous_val.comp continuous_subtype_val
     have hc : Continuous g :=
@@ -158,9 +181,13 @@ theorem lineGen_of : LineGen := by
       exact Matrix.map_mul
     obtain ⟨Y, h1, h2⟩ := mat_exp hc h0 ha
     refine ⟨Y, lie_of_unitary h0 h1 fun t => ?_, h2⟩
-    have hu : (mat (γ (Multiplicative.ofAdd t)))ᵀ * incM F W.J * (mat (γ (Multiplicative.ofAdd t))).map (cA σ) =
-        incM F W.J := (γ (Multiplicative.ofAdd t)).2
-    have e : ((mat (γ (Multiplicative.ofAdd t))).map (cA σ)).map (piInf (τ w)) = (g t).map star := by
+    have hu
+        : (mat (γ (Multiplicative.ofAdd t)))ᵀ * incM F W.J
+            * (mat (γ (Multiplicative.ofAdd t))).map (cA σ)
+          = incM F W.J :=
+      (γ (Multiplicative.ofAdd t)).2
+    have e
+        : ((mat (γ (Multiplicative.ofAdd t))).map (cA σ)).map (piInf (τ w)) = (g t).map star := by
       ext i j
       exact piInf_cA h _ _
     have hv := congrArg (fun M : Matrix (Fin d) (Fin d) (AE F E) => M.map (piInf (τ w))) hu

@@ -21,12 +21,14 @@ theorem residueTrdeg_holds (hTR : TRStatement) : ResidueTrdegStatement := by
       (algebraMap _ (IsLocalRing.ResidueField (V.comap (algebraMap Ω U))))).toAlgebra
   have hTRW := hTR K Ω (V.comap (algebraMap Ω U))
   rw [hD] at hTRW
-  have hST : IsScalarTower
-      (IsLocalRing.ResidueField ((V.comap (algebraMap Ω U)).comap (algebraMap K Ω)))
-      (IsLocalRing.ResidueField (V.comap (algebraMap Ω U))) (IsLocalRing.ResidueField V) :=
+  have hST
+      : IsScalarTower (IsLocalRing.ResidueField ((V.comap (algebraMap Ω U)).comap (algebraMap K Ω)))
+        (IsLocalRing.ResidueField (V.comap (algebraMap Ω U))) (IsLocalRing.ResidueField V) :=
     IsScalarTower.of_algebraMap_eq fun _ => rfl
-  have hres : ∀ j, IsLocalRing.residue V (u j) =
-      aeval (fun s => IsLocalRing.residue V ⟨t s, ht s⟩) (gaussRed V (p j) (hp j)) := by
+  have hres
+      : ∀ j,
+        IsLocalRing.residue V (u j)
+          = aeval (fun s => IsLocalRing.residue V ⟨t s, ht s⟩) (gaussRed V (p j) (hp j)) := by
     intro j
     obtain ⟨h, he⟩ := gaussRed_eval t V ht (p j) (hp j)
     have : u j = ⟨aeval t (p j), h⟩ := Subtype.ext (hpu j).symm
@@ -34,13 +36,16 @@ theorem residueTrdeg_holds (hTR : TRStatement) : ResidueTrdegStatement := by
   have hcardc : Cardinal.mk τ = ((Fintype.card σ + D : ℕ) : Cardinal) := by
     rw [Cardinal.mk_fintype, hcard]
   have hσ := Cardinal.mk_fintype σ
-  have hmemW : ∀ j, IsLocalRing.residue V (u j) ∈
-      Algebra.adjoin (IsLocalRing.ResidueField (V.comap (algebraMap Ω U)))
-        (Set.range fun s => IsLocalRing.residue V ⟨t s, ht s⟩) := by
+  have hmemW
+      : ∀ j,
+        IsLocalRing.residue V (u j)
+          ∈ Algebra.adjoin (IsLocalRing.ResidueField (V.comap (algebraMap Ω U)))
+            (Set.range fun s => IsLocalRing.residue V ⟨t s, ht s⟩) := by
     intro j
     rw [hres j]
     exact gauss_aeval_mem _ _ (Algebra.adjoin _ _).toSubring
-      (fun α => Subalgebra.algebraMap_mem _ _) (fun s => Algebra.subset_adjoin ⟨s, rfl⟩)
+      (fun α => Subalgebra.algebraMap_mem _ _)
+      (fun s => Algebra.subset_adjoin ⟨s, rfl⟩)
   have hW := gauss_card_le_trdeg_add _ _ hind hmemW
   rw [hcardc] at hW
   obtain ⟨h2, h3⟩ := gauss_card_arith hW hTRW (hσ ▸ gauss_trdeg_adjoin_le _)
@@ -49,18 +54,20 @@ theorem residueTrdeg_holds (hTR : TRStatement) : ResidueTrdegStatement := by
   letI : Algebra k₁ (IsLocalRing.ResidueField V) :=
     ((algebraMap (IsLocalRing.ResidueField (V.comap (algebraMap Ω U)))
       (IsLocalRing.ResidueField V)).comp (algebraMap k₁ _)).toAlgebra
-  have hST1 : IsScalarTower
-      (IsLocalRing.ResidueField ((V.comap (algebraMap Ω U)).comap (algebraMap K Ω)))
-      k₁ (IsLocalRing.ResidueField V) :=
+  have hST1
+      : IsScalarTower (IsLocalRing.ResidueField ((V.comap (algebraMap Ω U)).comap (algebraMap K Ω)))
+        k₁ (IsLocalRing.ResidueField V) :=
     IsScalarTower.of_algebraMap_eq fun _ => rfl
-  have hmem1 : ∀ j, IsLocalRing.residue V (u j) ∈
-      Algebra.adjoin k₁ (Set.range fun s => IsLocalRing.residue V ⟨t s, ht s⟩) := by
+  have hmem1
+      : ∀ j,
+        IsLocalRing.residue V (u j)
+          ∈ Algebra.adjoin k₁ (Set.range fun s => IsLocalRing.residue V ⟨t s, ht s⟩) := by
     intro j
     rw [hres j]
-    refine gauss_aeval_mem _ _ (Algebra.adjoin k₁ _).toSubring (fun α => ?_)
+    refine gauss_aeval_mem _ _ (Algebra.adjoin k₁ _).toSubring
+      (fun α => ?_)
       (fun s => Algebra.subset_adjoin ⟨s, rfl⟩)
-    have hc : (gaussRed V (p j) (hp j)).coeff α ∈ k₁ := by
-      rw [gaussRed_coeff]; exact hk₁ j α
+    have hc : (gaussRed V (p j) (hp j)).coeff α ∈ k₁ := by rw [gaussRed_coeff]; exact hk₁ j α
     exact Subalgebra.algebraMap_mem (Algebra.adjoin k₁ _) (⟨_, hc⟩ : k₁)
   have h1 := @gauss_card_le_trdeg_add _ _ _ _ _ _ _ _ _ hST1 _ _ _ _ hind hmem1
   rw [hcardc] at h1

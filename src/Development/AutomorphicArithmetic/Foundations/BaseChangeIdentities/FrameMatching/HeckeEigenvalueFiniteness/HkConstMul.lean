@@ -11,24 +11,28 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SplitDic
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT PositivityTheory.Rg.BcB.F.F5 PositivityTheory.Rg.BcB.F.Tail PositivityTheory.Rg.Bc.ArchbcB.B
-  PositivityTheory.Rg.BcB.F.Choice PositivityTheory.Rg.BcB.F.Eig PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcN.F2
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT PositivityTheory.Rg.BcB.F.F5
+  PositivityTheory.Rg.BcB.F.Tail PositivityTheory.Rg.Bc.ArchbcB.B PositivityTheory.Rg.BcB.F.Choice
+  PositivityTheory.Rg.BcB.F.Eig PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcN.F2
 open scoped Classical
 
 set_option synthInstance.maxHeartbeats 200000
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem hk_const_mul {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-    {ι : Type} [Fintype ι] [DecidableEq ι] {V : Type} [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ (GL ι F) V) (K : Subgroup (GL ι F)) (c : ℂ) (e : GL ι F → ℂ) (v : V) :
-    PositivityTheory.Rg.BcN.F2.hk ρ K (fun g => c * e g) v = c • PositivityTheory.Rg.BcN.F2.hk ρ K e v := by
+private theorem hk_const_mul
+    {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ (GL ι F) V) (K : Subgroup (GL ι F)) (c : ℂ) (e : GL ι F → ℂ) (v : V)
+    : PositivityTheory.Rg.BcN.F2.hk ρ K (fun g => c * e g) v
+      = c • PositivityTheory.Rg.BcN.F2.hk ρ K e v := by
   unfold PositivityTheory.Rg.BcN.F2.hk
   rw [smul_finsum]
   exact finsum_congr fun q => mul_smul _ _ _
 
-theorem UpperTheory.HeckeLevelFrameExistence.locE :
-    UpperTheory.HeckeLevelFrameExistence.LocE := by
+theorem UpperTheory.HeckeLevelFrameExistence.locE : UpperTheory.HeckeLevelFrameExistence.LocE := by
   intro E _ _ _ n w hw K' hKo hKle hlev σ hσ k D
   have hUL : UL n w = ⊤ := by unfold UL; rw [if_pos hw]
   have hmap : (K'.subgroupOf (UL n w)).map (UL n w).subtype = K' := by
@@ -46,15 +50,18 @@ theorem UpperTheory.HeckeLevelFrameExistence.locE :
     ⟨T y₀, ((hd 0 hz).2 y₀ hy₀).1, fun h => hy₀0 (T.map_eq_zero_iff.1 h)⟩
   have hchoice : PositivityTheory.Rg.BcB.F.Choice.ChoiceS :=
     PositivityTheory.Rg.BcB.F.Choice.choiceS_of
-      (fun E _ _ _ n w => GlobalTheory.T.isolate_representation_at_character (w.adicCompletion E) (Fin n))
+      (fun E _ _ _ n w =>
+        GlobalTheory.T.isolate_representation_at_character (w.adicCompletion E) (Fin n))
       (fun E _ _ _ n w => GlobalTheory.T.finite_subquotients (w.adicCompletion E) (Fin n))
       (fun E _ _ _ n w => GlobalTheory.T.finite_length_of_products (w.adicCompletion E) (Fin n))
-  obtain ⟨e₀, hIk, ⟨v₀, hv₀, l, hl1, hl⟩, hkill⟩ :=
-    hchoice E n w K' hKo hKc P hP0 k D
+  obtain ⟨e₀, hIk, ⟨v₀, hv₀, l, hl1, hl⟩, hkill⟩ := hchoice E n w K' hKo hKc P hP0 k D
   set r : ℂ := (((K'.subgroupOf (UL n w)).relIndex (KL n w) : ℕ) : ℂ) with hr
-  have hIk' : PositivityTheory.Rg.BcN.F2.IsHk K' (fun g => r * e₀ g) :=
-    ⟨hIk.1, hIk.2.1, hIk.2.2.1.mul_left, fun k₁ h₁ k₂ h₂ g => by
-      simp only [hIk.2.2.2 k₁ h₁ k₂ h₂ g]⟩
+  have hIk' : PositivityTheory.Rg.BcN.F2.IsHk K' (fun g => r * e₀ g) := ⟨
+    hIk.1,
+    hIk.2.1,
+    hIk.2.2.1.mul_left,
+    fun k₁ h₁ k₂ h₂ g => by simp only [hIk.2.2.2 k₁ h₁ k₂ h₂ g]
+  ⟩
   have hH := (hd _ hIk').1
   refine ⟨fun g => r * e₀ g, P, hIk', hH, hcomp, ?_, ?_⟩
   · have hy : T.symm v₀ ∈ fixed σ.ρ (K'.subgroupOf (UL n w)) := by

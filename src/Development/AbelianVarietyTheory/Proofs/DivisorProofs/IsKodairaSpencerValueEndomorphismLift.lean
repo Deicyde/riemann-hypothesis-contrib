@@ -7,13 +7,20 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WedgeOrdVpBa
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 open AlgebraicGeometry CategoryTheory GlobalTheory.DeRham GlobalTheory.Cris
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.KSExist
 
-theorem isKSValue_act : ∀ {R : Type} [CommRing R] {A : Over (Sp R)} [GrpObj A] {A' : Over (Sp (DualNumber R))} [GrpObj A'] {i : A.left ⟶ A'.left} (h : IsGrpPullback A A' (GlobalTheory.DeRham.epsRed R) i) {O : Type} [CommRing O] (a : OAct O A) (a' : OAct O A'), (∀ z, (a.act z).left ≫ i = i ≫ (a'.act z).left) → ∀ (z : O) {f : HdR A} {w : epsR R ⟶ A}, IsKSValue h f w → IsKSValue h (act (dp0 R) (𝟙 _) a z f) (w ≫ a.act z) := by
+theorem isKSValue_act
+    : ∀ {R : Type} [CommRing R] {A : Over (Sp R)} [GrpObj A] {A' : Over (Sp (DualNumber R))}
+        [GrpObj A'] {i : A.left ⟶ A'.left} (h : IsGrpPullback A A' (GlobalTheory.DeRham.epsRed R) i)
+        {O : Type} [CommRing O] (a : OAct O A) (a' : OAct O A'),
+      (∀ z, (a.act z).left ≫ i = i ≫ (a'.act z).left)
+        → ∀ (z : O) {f : HdR A} {w : epsR R ⟶ A},
+          IsKSValue h f w → IsKSValue h (act (dp0 R) (𝟙 _) a z f) (w ≫ a.act z) := by
   intro R _ A _ A' _ i h O _ a a' hi z f w hf
   haveI := a.hom z
   haveI := a'.hom z
@@ -22,10 +29,13 @@ theorem isKSValue_act : ∀ {R : Type} [CommRing R] {A : Over (Sp R)} [GrpObj A]
   have hm := push_mem_liftFil (epsDP R) h h (a.act z) (a'.act z) (e := (hi z).symm) hd
   have hl := l.push (a.act z)
   refine ⟨push (dp0 R) (𝟙 _) (a.act z) k, ⟨_, hm, fun c ↦ ?_⟩, hl⟩
-  have kk : GrpMor (dp0 R) (𝟙 _) A (epsDP R) (DeRham.epsRed R) A
-      (algebraMap R (DualNumber R)) (𝟙 _) (a.act z).left :=
-    ⟨(constMor A).dp, (constMor A).base, by simpa using (Over.w (a.act z)),
-      (homMor (dp0 R) (𝟙 _) (a.act z)).mul⟩
+  have kk : GrpMor (dp0 R) (𝟙 _) A (epsDP R) (DeRham.epsRed R) A (algebraMap R (DualNumber R)) (𝟙 _)
+      (a.act z).left := ⟨
+    (constMor A).dp,
+    (constMor A).base,
+    by simpa using (Over.w (a.act z)),
+    (homMor (dp0 R) (𝟙 _) (a.act z)).mul
+  ⟩
   have hM := homMor (epsDP R) (DeRham.epsRed R) (a.act z)
   have e1 := GrpMor.pull_pull (constMor A) hM kk (fun _ ↦ rfl) (by simp) c
   have e2 := GrpMor.pull_pull (homMor (dp0 R) (𝟙 _) (a.act z)) (constMor A) kk (fun _ ↦ rfl) rfl c

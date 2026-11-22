@@ -5,14 +5,22 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.WeilDeligne
+open NumberField IsDedekindDomain Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.WeilDeligne
 
 namespace GlobalTheory.Count
 
-theorem decOrbit_root_count : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω) (β β' : Ω) (S : Finset Ω), (∀ x, x ∈ S ↔ ∃ d ∈ Dec (F := E) A, d β = x) → ∀ g : Polynomial E, g.Monic → g.natDegree = S.card → aeval β' g = 0 → (∀ σ ∈ Dec (F := E) A, σ β' = β' → σ β = β) → (∀ σ : G E Ω, ∃ d ∈ Dec (F := E) A, σ β' = d β') ∧ (∀ σ ∈ Dec (F := E) A, σ β = β → σ β' = β') := by
+theorem decOrbit_root_count
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A : ValuationSubring Ω) (β β' : Ω) (S : Finset Ω),
+      (∀ x, x ∈ S ↔ ∃ d ∈ Dec (F := E) A, d β = x)
+        → ∀ g : Polynomial E,
+          g.Monic → g.natDegree = S.card → aeval β' g = 0
+            → (∀ σ ∈ Dec (F := E) A, σ β' = β' → σ β = β)
+            → (∀ σ : G E Ω, ∃ d ∈ Dec (F := E) A, σ β' = d β')
+              ∧ (∀ σ ∈ Dec (F := E) A, σ β = β → σ β' = β') := by
   intro E Ω _ _ _ _ _ A β β' S hS g hg hdeg hroot hstab
   classical
-
   let φ : Ω → Ω := fun x => if h : ∃ d ∈ Dec (F := E) A, d β = x then (Classical.choose h) β' else 0
   have hφ : ∀ x ∈ S, ∃ d ∈ Dec (F := E) A, d β = x ∧ φ x = d β' := by
     intro x hx
@@ -42,10 +50,13 @@ theorem decOrbit_root_count : ∀ (E Ω : Type) [Field E] [NumberField E] [Field
     intro r hr
     obtain ⟨x, hx, rfl⟩ := Finset.mem_image.1 hr
     obtain ⟨d, -, -, hdx⟩ := hφ x hx
-    rw [hdx]; exact hconj d
+    rw [hdx]
+    exact hconj d
   have hcard : (g.aroots Ω).toFinset.card ≤ (S.image φ).card := by
     rw [Finset.card_image_of_injOn hinj, ← hdeg]
-    calc (g.aroots Ω).toFinset.card ≤ (g.aroots Ω).card := Multiset.toFinset_card_le _
+    calc
+      (g.aroots Ω).toFinset.card
+        ≤ (g.aroots Ω).card := Multiset.toFinset_card_le _
       _ ≤ (g.map (algebraMap E Ω)).natDegree := Polynomial.card_roots' _
       _ = g.natDegree := Polynomial.natDegree_map _
   have heq : S.image φ = (g.aroots Ω).toFinset := Finset.eq_of_subset_of_card_le hsub hcard

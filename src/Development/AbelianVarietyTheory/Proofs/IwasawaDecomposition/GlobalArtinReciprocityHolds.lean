@@ -6,4 +6,5 @@ public import CompanionTheory.AutomorphicTheory.PlaceSeparation.IsOpenQuotientMa
 
 @[expose] public section
 
-theorem GlobalTheory.globalArtinReciprocity_holds : GlobalTheory.Published.GlobalArtinReciprocity := CompanionTheory.FamInh.globalArtin
+theorem GlobalTheory.globalArtinReciprocity_holds : GlobalTheory.Published.GlobalArtinReciprocity :=
+  CompanionTheory.FamInh.globalArtin

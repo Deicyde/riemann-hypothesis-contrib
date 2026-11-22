@@ -12,7 +12,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Domin
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix Formalism.MainNotions.G Formalism.MainNotions.TaylorLogMetric
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix Formalism.MainNotions.G
+  Formalism.MainNotions.TaylorLogMetric
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.JetTransport
@@ -21,11 +24,9 @@ open MvPolynomial Finsupp
 
 variable {ι : Type} [Fintype ι] {a b : ℕ}
 
-
 open Classical in
 noncomputable def wD (ι : Type) (a b : ℕ) : ((ι × Fin b × Fin b) ⊕ DVar ι a b) → (ι → ℕ) :=
   Sum.elim 0 fun x => Pi.single x.1 1
-
 
 open Classical in
 noncomputable def wF (ι : Type) (a : ℕ) : (ι × Fin a × Fin a) → (ι → ℕ) := fun v => Pi.single v.1 1
@@ -119,40 +120,54 @@ lemma jetLin_congr {K : Type} [Field K] (J₁ J₂ : (DVar ι a b →₀ ℕ) �
 
 end GlobalTheory.JetTransport
 
-theorem GlobalTheory.jetMapTransport : ∀ (D : D7) {p : ℕ} [Fact p.Prime] (lam : Qbar →+* ℂ_[p]) {a b : ℕ}
-    (J : (DVar D.what₂.Tau a b →₀ ℕ) → ℂ) (J' : (DVar D.what₂.Tau a b →₀ ℕ) → ℂ_[p]) (n : D.what₂.Tau → ℕ) (r : Qbar)
-    (A : MvPolynomial (GL3Theta.FrV D b) Qbar) (P : MvPolynomial (GL3Theta.FrV D a) Qbar)
-    (hJ : ∀ m : DVar D.what₂.Tau a b →₀ ℕ, (∀ τ, ∑ β, ∑ α, m (τ, β, α) = n τ) → ∃ x : Qbar, (x : ℂ) = J m ∧ lam x = J' m)
-    (hP : ∀ e ∈ P.support, ∀ τ, ∑ α, ∑ s, e (τ, α, s) = n τ)
-    (h : MvPolynomial.map (algebraMap Qbar ℂ) A = MvPolynomial.C (r : ℂ) * jetMap J (fun _ => 0) (MvPolynomial.map (algebraMap Qbar ℂ) P)), MvPolynomial.map lam A = MvPolynomial.C (lam r) * jetMap J' (fun _ => 0) (MvPolynomial.map lam P) := by
+theorem GlobalTheory.jetMapTransport
+    : ∀ (D : D7) {p : ℕ} [Fact p.Prime] (lam : Qbar →+* ℂ_[p]) {a b : ℕ}
+        (J : (DVar D.what₂.Tau a b →₀ ℕ) → ℂ) (J' : (DVar D.what₂.Tau a b →₀ ℕ) → ℂ_[p])
+        (n : D.what₂.Tau → ℕ) (r : Qbar) (A : MvPolynomial (GL3Theta.FrV D b) Qbar)
+        (P : MvPolynomial (GL3Theta.FrV D a) Qbar)
+        (hJ : ∀ m : DVar D.what₂.Tau a b →₀ ℕ,
+          (∀ τ, ∑ β, ∑ α, m (τ, β, α) = n τ) → ∃ x : Qbar, (x : ℂ) = J m ∧ lam x = J' m)
+        (hP : ∀ e ∈ P.support, ∀ τ, ∑ α, ∑ s, e (τ, α, s) = n τ)
+        (h : MvPolynomial.map (algebraMap Qbar ℂ) A
+          = MvPolynomial.C (r : ℂ)
+            * jetMap J (fun _ => 0) (MvPolynomial.map (algebraMap Qbar ℂ) P)),
+      MvPolynomial.map lam A
+        = MvPolynomial.C (lam r) * jetMap J' (fun _ => 0) (MvPolynomial.map lam P) := by
   intro D p _ lam a b J J' n r A P hJ hP h
   classical
   let x : (DVar D.what₂.Tau a b →₀ ℕ) → Qbar := fun m =>
     if hm : ∀ τ, ∑ β, ∑ α, m (τ, β, α) = n τ then (hJ m hm).choose else 0
-  have hx1 : ∀ m : DVar D.what₂.Tau a b →₀ ℕ, (∀ τ, ∑ β, ∑ α, m (τ, β, α) = n τ) →
-      J m = (algebraMap Qbar ℂ ∘ x) m := by
+  have hx1
+      : ∀ m : DVar D.what₂.Tau a b →₀ ℕ,
+        (∀ τ, ∑ β, ∑ α, m (τ, β, α) = n τ) → J m = (algebraMap Qbar ℂ ∘ x) m := by
     intro m hm
     simp only [x, Function.comp_apply, dif_pos hm]
     exact (hJ m hm).choose_spec.1.symm
-  have hx2 : ∀ m : DVar D.what₂.Tau a b →₀ ℕ, (∀ τ, ∑ β, ∑ α, m (τ, β, α) = n τ) →
-      J' m = (lam ∘ x) m := by
+  have hx2
+      : ∀ m : DVar D.what₂.Tau a b →₀ ℕ,
+        (∀ τ, ∑ β, ∑ α, m (τ, β, α) = n τ) → J' m = (lam ∘ x) m := by
     intro m hm
     simp only [x, Function.comp_apply, dif_pos hm]
     exact (hJ m hm).choose_spec.2.symm
-  have hPw : ∀ {K : Type} [Field K] (f : Qbar →+* K),
-      MvPolynomial.IsWeightedHomogeneous (GlobalTheory.JetTransport.wF D.what₂.Tau a) (MvPolynomial.map f P) n := by
+  have hPw
+      : ∀ {K : Type} [Field K] (f : Qbar →+* K),
+        MvPolynomial.IsWeightedHomogeneous (GlobalTheory.JetTransport.wF D.what₂.Tau a)
+          (MvPolynomial.map f P) n := by
     intro K _ f d hd
     funext τ
     rw [GlobalTheory.JetTransport.weight_wF]
     refine hP d (MvPolynomial.mem_support_iff.mpr fun h0 => hd ?_) τ
     rw [MvPolynomial.coeff_map, h0, map_zero]
-  have key : ∀ {K : Type} [Field K] (f : Qbar →+* K) (JK : (DVar D.what₂.Tau a b →₀ ℕ) → K),
-      (∀ m : DVar D.what₂.Tau a b →₀ ℕ, (∀ τ, ∑ β, ∑ α, m (τ, β, α) = n τ) → JK m = (f ∘ x) m) →
-      jetMap JK (fun _ => 0) (MvPolynomial.map f P) = MvPolynomial.map f (jetMap x (fun _ => 0) P) := by
+  have key
+      : ∀ {K : Type} [Field K] (f : Qbar →+* K) (JK : (DVar D.what₂.Tau a b →₀ ℕ) → K),
+        (∀ m : DVar D.what₂.Tau a b →₀ ℕ, (∀ τ, ∑ β, ∑ α, m (τ, β, α) = n τ) → JK m = (f ∘ x) m)
+          → jetMap JK (fun _ => 0) (MvPolynomial.map f P)
+            = MvPolynomial.map f (jetMap x (fun _ => 0) P) := by
     intro K _ f JK hJK
-    rw [GlobalTheory.JetTransport.jetMap_zero, GlobalTheory.JetTransport.jetMap_zero, ← GlobalTheory.JetTransport.jetLin_map,
-      ← GlobalTheory.JetTransport.subD_map]
-    exact GlobalTheory.JetTransport.jetLin_congr _ _ n _ (GlobalTheory.JetTransport.subD_hom _ n (hPw f)) hJK
+    rw [GlobalTheory.JetTransport.jetMap_zero, GlobalTheory.JetTransport.jetMap_zero,
+      ← GlobalTheory.JetTransport.jetLin_map, ← GlobalTheory.JetTransport.subD_map]
+    exact GlobalTheory.JetTransport.jetLin_congr _ _ n _
+      (GlobalTheory.JetTransport.subD_hom _ n (hPw f)) hJK
   have hA : A = MvPolynomial.C r * jetMap x (fun _ => 0) P := by
     apply MvPolynomial.map_injective (algebraMap Qbar ℂ) (algebraMap Qbar ℂ).injective
     rw [h, key (algebraMap Qbar ℂ) J hx1, map_mul, MvPolynomial.map_C]

@@ -16,18 +16,19 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Supercu
 
 noncomputable section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.JHMult GlobalTheory.Published GlobalTheory.SegmentRepModel
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.JHMult
+  GlobalTheory.Published GlobalTheory.SegmentRepModel
 
 namespace PositivityTheory.Pf1.SegRepC.Perm
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem entries_zero_or_d {d l : ℕ} (hd : 0 < d) (σ : IrrRep (GL (Fin d) k)) (hσ : IsCuspidal σ.ρ)
+theorem entries_zero_or_d
+    {d l : ℕ} (hd : 0 < d) (σ : IrrRep (GL (Fin d) k)) (hσ : IsCuspidal σ.ρ)
     (b : SizeMatrix (fun _ : Fin l => Fin d) (fun _ : Fin l => Fin d))
-    (f : ∀ i, (Σ j, Fin (b.1 i j)) ≃ Fin d)
-    (s : ∀ i j, IrrRep (GL (Fin (b.1 i j)) k))
-    (hs : ∀ i, IsSubquotient (piTensor fun j => (s i j).ρ) (jac (f i) (segTerm σ.ρ l i))) :
-    ∀ i j, b.1 i j = 0 ∨ b.1 i j = d := by
+    (f : ∀ i, (Σ j, Fin (b.1 i j)) ≃ Fin d) (s : ∀ i j, IrrRep (GL (Fin (b.1 i j)) k))
+    (hs : ∀ i, IsSubquotient (piTensor fun j => (s i j).ρ) (jac (f i) (segTerm σ.ρ l i)))
+    : ∀ i j, b.1 i j = 0 ∨ b.1 i j = d := by
   intro i j
   by_contra hne
   push_neg at hne
@@ -67,10 +68,6 @@ theorem entries_zero_or_d {d l : ℕ} (hd : 0 < d) (σ : IrrRep (GL (Fin d) k)) 
   apply hxy
   have : x' = y' := Subtype.ext (Subsingleton.elim _ _)
   rw [this]
-
-
-
-
 
 end PositivityTheory.Pf1.SegRepC.Perm
 

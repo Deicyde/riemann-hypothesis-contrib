@@ -14,14 +14,17 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.GeneralLinea
 
 @[expose] public section
 
-open Filter Topology GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult UpperTheory.Lit.Cas
+open Filter Topology GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult UpperTheory.Lit.Cas
 
-private theorem jac_equiv_of_equiv {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] {α n : Type} {m : α → Type} [Fintype α] [LinearOrder α]
-    [∀ a, Fintype (m a)] [∀ a, DecidableEq (m a)] [Fintype n] [DecidableEq n] (e : (Σ a, m a) ≃ n)
+private theorem jac_equiv_of_equiv
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {α n : Type} {m : α → Type} [Fintype α] [LinearOrder α] [∀ a, Fintype (m a)]
+    [∀ a, DecidableEq (m a)] [Fintype n] [DecidableEq n]
+    (e : (Σ a, m a) ≃ n)
     {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
-    {π : Representation ℂ (GL n k) V} {τ : Representation ℂ (GL n k) W} (φ : π.Equiv τ) :
-    Nonempty ((jac e π).Equiv (jac e τ)) := by
+    {π : Representation ℂ (GL n k) V} {τ : Representation ℂ (GL n k) W} (φ : π.Equiv τ)
+    : Nonempty ((jac e π).Equiv (jac e τ)) := by
   refine ⟨Representation.Equiv.mk' (jacMap e φ.toIntertwiningMap)
     (jacMap e φ.symm.toIntertwiningMap) ?_ ?_⟩
   · intro x
@@ -35,11 +38,15 @@ private theorem jac_equiv_of_equiv {k : Type} [Field k] [ValuativeRel k] [Topolo
       change Submodule.Quotient.mk (φ (φ.symm v)) = Submodule.Quotient.mk v
       simp
 
-private theorem cell_exp (hA : GlobalTheory.Published.IrreducibleAdmissibleGL) {k : Type} [Field k] [ValuativeRel k]
-    [TopologicalSpace k] [IsNonarchimedeanLocalField k] (hC : CasselmanNecSq k) (δ : IrrGL (k := k))
-    (h1 : 1 ≤ δ.1) (h2 : IsSqIntCoeff δ.rep) (y : Fin 2 → IrrGL (k := k)) (hr : ∑ j, (y j).1 = δ.1)
-    (hj : jm y hr δ.rep ≠ 0) (t : kˣ) (ht : Tendsto (fun n : ℕ => (t : k) ^ n) atTop (𝓝 0))
-    (a : Fin 2 → ℂ) (ha : ∀ j, ScalarBy (y j) t (a j)) : ‖a 0‖ ≤ 1 ∧ ‖a 0‖ * ‖a 1‖ = 1 := by
+private theorem cell_exp
+    (hA : GlobalTheory.Published.IrreducibleAdmissibleGL)
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (hC : CasselmanNecSq k)
+    (δ : IrrGL (k := k)) (h1 : 1 ≤ δ.1) (h2 : IsSqIntCoeff δ.rep)
+    (y : Fin 2 → IrrGL (k := k)) (hr : ∑ j, (y j).1 = δ.1) (hj : jm y hr δ.rep ≠ 0)
+    (t : kˣ) (ht : Tendsto (fun n : ℕ => (t : k) ^ n) atTop (𝓝 0))
+    (a : Fin 2 → ℂ) (ha : ∀ j, ScalarBy (y j) t (a j))
+    : ‖a 0‖ ≤ 1 ∧ ‖a 0‖ * ‖a 1‖ = 1 := by
   obtain ⟨⟨c, hc⟩, -, -⟩ := schur hA k δ t
   have hu : ‖c‖ = 1 := unitcent k δ.1 _ δ.rep 2 δ.snd.rep.smooth δ.snd.rep.irr h2 t c hc
   have hprod : a 0 * a 1 = c := split k δ.1 _ δ.rep y hr hj t c (a 0) (a 1) hc (ha 0) (ha 1)
@@ -58,8 +65,16 @@ private theorem cell_exp (hA : GlobalTheory.Published.IrreducibleAdmissibleGL) {
   rw [hf, Finset.prod_singleton] at hlt
   exact hlt.le
 
-theorem UpperTheory.Lit.Cas.prodExp :
-    GlobalTheory.Published.GeometricLemma → GlobalTheory.Published.BernsteinZelevinskyFiniteness → GlobalTheory.Published.IrreducibleAdmissibleGL → ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k], CasselmanNecSq k → ∀ (h N : ℕ) (δ : Fin h → IrrGL (k := k)) (hd : ∑ i, (δ i).1 = N), (∀ i, 1 ≤ (δ i).1 ∧ IsSqIntCoeff (δ i).rep) → ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin N) k) V), π.IsIrreducible → Nonempty (π.Equiv (prodIrr δ hd)) → UnitaryCentral π ∧ MaxExpWeak π := by
+theorem UpperTheory.Lit.Cas.prodExp
+    : GlobalTheory.Published.GeometricLemma → GlobalTheory.Published.BernsteinZelevinskyFiniteness
+      → GlobalTheory.Published.IrreducibleAdmissibleGL
+      → ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k],
+        CasselmanNecSq k
+          → ∀ (h N : ℕ) (δ : Fin h → IrrGL (k := k)) (hd : ∑ i, (δ i).1 = N),
+            (∀ i, 1 ≤ (δ i).1 ∧ IsSqIntCoeff (δ i).rep)
+              → ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin N) k) V),
+                π.IsIrreducible → Nonempty (π.Equiv (prodIrr δ hd))
+                  → UnitaryCentral π ∧ MaxExpWeak π := by
   intro hG hBZ hA k _ _ _ _ hC h N δ hd hδ V _ _ π hirr hφ
   obtain ⟨φ⟩ := hφ
   haveI := nontrivial_of_irreducible hirr
@@ -67,19 +82,21 @@ theorem UpperTheory.Lit.Cas.prodExp :
   · intro t c hc
     choose b hb using fun i => (schur hA k (δ i) t).1
     have hbn : ∀ i, ‖b i‖ = 1 := fun i =>
-      unitcent k (δ i).1 _ (δ i).rep 2 (δ i).snd.rep.smooth (δ i).snd.rep.irr (hδ i).2 t (b i) (hb i)
+      unitcent k (δ i).1 _ (δ i).rep 2 (δ i).snd.rep.smooth (δ i).snd.rep.irr (hδ i).2 t (b i)
+        (hb i)
     obtain ⟨v, hv⟩ := exists_ne (0 : V)
-    have hφv : φ.toLinearEquiv v ≠ 0 := by
-      rwa [ne_eq, LinearEquiv.map_eq_zero_iff]
-    have e1 : φ.toLinearEquiv (π (Matrix.GeneralLinearGroup.scalar (Fin N) t) v)
-        = prodIrr δ hd (Matrix.GeneralLinearGroup.scalar (Fin N) t) (φ.toLinearEquiv v) :=
+    have hφv : φ.toLinearEquiv v ≠ 0 := by rwa [ne_eq, LinearEquiv.map_eq_zero_iff]
+    have e1
+        : φ.toLinearEquiv (π (Matrix.GeneralLinearGroup.scalar (Fin N) t) v)
+          = prodIrr δ hd (Matrix.GeneralLinearGroup.scalar (Fin N) t) (φ.toLinearEquiv v) :=
       LinearMap.congr_fun
         (φ.toIntertwiningMap.isIntertwining' (Matrix.GeneralLinearGroup.scalar (Fin N) t)) v
     have e2 : c • φ.toLinearEquiv v = (∏ i, b i) • φ.toLinearEquiv v :=
-      calc c • φ.toLinearEquiv v = φ.toLinearEquiv (c • v) :=
-            (LinearEquiv.map_smul φ.toLinearEquiv c v).symm
+      calc
+        c • φ.toLinearEquiv v
+          = φ.toLinearEquiv (c • v) := (LinearEquiv.map_smul φ.toLinearEquiv c v).symm
         _ = φ.toLinearEquiv (π (Matrix.GeneralLinearGroup.scalar (Fin N) t) v) :=
-            congrArg _ (hc v).symm
+          congrArg _ (hc v).symm
         _ = prodIrr δ hd (Matrix.GeneralLinearGroup.scalar (Fin N) t) (φ.toLinearEquiv v) := e1
         _ = (∏ i, b i) • φ.toLinearEquiv v := scalarFull k h N δ hd t b hb _
     have hcb : c = ∏ i, b i := smul_left_injective ℂ hφv e2

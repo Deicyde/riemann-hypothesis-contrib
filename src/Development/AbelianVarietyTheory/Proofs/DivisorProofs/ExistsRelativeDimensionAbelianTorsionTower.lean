@@ -22,35 +22,51 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct WithConv
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct WithConv
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsTangent IsGrpPullback)
-open ReciprocityTheory.ChartRestriction.G.Semi (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
-open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv GlobalTheory.PtExt
+open ReciprocityTheory.ChartRestriction.G.Semi
+  (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
+open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv
+  GlobalTheory.PtExt
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.TowerDim
 
-theorem exists_smoothOfRelativeDimension_of_hodgeDeRham : GlobalTheory.Published.AbelianHodgeDeRham → ∀ (p : ℕ) [Fact p.Prime]
-    (R : Type) [CommRing R], IsNilpotent (p : R) → ∀ (A : Over (Sp R)) [GrpObj A], IsAbelianScheme A →
-    ∀ G : PDivGroup p R, G.TorsionTower A → ∃ g, SmoothOfRelativeDimension g A.hom := by
+theorem exists_smoothOfRelativeDimension_of_hodgeDeRham
+    : GlobalTheory.Published.AbelianHodgeDeRham
+      → ∀ (p : ℕ) [Fact p.Prime] (R : Type) [CommRing R],
+        IsNilpotent (p : R)
+          → ∀ (A : Over (Sp R)) [GrpObj A],
+            IsAbelianScheme A
+              → ∀ G : PDivGroup p R, G.TorsionTower A → ∃ g, SmoothOfRelativeDimension g A.hom := by
   intro hH p _ R _ hp A _ hA G t
-  have hF : GlobalTheory.Published.AbelianDeRham.Free := (GlobalTheory.abelianDeRham_free_baseChange_rigid hH).1
+  have hF : GlobalTheory.Published.AbelianDeRham.Free :=
+    (GlobalTheory.abelianDeRham_free_baseChange_rigid hH).1
   have hs := hA.smooth
-  refine ⟨G.height / 2, GlobalTheory.FibreDim.smoothOfRelativeDimension_of_forall_field R A _ hs fun k _ _ ↦ ?_⟩
+  refine ⟨
+    G.height / 2,
+    GlobalTheory.FibreDim.smoothOfRelativeDimension_of_forall_field R A _ hs fun k _ _ ↦ ?_
+  ⟩
   have hk : IsNilpotent (p : k) := by simpa using hp.map (algebraMap R k)
   have hk0 : (p : k) = 0 := hk.eq_zero
   letI : GrpObj ((Over.pullback (spMap (algebraMap R k))).obj A) := Functor.grpObjObj
-  have h := ReciprocityTheory.ChartRestriction.G.Geo.Tor.isGrpPullback_pullback A (spMap (algebraMap R k))
+  have h :=
+    ReciprocityTheory.ChartRestriction.G.Geo.Tor.isGrpPullback_pullback A (spMap (algebraMap R k))
   have hAk : IsAbelianScheme ((Over.pullback (spMap (algebraMap R k))).obj A) :=
     GlobalTheory.isAbelianScheme_pullback_obj _ A hA
-  obtain ⟨gk, hgk⟩ := GlobalTheory.AbelianDim.exists_relDim k ((Over.pullback (spMap (algebraMap R k))).obj A) hAk
+  obtain ⟨gk, hgk⟩ :=
+    GlobalTheory.AbelianDim.exists_relDim k ((Over.pullback (spMap (algebraMap R k))).obj A) hAk
   let tk := t.baseChange h
-  obtain ⟨L, hL⟩ := GlobalTheory.PtExt.exists_canMap k ((Over.pullback (spMap (algebraMap R k))).obj A) p
-    (G.baseChange k) tk hAk
+  obtain ⟨L, hL⟩ :=
+    GlobalTheory.PtExt.exists_canMap k ((Over.pullback (spMap (algebraMap R k))).obj A) p
+      (G.baseChange k) tk hAk
   have hbij : Function.Bijective L :=
-    GlobalTheory.T.deRham_to_rigidified_extension_bijective_p_nilpotent hH p k hk _ gk hAk hgk (G.baseChange k) tk L fun c ↦ (hL c (L c)).2 rfl
+    GlobalTheory.T.deRham_to_rigidified_extension_bijective_p_nilpotent hH p k hk _ gk hAk hgk
+      (G.baseChange k) tk L fun c ↦ (hL c (L c)).2 rfl
   obtain ⟨hfin, hprj, hrk⟩ := hF.prim hAk hgk
-  have h1 : Module.finrank k (primDR ((Over.pullback (spMap (algebraMap R k))).obj A)) = 2 * gk := by
+  have h1
+      : Module.finrank k (primDR ((Over.pullback (spMap (algebraMap R k))).obj A)) = 2 * gk := by
     have := hrk ⊥
     rwa [Module.rankAtStalk_eq_finrank_of_free] at this
   have h2 : Module.finrank k (G.baseChange k).RigExt = G.height :=

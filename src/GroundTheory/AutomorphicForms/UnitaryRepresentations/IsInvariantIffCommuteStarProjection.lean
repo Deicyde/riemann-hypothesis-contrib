@@ -9,11 +9,10 @@ namespace GroundTheory.Automorphic
 open scoped InnerProductSpace ComplexConjugate
 open ContinuousLinearMap Filter Topology
 
-structure UnitaryRep (G : Type*) [Group G] [TopologicalSpace G] (H : Type*)
-    [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] where
-
+structure UnitaryRep
+    (G : Type*) [Group G] [TopologicalSpace G]
+    (H : Type*) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] where
   toHom : G →* unitary (H →L[ℂ] H)
-
   continuous_orbit' : ∀ v : H, Continuous fun g => (toHom g : H →L[ℂ] H) v
 
 namespace UnitaryRep
@@ -23,7 +22,8 @@ variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteS
 variable {K : Type*} [NormedAddCommGroup K] [InnerProductSpace ℂ K] [CompleteSpace K]
 variable {L : Type*} [NormedAddCommGroup L] [InnerProductSpace ℂ L] [CompleteSpace L]
 
-@[coe] noncomputable def op (π : UnitaryRep G H) (g : G) : H →L[ℂ] H := (π.toHom g : H →L[ℂ] H)
+@[coe]
+noncomputable def op (π : UnitaryRep G H) (g : G) : H →L[ℂ] H := (π.toHom g : H →L[ℂ] H)
 
 noncomputable instance : CoeFun (UnitaryRep G H) (fun _ => G → H →L[ℂ] H) := ⟨op⟩
 
@@ -73,8 +73,9 @@ lemma inner_map_right (g : G) (v w : H) : ⟪v, π g w⟫_ℂ = ⟪π g⁻¹ v, 
 lemma norm_map_le (g : G) : ‖π g‖ ≤ 1 :=
   opNorm_le_bound _ zero_le_one fun v => by simp
 
-noncomputable def ofLinearIsometryEquiv (ρ : G →* (H ≃ₗᵢ[ℂ] H))
-    (hρ : ∀ v, Continuous fun g => ρ g v) : UnitaryRep G H where
+noncomputable def ofLinearIsometryEquiv
+    (ρ : G →* (H ≃ₗᵢ[ℂ] H)) (hρ : ∀ v, Continuous fun g => ρ g v)
+    : UnitaryRep G H where
   toHom := (Unitary.linearIsometryEquiv (𝕜 := ℂ) (H := H)).symm.toMonoidHom.comp ρ
   continuous_orbit' v := by simpa using hρ v
 
@@ -82,24 +83,22 @@ def IsInvariant (V : Submodule ℂ H) : Prop := ∀ (g : G) (v : H), v ∈ V →
 
 variable {π}
 
-theorem IsInvariant.orthogonal {V : Submodule ℂ H} (hV : π.IsInvariant V) :
-    π.IsInvariant Vᗮ := by
+theorem IsInvariant.orthogonal {V : Submodule ℂ H} (hV : π.IsInvariant V) : π.IsInvariant Vᗮ := by
   intro g v hv w hw
   rw [inner_map_right]
   exact hv _ (hV _ _ hw)
 
-theorem IsInvariant.topologicalClosure {V : Submodule ℂ H} (hV : π.IsInvariant V) :
-    π.IsInvariant V.topologicalClosure := by
+theorem IsInvariant.topologicalClosure {V : Submodule ℂ H} (hV : π.IsInvariant V)
+    : π.IsInvariant V.topologicalClosure := by
   intro g v hv
-  have hsub : Set.MapsTo (π g) (V : Set H) (V.topologicalClosure : Set H) :=
-    fun x hx => V.le_topologicalClosure (hV g x hx)
-  have hv' : v ∈ closure (V : Set H) := by
-    rwa [← Submodule.topologicalClosure_coe]
+  have hsub : Set.MapsTo (π g) (V : Set H) (V.topologicalClosure : Set H) := fun x hx =>
+    V.le_topologicalClosure (hV g x hx)
+  have hv' : v ∈ closure (V : Set H) := by rwa [← Submodule.topologicalClosure_coe]
   have := hsub.closure (π g).continuous hv'
   rwa [V.isClosed_topologicalClosure.closure_eq] at this
 
-theorem isInvariant_iff_commute_starProjection (V : Submodule ℂ H) [V.HasOrthogonalProjection] :
-    π.IsInvariant V ↔ ∀ g, Commute (π g) V.starProjection := by
+theorem isInvariant_iff_commute_starProjection (V : Submodule ℂ H) [V.HasOrthogonalProjection]
+    : π.IsInvariant V ↔ ∀ g, Commute (π g) V.starProjection := by
   constructor
   · intro hV g
     ext v
@@ -116,7 +115,6 @@ theorem isInvariant_iff_commute_starProjection (V : Submodule ℂ H) [V.HasOrtho
     have : π g (V.starProjection v) = V.starProjection (π g v) :=
       congrArg (fun T : H →L[ℂ] H => T v) (h g)
     rw [← this, hv]
-
 
 variable (π) in
 def intertwiners (σ : UnitaryRep G K) : Submodule ℂ (H →L[ℂ] K) where
@@ -136,19 +134,14 @@ lemma mem_intertwiners_self_iff {T : H →L[ℂ] H} :
   refine ⟨commute_of_mem_intertwiners, fun h g v => ?_⟩
   exact congrArg (fun S : H →L[ℂ] H => S v) (h g)
 
-
 variable (π σ) in
 structure Equiv where
-
   toLinearIsometryEquiv : H ≃ₗᵢ[ℂ] K
-
   map_apply' : ∀ (g : G) (v : H), toLinearIsometryEquiv (π g v) = σ g (toLinearIsometryEquiv v)
-
 
 namespace Equiv
 
 end Equiv
-
 
 variable (π) in
 def IsIrreducible : Prop :=
@@ -169,10 +162,11 @@ noncomputable def restrictAux (g : G) : V ≃ₗᵢ[ℂ] V where
 
 noncomputable def restrict : UnitaryRep G V :=
   ofLinearIsometryEquiv
-    { toFun := restrictAux π V hV
+    {
+      toFun := restrictAux π V hV
       map_one' := by ext v; simp [restrictAux]
-      map_mul' := fun g h =>
-        LinearIsometryEquiv.ext fun v => Subtype.ext (map_mul_apply π g h v) }
+      map_mul' := fun g h => LinearIsometryEquiv.ext fun v => Subtype.ext (map_mul_apply π g h v)
+    }
     (fun v => (π.continuous_orbit v).subtype_mk _)
 
 @[simp] lemma coe_restrict_apply (g : G) (v : V) :

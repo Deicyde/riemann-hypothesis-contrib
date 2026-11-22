@@ -12,8 +12,8 @@ namespace GlobalTheory.IoInj
 
 open PowerSeries
 
-theorem series_form {O : Type} [CommRing O] (ϖ : O) (hO : ∀ a, IsUnit a ∨ ϖ ∣ a) (a : O⟦X⟧) :
-    (∃ b, a = C ϖ * b) ∨ ∃ (b : O⟦X⟧) (k : ℕ) (u : O⟦X⟧), IsUnit u ∧ a = C ϖ * b + X ^ k * u := by
+theorem series_form {O : Type} [CommRing O] (ϖ : O) (hO : ∀ a, IsUnit a ∨ ϖ ∣ a) (a : O⟦X⟧)
+    : (∃ b, a = C ϖ * b) ∨ ∃ (b : O⟦X⟧) (k : ℕ) (u : O⟦X⟧), IsUnit u ∧ a = C ϖ * b + X ^ k * u := by
   classical
   by_cases h : ∀ n, ϖ ∣ coeff n a
   · left
@@ -29,20 +29,30 @@ theorem series_form {O : Type} [CommRing O] (ϖ : O) (hO : ∀ a, IsUnit a ∨ �
         exact ⟨d, fun _ => hd⟩
       · exact ⟨0, fun h' => absurd h' hn⟩
     choose d hd using h2
-    refine ⟨mk fun n => if n < Nat.find h then d n else 0, Nat.find h,
-      mk fun n => coeff (n + Nat.find h) a, ?_, ?_⟩
+    refine ⟨
+      mk fun n => if n < Nat.find h then d n else 0,
+      Nat.find h,
+      mk fun n => coeff (n + Nat.find h) a,
+      ?_,
+      ?_
+    ⟩
     · rw [isUnit_iff_constantCoeff]
       simpa using (hO _).resolve_right h1
     · ext n
       rw [map_add (f := _), coeff_C_mul, coeff_X_pow_mul', coeff_mk]
       by_cases hn : n < Nat.find h
       · rw [if_pos hn, if_neg (by omega), hd n hn, add_zero]
-      · rw [if_neg hn, if_pos (by omega), coeff_mk, Nat.sub_add_cancel (by omega), mul_zero, zero_add]
+      · rw [if_neg hn, if_pos (by omega), coeff_mk, Nat.sub_add_cancel (by omega), mul_zero,
+          zero_add]
 
-theorem letter_form {O ι : Type} [CommRing O] [DecidableEq ι] (ϖ : O) (hO : ∀ a, IsUnit a ∨ ϖ ∣ a)
-    (a : ι → O⟦X⟧) (i : ι) :
-    (∃ b, Pi.single i 1 * a = (fun _ => C ϖ) * b) ∨ ∃ (b : ι → O⟦X⟧) (k : ℕ) (u : ι → O⟦X⟧), IsUnit u ∧
-      Pi.single i 1 * a = (fun _ => C ϖ) * b + (fun _ => X) ^ k * u * Pi.single i 1 := by
+theorem letter_form
+    {O ι : Type} [CommRing O] [DecidableEq ι]
+    (ϖ : O) (hO : ∀ a, IsUnit a ∨ ϖ ∣ a)
+    (a : ι → O⟦X⟧) (i : ι)
+    : (∃ b, Pi.single i 1 * a = (fun _ => C ϖ) * b)
+      ∨ ∃ (b : ι → O⟦X⟧) (k : ℕ) (u : ι → O⟦X⟧),
+        IsUnit u
+          ∧ Pi.single i 1 * a = (fun _ => C ϖ) * b + (fun _ => X) ^ k * u * Pi.single i 1 := by
   rcases series_form ϖ hO (a i) with ⟨b, hb⟩ | ⟨b, k, u, hu, hb⟩
   · left
     refine ⟨Pi.single i b, ?_⟩
@@ -57,10 +67,12 @@ theorem letter_form {O ι : Type} [CommRing O] [DecidableEq ι] (ϖ : O) (hO : �
     · subst h; simp [hb]
     · simp [h]
 
-theorem prec_pi {O ι : Type} [CommRing O] (q : ℕ)
+theorem prec_pi
+    {O ι : Type} [CommRing O]
+    (q : ℕ)
     (h : ∀ a : ℕ → O, (∀ k k', k ≤ k' → (q : O) ^ k ∣ a k - a k') → ∃ L, ∀ k, (q : O) ^ k ∣ a k - L)
-    (a : ℕ → ι → O⟦X⟧) (ha : ∀ k k', k ≤ k' → (q : ι → O⟦X⟧) ^ k ∣ a k - a k') :
-    ∃ L, ∀ k, (q : ι → O⟦X⟧) ^ k ∣ a k - L := by
+    (a : ℕ → ι → O⟦X⟧) (ha : ∀ k k', k ≤ k' → (q : ι → O⟦X⟧) ^ k ∣ a k - a k')
+    : ∃ L, ∀ k, (q : ι → O⟦X⟧) ^ k ∣ a k - L := by
   have hq : ∀ k : ℕ, ((q : O⟦X⟧)) ^ k = C ((q : O) ^ k) := by intro k; simp
   have h1 : ∀ i n, ∃ L, ∀ k, (q : O) ^ k ∣ coeff n (a k i) - L := by
     intro i n
@@ -69,46 +81,59 @@ theorem prec_pi {O ι : Type} [CommRing O] (q : ℕ)
     obtain ⟨d, hd⟩ := ha k k' hk
     refine ⟨coeff n (d i), ?_⟩
     have := congrArg (fun x => coeff n (x i)) hd
-    simpa only [Pi.sub_apply, Pi.mul_apply, Pi.pow_apply, Pi.natCast_apply, map_sub, hq, coeff_C_mul] using this
+    simpa only [Pi.sub_apply, Pi.mul_apply, Pi.pow_apply, Pi.natCast_apply, map_sub, hq,
+        coeff_C_mul]
+      using this
   choose L hL using h1
   choose d hd using hL
   refine ⟨fun i => mk (L i), fun k => ⟨fun i => mk fun n => d i n k, ?_⟩⟩
   funext i
   ext n
-  simp only [Pi.sub_apply, Pi.mul_apply, Pi.pow_apply, Pi.natCast_apply, map_sub, hq, coeff_C_mul, coeff_mk, hd]
+  simp only [Pi.sub_apply, Pi.mul_apply, Pi.pow_apply, Pi.natCast_apply, map_sub, hq, coeff_C_mul,
+    coeff_mk, hd]
 
 section Abstract
 
 variable {A E B W ι : Type} [CommRing A] [CommRing E] [CommRing B] [CommRing W] [Fintype ι]
 
-theorem idem_eq_zero {R : Type} [CommRing R] {e : R} (he : e * e = e) (h : e ∈ Ideal.jacobson (⊥ : Ideal R)) :
-    e = 0 := by
+theorem idem_eq_zero
+    {R : Type} [CommRing R] {e : R} (he : e * e = e) (h : e ∈ Ideal.jacobson (⊥ : Ideal R))
+    : e = 0 := by
   have hu := Ideal.mem_jacobson_bot.mp h (-1)
   apply hu.mul_right_eq_zero.mp
   linear_combination -he
 
-theorem mem_jac_of_pow {R : Type} [CommRing R] {t u : R} (hu : IsUnit u) {n : ℕ}
-    (h : u * t ^ n ∈ Ideal.jacobson (⊥ : Ideal R)) (hn : n ≠ 0) : t ∈ Ideal.jacobson (⊥ : Ideal R) := by
+theorem mem_jac_of_pow
+    {R : Type} [CommRing R]
+    {t u : R} (hu : IsUnit u)
+    {n : ℕ} (h : u * t ^ n ∈ Ideal.jacobson (⊥ : Ideal R)) (hn : n ≠ 0)
+    : t ∈ Ideal.jacobson (⊥ : Ideal R) := by
   rw [Ideal.jacobson, Ideal.mem_sInf] at h ⊢
   intro J hJ
   haveI := hJ.2.isPrime
   exact Ideal.IsPrime.mem_of_pow_mem inferInstance n ((Ideal.unit_mul_mem_iff_mem J hu).mp (h hJ))
 
-theorem abstract (j : A →+* E) (f : E →+* W) (g : A →+* B) (c : B →+* W) (hcomm : ∀ a, f (j a) = c (g a))
-    (p : ℕ) (t π U : A) (n : ℕ) (hU : IsUnit U) (hp : (p : A) = U * t ^ (n + 1))
+theorem abstract
+    (j : A →+* E) (f : E →+* W) (g : A →+* B) (c : B →+* W) (hcomm : ∀ a, f (j a) = c (g a))
+    (p : ℕ)
+    (t π U : A)
+    (n : ℕ)
+    (hU : IsUnit U) (hp : (p : A) = U * t ^ (n + 1))
     (e : ι → A) (hee : ∀ i, e i * e i = e i) (hsum : ∑ i, e i = 1)
-    (dich : ∀ a i, (∃ b, e i * a = t * b) ∨ ∃ (b : A) (k : ℕ) (u : A), IsUnit u ∧
-      e i * a = t * b + π ^ k * u * e i)
-    (hA : ∀ a : ℕ → A, (∀ k k', k ≤ k' → (p : A) ^ k ∣ a k - a k') → ∃ L, ∀ k, (p : A) ^ k ∣ a k - L)
+    (dich : ∀ a i,
+      (∃ b, e i * a = t * b)
+        ∨ ∃ (b : A) (k : ℕ) (u : A), IsUnit u ∧ e i * a = t * b + π ^ k * u * e i)
+    (hA
+      : ∀ a : ℕ → A, (∀ k k', k ≤ k' → (p : A) ^ k ∣ a k - a k') → ∃ L, ∀ k, (p : A) ^ k ∣ a k - L)
     (hπ : IsUnit (j π)) (hE : IsAdicComplete (Ideal.span {(p : E)}) E)
     (hdense : ∀ x : E, ∃ (a : A) (m : ℕ), x * j (π ^ m) - j a ∈ Ideal.span {(p : E) ^ 1})
     (hsat : ∀ (a : A) (k : ℕ), j a ∈ Ideal.span {(p : E) ^ k} → ∃ b, a = (p : A) ^ k * b)
     (hWJ : (p : W) ∈ Ideal.jacobson (⊥ : Ideal W)) (hWtf : ∀ x : W, (p : W) * x = 0 → x = 0)
     (hcs : ∀ (y : B) (x : W), c y = (p : W) * x → ∃ y', c y' = x)
-    (hBJ : g π ∈ Ideal.jacobson (⊥ : Ideal B)) (hne : ∀ i, f (j (e i)) ≠ 0) :
-    Function.Injective f ∧ (∀ x, IsUnit (f x) → IsUnit x) ∧
-      (∀ (x : E) (y : W), f x = (p : W) * y → ∃ x', x = (p : E) * x') ∧
-      ∀ x : E, (∃ y, c y = f x) → ∃ a, j a = x := by
+    (hBJ : g π ∈ Ideal.jacobson (⊥ : Ideal B)) (hne : ∀ i, f (j (e i)) ≠ 0)
+    : Function.Injective f ∧ (∀ x, IsUnit (f x) → IsUnit x)
+      ∧ (∀ (x : E) (y : W), f x = (p : W) * y → ∃ x', x = (p : E) * x')
+      ∧ ∀ x : E, (∃ y, c y = f x) → ∃ a, j a = x := by
   classical
   have hpE : (p : E) = j U * j t ^ (n + 1) := by rw [← map_natCast j, hp]; simp
   have hpW : (p : W) = f (j U) * f (j t) ^ (n + 1) := by rw [← map_natCast f, hpE]; simp
@@ -193,7 +218,8 @@ theorem abstract (j : A →+* E) (f : E →+* W) (g : A →+* B) (c : B →+* W)
       rw [map_mul] at hy
       linear_combination hy
 
-  have key2 : ∀ x : E, (∃ y, c y = f x) → ∃ (a : A) (x' : E), x = j a + j t * x' ∧ ∃ y, c y = f x' := by
+  have key2
+      : ∀ x : E, (∃ y, c y = f x) → ∃ (a : A) (x' : E), x = j a + j t * x' ∧ ∃ y, c y = f x' := by
     rintro x ⟨y, hy⟩
     obtain ⟨a, m, z, h⟩ := hd x
     have h2 : ∀ i, ∃ b d, e i * a = t * b + π ^ m * d := by
@@ -220,7 +246,8 @@ theorem abstract (j : A →+* E) (f : E →+* W) (g : A →+* B) (c : B →+* W)
           linear_combination (-f (j v)) * h3 - f (j v) * f (j (e i)) * h4 - f (j π) ^ k * f (j (e i)) * h6
     choose b d hbd using h2
     have h5 : a = t * ∑ i, b i + π ^ m * ∑ i, d i := by
-      rw [← one_mul a, ← hsum, Finset.sum_mul, Finset.mul_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
+      rw [← one_mul a, ← hsum, Finset.sum_mul, Finset.mul_sum, Finset.mul_sum,
+        ← Finset.sum_add_distrib]
       exact Finset.sum_congr rfl fun i _ => hbd i
     have h6 : x = j (∑ i, d i) + j t * ((j (∑ i, b i) + z) * πi ^ m) := by
       rw [h5] at h
@@ -283,13 +310,14 @@ theorem abstract (j : A →+* E) (f : E →+* W) (g : A →+* B) (c : B →+* W)
     have h1 : ∀ k, ∃ a : A, (p : E) ^ k ∣ x - j a := fun k =>
       (key2' ((n + 1) * k) x hx).imp fun a ha => (htp k).trans ha
     choose a ha using h1
-    obtain ⟨L, hL⟩ := hA a (by
-      intro k k' hk
-      apply hsat
-      rw [Ideal.mem_span_singleton, map_sub]
-      have : j (a k) - j (a k') = (x - j (a k')) - (x - j (a k)) := by ring
-      rw [this]
-      exact dvd_sub ((pow_dvd_pow _ hk).trans (ha k')) (ha k))
+    obtain ⟨L, hL⟩ :=
+      hA a (by
+        intro k k' hk
+        apply hsat
+        rw [Ideal.mem_span_singleton, map_sub]
+        have : j (a k) - j (a k') = (x - j (a k')) - (x - j (a k)) := by ring
+        rw [this]
+        exact dvd_sub ((pow_dvd_pow _ hk).trans (ha k')) (ha k))
     refine ⟨L, (sub_eq_zero.mp (hsep _ fun k => ?_)).symm⟩
     have h2 := map_dvd j (hL k)
     rw [map_pow, map_natCast, map_sub] at h2
@@ -299,25 +327,29 @@ theorem abstract (j : A →+* E) (f : E →+* W) (g : A →+* B) (c : B →+* W)
 
 end Abstract
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct GlobalTheory.HWL
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  TensorProduct GlobalTheory.HWL
 
-theorem not_isUnit_εroot_sub_one {l : ℕ} [Fact l.Prime] {P : LocPrime l} (AI : LocAinf l P) (s : ℕ) :
-    ¬ IsUnit (AI.εroot s - 1) := by
+theorem not_isUnit_εroot_sub_one {l : ℕ} [Fact l.Prime] {P : LocPrime l} (AI : LocAinf l P) (s : ℕ)
+    : ¬ IsUnit (AI.εroot s - 1) := by
   induction s with
   | zero =>
     intro h
     have h1 := h.map (PreTilt.coeff (O := OC l) (p := l) 0)
-    rw [map_sub, map_one, LocAinf.εroot, Function.iterate_zero_apply, AI.ε_coeff, AI.ζ_zero, map_one,
-      sub_self] at h1
+    rw [map_sub, map_one, LocAinf.εroot, Function.iterate_zero_apply, AI.ε_coeff, AI.ζ_zero,
+        map_one, sub_self]
+      at h1
     exact not_isUnit_zero h1
   | succ s ih =>
     intro h
     apply ih
     have h1 := h.pow l
-    rwa [sub_pow_char, one_pow, LocAinf.εroot, Function.iterate_succ_apply', frobeniusEquiv_symm_pow_p] at h1
+    rwa [sub_pow_char, one_pow, LocAinf.εroot, Function.iterate_succ_apply',
+        frobeniusEquiv_symm_pow_p]
+      at h1
 
-theorem letφ_letE {O : Type} [CommRing O] {n : ℕ} (φ₀ : O⟦X⟧ →ₐ[O] O⟦X⟧) (i : ZMod n) :
-    letφ φ₀ (Pi.single i 1 : LetA O n) = Pi.single (i + 1) 1 := by
+theorem letφ_letE {O : Type} [CommRing O] {n : ℕ} (φ₀ : O⟦X⟧ →ₐ[O] O⟦X⟧) (i : ZMod n)
+    : letφ φ₀ (Pi.single i 1 : LetA O n) = Pi.single (i + 1) 1 := by
   funext i'
   change φ₀ ((Pi.single i 1 : LetA O n) (i' - 1)) = _
   by_cases h : i' = i + 1
@@ -325,10 +357,13 @@ theorem letφ_letE {O : Type} [CommRing O] {n : ℕ} (φ₀ : O⟦X⟧ →ₐ[O]
   · have h' : i' - 1 ≠ i := fun h' => h (by rw [← h']; ring)
     simp [h, h']
 
-theorem idem_ne_zero {O E W : Type} [CommRing O] [CommRing E] [CommRing W] [Nontrivial W] {n : ℕ} [NeZero n]
-    (j : LetA O n →+* E) (f : E →+* W) (φ₀ : O⟦X⟧ →ₐ[O] O⟦X⟧) (φE : E → E) (φW : W → W) (h0 : φW 0 = 0)
-    (h₁ : ∀ a, φE (j a) = j (letφ φ₀ a)) (h₂ : ∀ e, f (φE e) = φW (f e)) (i : ZMod n) :
-    f (j (Pi.single i 1)) ≠ 0 := by
+theorem idem_ne_zero
+    {O E W : Type} [CommRing O] [CommRing E] [CommRing W] [Nontrivial W]
+    {n : ℕ} [NeZero n]
+    (j : LetA O n →+* E) (f : E →+* W) (φ₀ : O⟦X⟧ →ₐ[O] O⟦X⟧) (φE : E → E)
+    (φW : W → W) (h0 : φW 0 = 0)
+    (h₁ : ∀ a, φE (j a) = j (letφ φ₀ a)) (h₂ : ∀ e, f (φE e) = φW (f e)) (i : ZMod n)
+    : f (j (Pi.single i 1)) ≠ 0 := by
   intro hi
   have h1 : ∀ m : ℕ, f (j (Pi.single (i + (m : ZMod n)) 1)) = 0 := by
     intro m
@@ -342,81 +377,97 @@ theorem idem_ne_zero {O E W : Type} [CommRing O] [CommRing E] [CommRing W] [Nont
   have := h1 (i' - i).val
   rwa [ZMod.natCast_zmod_val, add_sub_cancel] at this
 
-
 set_option maxHeartbeats 1000000 in
-theorem ioE_injective_saturated_inter (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (K : FinExt l)
-    (s : ℕ) (LL : FinExt l) (_h : Good K s LL) (Γ : GamS P K s LL) (R : WSer Γ) (I : IoS AI R) (_hI : IoW I) :
-    Function.Injective I.ioE ∧ (∀ x : R.EE, IsUnit (I.ioE x) → IsUnit x) ∧
-      (∀ (x : R.EE) (y : RW LL), I.ioE x = ((l : ℕ) : RW LL) * y → ∃ x', x = ((l : ℕ) : R.EE) * x') ∧
-      ∀ x : R.EE, (∃ y, inclR LL y = I.ioE x) →
-        ∃ a : LetA ↥(OL LL) (Module.finrank ℚ_[l] ↥(K0 K)), algebraMap _ R.EE a = x := by
+theorem ioE_injective_saturated_inter
+    (l : ℕ) [Fact l.Prime]
+    (P : LocPrime l) (AI : LocAinf l P)
+    (K : FinExt l) (s : ℕ) (LL : FinExt l)
+    (_h : Good K s LL) (Γ : GamS P K s LL) (R : WSer Γ) (I : IoS AI R) (_hI : IoW I)
+    : Function.Injective I.ioE ∧ (∀ x : R.EE, IsUnit (I.ioE x) → IsUnit x)
+      ∧ (∀ (x : R.EE) (y : RW LL),
+        I.ioE x = ((l : ℕ) : RW LL) * y → ∃ x', x = ((l : ℕ) : R.EE) * x')
+      ∧ ∀ x : R.EE,
+        (∃ y, inclR LL y = I.ioE x)
+          → ∃ a : LetA ↥(OL LL) (Module.finrank ℚ_[l] ↥(K0 K)), algebraMap _ R.EE a = x := by
   set_option synthInstance.maxHeartbeats 200000 in
-    classical
-    obtain ⟨_, hc, hl0, hlu, hfree, -, -⟩ := GlobalTheory.Per.integers_completeDVR l LL
-    obtain ⟨hWc, hWtf, -, hsat, hμ⟩ := GlobalTheory.HWL.TensorWitt.main l LL
-    haveI : FiniteDimensional ℚ_[l] K.1 := K.2
-    haveI : FiniteDimensional ℚ_[l] (K0 K) :=
-      Module.Finite.of_injective (IntermediateField.inclusion (inf_le_left : K0 K ≤ K.1)).toLinearMap
-        (IntermediateField.inclusion_injective (inf_le_left : K0 K ≤ K.1))
-    haveI : NeZero (Module.finrank ℚ_[l] (K0 K)) := ⟨Module.finrank_pos.ne'⟩
-    haveI : Nontrivial (RW LL) := Module.FaithfullyFlat.lTensor_nontrivial ℤ_[l] ↥(OL LL) (WCb l)
-    obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible ↥(OL LL)
-    obtain ⟨N, hN⟩ := IsDiscreteValuationRing.associated_pow_irreducible hl0 hϖ
-    obtain ⟨n, rfl⟩ : ∃ n, N = n + 1 := by
-      rcases N with _ | n
-      · exact absurd (by simpa using hN) hlu
-      · exact ⟨n, rfl⟩
-    obtain ⟨u, hu⟩ := hN.symm
-    have hm : IsLocalRing.maximalIdeal ↥(OL LL) = Ideal.span {ϖ} := hϖ.maximalIdeal_eq
-    have hO : ∀ a : ↥(OL LL), IsUnit a ∨ ϖ ∣ a := by
-      intro a
-      by_cases h : IsUnit a
-      · exact Or.inl h
-      · right
-        rw [← Ideal.mem_span_singleton, ← hm]
-        exact h
-    have hOp : ∀ a : ℕ → ↥(OL LL), (∀ k k', k ≤ k' → (l : ↥(OL LL)) ^ k ∣ a k - a k') →
-        ∃ L, ∀ k, (l : ↥(OL LL)) ^ k ∣ a k - L := by
-      intro a ha
-      have hiff : ∀ (k : ℕ) (x y : ↥(OL LL)),
-          x ≡ y [SMOD (IsLocalRing.maximalIdeal ↥(OL LL) ^ k • ⊤ : Submodule ↥(OL LL) ↥(OL LL))] ↔ ϖ ^ k ∣ x - y := by
-        intro k x y
-        rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, hm, Ideal.span_singleton_pow, Ideal.mem_span_singleton]
-      obtain ⟨L, hL⟩ := IsPrecomplete.prec hc.toIsPrecomplete (f := a) (by
+  classical
+  obtain ⟨_, hc, hl0, hlu, hfree, -, -⟩ := GlobalTheory.Per.integers_completeDVR l LL
+  obtain ⟨hWc, hWtf, -, hsat, hμ⟩ := GlobalTheory.HWL.TensorWitt.main l LL
+  haveI : FiniteDimensional ℚ_[l] K.1 := K.2
+  haveI : FiniteDimensional ℚ_[l] (K0 K) :=
+    Module.Finite.of_injective (IntermediateField.inclusion (inf_le_left : K0 K ≤ K.1)).toLinearMap
+      (IntermediateField.inclusion_injective (inf_le_left : K0 K ≤ K.1))
+  haveI : NeZero (Module.finrank ℚ_[l] (K0 K)) := ⟨Module.finrank_pos.ne'⟩
+  haveI : Nontrivial (RW LL) := Module.FaithfullyFlat.lTensor_nontrivial ℤ_[l] ↥(OL LL) (WCb l)
+  obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible ↥(OL LL)
+  obtain ⟨N, hN⟩ := IsDiscreteValuationRing.associated_pow_irreducible hl0 hϖ
+  obtain ⟨n, rfl⟩ : ∃ n, N = n + 1 := by
+    rcases N with _ | n
+    · exact absurd (by simpa using hN) hlu
+    · exact ⟨n, rfl⟩
+  obtain ⟨u, hu⟩ := hN.symm
+  have hm : IsLocalRing.maximalIdeal ↥(OL LL) = Ideal.span {ϖ} := hϖ.maximalIdeal_eq
+  have hO : ∀ a : ↥(OL LL), IsUnit a ∨ ϖ ∣ a := by
+    intro a
+    by_cases h : IsUnit a
+    · exact Or.inl h
+    · right
+      rw [← Ideal.mem_span_singleton, ← hm]
+      exact h
+  have hOp
+      : ∀ a : ℕ → ↥(OL LL),
+        (∀ k k', k ≤ k' → (l : ↥(OL LL)) ^ k ∣ a k - a k')
+          → ∃ L, ∀ k, (l : ↥(OL LL)) ^ k ∣ a k - L := by
+    intro a ha
+    have hiff
+        : ∀ (k : ℕ) (x y : ↥(OL LL)),
+          x ≡ y [SMOD (IsLocalRing.maximalIdeal ↥(OL LL) ^ k • ⊤ : Submodule ↥(OL LL) ↥(OL LL))]
+            ↔ ϖ ^ k ∣ x - y := by
+      intro k x y
+      rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, hm, Ideal.span_singleton_pow,
+        Ideal.mem_span_singleton]
+    obtain ⟨L, hL⟩ :=
+      IsPrecomplete.prec hc.toIsPrecomplete (f := a) (by
         intro k k' hk
         rw [hiff]
         refine (pow_dvd_pow_of_dvd ?_ k).trans (ha k k' hk)
         exact ⟨ϖ ^ n * u, by rw [← hu]; ring⟩)
-      refine ⟨L, fun k => ?_⟩
-      have h1 := (hiff _ _ _).mp (hL ((n + 1) * k))
-      have h2 : (l : ↥(OL LL)) ^ k ∣ ϖ ^ ((n + 1) * k) := by
-        rw [pow_mul]
-        exact pow_dvd_pow_of_dvd hN.dvd k
-      have : a k - L = (a k - a ((n + 1) * k)) + (a ((n + 1) * k) - L) := by ring
-      rw [this]
-      exact dvd_add (ha _ _ (by nlinarith)) (h2.trans h1)
-    have hp := P.PD_p K
-    have hE := R.EE_complete
-    have hdense := R.EE_dense
-    have hEsat := R.EE_sat
-    rw [hp] at hE hdense hEsat
-    refine abstract (algebraMap _ R.EE) I.ioE.toRingHom I.io.toRingHom (inclR LL).toRingHom I.ioE_ext l
-      (fun _ => C ϖ) letπ (fun _ => C (u : ↥(OL LL))) n
-      (Pi.isUnit_iff.mpr fun _ => u.isUnit.map C) ?_ (fun i => Pi.single i 1) ?_ ?_
-      (letter_form ϖ hO) (prec_pi l hOp) R.EE_π hE (fun x => hdense x 1) hEsat
-      (IsAdicComplete.le_jacobson_bot _ (Ideal.mem_span_singleton_self _)) hWtf hsat ?_ ?_
-    · funext i
-      have := congrArg (C : ↥(OL LL) →+* _) hu
-      rw [map_natCast, map_mul, map_pow] at this
-      simp only [Pi.natCast_apply, Pi.mul_apply, Pi.pow_apply, ← this]
-      ring
-    · intro i
-      rw [← Pi.single_mul, mul_one]
-    · exact Finset.univ_sum_single (1 : LetA ↥(OL LL) _)
-    · haveI := hμ _ (not_isUnit_εroot_sub_one AI s)
-      change I.io letπ ∈ _
-      rw [I.io_π]
-      exact IsAdicComplete.le_jacobson_bot _ (Ideal.mem_span_singleton_self _)
-    · exact idem_ne_zero (algebraMap _ R.EE) I.ioE.toRingHom R.φ₀ R.φE (φRW LL) (map_zero _) R.φE_ext I.ioE_φ
+    refine ⟨L, fun k => ?_⟩
+    have h1 := (hiff _ _ _).mp (hL ((n + 1) * k))
+    have h2 : (l : ↥(OL LL)) ^ k ∣ ϖ ^ ((n + 1) * k) := by
+      rw [pow_mul]
+      exact pow_dvd_pow_of_dvd hN.dvd k
+    have : a k - L = (a k - a ((n + 1) * k)) + (a ((n + 1) * k) - L) := by ring
+    rw [this]
+    exact dvd_add (ha _ _ (by nlinarith)) (h2.trans h1)
+  have hp := P.PD_p K
+  have hE := R.EE_complete
+  have hdense := R.EE_dense
+  have hEsat := R.EE_sat
+  rw [hp] at hE hdense hEsat
+  refine abstract (algebraMap _ R.EE) I.ioE.toRingHom I.io.toRingHom (inclR LL).toRingHom I.ioE_ext
+    l
+    (fun _ => C ϖ)
+    letπ
+    (fun _ => C (u : ↥(OL LL)))
+    n (Pi.isUnit_iff.mpr fun _ => u.isUnit.map C) ?_
+    (fun i => Pi.single i 1)
+    ?_ ?_ (letter_form ϖ hO) (prec_pi l hOp) R.EE_π hE
+    (fun x => hdense x 1)
+    hEsat (IsAdicComplete.le_jacobson_bot _ (Ideal.mem_span_singleton_self _)) hWtf hsat ?_ ?_
+  · funext i
+    have := congrArg (C : ↥(OL LL) →+* _) hu
+    rw [map_natCast, map_mul, map_pow] at this
+    simp only [Pi.natCast_apply, Pi.mul_apply, Pi.pow_apply, ← this]
+    ring
+  · intro i
+    rw [← Pi.single_mul, mul_one]
+  · exact Finset.univ_sum_single (1 : LetA ↥(OL LL) _)
+  · haveI := hμ _ (not_isUnit_εroot_sub_one AI s)
+    change I.io letπ ∈ _
+    rw [I.io_π]
+    exact IsAdicComplete.le_jacobson_bot _ (Ideal.mem_span_singleton_self _)
+  · exact idem_ne_zero (algebraMap _ R.EE) I.ioE.toRingHom R.φ₀ R.φE (φRW LL) (map_zero _) R.φE_ext
+      I.ioE_φ
 
 end GlobalTheory.IoInj

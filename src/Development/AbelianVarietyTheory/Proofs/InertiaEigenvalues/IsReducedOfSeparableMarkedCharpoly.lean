@@ -10,7 +10,8 @@ namespace GlobalTheory.UnitLemma
 
 open Polynomial
 
-theorem InvAlg.isReduced_of_separable_P : ∀ (K : UQ) (B : InvAlg K), B.P.Separable → IsReduced B.A := by
+theorem InvAlg.isReduced_of_separable_P
+    : ∀ (K : UQ) (B : InvAlg K), B.P.Separable → IsReduced B.A := by
   intro K B h
   obtain ⟨e, he⟩ := exists_basis_pow_of_separable K B h
   have h2 : minpoly K.E (LinearMap.mulLeft K.E B.g) = minpoly K.E B.g :=
@@ -19,8 +20,9 @@ theorem InvAlg.isReduced_of_separable_P : ∀ (K : UQ) (B : InvAlg K), B.P.Separ
     h.of_dvd (h2 ▸ LinearMap.minpoly_dvd_charpoly (LinearMap.mulLeft K.E B.g))
   have hsurj : ∀ a : B.A, ∃ q : K.E[X], aeval B.g q = a := by
     intro a
-    have hle : Submodule.span K.E (Set.range e) ≤
-        Subalgebra.toSubmodule (Algebra.adjoin K.E ({B.g} : Set B.A)) := by
+    have hle
+        : Submodule.span K.E (Set.range e)
+          ≤ Subalgebra.toSubmodule (Algebra.adjoin K.E ({B.g} : Set B.A)) := by
       rw [Submodule.span_le]
       rintro _ ⟨i, rfl⟩
       rw [he]

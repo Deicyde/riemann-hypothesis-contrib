@@ -10,26 +10,29 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PlaceDivisors
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.EndLoc GlobalTheory.TrivLocus
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory.TrivLocusLocal
 
-
 open ReciprocityTheory.ChartRestriction.G.Pdiv.PullbackComparison in
-theorem exists_gen_pull_pull_iff {X Y Z : Scheme.{0}} (N : LB X) (a : Y ⟶ X) (b : Z ⟶ Y) :
-    (∃ s : ((N.pull a).pull b).Gen, s.IsGen) ↔ ∃ s : (N.pull (b ≫ a)).Gen, s.IsGen := by
+theorem exists_gen_pull_pull_iff {X Y Z : Scheme.{0}} (N : LB X) (a : Y ⟶ X) (b : Z ⟶ Y)
+    : (∃ s : ((N.pull a).pull b).Gen, s.IsGen) ↔ ∃ s : (N.pull (b ≫ a)).Gen, s.IsGen := by
   have hb : ∀ z : Z, (b ≫ a).base z = a.base (b.base z) := fun z => rfl
-  have m1 : ∀ (j : PUnit.{1} → N.ι) (z : Z), z ∈ (N.pull (b ≫ a)).U j →
-      z ∈ ((N.pull a).pull b).U (fun _ _ => j PUnit.unit) := by
+  have m1
+      : ∀ (j : PUnit.{1} → N.ι) (z : Z),
+        z ∈ (N.pull (b ≫ a)).U j → z ∈ ((N.pull a).pull b).U (fun _ _ => j PUnit.unit) := by
     intro j z hz
     have h1 : (b ≫ a).base z ∈ N.U (j PUnit.unit) := (mem_wchart_pu N (b ≫ a) j z).1 hz
     have h2 : b.base z ∈ (N.pull a).U (fun _ => j PUnit.unit) :=
       (mem_wchart_pu N a (fun _ => j PUnit.unit) (b.base z)).2 (by rw [← hb]; exact h1)
     exact (mem_wchart_pu (N.pull a) b (fun _ _ => j PUnit.unit) z).2 h2
-  have m2 : ∀ (j : PUnit.{1} → PUnit.{1} → N.ι) (z : Z), z ∈ ((N.pull a).pull b).U j →
-      z ∈ (N.pull (b ≫ a)).U (fun _ => j PUnit.unit PUnit.unit) := by
+  have m2
+      : ∀ (j : PUnit.{1} → PUnit.{1} → N.ι) (z : Z),
+        z ∈ ((N.pull a).pull b).U j
+          → z ∈ (N.pull (b ≫ a)).U (fun _ => j PUnit.unit PUnit.unit) := by
     intro j z hz
     have h2 : b.base z ∈ (N.pull a).U (j PUnit.unit) := (mem_wchart_pu (N.pull a) b j z).1 hz
     have h1 : a.base (b.base z) ∈ N.U (j PUnit.unit PUnit.unit) :=
@@ -38,17 +41,25 @@ theorem exists_gen_pull_pull_iff {X Y Z : Scheme.{0}} (N : LB X) (a : Y ⟶ X) (
   constructor
   · intro h
     refine exists_gen_transfer (L := (N.pull a).pull b) (L' := N.pull (b ≫ a))
-      (fun j _ _ => j PUnit.unit) m1 ?_ h
+      (fun j _ _ => j PUnit.unit)
+      m1 ?_ h
     intro i j y hy
     have hy' := pull_inf_le N (b ≫ a) i j hy
     exact (germ_pull N (b ≫ a) i j y hy hy').trans
-      (germ_pull_pull N a b (fun _ _ => i PUnit.unit) (fun _ _ => j PUnit.unit) y ⟨m1 i y hy.1, m1 j y hy.2⟩ hy').symm
+      (germ_pull_pull N a b
+        (fun _ _ => i PUnit.unit)
+        (fun _ _ => j PUnit.unit)
+        y ⟨m1 i y hy.1, m1 j y hy.2⟩ hy').symm
   · intro h
     refine exists_gen_transfer (L := N.pull (b ≫ a)) (L' := (N.pull a).pull b)
-      (fun j _ => j PUnit.unit PUnit.unit) m2 ?_ h
+      (fun j _ => j PUnit.unit PUnit.unit)
+      m2 ?_ h
     intro i j y hy
-    have hy2 : y ∈ (N.pull (b ≫ a)).U (fun _ => i PUnit.unit PUnit.unit) ⊓
-        (N.pull (b ≫ a)).U (fun _ => j PUnit.unit PUnit.unit) := ⟨m2 i y hy.1, m2 j y hy.2⟩
+    have hy2
+        : y
+          ∈ (N.pull (b ≫ a)).U (fun _ => i PUnit.unit PUnit.unit)
+            ⊓ (N.pull (b ≫ a)).U (fun _ => j PUnit.unit PUnit.unit) :=
+      ⟨m2 i y hy.1, m2 j y hy.2⟩
     have hy' := pull_inf_le N (b ≫ a) _ _ hy2
     exact (germ_pull_pull N a b i j y hy hy').trans (germ_pull N (b ≫ a) _ _ y hy2 hy').symm
 
@@ -56,9 +67,16 @@ end GlobalTheory.TrivLocusLocal
 
 namespace GlobalTheory.TrivLocusLocal
 
-theorem exists_closed_triv_local : ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (A : Over S) [GrpObj A] (L₀ N : LB A.left), IsAbelianScheme A → L₀.IsLB → Out.RelAmple A L₀ → N.IsLB → Out.Rigidified A N → ∀ x : S, ∃ (U : S.Opens) (Z : Scheme.{0}) (i : Z ⟶ U), x ∈ U ∧ IsClosedImmersion i ∧ ∀ (T : Scheme.{0}) (t : T ⟶ U), TrivCond A N T (t ≫ U.ι) ↔ ∃ z : T ⟶ Z, z ≫ i = t := by
+theorem exists_closed_triv_local
+    : ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (A : Over S) [GrpObj A] (L₀ N : LB A.left),
+      IsAbelianScheme A → L₀.IsLB → Out.RelAmple A L₀ → N.IsLB → Out.Rigidified A N
+        → ∀ x : S, ∃ (U : S.Opens) (Z : Scheme.{0}) (i : Z ⟶ U),
+          x ∈ U ∧ IsClosedImmersion i
+            ∧ ∀ (T : Scheme.{0}) (t : T ⟶ U),
+              TrivCond A N T (t ≫ U.ι) ↔ ∃ z : T ⟶ Z, z ≫ i = t := by
   intro S _ A _ L₀ N hA hL₀ ha hN hr x
-  obtain ⟨R, j, _, hx, -⟩ := Scheme.exists_affine_mem_range_and_range_subset (x := x) (U := ⊤) trivial
+  obtain ⟨R, j, _, hx, -⟩ :=
+    Scheme.exists_affine_mem_range_and_range_subset (x := x) (U := ⊤) trivial
   let j' : Sp R ⟶ S := j
   haveI : IsOpenImmersion j' := inferInstanceAs (IsOpenImmersion j)
   letI : GrpObj ((Over.pullback j').obj A) := Functor.grpObjObj
@@ -75,7 +93,9 @@ theorem exists_closed_triv_local : ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] 
     have h1 := exists_gen_pull_comp N (eSec A) j' ⟨s, hs⟩
     rw [← GlobalTheory.RigidBundleGlue.eSec_comm hp] at h1
     exact (exists_gen_pull_pull_iff N φ₀ (eSec ((Over.pullback j').obj A))).2 h1
-  obtain ⟨Z, i₀, hi₀, H⟩ := GlobalTheory.T.exists_closed_subscheme_trivial_locus_rigidified R ((Over.pullback j').obj A) (L₀.pull φ₀) (N.pull φ₀) hB hL₀' haB hN' hrB
+  obtain ⟨Z, i₀, hi₀, H⟩ :=
+    GlobalTheory.T.exists_closed_subscheme_trivial_locus_rigidified R ((Over.pullback j').obj A)
+      (L₀.pull φ₀) (N.pull φ₀) hB hL₀' haB hN' hrB
   refine ⟨j'.opensRange, Z, i₀ ≫ j'.isoOpensRange.hom, hx, inferInstance, fun T t => ?_⟩
   let t' : T ⟶ Sp R := t ≫ j'.isoOpensRange.inv
   have ht : t' ≫ j' = t ≫ j'.opensRange.ι := by

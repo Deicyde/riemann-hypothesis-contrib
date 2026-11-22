@@ -7,13 +7,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Tower
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Tower
 
-private theorem exists_qz_ne_zero_annihilators_of_ne_zero (l : ℕ) [Fact l.Prime] (M : Type) [AddCommGroup M] [Module ℤ_[l] M]
-    (m : M) (hm : m ≠ 0) : ∃ x : QZ l, x ≠ 0 ∧ ∀ a : ℤ_[l], a • m = 0 → a • x = 0 := by
+private theorem exists_qz_ne_zero_annihilators_of_ne_zero
+    (l : ℕ) [Fact l.Prime] (M : Type) [AddCommGroup M] [Module ℤ_[l] M] (m : M) (hm : m ≠ 0)
+    : ∃ x : QZ l, x ≠ 0 ∧ ∀ a : ℤ_[l], a • m = 0 → a • x = 0 := by
   have hl1 : 1 < l := (Fact.out : l.Prime).one_lt
-  have hdec : ∀ (N : Type) [AddCommGroup N] [Module ℤ_[l] N] (a : ℤ_[l]) (ha : a ≠ 0) (y : N),
-      a • y = 0 ↔ (l : ℤ_[l]) ^ a.valuation • y = 0 := by
+  have hdec
+      : ∀ (N : Type) [AddCommGroup N] [Module ℤ_[l] N] (a : ℤ_[l]) (ha : a ≠ 0) (y : N),
+        a • y = 0 ↔ (l : ℤ_[l]) ^ a.valuation • y = 0 := by
     intro N _ _ a ha y
     conv_lhs => rw [PadicInt.unitCoeff_spec ha, mul_smul]
     exact (PadicInt.unitCoeff ha).isUnit.smul_eq_zero
@@ -48,8 +52,9 @@ private theorem exists_qz_ne_zero_annihilators_of_ne_zero (l : ℕ) [Fact l.Prim
     · rw [a0, zero_smul]
     · exact absurd ((hdec _ a a0 m).mp ha) (hex _)
 
-theorem UpperTheory.V.Tower.qzSep :
-    ∀ (l : ℕ) [Fact l.Prime] (M : Type) [AddCommGroup M] [Module ℤ_[l] M] (m : M), m ≠ 0 → ∃ f : M →ₗ[ℤ_[l]] QZ l, f m ≠ 0 := by
+theorem UpperTheory.V.Tower.qzSep
+    : ∀ (l : ℕ) [Fact l.Prime] (M : Type) [AddCommGroup M] [Module ℤ_[l] M] (m : M),
+      m ≠ 0 → ∃ f : M →ₗ[ℤ_[l]] QZ l, f m ≠ 0 := by
   intro l _ M _ _ m hm
   obtain ⟨x, hx0, hx⟩ := exists_qz_ne_zero_annihilators_of_ne_zero l M m hm
   set K := LinearMap.ker (LinearMap.toSpanSingleton ℤ_[l] M m) with hK
@@ -65,6 +70,7 @@ theorem UpperTheory.V.Tower.qzSep :
   refine ⟨h, ?_⟩
   have h1 := hh (K.mkQ 1)
   simp only [f, g, Submodule.mkQ_apply, Submodule.liftQ_apply, LinearMap.toSpanSingleton_apply,
-    one_smul] at h1
+      one_smul]
+    at h1
   rw [h1]
   exact hx0

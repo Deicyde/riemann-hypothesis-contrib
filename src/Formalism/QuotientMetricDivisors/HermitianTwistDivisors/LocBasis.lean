@@ -42,7 +42,8 @@ lemma hcompl_le (w : HeightOneSpectrum (𝓞 K)) :
   exact hs.1 w.asIdeal.zero_mem
 
 abbrev A (w : HeightOneSpectrum (𝓞 K)) : Subalgebra (𝓞 K) K :=
-  Localization.subalgebra.ofField K (Formalism.HermitianLatticesTheory.hcompl (K := K) w.asIdeal) (hcompl_le w)
+  Localization.subalgebra.ofField K (Formalism.HermitianLatticesTheory.hcompl (K := K) w.asIdeal)
+    (hcompl_le w)
 
 lemma mem_A (w : HeightOneSpectrum (𝓞 K)) (x : K) :
     x ∈ A w ↔ ∃ (a s : 𝓞 K) (_ : s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) w.asIdeal),
@@ -109,15 +110,13 @@ lemma mem_loc_iff_span (w : HeightOneSpectrum (𝓞 K)) {d : ℕ} (M : Submodule
 
 end SemilocalBasisHermitianTwistDivisors
 
-
 open SemilocalBasisHermitianTwistDivisors in
-theorem semilocal_basis_exists :
-    ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (d : ℕ)
-      (L : Submodule (𝓞 K) (Fin d → K)), Submodule.IsFullLattice K L →
-      ∀ w : HeightOneSpectrum (𝓞 K), ∃ f : Fin d → Fin d → K, IsLocBasis L w f := by
+theorem semilocal_basis_exists
+    : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (d : ℕ) (L : Submodule (𝓞 K) (Fin d → K)),
+      Submodule.IsFullLattice K L
+        → ∀ w : HeightOneSpectrum (𝓞 K), ∃ f : Fin d → Fin d → K, IsLocBasis L w f := by
   intro K _ _ _ d L hL w
-  have : IsDedekindDomain (A w) :=
-    IsLocalization.isDedekindDomain (𝓞 K) (hcompl_le w) (A w)
+  have : IsDedekindDomain (A w) := IsLocalization.isDedekindDomain (𝓞 K) (hcompl_le w) (A w)
   have : IsPrincipalIdealRing (A w) := IsPrincipalIdealRing.of_finite_primes (primes_finite w)
   set N : Submodule (A w) (Fin d → K) := Submodule.span (A w) (L : Set (Fin d → K)) with hN
   have : Module.Finite (A w) N := by
@@ -131,8 +130,7 @@ theorem semilocal_basis_exists :
   have hliA : LinearIndependent (A w) v := b.linearIndependent.map' N.subtype N.ker_subtype
   have hli : LinearIndependent K v := (LinearIndependent.iff_fractionRing (A w) K).mp hliA
   have hspanA : Submodule.span (A w) (Set.range v) = N := by
-    have : Set.range v = N.subtype '' Set.range b := by
-      rw [← Set.range_comp]; rfl
+    have : Set.range v = N.subtype '' Set.range b := by rw [← Set.range_comp]; rfl
     rw [this, Submodule.span_image, b.span_eq, Submodule.map_top, Submodule.range_subtype]
   have hspan : ⊤ ≤ Submodule.span K (Set.range v) := by
     rw [← hL.span_eq_top, Submodule.span_le]

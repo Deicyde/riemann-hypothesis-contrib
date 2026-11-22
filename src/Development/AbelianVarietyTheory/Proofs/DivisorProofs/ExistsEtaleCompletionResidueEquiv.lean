@@ -19,9 +19,13 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Compl
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.SiegJoin GlobalTheory.Poinc GlobalTheory.TChart
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.SiegJoin
+  GlobalTheory.Poinc GlobalTheory.TChart
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -31,11 +35,16 @@ namespace GlobalTheory.EtaleCompletionResidue
 
 open Polynomial
 
-theorem exists_finite_free_local_residue_equiv (B : Type) [CommRing B] [IsLocalRing B] [IsNoetherianRing B] (M : Type)
-    [Field M] (m : ResidueField B →+* M) (hmf : m.Finite) (hmu : m.FormallyUnramified) :
-    ∃ (C : Type) (_ : CommRing C) (_ : IsLocalRing C) (ψ₀ : B →+* C) (_ : IsLocalHom ψ₀) (E : M ≃+* ResidueField C),
-      IsNoetherianRing C ∧ Function.Injective ψ₀ ∧ ψ₀.Flat ∧ (maximalIdeal B).map ψ₀ = maximalIdeal C ∧
-      ((residue C).comp ψ₀).Finite ∧ ((residue C).comp ψ₀).FormallyUnramified ∧ (E : M →+* ResidueField C).comp m = ResidueField.map ψ₀ := by
+theorem exists_finite_free_local_residue_equiv
+    (B : Type) [CommRing B] [IsLocalRing B] [IsNoetherianRing B]
+    (M : Type) [Field M]
+    (m : ResidueField B →+* M) (hmf : m.Finite) (hmu : m.FormallyUnramified)
+    : ∃ (C : Type) (_ : CommRing C) (_ : IsLocalRing C) (ψ₀ : B →+* C) (_ : IsLocalHom ψ₀)
+        (E : M ≃+* ResidueField C),
+      IsNoetherianRing C ∧ Function.Injective ψ₀ ∧ ψ₀.Flat
+        ∧ (maximalIdeal B).map ψ₀ = maximalIdeal C ∧ ((residue C).comp ψ₀).Finite
+        ∧ ((residue C).comp ψ₀).FormallyUnramified
+        ∧ (E : M →+* ResidueField C).comp m = ResidueField.map ψ₀ := by
   letI : Algebra (ResidueField B) M := m.toAlgebra
   haveI : FiniteDimensional (ResidueField B) M := hmf
   haveI : Algebra.FormallyUnramified (ResidueField B) M := hmu
@@ -43,15 +52,17 @@ theorem exists_finite_free_local_residue_equiv (B : Type) [CommRing B] [IsLocalR
   let pb := Field.powerBasisOfFiniteOfSeparable (ResidueField B) M
   have hm := minpoly.monic pb.isIntegral_gen
   have hirr := minpoly.irreducible pb.isIntegral_gen
-  obtain ⟨F, hF, hdeg, hFm⟩ := Polynomial.lifts_and_degree_eq_and_monic (f := residue B)
-    (Polynomial.mem_lifts_of_surjective residue_surjective _) hm
+  obtain ⟨F, hF, hdeg, hFm⟩ :=
+    Polynomial.lifts_and_degree_eq_and_monic (f := residue B)
+      (Polynomial.mem_lifts_of_surjective residue_surjective _) hm
   have hg : Irreducible (F.map (residue B)) := hF ▸ hirr
   haveI : Fact (Irreducible (F.map (residue B))) := ⟨hg⟩
   haveI hfin : Module.Finite B (AdjoinRoot F) := .of_basis (AdjoinRoot.powerBasis' hFm).basis
   haveI : Module.Free B (AdjoinRoot F) := .of_basis (AdjoinRoot.powerBasis' hFm).basis
   have hqf : IsField (AdjoinRoot F ⧸ (maximalIdeal B).map (AdjoinRoot.of F)) := by
     have hR : IsField (AdjoinRoot (F.map (residue B))) := Field.toIsField _
-    exact MulEquiv.isField hR (AdjoinRoot.quotEquivQuotMap F (maximalIdeal B)).toRingEquiv.toMulEquiv
+    exact MulEquiv.isField hR
+      (AdjoinRoot.quotEquivQuotMap F (maximalIdeal B)).toRingEquiv.toMulEquiv
   have hJ : ((maximalIdeal B).map (algebraMap B (AdjoinRoot F))).IsMaximal := by
     rw [AdjoinRoot.algebraMap_eq]
     exact Ideal.Quotient.maximal_of_isField _ hqf
@@ -73,7 +84,8 @@ theorem exists_finite_free_local_residue_equiv (B : Type) [CommRing B] [IsLocalR
       rw [hmax]; exact Ideal.mem_map_of_mem _ h
     exact h2 hx
   have hinj : Function.Injective (algebraMap B (AdjoinRoot F)) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     by_contra h0
     change AdjoinRoot.mk F (C x) = 0 at hx
@@ -84,7 +96,9 @@ theorem exists_finite_free_local_residue_equiv (B : Type) [CommRing B] [IsLocalR
   haveI : IsNoetherianRing (AdjoinRoot F) := isNoetherian_of_tower B inferInstance
   let e₁ : ResidueField (AdjoinRoot F) ≃+* AdjoinRoot (F.map (residue B)) :=
     (Ideal.quotEquivOfEq hmax).trans (AdjoinRoot.quotEquivQuotMap F (maximalIdeal B)).toRingEquiv
-  have he₁ : e₁.toRingHom.comp (ResidueField.map (algebraMap B (AdjoinRoot F))) = AdjoinRoot.of (F.map (residue B)) := by
+  have he₁
+      : e₁.toRingHom.comp (ResidueField.map (algebraMap B (AdjoinRoot F)))
+        = AdjoinRoot.of (F.map (residue B)) := by
     apply Ideal.Quotient.ringHom_ext
     ext x
     show e₁ (ResidueField.map _ (residue B x)) = _
@@ -97,7 +111,9 @@ theorem exists_finite_free_local_residue_equiv (B : Type) [CommRing B] [IsLocalR
   let Eq' : M ≃+* ResidueField (AdjoinRoot F) := e₂.toRingEquiv.trans e₁.symm
   have hE : Eq'.toRingHom.comp m = ResidueField.map (algebraMap B (AdjoinRoot F)) := by
     ext x
-    have h1 : e₁ (ResidueField.map (algebraMap B (AdjoinRoot F)) x) = AdjoinRoot.of (F.map (residue B)) x :=
+    have h1
+        : e₁ (ResidueField.map (algebraMap B (AdjoinRoot F)) x)
+          = AdjoinRoot.of (F.map (residue B)) x :=
       congrArg (fun q => q x) he₁
     have h2 : e₂ (m x) = AdjoinRoot.of (F.map (residue B)) x := by
       rw [← AdjoinRoot.algebraMap_eq]
@@ -105,14 +121,34 @@ theorem exists_finite_free_local_residue_equiv (B : Type) [CommRing B] [IsLocalR
     show e₁.symm (e₂ (m x)) = _
     rw [h2, ← h1, RingEquiv.symm_apply_apply]
   have hψfin : (algebraMap B (AdjoinRoot F)).Finite := RingHom.finite_algebraMap.mpr hfin
-  refine ⟨AdjoinRoot F, inferInstance, inferInstance, algebraMap B (AdjoinRoot F), hloc, Eq', inferInstance,
-    hinj, RingHom.flat_algebraMap_iff.mpr inferInstance, hmax.symm,
-    RingHom.Finite.comp (RingHom.Finite.of_surjective _ residue_surjective) hψfin, ?_, hE⟩
+  refine ⟨
+    AdjoinRoot F,
+    inferInstance,
+    inferInstance,
+    algebraMap B (AdjoinRoot F),
+    hloc,
+    Eq',
+    inferInstance,
+    hinj,
+    RingHom.flat_algebraMap_iff.mpr inferInstance,
+    hmax.symm,
+    RingHom.Finite.comp (RingHom.Finite.of_surjective _ residue_surjective) hψfin,
+    ?_,
+    hE
+  ⟩
   rw [← ResidueField.map_comp_residue, ← hE]
-  exact RingHom.FormallyUnramified.comp (RingHom.FormallyUnramified.of_surjective residue_surjective)
+  exact RingHom.FormallyUnramified.comp
+    (RingHom.FormallyUnramified.of_surjective residue_surjective)
     (RingHom.FormallyUnramified.comp hmu (RingHom.FormallyUnramified.of_surjective Eq'.surjective))
 
-theorem exists_etaleCompletion_residue_equiv : ∀ (O : Type) [CommRing O] [IsDomain O] [IsLocalRing O] [IsIntegrallyClosed O] [CharZero O] [Algebra.EssFiniteType ℤ O] (M : Type) [Field M] (m : ResidueField O →+* M), m.Finite → m.FormallyUnramified → ∃ (A : Type) (_ : CommRing A) (_ : IsDomain A) (_ : IsLocalRing A) (ψ : O →+* A) (_ : IsLocalHom ψ) (E : M ≃+* ResidueField A), IsCN A ∧ IsEtaleCompletion ψ ∧ ((residue A).comp ψ).FormallyUnramified ∧ (E : M →+* ResidueField A).comp m = ResidueField.map ψ := by
+theorem exists_etaleCompletion_residue_equiv
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsLocalRing O] [IsIntegrallyClosed O] [CharZero O]
+        [Algebra.EssFiniteType ℤ O] (M : Type) [Field M] (m : ResidueField O →+* M),
+      m.Finite → m.FormallyUnramified
+        → ∃ (A : Type) (_ : CommRing A) (_ : IsDomain A) (_ : IsLocalRing A) (ψ : O →+* A)
+            (_ : IsLocalHom ψ) (E : M ≃+* ResidueField A),
+          IsCN A ∧ IsEtaleCompletion ψ ∧ ((residue A).comp ψ).FormallyUnramified
+            ∧ (E : M →+* ResidueField A).comp m = ResidueField.map ψ := by
   intro O _ _ _ _ _ _ M _ m hmf hmu
   have hOn : IsNoetherianRing O := Algebra.EssFiniteType.isNoetherianRing ℤ O
   obtain ⟨C, _, _, ψ₀, hψl, E₀, hCn, hψi, hψf, hψm, hψfin, hψfu, hE⟩ :=
@@ -145,12 +181,15 @@ theorem exists_etaleCompletion_residue_equiv : ∀ (O : Type) [CommRing O] [IsDo
     rw [hcomp]
     exact RingHom.FormallyUnramified.comp hψfu (RingHom.FormallyUnramified.of_surjective hbij.2)
   obtain ⟨hd, hic⟩ := GlobalTheory.AnalyticNormality.completion_isDomain_and_isIntegrallyClosed O
-  obtain ⟨hAd, hAi⟩ := GlobalTheory.EtaleCompletionNormal.isDomain_and_isIntegrallyClosed O A ψ hOn hd hic hAn hAc hloc het hur
+  obtain ⟨hAd, hAi⟩ :=
+    GlobalTheory.EtaleCompletionNormal.isDomain_and_isIntegrallyClosed O A ψ hOn hd hic hAn hAc hloc
+      het hur
   haveI := hAd
   have hψinj : Function.Injective ψ := hji.comp hψi
   haveI : CharZero A := charZero_of_injective_ringHom hψinj
   let E : M ≃+* ResidueField A := E₀.trans (RingEquiv.ofBijective _ hbij)
-  refine ⟨A, inferInstance, hAd, inferInstance, ψ, hloc, E, ⟨hAn, hAi, hAc, inferInstance⟩, het, hur, ?_⟩
+  refine
+    ⟨A, inferInstance, hAd, inferInstance, ψ, hloc, E, ⟨hAn, hAi, hAc, inferInstance⟩, het, hur, ?_⟩
   ext x
   obtain ⟨b, rfl⟩ := residue_surjective x
   have h2 := congrArg (fun t => t (residue O b)) hE

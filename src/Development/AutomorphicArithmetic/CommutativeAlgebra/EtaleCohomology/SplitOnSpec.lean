@@ -12,10 +12,13 @@ namespace UpperTheory.Ru.crystallineComparison
 
 open UpperTheory.Gal.crystallineComparison
 
-private theorem perm_of_aut {B : Type} [CommRing B] {d : ℕ} (a b : (Fin d → B) →+* (Fin d → B))
-    (hab : ∀ x, a (b x) = x) (hba : ∀ x, b (a x) = x) (ha : ∀ r : B, a (fun _ => r) = fun _ => r) :
-    ∃ e : Equiv.Perm (Fin d) → B, CompleteOrthogonalIdempotents e ∧
-      ∀ (σ : Equiv.Perm (Fin d)) (i : Fin d) (x : Fin d → B), e σ * (a x i - x (σ i)) = 0 := by
+private theorem perm_of_aut
+    {B : Type} [CommRing B]
+    {d : ℕ} (a b : (Fin d → B) →+* (Fin d → B)) (hab : ∀ x, a (b x) = x) (hba : ∀ x, b (a x) = x)
+    (ha : ∀ r : B, a (fun _ => r) = fun _ => r)
+    : ∃ e : Equiv.Perm (Fin d) → B,
+      CompleteOrthogonalIdempotents e
+        ∧ ∀ (σ : Equiv.Perm (Fin d)) (i : Fin d) (x : Fin d → B), e σ * (a x i - x (σ i)) = 0 := by
   classical
   have hb : ∀ r : B, b (fun _ => r) = fun _ => r := fun r => by
     conv_lhs => rw [← ha r]
@@ -46,8 +49,7 @@ private theorem perm_of_aut {B : Type} [CommRing B] {d : ℕ} (a b : (Fin d → 
   let G : Fin d → Fin d → B := fun i k => b (δ i) k
   have hGE : ∀ i k, G i k = E i k * G i k := by
     intro i k
-    have h1 : a (δ k) * δ i = (fun _ => E i k) * δ i := by
-      rw [mul_comm, δmul, mul_comm]
+    have h1 : a (δ k) * δ i = (fun _ => E i k) * δ i := by rw [mul_comm, δmul, mul_comm]
     have h2 := congrArg b h1
     rw [map_mul, map_mul, hba, hb] at h2
     have h3 := congrFun h2 k
@@ -56,15 +58,13 @@ private theorem perm_of_aut {B : Type} [CommRing B] {d : ℕ} (a b : (Fin d → 
     simpa [δ, G] using h3
   have hEG : ∀ i k, E i k = G i k * E i k := by
     intro i k
-    have h1 : b (δ i) * δ k = (fun _ => G i k) * δ k := by
-      rw [mul_comm, δmul]
+    have h1 : b (δ i) * δ k = (fun _ => G i k) * δ k := by rw [mul_comm, δmul]
     have h2 := congrArg a h1
     rw [map_mul, map_mul, hab, ha] at h2
     have h3 := congrFun h2 i
     simp only [Pi.mul_apply] at h3
     simpa [δ, E] using h3
-  have hEeqG : ∀ i k, E i k = G i k := fun i k => by
-    rw [hEG i k, mul_comm, ← hGE]
+  have hEeqG : ∀ i k, E i k = G i k := fun i k => by rw [hEG i k, mul_comm, ← hGE]
   have Eidem : ∀ i k, E i k * E i k = E i k := by
     intro i k
     have := congrFun (congrArg a (δδ k)) i
@@ -111,67 +111,93 @@ private theorem perm_of_aut {B : Type} [CommRing B] {d : ℕ} (a b : (Fin d → 
   · have h1 : ∏ i : Fin d, ∑ k, E i k = 1 := by simp [Esum]
     rw [Finset.prod_univ_sum] at h1
     rw [← h1]
-    have hz : ∀ f ∈ Fintype.piFinset (fun _ : Fin d => (Finset.univ : Finset (Fin d))),
-        f ∉ (Finset.univ.filter (fun f : Fin d → Fin d => Function.Bijective f)) → ∏ i, E i (f i) = 0 := by
+    have hz
+        : ∀ f ∈ Fintype.piFinset (fun _ : Fin d => (Finset.univ : Finset (Fin d))),
+          f ∉ (Finset.univ.filter (fun f : Fin d → Fin d => Function.Bijective f))
+            → ∏ i, E i (f i) = 0 := by
       intro f _ hf
       have hni : ¬ Function.Injective f := by
         intro hinj
         exact hf (Finset.mem_filter.2 ⟨Finset.mem_univ _, Finite.injective_iff_bijective.1 hinj⟩)
-      obtain ⟨i, j, hij, hne⟩ : ∃ i j, f i = f j ∧ i ≠ j := by
-        simpa [Function.Injective] using hni
+      obtain ⟨i, j, hij, hne⟩ : ∃ i j, f i = f j ∧ i ≠ j := by simpa [Function.Injective] using hni
       rw [← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ i),
-        ← Finset.mul_prod_erase (Finset.univ.erase i) _ (Finset.mem_erase.2 ⟨hne.symm, Finset.mem_univ j⟩),
+        ← Finset.mul_prod_erase (Finset.univ.erase i) _
+          (Finset.mem_erase.2 ⟨hne.symm, Finset.mem_univ j⟩),
         ← mul_assoc, hij, Ecol i j _ hne, zero_mul]
     rw [← Finset.sum_subset (by simp) hz]
-    refine Finset.sum_bij (fun σ _ => (σ : Fin d → Fin d)) (fun σ _ => ?_) (fun σ _ τ _ h => Equiv.coe_fn_injective h)
-      (fun f hf => ?_) (fun σ _ => rfl)
+    refine Finset.sum_bij
+      (fun σ _ => (σ : Fin d → Fin d))
+      (fun σ _ => ?_)
+      (fun σ _ τ _ h => Equiv.coe_fn_injective h)
+      (fun f hf => ?_)
+      (fun σ _ => rfl)
     · exact Finset.mem_filter.2 ⟨Finset.mem_univ _, σ.bijective⟩
     · exact ⟨Equiv.ofBijective f (Finset.mem_filter.1 hf).2, Finset.mem_univ _, rfl⟩
   · intro σ i x
     change (∏ j, E j (σ j)) * _ = 0
-    rw [← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ i), mul_comm (E i (σ i)), mul_assoc, Emul, mul_zero]
+    rw [← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ i), mul_comm (E i (σ i)), mul_assoc,
+      Emul, mul_zero]
 
-private def pt {W : Scheme.{0}} {R : Type} [CommRing R] (m : Spec (CommRingCat.of R) ⟶ W) : Γ(W, ⊤) →+* R :=
+private def pt {W : Scheme.{0}} {R : Type} [CommRing R] (m : Spec (CommRingCat.of R) ⟶ W)
+    : Γ(W, ⊤) →+* R :=
   (m.appTop ≫ (Scheme.ΓSpecIso (CommRingCat.of R)).hom).hom
 
-private theorem pt_comp {W : Scheme.{0}} {R R' : Type} [CommRing R] [CommRing R'] (f : R →+* R')
-    (m : Spec (CommRingCat.of R) ⟶ W) : pt (Spec.map (CommRingCat.ofHom f) ≫ m) = f.comp (pt m) := by
+private theorem pt_comp
+    {W : Scheme.{0}} {R R' : Type} [CommRing R] [CommRing R']
+    (f : R →+* R') (m : Spec (CommRingCat.of R) ⟶ W)
+    : pt (Spec.map (CommRingCat.ofHom f) ≫ m) = f.comp (pt m) := by
   have h := Scheme.ΓSpecIso_naturality (CommRingCat.ofHom f)
-  have : (Spec.map (CommRingCat.ofHom f) ≫ m).appTop ≫ (Scheme.ΓSpecIso (CommRingCat.of R')).hom =
-      (m.appTop ≫ (Scheme.ΓSpecIso (CommRingCat.of R)).hom) ≫ CommRingCat.ofHom f := by
+  have : (Spec.map (CommRingCat.ofHom f) ≫ m).appTop ≫ (Scheme.ΓSpecIso (CommRingCat.of R')).hom
+      = (m.appTop ≫ (Scheme.ΓSpecIso (CommRingCat.of R)).hom) ≫ CommRingCat.ofHom f := by
     rw [Scheme.Hom.comp_appTop, Category.assoc, h, Category.assoc]
   exact congrArg CommRingCat.Hom.hom this
 
-private theorem pt_inj {W : Scheme.{0}} [IsAffine W] {R : Type} [CommRing R] {m m' : Spec (CommRingCat.of R) ⟶ W}
-    (h : pt m = pt m') : m = m' := by
+private theorem pt_inj
+    {W : Scheme.{0}} [IsAffine W]
+    {R : Type} [CommRing R]
+    {m m' : Spec (CommRingCat.of R) ⟶ W} (h : pt m = pt m')
+    : m = m' := by
   apply ext_of_isAffine
-  have : m.appTop ≫ (Scheme.ΓSpecIso (CommRingCat.of R)).hom = m'.appTop ≫ (Scheme.ΓSpecIso (CommRingCat.of R)).hom :=
+  have : m.appTop ≫ (Scheme.ΓSpecIso (CommRingCat.of R)).hom
+      = m'.appTop ≫ (Scheme.ΓSpecIso (CommRingCat.of R)).hom :=
     CommRingCat.hom_ext h
   exact (cancel_mono _).1 this
 
-private theorem splitOn_spec {Y Z : Scheme.{0}} (p : Z ⟶ Y) {B : Type} [CommRing B] (x : Spec (CommRingCat.of B) ⟶ Y)
-    {m : ℕ} (z : Fin m → (Spec (CommRingCat.of B) ⟶ Z)) (h : SplitOn p x z) :
-    ∃ (hz : ∀ i, z i ≫ p = x) (Ψ : Spec (CommRingCat.of (Fin m → B)) ⟶ pullback p x), IsIso Ψ ∧
-      (∀ i, Spec.map (CommRingCat.ofHom (Pi.evalRingHom (fun _ : Fin m => B) i)) ≫ Ψ =
-        pullback.lift (z i) (𝟙 _) (by rw [hz i, Category.id_comp])) ∧
-      Ψ ≫ pullback.snd p x = Spec.map (CommRingCat.ofHom (Pi.ringHom fun _ : Fin m => RingHom.id B)) := by
+private theorem splitOn_spec
+    {Y Z : Scheme.{0}} (p : Z ⟶ Y)
+    {B : Type} [CommRing B]
+    (x : Spec (CommRingCat.of B) ⟶ Y)
+    {m : ℕ} (z : Fin m → (Spec (CommRingCat.of B) ⟶ Z)) (h : SplitOn p x z)
+    : ∃ (hz : ∀ i, z i ≫ p = x) (Ψ : Spec (CommRingCat.of (Fin m → B)) ⟶ pullback p x),
+      IsIso Ψ
+        ∧ (∀ i,
+          Spec.map (CommRingCat.ofHom (Pi.evalRingHom (fun _ : Fin m => B) i)) ≫ Ψ
+            = pullback.lift (z i) (𝟙 _) (by rw [hz i, Category.id_comp]))
+        ∧ Ψ ≫ pullback.snd p x
+          = Spec.map (CommRingCat.ofHom (Pi.ringHom fun _ : Fin m => RingHom.id B)) := by
   obtain ⟨hz, hiso⟩ := h
   let R : Fin m → CommRingCat := fun _ => CommRingCat.of B
   haveI : IsIso (sigmaSpec R) := inferInstance
   let D : ∐ (fun _ : Fin m => Spec (CommRingCat.of B)) ⟶ pullback p x :=
     Sigma.desc fun i => pullback.lift (z i) (𝟙 _) (by rw [hz i, Category.id_comp])
-  let s : (∐ fun _ : Fin m => Spec (CommRingCat.of B)) ⟶ Spec (CommRingCat.of (Fin m → B)) := sigmaSpec R
+  let s : (∐ fun _ : Fin m => Spec (CommRingCat.of B)) ⟶ Spec (CommRingCat.of (Fin m → B)) :=
+    sigmaSpec R
   haveI : IsIso s := inferInstanceAs (IsIso (sigmaSpec R))
-  have hs : ∀ i, Sigma.ι (fun _ : Fin m => Spec (CommRingCat.of B)) i ≫ s =
-      Spec.map (CommRingCat.ofHom (Pi.evalRingHom (fun _ : Fin m => B) i)) := fun i => ι_sigmaSpec R i
+  have hs
+      : ∀ i,
+        Sigma.ι (fun _ : Fin m => Spec (CommRingCat.of B)) i ≫ s
+          = Spec.map (CommRingCat.ofHom (Pi.evalRingHom (fun _ : Fin m => B) i)) := fun i =>
+    ι_sigmaSpec R i
   refine ⟨hz, inv s ≫ D, inferInstance, fun i => ?_, ?_⟩
   · rw [← hs i, Category.assoc, IsIso.hom_inv_id_assoc]
     simp [D]
   · rw [← cancel_epi s, Category.assoc, IsIso.hom_inv_id_assoc]
     apply Sigma.hom_ext
     intro i
-    have h1 : CommRingCat.ofHom (Pi.ringHom fun _ : Fin m => RingHom.id B) ≫
-        CommRingCat.ofHom (Pi.evalRingHom (fun _ : Fin m => B) i) = 𝟙 _ := by
+    have h1
+        : CommRingCat.ofHom (Pi.ringHom fun _ : Fin m => RingHom.id B)
+            ≫ CommRingCat.ofHom (Pi.evalRingHom (fun _ : Fin m => B) i)
+          = 𝟙 _ := by
       ext; rfl
     rw [← Category.assoc (Sigma.ι _ i) s, hs i, ← Spec.map_comp, h1, Spec.map_id]
     simp only [D, Sigma.ι_desc_assoc]
@@ -179,30 +205,31 @@ private theorem splitOn_spec {Y Z : Scheme.{0}} (p : Z ⟶ Y) {B : Type} [CommRi
 
 end UpperTheory.Ru.crystallineComparison
 
-open CategoryTheory Limits AlgebraicGeometry UpperTheory.Gal.crystallineComparison UpperTheory.Ru.crystallineComparison in
-theorem UpperTheory.Ru.crystallineComparison.splitPerm :
-    UpperTheory.Ru.crystallineComparison.SplitPerm := by
+open CategoryTheory Limits AlgebraicGeometry UpperTheory.Gal.crystallineComparison
+  UpperTheory.Ru.crystallineComparison in
+theorem UpperTheory.Ru.crystallineComparison.splitPerm
+    : UpperTheory.Ru.crystallineComparison.SplitPerm := by
   intro l Y T U _ hl hint y z z' hz hz' hs hs'
   haveI := T.fin
   let B := Localization.Away (l : U)
   let j := awayPt l U
   let alg : U →+* B := algebraMap U B
-  have halg : Function.Injective alg :=
-    IsLocalization.injective B (Submonoid.powers_le.2 hl)
+  have halg : Function.Injective alg := IsLocalization.injective B (Submonoid.powers_le.2 hl)
   haveI : IsAffine (pullback T.p y) := isAffine_of_isAffineHom (pullback.snd T.p y)
-  let sec : ∀ w : Spec (CommRingCat.of U) ⟶ T.Z, w ≫ T.p = y → (Spec (CommRingCat.of U) ⟶ pullback T.p y) :=
-    fun w hw => pullback.lift w (𝟙 _) (by rw [hw, Category.id_comp])
+  let sec
+      : ∀ w : Spec (CommRingCat.of U) ⟶ T.Z,
+        w ≫ T.p = y → (Spec (CommRingCat.of U) ⟶ pullback T.p y) := fun w hw =>
+    pullback.lift w (𝟙 _) (by rw [hw, Category.id_comp])
   let q : pullback T.p (j ≫ y) ⟶ pullback T.p y :=
-    pullback.lift (pullback.fst _ _) (pullback.snd _ _ ≫ j) (by rw [pullback.condition, Category.assoc])
+    pullback.lift (pullback.fst _ _) (pullback.snd _ _ ≫ j)
+      (by rw [pullback.condition, Category.assoc])
   obtain ⟨h1, Ψ, iΨ, hΨ, dΨ⟩ := splitOn_spec T.p (j ≫ y) (fun i => j ≫ z i) hs
   obtain ⟨h2, Ψ', iΨ', hΨ', dΨ'⟩ := splitOn_spec T.p (j ≫ y) (fun i => j ≫ z' i) hs'
   let dg := CommRingCat.ofHom (Pi.ringHom fun _ : Fin T.d => RingHom.id B)
   let a := Spec.preimage (Ψ' ≫ inv Ψ)
   let b := Spec.preimage (Ψ ≫ inv Ψ')
-  have ha : Spec.map a ≫ Ψ = Ψ' := by
-    simp [a, Spec.map_preimage]
-  have hb : Spec.map b ≫ Ψ' = Ψ := by
-    simp [b, Spec.map_preimage]
+  have ha : Spec.map a ≫ Ψ = Ψ' := by simp [a, Spec.map_preimage]
+  have hb : Spec.map b ≫ Ψ' = Ψ := by simp [b, Spec.map_preimage]
   have hab : b ≫ a = 𝟙 _ := by
     apply Spec.map_injective
     rw [Spec.map_comp, Spec.map_id, ← cancel_mono Ψ', Category.assoc, Category.id_comp, hb, ha]
@@ -213,12 +240,16 @@ theorem UpperTheory.Ru.crystallineComparison.splitPerm :
     apply Spec.map_injective
     have hd : Spec.map dg = Ψ ≫ pullback.snd T.p (j ≫ y) := dΨ.symm
     have hd' : Spec.map dg = Ψ' ≫ pullback.snd T.p (j ≫ y) := dΨ'.symm
-    calc Spec.map (dg ≫ a) = Spec.map a ≫ Ψ ≫ pullback.snd T.p (j ≫ y) := by rw [Spec.map_comp, hd]
+    calc
+      Spec.map (dg ≫ a)
+        = Spec.map a ≫ Ψ ≫ pullback.snd T.p (j ≫ y) := by rw [Spec.map_comp, hd]
       _ = Ψ' ≫ pullback.snd T.p (j ≫ y) := by rw [← Category.assoc, ha]
       _ = Spec.map dg := hd'.symm
-  obtain ⟨e, he, hE⟩ := perm_of_aut a.hom b.hom
-    (fun x => congrArg (fun f => f.hom x) hab) (fun x => congrArg (fun f => f.hom x) hba)
-    (fun r => congrArg (fun f => f.hom r) hda)
+  obtain ⟨e, he, hE⟩ :=
+    perm_of_aut a.hom b.hom
+      (fun x => congrArg (fun f => f.hom x) hab)
+      (fun x => congrArg (fun f => f.hom x) hba)
+      (fun r => congrArg (fun f => f.hom r) hda)
   let ζ : Fin T.d → (Γ(pullback T.p y, ⊤) →+* U) := fun i => pt (sec (z i) (hz i))
   let ζ' : Fin T.d → (Γ(pullback T.p y, ⊤) →+* U) := fun i => pt (sec (z' i) (hz' i))
   let θ : Γ(pullback T.p y, ⊤) →+* (Fin T.d → B) := pt (Ψ ≫ q)
@@ -226,33 +257,48 @@ theorem UpperTheory.Ru.crystallineComparison.splitPerm :
   have hss : ∀ w hw, sec w hw ≫ pullback.snd T.p y = 𝟙 _ := fun w hw => pullback.lift_snd _ _ _
   have hqf : q ≫ pullback.fst T.p y = pullback.fst _ _ := pullback.lift_fst _ _ _
   have hqs : q ≫ pullback.snd T.p y = pullback.snd _ _ ≫ j := pullback.lift_snd _ _ _
-  have hq : ∀ (w : Spec (CommRingCat.of U) ⟶ T.Z) (hw : w ≫ T.p = y) (h),
-      pullback.lift (j ≫ w) (𝟙 _) h ≫ q = j ≫ sec w hw := by
+  have hq
+      : ∀ (w : Spec (CommRingCat.of U) ⟶ T.Z) (hw : w ≫ T.p = y) (h),
+        pullback.lift (j ≫ w) (𝟙 _) h ≫ q = j ≫ sec w hw := by
     intro w hw h
     apply pullback.hom_ext
     · rw [Category.assoc, Category.assoc, hqf, hsf w hw, pullback.lift_fst]
-    · rw [Category.assoc, Category.assoc, hqs, hss w hw, ← Category.assoc, pullback.lift_snd, Category.id_comp, Category.comp_id]
+    · rw [Category.assoc, Category.assoc, hqs, hss w hw, ← Category.assoc, pullback.lift_snd,
+        Category.id_comp, Category.comp_id]
   have hθ : ∀ k s, θ s k = alg (ζ k s) := by
     intro k s
-    have h3 : (Pi.evalRingHom (fun _ : Fin T.d => B) k).comp θ =
-        pt (Spec.map (CommRingCat.ofHom (Pi.evalRingHom (fun _ : Fin T.d => B) k)) ≫ Ψ ≫ q) := (pt_comp _ _).symm
+    have h3
+        : (Pi.evalRingHom (fun _ : Fin T.d => B) k).comp θ
+          = pt (Spec.map (CommRingCat.ofHom (Pi.evalRingHom (fun _ : Fin T.d => B) k)) ≫ Ψ ≫ q) :=
+      (pt_comp _ _).symm
     rw [← Category.assoc, hΨ k, hq _ (hz k)] at h3
     have h4 : pt (j ≫ sec (z k) (hz k)) = alg.comp (ζ k) := pt_comp alg _
     exact congrArg (fun f => f s) (h3.trans h4)
   have hθ' : ∀ i s, a.hom (θ s) i = alg (ζ' i s) := by
     intro i s
-    have h3 : ((Pi.evalRingHom (fun _ : Fin T.d => B) i).comp a.hom).comp θ =
-        pt (Spec.map (CommRingCat.ofHom ((Pi.evalRingHom (fun _ : Fin T.d => B) i).comp a.hom)) ≫ Ψ ≫ q) :=
+    have h3
+        : ((Pi.evalRingHom (fun _ : Fin T.d => B) i).comp a.hom).comp θ
+          = pt
+            (Spec.map (CommRingCat.ofHom ((Pi.evalRingHom (fun _ : Fin T.d => B) i).comp a.hom)) ≫ Ψ
+              ≫ q) :=
       (pt_comp _ _).symm
-    have h5 : Spec.map (CommRingCat.ofHom ((Pi.evalRingHom (fun _ : Fin T.d => B) i).comp a.hom)) =
-        Spec.map (CommRingCat.ofHom (Pi.evalRingHom (fun _ : Fin T.d => B) i)) ≫ Spec.map a := by
+    have h5
+        : Spec.map (CommRingCat.ofHom ((Pi.evalRingHom (fun _ : Fin T.d => B) i).comp a.hom))
+          = Spec.map (CommRingCat.ofHom (Pi.evalRingHom (fun _ : Fin T.d => B) i))
+            ≫ Spec.map a := by
       rw [← Spec.map_comp]; rfl
-    rw [h5, Category.assoc, ← Category.assoc (Spec.map a), ha, ← Category.assoc, hΨ' i, hq _ (hz' i)] at h3
+    rw [h5, Category.assoc, ← Category.assoc (Spec.map a), ha, ← Category.assoc, hΨ' i,
+        hq _ (hz' i)]
+      at h3
     have h4 : pt (j ≫ sec (z' i) (hz' i)) = alg.comp (ζ' i) := pt_comp alg _
     exact congrArg (fun f => f s) (h3.trans h4)
   have hlift : ∀ σ, ∃ u : U, alg u = e σ := by
     intro σ
-    refine hint _ ⟨Polynomial.X ^ (1 + 1) - Polynomial.X, Polynomial.monic_X_pow_sub (lt_of_le_of_lt Polynomial.degree_X_le (by norm_num)), ?_⟩
+    refine hint _ ⟨
+      Polynomial.X ^ (1 + 1) - Polynomial.X,
+      Polynomial.monic_X_pow_sub (lt_of_le_of_lt Polynomial.degree_X_le (by norm_num)),
+      ?_
+    ⟩
     have hi : e σ * e σ = e σ := he.toOrthogonalIdempotents.idem σ
     simp [pow_two, hi]
   choose u hu using hlift
@@ -271,8 +317,9 @@ theorem UpperTheory.Ru.crystallineComparison.splitPerm :
       have h9 := congrArg ρ h8
       rw [map_mul, hρ, one_mul, map_sub, map_zero] at h9
       exact sub_eq_zero.1 h9
-    have h10 : Spec.map (CommRingCat.ofHom ρ) ≫ sec (z' i) (hz' i) =
-        Spec.map (CommRingCat.ofHom ρ) ≫ sec (z (σ i)) (hz (σ i)) := by
+    have h10
+        : Spec.map (CommRingCat.ofHom ρ) ≫ sec (z' i) (hz' i)
+          = Spec.map (CommRingCat.ofHom ρ) ≫ sec (z (σ i)) (hz (σ i)) := by
       apply pt_inj
       rw [pt_comp, pt_comp]
       ext s

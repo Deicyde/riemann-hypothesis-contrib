@@ -17,7 +17,8 @@ set_option maxSynthPendingDepth 1
 namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Close
 
 open MvPolynomial NumberField
-open ReciprocityTheory.ChartRestriction.G.Geo (IsMultiHomog IsArithVar mCoordIdeal secM MRing MRingOver)
+open ReciprocityTheory.ChartRestriction.G.Geo
+  (IsMultiHomog IsArithVar mCoordIdeal secM MRing MRingOver)
 
 noncomputable section
 

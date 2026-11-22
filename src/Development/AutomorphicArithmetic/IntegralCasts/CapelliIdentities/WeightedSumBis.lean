@@ -8,11 +8,11 @@ open scoped ContDiff
 
 namespace UpperTheory.Reformulated.B.weightedSumBis
 
-theorem exists_eq_exp (f : ℝ → ℂ) (hc : Continuous f) (h0 : f 0 = 1) (hm : ∀ x y, f (x + y) = f x * f y) :
-    ∃ c : ℂ, ∀ x : ℝ, f x = Complex.exp (c * x) := by
+theorem exists_eq_exp
+    (f : ℝ → ℂ) (hc : Continuous f) (h0 : f 0 = 1) (hm : ∀ x y, f (x + y) = f x * f y)
+    : ∃ c : ℂ, ∀ x : ℝ, f x = Complex.exp (c * x) := by
   set F : ℝ → ℂ := fun u => ∫ t in (0 : ℝ)..u, f t with hF
-  have hFd : ∀ u, HasDerivAt F (f u) u := fun u =>
-    (hc.integral_hasStrictDerivAt 0 u).hasDerivAt
+  have hFd : ∀ u, HasDerivAt F (f u) u := fun u => (hc.integral_hasStrictDerivAt 0 u).hasDerivAt
   obtain ⟨a, ha⟩ : ∃ a, F a ≠ 0 := by
     by_contra h
     push Not at h
@@ -26,8 +26,7 @@ theorem exists_eq_exp (f : ℝ → ℂ) (hc : Continuous f) (h0 : f 0 = 1) (hm :
     have h1 : F (x + a) - F x = ∫ t in x..(x + a), f t :=
       intervalIntegral.integral_interval_sub_left (hc.intervalIntegrable _ _)
         (hc.intervalIntegrable _ _)
-    have h2 : ∫ t in (0 : ℝ)..a, f (x + t) = ∫ t in x..(x + a), f t := by
-      simp
+    have h2 : ∫ t in (0 : ℝ)..a, f (x + t) = ∫ t in x..(x + a), f t := by simp
     rw [h1, ← h2]
     simp only [hm, hF]
     rw [intervalIntegral.integral_const_mul]
@@ -50,8 +49,7 @@ theorem exists_eq_exp (f : ℝ → ℂ) (hc : Continuous f) (h0 : f 0 = 1) (hm :
     rw [h3] at h2
     exact h2
   refine ⟨c, fun x => ?_⟩
-  have h := is_const_of_deriv_eq_zero (fun y => (hg y).differentiableAt)
-    (fun y => (hg y).deriv) x 0
+  have h := is_const_of_deriv_eq_zero (fun y => (hg y).differentiableAt) (fun y => (hg y).deriv) x 0
   simp only [h0, Complex.ofReal_zero, mul_zero, Complex.exp_zero, mul_one] at h
   rw [neg_mul, Complex.exp_neg] at h
   exact (mul_inv_eq_one₀ (Complex.exp_ne_zero _)).mp h

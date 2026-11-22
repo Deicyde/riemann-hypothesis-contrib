@@ -21,10 +21,14 @@ variable {k r : ℕ}
 theorem continuous_lmulM (a : Mat k r) : Continuous (lmulM a : Mt k r → Mt k r) := by
   unfold lmulM; fun_prop
 
-theorem map_invol_eq (HU : HaarUnique) {U : Set (Mat k r)} (hU : IsClosedSubgroup U) {μ : Measure (Mt k r)}
-    (hμ : IsHaarOn U μ) (f : Mt k r → Mt k r) (hf : Continuous f) (hff : ∀ x, f (f x) = x)
+theorem map_invol_eq
+    (HU : HaarUnique)
+    {U : Set (Mat k r)} (hU : IsClosedSubgroup U)
+    {μ : Measure (Mt k r)} (hμ : IsHaarOn U μ)
+    (f : Mt k r → Mt k r) (hf : Continuous f) (hff : ∀ x, f (f x) = x)
     (hfU : ∀ x : Mt k r, (x : Mat k r) ∈ U → (f x : Mat k r) ∈ U)
-    (hl : ∀ a ∈ U, ∃ b ∈ U, ∀ x, lmulM a (f x) = f (lmulM b x)) : μ.map f = μ := by
+    (hl : ∀ a ∈ U, ∃ b ∈ U, ∀ x, lmulM a (f x) = f (lmulM b x))
+    : μ.map f = μ := by
   have hfm : Measurable f := hf.measurable
   have hUc : IsClosed (show Set (Mt k r) from U) := hU.closed
   have hUm : MeasurableSet (show Set (Mt k r) from U) := hUc.measurableSet
@@ -43,15 +47,15 @@ theorem map_invol_eq (HU : HaarUnique) {U : Set (Mat k r)} (hU : IsClosedSubgrou
     intro K hK
     rw [Measure.map_apply hfm hK.measurableSet]
     have : f ⁻¹' K = f '' K := by
-      ext x; constructor
+      ext x
+      constructor
       · intro hx; exact ⟨f x, hx, hff x⟩
       · rintro ⟨y, hy, rfl⟩; show f (f y) ∈ K; rw [hff]; exact hy
     rw [this]
     exact hμ.finite_compact _ (hK.image hf)
   obtain ⟨c, hc⟩ := HU k r U μ (μ.map f) hU hμ h1 h2 h3
   have hff' : f ∘ f = id := funext hff
-  have hback : (μ.map f).map f = μ := by
-    rw [Measure.map_map hfm hfm, hff', Measure.map_id]
+  have hback : (μ.map f).map f = μ := by rw [Measure.map_map hfm hfm, hff', Measure.map_id]
   have hcc : (c * c) • μ = μ := by
     conv_rhs => rw [← hback]
     rw [hc, Measure.map_smul c hfm.aemeasurable, hc, smul_smul]

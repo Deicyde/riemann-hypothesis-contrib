@@ -9,10 +9,11 @@ open NumberField
 namespace GlobalTheory
 
 theorem im_embedding_ne_zero_of_not_mem_range_of_totallyReal_quadratic
-    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    [IsTotallyReal F] [IsTotallyComplex E] [Algebra.IsQuadraticExtension F E]
-    (w : InfinitePlace E) (θ : E) (hθ : θ ∉ Set.range (algebraMap F E)) :
-    (w.embedding θ).im ≠ 0 := by
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F]
+    [IsTotallyComplex E] [Algebra.IsQuadraticExtension F E]
+    (w : InfinitePlace E)
+    (θ : E) (hθ : θ ∉ Set.range (algebraMap F E))
+    : (w.embedding θ).im ≠ 0 := by
   intro h
   set φ := w.embedding with hφ
   have hF : ∀ c : F, (φ (algebraMap F E c)).im = 0 := by

@@ -24,17 +24,19 @@ lemma wt_pos_nat (α : σ →₀ ℕ) : 0 < (α.prod fun _ k => k.factorial : �
 lemma conj_wt (α : σ →₀ ℕ) : (starRingEnd ℂ) (wt α) = wt α := by
   rw [wt_eq_nat, map_natCast]
 
-private theorem fockInner_eq_sum_support_left (P Q : MvPolynomial σ ℂ) :
-    FockH1Action.fockInner P Q = ∑ α ∈ P.support, (starRingEnd ℂ) (AddMonoidAlgebra.coeff P α) * AddMonoidAlgebra.coeff Q α * wt α := by
-  unfold FockH1Action.fockInner
-  refine Finset.sum_congr rfl (fun α _ => ?_)
-  rw [Finset.sum_eq_single α]
-  · rw [if_pos rfl, wt]
-  · intro β _ hβ
-    rw [if_neg (Ne.symm hβ), mul_zero]
-  · intro hα
-    rw [MvPolynomial.mem_support_iff, not_not] at hα
-    simp only [hα, mul_zero, zero_mul]
+private theorem fockInner_eq_sum_support_left (P Q : MvPolynomial σ ℂ)
+    : FockH1Action.fockInner P Q
+      = ∑ α ∈ P.support, (starRingEnd ℂ) (AddMonoidAlgebra.coeff P α) * AddMonoidAlgebra.coeff Q α * wt α :=
+  by
+    unfold FockH1Action.fockInner
+    refine Finset.sum_congr rfl (fun α _ => ?_)
+    rw [Finset.sum_eq_single α]
+    · rw [if_pos rfl, wt]
+    · intro β _ hβ
+      rw [if_neg (Ne.symm hβ), mul_zero]
+    · intro hα
+      rw [MvPolynomial.mem_support_iff, not_not] at hα
+      simp only [hα, mul_zero, zero_mul]
 
 lemma fockInner_eq_sum (P Q : MvPolynomial σ ℂ) (S : Finset (σ →₀ ℕ))
     (hS : ∀ α, AddMonoidAlgebra.coeff P α ≠ 0 → AddMonoidAlgebra.coeff Q α ≠ 0 → α ∈ S) :
@@ -132,7 +134,8 @@ lemma fockInner_conj (P Q : MvPolynomial σ ℂ) :
   rw [map_mul, map_mul, conj_wt, Complex.conj_conj]
   ring
 
-private theorem conj_mul_self_eq_normSq (z : ℂ) : (starRingEnd ℂ) z * z = ((Complex.normSq z : ℝ) : ℂ) := by
+private theorem conj_mul_self_eq_normSq (z : ℂ)
+    : (starRingEnd ℂ) z * z = ((Complex.normSq z : ℝ) : ℂ) := by
   exact Complex.normSq_eq_conj_mul_self.symm
 
 lemma fockInner_self (P : MvPolynomial σ ℂ) : FockH1Action.fockInner P P =
@@ -187,19 +190,19 @@ lemma wt_add_single [Fintype σ] [DecidableEq σ] (β : σ →₀ ℕ) (l : σ) 
   push_cast
   ring
 
-private theorem X_mul_monomial_eq_monomial_add_single (l : σ) (a : σ →₀ ℕ) (c : ℂ) :
-    X l * monomial a c = monomial (a + Finsupp.single l 1) c := by
+private theorem X_mul_monomial_eq_monomial_add_single (l : σ) (a : σ →₀ ℕ) (c : ℂ)
+    : X l * monomial a c = monomial (a + Finsupp.single l 1) c := by
   rw [add_comm]
   rw [MvPolynomial.monomial_single_add, pow_one]
 
-private theorem fockInner_monomial_monomial_self (a : σ →₀ ℕ) (c d : ℂ) :
-    FockH1Action.fockInner (monomial a c) (monomial a d) = (starRingEnd ℂ) c * d * wt a := by
+private theorem fockInner_monomial_monomial_self (a : σ →₀ ℕ) (c d : ℂ)
+    : FockH1Action.fockInner (monomial a c) (monomial a d) = (starRingEnd ℂ) c * d * wt a := by
   classical
   rw [fockInner_eq_sum_left _ _ {a} support_monomial_subset, Finset.sum_singleton]
   simp [coeff_monomial]
 
-private theorem fockInner_monomial_monomial_of_ne (a b : σ →₀ ℕ) (c d : ℂ) (h : b ≠ a) :
-    FockH1Action.fockInner (monomial a c) (monomial b d) = 0 := by
+private theorem fockInner_monomial_monomial_of_ne (a b : σ →₀ ℕ) (c d : ℂ) (h : b ≠ a)
+    : FockH1Action.fockInner (monomial a c) (monomial b d) = 0 := by
   classical
   rw [fockInner_eq_sum_left _ _ {a} support_monomial_subset, Finset.sum_singleton]
   simp [coeff_monomial, h]

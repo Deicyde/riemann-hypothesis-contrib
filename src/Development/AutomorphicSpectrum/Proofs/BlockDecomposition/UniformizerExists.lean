@@ -7,42 +7,47 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 
 noncomputable section
 
-open NumberField IsDedekindDomain GlobalTheory.BCT Formalism.L2.Host PositivityTheory.Rg.BcB.F.Ex0 PositivityTheory.Rg.Bc.ArchbcB.B
+open NumberField IsDedekindDomain GlobalTheory.BCT Formalism.L2.Host PositivityTheory.Rg.BcB.F.Ex0
+  PositivityTheory.Rg.Bc.ArchbcB.B
 
 namespace GlobalTheory.CompanionTheory.UnifFix
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem conj_real (x : maximalRealSubfield E) :
-    IsCMField.complexConj E (algebraMap (maximalRealSubfield E) E x) = algebraMap (maximalRealSubfield E) E x := by
+theorem conj_real (x : maximalRealSubfield E)
+    : IsCMField.complexConj E (algebraMap (maximalRealSubfield E) E x)
+      = algebraMap (maximalRealSubfield E) E x := by
   exact (IsCMField.complexConj E).commutes x
 
-theorem cj_real (w : Pl E) (x : maximalRealSubfield E) :
-    GlobalTheory.BCT.cj w (algebraMap E (w.adicCompletion E) (algebraMap (maximalRealSubfield E) E x)) =
-      algebraMap E (w.adicCompletion E) (algebraMap (maximalRealSubfield E) E x) := by
+theorem cj_real (w : Pl E) (x : maximalRealSubfield E)
+    : GlobalTheory.BCT.cj w
+        (algebraMap E (w.adicCompletion E) (algebraMap (maximalRealSubfield E) E x))
+      = algebraMap E (w.adicCompletion E) (algebraMap (maximalRealSubfield E) E x) := by
   unfold GlobalTheory.BCT.cj
   split_ifs with h
   · rw [h.choose_spec.2, conj_real]
   · rfl
 
-theorem valuation_up (hU : GlobalTheory.BCT.Unr E) (w : Pl E) (x : maximalRealSubfield E) :
-    w.valuation E (algebraMap (maximalRealSubfield E) E x) =
-      (w.under (𝓞 (maximalRealSubfield E))).valuation (maximalRealSubfield E) x := by
+theorem valuation_up (hU : GlobalTheory.BCT.Unr E) (w : Pl E) (x : maximalRealSubfield E)
+    : w.valuation E (algebraMap (maximalRealSubfield E) E x)
+      = (w.under (𝓞 (maximalRealSubfield E))).valuation (maximalRealSubfield E) x := by
   have := hU w
   have h1 := HeightOneSpectrum.valuation_liesOver E (w.under (𝓞 (maximalRealSubfield E))) w x
   have he : w.asIdeal.ramificationIdx (𝓞 (maximalRealSubfield E)) = 1 := by
     exact Ideal.ramificationIdx_eq_one_of_isUnramifiedAt
   rw [← h1, he, pow_one]
 
-theorem neg_toAdd_unzero (a : WithZero (Multiplicative ℤ)) (h : a ≠ 0) (ha : a = WithZero.exp (-1 : ℤ)) :
-    -Multiplicative.toAdd (WithZero.unzero h) = 1 := by
+theorem neg_toAdd_unzero
+    (a : WithZero (Multiplicative ℤ)) (h : a ≠ 0) (ha : a = WithZero.exp (-1 : ℤ))
+    : - Multiplicative.toAdd (WithZero.unzero h) = 1 := by
   subst ha
   rfl
 
 theorem unifEx : UnifEx := by
   intro E _ _ _ hU w
-  obtain ⟨π, hπ⟩ := HeightOneSpectrum.valuation_exists_uniformizer (maximalRealSubfield E)
-    (w.under (𝓞 (maximalRealSubfield E)))
+  obtain ⟨π, hπ⟩ :=
+    HeightOneSpectrum.valuation_exists_uniformizer (maximalRealSubfield E)
+      (w.under (𝓞 (maximalRealSubfield E)))
   have hy : w.valuation E (algebraMap (maximalRealSubfield E) E π) = WithZero.exp (-1) := by
     rw [valuation_up hU w π, hπ]
   have hy0 : algebraMap (maximalRealSubfield E) E π ≠ 0 := by
@@ -51,11 +56,15 @@ theorem unifEx : UnifEx := by
     exact WithZero.zero_ne_coe hy
   have hne : algebraMap E (w.adicCompletion E) (algebraMap (maximalRealSubfield E) E π) ≠ 0 :=
     (map_ne_zero _).2 hy0
-  have hv : Valued.v (algebraMap E (w.adicCompletion E) (algebraMap (maximalRealSubfield E) E π)) =
-      WithZero.exp (-1) := by
-    rw [HeightOneSpectrum.algebraMap_adicCompletion (𝓞 E) E w, Function.comp_apply, Algebra.algebraMap_self,
-      RingHom.id_apply, HeightOneSpectrum.valuedAdicCompletion_eq_valuation', hy]
-  have hv0 : Valued.v (algebraMap E (w.adicCompletion E) (algebraMap (maximalRealSubfield E) E π)) ≠ 0 := by
+  have hv
+      : Valued.v (algebraMap E (w.adicCompletion E) (algebraMap (maximalRealSubfield E) E π))
+        = WithZero.exp (-1) := by
+    rw [HeightOneSpectrum.algebraMap_adicCompletion (𝓞 E) E w, Function.comp_apply,
+      Algebra.algebraMap_self, RingHom.id_apply,
+      HeightOneSpectrum.valuedAdicCompletion_eq_valuation', hy]
+  have hv0
+      : Valued.v (algebraMap E (w.adicCompletion E) (algebraMap (maximalRealSubfield E) E π))
+        ≠ 0 := by
     rw [hv]
     exact WithZero.coe_ne_zero
   refine ⟨Units.mk0 _ hne, ⟨?_, ?_⟩, ?_⟩

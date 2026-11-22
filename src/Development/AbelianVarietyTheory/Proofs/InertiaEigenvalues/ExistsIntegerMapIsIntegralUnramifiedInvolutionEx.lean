@@ -12,9 +12,12 @@ namespace GlobalTheory.UnitLemma.Unr
 
 open GlobalTheory.UnitLemma Polynomial
 
-theorem intMap_isIntegral_of_unr : ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E), IsUnrExt K K' d φ →
-    ∃ φO : K.O →+* K'.O, (∀ x, algebraMap K'.O K'.E (φO x) = φ (algebraMap K.O K.E x)) ∧
-      @Algebra.IsIntegral K.O K'.O _ _ φO.toAlgebra := by
+theorem intMap_isIntegral_of_unr
+    : ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E),
+      IsUnrExt K K' d φ
+        → ∃ φO : K.O →+* K'.O,
+          (∀ x, algebraMap K'.O K'.E (φO x) = φ (algebraMap K.O K.E x))
+            ∧ @Algebra.IsIntegral K.O K'.O _ _ φO.toAlgebra := by
   intro K K' d φ hU
   obtain ⟨φO, hφO⟩ := exists_intMap_of_unr hU
   refine ⟨φO, hφO, ?_⟩

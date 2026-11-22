@@ -23,13 +23,11 @@ theorem SchConcatAlternantZero.proof : SchConcatAlternantZero.Statement := by
   have hr : 0 < r := Nat.lt_of_le_of_lt (Nat.zero_le _) i.isLt
   let k : Fin r := ⟨r - 1, by omega⟩
   have hkv : (k : ℕ) = r - 1 := rfl
-  have hik : i ≤ k := by
-    rw [Fin.le_def, hkv]; omega
+  have hik : i ≤ k := by rw [Fin.le_def, hkv]; omega
   have hka : lam k < a := lt_of_le_of_lt (hanti hik) hi
   let j : Fin a := ⟨a - 1 - lam k, by omega⟩
   have hjv : (j : ℕ) = a - 1 - lam k := rfl
-  have hexp : lam k + (r - 1 - (k : ℕ)) = a - 1 - (j : ℕ) := by
-    rw [hkv, hjv]; omega
+  have hexp : lam k + (r - 1 - (k : ℕ)) = a - 1 - (j : ℕ) := by rw [hkv, hjv]; omega
   unfold alternant
   apply Matrix.det_zero_of_column_eq (i := Sum.inl k) (j := Sum.inr j) Sum.inl_ne_inr
   intro p

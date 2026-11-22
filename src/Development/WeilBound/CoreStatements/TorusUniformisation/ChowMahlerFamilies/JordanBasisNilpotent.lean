@@ -6,10 +6,10 @@ public import Mathlib
 
 namespace PositivityTheory.Xgn.JordanBasis
 
-theorem exists_span_sup_range {k W : Type} [Field k] [AddCommGroup W] [Module k W]
-    [FiniteDimensional k W] (π : Module.End k W) (r : ℕ)
-    (h : Module.finrank k (LinearMap.ker π) ≤ r) :
-    ∃ x : Fin r → W, ∀ v : W, ∃ a ∈ Submodule.span k (Set.range x), ∃ u : W, v = a + π u := by
+theorem exists_span_sup_range
+    {k W : Type} [Field k] [AddCommGroup W] [Module k W] [FiniteDimensional k W]
+    (π : Module.End k W) (r : ℕ) (h : Module.finrank k (LinearMap.ker π) ≤ r)
+    : ∃ x : Fin r → W, ∀ v : W, ∃ a ∈ Submodule.span k (Set.range x), ∃ u : W, v = a + π u := by
   classical
   have hd : Module.finrank k (W ⧸ LinearMap.range π) ≤ r := by
     have h1 := Submodule.finrank_quotient_add_finrank (LinearMap.range π)
@@ -26,10 +26,13 @@ theorem exists_span_sup_range {k W : Type} [Field k] [AddCommGroup W] [Module k 
     refine ⟨⟨j, lt_of_lt_of_le j.2 hd⟩, ?_⟩
     simp [x, j.2]
   refine ⟨x, fun v => ?_⟩
-  refine ⟨∑ j, b.repr ((LinearMap.range π).mkQ v) j • g (b j),
-    Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (hspan j), ?_⟩
-  have hq : (LinearMap.range π).mkQ
-      (v - ∑ j, b.repr ((LinearMap.range π).mkQ v) j • g (b j)) = 0 := by
+  refine ⟨
+    ∑ j, b.repr ((LinearMap.range π).mkQ v) j • g (b j),
+    Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (hspan j),
+    ?_
+  ⟩
+  have hq
+      : (LinearMap.range π).mkQ (v - ∑ j, b.repr ((LinearMap.range π).mkQ v) j • g (b j)) = 0 := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sub, map_sum]
     simp only [map_smul, hg]
@@ -38,10 +41,11 @@ theorem exists_span_sup_range {k W : Type} [Field k] [AddCommGroup W] [Module k 
   obtain ⟨u, hu⟩ := LinearMap.mem_range.mp hq
   exact ⟨u, by rw [hu]; abel⟩
 
-theorem span_eq_top {k W : Type} [Field k] [AddCommGroup W] [Module k W]
+theorem span_eq_top
+    {k W : Type} [Field k] [AddCommGroup W] [Module k W]
     (π : Module.End k W) (e r : ℕ) (hπ : π ^ e = 0) (x : Fin r → W)
-    (hx : ∀ v : W, ∃ a ∈ Submodule.span k (Set.range x), ∃ u : W, v = a + π u) :
-    Submodule.span k (Set.range fun q : Fin r × Fin e => (π ^ (q.2 : ℕ)) (x q.1)) = ⊤ := by
+    (hx : ∀ v : W, ∃ a ∈ Submodule.span k (Set.range x), ∃ u : W, v = a + π u)
+    : Submodule.span k (Set.range fun q : Fin r × Fin e => (π ^ (q.2 : ℕ)) (x q.1)) = ⊤ := by
   classical
   set S := Submodule.span k (Set.range fun q : Fin r × Fin e => (π ^ (q.2 : ℕ)) (x q.1)) with hS
   rcases Nat.eq_zero_or_pos e with he | he

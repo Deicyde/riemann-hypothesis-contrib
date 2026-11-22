@@ -15,23 +15,47 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RelativeH
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta MeasureTheory Set Filter NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta MeasureTheory Set
+  Filter NumberField
 open scoped Topology ContDiff TensorProduct
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
 
-open GlobalTheory.AdelicU Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes IsDedekindDomain Formalism.UG
+open GlobalTheory.AdelicU Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes IsDedekindDomain
+  Formalism.UG
 open scoped NNReal
 
 namespace GlobalTheory.RatCount
 
-theorem gl_count (hA : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E], ∃ (C : ℝ) (k : ℕ), ∀ B : ℝ, 1 ≤ B → {x : E | ∀ j, Height.mulHeight₁ ((minpoly F x).coeff j) ≤ B}.Finite ∧ (({x : E | ∀ j, Height.mulHeight₁ ((minpoly F x).coeff j) ≤ B}.ncard : ℕ) : ℝ) ≤ C * B ^ k) (hB : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E], ∃ (c : ℝ) (a : ℕ), ∀ (x : E) (j : ℕ), Height.mulHeight₁ ((minpoly F x).coeff j) ≤ c * (GlobalTheory.RatCount.htE F x : ℝ) ^ a) (hC : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (N : ℕ) (γ : GL (Fin N) E) (i j : Fin N), GlobalTheory.RatCount.htE F ((γ : Matrix (Fin N) (Fin N) E) i j) ≤ GlobalTheory.AdelicU.heightGL F (Formalism.UG.bc (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF F)) γ))
-    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (N : ℕ) :
-    ∃ (C : ℝ) (A : ℕ), ∀ T : ℝ, 1 ≤ T →
-      {γ : GL (Fin N) E | (heightGL F (bc (inclR (F := F) (AF F)) γ) : ℝ) ≤ T}.Finite ∧
-      (({γ : GL (Fin N) E | (heightGL F (bc (inclR (F := F) (AF F)) γ) : ℝ) ≤ T}.ncard : ℕ) : ℝ) ≤ C * T ^ A := by
+theorem gl_count
+    (hA : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E],
+      ∃ (C : ℝ) (k : ℕ), ∀ B : ℝ,
+        1 ≤ B
+          → {x : E | ∀ j, Height.mulHeight₁ ((minpoly F x).coeff j) ≤ B}.Finite
+            ∧ (({x : E | ∀ j, Height.mulHeight₁ ((minpoly F x).coeff j) ≤ B}.ncard : ℕ) : ℝ)
+              ≤ C * B ^ k)
+    (hB : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E],
+      ∃ (c : ℝ) (a : ℕ), ∀ (x : E) (j : ℕ),
+        Height.mulHeight₁ ((minpoly F x).coeff j) ≤ c * (GlobalTheory.RatCount.htE F x : ℝ) ^ a)
+    (hC : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (N : ℕ)
+        (γ : GL (Fin N) E) (i j : Fin N),
+      GlobalTheory.RatCount.htE F ((γ : Matrix (Fin N) (Fin N) E) i j)
+        ≤ GlobalTheory.AdelicU.heightGL F
+          (Formalism.UG.bc
+            (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F)
+              (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF F))
+            γ))
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (N : ℕ)
+    : ∃ (C : ℝ) (A : ℕ), ∀ T : ℝ,
+      1 ≤ T
+        → {γ : GL (Fin N) E | (heightGL F (bc (inclR (F := F) (AF F)) γ) : ℝ) ≤ T}.Finite
+          ∧ (({γ : GL (Fin N) E | (heightGL F (bc (inclR (F := F) (AF F)) γ) : ℝ) ≤ T}.ncard : ℕ)
+              : ℝ)
+            ≤ C * T ^ A := by
   obtain ⟨C0, k, hk⟩ := hA F E
   obtain ⟨c, a, ha⟩ := hB F E
   refine ⟨C0 ^ (N * N) * (max 1 c) ^ (k * (N * N)), a * k * (N * N), fun T hT => ?_⟩
@@ -45,10 +69,12 @@ theorem gl_count (hA : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
     refine (ha _ j).trans ?_
     have h1 : (htE F ((γ : Matrix (Fin N) (Fin N) E) p.1 p.2) : ℝ) ≤ T :=
       (NNReal.coe_le_coe.2 (hC F E N γ p.1 p.2)).trans hγ
-    calc c * (htE F ((γ : Matrix (Fin N) (Fin N) E) p.1 p.2) : ℝ) ^ a
-        ≤ max 1 c * (htE F ((γ : Matrix (Fin N) (Fin N) E) p.1 p.2) : ℝ) ^ a :=
-          mul_le_mul_of_nonneg_right (le_max_right _ _) (by positivity)
-      _ ≤ B := mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (by positivity) h1 a)
+    calc
+      c * (htE F ((γ : Matrix (Fin N) (Fin N) E) p.1 p.2) : ℝ) ^ a
+          ≤ max 1 c * (htE F ((γ : Matrix (Fin N) (Fin N) E) p.1 p.2) : ℝ) ^ a :=
+        mul_le_mul_of_nonneg_right (le_max_right _ _) (by positivity)
+      _ ≤ B :=
+        mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (by positivity) h1 a)
           (zero_le_one.trans (le_max_left _ _))
   let f : GL (Fin N) E → (Fin N × Fin N → E) := fun γ p => (γ : Matrix (Fin N) (Fin N) E) p.1 p.2
   have hinj : Set.InjOn f S := fun γ _ δ _ h => Units.ext (Matrix.ext fun i j => congrFun h (i, j))
@@ -56,8 +82,9 @@ theorem gl_count (hA : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
   have hmaps : ∀ γ ∈ S, f γ ∈ (P : Set (Fin N × Fin N → E)) := fun γ hγ => by
     simp only [P, Finset.mem_coe, Fintype.mem_piFinset, Set.Finite.mem_toFinset]
     exact fun p => hmem γ hγ p
-  have hSf : S.Finite := Set.Finite.of_finite_image ((P.finite_toSet).subset (by
-    rintro _ ⟨γ, hγ, rfl⟩; exact hmaps γ hγ)) hinj
+  have hSf : S.Finite :=
+    Set.Finite.of_finite_image
+      ((P.finite_toSet).subset (by rintro _ ⟨γ, hγ, rfl⟩; exact hmaps γ hγ)) hinj
   refine ⟨hSf, ?_⟩
   have h1 : S.ncard ≤ (P : Set (Fin N × Fin N → E)).ncard :=
     Set.ncard_le_ncard_of_injOn f hmaps hinj P.finite_toSet
@@ -67,43 +94,78 @@ theorem gl_count (hA : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
   have hC0 : 0 ≤ C0 := by
     have := (Nat.cast_nonneg (α := ℝ) _).trans hXc
     exact nonneg_of_mul_nonneg_left this (by positivity)
-  calc ((S.ncard : ℕ) : ℝ) ≤ ((X.ncard : ℝ)) ^ (N * N) := by exact_mod_cast h1
+  calc
+    ((S.ncard : ℕ) : ℝ)
+      ≤ ((X.ncard : ℝ)) ^ (N * N) := by exact_mod_cast h1
     _ ≤ (C0 * B ^ k) ^ (N * N) := pow_le_pow_left₀ (by positivity) hXc _
-    _ = C0 ^ (N * N) * (max 1 c) ^ (k * (N * N)) * T ^ (a * k * (N * N)) := by
-        rw [hBdef]; ring
+    _ = C0 ^ (N * N) * (max 1 c) ^ (k * (N * N)) * T ^ (a * k * (N * N)) := by rw [hBdef]; ring
 
-theorem gq_count (hA : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E], ∃ (C : ℝ) (k : ℕ), ∀ B : ℝ, 1 ≤ B → {x : E | ∀ j, Height.mulHeight₁ ((minpoly F x).coeff j) ≤ B}.Finite ∧ (({x : E | ∀ j, Height.mulHeight₁ ((minpoly F x).coeff j) ≤ B}.ncard : ℕ) : ℝ) ≤ C * B ^ k) (hB : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E], ∃ (c : ℝ) (a : ℕ), ∀ (x : E) (j : ℕ), Height.mulHeight₁ ((minpoly F x).coeff j) ≤ c * (GlobalTheory.RatCount.htE F x : ℝ) ^ a) (hC : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (N : ℕ) (γ : GL (Fin N) E) (i j : Fin N), GlobalTheory.RatCount.htE F ((γ : Matrix (Fin N) (Fin N) E) i j) ≤ GlobalTheory.AdelicU.heightGL F (Formalism.UG.bc (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F) (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF F)) γ)) {D : D7} (V : HSp D) :
-    ∃ (C : ℝ) (A : ℕ), ∀ T : ℝ, 1 ≤ T →
-      {γ : GQ V | GlobalTheory.Grow.height V (γ : GA D V) ≤ T}.Finite ∧
-      (({γ : GQ V | GlobalTheory.Grow.height V (γ : GA D V) ≤ T}.ncard : ℕ) : ℝ) ≤ C * T ^ A := by
+theorem gq_count
+    (hA : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E],
+      ∃ (C : ℝ) (k : ℕ), ∀ B : ℝ,
+        1 ≤ B
+          → {x : E | ∀ j, Height.mulHeight₁ ((minpoly F x).coeff j) ≤ B}.Finite
+            ∧ (({x : E | ∀ j, Height.mulHeight₁ ((minpoly F x).coeff j) ≤ B}.ncard : ℕ) : ℝ)
+              ≤ C * B ^ k)
+    (hB : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E],
+      ∃ (c : ℝ) (a : ℕ), ∀ (x : E) (j : ℕ),
+        Height.mulHeight₁ ((minpoly F x).coeff j) ≤ c * (GlobalTheory.RatCount.htE F x : ℝ) ^ a)
+    (hC : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (N : ℕ)
+        (γ : GL (Fin N) E) (i j : Fin N),
+      GlobalTheory.RatCount.htE F ((γ : Matrix (Fin N) (Fin N) E) i j)
+        ≤ GlobalTheory.AdelicU.heightGL F
+          (Formalism.UG.bc
+            (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (F := F)
+              (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF F))
+            γ))
+    {D : D7} (V : HSp D)
+    : ∃ (C : ℝ) (A : ℕ), ∀ T : ℝ,
+      1 ≤ T
+        → {γ : GQ V | GlobalTheory.Grow.height V (γ : GA D V) ≤ T}.Finite
+          ∧ (({γ : GQ V | GlobalTheory.Grow.height V (γ : GA D V) ≤ T}.ncard : ℕ) : ℝ)
+            ≤ C * T ^ A := by
   obtain ⟨C, A, h⟩ := gl_count hA hB hC D.host.F D.host.E V.rank
   refine ⟨C, A, fun T hT => ?_⟩
   obtain ⟨hf, hc⟩ := h T hT
-  have hex : ∀ γ : GQ V, ∃ δ : GL (Fin V.rank) D.host.E,
-      bc (inclR (F := D.host.F) (AF D.host.F)) δ = matHom V (γ : GA D V) := by
+  have hex
+      : ∀ γ : GQ V, ∃ δ : GL (Fin V.rank) D.host.E,
+        bc (inclR (F := D.host.F) (AF D.host.F)) δ = matHom V (γ : GA D V) := by
     intro γ
     have h1 := γ.2
     simp only [GQ, HFinIn, HFin, Subgroup.mem_subgroupOf, Subgroup.mem_map] at h1
     obtain ⟨δ, -, hδ⟩ := h1
     exact ⟨δ, hδ⟩
   choose φ hφ using hex
-  have hmaps : ∀ γ ∈ {γ : GQ V | GlobalTheory.Grow.height V (γ : GA D V) ≤ T},
-      φ γ ∈ {δ : GL (Fin V.rank) D.host.E | (heightGL D.host.F (bc (inclR (F := D.host.F) (AF D.host.F)) δ) : ℝ) ≤ T} := by
-    intro γ hγ
-    simp only [Set.mem_setOf_eq] at hγ ⊢
-    rw [hφ]
-    exact hγ
+  have hmaps
+      : ∀ γ ∈ {γ : GQ V | GlobalTheory.Grow.height V (γ : GA D V) ≤ T},
+        φ γ
+          ∈ {δ : GL (Fin V.rank) D.host.E | (heightGL D.host.F (bc (inclR (F := D.host.F) (AF D.host.F)) δ) : ℝ) ≤ T} :=
+    by
+      intro γ hγ
+      simp only [Set.mem_setOf_eq] at hγ ⊢
+      rw [hφ]
+      exact hγ
   have hinj : Set.InjOn φ {γ : GQ V | GlobalTheory.Grow.height V (γ : GA D V) ≤ T} := by
     intro a _ b _ hab
     have h2 : matHom V (a : GA D V) = matHom V (b : GA D V) := by rw [← hφ, ← hφ, hab]
     unfold Formalism.L2.Theta.matHom at h2
     exact Subtype.ext (Subgroup.subtype_injective _ h2)
-  refine ⟨Set.Finite.of_finite_image (hf.subset (by rintro _ ⟨γ, hγ, rfl⟩; exact hmaps γ hγ)) hinj, ?_⟩
+  refine
+    ⟨Set.Finite.of_finite_image (hf.subset (by rintro _ ⟨γ, hγ, rfl⟩; exact hmaps γ hγ)) hinj, ?_⟩
   exact (Nat.cast_le.2 (Set.ncard_le_ncard_of_injOn φ hmaps hinj hf)).trans hc
 
-theorem ncard_rat_mem_translate_le : ∀ {D : D7} {V : HSp D} {Ω : Set (GA D V)}, IsCompact Ω → ∃ (A : ℕ) (C : ℝ), ∀ g x : GA D V, {γ : GQ V | (γ : GA D V) * x ∈ (g * ·) '' Ω}.Finite ∧ ({γ : GQ V | (γ : GA D V) * x ∈ (g * ·) '' Ω}.ncard : ℝ) ≤ C * GlobalTheory.Grow.height V g ^ (2 * A) := by
+theorem ncard_rat_mem_translate_le
+    : ∀ {D : D7} {V : HSp D} {Ω : Set (GA D V)},
+      IsCompact Ω
+        → ∃ (A : ℕ) (C : ℝ), ∀ g x : GA D V,
+          {γ : GQ V | (γ : GA D V) * x ∈ (g * ·) '' Ω}.Finite
+            ∧ ({γ : GQ V | (γ : GA D V) * x ∈ (g * ·) '' Ω}.ncard : ℝ)
+              ≤ C * GlobalTheory.Grow.height V g ^ (2 * A) := by
   intro D V Ω hΩ
-  obtain ⟨C, A, hcount⟩ := gq_count GlobalTheory.T.finite_and_ncard_minpoly_coeff_height_le GlobalTheory.T.exists_mulHeight_minpoly_coeff_le_relativeHeight GlobalTheory.T.relativeHeight_entry_le_adelicHeightGL V
+  obtain ⟨C, A, hcount⟩ :=
+    gq_count GlobalTheory.T.finite_and_ncard_minpoly_coeff_height_le
+      GlobalTheory.T.exists_mulHeight_minpoly_coeff_le_relativeHeight
+      GlobalTheory.T.relativeHeight_entry_le_adelicHeightGL V
   have hK : IsCompact ((fun p : GA D V × GA D V => p.1 * p.2⁻¹) '' (Ω ×ˢ Ω)) :=
     (hΩ.prod hΩ).image (by fun_prop)
   obtain ⟨C₀, hC₀⟩ := GlobalTheory.Grow.exists_height_le_of_isCompact V hK
@@ -118,13 +180,15 @@ theorem ncard_rat_mem_translate_le : ∀ {D : D7} {V : HSp D} {Ω : Set (GA D V)
     have := GlobalTheory.Grow.height_pos V g
     positivity
   · set T : ℝ := max C₀ 1 * GlobalTheory.Grow.height V g ^ 2 with hTdef
-    have hT : 1 ≤ T := one_le_mul_of_one_le_of_one_le (le_max_right _ _)
-      (one_le_pow₀ (GlobalTheory.Grow.one_le_height V g))
+    have hT : 1 ≤ T :=
+      one_le_mul_of_one_le_of_one_le (le_max_right _ _)
+        (one_le_pow₀ (GlobalTheory.Grow.one_le_height V g))
     obtain ⟨hf, hc⟩ := hcount T hT
     let φ : GQ V → GQ V := fun γ => γ * γ₀⁻¹
     obtain ⟨y₀, hy₀, e₀⟩ := hγ₀
-    have hmaps : ∀ γ ∈ {γ : GQ V | (γ : GA D V) * x ∈ (g * ·) '' Ω},
-        φ γ ∈ {δ : GQ V | GlobalTheory.Grow.height V (δ : GA D V) ≤ T} := by
+    have hmaps
+        : ∀ γ ∈ {γ : GQ V | (γ : GA D V) * x ∈ (g * ·) '' Ω},
+          φ γ ∈ {δ : GQ V | GlobalTheory.Grow.height V (δ : GA D V) ≤ T} := by
       intro γ hγ
       obtain ⟨y, hy, e⟩ := hγ
       have h1 : ((φ γ : GQ V) : GA D V) = g * (y * y₀⁻¹) * g⁻¹ := by
@@ -138,21 +202,26 @@ theorem ncard_rat_mem_translate_le : ∀ {D : D7} {V : HSp D} {Ω : Set (GA D V)
         (hC₀ _ ⟨(y, y₀), ⟨hy, hy₀⟩, rfl⟩).trans (le_max_left _ _)
       show GlobalTheory.Grow.height V ((φ γ : GQ V) : GA D V) ≤ T
       rw [h1]
-      calc GlobalTheory.Grow.height V (g * (y * y₀⁻¹) * g⁻¹)
-          ≤ GlobalTheory.Grow.height V g * GlobalTheory.Grow.height V (y * y₀⁻¹) * GlobalTheory.Grow.height V g⁻¹ :=
-            (GlobalTheory.Grow.height_mul_le V _ _).trans (mul_le_mul_of_nonneg_right (GlobalTheory.Grow.height_mul_le V _ _)
+      calc
+        GlobalTheory.Grow.height V (g * (y * y₀⁻¹) * g⁻¹)
+            ≤ GlobalTheory.Grow.height V g * GlobalTheory.Grow.height V (y * y₀⁻¹)
+              * GlobalTheory.Grow.height V g⁻¹ :=
+          (GlobalTheory.Grow.height_mul_le V _ _).trans
+            (mul_le_mul_of_nonneg_right (GlobalTheory.Grow.height_mul_le V _ _)
               (GlobalTheory.Grow.height_pos V _).le)
         _ ≤ GlobalTheory.Grow.height V g * max C₀ 1 * GlobalTheory.Grow.height V g := by
-            rw [GlobalTheory.Grow.height_inv]
-            have := GlobalTheory.Grow.height_pos V g
-            gcongr
+          rw [GlobalTheory.Grow.height_inv]
+          have := GlobalTheory.Grow.height_pos V g
+          gcongr
         _ = T := by rw [hTdef]; ring
-    have hinj : Set.InjOn φ {γ : GQ V | (γ : GA D V) * x ∈ (g * ·) '' Ω} :=
-      fun a _ b _ hab => mul_right_cancel hab
-    refine ⟨Set.Finite.of_finite_image (hf.subset (by rintro _ ⟨γ, hγ, rfl⟩; exact hmaps γ hγ)) hinj, ?_⟩
-    calc (({γ : GQ V | (γ : GA D V) * x ∈ (g * ·) '' Ω}.ncard : ℕ) : ℝ)
-        ≤ (({δ : GQ V | GlobalTheory.Grow.height V (δ : GA D V) ≤ T}.ncard : ℕ) : ℝ) :=
-          Nat.cast_le.2 (Set.ncard_le_ncard_of_injOn φ hmaps hinj hf)
+    have hinj : Set.InjOn φ {γ : GQ V | (γ : GA D V) * x ∈ (g * ·) '' Ω} := fun a _ b _ hab =>
+      mul_right_cancel hab
+    refine
+      ⟨Set.Finite.of_finite_image (hf.subset (by rintro _ ⟨γ, hγ, rfl⟩; exact hmaps γ hγ)) hinj, ?_⟩
+    calc
+      (({γ : GQ V | (γ : GA D V) * x ∈ (g * ·) '' Ω}.ncard : ℕ) : ℝ)
+          ≤ (({δ : GQ V | GlobalTheory.Grow.height V (δ : GA D V) ≤ T}.ncard : ℕ) : ℝ) :=
+        Nat.cast_le.2 (Set.ncard_le_ncard_of_injOn φ hmaps hinj hf)
       _ ≤ C * T ^ A := hc
       _ = C * max C₀ 1 ^ A * GlobalTheory.Grow.height V g ^ (2 * A) := by rw [hTdef]; ring
 

@@ -28,17 +28,20 @@ variable {K : Type} [Field K] [NumberField K] [StarRing K] {d : ℕ}
 def shiftEquiv (d : ℕ) (a : K) (ha : a ≠ 0) : (Fin d → K) ≃ₗ[𝓞 K] (Fin d → K) :=
   (LinearEquiv.smulOfNeZero K (Fin d → K) a ha).restrictScalars (𝓞 K)
 
-theorem shift_smulLat_eq_map (a : K) (ha : a ≠ 0) (N : Submodule (𝓞 K) (Fin d → K)) :
-    smulLat a N = N.map ((shiftEquiv d a ha : (Fin d → K) ≃ₗ[𝓞 K] (Fin d → K)) :
-      (Fin d → K) →ₗ[𝓞 K] (Fin d → K)) := rfl
+theorem shift_smulLat_eq_map (a : K) (ha : a ≠ 0) (N : Submodule (𝓞 K) (Fin d → K))
+    : smulLat a N
+      = N.map
+        ((shiftEquiv d a ha : (Fin d → K) ≃ₗ[𝓞 K] (Fin d → K)) : (Fin d → K) →ₗ[𝓞 K] (Fin d → K)) :=
+  rfl
 
-theorem shift_mem_smulLat (a : K) (N : Submodule (𝓞 K) (Fin d → K)) (x : Fin d → K) :
-    x ∈ smulLat a N ↔ ∃ y ∈ N, a • y = x := by
+theorem shift_mem_smulLat (a : K) (N : Submodule (𝓞 K) (Fin d → K)) (x : Fin d → K)
+    : x ∈ smulLat a N ↔ ∃ y ∈ N, a • y = x := by
   simp [smulLat, Submodule.mem_map]
 
-theorem localizationAt_smul (w : HeightOneSpectrum (𝓞 K)) (a : K) (ha : a ≠ 0)
-    (N : Submodule (𝓞 K) (Fin d → K)) :
-    Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (smulLat a N) = smulLat a (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal N) := by
+theorem localizationAt_smul
+    (w : HeightOneSpectrum (𝓞 K)) (a : K) (ha : a ≠ 0) (N : Submodule (𝓞 K) (Fin d → K))
+    : Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (smulLat a N)
+      = smulLat a (Formalism.HermitianLatticesTheory.localization₂ w.asIdeal N) := by
   ext x
   rw [imageLcv_mem_locP, shift_mem_smulLat]
   constructor
@@ -57,46 +60,53 @@ theorem localizationAt_smul (w : HeightOneSpectrum (𝓞 K)) (a : K) (ha : a ≠
     rw [shift_mem_smulLat]
     exact ⟨s • y, hsy, smul_comm a s y⟩
 
-theorem shift_smulLat_span (a : K) (f : Fin d → Fin d → K) :
-    smulLat a (Submodule.span (𝓞 K) (Set.range f)) =
-      Submodule.span (𝓞 K) (Set.range fun k => a • f k) := by
+theorem shift_smulLat_span (a : K) (f : Fin d → Fin d → K)
+    : smulLat a (Submodule.span (𝓞 K) (Set.range f))
+      = Submodule.span (𝓞 K) (Set.range fun k => a • f k) := by
   rw [smulLat, Submodule.map_span, ← Set.range_comp]
   rfl
 
-theorem shift_vw_pow (w : HeightOneSpectrum (𝓞 K)) (a : K) (ha : a ≠ 0) (n : ℕ) :
-    vw w (a ^ n) = (n : ℤ) * vw w a := by
+theorem shift_vw_pow (w : HeightOneSpectrum (𝓞 K)) (a : K) (ha : a ≠ 0) (n : ℕ)
+    : vw w (a ^ n) = (n : ℤ) * vw w a := by
   simp only [vw]
   rw [← FractionalIdeal.spanSingleton_pow, FractionalIdeal.count_pow]
 
-theorem shift_idx_smulLat (w : HeightOneSpectrum (𝓞 K)) (N : Submodule (𝓞 K) (Fin d → K))
-    (hN : Submodule.IsFullLattice K N) (a : K) (ha : a ≠ 0) :
-    idx w N (smulLat a N) = (d : ℤ) * vw w a := by
+theorem shift_idx_smulLat
+    (w : HeightOneSpectrum (𝓞 K))
+    (N : Submodule (𝓞 K) (Fin d → K)) (hN : Submodule.IsFullLattice K N)
+    (a : K) (ha : a ≠ 0)
+    : idx w N (smulLat a N) = (d : ℤ) * vw w a := by
   letI := hN
   obtain ⟨f, hf, hl⟩ := semilocal_basis_exists K d N inferInstance w
-  have h1 : Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (Submodule.span (𝓞 K) (Set.range f)) =
-      Formalism.HermitianLatticesTheory.localization₂ w.asIdeal N := by
+  have h1
+      : Formalism.HermitianLatticesTheory.localization₂ w.asIdeal
+          (Submodule.span (𝓞 K) (Set.range f))
+        = Formalism.HermitianLatticesTheory.localization₂ w.asIdeal N := by
     unfold Formalism.HermitianLatticesTheory.loc at hl
     unfold Formalism.HermitianLatticesTheory.localization₂
-    exact idxChange_locS_of_le (Formalism.HermitianLatticesTheory.locBasic_hcompl_le (K := K) w.asIdeal) hl
-  have hdet : (Matrix.diagonal fun _ : Fin d => a).det = a ^ d := by
-    simp [Matrix.det_diagonal]
-  have h2 : Formalism.HermitianLatticesTheory.localization₂ w.asIdeal
-      (Submodule.span (𝓞 K) (Set.range (idxChangeAct f (Matrix.diagonal fun _ : Fin d => a)))) =
-      Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (smulLat a N) := by
+    exact idxChange_locS_of_le
+      (Formalism.HermitianLatticesTheory.locBasic_hcompl_le (K := K) w.asIdeal) hl
+  have hdet : (Matrix.diagonal fun _ : Fin d => a).det = a ^ d := by simp [Matrix.det_diagonal]
+  have h2
+      : Formalism.HermitianLatticesTheory.localization₂ w.asIdeal
+          (Submodule.span (𝓞 K) (Set.range (idxChangeAct f (Matrix.diagonal fun _ : Fin d => a))))
+        = Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (smulLat a N) := by
     rw [idxChange_act_diagonal, ← shift_smulLat_span, localizationAt_smul w a ha, h1,
       ← localizationAt_smul w a ha]
-  have h3 := idxChange_at w (smulLat a N) f hf (Matrix.diagonal fun _ : Fin d => a)
-    (by rw [hdet]; exact pow_ne_zero d ha) h2
+  have h3 :=
+    idxChange_at w (smulLat a N) f hf (Matrix.diagonal fun _ : Fin d => a)
+      (by rw [hdet]; exact pow_ne_zero d ha) h2
   rw [hdet, shift_vw_pow w a ha] at h3
   rw [← h3]
   unfold idx
   exact idxChange_lidx_congr w.asIdeal h1.symm rfl
 
-theorem shift_index_formula :
-    ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (d : ℕ)
-      (N N' : Submodule (𝓞 K) (Fin d → K)), Submodule.IsFullLattice K N →
-      ∀ (w : HeightOneSpectrum (𝓞 K)) (s : ℤ), IsShiftAt w N N' s →
-        idx w N N' = -((d : ℤ) * s) := by
+theorem shift_index_formula
+    : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (d : ℕ)
+        (N N' : Submodule (𝓞 K) (Fin d → K)),
+      Submodule.IsFullLattice K N
+        → ∀ (w : HeightOneSpectrum (𝓞 K)) (s : ℤ),
+          IsShiftAt w N N' s → idx w N N' = -((d : ℤ) * s) := by
   intro K _ _ _ d N N' hN w s hsh
   obtain ⟨a, ha, hva, hloc⟩ := hsh
   have e : idx w N N' = idx w N (smulLat a N) := by
@@ -107,12 +117,15 @@ theorem shift_index_formula :
 
 end Smul
 
-theorem mu_log_conductor :
-    ∀ (K : Type) [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K]
-      (d : ℕ), 0 < d →
-      ∀ X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ, (∀ v, IsUnit (X v).det) →
-      ∀ N : Submodule (𝓞 K) (Fin d → K), Submodule.IsFullLattice K N →
-        Formalism.HN.muDef (Pi.basisFun K (Fin d)) X N = -(lcv X N) / d := by
+theorem mu_log_conductor
+    : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K]
+        (d : ℕ),
+      0 < d
+        → ∀ X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ,
+          (∀ v, IsUnit (X v).det)
+            → ∀ N : Submodule (𝓞 K) (Fin d → K),
+              Submodule.IsFullLattice K N
+                → Formalism.HN.muDef (Pi.basisFun K (Fin d)) X N = -(lcv X N) / d := by
   intro K _ _ _ _ d hd X hX N hN
   have hfg : N.FG := hN.fg
   have hspan : Submodule.span K (N : Set (Fin d → K)) = ⊤ := hN.span_eq_top
@@ -124,10 +137,11 @@ theorem mu_log_conductor :
     have h3 := congrArg (fun U : Submodule K (Fin d → K) => finrank K U) hspan
     simp only [finrank_bot, finrank_top, finrank_fin_fun] at h3
     omega
-  obtain ⟨-, hmu, -⟩ := Formalism.HN.size_maximal_slope K (Fin d → K) (Fin d)
-    (Pi.basisFun K (Fin d)) X hX N hfg hne
+  obtain ⟨-, hmu, -⟩ :=
+    Formalism.HN.size_maximal_slope K (Fin d → K) (Fin d) (Pi.basisFun K (Fin d)) X hX N hfg hne
   have hht : 0 < Formalism.HN.ht (Pi.basisFun K (Fin d)) X N :=
-    (Formalism.HN.place_lattice_structure K (Fin d → K) (Fin d) (Pi.basisFun K (Fin d)) X hX N hfg).2.2
+    (Formalism.HN.place_lattice_structure K (Fin d → K) (Fin d) (Pi.basisFun K (Fin d)) X hX N
+      hfg).2.2
   have hrk : Formalism.HN.rkK N = d := by
     unfold Formalism.HN.rkK
     rw [hspan]
@@ -140,8 +154,8 @@ theorem mu_log_conductor :
   rw [hmu, Formalism.HN.size, Real.log_rpow hht, hrk, lcv, hn]
   field_simp
 
-theorem shift_lw_pos {K : Type} [Field K] [NumberField K] [StarRing K]
-    (w : HeightOneSpectrum (𝓞 K)) : 0 < lw w := by
+theorem shift_lw_pos {K : Type} [Field K] [NumberField K] [StarRing K] (w : HeightOneSpectrum (𝓞 K))
+    : 0 < lw w := by
   unfold lw
   apply div_pos
   · apply Real.log_pos
@@ -155,17 +169,21 @@ theorem shift_lw_pos {K : Type} [Field K] [NumberField K] [StarRing K]
     exact_mod_cast h2
   · exact_mod_cast Module.finrank_pos
 
-theorem shift_slope_mu :
-    ∀ (K : Type) [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K]
-      (d : ℕ) (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ), (∀ v, IsUnit (X v).det) →
-      ∀ N N' : Submodule (𝓞 K) (Fin d → K),
-        Submodule.IsFullLattice K N → Submodule.IsFullLattice K N' →
-        ∀ σ : HeightOneSpectrum (𝓞 K) → ℤ, IsShift N N' σ →
-          lcv X N' = lcv X N - 2 * (d : ℝ) * ∑ᶠ w : HeightOneSpectrum (𝓞 K), lw w * (σ w : ℝ) ∧
-          (0 < d → (Function.support σ).Finite ∧
-            Formalism.HN.muDef (Pi.basisFun K (Fin d)) X N' =
-              Formalism.HN.muDef (Pi.basisFun K (Fin d)) X N +
-                2 * ∑ᶠ w : HeightOneSpectrum (𝓞 K), lw w * (σ w : ℝ)) := by
+theorem shift_slope_mu
+    : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] [_root_.NumberField.IsTotallyComplex K]
+        (d : ℕ) (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ),
+      (∀ v, IsUnit (X v).det)
+        → ∀ N N' : Submodule (𝓞 K) (Fin d → K),
+          Submodule.IsFullLattice K N → Submodule.IsFullLattice K N'
+            → ∀ σ : HeightOneSpectrum (𝓞 K) → ℤ,
+              IsShift N N' σ
+                → lcv X N'
+                    = lcv X N - 2 * (d : ℝ) * ∑ᶠ w : HeightOneSpectrum (𝓞 K), lw w * (σ w : ℝ)
+                  ∧ (0 < d
+                    → (Function.support σ).Finite
+                      ∧ Formalism.HN.muDef (Pi.basisFun K (Fin d)) X N'
+                        = Formalism.HN.muDef (Pi.basisFun K (Fin d)) X N
+                          + 2 * ∑ᶠ w : HeightOneSpectrum (𝓞 K), lw w * (σ w : ℝ)) := by
   intro K _ _ _ _ d X hX N N' hN hN' σ hσ
   letI := hN
   letI := hN'
@@ -174,8 +192,9 @@ theorem shift_slope_mu :
     rw [shift_index_formula K d N N' hN w (σ w) (hσ w)]
     push_cast
     ring
-  have hsum : ∑ᶠ w : HeightOneSpectrum (𝓞 K), lw w * (idx w N N' : ℝ) =
-      -(d : ℝ) * ∑ᶠ w : HeightOneSpectrum (𝓞 K), lw w * (σ w : ℝ) := by
+  have hsum
+      : ∑ᶠ w : HeightOneSpectrum (𝓞 K), lw w * (idx w N N' : ℝ)
+        = -(d : ℝ) * ∑ᶠ w : HeightOneSpectrum (𝓞 K), lw w * (σ w : ℝ) := by
     simp_rw [key]
     rcases Nat.eq_zero_or_pos d with hd | hd
     · subst hd
@@ -189,7 +208,8 @@ theorem shift_slope_mu :
         rw [key]
         exact mul_ne_zero hd' hw
       exact (mul_finsum _ _).symm
-  have hL : lcv X N' = lcv X N - 2 * (d : ℝ) * ∑ᶠ w : HeightOneSpectrum (𝓞 K), lw w * (σ w : ℝ) := by
+  have hL
+      : lcv X N' = lcv X N - 2 * (d : ℝ) * ∑ᶠ w : HeightOneSpectrum (𝓞 K), lw w * (σ w : ℝ) := by
     rw [hlcv, hsum]
     ring
   refine ⟨hL, fun hd => ⟨?_, ?_⟩⟩
@@ -218,19 +238,20 @@ section Unit
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K] {d : ℕ}
 
-theorem shift_vw_alg (w : HeightOneSpectrum (𝓞 K)) (x : 𝓞 K) :
-    vw w (x : K) = FractionalIdeal.count K w
-      (FractionalIdeal.spanSingleton (𝓞 K)⁰ (algebraMap (𝓞 K) K x)) := rfl
+theorem shift_vw_alg (w : HeightOneSpectrum (𝓞 K)) (x : 𝓞 K)
+    : vw w (x : K)
+      = FractionalIdeal.count K w (FractionalIdeal.spanSingleton (𝓞 K)⁰ (algebraMap (𝓞 K) K x)) :=
+  rfl
 
 theorem shift_coe_ne_zero {x : 𝓞 K} (hx : x ≠ 0) : (x : K) ≠ 0 := by
-  first
-  | simpa using hx
-  | exact_mod_cast hx
+  first | simpa using hx | exact_mod_cast hx
 
-theorem shift_decomp (w : HeightOneSpectrum (𝓞 K)) :
-    ∃ ϖ : 𝓞 K, ϖ ≠ 0 ∧ vw w (ϖ : K) = 1 ∧
-      ∀ (n : ℕ) (x : 𝓞 K), x ≠ 0 → vw w (x : K) = n →
-        ∃ t s : 𝓞 K, t ∉ w.asIdeal ∧ s ∉ w.asIdeal ∧ t * x = ϖ ^ n * s := by
+theorem shift_decomp (w : HeightOneSpectrum (𝓞 K))
+    : ∃ ϖ : 𝓞 K,
+      ϖ ≠ 0 ∧ vw w (ϖ : K) = 1
+        ∧ ∀ (n : ℕ) (x : 𝓞 K),
+          x ≠ 0 → vw w (x : K) = n
+            → ∃ t s : 𝓞 K, t ∉ w.asIdeal ∧ s ∉ w.asIdeal ∧ t * x = ϖ ^ n * s := by
   obtain ⟨ϖ, _, hϖ0, hcnt, t0, ht0, hdiv⟩ := idxChange_unif (K := K) w
   refine ⟨ϖ, hϖ0, hcnt, ?_⟩
   intro n
@@ -258,10 +279,12 @@ theorem shift_decomp (w : HeightOneSpectrum (𝓞 K)) :
       rw [h, mul_zero] at hu
       exact (mul_ne_zero ht00 hx) hu
     have hvu : vw w (u : K) = n := by
-      have h1 : ((t0 : 𝓞 K) : K) * (x : K) = (ϖ : K) * (u : K) := by exact_mod_cast congrArg (fun z : 𝓞 K => (z : K)) hu
+      have h1 : ((t0 : 𝓞 K) : K) * (x : K) = (ϖ : K) * (u : K) := by
+        exact_mod_cast congrArg (fun z : 𝓞 K => (z : K)) hu
       have h2 := congrArg (vw w) h1
       rw [ValuationRepresentative.vw_mul w _ _ (shift_coe_ne_zero ht00) (shift_coe_ne_zero hx),
-        ValuationRepresentative.vw_mul w _ _ (shift_coe_ne_zero hϖ0) (shift_coe_ne_zero hu0), hv] at h2
+          ValuationRepresentative.vw_mul w _ _ (shift_coe_ne_zero hϖ0) (shift_coe_ne_zero hu0), hv]
+        at h2
       have h3 : vw w (t0 : K) = 0 := idxChange_cnt_unit (K := K) w ht0
       have h4 : vw w (ϖ : K) = 1 := hcnt
       rw [h3, h4] at h2
@@ -269,14 +292,16 @@ theorem shift_decomp (w : HeightOneSpectrum (𝓞 K)) :
       omega
     obtain ⟨t, s, ht, hs, hts⟩ := ih u hu0 hvu
     refine ⟨t * t0, s, w.isPrime.mul_notMem ht ht0, hs, ?_⟩
-    calc t * t0 * x = t * (t0 * x) := by ring
+    calc
+      t * t0 * x
+        = t * (t0 * x) := by ring
       _ = t * (ϖ * u) := by rw [hu]
       _ = ϖ * (t * u) := by ring
       _ = ϖ * (ϖ ^ n * s) := by rw [hts]
       _ = ϖ ^ (n + 1) * s := by ring
 
-theorem shift_int_of_nonneg (w : HeightOneSpectrum (𝓞 K)) (b : K) (hb : b ≠ 0) (hv : 0 ≤ vw w b) :
-    ∃ t y : 𝓞 K, t ∉ w.asIdeal ∧ (t : K) * b = (y : K) := by
+theorem shift_int_of_nonneg (w : HeightOneSpectrum (𝓞 K)) (b : K) (hb : b ≠ 0) (hv : 0 ≤ vw w b)
+    : ∃ t y : 𝓞 K, t ∉ w.asIdeal ∧ (t : K) * b = (y : K) := by
   obtain ⟨ϖ, hϖ0, _, hdec⟩ := shift_decomp w
   obtain ⟨x, y, hy, hxy⟩ := IsFractionRing.div_surjective (A := 𝓞 K) b
   have hy0 : y ≠ 0 := nonZeroDivisors.ne_zero hy
@@ -302,16 +327,21 @@ theorem shift_int_of_nonneg (w : HeightOneSpectrum (𝓞 K)) (b : K) (hb : b ≠
   refine ⟨t1 * s2, ϖ ^ k * s1 * t2, w.isPrime.mul_notMem ht1 hs2, ?_⟩
   rw [← hxy, mul_div_assoc', div_eq_iff hyK]
   have : t1 * s2 * x = ϖ ^ k * s1 * t2 * y := by
-    calc t1 * s2 * x = s2 * (t1 * x) := by ring
+    calc
+      t1 * s2 * x
+        = s2 * (t1 * x) := by ring
       _ = s2 * (ϖ ^ (k + m) * s1) := by rw [h1]
       _ = ϖ ^ k * s1 * (ϖ ^ m * s2) := by ring
       _ = ϖ ^ k * s1 * (t2 * y) := by rw [h2]
       _ = ϖ ^ k * s1 * t2 * y := by ring
   exact_mod_cast congrArg (fun z : 𝓞 K => (z : K)) this
 
-theorem localizationAt_le_of_le_localizationAt (w : HeightOneSpectrum (𝓞 K)) {A B : Submodule (𝓞 K) (Fin d → K)}
-    (h : A ≤ Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B) :
-    Formalism.HermitianLatticesTheory.localization₂ w.asIdeal A ≤ Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B := by
+theorem localizationAt_le_of_le_localizationAt
+    (w : HeightOneSpectrum (𝓞 K))
+    {A B : Submodule (𝓞 K) (Fin d → K)}
+    (h : A ≤ Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B)
+    : Formalism.HermitianLatticesTheory.localization₂ w.asIdeal A
+      ≤ Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B := by
   intro x hx
   rw [imageLcv_mem_locP] at hx
   obtain ⟨s, hs, hsx⟩ := hx
@@ -319,9 +349,12 @@ theorem localizationAt_le_of_le_localizationAt (w : HeightOneSpectrum (𝓞 K)) 
   rw [imageLcv_mem_locP]
   exact ⟨t * s, w.asIdeal.primeCompl.mul_mem ht hs, by rw [mul_smul]; exact htx⟩
 
-theorem shift_smul_mem_locP (w : HeightOneSpectrum (𝓞 K)) (N : Submodule (𝓞 K) (Fin d → K))
-    {a b : K} (ha : a ≠ 0) (hab : b = 0 ∨ vw w a ≤ vw w b) {x : Fin d → K} (hx : x ∈ N) :
-    b • x ∈ Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (smulLat a N) := by
+theorem shift_smul_mem_locP
+    (w : HeightOneSpectrum (𝓞 K))
+    (N : Submodule (𝓞 K) (Fin d → K))
+    {a b : K} (ha : a ≠ 0) (hab : b = 0 ∨ vw w a ≤ vw w b)
+    {x : Fin d → K} (hx : x ∈ N)
+    : b • x ∈ Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (smulLat a N) := by
   rcases hab with rfl | hab
   · rw [zero_smul]
     exact Submodule.zero_mem _
@@ -372,14 +405,18 @@ theorem shift_shiftIdeal_ne_zero (σ : HeightOneSpectrum (𝓞 K) → ℤ) : shi
   · intro v
     exact zpow_ne_zero _ (FractionalIdeal.coeIdeal_ne_zero.mpr v.ne_bot)
 
-theorem shift_count_shiftIdeal (σ : HeightOneSpectrum (𝓞 K) → ℤ) (hσ : (Function.support σ).Finite)
-    (w : HeightOneSpectrum (𝓞 K)) : FractionalIdeal.count K w (shiftIdeal σ) = -σ w := by
+theorem shift_count_shiftIdeal
+    (σ : HeightOneSpectrum (𝓞 K) → ℤ) (hσ : (Function.support σ).Finite)
+    (w : HeightOneSpectrum (𝓞 K))
+    : FractionalIdeal.count K w (shiftIdeal σ) = - σ w := by
   unfold shiftIdeal
-  exact FractionalIdeal.count_finprod K w (fun w => -σ w)
+  exact FractionalIdeal.count_finprod K w
+    (fun w => - σ w)
     (Filter.eventually_cofinite.2 (hσ.subset (fun x hx => by simpa using hx)))
 
-theorem shift_count_le_vw (I : FractionalIdeal (𝓞 K)⁰ K) (w : HeightOneSpectrum (𝓞 K)) {b : K}
-    (hb0 : b ≠ 0) (hb : b ∈ I) : FractionalIdeal.count K w I ≤ vw w b := by
+theorem shift_count_le_vw
+    (I : FractionalIdeal (𝓞 K)⁰ K) (w : HeightOneSpectrum (𝓞 K)) {b : K} (hb0 : b ≠ 0) (hb : b ∈ I)
+    : FractionalIdeal.count K w I ≤ vw w b := by
   have hI : I ≠ 0 := by
     intro h
     rw [h, FractionalIdeal.mem_zero_iff] at hb
@@ -387,7 +424,9 @@ theorem shift_count_le_vw (I : FractionalIdeal (𝓞 K)⁰ K) (w : HeightOneSpec
   have hle : FractionalIdeal.spanSingleton (𝓞 K)⁰ b ≤ I :=
     (FractionalIdeal.spanSingleton_le_iff_mem).mpr hb
   have hJ : I⁻¹ * FractionalIdeal.spanSingleton (𝓞 K)⁰ b ≤ 1 := by
-    calc I⁻¹ * FractionalIdeal.spanSingleton (𝓞 K)⁰ b ≤ I⁻¹ * I := by gcongr
+    calc
+      I⁻¹ * FractionalIdeal.spanSingleton (𝓞 K)⁰ b
+        ≤ I⁻¹ * I := by gcongr
       _ = 1 := inv_mul_cancel₀ hI
   obtain ⟨J, hJe⟩ := FractionalIdeal.le_one_iff_exists_coeIdeal.mp hJ
   have hsp0 : FractionalIdeal.spanSingleton (𝓞 K)⁰ b ≠ 0 := by
@@ -396,15 +435,20 @@ theorem shift_count_le_vw (I : FractionalIdeal (𝓞 K)⁰ K) (w : HeightOneSpec
     rw [hJe]; exact mul_ne_zero (inv_ne_zero hI) hsp0
   have e : FractionalIdeal.spanSingleton (𝓞 K)⁰ b = I * (J : FractionalIdeal (𝓞 K)⁰ K) := by
     rw [hJe, ← mul_assoc, mul_inv_cancel₀ hI, one_mul]
-  have hv : vw w b = FractionalIdeal.count K w I + FractionalIdeal.count K w (J : FractionalIdeal (𝓞 K)⁰ K) := by
+  have hv
+      : vw w b
+        = FractionalIdeal.count K w I
+          + FractionalIdeal.count K w (J : FractionalIdeal (𝓞 K)⁰ K) := by
     show FractionalIdeal.count K w (FractionalIdeal.spanSingleton (𝓞 K)⁰ b) = _
     rw [e, FractionalIdeal.count_mul K w hI hJ0]
   have hnn := FractionalIdeal.count_coe_nonneg K w J
   omega
 
-theorem shift_mem_ideal_loc (I : FractionalIdeal (𝓞 K)⁰ K) (hI : I ≠ 0) (w : HeightOneSpectrum (𝓞 K))
-    {a : K} (ha : a ≠ 0) (hv : vw w a = FractionalIdeal.count K w I) :
-    ∃ t : 𝓞 K, t ∉ w.asIdeal ∧ (t : K) * a ∈ I := by
+theorem shift_mem_ideal_loc
+    (I : FractionalIdeal (𝓞 K)⁰ K) (hI : I ≠ 0)
+    (w : HeightOneSpectrum (𝓞 K))
+    {a : K} (ha : a ≠ 0) (hv : vw w a = FractionalIdeal.count K w I)
+    : ∃ t : 𝓞 K, t ∉ w.asIdeal ∧ (t : K) * a ∈ I := by
   set J : FractionalIdeal (𝓞 K)⁰ K := FractionalIdeal.spanSingleton (𝓞 K)⁰ a * I⁻¹ with hJ
   have hsa : FractionalIdeal.spanSingleton (𝓞 K)⁰ a ≠ 0 :=
     FractionalIdeal.spanSingleton_ne_zero_iff.mpr ha
@@ -416,8 +460,9 @@ theorem shift_mem_ideal_loc (I : FractionalIdeal (𝓞 K)⁰ K) (hI : I ≠ 0) (
   have hfg : (J : Submodule (𝓞 K) K).FG := by
     have : IsNoetherian (𝓞 K) (J : Submodule (𝓞 K) K) := FractionalIdeal.isNoetherian J
     exact (Submodule.fg_top _).mp (IsNoetherian.noetherian ⊤)
-  have hle : (J : Submodule (𝓞 K) K) ≤
-      Formalism.HermitianLatticesTheory.locS w.asIdeal.primeCompl (1 : Submodule (𝓞 K) K) := by
+  have hle
+      : (J : Submodule (𝓞 K) K)
+        ≤ Formalism.HermitianLatticesTheory.locS w.asIdeal.primeCompl (1 : Submodule (𝓞 K) K) := by
     intro b hb
     by_cases hb0 : b = 0
     · rw [hb0]; exact Submodule.zero_mem _
@@ -427,7 +472,8 @@ theorem shift_mem_ideal_loc (I : FractionalIdeal (𝓞 K)⁰ K) (hI : I ≠ 0) (
     refine ⟨t, ht, ?_⟩
     rw [Submodule.mem_one]
     exact ⟨y, hty.symm⟩
-  obtain ⟨t, ht, htJ⟩ := Formalism.HermitianLatticesTheory.indexBasic_denom w.asIdeal.primeCompl _ _ hfg hle
+  obtain ⟨t, ht, htJ⟩ :=
+    Formalism.HermitianLatticesTheory.indexBasic_denom w.asIdeal.primeCompl _ _ hfg hle
   refine ⟨t, ht, ?_⟩
   have h2 : FractionalIdeal.spanSingleton (𝓞 K)⁰ (t : K) * J ≤ 1 := by
     rw [FractionalIdeal.spanSingleton_mul_le_iff]
@@ -436,21 +482,26 @@ theorem shift_mem_ideal_loc (I : FractionalIdeal (𝓞 K)⁰ K) (hI : I ≠ 0) (
     rw [← FractionalIdeal.mem_coe, FractionalIdeal.coe_one]
     exact h5
   have h3 : FractionalIdeal.spanSingleton (𝓞 K)⁰ ((t : K) * a) ≤ I := by
-    have h4 : FractionalIdeal.spanSingleton (𝓞 K)⁰ ((t : K) * a) =
-        FractionalIdeal.spanSingleton (𝓞 K)⁰ (t : K) * J * I := by
+    have h4
+        : FractionalIdeal.spanSingleton (𝓞 K)⁰ ((t : K) * a)
+          = FractionalIdeal.spanSingleton (𝓞 K)⁰ (t : K) * J * I := by
       rw [hJ, ← FractionalIdeal.spanSingleton_mul_spanSingleton, mul_assoc, mul_assoc,
         inv_mul_cancel₀ hI, mul_one]
     rw [h4]
-    calc FractionalIdeal.spanSingleton (𝓞 K)⁰ (t : K) * J * I ≤ 1 * I :=
-          mul_le_mul_left h2 I
+    calc
+      FractionalIdeal.spanSingleton (𝓞 K)⁰ (t : K) * J * I
+        ≤ 1 * I := mul_le_mul_left h2 I
       _ = I := one_mul I
   exact (FractionalIdeal.spanSingleton_le_iff_mem).mp h3
 
-theorem localizationAt_fractionalIdeal_smul_eq_smul (I : FractionalIdeal (𝓞 K)⁰ K) (hI : I ≠ 0)
-    (w : HeightOneSpectrum (𝓞 K)) (N : Submodule (𝓞 K) (Fin d → K))
-    {a : K} (ha : a ≠ 0) (hv : vw w a = FractionalIdeal.count K w I) :
-    Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (Formalism.HermitianLatticesTheory.idealSmul (I : Submodule (𝓞 K) K) N) =
-      Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (smulLat a N) := by
+theorem localizationAt_fractionalIdeal_smul_eq_smul
+    (I : FractionalIdeal (𝓞 K)⁰ K) (hI : I ≠ 0)
+    (w : HeightOneSpectrum (𝓞 K))
+    (N : Submodule (𝓞 K) (Fin d → K))
+    {a : K} (ha : a ≠ 0) (hv : vw w a = FractionalIdeal.count K w I)
+    : Formalism.HermitianLatticesTheory.localization₂ w.asIdeal
+        (Formalism.HermitianLatticesTheory.idealSmul (I : Submodule (𝓞 K) K) N)
+      = Formalism.HermitianLatticesTheory.localization₂ w.asIdeal (smulLat a N) := by
   apply le_antisymm
   · apply localizationAt_le_of_le_localizationAt
     unfold Formalism.HermitianLatticesTheory.idealSmul
@@ -473,27 +524,32 @@ theorem localizationAt_fractionalIdeal_smul_eq_smul (I : FractionalIdeal (𝓞 K
     rw [e]
     exact Submodule.subset_span ⟨_, hta, x, hx, rfl⟩
 
-theorem shift_smulLat_lattice (a : K) (ha : a ≠ 0) (N : Submodule (𝓞 K) (Fin d → K))
-    (hN : Submodule.IsFullLattice K N) : Submodule.IsFullLattice K (smulLat a N) := by
+theorem shift_smulLat_lattice
+    (a : K) (ha : a ≠ 0) (N : Submodule (𝓞 K) (Fin d → K)) (hN : Submodule.IsFullLattice K N)
+    : Submodule.IsFullLattice K (smulLat a N) := by
   letI : Submodule.IsLattice K (smulLat a N) := Submodule.IsLattice.of_fg K (hN.fg.map _)
   constructor
-  have hset : ((smulLat a N : Submodule (𝓞 K) (Fin d → K)) : Set (Fin d → K)) =
-      (LinearMap.lsmul K (Fin d → K) a) '' (N : Set (Fin d → K)) := by
+  have hset
+      : ((smulLat a N : Submodule (𝓞 K) (Fin d → K)) : Set (Fin d → K))
+        = (LinearMap.lsmul K (Fin d → K) a) '' (N : Set (Fin d → K)) := by
     simp [smulLat]
   rw [hset, ← Submodule.map_span, hN.span_eq_top, Submodule.map_top, LinearMap.range_eq_top]
   intro v
   exact ⟨a⁻¹ • v, by simp [smul_smul, mul_inv_cancel₀ ha, inv_mul_cancel₀ ha]⟩
 
-theorem shift_idealSmul_lattice (I : FractionalIdeal (𝓞 K)⁰ K) (hI : I ≠ 0)
-    (N : Submodule (𝓞 K) (Fin d → K)) (hN : Submodule.IsFullLattice K N) :
-    Submodule.IsFullLattice K (Formalism.HermitianLatticesTheory.idealSmul (I : Submodule (𝓞 K) K) N) := by
+theorem shift_idealSmul_lattice
+    (I : FractionalIdeal (𝓞 K)⁰ K) (hI : I ≠ 0)
+    (N : Submodule (𝓞 K) (Fin d → K)) (hN : Submodule.IsFullLattice K N)
+    : Submodule.IsFullLattice K
+      (Formalism.HermitianLatticesTheory.idealSmul (I : Submodule (𝓞 K) K) N) := by
   have hNfg : N.FG := hN.fg
   obtain ⟨c, hc, hcI⟩ := I.isFractional
   have hc0 : c ≠ 0 := nonZeroDivisors.ne_zero hc
   have hcK : (c : K) ≠ 0 := shift_coe_ne_zero hc0
-  have hidealFg :
-      (Formalism.HermitianLatticesTheory.idealSmul (I : Submodule (𝓞 K) K) N).FG := by
-    have hle : smulLat (c : K) (Formalism.HermitianLatticesTheory.idealSmul (I : Submodule (𝓞 K) K) N) ≤ N := by
+  have hidealFg : (Formalism.HermitianLatticesTheory.idealSmul (I : Submodule (𝓞 K) K) N).FG := by
+    have hle
+        : smulLat (c : K) (Formalism.HermitianLatticesTheory.idealSmul (I : Submodule (𝓞 K) K) N)
+          ≤ N := by
       unfold smulLat Formalism.HermitianLatticesTheory.idealSmul
       rw [Submodule.map_span, Submodule.span_le]
       rintro _ ⟨_, ⟨b, hb, x, hx, rfl⟩, rfl⟩
@@ -509,7 +565,8 @@ theorem shift_idealSmul_lattice (I : FractionalIdeal (𝓞 K)⁰ K) (hI : I ≠ 
       rw [e]
       exact N.smul_mem y hx
     have hnoe : IsNoetherian (𝓞 K) N := isNoetherian_of_fg_of_noetherian N hNfg
-    have hfg : (smulLat (c : K) (Formalism.HermitianLatticesTheory.idealSmul (I : Submodule (𝓞 K) K) N)).FG :=
+    have hfg : (smulLat (c : K)
+        (Formalism.HermitianLatticesTheory.idealSmul (I : Submodule (𝓞 K) K) N)).FG :=
       isNoetherian_submodule.mp hnoe _ hle
     rw [shift_smulLat_eq_map _ hcK] at hfg
     exact Submodule.fg_of_fg_map_injective _ (shiftEquiv d (c : K) hcK).injective hfg
@@ -517,18 +574,27 @@ theorem shift_idealSmul_lattice (I : FractionalIdeal (𝓞 K)⁰ K) (hI : I ≠ 
   constructor
   obtain ⟨b, hb, hb0⟩ := FractionalIdeal.exists_ne_zero_mem_isInteger hI
   have hbK : (b : K) ≠ 0 := shift_coe_ne_zero hb
-  have hle : smulLat (b : K) N ≤ Formalism.HermitianLatticesTheory.idealSmul (I : Submodule (𝓞 K) K) N := by
+  have hle
+      : smulLat (b : K) N
+        ≤ Formalism.HermitianLatticesTheory.idealSmul (I : Submodule (𝓞 K) K) N := by
     intro z hz
     obtain ⟨x, hx, rfl⟩ := (shift_mem_smulLat _ N z).mp hz
     exact Submodule.subset_span ⟨_, hb0, x, hx, rfl⟩
   have hspan := (shift_smulLat_lattice (b : K) hbK N hN).span_eq_top
   exact top_unique (hspan ▸ Submodule.span_mono (R := K) hle)
 
-theorem shift_eq_of_locP {A B : Submodule (𝓞 K) (Fin d → K)}
-    (h : ∀ w : HeightOneSpectrum (𝓞 K), Formalism.HermitianLatticesTheory.localization₂ w.asIdeal A = Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B) :
-    A = B := by
-  have key : ∀ {A B : Submodule (𝓞 K) (Fin d → K)},
-      (∀ w : HeightOneSpectrum (𝓞 K), Formalism.HermitianLatticesTheory.localization₂ w.asIdeal A = Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B) → A ≤ B := by
+theorem shift_eq_of_locP
+    {A B : Submodule (𝓞 K) (Fin d → K)}
+    (h : ∀ w : HeightOneSpectrum (𝓞 K),
+      Formalism.HermitianLatticesTheory.localization₂ w.asIdeal A
+        = Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B)
+    : A = B := by
+  have key
+      : ∀ {A B : Submodule (𝓞 K) (Fin d → K)},
+        (∀ w : HeightOneSpectrum (𝓞 K),
+            Formalism.HermitianLatticesTheory.localization₂ w.asIdeal A
+              = Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B)
+          → A ≤ B := by
     intro A B h x hx
     by_contra hxB
     let I : Ideal (𝓞 K) := B.comap (LinearMap.toSpanSingleton (𝓞 K) (Fin d → K) x)
@@ -540,7 +606,8 @@ theorem shift_eq_of_locP {A B : Submodule (𝓞 K) (Fin d → K)}
       rw [hmem, one_smul] at h1
       exact hxB h1
     obtain ⟨M, hM, hIM⟩ := Ideal.exists_le_maximal I hI
-    have hMne : M ≠ ⊥ := Ring.ne_bot_of_isMaximal_of_not_isField hM (NumberField.RingOfIntegers.not_isField K)
+    have hMne : M ≠ ⊥ :=
+      Ring.ne_bot_of_isMaximal_of_not_isField hM (NumberField.RingOfIntegers.not_isField K)
     let w : HeightOneSpectrum (𝓞 K) := ⟨M, hM.isPrime, hMne⟩
     have hxA : x ∈ Formalism.HermitianLatticesTheory.localization₂ w.asIdeal A :=
       (imageLcv_mem_locP _ _ _).2 ⟨1, w.asIdeal.primeCompl.one_mem, by rw [one_smul]; exact hx⟩
@@ -551,42 +618,59 @@ theorem shift_eq_of_locP {A B : Submodule (𝓞 K) (Fin d → K)}
 
 end Ideal
 
-theorem shift_existence :
-    ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (d : ℕ)
-      (N : Submodule (𝓞 K) (Fin d → K)), Submodule.IsFullLattice K N →
-      ∀ σ : HeightOneSpectrum (𝓞 K) → ℤ, (Function.support σ).Finite →
-        IsShift N (Formalism.HermitianLatticesTheory.idealSmul (shiftIdeal σ : Submodule (𝓞 K) K) N) σ ∧
-        Submodule.IsFullLattice K
-          (Formalism.HermitianLatticesTheory.idealSmul (shiftIdeal σ : Submodule (𝓞 K) K) N) ∧
-        ∀ N' : Submodule (𝓞 K) (Fin d → K), IsShift N N' σ →
-          N' = Formalism.HermitianLatticesTheory.idealSmul (shiftIdeal σ : Submodule (𝓞 K) K) N := by
+theorem shift_existence
+    : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (d : ℕ) (N : Submodule (𝓞 K) (Fin d → K)),
+      Submodule.IsFullLattice K N
+        → ∀ σ : HeightOneSpectrum (𝓞 K) → ℤ,
+          (Function.support σ).Finite
+            → IsShift N
+                (Formalism.HermitianLatticesTheory.idealSmul (shiftIdeal σ : Submodule (𝓞 K) K) N) σ
+              ∧ Submodule.IsFullLattice K
+                (Formalism.HermitianLatticesTheory.idealSmul (shiftIdeal σ : Submodule (𝓞 K) K) N)
+              ∧ ∀ N' : Submodule (𝓞 K) (Fin d → K),
+                IsShift N N' σ
+                  → N'
+                    = Formalism.HermitianLatticesTheory.idealSmul (shiftIdeal σ : Submodule (𝓞 K) K)
+                      N := by
   intro K _ _ _ d N hN σ hσ
   have hI := shift_shiftIdeal_ne_zero σ
-  have hsh : IsShift N (Formalism.HermitianLatticesTheory.idealSmul (shiftIdeal σ : Submodule (𝓞 K) K) N) σ := by
+  have hsh : IsShift N
+      (Formalism.HermitianLatticesTheory.idealSmul (shiftIdeal σ : Submodule (𝓞 K) K) N) σ := by
     intro w
-    obtain ⟨a, ha, hv⟩ := shift_exists_val w (-σ w)
-    exact ⟨a, ha, hv, localizationAt_fractionalIdeal_smul_eq_smul _ hI w N ha (by rw [hv, shift_count_shiftIdeal σ hσ])⟩
+    obtain ⟨a, ha, hv⟩ := shift_exists_val w (- σ w)
+    exact ⟨
+      a,
+      ha,
+      hv,
+      localizationAt_fractionalIdeal_smul_eq_smul _ hI w N ha
+        (by rw [hv, shift_count_shiftIdeal σ hσ])
+    ⟩
   refine ⟨hsh, shift_idealSmul_lattice _ hI N hN, ?_⟩
   intro N' hN'
   apply shift_eq_of_locP
   intro w
   obtain ⟨a, ha, hv, hl⟩ := hN' w
   rw [hl]
-  exact (localizationAt_fractionalIdeal_smul_eq_smul _ hI w N ha (by rw [hv, shift_count_shiftIdeal σ hσ])).symm
+  exact (localizationAt_fractionalIdeal_smul_eq_smul _ hI w N ha
+    (by rw [hv, shift_count_shiftIdeal σ hσ])).symm
 
-private theorem vw_eq_zero_of_not_mem_asIdeal {K : Type} [Field K] [NumberField K] [StarRing K] (w : HeightOneSpectrum (𝓞 K))
-    {t : 𝓞 K} (ht : t ∉ w.asIdeal) : vw w (t : K) = 0 := by
+private theorem vw_eq_zero_of_not_mem_asIdeal
+    {K : Type} [Field K] [NumberField K] [StarRing K]
+    (w : HeightOneSpectrum (𝓞 K))
+    {t : 𝓞 K} (ht : t ∉ w.asIdeal)
+    : vw w (t : K) = 0 := by
   have ht0 : t ≠ 0 := by
     rintro rfl
     exact ht w.asIdeal.zero_mem
   have hI : Ideal.span {t} ≠ 0 := by
     rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]
     exact ht0
-  have hv : vw w (t : K) =
-      ((Associates.mk w.asIdeal).count (Associates.mk (Ideal.span {t})).factors : ℤ) := by
+  have hv
+      : vw w (t : K)
+        = ((Associates.mk w.asIdeal).count (Associates.mk (Ideal.span {t})).factors : ℤ) := by
     rw [← FractionalIdeal.count_coe K w hI, FractionalIdeal.coeIdeal_span_singleton]
     simp [vw]
-  have hnd : ¬ (w.asIdeal ∣ Ideal.span {t}) := by
+  have hnd : ¬(w.asIdeal ∣ Ideal.span {t}) := by
     rw [Ideal.dvd_span_singleton]
     exact ht
   rw [← Associates.count_ne_zero_iff_dvd hI w.irreducible] at hnd
@@ -632,7 +716,10 @@ theorem shift_pairing_formula : ShiftPairing := by
 
 theorem divisor_into_dual_shift : DivIntoDualShift := by
   intro K _ _ _ d D R B n M π ι P ζ hζ0 hζ hP N N' σ τ hσ hτ hsh hR φ hφ
-  refine divisor_into_dual_lattice K D R (B φ) n M π ι (fun w => P w φ) ζ hζ0 hζ (fun w F => hP w φ F)
+  refine divisor_into_dual_lattice K D R (B φ) n M π ι
+    (fun w => P w φ)
+    ζ hζ0 hζ
+    (fun w F => hP w φ F)
     ?_ hR
   intro w F hF
   refine shift_pairing_formula K d w N N' (τ w) (hsh w) ((P w).flip F) ?_ φ hφ

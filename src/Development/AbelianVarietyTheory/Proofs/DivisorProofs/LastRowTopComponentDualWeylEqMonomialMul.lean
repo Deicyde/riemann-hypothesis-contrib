@@ -7,21 +7,30 @@ public import Formalism.BranchSandwichDivisors.DivFromPassageAndNorm
 
 @[expose] public section
 
-open MvPolynomial Formalism.GradedWeylDivisibility Formalism.BranchingDeterminantCap Formalism.BasicNotions Formalism.L2.DIV GlobalTheory.Mem.Gelf GlobalTheory.Mem.GelfCheck GlobalTheory.BrCompare
+open MvPolynomial Formalism.GradedWeylDivisibility Formalism.BranchingDeterminantCap
+  Formalism.BasicNotions Formalism.L2.DIV GlobalTheory.Mem.Gelf GlobalTheory.Mem.GelfCheck
+  GlobalTheory.BrCompare
 
 namespace GlobalTheory.BrCompare
 
-theorem monomial_eq_zmon_mul_emb {K : Type} [Field K] {n : ℕ} (b : Fin n → ℕ) (μ : Fin (n + 1) × Fin n →₀ ℕ)
-    (hμ : ∀ s, μ (Fin.last n, s) = b s) (c : K) :
-    ∃ f, (monomial μ c : BP K n) = zmon K n b * emb K n f := by
+theorem monomial_eq_zmon_mul_emb
+    {K : Type} [Field K]
+    {n : ℕ} (b : Fin n → ℕ) (μ : Fin (n + 1) × Fin n →₀ ℕ) (hμ : ∀ s, μ (Fin.last n, s) = b s)
+    (c : K)
+    : ∃ f, (monomial μ c : BP K n) = zmon K n b * emb K n f := by
   refine ⟨C c * ∏ a : Fin n, ∏ s : Fin n, X (a, s) ^ μ (a.castSucc, s), ?_⟩
-  rw [monomial_eq, Finsupp.prod_fintype _ _ (fun _ => pow_zero _), Fintype.prod_prod_type, Fin.prod_univ_castSucc]
+  rw [monomial_eq, Finsupp.prod_fintype _ _ (fun _ => pow_zero _), Fintype.prod_prod_type,
+    Fin.prod_univ_castSucc]
   simp only [hμ, zmon, emb, map_mul, map_prod, map_pow, rename_X, rename_C]
   ring
 
-theorem eq_zmon_mul_emb_of_homogeneous {K : Type} [Field K] {n : ℕ} (b : Fin n → ℕ) (H : BP K n)
-    (hH : IsWeightedHomogeneous (zW n) H (fun s => (b s : ℤ))) : ∃ f, H = zmon K n b * emb K n f := by
-  have h : ∀ μ ∈ H.support, ∃ f, (monomial μ (AddMonoidAlgebra.coeff H μ) : BP K n) = zmon K n b * emb K n f := by
+theorem eq_zmon_mul_emb_of_homogeneous
+    {K : Type} [Field K]
+    {n : ℕ} (b : Fin n → ℕ) (H : BP K n) (hH : IsWeightedHomogeneous (zW n) H (fun s => (b s : ℤ)))
+    : ∃ f, H = zmon K n b * emb K n f := by
+  have h
+      : ∀ μ ∈ H.support, ∃ f,
+        (monomial μ (AddMonoidAlgebra.coeff H μ) : BP K n) = zmon K n b * emb K n f := by
     intro μ hμ
     refine monomial_eq_zmon_mul_emb b μ (fun s => ?_) _
     have h1 := congrFun (hH (mem_support_iff.1 hμ)) s
@@ -33,17 +42,23 @@ theorem eq_zmon_mul_emb_of_homogeneous {K : Type} [Field K] {n : ℕ} (b : Fin n
     rw [map_sum, Finset.mul_sum, ← Finset.sum_congr rfl hg]
   exact H.as_sum
 
-theorem zmon_mul_emb_injective {K : Type} [Field K] {n : ℕ} (b : Fin n → ℕ) {f g : MvPolynomial (Fin n × Fin n) K}
-    (h : zmon K n b * emb K n f = zmon K n b * emb K n g) : f = g := by
+theorem zmon_mul_emb_injective
+    {K : Type} [Field K]
+    {n : ℕ} (b : Fin n → ℕ)
+    {f g : MvPolynomial (Fin n × Fin n) K} (h : zmon K n b * emb K n f = zmon K n b * emb K n g)
+    : f = g := by
   have hz : zmon K n b ≠ 0 := Finset.prod_ne_zero_iff.2 fun s _ => pow_ne_zero _ (X_ne_zero _)
-  refine rename_injective (fun v : Fin n × Fin n => ((v.1.castSucc, v.2) : Fin (n + 1) × Fin n)) ?_
-    (mul_left_cancel₀ hz h)
+  refine rename_injective
+    (fun v : Fin n × Fin n => ((v.1.castSucc, v.2) : Fin (n + 1) × Fin n))
+    ?_ (mul_left_cancel₀ hz h)
   exact (Fin.castSucc_injective n).prodMap Function.injective_id
 
-theorem zcomp_top_eq_zmon_mul_emb (K : Type) [Field K] [CharZero K] (n : ℕ) (lam : Fin n → ℕ) (G : BP K n)
-    (hG : G ∈ dualWeyl K (n + 1) n lam) (b : Fin n → ℕ) (hb : ∀ s, b s ≤ lam s)
-    (hmax : ∀ β', zcomp K n β' G ≠ 0 → omg β' ≤ omg fun s => (b s : ℤ)) :
-    ∃ f ∈ dualWeyl K n n (fun s => lam s - b s), zcomp K n (fun s => (b s : ℤ)) G = zmon K n b * emb K n f := by
+theorem zcomp_top_eq_zmon_mul_emb
+    (K : Type) [Field K] [CharZero K]
+    (n : ℕ) (lam : Fin n → ℕ) (G : BP K n) (hG : G ∈ dualWeyl K (n + 1) n lam) (b : Fin n → ℕ)
+    (hb : ∀ s, b s ≤ lam s) (hmax : ∀ β', zcomp K n β' G ≠ 0 → omg β' ≤ omg fun s => (b s : ℤ))
+    : ∃ f ∈ dualWeyl K n n (fun s => lam s - b s),
+      zcomp K n (fun s => (b s : ℤ)) G = zmon K n b * emb K n f := by
   obtain ⟨f, hf⟩ := eq_zmon_mul_emb_of_homogeneous b _ (bmD_zcomp_isWH (fun s => (b s : ℤ)) G)
   refine ⟨f, bm_mem_dualWeyl_iff.2 ⟨fun s => ?_, fun l j hlj => ?_⟩, hf⟩
   · have h := bmD_weight lam G hG (fun s => (b s : ℤ)) s

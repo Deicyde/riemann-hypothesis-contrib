@@ -9,27 +9,33 @@ noncomputable section
 
 namespace MassDataIdxK
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain Topology
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain Topology
 open scoped Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes TensorProduct
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {n : ℕ} (v : HeightOneSpectrum (𝓞 F))
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {n : ℕ}
+  (v : HeightOneSpectrum (𝓞 F))
 
-theorem latImage (L : Submodule (𝓞 E) (Fin n → E)) (hL : Submodule.span E (L : Set (Fin n → E)) = ⊤)
-    (hfg : L.FG) :
-    ∃ (m : ℕ) (b : Fin m → (Fin n → Fv F v ⊗[F] E)),
-      (∀ i, b i ∈ latLoc (E := E) v (L : Set (Fin n → E))) ∧
-      Submodule.span (Fv F v) (Set.range b) = ⊤ ∧
-      (latLoc (E := E) v (L : Set (Fin n → E)) : Set (Fin n → Fv F v ⊗[F] E)) =
-        (fun c : Fin m → Fv F v => ∑ i, c i • b i) ''
-          Set.pi Set.univ (fun _ => (v.adicCompletionIntegers F : Set (Fv F v))) := by
-  obtain ⟨m, s, hs⟩ := Submodule.fg_iff_exists_fin_generating_family.1 (hfg.restrictScalars (R := ℤ))
+theorem latImage
+    (L : Submodule (𝓞 E) (Fin n → E)) (hL : Submodule.span E (L : Set (Fin n → E)) = ⊤) (hfg : L.FG)
+    : ∃ (m : ℕ) (b : Fin m → (Fin n → Fv F v ⊗[F] E)),
+      (∀ i, b i ∈ latLoc (E := E) v (L : Set (Fin n → E)))
+        ∧ Submodule.span (Fv F v) (Set.range b) = ⊤
+        ∧ (latLoc (E := E) v (L : Set (Fin n → E)) : Set (Fin n → Fv F v ⊗[F] E))
+          = (fun c : Fin m → Fv F v => ∑ i, c i • b i)
+            '' Set.pi Set.univ (fun _ => (v.adicCompletionIntegers F : Set (Fv F v))) := by
+  obtain ⟨m, s, hs⟩ :=
+    Submodule.fg_iff_exists_fin_generating_family.1 (hfg.restrictScalars (R := ℤ))
   have hsL : ∀ i, s i ∈ L := fun i => by
     have : s i ∈ Submodule.span ℤ (Set.range s) := Submodule.subset_span ⟨i, rfl⟩
-    rw [hs] at this; exact this
+    rw [hs] at this
+    exact this
   set b : Fin m → (Fin n → Fv F v ⊗[F] E) := fun i => ratV (F := F) (Fv F v) (s i) with hb
-  have hlat : latLoc (E := E) v (L : Set (Fin n → E)) =
-      Submodule.span (v.adicCompletionIntegers F) (Set.range b) := by
+  have hlat
+      : latLoc (E := E) v (L : Set (Fin n → E))
+        = Submodule.span (v.adicCompletionIntegers F) (Set.range b) := by
     apply le_antisymm
     · unfold latLoc
       rw [Submodule.span_le]
@@ -62,28 +68,36 @@ theorem latImage (L : Submodule (𝓞 E) (Fin n → E)) (hL : Submodule.span E (
     · rintro ⟨d, hd, rfl⟩
       exact ⟨fun i => ⟨d i, hd i (Set.mem_univ _)⟩, rfl⟩
 
-theorem latOpenCompact (L : Submodule (𝓞 E) (Fin n → E))
-    (hL : Submodule.span E (L : Set (Fin n → E)) = ⊤) (hfg : L.FG) :
-    IsOpen (latLoc (E := E) v (L : Set (Fin n → E)) : Set (Fin n → Fv F v ⊗[F] E)) ∧
-      IsCompact (latLoc (E := E) v (L : Set (Fin n → E)) : Set (Fin n → Fv F v ⊗[F] E)) := by
+theorem latOpenCompact
+    (L : Submodule (𝓞 E) (Fin n → E)) (hL : Submodule.span E (L : Set (Fin n → E)) = ⊤) (hfg : L.FG)
+    : IsOpen (latLoc (E := E) v (L : Set (Fin n → E)) : Set (Fin n → Fv F v ⊗[F] E))
+      ∧ IsCompact (latLoc (E := E) v (L : Set (Fin n → E)) : Set (Fin n → Fv F v ⊗[F] E)) := by
   have := fdFE (F := F) (E := E)
   have := MassDataIdxSteps.tens_topRing (F := F) (E := E) v
   obtain ⟨m, b, -, hsp, heq⟩ := latImage v L hL hfg
-  let Φ : (Fin m → Fv F v) →ₗ[Fv F v] (Fin n → Fv F v ⊗[F] E) :=
-    { toFun := fun c => ∑ i, c i • b i
-      map_add' := fun c d => by simp [add_smul, Finset.sum_add_distrib]
-      map_smul' := fun r c => by simp [Finset.smul_sum, smul_smul] }
+  let Φ : (Fin m → Fv F v) →ₗ[Fv F v] (Fin n → Fv F v ⊗[F] E) := {
+    toFun := fun c => ∑ i, c i • b i
+    map_add' := fun c d => by simp [add_smul, Finset.sum_add_distrib]
+    map_smul' := fun r c => by simp [Finset.smul_sum, smul_smul]
+  }
   have hsurj : Function.Surjective Φ := by
     rw [← LinearMap.range_eq_top, eq_top_iff, ← hsp, Submodule.span_le]
     rintro _ ⟨i, rfl⟩
     refine ⟨Pi.single i 1, ?_⟩
     simp [Φ, Pi.single_apply]
-  have himg : (latLoc (E := E) v (L : Set (Fin n → E)) : Set (Fin n → Fv F v ⊗[F] E)) =
-      Φ '' Set.pi Set.univ (fun _ => (v.adicCompletionIntegers F : Set (Fv F v))) := heq
+  have himg
+      : (latLoc (E := E) v (L : Set (Fin n → E)) : Set (Fin n → Fv F v ⊗[F] E))
+        = Φ '' Set.pi Set.univ (fun _ => (v.adicCompletionIntegers F : Set (Fv F v))) :=
+    heq
   rw [himg]
-  refine ⟨IsModuleTopology.isOpenMap_of_surjective hsurj _
-    (isOpen_set_pi Set.finite_univ fun i _ => ReciprocityTheory.GeneralLinearIntegers.GeneralLinearIntegersOpenCompact.isOpen_integers v), ?_⟩
-  exact (isCompact_univ_pi fun _ => ReciprocityTheory.GeneralLinearIntegers.GeneralLinearIntegersOpenCompact.isCompact_integers v).image
-    (IsModuleTopology.continuous_of_linearMap Φ)
+  refine ⟨
+    IsModuleTopology.isOpenMap_of_surjective hsurj _
+      (isOpen_set_pi Set.finite_univ fun i _ =>
+        ReciprocityTheory.GeneralLinearIntegers.GeneralLinearIntegersOpenCompact.isOpen_integers v),
+    ?_
+  ⟩
+  exact (isCompact_univ_pi fun _ =>
+    ReciprocityTheory.GeneralLinearIntegers.GeneralLinearIntegersOpenCompact.isCompact_integers
+      v).image (IsModuleTopology.continuous_of_linearMap Φ)
 
 end MassDataIdxK

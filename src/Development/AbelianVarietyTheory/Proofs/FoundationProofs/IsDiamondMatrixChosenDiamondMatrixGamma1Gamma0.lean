@@ -41,8 +41,9 @@ private lemma exists_isDiam_of_coprime (N l d : ℕ) (hNl : Nat.Coprime N l) (hd
     simp
     exact (ZMod.natCast_eq_natCast_iff _ _ _).2 hkN
 
-theorem isDiam_sgD_of_prime : ∀ (N l d : ℕ), l.Prime → 0 < N → Nat.Coprime N l → Nat.Coprime d N →
-    IsDiam N l d (sgD N l d) := by
+theorem isDiam_sgD_of_prime
+    : ∀ (N l d : ℕ),
+      l.Prime → 0 < N → Nat.Coprime N l → Nat.Coprime d N → IsDiam N l d (sgD N l d) := by
   intro N l d _ _ hNl hd
   exact Classical.epsilon_spec (exists_isDiam_of_coprime N l d hNl hd)
 

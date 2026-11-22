@@ -7,10 +7,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open QuadraticAlgebra UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc
 
-private theorem vcount_one_add {O K : Type} [CommRing O] [Field K] [Algebra O K] {τ : K} (x : Etau K τ) :
-    vcount O τ (1 + x) = vcount O τ x := by
-  have key : ∀ X, (∃ S, IsLat O τ S ∧ (∀ y ∈ S, (1 + x) * y ∈ S) ∧ X = cls τ S) ↔
-      (∃ S, IsLat O τ S ∧ (∀ y ∈ S, x * y ∈ S) ∧ X = cls τ S) := by
+private theorem vcount_one_add
+    {O K : Type} [CommRing O] [Field K] [Algebra O K] {τ : K} (x : Etau K τ)
+    : vcount O τ (1 + x) = vcount O τ x := by
+  have key
+      : ∀ X,
+        (∃ S, IsLat O τ S ∧ (∀ y ∈ S, (1 + x) * y ∈ S) ∧ X = cls τ S)
+          ↔ (∃ S, IsLat O τ S ∧ (∀ y ∈ S, x * y ∈ S) ∧ X = cls τ S) := by
     intro X
     apply exists_congr
     intro S

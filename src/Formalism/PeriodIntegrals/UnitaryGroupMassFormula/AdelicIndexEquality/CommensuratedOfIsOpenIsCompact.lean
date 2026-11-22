@@ -12,13 +12,15 @@ namespace PI.UnitaryGroupMassFormula.AdIndexEq
 
 open Formalism.MainNotions.S
 
-theorem commensurated_of_isOpen_isCompact {G : Type} [Group G] [TopologicalSpace G]
-    [IsTopologicalGroup G] (K : Subgroup G) (ho : IsOpen (K : Set G)) (hc : IsCompact (K : Set G)) :
-    Commensurated K := by
+theorem commensurated_of_isOpen_isCompact
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (K : Subgroup G) (ho : IsOpen (K : Set G)) (hc : IsCompact (K : Set G))
+    : Commensurated K := by
   intro x
   have hmo : IsOpen ((K.map (MulAut.conj x).toMonoidHom : Subgroup G) : Set G) := by
-    have hset : ((K.map (MulAut.conj x).toMonoidHom : Subgroup G) : Set G) =
-        (fun y => x⁻¹ * y * x) ⁻¹' (K : Set G) := by
+    have hset
+        : ((K.map (MulAut.conj x).toMonoidHom : Subgroup G) : Set G)
+          = (fun y => x⁻¹ * y * x) ⁻¹' (K : Set G) := by
       ext y
       simp only [Subgroup.coe_map, Set.mem_image, Set.mem_preimage, SetLike.mem_coe,
         MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
@@ -40,7 +42,8 @@ theorem commensurated_of_isOpen_isCompact {G : Type} [Group G] [TopologicalSpace
 theorem ksub_isOpen (I : AutInst) : IsOpen ((PI.AdIndexEq.Ksub I : Subgroup I.Gf) : Set I.Gf) :=
   PI.WAU.kset_open I
 
-theorem ksub_isCompact (I : AutInst) : IsCompact ((PI.AdIndexEq.Ksub I : Subgroup I.Gf) : Set I.Gf) :=
+theorem ksub_isCompact (I : AutInst)
+    : IsCompact ((PI.AdIndexEq.Ksub I : Subgroup I.Gf) : Set I.Gf) :=
   PI.WAU.maximal_compact_isCompact I
 
 theorem compact_commensurated : KComm := fun I =>

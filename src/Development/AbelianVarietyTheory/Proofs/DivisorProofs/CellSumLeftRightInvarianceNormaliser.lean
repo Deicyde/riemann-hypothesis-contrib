@@ -24,11 +24,20 @@ theorem cellInv_holds : CellInv := by
   rw [e]
   refine if_congr ⟨?_, ?_⟩ rfl rfl
   · rintro ⟨u, hu, k', hk', e'⟩
-    refine ⟨k₂ * u * k₂⁻¹, hN u hu, k₂ * k' * (k : G)⁻¹, K.mul_mem (K.mul_mem hk₂ hk') (K.inv_mem k.2), ?_⟩
+    refine ⟨
+      k₂ * u * k₂⁻¹,
+      hN u hu,
+      k₂ * k' * (k : G)⁻¹,
+      K.mul_mem (K.mul_mem hk₂ hk') (K.inv_mem k.2),
+      ?_
+    ⟩
     have : x.out = k₁⁻¹ * (k₁ * x.out * k) * (k : G)⁻¹ := by group
-    rw [this, e']; group
+    rw [this, e']
+    group
   · rintro ⟨u, hu, k', hk', e'⟩
-    refine ⟨k₂⁻¹ * u * k₂, hN' u hu, k₂⁻¹ * k' * k, K.mul_mem (K.mul_mem (K.inv_mem hk₂) hk') k.2, ?_⟩
-    rw [e']; group
+    refine
+      ⟨k₂⁻¹ * u * k₂, hN' u hu, k₂⁻¹ * k' * k, K.mul_mem (K.mul_mem (K.inv_mem hk₂) hk') k.2, ?_⟩
+    rw [e']
+    group
 
 end GlobalTheory.SatakeWeyl

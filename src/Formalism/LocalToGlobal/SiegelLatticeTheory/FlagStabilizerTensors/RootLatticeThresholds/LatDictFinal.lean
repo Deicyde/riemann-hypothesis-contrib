@@ -12,10 +12,12 @@ namespace Formalism.L2.SG.Pf
 
 open Formalism.BasicNotions
 
-theorem latRowLat {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u : D.what₂.Word) : LatRowLat X u :=
+theorem latRowLat {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u : D.what₂.Word)
+    : LatRowLat X u :=
   latRowLat_of LatDictZ.lattice_genus X u
 
-theorem latSurj {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u : D.what₂.Word) : LatSurj X u :=
+theorem latSurj {D : D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u : D.what₂.Word)
+    : LatSurj X u :=
   latSurj_of LatDictZ.anisotropic_vector_orbit X u
 
 theorem lattice_steps_hold : LatticeRowBijectionClassFinite := fun _ X hK u =>

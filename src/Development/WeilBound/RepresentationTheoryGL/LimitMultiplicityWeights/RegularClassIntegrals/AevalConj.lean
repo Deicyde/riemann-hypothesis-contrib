@@ -63,7 +63,11 @@ end PLagr
 open PLagr in
 theorem lagr : Lagr := by
   intro n l hl
-  refine ⟨fun i Y => fun a b => (aeval (Matrix.of Y) (Lagrange.basis Finset.univ l i)) a b, fun i => ?_, ?_⟩
+  refine ⟨
+    fun i Y => fun a b => (aeval (Matrix.of Y) (Lagrange.basis Finset.univ l i)) a b,
+    fun i => ?_,
+    ?_
+  ⟩
   · exact contDiff_pi.2 fun a => contDiff_pi.2 fun b => cd_aeval _ a b
   · intro i g g' h1 h2
     change aeval (g' * diagonal l * g) (Lagrange.basis Finset.univ l i) = _

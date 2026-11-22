@@ -12,10 +12,10 @@ open MvPolynomial Formalism.GradedWeylDivisibility Formalism.BasicNotions Global
 
 namespace GlobalTheory.Alc
 
-theorem rowDeg_dominated_of_mem_dualWeyl (k : Type) [Field k] (N : ℕ) (ν : Fin N → ℕ) :
-    ∀ f ∈ dualWeyl k N N ν, ∀ m ∈ f.support,
-      (∀ j : ℕ, (∑ a : Fin N with a.val < j, rowDeg m a) ≤ ∑ a : Fin N with a.val < j, ν a) ∧
-      ∑ a, rowDeg m a = ∑ a, ν a := by
+theorem rowDeg_dominated_of_mem_dualWeyl (k : Type) [Field k] (N : ℕ) (ν : Fin N → ℕ)
+    : ∀ f ∈ dualWeyl k N N ν, ∀ m ∈ f.support,
+      (∀ j : ℕ, (∑ a : Fin N with a.val < j, rowDeg m a) ≤ ∑ a : Fin N with a.val < j, ν a)
+        ∧ ∑ a, rowDeg m a = ∑ a, ν a := by
   classical
   intro f hf
   rw [standardMonomialSpanDomain k N N ν] at hf

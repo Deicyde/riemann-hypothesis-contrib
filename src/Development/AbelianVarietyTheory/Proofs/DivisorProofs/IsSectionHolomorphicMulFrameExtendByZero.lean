@@ -10,14 +10,24 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HoloEtaleIff
 
 @[expose] public section
 
-open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
+open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates
+  ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
 open scoped ENNReal ContDiff
 
-theorem GlobalTheory.OTY.TwEst.isSecOn_frame_mul_ext0_and_measurable : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] (ι La : Type) [AddCommGroup La] (A : WeightedAtlas n Y ι La), ∀ (la : La) (U : Set Y) (z : Y → V n) (β : ι → Y → ℂ) (F0 : U → ℂ), Etale A U z → A.IsFrameOn la U β → Holo n (fun y : U => z y) F0 → A.IsSecOn la U (fun i y => β i y * GlobalTheory.OTY.TwEst.ext0 U F0 y) ∧ Measurable (GlobalTheory.OTY.TwEst.ext0 U F0) := by
+theorem GlobalTheory.OTY.TwEst.isSecOn_frame_mul_ext0_and_measurable
+    : ∀ (n : ℕ) (Y : Type) [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y]
+        [MeasurableSpace Y] [BorelSpace Y] (ι La : Type) [AddCommGroup La]
+        (A : WeightedAtlas n Y ι La),
+      ∀ (la : La) (U : Set Y) (z : Y → V n) (β : ι → Y → ℂ) (F0 : U → ℂ),
+        Etale A U z → A.IsFrameOn la U β → Holo n (fun y : U => z y) F0
+          → A.IsSecOn la U (fun i y => β i y * GlobalTheory.OTY.TwEst.ext0 U F0 y)
+            ∧ Measurable (GlobalTheory.OTY.TwEst.ext0 U F0) := by
   intro n Y _ _ _ _ _ ι La _ A la U z β F0 hE hβ hF
   have hfun : (fun y : U => GlobalTheory.OTY.TwEst.ext0 U F0 y) = F0 :=
     funext fun y => GlobalTheory.OTY.TwEst.extendByZeroOnSubset_apply_coe U F0 y
-  have hd := (GlobalTheory.T.holo_iff_differentiableOn_charts_of_etale n Y ι La A U z hE (GlobalTheory.OTY.TwEst.ext0 U F0)).1 (by rw [hfun]; exact hF)
+  have hd :=
+    (GlobalTheory.T.holo_iff_differentiableOn_charts_of_etale n Y ι La A U z hE
+      (GlobalTheory.OTY.TwEst.ext0 U F0)).1 (by rw [hfun]; exact hF)
   refine ⟨⟨fun i => (hβ.1.1 i).mul (hd i), fun i j y hy hi hj => ?_⟩, ?_⟩
   · show β i y * _ = _ * (β j y * _)
     rw [hβ.1.2 i j y hy hi hj, mul_assoc]
@@ -36,8 +46,8 @@ theorem GlobalTheory.OTY.TwEst.isSecOn_frame_mul_ext0_and_measurable : ∀ (n : 
       filter_upwards [e.open_source.mem_nhds hs] with x hx
       simp [e.left_inv hx]
     classical
-    have hm := hc.measurable_piecewise (continuousOn_const (c := (0 : ℂ)) (s := Uᶜ))
-      hE.isOpen.measurableSet
+    have hm :=
+      hc.measurable_piecewise (continuousOn_const (c := (0 : ℂ)) (s := Uᶜ)) hE.isOpen.measurableSet
     convert hm using 1
     funext y
     by_cases hy : y ∈ U

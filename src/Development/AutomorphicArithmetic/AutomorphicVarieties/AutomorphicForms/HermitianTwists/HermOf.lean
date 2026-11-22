@@ -9,8 +9,7 @@ open UpperTheory.V UpperTheory.V.Af
 
 open scoped BigOperators
 
-theorem UpperTheory.V.Af.Rn.hermOf :
-    UpperTheory.V.Af.Rn.HermOf := by
+theorem UpperTheory.V.Af.Rn.hermOf : UpperTheory.V.Af.Rn.HermOf := by
   intro c π hπ
   refine Br.hermEx ℚ 2 one_le_two π fun φ hφ => ?_
   classical
@@ -25,5 +24,5 @@ theorem UpperTheory.V.Af.Rn.hermOf :
     rw [Subsingleton.elim v Rat.infinitePlace]
     simp
   rw [hX, Fin.sum_univ_two, h1, h1, LinearMap.add_apply]
-  rw [(Br.capTwo ℚ π Rat.infinitePlace _ _ (hπ Rat.infinitePlace) φ hφ).1,
-    add_neg_cancel, zero_smul]
+  rw [(Br.capTwo ℚ π Rat.infinitePlace _ _ (hπ Rat.infinitePlace) φ hφ).1, add_neg_cancel,
+    zero_smul]

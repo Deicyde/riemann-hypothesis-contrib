@@ -6,19 +6,22 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.IsHomOp
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out GlobalTheory.ZH
 
 namespace GlobalTheory.ZH.RatModel
 
 open GlobalTheory.Points
 
-variable {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] {M : RatModel o Ω} {H : LB M.Z} {d : H.ι → Ω}
-  {J : Type} {σ : J → H.Sec} {t : J → Ω}
+variable
+  {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω]
+  {M : RatModel o Ω} {H : LB M.Z} {d : H.ι → Ω} {J : Type} {σ : J → H.Sec} {t : J → Ω}
 
-theorem mem_nonzeroLocus_iff_div (hH : H.IsLB) (hd : M.GenTriv H d) (hv : ∀ j, M.HasVal d (σ j) (t j))
-    (hg : ∀ l, ∀ z ∈ H.U l, ∃ i, t i ≠ 0 ∧ d l / t i ∈ M.O z) (i : J) (z : M.Z) :
-    z ∈ Out.nonzeroLocus (σ i) ↔ M.Div t i z := by
+theorem mem_nonzeroLocus_iff_div
+    (hH : H.IsLB) (hd : M.GenTriv H d) (hv : ∀ j, M.HasVal d (σ j) (t j))
+    (hg : ∀ l, ∀ z ∈ H.U l, ∃ i, t i ≠ 0 ∧ d l / t i ∈ M.O z) (i : J) (z : M.Z)
+    : z ∈ Out.nonzeroLocus (σ i) ↔ M.Div t i z := by
   constructor
   · intro hz
     obtain ⟨l, hl⟩ := TopologicalSpace.Opens.mem_iSup.1 hz
@@ -48,21 +51,35 @@ theorem mem_nonzeroLocus_iff_div (hH : H.IsLB) (hd : M.GenTriv H d) (hv : ∀ j,
     have e' : d l / t i' * (t i' / t i) = (t i / d l)⁻¹ := by field_simp
     rwa [e'] at h3
 
-theorem immBy_of_div : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] (M : RatModel o Ω) (H : LB M.Z) (d : H.ι → Ω) (J : Type) (σ : J → H.Sec) (t : J → Ω) (k : Type) [CommRing k] (p : M.Z ⟶ Sp k) (ψ : k →+* Ω), H.IsLB → M.GenTriv H d → (∀ j, M.HasVal d (σ j) (t j)) → (∀ l, ∀ z ∈ H.U l, ∃ i, t i ≠ 0 ∧ d l / t i ∈ M.O z) → M.pt ≫ p = spMap ψ → (∀ i, t i ≠ 0 → ∃ U : M.Z.Opens, IsAffineOpen U ∧ (U : Set M.Z) = {z | M.Div t i z} ∧ ∀ x ∈ M.ringOn U, x ∈ Subring.closure (Set.range ψ ∪ Set.range fun j => t j / t i)) → ImmBy p H σ Set.univ := by
+theorem immBy_of_div
+    : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] (M : RatModel o Ω) (H : LB M.Z)
+        (d : H.ι → Ω) (J : Type) (σ : J → H.Sec) (t : J → Ω) (k : Type) [CommRing k]
+        (p : M.Z ⟶ Sp k) (ψ : k →+* Ω),
+      H.IsLB → M.GenTriv H d → (∀ j, M.HasVal d (σ j) (t j))
+        → (∀ l, ∀ z ∈ H.U l, ∃ i, t i ≠ 0 ∧ d l / t i ∈ M.O z) → M.pt ≫ p = spMap ψ
+        → (∀ i,
+          t i ≠ 0
+            → ∃ U : M.Z.Opens,
+              IsAffineOpen U ∧ (U : Set M.Z) = {z | M.Div t i z}
+                ∧ ∀ x ∈ M.ringOn U,
+                  x ∈ Subring.closure (Set.range ψ ∪ Set.range fun j => t j / t i))
+        → ImmBy p H σ Set.univ := by
   intro o Ω _ _ _ M H d J σ t k _ p ψ hH hd hv hg hp hU
   have key := mem_nonzeroLocus_iff_div hH hd hv hg
   refine ⟨top_unique fun z _ => ?_, fun i _ => ?_⟩
   · have hc : z ∈ ⨆ l, H.U l := by rw [hH.cover]; trivial
     obtain ⟨l, hzl⟩ := TopologicalSpace.Opens.mem_iSup.1 hc
     obtain ⟨i, hi, h1⟩ := hg l z hzl
-    refine TopologicalSpace.Opens.mem_iSup.2 ⟨i, TopologicalSpace.Opens.mem_iSup.2 ⟨trivial, (key i z).2 ⟨hi, fun j => ?_⟩⟩⟩
+    refine TopologicalSpace.Opens.mem_iSup.2
+      ⟨i, TopologicalSpace.Opens.mem_iSup.2 ⟨trivial, (key i z).2 ⟨hi, fun j => ?_⟩⟩⟩
     have h2 := valF_mem_O hzl ((σ j).f l)
     rw [hv j l ⟨z, hzl⟩] at h2
     have h3 := mul_mem h2 h1
     have hdl := hd.ne l
     have e' : t j / d l * (d l / t i) = t j / t i := by field_simp
     rwa [e'] at h3
-  · have hempty : ∀ V : M.Z.Opens, ¬ (V : Set M.Z).Nonempty → Subsingleton Γ(M.Z, V) := fun V hV => by
+  · have hempty
+        : ∀ V : M.Z.Opens, ¬(V : Set M.Z).Nonempty → Subsingleton Γ(M.Z, V) := fun V hV => by
       have : V = ⊥ := SetLike.coe_injective (Set.not_nonempty_iff_eq_empty.1 hV)
       subst this
       infer_instance
@@ -71,8 +88,12 @@ theorem immBy_of_div : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] 
     by_cases hi : t i = 0
     · have hW : W = ⊥ := eq_bot_iff.2 fun z hz => (((key' z).1 hz).1 hi).elim
       subst hW
-      refine ⟨isAffineOpen_bot _, fun _ => 0, fun j l => ?_,
-        top_unique fun f _ => Subsingleton.elim 0 f ▸ zero_mem _⟩
+      refine ⟨
+        isAffineOpen_bot _,
+        fun _ => 0,
+        fun j l => ?_,
+        top_unique fun f _ => Subsingleton.elim 0 f ▸ zero_mem _
+      ⟩
       have := hempty (⊥ ⊓ H.U l) (fun ⟨z, hz⟩ => hz.1)
       exact Subsingleton.elim _ _
     · obtain ⟨U, hUa, hUe, hR⟩ := hU i hi
@@ -87,16 +108,17 @@ theorem immBy_of_div : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] 
         · have hl' : (H.U l : Set M.Z).Nonempty :=
             Set.Nonempty.mono (show (W ⊓ H.U l : M.Z.Opens) ≤ H.U l from inf_le_right) hl
           apply M.res_injective _ hl
-          rw [map_mul, res_apply, res_apply, res_apply, M.valF_resG _ hl, M.valF_resG _ hl, M.valF_resG _ hl,
-            hv j l hl', hv i l hl', hr]
+          rw [map_mul, res_apply, res_apply, res_apply, M.valF_resG _ hl, M.valF_resG _ hl,
+            M.valF_resG _ hl, hv j l hl', hv i l hl', hr]
           have hdl := hd.ne l
           field_simp
         · have := hempty _ hl
           exact Subsingleton.elim _ _
       · refine top_unique fun f _ => ?_
         have h1 := hR _ ((mem_ringOn_iff_exists hne).2 ⟨f, rfl⟩)
-        have e : (Set.range ψ ∪ Set.range fun j => t j / t i) =
-            M.res W hne '' (Set.range (constFn p W) ∪ Set.range r) := by
+        have e
+            : (Set.range ψ ∪ Set.range fun j => t j / t i)
+              = M.res W hne '' (Set.range (constFn p W) ∪ Set.range r) := by
           rw [Set.image_union, ← Set.range_comp, ← Set.range_comp]
           congr 2
           · funext a

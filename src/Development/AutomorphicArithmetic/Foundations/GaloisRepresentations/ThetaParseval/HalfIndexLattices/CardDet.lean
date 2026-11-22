@@ -7,13 +7,14 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open scoped TensorProduct Matrix Topology Kronecker ComplexOrder Classical
 open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Matrix
 open GlobalTheory.WeilM GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
-open Formalism.IndefR.DatumF MeasureTheory GlobalTheory.FinWeil GlobalTheory.FinLatF GlobalTheory.RealWeilF GlobalTheory.WeilPartsF
+open Formalism.IndefR.DatumF MeasureTheory GlobalTheory.FinWeil GlobalTheory.FinLatF
+  GlobalTheory.RealWeilF GlobalTheory.WeilPartsF
 open PositivityTheory.ThKW PositivityTheory.ThKW.AutEtaA
 open UpperTheory.TP.W
 
-private theorem card_quot_span_mul {R : Type} [CommRing R] [IsDomain R] {a b : R} (ha : a ≠ 0) :
-    Nat.card (R ⧸ Ideal.span {a * b}) =
-      Nat.card (R ⧸ Ideal.span {a}) * Nat.card (R ⧸ Ideal.span {b}) := by
+private theorem card_quot_span_mul {R : Type} [CommRing R] [IsDomain R] {a b : R} (ha : a ≠ 0)
+    : Nat.card (R ⧸ Ideal.span {a * b})
+      = Nat.card (R ⧸ Ideal.span {a}) * Nat.card (R ⧸ Ideal.span {b}) := by
   let f : R →+ R := AddMonoidHom.mulLeft a
   have hle : (Ideal.span {a * b}).toAddSubgroup ≤ (Ideal.span {a}).toAddSubgroup := by
     intro x hx
@@ -33,18 +34,19 @@ private theorem card_quot_span_mul {R : Type} [CommRing R] [IsDomain R] {a b : R
       exact ⟨y, rfl⟩
     · rintro ⟨y, rfl⟩
       exact ⟨y, trivial, rfl⟩
-  have hrel : (Ideal.span {a * b}).toAddSubgroup.relIndex (Ideal.span {a}).toAddSubgroup =
-      (Ideal.span {b}).toAddSubgroup.index := by
+  have hrel
+      : (Ideal.span {a * b}).toAddSubgroup.relIndex (Ideal.span {a}).toAddSubgroup
+        = (Ideal.span {b}).toAddSubgroup.index := by
     rw [← hmap, ← AddSubgroup.relIndex_comap, hcomap, AddSubgroup.relIndex_top_right]
   have hmul := AddSubgroup.relIndex_mul_index hle
   rw [hrel] at hmul
-  change (Ideal.span {a * b}).toAddSubgroup.index =
-    (Ideal.span {a}).toAddSubgroup.index * (Ideal.span {b}).toAddSubgroup.index
+  change (Ideal.span {a * b}).toAddSubgroup.index
+    = (Ideal.span {a}).toAddSubgroup.index * (Ideal.span {b}).toAddSubgroup.index
   rw [← hmul, Nat.mul_comm]
 
-private theorem card_quot_span_prod {R ι : Type} [CommRing R] [IsDomain R] (s : Finset ι) (c : ι → R)
-    (hc : ∀ i ∈ s, c i ≠ 0) :
-    Nat.card (R ⧸ Ideal.span {∏ i ∈ s, c i}) = ∏ i ∈ s, Nat.card (R ⧸ Ideal.span {c i}) := by
+private theorem card_quot_span_prod
+    {R ι : Type} [CommRing R] [IsDomain R] (s : Finset ι) (c : ι → R) (hc : ∀ i ∈ s, c i ≠ 0)
+    : Nat.card (R ⧸ Ideal.span {∏ i ∈ s, c i}) = ∏ i ∈ s, Nat.card (R ⧸ Ideal.span {c i}) := by
   induction s using Finset.induction_on with
   | empty =>
     have h : Ideal.span {(1 : R)} = ⊤ := Ideal.span_singleton_one
@@ -56,8 +58,7 @@ private theorem card_quot_span_prod {R ι : Type} [CommRing R] [IsDomain R] (s :
       card_quot_span_mul (hc i (Finset.mem_insert_self i s)),
       ih fun j hj => hc j (Finset.mem_insert_of_mem hj)]
 
-theorem UpperTheory.TP.W.cardDet :
-    CardDet := by
+theorem UpperTheory.TP.W.cardDet : CardDet := by
   intro R M _ _ _ _ _ _ _ f hinj
   set N := LinearMap.range f with hN
   let e : M ≃ₗ[R] N := LinearEquiv.ofInjective f hinj
@@ -82,8 +83,7 @@ theorem UpperTheory.TP.W.cardDet :
     · rw [hij, Matrix.diagonal_apply_eq, Finsupp.single_eq_same]
     · rw [Matrix.diagonal_apply_ne _ hij, Finsupp.single_eq_of_ne hij]
   have hass := LinearMap.associated_det_comp_equiv N.subtype e e'
-  have h0 : N.subtype ∘ₗ (e : M →ₗ[R] N) = f := by
-    ext x; rfl
+  have h0 : N.subtype ∘ₗ (e : M →ₗ[R] N) = f := by ext x; rfl
   rw [h0] at hass
   have h1 : LinearMap.det g = ∏ i, c i := by
     rw [← LinearMap.det_toMatrix b', hm, Matrix.det_diagonal]
@@ -99,5 +99,4 @@ theorem UpperTheory.TP.W.cardDet :
   have hcq : Nat.card (M ⧸ N) = ∏ i, Nat.card (R ⧸ Ideal.span {c i}) := by
     rw [← Nat.card_pi]
     exact Nat.card_congr (Submodule.quotientEquivPiSpan N b h).toEquiv
-  rw [hcq, Ideal.span_singleton_eq_span_singleton.2 hass,
-    card_quot_span_prod _ c fun i _ => hc0 i]
+  rw [hcq, Ideal.span_singleton_eq_span_singleton.2 hass, card_quot_span_prod _ c fun i _ => hc0 i]

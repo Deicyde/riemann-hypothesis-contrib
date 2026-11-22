@@ -10,7 +10,8 @@ public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.RightDerivativeZeroOut
 noncomputable section
 
 open Matrix
-open CompanionTheory.RgExh.Dec ReciprocityTheory.ChartRestriction.DS GlobalTheory.CompanionTheory.PSubFlag
+open CompanionTheory.RgExh.Dec ReciprocityTheory.ChartRestriction.DS
+  GlobalTheory.CompanionTheory.PSubFlag
 
 namespace GlobalTheory.CompanionTheory.UGeo
 
@@ -39,7 +40,8 @@ theorem Pp_add_Pm : Pp A + Pm A = A * A := by
 theorem sum_proj : Pm A + Pz A + Pp A = 1 := by
   have := Pp_add_Pm (A := A)
   simp only [Pz]
-  rw [← this]; abel
+  rw [← this]
+  abel
 
 theorem Pp_conj (hA : IsGrad ε A) : (Pp A)ᴴ = Pp A := by
   simp [Pp, Matrix.conjTranspose_smul, Matrix.conjTranspose_add, Matrix.conjTranspose_mul, hA.2.1]
@@ -56,7 +58,7 @@ theorem Pm_Pp (hA : IsGrad ε A) : Pm A * Pp A = 0 := by
   have := congrArg conjTranspose h
   rwa [conjTranspose_mul, Pm_conj hA, Pp_conj hA, conjTranspose_zero] at this
 
-theorem A_Pm (hA : IsGrad ε A) : A * Pm A = -Pm A := by
+theorem A_Pm (hA : IsGrad ε A) : A * Pm A = - Pm A := by
   have h := hA.2.2.1
   have h4 := four hA
   simp only [Pm, Matrix.mul_smul, Matrix.mul_sub, ← Matrix.mul_assoc, h, ← smul_neg, neg_sub]
@@ -68,9 +70,8 @@ theorem A_Pp (hA : IsGrad ε A) : A * Pp A = Pp A := by
 
 theorem Pm_idem (hA : IsGrad ε A) : Pm A * Pm A = Pm A := by
   have e := Pp_sub_Pm (A := A)
-  have h1 : Pm A * (Pp A - Pm A) = - (Pm A * Pm A) := by
-    rw [Matrix.mul_sub, Pm_Pp hA, zero_sub]
-  have h2 : (Pp A - Pm A) * Pm A = -Pm A := by rw [e]; exact A_Pm hA
+  have h1 : Pm A * (Pp A - Pm A) = -(Pm A * Pm A) := by rw [Matrix.mul_sub, Pm_Pp hA, zero_sub]
+  have h2 : (Pp A - Pm A) * Pm A = - Pm A := by rw [e]; exact A_Pm hA
   rw [Matrix.sub_mul, Pp_Pm hA, zero_sub] at h2
   exact neg_injective h2
 
@@ -79,8 +80,7 @@ theorem Pp_idem (hA : IsGrad ε A) : Pp A * Pp A = Pp A := by
   have h2 : (Pp A - Pm A) * Pp A = Pp A := by rw [e]; exact A_Pp hA
   rwa [Matrix.sub_mul, Pm_Pp hA, sub_zero] at h2
 
-theorem Pz_eq : Pz A = 1 - Pm A - Pp A := by
-  rw [← sum_proj (A := A)]; abel
+theorem Pz_eq : Pz A = 1 - Pm A - Pp A := by rw [← sum_proj (A := A)]; abel
 
 theorem Pm_Pz (hA : IsGrad ε A) : Pm A * Pz A = 0 := by
   rw [Pz_eq, Matrix.mul_sub, Matrix.mul_sub, Matrix.mul_one, Pm_idem hA, Pm_Pp hA]; simp
@@ -103,36 +103,39 @@ theorem Pp_J (hA : IsGrad ε A) : Pp A * Formalism.REAL.Jm ε = Formalism.REAL.J
   simpa [conjTranspose_mul, Pm_conj hA, Pp_conj hA, Formalism.REAL.Jm_conjTranspose] using this.symm
 
 theorem Pz_J (hA : IsGrad ε A) : Pz A * Formalism.REAL.Jm ε = Formalism.REAL.Jm ε * Pz A := by
-  rw [Pz_eq, Matrix.sub_mul, Matrix.sub_mul, Matrix.mul_sub, Matrix.mul_sub, Pp_J hA, Pm_J hA, Matrix.one_mul,
-    Matrix.mul_one]
+  rw [Pz_eq, Matrix.sub_mul, Matrix.sub_mul, Matrix.mul_sub, Matrix.mul_sub, Pp_J hA, Pm_J hA,
+    Matrix.one_mul, Matrix.mul_one]
   abel
 
 theorem hs_nonneg (M : Matrix (Fin n) (Fin n) ℂ) : 0 ≤ hs M := Formalism.REAL.frobenius_nonneg M
 
-theorem hs_mul_le (M N : Matrix (Fin n) (Fin n) ℂ) : hs (M * N) ≤ hs M * hs N := Formalism.REAL.frobenius_mul_le M N
+theorem hs_mul_le (M N : Matrix (Fin n) (Fin n) ℂ) : hs (M * N) ≤ hs M * hs N :=
+  Formalism.REAL.frobenius_mul_le M N
 
 theorem hs_eq_trace (M : Matrix (Fin n) (Fin n) ℂ) : hs M = (Matrix.trace (M * Mᴴ)).re := by
-  simp only [Formalism.REAL.hs, Matrix.trace, Matrix.diag, Matrix.mul_apply, Matrix.conjTranspose_apply, Complex.re_sum]
+  simp only [Formalism.REAL.hs, Matrix.trace, Matrix.diag, Matrix.mul_apply,
+    Matrix.conjTranspose_apply, Complex.re_sum]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   have e : M i j * star (M i j) = ((‖M i j‖ ^ 2 : ℝ) : ℂ) := by
     rw [Complex.star_def, Complex.mul_conj, Complex.normSq_eq_norm_sq]
   rw [e, Complex.ofReal_re]
 
-theorem hs_split {P : Matrix (Fin n) (Fin n) ℂ} (h1 : Pᴴ = P) (h2 : P * P = P) (M : Matrix (Fin n) (Fin n) ℂ) :
-    hs M = hs (M * P) + hs (M * (1 - P)) := by
+theorem hs_split
+    {P : Matrix (Fin n) (Fin n) ℂ} (h1 : Pᴴ = P) (h2 : P * P = P) (M : Matrix (Fin n) (Fin n) ℂ)
+    : hs M = hs (M * P) + hs (M * (1 - P)) := by
   have e1 : (M * P) * (M * P)ᴴ = M * P * Mᴴ := by
     rw [conjTranspose_mul, h1, Matrix.mul_assoc, ← Matrix.mul_assoc P, h2, Matrix.mul_assoc]
   have e2 : (M * (1 - P)) * (M * (1 - P))ᴴ = M * (1 - P) * Mᴴ := by
     have h3 : (1 - P) * (1 - P) = 1 - P := by
       simp only [Matrix.sub_mul, Matrix.mul_sub, Matrix.one_mul, Matrix.mul_one, h2]; abel
-    rw [conjTranspose_mul, conjTranspose_sub, conjTranspose_one, h1, Matrix.mul_assoc, ← Matrix.mul_assoc (1 - P), h3,
-      Matrix.mul_assoc]
-  rw [hs_eq_trace, hs_eq_trace (M * P), hs_eq_trace (M * (1 - P)), e1, e2, ← Complex.add_re, ← Matrix.trace_add,
-    ← Matrix.add_mul, ← Matrix.mul_add]
+    rw [conjTranspose_mul, conjTranspose_sub, conjTranspose_one, h1, Matrix.mul_assoc,
+      ← Matrix.mul_assoc (1 - P), h3, Matrix.mul_assoc]
+  rw [hs_eq_trace, hs_eq_trace (M * P), hs_eq_trace (M * (1 - P)), e1, e2, ← Complex.add_re,
+    ← Matrix.trace_add, ← Matrix.add_mul, ← Matrix.mul_add]
   simp
 
-theorem hs_three (hA : IsGrad ε A) (M : Matrix (Fin n) (Fin n) ℂ) :
-    hs M = hs (M * Pm A) + hs (M * Pz A) + hs (M * Pp A) := by
+theorem hs_three (hA : IsGrad ε A) (M : Matrix (Fin n) (Fin n) ℂ)
+    : hs M = hs (M * Pm A) + hs (M * Pz A) + hs (M * Pp A) := by
   have h1 := hs_split (Pm_conj hA) (Pm_idem hA) M
   have h2 := hs_split (Pp_conj hA) (Pp_idem hA) (M * (1 - Pm A))
   have e1 : M * (1 - Pm A) * Pp A = M * Pp A := by
@@ -163,7 +166,8 @@ theorem hs_J_mul (M : Matrix (Fin n) (Fin n) ℂ) : hs (Formalism.REAL.Jm ε * M
   simp only [Formalism.REAL.hs, Formalism.REAL.Jm, Matrix.diagonal_mul, norm_mul, h, one_mul]
 
 theorem hs_mul_J (M : Matrix (Fin n) (Fin n) ℂ) : hs (M * Formalism.REAL.Jm ε) = hs M := by
-  rw [← hs_conjTranspose, conjTranspose_mul, Formalism.REAL.Jm_conjTranspose, hs_J_mul, hs_conjTranspose]
+  rw [← hs_conjTranspose, conjTranspose_mul, Formalism.REAL.Jm_conjTranspose, hs_J_mul,
+    hs_conjTranspose]
 
 theorem hs_one : hs (1 : Matrix (Fin n) (Fin n) ℂ) = n := by
   simp [Formalism.REAL.hs, Matrix.one_apply, apply_ite, Finset.sum_ite_eq]
@@ -175,7 +179,8 @@ theorem hs_proj_le {P : Matrix (Fin n) (Fin n) ℂ} (h1 : Pᴴ = P) (h2 : P * P 
 
 theorem hs_eq_zero {M : Matrix (Fin n) (Fin n) ℂ} (h : hs M = 0) : M = 0 := by
   ext i j
-  have h1 : ∀ a ∈ Finset.univ, 0 ≤ ∑ b, ‖M a b‖ ^ 2 := fun a _ => Finset.sum_nonneg fun _ _ => by positivity
+  have h1 : ∀ a ∈ Finset.univ, 0 ≤ ∑ b, ‖M a b‖ ^ 2 := fun a _ =>
+    Finset.sum_nonneg fun _ _ => by positivity
   have h2 := (Finset.sum_eq_zero_iff_of_nonneg h1).1 h i (Finset.mem_univ _)
   have h3 := (Finset.sum_eq_zero_iff_of_nonneg fun _ _ => by positivity).1 h2 j (Finset.mem_univ _)
   simpa using h3
@@ -205,14 +210,15 @@ theorem Pp_ne_zero (hA : IsGrad ε A) : Pp A ≠ 0 := by
     simpa [← Matrix.mul_assoc, Formalism.REAL.Jm_mul_self] using this
   exact Pm_ne_zero hA h2
 
-theorem aT_mul_of_eigen {P : Matrix (Fin n) (Fin n) ℂ} {c : ℂ} (h : A * P = c • P) (t : ℝ) :
-    eT A t * P = Complex.exp (t * c) • P := by
+theorem aT_mul_of_eigen {P : Matrix (Fin n) (Fin n) ℂ} {c : ℂ} (h : A * P = c • P) (t : ℝ)
+    : eT A t * P = Complex.exp (t * c) • P := by
   ext i j
   have h1 : ((t : ℂ) • A) *ᵥ (fun k => P k j) = ((t : ℂ) * c) • (fun k => P k j) := by
     funext a
     have := congrFun (congrFun h a) j
     simp only [Matrix.mul_apply, Matrix.smul_apply, smul_eq_mul] at this
-    simp only [Matrix.mulVec, dotProduct, Matrix.smul_apply, smul_eq_mul, Pi.smul_apply, mul_assoc, ← Finset.mul_sum, this]
+    simp only [Matrix.mulVec, dotProduct, Matrix.smul_apply, smul_eq_mul, Pi.smul_apply, mul_assoc,
+      ← Finset.mul_sum, this]
   have h2 := congrFun (exp_mulVec_of_eigen h1) i
   simpa [eT, Matrix.mulVec, dotProduct, Matrix.mul_apply] using h2
 
@@ -242,19 +248,22 @@ theorem toM_inv_eq (x : S7.UJ ε) : (S7.toM x)⁻¹ = S7.toM x⁻¹ :=
     show ((x : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ) * ((x⁻¹ : S7.UJ ε) : (Matrix (Fin n) (Fin n) ℂ)ˣ) = 1
     simp)
 
-theorem hs_Pp_inv (hA : IsGrad ε A) (x : S7.UJ ε) : hs (Pp A * S7.toM x⁻¹) = hs (S7.toM x * Pm A) := by
+theorem hs_Pp_inv (hA : IsGrad ε A) (x : S7.UJ ε)
+    : hs (Pp A * S7.toM x⁻¹) = hs (S7.toM x * Pm A) := by
   rw [S7.toM_inv, ← Matrix.mul_assoc, ← Matrix.mul_assoc]
   show hs (Pp A * Formalism.REAL.Jm ε * (S7.toM x)ᴴ * Formalism.REAL.Jm ε) = _
-  rw [hs_mul_J, Pp_J hA, Matrix.mul_assoc, hs_J_mul, ← hs_conjTranspose, conjTranspose_mul, conjTranspose_conjTranspose,
-    Pm_conj hA]
+  rw [hs_mul_J, Pp_J hA, Matrix.mul_assoc, hs_J_mul, ← hs_conjTranspose, conjTranspose_mul,
+    conjTranspose_conjTranspose, Pm_conj hA]
 
-theorem hs_Pz_inv (hA : IsGrad ε A) (x : S7.UJ ε) : hs (Pz A * S7.toM x⁻¹) = hs (S7.toM x * Pz A) := by
+theorem hs_Pz_inv (hA : IsGrad ε A) (x : S7.UJ ε)
+    : hs (Pz A * S7.toM x⁻¹) = hs (S7.toM x * Pz A) := by
   rw [S7.toM_inv, ← Matrix.mul_assoc, ← Matrix.mul_assoc]
   show hs (Pz A * Formalism.REAL.Jm ε * (S7.toM x)ᴴ * Formalism.REAL.Jm ε) = _
-  rw [hs_mul_J, Pz_J hA, Matrix.mul_assoc, hs_J_mul, ← hs_conjTranspose, conjTranspose_mul, conjTranspose_conjTranspose,
-    Pz_conj hA]
+  rw [hs_mul_J, Pz_J hA, Matrix.mul_assoc, hs_J_mul, ← hs_conjTranspose, conjTranspose_mul,
+    conjTranspose_conjTranspose, Pz_conj hA]
 
-theorem toM_mul_ne_zero (x : S7.UJ ε) {P : Matrix (Fin n) (Fin n) ℂ} (hP : P ≠ 0) : S7.toM x * P ≠ 0 := by
+theorem toM_mul_ne_zero (x : S7.UJ ε) {P : Matrix (Fin n) (Fin n) ℂ} (hP : P ≠ 0)
+    : S7.toM x * P ≠ 0 := by
   intro h
   apply hP
   have h1 := congrArg (S7.toM x⁻¹ * ·) h

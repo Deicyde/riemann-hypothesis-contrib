@@ -8,9 +8,10 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem charpoly_mulLeft_separable_of_adjoin_eq_top : ∀ (E A : Type) [Field E] [CharZero E] [CommRing A]
-    [Algebra E A] [Module.Finite E A] (y : A), Algebra.adjoin E ({y} : Set A) = ⊤ → IsReduced A →
-    (LinearMap.mulLeft E y).charpoly.Separable := by
+theorem charpoly_mulLeft_separable_of_adjoin_eq_top
+    : ∀ (E A : Type) [Field E] [CharZero E] [CommRing A] [Algebra E A] [Module.Finite E A] (y : A),
+      Algebra.adjoin E ({y} : Set A) = ⊤ → IsReduced A
+        → (LinearMap.mulLeft E y).charpoly.Separable := by
   intro E A _ _ _ _ _ y htop hred
   have hint : IsIntegral E y := Algebra.IsIntegral.isIntegral y
   let pb := PowerBasis.ofAdjoinEqTop hint htop

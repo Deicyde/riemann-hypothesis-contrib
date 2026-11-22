@@ -8,9 +8,9 @@ open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.BZMir.W
 
 namespace GlobalTheory.CompanionTheory.AdmDict
 
-theorem fixed_eq_fixedVectors {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ G V) (K : Subgroup G) :
-    GlobalTheory.PRep.fixed ρ K = GroundTheory.Automorphic.fixedVectors ρ K := by
+theorem fixed_eq_fixedVectors
+    {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V) (K : Subgroup G)
+    : GlobalTheory.PRep.fixed ρ K = GroundTheory.Automorphic.fixedVectors ρ K := by
   ext v
   constructor
   · intro hv h hh
@@ -18,7 +18,10 @@ theorem fixed_eq_fixedVectors {G V : Type} [Group G] [AddCommGroup V] [Module �
   · intro hv h
     simpa using hv h h.2
 
-theorem isAdmissible_iff : ∀ {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V), GlobalTheory.PRep.IsAdmissible ρ ↔ GroundTheory.Automorphic.IsAdmissible ρ := by
+theorem isAdmissible_iff
+    : ∀ {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V]
+        [Module ℂ V] (ρ : Representation ℂ G V),
+      GlobalTheory.PRep.IsAdmissible ρ ↔ GroundTheory.Automorphic.IsAdmissible ρ := by
   intro G V _ _ _ _ _ ρ
   have hs : GlobalTheory.PRep.IsSmooth ρ ↔ GroundTheory.Automorphic.IsSmooth ρ := Iff.rfl
   constructor

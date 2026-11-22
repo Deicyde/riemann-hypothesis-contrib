@@ -7,14 +7,14 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.LiftApply
 
 namespace GlobalTheory.AdjoinStableCommutes
 
-theorem adjoin_stable_and_commutes {E V G : Type} [Field E] [AddCommGroup V] [Module E V]
-    (A : Set GlobalTheory.KZ.Letter) (f : GlobalTheory.KZ.Letter → Module.End E V) (W : Submodule E V)
-    (g : G → Module.End E V)
-    (hW : ∀ T ∈ A, ∀ x ∈ W, f T x ∈ W)
-    (hg : ∀ T ∈ A, ∀ (s : G), ∀ x ∈ W, f T (g s x) = g s (f T x)) :
-    ∀ Q ∈ Algebra.adjoin E (FreeAlgebra.ι E '' A), ∀ x ∈ W,
-      (FreeAlgebra.lift E f Q) x ∈ W ∧
-        ∀ s : G, g s ((FreeAlgebra.lift E f Q) x) = (FreeAlgebra.lift E f Q) (g s x) := by
+theorem adjoin_stable_and_commutes
+    {E V G : Type} [Field E] [AddCommGroup V] [Module E V]
+    (A : Set GlobalTheory.KZ.Letter) (f : GlobalTheory.KZ.Letter → Module.End E V)
+    (W : Submodule E V) (g : G → Module.End E V)
+    (hW : ∀ T ∈ A, ∀ x ∈ W, f T x ∈ W) (hg : ∀ T ∈ A, ∀ (s : G), ∀ x ∈ W, f T (g s x) = g s (f T x))
+    : ∀ Q ∈ Algebra.adjoin E (FreeAlgebra.ι E '' A), ∀ x ∈ W,
+      (FreeAlgebra.lift E f Q) x ∈ W
+        ∧ ∀ s : G, g s ((FreeAlgebra.lift E f Q) x) = (FreeAlgebra.lift E f Q) (g s x) := by
   intro Q hQ
   induction hQ using Algebra.adjoin_induction with
   | mem y hy =>

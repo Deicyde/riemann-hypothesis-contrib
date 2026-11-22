@@ -5,7 +5,10 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.TupMemL
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries
+  GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc
+  GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
 open scoped Formalism.Per NNReal
 
 noncomputable section
@@ -14,24 +17,36 @@ namespace GlobalTheory.TraceConjugationCover
 
 open scoped BigOperators
 
-def trBound {l : ℕ} [Fact l.Prime] {a m : ℕ} (t : Fin m → Finset (Matrix (Fin a) (Fin a) (Om l))) : ℝ :=
+def trBound {l : ℕ} [Fact l.Prime] {a m : ℕ} (t : Fin m → Finset (Matrix (Fin a) (Fin a) (Om l)))
+    : ℝ :=
   ∑ k, ∑ x ∈ t k, ‖x.trace‖
 
-theorem trBound_nonneg {l : ℕ} [Fact l.Prime] {a m : ℕ} (t : Fin m → Finset (Matrix (Fin a) (Fin a) (Om l))) :
-    0 ≤ trBound t :=
+theorem trBound_nonneg
+    {l : ℕ} [Fact l.Prime] {a m : ℕ} (t : Fin m → Finset (Matrix (Fin a) (Fin a) (Om l)))
+    : 0 ≤ trBound t :=
   Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _
 
-theorem le_trBound {l : ℕ} [Fact l.Prime] {a m : ℕ} (t : Fin m → Finset (Matrix (Fin a) (Fin a) (Om l)))
-    (k : Fin m) {x : Matrix (Fin a) (Fin a) (Om l)} (hx : x ∈ t k) : ‖x.trace‖ ≤ trBound t := by
+theorem le_trBound
+    {l : ℕ} [Fact l.Prime]
+    {a m : ℕ} (t : Fin m → Finset (Matrix (Fin a) (Fin a) (Om l))) (k : Fin m)
+    {x : Matrix (Fin a) (Fin a) (Om l)} (hx : x ∈ t k)
+    : ‖x.trace‖ ≤ trBound t := by
   unfold trBound
-  refine le_trans ?_ (Finset.single_le_sum (f := fun k => ∑ x ∈ t k, ‖x.trace‖)
-    (fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _) (Finset.mem_univ k))
+  refine le_trans ?_
+    (Finset.single_le_sum
+      (f := fun k => ∑ x ∈ t k, ‖x.trace‖)
+      (fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _)
+      (Finset.mem_univ k))
   exact Finset.single_le_sum (f := fun x => ‖x.trace‖) (fun _ _ => norm_nonneg _) hx
 
-theorem norm_trace_latL {l : ℕ} [Fact l.Prime] {a m : ℕ} (t : Fin m → Finset (Matrix (Fin a) (Fin a) (Om l)))
-    (M : ℕ) (y : Fin m → Matrix (Fin a) (Fin a) (Om l)) (hy : y ∈ latL t M) (k : Fin m) :
-    ‖(y k).trace‖ ≤ ((l : ℝ)⁻¹) ^ M * trBound t := by
-  have h0 : 0 ≤ ((l : ℝ)⁻¹) ^ M * trBound t := mul_nonneg (pow_nonneg (inv_nonneg.2 (Nat.cast_nonneg _)) _) (trBound_nonneg t)
+theorem norm_trace_latL
+    {l : ℕ} [Fact l.Prime]
+    {a m : ℕ} (t : Fin m → Finset (Matrix (Fin a) (Fin a) (Om l)))
+    (M : ℕ) (y : Fin m → Matrix (Fin a) (Fin a) (Om l)) (hy : y ∈ latL t M)
+    (k : Fin m)
+    : ‖(y k).trace‖ ≤ ((l : ℝ)⁻¹) ^ M * trBound t := by
+  have h0 : 0 ≤ ((l : ℝ)⁻¹) ^ M * trBound t :=
+    mul_nonneg (pow_nonneg (inv_nonneg.2 (Nat.cast_nonneg _)) _) (trBound_nonneg t)
   induction hy using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨j, hj⟩ := Set.mem_iUnion.1 hx
@@ -40,10 +55,12 @@ theorem norm_trace_latL {l : ℕ} [Fact l.Prime] {a m : ℕ} (t : Fin m → Fins
     by_cases hjk : k = j
     · subst hjk
       rw [Pi.single_eq_same, Matrix.trace_smul, smul_eq_mul, norm_mul, norm_pow, norm_l]
-      exact mul_le_mul_of_nonneg_left (le_trBound t k hz) (pow_nonneg (inv_nonneg.2 (Nat.cast_nonneg _)) _)
+      exact mul_le_mul_of_nonneg_left (le_trBound t k hz)
+        (pow_nonneg (inv_nonneg.2 (Nat.cast_nonneg _)) _)
     · rw [Pi.single_eq_of_ne hjk, Matrix.trace_zero, norm_zero]
       exact h0
-  | zero => simpa using h0
+  | zero =>
+    simpa using h0
   | add x y _ _ hx hy =>
     rw [Pi.add_apply, Matrix.trace_add]
     exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le hx hy)

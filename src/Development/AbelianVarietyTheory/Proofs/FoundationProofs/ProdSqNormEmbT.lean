@@ -8,21 +8,23 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Quadratic
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum GlobalTheory.RatEqui GlobalTheory.InertParity
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum GlobalTheory.RatEqui GlobalTheory.InertParity
 open scoped BigOperators Pointwise
 
 namespace GlobalTheory.TypeNormProduct
 
-theorem prod_sq_norm_embT : ∀ (D : D7) (y : 𝓞 D.host.E),
-    ∏ τ, ‖embT D τ (y : D.host.E)‖ ^ 2 = (Ideal.absNorm (Ideal.span {y}) : ℝ) := by
+theorem prod_sq_norm_embT
+    : ∀ (D : D7) (y : 𝓞 D.host.E),
+      ∏ τ, ‖embT D τ (y : D.host.E)‖ ^ 2 = (Ideal.absNorm (Ideal.span {y}) : ℝ) := by
   intro D y
   have hc : ∀ (φ : D.host.E →+* ℂ) (x : D.host.E), φ (D.host.conj x) = starRingEnd ℂ (φ x) :=
     fun φ x => D.host.conjE_apply φ x
   have hcc : ∀ x : D.host.E, D.host.conj (D.host.conj x) = x := fun x =>
     D.host.φ₀.injective (by rw [hc, hc, Complex.conj_conj])
   set x : D.host.E := (y : D.host.E) with hx
-  have ht : D.host.conj (x * D.host.conj x) = x * D.host.conj x := by
-    rw [map_mul, hcc, mul_comm]
+  have ht : D.host.conj (x * D.host.conj x) = x * D.host.conj x := by rw [map_mul, hcc, mul_comm]
   have h1 := GlobalTheory.NormSign.prod_embT D (x * D.host.conj x)
   have h2 := congrArg D.host.φ₀ (GlobalTheory.NormSign.norm_eq D.host ht)
   rw [map_pow, ← h1, map_ratCast, map_mul, Algebra.norm_eq_of_algEquiv] at h2

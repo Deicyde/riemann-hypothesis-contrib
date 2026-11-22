@@ -12,7 +12,9 @@ public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.HookBound
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Matrix MeasureTheory
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Matrix MeasureTheory
 open scoped ComplexOrder
 
 namespace Formalism.IndefR.Fock.Der
@@ -31,7 +33,6 @@ end Defs
 
 section Steps
 
-
 end Steps
 
 section Help
@@ -43,7 +44,6 @@ end Help
 section PolHelp
 
 variable {m n : ℕ}
-
 
 end PolHelp
 
@@ -57,10 +57,7 @@ section Gen
 
 variable {Sm : Set (Mx D m n → ℂ)} {aP aM : FVar D m n → (Mx D m n → ℂ) → (Mx D m n → ℂ)}
 
-
 end Gen
-
-
 
 end Assembly
 
@@ -84,13 +81,11 @@ section QuadPf
 
 variable {m n : ℕ}
 
-
 end QuadPf
 
 section DRhoPf
 
 open Formalism.IndefR.Fock.CCR
-
 
 end DRhoPf
 
@@ -105,7 +100,8 @@ section OmFar
 open Formalism.IndefR.Fock.DRho
 open scoped TensorProduct
 
-theorem finPart_mt {V : HSp D} {g : GA D V} (hg : g ∈ GinfC V) : (Formalism.L2.Theta.mt V g).map (finPart D) = 1 := by
+theorem finPart_mt {V : HSp D} {g : GA D V} (hg : g ∈ GinfC V)
+    : (Formalism.L2.Theta.mt V g).map (finPart D) = 1 := by
   have h0 : finHom V g = 1 := hg
   have h : (finHom V g).1 = 1 := by rw [h0]; rfl
   exact h

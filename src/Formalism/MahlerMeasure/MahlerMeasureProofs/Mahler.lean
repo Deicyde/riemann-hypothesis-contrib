@@ -129,7 +129,8 @@ lemma bB_succ_zero (c : ℚ) (i : ℕ) : bB c (i + 1) 0 = C (c / (i + 1 : ℕ)) 
       = (C ((((i + 1) * i.factorial : ℕ) : ℚ))⁻¹ * C c) * X * (descPochhammer ℚ i).comp (C c * X + C (((-1 : ℤ)) : ℚ)) := by ring
     _ = _ := by rw [hC]; ring
 
-theorem bB_mem (p k : ℕ) [Fact p.Prime] : ∀ i, i ≤ p ^ k → ∀ t : ℤ, bB ((p : ℚ) ^ k) i t ∈ zpT p := by
+theorem bB_mem (p k : ℕ) [Fact p.Prime]
+    : ∀ i, i ≤ p ^ k → ∀ t : ℤ, bB ((p : ℚ) ^ k) i t ∈ zpT p := by
   intro i
   induction i with
   | zero => intro _ t; rw [bB_zero]; exact Subring.one_mem _
@@ -146,7 +147,8 @@ theorem bB_mem (p k : ℕ) [Fact p.Prime] : ∀ i, i ≤ p ^ k → ∀ t : ℤ, 
     | pred n hn =>
       have e := bB_pascal ((p : ℚ) ^ k) i (-(n : ℤ) - 1)
       rw [sub_add_cancel] at e
-      rw [show bB ((p : ℚ) ^ k) (i + 1) (-(n : ℤ) - 1) = bB ((p : ℚ) ^ k) (i + 1) (-(n : ℤ)) - bB ((p : ℚ) ^ k) i (-(n : ℤ) - 1) by
+      rw [show bB ((p : ℚ) ^ k) (i + 1) (-(n : ℤ) - 1)
+          = bB ((p : ℚ) ^ k) (i + 1) (-(n : ℤ)) - bB ((p : ℚ) ^ k) i (-(n : ℤ) - 1) by
         rw [e]; ring]
       exact Subring.sub_mem _ hn (ih' _)
 

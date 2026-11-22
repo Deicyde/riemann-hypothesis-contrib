@@ -5,5 +5,6 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.Unita
 
 @[expose] public section
 
-theorem scWlocExists (hR : Formalism.L2.SG.HCReprodM.HCReprodDSm) : Formalism.L2.SG.SplitPrimeNormLemmas.WlocExists :=
+theorem scWlocExists (hR : Formalism.L2.SG.HCReprodM.HCReprodDSm)
+    : Formalism.L2.SG.SplitPrimeNormLemmas.WlocExists :=
   WlocSk.scWlocExists_of_chart WlocSk.nilpotent_chart_exists hR

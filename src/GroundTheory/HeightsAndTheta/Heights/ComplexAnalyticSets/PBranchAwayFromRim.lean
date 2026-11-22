@@ -16,10 +16,11 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open MvPolynomial Filter Topology
 
-theorem BranchAwayFromRim.proof (hex : NormalModelExists.Statement)
-    (hprop : NormalModelProper.Statement) (hlift : BranchLift.Statement)
-    (hirr : NormalLocallyIrreducible.Statement) (hext : BranchContainsNormalPoint.Statement) :
-    BranchAwayFromRim.Statement := by
+theorem BranchAwayFromRim.proof
+    (hex : NormalModelExists.Statement) (hprop : NormalModelProper.Statement)
+    (hlift : BranchLift.Statement) (hirr : NormalLocallyIrreducible.Statement)
+    (hext : BranchContainsNormalPoint.Statement)
+    : BranchAwayFromRim.Statement := by
   intro n k J u p x m γ hJ hdim hu hcov hdisj b
   obtain ⟨N, hN, hcovN⟩ := hcov
   obtain ⟨M⟩ := hex n J hJ
@@ -58,13 +59,16 @@ theorem BranchAwayFromRim.proof (hex : NormalModelExists.Statement)
     apply hgJ
     rw [← M.comap_eq]
     exact hm
-  have heval : ∀ w : Fin n ⊕ Fin M.m → ℂ,
-      eval w h = GroundTheory.Heights₂.Heights.linEval u (firstCoords w) *
-        ∏ i, eval (firstCoords w) (bd i) := by
+  have heval
+      : ∀ w : Fin n ⊕ Fin M.m → ℂ,
+        eval w h
+          = GroundTheory.Heights₂.Heights.linEval u (firstCoords w)
+            * ∏ i, eval (firstCoords w) (bd i) := by
     intro w
     simp only [h, g, eval_rename, map_mul, map_prod]
     congr 1
-    simp [GroundTheory.Heights₂.Heights.linForm, GroundTheory.Heights₂.Heights.linEval, firstCoords, Function.comp_def]
+    simp [GroundTheory.Heights₂.Heights.linForm, GroundTheory.Heights₂.Heights.linEval, firstCoords,
+      Function.comp_def]
   have hinj : ∀ w ∈ Z', ∀ w' ∈ Z', firstCoords w = firstCoords w' → eval w h ≠ 0 → w = w' := by
     intro w hw w' hw' hνw hne
     rw [heval] at hne
@@ -86,8 +90,9 @@ theorem BranchAwayFromRim.proof (hex : NormalModelExists.Statement)
   by_contra hcon
   push Not at hcon
   set r := (γ b).radius with hr
-  have hseq : ∀ j : ℕ, ∃ τ ∈ Metric.ball (0 : Fin k → ℂ) r,
-      (γ b).toFun τ ∈ Metric.ball x (1 / ((j : ℝ) + 1)) ∧ r - 1 / ((j : ℝ) + 1) < ‖τ‖ := by
+  have hseq
+      : ∀ j : ℕ, ∃ τ ∈ Metric.ball (0 : Fin k → ℂ) r,
+        (γ b).toFun τ ∈ Metric.ball x (1 / ((j : ℝ) + 1)) ∧ r - 1 / ((j : ℝ) + 1) < ‖τ‖ := by
     intro j
     have hpos : (0 : ℝ) < 1 / ((j : ℝ) + 1) := by positivity
     exact hcon _ hpos _ (by linarith)
@@ -130,12 +135,13 @@ theorem BranchAwayFromRim.proof (hex : NormalModelExists.Statement)
     refine hinj _ (hΓZ c t ht).1 q hqZ hν ?_
     rw [heval, hν, ← heval]
     exact hqh
-  have hPdisj : ∀ q ∈ P, ∀ c c', c ≠ c' → q ∈ Γ c '' Metric.ball 0 (γ c).radius →
-      q ∉ Γ c' '' Metric.ball 0 (γ c').radius := by
+  have hPdisj
+      : ∀ q ∈ P, ∀ c c',
+        c ≠ c' → q ∈ Γ c '' Metric.ball 0 (γ c).radius
+          → q ∉ Γ c' '' Metric.ball 0 (γ c').radius := by
     rintro q ⟨-, hqh⟩ c c' hcc' ⟨t, ht, rfl⟩ ⟨t', ht', hteq⟩
     have h1 : firstCoords (Γ c t) ∈ (γ c).image := ⟨t, ht, ((hΓZ c t ht).2).symm⟩
-    have h2 : firstCoords (Γ c t) ∈ (γ c').image :=
-      ⟨t', ht', by rw [← (hΓZ c' t' ht').2, hteq]⟩
+    have h2 : firstCoords (Γ c t) ∈ (γ c').image := ⟨t', ht', by rw [← (hΓZ c' t' ht').2, hteq]⟩
     have h3 := hdisj c c' hcc' ⟨h1, h2⟩
     apply hqh
     show eval (Γ c t) h = 0
@@ -143,8 +149,9 @@ theorem BranchAwayFromRim.proof (hex : NormalModelExists.Statement)
     rw [show GroundTheory.Heights₂.Heights.linEval u (firstCoords (Γ c t)) = 0 from h3, zero_mul]
 
   have hPsub : P ⊆ Γ b '' Metric.ball 0 r := by
-    have hsplit := isPreconnected_iff_subset_of_disjoint.mp hpre (O b) (⋃ c ∈ {c | c ≠ b}, O c)
-      (hOo b) (isOpen_biUnion fun c _ => hOo c) ?_ ?_
+    have hsplit :=
+      isPreconnected_iff_subset_of_disjoint.mp hpre (O b) (⋃ c ∈ {c | c ≠ b}, O c) (hOo b)
+        (isOpen_biUnion fun c _ => hOo c) ?_ ?_
     · rcases hsplit with hs | hs
       · intro q hq
         rw [hOeq b]
@@ -177,9 +184,11 @@ theorem BranchAwayFromRim.proof (hex : NormalModelExists.Statement)
       have h2 : q ∈ Γ c '' Metric.ball 0 (γ c).radius := by rw [hOeq c]; exact ⟨hqP.1.1, hqc⟩
       exact hPdisj q hqP b c (Ne.symm hc) h1 h2
 
-  obtain ⟨σ0, hσ0, hσx⟩ := hext (Fin n ⊕ Fin M.m) M.ideal h xh k r (Γ b) B M.isPrime
-    M.isIntegrallyClosed hh hxZ (hΓd b) (hΓinj b) (fun t ht => (hΓZ b t ht).1)
-    (hBo.mem_nhds hxB) hPsub
+  obtain ⟨σ0, hσ0, hσx⟩ :=
+    hext (Fin n ⊕ Fin M.m) M.ideal h xh k r (Γ b) B M.isPrime M.isIntegrallyClosed hh hxZ (hΓd b)
+      (hΓinj b)
+      (fun t ht => (hΓZ b t ht).1)
+      (hBo.mem_nhds hxB) hPsub
 
   have hσ0' : ‖σ0‖ < r := mem_ball_zero_iff.mp hσ0
   set δ := (r - ‖σ0‖) / 2 with hδ
@@ -189,7 +198,9 @@ theorem BranchAwayFromRim.proof (hex : NormalModelExists.Statement)
     rw [mem_ball_zero_iff]
     have h1 : ‖t‖ ≤ ‖σ0‖ + dist t σ0 := by
       rw [dist_eq_norm]
-      calc ‖t‖ = ‖σ0 + (t - σ0)‖ := by rw [add_sub_cancel]
+      calc
+        ‖t‖
+          = ‖σ0 + (t - σ0)‖ := by rw [add_sub_cancel]
         _ ≤ ‖σ0‖ + ‖t - σ0‖ := norm_add_le _ _
     have h2 := Metric.mem_ball.mp ht
     linarith
@@ -209,7 +220,9 @@ theorem BranchAwayFromRim.proof (hex : NormalModelExists.Statement)
     rw [← htτ]
     have h2 := Metric.mem_ball.mp ht
     rw [dist_eq_norm] at h2
-    calc ‖t‖ = ‖σ0 + (t - σ0)‖ := by rw [add_sub_cancel]
+    calc
+      ‖t‖
+        = ‖σ0 + (t - σ0)‖ := by rw [add_sub_cancel]
       _ ≤ ‖σ0‖ + ‖t - σ0‖ := norm_add_le _ _
       _ < ‖σ0‖ + δ := by linarith
   have hn2 := hτn (φ j)

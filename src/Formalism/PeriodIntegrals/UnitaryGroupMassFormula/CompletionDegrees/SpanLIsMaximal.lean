@@ -16,9 +16,11 @@ theorem span_l_isMaximal (l : ℕ) [hl : Fact l.Prime] : (Ideal.span {((l : ℕ)
       (Nat.prime_iff_prime_int.mp hl.out)
   · simp [hl.out.ne_zero]
 
-theorem liesOver_of_mem {l : ℕ} [hl : Fact l.Prime] {E : Type} [Field E] [NumberField E]
-    {v : HeightOneSpectrum (𝓞 E)} (hv : v ∈ placesOver E l) :
-    v.asIdeal.LiesOver (Ideal.span {((l : ℕ) : ℤ)}) := by
+theorem liesOver_of_mem
+    {l : ℕ} [hl : Fact l.Prime]
+    {E : Type} [Field E] [NumberField E]
+    {v : HeightOneSpectrum (𝓞 E)} (hv : v ∈ placesOver E l)
+    : v.asIdeal.LiesOver (Ideal.span {((l : ℕ) : ℤ)}) := by
   constructor
   refine (span_l_isMaximal l).eq_of_le ?_ ?_
   · intro h
@@ -36,12 +38,14 @@ theorem normCard : NormCard := by
   have := liesOver_of_mem hv
   have hmax := span_l_isMaximal l
   have hvmax : v.asIdeal.IsMaximal := v.isPrime.isMaximal v.ne_bot
-  have h1 : Nat.card (𝓞 E ⧸ v.asIdeal ^ v.asIdeal.ramificationIdx ℤ) =
-      Ideal.absNorm (v.asIdeal ^ v.asIdeal.ramificationIdx ℤ) := by
+  have h1
+      : Nat.card (𝓞 E ⧸ v.asIdeal ^ v.asIdeal.ramificationIdx ℤ)
+        = Ideal.absNorm (v.asIdeal ^ v.asIdeal.ramificationIdx ℤ) := by
     rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]
-  rw [h1, map_pow, Ideal.absNorm_eq_pow_inertiaDeg'_of_liesOver v.asIdeal
-    (Ideal.span {((l : ℕ) : ℤ)}) hmax.isPrime (by simp [(Fact.out : l.Prime).ne_zero]),
-    Ideal.absNorm_span_natCast, Module.finrank_self, pow_one,
-    Ideal.inertiaDeg'_eq_inertiaDeg, Formalism.MainNotions.N.locDeg, ← pow_mul, mul_comm]
+  rw [h1, map_pow,
+    Ideal.absNorm_eq_pow_inertiaDeg'_of_liesOver v.asIdeal (Ideal.span {((l : ℕ) : ℤ)}) hmax.isPrime
+      (by simp [(Fact.out : l.Prime).ne_zero]),
+    Ideal.absNorm_span_natCast, Module.finrank_self, pow_one, Ideal.inertiaDeg'_eq_inertiaDeg,
+    Formalism.MainNotions.N.locDeg, ← pow_mul, mul_comm]
 
 end PI.CompDegEF

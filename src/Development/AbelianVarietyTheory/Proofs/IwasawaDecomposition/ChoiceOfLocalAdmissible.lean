@@ -16,7 +16,11 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.N Formalism.MainNotions.StandardLattice Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2 Formalism.L2.Host Formalism.L2.DIV Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.NX GlobalTheory.HeightCounting GlobalTheory.TwInputs GlobalTheory.SeriesTie GlobalTheory.ExportSeries NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.MainNotions.StandardLattice Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.L2 Formalism.L2.Host Formalism.L2.DIV Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.NX GlobalTheory.HeightCounting GlobalTheory.TwInputs
+  GlobalTheory.SeriesTie GlobalTheory.ExportSeries NumberField IsDedekindDomain
 open Formalism.MainNotions.IntegralHeckeForms (TwOK HkIdx)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -27,9 +31,12 @@ noncomputable section
 
 namespace GlobalTheory.HeightCounting.FirstFacts
 
-theorem pair_of_over (D : D7) {Pq : HeightOneSpectrum (𝓞 (maximalRealSubfield D.host.E)) → PlE D.host}
-    (hPq : ∀ v, NG.OverPl (Pq v) v) (P P' : PlE D.host) (hc : IsConjPl D.host P P') (hne : P ≠ P') :
-    P ∈ Set.range Pq ↔ P' ∉ Set.range Pq := by
+theorem pair_of_over
+    (D : D7)
+    {Pq : HeightOneSpectrum (𝓞 (maximalRealSubfield D.host.E)) → PlE D.host}
+    (hPq : ∀ v, NG.OverPl (Pq v) v)
+    (P P' : PlE D.host) (hc : IsConjPl D.host P P') (hne : P ≠ P')
+    : P ∈ Set.range Pq ↔ P' ∉ Set.range Pq := by
   have e := (GlobalTheory.PlacePair.comap_eq_iff D P P').2 (Or.inr hc)
   constructor
   · rintro ⟨v, rfl⟩ ⟨v', rfl⟩
@@ -42,8 +49,10 @@ theorem pair_of_over (D : D7) {Pq : HeightOneSpectrum (𝓞 (maximalRealSubfield
     · exact ⟨v, e1.symm⟩
     · exact absurd ⟨v, GlobalTheory.GalChar.isConjPl_unique e1 hc⟩ h
 
-theorem vstd_of_over {K : GlobalTheory.Mem.Top.Ctx} (X : GlobalTheory.Mem.Stages) (hX : K.Over X.B.toPre) (i : Fin X.toD7.R.m) :
-    FWT.VStd X.toD7 i := by
+theorem vstd_of_over
+    {K : GlobalTheory.Mem.Top.Ctx}
+    (X : GlobalTheory.Mem.Stages) (hX : K.Over X.B.toPre) (i : Fin X.toD7.R.m)
+    : FWT.VStd X.toD7 i := by
   obtain ⟨-, -, -, -, -, hVf, -⟩ := GlobalTheory.Mem.HostFrames.frames_of_over K X hX
   obtain ⟨h1, h2⟩ := hVf i
   rw [GlobalTheory.StdFrameCounterexample.vstd_iff]
@@ -53,12 +62,15 @@ theorem vstd_of_over {K : GlobalTheory.Mem.Top.Ctx} (X : GlobalTheory.Mem.Stages
     refine forall_congr' fun a => ?_
     constructor
     · rintro ⟨y, hy⟩
-      rw [← hy]; exact y.2
+      rw [← hy]
+      exact y.2
     · intro h
       exact ⟨⟨x a, h⟩, rfl⟩
 
-theorem mem_range_of_mem_QE {X : Col.Fields} {sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)}
-    {Q : HeightOneSpectrum (𝓞 X.E)} : ∀ {ξ}, Q ∈ Col.QE sel ξ → Q ∈ Set.range sel := by
+theorem mem_range_of_mem_QE
+    {X : Col.Fields}
+    {sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)} {Q : HeightOneSpectrum (𝓞 X.E)}
+    : ∀ {ξ}, Q ∈ Col.QE sel ξ → Q ∈ Set.range sel := by
   classical
   intro ξ h
   unfold Col.QE at h

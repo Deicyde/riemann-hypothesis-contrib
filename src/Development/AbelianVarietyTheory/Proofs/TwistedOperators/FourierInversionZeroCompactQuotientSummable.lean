@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EqZer
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
+  Formalism.IndefR.Datum MeasureTheory NumberField Matrix
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -14,8 +16,23 @@ open scoped Pointwise
 
 namespace GlobalTheory.SeparatingCharacters
 
-theorem tsum_coefficients_eq_value_zero : ∀ (G : Type) [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G] [T2Space G] [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] (Γ : AddSubgroup G) [DiscreteTopology Γ] (K : Set G), IsCompact K → (∀ x, ∃ γ ∈ Γ, γ + x ∈ K) → ∀ (A : Type) [AddCommGroup A] (χ : A → G → ℂ), (∀ a, Continuous (χ a)) → (∀ a x y, χ a (x + y) = χ a x * χ a y) → (∀ a b x, χ (a + b) x = χ a x * χ b x) → (∀ x, χ 0 x = 1) → (∀ a x, ‖χ a x‖ = 1) → (∀ x, (∀ a, χ a x = 1) ↔ x ∈ Γ) → (∀ a, (∀ x, χ a x = 1) → a = 0) → ∀ (μ : Measure G) (𝓕 : Set G), μ.IsAddHaarMeasure → IsAddFundamentalDomain Γ 𝓕 μ → μ 𝓕 = 1 → ∀ Φ : G → ℂ, Continuous Φ → (∀ γ ∈ Γ, ∀ x, Φ (γ + x) = Φ x) → Summable (fun a => ∫ x in 𝓕, χ a x * Φ x ∂μ) → ∑' a, ∫ x in 𝓕, χ a x * Φ x ∂μ = Φ 0 := by
-  intro G _ _ _ _ _ _ _ _ Γ _ K hK hKcov A _ χ hχc hχmul hχadd hχ0 hχnorm hχker hχinj μ 𝓕 hμ h𝓕 h𝓕1 Φ hΦc hΦper hsum
+theorem tsum_coefficients_eq_value_zero
+    : ∀ (G : Type) [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G] [T2Space G]
+        [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+        (Γ : AddSubgroup G) [DiscreteTopology Γ] (K : Set G),
+      IsCompact K → (∀ x, ∃ γ ∈ Γ, γ + x ∈ K)
+        → ∀ (A : Type) [AddCommGroup A] (χ : A → G → ℂ),
+          (∀ a, Continuous (χ a)) → (∀ a x y, χ a (x + y) = χ a x * χ a y)
+            → (∀ a b x, χ (a + b) x = χ a x * χ b x) → (∀ x, χ 0 x = 1) → (∀ a x, ‖χ a x‖ = 1)
+            → (∀ x, (∀ a, χ a x = 1) ↔ x ∈ Γ) → (∀ a, (∀ x, χ a x = 1) → a = 0)
+            → ∀ (μ : Measure G) (𝓕 : Set G),
+              μ.IsAddHaarMeasure → IsAddFundamentalDomain Γ 𝓕 μ → μ 𝓕 = 1
+                → ∀ Φ : G → ℂ,
+                  Continuous Φ → (∀ γ ∈ Γ, ∀ x, Φ (γ + x) = Φ x)
+                    → Summable (fun a => ∫ x in 𝓕, χ a x * Φ x ∂μ)
+                    → ∑' a, ∫ x in 𝓕, χ a x * Φ x ∂μ = Φ 0 := by
+  intro G _ _ _ _ _ _ _ _ Γ _ K hK hKcov A _ χ hχc hχmul hχadd hχ0 hχnorm hχker hχinj μ 𝓕 hμ h𝓕 h𝓕1
+    Φ hΦc hΦper hsum
   classical
   haveI := hμ
   haveI : Countable Γ := TopologicalSpace.separableSpace_iff_countable.mp inferInstance
@@ -40,8 +57,10 @@ theorem tsum_coefficients_eq_value_zero : ∀ (G : Type) [AddCommGroup G] [Topol
     intro a γ hγ x
     rw [hχmul, (hχker γ).mpr hγ a, one_mul]
 
-  have lift : ∀ f : G → ℂ, Continuous f → (∀ γ ∈ Γ, ∀ x, f (γ + x) = f x) →
-      ∃ F : C(G ⧸ Γ, ℂ), ∀ x : G, F (QuotientAddGroup.mk x) = f x := by
+  have lift
+      : ∀ f : G → ℂ,
+        Continuous f → (∀ γ ∈ Γ, ∀ x, f (γ + x) = f x)
+          → ∃ F : C(G ⧸ Γ, ℂ), ∀ x : G, F (QuotientAddGroup.mk x) = f x := by
     intro f hf hper
     have hwd : ∀ x y : G, (QuotientAddGroup.mk x : G ⧸ Γ) = QuotientAddGroup.mk y → f x = f y := by
       intro x y hxy
@@ -49,7 +68,8 @@ theorem tsum_coefficients_eq_value_zero : ∀ (G : Type) [AddCommGroup G] [Topol
       have e : -x + y + x = y := by abel
       rw [e] at h1
       exact h1.symm
-    refine ⟨⟨fun q => Quotient.liftOn' q f (fun x y h => hwd x y (Quotient.sound' h)), ?_⟩, fun x => rfl⟩
+    refine
+      ⟨⟨fun q => Quotient.liftOn' q f (fun x y h => hwd x y (Quotient.sound' h)), ?_⟩, fun x => rfl⟩
     exact (QuotientAddGroup.isQuotientMap_mk Γ).continuous_iff.mpr hf
 
   haveI : CompactSpace (G ⧸ Γ) := by
@@ -63,8 +83,8 @@ theorem tsum_coefficients_eq_value_zero : ∀ (G : Type) [AddCommGroup G] [Topol
       exact neg_mem hγ
     rw [← himg]
     exact hK.image QuotientAddGroup.continuous_mk
-  have hc : ∀ a, ∃ F : C(G ⧸ Γ, ℂ), ∀ x : G, F (QuotientAddGroup.mk x) = χ a x :=
-    fun a => lift _ (hχc a) (hχper a)
+  have hc : ∀ a, ∃ F : C(G ⧸ Γ, ℂ), ∀ x : G, F (QuotientAddGroup.mk x) = χ a x := fun a =>
+    lift _ (hχc a) (hχper a)
   choose e he using hc
   obtain ⟨P, hP⟩ := lift Φ hΦc hΦper
 
@@ -72,28 +92,37 @@ theorem tsum_coefficients_eq_value_zero : ∀ (G : Type) [AddCommGroup G] [Topol
   have hint : ∀ w : C(G ⧸ Γ, ℂ), IntegrableOn (fun x => w (QuotientAddGroup.mk x)) 𝓕 μ := by
     intro w
     exact Measure.integrableOn_of_bounded h𝓕lt.ne
-      (w.continuous.comp QuotientAddGroup.continuous_mk).aestronglyMeasurable
-      (M := ‖w‖) (Filter.Eventually.of_forall fun x => w.norm_coe_le_norm _)
-  obtain ⟨I, hI⟩ : ∃ I : C(G ⧸ Γ, ℂ) →L[ℂ] ℂ,
-      ∀ w, I w = ∫ x in 𝓕, w (QuotientAddGroup.mk x) ∂μ := by
-    refine ⟨LinearMap.mkContinuous
-      { toFun := fun w => ∫ x in 𝓕, w (QuotientAddGroup.mk x) ∂μ
-        map_add' := fun v w => by
-          simp only [ContinuousMap.add_apply]
-          exact integral_add (hint v) (hint w)
-        map_smul' := fun c w => by
-          simp only [ContinuousMap.smul_apply, RingHom.id_apply]
-          exact integral_smul c _ } 1 (fun w => ?_), fun w => rfl⟩
-    calc ‖∫ x in 𝓕, w (QuotientAddGroup.mk x) ∂μ‖ ≤ ‖w‖ * μ.real 𝓕 :=
-          norm_setIntegral_le_of_norm_le_const h𝓕lt (fun x _ => w.norm_coe_le_norm _)
+      (w.continuous.comp QuotientAddGroup.continuous_mk).aestronglyMeasurable (M := ‖w‖)
+      (Filter.Eventually.of_forall fun x => w.norm_coe_le_norm _)
+  obtain ⟨I, hI⟩
+      : ∃ I : C(G ⧸ Γ, ℂ) →L[ℂ] ℂ, ∀ w, I w = ∫ x in 𝓕, w (QuotientAddGroup.mk x) ∂μ := by
+    refine ⟨
+      LinearMap.mkContinuous
+        {
+          toFun := fun w => ∫ x in 𝓕, w (QuotientAddGroup.mk x) ∂μ
+          map_add' := fun v w => by
+            simp only [ContinuousMap.add_apply]
+            exact integral_add (hint v) (hint w)
+          map_smul' := fun c w => by
+            simp only [ContinuousMap.smul_apply, RingHom.id_apply]
+            exact integral_smul c _
+        }
+        1 (fun w => ?_),
+      fun w => rfl
+    ⟩
+    calc
+      ‖∫ x in 𝓕, w (QuotientAddGroup.mk x) ∂μ‖ ≤ ‖w‖ * μ.real 𝓕 :=
+        norm_setIntegral_le_of_norm_le_const h𝓕lt (fun x _ => w.norm_coe_le_norm _)
       _ = 1 * ‖w‖ := by simp [Measure.real, h𝓕1]
 
   have hprod : ∀ a a', e a * e a' = e (a + a') := by
-    intro a a'; ext q
+    intro a a'
+    ext q
     obtain ⟨x, rfl⟩ := QuotientAddGroup.mk_surjective q
     simp [he, hχadd]
   have hstarE : ∀ a, star (e a) = e (-a) := by
-    intro a; ext q
+    intro a
+    ext q
     obtain ⟨x, rfl⟩ := QuotientAddGroup.mk_surjective q
     simp only [ContinuousMap.star_apply, he]
     exact hstar a x
@@ -120,12 +149,13 @@ theorem tsum_coefficients_eq_value_zero : ∀ (G : Type) [AddCommGroup G] [Topol
         exact ha (hχinj a hcon)
       have htr : IsAddFundamentalDomain Γ (y +ᵥ 𝓕) μ := h𝓕.vadd_of_comm y
       have key : (∫ x in 𝓕, χ a x ∂μ) = χ a y * ∫ x in 𝓕, χ a x ∂μ := by
-        calc (∫ x in 𝓕, χ a x ∂μ) = ∫ x in y +ᵥ 𝓕, χ a x ∂μ :=
-              h𝓕.setIntegral_eq htr (fun γ x => hχper a γ γ.2 x)
+        calc
+          (∫ x in 𝓕, χ a x ∂μ)
+            = ∫ x in y +ᵥ 𝓕, χ a x ∂μ := h𝓕.setIntegral_eq htr (fun γ x => hχper a γ γ.2 x)
           _ = ∫ x in 𝓕, χ a (y + x) ∂μ := by
-              rw [← Set.image_vadd]
-              exact (measurePreserving_add_left μ y).setIntegral_image_emb
-                (measurableEmbedding_addLeft y) _ _
+            rw [← Set.image_vadd]
+            exact (measurePreserving_add_left μ y).setIntegral_image_emb
+              (measurableEmbedding_addLeft y) _ _
           _ = ∫ x in 𝓕, χ a y * χ a x ∂μ := by simp_rw [hχmul]
           _ = χ a y * ∫ x in 𝓕, χ a x ∂μ := integral_const_mul _ _
       have h1 : (1 - χ a y) * ∫ x in 𝓕, χ a x ∂μ = 0 := by
@@ -143,17 +173,23 @@ theorem tsum_coefficients_eq_value_zero : ∀ (G : Type) [AddCommGroup G] [Topol
   have hsumn : Summable (fun a => ‖c a‖) := summable_norm_iff.mpr hsum
   have hgs : Summable (fun a => c a • e (-a)) := by
     refine Summable.of_norm_bounded hsumn fun a => ?_
-    calc ‖c a • e (-a)‖ ≤ ‖c a‖ * ‖e (-a)‖ := norm_smul_le _ _
+    calc
+      ‖c a • e (-a)‖
+        ≤ ‖c a‖ * ‖e (-a)‖ := norm_smul_le _ _
       _ ≤ ‖c a‖ * 1 := by gcongr; exact hnorm1 _
       _ = ‖c a‖ := mul_one _
   set g : C(G ⧸ Γ, ℂ) := ∑' a, c a • e (-a) with hgdef
   have hgcoef : ∀ b, I (e b * g) = c b := by
     intro b
-    have step : I (e b * g) = ∑' a, (I.comp (ContinuousLinearMap.mul ℂ C(G ⧸ Γ, ℂ) (e b))) (c a • e (-a)) :=
+    have step
+        : I (e b * g)
+          = ∑' a, (I.comp (ContinuousLinearMap.mul ℂ C(G ⧸ Γ, ℂ) (e b))) (c a • e (-a)) :=
       (I.comp (ContinuousLinearMap.mul ℂ C(G ⧸ Γ, ℂ) (e b))).map_tsum hgs
     rw [step]
-    have hterm : ∀ a, (I.comp (ContinuousLinearMap.mul ℂ C(G ⧸ Γ, ℂ) (e b))) (c a • e (-a)) =
-        if a = b then c b else 0 := by
+    have hterm
+        : ∀ a,
+          (I.comp (ContinuousLinearMap.mul ℂ C(G ⧸ Γ, ℂ) (e b))) (c a • e (-a))
+            = if a = b then c b else 0 := by
       intro a
       rw [ContinuousLinearMap.comp_apply, ContinuousLinearMap.mul_apply', mul_smul_comm, map_smul,
         hprod, hortho, smul_eq_mul]
@@ -175,8 +211,7 @@ theorem tsum_coefficients_eq_value_zero : ∀ (G : Type) [AddCommGroup G] [Topol
     refine Submodule.span_mono ?_ h1
     rintro _ ⟨_, ⟨a, rfl⟩, _, ⟨a', rfl⟩, rfl⟩
     exact ⟨a + a', (hprod a a').symm⟩
-  have hVone : (1 : C(G ⧸ Γ, ℂ)) ∈ V := by
-    rw [← hone]; exact Submodule.subset_span ⟨0, rfl⟩
+  have hVone : (1 : C(G ⧸ Γ, ℂ)) ∈ V := by rw [← hone]; exact Submodule.subset_span ⟨0, rfl⟩
   have hVstar : ∀ u ∈ V, star u ∈ V := by
     intro u hu
     induction hu using Submodule.span_induction with
@@ -187,16 +222,17 @@ theorem tsum_coefficients_eq_value_zero : ∀ (G : Type) [AddCommGroup G] [Topol
     | zero => simp
     | add x y _ _ hx hy => rw [star_add]; exact V.add_mem hx hy
     | smul r x _ hx => rw [star_smul]; exact V.smul_mem _ hx
-  let S : StarSubalgebra ℂ C(G ⧸ Γ, ℂ) :=
-    { carrier := (V : Set C(G ⧸ Γ, ℂ))
-      add_mem' := fun ha hb => V.add_mem ha hb
-      zero_mem' := V.zero_mem
-      mul_mem' := fun ha hb => hVmul _ ha _ hb
-      one_mem' := hVone
-      algebraMap_mem' := fun r => by
-        rw [Algebra.algebraMap_eq_smul_one]
-        exact V.smul_mem r hVone
-      star_mem' := fun ha => hVstar _ ha }
+  let S : StarSubalgebra ℂ C(G ⧸ Γ, ℂ) := {
+    carrier := (V : Set C(G ⧸ Γ, ℂ))
+    add_mem' := fun ha hb => V.add_mem ha hb
+    zero_mem' := V.zero_mem
+    mul_mem' := fun ha hb => hVmul _ ha _ hb
+    one_mem' := hVone
+    algebraMap_mem' := fun r => by
+      rw [Algebra.algebraMap_eq_smul_one]
+      exact V.smul_mem r hVone
+    star_mem' := fun ha => hVstar _ ha
+  }
   have hsep : S.SeparatesPoints := by
     intro q q' hne
     obtain ⟨x, rfl⟩ := QuotientAddGroup.mk_surjective q
@@ -222,7 +258,8 @@ theorem tsum_coefficients_eq_value_zero : ∀ (G : Type) [AddCommGroup G] [Topol
     | mem x hx =>
       obtain ⟨a, rfl⟩ := hx
       exact hH a
-    | zero => simp
+    | zero =>
+      simp
     | add x y _ _ hx hy =>
       simp only [Set.mem_setOf_eq] at hx hy ⊢
       rw [add_mul, map_add (f := _), hx, hy, add_zero]
@@ -280,7 +317,8 @@ theorem tsum_coefficients_eq_value_zero : ∀ (G : Type) [AddCommGroup G] [Topol
     have hev := (ContinuousMap.evalCLM ℂ (QuotientAddGroup.mk 0 : G ⧸ Γ)).map_tsum hgs
     simp only [ContinuousMap.evalCLM_apply] at hev
     rw [hgdef, hev]
-    congr 1; funext a
+    congr 1
+    funext a
     rw [ContinuousMap.smul_apply, he, hχz, smul_eq_mul, mul_one]
   have : k 0 = Φ 0 - ∑' a, c a := by
     rw [hkdef]

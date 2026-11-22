@@ -12,27 +12,31 @@ open scoped ENNReal
 
 namespace GlobalTheory
 
-theorem xClasses_index {K : Type} [Field K] [NumberField K] (I J : Ideal (𝓞 K)) (a : 𝓞 K)
-    (ha : a ≠ 0) (h : Ideal.span {a} = I * J) :
-    ((Ideal.span {a}).toAddSubgroup.addSubgroupOf J.toAddSubgroup).index = Ideal.absNorm I := by
+theorem xClasses_index
+    {K : Type} [Field K] [NumberField K]
+    (I J : Ideal (𝓞 K)) (a : 𝓞 K) (ha : a ≠ 0) (h : Ideal.span {a} = I * J)
+    : ((Ideal.span {a}).toAddSubgroup.addSubgroupOf J.toAddSubgroup).index = Ideal.absNorm I := by
   have hle : Ideal.span {a} ≤ J := by rw [h]; exact Ideal.mul_le_right
   have hJ : J ≠ ⊥ := by
     rintro rfl
     rw [Ideal.mul_bot, Ideal.span_singleton_eq_bot] at h
     exact ha h
   have hNJ : Ideal.absNorm J ≠ 0 := fun h0 => hJ (Ideal.absNorm_eq_zero_iff.mp h0)
-  have key := AddSubgroup.relIndex_mul_index
-    (H := (Ideal.span {a}).toAddSubgroup) (K := J.toAddSubgroup) hle
+  have key :=
+    AddSubgroup.relIndex_mul_index (H := (Ideal.span {a}).toAddSubgroup) (K := J.toAddSubgroup) hle
   have e1 : J.toAddSubgroup.index = Ideal.absNorm J := (Ideal.absNorm_eq_index J).symm
   have e2 : (Ideal.span {a}).toAddSubgroup.index = Ideal.absNorm I * Ideal.absNorm J := by
     rw [← map_mul, ← h, Ideal.absNorm_eq_index]
   rw [e1, e2] at key
   exact Nat.eq_of_mul_eq_mul_right (Nat.pos_of_ne_zero hNJ) key
 
-theorem xClasses_mem {K : Type} [Field K] [NumberField K] (I J : Ideal (𝓞 K)) (a : 𝓞 K)
-    (hI : I ≠ ⊥) (haI : a ∈ I) (h : Ideal.span {a} = I * J) (z : K)
-    (hz : ∀ α ∈ I, ∃ o : 𝓞 K, (o : K) = (α : K) * z) :
-    ∃ o : J.toAddSubgroup, ((o : 𝓞 K) : K) = (a : K) * z := by
+theorem xClasses_mem
+    {K : Type} [Field K] [NumberField K]
+    (I J : Ideal (𝓞 K))
+    (a : 𝓞 K)
+    (hI : I ≠ ⊥) (haI : a ∈ I) (h : Ideal.span {a} = I * J)
+    (z : K) (hz : ∀ α ∈ I, ∃ o : 𝓞 K, (o : K) = (α : K) * z)
+    : ∃ o : J.toAddSubgroup, ((o : 𝓞 K) : K) = (a : K) * z := by
   obtain ⟨o, ho⟩ := hz a haI
   have hmem : o ∈ J := by
     have hle : Ideal.span {o} * I ≤ J * I := by
@@ -43,7 +47,8 @@ theorem xClasses_mem {K : Type} [Field K] [NumberField K] (I J : Ideal (𝓞 K))
         apply IsFractionRing.injective (𝓞 K) K
         simp only [map_mul]
         change (o : K) * (α : K) = (a : K) * (p : K)
-        rw [ho, hp]; ring
+        rw [ho, hp]
+        ring
       rw [hop, mul_comm J I, ← h]
       exact Ideal.mul_mem_right p _ (Ideal.mem_span_singleton_self a)
     have hdvd : J * I ∣ Ideal.span {o} * I := Ideal.dvd_iff_le.mpr hle
@@ -51,12 +56,14 @@ theorem xClasses_mem {K : Type} [Field K] [NumberField K] (I J : Ideal (𝓞 K))
     exact Ideal.dvd_span_singleton.mp hdvd
   exact ⟨⟨o, hmem⟩, ho⟩
 
-theorem xClasses_denom {K : Type} [Field K] [NumberField K] (A : Ideal (𝓞 K)) {r : ℕ}
-    (Y : Matrix (Fin r) (Fin (r + 1)) (𝓞 K)) (f : Fin r → Fin (r + 1))
+theorem xClasses_denom
+    {K : Type} [Field K] [NumberField K]
+    (A : Ideal (𝓞 K))
+    {r : ℕ} (Y : Matrix (Fin r) (Fin (r + 1)) (𝓞 K)) (f : Fin r → Fin (r + 1))
     (S : Matrix (Fin r) (Fin r) K)
-    (hx : ∀ a b, ∀ α ∈ A, ∃ o : 𝓞 K,
-      (o : K) = (α : K) * (S * Y.map (algebraMap (𝓞 K) K)) a b) (i j : Fin r) :
-    ∀ α ∈ Ideal.span {(Y.submatrix id f).det} * A, ∃ o : 𝓞 K, (o : K) = (α : K) * S i j := by
+    (hx : ∀ a b, ∀ α ∈ A, ∃ o : 𝓞 K, (o : K) = (α : K) * (S * Y.map (algebraMap (𝓞 K) K)) a b)
+    (i j : Fin r)
+    : ∀ α ∈ Ideal.span {(Y.submatrix id f).det} * A, ∃ o : 𝓞 K, (o : K) = (α : K) * S i j := by
   classical
   intro α hα
   obtain ⟨β, hβ, rfl⟩ := Ideal.mem_span_singleton_mul.mp hα
@@ -64,8 +71,7 @@ theorem xClasses_denom {K : Type} [Field K] [NumberField K] (A : Ideal (𝓞 K))
   set B := Y.submatrix id f with hB
   have hM : B.map φ * (B.map φ).adjugate = (φ B.det) • (1 : Matrix (Fin r) (Fin r) K) := by
     rw [Matrix.mul_adjugate, RingHom.map_det]; rfl
-  have e1 : ∀ k, (S * Y.map φ) i (f k) = (S * B.map φ) i k := by
-    intro k; simp [Matrix.mul_apply, B]
+  have e1 : ∀ k, (S * Y.map φ) i (f k) = (S * B.map φ) i k := by intro k; simp [Matrix.mul_apply, B]
   have e2 : ∀ k, φ (B.adjugate k j) = (B.map φ).adjugate k j := by
     intro k; exact congrFun (congrFun (RingHom.map_adjugate φ B) k) j
   have hkey : ∑ k, (S * Y.map φ) i (f k) * φ (B.adjugate k j) = φ B.det * S i j := by
@@ -82,7 +88,18 @@ theorem xClasses_denom {K : Type} [Field K] [NumberField K] (A : Ideal (𝓞 K))
   refine Finset.sum_congr rfl fun k _ => ?_
   ring
 
-theorem xClasses : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (A : Ideal (𝓞 K)) (r : ℕ) (Y : Matrix (Fin r) (Fin (r + 1)) (𝓞 K)) (b₀ : Fin (r + 1)), A ≠ ⊥ → (Y.submatrix id b₀.succAbove).det ≠ 0 → ∃ reps : Finset (Matrix (Fin r) (Fin (r + 1)) K), reps.card ≤ Ideal.absNorm (Ideal.span {(Y.submatrix id b₀.succAbove).det} * A) ^ (r ^ 2) ∧ ∀ x : Matrix (Fin r) (Fin (r + 1)) K, (∀ a b, ∀ α ∈ A, ∃ o : 𝓞 K, (o : K) = (α : K) * x a b) → xᴴ * Y.map (algebraMap (𝓞 K) K) + (Y.map (algebraMap (𝓞 K) K))ᴴ * x = 0 → ∃ x₀ ∈ reps, ∃ c : Matrix (Fin r) (Fin r) (𝓞 K), (c.map (algebraMap (𝓞 K) K))ᴴ = -c.map (algebraMap (𝓞 K) K) ∧ x = x₀ + c.map (algebraMap (𝓞 K) K) * Y.map (algebraMap (𝓞 K) K) := by
+theorem xClasses
+    : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (A : Ideal (𝓞 K)) (r : ℕ)
+        (Y : Matrix (Fin r) (Fin (r + 1)) (𝓞 K)) (b₀ : Fin (r + 1)),
+      A ≠ ⊥ → (Y.submatrix id b₀.succAbove).det ≠ 0
+        → ∃ reps : Finset (Matrix (Fin r) (Fin (r + 1)) K),
+          reps.card ≤ Ideal.absNorm (Ideal.span {(Y.submatrix id b₀.succAbove).det} * A) ^ (r ^ 2)
+            ∧ ∀ x : Matrix (Fin r) (Fin (r + 1)) K,
+              (∀ a b, ∀ α ∈ A, ∃ o : 𝓞 K, (o : K) = (α : K) * x a b)
+                → xᴴ * Y.map (algebraMap (𝓞 K) K) + (Y.map (algebraMap (𝓞 K) K))ᴴ * x = 0
+                → ∃ x₀ ∈ reps, ∃ c : Matrix (Fin r) (Fin r) (𝓞 K),
+                  (c.map (algebraMap (𝓞 K) K))ᴴ = - c.map (algebraMap (𝓞 K) K)
+                    ∧ x = x₀ + c.map (algebraMap (𝓞 K) K) * Y.map (algebraMap (𝓞 K) K) := by
   classical
   intro K _ _ _ A r Y b₀ hA hdet
   set f := b₀.succAbove with hf
@@ -105,20 +122,21 @@ theorem xClasses : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (A : Id
     (1 : Matrix (Fin (r + 1)) (Fin (r + 1)) K).submatrix id f
   have hC : ∀ M : Matrix (Fin r) (Fin (r + 1)) K, M * C = M.submatrix id f := fun M => by
     simpa [C] using Matrix.mul_submatrix_one (Equiv.refl (Fin (r + 1))) f M
-  have hYf : YK * C = (Y.submatrix id f).map φ := by
-    rw [hC, hYK, Matrix.submatrix_map]
+  have hYf : YK * C = (Y.submatrix id f).map φ := by rw [hC, hYK, Matrix.submatrix_map]
   have hdetYf : IsUnit (YK * C).det := by
     rw [hYf, show ((Y.submatrix id f).map φ).det = φ D from (RingHom.map_det φ _).symm]
     exact isUnit_iff_ne_zero.mpr (fun h0 => hdet (hφinj (h0.trans (map_zero φ).symm)))
   have hdetYfH : IsUnit (YK * C)ᴴ.det := by
     rw [Matrix.det_conjTranspose]
     exact isUnit_iff_ne_zero.mpr (star_ne_zero.mpr (isUnit_iff_ne_zero.mp hdetYf))
-  obtain ⟨Good, hGood⟩ : ∃ G : Matrix (Fin r) (Fin (r + 1)) K → Prop, ∀ x, G x ↔
-      (∀ p q, ∀ α ∈ A, ∃ o : 𝓞 K, (o : K) = (α : K) * x p q) ∧ xᴴ * YK + YKᴴ * x = 0 :=
+  obtain ⟨Good, hGood⟩
+      : ∃ G : Matrix (Fin r) (Fin (r + 1)) K → Prop, ∀ x,
+        G x ↔ (∀ p q, ∀ α ∈ A, ∃ o : 𝓞 K, (o : K) = (α : K) * x p q) ∧ xᴴ * YK + YKᴴ * x = 0 :=
     ⟨_, fun _ => Iff.rfl⟩
 
-  obtain ⟨Sx, hSx⟩ : ∃ Sx : Matrix (Fin r) (Fin (r + 1)) K → Matrix (Fin r) (Fin r) K,
-      ∀ x, Good x → x = Sx x * YK ∧ (Sx x)ᴴ = -Sx x := by
+  obtain ⟨Sx, hSx⟩
+      : ∃ Sx : Matrix (Fin r) (Fin (r + 1)) K → Matrix (Fin r) (Fin r) K, ∀ x,
+        Good x → x = Sx x * YK ∧ (Sx x)ᴴ = - Sx x := by
     refine ⟨fun x => x * C * (YK * C)⁻¹, fun x hG => ?_⟩
     have hxY := ((hGood x).mp hG).2
     set Yf := YK * C with hYfdef
@@ -126,8 +144,7 @@ theorem xClasses : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (A : Id
     have hSYf : S * Yf = x * C := Matrix.nonsing_inv_mul_cancel_right _ _ hdetYf
     set P := x - S * YK with hP
     have hxP : x = S * YK + P := by rw [hP]; abel
-    have hPC : P * C = 0 := by
-      rw [hP, Matrix.sub_mul, Matrix.mul_assoc, ← hYfdef, hSYf, sub_self]
+    have hPC : P * C = 0 := by rw [hP, Matrix.sub_mul, Matrix.mul_assoc, ← hYfdef, hSYf, sub_self]
     have h1 : Cᴴ * xᴴ = Yfᴴ * Sᴴ := by
       rw [← Matrix.conjTranspose_mul, ← Matrix.conjTranspose_mul, hSYf]
     have h2 : Cᴴ * YKᴴ = Yfᴴ := by rw [← Matrix.conjTranspose_mul]
@@ -135,8 +152,9 @@ theorem xClasses : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (A : Id
       have h0 : Cᴴ * (xᴴ * YK + YKᴴ * x) = 0 := by rw [hxY, Matrix.mul_zero]
       rwa [Matrix.mul_add, ← Matrix.mul_assoc, ← Matrix.mul_assoc, h1, h2] at h0
     have h4 : Yfᴴ * ((Sᴴ + S) * YK + P) = 0 := by
-      calc Yfᴴ * ((Sᴴ + S) * YK + P) = Yfᴴ * Sᴴ * YK + Yfᴴ * (S * YK + P) := by
-            simp only [Matrix.add_mul, Matrix.mul_add, Matrix.mul_assoc]; abel
+      calc
+        Yfᴴ * ((Sᴴ + S) * YK + P) = Yfᴴ * Sᴴ * YK + Yfᴴ * (S * YK + P) := by
+          simp only [Matrix.add_mul, Matrix.mul_add, Matrix.mul_assoc]; abel
         _ = 0 := by rw [← hxP]; exact h3
     have h5 : (Sᴴ + S) * YK + P = 0 := by
       have h0 := congrArg (fun M => Yfᴴ⁻¹ * M) h4
@@ -144,7 +162,8 @@ theorem xClasses : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (A : Id
     have h6 : Sᴴ + S = 0 := by
       have h0 := congrArg (fun M => M * C * Yf⁻¹) h5
       rwa [Matrix.add_mul, hPC, add_zero, Matrix.mul_assoc ((Sᴴ + S)) YK C, ← hYfdef,
-        Matrix.mul_nonsing_inv_cancel_right _ _ hdetYf, Matrix.zero_mul, Matrix.zero_mul] at h0
+          Matrix.mul_nonsing_inv_cancel_right _ _ hdetYf, Matrix.zero_mul, Matrix.zero_mul]
+        at h0
     have h7 : P = 0 := by rwa [h6, Matrix.zero_mul, zero_add] at h5
     rw [h7, add_zero] at hxP
     exact ⟨hxP, eq_neg_of_add_eq_zero_left h6⟩
@@ -159,27 +178,37 @@ theorem xClasses : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (A : Id
     exact xClasses_denom A Y f (Sx x) hx' i j
   set Q := ↥J.toAddSubgroup ⧸ (Ideal.span {a}).toAddSubgroup.addSubgroupOf J.toAddSubgroup
   have hcardQ : Nat.card Q = Ideal.absNorm I := xClasses_index I J a ha0 hJ
-  have : Finite Q := Nat.finite_of_card_ne_zero (by
-    rw [hcardQ]; exact fun h0 => hI0 (Ideal.absNorm_eq_zero_iff.mp h0))
+  have : Finite Q :=
+    Nat.finite_of_card_ne_zero (by
+      rw [hcardQ]; exact fun h0 => hI0 (Ideal.absNorm_eq_zero_iff.mp h0))
   let _ : Fintype Q := Fintype.ofFinite Q
-  obtain ⟨key, hkey⟩ : ∃ key : Matrix (Fin r) (Fin (r + 1)) K → (Fin r → Fin r → Q),
-      ∀ x, Good x → ∀ i j, ∃ o : J.toAddSubgroup,
-        ((o : 𝓞 K) : K) = (a : K) * Sx x i j ∧ key x i j = (o : Q) := by
-    refine ⟨fun x i j => if h : ∃ o : J.toAddSubgroup, ((o : 𝓞 K) : K) = (a : K) * Sx x i j
-      then ((Classical.choose h : J.toAddSubgroup) : Q) else 0, fun x hG i j => ?_⟩
+  obtain ⟨key, hkey⟩
+      : ∃ key : Matrix (Fin r) (Fin (r + 1)) K → (Fin r → Fin r → Q), ∀ x,
+        Good x
+          → ∀ i j, ∃ o : J.toAddSubgroup,
+            ((o : 𝓞 K) : K) = (a : K) * Sx x i j ∧ key x i j = (o : Q) := by
+    refine ⟨
+      fun x i j =>
+        if h : ∃ o : J.toAddSubgroup, ((o : 𝓞 K) : K) = (a : K) * Sx x i j then
+          ((Classical.choose h : J.toAddSubgroup) : Q)
+        else
+          0,
+      fun x hG i j => ?_
+    ⟩
     have h := hent x hG i j
     exact ⟨Classical.choose h, Classical.choose_spec h, by simp only [dif_pos h]⟩
-  obtain ⟨g, hg⟩ : ∃ g : (Fin r → Fin r → Q) → Matrix (Fin r) (Fin (r + 1)) K,
-      ∀ q, (∃ x, Good x ∧ key x = q) → Good (g q) ∧ key (g q) = q := by
-    refine ⟨fun q => if h : ∃ x, Good x ∧ key x = q then Classical.choose h else 0,
-      fun q h => ?_⟩
+  obtain ⟨g, hg⟩
+      : ∃ g : (Fin r → Fin r → Q) → Matrix (Fin r) (Fin (r + 1)) K, ∀ q,
+        (∃ x, Good x ∧ key x = q) → Good (g q) ∧ key (g q) = q := by
+    refine ⟨fun q => if h : ∃ x, Good x ∧ key x = q then Classical.choose h else 0, fun q h => ?_⟩
     simp only [dif_pos h]
     exact Classical.choose_spec h
   refine ⟨Finset.univ.image g, ?_, ?_⟩
-  · calc (Finset.univ.image g).card ≤ (Finset.univ : Finset (Fin r → Fin r → Q)).card :=
-          Finset.card_image_le
+  · calc
+      (Finset.univ.image g).card
+        ≤ (Finset.univ : Finset (Fin r → Fin r → Q)).card := Finset.card_image_le
       _ = Fintype.card Q ^ (r ^ 2) := by
-          rw [Finset.card_univ, Fintype.card_fun, Fintype.card_fun, Fintype.card_fin, ← pow_mul, sq]
+        rw [Finset.card_univ, Fintype.card_fun, Fintype.card_fun, Fintype.card_fin, ← pow_mul, sq]
       _ = Ideal.absNorm I ^ (r ^ 2) := by rw [← Nat.card_eq_fintype_card, hcardQ]
   · intro x hx hxY
     have hG : Good x := (hGood x).mpr ⟨hx, hxY⟩
@@ -189,8 +218,7 @@ theorem xClasses : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (A : Id
       intro i j
       obtain ⟨o, ho, hko⟩ := hkey x hG i j
       obtain ⟨o', ho', hko'⟩ := hkey x' hG' i j
-      have e : ((o' : J.toAddSubgroup) : Q) = (o : Q) := by
-        rw [← hko, ← hko', hk]
+      have e : ((o' : J.toAddSubgroup) : Q) = (o : Q) := by rw [← hko, ← hko', hk]
       have hm := QuotientAddGroup.eq.mp e
       rw [AddSubgroup.mem_addSubgroupOf] at hm
       obtain ⟨t, ht⟩ := Ideal.mem_span_singleton'.mp hm
@@ -198,12 +226,12 @@ theorem xClasses : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (A : Id
       have ht' : φ t * φ a = φ a * (Sx x i j - Sx x' i j) := by
         rw [← map_mul, ht]
         simp only [AddSubgroup.coe_add, AddSubgroup.coe_neg, map_add (f := _), map_neg]
-        rw [← hc, ← hc, ho, ho']; ring
+        rw [← hc, ← hc, ho, ho']
+        ring
       exact mul_left_cancel₀ haK (by rw [mul_comm]; exact ht')
     obtain ⟨c, hcc⟩ : ∃ c : Matrix (Fin r) (Fin r) (𝓞 K), ∀ i j, φ (c i j) = Sx x i j - Sx x' i j :=
       ⟨fun i j => Classical.choose (hdiff i j), fun i j => Classical.choose_spec (hdiff i j)⟩
-    have hcm : c.map φ = Sx x - Sx x' := by
-      ext i j; simp [hcc]
+    have hcm : c.map φ = Sx x - Sx x' := by ext i j; simp [hcc]
     refine ⟨x', Finset.mem_image_of_mem _ (Finset.mem_univ _), c, ?_, ?_⟩
     · rw [hcm, Matrix.conjTranspose_sub, (hSx x hG).2, (hSx x' hG').2]; abel
     · rw [hcm, Matrix.sub_mul, ← (hSx x hG).1, ← (hSx x' hG').1]; abel

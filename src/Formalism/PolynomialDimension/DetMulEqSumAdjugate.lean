@@ -20,8 +20,10 @@ theorem locTelescope : Formalism.CountingSumsFrames.LocTelescope := by
       have h1 := ih (by omega)
       have h2 := hz m (by omega)
       omega
-  have hterm : ∀ j ∈ Finset.range J, (p : ℤ) ^ z j * ((p : ℤ) ^ (z (j + 1) - z j) - 1) =
-      (p : ℤ) ^ z (j + 1) - (p : ℤ) ^ z j := by
+  have hterm
+      : ∀ j ∈ Finset.range J,
+        (p : ℤ) ^ z j * ((p : ℤ) ^ (z (j + 1) - z j) - 1)
+          = (p : ℤ) ^ z (j + 1) - (p : ℤ) ^ z j := by
     intro j hj
     have h := hz j (Finset.mem_range.mp hj)
     rw [mul_sub, mul_one, ← pow_add, Nat.add_sub_cancel' h]
@@ -39,17 +41,19 @@ theorem graphMinor : Formalism.CountingSumsFrames.GraphMinor := by
   have hw : Matrix.mulVec (H.submatrix id (Fin.castLE h)).adjugate (fun m => H m c) ≠ 0 := by
     intro h0
     apply hv
-    have h1 : Matrix.mulVec (H.submatrix id (Fin.castLE h))
-        (Matrix.mulVec (H.submatrix id (Fin.castLE h)).adjugate (fun m => H m c)) =
-        (H.submatrix id (Fin.castLE h)).det • (fun m => H m c) := by
+    have h1
+        : Matrix.mulVec (H.submatrix id (Fin.castLE h))
+            (Matrix.mulVec (H.submatrix id (Fin.castLE h)).adjugate (fun m => H m c))
+          = (H.submatrix id (Fin.castLE h)).det • (fun m => H m c) := by
       rw [Matrix.mulVec_mulVec, Matrix.mul_adjugate]
       first
-        | rw [Matrix.smul_mulVec, Matrix.one_mulVec]
-        | rw [Matrix.smul_mulVec_assoc, Matrix.one_mulVec]
-        | (ext x; simp [Matrix.mulVec, dotProduct, Matrix.one_apply])
+      | rw [Matrix.smul_mulVec, Matrix.one_mulVec]
+      | rw [Matrix.smul_mulVec_assoc, Matrix.one_mulVec]
+      | (ext x; simp [Matrix.mulVec, dotProduct, Matrix.one_apply])
     rw [h0, Matrix.mulVec_zero] at h1
     exact (smul_eq_zero.mp h1.symm).resolve_left hA
-  obtain ⟨i, hi⟩ : ∃ i, Matrix.mulVec (H.submatrix id (Fin.castLE h)).adjugate (fun m => H m c) i ≠ 0 := by
+  obtain ⟨i, hi⟩
+      : ∃ i, Matrix.mulVec (H.submatrix id (Fin.castLE h)).adjugate (fun m => H m c) i ≠ 0 := by
     by_contra hh
     push_neg at hh
     exact hw (funext hh)
@@ -70,28 +74,33 @@ theorem localizerVanishes : Formalism.CountingSumsFrames.LocalizerVanishes := by
     rw [hn, pow_zero] at hcard
     have h1 := Fintype.one_lt_card (α := F)
     omega
-  have hsum : ∑ j ∈ Finset.range J, p ^ z j * (p ^ (z (j + 1) - z j) - 1) = p ^ z 0 * (p ^ n' - 1) := by
+  have hsum
+      : ∑ j ∈ Finset.range J, p ^ z j * (p ^ (z (j + 1) - z j) - 1) = p ^ z 0 * (p ^ n' - 1) := by
     have h1 := (locTelescope p J n' z hz hzJ).1
-    have h2 : ((∑ j ∈ Finset.range J, p ^ z j * (p ^ (z (j + 1) - z j) - 1) : ℕ) : ℤ) =
-        ((p ^ z 0 * (p ^ n' - 1) : ℕ) : ℤ) := by
-      rw [Nat.cast_sum, Finset.sum_congr rfl fun j _ => by
-        rw [Nat.cast_mul, Nat.cast_sub (hp1 _), Nat.cast_pow, Nat.cast_pow, Nat.cast_one]]
+    have h2
+        : ((∑ j ∈ Finset.range J, p ^ z j * (p ^ (z (j + 1) - z j) - 1) : ℕ) : ℤ)
+          = ((p ^ z 0 * (p ^ n' - 1) : ℕ) : ℤ) := by
+      rw [Nat.cast_sum,
+        Finset.sum_congr rfl fun j _ => by
+          rw [Nat.cast_mul, Nat.cast_sub (hp1 _), Nat.cast_pow, Nat.cast_pow, Nat.cast_one]]
       rw [Nat.cast_mul, Nat.cast_sub (hp1 _), Nat.cast_pow, Nat.cast_pow, Nat.cast_one]
       exact h1
     exact_mod_cast h2
-  have hexp : ∀ x : F, x ≠ 0 →
-      ∏ j ∈ Finset.range J, (x ^ p ^ z j) ^ (p ^ (z (j + 1) - z j) - 1) = 1 := by
+  have hexp
+      : ∀ x : F, x ≠ 0 → ∏ j ∈ Finset.range J, (x ^ p ^ z j) ^ (p ^ (z (j + 1) - z j) - 1) = 1 := by
     intro x hx
     simp only [← pow_mul]
     rw [Finset.prod_pow_eq_pow_sum, hsum, pow_mul, ← hcard]
     exact FiniteField.pow_card_sub_one_eq_one _ (pow_ne_zero _ hx)
-  have hfac : ∀ cols : Fin r → Fin k,
-      ∏ j ∈ Finset.range J, piMinor p r k (H.map (algebraMap F A)) (pos j) (t j) (z j) cols ^
-        (p ^ (z (j + 1) - z j) - 1) =
-      (∏ j ∈ Finset.range J, (Matrix.of fun l m => t j l m ^ p ^ (z j - pos j l)).det ^
-        (p ^ (z (j + 1) - z j) - 1)) *
-      algebraMap F A (∏ j ∈ Finset.range J, ((H.submatrix id cols).det ^ p ^ z j) ^
-        (p ^ (z (j + 1) - z j) - 1)) := by
+  have hfac
+      : ∀ cols : Fin r → Fin k,
+        ∏ j ∈ Finset.range J, piMinor p r k (H.map (algebraMap F A)) (pos j) (t j) (z j) cols ^
+          (p ^ (z (j + 1) - z j) - 1)
+          = (∏ j ∈ Finset.range J, (Matrix.of fun l m => t j l m ^ p ^ (z j - pos j l)).det ^
+              (p ^ (z (j + 1) - z j) - 1))
+            * algebraMap F A
+              (∏ j ∈ Finset.range J, ((H.submatrix id cols).det ^ p ^ z j) ^
+                (p ^ (z (j + 1) - z j) - 1)) := by
     intro cols
     rw [map_prod, ← Finset.prod_mul_distrib]
     refine Finset.prod_congr rfl fun j hj => ?_
@@ -109,13 +118,17 @@ theorem locExpand : Formalism.CountingSumsFrames.LocExpand := by
   intro R _ ι _ _ J Del piI Q hJ
   classical
   have h0J : 0 ∈ Finset.range J := Finset.mem_range.mpr (by omega)
-  have hexp : ∀ S : Finset ι, ∏ j ∈ Finset.range J, Del j ^ ((if j = 0 then 1 else 0) +
-      Fintype.card ι * (Q j - 1) - S.card * (Q j - 1)) =
-      Del 0 * (∏ j ∈ Finset.range J, Del j ^ (Q j - 1)) ^ (Fintype.card ι - S.card) := by
+  have hexp
+      : ∀ S : Finset ι,
+        ∏ j ∈ Finset.range J, Del j ^ ((if j = 0 then 1 else 0) +
+            Fintype.card ι * (Q j - 1) - S.card * (Q j - 1))
+          = Del 0 * (∏ j ∈ Finset.range J, Del j ^ (Q j - 1)) ^ (Fintype.card ι - S.card) := by
     intro S
     have hS : S.card ≤ Fintype.card ι := Finset.card_le_univ S
-    have he : ∀ j, (if j = 0 then 1 else 0) + Fintype.card ι * (Q j - 1) - S.card * (Q j - 1) =
-        (if j = 0 then 1 else 0) + (Q j - 1) * (Fintype.card ι - S.card) := by
+    have he
+        : ∀ j,
+          (if j = 0 then 1 else 0) + Fintype.card ι * (Q j - 1) - S.card * (Q j - 1)
+            = (if j = 0 then 1 else 0) + (Q j - 1) * (Fintype.card ι - S.card) := by
       intro j
       have h1 : S.card * (Q j - 1) ≤ Fintype.card ι * (Q j - 1) := Nat.mul_le_mul_right _ hS
       rw [Nat.add_sub_assoc h1, ← Nat.sub_mul, mul_comm]
@@ -123,54 +136,64 @@ theorem locExpand : Formalism.CountingSumsFrames.LocExpand := by
     congr 1
     rw [Finset.prod_eq_single_of_mem 0 h0J (fun j _ hj => by simp [hj])]
     simp
-  have hprod : ∏ I, (∏ j ∈ Finset.range J, Del j ^ (Q j - 1) -
-      ∏ j ∈ Finset.range J, piI I j ^ (Q j - 1)) =
-      ∑ S ∈ (Finset.univ : Finset ι).powerset, (∏ I ∈ S, -(∏ j ∈ Finset.range J, piI I j ^ (Q j - 1))) *
-        ∏ I ∈ Finset.univ \ S, ∏ j ∈ Finset.range J, Del j ^ (Q j - 1) := by
+  have hprod
+      : ∏ I, (∏ j ∈ Finset.range J, Del j ^ (Q j - 1) -
+          ∏ j ∈ Finset.range J, piI I j ^ (Q j - 1))
+        = ∑ S ∈ (Finset.univ : Finset ι).powerset, (∏ I ∈ S, -(∏ j ∈ Finset.range J, piI I j ^ (Q j - 1))) *
+            ∏ I ∈ Finset.univ \ S, ∏ j ∈ Finset.range J, Del j ^ (Q j - 1) := by
     rw [← Finset.prod_add]
     exact Finset.prod_congr rfl fun I _ => by ring
   rw [hprod, Finset.mul_sum, Finset.powerset_univ]
   refine Finset.sum_congr rfl fun S _ => ?_
-  have hneg : ∏ I ∈ S, -(∏ j ∈ Finset.range J, piI I j ^ (Q j - 1)) =
-      (-1) ^ S.card * ∏ I ∈ S, ∏ j ∈ Finset.range J, piI I j ^ (Q j - 1) := by
+  have hneg
+      : ∏ I ∈ S, -(∏ j ∈ Finset.range J, piI I j ^ (Q j - 1))
+        = (-1) ^ S.card * ∏ I ∈ S, ∏ j ∈ Finset.range J, piI I j ^ (Q j - 1) := by
     rw [← Finset.prod_const, ← Finset.prod_mul_distrib]
     exact Finset.prod_congr rfl fun _ _ => by ring
   rw [hexp S, hneg, Finset.prod_const, ← Finset.compl_eq_univ_sdiff, Finset.card_compl]
   ring
 theorem borderedDetLinear : Formalism.CountingSumsFrames.BorderedDetLinear := by
   intro R _ r ts T
-  have hsub : ∀ (u : R) (b : Fin r → R) (i : Fin (r + 1)),
-      (borderedMatrix r ts u T b).submatrix i.succAbove (Fin.last r).succAbove =
-        (borderedMatrix r ts 0 T 0).submatrix i.succAbove (Fin.last r).succAbove := by
+  have hsub
+      : ∀ (u : R) (b : Fin r → R) (i : Fin (r + 1)),
+        (borderedMatrix r ts u T b).submatrix i.succAbove (Fin.last r).succAbove
+          = (borderedMatrix r ts 0 T 0).submatrix i.succAbove (Fin.last r).succAbove := by
     intro u b i
     ext x y
     simp only [Matrix.submatrix_apply, Fin.succAbove_last, borderedMatrix, Matrix.of_apply]
     rcases Fin.eq_zero_or_eq_succ (i.succAbove x) with h | ⟨j, h⟩ <;> rw [h] <;> simp
-  have h0 : ∀ (u : R) (b : Fin r → R),
-      (borderedMatrix r ts u T b).submatrix (0 : Fin (r + 1)).succAbove (Fin.last r).succAbove = T := by
+  have h0
+      : ∀ (u : R) (b : Fin r → R),
+        (borderedMatrix r ts u T b).submatrix (0 : Fin (r + 1)).succAbove (Fin.last r).succAbove
+          = T := by
     intro u b
     ext x y
     simp [borderedMatrix, Fin.succAbove_last]
-  refine ⟨fun l => (-1) ^ ((l.succ : ℕ) + (Fin.last r : ℕ)) *
-    ((borderedMatrix r ts 0 T 0).submatrix l.succ.succAbove (Fin.last r).succAbove).det, fun u b => ?_⟩
+  refine ⟨
+    fun l =>
+      (-1) ^ ((l.succ : ℕ) + (Fin.last r : ℕ))
+        * ((borderedMatrix r ts 0 T 0).submatrix l.succ.succAbove (Fin.last r).succAbove).det,
+    fun u b => ?_
+  ⟩
   rw [Matrix.det_succ_column _ (Fin.last r), Fin.sum_univ_succ, h0]
   simp only [hsub u b]
-  simp only [borderedMatrix, Matrix.of_apply, Fin.cons_zero, Fin.cons_succ, Fin.snoc_last, Fin.val_zero,
-    Fin.val_last, zero_add]
+  simp only [borderedMatrix, Matrix.of_apply, Fin.cons_zero, Fin.cons_succ, Fin.snoc_last,
+    Fin.val_zero, Fin.val_last, zero_add]
   congr 1
   exact Finset.sum_congr rfl fun l _ => by ring
 theorem detMulEqSumAdjugate : Formalism.CountingSumsFrames.DetMulEqSumAdjugate := by
   intro R _ r T s a
-  calc T.det * s a = Matrix.mulVec (T.det • (1 : Matrix (Fin r) (Fin r) R)) s a := by
-        first
-          | (rw [Matrix.smul_mulVec, Matrix.one_mulVec]; rfl)
-          | (rw [Matrix.smul_mulVec_assoc, Matrix.one_mulVec]; rfl)
-          | simp [Matrix.mulVec, dotProduct, Matrix.one_apply, Matrix.smul_apply]
+  calc
+    T.det * s a = Matrix.mulVec (T.det • (1 : Matrix (Fin r) (Fin r) R)) s a := by
+      first
+      | (rw [Matrix.smul_mulVec, Matrix.one_mulVec]; rfl)
+      | (rw [Matrix.smul_mulVec_assoc, Matrix.one_mulVec]; rfl)
+      | simp [Matrix.mulVec, dotProduct, Matrix.one_apply, Matrix.smul_apply]
     _ = Matrix.mulVec (T.adjugate * T) s a := by rw [Matrix.adjugate_mul]
     _ = Matrix.mulVec T.adjugate (Matrix.mulVec T s) a := by rw [Matrix.mulVec_mulVec]
     _ = ∑ l, Matrix.mulVec T s l * T.adjugate a l := by
-        simp only [Matrix.mulVec, dotProduct]
-        exact Finset.sum_congr rfl fun _ _ => mul_comm _ _
+      simp only [Matrix.mulVec, dotProduct]
+      exact Finset.sum_congr rfl fun _ _ => mul_comm _ _
 theorem keyVanish : Formalism.CountingSumsFrames.KeyVanish := by
   intro p _ F _ _ r k h hdet s
   classical
@@ -186,20 +209,28 @@ theorem keyVanish : Formalism.CountingSumsFrames.KeyVanish := by
   · intro A t cols hA ht
     let T' : Matrix (Fin (r + 1)) (Fin k) F := Matrix.of fun l i => t l i ^ p ^ (s - A l)
     let P : Matrix (Fin k) (Fin k) F := Matrix.diagonal fun i => if i.val < r then 1 else 0
-    let G : Matrix (Fin k) (Fin (r + 1)) F := Matrix.of fun i c => (h.map (fun x => x ^ p ^ s)) i (cols c)
+    let G : Matrix (Fin k) (Fin (r + 1)) F :=
+      Matrix.of fun i c => (h.map (fun x => x ^ p ^ s)) i (cols c)
     have hz : (T' * P * G).det = 0 := by
       by_contra hne
-      have hrank := Matrix.rank_of_isUnit (T' * P * G)
-        ((Matrix.isUnit_iff_isUnit_det _).mpr (isUnit_iff_ne_zero.mpr hne))
+      have hrank :=
+        Matrix.rank_of_isUnit (T' * P * G)
+          ((Matrix.isUnit_iff_isUnit_det _).mpr (isUnit_iff_ne_zero.mpr hne))
       have h1 : (T' * P * G).rank ≤ P.rank :=
         (Matrix.rank_mul_le_left _ _).trans (Matrix.rank_mul_le_right _ _)
       have h2 : P.rank ≤ r := by
         rw [Matrix.rank_diagonal]
         refine (Fintype.card_le_of_injective
-          (fun i => (⟨i.1.val, by
-            have hi := i.2
-            by_contra hc
-            simp [hc] at hi⟩ : Fin r)) ?_).trans (Fintype.card_fin r).le
+          (fun i =>
+            (⟨
+               i.1.val,
+               by
+                 have hi := i.2
+                 by_contra hc
+                 simp [hc] at hi
+             ⟩
+              : Fin r))
+          ?_).trans (Fintype.card_fin r).le
         intro x y hxy
         apply Subtype.ext
         apply Fin.ext
@@ -217,30 +248,36 @@ theorem keyVanish : Formalism.CountingSumsFrames.KeyVanish := by
     · have h0 : t l i = 0 := ht l i (by omega)
       simp [hi, h0, zero_pow (hpne _)]
   · intro a t v ha ht hv
-    have hrow : ∀ c, ((Matrix.vecMul t (h.map fun x => x ^ p ^ a)) c) ^ p ^ (s - a) =
-        Matrix.vecMul (fun i => t i ^ p ^ (s - a)) (h.map fun x => x ^ p ^ s) c :=
-      fun c => frob_row h a s ha t c
+    have hrow
+        : ∀ c,
+          ((Matrix.vecMul t (h.map fun x => x ^ p ^ a)) c) ^ p ^ (s - a)
+            = Matrix.vecMul (fun i => t i ^ p ^ (s - a)) (h.map fun x => x ^ p ^ s) c := fun c =>
+      frob_row h a s ha t c
     simp_rw [hrow]
-    calc ∑ c, Matrix.vecMul (fun i => t i ^ p ^ (s - a)) (h.map fun x => x ^ p ^ s) c *
-          Matrix.vecMul v (Matrix.transpose (h.map fun x => x ^ p ^ s)⁻¹) c
-        = dotProduct (Matrix.vecMul (fun i => t i ^ p ^ (s - a)) (h.map fun x => x ^ p ^ s))
-            (Matrix.vecMul v (Matrix.transpose (h.map fun x => x ^ p ^ s)⁻¹)) := rfl
+    calc
+      ∑ c, Matrix.vecMul (fun i => t i ^ p ^ (s - a)) (h.map fun x => x ^ p ^ s) c *
+       Matrix.vecMul v (Matrix.transpose (h.map fun x => x ^ p ^ s)⁻¹) c
+          = dotProduct (Matrix.vecMul (fun i => t i ^ p ^ (s - a)) (h.map fun x => x ^ p ^ s))
+            (Matrix.vecMul v (Matrix.transpose (h.map fun x => x ^ p ^ s)⁻¹)) :=
+        rfl
       _ = dotProduct (fun i => t i ^ p ^ (s - a)) v := by
-          rw [Matrix.vecMul_transpose, Matrix.dotProduct_mulVec, Matrix.vecMul_vecMul,
-            Matrix.mul_nonsing_inv _ hHdet, Matrix.vecMul_one]
+        rw [Matrix.vecMul_transpose, Matrix.dotProduct_mulVec, Matrix.vecMul_vecMul,
+          Matrix.mul_nonsing_inv _ hHdet, Matrix.vecMul_one]
       _ = 0 := by
-          simp only [dotProduct]
-          refine Finset.sum_eq_zero fun i _ => ?_
-          by_cases hi : i.val < r
-          · simp [hv i hi]
-          · simp [ht i (by omega), zero_pow (hpne _)]
+        simp only [dotProduct]
+        refine Finset.sum_eq_zero fun i _ => ?_
+        by_cases hi : i.val < r
+        · simp [hv i hi]
+        · simp [ht i (by omega), zero_pow (hpne _)]
 theorem cleanInduction : Formalism.CountingSumsFrames.CleanInduction := by
   intro M _ Deg FF FF' hFF hFF' τ level spare sym raw o c' Q hdeg hsym hraw hstep S hS
   classical
-  have key : ∀ n : ℕ, ∀ x : τ, o + c' - level x ≤ n → o ≤ level x →
-      (2 * (Q : ℤ) + 1) * ((o : ℤ) + c' - 1 - level x) ≤ (spare x).1 →
-      ((o : ℤ) + c' - 1 - level x) ≤ (spare x).2 →
-      ∃ g ∈ Deg, g - sym x ∈ FF (o + c') ∧ g ∈ FF' (o + c') := by
+  have key
+      : ∀ n : ℕ, ∀ x : τ,
+        o + c' - level x ≤ n → o ≤ level x
+          → (2 * (Q : ℤ) + 1) * ((o : ℤ) + c' - 1 - level x) ≤ (spare x).1
+          → ((o : ℤ) + c' - 1 - level x) ≤ (spare x).2
+          → ∃ g ∈ Deg, g - sym x ∈ FF (o + c') ∧ g ∈ FF' (o + c') := by
     intro n
     induction n using Nat.strong_induction_on with
     | _ n ih =>
@@ -258,10 +295,13 @@ theorem cleanInduction : Formalism.CountingSumsFrames.CleanInduction := by
             push_cast at h2 ⊢
             linarith
         choose! gy hgyD hgyF hgyF' using hy
-        refine ⟨raw x - ∑ y ∈ ch, gy y, Deg.sub_mem (hdeg x).2 (sum_mem fun y hy => hgyD y hy), ?_, ?_⟩
+        refine
+          ⟨raw x - ∑ y ∈ ch, gy y, Deg.sub_mem (hdeg x).2 (sum_mem fun y hy => hgyD y hy), ?_, ?_⟩
         · have hrw : raw x - ∑ y ∈ ch, gy y - sym x = ρ - ∑ y ∈ ch, (gy y - sym y) := by
             rw [Finset.sum_sub_distrib]
-            calc raw x - ∑ y ∈ ch, gy y - sym x = (raw x - sym x) - ∑ y ∈ ch, gy y := by abel
+            calc
+              raw x - ∑ y ∈ ch, gy y - sym x
+                = (raw x - sym x) - ∑ y ∈ ch, gy y := by abel
               _ = (∑ y ∈ ch, sym y + ρ) - ∑ y ∈ ch, gy y := by rw [heq]
               _ = ρ - (∑ y ∈ ch, gy y - ∑ y ∈ ch, sym y) := by abel
           rw [hrw]
@@ -316,18 +356,20 @@ theorem lemma4Geom : Formalism.CountingSumsFrames.Lemma4Geom := by
   have hterm : ∀ m ∈ S, d m ≤ 2.02 * B * (1 / p ^ 2) ^ m := by
     intro m hm
     obtain ⟨_, _, hdm⟩ := hS m hm
-    calc d m ≤ 2.02 * a / p ^ (D0 + 2 * m) := hdm
+    calc
+      d m
+        ≤ 2.02 * a / p ^ (D0 + 2 * m) := hdm
       _ = 2.02 * (a / p ^ D0) * (1 / p ^ 2) ^ m := by
-          rw [pow_add, pow_mul, one_div_pow]
-          ring
+        rw [pow_add, pow_mul, one_div_pow]
+        ring
       _ ≤ 2.02 * B * (1 / p ^ 2) ^ m := by gcongr
   have h0S : 0 ∉ S := fun h => by have := (hS 0 h).1; omega
   have hgeom : ∑ m ∈ S, (1 / p ^ 2) ^ m ≤ 1 / (p ^ 2 - 1) := by
     have hsum := summable_geometric_of_lt_one hx0 hx1
     have h1 : ∑ m ∈ insert 0 S, (1 / p ^ 2) ^ m ≤ ∑' m : ℕ, (1 / p ^ 2) ^ m := by
       first
-        | exact hsum.sum_le_tsum _ (fun m _ => pow_nonneg hx0 m)
-        | exact sum_le_tsum _ (fun m _ => pow_nonneg hx0 m) hsum
+      | exact hsum.sum_le_tsum _ (fun m _ => pow_nonneg hx0 m)
+      | exact sum_le_tsum _ (fun m _ => pow_nonneg hx0 m) hsum
     rw [Finset.sum_insert h0S, pow_zero, tsum_geometric_of_lt_one hx0 hx1] at h1
     have h2 : (1 - 1 / p ^ 2)⁻¹ - 1 = 1 / (p ^ 2 - 1) := by
       have hp2' : p ^ 2 - 1 ≠ 0 := by linarith
@@ -336,7 +378,9 @@ theorem lemma4Geom : Formalism.CountingSumsFrames.Lemma4Geom := by
       ring
     linarith
   refine ⟨?_, ?_⟩
-  · calc ∑ m ∈ S, d m ≤ ∑ m ∈ S, 2.02 * B * (1 / p ^ 2) ^ m := Finset.sum_le_sum hterm
+  · calc
+      ∑ m ∈ S, d m
+        ≤ ∑ m ∈ S, 2.02 * B * (1 / p ^ 2) ^ m := Finset.sum_le_sum hterm
       _ = 2.02 * B * ∑ m ∈ S, (1 / p ^ 2) ^ m := by rw [Finset.mul_sum]
       _ ≤ 2.02 * B * (1 / (p ^ 2 - 1)) := by gcongr
       _ = 2.02 * B / (p ^ 2 - 1) := by ring
@@ -348,10 +392,11 @@ theorem lemma4Arith : Formalism.CountingSumsFrames.Lemma4Arith := by
 theorem lemma4Count : Formalism.CountingSumsFrames.Lemma4Count := by
   intro N1 ntops m kQ c' al h
   have h1 := Nat.mul_le_mul_right (m + kQ + c') h
-  calc ntops * (m + kQ + c') + (c' * al + 2 * c') ≤ N1 * (m + kQ + c') + (c' * al + 2 * c') :=
-        Nat.add_le_add_right h1 _
+  calc
+    ntops * (m + kQ + c') + (c' * al + 2 * c')
+      ≤ N1 * (m + kQ + c') + (c' * al + 2 * c') := Nat.add_le_add_right h1 _
     _ ≤ N1 * (m + kQ + c') + (c' * al + 2 * c') + (N1 * (c' * al + 2 * c') + (m + kQ + c')) :=
-        Nat.le_add_right _ _
+      Nat.le_add_right _ _
     _ = (N1 + 1) * (m + kQ + c' * al + 3 * c') := by ring
 
 end Formalism.CountingSumsFrames.Top

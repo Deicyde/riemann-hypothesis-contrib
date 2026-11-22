@@ -153,7 +153,15 @@ lemma mellin_sum {ι : Type} [Countable ι] {a : ι → ℂ} {N : ι → ℝ} {w
   simp_rw [hGi]
   rw [tsum_mul_right, mul_comm]
 
-theorem exists_entire_mellin : ∀ (ι : Type) [Countable ι] (a : ι → ℂ) (N : ι → ℝ) (R : ℂ) (wt : ℝ → ℂ), ContDiff ℝ ∞ wt → (∃ a b : ℝ, 0 < a ∧ ∀ y, wt y ≠ 0 → a ≤ y ∧ y ≤ b) → (∀ i, a i ≠ 0 → 1 ≤ N i) → (∀ σ : ℝ, 1 < σ → Summable fun i => ‖a i‖ * N i ^ (-σ)) → (∀ A : ℕ, ∃ C : ℝ, ∀ t : ℝ, 0 < t → t ≤ 1 → ‖∑' i, a i * wt (t * N i) - R / (t : ℂ)‖ ≤ C * t ^ A) → ∃ Z : ℂ → ℂ, Differentiable ℂ Z ∧ Z 1 = R ∧ ∀ s : ℂ, 1 < s.re → Z s = mellin wt s * ((s - 1) * ∑' i, a i * (N i : ℂ) ^ (-s)) := by
+theorem exists_entire_mellin
+    : ∀ (ι : Type) [Countable ι] (a : ι → ℂ) (N : ι → ℝ) (R : ℂ) (wt : ℝ → ℂ),
+      ContDiff ℝ ∞ wt → (∃ a b : ℝ, 0 < a ∧ ∀ y, wt y ≠ 0 → a ≤ y ∧ y ≤ b)
+        → (∀ i, a i ≠ 0 → 1 ≤ N i) → (∀ σ : ℝ, 1 < σ → Summable fun i => ‖a i‖ * N i ^ (-σ))
+        → (∀ A : ℕ, ∃ C : ℝ, ∀ t : ℝ,
+          0 < t → t ≤ 1 → ‖∑' i, a i * wt (t * N i) - R / (t : ℂ)‖ ≤ C * t ^ A)
+        → ∃ Z : ℂ → ℂ,
+          Differentiable ℂ Z ∧ Z 1 = R
+            ∧ ∀ s : ℂ, 1 < s.re → Z s = mellin wt s * ((s - 1) * ∑' i, a i * (N i : ℂ) ^ (-s)) := by
   intro ι _ a N R wt hwt hsupp0 hN hsum hasym
   obtain ⟨α, β, hα, hsupp⟩ := hsupp0
   have hc : Continuous wt := hwt.continuous
@@ -214,7 +222,8 @@ theorem exists_entire_mellin : ∀ (ι : Type) [Countable ι] (a : ι → ℂ) (
   have hHconv : ∀ s : ℂ, MellinConvergent H s := by
     intro s
     obtain ⟨b, hb, hbO⟩ := hbot' s
-    exact mellinConvergent_of_isBigO_rpow (a := s.re + 1) (b := b) hHloc (htop _) (by linarith) hbO hb
+    exact mellinConvergent_of_isBigO_rpow (a := s.re + 1) (b := b) hHloc (htop _) (by linarith) hbO
+      hb
   have hdiff : Differentiable ℂ (mellin H) := by
     intro s
     obtain ⟨b, hb, hbO⟩ := hbot' s

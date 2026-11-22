@@ -6,8 +6,7 @@ public import Mathlib.LinearAlgebra.Vandermonde
 
 @[expose] public section
 
-theorem UpperTheory.V.Pr.expSums :
-    UpperTheory.V.Pr.ExpSums := by
+theorem UpperTheory.V.Pr.expSums : UpperTheory.V.Pr.ExpSums := by
   intro κ ι σ _ _ _ α c hα hc
   classical
   by_contra hne
@@ -22,15 +21,18 @@ theorem UpperTheory.V.Pr.expSums :
     refine hα s (e i) (e j) (fun h' => h (e.injective h')) a ha ?_
     apply Units.ext
     simpa using hij
-  have h0 := Matrix.eq_zero_of_forall_pow_sum_mul_pow_eq_zero
-    (v := fun j => c s (e j) * ((α s (e j) : κˣ) : κ) ^ b) hinj (by
-      intro i
-      have h1 := hC (a • (i : ℕ) + b)
-      rw [hs i (Finset.mem_range.2 i.2), ← e.sum_comp] at h1
-      rw [← h1]
-      refine Finset.sum_congr rfl fun j _ => ?_
-      rw [smul_eq_mul, pow_add, pow_mul]
-      ring)
+  have h0 :=
+    Matrix.eq_zero_of_forall_pow_sum_mul_pow_eq_zero
+      (v := fun j => c s (e j) * ((α s (e j) : κˣ) : κ) ^ b)
+      hinj
+      (by
+        intro i
+        have h1 := hC (a • (i : ℕ) + b)
+        rw [hs i (Finset.mem_range.2 i.2), ← e.sum_comp] at h1
+        rw [← h1]
+        refine Finset.sum_congr rfl fun j _ => ?_
+        rw [smul_eq_mul, pow_add, pow_mul]
+        ring)
   obtain ⟨i, hi⟩ := hc s
   have h2 := congrFun h0 (e.symm i)
   simp only [Equiv.apply_symm_apply, Pi.zero_apply, mul_eq_zero] at h2

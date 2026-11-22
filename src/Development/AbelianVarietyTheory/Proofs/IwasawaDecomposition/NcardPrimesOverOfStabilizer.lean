@@ -13,8 +13,8 @@ open scoped TensorProduct Pointwise
 
 namespace GlobalTheory.HostSplit
 
-theorem jacobiSym_neg_eq_one {r p : ℕ} (hr : r % 2 = 1) (h4 : p % 4 = 1) (h1 : p % r = 1) :
-    jacobiSym (-(r : ℤ)) p = 1 := by
+theorem jacobiSym_neg_eq_one {r p : ℕ} (hr : r % 2 = 1) (h4 : p % 4 = 1) (h1 : p % r = 1)
+    : jacobiSym (-(r : ℤ)) p = 1 := by
   have hgo : Odd p := Nat.odd_iff.mpr (by omega)
   have hdo : Odd r := Nat.odd_iff.mpr hr
   rw [jacobiSym.neg _ hgo, ZMod.χ₄_nat_one_mod_four h4, one_mul,
@@ -24,15 +24,16 @@ theorem jacobiSym_neg_eq_one {r p : ℕ} (hr : r % 2 = 1) (h4 : p % 4 = 1) (h1 :
     rfl
   rw [h2, jacobiSym.one_left]
 
-theorem ncard_placesOver (E : Type) [Field E] [NumberField E] {p : ℕ} (hp : p.Prime) :
-    (placesOver E p).ncard = (Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 E)).ncard := by
+theorem ncard_placesOver (E : Type) [Field E] [NumberField E] {p : ℕ} (hp : p.Prime)
+    : (placesOver E p).ncard = (Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 E)).ncard := by
   have hmax : (Ideal.span {(p : ℤ)}).IsMaximal :=
     PrincipalIdealRing.isMaximal_of_irreducible (Nat.prime_iff_prime_int.mp hp).irreducible
   have hp0 : Ideal.span {(p : ℤ)} ≠ ⊥ := by
     rw [Ne, Ideal.span_singleton_eq_bot]
     exact_mod_cast hp.ne_zero
-  have himg : HeightOneSpectrum.asIdeal '' placesOver E p =
-      Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 E) := by
+  have himg
+      : HeightOneSpectrum.asIdeal '' placesOver E p
+        = Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 E) := by
     ext P
     constructor
     · rintro ⟨v, hv, rfl⟩
@@ -52,12 +53,14 @@ theorem ncard_placesOver (E : Type) [Field E] [NumberField E] {p : ℕ} (hp : p.
       exact h4
   rw [← himg, Set.ncard_image_of_injective _ (fun v w hvw => HeightOneSpectrum.ext hvw)]
 
-theorem ncard_primesOver_of_stabilizer (E : Type) [Field E] [NumberField E] [IsGalois ℚ E] (p : ℕ)
-    (P : Ideal (𝓞 E)) [P.IsPrime] [P.LiesOver (Ideal.span {(p : ℤ)})]
-    (h : ∀ σ : E ≃ₐ[ℚ] E, σ ∈ MulAction.stabilizer (E ≃ₐ[ℚ] E) P → σ = 1) :
-    (Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 E)).ncard = Module.finrank ℚ E := by
+theorem ncard_primesOver_of_stabilizer
+    (E : Type) [Field E] [NumberField E] [IsGalois ℚ E]
+    (p : ℕ) (P : Ideal (𝓞 E)) [P.IsPrime] [P.LiesOver (Ideal.span {(p : ℤ)})]
+    (h : ∀ σ : E ≃ₐ[ℚ] E, σ ∈ MulAction.stabilizer (E ≃ₐ[ℚ] E) P → σ = 1)
+    : (Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 E)).ncard = Module.finrank ℚ E := by
   have : IsGaloisGroup (E ≃ₐ[ℚ] E) ℤ (𝓞 E) := IsGaloisGroup.of_isFractionRing _ _ _ ℚ E
-  have hr : Set.range (fun σ : E ≃ₐ[ℚ] E => σ • P) = Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 E) := by
+  have hr
+      : Set.range (fun σ : E ≃ₐ[ℚ] E => σ • P) = Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 E) := by
     ext Q
     constructor
     · rintro ⟨σ, rfl⟩
@@ -74,15 +77,18 @@ theorem ncard_primesOver_of_stabilizer (E : Type) [Field E] [NumberField E] [IsG
     exact (inv_mul_eq_one.mp h1).symm
   rw [← hr, Set.ncard_range_of_injective hinj, IsGalois.card_aut_eq_finrank]
 
-theorem split_of_one_mod : ∀ (R : Ranks) (H : Host R) (p : ℕ), p.Prime → p % (H.QS * H.q * H.d) = 1 →
-    (placesOver H.E p).ncard = Module.finrank ℚ H.E ∧ H.cls p = PrimeClass.splitK := by
+theorem split_of_one_mod
+    : ∀ (R : Ranks) (H : Host R) (p : ℕ),
+      p.Prime → p % (H.QS * H.q * H.d) = 1
+        → (placesOver H.E p).ncard = Module.finrank ℚ H.E ∧ H.cls p = PrimeClass.splitK := by
   intro R H p hp hc
   have hd16 : H.d % 16 = 7 := H.hyp.2.2.2.1
   have hmod : ∀ m : ℕ, 1 < m → m ∣ H.QS * H.q * H.d → p % m = 1 := by
     intro m hm hdv
     rw [← Nat.mod_mod_of_dvd p hdv, hc]
     exact Nat.mod_eq_of_lt hm
-  have h4Q : 4 ∣ H.QS := (show (2 : ℕ) ^ 2 ∣ 2 ^ (R.e + 2) from pow_dvd_pow 2 (by omega)).trans H.tower_dvd
+  have h4Q : 4 ∣ H.QS :=
+    (show (2 : ℕ) ^ 2 ∣ 2 ^ (R.e + 2) from pow_dvd_pow 2 (by omega)).trans H.tower_dvd
   have h4 : p % 4 = 1 := hmod 4 (by norm_num) ((h4Q.mul_right _).mul_right _)
   have hd : p % H.d = 1 := hmod _ (by omega) (dvd_mul_left _ _)
   have hnd : ∀ m : ℕ, m ∣ H.QS * H.q * H.d → ¬ p ∣ m := by
@@ -100,7 +106,8 @@ theorem split_of_one_mod : ∀ (R : Ranks) (H : Host R) (p : ℕ), p.Prime → p
   · have : Fact p.Prime := ⟨hp⟩
     have hG : IsGalois ℚ H.E := H.galois
     have := Formalism.FrobeniusOrbits.SplitK.span_prime p
-    obtain ⟨⟨P, hP1, hP2⟩⟩ := (inferInstance : Nonempty (Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 H.E)))
+    obtain ⟨⟨P, hP1, hP2⟩⟩ :=
+      (inferInstance : Nonempty (Ideal.primesOver (Ideal.span {(p : ℤ)}) (𝓞 H.E)))
     obtain ⟨-, hF, -, hI⟩ := H.der.frob p hN P
     have h1 : IsArithFrobAt ℤ (1 : H.E ≃ₐ[ℚ] H.E) P := by
       refine (hF 1 1 ?_).2 (by rw [map_one, map_one])

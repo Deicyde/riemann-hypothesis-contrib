@@ -13,8 +13,9 @@ namespace Formalism.L2.FormalSeriesBounds.RF
 
 open Formalism.IncomingBounds Formalism.L2.Pj
 
-theorem pderiv_comm' {σ R : Type} [CommRing R] (i j : σ) (p : MvPolynomial σ R) :
-    MvPolynomial.pderiv i (MvPolynomial.pderiv j p) = MvPolynomial.pderiv j (MvPolynomial.pderiv i p) := by
+theorem pderiv_comm' {σ R : Type} [CommRing R] (i j : σ) (p : MvPolynomial σ R)
+    : MvPolynomial.pderiv i (MvPolynomial.pderiv j p)
+      = MvPolynomial.pderiv j (MvPolynomial.pderiv i p) := by
   induction p using MvPolynomial.induction_on' with
   | monomial s a =>
     simp only [MvPolynomial.pderiv_monomial]
@@ -23,18 +24,24 @@ theorem pderiv_comm' {σ R : Type} [CommRing R] (i j : σ) (p : MvPolynomial σ 
       rfl
     · congr 1
       · rw [tsub_right_comm]
-      · simp only [Finsupp.coe_tsub, Pi.sub_apply, Finsupp.single_apply, if_neg hij, if_neg (Ne.symm hij),
-          tsub_zero]
+      · simp only [Finsupp.coe_tsub, Pi.sub_apply, Finsupp.single_apply, if_neg hij,
+          if_neg (Ne.symm hij), tsub_zero]
         ring
   | add p q hp hq => simp only [map_add (f := _), hp, hq]
 
 section One
 
-variable {C : Type} [Field C] {V : VF C} {d : ℕ} [NeZero d] {I J : Fin 2 → Type} [∀ g, Fintype (I g)] [∀ g, Fintype (J g)]
+variable
+  {C : Type} [Field C]
+  {V : VF C} {d : ℕ} [NeZero d]
+  {I J : Fin 2 → Type} [∀ g, Fintype (I g)] [∀ g, Fintype (J g)]
 
-theorem no_conj_of_rowsOK {G : ∀ g, Cart V d (I g) (J g)} {alt : Prop} {N : ℕ} {P : MvPolynomial (Fin N × WV I) C}
-    {kind : Fin N → Knd d} (h : RowsOK G alt P kind) {ρ : Fin N} {w w' : WV I} (hw : (ρ, w) ∈ P.vars)
-    (hw' : (ρ, w') ∈ P.vars) (hg : w.1 ≠ w'.1) (ht : tyW G w = tyW G w') : False := by
+theorem no_conj_of_rowsOK
+    {G : ∀ g, Cart V d (I g) (J g)} {alt : Prop} {N : ℕ} {P : MvPolynomial (Fin N × WV I) C}
+    {kind : Fin N → Knd d} (h : RowsOK G alt P kind)
+    {ρ : Fin N} {w w' : WV I}
+    (hw : (ρ, w) ∈ P.vars) (hw' : (ρ, w') ∈ P.vars) (hg : w.1 ≠ w'.1) (ht : tyW G w = tyW G w')
+    : False := by
   obtain ⟨h1, h2⟩ := h
   rw [MvPolynomial.mem_vars_iff_mem_support] at hw hw'
   obtain ⟨μ, hμ, hμw⟩ := hw
@@ -59,9 +66,10 @@ theorem no_conj_of_rowsOK {G : ∀ g, Cart V d (I g) (J g)} {alt : Prop} {N : �
 
 variable (X : RowData C V d I J) (F : Flag X)
 
-theorem exists_rowsOK (hdich : X.Alt ∨ ∀ a, X.big 0 a) (hj : X.j' < X.n) (b : GlobalTheory d)
-    (hwt : ∀ g a k, b.wt X g a k ≠ 0 → k ≤ X.rkF g a) :
-    ∃ kind : Fin (b.what₂ X.n) → Knd d, RowsOK X.G X.Alt (b.poly X F) kind := by
+theorem exists_rowsOK
+    (hdich : X.Alt ∨ ∀ a, X.big 0 a) (hj : X.j' < X.n)
+    (b : GlobalTheory d) (hwt : ∀ g a k, b.wt X g a k ≠ 0 → k ≤ X.rkF g a)
+    : ∃ kind : Fin (b.what₂ X.n) → Knd d, RowsOK X.G X.Alt (b.poly X F) kind := by
   cases b with
   | ch g a u =>
     refine ⟨(GlobalTheory.ch g a u).kind X.n, (rowsOK_iff _ _ _ _).2 ⟨?_, ?_⟩⟩
@@ -115,19 +123,28 @@ end One
 
 section Fam
 
-variable {C : Type} [Field C] {V : VF C} {d : ℕ} [NeZero d] {T : Type} {r : T → ℕ} {cc : T → T} {a : T → ℕ → ℕ}
-  {Orb : Type} [Fintype Orb] {tau : Orb → Fin 2 → ZMod d → T} {J : Orb → Fin 2 → Type} [∀ o g, Fintype (J o g)]
+variable
+  {C : Type} [Field C]
+  {V : VF C} {d : ℕ} [NeZero d]
+  {T : Type} {r : T → ℕ} {cc : T → T} {a : T → ℕ → ℕ} {Orb : Type} [Fintype Orb]
+  {tau : Orb → Fin 2 → ZMod d → T} {J : Orb → Fin 2 → Type} [∀ o g, Fintype (J o g)]
   {X : ∀ o, RowData C V d (IIof r tau o) (J o)} {F : ∀ o, Flag (X o)} {Z : Finset Orb}
   {ga : Orb → Fin 2 → ZMod d → ℕ → ℕ} {n : ℕ} {L : Orb → List (GlobalTheory d × ℝ)}
   {pl : (Σ o, Σ i : Fin (L o).length, Fin (rowsAt (X := X) L o i)) → Fin n}
 
 end Fam
 
-theorem lap_one_apply {T : Type} (r : T → ℕ) (n : ℕ) (C : Type) [Field C] (τ τ' : T) (a : Fin (r τ)) (a' : Fin (r τ'))
-    (P : MvPolynomial (Letter T r n) C) :
-    lap r n C 1 τ τ' a a' P = ∑ b, ∑ b', (1 : Matrix (Fin n) (Fin n) C) b b' •
-      MvPolynomial.pderiv (⟨τ, a, b⟩ : Letter T r n) (MvPolynomial.pderiv (⟨τ', a', b'⟩ : Letter T r n) P) := by
-  simp only [lap, LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.comp_apply]
-  rfl
+theorem lap_one_apply
+    {T : Type} (r : T → ℕ)
+    (n : ℕ)
+    (C : Type) [Field C]
+    (τ τ' : T) (a : Fin (r τ)) (a' : Fin (r τ'))
+    (P : MvPolynomial (Letter T r n) C)
+    : lap r n C 1 τ τ' a a' P
+      = ∑ b, ∑ b', (1 : Matrix (Fin n) (Fin n) C) b b' •
+        MvPolynomial.pderiv (⟨τ, a, b⟩ : Letter T r n) (MvPolynomial.pderiv (⟨τ', a', b'⟩ : Letter T r n) P) :=
+  by
+    simp only [lap, LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.comp_apply]
+    rfl
 
 end Formalism.L2.FormalSeriesBounds.RF

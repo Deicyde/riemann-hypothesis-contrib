@@ -9,31 +9,49 @@ open MeasureTheory Matrix
 
 namespace GlobalTheory
 
-theorem typeFunction_unip_add {K : Type} [Field K] {ι : Type} [Fintype ι] [DecidableEq ι]
+theorem typeFunction_unip_add
+    {K : Type} [Field K]
+    {ι : Type} [Fintype ι] [DecidableEq ι]
     {a b : ℕ} (e : ι ≃ Fin a ⊕ Fin b) (u : (Fin a → Fin b → K) → GL ι K)
-    (hu : ∀ X, (u X : Matrix ι ι K) =
-      Matrix.reindex e.symm e.symm (Matrix.fromBlocks 1 (Matrix.of X) 0 1))
-    (X Y : Fin a → Fin b → K) : u (Y + X) = u X * u Y := by
+    (hu : ∀ X,
+      (u X : Matrix ι ι K) = Matrix.reindex e.symm e.symm (Matrix.fromBlocks 1 (Matrix.of X) 0 1))
+    (X Y : Fin a → Fin b → K)
+    : u (Y + X) = u X * u Y := by
   apply Units.ext
   rw [Units.val_mul, hu, hu, hu]
   simp only [Matrix.reindex_apply, Equiv.symm_symm]
   rw [Matrix.submatrix_mul_equiv, Matrix.fromBlocks_multiply]
   simp [Matrix.of_add_of]
 
-theorem typeFunction_constantTerm_eq_zero :
-  ∀ (K : Type) [Field K] [TopologicalSpace K] [IsTopologicalRing K] [LocallyCompactSpace K] [MeasurableSpace K] [BorelSpace K]
-  (ι : Type) [Fintype ι] [DecidableEq ι] (J : Subgroup (GL ι K)), IsOpen (J : Set (GL ι K)) → IsCompact (J : Set (GL ι K)) →
-  ∀ χ : J →* ℂˣ, IsOpen (χ.ker : Set J) →
-  (∀ (a b : ℕ) (e : ι ≃ Fin a ⊕ Fin b), 0 < a → 0 < b → ∀ u : (Fin a → Fin b → K) → GL ι K,
-      (∀ X, (u X : Matrix ι ι K) = Matrix.reindex e.symm e.symm (Matrix.fromBlocks 1 (Matrix.of X) 0 1)) →
-      ∀ h : GL ι K, ∃ X, ∃ hX : h⁻¹ * u X * h ∈ J, χ ⟨_, hX⟩ ≠ 1) →
-  ∀ f : GL ι K → ℂ, (∀ g (hg : g ∈ J), f g = (((χ ⟨g, hg⟩)⁻¹ : ℂˣ) : ℂ)) → (∀ g, g ∉ J → f g = 0) →
-  IsLocallyConstant f ∧ HasCompactSupport f ∧
-  (∀ x ∈ (χ.ker.map J.subtype), ∀ y ∈ (χ.ker.map J.subtype), ∀ g, f (x * g * y) = f g) ∧
-  (∀ (a b : ℕ) (e : ι ≃ Fin a ⊕ Fin b), 0 < a → 0 < b → ∀ (μ : Measure (Fin a → Fin b → K)), μ.IsAddHaarMeasure →
-    ∀ u : (Fin a → Fin b → K) → GL ι K,
-      (∀ X, (u X : Matrix ι ι K) = Matrix.reindex e.symm e.symm (Matrix.fromBlocks 1 (Matrix.of X) 0 1)) →
-      ∀ g h : GL ι K, ∫ X, f (g * (h⁻¹ * u X * h)) ∂μ = 0) := by
+theorem typeFunction_constantTerm_eq_zero
+    : ∀ (K : Type) [Field K] [TopologicalSpace K] [IsTopologicalRing K] [LocallyCompactSpace K]
+        [MeasurableSpace K] [BorelSpace K] (ι : Type) [Fintype ι] [DecidableEq ι]
+        (J : Subgroup (GL ι K)),
+      IsOpen (J : Set (GL ι K)) → IsCompact (J : Set (GL ι K))
+        → ∀ χ : J →* ℂˣ,
+          IsOpen (χ.ker : Set J)
+            → (∀ (a b : ℕ) (e : ι ≃ Fin a ⊕ Fin b),
+              0 < a → 0 < b
+                → ∀ u : (Fin a → Fin b → K) → GL ι K,
+                  (∀ X,
+                      (u X : Matrix ι ι K)
+                        = Matrix.reindex e.symm e.symm (Matrix.fromBlocks 1 (Matrix.of X) 0 1))
+                    → ∀ h : GL ι K, ∃ X, ∃ hX : h⁻¹ * u X * h ∈ J, χ ⟨_, hX⟩ ≠ 1)
+            → ∀ f : GL ι K → ℂ,
+              (∀ g (hg : g ∈ J), f g = (((χ ⟨g, hg⟩)⁻¹ : ℂˣ) : ℂ)) → (∀ g, g ∉ J → f g = 0)
+                → IsLocallyConstant f ∧ HasCompactSupport f
+                  ∧ (∀ x ∈ (χ.ker.map J.subtype), ∀ y ∈ (χ.ker.map J.subtype), ∀ g,
+                    f (x * g * y) = f g)
+                  ∧ (∀ (a b : ℕ) (e : ι ≃ Fin a ⊕ Fin b),
+                    0 < a → 0 < b
+                      → ∀ (μ : Measure (Fin a → Fin b → K)),
+                        μ.IsAddHaarMeasure
+                          → ∀ u : (Fin a → Fin b → K) → GL ι K,
+                            (∀ X,
+                                (u X : Matrix ι ι K)
+                                  = Matrix.reindex e.symm e.symm
+                                    (Matrix.fromBlocks 1 (Matrix.of X) 0 1))
+                              → ∀ g h : GL ι K, ∫ X, f (g * (h⁻¹ * u X * h)) ∂μ = 0) := by
   intro K _ _ _ _ _ _ ι _ _ J hJo hJc χ hχ hnt f hf1 hf0
   have hR : ∀ g j (hj : j ∈ J), f (g * j) = f g * (((χ ⟨j, hj⟩)⁻¹ : ℂˣ) : ℂ) := by
     intro g j hj
@@ -67,8 +85,12 @@ theorem typeFunction_constantTerm_eq_zero :
   refine ⟨?_, ?_, ?_, ?_⟩
   · rw [IsLocallyConstant.iff_exists_open]
     intro g
-    refine ⟨(fun x => g⁻¹ * x) ⁻¹' ((χ.ker.map J.subtype : Subgroup (GL ι K)) : Set (GL ι K)),
-      hNo.preimage (continuous_const.mul continuous_id), ?_, ?_⟩
+    refine ⟨
+      (fun x => g⁻¹ * x) ⁻¹' ((χ.ker.map J.subtype : Subgroup (GL ι K)) : Set (GL ι K)),
+      hNo.preimage (continuous_const.mul continuous_id),
+      ?_,
+      ?_
+    ⟩
     · simp only [Set.mem_preimage, inv_mul_cancel, SetLike.mem_coe]
       exact Subgroup.one_mem _
     · intro x hx
@@ -79,8 +101,9 @@ theorem typeFunction_constantTerm_eq_zero :
     rw [hRk y hy, hLk x hx]
   · intro a b e ha hb μ hμ u hu g h
     obtain ⟨Y, hY, hne⟩ := hnt a b e ha hb u hu h
-    have key : ∀ X, f (g * (h⁻¹ * u (Y + X) * h)) =
-        f (g * (h⁻¹ * u X * h)) * (((χ ⟨_, hY⟩)⁻¹ : ℂˣ) : ℂ) := by
+    have key
+        : ∀ X,
+          f (g * (h⁻¹ * u (Y + X) * h)) = f (g * (h⁻¹ * u X * h)) * (((χ ⟨_, hY⟩)⁻¹ : ℂˣ) : ℂ) := by
       intro X
       rw [← hR _ _ hY, typeFunction_unip_add e u hu]
       congr 1

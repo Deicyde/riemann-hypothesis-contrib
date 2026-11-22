@@ -10,8 +10,9 @@ open MvPolynomial Formalism.GradedWeylDivisibility Formalism.BasicNotions Global
 
 namespace GlobalTheory.Alc
 
-theorem natCast_eq_le_prime {p n m : ℕ} (hp : 0 < p) (hn : n ≤ p) (hm : m ≤ p)
-    (h : (n : ZMod p) = (m : ZMod p)) : n = m ∨ (n = 0 ∧ m = p) ∨ (n = p ∧ m = 0) := by
+theorem natCast_eq_le_prime
+    {p n m : ℕ} (hp : 0 < p) (hn : n ≤ p) (hm : m ≤ p) (h : (n : ZMod p) = (m : ZMod p))
+    : n = m ∨ (n = 0 ∧ m = p) ∨ (n = p ∧ m = 0) := by
   have h' : n % p = m % p := (ZMod.natCast_eq_natCast_iff' n m p).1 h
   rcases hn.eq_or_lt with rfl | hn' <;> rcases hm.eq_or_lt with rfl | hm'
   · exact Or.inl rfl
@@ -22,12 +23,17 @@ theorem natCast_eq_le_prime {p n m : ℕ} (hp : 0 < p) (hn : n ≤ p) (hm : m �
   · rw [Nat.mod_eq_of_lt hn', Nat.mod_eq_of_lt hm'] at h'
     exact Or.inl h'
 
-theorem eq_of_shifted_residues_eq :
-    ∀ (p N : ℕ), p.Prime → ∀ (ν μ : Fin N → ℕ), Antitone ν → Antitone μ →
-      (∀ h : 0 < N, ν ⟨N - 1, by omega⟩ = 0 ∧ μ ⟨0, h⟩ ≤ ν ⟨0, h⟩ ∧ ν ⟨0, h⟩ + (N - 1) ≤ p) →
-      (∀ x : ZMod p, (Finset.univ.filter fun i : Fin N => ((ν i + (N - 1 - i.val) : ℕ) : ZMod p) = x).card
-        = (Finset.univ.filter fun i : Fin N => ((μ i + (N - 1 - i.val) : ℕ) : ZMod p) = x).card) →
-      μ = ν := by
+theorem eq_of_shifted_residues_eq
+    : ∀ (p N : ℕ),
+      p.Prime
+        → ∀ (ν μ : Fin N → ℕ),
+          Antitone ν → Antitone μ
+            → (∀ h : 0 < N, ν ⟨N - 1, by omega⟩ = 0 ∧ μ ⟨0, h⟩ ≤ ν ⟨0, h⟩ ∧ ν ⟨0, h⟩ + (N - 1) ≤ p)
+            → (∀ x : ZMod p,
+              (Finset.univ.filter fun i : Fin N => ((ν i + (N - 1 - i.val) : ℕ) : ZMod p) = x).card
+                = (Finset.univ.filter fun i : Fin N =>
+                  ((μ i + (N - 1 - i.val) : ℕ) : ZMod p) = x).card)
+            → μ = ν := by
   intro p N hp ν μ hν hμ h hc
   rcases Nat.eq_zero_or_pos N with rfl | hN
   · funext i; exact i.elim0
@@ -35,8 +41,11 @@ theorem eq_of_shifted_residues_eq :
   have hp0 : 0 < p := hp.pos
   let a : Fin N → ℕ := fun i => ν i + (N - 1 - i.val)
   let b : Fin N → ℕ := fun i => μ i + (N - 1 - i.val)
-  have hc' : ∀ x : ZMod p, (Finset.univ.filter fun i : Fin N => ((a i : ℕ) : ZMod p) = x).card
-      = (Finset.univ.filter fun i : Fin N => ((b i : ℕ) : ZMod p) = x).card := hc
+  have hc'
+      : ∀ x : ZMod p,
+        (Finset.univ.filter fun i : Fin N => ((a i : ℕ) : ZMod p) = x).card
+          = (Finset.univ.filter fun i : Fin N => ((b i : ℕ) : ZMod p) = x).card :=
+    hc
   have ha : StrictAnti a := by
     intro i j hij
     have h4 := hν hij.le
@@ -55,7 +64,8 @@ theorem eq_of_shifted_residues_eq :
   let l : Fin N := ⟨N - 1, by omega⟩
   have hal : a l = 0 := by
     show ν ⟨N - 1, _⟩ + (N - 1 - (N - 1)) = 0
-    rw [h1]; omega
+    rw [h1]
+    omega
   have haz : a z ≤ p := by
     show ν ⟨0, hN⟩ + (N - 1 - 0) ≤ p
     omega
@@ -92,7 +102,8 @@ theorem eq_of_shifted_residues_eq :
 
   have sub : ∀ i, ∃ j, b j = a i := by
     intro i
-    have hpos : 0 < (Finset.univ.filter fun k : Fin N => ((a k : ℕ) : ZMod p) = (a i : ZMod p)).card :=
+    have hpos
+        : 0 < (Finset.univ.filter fun k : Fin N => ((a k : ℕ) : ZMod p) = (a i : ZMod p)).card :=
       Finset.card_pos.2 ⟨i, by simp⟩
     rw [hc' (a i : ZMod p)] at hpos
     obtain ⟨j, hj⟩ := Finset.card_pos.1 hpos

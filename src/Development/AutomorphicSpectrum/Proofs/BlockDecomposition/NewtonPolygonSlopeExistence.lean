@@ -5,13 +5,16 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison CrystallineSemistableComparison.R
+open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison
+  CrystallineSemistableComparison.R
 
 namespace GlobalTheory.CompanionTheory.NewtonSlope
 
-theorem exists_dvd_all {S ι : Type} [CommRing S] (T : Finset ι) (hT : T.Nonempty) (r : ι → S)
-    (hc : ∀ i ∈ T, ∀ j ∈ T, r i ∣ r j ∨ r j ∣ r i) :
-    ∃ i₀ ∈ T, ∀ j ∈ T, r j ∣ r i₀ := by
+theorem exists_dvd_all
+    {S ι : Type} [CommRing S]
+    (T : Finset ι) (hT : T.Nonempty)
+    (r : ι → S) (hc : ∀ i ∈ T, ∀ j ∈ T, r i ∣ r j ∨ r j ∣ r i)
+    : ∃ i₀ ∈ T, ∀ j ∈ T, r j ∣ r i₀ := by
   classical
   revert hT hc
   refine Finset.induction_on T ?_ ?_
@@ -26,8 +29,8 @@ theorem exists_dvd_all {S ι : Type} [CommRing S] (T : Finset ι) (hT : T.Nonemp
       rcases hj with rfl | hj
       · exact dvd_refl _
       · exact absurd hj (Finset.notMem_empty j)
-    · obtain ⟨i₀, hi₀, hmax⟩ := ih hs (fun i hi j hj =>
-        hc i (Finset.mem_insert_of_mem hi) j (Finset.mem_insert_of_mem hj))
+    · obtain ⟨i₀, hi₀, hmax⟩ :=
+        ih hs (fun i hi j hj => hc i (Finset.mem_insert_of_mem hi) j (Finset.mem_insert_of_mem hj))
       rcases hc a (Finset.mem_insert_self a s) i₀ (Finset.mem_insert_of_mem hi₀) with h | h
       · refine ⟨i₀, Finset.mem_insert_of_mem hi₀, ?_⟩
         intro j hj
@@ -40,16 +43,21 @@ theorem exists_dvd_all {S ι : Type} [CommRing S] (T : Finset ι) (hT : T.Nonemp
         · exact dvd_refl _
         · exact (hmax j hj).trans h
 
-theorem dich_of_dvd {S : Type} [CommRing S] {ϖ : S} (hD : Dich ϖ) {a b : S} {M : ℕ}
-    (h : a ∣ ϖ ^ M) : b ∣ a ∨ a ∣ b := by
+theorem dich_of_dvd {S : Type} [CommRing S] {ϖ : S} (hD : Dich ϖ) {a b : S} {M : ℕ} (h : a ∣ ϖ ^ M)
+    : b ∣ a ∨ a ∣ b := by
   obtain ⟨k, hk⟩ := h
   refine hD a b ⟨M, ?_⟩
   rw [hk]
   exact Ideal.mul_mem_right k _ (Ideal.subset_span (by simp))
 
-theorem first_slope : ∀ {S : Type} [CommRing S] (ϖ : S), Dich ϖ → Roots ϖ → ∀ (q : ℕ → S) (d M : ℕ),
-    0 < d → q d = 1 → q 0 ∣ ϖ ^ M → ∃ c : S, (∀ i, 1 ≤ i → i ≤ d → q 0 ∣ q i * c ^ i) ∧
-      ∃ i, 1 ≤ i ∧ i ≤ d ∧ q i * c ^ i ∣ q 0 := by
+theorem first_slope
+    : ∀ {S : Type} [CommRing S] (ϖ : S),
+      Dich ϖ → Roots ϖ
+        → ∀ (q : ℕ → S) (d M : ℕ),
+          0 < d → q d = 1 → q 0 ∣ ϖ ^ M
+            → ∃ c : S,
+              (∀ i, 1 ≤ i → i ≤ d → q 0 ∣ q i * c ^ i)
+                ∧ ∃ i, 1 ≤ i ∧ i ≤ d ∧ q i * c ^ i ∣ q 0 := by
   intro S _ ϖ hD hR q d M hd hqd h0
   classical
   have hex : ∀ j : ℕ, ∃ s : S, (1 ≤ j → q j ∣ q 0 → ∃ u : Sˣ, q 0 = q j * (↑u * s ^ j)) := by
@@ -82,8 +90,7 @@ theorem first_slope : ∀ {S : Type} [CommRing S] (ϖ : S), Dich ϖ → Roots ϖ
     rcases dich_of_dvd hD (b := q i) h0 with h | h
     · have hiT : i ∈ T := (hmemT i).mpr ⟨⟨hi1, hid⟩, h⟩
       obtain ⟨u, hu⟩ := hs i hi1 h
-      have h2 : q 0 ∣ q i * s i ^ i := by
-        rw [hu, mul_left_comm, Units.mul_left_dvd]
+      have h2 : q 0 ∣ q i * s i ^ i := by rw [hu, mul_left_comm, Units.mul_left_dvd]
       obtain ⟨k, hk⟩ := hmax i hiT
       exact h2.trans ⟨k ^ i, by rw [hk, mul_pow]; ring⟩
     · exact dvd_mul_of_dvd_left h _

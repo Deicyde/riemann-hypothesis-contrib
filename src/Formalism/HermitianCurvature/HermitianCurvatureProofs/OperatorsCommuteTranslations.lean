@@ -8,6 +8,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.NormFormOneUnita
 
 namespace Formalism.FourierDecayAlt.P
 
-theorem operators_commute_translations' : Formalism.FourierDecayAlt.C3.OperatorsCommuteTranslations := operators_commute_translations
+theorem operators_commute_translations'
+    : Formalism.FourierDecayAlt.C3.OperatorsCommuteTranslations :=
+  operators_commute_translations
 
 end Formalism.FourierDecayAlt.P

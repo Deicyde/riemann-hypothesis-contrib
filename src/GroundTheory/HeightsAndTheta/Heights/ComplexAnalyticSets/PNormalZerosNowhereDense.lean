@@ -15,11 +15,18 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open MvPolynomial Topology Filter
 
-theorem isAnalyticNear_zeroSetIn {σ : Type} [Fintype σ] (I : Ideal (MvPolynomial σ ℂ)) (w : σ → ℂ) :
-    IsAnalyticNear (zeroSetIn I) w := by
+theorem isAnalyticNear_zeroSetIn {σ : Type} [Fintype σ] (I : Ideal (MvPolynomial σ ℂ)) (w : σ → ℂ)
+    : IsAnalyticNear (zeroSetIn I) w := by
   obtain ⟨s, hs⟩ := (IsNoetherian.noetherian I : I.FG)
-  refine ⟨Set.univ, s.card, fun i z => eval z (s.equivFin.symm i : MvPolynomial σ ℂ), isOpen_univ, trivial,
-    fun i => AnalyticOnNhd.eval_mvPolynomial _, ?_⟩
+  refine ⟨
+    Set.univ,
+    s.card,
+    fun i z => eval z (s.equivFin.symm i : MvPolynomial σ ℂ),
+    isOpen_univ,
+    trivial,
+    fun i => AnalyticOnNhd.eval_mvPolynomial _,
+    ?_
+  ⟩
   ext z
   simp only [Set.mem_inter_iff, Set.mem_univ, and_true, Set.mem_ofPred_eq, true_and]
   constructor
@@ -36,18 +43,22 @@ theorem isAnalyticNear_zeroSetIn {σ : Type} [Fintype σ] (I : Ideal (MvPolynomi
     rw [← hs] at hq
     exact hle hq
 
-theorem analyticOnNhd_of_differentiableOn_scalar_fin {d : ℕ} {U : Set (Fin d → ℂ)} {F : (Fin d → ℂ) → ℂ}
-    (hU : IsOpen U) (hF : DifferentiableOn ℂ F U) : AnalyticOnNhd ℂ F U := by
+theorem analyticOnNhd_of_differentiableOn_scalar_fin
+    {d : ℕ} {U : Set (Fin d → ℂ)} {F : (Fin d → ℂ) → ℂ}
+    (hU : IsOpen U) (hF : DifferentiableOn ℂ F U)
+    : AnalyticOnNhd ℂ F U := by
   refine analyticOnNhd_of_continuousOn_of_separately hU hF.continuousOn (fun z hz i => ?_)
   have h1 : DifferentiableAt ℂ F (Function.update z i (z i)) := by
     rw [Function.update_eq_self]
     exact hF.differentiableAt (hU.mem_nhds hz)
   exact h1.comp (z i) (hasFDerivAt_update (𝕜 := ℂ) z (z i)).differentiableAt
 
-theorem germIrreducibleAt_zeroSetIn_of_integrallyClosed (hic : NormalGermIntegrallyClosed.Statement)
-    {σ : Type} [Fintype σ] (I : Ideal (MvPolynomial σ ℂ)) (w : σ → ℂ) (hI : I.IsPrime)
-    (hn : IsIntegrallyClosed (MvPolynomial σ ℂ ⧸ I)) (hw : w ∈ zeroSetIn I) :
-    GermIrreducibleAt (zeroSetIn I) w := by
+theorem germIrreducibleAt_zeroSetIn_of_integrallyClosed
+    (hic : NormalGermIntegrallyClosed.Statement)
+    {σ : Type} [Fintype σ]
+    (I : Ideal (MvPolynomial σ ℂ)) (w : σ → ℂ)
+    (hI : I.IsPrime) (hn : IsIntegrallyClosed (MvPolynomial σ ℂ ⧸ I)) (hw : w ∈ zeroSetIn I)
+    : GermIrreducibleAt (zeroSetIn I) w := by
   refine ⟨hw, fun f g hf hg hfg => ?_⟩
   by_contra hcon
   rw [not_or] at hcon
@@ -55,7 +66,8 @@ theorem germIrreducibleAt_zeroSetIn_of_integrallyClosed (hic : NormalGermIntegra
   set X := zeroSetIn I with hX
   set N : Set (σ → ℂ) :=
     ({z | AnalyticAt ℂ f z} ∩ {z | AnalyticAt ℂ g z}) ∩ interior {z | z ∈ X → f z * g z = 0} with hNdef
-  have hNo : IsOpen N := ((isOpen_analyticAt ℂ f).inter (isOpen_analyticAt ℂ g)).inter isOpen_interior
+  have hNo : IsOpen N :=
+    ((isOpen_analyticAt ℂ f).inter (isOpen_analyticAt ℂ g)).inter isOpen_interior
   have hwN : w ∈ N := ⟨⟨hf, hg⟩, mem_interior_iff_mem_nhds.mpr hfg⟩
   have hfd : DifferentiableOn ℂ f N := fun z hz => hz.1.1.differentiableAt.differentiableWithinAt
   have hgd : DifferentiableOn ℂ g N := fun z hz => hz.1.2.differentiableAt.differentiableWithinAt
@@ -73,14 +85,15 @@ theorem germIrreducibleAt_zeroSetIn_of_integrallyClosed (hic : NormalGermIntegra
     fin_cases j
     · exact differentiableOn_const (0 : ℂ)
     · exact differentiableOn_const (-1 : ℂ)
-  obtain ⟨V, hV, hwV, H, hH, hfH⟩ := hic σ I w N f (f + g) 2 ![0, -1] hI hn hw hNo hwN hfd (hfd.add hgd)
-    ha hGne (by
+  obtain ⟨V, hV, hwV, H, hH, hfH⟩ :=
+    hic σ I w N f (f + g) 2 ![0, -1] hI hn hw hNo hwN hfd (hfd.add hgd) ha hGne (by
       intro z hz
       have hp := hfgN z hz.1
       simp [Fin.sum_univ_two]
       linear_combination -hp)
   have hHc : ContinuousAt H w := (hH.differentiableAt (hV.mem_nhds hwV)).continuousAt
-  have hev : ∀ᶠ z in 𝓝 w, z ∈ V ∧ (z ∈ X → f z * g z = 0) := (show ∀ᶠ z in 𝓝 w, z ∈ V from hV.mem_nhds hwV).and hfg
+  have hev : ∀ᶠ z in 𝓝 w, z ∈ V ∧ (z ∈ X → f z * g z = 0) :=
+    (show ∀ᶠ z in 𝓝 w, z ∈ V from hV.mem_nhds hwV).and hfg
   rw [Filter.not_eventually] at hfne hgne
   have h1 : H w = 1 := by
     by_contra hne
@@ -100,9 +113,10 @@ theorem germIrreducibleAt_zeroSetIn_of_integrallyClosed (hic : NormalGermIntegra
     exact hzH.2 ((mul_eq_zero.mp hfz.symm).resolve_left hz.2)
   exact one_ne_zero (h1.symm.trans h0)
 
-theorem NormalZerosNowhereDense.proof (hic : NormalGermIntegrallyClosed.Statement)
-    (hconn : IrreducibleGermRegularConnected.Statement) (hdense : RegularLocusDense.Statement) :
-    NormalZerosNowhereDense.Statement := by
+theorem NormalZerosNowhereDense.proof
+    (hic : NormalGermIntegrallyClosed.Statement) (hconn : IrreducibleGermRegularConnected.Statement)
+    (hdense : RegularLocusDense.Statement)
+    : NormalZerosNowhereDense.Statement := by
   intro σ _ I w N G hI hn hw hN hwN hG hne
   have han := isAnalyticNear_zeroSetIn I w
   have hirr := germIrreducibleAt_zeroSetIn_of_integrallyClosed hic I w hI hn hw
@@ -132,8 +146,12 @@ theorem NormalZerosNowhereDense.proof (hic : NormalGermIntegrallyClosed.Statemen
     have hxA : A x ∈ Metric.ball y₀ r := by
       rw [← hgy₀, hAg y₀ hy₀O]
       exact Metric.mem_ball_self hr
-    refine ⟨W ∩ B ∩ A ⁻¹' Metric.ball y₀ r,
-      (hW.inter hB).inter (Metric.isOpen_ball.preimage A.continuous), ⟨⟨hxW, hxXB.2⟩, hxA⟩, ?_⟩
+    refine ⟨
+      W ∩ B ∩ A ⁻¹' Metric.ball y₀ r,
+      (hW.inter hB).inter (Metric.isOpen_ball.preimage A.continuous),
+      ⟨⟨hxW, hxXB.2⟩, hxA⟩,
+      ?_
+    ⟩
     have hcov : ∀ p ∈ X ∩ (W ∩ B ∩ A ⁻¹' Metric.ball y₀ r), ∃ y ∈ Metric.ball y₀ r, g y = p := by
       rintro p ⟨hpX, ⟨hpW, hpB⟩, hpA⟩
       obtain ⟨y, hyO, rfl⟩ : p ∈ g '' O := by rw [← hYW]; exact ⟨⟨hpX, hpB⟩, hpW⟩
@@ -151,16 +169,19 @@ theorem NormalZerosNowhereDense.proof (hic : NormalGermIntegrallyClosed.Statemen
       filter_upwards [(hg y₁ (hrO hy₁)).continuousAt.preimage_mem_nhds hpT,
         Metric.isOpen_ball.mem_nhds hy₁] with y hyT hyb
       exact hyT (hgO y (hrO hyb)).1
-    have hzero := hF.eqOn_zero_of_preconnected_of_eventuallyEq_zero (convex_ball y₀ r).isPreconnected hy₁ hev
+    have hzero :=
+      hF.eqOn_zero_of_preconnected_of_eventuallyEq_zero (convex_ball y₀ r).isPreconnected hy₁ hev
     intro q hq hqX
     obtain ⟨y, hy, rfl⟩ := hcov q ⟨hqX, hq⟩
     exact hzero hy
   choose! M hMo hxM hMT using hloc
 
   have hallR : ∀ x ∈ R, T ∈ 𝓝 x := by
-    obtain ⟨x₀, hx₀V, hx₀R⟩ := mem_closure_iff_nhds.mp (hdB hz) (interior V) (interior_mem_nhds.mpr hV)
+    obtain ⟨x₀, hx₀V, hx₀R⟩ :=
+      mem_closure_iff_nhds.mp (hdB hz) (interior V) (interior_mem_nhds.mpr hV)
     have hx₀T : T ∈ 𝓝 x₀ :=
-      Filter.mem_of_superset (isOpen_interior.mem_nhds hx₀V) (fun y hy hyX => hall y ⟨hyX, interior_subset hy⟩)
+      Filter.mem_of_superset (isOpen_interior.mem_nhds hx₀V)
+        (fun y hy hyX => hall y ⟨hyX, interior_subset hy⟩)
     by_contra hbad
     push Not at hbad
     obtain ⟨x₁, hx₁R, hx₁T⟩ := hbad
@@ -171,9 +192,9 @@ theorem NormalZerosNowhereDense.proof (hic : NormalGermIntegrallyClosed.Statemen
       by_cases h : T ∈ 𝓝 x
       · exact Or.inl (Set.mem_biUnion (x := x) ⟨hx, h⟩ (hxM x hx))
       · exact Or.inr (Set.mem_biUnion (x := x) ⟨hx, h⟩ (hxM x hx))
-    obtain ⟨q, hqR, hqu, hqv⟩ := hpc _ _ hu hv hcover
-      ⟨x₀, hx₀R, Set.mem_biUnion (x := x₀) ⟨hx₀R, hx₀T⟩ (hxM x₀ hx₀R)⟩
-      ⟨x₁, hx₁R, Set.mem_biUnion (x := x₁) ⟨hx₁R, hx₁T⟩ (hxM x₁ hx₁R)⟩
+    obtain ⟨q, hqR, hqu, hqv⟩ :=
+      hpc _ _ hu hv hcover ⟨x₀, hx₀R, Set.mem_biUnion (x := x₀) ⟨hx₀R, hx₀T⟩ (hxM x₀ hx₀R)⟩
+        ⟨x₁, hx₁R, Set.mem_biUnion (x := x₁) ⟨hx₁R, hx₁T⟩ (hxM x₁ hx₁R)⟩
     obtain ⟨a, ⟨haR, haT⟩, hqa⟩ := Set.mem_iUnion₂.mp hqu
     obtain ⟨b, ⟨hbR, hbT⟩, hqb⟩ := Set.mem_iUnion₂.mp hqv
     have hqX : q ∈ X := (regLocus_subset _ hqR).1

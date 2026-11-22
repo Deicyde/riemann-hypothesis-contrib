@@ -8,6 +8,7 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CuspRapi
 namespace PositivityTheory.Lit1.ClozelPurity
 
 theorem clozelPurity : GlobalTheory.Published.ClozelPurity :=
-  PositivityTheory.S2.Clozel.clozelPurity_of_bounded GlobalTheory.CompanionTheory.CuspFinGL.cuspFormsBoundedGL
+  PositivityTheory.S2.Clozel.clozelPurity_of_bounded
+    GlobalTheory.CompanionTheory.CuspFinGL.cuspFormsBoundedGL
 
 end PositivityTheory.Lit1.ClozelPurity

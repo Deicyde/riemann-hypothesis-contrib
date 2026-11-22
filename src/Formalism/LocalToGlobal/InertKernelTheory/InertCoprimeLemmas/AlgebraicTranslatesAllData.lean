@@ -13,8 +13,8 @@ namespace AlgTP
 
 open NumberField Formalism.BasicNotions Formalism.L2.Ker
 
-theorem exists_inert_prime (d : ℕ) (hd : d.Prime) (hd4 : d % 4 = 3) (n : ℕ) :
-    ∃ p, n < p ∧ p.Prime ∧ jacobiSym (-(d : ℤ)) p = -1 := by
+theorem exists_inert_prime (d : ℕ) (hd : d.Prime) (hd4 : d % 4 = 3) (n : ℕ)
+    : ∃ p, n < p ∧ p.Prime ∧ jacobiSym (-(d : ℤ)) p = -1 := by
   have : NeZero (4 * d) := ⟨by have := hd.pos; omega⟩
   have hu : IsUnit (-1 : ZMod (4 * d)) := isUnit_one.neg
   obtain ⟨p, hpn, hp, hpa⟩ := Nat.forall_exists_prime_gt_and_eq_mod hu n
@@ -39,25 +39,30 @@ theorem exists_inert_prime (d : ℕ) (hd : d.Prime) (hd4 : d % 4 = 3) (n : ℕ) 
     jacobiSym.at_neg_one hdodd, ZMod.χ₄_nat_three_mod_four hd4]
   norm_num
 
-theorem mem_one_iff {E : Type} [Field E] [NumberField E] (w : E) :
-    w ∈ (1 : Submodule (𝓞 E) E) ↔ IsIntegral ℤ w := by
+theorem mem_one_iff {E : Type} [Field E] [NumberField E] (w : E)
+    : w ∈ (1 : Submodule (𝓞 E) E) ↔ IsIntegral ℤ w := by
   rw [Submodule.mem_one]
   exact (IsIntegralClosure.isIntegral_iff (A := 𝓞 E)).symm
 
-theorem mem_range_iff {E : Type} [Field E] [NumberField E] (w : E) :
-    w ∈ (algebraMap (𝓞 E) E).range ↔ IsIntegral ℤ w := by
+theorem mem_range_iff {E : Type} [Field E] [NumberField E] (w : E)
+    : w ∈ (algebraMap (𝓞 E) E).range ↔ IsIntegral ℤ w := by
   rw [RingHom.mem_range]
   exact (IsIntegralClosure.isIntegral_iff (A := 𝓞 E)).symm
 
-theorem exists_den (D : D7) {N : ℕ} (L : Submodule (𝓞 D.host.E) (Fin N → D.host.E))
-    (hL : letI := D.host.cmStar; IsSDLat D.host.E N L) :
-    ∃ s : ℕ, 0 < s ∧ (∀ x ∈ L, (s : D.host.E) • x ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N) ∧
-      ∀ x ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N, (s : D.host.E) • x ∈ L := by
+theorem exists_den
+    (D : D7)
+    {N : ℕ} (L : Submodule (𝓞 D.host.E) (Fin N → D.host.E))
+    (hL : letI := D.host.cmStar; IsSDLat D.host.E N L)
+    : ∃ s : ℕ,
+      0 < s ∧ (∀ x ∈ L, (s : D.host.E) • x ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N)
+        ∧ ∀ x ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N, (s : D.host.E) • x ∈ L := by
   let _ := D.host.cmStar
   classical
   obtain ⟨S, hS⟩ := hL.1
   obtain ⟨y, hy0, hy⟩ := exists_integral_multiples ℤ ℚ (S.biUnion fun v => Finset.univ.image v)
-  have hint : ∀ w ∈ S.biUnion (fun v => Finset.univ.image v), IsIntegral ℤ ((y.natAbs : D.host.E) * w) := by
+  have hint
+      : ∀ w ∈ S.biUnion (fun v => Finset.univ.image v),
+        IsIntegral ℤ ((y.natAbs : D.host.E) * w) := by
     intro w hw
     have h := hy w hw
     rw [zsmul_eq_mul] at h
@@ -70,13 +75,18 @@ theorem exists_den (D : D7) {N : ℕ} (L : Submodule (𝓞 D.host.E) (Fin N → 
       have h' := h.neg
       rw [show -((y : D.host.E) * w) = ((y.natAbs : ℤ) : D.host.E) * w by rw [this]; ring] at h'
       simpa using h'
-  have hfirst : ∀ x ∈ L, ((y.natAbs : ℕ) : D.host.E) • x ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N := by
-    have hgen : ∀ v ∈ (S : Set (Fin N → D.host.E)), ((y.natAbs : ℕ) : D.host.E) • v ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N := by
+  have hfirst
+      : ∀ x ∈ L,
+        ((y.natAbs : ℕ) : D.host.E) • x ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N := by
+    have hgen
+        : ∀ v ∈ (S : Set (Fin N → D.host.E)),
+          ((y.natAbs : ℕ) : D.host.E) • v ∈ Formalism.MainNotions.StandardLatticesGL3.stdL D N := by
       intro v hv
       rw [Formalism.MainNotions.StandardLatticesGL3.stdL, Submodule.mem_pi]
       intro i _
       rw [mem_one_iff, Pi.smul_apply, smul_eq_mul]
-      exact hint (v i) (Finset.mem_biUnion.2 ⟨v, hv, Finset.mem_image.2 ⟨i, Finset.mem_univ _, rfl⟩⟩)
+      exact hint (v i)
+        (Finset.mem_biUnion.2 ⟨v, hv, Finset.mem_image.2 ⟨i, Finset.mem_univ _, rfl⟩⟩)
     intro x hx
     rw [← hS] at hx
     induction hx using Submodule.span_induction with
@@ -90,8 +100,9 @@ theorem exists_den (D : D7) {N : ℕ} (L : Submodule (𝓞 D.host.E) (Fin N → 
   intro z hz
   have hz' := hfirst z hz
   rw [Formalism.MainNotions.StandardLatticesGL3.stdL, Submodule.mem_pi] at hx hz'
-  have e : stdH D.host.E N z (((y.natAbs : ℕ) : D.host.E) • x) =
-      stdH D.host.E N (((y.natAbs : ℕ) : D.host.E) • z) x := by
+  have e
+      : stdH D.host.E N z (((y.natAbs : ℕ) : D.host.E) • x)
+        = stdH D.host.E N (((y.natAbs : ℕ) : D.host.E) • z) x := by
     unfold stdH
     refine Finset.sum_congr rfl fun i _ => ?_
     simp only [Pi.smul_apply, smul_eq_mul, star_mul', star_natCast]
@@ -116,14 +127,20 @@ theorem algebraic_translates_all_data : AlgTAll := by
   have hcop : ∀ m : ℕ, m ∣ a * s * s' → Nat.Coprime m p := fun m hm =>
     Nat.Coprime.symm ((Nat.Prime.coprime_iff_not_dvd hp).2 fun h =>
       absurd (Nat.le_of_dvd hpos (h.trans hm)) (by omega))
-  have H := (AlgP.algebraic_fact_kernels D cc δ B hcc hδ χ hχ p (by omega) hJ N N').1 L L' hA
-    ⟨s, hcop s (Dvd.intro_left _ rfl |>.mul_right _), hsL2, hsL1⟩
-    ⟨s', hcop s' (Dvd.intro_left _ rfl), hsL2', hsL1'⟩ t
-    ⟨a, ha, hcop a ((Dvd.intro _ rfl).mul_right _), hat⟩
+  have H :=
+    (AlgP.algebraic_fact_kernels D cc δ B hcc hδ χ hχ p (by omega) hJ N N').1 L L' hA
+      ⟨s, hcop s (Dvd.intro_left _ rfl |>.mul_right _), hsL2, hsL1⟩
+      ⟨s', hcop s' (Dvd.intro_left _ rfl), hsL2', hsL1'⟩ t
+      ⟨a, ha, hcop a ((Dvd.intro _ rfl).mul_right _), hat⟩
   exact H.2 α
 
-theorem algT_of {D : D7} {cc : Ideal (𝓞 D.host.K)} {δ : ℂ} (B : Base D cc δ) {χ : Formalism.MainNotions.TaylorLogMetric.IdE D → ℂ}
-    (hcc : Formalism.MainNotions.TaylorLogMetric.IsCurveIdeal D cc) (hδ : Formalism.MainNotions.TaylorLogMetric.IsDiscriminantTwelfthRootOfIdealLattice D cc δ) (hχ : Formalism.MainNotions.TaylorLogMetric.IsChi D χ) : B.AlgT χ :=
+theorem algT_of
+    {D : D7} {cc : Ideal (𝓞 D.host.K)} {δ : ℂ} (B : Base D cc δ)
+    {χ : Formalism.MainNotions.TaylorLogMetric.IdE D → ℂ}
+    (hcc : Formalism.MainNotions.TaylorLogMetric.IsCurveIdeal D cc)
+    (hδ : Formalism.MainNotions.TaylorLogMetric.IsDiscriminantTwelfthRootOfIdealLattice D cc δ)
+    (hχ : Formalism.MainNotions.TaylorLogMetric.IsChi D χ)
+    : B.AlgT χ :=
   algebraic_translates_all_data D cc δ B χ hcc hδ hχ
 
 end AlgTP

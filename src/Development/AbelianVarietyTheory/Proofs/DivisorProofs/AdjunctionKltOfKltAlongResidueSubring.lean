@@ -11,12 +11,23 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.AdjKltOfLtDi
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 
 namespace GlobalTheory.FieldPair
 
-theorem adjKlt_of_klt_restrict : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ →+* L) (cK : ℂ →+* K) (n : ℕ) (T : Subring L) (S : Place cL) (hS : S.Contains T) (ψ : S.ring →+* K) (f : S.ring) (w : Fin n → S.ring) (θ : S.ring →₀ ℚ) (R : Subring K), Function.Surjective ψ → (∀ a, ψ (S.const a) = cK a) → Irreducible f → TrBasis cK (fun i => ψ (w i)) → (∀ g ∈ θ.support, ψ g ≠ 0) → (∀ a ∈ R, ∃ t : T, ψ ⟨t, hS t t.2⟩ = a) → Klt cK n R (dForm cK (fun i => ψ (w i))) (Finsupp.mapDomain ψ θ) → AdjKlt cL (n + 1) T S (dForm cL (Fin.cons (f : L) (fun i => (w i : L)) : Fin (n + 1) → L)) (Finsupp.mapDomain (fun g : S.ring => (g : L)) θ + Finsupp.single (f : L) 1) := by
+theorem adjKlt_of_klt_restrict
+    : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ →+* L) (cK : ℂ →+* K) (n : ℕ) (T : Subring L)
+        (S : Place cL) (hS : S.Contains T) (ψ : S.ring →+* K) (f : S.ring) (w : Fin n → S.ring)
+        (θ : S.ring →₀ ℚ) (R : Subring K),
+      Function.Surjective ψ → (∀ a, ψ (S.const a) = cK a) → Irreducible f
+        → TrBasis cK (fun i => ψ (w i)) → (∀ g ∈ θ.support, ψ g ≠ 0)
+        → (∀ a ∈ R, ∃ t : T, ψ ⟨t, hS t t.2⟩ = a)
+        → Klt cK n R (dForm cK (fun i => ψ (w i))) (Finsupp.mapDomain ψ θ)
+        → AdjKlt cL (n + 1) T S (dForm cL (Fin.cons (f : L) (fun i => (w i : L)) : Fin (n + 1) → L))
+          (Finsupp.mapDomain (fun g : S.ring => (g : L)) θ + Finsupp.single (f : L) 1) := by
   intro L K _ _ cL cK n T S hS ψ f w θ R hψ hc hf hw hθ hR hK
   refine ⟨?_, ?_, ?_⟩
   · have htr := (trBasis_uniformiser_cons cL cK n S ψ f w hψ hc hf hw).1
@@ -31,8 +42,9 @@ theorem adjKlt_of_klt_restrict : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ 
     rw [Finsupp.add_apply, Finsupp.single_eq_of_ne hf0, add_zero]
     exact h1.trans hθ0
   intro Q hQ t u E hTQ hspan hdim hSQ hEQ hSt hEu hP
-  obtain ⟨F, hF, hdisc⟩ := GlobalTheory.AdjCodimTwo.disc_residue_eq cL cK n Q hQ t u S E ψ f w θ hspan hdim
-    hSQ hEQ hSt hEu hψ hc hf hw hθ hP
+  obtain ⟨F, hF, hdisc⟩ :=
+    GlobalTheory.AdjCodimTwo.disc_residue_eq cL cK n Q hQ t u S E ψ f w θ hspan hdim hSQ hEQ hSt hEu
+      hψ hc hf hw hθ hP
   rw [← hdisc]
   apply hK.lt_disc
   intro a ha

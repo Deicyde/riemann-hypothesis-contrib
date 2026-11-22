@@ -19,7 +19,8 @@ theorem att_rk_pos {N : Submodule ℤ E} [DiscreteTopology N] (hN : N ≠ ⊥) :
   exact Module.finrank_pos
 
 theorem att_rk_le {L N : Submodule ℤ E} [DiscreteTopology L] (h : N ≤ L) : rk N ≤ rk L :=
-  LinearMap.finrank_le_finrank_of_injective (f := Submodule.inclusion h) (Submodule.inclusion_injective h)
+  LinearMap.finrank_le_finrank_of_injective (f := Submodule.inclusion h)
+    (Submodule.inclusion_injective h)
 
 end
 

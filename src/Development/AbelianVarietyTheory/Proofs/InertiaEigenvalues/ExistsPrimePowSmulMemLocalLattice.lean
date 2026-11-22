@@ -7,14 +7,19 @@ public import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.Conduc
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK
+  GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
 open scoped Formalism.Per
 
 namespace GlobalTheory.LatPow
 
-theorem pow_smul_mem : ∀ (l : ℕ) [Fact l.Prime] (O K : Type) [CommRing O] [NormedField K] [Algebra O K]
-    [IsUnitBall O K] [NormedAlgebra ℚ_[l] K] (G : Type) [Group G] [TopologicalSpace G]
-    (T : LocLat G ℚ_[l] K O) (v : T.V), ∃ n₀ : ℕ, ∀ n, n₀ ≤ n → ∃ x : ↥T.L.T, (x : T.V) = (l : K) ^ n • v := by
+theorem pow_smul_mem
+    : ∀ (l : ℕ) [Fact l.Prime] (O K : Type) [CommRing O] [NormedField K] [Algebra O K]
+        [IsUnitBall O K] [NormedAlgebra ℚ_[l] K] (G : Type) [Group G] [TopologicalSpace G]
+        (T : LocLat G ℚ_[l] K O) (v : T.V),
+      ∃ n₀ : ℕ, ∀ n,
+        n₀ ≤ n → ∃ x : ↥T.L.T, (x : T.V) = (l : K) ^ n • v := by
   intro l _ O K _ _ _ _ _ G _ _ T v
   have hv : v ∈ Submodule.span K (T.L.T : Set T.V) := by rw [T.L.span]; trivial
   suffices h : ∃ n₀ : ℕ, ∀ n, n₀ ≤ n → (l : K) ^ n • v ∈ T.L.T by
@@ -27,13 +32,17 @@ theorem pow_smul_mem : ∀ (l : ℕ) [Fact l.Prime] (O K : Type) [CommRing O] [N
       rw [← algebraMap_smul K ((l : O) ^ n) x, map_pow, map_natCast]
     rw [this]
     exact T.L.T.smul_mem _ hx
-  | zero => exact ⟨0, fun n _ => by rw [smul_zero]; exact T.L.T.zero_mem⟩
+  | zero =>
+    exact ⟨0, fun n _ => by rw [smul_zero]; exact T.L.T.zero_mem⟩
   | add x y _ _ hx hy =>
     obtain ⟨a, ha⟩ := hx
     obtain ⟨b, hb⟩ := hy
-    exact ⟨max a b, fun n hn => by
-      rw [smul_add]
-      exact T.L.T.add_mem (ha n (le_of_max_le_left hn)) (hb n (le_of_max_le_right hn))⟩
+    exact ⟨
+      max a b,
+      fun n hn => by
+        rw [smul_add]
+        exact T.L.T.add_mem (ha n (le_of_max_le_left hn)) (hb n (le_of_max_le_right hn))
+    ⟩
   | smul c x _ hx =>
     obtain ⟨a, ha⟩ := hx
     obtain ⟨m, b, hb⟩ := exists_pow_mul_mem (O := O) l c

@@ -81,60 +81,58 @@ theorem sb_negSq_eq (p : ℕ) {r : ℕ} (u : Fin r → ℂ) : negSq p u = normSq
   refine Finset.sum_congr rfl fun k _ => ?_
   split_ifs <;> simp
 
-theorem sb_herm_swap {r : ℕ} {M : Matrix (Fin r) (Fin r) ℂ} (hM : Mᴴ = M) (v w : Fin r → ℂ) :
-    star v ⬝ᵥ (M *ᵥ w) = star (M *ᵥ v) ⬝ᵥ w := by
+theorem sb_herm_swap {r : ℕ} {M : Matrix (Fin r) (Fin r) ℂ} (hM : Mᴴ = M) (v w : Fin r → ℂ)
+    : star v ⬝ᵥ (M *ᵥ w) = star (M *ᵥ v) ⬝ᵥ w := by
   rw [star_mulVec, hM, dotProduct_mulVec]
 
-theorem sb_dot_Dp (p : ℕ) {r : ℕ} (v w : Fin r → ℂ) :
-    star v ⬝ᵥ (sbDp p r *ᵥ w) = star (sbDp p r *ᵥ v) ⬝ᵥ (sbDp p r *ᵥ w) := by
+theorem sb_dot_Dp (p : ℕ) {r : ℕ} (v w : Fin r → ℂ)
+    : star v ⬝ᵥ (sbDp p r *ᵥ w) = star (sbDp p r *ᵥ v) ⬝ᵥ (sbDp p r *ᵥ w) := by
   have h := sb_herm_swap (sb_Dp_herm p r) v (sbDp p r *ᵥ w)
   rw [mulVec_mulVec, sb_Dp_mul_Dp] at h
   exact h
 
-theorem sb_dot_Dn (p : ℕ) {r : ℕ} (v w : Fin r → ℂ) :
-    star v ⬝ᵥ (sbDn p r *ᵥ w) = star (sbDn p r *ᵥ v) ⬝ᵥ (sbDn p r *ᵥ w) := by
+theorem sb_dot_Dn (p : ℕ) {r : ℕ} (v w : Fin r → ℂ)
+    : star v ⬝ᵥ (sbDn p r *ᵥ w) = star (sbDn p r *ᵥ v) ⬝ᵥ (sbDn p r *ᵥ w) := by
   have h := sb_herm_swap (sb_Dn_herm p r) v (sbDn p r *ᵥ w)
   rw [mulVec_mulVec, sb_Dn_mul_Dn] at h
   exact h
 
-theorem sb_dot_split (p : ℕ) {r : ℕ} (v w : Fin r → ℂ) :
-    star v ⬝ᵥ w = star (sbDp p r *ᵥ v) ⬝ᵥ (sbDp p r *ᵥ w) +
-      star (sbDn p r *ᵥ v) ⬝ᵥ (sbDn p r *ᵥ w) := by
+theorem sb_dot_split (p : ℕ) {r : ℕ} (v w : Fin r → ℂ)
+    : star v ⬝ᵥ w
+      = star (sbDp p r *ᵥ v) ⬝ᵥ (sbDp p r *ᵥ w) + star (sbDn p r *ᵥ v) ⬝ᵥ (sbDn p r *ᵥ w) := by
   rw [← sb_dot_Dp p v w, ← sb_dot_Dn p v w, ← dotProduct_add, ← add_mulVec, sb_Dp_add_Dn,
     one_mulVec]
 
-theorem sb_dot_J (p : ℕ) {r : ℕ} (v w : Fin r → ℂ) :
-    star v ⬝ᵥ (signMat p r *ᵥ w) = star (sbDp p r *ᵥ v) ⬝ᵥ (sbDp p r *ᵥ w) -
-      star (sbDn p r *ᵥ v) ⬝ᵥ (sbDn p r *ᵥ w) := by
+theorem sb_dot_J (p : ℕ) {r : ℕ} (v w : Fin r → ℂ)
+    : star v ⬝ᵥ (signMat p r *ᵥ w)
+      = star (sbDp p r *ᵥ v) ⬝ᵥ (sbDp p r *ᵥ w) - star (sbDn p r *ᵥ v) ⬝ᵥ (sbDn p r *ᵥ w) := by
   rw [sb_signMat_eq, sub_mulVec, dotProduct_sub, sb_dot_Dp p v w, sb_dot_Dn p v w]
 
-private theorem re_star_dotProduct_self_eq_normSq {r : ℕ} (x : Fin r → ℂ) : (star x ⬝ᵥ x).re = normSq x := by
+private theorem re_star_dotProduct_self_eq_normSq {r : ℕ} (x : Fin r → ℂ)
+    : (star x ⬝ᵥ x).re = normSq x := by
   simp only [dotProduct, Pi.star_apply, Complex.re_sum, normSq]
   refine Finset.sum_congr rfl fun k _ => ?_
   have h1 : (star (x k) * x k).re = (x k).re * (x k).re + (x k).im * (x k).im := by
     simp [Complex.mul_re] <;> ring
   rw [h1, ← Complex.normSq_apply]
-  first
-    | exact (Complex.sq_norm _).symm
-    | exact Complex.normSq_eq_norm_sq _
-    | simp [Complex.sq_abs]
+  first | exact (Complex.sq_norm _).symm | exact Complex.normSq_eq_norm_sq _ | simp [Complex.sq_abs]
 
-theorem sb_re_dot_J (p : ℕ) {r : ℕ} (v : Fin r → ℂ) :
-    (star v ⬝ᵥ (signMat p r *ᵥ v)).re = posSq p v - negSq p v := by
-  rw [sb_dot_J, Complex.sub_re, re_star_dotProduct_self_eq_normSq, re_star_dotProduct_self_eq_normSq, sb_posSq_eq, sb_negSq_eq]
+theorem sb_re_dot_J (p : ℕ) {r : ℕ} (v : Fin r → ℂ)
+    : (star v ⬝ᵥ (signMat p r *ᵥ v)).re = posSq p v - negSq p v := by
+  rw [sb_dot_J, Complex.sub_re, re_star_dotProduct_self_eq_normSq,
+    re_star_dotProduct_self_eq_normSq, sb_posSq_eq, sb_negSq_eq]
 
 theorem sb_cs {r : ℕ} (v w : Fin r → ℂ) : (star v ⬝ᵥ w).re ^ 2 ≤ normSq v * normSq w := by
   have h1 : |(star v ⬝ᵥ w).re| ≤ ∑ k, ‖v k‖ * ‖w k‖ := by
     have e1 : |(star v ⬝ᵥ w).re| ≤ ‖star v ⬝ᵥ w‖ := by
       first
-        | exact Complex.abs_re_le_norm _
-        | exact RCLike.abs_re_le_norm _
-        | exact Complex.abs_re_le_abs _
+      | exact Complex.abs_re_le_norm _
+      | exact RCLike.abs_re_le_norm _
+      | exact Complex.abs_re_le_abs _
     have e2 : ‖star v ⬝ᵥ w‖ ≤ ∑ k, ‖star (v k) * w k‖ := by
       unfold dotProduct
       exact norm_sum_le _ _
-    have e3 : ∑ k, ‖star (v k) * w k‖ = ∑ k, ‖v k‖ * ‖w k‖ := by
-      simp [norm_mul, norm_star]
+    have e3 : ∑ k, ‖star (v k) * w k‖ = ∑ k, ‖v k‖ * ‖w k‖ := by simp [norm_mul, norm_star]
     linarith
   have h2 := Finset.sum_mul_sq_le_sq_mul_sq Finset.univ (fun k => ‖v k‖) (fun k => ‖w k‖)
   have h3 : (star v ⬝ᵥ w).re ^ 2 ≤ (∑ k, ‖v k‖ * ‖w k‖) ^ 2 :=
@@ -142,16 +140,16 @@ theorem sb_cs {r : ℕ} (v w : Fin r → ℂ) : (star v ⬝ᵥ w).re ^ 2 ≤ nor
   unfold normSq
   exact h3.trans h2
 
-private theorem two_mul_one_add_mul_le_of_le_mul (a b c d s : ℝ) (ha : 0 ≤ a) (hc : 0 ≤ c) (hd : 0 ≤ d)
-    (hs : 0 ≤ s) (hcd : c ≤ s * d) (hs1 : s < 1) (hle : a * c ≤ b * d) :
-    2 * (1 + s) * (a * c) ≤ s * (a ^ 2 + d ^ 2) + b ^ 2 + c ^ 2 := by
+private theorem two_mul_one_add_mul_le_of_le_mul
+    (a b c d s : ℝ) (ha : 0 ≤ a) (hc : 0 ≤ c) (hd : 0 ≤ d) (hs : 0 ≤ s) (hcd : c ≤ s * d)
+    (hs1 : s < 1) (hle : a * c ≤ b * d)
+    : 2 * (1 + s) * (a * c) ≤ s * (a ^ 2 + d ^ 2) + b ^ 2 + c ^ 2 := by
   rcases eq_or_lt_of_le hd with h0 | hdpos
   · subst h0
     have hc0 : c = 0 := le_antisymm (by simpa using hcd) hc
     subst hc0
     nlinarith [mul_nonneg hs (sq_nonneg a), sq_nonneg b]
-  · have hsq : (a * c) * (a * c) ≤ (b * d) * (b * d) :=
-      mul_self_le_mul_self (mul_nonneg ha hc) hle
+  · have hsq : (a * c) * (a * c) ≤ (b * d) * (b * d) := mul_self_le_mul_self (mul_nonneg ha hc) hle
     have hdc : 0 ≤ d - c := by nlinarith
     have hsdc : 0 ≤ s * d - c := by linarith
     have e1 : 0 ≤ (s * d ^ 2 + c ^ 2) * (a - d) ^ 2 :=
@@ -164,11 +162,11 @@ private theorem two_mul_one_add_mul_le_of_le_mul (a b c d s : ℝ) (ha : 0 ≤ a
     have e3 := mul_lt_mul_of_pos_left hneg hd2
     nlinarith
 
-theorem sb_real_bounds (a b c d s t : ℝ) (ha : 0 ≤ a) (hb : 0 ≤ b) (hc : 0 ≤ c) (hd : 0 ≤ d)
-    (hs : 0 ≤ s) (hs1 : s < 1) (hba : b ≤ s * a) (hcd : c ≤ s * d) (h1 : |t| ≤ a * c)
-    (h2 : |t| ≤ b * d) :
-    0 ≤ s * (a ^ 2 + d ^ 2) + b ^ 2 + c ^ 2 + 2 * (1 + s) * t ∧
-      0 ≤ s * (a ^ 2 + d ^ 2) - (b ^ 2 + c ^ 2) - 2 * (1 - s) * t := by
+theorem sb_real_bounds
+    (a b c d s t : ℝ) (ha : 0 ≤ a) (hb : 0 ≤ b) (hc : 0 ≤ c) (hd : 0 ≤ d) (hs : 0 ≤ s) (hs1 : s < 1)
+    (hba : b ≤ s * a) (hcd : c ≤ s * d) (h1 : |t| ≤ a * c) (h2 : |t| ≤ b * d)
+    : 0 ≤ s * (a ^ 2 + d ^ 2) + b ^ 2 + c ^ 2 + 2 * (1 + s) * t
+      ∧ 0 ≤ s * (a ^ 2 + d ^ 2) - (b ^ 2 + c ^ 2) - 2 * (1 - s) * t := by
   have hTc : |t| ≤ a * c := h1
   have hTad : |t| ≤ s * a * d := by
     have := mul_le_mul_of_nonneg_left hcd ha
@@ -179,8 +177,9 @@ theorem sb_real_bounds (a b c d s t : ℝ) (ha : 0 ≤ a) (hb : 0 ≤ b) (hc : 0
     · have e := two_mul_one_add_mul_le_of_le_mul a b c d s ha hc hd hs hcd hs1 hle
       have e' := mul_le_mul_of_nonneg_left hTc (by linarith : (0 : ℝ) ≤ 2 * (1 + s))
       nlinarith
-    · have e := two_mul_one_add_mul_le_of_le_mul d c b a s hd hb ha hs hba hs1
-        (by rw [mul_comm d b, mul_comm c a]; exact hle)
+    · have e :=
+        two_mul_one_add_mul_le_of_le_mul d c b a s hd hb ha hs hba hs1
+          (by rw [mul_comm d b, mul_comm c a]; exact hle)
       have e' := mul_le_mul_of_nonneg_left h2 (by linarith : (0 : ℝ) ≤ 2 * (1 + s))
       nlinarith
   have htl : 0 ≤ t + |t| := by linarith [neg_abs_le t]

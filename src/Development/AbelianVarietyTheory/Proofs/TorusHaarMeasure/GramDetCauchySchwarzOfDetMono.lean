@@ -9,8 +9,15 @@ open scoped ComplexOrder ENNReal Pointwise
 
 namespace GlobalTheory
 
-theorem gram_det_cauchy_schwarz_of_det_mono :
-    (∀ (n : Type) [Fintype n] [DecidableEq n] (P Q : Matrix n n ℂ), P.PosSemidef → Q.PosSemidef → 0 ≤ P.det.re ∧ P.det.re ≤ (P + Q).det.re ∧ (P.det ≠ 0 → (P + Q).det.re ≤ P.det.re → Q = 0)) → (∀ (m n : Type) [Fintype m] [Fintype n] [DecidableEq n] (A B : Matrix m n ℂ), ‖(Aᴴ * B).det‖ ^ 2 ≤ (((A)ᴴ * (A)).det.re) * (((B)ᴴ * (B)).det.re) ∧ ((Aᴴ * B).det ≠ 0 → (((A)ᴴ * (A)).det.re) * (((B)ᴴ * (B)).det.re) ≤ ‖(Aᴴ * B).det‖ ^ 2 → ∃ C : Matrix n n ℂ, B = A * C)) := by
+theorem gram_det_cauchy_schwarz_of_det_mono
+    : (∀ (n : Type) [Fintype n] [DecidableEq n] (P Q : Matrix n n ℂ),
+        P.PosSemidef → Q.PosSemidef
+          → 0 ≤ P.det.re ∧ P.det.re ≤ (P + Q).det.re
+            ∧ (P.det ≠ 0 → (P + Q).det.re ≤ P.det.re → Q = 0))
+      → (∀ (m n : Type) [Fintype m] [Fintype n] [DecidableEq n] (A B : Matrix m n ℂ),
+        ‖(Aᴴ * B).det‖ ^ 2 ≤ (((A)ᴴ * (A)).det.re) * (((B)ᴴ * (B)).det.re)
+          ∧ ((Aᴴ * B).det ≠ 0 → (((A)ᴴ * (A)).det.re) * (((B)ᴴ * (B)).det.re) ≤ ‖(Aᴴ * B).det‖ ^ 2
+            → ∃ C : Matrix n n ℂ, B = A * C)) := by
   intro H m n _ _ _ A B
   classical
   have hA : (Aᴴ * A).PosSemidef := posSemidef_conjTranspose_mul_self A
@@ -29,8 +36,7 @@ theorem gram_det_cauchy_schwarz_of_det_mono :
     rw [h2]
     simpa using mul_nonneg hA0 hB0
   · have hreal : (Aᴴ * A).det = ((Aᴴ * A).det.re : ℂ) := by
-      have : star (Aᴴ * A).det = (Aᴴ * A).det := by
-        rw [← det_conjTranspose, hA.1.eq]
+      have : star (Aᴴ * A).det = (Aᴴ * A).det := by rw [← det_conjTranspose, hA.1.eq]
       exact (Complex.conj_eq_iff_re.mp this).symm
     set g : ℝ := (Aᴴ * A).det.re with hg
     have hg0 : g ≠ 0 := fun h => hG (by rw [hreal, h]; simp)
@@ -61,15 +67,19 @@ theorem gram_det_cauchy_schwarz_of_det_mono :
     have hN : ‖(Aᴴ * B).det‖ ^ 2 = g * (g * ‖C.det‖ ^ 2) := by
       rw [hAB, norm_mul, Complex.norm_real, Real.norm_of_nonneg hA0]
       ring
-    obtain ⟨-, h2, h3⟩ := H n _ _ (posSemidef_conjTranspose_mul_self (A * C))
-      (posSemidef_conjTranspose_mul_self (B - A * C))
+    obtain ⟨-, h2, h3⟩ :=
+      H n _ _ (posSemidef_conjTranspose_mul_self (A * C))
+        (posSemidef_conjTranspose_mul_self (B - A * C))
     rw [← hsum, hP, Complex.ofReal_re] at h2 h3
     rw [hN]
     refine ⟨mul_le_mul_of_nonneg_left h2 hA0, fun hne hle => ⟨C, ?_⟩⟩
     have hc : C.det ≠ 0 := fun h => hne (by rw [hAB, h, mul_zero])
-    have hQ := h3 (by
-      have : g * ‖C.det‖ ^ 2 ≠ 0 := mul_ne_zero hg0 (pow_ne_zero _ (norm_ne_zero_iff.mpr hc))
-      exact_mod_cast this) (le_of_mul_le_mul_left hle hgpos)
+    have hQ :=
+      h3
+        (by
+          have : g * ‖C.det‖ ^ 2 ≠ 0 := mul_ne_zero hg0 (pow_ne_zero _ (norm_ne_zero_iff.mpr hc))
+          exact_mod_cast this)
+        (le_of_mul_le_mul_left hle hgpos)
     exact sub_eq_zero.mp (conjTranspose_mul_self_eq_zero.mp hQ)
 
 end GlobalTheory

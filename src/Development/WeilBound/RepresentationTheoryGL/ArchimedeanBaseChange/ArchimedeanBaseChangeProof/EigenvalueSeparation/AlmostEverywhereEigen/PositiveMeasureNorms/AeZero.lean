@@ -11,11 +11,14 @@ noncomputable section
 
 namespace PositivityTheory.Rg.BcB.E2.P.Spec
 
-theorem ae_zero {S : Type} [TopologicalSpace S] [CompactSpace S] [T2Space S] [MeasurableSpace S] [BorelSpace S]
-    (ν : Measure S) [IsFiniteMeasure ν] [ν.Regular] (u : S → ℝ) (hu : Continuous u) (h0 : ∀ s, 0 ≤ u s)
-    (hi : ∫ s, (u s : ℂ) ∂ν = 0) : ∀ᵐ s ∂ν, u s = 0 := by
+theorem ae_zero
+    {S : Type} [TopologicalSpace S] [CompactSpace S] [T2Space S] [MeasurableSpace S] [BorelSpace S]
+    (ν : Measure S) [IsFiniteMeasure ν] [ν.Regular]
+    (u : S → ℝ) (hu : Continuous u) (h0 : ∀ s, 0 ≤ u s) (hi : ∫ s, (u s : ℂ) ∂ν = 0)
+    : ∀ᵐ s ∂ν, u s = 0 := by
   rw [integral_complex_ofReal, Complex.ofReal_eq_zero] at hi
-  have hint : Integrable u ν := integrableOn_univ.1 (hu.continuousOn.integrableOn_compact isCompact_univ)
+  have hint : Integrable u ν :=
+    integrableOn_univ.1 (hu.continuousOn.integrableOn_compact isCompact_univ)
   exact (integral_eq_zero_iff_of_nonneg (fun s => h0 s) hint).1 hi
 
 end PositivityTheory.Rg.BcB.E2.P.Spec
@@ -35,10 +38,10 @@ theorem spec : Gelf → Point → SpecMeas → SpecIso → Spec := by
   let gr : S → ℝ := fun s => max 0 (1 - (2 / ε) * ∑ c ∈ C₀, ‖e c s - p c‖)
   have hgr : Continuous gr := by
     refine continuous_const.max (continuous_const.sub (continuous_const.mul ?_))
-    exact continuous_finsetSum _ fun c _ => continuous_norm.comp ((e c).continuous.sub continuous_const)
+    exact continuous_finsetSum _ fun c _ =>
+      continuous_norm.comp ((e c).continuous.sub continuous_const)
   let g : C(S, ℂ) := ⟨fun s => (gr s : ℂ), Complex.continuous_ofReal.comp hgr⟩
-  have hg0 : g s₀ = 1 := by
-    simp [g, gr, hs₀]
+  have hg0 : g s₀ = 1 := by simp [g, gr, hs₀]
   have hgne : π g ≠ 0 := by
     intro h
     have h1 : ‖g‖ = 0 := by rw [← hπ, h, norm_zero]
@@ -72,7 +75,8 @@ theorem spec : Gelf → Point → SpecMeas → SpecIso → Spec := by
     intro c hc
     let tr : S → ℝ := fun s => max 0 (‖e c s - p c‖ - ε)
     have htr : Continuous tr :=
-      continuous_const.max ((continuous_norm.comp ((e c).continuous.sub continuous_const)).sub continuous_const)
+      continuous_const.max ((continuous_norm.comp ((e c).continuous.sub continuous_const)).sub
+        continuous_const)
     let t : C(S, ℂ) := ⟨fun s => (tr s : ℂ), Complex.continuous_ofReal.comp htr⟩
     have htg : t * g = 0 := by
       ext s
@@ -90,7 +94,8 @@ theorem spec : Gelf → Point → SpecMeas → SpecIso → Spec := by
     have hint : ∫ s, (tr s : ℂ) ∂ν = 0 := by
       have h1 := hν t
       have h2 : π t w = 0 := by
-        rw [hw, ← ContinuousLinearMap.mul_apply, ← map_mul, htg, map_zero, ContinuousLinearMap.zero_apply]
+        rw [hw, ← ContinuousLinearMap.mul_apply, ← map_mul, htg, map_zero,
+          ContinuousLinearMap.zero_apply]
       rw [h2, inner_zero_right] at h1
       exact h1
     filter_upwards [ae_zero ν tr htr (fun s => le_max_left _ _) hint] with s hs

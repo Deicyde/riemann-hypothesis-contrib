@@ -30,8 +30,11 @@ private lemma mem_range_of_fixed {K K' : Type} [Field K] [Field K'] [Algebra K K
   have hy : (y : AlgebraicClosure K) ∈ ({σ₀ c} : Set (AlgebraicClosure K)) := hroot ▸ y.2
   exact hy
 
-theorem UpperTheory.finite_kernel_powClasses_of_primitive_root :
-    ∀ (K K' : Type) [Field K] [Field K'] [Algebra K K'] [FiniteDimensional K K'] (q : ℕ) [NeZero q], (∃ ζ : K, IsPrimitiveRoot ζ q) → FinCls q {a : Kˣ | ∃ b : K', algebraMap K K' (a : K) = b ^ q} := by
+theorem UpperTheory.finite_kernel_powClasses_of_primitive_root
+    : ∀ (K K' : Type) [Field K] [Field K'] [Algebra K K'] [FiniteDimensional K K'] (q : ℕ)
+        [NeZero q],
+      (∃ ζ : K, IsPrimitiveRoot ζ q)
+        → FinCls q {a : Kˣ | ∃ b : K', algebraMap K K' (a : K) = b ^ q} := by
   intro K K' _ _ _ _ q _ ⟨ζ, hζ⟩
   classical
   haveI := hζ.neZero'
@@ -39,8 +42,7 @@ theorem UpperTheory.finite_kernel_powClasses_of_primitive_root :
   have hq0 : q ≠ 0 := NeZero.ne q
   let σ₀ : K' →ₐ[K] AlgebraicClosure K := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   let S : Set Kˣ := {a : Kˣ | ∃ b : K', algebraMap K K' (a : K) = b ^ q}
   let bb : Kˣ → K' := fun a => if h : ∃ b : K', algebraMap K K' (a : K) = b ^ q then h.choose else 1
@@ -54,7 +56,8 @@ theorem UpperTheory.finite_kernel_powClasses_of_primitive_root :
     have h := hbb a ha
     rw [h0, zero_pow hq0] at h
     exact a.ne_zero ((algebraMap K K').injective (by rw [h, map_zero]))
-  let sig : Kˣ → (K' →ₐ[K] AlgebraicClosure K) → AlgebraicClosure K := fun a σ => σ (bb a) / σ₀ (bb a)
+  let sig : Kˣ → (K' →ₐ[K] AlgebraicClosure K) → AlgebraicClosure K := fun a σ =>
+    σ (bb a) / σ₀ (bb a)
   have hsig : ∀ a ∈ S, ∀ σ, sig a σ ∈ Polynomial.nthRootsFinset q (1 : AlgebraicClosure K) := by
     intro a ha σ
     rw [Polynomial.mem_nthRootsFinset (Nat.pos_of_ne_zero hq0)]
@@ -63,12 +66,13 @@ theorem UpperTheory.finite_kernel_powClasses_of_primitive_root :
     have h2 : σ₀ (bb a) ≠ 0 := (map_ne_zero σ₀).mpr (hbb0 a ha)
     simp only [sig, div_pow, h1, div_self (pow_ne_zero _ h2)]
   have hfin : (sig '' S).Finite := by
-    refine (Set.Finite.pi (t := fun _ => (Polynomial.nthRootsFinset q (1 : AlgebraicClosure K) : Set _))
+    refine (Set.Finite.pi
+      (t := fun _ => (Polynomial.nthRootsFinset q (1 : AlgebraicClosure K) : Set _))
       (fun _ => Finset.finite_toSet _)).subset ?_
     rintro _ ⟨a, ha, rfl⟩
     exact Set.mem_univ_pi.mpr (fun σ => hsig a ha σ)
-  let rep : ((K' →ₐ[K] AlgebraicClosure K) → AlgebraicClosure K) → Kˣ :=
-    fun f => if h : ∃ a ∈ S, sig a = f then h.choose else 1
+  let rep : ((K' →ₐ[K] AlgebraicClosure K) → AlgebraicClosure K) → Kˣ := fun f =>
+    if h : ∃ a ∈ S, sig a = f then h.choose else 1
   refine ⟨hfin.toFinset.image rep, ?_⟩
   intro a ha
   have hex : ∃ a' ∈ S, sig a' = sig a := ⟨a, ha, rfl⟩
@@ -102,6 +106,7 @@ theorem UpperTheory.finite_kernel_powClasses_of_primitive_root :
   refine ⟨Units.mk0 e he0, ?_⟩
   ext
   apply (algebraMap K K').injective
-  simp only [Units.val_mul, Units.val_pow_eq_pow_val, Units.val_mk0, map_mul, map_pow, he, hc, map_div₀]
+  simp only [Units.val_mul, Units.val_pow_eq_pow_val, Units.val_mk0, map_mul, map_pow, he, hc,
+    map_div₀]
   have : algebraMap K K' (t : K) ≠ 0 := (map_ne_zero _).mpr t.ne_zero
   field_simp

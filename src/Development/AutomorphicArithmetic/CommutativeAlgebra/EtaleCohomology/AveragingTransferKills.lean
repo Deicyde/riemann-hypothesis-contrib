@@ -61,9 +61,10 @@ private lemma avg_gen (hLA : LocAvg) {C : Type 1} [Category.{0} C] (Pa : Parts C
   rw [map_nsmul, map_zero]
   exact hLA C Pa T F' hF Q P p I g hL j _ h0
 
-private def pullT {Q P : PAlg l ⥤ Type} (p : Q ⟶ P) (n : ℕ) :
-    CH.Mor (CategoryOfElements.π (testι l ⋙ P) ⋙ coefT l n)
-      (CategoryOfElements.π (testι l ⋙ Q) ⋙ coefT l n) (RingHom.id _) := pullMor p n
+private def pullT {Q P : PAlg l ⥤ Type} (p : Q ⟶ P) (n : ℕ)
+    : CH.Mor (CategoryOfElements.π (testι l ⋙ P) ⋙ coefT l n)
+      (CategoryOfElements.π (testι l ⋙ Q) ⋙ coefT l n) (RingHom.id _) :=
+  pullMor p n
 
 private lemma locTrans_of {Q P : PAlg l ⥤ Type} {p : Q ⟶ P} {I : Type} [Fintype I]
     {g : I → (Q ⟶ Q)} (h : TTrans p g) (Pa : Parts (Test l))
@@ -92,8 +93,9 @@ private lemma averaging_transfer_kills (hLA : LocAvg) (hP : PartsEx) (hA : AcrAd
 
 end UpperTheory.Ru.crystallineComparison
 
-open CategoryTheory CategoryTheory.Limits GroundTheory.PAdicHodge CrystallineSemistableComparison UpperTheory.Ru.crystallineComparison in
-theorem UpperTheory.Ru.crystallineComparison.avgMH :
-    UpperTheory.Ru.crystallineComparison.AvgMH := by
+open CategoryTheory CategoryTheory.Limits GroundTheory.PAdicHodge CrystallineSemistableComparison
+  UpperTheory.Ru.crystallineComparison in
+theorem UpperTheory.Ru.crystallineComparison.avgMH
+    : UpperTheory.Ru.crystallineComparison.AvgMH := by
   intro l _ Q P p I _ g h n j x hx
   exact averaging_transfer_kills locAvg partsEx acrAdd theoryEx p h n j x hx

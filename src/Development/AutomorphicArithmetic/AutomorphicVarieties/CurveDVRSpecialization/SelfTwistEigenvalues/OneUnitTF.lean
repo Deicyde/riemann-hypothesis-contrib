@@ -6,8 +6,9 @@ public import Mathlib
 
 open Polynomial Matrix
 
-theorem UpperTheory.V.Pr.T.oneUnitTF :
-    ∀ {R : Type} [CommRing R] [IsDomain R] [IsLocalRing R] (p : ℕ) [Fact p.Prime] [CharP R p] (x : R) (n : ℕ),
+theorem UpperTheory.V.Pr.T.oneUnitTF
+    : ∀ {R : Type} [CommRing R] [IsDomain R] [IsLocalRing R] (p : ℕ) [Fact p.Prime] [CharP R p]
+        (x : R) (n : ℕ),
       n ≠ 0 → x - 1 ∈ IsLocalRing.maximalIdeal R → x ^ n = 1 → x = 1 := by
   intro R _ _ _ p _ _ x n hn hx hxn
   have hp : p.Prime := Fact.out
@@ -21,8 +22,9 @@ theorem UpperTheory.V.Pr.T.oneUnitTF :
     have h := (Ne.isUnit h0).map (ZMod.castHom (dvd_refl p) R)
     simpa using h
   have hs : (∑ i ∈ Finset.range m, (x ^ p ^ k) ^ i) - m ∈ IsLocalRing.maximalIdeal R := by
-    have h : (∑ i ∈ Finset.range m, (x ^ p ^ k) ^ i) - m
-        = ∑ i ∈ Finset.range m, ((x ^ p ^ k) ^ i - 1) := by
+    have h
+        : (∑ i ∈ Finset.range m, (x ^ p ^ k) ^ i) - m
+          = ∑ i ∈ Finset.range m, ((x ^ p ^ k) ^ i - 1) := by
       simp [Finset.sum_sub_distrib]
     rw [h]
     refine Ideal.sum_mem _ fun i _ => ?_

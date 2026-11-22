@@ -17,8 +17,7 @@ private lemma sigma_sch (σ : ℂ ≃+* ℂ) {n : ℕ} (μ : Fin n → ℕ) (x :
   unfold UpperTheory.Gal.Schur.sch
   exact MvPolynomial.comp_aeval_apply (φ := (σ : ℂ →+* ℂ).toRatAlgHom) x _
 
-theorem UpperTheory.Gal.LocalSmoothExtension.schWConj_of :
-    SchWEq → SchWConj := by
+theorem UpperTheory.Gal.LocalSmoothExtension.schWConj_of : SchWEq → SchWConj := by
   intro hE σ F _ _ n lam χ
   classical
   by_cases h : ∃ g : (F →+* ℂ) → Fin n → ℂ, Lists χ g
@@ -35,11 +34,12 @@ theorem UpperTheory.Gal.LocalSmoothExtension.schWConj_of :
       rw [h1, roots_map_sigma, h2, Multiset.map_map]
       rfl
     rw [hE F n (conjWt σ lam) χ _ hg', hE F n lam χ g hg, map_prod]
-    let e : (F →+* ℂ) ≃ (F →+* ℂ) :=
-      { toFun := fun τ => (σ.symm : ℂ →+* ℂ).comp τ
-        invFun := fun τ => (σ : ℂ →+* ℂ).comp τ
-        left_inv := fun τ => by ext x; simp
-        right_inv := fun τ => by ext x; simp }
+    let e : (F →+* ℂ) ≃ (F →+* ℂ) := {
+      toFun := fun τ => (σ.symm : ℂ →+* ℂ).comp τ
+      invFun := fun τ => (σ : ℂ →+* ℂ).comp τ
+      left_inv := fun τ => by ext x; simp
+      right_inv := fun τ => by ext x; simp
+    }
     refine Fintype.prod_equiv e _ _ fun τ => ?_
     rw [sigma_sch]
     rfl

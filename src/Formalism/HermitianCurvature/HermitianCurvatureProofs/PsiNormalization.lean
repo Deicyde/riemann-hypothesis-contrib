@@ -12,7 +12,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.BesselCapelliCommutation
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.JF
 
 variable {k r : ℕ}
 
@@ -28,7 +29,8 @@ end Formalism.FourierDecayAlt.P.BesselCapelliCommutation
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.JF
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 

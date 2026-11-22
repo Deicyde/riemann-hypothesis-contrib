@@ -47,13 +47,22 @@ section Count
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem cone_lift_spec [DecidableEq K] {Q : Ideal (MRingOver ℂ ι)} (hP : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal Q)
-    (i0 : (k : K) → ι k) (k0 : K) {z : (Σ k, ι k) → ℂ} (hz : z ∈ conePts Q) (hne : segre z i0 ≠ 0) :
-    lift i0 k0 (segre z) ∈ conePts Q ∧ segre (lift i0 k0 (segre z)) = segre z := by
+theorem cone_lift_spec
+    [DecidableEq K]
+    {Q : Ideal (MRingOver ℂ ι)} (hP : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal Q)
+    (i0 : (k : K) → ι k)
+    (k0 : K)
+    {z : (Σ k, ι k) → ℂ} (hz : z ∈ conePts Q) (hne : segre z i0 ≠ 0)
+    : lift i0 k0 (segre z) ∈ conePts Q ∧ segre (lift i0 k0 (segre z)) = segre z := by
   have h0 : ∀ k, z ⟨k, i0 k⟩ ≠ 0 := fun k => (Finset.prod_ne_zero_iff.mp hne) k (Finset.mem_univ k)
   rw [lift_segre i0 k0 hne]
-  refine ⟨cone_scale hP (c := fun k => (if k = k0 then segre z i0 else 1) / z ⟨k, i0 k⟩)
-    (fun k => div_ne_zero (by split_ifs <;> simp [hne]) (h0 k)) hz, ?_⟩
+  refine ⟨
+    cone_scale hP
+      (c := fun k => (if k = k0 then segre z i0 else 1) / z ⟨k, i0 k⟩)
+      (fun k => div_ne_zero (by split_ifs <;> simp [hne]) (h0 k))
+      hz,
+    ?_
+  ⟩
   have hprod : ∏ k, (if k = k0 then segre z i0 else 1) / z ⟨k, i0 k⟩ = 1 := by
     rw [Finset.prod_div_distrib, Finset.prod_ite_eq' Finset.univ k0, if_pos (Finset.mem_univ _)]
     exact div_self hne
@@ -61,12 +70,14 @@ theorem cone_lift_spec [DecidableEq K] {Q : Ideal (MRingOver ℂ ι)} (hP : Reci
   funext i
   rw [one_mul]
 
-theorem cone_sheetLift {Q : Ideal (MRingOver ℂ ι)} (hP : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal Q) {e : ℕ}
-    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (y : Fin e → ℂ)
+theorem cone_sheetLift
+    {Q : Ideal (MRingOver ℂ ι)} (hP : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal Q)
+    {e : ℕ} (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (y : Fin e → ℂ)
     (h : (Fin e → ℂ) → ((k : K) → ι k) → ℂ)
-    (hev : ∀ᶠ y' in 𝓝 y, DifferentiableAt ℂ h y' ∧ (∃ z ∈ conePts Q, segre z = h y') ∧
-      Ψ (h y') = Fin.cons 1 y') :
-    ∃ γ, IsSetSheet (conePts Q) Ψ y (h y) γ := by
+    (hev
+      : ∀ᶠ y' in 𝓝 y, DifferentiableAt ℂ h y' ∧ (∃ z ∈ conePts Q, segre z = h y') ∧
+        Ψ (h y') = Fin.cons 1 y')
+    : ∃ γ, IsSetSheet (conePts Q) Ψ y (h y) γ := by
   classical
   obtain ⟨hd0, ⟨z0, hz0, hs0⟩, -⟩ := hev.self_of_nhds
   rcases isEmpty_or_nonempty K with hK | ⟨⟨k0⟩⟩
@@ -82,7 +93,11 @@ theorem cone_sheetLift {Q : Ideal (MRingOver ℂ ι)} (hP : ReciprocityTheory.An
       exact Finset.prod_ne_zero_iff.mpr fun k _ => hi0 k
     have hnear : ∀ᶠ y' in 𝓝 y, h y' i0 ≠ 0 :=
       (differentiableAt_pi.mp hd0 i0).continuousAt.eventually_ne hy
-    refine ⟨fun y' => lift i0 k0 (h y'), ?_, (hev.and hnear).mono fun y' ⟨⟨hd, ⟨z, hz, hs⟩, hΨ⟩, hne⟩ => ?_⟩
+    refine ⟨
+      fun y' => lift i0 k0 (h y'),
+      ?_,
+      (hev.and hnear).mono fun y' ⟨⟨hd, ⟨z, hz, hs⟩, hΨ⟩, hne⟩ => ?_
+    ⟩
     · show segre (lift i0 k0 (h y)) = h y
       rw [← hs0]
       exact (cone_lift_spec hP i0 k0 hz0 (hs0 ▸ hy)).2
@@ -96,10 +111,11 @@ theorem cone_sheetLift {Q : Ideal (MRingOver ℂ ι)} (hP : ReciprocityTheory.An
         rw [← hs, h2, hs]
         exact hΨ
 
-theorem mem_setFibre_iff {S : Set ((Σ k, ι k) → ℂ)} {e m : ℕ} (σ : Fin m ≃ ((k : K) → ι k))
-    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (y : Fin e → ℂ) (x : Fin m → ℂ) :
-    (fun i' => x (σ.symm i')) ∈ setFibre S Ψ y ↔
-      x ∈ setChartSet S σ Ψ ∧ chartProjMatrix σ Ψ *ᵥ x = y := by
+theorem mem_setFibre_iff
+    {S : Set ((Σ k, ι k) → ℂ)} {e m : ℕ} (σ : Fin m ≃ ((k : K) → ι k))
+    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (y : Fin e → ℂ) (x : Fin m → ℂ)
+    : (fun i' => x (σ.symm i')) ∈ setFibre S Ψ y
+      ↔ x ∈ setChartSet S σ Ψ ∧ chartProjMatrix σ Ψ *ᵥ x = y := by
   constructor
   · rintro ⟨z, hz, hzw, hΨ⟩
     have hx : x = fun a => segre z (σ a) := by
@@ -125,11 +141,15 @@ theorem mem_setFibre_iff {S : Set ((Σ k, ι k) → ℂ)} {e m : ℕ} (σ : Fin 
       rw [h]
       rfl
 
-theorem cxGenericCount {Q : Ideal (MRingOver ℂ ι)} {e : ℕ} (hQ : IsCxVar Q e)
-    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (hΨ : IsSetGoodProj (conePts Q) Ψ) :
-    ∃ d : ℕ, (∀ y, (setFibre (conePts Q) Ψ y).encard ≤ d) ∧
-      volume {y : Fin e → ℂ | ¬ ((setFibre (conePts Q) Ψ y).encard = d ∧
-        ∀ w ∈ setFibre (conePts Q) Ψ y, ∃ γ, IsSetSheet (conePts Q) Ψ y w γ)} = 0 := by
+theorem cxGenericCount
+    {Q : Ideal (MRingOver ℂ ι)} {e : ℕ} (hQ : IsCxVar Q e)
+    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (hΨ : IsSetGoodProj (conePts Q) Ψ)
+    : ∃ d : ℕ,
+      (∀ y, (setFibre (conePts Q) Ψ y).encard ≤ d)
+        ∧ volume
+            {y : Fin e → ℂ | ¬ ((setFibre (conePts Q) Ψ y).encard = d ∧
+              ∀ w ∈ setFibre (conePts Q) Ψ y, ∃ γ, IsSetSheet (conePts Q) Ψ y w γ)}
+          = 0 := by
   classical
   have hR : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal Q := hQ.2.1.2.1
   set σ := (Fintype.equivFin ((k : K) → ι k)).symm
@@ -150,12 +170,16 @@ theorem cxGenericCount {Q : Ideal (MRingOver ℂ ι)} {e : ℕ} (hQ : IsCxVar Q 
       have : (RingHom.ker (MvPolynomial.eval x)).IsPrime := RingHom.ker_isPrime _
       obtain ⟨J, hJm, hJle⟩ := Ideal.exists_minimalPrimes_le hle
       exact ⟨J, (hF J).2 hJm, fun q hq => RingHom.mem_ker.1 (hJle hq)⟩
-  obtain ⟨hle, Δ, hΔ, hgen⟩ := ComponentsGenericCount.proof _ e F A
-    (fun J hJF => ⟨((hF J).1 hJF).1.1, hJ J ((hF J).1 hJF)⟩)
-    (fun J hJF J' hJ'F hJJ' => le_antisymm hJJ' (((hF J').1 hJ'F).2 ((hF J).1 hJF).1 hJJ'))
+  obtain ⟨hle, Δ, hΔ, hgen⟩ :=
+    ComponentsGenericCount.proof _ e F A
+      (fun J hJF => ⟨((hF J).1 hJF).1.1, hJ J ((hF J).1 hJF)⟩)
+      (fun J hJF J' hJ'F hJJ' => le_antisymm hJJ' (((hF J').1 hJ'F).2 ((hF J).1 hJF).1 hJJ'))
 
-  have hfib : ∀ y, setFibre (conePts Q) Ψ y = (fun x : Fin _ → ℂ => fun i' => x (σ.symm i')) ''
-      {x | (∃ J ∈ F, x ∈ zeroSet J) ∧ A *ᵥ x = y} := by
+  have hfib
+      : ∀ y,
+        setFibre (conePts Q) Ψ y
+          = (fun x : Fin _ → ℂ => fun i' => x (σ.symm i'))
+            '' {x | (∃ J ∈ F, x ∈ zeroSet J) ∧ A *ᵥ x = y} := by
     intro y
     ext w
     constructor
@@ -172,8 +196,11 @@ theorem cxGenericCount {Q : Ideal (MRingOver ℂ ι)} {e : ℕ} (hQ : IsCxVar Q 
     intro x x' h
     funext a
     simpa using congrFun h (σ a)
-  have henc : ∀ y, (setFibre (conePts Q) Ψ y).encard = {x | (∃ J ∈ F, x ∈ zeroSet J) ∧ A *ᵥ x = y}.encard :=
-    fun y => by rw [hfib y, hinj.injOn.encard_image]
+  have henc
+      : ∀ y,
+        (setFibre (conePts Q) Ψ y).encard
+          = {x | (∃ J ∈ F, x ∈ zeroSet J) ∧ A *ᵥ x = y}.encard := fun y => by
+    rw [hfib y, hinj.injOn.encard_image]
   refine ⟨∑ J ∈ F, projDegree J A, fun y => (henc y).trans_le (hle y), ?_⟩
   refine measure_mono_null (fun y hy => ?_) (DiscriminantSheetCover.volume_zero_set Δ hΔ)
   by_contra h0
@@ -190,17 +217,19 @@ theorem cxGenericCount {Q : Ideal (MRingOver ℂ ι)} {e : ℕ} (hQ : IsCxVar Q 
   have hgd : DifferentiableAt ℂ g y' := hg.differentiableAt (hUo.mem_nhds hy')
   exact ⟨differentiableAt_pi.2 fun i' => differentiableAt_pi.1 hgd (σ.symm i'), ⟨z, hz, hzw⟩, hΨz⟩
 
-theorem cxSimple_of_count {S : Set ((Σ k, ι k) → ℂ)} {e : ℕ}
-    {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} {d : ℕ} {y : Fin e → ℂ}
-    (hbd : ∀ y', (setFibre S Ψ y').encard ≤ d) (hy : (setFibre S Ψ y).encard = d)
-    (hsh : ∀ w ∈ setFibre S Ψ y, ∃ γ, IsSetSheet S Ψ y w γ) {w : ((k : K) → ι k) → ℂ}
-    (hw : w ∈ setFibre S Ψ y) : CxComp.cxSimple S Ψ w := by
+theorem cxSimple_of_count
+    {S : Set ((Σ k, ι k) → ℂ)} {e : ℕ} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} {d : ℕ}
+    {y : Fin e → ℂ} (hbd : ∀ y', (setFibre S Ψ y').encard ≤ d) (hy : (setFibre S Ψ y).encard = d)
+    (hsh : ∀ w ∈ setFibre S Ψ y, ∃ γ, IsSetSheet S Ψ y w γ)
+    {w : ((k : K) → ι k) → ℂ} (hw : w ∈ setFibre S Ψ y)
+    : CxComp.cxSimple S Ψ w := by
   have hF : (setFibre S Ψ y).Finite := Set.finite_of_encard_eq_coe hy
   choose! γ hγ using hsh
   obtain ⟨U, hU, hdisj⟩ := hF.t2_separation
 
-  have hev : ∀ᶠ y' in 𝓝 y, ∀ a ∈ setFibre S Ψ y,
-      (γ a y' ∈ S ∧ Ψ (segre (γ a y')) = Fin.cons 1 y') ∧ segre (γ a y') ∈ U a := by
+  have hev
+      : ∀ᶠ y' in 𝓝 y, ∀ a ∈ setFibre S Ψ y,
+        (γ a y' ∈ S ∧ Ψ (segre (γ a y')) = Fin.cons 1 y') ∧ segre (γ a y') ∈ U a := by
     refine (hF.eventually_all).2 fun a ha => ?_
     have hc := (segre_differentiableAt (hγ a ha).2.self_of_nhds.1).continuousAt
     have hmem : U a ∈ 𝓝 (segre (γ a y)) := by
@@ -209,13 +238,17 @@ theorem cxSimple_of_count {S : Set ((Σ k, ι k) → ℂ)} {e : ℕ}
     filter_upwards [(hγ a ha).2, hc.preimage_mem_nhds hmem] with y' h1 h2
     exact ⟨⟨h1.2.1, h1.2.2⟩, h2⟩
 
-  have hfib : ∀ y', (∀ a ∈ setFibre S Ψ y, (γ a y' ∈ S ∧ Ψ (segre (γ a y')) = Fin.cons 1 y') ∧
-      segre (γ a y') ∈ U a) → setFibre S Ψ y' = (fun a => segre (γ a y')) '' setFibre S Ψ y := by
+  have hfib
+      : ∀ y',
+        (∀ a ∈ setFibre S Ψ y,
+            (γ a y' ∈ S ∧ Ψ (segre (γ a y')) = Fin.cons 1 y') ∧ segre (γ a y') ∈ U a)
+          → setFibre S Ψ y' = (fun a => segre (γ a y')) '' setFibre S Ψ y := by
     intro y' h
     have hinj : Set.InjOn (fun a => segre (γ a y')) (setFibre S Ψ y) := by
       intro a ha b hb hab
       by_contra hne
-      exact Set.disjoint_left.mp (hdisj ha hb hne) (h a ha).2 (by simp only at hab; rw [hab]; exact (h b hb).2)
+      exact Set.disjoint_left.mp (hdisj ha hb hne) (h a ha).2
+        (by simp only at hab; rw [hab]; exact (h b hb).2)
     have hsub : (fun a => segre (γ a y')) '' setFibre S Ψ y ⊆ setFibre S Ψ y' := by
       rintro _ ⟨a, ha, rfl⟩
       exact ⟨γ a y', (h a ha).1.1, rfl, (h a ha).1.2⟩

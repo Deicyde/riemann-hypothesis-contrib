@@ -7,7 +7,11 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.ExistsExtend
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry NumberField GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.HT GlobalTheory.CompanionTheory.Ar.Flat ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.NumbersDVR.Bundles
+open CategoryTheory AlgebraicGeometry NumberField GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.HT GlobalTheory.CompanionTheory.Ar.Flat
+  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.NumbersDVR.Bundles
 
 noncomputable section
 
@@ -15,12 +19,17 @@ namespace GlobalTheory.CompanionTheory.Ar.Flat.HTStalk
 
 section Lattices
 
-variable {X : Scheme.{0}} {Ω : Type} [Field Ω] {G : Over X} [GrpObj G] {ξ : Spec (CommRingCat.of Ω) ⟶ X}
-  {V : Type} [AddCommGroup V] [Module Ω V]
+variable
+  {X : Scheme.{0}} {Ω : Type} [Field Ω]
+  {G : Over X} [GrpObj G]
+  {ξ : Spec (CommRingCat.of Ω) ⟶ X} {V : Type} [AddCommGroup V] [Module Ω V]
 
-theorem mem_htW_iff (M : LieModel G ξ V) (L : Semi.LB G.left) (n : ℕ) {R : Type} [CommRing R]
-    (ρ : R →+* Module.End Ω V) (σ : R →+* Ω) (𝔡 : Ideal R) (q : Cpt ξ) (e : V) :
-    e ∈ M.htW L n ρ σ 𝔡 q ↔ e ∈ GlobalTheory.CompanionTheory.Ar.eigSp ρ σ ∧ ∀ d ∈ 𝔡, σ d • e ∈ M.htDual L n ρ σ q := by
+theorem mem_htW_iff
+    (M : LieModel G ξ V) (L : Semi.LB G.left) (n : ℕ)
+    {R : Type} [CommRing R]
+    (ρ : R →+* Module.End Ω V) (σ : R →+* Ω) (𝔡 : Ideal R) (q : Cpt ξ) (e : V)
+    : e ∈ M.htW L n ρ σ 𝔡 q
+      ↔ e ∈ GlobalTheory.CompanionTheory.Ar.eigSp ρ σ ∧ ∀ d ∈ 𝔡, σ d • e ∈ M.htDual L n ρ σ q := by
   constructor
   · intro he
     induction he using Submodule.span_induction with
@@ -37,35 +46,43 @@ theorem mem_htW_iff (M : LieModel G ξ V) (L : Semi.LB G.left) (n : ℕ) {R : Ty
       exact Submodule.smul_mem _ c (hx.2 d hd)
   · exact fun h => Submodule.subset_span h
 
-theorem mem_htW_iff_forms (M : LieModel G ξ V) (L : Semi.LB G.left) (n : ℕ) {R : Type} [CommRing R]
-    (ρ : R →+* Module.End Ω V) (σ : R →+* Ω) (𝔡 : Ideal R) (q : Cpt ξ) (e : V) :
-    e ∈ M.htW L n ρ σ 𝔡 q ↔
-      e ∈ GlobalTheory.CompanionTheory.Ar.eigSp ρ σ ∧ ∀ w ∈ M.htOm L n q, ∀ d ∈ 𝔡, σ d * w e ∈ regAt ξ q := by
+theorem mem_htW_iff_forms
+    (M : LieModel G ξ V) (L : Semi.LB G.left) (n : ℕ)
+    {R : Type} [CommRing R]
+    (ρ : R →+* Module.End Ω V) (σ : R →+* Ω) (𝔡 : Ideal R) (q : Cpt ξ) (e : V)
+    : e ∈ M.htW L n ρ σ 𝔡 q
+      ↔ e ∈ GlobalTheory.CompanionTheory.Ar.eigSp ρ σ
+        ∧ ∀ w ∈ M.htOm L n q, ∀ d ∈ 𝔡, σ d * w e ∈ regAt ξ q := by
   rw [mem_htW_iff]
   refine and_congr_right fun he => ⟨fun h w hw d hd => ?_, fun h d hd => ?_⟩
   · have := ((M.mem_htDual_iff L n ρ σ q _).1 (h d hd)).2 w hw
     simpa [map_smul, smul_eq_mul] using this
-  · refine (M.mem_htDual_iff L n ρ σ q _).2 ⟨(GlobalTheory.CompanionTheory.Ar.eigSp ρ σ).smul_mem _ he, fun w hw => ?_⟩
+  · refine (M.mem_htDual_iff L n ρ σ q _).2
+      ⟨(GlobalTheory.CompanionTheory.Ar.eigSp ρ σ).smul_mem _ he, fun w hw => ?_⟩
     simpa [map_smul, smul_eq_mul] using h w hw d hd
 
 end Lattices
 
-theorem forall_different_iff {o Ω E : Type} [CommRing o] [Field Ω] [Algebra o Ω] [Field E] [NumberField E]
-    (A : Subalgebra o Ω) (B : Subring Ω) (hA : ∀ a : A, (a : Ω) ∈ B) (σ : E →+* Ω) (ds : A)
-    (hds : GeneratesDiff σ ds) (t : Ω) :
-    (∀ x ∈ differentIdeal ℤ (𝓞 E), σ (x : E) * t ∈ B) ↔ (ds : Ω) * t ∈ B := by
+theorem forall_different_iff
+    {o Ω E : Type} [CommRing o] [Field Ω] [Algebra o Ω] [Field E] [NumberField E]
+    (A : Subalgebra o Ω) (B : Subring Ω) (hA : ∀ a : A, (a : Ω) ∈ B)
+    (σ : E →+* Ω) (ds : A) (hds : GeneratesDiff σ ds)
+    (t : Ω)
+    : (∀ x ∈ differentIdeal ℤ (𝓞 E), σ (x : E) * t ∈ B) ↔ (ds : Ω) * t ∈ B := by
   constructor
   · intro h
-    have h1 : algebraMap A Ω ds ∈ Submodule.span A {algebraMap A Ω ds} :=
-      Submodule.subset_span rfl
+    have h1 : algebraMap A Ω ds ∈ Submodule.span A {algebraMap A Ω ds} := Submodule.subset_span rfl
     rw [hds] at h1
-    have h2 : ∀ z ∈ Submodule.span A {y : Ω | ∃ x ∈ differentIdeal ℤ (𝓞 E), y = σ (x : E)}, z * t ∈ B := by
+    have h2
+        : ∀ z ∈ Submodule.span A {y : Ω | ∃ x ∈ differentIdeal ℤ (𝓞 E), y = σ (x : E)},
+          z * t ∈ B := by
       intro z hz
       induction hz using Submodule.span_induction with
       | mem z hz =>
         obtain ⟨x, hx, rfl⟩ := hz
         exact h x hx
-      | zero => simpa using B.zero_mem
+      | zero =>
+        simpa using B.zero_mem
       | add u v _ _ hu hv =>
         rw [add_mul]
         exact B.add_mem hu hv
@@ -89,31 +106,46 @@ theorem forall_different_iff {o Ω E : Type} [CommRing o] [Field Ω] [Algebra o 
 
 section Model
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
-  {Xo : Moduli D l} {c : Coeff l} {O : Type} [CommRing O] {β : O →+* c.F} {Y : Model Xo c β} {S : Finset ℕ}
-  {Ω : Type} [Field Ω] {K : Type} [Fintype K] {J : K → Type} {y : (Σ k, J k) → Ω} (𝔐 : HodgeCpt Y S y)
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {D : Datum H} {l : Level H} {Xo : Moduli D l} {c : Coeff l} {O : Type} [CommRing O]
+  {β : O →+* c.F} {Y : Model Xo c β} {S : Finset ℕ} {Ω : Type} [Field Ω]
+  {K : Type} [Fintype K]
+  {J : K → Type} {y : (Σ k, J k) → Ω} (𝔐 : HodgeCpt Y S y)
 
-theorem inv_natCast_mem {p : ℕ} (hp : p.Prime) {q : Cpt 𝔐.ξ} (hq : InFibre 𝔐.ξ p q) (b : ℕ) (hb : ¬ p ∣ b) :
-    ((b : Ω))⁻¹ ∈ regAt 𝔐.ξ q := by
+theorem inv_natCast_mem
+    {p : ℕ} (hp : p.Prime) {q : Cpt 𝔐.ξ} (hq : InFibre 𝔐.ξ p q) (b : ℕ) (hb : ¬ p ∣ b)
+    : ((b : Ω))⁻¹ ∈ regAt 𝔐.ξ q := by
   have hZ : OverZp 𝔐 p q := by
     intro r hr hrq
     by_contra hne
     have hloc : IsLocalRing (GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q) :=
       IsLocalRing.of_surjective' (GlobalTheory.CompanionTheory.Ar.genMap 𝔐.ξ q).rangeRestrict
         (GlobalTheory.CompanionTheory.Ar.genMap 𝔐.ξ q).rangeRestrict_surjective
-    have key : ∀ m : ℕ, GlobalTheory.CompanionTheory.Ar.InFibre 𝔐.ξ m q → ¬ IsUnit ((m : GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q)) := by
+    have key
+        : ∀ m : ℕ,
+          GlobalTheory.CompanionTheory.Ar.InFibre 𝔐.ξ m q
+            → ¬ IsUnit ((m : GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q)) := by
       intro m hm hu
       apply hm
       obtain ⟨u, hu'⟩ := hu
-      have h1 : (m : Ω) * (((u⁻¹ : (GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q)ˣ) : GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q) : Ω) = 1 := by
-        have h2 := congrArg (fun x : GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q => (x : Ω)) u.mul_inv
+      have h1
+          : (m : Ω)
+              * (((u⁻¹ : (GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q)ˣ)
+                  : GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q)
+                : Ω)
+            = 1 := by
+        have h2 :=
+          congrArg (fun x : GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q => (x : Ω)) u.mul_inv
         simpa [hu'] using h2
       have h0 : (m : Ω) ≠ 0 := left_ne_zero_of_mul_eq_one h1
       refine ⟨h0, natCast_mem _ m, ?_⟩
       rw [← eq_inv_of_mul_eq_one_right h1]
       exact SetLike.coe_mem _
     have hcop : Nat.Coprime r p := (Nat.coprime_primes hr hp).2 hne
-    obtain ⟨a, b, hab⟩ := (Nat.isCoprime_iff_coprime.2 hcop).map (Int.castRingHom (GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q))
+    obtain ⟨a, b, hab⟩ :=
+      (Nat.isCoprime_iff_coprime.2 hcop).map
+        (Int.castRingHom (GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q))
     rcases IsLocalRing.isUnit_or_isUnit_of_add_one hab with h | h
     · exact key r hrq (by simpa using isUnit_of_mul_isUnit_right h)
     · exact key p hq (by simpa using isUnit_of_mul_isUnit_right h)
@@ -134,10 +166,13 @@ theorem inv_natCast_mem {p : ℕ} (hp : p.Prime) {q : Cpt 𝔐.ξ} (hq : InFibre
     rw [Nat.cast_mul, mul_inv]
     exact (regAt 𝔐.ξ q).mul_mem (ha h1) (hb' h2)
 
-theorem chart_mem_regAt {p : ℕ} (hp : p.Prime) {o : Type} [CommRing o] [Algebra o Ω]
+theorem chart_mem_regAt
+    {p : ℕ} (hp : p.Prime)
+    {o : Type} [CommRing o] [Algebra o Ω]
     (ho : ∀ x : Ω, x ∈ (algebraMap o Ω).range ↔ ∃ (a : ℤ) (b : ℕ), ¬ p ∣ b ∧ x = (a : Ω) / (b : Ω))
-    {s : ∀ k, J k} {q : Cpt 𝔐.ξ} (hs : InChart 𝔐.ξ (mseg y) s q) (hq : InFibre 𝔐.ξ p q)
-    (a : chartRing o (mseg y) s) : (a : Ω) ∈ regAt 𝔐.ξ q := by
+    {s : ∀ k, J k} {q : Cpt 𝔐.ξ}
+    (hs : InChart 𝔐.ξ (mseg y) s q) (hq : InFibre 𝔐.ξ p q) (a : chartRing o (mseg y) s)
+    : (a : Ω) ∈ regAt 𝔐.ξ q := by
   obtain ⟨a, ha⟩ := a
   change a ∈ regAt 𝔐.ξ q
   change a ∈ Algebra.adjoin o _ at ha
@@ -154,8 +189,30 @@ theorem chart_mem_regAt {p : ℕ} (hp : p.Prime) {o : Type} [CommRing o] [Algebr
 
 end Model
 
-theorem mem_V_inl_iff : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β) (S : Finset ℕ) (Ω : Type) [Field Ω] (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω) (𝔐 : HodgeCpt Y S y) (p : ℕ) [Fact p.Prime] (o : Type) [CommRing o] [Algebra o Ω] (ho : ∀ x : Ω, x ∈ (algebraMap o Ω).range ↔ ∃ (a : ℤ) (b : ℕ), ¬ p ∣ b ∧ x = (a : Ω) / (b : Ω)) (Dc : ∀ s : {s : ∀ k, J k // mseg y s ≠ 0}, HTChart (chartRing o (mseg y) s.1) Ω (cmConj E) p (𝔐.R p) (D.p + D.q) (Module.Dual Ω 𝔐.Li)), IsHTFamily 𝔐 p o Dc → p ∈ S → ∀ (τ : CMType H) (σ : E →+* Ω), (∀ a : 𝓞 E, σ (a : E) = 𝔐.emb (Sum.inl τ) a) → ∀ (s : {s : ∀ k, J k // mseg y s ≠ 0}) (ds : chartRing o (mseg y) s.1), GeneratesDiff σ ds → ∀ q : Cpt 𝔐.ξ, InChart 𝔐.ξ (mseg y) s.1 q → InFibre 𝔐.ξ p q → ∀ e : 𝔐.Li, e ∈ 𝔐.V (Sum.inl τ) q ↔ e ∈ HTL.latOn (Dc s) (GlobalTheory.CompanionTheory.Ar.HT.eigSp 𝔐.ρ σ) (ds : Ω) (regAt 𝔐.ξ q) := by
-  intro E _ _ _ H D l Xo c O _ β Y S Ω _ K _ J _ y 𝔐 p _ o _ _ ho Dc hD hpS τ σ hσ s ds hds q hs hq e
+theorem mem_V_inl_iff
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β)
+        (S : Finset ℕ) (Ω : Type) [Field Ω] (K : Type) [Fintype K] (J : K → Type)
+        [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω) (𝔐 : HodgeCpt Y S y) (p : ℕ) [Fact p.Prime]
+        (o : Type) [CommRing o] [Algebra o Ω]
+        (ho : ∀ x : Ω,
+          x ∈ (algebraMap o Ω).range ↔ ∃ (a : ℤ) (b : ℕ), ¬ p ∣ b ∧ x = (a : Ω) / (b : Ω))
+        (Dc : ∀ s : {s : ∀ k, J k // mseg y s ≠ 0},
+          HTChart (chartRing o (mseg y) s.1) Ω (cmConj E) p (𝔐.R p) (D.p + D.q)
+            (Module.Dual Ω 𝔐.Li)),
+      IsHTFamily 𝔐 p o Dc → p ∈ S
+        → ∀ (τ : CMType H) (σ : E →+* Ω),
+          (∀ a : 𝓞 E, σ (a : E) = 𝔐.emb (Sum.inl τ) a)
+            → ∀ (s : {s : ∀ k, J k // mseg y s ≠ 0}) (ds : chartRing o (mseg y) s.1),
+              GeneratesDiff σ ds
+                → ∀ q : Cpt 𝔐.ξ,
+                  InChart 𝔐.ξ (mseg y) s.1 q → InFibre 𝔐.ξ p q
+                    → ∀ e : 𝔐.Li,
+                      e ∈ 𝔐.V (Sum.inl τ) q
+                        ↔ e ∈ HTL.latOn (Dc s) (GlobalTheory.CompanionTheory.Ar.HT.eigSp 𝔐.ρ σ)
+                          (ds : Ω) (regAt 𝔐.ξ q) := by
+  intro E _ _ _ H D l Xo c O _ β Y S Ω _ K _ J _ y 𝔐 p _ o _ _ ho Dc hD hpS τ σ hσ s ds hds q hs hq
+    e
   have hp : p.Prime := Fact.out
   have hZ : OverZp 𝔐 p q := by
     intro r hr hrq
@@ -163,29 +220,41 @@ theorem mem_V_inl_iff : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (
     have hloc : IsLocalRing (GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q) :=
       IsLocalRing.of_surjective' (GlobalTheory.CompanionTheory.Ar.genMap 𝔐.ξ q).rangeRestrict
         (GlobalTheory.CompanionTheory.Ar.genMap 𝔐.ξ q).rangeRestrict_surjective
-    have key : ∀ m : ℕ, GlobalTheory.CompanionTheory.Ar.InFibre 𝔐.ξ m q → ¬ IsUnit ((m : GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q)) := by
+    have key
+        : ∀ m : ℕ,
+          GlobalTheory.CompanionTheory.Ar.InFibre 𝔐.ξ m q
+            → ¬ IsUnit ((m : GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q)) := by
       intro m hm hu
       apply hm
       obtain ⟨u, hu'⟩ := hu
-      have h1 : (m : Ω) * (((u⁻¹ : (GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q)ˣ) : GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q) : Ω) = 1 := by
-        have h2 := congrArg (fun x : GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q => (x : Ω)) u.mul_inv
+      have h1
+          : (m : Ω)
+              * (((u⁻¹ : (GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q)ˣ)
+                  : GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q)
+                : Ω)
+            = 1 := by
+        have h2 :=
+          congrArg (fun x : GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q => (x : Ω)) u.mul_inv
         simpa [hu'] using h2
       have h0 : (m : Ω) ≠ 0 := left_ne_zero_of_mul_eq_one h1
       refine ⟨h0, natCast_mem _ m, ?_⟩
       rw [← eq_inv_of_mul_eq_one_right h1]
       exact SetLike.coe_mem _
     have hcop : Nat.Coprime r p := (Nat.coprime_primes hr hp).2 hne
-    obtain ⟨a, b, hab⟩ := (Nat.isCoprime_iff_coprime.2 hcop).map (Int.castRingHom (GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q))
+    obtain ⟨a, b, hab⟩ :=
+      (Nat.isCoprime_iff_coprime.2 hcop).map
+        (Int.castRingHom (GlobalTheory.CompanionTheory.Ar.regAt 𝔐.ξ q))
     rcases IsLocalRing.isUnit_or_isUnit_of_add_one hab with h | h
     · exact key r hrq (by simpa using isUnit_of_mul_isUnit_right h)
     · exact key p hq (by simpa using isUnit_of_mul_isUnit_right h)
   have hV : 𝔐.V (Sum.inl τ) q = 𝔐.HT p (Sum.inl τ) q :=
-    Lat.patch_of_unique S _ _ hpS hq fun p' hp' h =>
-      hZ p' (𝔐.S_prime p' hp') h
-  have hE : e ∈ GlobalTheory.CompanionTheory.Ar.eigSp 𝔐.ρ (𝔐.emb (Sum.inl τ)) ↔ e ∈ GlobalTheory.CompanionTheory.Ar.HT.eigSp 𝔐.ρ σ := by
+    Lat.patch_of_unique S _ _ hpS hq fun p' hp' h => hZ p' (𝔐.S_prime p' hp') h
+  have hE
+      : e ∈ GlobalTheory.CompanionTheory.Ar.eigSp 𝔐.ρ (𝔐.emb (Sum.inl τ))
+        ↔ e ∈ GlobalTheory.CompanionTheory.Ar.HT.eigSp 𝔐.ρ σ := by
     rw [LatBasic.mem_eigSp]
-    simp only [GlobalTheory.CompanionTheory.Ar.eigSp, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply,
-      LinearMap.smul_apply, LinearMap.id_apply, sub_eq_zero, hσ]
+    simp only [GlobalTheory.CompanionTheory.Ar.eigSp, Submodule.mem_iInf, LinearMap.mem_ker,
+      LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply, sub_eq_zero, hσ]
   have hA := chart_mem_regAt 𝔐 hp ho hs hq
   have hO : omP 𝔐 p q = Submodule.span (regAt 𝔐.ξ q) ((Dc s).om' : Set (Module.Dual Ω 𝔐.Li)) :=
     hD.om'_loc s q hs hq
@@ -193,9 +262,10 @@ theorem mem_V_inl_iff : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (
   change e ∈ 𝔐.M.htW _ _ _ _ _ q ↔ _
   rw [mem_htW_iff_forms, hE]
   refine and_congr_right fun _ => ?_
-  have hT : ∀ w : Module.Dual Ω 𝔐.Li,
-      (∀ d ∈ differentIdeal ℤ (𝓞 E), 𝔐.emb (Sum.inl τ) d * w e ∈ regAt 𝔐.ξ q) ↔
-        (ds : Ω) * w e ∈ regAt 𝔐.ξ q := fun w => by
+  have hT
+      : ∀ w : Module.Dual Ω 𝔐.Li,
+        (∀ d ∈ differentIdeal ℤ (𝓞 E), 𝔐.emb (Sum.inl τ) d * w e ∈ regAt 𝔐.ξ q)
+          ↔ (ds : Ω) * w e ∈ regAt 𝔐.ξ q := fun w => by
     rw [← forall_different_iff _ _ hA σ ds hds]
     simp only [hσ]
   constructor

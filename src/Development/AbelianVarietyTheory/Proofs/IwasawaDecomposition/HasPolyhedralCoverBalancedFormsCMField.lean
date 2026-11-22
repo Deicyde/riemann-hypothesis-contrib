@@ -19,12 +19,22 @@ section Cover
 
 variable {O X : Type} [CommRing O] [AddCommGroup X] [Module O X]
 
-theorem hasRedCover_of_fintype (bar : O → O) {ι : Type} [Fintype ι] (f : ι → LinearMap.BilinForm ℤ X)
-    (h1 : ∀ i y z, f i y z = f i z y) (h2 : ∀ i y, 0 ≤ f i y y)
-    (h : ∀ B ∈ psdCone (bar := bar) (X := X), ∃ (e : X ≃ₗ[O] X) (c : ι → ℝ), (∀ i, 0 ≤ c i) ∧
-      pullR e.toLinearMap B = ∑ i, c i • toReal (f i)) : HasRedCover bar X := by
+theorem hasRedCover_of_fintype
+    (bar : O → O)
+    {ι : Type} [Fintype ι]
+    (f : ι → LinearMap.BilinForm ℤ X) (h1 : ∀ i y z, f i y z = f i z y) (h2 : ∀ i y, 0 ≤ f i y y)
+    (h : ∀ B ∈ psdCone (bar := bar) (X := X), ∃ (e : X ≃ₗ[O] X) (c : ι → ℝ),
+      (∀ i, 0 ≤ c i) ∧ pullR e.toLinearMap B = ∑ i, c i • toReal (f i))
+    : HasRedCover bar X := by
   let q := Fintype.equivFin ι
-  refine ⟨1, fun _ => Fintype.card ι, fun _ i => f (q.symm i), fun _ i => h1 _, fun _ i => h2 _, fun B hB => ?_⟩
+  refine ⟨
+    1,
+    fun _ => Fintype.card ι,
+    fun _ i => f (q.symm i),
+    fun _ i => h1 _,
+    fun _ i => h2 _,
+    fun B hB => ?_
+  ⟩
   obtain ⟨e, c, hc, he⟩ := h B hB
   refine ⟨e, 0, fun i => c (q.symm i), fun i => hc _, ?_⟩
   rw [he]
@@ -34,44 +44,60 @@ def sqForm {n : ℕ} (b : Module.Basis (Fin n) ℤ X) (l : Fin n → ℤ) : Line
   let φ : X →ₗ[ℤ] ℤ := ∑ i, l i • b.coord i
   (LinearMap.mul ℤ ℤ).compl₁₂ φ φ
 
-theorem sqForm_apply {n : ℕ} (b : Module.Basis (Fin n) ℤ X) (l : Fin n → ℤ) (y z : X) :
-    sqForm b l y z = (∑ i, l i * b.repr y i) * ∑ i, l i * b.repr z i := by
+theorem sqForm_apply {n : ℕ} (b : Module.Basis (Fin n) ℤ X) (l : Fin n → ℤ) (y z : X)
+    : sqForm b l y z = (∑ i, l i * b.repr y i) * ∑ i, l i * b.repr z i := by
   simp [sqForm, LinearMap.sum_apply]
   rw [Finset.sum_mul_sum, Finset.sum_comm]
 
-theorem sqForm_basis {n : ℕ} (b : Module.Basis (Fin n) ℤ X) (l : Fin n → ℤ) (i j : Fin n) :
-    sqForm b l (b i) (b j) = l i * l j := by
+theorem sqForm_basis {n : ℕ} (b : Module.Basis (Fin n) ℤ X) (l : Fin n → ℤ) (i j : Fin n)
+    : sqForm b l (b i) (b j) = l i * l j := by
   simp [sqForm_apply, Finsupp.single_apply]
 
-theorem exists_equiv_of_actMat_eq {n : ℕ} (b b' : Module.Basis (Fin n) ℤ X)
-    (h : (actMat b : O →+* _) = actMat b') : ∃ e : X ≃ₗ[O] X, ∀ i, e (b i) = b' i := by
+theorem exists_equiv_of_actMat_eq
+    {n : ℕ} (b b' : Module.Basis (Fin n) ℤ X) (h : (actMat b : O →+* _) = actMat b')
+    : ∃ e : X ≃ₗ[O] X, ∀ i, e (b i) = b' i := by
   let g : X ≃ₗ[ℤ] X := b.equiv b' (Equiv.refl _)
   have hg : ∀ i, g (b i) = b' i := fun i => by simp [g]
   have key : ∀ (c : O) (x : X), g (c • x) = c • g x := by
     intro c x
-    have h1 : (g.toLinearMap ∘ₗ (Module.toModuleEnd ℤ X c)) = (Module.toModuleEnd ℤ X c) ∘ₗ g.toLinearMap := by
+    have h1
+        : (g.toLinearMap ∘ₗ (Module.toModuleEnd ℤ X c))
+          = (Module.toModuleEnd ℤ X c) ∘ₗ g.toLinearMap := by
       refine b.ext fun j => ?_
       change g (c • b j) = c • g (b j)
       rw [hg]
-      calc g (c • b j) = g (∑ i, b.repr (c • b j) i • b i) := by rw [b.sum_repr]
+      calc
+        g (c • b j)
+          = g (∑ i, b.repr (c • b j) i • b i) := by rw [b.sum_repr]
         _ = ∑ i, b.repr (c • b j) i • b' i := by simp only [map_sum, map_smul, hg]
-        _ = ∑ i, b'.repr (c • b' j) i • b' i := Finset.sum_congr rfl fun i _ => by
-            have := congrFun (congrFun (congrArg (fun ρ : O →+* Matrix (Fin n) (Fin n) ℤ => ρ c) h) i) j
+        _ = ∑ i, b'.repr (c • b' j) i • b' i :=
+          Finset.sum_congr rfl fun i _ => by
+            have :=
+              congrFun (congrFun (congrArg (fun ρ : O →+* Matrix (Fin n) (Fin n) ℤ => ρ c) h) i) j
             simp only [actMat_apply] at this
             rw [this]
         _ = c • b' j := b'.sum_repr _
     exact LinearMap.congr_fun h1 x
   exact ⟨(g.toAddEquiv).toLinearEquiv key, hg⟩
 
-theorem actMat_balanced {bar : O → O} {n : ℕ} (b : Module.Basis (Fin n) ℤ X) {B : X →ₗ[ℤ] X →ₗ[ℤ] ℝ}
-    (hB : B ∈ realForms bar X) {G : Matrix (Fin n) (Fin n) ℝ} (hG : ∀ i j, B (b i) (b j) = G i j) (c : O) :
-    ((actMat b c).map (Int.cast : ℤ → ℝ))ᵀ * G = G * (actMat b (bar c)).map (Int.cast : ℤ → ℝ) := by
+theorem actMat_balanced
+    {bar : O → O} {n : ℕ} (b : Module.Basis (Fin n) ℤ X)
+    {B : X →ₗ[ℤ] X →ₗ[ℤ] ℝ} (hB : B ∈ realForms bar X)
+    {G : Matrix (Fin n) (Fin n) ℝ} (hG : ∀ i j, B (b i) (b j) = G i j)
+    (c : O)
+    : ((actMat b c).map (Int.cast : ℤ → ℝ))ᵀ * G
+      = G * (actMat b (bar c)).map (Int.cast : ℤ → ℝ) := by
   ext i j
   have e1 : B (c • b i) (b j) = ∑ k, (b.repr (c • b i) k : ℝ) * G k j :=
-    calc B (c • b i) (b j) = B (∑ k, b.repr (c • b i) k • b k) (b j) := by rw [b.sum_repr]
-      _ = _ := by simp only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, hG, zsmul_eq_mul]
+    calc
+      B (c • b i) (b j)
+        = B (∑ k, b.repr (c • b i) k • b k) (b j) := by rw [b.sum_repr]
+      _ = _ := by
+        simp only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, hG, zsmul_eq_mul]
   have e2 : B (b i) (bar c • b j) = ∑ k, G i k * (b.repr (bar c • b j) k : ℝ) :=
-    calc B (b i) (bar c • b j) = B (b i) (∑ k, b.repr (bar c • b j) k • b k) := by rw [b.sum_repr]
+    calc
+      B (b i) (bar c • b j)
+        = B (b i) (∑ k, b.repr (bar c • b j) k • b k) := by rw [b.sum_repr]
       _ = _ := by simp only [map_sum, map_smul, hG, zsmul_eq_mul, mul_comm]
   simp only [Matrix.mul_apply, Matrix.transpose_apply, Matrix.map_apply, actMat_apply]
   rw [← e1, ← e2]
@@ -79,8 +105,11 @@ theorem actMat_balanced {bar : O → O} {n : ℕ} (b : Module.Basis (Fin n) ℤ 
 
 end Cover
 
-theorem hasRedCover (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (X : Type) [AddCommGroup X] [Module (𝓞 E) X]
-    [Module.Finite (𝓞 E) X] [Module.Projective (𝓞 E) X] : HasRedCover H.bar X := by
+theorem hasRedCover
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (H : Host E)
+    (X : Type) [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite (𝓞 E) X] [Module.Projective (𝓞 E) X]
+    : HasRedCover H.bar X := by
   classical
   haveI : Module.Finite ℤ X := Module.Finite.trans (𝓞 E) X
   haveI : Module.Projective ℤ X := by
@@ -93,12 +122,18 @@ theorem hasRedCover (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host
   have hF := GlobalTheory.T.finite_balanced_cmIntegers_actions_siegelReduced E H n
   obtain ⟨S, hS⟩ := GlobalTheory.T.siegelGram_mem_cone_integer_squares n
   haveI : Nonempty (Module.Basis (Fin n) ℤ X) := ⟨Module.finBasisOfFinrankEq ℤ X hn⟩
-  let ref : (𝓞 E →+* Matrix (Fin n) (Fin n) ℤ) → Module.Basis (Fin n) ℤ X := fun ρ => Classical.epsilon fun b => actMat b = ρ
+  let ref : (𝓞 E →+* Matrix (Fin n) (Fin n) ℤ) → Module.Basis (Fin n) ℤ X := fun ρ =>
+    Classical.epsilon fun b => actMat b = ρ
   let ι := ↥hF.toFinset × ↥S
-  refine hasRedCover_of_fintype (ι := ι) _ (fun x => sqForm (ref x.1.1) x.2.1) (fun x y z => ?_) (fun x y => ?_) fun B hB => ?_
+  refine hasRedCover_of_fintype (ι := ι) _
+    (fun x => sqForm (ref x.1.1) x.2.1)
+    (fun x y z => ?_)
+    (fun x y => ?_)
+    fun B hB => ?_
   · simp only [sqForm_apply, mul_comm]
   · simp only [sqForm_apply]; exact mul_self_nonneg _
-  obtain ⟨b, d, d', u, B', h1, h2, h3, h4, h5, h6⟩ := GlobalTheory.T.exists_adapted_siegel_basis_balanced_forms E H X B₀ hB₀ hB₀' n hn B hB
+  obtain ⟨b, d, d', u, B', h1, h2, h3, h4, h5, h6⟩ :=
+    GlobalTheory.T.exists_adapted_siegel_basis_balanced_forms E H X B₀ hB₀ hB₀' n hn B hB
   have hρ : (actMat b : 𝓞 E →+* _) ∈ hF.toFinset := by
     rw [Set.Finite.mem_toFinset]
     exact ⟨d', u, h2, h3, fun c => actMat_balanced b h4 h6 c⟩
@@ -107,14 +142,16 @@ theorem hasRedCover (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host
   obtain ⟨e, he⟩ := exists_equiv_of_actMat_eq (O := 𝓞 E) (ref ρ) b href
   obtain ⟨c, hc, hG⟩ := hS d u h1
   refine ⟨e, fun x => if x.1.1 = ρ then c x.2.1 else 0, fun x => ?_, ?_⟩
-  · dsimp only; split_ifs
+  · dsimp only
+    split_ifs
     · exact hc _
     · exact le_rfl
   refine (ref ρ).ext fun i => (ref ρ).ext fun j => ?_
   have hl : B (b i) (b j) = ∑ l ∈ S, c l * ((l i : ℝ) * (l j : ℝ)) := by
     rw [h5, hG]
     simp [Matrix.sum_apply, vecMulVec_apply]
-  simp only [pullR_apply, LinearEquiv.coe_coe, he, hl, LinearMap.sum_apply, LinearMap.smul_apply, toReal_apply, smul_eq_mul]
+  simp only [pullR_apply, LinearEquiv.coe_coe, he, hl, LinearMap.sum_apply, LinearMap.smul_apply,
+    toReal_apply, smul_eq_mul]
   rw [Fintype.sum_prod_type, Finset.sum_eq_single (⟨ρ, hρ⟩ : ↥hF.toFinset)]
   · simp only [if_true, sqForm_basis]
     rw [← Finset.sum_coe_sort S]

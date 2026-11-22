@@ -26,15 +26,21 @@ theorem chow_form_hyperplane_section : GlobalTheory.Published.ChowFormHyperplane
   obtain ⟨c, hc, g', hg', heq⟩ :=
     GroundTheory.Heights₂.Heights.ChowFormSection.full k N (e + 1) P f u hproj hf' hu
   obtain ⟨hsec, hfix⟩ := hyperplane_section_divCycle k N (e + 1) P u f
-  have key : ∀ Q ∈ (GroundTheory.Heights₂.Heights.divCycle P u).support,
-      ∃ a : k, a ≠ 0 ∧ g' Q = C a * g Q := by
+  have key
+      : ∀ Q ∈ (GroundTheory.Heights₂.Heights.divCycle P u).support, ∃ a : k,
+        a ≠ 0 ∧ g' Q = C a * g Q := by
     intro Q hQ
     have hQ' : Q ∈ (GlobalTheory.ChowHt.hyperplaneSection P u).support := by
       rw [hsec]
       exact hQ
-    exact chow_form_unique_up_to_constant k N (e + 1) Q (g Q) (g' Q) (chow_form_of_integral_version k N e (d Q) Q (g Q) (hg Q hQ')) (hg' Q hQ)
+    exact chow_form_unique_up_to_constant k N (e + 1) Q (g Q) (g' Q)
+      (chow_form_of_integral_version k N e (d Q) Q (g Q) (hg Q hQ')) (hg' Q hQ)
   choose! a ha hga using key
-  refine ⟨c * ∏ Q ∈ (GroundTheory.Heights₂.Heights.divCycle P u).support, a Q ^ (GroundTheory.Heights₂.Heights.divCycle P u) Q, ?_, ?_⟩
+  refine ⟨
+    c * ∏ Q ∈ (GroundTheory.Heights₂.Heights.divCycle P u).support, a Q ^ (GroundTheory.Heights₂.Heights.divCycle P u) Q,
+    ?_,
+    ?_
+  ⟩
   · exact mul_ne_zero hc (Finset.prod_ne_zero_iff.2 fun Q hQ => pow_ne_zero _ (ha Q hQ))
   · rw [hfix, heq, hsec, Finsupp.prod, map_mul, map_prod, mul_assoc, ← Finset.prod_mul_distrib]
     congr 1

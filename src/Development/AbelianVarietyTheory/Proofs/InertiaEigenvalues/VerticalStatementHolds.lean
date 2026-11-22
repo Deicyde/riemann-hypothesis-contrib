@@ -18,22 +18,23 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsP
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW Formalism.UG GlobalTheory.LFun Formalism.L2.Host
+open NumberField IsDedekindDomain MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW Formalism.UG
+  GlobalTheory.LFun Formalism.L2.Host
 open scoped ENNReal ComplexConjugate ContDiff
 open GlobalTheory.MirTower GlobalTheory.CuspGeneric
 open GroundTheory.Automorphic.FourierWhittaker (partialCoeff blockGL uGL)
 
 namespace GlobalTheory
 
-theorem continuous_mul_norm_rpow_neg_half :
-    Continuous fun z : ℂ => z * ((‖z‖ ^ (-(1 / 2 : ℝ)) : ℝ) : ℂ) := by
+theorem continuous_mul_norm_rpow_neg_half
+    : Continuous fun z : ℂ => z * ((‖z‖ ^ (-(1 / 2 : ℝ)) : ℝ) : ℂ) := by
   rw [continuous_iff_continuousAt]
   intro z
   by_cases hz : z = 0
   · subst hz
     rw [ContinuousAt, zero_mul, tendsto_zero_iff_norm_tendsto_zero]
-    have hfun : (fun z : ℂ => ‖z * ((‖z‖ ^ (-(1 / 2 : ℝ)) : ℝ) : ℂ)‖)
-        = fun z => ‖z‖ ^ (1 / 2 : ℝ) := by
+    have hfun
+        : (fun z : ℂ => ‖z * ((‖z‖ ^ (-(1 / 2 : ℝ)) : ℝ) : ℂ)‖) = fun z => ‖z‖ ^ (1 / 2 : ℝ) := by
       funext z
       rcases eq_or_ne z 0 with rfl | hz
       · simp [Real.zero_rpow (show (1 / 2 : ℝ) ≠ 0 by norm_num)]

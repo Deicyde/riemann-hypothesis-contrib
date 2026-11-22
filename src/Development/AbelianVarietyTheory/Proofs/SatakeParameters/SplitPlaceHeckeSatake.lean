@@ -12,24 +12,36 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CommuteOf
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 open scoped TensorProduct
 
 namespace GlobalTheory.LabelTransport
 
-
 open Classical in
-theorem coset_transport {G H : Type} [Group G] [Group H] (ψ : G →* H) (T U J : Subgroup G) (K : Set H) (α : H)
-    (R : Finset H) (hK : ∀ x, ψ x ∈ K ↔ x ∈ U ∧ x ∈ T) (hKr : ∀ k ∈ K, ∃ x, ψ x = k)
-    (hJ : ∀ x ∈ T, x ∈ J ↔ x ∈ U) (pre : H → G) (hpre : ∀ γ ∈ R, ψ (pre γ) = γ ∧ pre γ ∈ T)
+theorem coset_transport
+    {G H : Type} [Group G] [Group H]
+    (ψ : G →* H)
+    (T U J : Subgroup G)
+    (K : Set H)
+    (α : H)
+    (R : Finset H)
+    (hK : ∀ x, ψ x ∈ K ↔ x ∈ U ∧ x ∈ T) (hKr : ∀ k ∈ K, ∃ x, ψ x = k) (hJ : ∀ x ∈ T, x ∈ J ↔ x ∈ U)
+    (pre : H → G) (hpre : ∀ γ ∈ R, ψ (pre γ) = γ ∧ pre γ ∈ T)
     (h1 : ∀ γ ∈ R, ∃ k₁ ∈ K, ∃ k₂ ∈ K, γ = k₁ * α * k₂)
-    (h2 : ∀ x : H, (∃ k₁ ∈ K, ∃ k₂ ∈ K, x = k₁ * α * k₂) → ∃! γ, γ ∈ R ∧ γ⁻¹ * x ∈ K) :
-    ∃ Ds : Set G, (∀ x ∈ Ds, x ∈ T) ∧ (∀ x ∈ Ds, ∀ κ ∈ U, κ ∈ T → x * κ ∈ Ds ∧ κ * x ∈ Ds) ∧
-      {c : G ⧸ J | ∃ x ∈ Ds, (x : G ⧸ J) = c}.Finite ∧
-      ∀ (W : Type) [AddCommMonoid W] (F : G → W), (∀ x, ∀ κ ∈ J, κ ∈ T → F (x * κ) = F x) → ∀ g,
-        (∑ᶠ c : G ⧸ J, if hc : ∃ x ∈ Ds, (x : G ⧸ J) = c then F (g * hc.choose) else 0) = ∑ γ ∈ R, F (g * pre γ) := by
+    (h2 : ∀ x : H, (∃ k₁ ∈ K, ∃ k₂ ∈ K, x = k₁ * α * k₂) → ∃! γ, γ ∈ R ∧ γ⁻¹ * x ∈ K)
+    : ∃ Ds : Set G,
+      (∀ x ∈ Ds, x ∈ T) ∧ (∀ x ∈ Ds, ∀ κ ∈ U, κ ∈ T → x * κ ∈ Ds ∧ κ * x ∈ Ds)
+        ∧ {c : G ⧸ J | ∃ x ∈ Ds, (x : G ⧸ J) = c}.Finite
+        ∧ ∀ (W : Type) [AddCommMonoid W] (F : G → W),
+          (∀ x, ∀ κ ∈ J, κ ∈ T → F (x * κ) = F x)
+            → ∀ g,
+              (∑ᶠ c : G ⧸ J, if hc : ∃ x ∈ Ds, (x : G ⧸ J) = c then F (g * hc.choose) else 0)
+                = ∑ γ ∈ R, F (g * pre γ) := by
   have hmul : ∀ a ∈ K, ∀ b ∈ K, a * b ∈ K := by
     intro a ha b hb
     obtain ⟨x, rfl⟩ := hKr a ha
@@ -37,7 +49,8 @@ theorem coset_transport {G H : Type} [Group G] [Group H] (ψ : G →* H) (T U J 
     rw [← map_mul, hK]
     exact ⟨mul_mem ((hK x).1 ha).1 ((hK y).1 hb).1, mul_mem ((hK x).1 ha).2 ((hK y).1 hb).2⟩
   let Ds : Set G := {x | x ∈ T ∧ ∃ k₁ ∈ K, ∃ k₂ ∈ K, ψ x = k₁ * α * k₂}
-  have hpD : ∀ γ ∈ R, pre γ ∈ Ds := fun γ hγ => ⟨(hpre γ hγ).2, by rw [(hpre γ hγ).1]; exact h1 γ hγ⟩
+  have hpD : ∀ γ ∈ R, pre γ ∈ Ds := fun γ hγ =>
+    ⟨(hpre γ hγ).2, by rw [(hpre γ hγ).1]; exact h1 γ hγ⟩
   have hrel : ∀ γ ∈ R, ∀ x ∈ T, ((pre γ : G ⧸ J) = (x : G ⧸ J) ↔ γ⁻¹ * ψ x ∈ K) := by
     intro γ hγ x hx
     have ht : (pre γ)⁻¹ * x ∈ T := mul_mem (inv_mem (hpre γ hγ).2) hx
@@ -56,7 +69,10 @@ theorem coset_transport {G H : Type} [Group G] [Group H] (ψ : G →* H) (T U J 
   refine ⟨Ds, fun x hx => hx.1, ?_, ?_, ?_⟩
   · rintro x ⟨hx, a, ha, b, hb, e⟩ κ hκ hκ'
     have hk : ψ κ ∈ K := (hK κ).2 ⟨hκ, hκ'⟩
-    refine ⟨⟨mul_mem hx hκ', a, ha, _, hmul b hb _ hk, ?_⟩, ⟨mul_mem hκ' hx, _, hmul _ hk a ha, b, hb, ?_⟩⟩
+    refine ⟨
+      ⟨mul_mem hx hκ', a, ha, _, hmul b hb _ hk, ?_⟩,
+      ⟨mul_mem hκ' hx, _, hmul _ hk a ha, b, hb, ?_⟩
+    ⟩
     · rw [map_mul, e, mul_assoc]
     · rw [map_mul, e]; simp only [mul_assoc]
   · exact (R.image fun γ => (pre γ : G ⧸ J)).finite_toSet.subset fun c hc => (hset c).1 hc
@@ -80,21 +96,30 @@ theorem coset_transport {G H : Type} [Group G] [Group H] (ψ : G →* H) (T U J 
       by_contra hn
       exact hc (dif_neg fun h => hn ((hset c).1 h))
 
-theorem tensCast_under {E : Type} [Field E] [NumberField E] {F1 F2 : Subfield E} (h : F1 = F2)
-    (P : HeightOneSpectrum (𝓞 E)) (α : FiniteAdeleRing (𝓞 F1) F1) (h1 : α (P.under (𝓞 F1)) = 1)
-    (h0 : ∀ v', v' ≠ P.under (𝓞 F1) → α v' = 0) :
-    ∃ α' : FiniteAdeleRing (𝓞 F2) F2,
-      GlobalTheory.NJoin.tensCast h (α ⊗ₜ[F1] (1 : E)) = (1 : E) ⊗ₜ[F2] α' ∧ α' (P.under (𝓞 F2)) = 1 ∧
-        ∀ v', v' ≠ P.under (𝓞 F2) → α' v' = 0 := by
+theorem tensCast_under
+    {E : Type} [Field E] [NumberField E]
+    {F1 F2 : Subfield E} (h : F1 = F2)
+    (P : HeightOneSpectrum (𝓞 E)) (α : FiniteAdeleRing (𝓞 F1) F1)
+    (h1 : α (P.under (𝓞 F1)) = 1) (h0 : ∀ v', v' ≠ P.under (𝓞 F1) → α v' = 0)
+    : ∃ α' : FiniteAdeleRing (𝓞 F2) F2,
+      GlobalTheory.NJoin.tensCast h (α ⊗ₜ[F1] (1 : E)) = (1 : E) ⊗ₜ[F2] α' ∧ α' (P.under (𝓞 F2)) = 1
+        ∧ ∀ v', v' ≠ P.under (𝓞 F2) → α' v' = 0 := by
   subst h
   exact ⟨α, rfl, h1, h0⟩
 
-theorem idem_mul_iff {L : Type} [Field L] [NumberField L] [IsCMField L]
-    (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (α : AFplus L) (h1 : α v = 1) (h0 : ∀ v', v' ≠ v → α v' = 0)
-    (z : AL L) : ((1 : L) ⊗ₜ[maximalRealSubfield L] α) * z = z ↔ ∀ v', v' ≠ v → compAt L v' z = 0 := by
-  have hc : ∀ u, compAt L u ((1 : L) ⊗ₜ[maximalRealSubfield L] α) = (1 : L) ⊗ₜ[maximalRealSubfield L] (α u) := by
+theorem idem_mul_iff
+    {L : Type} [Field L] [NumberField L] [IsCMField L]
+    (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (α : AFplus L)
+    (h1 : α v = 1) (h0 : ∀ v', v' ≠ v → α v' = 0)
+    (z : AL L)
+    : ((1 : L) ⊗ₜ[maximalRealSubfield L] α) * z = z ↔ ∀ v', v' ≠ v → compAt L v' z = 0 := by
+  have hc
+      : ∀ u,
+        compAt L u ((1 : L) ⊗ₜ[maximalRealSubfield L] α)
+          = (1 : L) ⊗ₜ[maximalRealSubfield L] (α u) := by
     intro u
-    rw [compAt, AlgHom.toRingHom_eq_coe, RingHom.coe_coe, Algebra.TensorProduct.map_tmul, AlgHom.id_apply]
+    rw [compAt, AlgHom.toRingHom_eq_coe, RingHom.coe_coe, Algebra.TensorProduct.map_tmul,
+      AlgHom.id_apply]
     rfl
   constructor
   · intro h u hu
@@ -109,9 +134,16 @@ theorem idem_mul_iff {L : Type} [Field L] [NumberField L] [IsCMField L]
       rw [h1, ← Algebra.TensorProduct.one_def, one_mul, sub_self]
     · rw [h u hu, mul_zero, sub_zero]
 
-theorem conj_supp {B : Type} [CommRing B] {m k : ℕ} (φ : B) (β : Matrix (Fin m) (Fin k) B)
-    (K : Matrix (Fin k) (Fin k) B) (β' : Matrix (Fin k) (Fin m) B) (h1 : β * β' = 1) (M : Matrix (Fin m) (Fin m) B)
-    (hM : M = β * K * β') (h : ∀ i j, φ * (K - 1) i j = (K - 1) i j) : ∀ i j, φ * (M - 1) i j = (M - 1) i j := by
+theorem conj_supp
+    {B : Type} [CommRing B]
+    {m k : ℕ}
+    (φ : B)
+    (β : Matrix (Fin m) (Fin k) B)
+    (K : Matrix (Fin k) (Fin k) B)
+    (β' : Matrix (Fin k) (Fin m) B) (h1 : β * β' = 1)
+    (M : Matrix (Fin m) (Fin m) B) (hM : M = β * K * β')
+    (h : ∀ i j, φ * (K - 1) i j = (K - 1) i j)
+    : ∀ i j, φ * (M - 1) i j = (M - 1) i j := by
   have e : M - 1 = β * (K - 1) * β' := by
     rw [hM, Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_one, h1]
   have e1 : φ • (K - 1) = K - 1 := Matrix.ext h
@@ -120,13 +152,18 @@ theorem conj_supp {B : Type} [CommRing B] {m k : ℕ} (φ : B) (β : Matrix (Fin
   rw [e]
   exact fun i j => congrFun (congrFun e2 i) j
 
-theorem conj_supp_iff {B : Type} [CommRing B] {m k : ℕ} (φ : B) (β : Matrix (Fin m) (Fin k) B)
-    (K : Matrix (Fin k) (Fin k) B) (β' : Matrix (Fin k) (Fin m) B) (h1 : β * β' = 1) (h2 : β' * β = 1)
-    (M : Matrix (Fin m) (Fin m) B) (hM : M = β * K * β') :
-    (∀ i j, φ * (M - 1) i j = (M - 1) i j) ↔ ∀ i j, φ * (K - 1) i j = (K - 1) i j := by
+theorem conj_supp_iff
+    {B : Type} [CommRing B]
+    {m k : ℕ}
+    (φ : B)
+    (β : Matrix (Fin m) (Fin k) B)
+    (K : Matrix (Fin k) (Fin k) B)
+    (β' : Matrix (Fin k) (Fin m) B) (h1 : β * β' = 1) (h2 : β' * β = 1)
+    (M : Matrix (Fin m) (Fin m) B) (hM : M = β * K * β')
+    : (∀ i j, φ * (M - 1) i j = (M - 1) i j) ↔ ∀ i j, φ * (K - 1) i j = (K - 1) i j := by
   refine ⟨conj_supp φ β' M β h2 K ?_, conj_supp φ β K β' h1 M hM⟩
-  rw [hM, ← Matrix.mul_assoc, ← Matrix.mul_assoc, h2, Matrix.one_mul, Matrix.mul_assoc, h2, Matrix.mul_one]
-
+  rw [hM, ← Matrix.mul_assoc, ← Matrix.mul_assoc, h2, Matrix.one_mul, Matrix.mul_assoc, h2,
+    Matrix.mul_one]
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar in
 set_option maxHeartbeats 2000000 in
@@ -190,6 +227,5 @@ theorem suppF_iff_trivOutside (D : D7) (s : SplitPlace D.host.E) (hF : D.host.F 
     have := e9 v'
     rw [h v' hv', sub_self] at this
     exact congrFun (congrFun this i) j
-
 
 end GlobalTheory.LabelTransport

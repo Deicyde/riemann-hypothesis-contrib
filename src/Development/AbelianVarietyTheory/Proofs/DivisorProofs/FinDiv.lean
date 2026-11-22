@@ -10,7 +10,8 @@ noncomputable section
 
 namespace GlobalTheory.FinSupp
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU
 
 variable (F : Type) [Field F] [NumberField F]
 

@@ -19,8 +19,10 @@ section Linear
 
 variable {L U : Type} [Field L] [AddCommGroup U] [Module L U]
 
-theorem exists_le_of_exh (D : Submodule L U) [FiniteDimensional L D] (F : ℤ → Submodule L U)
-    (hanti : Antitone F) (hexh : ∀ x, ∃ a, x ∈ F a) : ∃ a, D ≤ F a := by
+theorem exists_le_of_exh
+    (D : Submodule L U) [FiniteDimensional L D]
+    (F : ℤ → Submodule L U) (hanti : Antitone F) (hexh : ∀ x, ∃ a, x ∈ F a)
+    : ∃ a, D ≤ F a := by
   obtain ⟨S, hS⟩ : D.FG := Module.Finite.iff_fg.mp inferInstance
   choose n hn using hexh
   obtain ⟨a, ha⟩ := (S.image n).bddBelow
@@ -29,8 +31,10 @@ theorem exists_le_of_exh (D : Submodule L U) [FiniteDimensional L D] (F : ℤ �
   intro x hx
   exact hanti (ha (Finset.mem_coe.mpr (Finset.mem_image_of_mem n hx))) (hn x)
 
-theorem exists_inf_eq_bot_of_sep (D : Submodule L U) [FiniteDimensional L D] (F : ℤ → Submodule L U)
-    (hanti : Antitone F) (hsep : ∀ x, (∀ a, x ∈ F a) → x = 0) : ∃ a, D ⊓ F a = ⊥ := by
+theorem exists_inf_eq_bot_of_sep
+    (D : Submodule L U) [FiniteDimensional L D]
+    (F : ℤ → Submodule L U) (hanti : Antitone F) (hsep : ∀ x, (∀ a, x ∈ F a) → x = 0)
+    : ∃ a, D ⊓ F a = ⊥ := by
   have hfin : ∀ a, FiniteDimensional L ↥(D ⊓ F a) := fun a =>
     Submodule.finiteDimensional_of_le inf_le_left
   let a : ℤ := Function.argmin (fun a : ℤ => finrank L ↥(D ⊓ F a))
@@ -45,8 +49,8 @@ theorem exists_inf_eq_bot_of_sep (D : Submodule L U) [FiniteDimensional L D] (F 
     exact (this ▸ hx : x ∈ D ⊓ F b).2
   · exact hanti h hx.2
 
-theorem card_filter_succ (M : Multiset ℤ) (a : ℤ) :
-    Multiset.card (M.filter (a ≤ ·)) = Multiset.card (M.filter (a + 1 ≤ ·)) + M.count a := by
+theorem card_filter_succ (M : Multiset ℤ) (a : ℤ)
+    : Multiset.card (M.filter (a ≤ ·)) = Multiset.card (M.filter (a + 1 ≤ ·)) + M.count a := by
   induction M using Multiset.induction_on with
   | empty => simp
   | cons b M ih =>
@@ -54,12 +58,14 @@ theorem card_filter_succ (M : Multiset ℤ) (a : ℤ) :
       Multiset.card_add, ih]
     split_ifs <;> simp <;> omega
 
-theorem finrank_of_mult (D : Submodule L U) [FiniteDimensional L D] (F : ℤ → Submodule L U)
+theorem finrank_of_mult
+    (D : Submodule L U) [FiniteDimensional L D]
+    (F : ℤ → Submodule L U)
     (hanti : Antitone F) (hexh : ∀ x, ∃ a, x ∈ F a) (hsep : ∀ x, (∀ a, x ∈ F a) → x = 0)
     (M : Multiset ℤ)
-    (hM : ∀ a, (finrank L ↥(D ⊓ F a) : ℤ) - finrank L ↥(D ⊓ F (a + 1)) = (M.count a : ℤ)) :
-    finrank L D = Multiset.card M ∧
-      ∀ a, finrank L ↥(D ⊓ F a) = Multiset.card (M.filter (a ≤ ·)) := by
+    (hM : ∀ a, (finrank L ↥(D ⊓ F a) : ℤ) - finrank L ↥(D ⊓ F (a + 1)) = (M.count a : ℤ))
+    : finrank L D = Multiset.card M
+      ∧ ∀ a, finrank L ↥(D ⊓ F a) = Multiset.card (M.filter (a ≤ ·)) := by
   let g : ℤ → ℤ := fun a => (finrank L ↥(D ⊓ F a) : ℤ) - Multiset.card (M.filter (a ≤ ·))
   have hstep : ∀ a, g (a + 1) = g a := fun a => by
     have h1 := hM a
@@ -101,13 +107,19 @@ theorem finrank_of_mult (D : Submodule L U) [FiniteDimensional L D] (F : ℤ →
 
 end Linear
 
-open GlobalTheory.TripleGal Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.MainNotions.BlochKatoReduction Formalism.MainNotions.BlochKatoReduction.Gen Formalism.ConjugateSelfDual ReciprocityTheory.Gal NumberField IsDedekindDomain Polynomial
+open GlobalTheory.TripleGal Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions Formalism.MainNotions.N Formalism.MainNotions.BlochKatoReduction
+  Formalism.MainNotions.BlochKatoReduction.Gen Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  NumberField IsDedekindDomain Polynomial
 
-theorem finite_of_isdR {l : ℕ} [Fact l.Prime] {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω]
+theorem finite_of_isdR
+    {l : ℕ} [Fact l.Prime]
+    {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω]
     {Gw : Subgroup (Ω ≃ₐ[E] Ω)} {O : Type} [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O]
-    (Bw : LocBridge l E Ω Gw O) (P : LocPrime l) {m : ℕ}
-    (r : ↥Gw →* Matrix.GeneralLinearGroup (Fin m) O) (h : Bw.IsdRW P r) :
-    FiniteDimensional ↥Bw.LL.1 ↥(Formalism.WeaklyAdmissibleFiltrations.DdR (P.PD Bw.Kw) (Bw.rep r)) := by
+    (Bw : LocBridge l E Ω Gw O) (P : LocPrime l)
+    {m : ℕ} (r : ↥Gw →* Matrix.GeneralLinearGroup (Fin m) O) (h : Bw.IsdRW P r)
+    : FiniteDimensional ↥Bw.LL.1
+      ↥(Formalism.WeaklyAdmissibleFiltrations.DdR (P.PD Bw.Kw) (Bw.rep r)) := by
   set_option synthInstance.maxHeartbeats 200000 in
   rcases Nat.eq_zero_or_pos m with rfl | hm
   · haveI : Subsingleton (Formalism.WeaklyAdmissibleFiltrations.DdR (P.PD Bw.Kw) (Bw.rep r)) := by
@@ -124,7 +136,17 @@ theorem finite_of_isdR {l : ℕ} [Fact l.Prime] {E Ω : Type} [Field E] [Field �
     haveI : Module.Free ↥Bw.LL.1 ↥(Formalism.WeaklyAdmissibleFiltrations.DdR (P.PD Bw.Kw) (Bw.rep r)) := Module.Free.of_divisionRing _ _
     exact Module.finite_of_finrank_pos (by rw [h]; exact Nat.mul_pos Module.finrank_pos hm)
 
-theorem dims_of_mult : ∀ (D : D7) (bkP : BlochKatoReduction.BK D) (i : D.ntw.Tw) (s : D.ntw.Sig i), ∀ (v : HeightOneSpectrum (𝓞 D.host.E)) (hv : v ∈ placesOver D.host.E (D.ntw.l i)) (τ : EmbV bkP i v hv) (M : Multiset ℤ), HodgeL bkP i s → (∀ a : ℤ, Formalism.WeaklyAdmissibleFiltrations.multV (PDv bkP i v hv) (repV bkP i v hv (Tgl i s)) τ a = (M.count a : ℤ)) → dimD bkP i v hv (Tgl i s) τ = Multiset.card M ∧ dimFil0 bkP i v hv (Tgl i s) τ = Multiset.card (M.filter (0 ≤ ·)) := by
+theorem dims_of_mult
+    : ∀ (D : D7) (bkP : BlochKatoReduction.BK D) (i : D.ntw.Tw) (s : D.ntw.Sig i),
+      ∀ (v : HeightOneSpectrum (𝓞 D.host.E)) (hv : v ∈ placesOver D.host.E (D.ntw.l i))
+          (τ : EmbV bkP i v hv) (M : Multiset ℤ),
+        HodgeL bkP i s
+          → (∀ a : ℤ,
+            Formalism.WeaklyAdmissibleFiltrations.multV (PDv bkP i v hv) (repV bkP i v hv (Tgl i s))
+                τ a
+              = (M.count a : ℤ))
+          → dimD bkP i v hv (Tgl i s) τ = Multiset.card M
+            ∧ dimFil0 bkP i v hv (Tgl i s) τ = Multiset.card (M.filter (0 ≤ ·)) := by
   set_option synthInstance.maxHeartbeats 200000 in
   intro D bkP i s v hv τ M hH hM
   have hdR := (hH v hv (Tgl i s) (Or.inr rfl)).1
@@ -132,9 +154,12 @@ theorem dims_of_mult : ∀ (D : D7) (bkP : BlochKatoReduction.BK D) (i : D.ntw.T
   haveI : FiniteDimensional _ ↥(Formalism.WeaklyAdmissibleFiltrations.DdRE (PDv bkP i v hv) (repV bkP i v hv (Tgl i s)) τ) :=
     Submodule.finiteDimensional_of_le (S₂ := Formalism.WeaklyAdmissibleFiltrations.DdR (PDv bkP i v hv) (repV bkP i v hv (Tgl i s)))
       inf_le_left
-  have key := finrank_of_mult (Formalism.WeaklyAdmissibleFiltrations.DdRE (PDv bkP i v hv) (repV bkP i v hv (Tgl i s)) τ)
-    (Formalism.WeaklyAdmissibleFiltrations.FilV (PDv bkP i v hv)) (GlobalTheory.DRFil.FilV_antitone _) (GlobalTheory.DRFil.exists_mem_FilV _)
-    (GlobalTheory.DRFil.eq_zero_of_forall_mem_FilV _) M hM
+  have key :=
+    finrank_of_mult
+      (Formalism.WeaklyAdmissibleFiltrations.DdRE (PDv bkP i v hv) (repV bkP i v hv (Tgl i s)) τ)
+      (Formalism.WeaklyAdmissibleFiltrations.FilV (PDv bkP i v hv))
+      (GlobalTheory.DRFil.FilV_antitone _) (GlobalTheory.DRFil.exists_mem_FilV _)
+      (GlobalTheory.DRFil.eq_zero_of_forall_mem_FilV _) M hM
   exact ⟨key.1, key.2 0⟩
 
 end GlobalTheory.JumpDims

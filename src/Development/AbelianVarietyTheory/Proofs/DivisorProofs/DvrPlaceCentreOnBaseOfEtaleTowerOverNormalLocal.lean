@@ -11,24 +11,30 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsPlaceI
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 set_option autoImplicit false
 
 namespace GlobalTheory.FieldPair
 
-theorem Place.ord_eq_zero_iff_isUnit {L : Type} [Field L] {cL : ℂ →+* L} (P : Place cL) {u : P.ring}
-    (hu : u ≠ 0) : P.ord (u : L) = 0 ↔ IsUnit u := by
+theorem Place.ord_eq_zero_iff_isUnit
+    {L : Type} [Field L] {cL : ℂ →+* L} (P : Place cL) {u : P.ring} (hu : u ≠ 0)
+    : P.ord (u : L) = 0 ↔ IsUnit u := by
   refine ⟨fun h => ?_, P.ord_eq_zero⟩
   have hu' : (u : L) ≠ 0 := fun e => hu (Subtype.ext e)
   have hi : (u : L)⁻¹ ∈ P.ring := by
     rw [← P.ord_nonneg_iff (inv_ne_zero hu'), P.ord_inv, h, neg_zero]
   exact IsUnit.of_mul_eq_one ⟨_, hi⟩ (Subtype.ext (mul_inv_cancel₀ hu'))
 
-theorem Place.exists_centre_of_isPrimeOf : ∀ {L : Type} [Field L] (cL : ℂ →+* L) (T : Subring L) (P : Place cL), P.IsPrimeOf T →
-    ∃ q : Ideal T, q.IsPrime ∧ q.height = 1 ∧ ∀ t : T, t ≠ 0 → (P.ord (t : L) = 0 ↔ t ∉ q) := by
+theorem Place.exists_centre_of_isPrimeOf
+    : ∀ {L : Type} [Field L] (cL : ℂ →+* L) (T : Subring L) (P : Place cL),
+      P.IsPrimeOf T
+        → ∃ q : Ideal T,
+          q.IsPrime ∧ q.height = 1 ∧ ∀ t : T, t ≠ 0 → (P.ord (t : L) = 0 ↔ t ∉ q) := by
   intro L _ cL T P hP
   have hC : ∀ t : T, (t : L) ∈ P.ring := fun t => hP.1 _ t.2
   let f : T →+* P.ring := T.subtype.codRestrict P.ring hC
@@ -70,9 +76,11 @@ end GlobalTheory.FieldPair
 
 namespace GlobalTheory.FieldPair
 
-theorem IsEtTower.flat {K L : Type} [Field K] [Field L] {cK : ℂ →+* K} {cL : ℂ →+* L} {r : ℕ}
-    {R : Subring K} {T : Subring L} {ι : R →+* T} {ψ : T →+* R} {τ : Fin r → T}
-    (h : IsEtTower cK R cL T ι ψ τ) : IsNoetherianRing R ∧ ι.Flat := by
+theorem IsEtTower.flat
+    {K L : Type} [Field K] [Field L]
+    {cK : ℂ →+* K} {cL : ℂ →+* L} {r : ℕ} {R : Subring K} {T : Subring L} {ι : R →+* T}
+    {ψ : T →+* R} {τ : Fin r → T} (h : IsEtTower cK R cL T ι ψ τ)
+    : IsNoetherianRing R ∧ ι.Flat := by
   letI := (cK.codRestrict R h.base.const_mem).toAlgebra
   haveI : Algebra.EssFiniteType ℂ R := h.base.essFiniteType
   haveI hR : IsNoetherianRing R := Algebra.EssFiniteType.isNoetherianRing ℂ R
@@ -85,9 +93,12 @@ theorem IsEtTower.flat {K L : Type} [Field K] [Field L] {cK : ℂ →+* K} {cL :
     show ι a = e (MvPolynomial.C a)
     exact (MvPolynomial.eval₂_C _ _ _).symm
   haveI : Algebra.FormallyEtale B T := h.etale
-  have hc : (cL.codRestrict T h.top.const_mem) = e.comp ((algebraMap R B).comp (cK.codRestrict R h.base.const_mem)) := by
+  have hc
+      : (cL.codRestrict T h.top.const_mem)
+        = e.comp ((algebraMap R B).comp (cK.codRestrict R h.base.const_mem)) := by
     refine RingHom.ext fun a => Subtype.ext ?_
-    have h2 : e (MvPolynomial.C (cK.codRestrict R h.base.const_mem a)) = ι ⟨cK a, h.base.const_mem a⟩ :=
+    have h2
+        : e (MvPolynomial.C (cK.codRestrict R h.base.const_mem a)) = ι ⟨cK a, h.base.const_mem a⟩ :=
       MvPolynomial.eval₂_C _ _ _
     show cL a = ((e ((algebraMap R B) (cK.codRestrict R h.base.const_mem a)) : T) : L)
     rw [MvPolynomial.algebraMap_eq, h2, h.const]
@@ -103,11 +114,13 @@ end GlobalTheory.FieldPair
 
 namespace GlobalTheory.FieldPair
 
-theorem centre_of_isEtTower : ∀ {K L : Type} [Field K] [Field L] (cK : ℂ →+* K) (cL : ℂ →+* L) (r : ℕ) (R : Subring K) (T : Subring L)
-    (ι : R →+* T) (ψ : T →+* R) (τ : Fin r → T) (P : Place cL),
-  IsEtTower cK R cL T ι ψ τ → P.IsPrimeOf T →
-  (∀ g : R, g ≠ 0 → P.ord (ι g : L) = 0) ∨
-  ∃ P0 : Place cK, P0.IsPrimeOf R ∧ ∀ g : R, g ≠ 0 → (P0.ord (g : K) = 0 ↔ P.ord (ι g : L) = 0) := by
+theorem centre_of_isEtTower
+    : ∀ {K L : Type} [Field K] [Field L] (cK : ℂ →+* K) (cL : ℂ →+* L) (r : ℕ) (R : Subring K)
+        (T : Subring L) (ι : R →+* T) (ψ : T →+* R) (τ : Fin r → T) (P : Place cL),
+      IsEtTower cK R cL T ι ψ τ → P.IsPrimeOf T
+        → (∀ g : R, g ≠ 0 → P.ord (ι g : L) = 0)
+          ∨ ∃ P0 : Place cK,
+            P0.IsPrimeOf R ∧ ∀ g : R, g ≠ 0 → (P0.ord (g : K) = 0 ↔ P.ord (ι g : L) = 0) := by
   intro K L _ _ cK cL r R T ι ψ τ P h hP
   obtain ⟨-, hF⟩ := h.flat
   obtain ⟨q, hq, hq1, hqo⟩ := Place.exists_centre_of_isPrimeOf cL T P hP
@@ -141,13 +154,16 @@ theorem centre_of_isEtTower : ∀ {K L : Type} [Field K] [Field L] (cK : ℂ →
           ext x
           simp only [Ideal.under, Ideal.mem_comap, Ideal.mem_bot]
           exact ⟨fun e => hinj (e.trans (map_zero ι).symm), fun e => by simp [e]⟩
-        have h1 : 1 ≤ Q.height := ENat.one_le_iff_ne_zero.2 (mt Ideal.height_eq_zero_iff_eq_bot.1 hQ0)
+        have h1 : 1 ≤ Q.height :=
+          ENat.one_le_iff_ne_zero.2 (mt Ideal.height_eq_zero_iff_eq_bot.1 hQ0)
         have h2 := Ideal.height_add_one_le_of_lt_of_isPrime hQq
         rw [hq1] at h2
         have h3 : (1 : ℕ∞) + 1 ≤ 1 := le_trans (by gcongr) h2
         exact absurd h3 (by decide)
       · exact ENat.one_le_iff_ne_zero.2 (mt Ideal.height_eq_zero_iff_eq_bot.1 hp0)
-    obtain ⟨P0, h0, h0o⟩ := GlobalTheory.T.exists_place_isPrimeOf_of_height_one_normal_localModel cK R h.base h.normal p inferInstance hp1
+    obtain ⟨P0, h0, h0o⟩ :=
+      GlobalTheory.T.exists_place_isPrimeOf_of_height_one_normal_localModel cK R h.base h.normal p
+        inferInstance hp1
     exact ⟨P0, h0, fun g hg => (h0o g hg).trans (hι g hg).symm⟩
 
 end GlobalTheory.FieldPair

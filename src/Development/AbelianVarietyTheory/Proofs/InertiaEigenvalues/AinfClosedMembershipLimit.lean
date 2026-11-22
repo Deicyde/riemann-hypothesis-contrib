@@ -11,7 +11,9 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SmodEqI
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 open Matrix
 
@@ -19,17 +21,22 @@ noncomputable section
 
 namespace GlobalTheory.BSP.SatMod
 
-theorem approx {S A : Type} [CommRing S] [CommRing A] (l : ℕ) (ev : S →+* A) {d n : ℕ}
-    (mem : (Fin d → A) → Prop) (hadd : ∀ y z, mem y → mem z → mem (y + z))
+theorem approx
+    {S A : Type} [CommRing S] [CommRing A]
+    (l : ℕ)
+    (ev : S →+* A)
+    {d n : ℕ} (mem : (Fin d → A) → Prop) (hadd : ∀ y z, mem y → mem z → mem (y + z))
     (hsm : ∀ (c : S) y, mem y → mem (fun a => ev c * y a))
     (hsat : ∀ y, mem (fun a => (l : A) * y a) → mem y)
     (hA : ∀ x : A, (∀ k : ℕ, (l : A) ^ k ∣ x) → x = 0)
     (hS : ∀ f : ℕ → S, (∀ k, (l : S) ^ k ∣ f (k + 1) - f k) → ∃ z, ∀ k, (l : S) ^ k ∣ z - f k)
     (Y : Matrix (Fin d) (Fin n) A) (hY : ∀ c : Fin n → S, mem (Y *ᵥ fun a => ev (c a)))
     (hgen : ∀ y, mem y → ∃ c : Fin n → S, ∀ i, (l : A) ∣ y i - (Y *ᵥ fun a => ev (c a)) i)
-    (y : Fin d → A) (hy : mem y) : ∃ c : Fin n → S, y = Y *ᵥ fun a => ev (c a) := by
-  have step : ∀ y : {y // mem y}, ∃ (c : Fin n → S) (y' : {y // mem y}),
-      ∀ i, y.1 i = (Y *ᵥ fun a => ev (c a)) i + (l : A) * y'.1 i := by
+    (y : Fin d → A) (hy : mem y)
+    : ∃ c : Fin n → S, y = Y *ᵥ fun a => ev (c a) := by
+  have step
+      : ∀ y : {y // mem y}, ∃ (c : Fin n → S) (y' : {y // mem y}), ∀ i,
+        y.1 i = (Y *ᵥ fun a => ev (c a)) i + (l : A) * y'.1 i := by
     rintro ⟨y, hy⟩
     obtain ⟨c, hc⟩ := hgen y hy
     choose y' hy' using hc
@@ -50,10 +57,11 @@ theorem approx {S A : Type} [CommRing S] [CommRing A] (l : ℕ) (ev : S →+* A)
       intro i
       have h1 := hnx (ys k) i
       have h2 : ys (k + 1) = nx (ys k) := Function.iterate_succ_apply' _ _ _
-      have h3 : (Y *ᵥ fun a => ev (f (k + 1) a)) i =
-          (Y *ᵥ fun a => ev (f k a)) i + (l : A) ^ k * (Y *ᵥ fun a => ev (c (ys k) a)) i := by
-        simp only [f, Finset.sum_range_succ, map_add (f := _), map_mul, map_pow, map_natCast, mulVec, dotProduct,
-          Finset.mul_sum, ← Finset.sum_add_distrib]
+      have h3
+          : (Y *ᵥ fun a => ev (f (k + 1) a)) i
+            = (Y *ᵥ fun a => ev (f k a)) i + (l : A) ^ k * (Y *ᵥ fun a => ev (c (ys k) a)) i := by
+        simp only [f, Finset.sum_range_succ, map_add (f := _), map_mul, map_pow, map_natCast,
+          mulVec, dotProduct, Finset.mul_sum, ← Finset.sum_add_distrib]
         refine Finset.sum_congr rfl fun a _ => by ring
       rw [h3, h2]
       linear_combination ih i + (l : A) ^ k * h1
@@ -68,53 +76,64 @@ theorem approx {S A : Type} [CommRing S] [CommRing A] (l : ℕ) (ev : S →+* A)
   obtain ⟨q, hq⟩ := h4
   exact ⟨(ys k).1 i - q, by linear_combination hf k i - hq⟩
 
-theorem le_of_det_ne_zero {A : Type} [CommRing A] [IsDomain A] {d n : ℕ} (Y : Matrix (Fin d) (Fin n) A)
-    (C : Matrix (Fin n) (Fin d) A) (h : (Y * C).det ≠ 0) : d ≤ n := by
+theorem le_of_det_ne_zero
+    {A : Type} [CommRing A] [IsDomain A]
+    {d n : ℕ} (Y : Matrix (Fin d) (Fin n) A) (C : Matrix (Fin n) (Fin d) A) (h : (Y * C).det ≠ 0)
+    : d ≤ n := by
   have h1 : LinearIndependent A C.col := by
     rw [← Matrix.mulVec_injective_iff]
     intro v w hvw
-    have : (Y * C) *ᵥ (v - w) = 0 := by
-      rw [← mulVec_mulVec, mulVec_sub, hvw, sub_self, mulVec_zero]
+    have : (Y * C) *ᵥ (v - w) = 0 := by rw [← mulVec_mulVec, mulVec_sub, hvw, sub_self, mulVec_zero]
     exact sub_eq_zero.1 (Matrix.eq_zero_of_mulVec_eq_zero h this)
   simpa using h1.fintype_card_le_finrank
 
-theorem abstract {S R A F : Type} [CommRing S] [CommRing A] [IsDomain A] [CommRing R] [IsDomain R]
-    [IsPrincipalIdealRing R] [Field F] (l : ℕ) (ev : S →+* A) (red : S →+* R) (hred : Function.Surjective red)
+theorem abstract
+    {S R A F : Type} [CommRing S] [CommRing A] [IsDomain A] [CommRing R] [IsDomain R]
+    [IsPrincipalIdealRing R] [Field F]
+    (l : ℕ)
+    (ev : S →+* A)
+    (red : S →+* R) (hred : Function.Surjective red)
     (cc : A →+* F) (eb : R →+* F) (heb : Function.Injective eb) (hc : ∀ s, cc (ev s) = eb (red s))
-    (hcc : ∀ x, cc x = 0 → (l : A) ∣ x) {d : ℕ}
-    (mem : (Fin d → A) → Prop) (h0 : mem 0) (hadd : ∀ y z, mem y → mem z → mem (y + z))
+    (hcc : ∀ x, cc x = 0 → (l : A) ∣ x)
+    {d : ℕ} (mem : (Fin d → A) → Prop) (h0 : mem 0) (hadd : ∀ y z, mem y → mem z → mem (y + z))
     (hsm : ∀ (c : S) y, mem y → mem (fun a => ev c * y a))
     (hsat : ∀ y, mem (fun a => (l : A) * y a) → mem y)
     (hA : ∀ x : A, (∀ k : ℕ, (l : A) ^ k ∣ x) → x = 0)
     (hS : ∀ f : ℕ → S, (∀ k, (l : S) ^ k ∣ f (k + 1) - f k) → ∃ z, ∀ k, (l : S) ^ k ∣ z - f k)
-    (Y1 : Matrix (Fin d) (Fin d) A) (hY1 : Y1.det ≠ 0) (hm1 : ∀ c : Fin d → S, mem (Y1 *ᵥ fun a => ev (c a)))
+    (Y1 : Matrix (Fin d) (Fin d) A)
+    (hY1 : Y1.det ≠ 0) (hm1 : ∀ c : Fin d → S, mem (Y1 *ᵥ fun a => ev (c a)))
     (P : Matrix (Fin d) (Fin d) F) (hP : P.det ≠ 0)
-    (hPm : ∀ y, mem y → ∃ r : Fin d → R, (P *ᵥ fun a => cc (y a)) = fun a => eb (r a)) :
-    ∃ Y : Matrix (Fin d) (Fin d) A, (Y.map cc).det ≠ 0 ∧
-      ∀ y, mem y ↔ ∃ c : Fin d → S, y = Y *ᵥ fun a => ev (c a) := by
+    (hPm : ∀ y, mem y → ∃ r : Fin d → R, (P *ᵥ fun a => cc (y a)) = fun a => eb (r a))
+    : ∃ Y : Matrix (Fin d) (Fin d) A,
+      (Y.map cc).det ≠ 0 ∧ ∀ y, mem y ↔ ∃ c : Fin d → S, y = Y *ᵥ fun a => ev (c a) := by
   classical
-  let L : Submodule R (Fin d → R) :=
-    { carrier := {r | ∃ y, mem y ∧ (P *ᵥ fun a => cc (y a)) = fun a => eb (r a)}
-      zero_mem' := ⟨0, h0, by ext i; simp [mulVec, dotProduct]⟩
-      add_mem' := by
-        rintro r r' ⟨y, hy, h⟩ ⟨y', hy', h'⟩
-        refine ⟨y + y', hadd _ _ hy hy', funext fun i => ?_⟩
-        have e := congrFun h i
-        have e' := congrFun h' i
-        simp only [mulVec, dotProduct, Pi.add_apply, map_add (f := _), mul_add, Finset.sum_add_distrib] at e e' ⊢
-        rw [e, e']
-      smul_mem' := by
-        rintro t r ⟨y, hy, h⟩
-        obtain ⟨s, rfl⟩ := hred t
-        refine ⟨_, hsm s y hy, funext fun i => ?_⟩
-        have e := congrFun h i
-        simp only [mulVec, dotProduct, Pi.smul_apply, smul_eq_mul, map_mul, hc] at e ⊢
-        rw [← e, Finset.mul_sum]
-        exact Finset.sum_congr rfl fun a _ => by ring }
+  let L : Submodule R (Fin d → R) := {
+    carrier := {r | ∃ y, mem y ∧ (P *ᵥ fun a => cc (y a)) = fun a => eb (r a)}
+    zero_mem' := ⟨0, h0, by ext i; simp [mulVec, dotProduct]⟩
+    add_mem' := by
+      rintro r r' ⟨y, hy, h⟩ ⟨y', hy', h'⟩
+      refine ⟨y + y', hadd _ _ hy hy', funext fun i => ?_⟩
+      have e := congrFun h i
+      have e' := congrFun h' i
+      simp only [mulVec, dotProduct, Pi.add_apply, map_add (f := _), mul_add,
+          Finset.sum_add_distrib]
+        at e e' ⊢
+      rw [e, e']
+    smul_mem' := by
+      rintro t r ⟨y, hy, h⟩
+      obtain ⟨s, rfl⟩ := hred t
+      refine ⟨_, hsm s y hy, funext fun i => ?_⟩
+      have e := congrFun h i
+      simp only [mulVec, dotProduct, Pi.smul_apply, smul_eq_mul, map_mul, hc] at e ⊢
+      rw [← e, Finset.mul_sum]
+      exact Finset.sum_congr rfl fun a _ => by ring
+  }
   obtain ⟨n, b⟩ := Submodule.basisOfPid (Pi.basisFun R (Fin d)) L
-  have hli : LinearIndependent R fun j => (b j : Fin d → R) := b.linearIndependent.map' L.subtype L.ker_subtype
+  have hli : LinearIndependent R fun j => (b j : Fin d → R) :=
+    b.linearIndependent.map' L.subtype L.ker_subtype
   have hnd : n ≤ d := by simpa using hli.fintype_card_le_finrank
-  have hb : ∀ j, ∃ y, mem y ∧ (P *ᵥ fun a => cc (y a)) = fun a => eb ((b j : Fin d → R) a) := fun j => (b j).2
+  have hb : ∀ j, ∃ y, mem y ∧ (P *ᵥ fun a => cc (y a)) = fun a => eb ((b j : Fin d → R) a) :=
+    fun j => (b j).2
   choose yb hyb hyb' using hb
   let Y : Matrix (Fin d) (Fin n) A := Matrix.of fun i j => yb j i
   let B : Matrix (Fin d) (Fin n) R := Matrix.of fun i j => (b j : Fin d → R) i
@@ -138,7 +157,8 @@ theorem abstract {S R A F : Type} [CommRing S] [CommRing A] [IsDomain A] [CommRi
       funext i
       have := congrFun this i
       simp only [AddSubmonoidClass.coe_finsetSum, SetLike.val_smul, Finset.sum_apply, Pi.smul_apply,
-        smul_eq_mul] at this
+          smul_eq_mul]
+        at this
       rw [← this]
       simp [mulVec, dotProduct, B, hc', mul_comm]
     have e2 : P *ᵥ ((fun a => cc (y a)) - Y.map cc *ᵥ fun j => eb (red (c j))) = 0 := by
@@ -154,9 +174,11 @@ theorem abstract {S R A F : Type} [CommRing S] [CommRing A] [IsDomain A] [CommRi
     convert hY1 using 2
     ext i j
     have := congrFun (hC j) i
-    simp only [mulVec, dotProduct, Pi.single_apply, apply_ite ev, map_one, map_zero, mul_ite, mul_one, mul_zero,
-      Finset.sum_ite_eq', Finset.mem_univ, if_true] at this
-    rw [this]; rfl
+    simp only [mulVec, dotProduct, Pi.single_apply, apply_ite ev, map_one, map_zero, mul_ite,
+        mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+      at this
+    rw [this]
+    rfl
   obtain rfl : n = d := le_antisymm hnd hdn
   refine ⟨Y, fun h => ?_, fun y => ⟨hall y, fun ⟨c, hc⟩ => hc ▸ hY c⟩⟩
   have hB : B.det ≠ 0 := by
@@ -168,20 +190,26 @@ theorem abstract {S R A F : Type} [CommRing S] [CommRing A] [IsDomain A] [CommRi
   rw [det_mul, h, mul_zero, ← RingHom.mapMatrix_apply, ← RingHom.map_det] at this
   exact hB (heb (by rw [← this, map_zero]))
 
-theorem lim_of_complete {W : Type} [CommRing W] (x : W) [h : IsPrecomplete (Ideal.span {x}) W] (f : ℕ → W)
-    (hf : ∀ k, x ^ k ∣ f (k + 1) - f k) : ∃ z, ∀ k, x ^ k ∣ z - f k := by
+theorem lim_of_complete
+    {W : Type} [CommRing W]
+    (x : W) [h : IsPrecomplete (Ideal.span {x}) W]
+    (f : ℕ → W) (hf : ∀ k, x ^ k ∣ f (k + 1) - f k)
+    : ∃ z, ∀ k, x ^ k ∣ z - f k := by
   first
   | exact @_root_.GlobalTheory.ModularLimit.exists_limit
   | exact _root_.GlobalTheory.ModularLimit.exists_limit
   | (apply _root_.GlobalTheory.ModularLimit.exists_limit <;> assumption)
   | (intros; apply _root_.GlobalTheory.ModularLimit.exists_limit <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.ModularLimit.exists_limit <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.ModularLimit.exists_limit <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.ModularLimit.exists_limit ..)
 
 variable {l : ℕ} [hl : Fact l.Prime] {K : FinExt l} (bk : BK K)
 
-theorem lim_S (f : ℕ → bk.S) (hf : ∀ k, (l : bk.S) ^ k ∣ f (k + 1) - f k) :
-    ∃ z, ∀ k, (l : bk.S) ^ k ∣ z - f k := by
+theorem lim_S (f : ℕ → bk.S) (hf : ∀ k, (l : bk.S) ^ k ∣ f (k + 1) - f k)
+    : ∃ z, ∀ k, (l : bk.S) ^ k ∣ z - f k := by
   haveI : IsAdicComplete (Ideal.span {(l : Wq l bk.a)}) (Wq l bk.a) := WittVector.isAdicCompleteIdealSpanP
   have hC : ∀ k, (l : bk.S) ^ k = C ((l : Wq l bk.a) ^ k) := fun k => by rw [map_pow, map_natCast]
   have : ∀ i, ∃ z, ∀ k, (l : Wq l bk.a) ^ k ∣ z - coeff i (f k) := fun i =>
@@ -191,7 +219,10 @@ theorem lim_S (f : ℕ → bk.S) (hf : ∀ k, (l : bk.S) ^ k ∣ f (k + 1) - f k
   choose z hz using this
   refine ⟨PowerSeries.mk z, fun k => ?_⟩
   choose q hq using fun i => hz i k
-  exact ⟨PowerSeries.mk q, PowerSeries.ext fun i => by rw [map_sub, coeff_mk, hq, hC, coeff_C_mul, coeff_mk]⟩
+  exact ⟨
+    PowerSeries.mk q,
+    PowerSeries.ext fun i => by rw [map_sub, coeff_mk, hq, hC, coeff_C_mul, coeff_mk]
+  ⟩
 
 theorem sep_A (x : Ainf l) (hx : ∀ k : ℕ, (l : Ainf l) ^ k ∣ x) : x = 0 := by
   haveI : IsAdicComplete (Ideal.span {(l : Ainf l)}) (Ainf l) := WittVector.isAdicCompleteIdealSpanP
@@ -199,34 +230,40 @@ theorem sep_A (x : Ainf l) (hx : ∀ k : ℕ, (l : Ainf l) ^ k ∣ x) : x = 0 :=
   rw [Ideal.span_singleton_pow, smul_eq_mul, Ideal.mul_top, SModEq.zero, Ideal.mem_span_singleton]
   exact hx k
 
-def red : bk.S →+* (Fq l bk.a)⟦X⟧ := PowerSeries.map (WittVector.constantCoeff (p := l) (R := Fq l bk.a))
+def red : bk.S →+* (Fq l bk.a)⟦X⟧ :=
+  PowerSeries.map (WittVector.constantCoeff (p := l) (R := Fq l bk.a))
 
-theorem red_surj : Function.Surjective (red bk) := fun v =>
-  ⟨PowerSeries.mk fun n => WittVector.teichmuller l (coeff n v), by
+theorem red_surj : Function.Surjective (red bk) := fun v => ⟨
+  PowerSeries.mk fun n => WittVector.teichmuller l (coeff n v),
+  by
     ext n
-    simp [red, WittVector.constantCoeff_apply, WittVector.teichmuller_coeff_zero]⟩
+    simp [red, WittVector.constantCoeff_apply, WittVector.teichmuller_coeff_zero]
+⟩
 
 theorem ker_red_le : RingHom.ker (red bk) ≤ RingHom.ker bk.evRed := fun x hx => by
   obtain ⟨y, rfl⟩ := dvd_of_map_eq_zero l bk.a x hx
   rw [RingHom.mem_ker, map_mul, map_natCast, CharP.cast_eq_zero, zero_mul]
 
-def eo : (Fq l bk.a)⟦X⟧ →+* OCb l := (red bk).liftOfSurjective (red_surj bk) ⟨bk.evRed, ker_red_le bk⟩
+def eo : (Fq l bk.a)⟦X⟧ →+* OCb l :=
+  (red bk).liftOfSurjective (red_surj bk) ⟨bk.evRed, ker_red_le bk⟩
 
 theorem eo_red (s : bk.S) : eo bk (red bk s) = bk.evRed s :=
   (red bk).liftOfRightInverse_comp_apply _ _ _ s
 
-theorem eo_X : eo bk X = bk.flat := by
-  rw [← bk.evRed_X, ← eo_red, red, PowerSeries.map_X]
+theorem eo_X : eo bk X = bk.flat := by rw [← bk.evRed_X, ← eo_red, red, PowerSeries.map_X]
 
 theorem eo_injective : Function.Injective (eo bk) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro r hr
   obtain ⟨s, rfl⟩ := red_surj bk r
   rw [eo_red] at hr
   obtain ⟨y, rfl⟩ := bk.dvd_of_evRed_eq_zero s hr
-  rw [map_mul, map_natCast, ← map_natCast (C : Fq l bk.a →+* _), CharP.cast_eq_zero, map_zero, zero_mul]
+  rw [map_mul, map_natCast, ← map_natCast (C : Fq l bk.a →+* _), CharP.cast_eq_zero, map_zero,
+    zero_mul]
 
-theorem mem_range_eo (m : ℕ) : ∀ (o : OCb l) (r : (Fq l bk.a)⟦X⟧), bk.flat ^ m * o = eo bk r → ∃ r', o = eo bk r' := by
+theorem mem_range_eo (m : ℕ)
+    : ∀ (o : OCb l) (r : (Fq l bk.a)⟦X⟧), bk.flat ^ m * o = eo bk r → ∃ r', o = eo bk r' := by
   induction m with
   | zero => intro o r h; exact ⟨r, by simpa using h⟩
   | succ m ih =>
@@ -240,10 +277,12 @@ theorem mem_range_eo (m : ℕ) : ∀ (o : OCb l) (r : (Fq l bk.a)⟦X⟧), bk.fl
     obtain ⟨r', rfl⟩ := hX
     refine ih o r' (mul_left_cancel₀ bk.flat_ne_zero ?_)
     rw [map_mul, eo_X] at h
-    rw [← h]; ring
+    rw [← h]
+    ring
 
-theorem exists_pow_mul (x : Cb l) : ∃ (c : ℕ) (o : OCb l),
-    algebraMap (OCb l) (Cb l) bk.flat ^ c * x = algebraMap (OCb l) (Cb l) o := by
+theorem exists_pow_mul (x : Cb l)
+    : ∃ (c : ℕ) (o : OCb l),
+      algebraMap (OCb l) (Cb l) bk.flat ^ c * x = algebraMap (OCb l) (Cb l) o := by
   haveI := GlobalTheory.FrobInt.valuationRing_tilt l
   obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := OCb l) x
   have hb0 : b ≠ 0 := nonZeroDivisors.ne_zero hb
@@ -253,15 +292,30 @@ theorem exists_pow_mul (x : Cb l) : ∃ (c : ℕ) (o : OCb l),
     exact hb0 (AinfDiv.flat_haus bk b fun n => (ValuationRing.dvd_total _ _).resolve_right (h n))
   obtain ⟨c, q, hq⟩ := this
   refine ⟨c, q * a, ?_⟩
-  have hb1 : algebraMap (OCb l) (Cb l) b ≠ 0 := (map_ne_zero_iff _ (IsFractionRing.injective _ _)).2 hb0
+  have hb1 : algebraMap (OCb l) (Cb l) b ≠ 0 :=
+    (map_ne_zero_iff _ (IsFractionRing.injective _ _)).2 hb0
   rw [← map_pow, hq, map_mul, map_mul]
   field_simp
 
 end GlobalTheory.BSP.SatMod
 
-
 open GlobalTheory.BSP.SatMod in
-theorem GlobalTheory.BSP.saturated_module_free : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (d : ℕ) (mem : (Fin d → Ainf l) → Prop), mem 0 → (∀ y z, mem y → mem z → mem (y + z)) → (∀ (c : bk.S) y, mem y → mem (fun a => bk.ev c * y a)) → (∀ y, mem (fun a => (l : Ainf l) * y a) → mem y) → (∀ y : ℕ → Fin d → Ainf l, (∀ n, mem (y n)) → (∀ n a, (l : Ainf l) ^ n ∣ y (n + 1) a - y n a) → ∀ z : Fin d → Ainf l, (∀ n a, (l : Ainf l) ^ n ∣ z a - y n a) → mem z) → ∀ (Y1 : Matrix (Fin d) (Fin d) (Ainf l)) (Y' : Matrix (Fin d) (Fin d) (WCb l)), (Y1.map (inclW l)).det ≠ 0 → IsUnit Y' → (∀ c : Fin d → bk.S, mem (Y1 *ᵥ fun a => bk.ev (c a))) → (∀ y, mem y → ∃ w : Fin d → WCb l, (∀ i, w i ∈ bk.OE) ∧ (fun a => inclW l (y a)) = Y' *ᵥ w) → ∃ Y : Matrix (Fin d) (Fin d) (Ainf l), IsUnit (Y.map (inclW l)) ∧ ∀ y, mem y ↔ ∃ c : Fin d → bk.S, y = Y *ᵥ fun a => bk.ev (c a) := by
+theorem GlobalTheory.BSP.saturated_module_free
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (d : ℕ) (mem : (Fin d → Ainf l) → Prop),
+      mem 0 → (∀ y z, mem y → mem z → mem (y + z))
+        → (∀ (c : bk.S) y, mem y → mem (fun a => bk.ev c * y a))
+        → (∀ y, mem (fun a => (l : Ainf l) * y a) → mem y)
+        → (∀ y : ℕ → Fin d → Ainf l,
+          (∀ n, mem (y n)) → (∀ n a, (l : Ainf l) ^ n ∣ y (n + 1) a - y n a)
+            → ∀ z : Fin d → Ainf l, (∀ n a, (l : Ainf l) ^ n ∣ z a - y n a) → mem z)
+        → ∀ (Y1 : Matrix (Fin d) (Fin d) (Ainf l)) (Y' : Matrix (Fin d) (Fin d) (WCb l)),
+          (Y1.map (inclW l)).det ≠ 0 → IsUnit Y'
+            → (∀ c : Fin d → bk.S, mem (Y1 *ᵥ fun a => bk.ev (c a)))
+            → (∀ y,
+              mem y → ∃ w : Fin d → WCb l, (∀ i, w i ∈ bk.OE) ∧ (fun a => inclW l (y a)) = Y' *ᵥ w)
+            → ∃ Y : Matrix (Fin d) (Fin d) (Ainf l),
+              IsUnit (Y.map (inclW l))
+                ∧ ∀ y, mem y ↔ ∃ c : Fin d → bk.S, y = Y *ᵥ fun a => bk.ev (c a) := by
   intro l _ K bk d mem h0 hadd hsm hsat _ Y1 Y' hY1 hY' hm1 hOE
   classical
   let al := algebraMap (OCb l) (Cb l)
@@ -283,31 +337,38 @@ theorem GlobalTheory.BSP.saturated_module_free : ∀ (l : ℕ) [Fact l.Prime] (K
     rw [map_mul, map_pow, ← ho (i, j), show N = c (i, j) + e from he]
     ring
   choose o' ho' using hP
-  obtain ⟨Y, hY, hYm⟩ := abstract l bk.ev (red bk) (red_surj bk) (al.comp cA) (al.comp (eo bk))
-    (hal.comp (eo_injective bk)) (fun s => by rw [RingHom.comp_apply, RingHom.comp_apply, eo_red]; rfl)
-    (fun x hx => (AinfDiv.dvd_iff x).2 (hal (by rw [map_zero]; exact hx))) mem h0 hadd hsm hsat sep_A (lim_S bk)
-    Y1 (fun h => hY1 (by rw [← RingHom.mapMatrix_apply, ← RingHom.map_det, h, map_zero])) hm1
-    (al bk.flat ^ N • Q) (by rw [det_smul]; exact mul_ne_zero (pow_ne_zero _ (pow_ne_zero _ hf)) hQ)
-    (fun y hy => by
-      obtain ⟨w, hw, hyw⟩ := hOE y hy
-      have e1 : (↑U⁻¹ : Matrix (Fin d) (Fin d) (WCb l)) *ᵥ (fun a => inclW l (y a)) = w := by
-        rw [hyw, mulVec_mulVec, Units.inv_mul, one_mulVec]
-      have : ∀ i, ∃ r, ((al bk.flat ^ N • Q) *ᵥ fun a => (al.comp cA) (y a)) i = al (eo bk r) := fun i => by
-        have e2 : (Q *ᵥ fun a => (al.comp cA) (y a)) i = cW (w i) := by
-          rw [← e1]
-          simp [mulVec, dotProduct, Q, hcc]
-        have e3 : ((al bk.flat ^ N • Q) *ᵥ fun a => (al.comp cA) (y a)) i = al (∑ a, o' i a * cA (y a)) := by
-          simp [mulVec, dotProduct, ho']
-        obtain ⟨m, s, hs⟩ := ((GlobalTheory.BSP.oe_mod_l l K bk).1 (cW (w i))).1 ⟨w i, hw i, rfl⟩
-        have e4 : bk.flat ^ m * (∑ a, o' i a * cA (y a)) = eo bk (X ^ N * red bk s) := by
-          apply hal
-          rw [map_mul, ← e3, smul_mulVec, Pi.smul_apply, e2, map_mul, map_pow, map_pow, eo_X, eo_red, map_mul,
-            map_pow, smul_eq_mul, mul_left_comm, hs]
-          rfl
-        obtain ⟨r, hr⟩ := mem_range_eo bk m _ _ e4
-        exact ⟨r, by rw [e3, hr]⟩
-      choose r hr using this
-      exact ⟨r, funext hr⟩)
+  obtain ⟨Y, hY, hYm⟩ :=
+    abstract l bk.ev (red bk) (red_surj bk) (al.comp cA) (al.comp (eo bk))
+      (hal.comp (eo_injective bk))
+      (fun s => by rw [RingHom.comp_apply, RingHom.comp_apply, eo_red]; rfl)
+      (fun x hx => (AinfDiv.dvd_iff x).2 (hal (by rw [map_zero]; exact hx)))
+      mem h0 hadd hsm hsat sep_A (lim_S bk) Y1
+      (fun h => hY1 (by rw [← RingHom.mapMatrix_apply, ← RingHom.map_det, h, map_zero]))
+      hm1 (al bk.flat ^ N • Q)
+      (by rw [det_smul]; exact mul_ne_zero (pow_ne_zero _ (pow_ne_zero _ hf)) hQ)
+      (fun y hy => by
+        obtain ⟨w, hw, hyw⟩ := hOE y hy
+        have e1 : (↑U⁻¹ : Matrix (Fin d) (Fin d) (WCb l)) *ᵥ (fun a => inclW l (y a)) = w := by
+          rw [hyw, mulVec_mulVec, Units.inv_mul, one_mulVec]
+        have : ∀ i, ∃ r,
+            ((al bk.flat ^ N • Q) *ᵥ fun a => (al.comp cA) (y a)) i = al (eo bk r) := fun i => by
+          have e2 : (Q *ᵥ fun a => (al.comp cA) (y a)) i = cW (w i) := by
+            rw [← e1]
+            simp [mulVec, dotProduct, Q, hcc]
+          have e3
+              : ((al bk.flat ^ N • Q) *ᵥ fun a => (al.comp cA) (y a)) i
+                = al (∑ a, o' i a * cA (y a)) := by
+            simp [mulVec, dotProduct, ho']
+          obtain ⟨m, s, hs⟩ := ((GlobalTheory.BSP.oe_mod_l l K bk).1 (cW (w i))).1 ⟨w i, hw i, rfl⟩
+          have e4 : bk.flat ^ m * (∑ a, o' i a * cA (y a)) = eo bk (X ^ N * red bk s) := by
+            apply hal
+            rw [map_mul, ← e3, smul_mulVec, Pi.smul_apply, e2, map_mul, map_pow, map_pow, eo_X,
+              eo_red, map_mul, map_pow, smul_eq_mul, mul_left_comm, hs]
+            rfl
+          obtain ⟨r, hr⟩ := mem_range_eo bk m _ _ e4
+          exact ⟨r, by rw [e3, hr]⟩
+        choose r hr using this
+        exact ⟨r, funext hr⟩)
   refine ⟨Y, ?_, hYm⟩
   rw [Matrix.isUnit_iff_isUnit_det]
   apply WittVector.isUnit_of_coeff_zero_ne_zero

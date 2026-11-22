@@ -19,7 +19,8 @@ theorem progY_card (y0 : ℝ) (M : ℕ) : (progY y0 M).card = M := by
   unfold progY
   rw [card_image_of_injective _ (progY_injective y0), card_range]
 
-theorem progY_sep (y0 : ℝ) (M : ℕ) : ∀ y ∈ progY y0 M, ∀ y' ∈ progY y0 M, y ≠ y' → 5 ≤ |y - y'| := by
+theorem progY_sep (y0 : ℝ) (M : ℕ)
+    : ∀ y ∈ progY y0 M, ∀ y' ∈ progY y0 M, y ≠ y' → 5 ≤ |y - y'| := by
   intro y hy y' hy' hne
   simp only [progY, mem_image, mem_range] at hy hy'
   obtain ⟨i, -, rfl⟩ := hy
@@ -29,7 +30,7 @@ theorem progY_sep (y0 : ℝ) (M : ℕ) : ∀ y ∈ progY y0 M, ∀ y' ∈ progY 
     exact hne rfl
   have hsub : y0 + 5 * (i : ℝ) - (y0 + 5 * (j : ℝ)) = 5 * ((i : ℤ) - (j : ℤ) : ℤ) := by
     push_cast; ring
-  rw [hsub, abs_mul, abs_of_pos (by norm_num : (0:ℝ) < 5)]
+  rw [hsub, abs_mul, abs_of_pos (by norm_num : (0 : ℝ) < 5)]
   have h1 : (1 : ℝ) ≤ |(((i : ℤ) - (j : ℤ) : ℤ) : ℝ)| := by
     rw [← Int.cast_abs]
     have : (1 : ℤ) ≤ |(i : ℤ) - (j : ℤ)| := by
@@ -37,8 +38,9 @@ theorem progY_sep (y0 : ℝ) (M : ℕ) : ∀ y ∈ progY y0 M, ∀ y' ∈ progY 
     exact_mod_cast this
   linarith
 
-theorem progY_cut (lo hi : ℝ) (M : ℕ) (hlen : 5 * (M : ℝ) ≤ hi - lo) :
-    ∀ y ∈ progY (2 - hi) M, (lo + 2 ≤ -y ∧ -y ≤ hi - 2) ∧ (lo + 2 ≤ -(y + 1) ∧ -(y + 1) ≤ hi - 2) := by
+theorem progY_cut (lo hi : ℝ) (M : ℕ) (hlen : 5 * (M : ℝ) ≤ hi - lo)
+    : ∀ y ∈ progY (2 - hi) M,
+      (lo + 2 ≤ -y ∧ -y ≤ hi - 2) ∧ (lo + 2 ≤ -(y + 1) ∧ -(y + 1) ≤ hi - 2) := by
   intro y hy
   simp only [progY, mem_image, mem_range] at hy
   obtain ⟨i, hi', rfl⟩ := hy

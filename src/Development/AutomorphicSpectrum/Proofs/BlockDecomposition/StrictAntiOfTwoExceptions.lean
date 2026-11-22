@@ -6,10 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.Segments
 
-theorem shufcomb (l : ℕ) (hl : 3 ≤ l) (w : Fin l → ℕ) (hw : ∀ a, w a < l) (i j : Fin l)
-    (hi : w i = 0) (hj : w j = l - 1)
-    (h1 : ∀ a b, a < b → a ≠ i → b ≠ i → w b < w a)
-    (h2 : ∀ a b, a < b → a ≠ j → b ≠ j → w b < w a) : StrictAnti w := by
+theorem shufcomb
+    (l : ℕ) (hl : 3 ≤ l) (w : Fin l → ℕ) (hw : ∀ a, w a < l) (i j : Fin l)
+    (hi : w i = 0) (hj : w j = l - 1) (h1 : ∀ a b, a < b → a ≠ i → b ≠ i → w b < w a)
+    (h2 : ∀ a b, a < b → a ≠ j → b ≠ j → w b < w a)
+    : StrictAnti w := by
   have hij : i ≠ j := by
     intro h
     rw [h] at hi

@@ -13,9 +13,13 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IwasawaDecomp
 @[expose] public section
 
 open scoped ComplexConjugate Matrix NNReal
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.Cusp GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
-open GlobalTheory.IndefiniteRowSideFullHecke.SphericalVolumeLift (FinPl RealMat Lat IsFockVec IsSphOff HidaSetting volQ)
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.Cusp GlobalTheory.AdelicU GlobalTheory.Doubling
+  GlobalTheory.Cont GlobalTheory.MixModel
+open GlobalTheory.IndefiniteRowSideFullHecke.SphericalVolumeLift
+  (FinPl RealMat Lat IsFockVec IsSphOff HidaSetting volQ)
 open GlobalTheory.IndefiniteRowSideFullHecke.SphericalZero (ip delta swSec sZero IsKFinVec)
 open GlobalTheory.Mem.Th (CptF)
 open GlobalTheory.Core.Rk.IP
@@ -31,17 +35,22 @@ section IsoCol
 
 variable {A : Type} [CommRing A]
 
-theorem map_cT_rect (σ : A →+* A) (f : A →+* ℂ) (hσ : ∀ x, f (σ x) = star (f x)) {m p : Type}
-    (M : Matrix m p A) : (cT σ M).map f = (M.map f)ᴴ := by
+theorem map_cT_rect
+    (σ : A →+* A) (f : A →+* ℂ) (hσ : ∀ x, f (σ x) = star (f x)) {m p : Type} (M : Matrix m p A)
+    : (cT σ M).map f = (M.map f)ᴴ := by
   ext i j
   simp [cT, conjTranspose_apply, hσ]
 
-theorem exists_compact_keep_cols {n r : ℕ} (σ : A →+* A) (f : A →+* ℂ) (hf : Function.Bijective f)
-    (hσ : ∀ x, f (σ x) = star (f x)) {J : Matrix (Fin n) (Fin n) A} (b : GL (Fin n) A) (ε : Fin n → Bool)
+theorem exists_compact_keep_cols
+    {n r : ℕ}
+    (σ : A →+* A) (f : A →+* ℂ) (hf : Function.Bijective f) (hσ : ∀ x, f (σ x) = star (f x))
+    {J : Matrix (Fin n) (Fin n) A} (b : GL (Fin n) A) (ε : Fin n → Bool)
     (hb : cT σ b.1 * J * b.1 = (Matrix.diagonal fun i => if ε i then 1 else -1))
-    (X : Matrix (Fin n) (Fin r) A) (hX : cT σ X * J * X = 0) (g : GL (Fin n) A) (hg : g ∈ UJ σ J) :
-    ∃ k ∈ UJ σ J, b⁻¹ * k * b ∈ UJ σ (1 : Matrix (Fin n) (Fin n) A) ∧
-      ∃ β : Matrix (Fin r) (Fin r) A, (g * k⁻¹).1 * X = X * β := by
+    (X : Matrix (Fin n) (Fin r) A) (hX : cT σ X * J * X = 0)
+    (g : GL (Fin n) A) (hg : g ∈ UJ σ J)
+    : ∃ k ∈ UJ σ J,
+      b⁻¹ * k * b ∈ UJ σ (1 : Matrix (Fin n) (Fin n) A)
+        ∧ ∃ β : Matrix (Fin r) (Fin r) A, (g * k⁻¹).1 * X = X * β := by
   set F := RingEquiv.ofBijective f hf
   have hfF : ∀ z : ℂ, f (F.symm z) = z := fun z => F.apply_symm_apply z
   have hfinj : ∀ {p q : Type} (M N : Matrix p q A), M.map f = N.map f → M = N := fun M N h =>
@@ -66,8 +75,10 @@ theorem exists_compact_keep_cols {n r : ℕ} (σ : A →+* A) (f : A →+* ℂ) 
   set X' := Y.map f with hX'def
   have hY : cT σ Y * D * Y = 0 := by
     rw [← hb, hYdef, cT_mul]
-    calc cT σ X * cT σ (b⁻¹).1 * (cT σ b.1 * J * b.1) * ((b⁻¹).1 * X)
-        = cT σ X * (cT σ (b⁻¹).1 * (cT σ b.1 * J * b.1) * (b⁻¹).1) * X := by simp only [Matrix.mul_assoc]
+    calc
+      cT σ X * cT σ (b⁻¹).1 * (cT σ b.1 * J * b.1) * ((b⁻¹).1 * X)
+          = cT σ X * (cT σ (b⁻¹).1 * (cT σ b.1 * J * b.1) * (b⁻¹).1) * X := by
+        simp only [Matrix.mul_assoc]
       _ = 0 := by rw [cT_inv_cancel, hX]
   have hiso0 : X'ᴴ * Formalism.REAL.Jm ε * X' = 0 := by
     have := congrArg (fun M => M.map f) hY
@@ -97,9 +108,11 @@ theorem exists_compact_keep_cols {n r : ℕ} (σ : A →+* A) (f : A →+* ℂ) 
     intro u; ext i j; simp [bc, hfF]
   have hk1f : k1.1.map f = Formalism.MainNotions.S.uMat k0 := hbc _
   have hk1if : (k1⁻¹).1.map f = Formalism.MainNotions.S.uMat k0⁻¹ := by
-    have : k1⁻¹ = bc (F.symm : ℂ →+* A) ((k0⁻¹ : Formalism.REAL.UJ ε) : (Matrix (Fin n) (Fin n) ℂ)ˣ) := by
+    have : k1⁻¹
+        = bc (F.symm : ℂ →+* A) ((k0⁻¹ : Formalism.REAL.UJ ε) : (Matrix (Fin n) (Fin n) ℂ)ˣ) := by
       simp [k1, map_inv]
-    rw [this]; exact hbc _
+    rw [this]
+    exact hbc _
   have hk1D : k1 ∈ UJ σ D := by
     show cT σ k1.1 * D * k1.1 = D
     apply hfinj
@@ -108,8 +121,8 @@ theorem exists_compact_keep_cols {n r : ℕ} (σ : A →+* A) (f : A →+* ℂ) 
   have hk1one : k1 ∈ UJ σ (1 : Matrix (Fin n) (Fin n) A) := by
     show cT σ k1.1 * 1 * k1.1 = 1
     apply hfinj
-    rw [Matrix.map_mul, Matrix.map_mul, map_cT_rect σ f hσ, hk1f, Matrix.map_one _ (map_zero f) (map_one f),
-      Matrix.mul_one]
+    rw [Matrix.map_mul, Matrix.map_mul, map_cT_rect σ f hσ, hk1f,
+      Matrix.map_one _ (map_zero f) (map_one f), Matrix.mul_one]
     exact hk0
   refine ⟨b * k1 * b⁻¹, ?_, ?_, ?_⟩
   · have hk1' : k1 ∈ UJ σ (cT σ b.1 * J * b.1) := by rw [hb]; exact hk1D
@@ -147,15 +160,28 @@ theorem exists_compact_keep_cols {n r : ℕ} (σ : A →+* A) (f : A →+* ℂ) 
     apply hfinj
     rw [e1, e2]
     exact hHX
-  have hgk : g * (b * k1 * b⁻¹)⁻¹ = b * (h0 * k1⁻¹) * b⁻¹ := by
-    rw [hh0def]; group
+  have hgk : g * (b * k1 * b⁻¹)⁻¹ = b * (h0 * k1⁻¹) * b⁻¹ := by rw [hh0def]; group
   rw [hgk, Units.val_mul, Units.val_mul]
-  calc b.1 * H * (b⁻¹).1 * X = b.1 * (H * Y) := by rw [hYdef]; simp only [Matrix.mul_assoc]
+  calc
+    b.1 * H * (b⁻¹).1 * X
+      = b.1 * (H * Y) := by rw [hYdef]; simp only [Matrix.mul_assoc]
     _ = b.1 * ((b⁻¹).1 * X * β'.map F.symm) := by rw [hHY]
     _ = X * β'.map F.symm := by
-        rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mul]
+      rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, ← Units.val_mul, mul_inv_cancel, Units.val_one,
+        Matrix.one_mul]
 
-theorem iw_iso_cols : ∀ {A : Type} [CommRing A] {n r : ℕ} (σ : A →+* A) (f : A →+* ℂ), Function.Bijective f → (∀ x, f (σ x) = star (f x)) → ∀ {J : Matrix (Fin n) (Fin n) A} (b : GL (Fin n) A) (ε : Fin n → Bool), Formalism.UG.cT σ b.1 * J * b.1 = (Matrix.diagonal fun i => if ε i then 1 else -1) → ∀ (X : Matrix (Fin n) (Fin r) A), Formalism.UG.cT σ X * J * X = 0 → ∀ g : GL (Fin n) A, g ∈ UJ σ J → ∃ k ∈ UJ σ J, b⁻¹ * k * b ∈ UJ σ (1 : Matrix (Fin n) (Fin n) A) ∧ ∃ β : Matrix (Fin r) (Fin r) A, (g * k⁻¹).1 * X = X * β  := by
+theorem iw_iso_cols
+    : ∀ {A : Type} [CommRing A] {n r : ℕ} (σ : A →+* A) (f : A →+* ℂ),
+      Function.Bijective f → (∀ x, f (σ x) = star (f x))
+        → ∀ {J : Matrix (Fin n) (Fin n) A} (b : GL (Fin n) A) (ε : Fin n → Bool),
+          Formalism.UG.cT σ b.1 * J * b.1 = (Matrix.diagonal fun i => if ε i then 1 else -1)
+            → ∀ (X : Matrix (Fin n) (Fin r) A),
+              Formalism.UG.cT σ X * J * X = 0
+                → ∀ g : GL (Fin n) A,
+                  g ∈ UJ σ J
+                    → ∃ k ∈ UJ σ J,
+                      b⁻¹ * k * b ∈ UJ σ (1 : Matrix (Fin n) (Fin n) A)
+                        ∧ ∃ β : Matrix (Fin r) (Fin r) A, (g * k⁻¹).1 * X = X * β := by
   intro A _ n r σ f hf hσ J b ε hb X hX g hg
   exact exists_compact_keep_cols σ f hf hσ b ε hb X hX g hg
 

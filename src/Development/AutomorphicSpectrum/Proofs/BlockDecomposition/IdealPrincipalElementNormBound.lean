@@ -5,18 +5,24 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsLatInt
 
 @[expose] public section
 
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.CompanionTheory.SiegelND.Integ.Hua GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.CompanionTheory.SiegelND.Integ.Hua GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.HS
 open scoped Matrix
 
 namespace GlobalTheory.CompanionTheory.SiegelND.Integ.Hua.Mink
 
-theorem exists_ne_zero_mem_absNorm_le :
-    ∀ (E : Type) [Field E] [NumberField E], ∃ C : ℝ, 0 < C ∧ ∀ 𝔞 : Ideal (𝓞 E), 𝔞 ≠ ⊥ →
-      ∃ t ∈ 𝔞, t ≠ 0 ∧ (Ideal.absNorm (Ideal.span {t}) : ℝ) ≤ C * Ideal.absNorm 𝔞 := by
+theorem exists_ne_zero_mem_absNorm_le
+    : ∀ (E : Type) [Field E] [NumberField E], ∃ C : ℝ,
+      0 < C
+        ∧ ∀ 𝔞 : Ideal (𝓞 E),
+          𝔞 ≠ ⊥ → ∃ t ∈ 𝔞, t ≠ 0 ∧ (Ideal.absNorm (Ideal.span {t}) : ℝ) ≤ C * Ideal.absNorm 𝔞 := by
   intro E _ _
-  refine ⟨(4 / Real.pi) ^ InfinitePlace.nrComplexPlaces E *
-      ((Module.finrank ℚ E).factorial : ℝ) / (Module.finrank ℚ E : ℝ) ^ Module.finrank ℚ E *
-      Real.sqrt |(discr E : ℝ)|, ?_, ?_⟩
+  refine ⟨
+    (4 / Real.pi) ^ InfinitePlace.nrComplexPlaces E * ((Module.finrank ℚ E).factorial : ℝ)
+      / (Module.finrank ℚ E : ℝ) ^ Module.finrank ℚ E * Real.sqrt |(discr E : ℝ)|,
+    ?_,
+    ?_
+  ⟩
   · have hn : 0 < Module.finrank ℚ E := Module.finrank_pos
     have hd : (0 : ℝ) < |(discr E : ℝ)| := abs_pos.mpr (by exact_mod_cast discr_ne_zero E)
     have h1 : (0 : ℝ) < (4 / Real.pi) ^ InfinitePlace.nrComplexPlaces E :=
@@ -36,12 +42,13 @@ theorem exists_ne_zero_mem_absNorm_le :
     refine ⟨t, ht, ?_, ?_⟩
     · rintro rfl
       simp at ha0
-    · have key : ((Ideal.absNorm (Ideal.span {t}) : ℚ)) =
-          |Algebra.norm ℚ (algebraMap (𝓞 E) E t)| := by
+    · have key
+          : ((Ideal.absNorm (Ideal.span {t}) : ℚ)) = |Algebra.norm ℚ (algebraMap (𝓞 E) E t)| := by
         rw [← FractionalIdeal.coeIdeal_absNorm (K := E), FractionalIdeal.coeIdeal_span_singleton,
           FractionalIdeal.absNorm_span_singleton]
-      have key' : (Ideal.absNorm (Ideal.span {t}) : ℝ) =
-          ((|Algebra.norm ℚ (algebraMap (𝓞 E) E t)| : ℚ) : ℝ) := by
+      have key'
+          : (Ideal.absNorm (Ideal.span {t}) : ℝ)
+            = ((|Algebra.norm ℚ (algebraMap (𝓞 E) E t)| : ℚ) : ℝ) := by
         rw [← key, Rat.cast_natCast]
       rw [key']
       refine hle.trans (le_of_eq ?_)

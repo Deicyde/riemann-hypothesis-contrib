@@ -13,11 +13,16 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Val
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows GlobalTheory.Asc
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory
+  IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
+  GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows GlobalTheory.Asc
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.FinPl (Lat idAt idOff intAt grpAt grpOff MxAt latV latA InK MonoAt OrthAt PrimAt ColsAt)
+open GlobalTheory.FinPl
+  (Lat idAt idOff intAt grpAt grpOff MxAt latV latA InK MonoAt OrthAt PrimAt ColsAt)
 open scoped nonZeroDivisors ContDiff
 open GlobalTheory.AscFin
 open ValuativeRel
@@ -26,18 +31,26 @@ noncomputable section
 
 namespace GlobalTheory.SplitPtLev
 
-theorem dvd_of_mem_maxIdeal_pow : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-  (p : GlobalTheory.FinPl.SplitPt D k) (w : HeightOneSpectrum (𝓞 D.host.E)), Formalism.L2.NTheta.IsIdemAt p.e w → ∀ (d : ℕ) (m : 𝓞 D.host.E),
-  m ∉ w.asIdeal ^ (d + 1) → ∀ z ∈ IsLocalRing.maximalIdeal 𝒪[k] ^ d, ∃ c ∈ 𝒪[k], (z : k) = c * p.pr (incA D ((m : 𝓞 D.host.E) : D.host.E)) := by
+theorem dvd_of_mem_maxIdeal_pow
+    : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
+        [IsNonarchimedeanLocalField k] (p : GlobalTheory.FinPl.SplitPt D k)
+        (w : HeightOneSpectrum (𝓞 D.host.E)),
+      Formalism.L2.NTheta.IsIdemAt p.e w
+        → ∀ (d : ℕ) (m : 𝓞 D.host.E),
+          m ∉ w.asIdeal ^ (d + 1)
+            → ∀ z ∈ IsLocalRing.maximalIdeal 𝒪[k] ^ d, ∃ c ∈ 𝒪[k],
+              (z : k) = c * p.pr (incA D ((m : 𝓞 D.host.E) : D.host.E)) := by
   intro D k _ _ _ _ p w he d m hm z hz
   let f : 𝓞 D.host.E → k := fun x => p.pr (incA D (x : D.host.E))
   have fmul : ∀ x y, f (x * y) = f x * f y := by
     intro x y
     simp only [f, map_mul]
   obtain ⟨t, ht, ht2⟩ : ∃ t ∈ w.asIdeal, t ∉ w.asIdeal ^ 2 := by
-    obtain ⟨t, ht, ht2⟩ := Ideal.exists_mem_pow_notMem_pow_succ w.asIdeal w.ne_bot w.isPrime.ne_top 1
+    obtain ⟨t, ht, ht2⟩ :=
+      Ideal.exists_mem_pow_notMem_pow_succ w.asIdeal w.ne_bot w.isPrime.ne_top 1
     exact ⟨t, by simpa using ht, ht2⟩
-  have h1w : (1 : 𝓞 D.host.E) ∉ w.asIdeal := fun h => w.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 h)
+  have h1w : (1 : 𝓞 D.host.E) ∉ w.asIdeal := fun h =>
+    w.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 h)
   obtain ⟨q, hq⟩ := (GlobalTheory.FinPl.SplitPt.val_eq_unif_and_unit D k p w he t 1 ht ht2 h1w).1
   have hunit : ∀ x, x ∉ w.asIdeal → valuation k (f x) = 1 := fun x hx =>
     (GlobalTheory.FinPl.SplitPt.val_eq_unif_and_unit D k p w he t x ht ht2 hx).2
@@ -59,8 +72,9 @@ theorem dvd_of_mem_maxIdeal_pow : ∀ (D : D7) (k : Type) [Field k] [ValuativeRe
     obtain ⟨y, hy⟩ := Ideal.mem_span_singleton'.1 this
     exact ⟨y, hy.symm⟩
   have hq1 : valuation k ((q.1 : 𝒪[k]) : k) ≤ 1 := (GlobalTheory.FinPl.SplitPt.val_unif_lt_one q).le
-  have key : ∀ n (x : 𝓞 D.host.E), x ∉ w.asIdeal ^ (n + 1) →
-      valuation k ((q.1 : 𝒪[k]) : k) ^ n ≤ valuation k (f x) := by
+  have key
+      : ∀ n (x : 𝓞 D.host.E),
+        x ∉ w.asIdeal ^ (n + 1) → valuation k ((q.1 : 𝒪[k]) : k) ^ n ≤ valuation k (f x) := by
     intro n
     induction n with
     | zero =>
@@ -85,8 +99,9 @@ theorem dvd_of_mem_maxIdeal_pow : ∀ (D : D7) (k : Type) [Field k] [ValuativeRe
         exact mul_le_mul_of_nonneg_right (ih y hy') zero_le'
       · rw [hunit x hxw]
         exact pow_le_one₀ zero_le' hq1
-  have hzle : ∀ n, ∀ z ∈ IsLocalRing.maximalIdeal 𝒪[k] ^ n,
-      valuation k (z : k) ≤ valuation k ((q.1 : 𝒪[k]) : k) ^ n := by
+  have hzle
+      : ∀ n, ∀ z ∈ IsLocalRing.maximalIdeal 𝒪[k] ^ n,
+        valuation k (z : k) ≤ valuation k ((q.1 : 𝒪[k]) : k) ^ n := by
     intro n
     induction n with
     | zero =>

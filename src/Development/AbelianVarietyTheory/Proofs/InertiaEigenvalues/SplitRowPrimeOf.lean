@@ -8,13 +8,17 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SplitPr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Module
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations Module
 
 namespace GlobalTheory.HubX.SplitDecl
 
-theorem splitRowPrime_of {D : D7} {L : SizeData₂ D} {X : KillingConditions.HubData D} (i : D.nd.Loc)
-    (hg : D.nd.l i ∉ TwistedPlaces.gset D) (hr : KillingConditions.RangeAD L X.exc (D.nd.l i)) (hs : TwistedPlaces.SplitK D (D.nd.l i)) :
-    GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes.SplitRowPrime D.host (D.nd.l i) := by
+theorem splitRowPrime_of
+    {D : D7} {L : SizeData₂ D} {X : KillingConditions.HubData D}
+    (i : D.nd.Loc) (hg : D.nd.l i ∉ TwistedPlaces.gset D)
+    (hr : KillingConditions.RangeAD L X.exc (D.nd.l i)) (hs : TwistedPlaces.SplitK D (D.nd.l i))
+    : GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes.SplitRowPrime D.host (D.nd.l i) := by
   have hp := (D.nd.lPrime i).out
   have h5 : 5 ≤ D.nd.l i := by
     have h2 := hp.two_le
@@ -26,14 +30,22 @@ theorem splitRowPrime_of {D : D7} {L : SizeData₂ D} {X : KillingConditions.Hub
   rw [e]
   fin_cases k <;> simp [TwistedPlaces.gset]
 
-theorem main : ∀ (D : D7) (L : SizeData₂ D) (HW : HWOf D.loc) (R : KillingConditions.RowK) (X : KillingConditions.HubData D),
-    GlobalTheory.HubX.Canon L HW R X → ∀ (hJ : AdmissibleParameterJ.ConclusionJa D) (i : D.nd.Loc), TwistedPlaces.TwLoc D i → D.nd.l i ∉ TwistedPlaces.gset D →
-    KillingConditions.RangeAD L X.exc (D.nd.l i) → TwistedPlaces.SplitK D (D.nd.l i) →
-    EmbeddingTypes.hypDecl i (X.dc i) (Exists.choose hJ) ∧
-      ∀ v ∈ placesOver D.host.E (D.nd.l i), v.asIdeal.ramificationIdx ℤ = 1 := by
+theorem main
+    : ∀ (D : D7) (L : SizeData₂ D) (HW : HWOf D.loc) (R : KillingConditions.RowK)
+        (X : KillingConditions.HubData D),
+      GlobalTheory.HubX.Canon L HW R X
+        → ∀ (hJ : AdmissibleParameterJ.ConclusionJa D) (i : D.nd.Loc),
+          TwistedPlaces.TwLoc D i → D.nd.l i ∉ TwistedPlaces.gset D
+            → KillingConditions.RangeAD L X.exc (D.nd.l i) → TwistedPlaces.SplitK D (D.nd.l i)
+            → EmbeddingTypes.hypDecl i (X.dc i) (Exists.choose hJ)
+              ∧ ∀ v ∈ placesOver D.host.E (D.nd.l i), v.asIdeal.ramificationIdx ℤ = 1 := by
   intro D L HW R X h hJ i _ hg hr hs
   have hsp := splitRowPrime_of (L := L) (X := X) i hg hr hs
-  refine ⟨GlobalTheory.HubX.Check.decl h hJ i hg hr hs ((GlobalTheory.T.exists_splitPlacesDeclaration_splitRowPrime D i hJ.choose hsp).1), ?_⟩
+  refine ⟨
+    GlobalTheory.HubX.Check.decl h hJ i hg hr hs
+      ((GlobalTheory.T.exists_splitPlacesDeclaration_splitRowPrime D i hJ.choose hsp).1),
+    ?_
+  ⟩
   intro v hv
   exact (GlobalTheory.SplitPlaces.placesSplit D.host (D.nd.l i) hsp v hv).1
 

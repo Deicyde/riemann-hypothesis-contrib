@@ -6,8 +6,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FinrankFinit
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 open GlobalTheory.IwLevel (InSub IsIsogDeg)
 open GlobalTheory.AbDual (evc IsAdditive swap)
 attribute [local instance] Ideal.Quotient.field
@@ -15,13 +18,19 @@ open UpperTheory.Gal.crystallineComparison UpperTheory.Gal.crystallineComparison
 
 namespace UpperTheory.Gal.crystallineComparison.Mod
 
-private theorem count_eq (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonObj A] (hab : IsAbelianScheme A)
-    (K : Over S) (i : K ⟶ A) (hm : Mono i) (hfin : IsFinite K.hom) (hfl : Flat K.hom) (c : ℕ) (hi : i ^ c = 1)
+private theorem count_eq
+    (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonObj A]
+    (hab : IsAbelianScheme A)
+    (K : Over S) (i : K ⟶ A) (hm : Mono i) (hfin : IsFinite K.hom) (hfl : Flat K.hom)
+    (c : ℕ) (hi : i ^ c = 1)
     (P : ∀ T : Over S, (T ⟶ A) → Prop) (hP : ∀ (T : Over S) (g : T ⟶ A), InSub i g ↔ P T g)
-    (V : Type) [CommRing V] [IsDomain V] [ValuationRing V] [IsAlgClosed (FractionRing V)] (hc : (c : V) ≠ 0)
-    (z : Sp V ⟶ S) (B : Type) [CommRing B] [Algebra V B] [Module.Finite V B] [Module.Free V B] (k : Sp B ⟶ K.left)
-    (hk : IsPullback k (spMap (algebraMap V B)) K.hom z) :
-    Module.finrank V B = Nat.card {g : Over.mk (spMap (algebraMap V (FractionRing V)) ≫ z) ⟶ A // P _ g} := by
+    (V : Type) [CommRing V] [IsDomain V] [ValuationRing V] [IsAlgClosed (FractionRing V)]
+    (hc : (c : V) ≠ 0)
+    (z : Sp V ⟶ S)
+    (B : Type) [CommRing B] [Algebra V B] [Module.Finite V B] [Module.Free V B]
+    (k : Sp B ⟶ K.left) (hk : IsPullback k (spMap (algebraMap V B)) K.hom z)
+    : Module.finrank V B
+      = Nat.card {g : Over.mk (spMap (algebraMap V (FractionRing V)) ≫ z) ⟶ A // P _ g} := by
   haveI := hfin
   haveI := hfl
   have hcF : ((c : FractionRing V)) ≠ 0 := by
@@ -30,14 +39,17 @@ private theorem count_eq (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonObj 
     apply IsFractionRing.injective V (FractionRing V)
     simpa using h
   let pt : Sp (FractionRing V) := (⊥ : PrimeSpectrum (FractionRing V))
-  have h1 := GlobalTheory.T.finrank_finiteFlat_torsion_subscheme_eq_card_points S A hab K i c hm hfin hfl hi (FractionRing V) hcF
-    (spMap (algebraMap V (FractionRing V)) ≫ z) pt
-  have h2 := Scheme.Hom.finrank_of_isPullback k (spMap (algebraMap V B)) K.hom z hk
-    (spMap (algebraMap V (FractionRing V)) pt)
+  have h1 :=
+    GlobalTheory.T.finrank_finiteFlat_torsion_subscheme_eq_card_points S A hab K i c hm hfin hfl hi
+      (FractionRing V) hcF (spMap (algebraMap V (FractionRing V)) ≫ z) pt
+  have h2 :=
+    Scheme.Hom.finrank_of_isPullback k (spMap (algebraMap V B)) K.hom z hk
+      (spMap (algebraMap V (FractionRing V)) pt)
   have h3 := Scheme.Hom.finrank_SpecMap_algebraMap V B (spMap (algebraMap V (FractionRing V)) pt)
   rw [Scheme.Hom.comp_apply] at h1
-  have h4 : Nat.card {g : Over.mk (spMap (algebraMap V (FractionRing V)) ≫ z) ⟶ A // P _ g} =
-      Nat.card (Over.mk (spMap (algebraMap V (FractionRing V)) ≫ z) ⟶ K) := by
+  have h4
+      : Nat.card {g : Over.mk (spMap (algebraMap V (FractionRing V)) ≫ z) ⟶ A // P _ g}
+        = Nat.card (Over.mk (spMap (algebraMap V (FractionRing V)) ≫ z) ⟶ K) := by
     refine Nat.card_congr (Equiv.ofBijective (fun g => ⟨g ≫ i, (hP _ _).1 ⟨g, rfl⟩⟩) ⟨?_, ?_⟩).symm
     · intro a b hab'
       exact (cancel_mono i).1 (congrArg Subtype.val hab')
@@ -70,7 +82,9 @@ theorem fFRead_of : AlgOf → FFRead := by
     rw [e3, Module.rankAtStalk_eq_finrank_of_free] at e1
     rw [e4, Module.rankAtStalk_eq_finrank_of_free] at e2
     exact e1.trans e2.symm
-  have wsq : (kk ≫ i.left) ≫ A.hom = spMap (algebraMap (IsLocalRing.ResidueField V) Bk) ≫ (resPt V ≫ z) := by
+  have wsq
+      : (kk ≫ i.left) ≫ A.hom
+        = spMap (algebraMap (IsLocalRing.ResidueField V) Bk) ≫ (resPt V ≫ z) := by
     rw [Category.assoc, Over.w i]
     exact hkk.w
   have hlf : hpb.lift _ _ wsq ≫ φ = kk ≫ i.left := hpb.lift_fst _ _ wsq
@@ -83,12 +97,22 @@ theorem fFRead_of : AlgOf → FFRead := by
     · haveI := Over.mono_left_of_mono i
       have h1 := congrArg (· ≫ φ) hab'
       simp only [Category.assoc, hlf] at h1
-      simpa only [Category.assoc] using (cancel_mono i.left).1 (by simpa only [Category.assoc] using h1)
+      simpa only [Category.assoc] using
+        (cancel_mono i.left).1 (by simpa only [Category.assoc] using h1)
     · have h1 := congrArg (· ≫ A'.hom) hab'
       simpa only [Category.assoc, hls] using h1
-  refine ⟨Bk, inferInstance, inferInstance, inferInstance, inferInstance, hr.trans hcount,
-    Over.homMk (U := Over.mk (spMap (algebraMap (IsLocalRing.ResidueField V) Bk))) (hpb.lift _ _ wsq) hls,
-    ?_, ?_⟩
+  refine ⟨
+    Bk,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    hr.trans hcount,
+    Over.homMk (U := Over.mk (spMap (algebraMap (IsLocalRing.ResidueField V) Bk)))
+      (hpb.lift _ _ wsq) hls,
+    ?_,
+    ?_
+  ⟩
   · constructor
     intro X a b hab'
     ext
@@ -112,8 +136,7 @@ theorem fFRead_of : AlgOf → FFRead := by
     · rintro ⟨y, hy⟩
       have hyl := congrArg Over.Hom.left hy
       simp only [Over.comp_left, Over.homMk_left] at hyl
-      have hw3 : y.left ≫ K.hom = T.hom ≫ resPt V ≫ z := by
-        simpa using Over.w y
+      have hw3 : y.left ≫ K.hom = T.hom ≫ resPt V ≫ z := by simpa using Over.w y
       refine ⟨Over.homMk (hkk.lift y.left T.hom hw3) (by simpa using hkk.lift_snd _ _ hw3), ?_⟩
       ext
       simp only [Over.comp_left, Over.homMk_left]

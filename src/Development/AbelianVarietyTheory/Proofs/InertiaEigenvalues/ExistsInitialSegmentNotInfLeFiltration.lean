@@ -4,13 +4,14 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.NoTo
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc ValuativeRel GroundTheory.LocalField GlobalTheory.PMon.Ram
+open Formalism.BasicNotions Formalism.BasicNotions.Loc ValuativeRel GroundTheory.LocalField
+  GlobalTheory.PMon.Ram
 
 namespace GlobalTheory.PMon.Ram
 
-theorem exists_initialSegment_not_inf_le :
-    ∀ (G : Type) [Group G] (R : ℕ → Subgroup G) (A B : Subgroup G), Antitone R →
-      (∃ m, R m = ⊥) → ∃ n : ℕ, ∀ t, t < n ↔ ¬ A ⊓ R t ≤ B := by
+theorem exists_initialSegment_not_inf_le
+    : ∀ (G : Type) [Group G] (R : ℕ → Subgroup G) (A B : Subgroup G),
+      Antitone R → (∃ m, R m = ⊥) → ∃ n : ℕ, ∀ t, t < n ↔ ¬ A ⊓ R t ≤ B := by
   intro G _ R A B hR hm
   classical
   obtain ⟨m, hm⟩ := hm

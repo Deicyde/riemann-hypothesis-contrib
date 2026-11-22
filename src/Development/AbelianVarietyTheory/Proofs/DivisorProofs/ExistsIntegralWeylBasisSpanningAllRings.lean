@@ -15,10 +15,13 @@ open Formalism.GradedWeylDivisibility MvPolynomial
 
 namespace GlobalTheory.WeylBasis
 
-theorem map_mem_span {σ ι : Type} (R : Type) [CommRing R] (g : ι → MvPolynomial σ ℤ) {f : MvPolynomial σ ℤ}
-    (hf : f ∈ Submodule.span ℤ (Set.range g)) :
-    MvPolynomial.map (Int.castRingHom R) f ∈
-      Submodule.span R (Set.range fun i => MvPolynomial.map (Int.castRingHom R) (g i)) := by
+theorem map_mem_span
+    {σ ι : Type}
+    (R : Type) [CommRing R]
+    (g : ι → MvPolynomial σ ℤ)
+    {f : MvPolynomial σ ℤ} (hf : f ∈ Submodule.span ℤ (Set.range g))
+    : MvPolynomial.map (Int.castRingHom R) f
+      ∈ Submodule.span R (Set.range fun i => MvPolynomial.map (Int.castRingHom R) (g i)) := by
   induction hf using Submodule.span_induction with
   | mem y hy =>
     obtain ⟨i, rfl⟩ := hy
@@ -27,7 +30,8 @@ theorem map_mem_span {σ ι : Type} (R : Type) [CommRing R] (g : ι → MvPolyno
   | add y z _ _ hy hz => rw [map_add]; exact add_mem hy hz
   | smul a y _ hy => rw [map_zsmul]; exact zsmul_mem hy a
 
-theorem weyl_finite (n : ℕ) (ν : Fin n → ℕ) (hν : Antitone ν) : Module.Finite ℤ (weyl ℤ n n le_rfl ν) := by
+theorem weyl_finite (n : ℕ) (ν : Fin n → ℕ) (hν : Antitone ν)
+    : Module.Finite ℤ (weyl ℤ n n le_rfl ν) := by
   obtain ⟨c, hc, -⟩ := sSBasis ℤ n n ν
   have : Finite (ssIdx n n ν) := (sSIdxFinite n n ν).to_subtype
   have : Module.Finite ℤ (dualWeyl ℤ n n ν) := by
@@ -36,30 +40,49 @@ theorem weyl_finite (n : ℕ) (ν : Fin n → ℕ) (hν : Antitone ν) : Module.
   exact Module.Finite.of_injective (Submodule.inclusion (weylLeDual ℤ n n le_rfl ν hν))
     (Submodule.inclusion_injective _)
 
-theorem exists_weyl_basis : ∀ (n : ℕ) (ν : Fin n → ℕ), Antitone ν → ∃ (P : Type) (_ : Fintype P) (b : P → MvPolynomial (Fin n × Fin n) ℤ), LinearIndependent ℤ b ∧ (∀ (R : Type) [CommRing R], weyl R n n le_rfl ν = Submodule.span R (Set.range fun i => MvPolynomial.map (Int.castRingHom R) (b i))) ∧ ∀ (K : Type) [Field K] [CharZero K], dualWeyl K n n ν = Submodule.span K (Set.range fun i => MvPolynomial.map (Int.castRingHom K) (b i)) := by
+theorem exists_weyl_basis
+    : ∀ (n : ℕ) (ν : Fin n → ℕ),
+      Antitone ν
+        → ∃ (P : Type) (_ : Fintype P) (b : P → MvPolynomial (Fin n × Fin n) ℤ),
+          LinearIndependent ℤ b
+            ∧ (∀ (R : Type) [CommRing R],
+              weyl R n n le_rfl ν
+                = Submodule.span R (Set.range fun i => MvPolynomial.map (Int.castRingHom R) (b i)))
+            ∧ ∀ (K : Type) [Field K] [CharZero K],
+              dualWeyl K n n ν
+                = Submodule.span K
+                  (Set.range fun i => MvPolynomial.map (Int.castRingHom K) (b i)) := by
   intro n ν hν
   have := weyl_finite n ν hν
   have : Module.Free ℤ (weyl ℤ n n le_rfl ν) := inferInstance
   let B := Module.Free.chooseBasis ℤ (weyl ℤ n n le_rfl ν)
-  have hspan : Submodule.span ℤ (Set.range fun i => (B i : MvPolynomial (Fin n × Fin n) ℤ)) = weyl ℤ n n le_rfl ν := by
+  have hspan
+      : Submodule.span ℤ (Set.range fun i => (B i : MvPolynomial (Fin n × Fin n) ℤ))
+        = weyl ℤ n n le_rfl ν := by
     have h := congrArg (Submodule.map (weyl ℤ n n le_rfl ν).subtype) B.span_eq
     rw [Submodule.map_span, ← Set.range_comp, Submodule.map_subtype_top] at h
     exact h
-  have hR : ∀ (R : Type) [CommRing R], weyl R n n le_rfl ν =
-      Submodule.span R (Set.range fun i => MvPolynomial.map (Int.castRingHom R) (B i : MvPolynomial (Fin n × Fin n) ℤ)) := by
+  have hR
+      : ∀ (R : Type) [CommRing R],
+        weyl R n n le_rfl ν
+          = Submodule.span R
+            (Set.range fun i =>
+              MvPolynomial.map (Int.castRingHom R) (B i : MvPolynomial (Fin n × Fin n) ℤ)) := by
     intro R _
     apply le_antisymm
     · unfold weyl
       rw [Submodule.span_le]
       rintro _ ⟨w, rfl⟩
-      have hw' : applyWord ℤ w (hw ℤ le_rfl ν) ∈ weyl ℤ n n le_rfl ν := Submodule.subset_span ⟨w, rfl⟩
+      have hw' : applyWord ℤ w (hw ℤ le_rfl ν) ∈ weyl ℤ n n le_rfl ν :=
+        Submodule.subset_span ⟨w, rfl⟩
       rw [← hspan] at hw'
       have h := map_mem_span R _ hw'
       rw [← lclosedeq_applyWord_map, lclosedeq_hw_map] at h
       exact h
     · rw [Submodule.span_le]
       rintro _ ⟨i, rfl⟩
-      have h := map_mem_span R (fun w : List (Fin n × Fin n × ℕ) => applyWord ℤ w (hw ℤ le_rfl ν)) (B i).2
+      have h :=
+        map_mem_span R (fun w : List (Fin n × Fin n × ℕ) => applyWord ℤ w (hw ℤ le_rfl ν)) (B i).2
       simp only [← lclosedeq_applyWord_map, lclosedeq_hw_map] at h
       exact h
   refine ⟨_, inferInstance, fun i => (B i : MvPolynomial (Fin n × Fin n) ℤ), ?_, hR, ?_⟩

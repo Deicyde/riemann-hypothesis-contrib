@@ -6,19 +6,27 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.PowerSum
 
 noncomputable section
 
-open MeasureTheory NumberField IsDedekindDomain Filter GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace GroundTheory.Automorphic.AutomorphicForm
-open GroundTheory.Automorphic.CuspidalSpectrum GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets GlobalTheory.PRep Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.SmGL PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.L1 UpperTheory.ConvolutionTheory.C
+open MeasureTheory NumberField IsDedekindDomain Filter GroundTheory.Automorphic
+  GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+  GroundTheory.Automorphic.AutomorphicForm
+open GroundTheory.Automorphic.CuspidalSpectrum
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets GlobalTheory.PRep
+  Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.SmGL PositivityTheory.Rg.Tf.Core
+  PositivityTheory.Rg.Tf.Geo GroundTheory.Global GroundTheory.Global.SemiLocal
+  UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.L1 UpperTheory.ConvolutionTheory.C
 open scoped ComplexConjugate Classical InnerProductSpace
 
 namespace UpperTheory.ConvolutionTheory.C
 
 section
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {σ : E ≃ₐ[F] E} {n : ℕ} {q : Pl F} {w₀ : PlacesOver E q}
 
 def nsS (T : Ty σ n q w₀) : Finset (Pl F) := T.S.filter fun v => ¬ GM.Split E v
 
-def offN (μ : Measure (normOneGL (K := E) (n := n))) [μ.IsHaarMeasure] (T : Ty σ n q w₀) : Submodule ℂ (LL μ) :=
+def offN (μ : Measure (normOneGL (K := E) (n := n))) [μ.IsHaarMeasure] (T : Ty σ n q w₀)
+    : Submodule ℂ (LL μ) :=
   ⨅ (w : Pl E) (_ : w.under (𝓞 F) ∉ (nsS T : Set (Pl F))), eigL μ w (T.J w) (T.χ w)
 
 def lvN (T : Ty σ n q w₀) (L : GM.Loc σ n q w₀) (v : Pl F) : Subgroup (Gw n (T.mk' v).1) :=
@@ -26,7 +34,8 @@ def lvN (T : Ty σ n q w₀) (L : GM.Loc σ n q w₀) (v : Pl F) : Subgroup (Gw 
 
 end
 
-def kerChr {G : Type} [Group G] [TopologicalSpace G] (J : Subgroup G) (χ : G → ℂ) (h : IsChr J χ) : Subgroup G where
+def kerChr {G : Type} [Group G] [TopologicalSpace G] (J : Subgroup G) (χ : G → ℂ) (h : IsChr J χ)
+    : Subgroup G where
   carrier := {x | x ∈ J ∧ χ x = 1}
   one_mem' := by
     have h1 := h.2.2 1 J.one_mem 1 J.one_mem

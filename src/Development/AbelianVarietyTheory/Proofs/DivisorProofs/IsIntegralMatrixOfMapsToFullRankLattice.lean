@@ -10,18 +10,20 @@ open Polynomial Matrix GlobalTheory.LatOrb
 
 namespace GlobalTheory.LatOrb
 
-theorem isIntegral_of_mapsTo_lattice : ∀ {O K : Type} [CommRing O] [Field K] [Algebra O K] (n : ℕ) (M : Submodule O (Fin n → K)),
-    IsLatV O M → ∀ c : Matrix (Fin n) (Fin n) K, (∀ v ∈ M, c *ᵥ v ∈ M) → IsIntegral O c := by
+theorem isIntegral_of_mapsTo_lattice
+    : ∀ {O K : Type} [CommRing O] [Field K] [Algebra O K] (n : ℕ) (M : Submodule O (Fin n → K)),
+      IsLatV O M → ∀ c : Matrix (Fin n) (Fin n) K, (∀ v ∈ M, c *ᵥ v ∈ M) → IsIntegral O c := by
   intro O K _ _ _ n M hM c hc
   classical
   haveI : Module.Finite O M := Module.Finite.iff_fg.mpr hM.1
-  let f : Module.End O M :=
-    { toFun := fun v => ⟨c *ᵥ (v : Fin n → K), hc v v.2⟩
-      map_add' := fun x y => by ext1; simp [Matrix.mulVec_add]
-      map_smul' := fun a x => by
-        ext1
-        simp only [Submodule.coe_smul, RingHom.id_apply, SetLike.val_smul]
-        rw [Matrix.mulVec_smul] }
+  let f : Module.End O M := {
+    toFun := fun v => ⟨c *ᵥ (v : Fin n → K), hc v v.2⟩
+    map_add' := fun x y => by ext1; simp [Matrix.mulVec_add]
+    map_smul' := fun a x => by
+      ext1
+      simp only [Submodule.coe_smul, RingHom.id_apply, SetLike.val_smul]
+      rw [Matrix.mulVec_smul]
+  }
   have hpow : ∀ k : ℕ, ∀ v : M, (c ^ k) *ᵥ (v : Fin n → K) = (((f ^ k) v : M) : Fin n → K) := by
     intro k
     induction k with
@@ -31,7 +33,8 @@ theorem isIntegral_of_mapsTo_lattice : ∀ {O K : Type} [CommRing O] [Field K] [
       rw [pow_succ, ← Matrix.mulVec_mulVec, pow_succ, Module.End.mul_apply]
       have h1 : ((f v : M) : Fin n → K) = c *ᵥ (v : Fin n → K) := rfl
       rw [← h1, ih]
-  have key : ∀ q : O[X], ∀ v : M, aeval c q *ᵥ (v : Fin n → K) = (((aeval f q) v : M) : Fin n → K) := by
+  have key
+      : ∀ q : O[X], ∀ v : M, aeval c q *ᵥ (v : Fin n → K) = (((aeval f q) v : M) : Fin n → K) := by
     intro q
     induction q using Polynomial.induction_on' with
     | add p q hp hq => intro v; simp [Matrix.add_mulVec, hp, hq]

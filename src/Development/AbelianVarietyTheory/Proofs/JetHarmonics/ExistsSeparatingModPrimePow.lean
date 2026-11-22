@@ -15,7 +15,13 @@ private lemma ringHom_pow_sub_mem_span {A O : Type} [CommRing A] [CommRing O] (g
   exact Ideal.mem_span_singleton'.mpr
     ⟨σ c, by rw [← map_natCast σ g, ← map_mul, hc, map_sub, map_pow]⟩
 
-theorem _root_.GlobalTheory.exists_separating_mod_prime_pow : ∀ (A O : Type) [CommRing A] [Module.Finite ℤ A] [CommRing O] [IsLocalRing O] (g : ℕ), g.Prime → ¬ IsUnit (g : O) → (∀ x : A, x ^ g - x ∈ Ideal.span {(g : A)}) → ∀ (T : Type) [Fintype T] [DecidableEq T] (σ : T → A →+* O), Function.Injective σ → ∀ (K : ℕ) (t₀ : T), ∃ e : A, ∀ t, σ t e - (if t = t₀ then 1 else 0) ∈ Ideal.span {(g : O) ^ K} := by
+theorem _root_.GlobalTheory.exists_separating_mod_prime_pow
+    : ∀ (A O : Type) [CommRing A] [Module.Finite ℤ A] [CommRing O] [IsLocalRing O] (g : ℕ),
+      g.Prime → ¬ IsUnit (g : O) → (∀ x : A, x ^ g - x ∈ Ideal.span {(g : A)})
+        → ∀ (T : Type) [Fintype T] [DecidableEq T] (σ : T → A →+* O),
+          Function.Injective σ
+            → ∀ (K : ℕ) (t₀ : T), ∃ e : A, ∀ t,
+              σ t e - (if t = t₀ then 1 else 0) ∈ Ideal.span {(g : O) ^ K} := by
   intro A O _ _ _ _ g hg hgO hA T _ _ σ hσ K t₀
   have h2 : 2 ≤ g := hg.two_le
   have hgm : (g : O) ∈ IsLocalRing.maximalIdeal O :=
@@ -24,9 +30,11 @@ theorem _root_.GlobalTheory.exists_separating_mod_prime_pow : ∀ (A O : Type) [
     (Ideal.span_singleton_le_iff_mem _).mpr hgm
   have hb : ∀ t, t ≠ t₀ → ∃ b : A, σ t b ∈ Ideal.span {(g : O)} ∧ IsUnit (σ t₀ b) := by
     intro t ht
-    obtain ⟨a, ha⟩ := _root_.GlobalTheory.exists_isUnit_sub_of_ringHom_ne A O g hg hgO hA (σ t₀) (σ t)
-      (fun h => ht (hσ h).symm)
-    obtain ⟨⟨i, hi⟩, -⟩ := _root_.GlobalTheory.hom_value_congruent_int_mod_prime A O g hg hgO hA (σ t) a
+    obtain ⟨a, ha⟩ :=
+      _root_.GlobalTheory.exists_isUnit_sub_of_ringHom_ne A O g hg hgO hA (σ t₀) (σ t)
+        (fun h => ht (hσ h).symm)
+    obtain ⟨⟨i, hi⟩, -⟩ :=
+      _root_.GlobalTheory.hom_value_congruent_int_mod_prime A O g hg hgO hA (σ t) a
     refine ⟨a - (i : A), by rwa [map_sub, map_intCast], ?_⟩
     rw [map_sub, map_intCast]
     by_contra hn
@@ -40,12 +48,15 @@ theorem _root_.GlobalTheory.exists_separating_mod_prime_pow : ∀ (A O : Type) [
   obtain ⟨c, hc0, hct⟩ : ∃ c : A, IsUnit (σ t₀ c) ∧ ∀ t, t ≠ t₀ → σ t c ∈ Ideal.span {(g : O)} := by
     refine ⟨∏ t ∈ Finset.univ.erase t₀, b t, ?_, fun t ht => ?_⟩
     · rw [map_prod]
-      exact Finset.prod_induction _ IsUnit (fun _ _ => IsUnit.mul) isUnit_one
+      exact Finset.prod_induction _ IsUnit
+        (fun _ _ => IsUnit.mul)
+        isUnit_one
         (fun t ht => hb2 t (Finset.ne_of_mem_erase ht))
     · rw [map_prod, ← Finset.mul_prod_erase _ _ (Finset.mem_erase.mpr ⟨ht, Finset.mem_univ t⟩)]
       exact Ideal.mul_mem_right _ _ (hb1 t ht)
-  obtain ⟨f, hf0, hft⟩ : ∃ f : A, σ t₀ f - 1 ∈ Ideal.span {(g : O)} ∧
-      ∀ t, t ≠ t₀ → σ t f ∈ Ideal.span {(g : O)} := by
+  obtain ⟨f, hf0, hft⟩
+      : ∃ f : A,
+        σ t₀ f - 1 ∈ Ideal.span {(g : O)} ∧ ∀ t, t ≠ t₀ → σ t f ∈ Ideal.span {(g : O)} := by
     refine ⟨c ^ (g - 1), ?_, fun t ht => ?_⟩
     · rw [map_pow]
       have hz : σ t₀ c * (σ t₀ c ^ (g - 1) - 1) = σ t₀ c ^ g - σ t₀ c := by
@@ -74,8 +85,8 @@ theorem _root_.GlobalTheory.exists_separating_mod_prime_pow : ∀ (A O : Type) [
   · simp only [map_sub, map_one, map_pow]
     have hw : σ t f ^ K ∈ Ideal.span {(g : O)} ^ K := Ideal.pow_mem_pow (hft t ht) K
     have hgs := geom_sum_mul (1 - σ t f ^ K) K
-    have : 1 - (1 - σ t f ^ K) ^ K - 0 =
-        (∑ i ∈ Finset.range K, (1 - σ t f ^ K) ^ i) * σ t f ^ K := by
+    have : 1 - (1 - σ t f ^ K) ^ K - 0
+        = (∑ i ∈ Finset.range K, (1 - σ t f ^ K) ^ i) * σ t f ^ K := by
       linear_combination hgs
     rw [this]
     exact Ideal.mul_mem_left _ _ hw

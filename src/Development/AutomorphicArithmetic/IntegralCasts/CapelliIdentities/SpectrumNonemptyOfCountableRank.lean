@@ -71,12 +71,13 @@ private lemma spectrum_nonempty_of_countable_rank {V : Type} [AddCommGroup V] [_
   obtain ⟨k, hk, -⟩ := spectrum.exists_mem_of_not_isUnit_aeval_prod (not_and.mp hnu lead_unit)
   exact hne ⟨k, hk⟩
 
-theorem UpperTheory.Reformulated.B.DYhd6.main :
-    ∀ {V : Type} [inst : AddCommGroup V] [inst_1 : _root_.Module ℂ V] [Nontrivial V],
-      Module.rank ℂ V ≤ Cardinal.aleph0 →
-        ∀ (B : Subalgebra ℂ (Module.End ℂ V)),
-          (∀ (N : Submodule ℂ V), (∀ b ∈ B, ∀ x ∈ N, (b : V → V) x ∈ N) → N = ⊥ ∨ N = ⊤) →
-            ∀ (f : Module.End ℂ V) (s : Finset V), ∃ b ∈ B, ∀ m ∈ s, (f : V → V) m = (b : V → V) m := by
+theorem UpperTheory.Reformulated.B.DYhd6.main
+    : ∀ {V : Type} [inst : AddCommGroup V] [inst_1 : _root_.Module ℂ V] [Nontrivial V],
+      Module.rank ℂ V ≤ Cardinal.aleph0
+        → ∀ (B : Subalgebra ℂ (Module.End ℂ V)),
+          (∀ (N : Submodule ℂ V), (∀ b ∈ B, ∀ x ∈ N, (b : V → V) x ∈ N) → N = ⊥ ∨ N = ⊤)
+            → ∀ (f : Module.End ℂ V) (s : Finset V), ∃ b ∈ B, ∀ m ∈ s,
+              (f : V → V) m = (b : V → V) m := by
   intro V _ _ _ hV B hB f s
   have hsc : ∀ (c : ℂ) (x : V), c • x = (algebraMap ℂ B c) • x := fun c x => by
     change c • x = ((algebraMap ℂ (Module.End ℂ V) c : Module.End ℂ V)) x
@@ -107,21 +108,23 @@ theorem UpperTheory.Reformulated.B.DYhd6.main :
           exact this }
   have hscal : ∀ d : Module.End B V, ∃ a : ℂ, ∀ x, d x = a • x := by
     intro d
-    let T : Module.End ℂ V :=
-      { toFun := d
-        map_add' := d.map_add
-        map_smul' := fun c x => by
-          simp only [RingHom.id_apply]
-          rw [hsc, d.map_smul, ← hsc] }
+    let T : Module.End ℂ V := {
+      toFun := d
+      map_add' := d.map_add
+      map_smul' := fun c x => by
+        simp only [RingHom.id_apply]
+        rw [hsc, d.map_smul, ← hsc]
+    }
     obtain ⟨a, ha⟩ := spectrum_nonempty_of_countable_rank hV T
-    let e : V →ₗ[B] V :=
-      { toFun := fun x => a • x - d x
-        map_add' := fun x y => by
-          rw [smul_add, map_add d x y]
-          abel
-        map_smul' := fun b x => by
-          simp only [RingHom.id_apply]
-          rw [d.map_smul, smul_sub, hbc] }
+    let e : V →ₗ[B] V := {
+      toFun := fun x => a • x - d x
+      map_add' := fun x y => by
+        rw [smul_add, map_add d x y]
+        abel
+      map_smul' := fun b x => by
+        simp only [RingHom.id_apply]
+        rw [d.map_smul, smul_sub, hbc]
+    }
     rcases LinearMap.bijective_or_eq_zero e with hb | h0
     · exfalso
       apply ha
@@ -134,12 +137,13 @@ theorem UpperTheory.Reformulated.B.DYhd6.main :
     · refine ⟨a, fun x => ?_⟩
       have : a • x - d x = 0 := congrArg (fun g : V →ₗ[B] V => g x) h0
       exact (sub_eq_zero.mp this).symm
-  let F : Module.End (Module.End B V) V :=
-    { toFun := f
-      map_add' := f.map_add
-      map_smul' := fun d x => by
-        obtain ⟨a, ha⟩ := hscal d
-        simp only [RingHom.id_apply, Module.End.smul_def]
-        rw [ha, ha, f.map_smul] }
+  let F : Module.End (Module.End B V) V := {
+    toFun := f
+    map_add' := f.map_add
+    map_smul' := fun d x => by
+      obtain ⟨a, ha⟩ := hscal d
+      simp only [RingHom.id_apply, Module.End.smul_def]
+      rw [ha, ha, f.map_smul]
+  }
   obtain ⟨r, hr⟩ := jacobson_density F s
   exact ⟨r, r.2, fun m hm => hr m hm⟩

@@ -11,7 +11,9 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.GeometryOfNumbersTheory MeasureTheory
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.GeometryOfNumbersTheory
+  MeasureTheory
 
 noncomputable section
 
@@ -28,7 +30,8 @@ instance instCharZero (D : ℕ) : CharZero (Fld D) :=
   inferInstanceAs (CharZero (FractionRing (MvPolynomial (Fin (D + 1)) ℚ)))
 
 instance instAlgebra (D : ℕ) : Algebra (MvPolynomial (Fin (D + 1)) ℚ) (Fld D) :=
-  inferInstanceAs (Algebra (MvPolynomial (Fin (D + 1)) ℚ) (FractionRing (MvPolynomial (Fin (D + 1)) ℚ)))
+  inferInstanceAs
+    (Algebra (MvPolynomial (Fin (D + 1)) ℚ) (FractionRing (MvPolynomial (Fin (D + 1)) ℚ)))
 
 instance instIsFractionRing (D : ℕ) : IsFractionRing (MvPolynomial (Fin (D + 1)) ℚ) (Fld D) :=
   Localization.isLocalization
@@ -52,8 +55,7 @@ theorem scale_ne_zero {D : ℕ} {z : Ix (Idx D) → ℂ} (hz : z ≠ 0) : scale 
   apply hz
   funext q
   have h1 := congrFun h q
-  have h2 : (Real.sqrt (wt q) : ℂ) ≠ 0 := by
-    exact_mod_cast (Real.sqrt_pos.mpr (wt_pos q)).ne'
+  have h2 : (Real.sqrt (wt q) : ℂ) ≠ 0 := by exact_mod_cast (Real.sqrt_pos.mpr (wt_pos q)).ne'
   simpa [scale, h2] using h1
 
 def metric (D : ℕ) : ConeMetric ℂ (Ix (Idx D)) where
@@ -66,17 +68,18 @@ def metric (D : ℕ) : ConeMetric ℂ (Ix (Idx D)) where
       ring
     rw [this, (fsMetric (ι := Ix (Idx D))).smul]
 
-def gram (D n : ℕ) {r : ℕ} (b : Fin r → MvPolynomial (Ix (Idx D)) ℚ) : Matrix (Fin r) (Fin r) ℝ :=
-  fun k l => (1 / 2) *
-    ((∫ p : CP D, pairVal (metric D) n (b k) (b l) (map D p.rep) ∂CP.fsMeasure D).re +
-      (∫ p : CP D, pairVal (metric D) n (b k) (b l) (conjPt (map D p.rep)) ∂CP.fsMeasure D).re)
-
+def gram (D n : ℕ) {r : ℕ} (b : Fin r → MvPolynomial (Ix (Idx D)) ℚ)
+    : Matrix (Fin r) (Fin r) ℝ := fun k l =>
+  (1 / 2)
+    * ((∫ p : CP D, pairVal (metric D) n (b k) (b l) (map D p.rep) ∂CP.fsMeasure D).re
+      + (∫ p : CP D, pairVal (metric D) n (b k) (b l) (conjPt (map D p.rep)) ∂CP.fsMeasure D).re)
 
 open Classical in
 def chi (D n : ℕ) : ℝ :=
   if h : ∃ p : (Σ r : ℕ, Fin r → MvPolynomial (Ix (Idx D)) ℚ), IsSecBasis (x D) n p.2 then
     -(1 / 2) * Real.log (gram D n h.choose.2).det
-  else 0
+  else
+    0
 
 end Veronese
 
@@ -86,23 +89,28 @@ def VeroneseArith.Statement : Prop :=
   ∀ D : ℕ, 1 ≤ D → IsArithVar (ι := GlobalTheory (Idx D)) (coordIdeal ℤ (Veronese.x D)) (D + 1)
 
 def VeroneseSemipos.Statement : Prop :=
-  ∀ D : ℕ, IsSemipositiveRel (ι := GlobalTheory (Idx D)) ⊥ (coordIdeal ℤ (Veronese.x D))
-    (HermLine.ofCone (Veronese.metric D))
+  ∀ D : ℕ,
+    IsSemipositiveRel (ι := GlobalTheory (Idx D)) ⊥ (coordIdeal ℤ (Veronese.x D))
+      (HermLine.ofCone (Veronese.metric D))
 
 def VeroneseResolution.Statement : Prop :=
-  ∀ D : ℕ, 1 ≤ D → ∃ (J : Ideal (MRing (GlobalTheory (Idx D))))
-    (R : AnRes (ι := GlobalTheory (Idx D)) (coordIdeal ℤ (Veronese.x D)) J D)
-    (_ : MeasurableSpace R.X) (_ : BorelSpace R.X) (dV : Measure R.X),
-    IsSmoothVolume R.A dV ∧
-    ∀ g : (Ix (Idx D) → ℂ) → ℂ, (∀ (c : ℂ) (z : Ix (Idx D) → ℂ), c ≠ 0 → g (c • z) = g z) →
-      ∫ y, g (R.lift y y) ∂dV = ∫ p : CP D, g (Veronese.map D p.rep) ∂CP.fsMeasure D
+  ∀ D : ℕ,
+    1 ≤ D
+      → ∃ (J : Ideal (MRing (GlobalTheory (Idx D))))
+          (R : AnRes (ι := GlobalTheory (Idx D)) (coordIdeal ℤ (Veronese.x D)) J D)
+          (_ : MeasurableSpace R.X) (_ : BorelSpace R.X) (dV : Measure R.X),
+        IsSmoothVolume R.A dV
+          ∧ ∀ g : (Ix (Idx D) → ℂ) → ℂ,
+            (∀ (c : ℂ) (z : Ix (Idx D) → ℂ), c ≠ 0 → g (c • z) = g z)
+              → ∫ y, g (R.lift y y) ∂dV = ∫ p : CP D, g (Veronese.map D p.rep) ∂CP.fsMeasure D
 
-def VeroneseChi.Statement : Prop :=
-  ∀ D : ℕ, 1 ≤ D → ∀ n : ℕ, Veronese.chi D n = chiP D (2 * n)
+def VeroneseChi.Statement : Prop := ∀ D : ℕ, 1 ≤ D → ∀ n : ℕ, Veronese.chi D n = chiP D (2 * n)
 
 def VeroneseTop.Statement : Prop :=
-  ∀ D : ℕ, 1 ≤ D → ∀ I : AllFam, I.IsFamily →
-    top I (Veronese.x D) (Veronese.metric D) D = 2 ^ (D + 1) * hhOf I D
+  ∀ D : ℕ,
+    1 ≤ D
+      → ∀ I : AllFam,
+        I.IsFamily → top I (Veronese.x D) (Veronese.metric D) D = 2 ^ (D + 1) * hhOf I D
 
 def VeroneseGenDeg.Statement : Prop :=
   ∀ D : ℕ, 1 ≤ D → genDeg (ι := GlobalTheory (Idx D)) (coordIdeal ℤ (Veronese.x D)) D 1 = 2 ^ D

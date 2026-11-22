@@ -65,8 +65,8 @@ theorem stOrthOf : StOrthOf := by
     simp [cfL_apply, RCLike.inner_apply, mul_comm]
   have hpiadj : ∀ (h : G) (x y : H), ⟪π h⁻¹ x, y⟫_ℂ = ⟪x, π h y⟫_ℂ := by
     intro h x y
-    rw [← inner_pi π hiso h (π h⁻¹ x) y, ← ContinuousLinearMap.mul_apply, ← map_mul, mul_inv_cancel, map_one,
-      ContinuousLinearMap.one_apply]
+    rw [← inner_pi π hiso h (π h⁻¹ x) y, ← ContinuousLinearMap.mul_apply, ← map_mul, mul_inv_cancel,
+      map_one, ContinuousLinearMap.one_apply]
   have hshift : ∀ (h : G) v w v' w', B (π h v) w v' w' = B v w (π h⁻¹ v') w' := by
     intro h v w v' w'
     show ∫ g, cf π (π h v) w g * star (cf π v' w' g) ∂μ = ∫ g, cf π v w g * star (cf π (π h⁻¹ v') w' g) ∂μ
@@ -87,7 +87,9 @@ theorem stOrthOf : StOrthOf := by
     intro v w v' w'
     rw [hBT]
     have e := congrArg (fun A : H →L[ℂ] H => A v) (hc w w')
-    simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.smul_apply, ContinuousLinearMap.id_apply] at e
+    simp only [ContinuousLinearMap.comp_apply, ContinuousLinearMap.smul_apply,
+        ContinuousLinearMap.id_apply]
+      at e
     rw [e, inner_smul_right]
   have hcfinv : ∀ v w g, cf π v w g = star (cf π w v g⁻¹) := by
     intro v w g

@@ -23,13 +23,14 @@ section Exact
 
 variable (U : Subgroup G)
 
-noncomputable abbrev coindShortComplexOf (X : ShortComplex (Rep.{u} k U)) : ShortComplex (Rep.{u} k G) :=
+noncomputable abbrev coindShortComplexOf (X : ShortComplex (Rep.{u} k U))
+    : ShortComplex (Rep.{u} k G) :=
   ShortComplex.mk (Rep.coindMap U.subtype X.f) (Rep.coindMap U.subtype X.g) (by
     ext F x
     exact congrArg (fun φ => φ.hom (F.1 x)) X.zero)
 
-theorem shortExact_coindShortComplexOf {X : ShortComplex (Rep.{u} k U)} (hX : X.ShortExact) :
-    (coindShortComplexOf U X).ShortExact := by
+theorem shortExact_coindShortComplexOf {X : ShortComplex (Rep.{u} k U)} (hX : X.ShortExact)
+    : (coindShortComplexOf U X).ShortExact := by
   have hf : Function.Injective X.f.hom := (Rep.mono_iff_injective _).1 hX.mono_f
   have hexact := hX.exact.map (forget₂ (Rep.{u} k U) (ModuleCat.{u} k))
   rw [ShortComplex.moduleCat_exact_iff] at hexact
@@ -50,8 +51,8 @@ theorem shortExact_coindShortComplexOf {X : ShortComplex (Rep.{u} k U)} (hX : X.
   · have := hX.epi_g
     exact (Rep.coindFunctor k U.subtype).map_epi X.g
 
-noncomputable def coindEvalOneShortComplex (X : ShortComplex (Rep.{u} k U)) :
-    (coindShortComplexOf U X).map (Rep.resFunctor U.subtype) ⟶ X where
+noncomputable def coindEvalOneShortComplex (X : ShortComplex (Rep.{u} k U))
+    : (coindShortComplexOf U X).map (Rep.resFunctor U.subtype) ⟶ X where
   τ₁ := coindEvalOne U X.X₁
   τ₂ := coindEvalOne U X.X₂
   τ₃ := coindEvalOne U X.X₃
@@ -68,50 +69,66 @@ variable [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G] (U : OpenS
 
 section Naturality
 
-theorem shapiroMap_naturality {B B' : Rep.{u} k (U : Subgroup G)} [IsDiscreteRep B]
-    [IsDiscreteRep B'] (g : B ⟶ B') (n : ℕ) :
-    cohomologyMap (Rep.coindMap (U : Subgroup G).subtype g) n ≫ shapiroMap U B' n =
-      shapiroMap U B n ≫ cohomologyMap g n := by
+theorem shapiroMap_naturality
+    {B B' : Rep.{u} k (U : Subgroup G)} [IsDiscreteRep B] [IsDiscreteRep B'] (g : B ⟶ B') (n : ℕ)
+    : cohomologyMap (Rep.coindMap (U : Subgroup G).subtype g) n ≫ shapiroMap U B' n
+      = shapiroMap U B n ≫ cohomologyMap g n := by
   rw [← cohomologyMapAlong_id_eq_cohomologyMap, ← cohomologyMapAlong_id_eq_cohomologyMap,
     shapiroMap, shapiroMap, ← cohomologyMapAlong_comp, ← cohomologyMapAlong_comp]
   rfl
 
 end Naturality
 
-instance isDiscreteRep_coind_res (A : Rep.{u} k G) [IsDiscreteRep A] :
-    IsDiscreteRep (Rep.coind (U : Subgroup G).subtype (Rep.res (U : Subgroup G).subtype A)) :=
+instance isDiscreteRep_coind_res (A : Rep.{u} k G) [IsDiscreteRep A]
+    : IsDiscreteRep (Rep.coind (U : Subgroup G).subtype (Rep.res (U : Subgroup G).subtype A)) :=
   isDiscreteRep_coind U _
 
 section Acyclic
 
 variable (X : Type u) [AddCommGroup X] [Module k X]
 
-instance isDiscreteRep_coind_discreteCoind :
-    IsDiscreteRep (Rep.coind (U : Subgroup G).subtype (discreteCoind k (U : Subgroup G) X)) :=
+instance isDiscreteRep_coind_discreteCoind
+    : IsDiscreteRep (Rep.coind (U : Subgroup G).subtype (discreteCoind k (U : Subgroup G) X)) :=
   isDiscreteRep_coind U _
 
-noncomputable def coindDiscreteCoindIso :
-    Rep.coind (U : Subgroup G).subtype (discreteCoind k (U : Subgroup G) X) ≅
-      discreteCoind k G X where
-  hom := Rep.ofHom ⟨
-    { toFun := fun F => ⟨fun x => (F.1 x) 1,
-        (isLocallyConstant_coind U (discreteCoind k (U : Subgroup G) X) F).comp
-          fun ψ : LocallyConstant (U : Subgroup G) X => ψ 1⟩
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }, fun g => by
+noncomputable def coindDiscreteCoindIso
+    : Rep.coind (U : Subgroup G).subtype (discreteCoind k (U : Subgroup G) X)
+      ≅ discreteCoind k G X where
+  hom :=
+    Rep.ofHom ⟨
+      {
+        toFun := fun F => ⟨
+          fun x => (F.1 x) 1,
+          (isLocallyConstant_coind U (discreteCoind k (U : Subgroup G) X) F).comp
+            fun ψ : LocallyConstant (U : Subgroup G) X => ψ 1
+        ⟩
+        map_add' := fun _ _ => rfl
+        map_smul' := fun _ _ => rfl
+      },
+      fun g => by
         ext F x
-        rfl⟩
-  inv := Rep.ofHom ⟨
-    { toFun := fun φ => ⟨fun x => ⟨fun v => φ ((v : G) * x),
-          φ.isLocallyConstant.comp_continuous (continuous_subtype_val.mul continuous_const)⟩,
-        fun u x => by
-          ext v
-          simp [mul_assoc]⟩
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }, fun g => by
+        rfl
+    ⟩
+  inv :=
+    Rep.ofHom ⟨
+      {
+        toFun := fun φ => ⟨
+          fun x => ⟨
+            fun v => φ ((v : G) * x),
+            φ.isLocallyConstant.comp_continuous (continuous_subtype_val.mul continuous_const)
+          ⟩,
+          fun u x => by
+            ext v
+            simp [mul_assoc]
+        ⟩
+        map_add' := fun _ _ => rfl
+        map_smul' := fun _ _ => rfl
+      },
+      fun g => by
         ext φ x v
         change φ ((v : G) * x * g) = φ ((v : G) * (x * g))
-        rw [mul_assoc]⟩
+        rw [mul_assoc]
+    ⟩
   hom_inv_id := by
     ext F x v
     change (F.1 ((v : G) * x)) 1 = F.1 x v
@@ -122,9 +139,9 @@ noncomputable def coindDiscreteCoindIso :
     change φ (((1 : (U : Subgroup G)) : G) * x) = φ x
     simp
 
-theorem isZero_cohomology_coind_discreteCoind (n : ℕ) :
-    IsZero (cohomology (Rep.coind.{u} (U : Subgroup G).subtype
-      (discreteCoind k (U : Subgroup G) X)) (n + 1)) :=
+theorem isZero_cohomology_coind_discreteCoind (n : ℕ)
+    : IsZero (cohomology
+      (Rep.coind.{u} (U : Subgroup G).subtype (discreteCoind k (U : Subgroup G) X)) (n + 1)) :=
   (isZero_cohomology_discreteCoind (k := k) (G := G) (X := X) n).of_iso
     (cohomologyIsoOfIso (coindDiscreteCoindIso U X) (n + 1))
 
@@ -135,18 +152,21 @@ section DegreeZero
 variable (B : Rep.{u} k (U : Subgroup G)) [IsDiscreteRep B]
 
 omit [IsTopologicalGroup G] [CompactSpace G] [IsDiscreteRep B] in
-theorem coind_invariant_apply (f : (Rep.coind (U : Subgroup G).subtype B).ρ.invariants) (x : G) :
-    f.1.1 x = f.1.1 1 := by
+theorem coind_invariant_apply (f : (Rep.coind (U : Subgroup G).subtype B).ρ.invariants) (x : G)
+    : f.1.1 x = f.1.1 1 := by
   have h : f.1.1 (1 * x) = f.1.1 1 :=
     congrArg (fun φ : Rep.coind (U : Subgroup G).subtype B => φ.1 1) (f.2 x)
   rwa [one_mul] at h
 
-noncomputable def coindInvariantsEval :
-    (Rep.coind (U : Subgroup G).subtype B).ρ.invariants →ₗ[k] B.ρ.invariants where
-  toFun f := ⟨f.1.1 1, fun u => by
-    have h := f.1.2 u 1
-    simp only [Subgroup.subtype_apply, mul_one] at h
-    rw [← h, coind_invariant_apply]⟩
+noncomputable def coindInvariantsEval
+    : (Rep.coind (U : Subgroup G).subtype B).ρ.invariants →ₗ[k] B.ρ.invariants where
+  toFun f := ⟨
+    f.1.1 1,
+    fun u => by
+      have h := f.1.2 u 1
+      simp only [Subgroup.subtype_apply, mul_one] at h
+      rw [← h, coind_invariant_apply]
+  ⟩
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
@@ -160,18 +180,21 @@ theorem coindInvariantsEval_bijective : Function.Bijective (coindInvariantsEval 
     exact congrArg Subtype.val h
   · refine ⟨⟨⟨fun _ => b.1, fun u _ => (b.2 u).symm⟩, fun g => rfl⟩, rfl⟩
 
-private theorem cocyclesIso₀_hom_comp_f {Γ : Type u} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
-    (A : Rep.{u} k Γ) [IsDiscreteRep A] :
-    (cocyclesIso₀ A).hom ≫ ModuleCat.ofHom (invariantsToCochains₀ A) =
-      (cochainsComplex A).iCycles 0 := by
+private theorem cocyclesIso₀_hom_comp_f
+    {Γ : Type u} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+    (A : Rep.{u} k Γ) [IsDiscreteRep A]
+    : (cocyclesIso₀ A).hom ≫ ModuleCat.ofHom (invariantsToCochains₀ A)
+      = (cochainsComplex A).iCycles 0 := by
   dsimp only [cocyclesIso₀, KernelFork.mapIsoOfIsLimit]
   exact (KernelFork.mapOfIsLimit_ι _ _ _).trans (Category.comp_id _)
 
 theorem isIso_shapiroMap_zero : IsIso (shapiroMap U B 0) := by
   set ψ := cochainsMapAlong (A := Rep.coind (U : Subgroup G).subtype B) (B := B)
     (U : Subgroup G).subtype (continuous_subgroup_subtype _) (coindEvalOne (U : Subgroup G) B)
-  have hψ : HomologicalComplex.cyclesMap ψ 0 = (cocyclesIso₀ _).hom ≫
-      ModuleCat.ofHom (coindInvariantsEval U B) ≫ (cocyclesIso₀ B).inv := by
+  have hψ
+      : HomologicalComplex.cyclesMap ψ 0
+        = (cocyclesIso₀ _).hom ≫ ModuleCat.ofHom (coindInvariantsEval U B)
+          ≫ (cocyclesIso₀ B).inv := by
     have hK := cocyclesIso₀_hom_comp_f (Rep.coind (U : Subgroup G).subtype B)
     have hL := cocyclesIso₀_hom_comp_f B
     have hinj : Function.Injective ((cochainsComplex B).iCycles 0).hom :=
@@ -181,12 +204,13 @@ theorem isIso_shapiroMap_zero : IsIso (shapiroMap U B 0) := by
     simp only [ModuleCat.hom_comp, LinearMap.comp_apply] at e1
     rw [e1, ← hL, ← hK]
     set w := (cocyclesIso₀ (Rep.coind (U : Subgroup G).subtype B)).hom.hom z
-    have e2 : (cocyclesIso₀ B).hom.hom ((cocyclesIso₀ B).inv.hom (coindInvariantsEval U B w)) =
-        coindInvariantsEval U B w := by
+    have e2
+        : (cocyclesIso₀ B).hom.hom ((cocyclesIso₀ B).inv.hom (coindInvariantsEval U B w))
+          = coindInvariantsEval U B w := by
       simp
-    change (ψ.f 0).hom (invariantsToCochains₀ _ w) =
-      invariantsToCochains₀ B ((cocyclesIso₀ B).hom.hom
-        ((cocyclesIso₀ B).inv.hom (coindInvariantsEval U B w)))
+    change (ψ.f 0).hom (invariantsToCochains₀ _ w)
+      = invariantsToCochains₀ B
+        ((cocyclesIso₀ B).hom.hom ((cocyclesIso₀ B).inv.hom (coindInvariantsEval U B w)))
     rw [e2]
     apply Subtype.ext
     funext x
@@ -197,8 +221,10 @@ theorem isIso_shapiroMap_zero : IsIso (shapiroMap U B 0) := by
     rw [hψ]
     infer_instance
   have h := CochainComplex.isoHomologyπ₀_inv_naturality ψ
-  have h' : HomologicalComplex.homologyMap ψ 0 = (cochainsComplex _).isoHomologyπ₀.inv ≫
-      HomologicalComplex.cyclesMap ψ 0 ≫ (cochainsComplex B).isoHomologyπ₀.hom := by
+  have h'
+      : HomologicalComplex.homologyMap ψ 0
+        = (cochainsComplex _).isoHomologyπ₀.inv ≫ HomologicalComplex.cyclesMap ψ 0
+          ≫ (cochainsComplex B).isoHomologyπ₀.hom := by
     rw [← Category.assoc, ← h, Category.assoc, Iso.inv_hom_id, Category.comp_id]
   change IsIso (HomologicalComplex.homologyMap ψ 0)
   rw [h']
@@ -208,8 +234,8 @@ end DegreeZero
 
 section Shapiro
 
-theorem isIso_shapiroMap (n : ℕ) :
-    ∀ (B : Rep.{u} k (U : Subgroup G)) [IsDiscreteRep B], IsIso (shapiroMap U B n) := by
+theorem isIso_shapiroMap (n : ℕ)
+    : ∀ (B : Rep.{u} k (U : Subgroup G)) [IsDiscreteRep B], IsIso (shapiroMap U B n) := by
   induction n with
   | zero => intro B _; exact isIso_shapiroMap_zero U B
   | succ n ih =>
@@ -221,17 +247,22 @@ theorem isIso_shapiroMap (n : ℕ) :
     have i1 : IsDiscreteRep X.X₁ := isDiscreteRep_coindShortComplex_X₁ B
     have i2 : IsDiscreteRep X.X₂ := isDiscreteRep_coindShortComplex_X₂ B
     have i3 : IsDiscreteRep X.X₃ := isDiscreteRep_coindShortComplex_X₃ B
-    have j1 : IsDiscreteRep (coindShortComplexOf (U : Subgroup G) X).X₁ := isDiscreteRep_coind U X.X₁
-    have j2 : IsDiscreteRep (coindShortComplexOf (U : Subgroup G) X).X₂ := isDiscreteRep_coind U X.X₂
-    have j3 : IsDiscreteRep (coindShortComplexOf (U : Subgroup G) X).X₃ := isDiscreteRep_coind U X.X₃
-    have hcomm : δ hY n (n + 1) rfl ≫ shapiroMap U X.X₁ (n + 1) =
-        shapiroMap U X.X₃ n ≫ δ hX n (n + 1) rfl :=
+    have j1 : IsDiscreteRep (coindShortComplexOf (U : Subgroup G) X).X₁ :=
+      isDiscreteRep_coind U X.X₁
+    have j2 : IsDiscreteRep (coindShortComplexOf (U : Subgroup G) X).X₂ :=
+      isDiscreteRep_coind U X.X₂
+    have j3 : IsDiscreteRep (coindShortComplexOf (U : Subgroup G) X).X₃ :=
+      isDiscreteRep_coind U X.X₃
+    have hcomm
+        : δ hY n (n + 1) rfl ≫ shapiroMap U X.X₁ (n + 1)
+          = shapiroMap U X.X₃ n ≫ δ hX n (n + 1) rfl :=
       δ_comp_cohomologyMapAlong (U : Subgroup G).subtype (continuous_subgroup_subtype _)
         (coindEvalOneShortComplex (U : Subgroup G) X) hY hX n (n + 1) rfl
 
     have hδU : Epi (δ hX n (n + 1) rfl) :=
       (cohomology_exact₁ hX n (n + 1) rfl).epi_f
-        ((isZero_cohomology_discreteCoind (k := k) (G := (U : Subgroup G)) (X := B) n).eq_of_tgt _ _)
+        ((isZero_cohomology_discreteCoind (k := k) (G := (U : Subgroup G)) (X := B) n).eq_of_tgt _
+          _)
     have hδG : Epi (δ hY n (n + 1) rfl) :=
       (cohomology_exact₁ hY n (n + 1) rfl).epi_f
         ((isZero_cohomology_coind_discreteCoind U B n).eq_of_tgt _ _)
@@ -251,32 +282,33 @@ theorem isIso_shapiroMap (n : ℕ) :
         have := congrArg (fun f => f.hom y) hcomm
         simp only [ModuleCat.hom_comp, LinearMap.comp_apply] at this
         rw [← this, hx]
-      obtain ⟨z, hz⟩ := (ShortComplex.moduleCat_exact_iff _).1
-        (cohomology_exact₃ hX n (n + 1) rfl) _ h1
-      obtain ⟨z', rfl⟩ := (ModuleCat.epi_iff_surjective _).1
-        (@IsIso.epi_of_iso _ _ _ _ (shapiroMap U X.X₂ n) e2) z
-      have h2 : (shapiroMap U X.X₃ n).hom
-          ((cohomologyMap (coindShortComplexOf (U : Subgroup G) X).g n).hom z') =
-          (shapiroMap U X.X₃ n).hom y := by
+      obtain ⟨z, hz⟩ :=
+        (ShortComplex.moduleCat_exact_iff _).1 (cohomology_exact₃ hX n (n + 1) rfl) _ h1
+      obtain ⟨z', rfl⟩ :=
+        (ModuleCat.epi_iff_surjective _).1 (@IsIso.epi_of_iso _ _ _ _ (shapiroMap U X.X₂ n) e2) z
+      have h2
+          : (shapiroMap U X.X₃ n).hom
+              ((cohomologyMap (coindShortComplexOf (U : Subgroup G) X).g n).hom z')
+            = (shapiroMap U X.X₃ n).hom y := by
         have := congrArg (fun f => f.hom z') (shapiroMap_naturality U X.g n)
         simp only [ModuleCat.hom_comp, LinearMap.comp_apply] at this
         exact this.trans hz
-      have hinj := (ModuleCat.mono_iff_injective _).1
-        (@IsIso.mono_of_iso _ _ _ _ (shapiroMap U X.X₃ n) e3)
+      have hinj :=
+        (ModuleCat.mono_iff_injective _).1 (@IsIso.mono_of_iso _ _ _ _ (shapiroMap U X.X₃ n) e3)
       rw [← hinj h2]
       have := congrArg (fun f => f.hom z') (comp_δ hY n (n + 1) rfl)
-      simp only [ModuleCat.hom_comp, LinearMap.comp_apply, ModuleCat.hom_zero,
-        LinearMap.zero_apply] at this
+      simp only [ModuleCat.hom_comp, LinearMap.comp_apply, ModuleCat.hom_zero, LinearMap.zero_apply]
+        at this
       exact this
     show IsIso (shapiroMap U X.X₁ (n + 1))
     exact @isIso_of_mono_of_epi _ _ _ _ _ _ hmono hepi
 
-instance isIso_shapiroMap' (B : Rep.{u} k (U : Subgroup G)) [IsDiscreteRep B] (n : ℕ) :
-    IsIso (shapiroMap U B n) :=
+instance isIso_shapiroMap' (B : Rep.{u} k (U : Subgroup G)) [IsDiscreteRep B] (n : ℕ)
+    : IsIso (shapiroMap U B n) :=
   isIso_shapiroMap U n B
 
-noncomputable def shapiroIso (B : Rep.{u} k (U : Subgroup G)) [IsDiscreteRep B] (n : ℕ) :
-    cohomology (Rep.coind (U : Subgroup G).subtype B) n ≅ cohomology B n :=
+noncomputable def shapiroIso (B : Rep.{u} k (U : Subgroup G)) [IsDiscreteRep B] (n : ℕ)
+    : cohomology (Rep.coind (U : Subgroup G).subtype B) n ≅ cohomology B n :=
   asIso (shapiroMap U B n)
 
 end Shapiro
@@ -285,17 +317,17 @@ section Corestriction
 
 variable (A : Rep.{u} k G) [IsDiscreteRep A]
 
-theorem cohomologyRes_eq_coindUnit_shapiroMap (n : ℕ) :
-    cohomologyRes A (U : Subgroup G) n =
-      cohomologyMap (coindUnit (U : Subgroup G) A) n ≫
-        shapiroMap U (Rep.res (U : Subgroup G).subtype A) n := by
+theorem cohomologyRes_eq_coindUnit_shapiroMap (n : ℕ)
+    : cohomologyRes A (U : Subgroup G) n
+      = cohomologyMap (coindUnit (U : Subgroup G) A) n
+        ≫ shapiroMap U (Rep.res (U : Subgroup G).subtype A) n := by
   rw [← cohomologyMapAlong_id_eq_cohomologyMap, shapiroMap, ← cohomologyMapAlong_comp]
   erw [coindUnit_comp_coindEvalOne]
   rfl
 
 omit [CompactSpace G] in
-private theorem cohomologyMap_nsmul {B : Rep.{u} k G} [IsDiscreteRep B] (f : A ⟶ B) (m n : ℕ) :
-    cohomologyMap (m • f) n = m • cohomologyMap f n := by
+private theorem cohomologyMap_nsmul {B : Rep.{u} k G} [IsDiscreteRep B] (f : A ⟶ B) (m n : ℕ)
+    : cohomologyMap (m • f) n = m • cohomologyMap f n := by
   have h : cochainsMap (m • f) = m • cochainsMap f := by
     induction m with
     | zero =>
@@ -308,15 +340,17 @@ private theorem cohomologyMap_nsmul {B : Rep.{u} k G} [IsDiscreteRep B] (f : A �
   rw [cohomologyMap, h]
   exact (HomologicalComplex.homologyFunctor (ModuleCat k) (ComplexShape.up ℕ) n).map_nsmul
 
-noncomputable def cohomologyCores (n : ℕ) :
-    cohomology (Rep.res (U : Subgroup G).subtype A) n ⟶ cohomology A n :=
-  inv (shapiroMap U (Rep.res (U : Subgroup G).subtype A) n) ≫
-    cohomologyMap (coindTrace (U : Subgroup G) A) n
+noncomputable def cohomologyCores (n : ℕ)
+    : cohomology (Rep.res (U : Subgroup G).subtype A) n ⟶ cohomology A n :=
+  inv (shapiroMap U (Rep.res (U : Subgroup G).subtype A) n)
+    ≫ cohomologyMap (coindTrace (U : Subgroup G) A) n
 
-theorem cohomologyRes_comp_cohomologyCores (n : ℕ) :
-    cohomologyRes A (U : Subgroup G) n ≫ cohomologyCores U A n = (U : Subgroup G).index • 𝟙 _ := by
-  rw [cohomologyRes_eq_coindUnit_shapiroMap, cohomologyCores, Category.assoc, IsIso.hom_inv_id_assoc,
-    ← cohomologyMap_comp, coindUnit_comp_coindTrace, cohomologyMap_nsmul, cohomologyMap_id]
+theorem cohomologyRes_comp_cohomologyCores (n : ℕ)
+    : cohomologyRes A (U : Subgroup G) n ≫ cohomologyCores U A n
+      = (U : Subgroup G).index • 𝟙 _ := by
+  rw [cohomologyRes_eq_coindUnit_shapiroMap, cohomologyCores, Category.assoc,
+    IsIso.hom_inv_id_assoc, ← cohomologyMap_comp, coindUnit_comp_coindTrace, cohomologyMap_nsmul,
+    cohomologyMap_id]
 
 end Corestriction
 

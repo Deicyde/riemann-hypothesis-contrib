@@ -8,13 +8,15 @@ open TensorProduct Module
 
 namespace UpperTheory.V.Loc.R0
 
-variable {Q E F B H : Type} [Field Q] [Field E] [Algebra Q E] [Field F] [Algebra Q F]
-  [CommRing B] [Algebra Q B] [Algebra F B] [IsScalarTower Q F B]
+variable
+  {Q E F B H : Type} [Field Q] [Field E] [Algebra Q E] [Field F] [Algebra Q F] [CommRing B]
+  [Algebra Q B] [Algebra F B] [IsScalarTower Q F B]
 
-theorem inv_tensor [FiniteDimensional Q E] (a : H → B ≃ₐ[Q] B)
-    (ha : ∀ b, (∀ g, a g b = b) → ∃ c : F, algebraMap F B c = b) (z : E ⊗[Q] B)
-    (hz : ∀ g, (a g).toLinearMap.lTensor E z = z) :
-    ∃ c : E ⊗[Q] F, (IsScalarTower.toAlgHom Q F B).toLinearMap.lTensor E c = z := by
+theorem inv_tensor
+    [FiniteDimensional Q E]
+    (a : H → B ≃ₐ[Q] B) (ha : ∀ b, (∀ g, a g b = b) → ∃ c : F, algebraMap F B c = b)
+    (z : E ⊗[Q] B) (hz : ∀ g, (a g).toLinearMap.lTensor E z = z)
+    : ∃ c : E ⊗[Q] F, (IsScalarTower.toAlgHom Q F B).toLinearMap.lTensor E c = z := by
   let b := Module.finBasis Q E
   let φ : Fin (finrank Q E) → E ⊗[Q] B →ₗ[Q] B := fun i =>
     (TensorProduct.lid Q B).toLinearMap ∘ₗ (b.coord i).rTensor B
@@ -41,13 +43,16 @@ theorem inv_tensor [FiniteDimensional Q E] (a : H → B ≃ₐ[Q] B)
   rw [← hc]
   rfl
 
-theorem basis_of_unit [FiniteDimensional Q E] [Nontrivial B] (a : H → B ≃ₐ[Q] B)
-    (ha : ∀ b, (∀ g, a g b = b) → ∃ c : F, algebraMap F B c = b) (κ : H → E)
-    (T : H → E ⊗[Q] B →ₗ[E] E ⊗[Q] B) (hT : ∀ g v b, T g (v ⊗ₜ[Q] b) = (κ g * v) ⊗ₜ[Q] a g b)
+theorem basis_of_unit
+    [FiniteDimensional Q E] [Nontrivial B]
+    (a : H → B ≃ₐ[Q] B) (ha : ∀ b, (∀ g, a g b = b) → ∃ c : F, algebraMap F B c = b)
+    (κ : H → E) (T : H → E ⊗[Q] B →ₗ[E] E ⊗[Q] B)
+    (hT : ∀ g v b, T g (v ⊗ₜ[Q] b) = (κ g * v) ⊗ₜ[Q] a g b)
     (S : E ⊗[Q] F →ₗ[Q] Module.End Q (E ⊗[Q] B))
     (hS : ∀ e f v b, S (e ⊗ₜ[Q] f) (v ⊗ₜ[Q] b) = (e • v) ⊗ₜ[Q] (f • b))
-    (x : E ⊗[Q] B) (hu : IsUnit x) (hx : ∀ g, T g x = x) (y : E ⊗[Q] B) (hy : ∀ g, T g y = y) :
-    ∃! c : E ⊗[Q] F, y = S c x := by
+    (x : E ⊗[Q] B) (hu : IsUnit x) (hx : ∀ g, T g x = x)
+    (y : E ⊗[Q] B) (hy : ∀ g, T g y = y)
+    : ∃! c : E ⊗[Q] F, y = S c x := by
   let j := (IsScalarTower.toAlgHom Q F B).toLinearMap.lTensor E
   have hj : Function.Injective j :=
     Module.Flat.lTensor_preserves_injective_linearMap _ (algebraMap F B).injective
@@ -72,22 +77,28 @@ theorem basis_of_unit [FiniteDimensional Q E] [Nontrivial B] (a : H → B ≃ₐ
       | add z z' hz hz' => simp only [map_add (f := _), hz, hz', mul_add]
       | tmul v b => simp [hT, mul_left_comm]
   obtain ⟨z, rfl⟩ : ∃ z, y = z * x := ⟨y * ↑hu.unit⁻¹, by simp [mul_assoc]⟩
-  obtain ⟨c, hc⟩ := inv_tensor a ha z fun g => hu.mul_right_cancel (by
-    have := hy g
-    rwa [h2, hx] at this)
+  obtain ⟨c, hc⟩ :=
+    inv_tensor a ha z fun g =>
+      hu.mul_right_cancel (by
+        have := hy g
+        rwa [h2, hx] at this)
   refine ⟨c, by simp only [h1]; rw [← hc], fun c' hc' => hj ?_⟩
   simp only [h1] at hc'
   rw [← hu.mul_right_cancel hc']
   exact hc.symm
 
-theorem unit_of_span (D : Submodule E (E ⊗[Q] B)) (hD : finrank E D = 1) {m : ℕ} (b : Fin m → B)
-    (d : Fin m → E ⊗[Q] B) (hd : ∀ i, d i ∈ D)
-    (h : (1 : E ⊗[Q] B) = ∑ i, AlgebraTensorModule.map (LinearMap.id : E →ₗ[E] E) (LinearMap.mulLeft Q (b i)) (d i)) :
-    ∃ x ∈ D, IsUnit x := by
+theorem unit_of_span
+    (D : Submodule E (E ⊗[Q] B)) (hD : finrank E D = 1)
+    {m : ℕ} (b : Fin m → B) (d : Fin m → E ⊗[Q] B) (hd : ∀ i, d i ∈ D)
+    (h : (1 : E ⊗[Q] B)
+      = ∑ i, AlgebraTensorModule.map (LinearMap.id : E →ₗ[E] E) (LinearMap.mulLeft Q (b i)) (d i))
+    : ∃ x ∈ D, IsUnit x := by
   obtain ⟨x, -, hx⟩ := finrank_eq_one_iff'.1 hD
   choose e he using fun i => hx ⟨d i, hd i⟩
-  have h1 : ∀ c (z : E ⊗[Q] B), AlgebraTensorModule.map (LinearMap.id : E →ₗ[E] E) (LinearMap.mulLeft Q c) z =
-      ((1 : E) ⊗ₜ[Q] c) * z := by
+  have h1
+      : ∀ c (z : E ⊗[Q] B),
+        AlgebraTensorModule.map (LinearMap.id : E →ₗ[E] E) (LinearMap.mulLeft Q c) z
+          = ((1 : E) ⊗ₜ[Q] c) * z := by
     intro c z
     induction z using TensorProduct.induction_on with
     | zero => simp

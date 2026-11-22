@@ -37,23 +37,30 @@ theorem IntS.pow {f : MvPowerSeries τ C} (hf : IntS V f) (n : ℕ) : IntS V (f 
   | zero => rw [pow_zero]; exact IntS.one
   | succ n ih => rw [pow_succ]; exact ih.mul hf
 
-theorem IntS.subst {σ : Type} [Finite σ] {a : σ → MvPowerSeries τ C}
-    (ha0 : ∀ s, MvPowerSeries.constantCoeff (a s) = 0) (ha : ∀ s, IntS V (a s)) {f : MvPowerSeries σ C}
-    (hf : IntS V f) : IntS V (MvPowerSeries.subst a f) := by
+theorem IntS.subst
+    {σ : Type} [Finite σ]
+    {a : σ → MvPowerSeries τ C}
+    (ha0 : ∀ s, MvPowerSeries.constantCoeff (a s) = 0) (ha : ∀ s, IntS V (a s))
+    {f : MvPowerSeries σ C} (hf : IntS V f)
+    : IntS V (MvPowerSeries.subst a f) := by
   have hA : MvPowerSeries.HasSubst a := MvPowerSeries.hasSubst_of_constantCoeff_zero ha0
   intro μ
   rw [MvPowerSeries.coeff_subst hA]
-  have hterm : ∀ d : σ →₀ ℕ,
-      V.Ge 0 (MvPowerSeries.coeff d f • MvPowerSeries.coeff μ (d.prod fun s e => a s ^ e)) := by
+  have hterm
+      : ∀ d : σ →₀ ℕ,
+        V.Ge 0 (MvPowerSeries.coeff d f • MvPowerSeries.coeff μ (d.prod fun s e => a s ^ e)) := by
     intro d
     have hp : IntS V (d.prod fun s e => a s ^ e) := by
       show IntS V (∏ s ∈ d.support, a s ^ d s)
-      exact Finset.prod_induction _ (fun p => IntS V p) (fun _ _ hx hy => IntS.mul hx hy) IntS.one
+      exact Finset.prod_induction _
+        (fun p => IntS V p)
+        (fun _ _ hx hy => IntS.mul hx hy)
+        IntS.one
         (fun s _ => IntS.pow (ha s) _)
     have h2 := (hf d).mul (hp μ)
     simpa [smul_eq_mul] using h2
   by_cases hfin : (Function.support fun d : σ →₀ ℕ =>
-      MvPowerSeries.coeff d f • MvPowerSeries.coeff μ (d.prod fun s e => a s ^ e)).Finite
+    MvPowerSeries.coeff d f • MvPowerSeries.coeff μ (d.prod fun s e => a s ^ e)).Finite
   · rw [finsum_eq_sum _ hfin]
     exact VF.Ge.sum fun d _ => hterm d
   · rw [finsum_of_infinite_support hfin]
@@ -76,11 +83,15 @@ section Kill
 
 variable {dd : ℕ}
 
-theorem subst_ev_kill (h : PS C 2 dd) (g : Fin 2) (a : Fin 2 → Pt C 1 dd) (hag : a g = 0)
-    (hao : ∀ g', g' ≠ g → a g' = pt C dd 0) :
-    MvPowerSeries.subst (fun q : Fin 1 × Fin dd => (MvPowerSeries.X (1 - g, q.2) : PS C 2 dd)) (ev a h) =
-      MvPowerSeries.rescale (fun s : Fin 2 × Fin dd => if s.1 = g then (0 : C) else 1) h := by
-  have hbS : MvPowerSeries.HasSubst (fun q : Fin 1 × Fin dd => (MvPowerSeries.X (1 - g, q.2) : PS C 2 dd)) :=
+theorem subst_ev_kill
+    (h : PS C 2 dd)
+    (g : Fin 2) (a : Fin 2 → Pt C 1 dd) (hag : a g = 0) (hao : ∀ g', g' ≠ g → a g' = pt C dd 0)
+    : MvPowerSeries.subst
+        (fun q : Fin 1 × Fin dd => (MvPowerSeries.X (1 - g, q.2) : PS C 2 dd))
+        (ev a h)
+      = MvPowerSeries.rescale (fun s : Fin 2 × Fin dd => if s.1 = g then (0 : C) else 1) h := by
+  have hbS : MvPowerSeries.HasSubst (fun q : Fin 1 × Fin dd =>
+      (MvPowerSeries.X (1 - g, q.2) : PS C 2 dd)) :=
     MvPowerSeries.hasSubst_of_constantCoeff_zero fun q => MvPowerSeries.constantCoeff_X _
   have haS : MvPowerSeries.HasSubst (fun p : Fin 2 × Fin dd => a p.1 p.2) := by
     apply MvPowerSeries.hasSubst_of_constantCoeff_zero
@@ -102,26 +113,36 @@ theorem subst_ev_kill (h : PS C 2 dd) (g : Fin 2) (a : Fin 2 → Pt C 1 dd) (hag
     simp only [Pi.smul_apply', if_neg hs, one_smul]
     rw [← h2]
 
-theorem coeff_eval_second_zero (G : PS C 2 dd) (μ : Fin dd →₀ ℕ) :
-    MvPowerSeries.coeff (μ.mapDomain fun x : Fin dd => ((0 : Fin 1), x)) (ev (n := 1) ![pt C dd 0, 0] G) =
-      MvPowerSeries.coeff (μ.mapDomain fun x : Fin dd => ((0 : Fin 2), x)) G := by
-  have hk := subst_ev_kill G 1 ![pt C dd 0, 0] rfl (by
-    intro g' hg'
-    rw [fin_two_eq_one_sub_of_ne' 1 g' hg']
-    rfl)
-  have hinj : Function.Injective (fun q : Fin 1 × Fin dd => (((1 : Fin 2) - 1, q.2) : Fin 2 × Fin dd)) :=
-    fun a b h => snd_injective_fin_one (Prod.mk.inj (show (((1 : Fin 2) - 1, a.2) : Fin 2 × Fin dd) = ((1 : Fin 2) - 1, b.2) from h)).2
-  have h1 := coeff_subst_rename_inj (C := C) (fun q : Fin 1 × Fin dd => (((1 : Fin 2) - 1, q.2) : Fin 2 × Fin dd)) hinj
-    (ev (n := 1) ![pt C dd 0, 0] G) (μ.mapDomain fun x : Fin dd => ((0 : Fin 1), x))
+theorem coeff_eval_second_zero (G : PS C 2 dd) (μ : Fin dd →₀ ℕ)
+    : MvPowerSeries.coeff (μ.mapDomain fun x : Fin dd => ((0 : Fin 1), x))
+        (ev (n := 1) ![pt C dd 0, 0] G)
+      = MvPowerSeries.coeff (μ.mapDomain fun x : Fin dd => ((0 : Fin 2), x)) G := by
+  have hk :=
+    subst_ev_kill G 1 ![pt C dd 0, 0] rfl (by
+      intro g' hg'
+      rw [fin_two_eq_one_sub_of_ne' 1 g' hg']
+      rfl)
+  have hinj : Function.Injective (fun q : Fin 1 × Fin dd =>
+      (((1 : Fin 2) - 1, q.2) : Fin 2 × Fin dd)) := fun a b h =>
+    snd_injective_fin_one (Prod.mk.inj
+      (show (((1 : Fin 2) - 1, a.2) : Fin 2 × Fin dd) = ((1 : Fin 2) - 1, b.2) from h)).2
+  have h1 :=
+    coeff_subst_rename_inj (C := C)
+      (fun q : Fin 1 × Fin dd => (((1 : Fin 2) - 1, q.2) : Fin 2 × Fin dd))
+      hinj (ev (n := 1) ![pt C dd 0, 0] G) (μ.mapDomain fun x : Fin dd => ((0 : Fin 1), x))
   rw [hk, ← Finsupp.mapDomain_comp, MvPowerSeries.coeff_rescale] at h1
   rw [← h1]
-  have h2 : ((fun q : Fin 1 × Fin dd => (((1 : Fin 2) - 1, q.2) : Fin 2 × Fin dd)) ∘ fun x : Fin dd => ((0 : Fin 1), x)) =
-      fun x : Fin dd => ((0 : Fin 2), x) := by
+  have h2
+      : ((fun q : Fin 1 × Fin dd => (((1 : Fin 2) - 1, q.2) : Fin 2 × Fin dd))
+          ∘ fun x : Fin dd => ((0 : Fin 1), x))
+        = fun x : Fin dd => ((0 : Fin 2), x) := by
     funext x
     rfl
   rw [h2]
-  have h3 : ((μ.mapDomain fun x : Fin dd => ((0 : Fin 2), x)).prod
-      fun s m => (if s.1 = 1 then (0 : C) else 1) ^ m) = 1 := by
+  have h3
+      : ((μ.mapDomain fun x : Fin dd => ((0 : Fin 2), x)).prod fun s m =>
+          (if s.1 = 1 then (0 : C) else 1) ^ m)
+        = 1 := by
     unfold Finsupp.prod
     apply Finset.prod_eq_one
     intro s hs
@@ -136,8 +157,11 @@ end Kill
 
 section SgSec
 
-variable [CharZero C] {V : VF C} {O : Type} [CommRing O] [StarRing O] {dd : ℕ} {d : ℕ} {I : Fin 2 → Type}
-  [∀ g, Fintype (I g)] (Y : FBChart C V O dd) (p : PairData Y d I)
+variable
+  [CharZero C]
+  {V : VF C} {O : Type} [CommRing O] [StarRing O]
+  {dd : ℕ} {d : ℕ} {I : Fin 2 → Type} [∀ g, Fintype (I g)]
+  (Y : FBChart C V O dd) (p : PairData Y d I)
 
 end SgSec
 
@@ -145,13 +169,15 @@ section AddSec
 
 variable {dd : ℕ}
 
-theorem pts_eq_X : (fun p : Fin 2 × Fin dd => ![pt C (n := 2) dd 0, pt C (n := 2) dd 1] p.1 p.2) = MvPowerSeries.X := by
+theorem pts_eq_X
+    : (fun p : Fin 2 × Fin dd => ![pt C (n := 2) dd 0, pt C (n := 2) dd 1] p.1 p.2)
+      = MvPowerSeries.X := by
   funext p
   rcases p with ⟨i, j⟩
   fin_cases i <;> first | rfl | simp [pt]
 
-theorem addOf_pts (F : Fin dd → PS C 2 dd) (j : Fin dd) :
-    addOf F (pt C (n := 2) dd 0) (pt C (n := 2) dd 1) j = F j := by
+theorem addOf_pts (F : Fin dd → PS C 2 dd) (j : Fin dd)
+    : addOf F (pt C (n := 2) dd 0) (pt C (n := 2) dd 1) j = F j := by
   simp only [addOf, ev]
   rw [pts_eq_X, MvPowerSeries.subst_self]
   rfl

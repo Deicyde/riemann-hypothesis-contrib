@@ -10,11 +10,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-private theorem exists_map_eq_algebraMap_padicInt_of_isDvr {l : ℕ} [Fact l.Prime] (𝔞 : Amb l) {A : Type} [CommRing A] [IsDomain A]
-    [IsDiscreteValuationRing A] (f : A →+* 𝔞.V) (hf : 𝔞.IsDvr f) (c : Coef l) (t : ℤ_[l]) :
-    ∃ a : A, f a = 𝔞.a c (algebraMap ℤ_[l] c.O t) := by
+private theorem exists_map_eq_algebraMap_padicInt_of_isDvr
+    {l : ℕ} [Fact l.Prime]
+    (𝔞 : Amb l)
+    {A : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A]
+    (f : A →+* 𝔞.V) (hf : 𝔞.IsDvr f)
+    (c : Coef l) (t : ℤ_[l])
+    : ∃ a : A, f a = 𝔞.a c (algebraMap ℤ_[l] c.O t) := by
   classical
   haveI := c.dvr
   haveI := hf.loc
@@ -52,8 +58,11 @@ private theorem exists_map_eq_algebraMap_padicInt_of_isDvr {l : ℕ} [Fact l.Pri
       rw [e2, sub_self]
     have := (ZMod.intCast_zmod_eq_zero_iff_dvd _ (l ^ m)).mp e3
     exact_mod_cast this
-  have hcau : ∀ {m k : ℕ}, m ≤ k → ((t.appr m : ℕ) : A) ≡ ((t.appr k : ℕ) : A)
-      [SMOD (maximalIdeal A) ^ m • (⊤ : Submodule A A)] := by
+  have hcau
+      : ∀ {m k : ℕ},
+        m ≤ k
+          → ((t.appr m : ℕ) : A) ≡ ((t.appr k : ℕ) : A)
+            [SMOD (maximalIdeal A) ^ m • (⊤ : Submodule A A)] := by
     intro m k hmk
     rw [SModEq.sub_mem]
     obtain ⟨z, hz⟩ := hdvd m k hmk
@@ -81,8 +90,10 @@ private theorem exists_map_eq_algebraMap_padicInt_of_isDvr {l : ℕ} [Fact l.Pri
     refine ⟨f w - f q ^ k * 𝔞.a c (algebraMap ℤ_[l] c.O w'), ?_⟩
     have hl : ((l : ℕ) : 𝔞.V) = f π * f q := by rw [← map_natCast f, hq, map_mul]
     have e1 : f μ = f ((t.appr k : ℕ) : A) + f (w * π ^ k) := by rw [hw]; simp
-    have e2 : 𝔞.a c (algebraMap ℤ_[l] c.O t) = 𝔞.a c (algebraMap ℤ_[l] c.O ((t.appr k : ℕ) : ℤ_[l]))
-        + 𝔞.a c (algebraMap ℤ_[l] c.O (w' * (l : ℤ_[l]) ^ k)) := by
+    have e2
+        : 𝔞.a c (algebraMap ℤ_[l] c.O t)
+          = 𝔞.a c (algebraMap ℤ_[l] c.O ((t.appr k : ℕ) : ℤ_[l]))
+            + 𝔞.a c (algebraMap ℤ_[l] c.O (w' * (l : ℤ_[l]) ^ k)) := by
       rw [hw', ← map_add (f := _), ← map_add (f := _)]; simp
     rw [hd_def, e1, e2]
     simp only [map_natCast, map_mul, map_pow]
@@ -106,7 +117,9 @@ private theorem exists_map_eq_algebraMap_padicInt_of_isDvr {l : ℕ} [Fact l.Pri
     obtain ⟨s, hs⟩ := Polynomial.X_dvd_sub_C (p := r)
     have hc : f (r.coeff 0) = -(d * Polynomial.eval₂ f d s) := by
       have := congrArg (Polynomial.eval₂ f d) hs
-      simp only [Polynomial.eval₂_sub, Polynomial.eval₂_C, Polynomial.eval₂_mul, Polynomial.eval₂_X, hev] at this
+      simp only [Polynomial.eval₂_sub, Polynomial.eval₂_C, Polynomial.eval₂_mul, Polynomial.eval₂_X,
+          hev]
+        at this
       linear_combination -this
     obtain ⟨e, u, hu⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hr0 hπ
     obtain ⟨v, hv⟩ := hdk (e + 1)
@@ -117,16 +130,19 @@ private theorem exists_map_eq_algebraMap_padicInt_of_isDvr {l : ℕ} [Fact l.Pri
     rcases mul_eq_zero.mp key with h | h
     · exact pow_ne_zero _ hfπ h
     · have hu' : IsUnit (f π * (v * Polynomial.eval₂ f d s)) := by
-        have : f π * (v * Polynomial.eval₂ f d s) = -f (u : A) := by linear_combination h
+        have : f π * (v * Polynomial.eval₂ f d s) = - f (u : A) := by linear_combination h
         rw [this]
         exact ((u.isUnit).map f).neg
       exact hπ.not_isUnit (isUnit_of_map_unit f π (isUnit_of_mul_isUnit_left hu'))
   exact ⟨μ, sub_eq_zero.mp hd0⟩
 
-private theorem exists_coef_forall_sub_mem_maximalIdeal_of_isDvr {l : ℕ} [Fact l.Prime] (𝔞 : Amb l) {A : Type} [CommRing A] [IsDomain A]
-    [IsDiscreteValuationRing A] (f : A →+* 𝔞.V) (hf : 𝔞.IsDvr f) :
-    ∃ c₁ : Coef l, ∀ c' : Coef l, c₁.O ≤ c'.O → ∀ x : A, ∃ z : c'.O,
-      f x - 𝔞.a c' z ∈ maximalIdeal 𝔞.V := by
+private theorem exists_coef_forall_sub_mem_maximalIdeal_of_isDvr
+    {l : ℕ} [Fact l.Prime]
+    (𝔞 : Amb l)
+    {A : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A]
+    (f : A →+* 𝔞.V) (hf : 𝔞.IsDvr f)
+    : ∃ c₁ : Coef l, ∀ c' : Coef l,
+      c₁.O ≤ c'.O → ∀ x : A, ∃ z : c'.O, f x - 𝔞.a c' z ∈ maximalIdeal 𝔞.V := by
   classical
   haveI := hf.fin
   haveI := hf.loc
@@ -159,9 +175,13 @@ private theorem exists_coef_forall_sub_mem_maximalIdeal_of_isDvr {l : ℕ} [Fact
   convert this using 1
   ring
 
-private theorem exists_finset_coef_mem_subfield_closure_of_isDvr {l : ℕ} [Fact l.Prime] (𝔞 : Amb l) {A : Type} [CommRing A] [IsDomain A]
-    [IsDiscreteValuationRing A] (f : A →+* 𝔞.V) (hf : 𝔞.IsDvr f) (c : Coef l) :
-    ∃ s : Finset 𝔞.K, ∀ y : c.O,
+private theorem exists_finset_coef_mem_subfield_closure_of_isDvr
+    {l : ℕ} [Fact l.Prime]
+    (𝔞 : Amb l)
+    {A : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A]
+    (f : A →+* 𝔞.V) (hf : 𝔞.IsDvr f)
+    (c : Coef l)
+    : ∃ s : Finset 𝔞.K, ∀ y : c.O,
       𝔞.toK (𝔞.a c y) ∈ Subfield.closure (Set.range (𝔞.toK.comp f) ∪ ↑s) := by
   classical
   haveI := c.fin
@@ -171,21 +191,29 @@ private theorem exists_finset_coef_mem_subfield_closure_of_isDvr {l : ℕ} [Fact
   induction hy using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨i, rfl⟩ := hx
-    exact Subfield.subset_closure
-      (Or.inr (Finset.mem_coe.mpr (Finset.mem_image_of_mem _ (Finset.mem_univ i))))
-  | zero => rw [map_zero, map_zero]; exact Subfield.zero_mem _
-  | add x z _ _ hx hz => rw [map_add (f := _), map_add (f := _)]; exact Subfield.add_mem _ hx hz
+    exact Subfield.subset_closure (Or.inr (Finset.mem_coe.mpr (Finset.mem_image_of_mem _
+      (Finset.mem_univ i))))
+  | zero =>
+    rw [map_zero, map_zero]; exact Subfield.zero_mem _
+  | add x z _ _ hx hz =>
+    rw [map_add (f := _), map_add (f := _)]; exact Subfield.add_mem _ hx hz
   | smul t x _ hx =>
     rw [Algebra.smul_def, map_mul, map_mul]
     refine Subfield.mul_mem _ ?_ hx
     obtain ⟨a, ha⟩ := exists_map_eq_algebraMap_padicInt_of_isDvr 𝔞 f hf c t
     exact Subfield.subset_closure (Or.inl ⟨a, by simp [ha]⟩)
 
-theorem UpperTheory.V.Ws.smallCo :
-    ∀ {l : ℕ} [Fact l.Prime] (𝔞 : Amb l) {ι Γ : Type} [Group Γ] [TopologicalSpace Γ] (P : PD ι Γ 𝔞.V), 𝔞.Small P →
-      ∃ c₁ : Coef l, ∀ c' : Coef l, c₁.O ≤ c'.O → ∃ (R : Type) (_ : CommRing R) (_ : Algebra c'.O R) (_ : IsCO c'.O R) (f : R →+* 𝔞.V) (Q : PD ι Γ R),
-        Function.Injective f ∧ f.comp (algebraMap c'.O R) = 𝔞.a c' ∧ (residue 𝔞.V).comp f = (𝔞.j c').comp (res c'.O R : R →+* ResidueField c'.O) ∧
-        Q.Cont (maximalIdeal R) ∧ Q.map f = P := by
+theorem UpperTheory.V.Ws.smallCo
+    : ∀ {l : ℕ} [Fact l.Prime] (𝔞 : Amb l) {ι Γ : Type} [Group Γ] [TopologicalSpace Γ]
+        (P : PD ι Γ 𝔞.V),
+      𝔞.Small P
+        → ∃ c₁ : Coef l, ∀ c' : Coef l,
+          c₁.O ≤ c'.O
+            → ∃ (R : Type) (_ : CommRing R) (_ : Algebra c'.O R) (_ : IsCO c'.O R) (f : R →+* 𝔞.V)
+                (Q : PD ι Γ R),
+              Function.Injective f ∧ f.comp (algebraMap c'.O R) = 𝔞.a c'
+                ∧ (residue 𝔞.V).comp f = (𝔞.j c').comp (res c'.O R : R →+* ResidueField c'.O)
+                ∧ Q.Cont (maximalIdeal R) ∧ Q.map f = P := by
   intro l _ 𝔞 ι Γ _ _ P hP
   obtain ⟨A, _, _, _, f, P₁, hf, hP₁, rfl⟩ := hP
   obtain ⟨c₁, hc₁⟩ := exists_coef_forall_sub_mem_maximalIdeal_of_isDvr 𝔞 f hf
@@ -198,22 +226,26 @@ theorem UpperTheory.V.Ws.smallCo :
   haveI := hf'.fin
   haveI := c'.dvr
   have hmem : ∀ y : c'.O, 𝔞.a c' y ∈ f'.range := fun y => hcl _ (hs y)
-  let e : A' ≃+* f'.range := RingEquiv.ofBijective f'.rangeRestrict
-    ⟨fun x y h => hf'.inj (congrArg Subtype.val h), f'.rangeRestrict_surjective⟩
+  let e : A' ≃+* f'.range :=
+    RingEquiv.ofBijective f'.rangeRestrict
+      ⟨fun x y h => hf'.inj (congrArg Subtype.val h), f'.rangeRestrict_surjective⟩
   let φ : c'.O →+* A' := (e.symm : f'.range →+* A').comp ((𝔞.a c').codRestrict f'.range hmem)
   have hφ : ∀ y, f' (φ y) = 𝔞.a c' y := by
     intro y
     have : f'.rangeRestrict (φ y) = (𝔞.a c').codRestrict f'.range hmem y := e.apply_symm_apply _
     exact congrArg Subtype.val this
   letI : Algebra c'.O A' := φ.toAlgebra
-  have hloc : IsLocalHom (algebraMap c'.O A') := ⟨fun y hy => by
-    have : IsUnit (𝔞.a c' y) := by rw [← hφ]; exact hy.map f'
-    exact isUnit_of_map_unit (𝔞.a c') y this⟩
-  have hcl' : UpperTheory.V.CA.IsCL c'.O A' := ⟨inferInstance, hf'.complete, hloc, Module.Finite.of_finite⟩
+  have hloc : IsLocalHom (algebraMap c'.O A') :=
+    ⟨fun y hy => by
+      have : IsUnit (𝔞.a c' y) := by rw [← hφ]; exact hy.map f'
+      exact isUnit_of_map_unit (𝔞.a c') y this⟩
+  have hcl' : UpperTheory.V.CA.IsCL c'.O A' :=
+    ⟨inferInstance, hf'.complete, hloc, Module.Finite.of_finite⟩
   obtain ⟨S, hSmem, -, hco, hpow⟩ := UpperTheory.V.CA.cl_sub c'.O A' hcl'
   letI : Algebra c'.O S := SubalgebraClass.toAlgebra (R := c'.O) (A := A') S
   haveI := hco
-  have hmV : ∀ u : A', u ∈ maximalIdeal A' → f' u ∈ maximalIdeal 𝔞.V := fun u hu => map_nonunit f' u hu
+  have hmV : ∀ u : A', u ∈ maximalIdeal A' → f' u ∈ maximalIdeal 𝔞.V := fun u hu =>
+    map_nonunit f' u hu
   have hmS : ∀ u : S, u ∈ maximalIdeal S → f' u ∈ maximalIdeal 𝔞.V := by
     intro u hu
     apply hmV
@@ -227,7 +259,9 @@ theorem UpperTheory.V.Ws.smallCo :
     rw [mem_maximalIdeal, mem_nonunits_iff]
     intro hu
     have := hu.map f'
-    rw [map_sub, ← RingHom.comp_apply f' g, hfg, show f' (algebraMap c'.O A' z) = 𝔞.a c' z from hφ z] at this
+    rw [map_sub, ← RingHom.comp_apply f' g, hfg,
+        show f' (algebraMap c'.O A' z) = 𝔞.a c' z from hφ z]
+      at this
     rw [mem_maximalIdeal, mem_nonunits_iff] at hz
     exact hz this
   let g' : A →+* S := g.codRestrict S hgS
@@ -241,7 +275,8 @@ theorem UpperTheory.V.Ws.smallCo :
       exact (mem_nonunits_iff.mp ((mem_maximalIdeal _).mp (map_nonunit f x hx))) this
     have := (hpow 1 (g' x)).mpr (by rw [pow_one]; exact h1)
     rwa [pow_one] at this
-  refine ⟨S, inferInstance, inferInstance, hco, f'.comp S.val.toRingHom, P₁.map g', ?_, ?_, ?_, ?_, ?_⟩
+  refine
+    ⟨S, inferInstance, inferInstance, hco, f'.comp S.val.toRingHom, P₁.map g', ?_, ?_, ?_, ?_, ?_⟩
   · exact hf'.inj.comp Subtype.val_injective
   · exact RingHom.ext fun y => hφ y
   · ext x

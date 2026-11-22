@@ -8,8 +8,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open CategoryTheory AlgebraicGeometry TensorProduct
 open UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.Gal.crystallineComparison.etAway_of :
-    SecChart → EtChart → EtAwayChart := by
+theorem UpperTheory.Gal.crystallineComparison.etAway_of : SecChart → EtChart → EtAwayChart := by
   intro hsec het l Y T U hU
   obtain ⟨hZ, hpts⟩ := hsec l Y T U hU
   have hfin := @IsFinite.finite_app _ _ _ T.fin U hU

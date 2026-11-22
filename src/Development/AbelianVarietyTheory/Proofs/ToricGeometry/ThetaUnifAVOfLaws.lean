@@ -44,12 +44,14 @@ public import Development.AbelianVarietyTheory.Proofs.ToricGeometry.ThetaUnifAVO
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory
 
-theorem thetaUnifAV_of_laws :
-    Out.CubeSt → Out.MulNSt → Out.WeilSt → Out.WeilNondegSt → Out.GlobalSectionsRankAlgClosed → ThetaUnifAV := by
+theorem thetaUnifAV_of_laws
+    : Out.CubeSt → Out.MulNSt → Out.WeilSt → Out.WeilNondegSt → Out.GlobalSectionsRankAlgClosed
+      → ThetaUnifAV := by
   intro hcube hmul hpair hnd hsec
   have hval := @valAt'_rules
   have hvalaff := @existsUnique_point_of_ringHom
@@ -72,8 +74,8 @@ theorem thetaUnifAV_of_laws :
   have hglobframe := @CubeFrame.exists_global_frame
   have hautfactor := @automorphyFactor_exp_linear_of_cube
   have hahform := @appellHumbert_normal_form_of_linear_exponent
-  have hframe := @exists_appellHumbert_frame_isRig hcube hval hcubet
-    @hlocframe @hglobframe @hautfactor hahform
+  have hframe :=
+    @exists_appellHumbert_frame_isRig hcube hval hcubet @hlocframe @hglobframe @hautfactor hahform
   have hthg := @ThetaGroupFrame.thetaGrp_in_frame hval hholprod
   have hweil := @WeilExp.weilIs_exp_riemannForm hpair hval hvalext hsmred hthg
   have hunimod := @bilinForm_bijective_of_nondegenerate_mod

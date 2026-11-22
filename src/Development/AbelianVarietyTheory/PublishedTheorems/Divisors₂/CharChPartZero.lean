@@ -12,7 +12,8 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry Set Matrix MvPolynomial
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.L2DbarEstimates (V)
 open GlobalTheory.Points GlobalTheory.CxPts GlobalTheory.VB
 open scoped ComplexConjugate
@@ -39,7 +40,6 @@ variable {B : BottChern} {h : IsRegVar p D} (R : ArRing B h) {r : ℕ} (E : Herm
 
 end ArRing
 
-
 variable (q) in
 def IsGenSmooth (π : Y ⟶ X) : Prop :=
   ∃ U : Y.Opens, (∀ σ (y : CxPts q σ), y ∈ ptsIn q σ U) ∧ Smooth (U.ι ≫ π)
@@ -50,12 +50,14 @@ def relCot (π : Y ⟶ X) : Y.Modules := Conormal.conormal (pullback.diagonal π
 
 def dRel (π : Y ⟶ X) (W : Y.Opens) (f : Γ(Y, W)) : Γ(relCot π, W) :=
   Conormal.d (pullback.diagonal_fst π) (V := W) (W := pullback.snd π π ⁻¹ᵁ W)
-    (by rw [← Scheme.Hom.comp_preimage, pullback.diagonal_snd]; exact le_rfl) ((pullback.snd π π).app W f)
-
+    (by rw [← Scheme.Hom.comp_preimage, pullback.diagonal_snd]; exact le_rfl)
+    ((pullback.snd π π).app W f)
 
 variable (q) in
 def IsRelAcyclic (π : Y ⟶ X) (L : LB Y) : Prop :=
-  ∀ U : X.Opens, IsAffineOpen U → ∀ (κ : Type) [LinearOrder κ] [Fintype κ] (W : κ → Y.Opens),
-    (∀ i, IsAffineOpen (W i)) → ⨆ i, W i = π ⁻¹ᵁ U → ∀ n, (AbLaw.cechLB q L W).ExactAt (n + 1)
+  ∀ U : X.Opens,
+    IsAffineOpen U
+      → ∀ (κ : Type) [LinearOrder κ] [Fintype κ] (W : κ → Y.Opens),
+        (∀ i, IsAffineOpen (W i)) → ⨆ i, W i = π ⁻¹ᵁ U → ∀ n, (AbLaw.cechLB q L W).ExactAt (n + 1)
 
 end GlobalTheory.CxForm

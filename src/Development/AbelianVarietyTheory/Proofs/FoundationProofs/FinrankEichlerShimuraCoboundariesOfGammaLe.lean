@@ -80,8 +80,9 @@ lemma const_eq_zero {w M : ℕ} (hM : 0 < M) (hw : 1 ≤ w) (c : ℂ) (h : slP w
 end GlobalTheory.HeckeFamilyMatrices.CobDim
 
 open GlobalTheory.HeckeFamilyMatrices.CobDim in
-theorem GlobalTheory.HeckeFamilyMatrices.finrank_eichlerShimuraCoboundaries_of_Gamma_le : ∀ (M : ℕ) (Γ : Subgroup SL(2, ℤ)) (w : ℕ), 0 < M → 1 ≤ w →
-    CongruenceSubgroup.Gamma M ≤ Γ → Module.finrank ℂ (B1 Γ w) = w + 1 := by
+theorem GlobalTheory.HeckeFamilyMatrices.finrank_eichlerShimuraCoboundaries_of_Gamma_le
+    : ∀ (M : ℕ) (Γ : Subgroup SL(2, ℤ)) (w : ℕ),
+      0 < M → 1 ≤ w → CongruenceSubgroup.Gamma M ≤ Γ → Module.finrank ℂ (B1 Γ w) = w + 1 := by
   intro M Γ w hM hw hΓ
   unfold B1
   rw [LinearMap.finrank_range_of_inj, (degreeLTEquiv ℂ (w + 1)).finrank_eq, Module.finrank_fin_fun]

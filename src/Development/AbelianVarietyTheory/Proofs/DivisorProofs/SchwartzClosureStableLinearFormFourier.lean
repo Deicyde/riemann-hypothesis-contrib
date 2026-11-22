@@ -8,9 +8,11 @@ open FourierTransform MeasureTheory Filter Topology
 
 namespace GlobalTheory
 
-theorem topologicalClosure_stable_of_continuousLinearMap {M : Type} [TopologicalSpace M] [AddCommGroup M]
-    [Module ℂ M] [ContinuousSMul ℂ M] [ContinuousAdd M] (W : Submodule ℂ M) (T : M →L[ℂ] M)
-    (hT : ∀ f ∈ W, T f ∈ W) : ∀ f ∈ W.topologicalClosure, T f ∈ W.topologicalClosure := by
+theorem topologicalClosure_stable_of_continuousLinearMap
+    {M : Type}
+    [TopologicalSpace M] [AddCommGroup M] [Module ℂ M] [ContinuousSMul ℂ M] [ContinuousAdd M]
+    (W : Submodule ℂ M) (T : M →L[ℂ] M) (hT : ∀ f ∈ W, T f ∈ W)
+    : ∀ f ∈ W.topologicalClosure, T f ∈ W.topologicalClosure := by
   intro f hf
   have h1 : Submodule.map (T : M →ₗ[ℂ] M) W ≤ W := by
     rintro _ ⟨g, hg, rfl⟩
@@ -18,14 +20,14 @@ theorem topologicalClosure_stable_of_continuousLinearMap {M : Type} [Topological
   have h2 := Submodule.topologicalClosure_map T W
   exact Submodule.topologicalClosure_mono h1 (h2 ⟨f, hf, rfl⟩)
 
-theorem schwartz_closure_stable_linearForm_fourier :
-    ∀ (E : Type) [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E]
-    (W : Submodule ℂ (SchwartzMap E ℂ)),
-    (∀ (ℓ : E →L[ℝ] ℝ) (f f₁ : SchwartzMap E ℂ), f ∈ W → (∀ x, f₁ x = (ℓ x : ℂ) * f x) → f₁ ∈ W) →
-    (∀ f ∈ W, 𝓕 f ∈ W) →
-    (∀ (ℓ : E →L[ℝ] ℝ) (f f₁ : SchwartzMap E ℂ), f ∈ W.topologicalClosure → (∀ x, f₁ x = (ℓ x : ℂ) * f x) →
-      f₁ ∈ W.topologicalClosure) ∧
-    (∀ f ∈ W.topologicalClosure, 𝓕 f ∈ W.topologicalClosure) := by
+theorem schwartz_closure_stable_linearForm_fourier
+    : ∀ (E : Type) [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+        [MeasurableSpace E] [BorelSpace E] (W : Submodule ℂ (SchwartzMap E ℂ)),
+      (∀ (ℓ : E →L[ℝ] ℝ) (f f₁ : SchwartzMap E ℂ), f ∈ W → (∀ x, f₁ x = (ℓ x : ℂ) * f x) → f₁ ∈ W)
+        → (∀ f ∈ W, 𝓕 f ∈ W)
+        → (∀ (ℓ : E →L[ℝ] ℝ) (f f₁ : SchwartzMap E ℂ),
+            f ∈ W.topologicalClosure → (∀ x, f₁ x = (ℓ x : ℂ) * f x) → f₁ ∈ W.topologicalClosure)
+          ∧ (∀ f ∈ W.topologicalClosure, 𝓕 f ∈ W.topologicalClosure) := by
   intro E _ _ _ _ _ W hmul hF
   constructor
   · intro ℓ f f₁ hf hf₁
@@ -48,7 +50,9 @@ theorem schwartz_closure_stable_linearForm_fourier :
       intro g hg
       rw [SchwartzMap.fourierTransformCLM_apply]
       exact hF g hg
-    have := topologicalClosure_stable_of_continuousLinearMap W (SchwartzMap.fourierTransformCLM ℂ) hTW f hf
+    have :=
+      topologicalClosure_stable_of_continuousLinearMap W (SchwartzMap.fourierTransformCLM ℂ) hTW f
+        hf
     rwa [SchwartzMap.fourierTransformCLM_apply] at this
 
 end GlobalTheory

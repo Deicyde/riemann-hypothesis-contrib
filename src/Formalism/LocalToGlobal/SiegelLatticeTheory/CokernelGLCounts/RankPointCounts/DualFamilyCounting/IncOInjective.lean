@@ -18,31 +18,36 @@ open Formalism.HermitianLattices.Ext.L3 Formalism.L2.SG.Pf.Cnt
 
 section Transport
 
-variable {K F V : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F]
-  [Algebra F K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable
+  {K F V : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
+  [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
 def resF (h : V →ₗ⋆[K] V →ₗ[K] K) (W : Submodule K V) : W →ₗ⋆[K] W →ₗ[K] K :=
-  LinearMap.mk₂'ₛₗ (starRingEnd K) (RingHom.id K) (fun x y => h x y)
-    (fun x x' y => by simp) (fun c x y => by simp) (fun x y y' => by simp) (fun c x y => by simp)
+  LinearMap.mk₂'ₛₗ (starRingEnd K) (RingHom.id K)
+    (fun x y => h x y)
+    (fun x x' y => by simp)
+    (fun c x y => by simp)
+    (fun x y y' => by simp)
+    (fun c x y => by simp)
 
-@[simp] theorem resF_apply (h : V →ₗ⋆[K] V →ₗ[K] K) (W : Submodule K V) (x y : W) :
-    resF h W x y = h x y := rfl
+@[simp]
+theorem resF_apply (h : V →ₗ⋆[K] V →ₗ[K] K) (W : Submodule K V) (x y : W) : resF h W x y = h x y :=
+  rfl
 
 abbrev incO (W : Submodule K V) : W →ₗ[𝓞 K] V := W.subtype.restrictScalars (𝓞 K)
 
 abbrev latW (W : Submodule K V) (T : Submodule (𝓞 K) V) : Submodule (𝓞 K) W := T.comap (incO W)
 
-theorem map_latW {W : Submodule K V} {T : Submodule (𝓞 K) V} (hT : IsLatIn W T) :
-    (latW W T).map (incO W) = T := by
+theorem map_latW {W : Submodule K V} {T : Submodule (𝓞 K) V} (hT : IsLatIn W T)
+    : (latW W T).map (incO W) = T := by
   rw [Submodule.map_comap_eq, inf_eq_right]
   intro x hx
   exact ⟨⟨x, hT.2 ▸ Submodule.subset_span hx⟩, rfl⟩
 
 theorem incO_injective (W : Submodule K V) : Function.Injective (incO W) := Subtype.val_injective
 
-theorem isLattice_latW {W : Submodule K V} {T : Submodule (𝓞 K) V} (hT : IsLatIn W T) :
-    Submodule.IsFullLattice K (latW W T) := by
+theorem isLattice_latW {W : Submodule K V} {T : Submodule (𝓞 K) V} (hT : IsLatIn W T)
+    : Submodule.IsFullLattice K (latW W T) := by
   have hfg : (latW W T).FG :=
     Submodule.fg_of_fg_map_injective _ (incO_injective W) (by rw [map_latW hT]; exact hT.1)
   refine { toIsLattice := Submodule.IsLattice.of_fg K hfg, span_eq_top := ?_ }
@@ -50,7 +55,8 @@ theorem isLattice_latW {W : Submodule K V} {T : Submodule (𝓞 K) V} (hT : IsLa
   have himg : (Subtype.val '' ((latW W T : Submodule (𝓞 K) W) : Set W)) = (T : Set V) := by
     have e := congrArg (fun S : Submodule (𝓞 K) V => (S : Set V)) (map_latW hT)
     simpa [Submodule.map_coe] using e
-  rw [Submodule.map_span, Submodule.map_top, Submodule.range_subtype, Submodule.coe_subtype, himg, hT.2]
+  rw [Submodule.map_span, Submodule.map_top, Submodule.range_subtype, Submodule.coe_subtype, himg,
+    hT.2]
 
 private lemma mem_of_algebraMap_smul_mem (W : Submodule K V) {t : 𝓞 F} (ht : t ≠ 0) {x : V}
     (h : algebraMap (𝓞 F) (𝓞 K) t • x ∈ W) : x ∈ W := by
@@ -80,20 +86,25 @@ private lemma map_incO_locF (W : Submodule K V) (𝔭 : Ideal (𝓞 F)) [𝔭.Is
     convert hz using 1
     exact Subtype.ext hzx.symm
 
-theorem locF_latW {W : Submodule K V} {T : Submodule (𝓞 K) V} (hT : IsLatIn W T) (𝔭 : Ideal (𝓞 F))
-    [𝔭.IsPrime] : (locF 𝔭 (latW W T)).map (incO W) = locF 𝔭 T := by
+theorem locF_latW
+    {W : Submodule K V} {T : Submodule (𝓞 K) V} (hT : IsLatIn W T) (𝔭 : Ideal (𝓞 F)) [𝔭.IsPrime]
+    : (locF 𝔭 (latW W T)).map (incO W) = locF 𝔭 T := by
   rw [map_incO_locF, map_latW hT]
 
-theorem isJordanIn_res {h : V →ₗ⋆[K] V →ₗ[K] K} {W : Submodule K V} {T : Submodule (𝓞 K) V}
-    (hT : IsLatIn W T) {𝔭 : Ideal (𝓞 F)} [𝔭.IsPrime] {b : Fin (finrank K W) → V} {a : Fin (finrank K W) → 𝓞 F}
-    (hb : IsJordanIn h W T 𝔭 b a) :
-    IsJordanIn (resF h W) ⊤ (latW W T) 𝔭
-      (fun i => ⟨b (finCongr (finrank_top K W) i), hb.1 _⟩) (fun i => a (finCongr (finrank_top K W) i)) := by
+theorem isJordanIn_res
+    {h : V →ₗ⋆[K] V →ₗ[K] K} {W : Submodule K V} {T : Submodule (𝓞 K) V} (hT : IsLatIn W T)
+    {𝔭 : Ideal (𝓞 F)} [𝔭.IsPrime]
+    {b : Fin (finrank K W) → V} {a : Fin (finrank K W) → 𝓞 F} (hb : IsJordanIn h W T 𝔭 b a)
+    : IsJordanIn (resF h W) ⊤ (latW W T) 𝔭
+      (fun i => ⟨b (finCongr (finrank_top K W) i), hb.1 _⟩)
+      (fun i => a (finCongr (finrank_top K W) i)) := by
   obtain ⟨hbW, hloc, horth, hdiag, hne⟩ := hb
   refine ⟨fun i => Submodule.mem_top, ?_, ?_, ?_, fun i => hne _⟩
   · apply Submodule.map_injective_of_injective (incO_injective W)
-    have himg : ⇑(incO W) '' Set.range (fun i : Fin (finrank K (⊤ : Submodule K W)) =>
-        (⟨b (finCongr (finrank_top K W) i), hbW _⟩ : W)) = Set.range b := by
+    have himg
+        : ⇑(incO W) '' Set.range (fun i : Fin (finrank K (⊤ : Submodule K W)) =>
+            (⟨b (finCongr (finrank_top K W) i), hbW _⟩ : W))
+          = Set.range b := by
       ext v
       simp only [Set.mem_image, Set.mem_range]
       constructor

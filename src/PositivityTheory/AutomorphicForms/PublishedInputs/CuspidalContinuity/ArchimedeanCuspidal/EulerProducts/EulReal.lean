@@ -8,14 +8,14 @@ public import GroundTheory.AutomorphicForms.GL2.GodementSectionFactor
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Filter Topology
-open GroundTheory.Global GroundTheory.LocalField GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
+open GroundTheory.Global GroundTheory.LocalField GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm
 open GroundTheory.Automorphic.GodementSection (localChar)
 open scoped NumberField.AdeleRing ValuativeRel
 
 namespace Ad3.GP
 
-abbrev uniqueInfinitePlaceRat : Unique (InfinitePlace ℚ) :=
-  ⟨⟨wR⟩, fun w => Subsingleton.elim w wR⟩
+abbrev uniqueInfinitePlaceRat : Unique (InfinitePlace ℚ) := ⟨⟨wR⟩, fun w => Subsingleton.elim w wR⟩
 
 attribute [local instance] uniqueInfinitePlaceRat
 
@@ -45,19 +45,20 @@ theorem measurableEmbedding_aR : MeasurableEmbedding aR := by
   rw [← coe_aRh]
   exact aRh.measurableEmbedding
 
-theorem mult_wR : wR.mult = 1 := by
-  rw [InfinitePlace.mult, if_pos wR_isReal]
+theorem mult_wR : wR.mult = 1 := by rw [InfinitePlace.mult, if_pos wR_isReal]
 
 theorem map_eRu : Measure.map eRu (infinitePlaceUnitsMeasure wR) = mulR := by
   set e := InfinitePlace.Completion.isometryEquivRealOfIsReal wR_isReal
   have he : ∀ y : ℝ, ‖e.symm y‖ = |y| := fun y => by
-    have h0 : e.symm 0 = 0 := map_zero (InfinitePlace.Completion.ringEquivRealOfIsReal wR_isReal).symm
+    have h0 : e.symm 0 = 0 :=
+      map_zero (InfinitePlace.Completion.ringEquivRealOfIsReal wR_isReal).symm
     rw [e.symm.isometry.norm_map_of_map_zero h0, Real.norm_eq_abs]
   ext A hA
   have hpre : MeasurableSet (eRu ⁻¹' A) := eRu.continuous.measurable hA
   rw [Measure.map_apply eRu.continuous.measurable hA, infinitePlaceUnitsMeasure,
     unitsMeasure_apply _ _ hpre, infinitePlaceMeasure_of_isReal wR_isReal, mult_wR,
-    MeasureTheory.setLIntegral_map (GroundTheory.Global.measurableEmbedding_units_val.measurableSet_image' hpre)
+    MeasureTheory.setLIntegral_map
+      (GroundTheory.Global.measurableEmbedding_units_val.measurableSet_image' hpre)
       (measurable_density_unitsMeasure 1) e.symm.continuous.measurable,
     mulR, GroundTheory.Global.measurableEmbedding_units_val.comap_apply,
     withDensity_apply _ (GroundTheory.Global.measurableEmbedding_units_val.measurableSet_image' hA)]
@@ -73,19 +74,23 @@ theorem map_eRu : Measure.map eRu (infinitePlaceUnitsMeasure wR) = mulR := by
       refine ⟨eRu.symm r, by simpa using hr, ?_⟩
       rfl
   rw [hset]
-  refine setLIntegral_congr_fun (GroundTheory.Global.measurableEmbedding_units_val.measurableSet_image' hA) fun y _ => ?_
+  refine setLIntegral_congr_fun
+    (GroundTheory.Global.measurableEmbedding_units_val.measurableSet_image' hA) fun y _ => ?_
   rw [pow_one, he]
 
 theorem map_aR : Measure.map aR (infiniteIdeleMeasure ℚ) = mulR := by
   have h1 : Measurable aR := measurableEmbedding_aR.measurable
-  have h2 : Measurable (infiniteUnitsEquiv ℚ).symm := (infiniteUnitsEquiv ℚ).symm.continuous.measurable
+  have h2 : Measurable (infiniteUnitsEquiv ℚ).symm :=
+    (infiniteUnitsEquiv ℚ).symm.continuous.measurable
   rw [infiniteIdeleMeasure, Measure.map_map h1 h2]
-  have hc : aR ∘ (infiniteUnitsEquiv ℚ).symm =
-      eRu ∘ (MeasurableEquiv.piUnique fun w : InfinitePlace ℚ => (w.Completion)ˣ) := by
+  have hc
+      : aR ∘ (infiniteUnitsEquiv ℚ).symm
+        = eRu ∘ (MeasurableEquiv.piUnique fun w : InfinitePlace ℚ => (w.Completion)ˣ) := by
     funext p
     exact Units.ext rfl
   rw [hc, ← Measure.map_map eRu.continuous.measurable (MeasurableEquiv.measurable _)]
-  have hp := (measurePreserving_piUnique fun w : InfinitePlace ℚ => infinitePlaceUnitsMeasure w).map_eq
+  have hp :=
+    (measurePreserving_piUnique fun w : InfinitePlace ℚ => infinitePlaceUnitsMeasure w).map_eq
   convert congrArg (Measure.map eRu) hp using 2
   · exact (map_eRu).symm
 

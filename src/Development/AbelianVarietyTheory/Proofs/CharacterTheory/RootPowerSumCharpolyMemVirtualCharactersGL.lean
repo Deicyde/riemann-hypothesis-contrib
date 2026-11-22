@@ -16,8 +16,11 @@ open Polynomial GlobalTheory.CuspGL GlobalTheory.BI
 namespace GlobalTheory.CuspGL
 
 open Polynomial in
-private theorem sylow_normal_of_prime_pow_mem_center (E : Type) [Group E] [Finite E] (p : ℕ) [hp : Fact p.Prime] (P : Sylow p E)
-    (hE : ∀ (y : E), ∃ j, y ^ p ^ j ∈ Subgroup.center E) : (P : Subgroup E).Normal := by
+private theorem sylow_normal_of_prime_pow_mem_center
+    (E : Type) [Group E] [Finite E]
+    (p : ℕ) [hp : Fact p.Prime]
+    (P : Sylow p E) (hE : ∀ (y : E), ∃ j, y ^ p ^ j ∈ Subgroup.center E)
+    : (P : Subgroup E).Normal := by
   have hpq : IsPGroup p (E ⧸ Subgroup.center E) := by
     intro q
     induction q using QuotientGroup.induction_on with
@@ -39,10 +42,14 @@ private theorem sylow_normal_of_prime_pow_mem_center (E : Type) [Group E] [Finit
   exact sup_le (Subgroup.center_le_normalizer _) Subgroup.le_normalizer
 
 open Polynomial in
-private theorem exists_p_regular_split_of_normal_sylow_commute (E : Type) [Group E] [Finite E] (p : ℕ) [Fact p.Prime] (P : Sylow p E) [(P : Subgroup E).Normal]
-    (hcomm : ∀ x y : E, x ∈ (P : Subgroup E) → ¬ p ∣ orderOf y → Commute y x) :
-    ∃ H : Subgroup E, ∃ π : E →* H, ¬ p ∣ Nat.card H ∧
-      ∀ g, ∃ s, ∃ m : ℕ, g = (π g : E) * s ∧ Commute (π g : E) s ∧ s ^ p ^ m = 1 := by
+private theorem exists_p_regular_split_of_normal_sylow_commute
+    (E : Type) [Group E] [Finite E]
+    (p : ℕ) [Fact p.Prime]
+    (P : Sylow p E) [(P : Subgroup E).Normal]
+    (hcomm : ∀ x y : E, x ∈ (P : Subgroup E) → ¬ p ∣ orderOf y → Commute y x)
+    : ∃ H : Subgroup E, ∃ π : E →* H,
+      ¬ p ∣ Nat.card H
+        ∧ ∀ g, ∃ s, ∃ m : ℕ, g = (π g : E) * s ∧ Commute (π g : E) s ∧ s ^ p ^ m = 1 := by
   obtain ⟨H, hPH⟩ := Subgroup.exists_right_complement'_of_coprime P.card_coprime_index
   have hHP := hPH.symm
   refine ⟨H, hHP.QuotientMulEquiv.toMonoidHom.comp (QuotientGroup.mk' (P : Subgroup E)), ?_, ?_⟩
@@ -78,10 +85,13 @@ private theorem exists_p_regular_split_of_normal_sylow_commute (E : Type) [Group
       simpa using this
 
 open Polynomial in
-private theorem exists_p_regular_split_of_pow_mem_center (E : Type) [Group E] [Finite E] (p : ℕ) [hp : Fact p.Prime]
-    (hE : ∃ l, Nat.Prime l ∧ ∀ (y : E), ∃ j, y ^ l ^ j ∈ Subgroup.center E) :
-    ∃ H : Subgroup E, ∃ π : E →* H, ¬ p ∣ Nat.card H ∧
-      ∀ g, ∃ s, ∃ m : ℕ, g = (π g : E) * s ∧ Commute (π g : E) s ∧ s ^ p ^ m = 1 := by
+private theorem exists_p_regular_split_of_pow_mem_center
+    (E : Type) [Group E] [Finite E]
+    (p : ℕ) [hp : Fact p.Prime]
+    (hE : ∃ l, Nat.Prime l ∧ ∀ (y : E), ∃ j, y ^ l ^ j ∈ Subgroup.center E)
+    : ∃ H : Subgroup E, ∃ π : E →* H,
+      ¬ p ∣ Nat.card H
+        ∧ ∀ g, ∃ s, ∃ m : ℕ, g = (π g : E) * s ∧ Commute (π g : E) s ∧ s ^ p ^ m = 1 := by
   obtain ⟨l, hl, hy⟩ := hE
   obtain ⟨P⟩ := (inferInstance : Nonempty (Sylow p E))
   have hcen : ∀ y : E, Nat.Coprime l (orderOf y) → y ∈ Subgroup.center E := by
@@ -111,13 +121,18 @@ private theorem exists_p_regular_split_of_pow_mem_center (E : Type) [Group E] [F
     exact Subgroup.mem_center_iff.1 (hPc x hx) y
 
 open Polynomial in
-private theorem powerSum_roots_charpoly_complex_mem_virt (G : Type) [Group G] [Finite G] (n : ℕ) (ρ : G →* GL (Fin n) ℂ) (r : ℕ) :
-    (fun g => (Multiset.map (fun x => x ^ r) ((ρ g : Matrix (Fin n) (Fin n) ℂ).charpoly.roots)).sum)
+private theorem powerSum_roots_charpoly_complex_mem_virt
+    (G : Type) [Group G] [Finite G] (n : ℕ) (ρ : G →* GL (Fin n) ℂ) (r : ℕ)
+    : (fun g =>
+        (Multiset.map (fun x => x ^ r) ((ρ g : Matrix (Fin n) (Fin n) ℂ).charpoly.roots)).sum)
       ∈ _root_.GlobalTheory.BI.Virt ℂ ℂ G := by
   have hmul := (_root_.GlobalTheory.BI.virt_mul_comap_conj_ind_linear G).1
-  have he : ∀ j, (fun g => (ρ g : Matrix (Fin n) (Fin n) ℂ).charpoly.roots.esymm j)
-      ∈ _root_.GlobalTheory.BI.Virt ℂ ℂ G := fun j =>
-    _root_.GlobalTheory.BI.isChar_mem_virt_complex (_root_.GlobalTheory.BI.isChar_esymm_roots_charpoly G n j ρ)
+  have he
+      : ∀ j,
+        (fun g => (ρ g : Matrix (Fin n) (Fin n) ℂ).charpoly.roots.esymm j)
+          ∈ _root_.GlobalTheory.BI.Virt ℂ ℂ G := fun j =>
+    _root_.GlobalTheory.BI.isChar_mem_virt_complex
+      (_root_.GlobalTheory.BI.isChar_esymm_roots_charpoly G n j ρ)
   have hconst : ∀ c : ℤ, (fun _ : G => (c : ℂ)) ∈ _root_.GlobalTheory.BI.Virt ℂ ℂ G := by
     intro c
     have h1 : (fun _ : G => (1 : ℂ)) ∈ _root_.GlobalTheory.BI.Virt ℂ ℂ G :=
@@ -132,46 +147,65 @@ private theorem powerSum_roots_charpoly_complex_mem_virt (G : Type) [Group G] [F
     · convert hconst n using 1
       funext g
       simp [_root_.GlobalTheory.CharpolyPow.card_roots_charpoly]
-    · have rootSum_charpoly_mem_virt_of_pow_mem_center : (fun g => (Multiset.map (fun x => x ^ r) ((ρ g : Matrix (Fin n) (Fin n) ℂ).charpoly.roots)).sum)
-          = (fun _ => (((-1) ^ (r + 1) * r : ℤ) : ℂ)) * (fun g => (ρ g : Matrix (Fin n) (Fin n) ℂ).charpoly.roots.esymm r)
-            - ∑ i ∈ Finset.Ioo 0 r, ((fun _ => (((-1) ^ i : ℤ) : ℂ)) * (fun g => (ρ g : Matrix (Fin n) (Fin n) ℂ).charpoly.roots.esymm i)
-              * (fun g => (Multiset.map (fun x => x ^ (r - i)) ((ρ g : Matrix (Fin n) (Fin n) ℂ).charpoly.roots)).sum)) := by
-        funext g
-        rw [_root_.GlobalTheory.multiset_newton_psum _ r hr]
-        simp [Finset.sum_apply]
+    · have rootSum_charpoly_mem_virt_of_pow_mem_center
+          : (fun g =>
+              (Multiset.map (fun x => x ^ r) ((ρ g : Matrix (Fin n) (Fin n) ℂ).charpoly.roots)).sum)
+            = (fun _ => (((-1) ^ (r + 1) * r : ℤ) : ℂ))
+                * (fun g => (ρ g : Matrix (Fin n) (Fin n) ℂ).charpoly.roots.esymm r)
+              - ∑ i ∈ Finset.Ioo 0 r, ((fun _ => (((-1) ^ i : ℤ) : ℂ)) * (fun g => (ρ g : Matrix (Fin n) (Fin n) ℂ).charpoly.roots.esymm i)
+                * (fun g => (Multiset.map (fun x => x ^ (r - i)) ((ρ g : Matrix (Fin n) (Fin n) ℂ).charpoly.roots)).sum)) :=
+        by
+          funext g
+          rw [_root_.GlobalTheory.multiset_newton_psum _ r hr]
+          simp [Finset.sum_apply]
       rw [rootSum_charpoly_mem_virt_of_pow_mem_center]
       refine sub_mem (hmul _ (hconst _) _ (he r)) (sum_mem fun i hi => ?_)
       have hi' := Finset.mem_Ioo.1 hi
       exact hmul _ (hmul _ (hconst _) _ (he i)) _ (ih (r - i) (by omega))
 
 open Polynomial in
-private theorem powerSum_roots_charpoly_mem_virt_of_abByP (k : Type) [Field k] [IsAlgClosed k] (θ : k →* ℂ)
-    (hθ : ∀ x y : k, x ≠ 0 → y ≠ 0 → θ x = θ y → x = y) (H : Type) [Group H] [Finite H]
-    (hab : _root_.GlobalTheory.BI.AbByP H) (hc : (Nat.card H : k) ≠ 0) (n : ℕ) (ρ : H →* GL (Fin n) k) (r : ℕ) :
-    (fun g => (Multiset.map (fun α => θ α ^ r) ((ρ g : Matrix (Fin n) (Fin n) k).charpoly.roots)).sum)
+private theorem powerSum_roots_charpoly_mem_virt_of_abByP
+    (k : Type) [Field k] [IsAlgClosed k]
+    (θ : k →* ℂ) (hθ : ∀ x y : k, x ≠ 0 → y ≠ 0 → θ x = θ y → x = y)
+    (H : Type) [Group H] [Finite H]
+    (hab : _root_.GlobalTheory.BI.AbByP H) (hc : (Nat.card H : k) ≠ 0)
+    (n : ℕ) (ρ : H →* GL (Fin n) k)
+    (r : ℕ)
+    : (fun g =>
+        (Multiset.map (fun α => θ α ^ r) ((ρ g : Matrix (Fin n) (Fin n) k).charpoly.roots)).sum)
       ∈ _root_.GlobalTheory.BI.Virt ℂ ℂ H := by
-  obtain ⟨m, ρC, hC⟩ := (_root_.GlobalTheory.BI.matrixChar_iff_isChar H _).2
-    (_root_.GlobalTheory.CuspGL.isChar_brauerLift k θ hθ H hab hc n ρ)
+  obtain ⟨m, ρC, hC⟩ :=
+    (_root_.GlobalTheory.BI.matrixChar_iff_isChar H _).2
+      (_root_.GlobalTheory.CuspGL.isChar_brauerLift k θ hθ H hab hc n ρ)
   convert powerSum_roots_charpoly_complex_mem_virt H m ρC r using 1
   funext g
-  have h1 : Multiset.map (fun α => θ α ^ r) ((ρ g : Matrix (Fin n) (Fin n) k).charpoly.roots)
-      = Multiset.map θ ((ρ (g ^ r) : Matrix (Fin n) (Fin n) k).charpoly.roots) := by
-    rw [map_pow, Units.val_pow_eq_pow_val, _root_.GlobalTheory.CharpolyPow.roots_charpoly_pow, Multiset.map_map]
+  have h1
+      : Multiset.map (fun α => θ α ^ r) ((ρ g : Matrix (Fin n) (Fin n) k).charpoly.roots)
+        = Multiset.map θ ((ρ (g ^ r) : Matrix (Fin n) (Fin n) k).charpoly.roots) := by
+    rw [map_pow, Units.val_pow_eq_pow_val, _root_.GlobalTheory.CharpolyPow.roots_charpoly_pow,
+      Multiset.map_map]
     simp [Function.comp_def, map_pow]
   have h2 := hC (g ^ r)
   rw [h1, h2, map_pow, Units.val_pow_eq_pow_val, Matrix.trace_eq_sum_roots_charpoly,
     _root_.GlobalTheory.CharpolyPow.roots_charpoly_pow]
 
 open Polynomial in
-private theorem powerSum_roots_charpoly_mem_virt_of_split (k : Type) [Field k] [IsAlgClosed k] (p : ℕ) [Fact p.Prime] [CharP k p] (θ : k →* ℂ)
-    (hθ : ∀ x y : k, x ≠ 0 → y ≠ 0 → θ x = θ y → x = y) (E : Type) [Group E] [Finite E]
-    (hab : _root_.GlobalTheory.BI.AbByP E) (H : Subgroup E) (π : E →* H) (hc : (Nat.card H : k) ≠ 0)
+private theorem powerSum_roots_charpoly_mem_virt_of_split
+    (k : Type) [Field k] [IsAlgClosed k]
+    (p : ℕ) [Fact p.Prime] [CharP k p]
+    (θ : k →* ℂ) (hθ : ∀ x y : k, x ≠ 0 → y ≠ 0 → θ x = θ y → x = y)
+    (E : Type) [Group E] [Finite E]
+    (hab : _root_.GlobalTheory.BI.AbByP E)
+    (H : Subgroup E) (π : E →* H) (hc : (Nat.card H : k) ≠ 0)
     (hdec : ∀ g, ∃ s, ∃ m : ℕ, g = (π g : E) * s ∧ Commute (π g : E) s ∧ s ^ p ^ m = 1)
-    (n : ℕ) (ρ : E →* GL (Fin n) k) (r : ℕ) :
-    (fun g => (Multiset.map (fun α => θ α ^ r) ((ρ g : Matrix (Fin n) (Fin n) k).charpoly.roots)).sum)
+    (n : ℕ) (ρ : E →* GL (Fin n) k)
+    (r : ℕ)
+    : (fun g =>
+        (Multiset.map (fun α => θ α ^ r) ((ρ g : Matrix (Fin n) (Fin n) k).charpoly.roots)).sum)
       ∈ _root_.GlobalTheory.BI.Virt ℂ ℂ E := by
-  have hH := powerSum_roots_charpoly_mem_virt_of_abByP k θ hθ H (_root_.GlobalTheory.BI.AbByP.subgroup E H hab) hc n
-    (ρ.comp H.subtype) r
+  have hH :=
+    powerSum_roots_charpoly_mem_virt_of_abByP k θ hθ H
+      (_root_.GlobalTheory.BI.AbByP.subgroup E H hab) hc n (ρ.comp H.subtype) r
   have := (_root_.GlobalTheory.BI.virt_mul_comap_conj_ind_linear H).2.1 _ hH E π
   convert this using 1
   funext g
@@ -182,17 +216,23 @@ private theorem powerSum_roots_charpoly_mem_virt_of_split (k : Type) [Field k] [
   rw [map_mul, Units.val_mul]
   have hinj : Function.Injective (fun x : k => x ^ p ^ m) := iterateFrobenius_inj k p m
   apply Multiset.map_injective hinj
-  rw [← _root_.GlobalTheory.CharpolyPow.roots_charpoly_pow, ← _root_.GlobalTheory.CharpolyPow.roots_charpoly_pow]
+  rw [← _root_.GlobalTheory.CharpolyPow.roots_charpoly_pow,
+    ← _root_.GlobalTheory.CharpolyPow.roots_charpoly_pow]
   have hc' : Commute (ρ (π g : E) : Matrix (Fin n) (Fin n) k) (ρ s : Matrix (Fin n) (Fin n) k) := by
     have := (hcs.map ρ).units_val
     exact this
   rw [hc'.mul_pow, ← Units.val_pow_eq_pow_val (ρ s), ← map_pow, hs, map_one, Units.val_one, mul_one]
 
 open Polynomial in
-private theorem rootSum_charpoly_mem_virt_of_pow_mem_center (F : Type) [Field F] [Finite F] (θ : AlgebraicClosure F →* ℂ)
-    (hθ : ∀ x y : AlgebraicClosure F, x ≠ 0 → y ≠ 0 → θ x = θ y → x = y) (n k : ℕ)
-    (E : Subgroup (GL (Fin n) F)) (hE : ∃ l, Nat.Prime l ∧ ∀ (y : E), ∃ j, y ^ l ^ j ∈ Subgroup.center E) :
-    (fun x : E => _root_.GlobalTheory.CuspGL.rootSum θ k (Matrix.charpoly ((x : GL (Fin n) F) : Matrix (Fin n) (Fin n) F)))
+private theorem rootSum_charpoly_mem_virt_of_pow_mem_center
+    (F : Type) [Field F] [Finite F]
+    (θ : AlgebraicClosure F →* ℂ)
+    (hθ : ∀ x y : AlgebraicClosure F, x ≠ 0 → y ≠ 0 → θ x = θ y → x = y)
+    (n k : ℕ) (E : Subgroup (GL (Fin n) F))
+    (hE : ∃ l, Nat.Prime l ∧ ∀ (y : E), ∃ j, y ^ l ^ j ∈ Subgroup.center E)
+    : (fun x : E =>
+        _root_.GlobalTheory.CuspGL.rootSum θ k
+          (Matrix.charpoly ((x : GL (Fin n) F) : Matrix (Fin n) (Fin n) F)))
       ∈ _root_.GlobalTheory.BI.Virt ℂ ℂ E := by
   obtain ⟨p, hchar⟩ := CharP.exists F
   haveI := hchar
@@ -201,8 +241,14 @@ private theorem rootSum_charpoly_mem_virt_of_pow_mem_center (F : Type) [Field F]
     charP_of_injective_algebraMap (algebraMap F (AlgebraicClosure F)).injective p
   have hab : _root_.GlobalTheory.BI.AbByP E := by
     obtain ⟨l, hl, hy⟩ := hE
-    exact ⟨l, hl, Subgroup.center E, inferInstance,
-      fun a ha b _ => (Subgroup.mem_center_iff.1 ha b).symm, hy⟩
+    exact ⟨
+      l,
+      hl,
+      Subgroup.center E,
+      inferInstance,
+      fun a ha b _ => (Subgroup.mem_center_iff.1 ha b).symm,
+      hy
+    ⟩
   obtain ⟨H, π, hnd, hdec⟩ := exists_p_regular_split_of_pow_mem_center E p hE
   let ρ : E →* GL (Fin n) (AlgebraicClosure F) :=
     (Units.map (algebraMap F (AlgebraicClosure F)).mapMatrix.toMonoidHom).comp E.subtype
@@ -213,28 +259,37 @@ private theorem rootSum_charpoly_mem_virt_of_pow_mem_center (F : Type) [Field F]
   congr 3
   simp [ρ, Matrix.charpoly_map]
 
-
 open Polynomial in
-theorem _root_.GlobalTheory.CuspGL.rootSum_charpoly_mem_virt (F : Type) [Field F] [Finite F] (θ : AlgebraicClosure F →* ℂ)
-    (hθ : ∀ x y : AlgebraicClosure F, x ≠ 0 → y ≠ 0 → θ x = θ y → x = y) (n k : ℕ) :
-    (fun x : GL (Fin n) F => _root_.GlobalTheory.CuspGL.rootSum θ k (Matrix.charpoly (x : Matrix (Fin n) (Fin n) F)))
+theorem _root_.GlobalTheory.CuspGL.rootSum_charpoly_mem_virt
+    (F : Type) [Field F] [Finite F]
+    (θ : AlgebraicClosure F →* ℂ)
+    (hθ : ∀ x y : AlgebraicClosure F, x ≠ 0 → y ≠ 0 → θ x = θ y → x = y)
+    (n k : ℕ)
+    : (fun x : GL (Fin n) F =>
+        _root_.GlobalTheory.CuspGL.rootSum θ k (Matrix.charpoly (x : Matrix (Fin n) (Fin n) F)))
       ∈ _root_.GlobalTheory.BI.Virt ℂ ℂ (GL (Fin n) F) := by
   set χ : GL (Fin n) F → ℂ := fun x => _root_.GlobalTheory.CuspGL.rootSum θ k (Matrix.charpoly (x : Matrix (Fin n) (Fin n) F)) with hχ
-  obtain ⟨hmul, -, -, hind, -⟩ := _root_.GlobalTheory.BI.virt_mul_comap_conj_ind_linear (GL (Fin n) F)
+  obtain ⟨hmul, -, -, hind, -⟩ :=
+    _root_.GlobalTheory.BI.virt_mul_comap_conj_ind_linear (GL (Fin n) F)
   have hcl : ∀ (g x : GL (Fin n) F), χ (x⁻¹ * g * x) = χ g := by
     intro g x
     show _root_.GlobalTheory.CuspGL.rootSum θ k _ = _root_.GlobalTheory.CuspGL.rootSum θ k _
     congr 1
     simpa [Units.val_mul] using Matrix.charpoly_units_conj' x (g : Matrix (Fin n) (Fin n) F)
   have h1 := _root_.GlobalTheory.BI.one_mem_closure_ind_centralByPrime (GL (Fin n) F)
-  have H := AddSubgroup.closure_induction (p := fun φ _ => φ * χ ∈ _root_.GlobalTheory.BI.Virt ℂ ℂ (GL (Fin n) F))
-    (fun φ hφ => by
-      obtain ⟨E, ψ, hE, hψ, rfl⟩ := hφ
-      rw [_root_.GlobalTheory.BI.ind_mul_classFun_eq_ind_mul_restrict _ E ψ χ hcl]
-      exact hind E _ ((_root_.GlobalTheory.BI.virt_mul_comap_conj_ind_linear E).1 _ hψ _ (rootSum_charpoly_mem_virt_of_pow_mem_center F θ hθ n k E hE)))
-    (by simpa using (_root_.GlobalTheory.BI.Virt ℂ ℂ (GL (Fin n) F)).zero_mem)
-    (fun a b _ _ ha hb => by rw [add_mul]; exact add_mem ha hb)
-    (fun a _ ha => by rw [neg_mul]; exact neg_mem ha) h1
+  have H :=
+    AddSubgroup.closure_induction
+      (p := fun φ _ => φ * χ ∈ _root_.GlobalTheory.BI.Virt ℂ ℂ (GL (Fin n) F))
+      (fun φ hφ => by
+        obtain ⟨E, ψ, hE, hψ, rfl⟩ := hφ
+        rw [_root_.GlobalTheory.BI.ind_mul_classFun_eq_ind_mul_restrict _ E ψ χ hcl]
+        exact hind E _
+          ((_root_.GlobalTheory.BI.virt_mul_comap_conj_ind_linear E).1 _ hψ _
+            (rootSum_charpoly_mem_virt_of_pow_mem_center F θ hθ n k E hE)))
+      (by simpa using (_root_.GlobalTheory.BI.Virt ℂ ℂ (GL (Fin n) F)).zero_mem)
+      (fun a b _ _ ha hb => by rw [add_mul]; exact add_mem ha hb)
+      (fun a _ ha => by rw [neg_mul]; exact neg_mem ha)
+      h1
   simpa using H
 
 end GlobalTheory.CuspGL

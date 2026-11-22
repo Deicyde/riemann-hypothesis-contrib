@@ -9,22 +9,25 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open PositivityTheory.PfSWUS.Loc GlobalTheory.CompanionTheory.UnrDens GlobalTheory.CompanionTheory.SiegLoc Filter Topology
+open PositivityTheory.PfSWUS.Loc GlobalTheory.CompanionTheory.UnrDens
+  GlobalTheory.CompanionTheory.SiegLoc Filter Topology
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.SiegLoc.Scaled
 
-theorem sum_comp_surj {A B : Type} [AddCommGroup A] [AddCommGroup B] [Fintype A] [Fintype B]
-    (π : A →+ B) (hπ : Function.Surjective π) (G : B → ℂ) :
-    (Fintype.card B : ℂ) * ∑ a, G (π a) = (Fintype.card A : ℂ) * ∑ b, G b :=
+theorem sum_comp_surj
+    {A B : Type} [AddCommGroup A] [AddCommGroup B] [Fintype A] [Fintype B]
+    (π : A →+ B) (hπ : Function.Surjective π)
+    (G : B → ℂ)
+    : (Fintype.card B : ℂ) * ∑ a, G (π a) = (Fintype.card A : ℂ) * ∑ b, G b :=
   _root_.UpperTheory.Reformulated.B.Rd1.sum_comp_surj π hπ G
 
 variable {R : Type} [CommRing R]
 
-theorem fixed_decomp {σ : R →+* R} {ϖ : R} {q : ℕ} {ε : ℤ} (hR : IsUnrQuad R σ ϖ q ε)
-    (k : ℕ) (d : R) (hd : σ d = d) :
-    d ∈ lev ϖ k ∨ ∃ a₀ e c, k = e + a₀ ∧ σ c = c ∧ c ∉ lev ϖ 1 ∧ d = ϖ ^ a₀ * c := by
+theorem fixed_decomp
+    {σ : R →+* R} {ϖ : R} {q : ℕ} {ε : ℤ} (hR : IsUnrQuad R σ ϖ q ε) (k : ℕ) (d : R) (hd : σ d = d)
+    : d ∈ lev ϖ k ∨ ∃ a₀ e c, k = e + a₀ ∧ σ c = c ∧ c ∉ lev ϖ 1 ∧ d = ϖ ^ a₀ * c := by
   induction k with
   | zero => left; simp [lev]
   | succ k ih =>
@@ -47,8 +50,8 @@ theorem unit_notMem {ϖ x : R} (hϖ : ¬ IsUnit ϖ) (hx : IsUnit x) : x ∉ lev 
   obtain ⟨t, rfl⟩ := mem_lev_iff.1 h
   exact hϖ (by simpa using isUnit_of_mul_isUnit_left hx)
 
-theorem mul_mem_lev_iff {ϖ c : R} (hreg : IsSMulRegular R ϖ) (hc : IsUnit c) (e a₀ : ℕ) (y : R) :
-    ϖ ^ a₀ * c * y ∈ lev ϖ (e + a₀) ↔ y ∈ lev ϖ e := by
+theorem mul_mem_lev_iff {ϖ c : R} (hreg : IsSMulRegular R ϖ) (hc : IsUnit c) (e a₀ : ℕ) (y : R)
+    : ϖ ^ a₀ * c * y ∈ lev ϖ (e + a₀) ↔ y ∈ lev ϖ e := by
   constructor
   · intro h
     obtain ⟨t, ht⟩ := mem_lev_iff.1 h
@@ -59,37 +62,39 @@ theorem mul_mem_lev_iff {ϖ c : R} (hreg : IsSMulRegular R ϖ) (hc : IsUnit c) (
       ring
     obtain ⟨v, hv⟩ := hc.exists_left_inv
     refine mem_lev_iff.2 ⟨v * t, ?_⟩
-    calc y = v * (c * y) := by rw [← mul_assoc, hv, one_mul]
+    calc
+      y = v * (c * y) := by rw [← mul_assoc, hv, one_mul]
       _ = ϖ ^ e * (v * t) := by rw [h1]; ring
   · intro h
     obtain ⟨t, rfl⟩ := mem_lev_iff.1 h
     exact mem_lev_iff.2 ⟨c * t, by rw [pow_add]; ring⟩
 
-theorem card_range_mul {ϖ c : R} (hreg : IsSMulRegular R ϖ) (hc : IsUnit c) (e a₀ : ℕ) :
-    Nat.card (Set.range fun w : R ⧸ lev ϖ (e + a₀) =>
-      w * Ideal.Quotient.mk (lev ϖ (e + a₀)) (ϖ ^ a₀ * c)) = Nat.card (R ⧸ lev ϖ e) := by
+theorem card_range_mul {ϖ c : R} (hreg : IsSMulRegular R ϖ) (hc : IsUnit c) (e a₀ : ℕ)
+    : Nat.card (Set.range fun w : R ⧸ lev ϖ (e + a₀) =>
+        w * Ideal.Quotient.mk (lev ϖ (e + a₀)) (ϖ ^ a₀ * c))
+      = Nat.card (R ⧸ lev ϖ e) := by
   have hsurj : Function.Surjective (Ideal.Quotient.mk (lev ϖ e)) := Ideal.Quotient.mk_surjective
   set s := Function.surjInv hsurj with hsdef
   have hs : ∀ x, Ideal.Quotient.mk (lev ϖ e) (s x) = x := Function.surjInv_eq hsurj
-  let φ : R ⧸ lev ϖ e → R ⧸ lev ϖ (e + a₀) :=
-    fun x => Ideal.Quotient.mk (lev ϖ (e + a₀)) (ϖ ^ a₀ * c * s x)
+  let φ : R ⧸ lev ϖ e → R ⧸ lev ϖ (e + a₀) := fun x =>
+    Ideal.Quotient.mk (lev ϖ (e + a₀)) (ϖ ^ a₀ * c * s x)
   have hinj : Function.Injective φ := by
     intro x x' hxx
-    have h1 : ϖ ^ a₀ * c * s x - ϖ ^ a₀ * c * s x' ∈ lev ϖ (e + a₀) :=
-      Ideal.Quotient.eq.1 hxx
+    have h1 : ϖ ^ a₀ * c * s x - ϖ ^ a₀ * c * s x' ∈ lev ϖ (e + a₀) := Ideal.Quotient.eq.1 hxx
     rw [← mul_sub] at h1
     have h2 := (mul_mem_lev_iff hreg hc e a₀ _).1 h1
     rw [← hs x, ← hs x']
     exact Ideal.Quotient.eq.2 h2
-  have hrange : (Set.range fun w : R ⧸ lev ϖ (e + a₀) =>
-      w * Ideal.Quotient.mk (lev ϖ (e + a₀)) (ϖ ^ a₀ * c)) = Set.range φ := by
+  have hrange
+      : (Set.range fun w : R ⧸ lev ϖ (e + a₀) =>
+          w * Ideal.Quotient.mk (lev ϖ (e + a₀)) (ϖ ^ a₀ * c))
+        = Set.range φ := by
     ext z
     constructor
     · rintro ⟨w, rfl⟩
       obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective w
       refine ⟨Ideal.Quotient.mk (lev ϖ e) y, ?_⟩
-      have h1 : s (Ideal.Quotient.mk (lev ϖ e) y) - y ∈ lev ϖ e :=
-        Ideal.Quotient.eq.1 (hs _)
+      have h1 : s (Ideal.Quotient.mk (lev ϖ e) y) - y ∈ lev ϖ e := Ideal.Quotient.eq.1 (hs _)
       have h2 := (mul_mem_lev_iff hreg hc e a₀ _).2 h1
       rw [mul_sub] at h2
       have h3 := Ideal.Quotient.eq.2 h2
@@ -102,7 +107,24 @@ theorem card_range_mul {ϖ c : R} (hreg : IsSMulRegular R ϖ) (hc : IsUnit c) (e
   rw [hrange]
   exact Nat.card_congr (Equiv.ofInjective φ hinj).symm
 
-theorem gauss_image_level : ∀ (R : Type) [CommRing R] (σ : R →+* R) (ϖ : R) (q : ℕ) (ε : ℤ) (hR : IsUnrQuad R σ ϖ q ε) [∀ k, Fintype (R ⧸ lev ϖ k)] (ψ : ∀ k, AddChar (R ⧸ lev ϖ k) ℂ), IsLevelChars σ ϖ ψ → (∀ (j : ℕ) (a : R), σ a = a → a ∉ lev ϖ 1 → (∑ w : R ⧸ lev ϖ j, ψ j (Ideal.Quotient.mk (lev ϖ j) a * (barσ σ ϖ hR.fix_ϖ j w * w))) = ((ε : ℂ) * q) ^ j) → ∀ (k : ℕ) (d : R), σ d = d → ∃ e : ℕ, e ≤ k ∧ Nat.card (Set.range fun w : R ⧸ lev ϖ k => w * Ideal.Quotient.mk (lev ϖ k) d) = (q ^ 2) ^ e ∧ ∀ a : R, σ a = a → a ∉ lev ϖ 1 → (∑ w : R ⧸ lev ϖ k, ψ k (Ideal.Quotient.mk (lev ϖ k) (a * d) * (barσ σ ϖ hR.fix_ϖ k w * w))) = (q : ℂ) ^ (2 * k) * ((ε : ℂ) / q) ^ e := by
+theorem gauss_image_level
+    : ∀ (R : Type) [CommRing R] (σ : R →+* R) (ϖ : R) (q : ℕ) (ε : ℤ) (hR : IsUnrQuad R σ ϖ q ε)
+        [∀ k, Fintype (R ⧸ lev ϖ k)] (ψ : ∀ k, AddChar (R ⧸ lev ϖ k) ℂ),
+      IsLevelChars σ ϖ ψ
+        → (∀ (j : ℕ) (a : R),
+          σ a = a → a ∉ lev ϖ 1
+            → (∑ w : R ⧸ lev ϖ j, ψ j (Ideal.Quotient.mk (lev ϖ j) a * (barσ σ ϖ hR.fix_ϖ j w * w)))
+              = ((ε : ℂ) * q) ^ j)
+        → ∀ (k : ℕ) (d : R),
+          σ d = d
+            → ∃ e : ℕ,
+              e ≤ k
+                ∧ Nat.card (Set.range fun w : R ⧸ lev ϖ k => w * Ideal.Quotient.mk (lev ϖ k) d)
+                  = (q ^ 2) ^ e
+                ∧ ∀ a : R,
+                  σ a = a → a ∉ lev ϖ 1
+                    → (∑ w : R ⧸ lev ϖ k, ψ k (Ideal.Quotient.mk (lev ϖ k) (a * d) * (barσ σ ϖ hR.fix_ϖ k w * w)))
+                      = (q : ℂ) ^ (2 * k) * ((ε : ℂ) / q) ^ e := by
   intro R _ σ ϖ q ε hR _ ψ hψ H k d hd
   have hq : (q : ℂ) ≠ 0 := by
     have : q ≠ 0 := by have := hR.one_lt; omega
@@ -120,13 +142,14 @@ theorem gauss_image_level : ∀ (R : Type) [CommRing R] (σ : R →+* R) (ϖ : R
       simp
     · intro a _ _
       have hz' : Ideal.Quotient.mk (lev ϖ k) (a * d) = 0 := by rw [map_mul, hz, mul_zero]
-      simp only [hz', zero_mul, AddChar.map_zero_eq_one, Finset.sum_const, Finset.card_univ,
-        hcard, nsmul_eq_mul, mul_one, pow_zero]
+      simp only [hz', zero_mul, AddChar.map_zero_eq_one, Finset.sum_const, Finset.card_univ, hcard,
+        nsmul_eq_mul, mul_one, pow_zero]
       push_cast
       rfl
   · have hcu : IsUnit c := hR.fixLocal c hc hc1
     refine ⟨e, by omega, ?_, ?_⟩
-    · rw [card_range_mul hR.reg hcu e a₀, GlobalTheory.T.unramified_quotient_card R σ ϖ q ε hR e, pow_mul]
+    · rw [card_range_mul hR.reg hcu e a₀, GlobalTheory.T.unramified_quotient_card R σ ϖ q ε hR e,
+        pow_mul]
     · intro a ha ha1
       have hau : IsUnit a := hR.fixLocal a ha ha1
       have hac : a * c ∉ lev ϖ 1 := unit_notMem hR.notUnit (hau.mul hcu)
@@ -135,24 +158,26 @@ theorem gauss_image_level : ∀ (R : Type) [CommRing R] (σ : R →+* R) (ϖ : R
         intro x hx
         obtain ⟨t, rfl⟩ := mem_lev_iff.1 hx
         exact mem_lev_iff.2 ⟨ϖ ^ a₀ * t, by rw [pow_add]; ring⟩
-      let π : (R ⧸ lev ϖ (e + a₀)) →+ (R ⧸ lev ϖ e) :=
-        (Ideal.Quotient.factor hle).toAddMonoidHom
+      let π : (R ⧸ lev ϖ (e + a₀)) →+ (R ⧸ lev ϖ e) := (Ideal.Quotient.factor hle).toAddMonoidHom
       have hπ : Function.Surjective π := by
         intro x
         obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective x
         exact ⟨Ideal.Quotient.mk _ y, rfl⟩
       let G : R ⧸ lev ϖ e → ℂ := fun v =>
         ψ e (Ideal.Quotient.mk (lev ϖ e) (a * c) * (barσ σ ϖ hR.fix_ϖ e v * v))
-      have hF : ∀ w : R ⧸ lev ϖ (e + a₀),
-          ψ (e + a₀) (Ideal.Quotient.mk (lev ϖ (e + a₀)) (a * (ϖ ^ a₀ * c)) *
-            (barσ σ ϖ hR.fix_ϖ (e + a₀) w * w)) = G (π w) := by
+      have hF
+          : ∀ w : R ⧸ lev ϖ (e + a₀),
+            ψ (e + a₀)
+                (Ideal.Quotient.mk (lev ϖ (e + a₀)) (a * (ϖ ^ a₀ * c))
+                  * (barσ σ ϖ hR.fix_ϖ (e + a₀) w * w))
+              = G (π w) := by
         intro w
         obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective w
         have h1 := psi_pow hψ e a₀ (a * c * (σ y * y))
-        change ψ (e + a₀) (Ideal.Quotient.mk _ (a * (ϖ ^ a₀ * c)) *
-            (Ideal.Quotient.mk _ (σ y) * Ideal.Quotient.mk _ y)) =
-          ψ e (Ideal.Quotient.mk _ (a * c) *
-            (Ideal.Quotient.mk _ (σ y) * Ideal.Quotient.mk _ y))
+        change ψ (e + a₀)
+            (Ideal.Quotient.mk _ (a * (ϖ ^ a₀ * c))
+              * (Ideal.Quotient.mk _ (σ y) * Ideal.Quotient.mk _ y))
+          = ψ e (Ideal.Quotient.mk _ (a * c) * (Ideal.Quotient.mk _ (σ y) * Ideal.Quotient.mk _ y))
         rw [← map_mul, ← map_mul, ← map_mul, ← map_mul, ← h1]
         congr 2
         ring
@@ -162,8 +187,8 @@ theorem gauss_image_level : ∀ (R : Type) [CommRing R] (σ : R →+* R) (ϖ : R
       rw [h3, hcard, hcard] at h2
       push_cast at h2
       have hqe : (q : ℂ) ^ (2 * e) ≠ 0 := pow_ne_zero _ hq
-      have h4 : ∑ w, G (π w) =
-          (q : ℂ) ^ (2 * (e + a₀)) * ((ε : ℂ) * q) ^ e / (q : ℂ) ^ (2 * e) := by
+      have h4
+          : ∑ w, G (π w) = (q : ℂ) ^ (2 * (e + a₀)) * ((ε : ℂ) * q) ^ e / (q : ℂ) ^ (2 * e) := by
         rw [← h2]
         field_simp
       rw [h4, mul_pow, div_pow]

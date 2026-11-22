@@ -77,16 +77,22 @@ private lemma core {e0 γ C : ℝ}
         rw [hX, Real.div_rpow (sq_nonneg _) hL.le, hd0p, hLp]
         ring
 
-theorem lintegral_insertFiber_le (hC1 : C1) (hK : KER) {e0 γ : ℝ} (he0 : 0 < e0) (hγ : e0 < γ) (hγ2 : γ < 2) :
-    ∃ CK : ℝ, 0 < CK ∧ ∀ {p m : ℕ} (y : Yp p m),
-      ∫⁻ z : ℂ, ENNReal.ofReal (de (ins y z) 0 ^ (-(2 - e0))) * (‖z‖₊ : ℝ≥0∞) ^ (-γ) ≤
-        ENNReal.ofReal (CK * Lsq (tailPt y) 1 ^ (-1 + γ / 2) * de (tailPt y) 0 ^ (-(γ - e0))) := by
+theorem lintegral_insertFiber_le
+    (hC1 : C1) (hK : KER) {e0 γ : ℝ} (he0 : 0 < e0) (hγ : e0 < γ) (hγ2 : γ < 2)
+    : ∃ CK : ℝ,
+      0 < CK
+        ∧ ∀ {p m : ℕ} (y : Yp p m),
+          ∫⁻ z : ℂ, ENNReal.ofReal (de (ins y z) 0 ^ (-(2 - e0))) * (‖z‖₊ : ℝ≥0∞) ^ (-γ)
+            ≤ ENNReal.ofReal
+              (CK * Lsq (tailPt y) 1 ^ (-1 + γ / 2) * de (tailPt y) 0 ^ (-(γ - e0))) := by
   obtain ⟨C, hC⟩ := hK e0 γ he0 hγ hγ2
   refine ⟨max C 1, lt_of_lt_of_le one_pos (le_max_right _ _), ?_⟩
   intro p m y
-  have hf : ∀ z : ℂ, de (ins y z) 0 ^ 2 =
-      Lsq (tailPt y) 1 * ‖z - y.1 0 * bco (tailPt y) 1 / (Lsq (tailPt y) 1 : ℂ)‖ ^ 2 +
-        de (tailPt y) 1 ^ 2 / Lsq (tailPt y) 1 := by
+  have hf
+      : ∀ z : ℂ,
+        de (ins y z) 0 ^ 2
+          = Lsq (tailPt y) 1 * ‖z - y.1 0 * bco (tailPt y) 1 / (Lsq (tailPt y) 1 : ℂ)‖ ^ 2
+            + de (tailPt y) 1 ^ 2 / Lsq (tailPt y) 1 := by
     intro z
     have hb : bco (ins y z) 1 = bco (tailPt y) 1 := by simpa using bco_ins_succ y z 0
     have hd : de (ins y z) 1 = de (tailPt y) 1 := by simpa using de_ins_succ y z 0
@@ -94,17 +100,23 @@ theorem lintegral_insertFiber_le (hC1 : C1) (hK : KER) {e0 γ : ℝ} (he0 : 0 < 
     rw [hb, hd, Lsq_ins] at h
     simp only [ins, Fin.cons_zero] at h
     exact h
-  have h0 : de (tailPt y) 0 ^ 2 =
-      Lsq (tailPt y) 1 * ‖y.1 0 * bco (tailPt y) 1 / (Lsq (tailPt y) 1 : ℂ)‖ ^ 2 +
-        de (tailPt y) 1 ^ 2 / Lsq (tailPt y) 1 := by
+  have h0
+      : de (tailPt y) 0 ^ 2
+        = Lsq (tailPt y) 1 * ‖y.1 0 * bco (tailPt y) 1 / (Lsq (tailPt y) 1 : ℂ)‖ ^ 2
+          + de (tailPt y) 1 ^ 2 / Lsq (tailPt y) 1 := by
     have := hf 0
     rw [zero_sub, norm_neg] at this
     exact this
-  calc _ = ∫⁻ z : ℂ, ENNReal.ofReal (de (ins y z) 0 ^ (-(2 - e0))) * ENNReal.ofReal (‖z‖ ^ (-γ)) :=
-        nnorm_ae γ _
-    _ ≤ _ := core hC _ (fun z => de (ins y z) 0) (lt_of_lt_of_le one_pos (Lsq_ge_one _ _))
-        (lt_of_lt_of_le one_pos (de_ge_one _ _)) (le_trans zero_le_one (de_ge_one _ _)) h0
-        (fun z => le_trans zero_le_one (de_ge_one _ _)) hf
+  calc
+    _ = ∫⁻ z : ℂ, ENNReal.ofReal (de (ins y z) 0 ^ (-(2 - e0))) * ENNReal.ofReal (‖z‖ ^ (-γ)) :=
+      nnorm_ae γ _
+    _ ≤ _ :=
+      core hC _
+        (fun z => de (ins y z) 0)
+        (lt_of_lt_of_le one_pos (Lsq_ge_one _ _)) (lt_of_lt_of_le one_pos (de_ge_one _ _))
+        (le_trans zero_le_one (de_ge_one _ _)) h0
+        (fun z => le_trans zero_le_one (de_ge_one _ _))
+        hf
 
 end OSAux
 end ReciprocityTheory.ChartRestriction.DS.Xi

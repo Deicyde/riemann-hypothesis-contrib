@@ -14,23 +14,25 @@ namespace Formalism.G0
 
 namespace ManyOrbitsP
 
-theorem add_pow_ge (p q : ℝ) (hp : 0 ≤ p) (hq : 0 ≤ q) (k : ℕ) :
-    p ^ (k + 1) + ((k : ℝ) + 1) * q * p ^ k ≤ (p + q) ^ (k + 1) := by
+theorem add_pow_ge (p q : ℝ) (hp : 0 ≤ p) (hq : 0 ≤ q) (k : ℕ)
+    : p ^ (k + 1) + ((k : ℝ) + 1) * q * p ^ k ≤ (p + q) ^ (k + 1) := by
   induction k with
   | zero => simp
   | succ k ih =>
     have hpq : 0 ≤ p + q := add_nonneg hp hq
     have h1 := mul_le_mul_of_nonneg_left ih hpq
     have h2 : 0 ≤ ((k : ℝ) + 1) * q ^ 2 * p ^ k := by positivity
-    have e : (p + q) * (p ^ (k + 1) + ((k : ℝ) + 1) * q * p ^ k) -
-        (p ^ (k + 1 + 1) + (((k : ℝ) + 1) + 1) * q * p ^ (k + 1)) = ((k : ℝ) + 1) * q ^ 2 * p ^ k := by
+    have e
+        : (p + q) * (p ^ (k + 1) + ((k : ℝ) + 1) * q * p ^ k)
+            - (p ^ (k + 1 + 1) + (((k : ℝ) + 1) + 1) * q * p ^ (k + 1))
+          = ((k : ℝ) + 1) * q ^ 2 * p ^ k := by
       ring
     have e2 : (p + q) * (p + q) ^ (k + 1) = (p + q) ^ (k + 1 + 1) := by ring
     push_cast
     linarith
 
-theorem fact_esymm_le (s : Multiset ℝ) (hs : ∀ x ∈ s, 0 ≤ x) (n : ℕ) :
-    (n.factorial : ℝ) * s.esymm n ≤ s.sum ^ n := by
+theorem fact_esymm_le (s : Multiset ℝ) (hs : ∀ x ∈ s, 0 ≤ x) (n : ℕ)
+    : (n.factorial : ℝ) * s.esymm n ≤ s.sum ^ n := by
   induction s using Multiset.induction_on generalizing n with
   | empty =>
     cases n with
@@ -54,8 +56,10 @@ theorem fact_esymm_le (s : Multiset ℝ) (hs : ∀ x ∈ s, 0 ≤ x) (n : ℕ) :
       rw [e, Multiset.sum_cons, add_comm a t.sum]
       rw [Nat.factorial_succ] at h1 ⊢
       push_cast at h1 ⊢
-      have e5 : ((n : ℝ) + 1) * (n.factorial : ℝ) * (t.esymm (n + 1) + a * t.esymm n) =
-          ((n : ℝ) + 1) * (n.factorial : ℝ) * t.esymm (n + 1) + ((n : ℝ) + 1) * a * ((n.factorial : ℝ) * t.esymm n) := by
+      have e5
+          : ((n : ℝ) + 1) * (n.factorial : ℝ) * (t.esymm (n + 1) + a * t.esymm n)
+            = ((n : ℝ) + 1) * (n.factorial : ℝ) * t.esymm (n + 1)
+              + ((n : ℝ) + 1) * a * ((n.factorial : ℝ) * t.esymm n) := by
         ring
       linarith [h1, h3, h4, e5]
 
@@ -63,8 +67,10 @@ section Mod
 
 variable {R X : Type} [CommRing R] [AddCommGroup X] [Module R X]
 
-theorem allBut_mono {π : R} {M P : Submodule R X} {g g' E E' : ℕ} (h : AllButLE π M P g E)
-    (hg : g ≤ g') (hE : E ≤ E') : AllButLE π M P g' E' := by
+theorem allBut_mono
+    {π : R} {M P : Submodule R X} {g g' E E' : ℕ}
+    (h : AllButLE π M P g E) (hg : g ≤ g') (hE : E ≤ E')
+    : AllButLE π M P g' E' := by
   obtain ⟨C, hCM, hcard, hC⟩ := h
   refine ⟨C, hCM, hcard.trans hg, fun x hx => ?_⟩
   have := Submodule.smul_mem _ (π ^ (E' - E)) (hC x hx)

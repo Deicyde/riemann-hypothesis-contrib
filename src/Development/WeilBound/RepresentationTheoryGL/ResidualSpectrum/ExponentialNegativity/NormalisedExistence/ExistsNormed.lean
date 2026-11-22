@@ -12,7 +12,8 @@ noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory
 open GlobalTheory.CuspRep GlobalTheory.UnitaryBC
-open GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.Reduction
+open GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
+  GroundTheory.Automorphic.Reduction
 
 namespace PositivityTheory.Rg.Rs.JDict
 
@@ -22,8 +23,11 @@ theorem tor_const (N : ℕ) (t : ℝ) : An.tor E (fun _ : Fin N => t) = splitCen
   (GlobalTheory.CuspBoundSiegel.diagUnits_posIdele N (Real.exp_pos t)).trans (by rw [Real.log_exp])
 
 theorem aT_eq (N r : ℕ) (t : ℝ) : aT E N r t = An.aR E N r t := by
-  have e : An.aR E N r t = diagUnits N (fun i : Fin N =>
-      infId E (expU fun _ : InfinitePlace E => (((if (i : ℕ) < r then t else 0 : ℝ)) : ℂ))) := by
+  have e
+      : An.aR E N r t
+        = diagUnits N (fun i : Fin N =>
+          infId E
+            (expU fun _ : InfinitePlace E => (((if (i : ℕ) < r then t else 0 : ℝ)) : ℂ))) := by
     show diagUnits N (fun i : Fin N => posIdele (K := E) (Real.exp (if (i : ℕ) < r then t else 0)) (Real.exp_pos _)) = _
     congr 1
     funext i
@@ -31,20 +35,28 @@ theorem aT_eq (N r : ℕ) (t : ℝ) : aT E N r t = An.aR E N r t := by
   rw [e]
   refine Units.ext (Matrix.ext fun i j => ?_)
   rw [coe_diagUnits, Matrix.diagonal_apply]
-  change (1 : Matrix (Fin N) (Fin N) (Ad E)) i j - sInf E ((1 : Matrix (Fin N) (Fin N) (Cinf E)) i j) +
-    sInf E ((aInf E N r t : Matrix (Fin N) (Fin N) (Cinf E)) i j) = _
+  change (1 : Matrix (Fin N) (Fin N) (Ad E)) i j
+      - sInf E ((1 : Matrix (Fin N) (Fin N) (Cinf E)) i j)
+      + sInf E ((aInf E N r t : Matrix (Fin N) (Fin N) (Cinf E)) i j)
+    = _
   by_cases hij : i = j
   · subst hij
     rw [if_pos rfl, Matrix.one_apply_eq, Matrix.one_apply_eq]
     change _ = 1 - sInf E 1 + sInf E (fun _ => Complex.exp _)
     congr 2
     funext w
-    rw [show (aInf E N r t : Matrix (Fin N) (Fin N) (Cinf E)) = Matrix.diagonal (fun (k : Fin N) (_ : InfinitePlace E) =>
-      Complex.exp (if (k : ℕ) < r then (t : ℂ) else 0)) from rfl, Matrix.diagonal_apply_eq]
+    rw [show (aInf E N r t : Matrix (Fin N) (Fin N) (Cinf E))
+          = Matrix.diagonal (fun (k : Fin N) (_ : InfinitePlace E) =>
+            Complex.exp (if (k : ℕ) < r then (t : ℂ) else 0)) from
+        rfl,
+      Matrix.diagonal_apply_eq]
     split_ifs <;> simp
   · rw [if_neg hij, Matrix.one_apply_ne hij, Matrix.one_apply_ne hij]
-    rw [show (aInf E N r t : Matrix (Fin N) (Fin N) (Cinf E)) = Matrix.diagonal (fun (k : Fin N) (_ : InfinitePlace E) =>
-      Complex.exp (if (k : ℕ) < r then (t : ℂ) else 0)) from rfl, Matrix.diagonal_apply_ne _ hij, map_zero, sub_zero, add_zero]
+    rw [show (aInf E N r t : Matrix (Fin N) (Fin N) (Cinf E))
+          = Matrix.diagonal (fun (k : Fin N) (_ : InfinitePlace E) =>
+            Complex.exp (if (k : ℕ) < r then (t : ℂ) else 0)) from
+        rfl,
+      Matrix.diagonal_apply_ne _ hij, map_zero, sub_zero, add_zero]
 
 theorem lat_eq (N : ℕ) : latticeGL E N = An.lat E N := by
   unfold latticeGL An.lat
@@ -68,11 +80,14 @@ theorem vol_pos : 0 < (unipMeasure E N r).real (unipFundamentalDomain E N r) := 
     isAddFundamentalDomain_unipFundamentalDomain.measure_ne_zero (NeZero.ne _)
   exact ENNReal.toReal_pos h0 htop
 
-theorem ct_eq_smul [m : MeasurableSpace (BlockIx N r → Ad E)] [hb : BorelSpace (BlockIx N r → Ad E)]
-    (μ : Measure (BlockIx N r → Ad E)) (𝓕 : Set (BlockIx N r → Ad E)) (hμ : μ.IsAddHaarMeasure)
-    (h𝓕 : IsAddFundamentalDomain (ratN E N r) 𝓕 μ) :
-    ∃ c : ℝ, 0 < c ∧ ∀ φ : GA E N → ℂ, IsLeftInvariant φ → ∀ g,
-      ∫ x in 𝓕, φ (unip x * g) ∂μ = (c : ℂ) * constantTerm r φ g := by
+theorem ct_eq_smul
+    [m : MeasurableSpace (BlockIx N r → Ad E)] [hb : BorelSpace (BlockIx N r → Ad E)]
+    (μ : Measure (BlockIx N r → Ad E)) (𝓕 : Set (BlockIx N r → Ad E))
+    (hμ : μ.IsAddHaarMeasure) (h𝓕 : IsAddFundamentalDomain (ratN E N r) 𝓕 μ)
+    : ∃ c : ℝ,
+      0 < c
+        ∧ ∀ φ : GA E N → ℂ,
+          IsLeftInvariant φ → ∀ g, ∫ x in 𝓕, φ (unip x * g) ∂μ = (c : ℂ) * constantTerm r φ g := by
   have h : m = MeasurableSpace.pi := hb.measurable_eq.trans (pi_eq_borel E N r).symm
   subst h
   have e : μ = Measure.addHaarScalarFactor μ (unipMeasure E N r) • unipMeasure E N r :=
@@ -90,21 +105,28 @@ theorem ct_eq_smul [m : MeasurableSpace (BlockIx N r → Ad E)] [hb : BorelSpace
   simp only [GlobalTheory.CompanionTheory.CuspBridge.unipGL_eq_unip]
   rw [NNReal.smul_def, Complex.real_smul]
 
-theorem exists_normed [m : MeasurableSpace (BlockIx N r → Ad E)] [hb : BorelSpace (BlockIx N r → Ad E)] :
-    ∃ μ : Measure (BlockIx N r → Ad E), μ.IsAddHaarMeasure ∧
-      IsAddFundamentalDomain (ratN E N r) (unipFundamentalDomain E N r) μ ∧
-      ∀ f : (BlockIx N r → Ad E) → ℂ, ∫ x in unipFundamentalDomain E N r, f x ∂μ =
-        (((unipMeasure E N r).real (unipFundamentalDomain E N r) : ℝ) : ℂ)⁻¹ *
-          ∫ x in unipFundamentalDomain E N r, f x ∂unipMeasure E N r := by
+theorem exists_normed
+    [m : MeasurableSpace (BlockIx N r → Ad E)] [hb : BorelSpace (BlockIx N r → Ad E)]
+    : ∃ μ : Measure (BlockIx N r → Ad E),
+      μ.IsAddHaarMeasure ∧ IsAddFundamentalDomain (ratN E N r) (unipFundamentalDomain E N r) μ
+        ∧ ∀ f : (BlockIx N r → Ad E) → ℂ,
+          ∫ x in unipFundamentalDomain E N r, f x ∂μ
+            = (((unipMeasure E N r).real (unipFundamentalDomain E N r) : ℝ) : ℂ)⁻¹
+              * ∫ x in unipFundamentalDomain E N r, f x ∂unipMeasure E N r := by
   have h : m = MeasurableSpace.pi := hb.measurable_eq.trans (pi_eq_borel E N r).symm
   subst h
   have hpos := vol_pos E N r
   set a := unipMeasure E N r (unipFundamentalDomain E N r) with ha
   have h0 : a ≠ 0 := fun h => by simp [Measure.real, ← ha, h] at hpos
   have htop : a ≠ ⊤ := fun h => by simp [Measure.real, ← ha, h] at hpos
-  refine ⟨a⁻¹ • unipMeasure E N r, Measure.IsAddHaarMeasure.smul _ (ENNReal.inv_ne_zero.2 htop) (ENNReal.inv_ne_top.2 h0),
-    isAddFundamentalDomain_unipFundamentalDomain.mono Measure.smul_absolutelyContinuous, fun f => ?_⟩
-  rw [Measure.restrict_smul, integral_smul_measure, ENNReal.toReal_inv, Complex.real_smul, Complex.ofReal_inv]
+  refine ⟨
+    a⁻¹ • unipMeasure E N r,
+    Measure.IsAddHaarMeasure.smul _ (ENNReal.inv_ne_zero.2 htop) (ENNReal.inv_ne_top.2 h0),
+    isAddFundamentalDomain_unipFundamentalDomain.mono Measure.smul_absolutelyContinuous,
+    fun f => ?_
+  ⟩
+  rw [Measure.restrict_smul, integral_smul_measure, ENNReal.toReal_inv, Complex.real_smul,
+    Complex.ofReal_inv]
   rfl
 
 end CT
@@ -137,7 +159,8 @@ theorem dict_holds : Dict := by
       show ∫ x in 𝓕, φ.1 (unip x * g) ∂μ = _
       rw [hct φ.1 hL g]
       simp only [An.ctn]
-      have : (((unipMeasure E N r).real (unipFundamentalDomain E N r) : ℝ) : ℂ) ≠ 0 := by exact_mod_cast hv.ne'
+      have : (((unipMeasure E N r).real (unipFundamentalDomain E N r) : ℝ) : ℂ) ≠ 0 := by
+        exact_mod_cast hv.ne'
       field_simp
 
 end PositivityTheory.Rg.Rs

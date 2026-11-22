@@ -6,26 +6,35 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsLineBun
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory
+open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory
 
 namespace GlobalTheory.LBDescent
 
-theorem exists_finite_subextension_cls (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω]
-    [Algebra.IsAlgebraic K Ω] (B X : Scheme.{0}) (pB : B ⟶ Sp K) [QuasiCompact pB]
-    [QuasiSeparated pB] (p : X ⟶ Sp Ω) (φ : X ⟶ B)
-    (hX : IsPullback φ p pB (spMap (algebraMap K Ω))) (L : LB X) (hL : L.IsLB) :
-    ∃ F : IntermediateField K Ω, FiniteDimensional K F ∧
-      ∀ (X₁ : Scheme.{0}) (p₁ : X₁ ⟶ Sp F) (φ₁ : X₁ ⟶ B),
-        IsPullback φ₁ p₁ pB (spMap (algebraMap K F)) →
-        ∀ j : X ⟶ X₁, j ≫ φ₁ = φ → j ≫ p₁ = p ≫ spMap (algebraMap F Ω) →
-          ∃ x : CechPic.Pic X₁, CechPic.pull j x = CechPic.cls L hL := by
+theorem exists_finite_subextension_cls
+    (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω] [Algebra.IsAlgebraic K Ω]
+    (B X : Scheme.{0}) (pB : B ⟶ Sp K) [QuasiCompact pB] [QuasiSeparated pB]
+    (p : X ⟶ Sp Ω) (φ : X ⟶ B) (hX : IsPullback φ p pB (spMap (algebraMap K Ω)))
+    (L : LB X) (hL : L.IsLB)
+    : ∃ F : IntermediateField K Ω,
+      FiniteDimensional K F
+        ∧ ∀ (X₁ : Scheme.{0}) (p₁ : X₁ ⟶ Sp F) (φ₁ : X₁ ⟶ B),
+          IsPullback φ₁ p₁ pB (spMap (algebraMap K F))
+            → ∀ j : X ⟶ X₁,
+              j ≫ φ₁ = φ → j ≫ p₁ = p ≫ spMap (algebraMap F Ω)
+                → ∃ x : CechPic.Pic X₁, CechPic.pull j x = CechPic.cls L hL := by
   obtain ⟨R, M, ρ, ⟨T, hT⟩, hM, h1, h2, hI⟩ := exists_fg_lb pB p φ hX L hL
   let F : IntermediateField K Ω := IntermediateField.adjoin K (T : Set Ω)
   have hle : R ≤ F.toSubalgebra := by
     rw [← hT]
     exact IntermediateField.algebra_adjoin_le_adjoin K _
-  refine ⟨F, IntermediateField.finiteDimensional_adjoin
-    (fun x _ => (Algebra.IsAlgebraic.isAlgebraic x).isIntegral), ?_⟩
+  refine ⟨
+    F,
+    IntermediateField.finiteDimensional_adjoin (fun x _ =>
+      (Algebra.IsAlgebraic.isAlgebraic x).isIntegral),
+    ?_
+  ⟩
   intro X₁ p₁ φ₁ hX₁ j hj1 hj2
   let ι : R →+* F := (Subalgebra.inclusion hle).toRingHom
   have e1 : spMap ι ≫ spMap (algebraMap K R) = spMap (algebraMap K F) := by
@@ -43,7 +52,8 @@ theorem exists_finite_subextension_cls (K Ω : Type) [Field K] [Field Ω] [Algeb
     · rw [Category.assoc, Limits.pullback.lift_fst, hj1, h1]
     · rw [Category.assoc, Limits.pullback.lift_snd, ← Category.assoc, hj2, Category.assoc, e2, h2]
   refine ⟨CechPic.pull q (CechPic.cls M hM), ?_⟩
-  rw [← CechPic.pull_comp, hq, ← CechPic.cls_pull hM ρ (pull_isLB hM ρ), eq_comm, CechPic.cls_eq_iff]
+  rw [← CechPic.pull_comp, hq, ← CechPic.cls_pull hM ρ (pull_isLB hM ρ), eq_comm,
+    CechPic.cls_eq_iff]
   exact hI
 
 end GlobalTheory.LBDescent

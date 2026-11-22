@@ -35,13 +35,22 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.UniformIntegra
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 
 namespace GlobalTheory.CompanionTheory.Ar.Link
 
-theorem prov_an : Prov.An :=
-  ⟨GlobalTheory.CompanionTheory.Ar.Giv.tailBound_holds, GlobalTheory.T.convergence_statement_holds, GlobalTheory.T.signed_convergence_statement_holds, GlobalTheory.T.convergence_rate_statement_holds, GlobalTheory.T.uniform_integrability_statement_holds,
-    GlobalTheory.T.pullback_statement_holds, GlobalTheory.T.global_regularization_statement_holds⟩
+theorem prov_an : Prov.An := ⟨
+  GlobalTheory.CompanionTheory.Ar.Giv.tailBound_holds,
+  GlobalTheory.T.convergence_statement_holds,
+  GlobalTheory.T.signed_convergence_statement_holds,
+  GlobalTheory.T.convergence_rate_statement_holds,
+  GlobalTheory.T.uniform_integrability_statement_holds,
+  GlobalTheory.T.pullback_statement_holds,
+  GlobalTheory.T.global_regularization_statement_holds
+⟩
 
 end GlobalTheory.CompanionTheory.Ar.Link

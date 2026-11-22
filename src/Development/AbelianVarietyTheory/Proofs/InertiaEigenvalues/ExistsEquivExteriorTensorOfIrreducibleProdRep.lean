@@ -16,8 +16,9 @@ noncomputable section
 
 namespace GlobalTheory.TensorFactor
 
-variable {G H X Y : Type} [Group G] [Group H] [AddCommGroup X] [Module ℂ X] [AddCommGroup Y]
-  [Module ℂ Y] (τ : Representation ℂ (G × H) X) (ρ : Representation ℂ H Y)
+variable
+  {G H X Y : Type} [Group G] [Group H] [AddCommGroup X] [Module ℂ X] [AddCommGroup Y] [Module ℂ Y]
+  (τ : Representation ℂ (G × H) X) (ρ : Representation ℂ H Y)
 
 def homSpace : Submodule ℂ (Y →ₗ[ℂ] X) where
   carrier := {φ | ∀ h v, φ (ρ h v) = τ (1, h) (φ v)}
@@ -38,12 +39,16 @@ theorem apply_pair (g : G) (h : H) (x : X) : τ (g, h) x = τ (g, 1) (τ (1, h) 
   simp
 
 def homRep : Representation ℂ G (homSpace τ ρ) where
-  toFun g :=
-    { toFun := fun φ => ⟨(τ (g, 1)).comp φ.1, fun h v => by
+  toFun g := {
+    toFun := fun φ => ⟨
+      (τ (g, 1)).comp φ.1,
+      fun h v => by
         simp only [LinearMap.comp_apply]
-        rw [φ.2 h v, commute_apply]⟩
-      map_add' := fun φ ψ => by ext; simp
-      map_smul' := fun c φ => by ext; simp }
+        rw [φ.2 h v, commute_apply]
+    ⟩
+    map_add' := fun φ ψ => by ext; simp
+    map_smul' := fun c φ => by ext; simp
+  }
   map_one' := by
     ext φ v
     have : ((1 : G), (1 : H)) = (1 : G × H) := rfl
@@ -54,8 +59,10 @@ def homRep : Representation ℂ G (homSpace τ ρ) where
     show τ (a * b, 1) _ = τ (a, 1) (τ (b, 1) _)
     rw [this, map_mul, Module.End.mul_apply]
 
-@[simp] theorem homRep_apply_coe (g : G) (φ : homSpace τ ρ) :
-    ((homRep τ ρ g φ : homSpace τ ρ) : Y →ₗ[ℂ] X) = (τ (g, 1)).comp (φ : Y →ₗ[ℂ] X) := rfl
+@[simp]
+theorem homRep_apply_coe (g : G) (φ : homSpace τ ρ)
+    : ((homRep τ ρ g φ : homSpace τ ρ) : Y →ₗ[ℂ] X) = (τ (g, 1)).comp (φ : Y →ₗ[ℂ] X) :=
+  rfl
 
 def evMap : (extTensor (homRep τ ρ) ρ).IntertwiningMap τ where
   toLinearMap := TensorProduct.lift (homSpace τ ρ).subtype
@@ -63,19 +70,19 @@ def evMap : (extTensor (homRep τ ρ) ρ).IntertwiningMap τ where
     apply TensorProduct.ext'
     intro φ v
     obtain ⟨g, h⟩ := gh
-    simp only [LinearMap.comp_apply, extTensor_tmul, TensorProduct.lift.tmul, Submodule.subtype_apply,
-      homRep_apply_coe]
+    simp only [LinearMap.comp_apply, extTensor_tmul, TensorProduct.lift.tmul,
+      Submodule.subtype_apply, homRep_apply_coe]
     rw [φ.2 h v, ← apply_pair]
 
 end GlobalTheory.TensorFactor
 
 namespace GlobalTheory.TensorFactor
 
-variable {G H X Y : Type} [Group G] [Group H] [AddCommGroup X] [Module ℂ X] [AddCommGroup Y]
-  [Module ℂ Y] (τ : Representation ℂ (G × H) X) (ρ : Representation ℂ H Y)
+variable
+  {G H X Y : Type} [Group G] [Group H] [AddCommGroup X] [Module ℂ X] [AddCommGroup Y] [Module ℂ Y]
+  (τ : Representation ℂ (G × H) X) (ρ : Representation ℂ H Y)
 
-def diffMap (g : G) (φ : homSpace τ ρ) :
-    ρ.IntertwiningMap (τ.comp (MonoidHom.inr G H)) where
+def diffMap (g : G) (φ : homSpace τ ρ) : ρ.IntertwiningMap (τ.comp (MonoidHom.inr G H)) where
   toLinearMap := (τ (g, 1)).comp (φ : Y →ₗ[ℂ] X) - (φ : Y →ₗ[ℂ] X)
   isIntertwining' h := by
     ext v
@@ -83,8 +90,11 @@ def diffMap (g : G) (φ : homSpace τ ρ) :
       MonoidHom.inr_apply, map_sub]
     rw [φ.2 h v, commute_apply]
 
-theorem homRep_eq_of_apply_eq [ρ.IsIrreducible] {g : G} {φ : homSpace τ ρ} {y : Y} (hy : y ≠ 0)
-    (h : τ (g, 1) ((φ : Y →ₗ[ℂ] X) y) = (φ : Y →ₗ[ℂ] X) y) : homRep τ ρ g φ = φ := by
+theorem homRep_eq_of_apply_eq
+    [ρ.IsIrreducible]
+    {g : G} {φ : homSpace τ ρ} {y : Y}
+    (hy : y ≠ 0) (h : τ (g, 1) ((φ : Y →ₗ[ℂ] X) y) = (φ : Y →ₗ[ℂ] X) y)
+    : homRep τ ρ g φ = φ := by
   rcases Representation.IsIrreducible.injective_or_eq_zero (diffMap τ ρ g φ) with hi | h0
   · refine absurd (hi (a₁ := y) (a₂ := 0) ?_) hy
     simp [diffMap, h]
@@ -95,9 +105,18 @@ theorem homRep_eq_of_apply_eq [ρ.IsIrreducible] {g : G} {φ : homSpace τ ρ} {
 
 end GlobalTheory.TensorFactor
 
-
 open GlobalTheory.TensorFactor in
-theorem GlobalTheory.TensorFactor.exists_equiv_extTensor : ∀ (G H X Y : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [AddCommGroup X] [Module ℂ X] [AddCommGroup Y] [Module ℂ Y] (τ : Representation ℂ (G × H) X) (ρ : Representation ℂ H Y), IsSmooth τ → τ.IsIrreducible → ρ.IsIrreducible → (∀ (M : Submodule ℂ (Y →ₗ[ℂ] X)), (∀ φ ∈ M, ∀ g v, φ (ρ g v) = τ (1, g) (φ v)) → Function.Injective (TensorProduct.lift M.subtype)) → (∃ ι : Y →ₗ[ℂ] X, ι ≠ 0 ∧ ∀ g v, ι (ρ g v) = τ (1, g) (ι v)) → ∃ (W : Type) (_ : AddCommGroup W) (_ : Module ℂ W) (σ : Representation ℂ G W), IsSmooth σ ∧ σ.IsIrreducible ∧ Nonempty (τ.Equiv (extTensor σ ρ)) := by
+theorem GlobalTheory.TensorFactor.exists_equiv_extTensor
+    : ∀ (G H X Y : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group H]
+        [TopologicalSpace H] [IsTopologicalGroup H] [AddCommGroup X] [Module ℂ X] [AddCommGroup Y]
+        [Module ℂ Y] (τ : Representation ℂ (G × H) X) (ρ : Representation ℂ H Y),
+      IsSmooth τ → τ.IsIrreducible → ρ.IsIrreducible
+        → (∀ (M : Submodule ℂ (Y →ₗ[ℂ] X)),
+          (∀ φ ∈ M, ∀ g v, φ (ρ g v) = τ (1, g) (φ v))
+            → Function.Injective (TensorProduct.lift M.subtype))
+        → (∃ ι : Y →ₗ[ℂ] X, ι ≠ 0 ∧ ∀ g v, ι (ρ g v) = τ (1, g) (ι v))
+        → ∃ (W : Type) (_ : AddCommGroup W) (_ : Module ℂ W) (σ : Representation ℂ G W),
+          IsSmooth σ ∧ σ.IsIrreducible ∧ Nonempty (τ.Equiv (extTensor σ ρ)) := by
   intro G H X Y _ _ _ _ _ _ _ _ _ _ τ ρ hτs hτ hρ hinj hex
   obtain ⟨ι, hι0, hι⟩ := hex
   haveI := hτ
@@ -112,12 +131,19 @@ theorem GlobalTheory.TensorFactor.exists_equiv_extTensor : ∀ (G H X Y : Type) 
   have hsurj : Function.Surjective (evMap τ ρ) :=
     (Representation.IsIrreducible.surjective_or_eq_zero (evMap τ ρ)).resolve_right fun h0 =>
       hy0 (by simpa [evMap, ι'] using congrArg (fun f => f (ι' ⊗ₜ y0)) h0)
-  refine ⟨homSpace τ ρ, inferInstance, inferInstance, homRep τ ρ, ?_, ?_,
-    ⟨(Representation.IntertwiningMap.ofBijective (evMap τ ρ) ⟨hev, hsurj⟩).symm⟩⟩
+  refine ⟨
+    homSpace τ ρ,
+    inferInstance,
+    inferInstance,
+    homRep τ ρ,
+    ?_,
+    ?_,
+    ⟨(Representation.IntertwiningMap.ofBijective (evMap τ ρ) ⟨hev, hsurj⟩).symm⟩
+  ⟩
   · refine isSmooth_of_nhds fun φ => ?_
     have hc : Continuous fun g : G => ((g, (1 : H)) : G × H) := by fun_prop
-    refine Filter.mem_of_superset (((hτs ((φ : Y →ₗ[ℂ] X) y0)).preimage hc).mem_nhds ?_)
-      fun g hg => homRep_eq_of_apply_eq τ ρ hy0' hg
+    refine Filter.mem_of_superset (((hτs ((φ : Y →ₗ[ℂ] X) y0)).preimage hc).mem_nhds ?_) fun g hg =>
+      homRep_eq_of_apply_eq τ ρ hy0' hg
     have : ((1 : G), (1 : H)) = (1 : G × H) := rfl
     show τ ((1 : G), (1 : H)) _ = _
     simp [this]
@@ -127,27 +153,31 @@ theorem GlobalTheory.TensorFactor.exists_equiv_extTensor : ∀ (G H X Y : Type) 
       have h2 : ι' = 0 := (Submodule.mem_bot ℂ).1 h1
       exact hι0 (congrArg Subtype.val h2)⟩
     refine ⟨fun S => ?_⟩
-    let U : Subrepresentation τ :=
-      { toSubmodule :=
-          LinearMap.range ((evMap τ ρ).toLinearMap ∘ₗ LinearMap.rTensor Y S.toSubmodule.subtype)
-        apply_mem_toSubmodule := by
-          rintro ⟨g, h⟩ _ ⟨t, rfl⟩
-          induction t using TensorProduct.induction_on with
-          | zero => simp
-          | tmul ψ z =>
-            refine ⟨⟨homRep τ ρ g ψ, S.apply_mem_toSubmodule g ψ.2⟩ ⊗ₜ ρ h z, ?_⟩
-            show ((homRep τ ρ g ψ : homSpace τ ρ) : Y →ₗ[ℂ] X) (ρ h z) =
-              τ (g, h) (((ψ : homSpace τ ρ) : Y →ₗ[ℂ] X) z)
-            rw [homRep_apply_coe, LinearMap.comp_apply, (ψ : homSpace τ ρ).2 h z, ← apply_pair]
-          | add a b ha hb =>
-            rw [map_add (f := _), map_add (f := _)]
-            exact add_mem ha hb }
+    let U : Subrepresentation τ := {
+      toSubmodule :=
+        LinearMap.range ((evMap τ ρ).toLinearMap ∘ₗ LinearMap.rTensor Y S.toSubmodule.subtype)
+      apply_mem_toSubmodule := by
+        rintro ⟨g, h⟩ _ ⟨t, rfl⟩
+        induction t using TensorProduct.induction_on with
+        | zero => simp
+        | tmul ψ z =>
+          refine ⟨⟨homRep τ ρ g ψ, S.apply_mem_toSubmodule g ψ.2⟩ ⊗ₜ ρ h z, ?_⟩
+          show ((homRep τ ρ g ψ : homSpace τ ρ) : Y →ₗ[ℂ] X) (ρ h z) =
+            τ (g, h) (((ψ : homSpace τ ρ) : Y →ₗ[ℂ] X) z)
+          rw [homRep_apply_coe, LinearMap.comp_apply, (ψ : homSpace τ ρ).2 h z, ← apply_pair]
+        | add a b ha hb =>
+          rw [map_add (f := _), map_add (f := _)]
+          exact add_mem ha hb
+    }
     rcases IsSimpleOrder.eq_bot_or_eq_top U with hU | hU
     · left
       apply Subrepresentation.toSubmodule_injective
-      refine eq_bot_iff.2 fun ψ hψ => (Submodule.mem_bot ℂ).2 (Subtype.ext (LinearMap.ext fun z => ?_))
-      have hm : (evMap τ ρ).toLinearMap (LinearMap.rTensor Y S.toSubmodule.subtype (⟨ψ, hψ⟩ ⊗ₜ z)) ∈
-          U.toSubmodule := ⟨⟨ψ, hψ⟩ ⊗ₜ z, rfl⟩
+      refine eq_bot_iff.2 fun ψ hψ =>
+        (Submodule.mem_bot ℂ).2 (Subtype.ext (LinearMap.ext fun z => ?_))
+      have hm
+          : (evMap τ ρ).toLinearMap (LinearMap.rTensor Y S.toSubmodule.subtype (⟨ψ, hψ⟩ ⊗ₜ z))
+            ∈ U.toSubmodule :=
+        ⟨⟨ψ, hψ⟩ ⊗ₜ z, rfl⟩
       rw [hU] at hm
       have h2 := (Submodule.mem_bot ℂ).1 hm
       have h3 : ((ψ : homSpace τ ρ) : Y →ₗ[ℂ] X) z = 0 := by simpa [evMap] using h2

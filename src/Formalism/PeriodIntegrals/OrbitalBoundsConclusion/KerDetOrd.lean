@@ -6,5 +6,4 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.DeterminantKerne
 
 @[expose] public section
 
-theorem ordRelativeDet_independence : PI.KerIso.DetOrdIndep :=
-  PI.KerIso.DetOrdW.detOrdIndep
+theorem ordRelativeDet_independence : PI.KerIso.DetOrdIndep := PI.KerIso.DetOrdW.detOrdIndep

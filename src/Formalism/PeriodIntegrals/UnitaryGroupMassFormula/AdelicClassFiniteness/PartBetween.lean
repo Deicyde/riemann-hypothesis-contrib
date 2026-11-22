@@ -24,19 +24,23 @@ theorem partBetween : PartBetween := by
     apply hδ
     exact IsFractionRing.injective (𝓞 E) E (by rw [h, map_zero])
   let g := Function.surjInv (Ideal.Quotient.mk_surjective (I := Ideal.span {δ}))
-  let T : Set (Fin m → E) := Set.range (fun c : Fin k → ((𝓞 E) ⧸ Ideal.span {δ}) =>
-    (algebraMap (𝓞 E) E δ)⁻¹ • ∑ i, (algebraMap (𝓞 E) E (g (c i))) • n i)
+  let T : Set (Fin m → E) :=
+    Set.range (fun c : Fin k → ((𝓞 E) ⧸ Ideal.span {δ}) =>
+      (algebraMap (𝓞 E) E δ)⁻¹ • ∑ i, (algebraMap (𝓞 E) E (g (c i))) • n i)
   have hT : T.Finite := Set.finite_range _
   have key : ∀ x : Fin m → E, δ • x ∈ N → ∃ t ∈ T, x - t ∈ N := by
     intro x hx
     rw [← hn] at hx
     obtain ⟨a, ha⟩ := (Submodule.mem_span_range_iff_exists_fun (𝓞 E)).mp hx
-    have hq : ∀ i, ∃ q : 𝓞 E, algebraMap (𝓞 E) E (a i) -
-        algebraMap (𝓞 E) E (g (Ideal.Quotient.mk (Ideal.span {δ}) (a i))) =
-        algebraMap (𝓞 E) E δ * algebraMap (𝓞 E) E q := by
+    have hq
+        : ∀ i, ∃ q : 𝓞 E,
+          algebraMap (𝓞 E) E (a i)
+              - algebraMap (𝓞 E) E (g (Ideal.Quotient.mk (Ideal.span {δ}) (a i)))
+            = algebraMap (𝓞 E) E δ * algebraMap (𝓞 E) E q := by
       intro i
-      have h := Function.surjInv_eq (Ideal.Quotient.mk_surjective (I := Ideal.span {δ}))
-        (Ideal.Quotient.mk (Ideal.span {δ}) (a i))
+      have h :=
+        Function.surjInv_eq (Ideal.Quotient.mk_surjective (I := Ideal.span {δ}))
+          (Ideal.Quotient.mk (Ideal.span {δ}) (a i))
       rw [Ideal.Quotient.eq, Ideal.mem_span_singleton] at h
       obtain ⟨c, hc⟩ := h
       refine ⟨-c, ?_⟩
@@ -45,12 +49,17 @@ theorem partBetween : PartBetween := by
     refine ⟨_, ⟨fun i => Ideal.Quotient.mk (Ideal.span {δ}) (a i), rfl⟩, ?_⟩
     have hx2 : x = (algebraMap (𝓞 E) E δ)⁻¹ • ∑ i, a i • n i := by
       rw [ha, ← algebraMap_smul E δ x, smul_smul, inv_mul_cancel₀ hδE, one_smul]
-    have e1 : ∀ i, a i • n i - (algebraMap (𝓞 E) E (g (Ideal.Quotient.mk (Ideal.span {δ}) (a i)))) • n i =
-        (algebraMap (𝓞 E) E δ) • (q i • n i) := by
+    have e1
+        : ∀ i,
+          a i • n i - (algebraMap (𝓞 E) E (g (Ideal.Quotient.mk (Ideal.span {δ}) (a i)))) • n i
+            = (algebraMap (𝓞 E) E δ) • (q i • n i) := by
       intro i
       rw [← algebraMap_smul E (a i), ← algebraMap_smul E (q i), smul_smul, ← sub_smul, hq i]
-    have hdiff : x - (algebraMap (𝓞 E) E δ)⁻¹ • ∑ i, (algebraMap (𝓞 E) E
-        (g (Ideal.Quotient.mk (Ideal.span {δ}) (a i)))) • n i = ∑ i, q i • n i := by
+    have hdiff
+        : x - (algebraMap (𝓞 E) E δ)⁻¹
+            • ∑ i, (algebraMap (𝓞 E) E
+              (g (Ideal.Quotient.mk (Ideal.span {δ}) (a i)))) • n i
+          = ∑ i, q i • n i := by
       rw [hx2, ← smul_sub, ← Finset.sum_sub_distrib]
       simp_rw [e1]
       rw [← Finset.smul_sum, smul_smul, inv_mul_cancel₀ hδE, one_smul]

@@ -33,16 +33,16 @@ theorem isUnit_VA_iff (a : VA L) : IsUnit a ↔ Valued.v (a : L) = 1 := by
     have hprod := congrArg Valued.v hmul
     rw [map_mul, map_one] at hprod
     refine le_antisymm hu ?_
-    calc (1 : WithZero (Multiplicative ℤ)) = Valued.v ((u : VA L) : L) *
-          Valued.v (((u⁻¹ : (VA L)ˣ) : VA L) : L) := hprod.symm
+    calc
+      (1 : WithZero (Multiplicative ℤ))
+        = Valued.v ((u : VA L) : L) * Valued.v (((u⁻¹ : (VA L)ˣ) : VA L) : L) := hprod.symm
       _ ≤ Valued.v ((u : VA L) : L) := mul_le_of_le_one_right' hu'
   · intro h
     have ha0 : (a : L) ≠ 0 := by
       intro h0
       rw [h0, map_zero] at h
       exact zero_ne_one h
-    have hinv : (a : L)⁻¹ ∈ VA L := by
-      rw [mem_VA, map_inv₀, h, inv_one]
+    have hinv : (a : L)⁻¹ ∈ VA L := by rw [mem_VA, map_inv₀, h, inv_one]
     refine IsUnit.of_mul_eq_one (⟨(a : L)⁻¹, hinv⟩ : VA L) ?_
     apply Subtype.ext
     exact mul_inv_cancel₀ ha0
@@ -56,7 +56,8 @@ variable (σ : L →+* L) (hv : ∀ x, Valued.v (σ x) = Valued.v x)
 def sigA : VA L →+* VA L :=
   (σ.comp (VA L).subtype).codRestrict (VA L) (fun x => by
     show σ (x : L) ∈ VA L
-    rw [mem_VA, hv]; exact mem_VA.1 x.2)
+    rw [mem_VA, hv]
+    exact mem_VA.1 x.2)
 
 theorem sigA_coe (x : VA L) : ((sigA σ hv x : VA L) : L) = σ x := rfl
 
@@ -75,32 +76,38 @@ section Norm
 
 variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
 
-private theorem valuation_two_eq_one_of_unramInv_odd {ϖ : L} {σ : L →+* L} {q : ℕ} (hU : Formalism.UG.IsUnramInv ϖ σ q) (hq : Odd q) :
-    Valued.v (2 : L) = 1 := by
+private theorem valuation_two_eq_one_of_unramInv_odd
+    {ϖ : L} {σ : L →+* L} {q : ℕ} (hU : Formalism.UG.IsUnramInv ϖ σ q) (hq : Odd q)
+    : Valued.v (2 : L) = 1 := by
   obtain ⟨-, -, -, -, -, hq2, hcard⟩ := hU
   have hle : Valued.v (2 : L) ≤ 1 := by
-    calc Valued.v (2 : L) = Valued.v ((1 : L) + 1) := by norm_num
+    calc
+      Valued.v (2 : L)
+        = Valued.v ((1 : L) + 1) := by norm_num
       _ ≤ max (Valued.v (1 : L)) (Valued.v (1 : L)) := Valuation.map_add _ _ _
       _ = 1 := by simp
   by_contra h2
   have hlt := lt_of_le_of_ne hle h2
   have hmem : (2 : VA L) ∈ IsLocalRing.maximalIdeal (VA L) := by
     rw [mem_max_VA_iff]
-    first
-      | simpa using hlt
-      | exact_mod_cast hlt
+    first | simpa using hlt | exact_mod_cast hlt
   haveI : Finite ((Valued.v : Valuation L (WithZero (Multiplicative ℤ))).integer ⧸
       IsLocalRing.maximalIdeal (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring) :=
     Nat.finite_of_card_ne_zero (by rw [hcard]; positivity)
   letI := Fintype.ofFinite ((Valued.v : Valuation L (WithZero (Multiplicative ℤ))).integer ⧸
       IsLocalRing.maximalIdeal (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring)
-  have h2Q : (2 : (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).integer ⧸
-      IsLocalRing.maximalIdeal (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring) = 0 := by
+  have h2Q
+      : (2
+          : (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).integer ⧸
+            IsLocalRing.maximalIdeal (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring)
+        = 0 := by
     have h := Ideal.Quotient.eq_zero_iff_mem.2 hmem
     rw [map_ofNat] at h
     exact h
-  have hc0 := Nat.cast_card_eq_zero ((Valued.v : Valuation L (WithZero (Multiplicative ℤ))).integer ⧸
-      IsLocalRing.maximalIdeal (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring)
+  have hc0 :=
+    Nat.cast_card_eq_zero
+      ((Valued.v : Valuation L (WithZero (Multiplicative ℤ))).integer ⧸
+        IsLocalRing.maximalIdeal (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring)
   rw [← Nat.card_eq_fintype_card, hcard] at hc0
   obtain ⟨m, hm⟩ : Odd (q ^ 2) := hq.pow
   rw [hm] at hc0
@@ -110,33 +117,45 @@ private theorem valuation_two_eq_one_of_unramInv_odd {ϖ : L} {σ : L →+* L} {
   haveI : Unique ((Valued.v : Valuation L (WithZero (Multiplicative ℤ))).integer ⧸
       IsLocalRing.maximalIdeal (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring) :=
     ⟨⟨0⟩, fun _ => Subsingleton.elim _ _⟩
-  have hc1 := Nat.card_unique (α := (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).integer ⧸
-      IsLocalRing.maximalIdeal (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring)
+  have hc1 :=
+    Nat.card_unique
+      (α :=
+        (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).integer ⧸
+          IsLocalRing.maximalIdeal (Valued.v : Valuation L (WithZero (Multiplicative ℤ))).valuationSubring)
   rw [hcard] at hc1
   nlinarith
 
-theorem two_unit_VA {ϖ : L} {σ : L →+* L} {q : ℕ} (hU : Formalism.UG.IsUnramInv ϖ σ q) (hq : Odd q) :
-    IsUnit (2 : VA L) := by
+theorem two_unit_VA {ϖ : L} {σ : L →+* L} {q : ℕ} (hU : Formalism.UG.IsUnramInv ϖ σ q) (hq : Odd q)
+    : IsUnit (2 : VA L) := by
   rw [isUnit_VA_iff]
   first
-    | simpa using valuation_two_eq_one_of_unramInv_odd hU hq
-    | exact_mod_cast valuation_two_eq_one_of_unramInv_odd hU hq
+  | simpa using valuation_two_eq_one_of_unramInv_odd hU hq
+  | exact_mod_cast valuation_two_eq_one_of_unramInv_odd hU hq
 
-theorem two_val {ϖ : L} {σ : L →+* L} {q : ℕ} (hU : Formalism.UG.IsUnramInv ϖ σ q) (hq : Odd q) :
-    Valued.v (2 : L) = 1 := by
+theorem two_val {ϖ : L} {σ : L →+* L} {q : ℕ} (hU : Formalism.UG.IsUnramInv ϖ σ q) (hq : Odd q)
+    : Valued.v (2 : L) = 1 := by
   exact valuation_two_eq_one_of_unramInv_odd hU hq
 
-theorem normSurj [CompleteSpace L] (hF : FinNormSurj) (hS : HenselSqrt) {ϖ : L} {σ : L →+* L} {q : ℕ}
-    (hU : Formalism.UG.IsUnramInv ϖ σ q) (hq : Odd q) (c : VA L) (hcσ : sigA σ hU.2.1 c = c) (hc : IsUnit c) :
-    ∃ t : VA L, sigA σ hU.2.1 t * t = c := by
+theorem normSurj
+    [CompleteSpace L]
+    (hF : FinNormSurj) (hS : HenselSqrt)
+    {ϖ : L} {σ : L →+* L} {q : ℕ} (hU : Formalism.UG.IsUnramInv ϖ σ q) (hq : Odd q)
+    (c : VA L) (hcσ : sigA σ hU.2.1 c = c) (hc : IsUnit c)
+    : ∃ t : VA L, sigA σ hU.2.1 t * t = c := by
   obtain ⟨hσσ, hv, -, -, ⟨x₀, hx₀, hx₀v⟩, hq2, hcard⟩ := id hU
   haveI : Finite (IsLocalRing.ResidueField (VA L)) :=
     Nat.finite_of_card_ne_zero (by rw [show Nat.card (IsLocalRing.ResidueField (VA L)) = q ^ 2 from hcard]; positivity)
   letI : Fintype (IsLocalRing.ResidueField (VA L)) := Fintype.ofFinite _
-  have hτres : ∀ a : VA L, IsLocalRing.ResidueField.map (sigA σ hU.2.1) (IsLocalRing.residue (VA L) a) =
-      IsLocalRing.residue (VA L) (sigA σ hU.2.1 a) := fun a => IsLocalRing.ResidueField.map_residue _ a
-  have hττ : ∀ y, IsLocalRing.ResidueField.map (sigA σ hU.2.1)
-      (IsLocalRing.ResidueField.map (sigA σ hU.2.1) y) = y := by
+  have hτres
+      : ∀ a : VA L,
+        IsLocalRing.ResidueField.map (sigA σ hU.2.1) (IsLocalRing.residue (VA L) a)
+          = IsLocalRing.residue (VA L) (sigA σ hU.2.1 a) := fun a =>
+    IsLocalRing.ResidueField.map_residue _ a
+  have hττ
+      : ∀ y,
+        IsLocalRing.ResidueField.map (sigA σ hU.2.1)
+            (IsLocalRing.ResidueField.map (sigA σ hU.2.1) y)
+          = y := by
     intro y
     obtain ⟨a, rfl⟩ := IsLocalRing.residue_surjective y
     rw [hτres, hτres, sigA_inv σ _ hσσ]
@@ -148,8 +167,9 @@ theorem normSurj [CompleteSpace L] (hF : FinNormSurj) (hS : HenselSqrt) {ϖ : L}
     have h' : Valued.v (σ x₀ - x₀) < 1 := h
     rw [hx₀v] at h'
     exact lt_irrefl _ h'
-  have hcfix : IsLocalRing.ResidueField.map (sigA σ hU.2.1) (IsLocalRing.residue (VA L) c) =
-      IsLocalRing.residue (VA L) c := by
+  have hcfix
+      : IsLocalRing.ResidueField.map (sigA σ hU.2.1) (IsLocalRing.residue (VA L) c)
+        = IsLocalRing.residue (VA L) c := by
     rw [hτres, hcσ]
   have hc0 : IsLocalRing.residue (VA L) c ≠ 0 := by
     rw [Ne, IsLocalRing.residue_eq_zero_iff]
@@ -170,8 +190,9 @@ theorem normSurj [CompleteSpace L] (hF : FinNormSurj) (hS : HenselSqrt) {ϖ : L}
     rw [h, map_zero] at hav
     exact zero_ne_one hav
   have hu1 : Valued.v ((c : L) * (σ (y : L) * (y : L))⁻¹ - 1) < 1 := by
-    have h1 : (c : L) * (σ (y : L) * (y : L))⁻¹ - 1 =
-        -(σ (y : L) * (y : L) - c) * (σ (y : L) * (y : L))⁻¹ := by
+    have h1
+        : (c : L) * (σ (y : L) * (y : L))⁻¹ - 1
+          = -(σ (y : L) * (y : L) - c) * (σ (y : L) * (y : L))⁻¹ := by
       rw [neg_sub, sub_mul, mul_inv_cancel₀ ha0]
     rw [h1, map_mul, map_inv₀, hav, inv_one, mul_one, Valuation.map_neg]
     exact hdiff'

@@ -13,8 +13,10 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PowerMapFlat
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
-open GlobalTheory.CompanionTheory.Ar.BT ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out
+open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct
+open GlobalTheory.CompanionTheory.Ar.BT ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out
 open scoped CategoryTheory.Obj
 
 noncomputable section
@@ -35,26 +37,60 @@ theorem ofIdMk_toIdMk (Y : Over (Spec (CommRingCat.of R))) : ofIdMk Y ≫ toIdMk
 
 end Identity
 
-theorem exists_qfGroup_kernel : ∀ (R : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] [CharZero R] (B : Over (Spec (CommRingCat.of R))) [GrpObj B], IsSemiAbelian B → ∀ (N : ℕ), 1 ≤ N → ∀ (A : Over (Spec (CommRingCat.of R))) [GrpObj A] [IsCommMonObj A] (j : A ⟶ B) [IsMonHom j], IsPullback j (toUnit A) ((𝟙 B) ^ N) η[B] → (∀ g : A.left, (A.hom g).asIdeal = ⊥ → ∃ (κ : genPt R ⟶ A) (x : Spec (CommRingCat.of (FractionRing R))), κ.left x = g) → ∃ (C : Type) (_ : CommGroup C) (Γ : QFGroup R C) (φ : Γ.G ≅ A), IsMonHom φ.hom ∧ Γ.IsTorsionAlong B (𝟙 _) N (φ.hom.left ≫ j.left) := by
+theorem exists_qfGroup_kernel
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] [CharZero R]
+        (B : Over (Spec (CommRingCat.of R))) [GrpObj B],
+      IsSemiAbelian B
+        → ∀ (N : ℕ),
+          1 ≤ N
+            → ∀ (A : Over (Spec (CommRingCat.of R))) [GrpObj A] [IsCommMonObj A] (j : A ⟶ B)
+                [IsMonHom j],
+              IsPullback j (toUnit A) ((𝟙 B) ^ N) η[B]
+                → (∀ g : A.left,
+                  (A.hom g).asIdeal = ⊥
+                    → ∃ (κ : genPt R ⟶ A) (x : Spec (CommRingCat.of (FractionRing R))),
+                      κ.left x = g)
+                → ∃ (C : Type) (_ : CommGroup C) (Γ : QFGroup R C) (φ : Γ.G ≅ A),
+                  IsMonHom φ.hom ∧ Γ.IsTorsionAlong B (𝟙 _) N (φ.hom.left ≫ j.left) := by
   intro R _ _ _ _ B _ hB N hN A _ _ j _ hp hpt
   have := hB.smooth
   have := hB.separated
   have := hB.quasiCompact
   have := hB.comm
-  have := GlobalTheory.CompanionTheory.Ar.BT.flat_mul_semiAbelian (Spec (CommRingCat.of R)) B hB N hN
-  have := GlobalTheory.CompanionTheory.Ar.BT.locallyQuasiFinite_pow_semiAbelian (Spec (CommRingCat.of R)) B hB N hN
+  have :=
+    GlobalTheory.CompanionTheory.Ar.BT.flat_mul_semiAbelian (Spec (CommRingCat.of R)) B hB N hN
+  have :=
+    GlobalTheory.CompanionTheory.Ar.BT.locallyQuasiFinite_pow_semiAbelian (Spec (CommRingCat.of R))
+      B hB N hN
   have hm := mono_of_pullback hp
   obtain ⟨h1, h2, h3, h4, h5⟩ := kernel_props hp
   have := kernel_base_etale (genPt R).hom hp (isUnit_natCast_generic hN)
   haveI : IsReduced (genPt R).left := inferInstanceAs (IsReduced (Spec (CommRingCat.of (FractionRing R))))
   have hred := GlobalTheory.isReduced_of_smooth_of_isReduced (pullback.snd A.hom (genPt R).hom)
-  have hv : ∀ {Y : Over (Spec (CommRingCat.of R))} (g : Over.mk (Y.hom ≫ 𝟙 _) ⟶ B) (y : Y ⟶ A),
-      y.left ≫ j.left = g.left → y ≫ j = toIdMk Y ≫ g := fun {Y} g y h => by
+  have hv
+      : ∀ {Y : Over (Spec (CommRingCat.of R))} (g : Over.mk (Y.hom ≫ 𝟙 _) ⟶ B) (y : Y ⟶ A),
+        y.left ≫ j.left = g.left → y ≫ j = toIdMk Y ≫ g := fun {Y} g y h => by
     ext
     simpa [toIdMk] using h
-  refine ⟨genPt R ⟶ A, inferInstance,
-    { G := A, flat := h1, quasiFinite := h2, separated := h3, quasiCompact := h4, finPres := h5,
-      pt := MonoidHom.id _, pt_inj := ?_, pt_onto := hpt, gen_reduced := hred }, Iso.refl _, ?_, ?_⟩
+  refine ⟨
+    genPt R ⟶ A,
+    inferInstance,
+    {
+      G := A
+      flat := h1
+      quasiFinite := h2
+      separated := h3
+      quasiCompact := h4
+      finPres := h5
+      pt := MonoidHom.id _
+      pt_inj := ?_
+      pt_onto := hpt
+      gen_reduced := hred
+    },
+    Iso.refl _,
+    ?_,
+    ?_
+  ⟩
   · intro s t u v h
     exact Over.OverMorphism.ext (eq_of_same_point A.hom _ _ (Over.w _) (Over.w _) u v h)
   · show IsMonHom (𝟙 A)
@@ -76,8 +112,7 @@ theorem exists_qfGroup_kernel : ∀ (R : Type) [CommRing R] [IsDomain R] [IsNoet
     · intro Y g
       constructor
       · intro h
-        have h' : (toIdMk Y ≫ g) ^ N = 1 := by
-          rw [← MonObj.comp_pow, h, MonObj.comp_one]
+        have h' : (toIdMk Y ≫ g) ^ N = 1 := by rw [← MonObj.comp_pow, h, MonObj.comp_one]
         obtain ⟨y, hy⟩ := lift_of_torsion hp _ h'
         refine ⟨y, ?_⟩
         have e := congrArg (fun w => w.left) hy

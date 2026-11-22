@@ -5,16 +5,22 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsLeSpan
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.ZH GlobalTheory.Poinc
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory
+  GlobalTheory.ZH GlobalTheory.Poinc
 
 noncomputable section
 
 namespace GlobalTheory.Izumi
 
-theorem exists_point_of_isLocalHom {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] (M : RatModel o Ω) (x : M.Z)
-    {p : ℕ} [Fact p.Prime] (χ : M.O x →+* OO p) [IsLocalHom χ] :
-    ∃ y : Sp (OO p) ⟶ M.Z, y (cPt p) = x ∧ ∀ a : M.O x,
-      RatModel.val M (gPt p ≫ y) (a : Ω) = ((χ a : OO p) : PadicAlgCl p) := by
+theorem exists_point_of_isLocalHom
+    {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω]
+    (M : RatModel o Ω) (x : M.Z)
+    {p : ℕ} [Fact p.Prime]
+    (χ : M.O x →+* OO p) [IsLocalHom χ]
+    : ∃ y : Sp (OO p) ⟶ M.Z,
+      y (cPt p) = x
+        ∧ ∀ a : M.O x, RatModel.val M (gPt p ≫ y) (a : Ω) = ((χ a : OO p) : PadicAlgCl p) := by
   let χ' : M.Z.presheaf.stalk x ⟶ CommRingCat.of (OO p) :=
     CommRingCat.ofHom (χ.comp (M.stalkEquiv x).toRingHom)
   haveI : IsLocalHom χ'.hom := by
@@ -24,7 +30,9 @@ theorem exists_point_of_isLocalHom {o Ω : Type} [CommRing o] [Field Ω] [Algebr
   set y : Sp (OO p) ⟶ M.Z := Spec.map χ' ≫ M.Z.fromSpecStalk x with hy
   have hc : y (cPt p) = x := by
     rw [hy, Scheme.Hom.comp_apply, Spec_closedPoint, Scheme.fromSpecStalk_closedPoint]
-  have key : ∀ h : y (cPt p) ⤳ x, M.Z.presheaf.stalkSpecializes h ≫ Scheme.stalkClosedPointTo y = χ' := by
+  have key
+      : ∀ h : y (cPt p) ⤳ x,
+        M.Z.presheaf.stalkSpecializes h ≫ Scheme.stalkClosedPointTo y = χ' := by
     intro h
     refine TopCat.Presheaf.stalk_hom_ext _ fun W hxW => ?_
     rw [← Category.assoc, TopCat.Presheaf.germ_stalkSpecializes]
@@ -32,15 +40,24 @@ theorem exists_point_of_isLocalHom {o Ω : Type} [CommRing o] [Field Ω] [Algebr
   refine ⟨y, hc, fun a => ?_⟩
   rw [RatModel.val_gPt hc a]
   change (((M.Z.presheaf.stalkSpecializes _ ≫ Scheme.stalkClosedPointTo y).hom
-    ((M.stalkEquiv x).symm a) : OO p) : PadicAlgCl p) = _
+          ((M.stalkEquiv x).symm a)
+        : OO p)
+      : PadicAlgCl p)
+    = _
   rw [key]
   exact congrArg (fun b => ((χ b : OO p) : PadicAlgCl p)) ((M.stalkEquiv x).apply_symm_apply a)
 
-theorem exists_ne_zero_forall_exists_cen (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] (M : RatModel o Ω)
-    (U : M.Z.Opens) (hU : (U : Set M.Z).Nonempty) (x : M.Z) :
-    ∃ s : M.O x, s ≠ 0 ∧ ∀ (p : ℕ) [Fact p.Prime] (χ : M.O x →+* OO p), IsLocalHom χ → χ s ≠ 0 →
-      ∃ y : Sp (OO p) ⟶ M.Z, M.Cen U x y ∧ ∀ a : M.O x,
-        RatModel.val M (gPt p ≫ y) (a : Ω) = ((χ a : OO p) : PadicAlgCl p) := by
+theorem exists_ne_zero_forall_exists_cen
+    (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω]
+    (M : RatModel o Ω) (U : M.Z.Opens) (hU : (U : Set M.Z).Nonempty) (x : M.Z)
+    : ∃ s : M.O x,
+      s ≠ 0
+        ∧ ∀ (p : ℕ) [Fact p.Prime] (χ : M.O x →+* OO p),
+          IsLocalHom χ → χ s ≠ 0
+            → ∃ y : Sp (OO p) ⟶ M.Z,
+              M.Cen U x y
+                ∧ ∀ a : M.O x,
+                  RatModel.val M (gPt p ≫ y) (a : Ω) = ((χ a : OO p) : PadicAlgCl p) := by
   obtain ⟨V, hV, hxV, -⟩ := exists_isAffineOpen_mem_and_subset (U := ⊤) (x := x) trivial
   obtain ⟨w, hwU, hwV⟩ := M.nonempty_inf hU ⟨x, hxV⟩
   obtain ⟨t, htU, hwt⟩ := hV.exists_basicOpen_le (V := U) ⟨w, hwU⟩ hwV
@@ -57,8 +74,9 @@ theorem exists_ne_zero_forall_exists_cen (o Ω : Type) [CommRing o] [Field Ω] [
     rw [e]
     intro h0
     exact hs (Subtype.ext h0)
-  have hu := (RatModel.val_ne_zero_iff (RatModel.range_eq_singleton _ w')
-    ⟨valF M.pt V t, RatModel.valF_mem_O hz t⟩).1 hne
+  have hu :=
+    (RatModel.val_ne_zero_iff (RatModel.range_eq_singleton _ w')
+      ⟨valF M.pt V t, RatModel.valF_mem_O hz t⟩).1 hne
   exact htU ((RatModel.isUnit_valF_iff hz t).1 hu)
 
 end GlobalTheory.Izumi

@@ -10,7 +10,8 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 open GlobalTheory.CechPic GlobalTheory.AbDual
 open GlobalTheory.IndefiniteRowSideFullHecke.ZeroSectionBase (IsPrincipalPol sqToBase toBase)
@@ -23,18 +24,21 @@ variable {S : Scheme.{0}}
 
 section Biadd
 
-variable {A B : Over S} [GrpObj A] [GrpObj B] {P : LB (A ⊗ B).left} (hD : IsDual A B P)
-  (hD' : IsDual B A (swap P)) {Y : Over S}
+variable
+  {A B : Over S} [GrpObj A] [GrpObj B]
+  {P : LB (A ⊗ B).left} (hD : IsDual A B P) (hD' : IsDual B A (swap P))
+  {Y : Over S}
 
 include hD in
-theorem evc_mul_left (a a' : Y ⟶ A) (b : Y ⟶ B) :
-    evc hD.isLB (a * a') b = evc hD.isLB a b + evc hD.isLB a' b :=
+theorem evc_mul_left (a a' : Y ⟶ A) (b : Y ⟶ B)
+    : evc hD.isLB (a * a') b = evc hD.isLB a b + evc hD.isLB a' b :=
   (isAdditive_iff hD.isLB).1 hD.additive Y a a' b
 
 include hD hD' in
-theorem evc_mul_right (a : Y ⟶ A) (b b' : Y ⟶ B) :
-    evc hD.isLB a (b * b') = evc hD.isLB a b + evc hD.isLB a b' := by
-  rw [← evc_swap hD.isLB hD'.isLB, (isAdditive_iff hD'.isLB).mp hD'.additive Y b b' a, evc_swap, evc_swap]
+theorem evc_mul_right (a : Y ⟶ A) (b b' : Y ⟶ B)
+    : evc hD.isLB a (b * b') = evc hD.isLB a b + evc hD.isLB a b' := by
+  rw [← evc_swap hD.isLB hD'.isLB, (isAdditive_iff hD'.isLB).mp hD'.additive Y b b' a, evc_swap,
+    evc_swap]
 
 include hD in
 theorem evc_one_l (b : Y ⟶ B) : evc hD.isLB (1 : Y ⟶ A) b = 0 := hD.additive.evc_one hD.isLB b
@@ -66,8 +70,12 @@ def lamHom (x y : T ⟶ G) : Pic G.left →+ Pic T.left :=
 theorem lam_eq_lamHom (c : Pic G.left) (x y : T ⟶ G) : lam c x y = lamHom x y c := by
   simp [lam, lamHom]
 
-theorem lam_pull_pt (φ : G ⟶ G') (c : Pic G'.left) (x y : T ⟶ G) (hm : (x * y) ≫ φ = (x ≫ φ) * (y ≫ φ))
-    (h1 : (1 : T ⟶ G) ≫ φ = 1) : lam (pull φ.left c) x y = lam c (x ≫ φ) (y ≫ φ) := by
+theorem lam_pull_pt
+    (φ : G ⟶ G')
+    (c : Pic G'.left)
+    (x y : T ⟶ G) (hm : (x * y) ≫ φ = (x ≫ φ) * (y ≫ φ))
+    (h1 : (1 : T ⟶ G) ≫ φ = 1)
+    : lam (pull φ.left c) x y = lam c (x ≫ φ) (y ≫ φ) := by
   simp only [lam, ← pull_comp, ← Over.comp_left, hm, h1]
 
 end abelian₂
@@ -76,14 +84,18 @@ section Fib
 
 variable {Ω : Type} [Field Ω] (s : Sp Ω ⟶ S)
 
-theorem map_mul_pt {G G' : Over S} [GrpObj G] [GrpObj G'] (f : G ⟶ G') [IsMonHom f] {T : Over (Sp Ω)}
-    (x y : T ⟶ (Over.pullback s).obj G) :
-    (x * y) ≫ (Over.pullback s).map f = (x ≫ (Over.pullback s).map f) * (y ≫ (Over.pullback s).map f) := by
+theorem map_mul_pt
+    {G G' : Over S} [GrpObj G] [GrpObj G']
+    (f : G ⟶ G') [IsMonHom f]
+    {T : Over (Sp Ω)} (x y : T ⟶ (Over.pullback s).obj G)
+    : (x * y) ≫ (Over.pullback s).map f
+      = (x ≫ (Over.pullback s).map f) * (y ≫ (Over.pullback s).map f) := by
   apply toBase_injective s
   rw [toBase_map, toBase_mul, toBase_mul, toBase_map, toBase_map, MonObj.mul_comp]
 
-theorem map_one_pt {G G' : Over S} [GrpObj G] [GrpObj G'] (f : G ⟶ G') [IsMonHom f] {T : Over (Sp Ω)} :
-    (1 : T ⟶ (Over.pullback s).obj G) ≫ (Over.pullback s).map f = 1 := by
+theorem map_one_pt
+    {G G' : Over S} [GrpObj G] [GrpObj G'] (f : G ⟶ G') [IsMonHom f] {T : Over (Sp Ω)}
+    : (1 : T ⟶ (Over.pullback s).obj G) ≫ (Over.pullback s).map f = 1 := by
   apply toBase_injective s G'
   rw [toBase_map, toBase_one, toBase_one, MonObj.one_comp]
 

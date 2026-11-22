@@ -5,18 +5,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 @[expose] public section
 
 open CategoryTheory UpperTheory.V.Af.BA in
-private def repHomEvalLinearMap {Γ : Type} [Group Γ] {A B : Rep.{0} ℂ Γ} (x : A) : (A ⟶ B) →ₗ[ℂ] B where
+private def repHomEvalLinearMap {Γ : Type} [Group Γ] {A B : Rep.{0} ℂ Γ} (x : A)
+    : (A ⟶ B) →ₗ[ℂ] B where
   toFun φ := φ.hom x
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
 open CategoryTheory UpperTheory.V.Af.BA in
-theorem UpperTheory.rep_hom_alternating_sum_eq_zero :
-    UpperTheory.V.Af.BA.AltZero := by
+theorem UpperTheory.rep_hom_alternating_sum_eq_zero : UpperTheory.V.Af.BA.AltZero := by
   intro Γ I _ _ K
-  have key : ∀ (p : ℕ) (t : K.Tup p), (K.alt p).hom (Finsupp.single t 1) =
-      ((p + 1).factorial : ℂ)⁻¹ • ∑ π : Equiv.Perm (Fin (p + 1)),
-        ((Equiv.Perm.sign π : ℤ) : ℂ) • Finsupp.single (K.re π t) (1 : ℂ) := by
+  have key
+      : ∀ (p : ℕ) (t : K.Tup p),
+        (K.alt p).hom (Finsupp.single t 1)
+          = ((p + 1).factorial : ℂ)⁻¹
+            • ∑ π : Equiv.Perm (Fin (p + 1)),
+              ((Equiv.Perm.sign π : ℤ) : ℂ) • Finsupp.single (K.re π t) (1 : ℂ) := by
     intro p t
     show repHomEvalLinearMap (B := PC Γ (K.Tup p)) (Finsupp.single t (1 : ℂ)) (K.alt p) = _
     set_option synthInstance.maxHeartbeats 100000 in

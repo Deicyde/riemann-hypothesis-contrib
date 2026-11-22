@@ -13,14 +13,26 @@ noncomputable section
 
 namespace GlobalTheory.UPel.Sm.KSCount
 
-theorem ksDim_of_eigen_reduce : ∀ (k : Type) (H : Type 1) (O : Type) [Field k] [AddCommGroup H] [Module k H] [FiniteDimensional k H] [Ring O] (ρ : O →+* Module.End k H) (st : O → O) (φ : LinearMap.BilinForm k H) (Fil Z : Submodule k H) (w : O) (r r' : k) (d : ℕ), Function.Surjective st → (∀ b x y, φ (ρ b x) y = φ x (ρ (st b) y)) → (∀ x y, φ x y = -φ y x) → (∀ x, (∀ y, φ x y = 0) → x = 0) → (∀ x ∈ Fil, ∀ y ∈ Fil, φ x y = 0) → 2 * Module.finrank k Fil = Module.finrank k H → (∀ a, ∀ x ∈ Fil, ρ a x ∈ Fil) → (∀ a, ρ w * ρ a = ρ a * ρ w) → (ρ w - r • 1) * (ρ w - r' • 1) = 0 → r ≠ r' → (∀ x y, φ (ρ w x) y = φ x ((r + r') • y - ρ w y)) → Z ≤ LinearMap.range (ρ w - r' • 1) → KSDim ρ 0 (Fil ⊔ LinearMap.range (ρ w - r • 1)) Z d → KSDim ρ φ Fil Z d := by
-  intro k H O _ _ _ _ _ ρ st φ Fil Z w r r' d hst hadj hskew hnd hiso hdim hstab hcomm hA hr hφw hZ hd
+theorem ksDim_of_eigen_reduce
+    : ∀ (k : Type) (H : Type 1) (O : Type) [Field k] [AddCommGroup H] [Module k H]
+        [FiniteDimensional k H] [Ring O] (ρ : O →+* Module.End k H) (st : O → O)
+        (φ : LinearMap.BilinForm k H) (Fil Z : Submodule k H) (w : O) (r r' : k) (d : ℕ),
+      Function.Surjective st → (∀ b x y, φ (ρ b x) y = φ x (ρ (st b) y)) → (∀ x y, φ x y = - φ y x)
+        → (∀ x, (∀ y, φ x y = 0) → x = 0) → (∀ x ∈ Fil, ∀ y ∈ Fil, φ x y = 0)
+        → 2 * Module.finrank k Fil = Module.finrank k H → (∀ a, ∀ x ∈ Fil, ρ a x ∈ Fil)
+        → (∀ a, ρ w * ρ a = ρ a * ρ w) → (ρ w - r • 1) * (ρ w - r' • 1) = 0 → r ≠ r'
+        → (∀ x y, φ (ρ w x) y = φ x ((r + r') • y - ρ w y)) → Z ≤ LinearMap.range (ρ w - r' • 1)
+        → KSDim ρ 0 (Fil ⊔ LinearMap.range (ρ w - r • 1)) Z d
+        → KSDim ρ φ Fil Z d := by
+  intro k H O _ _ _ _ _ ρ st φ Fil Z w r r' d hst hadj hskew hnd hiso hdim hstab hcomm hA hr hφw hZ
+    hd
   set A := ρ w with hAdef
   have hA2 : ∀ x, A (A x) = (r + r') • A x - (r * r') • x := by
     intro x
     have h := LinearMap.congr_fun hA x
-    simp only [Module.End.mul_apply, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply,
-      map_sub, map_smul, LinearMap.zero_apply] at h
+    simp only [Module.End.mul_apply, LinearMap.sub_apply, LinearMap.smul_apply,
+        Module.End.one_apply, map_sub, map_smul, LinearMap.zero_apply]
+      at h
     linear_combination (norm := module) h
   have hrr : r - r' ≠ 0 := sub_ne_zero.2 hr
   set c := (r - r')⁻¹ with hc
@@ -28,15 +40,17 @@ theorem ksDim_of_eigen_reduce : ∀ (k : Type) (H : Type 1) (O : Type) [Field k]
   let P : Module.End k H := c • (A - r' • 1)
   have hPx : ∀ x, P x = c • (A x - r' • x) := fun x => by simp [P]
   have hPA : ∀ x, A (P x) = r • P x := by
-    intro x; rw [hPx, map_smul, map_sub, map_smul, hA2]
+    intro x
+    rw [hPx, map_smul, map_sub, map_smul, hA2]
     linear_combination (norm := module) (0:k) • x
   have hPfix : ∀ x, A x = r • x → P x = x := by
-    intro x hx; rw [hPx, hx]
+    intro x hx
+    rw [hPx, hx]
     linear_combination (norm := module) hc1 • x
-  have hPkill : ∀ x, A x = r' • x → P x = 0 := by
-    intro x hx; rw [hPx, hx]; simp
+  have hPkill : ∀ x, A x = r' • x → P x = 0 := by intro x hx; rw [hPx, hx]; simp
   have hQA : ∀ x, A (x - P x) = r' • (x - P x) := by
-    intro x; rw [map_sub, hPA]
+    intro x
+    rw [map_sub, hPA]
     have : A x - r' • x = (r - r') • P x := by rw [hPx, smul_smul, mul_comm, hc1, one_smul]
     linear_combination (norm := module) this
   have hPP : ∀ x, P (P x) = P x := fun x => hPfix _ (hPA x)
@@ -48,7 +62,8 @@ theorem ksDim_of_eigen_reduce : ∀ (k : Type) (H : Type 1) (O : Type) [Field k]
   have hPFil : ∀ x ∈ Fil, P x ∈ Fil := fun x hx => by
     rw [hPx]; exact Fil.smul_mem _ (Fil.sub_mem (hstab w x hx) (Fil.smul_mem _ hx))
   have hQFil : ∀ x ∈ Fil, x - P x ∈ Fil := fun x hx => Fil.sub_mem hx (hPFil x hx)
-  have hφeig : ∀ (s t : k), s ≠ t → s + t = r + r' → ∀ u v, A u = s • u → A v = s • v → φ u v = 0 := by
+  have hφeig
+      : ∀ (s t : k), s ≠ t → s + t = r + r' → ∀ u v, A u = s • u → A v = s • v → φ u v = 0 := by
     intro s t hst' hsum u v hu hv
     have h := hφw u v
     rw [hu, hv] at h
@@ -85,7 +100,8 @@ theorem ksDim_of_eigen_reduce : ∀ (k : Type) (H : Type 1) (O : Type) [Field k]
   set G := Fil ⊔ LinearMap.range (A - r • 1) with hG
   have hrangeP : ∀ y ∈ LinearMap.range (A - r • 1), P y = 0 := by
     rintro _ ⟨z, rfl⟩
-    simp only [LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply, map_sub, map_smul, hPAc, hPA, sub_self]
+    simp only [LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply, map_sub, map_smul,
+      hPAc, hPA, sub_self]
   have hFilG : Fil ≤ G := le_sup_left
   have hmemG : ∀ x ∈ G, P x ∈ Fil := by
     intro x hx
@@ -103,38 +119,41 @@ theorem ksDim_of_eigen_reduce : ∀ (k : Type) (H : Type 1) (O : Type) [Field k]
     intro z hz
     obtain ⟨y, rfl⟩ := hZ hz
     apply hPfix
-    simp only [LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply, map_sub, map_smul, hA2]
+    simp only [LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply, map_sub, map_smul,
+      hA2]
     module
   have hwQ : ∀ (F : Submodule k H) v, r • v - A v ∈ F → v - P v ∈ F := by
     intro F v hv
     have e : v - P v = c • (r • v - A v) := by
       have h := hAP v
       linear_combination (norm := module) c • h - hc1 • v + hc1 • P v
-    rw [e]; exact F.smul_mem _ hv
+    rw [e]
+    exact F.smul_mem _ hv
   have hwP : ∀ (F : Submodule k H) v, r' • v - A v ∈ F → P v ∈ F := by
     intro F v hv
     have e : P v = (-c) • (r' • v - A v) := by
       have h := hAP v
       linear_combination (norm := module) (-c) • h - hc1 • P v
-    rw [e]; exact F.smul_mem _ hv
-  have L1 : ∀ v y, φ (P v) y = φ (P v) (y - P y) := fun v y => by
-    rw [hφdec (P v) y]; simp [hPP]
+    rw [e]
+    exact F.smul_mem _ hv
+  have L1 : ∀ v y, φ (P v) y = φ (P v) (y - P y) := fun v y => by rw [hφdec (P v) y]; simp [hPP]
   have L2 : ∀ v y, φ (v - P v) y = φ v (P y) := fun v y => by
     rw [hφdec (v - P v) y, hφdec v (P y)]; simp [hPP, hPQ]
-  have L3 : ∀ x v, φ x (P v) = φ (x - P x) (P v) := fun x v => by
-    rw [hφdec x (P v)]; simp [hPP]
+  have L3 : ∀ x v, φ x (P v) = φ (x - P x) (P v) := fun x v => by rw [hφdec x (P v)]; simp [hPP]
   have L4 : ∀ x v, φ x (v - P v) = φ (P x) v := fun x v => by
     rw [hφdec x (v - P v), hφdec (P x) v]; simp [hPP, hPQ]
   have hQcrit : ∀ v, (∀ y ∈ Fil, φ v (P y) = 0) → v - P v ∈ Fil := by
     intro v hv
     apply hperp
     intro y hy
-    rw [L2]; exact hv y hy
+    rw [L2]
+    exact hv y hy
 
-  let conj : (H →ₗ[k] H) →ₗ[k] (H →ₗ[k] H) :=
-    { toFun := fun g => P ∘ₗ g ∘ₗ P
-      map_add' := fun f g => by ext; simp
-      map_smul' := fun a f => by ext; simp }
+  let conj : (H →ₗ[k] H) →ₗ[k] (H →ₗ[k] H) := {
+    toFun := fun g => P ∘ₗ g ∘ₗ P
+    map_add' := fun f g => by ext; simp
+    map_smul' := fun a f => by ext; simp
+  }
   have hconj : ∀ g x, conj g x = P (g (P x)) := fun _ _ => rfl
   have hi : ∀ g, IsKS ρ φ Fil Z g → IsKS ρ 0 G Z (conj g) := by
     intro g hg
@@ -146,7 +165,8 @@ theorem ksDim_of_eigen_reduce : ∀ (k : Type) (H : Type 1) (O : Type) [Field k]
     intro g hg
     constructor
     · intro h x hx
-      rw [hconj]; exact hFilG (hPFil _ (h _ (hmemG x hx)))
+      rw [hconj]
+      exact hFilG (hPFil _ (h _ (hmemG x hx)))
     · intro h
       have hPpart : ∀ u ∈ Fil, P (g (P u)) ∈ Fil := by
         intro u hu
@@ -188,18 +208,18 @@ theorem ksDim_of_eigen_reduce : ∀ (k : Type) (H : Type 1) (O : Type) [Field k]
       have : φ u v = 0 := LinearMap.congr_fun hv u
       rw [this, neg_zero]
     have hsurj : Function.Surjective φ.flip :=
-      (LinearMap.injective_iff_surjective_of_finrank_eq_finrank
-        (Subspace.dual_finrank_eq).symm).1 hinj
-    obtain ⟨s, hs⟩ := LinearMap.exists_rightInverse_of_surjective φ.flip (LinearMap.range_eq_top.2 hsurj)
+      (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (Subspace.dual_finrank_eq).symm).1
+        hinj
+    obtain ⟨s, hs⟩ :=
+      LinearMap.exists_rightInverse_of_surjective φ.flip (LinearMap.range_eq_top.2 hsurj)
     let L : H →ₗ[k] H := P ∘ₗ f' ∘ₗ P
     let T : H →ₗ[k] H := s ∘ₗ (-(L.dualMap ∘ₗ φ.flip))
-    have hT : ∀ u v, φ u (T v) = -φ (P (f' (P u))) v := by
+    have hT : ∀ u v, φ u (T v) = - φ (P (f' (P u))) v := by
       intro u v
-      have := LinearMap.congr_fun (LinearMap.congr_fun hs (-(L.dualMap ∘ₗ φ.flip) v)) u
+      have := LinearMap.congr_fun (LinearMap.congr_fun hs (- (L.dualMap ∘ₗ φ.flip) v)) u
       simpa [T, L] using this
     let g : H →ₗ[k] H := L + (1 - P) ∘ₗ T ∘ₗ (1 - P)
-    have hg : ∀ x, g x = P (f' (P x)) + (T (x - P x) - P (T (x - P x))) := fun x => by
-      simp [g, L]
+    have hg : ∀ x, g x = P (f' (P x)) + (T (x - P x) - P (T (x - P x))) := fun x => by simp [g, L]
     have hT0 : T 0 = 0 := map_zero T
     refine ⟨g, ⟨fun a x hx => ?_, fun z hz => ?_, fun x _ y _ => ?_⟩, fun x hx => ?_⟩
     · obtain ⟨q, hq⟩ : ∃ q, q = x - P x := ⟨_, rfl⟩
@@ -218,8 +238,8 @@ theorem ksDim_of_eigen_reduce : ∀ (k : Type) (H : Type 1) (O : Type) [Field k]
         rw [← hPρ (st a) (f' u), ← map_sub]; exact hmemG _ (hf'.1 (st a) u (hFilG (hPFil y hy)))
       have h4 := hiso _ hm q hqF
       rw [LinearMap.map_sub₂] at h4
-      have F2 : φ u (T (ρ a q)) = -φ (P (f' u)) (ρ a q) := by rw [hT, hu, hPP]
-      have F5 : φ (ρ (st a) u) t = -φ (P (f' (ρ (st a) u))) q := by rw [ht, hT, hu, hPρ, hPP]
+      have F2 : φ u (T (ρ a q)) = - φ (P (f' u)) (ρ a q) := by rw [hT, hu, hPP]
+      have F5 : φ (ρ (st a) u) t = - φ (P (f' (ρ (st a) u))) q := by rw [ht, hT, hu, hPρ, hPP]
       have F3 := hadj a t u
       have F7 := hadj a q (P (f' u))
       have S1 := hskew (T (ρ a q)) u
@@ -246,14 +266,18 @@ theorem ksDim_of_eigen_reduce : ∀ (k : Type) (H : Type 1) (O : Type) [Field k]
       linear_combination ex + ey + K1 + K2 + K3 + K4 + K5 + K7 - K6 + K8
     · rw [hconj, hg, hPP, sub_self, hT0, map_zero, sub_zero, add_zero, hPP]
       have hu : x - P x ∈ G := hQG x
-      have hp : P (f' (x - P x)) ∈ G := hwP G _ (by
-        have := hf'.1 w (x - P x) hu
-        rwa [← hAdef, hQA, map_smul] at this)
+      have hp : P (f' (x - P x)) ∈ G :=
+        hwP G _ (by
+          have := hf'.1 w (x - P x) hu
+          rwa [← hAdef, hQA, map_smul] at this)
       have hq1 := hQG (f' (x - P x))
       have hq2 := hQG (f' (P x))
       have e1 : f' x = f' (P x) + f' (x - P x) := by rw [← map_add (f := _), add_sub_cancel]
-      have e : P (f' (P x)) - f' x = -(f' (P x) - P (f' (P x))) -
-          (P (f' (x - P x)) + (f' (x - P x) - P (f' (x - P x)))) := by rw [e1]; abel
+      have e
+          : P (f' (P x)) - f' x
+            = -(f' (P x) - P (f' (P x)))
+              - (P (f' (x - P x)) + (f' (x - P x) - P (f' (x - P x)))) := by
+        rw [e1]; abel
       rw [e]
       exact G.sub_mem (G.neg_mem hq2) (G.add_mem hp hq1)
 
@@ -266,11 +290,11 @@ theorem ksDim_of_eigen_reduce : ∀ (k : Type) (H : Type 1) (O : Type) [Field k]
     · rintro ⟨f', hf', rfl⟩
       obtain ⟨g, hg, hgf⟩ := hiii f' hf'
       exact ⟨g, hg, (cls_eq_iff (Fil := G) _ _).2 hgf⟩
-  have hkerEq : LinearMap.ker (cls Fil ∘ₗ p.subtype) = LinearMap.ker ((cls G ∘ₗ conj) ∘ₗ p.subtype) := by
+  have hkerEq
+      : LinearMap.ker (cls Fil ∘ₗ p.subtype) = LinearMap.ker ((cls G ∘ₗ conj) ∘ₗ p.subtype) := by
     ext ⟨g, hg⟩
     simp only [LinearMap.mem_ker, LinearMap.comp_apply, Submodule.subtype_apply]
-    have e1 : cls Fil g = 0 ↔ ∀ x ∈ Fil, g x ∈ Fil := by
-      rw [← (cls Fil).map_zero, cls_eq_iff]; simp
+    have e1 : cls Fil g = 0 ↔ ∀ x ∈ Fil, g x ∈ Fil := by rw [← (cls Fil).map_zero, cls_eq_iff]; simp
     have e2 : cls G (conj g) = 0 ↔ ∀ x ∈ G, conj g x ∈ G := by
       rw [← (cls G).map_zero, cls_eq_iff]; simp
     rw [e1, e2]

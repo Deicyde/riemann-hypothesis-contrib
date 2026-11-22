@@ -9,8 +9,10 @@ open NumberField
 namespace GlobalTheory
 
 theorem ringOfIntegers_eq_zero_of_natCast_dvd_of_norm_embedding_le
-    (E : Type) [Field E] [NumberField E] (g₀ : ℕ) (B : ℝ) (t : 𝓞 E)
-    (hd : (g₀ : 𝓞 E) ∣ t) (hB : ∀ ι : E →+* ℂ, ‖ι (t : E)‖ ≤ B) (hlt : B < g₀) : t = 0 := by
+    (E : Type) [Field E] [NumberField E]
+    (g₀ : ℕ) (B : ℝ) (t : 𝓞 E) (hd : (g₀ : 𝓞 E) ∣ t) (hB : ∀ ι : E →+* ℂ, ‖ι (t : E)‖ ≤ B)
+    (hlt : B < g₀)
+    : t = 0 := by
   by_contra ht
   obtain ⟨s, rfl⟩ := hd
   have hs : s ≠ 0 := by

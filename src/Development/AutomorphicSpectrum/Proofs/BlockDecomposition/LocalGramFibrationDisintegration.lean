@@ -13,7 +13,8 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 open GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.WeilSiegel.Free
 
@@ -21,11 +22,20 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.WeilSiegel.Free.FibreInv
 
-theorem isFibreFamily_map_homeo {V X Y : Type} [TopologicalSpace V] [MeasurableSpace V] [BorelSpace V]
-    [TopologicalSpace X] [MeasurableSpace X] (μ : Measure V) (ν : Measure X) (f : V → Y) (ι : X → Y)
-    (e : V ≃ₜ V) (hf : ∀ v, f (e v) = f v) (U : Set V) (hU : e ⁻¹' U = U) (hμ : μ.map e = μ)
-    (B : Set X) (fib : X → Measure V) (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι U ν B fib) :
-    Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι U ν B (fun b => (fib b).map e) := by
+theorem isFibreFamily_map_homeo
+    {V X Y : Type}
+    [TopologicalSpace V] [MeasurableSpace V] [BorelSpace V] [TopologicalSpace X] [MeasurableSpace X]
+    (μ : Measure V)
+    (ν : Measure X)
+    (f : V → Y)
+    (ι : X → Y)
+    (e : V ≃ₜ V) (hf : ∀ v, f (e v) = f v)
+    (U : Set V) (hU : e ⁻¹' U = U)
+    (hμ : μ.map e = μ)
+    (B : Set X) (fib : X → Measure V)
+    (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι U ν B fib)
+    : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι U ν B
+      (fun b => (fib b).map e) := by
   obtain ⟨h1, h2, h3⟩ := h
   have hemb : MeasurableEmbedding e := e.measurableEmbedding
   refine ⟨?_, ?_, ?_⟩
@@ -50,8 +60,8 @@ theorem isFibreFamily_map_homeo {V X Y : Type} [TopologicalSpace V] [MeasurableS
     have hts' : tsupport (φ ∘ e) ⊆ U := by
       rw [tsupport_comp_eq_preimage, ← hU]
       exact Set.preimage_mono hts
-    obtain ⟨hi, hcont⟩ := h3 (φ ∘ e) (hφ.comp e.continuous)
-      (hcs.comp_isClosedEmbedding e.isClosedEmbedding) hts'
+    obtain ⟨hi, hcont⟩ :=
+      h3 (φ ∘ e) (hφ.comp e.continuous) (hcs.comp_isClosedEmbedding e.isClosedEmbedding) hts'
     refine ⟨fun b hb => ?_, ?_⟩
     · rw [hemb.integrable_map_iff]
       exact hi b hb
@@ -61,9 +71,10 @@ theorem isFibreFamily_map_homeo {V X Y : Type} [TopologicalSpace V] [MeasurableS
       rw [this]
       exact hcont
 
-theorem linearIndependent_mulVec {K : Type} [CommRing K] {M n : ℕ} (g : GL (Fin M) K) (X : Fin n → Fin M → K)
-    (hX : LinearIndependent K X) :
-    LinearIndependent K (fun a => (g : Matrix (Fin M) (Fin M) K).mulVec (X a)) := by
+theorem linearIndependent_mulVec
+    {K : Type} [CommRing K]
+    {M n : ℕ} (g : GL (Fin M) K) (X : Fin n → Fin M → K) (hX : LinearIndependent K X)
+    : LinearIndependent K (fun a => (g : Matrix (Fin M) (Fin M) K).mulVec (X a)) := by
   have hinj : Function.Injective (Matrix.mulVecLin (g : Matrix (Fin M) (Fin M) K)) := by
     intro x y hxy
     have h2 := congrArg (((g⁻¹ : GL (Fin M) K) : Matrix (Fin M) (Fin M) K).mulVec) hxy
@@ -71,7 +82,20 @@ theorem linearIndependent_mulVec {K : Type} [CommRing K] {M n : ℕ} (g : GL (Fi
     exact h2
   exact hX.map' (Matrix.mulVecLin (g : Matrix (Fin M) (Fin M) K)) (LinearMap.ker_eq_bot.2 hinj)
 
-theorem map_actW_fibre_free : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E), IsHermND σ J → ∀ (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [MeasurableSpace R] [BorelSpace R], IsLocR R → ∀ (n : ℕ), ∀ (μ : Measure (Fin n → Fin M → R ⊗[F] E)) (ν : Measure (HermR R σ n)) (m : HermR R σ n → Measure (Fin n → Fin M → R ⊗[F] E)), μ.IsAddHaarMeasure → ν.IsAddHaarMeasure → IsGramFibFree R σ J n μ ν m → ∀ (h : HA R σ J) (S : HermR R σ n), (m S).map (actW R σ J h) = m S := by
+theorem map_actW_fibre_free
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (M : ℕ) (J : Matrix (Fin M) (Fin M) E),
+          IsHermND σ J
+            → ∀ (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [MeasurableSpace R]
+                [BorelSpace R],
+              IsLocR R
+                → ∀ (n : ℕ),
+                  ∀ (μ : Measure (Fin n → Fin M → R ⊗[F] E)) (ν : Measure (HermR R σ n))
+                      (m : HermR R σ n → Measure (Fin n → Fin M → R ⊗[F] E)),
+                    μ.IsAddHaarMeasure → ν.IsAddHaarMeasure → IsGramFibFree R σ J n μ ν m
+                      → ∀ (h : HA R σ J) (S : HermR R σ n), (m S).map (actW R σ J h) = m S := by
   intro F E _ _ _ _ _ σ hσ M J hJ R _ _ _ _ _ hR n μ ν m hμ hν hm h S
   have hR' := hR
   obtain ⟨_, _, _, _, -, -, -, -⟩ := hR'
@@ -79,17 +103,19 @@ theorem map_actW_fibre_free : ∀ (F E : Type) [Field F] [NumberField F] [Field 
   have hbor' := hbor n M
   obtain ⟨_, _, _, _, hlift⟩ := GlobalTheory.CompanionTheory.SW.HermTop.herm_top F E σ hσ R n
   obtain ⟨g, hgc, hgf⟩ := hlift M J hJ
-  obtain ⟨_, -, -, -, -, hact⟩ := GlobalTheory.T.adelic_unitary_group_locally_compact F E σ hσ M J hJ R
+  obtain ⟨_, -, -, -, -, hact⟩ :=
+    GlobalTheory.T.adelic_unitary_group_locally_compact F E σ hσ M J hJ R
   obtain ⟨hcont, hone, hmul, hgr⟩ := hact n
   have hcg : ∀ k : HA R σ J, Continuous (actW R σ J k : (Fin n → Fin M → R ⊗[F] E) → _) := fun k =>
     hcont.comp (Continuous.prodMk_right k)
-  let e : (Fin n → Fin M → R ⊗[F] E) ≃ₜ (Fin n → Fin M → R ⊗[F] E) :=
-    { toFun := actW R σ J h
-      invFun := actW R σ J h⁻¹
-      left_inv := fun X => by rw [← hmul, inv_mul_cancel, hone]
-      right_inv := fun X => by rw [← hmul, mul_inv_cancel, hone]
-      continuous_toFun := hcg h
-      continuous_invFun := hcg h⁻¹ }
+  let e : (Fin n → Fin M → R ⊗[F] E) ≃ₜ (Fin n → Fin M → R ⊗[F] E) := {
+    toFun := actW R σ J h
+    invFun := actW R σ J h⁻¹
+    left_inv := fun X => by rw [← hmul, inv_mul_cancel, hone]
+    right_inv := fun X => by rw [← hmul, mul_inv_cancel, hone]
+    continuous_toFun := hcg h
+    continuous_invFun := hcg h⁻¹
+  }
   let W : Set (Fin n → Fin M → R ⊗[F] E) := {X | LinearIndependent (R ⊗[F] E) X}
   have hWo : IsOpen W := GlobalTheory.T.linearly_independent_frames_open F E σ hσ R hR n M
   have hfree : ∀ (k : HA R σ J) (X : Fin n → Fin M → R ⊗[F] E), X ∈ W → actW R σ J k X ∈ W :=
@@ -101,17 +127,24 @@ theorem map_actW_fibre_free : ∀ (F E : Type) [Field F] [NumberField F] [Field 
     have h3 : actW R σ J h⁻¹ (actW R σ J h X) = X := by rw [← hmul, inv_mul_cancel, hone]
     rw [h3] at h2
     exact h2
-  have hμm : μ.map e = μ := GlobalTheory.T.unitary_action_preserves_haar_local F E σ hσ M J hJ R hR n μ hμ h
-  have ht := isFibreFamily_map_homeo μ ν (gramR R σ J) Subtype.val e (fun X => hgr h X) W hU hμm
-    Set.univ m hm
-  have hm0 : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ (gramR R σ J) Subtype.val (g ⁻¹' Set.univ ∩ W) ν Set.univ m := by
+  have hμm : μ.map e = μ :=
+    GlobalTheory.T.unitary_action_preserves_haar_local F E σ hσ M J hJ R hR n μ hμ h
+  have ht :=
+    isFibreFamily_map_homeo μ ν (gramR R σ J) Subtype.val e
+      (fun X => hgr h X)
+      W hU hμm Set.univ m hm
+  have hm0 : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ (gramR R σ J)
+      Subtype.val (g ⁻¹' Set.univ ∩ W) ν Set.univ m := by
     rw [Set.preimage_univ, Set.univ_inter]
     exact hm
-  have ht0 : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ (gramR R σ J) Subtype.val (g ⁻¹' Set.univ ∩ W) ν Set.univ
-      (fun b => (m b).map e) := by
+  have ht0 : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ (gramR R σ J)
+      Subtype.val (g ⁻¹' Set.univ ∩ W) ν Set.univ (fun b => (m b).map e) := by
     rw [Set.preimage_univ, Set.univ_inter]
     exact ht
-  exact GlobalTheory.T.measurable_embedding_of_injective_proper _ _ _ μ ν (gramR R σ J) g Subtype.val Subtype.val_injective hgc hgf W hWo Set.univ Set.univ
-    isOpen_univ isOpen_univ subset_rfl m (fun b => (m b).map e) hm0 ht0 S (Set.mem_univ S)
+  exact GlobalTheory.T.measurable_embedding_of_injective_proper _ _ _ μ ν (gramR R σ J) g
+    Subtype.val Subtype.val_injective hgc hgf W hWo Set.univ Set.univ isOpen_univ isOpen_univ
+    subset_rfl m
+    (fun b => (m b).map e)
+    hm0 ht0 S (Set.mem_univ S)
 
 end GlobalTheory.CompanionTheory.WeilSiegel.Free.FibreInv

@@ -13,22 +13,26 @@ open IsLocalRing TensorProduct
 
 section Nakayama
 
-theorem finite_of_isHausdorff_of_finite_quotient {R : Type*} [CommRing R] (I : Ideal R)
-    [IsAdicComplete I R] (M : Type*) [AddCommGroup M] [Module R M] [IsHausdorff I M]
-    [Module.Finite R (M ⧸ (I • ⊤ : Submodule R M))] : Module.Finite R M := by
+theorem finite_of_isHausdorff_of_finite_quotient
+    {R : Type*} [CommRing R]
+    (I : Ideal R) [IsAdicComplete I R]
+    (M : Type*)
+    [AddCommGroup M] [Module R M] [IsHausdorff I M] [Module.Finite R (M ⧸ (I • ⊤ : Submodule R M))]
+    : Module.Finite R M := by
   obtain ⟨n, g, hg⟩ := Module.Finite.exists_fin' R (M ⧸ (I • ⊤ : Submodule R M))
-  obtain ⟨f, hf⟩ := Module.projective_lifting_property (I • ⊤ : Submodule R M).mkQ g
-    (Submodule.mkQ_surjective _)
+  obtain ⟨f, hf⟩ :=
+    Module.projective_lifting_property (I • ⊤ : Submodule R M).mkQ g (Submodule.mkQ_surjective _)
   haveI := ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion.isPrecomplete_finite_module I (Fin n → R)
   exact Module.Finite.of_surjective f
     (surjective_of_mkQ_comp_surjective (I := I) (by rw [hf]; exact hg))
 
-theorem finite_of_forall_prime_mem {R B : Type*} [CommRing R] [IsLocalRing R]
-    [IsAdicComplete (maximalIdeal R) R] [CommRing B] [IsDomain B] [IsNoetherianRing B]
-    [IsLocalRing B] [Algebra R B] [Finite (B ⧸ maximalIdeal B)] {f : B} (hf : f ≠ 0)
-    (H : ∀ P : Ideal B, P.IsPrime → P ≠ ⊥ → f ∈ P)
+theorem finite_of_forall_prime_mem
+    {R B : Type*} [CommRing R] [IsLocalRing R] [IsAdicComplete (maximalIdeal R) R] [CommRing B]
+    [IsDomain B] [IsNoetherianRing B] [IsLocalRing B] [Algebra R B] [Finite (B ⧸ maximalIdeal B)]
+    {f : B} (hf : f ≠ 0) (H : ∀ P : Ideal B, P.IsPrime → P ≠ ⊥ → f ∈ P)
     (h0 : (maximalIdeal R).map (algebraMap R B) ≠ ⊥)
-    (h1 : (maximalIdeal R).map (algebraMap R B) ≠ ⊤) : Module.Finite R B := by
+    (h1 : (maximalIdeal R).map (algebraMap R B) ≠ ⊤)
+    : Module.Finite R B := by
   set J := (maximalIdeal R).map (algebraMap R B) with hJ
   have hrad : maximalIdeal B ≤ J.radical := by
     rw [Ideal.radical_eq_sInf]
@@ -50,28 +54,35 @@ end Nakayama
 
 section Core
 
-theorem exists_prime_notMem_forall_mem {A : Type*} [CommRing A] [IsNoetherianRing A] {f : A}
-    {q : Ideal A} (hq : q.IsPrime) (hf : f ∉ q) : ∃ Q : Ideal A, Q.IsPrime ∧ f ∉ Q ∧
-      ∀ P : Ideal (A ⧸ Q), P.IsPrime → P ≠ ⊥ → Ideal.Quotient.mk Q f ∈ P := by
-  obtain ⟨Q, hQ, hmax⟩ := set_has_maximal_iff_noetherian.mpr (inferInstance : IsNoetherian A A)
-    {Q : Ideal A | Q.IsPrime ∧ f ∉ Q} ⟨q, hq, hf⟩
+theorem exists_prime_notMem_forall_mem
+    {A : Type*} [CommRing A] [IsNoetherianRing A]
+    {f : A} {q : Ideal A} (hq : q.IsPrime) (hf : f ∉ q)
+    : ∃ Q : Ideal A,
+      Q.IsPrime ∧ f ∉ Q ∧ ∀ P : Ideal (A ⧸ Q), P.IsPrime → P ≠ ⊥ → Ideal.Quotient.mk Q f ∈ P := by
+  obtain ⟨Q, hQ, hmax⟩ :=
+    set_has_maximal_iff_noetherian.mpr (inferInstance : IsNoetherian A A)
+      {Q : Ideal A | Q.IsPrime ∧ f ∉ Q} ⟨q, hq, hf⟩
   refine ⟨Q, hQ.1, hQ.2, fun P hP hP0 => ?_⟩
   by_contra h
   refine hmax (P.comap (Ideal.Quotient.mk Q)) ⟨Ideal.IsPrime.comap _, h⟩ ?_
   obtain ⟨x, hx, hx0⟩ := (Submodule.ne_bot_iff P).mp hP0
   obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective x
-  refine SetLike.lt_iff_le_and_exists.mpr ⟨fun a ha => ?_, x, hx,
-    fun hxQ => hx0 (Ideal.Quotient.eq_zero_iff_mem.mpr hxQ)⟩
+  refine SetLike.lt_iff_le_and_exists.mpr
+    ⟨fun a ha => ?_, x, hx, fun hxQ => hx0 (Ideal.Quotient.eq_zero_iff_mem.mpr hxQ)⟩
   rw [Ideal.mem_comap, Ideal.Quotient.eq_zero_iff_mem.mpr ha]
   exact P.zero_mem
 
-theorem exists_prime_finite_quotient_atPrime {R A : Type*} [CommRing R] [IsLocalRing R]
-    [IsAdicComplete (maximalIdeal R) R] [CommRing A] [IsNoetherianRing A] [Algebra R A]
+theorem exists_prime_finite_quotient_atPrime
+    {R A : Type*} [CommRing R] [IsLocalRing R] [IsAdicComplete (maximalIdeal R) R] [CommRing A]
+    [IsNoetherianRing A] [Algebra R A]
     (m : Ideal A) [m.IsMaximal] [Finite (A ⧸ m)]
-    (hm : (maximalIdeal R).map (algebraMap R A) ≤ m) {q : Ideal A} (hq : q.IsPrime) (hqm : q ≤ m)
-    {ϖ : R} (hϖ : ϖ ∈ maximalIdeal R) {f : A} (hf : algebraMap R A ϖ * f ∉ q) :
-    ∃ Q : Ideal (Localization.AtPrime m), Q.IsPrime ∧
-      algebraMap A _ (algebraMap R A ϖ * f) ∉ Q ∧ Module.Finite R (Localization.AtPrime m ⧸ Q) := by
+    (hm : (maximalIdeal R).map (algebraMap R A) ≤ m)
+    {q : Ideal A} (hq : q.IsPrime) (hqm : q ≤ m)
+    {ϖ : R} (hϖ : ϖ ∈ maximalIdeal R)
+    {f : A} (hf : algebraMap R A ϖ * f ∉ q)
+    : ∃ Q : Ideal (Localization.AtPrime m),
+      Q.IsPrime ∧ algebraMap A _ (algebraMap R A ϖ * f) ∉ Q
+        ∧ Module.Finite R (Localization.AtPrime m ⧸ Q) := by
   set L := Localization.AtPrime m
   have hdis : Disjoint (m.primeCompl : Set A) (q : Set A) :=
     Set.disjoint_left.mpr fun x hx hxq => hx (hqm hxq)
@@ -105,22 +116,23 @@ theorem exists_prime_finite_quotient_atPrime {R A : Type*} [CommRing R] [IsLocal
     rw [Ideal.map_le_iff_le_comap]
     intro r hr
     have h1 : algebraMap A L (algebraMap R A r) ∈ maximalIdeal L :=
-      (IsLocalization.AtPrime.to_map_mem_maximal_iff L m _).mpr
-        (hm (Ideal.mem_map_of_mem _ hr))
+      (IsLocalization.AtPrime.to_map_mem_maximal_iff L m _).mpr (hm (Ideal.mem_map_of_mem _ hr))
     exact map_nonunit (Ideal.Quotient.mk Q) _ h1
 
 end Core
 
 section Integers
 
-variable (p : ℕ) [Fact p.Prime] (K : Type*) [Field K] [Algebra ℚ_[p] K] [Algebra ℤ_[p] K]
-  [IsScalarTower ℤ_[p] ℚ_[p] K] [FiniteDimensional ℚ_[p] K]
+variable
+  (p : ℕ) [Fact p.Prime]
+  (K : Type*) [Field K] [Algebra ℚ_[p] K] [Algebra ℤ_[p] K] [IsScalarTower ℤ_[p] ℚ_[p] K]
+  [FiniteDimensional ℚ_[p] K]
 
 instance finite_integralClosure_padicInt : Module.Finite ℤ_[p] (integralClosure ℤ_[p] K) :=
   IsIntegralClosure.finite ℤ_[p] ℚ_[p] K _
 
-instance isDiscreteValuationRing_integralClosure_padicInt :
-    IsDiscreteValuationRing (integralClosure ℤ_[p] K) :=
+instance isDiscreteValuationRing_integralClosure_padicInt
+    : IsDiscreteValuationRing (integralClosure ℤ_[p] K) :=
   ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion.cl_dvr ℤ_[p] ℚ_[p] K
 
 instance isFractionRing_integralClosure_padicInt : IsFractionRing (integralClosure ℤ_[p] K) K :=
@@ -133,34 +145,34 @@ theorem charZero_integralClosure_padicInt : CharZero (integralClosure ℤ_[p] K)
   haveI : CharZero K := charZero_of_injective_algebraMap (algebraMap ℚ_[p] K).injective
   inferInstance
 
-
 omit [Algebra ℚ_[p] K] [IsScalarTower ℤ_[p] ℚ_[p] K] [FiniteDimensional ℚ_[p] K] in
-theorem isLocalHom_of_injective_integralClosure {B : Type*} [CommRing B] [Algebra ℤ_[p] B]
-    (g : B →ₐ[ℤ_[p]] integralClosure ℤ_[p] K) (hg : Function.Injective g) :
-    IsLocalHom (g : B →+* integralClosure ℤ_[p] K) := by
+theorem isLocalHom_of_injective_integralClosure
+    {B : Type*} [CommRing B] [Algebra ℤ_[p] B]
+    (g : B →ₐ[ℤ_[p]] integralClosure ℤ_[p] K) (hg : Function.Injective g)
+    : IsLocalHom (g : B →+* integralClosure ℤ_[p] K) := by
   refine RingHom.IsIntegral.isLocalHom ?_ hg
   refine RingHom.IsIntegral.tower_top (algebraMap ℤ_[p] B) _ ?_
   rw [g.comp_algebraMap]
   exact fun x => (Algebra.IsIntegral.isIntegral x : IsIntegral ℤ_[p] x)
 
-variable {L : Type*} [Field L] [Algebra ℚ_[p] L] [Algebra ℤ_[p] L]
-  [IsScalarTower ℤ_[p] ℚ_[p] L] [FiniteDimensional ℚ_[p] L]
+variable
+  {L : Type*} [Field L] [Algebra ℚ_[p] L] [Algebra ℤ_[p] L] [IsScalarTower ℤ_[p] ℚ_[p] L]
+  [FiniteDimensional ℚ_[p] L]
 
 omit [FiniteDimensional ℚ_[p] K] [FiniteDimensional ℚ_[p] L] in
-theorem mapIntegralClosure_padicInt_injective (σ : K →ₐ[ℚ_[p]] L) :
-    Function.Injective (σ.restrictScalars ℤ_[p]).mapIntegralClosure := fun _ _ h =>
+theorem mapIntegralClosure_padicInt_injective (σ : K →ₐ[ℚ_[p]] L)
+    : Function.Injective (σ.restrictScalars ℤ_[p]).mapIntegralClosure := fun _ _ h =>
   Subtype.ext (σ.toRingHom.injective (congrArg Subtype.val h))
 
-theorem comap_maximalIdeal_mapIntegralClosure (σ : K →ₐ[ℚ_[p]] L) :
-    (maximalIdeal (integralClosure ℤ_[p] L)).comap
-        ((σ.restrictScalars ℤ_[p]).mapIntegralClosure :
-          integralClosure ℤ_[p] K →+* integralClosure ℤ_[p] L) =
-      maximalIdeal (integralClosure ℤ_[p] K) := by
+theorem comap_maximalIdeal_mapIntegralClosure (σ : K →ₐ[ℚ_[p]] L)
+    : (maximalIdeal (integralClosure ℤ_[p] L)).comap
+        ((σ.restrictScalars ℤ_[p]).mapIntegralClosure
+          : integralClosure ℤ_[p] K →+* integralClosure ℤ_[p] L)
+      = maximalIdeal (integralClosure ℤ_[p] K) := by
   haveI := isLocalHom_of_injective_integralClosure _ (mapIntegralClosure_padicInt_injective σ)
   exact maximalIdeal_comap _
 
-theorem isIntegral_padicInt_iff_norm_le_one (x : PadicAlgCl p) :
-    IsIntegral ℤ_[p] x ↔ ‖x‖ ≤ 1 := by
+theorem isIntegral_padicInt_iff_norm_le_one (x : PadicAlgCl p) : IsIntegral ℤ_[p] x ↔ ‖x‖ ≤ 1 := by
   have hx : IsIntegral ℚ_[p] x := Algebra.IsIntegral.isIntegral x
   rw [← PadicAlgCl.spectralNorm_eq, spectralNorm, spectralValue_le_one_iff (minpoly.monic hx)]
   constructor
@@ -175,14 +187,15 @@ theorem isIntegral_padicInt_iff_norm_le_one (x : PadicAlgCl p) :
     refine ⟨q, hqm, ?_⟩
     rw [← Polynomial.aeval_def, ← Polynomial.aeval_map_algebraMap ℚ_[p], hq, minpoly.aeval]
 
-theorem mem_integralClosure_padicInt_iff (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (x : K) :
-    x ∈ integralClosure ℤ_[p] K ↔ ‖(x : PadicAlgCl p)‖ ≤ 1 := by
+theorem mem_integralClosure_padicInt_iff (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (x : K)
+    : x ∈ integralClosure ℤ_[p] K ↔ ‖(x : PadicAlgCl p)‖ ≤ 1 := by
   rw [← isIntegral_padicInt_iff_norm_le_one, mem_integralClosure_iff]
   exact (isIntegral_algHom_iff (K.val.restrictScalars ℤ_[p]) K.val.toRingHom.injective).symm
 
-theorem mem_maximalIdeal_integralClosure_iff (K : IntermediateField ℚ_[p] (PadicAlgCl p))
-    [FiniteDimensional ℚ_[p] K] (x : integralClosure ℤ_[p] K) :
-    x ∈ maximalIdeal (integralClosure ℤ_[p] K) ↔ ‖((x : K) : PadicAlgCl p)‖ < 1 := by
+theorem mem_maximalIdeal_integralClosure_iff
+    (K : IntermediateField ℚ_[p] (PadicAlgCl p)) [FiniteDimensional ℚ_[p] K]
+    (x : integralClosure ℤ_[p] K)
+    : x ∈ maximalIdeal (integralClosure ℤ_[p] K) ↔ ‖((x : K) : PadicAlgCl p)‖ < 1 := by
   have hle := fun y : integralClosure ℤ_[p] K => (mem_integralClosure_padicInt_iff K y).mp y.2
   rw [mem_maximalIdeal, mem_nonunits_iff, ← not_le]
   refine not_congr ⟨fun h => ?_, fun h => ?_⟩
@@ -192,7 +205,8 @@ theorem mem_maximalIdeal_integralClosure_iff (K : IntermediateField ℚ_[p] (Pad
       have : ((x : K) : PadicAlgCl p) * ((y : K) : PadicAlgCl p) = 1 := by
         exact_mod_cast congrArg (fun z : integralClosure ℤ_[p] K => ((z : K) : PadicAlgCl p)) hy
       rw [this, norm_one]
-    calc 1 = _ := h1.symm
+    calc
+      1 = _ := h1.symm
       _ ≤ _ := mul_le_of_le_one_right (norm_nonneg _) (hle y)
   · have h0 : (x : K) ≠ 0 := by
       intro h0
@@ -203,17 +217,20 @@ theorem mem_maximalIdeal_integralClosure_iff (K : IntermediateField ℚ_[p] (Pad
       exact inv_le_one_of_one_le₀ h
     exact IsUnit.of_mul_eq_one ⟨_, hinv⟩ (Subtype.ext (mul_inv_cancel₀ h0))
 
-theorem exists_injective_algHom_integralClosure (B : Type*) [CommRing B] [IsDomain B]
-    [Algebra ℤ_[p] B] [Module.Finite ℤ_[p] B] (hp : (p : B) ≠ 0) :
-    ∃ (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (_ : FiniteDimensional ℚ_[p] K)
-      (g : B →ₐ[ℤ_[p]] integralClosure ℤ_[p] K), Function.Injective g := by
+theorem exists_injective_algHom_integralClosure
+    (B : Type*) [CommRing B] [IsDomain B] [Algebra ℤ_[p] B] [Module.Finite ℤ_[p] B]
+    (hp : (p : B) ≠ 0)
+    : ∃ (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (_ : FiniteDimensional ℚ_[p] K)
+        (g : B →ₐ[ℤ_[p]] integralClosure ℤ_[p] K),
+      Function.Injective g := by
   classical
   have hinj : Function.Injective (algebraMap ℤ_[p] B) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro a ha
     by_contra h0
-    obtain ⟨n, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible h0
-      (PadicInt.irreducible_p (p := p))
+    obtain ⟨n, u, rfl⟩ :=
+      IsDiscreteValuationRing.eq_unit_mul_pow_irreducible h0 (PadicInt.irreducible_p (p := p))
     rw [map_mul, map_pow, map_natCast] at ha
     exact mul_ne_zero (u.isUnit.map _).ne_zero (pow_ne_zero n hp) ha
   haveI : FaithfulSMul ℤ_[p] B := (faithfulSMul_iff_algebraMap_injective _ _).mpr hinj
@@ -222,11 +239,11 @@ theorem exists_injective_algHom_integralClosure (B : Type*) [CommRing B] [IsDoma
     exact (algebraMap ℚ_[p] (PadicAlgCl p)).injective.comp (IsFractionRing.injective _ _))
   let φ : B →ₐ[ℤ_[p]] PadicAlgCl p := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   have hφ : Function.Injective φ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro b hb
     have : (RingHom.ker φ).comap (algebraMap ℤ_[p] B) = ⊥ := by
       refine eq_bot_iff.mpr fun a ha => ?_
@@ -242,30 +259,36 @@ theorem exists_injective_algHom_integralClosure (B : Type*) [CommRing B] [IsDoma
     intro b
     have hb : b ∈ Submodule.span ℤ_[p] (s : Set B) := hs ▸ Submodule.mem_top
     induction hb using Submodule.span_induction with
-    | mem x hx =>
-      exact IntermediateField.subset_adjoin _ _ (by simpa using ⟨x, hx, rfl⟩)
+    | mem x hx => exact IntermediateField.subset_adjoin _ _ (by simpa using ⟨x, hx, rfl⟩)
     | zero => rw [map_zero]; exact K.zero_mem
     | add x y _ _ hx hy => rw [map_add (f := _)]; exact K.add_mem hx hy
     | smul a x _ hx =>
       rw [map_smul, ← algebraMap_smul ℚ_[p]]
       exact K.smul_mem hx
-  let ψ : B →ₐ[ℤ_[p]] K :=
-    { toFun := fun b => ⟨φ b, hmem b⟩
-      map_one' := Subtype.ext (map_one φ)
-      map_mul' := fun a b => Subtype.ext (map_mul φ a b)
-      map_zero' := Subtype.ext (map_zero φ)
-      map_add' := fun a b => Subtype.ext (map_add φ a b)
-      commutes' := fun a => Subtype.ext (φ.commutes a) }
-  refine ⟨K, inferInstance, ψ.codRestrict (integralClosure ℤ_[p] K) fun b =>
-    (Algebra.IsIntegral.isIntegral (R := ℤ_[p]) b).map ψ, fun a b h => hφ ?_⟩
+  let ψ : B →ₐ[ℤ_[p]] K := {
+    toFun := fun b => ⟨φ b, hmem b⟩
+    map_one' := Subtype.ext (map_one φ)
+    map_mul' := fun a b => Subtype.ext (map_mul φ a b)
+    map_zero' := Subtype.ext (map_zero φ)
+    map_add' := fun a b => Subtype.ext (map_add φ a b)
+    commutes' := fun a => Subtype.ext (φ.commutes a)
+  }
+  refine ⟨
+    K,
+    inferInstance,
+    ψ.codRestrict (integralClosure ℤ_[p] K) fun b =>
+      (Algebra.IsIntegral.isIntegral (R := ℤ_[p]) b).map ψ,
+    fun a b h => hφ ?_
+  ⟩
   exact congrArg (fun z : integralClosure ℤ_[p] K => ((z : K) : PadicAlgCl p)) h
 
 end Integers
 
 section Affine
 
-theorem finite_quotient_of_finiteType_int {A : Type*} [CommRing A] [Algebra.FiniteType ℤ A]
-    (m : Ideal A) [m.IsMaximal] : Finite (A ⧸ m) := by
+theorem finite_quotient_of_finiteType_int
+    {A : Type*} [CommRing A] [Algebra.FiniteType ℤ A] (m : Ideal A) [m.IsMaximal]
+    : Finite (A ⧸ m) := by
   letI := Ideal.Quotient.field m
   haveI := ReciprocityTheory.AnForm.R.IntegerToRational.isJacobsonRing_int
   haveI : Module.Finite ℤ (A ⧸ m) := finite_of_finite_type_of_isJacobsonRing ℤ _
@@ -273,29 +296,36 @@ theorem finite_quotient_of_finiteType_int {A : Type*} [CommRing A] [Algebra.Fini
   have hp0 : p ≠ 0 := by
     rintro rfl
     haveI := CharP.charP_to_charZero (A ⧸ m)
-    exact Int.not_isField (isField_of_isIntegral_of_isField
-      (algebraMap ℤ (A ⧸ m)).injective_int (Field.toIsField _))
+    exact Int.not_isField (isField_of_isIntegral_of_isField (algebraMap ℤ (A ⧸ m)).injective_int
+      (Field.toIsField _))
   haveI : Fact p.Prime := ⟨(CharP.char_is_prime_or_zero (A ⧸ m) p).resolve_right hp0⟩
   letI := ZMod.algebra (A ⧸ m) p
   haveI : Module.Finite (ZMod p) (A ⧸ m) := Module.Finite.of_restrictScalars_finite ℤ _ _
   exact Module.finite_of_finite (ZMod p)
 
-theorem exists_prime_natCast_mem_of_finiteType_int {A : Type*} [CommRing A]
-    [Algebra.FiniteType ℤ A] (m : Ideal A) [m.IsMaximal] : ∃ p : ℕ, p.Prime ∧ (p : A) ∈ m := by
+theorem exists_prime_natCast_mem_of_finiteType_int
+    {A : Type*} [CommRing A] [Algebra.FiniteType ℤ A] (m : Ideal A) [m.IsMaximal]
+    : ∃ p : ℕ, p.Prime ∧ (p : A) ∈ m := by
   letI := Ideal.Quotient.field m
   haveI := finite_quotient_of_finiteType_int m
   obtain ⟨p, hp⟩ := CharP.exists (A ⧸ m)
-  refine ⟨p, (CharP.char_is_prime_or_zero (A ⧸ m) p).resolve_right
-    (CharP.char_ne_zero_of_finite (A ⧸ m) p), ?_⟩
+  refine ⟨
+    p,
+    (CharP.char_is_prime_or_zero (A ⧸ m) p).resolve_right (CharP.char_ne_zero_of_finite (A ⧸ m) p),
+    ?_
+  ⟩
   rw [← Ideal.Quotient.eq_zero_iff_mem, map_natCast, CharP.cast_eq_zero]
 
 variable {p : ℕ} [Fact p.Prime]
 
-theorem exists_padicInt_algHom_comap_eq {A : Type*} [CommRing A] [IsNoetherianRing A]
-    [Algebra ℤ_[p] A] (m : Ideal A) [m.IsMaximal] [Finite (A ⧸ m)] (hp : (p : A) ∈ m)
-    {q : Ideal A} (hq : q.IsPrime) (hqm : q ≤ m) {f : A} (hf : (p : A) * f ∉ q) :
-    ∃ (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (_ : FiniteDimensional ℚ_[p] K)
-      (y : A →ₐ[ℤ_[p]] integralClosure ℤ_[p] K),
+theorem exists_padicInt_algHom_comap_eq
+    {A : Type*} [CommRing A] [IsNoetherianRing A] [Algebra ℤ_[p] A]
+    (m : Ideal A) [m.IsMaximal] [Finite (A ⧸ m)]
+    (hp : (p : A) ∈ m)
+    {q : Ideal A} (hq : q.IsPrime) (hqm : q ≤ m)
+    {f : A} (hf : (p : A) * f ∉ q)
+    : ∃ (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (_ : FiniteDimensional ℚ_[p] K)
+        (y : A →ₐ[ℤ_[p]] integralClosure ℤ_[p] K),
       (maximalIdeal (integralClosure ℤ_[p] K)).comap y = m ∧ y f ≠ 0 := by
   have hm : (maximalIdeal ℤ_[p]).map (algebraMap ℤ_[p] A) ≤ m := by
     rw [PadicInt.maximalIdeal_eq_span_p, Ideal.map_span, Set.image_singleton, map_natCast,
@@ -303,30 +333,38 @@ theorem exists_padicInt_algHom_comap_eq {A : Type*} [CommRing A] [IsNoetherianRi
     exact hp
   have hϖ : (p : ℤ_[p]) ∈ maximalIdeal ℤ_[p] := by
     rw [PadicInt.maximalIdeal_eq_span_p]; exact Ideal.mem_span_singleton_self _
-  obtain ⟨Q, hQ, hfQ, hfin⟩ := exists_prime_finite_quotient_atPrime m hm hq hqm hϖ (f := f)
-    (by rwa [map_natCast])
+  obtain ⟨Q, hQ, hfQ, hfin⟩ :=
+    exists_prime_finite_quotient_atPrime m hm hq hqm hϖ (f := f) (by rwa [map_natCast])
   set L := Localization.AtPrime m
   have hf0 := mt Ideal.Quotient.eq_zero_iff_mem.mp hfQ
   rw [map_natCast, map_mul, map_mul, map_natCast, map_natCast] at hf0
-  obtain ⟨K, hK, g, hg⟩ := exists_injective_algHom_integralClosure (p := p) (L ⧸ Q)
-    (left_ne_zero_of_mul hf0)
+  obtain ⟨K, hK, g, hg⟩ :=
+    exists_injective_algHom_integralClosure (p := p) (L ⧸ Q) (left_ne_zero_of_mul hf0)
   haveI : IsLocalRing (L ⧸ Q) :=
     .of_surjective' (Ideal.Quotient.mk Q) Ideal.Quotient.mk_surjective
   haveI : IsLocalHom (Ideal.Quotient.mk Q) :=
     IsLocalHom.of_surjective _ Ideal.Quotient.mk_surjective
   haveI := isLocalHom_of_injective_integralClosure g hg
-  refine ⟨K, hK, g.comp ((Ideal.Quotient.mkₐ ℤ_[p] Q).comp (IsScalarTower.toAlgHom ℤ_[p] A L)),
-    ?_, fun h => right_ne_zero_of_mul hf0 (hg (h.trans (map_zero g).symm))⟩
+  refine ⟨
+    K,
+    hK,
+    g.comp ((Ideal.Quotient.mkₐ ℤ_[p] Q).comp (IsScalarTower.toAlgHom ℤ_[p] A L)),
+    ?_,
+    fun h => right_ne_zero_of_mul hf0 (hg (h.trans (map_zero g).symm))
+  ⟩
   ext a
   rw [← IsLocalization.AtPrime.to_map_mem_maximal_iff L m,
     ← maximalIdeal_comap (Ideal.Quotient.mk Q),
     ← maximalIdeal_comap (g : L ⧸ Q →+* integralClosure ℤ_[p] K)]
   rfl
 
-theorem exists_padic_point {A : Type*} [CommRing A] [IsDomain A] [CharZero A]
-    [Algebra.FiniteType ℤ A] (m : Ideal A) [m.IsMaximal] (hp : (p : A) ∈ m) {f : A} (hf : f ≠ 0) :
-    ∃ (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (_ : FiniteDimensional ℚ_[p] K)
-      (y : A →+* integralClosure ℤ_[p] K),
+theorem exists_padic_point
+    {A : Type*} [CommRing A] [IsDomain A] [CharZero A] [Algebra.FiniteType ℤ A]
+    (m : Ideal A) [m.IsMaximal]
+    (hp : (p : A) ∈ m)
+    {f : A} (hf : f ≠ 0)
+    : ∃ (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (_ : FiniteDimensional ℚ_[p] K)
+        (y : A →+* integralClosure ℤ_[p] K),
       (maximalIdeal (integralClosure ℤ_[p] K)).comap y = m ∧ y f ≠ 0 := by
   letI := Ideal.Quotient.field m
   haveI := finite_quotient_of_finiteType_int m
@@ -336,9 +374,10 @@ theorem exists_padic_point {A : Type*} [CommRing A] [IsDomain A] [CharZero A]
   haveI : IsNoetherianRing (ℤ_[p] ⊗[ℤ] A) := Algebra.FiniteType.isNoetherianRing ℤ_[p] _
   haveI : IsNoetherianRing (A ⊗[ℤ] ℤ_[p]) :=
     isNoetherianRing_of_ringEquiv _ (Algebra.TensorProduct.comm ℤ ℤ_[p] A).toRingEquiv
-  let ρ : A ⊗[ℤ] ℤ_[p] →ₐ[A] A ⧸ m := Algebra.TensorProduct.lift (Algebra.ofId A (A ⧸ m))
-    ((ZMod.castHom (dvd_refl p) (A ⧸ m)).comp PadicInt.toZMod).toIntAlgHom
-    fun _ _ => Commute.all _ _
+  let ρ : A ⊗[ℤ] ℤ_[p] →ₐ[A] A ⧸ m :=
+    Algebra.TensorProduct.lift (Algebra.ofId A (A ⧸ m))
+      ((ZMod.castHom (dvd_refl p) (A ⧸ m)).comp PadicInt.toZMod).toIntAlgHom
+      fun _ _ => Commute.all _ _
   have hρ : Function.Surjective ρ := fun x => by
     obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective x
     exact ⟨algebraMap A _ a, ρ.commutes a⟩
@@ -350,38 +389,45 @@ theorem exists_padic_point {A : Type*} [CommRing A] [IsDomain A] [CharZero A]
     rw [RingHom.mem_ker, ρ.commutes]
     exact Ideal.Quotient.eq_zero_iff_mem
   haveI : m'.LiesOver m := ⟨Ideal.ext fun a => (hmm a).symm⟩
-  obtain ⟨q, hqm, hq, hq0⟩ := m'.exists_ideal_le_liesOver_of_le (p := (⊥ : Ideal A)) (q := m)
-    bot_le
-  obtain ⟨K, hK, y, hy, hyf⟩ := exists_padicInt_algHom_comap_eq (p := p) m'
-    (by rw [← map_natCast (algebraMap A (A ⊗[ℤ] ℤ_[p])), hmm]; exact hp) hq hqm
-    (f := algebraMap A _ f) (by
-      rw [← map_natCast (algebraMap A (A ⊗[ℤ] ℤ_[p])), ← map_mul,
-        ← Ideal.mem_of_liesOver q (⊥ : Ideal A), Ideal.mem_bot]
-      exact mul_ne_zero (Nat.cast_ne_zero.mpr (Fact.out : p.Prime).ne_zero) hf)
+  obtain ⟨q, hqm, hq, hq0⟩ := m'.exists_ideal_le_liesOver_of_le (p := (⊥ : Ideal A)) (q := m) bot_le
+  obtain ⟨K, hK, y, hy, hyf⟩ :=
+    exists_padicInt_algHom_comap_eq (p := p) m'
+      (by rw [← map_natCast (algebraMap A (A ⊗[ℤ] ℤ_[p])), hmm]; exact hp) hq hqm
+      (f := algebraMap A _ f)
+      (by
+        rw [← map_natCast (algebraMap A (A ⊗[ℤ] ℤ_[p])), ← map_mul,
+          ← Ideal.mem_of_liesOver q (⊥ : Ideal A), Ideal.mem_bot]
+        exact mul_ne_zero (Nat.cast_ne_zero.mpr (Fact.out : p.Prime).ne_zero) hf)
   refine ⟨K, hK, y.toRingHom.comp (algebraMap A _), ?_, hyf⟩
   ext a
   rw [← hmm, ← hy]
   rfl
 
-theorem padic_point_comp {A : Type*} [CommRing A] {K L : Type*}
-    [Field K] [Algebra ℚ_[p] K] [Algebra ℤ_[p] K] [IsScalarTower ℤ_[p] ℚ_[p] K]
+theorem padic_point_comp
+    {A : Type*} [CommRing A]
+    {K L : Type*} [Field K] [Algebra ℚ_[p] K] [Algebra ℤ_[p] K] [IsScalarTower ℤ_[p] ℚ_[p] K]
     [FiniteDimensional ℚ_[p] K] [Field L] [Algebra ℚ_[p] L] [Algebra ℤ_[p] L]
-    [IsScalarTower ℤ_[p] ℚ_[p] L] [FiniteDimensional ℚ_[p] L] (σ : K →ₐ[ℚ_[p]] L)
-    (y : A →+* integralClosure ℤ_[p] K) :
-    (maximalIdeal (integralClosure ℤ_[p] L)).comap
-        ((σ.restrictScalars ℤ_[p]).mapIntegralClosure.toRingHom.comp y) =
-      (maximalIdeal (integralClosure ℤ_[p] K)).comap y ∧
-    RingHom.ker ((σ.restrictScalars ℤ_[p]).mapIntegralClosure.toRingHom.comp y) =
-      RingHom.ker y := by
+    [IsScalarTower ℤ_[p] ℚ_[p] L] [FiniteDimensional ℚ_[p] L]
+    (σ : K →ₐ[ℚ_[p]] L) (y : A →+* integralClosure ℤ_[p] K)
+    : (maximalIdeal (integralClosure ℤ_[p] L)).comap
+          ((σ.restrictScalars ℤ_[p]).mapIntegralClosure.toRingHom.comp y)
+        = (maximalIdeal (integralClosure ℤ_[p] K)).comap y
+      ∧ RingHom.ker ((σ.restrictScalars ℤ_[p]).mapIntegralClosure.toRingHom.comp y)
+        = RingHom.ker y := by
   refine ⟨by rw [← Ideal.comap_comap, ← comap_maximalIdeal_mapIntegralClosure σ]; rfl, ?_⟩
   exact RingHom.ker_comp_of_injective y (mapIntegralClosure_padicInt_injective σ)
 
-theorem exists_padic_point_forall_ge {A : Type*} [CommRing A] [IsDomain A] [CharZero A]
-    [Algebra.FiniteType ℤ A] (m : Ideal A) [m.IsMaximal] (hp : (p : A) ∈ m) {f : A} (hf : f ≠ 0) :
-    ∃ K₀ : IntermediateField ℚ_[p] (PadicAlgCl p), FiniteDimensional ℚ_[p] K₀ ∧
-      ∀ (K : IntermediateField ℚ_[p] (PadicAlgCl p)) [FiniteDimensional ℚ_[p] K], K₀ ≤ K →
-        ∃ y : A →+* integralClosure ℤ_[p] K,
-          (maximalIdeal (integralClosure ℤ_[p] K)).comap y = m ∧ y f ≠ 0 := by
+theorem exists_padic_point_forall_ge
+    {A : Type*} [CommRing A] [IsDomain A] [CharZero A] [Algebra.FiniteType ℤ A]
+    (m : Ideal A) [m.IsMaximal]
+    (hp : (p : A) ∈ m)
+    {f : A} (hf : f ≠ 0)
+    : ∃ K₀ : IntermediateField ℚ_[p] (PadicAlgCl p),
+      FiniteDimensional ℚ_[p] K₀
+        ∧ ∀ (K : IntermediateField ℚ_[p] (PadicAlgCl p)) [FiniteDimensional ℚ_[p] K],
+          K₀ ≤ K
+            → ∃ y : A →+* integralClosure ℤ_[p] K,
+              (maximalIdeal (integralClosure ℤ_[p] K)).comap y = m ∧ y f ≠ 0 := by
   obtain ⟨K₀, hK₀, y, hy, hyf⟩ := exists_padic_point m hp hf
   refine ⟨K₀, hK₀, fun K _ h => ?_⟩
   obtain ⟨h1, h2⟩ := padic_point_comp (IntermediateField.inclusion h) y
@@ -395,22 +441,29 @@ section Scheme
 
 open AlgebraicGeometry CategoryTheory TopologicalSpace
 
-theorem finiteType_int_sections {Z : Scheme.{0}} (π : Z ⟶ Spec (.of ℤ)) [LocallyOfFiniteType π]
-    {V : Z.Opens} (hV : IsAffineOpen V) : Algebra.FiniteType ℤ Γ(Z, V) := by
-  have h := HasRingHomProperty.appLE @LocallyOfFiniteType π inferInstance
-    ⟨⊤, isAffineOpen_top _⟩ ⟨V, hV⟩ le_top
-  have h' := h.comp (RingHom.FiniteType.of_surjective (Scheme.ΓSpecIso (.of ℤ)).inv.hom
-    (Scheme.ΓSpecIso (.of ℤ)).symm.commRingCatIsoToRingEquiv.surjective)
+theorem finiteType_int_sections
+    {Z : Scheme.{0}} (π : Z ⟶ Spec (.of ℤ)) [LocallyOfFiniteType π]
+    {V : Z.Opens} (hV : IsAffineOpen V)
+    : Algebra.FiniteType ℤ Γ(Z, V) := by
+  have h :=
+    HasRingHomProperty.appLE @LocallyOfFiniteType π inferInstance ⟨⊤, isAffineOpen_top _⟩ ⟨V, hV⟩
+      le_top
+  have h' :=
+    h.comp (RingHom.FiniteType.of_surjective (Scheme.ΓSpecIso (.of ℤ)).inv.hom
+      (Scheme.ΓSpecIso (.of ℤ)).symm.commRingCatIsoToRingEquiv.surjective)
   rw [← RingHom.finiteType_algebraMap]
   convert h' using 1
   exact RingHom.ext_int _ _
 
-theorem charZero_sections_of_flat {Z : Scheme.{0}} [IsIntegral Z] (π : Z ⟶ Spec (.of ℤ)) [Flat π]
-    {V : Z.Opens} (hV : IsAffineOpen V) [Nonempty V] : CharZero Γ(Z, V) := by
-  have h := HasRingHomProperty.appLE @Flat π inferInstance
-    ⟨⊤, isAffineOpen_top _⟩ ⟨V, hV⟩ le_top
-  have h' := (RingHom.Flat.of_bijective (f := (Scheme.ΓSpecIso (.of ℤ)).inv.hom)
-    (Scheme.ΓSpecIso (.of ℤ)).symm.commRingCatIsoToRingEquiv.bijective).comp h
+theorem charZero_sections_of_flat
+    {Z : Scheme.{0}} [IsIntegral Z]
+    (π : Z ⟶ Spec (.of ℤ)) [Flat π]
+    {V : Z.Opens} (hV : IsAffineOpen V) [Nonempty V]
+    : CharZero Γ(Z, V) := by
+  have h := HasRingHomProperty.appLE @Flat π inferInstance ⟨⊤, isAffineOpen_top _⟩ ⟨V, hV⟩ le_top
+  have h' :=
+    (RingHom.Flat.of_bijective (f := (Scheme.ΓSpecIso (.of ℤ)).inv.hom)
+      (Scheme.ΓSpecIso (.of ℤ)).symm.commRingCatIsoToRingEquiv.bijective).comp h
   have h'' : (algebraMap ℤ Γ(Z, V)).Flat := by
     convert h' using 1
     exact RingHom.ext_int _ _
@@ -419,17 +472,18 @@ theorem charZero_sections_of_flat {Z : Scheme.{0}} [IsIntegral Z] (π : Z ⟶ Sp
   have := FaithfulSMul.algebraMap_injective ℤ Γ(Z, V) (a₁ := a) (a₂ := b) (by simpa using hab)
   exact_mod_cast this
 
-theorem mem_primeIdealOf_iff_evaluation_eq_zero {Z : Scheme.{0}} {V : Z.Opens}
-    (hV : IsAffineOpen V) {z : Z} (hz : z ∈ V) (a : Γ(Z, V)) :
-    a ∈ (hV.primeIdealOf ⟨z, hz⟩).asIdeal ↔ Z.evaluation V z hz a = 0 := by
+theorem mem_primeIdealOf_iff_evaluation_eq_zero
+    {Z : Scheme.{0}} {V : Z.Opens} (hV : IsAffineOpen V) {z : Z} (hz : z ∈ V) (a : Γ(Z, V))
+    : a ∈ (hV.primeIdealOf ⟨z, hz⟩).asIdeal ↔ Z.evaluation V z hz a = 0 := by
   rw [Scheme.evaluation_eq_zero_iff_notMem_basicOpen, ← not_iff_not, not_not,
     ← PrimeSpectrum.mem_basicOpen, ← hV.fromSpec_preimage_basicOpen]
   change hV.fromSpec (hV.primeIdealOf ⟨z, hz⟩) ∈ Z.basicOpen a ↔ _
   rw [hV.fromSpec_primeIdealOf]
 
-theorem exists_prime_residueField_eq_zero {Z : Scheme.{0}} (π : Z ⟶ Spec (.of ℤ))
-    [LocallyOfFiniteType π] {z : Z} (hz : IsClosed ({z} : Set Z)) :
-    ∃ p : ℕ, p.Prime ∧ (p : Z.residueField z) = 0 := by
+theorem exists_prime_residueField_eq_zero
+    {Z : Scheme.{0}} (π : Z ⟶ Spec (.of ℤ)) [LocallyOfFiniteType π]
+    {z : Z} (hz : IsClosed ({z} : Set Z))
+    : ∃ p : ℕ, p.Prime ∧ (p : Z.residueField z) = 0 := by
   obtain ⟨V, hV, hzV, -⟩ := exists_isAffineOpen_mem_and_subset (U := ⊤) (x := z) trivial
   haveI := finiteType_int_sections π hV
   haveI := hV.primeIdealOf_isMaximal_of_isClosed ⟨z, hzV⟩ hz
@@ -439,21 +493,26 @@ theorem exists_prime_residueField_eq_zero {Z : Scheme.{0}} (π : Z ⟶ Spec (.of
 
 variable {p : ℕ} [Fact p.Prime]
 
-theorem apply_genericPoint_eq_of_charZero {R : CommRingCat.{0}} [IsDomain R] [CharZero R]
-    (g : Spec R ⟶ Spec (.of ℤ)) : g (genericPoint (Spec R)) = genericPoint (Spec (.of ℤ)) := by
+theorem apply_genericPoint_eq_of_charZero
+    {R : CommRingCat.{0}} [IsDomain R] [CharZero R] (g : Spec R ⟶ Spec (.of ℤ))
+    : g (genericPoint (Spec R)) = genericPoint (Spec (.of ℤ)) := by
   have : g = Spec.map (CommRingCat.ofHom (Int.castRingHom R)) := specZIsTerminal.hom_ext _ _
   rw [this, genericPoint_eq_bot_of_affine, genericPoint_eq_bot_of_affine]
   refine PrimeSpectrum.ext ?_
   exact Ideal.comap_bot_of_injective (Int.castRingHom R) Int.cast_injective
 
-theorem exists_padic_point_scheme_forall_ge {Z : Scheme.{0}} [IsIntegral Z]
-    (π : Z ⟶ Spec (.of ℤ)) [Flat π] [LocallyOfFiniteType π] {z : Z} (hz : IsClosed ({z} : Set Z))
-    (hp : (p : Z.residueField z) = 0) (U : Z.Opens) (hU : (U : Set Z).Nonempty) :
-    ∃ K₀ : IntermediateField ℚ_[p] (PadicAlgCl p), FiniteDimensional ℚ_[p] K₀ ∧
-      ∀ (K : IntermediateField ℚ_[p] (PadicAlgCl p)) [FiniteDimensional ℚ_[p] K], K₀ ≤ K →
-        ∃ y : Spec (.of (integralClosure ℤ_[p] K)) ⟶ Z,
-          y (closedPoint (integralClosure ℤ_[p] K)) = z ∧ y (genericPoint _) ∈ U ∧
-            π (y (genericPoint _)) = genericPoint _ := by
+theorem exists_padic_point_scheme_forall_ge
+    {Z : Scheme.{0}} [IsIntegral Z]
+    (π : Z ⟶ Spec (.of ℤ)) [Flat π] [LocallyOfFiniteType π]
+    {z : Z} (hz : IsClosed ({z} : Set Z)) (hp : (p : Z.residueField z) = 0)
+    (U : Z.Opens) (hU : (U : Set Z).Nonempty)
+    : ∃ K₀ : IntermediateField ℚ_[p] (PadicAlgCl p),
+      FiniteDimensional ℚ_[p] K₀
+        ∧ ∀ (K : IntermediateField ℚ_[p] (PadicAlgCl p)) [FiniteDimensional ℚ_[p] K],
+          K₀ ≤ K
+            → ∃ y : Spec (.of (integralClosure ℤ_[p] K)) ⟶ Z,
+              y (closedPoint (integralClosure ℤ_[p] K)) = z ∧ y (genericPoint _) ∈ U
+                ∧ π (y (genericPoint _)) = genericPoint _ := by
   obtain ⟨V, hV, hzV, -⟩ := exists_isAffineOpen_mem_and_subset (U := ⊤) (x := z) trivial
   haveI : Nonempty V := ⟨⟨z, hzV⟩⟩
   haveI := finiteType_int_sections π hV
@@ -464,9 +523,9 @@ theorem exists_padic_point_scheme_forall_ge {Z : Scheme.{0}} [IsIntegral Z]
   have hf : f ≠ 0 := by
     rintro rfl
     simp at hxf
-  obtain ⟨K₀, hK₀, H⟩ := exists_padic_point_forall_ge (p := p)
-    (hV.primeIdealOf ⟨z, hzV⟩).asIdeal
-    ((mem_primeIdealOf_iff_evaluation_eq_zero hV hzV _).mpr (by simpa using hp)) hf
+  obtain ⟨K₀, hK₀, H⟩ :=
+    exists_padic_point_forall_ge (p := p) (hV.primeIdealOf ⟨z, hzV⟩).asIdeal
+      ((mem_primeIdealOf_iff_evaluation_eq_zero hV hzV _).mpr (by simpa using hp)) hf
   refine ⟨K₀, hK₀, fun K _ h => ?_⟩
   obtain ⟨y, hy, hyf⟩ := H K h
   refine ⟨Spec.map (CommRingCat.ofHom y) ≫ hV.fromSpec, ?_, ?_, ?_⟩
@@ -480,13 +539,15 @@ theorem exists_padic_point_scheme_forall_ge {Z : Scheme.{0}} [IsIntegral Z]
     rw [← Scheme.Hom.comp_apply]
     exact apply_genericPoint_eq_of_charZero _
 
-theorem exists_padic_point_scheme {Z : Scheme.{0}} [IsIntegral Z]
-    (π : Z ⟶ Spec (.of ℤ)) [Flat π] [LocallyOfFiniteType π] {z : Z} (hz : IsClosed ({z} : Set Z))
-    (hp : (p : Z.residueField z) = 0) (U : Z.Opens) (hU : (U : Set Z).Nonempty) :
-    ∃ (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (_ : FiniteDimensional ℚ_[p] K)
-      (y : Spec (.of (integralClosure ℤ_[p] K)) ⟶ Z),
-        y (closedPoint (integralClosure ℤ_[p] K)) = z ∧ y (genericPoint _) ∈ U ∧
-          π (y (genericPoint _)) = genericPoint _ := by
+theorem exists_padic_point_scheme
+    {Z : Scheme.{0}} [IsIntegral Z]
+    (π : Z ⟶ Spec (.of ℤ)) [Flat π] [LocallyOfFiniteType π]
+    {z : Z} (hz : IsClosed ({z} : Set Z)) (hp : (p : Z.residueField z) = 0)
+    (U : Z.Opens) (hU : (U : Set Z).Nonempty)
+    : ∃ (K : IntermediateField ℚ_[p] (PadicAlgCl p)) (_ : FiniteDimensional ℚ_[p] K)
+        (y : Spec (.of (integralClosure ℤ_[p] K)) ⟶ Z),
+      y (closedPoint (integralClosure ℤ_[p] K)) = z ∧ y (genericPoint _) ∈ U
+        ∧ π (y (genericPoint _)) = genericPoint _ := by
   obtain ⟨K, hK, H⟩ := exists_padic_point_scheme_forall_ge π hz hp U hU
   exact ⟨K, hK, H K le_rfl⟩
 

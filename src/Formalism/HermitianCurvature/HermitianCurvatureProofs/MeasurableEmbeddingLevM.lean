@@ -11,7 +11,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.PBH
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -45,10 +46,11 @@ theorem measurableEmbedding_levM : MeasurableEmbedding (B2.levM k ρ) := by
   rw [hr]
   exact (isClosed_eq (continuous_levM.comp continuous_projM) continuous_id).measurableSet
 
-theorem zWeight_fin (T T' R : ℝ) :
-    ∫⁻ ζ in Metric.closedBall (0 : ℂ) R, ENNReal.ofReal (B2.zWeight k T T' ζ) < ⊤ := by
-  have hC : ∀ ζ ∈ Metric.closedBall (0 : ℂ) R,
-      ENNReal.ofReal (B2.zWeight k T T' ζ) ≤ ENNReal.ofReal ((R ^ 2 + |T * T'|) ^ (k - 1)) := by
+theorem zWeight_fin (T T' R : ℝ)
+    : ∫⁻ ζ in Metric.closedBall (0 : ℂ) R, ENNReal.ofReal (B2.zWeight k T T' ζ) < ⊤ := by
+  have hC
+      : ∀ ζ ∈ Metric.closedBall (0 : ℂ) R,
+        ENNReal.ofReal (B2.zWeight k T T' ζ) ≤ ENNReal.ofReal ((R ^ 2 + |T * T'|) ^ (k - 1)) := by
     intro ζ hζ
     apply ENNReal.ofReal_le_ofReal
     have hn : ‖ζ‖ ≤ R := by simpa using hζ
@@ -60,23 +62,28 @@ theorem zWeight_fin (T T' R : ℝ) :
     · apply pow_le_pow_left₀ (by linarith)
       linarith [neg_abs_le (T * T')]
     · positivity
-  calc ∫⁻ ζ in Metric.closedBall (0 : ℂ) R, ENNReal.ofReal (B2.zWeight k T T' ζ)
-      ≤ ∫⁻ _ in Metric.closedBall (0 : ℂ) R, ENNReal.ofReal ((R ^ 2 + |T * T'|) ^ (k - 1)) :=
-        setLIntegral_mono' measurableSet_closedBall hC
-    _ = ENNReal.ofReal ((R ^ 2 + |T * T'|) ^ (k - 1)) * MeasureTheory.volume (Metric.closedBall (0 : ℂ) R) :=
-        setLIntegral_const _ _
+  calc
+    ∫⁻ ζ in Metric.closedBall (0 : ℂ) R, ENNReal.ofReal (B2.zWeight k T T' ζ)
+        ≤ ∫⁻ _ in Metric.closedBall (0 : ℂ) R, ENNReal.ofReal ((R ^ 2 + |T * T'|) ^ (k - 1)) :=
+      setLIntegral_mono' measurableSet_closedBall hC
+    _ = ENNReal.ofReal ((R ^ 2 + |T * T'|) ^ (k - 1))
+        * MeasureTheory.volume (Metric.closedBall (0 : ℂ) R) :=
+      setLIntegral_const _ _
     _ < ⊤ := ENNReal.mul_lt_top ENNReal.ofReal_lt_top measure_closedBall_lt_top
 
 section pair
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
-  {z z' : Fin (2 * ρ + k + 1) → ℂ} {π : Mx k (1 + ρ) → (Wp →L[ℂ] Wp)} {π' : Mx k (1 + ρ) → (Wq →L[ℂ] Wq)}
+  {z z' : Fin (2 * ρ + k + 1) → ℂ} {π : Mx k (1 + ρ) → (Wp →L[ℂ] Wp)}
+  {π' : Mx k (1 + ρ) → (Wq →L[ℂ] Wq)}
 
-theorem pairAt_tr {t : ℂ} (ht : t ≠ 0) {μ : Measure (Mt k (1 + ρ))} {μs : Measure (Mt k ρ)}
-    (hmap : μs.map (B2.levM k ρ) = μ) (Φ Ψ : RadSp k (1 + ρ) (liftVec k 1 ρ z) (liftVec k 1 ρ z') π π')
-    (c : Fin ρ → ℂ) :
-    P5.pairAt μs (trL ht z z' π π' Φ) (trL ht z z' π π' Ψ) c = P5.pairAt μ Φ Ψ (consC t c) := by
+theorem pairAt_tr
+    {t : ℂ} (ht : t ≠ 0)
+    {μ : Measure (Mt k (1 + ρ))} {μs : Measure (Mt k ρ)} (hmap : μs.map (B2.levM k ρ) = μ)
+    (Φ Ψ : RadSp k (1 + ρ) (liftVec k 1 ρ z) (liftVec k 1 ρ z') π π') (c : Fin ρ → ℂ)
+    : P5.pairAt μs (trL ht z z' π π' Φ) (trL ht z z' π π' Ψ) c = P5.pairAt μ Φ Ψ (consC t c) := by
   subst hmap
   simp only [P5.pairAt]
   rw [measurableEmbedding_levM.integral_map]
@@ -88,6 +95,7 @@ end Formalism.FourierDecayAlt.P.PBH
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P.PBH
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.P.PBH
 
 end Formalism.FourierDecayAlt.P

@@ -5,16 +5,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeckeAlgebr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL Formalism.BasicNotions
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep
+  GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  Formalism.BasicNotions
 open UpperTheory.V.W (Plc Lp)
 open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open UpperTheory.V.Z.Sym.Al
 
-theorem UpperTheory.V.Z.Sym.Al.secSpec :
-    ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (w : Plc L), IsSplitAt w →
-        (∀ g, secW n w g ∈ locU n w) ∧ (∀ g, cLoc w (secW n w g) = g) ∧ (∀ x ∈ locU n w, secW n w (cLoc w x) = x) ∧ Continuous (secW n w) := by
+theorem UpperTheory.V.Z.Sym.Al.secSpec
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (w : Plc L),
+      IsSplitAt w
+        → (∀ g, secW n w g ∈ locU n w) ∧ (∀ g, cLoc w (secW n w g) = g)
+          ∧ (∀ x ∈ locU n w, secW n w (cLoc w x) = x) ∧ Continuous (secW n w) := by
   intro L _ _ _ n w hw
   obtain ⟨e, he⟩ := GlobalTheory.T.splitPlace_unitaryLocalPoints_equiv_GL L n w hw
   have hs : ∀ y, cLoc w (e.symm y : UA L n) = y := fun y => by rw [← he, e.apply_symm_apply]

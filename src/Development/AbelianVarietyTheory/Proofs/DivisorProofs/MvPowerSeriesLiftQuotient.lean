@@ -5,12 +5,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CobOneEqZero
 
 @[expose] public section
 
-open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv GlobalTheory.Katz
+  GlobalTheory.QLog GlobalTheory.PDivGroup
 
 namespace GlobalTheory
 
-theorem mvPowerSeries_lift_quotient :
-    ∀ (O σ : Type) [CommRing O] (I : Ideal O), (∀ g : MvPowerSeries σ (O ⧸ I), ∃ f : MvPowerSeries σ O, map (Ideal.Quotient.mk I) f = g ∧ (constantCoeff g = 0 → constantCoeff f = 0)) ∧ (∀ f : MvPowerSeries σ O, map (Ideal.Quotient.mk I) f = 0 ↔ ∀ α, coeff α f ∈ I) ∧ ∀ (a : O) (f : MvPowerSeries σ O), (∀ α, a ∣ coeff α f) ↔ ∃ g, f = a • g := by
+theorem mvPowerSeries_lift_quotient
+    : ∀ (O σ : Type) [CommRing O] (I : Ideal O),
+      (∀ g : MvPowerSeries σ (O ⧸ I), ∃ f : MvPowerSeries σ O,
+          map (Ideal.Quotient.mk I) f = g ∧ (constantCoeff g = 0 → constantCoeff f = 0))
+        ∧ (∀ f : MvPowerSeries σ O, map (Ideal.Quotient.mk I) f = 0 ↔ ∀ α, coeff α f ∈ I)
+        ∧ ∀ (a : O) (f : MvPowerSeries σ O), (∀ α, a ∣ coeff α f) ↔ ∃ g, f = a • g := by
   classical
   intro O σ _ I
   refine ⟨?_, ?_, ?_⟩

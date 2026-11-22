@@ -11,19 +11,25 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace ReciprocityTheory.ChartRestriction.G.DVR.UUA
 
-open ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.H1
+open ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.H1
 
-variable {R : Type} [CommRing R] [IsDomain R] {D : DegPre R} {F : Type} [Field F] [Algebra (FractionRing R) F]
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {D : DegPre R} {F : Type} [Field F] [Algebra (FractionRing R) F]
 
-theorem sval_zero_of {X Y Z : Scheme.{0}} {L : LB X} {K : Type} [Fintype K] {φ : K → (Y ⟶ X)} {ε : K → ℤ}
-    {s : LB.Sec (LB.LinComb L φ ε)} (h : ∀ j, s.f j = 0) (r : Z ⟶ Y) (z : Z) (J : (Z ⟶ X) → L.ι)
-    (hm : r z ∈ LB.wchart L φ (fun k => J (r ≫ φ k))) : sval s r z J = 0 := by
+theorem sval_zero_of
+    {X Y Z : Scheme.{0}} {L : LB X} {K : Type} [Fintype K]
+    {φ : K → (Y ⟶ X)} {ε : K → ℤ} {s : LB.Sec (LB.LinComb L φ ε)} (h : ∀ j, s.f j = 0)
+    (r : Z ⟶ Y) (z : Z) (J : (Z ⟶ X) → L.ι) (hm : r z ∈ LB.wchart L φ (fun k => J (r ≫ φ k)))
+    : sval s r z J = 0 := by
   have h' := h (fun k => J (r ≫ φ k))
   unfold sval
   rw [h']
@@ -39,9 +45,11 @@ theorem trF_zero : DegPre.trF D F 0 = 𝟙 _ := by
   rw [zero_smul, pow_zero] at h0
   rw [trF_eq, h0, trPt_one]
 
-private theorem sval_eq_zero_of_sec_f_eq_zero {X Y Z : Scheme.{0}} {L : LB X} {K : Type} [Fintype K] {φ : K → (Y ⟶ X)}
-    {ε : K → ℤ} {s : LB.Sec (LB.LinComb L φ ε)} (h : ∀ j, s.f j = 0) (r : Z ⟶ Y) (z : Z)
-    (J : (Z ⟶ X) → L.ι) : sval s r z J = 0 := by
+private theorem sval_eq_zero_of_sec_f_eq_zero
+    {X Y Z : Scheme.{0}} {L : LB X} {K : Type} [Fintype K]
+    {φ : K → (Y ⟶ X)} {ε : K → ℤ} {s : LB.Sec (LB.LinComb L φ ε)} (h : ∀ j, s.f j = 0)
+    (r : Z ⟶ Y) (z : Z) (J : (Z ⟶ X) → L.ι)
+    : sval s r z J = 0 := by
   have h' := h (fun k => J (r ≫ φ k))
   unfold sval
   rw [h']
@@ -50,44 +58,68 @@ private theorem sval_eq_zero_of_sec_f_eq_zero {X Y Z : Scheme.{0}} {L : LB X} {K
   · erw [map_zero, map_zero]
   · rfl
 
-theorem exists_fam_rep (hG : GlobalFnsSt) (hB : D.TauBimult) (k : ℕ) (ρ : D.X)
-    (hcls : ∀ a b : D.X, ρ + k • a = ρ + k • b → a = b)
-    (σ : LB.Sec (LB.LinComb D.P.L (DegPre.famφ D F ρ) (DegPre.famε k))) :
-    ∃ s : Fam D F k, s.s ρ = σ ∧ ∀ β : D.X, (∀ mu, ρ + k • mu ≠ β) → ∀ j, (s.s β).f j = 0 := by
+theorem exists_fam_rep
+    (hG : GlobalFnsSt) (hB : D.TauBimult)
+    (k : ℕ) (ρ : D.X) (hcls : ∀ a b : D.X, ρ + k • a = ρ + k • b → a = b)
+    (σ : LB.Sec (LB.LinComb D.P.L (DegPre.famφ D F ρ) (DegPre.famε k)))
+    : ∃ s : Fam D F k, s.s ρ = σ ∧ ∀ β : D.X, (∀ mu, ρ + k • mu ≠ β) → ∀ j, (s.s β).f j = 0 := by
   classical
   have hL : D.P.L.IsLB := D.P.isLB
   choose u hu hcu using fun mu : D.X => (gen_fe (F := F) hG k mu ρ).1
-  have hval : ∀ (mu : D.X) (T : Over (Spec (CommRingCat.of R))) (ρ' : T ⟶ DegPre.BF D F) (z : T.left) (J),
-      Good D.P.L z J → val (u mu) ρ'.left z J =
-        uVal D F k ρ (cP D _ mu) ρ' z J * val (DegPre.famMult D F k mu ρ) (ρ' ≫ fst _ _).left z J :=
-    fun mu => (gen_fe (F := F) hG k mu ρ).2 (u mu) (hu mu) (hcu mu)
-  have hF : ∀ mu : D.X, FormEq (Sum.elim (fun i => (DegPre.trF D F mu).left ≫ DegPre.famφ D F ρ i)
-      (DegPre.deltaφ D F k ρ mu)) (Sum.elim (DegPre.famε k) (DegPre.deltaε k))
-      (DegPre.famφ D F (ρ + k • mu)) (DegPre.famε k) := by
+  have hval
+      : ∀ (mu : D.X) (T : Over (Spec (CommRingCat.of R))) (ρ' : T ⟶ DegPre.BF D F) (z : T.left) (J),
+        Good D.P.L z J
+          → val (u mu) ρ'.left z J
+            = uVal D F k ρ (cP D _ mu) ρ' z J
+              * val (DegPre.famMult D F k mu ρ) (ρ' ≫ fst _ _).left z J := fun mu =>
+    (gen_fe (F := F) hG k mu ρ).2 (u mu) (hu mu) (hcu mu)
+  have hF
+      : ∀ mu : D.X,
+        FormEq
+          (Sum.elim
+            (fun i => (DegPre.trF D F mu).left ≫ DegPre.famφ D F ρ i)
+            (DegPre.deltaφ D F k ρ mu))
+          (Sum.elim (DegPre.famε k) (DegPre.deltaε k)) (DegPre.famφ D F (ρ + k • mu))
+          (DegPre.famε k) := by
     intro mu U _ h
-    simp only [Fintype.prod_sum_type, Sum.elim_inl, Sum.elim_inr, DegPre.deltaφ, DegPre.deltaε, zpow_neg]
+    simp only [Fintype.prod_sum_type, Sum.elim_inl, Sum.elim_inr, DegPre.deltaφ, DegPre.deltaε,
+      zpow_neg]
     rw [Finset.prod_inv_distrib, mul_left_comm, mul_inv_cancel, _root_.mul_one]
   choose tm htm using fun mu : D.X =>
     exists_sec hL (hF mu) (pullMulSec σ (DegPre.trF D F mu).left (u mu) (hu mu))
-  have hX0 : ∀ (T : Over (Spec (CommRingCat.of R))) (ρ' : T ⟶ DegPre.BF D F) (z : T.left) (J),
-      Good D.P.L z J →
-      uVal D F k ρ (cP D _ 0) ρ' z J * val (DegPre.famMult D F k 0 ρ) (ρ' ≫ fst _ _).left z J = 1 := by
+  have hX0
+      : ∀ (T : Over (Spec (CommRingCat.of R))) (ρ' : T ⟶ DegPre.BF D F) (z : T.left) (J),
+        Good D.P.L z J
+          → uVal D F k ρ (cP D _ 0) ρ' z J * val (DegPre.famMult D F k 0 ρ) (ρ' ≫ fst _ _).left z J
+            = 1 := by
     intro T ρ' z J hJ
     have e := fe_cocycle hB ρ' hJ k ρ 0 0
     rw [trF_zero, Category.comp_id, smul_zero, add_zero, add_zero] at e
     exact mul_eq_left.mp e
-  let cst : ∀ {a b : D.X}, a = b → LB.Sec (LB.LinComb D.P.L (DegPre.famφ D F a) (DegPre.famε k)) →
-      LB.Sec (LB.LinComb D.P.L (DegPre.famφ D F b) (DegPre.famε k)) := fun h x => h ▸ x
+  let cst
+      : ∀ {a b : D.X},
+        a = b → LB.Sec (LB.LinComb D.P.L (DegPre.famφ D F a) (DegPre.famε k))
+          → LB.Sec (LB.LinComb D.P.L (DegPre.famφ D F b) (DegPre.famε k)) := fun h x =>
+    h ▸ x
   let S : ∀ β : D.X, LB.Sec (LB.LinComb D.P.L (DegPre.famφ D F β) (DegPre.famε k)) := fun β =>
-    if hβ : ρ = β then cst hβ σ else
-      if h : ∃ mu, ρ + k • mu = β then cst h.choose_spec (tm h.choose) else (0 : Fam D F k).s β
+    if hβ : ρ = β then
+      cst hβ σ
+    else if h : ∃ mu, ρ + k • mu = β then
+      cst h.choose_spec (tm h.choose)
+    else
+      (0 : Fam D F k).s β
   have hSρ : S ρ = σ := by
     dsimp only [S]
     rw [dite_eq_left rfl]
-  have hA : ∀ (mu β : D.X), ρ + k • mu = β → ∀ (T : Over (Spec (CommRingCat.of R)))
-      (ρ' : T ⟶ DegPre.BF D F) (z : T.left) (J), Good D.P.L z J →
-      sval (S β) ρ'.left z J = sval σ (ρ' ≫ DegPre.trF D F mu).left z J *
-        (uVal D F k ρ (cP D _ mu) ρ' z J * val (DegPre.famMult D F k mu ρ) (ρ' ≫ fst _ _).left z J).val := by
+  have hA
+      : ∀ (mu β : D.X),
+        ρ + k • mu = β
+          → ∀ (T : Over (Spec (CommRingCat.of R))) (ρ' : T ⟶ DegPre.BF D F) (z : T.left) (J),
+            Good D.P.L z J
+              → sval (S β) ρ'.left z J
+                = sval σ (ρ' ≫ DegPre.trF D F mu).left z J
+                  * (uVal D F k ρ (cP D _ mu) ρ' z J
+                    * val (DegPre.famMult D F k mu ρ) (ρ' ≫ fst _ _).left z J).val := by
     intro mu β e T ρ' z J hJ
     by_cases hβ : ρ = β
     · subst hβ
@@ -95,10 +127,12 @@ theorem exists_fam_rep (hG : GlobalFnsSt) (hB : D.TauBimult) (k : ℕ) (ρ : D.X
       rw [hSρ, hX0 T ρ' z J hJ, trF_zero, Category.comp_id, Units.val_one, _root_.mul_one]
     · subst e
       have hex : ∃ mu', ρ + k • mu' = ρ + k • mu := ⟨mu, rfl⟩
-      have key : ∀ (c : D.X) (ec : ρ + k • c = ρ + k • mu),
-          sval (cst ec (tm c)) ρ'.left z J = sval σ (ρ' ≫ DegPre.trF D F mu).left z J *
-            (uVal D F k ρ (cP D _ mu) ρ' z J *
-              val (DegPre.famMult D F k mu ρ) (ρ' ≫ fst _ _).left z J).val := by
+      have key
+          : ∀ (c : D.X) (ec : ρ + k • c = ρ + k • mu),
+            sval (cst ec (tm c)) ρ'.left z J
+              = sval σ (ρ' ≫ DegPre.trF D F mu).left z J
+                * (uVal D F k ρ (cP D _ mu) ρ' z J
+                  * val (DegPre.famMult D F k mu ρ) (ρ' ≫ fst _ _).left z J).val := by
         intro c ec
         obtain rfl : c = mu := hcls _ _ ec
         change sval (tm c) ρ'.left z J = _
@@ -121,11 +155,11 @@ theorem exists_fam_rep (hG : GlobalFnsSt) (hB : D.TauBimult) (k : ℕ) (ρ : D.X
   intro y J hJ
   by_cases hα : ∃ nu, ρ + k • nu = α
   · obtain ⟨nu, rfl⟩ := hα
-    have hfst : DegPre.trF D F mu' ≫ fst (TF (R := R) F) D.P.A = fst _ _ := by
-      simp [DegPre.trF]
+    have hfst : DegPre.trF D F mu' ≫ fst (TF (R := R) F) D.P.A = fst _ _ := by simp [DegPre.trF]
     have c1 := fe_cocycle hB (𝟙 (DegPre.BF D F)) hJ k ρ nu mu'
-    have e1 := hA (nu + mu') (ρ + k • nu + k • mu') (by rw [smul_add, add_assoc]) _
-      (𝟙 (DegPre.BF D F)) y J hJ
+    have e1 :=
+      hA (nu + mu') (ρ + k • nu + k • mu') (by rw [smul_add, add_assoc]) _ (𝟙 (DegPre.BF D F)) y J
+        hJ
     have e2 := hA nu (ρ + k • nu) rfl _ (DegPre.trF D F mu') y J hJ
     have e3 := hvv _ (𝟙 (DegPre.BF D F)) y J hJ
     simp only [Over.id_left, Category.id_comp, hfst] at c1 e1 e2 e3

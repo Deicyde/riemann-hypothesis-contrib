@@ -21,41 +21,57 @@ noncomputable section
 
 namespace GlobalTheory.Member
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
 open scoped TensorProduct Matrix Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem markMove_finVec_mem {D : D7} (V : HSp D) (g : GA D V) {v : Fin V.rank → D.host.E} (hv : v ∈ latG V g) :
-    finVec V v ∈ latGHat V g := by
+theorem markMove_finVec_mem
+    {D : D7} (V : HSp D) (g : GA D V) {v : Fin V.rank → D.host.E} (hv : v ∈ latG V g)
+    : finVec V v ∈ latGHat V g := by
   rw [(GlobalTheory.Member.latG_lattice_and_completion D V g).2.2.2.2.1]
   exact AddSubgroup.subset_closure ⟨1, fun w => one_mem _, v, hv, rfl⟩
 
-theorem markMove_mulVec_mem {D : D7} (V : HSp D) (g : GA D V)
-    {y : Fin V.rank → Af D.host.F ⊗[D.host.F] D.host.E} (hy : y ∈ latGHat V 1) :
-    (finHom V g).1 *ᵥ y ∈ latGHat V g := by
+theorem markMove_mulVec_mem
+    {D : D7} (V : HSp D) (g : GA D V)
+    {y : Fin V.rank → Af D.host.F ⊗[D.host.F] D.host.E} (hy : y ∈ latGHat V 1)
+    : (finHom V g).1 *ᵥ y ∈ latGHat V g := by
   have h := (GlobalTheory.Member.latG_lattice_and_completion D V g).2.2.2.1
   rw [(GlobalTheory.Member.latG_lattice_and_completion D V 1).2.2.2.2.1] at hy
   rw [← SetLike.mem_coe, h]
   exact ⟨y, hy, rfl⟩
 
-theorem markMove_finVec_add_nsmul {D : D7} (V : HSp D) (x y : Fin V.rank → D.host.E) (n : ℕ) :
-    finVec V (x + n • y) = finVec V x + n • finVec V y := by
+theorem markMove_finVec_add_nsmul {D : D7} (V : HSp D) (x y : Fin V.rank → D.host.E) (n : ℕ)
+    : finVec V (x + n • y) = finVec V x + n • finVec V y := by
   funext i
   simp only [finVec, Pi.add_apply, Pi.smul_apply, TensorProduct.tmul_add]
   congr 1
   exact map_nsmul (TensorProduct.mk D.host.F (Af D.host.F) D.host.E 1) n (y i)
 
-theorem markMove_mulVec_nsmul {R : Type} [CommRing R] {m : ℕ} (A : Matrix (Fin m) (Fin m) R) (n : ℕ)
-    (y : Fin m → R) : A *ᵥ (n • y) = n • (A *ᵥ y) := Matrix.mulVec_smul _ _ _
+theorem markMove_mulVec_nsmul
+    {R : Type} [CommRing R] {m : ℕ} (A : Matrix (Fin m) (Fin m) R) (n : ℕ) (y : Fin m → R)
+    : A *ᵥ (n • y) = n • (A *ᵥ y) :=
+  Matrix.mulVec_smul _ _ _
 
-theorem markMove_finHom_mul {D : D7} (V : HSp D) (g h : GA D V)
-    (y : Fin V.rank → Af D.host.F ⊗[D.host.F] D.host.E) :
-    (finHom V (g * h)).1 *ᵥ y = (finHom V g).1 *ᵥ ((finHom V h).1 *ᵥ y) := by
+theorem markMove_finHom_mul
+    {D : D7} (V : HSp D) (g h : GA D V) (y : Fin V.rank → Af D.host.F ⊗[D.host.F] D.host.E)
+    : (finHom V (g * h)).1 *ᵥ y = (finHom V g).1 *ᵥ ((finHom V h).1 *ᵥ y) := by
   rw [map_mul, Units.val_mul, Matrix.mulVec_mulVec]
 
-
 set_option maxHeartbeats 800000 in
-theorem mark_move : ∀ (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (V : HSp D) (r : ℕ) (C : Ctx Xo c σ V r), C.OK → ∀ h k γ, C.Mark h k γ → (∀ γ₀ ∈ GQ V, C.Mark (γ₀ * h) k (γ * γ₀⁻¹)) ∧ (∀ u, FinCong V l.M u → C.Mark (h * u) k γ) ∧ (∀ u ∈ GinfC V, C.Mark (h * u) k γ) ∧ ∀ δ ∈ (C.M.X k).Γ, ∃ γ₁ ∈ GQ V, C.Mark h k (γ₁ * γ) ∧ C.fr (γ₁ * γ * h) k = lact δ (C.fr (γ * h) k) := by
+theorem mark_move
+    : ∀ (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E) (Dw : Datum H)
+        (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (V : HSp D) (r : ℕ)
+        (C : Ctx Xo c σ V r),
+      C.OK
+        → ∀ h k γ,
+          C.Mark h k γ
+            → (∀ γ₀ ∈ GQ V, C.Mark (γ₀ * h) k (γ * γ₀⁻¹))
+              ∧ (∀ u, FinCong V l.M u → C.Mark (h * u) k γ) ∧ (∀ u ∈ GinfC V, C.Mark (h * u) k γ)
+              ∧ ∀ δ ∈ (C.M.X k).Γ, ∃ γ₁ ∈ GQ V,
+                C.Mark h k (γ₁ * γ) ∧ C.fr (γ₁ * γ * h) k = lact δ (C.fr (γ * h) k) := by
   intro D H Dw l Xo c σ V r C hC h k γ hM
   obtain ⟨hγ, hΛ, hmk⟩ := hM
   refine ⟨fun γ₀ hγ₀ => ?_, fun u hu => ?_, fun u hu => ?_, fun δ hδ => ?_⟩
@@ -72,11 +88,13 @@ theorem mark_move : ∀ (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo.T
       have hιa : C.ι a ∈ l.Mb.map (H.bar : 𝓞 D.host.E →+* 𝓞 D.host.E) • latG V 1 := by
         rw [← hC.iota.emb.2, ← Submodule.map_top, ← Submodule.map_smul'']
         exact Submodule.mem_map_of_mem ha
-      obtain ⟨y, hy, hy'⟩ := ((GlobalTheory.Member.AALev.congruences_agree D V u).2 l.M _).1 (((GlobalTheory.Member.finCong_iff_half_and_kfHalf D H l V).1 u).1 hu) _ hιa
+      obtain ⟨y, hy, hy'⟩ :=
+        ((GlobalTheory.Member.AALev.congruences_agree D V u).2 l.M _).1
+          (((GlobalTheory.Member.finCong_iff_half_and_kfHalf D H l V).1 u).1 hu) _ hιa
       rw [e, e2]
       refine ⟨w - (finHom V (γ * h)).1 *ᵥ y, sub_mem hw (markMove_mulVec_mem V _ hy), ?_⟩
-      rw [markMove_finHom_mul, sub_eq_iff_eq_add'.1 hy', Matrix.mulVec_add, markMove_mulVec_nsmul, nsmul_sub, ← hw',
-        sub_add_eq_sub_sub]
+      rw [markMove_finHom_mul, sub_eq_iff_eq_add'.1 hy', Matrix.mulVec_add, markMove_mulVec_nsmul,
+        nsmul_sub, ← hw', sub_add_eq_sub_sub]
   · have e : finHom V (γ * (h * u)) = finHom V (γ * h) := by
       have hu' : finHom V u = 1 := hu
       rw [← mul_assoc, map_mul _ _ u, hu', mul_one]
@@ -87,7 +105,7 @@ theorem mark_move : ∀ (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo.T
   · have hr := C.hr
     subst hr
     obtain ⟨⟨hU, hS⟩, hcong, -⟩ := (hC.base.gam k δ).1 hδ
-    have hG : (C.M.X k).Gm = -V.gramᵀ := (hC.modelW k).1
+    have hG : (C.M.X k).Gm = - V.gramᵀ := (hC.modelW k).1
     rw [hG] at hU
     obtain ⟨r1, -, r3, -, r5⟩ := GlobalTheory.Member.RatElt.rational_elements D V
     obtain ⟨γ₁, hγ₁⟩ := r3 δ hU
@@ -98,11 +116,17 @@ theorem mark_move : ∀ (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo.T
       rw [← SetLike.mem_coe, hΛ]
       exact ⟨fun ⟨x, hx, e⟩ => (show x = v from e) ▸ hx, fun hv => ⟨v, hv, rfl⟩⟩
     have hΛ'' : ∀ v, v ∈ (C.M.X k).Λ ↔ v ∈ latG V (γ₁ * (γ * h)) := fun v => by
-      have e : (δ : Matrix (Fin V.rank) (Fin V.rank) D.host.E) *ᵥ
-          (((δ⁻¹ : GL (Fin V.rank) D.host.E) : Matrix (Fin V.rank) (Fin V.rank) D.host.E) *ᵥ v) = v := by
+      have e
+          : (δ : Matrix (Fin V.rank) (Fin V.rank) D.host.E)
+              *ᵥ (((δ⁻¹ : GL (Fin V.rank) D.host.E) : Matrix (Fin V.rank) (Fin V.rank) D.host.E)
+                *ᵥ v)
+            = v := by
         rw [Matrix.mulVec_mulVec, Units.mul_inv, Matrix.one_mulVec]
-      have h0 := ((hS _).symm.trans (hΛ' (((δ⁻¹ : GL (Fin V.rank) D.host.E) :
-        Matrix (Fin V.rank) (Fin V.rank) D.host.E) *ᵥ v))).trans (m1 _)
+      have h0 :=
+        ((hS _).symm.trans
+          (hΛ'
+            (((δ⁻¹ : GL (Fin V.rank) D.host.E) : Matrix (Fin V.rank) (Fin V.rank) D.host.E)
+              *ᵥ v))).trans (m1 _)
       rwa [e] at h0
     refine ⟨γ₁, hq, ⟨mul_mem hq hγ, ?_, ?_⟩, ?_⟩
     · rw [mul_assoc]
@@ -111,17 +135,25 @@ theorem mark_move : ∀ (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo.T
       exact ⟨fun hv => ⟨v, hv, rfl⟩, fun ⟨x, hx, e⟩ => (show x = v from e) ▸ hx⟩
     · intro a ha
       obtain ⟨w, hw, hw'⟩ := hmk a ha
-      have hta : C.F.t k a ∈ l.Mb.map (H.bar : 𝓞 D.host.E →+* 𝓞 D.host.E) •
-          (⊤ : Submodule (𝓞 D.host.E) (C.F.Di k).La) := by
+      have hta
+          : C.F.t k a
+            ∈ l.Mb.map (H.bar : 𝓞 D.host.E →+* 𝓞 D.host.E)
+              • (⊤ : Submodule (𝓞 D.host.E) (C.F.Di k).La) := by
         have h1 := Submodule.mem_map_of_mem (f := C.F.t k) ha
         rw [Submodule.map_smul''] at h1
         exact Submodule.smul_mono le_rfl le_top h1
       obtain ⟨b, hb⟩ := hcong _ hta
       rw [mul_assoc]
-      refine ⟨(finHom V γ₁).1 *ᵥ w - finVec V (C.M.φ k b : Fin V.rank → D.host.E),
-        sub_mem ((m2 w).1 hw) (markMove_finVec_mem V _ ((hΛ'' _).1 (C.M.φ k b).2)), ?_⟩
-      have hw2 : finVec V (C.M.φ k (C.F.t k a) : Fin V.rank → D.host.E) -
-          (finHom V (γ * h)).1 *ᵥ (finVec V (C.ι a)) = (l.M : ℕ) • w := hw'
+      refine ⟨
+        (finHom V γ₁).1 *ᵥ w - finVec V (C.M.φ k b : Fin V.rank → D.host.E),
+        sub_mem ((m2 w).1 hw) (markMove_finVec_mem V _ ((hΛ'' _).1 (C.M.φ k b).2)),
+        ?_
+      ⟩
+      have hw2
+          : finVec V (C.M.φ k (C.F.t k a) : Fin V.rank → D.host.E)
+              - (finHom V (γ * h)).1 *ᵥ (finVec V (C.ι a))
+            = (l.M : ℕ) • w :=
+        hw'
       have h3 := f1 (C.M.φ k (C.F.t k a) : Fin V.rank → D.host.E)
       rw [hb, markMove_finVec_add_nsmul] at h3
       show finVec V (C.M.φ k (C.F.t k a) : Fin V.rank → D.host.E) - _ = _

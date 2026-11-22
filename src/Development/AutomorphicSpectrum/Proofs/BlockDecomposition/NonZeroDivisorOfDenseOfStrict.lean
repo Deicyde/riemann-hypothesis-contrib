@@ -6,11 +6,13 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.ComplReg
 
-theorem nonZeroDivisor_of_dense_of_strict {B T : Type} [CommRing B] [CommRing T] (π : B)
-    (g : B →+* T) (hH : IsHausdorff (Ideal.span {g π}) T)
+theorem nonZeroDivisor_of_dense_of_strict
+    {B T : Type} [CommRing B] [CommRing T]
+    (π : B) (g : B →+* T) (hH : IsHausdorff (Ideal.span {g π}) T)
     (hd : ∀ (M : ℕ) (y : T), ∃ x, y - g x ∈ Ideal.span {g π ^ M})
     (hk : ∀ (M : ℕ) (x : B), g x ∈ Ideal.span {g π ^ M} → x ∈ Ideal.span {π ^ M})
-    (hπ : π ∈ nonZeroDivisors B) : g π ∈ nonZeroDivisors T := by
+    (hπ : π ∈ nonZeroDivisors B)
+    : g π ∈ nonZeroDivisors T := by
   have key : ∀ t : T, t * g π = 0 → ∀ M : ℕ, t ∈ Ideal.span {g π ^ M} := by
     intro t ht M
     obtain ⟨x, hx⟩ := hd M t
@@ -26,8 +28,7 @@ theorem nonZeroDivisor_of_dense_of_strict {B T : Type} [CommRing B] [CommRing T]
       rw [sub_mul, hc]
       ring
     have hxeq : x = π ^ M * c := sub_eq_zero.mp ((mem_nonZeroDivisors_iff.mp hπ).2 _ h0)
-    have hgx : g x = g π ^ M * g c := by
-      rw [hxeq, map_mul, map_pow]
+    have hgx : g x = g π ^ M * g c := by rw [hxeq, map_mul, map_pow]
     rw [Ideal.mem_span_singleton]
     exact ⟨d + g c, by linear_combination hd' + hgx⟩
   have main : ∀ t : T, t * g π = 0 → t = 0 := by

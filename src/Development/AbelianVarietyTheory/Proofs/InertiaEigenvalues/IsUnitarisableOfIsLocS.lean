@@ -19,7 +19,11 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Split
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
+  Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain
+  GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting
+  GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.Up
 attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.TypeRec.factG
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -30,25 +34,41 @@ open GlobalTheory.CuspRep.ParLaws GlobalTheory.LocLanglands
 end GlobalTheory.RowSphSmall
 
 section FormSec
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.RecTie Formalism.L2.Rows GlobalTheory.Mem GlobalTheory.Mem.R3 ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev
+  Formalism.IndefR.RecTie Formalism.L2.Rows GlobalTheory.Mem GlobalTheory.Mem.R3
+  ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2
 open Formalism.IndefR.principalLevelFrame Formalism.IndefR.Mult
 
 namespace GlobalTheory.RowSphSmall
 
-
 set_option maxHeartbeats 1000000 in
-theorem exists_form_rowRepR (hH : GlobalTheory.Published.HarishChandraFinite) (hC : GlobalTheory.Published.CuspRapidDecay) (D : D7) (G : Type) [Group G]
-    [Fintype G] (Pl0 I0 T : Type) (A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m) (Ks : Type) [Field Ks] [NumberField Ks]
-    [Algebra Ks D.what₂.LL] (R : RealDat3 D A3 Ks) (F : Face3 D A3) (cG : G0 R.Pg D.R.r ≃* G0g D.nd) (X0 : BaseLevelRowSide D)
-    (Y : Read (A3 := A3) R.toRealDat F.lv2 X0) (hP : Pins R F cG) (σ : D.what₂.FT) :
-    ∃ B : (principalLevelFrame.rowRepR R.θ (Y.eFT σ)).S → (principalLevelFrame.rowRepR R.θ (Y.eFT σ)).S → ℂ,
-      (∀ x y z (c : ℂ), B x (y + c • z) = B x y + c * B x z) ∧ (∀ x y, B x y = starRingEnd ℂ (B y x)) ∧
-      (∀ x, x ≠ 0 → 0 < (B x x).re) ∧
-      ∀ h (x y x' y' : (principalLevelFrame.rowRepR R.θ (Y.eFT σ)).S), (x' : GAf D.host.E D.R.r → ℂ) = NG.rt D.host.E D.R.r h x →
-        (y' : GAf D.host.E D.R.r → ℂ) = NG.rt D.host.E D.R.r h y → B x' y' = B x y := by
+theorem exists_form_rowRepR
+    (hH : GlobalTheory.Published.HarishChandraFinite) (hC : GlobalTheory.Published.CuspRapidDecay)
+    (D : D7)
+    (G : Type) [Group G] [Fintype G]
+    (Pl0 I0 T : Type) (A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m)
+    (Ks : Type) [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+    (R : RealDat3 D A3 Ks)
+    (F : Face3 D A3)
+    (cG : G0 R.Pg D.R.r ≃* G0g D.nd)
+    (X0 : BaseLevelRowSide D) (Y : Read (A3 := A3) R.toRealDat F.lv2 X0)
+    (hP : Pins R F cG) (σ : D.what₂.FT)
+    : ∃ B : (principalLevelFrame.rowRepR R.θ (Y.eFT σ)).S
+        → (principalLevelFrame.rowRepR R.θ (Y.eFT σ)).S
+        → ℂ,
+      (∀ x y z (c : ℂ), B x (y + c • z) = B x y + c * B x z)
+        ∧ (∀ x y, B x y = starRingEnd ℂ (B y x)) ∧ (∀ x, x ≠ 0 → 0 < (B x x).re)
+        ∧ ∀ h (x y x' y' : (principalLevelFrame.rowRepR R.θ (Y.eFT σ)).S),
+          (x' : GAf D.host.E D.R.r → ℂ) = NG.rt D.host.E D.R.r h x
+            → (y' : GAf D.host.E D.R.r → ℂ) = NG.rt D.host.E D.R.r h y
+            → B x' y' = B x y := by
   obtain ⟨b, hb⟩ := principalLevelFrame.rowRepR_occ R.θ (Y.eFT σ)
   set π := principalLevelFrame.rowRepR R.θ (Y.eFT σ) with hπ
-  have hne : isotIn (D := D) (actM Y.PY (R.MY 0)) (Minf R.θ Y.PY (R.MY 0)) (FinTyp.conjT π) ≠ ⊥ := by
+  have hne
+      : isotIn (D := D) (actM Y.PY (R.MY 0)) (Minf R.θ Y.PY (R.MY 0)) (FinTyp.conjT π) ≠ ⊥ := by
     intro h
     apply hb
     unfold isotE isotL
@@ -57,8 +77,11 @@ theorem exists_form_rowRepR (hH : GlobalTheory.Published.HarishChandraFinite) (h
   have hθ : IsInfFam R.θ := hM.inf
   have hSig : (Yc D 0).SigOK := D.sp.Y_sig 0
   have hcc := GlobalTheory.T.unitary_congruence_conj_contains_congruence D.host.E D.R.r
-  have hfd : ∀ j, j < D.R.m → (R.νY A3.A.μ0 j).IsHaarMeasure ∧
-      IsFundamentalDomain (GQ (Yc D j)) (R.fdY A3.A.μ0 j) (R.νY A3.A.μ0 j) := by
+  have hfd
+      : ∀ j,
+        j < D.R.m
+          → (R.νY A3.A.μ0 j).IsHaarMeasure
+            ∧ IsFundamentalDomain (GQ (Yc D j)) (R.fdY A3.A.μ0 j) (R.νY A3.A.μ0 j) := by
     intro j hj
     by_cases h : j + 1 < D.R.m
     · have := hM.νY A3.A.μ0 j h
@@ -69,13 +92,17 @@ theorem exists_form_rowRepR (hH : GlobalTheory.Published.HarishChandraFinite) (h
   obtain ⟨hHaar, hFD⟩ := hfd 0 Y.hm
   have hSA : SchurAll D := fun V _ S θ M J χ μ 𝓕 =>
     (GlobalTheory.MultFinite.hcFinite_and_schurMult hH hC D θ V S M J χ μ 𝓕).2
-  obtain ⟨hlin, hherm, hpos⟩ := GlobalTheory.FinTypesRows.minf_sesq (M := R.MY 0) (θ := R.θ) (R.νY A3.A.μ0 0)
-    (R.fdY A3.A.μ0 0) Y.PY hSA hSig hθ hHaar hFD
-  obtain ⟨B', h1, h2, h3, h4⟩ := GlobalTheory.finTyp_invariant_form_of_isotIn D D.R.r _ (actM Y.PY (R.MY 0))
-    (Minf R.θ Y.PY (R.MY 0)) (ipM (R.MY 0) (R.νY A3.A.μ0 0) (R.fdY A3.A.μ0 0)) hlin hherm hpos
-    (fun h x hx => GlobalTheory.FinTypesRows.minf_stable Y.PY hcc h hx)
-    (fun h x hx y hy => GlobalTheory.T.schur_pairing_invariant_under_standard_group D (Yc D 0) _ R.θ (R.MY 0) D.R.r Y.PY (R.νY A3.A.μ0 0) (R.fdY A3.A.μ0 0) hSA hSig hθ
-      hHaar hFD h x hx y hy) (FinTyp.conjT π) hne
+  obtain ⟨hlin, hherm, hpos⟩ :=
+    GlobalTheory.FinTypesRows.minf_sesq (M := R.MY 0) (θ := R.θ) (R.νY A3.A.μ0 0) (R.fdY A3.A.μ0 0)
+      Y.PY hSA hSig hθ hHaar hFD
+  obtain ⟨B', h1, h2, h3, h4⟩ :=
+    GlobalTheory.finTyp_invariant_form_of_isotIn D D.R.r _ (actM Y.PY (R.MY 0))
+      (Minf R.θ Y.PY (R.MY 0)) (ipM (R.MY 0) (R.νY A3.A.μ0 0) (R.fdY A3.A.μ0 0)) hlin hherm hpos
+      (fun h x hx => GlobalTheory.FinTypesRows.minf_stable Y.PY hcc h hx)
+      (fun h x hx y hy =>
+        GlobalTheory.T.schur_pairing_invariant_under_standard_group D (Yc D 0) _ R.θ (R.MY 0) D.R.r
+          Y.PY (R.νY A3.A.μ0 0) (R.fdY A3.A.μ0 0) hSA hSig hθ hHaar hFD h x hx y hy)
+      (FinTyp.conjT π) hne
   exact GlobalTheory.RowLocalRows.form_of_conjT π B' h1 h2 h3 h4
 
 end GlobalTheory.RowSphSmall
@@ -83,13 +110,18 @@ end FormSec
 
 namespace GlobalTheory.RowSphSmall
 
-theorem isUnitarisable_of_isLocS {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} (π : NG.FinTyp L n)
-    (B : π.S → π.S → ℂ) (hlin : ∀ x y z (c : ℂ), B x (y + c • z) = B x y + c * B x z)
+theorem isUnitarisable_of_isLocS
+    {L : Type} [Field L] [NumberField L] [IsCMField L]
+    {n : ℕ} (π : NG.FinTyp L n) (B : π.S → π.S → ℂ)
+    (hlin : ∀ x y z (c : ℂ), B x (y + c • z) = B x y + c * B x z)
     (hherm : ∀ x y, B x y = starRingEnd ℂ (B y x)) (hpos : ∀ x, x ≠ 0 → 0 < (B x x).re)
-    (hinv : ∀ h (x y x' y' : π.S), (x' : Formalism.AUTREP.GAf L n → ℂ) = NG.rt L n h x →
-      (y' : Formalism.AUTREP.GAf L n → ℂ) = NG.rt L n h y → B x' y' = B x y)
-    (s : ReciprocityTheory.Aut.SplitPlace L) (τ : GlobalTheory.SmGL.IrrRep (GL (Fin n) (s.w.adicCompletion L))) (hτ : IsLocS π.S s τ) :
-    GlobalTheory.SmGL.IsUnitarisable τ.ρ := by
+    (hinv : ∀ h (x y x' y' : π.S),
+      (x' : Formalism.AUTREP.GAf L n → ℂ) = NG.rt L n h x
+        → (y' : Formalism.AUTREP.GAf L n → ℂ) = NG.rt L n h y
+        → B x' y' = B x y)
+    (s : ReciprocityTheory.Aut.SplitPlace L)
+    (τ : GlobalTheory.SmGL.IrrRep (GL (Fin n) (s.w.adicCompletion L))) (hτ : IsLocS π.S s τ)
+    : GlobalTheory.SmGL.IsUnitarisable τ.ρ := by
   obtain ⟨i, T, -, -, hTi, hTm, hTe⟩ := hτ
   obtain ⟨e, he1, he2⟩ := GlobalTheory.SplitEmb.exists_hom_trivOutside_loc L n s
   let t : τ.V → π.S := fun v => ⟨T v, hTm v⟩
@@ -123,7 +155,8 @@ theorem isUnitarisable_of_isLocS {L : Type} [Field L] [NumberField L] [IsCMField
       linear_combination -this
     simpa [h0] using h1
   let Bf : τ.V →ₗ[ℂ] τ.V →ₛₗ[starRingEnd ℂ] ℂ :=
-    LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ) (fun v w => B (t w) (t v))
+    LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ)
+      (fun v w => B (t w) (t v))
       (fun v v' w => by rw [tadd, hadd2])
       (fun c v w => by rw [tsmul, hsm2]; rfl)
       (fun v w w' => by rw [tadd, hadd1])

@@ -6,12 +6,14 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.AtBas
 
 noncomputable section
 
-open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG GlobalTheory.LocOver
+open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG
+  GlobalTheory.LocOver
 open scoped Classical
 
 namespace GlobalTheory.UnipFrame
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
   {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
   {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
 
@@ -83,21 +85,22 @@ section Elem
 variable {H : HermSp M V} {r : ℕ} (Fr : FrameD H r) (y : Fin r → V)
 
 def prL : V →ₗ[E] V :=
-  LinearMap.id - ∑ a, (hL H (Fr.es a)).smulRight (Fr.f a.castSucc) -
-    ∑ a, (hL H (Fr.f a.castSucc)).smulRight (Fr.es a)
+  LinearMap.id - ∑ a, (hL H (Fr.es a)).smulRight (Fr.f a.castSucc)
+    - ∑ a, (hL H (Fr.f a.castSucc)).smulRight (Fr.es a)
 
 lemma prL_apply (v : V) : prL Fr v = Fr.prF v := by
   simp [prL, prF_eq, hL]
 
 def Nl : V →ₗ[E] V :=
-  ∑ a, (hL H (Fr.f a.castSucc)).smulRight (y a - Fr.es a) -
-    ∑ j, ((hL H (y j)).comp (prL Fr)).smulRight (Fr.f j.castSucc)
+  ∑ a, (hL H (Fr.f a.castSucc)).smulRight (y a - Fr.es a)
+    - ∑ j, ((hL H (y j)).comp (prL Fr)).smulRight (Fr.f j.castSucc)
 
 lemma Nl_apply (v : V) : Nl Fr y v = ∑ a, H.h v (Fr.f a.castSucc) • (y a - Fr.es a) -
     ∑ j, H.h (Fr.prF v) (y j) • Fr.f j.castSucc := by
   simp [Nl, prL_apply, hL]
 
-variable (hy1 : ∀ a b, H.h (y a) (Fr.f b) = if b = a.castSucc then 1 else 0)
+variable
+  (hy1 : ∀ a b, H.h (y a) (Fr.f b) = if b = a.castSucc then 1 else 0)
   (hy2 : ∀ a b, H.h (y a) (y b) = 0)
 
 include hy1 in
@@ -149,7 +152,8 @@ lemma inv_right : (1 - Nl Fr y + Nl Fr y * Nl Fr y) * (1 + Nl Fr y) = 1 := by
   rw [this, Nl_cube Fr y hy1, add_zero]
 
 def nE : V ≃ₗ[E] V :=
-  LinearEquiv.ofLinear (1 + Nl Fr y) (1 - Nl Fr y + Nl Fr y * Nl Fr y) (inv_left Fr y hy1) (inv_right Fr y hy1)
+  LinearEquiv.ofLinear (1 + Nl Fr y) (1 - Nl Fr y + Nl Fr y * Nl Fr y) (inv_left Fr y hy1)
+    (inv_right Fr y hy1)
 
 lemma nE_apply (v : V) : nE Fr y hy1 v = v + Nl Fr y v := by
   simp [nE]
@@ -158,7 +162,8 @@ end Elem
 
 section Unit
 
-variable {H : HermSp M V} {r : ℕ} (Fr : FrameD H r) (y : Fin r → V)
+variable
+  {H : HermSp M V} {r : ℕ} (Fr : FrameD H r) (y : Fin r → V)
   (hy1 : ∀ a b, H.h (y a) (Fr.f b) = if b = a.castSucc then 1 else 0)
   (hy2 : ∀ a b, H.h (y a) (y b) = 0)
 
@@ -244,12 +249,16 @@ lemma unitary : IsUnitary H (nE Fr y hy1) := by
 
 end Unit
 
-theorem exists_unitary_frame_dual {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type}
-    [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E) {V : Type}
-    [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ) (Fr : FrameD H r) (y : Fin r → V) :
-    (∀ a b, H.h (y a) (Fr.f b) = if b = a.castSucc then 1 else 0) → (∀ a b, H.h (y a) (y b) = 0) →
-    ∃ n : V ≃ₗ[E] V, IsUnitary H n ∧ (∀ b, n (Fr.f b) = Fr.f b) ∧ (∀ a, n (Fr.es a) = y a) ∧
-      ∀ v ∈ H.perp (H.X Fr.f), n v - v ∈ H.X Fr.f := by
+theorem exists_unitary_frame_dual
+    {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+    {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
+    (M : Model F E)
+    {V : Type} [AddCommGroup V] [Module E V]
+    (H : HermSp M V) (r : ℕ) (Fr : FrameD H r) (y : Fin r → V)
+    : (∀ a b, H.h (y a) (Fr.f b) = if b = a.castSucc then 1 else 0) → (∀ a b, H.h (y a) (y b) = 0)
+      → ∃ n : V ≃ₗ[E] V,
+        IsUnitary H n ∧ (∀ b, n (Fr.f b) = Fr.f b) ∧ (∀ a, n (Fr.es a) = y a)
+          ∧ ∀ v ∈ H.perp (H.X Fr.f), n v - v ∈ H.X Fr.f := by
   intro hy1 hy2
   refine ⟨nE Fr y hy1, unitary Fr y hy1 hy2, ?_, n_es Fr y hy1, ?_⟩
   · intro b

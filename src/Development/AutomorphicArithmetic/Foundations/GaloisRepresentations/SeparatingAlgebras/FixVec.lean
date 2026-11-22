@@ -10,8 +10,7 @@ namespace UpperTheory.Gal.Gen
 theorem fixVec_pf : FixVec := by
   intro l _ H _ hH V _ _ _ ρ U hU hne
   classical
-  let act : H → (V ⧸ U) →ₗ[ZMod l] (V ⧸ U) :=
-    fun h => U.mapQ U (ρ h) (fun u hu => hU h u hu)
+  let act : H → (V ⧸ U) →ₗ[ZMod l] (V ⧸ U) := fun h => U.mapQ U (ρ h) (fun u hu => hU h u hu)
   have act_mk : ∀ (h : H) (v : V), act h (U.mkQ v) = U.mkQ (ρ h v) := fun h v => rfl
   letI : MulAction H (V ⧸ U) :=
     { smul := fun h x => act h x

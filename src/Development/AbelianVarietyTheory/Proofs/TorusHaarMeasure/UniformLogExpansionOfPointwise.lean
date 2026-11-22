@@ -134,32 +134,59 @@ private lemma exists_pos_uniform_le_sum_log_ratio_det_gram {r i : ℕ}
     obtain ⟨X, hX⟩ := exists_mul_right_orthonormal_of_re_det_gram_pos M hM
     exact absurd ⟨M * X, hX⟩ hne
 
-
 open MeasureTheory Topology Matrix in
 open scoped ComplexOrder ENNReal Pointwise in
-theorem _root_.GlobalTheory.uniform_log_expansion_of_pointwise :
-    (∀ (r : ℕ) (S : Finset (Matrix (Fin r) (Fin r) ℂ)), (∀ a ∈ S, a.IsHermitian ∧ a.det ≠ 0 ∧ a⁻¹ ∈ S) → (∀ W : Submodule ℂ (Fin r → ℂ), (∀ a ∈ S, ∀ v ∈ W, (a * a).mulVec v ∈ W) → W = ⊥ ∨ W = ⊤) → ∀ (i : ℕ), 0 < i → i < r → ∀ M : Matrix (Fin r) (Fin i) ℂ, 0 < (((M)ᴴ * (M)).det.re) → (∀ a ∈ S, 0 < (((a * M)ᴴ * (a * M)).det.re)) ∧ 0 < ∑ a ∈ S, Real.log ((((a * M)ᴴ * (a * M)).det.re) / (((M)ᴴ * (M)).det.re))) → (∀ (r : ℕ) (S : Finset (Matrix (Fin r) (Fin r) ℂ)), (∀ a ∈ S, a.IsHermitian ∧ a.det ≠ 0 ∧ a⁻¹ ∈ S) → (∀ W : Submodule ℂ (Fin r → ℂ), (∀ a ∈ S, ∀ v ∈ W, (a * a).mulVec v ∈ W) → W = ⊥ ∨ W = ⊤) → ∃ η : ℝ, 0 < η ∧ ∀ (i : ℕ), 0 < i → i < r → ∀ M : Matrix (Fin r) (Fin i) ℂ, 0 < (((M)ᴴ * (M)).det.re) → η ≤ ∑ a ∈ S, Real.log ((((a * M)ᴴ * (a * M)).det.re) / (((M)ᴴ * (M)).det.re))) := by
-  intro hpt r S hS hirr
-  have key : ∀ i : ℕ, ∃ η : ℝ, 0 < η ∧ (0 < i → i < r → ∀ M : Matrix (Fin r) (Fin i) ℂ,
-      0 < (Mᴴ * M).det.re →
-      η ≤ ∑ a ∈ S, Real.log (((a * M)ᴴ * (a * M)).det.re / (Mᴴ * M).det.re)) := by
-    intro i
-    by_cases hi : 0 < i ∧ i < r
-    · obtain ⟨η, hη, h⟩ := exists_pos_uniform_le_sum_log_ratio_det_gram S
-        (fun M hM => hpt r S hS hirr i hi.1 hi.2 M hM)
-      exact ⟨η, hη, fun _ _ => h⟩
-    · exact ⟨1, one_pos, fun h1 h2 => absurd ⟨h1, h2⟩ hi⟩
-  choose η hη hb using key
-  have hmem1 : (1 : ℝ) ∈ (Finset.range r).image η ∪ {1} :=
-    Finset.mem_union_right _ (Finset.mem_singleton_self 1)
-  refine ⟨((Finset.range r).image η ∪ {1}).min' ⟨1, hmem1⟩, ?_, ?_⟩
-  · rcases Finset.mem_union.mp (Finset.min'_mem _ ⟨1, hmem1⟩) with hy | hy
-    · obtain ⟨j, -, hj⟩ := Finset.mem_image.mp hy
-      rw [← hj]
-      exact hη j
-    · rw [Finset.mem_singleton.mp hy]; exact one_pos
-  · intro i hi hir M hM
-    exact (Finset.min'_le _ _ (Finset.mem_union_left _
-      (Finset.mem_image_of_mem η (Finset.mem_range.mpr hir)))).trans (hb i hi hir M hM)
+theorem _root_.GlobalTheory.uniform_log_expansion_of_pointwise
+    : (∀ (r : ℕ) (S : Finset (Matrix (Fin r) (Fin r) ℂ)),
+        (∀ a ∈ S, a.IsHermitian ∧ a.det ≠ 0 ∧ a⁻¹ ∈ S)
+          → (∀ W : Submodule ℂ (Fin r → ℂ),
+            (∀ a ∈ S, ∀ v ∈ W, (a * a).mulVec v ∈ W) → W = ⊥ ∨ W = ⊤)
+          → ∀ (i : ℕ),
+            0 < i → i < r
+              → ∀ M : Matrix (Fin r) (Fin i) ℂ,
+                0 < (((M)ᴴ * (M)).det.re)
+                  → (∀ a ∈ S, 0 < (((a * M)ᴴ * (a * M)).det.re))
+                    ∧ 0 < ∑ a ∈ S, Real.log ((((a * M)ᴴ * (a * M)).det.re) / (((M)ᴴ * (M)).det.re)))
+      → (∀ (r : ℕ) (S : Finset (Matrix (Fin r) (Fin r) ℂ)),
+        (∀ a ∈ S, a.IsHermitian ∧ a.det ≠ 0 ∧ a⁻¹ ∈ S)
+          → (∀ W : Submodule ℂ (Fin r → ℂ),
+            (∀ a ∈ S, ∀ v ∈ W, (a * a).mulVec v ∈ W) → W = ⊥ ∨ W = ⊤)
+          → ∃ η : ℝ,
+            0 < η
+              ∧ ∀ (i : ℕ),
+                0 < i → i < r
+                  → ∀ M : Matrix (Fin r) (Fin i) ℂ,
+                    0 < (((M)ᴴ * (M)).det.re)
+                      → η
+                        ≤ ∑ a ∈ S, Real.log ((((a * M)ᴴ * (a * M)).det.re) / (((M)ᴴ * (M)).det.re))) :=
+  by
+    intro hpt r S hS hirr
+    have key
+        : ∀ i : ℕ, ∃ η : ℝ,
+          0 < η
+            ∧ (0 < i → i < r
+              → ∀ M : Matrix (Fin r) (Fin i) ℂ,
+                0 < (Mᴴ * M).det.re
+                  → η ≤ ∑ a ∈ S, Real.log (((a * M)ᴴ * (a * M)).det.re / (Mᴴ * M).det.re)) := by
+      intro i
+      by_cases hi : 0 < i ∧ i < r
+      · obtain ⟨η, hη, h⟩ :=
+          exists_pos_uniform_le_sum_log_ratio_det_gram S
+            (fun M hM => hpt r S hS hirr i hi.1 hi.2 M hM)
+        exact ⟨η, hη, fun _ _ => h⟩
+      · exact ⟨1, one_pos, fun h1 h2 => absurd ⟨h1, h2⟩ hi⟩
+    choose η hη hb using key
+    have hmem1 : (1 : ℝ) ∈ (Finset.range r).image η ∪ {1} :=
+      Finset.mem_union_right _ (Finset.mem_singleton_self 1)
+    refine ⟨((Finset.range r).image η ∪ {1}).min' ⟨1, hmem1⟩, ?_, ?_⟩
+    · rcases Finset.mem_union.mp (Finset.min'_mem _ ⟨1, hmem1⟩) with hy | hy
+      · obtain ⟨j, -, hj⟩ := Finset.mem_image.mp hy
+        rw [← hj]
+        exact hη j
+      · rw [Finset.mem_singleton.mp hy]; exact one_pos
+    · intro i hi hir M hM
+      exact (Finset.min'_le _ _
+          (Finset.mem_union_left _ (Finset.mem_image_of_mem η (Finset.mem_range.mpr hir)))).trans
+        (hb i hi hir M hM)
 
 end GlobalTheory

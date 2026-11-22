@@ -13,11 +13,20 @@ open scoped MatrixGroups Real ComplexConjugate
 
 namespace GlobalTheory
 
-theorem latF_rows_subst : ∀ (N l : ℕ) (ν : DirichletCharacter ℂ N) (φ : ZMod l → ℂ) (a b c d : ℤ),
-    (N : ℤ) * a * d - l * b * c = 1 → 0 < N → 0 < l → ∀ y : ℤ × ℤ,
-    (if (N : ℤ) ∣ y.1 then latF l (ch ν) φ (y.1 / N * (N * d) - y.2 * (l * c), -(y.1 / N * b) + y.2 * a) else 0) =
-      latF (N * l) (fun _ => 1) (fun z => ν (-(c : ZMod N) * ZMod.castHom (Dvd.intro l rfl) (ZMod N) z) *
-        φ ((a : ZMod l) * ZMod.castHom (Dvd.intro_left N rfl) (ZMod l) z)) y := by
+theorem latF_rows_subst
+    : ∀ (N l : ℕ) (ν : DirichletCharacter ℂ N) (φ : ZMod l → ℂ) (a b c d : ℤ),
+      (N : ℤ) * a * d - l * b * c = 1 → 0 < N → 0 < l
+        → ∀ y : ℤ × ℤ,
+          (if (N : ℤ) ∣ y.1 then
+             latF l (ch ν) φ (y.1 / N * (N * d) - y.2 * (l * c), -(y.1 / N * b) + y.2 * a)
+           else
+             0)
+            = latF (N * l)
+              (fun _ => 1)
+              (fun z =>
+                ν (-(c : ZMod N) * ZMod.castHom (Dvd.intro l rfl) (ZMod N) z)
+                  * φ ((a : ZMod l) * ZMod.castHom (Dvd.intro_left N rfl) (ZMod l) z))
+              y := by
   intro N l ν φ a b c d hdet hN hl y
   obtain ⟨y1, y2⟩ := y
   have hNz : (N : ℤ) ≠ 0 := by exact_mod_cast hN.ne'
@@ -36,11 +45,11 @@ theorem latF_rows_subst : ∀ (N l : ℕ) (ν : DirichletCharacter ℂ N) (φ : 
       constructor
       · intro h
         have h' : (l : ℤ) ∣ m * (N * d) := by
-          have := dvd_add h (dvd_mul_of_dvd_right (dvd_mul_right (l:ℤ) c) y2)
+          have := dvd_add h (dvd_mul_of_dvd_right (dvd_mul_right (l : ℤ) c) y2)
           simpa using this
         exact hcop.symm.dvd_of_dvd_mul_right h'
       · intro h
-        exact dvd_sub (dvd_mul_of_dvd_left h _) (dvd_mul_of_dvd_right (dvd_mul_right (l:ℤ) c) y2)
+        exact dvd_sub (dvd_mul_of_dvd_left h _) (dvd_mul_of_dvd_right (dvd_mul_right (l : ℤ) c) y2)
     push_cast
     by_cases h2 : (l : ℤ) ∣ m
     · obtain ⟨m2, rfl⟩ := h2

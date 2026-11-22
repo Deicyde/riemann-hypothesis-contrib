@@ -27,12 +27,12 @@ def sumAct (M : GKMod p q) (Y : Type) : Mat p q →ₗ[ℂ] Module.End ℂ (Y �
     refine LinearMap.ext fun v => Finsupp.ext fun y => ?_
     simp
 
-theorem sumAct_apply (M : GKMod p q) (Y : Type) (X : Mat p q) (v : Y →₀ M.V) (y : Y) :
-    sumAct M Y X v y = M.act X (v y) := by
+theorem sumAct_apply (M : GKMod p q) (Y : Type) (X : Mat p q) (v : Y →₀ M.V) (y : Y)
+    : sumAct M Y X v y = M.act X (v y) := by
   simp [sumAct]
 
-theorem sumAct_single (M : GKMod p q) (Y : Type) (X : Mat p q) (y : Y) (x : M.V) :
-    sumAct M Y X (Finsupp.single y x) = Finsupp.single y (M.act X x) := by
+theorem sumAct_single (M : GKMod p q) (Y : Type) (X : Mat p q) (y : Y) (x : M.V)
+    : sumAct M Y X (Finsupp.single y x) = Finsupp.single y (M.act X x) := by
   simp [sumAct]
 
 def sumMod (M : GKMod p q) (Y : Type) : GKMod p q where
@@ -44,8 +44,13 @@ def sumMod (M : GKMod p q) (Y : Type) : GKMod p q where
     simp only [LinearMap.sub_apply, Module.End.mul_apply, Finsupp.sub_apply, sumAct_apply]
   kfin v := by
     induction v using Finsupp.induction_linear with
-    | zero => exact ⟨⊥, inferInstance, Submodule.zero_mem _, fun X _ w hw => by
-        rw [Submodule.mem_bot] at hw ⊢; rw [hw, map_zero]⟩
+    | zero =>
+      exact ⟨
+        ⊥,
+        inferInstance,
+        Submodule.zero_mem _,
+        fun X _ w hw => by rw [Submodule.mem_bot] at hw ⊢; rw [hw, map_zero]
+      ⟩
     | add f g hf hg =>
       obtain ⟨W, hW, hf, hK⟩ := hf
       obtain ⟨W', hW', hg, hK'⟩ := hg
@@ -64,13 +69,15 @@ def sumMod (M : GKMod p q) (Y : Type) : GKMod p q where
     | zero => exact Submodule.zero_mem _
     | add f g hf hg => exact Submodule.add_mem _ hf hg
     | single y x =>
-      have h : (⨆ μ : Ix p q → ℚ, wtSub M.act μ) ≤
-          (⨆ μ : Ix p q → ℚ, wtSub (sumAct M Y) μ).comap (Finsupp.lsingle y) := by
+      have h
+          : (⨆ μ : Ix p q → ℚ, wtSub M.act μ)
+            ≤ (⨆ μ : Ix p q → ℚ, wtSub (sumAct M Y) μ).comap (Finsupp.lsingle y) := by
         refine iSup_le fun μ x hx => ?_
         rw [Submodule.mem_comap]
         refine Submodule.mem_iSup_of_mem μ ?_
         simp only [wtSub, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply,
-          LinearMap.smul_apply, LinearMap.id_apply] at hx ⊢
+            LinearMap.smul_apply, LinearMap.id_apply]
+          at hx ⊢
         intro a
         rw [Finsupp.lsingle_apply, sumAct_single, Finsupp.smul_single, ← Finsupp.single_sub, hx a,
           Finsupp.single_zero]
@@ -88,19 +95,21 @@ def fockMod (p q r s : ℕ) : GKMod p q where
   kfin P := ((GlobalTheory.FockPolGK.pol_locFin_weights p q r s).1 P).1
   wts P := ((GlobalTheory.FockPolGK.pol_locFin_weights p q r s).1 P).2
 
-theorem exists_unitary_image (M : GKMod p q) (Y Z : Type) [AddCommGroup Y] [Module ℂ Y]
-    [NormedAddCommGroup Z] [InnerProductSpace ℂ Z] (B : M.V →ₗ[ℂ] Y →ₛₗ[starRingEnd ℂ] Z)
+theorem exists_unitary_image
+    (M : GKMod p q)
+    (Y Z : Type) [AddCommGroup Y] [Module ℂ Y] [NormedAddCommGroup Z] [InnerProductSpace ℂ Z]
+    (B : M.V →ₗ[ℂ] Y →ₛₗ[starRingEnd ℂ] Z)
     (hB : ∀ (X : Mat p q) P P' y y',
-      ⟪B (M.act X P) y, B P' y'⟫_ℂ = ⟪B P y, B (M.act (adjZ X) P') y'⟫_ℂ) :
-    ∃ (A : UGKMod p q) (j : A.M.V →ₗ[ℂ] Z) (B' : M.V →ₗ[ℂ] Y →ₛₗ[starRingEnd ℂ] A.M.V),
-      Function.Injective j ∧ (∀ P y, j (B' P y) = B P y) ∧
-        Submodule.span ℂ {x | ∃ P y, B' P y = x} = ⊤ ∧
-        ∀ X P y, B' (M.act X P) y = A.M.act X (B' P y) := by
+      ⟪B (M.act X P) y, B P' y'⟫_ℂ = ⟪B P y, B (M.act (adjZ X) P') y'⟫_ℂ)
+    : ∃ (A : UGKMod p q) (j : A.M.V →ₗ[ℂ] Z) (B' : M.V →ₗ[ℂ] Y →ₛₗ[starRingEnd ℂ] A.M.V),
+      Function.Injective j ∧ (∀ P y, j (B' P y) = B P y)
+        ∧ Submodule.span ℂ {x | ∃ P y, B' P y = x} = ⊤
+        ∧ ∀ X P y, B' (M.act X P) y = A.M.act X (B' P y) := by
   let E : (Y →₀ M.V) →ₗ[ℂ] Z := Finsupp.lsum ℂ fun y => B.flip y
-  have hE1 : ∀ y P, E (Finsupp.single y P) = B P y := fun y P => by
-    simp [E]
-  have hE : ∀ X (x x' : Y →₀ M.V), ⟪E (sumAct M Y X x), E x'⟫_ℂ =
-      ⟪E x, E (sumAct M Y (adjZ X) x')⟫_ℂ := by
+  have hE1 : ∀ y P, E (Finsupp.single y P) = B P y := fun y P => by simp [E]
+  have hE
+      : ∀ X (x x' : Y →₀ M.V),
+        ⟪E (sumAct M Y X x), E x'⟫_ℂ = ⟪E x, E (sumAct M Y (adjZ X) x')⟫_ℂ := by
     intro X x x'
     induction x using Finsupp.induction_linear with
     | zero => simp
@@ -115,7 +124,8 @@ theorem exists_unitary_image (M : GKMod p q) (Y Z : Type) [AddCommGroup Y] [Modu
   let g : (Y →₀ M.V) →ₗ[ℂ] A.M.V := f
   have hjg : ∀ y P, j (g (Finsupp.single y P)) = B P y := fun y P => (hjf _).trans (hE1 y P)
   let B' : M.V →ₗ[ℂ] Y →ₛₗ[starRingEnd ℂ] A.M.V :=
-    LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ) (fun P y => g (Finsupp.single y P))
+    LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ)
+      (fun P y => g (Finsupp.single y P))
       (fun P P' y => by rw [Finsupp.single_add, map_add (f := _)])
       (fun c P y => by rw [← Finsupp.smul_single, map_smul, RingHom.id_apply])
       (fun P y y' => hj (by rw [map_add (f := _), hjg, hjg, hjg, map_add (f := _)]))
@@ -132,8 +142,8 @@ theorem exists_unitary_image (M : GKMod p q) (Y Z : Type) [AddCommGroup Y] [Modu
   · rw [hB', hB', ← sumAct_single]
     exact hact X _
 
-theorem unitaryImage : ∀ p q r s : ℕ, UnitaryImage p q r s :=
-  fun p q r s Y Z _ _ _ _ B hB => exists_unitary_image (fockMod p q r s) Y Z B hB
+theorem unitaryImage : ∀ p q r s : ℕ, UnitaryImage p q r s := fun p q r s Y Z _ _ _ _ B hB =>
+  exists_unitary_image (fockMod p q r s) Y Z B hB
 
 end GlobalTheory.Chain.IoLift.UImg
 

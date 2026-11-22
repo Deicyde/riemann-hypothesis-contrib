@@ -8,13 +8,14 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem charpoly_mulLeft_eq_map_of_spanning_lattice (R F A S : Type) [CommRing R] [IsDomain R]
-    [IsDiscreteValuationRing R] [Field F] [Algebra R F] [IsFractionRing R F] [CommRing A]
-    [Algebra F A] [Algebra R A] [IsScalarTower R F A] [Module.Finite F A] [CommRing S]
-    [Algebra R S] [Module.Finite R S] (ι : S →ₐ[R] A) (hι : Function.Injective ι)
-    (hspan : Submodule.span F (Set.range ι) = ⊤) :
-    ∃ (n : ℕ) (b : Module.Basis (Fin n) R S), ∀ x : S, (LinearMap.mulLeft F (ι x)).charpoly =
-      ((LinearMap.toMatrix b b (LinearMap.mulLeft R x)).charpoly).map (algebraMap R F) := by
+theorem charpoly_mulLeft_eq_map_of_spanning_lattice
+    (R F A S : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field F] [Algebra R F]
+    [IsFractionRing R F] [CommRing A] [Algebra F A] [Algebra R A] [IsScalarTower R F A]
+    [Module.Finite F A] [CommRing S] [Algebra R S] [Module.Finite R S]
+    (ι : S →ₐ[R] A) (hι : Function.Injective ι) (hspan : Submodule.span F (Set.range ι) = ⊤)
+    : ∃ (n : ℕ) (b : Module.Basis (Fin n) R S), ∀ x : S,
+      (LinearMap.mulLeft F (ι x)).charpoly
+        = ((LinearMap.toMatrix b b (LinearMap.mulLeft R x)).charpoly).map (algebraMap R F) := by
   classical
   have hRF : Function.Injective (algebraMap R F) := IsFractionRing.injective R F
   haveI : Module.IsTorsionFree R S := by
@@ -36,7 +37,7 @@ theorem charpoly_mulLeft_eq_map_of_spanning_lattice (R F A S : Type) [CommRing R
     intro y
     conv_lhs => rw [← b.sum_repr y]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, algebraMap_smul]
+    simp only [map_sum, map_smul, algebraMap_smul]
   have hliR : LinearIndependent R (fun i => ι (b i)) :=
     b.linearIndependent.map' ι.toLinearMap (LinearMap.ker_eq_bot.mpr hι)
   have hli : LinearIndependent F (fun i => ι (b i)) :=
@@ -45,12 +46,12 @@ theorem charpoly_mulLeft_eq_map_of_spanning_lattice (R F A S : Type) [CommRing R
     rw [← hspan, Submodule.span_le]
     rintro _ ⟨y, rfl⟩
     rw [hexp y]
-    exact Submodule.sum_mem _ fun i _ =>
-      Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
+    exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
   let b' : Module.Basis (Fin (Module.finrank R S)) F A := Module.Basis.mk hli hsp
   have hb' : ∀ i, b' i = ι (b i) := fun i => by simp [b']
-  have hM : LinearMap.toMatrix b' b' (LinearMap.mulLeft F (ι x)) =
-      (LinearMap.toMatrix b b (LinearMap.mulLeft R x)).map (algebraMap R F) := by
+  have hM
+      : LinearMap.toMatrix b' b' (LinearMap.mulLeft F (ι x))
+        = (LinearMap.toMatrix b b (LinearMap.mulLeft R x)).map (algebraMap R F) := by
     ext i j
     rw [Matrix.map_apply, LinearMap.toMatrix_apply, LinearMap.toMatrix_apply,
       LinearMap.mulLeft_apply, LinearMap.mulLeft_apply, hb', ← map_mul, hexp]

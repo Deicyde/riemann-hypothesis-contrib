@@ -15,19 +15,25 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
-open GlobalTheory GlobalTheory.IndefiniteRowSideFullHecke GlobalTheory.CM GlobalTheory.FlatDegreeCompare
+open GlobalTheory GlobalTheory.IndefiniteRowSideFullHecke GlobalTheory.CM
+  GlobalTheory.FlatDegreeCompare
 
 namespace GlobalTheory.LevelRaise
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
-  {B : Type} [CommRing B] {b : Base l B} {S : Scheme.{0}} {s : S ⟶ Sp B}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {D : Datum H} {l : Level H} {B : Type} [CommRing B]
+  {b : Base l B} {S : Scheme.{0}} {s : S ⟶ Sp B}
 
-theorem exists_enum (o : Obj D l b s) {M : ℕ} (hM : 0 < M) :
-    ∃ (J : Type) (_ : Finite J), ∀ (K : Type) [Field K] [IsAlgClosed K] (x : Sp K ⟶ S),
-      ∃ u : J → (Over.mk x ⟶ o.t.G), Function.Injective u ∧ ∀ w, w ^ M = 1 ↔ ∃ j, u j = w := by
+theorem exists_enum (o : Obj D l b s) {M : ℕ} (hM : 0 < M)
+    : ∃ (J : Type) (_ : Finite J), ∀ (K : Type) [Field K] [IsAlgClosed K] (x : Sp K ⟶ S),
+      ∃ u : J → (Over.mk x ⟶ o.t.G),
+        Function.Injective u ∧ ∀ w, w ^ M = 1 ↔ ∃ j, u j = w := by
   obtain ⟨J, _, π, r, hr, hπ⟩ := LevelFlat.exists_finite_quotient D M hM
   refine ⟨J, inferInstance, fun K _ _ x => ?_⟩
   obtain ⟨β, hβ⟩ := Spec.map_surjective (x ≫ s)
@@ -44,11 +50,19 @@ theorem exists_enum (o : Obj D l b s) {M : ℕ} (hM : 0 < M) :
   · rintro ⟨j, rfl⟩
     exact ⟨_, rfl⟩
 
-theorem exists_finite_set (o : Obj D l b s) {M : ℕ} (hM : 0 < M) {K F : Type} [Field K] [Field F] [Algebra K F]
-    [IsAlgClosed F] (x : Sp K ⟶ S) :
-    ∃ T : Set F, T.Finite ∧ ∀ L : IntermediateField K F, T ⊆ L →
-      ∀ w : Over.mk (spMap (algebraMap K F) ≫ x) ⟶ o.t.G, w ^ M = 1 →
-        ∃ q : Over.mk (spMap (algebraMap K L) ≫ x) ⟶ o.t.G, spMap (algebraMap L F) ≫ q.left = w.left := by
+theorem exists_finite_set
+    (o : Obj D l b s)
+    {M : ℕ} (hM : 0 < M)
+    {K F : Type} [Field K] [Field F] [Algebra K F] [IsAlgClosed F]
+    (x : Sp K ⟶ S)
+    : ∃ T : Set F,
+      T.Finite
+        ∧ ∀ L : IntermediateField K F,
+          T ⊆ L
+            → ∀ w : Over.mk (spMap (algebraMap K F) ≫ x) ⟶ o.t.G,
+              w ^ M = 1
+                → ∃ q : Over.mk (spMap (algebraMap K L) ≫ x) ⟶ o.t.G,
+                  spMap (algebraMap L F) ≫ q.left = w.left := by
   haveI := o.proper
   obtain ⟨J, _, hJ⟩ := exists_enum o hM
   obtain ⟨u, -, hu⟩ := hJ F (spMap (algebraMap K F) ≫ x)

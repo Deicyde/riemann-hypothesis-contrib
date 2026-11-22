@@ -20,8 +20,11 @@ open Formalism.L2.Indef.Tree
 
 namespace Formalism.L2.Indef.Tree.ArchimedeanLeafBounds.Cuts
 
-def TestLatticeCondition {K : Type} [Field K] [NumberField K] [StarRing K] (n : ℕ) (X' : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ)
-    (M : Submodule (𝓞 K) (Fin n → K)) (E : ℝ) : Prop :=
+def TestLatticeCondition
+    {K : Type} [Field K] [NumberField K] [StarRing K]
+    (n : ℕ) (X' : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ) (M : Submodule (𝓞 K) (Fin n → K))
+    (E : ℝ)
+    : Prop :=
   M.FG ∧ M ≠ ⊥ ∧ (∀ v, IsUnit (X' v).det) ∧ muMaxDef (Pi.basisFun K (Fin n)) X' M ≤ E
 
 end Formalism.L2.Indef.Tree.ArchimedeanLeafBounds.Cuts

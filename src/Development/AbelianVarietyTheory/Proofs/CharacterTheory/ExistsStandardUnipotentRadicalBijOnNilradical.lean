@@ -17,8 +17,7 @@ def lowSub (F : Type) [Field F] (d a : ℕ) : Submodule F (Fin d → F) :=
 
 def unip {d : ℕ} (A : Submodule F (Fin d → F)) : Subgroup (GL (Fin d) F) where
   carrier := {u | Matrix.toLin' (u : Matrix (Fin d) (Fin d) F) - 1 ∈ nilRad A}
-  one_mem' := by
-    refine ⟨fun x => ?_, fun x _ => ?_⟩ <;> simp
+  one_mem' := by refine ⟨fun x => ?_, fun x _ => ?_⟩ <;> simp
   mul_mem' := by
     rintro u v ⟨hu1, hu2⟩ ⟨hv1, hv2⟩
     refine ⟨fun x => ?_, fun x hx => ?_⟩
@@ -30,12 +29,18 @@ def unip {d : ℕ} (A : Submodule F (Fin d → F)) : Subgroup (GL (Fin d) F) whe
       rw [Units.val_mul, Matrix.toLin'_mul, LinearMap.comp_apply, h2, h1]
   inv_mem' := by
     rintro u ⟨hu1, hu2⟩
-    have e1 : ∀ x, Matrix.toLin' (u : Matrix (Fin d) (Fin d) F)
-        (Matrix.toLin' ((u⁻¹ : GL (Fin d) F) : Matrix (Fin d) (Fin d) F) x) = x := fun x => by
+    have e1
+        : ∀ x,
+          Matrix.toLin' (u : Matrix (Fin d) (Fin d) F)
+              (Matrix.toLin' ((u⁻¹ : GL (Fin d) F) : Matrix (Fin d) (Fin d) F) x)
+            = x := fun x => by
       rw [← LinearMap.comp_apply, ← Matrix.toLin'_mul, ← Units.val_mul, mul_inv_cancel,
         Units.val_one, Matrix.toLin'_one, LinearMap.id_apply]
-    have e2 : ∀ x, Matrix.toLin' ((u⁻¹ : GL (Fin d) F) : Matrix (Fin d) (Fin d) F)
-        (Matrix.toLin' (u : Matrix (Fin d) (Fin d) F) x) = x := fun x => by
+    have e2
+        : ∀ x,
+          Matrix.toLin' ((u⁻¹ : GL (Fin d) F) : Matrix (Fin d) (Fin d) F)
+              (Matrix.toLin' (u : Matrix (Fin d) (Fin d) F) x)
+            = x := fun x => by
       rw [← LinearMap.comp_apply, ← Matrix.toLin'_mul, ← Units.val_mul, inv_mul_cancel,
         Units.val_one, Matrix.toLin'_one, LinearMap.id_apply]
     refine ⟨fun x => ?_, fun x hx => ?_⟩
@@ -122,20 +127,32 @@ private lemma toLin'_mem_nilRad_lowSub_iff {d a : ℕ} (N : Matrix (Fin d) (Fin 
       · simp [h0]
       · simp [hx j hj]
 
-
 open Polynomial in
 variable {F : Type} [Field F] in
-theorem _root_.GlobalTheory.CuspGL.UnipNilRad.exists_unip_bijOn_nilRad :
-    ∀ (F : Type) [Field F] [Finite F] (d a : ℕ), a ≤ d → ∃ (A : Submodule F (Fin d → F)) (H : Subgroup (GL (Fin d) F)), Module.finrank F A = a ∧ (H : Set (GL (Fin d) F)) = {u : GL (Fin d) F | ∀ i j : Fin d, (u : Matrix (Fin d) (Fin d) F) i j = (if i = j then 1 else 0) ∨ (i.val < a ∧ a ≤ j.val)} ∧ Set.BijOn (fun u : GL (Fin d) F => Matrix.toLin' (u : Matrix (Fin d) (Fin d) F) - 1) (H : Set (GL (Fin d) F)) (_root_.GlobalTheory.CuspGL.nilRad A) := by
+theorem _root_.GlobalTheory.CuspGL.UnipNilRad.exists_unip_bijOn_nilRad
+    : ∀ (F : Type) [Field F] [Finite F] (d a : ℕ),
+      a ≤ d
+        → ∃ (A : Submodule F (Fin d → F)) (H : Subgroup (GL (Fin d) F)),
+          Module.finrank F A = a
+            ∧ (H : Set (GL (Fin d) F))
+              = {u : GL (Fin d) F | ∀ i j : Fin d, (u : Matrix (Fin d) (Fin d) F) i j = (if i = j then 1 else 0) ∨ (i.val < a ∧ a ≤ j.val)}
+            ∧ Set.BijOn
+              (fun u : GL (Fin d) F => Matrix.toLin' (u : Matrix (Fin d) (Fin d) F) - 1)
+              (H : Set (GL (Fin d) F)) (_root_.GlobalTheory.CuspGL.nilRad A) := by
   intro F _ _ d a had
-  refine ⟨_root_.GlobalTheory.CuspGL.UnipNilRad.lowSub F d a,
+  refine ⟨
+    _root_.GlobalTheory.CuspGL.UnipNilRad.lowSub F d a,
     _root_.GlobalTheory.CuspGL.UnipNilRad.unip (_root_.GlobalTheory.CuspGL.UnipNilRad.lowSub F d a),
-    finrank_lowSub_of_le had, ?_, ?_⟩
+    finrank_lowSub_of_le had,
+    ?_,
+    ?_
+  ⟩
   · ext u
     show Matrix.toLin' (u : Matrix (Fin d) (Fin d) F) - 1 ∈
       _root_.GlobalTheory.CuspGL.nilRad (_root_.GlobalTheory.CuspGL.UnipNilRad.lowSub F d a) ↔ _
-    have hsub : Matrix.toLin' (u : Matrix (Fin d) (Fin d) F) - 1 =
-        Matrix.toLin' ((u : Matrix (Fin d) (Fin d) F) - 1) := by
+    have hsub
+        : Matrix.toLin' (u : Matrix (Fin d) (Fin d) F) - 1
+          = Matrix.toLin' ((u : Matrix (Fin d) (Fin d) F) - 1) := by
       rw [map_sub, Matrix.toLin'_one]
       rfl
     rw [hsub, toLin'_mem_nilRad_lowSub_iff, Set.mem_setOf_eq]
@@ -149,8 +166,8 @@ theorem _root_.GlobalTheory.CuspGL.UnipNilRad.exists_unip_bijOn_nilRad :
         refine LinearMap.ext fun x => ?_
         rw [Matrix.toLin'_mul, LinearMap.comp_apply, hNf, map_zero, LinearMap.zero_apply]
         exact hf.2 _ (hf.1 x)
-      let u : GL (Fin d) F := ⟨1 + N, 1 - N, by noncomm_ring; rw [hN]; simp,
-        by noncomm_ring; rw [hN]; simp⟩
+      let u : GL (Fin d) F :=
+        ⟨1 + N, 1 - N, by noncomm_ring; rw [hN]; simp, by noncomm_ring; rw [hN]; simp⟩
       have hu : Matrix.toLin' (u : Matrix (Fin d) (Fin d) F) - 1 = f := by
         show Matrix.toLin' (1 + N) - 1 = f
         rw [map_add (f := _), Matrix.toLin'_one, hNf]

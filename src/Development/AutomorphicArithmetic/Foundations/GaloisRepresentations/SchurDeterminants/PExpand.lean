@@ -25,8 +25,7 @@ private lemma one_factor {K R : Type} [CommRing K] [CommRing R] [Algebra K R] (n
   unfold detOne
   simp only [sub_eq_add_neg]
 
-theorem UpperTheory.Gal.Schur.expand :
-    Expand := by
+theorem UpperTheory.Gal.Schur.expand : Expand := by
   intro K R π _ _ _ _ _ n x g
   simp only [one_factor (K := K)]
   rw [Fintype.prod_sum]

@@ -8,14 +8,16 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.Ln03.K8
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.MainNotions.WachCoordinates Formalism.MainNotions.WachCoordinates.Br Formalism.ExponentWindows Formalism.ExponentWindows.G TensorProduct
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions
+  Formalism.MainNotions.WachCoordinates Formalism.MainNotions.WachCoordinates.Br
+  Formalism.ExponentWindows Formalism.ExponentWindows.G TensorProduct
 
 section Content
 
 variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
-theorem C_dvd_iff_dvd_coeffs (ϖ : O) (f : PowerSeries O) :
-    PowerSeries.C ϖ ∣ f ↔ ∀ k, ϖ ∣ PowerSeries.coeff k f := by
+theorem C_dvd_iff_dvd_coeffs (ϖ : O) (f : PowerSeries O)
+    : PowerSeries.C ϖ ∣ f ↔ ∀ k, ϖ ∣ PowerSeries.coeff k f := by
   constructor
   · rintro ⟨g, rfl⟩ k
     rw [PowerSeries.coeff_C_mul]
@@ -26,10 +28,12 @@ theorem C_dvd_iff_dvd_coeffs (ϖ : O) (f : PowerSeries O) :
     ext k
     rw [PowerSeries.coeff_C_mul, PowerSeries.coeff_mk, hg]
 
-theorem prime_C_uniformizer {ϖ : O} (hϖ : Irreducible ϖ) : Prime (PowerSeries.C ϖ : PowerSeries O) := by
+theorem prime_C_uniformizer {ϖ : O} (hϖ : Irreducible ϖ)
+    : Prime (PowerSeries.C ϖ : PowerSeries O) := by
   have : (Ideal.span {ϖ} : Ideal O).IsPrime := (Ideal.span_singleton_prime hϖ.ne_zero).2 hϖ.prime
-  have key : ∀ f : PowerSeries O, PowerSeries.C ϖ ∣ f ↔
-      PowerSeries.map (Ideal.Quotient.mk (Ideal.span {ϖ})) f = 0 := by
+  have key
+      : ∀ f : PowerSeries O,
+        PowerSeries.C ϖ ∣ f ↔ PowerSeries.map (Ideal.Quotient.mk (Ideal.span {ϖ})) f = 0 := by
     intro f
     rw [C_dvd_iff_dvd_coeffs]
     constructor
@@ -39,7 +43,8 @@ theorem prime_C_uniformizer {ϖ : O} (hϖ : Irreducible ϖ) : Prime (PowerSeries
       exact h k
     · intro h k
       have h1 := congrArg (PowerSeries.coeff k) h
-      rw [PowerSeries.coeff_map, map_zero, Ideal.Quotient.eq_zero_iff_mem, Ideal.mem_span_singleton] at h1
+      rw [PowerSeries.coeff_map, map_zero, Ideal.Quotient.eq_zero_iff_mem, Ideal.mem_span_singleton]
+        at h1
       exact h1
   refine ⟨?_, ?_, ?_⟩
   · intro h
@@ -54,8 +59,8 @@ theorem prime_C_uniformizer {ϖ : O} (hϖ : Irreducible ϖ) : Prime (PowerSeries
     · exact Or.inl ((key f).2 h)
     · exact Or.inr ((key g).2 h)
 
-theorem power_series_cancel_bounded (q : O) {f : PowerSeries O} (hf : f ≠ 0) :
-    ∃ c₀ : ℕ, ∀ (k : ℕ) (g : PowerSeries O),
+theorem power_series_cancel_bounded (q : O) {f : PowerSeries O} (hf : f ≠ 0)
+    : ∃ c₀ : ℕ, ∀ (k : ℕ) (g : PowerSeries O),
       (PowerSeries.C q) ^ (k + c₀) ∣ f * g → (PowerSeries.C q) ^ k ∣ g := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
   have hP := prime_C_uniformizer hϖ
@@ -126,33 +131,40 @@ theorem power_series_cancel_bounded (q : O) {f : PowerSeries O} (hf : f ≠ 0) :
 
 end Content
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL : Type} [Field LL] [Algebra Qp LL]
-    {O : Type} [CommRing O] [Algebra O LL] [TopologicalSpace LL]
-    {v : AddValuation LL (WithTop ℚ)} {n : ℕ} [NeZero n] {W : LocWach PD LL O v n}
-    {Lb : LevB W} {hR : Ring9 W} {uZ : ℤ_[PD.p]ˣ} {ιZ : ℤ_[PD.p] →+* O}
-    {T : LocLat G Qp LL O} {C : Coord W (baseIdOf hR) T} {c : ZMod n}
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL : Type} [Field LL] [Algebra Qp LL]
+  {O : Type} [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} [NeZero n]
+  {W : LocWach PD LL O v n} {Lb : LevB W} {hR : Ring9 W} {uZ : ℤ_[PD.p]ˣ} {ιZ : ℤ_[PD.p] →+* O}
+  {T : LocLat G Qp LL O} {C : Coord W (baseIdOf hR) T} {c : ZMod n}
 
-theorem isRegular_image_in_EE [IsDomain O] [IsDiscreteValuationRing O] (hR : Ring9 W)
-    {κ : PowerSeries O} (hκ : κ ≠ 0) (x : W.EE)
-    (hx : algebraMap (LetA O n) W.EE ((baseIdOf hR).d κ) * x = 0) : x = 0 := by
+theorem isRegular_image_in_EE
+    [IsDomain O] [IsDiscreteValuationRing O]
+    (hR : Ring9 W)
+    {κ : PowerSeries O} (hκ : κ ≠ 0)
+    (x : W.EE) (hx : algebraMap (LetA O n) W.EE ((baseIdOf hR).d κ) * x = 0)
+    : x = 0 := by
   have := W.EE_complete
   have hf : (baseIdOf hR).ι κ ≠ 0 := fun h => hκ (baseIdOf_inj hR (by rw [h, map_zero]))
   obtain ⟨c₀, hc₀⟩ := power_series_cancel_bounded ((PD.p : ℕ) : O) hf
   have key : ∀ k : ℕ, x ∈ Ideal.span {((PD.p : ℕ) : W.EE) ^ k} := by
     intro k
     obtain ⟨a, m, ham⟩ := W.EE_dense x (k + c₀)
-    have h1 : algebraMap (LetA O n) W.EE ((baseIdOf hR).d κ * a) ∈
-        Ideal.span {((PD.p : ℕ) : W.EE) ^ (k + c₀)} := by
+    have h1
+        : algebraMap (LetA O n) W.EE ((baseIdOf hR).d κ * a)
+          ∈ Ideal.span {((PD.p : ℕ) : W.EE) ^ (k + c₀)} := by
       obtain ⟨y, hy⟩ := Ideal.mem_span_singleton'.1 ham
       rw [Ideal.mem_span_singleton']
       refine ⟨-(algebraMap (LetA O n) W.EE ((baseIdOf hR).d κ) * y), ?_⟩
-      have e : algebraMap (LetA O n) W.EE a =
-          x * algebraMap (LetA O n) W.EE (letπ ^ m) - y * ((PD.p : ℕ) : W.EE) ^ (k + c₀) := by
+      have e
+          : algebraMap (LetA O n) W.EE a
+            = x * algebraMap (LetA O n) W.EE (letπ ^ m) - y * ((PD.p : ℕ) : W.EE) ^ (k + c₀) := by
         rw [hy]; ring
       rw [map_mul, e, mul_sub, ← mul_assoc, hx, zero_mul]
       ring
@@ -172,8 +184,9 @@ theorem isRegular_image_in_EE [IsDomain O] [IsDiscreteValuationRing O] (hR : Rin
         rw [hd i, map_natCast]
       rw [h5, map_mul, map_pow, map_natCast]
       exact Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self _)
-    have ham' : x * algebraMap (LetA O n) W.EE (letπ ^ m) - algebraMap (LetA O n) W.EE a ∈
-        Ideal.span {((PD.p : ℕ) : W.EE) ^ k} :=
+    have ham'
+        : x * algebraMap (LetA O n) W.EE (letπ ^ m) - algebraMap (LetA O n) W.EE a
+          ∈ Ideal.span {((PD.p : ℕ) : W.EE) ^ k} :=
       Ideal.mem_span_singleton.2 (dvd_trans (pow_dvd_pow _ (Nat.le_add_right k c₀))
         (Ideal.mem_span_singleton.1 ham))
     have h6 := Ideal.add_mem _ ham' h4
@@ -184,8 +197,11 @@ theorem isRegular_image_in_EE [IsDomain O] [IsDiscreteValuationRing O] (hR : Rin
   rw [SModEq.zero, Ideal.span_singleton_pow, smul_eq_mul, Ideal.mul_top]
   exact key k
 
-theorem smul_cancel [IsDomain O] [IsDiscreteValuationRing O] (κ : PowerSeries O) (hκ : κ ≠ 0)
-    (x y : C.V) (h : κ • x = κ • y) : x = y := by
+theorem smul_cancel
+    [IsDomain O] [IsDiscreteValuationRing O]
+    (κ : PowerSeries O) (hκ : κ ≠ 0)
+    (x y : C.V) (h : κ • x = κ • y)
+    : x = y := by
   have hz : (baseIdOf hR).d κ • C.t 0 (x - y) = 0 := by
     rw [← C.t_smul, smul_sub, h, sub_self, C.t_zero]
   have hz' : algebraMap (LetA O n) W.EE ((baseIdOf hR).d κ) • C.t 0 (x - y) = 0 := by

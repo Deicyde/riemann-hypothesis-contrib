@@ -16,9 +16,10 @@ noncomputable section
 
 namespace AnalyticImplicitChart
 
-theorem pi_surjective_of_linearIndependent {E ι : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    [Fintype ι] {φ : ι → E →L[ℂ] ℂ} (hφ : LinearIndependent ℂ φ) :
-    Function.Surjective (LinearMap.pi fun j => (φ j : E →ₗ[ℂ] ℂ)) := by
+theorem pi_surjective_of_linearIndependent
+    {E ι : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] [Fintype ι]
+    {φ : ι → E →L[ℂ] ℂ} (hφ : LinearIndependent ℂ φ)
+    : Function.Surjective (LinearMap.pi fun j => (φ j : E →ₗ[ℂ] ℂ)) := by
   classical
   rw [← LinearMap.dualMap_injective_iff, ← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
   intro f hf
@@ -58,7 +59,8 @@ theorem proof : AnalyticImplicitChart.Statement := by
     have := L.finrank_range_add_finrank_ker
     have hKk : Module.finrank ℂ K = Module.finrank ℂ (LinearMap.ker L) := rfl
     rw [LinearMap.range_eq_top.2 hLs, finrank_top, Module.finrank_fintype_fun_eq_card,
-      Module.finrank_fintype_fun_eq_card] at this
+        Module.finrank_fintype_fun_eq_card]
+      at this
     omega
   set eK : K ≃ₗ[ℂ] (Fin d → ℂ) := LinearEquiv.ofFinrankEq K (Fin d → ℂ) (by simp [d]) with heK
   set A : (σ → ℂ) →L[ℂ] (Fin d → ℂ) :=
@@ -77,9 +79,11 @@ theorem proof : AnalyticImplicitChart.Statement := by
     have h3 : K.projectionOnto q hq (z - w) = 0 := eK.injective (by simpa [hA] using h1)
     rw [Submodule.projectionOnto_apply_of_mem_left hq h2] at h3
     simpa using congrArg Subtype.val h3
-  have hPbij : Function.Bijective (P : (σ → ℂ) →ₗ[ℂ] (Fin d → ℂ) × (ι → ℂ)) :=
-    ⟨hPinj, (LinearMap.injective_iff_surjective_of_finrank_eq_finrank
-      (by simp [Module.finrank_prod, hd])).1 hPinj⟩
+  have hPbij : Function.Bijective (P : (σ → ℂ) →ₗ[ℂ] (Fin d → ℂ) × (ι → ℂ)) := ⟨
+    hPinj,
+    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank (by simp [Module.finrank_prod, hd])).1
+      hPinj
+  ⟩
   set Pe : (σ → ℂ) ≃L[ℂ] (Fin d → ℂ) × (ι → ℂ) :=
     (LinearEquiv.ofBijective _ hPbij).toContinuousLinearEquiv with hPe
   have hPeP : (Pe : (σ → ℂ) →L[ℂ] (Fin d → ℂ) × (ι → ℂ)) = P := by ext1 x; rfl
@@ -92,9 +96,11 @@ theorem proof : AnalyticImplicitChart.Statement := by
   have hst : HasStrictFDerivAt F (Pe : (σ → ℂ) →L[ℂ] _) a := by
     have := (hFan a hh).hasStrictFDerivAt; rwa [hFd.fderiv] at this
   set Φ := hst.toOpenPartialHomeomorph F with hΦ
-  have hev : ∀ᶠ t in 𝓝 a, (∀ j, AnalyticAt ℂ (h j) t) ∧ t ∈ W ∧
-      fderiv ℂ F t ∈ Set.range ((↑) : ((σ → ℂ) ≃L[ℂ] (Fin d → ℂ) × (ι → ℂ)) → _) := by
-    refine (Filter.eventually_all.2 fun j => (hh j).eventually_analyticAt).and ((show ∀ᶠ t in 𝓝 a, t ∈ W from hW).and ?_)
+  have hev
+      : ∀ᶠ t in 𝓝 a, (∀ j, AnalyticAt ℂ (h j) t) ∧ t ∈ W ∧
+        fderiv ℂ F t ∈ Set.range ((↑) : ((σ → ℂ) ≃L[ℂ] (Fin d → ℂ) × (ι → ℂ)) → _) := by
+    refine (Filter.eventually_all.2 fun j => (hh j).eventually_analyticAt).and
+      ((show ∀ᶠ t in 𝓝 a, t ∈ W from hW).and ?_)
     exact (hFan a hh).fderiv.continuousAt.preimage_mem_nhds
       (ContinuousLinearEquiv.isOpen.mem_nhds ⟨Pe, hFd.fderiv.symm⟩)
   obtain ⟨V₀, hV₀, hV₀o, haV₀⟩ := eventually_nhds_iff.1 hev
@@ -102,36 +108,51 @@ theorem proof : AnalyticImplicitChart.Statement := by
   have hΨs : Ψ.source = Φ.source ∩ V₀ := OpenPartialHomeomorph.restrOpen_source _ _ _
   have hΨF : ∀ z, Ψ z = F z := fun z => rfl
   have haΨ : a ∈ Ψ.source := hΨs ▸ ⟨hst.mem_toOpenPartialHomeomorph_source, haV₀⟩
-  have hsrc : ∀ t ∈ Ψ.source, (∀ j, AnalyticAt ℂ (h j) t) ∧ t ∈ W ∧
-      fderiv ℂ F t ∈ Set.range ((↑) : ((σ → ℂ) ≃L[ℂ] (Fin d → ℂ) × (ι → ℂ)) → _) :=
+  have hsrc
+      : ∀ t ∈ Ψ.source,
+        (∀ j, AnalyticAt ℂ (h j) t) ∧ t ∈ W
+          ∧ fderiv ℂ F t ∈ Set.range ((↑) : ((σ → ℂ) ≃L[ℂ] (Fin d → ℂ) × (ι → ℂ)) → _) :=
     fun t ht => hV₀ t (hΨs ▸ ht).2
   set O : Set (Fin d → ℂ) := (fun y => (y, (0 : ι → ℂ))) ⁻¹' Ψ.target with hO
-  refine ⟨d, A, O, Ψ.source, fun y => Ψ.symm (y, 0), hd,
-    Ψ.open_target.preimage (continuous_id.prodMk continuous_const), Ψ.open_source, haΨ,
-    fun t ht => (hsrc t ht).2.1, ?_, ?_, ?_⟩
+  refine ⟨
+    d,
+    A,
+    O,
+    Ψ.source,
+    fun y => Ψ.symm (y, 0),
+    hd,
+    Ψ.open_target.preimage (continuous_id.prodMk continuous_const),
+    Ψ.open_source,
+    haΨ,
+    fun t ht => (hsrc t ht).2.1,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro y hy
     have hp : (y, (0 : ι → ℂ)) ∈ Ψ.target := hy
     obtain ⟨han, -, e', he'⟩ := hsrc _ (Ψ.map_target hp)
     have hFe : HasFDerivAt Ψ (e' : (σ → ℂ) →L[ℂ] _) (Ψ.symm (y, 0)) := by
       rw [he']; exact (hFan _ han).differentiableAt.hasFDerivAt
-    have hc : ContDiffAt ℂ ω Ψ.symm (y, 0) :=
-      Ψ.contDiffAt_symm hp hFe (hFan _ han).contDiffAt
+    have hc : ContDiffAt ℂ ω Ψ.symm (y, 0) := Ψ.contDiffAt_symm hp hFe (hFan _ han).contDiffAt
     have hi : AnalyticAt ℂ (fun y : Fin d → ℂ => (y, (0 : ι → ℂ))) y :=
       analyticAt_id.prod analyticAt_const
-    exact AnalyticAt.comp (g := Ψ.symm) (f := fun y : Fin d → ℂ => (y, (0 : ι → ℂ))) (x := y)
-      hc.analyticAt hi
+    exact AnalyticAt.comp (g := Ψ.symm)
+      (f := fun y : Fin d → ℂ => (y, (0 : ι → ℂ)))
+      (x := y) hc.analyticAt hi
   · intro y hy
     exact congrArg Prod.fst (Ψ.right_inv (show (y, (0 : ι → ℂ)) ∈ Ψ.target from hy))
   · ext z
     constructor
     · rintro ⟨hzV, hz0⟩
-      have hFz : F z = (A z, 0) := by
-        simp only [hF, Prod.mk.injEq, true_and]; funext j; exact hz0 j
+      have hFz : F z = (A z, 0) := by simp only [hF, Prod.mk.injEq, true_and]; funext j; exact hz0 j
       refine ⟨A z, ?_, ?_⟩
       · show (A z, (0 : ι → ℂ)) ∈ Ψ.target
-        rw [← hFz, ← hΨF]; exact Ψ.map_source hzV
+        rw [← hFz, ← hΨF]
+        exact Ψ.map_source hzV
       · show Ψ.symm (A z, 0) = z
-        rw [← hFz, ← hΨF]; exact Ψ.left_inv hzV
+        rw [← hFz, ← hΨF]
+        exact Ψ.left_inv hzV
     · rintro ⟨y, hy, rfl⟩
       have hp : (y, (0 : ι → ℂ)) ∈ Ψ.target := hy
       refine ⟨Ψ.map_target hp, fun j => ?_⟩

@@ -6,13 +6,15 @@ public import Formalism.LocalToGlobal.Columns.HeckeInertComm
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.DivisionValues Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.DivisionValues Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef
 
 namespace GlobalTheory.InertRank
 
-theorem exists_dvd_all {A ι : Type*} [CommRing A] [IsDomain A] [ValuationRing A]
-    (a : ι → A) (s : Finset ι) (h : ∃ i ∈ s, a i ≠ 0) :
-    ∃ j ∈ s, a j ≠ 0 ∧ ∀ i ∈ s, a j ∣ a i := by
+theorem exists_dvd_all
+    {A ι : Type*} [CommRing A] [IsDomain A] [ValuationRing A]
+    (a : ι → A) (s : Finset ι) (h : ∃ i ∈ s, a i ≠ 0)
+    : ∃ j ∈ s, a j ≠ 0 ∧ ∀ i ∈ s, a j ∣ a i := by
   classical
   induction s using Finset.induction_on with
   | empty => simp at h
@@ -42,17 +44,21 @@ theorem exists_dvd_all {A ι : Type*} [CommRing A] [IsDomain A] [ValuationRing A
       · rw [hs i hi]
         exact dvd_zero _
 
-theorem exists_dvd_all_away {R ι : Type*} [CommRing R] [IsDedekindDomain R] [Fintype ι]
-    (P : HeightOneSpectrum R) (a : ι → R) (h : ∃ i, a i ≠ 0) :
-    ∃ j, a j ≠ 0 ∧ ∀ i, ∃ r s : R, s ∉ P.asIdeal ∧ s * a i = a j * r := by
+theorem exists_dvd_all_away
+    {R ι : Type*} [CommRing R] [IsDedekindDomain R] [Fintype ι]
+    (P : HeightOneSpectrum R)
+    (a : ι → R) (h : ∃ i, a i ≠ 0)
+    : ∃ j, a j ≠ 0 ∧ ∀ i, ∃ r s : R, s ∉ P.asIdeal ∧ s * a i = a j * r := by
   let A := Localization.AtPrime P.asIdeal
   have hinj : Function.Injective (algebraMap R A) :=
     IsLocalization.injective A (Ideal.primeCompl_le_nonZeroDivisors P.asIdeal)
   haveI : IsDiscreteValuationRing A :=
     IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain R P.ne_bot A
   obtain ⟨i0, hi0⟩ := h
-  obtain ⟨j, -, hj0, hdvd⟩ := exists_dvd_all (fun i => algebraMap R A (a i)) Finset.univ
-    ⟨i0, Finset.mem_univ _, fun h0 => hi0 (hinj (by simpa using h0))⟩
+  obtain ⟨j, -, hj0, hdvd⟩ :=
+    exists_dvd_all
+      (fun i => algebraMap R A (a i))
+      Finset.univ ⟨i0, Finset.mem_univ _, fun h0 => hi0 (hinj (by simpa using h0))⟩
   refine ⟨j, fun h0 => hj0 (by simp [h0]), fun i => ?_⟩
   obtain ⟨c, hc⟩ := hdvd i (Finset.mem_univ _)
   obtain ⟨⟨r, s⟩, rfl⟩ := IsLocalization.mk'_surjective P.asIdeal.primeCompl c
@@ -62,9 +68,11 @@ theorem exists_dvd_all_away {R ι : Type*} [CommRing R] [IsDedekindDomain R] [Fi
   rw [map_mul, map_mul, hc, ← hs]
   ring
 
-theorem exists_dep_away {E : Type} [Field E] [NumberField E] {n : ℕ} {ι : Type} [Fintype ι]
-    (P : HeightOneSpectrum (𝓞 E)) (v : ι → Fin n → E) (hcard : n < Fintype.card ι) :
-    ∃ b : ι → 𝓞 E, ∑ i, b i • v i = 0 ∧ ∃ j, b j ∉ P.asIdeal := by
+theorem exists_dep_away
+    {E : Type} [Field E] [NumberField E]
+    {n : ℕ} {ι : Type} [Fintype ι]
+    (P : HeightOneSpectrum (𝓞 E)) (v : ι → Fin n → E) (hcard : n < Fintype.card ι)
+    : ∃ b : ι → 𝓞 E, ∑ i, b i • v i = 0 ∧ ∃ j, b j ∉ P.asIdeal := by
   classical
   have hdep : ¬ LinearIndependent (𝓞 E) v := by
     intro hli
@@ -84,7 +92,8 @@ theorem exists_dep_away {E : Type} [Field E] [NumberField E] {n : ℕ} {ι : Typ
       simp_rw [smul_smul, hcoef, mul_smul]
       rw [← Finset.smul_sum, ha, smul_zero]
     have hj0' : algebraMap (𝓞 E) E (a j) ≠ 0 := by simpa using hj0
-    have h2 : algebraMap (𝓞 E) E (a j) • ∑ i, ((∏ k ∈ Finset.univ.erase i, s k) * r i) • v i = 0 := by
+    have h2
+        : algebraMap (𝓞 E) E (a j) • ∑ i, ((∏ k ∈ Finset.univ.erase i, s k) * r i) • v i = 0 := by
       rw [algebraMap_smul]; exact h1
     exact (smul_eq_zero.1 h2).resolve_left hj0'
   · have hsj : r j = s j := by
@@ -96,13 +105,14 @@ theorem exists_dep_away {E : Type} [Field E] [NumberField E] {n : ℕ} {ι : Typ
     obtain ⟨k, -, hk⟩ := (Ideal.IsPrime.prod_mem_iff (hp := P.isPrime)).1 hmem
     exact hs k hk
 
-theorem coeff_mem {E : Type} [Field E] [NumberField E] {n : ℕ} {P : Ideal (𝓞 E)} {y : List ℕ}
+theorem coeff_mem
+    {E : Type} [Field E] [NumberField E]
+    {n : ℕ} {P : Ideal (𝓞 E)} {y : List ℕ}
     (hy : ∀ a ∈ y, 0 < a) (A B : Submodule (𝓞 E) (Formalism.L2.Col.Sp E n))
-    (e : (A ⧸ (B ⊓ A).comap A.subtype) ≃ₗ[𝓞 E] Formalism.L2.Col.inType P y)
-    (x : Fin y.length → A)
-    (hx : ∀ i, e (Submodule.Quotient.mk (x i)) = Pi.single i 1)
-    (b : Fin y.length → 𝓞 E) (hz : (∑ i, b i • (x i : Formalism.L2.Col.Sp E n)) ∈ B)
-    (i : Fin y.length) : b i ∈ P := by
+    (e : (A ⧸ (B ⊓ A).comap A.subtype) ≃ₗ[𝓞 E] Formalism.L2.Col.inType P y) (x : Fin y.length → A)
+    (hx : ∀ i, e (Submodule.Quotient.mk (x i)) = Pi.single i 1) (b : Fin y.length → 𝓞 E)
+    (hz : (∑ i, b i • (x i : Formalism.L2.Col.Sp E n)) ∈ B) (i : Fin y.length)
+    : b i ∈ P := by
   classical
   have hq : (Submodule.Quotient.mk (∑ k, b k • x k) : A ⧸ (B ⊓ A).comap A.subtype) = 0 := by
     rw [Submodule.Quotient.mk_eq_zero, Submodule.mem_comap]
@@ -116,25 +126,32 @@ theorem coeff_mem {E : Type} [Field E] [NumberField E] {n : ℕ} {P : Ideal (�
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smul, map_smul, Submodule.mkQ_apply, hx]
   have hi := congrFun he i
-  rw [Finset.sum_apply, Finset.sum_eq_single i
-    (fun k _ hk => by rw [Pi.smul_apply, Pi.single_eq_of_ne hk.symm, smul_zero]) (by simp),
-    Pi.smul_apply, Pi.single_eq_same] at hi
-  have hi' : (Ideal.Quotient.mk (P ^ y.get i)) (b i) = 0 := by
-    simpa [Algebra.smul_def] using hi
+  rw [Finset.sum_apply,
+      Finset.sum_eq_single i
+        (fun k _ hk => by rw [Pi.smul_apply, Pi.single_eq_of_ne hk.symm, smul_zero])
+        (by simp),
+      Pi.smul_apply, Pi.single_eq_same]
+    at hi
+  have hi' : (Ideal.Quotient.mk (P ^ y.get i)) (b i) = 0 := by simpa [Algebra.smul_def] using hi
   have hmem := Ideal.Quotient.eq_zero_iff_mem.1 hi'
   have hpos : 0 < y.get i := hy _ (List.get_mem y i)
   exact Ideal.pow_le_self hpos.ne' hmem
 
-theorem two_mul_length_le {E : Type} [Field E] [NumberField E] [StarRing E] {n : ℕ}
-    {ST SG : Finset (HeightOneSpectrum (𝓞 E))} (P : HeightOneSpectrum (𝓞 E)) (y : List ℕ)
-    (d e : Col.DecoSet (E := E) (n := n) (ST := ST) (SG := SG)) (hy : ∀ a ∈ y, 0 < a) (he : e ∈ d.inertSet P.asIdeal y) :
-    2 * y.length ≤ n := by
+theorem two_mul_length_le
+    {E : Type} [Field E] [NumberField E] [StarRing E]
+    {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 E))}
+    (P : HeightOneSpectrum (𝓞 E)) (y : List ℕ)
+    (d e : Col.DecoSet (E := E) (n := n) (ST := ST) (SG := SG))
+    (hy : ∀ a ∈ y, 0 < a) (he : e ∈ d.inertSet P.asIdeal y)
+    : 2 * y.length ≤ n := by
   classical
   obtain ⟨⟨⟨e1⟩, ⟨e2⟩⟩, -, -⟩ := he
   by_contra hlt
-  have lift : ∀ {A B : Submodule (𝓞 E) (Formalism.L2.Col.Sp E n)}
-      (f : (A ⧸ (B ⊓ A).comap A.subtype) ≃ₗ[𝓞 E] Formalism.L2.Col.inType P.asIdeal y),
-      ∃ x : Fin y.length → A, ∀ i, f (Submodule.Quotient.mk (x i)) = Pi.single i 1 := by
+  have lift
+      : ∀ {A B : Submodule (𝓞 E) (Formalism.L2.Col.Sp E n)}
+          (f : (A ⧸ (B ⊓ A).comap A.subtype) ≃ₗ[𝓞 E] Formalism.L2.Col.inType P.asIdeal y),
+        ∃ x : Fin y.length → A, ∀ i,
+          f (Submodule.Quotient.mk (x i)) = Pi.single i 1 := by
     intro A B f
     have : ∀ i, ∃ a : A, f (Submodule.Quotient.mk a) = Pi.single i 1 := fun i => by
       obtain ⟨a, ha⟩ := Submodule.Quotient.mk_surjective _ (f.symm (Pi.single i 1))
@@ -143,9 +160,12 @@ theorem two_mul_length_le {E : Type} [Field E] [NumberField E] [StarRing E] {n :
     exact ⟨x, hx⟩
   obtain ⟨x, hx⟩ := lift e1
   obtain ⟨x', hx'⟩ := lift e2
-  obtain ⟨b, hb, j, hj⟩ := exists_dep_away (ι := Fin y.length ⊕ Fin y.length) P
-    (Sum.elim (fun i => (x i : Formalism.L2.Col.Sp E n)) (fun i => (x' i : Formalism.L2.Col.Sp E n)))
-    (by simp; omega)
+  obtain ⟨b, hb, j, hj⟩ :=
+    exists_dep_away (ι := Fin y.length ⊕ Fin y.length) P
+      (Sum.elim
+        (fun i => (x i : Formalism.L2.Col.Sp E n))
+        (fun i => (x' i : Formalism.L2.Col.Sp E n)))
+      (by simp; omega)
   rw [Fintype.sum_sum_type] at hb
   simp only [Sum.elim_inl, Sum.elim_inr] at hb
   have h1 : (∑ i, b (Sum.inl i) • (x i : Formalism.L2.Col.Sp E n)) ∈ e.1.N := by

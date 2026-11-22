@@ -12,10 +12,12 @@ open Filter Topology
 
 namespace GlobalTheory.OrbitAnalytic
 
-theorem hasDerivAt_orbit {H : Type} [NormedAddCommGroup H] [NormedSpace ℂ H]
-    (U : ℝ → H →L[ℂ] H) (hU : ∀ s t, U (s + t) = U s * U t) (v v' : H)
-    (h : HasDerivAt (fun t : ℝ => U t v) v' 0) (t : ℝ) :
-    HasDerivAt (fun t : ℝ => U t v) (U t v') t := by
+theorem hasDerivAt_orbit
+    {H : Type} [NormedAddCommGroup H] [NormedSpace ℂ H]
+    (U : ℝ → H →L[ℂ] H) (hU : ∀ s t, U (s + t) = U s * U t)
+    (v v' : H) (h : HasDerivAt (fun t : ℝ => U t v) v' 0)
+    (t : ℝ)
+    : HasDerivAt (fun t : ℝ => U t v) (U t v') t := by
   have h0 : HasDerivAt (fun s : ℝ => U t (U s v)) (U t v') (t - t) := by
     rw [sub_self]
     exact ((U t).restrictScalars ℝ).hasFDerivAt.comp_hasDerivAt 0 h
@@ -83,10 +85,12 @@ private lemma norm_sub_taylor_sum_le_of_hasDerivAt_tower {E : Type} [NormedAddCo
       (fun s _ => (hder s).hasDerivWithinAt) ha0 hB hbound
     exact key ⟨hz, le_rfl⟩
 
-theorem taylor_bound {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    (f : ℕ → ℝ → E) (hf : ∀ k t, HasDerivAt (f k) (f (k + 1) t) t) (a z : ℝ) (N : ℕ) (M : ℝ)
-    (hM : ∀ t, ‖f (N + 1) t‖ ≤ M) :
-    ‖f 0 (a + z) - ∑ k ∈ Finset.range (N + 1), (z ^ k / (k.factorial : ℝ)) • f k a‖
+theorem taylor_bound
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    (f : ℕ → ℝ → E) (hf : ∀ k t, HasDerivAt (f k) (f (k + 1) t) t)
+    (a z : ℝ)
+    (N : ℕ) (M : ℝ) (hM : ∀ t, ‖f (N + 1) t‖ ≤ M)
+    : ‖f 0 (a + z) - ∑ k ∈ Finset.range (N + 1), (z ^ k / (k.factorial : ℝ)) • f k a‖
       ≤ |z| ^ (N + 1) / (N.factorial : ℝ) * M := by
   have hM0 : 0 ≤ M := (norm_nonneg _).trans (hM 0)
   have hfac : (0 : ℝ) < N.factorial := by positivity
@@ -114,8 +118,9 @@ theorem taylor_bound {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
     have e1 : g 0 (-a + -z) = f 0 (a + z) := by
       rw [hg]
       simp only [pow_zero, one_smul, neg_add, neg_neg]
-    have e2 : ∑ k ∈ Finset.range (N + 1), ((-z) ^ k / (k.factorial : ℝ)) • g k (-a) =
-        ∑ k ∈ Finset.range (N + 1), (z ^ k / (k.factorial : ℝ)) • f k a := by
+    have e2
+        : ∑ k ∈ Finset.range (N + 1), ((-z) ^ k / (k.factorial : ℝ)) • g k (-a)
+          = ∑ k ∈ Finset.range (N + 1), (z ^ k / (k.factorial : ℝ)) • f k a := by
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [hg, neg_neg, smul_smul]
       congr 1
@@ -123,7 +128,8 @@ theorem taylor_bound {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
       have h1 : ((-1 : ℝ) ^ k) * (-1) ^ k = 1 := by
         rw [← mul_pow]
         norm_num
-      calc (-1) ^ k * z ^ k / (k.factorial : ℝ) * (-1) ^ k
+      calc
+        (-1) ^ k * z ^ k / (k.factorial : ℝ) * (-1) ^ k
           = ((-1) ^ k * (-1) ^ k) * (z ^ k / (k.factorial : ℝ)) := by ring
         _ = z ^ k / (k.factorial : ℝ) := by rw [h1, one_mul]
     rw [e1, e2] at h
@@ -131,14 +137,18 @@ theorem taylor_bound {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
     exact h.trans (mul_le_mul_of_nonneg_right
       (div_le_div_of_nonneg_left (pow_nonneg (by linarith) _) hfac hfac') hM0)
 
-theorem analyticAt_of_bound {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
-    (f : ℕ → ℝ → E) (hf : ∀ k t, HasDerivAt (f k) (f (k + 1) t) t) (C r : ℝ) (hr : 0 < r)
-    (hM : ∀ k t, ‖f k t‖ ≤ C * (k.factorial : ℝ) / r ^ k) (a : ℝ) :
-    AnalyticAt ℝ (f 0) a := by
-  obtain ⟨p, hp⟩ : ∃ p : FormalMultilinearSeries ℝ ℝ E, ∀ k,
-      p k = ContinuousMultilinearMap.mkPiRing ℝ (Fin k) (((k.factorial : ℝ)⁻¹) • f k a) :=
-    ⟨fun k => ContinuousMultilinearMap.mkPiRing ℝ (Fin k) (((k.factorial : ℝ)⁻¹) • f k a),
-      fun _ => rfl⟩
+theorem analyticAt_of_bound
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
+    (f : ℕ → ℝ → E) (hf : ∀ k t, HasDerivAt (f k) (f (k + 1) t) t)
+    (C r : ℝ) (hr : 0 < r) (hM : ∀ k t, ‖f k t‖ ≤ C * (k.factorial : ℝ) / r ^ k)
+    (a : ℝ)
+    : AnalyticAt ℝ (f 0) a := by
+  obtain ⟨p, hp⟩
+      : ∃ p : FormalMultilinearSeries ℝ ℝ E, ∀ k,
+        p k = ContinuousMultilinearMap.mkPiRing ℝ (Fin k) (((k.factorial : ℝ)⁻¹) • f k a) := ⟨
+    fun k => ContinuousMultilinearMap.mkPiRing ℝ (Fin k) (((k.factorial : ℝ)⁻¹) • f k a),
+    fun _ => rfl
+  ⟩
   have happly : ∀ k (y : ℝ), p k (fun _ => y) = (y ^ k / (k.factorial : ℝ)) • f k a := by
     intro k y
     rw [hp, ContinuousMultilinearMap.mkPiRing_apply, Finset.prod_const, Finset.card_univ,
@@ -152,10 +162,11 @@ theorem analyticAt_of_bound {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E
     have hrk : 0 < r ^ k := pow_pos hr k
     have hk : (0 : ℝ) < k.factorial := by positivity
     rw [hnorm]
-    calc (k.factorial : ℝ)⁻¹ * ‖f k a‖ * r ^ k
-        ≤ (k.factorial : ℝ)⁻¹ * (C * (k.factorial : ℝ) / r ^ k) * r ^ k := by
-          gcongr
-          exact hM k a
+    calc
+      (k.factorial : ℝ)⁻¹ * ‖f k a‖ * r ^ k
+          ≤ (k.factorial : ℝ)⁻¹ * (C * (k.factorial : ℝ) / r ^ k) * r ^ k := by
+        gcongr
+        exact hM k a
       _ = C := by field_simp
   have hrad : ENNReal.ofReal r ≤ p.radius :=
     p.le_radius_of_bound C (r := r.toNNReal) fun k => by
@@ -168,37 +179,44 @@ theorem analyticAt_of_bound {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E
   have hq1 : |y| / r < 1 := (div_lt_one hr).mpr hy
   have hterm : ∀ n, ‖p n (fun _ => y)‖ ≤ C * (|y| / r) ^ n := by
     intro n
-    calc ‖p n (fun _ => y)‖ ≤ ‖p n‖ * ∏ _i : Fin n, ‖y‖ := (p n).le_opNorm _
+    calc
+      ‖p n (fun _ => y)‖
+        ≤ ‖p n‖ * ∏ _i : Fin n, ‖y‖ := (p n).le_opNorm _
       _ = ‖p n‖ * r ^ n * (|y| / r) ^ n := by
-          rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin, Real.norm_eq_abs, div_pow]
-          field_simp
+        rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin, Real.norm_eq_abs, div_pow]
+        field_simp
       _ ≤ C * (|y| / r) ^ n := by
-          gcongr
-          exact hbd n
+        gcongr
+        exact hbd n
   have hsum : Summable (fun n => ‖p n (fun _ => y)‖) :=
-    Summable.of_nonneg_of_le (fun n => norm_nonneg _) hterm
-      ((summable_geometric_of_lt_one hq0 hq1).mul_left C)
+    Summable.of_nonneg_of_le
+      (fun n => norm_nonneg _)
+      hterm ((summable_geometric_of_lt_one hq0 hq1).mul_left C)
   rw [hasSum_iff_tendsto_nat_of_summable_norm hsum, ← tendsto_add_atTop_iff_nat 1]
   simp only [happly]
   rw [tendsto_iff_norm_sub_tendsto_zero]
-  refine squeeze_zero (g := fun N : ℕ => C * (((N + 1 : ℕ) : ℝ) * (|y| / r) ^ (N + 1)))
-    (fun _ => norm_nonneg _) (fun N => ?_) ?_
+  refine squeeze_zero
+    (g := fun N : ℕ => C * (((N + 1 : ℕ) : ℝ) * (|y| / r) ^ (N + 1)))
+    (fun _ => norm_nonneg _)
+    (fun N => ?_)
+    ?_
   · rw [norm_sub_rev]
-    calc _ ≤ |y| ^ (N + 1) / (N.factorial : ℝ) *
-          (C * ((N + 1).factorial : ℝ) / r ^ (N + 1)) :=
-          taylor_bound f hf a y N _ (fun t => hM (N + 1) t)
+    calc
+      _ ≤ |y| ^ (N + 1) / (N.factorial : ℝ) * (C * ((N + 1).factorial : ℝ) / r ^ (N + 1)) :=
+        taylor_bound f hf a y N _ (fun t => hM (N + 1) t)
       _ = C * (((N + 1 : ℕ) : ℝ) * (|y| / r) ^ (N + 1)) := by
-          rw [Nat.factorial_succ, div_pow]
-          push_cast
-          field_simp
-  · have := ((tendsto_self_mul_const_pow_of_lt_one hq0 hq1).comp
-      (tendsto_add_atTop_nat 1)).const_mul C
+        rw [Nat.factorial_succ, div_pow]
+        push_cast
+        field_simp
+  · have :=
+      ((tendsto_self_mul_const_pow_of_lt_one hq0 hq1).comp (tendsto_add_atTop_nat 1)).const_mul C
     simpa using this
 
-theorem bound_of_analyticAt {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
-    (f : ℕ → ℝ → E) (hf : ∀ k t, HasDerivAt (f k) (f (k + 1) t) t) (a : ℝ)
-    (h : AnalyticAt ℝ (f 0) a) :
-    ∃ C r : ℝ, 0 < r ∧ ∀ k, ‖f k a‖ ≤ C * (k.factorial : ℝ) / r ^ k := by
+theorem bound_of_analyticAt
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
+    (f : ℕ → ℝ → E) (hf : ∀ k t, HasDerivAt (f k) (f (k + 1) t) t)
+    (a : ℝ) (h : AnalyticAt ℝ (f 0) a)
+    : ∃ C r : ℝ, 0 < r ∧ ∀ k, ‖f k a‖ ≤ C * (k.factorial : ℝ) / r ^ k := by
   obtain ⟨p, ρ, hp⟩ := h
   have hiter : ∀ k, iteratedDeriv k (f 0) = f k := by
     intro k
@@ -216,23 +234,35 @@ theorem bound_of_analyticAt {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E
   have hr'pos : (0 : ℝ) < r' := by exact_mod_cast hr'0
   refine ⟨C, r', hr'pos, fun k => ?_⟩
   have hpos : (0 : ℝ) < (r' : ℝ) ^ k := pow_pos hr'pos k
-  calc ‖f k a‖ = ‖k.factorial • p k (fun _ => (1 : ℝ))‖ := by rw [← hval k]
+  calc
+    ‖f k a‖
+      = ‖k.factorial • p k (fun _ => (1 : ℝ))‖ := by rw [← hval k]
     _ ≤ k.factorial * ‖p k (fun _ => (1 : ℝ))‖ := norm_nsmul_le
     _ ≤ k.factorial * ‖p k‖ := by
-        gcongr
-        simpa using (p k).le_opNorm (fun _ => (1 : ℝ))
+      gcongr
+      simpa using (p k).le_opNorm (fun _ => (1 : ℝ))
     _ ≤ k.factorial * (C / (r' : ℝ) ^ k) := by
-        gcongr
-        rw [le_div_iff₀ hpos]
-        exact hCb k
+      gcongr
+      rw [le_div_iff₀ hpos]
+      exact hCb k
     _ = C * (k.factorial : ℝ) / (r' : ℝ) ^ k := by ring
 
-theorem analyticOnNhd_orbit_of_norm_eq : ∀ (H₁ : Type) [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁] [CompleteSpace H₁] (H₂ : Type) [NormedAddCommGroup H₂] [InnerProductSpace ℂ H₂] [CompleteSpace H₂] (U₁ : ℝ → H₁ →L[ℂ] H₁) (U₂ : ℝ → H₂ →L[ℂ] H₂), (∀ s t, U₁ (s + t) = U₁ s * U₁ t) → (∀ s t, U₂ (s + t) = U₂ s * U₂ t) → U₁ 0 = 1 → U₂ 0 = 1 → (∀ t x, ‖U₂ t x‖ = ‖x‖) → ∀ (w₁ : ℕ → H₁) (w₂ : ℕ → H₂), (∀ k, HasDerivAt (fun t : ℝ => U₁ t (w₁ k)) (w₁ (k + 1)) 0) → (∀ k, HasDerivAt (fun t : ℝ => U₂ t (w₂ k)) (w₂ (k + 1)) 0) → (∀ k, ‖w₁ k‖ = ‖w₂ k‖) → AnalyticAt ℝ (fun t : ℝ => U₁ t (w₁ 0)) 0 → AnalyticOnNhd ℝ (fun t : ℝ => U₂ t (w₂ 0)) Set.univ := by
+theorem analyticOnNhd_orbit_of_norm_eq
+    : ∀ (H₁ : Type) [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁] [CompleteSpace H₁] (H₂ : Type)
+        [NormedAddCommGroup H₂] [InnerProductSpace ℂ H₂] [CompleteSpace H₂] (U₁ : ℝ → H₁ →L[ℂ] H₁)
+        (U₂ : ℝ → H₂ →L[ℂ] H₂),
+      (∀ s t, U₁ (s + t) = U₁ s * U₁ t) → (∀ s t, U₂ (s + t) = U₂ s * U₂ t) → U₁ 0 = 1 → U₂ 0 = 1
+        → (∀ t x, ‖U₂ t x‖ = ‖x‖)
+        → ∀ (w₁ : ℕ → H₁) (w₂ : ℕ → H₂),
+          (∀ k, HasDerivAt (fun t : ℝ => U₁ t (w₁ k)) (w₁ (k + 1)) 0)
+            → (∀ k, HasDerivAt (fun t : ℝ => U₂ t (w₂ k)) (w₂ (k + 1)) 0) → (∀ k, ‖w₁ k‖ = ‖w₂ k‖)
+            → AnalyticAt ℝ (fun t : ℝ => U₁ t (w₁ 0)) 0
+            → AnalyticOnNhd ℝ (fun t : ℝ => U₂ t (w₂ 0)) Set.univ := by
   intro H₁ _ _ _ H₂ _ _ _ U₁ U₂ hU₁ hU₂ h01 _ hiso w₁ w₂ hd₁ hd₂ hw han
-  have hF₁ : ∀ k t, HasDerivAt (fun s : ℝ => U₁ s (w₁ k)) (U₁ t (w₁ (k + 1))) t :=
-    fun k t => hasDerivAt_orbit U₁ hU₁ (w₁ k) (w₁ (k + 1)) (hd₁ k) t
-  have hF₂ : ∀ k t, HasDerivAt (fun s : ℝ => U₂ s (w₂ k)) (U₂ t (w₂ (k + 1))) t :=
-    fun k t => hasDerivAt_orbit U₂ hU₂ (w₂ k) (w₂ (k + 1)) (hd₂ k) t
+  have hF₁ : ∀ k t, HasDerivAt (fun s : ℝ => U₁ s (w₁ k)) (U₁ t (w₁ (k + 1))) t := fun k t =>
+    hasDerivAt_orbit U₁ hU₁ (w₁ k) (w₁ (k + 1)) (hd₁ k) t
+  have hF₂ : ∀ k t, HasDerivAt (fun s : ℝ => U₂ s (w₂ k)) (U₂ t (w₂ (k + 1))) t := fun k t =>
+    hasDerivAt_orbit U₂ hU₂ (w₂ k) (w₂ (k + 1)) (hd₂ k) t
   obtain ⟨C, r, hr, hCr⟩ := bound_of_analyticAt (fun k t => U₁ t (w₁ k)) hF₁ 0 han
   intro a _
   refine analyticAt_of_bound (fun k t => U₂ t (w₂ k)) hF₂ C r hr (fun k t => ?_) a

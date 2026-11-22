@@ -7,9 +7,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 open NumberField IsDedekindDomain UpperTheory.V.Kum UpperTheory.V.Stick
 open scoped nonZeroDivisors
 
-theorem UpperTheory.V.Stick.redRoot :
-    ∀ (R : Type) [CommRing R] [IsDomain R] (p : ℕ) [Fact p.Prime] (π : R →+* ZMod p) (M : ℕ) (ζ : R),
-    p.Coprime M → IsPrimitiveRoot ζ M → IsPrimitiveRoot (π ζ) M ∧ M ∣ p - 1 := by
+theorem UpperTheory.V.Stick.redRoot
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (p : ℕ) [Fact p.Prime] (π : R →+* ZMod p) (M : ℕ)
+        (ζ : R),
+      p.Coprime M → IsPrimitiveRoot ζ M → IsPrimitiveRoot (π ζ) M ∧ M ∣ p - 1 := by
   intro R _ _ p hp π M ζ hcop hζ
   have hpp : p.Prime := hp.out
   have hM : 0 < M := by

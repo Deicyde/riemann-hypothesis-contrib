@@ -11,13 +11,16 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 noncomputable section
 namespace GlobalTheory.NotCartier
 
-theorem ringKrullDim_stalk_le_one {X : Scheme.{0}} [IsLocallyNoetherian X] (J : X.IdealSheafData) (x : X)
-    (hx : x ∈ J.support) (hmin : ∀ z ∈ J.support, z ⤳ x → z = x) (V : X.affineOpens) (hxV : x ∈ V.1)
-    (hP : (J.ideal V).IsPrincipal) : ringKrullDim (X.presheaf.stalk x) ≤ 1 := by
+theorem ringKrullDim_stalk_le_one
+    {X : Scheme.{0}} [IsLocallyNoetherian X]
+    (J : X.IdealSheafData) (x : X) (hx : x ∈ J.support) (hmin : ∀ z ∈ J.support, z ⤳ x → z = x)
+    (V : X.affineOpens) (hxV : x ∈ V.1) (hP : (J.ideal V).IsPrincipal)
+    : ringKrullDim (X.presheaf.stalk x) ≤ 1 := by
   haveI := IsLocallyNoetherian.component_noetherian V
   have hV : IsAffineOpen V.1 := V.2
   let p := hV.primeIdealOf ⟨x, hxV⟩
-  let _ : Algebra Γ(X, V.1) (X.presheaf.stalk x) := TopCat.Presheaf.algebra_section_stalk X.presheaf ⟨x, hxV⟩
+  let _ : Algebra Γ(X, V.1) (X.presheaf.stalk x) :=
+    TopCat.Presheaf.algebra_section_stalk X.presheaf ⟨x, hxV⟩
   have hloc := hV.isLocalization_stalk ⟨x, hxV⟩
   have hp : hV.fromSpec p = x := hV.fromSpec_primeIdealOf ⟨x, hxV⟩
   have hsupp : ∀ q : Spec Γ(X, V.1), hV.fromSpec q ∈ J.support ↔ J.ideal V ≤ q.asIdeal := by
@@ -43,17 +46,19 @@ end GlobalTheory.NotCartier
 
 namespace GlobalTheory.NotCartier
 
-theorem ker_ne_bot_and_not_effCartier : ∀ {W Y : Scheme.{0}} [IsIntegral W] [IsLocallyNoetherian Y] (i : W ⟶ Y)
-    [IsClosedImmersion i], 2 ≤ ringKrullDim (Y.presheaf.stalk (i (genericPoint W))) →
-    i.ker ≠ ⊥ ∧ ∀ U : Y.Opens, i (genericPoint W) ∈ U → ¬ FinalTheorems.EffCartier (i.ker.comap U.ι) := by
+theorem ker_ne_bot_and_not_effCartier
+    : ∀ {W Y : Scheme.{0}} [IsIntegral W] [IsLocallyNoetherian Y] (i : W ⟶ Y) [IsClosedImmersion i],
+      2 ≤ ringKrullDim (Y.presheaf.stalk (i (genericPoint W)))
+        → i.ker ≠ ⊥
+          ∧ ∀ U : Y.Opens,
+            i (genericPoint W) ∈ U → ¬ FinalTheorems.EffCartier (i.ker.comap U.ι) := by
   intro W Y _ _ i _ hdim
   set y := i (genericPoint W) with hy
   have hsub : (i.ker.support : Set Y) ⊆ closure {y} := by
     rw [Scheme.Hom.support_ker]
     refine closure_minimal ?_ isClosed_closure
     rintro _ ⟨w, rfl⟩
-    have hw : w ∈ closure {genericPoint W} := by
-      rw [(genericPoint_spec W).def]; trivial
+    have hw : w ∈ closure {genericPoint W} := by rw [(genericPoint_spec W).def]; trivial
     exact specializes_iff_mem_closure.1 ((specializes_iff_mem_closure.2 hw).map i.continuous)
   have hyS : y ∈ i.ker.support := by
     rw [← SetLike.mem_coe, Scheme.Hom.support_ker]; exact subset_closure ⟨_, rfl⟩

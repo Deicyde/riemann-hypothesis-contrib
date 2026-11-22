@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FormallyU
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.MulUnramified
@@ -64,16 +65,25 @@ end GlobalTheory.MulUnramified
 
 namespace GlobalTheory.MulUnramified
 
-theorem eq_one_of_pow_eq_one_thick : ∀ (C C₀ : Type) [CommRing C] [CommRing C₀] (π : C →+* C₀), Function.Surjective π → RingHom.ker π ^ 2 = 0 → ∀ (G : Over (Sp C)) [GrpObj G] (n : ℕ), IsUnit (n : C) → ∀ (T : Over (Sp C)) (z : T ⟶ G), (∀ (T₀ : Over (Sp C₀)) (j : Over.mk (T₀.hom ≫ spMap π) ⟶ T), j ≫ z = 1) → z ^ n = 1 → z = 1 := by
+theorem eq_one_of_pow_eq_one_thick
+    : ∀ (C C₀ : Type) [CommRing C] [CommRing C₀] (π : C →+* C₀),
+      Function.Surjective π → RingHom.ker π ^ 2 = 0
+        → ∀ (G : Over (Sp C)) [GrpObj G] (n : ℕ),
+          IsUnit (n : C)
+            → ∀ (T : Over (Sp C)) (z : T ⟶ G),
+              (∀ (T₀ : Over (Sp C₀)) (j : Over.mk (T₀.hom ≫ spMap π) ⟶ T), j ≫ z = 1) → z ^ n = 1
+                → z = 1 := by
   intro C C₀ _ _ π hπ hsq G _ n hn T z hz hzn
   apply Over.OverMorphism.ext
   refine T.left.affineOpenCover.openCover.hom_ext _ _ fun i ↦ ?_
   let k : T.left.affineOpenCover.I₀ := i
-  let f : Over.mk (T.left.affineOpenCover.f k ≫ T.hom) ⟶ T := Over.homMk (T.left.affineOpenCover.f k) rfl
-  have hfz : (f ≫ z) ^ n = 1 := by
-    rw [← MonObj.comp_pow, hzn, comp_one]
-  have h := eq_one_of_pow_eq_one_thick_affine C C₀ π hπ hsq G n hn _ _ (f ≫ z)
-    (fun T₀ j ↦ by rw [← Category.assoc]; exact hz T₀ _) hfz
+  let f : Over.mk (T.left.affineOpenCover.f k ≫ T.hom) ⟶ T :=
+    Over.homMk (T.left.affineOpenCover.f k) rfl
+  have hfz : (f ≫ z) ^ n = 1 := by rw [← MonObj.comp_pow, hzn, comp_one]
+  have h :=
+    eq_one_of_pow_eq_one_thick_affine C C₀ π hπ hsq G n hn _ _ (f ≫ z)
+      (fun T₀ j ↦ by rw [← Category.assoc]; exact hz T₀ _)
+      hfz
   have h' := congrArg (·.left) (h.trans (comp_one f).symm)
   simp only [Over.comp_left] at h'
   exact h'

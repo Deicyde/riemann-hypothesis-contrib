@@ -15,15 +15,15 @@ noncomputable section
 
 namespace PGaussConstant
 
-theorem rhs_eq (n : ℕ) :
-    (72 * Real.exp 4 * (n : ℝ)) ^ ((n : ℝ) / 2) = (6 * √2 * Real.exp 2 * √(n : ℝ)) ^ n := by
+theorem rhs_eq (n : ℕ)
+    : (72 * Real.exp 4 * (n : ℝ)) ^ ((n : ℝ) / 2) = (6 * √2 * Real.exp 2 * √(n : ℝ)) ^ n := by
   have hx : (0 : ℝ) ≤ n := Nat.cast_nonneg n
   have ha : 0 ≤ 6 * √2 * Real.exp 2 * √(n : ℝ) := by positivity
   have hsq : 72 * Real.exp 4 * (n : ℝ) = (6 * √2 * Real.exp 2 * √(n : ℝ)) ^ 2 := by
-    have h4 : Real.exp 2 ^ 2 = Real.exp 4 := by
-      rw [← Real.exp_nat_mul]; norm_num
+    have h4 : Real.exp 2 ^ 2 = Real.exp 4 := by rw [← Real.exp_nat_mul]; norm_num
     have : (6 * √2 * Real.exp 2 * √(n : ℝ)) ^ 2
-        = 36 * (√2) ^ 2 * (Real.exp 2) ^ 2 * (√(n : ℝ)) ^ 2 := by ring
+        = 36 * (√2) ^ 2 * (Real.exp 2) ^ 2 * (√(n : ℝ)) ^ 2 := by
+      ring
     rw [this, Real.sq_sqrt (by norm_num), Real.sq_sqrt hx, h4]
     ring
   rw [hsq, ← Real.rpow_natCast (6 * √2 * Real.exp 2 * √(n : ℝ)) 2, ← Real.rpow_mul ha,
@@ -32,11 +32,13 @@ theorem rhs_eq (n : ℕ) :
   push_cast
   ring
 
-theorem exp_part (n : ℕ) (hn : 1 ≤ n) :
-    2 * (Real.exp √(n : ℝ) * Real.exp ((n : ℝ) / (2 * π))) ≤ 2 ^ n * Real.exp 2 ^ n := by
+theorem exp_part (n : ℕ) (hn : 1 ≤ n)
+    : 2 * (Real.exp √(n : ℝ) * Real.exp ((n : ℝ) / (2 * π))) ≤ 2 ^ n * Real.exp 2 ^ n := by
   have hx : (1 : ℝ) ≤ n := by exact_mod_cast hn
   have h2 : (2 : ℝ) ≤ 2 ^ n := by
-    calc (2 : ℝ) = 2 ^ 1 := by norm_num
+    calc
+      (2 : ℝ)
+        = 2 ^ 1 := by norm_num
       _ ≤ 2 ^ n := pow_le_pow_right₀ (by norm_num) hn
   have hs : √(n : ℝ) ≤ n := by
     have := Real.sqrt_le_sqrt (show (n : ℝ) ≤ (n : ℝ) ^ 2 by nlinarith)
@@ -51,20 +53,21 @@ theorem exp_part (n : ℕ) (hn : 1 ≤ n) :
 
 end PGaussConstant
 
-
 open PGaussConstant in
 theorem GaussConstant.proof : GaussConstant.Statement := by
   intro n hn
   rw [PGaussConstant.rhs_eq, gaussShellConst]
   have key := PGaussConstant.exp_part n hn
   have hc : 0 ≤ √2 ^ n * 3 ^ n * √(n : ℝ) ^ n := by positivity
-  calc √2 ^ n * (2 * (3 ^ n * √(n : ℝ) ^ n * Real.exp √(n : ℝ) * Real.exp ((n : ℝ) / (2 * π))))
-      = (√2 ^ n * 3 ^ n * √(n : ℝ) ^ n) *
-          (2 * (Real.exp √(n : ℝ) * Real.exp ((n : ℝ) / (2 * π)))) := by ring
+  calc
+    √2 ^ n * (2 * (3 ^ n * √(n : ℝ) ^ n * Real.exp √(n : ℝ) * Real.exp ((n : ℝ) / (2 * π))))
+        = (√2 ^ n * 3 ^ n * √(n : ℝ) ^ n)
+          * (2 * (Real.exp √(n : ℝ) * Real.exp ((n : ℝ) / (2 * π)))) := by
+      ring
     _ ≤ (√2 ^ n * 3 ^ n * √(n : ℝ) ^ n) * (2 ^ n * Real.exp 2 ^ n) :=
-        mul_le_mul_of_nonneg_left key hc
+      mul_le_mul_of_nonneg_left key hc
     _ = (6 * √2 * Real.exp 2 * √(n : ℝ)) ^ n := by
-        rw [show (6 : ℝ) = 2 * 3 by norm_num]; simp only [mul_pow]; ring
+      rw [show (6 : ℝ) = 2 * 3 by norm_num]; simp only [mul_pow]; ring
 
 end
 

@@ -13,8 +13,10 @@ namespace UpperTheory.Esk.ActionsPreserveMeasuresLemmas
 
 open UpperTheory.Esk
 
-theorem count_pres {α : Type} [MeasurableSpace α] [MeasurableSingletonClass α] [Countable α] (f : α → α)
-    (hf : Function.Bijective f) : MeasurePreserving f Measure.count Measure.count := by
+theorem count_pres
+    {α : Type} [MeasurableSpace α] [MeasurableSingletonClass α] [Countable α]
+    (f : α → α) (hf : Function.Bijective f)
+    : MeasurePreserving f Measure.count Measure.count := by
   refine ⟨measurable_of_countable f, ?_⟩
   ext s hs
   rw [Measure.map_apply (measurable_of_countable f) hs, Measure.count_apply hs,
@@ -25,16 +27,20 @@ theorem count_pres {α : Type} [MeasurableSpace α] [MeasurableSingletonClass α
 theorem countable_PG (F : Type) [Field F] [Countable F] : Countable (PG F) := by
   have : Countable (Matrix (Fin 2) (Fin 2) F) := inferInstanceAs (Countable (Fin 2 → Fin 2 → F))
   have : Countable (GL (Fin 2) F) :=
-    Function.Injective.countable (f := fun g : GL (Fin 2) F => (g : Matrix (Fin 2) (Fin 2) F)) fun a b h => Units.ext h
+    Function.Injective.countable
+      (f := fun g : GL (Fin 2) F => (g : Matrix (Fin 2) (Fin 2) F))
+      fun a b h => Units.ext h
   exact QuotientGroup.mk_surjective.countable
 
-theorem smulX {F I Gf : Type} [Field F] [Group Gf] (D : Dat F I Gf) (g : GL (Fin 2) F) (z : D.Xs) :
-    ((g : PG F) • z) = (fun v => D.r v g • z v : I → P) := rfl
+theorem smulX {F I Gf : Type} [Field F] [Group Gf] (D : Dat F I Gf) (g : GL (Fin 2) F) (z : D.Xs)
+    : ((g : PG F) • z) = (fun v => D.r v g • z v : I → P) :=
+  rfl
 
 end UpperTheory.Esk.ActionsPreserveMeasuresLemmas
 
 open UpperTheory.Esk.ActionsPreserveMeasuresLemmas in
-theorem UpperTheory.Esk.actions_preserve_measures_proof : UpperTheory.Esk.B1a → UpperTheory.Esk.B1b → UpperTheory.Esk.B1c → UpperTheory.Esk.E0a := by
+theorem UpperTheory.Esk.actions_preserve_measures_proof
+    : UpperTheory.Esk.B1a → UpperTheory.Esk.B1b → UpperTheory.Esk.B1c → UpperTheory.Esk.E0a := by
   intro h1 h2 h3 F I Gf _ _ _ D ax
   have : SigmaFinite (volume : Measure P) := h1.1
   have : (volume : Measure P).IsOpenPosMeasure := h1.2.1
@@ -48,7 +54,9 @@ theorem UpperTheory.Esk.actions_preserve_measures_proof : UpperTheory.Esk.B1a �
     intro γ
     obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective γ
     simp only [smulX]
-    exact measurePreserving_pi (fun _ : I => (volume : Measure P)) (fun _ : I => (volume : Measure P))
+    exact measurePreserving_pi
+      (fun _ : I => (volume : Measure P))
+      (fun _ : I => (volume : Measure P))
       (fun v => (h1.2.2 (D.r v g)).2)
   have contX : ∀ γ : PG F, Continuous fun z : D.Xs => γ • z := by
     intro γ
@@ -62,12 +70,18 @@ theorem UpperTheory.Esk.actions_preserve_measures_proof : UpperTheory.Esk.B1a �
     exact (count_pres (fun ω : D.Cj × D.Om => γ • ω) (MulAction.bijective γ)).prod (presX γ)
   · intro δ hδ
     have hk : Continuous fun p : P × P => kap p.1 p.2 := h3.2.2.2.2.1
-    have hk1 : ∀ z : P, Continuous fun w => kap z w := fun z => hk.comp (continuous_const.prodMk continuous_id)
+    have hk1 : ∀ z : P, Continuous fun w => kap z w := fun z =>
+      hk.comp (continuous_const.prodMk continuous_id)
     set U : Set P := {w | δ < kap iP w} with hU
     have hUo : IsOpen U := isOpen_lt continuous_const (hk1 iP)
-    have hUp : 0 < volume U := hUo.measure_pos volume ⟨iP, by
-      show δ < kap iP iP
-      rw [h3.2.1 iP]; exact hδ⟩
+    have hUp : 0 < volume U :=
+      hUo.measure_pos volume ⟨
+        iP,
+        by
+          show δ < kap iP iP
+          rw [h3.2.1 iP]
+          exact hδ
+      ⟩
     obtain ⟨c0, hc0, hc0U⟩ := ENNReal.lt_iff_exists_nnreal_btwn.1 hUp
     have hS : ∀ z : P, MeasurableSet {w | δ ≤ kap z w} := fun z =>
       measurableSet_le measurable_const (hk1 z).measurable

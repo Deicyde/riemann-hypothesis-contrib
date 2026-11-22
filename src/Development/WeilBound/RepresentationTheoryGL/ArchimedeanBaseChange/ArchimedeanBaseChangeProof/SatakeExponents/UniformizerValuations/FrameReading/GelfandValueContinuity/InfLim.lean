@@ -9,24 +9,28 @@ noncomputable section
 
 open Polynomial Finset Filter Topology
 open scoped Classical
-open PositivityTheory.RgBcC.Bridge PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.CG.InfiniteConvergence
+open PositivityTheory.RgBcC.Bridge PositivityTheory.Rg.BcB.CG
+  PositivityTheory.Rg.BcB.CG.InfiniteConvergence
 
 namespace PositivityTheory.Rg.BcB.F.Rd.B
 
 theorem gelfVal_cont (n l : ℕ) : Continuous fun χ : Fin n → ℂ => GlobalTheory.Dec.gelfVal χ l := by
   unfold GlobalTheory.Dec.gelfVal
-  have hA : Continuous fun χ : Fin n → ℂ => Formalism.REAL.Amat (fun c => χ c + ((n : ℂ) - 1) / 2) := by
+  have hA
+      : Continuous fun χ : Fin n → ℂ => Formalism.REAL.Amat (fun c => χ c + ((n : ℂ) - 1) / 2) := by
     refine continuous_pi fun a => continuous_pi fun b => ?_
     simp only [Formalism.REAL.Amat, Matrix.of_apply]
     split_ifs
     · exact (continuous_apply a).add continuous_const
     · exact continuous_const
     · exact continuous_const
-  exact continuous_finsetSum _ fun a _ => continuous_finsetSum _ fun b _ => (hA.pow l).matrix_elem a b
+  exact continuous_finsetSum _ fun a _ =>
+    continuous_finsetSum _ fun b _ => (hA.pow l).matrix_elem a b
 
-theorem coef_conv (m : ℕ) (x : ℕ → Fin (m + 1) → ℂ) (t : ℕ → ℂ)
-    (ht : ∀ l, Tendsto (fun k => GlobalTheory.Dec.gelfVal (x k) l) atTop (𝓝 (t l))) :
-    ∀ i, ∃ c, Tendsto (fun k => (cq m (x k)).coeff i) atTop (𝓝 c) := by
+theorem coef_conv
+    (m : ℕ) (x : ℕ → Fin (m + 1) → ℂ)
+    (t : ℕ → ℂ) (ht : ∀ l, Tendsto (fun k => GlobalTheory.Dec.gelfVal (x k) l) atTop (𝓝 (t l)))
+    : ∀ i, ∃ c, Tendsto (fun k => (cq m (x k)).coeff i) atTop (𝓝 c) := by
   have hind : ∀ j i, m + 1 - j ≤ i → ∃ c, Tendsto (fun k => (cq m (x k)).coeff i) atTop (𝓝 c) := by
     intro j
     induction j with
@@ -50,15 +54,22 @@ theorem coef_conv (m : ℕ) (x : ℕ → Fin (m + 1) → ℂ) (t : ℕ → ℂ)
       · have hr : i ≤ m := by omega
         have hij' : i + j = m := by omega
         have hne : ((j : ℂ) + 1) ≠ 0 := by exact_mod_cast Nat.succ_ne_zero j
-        have hform : ∀ χ : Fin (m + 1) → ℂ, (cq m χ).coeff i =
-            (defect (GlobalTheory.Dec.gelfVal χ) m (m + 1) (Hi i (m + 1) (cq m χ))).coeff (i + (m + 1)) / ((j : ℂ) + 1) := by
+        have hform
+            : ∀ χ : Fin (m + 1) → ℂ,
+              (cq m χ).coeff i
+                = (defect (GlobalTheory.Dec.gelfVal χ) m (m + 1) (Hi i (m + 1) (cq m χ))).coeff
+                    (i + (m + 1))
+                  / ((j : ℂ) + 1) := by
           intro χ
           have hk := key m χ i hr
           have hc : (i : ℂ) = (m : ℂ) - j := by rw [← hij']; push_cast; ring
           rw [eq_div_iff hne]
           linear_combination (-1 : ℂ) * hk + (cq m χ).coeff i * hc
-        let c : ℕ → ℂ := fun l => if h : ∃ c, Tendsto (fun k => (cq m (x k)).coeff l) atTop (𝓝 c) then h.choose else 0
-        have hc : ∀ l ∈ Ioc i (m + 1), Tendsto (fun k => (cq m (x k)).coeff l) atTop (𝓝 (c l)) := fun l hl => by
+        let c : ℕ → ℂ := fun l =>
+          if h : ∃ c, Tendsto (fun k => (cq m (x k)).coeff l) atTop (𝓝 c) then h.choose else 0
+        have hc
+            : ∀ l ∈ Ioc i (m + 1),
+              Tendsto (fun k => (cq m (x k)).coeff l) atTop (𝓝 (c l)) := fun l hl => by
           have h := ih l (by simp only [mem_Ioc] at hl; omega)
           simp only [c, dif_pos h]
           exact h.choose_spec
@@ -74,14 +85,18 @@ theorem coef_conv (m : ℕ) (x : ℕ → Fin (m + 1) → ℂ) (t : ℕ → ℂ)
         have h2 : CoefTo (fun k => (Hi i (m + 1) (cq m (x k))).comp (X + 1)) (Q₀.comp (X + 1)) := by
           simp only [Hi_comp, hQc]
           exact CoefTo.sum _ fun l hl => CoefTo.mul (CoefTo.C (hc l hl)) (CoefTo.const _)
-        have h3 := CoefTo.defect (t := fun k => GlobalTheory.Dec.gelfVal (x k)) ht m (m + 1) h1 h2 (i + (m + 1))
+        have h3 :=
+          CoefTo.defect
+            (t := fun k => GlobalTheory.Dec.gelfVal (x k))
+            ht m (m + 1) h1 h2 (i + (m + 1))
         exact ⟨_, (h3.div_const ((j : ℂ) + 1)).congr fun k => (hform (x k)).symm⟩
   exact fun i => hind (m + 1) i (by omega)
 
 theorem infLim : InfLim := by
   intro n x t ht
   rcases n with _ | m
-  · have h0 : ∀ (χ : Fin 0 → ℂ) (l : ℕ), GlobalTheory.Dec.gelfVal χ l = 0 := fun χ l => by simp [GlobalTheory.Dec.gelfVal]
+  · have h0 : ∀ (χ : Fin 0 → ℂ) (l : ℕ), GlobalTheory.Dec.gelfVal χ l = 0 := fun χ l => by
+      simp [GlobalTheory.Dec.gelfVal]
     refine ⟨Fin.elim0, fun l => ?_⟩
     have h := ht l
     simp only [h0] at h
@@ -114,7 +129,9 @@ theorem infLim : InfLim := by
     mem_closedBall_zero_iff.2 ((pi_norm_le_iff_of_nonneg hB0).2 fun s => hxb _ s)
   obtain ⟨z, -, ψ, hψm, hψ⟩ := tendsto_subseq_of_bounded Metric.isBounded_closedBall hmem
   refine ⟨z, fun l => ?_⟩
-  have h1 : Tendsto (fun k => GlobalTheory.Dec.gelfVal (x (ψ k)) l) atTop (𝓝 (GlobalTheory.Dec.gelfVal z l)) :=
+  have h1 : Tendsto
+      (fun k => GlobalTheory.Dec.gelfVal (x (ψ k)) l)
+      atTop (𝓝 (GlobalTheory.Dec.gelfVal z l)) :=
     ((gelfVal_cont (m + 1) l).tendsto z).comp hψ
   have h2 : Tendsto (fun k => GlobalTheory.Dec.gelfVal (x (ψ k)) l) atTop (𝓝 (t l)) :=
     (ht l).comp hψm.tendsto_atTop

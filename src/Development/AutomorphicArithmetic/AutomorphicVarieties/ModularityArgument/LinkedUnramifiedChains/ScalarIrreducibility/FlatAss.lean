@@ -4,15 +4,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-private theorem flatAss_ann {A R : Type} [CommRing A] [CommRing R] [Algebra A R] [Module.Flat A R]
-    (P : Ideal A) (a : A) (hmem : ∀ b, b ∈ P ↔ b * a = 0) (r : R) (h : a • r = 0) :
-    r ∈ P.map (algebraMap A R) := by
+private theorem flatAss_ann
+    {A R : Type} [CommRing A] [CommRing R] [Algebra A R] [Module.Flat A R]
+    (P : Ideal A) (a : A) (hmem : ∀ b, b ∈ P ↔ b * a = 0)
+    (r : R) (h : a • r = 0)
+    : r ∈ P.map (algebraMap A R) := by
   have h1 : ∑ _i : Fin 1, a • r = 0 := by
     rw [Fin.sum_univ_one]
     exact h
   obtain ⟨l, c, y, hy, hc⟩ :=
-    Module.Flat.isTrivialRelation_of_sum_smul_eq_zero (f := fun _ : Fin 1 => a)
-      (x := fun _ : Fin 1 => r) h1
+    Module.Flat.isTrivialRelation_of_sum_smul_eq_zero
+      (f := fun _ : Fin 1 => a)
+      (x := fun _ : Fin 1 => r)
+      h1
   have hr : r = ∑ j, c 0 j • y j := hy 0
   rw [hr]
   refine Ideal.sum_mem _ fun j _ => ?_
@@ -23,14 +27,15 @@ private theorem flatAss_ann {A R : Type} [CommRing A] [CommRing R] [Algebra A R]
   rw [mul_comm]
   exact h2
 
-private theorem flatAss_annih {A R : Type} [CommRing A] [CommRing R] [Algebra A R] [Module.Flat A R]
-    (P : Ideal A) (a : A) (hmem : ∀ b, b ∈ P ↔ b * a = 0) :
-    Module.annihilator R (Ideal.span {algebraMap A R a} : Ideal R) = P.map (algebraMap A R) := by
+private theorem flatAss_annih
+    {A R : Type} [CommRing A] [CommRing R] [Algebra A R] [Module.Flat A R]
+    (P : Ideal A) (a : A) (hmem : ∀ b, b ∈ P ↔ b * a = 0)
+    : Module.annihilator R (Ideal.span {algebraMap A R a} : Ideal R) = P.map (algebraMap A R) := by
   apply le_antisymm
   · intro r hr
     have h0 : r * algebraMap A R a = 0 :=
-      congrArg Subtype.val (Module.mem_annihilator.1 hr
-        ⟨algebraMap A R a, Ideal.mem_span_singleton_self _⟩)
+      congrArg Subtype.val
+        (Module.mem_annihilator.1 hr ⟨algebraMap A R a, Ideal.mem_span_singleton_self _⟩)
     refine flatAss_ann P a hmem r ?_
     rw [Algebra.smul_def, mul_comm]
     exact h0
@@ -42,11 +47,12 @@ private theorem flatAss_annih {A R : Type} [CommRing A] [CommRing R] [Algebra A 
     change algebraMap A R b * (c * algebraMap A R a) = 0
     rw [mul_left_comm, ← map_mul, (hmem b).1 hb, map_zero, mul_zero]
 
-private theorem flatAss_alg {A R : Type} [CommRing A] [CommRing R] [IsNoetherianRing A]
-    [IsNoetherianRing R] [Algebra A R] [Module.Flat A R] (Q : Ideal R) (hQ : Q.IsPrime)
-    (hmin : ∀ P ∈ associatedPrimes R R, P ≤ Q → P ∈ minimalPrimes R)
-    (P : Ideal A) (hP : P ∈ associatedPrimes A A) (hPQ : P ≤ Q.comap (algebraMap A R)) :
-    P ∈ minimalPrimes A := by
+private theorem flatAss_alg
+    {A R : Type} [CommRing A] [CommRing R] [IsNoetherianRing A] [IsNoetherianRing R] [Algebra A R]
+    [Module.Flat A R]
+    (Q : Ideal R) (hQ : Q.IsPrime) (hmin : ∀ P ∈ associatedPrimes R R, P ≤ Q → P ∈ minimalPrimes R)
+    (P : Ideal A) (hP : P ∈ associatedPrimes A A) (hPQ : P ≤ Q.comap (algebraMap A R))
+    : P ∈ minimalPrimes A := by
   haveI : Algebra.HasGoingDown A R := Algebra.HasGoingDown.of_flat
   obtain ⟨hPp, a, hPa⟩ := isAssociatedPrime_iff.1 hP
   have hmem : ∀ b, b ∈ P ↔ b * a = 0 := fun b => by
@@ -71,10 +77,16 @@ private theorem flatAss_alg {A R : Type} [CommRing A] [CommRing R] [IsNoetherian
   rw [hlies.over, heq]
   exact hPc
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af UpperTheory.V.Pr UpperTheory.V.Alg UpperTheory.V.J
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp
+  IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af
+  UpperTheory.V.Pr UpperTheory.V.Alg UpperTheory.V.J
 
-theorem UpperTheory.V.J.flatAss :
-    ∀ (A R : Type) [CommRing A] [CommRing R] [IsNoetherianRing A] [IsNoetherianRing R] (ι : A →+* R), ι.Flat → ∀ Q : Ideal R, Q.IsPrime →
-        (∀ P ∈ associatedPrimes R R, P ≤ Q → P ∈ minimalPrimes R) → ∀ P ∈ associatedPrimes A A, P ≤ Q.comap ι → P ∈ minimalPrimes A :=
-  fun A R _ _ _ _ ι hι Q hQ hmin P hP hPQ =>
-    @flatAss_alg A R _ _ _ _ ι.toAlgebra hι Q hQ hmin P hP hPQ
+theorem UpperTheory.V.J.flatAss
+    : ∀ (A R : Type) [CommRing A] [CommRing R] [IsNoetherianRing A] [IsNoetherianRing R]
+        (ι : A →+* R),
+      ι.Flat
+        → ∀ Q : Ideal R,
+          Q.IsPrime → (∀ P ∈ associatedPrimes R R, P ≤ Q → P ∈ minimalPrimes R)
+            → ∀ P ∈ associatedPrimes A A,
+              P ≤ Q.comap ι → P ∈ minimalPrimes A := fun A R _ _ _ _ ι hι Q hQ hmin P hP hPQ =>
+  @flatAss_alg A R _ _ _ _ ι.toAlgebra hι Q hQ hmin P hP hPQ

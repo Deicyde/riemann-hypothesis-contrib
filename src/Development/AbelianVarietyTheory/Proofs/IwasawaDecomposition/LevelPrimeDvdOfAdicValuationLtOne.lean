@@ -14,8 +14,8 @@ namespace GlobalTheory.LevelUnif
 
 open GlobalTheory.LevelHecke
 
-theorem le_exp_sub_one {x : WithZero (Multiplicative ℤ)} {n : ℤ} (h : x < WithZero.exp n) :
-    x ≤ WithZero.exp (n - 1) := by
+theorem le_exp_sub_one {x : WithZero (Multiplicative ℤ)} {n : ℤ} (h : x < WithZero.exp n)
+    : x ≤ WithZero.exp (n - 1) := by
   rcases eq_or_ne x 0 with rfl | hx
   · exact zero_le'
   rw [← WithZero.exp_log hx] at h ⊢
@@ -23,9 +23,10 @@ theorem le_exp_sub_one {x : WithZero (Multiplicative ℤ)} {n : ℤ} (h : x < Wi
   rw [WithZero.exp_le_exp]
   omega
 
-theorem T_notMem_sq (D : D7) (u : D.what₂.Word) (A : Formalism.L2.Forms.AtTTied u)
-    (v : HeightOneSpectrum (𝓞 D.host.F)) (hv : (((D.mem u).A.T : ℕ) : 𝓞 D.host.F) ∈ v.asIdeal) :
-    (((D.mem u).A.T : ℕ) : 𝓞 D.host.F) ∉ v.asIdeal ^ 2 := by
+theorem T_notMem_sq
+    (D : D7) (u : D.what₂.Word) (A : Formalism.L2.Forms.AtTTied u)
+    (v : HeightOneSpectrum (𝓞 D.host.F)) (hv : (((D.mem u).A.T : ℕ) : 𝓞 D.host.F) ∈ v.asIdeal)
+    : (((D.mem u).A.T : ℕ) : 𝓞 D.host.F) ∉ v.asIdeal ^ 2 := by
   set v0 := A.eV.symm ⟨v, hv⟩ with hv0
   have hU := GlobalTheory.LevelUnram.unram D u A v0
   set P := RingHom.ker (A.res v0) with hP
@@ -35,8 +36,7 @@ theorem T_notMem_sq (D : D7) (u : D.what₂.Word) (A : Formalism.L2.Forms.AtTTie
     have h := (A.res_v v0 x).1 (by rw [hv0, Equiv.apply_symm_apply]; exact hx)
     exact h
   have hTP : (((D.mem u).A.T : ℕ) : 𝓞 D.host.E) ∈ P := hU.1
-  have hT0 : (((D.mem u).A.T : ℕ) : 𝓞 D.host.E) ≠ 0 := by
-    exact_mod_cast (D.mem u).A.T_prime.ne_zero
+  have hT0 : (((D.mem u).A.T : ℕ) : 𝓞 D.host.E) ≠ 0 := by exact_mod_cast (D.mem u).A.T_prime.ne_zero
   have hPbot : P ≠ ⊥ := fun h => hT0 (by rw [h] at hTP; exact (Ideal.mem_bot).1 hTP)
   have hlt : P ^ 2 < P ^ 1 := Ideal.pow_right_strictAnti P hPbot hPp.ne_top (by norm_num)
   rw [pow_one] at hlt
@@ -57,10 +57,12 @@ theorem T_notMem_sq (D : D7) (u : D.what₂.Word) (A : Formalism.L2.Forms.AtTTie
   have h4 := Ideal.pow_right_mono hle 2 h3
   simpa using h4
 
-theorem dvd_of_val_lt_one : ∀ (D : Formalism.BasicNotions.D7) (u : D.what₂.Word) (A : Formalism.L2.Forms.AtTTied u)
-    (v : HeightOneSpectrum (𝓞 D.host.F)) (_ : (((D.mem u).A.T : ℕ) : 𝓞 D.host.F) ∈ v.asIdeal)
-    (a : v.adicCompletionIntegers D.host.F) (_ : Valued.v (a : v.adicCompletion D.host.F) < 1),
-    ∃ b : v.adicCompletionIntegers D.host.F, a = (((D.mem u).A.T : ℕ) : v.adicCompletionIntegers D.host.F) * b := by
+theorem dvd_of_val_lt_one
+    : ∀ (D : Formalism.BasicNotions.D7) (u : D.what₂.Word) (A : Formalism.L2.Forms.AtTTied u)
+        (v : HeightOneSpectrum (𝓞 D.host.F)) (_ : (((D.mem u).A.T : ℕ) : 𝓞 D.host.F) ∈ v.asIdeal)
+        (a : v.adicCompletionIntegers D.host.F) (_ : Valued.v (a : v.adicCompletion D.host.F) < 1),
+      ∃ b : v.adicCompletionIntegers D.host.F,
+        a = (((D.mem u).A.T : ℕ) : v.adicCompletionIntegers D.host.F) * b := by
   intro D u A v hv a ha
   have hT2 := T_notMem_sq D u A v hv
   have hval : v.intValuation (((D.mem u).A.T : ℕ) : 𝓞 D.host.F) = WithZero.exp (-1) := by

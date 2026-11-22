@@ -162,10 +162,15 @@ lemma sigma_id (L : PeriodPair) (n m : ℕ) (hnC : (n : ℂ) = 2 * m + 1) (S : F
   apply mul_left_cancel₀ hne
   linear_combination -(k1 z) - F z * hC
 
-theorem wp_odd_mul_sub_half_prod : ∀ (L : PeriodPair) (n : ℕ) (S : Finset ℂ) (t : ℂ), Odd n →
-    Formalism.L2.Th1.F.IsKerReps L (n : ℂ) S → t ∉ L.lattice → 2 * t ∈ L.lattice → ∀ z, (n : ℂ) * z ∉ L.lattice →
-    (n : ℂ) ^ 2 * (L.weierstrassP (n * z) - L.weierstrassP t) * ∏ P ∈ S, (L.weierstrassP z - L.weierstrassP P)
-      = (L.weierstrassP z - L.weierstrassP t) * ∏ P ∈ S, (L.weierstrassP z - L.weierstrassP (t + P)) := by
+theorem wp_odd_mul_sub_half_prod
+    : ∀ (L : PeriodPair) (n : ℕ) (S : Finset ℂ) (t : ℂ),
+      Odd n → Formalism.L2.Th1.F.IsKerReps L (n : ℂ) S → t ∉ L.lattice → 2 * t ∈ L.lattice
+        → ∀ z,
+          (n : ℂ) * z ∉ L.lattice
+            → (n : ℂ) ^ 2 * (L.weierstrassP (n * z) - L.weierstrassP t)
+                * ∏ P ∈ S, (L.weierstrassP z - L.weierstrassP P)
+              = (L.weierstrassP z - L.weierstrassP t)
+                * ∏ P ∈ S, (L.weierstrassP z - L.weierstrassP (t + P)) := by
   intro L n S t hodd hS ht h2t z hnz
   obtain ⟨m, hm⟩ := hodd
   have hnC : (n : ℂ) = 2 * m + 1 := by rw [hm]; push_cast; ring
@@ -174,7 +179,8 @@ theorem wp_odd_mul_sub_half_prod : ∀ (L : PeriodPair) (n : ℕ) (S : Finset �
   have hcardR := kerRepsCard L n S hn hst hS
   have hcardN : S.card + 1 = n ^ 2 := by
     have : Complex.normSq (n : ℂ) = (n : ℝ) ^ 2 := by rw [Complex.normSq_apply]; simp; ring
-    rw [this] at hcardR; exact_mod_cast hcardR
+    rw [this] at hcardR
+    exact_mod_cast hcardR
   have hcard : (S.card : ℂ) + 1 = (n : ℂ) ^ 2 := by exact_mod_cast hcardN
   have hS4 : S.card = 4 * (m * m + m) :=
     Nat.add_right_cancel (by rw [hcardN, hm]; ring : S.card + 1 = 4 * (m * m + m) + 1)
@@ -185,10 +191,15 @@ theorem wp_odd_mul_sub_half_prod : ∀ (L : PeriodPair) (n : ℕ) (S : Finset �
     have hnP := (hS.1 P hP).1
     have h2P : 2 * P ∈ L.lattice := by
       have := sub_mem (nsmul_mem h 2) h2t
-      convert this using 1; rw [nsmul_eq_mul]; push_cast; ring
+      convert this using 1
+      rw [nsmul_eq_mul]
+      push_cast
+      ring
     have hPL : P ∈ L.lattice := by
       have := sub_mem hnP (nsmul_mem h2P m)
-      convert this using 1; rw [nsmul_eq_mul, hnC]; ring
+      convert this using 1
+      rw [nsmul_eq_mul, hnC]
+      ring
     exact (hS.1 P hP).2 hPL
   have hsig := sigma_id L n m hnC S t hn hst hS hev hcard ht h2t z
   have hD : ∏ P ∈ S, sgStar L (t + P) ^ 2 ≠ 0 :=
@@ -199,11 +210,16 @@ theorem wp_odd_mul_sub_half_prod : ∀ (L : PeriodPair) (n : ℕ) (S : Finset �
   have hI := isogenySigma L n S hn hst hS z hzL
   have hadd1 := sgStarAdd L (n * z) t hnz ht
   have hadd2 := sgStarAdd L z t hzL ht
-  have hprod : ∏ P ∈ S, (sgStar L (z + t + P) * sgStar L (z - t - P))
-      = (sgStar L z ^ 2) ^ S.card * (∏ P ∈ S, sgStar L (t + P) ^ 2)
-        * ∏ P ∈ S, (L.weierstrassP z - L.weierstrassP (t + P)) := by
-    have e : ∀ P ∈ S, sgStar L (z + t + P) * sgStar L (z - t - P)
-        = (-1) * (sgStar L z ^ 2 * sgStar L (t + P) ^ 2 * (L.weierstrassP z - L.weierstrassP (t + P))) := by
+  have hprod
+      : ∏ P ∈ S, (sgStar L (z + t + P) * sgStar L (z - t - P))
+        = (sgStar L z ^ 2) ^ S.card * (∏ P ∈ S, sgStar L (t + P) ^ 2)
+          * ∏ P ∈ S, (L.weierstrassP z - L.weierstrassP (t + P)) := by
+    have e
+        : ∀ P ∈ S,
+          sgStar L (z + t + P) * sgStar L (z - t - P)
+            = (-1)
+              * (sgStar L z ^ 2 * sgStar L (t + P) ^ 2
+                * (L.weierstrassP z - L.weierstrassP (t + P))) := by
       intro P hP
       rw [show z + t + P = z + (t + P) by ring, show z - t - P = z - (t + P) by ring,
         sgStarAdd L z (t + P) hzL (htP P hP)]

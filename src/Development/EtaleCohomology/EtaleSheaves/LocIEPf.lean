@@ -26,8 +26,11 @@ instance (S : Submonoid A) : Preorder (DivS S) where
 def mkD {S : Submonoid A} (a : A) (h : a ∈ S) : DivS S := (⟨a, h⟩ : S)
 
 instance (S : Submonoid A) : IsDirected (DivS S) (· ≤ ·) :=
-  ⟨fun s t => ⟨mkD (val s * val t) (S.mul_mem (val_mem s) (val_mem t)),
-    Dvd.intro _ rfl, Dvd.intro_left _ rfl⟩⟩
+  ⟨fun s t => ⟨
+    mkD (val s * val t) (S.mul_mem (val_mem s) (val_mem t)),
+    Dvd.intro _ rfl,
+    Dvd.intro_left _ rfl
+  ⟩⟩
 
 instance (S : Submonoid A) : Nonempty (DivS S) := ⟨mkD 1 S.one_mem⟩
 
@@ -54,17 +57,21 @@ variable (S : Submonoid A)
 def F : DivS S ⥤ CommRingCat.{0} where
   obj s := CommRingCat.of (Localization.Away (val s))
   map f := CommRingCat.ofHom (mp (leOfHom f))
-  map_id s := by
-    ext1; apply ext_away; ext x; exact mp_alg (leOfHom (𝟙 s)) x
+  map_id s := by ext1; apply ext_away; ext x; exact mp_alg (leOfHom (𝟙 s)) x
   map_comp f g := by
-    ext1; apply ext_away; ext x
-    exact (by rw [mp_alg, mp_alg, mp_alg] : mp (leOfHom (f ≫ g)) (algebraMap A _ x) =
-      mp (leOfHom g) (mp (leOfHom f) (algebraMap A _ x)))
+    ext1
+    apply ext_away
+    ext x
+    exact (by rw [mp_alg, mp_alg, mp_alg]
+      : mp (leOfHom (f ≫ g)) (algebraMap A _ x)
+        = mp (leOfHom g) (mp (leOfHom f) (algebraMap A _ x)))
 
 def tN : (Functor.const (DivS S)).obj (CommRingCat.of A) ⟶ F S where
   app s := CommRingCat.ofHom (algebraMap A (Localization.Away (val s)))
   naturality s t f := by
-    ext1; apply RingHom.ext; intro x
+    ext1
+    apply RingHom.ext
+    intro x
     exact (mp_alg (leOfHom f) x).symm
 
 variable (B : Type) [CommRing B] [Algebra A B] [IsLocalization S B]
@@ -78,9 +85,11 @@ lemma lB_alg (s : DivS S) (x : A) : lB S B s (algebraMap A _ x) = algebraMap A B
 def sN : F S ⟶ (Functor.const (DivS S)).obj (CommRingCat.of B) where
   app s := CommRingCat.ofHom (lB S B s)
   naturality s t f := by
-    ext1; apply ext_away; ext x
-    exact (by rw [mp_alg, lB_alg, lB_alg] :
-      lB S B t (mp (leOfHom f) (algebraMap A _ x)) = lB S B s (algebraMap A _ x))
+    ext1
+    apply ext_away
+    ext x
+    exact (by rw [mp_alg, lB_alg, lB_alg]
+      : lB S B t (mp (leOfHom f) (algebraMap A _ x)) = lB S B s (algebraMap A _ x))
 
 lemma isColim : Nonempty (IsColimit (Cocone.mk _ (sN S B))) := by
   have : ReflectsColimitsOfShape (DivS S) (forget CommRingCat.{0}) :=
@@ -129,7 +138,8 @@ theorem LocIE_of : LateralTheory.E.t_E3Cut.LocIE := by
   · change (algebraMap A (Localization.Away (val j))).Etale
     rw [RingHom.etale_algebraMap]
     exact Algebra.Etale.of_isLocalizationAway (val j)
-  · ext1; ext x
+  · ext1
+    ext x
     exact lB_alg S B j x
 
 end LateralTheory.E.LocIEPf

@@ -8,8 +8,8 @@ namespace GlobalTheory.FirstColumnConjugation
 
 open Matrix
 
-theorem exists_det_ne_zero_first_col {n : ℕ} (v : Fin (n + 1) → ℂ) (hv : v ≠ 0) :
-    ∃ P : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ, P.det ≠ 0 ∧ ∀ k, P k 0 = v k := by
+theorem exists_det_ne_zero_first_col {n : ℕ} (v : Fin (n + 1) → ℂ) (hv : v ≠ 0)
+    : ∃ P : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ, P.det ≠ 0 ∧ ∀ k, P k 0 = v k := by
   obtain ⟨k₀, hk₀⟩ := Function.ne_iff.1 hv
   let u : Fin (n + 1) → ℂ := v - Pi.single k₀ (1 : ℂ)
   let Q : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ :=
@@ -27,8 +27,8 @@ theorem exists_det_ne_zero_first_col {n : ℕ} (v : Fin (n + 1) → ℂ) (hv : v
     exact mul_ne_zero (by simp) hk₀
   · simp [hQcol]
 
-theorem exists_conj_first_col_zero {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) :
-    ∃ (P : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) (B : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ),
+theorem exists_conj_first_col_zero {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ)
+    : ∃ (P : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ) (B : Matrix (Fin (n + 1)) (Fin (n + 1)) ℂ),
       Matrix.det P ≠ 0 ∧ (∀ a : Fin n, B (Fin.succ a) 0 = 0) ∧ A * P = P * B := by
   obtain ⟨μ, hμ⟩ := Module.End.exists_eigenvalue (Matrix.toLin' A)
   obtain ⟨v, hv⟩ := hμ.exists_hasEigenvector
@@ -48,7 +48,7 @@ theorem exists_conj_first_col_zero {n : ℕ} (A : Matrix (Fin (n + 1)) (Fin (n +
     have h := congrFun hcol (Fin.succ a)
     rw [mulVec_single_one] at h
     simpa [Pi.single_apply, Fin.succ_ne_zero] using h
-  · rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, Matrix.mul_nonsing_inv _ ((Matrix.isUnit_iff_isUnit_det P).1 hu),
-      Matrix.one_mul]
+  · rw [← Matrix.mul_assoc, ← Matrix.mul_assoc,
+      Matrix.mul_nonsing_inv _ ((Matrix.isUnit_iff_isUnit_det P).1 hu), Matrix.one_mul]
 
 end GlobalTheory.FirstColumnConjugation

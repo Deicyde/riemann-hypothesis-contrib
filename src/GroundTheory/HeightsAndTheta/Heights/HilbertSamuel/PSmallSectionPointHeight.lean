@@ -15,7 +15,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I2
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I2
 
 noncomputable section
 
@@ -25,8 +26,8 @@ namespace SmallSectionPointHeight
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω]
 
-theorem aeval_eq_eval_mConeMap (y : (Σ k, ι k) → Ω) (f : MRing ι) :
-    aeval y f = eval (fun _ ↦ (1 : Ω)) (mConeMap y f) := by
+theorem aeval_eq_eval_mConeMap (y : (Σ k, ι k) → Ω) (f : MRing ι)
+    : aeval y f = eval (fun _ ↦ (1 : Ω)) (mConeMap y f) := by
   induction f using MvPolynomial.induction_on with
   | C c => simp [mConeMap]
   | add p q hp hq => rw [map_add (f := _), map_add (f := _), map_add (f := _), hp, hq]
@@ -34,33 +35,40 @@ theorem aeval_eq_eval_mConeMap (y : (Σ k, ι k) → Ω) (f : MRing ι) :
     rw [map_mul, map_mul, map_mul, hp]
     simp [mConeMap]
 
-theorem notMem_mCoordIdeal {y : (Σ k, ι k) → Ω} {f : MRing ι} (hf : aeval y f ≠ 0) :
-    f ∉ mCoordIdeal y := by
+theorem notMem_mCoordIdeal {y : (Σ k, ι k) → Ω} {f : MRing ι} (hf : aeval y f ≠ 0)
+    : f ∉ mCoordIdeal y := by
   intro h
   rw [mCoordIdeal, RingHom.mem_ker] at h
   exact hf (by rw [aeval_eq_eval_mConeMap, h, map_zero])
 
-theorem coord_ne_zero {y : (Σ k, ι k) → Ω} {p : Σ k, ι k} (hp : (X p : MRing ι) ∉ mCoordIdeal y) :
-    y p ≠ 0 := by
+theorem coord_ne_zero {y : (Σ k, ι k) → Ω} {p : Σ k, ι k} (hp : (X p : MRing ι) ∉ mCoordIdeal y)
+    : y p ≠ 0 := by
   intro h0
   apply hp
   rw [mCoordIdeal, RingHom.mem_ker]
   simp [mConeMap, h0]
 
-theorem powLine_h (A : ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι) (m : ℕ) (z : (Σ k, ι k) → ℂ) :
-    (IndefiniteRowSideFullHecke.HeightsSet.powLine A m).h z = A.h z ^ m := by
+theorem powLine_h
+    (A : ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι) (m : ℕ) (z : (Σ k, ι k) → ℂ)
+    : (IndefiniteRowSideFullHecke.HeightsSet.powLine A m).h z = A.h z ^ m := by
   induction m with
-  | zero => simp [IndefiniteRowSideFullHecke.HeightsSet.powLine, IndefiniteRowSideFullHecke.HeightsSet.constLine]
-  | succ m ih => simp [IndefiniteRowSideFullHecke.HeightsSet.powLine, ReciprocityTheory.ChartRestriction.G.Geo.HermLine.tensor, ih, pow_succ]
+  | zero =>
+    simp [IndefiniteRowSideFullHecke.HeightsSet.powLine,
+      IndefiniteRowSideFullHecke.HeightsSet.constLine]
+  | succ m ih =>
+    simp [IndefiniteRowSideFullHecke.HeightsSet.powLine,
+      ReciprocityTheory.ChartRestriction.G.Geo.HermLine.tensor, ih, pow_succ]
 
-theorem aeval_chartMon (y : (Σ k, ι k) → Ω) (c : (k : K) → ι k) (e : K → ℕ) :
-    aeval y (IndefiniteRowSideFullHecke.HeightsSet.chartMon c e) = ∏ k, y ⟨k, c k⟩ ^ e k := by
+theorem aeval_chartMon (y : (Σ k, ι k) → Ω) (c : (k : K) → ι k) (e : K → ℕ)
+    : aeval y (IndefiniteRowSideFullHecke.HeightsSet.chartMon c e) = ∏ k, y ⟨k, c k⟩ ^ e k := by
   simp [IndefiniteRowSideFullHecke.HeightsSet.chartMon, map_prod, map_pow]
 
-theorem vertR_le {W : Ideal (MRing ι)} {G H : MRing ι}
-    (h : ∀ V ∈ divSupp W H, V ∈ divSupp W G ∧
-      multAt (W ⊔ Ideal.span {H}) V ≤ multAt (W ⊔ Ideal.span {G}) V) :
-    vertR W (Fin.elim0 : Fin 0 → ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι) H ≤ vertR W (Fin.elim0 : Fin 0 → ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι) G := by
+theorem vertR_le
+    {W : Ideal (MRing ι)} {G H : MRing ι}
+    (h : ∀ V ∈ divSupp W H,
+      V ∈ divSupp W G ∧ multAt (W ⊔ Ideal.span {H}) V ≤ multAt (W ⊔ Ideal.span {G}) V)
+    : vertR W (Fin.elim0 : Fin 0 → ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι) H
+      ≤ vertR W (Fin.elim0 : Fin 0 → ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι) G := by
   classical
   unfold vertR
   rw [finsum_mem_eq_finite_toFinset_sum _ (divSupp_finite W H),
@@ -68,28 +76,35 @@ theorem vertR_le {W : Ideal (MRing ι)} {G H : MRing ι}
   have hsub : (divSupp_finite W H).toFinset ⊆ (divSupp_finite W G).toFinset := fun V hV ↦ by
     rw [Set.Finite.mem_toFinset] at hV ⊢
     exact (h V hV).1
-  have hc : ∀ V : Ideal (MRing ι), 0 ≤ (if IsHorizontal V then (0 : ℝ) else
-      (geoNum 0 V (fun j ↦ ((Fin.elim0 : Fin 0 → ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι) j).a) : ℝ) * Real.log (charOf V)) := by
+  have hc
+      : ∀ V : Ideal (MRing ι),
+        0 ≤ (if IsHorizontal V then
+               (0 : ℝ)
+             else
+               (geoNum 0 V (fun j ↦
+                     ((Fin.elim0 : Fin 0 → ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι)
+                       j).a)
+                   : ℝ)
+                 * Real.log (charOf V)) := by
     intro V
     split_ifs
     · exact le_rfl
-    · exact mul_nonneg (by exact_mod_cast IndefiniteRowSideFullHecke.HeightsSet.geoNum_zero_nonneg V _)
+    · exact mul_nonneg
+        (by exact_mod_cast IndefiniteRowSideFullHecke.HeightsSet.geoNum_zero_nonneg V _)
         (Real.log_natCast_nonneg _)
-  refine le_trans ?_ (Finset.sum_le_sum_of_subset_of_nonneg hsub fun V _ _ ↦
-    mul_nonneg (Nat.cast_nonneg _) (hc V))
+  refine le_trans ?_
+    (Finset.sum_le_sum_of_subset_of_nonneg hsub fun V _ _ ↦ mul_nonneg (Nat.cast_nonneg _) (hc V))
   refine Finset.sum_le_sum fun V hV ↦ ?_
   rw [Set.Finite.mem_toFinset] at hV
   exact mul_le_mul_of_nonneg_right (by exact_mod_cast (h V hV).2) (hc V)
 
 end SmallSectionPointHeight
 
-
 open SmallSectionPointHeight in
-theorem SmallSectionPointHeight.proof (hOrd : SectionOrderAtPoint.Statement) :
-    SmallSectionPointHeight.Statement := by
+theorem SmallSectionPointHeight.proof (hOrd : SectionOrderAtPoint.Statement)
+    : SmallSectionPointHeight.Statement := by
   intro K _ ι _ Ω _ y D A τ s II hII hP hbir hA hτ hs hs0 hsmall
   classical
-
   choose c hc using hP.2.1.2.2
   have hyc : ∀ k, y ⟨k, c k⟩ ≠ 0 := fun k ↦ coord_ne_zero (hc k)
 
@@ -103,16 +118,20 @@ theorem SmallSectionPointHeight.proof (hOrd : SectionOrderAtPoint.Statement) :
   set G := g0 * IndefiniteRowSideFullHecke.HeightsSet.chartMon c ap with hGdef
   set H := h0 * IndefiniteRowSideFullHecke.HeightsSet.chartMon c an with hHdef
   have hG : IsMultiHomog G (d + ap) :=
-    IndefiniteRowSideFullHecke.HeightsSet.isMultiHomog_mul hg0 (IndefiniteRowSideFullHecke.HeightsSet.isMultiHomog_chartMon c ap)
+    IndefiniteRowSideFullHecke.HeightsSet.isMultiHomog_mul hg0
+      (IndefiniteRowSideFullHecke.HeightsSet.isMultiHomog_chartMon c ap)
   have hH : IsMultiHomog H (d + an) :=
-    IndefiniteRowSideFullHecke.HeightsSet.isMultiHomog_mul hh0 (IndefiniteRowSideFullHecke.HeightsSet.isMultiHomog_chartMon c an)
+    IndefiniteRowSideFullHecke.HeightsSet.isMultiHomog_mul hh0
+      (IndefiniteRowSideFullHecke.HeightsSet.isMultiHomog_chartMon c an)
   have hdeg : ∀ k, ((d + ap) k : ℤ) = (d + an) k + τ * A.a k := fun k ↦ by
     simp only [Pi.add_apply, Nat.cast_add, hpn k]
     ring
   have hGH : aeval y G = s * aeval y H := by
-    have hprod : ∀ k, y ⟨k, c k⟩ ^ ap k = y ⟨k, c k⟩ ^ ((τ : ℤ) * A.a k) * y ⟨k, c k⟩ ^ an k := fun k ↦ by
+    have hprod
+        : ∀ k, y ⟨k, c k⟩ ^ ap k = y ⟨k, c k⟩ ^ ((τ : ℤ) * A.a k) * y ⟨k, c k⟩ ^ an k := fun k ↦ by
       rw [← zpow_natCast, ← zpow_natCast, ← zpow_add₀ (hyc k), hpn k, add_comm]
-    have h1 : (∏ k, y ⟨k, c k⟩ ^ (-((τ : ℤ) * A.a k))) * ∏ k, y ⟨k, c k⟩ ^ ((τ : ℤ) * A.a k) = 1 := by
+    have h1
+        : (∏ k, y ⟨k, c k⟩ ^ (-((τ : ℤ) * A.a k))) * ∏ k, y ⟨k, c k⟩ ^ ((τ : ℤ) * A.a k) = 1 := by
       rw [← Finset.prod_mul_distrib]
       exact Finset.prod_eq_one fun k _ ↦ by rw [← zpow_add₀ (hyc k), neg_add_cancel, zpow_zero]
     rw [hGdef, hHdef, map_mul, map_mul, aeval_chartMon, aeval_chartMon, hgh0,
@@ -124,8 +143,12 @@ theorem SmallSectionPointHeight.proof (hOrd : SectionOrderAtPoint.Statement) :
   have hGy : aeval y G ≠ 0 := by
     rw [hGH]
     exact mul_ne_zero hs0 hHy
-  refine ⟨G * H, ⟨_, IndefiniteRowSideFullHecke.HeightsSet.isMultiHomog_mul hG hH⟩,
-    notMem_mCoordIdeal (by rw [map_mul]; exact mul_ne_zero hGy hHy), ?_⟩
+  refine ⟨
+    G * H,
+    ⟨_, IndefiniteRowSideFullHecke.HeightsSet.isMultiHomog_mul hG hH⟩,
+    notMem_mCoordIdeal (by rw [map_mul]; exact mul_ne_zero hGy hHy),
+    ?_
+  ⟩
   intro W hW hPW hfW
   have hGW : G ∉ W := fun h ↦ hfW (W.mul_mem_right H h)
   have hHW : H ∉ W := fun h ↦ hfW (W.mul_mem_left G h)
@@ -135,7 +158,8 @@ theorem SmallSectionPointHeight.proof (hOrd : SectionOrderAtPoint.Statement) :
   have hE : IsSmoothHerm E := IndefiniteRowSideFullHecke.HeightsSet.isSmoothHerm_powLine hA τ
   set B := HermLine.sqMetric (ι := ι) (d + an) with hBdef
   have hB : IsSmoothHerm B := isSmoothHerm_sqMetric _
-  have hEB : IsSmoothHerm (E.tensor B) := IndefiniteRowSideFullHecke.HeightsSet.isSmoothHerm_tensor hE hB
+  have hEB : IsSmoothHerm (E.tensor B) :=
+    IndefiniteRowSideFullHecke.HeightsSet.isSmoothHerm_tensor hE hB
   have hEBa : ∀ k, (E.tensor B).a k = ((d + ap) k : ℕ) := fun k ↦ by
     show E.a k + B.a k = _
     rw [hEdef, IndefiniteRowSideFullHecke.HeightsSet.powLine_a, hdeg k]
@@ -144,20 +168,27 @@ theorem SmallSectionPointHeight.proof (hOrd : SectionOrderAtPoint.Statement) :
   have hsecG : IsSectionOn W (E.tensor B) G := ⟨_, hEBa, hG, hGW⟩
   have hsecH : IsSectionOn W B H := ⟨_, fun k ↦ rfl, hH, hHW⟩
   have hRG := IndefiniteRowSideFullHecke.HeightsSet.inter_eq_recR (II K ι) hI hW hEB hEBa hG hGW
-  have hRH := IndefiniteRowSideFullHecke.HeightsSet.inter_eq_recR (II K ι) hI hW hB (fun k ↦ rfl) hH hHW
+  have hRH :=
+    IndefiniteRowSideFullHecke.HeightsSet.inter_eq_recR (II K ι) hI hW hB (fun k ↦ rfl) hH hHW
   have hadd := IndefiniteRowSideFullHecke.HeightsSet.inter_tensor (II K ι) hI hW hE hB
   have hpow := IndefiniteRowSideFullHecke.HeightsSet.inter_powLine (II K ι) hI hW hA τ
   rw [recR_eq, Inter.cycR_eq_vertR_of_dimOne Inter.arithVarZero _ hW hsecG] at hRG
   rw [recR_eq, Inter.cycR_eq_vertR_of_dimOne Inter.arithVarZero _ hW hsecH] at hRH
 
-  have hvert := vertR_le (hOrd K ι Ω y A.a τ s W G H (d + ap) (d + an) hW hPW hs hG hH hdeg hGH hGW hHW)
+  have hvert :=
+    vertR_le (hOrd K ι Ω y A.a τ s W G H (d + ap) (d + an) hW hPW hs hG hH hdeg hGH hGW hHW)
 
-  have harch : arInt W G (E.tensor B) (Fin.elim0 : Fin 0 → ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι) ≤
-      arInt W H B (Fin.elim0 : Fin 0 → ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι) := by
+  have harch
+      : arInt W G (E.tensor B)
+          (Fin.elim0 : Fin 0 → ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι)
+        ≤ arInt W H B
+          (Fin.elim0 : Fin 0 → ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι) := by
     unfold arInt
     rw [Inter.ptsIntegral_add_of_dimOne fibreFinite hW _ (g₁ := logNorm B H)
-      (g₂ := fun z ↦ logNorm (E.tensor B) G z - logNorm B H z) fun z _ ↦ by ring]
-    refine add_le_of_nonpos_right (IndefiniteRowSideFullHecke.HeightsSet.ptsIntegral_nonpos W _ fun z hz ↦ ?_)
+      (g₂ := fun z ↦ logNorm (E.tensor B) G z - logNorm B H z)
+      fun z _ ↦ by ring]
+    refine add_le_of_nonpos_right (IndefiniteRowSideFullHecke.HeightsSet.ptsIntegral_nonpos W _
+      fun z hz ↦ ?_)
     show logNorm (E.tensor B) G z - logNorm B H z ≤ 0
     have hGz := norm_pos_iff.mpr (Inter.eval_ne_zero_of_dimOne Inter.arithVarZero hW hsecG hz)
     have hHz := norm_pos_iff.mpr (Inter.eval_ne_zero_of_dimOne Inter.arithVarZero hW hsecH hz)

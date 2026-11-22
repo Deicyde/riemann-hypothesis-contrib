@@ -30,7 +30,9 @@ section R2
 
 open PowerSeries
 
-private def DivisibilityInvariant {O : Type} [CommRing O] (ϖ : O) (e : ℕ) (f : PowerSeries O) (i m : ℕ) : Prop :=
+private def DivisibilityInvariant
+    {O : Type} [CommRing O] (ϖ : O) (e : ℕ) (f : PowerSeries O) (i m : ℕ)
+    : Prop :=
   ¬ ϖ ^ (m + 1) ∣ coeff i f ∧ ∀ t : ℕ, 1 ≤ t → ϖ ^ (m + 1 - e * t) ∣ coeff (i + t) f
 
 private lemma divisibilityInvariant_mul_linear {O : Type} [CommRing O] (ϖ c : O) (e : ℕ) (hc : ϖ ^ e ∣ c)
@@ -101,23 +103,25 @@ private lemma coeff_dvd_of_mem_span {O : Type} [CommRing O] (d : O) (B : ℕ) (F
 
 theorem content_divisibility : R2 := by
   intro O _ _ _ ϖ hϖ l hl e u he hlu f₁ a A' y B v₁ k _ hndiv hB hmem
-  have hnd0 : ¬ ϖ ^ (e * v₁ + 1) ∣ coeff 0 f₁ := by
-    rwa [coeff_zero_eq_constantCoeff_apply]
+  have hnd0 : ¬ ϖ ^ (e * v₁ + 1) ∣ coeff 0 f₁ := by rwa [coeff_zero_eq_constantCoeff_apply]
   obtain ⟨i₀, hi₀, hinv⟩ := exists_divisibilityInvariant ϖ e he f₁ v₁ hnd0
   have hl_dvd : ϖ ^ e ∣ (l : O) := ⟨u, by rw [hlu, mul_comm]⟩
   have hinv2 := divisibilityInvariant_mul_pow ϖ (l : O) e hl_dvd f₁ i₀ _ hinv A'
-  have hF : C ((l : O) ^ a) * f₁ * (X - C (l : O)) ^ A' * X ^ y =
-      (C ((l : O) ^ a) * (f₁ * (X - C (l : O)) ^ A')) * X ^ y := by ring
+  have hF
+      : C ((l : O) ^ a) * f₁ * (X - C (l : O)) ^ A' * X ^ y
+        = (C ((l : O) ^ a) * (f₁ * (X - C (l : O)) ^ A')) * X ^ y := by
+    ring
   have hj : i₀ + A' + y < B := by omega
   have hd := coeff_dvd_of_mem_span (ϖ ^ k) B _ hmem (i₀ + A' + y) hj
   rw [hF, coeff_mul_X_pow, coeff_C_mul] at hd
 
-  have hnd : ¬ ϖ ^ (e * (v₁ - i₀) + 1 + e * a) ∣
-      (l : O) ^ a * coeff (i₀ + A') (f₁ * (X - C (l : O)) ^ A') := by
+  have hnd : ¬ ϖ ^ (e * (v₁ - i₀) + 1 + e * a)
+      ∣ (l : O) ^ a * coeff (i₀ + A') (f₁ * (X - C (l : O)) ^ A') := by
     intro h
     apply hinv2.1
-    have h' : ϖ ^ (e * a) * ϖ ^ (e * (v₁ - i₀) + 1) ∣
-        ϖ ^ (e * a) * (((u ^ a : Oˣ) : O) * coeff (i₀ + A') (f₁ * (X - C (l : O)) ^ A')) := by
+    have h'
+        : ϖ ^ (e * a) * ϖ ^ (e * (v₁ - i₀) + 1)
+          ∣ ϖ ^ (e * a) * (((u ^ a : Oˣ) : O) * coeff (i₀ + A') (f₁ * (X - C (l : O)) ^ A')) := by
       rw [← pow_add, add_comm (e * a)]
       convert h using 1
       rw [hlu, Units.val_pow_eq_pow_val, mul_pow, ← pow_mul]
@@ -223,17 +227,17 @@ theorem killerKap_holds : KillerKap 8 := by
       Real.logb_le_logb_of_le (by linarith) (by norm_num) (by linarith)
     rw [Real.logb_self_eq_one (by linarith)] at this
     linarith
-  have hdiv : ∀ x : ℝ, 0 ≤ x → x / ((l : ℝ) - 1) ≤ x := fun x hx =>
-    div_le_self hx (by linarith)
+  have hdiv : ∀ x : ℝ, 0 ≤ x → x / ((l : ℝ) - 1) ≤ x := fun x hx => div_le_self hx (by linarith)
   have hG0 : (0 : ℝ) ≤ G := Nat.cast_nonneg _
   have hS0 : (0 : ℝ) ≤ S := Nat.cast_nonneg _
   have hr0 : (0 : ℝ) ≤ ro := Nat.cast_nonneg _
   have hL0 : (0 : ℝ) ≤ ell := Nat.cast_nonneg _
   have hrS : (0 : ℝ) ≤ (ro : ℝ) * S := mul_nonneg hr0 hS0
   rcases Nat.eq_zero_or_pos S with hS | hS
-  ·
-    have hJS : JS ⊆ Finset.Icc (-(2 * G : ℤ)) G ∪
-        Finset.univ.biUnion fun k : Fin 0 => Finset.Ico ((Fin.elim0 k : ℤ)) ((Fin.elim0 k : ℤ) + S) := by
+  · have hJS
+        : JS
+          ⊆ Finset.Icc (-(2 * G : ℤ)) G ∪ Finset.univ.biUnion fun k : Fin 0 =>
+            Finset.Ico ((Fin.elim0 k : ℤ)) ((Fin.elim0 k : ℤ) + S) := by
       intro i hi
       rcases Finset.mem_union.mp hi with h2 | h2
       · exact Finset.mem_union_left _ h2
@@ -253,8 +257,10 @@ theorem killerKap_holds : KillerKap 8 := by
     have hd2 := hdiv (S : ℝ) hS0
     have hS1 : (1 : ℝ) ≤ S := by exact_mod_cast hS
     have hrle : (ro : ℝ) ≤ ro * S := by nlinarith
-    have h3 : (ro : ℝ) * ((S : ℝ) / ((l : ℝ) - 1) + Real.logb l ((2 * h : ℕ) : ℝ)) ≤
-        ro * (S + (1 + Real.logb l h)) := mul_le_mul_of_nonneg_left (by linarith) hr0
+    have h3
+        : (ro : ℝ) * ((S : ℝ) / ((l : ℝ) - 1) + Real.logb l ((2 * h : ℕ) : ℝ))
+          ≤ ro * (S + (1 + Real.logb l h)) :=
+      mul_le_mul_of_nonneg_left (by linarith) hr0
     push_cast at hd1 h3 hlog ⊢
     nlinarith [mul_nonneg hG0 hL0, mul_nonneg hrS hL0, mul_nonneg hr0 hLh]
 
@@ -276,25 +282,31 @@ theorem killerKap_of_le {C : ℝ} (hC : 8 ≤ C) : KillerKap C := by
     add_nonneg (by positivity) (mul_nonneg (by positivity) hlog)
   exact h8.trans (mul_le_mul_of_nonneg_right hC hX)
 
-theorem lemma_M_prime_hypothesis (D : Formalism.BasicNotions.D7) (HW : Formalism.BasicNotions.HWOf D.loc) (F : Formalism.BasicNotions.FonOf D.loc D.locA HW) {C : ℝ} (hC : 8 ≤ C) (hLev : KillerLevL D.loc D.locA HW F)
-    (hMod : KillerModL D.loc D.locA HW F) : adm8 D HW F C :=
+theorem lemma_M_prime_hypothesis
+    (D : Formalism.BasicNotions.D7) (HW : Formalism.BasicNotions.HWOf D.loc)
+    (F : Formalism.BasicNotions.FonOf D.loc D.locA HW)
+    {C : ℝ} (hC : 8 ≤ C)
+    (hLev : KillerLevL D.loc D.locA HW F) (hMod : KillerModL D.loc D.locA HW F)
+    : adm8 D HW F C :=
   ⟨killerVal_holds, killerKills_holds, hLev, hMod, killerKap_of_le hC⟩
 
 open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
 
 section KillerBridge
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR}
-    {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
-    {v : AddValuation LL (WithTop ℚ)} {n : ℕ} (W : LocWach PD LL O v n)
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} (W : LocWach PD LL O v n)
 
-theorem γD_smulA (T : LocLat G Qp LL O) (g : W.Gam) (a : LetA O n) (x : W.DD T) :
-    W.γD T g (a • x) = W.γA g a • W.γD T g x := by
+theorem γD_smulA (T : LocLat G Qp LL O) (g : W.Gam) (a : LetA O n) (x : W.DD T)
+    : W.γD T g (a • x) = W.γA g a • W.γD T g x := by
   rw [← algebraMap_smul W.EE a x, W.γD_smul, W.γE_ext, algebraMap_smul]
   rfl
 
@@ -327,18 +339,24 @@ theorem killer_module_of_pi_stable (h : Pi0Stable W) : KillerModCore W := by
     · rw [smul_comm, ← γA_letE W W.gam c, ← γD_smulA, hc]
     · change W.γD T W.gam (W.π₀ • y) = _
       rw [γD_smulA, hπ, mul_smul]
-  exact Formalism.ExponentWindows.aeval_sub_eval_one_smul_mem O (W.DD T) (W.γ T) (piNc W T c) hst (PPO W ell JS) w hw
+  exact Formalism.ExponentWindows.aeval_sub_eval_one_smul_mem O (W.DD T) (W.γ T) (piNc W T c) hst
+    (PPO W ell JS) w hw
 
 end KillerBridge
 
-theorem killerModL_of (LT : LocTheory) (A : ∀ (l : ℕ) [Fact l.Prime], LocAinf l (LT l)) (HW : HWOf LT)
-    (F : FonOf LT A HW)
-    (h : AtCaseA fun l _ K LL hG => Pi0Stable ((HW l).W K 1 LL hG)) : KillerModL LT A HW F := by
+theorem killerModL_of
+    (LT : LocTheory) (A : ∀ (l : ℕ) [Fact l.Prime], LocAinf l (LT l)) (HW : HWOf LT)
+    (F : FonOf LT A HW) (h : AtCaseA fun l _ K LL hG => Pi0Stable ((HW l).W K 1 LL hG))
+    : KillerModL LT A HW F := by
   intro l _ K LL hG hA h5
   exact killer_module_of_pi_stable _ (h l K LL hG hA h5)
 
-theorem pi_stability_content_clause (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) {C : ℝ} (hC : 8 ≤ C) (hLev : KillerLevL D.loc D.locA HW F)
-    (h : AtCaseA fun l _ K LL hG => Pi0Stable ((HW l).W K 1 LL hG)) : adm8 D HW F C :=
+theorem pi_stability_content_clause
+    (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW)
+    {C : ℝ} (hC : 8 ≤ C)
+    (hLev : KillerLevL D.loc D.locA HW F)
+    (h : AtCaseA fun l _ K LL hG => Pi0Stable ((HW l).W K 1 LL hG))
+    : adm8 D HW F C :=
   lemma_M_prime_hypothesis D HW F hC hLev (killerModL_of D.loc D.locA HW F h)
 
 end Formalism.MainNotions.ArcLiftingSetup

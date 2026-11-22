@@ -13,8 +13,8 @@ namespace ReciprocityTheory.PGsh.Up
 
 variable {R : Type} [CommRing R]
 
-def matEquiv {d : ℕ} (P : Matrix (Fin d) (Fin d) R) (hP : IsUnit P.det) :
-    (Fin d → R) ≃ₗ[R] (Fin d → R) :=
+def matEquiv {d : ℕ} (P : Matrix (Fin d) (Fin d) R) (hP : IsUnit P.det)
+    : (Fin d → R) ≃ₗ[R] (Fin d → R) :=
   LinearEquiv.ofLinear (Matrix.toLin' P) (Matrix.toLin' P⁻¹)
     (by rw [← Matrix.toLin'_mul, mul_nonsing_inv _ hP, Matrix.toLin'_one])
     (by rw [← Matrix.toLin'_mul, nonsing_inv_mul _ hP, Matrix.toLin'_one])
@@ -42,16 +42,20 @@ private lemma hasLen_of_linearEquiv' {C : Type} [Field C] {v : Valuation C NNRea
   obtain ⟨m, c, ⟨e0⟩, hc⟩ := h
   exact ⟨m, c, ⟨e.symm.trans e0⟩, hc⟩
 
-theorem dualLen_fin {C : Type} [Field C] {v : Valuation C NNReal} [Algebra R C]
-    (hv : v.Integers R) {d n : ℕ} (A : Matrix (Fin d) (Fin n) R) (c : R) (hc : c ≠ 0)
-    (hkill : ∀ w : Fin d → R, ∃ t, A *ᵥ t = c • w) {c₁ : NNReal}
-    (hc₁ : HasLen v R ((Fin d → R) ⧸ LinearMap.range A.mulVecLin) c₁) :
-    ∃ y : NNReal, HasLen v R ((Fin d → R) ⧸ zSub A c) y ∧ y * c₁ = v (algebraMap R C c) ^ d := by
+theorem dualLen_fin
+    {C : Type} [Field C]
+    {v : Valuation C NNReal} [Algebra R C]
+    (hv : v.Integers R)
+    {d n : ℕ} (A : Matrix (Fin d) (Fin n) R)
+    (c : R) (hc : c ≠ 0) (hkill : ∀ w : Fin d → R, ∃ t, A *ᵥ t = c • w)
+    {c₁ : NNReal} (hc₁ : HasLen v R ((Fin d → R) ⧸ LinearMap.range A.mulVecLin) c₁)
+    : ∃ y : NNReal, HasLen v R ((Fin d → R) ⧸ zSub A c) y ∧ y * c₁ = v (algebraMap R C c) ^ d := by
   classical
-  have hsmith : ∀ (d n : ℕ) (A : Matrix (Fin d) (Fin n) R),
-      ∃ (P : Matrix (Fin d) (Fin d) R) (Q : Matrix (Fin n) (Fin n) R) (a : Fin d → R),
-        IsUnit P.det ∧ IsUnit Q.det ∧
-          ∀ j k, (P * A * Q) j k = if (k : ℕ) = (j : ℕ) then a j else 0 := by
+  have hsmith
+      : ∀ (d n : ℕ) (A : Matrix (Fin d) (Fin n) R),
+        ∃ (P : Matrix (Fin d) (Fin d) R) (Q : Matrix (Fin n) (Fin n) R) (a : Fin d → R),
+          IsUnit P.det ∧ IsUnit Q.det
+            ∧ ∀ j k, (P * A * Q) j k = if (k : ℕ) = (j : ℕ) then a j else 0 := by
     intro d
     induction d with
     | zero =>
@@ -70,12 +74,16 @@ theorem dualLen_fin {C : Type} [Field C] {v : Valuation C NNReal} [Algebra R C]
             simpa [g] using congrFun (hz ha j) i
           exact ⟨1, 1, 0, by simp, by simp, fun j k => by simp [hA]⟩
         · obtain ⟨j0, hj0, hs0⟩ := hnz ha
-          have hAj0 : ∀ i, A i j0 = a * u i := fun i => by
-            simpa [g] using congrFun hj0 i
+          have hAj0 : ∀ i, A i j0 = a * u i := fun i => by simpa [g] using congrFun hj0 i
           have hAi0 : ∀ l, A i0 l = a * s l := fun l => hs l
           set B := (Smith.Vm i0 u)ᵀ * A * Smith.Vm j0 s with hBdef
-          have hB : ∀ k l, B k l = if k = i0 then (if l = j0 then a else 0) else
-              (if l = j0 then 0 else A k l - s l * (a * u k)) := by
+          have hB
+              : ∀ k l,
+                B k l
+                  = if k = i0 then
+                      (if l = j0 then a else 0)
+                    else
+                      (if l = j0 then 0 else A k l - s l * (a * u k)) := by
             intro k l
             rw [hBdef, Matrix.mul_assoc, Smith.VmT_mul, Smith.mul_Vm, Smith.mul_Vm]
             by_cases hk : k = i0 <;> by_cases hl : l = j0
@@ -83,7 +91,8 @@ theorem dualLen_fin {C : Type} [Field C] {v : Valuation C NNReal} [Algebra R C]
             · subst hk; simp [hl, hAi0, hs0] <;> ring
             · subst hl; simp [hk, hAj0, hu] <;> ring
             · simp [hk, hl, hAj0, hAi0, hu] <;> ring
-          let A₀ : Matrix (Fin d) (Fin n) R := Matrix.of fun l k => B (i0.succAbove l) (j0.succAbove k)
+          let A₀ : Matrix (Fin d) (Fin n) R :=
+            Matrix.of fun l k => B (i0.succAbove l) (j0.succAbove k)
           obtain ⟨P₀, Q₀, a₀, hP₀, hQ₀, hD₀⟩ := ih n A₀
           set M := B.submatrix (Smith.piv i0) (Smith.piv j0) with hM
           let U : Matrix (Fin (d + 1)) (Fin (d + 1)) R := (Smith.piv i0).toPEquiv.toMatrix
@@ -94,8 +103,8 @@ theorem dualLen_fin {C : Type} [Field C] {v : Valuation C NNReal} [Algebra R C]
             rfl
           have hrow : ∀ k : Fin n, M 0 k.succ = 0 := by
             intro k
-            simp only [hM, Matrix.submatrix_apply, Smith.piv_zero, Smith.piv_succ, hB,
-              ite_true, Fin.succAbove_ne, ite_false]
+            simp only [hM, Matrix.submatrix_apply, Smith.piv_zero, Smith.piv_succ, hB, ite_true,
+              Fin.succAbove_ne, ite_false]
           have hcol : ∀ l : Fin d, M l.succ 0 = 0 := by
             intro l
             simp only [hM, Matrix.submatrix_apply, Smith.piv_zero, Smith.piv_succ, hB,
@@ -105,15 +114,22 @@ theorem dualLen_fin {C : Type} [Field C] {v : Valuation C NNReal} [Algebra R C]
             simp only [hM, Matrix.of_apply, Matrix.submatrix_apply, Smith.piv_succ]
             rfl
           obtain ⟨e00, e0s, es0, ess⟩ := Smith.blockOne_mul_mul_blockOne P₀ M Q₀ hrow hcol
-          refine ⟨Smith.bd1 P₀ * U * (Smith.Vm i0 u)ᵀ, Smith.Vm j0 s * V * Smith.bd1 Q₀,
-            Fin.cons a a₀, ?_, ?_, ?_⟩
+          refine ⟨
+            Smith.bd1 P₀ * U * (Smith.Vm i0 u)ᵀ,
+            Smith.Vm j0 s * V * Smith.bd1 Q₀,
+            Fin.cons a a₀,
+            ?_,
+            ?_,
+            ?_
+          ⟩
           · rw [Matrix.det_mul, Matrix.det_mul, Smith.det_blockOne_alt, Matrix.det_transpose,
               Smith.det_Vm, mul_one]
             exact hP₀.mul (Smith.isUnit_det_perm (Smith.piv i0))
           · rw [Matrix.det_mul, Matrix.det_mul, Smith.det_blockOne_alt, Smith.det_Vm, one_mul]
             exact (Smith.isUnit_det_perm (Smith.piv j0).symm).mul hQ₀
-          · have hfull : Smith.bd1 P₀ * U * (Smith.Vm i0 u)ᵀ * A *
-                  (Smith.Vm j0 s * V * Smith.bd1 Q₀) = Smith.bd1 P₀ * M * Smith.bd1 Q₀ := by
+          · have hfull
+                : Smith.bd1 P₀ * U * (Smith.Vm i0 u)ᵀ * A * (Smith.Vm j0 s * V * Smith.bd1 Q₀)
+                  = Smith.bd1 P₀ * M * Smith.bd1 Q₀ := by
               rw [← hM_eq, hBdef]
               simp only [Matrix.mul_assoc]
             intro j k
@@ -130,16 +146,18 @@ theorem dualLen_fin {C : Type} [Field C] {v : Valuation C NNReal} [Algebra R C]
   obtain ⟨P, Q, a, hP, hQ, hD⟩ := hsmith d n A
   have hPQ : ∀ t : Fin n → R, (P * A * Q) *ᵥ (Q⁻¹ *ᵥ t) = P *ᵥ (A *ᵥ t) := by
     intro t
-    rw [Matrix.mulVec_mulVec, Matrix.mul_assoc (P * A), Matrix.mul_nonsing_inv _ hQ,
-      Matrix.mul_one, ← Matrix.mulVec_mulVec]
-  have hDv : ∀ (s : Fin n → R) (j : Fin d),
-      ((P * A * Q) *ᵥ s) j = if h : (j : ℕ) < n then a j * s ⟨j, h⟩ else 0 := by
+    rw [Matrix.mulVec_mulVec, Matrix.mul_assoc (P * A), Matrix.mul_nonsing_inv _ hQ, Matrix.mul_one,
+      ← Matrix.mulVec_mulVec]
+  have hDv
+      : ∀ (s : Fin n → R) (j : Fin d),
+        ((P * A * Q) *ᵥ s) j = if h : (j : ℕ) < n then a j * s ⟨j, h⟩ else 0 := by
     intro s j
     have h1 := sum_val_eq (j : ℕ) (fun k => a j * s k)
     rw [← h1]
     simp only [Matrix.mulVec, dotProduct, hD, ite_mul, zero_mul]
-  have hDt : ∀ (y : Fin d → R) (k : Fin n),
-      ((P * A * Q)ᵀ *ᵥ y) k = if h : (k : ℕ) < d then a ⟨k, h⟩ * y ⟨k, h⟩ else 0 := by
+  have hDt
+      : ∀ (y : Fin d → R) (k : Fin n),
+        ((P * A * Q)ᵀ *ᵥ y) k = if h : (k : ℕ) < d then a ⟨k, h⟩ * y ⟨k, h⟩ else 0 := by
     intro y k
     have h1 := sum_val_eq (k : ℕ) (fun j => a j * y j)
     rw [← h1]
@@ -175,8 +193,9 @@ theorem dualLen_fin {C : Type} [Field C] {v : Valuation C NNReal} [Algebra R C]
       apply hv.hom_inj
       rw [h0, map_zero]
     exact mul_left_cancel₀ hne h'
-  have e1 : ((Fin d → R) ⧸ LinearMap.range A.mulVecLin) ≃ₗ[R]
-      ((Fin d → R) ⧸ Submodule.pi Set.univ (fun j => (Ideal.span {a j} : Submodule R R))) := by
+  have e1
+      : ((Fin d → R) ⧸ LinearMap.range A.mulVecLin) ≃ₗ[R]
+        ((Fin d → R) ⧸ Submodule.pi Set.univ (fun j => (Ideal.span {a j} : Submodule R R))) := by
     refine Submodule.Quotient.equiv _ _ (matEquiv P hP) ?_
     ext x
     rw [Submodule.mem_map, Submodule.mem_pi]
@@ -191,8 +210,11 @@ theorem dualLen_fin {C : Type} [Field C] {v : Valuation C NNReal} [Algebra R C]
       have hx' : ∀ j, ∃ s, s * a j = x j := fun j =>
         Ideal.mem_span_singleton'.mp (hx j (Set.mem_univ _))
       choose s hs using hx'
-      refine ⟨A *ᵥ (Q *ᵥ fun k => if h : (k : ℕ) < d then s ⟨k, h⟩ else 0),
-        LinearMap.mem_range.mpr ⟨_, rfl⟩, ?_⟩
+      refine ⟨
+        A *ᵥ (Q *ᵥ fun k => if h : (k : ℕ) < d then s ⟨k, h⟩ else 0),
+        LinearMap.mem_range.mpr ⟨_, rfl⟩,
+        ?_
+      ⟩
       simp only [LinearEquiv.coe_coe, matEquiv_apply]
       funext j
       rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hDv, dite_eq_left (hlt j)]
@@ -203,8 +225,9 @@ theorem dualLen_fin {C : Type} [Field C] {v : Valuation C NNReal} [Algebra R C]
     intro x
     rw [Matrix.transpose_mul, Matrix.transpose_mul, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec,
       Matrix.mul_assoc]
-  have e2 : ((Fin d → R) ⧸ zSub A c) ≃ₗ[R]
-      ((Fin d → R) ⧸ Submodule.pi Set.univ (fun j => (Ideal.span {b j} : Submodule R R))) := by
+  have e2
+      : ((Fin d → R) ⧸ zSub A c) ≃ₗ[R]
+        ((Fin d → R) ⧸ Submodule.pi Set.univ (fun j => (Ideal.span {b j} : Submodule R R))) := by
     have hPt : IsUnit Pᵀ.det := by rwa [Matrix.det_transpose]
     refine Submodule.Quotient.equiv _ _ (matEquiv Pᵀ hPt).symm ?_
     ext x
@@ -225,8 +248,8 @@ theorem dualLen_fin {C : Type} [Field C] {v : Valuation C NNReal} [Algebra R C]
       have hx' : ∀ j, ∃ s, s * b j = x j := fun j =>
         Ideal.mem_span_singleton'.mp (hx j (Set.mem_univ _))
       choose s hs using hx'
-      have h1 : (P * A * Q)ᵀ *ᵥ x =
-          c • (fun k : Fin n => if h : (k : ℕ) < d then s ⟨k, h⟩ else 0) := by
+      have h1
+          : (P * A * Q)ᵀ *ᵥ x = c • (fun k : Fin n => if h : (k : ℕ) < d then s ⟨k, h⟩ else 0) := by
         funext k
         rw [hDt, Pi.smul_apply, smul_eq_mul]
         by_cases h : (k : ℕ) < d
@@ -234,13 +257,14 @@ theorem dualLen_fin {C : Type} [Field C] {v : Valuation C NNReal} [Algebra R C]
           ring
         · rw [dite_eq_right h, dite_eq_right h, mul_zero]
       refine ⟨(Q⁻¹)ᵀ *ᵥ (fun k : Fin n => if h : (k : ℕ) < d then s ⟨k, h⟩ else 0), ?_⟩
-      calc Aᵀ *ᵥ (Pᵀ *ᵥ x) = (Q⁻¹)ᵀ *ᵥ ((P * A * Q)ᵀ *ᵥ x) := by
-            rw [hT, Matrix.mulVec_mulVec (M := (Q⁻¹)ᵀ) (N := Qᵀ), ← Matrix.transpose_mul,
-              Matrix.mul_nonsing_inv _ hQ,
-              Matrix.transpose_one, Matrix.one_mulVec]
+      calc
+        Aᵀ *ᵥ (Pᵀ *ᵥ x) = (Q⁻¹)ᵀ *ᵥ ((P * A * Q)ᵀ *ᵥ x) := by
+          rw [hT, Matrix.mulVec_mulVec (M := (Q⁻¹)ᵀ) (N := Qᵀ), ← Matrix.transpose_mul,
+            Matrix.mul_nonsing_inv _ hQ, Matrix.transpose_one, Matrix.one_mulVec]
         _ = _ := by rw [h1, Matrix.mulVec_smul]
-  have hA1 : HasLen v R ((Fin d → R) ⧸ LinearMap.range A.mulVecLin)
-      (∏ j, v (algebraMap R C (a j))) := hasLen_of_linearEquiv' (hasLen_pi v a) e1.symm
+  have hA1
+      : HasLen v R ((Fin d → R) ⧸ LinearMap.range A.mulVecLin) (∏ j, v (algebraMap R C (a j))) :=
+    hasLen_of_linearEquiv' (hasLen_pi v a) e1.symm
   have hc1 := hasLen_unique hv hc₁ hA1
   refine ⟨∏ j, v (algebraMap R C (b j)), hasLen_of_linearEquiv' (hasLen_pi v b) e2.symm, ?_⟩
   rw [hc1, ← Finset.prod_mul_distrib]

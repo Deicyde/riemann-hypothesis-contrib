@@ -6,19 +6,28 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Stick UpperTheory.V.FW
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Stick
+  UpperTheory.V.FW
 open scoped nonZeroDivisors
 
-private theorem totient_prime_pow_add_le_pow_mul_totient (l : ℕ) (hl : l.Prime) (n k : ℕ) :
-    (l ^ (n + k)).totient ≤ l ^ k * (l ^ n).totient := by
+private theorem totient_prime_pow_add_le_pow_mul_totient (l : ℕ) (hl : l.Prime) (n k : ℕ)
+    : (l ^ (n + k)).totient ≤ l ^ k * (l ^ n).totient := by
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · simpa using Nat.totient_le (l ^ k)
   · rw [Nat.totient_prime_pow hl (by omega), Nat.totient_prime_pow hl hn]
     have : n + k - 1 = k + (n - 1) := by omega
     rw [this, pow_add, mul_assoc]
 
-theorem UpperTheory.V.FW.embed :
-    ∀ (l : ℕ) [Fact l.Prime] (K : Type) [Field K] [NumberField K] [IsAbelianGalois ℚ K], ∃ f D : ℕ, f.Coprime l ∧ 1 < f ∧ ∀ (n n₀ : ℕ) (K' : Type) [Field K'] [NumberField K'] [Algebra K K'] [IsCyclotomicExtension {l ^ n} K K'], ∃ (m : ℕ) (L : Type) (_ : Field L) (_ : NumberField L) (_ : Algebra K' L) (_ : IsCyclotomicExtension {f * l ^ m} ℚ L), n₀ ≤ m ∧ Module.finrank K' L ≤ D * l ^ n₀ := by
+theorem UpperTheory.V.FW.embed
+    : ∀ (l : ℕ) [Fact l.Prime] (K : Type) [Field K] [NumberField K] [IsAbelianGalois ℚ K],
+      ∃ f D : ℕ,
+        f.Coprime l ∧ 1 < f
+          ∧ ∀ (n n₀ : ℕ) (K' : Type) [Field K'] [NumberField K'] [Algebra K K']
+              [IsCyclotomicExtension {l ^ n} K K'],
+            ∃ (m : ℕ) (L : Type) (_ : Field L) (_ : NumberField L) (_ : Algebra K' L)
+                (_ : IsCyclotomicExtension {f * l ^ m} ℚ L),
+              n₀ ≤ m ∧ Module.finrank K' L ≤ D * l ^ n₀ := by
   intro l hl K _ _ _
   have hp : l.Prime := hl.out
   obtain ⟨N, hN, ⟨φ⟩⟩ := CF.kwHom K
@@ -28,11 +37,11 @@ theorem UpperTheory.V.FW.embed :
     rcases Nat.eq_zero_or_pos f₀ with h | h
     · simp [h] at hN
     · exact h
-  have hlc : (l + 1).Coprime l := by
-    simp
+  have hlc : (l + 1).Coprime l := by simp
   refine ⟨f₀ * (l + 1), f₀ * (l + 1) * l ^ e, Nat.Coprime.mul_left hf₀c hlc, ?_, ?_⟩
   · have : 1 < l + 1 := by have := hp.one_lt; omega
-    calc 1 < l + 1 := this
+    calc
+      1 < l + 1 := this
       _ ≤ f₀ * (l + 1) := Nat.le_mul_of_pos_left _ hf₀pos
   intro n n₀ K' _ _ _ _
   set m := n + (e + n₀) with hm
@@ -52,8 +61,7 @@ theorem UpperTheory.V.FW.embed :
     refine ⟨f₀ * (l + 1) * l ^ (e + n₀), ?_⟩
     rw [hM, hm]
     ring
-  have hcyc : IsCyclotomicExtension {M} ℚ L :=
-    embCyc (l ^ e * f₀) (l ^ n) M K K' L hdvdN hdvdm ⟨φ⟩
+  have hcyc : IsCyclotomicExtension {M} ℚ L := embCyc (l ^ e * f₀) (l ^ n) M K K' L hdvdN hdvdm ⟨φ⟩
   refine ⟨m, L, inferInstance, inferInstance, inferInstance, hcyc, by omega, ?_⟩
   have hL : Module.finrank ℚ L = M.totient := IsCyclotomicExtension.Rat.finrank M L
   have hlnpos : 0 < l ^ n := pow_pos hp.pos n
@@ -67,16 +75,18 @@ theorem UpperTheory.V.FW.embed :
   have htot : M.totient ≤ f₀ * (l + 1) * l ^ e * l ^ n₀ * (l ^ n).totient := by
     have hco : (f₀ * (l + 1)).Coprime (l ^ m) := (Nat.Coprime.mul_left hf₀c hlc).pow_right m
     rw [hM, Nat.totient_mul hco]
-    calc (f₀ * (l + 1)).totient * (l ^ m).totient ≤ f₀ * (l + 1) * (l ^ m).totient :=
-          Nat.mul_le_mul_right _ (Nat.totient_le _)
+    calc
+      (f₀ * (l + 1)).totient * (l ^ m).totient
+        ≤ f₀ * (l + 1) * (l ^ m).totient := Nat.mul_le_mul_right _ (Nat.totient_le _)
       _ ≤ f₀ * (l + 1) * (l ^ (e + n₀) * (l ^ n).totient) :=
-          Nat.mul_le_mul_left _ (totient_prime_pow_add_le_pow_mul_totient l hp n (e + n₀))
+        Nat.mul_le_mul_left _ (totient_prime_pow_add_le_pow_mul_totient l hp n (e + n₀))
       _ = f₀ * (l + 1) * l ^ e * l ^ n₀ * (l ^ n).totient := by
-          rw [pow_add]
-          ring
+        rw [pow_add]
+        ring
   have htpos : 0 < (l ^ n).totient := Nat.totient_pos.2 hlnpos
   refine Nat.le_of_mul_le_mul_right ?_ htpos
-  calc Module.finrank K' L * (l ^ n).totient ≤ Module.finrank K' L * Module.finrank ℚ K' :=
-        Nat.mul_le_mul_left _ hK'
+  calc
+    Module.finrank K' L * (l ^ n).totient
+      ≤ Module.finrank K' L * Module.finrank ℚ K' := Nat.mul_le_mul_left _ hK'
     _ = M.totient := by rw [mul_comm, htow, hL]
     _ ≤ f₀ * (l + 1) * l ^ e * l ^ n₀ * (l ^ n).totient := htot

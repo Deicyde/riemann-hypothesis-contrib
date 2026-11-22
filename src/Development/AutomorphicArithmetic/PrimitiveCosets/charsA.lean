@@ -7,21 +7,24 @@ public import Development.AutomorphicArithmetic.PrimitiveCosets.TopsSum
 
 @[expose] public section
 
-open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5 Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
+open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5
+  Formalism.RankGapBounds.WeightedMeanData Formalism.LFunctionChainParameters.WeightedSlopeBounds
+  Formalism.LFunctionChainParameters.characterSumData
+  Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LErr
   Formalism.LFunctionChainParameters.LChain Formalism.LFunctionChainParameters.LHost
 
-private theorem embedding_generator_eq (φ : Frame) (s : φ.A) : toE φ (φ.tau1 s) = Multiplicative.ofAdd ((0 : E0), s) := by
-  first
-  | rfl
-  | simp [toE, Frame.tau1, Frame.iota, Frame.iotaInv, sgn2]
+private theorem embedding_generator_eq (φ : Frame) (s : φ.A)
+    : toE φ (φ.tau1 s) = Multiplicative.ofAdd ((0 : E0), s) := by
+  first | rfl | simp [toE, Frame.tau1, Frame.iota, Frame.iotaInv, sgn2]
 
-private theorem toE_iod (φ : Frame) : toE φ φ.iod = Multiplicative.ofAdd (sgc0 : E0 × φ.A) := by
+private theorem toE_iod (φ : Frame) : toE φ φ.iod = Multiplicative.ofAdd (sgc0 : E0 × φ.A) := by rfl
+
+private theorem chr_coe_eq_addChar_toE (φ : Frame) (ψ : AddChar (E0 × φ.A) ℂ) (g : φ.GG)
+    : ((chr φ ψ g : ℂˣ) : ℂ) = ψ (Multiplicative.toAdd (toE φ g)) :=
   rfl
 
-private theorem chr_coe_eq_addChar_toE (φ : Frame) (ψ : AddChar (E0 × φ.A) ℂ) (g : φ.GG) :
-    ((chr φ ψ g : ℂˣ) : ℂ) = ψ (Multiplicative.toAdd (toE φ g)) := rfl
-
-private theorem mem_PsiA_iff (φ : Frame) (ψ : AddChar (E0 × φ.A) ℂ) : ψ ∈ PsiA φ.A0 ↔ Frame.TrivialOnFirstFactor (chr φ ψ) := by
+private theorem mem_PsiA_iff (φ : Frame) (ψ : AddChar (E0 × φ.A) ℂ)
+    : ψ ∈ PsiA φ.A0 ↔ Frame.TrivialOnFirstFactor (chr φ ψ) := by
   have key : ∀ s : φ.A, ((chr φ ψ (φ.tau1 s) : ℂˣ) : ℂ) = ψ ((0 : E0), s) := by
     intro s
     rw [chr_coe_eq_addChar_toE, embedding_generator_eq]
@@ -37,16 +40,17 @@ private theorem mem_PsiA_iff (φ : Frame) (ψ : AddChar (E0 × φ.A) ℂ) : ψ �
     rw [key, Units.val_one] at h2
     exact h2
 
-private theorem mem_keptA (Λ : Level) (φ : Frame) (H : HostRaw φ) (ψ : AddChar (E0 × φ.A) ℂ) :
-    ψ ∈ keptA Λ H ↔ H.Kept Λ.KEPT (chr φ ψ) := by
+private theorem mem_keptA (Λ : Level) (φ : Frame) (H : HostRaw φ) (ψ : AddChar (E0 × φ.A) ℂ)
+    : ψ ∈ keptA Λ H ↔ H.Kept Λ.KEPT (chr φ ψ) := by
   simp [keptA]
 
-private theorem chr_bounded (Λ : Level) (φ : Frame) (H : HostRaw φ) (ψ : AddChar (E0 × φ.A) ℂ) (h : ψ ∈ PsiA φ.A0)
-    (hk : ψ ∉ keptA Λ H) : chr φ ψ ∈ H.Bounded Λ.KEPT := by
+private theorem chr_bounded
+    (Λ : Level) (φ : Frame) (H : HostRaw φ) (ψ : AddChar (E0 × φ.A) ℂ)
+    (h : ψ ∈ PsiA φ.A0) (hk : ψ ∉ keptA Λ H)
+    : chr φ ψ ∈ H.Bounded Λ.KEPT := by
   have h1 := (mem_PsiA_iff φ ψ).1 h
   have h2 : ¬ H.Kept Λ.KEPT (chr φ ψ) := fun h => hk ((mem_keptA Λ φ H ψ).2 h)
-  have h3 : φ.iod * φ.iod = 1 := by
-    simp [Frame.iod]
+  have h3 : φ.iod * φ.iod = 1 := by simp [Frame.iod]
   have h4 : chr φ ψ φ.iod * chr φ ψ φ.iod = 1 := by rw [← map_mul, h3, map_one]
   have h5 : ((chr φ ψ φ.iod : ℂˣ) : ℂ) * ((chr φ ψ φ.iod : ℂˣ) : ℂ) = 1 := by
     rw [← Units.val_mul, h4, Units.val_one]
@@ -54,8 +58,9 @@ private theorem chr_bounded (Λ : Level) (φ : Frame) (H : HostRaw φ) (ψ : Add
   · exact Or.inl ⟨⟨h1, Units.ext h6⟩, h2⟩
   · exact Or.inr ⟨h1, Units.ext h6⟩
 
-private theorem eq_of_prim_eq (φ : Frame) (H : HostAx φ) (θ θ' : φ.Char)
-    (h : H.toHostRaw.prim θ = H.toHostRaw.prim θ') : θ = θ' := by
+private theorem eq_of_prim_eq
+    (φ : Frame) (H : HostAx φ) (θ θ' : φ.Char) (h : H.toHostRaw.prim θ = H.toHostRaw.prim θ')
+    : θ = θ' := by
   apply MonoidHom.ext
   intro g
   obtain ⟨u, rfl⟩ := HostDer.art_surj H.der g
@@ -68,7 +73,8 @@ private theorem eq_of_prim_eq (φ : Frame) (H : HostAx φ) (θ θ' : φ.Char)
   rw [← HostRaw.dir_unit, ← HostRaw.dir_unit]
   simpa [HostRaw.dirAt, ZMod.natCast_zmod_val] using e
 
-private theorem zero_kept (Λ : Level) (φ : Frame) (H : HostRaw φ) : (0 : AddChar (E0 × φ.A) ℂ) ∈ keptA Λ H := by
+private theorem zero_kept (Λ : Level) (φ : Frame) (H : HostRaw φ)
+    : (0 : AddChar (E0 × φ.A) ℂ) ∈ keptA Λ H := by
   rw [mem_keptA, HostRaw.kept_iff]
   have hc : chr φ 0 = 1 := by
     refine MonoidHom.ext fun g => Units.ext ?_
@@ -81,10 +87,12 @@ private theorem zero_kept (Λ : Level) (φ : Frame) (H : HostRaw φ) : (0 : AddC
   rw [hc, HostRaw.prim, hd, PChar.of_one]
   exact Λ.one_mem
 
-theorem UpperTheory.Comparison₂.charsA :
-    ∀ (Λ : Level) (φ : Frame) (H : HostAx φ) (TT : Finset φ.A) (x eps C : ℝ) (ell : AddChar (E0 × φ.A) ℂ → ℂ), 0 < x →
-      EAtH Λ H.toHostRaw TT x eps C → HostAddCharCompatible H.toHostRaw ell →
-        CharsA ell φ.A0 (keptA Λ H.toHostRaw) TT (3 * (Λ.o : ℝ) + 1)⁻¹ (4 * (Λ.o : ℝ)) (koOf Λ) C eps x := by
+theorem UpperTheory.Comparison₂.charsA
+    : ∀ (Λ : Level) (φ : Frame) (H : HostAx φ) (TT : Finset φ.A) (x eps C : ℝ)
+        (ell : AddChar (E0 × φ.A) ℂ → ℂ),
+      0 < x → EAtH Λ H.toHostRaw TT x eps C → HostAddCharCompatible H.toHostRaw ell
+        → CharsA ell φ.A0 (keptA Λ H.toHostRaw) TT (3 * (Λ.o : ℝ) + 1)⁻¹ (4 * (Λ.o : ℝ)) (koOf Λ) C
+          eps x := by
   intro Λ φ H TT x eps C ell hx hE hL
   have ho := hE.o_eq
   have kept_xp : ∀ ψ ∈ keptA Λ H.toHostRaw, chr φ ψ ∈ φ.Xp := by
@@ -118,7 +126,10 @@ theorem UpperTheory.Comparison₂.charsA :
     rw [(prim_read φ H ell hL ψ).1 hne, koOf]
     have hm : H.toHostRaw.prim (chr φ ψ) ∈ Λ.KEPT :=
       (HostRaw.kept_iff _ _ _).1 ((mem_keptA Λ φ H.toHostRaw ψ).1 hψ)
-    exact Finset.single_le_sum (f := fun p : PChar => ‖An.logDerivativeAtOne p.χ‖) (fun _ _ => norm_nonneg _) hm
+    exact Finset.single_le_sum
+      (f := fun p : PChar => ‖An.logDerivativeAtOne p.χ‖)
+      (fun _ _ => norm_nonneg _)
+      hm
   · intro ψ hP hk
     have hne : ψ ≠ 0 := by
       rintro rfl

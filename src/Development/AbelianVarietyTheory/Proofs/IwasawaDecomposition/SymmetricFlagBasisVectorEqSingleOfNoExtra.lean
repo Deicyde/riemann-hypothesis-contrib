@@ -12,7 +12,9 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IntegralD
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 Matrix
 open scoped TensorProduct
 
 noncomputable section
@@ -25,26 +27,35 @@ section Local
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {P : HeightOneSpectrum (𝓞 E)} {n : ℕ}
 
-theorem extE_zero (κ : Sp E n ≃ₗ[E] Sp E n) (v : Sp E (n + 0)) : GlobalTheory.CongLevel.extE 0 κ v = κ v := by
+theorem extE_zero (κ : Sp E n ≃ₗ[E] Sp E n) (v : Sp E (n + 0))
+    : GlobalTheory.CongLevel.extE 0 κ v = κ v := by
   funext l
-  rw [GlobalTheory.CongLevel.extE_apply, Pi.add_apply, GlobalTheory.CongLevel.inX_apply, dite_eq_left (show l.1 < n from l.2)]
+  rw [GlobalTheory.CongLevel.extE_apply, Pi.add_apply, GlobalTheory.CongLevel.inX_apply,
+    dite_eq_left (show l.1 < n from l.2)]
   show v l + (κ v l - v l) = κ v l
   ring
 
 omit [StarRing E] in
-theorem intAt_of_ite {a : E} {p : Prop} [Decidable p]
-    (h : IntAt P (((qOf P : E) ^ (if p then (1 : ℤ) else 0))⁻¹ * a)) : IntAt P a := by
+theorem intAt_of_ite
+    {a : E} {p : Prop} [Decidable p]
+    (h : IntAt P (((qOf P : E) ^ (if p then (1 : ℤ) else 0))⁻¹ * a))
+    : IntAt P a := by
   split_ifs at h
   · have := (intAt_nat (P := P) (qOf P)).mul h
     rwa [zpow_one, mul_inv_cancel_left₀ qOf_ne_zero] at this
   · simpa using h
 
-theorem maps_D (hd : ∀ a : E, IntAt P a → redP P a = 0 → IntAt P (a / (qOf P : E))) (κ : GLint E n P)
-    (D : ℕ → Prop) [DecidablePred D] (h : ∀ l b : Fin n, D l.1 → ¬ D b.1 → redMat κ l b = 0) (x : Sp E n)
-    (hx : ∀ l : Fin n, IntAt P (((qOf P : E) ^ (if D l.1 then (1 : ℤ) else 0))⁻¹ * x l)) :
-    ∀ l : Fin n, IntAt P (((qOf P : E) ^ (if D l.1 then (1 : ℤ) else 0))⁻¹ * κ.1 x l) := by
+theorem maps_D
+    (hd : ∀ a : E, IntAt P a → redP P a = 0 → IntAt P (a / (qOf P : E)))
+    (κ : GLint E n P)
+    (D : ℕ → Prop) [DecidablePred D]
+    (h : ∀ l b : Fin n, D l.1 → ¬ D b.1 → redMat κ l b = 0)
+    (x : Sp E n)
+    (hx : ∀ l : Fin n, IntAt P (((qOf P : E) ^ (if D l.1 then (1 : ℤ) else 0))⁻¹ * x l))
+    : ∀ l : Fin n, IntAt P (((qOf P : E) ^ (if D l.1 then (1 : ℤ) else 0))⁻¹ * κ.1 x l) := by
   intro l
-  have e : κ.1 x l = ∑ b, x b * κ.1 (Pi.single b 1) l := apply_eq_sum (κ.1 : Sp E n →ₗ[E] Sp E n) x l
+  have e : κ.1 x l = ∑ b, x b * κ.1 (Pi.single b 1) l :=
+    apply_eq_sum (κ.1 : Sp E n →ₗ[E] Sp E n) x l
   rw [e, Finset.mul_sum]
   refine intAt_sum _ fun b _ => ?_
   have ha := glint_entry κ l b
@@ -64,19 +75,24 @@ theorem maps_D (hd : ∀ a : E, IntAt P a → redP P a = 0 → IntAt P (a / (qOf
   · rw [if_neg hl, zpow_zero, inv_one, one_mul]
     exact hxb.mul ha
 
-theorem stab_D (hd : ∀ a : E, IntAt P a → redP P a = 0 → IntAt P (a / (qOf P : E))) (κ : GLint E n P)
-    (D : ℕ → Prop) [DecidablePred D] (h : ∀ l b : Fin n, D l.1 → ¬ D b.1 → redMat κ l b = 0)
-    (h' : ∀ l b : Fin n, D l.1 → ¬ D b.1 → redMat κ⁻¹ l b = 0) (x : Sp E n) :
-    (∀ l : Fin n, IntAt P (((qOf P : E) ^ (if D l.1 then (1 : ℤ) else 0))⁻¹ * κ.1 x l)) ↔
-      ∀ l : Fin n, IntAt P (((qOf P : E) ^ (if D l.1 then (1 : ℤ) else 0))⁻¹ * x l) := by
+theorem stab_D
+    (hd : ∀ a : E, IntAt P a → redP P a = 0 → IntAt P (a / (qOf P : E)))
+    (κ : GLint E n P)
+    (D : ℕ → Prop) [DecidablePred D]
+    (h : ∀ l b : Fin n, D l.1 → ¬ D b.1 → redMat κ l b = 0)
+    (h' : ∀ l b : Fin n, D l.1 → ¬ D b.1 → redMat κ⁻¹ l b = 0) (x : Sp E n)
+    : (∀ l : Fin n, IntAt P (((qOf P : E) ^ (if D l.1 then (1 : ℤ) else 0))⁻¹ * κ.1 x l))
+      ↔ ∀ l : Fin n, IntAt P (((qOf P : E) ^ (if D l.1 then (1 : ℤ) else 0))⁻¹ * x l) := by
   refine ⟨fun hx => ?_, maps_D hd κ D h x⟩
   have := maps_D hd κ⁻¹ D h' _ hx
   have e : (κ⁻¹ : GLint E n P).1 (κ.1 x) = x := κ.1.symm_apply_apply x
   rwa [e] at this
 
-theorem mem_symmetricFlagLattice_iff_of_no_extra (k rS s : ℕ) (x : Sp E (n + 0)) :
-    x ∈ LocE.flagS P (qOf P) k rS n 0 s ↔
-      ∀ l : Fin n, IntAt P (((qOf P : E) ^ (if LocE.bd5 k rS s ≤ symIdx k rS l.1 then (1 : ℤ) else 0))⁻¹ * x l) := by
+theorem mem_symmetricFlagLattice_iff_of_no_extra (k rS s : ℕ) (x : Sp E (n + 0))
+    : x ∈ LocE.flagS P (qOf P) k rS n 0 s
+      ↔ ∀ l : Fin n,
+        IntAt P
+          (((qOf P : E) ^ (if LocE.bd5 k rS s ≤ symIdx k rS l.1 then (1 : ℤ) else 0))⁻¹ * x l) := by
   unfold LocE.flagS
   rw [GlobalTheory.CongLevel.mem_sclLat]
   refine forall_congr' fun l => ?_
@@ -86,10 +102,11 @@ theorem mem_symmetricFlagLattice_iff_of_no_extra (k rS s : ℕ) (x : Sp E (n + 0
   rw [hf, hs, zero_add]
 
 omit [StarRing E] in
-theorem symmetricFlagBasisVector_eq_single_of_no_extra (k rS s : ℕ) (h : symIdxInv k rS s < n) :
-    LocE.bvecS E (qOf P) k rS n 0 s = (Pi.single (⟨symIdxInv k rS s, h⟩ : Fin n) 1 : Sp E n) := by
+theorem symmetricFlagBasisVector_eq_single_of_no_extra (k rS s : ℕ) (h : symIdxInv k rS s < n)
+    : LocE.bvecS E (qOf P) k rS n 0 s = (Pi.single (⟨symIdxInv k rS s, h⟩ : Fin n) 1 : Sp E n) := by
   unfold LocE.bvecS LocE.bvecG
-  have hf : LocE.fIdx k 0 n (symIdxInv k rS s) = symIdxInv k rS s := by unfold LocE.fIdx; split_ifs <;> omega
+  have hf : LocE.fIdx k 0 n (symIdxInv k rS s) = symIdxInv k rS s := by
+    unfold LocE.fIdx; split_ifs <;> omega
   have hs : LocE.scE n (fun i => i + 1) (symIdxInv k rS s) = 0 := by unfold LocE.scE; rw [if_pos h]
   rw [hf, hs, zpow_zero, one_smul]
   funext l
@@ -104,8 +121,8 @@ namespace GlobalTheory.Mem.LastGrp
 
 open GlobalTheory.TopStep
 
-theorem lv_lt {k rS t b l : ℕ} (hb : b < rSym k rS) (h : symIdx k rS b < symIdx k rS l) :
-    lvSym k rS t b < lvSym k rS t l := by
+theorem lv_lt {k rS t b l : ℕ} (hb : b < rSym k rS) (h : symIdx k rS b < symIdx k rS l)
+    : lvSym k rS t b < lvSym k rS t l := by
   rw [lvSym_of_lt hb]
   by_cases hl : l < rSym k rS
   · rw [lvSym_of_lt hl]
@@ -115,9 +132,10 @@ theorem lv_lt {k rS t b l : ℕ} (hb : b < rSym k rS) (h : symIdx k rS b < symId
     have h2 := posSym_lt hb
     omega
 
-theorem lv_flag {k rS t s l b : ℕ} (hs : s < rSym k rS ∨ ∃ i, s = rSym k rS + i * t)
-    (hl : LocE.bd5 k rS s ≤ symIdx k rS l) (hb : ¬ LocE.bd5 k rS s ≤ symIdx k rS b) :
-    lvSym k rS t b < lvSym k rS t l := by
+theorem lv_flag
+    {k rS t s l b : ℕ} (hs : s < rSym k rS ∨ ∃ i, s = rSym k rS + i * t)
+    (hl : LocE.bd5 k rS s ≤ symIdx k rS l) (hb : ¬ LocE.bd5 k rS s ≤ symIdx k rS b)
+    : lvSym k rS t b < lvSym k rS t l := by
   have hbl : symIdx k rS b < symIdx k rS l := by omega
   by_cases hbr : b < rSym k rS
   · exact lv_lt hbr hbl
@@ -129,8 +147,7 @@ theorem lv_flag {k rS t s l b : ℕ} (hs : s < rSym k rS ∨ ∃ i, s = rSym k r
     · have hd : LocE.bd5 k rS (rSym k rS + i * t) = rSym k rS + i * t := by
         unfold LocE.bd5 rSym; rw [if_neg (by omega)]
       rw [hd] at hl hb
-      have hlr : ¬ l < rSym k rS := by
-        intro h; unfold symIdx rSym at *; split_ifs at hl <;> omega
+      have hlr : ¬ l < rSym k rS := by intro h; unfold symIdx rSym at *; split_ifs at hl <;> omega
       have hsl : symIdx k rS l = l := by unfold symIdx rSym at *; split_ifs <;> omega
       rw [hsb] at hb
       rw [hsl] at hl
@@ -154,29 +171,42 @@ section Local
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {P : HeightOneSpectrum (𝓞 E)} {n : ℕ}
 
-theorem mem_JGsym0 (hd : ∀ a : E, IntAt P a → redP P a = 0 → IntAt P (a / (qOf P : E))) {k rS t : ℕ}
-    (hn : rSym k rS ≤ n) (κ : GLint E n P)
-    (h1 : ∀ x y : Fin n, lvSym k rS t y.1 < lvSym k rS t x.1 → redMat κ x y = 0)
+theorem mem_JGsym0
+    (hd : ∀ a : E, IntAt P a → redP P a = 0 → IntAt P (a / (qOf P : E)))
+    {k rS t : ℕ} (hn : rSym k rS ≤ n)
+    (κ : GLint E n P) (h1 : ∀ x y : Fin n, lvSym k rS t y.1 < lvSym k rS t x.1 → redMat κ x y = 0)
     (h1' : ∀ x y : Fin n, lvSym k rS t y.1 < lvSym k rS t x.1 → redMat κ⁻¹ x y = 0)
     (h2 : ∀ x : Fin n, x.1 < rSym k rS → redMat κ x x = 1)
-    (h3 : ∀ x y : Fin n, x.1 < k → y.1 = k + rS → redMat κ x y = 0) :
-    GlobalTheory.CongLevel.extE 0 κ.1 ∈ LocE.JGsym P (qOf P) k rS (rSym k rS) t n 0 := by
-  have hst : ∀ s, (s < rSym k rS ∨ ∃ i, s = rSym k rS + i * t) →
-      GlobalTheory.CongLevel.extE 0 κ.1 ∈ stabL E (n + 0) (LocE.flagS P (qOf P) k rS n 0 s) := by
+    (h3 : ∀ x y : Fin n, x.1 < k → y.1 = k + rS → redMat κ x y = 0)
+    : GlobalTheory.CongLevel.extE 0 κ.1 ∈ LocE.JGsym P (qOf P) k rS (rSym k rS) t n 0 := by
+  have hst
+      : ∀ s,
+        (s < rSym k rS ∨ ∃ i, s = rSym k rS + i * t)
+          → GlobalTheory.CongLevel.extE 0 κ.1
+            ∈ stabL E (n + 0) (LocE.flagS P (qOf P) k rS n 0 s) := by
     intro s hs v
-    rw [extE_zero, mem_symmetricFlagLattice_iff_of_no_extra, mem_symmetricFlagLattice_iff_of_no_extra]
-    exact stab_D hd κ (fun y => LocE.bd5 k rS s ≤ symIdx k rS y) (fun l b hl hb => h1 l b (lv_flag hs hl hb))
-      (fun l b hl hb => h1' l b (lv_flag hs hl hb)) v
-  refine ⟨GlobalTheory.CongLevel.extE_stab P (qOf P) 0 _ κ.1 κ.2, fun s hs => hst s (Or.inr hs),
-    fun s hs => ⟨hst s (Or.inl hs), ?_⟩⟩
+    rw [extE_zero, mem_symmetricFlagLattice_iff_of_no_extra,
+      mem_symmetricFlagLattice_iff_of_no_extra]
+    exact stab_D hd κ
+      (fun y => LocE.bd5 k rS s ≤ symIdx k rS y)
+      (fun l b hl hb => h1 l b (lv_flag hs hl hb))
+      (fun l b hl hb => h1' l b (lv_flag hs hl hb))
+      v
+  refine ⟨
+    GlobalTheory.CongLevel.extE_stab P (qOf P) 0 _ κ.1 κ.2,
+    fun s hs => hst s (Or.inr hs),
+    fun s hs => ⟨hst s (Or.inl hs), ?_⟩
+  ⟩
   have hb : symIdxInv k rS s < n := by unfold symIdxInv rSym at *; split_ifs <;> omega
-  rw [extE_zero, symmetricFlagBasisVector_eq_single_of_no_extra k rS s hb, mem_symmetricFlagLattice_iff_of_no_extra]
+  rw [extE_zero, symmetricFlagBasisVector_eq_single_of_no_extra k rS s hb,
+    mem_symmetricFlagLattice_iff_of_no_extra]
   intro l
   set b : Fin n := ⟨symIdxInv k rS s, hb⟩ with hbdef
   have ha := glint_entry κ l b
   have hbr : b.1 < rSym k rS := by
     show symIdxInv k rS s < rSym k rS
-    unfold symIdxInv rSym at *; split_ifs <;> omega
+    unfold symIdxInv rSym at *
+    split_ifs <;> omega
   have hsg : IntAt P ((Pi.single b 1 : Sp E n) l) := by
     by_cases h : l = b
     · subst h; simpa using intAt_one
@@ -194,7 +224,8 @@ theorem mem_JGsym0 (hd : ∀ a : E, IntAt P a → redP P a = 0 → IntAt P (a / 
         by_cases hsk : s = rS + k
         · have hb1 : b.1 = k + rS := by
             show symIdxInv k rS s = k + rS
-            unfold symIdxInv; split_ifs <;> omega
+            unfold symIdxInv
+            split_ifs <;> omega
           by_cases hlk : l.1 < k
           · exact h3 l b hlk hb1
           · refine h1 l b (lv_lt (by rw [hb1]; unfold rSym; omega) ?_)
@@ -207,14 +238,16 @@ theorem mem_JGsym0 (hd : ∀ a : E, IntAt P a → redP P a = 0 → IntAt P (a / 
         · have hd5 : LocE.bd5 k rS s = s := by unfold LocE.bd5; rw [if_neg hsk]
           rw [hd5] at hl
           refine h1 l b (lv_lt hbr ?_)
-          have hne : symIdx k rS l.1 ≠ symIdx k rS b.1 := fun e => hlb (Fin.ext (by
-            have := congrArg (symIdxInv k rS) e
-            rwa [symIdxInv_symIdx, symIdxInv_symIdx] at this))
+          have hne : symIdx k rS l.1 ≠ symIdx k rS b.1 := fun e =>
+            hlb (Fin.ext (by
+              have := congrArg (symIdxInv k rS) e
+              rwa [symIdxInv_symIdx, symIdxInv_symIdx] at this))
           omega
     have h0 : redP P (κ.1 (Pi.single b 1) l - (Pi.single b 1 : Sp E n) l) = 0 := by
       rw [reduction_sub ha hsg]
       have e1 : redP P (κ.1 (Pi.single b 1) l) = redMat κ l b := rfl
-      have e2 : redP P ((Pi.single b 1 : Sp E n) l) = (Pi.single b 1 : Fin n → 𝓞 E ⧸ P.asIdeal) l := by
+      have e2
+          : redP P ((Pi.single b 1 : Sp E n) l) = (Pi.single b 1 : Fin n → 𝓞 E ⧸ P.asIdeal) l := by
         by_cases h : l = b
         · subst h; simpa using reduction_one₂
         · simpa [h] using reduction_zero
@@ -225,13 +258,14 @@ theorem mem_JGsym0 (hd : ∀ a : E, IntAt P a → redP P a = 0 → IntAt P (a / 
   · rw [zpow_zero, inv_one, one_mul]
     exact intAt_sub ha hsg
 
-theorem mem_JGsym_c (hd : ∀ a : E, IntAt P a → redP P a = 0 → IntAt P (a / (qOf P : E))) {k rS t c : ℕ} (hc : c = 0)
-    (hn : rSym k rS ≤ n) (κ : GLint E n P)
-    (h1 : ∀ x y : Fin n, lvSym k rS t y.1 < lvSym k rS t x.1 → redMat κ x y = 0)
+theorem mem_JGsym_c
+    (hd : ∀ a : E, IntAt P a → redP P a = 0 → IntAt P (a / (qOf P : E)))
+    {k rS t c : ℕ} (hc : c = 0) (hn : rSym k rS ≤ n)
+    (κ : GLint E n P) (h1 : ∀ x y : Fin n, lvSym k rS t y.1 < lvSym k rS t x.1 → redMat κ x y = 0)
     (h1' : ∀ x y : Fin n, lvSym k rS t y.1 < lvSym k rS t x.1 → redMat κ⁻¹ x y = 0)
     (h2 : ∀ x : Fin n, x.1 < rSym k rS → redMat κ x x = 1)
-    (h3 : ∀ x y : Fin n, x.1 < k → y.1 = k + rS → redMat κ x y = 0) :
-    GlobalTheory.CongLevel.extE c κ.1 ∈ LocE.JGsym P (qOf P) k rS (rSym k rS) t n c := by
+    (h3 : ∀ x y : Fin n, x.1 < k → y.1 = k + rS → redMat κ x y = 0)
+    : GlobalTheory.CongLevel.extE c κ.1 ∈ LocE.JGsym P (qOf P) k rS (rSym k rS) t n c := by
   subst hc
   exact mem_JGsym0 hd hn κ h1 h1' h2 h3
 
@@ -243,7 +277,18 @@ namespace GlobalTheory.Mem.LastGrp
 
 open GlobalTheory.TopStep
 
-theorem mem_levG_last : ∀ {X : Fields} {Pr : Primes X} {R : Ranks} (Ch : Chars X Pr R.m) (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) {S : Set ℕ} (mu : Tup X.F X.E X.K S) (cst : LocCst X (rowSG Pr sel mu)) (L : ChIdx X Pr R (QE sel (mu : Chr X.F X.E X.K))) (G : ChGlob X R.m) (m2 : ℕ), X.Ok → Pr.Ok → IsSel X sel → L.Ok Ch sel mu cst G m2 → cst.sharp = true → ∀ (j : ℕ), j + 1 = R.m → ∀ (b : L.β j) (w : {w // w ∈ Pr.vGs}) (κ : Type) [Field κ] (e : (𝓞 X.E ⧸ w.1.asIdeal) ≃+* κ) (M : GL (Fin (R.N j)) (𝓞 X.E ⧸ w.1.asIdeal)), Matrix.GeneralLinearGroup.map e.toRingHom M ∈ JSymG κ (R.N j) R.k (rSD R) R.t false → M ∈ (L.levG j b w).H := by
+theorem mem_levG_last
+    : ∀ {X : Fields} {Pr : Primes X} {R : Ranks} (Ch : Chars X Pr R.m)
+        (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) {S : Set ℕ}
+        (mu : Tup X.F X.E X.K S) (cst : LocCst X (rowSG Pr sel mu))
+        (L : ChIdx X Pr R (QE sel (mu : Chr X.F X.E X.K))) (G : ChGlob X R.m) (m2 : ℕ),
+      X.Ok → Pr.Ok → IsSel X sel → L.Ok Ch sel mu cst G m2 → cst.sharp = true
+        → ∀ (j : ℕ),
+          j + 1 = R.m
+            → ∀ (b : L.β j) (w : {w // w ∈ Pr.vGs}) (κ : Type) [Field κ]
+                (e : (𝓞 X.E ⧸ w.1.asIdeal) ≃+* κ) (M : GL (Fin (R.N j)) (𝓞 X.E ⧸ w.1.asIdeal)),
+              Matrix.GeneralLinearGroup.map e.toRingHom M ∈ JSymG κ (R.N j) R.k (rSD R) R.t false
+                → M ∈ (L.levG j b w).H := by
   intro X Pr R Ch sel S mu cst L G m2 hX hPr hsel hL hs j hj b w κ _ e M hM
   have hm := hL.hm
   obtain rfl : j = m2 + 1 := by omega
@@ -262,21 +307,38 @@ theorem mem_levG_last : ∀ {X : Fields} {Pr : Primes X} {R : Ranks} (Ch : Chars
     unfold Ranks.r Ranks.N
     have := Nat.le_mul_of_pos_right (m2 + 1) (by omega : 0 < R.t + 1)
     omega
-  have ent : ∀ x y, ((Matrix.GeneralLinearGroup.map e.toRingHom M : GL _ _) : Matrix _ _ _) x y = e (M.1 x y) :=
+  have ent
+      : ∀ x y,
+        ((Matrix.GeneralLinearGroup.map e.toRingHom M : GL _ _) : Matrix _ _ _) x y = e (M.1 x y) :=
     fun _ _ => rfl
-  have ent' : ∀ x y, (((Matrix.GeneralLinearGroup.map e.toRingHom M)⁻¹ : GL _ _) : Matrix _ _ _) x y = e ((M⁻¹).1 x y) :=
-    fun x y => by rw [← map_inv]; rfl
+  have ent'
+      : ∀ x y,
+        (((Matrix.GeneralLinearGroup.map e.toRingHom M)⁻¹ : GL _ _) : Matrix _ _ _) x y
+          = e ((M⁻¹).1 x y) := fun x y => by
+    rw [← map_inv]; rfl
   have z : ∀ a, e a = 0 → a = 0 := fun a h => e.injective (h.trans (map_zero e).symm)
   have o : ∀ a, e a = 1 → a = 1 := fun a h => e.injective (h.trans (map_one e).symm)
-  have hJ : GlobalTheory.CongLevel.extE (cOf R (m2 + 1)) k0.1 ∈ Jat (Pr := Pr) (R := R) cst.sharp (m2 + 1) w.1 := by
+  have hJ
+      : GlobalTheory.CongLevel.extE (cOf R (m2 + 1)) k0.1
+        ∈ Jat (Pr := Pr) (R := R) cst.sharp (m2 + 1) w.1 := by
     unfold Jat
     rw [if_pos w.2, hs, if_pos rfl, ← hr]
-    refine mem_JGsym_c hd hc hn k0 (fun x y hxy => ?_) (fun x y hxy => ?_) (fun x hx => ?_) (fun x y hx hy => ?_)
+    refine mem_JGsym_c hd hc hn k0
+      (fun x y hxy => ?_)
+      (fun x y hxy => ?_)
+      (fun x hx => ?_)
+      (fun x y hx hy => ?_)
     · rw [eM]; exact z _ (by rw [← ent]; exact hA.1 x y hxy)
     · rw [eMi]; exact z _ (by rw [← ent']; exact hB.1 x y hxy)
     · rw [eM]; exact o _ (by rw [← ent]; exact hA.2.1 x hx)
     · rw [eM]; exact z _ (by rw [← ent]; exact hA.2.2.1 x y hx hy)
-  exact ⟨GlobalTheory.CongLevel.extE (cOf R (m2 + 1)) k0.1, ⟨GlobalTheory.CongLevel.extendByIdOnLastCoordsLinearEquiv_mem_firstRowGroup _ _, by simpa using hJ⟩,
-    GlobalTheory.CongLevel.extE_inX _ _⟩
+  exact ⟨
+    GlobalTheory.CongLevel.extE (cOf R (m2 + 1)) k0.1,
+    ⟨
+      GlobalTheory.CongLevel.extendByIdOnLastCoordsLinearEquiv_mem_firstRowGroup _ _,
+      by simpa using hJ
+    ⟩,
+    GlobalTheory.CongLevel.extE_inX _ _
+  ⟩
 
 end GlobalTheory.Mem.LastGrp

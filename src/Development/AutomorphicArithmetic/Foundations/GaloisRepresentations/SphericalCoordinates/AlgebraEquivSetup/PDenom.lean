@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.InvMem
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKGeo GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC Formalism.UG
+open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKGeo
+  GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC Formalism.UG
 open UpperTheory.Gal.CertificateRingHomMap (GUf Plc comp lev GLw IsCen mat sim)
 open UpperTheory.Gal.W2.Seed UpperTheory.Gal.Int.Geo UpperTheory.Gal.Int.Geo.Pl UpperTheory.Gal.Spc
 open scoped TensorProduct Classical
@@ -22,8 +23,8 @@ variable {p : ℕ} [Fact p.Prime]
 private def HasDen (D : Datum p) (z : AfP p ⊗[ℚ] VQ D) : Prop :=
   ∃ c : ℕ, 0 < c ∧ c.Coprime p ∧ c • z ∈ LaHat D
 
-private theorem HasDen.add {D : Datum p} {u w : AfP p ⊗[ℚ] VQ D} (hu : HasDen D u) (hw : HasDen D w) :
-    HasDen D (u + w) := by
+private theorem HasDen.add {D : Datum p} {u w : AfP p ⊗[ℚ] VQ D} (hu : HasDen D u) (hw : HasDen D w)
+    : HasDen D (u + w) := by
   obtain ⟨c, hc0, hcp, hc⟩ := hu
   obtain ⟨d, hd0, hdp, hd⟩ := hw
   refine ⟨c * d, Nat.mul_pos hc0 hd0, Nat.Coprime.mul_left hcp hdp, ?_⟩
@@ -37,8 +38,8 @@ private theorem HasDen.add {D : Datum p} {u w : AfP p ⊗[ℚ] VQ D} (hu : HasDe
 private theorem hasDen_zero (D : Datum p) : HasDen D 0 := by
   exact ⟨1, Nat.one_pos, Nat.coprime_one_left p, by simp [AddSubgroup.zero_mem]⟩
 
-private theorem hasDen_gen (D : Datum p) (a : AfP p) (x : D.La) :
-    HasDen D (a ⊗ₜ[ℚ] ((1 : ℚ) ⊗ₜ[ℤ] x : VQ D)) := by
+private theorem hasDen_gen (D : Datum p) (a : AfP p) (x : D.La)
+    : HasDen D (a ⊗ₜ[ℚ] ((1 : ℚ) ⊗ₜ[ℤ] x : VQ D)) := by
   obtain ⟨j, hj0, hjp, hj⟩ := GlobalTheory.T.exists_coprime_nat_mul_finiteAdeleAwayP_integral p a
   refine ⟨j, hj0, hjp, ?_⟩
   rw [TensorProduct.smul_tmul', nsmul_eq_mul]
@@ -64,19 +65,19 @@ private theorem hasDen (D : Datum p) (z : AfP p ⊗[ℚ] VQ D) : HasDen D z := b
   | add s t hs ht => exact hs.add ht
 
 private noncomputable def inAfH (D : Datum p) : D.La →+ AfP p ⊗[ℚ] VQ D :=
-  (TensorProduct.mk ℚ (AfP p) (VQ D) 1).toAddMonoidHom.comp (TensorProduct.mk ℤ ℚ D.La 1).toAddMonoidHom
+  (TensorProduct.mk ℚ (AfP p) (VQ D) 1).toAddMonoidHom.comp
+    (TensorProduct.mk ℤ ℚ D.La 1).toAddMonoidHom
 
 end UpperTheory.Gal.W2.Seed.TensorDenominatorBound
 
 open UpperTheory.Gal.W2.Seed.TensorDenominatorBound in
-theorem UpperTheory.Gal.W2.Seed.pDenom :
-    Denom := by
+theorem UpperTheory.Gal.W2.Seed.pDenom : Denom := by
   intro p _ D G L h
   haveI := D.finLa
   obtain ⟨s, hs⟩ := Module.Finite.fg_top (R := ℤ) (M := D.La)
   choose c hc0 hcp hcm using fun x : D.La => hasDen D (L.actG h (inAfH D x))
-  refine ⟨∏ x ∈ s, c x, Finset.prod_pos fun x _ => hc0 x,
-    Nat.Coprime.prod_left fun x _ => hcp x, ?_⟩
+  refine
+    ⟨∏ x ∈ s, c x, Finset.prod_pos fun x _ => hc0 x, Nat.Coprime.prod_left fun x _ => hcp x, ?_⟩
   have hgen : ∀ x : D.La, (∏ y ∈ s, c y) • L.actG h (inAfH D x) ∈ LaHat D := by
     intro x
     have hx : x ∈ Submodule.span ℤ (s : Set D.La) := by rw [hs]; trivial
@@ -84,7 +85,8 @@ theorem UpperTheory.Gal.W2.Seed.pDenom :
     | mem y hy =>
       rw [← Finset.mul_prod_erase s c hy, mul_comm, mul_smul]
       exact AddSubgroup.nsmul_mem _ (hcm y) _
-    | zero => simp [AddSubgroup.zero_mem]
+    | zero =>
+      simp [AddSubgroup.zero_mem]
     | add y z _ _ hy hz =>
       rw [map_add (f := _), map_add (f := _), smul_add]
       exact AddSubgroup.add_mem _ hy hz
@@ -100,7 +102,8 @@ theorem UpperTheory.Gal.W2.Seed.pDenom :
       simp [inAfH, TensorProduct.smul_tmul']
     rw [e, map_smul, smul_comm]
     exact GlobalTheory.W2.smul_mem_laHat ha (hgen x)
-  | zero => simp [AddSubgroup.zero_mem]
+  | zero =>
+    simp [AddSubgroup.zero_mem]
   | add y z _ _ hy hz =>
     rw [map_add (f := _), smul_add]
     exact AddSubgroup.add_mem _ hy hz

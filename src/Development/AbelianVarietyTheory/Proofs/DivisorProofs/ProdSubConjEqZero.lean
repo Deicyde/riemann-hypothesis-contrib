@@ -16,7 +16,6 @@ namespace GlobalTheory.EtC.GalSec.Tens
 
 variable (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω]
 
-
 open Classical in
 def conj (θ : Ω) : Finset Ω := by
   classical
@@ -24,7 +23,6 @@ def conj (θ : Ω) : Finset Ω := by
 
 def DependsOn (k : ℕ) (θ : Ω) (φ : LCRing K Ω k) : Prop :=
   ∀ g g' : Fin k → (Ω ≃ₐ[K] Ω), (∀ i, g i θ = g' i θ) → φ g = φ g'
-
 
 open Classical in
 def pick (k : ℕ) (θ : Ω) (t : Fin k → Ω) : Fin k → (Ω ≃ₐ[K] Ω) := by
@@ -34,12 +32,11 @@ def pick (k : ℕ) (θ : Ω) (t : Fin k → Ω) : Fin k → (Ω ≃ₐ[K] Ω) :=
 variable {K Ω}
 variable {B : Type} [CommRing B]
 
-
 open Classical in
 def idem (g₀ : Ω →+* B) (θ : Ω) (b : B) (s : conj K Ω θ) : B := by
   classical
-  exact g₀ (∏ j ∈ (Finset.univ : Finset (conj K Ω θ)).erase s, ((s : Ω) - (j : Ω)))⁻¹ *
-    ∏ j ∈ (Finset.univ : Finset (conj K Ω θ)).erase s, (b - g₀ (j : Ω))
+  exact g₀ (∏ j ∈ (Finset.univ : Finset (conj K Ω θ)).erase s, ((s : Ω) - (j : Ω)))⁻¹
+    * ∏ j ∈ (Finset.univ : Finset (conj K Ω θ)).erase s, (b - g₀ (j : Ω))
 
 def lev (g₀ : Ω →+* B) {k : ℕ} (gs : Fin k → (Ω →+* B)) (θ : Ω) (φ : LCRing K Ω k) : B :=
   ∑ t : Fin k → conj K Ω θ, g₀ (φ (pick K Ω k θ (fun i => (t i : Ω)))) * ∏ i, idem g₀ θ (gs i θ) (t i)
@@ -52,8 +49,8 @@ open Polynomial
 
 variable {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω]
 
-theorem mem_conj_iff [Algebra.IsAlgebraic K Ω] [Normal K Ω] (θ s : Ω) :
-    s ∈ conj K Ω θ ↔ ∃ σ : Ω ≃ₐ[K] Ω, σ θ = s := by
+theorem mem_conj_iff [Algebra.IsAlgebraic K Ω] [Normal K Ω] (θ s : Ω)
+    : s ∈ conj K Ω θ ↔ ∃ σ : Ω ≃ₐ[K] Ω, σ θ = s := by
   classical
   have hne : minpoly K θ ≠ 0 := minpoly.ne_zero (Algebra.IsIntegral.isIntegral θ)
   simp only [conj, Multiset.mem_toFinset, mem_aroots, ne_eq, hne, not_false_eq_true, true_and]
@@ -70,8 +67,8 @@ theorem mem_conj_iff [Algebra.IsAlgebraic K Ω] [Normal K Ω] (θ s : Ω) :
 theorem self_mem_conj [Algebra.IsAlgebraic K Ω] [Normal K Ω] (θ : Ω) : θ ∈ conj K Ω θ :=
   (mem_conj_iff θ θ).2 ⟨1, rfl⟩
 
-theorem prod_conj [Algebra.IsAlgebraic K Ω] [Normal K Ω] [Algebra.IsSeparable K Ω] (θ : Ω) :
-    ∏ s ∈ conj K Ω θ, (X - C s) = (minpoly K θ).map (algebraMap K Ω) := by
+theorem prod_conj [Algebra.IsAlgebraic K Ω] [Normal K Ω] [Algebra.IsSeparable K Ω] (θ : Ω)
+    : ∏ s ∈ conj K Ω θ, (X - C s) = (minpoly K θ).map (algebraMap K Ω) := by
   classical
   have hint := Algebra.IsIntegral.isIntegral (R := K) θ
   have hsp : Splits ((minpoly K θ).map (algebraMap K Ω)) := Normal.splits inferInstance θ
@@ -89,23 +86,28 @@ open Polynomial
 
 variable {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω]
 
-theorem apply_mem_conj [Algebra.IsAlgebraic K Ω] [Normal K Ω] (θ : Ω) (σ : Ω ≃ₐ[K] Ω) :
-    σ θ ∈ conj K Ω θ :=
+theorem apply_mem_conj [Algebra.IsAlgebraic K Ω] [Normal K Ω] (θ : Ω) (σ : Ω ≃ₐ[K] Ω)
+    : σ θ ∈ conj K Ω θ :=
   (mem_conj_iff θ (σ θ)).2 ⟨σ, rfl⟩
 
-theorem prod_sub_conj_eq_zero [Algebra.IsAlgebraic K Ω] [Normal K Ω] [Algebra.IsSeparable K Ω]
-    {B : Type} [CommRing B] (g₀ σ' : Ω →+* B)
-    (h : σ'.comp (algebraMap K Ω) = g₀.comp (algebraMap K Ω)) (θ : Ω) :
-    ∏ s ∈ conj K Ω θ, (σ' θ - g₀ s) = 0 := by
+theorem prod_sub_conj_eq_zero
+    [Algebra.IsAlgebraic K Ω] [Normal K Ω] [Algebra.IsSeparable K Ω]
+    {B : Type} [CommRing B]
+    (g₀ σ' : Ω →+* B) (h : σ'.comp (algebraMap K Ω) = g₀.comp (algebraMap K Ω))
+    (θ : Ω)
+    : ∏ s ∈ conj K Ω θ, (σ' θ - g₀ s) = 0 := by
   have h1 : (∏ s ∈ conj K Ω θ, (X - C s)).eval₂ g₀ (σ' θ) = ∏ s ∈ conj K Ω θ, (σ' θ - g₀ s) := by
     rw [eval₂_finsetProd]
     simp
   rw [← h1, prod_conj, eval₂_map, ← h, ← hom_eval₂, ← aeval_def, minpoly.aeval, map_zero]
 
-theorem idem_spec [Algebra.IsAlgebraic K Ω] [Normal K Ω] {B : Type} [CommRing B] (g₀ : Ω →+* B)
-    (θ : Ω) (b : B) (hb : ∏ s ∈ conj K Ω θ, (b - g₀ s) = 0) :
-    CompleteOrthogonalIdempotents (idem (K := K) g₀ θ b) ∧ (∀ s : conj K Ω θ, b * idem (K := K) g₀ θ b s = g₀ s * idem (K := K) g₀ θ b s) ∧
-      b = ∑ s : conj K Ω θ, g₀ s * idem (K := K) g₀ θ b s := by
+theorem idem_spec
+    [Algebra.IsAlgebraic K Ω] [Normal K Ω]
+    {B : Type} [CommRing B]
+    (g₀ : Ω →+* B) (θ : Ω) (b : B) (hb : ∏ s ∈ conj K Ω θ, (b - g₀ s) = 0)
+    : CompleteOrthogonalIdempotents (idem (K := K) g₀ θ b)
+      ∧ (∀ s : conj K Ω θ, b * idem (K := K) g₀ θ b s = g₀ s * idem (K := K) g₀ θ b s)
+      ∧ b = ∑ s : conj K Ω θ, g₀ s * idem (K := K) g₀ θ b s := by
   classical
   letI : Algebra Ω B := g₀.toAlgebra
   haveI : Nonempty (conj K Ω θ) := ⟨⟨θ, self_mem_conj θ⟩⟩
@@ -127,8 +129,11 @@ theorem idem_spec [Algebra.IsAlgebraic K Ω] [Normal K Ω] {B : Type} [CommRing 
   · conv_lhs => rw [h3]
     simp only [Algebra.smul_def, RingHom.algebraMap_toAlgebra]
 
-theorem pick_spec [Algebra.IsAlgebraic K Ω] [Normal K Ω] (k : ℕ) (θ : Ω) (t : Fin k → Ω)
-    (ht : ∀ i, t i ∈ conj K Ω θ) (i : Fin k) : pick K Ω k θ t i θ = t i := by
+theorem pick_spec
+    [Algebra.IsAlgebraic K Ω] [Normal K Ω]
+    (k : ℕ) (θ : Ω) (t : Fin k → Ω) (ht : ∀ i, t i ∈ conj K Ω θ)
+    (i : Fin k)
+    : pick K Ω k θ t i θ = t i := by
   have hex : ∃ g : Fin k → (Ω ≃ₐ[K] Ω), ∀ i, g i θ = t i := by
     choose g hg using fun i => (mem_conj_iff θ (t i)).1 (ht i)
     exact ⟨g, hg⟩

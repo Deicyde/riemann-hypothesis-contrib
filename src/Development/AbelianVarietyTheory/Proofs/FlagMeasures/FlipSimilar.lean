@@ -41,16 +41,17 @@ private lemma mul_one_submatrix_rev_apply {n : ℕ} (A : Mt g n) (i j : Fin n) :
   simp [Matrix.one_apply]
 
 theorem flip_similar {n : ℕ} (M : Mt g n) : ∃ P : Mt g n, IsUnit P ∧ P * M = flip M * P := by
-
   obtain ⟨Q, hQ, hQM⟩ := GlobalTheory.SimilarTranspose.main (ZMod g) (Fin n) M
   have hJJ : (1 : Mt g n).submatrix Fin.rev id * (1 : Mt g n).submatrix Fin.rev id = 1 := by
     ext i j
     rw [one_submatrix_rev_mul_apply]
     simp [Matrix.one_apply]
-  have hflip : flip M = (1 : Mt g n).submatrix Fin.rev id * M.transpose *
-      (1 : Mt g n).submatrix Fin.rev id := by
+  have hflip
+      : flip M
+        = (1 : Mt g n).submatrix Fin.rev id * M.transpose * (1 : Mt g n).submatrix Fin.rev id := by
     ext i j
-    rw [mul_one_submatrix_rev_apply, one_submatrix_rev_mul_apply, flip_apply, Matrix.transpose_apply]
+    rw [mul_one_submatrix_rev_apply, one_submatrix_rev_mul_apply, flip_apply,
+      Matrix.transpose_apply]
   generalize (1 : Mt g n).submatrix Fin.rev id = J at hJJ hflip
   refine ⟨J * Q, IsUnit.mul ⟨⟨J, J, hJJ, hJJ⟩, rfl⟩ hQ, ?_⟩
   have hJJQ : J * (J * Q) = Q := by rw [← Matrix.mul_assoc, hJJ, Matrix.one_mul]
@@ -90,8 +91,8 @@ theorem toG_coe {n : ℕ} (x : Gn g n) : toG (x : Mt g n) = x := by
   rw [dite_eq_left (Units.isUnit x)]
   exact Units.ext rfl
 
-theorem class_flip {n : ℕ} {α : Gn g n → ℂ} (hα : IsClass α) (M : Mt g n) :
-    α (toG (flip M)) = α (toG M) := by
+theorem class_flip {n : ℕ} {α : Gn g n → ℂ} (hα : IsClass α) (M : Mt g n)
+    : α (toG (flip M)) = α (toG M) := by
   by_cases hM : IsUnit M
   · have e1 : toG M = hM.unit := by
       unfold toG
@@ -138,7 +139,8 @@ theorem tl_flip {a b : ℕ} (M : Mt g (a + b)) : tl b (flip M) = flip (br a b M)
   simp only [tl, br]
   rw [entN_of_lt (flip M) i j (by omega) (by omega),
     entN_of_lt M (a + j.rev) (a + i.rev) (by simp only [Fin.val_rev]; omega)
-      (by simp only [Fin.val_rev]; omega), flip_apply]
+      (by simp only [Fin.val_rev]; omega),
+    flip_apply]
   congr 1 <;> ext <;> simp only [Fin.val_rev] <;> omega
 
 private lemma entN_eq_apply_of_lt_of_lt {n : ℕ} (M : Mt g n) (x y : ℕ) (hx : x < n) (hy : y < n) :
@@ -154,7 +156,8 @@ theorem br_flip {a b : ℕ} (M : Mt g (a + b)) : br b a (flip M) = flip (tl a M)
   simp only [tl, br]
   rw [entN_eq_apply_of_lt_of_lt (flip M) (b + i) (b + j) (by omega) (by omega),
     entN_eq_apply_of_lt_of_lt M j.rev i.rev (by simp only [Fin.val_rev]; omega)
-      (by simp only [Fin.val_rev]; omega), flip_apply]
+      (by simp only [Fin.val_rev]; omega),
+    flip_apply]
   congr 1 <;> ext <;> simp only [Fin.val_rev] <;> omega
 
 private lemma sum_flipG_conj_eq_sum_conj_flipG {n : ℕ} (F : Gn g n → ℂ) (w : Gn g n) :
@@ -174,23 +177,30 @@ private lemma sum_conj_conj_eq_sum_conj {n : ℕ} (F : Gn g n → ℂ) (w p : Gn
   intro y
   simp only [mul_inv_rev, inv_inv, mul_assoc]
 
-theorem main : ∀ (g : ℕ) [Fact g.Prime] (a b n : ℕ) (α : Gn g a → ℂ) (β : Gn g b → ℂ),
-    IsClass α → IsClass β → n = a + b → hc a b α β n = hc b a β α n := by
+theorem main
+    : ∀ (g : ℕ) [Fact g.Prime] (a b n : ℕ) (α : Gn g a → ℂ) (β : Gn g b → ℂ),
+      IsClass α → IsClass β → n = a + b → hc a b α β n = hc b a β α n := by
   intro g _ a b n α β hα hβ hn
   subst hn
   funext x
 
-  have key : ∀ z : Gn g (a + b),
-      (if InPar b ((flipG z : Gn g (a + b)) : Mt g (a + b)) then
-        β (toG (tl b ((flipG z : Gn g (a + b)) : Mt g (a + b)))) *
-          α (toG (br b a ((flipG z : Gn g (a + b)) : Mt g (a + b)))) else 0) =
-      (if InPar a (z : Mt g (a + b)) then
-        α (toG (tl a (z : Mt g (a + b)))) * β (toG (br a b (z : Mt g (a + b)))) else 0) := by
+  have key
+      : ∀ z : Gn g (a + b),
+        (if InPar b ((flipG z : Gn g (a + b)) : Mt g (a + b)) then
+           β (toG (tl b ((flipG z : Gn g (a + b)) : Mt g (a + b))))
+             * α (toG (br b a ((flipG z : Gn g (a + b)) : Mt g (a + b))))
+         else
+           0)
+          = (if InPar a (z : Mt g (a + b)) then
+               α (toG (tl a (z : Mt g (a + b)))) * β (toG (br a b (z : Mt g (a + b))))
+             else
+               0) := by
     intro z
     simp only [flipG_coe, inPar_flip, tl_flip, br_flip, class_flip hβ, class_flip hα]
     rw [mul_comm]
-  have hcard : (Finset.univ.filter fun p : Gn g (a + b) => InPar a (p : Mt g (a + b))).card =
-      (Finset.univ.filter fun p : Gn g (a + b) => InPar b (p : Mt g (a + b))).card := by
+  have hcard
+      : (Finset.univ.filter fun p : Gn g (a + b) => InPar a (p : Mt g (a + b))).card
+        = (Finset.univ.filter fun p : Gn g (a + b) => InPar b (p : Mt g (a + b))).card := by
     refine Finset.card_nbij' flipG flipG ?_ ?_ ?_ ?_
     · intro q hq
       simp only [Finset.coe_filter, Finset.mem_univ, true_and, Set.mem_setOf_eq] at hq ⊢
@@ -208,17 +218,21 @@ theorem main : ∀ (g : ℕ) [Fact g.Prime] (a b n : ℕ) (α : Gn g a → ℂ) 
   obtain ⟨p, hp⟩ := flipG_conj x
   let Fba : Gn g (a + b) → ℂ := fun z =>
     if InPar b (z : Mt g (a + b)) then
-      β (toG (tl b (z : Mt g (a + b)))) * α (toG (br b a (z : Mt g (a + b)))) else 0
-  have e1 : (∑ y : Gn g (a + b), if InPar a ((y⁻¹ * x * y : Gn g (a + b)) : Mt g (a + b)) then
-      α (toG (tl a ((y⁻¹ * x * y : Gn g (a + b)) : Mt g (a + b)))) *
-        β (toG (br a b ((y⁻¹ * x * y : Gn g (a + b)) : Mt g (a + b)))) else 0) =
-      ∑ y : Gn g (a + b), Fba (y⁻¹ * x * y) := by
-    calc _ = ∑ y : Gn g (a + b), Fba (flipG (y⁻¹ * x * y)) :=
-          Finset.sum_congr rfl fun y _ => (key _).symm
+      β (toG (tl b (z : Mt g (a + b)))) * α (toG (br b a (z : Mt g (a + b))))
+    else
+      0
+  have e1
+      : (∑ y : Gn g (a + b), if InPar a ((y⁻¹ * x * y : Gn g (a + b)) : Mt g (a + b)) then
+          α (toG (tl a ((y⁻¹ * x * y : Gn g (a + b)) : Mt g (a + b)))) *
+            β (toG (br a b ((y⁻¹ * x * y : Gn g (a + b)) : Mt g (a + b)))) else 0)
+        = ∑ y : Gn g (a + b), Fba (y⁻¹ * x * y) := by
+    calc
+      _ = ∑ y : Gn g (a + b), Fba (flipG (y⁻¹ * x * y)) :=
+        Finset.sum_congr rfl fun y _ => (key _).symm
       _ = ∑ y : Gn g (a + b), Fba (y⁻¹ * flipG x * y) := sum_flipG_conj_eq_sum_conj_flipG Fba x
       _ = ∑ y : Gn g (a + b), Fba (y⁻¹ * x * y) := by
-          rw [hp]
-          exact sum_conj_conj_eq_sum_conj Fba x p
+        rw [hp]
+        exact sum_conj_conj_eq_sum_conj Fba x p
   simp only [hc, hcT]
   rw [hcard]
   congr 1

@@ -39,7 +39,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LabelTa
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.SplitRead GlobalTheory.PendOf GlobalTheory.LevelType
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.SplitRead
+  GlobalTheory.PendOf GlobalTheory.LevelType
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 noncomputable section
@@ -50,17 +51,30 @@ open ValuativeRel Polynomial
 
 section Finite
 
-theorem isRoot_of_parVec {p : ℕ} [Fact p.Prime] (L : GlobalTheory.GLq.LabelDatum p) {r : ℕ} {α : Type} [Fintype α] [LinearOrder α]
-    {m : α → Type} [∀ a, Fintype (m a)] [∀ a, DecidableEq (m a)] (e : (Σ a, m a) ≃ Fin r) (a : α)
-    {θ : (ZMod p)ˣ →* ℂˣ} {u : ZMod p} {f : (ZMod p)[X]} (ρ : FDRep ℂ (GL (Fin r) (ZMod p))) (hρ : CategoryTheory.Simple ρ)
-    (hf : GlobalTheory.GLq.HasLabel L (fun x => ρ.character x) f) (hθ : GlobalTheory.GLp.IsCharLab L θ u) (ha : Fintype.card (m a) = 1)
-    {v : ρ} (hv : v ≠ 0) (h : ParVec ρ.ρ e a θ v) : f.IsRoot u := by
-  obtain ⟨c, v', hc, hv', hs⟩ := GlobalTheory.T.exists_standardTypeVector_of_parabolicTypeVector p r α m e a θ _ ρ.ρ v ha hv h
+theorem isRoot_of_parVec
+    {p : ℕ} [Fact p.Prime]
+    (L : GlobalTheory.GLq.LabelDatum p)
+    {r : ℕ} {α : Type} [Fintype α] [LinearOrder α]
+    {m : α → Type} [∀ a, Fintype (m a)] [∀ a, DecidableEq (m a)]
+    (e : (Σ a, m a) ≃ Fin r)
+    (a : α)
+    {θ : (ZMod p)ˣ →* ℂˣ} {u : ZMod p} {f : (ZMod p)[X]}
+    (ρ : FDRep ℂ (GL (Fin r) (ZMod p)))
+    (hρ : CategoryTheory.Simple ρ) (hf : GlobalTheory.GLq.HasLabel L (fun x => ρ.character x) f)
+    (hθ : GlobalTheory.GLp.IsCharLab L θ u) (ha : Fintype.card (m a) = 1)
+    {v : ρ} (hv : v ≠ 0) (h : ParVec ρ.ρ e a θ v)
+    : f.IsRoot u := by
+  obtain ⟨c, v', hc, hv', hs⟩ :=
+    GlobalTheory.T.exists_standardTypeVector_of_parabolicTypeVector p r α m e a θ _ ρ.ρ v ha hv h
   have ht := GlobalTheory.T.stdParabolicTwistedTraceSum_ne_zero_of_vector p r c θ ρ v' hv' hs
   have hr : r = c + 1 + (r - c - 1) := by omega
-  obtain ⟨A, B, hA, hB, h1, h2⟩ := GlobalTheory.T.exists_irreducible_harishChandra_of_stdTrace_ne_zero p r c (r - c - 1) θ ρ.character hr ⟨ρ, fun _ => rfl⟩ ht
-  obtain ⟨σ, hσ, h3⟩ := GlobalTheory.T.exists_irreducible_detTwist_of_stdTrace_twoBlock p c θ A hA h2
-  exact GlobalTheory.T.thetaLabel_root_of_harishChandraConstituent p L r c _ θ u f _ A B σ hr ⟨ρ, hρ, fun _ => rfl⟩ hA hB hσ hf hθ h1 h3
+  obtain ⟨A, B, hA, hB, h1, h2⟩ :=
+    GlobalTheory.T.exists_irreducible_harishChandra_of_stdTrace_ne_zero p r c (r - c - 1) θ
+      ρ.character hr ⟨ρ, fun _ => rfl⟩ ht
+  obtain ⟨σ, hσ, h3⟩ :=
+    GlobalTheory.T.exists_irreducible_detTwist_of_stdTrace_twoBlock p c θ A hA h2
+  exact GlobalTheory.T.thetaLabel_root_of_harishChandraConstituent p L r c _ θ u f _ A B σ hr
+    ⟨ρ, hρ, fun _ => rfl⟩ hA hB hσ hf hθ h1 h3
 
 end Finite
 
@@ -68,21 +82,27 @@ section Local
 
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
 
-theorem isSubquotient_jac_two {a b n V W : Type} [Fintype a] [DecidableEq a] [Fintype b] [DecidableEq b] [Fintype n]
-    [DecidableEq n] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W] (e : a ⊕ b ≃ n)
-    {π : Representation ℂ (GL n F) V} {τ : Representation ℂ (GL n F) W} (hτ : IsSmooth τ) (h : IsSubquotient π τ) :
-    IsSubquotient (jac (two e) π) (jac (two e) τ) := by
+theorem isSubquotient_jac_two
+    {a b n V W : Type} [Fintype a] [DecidableEq a] [Fintype b] [DecidableEq b] [Fintype n]
+    [DecidableEq n] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    (e : a ⊕ b ≃ n)
+    {π : Representation ℂ (GL n F) V} {τ : Representation ℂ (GL n F) W}
+    (hτ : IsSmooth τ) (h : IsSubquotient π τ)
+    : IsSubquotient (jac (two e) π) (jac (two e) τ) := by
   obtain ⟨S, f, hf⟩ := h
   let ι : S.toRepresentation.IntertwiningMap τ := ⟨S.toSubmodule.subtype, fun _ => rfl⟩
-  refine (IsSubquotient.of_surjective (jacMap (two e) f) fun y => ?_).trans (.of_injective (jacMap (two e) ι) ?_)
+  refine (IsSubquotient.of_surjective (jacMap (two e) f) fun y => ?_).trans
+    (.of_injective (jacMap (two e) ι) ?_)
   · obtain ⟨w, rfl⟩ := Submodule.Quotient.mk_surjective _ y
     obtain ⟨v, rfl⟩ := hf w
     exact ⟨Submodule.Quotient.mk v, rfl⟩
   · refine (injective_iff_map_eq_zero _).2 fun x hx => ?_
     obtain ⟨v, rfl⟩ := Submodule.Quotient.mk_surjective _ x
     have h1 : ι v ∈ twKer τ (unipRad F (two e)) 1 := (Submodule.Quotient.mk_eq_zero _).1 hx
-    have hN := GlobalTheory.InertSupp.unipRad_eq_unipOf F (e := two e) (c := fun i => ((blk (two e) i).toNat : ℤ))
-      fun i j => by cases blk (two e) i <;> cases blk (two e) j <;> simp
+    have hN :=
+      GlobalTheory.InertSupp.unipRad_eq_unipOf F (e := two e)
+        (c := fun i => ((blk (two e) i).toNat : ℤ))
+        fun i j => by cases blk (two e) i <;> cases blk (two e) j <;> simp
     obtain ⟨T, hT, h2⟩ := GlobalTheory.JacquetExact.exists_finset_of_mem_twKer h1
     obtain ⟨H, hle, hH, hSH⟩ := GlobalTheory.UnipCompact.exists_compact_subgroup F n _ T (hN ▸ hT)
     refine (Submodule.Quotient.mk_eq_zero _).2 ?_
@@ -91,20 +111,28 @@ theorem isSubquotient_jac_two {a b n V W : Type} [Fintype a] [DecidableEq a] [Fi
 
 variable {p : ℕ} [Fact p.Prime] {r t : ℕ}
 
-theorem typeVec_first {X : Bool → Type} [∀ j, AddCommGroup (X j)] [∀ j, Module ℂ (X j)]
+theorem typeVec_first
+    {X : Bool → Type} [∀ j, AddCommGroup (X j)] [∀ j, Module ℂ (X j)]
     (ρ : ∀ j, Representation ℂ (GL (Two (Fin r) (Fin t) j) F) (X j)) (hρ : ∀ j, IsSmooth (ρ j))
-    {Y : Type} [AddCommGroup Y] [Module ℂ Y] {τ : Representation ℂ (Levi F (Two (Fin r) (Fin t))) Y}
-    (h : IsSubquotient τ (piTensor ρ)) {z : MonoidAlgebra ℂ (GL (Fin r) (ZMod p))} {w : Y}
-    (hw : TypeVec (n := Fin r) (τ.comp (MonoidHom.mulSingle (fun j => GL (Two (Fin r) (Fin t) j) F) false)) z w) :
-    ∃ x, TypeVec (n := Fin r) (ρ false) z x := by
-  obtain ⟨y, hy⟩ := TypeVec.up (n := Fin r)
-    (π := (piTensor ρ).comp (MonoidHom.mulSingle (fun j => GL (Two (Fin r) (Fin t) j) F) false))
-    (isSmooth_comp (isSmooth_piTensor hρ) _ (continuous_mulSingle (A := fun j => GL (Two (Fin r) (Fin t) j) F) false))
-    (GlobalTheory.CuspRep.ParLaws.isSubquotient_comp h _) hw
+    {Y : Type} [AddCommGroup Y] [Module ℂ Y]
+    {τ : Representation ℂ (Levi F (Two (Fin r) (Fin t))) Y} (h : IsSubquotient τ (piTensor ρ))
+    {z : MonoidAlgebra ℂ (GL (Fin r) (ZMod p))} {w : Y}
+    (hw : TypeVec (n := Fin r)
+      (τ.comp (MonoidHom.mulSingle (fun j => GL (Two (Fin r) (Fin t) j) F) false)) z w)
+    : ∃ x, TypeVec (n := Fin r) (ρ false) z x := by
+  obtain ⟨y, hy⟩ :=
+    TypeVec.up (n := Fin r)
+      (π := (piTensor ρ).comp (MonoidHom.mulSingle (fun j => GL (Two (Fin r) (Fin t) j) F) false))
+      (isSmooth_comp (isSmooth_piTensor hρ) _
+        (continuous_mulSingle (A := fun j => GL (Two (Fin r) (Fin t) j) F) false))
+      (GlobalTheory.CuspRep.ParLaws.isSubquotient_comp h _) hw
   exact TypeVec.factor (m := Two (Fin r) (Fin t)) ρ false hy
 
-theorem typeVec_iff {W : Type} [AddCommGroup W] [Module ℂ W] (π : Representation ℂ (GL (Fin r) F) W)
-    (z : MonoidAlgebra ℂ (GL (Fin r) (ZMod p))) (y : W) (h : TypeVec π z y) : IsLevelOne π y ∧ NotKilled π z y := by
+theorem typeVec_iff
+    {W : Type} [AddCommGroup W] [Module ℂ W]
+    (π : Representation ℂ (GL (Fin r) F) W) (z : MonoidAlgebra ℂ (GL (Fin r) (ZMod p))) (y : W)
+    (h : TypeVec π z y)
+    : IsLevelOne π y ∧ NotKilled π z y := by
   obtain ⟨h1, ℓ, hℓ, h0⟩ := h
   refine ⟨fun h hh => h1 h (GlobalTheory.StepData.mem_KOne.2 fun a b => ?_), ℓ, fun g a b => ?_, h0⟩
   · simpa [Matrix.one_apply] using hh a b
@@ -113,33 +141,64 @@ theorem typeVec_iff {W : Type} [AddCommGroup W] [Module ℂ W] (π : Representat
 
 end Local
 
-theorem hasLabelO_of_mul {p : ℕ} [Fact p.Prime] {C : Formalism.IrreducibleCountingLemmas.TYPES.LabelConv (ZMod p)}
-    (O : Formalism.IrreducibleCountingLemmas.TYPES.LabelMap (ZMod p) C) {r : ℕ} (ρ : FDRep ℂ (GL (Fin r) (ZMod p))) (hρ : CategoryTheory.Simple ρ)
-    {f : (ZMod p)[X]} (h0 : Formalism.IrreducibleCountingLemmas.TYPES.zIdem ρ ≠ 0)
-    (h : Formalism.IrreducibleCountingLemmas.TYPES.zIdem ρ * Formalism.L2.NT.eSerO O r f = Formalism.IrreducibleCountingLemmas.TYPES.zIdem ρ) : Formalism.IrreducibleCountingLemmas.TYPES.HasLabelO O ρ f := by
+theorem hasLabelO_of_mul
+    {p : ℕ} [Fact p.Prime]
+    {C : Formalism.IrreducibleCountingLemmas.TYPES.LabelConv (ZMod p)}
+    (O : Formalism.IrreducibleCountingLemmas.TYPES.LabelMap (ZMod p) C)
+    {r : ℕ} (ρ : FDRep ℂ (GL (Fin r) (ZMod p))) (hρ : CategoryTheory.Simple ρ)
+    {f : (ZMod p)[X]}
+    (h0 : Formalism.IrreducibleCountingLemmas.TYPES.zIdem ρ ≠ 0)
+    (h : Formalism.IrreducibleCountingLemmas.TYPES.zIdem ρ * Formalism.L2.NT.eSerO O r f
+      = Formalism.IrreducibleCountingLemmas.TYPES.zIdem ρ)
+    : Formalism.IrreducibleCountingLemmas.TYPES.HasLabelO O ρ f := by
   classical
   rw [GlobalTheory.SerOSys.eSerO_eq_sum, Finset.mul_sum] at h
   obtain ⟨z, hz, hne⟩ := Finset.exists_ne_zero_of_sum_ne_zero (h.trans_ne h0)
   obtain ⟨τ, hτ, rfl, hl⟩ := (GlobalTheory.SerOSys.Zl_finite O r f).mem_toFinset.1 hz
-  refine GlobalTheory.SerOSys.hasLabelO_of_repIso O hl (GlobalTheory.SerOSys.repIso_of_zIdem_eq ρ τ hρ hτ ?_)
+  refine GlobalTheory.SerOSys.hasLabelO_of_repIso O hl
+    (GlobalTheory.SerOSys.repIso_of_zIdem_eq ρ τ hρ hτ ?_)
   by_contra e
   exact hne (GlobalTheory.SerOSys.zIdem_mul_eq_zero ρ τ hρ hτ e)
 
-theorem exists_hasLabel {p : ℕ} [Fact p.Prime] (t : Formalism.CyclotomicNorms.Fbar p →* ℂ)
-    (ht : ∀ x y : Formalism.CyclotomicNorms.Fbar p, x ≠ 0 → y ≠ 0 → t x = t y → x = y) (ζ : ℕ → Formalism.CyclotomicNorms.Fbar p) (hζ : Formalism.L2.NT.IsGenSys ζ)
-    (O : Formalism.IrreducibleCountingLemmas.TYPES.LabelMap (ZMod p) (Formalism.L2.NT.convC t ht ζ hζ))
-    (hO : ∀ (d : ℕ) (τ : FDRep ℂ (GL (Fin d) (ZMod p))), 1 ≤ d → CategoryTheory.Simple τ →
-      Formalism.IrreducibleCountingLemmas.TYPES.IsCuspidal (ZMod p) τ → Formalism.IrreducibleCountingLemmas.TYPES.HasCuspLabel (Formalism.L2.NT.convC t ht ζ hζ) τ (O.lab d τ))
-    {r : ℕ} (ρ : FDRep ℂ (GL (Fin r) (ZMod p))) (hρ : CategoryTheory.Simple ρ) {f : (ZMod p)[X]}
+theorem exists_hasLabel
+    {p : ℕ} [Fact p.Prime]
+    (t : Formalism.CyclotomicNorms.Fbar p →* ℂ)
+    (ht : ∀ x y : Formalism.CyclotomicNorms.Fbar p, x ≠ 0 → y ≠ 0 → t x = t y → x = y)
+    (ζ : ℕ → Formalism.CyclotomicNorms.Fbar p) (hζ : Formalism.L2.NT.IsGenSys ζ)
+    (O : Formalism.IrreducibleCountingLemmas.TYPES.LabelMap (ZMod p)
+      (Formalism.L2.NT.convC t ht ζ hζ))
+    (hO : ∀ (d : ℕ) (τ : FDRep ℂ (GL (Fin d) (ZMod p))),
+      1 ≤ d → CategoryTheory.Simple τ
+        → Formalism.IrreducibleCountingLemmas.TYPES.IsCuspidal (ZMod p) τ
+        → Formalism.IrreducibleCountingLemmas.TYPES.HasCuspLabel (Formalism.L2.NT.convC t ht ζ hζ) τ
+          (O.lab d τ))
+    {r : ℕ} (ρ : FDRep ℂ (GL (Fin r) (ZMod p))) (hρ : CategoryTheory.Simple ρ)
+    {f : (ZMod p)[X]}
     (h0 : Formalism.IrreducibleCountingLemmas.TYPES.zIdem ρ ≠ 0)
-    (h : Formalism.IrreducibleCountingLemmas.TYPES.zIdem ρ * Formalism.L2.NT.eSerO O r f = Formalism.IrreducibleCountingLemmas.TYPES.zIdem ρ) :
-    ∃ L : GlobalTheory.GLq.LabelDatum p, L.teich = t ∧ L.gen = ζ ∧ GlobalTheory.GLq.HasLabel L (fun x => ρ.character x) f := by
-  let L : GlobalTheory.GLq.LabelDatum p := ⟨t, ht, ζ, fun d hd => (hζ d hd).1,
-    fun d e hd he => (hζ d hd).2 (d * e) (dvd_mul_right d e) (Nat.mul_pos hd he)⟩
-  exact ⟨L, rfl, rfl, GlobalTheory.T.classFunctionLabel_of_labelMap_label p L O (fun d V hd hs hc => GlobalTheory.T.isCuspidalCharacterOfPolynomial_of_cuspidalLabel p L t ht hζ rfl d V _ hd
-    ((GlobalTheory.T.isCuspidalCharacter_iff_isCuspidal_GLnFiniteField p d V hd hs).2 hc) (hO d V hd hs hc)) (GlobalTheory.T.trace_harishChandra_induced_eq_product_characters p) (GlobalTheory.T.isConstituent_harishChandraRep_iff_pairing_ne_zero p) r ρ f hρ
-    (hasLabelO_of_mul O ρ hρ h0 h)⟩
-
+    (h : Formalism.IrreducibleCountingLemmas.TYPES.zIdem ρ * Formalism.L2.NT.eSerO O r f
+      = Formalism.IrreducibleCountingLemmas.TYPES.zIdem ρ)
+    : ∃ L : GlobalTheory.GLq.LabelDatum p,
+      L.teich = t ∧ L.gen = ζ ∧ GlobalTheory.GLq.HasLabel L (fun x => ρ.character x) f := by
+  let L : GlobalTheory.GLq.LabelDatum p := ⟨
+    t,
+    ht,
+    ζ,
+    fun d hd => (hζ d hd).1,
+    fun d e hd he => (hζ d hd).2 (d * e) (dvd_mul_right d e) (Nat.mul_pos hd he)
+  ⟩
+  exact ⟨
+    L,
+    rfl,
+    rfl,
+    GlobalTheory.T.classFunctionLabel_of_labelMap_label p L O
+      (fun d V hd hs hc =>
+        GlobalTheory.T.isCuspidalCharacterOfPolynomial_of_cuspidalLabel p L t ht hζ rfl d V _ hd
+          ((GlobalTheory.T.isCuspidalCharacter_iff_isCuspidal_GLnFiniteField p d V hd hs).2 hc)
+          (hO d V hd hs hc))
+      (GlobalTheory.T.trace_harishChandra_induced_eq_product_characters p)
+      (GlobalTheory.T.isConstituent_harishChandraRep_iff_pairing_ne_zero p) r ρ f hρ
+      (hasLabelO_of_mul O ρ hρ h0 h)
+  ⟩
 
 end GlobalTheory.BlockTypeSplit
 

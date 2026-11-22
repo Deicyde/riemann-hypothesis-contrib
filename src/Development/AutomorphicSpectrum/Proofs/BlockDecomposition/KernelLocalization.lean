@@ -30,8 +30,7 @@ theorem mul_mem {x y : Mat n} (hx : x ∈ GLs n) (hy : y ∈ GLs n) : x * y ∈ 
 theorem inv_mem {x : Mat n} (hx : x ∈ GLs n) : x⁻¹ ∈ GLs n :=
   (Matrix.isUnit_nonsing_inv_det x (isUnit_iff_ne_zero.mpr hx)).ne_zero
 
-theorem val_mem (y : G n) : y.val ∈ GLs n :=
-  ((Matrix.isUnit_iff_isUnit_det _).mp y.isUnit).ne_zero
+theorem val_mem (y : G n) : y.val ∈ GLs n := ((Matrix.isUnit_iff_isUnit_det _).mp y.isUnit).ne_zero
 
 def step (r s : ℝ) : ℝ := Real.smoothTransition (r + 1 - s)
 
@@ -46,35 +45,46 @@ theorem step_eq_zero {r s : ℝ} (h : r + 1 ≤ s) : step r s = 0 :=
 
 def cutAt (r : ℝ) (x y : Mat n) : ℝ := step r (lg (x⁻¹ * y))
 
-theorem cutAt_smooth (hL : LgFacts) (r : ℝ) {x : Mat n} (hx : x ∈ GLs n) :
-    ContDiffOn ℝ ∞ (cutAt r x) (GLs n) := by
+theorem cutAt_smooth (hL : LgFacts) (r : ℝ) {x : Mat n} (hx : x ∈ GLs n)
+    : ContDiffOn ℝ ∞ (cutAt r x) (GLs n) := by
   have hm : ContDiff ℝ ∞ (fun y : Mat n => x⁻¹ * y) :=
     (LinearMap.toContinuousLinearMap (LinearMap.mulLeft ℝ x⁻¹)).contDiff
   have h1 : ContDiffOn ℝ ∞ (fun y : Mat n => lg (x⁻¹ * y)) (GLs n) :=
     (hL n).2.2.2.1.comp hm.contDiffOn fun _ hy => mul_mem (inv_mem hx) hy
   exact (step_contDiff r).comp_contDiffOn h1
 
-theorem cutAt_mul_unitary (hL : LgFacts) (r : ℝ) {x g : Mat n} (hx : x ∈ GLs n) (hg : g ∈ GLs n)
-    (k : Matrix.unitaryGroup (Fin n) ℂ) : cutAt r x (g * k.1) = cutAt r x g := by
+theorem cutAt_mul_unitary
+    (hL : LgFacts) (r : ℝ)
+    {x g : Mat n} (hx : x ∈ GLs n) (hg : g ∈ GLs n)
+    (k : Matrix.unitaryGroup (Fin n) ℂ)
+    : cutAt r x (g * k.1) = cutAt r x g := by
   have h := (hL n).2.2.1 (x⁻¹ * g) (mul_mem (inv_mem hx) hg) 1 k
   have e : ((1 : Matrix.unitaryGroup (Fin n) ℂ)).1 * (x⁻¹ * g) * k.1 = x⁻¹ * (g * k.1) := by
     rw [show ((1 : Matrix.unitaryGroup (Fin n) ℂ)).1 = 1 from rfl, one_mul, mul_assoc]
   rw [e] at h
   simp only [cutAt, h]
 
-def cutSec {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] (r : ℝ) (x : Mat n) (f : Mat n → V) : Mat n → V :=
-  fun y => ((cutAt r x y : ℝ) : ℂ) • f y
+def cutSec {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] (r : ℝ) (x : Mat n) (f : Mat n → V)
+    : Mat n → V := fun y =>
+  ((cutAt r x y : ℝ) : ℂ) • f y
 
-theorem cutSec_mem (hL : LgFacts) (r : ℝ) {x : Mat n} (hx : x ∈ GLs n) {E : KMod n} {f : Mat n → E.V}
-    (hf : f ∈ CE E) : cutSec r x f ∈ CE E := by
+theorem cutSec_mem
+    (hL : LgFacts) (r : ℝ)
+    {x : Mat n} (hx : x ∈ GLs n)
+    {E : KMod n} {f : Mat n → E.V} (hf : f ∈ CE E)
+    : cutSec r x f ∈ CE E := by
   refine ⟨?_, fun g hg k => ?_⟩
   · have hc : ContDiffOn ℝ ∞ (fun y => ((cutAt r x y : ℝ) : ℂ)) (GLs n) :=
       Complex.ofRealCLM.contDiff.comp_contDiffOn (cutAt_smooth hL r hx)
     exact hc.smul hf.1
   · simp only [cutSec, cutAt_mul_unitary hL r hx hg k, hf.2 g hg k, map_smul]
 
-theorem cutSec_cpt (hL : LgFacts) (r : ℝ) {x : Mat n} (hx : x ∈ GLs n) {V : Type} [NormedAddCommGroup V]
-    [NormedSpace ℂ V] (f : Mat n → V) : Cpt (cutSec r x f) := by
+theorem cutSec_cpt
+    (hL : LgFacts) (r : ℝ)
+    {x : Mat n} (hx : x ∈ GLs n)
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V]
+    (f : Mat n → V)
+    : Cpt (cutSec r x f) := by
   refine ⟨lg x + (r + 1), fun y hy h => ?_⟩
   have e : x * (x⁻¹ * y) = y := Matrix.mul_nonsing_inv_cancel_left x y (isUnit_iff_ne_zero.mpr hx)
   have hs := (hL n).1 x hx (x⁻¹ * y) (mul_mem (inv_mem hx) hy)
@@ -82,17 +92,22 @@ theorem cutSec_cpt (hL : LgFacts) (r : ℝ) {x : Mat n} (hx : x ∈ GLs n) {V : 
   have h0 : cutAt r x y = 0 := step_eq_zero (by linarith)
   simp [cutSec, h0]
 
-theorem cutSec_eq {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] {r : ℝ} {x y : Mat n} (hx : x ∈ GLs n)
-    (f : Mat n → V) (h : lg y ≤ r) : cutSec r x f (x * y) = f (x * y) := by
+theorem cutSec_eq
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V]
+    {r : ℝ} {x y : Mat n} (hx : x ∈ GLs n)
+    (f : Mat n → V) (h : lg y ≤ r)
+    : cutSec r x f (x * y) = f (x * y) := by
   have e : x⁻¹ * (x * y) = y := Matrix.nonsing_inv_mul_cancel_left x y (isUnit_iff_ne_zero.mpr hx)
   have h1 : cutAt r x (x * y) = 1 := by
     rw [cutAt, e]
     exact step_eq_one h
   simp [cutSec, h1]
 
-theorem wave_sub {E : KMod n} {u v : ℝ → Mat n → E.V} (hu : IsWave E u) (hv : IsWave E v) :
-    IsWave E fun t y => u t y - v t y := by
-  have h := GlobalTheory.CompanionTheory.WaveK.Lin.wave_add hu (GlobalTheory.CompanionTheory.WaveK.Lin.wave_smul (-1 : ℂ) hv)
+theorem wave_sub {E : KMod n} {u v : ℝ → Mat n → E.V} (hu : IsWave E u) (hv : IsWave E v)
+    : IsWave E fun t y => u t y - v t y := by
+  have h :=
+    GlobalTheory.CompanionTheory.WaveK.Lin.wave_add hu
+      (GlobalTheory.CompanionTheory.WaveK.Lin.wave_smul (-1 : ℂ) hv)
   simpa [sub_eq_add_neg] using h
 
 theorem kerLoc : KerLoc := by
@@ -111,7 +126,9 @@ theorem kerLoc : KerLoc := by
     have hb : c * (1 + |t|) ≤ |c| * (1 + |T|) := by
       have h1 : |t| ≤ |T| := ht.trans (le_abs_self T)
       have h2 : (0 : ℝ) ≤ 1 + |t| := by positivity
-      calc c * (1 + |t|) ≤ |c| * (1 + |t|) := mul_le_mul_of_nonneg_right (le_abs_self c) h2
+      calc
+        c * (1 + |t|)
+          ≤ |c| * (1 + |t|) := mul_le_mul_of_nonneg_right (le_abs_self c) h2
         _ ≤ |c| * (1 + |T|) := mul_le_mul_of_nonneg_left (by linarith) (abs_nonneg c)
     show u 0 (x * y) - v 0 (x * y) = 0
     rw [hv0 _ (mul_mem hx hy), cutSec_eq hx _ (hly.trans (hb.trans hcr)), sub_self]

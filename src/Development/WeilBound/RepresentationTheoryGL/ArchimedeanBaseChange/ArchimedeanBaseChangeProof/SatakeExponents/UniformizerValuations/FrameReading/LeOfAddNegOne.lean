@@ -9,17 +9,20 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel GlobalTheory.CuspRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel GlobalTheory.CuspRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace PositivityTheory.Rg.BcB.F.Tail.PExp.DlB
 
-theorem pair_sum (N : ℕ) (x : Fin N → ℤ) :
-    ∑ i : Fin N, ∑ j ∈ Finset.univ.filter (fun j => i < j), (x i - x j) =
-      ∑ i : Fin N, ((N : ℤ) - 1 - 2 * (i : ℕ)) * x i := by
-  have hswap : ∑ i : Fin N, ∑ j ∈ Finset.univ.filter (fun j => i < j), x j =
-      ∑ j : Fin N, ∑ i ∈ Finset.univ.filter (fun i => i < j), x j :=
+theorem pair_sum (N : ℕ) (x : Fin N → ℤ)
+    : ∑ i : Fin N, ∑ j ∈ Finset.univ.filter (fun j => i < j), (x i - x j)
+      = ∑ i : Fin N, ((N : ℤ) - 1 - 2 * (i : ℕ)) * x i := by
+  have hswap
+      : ∑ i : Fin N, ∑ j ∈ Finset.univ.filter (fun j => i < j), x j
+        = ∑ j : Fin N, ∑ i ∈ Finset.univ.filter (fun i => i < j), x j :=
     Finset.sum_comm' (fun i j => by simp)
   simp only [Finset.sum_sub_distrib, Finset.sum_const, nsmul_eq_mul]
   rw [hswap]
@@ -36,15 +39,15 @@ theorem pair_sum (N : ℕ) (x : Fin N → ℤ) :
   rw [h]
   ring
 
-theorem prod_zpow' (a : ℝ) (ha : a ≠ 0) {ι : Type*} (s : Finset ι) (f : ι → ℤ) :
-    ∏ i ∈ s, a ^ f i = a ^ ∑ i ∈ s, f i := by
+theorem prod_zpow' (a : ℝ) (ha : a ≠ 0) {ι : Type*} (s : Finset ι) (f : ι → ℤ)
+    : ∏ i ∈ s, a ^ f i = a ^ ∑ i ∈ s, f i := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
   | insert i s hi ih => rw [Finset.prod_insert hi, Finset.sum_insert hi, zpow_add₀ ha, ih]
 
-theorem le_ofAdd_neg_one (b : WithZero (Multiplicative ℤ)) (h : b < 1) :
-    b ≤ ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
+theorem le_ofAdd_neg_one (b : WithZero (Multiplicative ℤ)) (h : b < 1)
+    : b ≤ ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
   induction b using WithZero.recZeroCoe with
   | zero => exact zero_le
   | coe a =>
@@ -54,11 +57,16 @@ theorem le_ofAdd_neg_one (b : WithZero (Multiplicative ℤ)) (h : b < 1) :
     show Multiplicative.toAdd a ≤ -1
     omega
 
-theorem unif_of_ordL (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E))
-    (ϖ : (w.adicCompletion E)ˣ) (h : ordL (ϖ : w.adicCompletion E) = 1) :
-    valuation (w.adicCompletion E) (ϖ : w.adicCompletion E) = uniformizer (w.adicCompletion E) := by
+theorem unif_of_ordL
+    (E : Type) [Field E] [NumberField E]
+    (w : HeightOneSpectrum (𝓞 E)) (ϖ : (w.adicCompletion E)ˣ)
+    (h : ordL (ϖ : w.adicCompletion E) = 1)
+    : valuation (w.adicCompletion E) (ϖ : w.adicCompletion E)
+      = uniformizer (w.adicCompletion E) := by
   set K := w.adicCompletion E
-  have hv : Valued.v (ϖ : K) = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
+  have hv
+      : Valued.v (ϖ : K)
+        = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
     unfold ordL at h
     split_ifs at h with h0
     · exact absurd h (by norm_num)
@@ -106,21 +114,28 @@ theorem dlBridge' : DlBridge := by
   set S : ℤ := ∑ i : Fin N, ((N : ℤ) - 1 - 2 * (i : ℕ)) * x i with hS
   have hdB : deltaB (fun i => ϖ ^ x i) = q ^ (-S) := by
     unfold deltaB
-    have e1 : ∀ i j : Fin N, nabs (w.adicCompletion E) (ϖ ^ x i / ϖ ^ x j) = q ^ (-(x i - x j)) := fun i j => by
+    have e1
+        : ∀ i j : Fin N,
+          nabs (w.adicCompletion E) (ϖ ^ x i / ϖ ^ x j) = q ^ (-(x i - x j)) := fun i j => by
       rw [show ϖ ^ x i / ϖ ^ x j = ϖ ^ (x i - x j) by rw [_root_.zpow_sub, div_eq_mul_inv], hz]
     simp only [e1]
-    rw [Finset.prod_congr rfl fun i _ => prod_zpow' q hqpos.ne' _ _, prod_zpow' q hqpos.ne',
-      hS, ← pair_sum]
+    rw [Finset.prod_congr rfl fun i _ => prod_zpow' q hqpos.ne' _ _, prod_zpow' q hqpos.ne', hS,
+      ← pair_sum]
     congr 1
     simp only [Finset.sum_neg_distrib]
-  have hdH : (deltaHalf (w.adicCompletion E) (fun _ : Fin N => Unit) (leviTorus (w.adicCompletion E) (Fin N) fun i => ϖ ^ x i) : ℂ) =
-      ((√(deltaB (fun i => ϖ ^ x i)) : ℝ) : ℂ) := by
+  have hdH
+      : (deltaHalf (w.adicCompletion E)
+            (fun _ : Fin N => Unit)
+            (leviTorus (w.adicCompletion E) (Fin N) fun i => ϖ ^ x i)
+          : ℂ)
+        = ((√(deltaB (fun i => ϖ ^ x i)) : ℝ) : ℂ) := by
     rw [val_deltaHalf, deltaB_eq_modulus]
   rw [hdH, hdB]
   set r : ℝ := √q with hr
   have hrpos : 0 < r := Real.sqrt_pos.2 hqpos
   have e : q ^ (-S) = (r ^ (-S)) ^ 2 := by
-    rw [← zpow_natCast, ← _root_.zpow_mul, mul_comm, _root_.zpow_mul, zpow_natCast, hr, Real.sq_sqrt hqpos.le]
+    rw [← zpow_natCast, ← _root_.zpow_mul, mul_comm, _root_.zpow_mul, zpow_natCast, hr,
+      Real.sq_sqrt hqpos.le]
   have hqh : GlobalTheory.BCT.qh w = (r : ℂ) := rfl
   rw [hqh, e, Real.sqrt_sq (zpow_nonneg hrpos.le _), ← Complex.ofReal_mul, ← Complex.ofReal_zpow]
   congr 1

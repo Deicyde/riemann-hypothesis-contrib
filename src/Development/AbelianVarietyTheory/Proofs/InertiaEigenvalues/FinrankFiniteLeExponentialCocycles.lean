@@ -18,22 +18,24 @@ open Formalism Formalism.WeaklyAdmissibleFiltrations GlobalTheory.HyodoDef Tenso
 
 section Generic
 
-variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    {LL : Type} [Field LL] [Algebra Qp LL]
-    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
-    (ρ : Representation LL G V)
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  {LL : Type} [Field LL] [Algebra Qp LL]
+  {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
+  (ρ : Representation LL G V)
 
 theorem mem_Dcris_iff (x : V ⊗[Qp] B) : x ∈ Dcris PD ρ ↔ ∀ g, actVB PD ρ g x = x := by
-  simp only [Dcris, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply,
-    LinearMap.id_apply, sub_eq_zero]
+  simp only [Dcris, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.id_apply,
+    sub_eq_zero]
 
-theorem φVB_mem_Dcris {x : V ⊗[Qp] B} (hx : x ∈ Dcris PD ρ) :
-    φVB PD (LL := LL) (V := V) x ∈ Dcris PD ρ := by
+theorem φVB_mem_Dcris {x : V ⊗[Qp] B} (hx : x ∈ Dcris PD ρ)
+    : φVB PD (LL := LL) (V := V) x ∈ Dcris PD ρ := by
   rw [mem_Dcris_iff] at hx ⊢
   intro g
   rw [← GlobalTheory.CobCrisLift.φVB_act, hx g]
@@ -59,7 +61,8 @@ def pairs : Submodule LL ((G → V) × (V ⊗[Qp] B)) where
     rfl
 
 def projZ : pairs PD ρ →ₗ[LL] finiteCocycles PD ρ :=
-  LinearMap.codRestrict (finiteCocycles PD ρ) ((LinearMap.fst LL (G → V) (V ⊗[Qp] B)).comp (pairs PD ρ).subtype)
+  LinearMap.codRestrict (finiteCocycles PD ρ)
+    ((LinearMap.fst LL (G → V) (V ⊗[Qp] B)).comp (pairs PD ρ).subtype)
     (fun p => ⟨p.2.1, p.1.2, p.2.2⟩)
 
 theorem projZ_surjective : Function.Surjective (projZ PD ρ) := by
@@ -72,45 +75,55 @@ def toDcris : pairs PD ρ →ₗ[LL] Dcris PD ρ :=
       (pairs PD ρ).subtype)
     (fun p => GlobalTheory.CobCrisLift.sub_φ_mem_Dcris PD ρ p.1.1 p.1.2 p.2.2)
 
-theorem fst_mem_exponential_cocycles (p : pairs PD ρ) (hp : toDcris PD ρ p ∈ LinearMap.range (oneSubφ PD ρ)) :
-    (p : (G → V) × (V ⊗[Qp] B)).1 ∈ crystallineCocycles PD ρ := by
+theorem fst_mem_exponential_cocycles
+    (p : pairs PD ρ) (hp : toDcris PD ρ p ∈ LinearMap.range (oneSubφ PD ρ))
+    : (p : (G → V) × (V ⊗[Qp] B)).1 ∈ crystallineCocycles PD ρ := by
   obtain ⟨e, he⟩ := hp
-  have he' : (e : V ⊗[Qp] B) - φVB PD (LL := LL) (V := V) e
-      = p.1.2 - φVB PD (LL := LL) (V := V) p.1.2 := congrArg Subtype.val he
+  have he'
+      : (e : V ⊗[Qp] B) - φVB PD (LL := LL) (V := V) e = p.1.2 - φVB PD (LL := LL) (V := V) p.1.2 :=
+    congrArg Subtype.val he
   refine ⟨p.2.1, p.1.2 - e, ?_, fun g => ?_⟩
   · rw [map_sub]
-    calc φVB PD (LL := LL) (V := V) p.1.2 - φVB PD (LL := LL) (V := V) e
-        = (p.1.2 - (e : V ⊗[Qp] B)) + (((e : V ⊗[Qp] B) - φVB PD (LL := LL) (V := V) e)
-          - (p.1.2 - φVB PD (LL := LL) (V := V) p.1.2)) := by abel
+    calc
+      φVB PD (LL := LL) (V := V) p.1.2 - φVB PD (LL := LL) (V := V) e
+          = (p.1.2 - (e : V ⊗[Qp] B))
+            + (((e : V ⊗[Qp] B) - φVB PD (LL := LL) (V := V) e)
+              - (p.1.2 - φVB PD (LL := LL) (V := V) p.1.2)) := by
+        abel
       _ = p.1.2 - e := by rw [he', sub_self, add_zero]
   · have hg := (mem_Dcris_iff PD ρ e).1 e.2 g
     rw [p.2.2 g, map_sub, hg]
     abel
 
-theorem finrank_finite_cocycles_le [Module.Finite LL (Dcris PD ρ)] :
-    finrank LL (finiteCocycles PD ρ) ≤ finrank LL (crystallineCocycles PD ρ) +
-      finrank LL ↥(Dcris PD ρ ⊓ LinearMap.ker (φVB PD (LL := LL) (V := V) - LinearMap.id)) := by
+theorem finrank_finite_cocycles_le [Module.Finite LL (Dcris PD ρ)]
+    : finrank LL (finiteCocycles PD ρ)
+      ≤ finrank LL (crystallineCocycles PD ρ)
+        + finrank LL ↥(Dcris PD ρ ⊓ LinearMap.ker (φVB PD (LL := LL) (V := V) - LinearMap.id)) := by
   by_cases hf : Module.Finite LL (finiteCocycles PD ρ)
   swap
   · rw [Module.finrank_of_not_finite hf]; exact Nat.zero_le _
-  obtain ⟨s, hs⟩ := (projZ PD ρ).exists_rightInverse_of_surjective
-    (LinearMap.range_eq_top.2 (projZ_surjective PD ρ))
+  obtain ⟨s, hs⟩ :=
+    (projZ PD ρ).exists_rightInverse_of_surjective
+      (LinearMap.range_eq_top.2 (projZ_surjective PD ρ))
   set N := LinearMap.range (oneSubφ PD ρ) with hN
   let T : finiteCocycles PD ρ →ₗ[LL] (Dcris PD ρ ⧸ N) := N.mkQ ∘ₗ toDcris PD ρ ∘ₗ s
   have hle : crystallineCocycles PD ρ ≤ finiteCocycles PD ρ := fun c ⟨hc, x, _, hx⟩ => ⟨hc, x, hx⟩
   haveI : Module.Finite LL (crystallineCocycles PD ρ) :=
     Module.Finite.of_injective (Submodule.inclusion hle) (Submodule.inclusion_injective hle)
-  have hmem : ∀ k : LinearMap.ker T, ((k : finiteCocycles PD ρ) : G → V) ∈ crystallineCocycles PD ρ := by
+  have hmem
+      : ∀ k : LinearMap.ker T, ((k : finiteCocycles PD ρ) : G → V) ∈ crystallineCocycles PD ρ := by
     intro k
     have hk : T k = 0 := LinearMap.mem_ker.1 k.2
     have h := fst_mem_exponential_cocycles PD ρ (s k) ((Submodule.Quotient.mk_eq_zero N).1 hk)
     have hsk : projZ PD ρ (s k) = k := LinearMap.congr_fun hs k
-    have hv : ((s k : pairs PD ρ) : (G → V) × (V ⊗[Qp] B)).1 = ((k : finiteCocycles PD ρ) : G → V) :=
+    have hv
+        : ((s k : pairs PD ρ) : (G → V) × (V ⊗[Qp] B)).1 = ((k : finiteCocycles PD ρ) : G → V) :=
       congrArg Subtype.val hsk
     rwa [hv] at h
   have h1 : finrank LL (LinearMap.ker T) ≤ finrank LL (crystallineCocycles PD ρ) := by
     let j : LinearMap.ker T →ₗ[LL] crystallineCocycles PD ρ :=
-      LinearMap.codRestrict (crystallineCocycles PD ρ) ((finiteCocycles PD ρ).subtype ∘ₗ (LinearMap.ker T).subtype) hmem
+      LinearMap.codRestrict (crystallineCocycles PD ρ)
+        ((finiteCocycles PD ρ).subtype ∘ₗ (LinearMap.ker T).subtype) hmem
     have hj : Function.Injective j := by
       intro a b hab
       have h := congrArg Subtype.val hab
@@ -150,9 +163,21 @@ end Generic
 
 end GlobalTheory.HyodoFE
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N GlobalTheory.HyodoDef GlobalTheory.Pst TensorProduct Module
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N GlobalTheory.HyodoDef
+  GlobalTheory.Pst TensorProduct Module
 
-theorem GlobalTheory.HyodoFE.finrank_finite_le_exponential_add : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P), LocTied l P AI → ∀ (K : FinExt l) (V : Type) [AddCommGroup V] [Module ℚ_[l] V] [FiniteDimensional ℚ_[l] V] [TopologicalSpace V] [IsModuleTopology ℚ_[l] V] [ContinuousAdd V] [ContinuousConstSMul ℚ_[l] V] (ρ : Representation ℚ_[l] ↥(GK K) V), (∀ v, Continuous fun g => ρ g v) → IsDR (P.PD K) ρ → finrank ℚ_[l] ↥(finiteCocycles (P.PD K) ρ) ≤ finrank ℚ_[l] ↥(crystallineCocycles (P.PD K) ρ) + finrank ℚ_[l] ↥(Dcris (P.PD K) ρ ⊓ LinearMap.ker (φVB (P.PD K) (LL := ℚ_[l]) (V := V) - LinearMap.id)) := by
+theorem GlobalTheory.HyodoFE.finrank_finite_le_exponential_add
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
+      LocTied l P AI
+        → ∀ (K : FinExt l) (V : Type) [AddCommGroup V] [Module ℚ_[l] V] [FiniteDimensional ℚ_[l] V]
+            [TopologicalSpace V] [IsModuleTopology ℚ_[l] V] [ContinuousAdd V]
+            [ContinuousConstSMul ℚ_[l] V] (ρ : Representation ℚ_[l] ↥(GK K) V),
+          (∀ v, Continuous fun g => ρ g v) → IsDR (P.PD K) ρ
+            → finrank ℚ_[l] ↥(finiteCocycles (P.PD K) ρ)
+              ≤ finrank ℚ_[l] ↥(crystallineCocycles (P.PD K) ρ) + finrank ℚ_[l]
+                ↥(Dcris (P.PD K) ρ
+                  ⊓ LinearMap.ker (φVB (P.PD K) (LL := ℚ_[l]) (V := V) - LinearMap.id)) := by
   intro l _ P AI _ K V _ _ _ _ _ _ _ ρ _ hdR
   haveI := GlobalTheory.DcrisFin.dcris_finite_of_isDR l P K V ρ hdR
   exact GlobalTheory.HyodoFE.finrank_finite_cocycles_le (P.PD K) ρ

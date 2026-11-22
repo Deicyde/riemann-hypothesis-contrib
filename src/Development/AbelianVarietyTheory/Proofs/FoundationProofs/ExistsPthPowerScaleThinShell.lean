@@ -11,9 +11,10 @@ namespace GlobalTheory.AlmostEt
 
 variable {L : Type} [Field L]
 
-theorem approxRoot_exists_val_pow {p : ℕ} {v : Valuation L ℝ≥0} {F : Subfield L}
-    (hA : ApproxRoot p v F) {u : L} (hu : u ∈ F) (hu0 : u ≠ 0) :
-    ∃ w ∈ F, v w ^ p = v u := by
+theorem approxRoot_exists_val_pow
+    {p : ℕ} {v : Valuation L ℝ≥0} {F : Subfield L} (hA : ApproxRoot p v F)
+    {u : L} (hu : u ∈ F) (hu0 : u ≠ 0)
+    : ∃ w ∈ F, v w ^ p = v u := by
   obtain ⟨θ, hθ, h⟩ := hA
   obtain ⟨w, hw, hle⟩ := h u hu
   have hvu : 0 < v u := pos_iff_ne_zero.mpr ((Valuation.ne_zero_iff v).mpr hu0)
@@ -24,9 +25,10 @@ theorem approxRoot_exists_val_pow {p : ℕ} {v : Valuation L ℝ≥0} {F : Subfi
   rw [← map_pow]
   exact Valuation.map_eq_of_sub_lt v hlt
 
-theorem approxRoot_exists_root_of_p {p : ℕ} (hp : p.Prime) {v : Valuation L ℝ≥0} {F : Subfield L}
-    (hA : ApproxRoot p v F) (hp0 : 0 < v (p : L)) :
-    ∀ k : ℕ, ∃ π ∈ F, v π ^ (p ^ k) = v (p : L) := by
+theorem approxRoot_exists_root_of_p
+    {p : ℕ} (hp : p.Prime)
+    {v : Valuation L ℝ≥0} {F : Subfield L} (hA : ApproxRoot p v F) (hp0 : 0 < v (p : L))
+    : ∀ k : ℕ, ∃ π ∈ F, v π ^ (p ^ k) = v (p : L) := by
   intro k
   induction k with
   | zero => exact ⟨(p : L), natCast_mem F p, by simp⟩
@@ -40,10 +42,15 @@ theorem approxRoot_exists_root_of_p {p : ℕ} (hp : p.Prime) {v : Valuation L �
     refine ⟨w, hw, ?_⟩
     rw [pow_succ', pow_mul, hw', hv]
 
-theorem exists_scale_shell (L : Type) [Field L] (v : Valuation L ℝ≥0) (p : ℕ) (hp : p.Prime)
-    (F : Subfield L) (hA : ApproxRoot p v F) (hp0 : 0 < v (p : L)) (hp1 : v (p : L) < 1)
-    (r : ℝ≥0) (hr : r < 1) (x : L) (hx : x ≠ 0) :
-    ∃ d ∈ F, d ≠ 0 ∧ r < v (x * d ^ p) ∧ v (x * d ^ p) ≤ 1 := by
+theorem exists_scale_shell
+    (L : Type) [Field L]
+    (v : Valuation L ℝ≥0)
+    (p : ℕ) (hp : p.Prime)
+    (F : Subfield L) (hA : ApproxRoot p v F)
+    (hp0 : 0 < v (p : L)) (hp1 : v (p : L) < 1)
+    (r : ℝ≥0) (hr : r < 1)
+    (x : L) (hx : x ≠ 0)
+    : ∃ d ∈ F, d ≠ 0 ∧ r < v (x * d ^ p) ∧ v (x * d ^ p) ≤ 1 := by
   obtain ⟨n, hn⟩ := exists_pow_lt_of_lt_one (pow_pos hp0 p) hr
   obtain ⟨π, hπ, hv⟩ := approxRoot_exists_root_of_p hp hA hp0 n
   set s := v π with hs
@@ -80,17 +87,24 @@ theorem exists_scale_shell (L : Type) [Field L] (v : Valuation L ℝ≥0) (p : �
   constructor
   · have e : t⁻¹ ^ m * t ^ (m + 1) = t := by
       rw [inv_zpow, zpow_add_one₀ htne, ← mul_assoc, inv_mul_cancel₀ (zpow_ne_zero _ htne), one_mul]
-    calc r < t := hrt
+    calc
+      r < t := hrt
       _ = t⁻¹ ^ m * t ^ (m + 1) := e.symm
       _ < v x * t ^ (m + 1) := mul_lt_mul_of_pos_right hm1 (zpow_pos ht0 _)
   · have e : t⁻¹ ^ (m + 1) * t ^ (m + 1) = 1 := by
       rw [inv_zpow, inv_mul_cancel₀ (zpow_ne_zero _ htne)]
-    calc v x * t ^ (m + 1) ≤ t⁻¹ ^ (m + 1) * t ^ (m + 1) := mul_le_mul_of_nonneg_right hm2 (by positivity)
+    calc
+      v x * t ^ (m + 1)
+        ≤ t⁻¹ ^ (m + 1) * t ^ (m + 1) := mul_le_mul_of_nonneg_right hm2 (by positivity)
       _ = 1 := e
 
-theorem klc_scale : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) (p : ℕ), p.Prime → ∀ F : Subfield L,
-    ApproxRoot p v F → 0 < v (p : L) → v (p : L) < 1 → ∀ r : ℝ≥0, r < 1 → ∀ x : L, x ≠ 0 →
-    ∃ d ∈ F, d ≠ 0 ∧ r < v (x * d ^ p) ∧ v (x * d ^ p) ≤ 1 :=
+theorem klc_scale
+    : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) (p : ℕ),
+      p.Prime
+        → ∀ F : Subfield L,
+          ApproxRoot p v F → 0 < v (p : L) → v (p : L) < 1
+            → ∀ r : ℝ≥0,
+              r < 1 → ∀ x : L, x ≠ 0 → ∃ d ∈ F, d ≠ 0 ∧ r < v (x * d ^ p) ∧ v (x * d ^ p) ≤ 1 :=
   fun L _ v p hp F hA hp0 hp1 r hr x hx => exists_scale_shell L v p hp F hA hp0 hp1 r hr x hx
 
 end GlobalTheory.AlmostEt

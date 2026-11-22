@@ -4,16 +4,21 @@ public import Mathlib
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory
+  CartesianMonoidalCategory MonObj
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem grpObj_of_mono_factor {C : Type*} [Category C] [CartesianMonoidalCategory C]
-    {A K : C} [GrpObj A] (i : K ⟶ A) [Mono i] (m : K ⊗ K ⟶ K) (hm : m ≫ i = (i ⊗ₘ i) ≫ μ[A])
-    (e : 𝟙_ C ⟶ K) (he : e ≫ i = η[A]) (v : K ⟶ K) (hv : v ≫ i = i ≫ ι[A]) :
-    ∃ _ : GrpObj K, IsMonHom i := by
+theorem grpObj_of_mono_factor
+    {C : Type*} [Category C] [CartesianMonoidalCategory C]
+    {A K : C} [GrpObj A]
+    (i : K ⟶ A) [Mono i]
+    (m : K ⊗ K ⟶ K) (hm : m ≫ i = (i ⊗ₘ i) ≫ μ[A])
+    (e : 𝟙_ C ⟶ K) (he : e ≫ i = η[A])
+    (v : K ⟶ K) (hv : v ≫ i = i ≫ ι[A])
+    : ∃ _ : GrpObj K, IsMonHom i := by
   letI M : MonObj K :=
     { one := e, mul := m
       one_mul := by
@@ -54,9 +59,11 @@ theorem grpObj_of_mono_factor {C : Type*} [Category C] [CartesianMonoidalCategor
           ← Category.assoc, toUnit_unique (i ≫ toUnit A) (toUnit K)] }
   exact ⟨G, { one_hom := he, mul_hom := hm }⟩
 
-theorem overScheme_grpObj_of_mono_factor : ∀ (T : Scheme.{0}) (A K : Over T) [GrpObj A] (i : K ⟶ A),
-    Mono i → (∃ m : K ⊗ K ⟶ K, m ≫ i = (i ⊗ₘ i) ≫ μ[A]) → (∃ e : 𝟙_ (Over T) ⟶ K, e ≫ i = η[A]) →
-    (∃ v : K ⟶ K, v ≫ i = i ≫ ι[A]) → ∃ _ : GrpObj K, IsMonHom i := by
+theorem overScheme_grpObj_of_mono_factor
+    : ∀ (T : Scheme.{0}) (A K : Over T) [GrpObj A] (i : K ⟶ A),
+      Mono i → (∃ m : K ⊗ K ⟶ K, m ≫ i = (i ⊗ₘ i) ≫ μ[A]) → (∃ e : 𝟙_ (Over T) ⟶ K, e ≫ i = η[A])
+        → (∃ v : K ⟶ K, v ≫ i = i ≫ ι[A])
+        → ∃ _ : GrpObj K, IsMonHom i := by
   intro T A K _ i hi ⟨m, hm⟩ ⟨e, he⟩ ⟨v, hv⟩
   exact grpObj_of_mono_factor i m hm e he v hv
 

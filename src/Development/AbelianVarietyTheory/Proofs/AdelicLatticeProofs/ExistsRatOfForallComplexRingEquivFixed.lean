@@ -12,11 +12,10 @@ open scoped Kronecker ComplexOrder TensorProduct
 
 namespace GlobalTheory.ClassFin
 
-
 open Matrix in
 open scoped Kronecker ComplexOrder TensorProduct in
-theorem _root_.GlobalTheory.ClassFin.exists_rat_of_forall_ringEquiv_fixed :
-    ∀ z : ℂ, (∀ σ : ℂ ≃+* ℂ, σ z = z) → ∃ q : ℚ, z = q := by
+theorem _root_.GlobalTheory.ClassFin.exists_rat_of_forall_ringEquiv_fixed
+    : ∀ z : ℂ, (∀ σ : ℂ ≃+* ℂ, σ z = z) → ∃ q : ℚ, z = q := by
   intro z hz
   by_contra h
   push_neg at h

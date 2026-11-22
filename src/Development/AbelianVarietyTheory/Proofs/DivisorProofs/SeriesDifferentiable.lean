@@ -8,11 +8,32 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasFDerivAtD
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.CMVal GlobalTheory.IndefiniteRowSideFullHecke.DefiningCoordinates GlobalTheory.DeformedSum
+open NumberField IsDedekindDomain GlobalTheory.CMVal
+  GlobalTheory.IndefiniteRowSideFullHecke.DefiningCoordinates GlobalTheory.DeformedSum
 
 namespace GlobalTheory.DeformedSum.Series
 
-theorem series_differentiable : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (I : Type) [Fintype I] [DecidableEq I] (φ : I → E →+* ℂ), IsCMType φ → ∀ s : ℕ, 2 ≤ s → ∀ (c : Ideal (OF E)) (y : (Af E)ˣ), c ≠ ⊥ → ∀ (m : I → ℕ) (z : I → ℂ), z ∈ polydisc I → Summable (fun q : modUnits (lattice c y) => dTerm φ (2 * s) m z q.1.out) ∧ DifferentiableAt ℂ (fun w : I → ℂ => ∑' q : modUnits (lattice c y), dTerm φ (2 * s) m w q.1.out) z ∧ ∀ i : I, HasLineDerivAt ℂ (fun w : I → ℂ => ∑' q : modUnits (lattice c y), dTerm φ (2 * s) m w q.1.out) (∑' q : modUnits (lattice c y), dTerm φ (2 * s) (m + Pi.single i 1) z q.1.out) z (Pi.single i 1) := by
+theorem series_differentiable
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (I : Type) [Fintype I] [DecidableEq I]
+        (φ : I → E →+* ℂ),
+      IsCMType φ
+        → ∀ s : ℕ,
+          2 ≤ s
+            → ∀ (c : Ideal (OF E)) (y : (Af E)ˣ),
+              c ≠ ⊥
+                → ∀ (m : I → ℕ) (z : I → ℂ),
+                  z ∈ polydisc I
+                    → Summable (fun q : modUnits (lattice c y) => dTerm φ (2 * s) m z q.1.out)
+                      ∧ DifferentiableAt ℂ
+                        (fun w : I → ℂ =>
+                          ∑' q : modUnits (lattice c y), dTerm φ (2 * s) m w q.1.out)
+                        z
+                      ∧ ∀ i : I,
+                        HasLineDerivAt ℂ
+                          (fun w : I → ℂ =>
+                            ∑' q : modUnits (lattice c y), dTerm φ (2 * s) m w q.1.out)
+                          (∑' q : modUnits (lattice c y), dTerm φ (2 * s) (m + Pi.single i 1) z q.1.out)
+                          z (Pi.single i 1) := by
   intro E _ _ _ I _ _ φ hφ s hs c y hc m z hz
 
   have hz1 : ‖z‖ < 1 := by
@@ -31,30 +52,39 @@ theorem series_differentiable : ∀ (E : Type) [Field E] [NumberField E] [IsCMFi
   have hUpd : ∀ w ∈ U, w ∈ polydisc I := fun w hw i => lt_of_le_of_lt (hUle w hw i) hr1
 
   set N : modUnits (lattice c y) → ℝ := fun q => |(Algebra.norm ℚ (q.1.out : E) : ℝ)| ^ (-(s : ℝ)) with hN
-  have hNs : Summable N := GlobalTheory.CMVal.Conv.summable_norm_rpow E c y (s : ℝ) hc (by exact_mod_cast (by omega : 1 < s))
+  have hNs : Summable N :=
+    GlobalTheory.CMVal.Conv.summable_norm_rpow E c y (s : ℝ) hc
+      (by exact_mod_cast (by omega : 1 < s))
   have hne : ∀ q : modUnits (lattice c y), q.1.out ≠ 0 := fun q => (out_mem_lattice q).2
-  obtain ⟨C0, hC0⟩ := GlobalTheory.T.deformedProductDerivativeTerm_norm_le_uniform E I φ hφ s m r hr1
-  have hsum : ∀ w ∈ U, Summable (fun q : modUnits (lattice c y) => dTerm φ (2 * s) m w q.1.out) := fun w hw =>
-    Summable.of_norm_bounded (hNs.mul_left C0) fun q => hC0 w (hUle w hw) _ (hne q)
+  obtain ⟨C0, hC0⟩ :=
+    GlobalTheory.T.deformedProductDerivativeTerm_norm_le_uniform E I φ hφ s m r hr1
+  have hsum : ∀ w ∈ U, Summable (fun q : modUnits (lattice c y) => dTerm φ (2 * s) m w q.1.out) :=
+    fun w hw => Summable.of_norm_bounded (hNs.mul_left C0) fun q => hC0 w (hUle w hw) _ (hne q)
   choose C hC using fun j : I => GlobalTheory.T.deformedProductDerivativeTerm_norm_le_uniform E I φ hφ s (m + Pi.single j 1) r hr1
   set f' : modUnits (lattice c y) → (I → ℂ) → ((I → ℂ) →L[ℂ] ℂ) := fun q w =>
     ∑ j, dTerm φ (2 * s) (m + Pi.single j 1) w q.1.out • (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : I => ℂ) j) with hf'
   set u : modUnits (lattice c y) → ℝ := fun q => ∑ j, C j * N q * ‖ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : I => ℂ) j‖ with hu
   have hus : Summable u := summable_sum fun j _ => ((hNs.mul_left (C j)).mul_right _)
-  have hder : ∀ q w, w ∈ U → HasFDerivAt (fun w : I → ℂ => dTerm φ (2 * s) m w q.1.out) (f' q w) w :=
-    fun q w hw => GlobalTheory.T.hasFDerivAt_deformedProductDerivativeTerm E I φ (2 * s) m q.1.out (hne q) w (hUpd w hw)
+  have hder
+      : ∀ q w, w ∈ U → HasFDerivAt (fun w : I → ℂ => dTerm φ (2 * s) m w q.1.out) (f' q w) w :=
+    fun q w hw =>
+      GlobalTheory.T.hasFDerivAt_deformedProductDerivativeTerm E I φ (2 * s) m q.1.out (hne q) w
+        (hUpd w hw)
   have hbd : ∀ q w, w ∈ U → ‖f' q w‖ ≤ u q := by
     intro q w hw
     refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun j _ => ?_)
     rw [norm_smul]
     exact mul_le_mul_of_nonneg_right (hC j w (hUle w hw) _ (hne q)) (norm_nonneg _)
-  have hF : HasFDerivAt (fun w : I → ℂ => ∑' q : modUnits (lattice c y), dTerm φ (2 * s) m w q.1.out)
+  have hF : HasFDerivAt
+      (fun w : I → ℂ => ∑' q : modUnits (lattice c y), dTerm φ (2 * s) m w q.1.out)
       (∑' q, f' q z) z :=
     hasFDerivAt_tsum_of_isPreconnected hus hUo hUc hder hbd hzU (hsum z hzU) hzU
   refine ⟨hsum z hzU, hF.differentiableAt, fun i => ?_⟩
   have hL := hF.hasLineDerivAt (Pi.single i 1)
   have hcs : Summable (fun q => f' q z) := Summable.of_norm_bounded hus fun q => hbd q z hzU
-  have hev : (∑' q, f' q z) (Pi.single i 1) = ∑' q : modUnits (lattice c y), dTerm φ (2 * s) (m + Pi.single i 1) z q.1.out := by
+  have hev
+      : (∑' q, f' q z) (Pi.single i 1)
+        = ∑' q : modUnits (lattice c y), dTerm φ (2 * s) (m + Pi.single i 1) z q.1.out := by
     have hm := (ContinuousLinearMap.apply ℂ ℂ (Pi.single i (1 : ℂ) : I → ℂ)).map_tsum hcs
     simp only [ContinuousLinearMap.apply_apply] at hm
     rw [hm]

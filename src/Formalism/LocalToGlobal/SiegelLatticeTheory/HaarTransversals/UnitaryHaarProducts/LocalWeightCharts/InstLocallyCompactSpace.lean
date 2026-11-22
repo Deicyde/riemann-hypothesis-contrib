@@ -53,7 +53,8 @@ lemma emb : IsClosedEmbedding (val : Grp U h → Mx k r) := h.closed.isClosedEmb
 instance : IsTopologicalGroup (Grp U h) where
   continuous_mul := by
     rw [emb.isInducing.continuous_iff]
-    exact Continuous.matrix_mul (emb.continuous.comp continuous_fst) (emb.continuous.comp continuous_snd)
+    exact Continuous.matrix_mul (emb.continuous.comp continuous_fst)
+      (emb.continuous.comp continuous_snd)
   continuous_inv := by
     rw [emb.isInducing.continuous_iff]
     have : (val ∘ fun a : Grp U h => a⁻¹) = fun a : Grp U h => (a.val.det)⁻¹ • a.val.adjugate := by
@@ -62,7 +63,8 @@ instance : IsTopologicalGroup (Grp U h) where
       rw [Matrix.inv_def, Ring.inverse_eq_inv']
     rw [this]
     have hv : Continuous (val : Grp U h → Mx k r) := emb.continuous
-    exact Continuous.smul (Continuous.inv₀ hv.matrix_det fun a => (h.unit _ a.mem).ne_zero) hv.matrix_adjugate
+    exact Continuous.smul (Continuous.inv₀ hv.matrix_det fun a => (h.unit _ a.mem).ne_zero)
+      hv.matrix_adjugate
 
 instance : LocallyCompactSpace (Grp U h) :=
   have : LocallyCompactSpace (Mx k r) := inferInstanceAs (LocallyCompactSpace (Mt k r))
@@ -109,8 +111,8 @@ theorem hmeas_haar (U : Set (Mx k r)) (h : ClSub U) : IsHaarOn U (hmeas U h) := 
   refine ⟨sigma_of_compact _ (hmeas_compact U h), ?_, ?_, ?_⟩
   · intro h0
     have h1 := congrArg (fun μ : Measure (Mt k r) => μ Set.univ) h0
-    simp only [hmeas, Measure.map_apply hmeas' MeasurableSet.univ, Measure.coe_zero,
-      Pi.zero_apply] at h1
+    simp only [hmeas, Measure.map_apply hmeas' MeasurableSet.univ, Measure.coe_zero, Pi.zero_apply]
+      at h1
     rw [Set.preimage_univ] at h1
     exact (NeZero.ne (Measure.haar : Measure (Grp U h))) (Measure.measure_univ_eq_zero.mp h1)
   · have hm : MeasurableSet {x : Mt k r | Matrix.of x ∉ U} := hUc.measurableSet.compl
@@ -129,14 +131,14 @@ theorem hmeas_haar (U : Set (Mx k r)) (h : ClSub U) : IsHaarOn U (hmeas U h) := 
       exact this.measurable
     unfold hmeas
     rw [Measure.map_map hl hmeas']
-    have : lmulM s ∘ (Grp.vt : Grp U h → Mt k r) =
-        (Grp.vt : Grp U h → Mt k r) ∘ (fun x => Grp.mk s hs * x) := by
+    have : lmulM s ∘ (Grp.vt : Grp U h → Mt k r)
+        = (Grp.vt : Grp U h → Mt k r) ∘ (fun x => Grp.mk s hs * x) := by
       funext x
       rfl
     rw [this, ← Measure.map_map hmeas' (measurable_const_mul _), map_mul_left_eq_self]
 
-theorem haar_unique (U : Set (Mx k r)) (h : ClSub U) (μ : Measure (Mt k r)) (hμ : IsHaarOn U μ) :
-    ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ∞ ∧ μ = c • hmeas U h := by
+theorem haar_unique (U : Set (Mx k r)) (h : ClSub U) (μ : Measure (Mt k r)) (hμ : IsHaarOn U μ)
+    : ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ∞ ∧ μ = c • hmeas U h := by
   obtain ⟨hσ, h0, hconc, hinv⟩ := hμ
   have hE := val_memb U h
   set ψ := (Grp.vt : Grp U h → Mt k r) with hψdef
@@ -152,7 +154,8 @@ theorem haar_unique (U : Set (Mx k r)) (h : ClSub U) (μ : Measure (Mt k r)) (h�
     refine ⟨Grp.mk (h := h) (Matrix.of x) ?_, rfl⟩
     by_contra h'
     exact hc h'
-  have hσν : SigmaFinite ν := SigmaFinite.of_map ν hE.measurable.aemeasurable (by rw [hmapν]; exact hσ)
+  have hσν : SigmaFinite ν :=
+    SigmaFinite.of_map ν hE.measurable.aemeasurable (by rw [hmapν]; exact hσ)
   have hinj : ∀ a b : Measure (Grp U h), a.map ψ = b.map ψ → a = b := by
     intro a b hab
     rw [← hE.comap_map a, ← hE.comap_map b, hab]
@@ -171,8 +174,7 @@ theorem haar_unique (U : Set (Mx k r)) (h : ClSub U) (μ : Measure (Mt k r)) (h�
     rw [Measure.map_map hE.measurable hmul, hcomp, ← Measure.map_map hlm hE.measurable, hmapν]
     exact hinv _ g.mem
   obtain ⟨K, hK, hKn⟩ := exists_compact_mem_nhds (1 : Grp U h)
-  have hK0 : (Measure.haar : Measure (Grp U h)) K ≠ 0 :=
-    (Measure.measure_pos_of_mem_nhds _ hKn).ne'
+  have hK0 : (Measure.haar : Measure (Grp U h)) K ≠ 0 := (Measure.measure_pos_of_mem_nhds _ hKn).ne'
   have hKt : (Measure.haar : Measure (Grp U h)) K ≠ ∞ := hK.measure_lt_top.ne
   have heq := measure_eq_div_smul ν (Measure.haar : Measure (Grp U h)) hK0 hKt
   set c := ν K / (Measure.haar : Measure (Grp U h)) K with hc
@@ -185,7 +187,8 @@ theorem haar_unique (U : Set (Mx k r)) (h : ClSub U) (μ : Measure (Mt k r)) (h�
     have hnull : ∀ i, (Measure.haar : Measure (Grp U h)) (spanningSets ν i) = 0 := by
       intro i
       have hlt := measure_spanningSets_lt_top ν i
-      have hS : ν (spanningSets ν i) = (c • (Measure.haar : Measure (Grp U h))) (spanningSets ν i) :=
+      have hS
+          : ν (spanningSets ν i) = (c • (Measure.haar : Measure (Grp U h))) (spanningSets ν i) :=
         congrArg (fun m : Measure (Grp U h) => m (spanningSets ν i)) heq
       rw [hS, Measure.smul_apply, smul_eq_mul, htop] at hlt
       by_contra hne
@@ -204,14 +207,14 @@ def tau (k r : ℕ) (i : Fin (2 * r + k + 1)) : Fin (2 * r + k + 1) :=
 
 def sgn (k r : ℕ) (i : Fin (2 * r + k + 1)) : ℂ := if i.val = r + k then -1 else 1
 
-theorem hpk_row (i m : Fin (2 * r + k + 1)) :
-    Hpk k r i m = if m = tau k r i then sgn k r i else 0 := by
+theorem hpk_row (i m : Fin (2 * r + k + 1))
+    : Hpk k r i m = if m = tau k r i then sgn k r i else 0 := by
   unfold Hpk tau sgn
   simp only [Fin.ext_iff]
   split_ifs <;> first | rfl | (exfalso; omega)
 
-theorem hpk_mul_apply (A : Mx k r) (i j : Fin (2 * r + k + 1)) :
-    (Hpk k r * A) i j = sgn k r i * A (tau k r i) j := by
+theorem hpk_mul_apply (A : Mx k r) (i j : Fin (2 * r + k + 1))
+    : (Hpk k r * A) i j = sgn k r i * A (tau k r i) j := by
   rw [Matrix.mul_apply, Finset.sum_eq_single (tau k r i)]
   · rw [hpk_row, if_pos rfl]
   · intro m _ hm
@@ -244,44 +247,53 @@ theorem hpk_sq : Hpk k r * Hpk k r = 1 := by
 theorem isUnit_of_uh {g : Mx k r} (hg : g ∈ UH (Hpk k r)) : IsUnit g.det := by
   apply Matrix.isUnit_det_of_left_inverse (B := Hpk k r * gᴴ * Hpk k r)
   have hg' : gᴴ * Hpk k r * g = Hpk k r := hg
-  calc Hpk k r * gᴴ * Hpk k r * g = Hpk k r * (gᴴ * Hpk k r * g) := by
-        simp only [Matrix.mul_assoc]
+  calc
+    Hpk k r * gᴴ * Hpk k r * g
+      = Hpk k r * (gᴴ * Hpk k r * g) := by simp only [Matrix.mul_assoc]
     _ = 1 := by rw [hg', hpk_sq]
 
 theorem uh_one : (1 : Mx k r) ∈ UH (Hpk k r) := by
   show (1 : Mx k r)ᴴ * Hpk k r * 1 = Hpk k r
   rw [conjTranspose_one, Matrix.one_mul, Matrix.mul_one]
 
-theorem uh_mul {g h : Mx k r} (hg : g ∈ UH (Hpk k r)) (hh : h ∈ UH (Hpk k r)) : g * h ∈ UH (Hpk k r) := by
+theorem uh_mul {g h : Mx k r} (hg : g ∈ UH (Hpk k r)) (hh : h ∈ UH (Hpk k r))
+    : g * h ∈ UH (Hpk k r) := by
   have hg' : gᴴ * Hpk k r * g = Hpk k r := hg
   have hh' : hᴴ * Hpk k r * h = Hpk k r := hh
   show (g * h)ᴴ * Hpk k r * (g * h) = Hpk k r
   rw [conjTranspose_mul]
-  calc hᴴ * gᴴ * Hpk k r * (g * h) = hᴴ * (gᴴ * Hpk k r * g) * h := by
-        simp only [Matrix.mul_assoc]
+  calc
+    hᴴ * gᴴ * Hpk k r * (g * h)
+      = hᴴ * (gᴴ * Hpk k r * g) * h := by simp only [Matrix.mul_assoc]
     _ = Hpk k r := by rw [hg', hh']
 
 theorem uh_inv {g : Mx k r} (hg : g ∈ UH (Hpk k r)) : g⁻¹ ∈ UH (Hpk k r) := by
   have hg' : gᴴ * Hpk k r * g = Hpk k r := hg
   have hu := isUnit_of_uh hg
   show (g⁻¹)ᴴ * Hpk k r * g⁻¹ = Hpk k r
-  calc (g⁻¹)ᴴ * Hpk k r * g⁻¹ = (g⁻¹)ᴴ * (gᴴ * Hpk k r * g) * g⁻¹ := by rw [hg']
-    _ = (g * g⁻¹)ᴴ * Hpk k r * (g * g⁻¹) := by
-        rw [conjTranspose_mul]; simp only [Matrix.mul_assoc]
+  calc
+    (g⁻¹)ᴴ * Hpk k r * g⁻¹
+      = (g⁻¹)ᴴ * (gᴴ * Hpk k r * g) * g⁻¹ := by rw [hg']
+    _ = (g * g⁻¹)ᴴ * Hpk k r * (g * g⁻¹) := by rw [conjTranspose_mul]; simp only [Matrix.mul_assoc]
     _ = Hpk k r := by
-        rw [Matrix.mul_nonsing_inv _ hu, conjTranspose_one, Matrix.one_mul, Matrix.mul_one]
+      rw [Matrix.mul_nonsing_inv _ hu, conjTranspose_one, Matrix.one_mul, Matrix.mul_one]
 
 theorem uh_closed : IsClosed (UH (Hpk k r) : Set (Mx k r)) := by
   have hc : Continuous fun g : Mx k r => gᴴ * Hpk k r * g :=
     ((continuous_id.matrix_conjTranspose).matrix_mul continuous_const).matrix_mul continuous_id
   exact isClosed_singleton.preimage hc
 
-theorem uh_clsub : ClSub (UH (Hpk k r) : Set (Mx k r)) :=
-  ⟨uh_one, fun _ ha _ hb => uh_mul ha hb, fun _ ha => uh_inv ha, fun _ ha => isUnit_of_uh ha, uh_closed⟩
+theorem uh_clsub : ClSub (UH (Hpk k r) : Set (Mx k r)) := ⟨
+  uh_one,
+  fun _ ha _ hb => uh_mul ha hb,
+  fun _ ha => uh_inv ha,
+  fun _ ha => isUnit_of_uh ha,
+  uh_closed
+⟩
 
 def col (k r : ℕ) (g : Mx k r) : Prop :=
-  ∀ i j : Fin (2 * r + k + 1), j.val ≤ r + k → (j.val ≤ i.val ∨ r ≤ i.val) →
-    g i j = if i = j then 1 else 0
+  ∀ i j : Fin (2 * r + k + 1),
+    j.val ≤ r + k → (j.val ≤ i.val ∨ r ≤ i.val) → g i j = if i = j then 1 else 0
 
 theorem nset_iff (g : Mx k r) : g ∈ Nset k r ↔ g ∈ UH (Hpk k r) ∧ col k r g := by
   constructor
@@ -320,8 +332,10 @@ theorem col_mul {g h : Mx k r} (hg : col k r g) (hh : col k r h) : col k r (g * 
     exact absurd (Finset.mem_univ j) hj'
 
 theorem col_of_left_inv {g g' : Mx k r} (hg : col k r g) (hm : g' * g = 1) : col k r g' := by
-  have key : ∀ n : ℕ, ∀ i j : Fin (2 * r + k + 1), j.val < n → j.val ≤ r + k →
-      (j.val ≤ i.val ∨ r ≤ i.val) → g' i j = if i = j then 1 else 0 := by
+  have key
+      : ∀ n : ℕ, ∀ i j : Fin (2 * r + k + 1),
+        j.val < n → j.val ≤ r + k → (j.val ≤ i.val ∨ r ≤ i.val)
+          → g' i j = if i = j then 1 else 0 := by
     intro n
     induction n with
     | zero => intro i j h; omega
@@ -348,19 +362,24 @@ theorem col_of_left_inv {g g' : Mx k r} (hg : col k r g) (hm : g' * g = 1) : col
 theorem n_closed : IsClosed (Nset k r : Set (Mx k r)) := by
   have he : ∀ i j : Fin (2 * r + k + 1), Continuous fun g : Mx k r => g i j := fun i j =>
     continuous_id.matrix_elem i j
-  have e : Nset k r = UH (Hpk k r) ∩ ((⋂ (a : Fin r) (i : Fin (2 * r + k + 1)) (_ : a.val ≤ i.val),
-        {g : Mx k r | g i (eI k r a) = if i = eI k r a then 1 else 0}) ∩
-      (⋂ (i : Fin (2 * r + k + 1)) (j : Fin (2 * r + k + 1)) (_ : r ≤ j.val) (_ : j.val ≤ r + k) (_ : r ≤ i.val),
-        {g : Mx k r | g i j = if i = j then 1 else 0})) := by
+  have e
+      : Nset k r
+        = UH (Hpk k r)
+          ∩ ((⋂ (a : Fin r) (i : Fin (2 * r + k + 1)) (_ : a.val ≤ i.val),
+               {g : Mx k r | g i (eI k r a) = if i = eI k r a then 1 else 0})
+            ∩ (⋂ (i : Fin (2 * r + k + 1)) (j : Fin (2 * r + k + 1)) (_ : r ≤ j.val) (_ : j.val ≤ r + k) (_ : r ≤ i.val),
+                {g : Mx k r | g i j = if i = j then 1 else 0})) := by
     ext g
     simp only [Set.mem_inter_iff, Set.mem_iInter, Set.mem_ofPred_eq]
     exact Iff.rfl
   rw [e]
   refine uh_closed.inter (IsClosed.inter ?_ ?_)
-  · exact isClosed_iInter fun a => isClosed_iInter fun i => isClosed_iInter fun _ =>
-      isClosed_eq (he _ _) continuous_const
-  · exact isClosed_iInter fun i => isClosed_iInter fun j => isClosed_iInter fun _ => isClosed_iInter fun _ =>
-      isClosed_iInter fun _ => isClosed_eq (he _ _) continuous_const
+  · exact isClosed_iInter fun a =>
+      isClosed_iInter fun i => isClosed_iInter fun _ => isClosed_eq (he _ _) continuous_const
+  · exact isClosed_iInter fun i =>
+      isClosed_iInter fun j =>
+        isClosed_iInter fun _ =>
+          isClosed_iInter fun _ => isClosed_iInter fun _ => isClosed_eq (he _ _) continuous_const
 
 theorem n_clsub : ClSub (Nset k r : Set (Mx k r)) := by
   refine ⟨(nset_iff _).2 ⟨uh_one, col_one⟩, ?_, ?_, fun a ha => isUnit_of_uh ha.1, n_closed⟩
@@ -373,14 +392,17 @@ theorem n_clsub : ClSub (Nset k r : Set (Mx k r)) := by
 
 def haarNm (k r : ℕ) : Measure (Mt k r) := hmeas (Nset k r) n_clsub
 
-theorem haarNm_eq : haarNm k r = (Measure.haar : Measure (Grp (Nset k r : Set (Mx k r)) n_clsub)).map Grp.vt := rfl
+theorem haarNm_eq
+    : haarNm k r = (Measure.haar : Measure (Grp (Nset k r : Set (Mx k r)) n_clsub)).map Grp.vt :=
+  rfl
 
 theorem haarNm_haar : IsHaarOn (Nset k r) (haarNm k r) := hmeas_haar _ _
 
-theorem haarNm_compact (K : Set (Mt k r)) (hK : IsCompact K) : haarNm k r K < ⊤ := hmeas_compact _ _ K hK
+theorem haarNm_compact (K : Set (Mt k r)) (hK : IsCompact K) : haarNm k r K < ⊤ :=
+  hmeas_compact _ _ K hK
 
-theorem n_unique (μ : Measure (Mt k r)) (hμ : IsHaarOn (Nset k r) μ) :
-    ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ∞ ∧ μ = c • haarNm k r :=
+theorem n_unique (μ : Measure (Mt k r)) (hμ : IsHaarOn (Nset k r) μ)
+    : ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ∞ ∧ μ = c • haarNm k r :=
   haar_unique _ _ μ hμ
 
 end WlocSk.HM

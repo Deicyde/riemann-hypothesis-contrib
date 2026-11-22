@@ -15,10 +15,12 @@ namespace GlobalTheory.AdelicLatticeClosure
 open NumberField IsDedekindDomain
 open scoped TensorProduct
 
-theorem adelic_hat_mul_of_mul_closed {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
-    (J : Set E) (hJ : ∀ x ∈ J, ∀ y ∈ J, x * y ∈ J) {z w : GlobalTheory.AdLat.RA F E}
-    (hz : z ∈ GlobalTheory.AdLat.hat1 F J) (hw : w ∈ GlobalTheory.AdLat.hat1 F J) :
-    z * w ∈ GlobalTheory.AdLat.hat1 F J := by
+theorem adelic_hat_mul_of_mul_closed
+    {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
+    (J : Set E) (hJ : ∀ x ∈ J, ∀ y ∈ J, x * y ∈ J)
+    {z w : GlobalTheory.AdLat.RA F E}
+    (hz : z ∈ GlobalTheory.AdLat.hat1 F J) (hw : w ∈ GlobalTheory.AdLat.hat1 F J)
+    : z * w ∈ GlobalTheory.AdLat.hat1 F J := by
   unfold GlobalTheory.AdLat.hat1 at hz hw ⊢
   induction hz using AddSubgroup.closure_induction with
   | mem z hz =>
@@ -36,14 +38,13 @@ theorem adelic_hat_mul_of_mul_closed {F E : Type} [Field F] [NumberField F] [Fie
   | add u v _ _ hu hv => rw [add_mul]; exact add_mem hu hv
   | neg u _ hu => rw [neg_mul]; exact neg_mem hu
 
-theorem adelic_hat_one_mul_mem {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] {z w : GlobalTheory.AdLat.RA F E}
-    (hz : z ∈ GlobalTheory.AdLat.hat1 F
-      (↑(1 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Set E))
-    (hw : w ∈ GlobalTheory.AdLat.hat1 F
-      (↑(1 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Set E)) :
-    z * w ∈ GlobalTheory.AdLat.hat1 F
-      (↑(1 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Set E) := by
+theorem adelic_hat_one_mul_mem
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {z w : GlobalTheory.AdLat.RA F E}
+    (hz : z ∈ GlobalTheory.AdLat.hat1 F (↑(1 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Set E))
+    (hw : w ∈ GlobalTheory.AdLat.hat1 F (↑(1 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Set E))
+    : z * w
+      ∈ GlobalTheory.AdLat.hat1 F (↑(1 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Set E) := by
   refine adelic_hat_mul_of_mul_closed _ ?_ hz hw
   intro x hx y hy
   obtain ⟨a, rfl⟩ := (FractionalIdeal.mem_one_iff _).1 hx

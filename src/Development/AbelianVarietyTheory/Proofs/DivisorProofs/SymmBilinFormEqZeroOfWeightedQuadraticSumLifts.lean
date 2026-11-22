@@ -106,11 +106,17 @@ lemma pow_dvd_all {s r : ℕ} (W : Matrix (Fin s) (Fin s) ℤ) (N : ℕ) [NeZero
 
 end GlobalTheory.Poinc.Span
 
-theorem GlobalTheory.Poinc.symm_eq_zero_of_qW_lifts :
-    ∀ (W : Matrix (Fin 8) (Fin 8) ℤ), PosW W → ∀ (N : ℕ) [NeZero N], 3 ≤ N → ∀ r : ℕ,
-      (∃ ε : Fin 8 → ℤ, Nat.Coprime N (2 * (∑ u, ∑ v, W u v * ε u * ε v).natAbs)) →
-      ∀ μ : (Fin 8 → Fin r → ZMod N) → (Fin 8 → Fin r → ℤ), (∀ c u i, ((μ c u i : ℤ) : ZMod N) = c u i) →
-      ∀ b : LinearMap.BilinForm ℤ (Fin r → ℤ), (∀ x y, b x y = b y x) → (∀ c, qW W b (μ c) = 0) → b = 0 := by
+theorem GlobalTheory.Poinc.symm_eq_zero_of_qW_lifts
+    : ∀ (W : Matrix (Fin 8) (Fin 8) ℤ),
+      PosW W
+        → ∀ (N : ℕ) [NeZero N],
+          3 ≤ N
+            → ∀ r : ℕ,
+              (∃ ε : Fin 8 → ℤ, Nat.Coprime N (2 * (∑ u, ∑ v, W u v * ε u * ε v).natAbs))
+                → ∀ μ : (Fin 8 → Fin r → ZMod N) → (Fin 8 → Fin r → ℤ),
+                  (∀ c u i, ((μ c u i : ℤ) : ZMod N) = c u i)
+                    → ∀ b : LinearMap.BilinForm ℤ (Fin r → ℤ),
+                      (∀ x y, b x y = b y x) → (∀ c, qW W b (μ c) = 0) → b = 0 := by
   intro W _ N _ hN r hε μ hμ b hb h0
   refine LinearMap.ext₂ fun x z => ?_
   have h := GlobalTheory.Poinc.Span.pow_dvd_all W N hε μ hμ (b x z).natAbs b hb h0 x z

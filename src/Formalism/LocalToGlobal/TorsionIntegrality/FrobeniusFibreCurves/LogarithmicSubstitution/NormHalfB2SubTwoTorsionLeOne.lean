@@ -19,17 +19,18 @@ section Alg
 
 variable {K : Type} [Field K] [CharZero K]
 
-theorem kap_eq (W : WeierstrassCurve K) (xT yT : K) (h2 : 2 * yT + W.a₁ * xT + W.a₃ = 0) :
-    kapW W xT = 3 * xT ^ 2 + 2 * W.a₂ * xT + W.a₄ - W.a₁ * yT := by
+theorem kap_eq (W : WeierstrassCurve K) (xT yT : K) (h2 : 2 * yT + W.a₁ * xT + W.a₃ = 0)
+    : kapW W xT = 3 * xT ^ 2 + 2 * W.a₂ * xT + W.a₄ - W.a₁ * yT := by
   unfold kapW e1W g₂ WeierstrassCurve.c₄ WeierstrassCurve.b₂ WeierstrassCurve.b₄
   linear_combination (W.a₁ / 2) * h2
 
-theorem two_torsion_x_root_of_cubic (W : WeierstrassCurve K) (xT yT : K) (hE : W.toAffine.Equation xT yT)
-    (h2 : 2 * yT + W.a₁ * xT + W.a₃ = 0) :
-    4 * e1W W xT ^ 3 - g₂ W * e1W W xT - g₃ W = 0 := by
+theorem two_torsion_x_root_of_cubic
+    (W : WeierstrassCurve K) (xT yT : K)
+    (hE : W.toAffine.Equation xT yT) (h2 : 2 * yT + W.a₁ * xT + W.a₃ = 0)
+    : 4 * e1W W xT ^ 3 - g₂ W * e1W W xT - g₃ W = 0 := by
   rw [WeierstrassCurve.Affine.equation_iff] at hE
-  unfold e1W g₂ g₃ WeierstrassCurve.c₄ WeierstrassCurve.c₆ WeierstrassCurve.b₂
-    WeierstrassCurve.b₄ WeierstrassCurve.b₆
+  unfold e1W g₂ g₃ WeierstrassCurve.c₄ WeierstrassCurve.c₆ WeierstrassCurve.b₂ WeierstrassCurve.b₄
+    WeierstrassCurve.b₆
   linear_combination (2 * yT + W.a₁ * xT + W.a₃) * h2 - 4 * hE
 
 end Alg
@@ -49,9 +50,11 @@ theorem norm_mul_le_one' {a b : K} (ha : ‖a‖ ≤ 1) (hb : ‖b‖ ≤ 1) : �
   rw [norm_mul]
   exact mul_le_one₀ ha (norm_nonneg b) hb
 
-theorem norm_kap [CharZero K] (W : WeierstrassCurve K) (xT yT : K) (hW : IntModel W)
-    (h2 : 2 * yT + W.a₁ * xT + W.a₃ = 0) (hx : ‖xT‖ ≤ 1) (hy : ‖yT‖ ≤ 1) :
-    ‖kapW W xT‖ ≤ 1 := by
+theorem norm_kap
+    [CharZero K]
+    (W : WeierstrassCurve K) (xT yT : K)
+    (hW : IntModel W) (h2 : 2 * yT + W.a₁ * xT + W.a₃ = 0) (hx : ‖xT‖ ≤ 1) (hy : ‖yT‖ ≤ 1)
+    : ‖kapW W xT‖ ≤ 1 := by
   obtain ⟨h1, h2', -, h4, -⟩ := hW
   rw [kap_eq W xT yT h2]
   have n3 : ‖(3 : K)‖ ≤ 1 := by exact_mod_cast IsUltrametricDist.norm_natCast_le_one K 3
@@ -69,8 +72,9 @@ end Norm
 
 theorem curve_sigma_function_holds : CurveSigma := by
   intro K _ _ W s2
-  obtain ⟨h0, h1⟩ := phODef K s2 (wpReg W) (logSer W) (Formalism.L2.Th1.A.ZSer.log_cc W)
-    (Formalism.L2.Th1.A.ZSer.log_one W)
+  obtain ⟨h0, h1⟩ :=
+    phODef K s2 (wpReg W) (logSer W) (Formalism.L2.Th1.A.ZSer.log_cc W)
+      (Formalism.L2.Th1.A.ZSer.log_one W)
   exact ⟨h0, h1, addSgStar K (g₂ W) (g₃ W) s2 (wpReg W) (bridgeWp K W)⟩
 
 theorem curve_formal_first_level_holds : WeierstrassBiadditiveModEquiv := by

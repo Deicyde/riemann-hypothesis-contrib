@@ -8,8 +8,9 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.RamifiedDiscrim
 
 open Formalism.BasicNotions
 
-theorem UpperTheory.Ram.two_fm_le_rdE :
-    ∀ (R : Ranks) (H : Host R), 2 * (R.f : ℝ) * R.m ≤ H.rdE ∧ 4 * (R.t : ℝ) * R.r + 1 ≤ H.rdE := by
+theorem UpperTheory.Ram.two_fm_le_rdE
+    : ∀ (R : Ranks) (H : Host R),
+      2 * (R.f : ℝ) * R.m ≤ H.rdE ∧ 4 * (R.t : ℝ) * R.r + 1 ≤ H.rdE := by
   intro R H
   obtain ⟨hq, hd⟩ := H.qd_big
   obtain ⟨-, -, hsq, -⟩ := UpperTheory.KR.log_qd_le_rd H.toHostAx H.flPS
@@ -44,8 +45,9 @@ theorem UpperTheory.Ram.two_fm_le_rdE :
     omega
   have hnat : 2 * R.f * R.m ≤ 4 * R.t * R.r + 1 := by
     have h1 : R.f ≤ R.r := by omega
-    calc 2 * R.f * R.m ≤ 2 * R.r * R.t := by
-          apply Nat.mul_le_mul (Nat.mul_le_mul_left 2 h1) hmt
+    calc
+      2 * R.f * R.m
+        ≤ 2 * R.r * R.t := by apply Nat.mul_le_mul (Nat.mul_le_mul_left 2 h1) hmt
       _ ≤ 4 * R.t * R.r + 1 := by nlinarith
   have : (2 * (R.f : ℝ) * R.m) ≤ X := by
     rw [hX]

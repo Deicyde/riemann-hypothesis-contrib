@@ -8,20 +8,25 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsSmo
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
 
 namespace GlobalTheory
 
-theorem natCard_torsion_quot_span_dvd_of_range_subset :
-    ∀ (L : Type) [AddCommGroup L] {m n : ℕ} (δ : Fin m → L) (γ : Fin n → L), LinearIndependent ℤ δ →
-    Set.range γ ⊆ Set.range δ →
-    Nat.card (Submodule.torsion ℤ (L ⧸ Submodule.span ℤ (Set.range γ))) ∣
-      Nat.card (Submodule.torsion ℤ (L ⧸ Submodule.span ℤ (Set.range δ))) := by
+theorem natCard_torsion_quot_span_dvd_of_range_subset
+    : ∀ (L : Type) [AddCommGroup L] {m n : ℕ} (δ : Fin m → L) (γ : Fin n → L),
+      LinearIndependent ℤ δ → Set.range γ ⊆ Set.range δ
+        → Nat.card (Submodule.torsion ℤ (L ⧸ Submodule.span ℤ (Set.range γ)))
+          ∣ Nat.card (Submodule.torsion ℤ (L ⧸ Submodule.span ℤ (Set.range δ))) := by
   intro L _ m n δ γ hli hsub
   have hAB : Submodule.span ℤ (Set.range γ) ≤ Submodule.span ℤ (Set.range δ) :=
     Submodule.span_mono hsub
-  have key : ∀ z : L, z ∈ Submodule.span ℤ (Set.range δ) → ∀ a : ℤ, a ≠ 0 →
-      a • z ∈ Submodule.span ℤ (Set.range γ) → z ∈ Submodule.span ℤ (Set.range γ) := by
+  have key
+      : ∀ z : L,
+        z ∈ Submodule.span ℤ (Set.range δ)
+          → ∀ a : ℤ,
+            a ≠ 0 → a • z ∈ Submodule.span ℤ (Set.range γ)
+              → z ∈ Submodule.span ℤ (Set.range γ) := by
     intro z hz a ha haz
     have himg : δ '' (δ ⁻¹' Set.range γ) = Set.range γ := Set.image_preimage_eq_of_subset hsub
     rw [← himg] at haz ⊢
@@ -42,14 +47,16 @@ theorem natCard_torsion_quot_span_dvd_of_range_subset :
     exact (mul_eq_zero.mp this).resolve_left ha
   let q : (L ⧸ Submodule.span ℤ (Set.range γ)) →ₗ[ℤ] (L ⧸ Submodule.span ℤ (Set.range δ)) :=
     Submodule.factor hAB
-  let f : Submodule.torsion ℤ (L ⧸ Submodule.span ℤ (Set.range γ)) →+
-      Submodule.torsion ℤ (L ⧸ Submodule.span ℤ (Set.range δ)) :=
+  let f
+      : Submodule.torsion ℤ (L ⧸ Submodule.span ℤ (Set.range γ))
+        →+ Submodule.torsion ℤ (L ⧸ Submodule.span ℤ (Set.range δ)) :=
     (q.restrict (p := Submodule.torsion ℤ _) (q := Submodule.torsion ℤ _) (fun x hx => by
       rw [Submodule.mem_torsion_iff] at hx ⊢
       obtain ⟨a, ha⟩ := hx
       exact ⟨a, by rw [Submonoid.smul_def] at ha ⊢; rw [← map_smul, ha, map_zero]⟩)).toAddMonoidHom
   have hinj : Function.Injective f := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     rintro ⟨x, hx⟩ hfx
     have hqx : q x = 0 := congrArg Subtype.val hfx
     apply Subtype.ext

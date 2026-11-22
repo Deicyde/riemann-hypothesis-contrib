@@ -13,21 +13,23 @@ noncomputable section
 
 namespace GlobalTheory.SeqCx
 
-theorem mapDomain_prepend_apply' {V : Type} (τ : List V) (y : List V →₀ ℤ) (l : List V) :
-    Finsupp.mapDomain (fun w => τ ++ w) y l = if τ <+: l then y (l.drop τ.length) else 0 := by
+theorem mapDomain_prepend_apply' {V : Type} (τ : List V) (y : List V →₀ ℤ) (l : List V)
+    : Finsupp.mapDomain (fun w => τ ++ w) y l = if τ <+: l then y (l.drop τ.length) else 0 := by
   by_cases h : τ <+: l
   · obtain ⟨u, rfl⟩ := h
     rw [if_pos (List.prefix_append τ u)]
-    have hinj : Function.Injective (fun w : List V => τ ++ w) := fun a b hab => List.append_cancel_left hab
+    have hinj : Function.Injective (fun w : List V => τ ++ w) := fun a b hab =>
+      List.append_cancel_left hab
     rw [Finsupp.mapDomain_apply_of_injective hinj y u]
     simp
   · rw [if_neg h, Finsupp.mapDomain_notin_range]
     rintro ⟨u, rfl⟩
     exact h (List.prefix_append τ u)
 
-theorem bd_mem_supported_of_eraseIdx {V : Type} {A B : Set (List V)}
-    (h : ∀ l ∈ A, ∀ i < l.length, l.eraseIdx i ∈ B) {x : List V →₀ ℤ}
-    (hx : x ∈ Finsupp.supported ℤ ℤ A) : bd V x ∈ Finsupp.supported ℤ ℤ B := by
+theorem bd_mem_supported_of_eraseIdx
+    {V : Type} {A B : Set (List V)} (h : ∀ l ∈ A, ∀ i < l.length, l.eraseIdx i ∈ B)
+    {x : List V →₀ ℤ} (hx : x ∈ Finsupp.supported ℤ ℤ A)
+    : bd V x ∈ Finsupp.supported ℤ ℤ B := by
   rw [Finsupp.supported_eq_span_single] at hx
   induction hx using Submodule.span_induction with
   | mem z hz =>
@@ -35,7 +37,8 @@ theorem bd_mem_supported_of_eraseIdx {V : Type} {A B : Set (List V)}
     simp only [bd, Finsupp.linearCombination_single, one_smul]
     refine Submodule.sum_mem _ fun i hi => Submodule.smul_mem _ _ ?_
     exact Finsupp.single_mem_supported ℤ _ (h l hl i (Finset.mem_range.1 hi))
-  | zero => simp
+  | zero =>
+    simp
   | add a b _ _ ha hb =>
     rw [map_add (f := _)]
     exact Submodule.add_mem _ ha hb
@@ -43,24 +46,28 @@ theorem bd_mem_supported_of_eraseIdx {V : Type} {A B : Set (List V)}
     rw [LinearMap.map_smul]
     exact Submodule.smul_mem _ r ha
 
-theorem mapDomain_mem_supported_of_maps {V : Type} {A B : Set (List V)} (f : List V → List V)
-    (h : ∀ l ∈ A, f l ∈ B) {x : List V →₀ ℤ}
-    (hx : x ∈ Finsupp.supported ℤ ℤ A) : Finsupp.mapDomain f x ∈ Finsupp.supported ℤ ℤ B := by
+theorem mapDomain_mem_supported_of_maps
+    {V : Type} {A B : Set (List V)} (f : List V → List V) (h : ∀ l ∈ A, f l ∈ B)
+    {x : List V →₀ ℤ} (hx : x ∈ Finsupp.supported ℤ ℤ A)
+    : Finsupp.mapDomain f x ∈ Finsupp.supported ℤ ℤ B := by
   rw [Finsupp.mem_supported] at hx ⊢
   intro l hl
   obtain ⟨a, ha, rfl⟩ := Finset.mem_image.mp (Finsupp.mapDomain_support hl)
   exact h a (hx ha)
 
-theorem prepend_part_mem_supported {V : Type} (τ : List V) {A B : Set (List V)}
-    (h : ∀ w ∈ A, ∀ i < τ.length, τ.eraseIdx i ++ w ∈ B) {y : List V →₀ ℤ}
-    (hy : y ∈ Finsupp.supported ℤ ℤ A) :
-    (y.sum fun w a => a • Finsupp.mapDomain (fun σ => σ ++ w) (bd V (Finsupp.single τ 1)))
+theorem prepend_part_mem_supported
+    {V : Type} (τ : List V)
+    {A B : Set (List V)} (h : ∀ w ∈ A, ∀ i < τ.length, τ.eraseIdx i ++ w ∈ B)
+    {y : List V →₀ ℤ} (hy : y ∈ Finsupp.supported ℤ ℤ A)
+    : (y.sum fun w a => a • Finsupp.mapDomain (fun σ => σ ++ w) (bd V (Finsupp.single τ 1)))
       ∈ Finsupp.supported ℤ ℤ B := by
   refine Submodule.finsuppSum_mem ℤ _ y _ fun w hw => Submodule.smul_mem _ _ ?_
   have hwA : w ∈ A := (Finsupp.mem_supported ℤ y).1 hy (Finsupp.mem_support_iff.2 hw)
-  have hb : bd V (Finsupp.single τ 1) ∈
-      Finsupp.supported ℤ ℤ {σ | ∃ i < τ.length, σ = τ.eraseIdx i} := by
-    refine bd_mem_supported_of_eraseIdx (A := {τ}) ?_ (Finsupp.single_mem_supported ℤ 1 (Set.mem_singleton τ))
+  have hb
+      : bd V (Finsupp.single τ 1)
+        ∈ Finsupp.supported ℤ ℤ {σ | ∃ i < τ.length, σ = τ.eraseIdx i} := by
+    refine bd_mem_supported_of_eraseIdx (A := {τ}) ?_
+      (Finsupp.single_mem_supported ℤ 1 (Set.mem_singleton τ))
     intro l hl i hi
     obtain rfl := Set.mem_singleton_iff.1 hl
     exact ⟨i, hi, rfl⟩
@@ -69,22 +76,34 @@ theorem prepend_part_mem_supported {V : Type} (τ : List V) {A B : Set (List V)}
   obtain ⟨i, hi, rfl⟩ := hσ
   exact h w hwA i hi
 
-theorem drop_eraseIdx_sublist_drop {V : Type} :
-    ∀ (l : List V) (i k : ℕ), ((l.eraseIdx i).drop k).Sublist (l.drop k)
+theorem drop_eraseIdx_sublist_drop {V : Type}
+    : ∀ (l : List V) (i k : ℕ), ((l.eraseIdx i).drop k).Sublist (l.drop k)
   | [], _, _ => by simp
   | a :: t, 0, 0 => by simp
   | a :: t, 0, k + 1 => by simpa using List.drop_sublist_drop_left t (Nat.le_succ k)
   | a :: t, i + 1, 0 => by simpa using List.eraseIdx_sublist (a :: t) (i + 1)
   | a :: t, i + 1, k + 1 => by simpa using drop_eraseIdx_sublist_drop t i k
 
-theorem retract_step : ∀ (V : Type) (F : Set (List V)) (S : Set V), SubClosed F → ∀ (p k : ℕ), (∀ τ ∈ F, ∀ x, τ.getLast? = some x → x ∉ S → τ.length = k + 1 → τ.length ≤ p → ExactAt (linkIn F S τ) (p - τ.length)) → ∀ c ∈ chains {l ∈ F | ∀ y ∈ l.drop (k + 1), y ∈ S} p, bd V c = 0 → ∃ b ∈ chains F (p + 1), c - bd V b ∈ chains {l ∈ F | ∀ y ∈ l.drop k, y ∈ S} p := by
+theorem retract_step
+    : ∀ (V : Type) (F : Set (List V)) (S : Set V),
+      SubClosed F
+        → ∀ (p k : ℕ),
+          (∀ τ ∈ F, ∀ x,
+              τ.getLast? = some x → x ∉ S → τ.length = k + 1 → τ.length ≤ p
+                → ExactAt (linkIn F S τ) (p - τ.length))
+            → ∀ c ∈ chains {l ∈ F | ∀ y ∈ l.drop (k + 1), y ∈ S} p,
+              bd V c = 0
+                → ∃ b ∈ chains F (p + 1),
+                  c - bd V b ∈ chains {l ∈ F | ∀ y ∈ l.drop k, y ∈ S} p := by
   intro V F S hF p k hex c hc hbd
-  have hcs : ∀ l, c l ≠ 0 → (l ∈ F ∧ ∀ y ∈ l.drop (k+1), y ∈ S) ∧ l.length = p := fun l hl =>
+  have hcs : ∀ l, c l ≠ 0 → (l ∈ F ∧ ∀ y ∈ l.drop (k + 1), y ∈ S) ∧ l.length = p := fun l hl =>
     (Finsupp.mem_supported ℤ c).1 hc (Finsupp.mem_support_iff.2 hl)
   set P : Finset (List V) :=
     (c.support.filter (fun l => ¬ ∀ y ∈ l.drop k, y ∈ S)).image (List.take (k+1)) with hPdef
-  have hP : ∀ τ ∈ P, τ.length = k+1 ∧ τ ∈ F ∧ k+1 ≤ p ∧
-      ∃ hk : k < τ.length, τ[k] ∉ S ∧ τ.getLast? = some τ[k] := by
+  have hP
+      : ∀ τ ∈ P,
+        τ.length = k + 1 ∧ τ ∈ F ∧ k + 1 ≤ p
+          ∧ ∃ hk : k < τ.length, τ[k] ∉ S ∧ τ.getLast? = some τ[k] := by
     intro τ hτ
     simp only [P, Finset.mem_image, Finset.mem_filter, Finsupp.mem_support_iff] at hτ
     obtain ⟨l, ⟨hl0, hlbad⟩, rfl⟩ := hτ
@@ -103,7 +122,7 @@ theorem retract_step : ∀ (V : Type) (F : Set (List V)) (S : Set V), SubClosed 
       rcases List.mem_cons.1 hy with rfl | hy
       · exact hs
       · exact hlS y hy
-    have hlen : (l.take (k+1)).length = k+1 := by
+    have hlen : (l.take (k + 1)).length = k + 1 := by
       simp only [List.length_take]
       omega
     refine ⟨hlen, hF l hlF _ (List.take_sublist _ _), by omega, by omega, ?_, ?_⟩
@@ -125,13 +144,15 @@ theorem retract_step : ∀ (V : Type) (F : Set (List V)) (S : Set V), SubClosed 
     rw [(hP τ hτ).1] at e1
     rw [(hP τ' hτ').1] at e2
     rw [e1, e2]
-  have hinj : ∀ τ : List V, Function.Injective (fun w : List V => τ ++ w) :=
-    fun τ a b hab => List.append_cancel_left hab
+  have hinj : ∀ τ : List V, Function.Injective (fun w : List V => τ ++ w) := fun τ a b hab =>
+    List.append_cancel_left hab
   let ys : List V → (List V →₀ ℤ) := fun τ =>
     Finsupp.comapDomain (fun w => τ ++ w) c (fun a _ b _ hab => hinj τ hab)
   have hys : ∀ τ w, ys τ w = c (τ ++ w) := fun τ w => rfl
-  have happly : ∀ l, (∑ τ ∈ P, Finsupp.mapDomain (fun w => τ ++ w) (ys τ)) l =
-      ∑ τ ∈ P, if τ <+: l then c l else 0 := by
+  have happly
+      : ∀ l,
+        (∑ τ ∈ P, Finsupp.mapDomain (fun w => τ ++ w) (ys τ)) l
+          = ∑ τ ∈ P, if τ <+: l then c l else 0 := by
     intro l
     rw [Finsupp.finsetSum_apply]
     refine Finset.sum_congr rfl fun τ _ => ?_
@@ -149,8 +170,10 @@ theorem retract_step : ∀ (V : Type) (F : Set (List V)) (S : Set V), SubClosed 
     by_cases hex' : ∃ τ ∈ P, τ <+: l
     · obtain ⟨τ0, hτ0, hpr⟩ := hex'
       rw [Finset.sum_eq_single τ0
-        (fun τ hτ hne => by rw [if_neg]; exact fun h => hne (huniq τ0 hτ0 τ hτ l hpr h))
-        (fun h => absurd hτ0 h), if_pos hpr, sub_self] at hl
+            (fun τ hτ hne => by rw [if_neg]; exact fun h => hne (huniq τ0 hτ0 τ hτ l hpr h))
+            (fun h => absurd hτ0 h),
+          if_pos hpr, sub_self]
+        at hl
       exact absurd rfl hl
     · push_neg at hex'
       rw [Finset.sum_eq_zero (fun τ hτ => if_neg (hex' τ hτ)), sub_zero] at hl
@@ -158,7 +181,7 @@ theorem retract_step : ∀ (V : Type) (F : Set (List V)) (S : Set V), SubClosed 
       simp only [Set.mem_setOf_eq]
       refine ⟨⟨hlF, ?_⟩, hlp⟩
       by_contra hbad
-      apply hex' (l.take (k+1)) _ (List.take_prefix _ _)
+      apply hex' (l.take (k + 1)) _ (List.take_prefix _ _)
       exact Finset.mem_image.2 ⟨l, Finset.mem_filter.2 ⟨Finsupp.mem_support_iff.2 hl, hbad⟩, rfl⟩
   have hysmem : ∀ τ ∈ P, ys τ ∈ chains (linkIn F S τ) (p - τ.length) := by
     intro τ hτ
@@ -172,8 +195,9 @@ theorem retract_step : ∀ (V : Type) (F : Set (List V)) (S : Set V), SubClosed 
     refine ⟨⟨hS1, hF1⟩, ?_⟩
     rw [List.length_append] at hp1
     omega
-  have hGood : ∀ τ ∈ P, ∀ w, (∀ x ∈ w, x ∈ S) → ∀ i < τ.length,
-      ∀ y ∈ (τ.eraseIdx i ++ w).drop k, y ∈ S := by
+  have hGood
+      : ∀ τ ∈ P, ∀ w,
+        (∀ x ∈ w, x ∈ S) → ∀ i < τ.length, ∀ y ∈ (τ.eraseIdx i ++ w).drop k, y ∈ S := by
     intro τ hτ w hw i hi y hy
     have hel : (τ.eraseIdx i).length = k := by
       rw [List.length_eraseIdx_of_lt hi, (hP τ hτ).1]
@@ -181,9 +205,12 @@ theorem retract_step : ∀ (V : Type) (F : Set (List V)) (S : Set V), SubClosed 
     rw [List.drop_left' hel] at hy
     exact hw y hy
   have hbdys : ∀ τ ∈ P, bd V (ys τ) = 0 := by
-    have hdec : bd V c = bd V Cg + ∑ τ ∈ P, ((ys τ).sum fun w a =>
-        a • Finsupp.mapDomain (fun σ => σ ++ w) (bd V (Finsupp.single τ 1))) +
-        ∑ τ ∈ P, (-1 : ℤ) ^ τ.length • Finsupp.mapDomain (fun w => τ ++ w) (bd V (ys τ)) := by
+    have hdec
+        : bd V c
+          = bd V Cg
+            + ∑ τ ∈ P, ((ys τ).sum fun w a =>
+              a • Finsupp.mapDomain (fun σ => σ ++ w) (bd V (Finsupp.single τ 1)))
+            + ∑ τ ∈ P, (-1 : ℤ) ^ τ.length • Finsupp.mapDomain (fun w => τ ++ w) (bd V (ys τ)) := by
       have hc2 : c = Cg + ∑ τ ∈ P, Finsupp.mapDomain (fun w => τ ++ w) (ys τ) := by
         rw [hCg]
         abel
@@ -219,7 +246,8 @@ theorem retract_step : ∀ (V : Type) (F : Set (List V)) (S : Set V), SubClosed 
         ((Finsupp.mem_supported ℤ g).1 hgmem (Finsupp.mem_support_iff.2 hne))
     rw [hg0, zero_add, Finset.sum_eq_single τ0] at h0
     · rw [Finsupp.smul_apply, mapDomain_prepend_apply', if_pos (List.prefix_append _ _),
-        List.drop_left, smul_eq_mul] at h0
+          List.drop_left, smul_eq_mul]
+        at h0
       rw [Finsupp.zero_apply]
       rcases mul_eq_zero.1 h0.symm with h | h
       · exact absurd h (pow_ne_zero _ (by norm_num))
@@ -246,21 +274,25 @@ theorem retract_step : ∀ (V : Type) (F : Set (List V)) (S : Set V), SubClosed 
     refine ⟨hwF, ?_⟩
     rw [List.length_append, hwl]
     omega
-  · have hbdb : bd V (∑ τ ∈ P, (-1 : ℤ) ^ τ.length • Finsupp.mapDomain (fun w => τ ++ w) (zf τ)) =
-        ∑ τ ∈ P, ((-1 : ℤ) ^ τ.length • ((zf τ).sum fun w a =>
-          a • Finsupp.mapDomain (fun σ => σ ++ w) (bd V (Finsupp.single τ 1))) +
-          Finsupp.mapDomain (fun w => τ ++ w) (ys τ)) := by
+  · have hbdb
+        : bd V (∑ τ ∈ P, (-1 : ℤ) ^ τ.length • Finsupp.mapDomain (fun w => τ ++ w) (zf τ))
+          = ∑ τ ∈ P, ((-1 : ℤ) ^ τ.length • ((zf τ).sum fun w a =>
+              a • Finsupp.mapDomain (fun σ => σ ++ w) (bd V (Finsupp.single τ 1))) +
+              Finsupp.mapDomain (fun w => τ ++ w) (ys τ)) := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum]
       refine Finset.sum_congr rfl fun τ hτ => ?_
-      rw [LinearMap.map_smul, GlobalTheory.T.seqChain_boundary_prefix_chain, hzb τ hτ, smul_add, smul_smul, ← mul_pow]
+      rw [LinearMap.map_smul, GlobalTheory.T.seqChain_boundary_prefix_chain, hzb τ hτ, smul_add,
+        smul_smul, ← mul_pow]
       simp
     rw [hbdb, Finset.sum_add_distrib]
-    have hrw : c - (∑ τ ∈ P, (-1 : ℤ) ^ τ.length • ((zf τ).sum fun w a =>
-          a • Finsupp.mapDomain (fun σ => σ ++ w) (bd V (Finsupp.single τ 1))) +
-          ∑ τ ∈ P, Finsupp.mapDomain (fun w => τ ++ w) (ys τ)) =
-        Cg - ∑ τ ∈ P, (-1 : ℤ) ^ τ.length • ((zf τ).sum fun w a =>
-          a • Finsupp.mapDomain (fun σ => σ ++ w) (bd V (Finsupp.single τ 1))) := by
+    have hrw
+        : c - (∑ τ ∈ P, (-1 : ℤ) ^ τ.length • ((zf τ).sum fun w a =>
+              a • Finsupp.mapDomain (fun σ => σ ++ w) (bd V (Finsupp.single τ 1)))
+            + ∑ τ ∈ P, Finsupp.mapDomain (fun w => τ ++ w) (ys τ))
+          = Cg
+            - ∑ τ ∈ P, (-1 : ℤ) ^ τ.length • ((zf τ).sum fun w a =>
+              a • Finsupp.mapDomain (fun σ => σ ++ w) (bd V (Finsupp.single τ 1))) := by
       rw [hCg]
       abel
     rw [hrw]
@@ -286,7 +318,17 @@ end
 
 section
 open GlobalTheory.SeqCx Matrix
-theorem _root_.GlobalTheory.T.seqChain_cycle_retraction_of_link_exact : ∀ (V : Type) (F : Set (List V)) (S : Set V), SubClosed F → ∀ (p k : ℕ), (∀ τ ∈ F, ∀ x, τ.getLast? = some x → x ∉ S → τ.length = k + 1 → τ.length ≤ p → ExactAt (linkIn F S τ) (p - τ.length)) → ∀ c ∈ chains {l ∈ F | ∀ y ∈ l.drop (k + 1), y ∈ S} p, bd V c = 0 → ∃ b ∈ chains F (p + 1), c - bd V b ∈ chains {l ∈ F | ∀ y ∈ l.drop k, y ∈ S} p := by
+theorem _root_.GlobalTheory.T.seqChain_cycle_retraction_of_link_exact
+    : ∀ (V : Type) (F : Set (List V)) (S : Set V),
+      SubClosed F
+        → ∀ (p k : ℕ),
+          (∀ τ ∈ F, ∀ x,
+              τ.getLast? = some x → x ∉ S → τ.length = k + 1 → τ.length ≤ p
+                → ExactAt (linkIn F S τ) (p - τ.length))
+            → ∀ c ∈ chains {l ∈ F | ∀ y ∈ l.drop (k + 1), y ∈ S} p,
+              bd V c = 0
+                → ∃ b ∈ chains F (p + 1),
+                  c - bd V b ∈ chains {l ∈ F | ∀ y ∈ l.drop k, y ∈ S} p := by
   first
   | exact @GlobalTheory.SeqCx.retract_step
   | exact @GlobalTheory.SeqCx.drop_eraseIdx_sublist_drop

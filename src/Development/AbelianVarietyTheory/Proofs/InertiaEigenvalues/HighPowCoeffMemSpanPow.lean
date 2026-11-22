@@ -8,15 +8,19 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ZlTower
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices GlobalTheory.WeakClosed
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices GlobalTheory.WeakClosed
 open scoped Topology PowerSeries.WithPiTopology
 set_option synthInstance.maxHeartbeats 400000
 set_option maxHeartbeats 1600000
 
 namespace GlobalTheory.WittHighPow
 
-theorem high_pow_coeff_mem_span_pow :
-    ∀ {p : ℕ} [Fact p.Prime] {R : Type} [CommRing R] [CharP R p] [PerfectRing R p] (x : WittVector p R) (N m : ℕ), ∃ k : ℕ, ∀ (z : WittVector p R) (n : ℕ), n < N → (x ^ k * z).coeff n ∈ Ideal.span {x.coeff 0 ^ m} := by
+theorem high_pow_coeff_mem_span_pow
+    : ∀ {p : ℕ} [Fact p.Prime] {R : Type} [CommRing R] [CharP R p] [PerfectRing R p]
+        (x : WittVector p R) (N m : ℕ),
+      ∃ k : ℕ, ∀ (z : WittVector p R) (n : ℕ),
+        n < N → (x ^ k * z).coeff n ∈ Ideal.span {x.coeff 0 ^ m} := by
   intro p _ R _ _ _ x N m
   classical
   set J : Ideal R := Ideal.span {x.coeff 0 ^ m} with hJ
@@ -28,13 +32,14 @@ theorem high_pow_coeff_mem_span_pow :
     constructor
     · intro h n hn
       have := congrArg (fun t => TruncatedWittVector.coeff ⟨n, hn⟩ t) h
-      simp only [f, RingHom.comp_apply, WittVector.coeff_truncate,
-        WittVector.map_coeff, TruncatedWittVector.coeff_zero] at this
+      simp only [f, RingHom.comp_apply, WittVector.coeff_truncate, WittVector.map_coeff,
+          TruncatedWittVector.coeff_zero]
+        at this
       exact (Ideal.Quotient.eq_zero_iff_mem).1 this
     · intro h
       ext i
-      simp only [f, RingHom.comp_apply, WittVector.coeff_truncate,
-        WittVector.map_coeff, TruncatedWittVector.coeff_zero]
+      simp only [f, RingHom.comp_apply, WittVector.coeff_truncate, WittVector.map_coeff,
+        TruncatedWittVector.coeff_zero]
       exact (Ideal.Quotient.eq_zero_iff_mem).2 (h i i.2)
   set I := RingHom.ker f
   set ϖ := x.coeff 0
@@ -46,19 +51,19 @@ theorem high_pow_coeff_mem_span_pow :
     simp only [WittVector.add_coeff_zero, t, WittVector.teichmuller_coeff_zero] at h2
     linear_combination -h2
   have hyV : y = WittVector.verschiebung (y.shift 1) := by
-    have := WittVector.eq_iterate_verschiebung (x := y) (n := 1) (by
-      intro i hi; interval_cases i; exact hy0)
+    have :=
+      WittVector.eq_iterate_verschiebung (x := y) (n := 1)
+        (by intro i hi; interval_cases i; exact hy0)
     simpa using this
-  let u : WittVector p R := WittVector.mk p (fun n => (frobeniusEquiv R p).symm ((y.shift 1).coeff n))
+  let u : WittVector p R :=
+    WittVector.mk p (fun n => (frobeniusEquiv R p).symm ((y.shift 1).coeff n))
   have hu : WittVector.frobenius u = y.shift 1 := by
     ext n
     rw [WittVector.coeff_frobenius_charP]
     simp only [u, WittVector.coeff_mk]
     exact frobenius_apply_frobeniusEquiv_symm R p _
-  have hyp : y = u * (p : WittVector p R) := by
-    rw [hyV, ← hu, WittVector.verschiebung_frobenius]
-  have hx : x = t + u * (p : WittVector p R) := by
-    rw [← hyp]; simp [y]
+  have hyp : y = u * (p : WittVector p R) := by rw [hyV, ← hu, WittVector.verschiebung_frobenius]
+  have hx : x = t + u * (p : WittVector p R) := by rw [← hyp]; simp [y]
   have ht : t ^ m ∈ I := by
     rw [hmem]
     intro n _

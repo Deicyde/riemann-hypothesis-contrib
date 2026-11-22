@@ -8,9 +8,17 @@ namespace GlobalTheory
 
 open IsLocalRing
 
-
 open IsLocalRing in
-theorem _root_.GlobalTheory.exists_arithFrobenius_absGalois (V K : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [CharZero K] [Algebra V K] [IsFractionRing V K] (hfin : Finite (IsLocalRing.ResidueField V)) (Ω : Type) [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω] [Algebra V Ω] [IsScalarTower V K Ω] [IsLocalRing (integralClosure V Ω)] : ∃ φ : Ω ≃ₐ[K] Ω, ∀ x : integralClosure V Ω, ∃ y : integralClosure V Ω, (y : Ω) = φ x ∧ y - x ^ Nat.card (IsLocalRing.ResidueField V) ∈ IsLocalRing.maximalIdeal (integralClosure V Ω) := by
+theorem _root_.GlobalTheory.exists_arithFrobenius_absGalois
+    (V K : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [CharZero K]
+    [Algebra V K] [IsFractionRing V K]
+    (hfin : Finite (IsLocalRing.ResidueField V))
+    (Ω : Type) [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω] [Algebra V Ω] [IsScalarTower V K Ω]
+    [IsLocalRing (integralClosure V Ω)]
+    : ∃ φ : Ω ≃ₐ[K] Ω, ∀ x : integralClosure V Ω, ∃ y : integralClosure V Ω,
+      (y : Ω) = φ x
+        ∧ y - x ^ Nat.card (IsLocalRing.ResidueField V)
+          ∈ IsLocalRing.maximalIdeal (integralClosure V Ω) := by
   classical
   haveI : Algebra.IsIntegral K Ω := inferInstance
   letI : TopologicalSpace (integralClosure V Ω) := ⊥
@@ -47,13 +55,15 @@ theorem _root_.GlobalTheory.exists_arithFrobenius_absGalois (V K : Type) [CommRi
       (integralClosure V Ω ⧸ maximalIdeal (integralClosure V Ω)) := inferInstance
   haveI : Algebra.IsAlgebraic (V ⧸ maximalIdeal V)
       (integralClosure V Ω ⧸ maximalIdeal (integralClosure V Ω)) := Algebra.IsIntegral.isAlgebraic
-  obtain ⟨g, hg⟩ := Ideal.Quotient.stabilizerHom_surjective_of_profinite (G := Ω ≃ₐ[K] Ω)
-    (maximalIdeal V) (maximalIdeal (integralClosure V Ω))
-    (FiniteField.frobeniusAlgEquivOfAlgebraic (V ⧸ maximalIdeal V) _)
+  obtain ⟨g, hg⟩ :=
+    Ideal.Quotient.stabilizerHom_surjective_of_profinite (G := Ω ≃ₐ[K] Ω) (maximalIdeal V)
+      (maximalIdeal (integralClosure V Ω))
+      (FiniteField.frobeniusAlgEquivOfAlgebraic (V ⧸ maximalIdeal V) _)
   refine ⟨g.1, fun x => ⟨g.1 • x, rfl, ?_⟩⟩
   rw [← Ideal.Quotient.eq]
   have h := congrArg (fun e => e (Ideal.Quotient.mk (maximalIdeal (integralClosure V Ω)) x)) hg
-  simp only [Ideal.Quotient.stabilizerHom_apply, FiniteField.frobeniusAlgEquivOfAlgebraic_apply] at h
+  simp only [Ideal.Quotient.stabilizerHom_apply, FiniteField.frobeniusAlgEquivOfAlgebraic_apply]
+    at h
   rw [Fintype.card_eq_nat_card] at h
   rw [map_pow]
   exact h

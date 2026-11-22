@@ -14,9 +14,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LevelCharact
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef
-open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx Formalism.IndefR.Links
+open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+  Formalism.IndefR.Links
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.RawLift
@@ -25,9 +28,12 @@ open Classical
 
 namespace GlobalTheory.LocCore
 
-theorem adj_det_integral {K : Type*} [Field K] {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
-    (v : Valuation K Γ) {n : ℕ} (A : Matrix (Fin n) (Fin n) K) (hA : ∀ i j, v (A i j) ≤ 1) :
-    (∀ i j, v (A.adjugate i j) ≤ 1) ∧ v A.det ≤ 1 := by
+theorem adj_det_integral
+    {K : Type*} [Field K]
+    {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
+    (v : Valuation K Γ)
+    {n : ℕ} (A : Matrix (Fin n) (Fin n) K) (hA : ∀ i j, v (A i j) ≤ 1)
+    : (∀ i j, v (A.adjugate i j) ≤ 1) ∧ v A.det ≤ 1 := by
   let A' : Matrix (Fin n) (Fin n) v.integer := fun i j => ⟨A i j, hA i j⟩
   have hA' : A'.map v.integer.subtype = A := by ext i j; rfl
   constructor
@@ -41,13 +47,15 @@ theorem adj_det_integral {K : Type*} [Field K] {Γ : Type*} [LinearOrderedCommGr
     rw [← h]
     exact (A'.det).2
 
-theorem solve_integral {K : Type*} [Field K] {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
-    (v : Valuation K Γ) {n : ℕ} (A B κ : Matrix (Fin n) (Fin n) K) (hAB : A * κ = B)
-    (hA : ∀ i j, v (A i j) ≤ 1) (hB : ∀ i j, v (B i j) ≤ 1)
-    (hdA : v A.det = 1) (hdB : v B.det = 1) :
-    (∀ a b, v (κ a b) ≤ 1) ∧ v κ.det = 1 ∧
-      ((∀ i j, v ((A - 1) i j) < 1) → (∀ i j, v ((B - 1) i j) < 1) →
-        ∀ a b, v ((κ - 1) a b) < 1) := by
+theorem solve_integral
+    {K : Type*} [Field K]
+    {Γ : Type*} [LinearOrderedCommGroupWithZero Γ]
+    (v : Valuation K Γ)
+    {n : ℕ} (A B κ : Matrix (Fin n) (Fin n) K) (hAB : A * κ = B) (hA : ∀ i j, v (A i j) ≤ 1)
+    (hB : ∀ i j, v (B i j) ≤ 1) (hdA : v A.det = 1) (hdB : v B.det = 1)
+    : (∀ a b, v (κ a b) ≤ 1) ∧ v κ.det = 1
+      ∧ ((∀ i j, v ((A - 1) i j) < 1) → (∀ i j, v ((B - 1) i j) < 1)
+        → ∀ a b, v ((κ - 1) a b) < 1) := by
   obtain ⟨hadj, -⟩ := adj_det_integral v A hA
   have key : A.det • κ = A.adjugate * B := by
     rw [← hAB, ← Matrix.mul_assoc, Matrix.adjugate_mul, Matrix.smul_mul, Matrix.one_mul]
@@ -86,16 +94,18 @@ end GlobalTheory.LocCore
 
 namespace GlobalTheory.LocCore
 
-noncomputable def topAt {D : D7} (P : Pl D.host.E) {m n : ℕ} (hmn : n ≤ m)
-    (U : Matrix (Fin m) (Fin n) (Formalism.IndefR.Datum.EAf D)) :
-    Matrix (Fin n) (Fin n) (HeightOneSpectrum.adicCompletion D.host.E P) :=
-  fun i j => GlobalTheory.StdFrames.cpt P (U (Fin.castLE hmn i) j)
+noncomputable def topAt
+    {D : D7} (P : Pl D.host.E)
+    {m n : ℕ} (hmn : n ≤ m) (U : Matrix (Fin m) (Fin n) (Formalism.IndefR.Datum.EAf D))
+    : Matrix (Fin n) (Fin n) (HeightOneSpectrum.adicCompletion D.host.E P) := fun i j =>
+  GlobalTheory.StdFrames.cpt P (U (Fin.castLE hmn i) j)
 
-theorem topAt_facts {D : D7} (P : Pl D.host.E) {m n : ℕ} (hmn : n ≤ m)
-    (U : Matrix (Fin m) (Fin n) (Formalism.IndefR.Datum.EAf D)) (hU : IsIntM U)
-    (hdU : IsUnit (topL n (redM P U)).det) :
-    (∀ i j, Valued.v (topAt P hmn U i j) ≤ 1) ∧ Valued.v (topAt P hmn U).det = 1 ∧
-      (topL n (redM P U) = 1 → ∀ i j, Valued.v ((topAt P hmn U - 1) i j) < 1) := by
+theorem topAt_facts
+    {D : D7} (P : Pl D.host.E)
+    {m n : ℕ} (hmn : n ≤ m) (U : Matrix (Fin m) (Fin n) (Formalism.IndefR.Datum.EAf D))
+    (hU : IsIntM U) (hdU : IsUnit (topL n (redM P U)).det)
+    : (∀ i j, Valued.v (topAt P hmn U i j) ≤ 1) ∧ Valued.v (topAt P hmn U).det = 1
+      ∧ (topL n (redM P U) = 1 → ∀ i j, Valued.v ((topAt P hmn U - 1) i j) < 1) := by
   let S := Formalism.L2.Herm.intAf (↥D.host.F) D.host.E
   let A' : Matrix (Fin n) (Fin n) S := fun i j => ⟨U (Fin.castLE hmn i) j, hU _ _⟩
   let φ : S →+* HeightOneSpectrum.adicCompletion D.host.E P :=
@@ -110,8 +120,8 @@ theorem topAt_facts {D : D7} (P : Pl D.host.E) {m n : ℕ} (hmn : n ≤ m)
     intro i j
     have := (GlobalTheory.StdFrames.mem_OA_iff (U (Fin.castLE hmn i) j)).1 (hU _ _) P
     exact (HeightOneSpectrum.mem_adicCompletionIntegers _ _ _).1 this
-  have hφ : ∀ s : S, resS (↥D.host.F) P s = 0 ↔ Valued.v (φ s) < 1 :=
-    fun s => GlobalTheory.AdIsom.resS_eq_zero_iff_cpt P s
+  have hφ : ∀ s : S, resS (↥D.host.F) P s = 0 ↔ Valued.v (φ s) < 1 := fun s =>
+    GlobalTheory.AdIsom.resS_eq_zero_iff_cpt P s
   refine ⟨hint, ?_, ?_⟩
   · apply le_antisymm ((adj_det_integral Valued.v _ hint).2)
     have h1 : resS (↥D.host.F) P A'.det ≠ 0 := by
@@ -137,7 +147,19 @@ end GlobalTheory.LocCore
 
 namespace GlobalTheory.LocCore
 
-theorem kappa_integral_at : ∀ (D : D7) (P : Pl D.host.E) (m n : ℕ) (U Y : Matrix (Fin m) (Fin n) (Formalism.IndefR.Datum.EAf D)) (κ : Matrix (Fin n) (Fin n) (Formalism.IndefR.Datum.EAf D)) (c : Formalism.IndefR.Datum.EAf D), GlobalTheory.StdFrames.cpt P c = 1 → (HMul.hMul U κ : Matrix (Fin m) (Fin n) (Formalism.IndefR.Datum.EAf D)) = c • Y + (1 - c) • U → IsIntM U → IsIntM Y → IsUnit (topL n (redM P U)).det → IsUnit (topL n (redM P Y)).det → (∀ a b, GlobalTheory.StdFrames.cpt P (κ a b) ∈ P.adicCompletionIntegers D.host.E) ∧ Valued.v (GlobalTheory.StdFrames.cpt P κ.det) = 1 ∧ (topL n (redM P U) = 1 → topL n (redM P Y) = 1 → ∀ a b, Valued.v (GlobalTheory.StdFrames.cpt P ((κ - 1) a b)) < 1) := by
+theorem kappa_integral_at
+    : ∀ (D : D7) (P : Pl D.host.E) (m n : ℕ)
+        (U Y : Matrix (Fin m) (Fin n) (Formalism.IndefR.Datum.EAf D))
+        (κ : Matrix (Fin n) (Fin n) (Formalism.IndefR.Datum.EAf D))
+        (c : Formalism.IndefR.Datum.EAf D),
+      GlobalTheory.StdFrames.cpt P c = 1
+        → (HMul.hMul U κ : Matrix (Fin m) (Fin n) (Formalism.IndefR.Datum.EAf D))
+          = c • Y + (1 - c) • U
+        → IsIntM U → IsIntM Y → IsUnit (topL n (redM P U)).det → IsUnit (topL n (redM P Y)).det
+        → (∀ a b, GlobalTheory.StdFrames.cpt P (κ a b) ∈ P.adicCompletionIntegers D.host.E)
+          ∧ Valued.v (GlobalTheory.StdFrames.cpt P κ.det) = 1
+          ∧ (topL n (redM P U) = 1 → topL n (redM P Y) = 1
+            → ∀ a b, Valued.v (GlobalTheory.StdFrames.cpt P ((κ - 1) a b)) < 1) := by
   intro D P m n U Y κ c hc hUk hU hY hdU hdY
   by_cases hmn : n ≤ m
   swap
@@ -157,7 +179,8 @@ theorem kappa_integral_at : ∀ (D : D7) (P : Pl D.host.E) (m n : ℕ) (U Y : Ma
     have h := congrArg cp (congrFun (congrFun hUk (Fin.castLE hmn i)) j)
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [Matrix.mul_apply, Matrix.add_apply, Matrix.smul_apply, smul_eq_mul, map_sum,
-      map_mul, map_add, map_sub, map_one, hc, sub_self, zero_mul, add_zero, one_mul] at h
+          map_mul, map_add, map_sub, map_one, hc, sub_self, zero_mul, add_zero, one_mul]
+        at h
     rw [Matrix.mul_apply]
     simp only [Matrix.map_apply]
     exact h

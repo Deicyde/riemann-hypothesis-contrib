@@ -34,7 +34,8 @@ theorem tent_cont (x δ : ℝ) : Continuous (tent x δ) := by
 
 theorem tent_self (x δ : ℝ) : tent x δ x = 1 := by simp [tent]
 
-theorem tent_mul {x y : ℝ} (h : x ≠ y) (t : ℝ) : tent x (|x - y| / 2) t * tent y (|x - y| / 2) t = 0 := by
+theorem tent_mul {x y : ℝ} (h : x ≠ y) (t : ℝ)
+    : tent x (|x - y| / 2) t * tent y (|x - y| / 2) t = 0 := by
   have hd : 0 < |x - y| / 2 := by have := abs_pos.2 (sub_ne_zero.2 h); linarith
   by_cases h1 : |x - y| / 2 ≤ |t - x|
   · have : tent x (|x - y| / 2) t = 0 := by
@@ -60,10 +61,12 @@ theorem tent_mul {x y : ℝ} (h : x ≠ y) (t : ℝ) : tent x (|x - y| / 2) t * 
       linarith
     rw [this, mul_zero]
 
-theorem schur_selfAdjoint [Nontrivial H] (𝒮 : Set (H →L[ℂ] H))
+theorem schur_selfAdjoint
+    [Nontrivial H]
+    (𝒮 : Set (H →L[ℂ] H))
     (hirr : ∀ S : Submodule ℂ H, IsClosed (S : Set H) → (∀ U ∈ 𝒮, ∀ v ∈ S, U v ∈ S) → S = ⊥ ∨ S = ⊤)
-    (A : H →L[ℂ] H) (hA : IsSelfAdjoint A) (hc : ∀ U ∈ 𝒮, Commute A U) :
-    ∃ a : ℝ, A = algebraMap ℝ (H →L[ℂ] H) a := by
+    (A : H →L[ℂ] H) (hA : IsSelfAdjoint A) (hc : ∀ U ∈ 𝒮, Commute A U)
+    : ∃ a : ℝ, A = algebraMap ℝ (H →L[ℂ] H) a := by
   obtain ⟨a, ha⟩ := ContinuousFunctionalCalculus.spectrum_nonempty (R := ℝ) A hA
   have hsub : ∀ y ∈ spectrum ℝ A, y = a := by
     intro y hy
@@ -72,7 +75,8 @@ theorem schur_selfAdjoint [Nontrivial H] (𝒮 : Set (H →L[ℂ] H))
     set F := cfc (tent y δ) A with hF
     set G := cfc (tent a δ) A with hG
     have hFG : F * G = 0 := by
-      rw [hF, hG, ← cfc_mul (tent y δ) (tent a δ) A (tent_cont _ _).continuousOn (tent_cont _ _).continuousOn]
+      rw [hF, hG,
+        ← cfc_mul (tent y δ) (tent a δ) A (tent_cont _ _).continuousOn (tent_cont _ _).continuousOn]
       have : (fun t => tent y δ t * tent a δ t) = fun _ => (0 : ℝ) := by
         funext t; exact tent_mul hne t
       rw [this, cfc_const_zero]
@@ -109,24 +113,29 @@ theorem schur_selfAdjoint [Nontrivial H] (𝒮 : Set (H →L[ℂ] H))
       have : w ∈ S := by rw [h]; trivial
       exact hSk this
   refine ⟨a, ?_⟩
-  calc A = cfc (id : ℝ → ℝ) A := (cfc_id ℝ A hA).symm
+  calc
+    A = cfc (id : ℝ → ℝ) A := (cfc_id ℝ A hA).symm
     _ = cfc (fun _ : ℝ => a) A := cfc_congr fun y hy => hsub y hy
     _ = algebraMap ℝ (H →L[ℂ] H) a := cfc_const a A hA
 
-theorem schur_general [Nontrivial H] (𝒮 : Set (H →L[ℂ] H))
+theorem schur_general
+    [Nontrivial H]
+    (𝒮 : Set (H →L[ℂ] H))
     (hirr : ∀ S : Submodule ℂ H, IsClosed (S : Set H) → (∀ U ∈ 𝒮, ∀ v ∈ S, U v ∈ S) → S = ⊥ ∨ S = ⊤)
-    (A : H →L[ℂ] H) (hc : ∀ U ∈ 𝒮, Commute A U) (hc' : ∀ U ∈ 𝒮, Commute A (star U)) :
-    ∃ z : ℂ, ∀ v, A v = z • v := by
+    (A : H →L[ℂ] H) (hc : ∀ U ∈ 𝒮, Commute A U) (hc' : ∀ U ∈ 𝒮, Commute A (star U))
+    : ∃ z : ℂ, ∀ v, A v = z • v := by
   have hs : ∀ U ∈ 𝒮, Commute (star A) U := fun U hU => by
     have := (hc' U hU).star_star
     rwa [star_star] at this
-  obtain ⟨a, ha⟩ := schur_selfAdjoint 𝒮 hirr (A + star A) (IsSelfAdjoint.add_star_self A)
-    (fun U hU => (hc U hU).add_left (hs U hU))
+  obtain ⟨a, ha⟩ :=
+    schur_selfAdjoint 𝒮 hirr (A + star A) (IsSelfAdjoint.add_star_self A)
+      (fun U hU => (hc U hU).add_left (hs U hU))
   have hsa : IsSelfAdjoint (Complex.I • (A - star A)) := by
     rw [isSelfAdjoint_iff, star_smul, star_sub, star_star]
     simp only [RCLike.star_def, Complex.conj_I, neg_smul, ← smul_neg, neg_sub]
-  obtain ⟨b, hb⟩ := schur_selfAdjoint 𝒮 hirr (Complex.I • (A - star A)) hsa
-    (fun U hU => ((hc U hU).sub_left (hs U hU)).smul_left _)
+  obtain ⟨b, hb⟩ :=
+    schur_selfAdjoint 𝒮 hirr (Complex.I • (A - star A)) hsa
+      (fun U hU => ((hc U hU).sub_left (hs U hU)).smul_left _)
   refine ⟨((a : ℂ) - Complex.I * b) / 2, fun v => ?_⟩
   have h1 : A v + star A v = (a : ℂ) • v := by
     have := congrArg (fun T : H →L[ℂ] H => T v) ha
@@ -135,12 +144,13 @@ theorem schur_general [Nontrivial H] (𝒮 : Set (H →L[ℂ] H))
     have := congrArg (fun T : H →L[ℂ] H => T v) hb
     simpa [Algebra.algebraMap_eq_smul_one] using this
   have h3 : A v - star A v = -(Complex.I * b) • v := by
-    have : A v - star A v = (-Complex.I) • (Complex.I • (A v - star A v)) := by
-      rw [smul_smul]; simp
-    rw [this, h2, smul_smul]; ring_nf
+    have : A v - star A v = (-Complex.I) • (Complex.I • (A v - star A v)) := by rw [smul_smul]; simp
+    rw [this, h2, smul_smul]
+    ring_nf
   have h4 : (2 : ℂ) • A v = ((a : ℂ) - Complex.I * b) • v := by
     have : (2 : ℂ) • A v = (A v + star A v) + (A v - star A v) := by rw [two_smul]; abel
-    rw [this, h1, h3, ← add_smul]; ring_nf
+    rw [this, h1, h3, ← add_smul]
+    ring_nf
   have h5 : A v = (2 : ℂ)⁻¹ • ((2 : ℂ) • A v) := by rw [smul_smul]; simp
   rw [h5, h4, smul_smul]
   congr 1
@@ -165,7 +175,9 @@ open scoped InnerProductSpace ENNReal
 
 section Ortho
 
-variable {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G]
+variable
+  {G : Type*}
+  [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G]
   {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
 
 structure SqRep (μ : Measure G) (σ : G → (H →L[ℂ] H)) : Prop where
@@ -230,8 +242,8 @@ def Tc (h : SqRep μ σ) (w : H) : H →L[ℂ] Lp ℂ 2 μ := ⟨h.T w, h.T_cont
 def II (μ : Measure G) (σ : G → (H →L[ℂ] H)) (v w v' w' : H) : ℂ :=
   ∫ g, ⟪w, σ g v⟫_ℂ * star ⟪w', σ g v'⟫_ℂ ∂μ
 
-theorem integrable (h : SqRep μ σ) (v w v' w' : H) :
-    Integrable (fun g => ⟪w, σ g v⟫_ℂ * star ⟪w', σ g v'⟫_ℂ) μ := by
+theorem integrable (h : SqRep μ σ) (v w v' w' : H)
+    : Integrable (fun g => ⟪w, σ g v⟫_ℂ * star ⟪w', σ g v'⟫_ℂ) μ := by
   refine (L2.integrable_inner (𝕜 := ℂ) (h.Tc w' v') (h.Tc w v)).congr ?_
   filter_upwards [h.T_ae w v, h.T_ae w' v'] with g h1 h2
   have e1 : (h.Tc w v : G → ℂ) g = ⟪w, σ g v⟫_ℂ := h1
@@ -269,41 +281,47 @@ open scoped InnerProductSpace ENNReal
 
 section Ortho2
 
-variable {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G]
+variable
+  {G : Type*}
+  [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G]
   {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
   {μ : Measure G} {σ : G → (H →L[ℂ] H)}
 
 namespace SqRep
 
-theorem II_right [μ.IsMulRightInvariant] (h : SqRep μ σ) (a : G) (v w v' w' : H) :
-    II μ σ (σ a v) w (σ a v') w' = II μ σ v w v' w' := by
+theorem II_right [μ.IsMulRightInvariant] (h : SqRep μ σ) (a : G) (v w v' w' : H)
+    : II μ σ (σ a v) w (σ a v') w' = II μ σ v w v' w' := by
   unfold II
-  have e : ∀ g, ⟪w, σ g (σ a v)⟫_ℂ * star ⟪w', σ g (σ a v')⟫_ℂ =
-      (fun x => ⟪w, σ x v⟫_ℂ * star ⟪w', σ x v'⟫_ℂ) (g * a) := by
+  have e
+      : ∀ g,
+        ⟪w, σ g (σ a v)⟫_ℂ * star ⟪w', σ g (σ a v')⟫_ℂ
+          = (fun x => ⟪w, σ x v⟫_ℂ * star ⟪w', σ x v'⟫_ℂ) (g * a) := by
     intro g
     simp only [h.mul g a, ContinuousLinearMap.comp_apply]
   simp_rw [e]
   exact integral_mul_right_eq_self (fun x => ⟪w, σ x v⟫_ℂ * star ⟪w', σ x v'⟫_ℂ) a
 
-theorem II_inv [μ.IsInvInvariant] (h : SqRep μ σ) (v w v' w' : H) : II μ σ v w v' w' = II μ σ w' v' w v := by
+theorem II_inv [μ.IsInvInvariant] (h : SqRep μ σ) (v w v' w' : H)
+    : II μ σ v w v' w' = II μ σ w' v' w v := by
   unfold II
   rw [← integral_inv_eq_self (fun g => ⟪w, σ g v⟫_ℂ * star ⟪w', σ g v'⟫_ℂ) μ]
   refine integral_congr_ae (Eventually.of_forall fun g => ?_)
   show ⟪w, σ g⁻¹ v⟫_ℂ * star ⟪w', σ g⁻¹ v'⟫_ℂ = ⟪v', σ g w'⟫_ℂ * star ⟪v, σ g w⟫_ℂ
-  have e1 : ⟪w, σ g⁻¹ v⟫_ℂ = star ⟪v, σ g w⟫_ℂ := by
-    rw [← inner_conj_symm, h.inner_inv]; rfl
+  have e1 : ⟪w, σ g⁻¹ v⟫_ℂ = star ⟪v, σ g w⟫_ℂ := by rw [← inner_conj_symm, h.inner_inv]; rfl
   have e2 : star ⟪w', σ g⁻¹ v'⟫_ℂ = ⟪v', σ g w'⟫_ℂ := by
     have : star ⟪w', σ g⁻¹ v'⟫_ℂ = ⟪σ g⁻¹ v', w'⟫_ℂ := inner_conj_symm _ _
     rw [this, h.inner_inv]
   rw [e1, e2, mul_comm]
 
-def AA (h : SqRep μ σ) (w w' : H) : H →L[ℂ] H := (ContinuousLinearMap.adjoint (h.Tc w')).comp (h.Tc w)
+def AA (h : SqRep μ σ) (w w' : H) : H →L[ℂ] H :=
+  (ContinuousLinearMap.adjoint (h.Tc w')).comp (h.Tc w)
 
 theorem inner_AA (h : SqRep μ σ) (v w v' w' : H) : ⟪v', h.AA w w' v⟫_ℂ = II μ σ v w v' w' := by
   unfold AA
   rw [ContinuousLinearMap.comp_apply, ContinuousLinearMap.adjoint_inner_right, h.inner_Tc]
 
-theorem AA_comm [μ.IsMulRightInvariant] (h : SqRep μ σ) (w w' : H) (a : G) : Commute (h.AA w w') (σ a) := by
+theorem AA_comm [μ.IsMulRightInvariant] (h : SqRep μ σ) (w w' : H) (a : G)
+    : Commute (h.AA w w') (σ a) := by
   show h.AA w w' * σ a = σ a * h.AA w w'
   ext v
   show h.AA w w' (σ a v) = σ a (h.AA w w' v)
@@ -318,19 +336,23 @@ theorem star_eq (h : SqRep μ σ) (a : G) : star (σ a) = σ a⁻¹ := by
   rw [ContinuousLinearMap.eq_adjoint_iff]
   exact fun x y => h.inner_inv a x y
 
-theorem exists_scalar [Nontrivial H] [μ.IsMulRightInvariant] (h : SqRep μ σ) (w w' : H) :
-    ∃ z : ℂ, ∀ v v', II μ σ v w v' w' = z * ⟪v', v⟫_ℂ := by
-  obtain ⟨z, hz⟩ := schur_general (Set.range σ)
-    (fun S hS hinv => h.irr S hS fun g v hv => hinv _ ⟨g, rfl⟩ v hv) (h.AA w w')
-    (by rintro _ ⟨a, rfl⟩; exact h.AA_comm w w' a)
-    (by rintro _ ⟨a, rfl⟩; rw [h.star_eq]; exact h.AA_comm w w' a⁻¹)
+theorem exists_scalar [Nontrivial H] [μ.IsMulRightInvariant] (h : SqRep μ σ) (w w' : H)
+    : ∃ z : ℂ, ∀ v v', II μ σ v w v' w' = z * ⟪v', v⟫_ℂ := by
+  obtain ⟨z, hz⟩ :=
+    schur_general (Set.range σ)
+      (fun S hS hinv => h.irr S hS fun g v hv => hinv _ ⟨g, rfl⟩ v hv)
+      (h.AA w w') (by rintro _ ⟨a, rfl⟩; exact h.AA_comm w w' a)
+      (by rintro _ ⟨a, rfl⟩; rw [h.star_eq]; exact h.AA_comm w w' a⁻¹)
   refine ⟨z, fun v v' => ?_⟩
   rw [← h.inner_AA, hz, inner_smul_right]
 
-theorem ortho [Nontrivial H] [μ.IsMulRightInvariant] [μ.IsInvInvariant] [μ.IsOpenPosMeasure] (h : SqRep μ σ) :
-    ∃ d : ℝ, 0 < d ∧ ∀ v w v' w' : H,
-      Integrable (fun g => ⟪w, σ g v⟫_ℂ * star ⟪w', σ g v'⟫_ℂ) μ ∧
-      ∫ g, ⟪w, σ g v⟫_ℂ * star ⟪w', σ g v'⟫_ℂ ∂μ = ⟪v', v⟫_ℂ * ⟪w, w'⟫_ℂ / (d : ℂ) := by
+theorem ortho
+    [Nontrivial H] [μ.IsMulRightInvariant] [μ.IsInvInvariant] [μ.IsOpenPosMeasure] (h : SqRep μ σ)
+    : ∃ d : ℝ,
+      0 < d
+        ∧ ∀ v w v' w' : H,
+          Integrable (fun g => ⟪w, σ g v⟫_ℂ * star ⟪w', σ g v'⟫_ℂ) μ
+            ∧ ∫ g, ⟪w, σ g v⟫_ℂ * star ⟪w', σ g v'⟫_ℂ ∂μ = ⟪v', v⟫_ℂ * ⟪w, w'⟫_ℂ / (d : ℂ) := by
   obtain ⟨e, he⟩ := exists_ne (0 : H)
   have hN : (0 : ℝ) < ‖e‖ ^ 2 := by positivity
   have hee : ⟪e, e⟫_ℂ = ((‖e‖ ^ 2 : ℝ) : ℂ) := by rw [inner_self_eq_norm_sq_to_K]; norm_cast
@@ -378,10 +400,8 @@ theorem ortho [Nontrivial H] [μ.IsMulRightInvariant] [μ.IsInvInvariant] [μ.Is
   have key : II μ σ v w v' w' = z w w' * ⟪v', v⟫_ℂ := hz w w' v v'
   show II μ σ v w v' w' = _
   rw [key]
-  have e1 : z w w' = z e e * ⟪w, w'⟫_ℂ / ((‖e‖ ^ 2 : ℝ) : ℂ) := by
-    rw [← hzw]; field_simp
-  have e2 : z e e = (J : ℂ) / ((‖e‖ ^ 2 : ℝ) : ℂ) := by
-    rw [← hzee]; field_simp
+  have e1 : z w w' = z e e * ⟪w, w'⟫_ℂ / ((‖e‖ ^ 2 : ℝ) : ℂ) := by rw [← hzw]; field_simp
+  have e2 : z e e = (J : ℂ) / ((‖e‖ ^ 2 : ℝ) : ℂ) := by rw [← hzee]; field_simp
   rw [e1, e2]
   push_cast
   have hne : ((‖e‖ : ℝ) : ℂ) ≠ 0 := by
@@ -407,7 +427,8 @@ namespace Formalism.MainNotions.SchurRelationsDiscreteSeries
 
 open MeasureTheory Matrix Finset
 open scoped InnerProductSpace ENNReal
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.QuantumDeterminants
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.QuantumDeterminants
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -429,14 +450,15 @@ namespace Formalism.MainNotions.SchurRelationsDiscreteSeries
 
 open MeasureTheory Matrix Finset
 open scoped InnerProductSpace ENNReal
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.QuantumDeterminants
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.QuantumDeterminants
 
 section Tr
 
 variable {k r : ℕ} {ε : Fin (2 * r + k + 1) → Bool}
 
-theorem conj_mem {P a : MatKR k r} (hP : IsCayleyU k r ε P) (ha : a ∈ UH (Hpk k r)) :
-    P * a * P⁻¹ ∈ UJset ε ∧ P⁻¹ * (P * a * P⁻¹) * P = a := by
+theorem conj_mem {P a : MatKR k r} (hP : IsCayleyU k r ε P) (ha : a ∈ UH (Hpk k r))
+    : P * a * P⁻¹ ∈ UJset ε ∧ P⁻¹ * (P * a * P⁻¹) * P = a := by
   have hu : IsUnit P.det := (Matrix.isUnit_iff_isUnit_det _).1 hP.1.1
   have h1 : P⁻¹ * P = 1 := Matrix.nonsing_inv_mul _ hu
   have h2 : P * P⁻¹ = 1 := Matrix.mul_nonsing_inv _ hu
@@ -444,14 +466,17 @@ theorem conj_mem {P a : MatKR k r} (hP : IsCayleyU k r ε P) (ha : a ∈ UH (Hpk
   have ha' : aᴴ * Hpk k r * a = Hpk k r := ha
   constructor
   · show (P * a * P⁻¹)ᴴ * Formalism.REAL.Jm ε * (P * a * P⁻¹) = Formalism.REAL.Jm ε
-    calc (P * a * P⁻¹)ᴴ * Formalism.REAL.Jm ε * (P * a * P⁻¹)
-        = (P⁻¹)ᴴ * (aᴴ * (Pᴴ * Formalism.REAL.Jm ε * P) * a) * P⁻¹ := by
-          simp only [conjTranspose_mul, Matrix.mul_assoc]
+    calc
+      (P * a * P⁻¹)ᴴ * Formalism.REAL.Jm ε * (P * a * P⁻¹)
+          = (P⁻¹)ᴴ * (aᴴ * (Pᴴ * Formalism.REAL.Jm ε * P) * a) * P⁻¹ := by
+        simp only [conjTranspose_mul, Matrix.mul_assoc]
       _ = (P⁻¹)ᴴ * (Pᴴ * Formalism.REAL.Jm ε * P) * P⁻¹ := by rw [hH, ha']
       _ = (P * P⁻¹)ᴴ * Formalism.REAL.Jm ε * (P * P⁻¹) := by
-          simp only [conjTranspose_mul, Matrix.mul_assoc]
+        simp only [conjTranspose_mul, Matrix.mul_assoc]
       _ = Formalism.REAL.Jm ε := by rw [h2]; simp
-  · calc P⁻¹ * (P * a * P⁻¹) * P = (P⁻¹ * P) * a * (P⁻¹ * P) := by simp only [Matrix.mul_assoc]
+  · calc
+      P⁻¹ * (P * a * P⁻¹) * P
+        = (P⁻¹ * P) * a * (P⁻¹ * P) := by simp only [Matrix.mul_assoc]
       _ = a := by rw [h1]; simp
 
 def cjH (P : MatKR k r) (hu : IsUnit P.det) : MatKR k r ≃ₜ MatKR k r where
@@ -459,40 +484,46 @@ def cjH (P : MatKR k r) (hu : IsUnit P.det) : MatKR k r ≃ₜ MatKR k r where
   invFun y := P * y * P⁻¹
   left_inv x := by
     have h2 : P * P⁻¹ = 1 := Matrix.mul_nonsing_inv _ hu
-    calc P * (P⁻¹ * x * P) * P⁻¹ = (P * P⁻¹) * x * (P * P⁻¹) := by simp only [Matrix.mul_assoc]
+    calc
+      P * (P⁻¹ * x * P) * P⁻¹
+        = (P * P⁻¹) * x * (P * P⁻¹) := by simp only [Matrix.mul_assoc]
       _ = x := by rw [h2]; simp
   right_inv y := by
     have h1 : P⁻¹ * P = 1 := Matrix.nonsing_inv_mul _ hu
-    calc P⁻¹ * (P * y * P⁻¹) * P = (P⁻¹ * P) * y * (P⁻¹ * P) := by simp only [Matrix.mul_assoc]
+    calc
+      P⁻¹ * (P * y * P⁻¹) * P
+        = (P⁻¹ * P) * y * (P⁻¹ * P) := by simp only [Matrix.mul_assoc]
       _ = y := by rw [h1]; simp
   continuous_toFun := (continuous_const.matrix_mul continuous_id).matrix_mul continuous_const
   continuous_invFun := (continuous_const.matrix_mul continuous_id).matrix_mul continuous_const
 
 def ioP (P : MatKR k r) (g : Formalism.REAL.UJ ε) : Mt k r := P⁻¹ * umat g * P
 
-theorem measurableEmbedding_conjCayley {P : MatKR k r} (hP : IsCayleyU k r ε P) : MeasurableEmbedding (ioP (ε := ε) P) := by
+theorem measurableEmbedding_conjCayley {P : MatKR k r} (hP : IsCayleyU k r ε P)
+    : MeasurableEmbedding (ioP (ε := ε) P) := by
   have hu : IsUnit P.det := (Matrix.isUnit_iff_isUnit_det _).1 hP.1.1
   have h1 : Topology.IsClosedEmbedding (fun g : Formalism.REAL.UJ ε => (cjH P hu) (umat g)) :=
     (cjH P hu).isClosedEmbedding.comp (Formalism.REAL.isClosedEmbeddingMatrix _ ε).1
   have h2 : Topology.IsClosedEmbedding (ioP (ε := ε) P) := h1
   exact h2.measurableEmbedding
 
-theorem conj_mem_unitaryGroup {P : MatKR k r} (hP : IsCayleyU k r ε P) (g : Formalism.REAL.UJ ε) :
-    Matrix.of (ioP P g) ∈ UH (Hpk k r) := by
+theorem conj_mem_unitaryGroup {P : MatKR k r} (hP : IsCayleyU k r ε P) (g : Formalism.REAL.UJ ε)
+    : Matrix.of (ioP P g) ∈ UH (Hpk k r) := by
   have hu : IsUnit P.det := (Matrix.isUnit_iff_isUnit_det _).1 hP.1.1
   have h2 : P * P⁻¹ = 1 := Matrix.mul_nonsing_inv _ hu
   have hH : Pᴴ * Formalism.REAL.Jm ε * P = Hpk k r := hP.1.2
   have hg : (umat g)ᴴ * Formalism.REAL.Jm ε * umat g = Formalism.REAL.Jm ε := g.2
   show (P⁻¹ * umat g * P)ᴴ * Hpk k r * (P⁻¹ * umat g * P) = Hpk k r
   rw [← hH]
-  calc (P⁻¹ * umat g * P)ᴴ * (Pᴴ * Formalism.REAL.Jm ε * P) * (P⁻¹ * umat g * P)
-      = Pᴴ * ((umat g)ᴴ * ((P * P⁻¹)ᴴ * Formalism.REAL.Jm ε * (P * P⁻¹)) * umat g) * P := by
-        simp only [conjTranspose_mul, Matrix.mul_assoc]
+  calc
+    (P⁻¹ * umat g * P)ᴴ * (Pᴴ * Formalism.REAL.Jm ε * P) * (P⁻¹ * umat g * P)
+        = Pᴴ * ((umat g)ᴴ * ((P * P⁻¹)ᴴ * Formalism.REAL.Jm ε * (P * P⁻¹)) * umat g) * P := by
+      simp only [conjTranspose_mul, Matrix.mul_assoc]
     _ = Pᴴ * ((umat g)ᴴ * Formalism.REAL.Jm ε * umat g) * P := by rw [h2]; simp
     _ = Pᴴ * Formalism.REAL.Jm ε * P := by rw [hg]
 
-theorem isHaarOn_map_conjCayley {P : MatKR k r} (hP : IsCayleyU k r ε P) :
-    Formalism.MainNotions.S.IsHaarOn (UH (Hpk k r)) ((Formalism.REAL.muG ε).map (ioP P)) := by
+theorem isHaarOn_map_conjCayley {P : MatKR k r} (hP : IsCayleyU k r ε P)
+    : Formalism.MainNotions.S.IsHaarOn (UH (Hpk k r)) ((Formalism.REAL.muG ε).map (ioP P)) := by
   have hemb := measurableEmbedding_conjCayley hP
   have hu : IsUnit P.det := (Matrix.isUnit_iff_isUnit_det _).1 hP.1.1
   have h1 : P⁻¹ * P = 1 := Matrix.nonsing_inv_mul _ hu
@@ -519,26 +550,38 @@ theorem isHaarOn_map_conjCayley {P : MatKR k r} (hP : IsCayleyU k r ε P) :
     have hcomp : lmulM s ∘ ioP (ε := ε) P = ioP P ∘ fun g => s' * g := by
       funext g
       show s * (P⁻¹ * umat g * P) = P⁻¹ * (P * s * P⁻¹ * umat g) * P
-      calc s * (P⁻¹ * umat g * P) = (P⁻¹ * P) * s * (P⁻¹ * umat g * P) := by rw [h1]; simp
+      calc
+        s * (P⁻¹ * umat g * P)
+          = (P⁻¹ * P) * s * (P⁻¹ * umat g * P) := by rw [h1]; simp
         _ = P⁻¹ * (P * s * P⁻¹ * umat g) * P := by simp only [Matrix.mul_assoc]
     rw [hcomp, ← Measure.map_map hemb.measurable (measurable_const_mul s'), map_mul_left_eq_self]
 
-theorem transport {P : MatKR k r} (hP : IsCayleyU k r ε P) {μ : Measure (Mt k r)}
-    (hμ : Formalism.MainNotions.S.IsHaarOn (UH (Hpk k r)) μ) :
-    ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ μ = c • (Formalism.REAL.muG ε).map (ioP P) := by
+theorem transport
+    {P : MatKR k r} (hP : IsCayleyU k r ε P)
+    {μ : Measure (Mt k r)} (hμ : Formalism.MainNotions.S.IsHaarOn (UH (Hpk k r)) μ)
+    : ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ μ = c • (Formalism.REAL.muG ε).map (ioP P) := by
   obtain ⟨ν, hν⟩ := Formalism.FourierDecayAlt.P.unitary_group_haar_exists k r
-  obtain ⟨c1, a1, a2, e1⟩ := BridgeLemma₃.hu_eq_smul (Formalism.FourierDecayAlt.P.unitary_group_closed k r) hν hμ
-  obtain ⟨c2, b1, b2, e2⟩ := BridgeLemma₃.hu_eq_smul (Formalism.FourierDecayAlt.P.unitary_group_closed k r) hν (isHaarOn_map_conjCayley hP)
+  obtain ⟨c1, a1, a2, e1⟩ :=
+    BridgeLemma₃.hu_eq_smul (Formalism.FourierDecayAlt.P.unitary_group_closed k r) hν hμ
+  obtain ⟨c2, b1, b2, e2⟩ :=
+    BridgeLemma₃.hu_eq_smul (Formalism.FourierDecayAlt.P.unitary_group_closed k r) hν
+      (isHaarOn_map_conjCayley hP)
   refine ⟨c1 / c2, ENNReal.div_ne_zero.2 ⟨a1, b2⟩, ENNReal.div_ne_top a2 b1, ?_⟩
   rw [e1, e2, smul_smul, ENNReal.div_mul_cancel b1 b2]
 
-theorem schur_hpk {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {σ : MatKR k r → (H →L[ℂ] H)}
-    {P : MatKR k r} (hP : IsCayleyU k r ε P) {d : ℝ} (hd : IsFdeg (Formalism.REAL.muG ε) (fun g => σ (P⁻¹ * g * P)) d)
-    {μG : Measure (Mt k r)} (hμ : Formalism.MainNotions.S.IsHaarOn (UH (Hpk k r)) μG) :
-    ∃ d' : ℝ, 0 < d' ∧ ∀ v w v' w' : H,
-      Integrable (fun x => inner ℂ w (σ (Matrix.of x) v) * star (inner ℂ w' (σ (Matrix.of x) v'))) μG ∧
-      ∫ x, inner ℂ w (σ (Matrix.of x) v) * star (inner ℂ w' (σ (Matrix.of x) v')) ∂μG =
-        inner ℂ v' v * inner ℂ w w' / (d' : ℂ) := by
+theorem schur_hpk
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    {σ : MatKR k r → (H →L[ℂ] H)} {P : MatKR k r} (hP : IsCayleyU k r ε P)
+    {d : ℝ} (hd : IsFdeg (Formalism.REAL.muG ε) (fun g => σ (P⁻¹ * g * P)) d)
+    {μG : Measure (Mt k r)} (hμ : Formalism.MainNotions.S.IsHaarOn (UH (Hpk k r)) μG)
+    : ∃ d' : ℝ,
+      0 < d'
+        ∧ ∀ v w v' w' : H,
+          Integrable
+              (fun x => inner ℂ w (σ (Matrix.of x) v) * star (inner ℂ w' (σ (Matrix.of x) v')))
+              μG
+            ∧ ∫ x, inner ℂ w (σ (Matrix.of x) v) * star (inner ℂ w' (σ (Matrix.of x) v')) ∂μG
+              = inner ℂ v' v * inner ℂ w w' / (d' : ℂ) := by
   obtain ⟨c, c0, ctop, hc⟩ := transport hP hμ
   have hc' : 0 < c.toReal := ENNReal.toReal_pos c0 ctop
   obtain ⟨hd0, hS⟩ := hd
@@ -552,7 +595,9 @@ theorem schur_hpk {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {�
     exact hi
   · rw [hc, integral_smul_measure, hemb.integral_map]
     have : (∫ g, inner ℂ w (σ (Matrix.of (ioP P g)) v) * star (inner ℂ w' (σ (Matrix.of (ioP P g)) v'))
-        ∂(Formalism.REAL.muG ε)) = inner ℂ v' v * inner ℂ w w' / (d : ℂ) := he
+             ∂(Formalism.REAL.muG ε))
+        = inner ℂ v' v * inner ℂ w w' / (d : ℂ) :=
+      he
     rw [this, Complex.real_smul]
     push_cast
     have h1 : (c.toReal : ℂ) ≠ 0 := by exact_mod_cast hc'.ne'
@@ -575,30 +620,43 @@ namespace Formalism.MainNotions.SchurRelationsDiscreteSeries
 
 open MeasureTheory Matrix
 open scoped InnerProductSpace ENNReal
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.QuantumDeterminants
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.QuantumDeterminants
 
 section Fdeg
 
 variable {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 
-instance muG_right : (Formalism.REAL.muG ε).IsMulRightInvariant := ⟨fun g => Formalism.REAL.indefinite_unitary_unimodular n ε g⟩
+instance muG_right : (Formalism.REAL.muG ε).IsMulRightInvariant :=
+  ⟨fun g => Formalism.REAL.indefinite_unitary_unimodular n ε g⟩
 
 instance muG_inv : (Formalism.REAL.muG ε).IsInvInvariant :=
   ⟨Formalism.REAL.invInvariant_of Formalism.REAL.indefinite_unitary_unimodular n ε⟩
 
-instance muG_open : (Formalism.REAL.muG ε).IsOpenPosMeasure := by unfold Formalism.REAL.muG; infer_instance
+instance muG_open : (Formalism.REAL.muG ε).IsOpenPosMeasure := by
+  unfold Formalism.REAL.muG; infer_instance
 
-theorem sqRep_of_isDS [CompleteSpace H] {lam : Fin n → ℝ} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
-    (h : IsDS ε lam σ) : SqRep (Formalism.REAL.muG ε) (fun g : Formalism.REAL.UJ ε => σ (umat g)) := by
+theorem sqRep_of_isDS
+    [CompleteSpace H]
+    {lam : Fin n → ℝ} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} (h : IsDS ε lam σ)
+    : SqRep (Formalism.REAL.muG ε) (fun g : Formalism.REAL.UJ ε => σ (umat g)) := by
   obtain ⟨-, -, ⟨⟨h1, hm⟩, hiso, hcont⟩, hirr, hl2, -⟩ := h
   have hmem : ∀ g : Formalism.REAL.UJ ε, umat g ∈ UJset ε := fun g => g.2
-  refine ⟨h1, fun a b => hm _ (hmem a) _ (hmem b), fun g v => hiso _ (hmem g) v, fun v => ?_, fun S hS hinv => ?_, hl2⟩
+  refine ⟨
+    h1,
+    fun a b => hm _ (hmem a) _ (hmem b),
+    fun g v => hiso _ (hmem g) v,
+    fun v => ?_,
+    fun S hS hinv => ?_,
+    hl2
+  ⟩
   · exact (hcont v).comp_continuous (Formalism.REAL.isClosedEmbeddingMatrix n ε).1.continuous hmem
   · refine hirr S hS fun g hg v hv => ?_
     exact hinv (Formalism.REAL.indefiniteUnitaryMk ε g hg) v hv
 
-theorem fdeg_exists {lam : Fin n → ℝ} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} (h : IsDS ε lam σ) :
-    ∃ d : ℝ, IsFdeg (Formalism.REAL.muG ε) σ d := by
+theorem fdeg_exists
+    {lam : Fin n → ℝ} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} (h : IsDS ε lam σ)
+    : ∃ d : ℝ, IsFdeg (Formalism.REAL.muG ε) σ d := by
   have : CompleteSpace H := h.1
   have : Nontrivial H := h.2.1
   obtain ⟨d, hd, ho⟩ := (sqRep_of_isDS h).ortho
@@ -618,11 +676,13 @@ noncomputable section
 
 namespace Formalism.MainNotions.SchurRelationsDiscreteSeries
 
-open Formalism.MainNotions.S.Loc Formalism.MainNotions.BridgeLemma ValuativeRel IsDedekindDomain NumberField Topology
+open Formalism.MainNotions.S.Loc Formalism.MainNotions.BridgeLemma ValuativeRel IsDedekindDomain
+  NumberField Topology
 
 section Resid
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {sig : E →ₐ[F] E} {p : HeightOneSpectrum (𝓞 F)} (A : LocAt F E sig p)
 
 end Resid
@@ -639,7 +699,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.SchurRelationsDiscreteSeries
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.MainNotions.S.LocalSplitGroups Formalism.MainNotions.BridgeLemma ValuativeRel IsDedekindDomain NumberField Ideal
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.MainNotions.BridgeLemma ValuativeRel
+  IsDedekindDomain NumberField Ideal
 
 section PrimeSum
 
@@ -657,7 +719,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.SchurRelationsDiscreteSeries
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.MainNotions.S.LocalSplitGroups Formalism.MainNotions.LocalBesselAndTopKernel Formalism.MainNotions.BridgeLemma
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.MainNotions.LocalBesselAndTopKernel
+  Formalism.MainNotions.BridgeLemma
 
 section S27
 
@@ -677,7 +741,8 @@ namespace Formalism.MainNotions.SchurRelationsDiscreteSeries
 
 open MeasureTheory Matrix Finset
 open scoped InnerProductSpace ENNReal
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.QuantumDeterminants
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.QuantumDeterminants
 
 section Homog
 
@@ -705,7 +770,9 @@ namespace Formalism.MainNotions.SchurRelationsDiscreteSeries
 
 open MeasureTheory Matrix Finset
 open scoped InnerProductSpace ENNReal
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.QuantumDeterminants Formalism.MainNotions.UniformConstantsAndStatements ValuativeRel IsDedekindDomain NumberField
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.QuantumDeterminants Formalism.MainNotions.UniformConstantsAndStatements ValuativeRel
+  IsDedekindDomain NumberField
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -735,9 +802,9 @@ theorem hypTT_all (u u' : D.what₂.Word) : HypTT D u u' := by
     · exact Nat.not_prime_one hT
     · rw [Nat.mod_eq_of_lt (by nlinarith)] at hm; omega
   refine ⟨p1, p2, three _ p1 t1, three _ p2 t2, ?_⟩
-  have hm : (D.mem u).A.T ≡ (D.mem u').A.T [MOD G ^ 2] := by
-    unfold Nat.ModEq; rw [t1, t2]
-  have hm' : (D.mem u).A.T ≡ (D.mem u').A.T [MOD G] := Nat.ModEq.of_dvd (Dvd.intro_left _ (sq G).symm) hm
+  have hm : (D.mem u).A.T ≡ (D.mem u').A.T [MOD G ^ 2] := by unfold Nat.ModEq; rw [t1, t2]
+  have hm' : (D.mem u).A.T ≡ (D.mem u').A.T [MOD G] :=
+    Nat.ModEq.of_dvd (Dvd.intro_left _ (sq G).symm) hm
   exact Int.natCast_modEq_iff.2 hm'
 
 end Main
@@ -756,7 +823,9 @@ namespace Formalism.MainNotions.SchurRelationsDiscreteSeries
 
 open MeasureTheory Matrix Finset
 open scoped InnerProductSpace ENNReal
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.QuantumDeterminants Formalism.MainNotions.UniformConstantsAndStatements ValuativeRel IsDedekindDomain NumberField
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.QuantumDeterminants Formalism.MainNotions.UniformConstantsAndStatements ValuativeRel
+  IsDedekindDomain NumberField
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 

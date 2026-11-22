@@ -8,6 +8,7 @@ public import Formalism.LocalToGlobal.AlgebraicTheory.AlgebraicTheoryProofs.Norm
 
 namespace GlobalTheory
 
-theorem locNormPow_tensorPowers : Formalism.L2.AlgTh.LocNormPow := Formalism.L2.AlgTh.local_norm_power
+theorem locNormPow_tensorPowers : Formalism.L2.AlgTh.LocNormPow :=
+  Formalism.L2.AlgTh.local_norm_power
 
 end GlobalTheory

@@ -18,34 +18,37 @@ def sA (p l g : ℕ) : ℝ := ∑ i : Fin p, ((l + (p - 1 - i.1) * g : ℕ) : �
 
 theorem sA_le (p l g : ℕ) : sA p l g ≤ p * ((l : ℝ) + p * g) := by
   unfold sA
-  calc ∑ i : Fin p, (((l + (p - 1 - i.1) * g : ℕ)) : ℝ)
-      ≤ ∑ _i : Fin p, ((l : ℝ) + p * g) := by
-        apply Finset.sum_le_sum
-        intro i _
-        have h1 : (p - 1 - i.1) * g ≤ p * g := Nat.mul_le_mul_right g (by omega)
-        have h2 : l + (p - 1 - i.1) * g ≤ l + p * g := by omega
-        exact_mod_cast h2
+  calc
+    ∑ i : Fin p, (((l + (p - 1 - i.1) * g : ℕ)) : ℝ) ≤ ∑ _i : Fin p, ((l : ℝ) + p * g) := by
+      apply Finset.sum_le_sum
+      intro i _
+      have h1 : (p - 1 - i.1) * g ≤ p * g := Nat.mul_le_mul_right g (by omega)
+      have h2 : l + (p - 1 - i.1) * g ≤ l + p * g := by omega
+      exact_mod_cast h2
     _ = p * ((l : ℝ) + p * g) := by
-        rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+      rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
 
 theorem sA_ge (p l g : ℕ) : (p : ℝ) * l ≤ sA p l g := by
   unfold sA
-  calc (p : ℝ) * l = ∑ _i : Fin p, (l : ℝ) := by
-        rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+  calc
+    (p : ℝ) * l = ∑ _i : Fin p, (l : ℝ) := by
+      rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
     _ ≤ ∑ i : Fin p, (((l + (p - 1 - i.1) * g : ℕ)) : ℝ) := by
-        apply Finset.sum_le_sum
-        intro i _
-        exact_mod_cast Nat.le_add_right l _
+      apply Finset.sum_le_sum
+      intro i _
+      exact_mod_cast Nat.le_add_right l _
 
 theorem sA_nonneg (p l g : ℕ) : 0 ≤ sA p l g := Finset.sum_nonneg (fun _ _ => Nat.cast_nonneg _)
 
-theorem sA_lin {p l1 g1 l2 g2 : ℕ} {a1 a2 e : ℝ}
-    (h : ∀ c : ℕ, c < p → a1 * ((l1 + c * g1 : ℕ) : ℝ) ≤ a2 * ((l2 + c * g2 : ℕ) : ℝ) + e) :
-    a1 * sA p l1 g1 ≤ a2 * sA p l2 g2 + p * e := by
+theorem sA_lin
+    {p l1 g1 l2 g2 : ℕ} {a1 a2 e : ℝ}
+    (h : ∀ c : ℕ, c < p → a1 * ((l1 + c * g1 : ℕ) : ℝ) ≤ a2 * ((l2 + c * g2 : ℕ) : ℝ) + e)
+    : a1 * sA p l1 g1 ≤ a2 * sA p l2 g2 + p * e := by
   unfold sA
   rw [Finset.mul_sum, Finset.mul_sum]
-  have h2 : ∑ i : Fin p, (a2 * ((l2 + (p - 1 - i.1) * g2 : ℕ) : ℝ) + e) =
-      ∑ i : Fin p, a2 * ((l2 + (p - 1 - i.1) * g2 : ℕ) : ℝ) + p * e := by
+  have h2
+      : ∑ i : Fin p, (a2 * ((l2 + (p - 1 - i.1) * g2 : ℕ) : ℝ) + e)
+        = ∑ i : Fin p, a2 * ((l2 + (p - 1 - i.1) * g2 : ℕ) : ℝ) + p * e := by
     rw [Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
   rw [← h2]
   exact Finset.sum_le_sum (fun i _ => h _ (by have := i.isLt; omega))
@@ -62,21 +65,26 @@ def apW (D : D7) (j l g n : ℕ) (hn : Even n) : WeightFamilies.Wt D j where
 
 variable {D : D7}
 
-theorem apW_aP (j l g n : ℕ) (hn : Even n) (τ : D.what₂.Tau) (i : Fin (D.R.sigW j).1) :
-    (apW D j l g n hn).aP τ i = l + ((D.R.sigW j).1 - 1 - i.1) * g := rfl
+theorem apW_aP (j l g n : ℕ) (hn : Even n) (τ : D.what₂.Tau) (i : Fin (D.R.sigW j).1)
+    : (apW D j l g n hn).aP τ i = l + ((D.R.sigW j).1 - 1 - i.1) * g :=
+  rfl
 
-theorem apW_aM (j l g n : ℕ) (hn : Even n) (τ : D.what₂.Tau) (i : Fin (D.R.sigW j).2) :
-    (apW D j l g n hn).aM τ i = 0 := rfl
+theorem apW_aM (j l g n : ℕ) (hn : Even n) (τ : D.what₂.Tau) (i : Fin (D.R.sigW j).2)
+    : (apW D j l g n hn).aM τ i = 0 :=
+  rfl
 
-theorem sum_apW (j l g n : ℕ) (hn : Even n) :
-    (∑ τ, ((∑ i, ((apW D j l g n hn).aP τ i : ℝ)) + ∑ i, ((apW D j l g n hn).aM τ i : ℝ))) =
-      D.R.f * sA (D.R.sigW j).1 l g := by
-  have hin : ∀ τ : D.what₂.Tau, (∑ i, ((apW D j l g n hn).aP τ i : ℝ)) + ∑ i, ((apW D j l g n hn).aM τ i : ℝ) =
-      sA (D.R.sigW j).1 l g := by
+theorem sum_apW (j l g n : ℕ) (hn : Even n)
+    : (∑ τ, ((∑ i, ((apW D j l g n hn).aP τ i : ℝ)) + ∑ i, ((apW D j l g n hn).aM τ i : ℝ)))
+      = D.R.f * sA (D.R.sigW j).1 l g := by
+  have hin
+      : ∀ τ : D.what₂.Tau,
+        (∑ i, ((apW D j l g n hn).aP τ i : ℝ)) + ∑ i, ((apW D j l g n hn).aM τ i : ℝ)
+          = sA (D.R.sigW j).1 l g := by
     intro τ
     simp only [apW_aM, Nat.cast_zero, Finset.sum_const_zero, add_zero]
     rfl
-  rw [Finset.sum_congr rfl (fun τ _ => hin τ), Finset.sum_const, Finset.card_univ, D.what₂.card_Tau, nsmul_eq_mul]
+  rw [Finset.sum_congr rfl (fun τ _ => hin τ), Finset.sum_const, Finset.card_univ, D.what₂.card_Tau,
+    nsmul_eq_mul]
 
 theorem DF_le_size {j : ℕ} (w : WeightFamilies.Wt D j) : (DF w : ℝ) ≤ w.size := by
   have key : ∀ (a b : ℝ), 0 ≤ b → a ≤ a + b + 1 := fun a b hb => by linarith
@@ -86,8 +94,7 @@ theorem DF_le_size {j : ℕ} (w : WeightFamilies.Wt D j) : (DF w : ℝ) ≤ w.si
 
 theorem sigW_m_fst (D : D7) : (D.R.sigW D.R.m).1 = D.R.r := rfl
 
-theorem sigW_m_snd (D : D7) : (D.R.sigW D.R.m).2 = 0 := by
-  simp [Ranks.sigW]
+theorem sigW_m_snd (D : D7) : (D.R.sigW D.R.m).2 = 0 := by simp [Ranks.sigW]
 
 theorem r_pos (D : D7) : 0 < D.R.r := by
   unfold Ranks.r
@@ -107,15 +114,16 @@ theorem dimY_m (D : D7) : WeightFamilies.dimY D D.R.m = D.R.f * D.R.r.choose 2 :
 theorem baseDegree_at_lift_index (D : D7) : n0 D D.R.m = D.R.r + 2 * g0 D := by
   simp [n0, Ranks.sigW]
 
-theorem size_apW_m (l g n : ℕ) (hn : Even n) :
-    (apW D D.R.m l g n hn).size = D.R.f * sA D.R.r l g + (D.R.f : ℝ) * D.R.r * n + 1 := by
+theorem size_apW_m (l g n : ℕ) (hn : Even n)
+    : (apW D D.R.m l g n hn).size = D.R.f * sA D.R.r l g + (D.R.f : ℝ) * D.R.r * n + 1 := by
   unfold WeightFamilies.Wt.size
   rw [sum_apW, sigW_m_fst, sigW_m_snd]
   have hn' : (apW D D.R.m l g n hn).n = n := rfl
   rw [hn']
   norm_num
 
-theorem DF_apW_m (l g n : ℕ) (hn : Even n) : (DF (apW D D.R.m l g n hn) : ℝ) = D.R.f * sA D.R.r l g := by
+theorem DF_apW_m (l g n : ℕ) (hn : Even n)
+    : (DF (apW D D.R.m l g n hn) : ℝ) = D.R.f * sA D.R.r l g := by
   unfold DF degP
   push_cast
   rw [sum_apW]
@@ -174,7 +182,8 @@ def ka : WeightFamilies.Wt D D.R.m := apW D D.R.m X.kl (X.Tq * X.Q - 2) D.R.nV X
 def wL : WeightFamilies.Wt D D.R.m := apW D D.R.m X.Q0 X.Q X.nW X.nW_even
 
 def wF : WeightFamilies.Wt D D.R.m :=
-  apW D D.R.m ((Dm D + 2) * X.nW + 2 * D.R.r + (Dm D + 2) * X.Q0) ((Dm D + 2) * X.Q - 2) X.nP X.even_nP₂
+  apW D D.R.m ((Dm D + 2) * X.nW + 2 * D.R.r + (Dm D + 2) * X.Q0) ((Dm D + 2) * X.Q - 2) X.nP
+    X.even_nP₂
 
 theorem Tq_cast : (X.Tq : ℝ) = (X.T : ℝ) + Dm D + 2 := by
   rw [X.Tq_eq]
@@ -196,24 +205,32 @@ theorem gF_cast : (((Dm D + 2) * X.Q - 2 : ℕ) : ℝ) = ((Dm D : ℝ) + 2) * X.
   push_cast
   ring
 
-theorem DQ_cast_ge : (2 : ℝ) ≤ ((Dm D : ℝ) + 2) * X.Q := by
-  exact_mod_cast X.two_le_DQ
+theorem DQ_cast_ge : (2 : ℝ) ≤ ((Dm D : ℝ) + 2) * X.Q := by exact_mod_cast X.two_le_DQ
 
-theorem ka_size : X.ka.size = D.R.f * sA D.R.r X.kl (X.Tq * X.Q - 2) + (D.R.f : ℝ) * D.R.r * D.R.nV + 1 := size_apW_m _ _ _ _
+theorem ka_size
+    : X.ka.size = D.R.f * sA D.R.r X.kl (X.Tq * X.Q - 2) + (D.R.f : ℝ) * D.R.r * D.R.nV + 1 :=
+  size_apW_m _ _ _ _
 
-theorem wL_size : X.wL.size = D.R.f * sA D.R.r X.Q0 X.Q + (D.R.f : ℝ) * D.R.r * X.nW + 1 := size_apW_m _ _ _ _
+theorem wL_size : X.wL.size = D.R.f * sA D.R.r X.Q0 X.Q + (D.R.f : ℝ) * D.R.r * X.nW + 1 :=
+  size_apW_m _ _ _ _
 
-theorem wF_size : X.wF.size = D.R.f * sA D.R.r ((Dm D + 2) * X.nW + 2 * D.R.r + (Dm D + 2) * X.Q0) ((Dm D + 2) * X.Q - 2) +
-    (D.R.f : ℝ) * D.R.r * X.nP + 1 := size_apW_m _ _ _ _
+theorem wF_size
+    : X.wF.size
+      = D.R.f * sA D.R.r ((Dm D + 2) * X.nW + 2 * D.R.r + (Dm D + 2) * X.Q0) ((Dm D + 2) * X.Q - 2)
+        + (D.R.f : ℝ) * D.R.r * X.nP + 1 :=
+  size_apW_m _ _ _ _
 
-theorem ka_size_le : X.ka.size ≤
-    (D.R.f : ℝ) * D.R.r * ((X.kl : ℝ) + D.R.r * ((X.Tq : ℝ) * X.Q)) + (D.R.f : ℝ) * D.R.r * D.R.nV + 1 := by
+theorem ka_size_le
+    : X.ka.size
+      ≤ (D.R.f : ℝ) * D.R.r * ((X.kl : ℝ) + D.R.r * ((X.Tq : ℝ) * X.Q))
+        + (D.R.f : ℝ) * D.R.r * D.R.nV + 1 := by
   rw [X.ka_size]
   have h1 := sA_le D.R.r X.kl (X.Tq * X.Q - 2)
   have hg : ((X.Tq * X.Q - 2 : ℕ) : ℝ) ≤ (X.Tq : ℝ) * X.Q := by rw [X.gk_cast]; linarith
   have hf : (0 : ℝ) ≤ D.R.f := Nat.cast_nonneg _
   have hr : (0 : ℝ) ≤ D.R.r := Nat.cast_nonneg _
-  have h4 : (D.R.r : ℝ) * (D.R.r * ((X.Tq * X.Q - 2 : ℕ) : ℝ)) ≤ D.R.r * (D.R.r * ((X.Tq : ℝ) * X.Q)) :=
+  have h4
+      : (D.R.r : ℝ) * (D.R.r * ((X.Tq * X.Q - 2 : ℕ) : ℝ)) ≤ D.R.r * (D.R.r * ((X.Tq : ℝ) * X.Q)) :=
     mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left hg hr) hr
   have h2 : sA D.R.r X.kl (X.Tq * X.Q - 2) ≤ D.R.r * ((X.kl : ℝ) + D.R.r * ((X.Tq : ℝ) * X.Q)) := by
     linarith
@@ -261,11 +278,14 @@ theorem T_wL_le : (X.T : ℝ) * X.wL.size ≤ X.ka.size + X.T := by
   rw [hnV]
   nlinarith
 
-theorem wF_size_le : X.wF.size ≤
-    ((Dm D : ℝ) + 2) * X.wL.size + 2 * (D.R.f : ℝ) * (D.R.r : ℝ) ^ 2 + (D.R.f : ℝ) * D.R.r * X.nP + 1 := by
+theorem wF_size_le
+    : X.wF.size
+      ≤ ((Dm D : ℝ) + 2) * X.wL.size + 2 * (D.R.f : ℝ) * (D.R.r : ℝ) ^ 2
+        + (D.R.f : ℝ) * D.R.r * X.nP + 1 := by
   rw [X.wF_size, X.wL_size]
-  have hlin : 1 * sA D.R.r ((Dm D + 2) * X.nW + 2 * D.R.r + (Dm D + 2) * X.Q0) ((Dm D + 2) * X.Q - 2) ≤
-      ((Dm D : ℝ) + 2) * sA D.R.r X.Q0 X.Q + D.R.r * (((Dm D : ℝ) + 2) * X.nW + 2 * D.R.r) := by
+  have hlin
+      : 1 * sA D.R.r ((Dm D + 2) * X.nW + 2 * D.R.r + (Dm D + 2) * X.Q0) ((Dm D + 2) * X.Q - 2)
+        ≤ ((Dm D : ℝ) + 2) * sA D.R.r X.Q0 X.Q + D.R.r * (((Dm D : ℝ) + 2) * X.nW + 2 * D.R.r) := by
     apply sA_lin
     intro c _
     simp only [Nat.cast_add, Nat.cast_mul, Nat.cast_ofNat]

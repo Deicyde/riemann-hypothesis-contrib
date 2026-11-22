@@ -11,8 +11,12 @@ open scoped ComplexConjugate NNReal
 
 namespace GlobalTheory.CompanionTheory.WeilCoinv
 
-theorem exists_dotProduct_ne_one {k : Type} [Field k] {κ : Type} [Fintype κ] {ψ : AddChar k ℂ} (hψ : ψ ≠ 1)
-    {x : κ → k} (hx : x ≠ 0) : ∃ y : κ → k, ψ (x ⬝ᵥ y) ≠ 1 := by
+theorem exists_dotProduct_ne_one
+    {k : Type} [Field k]
+    {κ : Type} [Fintype κ]
+    {ψ : AddChar k ℂ} (hψ : ψ ≠ 1)
+    {x : κ → k} (hx : x ≠ 0)
+    : ∃ y : κ → k, ψ (x ⬝ᵥ y) ≠ 1 := by
   classical
   obtain ⟨t, ht⟩ := AddChar.ne_one_iff.mp hψ
   obtain ⟨i, hi⟩ := Function.ne_iff.mp hx
@@ -22,10 +26,13 @@ theorem exists_dotProduct_ne_one {k : Type} [Field k] {κ : Type} [Fintype κ] {
   rw [dotProduct_single, hxt]
   exact ht
 
-theorem exists_eq_mul_apply_zero : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] [Invertible (2 : k)] (κ : Type) [Fintype κ] (ψ : AddChar k ℂ),
-    Continuous ψ → ψ ≠ 1 → ∀ l : ((κ → k) → ℂ) →ₗ[ℂ] ℂ,
-    (∀ y, ∀ φ ∈ SB (κ → k), l (schr ψ (0, y) φ) = l φ) → ∃ a : ℂ, ∀ φ ∈ SB (κ → k), l φ = a * φ 0 := by
+theorem exists_eq_mul_apply_zero
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [Invertible (2 : k)] (κ : Type) [Fintype κ] (ψ : AddChar k ℂ),
+      Continuous ψ → ψ ≠ 1
+        → ∀ l : ((κ → k) → ℂ) →ₗ[ℂ] ℂ,
+          (∀ y, ∀ φ ∈ SB (κ → k), l (schr ψ (0, y) φ) = l φ)
+            → ∃ a : ℂ, ∀ φ ∈ SB (κ → k), l φ = a * φ 0 := by
   intro k _ _ _ _ _ κ _ ψ hψc hψ l hl
   classical
   haveI : NonarchimedeanAddGroup k := GlobalTheory.WeilM.nonarch_field k
@@ -33,23 +40,27 @@ theorem exists_eq_mul_apply_zero : ∀ (k : Type) [Field k] [ValuativeRel k] [To
   have hψlc : IsLocallyConstant ψ := GlobalTheory.WeilM.isLocallyConstant_addChar ψ hψc
   have hχ : ∀ y : κ → k, IsLocallyConstant (fun x : κ → k => ψ (x ⬝ᵥ y)) := fun y =>
     hψlc.comp_continuous (continuous_id.dotProduct continuous_const)
-  have key : ∀ t : Finset (κ → k), ∀ φ ∈ SB (κ → k),
-      (∀ x, φ x ≠ 0 → ∃ y ∈ t, ψ (x ⬝ᵥ y) ≠ 1) → l φ = 0 := by
+  have key
+      : ∀ t : Finset (κ → k), ∀ φ ∈ SB (κ → k),
+        (∀ x, φ x ≠ 0 → ∃ y ∈ t, ψ (x ⬝ᵥ y) ≠ 1) → l φ = 0 := by
     intro t
     induction t using Finset.induction_on with
     | empty =>
       intro φ _ h
-      have hz : φ = 0 := funext fun x => by
-        by_contra hx
-        obtain ⟨y, hy, -⟩ := h x hx
-        simp at hy
+      have hz : φ = 0 :=
+        funext fun x => by
+          by_contra hx
+          obtain ⟨y, hy, -⟩ := h x hx
+          simp at hy
       rw [hz, map_zero]
     | @insert y t hyt ih =>
       intro φ hφ h
       obtain ⟨hφl, hφc⟩ := hφ
-      obtain ⟨φ₁, hφ₁⟩ : ∃ f : (κ → k) → ℂ, f = fun x => if ψ (x ⬝ᵥ y) = 1 then φ x else 0 := ⟨_, rfl⟩
-      obtain ⟨g, hg⟩ : ∃ f : (κ → k) → ℂ,
-          f = fun x => if ψ (x ⬝ᵥ y) = 1 then 0 else φ x / (ψ (x ⬝ᵥ y) - 1) := ⟨_, rfl⟩
+      obtain ⟨φ₁, hφ₁⟩ : ∃ f : (κ → k) → ℂ, f = fun x => if ψ (x ⬝ᵥ y) = 1 then φ x else 0 :=
+        ⟨_, rfl⟩
+      obtain ⟨g, hg⟩
+          : ∃ f : (κ → k) → ℂ, f = fun x => if ψ (x ⬝ᵥ y) = 1 then 0 else φ x / (ψ (x ⬝ᵥ y) - 1) :=
+        ⟨_, rfl⟩
       have hφ₁SB : φ₁ ∈ SB (κ → k) := by
         refine ⟨?_, hφc.mono ?_⟩
         · rw [hφ₁]
@@ -109,8 +120,11 @@ theorem exists_eq_mul_apply_zero : ∀ (k : Type) [Field k] [ValuativeRel k] [To
         exact hx h0
       obtain ⟨y, hy⟩ := exists_dotProduct_ne_one hψ hx0
       exact Set.mem_iUnion.mpr ⟨y, hy⟩
-    obtain ⟨t, ht⟩ := hK.elim_finite_subcover (fun y : κ → k => {x | ψ (x ⬝ᵥ y) ≠ 1})
-      (fun y => ((hχ y).isClosed_fiber 1).isOpen_compl) hcov
+    obtain ⟨t, ht⟩ :=
+      hK.elim_finite_subcover
+        (fun y : κ → k => {x | ψ (x ⬝ᵥ y) ≠ 1})
+        (fun y => ((hχ y).isClosed_fiber 1).isOpen_compl)
+        hcov
     refine key t φ ⟨hφl, hφc⟩ ?_
     intro x hx
     have hxt := ht hx

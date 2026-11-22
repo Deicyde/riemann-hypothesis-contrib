@@ -13,11 +13,12 @@ namespace CompanionTheory.D.gk.HC
 
 open ReciprocityTheory.ChartRestriction.DS Module.End
 
-variable {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+variable
+  {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
 
-theorem cpart_inK_A {Z : Matrix (Fin n) (Fin n) ℂ} (hZ : Z * Jm ε = Jm ε * Z) :
-    inK ε (S7.cpart1 ε Z) ∧ inK ε (S7.cpart2 ε Z) := by
+theorem cpart_inK_A {Z : Matrix (Fin n) (Fin n) ℂ} (hZ : Z * Jm ε = Jm ε * Z)
+    : inK ε (S7.cpart1 ε Z) ∧ inK ε (S7.cpart2 ε Z) := by
   have hJh : (Jm ε)ᴴ = Jm ε := Jm_conjTranspose_self
   have hZh : Zᴴ * Jm ε = Jm ε * Zᴴ := by
     have h := congrArg Matrix.conjTranspose hZ
@@ -31,15 +32,19 @@ theorem cpart_inK_A {Z : Matrix (Fin n) (Fin n) ℂ} (hZ : Z * Jm ε = Jm ε * Z
   · unfold S7.cpart2
     rw [Matrix.smul_mul, Matrix.mul_smul, Matrix.add_mul, Matrix.mul_add, hZ, hc]
 
-theorem single_comm_A {a b : Fin n} (hab : ε a = ε b) :
-    Matrix.single a b (1 : ℂ) * Jm ε = Jm ε * Matrix.single a b (1 : ℂ) := by
+theorem single_comm_A {a b : Fin n} (hab : ε a = ε b)
+    : Matrix.single a b (1 : ℂ) * Jm ε = Jm ε * Matrix.single a b (1 : ℂ) := by
   ext i j
   simp only [Jm, Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.single_apply]
   split_ifs with h1 h2 h2 <;> simp_all
 
-theorem dS_mem_of_inK_A (hσ : Formalism.MainNotions.S.IsURepOn (Formalism.MainNotions.S.UJset ε) σ) {S : Submodule ℂ H}
-    [FiniteDimensional ℂ S] (hK : Formalism.MainNotions.S.IsKStableOn ε σ S) {Z : Matrix (Fin n) (Fin n) ℂ} (hZ : inK ε Z)
-    {s : H} (hs : s ∈ S) (hsm : s ∈ smD ε σ) : dS σ Z s ∈ S := by
+theorem dS_mem_of_inK_A
+    (hσ : Formalism.MainNotions.S.IsURepOn (Formalism.MainNotions.S.UJset ε) σ)
+    {S : Submodule ℂ H} [FiniteDimensional ℂ S]
+    (hK : Formalism.MainNotions.S.IsKStableOn ε σ S)
+    {Z : Matrix (Fin n) (Fin n) ℂ} (hZ : inK ε Z)
+    {s : H} (hs : s ∈ S) (hsm : s ∈ smD ε σ)
+    : dS σ Z s ∈ S := by
   have hd := hasDerivAt_dS hσ hZ.1 ((mem_smD_iff ε σ s).1 hsm)
   have ht := hd.tendsto_slope_zero
   have hcl : IsClosed (S : Set H) := Submodule.closed_of_finiteDimensional S
@@ -48,33 +53,38 @@ theorem dS_mem_of_inK_A (hσ : Formalism.MainNotions.S.IsURepOn (Formalism.MainN
     obtain ⟨h1, h2⟩ := hZ
     refine ⟨?_, ?_⟩
     · unfold inG at h1 ⊢
-      rw [Matrix.conjTranspose_smul, Matrix.smul_mul, Matrix.mul_smul, Complex.star_def, Complex.conj_ofReal,
-        ← smul_add, h1, smul_zero]
+      rw [Matrix.conjTranspose_smul, Matrix.smul_mul, Matrix.mul_smul, Complex.star_def,
+        Complex.conj_ofReal, ← smul_add, h1, smul_zero]
     · rw [Matrix.smul_mul, Matrix.mul_smul, h2]
   have h1 : σ (NormedSpace.exp (((0 + t : ℝ) : ℂ) • Z)) s ∈ S := by
     rw [zero_add]; exact hK _ (exp_mem_Kset hZt) s hs
-  have h0 : σ (NormedSpace.exp (((0 : ℝ) : ℂ) • Z)) s = s := by
-    rw [exp_zero_smul, hσ.1.1]; rfl
+  have h0 : σ (NormedSpace.exp (((0 : ℝ) : ℂ) • Z)) s = s := by rw [exp_zero_smul, hσ.1.1]; rfl
   simp only [zero_add] at h1
   show (t⁻¹ : ℝ) • (σ (NormedSpace.exp (((0 + t : ℝ) : ℂ) • Z)) s - σ (NormedSpace.exp (((0 : ℝ) : ℂ) • Z)) s) ∈ S
   rw [zero_add, h0]
   exact Submodule.smul_of_tower_mem _ _ (Submodule.sub_mem _ h1 hs)
 
-theorem smE_mem_of_compact_A (hσ : Formalism.MainNotions.S.IsURepOn (Formalism.MainNotions.S.UJset ε) σ) {S : Submodule ℂ H}
-    [FiniteDimensional ℂ S] (hK : Formalism.MainNotions.S.IsKStableOn ε σ S) {a b : Fin n} (hab : ε a = ε b) (x : smD ε σ)
-    (hx : (x : H) ∈ S) : ((smE ε σ a b x : smD ε σ) : H) ∈ S := by
+theorem smE_mem_of_compact_A
+    (hσ : Formalism.MainNotions.S.IsURepOn (Formalism.MainNotions.S.UJset ε) σ)
+    {S : Submodule ℂ H} [FiniteDimensional ℂ S]
+    (hK : Formalism.MainNotions.S.IsKStableOn ε σ S)
+    {a b : Fin n} (hab : ε a = ε b)
+    (x : smD ε σ) (hx : (x : H) ∈ S)
+    : ((smE ε σ a b x : smD ε σ) : H) ∈ S := by
   obtain ⟨h1, h2⟩ := cpart_inK_A (single_comm_A hab)
   rw [smE_apply hσ]
-  exact Submodule.add_mem _ (dS_mem_of_inK_A hσ hK h1 hx x.2) (Submodule.smul_mem _ _ (dS_mem_of_inK_A hσ hK h2 hx x.2))
+  exact Submodule.add_mem _ (dS_mem_of_inK_A hσ hK h1 hx x.2)
+    (Submodule.smul_mem _ _ (dS_mem_of_inK_A hσ hK h2 hx x.2))
 
-theorem exp_two_pi_A (a : Fin n) :
-    NormedSpace.exp (((2 * Real.pi : ℝ) : ℂ) • (Complex.I • Matrix.single a a (1 : ℂ))) = 1 := by
-  rw [show ((2 * Real.pi : ℝ) : ℂ) • (Complex.I • Matrix.single a a (1 : ℂ)) =
-      Matrix.diagonal (Pi.single a (2 * Real.pi * Complex.I)) by
+theorem exp_two_pi_A (a : Fin n)
+    : NormedSpace.exp (((2 * Real.pi : ℝ) : ℂ) • (Complex.I • Matrix.single a a (1 : ℂ))) = 1 := by
+  rw [show ((2 * Real.pi : ℝ) : ℂ) • (Complex.I • Matrix.single a a (1 : ℂ))
+      = Matrix.diagonal (Pi.single a (2 * Real.pi * Complex.I)) by
     rw [smul_smul, Matrix.diagonal_single, Matrix.smul_single]
     simp]
   rw [Matrix.exp_diagonal, ← Matrix.diagonal_one]
-  congr 1; funext i
+  congr 1
+  funext i
   by_cases h : i = a
   · subst h; simp [← Complex.exp_eq_exp_ℂ]
   · simp [h]
@@ -82,11 +92,16 @@ theorem exp_two_pi_A (a : Fin n) :
 theorem inG_diag_A (a : Fin n) : inG ε (Complex.I • Matrix.single a a (1 : ℂ)) := by
   unfold inG
   have hc := single_comm_A (ε := ε) (a := a) (b := a) rfl
-  rw [Matrix.conjTranspose_smul, Matrix.conjTranspose_single, star_one, Matrix.smul_mul, Matrix.mul_smul, hc]
+  rw [Matrix.conjTranspose_smul, Matrix.conjTranspose_single, star_one, Matrix.smul_mul,
+    Matrix.mul_smul, hc]
   simp
 
-theorem eig_int_A (hσ : Formalism.MainNotions.S.IsURepOn (Formalism.MainNotions.S.UJset ε) σ) (a : Fin n) {w : smD ε σ} (hw : w ≠ 0) {c : ℂ}
-    (hc : smE ε σ a a w = c • w) : ∃ m : ℤ, c = m := by
+theorem eig_int_A
+    (hσ : Formalism.MainNotions.S.IsURepOn (Formalism.MainNotions.S.UJset ε) σ)
+    (a : Fin n)
+    {w : smD ε σ} (hw : w ≠ 0)
+    {c : ℂ} (hc : smE ε σ a a w = c • w)
+    : ∃ m : ℤ, c = m := by
   have hD := isDerivedOn_smE hσ
   set X : Matrix (Fin n) (Fin n) ℂ := Complex.I • Matrix.single a a (1 : ℂ)
   have hX : inG ε X := inG_diag_A a
@@ -99,21 +114,27 @@ theorem eig_int_A (hσ : Formalism.MainNotions.S.IsURepOn (Formalism.MainNotions
     exact this
   set g : ℝ → H := fun t => Complex.exp (-(Complex.I * c) * t) • f t
   have hg : ∀ t, HasDerivAt g 0 t := fun t => by
-    have h1 : HasDerivAt (fun t : ℝ => Complex.exp (-(Complex.I * c) * t))
+    have h1 : HasDerivAt
+        (fun t : ℝ => Complex.exp (-(Complex.I * c) * t))
         (Complex.exp (-(Complex.I * c) * t) * (-(Complex.I * c))) t := by
       have := ((hasDerivAt_id (t : ℂ)).const_mul (-(Complex.I * c))).cexp
       have h2 := this.comp_ofReal (z := t)
       simpa using h2
     refine (h1.smul (hf t)).congr_deriv ?_
     rw [smul_smul, ← add_smul, mul_neg, add_neg_cancel, zero_smul]
-  have hconst := is_const_of_deriv_eq_zero (fun t => (hg t).differentiableAt) (fun t => (hg t).deriv)
-    (2 * Real.pi) 0
+  have hconst :=
+    is_const_of_deriv_eq_zero
+      (fun t => (hg t).differentiableAt)
+      (fun t => (hg t).deriv)
+      (2 * Real.pi) 0
   have h2pi : f (2 * Real.pi) = (w : H) := by
     show σ (NormedSpace.exp (((2 * Real.pi : ℝ) : ℂ) • X)) (w : H) = (w : H)
-    rw [exp_two_pi_A, hσ.1.1]; rfl
+    rw [exp_two_pi_A, hσ.1.1]
+    rfl
   have h0 : f 0 = (w : H) := by
     show σ (NormedSpace.exp (((0 : ℝ) : ℂ) • X)) (w : H) = (w : H)
-    rw [exp_zero_smul, hσ.1.1]; rfl
+    rw [exp_zero_smul, hσ.1.1]
+    rfl
   simp only [g, h2pi, h0, Complex.ofReal_zero, mul_zero, Complex.exp_zero, one_smul] at hconst
   have hw' : (w : H) ≠ 0 := fun h => hw (Subtype.ext h)
   have he : Complex.exp (-(Complex.I * c) * ((2 * Real.pi : ℝ) : ℂ)) = 1 := by
@@ -139,12 +160,12 @@ theorem integral_weights : IntWts := by
   have hS₀f : FiniteDimensional ℂ S₀ :=
     Module.Finite.of_injective (((smD ε σ).subtype.comp S₀.subtype).codRestrict S fun x => x.2)
       (fun x y h => Subtype.ext (Subtype.ext (congrArg (fun z : S => (z : H)) h)))
-  have hst : ∀ a, ∀ x ∈ S₀, smE ε σ a a x ∈ S₀ := fun a x hx =>
-    smE_mem_of_compact_A hσ hSK rfl x hx
+  have hst : ∀ a, ∀ x ∈ S₀, smE ε σ a a x ∈ S₀ := fun a x hx => smE_mem_of_compact_A hσ hSK rfl x hx
   let T : Fin n → (S₀ →ₗ[ℂ] S₀) := fun a => (smE ε σ a a).restrict (hst a)
   have hT : ∀ a, (T a).IsSymmetric := fun a x y => by
     show ⟪((smE ε σ a a (x : smD ε σ) : smD ε σ)), (y : smD ε σ)⟫_ℂ = ⟪(x : smD ε σ), smE ε σ a a y⟫_ℂ
-    rw [hU a a]; simp [adjSign]
+    rw [hU a a]
+    simp [adjSign]
   have hC : Pairwise (Function.onFun Commute T) := fun a b _ => by
     refine LinearMap.ext fun x => Subtype.ext ?_
     show smE ε σ a a (smE ε σ b b x) = smE ε σ b b (smE ε σ a a x)

@@ -13,14 +13,15 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+  Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
 open Formalism.L2.Host (CharFrame HChar TupTied)
-open GlobalTheory.AtMember GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top GlobalTheory.Mem.Top.Bl GlobalTheory.Fc GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.Plug
+open GlobalTheory.AtMember GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top
+  GlobalTheory.Mem.Top.Bl GlobalTheory.Fc GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.Plug
 
 namespace GlobalTheory.PlugPt
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-
 
 set_option genInjectivity false in
 set_option genSizeOfSpec false in
@@ -50,8 +51,11 @@ namespace Side
 
 variable {D : D7} {nch : NChoice D} (s : Side D nch)
 
-def upd (kap : ℝ) (lam : type_of% s.R.lam3) (err : type_of% s.R.err0) : Side D nch :=
-  { s with R := (s.R.updS kap lam).withErr err, YS := { s.YS with } }
+def upd (kap : ℝ) (lam : type_of% s.R.lam3) (err : type_of% s.R.err0) : Side D nch := {
+  s with
+  R := (s.R.updS kap lam).withErr err
+  YS := { s.YS with }
+}
 
 structure Ties (EX : ErrX D) (xd : ThData D) : Prop where
   frame : s.R.C = s.cf
@@ -65,21 +69,42 @@ structure Ties (EX : ErrX D) (xd : ThData D) : Prop where
   types : GlobalTheory.DimPartsCompare.TameTie D s.cf.W.om
 
 def Export (xd : ThData D) : Prop :=
-  Nonempty (GlobalTheory.SeriesTie.ExportTie s.YS s.v₀) ∧ LevelIs D.nexp (s.R.eG.trans s.cG) s.P0 s.ψ0⁻¹ ∧ AllData D.nexp xd.xd0
+  Nonempty (GlobalTheory.SeriesTie.ExportTie s.YS s.v₀)
+    ∧ LevelIs D.nexp (s.R.eG.trans s.cG) s.P0 s.ψ0⁻¹ ∧ AllData D.nexp xd.xd0
 
-def Rays : Prop := ∀ t, GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.ContainsRayField (GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.embK D) (GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.tupLevel s.R.toRealDat t)
+def Rays : Prop :=
+  ∀ t,
+    GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.ContainsRayField
+      (GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.embK D)
+      (GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.tupLevel s.R.toRealDat t)
 
 end Side
 
 abbrev BdPt : BdT := fun _ O c => PtAt O.ex c
 
-def sidePt {D : D7} {O : Obj D} {c : ℝ} (b : BdPt D O c) : Side D O.ex.nch :=
-  { G := b.P.Gp, Pl0 := b.P.Pl0, I0 := b.P.I0, T := b.P.T, A3 := b.P.A3, J := b.T, R := b.R, P0 := b.P.P0, ψ0 := b.P.ψ0, cG := b.cG,
-    v₀ := b.v₀, S := b.Sx, YS := b.nexp, cf := b.R.C, tp := b.Tp }
+def sidePt {D : D7} {O : Obj D} {c : ℝ} (b : BdPt D O c) : Side D O.ex.nch := {
+  G := b.P.Gp
+  Pl0 := b.P.Pl0
+  I0 := b.P.I0
+  T := b.P.T
+  A3 := b.P.A3
+  J := b.T
+  R := b.R
+  P0 := b.P.P0
+  ψ0 := b.P.ψ0
+  cG := b.cG
+  v₀ := b.v₀
+  S := b.Sx
+  YS := b.nexp
+  cf := b.R.C
+  tp := b.Tp
+}
 
 section Wit
 
-variable {K : Ctx} {B : Base} {f : Fr B.toPre} {T : TwDat B} {w : ColW B f T} {Z : w.Lt} {Wt : Set B.places.Pl} {p0 : BaseLevelRowSide (w.D Z)}
+variable
+  {K : Ctx} {B : Base} {f : Fr B.toPre} {T : TwDat B} {w : ColW B f T} {Z : w.Lt}
+  {Wt : Set B.places.Pl} {p0 : BaseLevelRowSide (w.D Z)}
 
 end Wit
 
@@ -87,10 +112,12 @@ variable {hL : GlobalTheory.Published.LocalLanglandsGL} {𝒮 : Slots}
 
 def RayRec (D : D7) (nch : NChoice D) : Prop :=
   ∀ (w : D.what₂.places.Pl) (S : Finset (Pl D.host.E)),
-    (∀ P ∈ S, (((D.host.pde * D.host.pde' : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal ∧ (Nat.card (kP P)).Prime) ∨
-      (D.what₂.muAt w ≠ D.what₂.mu0 ∧ P ∈ nch.Q w)) →
-    GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.ContainsRayField (GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.embK D)
-      (D.host.g 0 * D.host.g 1 * ∏ q ∈ S.image (fun P => Nat.card (kP P)), q)
+    (∀ P ∈ S,
+        (((D.host.pde * D.host.pde' : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal ∧ (Nat.card (kP P)).Prime)
+          ∨ (D.what₂.muAt w ≠ D.what₂.mu0 ∧ P ∈ nch.Q w))
+      → GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.ContainsRayField
+        (GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.embK D)
+        (D.host.g 0 * D.host.g 1 * ∏ q ∈ S.image (fun P => Nat.card (kP P)), q)
 
 def RayPosition : V4.Slot := fun _ X _ _ c => RayRec X.toD7 c.O.nch
 

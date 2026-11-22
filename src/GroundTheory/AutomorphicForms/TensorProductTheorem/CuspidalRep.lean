@@ -24,34 +24,42 @@ attribute [local instance 100] LieRing.ofAssociativeRing
 
 variable {K : Type*} [Field K] [NumberField K] {n : ℕ}
 
-theorem exists_compl_centralCuspForms (U : Submodule ℂ (cuspForms K n)) (hU : U ≤ centralCuspForms K n)
-    (hUρ : ∀ X, ∀ φ ∈ U, (gkModuleCusp K n).ρ X φ ∈ U)
-    (hUσ : ∀ k, ∀ φ ∈ U, (gkModuleCusp K n).σ k φ ∈ U)
-    (hUτ : ∀ g, ∀ φ ∈ U, finRepCusp K n g φ ∈ U) :
-    ∃ C : Submodule ℂ (cuspForms K n), C ≤ centralCuspForms K n ∧
-      (∀ X, ∀ φ ∈ C, (gkModuleCusp K n).ρ X φ ∈ C) ∧ (∀ k, ∀ φ ∈ C, (gkModuleCusp K n).σ k φ ∈ C) ∧
-      (∀ g, ∀ φ ∈ C, finRepCusp K n g φ ∈ C) ∧ U ⊓ C = ⊥ ∧ U ⊔ C = centralCuspForms K n := by
+theorem exists_compl_centralCuspForms
+    (U : Submodule ℂ (cuspForms K n))
+    (hU : U ≤ centralCuspForms K n) (hUρ : ∀ X, ∀ φ ∈ U, (gkModuleCusp K n).ρ X φ ∈ U)
+    (hUσ : ∀ k, ∀ φ ∈ U, (gkModuleCusp K n).σ k φ ∈ U) (hUτ : ∀ g, ∀ φ ∈ U, finRepCusp K n g φ ∈ U)
+    : ∃ C : Submodule ℂ (cuspForms K n),
+      C ≤ centralCuspForms K n ∧ (∀ X, ∀ φ ∈ C, (gkModuleCusp K n).ρ X φ ∈ C)
+        ∧ (∀ k, ∀ φ ∈ C, (gkModuleCusp K n).σ k φ ∈ C) ∧ (∀ g, ∀ φ ∈ C, finRepCusp K n g φ ∈ C)
+        ∧ U ⊓ C = ⊥ ∧ U ⊔ C = centralCuspForms K n := by
   obtain ⟨d, b, ε, B, hε, horth, hsymm, hinv, hK⟩ := exists_archCartanData (K := K) (n := n)
-  obtain ⟨μ, hμ⟩ : ∃ μ : Measure (Reduction.normOneGL (K := K) (n := n)), μ.IsHaarMeasure := ⟨Measure.haar, inferInstance⟩
+  obtain ⟨μ, hμ⟩ : ∃ μ : Measure (Reduction.normOneGL (K := K) (n := n)), μ.IsHaarMeasure :=
+    ⟨Measure.haar, inferInstance⟩
   exact exists_isCompl_of_finite (cuspToL2 μ)
     (fun a ha h0 => injOn_cuspToL2 μ ha (fun _ _ => rfl) (h0.trans (map_zero (cuspToL2 μ)).symm))
     (fun g a ha c hc => petersson_inner_finiteAdelic_invariant μ g ha hc)
     (fun k a ha c hc => petersson_inner_maximalCompact_invariant μ k ha hc)
-    (fun X a ha c hc => petersson_inner_lieAlgebra_skewAdjoint μ X ha hc) b
+    (fun X a ha c hc => petersson_inner_lieAlgebra_skewAdjoint μ X ha hc)
+    b
     (fun φ => exists_aeval_uActionCusp_laplacianU_eq_zero φ b ε B hε horth hsymm hinv hK)
-    (fun U₀ _ P hP hPd S hS => finiteDimensional_of_eigen b P hP hPd 0
-      ((U₀ : Subgroup (AdelicGLn.FiniteAdelicGL K n)).comap (AdelicGLn.integralFiniteGL K n).subtype)
-      (U₀.isOpen.preimage continuous_subtype_val) S fun φ hφ =>
-        ⟨(hS φ hφ).1, by rw [zero_smul]; exact (hS φ hφ).2.1, fun u hu => (hS φ hφ).2.2 _ hu⟩)
+    (fun U₀ _ P hP hPd S hS =>
+      finiteDimensional_of_eigen b P hP hPd 0
+        ((U₀ : Subgroup (AdelicGLn.FiniteAdelicGL K n)).comap
+          (AdelicGLn.integralFiniteGL K n).subtype)
+        (U₀.isOpen.preimage continuous_subtype_val) S
+        fun φ hφ =>
+          ⟨(hS φ hφ).1, by rw [zero_smul]; exact (hS φ hφ).2.1, fun u hu => (hS φ hφ).2.2 _ hu⟩)
     U hU hUρ hUσ hUτ
 
-theorem isIrreducible_cuspSubmodule_of (U : Submodule ℂ (cuspForms K n))
-    (hρ : ∀ X, ∀ φ ∈ U, (gkModuleCusp K n).ρ X φ ∈ U) (hσ : ∀ k, ∀ φ ∈ U, (gkModuleCusp K n).σ k φ ∈ U)
-    (hτ : ∀ g, ∀ φ ∈ U, finRepCusp K n g φ ∈ U) (hne : U ≠ ⊥)
-    (hmin : ∀ W : Submodule ℂ (cuspForms K n), W ≤ U → (∀ X, ∀ φ ∈ W, (gkModuleCusp K n).ρ X φ ∈ W) →
-      (∀ k, ∀ φ ∈ W, (gkModuleCusp K n).σ k φ ∈ W) → (∀ g, ∀ φ ∈ W, finRepCusp K n g φ ∈ W) →
-      W = ⊥ ∨ W = U) :
-    (cuspSubmodule K n U hρ hσ hτ).IsIrreducible := by
+theorem isIrreducible_cuspSubmodule_of
+    (U : Submodule ℂ (cuspForms K n)) (hρ : ∀ X, ∀ φ ∈ U, (gkModuleCusp K n).ρ X φ ∈ U)
+    (hσ : ∀ k, ∀ φ ∈ U, (gkModuleCusp K n).σ k φ ∈ U) (hτ : ∀ g, ∀ φ ∈ U, finRepCusp K n g φ ∈ U)
+    (hne : U ≠ ⊥)
+    (hmin : ∀ W : Submodule ℂ (cuspForms K n),
+      W ≤ U → (∀ X, ∀ φ ∈ W, (gkModuleCusp K n).ρ X φ ∈ W)
+        → (∀ k, ∀ φ ∈ W, (gkModuleCusp K n).σ k φ ∈ W) → (∀ g, ∀ φ ∈ W, finRepCusp K n g φ ∈ W)
+        → W = ⊥ ∨ W = U)
+    : (cuspSubmodule K n U hρ hσ hτ).IsIrreducible := by
   set Mx := cuspSubmodule K n U hρ hσ hτ with hMx
   obtain ⟨u, huU, hu0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hne
   have hne' : (⊥ : Subrepresentation Mx.fullRep) ≠ ⊤ := by
@@ -99,26 +107,28 @@ theorem isIrreducible_cuspSubmodule_of (U : Submodule ℂ (cuspForms K n))
     obtain ⟨y', hy', e⟩ := this
     rwa [← Subtype.ext e]
 
-
 variable (K n) in
 structure CuspidalAutomorphicRepresentation where
-
   carrier : Submodule ℂ (cuspForms K n)
   le_central : carrier ≤ centralCuspForms K n
   stable_ρ : ∀ X, ∀ φ ∈ carrier, (gkModuleCusp K n).ρ X φ ∈ carrier
   stable_σ : ∀ k, ∀ φ ∈ carrier, (gkModuleCusp K n).σ k φ ∈ carrier
   stable_τ : ∀ g, ∀ φ ∈ carrier, finRepCusp K n g φ ∈ carrier
   isIrreducible : (cuspSubmodule K n carrier stable_ρ stable_σ stable_τ).IsIrreducible
-  exists_compl : ∃ C : Submodule ℂ (cuspForms K n), C ≤ centralCuspForms K n ∧
-    (∀ X, ∀ φ ∈ C, (gkModuleCusp K n).ρ X φ ∈ C) ∧ (∀ k, ∀ φ ∈ C, (gkModuleCusp K n).σ k φ ∈ C) ∧
-    (∀ g, ∀ φ ∈ C, finRepCusp K n g φ ∈ C) ∧ carrier ⊓ C = ⊥ ∧ carrier ⊔ C = centralCuspForms K n
+  exists_compl
+    : ∃ C : Submodule ℂ (cuspForms K n),
+      C ≤ centralCuspForms K n ∧ (∀ X, ∀ φ ∈ C, (gkModuleCusp K n).ρ X φ ∈ C)
+        ∧ (∀ k, ∀ φ ∈ C, (gkModuleCusp K n).σ k φ ∈ C) ∧ (∀ g, ∀ φ ∈ C, finRepCusp K n g φ ∈ C)
+        ∧ carrier ⊓ C = ⊥ ∧ carrier ⊔ C = centralCuspForms K n
 
 namespace CuspidalAutomorphicRepresentation
 
-def ofIrreducible (U : Submodule ℂ (cuspForms K n)) (hU : U ≤ centralCuspForms K n)
-    (hρ : ∀ X, ∀ φ ∈ U, (gkModuleCusp K n).ρ X φ ∈ U) (hσ : ∀ k, ∀ φ ∈ U, (gkModuleCusp K n).σ k φ ∈ U)
-    (hτ : ∀ g, ∀ φ ∈ U, finRepCusp K n g φ ∈ U) (hirr : (cuspSubmodule K n U hρ hσ hτ).IsIrreducible) :
-    CuspidalAutomorphicRepresentation K n where
+def ofIrreducible
+    (U : Submodule ℂ (cuspForms K n)) (hU : U ≤ centralCuspForms K n)
+    (hρ : ∀ X, ∀ φ ∈ U, (gkModuleCusp K n).ρ X φ ∈ U)
+    (hσ : ∀ k, ∀ φ ∈ U, (gkModuleCusp K n).σ k φ ∈ U) (hτ : ∀ g, ∀ φ ∈ U, finRepCusp K n g φ ∈ U)
+    (hirr : (cuspSubmodule K n U hρ hσ hτ).IsIrreducible)
+    : CuspidalAutomorphicRepresentation K n where
   carrier := U
   le_central := hU
   stable_ρ := hρ
@@ -133,13 +143,11 @@ abbrev toModule (π : CuspidalAutomorphicRepresentation K n) : AdelicGKModule K 
 theorem isAdmissible (π : CuspidalAutomorphicRepresentation K n) : π.toModule.IsAdmissible :=
   isAdmissible_cuspSubmodule π.carrier π.stable_ρ π.stable_σ π.stable_τ π.isIrreducible
 
-theorem nonempty_adelicDecomposition (π : CuspidalAutomorphicRepresentation K n) :
-    Nonempty (AdelicDecomposition π.toModule) :=
+theorem nonempty_adelicDecomposition (π : CuspidalAutomorphicRepresentation K n)
+    : Nonempty (AdelicDecomposition π.toModule) :=
   AutomorphicForm.nonempty_adelicDecomposition π.toModule π.isIrreducible π.isAdmissible
 
 end CuspidalAutomorphicRepresentation
-
-
 
 end AutomorphicForm
 

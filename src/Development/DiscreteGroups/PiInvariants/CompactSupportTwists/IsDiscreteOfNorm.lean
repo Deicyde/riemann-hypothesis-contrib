@@ -23,7 +23,8 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IsConjSel
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -33,9 +34,10 @@ open PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.Desc
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-
-theorem reg_of {π : CuspSub E n} (hreg : (CG.mk π).IsRegAlg) {τ : E →+* ℂ} {m : Multiset ℂ}
-    (hm : HasInfCharGL π.V τ m) : ∃ lam : DomWeight n, m = infOfWeight lam := by
+theorem reg_of
+    {π : CuspSub E n} (hreg : (CG.mk π).IsRegAlg)
+    {τ : E →+* ℂ} {m : Multiset ℂ} (hm : HasInfCharGL π.V τ m)
+    : ∃ lam : DomWeight n, m = infOfWeight lam := by
   have h1 : (CG.mk π).HasInfChar τ m := hm
   obtain ⟨hnd, hz⟩ := hreg τ
   rw [h1.infChar_eq] at hnd hz

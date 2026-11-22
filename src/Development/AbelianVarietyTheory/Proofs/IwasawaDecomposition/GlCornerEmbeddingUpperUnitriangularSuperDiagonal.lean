@@ -7,73 +7,84 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Matrix MeasureTheory TensorProduct Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.Whittaker GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocDict
+open NumberField IsDedekindDomain ValuativeRel Matrix MeasureTheory TensorProduct
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL
+  GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.Whittaker GlobalTheory.WeilDeligne
+  GlobalTheory.LocLanglands GlobalTheory.LocDict
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.CornerUnip
 
-theorem corner_symm_castSucc {m : ℕ} (i : Fin m) :
-    (stdSum (rfl : m + 1 = m + 1)).symm (Fin.castSucc i) = Sum.inl i := by
+theorem corner_symm_castSucc {m : ℕ} (i : Fin m)
+    : (stdSum (rfl : m + 1 = m + 1)).symm (Fin.castSucc i) = Sum.inl i := by
   rw [Equiv.symm_apply_eq]; ext; simp [stdSum_inl]
 
-theorem corner_symm_last (m : ℕ) :
-    (stdSum (rfl : m + 1 = m + 1)).symm (Fin.last m) = Sum.inr 0 := by
+theorem corner_symm_last (m : ℕ)
+    : (stdSum (rfl : m + 1 = m + 1)).symm (Fin.last m) = Sum.inr 0 := by
   rw [Equiv.symm_apply_eq]; ext; simp [stdSum_inr]
 
 variable {R : Type} [CommRing R] {m : ℕ}
 
-theorem corner_cc (u : GL (Fin m) R) (i j : Fin m) :
-    (corner u : Matrix (Fin (m+1)) (Fin (m+1)) R) (Fin.castSucc i) (Fin.castSucc j) = (u : Matrix _ _ R) i j := by
-  have val_emb₂ (g : GL (Fin m) R × GL (Fin 1) R) :
-      (emb₂ R (stdSum (rfl : m + 1 = m + 1)) g : Matrix (Fin (m+1)) (Fin (m+1)) R) =
-        Matrix.reindex (stdSum (rfl : m + 1 = m + 1)) (stdSum (rfl : m + 1 = m + 1)) (Matrix.fromBlocks g.1.val 0 0 g.2.val) := by
+theorem corner_cc (u : GL (Fin m) R) (i j : Fin m)
+    : (corner u : Matrix (Fin (m + 1)) (Fin (m + 1)) R) (Fin.castSucc i) (Fin.castSucc j)
+      = (u : Matrix _ _ R) i j := by
+  have val_emb₂ (g : GL (Fin m) R × GL (Fin 1) R)
+      : (emb₂ R (stdSum (rfl : m + 1 = m + 1)) g : Matrix (Fin (m + 1)) (Fin (m + 1)) R)
+        = Matrix.reindex (stdSum (rfl : m + 1 = m + 1)) (stdSum (rfl : m + 1 = m + 1))
+          (Matrix.fromBlocks g.1.val 0 0 g.2.val) := by
     ext i j
     simp [emb₂, leviEmb, leviTwo, two, Matrix.reindex_apply, Matrix.blockDiagonal']
-    rcases (stdSum (rfl : m + 1 = m + 1)).symm i with a | a <;>
-      rcases (stdSum (rfl : m + 1 = m + 1)).symm j with b | b <;> simp
+    rcases (stdSum (rfl : m + 1 = m + 1)).symm i with a | a
+      <;> rcases (stdSum (rfl : m + 1 = m + 1)).symm j with b | b <;> simp
   rw [corner, val_emb₂]
   simp [Matrix.reindex_apply, Matrix.submatrix_apply, corner_symm_castSucc]
 
-theorem corner_cl (u : GL (Fin m) R) (i : Fin m) :
-    (corner u : Matrix (Fin (m+1)) (Fin (m+1)) R) (Fin.castSucc i) (Fin.last m) = 0 := by
-  have val_emb₂ (g : GL (Fin m) R × GL (Fin 1) R) :
-      (emb₂ R (stdSum (rfl : m + 1 = m + 1)) g : Matrix (Fin (m+1)) (Fin (m+1)) R) =
-        Matrix.reindex (stdSum (rfl : m + 1 = m + 1)) (stdSum (rfl : m + 1 = m + 1)) (Matrix.fromBlocks g.1.val 0 0 g.2.val) := by
+theorem corner_cl (u : GL (Fin m) R) (i : Fin m)
+    : (corner u : Matrix (Fin (m + 1)) (Fin (m + 1)) R) (Fin.castSucc i) (Fin.last m) = 0 := by
+  have val_emb₂ (g : GL (Fin m) R × GL (Fin 1) R)
+      : (emb₂ R (stdSum (rfl : m + 1 = m + 1)) g : Matrix (Fin (m + 1)) (Fin (m + 1)) R)
+        = Matrix.reindex (stdSum (rfl : m + 1 = m + 1)) (stdSum (rfl : m + 1 = m + 1))
+          (Matrix.fromBlocks g.1.val 0 0 g.2.val) := by
     ext i j
     simp [emb₂, leviEmb, leviTwo, two, Matrix.reindex_apply, Matrix.blockDiagonal']
-    rcases (stdSum (rfl : m + 1 = m + 1)).symm i with a | a <;>
-      rcases (stdSum (rfl : m + 1 = m + 1)).symm j with b | b <;> simp
+    rcases (stdSum (rfl : m + 1 = m + 1)).symm i with a | a
+      <;> rcases (stdSum (rfl : m + 1 = m + 1)).symm j with b | b <;> simp
   rw [corner, val_emb₂]
   simp [Matrix.reindex_apply, Matrix.submatrix_apply, corner_symm_castSucc, corner_symm_last]
 
-theorem corner_lc (u : GL (Fin m) R) (j : Fin m) :
-    (corner u : Matrix (Fin (m+1)) (Fin (m+1)) R) (Fin.last m) (Fin.castSucc j) = 0 := by
-  have val_emb₂ (g : GL (Fin m) R × GL (Fin 1) R) :
-      (emb₂ R (stdSum (rfl : m + 1 = m + 1)) g : Matrix (Fin (m+1)) (Fin (m+1)) R) =
-        Matrix.reindex (stdSum (rfl : m + 1 = m + 1)) (stdSum (rfl : m + 1 = m + 1)) (Matrix.fromBlocks g.1.val 0 0 g.2.val) := by
+theorem corner_lc (u : GL (Fin m) R) (j : Fin m)
+    : (corner u : Matrix (Fin (m + 1)) (Fin (m + 1)) R) (Fin.last m) (Fin.castSucc j) = 0 := by
+  have val_emb₂ (g : GL (Fin m) R × GL (Fin 1) R)
+      : (emb₂ R (stdSum (rfl : m + 1 = m + 1)) g : Matrix (Fin (m + 1)) (Fin (m + 1)) R)
+        = Matrix.reindex (stdSum (rfl : m + 1 = m + 1)) (stdSum (rfl : m + 1 = m + 1))
+          (Matrix.fromBlocks g.1.val 0 0 g.2.val) := by
     ext i j
     simp [emb₂, leviEmb, leviTwo, two, Matrix.reindex_apply, Matrix.blockDiagonal']
-    rcases (stdSum (rfl : m + 1 = m + 1)).symm i with a | a <;>
-      rcases (stdSum (rfl : m + 1 = m + 1)).symm j with b | b <;> simp
+    rcases (stdSum (rfl : m + 1 = m + 1)).symm i with a | a
+      <;> rcases (stdSum (rfl : m + 1 = m + 1)).symm j with b | b <;> simp
   rw [corner, val_emb₂]
   simp [Matrix.reindex_apply, Matrix.submatrix_apply, corner_symm_castSucc, corner_symm_last]
 
-theorem corner_ll (u : GL (Fin m) R) :
-    (corner u : Matrix (Fin (m+1)) (Fin (m+1)) R) (Fin.last m) (Fin.last m) = 1 := by
-  have val_emb₂ (g : GL (Fin m) R × GL (Fin 1) R) :
-      (emb₂ R (stdSum (rfl : m + 1 = m + 1)) g : Matrix (Fin (m+1)) (Fin (m+1)) R) =
-        Matrix.reindex (stdSum (rfl : m + 1 = m + 1)) (stdSum (rfl : m + 1 = m + 1)) (Matrix.fromBlocks g.1.val 0 0 g.2.val) := by
+theorem corner_ll (u : GL (Fin m) R)
+    : (corner u : Matrix (Fin (m + 1)) (Fin (m + 1)) R) (Fin.last m) (Fin.last m) = 1 := by
+  have val_emb₂ (g : GL (Fin m) R × GL (Fin 1) R)
+      : (emb₂ R (stdSum (rfl : m + 1 = m + 1)) g : Matrix (Fin (m + 1)) (Fin (m + 1)) R)
+        = Matrix.reindex (stdSum (rfl : m + 1 = m + 1)) (stdSum (rfl : m + 1 = m + 1))
+          (Matrix.fromBlocks g.1.val 0 0 g.2.val) := by
     ext i j
     simp [emb₂, leviEmb, leviTwo, two, Matrix.reindex_apply, Matrix.blockDiagonal']
-    rcases (stdSum (rfl : m + 1 = m + 1)).symm i with a | a <;>
-      rcases (stdSum (rfl : m + 1 = m + 1)).symm j with b | b <;> simp
+    rcases (stdSum (rfl : m + 1 = m + 1)).symm i with a | a
+      <;> rcases (stdSum (rfl : m + 1 = m + 1)).symm j with b | b <;> simp
   rw [corner, val_emb₂]
   simp [Matrix.reindex_apply, Matrix.submatrix_apply, corner_symm_last]
 
 end GlobalTheory.CornerUnip
 
 open GlobalTheory.CornerUnip in
-theorem GlobalTheory.CornerUnip.corner_unipB_superDiag : ∀ (R : Type) [CommRing R] (m : ℕ) (u : GL (Fin m) R), u ∈ unipB R (Fin m) → corner u ∈ unipB R (Fin (m + 1)) ∧ superDiag (corner u) = superDiag u := by
+theorem GlobalTheory.CornerUnip.corner_unipB_superDiag
+    : ∀ (R : Type) [CommRing R] (m : ℕ) (u : GL (Fin m) R),
+      u ∈ unipB R (Fin m)
+        → corner u ∈ unipB R (Fin (m + 1)) ∧ superDiag (corner u) = superDiag u := by
   intro R _ m u hu
   rw [mem_unipB] at hu
   obtain ⟨hl, hd⟩ := hu

@@ -11,12 +11,14 @@ open scoped Classical
 
 namespace Formalism.L2.SG.Pf.RegroupPf
 
-open Formalism.L2.SG.FoldBound Formalism.L2.SG.PoincareSeriesSquareIntegrable NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.TermOp
+open Formalism.L2.SG.FoldBound Formalism.L2.SG.PoincareSeriesSquareIntegrable NumberField
+  Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.TermOp
 open Formalism.L2.SG.HidaSetting Matrix
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-open Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.TermOp.KExpCut Formalism.L2.SG.Full
+open Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.TermOp.KExpCut
+  Formalism.L2.SG.Full
 
 theorem rational_isomorphism_holds : RatIsoC := by
   intro D X γ hγ
@@ -40,7 +42,7 @@ theorem rational_isomorphism_holds : RatIsoC := by
     show X.ιE.symm (X.bas.repr (Matrix.toLin X.bas X.bas Mg y) i) = _
     rw [Matrix.toLin_apply, Module.Basis.repr_sum_self]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [Mg, φ, Matrix.mulVec, dotProduct, Formalism.L2.SG.HidaSetting.HidaSetting.crd,
+    simp [Mg, φ, Matrix.mulVec, dotProduct, Formalism.L2.SG.HidaSetting.HidaSetting.crd,
       Formalism.L2.SG.HidaSetting.crdOf, map_sum, map_mul]
   refine ⟨σ, ⟨g, hgU, h1, h2, hcrd⟩, fun x y => ?_⟩
   rw [← Formalism.L2.SG.PoincareInHH.Cut.hform_crd (X := X) (σ x) (σ y),

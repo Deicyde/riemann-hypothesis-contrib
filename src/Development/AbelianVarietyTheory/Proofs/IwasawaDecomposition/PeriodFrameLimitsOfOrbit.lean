@@ -11,15 +11,22 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.UnifFrDet
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits NumberField ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.L2.Pj GlobalTheory.Toroidal GlobalTheory.Cartier GlobalTheory.ShFam GlobalTheory.ShFam.BdArc Filter Topology
+open AlgebraicGeometry CategoryTheory Limits NumberField ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.L2.Pj
+  GlobalTheory.Toroidal GlobalTheory.Cartier GlobalTheory.ShFam GlobalTheory.ShFam.BdArc Filter
+  Topology
 open ReciprocityTheory.ChartRestriction.G.FD (Data Frame Bor rmul lact mat col dmin Wt hermC bchar)
 open scoped Matrix
 
 namespace GlobalTheory.OrbitNfac
 
-theorem span_bound {α : Type} (l : Filter α) {n m : ℕ} (L : α → Fin n → Fin m → ℂ) (L0 : Fin n → Fin m → ℂ)
-    (hL : ∀ j i, Tendsto (fun w => L w j i) l (𝓝 (L0 j i))) (hs : Submodule.span ℂ (Set.range L0) = ⊤) :
-    ∃ K : ℝ, 0 ≤ K ∧ ∀ᶠ w in l, ∀ (ℓ : Fin m → ℂ) (k : Fin m), ‖ℓ k‖ ≤ K * ∑ j, ‖∑ i, ℓ i * L w j i‖ := by
+theorem span_bound
+    {α : Type} (l : Filter α)
+    {n m : ℕ} (L : α → Fin n → Fin m → ℂ) (L0 : Fin n → Fin m → ℂ)
+    (hL : ∀ j i, Tendsto (fun w => L w j i) l (𝓝 (L0 j i)))
+    (hs : Submodule.span ℂ (Set.range L0) = ⊤)
+    : ∃ K : ℝ,
+      0 ≤ K ∧ ∀ᶠ w in l, ∀ (ℓ : Fin m → ℂ) (k : Fin m), ‖ℓ k‖ ≤ K * ∑ j, ‖∑ i, ℓ i * L w j i‖ := by
   classical
   have hA : ∀ k : Fin m, ∃ A : Fin n → ℂ, ∑ j, A j • L0 j = Pi.single k 1 := fun k =>
     (Submodule.mem_span_range_iff_exists_fun ℂ).1 (hs ▸ Submodule.mem_top)
@@ -27,10 +34,17 @@ theorem span_bound {α : Type} (l : Filter α) {n m : ℕ} (L : α → Fin n →
   set K : ℝ := ∑ k, ∑ j, ‖A k j‖ with hK
   have hK0 : 0 ≤ K := Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _
   have hAK : ∀ k j, ‖A k j‖ ≤ K := fun k j =>
-    (Finset.single_le_sum (f := fun j => ‖A k j‖) (fun _ _ => norm_nonneg _) (Finset.mem_univ j)).trans
-      (Finset.single_le_sum (f := fun k => ∑ j, ‖A k j‖)
-        (fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _) (Finset.mem_univ k))
-  have ht : Tendsto (fun w => K * ∑ j, ∑ i, ‖L0 j i - L w j i‖) l (𝓝 (K * ∑ j : Fin n, ∑ i : Fin m, (0 : ℝ))) := by
+    (Finset.single_le_sum
+        (f := fun j => ‖A k j‖)
+        (fun _ _ => norm_nonneg _)
+        (Finset.mem_univ j)).trans
+      (Finset.single_le_sum
+        (f := fun k => ∑ j, ‖A k j‖)
+        (fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _)
+        (Finset.mem_univ k))
+  have ht : Tendsto
+      (fun w => K * ∑ j, ∑ i, ‖L0 j i - L w j i‖)
+      l (𝓝 (K * ∑ j : Fin n, ∑ i : Fin m, (0 : ℝ))) := by
     refine Tendsto.const_mul _ (tendsto_finsetSum _ fun j _ => tendsto_finsetSum _ fun i _ => ?_)
     have := ((tendsto_const_nhds (x := L0 j i)).sub (hL j i)).norm
     simpa using this
@@ -42,14 +56,16 @@ theorem span_bound {α : Type} (l : Filter α) {n m : ℕ} (L : α → Fin n →
   have key : ∀ k, ‖ℓ k‖ ≤ K * S + ‖ℓ‖ / 2 := by
     intro k
     have e1 : ℓ k = ∑ j, A k j * ((∑ i, ℓ i * L w j i) + ∑ i, ℓ i * (L0 j i - L w j i)) := by
-      have e2 : ℓ k = ∑ i, ℓ i * (∑ j, A k j • L0 j) i := by
-        rw [hA k]; simp [Pi.single_apply]
+      have e2 : ℓ k = ∑ i, ℓ i * (∑ j, A k j • L0 j) i := by rw [hA k]; simp [Pi.single_apply]
       rw [e2]
-      simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.mul_sum, ← Finset.sum_add_distrib]
+      simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.mul_sum,
+        ← Finset.sum_add_distrib]
       rw [Finset.sum_comm]
       exact Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun i _ => by ring
-    have e3 : ∀ j, ‖A k j * ((∑ i, ℓ i * L w j i) + ∑ i, ℓ i * (L0 j i - L w j i))‖ ≤
-        K * ‖∑ i, ℓ i * L w j i‖ + ‖ℓ‖ * (K * ∑ i, ‖L0 j i - L w j i‖) := by
+    have e3
+        : ∀ j,
+          ‖A k j * ((∑ i, ℓ i * L w j i) + ∑ i, ℓ i * (L0 j i - L w j i))‖
+            ≤ K * ‖∑ i, ℓ i * L w j i‖ + ‖ℓ‖ * (K * ∑ i, ‖L0 j i - L w j i‖) := by
       intro j
       have h1 : ‖∑ i, ℓ i * (L0 j i - L w j i)‖ ≤ ‖ℓ‖ * ∑ i, ‖L0 j i - L w j i‖ := by
         rw [Finset.mul_sum]
@@ -57,13 +73,15 @@ theorem span_bound {α : Type} (l : Filter α) {n m : ℕ} (L : α → Fin n →
         rw [norm_mul]
         exact mul_le_mul_of_nonneg_right (norm_le_pi_norm ℓ i) (norm_nonneg _)
       rw [norm_mul]
-      calc _ ≤ K * (‖∑ i, ℓ i * L w j i‖ + ‖ℓ‖ * ∑ i, ‖L0 j i - L w j i‖) :=
-            mul_le_mul (hAK k j) ((norm_add_le _ _).trans (by linarith)) (norm_nonneg _) hK0
+      calc
+        _ ≤ K * (‖∑ i, ℓ i * L w j i‖ + ‖ℓ‖ * ∑ i, ‖L0 j i - L w j i‖) :=
+          mul_le_mul (hAK k j) ((norm_add_le _ _).trans (by linarith)) (norm_nonneg _) hK0
         _ = _ := by ring
-    calc ‖ℓ k‖ ≤ ∑ j, (K * ‖∑ i, ℓ i * L w j i‖ + ‖ℓ‖ * (K * ∑ i, ‖L0 j i - L w j i‖)) := by
-          rw [e1]; exact (norm_sum_le _ _).trans (Finset.sum_le_sum fun j _ => e3 j)
+    calc
+      ‖ℓ k‖ ≤ ∑ j, (K * ‖∑ i, ℓ i * L w j i‖ + ‖ℓ‖ * (K * ∑ i, ‖L0 j i - L w j i‖)) := by
+        rw [e1]; exact (norm_sum_le _ _).trans (Finset.sum_le_sum fun j _ => e3 j)
       _ = K * S + ‖ℓ‖ * (K * ∑ j, ∑ i, ‖L0 j i - L w j i‖) := by
-          rw [Finset.sum_add_distrib, ← Finset.mul_sum, ← Finset.mul_sum, ← Finset.mul_sum]
+        rw [Finset.sum_add_distrib, ← Finset.mul_sum, ← Finset.mul_sum, ← Finset.mul_sum]
       _ ≤ K * S + ‖ℓ‖ / 2 := by nlinarith [norm_nonneg ℓ]
   have h2 : ‖ℓ‖ ≤ K * S + ‖ℓ‖ / 2 := (pi_norm_le_iff_of_nonneg (by positivity)).2 key
   have := norm_le_pi_norm ℓ k
@@ -71,20 +89,25 @@ theorem span_bound {α : Type} (l : Filter α) {n m : ℕ} (L : α → Fin n →
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {N : ℕ} (X : Data E N)
 
-theorem coord_le {x b : Frame X.Ψ N} (hx : x ∈ X.dom) (hb : b ∈ Bor X.Ψ N) (ho : X.IsOrtho (rmul x b)) (τ : X.Ψ)
-    (u : Fin N → ℂ) (i : Fin N) : ‖((mat (rmul x b) τ)⁻¹ *ᵥ u) i‖ ≤ 1 + X.maj x τ u := by
+theorem coord_le
+    {x b : Frame X.Ψ N} (hx : x ∈ X.dom) (hb : b ∈ Bor X.Ψ N) (ho : X.IsOrtho (rmul x b))
+    (τ : X.Ψ) (u : Fin N → ℂ) (i : Fin N)
+    : ‖((mat (rmul x b) τ)⁻¹ *ᵥ u) i‖ ≤ 1 + X.maj x τ u := by
   have hy := ReciprocityTheory.ChartRestriction.G.FD.OrthogonalFrameDomain.rmul_mem_dom X hx hb
   have h := UnipMove.GraphH.maj_ortho X ho τ ((mat (rmul x b) τ)⁻¹ *ᵥ u)
   rw [Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ (Ne.isUnit (hy τ).1), Matrix.one_mulVec,
-    GlobalTheory.MajInv.maj_rmul X hx hb] at h
+      GlobalTheory.MajInv.maj_rmul X hx hb]
+    at h
   have h2 : ‖((mat (rmul x b) τ)⁻¹ *ᵥ u) i‖ ^ 2 ≤ X.maj x τ u := by
     rw [h]
-    exact Finset.single_le_sum (f := fun j => ‖((mat (rmul x b) τ)⁻¹ *ᵥ u) j‖ ^ 2) (fun _ _ => sq_nonneg _)
+    exact Finset.single_le_sum
+      (f := fun j => ‖((mat (rmul x b) τ)⁻¹ *ᵥ u) j‖ ^ 2)
+      (fun _ _ => sq_nonneg _)
       (Finset.mem_univ i)
   nlinarith [sq_nonneg (‖((mat (rmul x b) τ)⁻¹ *ᵥ u) i‖ - 1), sq_nonneg ‖((mat (rmul x b) τ)⁻¹ *ᵥ u) i‖]
 
-theorem inv_diag {b : Frame X.Ψ N} (hb : b ∈ Bor X.Ψ N) (τ : X.Ψ) (i : Fin N) :
-    (mat b τ)⁻¹ i i = (b τ i i)⁻¹ := by
+theorem inv_diag {b : Frame X.Ψ N} (hb : b ∈ Bor X.Ψ N) (τ : X.Ψ) (i : Fin N)
+    : (mat b τ)⁻¹ i i = (b τ i i)⁻¹ := by
   have hi := (ReciprocityTheory.ChartRestriction.G.AR.Up.ExtFPf.invF_mem X hb τ).2
   have h := congrFun (congrFun (Matrix.nonsing_inv_mul (mat b τ) (Ne.isUnit (hb τ).1)) i) i
   rw [Matrix.mul_apply, Matrix.one_apply_eq, Finset.sum_eq_single i] at h
@@ -97,10 +120,15 @@ theorem inv_diag {b : Frame X.Ψ N} (hb : b ∈ Bor X.Ψ N) (τ : X.Ψ) (i : Fin
       rw [this, mul_zero]
   · simp
 
-theorem quot_bound {x b : Frame X.Ψ N} (hx : x ∈ X.dom) (hb : b ∈ Bor X.Ψ N) (ho : X.IsOrtho (rmul x b)) (τ : X.Ψ)
-    {n : ℕ} (v : Fin n → Fin N → E) {K : ℝ} (hK : 0 ≤ K)
-    (h : ∀ (ℓ : Fin (N - X.p0) → ℂ) (k : Fin (N - X.p0)), ‖ℓ k‖ ≤ K * ∑ j, ‖∑ i, ℓ i * perFr X x (v j) τ.1 i‖)
-    (i : Fin N) (hi : X.p0 ≤ i) : ‖b τ i i‖⁻¹ ≤ K * ∑ j, (1 + X.maj x τ (Data.emb τ.1 (v j))) := by
+theorem quot_bound
+    {x b : Frame X.Ψ N} (hx : x ∈ X.dom) (hb : b ∈ Bor X.Ψ N) (ho : X.IsOrtho (rmul x b))
+    (τ : X.Ψ)
+    {n : ℕ} (v : Fin n → Fin N → E)
+    {K : ℝ} (hK : 0 ≤ K)
+    (h : ∀ (ℓ : Fin (N - X.p0) → ℂ) (k : Fin (N - X.p0)),
+      ‖ℓ k‖ ≤ K * ∑ j, ‖∑ i, ℓ i * perFr X x (v j) τ.1 i‖)
+    (i : Fin N) (hi : X.p0 ≤ i)
+    : ‖b τ i i‖⁻¹ ≤ K * ∑ j, (1 + X.maj x τ (Data.emb τ.1 (v j))) := by
   have hinv := (ReciprocityTheory.ChartRestriction.G.AR.Up.ExtFPf.invF_mem X hb τ).2
   let e : Fin (N - X.p0) → Fin N := fun k => ⟨X.p0 + k, by have := k.2; omega⟩
   have h1 := h (fun k => (mat b τ)⁻¹ i (e k)) ⟨i - X.p0, by have := i.2; omega⟩
@@ -108,13 +136,17 @@ theorem quot_bound {x b : Frame X.Ψ N} (hx : x ∈ X.dom) (hb : b ∈ Bor X.Ψ 
   simp only [he] at h1
   rw [inv_diag X hb, norm_inv] at h1
   refine h1.trans (mul_le_mul_of_nonneg_left (Finset.sum_le_sum fun j _ => ?_) hK)
-  have e1 : ∑ k : Fin (N - X.p0), (mat b τ)⁻¹ i (e k) * perFr X x (v j) τ.1 k =
-      ((mat (rmul x b) τ)⁻¹ *ᵥ Data.emb τ.1 (v j)) i := by
+  have e1
+      : ∑ k : Fin (N - X.p0), (mat b τ)⁻¹ i (e k) * perFr X x (v j) τ.1 k
+        = ((mat (rmul x b) τ)⁻¹ *ᵥ Data.emb τ.1 (v j)) i := by
     have e2 : mat (rmul x b) τ = mat x τ * mat b τ := rfl
     rw [e2, Matrix.mul_inv_rev, ← Matrix.mulVec_mulVec]
     show _ = ∑ a, (mat b τ)⁻¹ i a * ((mat x τ)⁻¹ *ᵥ Data.emb τ.1 (v j)) a
-    refine Finset.sum_of_injOn e (fun a _ c _ hac => Fin.ext ?_)
-      (fun _ _ => Finset.mem_coe.mpr (Finset.mem_univ _)) (fun a _ ha => ?_) (fun k _ => ?_)
+    refine Finset.sum_of_injOn e
+      (fun a _ c _ hac => Fin.ext ?_)
+      (fun _ _ => Finset.mem_coe.mpr (Finset.mem_univ _))
+      (fun a _ ha => ?_)
+      (fun k _ => ?_)
     · have := congrArg Fin.val hac
       simp only [e] at this
       omega
@@ -127,10 +159,15 @@ theorem quot_bound {x b : Frame X.Ψ N} (hx : x ∈ X.dom) (hb : b ∈ Bor X.Ψ 
   rw [e1]
   exact coord_le X hx hb ho τ _ i
 
-theorem fil_bound {x b : Frame X.Ψ N} (hx : x ∈ X.dom) (hb : b ∈ Bor X.Ψ N) (ho : X.IsOrtho (rmul x b)) (τ : X.Ψ)
-    {n : ℕ} (v : Fin n → Fin N → E) {K : ℝ} (hK : 0 ≤ K)
-    (h : ∀ (ℓ : Fin X.p0 → ℂ) (k : Fin X.p0), ‖ℓ k‖ ≤ K * ∑ j, ‖∑ i, ℓ i * perFr X x (v j) (conjEmb τ.1) i‖)
-    (i : Fin N) (hi : (i : ℕ) < X.p0) : ‖b τ i i‖ ≤ K * ∑ j, (1 + X.maj x τ (Data.emb τ.1 (v j))) := by
+theorem fil_bound
+    {x b : Frame X.Ψ N} (hx : x ∈ X.dom) (hb : b ∈ Bor X.Ψ N) (ho : X.IsOrtho (rmul x b))
+    (τ : X.Ψ)
+    {n : ℕ} (v : Fin n → Fin N → E)
+    {K : ℝ} (hK : 0 ≤ K)
+    (h : ∀ (ℓ : Fin X.p0 → ℂ) (k : Fin X.p0),
+      ‖ℓ k‖ ≤ K * ∑ j, ‖∑ i, ℓ i * perFr X x (v j) (conjEmb τ.1) i‖)
+    (i : Fin N) (hi : (i : ℕ) < X.p0)
+    : ‖b τ i i‖ ≤ K * ∑ j, (1 + X.maj x τ (Data.emb τ.1 (v j))) := by
   have hp := X.p0_le
   have hy := ReciprocityTheory.ChartRestriction.G.FD.OrthogonalFrameDomain.rmul_mem_dom X hx hb
   let e : Fin X.p0 → Fin N := fun k => ⟨X.p0 - 1 - k, by have := k.2; omega⟩
@@ -139,12 +176,17 @@ theorem fil_bound {x b : Frame X.Ψ N} (hx : x ∈ X.dom) (hb : b ∈ Bor X.Ψ N
   simp only [he] at h1
   refine h1.trans (mul_le_mul_of_nonneg_left (Finset.sum_le_sum fun j _ => ?_) hK)
   have hc : conjEmb τ.1 ∉ X.Ψ := (X.cmType τ.1).1 τ.2
-  have e1 : ∑ k : Fin X.p0, b τ (e k) i * perFr X x (v j) (conjEmb τ.1) k =
-      hermC τ.1 X.Gm (col (mat (rmul x b) τ) i) (Data.emb τ.1 (v j)) := by
+  have e1
+      : ∑ k : Fin X.p0, b τ (e k) i * perFr X x (v j) (conjEmb τ.1) k
+        = hermC τ.1 X.Gm (col (mat (rmul x b) τ) i) (Data.emb τ.1 (v j)) := by
     have e2 : mat (rmul x b) τ = mat x τ * mat b τ := rfl
-    rw [e2, UnipMove.GraphH.col_mul, Data.mulVec_eq_sum_col, ReciprocityTheory.ChartRestriction.G.FD.hermC_sum_left]
-    refine Finset.sum_of_injOn e (fun a _ c _ hac => Fin.ext ?_)
-      (fun _ _ => Finset.mem_coe.mpr (Finset.mem_univ _)) (fun a _ ha => ?_) (fun k _ => ?_)
+    rw [e2, UnipMove.GraphH.col_mul, Data.mulVec_eq_sum_col,
+      ReciprocityTheory.ChartRestriction.G.FD.hermC_sum_left]
+    refine Finset.sum_of_injOn e
+      (fun a _ c _ hac => Fin.ext ?_)
+      (fun _ _ => Finset.mem_coe.mpr (Finset.mem_univ _))
+      (fun a _ ha => ?_)
+      (fun k _ => ?_)
     · have := congrArg Fin.val hac
       simp only [e] at this
       have := a.2
@@ -162,11 +204,17 @@ theorem fil_bound {x b : Frame X.Ψ N} (hx : x ∈ X.dom) (hb : b ∈ Bor X.Ψ N
   refine le_trans (le_of_eq ?_) (coord_le X hx hb ho τ (Data.emb τ.1 (v j)) i)
   set c := (mat (rmul x b) τ)⁻¹ *ᵥ Data.emb τ.1 (v j) with hcdef
   have hv : Data.emb τ.1 (v j) = mat (rmul x b) τ *ᵥ c := by
-    rw [hcdef, Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ (Ne.isUnit (hy τ).1), Matrix.one_mulVec]
-  have hg : ∀ a, hermC τ.1 X.Gm (col (mat (rmul x b) τ) i) (col (mat (rmul x b) τ) a) = if i = a then 1 else 0 := by
+    rw [hcdef, Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ (Ne.isUnit (hy τ).1),
+      Matrix.one_mulVec]
+  have hg
+      : ∀ a,
+        hermC τ.1 X.Gm (col (mat (rmul x b) τ) i) (col (mat (rmul x b) τ) a)
+          = if i = a then 1 else 0 := by
     intro a
     have := congrFun (congrFun (ho τ) i) a
-    simpa [ReciprocityTheory.ChartRestriction.G.FD.gram, Matrix.diagonal_apply, ReciprocityTheory.ChartRestriction.G.FD.sgn, hi] using this
+    simpa [ReciprocityTheory.ChartRestriction.G.FD.gram, Matrix.diagonal_apply,
+        ReciprocityTheory.ChartRestriction.G.FD.sgn, hi]
+      using this
   rw [hv, Data.mulVec_eq_sum_col, ReciprocityTheory.ChartRestriction.G.FD.hermC_sum_right]
   simp_rw [ReciprocityTheory.ChartRestriction.G.FD.hermC_smul_right, hg]
   simp
@@ -177,18 +225,26 @@ theorem nfac_ortho {y : Frame X.Ψ N} (ho : X.IsOrtho y) (la : Wt X.Ψ N) : X.nf
     unfold dmin
     rw [ho τ, ReciprocityTheory.ChartRestriction.G.FD.FrameDegreeData.lminor_diagonal, norm_prod]
     refine Finset.prod_eq_one fun j _ => ?_
-    rcases ReciprocityTheory.ChartRestriction.G.FD.FrameDegreeData.sgn_sq X.p0 (Fin.castLE (Nat.le_of_lt_succ i.isLt) j) with h | h <;> rw [h] <;> simp
+    rcases ReciprocityTheory.ChartRestriction.G.FD.FrameDegreeData.sgn_sq X.p0
+          (Fin.castLE (Nat.le_of_lt_succ i.isLt) j)
+        with h | h
+      <;> rw [h] <;> simp
   unfold Data.nfac
   simp [h]
 
-theorem nfac_shift {T : ℝ} {M : ℕ} {γ : GL (Fin N) E} {x : ℂ → Frame X.Ψ N} (h : IsOrbit X T M γ x) (la : Wt X.Ψ N)
-    (k : ℤ) : ∀ w : ℂ, T < w.im → X.nfac la (x (w + k * M)) = X.nfac la (x w) := by
+theorem nfac_shift
+    {T : ℝ} {M : ℕ} {γ : GL (Fin N) E} {x : ℂ → Frame X.Ψ N} (h : IsOrbit X T M γ x)
+    (la : Wt X.Ψ N) (k : ℤ)
+    : ∀ w : ℂ, T < w.im → X.nfac la (x (w + k * M)) = X.nfac la (x w) := by
   obtain ⟨-, hγ, -, hd, hs⟩ := h
   have one : ∀ w : ℂ, T < w.im → X.nfac la (x (w + M)) = X.nfac la (x w) := by
     intro w hw
     obtain ⟨b, hb, hb1, e⟩ := hs w hw
-    rw [e, ReciprocityTheory.ChartRestriction.G.AR.Inst.normFactor_rightBorel_holds N X la _ (GlobalTheory.MajInv.lact_mem_dom X (X.Γ_stab γ hγ) (hd w hw)) b hb,
-      ReciprocityTheory.ChartRestriction.G.AR.Inst.normFactor_leftAction_holds N X la γ hγ _ (hd w hw)]
+    rw [e,
+      ReciprocityTheory.ChartRestriction.G.AR.Inst.normFactor_rightBorel_holds N X la _
+        (GlobalTheory.MajInv.lact_mem_dom X (X.Γ_stab γ hγ) (hd w hw)) b hb,
+      ReciprocityTheory.ChartRestriction.G.AR.Inst.normFactor_leftAction_holds N X la γ hγ _
+        (hd w hw)]
     simp [bchar, hb1]
   induction k using Int.induction_on with
   | zero => intro w _; simp
@@ -205,14 +261,21 @@ theorem nfac_shift {T : ℝ} {M : ℕ} {γ : GL (Fin N) E} {x : ℂ → Frame X.
     push_cast
     ring
 
-theorem maj_strip {T : ℝ} {x : ℂ → Frame X.Ψ N} (hx : DifferentiableOn ℂ x {w | T < w.im})
-    (hd : ∀ w : ℂ, T < w.im → x w ∈ X.dom) (M : ℝ) (τ : X.Ψ) (u : Fin N → ℂ) :
-    ∃ D : ℝ, 0 ≤ D ∧ ∀ w : ℂ, T + 1 ≤ w.im → 1 ≤ w.im → |w.re| ≤ M → 1 + X.maj (x w) τ u ≤ D * w.im ^ 2 := by
+theorem maj_strip
+    {T : ℝ} {x : ℂ → Frame X.Ψ N}
+    (hx : DifferentiableOn ℂ x {w | T < w.im}) (hd : ∀ w : ℂ, T < w.im → x w ∈ X.dom)
+    (M : ℝ) (τ : X.Ψ) (u : Fin N → ℂ)
+    : ∃ D : ℝ,
+      0 ≤ D
+        ∧ ∀ w : ℂ, T + 1 ≤ w.im → 1 ≤ w.im → |w.re| ≤ M → 1 + X.maj (x w) τ u ≤ D * w.im ^ 2 := by
   set w0 : ℂ := ⟨0, T + 1⟩ with hw0
   have h0 : T < w0.im := by simp [hw0]
-  have hm : 0 ≤ X.maj (x w0) τ u := ReciprocityTheory.ChartRestriction.G.FD.MajorantConjugateTransfer.maj_nonneg X (hd w0 h0) τ u
-  refine ⟨1 + (2 + M ^ 2 + (1 + |T + 1|) ^ 2) * X.maj (x w0) τ u, by positivity, fun w h1 h2 h3 => ?_⟩
-  have h := GlobalTheory.T.majorant_harnack_holomorphic_half_plane E N X T x hx hd w0 w h0 (by linarith) τ u
+  have hm : 0 ≤ X.maj (x w0) τ u :=
+    ReciprocityTheory.ChartRestriction.G.FD.MajorantConjugateTransfer.maj_nonneg X (hd w0 h0) τ u
+  refine
+    ⟨1 + (2 + M ^ 2 + (1 + |T + 1|) ^ 2) * X.maj (x w0) τ u, by positivity, fun w h1 h2 h3 => ?_⟩
+  have h :=
+    GlobalTheory.T.majorant_harnack_holomorphic_half_plane E N X T x hx hd w0 w h0 (by linarith) τ u
   have e0 : w0.im - T = 1 := by simp [hw0]
   rw [e0, one_mul] at h
   have e1 : ‖w0 - w‖ ^ 2 = w.re ^ 2 + (T + 1 - w.im) ^ 2 := by
@@ -238,6 +301,5 @@ theorem maj_strip {T : ℝ} {x : ℂ → Frame X.Ψ N} (hx : DifferentiableOn �
 end GlobalTheory.OrbitNfac
 
 namespace GlobalTheory
-
 
 end GlobalTheory

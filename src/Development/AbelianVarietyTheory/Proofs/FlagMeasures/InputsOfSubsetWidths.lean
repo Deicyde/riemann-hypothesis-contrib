@@ -22,12 +22,18 @@ public import Formalism.HermitianCurvature.BesselNonvanishingReduction
 @[expose] public section
 
 open scoped Classical
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.PackageTie2 Formalism.L2.SG.TermTieOf GlobalTheory.Core.Deg
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full Formalism.L2.SG.RowsConc
+  Formalism.L2.SG.PackageTie2 Formalism.L2.SG.TermTieOf GlobalTheory.Core.Deg
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Core.Deg
 
-theorem inputs_of_subset_widths : ∀ S S' : Set ℝ, S ⊆ S' → (AmpOn S' → AmpOn S) ∧ (SmallOn S' → SmallOn S) ∧ (CntOn S' → CntOn S) ∧ (CountBoundOn S' → CountBoundOn S) ∧ (TieOn S' → TieOn S) := by
+theorem inputs_of_subset_widths
+    : ∀ S S' : Set ℝ,
+      S ⊆ S'
+        → (AmpOn S' → AmpOn S) ∧ (SmallOn S' → SmallOn S) ∧ (CntOn S' → CntOn S)
+          ∧ (CountBoundOn S' → CountBoundOn S) ∧ (TieOn S' → TieOn S) := by
   intro S S' hSS
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · intro h Cg cb Cu cT CT hb hT

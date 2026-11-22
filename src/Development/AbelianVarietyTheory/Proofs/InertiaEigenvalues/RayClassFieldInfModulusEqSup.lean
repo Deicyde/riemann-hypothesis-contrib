@@ -16,20 +16,24 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory.RayCompositum
 
-open GlobalTheory.NT GlobalTheory.FieldSize GlobalTheory.IndefiniteRowSideFullHecke.RayPrincipalIdeals GlobalTheory.RayFieldCompare GlobalTheory.RayMaximal
+open GlobalTheory.NT GlobalTheory.FieldSize
+  GlobalTheory.IndefiniteRowSideFullHecke.RayPrincipalIdeals GlobalTheory.RayFieldCompare
+  GlobalTheory.RayMaximal
 
 variable {K : Type} [Field K] [NumberField K]
 
 set_option autoImplicit false in
 open NumberField IsDedekindDomain in
 variable {K : Type} [Field K] [NumberField K] in
-private theorem heckeIdeal_comp_restrictNormalHom {L M : Type} [Field L]
-    [NumberField L] [Field M] [NumberField M] [Algebra K L] [Algebra K M] [Algebra L M]
-    [IsScalarTower K L M] [IsGalois K L] [IsGalois K M] {𝔪 : Ideal (𝓞 K)}
+private theorem heckeIdeal_comp_restrictNormalHom
+    {L M : Type} [Field L] [NumberField L] [Field M] [NumberField M] [Algebra K L] [Algebra K M]
+    [Algebra L M] [IsScalarTower K L M] [IsGalois K L] [IsGalois K M]
+    {𝔪 : Ideal (𝓞 K)}
     (hM : ∀ 𝔭 : HeightOneSpectrum (𝓞 K), ¬ 𝔭.asIdeal ∣ 𝔪 → _root_.GlobalTheory.NT.UnramIn M 𝔭)
-    (χ : Gal(L/K) →* ℂˣ) {I : Ideal (𝓞 K)} (hI0 : I ≠ ⊥) (hI : IsCoprime I 𝔪) :
-    _root_.GlobalTheory.NT.heckeIdeal M (χ.comp (AlgEquiv.restrictNormalHom L)) I =
-      _root_.GlobalTheory.NT.heckeIdeal L χ I := by
+    (χ : Gal(L/K) →* ℂˣ)
+    {I : Ideal (𝓞 K)} (hI0 : I ≠ ⊥) (hI : IsCoprime I 𝔪)
+    : _root_.GlobalTheory.NT.heckeIdeal M (χ.comp (AlgEquiv.restrictNormalHom L)) I
+      = _root_.GlobalTheory.NT.heckeIdeal L χ I := by
   unfold _root_.GlobalTheory.NT.heckeIdeal
   refine finprod_congr fun 𝔭 => ?_
   by_cases hc : (Associates.mk 𝔭.asIdeal).count (Associates.mk I).factors = 0
@@ -38,19 +42,22 @@ private theorem heckeIdeal_comp_restrictNormalHom {L M : Type} [Field L]
     have hnd : ¬ 𝔭.asIdeal ∣ 𝔪 := by
       intro h
       rw [Ideal.dvd_iff_le] at hdvd h
-      exact 𝔭.isPrime.ne_top (top_unique ((Ideal.isCoprime_iff_sup_eq.1 hI).ge.trans (sup_le hdvd h)))
+      exact 𝔭.isPrime.ne_top (top_unique ((Ideal.isCoprime_iff_sup_eq.1 hI).ge.trans
+        (sup_le hdvd h)))
     obtain ⟨σ, hσ⟩ := _root_.GlobalTheory.NT.exists_isFrob M 𝔭
     have hu := hM 𝔭 hnd
     rw [_root_.GlobalTheory.NT.heckeVal_of_unramIn M _ hu hσ,
-      _root_.GlobalTheory.NT.heckeVal_of_unramIn L χ (_root_.GlobalTheory.RayMaximal.unramIn_of_tower hu)
+      _root_.GlobalTheory.NT.heckeVal_of_unramIn L χ
+        (_root_.GlobalTheory.RayMaximal.unramIn_of_tower hu)
         (_root_.GlobalTheory.RayMaximal.isFrob_restrictNormal hσ)]
     rfl
 
 set_option autoImplicit false in
 open NumberField IsDedekindDomain in
 variable {K : Type} [Field K] [NumberField K] in
-private theorem not_isUnit_natCast_of_prime' {F : Type} [Field F] [NumberField F] {q : ℕ}
-    (hq : q.Prime) : ¬ IsUnit ((q : 𝓞 F)) := by
+private theorem not_isUnit_natCast_of_prime'
+    {F : Type} [Field F] [NumberField F] {q : ℕ} (hq : q.Prime)
+    : ¬ IsUnit ((q : 𝓞 F)) := by
   intro h
   have h' := h.map (Algebra.norm ℤ)
   rw [show ((q : ℕ) : 𝓞 F) = algebraMap ℤ (𝓞 F) (q : ℤ) by simp, Algebra.norm_algebraMap] at h'
@@ -62,16 +69,19 @@ private theorem not_isUnit_natCast_of_prime' {F : Type} [Field F] [NumberField F
 set_option autoImplicit false in
 open NumberField IsDedekindDomain in
 variable {K : Type} [Field K] [NumberField K] in
-private theorem isCoprime_of_le_right {R : Type} [CommRing R] {I J J' : Ideal R}
-    (h : IsCoprime I J) (hJ : J ≤ J') : IsCoprime I J' := by
+private theorem isCoprime_of_le_right
+    {R : Type} [CommRing R] {I J J' : Ideal R} (h : IsCoprime I J) (hJ : J ≤ J')
+    : IsCoprime I J' := by
   rw [Ideal.isCoprime_iff_sup_eq] at h ⊢
   exact top_unique (h.ge.trans (sup_le_sup_left hJ _))
 
 set_option autoImplicit false in
 open NumberField IsDedekindDomain in
 variable {K : Type} [Field K] [NumberField K] in
-private theorem mem_of_mul_mem_of_isCoprime_span {R : Type} [CommRing R] {J : Ideal R} {y z : R}
-    (h : IsCoprime (Ideal.span {y}) J) (hyz : y * z ∈ J) : z ∈ J := by
+private theorem mem_of_mul_mem_of_isCoprime_span
+    {R : Type} [CommRing R]
+    {J : Ideal R} {y z : R} (h : IsCoprime (Ideal.span {y}) J) (hyz : y * z ∈ J)
+    : z ∈ J := by
   obtain ⟨i, hi, j, hj, hij⟩ := Ideal.isCoprime_iff_exists.1 h
   obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton.1 hi
   have : z = c * (y * z) + z * j := by linear_combination (-z) * hij
@@ -81,19 +91,21 @@ private theorem mem_of_mul_mem_of_isCoprime_span {R : Type} [CommRing R] {J : Id
 set_option autoImplicit false in
 open NumberField IsDedekindDomain in
 variable {K : Type} [Field K] [NumberField K] in
-private theorem exists_rayPair_inf_of_rayPair (hu : ∀ u : (𝓞 K)ˣ, u = 1 ∨ u = -1)
-    {𝔞 𝔟 : Ideal (𝓞 K)} {q : ℕ} (hq : q.Prime) (hq2 : q ≠ 2)
-    (ha : 𝔞 ≤ Ideal.span {(q : 𝓞 K)}) (hb : 𝔟 ≤ Ideal.span {(q : 𝓞 K)}) {I : Ideal (𝓞 K)}
-    {α β α' β' : 𝓞 K} (h₁ : _root_.GlobalTheory.NT.RayPair 𝔞 α β) (e₁ : I * Ideal.span {β} = Ideal.span {α})
-    (h₂ : _root_.GlobalTheory.NT.RayPair 𝔟 α' β') (e₂ : I * Ideal.span {β'} = Ideal.span {α'}) :
-    ∃ γ δ, _root_.GlobalTheory.NT.RayPair (𝔞 ⊓ 𝔟) γ δ ∧ I * Ideal.span {δ} = Ideal.span {γ} := by
+private theorem exists_rayPair_inf_of_rayPair
+    (hu : ∀ u : (𝓞 K)ˣ, u = 1 ∨ u = -1)
+    {𝔞 𝔟 : Ideal (𝓞 K)} {q : ℕ}
+    (hq : q.Prime) (hq2 : q ≠ 2) (ha : 𝔞 ≤ Ideal.span {(q : 𝓞 K)}) (hb : 𝔟 ≤ Ideal.span {(q : 𝓞 K)})
+    {I : Ideal (𝓞 K)} {α β α' β' : 𝓞 K}
+    (h₁ : _root_.GlobalTheory.NT.RayPair 𝔞 α β) (e₁ : I * Ideal.span {β} = Ideal.span {α})
+    (h₂ : _root_.GlobalTheory.NT.RayPair 𝔟 α' β') (e₂ : I * Ideal.span {β'} = Ideal.span {α'})
+    : ∃ γ δ, _root_.GlobalTheory.NT.RayPair (𝔞 ⊓ 𝔟) γ δ ∧ I * Ideal.span {δ} = Ideal.span {γ} := by
   obtain ⟨hα0, hβ0, hαc, hβc, hd, hpos⟩ := h₁
   obtain ⟨hα0', hβ0', hαc', hβc', hd', hpos'⟩ := h₂
   have hqtop : Ideal.span {(q : 𝓞 K)} ≠ ⊤ := fun h =>
     not_isUnit_natCast_of_prime' hq (Ideal.span_singleton_eq_top.1 h)
   have hspan : Ideal.span {α * β'} = Ideal.span {α' * β} := by
-    rw [← Ideal.span_singleton_mul_span_singleton, ← Ideal.span_singleton_mul_span_singleton,
-      ← e₁, ← e₂]
+    rw [← Ideal.span_singleton_mul_span_singleton, ← Ideal.span_singleton_mul_span_singleton, ← e₁,
+      ← e₂]
     ring
   obtain ⟨u, hu'⟩ := Ideal.span_singleton_eq_span_singleton.1 hspan
   have key : α * β' = α' * β := by
@@ -156,8 +168,19 @@ private theorem exists_rayPair_inf_of_rayPair (hu : ∀ u : (𝓞 K)ˣ, u = 1 �
   have hmul : γ * β = α * δ := by
     simp only [hγdef, hδdef]
     linear_combination (-(a₀ * r')) * key
-  refine ⟨γ, δ, ⟨hγ0, hδ0, _root_.GlobalTheory.Mem.RayNo.isCoprime_span hγ1, _root_.GlobalTheory.Mem.RayNo.isCoprime_span hδ1,
-    hγδ, fun φ => ?_⟩, ?_⟩
+  refine ⟨
+    γ,
+    δ,
+    ⟨
+      hγ0,
+      hδ0,
+      _root_.GlobalTheory.Mem.RayNo.isCoprime_span hγ1,
+      _root_.GlobalTheory.Mem.RayNo.isCoprime_span hδ1,
+      hγδ,
+      fun φ => ?_
+    ⟩,
+    ?_
+  ⟩
   · have hφ : φ (γ : K) * φ (β : K) = φ (α : K) * φ (δ : K) := by
       have := congrArg (fun z : 𝓞 K => φ (z : K)) hmul
       simpa using this
@@ -174,27 +197,35 @@ private theorem exists_rayPair_inf_of_rayPair (hu : ∀ u : (𝓞 K)ˣ, u = 1 �
       rw [Ideal.zero_eq_bot, Ne, Ideal.span_singleton_eq_bot]
       exact hβ0
     apply mul_right_cancel₀ hβI
-    rw [mul_assoc, mul_comm (Ideal.span {δ}), ← mul_assoc, e₁, Ideal.span_singleton_mul_span_singleton,
-      Ideal.span_singleton_mul_span_singleton, hmul]
-
+    rw [mul_assoc, mul_comm (Ideal.span {δ}), ← mul_assoc, e₁,
+      Ideal.span_singleton_mul_span_singleton, Ideal.span_singleton_mul_span_singleton, hmul]
 
 set_option autoImplicit false in
 open NumberField IsDedekindDomain in
 variable {K : Type} [Field K] [NumberField K] in
-theorem _root_.GlobalTheory.RayCompositum.fieldRange_sup_eq_top : ∀ {K H H₁ H₂ : Type} [Field K] [NumberField K] [Field H] [NumberField H]
-    [Algebra K H] [IsAbelianGalois K H] [Field H₁] [NumberField H₁] [Algebra K H₁] [IsAbelianGalois K H₁]
-    [Field H₂] [NumberField H₂] [Algebra K H₂] [IsAbelianGalois K H₂], (∀ u : (𝓞 K)ˣ, u = 1 ∨ u = -1) →
-    ∀ {𝔞 𝔟 : Ideal (𝓞 K)}, 𝔞 ≠ ⊥ → 𝔟 ≠ ⊥ → ∀ {q : ℕ}, q.Prime → q ≠ 2 → 𝔞 ≤ Ideal.span {(q : 𝓞 K)} →
-    𝔟 ≤ Ideal.span {(q : 𝓞 K)} → _root_.GlobalTheory.FieldSize.IsRay H (𝔞 ⊓ 𝔟) → _root_.GlobalTheory.FieldSize.IsRay H₁ 𝔞 →
-    _root_.GlobalTheory.FieldSize.IsRay H₂ 𝔟 → ∀ (f₁ : H₁ →ₐ[K] H) (f₂ : H₂ →ₐ[K] H), f₁.fieldRange ⊔ f₂.fieldRange = ⊤ := by
+theorem _root_.GlobalTheory.RayCompositum.fieldRange_sup_eq_top
+    : ∀ {K H H₁ H₂ : Type} [Field K] [NumberField K] [Field H] [NumberField H] [Algebra K H]
+        [IsAbelianGalois K H] [Field H₁] [NumberField H₁] [Algebra K H₁] [IsAbelianGalois K H₁]
+        [Field H₂] [NumberField H₂] [Algebra K H₂] [IsAbelianGalois K H₂],
+      (∀ u : (𝓞 K)ˣ, u = 1 ∨ u = -1)
+        → ∀ {𝔞 𝔟 : Ideal (𝓞 K)},
+          𝔞 ≠ ⊥ → 𝔟 ≠ ⊥
+            → ∀ {q : ℕ},
+              q.Prime → q ≠ 2 → 𝔞 ≤ Ideal.span {(q : 𝓞 K)} → 𝔟 ≤ Ideal.span {(q : 𝓞 K)}
+                → _root_.GlobalTheory.FieldSize.IsRay H (𝔞 ⊓ 𝔟)
+                → _root_.GlobalTheory.FieldSize.IsRay H₁ 𝔞
+                → _root_.GlobalTheory.FieldSize.IsRay H₂ 𝔟
+                → ∀ (f₁ : H₁ →ₐ[K] H) (f₂ : H₂ →ₐ[K] H), f₁.fieldRange ⊔ f₂.fieldRange = ⊤ := by
   intro K H H₁ H₂ _ _ _ _ _ _ _ _ _ _ _ _ _ _ hu 𝔞 𝔟 _ _ q hq hq2 haq hbq hH hH₁ hH₂ f₁ f₂
   letI : Algebra H₁ H := f₁.toRingHom.toAlgebra
   haveI : IsScalarTower K H₁ H := IsScalarTower.of_algebraMap_eq fun x => (f₁.commutes x).symm
   letI : Algebra H₂ H := f₂.toRingHom.toAlgebra
   haveI : IsScalarTower K H₂ H := IsScalarTower.of_algebraMap_eq fun x => (f₂.commutes x).symm
-  have hres : ∀ {E : Type} [Field E] [Algebra K E] [Algebra E H] [IsScalarTower K E H] [Normal K E]
-      (f : E →ₐ[K] H), (∀ y, algebraMap E H y = f y) → ∀ σ : Gal(H/K),
-      (∀ x ∈ f.fieldRange, σ x = x) → AlgEquiv.restrictNormalHom E σ = 1 := by
+  have hres
+      : ∀ {E : Type} [Field E] [Algebra K E] [Algebra E H] [IsScalarTower K E H] [Normal K E]
+          (f : E →ₐ[K] H),
+        (∀ y, algebraMap E H y = f y)
+          → ∀ σ : Gal(H/K), (∀ x ∈ f.fieldRange, σ x = x) → AlgEquiv.restrictNormalHom E σ = 1 := by
     intro E _ _ _ _ _ f hf σ hσ
     ext y
     rw [AlgEquiv.one_apply]

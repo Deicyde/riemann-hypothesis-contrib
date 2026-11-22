@@ -23,8 +23,8 @@ theorem isIntegral_jInv : Formalism.L2.Th1.CM.JInvariantIntegrality := by
   intro d L _ hd4 hcm
   obtain ⟨a, τ, ha, h⟩ := GlobalTheory.exists_lattice_eq_mul_tau L
   have e : Formalism.L2.Th1.CM.jInv L = (GlobalTheory.latticeCurve L).j := by
-    rw [WeierstrassCurve.j, Units.val_inv_eq_inv_val, WeierstrassCurve.coe_Δ', GlobalTheory.latticeCurve_Δ, GlobalTheory.latticeCurve_c₄,
-      Formalism.L2.Th1.CM.jInv]
+    rw [WeierstrassCurve.j, Units.val_inv_eq_inv_val, WeierstrassCurve.coe_Δ',
+      GlobalTheory.latticeCurve_Δ, GlobalTheory.latticeCurve_c₄, Formalism.L2.Th1.CM.jInv]
     ring
   rw [e, GlobalTheory.latticeCurve_j ha h]
   refine GlobalTheory.isIntegral_modularJ_of_mul_mem (α := Formalism.L2.Th1.CM.omegaK d) ?_ ?_
@@ -38,33 +38,41 @@ theorem isIntegral_jInv : Formalism.L2.Th1.CM.JInvariantIntegrality := by
     refine Submodule.mem_span_pair.2 ⟨m', n', ?_⟩
     simp only [zsmul_eq_mul, mul_one]
     apply mul_left_cancel₀ ha
-    rw [h']; ring
+    rw [h']
+    ring
 
-theorem norm_jInv_le_one (d : ℕ) (L : PeriodPair) (hsq : Squarefree d) (hmod : d % 4 = 3) (hcm : Formalism.L2.Th1.CM.HasCMBy d L)
-    (p : ℕ) [Fact p.Prime] (ι : ℂ ≃+* ℂ_[p]) : ‖ι (Formalism.L2.Th1.CM.jInv L)‖ ≤ 1 :=
+theorem norm_jInv_le_one
+    (d : ℕ) (L : PeriodPair)
+    (hsq : Squarefree d) (hmod : d % 4 = 3) (hcm : Formalism.L2.Th1.CM.HasCMBy d L)
+    (p : ℕ) [Fact p.Prime]
+    (ι : ℂ ≃+* ℂ_[p])
+    : ‖ι (Formalism.L2.Th1.CM.jInv L)‖ ≤ 1 :=
   GlobalTheory.MomOne.model_norm_le_one_of_isIntegral
-    ((isIntegral_jInv d L hsq hmod hcm).map_of_comp_eq (RingHom.id ℤ) (ι : ℂ →+* ℂ_[p]) (RingHom.ext_int _ _))
+    ((isIntegral_jInv d L hsq hmod hcm).map_of_comp_eq (RingHom.id ℤ) (ι : ℂ →+* ℂ_[p])
+      (RingHom.ext_int _ _))
 
 section
 
 open Formalism.L2.Th1.CM (HasCMBy omegaK jInv)
 open Formalism.L2.Th1.F (scalePair)
 
-def RootCubic : Prop :=
-  ∀ j r : ℂ_[2], ‖j‖ ≤ 1 → (r + 16) ^ 3 = j * r → ‖r‖ ≤ 1
+def RootCubic : Prop := ∀ j r : ℂ_[2], ‖j‖ ≤ 1 → (r + 16) ^ 3 = j * r → ‖r‖ ≤ 1
 
-def UnitOfRoot : Prop :=
-  ∀ j r : ℂ_[2], ‖r‖ = 1 → (r + 16) ^ 3 = j * r → ‖j‖ = 1
+def UnitOfRoot : Prop := ∀ j r : ℂ_[2], ‖r‖ = 1 → (r + 16) ^ 3 = j * r → ‖j‖ = 1
 
 def UnitChoice : Prop :=
-  ∀ d : ℕ, d % 8 = 7 → ∀ (h : ℕ) (x y : ℤ), 0 < h → Odd y →
-    x ^ 2 + x * y + (((d + 1) / 4 : ℕ) : ℤ) * y ^ 2 = 2 ^ h → ∀ ι : ℂ ≃+* ℂ_[2],
-    ∃ π : ℂ, (π = x + y * omegaK d ∨ π = x + y * conj (omegaK d)) ∧ ‖ι π‖ = 1
+  ∀ d : ℕ,
+    d % 8 = 7
+      → ∀ (h : ℕ) (x y : ℤ),
+        0 < h → Odd y → x ^ 2 + x * y + (((d + 1) / 4 : ℕ) : ℤ) * y ^ 2 = 2 ^ h
+          → ∀ ι : ℂ ≃+* ℂ_[2], ∃ π : ℂ,
+            (π = x + y * omegaK d ∨ π = x + y * conj (omegaK d)) ∧ ‖ι π‖ = 1
 
 def DeuringScale : Prop :=
-  ∀ (L : PeriodPair) (ι : ℂ ≃+* ℂ_[2]) (W : WeierstrassCurve ℂ_[2]), W.Δ ≠ 0 →
-    W.c₄ ^ 3 = ι (jInv L) * W.Δ →
-    ∃ (c : ℂ) (hc : c ≠ 0), W.c₄ / 12 = ι (scalePair L c hc).g₂ ∧ W.c₆ / 216 = ι (scalePair L c hc).g₃
+  ∀ (L : PeriodPair) (ι : ℂ ≃+* ℂ_[2]) (W : WeierstrassCurve ℂ_[2]),
+    W.Δ ≠ 0 → W.c₄ ^ 3 = ι (jInv L) * W.Δ
+      → ∃ (c : ℂ) (hc : c ≠ 0),
+        W.c₄ / 12 = ι (scalePair L c hc).g₂ ∧ W.c₆ / 216 = ι (scalePair L c hc).g₃
 
 end
 
@@ -84,7 +92,8 @@ theorem twist : Twist := by
   have hΔG : W.Δ = G2 ^ 3 - 27 * G3 ^ 2 := by
     have h1728 : (1728 : K) ≠ 0 := by norm_num
     apply mul_left_cancel₀ h1728
-    rw [hcr, hc4, hc6]; ring
+    rw [hcr, hc4, hc6]
+    ring
   rw [hc4, hΔG] at hrel
   rw [hΔG] at hΔ
   have key : G2 ^ 3 * g3 ^ 2 = g2 ^ 3 * G3 ^ 2 := by
@@ -93,8 +102,7 @@ theorem twist : Twist := by
     linear_combination (-1 : K) * hrel
   by_cases hg2 : g2 = 0
   · subst hg2
-    have hg3 : g3 ≠ 0 := by
-      rintro rfl; exact hD (by ring)
+    have hg3 : g3 ≠ 0 := by rintro rfl; exact hD (by ring)
     have hG2z : G2 = 0 := by
       have h0 : (12 * G2) ^ 3 * ((0 : K) ^ 3 - 27 * g3 ^ 2) = 0 := by rw [hrel]; ring
       rcases mul_eq_zero.1 h0 with h | h
@@ -102,11 +110,9 @@ theorem twist : Twist := by
         simpa using this
       · exact absurd h hD
     subst hG2z
-    have hG3 : G3 ≠ 0 := by
-      rintro rfl; exact hΔ (by ring)
+    have hG3 : G3 ≠ 0 := by rintro rfl; exact hΔ (by ring)
     obtain ⟨u, hu⟩ := IsAlgClosed.exists_pow_nat_eq (G3 / g3) (by norm_num : 0 < 6)
-    have hu0 : u ≠ 0 := by
-      rintro rfl; exact div_ne_zero hG3 hg3 (by rw [← hu]; ring)
+    have hu0 : u ≠ 0 := by rintro rfl; exact div_ne_zero hG3 hg3 (by rw [← hu]; ring)
     exact ⟨u, hu0, by ring, by rw [hu, div_mul_cancel₀ _ hg3]⟩
   by_cases hg3 : g3 = 0
   · subst hg3
@@ -116,11 +122,9 @@ theorem twist : Twist := by
       · exact absurd (pow_eq_zero_iff (n := 3) (by norm_num) |>.1 h) hg2
       · exact pow_eq_zero_iff (n := 2) (by norm_num) |>.1 h
     subst hG3z
-    have hG2 : G2 ≠ 0 := by
-      rintro rfl; exact hΔ (by ring)
+    have hG2 : G2 ≠ 0 := by rintro rfl; exact hΔ (by ring)
     obtain ⟨u, hu⟩ := IsAlgClosed.exists_pow_nat_eq (G2 / g2) (by norm_num : 0 < 4)
-    have hu0 : u ≠ 0 := by
-      rintro rfl; exact div_ne_zero hG2 hg2 (by rw [← hu]; ring)
+    have hu0 : u ≠ 0 := by rintro rfl; exact div_ne_zero hG2 hg2 (by rw [← hu]; ring)
     exact ⟨u, hu0, by rw [hu, div_mul_cancel₀ _ hg2], by ring⟩
   have hG2 : G2 ≠ 0 := by
     rintro rfl
@@ -129,7 +133,8 @@ theorem twist : Twist := by
       rcases mul_eq_zero.1 h0 with h | h
       · exact absurd (pow_eq_zero_iff (n := 3) (by norm_num) |>.1 h) hg2
       · exact pow_eq_zero_iff (n := 2) (by norm_num) |>.1 h
-    subst hG3; exact hΔ (by ring)
+    subst hG3
+    exact hΔ (by ring)
   have hG3 : G3 ≠ 0 := by
     rintro rfl
     have h0 : G2 ^ 3 * g3 ^ 2 = 0 := by rw [key]; ring
@@ -137,15 +142,13 @@ theorem twist : Twist := by
     · exact hG2 (pow_eq_zero_iff (n := 3) (by norm_num) |>.1 h)
     · exact hg3 (pow_eq_zero_iff (n := 2) (by norm_num) |>.1 h)
   obtain ⟨s, hs⟩ : ∃ s : K, s = (G3 / g3) / (G2 / g2) := ⟨_, rfl⟩
-  have hs0 : s ≠ 0 := by
-    rw [hs]; exact div_ne_zero (div_ne_zero hG3 hg3) (div_ne_zero hG2 hg2)
+  have hs0 : s ≠ 0 := by rw [hs]; exact div_ne_zero (div_ne_zero hG3 hg3) (div_ne_zero hG2 hg2)
   have hs2 : s ^ 2 = G2 / g2 := by
     rw [hs, div_pow, div_pow, div_pow, div_div_eq_mul_div, div_eq_div_iff (by positivity) hg2]
     field_simp
     linear_combination (-1 : K) * key
   obtain ⟨u, hu⟩ := IsAlgClosed.exists_pow_nat_eq s (by norm_num : 0 < 2)
-  have hu0 : u ≠ 0 := by
-    rintro rfl; exact hs0 (by rw [← hu]; ring)
+  have hu0 : u ≠ 0 := by rintro rfl; exact hs0 (by rw [← hu]; ring)
   refine ⟨u, hu0, ?_, ?_⟩
   · rw [show u ^ 4 = (u ^ 2) ^ 2 by ring, hu, hs2, div_mul_cancel₀ _ hg2]
   · rw [show u ^ 6 = (u ^ 2) ^ 2 * u ^ 2 by ring, hu, hs2, hs]
@@ -163,8 +166,7 @@ theorem deuringScale_of (hT : Twist) : DeuringScale := by
   have hd : L.g₂ ^ 3 - 27 * L.g₃ ^ 2 ≠ 0 := Formalism.L2.Th1.F.discNeZero L
   have hdι : ι (L.g₂ ^ 3 - 27 * L.g₃ ^ 2) = (ι L.g₂) ^ 3 - 27 * (ι L.g₃) ^ 2 := by
     simp [map_sub, map_mul, map_pow, map_ofNat]
-  have hd' : (ι L.g₂) ^ 3 - 27 * (ι L.g₃) ^ 2 ≠ 0 := by
-    rw [← hdι]; exact (map_ne_zero ι).mpr hd
+  have hd' : (ι L.g₂) ^ 3 - 27 * (ι L.g₃) ^ 2 ≠ 0 := by rw [← hdι]; exact (map_ne_zero ι).mpr hd
   have hjι : ι (jInv L) = 1728 * (ι L.g₂) ^ 3 / ((ι L.g₂) ^ 3 - 27 * (ι L.g₃) ^ 2) := by
     unfold jInv
     rw [map_div₀, hdι]
@@ -219,8 +221,7 @@ theorem integral_root_cubic_X_add_sixteen_two_adic : RootCubic := by
   have h16 : ‖(16 : ℂ_[2])‖ < ‖r‖ := by rw [cubic_norm_sixteen]; linarith
   have e : ‖r + 16‖ = ‖r‖ := by
     rw [IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm h16.ne', max_eq_left h16.le]
-  have hn : ‖r + 16‖ ^ 3 = ‖j‖ * ‖r‖ := by
-    rw [← norm_pow, h, norm_mul]
+  have hn : ‖r + 16‖ ^ 3 = ‖j‖ * ‖r‖ := by rw [← norm_pow, h, norm_mul]
   rw [e] at hn
   have hpos : 0 < ‖r‖ := by linarith
   have : ‖r‖ ^ 3 ≤ ‖r‖ := by rw [hn]; exact mul_le_of_le_one_left (norm_nonneg _) hj
@@ -232,8 +233,7 @@ theorem unit_root_cubic_forces_unit_jInvariant : UnitOfRoot := by
   have h16 : ‖(16 : ℂ_[2])‖ < ‖r‖ := by rw [cubic_norm_sixteen, hr]; norm_num
   have e : ‖r + 16‖ = ‖r‖ := by
     rw [IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm h16.ne', max_eq_left h16.le]
-  have hn : ‖r + 16‖ ^ 3 = ‖j‖ * ‖r‖ := by
-    rw [← norm_pow, h, norm_mul]
+  have hn : ‖r + 16‖ ^ 3 = ‖j‖ * ‖r‖ := by rw [← norm_pow, h, norm_mul]
   rw [e, hr] at hn
   linarith
 
@@ -245,7 +245,7 @@ open Formalism.L2.Th1.CM (HasCMBy omegaK jInv)
 open Formalism.L2.Th1.F (scalePair)
 
 theorem norm_three_padicComplex_two : ‖(3 : ℂ_[2])‖ = 1 := by
-  have h := PadicComplex.norm_extends' (p := 2) ((3:ℕ) : ℚ_[2])
+  have h := PadicComplex.norm_extends' (p := 2) ((3 : ℕ) : ℚ_[2])
   rw [Padic.norm_natCast_eq_one_iff.2 (by norm_num)] at h
   rw [← h]
   congr 1
@@ -254,8 +254,9 @@ theorem norm_three_padicComplex_two : ‖(3 : ℂ_[2])‖ = 1 := by
 
 theorem disc_ne_zero (L : PeriodPair) : disc L ≠ 0 := Formalism.L2.Th1.F.discNeZero L
 
-theorem disc_of_mul (L M : PeriodPair) (π : ℂ) (hπ : π ≠ 0) (hM : ∀ z, z ∈ M.lattice ↔ π * z ∈ L.lattice) :
-    disc M = π ^ 12 * disc L := by
+theorem disc_of_mul
+    (L M : PeriodPair) (π : ℂ) (hπ : π ≠ 0) (hM : ∀ z, z ∈ M.lattice ↔ π * z ∈ L.lattice)
+    : disc M = π ^ 12 * disc L := by
   have hinv : π⁻¹ ≠ 0 := inv_ne_zero hπ
   have hH := Formalism.L2.Th1.F.homogeneity L π⁻¹ hinv
   have hlat : M.lattice = (scalePair L π⁻¹ hinv).lattice := by
@@ -268,8 +269,9 @@ theorem disc_of_mul (L M : PeriodPair) (π : ℂ) (hπ : π ≠ 0) (hM : ∀ z, 
   rw [hg2, hg3, h2, h3]
   field_simp
 
-theorem jUnit_of (hW : TwoIsog) (hN : NormPow) (hC : Chain) (hR : RootCubic) (hU : UnitOfRoot)
-    (hP : UnitChoice) : JUnit := by
+theorem jUnit_of
+    (hW : TwoIsog) (hN : NormPow) (hC : Chain) (hR : RootCubic) (hU : UnitOfRoot) (hP : UnitChoice)
+    : JUnit := by
   intro d L hsf hd hL ι
   obtain ⟨h, x, y, hh, hy, hxy⟩ := hN d hsf hd
   obtain ⟨π, hπ, hπ1⟩ := hP d hd h x y hh hy hxy ι
@@ -345,7 +347,9 @@ theorem full_of (hS : DeuringScale) (hJ : JUnit) : Full := by
   have ha1 : ‖a‖ = 1 := by
     rw [hinv, norm_mul] at hc4n
     have : 1 ≤ ‖a‖ := by
-      calc (1 : ℝ) = ‖a‖ * ‖a ^ 3 - 24‖ := hc4n.symm
+      calc
+        (1 : ℝ)
+          = ‖a‖ * ‖a ^ 3 - 24‖ := hc4n.symm
         _ ≤ ‖a‖ * 1 := mul_le_mul_of_nonneg_left hsub (norm_nonneg _)
         _ = ‖a‖ := mul_one _
     exact le_antisymm ha this
@@ -357,8 +361,10 @@ theorem full_of (hS : DeuringScale) (hJ : JUnit) : Full := by
   · simp [Formalism.ELL.deuring]
   · exact ha1
 
-theorem full_of_steps (hT : DeuringScale) (hW : TwoIsog) (hN : NormPow) (hC : Chain) (hR : RootCubic)
-    (hU : UnitOfRoot) (hP : UnitChoice) : Full :=
+theorem full_of_steps
+    (hT : DeuringScale) (hW : TwoIsog) (hN : NormPow) (hC : Chain) (hR : RootCubic)
+    (hU : UnitOfRoot) (hP : UnitChoice)
+    : Full :=
   full_of hT (jUnit_of hW hN hC hR hU hP)
 
 end
@@ -366,7 +372,8 @@ end
 section
 
 theorem full_of_open (hW : TwoIsog) (hN : NormPow) (hC : Chain) (hP : UnitChoice) : Full :=
-  full_of_steps deuring_lattice_homothety_two_adic hW hN hC integral_root_cubic_X_add_sixteen_two_adic unit_root_cubic_forces_unit_jInvariant hP
+  full_of_steps deuring_lattice_homothety_two_adic hW hN hC
+    integral_root_cubic_X_add_sixteen_two_adic unit_root_cubic_forces_unit_jInvariant hP
 
 end
 
@@ -519,10 +526,12 @@ theorem twoIsogeny_discriminant_ratio_cubic : TwoIsog := by
   have hg3 : L.g₃ = 140 * L.G 6 := rfl
   have hg2' : L'.g₂ = 60 * e ^ 2 - 4 * L.g₂ := by
     show 60 * L'.G 4 = _
-    rw [hG4, hS4, hg2]; ring
+    rw [hG4, hS4, hg2]
+    ring
   have hg3' : L'.g₃ = L.g₃ + 84 * e ^ 3 - 7 * L.g₂ * e := by
     show 140 * L'.G 6 = _
-    rw [hG6, hS6, hg3, hg2]; ring
+    rw [hG6, hS6, hg3, hg2]
+    ring
   have hd := Formalism.L2.Th1.F.discNeZero L
   simp only [disc, Formalism.L2.Th1.CM.jInv]
   rw [hg2', hg3']
@@ -546,15 +555,18 @@ theorem norm_odd_eq_one (n : ℤ) (hn : Odd n) : ‖(n : ℂ_[2])‖ = 1 := by
   obtain ⟨k, rfl⟩ := hn
   have hk : ‖(2 : ℂ_[2]) * (k : ℂ_[2])‖ < 1 := by
     rw [norm_mul]
-    calc ‖(2 : ℂ_[2])‖ * ‖(k : ℂ_[2])‖ ≤ ‖(2 : ℂ_[2])‖ * 1 :=
-          mul_le_mul_of_nonneg_left (IsUltrametricDist.norm_intCast_le_one ℂ_[2] k) (norm_nonneg _)
+    calc
+      ‖(2 : ℂ_[2])‖ * ‖(k : ℂ_[2])‖ ≤ ‖(2 : ℂ_[2])‖ * 1 :=
+        mul_le_mul_of_nonneg_left (IsUltrametricDist.norm_intCast_le_one ℂ_[2] k) (norm_nonneg _)
       _ < 1 := by rw [mul_one]; exact norm_two_lt_one
   have e : ((2 * k + 1 : ℤ) : ℂ_[2]) = 2 * (k : ℂ_[2]) + 1 := by push_cast; ring
   rw [e, IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (by rw [norm_one]; exact hk.ne)]
-  rw [norm_one]; exact max_eq_right hk.le
+  rw [norm_one]
+  exact max_eq_right hk.le
 
 theorem omegaK_add_conj (d : ℕ) : omegaK d + conj (omegaK d) = 1 := by
-  simp only [omegaK, map_div₀, map_add (f := _), map_one, map_mul, Complex.conj_I, Complex.conj_ofReal, map_ofNat]
+  simp only [omegaK, map_div₀, map_add (f := _), map_one, map_mul, Complex.conj_I,
+    Complex.conj_ofReal, map_ofNat]
   ring
 
 theorem omegaK_sq_four (d : ℕ) : 4 * omegaK d ^ 2 = 4 * omegaK d - (1 + d) := by
@@ -590,8 +602,7 @@ theorem exists_unit_conjugate_norm_two_power_two_adic : UnitChoice := by
         rw [hc]
         linear_combination hx + (-(y : ℂ) ^ 2 / 4) * hsq + (-(y : ℂ) ^ 2 / 4) * hq4]
     rw [map_pow, map_ofNat]
-  have hodd : Odd (2 * x + y) := by
-    rcases hy with ⟨k, rfl⟩; exact ⟨x + k, by ring⟩
+  have hodd : Odd (2 * x + y) := by rcases hy with ⟨k, rfl⟩; exact ⟨x + k, by ring⟩
   have hn1 : ‖a + b‖ = 1 := by rw [hsum]; exact norm_odd_eq_one _ hodd
   have hlt : ‖a‖ * ‖b‖ < 1 := by
     rw [← norm_mul, hprod, norm_pow]
@@ -603,8 +614,7 @@ theorem exists_unit_conjugate_norm_two_power_two_adic : UnitChoice := by
     rw [e, IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (by rw [norm_neg, hn1]; exact ha.ne'),
       norm_neg, hn1]
     exact max_eq_left ha.le
-  · have hb : ‖b‖ < 1 := by
-      have ha' := not_lt.mp ha; nlinarith [norm_nonneg b]
+  · have hb : ‖b‖ < 1 := by have ha' := not_lt.mp ha; nlinarith [norm_nonneg b]
     refine ⟨(x : ℂ) + y * ω, Or.inl rfl, ?_⟩
     show ‖a‖ = 1
     have e : a = (a + b) + (-b) := by ring
@@ -617,7 +627,8 @@ end
 section
 
 theorem full_of_normPow_chain (hN : NormPow) (hC : Chain) : Full :=
-  full_of_open twoIsogeny_discriminant_ratio_cubic hN hC exists_unit_conjugate_norm_two_power_two_adic
+  full_of_open twoIsogeny_discriminant_ratio_cubic hN hC
+    exists_unit_conjugate_norm_two_power_two_adic
 
 end
 
@@ -643,10 +654,12 @@ end
 
 section
 
-theorem isPrincipal_pow_prime_over_two : NormPow := fun d hd h7 => AlgebraicValuationTrichotomy.exists_norm_eq_two_pow d hd h7
+theorem isPrincipal_pow_prime_over_two : NormPow := fun d hd h7 =>
+  AlgebraicValuationTrichotomy.exists_norm_eq_two_pow d hd h7
 
 end
 
-theorem goodModelTwo : Formalism.L2.Th1.Top.GoodModelTwo := full_of_normPow isPrincipal_pow_prime_over_two
+theorem goodModelTwo : Formalism.L2.Th1.Top.GoodModelTwo :=
+  full_of_normPow isPrincipal_pow_prime_over_two
 
 end GlobalTheory.ThLoc.GoodTwo

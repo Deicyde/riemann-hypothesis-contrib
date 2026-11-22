@@ -10,8 +10,11 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Las
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.IndefR Formalism.IndefR.Links GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.ChiGrid GlobalTheory.Unf
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.IndefR Formalism.IndefR.Links GlobalTheory.MixModel GlobalTheory.MixPer
+  GlobalTheory.Grow GlobalTheory.ChiGrid GlobalTheory.Unf
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.RowChain
@@ -22,9 +25,10 @@ section Rescale
 
 variable {S S₀ : HSp D} {ρ : ℕ}
 
-theorem sandwich {m n : ℕ} (A : Matrix (Fin S.rank) (Fin m) D.host.E) (B : Matrix (Fin S.rank) (Fin n) D.host.E)
-    (P : Matrix (Fin m) (Fin m) D.host.E) (Q : Matrix (Fin n) (Fin n) D.host.E) :
-    (A * P)ᴴ * S.gram * (B * Q) = Pᴴ * (Aᴴ * S.gram * B) * Q := by
+theorem sandwich
+    {m n : ℕ} (A : Matrix (Fin S.rank) (Fin m) D.host.E) (B : Matrix (Fin S.rank) (Fin n) D.host.E)
+    (P : Matrix (Fin m) (Fin m) D.host.E) (Q : Matrix (Fin n) (Fin n) D.host.E)
+    : (A * P)ᴴ * S.gram * (B * Q) = Pᴴ * (Aᴴ * S.gram * B) * Q := by
   simp only [conjTranspose_mul, Matrix.mul_assoc]
 
 def diagDec (d : HypDec S S₀ ρ) (l : Fin ρ → D.host.E) (hl : ∀ a, l a ≠ 0) : HypDec S S₀ ρ where
@@ -43,8 +47,11 @@ def diagDec (d : HypDec S S₀ ρ) (l : Fin ρ → D.host.E) (hl : ∀ a, l a �
   i₀e' := by rw [← Matrix.mul_assoc, d.i₀e', Matrix.zero_mul]
   rank_add := d.rank_add
 
-theorem perp_diag {e : Matrix (Fin S.rank) (Fin ρ) D.host.E} (l : Fin ρ → D.host.E) (hl : ∀ a, l a ≠ 0)
-    (x : Fin S.rank → D.host.E) (hx : ((e * diagonal l)ᴴ * S.gram).mulVec x = 0) : (eᴴ * S.gram).mulVec x = 0 := by
+theorem perp_diag
+    {e : Matrix (Fin S.rank) (Fin ρ) D.host.E}
+    (l : Fin ρ → D.host.E) (hl : ∀ a, l a ≠ 0)
+    (x : Fin S.rank → D.host.E) (hx : ((e * diagonal l)ᴴ * S.gram).mulVec x = 0)
+    : (eᴴ * S.gram).mulVec x = 0 := by
   rw [conjTranspose_mul, diagonal_conjTranspose, Matrix.mul_assoc, ← mulVec_mulVec] at hx
   funext j
   have := congrFun hx j
@@ -54,22 +61,34 @@ theorem perp_diag {e : Matrix (Fin S.rank) (Fin ρ) D.host.E} (l : Fin ρ → D.
   · exact absurd h (hl j)
   · exact h
 
-theorem flagGen_diag {e : Matrix (Fin S.rank) (Fin ρ) D.host.E} (l : Fin ρ → D.host.E) (hl : ∀ a, l a ≠ 0) (g : GA D S)
-    (hg : (∀ i : Fin ρ, ∃ a : Fin ρ → AE D, (∀ j, i ≤ j → a j = 0) ∧
-      (subOne S g).mulVec (ratV fun k => e k i) = (e.map (incA D)).mulVec a) ∧
-      ∀ x : Fin S.rank → D.host.E, (Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) e * S.gram).mulVec x = 0 →
-        ∃ a : Fin ρ → AE D, (subOne S g).mulVec (ratV x) = (e.map (incA D)).mulVec a) :
-    (∀ i : Fin ρ, ∃ a : Fin ρ → AE D, (∀ j, i ≤ j → a j = 0) ∧
-      (subOne S g).mulVec (ratV fun k => (e * diagonal l) k i) = ((e * diagonal l).map (incA D)).mulVec a) ∧
-      ∀ x : Fin S.rank → D.host.E,
-        (Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) (e * diagonal l) * S.gram).mulVec x = 0 →
-        ∃ a : Fin ρ → AE D, (subOne S g).mulVec (ratV x) = ((e * diagonal l).map (incA D)).mulVec a := by
-  have hmv : ∀ a : Fin ρ → AE D, ((e * diagonal l).map (incA D)).mulVec (fun j => incA D (l j)⁻¹ * a j) =
-      (e.map (incA D)).mulVec a := fun a => by
+theorem flagGen_diag
+    {e : Matrix (Fin S.rank) (Fin ρ) D.host.E}
+    (l : Fin ρ → D.host.E) (hl : ∀ a, l a ≠ 0)
+    (g : GA D S)
+    (hg : (∀ i : Fin ρ, ∃ a : Fin ρ → AE D,
+        (∀ j, i ≤ j → a j = 0)
+          ∧ (subOne S g).mulVec (ratV fun k => e k i) = (e.map (incA D)).mulVec a)
+      ∧ ∀ x : Fin S.rank → D.host.E,
+        (Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) e * S.gram).mulVec x = 0
+          → ∃ a : Fin ρ → AE D, (subOne S g).mulVec (ratV x) = (e.map (incA D)).mulVec a)
+    : (∀ i : Fin ρ, ∃ a : Fin ρ → AE D,
+        (∀ j, i ≤ j → a j = 0)
+          ∧ (subOne S g).mulVec (ratV fun k => (e * diagonal l) k i)
+            = ((e * diagonal l).map (incA D)).mulVec a)
+      ∧ ∀ x : Fin S.rank → D.host.E,
+        (Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) (e * diagonal l) * S.gram).mulVec x
+            = 0
+          → ∃ a : Fin ρ → AE D,
+            (subOne S g).mulVec (ratV x) = ((e * diagonal l).map (incA D)).mulVec a := by
+  have hmv
+      : ∀ a : Fin ρ → AE D,
+        ((e * diagonal l).map (incA D)).mulVec (fun j => incA D (l j)⁻¹ * a j)
+          = (e.map (incA D)).mulVec a := fun a => by
     funext k
     simp only [mulVec, dotProduct, Matrix.map_apply, mul_diagonal]
     refine Finset.sum_congr rfl fun j _ => ?_
-    rw [map_mul, mul_assoc, ← mul_assoc (incA D (l j)), ← map_mul, mul_inv_cancel₀ (hl j), map_one, one_mul]
+    rw [map_mul, mul_assoc, ← mul_assoc (incA D (l j)), ← map_mul, mul_inv_cancel₀ (hl j), map_one,
+      one_mul]
   refine ⟨fun i => ?_, fun x hx => ?_⟩
   · obtain ⟨a, ha0, ha⟩ := hg.1 i
     refine ⟨fun j => incA D (l j)⁻¹ * (incA D (l i) * a j), fun j hj => ?_, ?_⟩
@@ -81,14 +100,18 @@ theorem flagGen_diag {e : Matrix (Fin S.rank) (Fin ρ) D.host.E} (l : Fin ρ →
       rw [mul_diagonal, map_mul, mul_comm]
     rw [hcol, mulVec_smul, ha, ← mulVec_smul, ← hmv]
     rfl
-  · have h1 : Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) (e * diagonal l) = (e * diagonal l)ᴴ := rfl
+  · have h1
+        : Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) (e * diagonal l)
+          = (e * diagonal l)ᴴ :=
+      rfl
     have h2 : Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) e = eᴴ := rfl
     rw [h1] at hx
     obtain ⟨a, ha⟩ := hg.2 x (by rw [h2]; exact perp_diag l hl x hx)
     exact ⟨_, ha.trans (hmv a).symm⟩
 
-theorem nFlag_diag (e : Matrix (Fin S.rank) (Fin ρ) D.host.E) (l : Fin ρ → D.host.E) (hl : ∀ a, l a ≠ 0) :
-    NFlag S (e * diagonal l) = NFlag S e := by
+theorem nFlag_diag
+    (e : Matrix (Fin S.rank) (Fin ρ) D.host.E) (l : Fin ρ → D.host.E) (hl : ∀ a, l a ≠ 0)
+    : NFlag S (e * diagonal l) = NFlag S e := by
   have hl' : ∀ a, (l a)⁻¹ ≠ 0 := fun a => inv_ne_zero (hl a)
   have e0 : diagonal l * diagonal (fun a => (l a)⁻¹) = 1 := by
     rw [diagonal_mul_diagonal, ← diagonal_one]
@@ -108,15 +131,19 @@ def trMeas {S : HSp D} {N N' : Subgroup (GA D S)} (h : N = N') (ν : Measure N) 
 
 def trSet {S : HSp D} {N N' : Subgroup (GA D S)} (h : N = N') (𝓝 : Set N) : Set N' := h ▸ 𝓝
 
-theorem isUnit_trans {S : HSp D} {N N' : Subgroup (GA D S)} (h : N = N') (ν : Measure N) (𝓝 : Set N)
-    (hu : ν.IsHaarMeasure ∧ IsFundamentalDomain ((GQ S).subgroupOf N) 𝓝 ν ∧ ν 𝓝 = 1) :
-    (trMeas h ν).IsHaarMeasure ∧ IsFundamentalDomain ((GQ S).subgroupOf N') (trSet h 𝓝) (trMeas h ν) ∧
-      trMeas h ν (trSet h 𝓝) = 1 := by
+theorem isUnit_trans
+    {S : HSp D} {N N' : Subgroup (GA D S)} (h : N = N') (ν : Measure N) (𝓝 : Set N)
+    (hu : ν.IsHaarMeasure ∧ IsFundamentalDomain ((GQ S).subgroupOf N) 𝓝 ν ∧ ν 𝓝 = 1)
+    : (trMeas h ν).IsHaarMeasure
+      ∧ IsFundamentalDomain ((GQ S).subgroupOf N') (trSet h 𝓝) (trMeas h ν)
+      ∧ trMeas h ν (trSet h 𝓝) = 1 := by
   subst h
   exact hu
 
-def volNOf {S₀' : HSp D} {ρ' : ℕ} {d : HypDec S S₀ ρ} {d' : HypDec S S₀' ρ'} (h : NFlag S d.e = NFlag S d'.e)
-    (v : VolN d) : VolN d' :=
+def volNOf
+    {S₀' : HSp D} {ρ' : ℕ} {d : HypDec S S₀ ρ} {d' : HypDec S S₀' ρ'}
+    (h : NFlag S d.e = NFlag S d'.e) (v : VolN d)
+    : VolN d' :=
   ⟨trMeas h v.ν, trSet h v.𝓝, isUnit_trans h v.ν v.𝓝 v.unit⟩
 
 end Rescale
@@ -129,25 +156,29 @@ open GlobalTheory.FunObj
 
 variable {T : Type}
 
-noncomputable def splitFam {S : Arrow T → Type} {X Y : Node} {p : Path T X Y} :
-    ∀ {Z : Node} (q : Path T Y Z), (p.comp q).Fam S → p.Fam S × q.Fam S
+noncomputable def splitFam {S : Arrow T → Type} {X Y : Node} {p : Path T X Y}
+    : ∀ {Z : Node} (q : Path T Y Z), (p.comp q).Fam S → p.Fam S × q.Fam S
   | _, .nil, d => (d, ())
   | _, .snoc _ q, d => ((splitFam q d.1).1, ((splitFam q d.1).2, d.2))
 
-theorem all_splitFam {S : Arrow T → Type} (P : ∀ a, S a → Prop) {X Y : Node} {p : Path T X Y} :
-    ∀ {Z : Node} (q : Path T Y Z) (d : (p.comp q).Fam S), Path.Fam.All P d →
-      Path.Fam.All P (splitFam q d).1 ∧ Path.Fam.All P (splitFam q d).2
+theorem all_splitFam {S : Arrow T → Type} (P : ∀ a, S a → Prop) {X Y : Node} {p : Path T X Y}
+    : ∀ {Z : Node} (q : Path T Y Z) (d : (p.comp q).Fam S),
+      Path.Fam.All P d → Path.Fam.All P (splitFam q d).1 ∧ Path.Fam.All P (splitFam q d).2
   | _, .nil, _, h => ⟨h, trivial⟩
   | _, .snoc _ q, d, h => ⟨(all_splitFam P q d.1 h.1).1, (all_splitFam P q d.1 h.1).2, h.2⟩
 
-noncomputable def getD {S : Arrow T → Type} (t : T) (i : ℕ) : ∀ (n : ℕ), (downPath t i n).Fam S → ∀ j, j < n → S (.down t i j)
+noncomputable def getD {S : Arrow T → Type} (t : T) (i : ℕ)
+    : ∀ (n : ℕ), (downPath t i n).Fam S → ∀ j, j < n → S (.down t i j)
   | 0, _, _, h => absurd h (Nat.not_lt_zero _)
   | n + 1, d, j, h =>
-    if hj : j < n then getD t i n (splitFam (p := Path.one (.down t i n)) (downPath t i n) d).2 j hj
-    else (show n = j by omega) ▸ (splitFam (p := Path.one (.down t i n)) (downPath t i n) d).1.2
+    if hj : j < n then
+      getD t i n (splitFam (p := Path.one (.down t i n)) (downPath t i n) d).2 j hj
+    else
+      (show n = j by omega) ▸ (splitFam (p := Path.one (.down t i n)) (downPath t i n) d).1.2
 
-theorem getD_all {S : Arrow T → Type} (P : ∀ a, S a → Prop) (t : T) (i : ℕ) :
-    ∀ (n : ℕ) (d : (downPath t i n).Fam S), Path.Fam.All P d → ∀ j (h : j < n), P (.down t i j) (getD t i n d j h)
+theorem getD_all {S : Arrow T → Type} (P : ∀ a, S a → Prop) (t : T) (i : ℕ)
+    : ∀ (n : ℕ) (d : (downPath t i n).Fam S),
+      Path.Fam.All P d → ∀ j (h : j < n), P (.down t i j) (getD t i n d j h)
   | 0, _, _, _, h => absurd h (Nat.not_lt_zero _)
   | n + 1, d, hd, j, h => by
     have hs := all_splitFam P (p := Path.one (.down t i n)) (downPath t i n) d hd

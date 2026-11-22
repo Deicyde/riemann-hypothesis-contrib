@@ -6,9 +6,10 @@ public import Mathlib
 
 namespace UpperTheory.Reformulated.B.Qk44
 
-theorem hom_or {Γ C : Type} [Group Γ] [CommGroup C] (I : Subgroup Γ) (f g h : Γ →* C)
-    (H : ∀ s ∈ I, f s = g s ∨ f s = h s) :
-    (∀ s ∈ I, f s = g s) ∨ ∀ s ∈ I, f s = h s := by
+theorem hom_or
+    {Γ C : Type} [Group Γ] [CommGroup C]
+    (I : Subgroup Γ) (f g h : Γ →* C) (H : ∀ s ∈ I, f s = g s ∨ f s = h s)
+    : (∀ s ∈ I, f s = g s) ∨ ∀ s ∈ I, f s = h s := by
   by_cases hg : ∀ s ∈ I, f s = g s
   · exact Or.inl hg
   · right

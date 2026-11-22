@@ -37,18 +37,20 @@ def fracRing (A : Subalgebra F Ω) (p : Ideal A) [hp : p.IsPrime] : Subring Ω w
     rintro _ ⟨a, b, hb, rfl⟩
     exact ⟨-a, b, hb, by simp only [NegMemClass.coe_neg]; ring⟩
 
-theorem mem_locIn (A : Subalgebra F Ω) (p : Ideal A) [hp : p.IsPrime] (a : A) :
-    (a : Ω) ∈ IndefiniteRowSideFullHecke.Kleiman2.locIn A p :=
+theorem mem_locIn (A : Subalgebra F Ω) (p : Ideal A) [hp : p.IsPrime] (a : A)
+    : (a : Ω) ∈ IndefiniteRowSideFullHecke.Kleiman2.locIn A p :=
   Subring.subset_closure ⟨a, 1, fun h => hp.ne_top ((Ideal.eq_top_iff_one _).mpr h), by simp⟩
 
-theorem inv_mem_locIn (A : Subalgebra F Ω) (p : Ideal A) (a : A) (ha : a ∉ p) :
-    (a : Ω)⁻¹ ∈ IndefiniteRowSideFullHecke.Kleiman2.locIn A p :=
+theorem inv_mem_locIn (A : Subalgebra F Ω) (p : Ideal A) (a : A) (ha : a ∉ p)
+    : (a : Ω)⁻¹ ∈ IndefiniteRowSideFullHecke.Kleiman2.locIn A p :=
   Subring.subset_closure ⟨1, a, ha, by simp⟩
 
-theorem inv_not_mem_locIn (A : Subalgebra F Ω) (p : Ideal A) [hp : p.IsPrime] (a : A) (ha : a ∈ p)
-    (ha0 : (a : Ω) ≠ 0) : (a : Ω)⁻¹ ∉ IndefiniteRowSideFullHecke.Kleiman2.locIn A p := by
+theorem inv_not_mem_locIn
+    (A : Subalgebra F Ω) (p : Ideal A) [hp : p.IsPrime] (a : A) (ha : a ∈ p) (ha0 : (a : Ω) ≠ 0)
+    : (a : Ω)⁻¹ ∉ IndefiniteRowSideFullHecke.Kleiman2.locIn A p := by
   intro hmem
-  have hle : IndefiniteRowSideFullHecke.Kleiman2.locIn A p ≤ fracRing A p := Subring.closure_le.mpr fun u hu => hu
+  have hle : IndefiniteRowSideFullHecke.Kleiman2.locIn A p ≤ fracRing A p :=
+    Subring.closure_le.mpr fun u hu => hu
   obtain ⟨a', b, hb, hab⟩ := hle hmem
   have hb0 : (b : Ω) ≠ 0 := fun h => hb (by rw [show b = 0 from Subtype.ext h]; exact p.zero_mem)
   have hba : b = a * a' := by
@@ -58,18 +60,25 @@ theorem inv_not_mem_locIn (A : Subalgebra F Ω) (p : Ideal A) [hp : p.IsPrime] (
     linear_combination hab
   exact hb (hba ▸ p.mul_mem_right a' ha)
 
-theorem mem_chart_of_mem_secOver {K : Type} [Fintype K] {ι : K → Type} {y : (Σ k, ι k) → Ω} {δ : K → ℤ}
-    {s : Ω} (hs : s ∈ secOver F y δ) (c : ∀ k, ι k) (hc : ∀ k, y ⟨k, c k⟩ ≠ 0) :
-    s * ∏ k, y ⟨k, c k⟩ ^ (-δ k) ∈ chartRingOver F y c := by
+theorem mem_chart_of_mem_secOver
+    {K : Type} [Fintype K]
+    {ι : K → Type} {y : (Σ k, ι k) → Ω} {δ : K → ℤ} {s : Ω}
+    (hs : s ∈ secOver F y δ) (c : ∀ k, ι k) (hc : ∀ k, y ⟨k, c k⟩ ≠ 0)
+    : s * ∏ k, y ⟨k, c k⟩ ^ (-δ k) ∈ chartRingOver F y c := by
   simp only [secOver, Submodule.mem_iInf, Submodule.mem_comap, LinearMap.mulRight_apply] at hs
   exact hs c hc
 
-theorem prod_twist {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} (y : (Σ k, ι k) → Ω)
-    (c : ∀ k, ι k) (hc : ∀ k, y ⟨k, c k⟩ ≠ 0) (β : K → ℤ) (k₀ : K) (m : ℕ) :
-    ∏ k, y ⟨k, c k⟩ ^ (-(β + (m : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀) k) =
-      (∏ k, y ⟨k, c k⟩ ^ (-β k)) * (y ⟨k₀, c k₀⟩ ^ m)⁻¹ := by
-  have h1 : ∀ k, y ⟨k, c k⟩ ^ (-(β + (m : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀) k) =
-      y ⟨k, c k⟩ ^ (-β k) * y ⟨k, c k⟩ ^ (-((m : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀) k) := by
+theorem prod_twist
+    {K : Type} [Fintype K] [DecidableEq K]
+    {ι : K → Type} (y : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (hc : ∀ k, y ⟨k, c k⟩ ≠ 0)
+    (β : K → ℤ) (k₀ : K) (m : ℕ)
+    : ∏ k, y ⟨k, c k⟩ ^ (-(β + (m : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀) k)
+      = (∏ k, y ⟨k, c k⟩ ^ (-β k)) * (y ⟨k₀, c k₀⟩ ^ m)⁻¹ := by
+  have h1
+      : ∀ k,
+        y ⟨k, c k⟩ ^ (- (β + (m : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀) k)
+          = y ⟨k, c k⟩ ^ (- β k)
+            * y ⟨k, c k⟩ ^ (- ((m : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀) k) := by
     intro k
     rw [← zpow_add₀ (hc k)]
     congr 1
@@ -84,9 +93,11 @@ theorem prod_twist {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} (y :
   · intro h
     exact absurd (Finset.mem_univ k₀) h
 
-theorem exists_not_mem {A : Subalgebra F Ω} (p : Ideal A) [hp : p.IsPrime] {n : ℕ} (t : Fin n → Ω)
-    (ht : ∀ j, t j ∈ A) (u : Fin n → Ω) (hu : ∀ j, u j ∈ A) (hsum : ∑ j, u j * t j = 1) :
-    ∃ j, (⟨t j, ht j⟩ : A) ∉ p := by
+theorem exists_not_mem
+    {A : Subalgebra F Ω} (p : Ideal A) [hp : p.IsPrime]
+    {n : ℕ} (t : Fin n → Ω) (ht : ∀ j, t j ∈ A) (u : Fin n → Ω) (hu : ∀ j, u j ∈ A)
+    (hsum : ∑ j, u j * t j = 1)
+    : ∃ j, (⟨t j, ht j⟩ : A) ∉ p := by
   by_contra hcon
   simp only [not_exists, not_not] at hcon
   have hmem : (∑ j, (⟨u j, hu j⟩ : A) * ⟨t j, ht j⟩) ∈ p :=
@@ -97,21 +108,28 @@ theorem exists_not_mem {A : Subalgebra F Ω} (p : Ideal A) [hp : p.IsPrime] {n :
     exact hsum
   exact hp.ne_top ((Ideal.eq_top_iff_one _).mpr (h1 ▸ hmem))
 
-theorem gen_of_gen {N : ℕ} {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type}
-    {y : (Σ k, ι k) → Ω} {k₀ : K} {e : ι k₀ ≃ Fin (N + 1)}
-    {K' : Type} [Fintype K'] [DecidableEq K'] {ι' : K' → Type}
-    {y' : (Σ k, ι' k) → Ω} {k₀' : K'} {e' : ι' k₀' ≃ Fin (N + 1)}
-    (hpts : IndefiniteRowSideFullHecke.Kleiman2.modelPts F y' ⊆ IndefiniteRowSideFullHecke.Kleiman2.modelPts F y)
-    (hx : IndefiniteRowSideFullHecke.Kleiman2.blockVec y k₀ ∘ e.symm = IndefiniteRowSideFullHecke.Kleiman2.blockVec y' k₀' ∘ e'.symm)
-    {β : K → ℤ} {β' : K' → ℤ} (m : ℕ)
-    (hs : secOver F y' (β' + (m : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀') ≤
-      secOver F y (β + (m : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀))
-    (hgen' : IndefiniteRowSideFullHecke.Kleiman2.IsGenerated F y' (β' + (m : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀'))
-    {n : ℕ} {h : Fin n → Ω} (hh : ∀ j, h j ∈ secOver F y β) (hh' : ∀ j, h j ∈ secOver F y' β')
-    (hg : GeneratesOver F y β h) : GeneratesOver F y' β' h := by
+theorem gen_of_gen
+    {N : ℕ} {K : Type} [Fintype K] [DecidableEq K]
+    {ι : K → Type} {y : (Σ k, ι k) → Ω} {k₀ : K} {e : ι k₀ ≃ Fin (N + 1)} {K' : Type}
+    [Fintype K'] [DecidableEq K']
+    {ι' : K' → Type} {y' : (Σ k, ι' k) → Ω} {k₀' : K'} {e' : ι' k₀' ≃ Fin (N + 1)}
+    (hpts : IndefiniteRowSideFullHecke.Kleiman2.modelPts F y'
+      ⊆ IndefiniteRowSideFullHecke.Kleiman2.modelPts F y)
+    (hx : IndefiniteRowSideFullHecke.Kleiman2.blockVec y k₀ ∘ e.symm
+      = IndefiniteRowSideFullHecke.Kleiman2.blockVec y' k₀' ∘ e'.symm)
+    {β : K → ℤ} {β' : K' → ℤ}
+    (m : ℕ)
+    (hs : secOver F y' (β' + (m : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀')
+      ≤ secOver F y (β + (m : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀))
+    (hgen' : IndefiniteRowSideFullHecke.Kleiman2.IsGenerated F y'
+      (β' + (m : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀'))
+    {n : ℕ} {h : Fin n → Ω}
+    (hh : ∀ j, h j ∈ secOver F y β) (hh' : ∀ j, h j ∈ secOver F y' β') (hg : GeneratesOver F y β h)
+    : GeneratesOver F y' β' h := by
   intro c' hc'
   set g' := ∏ k, y' ⟨k, c' k⟩ ^ (-β' k) with hg'def
-  have ht : ∀ j, h j * g' ∈ chartRingOver F y' c' := fun j => mem_chart_of_mem_secOver (hh' j) c' hc'
+  have ht : ∀ j, h j * g' ∈ chartRingOver F y' c' := fun j =>
+    mem_chart_of_mem_secOver (hh' j) c' hc'
   let t : Fin n → chartRingOver F y' c' := fun j => ⟨h j * g', ht j⟩
   by_cases htop : Ideal.span (Set.range t) = ⊤
   · obtain ⟨u, hu⟩ := (Ideal.mem_span_range_iff_exists_fun).mp ((Ideal.eq_top_iff_one _).mp htop)
@@ -157,9 +175,10 @@ theorem gen_of_gen {N : ℕ} {K : Type} [Fintype K] [DecidableEq K] {ι : K → 
   have hsl : sv l ≠ 0 := fun h0 => hlne (by simp [h0])
 
   have hmemp : t j ∈ p' := hle (Ideal.subset_span ⟨j, rfl⟩)
-  have hkey : (h j * g')⁻¹ =
-      (h j * g)⁻¹ * (sv l * (g * (y ⟨k₀, c k₀⟩ ^ m)⁻¹)) *
-        (sv l * (g' * (y' ⟨k₀', c' k₀'⟩ ^ m)⁻¹))⁻¹ * (y ⟨k₀, c k₀⟩ / y' ⟨k₀', c' k₀'⟩) ^ m := by
+  have hkey
+      : (h j * g')⁻¹
+        = (h j * g)⁻¹ * (sv l * (g * (y ⟨k₀, c k₀⟩ ^ m)⁻¹))
+          * (sv l * (g' * (y' ⟨k₀', c' k₀'⟩ ^ m)⁻¹))⁻¹ * (y ⟨k₀, c k₀⟩ / y' ⟨k₀', c' k₀'⟩) ^ m := by
     rw [div_pow]
     field_simp
   apply inv_not_mem_locIn _ p' (t j) hmemp (mul_ne_zero hhj hg'ne)
@@ -172,7 +191,6 @@ theorem gen_of_gen {N : ℕ} {K : Type} [Fintype K] [DecidableEq K] {ι : K → 
   · exact mem_locIn _ p' ⟨_, hratio⟩
 
 end ModelChangeGen
-
 
 open ModelChangeGen in
 theorem ModelChangeGen.proof (hT : ModelTwistGenerated.Statement) : ModelChangeGen.Statement := by

@@ -33,48 +33,52 @@ theorem isOpen_strip (c : Fin (e + 1) → ℂ) (ρ : ℝ) : IsOpen (strip c ρ) 
   have h1 : IsOpen {u : Fin (e + 1) → ℂ | (u 0).re < Real.log ρ} :=
     isOpen_lt (continuous_re.comp (continuous_apply 0)) continuous_const
   have h2 : IsOpen {u : Fin (e + 1) → ℂ | ∀ i, i ≠ 0 → dist (u i) (c i) < ρ} := by
-    have : {u : Fin (e + 1) → ℂ | ∀ i, i ≠ 0 → dist (u i) (c i) < ρ} =
-        ⋂ i ∈ ({0}ᶜ : Finset (Fin (e + 1))), {u | dist (u i) (c i) < ρ} := by
+    have : {u : Fin (e + 1) → ℂ | ∀ i, i ≠ 0 → dist (u i) (c i) < ρ}
+        = ⋂ i ∈ ({0}ᶜ : Finset (Fin (e + 1))), {u | dist (u i) (c i) < ρ} := by
       ext u; simp
     rw [this]
     exact isOpen_biInter_finset fun i _ =>
       isOpen_lt ((continuous_apply i).dist continuous_const) continuous_const
   exact h1.inter h2
 
-theorem base_mem_strip (c : Fin (e + 1) → ℂ) {ρ : ℝ} (hρ : 0 < ρ) :
-    Function.update c 0 ((Real.log ρ - 1 : ℝ) : ℂ) ∈ strip c ρ := by
+theorem base_mem_strip (c : Fin (e + 1) → ℂ) {ρ : ℝ} (hρ : 0 < ρ)
+    : Function.update c 0 ((Real.log ρ - 1 : ℝ) : ℂ) ∈ strip c ρ := by
   refine ⟨by simp, fun i hi => ?_⟩
   simp [Function.update_of_ne hi, hρ]
 
-instance simplyConnected_strip (c : Fin (e + 1) → ℂ) (ρ : ℝ) [Fact (0 < ρ)] :
-    SimplyConnectedSpace (strip c ρ) := by
+instance simplyConnected_strip (c : Fin (e + 1) → ℂ) (ρ : ℝ) [Fact (0 < ρ)]
+    : SimplyConnectedSpace (strip c ρ) := by
   have := (convex_strip c ρ).contractibleSpace ⟨_, base_mem_strip c (Fact.out : 0 < ρ)⟩
   infer_instance
 
-instance locPathConnected_strip (c : Fin (e + 1) → ℂ) (ρ : ℝ) :
-    LocallyPathConnectedSpace (strip c ρ) :=
+instance locPathConnected_strip (c : Fin (e + 1) → ℂ) (ρ : ℝ)
+    : LocallyPathConnectedSpace (strip c ρ) :=
   (isOpen_strip c ρ).locallyPathConnectedSpace
 
-def shift (c : Fin (e + 1) → ℂ) (ρ : ℝ) (k : ℤ) (u : strip c ρ) : strip c ρ :=
-  ⟨Function.update u.1 0 (u.1 0 + k * (2 * π * I)), by
+def shift (c : Fin (e + 1) → ℂ) (ρ : ℝ) (k : ℤ) (u : strip c ρ) : strip c ρ := ⟨
+  Function.update u.1 0 (u.1 0 + k * (2 * π * I)),
+  by
     refine ⟨by simpa using u.2.1, fun i hi => ?_⟩
     rw [Function.update_of_ne hi]
-    exact u.2.2 i hi⟩
+    exact u.2.2 i hi
+⟩
 
-theorem shift_val (c : Fin (e + 1) → ℂ) (ρ : ℝ) (k : ℤ) (u : strip c ρ) :
-    (shift c ρ k u).1 = Function.update u.1 0 (u.1 0 + k * (2 * π * I)) := rfl
+theorem shift_val (c : Fin (e + 1) → ℂ) (ρ : ℝ) (k : ℤ) (u : strip c ρ)
+    : (shift c ρ k u).1 = Function.update u.1 0 (u.1 0 + k * (2 * π * I)) :=
+  rfl
 
 theorem continuous_shift (c : Fin (e + 1) → ℂ) (ρ : ℝ) (k : ℤ) : Continuous (shift c ρ k) := by
   refine Continuous.subtype_mk ?_ _
   exact continuous_subtype_val.update 0
     (((continuous_apply 0).comp continuous_subtype_val).add continuous_const)
 
-theorem shift_shift (c : Fin (e + 1) → ℂ) (ρ : ℝ) (k l : ℤ) (u : strip c ρ) :
-    shift c ρ k (shift c ρ l u) = shift c ρ (k + l) u := by
+theorem shift_shift (c : Fin (e + 1) → ℂ) (ρ : ℝ) (k l : ℤ) (u : strip c ρ)
+    : shift c ρ k (shift c ρ l u) = shift c ρ (k + l) u := by
   apply Subtype.ext
   simp only [shift_val, Function.update_self, Function.update_idem]
   congr 1
-  push_cast; ring
+  push_cast
+  ring
 
 theorem shift_zero (c : Fin (e + 1) → ℂ) (ρ : ℝ) (u : strip c ρ) : shift c ρ 0 u = u := by
   apply Subtype.ext
@@ -82,38 +86,45 @@ theorem shift_zero (c : Fin (e + 1) → ℂ) (ρ : ℝ) (u : strip c ρ) : shift
 
 variable {c : Fin (e + 1) → ℂ} {r : ℝ}
 
-theorem expMap_mem (hc : c 0 = 0) {ρ : ℝ} (hρ : 0 < ρ) (hρr : ρ ≤ r) (u : strip c ρ) :
-    Function.update u.1 0 (exp (u.1 0)) ∈ Metric.ball c r ∩ {t : Fin (e + 1) → ℂ | t 0 ≠ 0} := by
+theorem expMap_mem (hc : c 0 = 0) {ρ : ℝ} (hρ : 0 < ρ) (hρr : ρ ≤ r) (u : strip c ρ)
+    : Function.update u.1 0 (exp (u.1 0)) ∈ Metric.ball c r ∩ {t : Fin (e + 1) → ℂ | t 0 ≠ 0} := by
   refine ⟨?_, by simp [exp_ne_zero]⟩
   rw [Metric.mem_ball, dist_pi_lt_iff (hρ.trans_le hρr)]
   intro i
   rcases eq_or_ne i 0 with rfl | hi
   · simp only [Function.update_self, hc, dist_zero_right, norm_exp]
-    calc Real.exp (u.1 0).re < Real.exp (Real.log ρ) := Real.exp_lt_exp.2 u.2.1
+    calc
+      Real.exp (u.1 0).re
+        < Real.exp (Real.log ρ) := Real.exp_lt_exp.2 u.2.1
       _ = ρ := Real.exp_log hρ
       _ ≤ r := hρr
   · rw [Function.update_of_ne hi]
     exact (u.2.2 i hi).trans_le hρr
 
-def expMap (hc : c 0 = 0) {ρ : ℝ} (hρ : 0 < ρ) (hρr : ρ ≤ r) :
-    C(strip c ρ, ↥(Metric.ball c r ∩ {t : Fin (e + 1) → ℂ | t 0 ≠ 0})) where
+def expMap (hc : c 0 = 0) {ρ : ℝ} (hρ : 0 < ρ) (hρr : ρ ≤ r)
+    : C(strip c ρ, ↥(Metric.ball c r ∩ {t : Fin (e + 1) → ℂ | t 0 ≠ 0})) where
   toFun u := ⟨Function.update u.1 0 (exp (u.1 0)), expMap_mem hc hρ hρr u⟩
   continuous_toFun := by
     refine Continuous.subtype_mk ?_ _
     exact continuous_subtype_val.update 0 (((continuous_apply 0).comp continuous_subtype_val).cexp)
 
-theorem expMap_val (hc : c 0 = 0) {ρ : ℝ} (hρ : 0 < ρ) (hρr : ρ ≤ r) (u : strip c ρ) :
-    ((expMap hc hρ hρr u : _) : Fin (e + 1) → ℂ) = Function.update u.1 0 (exp (u.1 0)) := rfl
+theorem expMap_val (hc : c 0 = 0) {ρ : ℝ} (hρ : 0 < ρ) (hρr : ρ ≤ r) (u : strip c ρ)
+    : ((expMap hc hρ hρr u : _) : Fin (e + 1) → ℂ) = Function.update u.1 0 (exp (u.1 0)) :=
+  rfl
 
-theorem expMap_shift (hc : c 0 = 0) {ρ : ℝ} (hρ : 0 < ρ) (hρr : ρ ≤ r) (k : ℤ) (u : strip c ρ) :
-    expMap hc hρ hρr (shift c ρ k u) = expMap hc hρ hρr u := by
+theorem expMap_shift (hc : c 0 = 0) {ρ : ℝ} (hρ : 0 < ρ) (hρr : ρ ≤ r) (k : ℤ) (u : strip c ρ)
+    : expMap hc hρ hρr (shift c ρ k u) = expMap hc hρ hρr u := by
   apply Subtype.ext
   rw [expMap_val, expMap_val, shift_val]
   simp only [Function.update_self, Function.update_idem, exp_add, exp_int_mul_two_pi_mul_I, mul_one]
 
-theorem mem_strip_of_exp (hc : c 0 = 0) {ρ : ℝ} (hρ0 : 0 < ρ) (hρ1 : ρ ≤ 1) {t : Fin (e + 1) → ℂ}
-    (ht : t ∈ Metric.ball c ρ) {w : ℂ} (hw : exp w = t 0) {k : ℕ} (hk : 1 ≤ k) :
-    Function.update t 0 (k * w) ∈ strip c ρ := by
+theorem mem_strip_of_exp
+    (hc : c 0 = 0)
+    {ρ : ℝ} (hρ0 : 0 < ρ) (hρ1 : ρ ≤ 1)
+    {t : Fin (e + 1) → ℂ} (ht : t ∈ Metric.ball c ρ)
+    {w : ℂ} (hw : exp w = t 0)
+    {k : ℕ} (hk : 1 ≤ k)
+    : Function.update t 0 (k * w) ∈ strip c ρ := by
   have ht0 : t 0 ≠ 0 := hw ▸ exp_ne_zero w
   have hnorm : ‖t 0‖ < ρ := by
     have := (dist_le_pi_dist t c 0).trans_lt ht
@@ -130,7 +141,6 @@ theorem mem_strip_of_exp (hc : c 0 = 0) {ρ : ℝ} (hρ0 : 0 < ρ) (hρ1 : ρ �
 
 end FiniteCoverPuncturedPolydisc
 
-
 open FiniteCoverPuncturedPolydisc in
 theorem FiniteCoverPuncturedPolydisc.proof : FiniteCoverPuncturedPolydisc.Statement := by
   intro e N c r Y _ p hr hc hcov hfib
@@ -141,12 +151,12 @@ theorem FiniteCoverPuncturedPolydisc.proof : FiniteCoverPuncturedPolydisc.Statem
   let E := expMap hc hρ0 hρr
   let u₀ : strip c ρ := ⟨_, base_mem_strip c hρ0⟩
 
-  have hlift : ∀ (a : strip c ρ) (y : Y), p y = E a →
-      ∃ G : C(strip c ρ, Y), G a = y ∧ p ∘ G = E :=
+  have hlift : ∀ (a : strip c ρ) (y : Y), p y = E a → ∃ G : C(strip c ρ, Y), G a = y ∧ p ∘ G = E :=
     fun a y h => (hcov.existsUnique_continuousMap_lifts E a y h).exists
   have huniq : ∀ G₁ G₂ : C(strip c ρ, Y), p ∘ G₁ = E → p ∘ G₂ = E → ∀ a, G₁ a = G₂ a → G₁ = G₂ :=
-    fun G₁ G₂ h1 h2 a ha => ContinuousMap.ext
-      (congrFun (hcov.eq_of_comp_eq G₁.continuous G₂.continuous (h1.trans h2.symm) a ha))
+    fun G₁ G₂ h1 h2 a ha =>
+      ContinuousMap.ext (congrFun (hcov.eq_of_comp_eq G₁.continuous G₂.continuous (h1.trans h2.symm)
+        a ha))
 
   let F : Set Y := p ⁻¹' {E u₀}
   have hFfin : F.Finite := Set.finite_of_encard_eq_coe (hfib (E u₀))
@@ -184,8 +194,9 @@ theorem FiniteCoverPuncturedPolydisc.proof : FiniteCoverPuncturedPolydisc.Statem
   let s : F → F := fun y => ⟨_, hs_mem y⟩
   have hLs : ∀ y : F, ∀ a, L y (shift c ρ 1 a) = L (s y) a := by
     intro y a
-    have := huniq ((L y).comp ⟨shift c ρ 1, continuous_shift c ρ 1⟩) (L (s y))
-      (by funext a; simp [hLp', hEshift]) (hLp _) u₀ (by rw [hL0]; rfl)
+    have :=
+      huniq ((L y).comp ⟨shift c ρ 1, continuous_shift c ρ 1⟩) (L (s y))
+        (by funext a; simp [hLp', hEshift]) (hLp _) u₀ (by rw [hL0]; rfl)
     exact DFunLike.congr_fun this a
   have hs_inj : Function.Injective s := by
     intro y y' h
@@ -208,7 +219,7 @@ theorem FiniteCoverPuncturedPolydisc.proof : FiniteCoverPuncturedPolydisc.Statem
       intro y a
       have hy : y = s (σ⁻¹ y) := by rw [← hσ]; simp
       conv_lhs => rw [hy]
-      rw [← hLs, shift_shift, show (1 : ℤ) + (-↑k - 1) = -↑k by ring, ih, zpow_sub_one,
+      rw [← hLs, shift_shift, show (1 : ℤ) + (- ↑k - 1) = - ↑k by ring, ih, zpow_sub_one,
         Equiv.Perm.mul_apply]
 
   let Q := MulAction.orbitRel.Quotient (Subgroup.zpowers σ) F
@@ -249,23 +260,27 @@ theorem FiniteCoverPuncturedPolydisc.proof : FiniteCoverPuncturedPolydisc.Statem
     rw [← hcardF]
     have h1 : ∑ b, ord b = ∑ q : Q, Function.minimalPeriod (σ • ·) q.out :=
       Equiv.sum_comp eQ (fun q => Function.minimalPeriod (σ • ·) q.out)
-    have h2 : ∀ q : Q, Function.minimalPeriod (σ • ·) q.out =
-        Nat.card (MulAction.orbit (Subgroup.zpowers σ) q.out) := by
+    have h2
+        : ∀ q : Q,
+          Function.minimalPeriod (σ • ·) q.out
+            = Nat.card (MulAction.orbit (Subgroup.zpowers σ) q.out) := by
       intro q
       rw [MulAction.minimalPeriod_eq_card, Nat.card_eq_fintype_card]
     rw [h1, Finset.sum_congr rfl (fun q _ => h2 q),
       Nat.card_congr (MulAction.selfEquivSigmaOrbits (Subgroup.zpowers σ) F), Nat.card_sigma]
 
-  have hpt : ∀ b (t : ↥(Metric.ball c ρ ∩ {t : Fin (e + 1) → ℂ | t 0 ≠ 0})) (w : ℂ), exp w = t.1 0 →
-      Function.update t.1 0 (ord b * w) ∈ strip c ρ :=
-    fun b t w hw => mem_strip_of_exp hc hρ0 hρ1 t.2.1 hw (hord b)
-  let ψ : Fin m → ↥(Metric.ball c ρ ∩ {t : Fin (e + 1) → ℂ | t 0 ≠ 0}) → Y :=
-    fun b t => L (rep b) ⟨_, hpt b t (log (t.1 0)) (exp_log t.2.2)⟩
+  have hpt
+      : ∀ b (t : ↥(Metric.ball c ρ ∩ {t : Fin (e + 1) → ℂ | t 0 ≠ 0})) (w : ℂ),
+        exp w = t.1 0 → Function.update t.1 0 (ord b * w) ∈ strip c ρ := fun b t w hw =>
+    mem_strip_of_exp hc hρ0 hρ1 t.2.1 hw (hord b)
+  let ψ : Fin m → ↥(Metric.ball c ρ ∩ {t : Fin (e + 1) → ℂ | t 0 ≠ 0}) → Y := fun b t =>
+    L (rep b) ⟨_, hpt b t (log (t.1 0)) (exp_log t.2.2)⟩
   have hψw : ∀ b t w (hw : exp w = t.1 0), ψ b t = L (rep b) ⟨_, hpt b t w hw⟩ := by
     intro b t w hw
     obtain ⟨n, hn⟩ := exp_eq_exp_iff_exists_int.1 (hw.trans (exp_log t.2.2).symm)
-    have hsh : (⟨_, hpt b t w hw⟩ : strip c ρ) =
-        shift c ρ (ord b * n) ⟨_, hpt b t (log (t.1 0)) (exp_log t.2.2)⟩ := by
+    have hsh
+        : (⟨_, hpt b t w hw⟩ : strip c ρ)
+          = shift c ρ (ord b * n) ⟨_, hpt b t (log (t.1 0)) (exp_log t.2.2)⟩ := by
       apply Subtype.ext
       simp only [shift_val, Function.update_self, Function.update_idem, hn]
       congr 1
@@ -277,8 +292,9 @@ theorem FiniteCoverPuncturedPolydisc.proof : FiniteCoverPuncturedPolydisc.Statem
     rw [continuous_iff_continuousAt]
     intro t₁
     have hz : t₁.1 0 ≠ 0 := t₁.2.2
-    have hw : ∀ t : ↥(Metric.ball c ρ ∩ {t : Fin (e + 1) → ℂ | t 0 ≠ 0}),
-        exp (log (t₁.1 0) + log (t.1 0 / t₁.1 0)) = t.1 0 := by
+    have hw
+        : ∀ t : ↥(Metric.ball c ρ ∩ {t : Fin (e + 1) → ℂ | t 0 ≠ 0}),
+          exp (log (t₁.1 0) + log (t.1 0 / t₁.1 0)) = t.1 0 := by
       intro t
       rw [exp_add, exp_log hz, exp_log (div_ne_zero t.2.2 hz)]
       field_simp
@@ -297,8 +313,9 @@ theorem FiniteCoverPuncturedPolydisc.proof : FiniteCoverPuncturedPolydisc.Statem
     show ((p (L (rep b) _) : Fin (e + 1) → ℂ)) = _
     rw [hLp', expMap_val]
     simp only [Function.update_self, Function.update_idem, exp_nat_mul, exp_log t.2.2]
-  have hrest : ∀ b b' t t', ψ b t = ψ b' t' → (∀ i, i ≠ 0 → t.1 i = t'.1 i) ∧
-      t.1 0 ^ ord b = t'.1 0 ^ ord b' := by
+  have hrest
+      : ∀ b b' t t',
+        ψ b t = ψ b' t' → (∀ i, i ≠ 0 → t.1 i = t'.1 i) ∧ t.1 0 ^ ord b = t'.1 0 ^ ord b' := by
     intro b b' t t' h
     have hp := congrArg (fun y => ((p y : Fin (e + 1) → ℂ))) h
     simp only [hpψ] at hp
@@ -306,17 +323,21 @@ theorem FiniteCoverPuncturedPolydisc.proof : FiniteCoverPuncturedPolydisc.Statem
     have := congrFun hp i
     simpa [Function.update_of_ne hi] using this
 
-  have hmeet : ∀ b b' t t', ψ b t = ψ b' t' → ∃ n : ℤ,
-      (ord b' : ℂ) * log (t'.1 0) = ord b * log (t.1 0) + n * (2 * π * I) ∧
-      rep b = (σ ^ n) (rep b') := by
+  have hmeet
+      : ∀ b b' t t',
+        ψ b t = ψ b' t'
+          → ∃ n : ℤ,
+            (ord b' : ℂ) * log (t'.1 0) = ord b * log (t.1 0) + n * (2 * π * I)
+              ∧ rep b = (σ ^ n) (rep b') := by
     intro b b' t t' h
     obtain ⟨hr', h0⟩ := hrest b b' t t' h
     have hexp : exp (ord b' * log (t'.1 0)) = exp (ord b * log (t.1 0)) := by
       rw [exp_nat_mul, exp_nat_mul, exp_log t.2.2, exp_log t'.2.2, h0]
     obtain ⟨n, hn⟩ := exp_eq_exp_iff_exists_int.1 hexp
     refine ⟨n, hn, ?_⟩
-    have hsh : (⟨_, hpt b' t' (log (t'.1 0)) (exp_log t'.2.2)⟩ : strip c ρ) =
-        shift c ρ n ⟨_, hpt b t (log (t.1 0)) (exp_log t.2.2)⟩ := by
+    have hsh
+        : (⟨_, hpt b' t' (log (t'.1 0)) (exp_log t'.2.2)⟩ : strip c ρ)
+          = shift c ρ n ⟨_, hpt b t (log (t.1 0)) (exp_log t.2.2)⟩ := by
       apply Subtype.ext
       funext i
       rcases eq_or_ne i 0 with rfl | hi
@@ -397,7 +418,9 @@ theorem FiniteCoverPuncturedPolydisc.proof : FiniteCoverPuncturedPolydisc.Statem
           by_contra hcon
           replace hcon := not_lt.1 hcon
           nlinarith [mul_le_mul_of_nonpos_right hmN' hlogρ, mul_le_mul_of_nonneg_left hcon hmpos.le]
-        calc Real.exp w.re < Real.exp (Real.log ρ) := Real.exp_lt_exp.2 hlt
+        calc
+          Real.exp w.re
+            < Real.exp (Real.log ρ) := Real.exp_lt_exp.2 hlt
           _ = ρ := Real.exp_log hρ0
       · simp only [t, Function.update_of_ne hi]
         exact ((dist_le_pi_dist _ c i).trans_lt hy).trans_le hρN

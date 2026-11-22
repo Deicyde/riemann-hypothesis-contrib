@@ -13,7 +13,8 @@ open scoped TensorProduct Matrix
 
 namespace Formalism.L2.SG.Pf.RedExists0Pf
 
-open Formalism.MainNotions.S Formalism.L2.SG.Pf.RowDictPf PIW.AdelClassFin Formalism.L2.SG.Pf.RedBasicsPf
+open Formalism.MainNotions.S Formalism.L2.SG.Pf.RowDictPf PIW.AdelClassFin
+  Formalism.L2.SG.Pf.RedBasicsPf
 
 theorem reduction_exists : Formalism.L2.SG.Pf.RowDictPf.RedExists0 := by
   intro I w p hp hcard m hm x hx
@@ -27,24 +28,33 @@ theorem reduction_exists : Formalism.L2.SG.Pf.RowDictPf.RedExists0 := by
   choose c' hc' using fun i => coords I w hp hcard hb ((hxi' _).1 (DictLat.iv_mem I (hb.1 i)))
   let M : Matrix (Fin I.n) (Fin I.n) (ZMod p) := Matrix.of fun j i => ((c i j : ℤ) : ZMod p)
   let N : Matrix (Fin I.n) (Fin I.n) (ZMod p) := Matrix.of fun k j => ((c' j k : ℤ) : ZMod p)
-  have hzs : ∀ (z : ℤ) {v : Fin I.n → I.E ⊗[I.F] Af I.F}, v ∈ lamAf (F := I.F) (wLat0 I w) →
-      (z : I.E ⊗[I.F] Af I.F) • v ∈ lamAf (F := I.F) (wLat0 I w) := fun z v hv => by
+  have hzs
+      : ∀ (z : ℤ) {v : Fin I.n → I.E ⊗[I.F] Af I.F},
+        v ∈ lamAf (F := I.F) (wLat0 I w)
+          → (z : I.E ⊗[I.F] Af I.F) • v ∈ lamAf (F := I.F) (wLat0 I w) := fun z v hv => by
     rw [Int.cast_smul_eq_zsmul]; exact zsmul_mem hv z
   have hdiv : ∀ i k, (p : ℤ) ∣ (1 : Matrix (Fin I.n) (Fin I.n) ℤ) i k - ∑ j, c i j * c' j k := by
     intro i
-    have hW : iv I (b i) - ∑ j, (c i j : I.E ⊗[I.F] Af I.F) •
-        ∑ k, (c' j k : I.E ⊗[I.F] Af I.F) • iv I (b k) ∈ lamAf (F := I.F) (wLat0 I w) := by
+    have hW
+        : iv I (b i)
+            - ∑ j, (c i j : I.E ⊗[I.F] Af I.F) •
+              ∑ k, (c' j k : I.E ⊗[I.F] Af I.F) • iv I (b k)
+          ∈ lamAf (F := I.F) (wLat0 I w) := by
       have h1 := stab_w I w hxi (hc i)
-      have h2 : ∑ j, (c i j : I.E ⊗[I.F] Af I.F) • (I.fmat x⁻¹ *ᵥ iv I (b j) -
-          ∑ k, (c' j k : I.E ⊗[I.F] Af I.F) • iv I (b k)) ∈ lamAf (F := I.F) (wLat0 I w) :=
+      have h2
+          : ∑ j, (c i j : I.E ⊗[I.F] Af I.F) • (I.fmat x⁻¹ *ᵥ iv I (b j) -
+              ∑ k, (c' j k : I.E ⊗[I.F] Af I.F) • iv I (b k))
+            ∈ lamAf (F := I.F) (wLat0 I w) :=
         Submodule.sum_mem _ fun j _ => hzs _ (hc' j)
       have h3 := Submodule.add_mem _ h1 h2
       convert h3 using 1
-      rw [Matrix.mulVec_sub, Matrix.mulVec_mulVec, DictGen.fmat_inv_mul, Matrix.one_mulVec, Matrix.mulVec_sum]
+      rw [Matrix.mulVec_sub, Matrix.mulVec_mulVec, DictGen.fmat_inv_mul, Matrix.one_mulVec,
+        Matrix.mulVec_sum]
       simp only [Matrix.mulVec_smul, smul_sub, Finset.sum_sub_distrib]
       abel
-    have hW2 : iv I (b i - ∑ k, ((∑ j, c i j * c' j k : ℤ) : I.E) • b k) ∈
-        lamAf (F := I.F) (wLat0 I w) := by
+    have hW2
+        : iv I (b i - ∑ k, ((∑ j, c i j * c' j k : ℤ) : I.E) • b k)
+          ∈ lamAf (F := I.F) (wLat0 I w) := by
       rw [iv_lin]
       convert hW using 2
       simp only [Finset.smul_sum, smul_smul]
@@ -53,8 +63,9 @@ theorem reduction_exists : Formalism.L2.SG.Pf.RowDictPf.RedExists0 := by
       simp only [← Finset.sum_smul, Int.cast_sum, Int.cast_mul]
     have h4 := inter I w hW2
     intro k
-    have h5 : ∑ k, (((1 : Matrix (Fin I.n) (Fin I.n) ℤ) i k - ∑ j, c i j * c' j k : ℤ) : I.E) • b k ∈
-        wLat0 I w := by
+    have h5
+        : ∑ k, (((1 : Matrix (Fin I.n) (Fin I.n) ℤ) i k - ∑ j, c i j * c' j k : ℤ) : I.E) • b k
+          ∈ wLat0 I w := by
       convert h4 using 1
       simp only [Int.cast_sub, sub_smul, Finset.sum_sub_distrib]
       congr 1
@@ -67,8 +78,9 @@ theorem reduction_exists : Formalism.L2.SG.Pf.RowDictPf.RedExists0 := by
     push_cast at h
     rw [sub_eq_zero] at h
     simp only [N, M, Matrix.mul_apply, Matrix.of_apply]
-    have e : ∑ j, ((c' j k : ℤ) : ZMod p) * ((c i j : ℤ) : ZMod p) =
-        ∑ j, ((c i j : ℤ) : ZMod p) * ((c' j k : ℤ) : ZMod p) :=
+    have e
+        : ∑ j, ((c' j k : ℤ) : ZMod p) * ((c i j : ℤ) : ZMod p)
+          = ∑ j, ((c i j : ℤ) : ZMod p) * ((c' j k : ℤ) : ZMod p) :=
       Finset.sum_congr rfl fun j _ => mul_comm _ _
     rw [e, ← h]
     by_cases hik : i = k
@@ -78,8 +90,10 @@ theorem reduction_exists : Formalism.L2.SG.Pf.RowDictPf.RedExists0 := by
   refine ⟨⟨M, N, hMN, hNM⟩, b, hb, fun i => ?_⟩
   show I.fmat x *ᵥ iv I (b i) - ∑ j, ((((M j i).val : ℕ)) : I.E ⊗[I.F] Af I.F) • iv I (b j) ∈
     lamAf (F := I.F) (wLat0 I w)
-  have hS : (∑ j, ((((((c i j : ℤ) : ZMod p)).val : ℕ) : I.E ⊗[I.F] Af I.F) • iv I (b j) -
-      ((c i j : ℤ) : I.E ⊗[I.F] Af I.F) • iv I (b j))) ∈ lamAf (F := I.F) (wLat0 I w) :=
+  have hS
+      : (∑ j, ((((((c i j : ℤ) : ZMod p)).val : ℕ) : I.E ⊗[I.F] Af I.F) • iv I (b j) -
+          ((c i j : ℤ) : I.E ⊗[I.F] Af I.F) • iv I (b j)))
+        ∈ lamAf (F := I.F) (wLat0 I w) :=
     Submodule.sum_mem _ fun j _ => val_sub I w hp hcard (hb.1 j) (c i j)
   have key := Submodule.sub_mem _ (hc i) hS
   convert key using 1

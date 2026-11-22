@@ -6,34 +6,34 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CurveDVRSpe
 
 set_option maxHeartbeats 1000000 in
 open IsLocalRing Filter Topology in
-theorem UpperTheory.V.Pr.linClosedOfAdic :
-    UpperTheory.V.Pr.LinClosedOfAdic := by
+theorem UpperTheory.V.Pr.linClosedOfAdic : UpperTheory.V.Pr.LinClosedOfAdic := by
   intro G A κ _ _ _ _ _ _ j hj n a ha f
   classical
-  let e : (Fin n × Fin n → A) → Matrix (Fin n) (Fin n) κ :=
-    fun y => Matrix.of fun s t => j (y (s, t))
-  let K : Submodule A (Fin n × Fin n → A) :=
-    { carrier := {y | f (e y) = 0}
-      add_mem' := by
-        intro x y hx hy
-        have h : e (x + y) = e x + e y := by
-          ext s t
-          simp [e]
-        simp only [Set.mem_setOf_eq] at hx hy ⊢
-        rw [h, map_add (f := _), hx, hy, add_zero]
-      zero_mem' := by
-        have h : e 0 = 0 := by
-          ext s t
-          simp [e]
-        simp only [Set.mem_setOf_eq]
-        rw [h, map_zero]
-      smul_mem' := by
-        intro r x hx
-        have h : e (r • x) = j r • e x := by
-          ext s t
-          simp [e]
-        simp only [Set.mem_setOf_eq] at hx ⊢
-        rw [h, map_smul, hx, smul_zero] }
+  let e : (Fin n × Fin n → A) → Matrix (Fin n) (Fin n) κ := fun y =>
+    Matrix.of fun s t => j (y (s, t))
+  let K : Submodule A (Fin n × Fin n → A) := {
+    carrier := {y | f (e y) = 0}
+    add_mem' := by
+      intro x y hx hy
+      have h : e (x + y) = e x + e y := by
+        ext s t
+        simp [e]
+      simp only [Set.mem_setOf_eq] at hx hy ⊢
+      rw [h, map_add (f := _), hx, hy, add_zero]
+    zero_mem' := by
+      have h : e 0 = 0 := by
+        ext s t
+        simp [e]
+      simp only [Set.mem_setOf_eq]
+      rw [h, map_zero]
+    smul_mem' := by
+      intro r x hx
+      have h : e (r • x) = j r • e x := by
+        ext s t
+        simp [e]
+      simp only [Set.mem_setOf_eq] at hx ⊢
+      rw [h, map_smul, hx, smul_zero]
+  }
   let y : G → (Fin n × Fin n → A) := fun g p => a g p.1 p.2
   have hy : ∀ g, (a g).map j = e (y g) := fun g => by
     ext s t
@@ -47,20 +47,24 @@ theorem UpperTheory.V.Pr.linClosedOfAdic :
     show f ((a g0).map j) = 0
     rw [hy]
     exact h
-  have hbot := Ideal.iInf_pow_smul_eq_bot_of_isLocalRing (R := A)
-    (M := (Fin n × Fin n → A) ⧸ K) (maximalIdeal A) (maximalIdeal.isMaximal A).ne_top
-  obtain ⟨N, hN⟩ : ∃ N : ℕ, K.mkQ (y g0) ∉
-      (maximalIdeal A ^ N • ⊤ : Submodule A ((Fin n × Fin n → A) ⧸ K)) := by
+  have hbot :=
+    Ideal.iInf_pow_smul_eq_bot_of_isLocalRing (R := A) (M := (Fin n × Fin n → A) ⧸ K)
+      (maximalIdeal A) (maximalIdeal.isMaximal A).ne_top
+  obtain ⟨N, hN⟩
+      : ∃ N : ℕ,
+        K.mkQ (y g0) ∉ (maximalIdeal A ^ N • ⊤ : Submodule A ((Fin n × Fin n → A) ⧸ K)) := by
     by_contra h
     push_neg at h
     apply hK
-    have hm : K.mkQ (y g0) ∈
-        (⨅ i : ℕ, maximalIdeal A ^ i • ⊤ : Submodule A ((Fin n × Fin n → A) ⧸ K)) :=
+    have hm
+        : K.mkQ (y g0)
+          ∈ (⨅ i : ℕ, maximalIdeal A ^ i • ⊤ : Submodule A ((Fin n × Fin n → A) ⧸ K)) :=
       Submodule.mem_iInf _ |>.mpr h
     rw [hbot] at hm
     exact (Submodule.mem_bot A).mp hm
-  let U : Set G := ⋂ p : Fin n × Fin n, {g | Ideal.Quotient.mk (maximalIdeal A ^ N) (a g p.1 p.2) =
-    Ideal.Quotient.mk (maximalIdeal A ^ N) (a g0 p.1 p.2)}
+  let U : Set G :=
+    ⋂ p : Fin n × Fin n, {g | Ideal.Quotient.mk (maximalIdeal A ^ N) (a g p.1 p.2) =
+      Ideal.Quotient.mk (maximalIdeal A ^ N) (a g0 p.1 p.2)}
   refine ⟨U, ?_, ?_, ?_⟩
   · intro g hg hgS
     apply hN
@@ -80,8 +84,9 @@ theorem UpperTheory.V.Pr.linClosedOfAdic :
       rw [Finset.sum_apply]
       simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul, Pi.single_apply, mul_ite, mul_one,
         mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
-    have hmem : K.mkQ (y g - y g0) ∈
-        (maximalIdeal A ^ N • ⊤ : Submodule A ((Fin n × Fin n → A) ⧸ K)) := by
+    have hmem
+        : K.mkQ (y g - y g0)
+          ∈ (maximalIdeal A ^ N • ⊤ : Submodule A ((Fin n × Fin n → A) ⧸ K)) := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [hsum, map_sum]
       refine Submodule.sum_mem _ fun p _ => ?_

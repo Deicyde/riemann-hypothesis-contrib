@@ -14,7 +14,10 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.E
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Out GlobalTheory.CechPic GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory GlobalTheory.ZH
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Out
+  GlobalTheory.CechPic GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory GlobalTheory.ZH
 open scoped CategoryTheory.Obj
 attribute [local instance] CategoryTheory.Over.cartesianMonoidalCategory
 
@@ -22,12 +25,14 @@ open TensorProduct
 
 namespace GlobalTheory.TangentCrit
 
-theorem formallyUnramified_of_dual_const_field {K A B : Type} [Field K] [IsAlgClosed K]
-    [CommRing A] [CommRing B] [Algebra K A] [Algebra K B] [Algebra A B] [IsScalarTower K A B]
-    [Algebra.FiniteType K B] [Algebra.FiniteType A B]
-    (H : ∀ φ : B →+* DualNumber K, (∀ c, φ (algebraMap K B c) = algebraMap K (DualNumber K) c) →
-      (∀ a, (φ (algebraMap A B a)).snd = 0) → ∀ b, (φ b).snd = 0) :
-    Algebra.FormallyUnramified A B := by
+theorem formallyUnramified_of_dual_const_field
+    {K A B : Type} [Field K] [IsAlgClosed K] [CommRing A] [CommRing B] [Algebra K A] [Algebra K B]
+    [Algebra A B] [IsScalarTower K A B] [Algebra.FiniteType K B] [Algebra.FiniteType A B]
+    (H : ∀ φ : B →+* DualNumber K,
+      (∀ c, φ (algebraMap K B c) = algebraMap K (DualNumber K) c)
+        → (∀ a, (φ (algebraMap A B a)).snd = 0)
+        → ∀ b, (φ b).snd = 0)
+    : Algebra.FormallyUnramified A B := by
   refine ⟨?_⟩
   by_contra hne
   rw [← Module.support_eq_empty_iff (R := B), ← ne_eq, ← Set.nonempty_iff_ne_empty] at hne
@@ -48,8 +53,7 @@ theorem formallyUnramified_of_dual_const_field {K A B : Type} [Field K] [IsAlgCl
   haveI : Module.Finite K m.ResidueField := finite_of_finite_type_of_isJacobsonRing K _
   let ev : m.ResidueField →ₐ[K] K := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   letI : Algebra m.ResidueField K := ev.toRingHom.toAlgebra
   letI : Algebra B K := (ev.toRingHom.comp (algebraMap B m.ResidueField)).toAlgebra

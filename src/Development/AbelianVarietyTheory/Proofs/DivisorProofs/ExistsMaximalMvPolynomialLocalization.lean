@@ -9,22 +9,25 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SpanFinra
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
 
 namespace GlobalTheory.DedekindDimFormula
 open ReciprocityTheory.CA
 
-theorem isMaximal_comap_C {o : Type} [CommRing o] [IsJacobsonRing o] (N : ℕ)
-    (𝔑 : Ideal (MvPolynomial (Fin N) o)) [𝔑.IsMaximal] :
-    (𝔑.comap (MvPolynomial.C : o →+* MvPolynomial (Fin N) o)).IsMaximal := by
+theorem isMaximal_comap_C
+    {o : Type} [CommRing o] [IsJacobsonRing o]
+    (N : ℕ) (𝔑 : Ideal (MvPolynomial (Fin N) o)) [𝔑.IsMaximal]
+    : (𝔑.comap (MvPolynomial.C : o →+* MvPolynomial (Fin N) o)).IsMaximal := by
   have hi := MvPolynomial.quotient_mk_comp_C_isIntegral_of_isJacobsonRing 𝔑
   letI := Ideal.Quotient.field 𝔑
-  have := Ideal.isMaximal_comap_of_isIntegral_of_isMaximal' _ hi
-    (⊥ : Ideal (MvPolynomial (Fin N) o ⧸ 𝔑))
+  have :=
+    Ideal.isMaximal_comap_of_isIntegral_of_isMaximal' _ hi (⊥ : Ideal (MvPolynomial (Fin N) o ⧸ 𝔑))
   rwa [← Ideal.comap_comap, ← RingHom.ker_eq_comap_bot, Ideal.mk_ker] at this
 
-theorem isCM_localization (o : Type) [CommRing o] [IsDomain o] [IsDedekindDomain o] :
-    ∃ δ : ℕ, ∀ (p : Ideal o) [p.IsMaximal],
+theorem isCM_localization (o : Type) [CommRing o] [IsDomain o] [IsDedekindDomain o]
+    : ∃ δ : ℕ, ∀ (p : Ideal o) [p.IsMaximal],
       IsCM (Localization.AtPrime p) ∧ ringKrullDim (Localization.AtPrime p) = δ := by
   by_cases hf : IsField o
   · refine ⟨0, fun p _ => ?_⟩
@@ -53,12 +56,16 @@ theorem isCM_localization (o : Type) [CommRing o] [IsDomain o] [IsDedekindDomain
       RingTheory.Sequence.isWeaklyRegular_singleton_iff]
     exact IsSMulRegular.of_ne_zero hϖ.ne_zero
 
-theorem exists_maximal_mvPolynomial_localization' {o : Type} [CommRing o] (N : ℕ) (p : Ideal o) [p.IsMaximal] (𝔑 : Ideal (MvPolynomial (Fin N) o)) [𝔑.IsMaximal]
-    (hc : 𝔑.comap (MvPolynomial.C : o →+* MvPolynomial (Fin N) o) = p) :
-    ∃ (𝔑' : Ideal (MvPolynomial (Fin N) (Localization.AtPrime p))) (_ : 𝔑'.IsMaximal),
-      𝔑'.comap (MvPolynomial.C : Localization.AtPrime p →+* _) =
-        IsLocalRing.maximalIdeal (Localization.AtPrime p) ∧
-      Nonempty (Localization.AtPrime 𝔑' ≃+* Localization.AtPrime 𝔑) ∧ 𝔑'.height = 𝔑.height := by
+theorem exists_maximal_mvPolynomial_localization'
+    {o : Type} [CommRing o]
+    (N : ℕ)
+    (p : Ideal o) [p.IsMaximal]
+    (𝔑 : Ideal (MvPolynomial (Fin N) o)) [𝔑.IsMaximal]
+    (hc : 𝔑.comap (MvPolynomial.C : o →+* MvPolynomial (Fin N) o) = p)
+    : ∃ (𝔑' : Ideal (MvPolynomial (Fin N) (Localization.AtPrime p))) (_ : 𝔑'.IsMaximal),
+      𝔑'.comap (MvPolynomial.C : Localization.AtPrime p →+* _)
+          = IsLocalRing.maximalIdeal (Localization.AtPrime p)
+        ∧ Nonempty (Localization.AtPrime 𝔑' ≃+* Localization.AtPrime 𝔑) ∧ 𝔑'.height = 𝔑.height := by
   classical
   letI : Algebra (MvPolynomial (Fin N) o) (MvPolynomial (Fin N) (Localization.AtPrime p)) :=
     MvPolynomial.algebraMvPolynomial
@@ -69,9 +76,13 @@ theorem exists_maximal_mvPolynomial_localization' {o : Type} [CommRing o] (N : �
     rw [Set.disjoint_left]
     rintro x ⟨m, hm, rfl⟩ hx
     exact hm (hc ▸ (show m ∈ 𝔑.comap MvPolynomial.C from hx))
-  let 𝔑' := 𝔑.map (algebraMap (MvPolynomial (Fin N) o) (MvPolynomial (Fin N) (Localization.AtPrime p)))
+  let 𝔑' :=
+    𝔑.map (algebraMap (MvPolynomial (Fin N) o) (MvPolynomial (Fin N) (Localization.AtPrime p)))
   haveI hP : 𝔑'.IsPrime := IsLocalization.isPrime_of_isPrime_disjoint W _ 𝔑 inferInstance hdisj
-  have hcm : 𝔑'.comap (algebraMap (MvPolynomial (Fin N) o) (MvPolynomial (Fin N) (Localization.AtPrime p))) = 𝔑 :=
+  have hcm
+      : 𝔑'.comap (algebraMap (MvPolynomial (Fin N) o)
+          (MvPolynomial (Fin N) (Localization.AtPrime p)))
+        = 𝔑 :=
     IsLocalization.under_map_of_isPrime_disjoint W _ inferInstance hdisj
   haveI hM : 𝔑'.IsMaximal := by
     refine ⟨⟨hP.ne_top, fun J hJ => ?_⟩⟩
@@ -97,8 +108,11 @@ theorem exists_maximal_mvPolynomial_localization' {o : Type} [CommRing o] (N : �
     rw [← Localization.AtPrime.map_eq_maximalIdeal, Ideal.map_le_iff_le_comap]
     intro x hx
     rw [Ideal.mem_comap, Ideal.mem_comap]
-    have e : (MvPolynomial.C (algebraMap o (Localization.AtPrime p) x) : MvPolynomial (Fin N) (Localization.AtPrime p)) =
-        algebraMap (MvPolynomial (Fin N) o) (MvPolynomial (Fin N) (Localization.AtPrime p)) (MvPolynomial.C x) := by
+    have e
+        : (MvPolynomial.C (algebraMap o (Localization.AtPrime p) x)
+            : MvPolynomial (Fin N) (Localization.AtPrime p))
+          = algebraMap (MvPolynomial (Fin N) o) (MvPolynomial (Fin N) (Localization.AtPrime p))
+            (MvPolynomial.C x) := by
       rw [MvPolynomial.algebraMap_def, MvPolynomial.map_C]
     rw [e]
     exact Ideal.mem_map_of_mem _ (by rw [← hc] at hx; exact hx)
@@ -111,11 +125,13 @@ theorem exists_maximal_mvPolynomial_localization' {o : Type} [CommRing o] (N : �
       have h0' : IsLocalization (𝔑'.comap (algebraMap (MvPolynomial (Fin N) o) (MvPolynomial (Fin N) (Localization.AtPrime p)))).primeCompl (Localization.AtPrime 𝔑') := h0
       rw [hsub] at h0'
       exact h0'
-    exact ⟨(IsLocalization.algEquiv 𝔑.primeCompl (Localization.AtPrime 𝔑') (Localization.AtPrime 𝔑)).toRingEquiv⟩
+    exact ⟨(IsLocalization.algEquiv 𝔑.primeCompl (Localization.AtPrime 𝔑')
+      (Localization.AtPrime 𝔑)).toRingEquiv⟩
 
-theorem polyEquidim : ∀ (o : Type) [CommRing o] [IsDomain o] [IsDedekindDomain o] [IsJacobsonRing o] (N : ℕ),
-    ∃ d : ℕ, ∀ (𝔑 : Ideal (MvPolynomial (Fin N) o)) [𝔑.IsMaximal],
-      IsCM (Localization.AtPrime 𝔑) ∧ 𝔑.height = (d : ℕ∞) := by
+theorem polyEquidim
+    : ∀ (o : Type) [CommRing o] [IsDomain o] [IsDedekindDomain o] [IsJacobsonRing o] (N : ℕ),
+      ∃ d : ℕ, ∀ (𝔑 : Ideal (MvPolynomial (Fin N) o)) [𝔑.IsMaximal],
+        IsCM (Localization.AtPrime 𝔑) ∧ 𝔑.height = (d : ℕ∞) := by
   intro o _ _ _ _ N
   obtain ⟨δ, hδ⟩ := isCM_localization o
   refine ⟨δ + N, fun 𝔑 _ => ?_⟩
@@ -134,11 +150,13 @@ end GlobalTheory.DedekindDimFormula
 
 namespace GlobalTheory.DedekindDimFormula
 
-theorem affine_heights (o A : Type) [CommRing o] [IsDomain o] [IsDedekindDomain o] [IsJacobsonRing o]
-    [CommRing A] [IsDomain A] [Algebra o A] [Algebra.FiniteType o A] :
-    ∃ h : ℕ, (∀ (M : Ideal A) [M.IsMaximal], M.height = (h : ℕ∞)) ∧
-      ∀ (P M : Ideal A) [P.IsPrime] [M.IsMaximal],
-        (M.height : WithBot ℕ∞) ≤ (P.height : WithBot ℕ∞) + ringKrullDim (A ⧸ P) := by
+theorem affine_heights
+    (o A : Type) [CommRing o] [IsDomain o] [IsDedekindDomain o] [IsJacobsonRing o] [CommRing A]
+    [IsDomain A] [Algebra o A] [Algebra.FiniteType o A]
+    : ∃ h : ℕ,
+      (∀ (M : Ideal A) [M.IsMaximal], M.height = (h : ℕ∞))
+        ∧ ∀ (P M : Ideal A) [P.IsPrime] [M.IsMaximal],
+          (M.height : WithBot ℕ∞) ≤ (P.height : WithBot ℕ∞) + ringKrullDim (A ⧸ P) := by
   obtain ⟨N, f, hf⟩ := Algebra.FiniteType.iff_quotient_mvPolynomial''.mp ‹Algebra.FiniteType o A›
   obtain ⟨d, hd⟩ := polyEquidim o N
   set Q := RingHom.ker (f : MvPolynomial (Fin N) o →+* A) with hQdef
@@ -168,7 +186,10 @@ theorem affine_heights (o A : Type) [CommRing o] [IsDomain o] [IsDedekindDomain 
     exact (WithTop.add_right_cancel (ENat.coe_ne_top k) this).symm
   · haveI : (P.comap e).IsPrime := Ideal.comap_isPrime _ _
     haveI : (M.comap e).IsMaximal := Ideal.comap_isMaximal_of_surjective _ e.surjective
-    have h := GlobalTheory.FinTypeIntCatenary.height_le_of_equidim d (fun 𝔑 _ => hd 𝔑) Q (P.comap e) (M.comap e)
+    have h :=
+      GlobalTheory.FinTypeIntCatenary.height_le_of_equidim d
+        (fun 𝔑 _ => hd 𝔑)
+        Q (P.comap e) (M.comap e)
     rw [RingEquiv.height_comap, RingEquiv.height_comap] at h
     have hdim : ringKrullDim ((MvPolynomial (Fin N) o ⧸ Q) ⧸ P.comap e) = ringKrullDim (A ⧸ P) :=
       ringKrullDim_eq_of_ringEquiv (Ideal.quotientEquiv _ _ e

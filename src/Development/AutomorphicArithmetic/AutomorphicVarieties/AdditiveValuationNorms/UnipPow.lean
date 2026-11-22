@@ -9,8 +9,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AdditiveVal
 
 open UpperTheory.V UpperTheory.V.PropA
 
-theorem UpperTheory.V.PropA.unipPow :
-    ∀ (l : ℕ) [Fact l.Prime] (X : Type) [AddCommGroup X] [Module ℤ_[l] X] (R : ℕ) (g : Module.End ℤ_[l] X), GenBy l R X → Unip g → InPow 1 ((g - 1) ^ R) := by
+theorem UpperTheory.V.PropA.unipPow
+    : ∀ (l : ℕ) [Fact l.Prime] (X : Type) [AddCommGroup X] [Module ℤ_[l] X] (R : ℕ)
+        (g : Module.End ℤ_[l] X),
+      GenBy l R X → Unip g → InPow 1 ((g - 1) ^ R) := by
   intro l _ X _ _ R g hgen hu
   obtain ⟨N, hN⟩ := hu
   let p : Submodule ℤ_[l] X := LinearMap.range ((l : ℤ_[l]) • (1 : Module.End ℤ_[l] X))
@@ -24,9 +26,11 @@ theorem UpperTheory.V.PropA.unipPow :
     rw [Submodule.mem_comap, map_smul]
     exact (memp _).mpr ⟨(g - 1) y, rfl⟩
   let F : Module.End ℤ_[l] (X ⧸ p) := p.mapQ p (g - 1) hp
-  have hFx : ∀ x : X, F (Submodule.Quotient.mk x) = Submodule.Quotient.mk ((g - 1) x) :=
-    fun x => Submodule.mapQ_apply _ _ _ x
-  have key : ∀ (k : ℕ) (x : X), (F ^ k) (Submodule.Quotient.mk x) = Submodule.Quotient.mk (((g - 1) ^ k) x) := by
+  have hFx : ∀ x : X, F (Submodule.Quotient.mk x) = Submodule.Quotient.mk ((g - 1) x) := fun x =>
+    Submodule.mapQ_apply _ _ _ x
+  have key
+      : ∀ (k : ℕ) (x : X),
+        (F ^ k) (Submodule.Quotient.mk x) = Submodule.Quotient.mk (((g - 1) ^ k) x) := by
     intro k
     induction k with
     | zero =>

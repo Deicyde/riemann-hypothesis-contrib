@@ -6,15 +6,15 @@ public import Mathlib
 
 namespace Bl.general_b_fact_third'''''
 
-theorem goal1 :
-  ∀ {E : Type} [inst : Field.{0} E] [NumberField.{0} E] {V : Type} [inst_2 : AddCommGroup.{0} V]
-  [inst_3 : Module.{0, 0} E V] [inst_4 : Module.{0, 0} (NumberField.RingOfIntegers.{0} E) V]
-  [IsScalarTower.{0, 0, 0} (NumberField.RingOfIntegers.{0} E) E V]
-  (Λ : Submodule.{0, 0} (NumberField.RingOfIntegers.{0} E) V),
-  Eq.{1} (Submodule.span.{0, 0} E (SetLike.coe.{0, 0} Λ)) Top.top.{0} →
-    ∀ (x : V),
-      Exists.{1} fun (d : NumberField.RingOfIntegers.{0} E) ↦
-        And (Ne.{1} d 0) (Membership.mem.{0, 0} Λ (HSMul.hSMul.{0, 0, 0} d x)) := by
+theorem goal1
+    : ∀ {E : Type} [inst : Field.{0} E] [NumberField.{0} E] {V : Type} [inst_2 : AddCommGroup.{0} V]
+        [inst_3 : Module.{0, 0} E V] [inst_4 : Module.{0, 0} (NumberField.RingOfIntegers.{0} E) V]
+        [IsScalarTower.{0, 0, 0} (NumberField.RingOfIntegers.{0} E) E V]
+        (Λ : Submodule.{0, 0} (NumberField.RingOfIntegers.{0} E) V),
+      Eq.{1} (Submodule.span.{0, 0} E (SetLike.coe.{0, 0} Λ)) Top.top.{0}
+        → ∀ (x : V),
+          Exists.{1} fun (d : NumberField.RingOfIntegers.{0} E) ↦
+            And (Ne.{1} d 0) (Membership.mem.{0, 0} Λ (HSMul.hSMul.{0, 0, 0} d x)) := by
   intro E _ _ V _ _ _ _ Λ hspan x
   have hx : x ∈ Submodule.span E (Λ : Set V) := by rw [hspan]; exact Submodule.mem_top
   induction hx using Submodule.span_induction with
@@ -31,11 +31,13 @@ theorem goal1 :
   | smul a y _ hy =>
     obtain ⟨d, hd, h⟩ := hy
     obtain ⟨z, hs⟩ := IsLocalization.surj (nonZeroDivisors (NumberField.RingOfIntegers E)) a
-    refine ⟨(z.2 : NumberField.RingOfIntegers E) * d, mul_ne_zero (nonZeroDivisors.ne_zero z.2.2) hd, ?_⟩
+    refine
+      ⟨(z.2 : NumberField.RingOfIntegers E) * d, mul_ne_zero (nonZeroDivisors.ne_zero z.2.2) hd, ?_⟩
     have key : (z.2 : NumberField.RingOfIntegers E) • (a • y) = z.1 • y := by
       rw [← algebraMap_smul E (z.2 : NumberField.RingOfIntegers E) (a • y), smul_smul,
-        mul_comm (algebraMap (NumberField.RingOfIntegers E) E (z.2 : NumberField.RingOfIntegers E)) a, hs,
-        algebraMap_smul]
+        mul_comm (algebraMap (NumberField.RingOfIntegers E) E (z.2 : NumberField.RingOfIntegers E))
+          a,
+        hs, algebraMap_smul]
     rw [mul_comm _ d, mul_smul, key, smul_smul, mul_comm d z.1, ← smul_smul]
     exact Λ.smul_mem z.1 h
 

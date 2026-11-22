@@ -8,11 +8,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open CategoryTheory AlgebraicGeometry TensorProduct
 open UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.Gal.crystallineComparison.congrRad_of :
-    CongrRad := by
+theorem UpperTheory.Gal.crystallineComparison.congrRad_of : CongrRad := by
   intro R _ 𝔞 h𝔞 ι N N' H B' _ g hg
-  have key : ∀ (a : ℕ) (m : ι →₀ ℕ),
-      AddMonoidAlgebra.coeff (N.coeff a) m - AddMonoidAlgebra.coeff (N'.coeff a) m ∈ 𝔞 := by
+  have key
+      : ∀ (a : ℕ) (m : ι →₀ ℕ),
+        AddMonoidAlgebra.coeff (N.coeff a) m - AddMonoidAlgebra.coeff (N'.coeff a) m ∈ 𝔞 := by
     intro a m
     rw [← h𝔞.radical, ← Ideal.sInf_minimalPrimes, Ideal.mem_sInf]
     intro 𝔭 h𝔭

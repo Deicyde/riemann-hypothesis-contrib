@@ -18,31 +18,40 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 variable {n : ℕ}
 
-private theorem contDiff_lead_casimir_coefficients (j : ℕ) :
-    ContDiff ℂ 1 (fun w : Matrix (Fin n) (Fin n) ℂ => lead j w) := by
+private theorem contDiff_lead_casimir_coefficients (j : ℕ)
+    : ContDiff ℂ 1 (fun w : Matrix (Fin n) (Fin n) ℂ => lead j w) := by
   by_cases h : j ≤ n
-  · have e : (fun w : Matrix (Fin n) (Fin n) ℂ => lead j w) =
-        fun w => (w.submatrix (Fin.castLE h) (Fin.castLE h)).det := funext fun w => dif_pos h
+  · have e
+        : (fun w : Matrix (Fin n) (Fin n) ℂ => lead j w)
+          = fun w => (w.submatrix (Fin.castLE h) (Fin.castLE h)).det :=
+      funext fun w => dif_pos h
     rw [e]
     simp only [Matrix.det_apply, Matrix.submatrix_apply, Units.smul_def, zsmul_eq_mul]
     refine ContDiff.sum fun σ _ => contDiff_const.mul ?_
     refine contDiff_prod fun p _ => ?_
-    exact contDiff_pi.1 (contDiff_pi.1 (contDiff_id (𝕜 := ℂ) (E := Matrix (Fin n) (Fin n) ℂ))
-      (Fin.castLE h (σ p))) (Fin.castLE h p)
-  · have e : (fun w : Matrix (Fin n) (Fin n) ℂ => lead j w) = fun _ => 0 := funext fun w => dif_neg h
+    exact contDiff_pi.1
+      (contDiff_pi.1 (contDiff_id (𝕜 := ℂ) (E := Matrix (Fin n) (Fin n) ℂ)) (Fin.castLE h (σ p)))
+      (Fin.castLE h p)
+  · have e : (fun w : Matrix (Fin n) (Fin n) ℂ => lead j w) = fun _ => 0 :=
+      funext fun w => dif_neg h
     rw [e]
     exact contDiff_const
 
-private theorem differentiableAt_PhiM_of_mem_OmegaSet (μ : Fin n → ℤ) {z : Matrix (Fin n) (Fin n) ℂ} (hz : z ∈ OmegaSet n) :
-    DifferentiableAt ℂ (PhiM μ) z := by
+private theorem differentiableAt_PhiM_of_mem_OmegaSet
+    (μ : Fin n → ℤ) {z : Matrix (Fin n) (Fin n) ℂ} (hz : z ∈ OmegaSet n)
+    : DifferentiableAt ℂ (PhiM μ) z := by
   have hz' : ∀ i : Fin n, lead ((i : ℕ) + 1) z ≠ 0 := hz
-  have key : ∀ i : Fin n, ContDiffAt ℂ 1
-      (fun w : Matrix (Fin n) (Fin n) ℂ => lead ((i : ℕ) + 1) w ^ (-(μ i - muNext μ i))) z := by
+  have key
+      : ∀ i : Fin n,
+        ContDiffAt ℂ 1
+          (fun w : Matrix (Fin n) (Fin n) ℂ => lead ((i : ℕ) + 1) w ^ (-(μ i - muNext μ i)))
+          z := by
     intro i
     have hd : ContDiffAt ℂ 1 (fun w : Matrix (Fin n) (Fin n) ℂ => lead ((i : ℕ) + 1) w) z :=
       (contDiff_lead_casimir_coefficients ((i : ℕ) + 1)).contDiffAt
-    have key' : ∀ k : ℤ,
-        ContDiffAt ℂ 1 (fun w : Matrix (Fin n) (Fin n) ℂ => lead ((i : ℕ) + 1) w ^ k) z := by
+    have key'
+        : ∀ k : ℤ,
+          ContDiffAt ℂ 1 (fun w : Matrix (Fin n) (Fin n) ℂ => lead ((i : ℕ) + 1) w ^ k) z := by
       intro k
       cases k with
       | ofNat p => simpa using hd.pow p
@@ -50,16 +59,24 @@ private theorem differentiableAt_PhiM_of_mem_OmegaSet (μ : Fin n → ℤ) {z : 
         simp only [zpow_negSucc]
         exact (hd.pow (p + 1)).inv (pow_ne_zero _ (hz' i))
     exact key' _
-  have hc : ContDiffAt ℂ 1 (fun w : Matrix (Fin n) (Fin n) ℂ =>
-      ∏ i : Fin n, lead ((i : ℕ) + 1) w ^ (-(μ i - muNext μ i))) z :=
+  have hc : ContDiffAt ℂ 1
+      (fun w : Matrix (Fin n) (Fin n) ℂ =>
+        ∏ i : Fin n, lead ((i : ℕ) + 1) w ^ (-(μ i - muNext μ i)))
+      z :=
     contDiffAt_prod fun i _ => key i
   exact hc.differentiableAt one_ne_zero
 
-private theorem fderiv_PhiM_of_lead_curve (μ : Fin n → ℤ) {z V : Matrix (Fin n) (Fin n) ℂ} (hz : z ∈ OmegaSet n)
-    (D : ℕ → ℂ) (hlead : ∀ (t : ℂ) (i : Fin n), lead ((i : ℕ) + 1) (z + t • V) =
-      (∏ a ∈ Finset.range ((i : ℕ) + 1), (1 + t * D a)) * lead ((i : ℕ) + 1) z) :
-    fderiv ℂ (PhiM μ) z V = -(∑ a ∈ Finset.range n,
-      (if h : a < n then (μ ⟨a, h⟩ : ℂ) else 0) * D a) * PhiM μ z := by
+private theorem fderiv_PhiM_of_lead_curve
+    (μ : Fin n → ℤ)
+    {z V : Matrix (Fin n) (Fin n) ℂ} (hz : z ∈ OmegaSet n)
+    (D : ℕ → ℂ)
+    (hlead : ∀ (t : ℂ) (i : Fin n),
+      lead ((i : ℕ) + 1) (z + t • V)
+        = (∏ a ∈ Finset.range ((i : ℕ) + 1), (1 + t * D a)) * lead ((i : ℕ) + 1) z)
+    : fderiv ℂ (PhiM μ) z V
+      = -(∑ a ∈ Finset.range n,
+           (if h : a < n then (μ ⟨a, h⟩ : ℂ) else 0) * D a)
+        * PhiM μ z := by
   set m : ℕ → ℂ := fun k => if h : k < n then (μ ⟨k, h⟩ : ℂ) else 0 with hm
   have hc : HasDerivAt (fun t : ℂ => z + t • V) V 0 := by
     exact (((hasDerivAt_id (0 : ℂ)).smul_const V).const_add z).congr_deriv (one_smul ℂ V)
@@ -68,34 +85,45 @@ private theorem fderiv_PhiM_of_lead_curve (μ : Fin n → ℤ) {z V : Matrix (Fi
     exact (differentiableAt_PhiM_of_mem_OmegaSet μ hz).hasFDerivAt
   have h1 := hΦ.comp_hasDerivAt (0 : ℂ) hc
   set p : Fin n → ℂ → ℂ := fun i t => ∏ a ∈ Finset.range ((i : ℕ) + 1), (1 + t * D a) with hp
-  have hfun : (PhiM μ ∘ fun t : ℂ => z + t • V) =
-      fun t => (∏ i : Fin n, p i t ^ (-(μ i - muNext μ i))) * PhiM μ z := by
+  have hfun
+      : (PhiM μ ∘ fun t : ℂ => z + t • V)
+        = fun t => (∏ i : Fin n, p i t ^ (-(μ i - muNext μ i))) * PhiM μ z := by
     funext t
     simp only [Function.comp_apply, PhiM, hlead, mul_zpow, Finset.prod_mul_distrib, hp]
   have hpd : ∀ i : Fin n, HasDerivAt (p i) (∑ a ∈ Finset.range ((i : ℕ) + 1), D a) 0 := by
     intro i
-    have h := HasDerivAt.finsetProd (u := Finset.range ((i : ℕ) + 1)) (x := (0 : ℂ))
-      (f := fun a t => 1 + t * D a) (f' := fun a => D a)
-      (fun a _ => by simpa using ((hasDerivAt_id (0 : ℂ)).mul_const (D a)).const_add 1)
+    have h :=
+      HasDerivAt.finsetProd (u := Finset.range ((i : ℕ) + 1)) (x := (0 : ℂ))
+        (f := fun a t => 1 + t * D a)
+        (f' := fun a => D a)
+        (fun a _ => by simpa using ((hasDerivAt_id (0 : ℂ)).mul_const (D a)).const_add 1)
     refine (h.congr_deriv (by simp [Finset.prod_apply])).congr_of_eventuallyEq
       (Filter.Eventually.of_forall fun t => ?_)
     simp [hp, Finset.prod_apply]
   have hp0 : ∀ i : Fin n, p i 0 = 1 := fun i => by simp [hp]
-  have hfd : ∀ i : Fin n, HasDerivAt (fun t => p i t ^ (-(μ i - muNext μ i)))
-      ((((-(μ i - muNext μ i)) : ℤ) : ℂ) * ∑ a ∈ Finset.range ((i : ℕ) + 1), D a) 0 := by
+  have hfd
+      : ∀ i : Fin n,
+        HasDerivAt
+          (fun t => p i t ^ (-(μ i - muNext μ i)))
+          ((((-(μ i - muNext μ i)) : ℤ) : ℂ) * ∑ a ∈ Finset.range ((i : ℕ) + 1), D a) 0 := by
     intro i
-    have h := (hasDerivAt_zpow (-(μ i - muNext μ i)) (p i 0)
-      (Or.inl (by rw [hp0]; exact one_ne_zero))).comp (0 : ℂ) (hpd i)
+    have h :=
+      (hasDerivAt_zpow (-(μ i - muNext μ i)) (p i 0) (Or.inl (by rw [hp0]; exact one_ne_zero))).comp
+        (0 : ℂ) (hpd i)
     exact h.congr_deriv (by rw [hp0]; simp)
-  have h2 : HasDerivAt (fun t => (∏ i : Fin n, p i t ^ (-(μ i - muNext μ i))) * PhiM μ z)
-      ((∑ i : Fin n, (((-(μ i - muNext μ i)) : ℤ) : ℂ) * ∑ a ∈ Finset.range ((i : ℕ) + 1), D a) *
-        PhiM μ z) 0 := by
+  have h2 : HasDerivAt
+      (fun t => (∏ i : Fin n, p i t ^ (-(μ i - muNext μ i))) * PhiM μ z)
+      ((∑ i : Fin n, (((-(μ i - muNext μ i)) : ℤ) : ℂ) * ∑ a ∈ Finset.range ((i : ℕ) + 1), D a)
+        * PhiM μ z)
+      0 := by
     have h := (HasDerivAt.finsetProd (u := Finset.univ) (fun i _ => hfd i)).mul_const (PhiM μ z)
     refine (h.congr_deriv (by simp [hp0, Finset.prod_apply])).congr_of_eventuallyEq
       (Filter.Eventually.of_forall fun t => ?_)
     simp [Finset.prod_apply]
-  have htel : ∀ N : ℕ, ∑ k ∈ Finset.range N, (m (k + 1) - m k) * ∑ a ∈ Finset.range (k + 1), D a =
-      m N * ∑ a ∈ Finset.range N, D a - ∑ a ∈ Finset.range N, m a * D a := by
+  have htel
+      : ∀ N : ℕ,
+        ∑ k ∈ Finset.range N, (m (k + 1) - m k) * ∑ a ∈ Finset.range (k + 1), D a
+          = m N * ∑ a ∈ Finset.range N, D a - ∑ a ∈ Finset.range N, m a * D a := by
     intro N
     induction N with
     | zero => simp
@@ -108,13 +136,16 @@ private theorem fderiv_PhiM_of_lead_curve (μ : Fin n → ℤ) {z V : Matrix (Fi
   have hmN : ∀ i : Fin n, ((muNext μ i : ℤ) : ℂ) = m ((i : ℕ) + 1) := fun i => by
     simp only [muNext, hm]
     split_ifs <;> simp
-  have hterm : ∀ i : Fin n, (((-(μ i - muNext μ i)) : ℤ) : ℂ) * ∑ a ∈ Finset.range ((i : ℕ) + 1), D a =
-      (m ((i : ℕ) + 1) - m i) * ∑ a ∈ Finset.range ((i : ℕ) + 1), D a := fun i => by
+  have hterm
+      : ∀ i : Fin n,
+        (((-(μ i - muNext μ i)) : ℤ) : ℂ) * ∑ a ∈ Finset.range ((i : ℕ) + 1), D a
+          = (m ((i : ℕ) + 1) - m i) * ∑ a ∈ Finset.range ((i : ℕ) + 1), D a := fun i => by
     rw [hm0 i, ← hmN i]
     push_cast
     ring
-  have hsumeq : ∑ i : Fin n, (((-(μ i - muNext μ i)) : ℤ) : ℂ) * ∑ a ∈ Finset.range ((i : ℕ) + 1), D a =
-      -∑ a ∈ Finset.range n, m a * D a := by
+  have hsumeq
+      : ∑ i : Fin n, (((-(μ i - muNext μ i)) : ℤ) : ℂ) * ∑ a ∈ Finset.range ((i : ℕ) + 1), D a
+        = - ∑ a ∈ Finset.range n, m a * D a := by
     rw [Finset.sum_congr rfl fun i _ => hterm i,
       Fin.sum_univ_eq_sum_range (fun k => (m (k + 1) - m k) * ∑ a ∈ Finset.range (k + 1), D a) n,
       htel n, hmn]
@@ -124,15 +155,15 @@ private theorem fderiv_PhiM_of_lead_curve (μ : Fin n → ℤ) {z V : Matrix (Fi
   rw [hsumeq] at hu
   exact hu
 
-private theorem lead_add_smul_mul_of_isLowerTri {X z : Matrix (Fin n) (Fin n) ℂ} (hX : IsLowerTri X) (t : ℂ)
-    (i : Fin n) : lead ((i : ℕ) + 1) (z + t • (X * z)) =
-      (∏ a ∈ Finset.range ((i : ℕ) + 1), (1 + t * (if h : a < n then X ⟨a, h⟩ ⟨a, h⟩ else 0))) *
-        lead ((i : ℕ) + 1) z := by
+private theorem lead_add_smul_mul_of_isLowerTri
+    {X z : Matrix (Fin n) (Fin n) ℂ} (hX : IsLowerTri X) (t : ℂ) (i : Fin n)
+    : lead ((i : ℕ) + 1) (z + t • (X * z))
+      = (∏ a ∈ Finset.range ((i : ℕ) + 1), (1 + t * (if h : a < n then X ⟨a, h⟩ ⟨a, h⟩ else 0)))
+        * lead ((i : ℕ) + 1) z := by
   have hi : (i : ℕ) + 1 ≤ n := i.2
   set e : Fin ((i : ℕ) + 1) → Fin n := Fin.castLE hi with he
   set A : Matrix (Fin n) (Fin n) ℂ := 1 + t • X with hA
-  have hAz : z + t • (X * z) = A * z := by
-    rw [hA, Matrix.add_mul, Matrix.one_mul, Matrix.smul_mul]
+  have hAz : z + t • (X * z) = A * z := by rw [hA, Matrix.add_mul, Matrix.one_mul, Matrix.smul_mul]
   have hzero : ∀ a c : Fin n, a < c → A a c = 0 := fun a c hac => by
     rw [hA, Matrix.add_apply, Matrix.one_apply_ne (ne_of_lt hac), Matrix.smul_apply, hX _ _ hac,
       smul_zero, zero_add]
@@ -168,18 +199,18 @@ private theorem lead_add_smul_mul_of_isLowerTri {X z : Matrix (Fin n) (Fin n) �
   simp only [dif_pos hp, hep, Matrix.submatrix_apply, hA, Matrix.add_apply, Matrix.one_apply_eq,
     Matrix.smul_apply, smul_eq_mul]
 
-private theorem lead_add_smul_mul_of_isUpperTri {X z : Matrix (Fin n) (Fin n) ℂ} (hX : IsUpperTri X) (t : ℂ)
-    (i : Fin n) : lead ((i : ℕ) + 1) (z + t • (z * X)) =
-      (∏ a ∈ Finset.range ((i : ℕ) + 1), (1 + t * (if h : a < n then X ⟨a, h⟩ ⟨a, h⟩ else 0))) *
-        lead ((i : ℕ) + 1) z := by
+private theorem lead_add_smul_mul_of_isUpperTri
+    {X z : Matrix (Fin n) (Fin n) ℂ} (hX : IsUpperTri X) (t : ℂ) (i : Fin n)
+    : lead ((i : ℕ) + 1) (z + t • (z * X))
+      = (∏ a ∈ Finset.range ((i : ℕ) + 1), (1 + t * (if h : a < n then X ⟨a, h⟩ ⟨a, h⟩ else 0)))
+        * lead ((i : ℕ) + 1) z := by
   have hi : (i : ℕ) + 1 ≤ n := i.2
   set e : Fin ((i : ℕ) + 1) → Fin n := Fin.castLE hi with he
   set A : Matrix (Fin n) (Fin n) ℂ := 1 + t • X with hA
-  have hAz : z + t • (z * X) = z * A := by
-    rw [hA, Matrix.mul_add, Matrix.mul_one, Matrix.mul_smul]
+  have hAz : z + t • (z * X) = z * A := by rw [hA, Matrix.mul_add, Matrix.mul_one, Matrix.mul_smul]
   have hzero : ∀ a c : Fin n, c < a → A a c = 0 := fun a c hca => by
-    rw [hA, Matrix.add_apply, Matrix.one_apply_ne (ne_of_lt hca).symm, Matrix.smul_apply, hX _ _ hca,
-      smul_zero, zero_add]
+    rw [hA, Matrix.add_apply, Matrix.one_apply_ne (ne_of_lt hca).symm, Matrix.smul_apply,
+      hX _ _ hca, smul_zero, zero_add]
   have hsub : (z * A).submatrix e e = z.submatrix e e * A.submatrix e e := by
     ext p q
     simp only [Matrix.submatrix_apply, Matrix.mul_apply]
@@ -231,10 +262,10 @@ lemma fderiv_phiM_upper (μ : Fin n → ℤ) {z X : Matrix (Fin n) (Fin n) ℂ} 
     simp
   rw [fderiv_PhiM_of_lead_curve μ hz _ (fun t i => lead_add_smul_mul_of_isUpperTri hX t i), hs]
 
-theorem phiM_part (μ : Fin n → ℤ) {z B : Matrix (Fin n) (Fin n) ℂ} (hz : z ∈ OmegaSet n) :
-    fderiv ℂ (PhiM μ) z (B * z + z * B) =
-      fderiv ℂ (PhiM μ) z (z * lowMinusUp B - lowMinusUp B * z) -
-        2 * (∑ a, (μ a : ℂ) * B a a) * PhiM μ z := by
+theorem phiM_part (μ : Fin n → ℤ) {z B : Matrix (Fin n) (Fin n) ℂ} (hz : z ∈ OmegaSet n)
+    : fderiv ℂ (PhiM μ) z (B * z + z * B)
+      = fderiv ℂ (PhiM μ) z (z * lowMinusUp B - lowMinusUp B * z)
+        - 2 * (∑ a, (μ a : ℂ) * B a a) * PhiM μ z := by
   set X1 : Matrix (Fin n) (Fin n) ℂ :=
     Matrix.of fun a b => if b < a then 2 * B a b else if a = b then B a b else 0 with hX1
   set X2 : Matrix (Fin n) (Fin n) ℂ :=
@@ -258,7 +289,8 @@ theorem phiM_part (μ : Fin n → ℤ) {z B : Matrix (Fin n) (Fin n) ℂ} (hz : 
     abel
   have d1 : ∑ a, (μ a : ℂ) * X1 a a = ∑ a, (μ a : ℂ) * B a a := by simp [hX1]
   have d2 : ∑ a, (μ a : ℂ) * X2 a a = ∑ a, (μ a : ℂ) * B a a := by simp [hX2]
-  rw [hsplit, map_add (f := _), map_add (f := _), fderiv_phiM_lower μ hz hL, fderiv_phiM_upper μ hz hU, d1, d2]
+  rw [hsplit, map_add (f := _), map_add (f := _), fderiv_phiM_lower μ hz hL,
+    fderiv_phiM_upper μ hz hU, d1, d2]
   ring
 
 end ReciprocityTheory.ChartRestriction.DS.S7

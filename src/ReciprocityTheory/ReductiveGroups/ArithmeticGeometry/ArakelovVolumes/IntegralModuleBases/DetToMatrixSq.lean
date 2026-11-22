@@ -11,7 +11,8 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.IntegralModuleBases
 
-open Finset InnerProductSpace Matrix ReciprocityTheory.ReducedBases ReciprocityTheory.ReducedBases.T2
+open Finset InnerProductSpace Matrix ReciprocityTheory.ReducedBases
+  ReciprocityTheory.ReducedBases.T2
 open scoped MatrixOrder ComplexOrder
 
 variable {d : ℕ}

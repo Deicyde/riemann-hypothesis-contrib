@@ -6,18 +6,21 @@ public import Mathlib
 
 open scoped BigOperators
 
-private theorem burnside_endomorphism {S A : Type} [AddCommGroup S] [Module ℂ S] [FiniteDimensional ℂ S]
-    [Ring A] [Algebra ℂ A] [Module A S] [IsScalarTower ℂ A S] [IsSimpleModule A S]
-    (t : Module.End ℂ S) : ∃ a : A, ∀ m : S, t m = a • m := by
+private theorem burnside_endomorphism
+    {S A : Type} [AddCommGroup S] [Module ℂ S] [FiniteDimensional ℂ S] [Ring A] [Algebra ℂ A]
+    [Module A S] [IsScalarTower ℂ A S] [IsSimpleModule A S]
+    (t : Module.End ℂ S)
+    : ∃ a : A, ∀ m : S, t m = a • m := by
   classical
   have hb := IsSimpleModule.algebraMap_end_bijective_of_isAlgClosed (A := A) (V := S) ℂ
-  let f : Module.End (Module.End A S) S :=
-    { toFun := t
-      map_add' := t.map_add
-      map_smul' := by
-        intro d m
-        obtain ⟨c, rfl⟩ := hb.2 d
-        simp [Module.algebraMap_end_apply] }
+  let f : Module.End (Module.End A S) S := {
+    toFun := t
+    map_add' := t.map_add
+    map_smul' := by
+      intro d m
+      obtain ⟨c, rfl⟩ := hb.2 d
+      simp [Module.algebraMap_end_apply]
+  }
   let b := Module.finBasis ℂ S
   obtain ⟨a, ha⟩ := jacobson_density f (Finset.univ.image b)
   refine ⟨a, fun m => ?_⟩
@@ -25,11 +28,14 @@ private theorem burnside_endomorphism {S A : Type} [AddCommGroup S] [Module ℂ 
   have : t = u := by
     refine b.ext fun i => ?_
     exact ha (b i) (Finset.mem_image_of_mem _ (Finset.mem_univ i))
-  rw [this]; rfl
+  rw [this]
+  rfl
 
-private theorem burn_sub {S : Type} [AddCommGroup S] [Module ℂ S] [FiniteDimensional ℂ S]
-    [Nontrivial S] (R : Subalgebra ℂ (Module.End ℂ S))
-    (h : ∀ x : S, x ≠ 0 → Submodule.span ℂ {y | ∃ r ∈ R, y = r x} = ⊤) : R = ⊤ := by
+private theorem burn_sub
+    {S : Type} [AddCommGroup S] [Module ℂ S] [FiniteDimensional ℂ S] [Nontrivial S]
+    (R : Subalgebra ℂ (Module.End ℂ S))
+    (h : ∀ x : S, x ≠ 0 → Submodule.span ℂ {y | ∃ r ∈ R, y = r x} = ⊤)
+    : R = ⊤ := by
   have hs : IsSimpleModule R S := by
     rw [isSimpleModule_iff]
     refine { eq_bot_or_eq_top := fun N => ?_ }
@@ -49,10 +55,17 @@ private theorem burn_sub {S : Type} [AddCommGroup S] [Module ℂ S] [FiniteDimen
   intro t _
   obtain ⟨a, ha⟩ := burnside_endomorphism (A := R) t
   have : t = (a : Module.End ℂ S) := LinearMap.ext ha
-  rw [this]; exact a.2
+  rw [this]
+  exact a.2
 
-theorem UpperTheory.exists_algHom_end_intertwining_mem_adjoin :
-    ∀ (S X : Type) [AddCommGroup S] [Module ℂ S] [AddCommGroup X] [Module ℂ X] [FiniteDimensional ℂ S] [FiniteDimensional ℂ X] [Nontrivial S] (M : Set (S →ₗ[ℂ] X)) (P : Set (Module.End ℂ S × Module.End ℂ X)), (⨆ f ∈ M, LinearMap.range f) = ⊤ → (∀ p ∈ P, ∀ f ∈ M, p.2 ∘ₗ f = f ∘ₗ p.1) → (∀ x : S, x ≠ 0 → Submodule.span ℂ {y | ∃ p ∈ P, y = p.1 x} = ⊤) → ∃ c : Module.End ℂ S →ₐ[ℂ] Module.End ℂ X, (∀ t, ∀ f ∈ M, c t ∘ₗ f = f ∘ₗ t) ∧ ∀ t, c t ∈ Algebra.adjoin ℂ (Prod.snd '' P) := by
+theorem UpperTheory.exists_algHom_end_intertwining_mem_adjoin
+    : ∀ (S X : Type) [AddCommGroup S] [Module ℂ S] [AddCommGroup X] [Module ℂ X]
+        [FiniteDimensional ℂ S] [FiniteDimensional ℂ X] [Nontrivial S] (M : Set (S →ₗ[ℂ] X))
+        (P : Set (Module.End ℂ S × Module.End ℂ X)),
+      (⨆ f ∈ M, LinearMap.range f) = ⊤ → (∀ p ∈ P, ∀ f ∈ M, p.2 ∘ₗ f = f ∘ₗ p.1)
+        → (∀ x : S, x ≠ 0 → Submodule.span ℂ {y | ∃ p ∈ P, y = p.1 x} = ⊤)
+        → ∃ c : Module.End ℂ S →ₐ[ℂ] Module.End ℂ X,
+          (∀ t, ∀ f ∈ M, c t ∘ₗ f = f ∘ₗ t) ∧ ∀ t, c t ∈ Algebra.adjoin ℂ (Prod.snd '' P) := by
   intro S X _ _ _ _ _ _ _ M P hM hP hirr
   let Q : Subalgebra ℂ (Module.End ℂ S × Module.End ℂ X) := Algebra.adjoin ℂ P
   let π₁ : (Module.End ℂ S × Module.End ℂ X) →ₐ[ℂ] Module.End ℂ S := AlgHom.fst ℂ _ _
@@ -102,7 +115,8 @@ theorem UpperTheory.exists_algHom_end_intertwining_mem_adjoin :
     obtain ⟨q, hq, rfl⟩ := ht
     exact ⟨⟨q, hq⟩, rfl⟩
   let e : Q ≃ₐ[ℂ] Module.End ℂ S := AlgEquiv.ofBijective φ ⟨hinj, hsurj⟩
-  have he : ∀ t, ((e.symm t : Q) : Module.End ℂ S × Module.End ℂ X).1 = t := fun t => e.apply_symm_apply t
+  have he : ∀ t, ((e.symm t : Q) : Module.End ℂ S × Module.End ℂ X).1 = t := fun t =>
+    e.apply_symm_apply t
   refine ⟨ψ.comp (e.symm : Module.End ℂ S →ₐ[ℂ] Q), fun t f hf => ?_, fun t => ?_⟩
   · have := hcomm _ (e.symm t).2 f hf
     rw [he t] at this

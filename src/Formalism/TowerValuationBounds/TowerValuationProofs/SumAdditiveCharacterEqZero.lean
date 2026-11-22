@@ -41,14 +41,17 @@ theorem height_bound_alt : AbsValuationSumBound := by
     rcases le_total 0 x with h | h
     · rw [abs_of_nonneg h, max_eq_left (by linarith)]; ring
     · rw [abs_of_nonpos h, max_eq_right (by linarith)]; ring
-  have h1 : ∑ w ∈ Wx, lam w * |val w| =
-      (∑ σ, Real.log (absx σ)) / Fintype.card E + 2 * ∑ w ∈ Wx, lam w * max 0 (-val w) := by
+  have h1
+      : ∑ w ∈ Wx, lam w * |val w|
+        = (∑ σ, Real.log (absx σ)) / Fintype.card E + 2 * ∑ w ∈ Wx, lam w * max 0 (-val w) := by
     rw [← hpf, Finset.mul_sum, ← Finset.sum_add_distrib]
     apply sum_congr rfl
     intro w _
-    rw [habs]; ring
-  have hmean : (∑ σ, Real.log (absx σ)) / Fintype.card E ≤
-      (∑ σ, Real.posLog (absx σ)) / Fintype.card E := by
+    rw [habs]
+    ring
+  have hmean
+      : (∑ σ, Real.log (absx σ)) / Fintype.card E
+        ≤ (∑ σ, Real.posLog (absx σ)) / Fintype.card E := by
     apply div_le_div_of_nonneg_right _ (Nat.cast_nonneg _)
     apply sum_le_sum
     intro σ _
@@ -57,20 +60,23 @@ theorem height_bound_alt : AbsValuationSumBound := by
   refine ⟨h1, by rw [h1]; linarith, ?_⟩
   intro hδ hden hB F
   have h2 : ∑ w ∈ F, lam w * |val w| ≤ ∑ w ∈ Wx, lam w * |val w| := by
-    calc ∑ w ∈ F, lam w * |val w| ≤ ∑ w ∈ F ∪ Wx, lam w * |val w| :=
-          sum_le_sum_of_subset_of_nonneg subset_union_left
-            (fun w _ _ => mul_nonneg (hlam w) (abs_nonneg _))
+    calc
+      ∑ w ∈ F, lam w * |val w| ≤ ∑ w ∈ F ∪ Wx, lam w * |val w| :=
+        sum_le_sum_of_subset_of_nonneg subset_union_left
+          (fun w _ _ => mul_nonneg (hlam w) (abs_nonneg _))
       _ = ∑ w ∈ Wx, lam w * |val w| := by
-          symm
-          apply sum_subset subset_union_right
-          intro w _ hw
-          rw [hsupp w hw]; simp
+        symm
+        apply sum_subset subset_union_right
+        intro w _ hw
+        rw [hsupp w hw]
+        simp
   have h3 : ∑ w ∈ Wx, lam w * max 0 (-val w) ≤ 3 * Bδ := by
-    calc ∑ w ∈ Wx, lam w * max 0 (-val w) ≤ ∑ w ∈ Wx, 3 * (lam w * δ w) := by
-          apply sum_le_sum
-          intro w _
-          have : max 0 (-val w) ≤ 3 * δ w := max_le (by linarith [hδ w]) (by linarith [hden w])
-          nlinarith [hlam w]
+    calc
+      ∑ w ∈ Wx, lam w * max 0 (-val w) ≤ ∑ w ∈ Wx, 3 * (lam w * δ w) := by
+        apply sum_le_sum
+        intro w _
+        have : max 0 (- val w) ≤ 3 * δ w := max_le (by linarith [hδ w]) (by linarith [hden w])
+        nlinarith [hlam w]
       _ = 3 * ∑ w ∈ Wx, lam w * δ w := by rw [Finset.mul_sum]
       _ ≤ 3 * Bδ := by linarith [hB Wx]
   linarith
@@ -86,9 +92,11 @@ theorem tower_bound : TowerProductFormula := by
       rw [Finset.prod_Icc_succ_top (by omega), prod_range_succ, ← mul_assoc, ih (by omega)]
       have := hbe n (by omega)
       have e1 : L (e + ((n + 1 : ℕ) : ℤ)) = L (e + n + 1) := by congr 1; push_cast; ring
-      rw [e1, mul_assoc, this]; ring
-  have al : ∀ n, n ≤ p → c 0 q =
-      (∏ i ∈ range n, u i q) * (∏ k ∈ Icc 1 n, L (e + q - k + 1)) * c n q := by
+      rw [e1, mul_assoc, this]
+      ring
+  have al
+      : ∀ n,
+        n ≤ p → c 0 q = (∏ i ∈ range n, u i q) * (∏ k ∈ Icc 1 n, L (e + q - k + 1)) * c n q := by
     intro n
     induction n with
     | zero => intro _; simp
@@ -96,7 +104,8 @@ theorem tower_bound : TowerProductFormula := by
       intro hn
       rw [Finset.prod_Icc_succ_top (by omega), prod_range_succ, ih (by omega), hal n (by omega)]
       have e1 : L (e + q - ((n + 1 : ℕ) : ℤ) + 1) = L (e - n + q) := by congr 1; push_cast; ring
-      rw [e1]; ring
+      rw [e1]
+      ring
   have hne : ∏ k ∈ Icc 1 q, L (e + k) ≠ 0 := by
     apply prod_ne_zero_iff.mpr
     intro k hk
@@ -107,10 +116,11 @@ theorem tower_bound : TowerProductFormula := by
 
 theorem lemma_c_gauss_sum : HermitianSumValuationBound := by
   intro K _ v vc conj hconj ι κ _ X z z' gm c0 δ hc0 hz hint hg
-  have gen : ∀ (y : ι → κ → K) (t : WithTop ℝ),
-      (∀ x ∈ X, ∀ k, t ≤ v (y x k)) → (∀ x ∈ X, ∀ k, ((-δ : ℝ) : WithTop ℝ) ≤ vc (y x k)) →
-      t + ((-δ : ℝ) : WithTop ℝ) + ((-δ : ℝ) : WithTop ℝ) ≤
-        v (∑ x ∈ X, ∑ k, ∑ l, y x k * conj (y x l) * gm x k l) := by
+  have gen
+      : ∀ (y : ι → κ → K) (t : WithTop ℝ),
+        (∀ x ∈ X, ∀ k, t ≤ v (y x k)) → (∀ x ∈ X, ∀ k, ((-δ : ℝ) : WithTop ℝ) ≤ vc (y x k))
+          → t + ((-δ : ℝ) : WithTop ℝ) + ((-δ : ℝ) : WithTop ℝ)
+            ≤ v (∑ x ∈ X, ∑ k, ∑ l, y x k * conj (y x l) * gm x k l) := by
     intro y t h1 h2
     apply AddValuation.map_le_sum
     intro x hx
@@ -123,24 +133,26 @@ theorem lemma_c_gauss_sum : HermitianSumValuationBound := by
   have hinv : v c0 + v c0⁻¹ = 0 := by
     rw [← AddValuation.map_mul, mul_inv_cancel₀ hc0, AddValuation.map_one]
   obtain ⟨r, hr⟩ : ∃ r : ℝ, v c0 = (r : WithTop ℝ) := by
-    have : v c0 ≠ ⊤ := by
-      intro h; exact hc0 ((AddValuation.top_iff v).mp h)
+    have : v c0 ≠ ⊤ := by intro h; exact hc0 ((AddValuation.top_iff v).mp h)
     exact ⟨(v c0).untop this, (WithTop.coe_untop _ this).symm⟩
   have hr' : v c0⁻¹ = ((-r : ℝ) : WithTop ℝ) := by
-    have : v c0⁻¹ ≠ ⊤ := by
-      intro h; exact (inv_ne_zero hc0) ((AddValuation.top_iff v).mp h)
+    have : v c0⁻¹ ≠ ⊤ := by intro h; exact (inv_ne_zero hc0) ((AddValuation.top_iff v).mp h)
     obtain ⟨r', hr'⟩ : ∃ r' : ℝ, v c0⁻¹ = (r' : WithTop ℝ) := ⟨_, (WithTop.coe_untop _ this).symm⟩
     rw [hr, hr', ← WithTop.coe_add, ← WithTop.coe_zero, WithTop.coe_eq_coe] at hinv
-    rw [hr']; congr 1; linarith
-  have shift : ∀ (s : ℝ) (T : WithTop ℝ),
-      ((s - δ : ℝ) : WithTop ℝ) + ((-δ : ℝ) : WithTop ℝ) + ((-δ : ℝ) : WithTop ℝ) ≤ T →
-      (s : WithTop ℝ) ≤ T + ((3 * δ : ℝ) : WithTop ℝ) := by
+    rw [hr']
+    congr 1
+    linarith
+  have shift
+      : ∀ (s : ℝ) (T : WithTop ℝ),
+        ((s - δ : ℝ) : WithTop ℝ) + ((-δ : ℝ) : WithTop ℝ) + ((-δ : ℝ) : WithTop ℝ) ≤ T
+          → (s : WithTop ℝ) ≤ T + ((3 * δ : ℝ) : WithTop ℝ) := by
     intro s T h
     induction T using WithTop.recTopCoe with
     | top => simp
     | coe T =>
       rw [← WithTop.coe_add, ← WithTop.coe_add, WithTop.coe_le_coe] at h
-      rw [← WithTop.coe_add, WithTop.coe_le_coe]; linarith
+      rw [← WithTop.coe_add, WithTop.coe_le_coe]
+      linarith
   refine ⟨?_, ?_, ?_, ?_⟩
   · rw [hr]
     apply shift
@@ -157,17 +169,24 @@ theorem lemma_c_gauss_sum : HermitianSumValuationBound := by
     exact add_le_add le_rfl (hint x hx k).1
   · have := gen z _ (fun x hx k => (hint x hx k).1) (fun x hx k => (hint x hx k).2.1)
     refine le_trans (le_of_eq ?_) this
-    rw [← WithTop.coe_add, ← WithTop.coe_add]; congr 1; ring
+    rw [← WithTop.coe_add, ← WithTop.coe_add]
+    congr 1
+    ring
   · have := gen z' _ (fun x hx k => (hint x hx k).2.2.1) (fun x hx k => (hint x hx k).2.2.2)
     refine le_trans (le_of_eq ?_) this
-    rw [← WithTop.coe_add, ← WithTop.coe_add]; congr 1; ring
+    rw [← WithTop.coe_add, ← WithTop.coe_add]
+    congr 1
+    ring
 
 section gauss
 variable {R : Type} [CommRing R] [Fintype R] [DecidableEq R] (I : Ideal R) (ψ : AddChar R ℂ)
 
-def d9u (hI : ∀ y ∈ I, ∀ y' ∈ I, y * y' = 0) (y : I) : Rˣ :=
-  ⟨1 + y, 1 - y, by have := hI y y.2 y y.2; linear_combination -this,
-    by have := hI y y.2 y y.2; linear_combination -this⟩
+def d9u (hI : ∀ y ∈ I, ∀ y' ∈ I, y * y' = 0) (y : I) : Rˣ := ⟨
+  1 + y,
+  1 - y,
+  by have := hI y y.2 y y.2; linear_combination -this,
+  by have := hI y y.2 y y.2; linear_combination -this
+⟩
 
 omit [Fintype R] [DecidableEq R] in
 lemma sum_additive_character_eq_zero [Fintype I] (z : R) (hz : ∃ y ∈ I, ψ (z * y) ≠ 1) : ∑ y : I, ψ (z * (y : R)) = 0 := by
@@ -264,8 +283,9 @@ theorem gauss_sum_ratio : GaussSumTwist := by
   constructor
   · rw [gauss_sum_localize I ψ hI hψ ν c hν, Nat.card_eq_fintype_card]
 
-    have hbij : ∑ x : Rˣ, (if (x : R) - c ∈ I then (((ν x)⁻¹ : ℂˣ) : ℂ) * ψ (x : R) else 0) =
-        ∑ y : I, (((ν (x0 * d9u I hI y))⁻¹ : ℂˣ) : ℂ) * ψ ((x0 * d9u I hI y : Rˣ) : R) := by
+    have hbij
+        : ∑ x : Rˣ, (if (x : R) - c ∈ I then (((ν x)⁻¹ : ℂˣ) : ℂ) * ψ (x : R) else 0)
+          = ∑ y : I, (((ν (x0 * d9u I hI y))⁻¹ : ℂˣ) : ℂ) * ψ ((x0 * d9u I hI y : Rˣ) : R) := by
       rw [← sum_filter]
       symm
       apply sum_bij (fun (y : I) _ => x0 * d9u I hI y)
@@ -292,10 +312,12 @@ theorem gauss_sum_ratio : GaussSumTwist := by
         linear_combination (x : R) * this
       · intro y _; rfl
     rw [hbij]
-    have : ∀ y : I, (((ν (x0 * d9u I hI y))⁻¹ : ℂˣ) : ℂ) * ψ ((x0 * d9u I hI y : Rˣ) : R) =
-        (((ν x0)⁻¹ : ℂˣ) : ℂ) * ψ (x0 : R) := by
+    have : ∀ y : I,
+        (((ν (x0 * d9u I hI y))⁻¹ : ℂˣ) : ℂ) * ψ ((x0 * d9u I hI y : Rˣ) : R)
+          = (((ν x0)⁻¹ : ℂˣ) : ℂ) * ψ (x0 : R) := by
       intro y
-      rw [gauss_sum_translate_unit I ψ hI ν c hν x0 y, hI _ hx0 _ y.2, AddChar.map_zero_eq_one, mul_one]
+      rw [gauss_sum_translate_unit I ψ hI ν c hν x0 y, hI _ hx0 _ y.2, AddChar.map_zero_eq_one,
+        mul_one]
     simp only [this, sum_const, card_univ, nsmul_eq_mul]
   · have hνd : ∀ u : Rˣ, (u : R) - 1 ∈ I → (((ν * dl) u : ℂˣ) : ℂ) = ψ (c * ((u : R) - 1)) := by
       intro u hu
@@ -326,42 +348,51 @@ theorem valuation_ratio_bound : TowerValuationBound := by
     rw [b1, additive_map_div hv]
     have := le_abs_self (v (Td s))
     have := neg_abs_le (v (T s))
-    simp only [hf]; linarith
-  have lo : ∀ s : ℤ, 1 ≤ s → s ≤ h → -v (ρ s) ≤ f s + N0 := by
+    simp only [hf]
+    linarith
+  have lo : ∀ s : ℤ, 1 ≤ s → s ≤ h → - v (ρ s) ≤ f s + N0 := by
     intro s a1 a2
     obtain ⟨b1, b2, b3⟩ := hR1 s a1 a2
     rw [b1, additive_map_div hv]
     have := le_abs_self (v (T s))
     have := abs_nonneg (v (Td s))
-    simp only [hf]; linarith
-  have gen : ∀ {ι : Type} (I : Finset ι) (φ : ι → ℤ) (w : ι → ℝ) (c : ℝ), Set.InjOn φ I →
-      (∀ k ∈ I, 1 ≤ φ k ∧ φ k ≤ h) → (∀ k ∈ I, w k ≤ f (φ k) + c) →
-      ∑ k ∈ I, w k ≤ S + I.card * c := by
+    simp only [hf]
+    linarith
+  have gen
+      : ∀ {ι : Type} (I : Finset ι) (φ : ι → ℤ) (w : ι → ℝ) (c : ℝ),
+        Set.InjOn φ I → (∀ k ∈ I, 1 ≤ φ k ∧ φ k ≤ h) → (∀ k ∈ I, w k ≤ f (φ k) + c)
+          → ∑ k ∈ I, w k ≤ S + I.card * c := by
     intro ι I φ w c hinj hran hw
     classical
-    calc ∑ k ∈ I, w k ≤ ∑ k ∈ I, (f (φ k) + c) := sum_le_sum hw
+    calc
+      ∑ k ∈ I, w k
+        ≤ ∑ k ∈ I, (f (φ k) + c) := sum_le_sum hw
       _ = ∑ s ∈ I.image φ, f s + I.card * c := by
-          rw [sum_add_distrib, sum_const, nsmul_eq_mul, sum_image hinj]
+        rw [sum_add_distrib, sum_const, nsmul_eq_mul, sum_image hinj]
       _ ≤ S + I.card * c := by
-          have : ∑ s ∈ I.image φ, f s ≤ S := by
-            apply sum_le_sum_of_subset_of_nonneg
-            · intro s hs
-              rw [mem_image] at hs
-              obtain ⟨k, hk, rfl⟩ := hs
-              rw [mem_Icc]; exact hran k hk
-            · intro s _ _; exact hf0 s
-          linarith
+        have : ∑ s ∈ I.image φ, f s ≤ S := by
+          apply sum_le_sum_of_subset_of_nonneg
+          · intro s hs
+            rw [mem_image] at hs
+            obtain ⟨k, hk, rfl⟩ := hs
+            rw [mem_Icc]
+            exact hran k hk
+          · intro s _ _; exact hf0 s
+        linarith
 
   have n1 : ∑ s ∈ Icc (1 - ((e : ℤ) + q - p)) 0, v (ρ s) ≤ S + ((e : ℝ) + q - p) * ε := by
     have hc : ((Icc (1 - ((e : ℤ) + q - p)) 0).card : ℝ) = (e : ℝ) + q - p := by
       rw [Int.card_Icc]
       have : (0 + 1 - (1 - ((e : ℤ) + q - p))).toNat = e + q - p := by omega
-      rw [this, Nat.cast_sub (by omega)]; push_cast; ring
+      rw [this, Nat.cast_sub (by omega)]
+      push_cast
+      ring
     rw [← hc]
     apply gen _ (fun s => 1 - s)
     · intro x _ y _ hxy; simp only at hxy; omega
     · intro s hs; rw [mem_Icc] at hs; constructor <;> omega
-    · intro s hs; rw [mem_Icc] at hs
+    · intro s hs
+      rw [mem_Icc] at hs
       obtain ⟨b1, b2⟩ := hR2 s hs.1 hs.2
       rw [b1, hv, b2, zero_add]
       exact up _ (by omega) (by omega)
@@ -369,12 +400,15 @@ theorem valuation_ratio_bound : TowerValuationBound := by
     have hc : ((Icc (1 : ℤ) ((h : ℤ) - (p + q))).card : ℝ) = (h : ℝ) - (p + q) := by
       rw [Int.card_Icc]
       have : ((h : ℤ) - (p + q) + 1 - 1).toNat = h - (p + q) := by omega
-      rw [this, Nat.cast_sub (by omega)]; push_cast; ring
+      rw [this, Nat.cast_sub (by omega)]
+      push_cast
+      ring
     rw [← hc]
     apply gen _ (fun s => s)
     · intro x _ y _ hxy; exact hxy
     · intro s hs; rw [mem_Icc] at hs; constructor <;> omega
-    · intro s hs; rw [mem_Icc] at hs
+    · intro s hs
+      rw [mem_Icc] at hs
       exact up _ (by omega) (by omega)
   have n3 : ∑ k ∈ Icc 1 p, v (ρ ((e : ℤ) + q - k + 1)) ≤ S + (p : ℝ) * ε := by
     have hc : ((Icc 1 p).card : ℝ) = (p : ℝ) := by rw [Nat.card_Icc]; simp
@@ -382,7 +416,8 @@ theorem valuation_ratio_bound : TowerValuationBound := by
     apply gen _ (fun k : ℕ => (e : ℤ) + q - k + 1)
     · intro x _ y _ hxy; simp only at hxy; omega
     · intro k hk; rw [mem_Icc] at hk; constructor <;> omega
-    · intro k hk; rw [mem_Icc] at hk
+    · intro k hk
+      rw [mem_Icc] at hk
       exact up _ (by omega) (by omega)
   have n4 : ∑ k ∈ Icc 1 q, -v (ρ ((e : ℤ) + k)) ≤ S + (q : ℝ) * N0 := by
     have hc : ((Icc 1 q).card : ℝ) = (q : ℝ) := by rw [Nat.card_Icc]; simp
@@ -390,13 +425,18 @@ theorem valuation_ratio_bound : TowerValuationBound := by
     apply gen _ (fun k : ℕ => (e : ℤ) + k)
     · intro x _ y _ hxy; simp only at hxy; omega
     · intro k hk; rw [mem_Icc] at hk; constructor <;> omega
-    · intro k hk; rw [mem_Icc] at hk
+    · intro k hk
+      rw [mem_Icc] at hk
       exact lo _ (by omega) (by omega)
-  have hsplit : ∑ s ∈ Icc (1 - ((e : ℤ) + q - p)) ((h : ℤ) - (p + q)), v (ρ s) =
-      ∑ s ∈ Icc (1 - ((e : ℤ) + q - p)) 0, v (ρ s) + ∑ s ∈ Icc (1 : ℤ) ((h : ℤ) - (p + q)), v (ρ s) := by
+  have hsplit
+      : ∑ s ∈ Icc (1 - ((e : ℤ) + q - p)) ((h : ℤ) - (p + q)), v (ρ s)
+        = ∑ s ∈ Icc (1 - ((e : ℤ) + q - p)) 0, v (ρ s)
+          + ∑ s ∈ Icc (1 : ℤ) ((h : ℤ) - (p + q)), v (ρ s) := by
     rw [← sum_union]
     · congr 1
-      ext s; simp only [mem_Icc, mem_union]; omega
+      ext s
+      simp only [mem_Icc, mem_union]
+      omega
     · rw [disjoint_left]; intro s hs hs'; rw [mem_Icc] at hs hs'; omega
   have hA : v A = v A0 + ∑ s ∈ Icc (1 - ((e : ℤ) + q - p)) ((h : ℤ) - (p + q)), v (ρ s) := by
     have := congrArg v hCor
@@ -408,10 +448,12 @@ theorem valuation_ratio_bound : TowerValuationBound := by
   have u2 : ∑ i ∈ range p, v (ua i) ≤ (p : ℝ) * σ := by
     have := sum_le_card_nsmul (range p) (fun j => v (ua j)) σ (fun j hj => hua j (mem_range.mp hj))
     simpa using this
-  have hvr : v r = ∑ j ∈ range q, v (ub j) + ∑ i ∈ range p, v (ua i) + (v c0 - v c00) +
-      ∑ k ∈ Icc 1 p, v (ρ ((e : ℤ) + q - k + 1)) + ∑ k ∈ Icc 1 q, -v (ρ ((e : ℤ) + k)) := by
-    rw [hr, hv, hv, hv, hv, additive_map_inv hv, additive_map_div hv, additive_map_prod hv, additive_map_prod hv, additive_map_prod hv,
-      additive_map_prod hv, sum_neg_distrib]
+  have hvr
+      : v r
+        = ∑ j ∈ range q, v (ub j) + ∑ i ∈ range p, v (ua i) + (v c0 - v c00)
+          + ∑ k ∈ Icc 1 p, v (ρ ((e : ℤ) + q - k + 1)) + ∑ k ∈ Icc 1 q, -v (ρ ((e : ℤ) + k)) := by
+    rw [hr, hv, hv, hv, hv, additive_map_inv hv, additive_map_div hv, additive_map_prod hv,
+      additive_map_prod hv, additive_map_prod hv, additive_map_prod hv, sum_neg_distrib]
   have b1 := le_abs_self (v A0)
   have b2 := le_abs_self (v A0')
   have hd : (d : ℝ) = 2 * h := by exact_mod_cast h3
@@ -482,8 +524,7 @@ theorem prime_sum_bound : PrimeLogSquareSumLtOne := by
     have hp := hP l hl
     have h2 := hp.two_le
     have hle : l ≤ M := le_trans (Finset.le_sup (f := id) hl) (le_max_left _ _)
-    have h4 : l ≠ 4 := by
-      rintro rfl; exact absurd hp (by norm_num)
+    have h4 : l ≠ 4 := by rintro rfl; exact absurd hp (by norm_num)
     simp only [mem_union, mem_insert, mem_singleton, mem_Icc]
     omega
   have hnn : ∀ n : ℕ, 0 ≤ Real.log n / (n : ℝ) ^ 2 := by
@@ -491,8 +532,11 @@ theorem prime_sum_bound : PrimeLogSquareSumLtOne := by
   have h1 : ∑ l ∈ P, Real.log l / (l : ℝ) ^ 2 ≤ ∑ l ∈ {2, 3} ∪ Icc 5 M, Real.log l / (l : ℝ) ^ 2 :=
     sum_le_sum_of_subset_of_nonneg hsub (fun n _ _ => hnn n)
   have hd : Disjoint ({2, 3} : Finset ℕ) (Icc 5 M) := by
-    rw [disjoint_left]; intro x hx hx'
-    simp only [mem_insert, mem_singleton] at hx; rw [mem_Icc] at hx'; omega
+    rw [disjoint_left]
+    intro x hx hx'
+    simp only [mem_insert, mem_singleton] at hx
+    rw [mem_Icc] at hx'
+    omega
   rw [sum_union hd, sum_pair (by norm_num)] at h1
   have h2 := sum_log_div_sq_telescoping M hM
   have h3 : 0 ≤ (1 + Real.log M) / M :=
@@ -508,10 +552,12 @@ theorem prime_budget_bound : PrimeLogBudget := by
   intro N0 BN0 h P hP
   have h1 := h P hP
   have h2 := prime_sum_bound P hP
-  have e : ∑ l ∈ P, (N0 l + ((l : ℝ) ^ 2)⁻¹) * Real.log l =
-      ∑ l ∈ P, N0 l * Real.log l + ∑ l ∈ P, Real.log l / (l : ℝ) ^ 2 := by
+  have e
+      : ∑ l ∈ P, (N0 l + ((l : ℝ) ^ 2)⁻¹) * Real.log l
+        = ∑ l ∈ P, N0 l * Real.log l + ∑ l ∈ P, Real.log l / (l : ℝ) ^ 2 := by
     rw [← sum_add_distrib]; apply sum_congr rfl; intro l _; rw [div_eq_mul_inv]; ring
-  rw [e]; linarith
+  rw [e]
+  linarith
 
 theorem grid_bound : GridValuationBound := by
   intro W X S m N lam δ ell N0 vr vx XX ch dd yy S0 cc ee qq vq H B BN Bδ W0 hlam hδ hN0 hvq hprime
@@ -520,25 +566,33 @@ theorem grid_bound : GridValuationBound := by
   set t : W → ℝ := fun w => N0 (ell w) + ((ell w : ℝ) ^ 2)⁻¹ with ht
   set uu : W → ℝ := fun w => ∑ s ∈ S0, (cc s : ℝ) * vq w s with huu
   have ht0 : ∀ w, 0 ≤ t w := fun w => add_nonneg (hN0 _) (by positivity)
-  have hu0 : ∀ w, 0 ≤ uu w := fun w => sum_nonneg (fun s _ => mul_nonneg (Nat.cast_nonneg _) (hvq w s))
+  have hu0 : ∀ w, 0 ≤ uu w := fun w =>
+    sum_nonneg (fun s _ => mul_nonneg (Nat.cast_nonneg _) (hvq w s))
   set Q : ℝ := ∑ s ∈ S0, (ee s : ℝ) * Real.log (qq s) with hQ
   have hlogq : ∀ s ∈ S0, 0 ≤ Real.log (qq s) := fun s _ => Real.log_natCast_nonneg _
   have hQ0 : 0 ≤ Q := sum_nonneg (fun s hs => mul_nonneg (Nat.cast_nonneg _) (hlogq s hs))
   have hcard : ((Finset.univ : Finset (Fin m × Fin m)).card : ℝ) = (m : ℝ) ^ 2 := by
     rw [card_univ, Fintype.card_prod, Fintype.card_fin]; push_cast; ring
 
-  have hpt : ∀ w ∈ W0, lam w * ∑ ij, vr w ij ≤
-      ∑ ij, ∑ b, ∑ x ∈ XX ij b, lam w * |vx w x| +
-        (m : ℝ) ^ 2 * (2 * N * (lam w * t w) + 6 * (lam w * δ w) + 2 * m * (lam w * uu w)) := by
+  have hpt
+      : ∀ w ∈ W0,
+        lam w * ∑ ij, vr w ij
+          ≤ ∑ ij, ∑ b, ∑ x ∈ XX ij b, lam w * |vx w x|
+            + (m : ℝ) ^ 2
+              * (2 * N * (lam w * t w) + 6 * (lam w * δ w) + 2 * m * (lam w * uu w)) := by
     intro w hw
-    have h1 : ∑ ij, vr w ij ≤ ∑ ij, (∑ b, ∑ x ∈ XX ij b, |vx w x| +
-        (2 * N * t w + 6 * δ w + 2 * m * uu w)) := by
+    have h1
+        : ∑ ij, vr w ij
+          ≤ ∑ ij, (∑ b, ∑ x ∈ XX ij b, |vx w x| +
+            (2 * N * t w + 6 * δ w + 2 * m * uu w)) := by
       apply sum_le_sum
       intro ij _
       have a1 := hsq w hw ij
       have a2 : ∑ x ∈ XX ij (ch w), |vx w x| ≤ ∑ b, ∑ x ∈ XX ij b, |vx w x| :=
-        Finset.single_le_sum (f := fun b => ∑ x ∈ XX ij b, |vx w x|)
-          (fun b _ => sum_nonneg (fun x _ => abs_nonneg _)) (mem_univ (ch w))
+        Finset.single_le_sum
+          (f := fun b => ∑ x ∈ XX ij b, |vx w x|)
+          (fun b _ => sum_nonneg (fun x _ => abs_nonneg _))
+          (mem_univ (ch w))
       have a3 : (dd ij : ℝ) * t w ≤ 2 * N * t w := by
         apply mul_le_mul_of_nonneg_right _ (ht0 w)
         exact_mod_cast hdd ij
@@ -552,21 +606,28 @@ theorem grid_bound : GridValuationBound := by
     refine h2.trans (le_of_eq ?_)
     rw [mul_add, mul_sum]
     congr 1
-    · apply sum_congr rfl; intro ij _
-      rw [mul_sum]; apply sum_congr rfl; intro b _
+    · apply sum_congr rfl
+      intro ij _
+      rw [mul_sum]
+      apply sum_congr rfl
+      intro b _
       rw [mul_sum]
     · ring
   have hsum := sum_le_sum hpt
   rw [sum_add_distrib, ← mul_sum, sum_add_distrib, sum_add_distrib, ← mul_sum, ← mul_sum, ← mul_sum]
     at hsum
 
-  have hX : ∑ w ∈ W0, ∑ ij, ∑ b, ∑ x ∈ XX ij b, lam w * |vx w x| ≤ ∑ ij, ∑ b, ∑ x ∈ XX ij b, H x := by
+  have hX
+      : ∑ w ∈ W0, ∑ ij, ∑ b, ∑ x ∈ XX ij b, lam w * |vx w x| ≤ ∑ ij, ∑ b, ∑ x ∈ XX ij b, H x := by
     rw [sum_comm]
-    apply sum_le_sum; intro ij _
+    apply sum_le_sum
+    intro ij _
     rw [sum_comm]
-    apply sum_le_sum; intro b _
+    apply sum_le_sum
+    intro b _
     rw [sum_comm]
-    apply sum_le_sum; intro x _
+    apply sum_le_sum
+    intro x _
     exact hH x W0
 
   have hT : ∑ w ∈ W0, lam w * t w ≤ BN := by
@@ -574,13 +635,15 @@ theorem grid_bound : GridValuationBound := by
     rw [← sum_fiberwise_of_maps_to hmaps]
     refine le_trans (sum_le_sum ?_) (hBN (W0.image ell) ?_)
     · intro l _
-      have e1 : ∑ w ∈ W0 with ell w = l, lam w * t w =
-          (N0 l + ((l : ℝ) ^ 2)⁻¹) * ∑ w ∈ W0 with ell w = l, lam w := by
+      have e1
+          : ∑ w ∈ W0 with ell w = l, lam w * t w
+            = (N0 l + ((l : ℝ) ^ 2)⁻¹) * ∑ w ∈ W0 with ell w = l, lam w := by
         rw [mul_sum]
         apply sum_congr rfl
         intro w hw
         rw [mem_filter] at hw
-        simp only [ht, hw.2]; ring
+        simp only [ht, hw.2]
+        ring
       rw [e1]
       apply mul_le_mul_of_nonneg_left
       · exact hfib l _ (fun w hw => (mem_filter.mp hw).2)
@@ -594,20 +657,24 @@ theorem grid_bound : GridValuationBound := by
     have e1 : ∑ w ∈ W0, lam w * uu w = ∑ s ∈ S0, (cc s : ℝ) * ∑ w ∈ W0, lam w * vq w s := by
       simp only [huu, mul_sum]
       rw [sum_comm]
-      apply sum_congr rfl; intro s _
-      apply sum_congr rfl; intro w _
+      apply sum_congr rfl
+      intro s _
+      apply sum_congr rfl
+      intro w _
       ring
     rw [e1]
     apply sum_le_sum
     intro s hs
     have c1 : (cc s : ℝ) ≤ ee s := by exact_mod_cast hcc s hs
-    calc (cc s : ℝ) * ∑ w ∈ W0, lam w * vq w s ≤ (cc s : ℝ) * Real.log (qq s) :=
-          mul_le_mul_of_nonneg_left (hq s hs W0) (Nat.cast_nonneg _)
+    calc
+      (cc s : ℝ) * ∑ w ∈ W0, lam w * vq w s
+        ≤ (cc s : ℝ) * Real.log (qq s) := mul_le_mul_of_nonneg_left (hq s hs W0) (Nat.cast_nonneg _)
       _ ≤ (ee s : ℝ) * Real.log (qq s) := mul_le_mul_of_nonneg_right c1 (hlogq s hs)
   have hm0 : (0 : ℝ) ≤ m := Nat.cast_nonneg _
   have hNn : (0 : ℝ) ≤ N := Nat.cast_nonneg _
-  have hin : 2 * N * ∑ w ∈ W0, lam w * t w + 6 * ∑ w ∈ W0, lam w * δ w +
-      2 * m * ∑ w ∈ W0, lam w * uu w ≤ 2 * N * BN + 6 * Bδ + 4 * m * Q := by
+  have hin
+      : 2 * N * ∑ w ∈ W0, lam w * t w + 6 * ∑ w ∈ W0, lam w * δ w + 2 * m * ∑ w ∈ W0, lam w * uu w
+        ≤ 2 * N * BN + 6 * Bδ + 4 * m * Q := by
     have z1 : 2 * N * ∑ w ∈ W0, lam w * t w ≤ 2 * N * BN :=
       mul_le_mul_of_nonneg_left hT (by positivity)
     have z2 := hBδ W0
@@ -615,8 +682,9 @@ theorem grid_bound : GridValuationBound := by
       mul_le_mul_of_nonneg_left hU (by positivity)
     have z4 : 0 ≤ m * Q := mul_nonneg hm0 hQ0
     linarith
-  have hmain : ∑ w ∈ W0, lam w * ∑ ij, vr w ij ≤
-      (∑ ij, ∑ b, ∑ x ∈ XX ij b, H x) + (m : ℝ) ^ 2 * (2 * N * BN + 6 * Bδ + 4 * m * Q) := by
+  have hmain
+      : ∑ w ∈ W0, lam w * ∑ ij, vr w ij
+        ≤ (∑ ij, ∑ b, ∑ x ∈ XX ij b, H x) + (m : ℝ) ^ 2 * (2 * N * BN + 6 * Bδ + 4 * m * Q) := by
     have := mul_le_mul_of_nonneg_left hin (show (0 : ℝ) ≤ (m : ℝ) ^ 2 by positivity)
     linarith
   refine ⟨hmain, ?_⟩
@@ -628,19 +696,28 @@ theorem grid_bound : GridValuationBound := by
       rw [nsmul_eq_mul] at k1
       have k2 : ((XX ij b).card : ℝ) ≤ 2 + 8 * N := by exact_mod_cast hXc ij b
       exact k1.trans (mul_le_mul_of_nonneg_right k2 hB0)
-    calc ∑ ij, ∑ b, ∑ x ∈ XX ij b, H x ≤ ∑ _ij : Fin m × Fin m, ∑ _b : Bool, (2 + 8 * (N : ℝ)) * B :=
-          sum_le_sum (fun ij _ => sum_le_sum (fun b _ => this ij b))
+    calc
+      ∑ ij, ∑ b, ∑ x ∈ XX ij b, H x ≤ ∑ _ij : Fin m × Fin m, ∑ _b : Bool, (2 + 8 * (N : ℝ)) * B :=
+        sum_le_sum (fun ij _ => sum_le_sum (fun b _ => this ij b))
       _ = (m : ℝ) ^ 2 * (2 * (2 + 8 * N) * B) := by
-          simp only [sum_const, nsmul_eq_mul, card_univ, Fintype.card_bool, Fintype.card_prod, Fintype.card_fin]
-          push_cast; ring
-  have hfin : ∑ w ∈ W0, lam w * ∑ ij, vr w ij ≤
-      (m : ℝ) ^ 2 * (2 * (2 + 8 * N) * B + 2 * N * BN + 6 * Bδ + 4 * m * Q) := by
-    have e : (m : ℝ) ^ 2 * (2 * (2 + 8 * N) * B + 2 * N * BN + 6 * Bδ + 4 * m * Q) =
-        (m : ℝ) ^ 2 * (2 * (2 + 8 * N) * B) + (m : ℝ) ^ 2 * (2 * N * BN + 6 * Bδ + 4 * m * Q) := by ring
-    rw [e]; linarith
+        simp only [sum_const, nsmul_eq_mul, card_univ, Fintype.card_bool, Fintype.card_prod,
+          Fintype.card_fin]
+        push_cast
+        ring
+  have hfin
+      : ∑ w ∈ W0, lam w * ∑ ij, vr w ij
+        ≤ (m : ℝ) ^ 2 * (2 * (2 + 8 * N) * B + 2 * N * BN + 6 * Bδ + 4 * m * Q) := by
+    have e
+        : (m : ℝ) ^ 2 * (2 * (2 + 8 * N) * B + 2 * N * BN + 6 * Bδ + 4 * m * Q)
+          = (m : ℝ) ^ 2 * (2 * (2 + 8 * N) * B)
+            + (m : ℝ) ^ 2 * (2 * N * BN + 6 * Bδ + 4 * m * Q) := by
+      ring
+    rw [e]
+    linarith
   refine ⟨hfin, ?_⟩
-  have e : ∑ w ∈ W0, lam w * ((∑ ij, vr w ij) + δ w) =
-      ∑ w ∈ W0, lam w * ∑ ij, vr w ij + ∑ w ∈ W0, lam w * δ w := by
+  have e
+      : ∑ w ∈ W0, lam w * ((∑ ij, vr w ij) + δ w)
+        = ∑ w ∈ W0, lam w * ∑ ij, vr w ij + ∑ w ∈ W0, lam w * δ w := by
     rw [← sum_add_distrib]; apply sum_congr rfl; intro w _; ring
   rw [e]
   have := hBδ W0
@@ -659,23 +736,28 @@ theorem grid_squares_bound : GridValuationBoundSquares := by
     | Sum.inl true => vA' w x.1.1
     | Sum.inr (_, s, false) => vT w x.1.1 s
     | Sum.inr (_, s, true) => vTd w x.1.1 x.1.2 s
-  let XX : Fin m × Fin m → Bool → Finset (((Fin m × Fin m) × Bool) × (Bool ⊕ (Fin 4 × ℤ × Bool))) := fun ij b =>
-    ({(ij, b)} : Finset ((Fin m × Fin m) × Bool)) ×ˢ
-      ((Finset.univ : Finset Bool).disjSum
-        ((Finset.univ : Finset (Fin 4)) ×ˢ (Icc (1 : ℤ) (hh ij) ×ˢ (Finset.univ : Finset Bool))))
+  let XX : Fin m × Fin m → Bool → Finset (((Fin m × Fin m) × Bool) × (Bool ⊕ (Fin 4 × ℤ × Bool))) :=
+    fun ij b =>
+      ({(ij, b)} : Finset ((Fin m × Fin m) × Bool))
+        ×ˢ ((Finset.univ : Finset Bool).disjSum
+          ((Finset.univ : Finset (Fin 4)) ×ˢ (Icc (1 : ℤ) (hh ij) ×ˢ (Finset.univ : Finset Bool))))
   have hB0 : 0 ≤ B := by
     have ij : Fin m × Fin m := (⟨0, by omega⟩, ⟨0, by omega⟩)
     simpa using hA ij ∅
-  have hsumXX : ∀ w ij b, ∑ x ∈ XX ij b, |vx w x| = |vA w ij| + |vA' w ij| +
-      4 * (∑ s ∈ Icc (1 : ℤ) (hh ij), (|vT w ij s| + |vTd w ij b s|)) := by
+  have hsumXX
+      : ∀ w ij b,
+        ∑ x ∈ XX ij b, |vx w x|
+          = |vA w ij| + |vA' w ij|
+            + 4 * (∑ s ∈ Icc (1 : ℤ) (hh ij), (|vT w ij s| + |vTd w ij b s|)) := by
     intro w ij b
     simp only [XX, sum_product, sum_singleton, sum_disjSum, Fintype.sum_bool, vx, sum_const,
       card_univ, Fintype.card_fin, nsmul_eq_mul]
     push_cast
-    have : ∑ s ∈ Icc (1 : ℤ) (hh ij), (|vTd w ij b s| + |vT w ij s|) =
-        ∑ s ∈ Icc (1 : ℤ) (hh ij), (|vT w ij s| + |vTd w ij b s|) :=
+    have : ∑ s ∈ Icc (1 : ℤ) (hh ij), (|vTd w ij b s| + |vT w ij s|)
+        = ∑ s ∈ Icc (1 : ℤ) (hh ij), (|vT w ij s| + |vTd w ij b s|) :=
       sum_congr rfl (fun s _ => add_comm _ _)
-    rw [this]; ring
+    rw [this]
+    ring
   have hcardXX : ∀ ij b, (XX ij b).card ≤ 2 + 8 * N := by
     intro ij b
     simp only [XX, card_product, card_singleton, card_disjSum, card_univ, Fintype.card_bool,
@@ -683,9 +765,12 @@ theorem grid_squares_bound : GridValuationBoundSquares := by
     have h1 := hdh ij
     have h2 := hdd ij
     have : ((hh ij : ℤ) + 1 - 1).toNat = hh ij := by omega
-    rw [this]; omega
-  refine ((grid_bound W _ S m N lam δ ell N0 vr vx XX ch dd yy S0 cc ee qq vq (fun _ => B) B BN Bδ W0
-    hlam hδ hN0 hvq hprime hfib hdd hyy hcc ?_ ?_ hBN hBδ hq).2 hB0 (fun _ => le_rfl) hcardXX).1
+    rw [this]
+    omega
+  refine ((grid_bound W _ S m N lam δ ell N0 vr vx XX ch dd yy S0 cc ee qq vq
+    (fun _ => B)
+    B BN Bδ W0 hlam hδ hN0 hvq hprime hfib hdd hyy hcc ?_ ?_ hBN hBδ
+    hq).2 hB0 (fun _ => le_rfl) hcardXX).1
   · intro w hw ij
     rw [hsumXX]
     have := hsq w hw ij
@@ -701,7 +786,9 @@ theorem grid_squares_bound : GridValuationBoundSquares := by
 section tests
 
 def trivialValuationRat : AddValuation ℚ (WithTop ℝ) :=
-  AddValuation.of (fun x => if x = 0 then ⊤ else 0) (by simp) (by simp)
+  AddValuation.of
+    (fun x => if x = 0 then ⊤ else 0)
+    (by simp) (by simp)
     (by
       intro x y
       by_cases hx : x = 0
@@ -718,7 +805,9 @@ def trivialValuationRat : AddValuation ℚ (WithTop ℝ) :=
         · simp [hx, hy])
 
 def twoAdicValuationRat : AddValuation ℚ (WithTop ℝ) :=
-  AddValuation.of (fun x => if x = 0 then ⊤ else (((padicValRat 2 x : ℤ) : ℝ) : WithTop ℝ)) (by simp) (by simp)
+  AddValuation.of
+    (fun x => if x = 0 then ⊤ else (((padicValRat 2 x : ℤ) : ℝ) : WithTop ℝ))
+    (by simp) (by simp)
     (by
       intro x y
       by_cases hx : x = 0
@@ -737,7 +826,9 @@ def twoAdicValuationRat : AddValuation ℚ (WithTop ℝ) :=
       · by_cases hy : y = 0
         · simp [hy]
         · simp only [if_neg hx, if_neg hy, if_neg (mul_ne_zero hx hy)]
-          rw [padicValRat.mul hx hy, ← WithTop.coe_add]; push_cast; rfl)
+          rw [padicValRat.mul hx hy, ← WithTop.coe_add]
+          push_cast
+          rfl)
 
 lemma two_adic_valuation_half : twoAdicValuationRat (1 / 2 : ℚ) = ((-1 : ℝ) : WithTop ℝ) := by
   have h : padicValRat 2 (1 / 2 : ℚ) = -1 := by

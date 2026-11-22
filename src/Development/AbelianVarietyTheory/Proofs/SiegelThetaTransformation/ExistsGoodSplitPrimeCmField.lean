@@ -14,40 +14,43 @@ namespace GlobalTheory.SW.SplitPrime
 
 open Polynomial
 
-
 open Matrix Complex NumberField Filter Topology in
 open scoped ComplexConjugate ComplexOrder Real Classical in
 open Polynomial in
-theorem _root_.GlobalTheory.SW.SplitPrime.exists_prim_den (E : Type) [Field E] [NumberField E] :
-    ∃ (θ : 𝓞 E) (d : ℤ), d ≠ 0 ∧ Algebra.adjoin ℚ {(θ : E)} = ⊤ ∧
-      ∀ a : 𝓞 E, ∃ g : ℤ[X], (d : 𝓞 E) * a = aeval θ g := by
+theorem _root_.GlobalTheory.SW.SplitPrime.exists_prim_den (E : Type) [Field E] [NumberField E]
+    : ∃ (θ : 𝓞 E) (d : ℤ),
+      d ≠ 0 ∧ Algebra.adjoin ℚ {(θ : E)} = ⊤
+        ∧ ∀ a : 𝓞 E, ∃ g : ℤ[X], (d : 𝓞 E) * a = aeval θ g := by
   obtain ⟨α, hα⟩ := Field.exists_primitive_element ℚ E
-  obtain ⟨y, hy0, hyi⟩ := ((IsFractionRing.isAlgebraic_iff ℤ ℚ E).mpr
-    (Algebra.IsAlgebraic.isAlgebraic α)).exists_integral_multiple
+  obtain ⟨y, hy0, hyi⟩ :=
+    ((IsFractionRing.isAlgebraic_iff ℤ ℚ E).mpr
+      (Algebra.IsAlgebraic.isAlgebraic α)).exists_integral_multiple
   set θ : E := y • α with hθdef
   clear_value θ
   have hθ : IntermediateField.adjoin ℚ {θ} = ⊤ := by
     rw [eq_top_iff, ← hα, IntermediateField.adjoin_simple_le_iff]
     have hy : ((y : ℚ) : E) ≠ 0 := by exact_mod_cast hy0
-    have : α = ((y : ℚ) : E)⁻¹ * θ := by
-      rw [hθdef, zsmul_eq_mul]; push_cast; field_simp
+    have : α = ((y : ℚ) : E)⁻¹ * θ := by rw [hθdef, zsmul_eq_mul]; push_cast; field_simp
     rw [this]
     exact mul_mem (inv_mem (IntermediateField.algebraMap_mem _ _))
       (IntermediateField.mem_adjoin_simple_self ℚ θ)
   have hθℚ : IsIntegral ℚ θ := hyi.tower_top
-  let B : PowerBasis ℚ E := (IntermediateField.adjoin.powerBasis hθℚ).map
-    ((IntermediateField.equivOfEq hθ).trans IntermediateField.topEquiv)
+  let B : PowerBasis ℚ E :=
+    (IntermediateField.adjoin.powerBasis hθℚ).map
+      ((IntermediateField.equivOfEq hθ).trans IntermediateField.topEquiv)
   have hBgen : B.gen = θ := by simp [B]
-  have hD := Algebra.discr_isIntegral ℚ (R := ℤ) (b := B.basis) (fun i => by
-    rw [B.basis_eq_pow, hBgen]; exact hyi.pow _)
+  have hD :=
+    Algebra.discr_isIntegral ℚ (R := ℤ) (b := B.basis)
+      (fun i => by rw [B.basis_eq_pow, hBgen]; exact hyi.pow _)
   obtain ⟨d, hd⟩ := IsIntegrallyClosed.isIntegral_iff.mp hD
   refine ⟨⟨θ, hyi⟩, d, ?_, ?_, fun a => ?_⟩
   · rintro rfl
     exact Algebra.discr_not_zero_of_basis ℚ B.basis (by simpa using hd.symm)
   · show Algebra.adjoin ℚ {θ} = ⊤
-    rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic hθℚ.isAlgebraic, hθ]; rfl
-  · have hm := Algebra.discr_mul_isIntegral_mem_adjoin ℚ (R := ℤ) (B := B)
-      (by rw [hBgen]; exact hyi) a.2
+    rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic hθℚ.isAlgebraic, hθ]
+    rfl
+  · have hm :=
+      Algebra.discr_mul_isIntegral_mem_adjoin ℚ (R := ℤ) (B := B) (by rw [hBgen]; exact hyi) a.2
     rw [hBgen, ← hd, Algebra.adjoin_singleton_eq_range_aeval] at hm
     obtain ⟨g, hg⟩ := hm
     refine ⟨g, Subtype.ext ?_⟩
@@ -56,13 +59,15 @@ theorem _root_.GlobalTheory.SW.SplitPrime.exists_prim_den (E : Type) [Field E] [
       (aeval_algebraMap_apply E (⟨θ, hyi⟩ : 𝓞 E) g).symm
     refine Eq.trans ?_ h1.symm
     rw [hg, algebraMap_smul, zsmul_eq_mul]
-    push_cast; rfl
+    push_cast
+    rfl
 
 open Matrix Complex NumberField Filter Topology in
 open scoped ComplexConjugate ComplexOrder Real Classical in
 open Polynomial in
-private theorem exists_prime_dvd_eval_not_dvd_of_natDegree_pos (h : ℤ[X]) (hh : 0 < h.natDegree) (M : ℤ)
-    (hM : M ≠ 0) : ∃ (n : ℤ) (p : ℕ), p.Prime ∧ (p : ℤ) ∣ h.eval n ∧ ¬ (p : ℤ) ∣ M := by
+private theorem exists_prime_dvd_eval_not_dvd_of_natDegree_pos
+    (h : ℤ[X]) (hh : 0 < h.natDegree) (M : ℤ) (hM : M ≠ 0)
+    : ∃ (n : ℤ) (p : ℕ), p.Prime ∧ (p : ℤ) ∣ h.eval n ∧ ¬ (p : ℤ) ∣ M := by
   set c := h.coeff 0 with hcdef
   by_cases hc : c = 0
   · obtain ⟨p, hp1, hp⟩ := Nat.exists_infinite_primes (M.natAbs + 1)
@@ -76,7 +81,8 @@ private theorem exists_prime_dvd_eval_not_dvd_of_natDegree_pos (h : ℤ[X]) (hh 
   have hq0 : q ≠ 0 := by
     rintro rfl
     rw [mul_zero, sub_eq_zero] at hq
-    rw [hq, natDegree_C] at hh; exact lt_irrefl _ hh
+    rw [hq, natDegree_C] at hh
+    exact lt_irrefl _ hh
   set r : ℤ[X] := q.comp (C (c * M) * X) with hr
   set G : ℤ[X] := 1 + C M * X * r with hG
   have hev : ∀ t : ℤ, h.eval (c * M * t) = c * G.eval t := by
@@ -120,16 +126,16 @@ private theorem exists_prime_dvd_eval_not_dvd_of_natDegree_pos (h : ℤ[X]) (hh 
   · have hg' : g = 1 + M * (t * r.eval t) := by
       simp only [hg, hG, eval_add, eval_one, eval_mul, eval_C, eval_X]; ring
     have h4 : (1 : ℤ) = g - M * (t * r.eval t) := by rw [hg']; ring
-    have : (g.natAbs.minFac : ℤ) ∣ 1 := by
-      rw [h4]; exact dvd_sub hpg (Dvd.dvd.mul_right hpM _)
+    have : (g.natAbs.minFac : ℤ) ∣ 1 := by rw [h4]; exact dvd_sub hpg (Dvd.dvd.mul_right hpM _)
     exact hp.one_lt.ne' (by exact_mod_cast Int.eq_one_of_dvd_one (by positivity) this)
 
 open Matrix Complex NumberField Filter Topology in
 open scoped ComplexConjugate ComplexOrder Real Classical in
 open Polynomial in
-private theorem span_prime_sup_span_proper_of_dvd_norm {E : Type} [Field E] [NumberField E] (x : 𝓞 E)
-    (p : ℕ) (hp : p.Prime) (hdvd : (p : ℤ) ∣ Algebra.norm ℤ x) :
-    Ideal.span {(p : 𝓞 E)} ⊔ Ideal.span {x} ≠ ⊤ := by
+private theorem span_prime_sup_span_proper_of_dvd_norm
+    {E : Type} [Field E] [NumberField E]
+    (x : 𝓞 E) (p : ℕ) (hp : p.Prime) (hdvd : (p : ℤ) ∣ Algebra.norm ℤ x)
+    : Ideal.span {(p : 𝓞 E)} ⊔ Ideal.span {x} ≠ ⊤ := by
   intro htop
   have h1 : (1 : 𝓞 E) ∈ Ideal.span {(p : 𝓞 E)} ⊔ Ideal.span {x} := htop ▸ Submodule.mem_top
   obtain ⟨a, ha, b, hb, hab⟩ := Submodule.mem_sup.mp h1
@@ -151,42 +157,45 @@ private theorem span_prime_sup_span_proper_of_dvd_norm {E : Type} [Field E] [Num
       rw [Int.natAbs_ne_zero, Ne, Algebra.norm_eq_zero_iff]; exact hx
     haveI : Finite (𝓞 E ⧸ I) := Nat.finite_of_card_ne_zero (hcard ▸ hne)
     haveI := Fact.mk hp
-    have hpc : p ∣ Nat.card (𝓞 E ⧸ I) := by
-      rw [hcard]; simpa using Int.natAbs_dvd_natAbs.mpr hdvd
+    have hpc : p ∣ Nat.card (𝓞 E ⧸ I) := by rw [hcard]; simpa using Int.natAbs_dvd_natAbs.mpr hdvd
     obtain ⟨z, hz⟩ := exists_prime_addOrderOf_dvd_card' (G := 𝓞 E ⧸ I) p hpc
     have hpz : (p : 𝓞 E ⧸ I) * z = 0 := by
       rw [← nsmul_eq_mul, ← hz]; exact addOrderOf_nsmul_eq_zero z
     have hunit : (Ideal.Quotient.mk I y) * (p : 𝓞 E ⧸ I) = 1 := by
       have := congrArg (Ideal.Quotient.mk I) hab
       rw [map_add (f := _), Ideal.Quotient.eq_zero_iff_mem.mpr hb, add_zero, map_one, map_mul,
-        map_natCast] at this
+          map_natCast]
+        at this
       exact this
     have hz0 : z = 0 := by
-      calc z = (Ideal.Quotient.mk I y) * (p : 𝓞 E ⧸ I) * z := by rw [hunit, one_mul]
+      calc
+        z = (Ideal.Quotient.mk I y) * (p : 𝓞 E ⧸ I) * z := by rw [hunit, one_mul]
         _ = 0 := by rw [mul_assoc, hpz, mul_zero]
     rw [hz0, addOrderOf_zero] at hz
     exact hp.one_lt.ne hz
 
-
 open Matrix Complex NumberField Filter Topology in
 open scoped ComplexConjugate ComplexOrder Real Classical in
 open Polynomial in
-theorem _root_.GlobalTheory.SW.SplitPrime.exists_degree_one {E : Type} [Field E] [NumberField E] (θ : 𝓞 E)
-    (hθ : θ ≠ 0) (d : ℤ) (hd : d ≠ 0) (hden : ∀ a : 𝓞 E, ∃ g : ℤ[X], (d : 𝓞 E) * a = aeval θ g)
-    (N : ℤ) (hN : N ≠ 0) :
-    ∃ P : Ideal (𝓞 E), P.IsMaximal ∧ (N : 𝓞 E) ∉ P ∧
-      Function.Surjective (Int.castRingHom (𝓞 E ⧸ P)) := by
-  obtain ⟨n, p, hp, hpn, hpM⟩ := exists_prime_dvd_eval_not_dvd_of_natDegree_pos
-    (LinearMap.charpoly (Algebra.lmul ℤ (𝓞 E) θ)) (by
-      rw [LinearMap.charpoly_natDegree]; exact Module.finrank_pos) (N * d) (mul_ne_zero hN hd)
-  have hnorm : (LinearMap.charpoly (Algebra.lmul ℤ (𝓞 E) θ)).eval n =
-      Algebra.norm ℤ ((n : 𝓞 E) - θ) := by
+theorem _root_.GlobalTheory.SW.SplitPrime.exists_degree_one
+    {E : Type} [Field E] [NumberField E]
+    (θ : 𝓞 E) (hθ : θ ≠ 0)
+    (d : ℤ) (hd : d ≠ 0) (hden : ∀ a : 𝓞 E, ∃ g : ℤ[X], (d : 𝓞 E) * a = aeval θ g)
+    (N : ℤ) (hN : N ≠ 0)
+    : ∃ P : Ideal (𝓞 E),
+      P.IsMaximal ∧ (N : 𝓞 E) ∉ P ∧ Function.Surjective (Int.castRingHom (𝓞 E ⧸ P)) := by
+  obtain ⟨n, p, hp, hpn, hpM⟩ :=
+    exists_prime_dvd_eval_not_dvd_of_natDegree_pos (LinearMap.charpoly (Algebra.lmul ℤ (𝓞 E) θ))
+      (by rw [LinearMap.charpoly_natDegree]; exact Module.finrank_pos) (N * d) (mul_ne_zero hN hd)
+  have hnorm
+      : (LinearMap.charpoly (Algebra.lmul ℤ (𝓞 E) θ)).eval n = Algebra.norm ℤ ((n : 𝓞 E) - θ) := by
     rw [LinearMap.eval_charpoly, Algebra.norm_apply]
     congr 1
     ext x
     simp [Algebra.smul_def, sub_mul]
   rw [hnorm] at hpn
-  obtain ⟨P, hP, hJ⟩ := Ideal.exists_le_maximal _ (span_prime_sup_span_proper_of_dvd_norm _ p hp hpn)
+  obtain ⟨P, hP, hJ⟩ :=
+    Ideal.exists_le_maximal _ (span_prime_sup_span_proper_of_dvd_norm _ p hp hpn)
   have hpP : (p : 𝓞 E) ∈ P := hJ (Ideal.mem_sup_left (Ideal.mem_span_singleton_self _))
   have hxP : (n : 𝓞 E) - θ ∈ P := hJ (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _))
   have hcop : ∀ k : ℤ, ¬ (p : ℤ) ∣ k → ∃ v : ℤ, (v : 𝓞 E) * k - 1 ∈ P := by
@@ -224,22 +233,23 @@ theorem _root_.GlobalTheory.SW.SplitPrime.exists_degree_one {E : Type} [Field E]
   simp only [eq_intCast, Int.cast_mul]
   rw [← hga, ← map_intCast (Ideal.Quotient.mk P) v, ← map_mul, ← mul_assoc, map_mul, hv', one_mul]
 
-
 open Matrix Complex NumberField Filter Topology in
 open scoped ComplexConjugate ComplexOrder Real Classical in
 open Polynomial in
-theorem _root_.GlobalTheory.SW.SplitPrime.absNorm_prime {E : Type} [Field E] [NumberField E]
-    (P : Ideal (𝓞 E)) (hP : P.IsMaximal)
-    (hs : Function.Surjective (Int.castRingHom (𝓞 E ⧸ P))) : (Ideal.absNorm P).Prime := by
+theorem _root_.GlobalTheory.SW.SplitPrime.absNorm_prime
+    {E : Type} [Field E] [NumberField E]
+    (P : Ideal (𝓞 E)) (hP : P.IsMaximal) (hs : Function.Surjective (Int.castRingHom (𝓞 E ⧸ P)))
+    : (Ideal.absNorm P).Prime := by
   letI := Ideal.Quotient.field P
   have hN : Ideal.absNorm P = Nat.card (𝓞 E ⧸ P) := Ideal.absNorm_eq_natCard P
   obtain ⟨p, hp⟩ := CharP.exists (𝓞 E ⧸ P)
   haveI := hp
-  have hp' : p.Prime := (CharP.char_is_prime_or_zero (𝓞 E ⧸ P) p).resolve_right (by
-    rintro rfl
-    haveI : CharZero (𝓞 E ⧸ P) := CharP.charP_to_charZero _
-    haveI : Infinite (𝓞 E ⧸ P) := Infinite.of_injective _ Nat.cast_injective
-    exact not_finite (𝓞 E ⧸ P))
+  have hp' : p.Prime :=
+    (CharP.char_is_prime_or_zero (𝓞 E ⧸ P) p).resolve_right (by
+      rintro rfl
+      haveI : CharZero (𝓞 E ⧸ P) := CharP.charP_to_charZero _
+      haveI : Infinite (𝓞 E ⧸ P) := Infinite.of_injective _ Nat.cast_injective
+      exact not_finite (𝓞 E ⧸ P))
   haveI := Fact.mk hp'
   have hbij : Function.Bijective (ZMod.castHom (dvd_refl p) (𝓞 E ⧸ P)) := by
     refine ⟨(ZMod.castHom (dvd_refl p) (𝓞 E ⧸ P)).injective, fun y => ?_⟩
@@ -248,23 +258,27 @@ theorem _root_.GlobalTheory.SW.SplitPrime.absNorm_prime {E : Type} [Field E] [Nu
   rw [hN, ← Nat.card_congr (Equiv.ofBijective _ hbij), Nat.card_zmod]
   exact hp'
 
-
 open Matrix Complex NumberField Filter Topology in
 open scoped ComplexConjugate ComplexOrder Real Classical in
 open Polynomial in
-theorem _root_.GlobalTheory.SW.SplitPrime.exists_goodPrime : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
-    (m : ℕ), 0 < m → ∃ (q : ℕ) (P : Ideal (𝓞 E)), _root_.GlobalTheory.SW.GoodPrime m q P := by
+theorem _root_.GlobalTheory.SW.SplitPrime.exists_goodPrime
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (m : ℕ),
+      0 < m → ∃ (q : ℕ) (P : Ideal (𝓞 E)), _root_.GlobalTheory.SW.GoodPrime m q P := by
   intro E _ _ _ m hm
   obtain ⟨θ, d, hd, hadj, hden⟩ := _root_.GlobalTheory.SW.SplitPrime.exists_prim_den E
-  have hcc : ∀ x : E, _root_.ReciprocityTheory.ChartRestriction.G.FD.cc x = IsCMField.complexConj E x := fun x => rfl
-  let θc : 𝓞 E := ⟨_root_.ReciprocityTheory.ChartRestriction.G.FD.cc (θ : E), _root_.GlobalTheory.SW.Base.isIntegral_cc θ.2⟩
+  have hcc
+      : ∀ x : E, _root_.ReciprocityTheory.ChartRestriction.G.FD.cc x = IsCMField.complexConj E x :=
+    fun x => rfl
+  let θc : 𝓞 E := ⟨
+    _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (θ : E),
+    _root_.GlobalTheory.SW.Base.isIntegral_cc θ.2
+  ⟩
   have hβ : θ - θc ≠ 0 := by
     intro h
     have h' : IsCMField.complexConj E (θ : E) = θ := by
       rw [← hcc]; exact (congrArg Subtype.val (sub_eq_zero.mp h)).symm
     have : (((IsCMField.complexConj E).toAlgHom).restrictScalars ℚ) = AlgHom.id ℚ E :=
-      AlgHom.ext_of_adjoin_eq_top hadj (by
-        intro x hx; rw [Set.mem_singleton_iff.mp hx]; exact h')
+      AlgHom.ext_of_adjoin_eq_top hadj (by intro x hx; rw [Set.mem_singleton_iff.mp hx]; exact h')
     apply IsCMField.complexConj_ne_one E
     ext x
     exact DFunLike.congr_fun this x
@@ -277,10 +291,12 @@ theorem _root_.GlobalTheory.SW.SplitPrime.exists_goodPrime : ∀ (E : Type) [Fie
     rw [hcc, map_zero]
   set Nv : ℤ := m * (2 * discr E) * Algebra.norm ℤ (θ - θc) with hNv
   have hNv0 : Nv ≠ 0 := by
-    refine mul_ne_zero (mul_ne_zero (by exact_mod_cast hm.ne')
-      (mul_ne_zero two_ne_zero (discr_ne_zero E))) ?_
-    rw [Ne, Algebra.norm_eq_zero_iff]; exact hβ
-  obtain ⟨P, hP, hNP, hs⟩ := _root_.GlobalTheory.SW.SplitPrime.exists_degree_one θ hθ d hd hden Nv hNv0
+    refine mul_ne_zero
+      (mul_ne_zero (by exact_mod_cast hm.ne') (mul_ne_zero two_ne_zero (discr_ne_zero E))) ?_
+    rw [Ne, Algebra.norm_eq_zero_iff]
+    exact hβ
+  obtain ⟨P, hP, hNP, hs⟩ :=
+    _root_.GlobalTheory.SW.SplitPrime.exists_degree_one θ hθ d hd hden Nv hNv0
   have hq := _root_.GlobalTheory.SW.SplitPrime.absNorm_prime P hP hs
   have hqN : ¬ ((Ideal.absNorm P : ℕ) : ℤ) ∣ Nv := by
     rintro ⟨k, hk⟩
@@ -299,14 +315,14 @@ theorem _root_.GlobalTheory.SW.SplitPrime.exists_goodPrime : ∀ (E : Type) [Fie
       have := hP.eq_of_le hne le_sup_left
       exact le_sup_right.trans this.symm.le
     obtain ⟨n0, hn0⟩ := hs (Ideal.Quotient.mk P θ)
-    have h1 : θ - (n0 : 𝓞 E) ∈ P := by
-      rw [← Ideal.Quotient.eq, ← hn0, eq_intCast, map_intCast]
+    have h1 : θ - (n0 : 𝓞 E) ∈ P := by rw [← Ideal.Quotient.eq, ← hn0, eq_intCast, map_intCast]
     have h2 : θc - (n0 : 𝓞 E) ∈ P := by
       apply hle
       unfold _root_.GlobalTheory.SW.conjI
       apply Ideal.subset_span
       refine ⟨θ - (n0 : 𝓞 E), h1, ?_⟩
-      change ((θc : E) - ((n0 : 𝓞 E) : E)) = _root_.ReciprocityTheory.ChartRestriction.G.FD.cc ((θ : E) - ((n0 : 𝓞 E) : E))
+      change ((θc : E) - ((n0 : 𝓞 E) : E))
+        = _root_.ReciprocityTheory.ChartRestriction.G.FD.cc ((θ : E) - ((n0 : 𝓞 E) : E))
       have hn : ((n0 : 𝓞 E) : E) = (n0 : E) := by push_cast; rfl
       rw [hn, hcc, map_sub, map_intCast]
       rfl

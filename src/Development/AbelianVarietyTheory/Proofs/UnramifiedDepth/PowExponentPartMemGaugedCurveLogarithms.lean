@@ -14,7 +14,9 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.CurveLogar
 @[expose] public section
 
 open scoped BigOperators
-open NumberField Formalism.IncomingBounds Formalism.L2.FormalSeriesBounds Formalism.L2.Pj GlobalTheory.RowLaw ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+open NumberField Formalism.IncomingBounds Formalism.L2.FormalSeriesBounds Formalism.L2.Pj
+  GlobalTheory.RowLaw ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 
 noncomputable section
 
@@ -62,8 +64,8 @@ theorem ge_of_pow_eq_one (V : VF C) {ζ : C} {p : ℕ} (hp : 0 < p) (h : ζ ^ p 
       · exact h
     rw [h3]
 
-theorem sum_pow_root {ζ : C} {p : ℕ} (hζ : IsPrimitiveRoot ζ p) (m : ℕ) :
-    ∑ j ∈ Finset.range p, (ζ ^ j) ^ m = if p ∣ m then (p : C) else 0 := by
+theorem sum_pow_root {ζ : C} {p : ℕ} (hζ : IsPrimitiveRoot ζ p) (m : ℕ)
+    : ∑ j ∈ Finset.range p, (ζ ^ j) ^ m = if p ∣ m then (p : C) else 0 := by
   have e : ∀ j, (ζ ^ j) ^ m = (ζ ^ m) ^ j := fun j => by rw [← pow_mul, ← pow_mul, mul_comm]
   simp_rw [e]
   split_ifs with h
@@ -73,18 +75,19 @@ theorem sum_pow_root {ζ : C} {p : ℕ} (hζ : IsPrimitiveRoot ζ p) (m : ℕ) :
     rw [← pow_mul, mul_comm m p, pow_mul, hζ.pow_eq_one, one_pow, sub_self] at this
     exact (mul_eq_zero.1 this).resolve_right hne
 
-
 open Classical in
 def filt (P : ℕ → Prop) (f : PowerSeries C) : PowerSeries C :=
   PowerSeries.mk fun m => if P m then PowerSeries.coeff m f else 0
 
 open Classical in
-theorem coeff_filt (P : ℕ → Prop) (f : PowerSeries C) (m : ℕ) :
-    PowerSeries.coeff m (filt P f) = if P m then PowerSeries.coeff m f else 0 := by
+theorem coeff_filt (P : ℕ → Prop) (f : PowerSeries C) (m : ℕ)
+    : PowerSeries.coeff m (filt P f) = if P m then PowerSeries.coeff m f else 0 := by
   simp [filt]
 
-theorem sub_avg [CharZero C] {ζ : C} {p : ℕ} (hp : 0 < p) (hζ : IsPrimitiveRoot ζ p) (f : PowerSeries C) :
-    f + -((p : C)⁻¹ • ∑ j ∈ Finset.range p, PowerSeries.rescale (ζ ^ j) f) = filt (fun m => ¬ p ∣ m) f := by
+theorem sub_avg
+    [CharZero C] {ζ : C} {p : ℕ} (hp : 0 < p) (hζ : IsPrimitiveRoot ζ p) (f : PowerSeries C)
+    : f + -((p : C)⁻¹ • ∑ j ∈ Finset.range p, PowerSeries.rescale (ζ ^ j) f)
+      = filt (fun m => ¬ p ∣ m) f := by
   ext m
   have hp' : (p : C) ≠ 0 := by exact_mod_cast hp.ne'
   set_option synthInstance.maxHeartbeats 100000 in
@@ -95,13 +98,14 @@ theorem sub_avg [CharZero C] {ζ : C} {p : ℕ} (hp : 0 < p) (hζ : IsPrimitiveR
   · simp [h, hp']
   · simp [h]
 
-theorem filt_filt (P Q : ℕ → Prop) (f : PowerSeries C) :
-    filt P (filt Q f) = filt (fun m => P m ∧ Q m) f := by
+theorem filt_filt (P Q : ℕ → Prop) (f : PowerSeries C)
+    : filt P (filt Q f) = filt (fun m => P m ∧ Q m) f := by
   ext m
   rw [coeff_filt, coeff_filt, coeff_filt]
   by_cases h : P m <;> by_cases h' : Q m <;> simp [h, h']
 
-theorem filt_congr {P Q : ℕ → Prop} (h : ∀ m, P m ↔ Q m) (f : PowerSeries C) : filt P f = filt Q f := by
+theorem filt_congr {P Q : ℕ → Prop} (h : ∀ m, P m ↔ Q m) (f : PowerSeries C)
+    : filt P f = filt Q f := by
   have : P = Q := funext fun m => propext (h m)
   rw [this]
 
@@ -111,8 +115,9 @@ theorem filt_true {P : ℕ → Prop} (h : ∀ m, P m) (f : PowerSeries C) : filt
 
 def Good (l n m : ℕ) : Prop := ∀ p < n, p.Prime → p ≠ l → ¬ p ∣ m
 
-theorem coeff_filt_good {l : ℕ} (hl : l.Prime) (hl2 : l ≠ 2) (f : PowerSeries C) (m n : ℕ) (hn : m + 3 ≤ n) :
-    PowerSeries.coeff m (filt (Good l n) f) = PowerSeries.coeff m (typ l f) := by
+theorem coeff_filt_good
+    {l : ℕ} (hl : l.Prime) (hl2 : l ≠ 2) (f : PowerSeries C) (m n : ℕ) (hn : m + 3 ≤ n)
+    : PowerSeries.coeff m (filt (Good l n) f) = PowerSeries.coeff m (typ l f) := by
   rw [coeff_filt]
   unfold typ
   by_cases hm : ∃ s, l ^ s = m
@@ -130,23 +135,35 @@ theorem coeff_filt_good {l : ℕ} (hl : l.Prime) (hl2 : l ≠ 2) (f : PowerSerie
       by_contra hne
       exact hg q (by have := Nat.le_of_dvd hpos hqm; omega) hq hne hqm
 
-variable {V : VF C} {d : ℕ} [NeZero d] {I : Fin 2 → Type} [∀ g, Fintype (I g)] {κ : Type} [Fintype κ]
+variable
+  {V : VF C} {d : ℕ} [NeZero d]
+  {I : Fin 2 → Type} [∀ g, Fintype (I g)]
+  {κ : Type} [Fintype κ]
   {X : RawChart C d I κ}
 
-theorem filt_not_dvd_mem (hX : RLaw X V) (g : Fin 2) {p : ℕ} (hp : p.Prime) (hpl : p ≠ V.l)
-    (a : (κ → PowerSeries C) × (JJ I g → PowerSeries C)) (ha : a ∈ Cv X V g) :
-    ((fun i => filt (fun m => ¬ p ∣ m) (a.1 i), fun q => filt (fun m => ¬ p ∣ m) (a.2 q)) :
-      (κ → PowerSeries C) × (JJ I g → PowerSeries C)) ∈ Cv X V g := by
+theorem filt_not_dvd_mem
+    (hX : RLaw X V)
+    (g : Fin 2)
+    {p : ℕ} (hp : p.Prime) (hpl : p ≠ V.l)
+    (a : (κ → PowerSeries C) × (JJ I g → PowerSeries C)) (ha : a ∈ Cv X V g)
+    : ((fun i => filt (fun m => ¬ p ∣ m) (a.1 i), fun q => filt (fun m => ¬ p ∣ m) (a.2 q))
+        : (κ → PowerSeries C) × (JJ I g → PowerSeries C))
+      ∈ Cv X V g := by
   have := hX.charZero
   have := hX.closed
   have : NeZero (p : C) := ⟨by exact_mod_cast hp.ne_zero⟩
   have : NeZero p := ⟨hp.ne_zero⟩
   obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot C p
-  obtain ⟨h0, hadd, hneg, hres⟩ := GlobalTheory.T.gaugedFormalGroupCurveLogarithms_addSubgroup_rescale C V d I κ X hX g
+  obtain ⟨h0, hadd, hneg, hres⟩ :=
+    GlobalTheory.T.gaugedFormalGroupCurveLogarithms_addSubgroup_rescale C V d I κ X hX g
   have hζ0 : V.Ge 0 ζ := ge_of_pow_eq_one V hp.pos hζ.pow_eq_one
-  have hs : ∀ n : ℕ, ((fun i => ∑ j ∈ Finset.range n, PowerSeries.rescale (ζ ^ j) (a.1 i),
-      fun q => ∑ j ∈ Finset.range n, PowerSeries.rescale (ζ ^ j) (a.2 q)) :
-      (κ → PowerSeries C) × (JJ I g → PowerSeries C)) ∈ Cv X V g := by
+  have hs
+      : ∀ n : ℕ,
+        ((
+           fun i => ∑ j ∈ Finset.range n, PowerSeries.rescale (ζ ^ j) (a.1 i),
+           fun q => ∑ j ∈ Finset.range n, PowerSeries.rescale (ζ ^ j) (a.2 q)
+         ) : (κ → PowerSeries C) × (JJ I g → PowerSeries C))
+          ∈ Cv X V g := by
     intro n
     induction n with
     | zero =>
@@ -156,16 +173,23 @@ theorem filt_not_dvd_mem (hX : RLaw X V) (g : Fin 2) {p : ℕ} (hp : p.Prime) (h
       have := hadd _ ih _ (hres (ζ ^ n) (hζ0.pow n) a ha)
       simp only [Finset.sum_range_succ]
       exact this
-  have h2 := hadd _ ha _ (hneg _ (GlobalTheory.T.curveLogarithms_inv_natCast_smul_mem C V d I κ X hX g p (v_prime_eq_zero V hp hpl) _ (hs p)))
+  have h2 :=
+    hadd _ ha _
+      (hneg _
+        (GlobalTheory.T.curveLogarithms_inv_natCast_smul_mem C V d I κ X hX g p
+          (v_prime_eq_zero V hp hpl) _ (hs p)))
   convert h2 using 1
   refine Prod.ext (funext fun i => ?_) (funext fun q => ?_)
   · exact (sub_avg hp.pos hζ (a.1 i)).symm
   · exact (sub_avg hp.pos hζ (a.2 q)).symm
 
-theorem filt_good_mem (hX : RLaw X V) (g : Fin 2)
-    (a : (κ → PowerSeries C) × (JJ I g → PowerSeries C)) (ha : a ∈ Cv X V g) (n : ℕ) :
-    ((fun i => filt (Good V.l n) (a.1 i), fun q => filt (Good V.l n) (a.2 q)) :
-      (κ → PowerSeries C) × (JJ I g → PowerSeries C)) ∈ Cv X V g := by
+theorem filt_good_mem
+    (hX : RLaw X V)
+    (g : Fin 2) (a : (κ → PowerSeries C) × (JJ I g → PowerSeries C)) (ha : a ∈ Cv X V g)
+    (n : ℕ)
+    : ((fun i => filt (Good V.l n) (a.1 i), fun q => filt (Good V.l n) (a.2 q))
+        : (κ → PowerSeries C) × (JJ I g → PowerSeries C))
+      ∈ Cv X V g := by
   induction n with
   | zero =>
     have h : ∀ m, Good V.l 0 m := fun m p hp => absurd hp (Nat.not_lt_zero p)
@@ -200,10 +224,17 @@ theorem filt_good_mem (hX : RLaw X V) (g : Fin 2)
 
 end GlobalTheory.RowLaw.TypPart
 
-
 open GlobalTheory.RowLaw.TypPart in
-theorem GlobalTheory.RowLaw.typ_mem_Cv : ∀ (C : Type) [Field C] (V : VF C) (d : ℕ) [NeZero d] (I : Fin 2 → Type) [∀ g, Fintype (I g)] (κ : Type) [Fintype κ] (X : RawChart C d I κ), RLaw X V → ∀ g, ∀ a ∈ Cv X V g, ((fun i => typ V.l (a.1 i), fun q => typ V.l (a.2 q)) : ((κ → PowerSeries C) × (JJ I g → PowerSeries C))) ∈ Cv X V g := by
+theorem GlobalTheory.RowLaw.typ_mem_Cv
+    : ∀ (C : Type) [Field C] (V : VF C) (d : ℕ) [NeZero d] (I : Fin 2 → Type) [∀ g, Fintype (I g)]
+        (κ : Type) [Fintype κ] (X : RawChart C d I κ),
+      RLaw X V
+        → ∀ g, ∀ a ∈ Cv X V g,
+          ((fun i => typ V.l (a.1 i), fun q => typ V.l (a.2 q))
+              : ((κ → PowerSeries C) × (JJ I g → PowerSeries C)))
+            ∈ Cv X V g := by
   intro C _ V d _ I _ κ _ X hX g a ha
-  refine GlobalTheory.RowLaw.cv_closed_under_limits C V d I κ X hX g _ _ (filt_good_mem hX g a ha) fun m => ⟨m + 3, fun n hn => ⟨fun i => ?_, fun q => ?_⟩⟩
+  refine GlobalTheory.RowLaw.cv_closed_under_limits C V d I κ X hX g _ _ (filt_good_mem hX g a ha)
+    fun m => ⟨m + 3, fun n hn => ⟨fun i => ?_, fun q => ?_⟩⟩
   · exact coeff_filt_good V.l_prime hX.odd _ m n hn
   · exact coeff_filt_good V.l_prime hX.odd _ m n hn

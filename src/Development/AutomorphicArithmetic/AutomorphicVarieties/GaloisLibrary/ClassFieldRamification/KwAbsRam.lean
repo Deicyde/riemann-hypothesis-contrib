@@ -7,20 +7,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain IntermediateField Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Kum UpperTheory.V.CF
+open NumberField IsDedekindDomain IntermediateField Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal UpperTheory.V.Kum UpperTheory.V.CF
 open scoped Pointwise
 
-private theorem abelian_ramification_cyclotomic_bound (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (V : Subgroup (G ℚ Ω))
-    (hV : IsOpen (V : Set (G ℚ Ω))) (hc : commutator (G ℚ Ω) ≤ V) (M : ℕ) (hM : 0 < M)
-    (hI : ∀ A : ValuationSubring Ω, ¬ A.valuation (M : Ω) < 1 → Ine (F := ℚ) A ≤ V) :
-    ∃ n : ℕ, ∀ g : G ℚ Ω, (∀ ζ : Ω, ζ ^ M ^ n = 1 → g ζ = ζ) → g ∈ V := by
+private theorem abelian_ramification_cyclotomic_bound
+    (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    (V : Subgroup (G ℚ Ω)) (hV : IsOpen (V : Set (G ℚ Ω))) (hc : commutator (G ℚ Ω) ≤ V)
+    (M : ℕ)
+    (hM : 0 < M) (hI : ∀ A : ValuationSubring Ω, ¬ A.valuation (M : Ω) < 1 → Ine (F := ℚ) A ≤ V)
+    : ∃ n : ℕ, ∀ g : G ℚ Ω, (∀ ζ : Ω, ζ ^ M ^ n = 1 → g ζ = ζ) → g ∈ V := by
   classical
   haveI : IsGalois ℚ Ω := IsAlgClosure.isGalois ℚ Ω
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   set L : IntermediateField ℚ Ω := IntermediateField.fixedField V with hLdef
   have hVc : IsClosed (V : Set (G ℚ Ω)) := Subgroup.isClosed_of_isOpen V hV
-  have hLV : L.fixingSubgroup = V :=
-    InfiniteGalois.fixingSubgroup_fixedField ⟨V, hVc⟩
+  have hLV : L.fixingSubgroup = V := InfiniteGalois.fixingSubgroup_fixedField ⟨V, hVc⟩
   haveI : FiniteDimensional ℚ L := by
     rw [← InfiniteGalois.isOpen_iff_finite]
     rw [hLV]
@@ -80,8 +82,10 @@ private theorem abelian_ramification_cyclotomic_bound (Ω : Type) [Field Ω] [Ch
       have h1 : (1 : 𝓞 L) ∈ w.asIdeal := by
         have := Nat.gcd_eq_gcd_ab p M
         rw [hcop] at this
-        have e : ((1 : ℤ) : 𝓞 L) = ((p : ℤ) : 𝓞 L) * ((Nat.gcdA p M : ℤ) : 𝓞 L)
-            + ((M : ℤ) : 𝓞 L) * ((Nat.gcdB p M : ℤ) : 𝓞 L) := by
+        have e
+            : ((1 : ℤ) : 𝓞 L)
+              = ((p : ℤ) : 𝓞 L) * ((Nat.gcdA p M : ℤ) : 𝓞 L)
+                + ((M : ℤ) : 𝓞 L) * ((Nat.gcdB p M : ℤ) : 𝓞 L) := by
           rw [← Int.cast_mul, ← Int.cast_mul, ← Int.cast_add]
           congr 1
         simp only [Int.cast_one, Int.cast_natCast] at e
@@ -104,8 +108,12 @@ private theorem abelian_ramification_cyclotomic_bound (Ω : Type) [Field Ω] [Ch
   rw [← hLV]
   exact (IntermediateField.le_iff_le S L).1 hLS hgS
 
-theorem UpperTheory.V.CF.kwAbsRam :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (V : Subgroup (G ℚ Ω)), IsOpen (V : Set (G ℚ Ω)) → commutator (G ℚ Ω) ≤ V → ∀ M : ℕ, 0 < M → (∀ A : ValuationSubring Ω, ¬ A.valuation (M : Ω) < 1 → Ine (F := ℚ) A ≤ V) → ∃ n : ℕ, ∀ g : G ℚ Ω, (∀ ζ : Ω, ζ ^ M ^ n = 1 → g ζ = ζ) → g ∈ V := by
+theorem UpperTheory.V.CF.kwAbsRam
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (V : Subgroup (G ℚ Ω)),
+      IsOpen (V : Set (G ℚ Ω)) → commutator (G ℚ Ω) ≤ V
+        → ∀ M : ℕ,
+          0 < M → (∀ A : ValuationSubring Ω, ¬ A.valuation (M : Ω) < 1 → Ine (F := ℚ) A ≤ V)
+            → ∃ n : ℕ, ∀ g : G ℚ Ω, (∀ ζ : Ω, ζ ^ M ^ n = 1 → g ζ = ζ) → g ∈ V := by
   intro Ω _ alg _ V hV hc M hM hI
   have hch : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
   obtain rfl : alg = DivisionRing.toRatAlgebra := Subsingleton.elim _ _

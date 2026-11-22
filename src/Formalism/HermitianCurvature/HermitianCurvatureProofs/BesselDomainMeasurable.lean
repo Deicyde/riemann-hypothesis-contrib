@@ -11,7 +11,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.JFxDs3
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.JF Formalism.FourierDecayAlt.P.B4
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.JF Formalism.FourierDecayAlt.P.B4
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -149,10 +150,12 @@ lemma tele {F : Mat k r → E} {A c K ε : ℝ} {m : ℕ} (h : CCle A m F c) (hc
 
 section meas
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq]
+variable
+  {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
 
-def adM (p : SS k r) (x : Bool × Mat k r) : Bool × Mat k r := (x.1, cond x.1 (AdL p x.2) (AdR p x.2))
+def adM (p : SS k r) (x : Bool × Mat k r) : Bool × Mat k r :=
+  (x.1, cond x.1 (AdL p x.2) (AdR p x.2))
 
 lemma lr_ad (p : SS k r) (u v : List (Mat k r)) :
     lr (u.map (AdL p)) (v.map (AdR p)) = (lr u v).map (adM p) := by
@@ -167,9 +170,11 @@ lemma unit_lr' {u v : List (Mat k r)} (hu : ∀ X ∈ u, unitLie k r X) (hv : �
   · exact hu X hX
   · exact hv X hX
 
-private theorem inLie_conj_of_mem_GV {y X : Mat k r} (hy : y ∈ GV k r) (hX : inLie k r X) : inLie k r (y⁻¹ * X * y) := by
+private theorem inLie_conj_of_mem_GV {y X : Mat k r} (hy : y ∈ GV k r) (hX : inLie k r X)
+    : inLie k r (y⁻¹ * X * y) := by
   have hHH : Hpk k r * Hpk k r = 1 := Formalism.QuantumDeterminants.GBasic.Hpk_sq k r
-  have hHH' : ∀ A : Mat k r, Hpk k r * (Hpk k r * A) = A := fun A => by rw [← mul_assoc, hHH, one_mul]
+  have hHH' : ∀ A : Mat k r, Hpk k r * (Hpk k r * A) = A := fun A => by
+    rw [← mul_assoc, hHH, one_mul]
   have hX' : Xᴴ * Hpk k r + Hpk k r * X = 0 := hX
   have hy' : yᴴ * Hpk k r * y = Hpk k r := hy
   have hinv : y⁻¹ = Hpk k r * yᴴ * Hpk k r := by
@@ -178,8 +183,8 @@ private theorem inLie_conj_of_mem_GV {y X : Mat k r} (hy : y ∈ GV k r) (hX : i
     rw [hy', hHH]
   have e1 : (y⁻¹ * X * y)ᴴ * Hpk k r = yᴴ * (Xᴴ * Hpk k r) * y := by
     rw [hinv]
-    simp only [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, Formalism.QuantumDeterminants.GBasic.Hpk_herm, mul_assoc,
-      hHH, mul_one]
+    simp only [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose,
+      Formalism.QuantumDeterminants.GBasic.Hpk_herm, mul_assoc, hHH, mul_one]
   have e2 : Hpk k r * (y⁻¹ * X * y) = yᴴ * (Hpk k r * X) * y := by
     rw [hinv]
     simp only [mul_assoc, hHH']
@@ -248,65 +253,93 @@ theorem bessel_domain_measurable : JFxDs2.JDomMeas := by
   have hwu : ∀ x ∈ lr u v, unitLie k r x.2 := unit_lr' hu hv
   have hwt : LRt ((lr u v).map Prod.fst) := lrt_lr u v
   have hwl : (lr u v).length ≤ m := by rw [length_lr]; exact hl
-  have hx : ContinuousOn (fun p => sgs p g) {p : SS k r | D.inSS p} := B6.conjugated_pair_continuous_on D g
+  have hx : ContinuousOn (fun p => sgs p g) {p : SS k r | D.inSS p} :=
+    B6.conjugated_pair_continuous_on D g
   have hxG : ∀ p ∈ {p : SS k r | D.inSS p}, sgs p g ∈ GV k r := fun p hp => B7.sgs_mem D hp hgG
-  have hmain : ContinuousOn (fun p => W ((lr u v).map (adM p)) F (sgs p g)) {p : SS k r | D.inSS p} := by
+  have hmain
+      : ContinuousOn (fun p => W ((lr u v).map (adM p)) F (sgs p g)) {p : SS k r | D.inSS p} := by
     intro p₀ hp₀
     have hAL : AllLie ((lr u v).map (adM p₀)) := by
       intro y hy
       obtain ⟨y', hy', rfl⟩ := List.mem_map.mp hy
       exact adM_lie hp₀ (hwu y' hy').1
     have hck : CkOn ((0 : ℕ) : ℕ∞) (GV k r) (W ((lr u v).map (adM p₀)) F) :=
-      smooth_on_of_word_derivatives ((lr u v).map (adM p₀)) hAL 0 (ckOn_mono (by simpa using hwl) hc.1)
-    have hsec : ContinuousWithinAt (fun p => W ((lr u v).map (adM p₀)) F (sgs p g)) {p : SS k r | D.inSS p} p₀ :=
+      smooth_on_of_word_derivatives ((lr u v).map (adM p₀)) hAL 0
+        (ckOn_mono (by simpa using hwl) hc.1)
+    have hsec : ContinuousWithinAt
+        (fun p => W ((lr u v).map (adM p₀)) F (sgs p g))
+        {p : SS k r | D.inSS p} p₀ :=
       ((B6.continuousOn_of_contDiffOn_group hck).comp hx hxG) p₀ hp₀
     let Kf : SS k r → ℝ := fun p => 1 + ((lr u v).map fun x => ‖(adM p x).2‖ + ‖(adM p₀ x).2‖).sum
     let εf : SS k r → ℝ := fun p => ((lr u v).map fun x => ‖(adM p x).2 - (adM p₀ x).2‖).sum
     have hKc : ContinuousOn Kf {p : SS k r | D.inSS p} :=
-      continuousOn_const.add (cont_sum _ (fun x p => ‖(adM p x).2‖ + ‖(adM p₀ x).2‖) (lr u v)
+      continuousOn_const.add (cont_sum _
+        (fun x p => ‖(adM p x).2‖ + ‖(adM p₀ x).2‖)
+        (lr u v)
         (fun x _ => (adM_cont D x).norm.add continuousOn_const))
     have hεc : ContinuousOn εf {p : SS k r | D.inSS p} :=
-      cont_sum _ (fun x p => ‖(adM p x).2 - (adM p₀ x).2‖) (lr u v)
+      cont_sum _
+        (fun x p => ‖(adM p x).2 - (adM p₀ x).2‖)
+        (lr u v)
         (fun x _ => ((adM_cont D x).sub continuousOn_const).norm)
     have hε0 : εf p₀ = 0 := by simp [εf]
     let Bf : SS k r → ℝ := fun p => ((lr u v).length : ℝ) * (Kf p ^ m * εf p * c)
     have hBc : ContinuousWithinAt Bf {p : SS k r | D.inSS p} p₀ :=
-      continuousWithinAt_const.mul ((((hKc p₀ hp₀).pow m).mul (hεc p₀ hp₀)).mul continuousWithinAt_const)
+      continuousWithinAt_const.mul ((((hKc p₀ hp₀).pow m).mul (hεc p₀ hp₀)).mul
+        continuousWithinAt_const)
     have hB0 : Bf p₀ = 0 := by simp [Bf, hε0]
-    have hd : Tendsto (fun p => W ((lr u v).map (adM p)) F (sgs p g) - W ((lr u v).map (adM p₀)) F (sgs p g))
+    have hd : Tendsto
+        (fun p => W ((lr u v).map (adM p)) F (sgs p g) - W ((lr u v).map (adM p₀)) F (sgs p g))
         (𝓝[{p : SS k r | D.inSS p}] p₀) (𝓝 0) := by
       have hBt : Tendsto Bf (𝓝[{p : SS k r | D.inSS p}] p₀) (𝓝 0) := by
         have := hBc.tendsto; rwa [hB0] at this
       refine squeeze_zero_norm' ?_ hBt
       filter_upwards [self_mem_nhdsWithin] with p hp
       have hxp := hxG p hp
-      have hK1 : 1 ≤ Kf p := le_add_of_nonneg_right (List.sum_nonneg (by
-        intro y hy
-        obtain ⟨y', _, rfl⟩ := List.mem_map.mp hy
-        positivity))
-      have hT := tele hc hc0 hK1 (adM p) (adM p₀) (lr u v) [] (by simp)
-        (by
-          intro x hx
-          have hmK := le_sum_map (fun x => ‖(adM p x).2‖ + ‖(adM p₀ x).2‖) (fun _ => by positivity) (lr u v) hx
-          have hmε := le_sum_map (fun x => ‖(adM p x).2 - (adM p₀ x).2‖) (fun _ => norm_nonneg _) (lr u v) hx
-          refine ⟨rfl, rfl, adM_lie hp (hwu x hx).1, adM_lie hp₀ (hwu x hx).1, ?_, ?_, hmε⟩
-          · have := norm_nonneg (adM p₀ x).2
-            show ‖(adM p x).2‖ ≤ Kf p
-            simp only [Kf]; linarith
-          · have := norm_nonneg (adM p x).2
-            show ‖(adM p₀ x).2‖ ≤ Kf p
-            simp only [Kf]; linarith)
-        (by simpa using hwt) (by simpa using hwl) _ hxp
+      have hK1 : 1 ≤ Kf p :=
+        le_add_of_nonneg_right (List.sum_nonneg (by
+          intro y hy
+          obtain ⟨y', _, rfl⟩ := List.mem_map.mp hy
+          positivity))
+      have hT :=
+        tele hc hc0 hK1 (adM p) (adM p₀) (lr u v) [] (by simp)
+          (by
+            intro x hx
+            have hmK :=
+              le_sum_map
+                (fun x => ‖(adM p x).2‖ + ‖(adM p₀ x).2‖)
+                (fun _ => by positivity)
+                (lr u v) hx
+            have hmε :=
+              le_sum_map
+                (fun x => ‖(adM p x).2 - (adM p₀ x).2‖)
+                (fun _ => norm_nonneg _)
+                (lr u v) hx
+            refine ⟨rfl, rfl, adM_lie hp (hwu x hx).1, adM_lie hp₀ (hwu x hx).1, ?_, ?_, hmε⟩
+            · have := norm_nonneg (adM p₀ x).2
+              show ‖(adM p x).2‖ ≤ Kf p
+              simp only [Kf]
+              linarith
+            · have := norm_nonneg (adM p x).2
+              show ‖(adM p₀ x).2‖ ≤ Kf p
+              simp only [Kf]
+              linarith)
+          (by simpa using hwt) (by simpa using hwl) _ hxp
       simp only [List.nil_append] at hT
       have h1 : 1 ≤ gN (sgs p g) ^ A := Real.one_le_rpow (BetaSesquilinearity.gN_ge_one hxp) hA
-      calc ‖W ((lr u v).map (adM p)) F (sgs p g) - W ((lr u v).map (adM p₀)) F (sgs p g)‖
-          ≤ gN (sgs p g) ^ A * ‖W ((lr u v).map (adM p)) F (sgs p g) - W ((lr u v).map (adM p₀)) F (sgs p g)‖ :=
-            le_mul_of_one_le_left (norm_nonneg _) h1
+      calc
+        ‖W ((lr u v).map (adM p)) F (sgs p g) - W ((lr u v).map (adM p₀)) F (sgs p g)‖
+            ≤ gN (sgs p g) ^ A
+              * ‖W ((lr u v).map (adM p)) F (sgs p g) - W ((lr u v).map (adM p₀)) F (sgs p g)‖ :=
+          le_mul_of_one_le_left (norm_nonneg _) h1
         _ ≤ Bf p := hT
     have hdc : ContinuousWithinAt
         (fun p => W ((lr u v).map (adM p)) F (sgs p g) - W ((lr u v).map (adM p₀)) F (sgs p g))
         {p : SS k r | D.inSS p} p₀ := by
-      have e0 : (fun p => W ((lr u v).map (adM p)) F (sgs p g) - W ((lr u v).map (adM p₀)) F (sgs p g)) p₀ = 0 :=
+      have e0
+          : (fun p => W ((lr u v).map (adM p)) F (sgs p g) - W ((lr u v).map (adM p₀)) F (sgs p g))
+              p₀
+            = 0 :=
         sub_self _
       unfold ContinuousWithinAt
       rw [e0]
@@ -314,15 +347,19 @@ theorem bessel_domain_measurable : JFxDs2.JDomMeas := by
     refine (hdc.add hsec).congr (fun p _ => ?_) ?_
     · simp
     · simp
-  have hΦ : ContinuousOn (fun p => rho D p (dLR (u.map (AdL p)) (v.map (AdR p)) F) g) {p : SS k r | D.inSS p} := by
-    have e : (fun p => rho D p (dLR (u.map (AdL p)) (v.map (AdR p)) F) g) =
-        fun p => B6.Sd D p (W ((lr u v).map (adM p)) F (sgs p g)) := by
+  have hΦ : ContinuousOn
+      (fun p => rho D p (dLR (u.map (AdL p)) (v.map (AdR p)) F) g)
+      {p : SS k r | D.inSS p} := by
+    have e
+        : (fun p => rho D p (dLR (u.map (AdL p)) (v.map (AdR p)) F) g)
+          = fun p => B6.Sd D p (W ((lr u v).map (adM p)) F (sgs p g)) := by
       funext p
       rw [B6.rho_eq, dLR_eq, lr_ad]
     rw [e]
     exact (B6.Sd_continuousOn D).clm_apply hmain
   have := hΦ.aestronglyMeasurable (μ := D.μSS) (B6.measurableSet_inSS D)
-  have hr : D.μSS.restrict {p | D.inSS p} = D.μSS := Measure.restrict_eq_self_of_ae_mem (B5.ae_inSS D)
+  have hr : D.μSS.restrict {p | D.inSS p} = D.μSS :=
+    Measure.restrict_eq_self_of_ae_mem (B5.ae_inSS D)
   rwa [hr] at this
 
 end meas

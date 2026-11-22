@@ -14,43 +14,61 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.CompactUn
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped Matrix
 
 namespace GlobalTheory.HoweRealKer
 
-theorem det_ne_zero_of_hasSig {n r s : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} (h : HasSig M r s) : M.det ≠ 0 := by
+theorem det_ne_zero_of_hasSig {n r s : ℕ} {M : Matrix (Fin n) (Fin n) ℂ} (h : HasSig M r s)
+    : M.det ≠ 0 := by
   obtain ⟨hrs, A, hA⟩ := h
   let e : Fin r ⊕ Fin s ≃ Fin n := finSumFinEquiv.trans (finCongr hrs)
   let A' : Matrix (Fin n) (Fin n) ℂ := A.submatrix id e.symm
-  have hA' : A'ᵀ * M * A'.map star = (Matrix.fromBlocks (1 : Matrix (Fin r) (Fin r) ℂ) 0 0 (-1)).submatrix e.symm e.symm := by
+  have hA'
+      : A'ᵀ * M * A'.map star
+        = (Matrix.fromBlocks (1 : Matrix (Fin r) (Fin r) ℂ) 0 0 (-1)).submatrix e.symm e.symm := by
     rw [← hA]
     ext i j
     simp [A', Matrix.mul_apply, Matrix.transpose_apply, Matrix.submatrix_apply, Matrix.map_apply]
-  have hD : (Matrix.fromBlocks (1 : Matrix (Fin r) (Fin r) ℂ) 0 0 (-1 : Matrix (Fin s) (Fin s) ℂ)).det ≠ 0 := by
-    rw [Matrix.det_fromBlocks_zero₂₁, Matrix.det_one, one_mul, Matrix.det_neg, Matrix.det_one, mul_one]
+  have hD
+      : (Matrix.fromBlocks (1 : Matrix (Fin r) (Fin r) ℂ) 0 0 (-1 : Matrix (Fin s) (Fin s) ℂ)).det
+        ≠ 0 := by
+    rw [Matrix.det_fromBlocks_zero₂₁, Matrix.det_one, one_mul, Matrix.det_neg, Matrix.det_one,
+      mul_one]
     simp
   intro hM
   apply hD
-  rw [← Matrix.det_submatrix_equiv_self e.symm, ← hA', Matrix.det_mul, Matrix.det_mul, hM, mul_zero, zero_mul]
+  rw [← Matrix.det_submatrix_equiv_self e.symm, ← hA', Matrix.det_mul, Matrix.det_mul, hM, mul_zero,
+    zero_mul]
 
-theorem det_ne_zero_of_sig {E : Type} [Field E] {n : ℕ}
-    (J : Matrix (Fin n) (Fin n) E) (f : E →+* ℂ) {r s : ℕ} (h : HasSig (J.map f) r s) : J.det ≠ 0 := by
+theorem det_ne_zero_of_sig
+    {E : Type} [Field E]
+    {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+    (f : E →+* ℂ)
+    {r s : ℕ} (h : HasSig (J.map f) r s)
+    : J.det ≠ 0 := by
   intro hJ
   apply det_ne_zero_of_hasSig h
   rw [← RingHom.mapMatrix_apply, ← RingHom.map_det, hJ, map_zero]
 
-theorem det_ne_zero_of_sigI {E : Type} [Field E] {n : ℕ}
-    (J : Matrix (Fin n) (Fin n) E) (f : E →+* ℂ) {r s : ℕ} (h : HasSig (Complex.I • J.map f) r s) : J.det ≠ 0 := by
+theorem det_ne_zero_of_sigI
+    {E : Type} [Field E]
+    {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+    (f : E →+* ℂ)
+    {r s : ℕ} (h : HasSig (Complex.I • J.map f) r s)
+    : J.det ≠ 0 := by
   intro hJ
   apply det_ne_zero_of_hasSig h
   rw [Matrix.det_smul, ← RingHom.mapMatrix_apply, ← RingHom.map_det, hJ, map_zero, mul_zero]
 
-theorem resEtaPow_div {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+theorem resEtaPow_div
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
     {χ χ' : Chr F E} {n m : ℕ}
     (h : ResEtaPow (Units.map (algebraMap F (AF F)).toMonoidHom).range χ n)
-    (h' : ResEtaPow (Units.map (algebraMap F (AF F)).toMonoidHom).range χ' m) :
-    ResEtaPow (Units.map (algebraMap F (AF F)).toMonoidHom).range (χ / χ') (n + m) := by
+    (h' : ResEtaPow (Units.map (algebraMap F (AF F)).toMonoidHom).range χ' m)
+    : ResEtaPow (Units.map (algebraMap F (AF F)).toMonoidHom).range (χ / χ') (n + m) := by
   intro x
   rw [MonoidHom.div_apply, Circle.coe_div, h x, h' x]
   split_ifs
@@ -58,64 +76,95 @@ theorem resEtaPow_div {F E : Type} [Field F] [NumberField F] [Field E] [NumberFi
   · rw [pow_add]
     rcases neg_one_pow_eq_or ℂ m with hm | hm <;> rw [hm] <;> ring
 
-theorem isHecke_div {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {χ χ' : Chr F E} (h : IsHecke F E χ) (h' : IsHecke F E χ') : IsHecke F E (χ / χ') :=
+theorem isHecke_div
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {χ χ' : Chr F E} (h : IsHecke F E χ) (h' : IsHecke F E χ')
+    : IsHecke F E (χ / χ') :=
   ⟨h.1.div' h'.1, fun x => by simp only [MonoidHom.div_apply, h.2 x, h'.2 x, div_self']⟩
 
-theorem actsD_zero {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
-    (T : ℝ → ((κ → AF F) → ℂ) →ₗ[ℂ] (κ → AF F) → ℂ) :
-    ActsD (evI F) (fun t => T t) ((0 : SInf F κ) : (κ → mixedEmbedding.mixedSpace F) → ℂ) ((0 : SInf F κ) : _) := by
+theorem actsD_zero
+    {F : Type} [Field F] [NumberField F]
+    {κ : Type} [Fintype κ]
+    (T : ℝ → ((κ → AF F) → ℂ) →ₗ[ℂ] (κ → AF F) → ℂ)
+    : ActsD (evI F)
+      (fun t => T t)
+      ((0 : SInf F κ) : (κ → mixedEmbedding.mixedSpace F) → ℂ) ((0 : SInf F κ) : _) := by
   intro r _ x
   have h0 : tens (evI F) ((0 : SInf F κ) : (κ → mixedEmbedding.mixedSpace F) → ℂ) r = 0 := by
     funext y; simp [tens]
   simp only [h0, map_zero, Pi.zero_apply]
   exact hasDerivAt_const 0 0
 
-theorem acts_zero {F : Type} [Field F] [NumberField F] {κ : Type} [Fintype κ]
-    (T : ((κ → AF F) → ℂ) →ₗ[ℂ] (κ → AF F) → ℂ) :
-    Acts (evI F) T ((0 : SInf F κ) : (κ → mixedEmbedding.mixedSpace F) → ℂ) ((0 : SInf F κ) : _) := by
+theorem acts_zero
+    {F : Type} [Field F] [NumberField F]
+    {κ : Type} [Fintype κ]
+    (T : ((κ → AF F) → ℂ) →ₗ[ℂ] (κ → AF F) → ℂ)
+    : Acts (evI F) T ((0 : SInf F κ) : (κ → mixedEmbedding.mixedSpace F) → ℂ)
+      ((0 : SInf F κ) : _) := by
   intro r _
   have h0 : tens (evI F) ((0 : SInf F κ) : (κ → mixedEmbedding.mixedSpace F) → ℂ) r = 0 := by
     funext y; simp [tens]
   simp only [h0, map_zero]
 
-theorem main : GlobalTheory.Published.HoweDualityReal → ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E)
-    (Bs : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Base F E) (a a' : ℕ) (G : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Geo σ a a') (Xc : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Chars F E)
-    (om : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rep σ G.V G.W) (om' : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rep σ G.V' G.W)
-    (R : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.RealMaps F a a') (Rf : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.FinMaps F a a'),
-    GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.IsMatched Bs G Xc om om' R Rf →
-      (∃ L : ℕ, ∀ (m : ℕ) (N : Fin m → Submodule ℂ (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F (Fin a × Fin (a + a')))),
-        StrictMono N → (∀ i, GlobalTheory.Published.ThetaSubInf G.M Bs.ψ Bs.emb om (N i)) → m ≤ L) ∧
-      ∀ N : Submodule ℂ (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F (Fin a × Fin (a + a'))), GlobalTheory.Published.ThetaSubInf G.M Bs.ψ Bs.emb om N →
-        N ≠ G.M.Pol Bs.ψ Bs.emb → ∀ f ∈ N, R.p f = 0 := by
+theorem main
+    : GlobalTheory.Published.HoweDualityReal
+      → ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+          (σ : E →ₐ[F] E) (Bs : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Base F E)
+          (a a' : ℕ) (G : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Geo σ a a')
+          (Xc : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Chars F E)
+          (om : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rep σ G.V G.W)
+          (om' : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rep σ G.V' G.W)
+          (R : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.RealMaps F a a')
+          (Rf : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.FinMaps F a a'),
+        GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.IsMatched Bs G Xc om om' R Rf
+          → (∃ L : ℕ,
+              ∀ (m : ℕ)
+                  (N : Fin m
+                    → Submodule ℂ
+                      (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F
+                        (Fin a × Fin (a + a')))),
+                StrictMono N → (∀ i, GlobalTheory.Published.ThetaSubInf G.M Bs.ψ Bs.emb om (N i))
+                  → m ≤ L)
+            ∧ ∀ N : Submodule ℂ
+                (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.SInf F
+                  (Fin a × Fin (a + a'))),
+              GlobalTheory.Published.ThetaSubInf G.M Bs.ψ Bs.emb om N → N ≠ G.M.Pol Bs.ψ Bs.emb
+                → ∀ f ∈ N, R.p f = 0 := by
   intro hHD F E _ _ _ _ _ σ Bs a a' G Xc om om' R Rf hMt
   obtain ⟨ht, hr, -⟩ := hMt
   have w0 : InfinitePlace F := Classical.arbitrary _
   have hVdet : G.V.J.det ≠ 0 := det_ne_zero_of_sig _ _ (ht.geo.hV.sig w0)
   have hV'det : G.V'.J.det ≠ 0 := det_ne_zero_of_sig _ _ (ht.geo.hV'.sig w0)
   have hWdet : G.W.J.det ≠ 0 := det_ne_zero_of_sigI _ _ (ht.geo.hW.sig w0)
-  have hresW : ResEtaPow (Units.map (algebraMap F (AF F)).toMonoidHom).range (Xc.β / Xc.α) (a + a') :=
+  have hresW
+      : ResEtaPow (Units.map (algebraMap F (AF F)).toMonoidHom).range (Xc.β / Xc.α) (a + a') :=
     resEtaPow_div ht.chars.resβ ht.chars.resα
-  have hresW' : ResEtaPow (Units.map (algebraMap F (AF F)).toMonoidHom).range (Xc.α / Xc.β) (a' + a) :=
+  have hresW'
+      : ResEtaPow (Units.map (algebraMap F (AF F)).toMonoidHom).range (Xc.α / Xc.β) (a' + a) :=
     resEtaPow_div ht.chars.resα ht.chars.resβ
   rw [Nat.add_comm a' a] at hresW'
   have hHk := isHecke_div ht.chars.heckeβ ht.chars.heckeα
   have hHk' := isHecke_div ht.chars.heckeα ht.chars.heckeβ
-  obtain ⟨hchain, hsum⟩ := hHD F E σ ht.base.cm a (a + a') G.V G.W G.M Bs.ψ Xc.β (Xc.β / Xc.α) om ht.base.std
-    ht.geo.hV.herm hVdet ht.geo.hW.skew hWdet ht.chars.resβ hresW ht.chars.heckeβ hHk ht.weil Bs.emb
-    ht.geo.hV.cartan ht.geo.hW.cartan
-  have L := GlobalTheory.T.lieDerivative_polynomialFock_archimedeanUnitary F E σ ht.base.cm a (a + a') G.V G.W G.M Bs.ψ Xc.β (Xc.β / Xc.α) om ht.base.std
-    ht.geo.hV.herm hVdet ht.geo.hW.skew hWdet ht.chars.resβ hresW ht.chars.heckeβ hHk ht.weil Bs.emb
-    ht.geo.hV.cartan ht.geo.hW.cartan
-  have L' := GlobalTheory.T.lieDerivative_polynomialFock_archimedeanUnitary F E σ ht.base.cm a' (a + a') G.V' G.W G.M' Bs.ψ Xc.α (Xc.α / Xc.β) om' ht.base.std
-    ht.geo.hV'.herm hV'det ht.geo.hW.skew hWdet ht.chars.resα hresW' ht.chars.heckeα hHk' ht.weil' Bs.emb
-    ht.geo.hV'.cartan ht.geo.hW.cartan
-  have C := GlobalTheory.T.compactUnitary_preserves_polynomialFock F E σ ht.base.cm a (a + a') G.V G.W G.M Bs.ψ Xc.β (Xc.β / Xc.α) om ht.base.std
-    ht.geo.hV.herm hVdet ht.geo.hW.skew hWdet ht.chars.resβ hresW ht.chars.heckeβ hHk ht.weil Bs.emb
-    ht.geo.hV.cartan ht.geo.hW.cartan
-  have C' := GlobalTheory.T.compactUnitary_preserves_polynomialFock F E σ ht.base.cm a' (a + a') G.V' G.W G.M' Bs.ψ Xc.α (Xc.α / Xc.β) om' ht.base.std
-    ht.geo.hV'.herm hV'det ht.geo.hW.skew hWdet ht.chars.resα hresW' ht.chars.heckeα hHk' ht.weil' Bs.emb
-    ht.geo.hV'.cartan ht.geo.hW.cartan
+  obtain ⟨hchain, hsum⟩ :=
+    hHD F E σ ht.base.cm a (a + a') G.V G.W G.M Bs.ψ Xc.β (Xc.β / Xc.α) om ht.base.std
+      ht.geo.hV.herm hVdet ht.geo.hW.skew hWdet ht.chars.resβ hresW ht.chars.heckeβ hHk ht.weil
+      Bs.emb ht.geo.hV.cartan ht.geo.hW.cartan
+  have L :=
+    GlobalTheory.T.lieDerivative_polynomialFock_archimedeanUnitary F E σ ht.base.cm a (a + a') G.V
+      G.W G.M Bs.ψ Xc.β (Xc.β / Xc.α) om ht.base.std ht.geo.hV.herm hVdet ht.geo.hW.skew hWdet
+      ht.chars.resβ hresW ht.chars.heckeβ hHk ht.weil Bs.emb ht.geo.hV.cartan ht.geo.hW.cartan
+  have L' :=
+    GlobalTheory.T.lieDerivative_polynomialFock_archimedeanUnitary F E σ ht.base.cm a' (a + a') G.V'
+      G.W G.M' Bs.ψ Xc.α (Xc.α / Xc.β) om' ht.base.std ht.geo.hV'.herm hV'det ht.geo.hW.skew hWdet
+      ht.chars.resα hresW' ht.chars.heckeα hHk' ht.weil' Bs.emb ht.geo.hV'.cartan ht.geo.hW.cartan
+  have C :=
+    GlobalTheory.T.compactUnitary_preserves_polynomialFock F E σ ht.base.cm a (a + a') G.V G.W G.M
+      Bs.ψ Xc.β (Xc.β / Xc.α) om ht.base.std ht.geo.hV.herm hVdet ht.geo.hW.skew hWdet ht.chars.resβ
+      hresW ht.chars.heckeβ hHk ht.weil Bs.emb ht.geo.hV.cartan ht.geo.hW.cartan
+  have C' :=
+    GlobalTheory.T.compactUnitary_preserves_polynomialFock F E σ ht.base.cm a' (a + a') G.V' G.W
+      G.M' Bs.ψ Xc.α (Xc.α / Xc.β) om' ht.base.std ht.geo.hV'.herm hV'det ht.geo.hW.skew hWdet
+      ht.chars.resα hresW' ht.chars.heckeα hHk' ht.weil' Bs.emb ht.geo.hV'.cartan ht.geo.hW.cartan
   refine ⟨hchain, ?_⟩
   intro N hN hNP
 
@@ -131,14 +180,16 @@ theorem main : GlobalTheory.Published.HoweDualityReal → ∀ (F E : Type) [Fiel
       rw [map_sub, hr.quot.cpt k hk g hg g₁ hg₁, sub_self]
     · intro γ hγ g hg g₁ hg₁
       refine ⟨?_, (L γ hγ g hg.2).2 g₁ hg₁⟩
-      have e := hr.lie γ hγ g hg.2 0 (Submodule.zero_mem _) g₁ 0 hg₁ (actsD_zero _)
-        (by rw [LinearMap.mem_ker.mp hg.1, map_zero])
+      have e :=
+        hr.lie γ hγ g hg.2 0 (Submodule.zero_mem _) g₁ 0 hg₁ (actsD_zero _)
+          (by rw [LinearMap.mem_ker.mp hg.1, map_zero])
       show R.p g₁ = 0
       rw [e, map_zero]
     · intro k hk g hg g₁ hg₁
       refine ⟨?_, (C k hk g hg.2).2 g₁ hg₁⟩
-      have e := hr.cpt k hk g hg.2 0 (Submodule.zero_mem _) g₁ 0 hg₁ (acts_zero _)
-        (by rw [LinearMap.mem_ker.mp hg.1, map_zero])
+      have e :=
+        hr.cpt k hk g hg.2 0 (Submodule.zero_mem _) g₁ 0 hg₁ (acts_zero _)
+          (by rw [LinearMap.mem_ker.mp hg.1, map_zero])
       show R.p g₁ = 0
       rw [e, map_zero]
   have hKP : K ≠ P := by
@@ -163,7 +214,8 @@ theorem main : GlobalTheory.Published.HoweDualityReal → ∀ (F E : Type) [Fiel
       intro g hg
       have hpg : R.p g ∈ N.map R.p := htop ▸ Submodule.mem_top
       obtain ⟨n₀, hn₀, hpn⟩ := hpg
-      have hk : g - n₀ ∈ K := ⟨show R.p (g - n₀) = 0 by rw [map_sub, hpn, sub_self], P.sub_mem hg (hN.1 hn₀)⟩
+      have hk : g - n₀ ∈ K :=
+        ⟨show R.p (g - n₀) = 0 by rw [map_sub, hpn, sub_self], P.sub_mem hg (hN.1 hn₀)⟩
       have := Submodule.add_mem_sup hn₀ hk
       simpa using this
   · intro γ hγ g hg g₁ hg₁ hpg

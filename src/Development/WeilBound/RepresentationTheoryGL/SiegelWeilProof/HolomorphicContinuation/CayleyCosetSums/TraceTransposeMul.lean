@@ -19,7 +19,8 @@ open PositivityTheory.Rg.Sw PositivityTheory.Rg.Sw.WR.G
 
 variable {m n : ℕ}
 
-theorem det_gram_eq_zero (hmn : m < n) (x : Fin m → Fin n → ℂ) : (gramX (fun _ : Fin m => true) x).det = 0 := by
+theorem det_gram_eq_zero (hmn : m < n) (x : Fin m → Fin n → ℂ)
+    : (gramX (fun _ : Fin m => true) x).det = 0 := by
   have hg : gramX (fun _ : Fin m => true) x = (Matrix.of x)ᴴ * Matrix.of x := by
     ext i j
     simp [gramX, evX, Qp, Qb, Matrix.mul_apply, Matrix.conjTranspose_apply]
@@ -33,7 +34,8 @@ theorem det_gram_eq_zero (hmn : m < n) (x : Fin m → Fin n → ℂ) : (gramX (f
   simp only [Fintype.card_fin] at h1 h3
   omega
 
-theorem trace_transpose_mul' (X Y : Matrix (Fin n) (Fin n) ℂ) : (Xᵀ * Y).trace = (Yᵀ * X).trace := by
+theorem trace_transpose_mul' (X Y : Matrix (Fin n) (Fin n) ℂ)
+    : (Xᵀ * Y).trace = (Yᵀ * X).trace := by
   rw [← Matrix.trace_transpose, Matrix.transpose_mul, Matrix.transpose_transpose]
 
 end PositivityTheory.Rg.Sw.HSt.L3

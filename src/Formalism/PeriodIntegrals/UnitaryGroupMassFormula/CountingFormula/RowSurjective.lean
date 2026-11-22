@@ -8,6 +8,7 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.CountingFormula.
 
 namespace PI.UnitaryGroupMassFormula.CntFormula.RowsMassW
 
-theorem row_surjective : RowSurj := rowSurj_of_genus PI.UnitaryGroupMassFormula.CntFormula.UG.unimodular_one_genus
+theorem row_surjective : RowSurj :=
+  rowSurj_of_genus PI.UnitaryGroupMassFormula.CntFormula.UG.unimodular_one_genus
 
 end PI.UnitaryGroupMassFormula.CntFormula.RowsMassW

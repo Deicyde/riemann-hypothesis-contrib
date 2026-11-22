@@ -47,8 +47,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open NumberField IsDedekindDomain Polynomial Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.LocGL GlobalTheory.SplitWeil GlobalTheory.SmGL
-open UpperTheory.V.Z.Gam UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter GlobalTheory.HenQ UpperTheory.V.Z.Inf UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.Ad
+open NumberField IsDedekindDomain Polynomial Formalism.L2.Host GlobalTheory.CuspRep
+  GlobalTheory.LocGL GlobalTheory.SplitWeil GlobalTheory.SmGL
+open UpperTheory.V.Z.Gam UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter GlobalTheory.HenQ
+  UpperTheory.V.Z.Inf UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.Ad
 open GroundTheory.Global GroundTheory.Global.SemiLocal GroundTheory.LocalField
 open GroundTheory.Automorphic.GodementSection (localChar)
 open Ad3P.DihedralUnramifiedPlaces (toH)
@@ -63,7 +65,8 @@ section Loc
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-private theorem unr_mul {a b : kˣ →* ℂˣ} (ha : IsUnram a) (hb : IsUnram b) : IsUnram (a * b) := fun x hx => by
+private theorem unr_mul {a b : kˣ →* ℂˣ} (ha : IsUnram a) (hb : IsUnram b)
+    : IsUnram (a * b) := fun x hx => by
   rw [MonoidHom.mul_apply, ha x hx, hb x hx, one_mul]
 
 private theorem unr_inv {a : kˣ →* ℂˣ} (ha : IsUnram a) : IsUnram a⁻¹ := fun x hx => by
@@ -72,4 +75,3 @@ private theorem unr_inv {a : kˣ →* ℂˣ} (ha : IsUnram a) : IsUnram a⁻¹ :
 end Loc
 
 end UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.Ad
-

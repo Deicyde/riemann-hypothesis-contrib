@@ -10,7 +10,30 @@ open BpJoin Formalism.FourierDecayAlt Formalism.MainNotions.S.ThB
 
 namespace GlobalTheory
 
-theorem margin_arith_closing : ∀ Cc C₀ : ℝ, 0 ≤ C₀ → ∃ Cg₀ : ℝ, 0 ≤ Cg₀ ∧ ∀ Cg : ℝ, Cg₀ ≤ Cg → ∀ (k r n₀ p₀ : ℕ) (h d : ℝ), 1 ≤ k → n₀ ≤ 30 * (r + 1) ^ 2 + 6 → (p₀ : ℝ) ≤ C₀ * ((r : ℝ) + 1) ^ 2 → Cg * (((2 * r + 2 : ℕ) : ℝ) ^ ((9 : ℝ) / 2) * (((3 * (r + 1) : ℕ) : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2 + ((2 * r + k + 1 : ℕ) : ℝ) ^ 3)) ≤ h → 0 ≤ d → (Cc * ((r : ℝ) + 1) ^ 4 * (((3 * (r + 1) : ℕ) : ℝ) * (2 * (r : ℝ) + k + 1) ^ 2 + (2 * (r : ℝ) + k + 1) ^ 3) ≤ (ThreeDimData.aOf r (h / 2) - 1) - (((2 * r + 2) * p₀ + n₀ * (r + 1) : ℕ) : ℝ)) ∧ d + (((2 * r + 2) * p₀ + n₀ * (r + 1) : ℕ) : ℝ) ≤ max (Cg * ((2 * r + 2 : ℕ) : ℝ) ^ 3) (200 * d) / 2 - 1 ∧ (((r + 1) * (2 * p₀ + n₀) + (r + 1) * (r + 2) : ℕ) : ℝ) ≤ (C₀ + 10) * ((2 * r + 2 : ℕ) : ℝ) ^ 3 := by
+theorem margin_arith_closing
+    : ∀ Cc C₀ : ℝ,
+      0 ≤ C₀
+        → ∃ Cg₀ : ℝ,
+          0 ≤ Cg₀
+            ∧ ∀ Cg : ℝ,
+              Cg₀ ≤ Cg
+                → ∀ (k r n₀ p₀ : ℕ) (h d : ℝ),
+                  1 ≤ k → n₀ ≤ 30 * (r + 1) ^ 2 + 6 → (p₀ : ℝ) ≤ C₀ * ((r : ℝ) + 1) ^ 2
+                    → Cg
+                        * (((2 * r + 2 : ℕ) : ℝ) ^ ((9 : ℝ) / 2)
+                          * (((3 * (r + 1) : ℕ) : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2
+                            + ((2 * r + k + 1 : ℕ) : ℝ) ^ 3))
+                      ≤ h
+                    → 0 ≤ d
+                    → (Cc * ((r : ℝ) + 1) ^ 4
+                          * (((3 * (r + 1) : ℕ) : ℝ) * (2 * (r : ℝ) + k + 1) ^ 2
+                            + (2 * (r : ℝ) + k + 1) ^ 3)
+                        ≤ (ThreeDimData.aOf r (h / 2) - 1)
+                          - (((2 * r + 2) * p₀ + n₀ * (r + 1) : ℕ) : ℝ))
+                      ∧ d + (((2 * r + 2) * p₀ + n₀ * (r + 1) : ℕ) : ℝ)
+                        ≤ max (Cg * ((2 * r + 2 : ℕ) : ℝ) ^ 3) (200 * d) / 2 - 1
+                      ∧ (((r + 1) * (2 * p₀ + n₀) + (r + 1) * (r + 2) : ℕ) : ℝ)
+                        ≤ (C₀ + 10) * ((2 * r + 2 : ℕ) : ℝ) ^ 3 := by
   intro Cc C₀ hC₀
   have habs : 0 ≤ |Cc| := abs_nonneg _
   have hle : Cc ≤ |Cc| := le_abs_self _
@@ -48,11 +71,15 @@ theorem margin_arith_closing : ∀ Cc C₀ : ℝ, 0 ≤ C₀ → ∃ Cg₀ : ℝ
   have hR34 : R ^ 3 ≤ R ^ 4 := pow_le_pow_right₀ hR1 (by norm_num)
   have hA : R * p₀ ≤ C₀ * R ^ 3 := by
     have := mul_le_mul_of_nonneg_left hp hR0.le
-    calc R * p₀ ≤ R * (C₀ * R ^ 2) := this
+    calc
+      R * p₀
+        ≤ R * (C₀ * R ^ 2) := this
       _ = C₀ * R ^ 3 := by ring
   have hB : R * n₀ ≤ 36 * R ^ 3 := by
     have := mul_le_mul_of_nonneg_left hn' hR0.le
-    calc R * n₀ ≤ R * (30 * R ^ 2 + 6) := this
+    calc
+      R * n₀
+        ≤ R * (30 * R ^ 2 + 6) := this
       _ = 30 * R ^ 3 + 6 * R := by ring
       _ ≤ _ := by linarith
   have hC3 : 0 ≤ C₀ * R ^ 3 := by positivity
@@ -66,7 +93,8 @@ theorem margin_arith_closing : ∀ Cc C₀ : ℝ, 0 ≤ C₀ → ∃ Cg₀ : ℝ
     have h1 : Cg * (R ^ 4 * Q) ≤ h / 2 / (8 * Real.sqrt (2 * R)) := by
       rw [le_div_iff₀ (by positivity)]
       have : Cg * (R ^ 4 * Q) * (8 * Real.sqrt (2 * R))
-          = Cg * ((2 * R) ^ 4 * Real.sqrt (2 * R) * Q) / 2 := by ring
+          = Cg * ((2 * R) ^ 4 * Real.sqrt (2 * R) * Q) / 2 := by
+        ring
       rw [this]
       linarith
     have hX : 2 * R ^ 3 ≤ R ^ 4 * Q := by

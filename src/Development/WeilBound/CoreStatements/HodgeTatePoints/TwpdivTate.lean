@@ -20,22 +20,27 @@ def lvl (G : PDivGroup p O) (n : ℕ) : G.Tate →+ Additive (WithConv (G.A n �
 
 theorem lvl_smul (n : ℕ) (a : ℤ_[p]) (x : G.Tate) : lvl G n (a • x) = digit n a • lvl G n x := rfl
 
-theorem tate_equiv {La : Type} [AddCommGroup La] [Module.Free ℤ La] [Module.Finite ℤ La] (τ : La →+ G.Tate)
+theorem tate_equiv
+    {La : Type} [AddCommGroup La] [Module.Free ℤ La] [Module.Finite ℤ La]
+    (τ : La →+ G.Tate)
     (h1 : ∀ n a a', (τ a).conv n = (τ a').conv n ↔ ∃ b : La, a - a' = (p ^ n) • b)
-    (h2 : ∀ n y, ∃ a, (τ a).conv n = y) :
-    ∃ j : ℤ_[p] ⊗[ℤ] La ≃ₗ[ℤ_[p]] G.Tate, ∀ a, j (1 ⊗ₜ a) = τ a := by
+    (h2 : ∀ n y, ∃ a, (τ a).conv n = y)
+    : ∃ j : ℤ_[p] ⊗[ℤ] La ≃ₗ[ℤ_[p]] G.Tate, ∀ a, j (1 ⊗ₜ a) = τ a := by
   classical
   let j : ℤ_[p] ⊗[ℤ] La →ₗ[ℤ_[p]] G.Tate := LinearMap.liftBaseChange ℤ_[p] τ.toIntLinearMap
   have hj : ∀ (c : ℤ_[p]) a, j (c ⊗ₜ a) = c • τ a := fun c a => rfl
   let b := Module.Free.chooseBasis ℤ La
-  have key : ∀ (c : Module.Free.ChooseBasisIndex ℤ La → ℤ_[p]) n,
-      (j (∑ i, c i ⊗ₜ b i)).conv n = (τ (∑ i, digit n (c i) • b i)).conv n := by
+  have key
+      : ∀ (c : Module.Free.ChooseBasisIndex ℤ La → ℤ_[p]) n,
+        (j (∑ i, c i ⊗ₜ b i)).conv n = (τ (∑ i, digit n (c i) • b i)).conv n := by
     intro c n
     change lvl G n _ = lvl G n _
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, hj, lvl_smul, map_nsmul]
-  have hdiv : ∀ n (a a' : La), (∃ u : La, a - a' = (p ^ n) • u) ↔
-      ∀ i, ((b.repr a i : ℤ) : ZMod (p ^ n)) = (b.repr a' i : ℤ) := by
+    simp only [map_sum, hj, lvl_smul, map_nsmul]
+  have hdiv
+      : ∀ n (a a' : La),
+        (∃ u : La, a - a' = (p ^ n) • u)
+          ↔ ∀ i, ((b.repr a i : ℤ) : ZMod (p ^ n)) = (b.repr a' i : ℤ) := by
     intro n a a'
     simp only [ZMod.intCast_eq_intCast_iff_dvd_sub]
     constructor
@@ -60,13 +65,14 @@ theorem tate_equiv {La : Type} [AddCommGroup La] [Module.Free ℤ La] [Module.Fi
       refine ⟨(b.baseChange ℤ_[p]).repr z, ?_⟩
       conv_lhs => rw [← (b.baseChange ℤ_[p]).sum_repr z]
       simp [TensorProduct.smul_tmul']
-    have hc : ∀ i, c i = 0 := fun i => PadicInt.ext_of_toZModPow.1 fun n => by
-      have h3 := key c n
-      rw [hz, ← map_zero τ] at h3
-      have h4 := (hdiv n _ _).1 ((h1 n _ _).1 h3) i
-      rw [hrep] at h4
-      rw [map_zero, ← cast_digit]
-      simpa using h4.symm
+    have hc : ∀ i, c i = 0 := fun i =>
+      PadicInt.ext_of_toZModPow.1 fun n => by
+        have h3 := key c n
+        rw [hz, ← map_zero τ] at h3
+        have h4 := (hdiv n _ _).1 ((h1 n _ _).1 h3) i
+        rw [hrep] at h4
+        rw [map_zero, ← cast_digit]
+        simpa using h4.symm
     simp [hc]
   · choose a ha using fun n => h2 n (x.conv n)
     have hc : ∀ n, (τ (a (n + 1))).conv n = (τ (a n)).conv n := fun n => by
@@ -75,12 +81,14 @@ theorem tate_equiv {La : Type} [AddCommGroup La] [Module.Free ℤ La] [Module.Fi
       have := (hdiv n _ _).1 ((h1 n _ _).1 (hc n).symm) i
       rw [ZMod.intCast_eq_intCast_iff_dvd_sub] at this
       exact_mod_cast this
-    refine ⟨∑ i, PadicInt.ofIntSeq _ (PadicInt.isCauSeq_padicNorm_of_pow_dvd_sub
-      (fun n => b.repr (a n) i) p (hd i)) ⊗ₜ b i,
-      TateOver.ext_conv fun n => ?_⟩
+    refine ⟨
+      ∑ i, PadicInt.ofIntSeq _ (PadicInt.isCauSeq_padicNorm_of_pow_dvd_sub
+        (fun n => b.repr (a n) i) p (hd i)) ⊗ₜ b i,
+      TateOver.ext_conv fun n => ?_
+    ⟩
     rw [key, ← ha, h1, hdiv]
     intro i
-    rw [hrep, Int.cast_natCast, cast_digit, PadicInt.toZModPow_ofIntSeq_of_pow_dvd_sub
-      (fun n => b.repr (a n) i) p (hd i)]
+    rw [hrep, Int.cast_natCast, cast_digit,
+      PadicInt.toZModPow_ofIntSeq_of_pow_dvd_sub (fun n => b.repr (a n) i) p (hd i)]
 
 end PositivityTheory.HtPt.Twpdiv

@@ -31,32 +31,34 @@ variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ}
 open scoped MatrixGroups TensorProduct in
 open Matrix in
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} in
-theorem _root_.GlobalTheory.KZ.ES.LevFin.sl_ofSL_mul (X : _root_.GlobalTheory.KZ.Tower Ω ε)
-    (a b : SL(2, ℤ)) (f : X.K) :
-    X.sl (_root_.GlobalTheory.KZ.ofSL (a * b)) f =
-      X.sl (_root_.GlobalTheory.KZ.ofSL b) (X.sl (_root_.GlobalTheory.KZ.ofSL a) f) := by
+theorem _root_.GlobalTheory.KZ.ES.LevFin.sl_ofSL_mul
+    (X : _root_.GlobalTheory.KZ.Tower Ω ε) (a b : SL(2, ℤ)) (f : X.K)
+    : X.sl (_root_.GlobalTheory.KZ.ofSL (a * b)) f
+      = X.sl (_root_.GlobalTheory.KZ.ofSL b) (X.sl (_root_.GlobalTheory.KZ.ofSL a) f) := by
   rw [map_mul, X.sl_mul]
 
 open scoped MatrixGroups TensorProduct in
 open Matrix in
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} in
-theorem _root_.GlobalTheory.KZ.ES.LevFin.sl_ofSL_one (X : _root_.GlobalTheory.KZ.Tower Ω ε)
-    (f : X.K) : X.sl (_root_.GlobalTheory.KZ.ofSL 1) f = f := by
+theorem _root_.GlobalTheory.KZ.ES.LevFin.sl_ofSL_one
+    (X : _root_.GlobalTheory.KZ.Tower Ω ε) (f : X.K)
+    : X.sl (_root_.GlobalTheory.KZ.ofSL 1) f = f := by
   rw [map_one, X.sl_one]
 
 open scoped MatrixGroups TensorProduct in
 open Matrix in
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} in
 theorem _root_.GlobalTheory.KZ.ES.LevFin.lev_sl
-    (X : _root_.GlobalTheory.KZ.Tower Ω ε) (M : ℕ) (g : SL(2, ℤ)) {f : X.K}
-    (hf : _root_.GlobalTheory.KZ.ES.Lev X M f) :
-    _root_.GlobalTheory.KZ.ES.Lev X M (X.sl (_root_.GlobalTheory.KZ.ofSL g) f) := by
+    (X : _root_.GlobalTheory.KZ.Tower Ω ε) (M : ℕ)
+    (g : SL(2, ℤ))
+    {f : X.K} (hf : _root_.GlobalTheory.KZ.ES.Lev X M f)
+    : _root_.GlobalTheory.KZ.ES.Lev X M (X.sl (_root_.GlobalTheory.KZ.ofSL g) f) := by
   intro γ hγ
   have hc : g * γ * g⁻¹ ∈ CongruenceSubgroup.Gamma M :=
     (CongruenceSubgroup.Gamma_normal M).conj_mem γ hγ g
   have he : g * γ = (g * γ * g⁻¹) * g := by group
-  rw [← _root_.GlobalTheory.KZ.ES.LevFin.sl_ofSL_mul, he, _root_.GlobalTheory.KZ.ES.LevFin.sl_ofSL_mul,
-    hf _ hc]
+  rw [← _root_.GlobalTheory.KZ.ES.LevFin.sl_ofSL_mul, he,
+    _root_.GlobalTheory.KZ.ES.LevFin.sl_ofSL_mul, hf _ hc]
 
 def levSub (X : Tower Ω ε) (M : ℕ) : Subfield X.K where
   carrier := {f | Lev X M f}
@@ -99,8 +101,9 @@ def actE (X : Tower Ω ε) (M : ℕ) (g : SL(2, ℤ)) : levSub X M ≃+* levSub 
     show X.sl (ofSL g⁻¹) ((a : X.K) + b) = X.sl (ofSL g⁻¹) a + X.sl (ofSL g⁻¹) b
     rw [map_add (f := _)]
 
-theorem actE_apply (X : Tower Ω ε) (M : ℕ) (g : SL(2, ℤ)) (f : levSub X M) :
-    ((actE X M g f : levSub X M) : X.K) = X.sl (ofSL g⁻¹) f := rfl
+theorem actE_apply (X : Tower Ω ε) (M : ℕ) (g : SL(2, ℤ)) (f : levSub X M)
+    : ((actE X M g f : levSub X M) : X.K) = X.sl (ofSL g⁻¹) f :=
+  rfl
 
 def act (X : Tower Ω ε) (M : ℕ) : SL(2, ℤ) →* RingAut (levSub X M) where
   toFun := actE X M
@@ -385,17 +388,22 @@ private lemma mem_adjoin_jK_of_sl_invariant [IsAlgClosure ℚ Ω]
   rw [e]
   exact div_mem hgF hℓF
 
-
 open scoped MatrixGroups TensorProduct in
 open Matrix in
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} in
-theorem _root_.GlobalTheory.KZ.ES.LevFin.exists_finset_span : ∀ {Ω : Type} [Field Ω]
-    [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : _root_.GlobalTheory.KZ.Tower Ω ε),
-    (∃ φ : ℂ → ℂ, DifferentiableOn ℂ φ _root_.GlobalTheory.KZ.Hs ∧
-      X.an X.jK = (φ : _root_.GlobalTheory.KZ.Mero)) → ∀ M : ℕ, 0 < M → ∃ T : Finset X.K,
-      (∀ x ∈ T, _root_.GlobalTheory.KZ.ES.Lev X M x) ∧
-      ∀ f : X.K, _root_.GlobalTheory.KZ.ES.Lev X M f →
-        f ∈ Submodule.span (IntermediateField.adjoin Ω {X.jK}) (T : Set X.K) := by
+theorem _root_.GlobalTheory.KZ.ES.LevFin.exists_finset_span
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ)
+        (X : _root_.GlobalTheory.KZ.Tower Ω ε),
+      (∃ φ : ℂ → ℂ,
+          DifferentiableOn ℂ φ _root_.GlobalTheory.KZ.Hs
+            ∧ X.an X.jK = (φ : _root_.GlobalTheory.KZ.Mero))
+        → ∀ M : ℕ,
+          0 < M
+            → ∃ T : Finset X.K,
+              (∀ x ∈ T, _root_.GlobalTheory.KZ.ES.Lev X M x)
+                ∧ ∀ f : X.K,
+                  _root_.GlobalTheory.KZ.ES.Lev X M f
+                    → f ∈ Submodule.span (IntermediateField.adjoin Ω {X.jK}) (T : Set X.K) := by
   intro Ω _ _ _ ε X hj M hM
   classical
   haveI : NeZero M := ⟨hM.ne'⟩
@@ -423,25 +431,31 @@ theorem _root_.GlobalTheory.KZ.ES.LevFin.exists_finset_span : ∀ {Ω : Type} [F
     have hf' : f = (fL : X.K) := rfl
     rw [hf', hcoe]
     refine Submodule.sum_mem _ fun i _ => ?_
-    have hinv : ∀ γ : SL(2, ℤ), X.sl (_root_.GlobalTheory.KZ.ofSL γ)
-        ((b.repr fL i : L) : X.K) = ((b.repr fL i : L) : X.K) := by
-      have H : ∀ δ : SL(2, ℤ), X.sl (_root_.GlobalTheory.KZ.ofSL δ⁻¹) ((b.repr fL i : L) : X.K) =
-          ((b.repr fL i : L) : X.K) := by
+    have hinv
+        : ∀ γ : SL(2, ℤ),
+          X.sl (_root_.GlobalTheory.KZ.ofSL γ) ((b.repr fL i : L) : X.K)
+            = ((b.repr fL i : L) : X.K) := by
+      have H
+          : ∀ δ : SL(2, ℤ),
+            X.sl (_root_.GlobalTheory.KZ.ofSL δ⁻¹) ((b.repr fL i : L) : X.K)
+              = ((b.repr fL i : L) : X.K) := by
         intro δ
         have hx : ∀ g : ρ.range, g • (b.repr fL i : L) = (b.repr fL i : L) := (b.repr fL i).2
         have hx' : (ρ δ) (b.repr fL i : L) = (b.repr fL i : L) :=
           hx ⟨ρ δ, MonoidHom.mem_range.2 ⟨δ, rfl⟩⟩
         have e := congrArg Subtype.val hx'
-        have e2 : (((ρ δ) (b.repr fL i : L) : L) : X.K) =
-            X.sl (_root_.GlobalTheory.KZ.ofSL δ⁻¹) ((b.repr fL i : L) : X.K) :=
+        have e2
+            : (((ρ δ) (b.repr fL i : L) : L) : X.K)
+              = X.sl (_root_.GlobalTheory.KZ.ofSL δ⁻¹) ((b.repr fL i : L) : X.K) :=
           _root_.GlobalTheory.KZ.ES.LevFin.actE_apply X M δ _
         exact e2.symm.trans e
       intro γ
       have hγ := H γ⁻¹
       generalize ((b.repr fL i : L) : X.K) = c at hγ ⊢
       rwa [inv_inv] at hγ
-    have ht : ((b i : L) : X.K) ∈
-        ((Finset.univ.image fun j => ((b j : L) : X.K) : Finset X.K) : Set X.K) :=
+    have ht
+        : ((b i : L) : X.K)
+          ∈ ((Finset.univ.image fun j => ((b j : L) : X.K) : Finset X.K) : Set X.K) :=
       Finset.mem_coe.2 (Finset.mem_image_of_mem _ (Finset.mem_univ i))
     generalize ((b.repr fL i : L) : X.K) = c at hinv ⊢
     generalize ((b i : L) : X.K) = t at ht ⊢

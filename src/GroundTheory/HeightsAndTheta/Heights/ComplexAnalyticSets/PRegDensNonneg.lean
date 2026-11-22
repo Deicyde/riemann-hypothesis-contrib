@@ -24,8 +24,8 @@ noncomputable section
 
 namespace RegularizedDensityNonneg
 
-theorem half_log_eq_phi (a : ℂ) {ε : ℝ} (hε : 0 ≤ ε) :
-    Real.log (‖a‖ ^ 2 + ε) / 2 = phi (![a, ((√ε : ℝ) : ℂ)] : Fin 2 → ℂ) := by
+theorem half_log_eq_phi (a : ℂ) {ε : ℝ} (hε : 0 ≤ ε)
+    : Real.log (‖a‖ ^ 2 + ε) / 2 = phi (![a, ((√ε : ℝ) : ℂ)] : Fin 2 → ℂ) := by
   simp only [phi, sqSum, Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one,
     Complex.norm_real, Real.norm_eq_abs, sq_abs, Real.sq_sqrt hε]
   ring
@@ -41,13 +41,15 @@ theorem RegDensNonneg.proof : RegDensNonneg.Statement := by
     set y := A *ᵥ x
     have hh : AnalyticAt ℂ (fun w => linEval u (s w)) y := by
       unfold linEval
-      exact Finset.analyticAt_fun_sum _ fun j _ => analyticAt_const.mul ((analyticAt_pi_iff.1 han) j)
+      exact Finset.analyticAt_fun_sum _ fun j _ =>
+        analyticAt_const.mul ((analyticAt_pi_iff.1 han) j)
     let τ : (Fin (d + 1) → ℂ) → (Fin 2 → ℂ) := fun w => ![linEval u (s w), ((√ε : ℝ) : ℂ)]
     have hτ : AnalyticAt ℂ τ y := by
       refine analyticAt_pi_iff.2 fun i => ?_
       fin_cases i
       · simpa [τ] using hh
-      · simpa [τ] using (analyticAt_const : AnalyticAt ℂ (fun _ : Fin (d + 1) → ℂ => ((√ε : ℝ) : ℂ)) y)
+      · simpa [τ] using
+          (analyticAt_const : AnalyticAt ℂ (fun _ : Fin (d + 1) → ℂ => ((√ε : ℝ) : ℂ)) y)
     have hS : sqSum (τ y) ≠ 0 := by
       have : sqSum (τ y) = ‖linEval u (s y)‖ ^ 2 + ε := by
         simp only [τ, sqSum, Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one,
@@ -59,7 +61,8 @@ theorem RegDensNonneg.proof : RegDensNonneg.Statement := by
       funext w
       exact RegularizedDensityNonneg.half_log_eq_phi _ hε.le
     rw [hfun]
-    refine ReciprocityTheory.AnForm.M.hessC_posSemidef _ _ (hφ.comp _ hτ.restrictScalars.contDiffAt) fun v => ?_
+    refine ReciprocityTheory.AnForm.M.hessC_posSemidef _ _ (hφ.comp _ hτ.restrictScalars.contDiffAt)
+      fun v => ?_
     rw [ReciprocityTheory.AnForm.levi_comp v hτ hφ]
     exact GroundTheory.Heights₂.Heights.Inter.TorusInvariantLevi.leviForm_phi_nonneg hS _
   · simp only [Matrix.cons_val_succ]
@@ -67,7 +70,8 @@ theorem RegDensNonneg.proof : RegDensNonneg.Statement := by
       ((contDiff_euclPot n).of_le (WithTop.coe_le_coe.mpr le_top)).contDiffAt
     have e : (euclPot : (Fin n → ℂ) → ℝ) = fun w => ∑ i, Complex.normSq (w i) := by
       funext w; simp [euclPot, Complex.normSq_eq_norm_sq]
-    rw [ReciprocityTheory.AnForm.A.hessC_comp _ _ _ han hE, e, ReciprocityTheory.AnForm.A.hessC_sum_normSq]
+    rw [ReciprocityTheory.AnForm.A.hessC_comp _ _ _ han hE, e,
+      ReciprocityTheory.AnForm.A.hessC_sum_normSq]
     exact GradDensSheetBound.posSemidef_transpose_mul_mul_conj _ PosSemidef.one
 
 end

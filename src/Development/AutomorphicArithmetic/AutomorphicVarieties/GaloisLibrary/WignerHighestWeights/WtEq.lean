@@ -9,14 +9,21 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.DualInfin
 open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.AlgRepEndIrreducible
 open scoped TensorProduct
 
-theorem UpperTheory.V.AlgRepEndIrreducible.wtEq :
-    ∀ (n : ℕ) (ν ν' : Fin n → ℂ), Dom ν → Dom ν' →
-      (∀ u : ℂ, ∏ k : Fin n, (u - (k : ℂ) + ν k) = ∏ k : Fin n, (u - (k : ℂ) + ν' k)) → ν = ν' := by
+theorem UpperTheory.V.AlgRepEndIrreducible.wtEq
+    : ∀ (n : ℕ) (ν ν' : Fin n → ℂ),
+      Dom ν → Dom ν'
+        → (∀ u : ℂ, ∏ k : Fin n, (u - (k : ℂ) + ν k) = ∏ k : Fin n, (u - (k : ℂ) + ν' k))
+        → ν = ν' := by
   intro n ν ν' hν hν' hp
   classical
-  have key : ∀ μ : Fin n → ℂ, Dom μ → ∀ i : Fin n,
-      (Multiset.filter (fun y => ∃ k : ℕ, y - (μ i - (i : ℂ)) = (k : ℂ) + 1)
-        (Multiset.map (fun j : Fin n => μ j - (j : ℂ)) Finset.univ.val)).card = (i : ℕ) := by
+  have key
+      : ∀ μ : Fin n → ℂ,
+        Dom μ
+          → ∀ i : Fin n,
+            (Multiset.filter
+                (fun y => ∃ k : ℕ, y - (μ i - (i : ℂ)) = (k : ℂ) + 1)
+                (Multiset.map (fun j : Fin n => μ j - (j : ℂ)) Finset.univ.val)).card
+              = (i : ℕ) := by
     intro μ hμ i
     have hP : ∀ j : Fin n, (∃ k : ℕ, μ j - (j : ℂ) - (μ i - (i : ℂ)) = (k : ℂ) + 1) ↔ j < i := by
       intro j
@@ -40,31 +47,36 @@ theorem UpperTheory.V.AlgRepEndIrreducible.wtEq :
       · intro hji
         obtain ⟨m, hm⟩ := hμ j i hji
         obtain ⟨d, hd⟩ := Nat.exists_eq_add_of_lt (show (j : ℕ) < (i : ℕ) from hji)
-        have hi : ((i : ℕ) : ℂ) = ((j : ℕ) : ℂ) + (d : ℂ) + 1 := by
-          exact_mod_cast hd
+        have hi : ((i : ℕ) : ℂ) = ((j : ℕ) : ℂ) + (d : ℂ) + 1 := by exact_mod_cast hd
         refine ⟨m + d, ?_⟩
         push_cast
         linear_combination hm + hi
     rw [Multiset.filter_map, Multiset.card_map]
-    have hf : Multiset.filter ((fun y => ∃ k : ℕ, y - (μ i - (i : ℂ)) = (k : ℂ) + 1) ∘
-        fun j : Fin n => μ j - (j : ℂ)) Finset.univ.val
+    have hf
+        : Multiset.filter
+            ((fun y => ∃ k : ℕ, y - (μ i - (i : ℂ)) = (k : ℂ) + 1) ∘ fun j : Fin n => μ j - (j : ℂ))
+            Finset.univ.val
           = Multiset.filter (fun j : Fin n => j < i) Finset.univ.val :=
       Multiset.filter_congr (fun j _ => hP j)
     rw [hf]
-    calc (Multiset.filter (fun j : Fin n => j < i) Finset.univ.val).card
+    calc
+      (Multiset.filter (fun j : Fin n => j < i) Finset.univ.val).card
         = (Finset.univ.filter (fun j : Fin n => j < i)).card := rfl
       _ = (Finset.Iio i).card := by
         congr 1
         ext j
         simp
       _ = (i : ℕ) := Fin.card_Iio i
-  have hm : Multiset.map (fun j : Fin n => ν j - (j : ℂ)) Finset.univ.val
-      = Multiset.map (fun j : Fin n => ν' j - (j : ℂ)) Finset.univ.val := by
+  have hm
+      : Multiset.map (fun j : Fin n => ν j - (j : ℂ)) Finset.univ.val
+        = Multiset.map (fun j : Fin n => ν' j - (j : ℂ)) Finset.univ.val := by
     apply msetSep
     intro u
     rw [Multiset.map_map, Multiset.map_map]
-    have e : ∀ μ : Fin n → ℂ, (Multiset.map ((fun x => u + x) ∘ fun j : Fin n => μ j - (j : ℂ))
-        Finset.univ.val).prod = ∏ k : Fin n, (u - (k : ℂ) + μ k) := by
+    have e
+        : ∀ μ : Fin n → ℂ,
+          (Multiset.map ((fun x => u + x) ∘ fun j : Fin n => μ j - (j : ℂ)) Finset.univ.val).prod
+            = ∏ k : Fin n, (u - (k : ℂ) + μ k) := by
       intro μ
       rw [Finset.prod_eq_multiset_prod]
       congr 2

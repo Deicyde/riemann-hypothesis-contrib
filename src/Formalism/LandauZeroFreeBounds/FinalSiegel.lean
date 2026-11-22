@@ -16,10 +16,12 @@ public import Formalism.LandauZeroFreeBounds.ExceptionalZeroBounds.SiegelOf
 namespace Formalism.ZeroFreeDirichlet
 
 theorem bqKey : BqKey :=
-  product_lfunction_key_inequality dirichlet_product_coefficients dirichlet_product_entire product_lfunction_growth_bound lfunction_one_upper_bound
+  product_lfunction_key_inequality dirichlet_product_coefficients dirichlet_product_entire
+    product_lfunction_growth_bound lfunction_one_upper_bound
 
 theorem siegelLower : SiegelLower :=
-  siegel_theorem_of exists_product_character exists_real_nontrivial_character bqKey lfunction_one_upper_bound zeta_negative_real_axis
-    real_lfunction_real_on_reals lfunction_one_same_character
+  siegel_theorem_of exists_product_character exists_real_nontrivial_character bqKey
+    lfunction_one_upper_bound zeta_negative_real_axis real_lfunction_real_on_reals
+    lfunction_one_same_character
 
 end Formalism.ZeroFreeDirichlet

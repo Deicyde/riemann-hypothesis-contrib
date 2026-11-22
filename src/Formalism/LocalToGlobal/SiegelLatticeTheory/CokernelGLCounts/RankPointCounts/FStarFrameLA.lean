@@ -18,33 +18,34 @@ variable {E : Type} [Field E] [NumberField E] [StarRing E] (S : Formalism.BasicN
 
 def gram {m n : Type*} (u : n → S.V) (v : m → S.V) : Matrix m n E := fun i j => S.hT (v i) (u j)
 
-def comb {m n : Type*} [Fintype m] (u : m → S.V) (A : Matrix m n E) : n → S.V := fun j => ∑ i, A i j • u i
+def comb {m n : Type*} [Fintype m] (u : m → S.V) (A : Matrix m n E) : n → S.V := fun j =>
+  ∑ i, A i j • u i
 
 def om {r : ℕ} (f f' : Fin (r + 1) → S.V) : S.V := ∑ b, (gram S f' f).adjugate b (Fin.last r) • f' b
 
 variable {S}
 
-theorem gram_comb_left {l m n : Type*} [Fintype m] (u : m → S.V) (A : Matrix m n E) (v : l → S.V) :
-    gram S (comb S u A) v = gram S u v * A := by
+theorem gram_comb_left {l m n : Type*} [Fintype m] (u : m → S.V) (A : Matrix m n E) (v : l → S.V)
+    : gram S (comb S u A) v = gram S u v * A := by
   ext i j
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [gram, comb, Matrix.mul_apply, map_sum, map_smul, smul_eq_mul]
   exact Finset.sum_congr rfl fun k _ => mul_comm _ _
 
-theorem gram_comb_right {l m n : Type*} [Fintype m] (u : l → S.V) (v : m → S.V) (B : Matrix m n E) :
-    gram S u (comb S v B) = Bᴴ * gram S u v := by
+theorem gram_comb_right {l m n : Type*} [Fintype m] (u : l → S.V) (v : m → S.V) (B : Matrix m n E)
+    : gram S u (comb S v B) = Bᴴ * gram S u v := by
   ext i j
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [gram, comb, Matrix.mul_apply, map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply,
+  simp only [gram, comb, Matrix.mul_apply, map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply,
     LinearMap.smul_apply, smul_eq_mul, Matrix.conjTranspose_apply, starRingEnd_apply]
 
-theorem gram_add_left {m n : Type*} (u₁ u₂ : n → S.V) (v : m → S.V) :
-    gram S (u₁ + u₂) v = gram S u₁ v + gram S u₂ v := by
+theorem gram_add_left {m n : Type*} (u₁ u₂ : n → S.V) (v : m → S.V)
+    : gram S (u₁ + u₂) v = gram S u₁ v + gram S u₂ v := by
   ext i j
   simp [gram, map_add (f := _)]
 
-theorem gram_add_right {m n : Type*} (u : n → S.V) (v₁ v₂ : m → S.V) :
-    gram S u (v₁ + v₂) = gram S u v₁ + gram S u v₂ := by
+theorem gram_add_right {m n : Type*} (u : n → S.V) (v₁ v₂ : m → S.V)
+    : gram S u (v₁ + v₂) = gram S u v₁ + gram S u v₂ := by
   ext i j
   simp [gram, map_add (f := _), LinearMap.add_apply]
 
@@ -62,29 +63,34 @@ open Formalism.MainNotions.S
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : Formalism.BasicNotions.HSpace E}
 
-theorem adj_last {r : ℕ} (A : Matrix (Fin (r + 1)) (Fin (r + 1)) E) :
-    A.adjugate (Fin.last r) (Fin.last r) = leadMinorE A r := by
+theorem adj_last {r : ℕ} (A : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
+    : A.adjugate (Fin.last r) (Fin.last r) = leadMinorE A r := by
   rw [Matrix.adjugate_fin_succ_eq_det_submatrix, Fin.succAbove_last]
   unfold leadMinorE
   rw [dite_eq_left (Nat.le_succ r)]
-  have hc : (Fin.castLE (Nat.le_succ r) : Fin r → Fin (r + 1)) = Fin.castSucc := funext fun i => Fin.ext rfl
+  have hc : (Fin.castLE (Nat.le_succ r) : Fin r → Fin (r + 1)) = Fin.castSucc :=
+    funext fun i => Fin.ext rfl
   rw [hc, Fin.val_last, ← two_mul, pow_mul, neg_one_sq, one_pow, one_mul]
 
-theorem leadMinorE_full {r : ℕ} (A : Matrix (Fin (r + 1)) (Fin (r + 1)) E) : leadMinorE A (r + 1) = A.det := by
+theorem leadMinorE_full {r : ℕ} (A : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
+    : leadMinorE A (r + 1) = A.det := by
   unfold leadMinorE
   rw [dite_eq_left le_rfl]
-  have hc : (Fin.castLE (le_refl (r + 1)) : Fin (r + 1) → Fin (r + 1)) = id := funext fun i => Fin.ext rfl
+  have hc : (Fin.castLE (le_refl (r + 1)) : Fin (r + 1) → Fin (r + 1)) = id :=
+    funext fun i => Fin.ext rfl
   rw [hc, Matrix.submatrix_id_id]
 
-theorem mulVec_adjCol {r : ℕ} (A : Matrix (Fin (r + 1)) (Fin (r + 1)) E) :
-    A *ᵥ (fun b => A.adjugate b (Fin.last r)) = A.det • Pi.single (Fin.last r) 1 := by
+theorem mulVec_adjCol {r : ℕ} (A : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
+    : A *ᵥ (fun b => A.adjugate b (Fin.last r)) = A.det • Pi.single (Fin.last r) 1 := by
   ext i
   have h := congrFun (congrFun (Matrix.mul_adjugate A) i) (Fin.last r)
   simp only [Matrix.mul_apply, Matrix.smul_apply, Matrix.one_apply, smul_eq_mul] at h
   simp only [Matrix.mulVec, dotProduct, Pi.smul_apply, Pi.single_apply, smul_eq_mul, h]
 
-theorem mul_eq_zero_of_last {r : ℕ} (A Q : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
-    (hA : ∀ i j, (i ≠ Fin.last r ∨ j ≠ Fin.last r) → A i j = 0) (hQ : ∀ b, Q (Fin.last r) b = 0) : A * Q = 0 := by
+theorem mul_eq_zero_of_last
+    {r : ℕ} (A Q : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
+    (hA : ∀ i j, (i ≠ Fin.last r ∨ j ≠ Fin.last r) → A i j = 0) (hQ : ∀ b, Q (Fin.last r) b = 0)
+    : A * Q = 0 := by
   ext i b
   simp only [Matrix.mul_apply, Matrix.zero_apply]
   refine Finset.sum_eq_zero fun j _ => ?_
@@ -92,9 +98,11 @@ theorem mul_eq_zero_of_last {r : ℕ} (A Q : Matrix (Fin (r + 1)) (Fin (r + 1)) 
   · subst hj; rw [hQ, mul_zero]
   · rw [hA i j (Or.inr hj), zero_mul]
 
-theorem quad_last {r : ℕ} (A : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
-    (hA : ∀ i j, (i ≠ Fin.last r ∨ j ≠ Fin.last r) → A i j = 0) (v : Fin (r + 1) → E) :
-    star v ⬝ᵥ (A *ᵥ v) = star (v (Fin.last r)) * A (Fin.last r) (Fin.last r) * v (Fin.last r) := by
+theorem quad_last
+    {r : ℕ} (A : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
+    (hA : ∀ i j, (i ≠ Fin.last r ∨ j ≠ Fin.last r) → A i j = 0) (v : Fin (r + 1) → E)
+    : star v ⬝ᵥ (A *ᵥ v)
+      = star (v (Fin.last r)) * A (Fin.last r) (Fin.last r) * v (Fin.last r) := by
   simp only [dotProduct, Matrix.mulVec, Pi.star_apply]
   rw [Finset.sum_eq_single (Fin.last r)]
   · rw [Finset.sum_eq_single (Fin.last r)]
@@ -108,8 +116,8 @@ theorem quad_last {r : ℕ} (A : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
 def solM {n : Type*} [Fintype n] (H : Matrix n n E) (k ℓ : n → E) : Matrix n n E :=
   (2 : E)⁻¹ • (H - vecMulVec (H *ᵥ k) (star ℓ) + vecMulVec ℓ (star k ᵥ* H))
 
-theorem solM_add {n : Type*} [Fintype n] (H : Matrix n n E) (hH : Hᴴ = H) (k ℓ : n → E) :
-    solM H k ℓ + (solM H k ℓ)ᴴ = H := by
+theorem solM_add {n : Type*} [Fintype n] (H : Matrix n n E) (hH : Hᴴ = H) (k ℓ : n → E)
+    : solM H k ℓ + (solM H k ℓ)ᴴ = H := by
   have h1 : ∀ i j, star (H j i) = H i j := fun i j => by
     have := congrFun (congrFun hH i) j; rwa [Matrix.conjTranspose_apply] at this
   have h2 : star (H *ᵥ k) = star k ᵥ* H := by rw [Matrix.star_mulVec, hH]
@@ -118,14 +126,17 @@ theorem solM_add {n : Type*} [Fintype n] (H : Matrix n n E) (hH : Hᴴ = H) (k �
   have h3' : ∀ j, star ((star k ᵥ* H) j) = (H *ᵥ k) j := fun j => congrFun h3 j
   have h22 : star (2 : E)⁻¹ = (2 : E)⁻¹ := by rw [star_inv₀, star_ofNat]
   ext i j
-  simp only [solM, Matrix.add_apply, Matrix.conjTranspose_apply, Matrix.smul_apply, Matrix.sub_apply,
-    vecMulVec_apply, smul_eq_mul, Pi.star_apply, star_mul', star_add, star_sub, star_star, h22, h1, h2', h3']
+  simp only [solM, Matrix.add_apply, Matrix.conjTranspose_apply, Matrix.smul_apply,
+    Matrix.sub_apply, vecMulVec_apply, smul_eq_mul, Pi.star_apply, star_mul', star_add, star_sub,
+    star_star, h22, h1, h2', h3']
   have h2ne : (2 : E) ≠ 0 := two_ne_zero
   field_simp
   ring
 
-theorem solM_mulVec {n : Type*} [Fintype n] (H : Matrix n n E) (k ℓ : n → E) (hk : star k ⬝ᵥ (H *ᵥ k) = 0)
-    (hℓ : star ℓ ⬝ᵥ k = 1) : solM H k ℓ *ᵥ k = 0 := by
+theorem solM_mulVec
+    {n : Type*} [Fintype n]
+    (H : Matrix n n E) (k ℓ : n → E) (hk : star k ⬝ᵥ (H *ᵥ k) = 0) (hℓ : star ℓ ⬝ᵥ k = 1)
+    : solM H k ℓ *ᵥ k = 0 := by
   have hv : ∀ a b : n → E, vecMulVec a b *ᵥ k = fun i => a i * (b ⬝ᵥ k) := by
     intro a b; ext i; simp [Matrix.mulVec, dotProduct, vecMulVec_apply, Finset.mul_sum, mul_assoc]
   have hk' : star k ᵥ* H ⬝ᵥ k = 0 := by rw [← Matrix.dotProduct_mulVec]; exact hk
@@ -133,14 +144,14 @@ theorem solM_mulVec {n : Type*} [Fintype n] (H : Matrix n n E) (k ℓ : n → E)
   ext i
   simp
 
-theorem sum_comb {m n : Type*} [Fintype m] [Fintype n] (u : m → S.V) (A : Matrix m n E) (v : n → E) :
-    ∑ b, v b • comb S u A b = ∑ i, (A *ᵥ v) i • u i := by
+theorem sum_comb {m n : Type*} [Fintype m] [Fintype n] (u : m → S.V) (A : Matrix m n E) (v : n → E)
+    : ∑ b, v b • comb S u A b = ∑ i, (A *ᵥ v) i • u i := by
   simp only [comb, Finset.smul_sum, smul_smul, Matrix.mulVec, dotProduct, Finset.sum_smul]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun b _ => by rw [mul_comm]
 
-theorem sum_mem_X {r : ℕ} {T : E} (F : FlagG S r T) (v : Fin (r + 1) → E) (hv : v (Fin.last r) = 0) :
-    ∑ a, v a • F.fvec a ∈ F.X := by
+theorem sum_mem_X {r : ℕ} {T : E} (F : FlagG S r T) (v : Fin (r + 1) → E) (hv : v (Fin.last r) = 0)
+    : ∑ a, v a • F.fvec a ∈ F.X := by
   rw [Fin.sum_univ_castSucc, hv, zero_smul, add_zero]
   refine Submodule.sum_mem _ fun a _ => Submodule.smul_mem _ _ ?_
   simp only [FlagG.fvec, Fin.snoc_castSucc]
@@ -154,14 +165,15 @@ open Formalism.MainNotions.S
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : Formalism.BasicNotions.HSpace E}
 
-theorem frame_la {r : ℕ} {T T' : E} (F : FlagG S r T) (f₁ : Fin (r + 1) → S.V)
+theorem frame_la
+    {r : ℕ} {T T' : E} (F : FlagG S r T) (f₁ : Fin (r + 1) → S.V)
     (h1 : ∀ a b, (a ≠ Fin.last r ∨ b ≠ Fin.last r) → S.hT (f₁ a) (f₁ b) = 0)
-    (h2 : S.hT (f₁ (Fin.last r)) (f₁ (Fin.last r)) = -T')
-    (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (hZ : Z.det ≠ 0) (hZ₁ : (gram S f₁ F.fvec).det ≠ 0)
-    (hx : leadMinorE (gram S f₁ F.fvec) r * Z.det = leadMinorE Z r * (gram S f₁ F.fvec).det) :
-    ∃ F₂ : FlagG S r T', Zhat F F₂ = Z ∧
-      Z.det • om S F.fvec f₁ - (gram S f₁ F.fvec).det • om S F.fvec F₂.fvec ∈ F.X ∧
-      ∀ b, F₂.fvec b ∈ Submodule.span E (Set.range (Sum.elim F.fvec f₁)) := by
+    (h2 : S.hT (f₁ (Fin.last r)) (f₁ (Fin.last r)) = -T') (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) E)
+    (hZ : Z.det ≠ 0) (hZ₁ : (gram S f₁ F.fvec).det ≠ 0)
+    (hx : leadMinorE (gram S f₁ F.fvec) r * Z.det = leadMinorE Z r * (gram S f₁ F.fvec).det)
+    : ∃ F₂ : FlagG S r T',
+      Zhat F F₂ = Z ∧ Z.det • om S F.fvec f₁ - (gram S f₁ F.fvec).det • om S F.fvec F₂.fvec ∈ F.X
+        ∧ ∀ b, F₂.fvec b ∈ Submodule.span E (Set.range (Sum.elim F.fvec f₁)) := by
   set f := F.fvec with hf
   set Z₁ := gram S f₁ f with hZ₁def
   set l := Fin.last r with hl
@@ -211,12 +223,14 @@ theorem frame_la {r : ℕ} {T T' : E} (F : FlagG S r T) (f₁ : Fin (r + 1) → 
 
   set H := Γ' - Pᴴ * Γ' * P with hH
   have hHh : Hᴴ = H := by
-    simp only [hH, Matrix.conjTranspose_sub, Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, hΓ'h,
-      Matrix.mul_assoc]
+    simp only [hH, Matrix.conjTranspose_sub, Matrix.conjTranspose_mul,
+      Matrix.conjTranspose_conjTranspose, hΓ'h, Matrix.mul_assoc]
   have hkHk : star k ⬝ᵥ (H *ᵥ k) = 0 := by
     have e1 : star k ⬝ᵥ ((Pᴴ * Γ' * P) *ᵥ k) = star (P *ᵥ k) ⬝ᵥ (Γ' *ᵥ (P *ᵥ k)) := by
-      rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec, Matrix.star_mulVec]
-    rw [hH, Matrix.sub_mulVec, dotProduct_sub, e1, quad_last Γ' hΓ'0, quad_last Γ' hΓ'0, hPkl, sub_self]
+      rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec,
+        Matrix.star_mulVec]
+    rw [hH, Matrix.sub_mulVec, dotProduct_sub, e1, quad_last Γ' hΓ'0, quad_last Γ' hΓ'0, hPkl,
+      sub_self]
   have hk0 : k ≠ 0 := by
     intro h
     have := hZk
@@ -264,11 +278,14 @@ theorem frame_la {r : ℕ} {T T' : E} (F : FlagG S r T) (f₁ : Fin (r + 1) → 
     have e2 : Pᴴ * (Z₁ᴴ * Q) = Mᴴ := by
       rw [← Matrix.mul_assoc, ← Matrix.conjTranspose_mul, hZ₁P, ← hQZ, Matrix.conjTranspose_mul,
         Matrix.conjTranspose_conjTranspose]
-    calc gram S f₂ f₂ = gram S f₂ (comb S f₁ P) + gram S f₂ (comb S f Q) := by rw [hf₂, gram_add_right]
+    calc
+      gram S f₂ f₂
+        = gram S f₂ (comb S f₁ P) + gram S f₂ (comb S f Q) := by rw [hf₂, gram_add_right]
       _ = Pᴴ * (Γ' * P + Z₁ᴴ * Q) + Qᴴ * Z := by rw [gram_comb_right, gram_comb_right, e1, hZ2]
       _ = Pᴴ * Γ' * P + (M + Mᴴ) := by rw [Matrix.mul_add, e2, hQZ, Matrix.mul_assoc]; abel
       _ = Γ' := by rw [hMH, hH]; abel
-  have hG2e : ∀ a b, S.hT (f₂ a) (f₂ b) = S.hT (f₁ a) (f₁ b) := fun a b => congrFun (congrFun hG2 a) b
+  have hG2e : ∀ a b, S.hT (f₂ a) (f₂ b) = S.hT (f₁ a) (f₁ b) := fun a b =>
+    congrFun (congrFun hG2 a) b
   have hind : LinearIndependent E (fun a : Fin r => f₂ (Fin.castSucc a)) := by
     rw [Fintype.linearIndependent_iff]
     intro g hg a

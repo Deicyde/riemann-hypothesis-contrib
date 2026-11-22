@@ -65,9 +65,10 @@ lemma lift_down (Tw : ATowerL R₀ p) (n : ℕ) (τ1 : B.G Tw.O) (th1 : B.G (Tw.
   · have h := congrArg (fun f => LinearMap.lTensor B.gg f w1) h3
     simpa only [LinearMap.lTensor_comp, LinearMap.comp_apply] using h
 
-def coordK (M : Type u) [AddCommGroup M] [Module R₀ M] (k : Module.Free.ChooseBasisIndex R₀ B.gg) :
-    B.gg ⊗[R₀] M →ₗ[R₀] M :=
-  (TensorProduct.lid R₀ M).toLinearMap ∘ₗ LinearMap.rTensor M ((Module.Free.chooseBasis R₀ B.gg).coord k)
+def coordK (M : Type u) [AddCommGroup M] [Module R₀ M] (k : Module.Free.ChooseBasisIndex R₀ B.gg)
+    : B.gg ⊗[R₀] M →ₗ[R₀] M :=
+  (TensorProduct.lid R₀ M).toLinearMap
+    ∘ₗ LinearMap.rTensor M ((Module.Free.chooseBasis R₀ B.gg).coord k)
 
 lemma coordK_lTensor {M M' : Type u} [AddCommGroup M] [Module R₀ M] [AddCommGroup M'] [Module R₀ M']
     (f : M →ₗ[R₀] M') (k : Module.Free.ChooseBasisIndex R₀ B.gg) (x : B.gg ⊗[R₀] M) :

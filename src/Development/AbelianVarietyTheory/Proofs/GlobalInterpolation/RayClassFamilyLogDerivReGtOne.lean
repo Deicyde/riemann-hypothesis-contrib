@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.TsumOn
 
 @[expose] public section
 
-open Complex ArithmeticFunction MeasureTheory Filter Topology NumberField GlobalTheory.Hk GlobalTheory.Mem
+open Complex ArithmeticFunction MeasureTheory Filter Topology NumberField GlobalTheory.Hk
+  GlobalTheory.Mem
 open scoped Classical
 
 namespace GlobalTheory.Hk.LogDeriv
@@ -257,14 +258,19 @@ lemma conv_chi (n : ℕ) : Complex.log n * 𝓕.aChi χ n = (𝓕.lamChi χ ⍟ 
         (∑ h, χ h * (𝓕.lam h p.1 : ℂ)) * ∑ g, χ g * (𝓕.a g p.2 : ℂ) := by
         simp_rw [Finset.sum_mul, Finset.mul_sum]
 
-theorem logDeriv_F : ∀ (𝓕 : LFam) (χ : AddChar 𝓕.G ℂ) (s : ℂ), 1 < s.re → LSeriesSummable (𝓕.lamChi χ) s ∧ ((s.re - 1) / s.re) ^ 2 ≤ ‖LSeries (𝓕.aChi χ) s‖ ∧ 𝓕.F χ s ≠ 0 ∧ -(deriv (𝓕.F χ) s / 𝓕.F χ s) + (if χ = 1 then 1 / (s - 1) else 0) = LSeries (𝓕.lamChi χ) s := by
+theorem logDeriv_F
+    : ∀ (𝓕 : LFam) (χ : AddChar 𝓕.G ℂ) (s : ℂ),
+      1 < s.re
+        → LSeriesSummable (𝓕.lamChi χ) s ∧ ((s.re - 1) / s.re) ^ 2 ≤ ‖LSeries (𝓕.aChi χ) s‖
+          ∧ 𝓕.F χ s ≠ 0
+          ∧ -(deriv (𝓕.F χ) s / 𝓕.F χ s) + (if χ = 1 then 1 / (s - 1) else 0)
+            = LSeries (𝓕.lamChi χ) s := by
   intro 𝓕 χ s hs
   obtain ⟨-, hLS, -, -⟩ := GlobalTheory.Hk.RayCont.continuation_growth 𝓕 χ
   have ha : ∀ z : ℂ, 1 < z.re → LSeriesSummable (𝓕.aChi χ) z := fun z hz => (hLS z hz).1
   have hl : ∀ z : ℂ, 1 < z.re → LSeriesSummable (𝓕.lamChi χ) z := fun z hz =>
     summable_of_le (norm_lamChi_le 𝓕 χ) z hz
-  have hlb := norm_ge_of_conv ha (norm_lamChi_le 𝓕 χ) (aChi_one 𝓕 χ)
-    (fun n _ => conv_chi 𝓕 χ n) hs
+  have hlb := norm_ge_of_conv ha (norm_lamChi_le 𝓕 χ) (aChi_one 𝓕 χ) (fun n _ => conv_chi 𝓕 χ n) hs
   have hσ : 0 < (s.re - 1) / s.re := div_pos (by linarith) (by linarith)
   have hL0 : LSeries (𝓕.aChi χ) s ≠ 0 := by
     intro h
@@ -282,11 +288,11 @@ theorem logDeriv_F : ∀ (𝓕 : LFam) (χ : AddChar 𝓕.G ℂ) (s : ℂ), 1 < 
     split_ifs <;> simp [hs1, hL0]
   · by_cases h : χ = 1
     · have hev : 𝓕.F χ =ᶠ[𝓝 s] fun z => (z - 1) * LSeries (𝓕.aChi χ) z :=
-        Filter.eventually_of_mem (hU.mem_nhds hs) fun z hz => by
-          rw [(hLS z hz).2, if_pos h]
-      have hd : HasDerivAt (fun z => (z - 1) * LSeries (𝓕.aChi χ) z)
-          (1 * LSeries (𝓕.aChi χ) s +
-            (s - 1) * (-(LSeries (𝓕.lamChi χ) s * LSeries (𝓕.aChi χ) s))) s :=
+        Filter.eventually_of_mem (hU.mem_nhds hs) fun z hz => by rw [(hLS z hz).2, if_pos h]
+      have hd : HasDerivAt
+          (fun z => (z - 1) * LSeries (𝓕.aChi χ) z)
+          (1 * LSeries (𝓕.aChi χ) s + (s - 1) * (-(LSeries (𝓕.lamChi χ) s * LSeries (𝓕.aChi χ) s)))
+          s :=
         ((hasDerivAt_id s).sub_const (1 : ℂ)).mul hder
       rw [hev.deriv_eq, hd.deriv, (hLS s hs).2, if_pos h, if_pos h]
       field_simp

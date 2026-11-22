@@ -16,9 +16,11 @@ open MvPolynomial
 
 universe u
 
-theorem IsMultiHomogIdeal.sup {K : Type*} [DecidableEq K] {ι : K → Type*} {R : Type*} [CommRing R]
-    {I J : Ideal (MRing ι R)} (hI : IsMultiHomogIdeal I) (hJ : IsMultiHomogIdeal J) :
-    IsMultiHomogIdeal (I ⊔ J) := by
+theorem IsMultiHomogIdeal.sup
+    {K : Type*} [DecidableEq K]
+    {ι : K → Type*} {R : Type*} [CommRing R]
+    {I J : Ideal (MRing ι R)} (hI : IsMultiHomogIdeal I) (hJ : IsMultiHomogIdeal J)
+    : IsMultiHomogIdeal (I ⊔ J) := by
   intro f hf b
   obtain ⟨x, hx, y, hy, rfl⟩ := Submodule.mem_sup.mp hf
   rw [map_add (f := _)]
@@ -49,8 +51,7 @@ theorem RightTermSupport.proof : RightTermSupport.Statement.{u} := by
   obtain ⟨bf, bg, hbf, hbg, -⟩ := hD.1.degrees
   have hDm : IsMultiHomogIdeal (divisorIdeal P f g) :=
     ColonMultiHomog.proof O K ι _ g bg (SupSpanMultiHomog.proof O K ι P f bf hP hbf) hbg
-  have hUmh : IsMultiHomogIdeal U :=
-    MinimalPrimeMultiHomog.proof O K ι _ U (hWmh.sup hDm) hUm.1
+  have hUmh : IsMultiHomogIdeal U := MinimalPrimeMultiHomog.proof O K ι _ U (hWmh.sup hDm) hUm.1
   apply hU
   refine ⟨hUp, hUmh, hUm.2, ?_, hPW.trans hWU'⟩
   by_cases hϖW : (C ϖ : MRing ι O) ∈ W
@@ -70,8 +71,7 @@ theorem RightTermSupport.proof : RightTermSupport.Statement.{u} := by
     have e : g * (u * v' - u' * v) = u' * (u * f - v * g) - u * (u' * f - v' * g) := by ring
     rw [e]
     exact W.sub_mem (W.mul_mem_left _ huv) (W.mul_mem_left _ (hPW huv'))
-  have hdiff : u * v' - u' * v ∈ U :=
-    hWU' ((hWp.mem_or_mem hmem).resolve_left hV.den_not_mem)
+  have hdiff : u * v' - u' * v ∈ U := hWU' ((hWp.mem_or_mem hmem).resolve_left hV.den_not_mem)
   have hv'U : v' ∈ U := hDU hv'D
   have hu'v : u' * v ∈ U := by
     have e : u' * v = u * v' - (u * v' - u' * v) := by ring

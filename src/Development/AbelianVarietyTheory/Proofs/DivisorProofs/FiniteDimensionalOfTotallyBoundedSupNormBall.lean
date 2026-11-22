@@ -8,11 +8,14 @@ open NumberField MeasureTheory GlobalTheory.CuspRep GlobalTheory.HCF Topology
 
 namespace GlobalTheory
 
-theorem finiteDimensional_of_totallyBounded_supBall :
-    ∀ (T : Type) (V : Submodule ℂ (T → ℂ)) (B : Set T), (∀ φ ∈ V, (∀ x ∈ B, φ x = 0) → φ = 0) →
-      (∀ φ ∈ V, ∃ M : ℝ, ∀ x ∈ B, ‖φ x‖ ≤ M) →
-      (∀ ε : ℝ, 0 < ε → ∃ F : Finset (T → ℂ), ∀ φ ∈ V, (∀ x ∈ B, ‖φ x‖ ≤ 1) →
-        ∃ ψ ∈ F, ∀ x ∈ B, ‖φ x - ψ x‖ ≤ ε) → FiniteDimensional ℂ V := by
+theorem finiteDimensional_of_totallyBounded_supBall
+    : ∀ (T : Type) (V : Submodule ℂ (T → ℂ)) (B : Set T),
+      (∀ φ ∈ V, (∀ x ∈ B, φ x = 0) → φ = 0) → (∀ φ ∈ V, ∃ M : ℝ, ∀ x ∈ B, ‖φ x‖ ≤ M)
+        → (∀ ε : ℝ,
+          0 < ε
+            → ∃ F : Finset (T → ℂ), ∀ φ ∈ V,
+              (∀ x ∈ B, ‖φ x‖ ≤ 1) → ∃ ψ ∈ F, ∀ x ∈ B, ‖φ x - ψ x‖ ≤ ε)
+        → FiniteDimensional ℂ V := by
   intro T V B hinj hbdd htb
   classical
   have hmem : ∀ φ : V, Memℓp (fun x : B => (φ : T → ℂ) x) (⊤ : ENNReal) := by
@@ -22,10 +25,11 @@ theorem finiteDimensional_of_totallyBounded_supBall :
     refine ⟨M, ?_⟩
     rintro _ ⟨x, rfl⟩
     exact hM x x.2
-  let L : V →ₗ[ℂ] lp (fun _ : B => ℂ) (⊤ : ENNReal) :=
-    { toFun := fun φ => ⟨fun x : B => (φ : T → ℂ) x, hmem φ⟩
-      map_add' := fun φ ψ => lp.ext (funext fun _ => rfl)
-      map_smul' := fun c φ => lp.ext (funext fun _ => rfl) }
+  let L : V →ₗ[ℂ] lp (fun _ : B => ℂ) (⊤ : ENNReal) := {
+    toFun := fun φ => ⟨fun x : B => (φ : T → ℂ) x, hmem φ⟩
+    map_add' := fun φ ψ => lp.ext (funext fun _ => rfl)
+    map_smul' := fun c φ => lp.ext (funext fun _ => rfl)
+  }
   have hLapp : ∀ (φ : V) (x : B), (L φ) x = (φ : T → ℂ) x := fun _ _ => rfl
   have hL : Function.Injective L := by
     refine (injective_iff_map_eq_zero L).2 fun φ hφ => ?_

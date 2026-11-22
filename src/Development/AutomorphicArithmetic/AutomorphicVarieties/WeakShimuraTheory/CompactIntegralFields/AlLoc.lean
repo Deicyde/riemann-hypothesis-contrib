@@ -10,25 +10,37 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsRe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-private theorem al_loc {l : ℕ} [Fact l.Prime] (c : Coef l) {B : Type} [CommRing B] [IsDomain B] [CharP B l] (g : c.O →+* B) :
-    IsLocalHom g := by
+private theorem al_loc
+    {l : ℕ} [Fact l.Prime]
+    (c : Coef l)
+    {B : Type} [CommRing B] [IsDomain B] [CharP B l]
+    (g : c.O →+* B)
+    : IsLocalHom g := by
   have hl : (l : c.O) ≠ 0 := Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero
-  have hk : RingHom.ker g ≠ ⊥ := fun h => hl (by
-    have : (l : c.O) ∈ RingHom.ker g := by rw [RingHom.mem_ker, map_natCast, CharP.cast_eq_zero]
-    rwa [h, Ideal.mem_bot] at this)
-  have hm : RingHom.ker g = maximalIdeal c.O := eq_maximalIdeal ((RingHom.ker_isPrime g).isMaximal hk)
+  have hk : RingHom.ker g ≠ ⊥ := fun h =>
+    hl (by
+      have : (l : c.O) ∈ RingHom.ker g := by rw [RingHom.mem_ker, map_natCast, CharP.cast_eq_zero]
+      rwa [h, Ideal.mem_bot] at this)
+  have hm : RingHom.ker g = maximalIdeal c.O :=
+    eq_maximalIdeal ((RingHom.ker_isPrime g).isMaximal hk)
   refine ⟨fun x hx => by_contra fun h => hx.ne_zero ?_⟩
   have : x ∈ RingHom.ker g := hm ▸ (mem_maximalIdeal x).2 h
   exact this
 
-private theorem al_le {l : ℕ} [Fact l.Prime] (c : Coef l) : c.O ≤ integralClosure ℤ_[l] (PadicAlgCl l) := fun x hx =>
+private theorem al_le {l : ℕ} [Fact l.Prime] (c : Coef l)
+    : c.O ≤ integralClosure ℤ_[l] (PadicAlgCl l) := fun x hx =>
   (Algebra.IsIntegral.isIntegral (R := ℤ_[l]) (⟨x, hx⟩ : c.O)).map c.O.val
 
-theorem UpperTheory.V.Ws.ambL :
-    ∀ {l : ℕ} [Fact l.Prime] (c : Coef l) (A : Type) [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] [IsAdicComplete (maximalIdeal A) A]
-      [Finite (ResidueField A)] [CharP A l] (a : c.O →+* A), ∃ (𝔞 : Amb l) (f : A →+* 𝔞.V), CharP 𝔞.K l ∧ 𝔞.IsDvr f ∧ f.comp a = 𝔞.a c := by
+theorem UpperTheory.V.Ws.ambL
+    : ∀ {l : ℕ} [Fact l.Prime] (c : Coef l) (A : Type) [CommRing A] [IsDomain A]
+        [IsDiscreteValuationRing A] [IsAdicComplete (maximalIdeal A) A] [Finite (ResidueField A)]
+        [CharP A l] (a : c.O →+* A),
+      ∃ (𝔞 : Amb l) (f : A →+* 𝔞.V),
+        CharP 𝔞.K l ∧ 𝔞.IsDvr f ∧ f.comp a = 𝔞.a c := by
   intro l _ c A _ _ _ _ _ _ a
   haveI := c.dvr
   haveI := c.fin
@@ -62,16 +74,24 @@ theorem UpperTheory.V.Ws.ambL :
   have hS : ∀ c' : Coef l, ∀ x : c'.O, (x : PadicAlgCl l) ∈ S := fun c' x =>
     IsIntegral.tower_top (A := c.O) (al_le c' x.2)
   let ι : ∀ c' : Coef l, c'.O →+* S := fun c' => c'.O.val.toRingHom.codRestrict S (hS c')
-  refine ⟨Amb.mk K V (fun c' => Φ.comp (ι c')) ?_ ?_ ?_, f, hK, ⟨hfinj, hfloc, inferInstance, inferInstance, halg⟩, ?_⟩
+  refine ⟨
+    Amb.mk K V (fun c' => Φ.comp (ι c')) ?_ ?_ ?_,
+    f,
+    hK,
+    ⟨hfinj, hfloc, inferInstance, inferInstance, halg⟩,
+    ?_
+  ⟩
   · intro c1 c2 h x
     exact congrArg Φ (Subtype.ext rfl)
   · intro c'
     exact al_loc c' _
   · intro x
     obtain ⟨p, hp0, hp⟩ := halg x
-    have hint := UpperTheory.residue_isIntegral_of_algebraic_over_dvr A K V f hfinj hfloc x ⟨p, hp0, hp⟩
-    obtain ⟨y, hy⟩ := UpperTheory.exists_integralClosure_preimage_of_isIntegral c.O (PadicAlgCl l) (ResidueField V)
-      ((IsLocalRing.residue V).comp Φ) (IsLocalRing.residue V x) hint
+    have hint :=
+      UpperTheory.residue_isIntegral_of_algebraic_over_dvr A K V f hfinj hfloc x ⟨p, hp0, hp⟩
+    obtain ⟨y, hy⟩ :=
+      UpperTheory.exists_integralClosure_preimage_of_isIntegral c.O (PadicAlgCl l) (ResidueField V)
+        ((IsLocalRing.residue V).comp Φ) (IsLocalRing.residue V x) hint
     have hyl : IsIntegral ℤ_[l] (y : PadicAlgCl l) := isIntegral_trans (A := c.O) _ y.2
     obtain ⟨c', -, hc'⟩ := (coefSup l).2.2.1 c y.1 hyl
     refine ⟨c', ⟨y.1, hc'⟩, ?_⟩

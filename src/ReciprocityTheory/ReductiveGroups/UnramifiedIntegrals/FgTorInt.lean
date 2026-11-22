@@ -15,27 +15,32 @@ namespace ReciprocityTheory.ChartRestriction.L1
 open PowerSeries Formalism.G Formalism.LT Formalism.L2.Th1.CM
 open Formalism.L2.Th1
 
-theorem le_one_of_prod_max_le_one {α : Type} (S : Finset α) (f : α → ℝ)
-    (h : ∏ P ∈ S, max 1 (f P) ≤ 1) (Q : α) (hQ : Q ∈ S) : f Q ≤ 1 := by
+theorem le_one_of_prod_max_le_one
+    {α : Type} (S : Finset α) (f : α → ℝ) (h : ∏ P ∈ S, max 1 (f P) ≤ 1) (Q : α) (hQ : Q ∈ S)
+    : f Q ≤ 1 := by
   classical
   rw [← Finset.mul_prod_erase S _ hQ] at h
-  have h1 : (1 : ℝ) ≤ ∏ P ∈ S.erase Q, max 1 (f P) :=
-    Finset.one_le_prod₀ fun P _ => le_max_left _ _
+  have h1 : (1 : ℝ) ≤ ∏ P ∈ S.erase Q, max 1 (f P) := Finset.one_le_prod₀ fun P _ => le_max_left _ _
   have h2 : max 1 (f Q) ≤ max 1 (f Q) * ∏ P ∈ S.erase Q, max 1 (f P) := by
     calc
-      max 1 (f Q) = max 1 (f Q) * 1 := (mul_one _).symm
+      max 1 (f Q)
+        = max 1 (f Q) * 1 := (mul_one _).symm
       _ ≤ max 1 (f Q) * ∏ P ∈ S.erase Q, max 1 (f P) :=
         mul_le_mul_of_nonneg_left h1 (le_trans zero_le_one (le_max_left _ _))
   exact (le_max_right _ _).trans (h2.trans h)
 
-theorem tor_integral (l : ℕ) [Fact l.Prime] (hl : l ≠ 2) (L : PeriodPair) (ι : ℂ ≃+* ℂ_[l])
-    (g2 g3 : ℂ_[l]) (hM : LatModel l L ι g2 g3) (n : ℕ) (hn : 0 < n) (hln : ¬ l ∣ n) (P : ℂ)
-    (hP : (n : ℂ) * P ∈ L.lattice) (hP' : P ∉ L.lattice) :
-    ‖ι (L.weierstrassP P)‖ ≤ 1 ∧ ‖ι (L.derivWeierstrassP P)‖ ≤ 1 := by
+theorem tor_integral
+    (l : ℕ) [Fact l.Prime]
+    (hl : l ≠ 2)
+    (L : PeriodPair) (ι : ℂ ≃+* ℂ_[l]) (g2 g3 : ℂ_[l]) (hM : LatModel l L ι g2 g3)
+    (n : ℕ) (hn : 0 < n) (hln : ¬ l ∣ n)
+    (P : ℂ) (hP : (n : ℂ) * P ∈ L.lattice) (hP' : P ∉ L.lattice)
+    : ‖ι (L.weierstrassP P)‖ ≤ 1 ∧ ‖ι (L.derivWeierstrassP P)‖ ≤ 1 := by
   have hlp : l.Prime := Fact.out
   have h2 : ‖(2 : ℂ_[l])‖ = 1 := by
-    have := norm_natCast_Cl_of_not_dvd l (n := 2)
-      (fun h => hl ((Nat.prime_dvd_prime_iff_eq hlp Nat.prime_two).1 h))
+    have :=
+      norm_natCast_Cl_of_not_dvd l (n := 2)
+        (fun h => hl ((Nat.prime_dvd_prime_iff_eq hlp Nat.prime_two).1 h))
     simpa using this
   have hnn : ‖(n : ℂ_[l])‖ = 1 := norm_natCast_Cl_of_not_dvd l hln
   have hn0 : (n : ℂ) ≠ 0 := Nat.cast_ne_zero.2 hn.ne'
@@ -48,8 +53,8 @@ theorem tor_integral (l : ℕ) [Fact l.Prime] (hl : l ≠ 2) (L : PeriodPair) (�
   have hee := mult_unique g2 g3 (n : ℂ_[l]) e he0 hel
   rw [← hee] at hsq
   have hG := integral_of_sq_eq hei he0 hUi hU0 hsq
-  obtain ⟨hxi, hx0, -, -⟩ := A.bridgeCurve ℂ_[l] (A.shortW g2 g3)
-    (shortW_intModel g2 g3 hM.n2 hM.n3 h2)
+  obtain ⟨hxi, hx0, -, -⟩ :=
+    A.bridgeCurve ℂ_[l] (A.shortW g2 g3) (shortW_intModel g2 g3 hM.n2 hM.n3 h2)
   have hxi' : IntegralPS (A.xS (A.shortW g2 g3)) := (integralPS_iff_mv _).2 hxi
   have hb := gauss_bound S (fun P => ι (L.weierstrassP P)) _ hxi' hx0 _ hG
   rw [norm_pow, hnn, one_pow, one_mul] at hb
@@ -64,8 +69,7 @@ theorem tor_integral (l : ℕ) [Fact l.Prime] (hl : l ≠ 2) (L : PeriodPair) (�
   have hrel := congrArg ι (L.derivWeierstrassP_sq P hP')
   simp only [map_pow, map_sub, map_mul, ← hM.eq2, ← hM.eq3] at hrel
   have h4 : ‖ι (4 : ℂ)‖ ≤ 1 := by
-    have : ι (4 : ℂ) = ((4 : ℕ) : ℂ_[l]) := by
-      rw [← map_natCast ι 4]; norm_num
+    have : ι (4 : ℂ) = ((4 : ℕ) : ℂ_[l]) := by rw [← map_natCast ι 4]; norm_num
     rw [this]
     exact IsUltrametricDist.norm_natCast_le_one ℂ_[l] 4
   have hy2 : ‖ι (L.derivWeierstrassP P)‖ ^ 2 ≤ 1 := by

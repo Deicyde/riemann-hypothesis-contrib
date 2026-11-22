@@ -9,8 +9,12 @@ open scoped ComplexConjugate
 
 namespace Formalism.FourierDecayAlt.P.A5x1
 
-theorem lamN_last {K : Type} [CommRing K] (R : Subring K) {n : ℕ} (Z : Matrix (Fin n) (Fin n) K)
-    (j : ℕ) (hj : j + 1 = n) : lamN R Z j = lamLin R Z := by
+theorem lamN_last
+    {K : Type} [CommRing K]
+    (R : Subring K)
+    {n : ℕ} (Z : Matrix (Fin n) (Fin n) K)
+    (j : ℕ) (hj : j + 1 = n)
+    : lamN R Z j = lamLin R Z := by
   unfold lamN lamTil lamLin rowN lastCoord
   congr 2
   apply Finset.sum_congr rfl

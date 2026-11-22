@@ -8,13 +8,23 @@ open TensorProduct
 
 namespace GlobalTheory.CompanionTheory.RegularLocal
 
-theorem regular_of_regular_at_maximal : ∀ (R Q P : Type) [CommRing R] [AddCommGroup Q] [Module R Q] [AddCommGroup P] [Module R P] [Module.Finite R Q] [Module.Projective R Q] [Module.Finite R P] [Module.Projective R P] (d : Q →ₗ[R] P), (∀ (p : Ideal R) [p.IsMaximal], ∃ r : Localization.AtPrime p ⊗[R] P →ₗ[Localization.AtPrime p] Localization.AtPrime p ⊗[R] Q, d.baseChange (Localization.AtPrime p) ∘ₗ r ∘ₗ d.baseChange (Localization.AtPrime p) = d.baseChange (Localization.AtPrime p)) → ∃ r : P →ₗ[R] Q, d ∘ₗ r ∘ₗ d = d := by
+theorem regular_of_regular_at_maximal
+    : ∀ (R Q P : Type) [CommRing R] [AddCommGroup Q] [Module R Q] [AddCommGroup P] [Module R P]
+        [Module.Finite R Q] [Module.Projective R Q] [Module.Finite R P] [Module.Projective R P]
+        (d : Q →ₗ[R] P),
+      (∀ (p : Ideal R) [p.IsMaximal],
+          ∃ r : Localization.AtPrime p ⊗[R] P →ₗ[Localization.AtPrime p] Localization.AtPrime p ⊗[R] Q,
+            d.baseChange (Localization.AtPrime p) ∘ₗ r ∘ₗ d.baseChange (Localization.AtPrime p)
+              = d.baseChange (Localization.AtPrime p))
+        → ∃ r : P →ₗ[R] Q, d ∘ₗ r ∘ₗ d = d := by
   intro R Q P _ _ _ _ _ _ _ _ _ d h
   have hex : Function.Exact d (LinearMap.range d).mkQ := LinearMap.exact_map_mkQ_range d
   have hsurj : Function.Surjective (LinearMap.range d).mkQ := Submodule.mkQ_surjective _
 
-  have hloc : ∀ (p : Ideal R) [p.IsMaximal], Module.Flat (Localization.AtPrime p)
-      (Localization.AtPrime p ⊗[R] (P ⧸ LinearMap.range d)) := by
+  have hloc
+      : ∀ (p : Ideal R) [p.IsMaximal],
+        Module.Flat (Localization.AtPrime p)
+          (Localization.AtPrime p ⊗[R] (P ⧸ LinearMap.range d)) := by
     intro p _
     obtain ⟨r, hr⟩ := h p
     set A := Localization.AtPrime p
@@ -33,8 +43,8 @@ theorem regular_of_regular_at_maximal : ∀ (R Q P : Type) [CommRing R] [AddComm
       simp only [LinearMap.comp_apply] at this
       simp [e, this]
     let s : A ⊗[R] (P ⧸ LinearMap.range d) →ₗ[A] A ⊗[R] P :=
-      ((LinearMap.range dA).liftQ e (fun x hx => he x hx)) ∘ₗ
-        (hexA.linearEquivOfSurjective hsA).symm.toLinearMap
+      ((LinearMap.range dA).liftQ e (fun x hx => he x hx))
+        ∘ₗ (hexA.linearEquivOfSurjective hsA).symm.toLinearMap
     have hs : ∀ x, s (πA x) = e x := by
       intro x
       have : (hexA.linearEquivOfSurjective hsA).symm (πA x) = (LinearMap.range dA).mkQ x := by
@@ -82,8 +92,8 @@ theorem regular_of_regular_at_maximal : ∀ (R Q P : Type) [CommRing R] [AddComm
     Module.Projective.of_split (LinearMap.range d).subtype g (by
       ext y
       simpa [g] using hg y)
-  obtain ⟨t, ht⟩ := Module.projective_lifting_property d.rangeRestrict LinearMap.id
-    d.surjective_rangeRestrict
+  obtain ⟨t, ht⟩ :=
+    Module.projective_lifting_property d.rangeRestrict LinearMap.id d.surjective_rangeRestrict
   refine ⟨t ∘ₗ g, ?_⟩
   ext y
   have h1 : g (d y) = d.rangeRestrict y := by

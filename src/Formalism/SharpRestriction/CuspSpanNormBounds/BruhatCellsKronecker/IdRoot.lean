@@ -11,9 +11,26 @@ namespace Formalism.MainNotions.BridgeLemma
 
 open NumberField IsDedekindDomain
 
-theorem iroot_mem {R : Type} [CommRing R] [IsDomain R] (ζ : R) (M : ℕ) (P : Ideal R) (h1 : ζ ≠ 1) (hM : ζ ^ M = 1)
-    (hP : ζ - 1 ∈ P) : (M : R) ∈ P := by
-  first | exact Bl.general_b_fact_upper_version.goal1 .. | (apply Bl.general_b_fact_upper_version.goal1 <;> assumption) | (intros; apply Bl.general_b_fact_upper_version.goal1 <;> assumption) | (apply @Bl.general_b_fact_upper_version.goal1 <;> assumption) | (intros; apply @Bl.general_b_fact_upper_version.goal1 <;> assumption) | (apply @Bl.general_b_fact_upper_version.goal1 <;> first | assumption | infer_instance) | exact @Bl.general_b_fact_upper_version.goal1 R ‹_› ‹_› ζ M P h1 hM hP | exact @Bl.general_b_fact_upper_version.goal1 R ‹_› ‹_› ζ M P h1 hM | exact @Bl.general_b_fact_upper_version.goal1 R ‹_› ‹_› ζ M P h1 | exact @Bl.general_b_fact_upper_version.goal1 R ‹_› ‹_› ζ M P | exact @Bl.general_b_fact_upper_version.goal1 R ‹_› ‹_› ζ M | exact @Bl.general_b_fact_upper_version.goal1 R ‹_› ‹_› ζ | exact @Bl.general_b_fact_upper_version.goal1 R ‹_› ‹_› | exact @Bl.general_b_fact_upper_version.goal1 R ‹_› | exact @Bl.general_b_fact_upper_version.goal1 R
+theorem iroot_mem
+    {R : Type} [CommRing R] [IsDomain R]
+    (ζ : R) (M : ℕ) (P : Ideal R) (h1 : ζ ≠ 1) (hM : ζ ^ M = 1) (hP : ζ - 1 ∈ P)
+    : (M : R) ∈ P := by
+  first
+  | exact Bl.general_b_fact_upper_version.goal1 ..
+  | (apply Bl.general_b_fact_upper_version.goal1 <;> assumption)
+  | (intros; apply Bl.general_b_fact_upper_version.goal1 <;> assumption)
+  | (apply @Bl.general_b_fact_upper_version.goal1 <;> assumption)
+  | (intros; apply @Bl.general_b_fact_upper_version.goal1 <;> assumption)
+  | (apply @Bl.general_b_fact_upper_version.goal1 <;> first | assumption | infer_instance)
+  | exact @Bl.general_b_fact_upper_version.goal1 R ‹_› ‹_› ζ M P h1 hM hP
+  | exact @Bl.general_b_fact_upper_version.goal1 R ‹_› ‹_› ζ M P h1 hM
+  | exact @Bl.general_b_fact_upper_version.goal1 R ‹_› ‹_› ζ M P h1
+  | exact @Bl.general_b_fact_upper_version.goal1 R ‹_› ‹_› ζ M P
+  | exact @Bl.general_b_fact_upper_version.goal1 R ‹_› ‹_› ζ M
+  | exact @Bl.general_b_fact_upper_version.goal1 R ‹_› ‹_› ζ
+  | exact @Bl.general_b_fact_upper_version.goal1 R ‹_› ‹_›
+  | exact @Bl.general_b_fact_upper_version.goal1 R ‹_›
+  | exact @Bl.general_b_fact_upper_version.goal1 R
 
 theorem id_root : RootsOfUnityFormal := by
   intro R _ _ ζ N g1 g2 P1 P2 hN hζN hg1 hg2 hne hP1 hP2 h1 h2 hz1 hz2
@@ -49,15 +66,17 @@ theorem id_root : RootsOfUnityFormal := by
 theorem id_over : ExistsPrimeAbove := by
   intro E _ _ p hp
   have hmax : (Ideal.span {(p : ℤ)}).IsMaximal :=
-    (Ideal.span_singleton_prime (Int.natCast_ne_zero.2 hp.ne_zero)).2 (Nat.prime_iff_prime_int.1 hp) |>.isMaximal
-      (by rw [Ne, Ideal.span_singleton_eq_bot]; exact Int.natCast_ne_zero.2 hp.ne_zero)
-  obtain ⟨Q, hQ, hc⟩ := Ideal.exists_ideal_over_maximal_of_isIntegral (S := 𝓞 E) (Ideal.span {(p : ℤ)}) (by
-    rw [(RingHom.injective_iff_ker_eq_bot _).1 (FaithfulSMul.algebraMap_injective ℤ (𝓞 E))]
-    exact bot_le)
+    (Ideal.span_singleton_prime (Int.natCast_ne_zero.2 hp.ne_zero)).2 (Nat.prime_iff_prime_int.1 hp)
+      |>.isMaximal (by rw [Ne, Ideal.span_singleton_eq_bot]; exact Int.natCast_ne_zero.2 hp.ne_zero)
+  obtain ⟨Q, hQ, hc⟩ :=
+    Ideal.exists_ideal_over_maximal_of_isIntegral (S := 𝓞 E) (Ideal.span {(p : ℤ)}) (by
+      rw [(RingHom.injective_iff_ker_eq_bot _).1 (FaithfulSMul.algebraMap_injective ℤ (𝓞 E))]
+      exact bot_le)
   have hpQ : (p : 𝓞 E) ∈ Q := by
     have : (p : ℤ) ∈ Q.comap (algebraMap ℤ (𝓞 E)) := by
       change (p : ℤ) ∈ Ideal.under ℤ Q
-      rw [hc]; exact Ideal.mem_span_singleton_self _
+      rw [hc]
+      exact Ideal.mem_span_singleton_self _
     simpa using this
   refine ⟨⟨Q, hQ.isPrime, ?_⟩, hpQ⟩
   rintro rfl

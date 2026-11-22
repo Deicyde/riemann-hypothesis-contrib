@@ -11,10 +11,12 @@ open MeasureTheory
 namespace PositivityTheory.SiegelWeilFormula.Act
 
 def LatHaar : Prop :=
-  ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [LocallyCompactSpace V]
-    [SecondCountableTopology V] [T2Space V] [MeasurableSpace V] [BorelSpace V] (μ : Measure V) [μ.IsAddHaarMeasure]
-    (Γ : AddSubgroup V) [Countable Γ] (φ : V ≃ₜ+ V), (∀ x, φ x ∈ Γ ↔ x ∈ Γ) →
-    ∀ s : Set V, IsAddFundamentalDomain Γ s μ → μ s ≠ 0 → μ s ≠ ⊤ → μ.map φ = μ
+  ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
+      [LocallyCompactSpace V] [SecondCountableTopology V] [T2Space V] [MeasurableSpace V]
+      [BorelSpace V] (μ : Measure V) [μ.IsAddHaarMeasure] (Γ : AddSubgroup V) [Countable Γ]
+      (φ : V ≃ₜ+ V),
+    (∀ x, φ x ∈ Γ ↔ x ∈ Γ)
+      → ∀ s : Set V, IsAddFundamentalDomain Γ s μ → μ s ≠ 0 → μ s ≠ ⊤ → μ.map φ = μ
 
 theorem latHaar : LatHaar := by
   unfold LatHaar

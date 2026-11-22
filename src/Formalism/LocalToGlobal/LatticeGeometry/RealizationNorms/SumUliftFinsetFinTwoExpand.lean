@@ -28,8 +28,10 @@ namespace Formalism.L2.Geo.Rec.DualLatticeEmbeddings
 
 variable {K : Type} [Field K] [NumberField K] {n : ℕ}
 
-theorem nPl_mul_two [_root_.NumberField.IsTotallyComplex K] : Fintype.card (InfinitePlace K) * 2 = finrank ℚ K := by
-  rw [NumberField.IsTotallyComplex.finrank, NumberField.InfinitePlace.card_eq_nrRealPlaces_add_nrComplexPlaces,
+theorem nPl_mul_two [_root_.NumberField.IsTotallyComplex K]
+    : Fintype.card (InfinitePlace K) * 2 = finrank ℚ K := by
+  rw [NumberField.IsTotallyComplex.finrank,
+    NumberField.InfinitePlace.card_eq_nrRealPlaces_add_nrComplexPlaces,
     NumberField.IsTotallyComplex.nrRealPlaces_eq_zero]
   ring
 
@@ -43,6 +45,7 @@ noncomputable section
 
 namespace Formalism.L2.Geo.Rec.DualLatticeEmbeddings
 
-variable {K : Type} [Field K] [NumberField K] {n : ℕ} [StarRing K] [_root_.NumberField.IsTotallyComplex K]
+variable
+  {K : Type} [Field K] [NumberField K] {n : ℕ} [StarRing K] [_root_.NumberField.IsTotallyComplex K]
 
 end Formalism.L2.Geo.Rec.DualLatticeEmbeddings

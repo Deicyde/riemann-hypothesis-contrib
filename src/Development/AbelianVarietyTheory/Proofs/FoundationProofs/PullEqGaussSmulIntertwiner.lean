@@ -13,7 +13,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaTran
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 namespace GlobalTheory.UnitaryTheta.Constant
@@ -23,23 +25,35 @@ section General
 open Complex MeasureTheory
 open scoped Real ComplexConjugate
 
-variable {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V]
-  [MeasurableSpace V] [BorelSpace V]
+variable
+  {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V] [MeasurableSpace V]
+  [BorelSpace V]
 
-theorem const_eq (μ : Measure V) [μ.IsAddHaarMeasure] (H : Sesq V) (hH : IsPosHerm H) (a : V ≃ₗ[ℂ] V)
+theorem const_eq
+    (μ : Measure V) [μ.IsAddHaarMeasure]
+    (H : Sesq V) (hH : IsPosHerm H)
+    (a : V ≃ₗ[ℂ] V)
     (ha : ∀ z w, H (a z) (a w) = H z w) (hdet : LinearMap.det (1 - (a : V →ₗ[ℂ] V)) ≠ 0)
     (C : V →ₗ[ℂ] V) (hC : ∀ x, C (x - a x) = (1 / 2 : ℂ) • (x + a x))
-    (A A₁ : AddSubgroup V) [DiscreteTopology A] (hfg : A.FG) (hsp : Submodule.span ℝ (A : Set V) = ⊤)
-    [Finite (A₁ ⧸ A.addSubgroupOf A₁)] (hA₁ : ∀ y, a y ∈ A → y ∈ A₁)
-    (hint : ∀ x ∈ A₁, ∀ y ∈ A₁, ∃ m : ℤ, (H x y).im = m)
+    (A A₁ : AddSubgroup V) [DiscreteTopology A]
+    (hfg : A.FG) (hsp : Submodule.span ℝ (A : Set V) = ⊤)
+    [Finite (A₁ ⧸ A.addSubgroupOf A₁)]
+    (hA₁ : ∀ y, a y ∈ A → y ∈ A₁) (hint : ∀ x ∈ A₁, ∀ y ∈ A₁, ∃ m : ℤ, (H x y).im = m)
     (α : V → ℂ) (hα : IsSemichar H A α) (hαa : ∀ y, α (a y) = α y) (hαn : ∀ y, α (-y) = α y)
     (m : ℕ) (hm : 0 < m) (hmA : ∀ x ∈ A, ∃ y ∈ A, a y ∈ A ∧ m • x = y - a y)
     (c : ℂ) (n : ℝ) (hn : 0 < n)
-    (hc : ∀ z w, kerSum H A α z (a w) = c * ((n : ℂ) * ∑ᶠ q : A₁ ⧸ A.addSubgroupOf A₁,
-      α ((q.out : A₁) : V) * Heisenberg₂ H ((q.out : A₁) : V) (kerSum H A α z) w)) :
-    ∃ r : ℝ, 0 < r ∧ c = r * (LinearMap.det (1 - (a : V →ₗ[ℂ] V)))⁻¹ *
-      ∑ᶠ q : A ⧸ (subLa m A).addSubgroupOf A, α ((q.out : A) : V) *
-        cexp (-(π : ℂ) * H (C ((q.out : A) : V)) ((q.out : A) : V)) := by
+    (hc : ∀ z w,
+      kerSum H A α z (a w)
+        = c
+          * ((n : ℂ)
+            * ∑ᶠ q : A₁ ⧸ A.addSubgroupOf A₁,
+              α ((q.out : A₁) : V) * Heisenberg₂ H ((q.out : A₁) : V) (kerSum H A α z) w))
+    : ∃ r : ℝ,
+      0 < r
+        ∧ c
+          = r * (LinearMap.det (1 - (a : V →ₗ[ℂ] V)))⁻¹
+            * ∑ᶠ q : A ⧸ (subLa m A).addSubgroupOf A, α ((q.out : A) : V) *
+                cexp (-(π : ℂ) * H (C ((q.out : A) : V)) ((q.out : A) : V)) := by
   set B : V →ₗ[ℂ] V := C + (1 / 2 : ℂ) • LinearMap.id with hBdef
   have hB1 : ∀ y, B (y - a y) = y := by
     intro y
@@ -60,8 +74,8 @@ theorem const_eq (μ : Measure V) [μ.IsAddHaarMeasure] (H : Sesq V) (hH : IsPos
     rw [hB1, hC]
     have h1 := hH.1 (a y) y
     have h2 : (H y y).im = 0 := Complex.conj_eq_iff_im.1 (hH.1 y y).symm
-    simp only [map_smul, map_add (f := _), map_sub, LinearMap.smul_apply, LinearMap.add_apply, LinearMap.sub_apply, ha, h1,
-      smul_eq_mul]
+    simp only [map_smul, map_add (f := _), map_sub, LinearMap.smul_apply, LinearMap.add_apply,
+      LinearMap.sub_apply, ha, h1, smul_eq_mul]
     apply Complex.ext <;> simp [h2] <;> ring
   let Λ : AddSubgroup V := (subLa m A).comap (1 - (a : V →ₗ[ℂ] V)).toAddMonoidHom
   have hΛ : ∀ y, y ∈ Λ ↔ y - a y ∈ subLa m A := fun y => by simp [Λ]
@@ -69,9 +83,9 @@ theorem const_eq (μ : Measure V) [μ.IsAddHaarMeasure] (H : Sesq V) (hH : IsPos
     intro y hy
     obtain ⟨x, hx, e⟩ := (hΛ y).1 hy
     obtain ⟨y', h1, h2, h3⟩ := hmA x hx
-    have : y = y' := by
-      rw [← hB1 y, ← hB1 y', ← h3, ← e]; rfl
-    rw [this]; exact ⟨h1, h2⟩
+    have : y = y' := by rw [← hB1 y, ← hB1 y', ← h3, ← e]; rfl
+    rw [this]
+    exact ⟨h1, h2⟩
   have hle : Λ ≤ A := fun y hy => (hΛ' y hy).1
   have hdisc : DiscreteTopology Λ := DiscreteTopology.of_subset (s := (A : Set V)) inferInstance hle
   have hspan : Submodule.span ℝ (Λ : Set V) = ⊤ := by
@@ -79,10 +93,10 @@ theorem const_eq (μ : Measure V) [μ.IsAddHaarMeasure] (H : Sesq V) (hH : IsPos
       intro x hx
       induction hx using Submodule.span_induction with
       | mem x hx =>
-        have h2 : B (m • x) ∈ Λ := by
-          rw [hΛ, hB2]; exact ⟨x, hx, rfl⟩
+        have h2 : B (m • x) ∈ Λ := by rw [hΛ, hB2]; exact ⟨x, hx, rfl⟩
         have h3 : B x = (m : ℝ)⁻¹ • B (m • x) := by
-          rw [map_nsmul, ← Nat.cast_smul_eq_nsmul ℝ, smul_smul, inv_mul_cancel₀ (by positivity), one_smul]
+          rw [map_nsmul, ← Nat.cast_smul_eq_nsmul ℝ, smul_smul, inv_mul_cancel₀ (by positivity),
+            one_smul]
         rw [h3]
         exact Submodule.smul_mem _ _ (Submodule.subset_span h2)
       | zero => simp
@@ -95,47 +109,70 @@ theorem const_eq (μ : Measure V) [μ.IsAddHaarMeasure] (H : Sesq V) (hH : IsPos
   obtain ⟨k, b, hb⟩ := GlobalTheory.ThetaInter.exists_basis hdisc hspan
   have hFd : IsAddFundamentalDomain Λ (ZSpan.fundamentalDomain b) μ := by
     rw [← hb]; exact ZSpan.isAddFundamentalDomain' b μ
-  have hfin : μ (ZSpan.fundamentalDomain b) ≠ ⊤ := (ZSpan.fundamentalDomain_isBounded b).measure_lt_top.ne
+  have hfin : μ (ZSpan.fundamentalDomain b) ≠ ⊤ :=
+    (ZSpan.fundamentalDomain_isBounded b).measure_lt_top.ne
   have hpos : 0 < μ.real (ZSpan.fundamentalDomain b) :=
     ENNReal.toReal_pos (ZSpan.measure_fundamentalDomain_ne_zero b) hfin
   haveI : Finite (A ⧸ (subLa m A).addSubgroupOf A) :=
     GlobalTheory.ThetaInter.finite_quot hfg fun x hx => ⟨m, hm, x, hx, rfl⟩
   letI := Fintype.ofFinite (A ⧸ (subLa m A).addSubgroupOf A)
   letI := Fintype.ofFinite (A₁ ⧸ A.addSubgroupOf A₁)
-  obtain ⟨κ, hκ, hL⟩ := Graph.integral_kerSum_graph_eq V μ H hH a ha hdet B hB2 A Λ hle (fun y hy => (hΛ' y hy).2) α hα
-    (fun y _ => hαa y) _ hFd (A ⧸ (subLa m A).addSubgroupOf A) (fun q => ((q.out : A) : V)) (fun q => (q.out : A).2) (by
-      intro x hx
-      have h1 : ((((⟨x, hx⟩ : A) : A ⧸ (subLa m A).addSubgroupOf A).out : A) : V) - x ∈ subLa m A := by
-        have := QuotientAddGroup.eq.1
-          (Quotient.out_eq ((⟨x, hx⟩ : A) : A ⧸ (subLa m A).addSubgroupOf A)).symm
-        rw [AddSubgroup.mem_addSubgroupOf] at this
-        simpa [neg_add_eq_sub] using this
-      refine ⟨(((⟨x, hx⟩ : A) : A ⧸ (subLa m A).addSubgroupOf A), ⟨B _, by rw [hΛ, hB2]; exact h1⟩), ?_, ?_⟩
-      · simp only [hB2]; abel
-      · rintro ⟨q, y, hy⟩ e
-        simp only at e
-        have hq : q = ((⟨x, hx⟩ : A) : A ⧸ (subLa m A).addSubgroupOf A) := by
-          rw [← Quotient.out_eq q]
-          refine (QuotientAddGroup.eq.2 ?_).symm
-          rw [AddSubgroup.mem_addSubgroupOf]
-          convert (hΛ y).1 hy using 1
-          simp only [AddSubgroup.coe_add, AddSubgroup.coe_neg]
-          rw [e]; abel
-        subst hq
-        refine Prod.ext rfl (Subtype.ext ?_)
-        simp only
-        rw [← hB1 y]
-        congr 1
-        exact (sub_sub_cancel _ _).symm.trans (congrArg _ e.symm))
-  have hR := fun q : A₁ ⧸ A.addSubgroupOf A₁ => integral_heis_kerSum_diag V μ H hH A Λ hle α hα _ hFd hfin
-    ((q.out : A₁) : V) fun y hy => hint _ (q.out : A₁).2 y (hA₁ y (hΛ' y hy).2)
-  have hsum : ∫ z in ZSpan.fundamentalDomain b, kerSum H A α z (a z) * cexp (-(π : ℂ) * H z z) ∂μ =
-      c * n * (μ.real (ZSpan.fundamentalDomain b) : ℂ) := by
-    have e : ∀ z, kerSum H A α z (a z) * cexp (-(π : ℂ) * H z z) = c * n * ∑ q : A₁ ⧸ A.addSubgroupOf A₁,
-        α ((q.out : A₁) : V) * (Heisenberg₂ H ((q.out : A₁) : V) (kerSum H A α z) z * cexp (-(π : ℂ) * H z z)) := by
-      intro z
-      rw [hc, finsum_eq_sum_of_fintype]
-      simp only [← mul_assoc, ← Finset.sum_mul]
+  obtain ⟨κ, hκ, hL⟩ :=
+    Graph.integral_kerSum_graph_eq V μ H hH a ha hdet B hB2 A Λ hle
+      (fun y hy => (hΛ' y hy).2)
+      α hα
+      (fun y _ => hαa y)
+      _ hFd (A ⧸ (subLa m A).addSubgroupOf A)
+      (fun q => ((q.out : A) : V))
+      (fun q => (q.out : A).2)
+      (by
+        intro x hx
+        have h1
+            : ((((⟨x, hx⟩ : A) : A ⧸ (subLa m A).addSubgroupOf A).out : A) : V) - x
+              ∈ subLa m A := by
+          have :=
+            QuotientAddGroup.eq.1 (Quotient.out_eq
+              ((⟨x, hx⟩ : A) : A ⧸ (subLa m A).addSubgroupOf A)).symm
+          rw [AddSubgroup.mem_addSubgroupOf] at this
+          simpa [neg_add_eq_sub] using this
+        refine ⟨
+          (((⟨x, hx⟩ : A) : A ⧸ (subLa m A).addSubgroupOf A), ⟨B _, by rw [hΛ, hB2]; exact h1⟩),
+          ?_,
+          ?_
+        ⟩
+        · simp only [hB2]; abel
+        · rintro ⟨q, y, hy⟩ e
+          simp only at e
+          have hq : q = ((⟨x, hx⟩ : A) : A ⧸ (subLa m A).addSubgroupOf A) := by
+            rw [← Quotient.out_eq q]
+            refine (QuotientAddGroup.eq.2 ?_).symm
+            rw [AddSubgroup.mem_addSubgroupOf]
+            convert (hΛ y).1 hy using 1
+            simp only [AddSubgroup.coe_add, AddSubgroup.coe_neg]
+            rw [e]
+            abel
+          subst hq
+          refine Prod.ext rfl (Subtype.ext ?_)
+          simp only
+          rw [← hB1 y]
+          congr 1
+          exact (sub_sub_cancel _ _).symm.trans (congrArg _ e.symm))
+  have hR := fun q : A₁ ⧸ A.addSubgroupOf A₁ =>
+    integral_heis_kerSum_diag V μ H hH A Λ hle α hα _ hFd hfin ((q.out : A₁) : V) fun y hy =>
+      hint _ (q.out : A₁).2 y (hA₁ y (hΛ' y hy).2)
+  have hsum
+      : ∫ z in ZSpan.fundamentalDomain b, kerSum H A α z (a z) * cexp (-(π : ℂ) * H z z) ∂μ
+        = c * n * (μ.real (ZSpan.fundamentalDomain b) : ℂ) := by
+    have e
+        : ∀ z,
+          kerSum H A α z (a z) * cexp (-(π : ℂ) * H z z)
+            = c * n
+              * ∑ q : A₁ ⧸ A.addSubgroupOf A₁,
+                α ((q.out : A₁) : V) * (Heisenberg₂ H ((q.out : A₁) : V) (kerSum H A α z) z * cexp (-(π : ℂ) * H z z)) :=
+      by
+        intro z
+        rw [hc, finsum_eq_sum_of_fintype]
+        simp only [← mul_assoc, ← Finset.sum_mul]
     simp only [e]
     rw [integral_const_mul, integral_finsetSum _ fun q _ => (hR q).1.const_mul _]
     congr 1
@@ -144,7 +181,8 @@ theorem const_eq (μ : Measure V) [μ.IsAddHaarMeasure] (H : Sesq V) (hH : IsPos
       rw [integral_const_mul, (hR 0).2, if_pos h0, hαn, ← mul_assoc]
       rcases hα.1 _ h0 with h | h <;> simp [h]
     · intro q _ hq
-      rw [integral_const_mul, (hR q).2, if_neg (fun h => hq ((GlobalTheory.ThetaInter.out_mem_iff q).1 h)), mul_zero]
+      rw [integral_const_mul, (hR q).2,
+        if_neg (fun h => hq ((GlobalTheory.ThetaInter.out_mem_iff q).1 h)), mul_zero]
     · simp
   refine ⟨κ / (n * μ.real (ZSpan.fundamentalDomain b)), by positivity, ?_⟩
   rw [finsum_eq_sum_of_fintype]
@@ -160,7 +198,6 @@ theorem const_eq (μ : Measure V) [μ.IsAddHaarMeasure] (H : Sesq V) (hH : IsPos
   linear_combination hL
 
 end General
-
 
 open MeasureTheory GlobalTheory.ThetaInter in
 theorem pull_eq_gauss_smul_intertwiner : ∀ (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ : ℂ), Crv D cc δ → ∀ (N N' : ℕ) (A A₁ : AddSubgroup (VC D N N')), KLat D (tor0 D cc δ) A → KLat D (tor0 D cc δ) A₁ → ∀ (u : VC D N N' ≃ₗ[ℂ] VC D N N'), (∀ z w, Hf D (tor0 D cc δ) (u z) (u w) = Hf D (tor0 D cc δ) z w) → (∀ x, x ∈ A ↔ u x ∈ A₁) → LinearMap.det (LinearMap.id - (u.symm : VC D N N' →ₗ[ℂ] VC D N N')) ≠ 0 → ∀ (C : VC D N N' →ₗ[ℂ] VC D N N'), (∀ x, C (x - u.symm x) = (1 / 2 : ℂ) • (x + u.symm x)) → ∀ m : ℕ, 0 < m → (∀ x ∈ A, ∃ y ∈ A, u.symm y ∈ A ∧ m • x = y - u.symm y) → ∀ th ∈ ThSp D (tor0 D cc δ) A, th ≠ 0 → ∃ (c : ℂ) (r : ℝ), ‖c‖ = 1 ∧ 0 < r ∧ c = r * (LinearMap.det (LinearMap.id - (u.symm : VC D N N' →ₗ[ℂ] VC D N N')))⁻¹ * (∑ᶠ q : A ⧸ (subLa m A).addSubgroupOf A, al D (tor0 D cc δ) ((q.out : A) : VC D N N') * Complex.exp (-(Real.pi : ℂ) * Hf D (tor0 D cc δ) (C ((q.out : A) : VC D N N')) ((q.out : A) : VC D N N'))) ∧ (fun z => th (u.symm z)) = c • Iop D (tor0 D cc δ) A A₁ th := by

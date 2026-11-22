@@ -19,24 +19,25 @@ private lemma UpperTheory.Reformulated.B.Qn12.step_add {R ι : Type*} [CommRing 
   simp only [add_mul, Finset.sum_add_distrib]
   linear_combination hc + hd
 
-theorem UpperTheory.Reformulated.B.Qn12.exists_expansion :
-    ∀ {n : ℕ} (q : Fin n → ℂ)
-    (p : MvPolynomial (Fin n) ℂ),
-    ∃ (c : Fin n → MvPolynomial (Fin n) ℂ),
-      p =
-        (MvPolynomial.C : ℂ → MvPolynomial (Fin n) ℂ) ((MvPolynomial.eval q : MvPolynomial (Fin n) ℂ → ℂ) p) +
-          ∑ i : Fin n, c i * (MvPolynomial.X i - (MvPolynomial.C : ℂ → MvPolynomial (Fin n) ℂ) (q i)) := by
-  intro n q p
-  induction p using MvPolynomial.induction_on with
-  | C a => exact ⟨0, by simp⟩
-  | add p r hp hr =>
-    obtain ⟨c, hc⟩ := hp
-    obtain ⟨d, hd⟩ := hr
-    refine ⟨fun i => c i + d i, ?_⟩
-    rw [map_add (f := _), map_add (f := _)]
-    exact UpperTheory.Reformulated.B.Qn12.step_add _ c d p r _ _ hc hd
-  | mul_X p j hp =>
-    obtain ⟨c, hc⟩ := hp
-    refine ⟨fun i => c i * MvPolynomial.C (q j) + if i = j then p else 0, ?_⟩
-    rw [map_mul, MvPolynomial.eval_X, map_mul]
-    exact UpperTheory.Reformulated.B.Qn12.step (fun i => MvPolynomial.X i - MvPolynomial.C (q i)) c p _ _ _ j rfl hc
+theorem UpperTheory.Reformulated.B.Qn12.exists_expansion
+    : ∀ {n : ℕ} (q : Fin n → ℂ) (p : MvPolynomial (Fin n) ℂ), ∃ (c : Fin n → MvPolynomial (Fin n) ℂ),
+      p = (MvPolynomial.C : ℂ → MvPolynomial (Fin n) ℂ)
+          ((MvPolynomial.eval q : MvPolynomial (Fin n) ℂ → ℂ) p)
+        + ∑ i : Fin n, c i * (MvPolynomial.X i - (MvPolynomial.C : ℂ → MvPolynomial (Fin n) ℂ) (q i)) :=
+  by
+    intro n q p
+    induction p using MvPolynomial.induction_on with
+    | C a => exact ⟨0, by simp⟩
+    | add p r hp hr =>
+      obtain ⟨c, hc⟩ := hp
+      obtain ⟨d, hd⟩ := hr
+      refine ⟨fun i => c i + d i, ?_⟩
+      rw [map_add (f := _), map_add (f := _)]
+      exact UpperTheory.Reformulated.B.Qn12.step_add _ c d p r _ _ hc hd
+    | mul_X p j hp =>
+      obtain ⟨c, hc⟩ := hp
+      refine ⟨fun i => c i * MvPolynomial.C (q j) + if i = j then p else 0, ?_⟩
+      rw [map_mul, MvPolynomial.eval_X, map_mul]
+      exact UpperTheory.Reformulated.B.Qn12.step
+        (fun i => MvPolynomial.X i - MvPolynomial.C (q i))
+        c p _ _ _ j rfl hc

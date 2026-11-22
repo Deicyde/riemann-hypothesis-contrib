@@ -35,8 +35,9 @@ def saturation (x : B) (hx : IsIntegral A x) : Subring B where
     rintro a ⟨n, hn⟩
     exact ⟨n, by simpa using hn.neg⟩
 
-theorem mem_saturation_of_isIntegral {x : B} (hx : IsIntegral A x) {b : B}
-    (hb : IsIntegral (saturation x hx) b) : b ∈ saturation x hx := by
+theorem mem_saturation_of_isIntegral
+    {x : B} (hx : IsIntegral A x) {b : B} (hb : IsIntegral (saturation x hx) b)
+    : b ∈ saturation x hx := by
   rcases subsingleton_or_nontrivial B with hB | hB
   · rw [Subsingleton.elim b 0]
     exact zero_mem _
@@ -62,8 +63,11 @@ theorem mem_saturation_of_isIntegral {x : B} (hx : IsIntegral A x) {b : B}
     intro h
     rw [hq.natDegree_eq_zero.mp h] at hqz
     simp at hqz
-  refine ⟨N, IsIntegral.of_aeval_monic_of_isIntegral_coeff (p := q.scaleRoots (x ^ N))
-    ((monic_scaleRoots_iff _).mpr hq) (by rwa [natDegree_scaleRoots]) ?_ fun i => ?_⟩
+  refine ⟨
+    N,
+    IsIntegral.of_aeval_monic_of_isIntegral_coeff (p := q.scaleRoots (x ^ N))
+      ((monic_scaleRoots_iff _).mpr hq) (by rwa [natDegree_scaleRoots]) ?_ fun i => ?_
+  ⟩
   · rw [mul_comm, scaleRoots_eval_mul, hqz, mul_zero]
     exact isIntegral_zero
   · rw [coeff_scaleRoots]
@@ -100,8 +104,8 @@ theorem mem_piece {n : ℕ} {a : L} : a ∈ piece o t n ↔ IsIntegral (cone o t
 
 theorem C_mul_X_mem_cone (s : σ) : C (t s) * X ∈ cone o t := Algebra.subset_adjoin ⟨s, rfl⟩
 
-theorem mul_mem_piece {m n : ℕ} {a b : L} (ha : a ∈ piece o t m) (hb : b ∈ piece o t n) :
-    a * b ∈ piece o t (m + n) := by
+theorem mul_mem_piece {m n : ℕ} {a b : L} (ha : a ∈ piece o t m) (hb : b ∈ piece o t n)
+    : a * b ∈ piece o t (m + n) := by
   have h := IsIntegral.mul ha hb
   rwa [mem_piece, map_mul, pow_add, mul_mul_mul_comm]
 
@@ -112,8 +116,7 @@ theorem mem_piece_one (s : σ) : t s ∈ piece o t 1 := by
   rw [mem_piece, pow_one]
   exact isIntegral_algebraMap (x := (⟨_, C_mul_X_mem_cone s⟩ : cone o t))
 
-theorem one_mem_piece_zero : (1 : L) ∈ piece o t 0 := by
-  simpa [mem_piece] using isIntegral_one
+theorem one_mem_piece_zero : (1 : L) ∈ piece o t 0 := by simpa [mem_piece] using isIntegral_one
 
 theorem span_pow_le_piece (n : ℕ) : Submodule.span o (Set.range t) ^ n ≤ piece o t n := by
   induction n with
@@ -127,8 +130,8 @@ theorem span_pow_le_piece (n : ℕ) : Submodule.span o (Set.range t) ^ n ≤ pie
 theorem pow_mem_piece (s : σ) (n : ℕ) : t s ^ n ∈ piece o t n :=
   span_pow_le_piece n (Submodule.pow_mem_pow _ (Submodule.subset_span (Set.mem_range_self s)) n)
 
-theorem coeff_mem_span_pow {p : L[X]} (hp : p ∈ cone o t) (n : ℕ) :
-    p.coeff n ∈ Submodule.span o (Set.range t) ^ n := by
+theorem coeff_mem_span_pow {p : L[X]} (hp : p ∈ cone o t) (n : ℕ)
+    : p.coeff n ∈ Submodule.span o (Set.range t) ^ n := by
   induction hp using Algebra.adjoin_induction generalizing n with
   | mem x hx =>
     obtain ⟨s, rfl⟩ := hx
@@ -143,29 +146,29 @@ theorem coeff_mem_span_pow {p : L[X]} (hp : p ∈ cone o t) (n : ℕ) :
     · subst h
       simp
     · simp
-  | add x y _ _ hx hy => rw [coeff_add]; exact add_mem (hx n) (hy n)
+  | add x y _ _ hx hy =>
+    rw [coeff_add]; exact add_mem (hx n) (hy n)
   | mul x y _ _ hx hy =>
     rw [coeff_mul]
     refine Submodule.sum_mem _ fun c hc => ?_
     rw [← Finset.HasAntidiagonal.mem_antidiagonal.mp hc, pow_add]
     exact Submodule.mul_mem_mul (hx _) (hy _)
 
-def spread (L : Type*) [CommRing L] : L[X] →+* L[X][X] :=
-  eval₂RingHom (C.comp C) (C X * X)
+def spread (L : Type*) [CommRing L] : L[X] →+* L[X][X] := eval₂RingHom (C.comp C) (C X * X)
 
-theorem coeff_spread {L : Type*} [CommRing L] (p : L[X]) (n : ℕ) :
-    (spread L p).coeff n = C (p.coeff n) * X ^ n := by
+theorem coeff_spread {L : Type*} [CommRing L] (p : L[X]) (n : ℕ)
+    : (spread L p).coeff n = C (p.coeff n) * X ^ n := by
   induction p using Polynomial.induction_on' with
   | add p q hp hq => simp only [map_add (f := _), coeff_add, hp, hq, add_mul]
   | monomial m a =>
-    rw [spread, coe_eval₂RingHom, eval₂_monomial, mul_pow, ← C_pow, RingHom.comp_apply,
-      ← mul_assoc, ← C_mul, coeff_C_mul_X_pow, coeff_monomial]
+    rw [spread, coe_eval₂RingHom, eval₂_monomial, mul_pow, ← C_pow, RingHom.comp_apply, ← mul_assoc,
+      ← C_mul, coeff_C_mul_X_pow, coeff_monomial]
     by_cases h : n = m
     · simp [h]
     · simp [h, Ne.symm h]
 
-theorem isIntegral_cone_iff {p : L[X]} :
-    IsIntegral (cone o t) p ↔ ∀ n, p.coeff n ∈ piece o t n := by
+theorem isIntegral_cone_iff {p : L[X]}
+    : IsIntegral (cone o t) p ↔ ∀ n, p.coeff n ∈ piece o t n := by
   constructor
   · intro hp n
     have h1 : ∀ s : cone o t, spread L s ∈ (mapRingHom (algebraMap (cone o t) L[X])).range := by
@@ -183,12 +186,13 @@ theorem isIntegral_cone_iff {p : L[X]} :
     choose φ hφ using h1
     have hinj : Function.Injective (mapRingHom (algebraMap (cone o t) L[X])) :=
       Polynomial.map_injective _ Subtype.val_injective
-    let ψ : cone o t →+* (cone o t)[X] :=
-      { toFun := φ
-        map_one' := hinj (by rw [hφ, map_one]; exact map_one _)
-        map_zero' := hinj (by rw [hφ, map_zero]; exact map_zero _)
-        map_add' := fun a b => hinj (by rw [map_add (f := _), hφ, hφ, hφ]; exact map_add _ _ _)
-        map_mul' := fun a b => hinj (by rw [map_mul, hφ, hφ, hφ]; exact map_mul _ _ _) }
+    let ψ : cone o t →+* (cone o t)[X] := {
+      toFun := φ
+      map_one' := hinj (by rw [hφ, map_one]; exact map_one _)
+      map_zero' := hinj (by rw [hφ, map_zero]; exact map_zero _)
+      map_add' := fun a b => hinj (by rw [map_add (f := _), hφ, hφ, hφ]; exact map_add _ _ _)
+      map_mul' := fun a b => hinj (by rw [map_mul, hφ, hφ, hφ]; exact map_mul _ _ _)
+    }
     letI : Algebra (cone o t)[X] L[X][X] := Polynomial.algebra _ _
     have h2 : IsIntegral (cone o t)[X] (spread L p) :=
       hp.map_of_comp_eq ψ (spread L) (RingHom.ext fun s => hφ s)
@@ -203,8 +207,10 @@ theorem piece_zero : piece o t 0 = (integralClosure o L).toSubmodule := by
   rw [mem_piece, pow_zero, mul_one, Subalgebra.mem_toSubmodule, mem_integralClosure_iff]
   constructor
   · intro h
-    have h1 : ∀ s : cone o t, ((evalRingHom 0).comp (algebraMap (cone o t) L[X])) s ∈
-        (⊥ : Subalgebra o L) := fun s => by
+    have h1
+        : ∀ s : cone o t,
+          ((evalRingHom 0).comp (algebraMap (cone o t) L[X])) s
+            ∈ (⊥ : Subalgebra o L) := fun s => by
       have := coeff_mem_span_pow s.2 0
       rw [pow_zero, Submodule.mem_one, coeff_zero_eq_eval_zero] at this
       exact Algebra.mem_bot.mpr this
@@ -216,10 +222,11 @@ theorem piece_zero : piece o t 0 = (integralClosure o L).toSubmodule := by
   · intro h
     exact (h.map (CAlgHom (R := o) (A := L))).tower_top
 
-theorem isIntegral_div_of_mem_piece (i : σ) {n : ℕ} {a : L} (ha : a ∈ piece o t n) :
-    IsIntegral (ratioRing o t i) (a / t i ^ n) := by
-  have h1 : ∀ s : cone o t, ((evalRingHom (t i)⁻¹).comp (algebraMap (cone o t) L[X])) s ∈
-      ratioRing o t i := by
+theorem isIntegral_div_of_mem_piece (i : σ) {n : ℕ} {a : L} (ha : a ∈ piece o t n)
+    : IsIntegral (ratioRing o t i) (a / t i ^ n) := by
+  have h1
+      : ∀ s : cone o t,
+        ((evalRingHom (t i)⁻¹).comp (algebraMap (cone o t) L[X])) s ∈ ratioRing o t i := by
     rintro ⟨s, hs⟩
     induction hs using Algebra.adjoin_induction with
     | mem x hx =>
@@ -232,14 +239,14 @@ theorem isIntegral_div_of_mem_piece (i : σ) {n : ℕ} {a : L} (ha : a ∈ piece
     IsIntegral.map_of_comp_eq (RingHom.codRestrict _ _ h1) (evalRingHom _) rfl ha
   simpa [div_eq_mul_inv] using h2
 
-theorem isIntegral_ratioRing_iff {i : σ} (hi : t i ≠ 0) {f : L} :
-    IsIntegral (ratioRing o t i) f ↔ ∃ n, f * t i ^ n ∈ piece o t n := by
+theorem isIntegral_ratioRing_iff {i : σ} (hi : t i ≠ 0) {f : L}
+    : IsIntegral (ratioRing o t i) f ↔ ∃ n, f * t i ^ n ∈ piece o t n := by
   constructor
   · intro hf
     have hx : IsIntegral (cone o t) (C (t i) * X) :=
       isIntegral_algebraMap (x := (⟨_, C_mul_X_mem_cone i⟩ : cone o t))
-    have h1 : ∀ s : ratioRing o t i, (C.comp (algebraMap (ratioRing o t i) L)) s ∈
-        saturation _ hx := by
+    have h1
+        : ∀ s : ratioRing o t i, (C.comp (algebraMap (ratioRing o t i) L)) s ∈ saturation _ hx := by
       rintro ⟨s, hs⟩
       induction hs using Algebra.adjoin_induction with
       | mem x hx =>
@@ -255,8 +262,8 @@ theorem isIntegral_ratioRing_iff {i : σ} (hi : t i ≠ 0) {f : L} :
         exact isIntegral_algebraMap (x := algebraMap o (cone o t) r)
       | add x y _ _ hx hy => simpa using add_mem hx hy
       | mul x y _ _ hx hy => simpa using mul_mem hx hy
-    obtain ⟨n, hn⟩ := mem_saturation_of_isIntegral hx
-      (hf.map_of_comp_eq (RingHom.codRestrict _ _ h1) C rfl)
+    obtain ⟨n, hn⟩ :=
+      mem_saturation_of_isIntegral hx (hf.map_of_comp_eq (RingHom.codRestrict _ _ h1) C rfl)
     refine ⟨n, ?_⟩
     rwa [mem_piece, map_mul, map_pow, mul_assoc, ← mul_pow]
   · rintro ⟨n, hn⟩
@@ -266,62 +273,82 @@ section Finite
 
 variable (o t) [IsDedekindDomain o] [CharZero L] [Algebra.EssFiniteType o L] [Finite σ]
 
-theorem finite_integralClosure_cone :
-    Module.Finite (cone o t) (integralClosure (cone o t) L[X]) := by
+theorem finite_integralClosure_cone
+    : Module.Finite (cone o t) (integralClosure (cone o t) L[X]) := by
   haveI : Algebra.FiniteType o (cone o t) := .adjoin_of_finite (Set.finite_range _)
   haveI : Algebra.EssFiniteType o L[X] := .comp o L _
   haveI : Algebra.EssFiniteType (cone o t) L[X] := .of_comp o _ _
   exact finite_integralClosure_of_essFiniteType_of_isReduced (R := cone o t) o L[X]
 
-theorem exists_generators : ∃ e : ℕ, 0 < e ∧ ∃ N : ℕ → Submodule o L, (∀ q, (N q).FG) ∧
-    (∀ q, N q ≤ piece o t q) ∧ (∀ q, e < q → N q = ⊥) ∧ ∀ n, piece o t n ≤
-      ⨆ c ∈ Finset.HasAntidiagonal.antidiagonal n, Submodule.span o (Set.range t) ^ c.1 * N c.2 := by
-  classical
-  obtain ⟨G, hG⟩ := (finite_integralClosure_cone o t).fg_top
-  let N : ℕ → Submodule o L := fun q => Submodule.span o
-    ((fun g : integralClosure (cone o t) L[X] => (g : L[X]).coeff q) '' G)
-  refine ⟨G.sup (fun g => g.1.natDegree) + 1, Nat.succ_pos _, N,
-    fun q => Submodule.fg_span (G.finite_toSet.image _), fun q => Submodule.span_le.mpr ?_,
-    fun q hq => Submodule.span_eq_bot.mpr ?_, fun n a ha => ?_⟩
-  · rintro _ ⟨g, -, rfl⟩
-    exact isIntegral_cone_iff.mp g.2 q
-  · rintro _ ⟨g, hg, rfl⟩
-    have := Finset.le_sup (f := fun g : integralClosure (cone o t) L[X] => (g : L[X]).natDegree) hg
-    exact coeff_eq_zero_of_natDegree_lt (by omega)
-  · have key : ∀ p ∈ Submodule.span (cone o t) (G : Set (integralClosure (cone o t) L[X])), ∀ n,
-        (p : L[X]).coeff n ∈
-          ⨆ c ∈ Finset.HasAntidiagonal.antidiagonal n, Submodule.span o (Set.range t) ^ c.1 * N c.2 := by
-      intro p hp
-      induction hp using Submodule.span_induction with
-      | mem g hg =>
-        intro n
-        refine Submodule.mem_iSup_of_mem (0, n) (Submodule.mem_iSup_of_mem (by simp) ?_)
-        rw [pow_zero, one_mul]
-        exact Submodule.subset_span ⟨g, hg, rfl⟩
-      | zero => intro n; simp
-      | add x y _ _ hx hy => intro n; simpa using add_mem (hx n) (hy n)
-      | smul s x _ hx =>
-        intro n
-        change ((s : L[X]) * (x : L[X])).coeff n ∈ _
-        rw [coeff_mul]
-        refine Submodule.sum_mem _ fun d hd => ?_
-        refine SetLike.le_def.mp ?_ (Submodule.mul_mem_mul (coeff_mem_span_pow s.2 d.1) (hx d.2))
-        rw [Submodule.mul_iSup]
-        refine iSup_le fun c => ?_
-        rw [Submodule.mul_iSup]
-        refine iSup_le fun hc => ?_
-        rw [← mul_assoc, ← pow_add]
-        rw [Finset.HasAntidiagonal.mem_antidiagonal] at hc hd
-        exact le_iSup₂_of_le (d.1 + c.1, c.2) (by rw [Finset.HasAntidiagonal.mem_antidiagonal]; omega) le_rfl
-    simpa using key ⟨_, ha⟩ (hG ▸ Submodule.mem_top) n
+theorem exists_generators
+    : ∃ e : ℕ,
+      0 < e
+        ∧ ∃ N : ℕ → Submodule o L,
+          (∀ q, (N q).FG) ∧ (∀ q, N q ≤ piece o t q) ∧ (∀ q, e < q → N q = ⊥)
+            ∧ ∀ n,
+              piece o t n
+                ≤ ⨆ c ∈ Finset.HasAntidiagonal.antidiagonal n, Submodule.span o (Set.range t) ^ c.1 * N c.2 :=
+  by
+    classical
+    obtain ⟨G, hG⟩ := (finite_integralClosure_cone o t).fg_top
+    let N : ℕ → Submodule o L := fun q =>
+      Submodule.span o ((fun g : integralClosure (cone o t) L[X] => (g : L[X]).coeff q) '' G)
+    refine ⟨
+      G.sup (fun g => g.1.natDegree) + 1,
+      Nat.succ_pos _,
+      N,
+      fun q => Submodule.fg_span (G.finite_toSet.image _),
+      fun q => Submodule.span_le.mpr ?_,
+      fun q hq => Submodule.span_eq_bot.mpr ?_,
+      fun n a ha => ?_
+    ⟩
+    · rintro _ ⟨g, -, rfl⟩
+      exact isIntegral_cone_iff.mp g.2 q
+    · rintro _ ⟨g, hg, rfl⟩
+      have :=
+        Finset.le_sup (f := fun g : integralClosure (cone o t) L[X] => (g : L[X]).natDegree) hg
+      exact coeff_eq_zero_of_natDegree_lt (by omega)
+    · have key
+          : ∀ p ∈ Submodule.span (cone o t) (G : Set (integralClosure (cone o t) L[X])), ∀ n,
+            (p : L[X]).coeff n
+              ∈ ⨆ c ∈ Finset.HasAntidiagonal.antidiagonal n, Submodule.span o (Set.range t) ^ c.1 * N c.2 :=
+        by
+          intro p hp
+          induction hp using Submodule.span_induction with
+          | mem g hg =>
+            intro n
+            refine Submodule.mem_iSup_of_mem (0, n) (Submodule.mem_iSup_of_mem (by simp) ?_)
+            rw [pow_zero, one_mul]
+            exact Submodule.subset_span ⟨g, hg, rfl⟩
+          | zero =>
+            intro n; simp
+          | add x y _ _ hx hy =>
+            intro n; simpa using add_mem (hx n) (hy n)
+          | smul s x _ hx =>
+            intro n
+            change ((s : L[X]) * (x : L[X])).coeff n ∈ _
+            rw [coeff_mul]
+            refine Submodule.sum_mem _ fun d hd => ?_
+            refine SetLike.le_def.mp ?_
+              (Submodule.mul_mem_mul (coeff_mem_span_pow s.2 d.1) (hx d.2))
+            rw [Submodule.mul_iSup]
+            refine iSup_le fun c => ?_
+            rw [Submodule.mul_iSup]
+            refine iSup_le fun hc => ?_
+            rw [← mul_assoc, ← pow_add]
+            rw [Finset.HasAntidiagonal.mem_antidiagonal] at hc hd
+            exact le_iSup₂_of_le (d.1 + c.1, c.2)
+              (by rw [Finset.HasAntidiagonal.mem_antidiagonal]; omega) le_rfl
+      simpa using key ⟨_, ha⟩ (hG ▸ Submodule.mem_top) n
 
 theorem piece_fg (n : ℕ) : (piece o t n).FG := by
   obtain ⟨e, -, N, hN, -, -, h⟩ := exists_generators o t
   refine Submodule.FG.of_le (Submodule.fg_biSup _ _ fun c _ => ?_) (h n)
   exact ((Submodule.fg_span (Set.finite_range t)).pow _).mul (hN _)
 
-theorem exists_spanning_tuple (e : ℕ) : ∃ (M : ℕ) (z : Fin (M + 1) → L) (c : σ → Fin (M + 1)),
-    Submodule.span o (Set.range z) = piece o t e ∧ ∀ j, z (c j) = t j ^ e := by
+theorem exists_spanning_tuple (e : ℕ)
+    : ∃ (M : ℕ) (z : Fin (M + 1) → L) (c : σ → Fin (M + 1)),
+      Submodule.span o (Set.range z) = piece o t e ∧ ∀ j, z (c j) = t j ^ e := by
   classical
   obtain ⟨G, hG⟩ := piece_fg o t e
   have hfin : (insert 0 ((G : Set L) ∪ Set.range fun j => t j ^ e)).Finite :=
@@ -337,8 +364,9 @@ theorem exists_spanning_tuple (e : ℕ) : ∃ (M : ℕ) (z : Fin (M + 1) → L) 
   rintro _ ⟨j, rfl⟩
   exact pow_mem_piece j e
 
-theorem exists_piece_succ_eq : ∃ e : ℕ, 0 < e ∧ ∀ d, e ≤ d →
-    piece o t (d + 1) = Submodule.span o (Set.range t) * piece o t d := by
+theorem exists_piece_succ_eq
+    : ∃ e : ℕ,
+      0 < e ∧ ∀ d, e ≤ d → piece o t (d + 1) = Submodule.span o (Set.range t) * piece o t d := by
   obtain ⟨e, he, N, -, hN, hN', h⟩ := exists_generators o t
   refine ⟨e, he, fun d hd => le_antisymm ((h _).trans (iSup₂_le fun c hc => ?_)) ?_⟩
   · rw [Finset.HasAntidiagonal.mem_antidiagonal] at hc
@@ -347,17 +375,15 @@ theorem exists_piece_succ_eq : ∃ e : ℕ, 0 < e ∧ ∀ d, e ≤ d →
       exact bot_le
     · obtain ⟨m, hm⟩ : ∃ m, c.1 = m + 1 := ⟨c.1 - 1, by omega⟩
       rw [hm, pow_succ', mul_assoc, show d = m + c.2 by omega]
-      exact mul_le_mul' le_rfl
-        ((mul_le_mul' (span_pow_le_piece m) (hN _)).trans (piece_mul_le _ _))
+      exact mul_le_mul' le_rfl ((mul_le_mul' (span_pow_le_piece m) (hN _)).trans (piece_mul_le _ _))
   · rw [add_comm]
-    exact (mul_le_mul' (by simpa using span_pow_le_piece 1) le_rfl).trans
-      (piece_mul_le 1 d)
+    exact (mul_le_mul' (by simpa using span_pow_le_piece 1) le_rfl).trans (piece_mul_le 1 d)
 
-theorem exists_piece_mul_eq_pow : ∃ e : ℕ, 0 < e ∧ ∀ j, 0 < j →
-    piece o t (j * e) = piece o t e ^ j := by
+theorem exists_piece_mul_eq_pow
+    : ∃ e : ℕ, 0 < e ∧ ∀ j, 0 < j → piece o t (j * e) = piece o t e ^ j := by
   obtain ⟨e, he, h⟩ := exists_piece_succ_eq o t
-  have h1 : ∀ d, e ≤ d → ∀ m,
-      piece o t (d + m) = Submodule.span o (Set.range t) ^ m * piece o t d := by
+  have h1
+      : ∀ d, e ≤ d → ∀ m, piece o t (d + m) = Submodule.span o (Set.range t) ^ m * piece o t d := by
     intro d hd m
     induction m with
     | zero => simp
@@ -373,11 +399,12 @@ theorem exists_piece_mul_eq_pow : ∃ e : ℕ, 0 < e ∧ ∀ j, 0 < j →
 
 end Finite
 
-theorem isIntegral_ratioRing_iff_mem_adjoin {τ : Type*} {z : τ → L} {e : ℕ} (he : 0 < e)
-    (hz : Submodule.span o (Set.range z) = piece o t e)
-    (hv : ∀ j, 0 < j → piece o t (j * e) = piece o t e ^ j) {i : σ} (hi : t i ≠ 0) {f : L} :
-    IsIntegral (ratioRing o t i) f ↔
-      f ∈ Algebra.adjoin o (Set.range fun k => z k / t i ^ e) := by
+theorem isIntegral_ratioRing_iff_mem_adjoin
+    {τ : Type*} {z : τ → L} {e : ℕ} (he : 0 < e) (hz : Submodule.span o (Set.range z) = piece o t e)
+    (hv : ∀ j, 0 < j → piece o t (j * e) = piece o t e ^ j)
+    {i : σ} (hi : t i ≠ 0)
+    {f : L}
+    : IsIntegral (ratioRing o t i) f ↔ f ∈ Algebra.adjoin o (Set.range fun k => z k / t i ^ e) := by
   constructor
   · intro hf
     obtain ⟨n, hn⟩ := (isIntegral_ratioRing_iff hi).mp hf
@@ -385,8 +412,9 @@ theorem isIntegral_ratioRing_iff_mem_adjoin {τ : Type*} {z : τ → L} {e : ℕ
       Nat.exists_eq_add_of_le ((Nat.le_succ n).trans (Nat.le_mul_of_pos_right _ he))
     have h1 := mul_mem_piece hn (pow_mem_piece i m)
     rw [mul_assoc, ← pow_add, ← hm, hv _ n.succ_pos, ← hz] at h1
-    have key : ∀ j, ∀ a ∈ Submodule.span o (Set.range z) ^ j,
-        a / t i ^ (j * e) ∈ Algebra.adjoin o (Set.range fun k => z k / t i ^ e) := by
+    have key
+        : ∀ j, ∀ a ∈ Submodule.span o (Set.range z) ^ j,
+          a / t i ^ (j * e) ∈ Algebra.adjoin o (Set.range fun k => z k / t i ^ e) := by
       intro j a ha
       induction ha using Submodule.pow_induction_on_left' with
       | algebraMap r => simpa using Subalgebra.algebraMap_mem _ r
@@ -404,8 +432,9 @@ theorem isIntegral_ratioRing_iff_mem_adjoin {τ : Type*} {z : τ → L} {e : ℕ
         | smul c x _ hx => rw [smul_div_assoc]; exact Subalgebra.smul_mem _ hx c
     simpa [hi] using key _ _ h1
   · intro hf
-    have h : Algebra.adjoin o (Set.range fun k => z k / t i ^ e) ≤
-        (integralClosure (ratioRing o t i) L).restrictScalars o := by
+    have h
+        : Algebra.adjoin o (Set.range fun k => z k / t i ^ e)
+          ≤ (integralClosure (ratioRing o t i) L).restrictScalars o := by
       refine Algebra.adjoin_le ?_
       rintro _ ⟨k, rfl⟩
       exact isIntegral_div_of_mem_piece i (hz ▸ Submodule.subset_span ⟨k, rfl⟩)

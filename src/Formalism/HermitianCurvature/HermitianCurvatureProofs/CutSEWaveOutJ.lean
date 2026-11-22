@@ -11,11 +11,14 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.CutSE
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.P5 Formalism.FourierDecayAlt.P5.HerA Formalism.FourierDecayAlt.P5.HerB Formalism.FourierDecayAlt.P5.HerC
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q
+  Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.P5 Formalism.FourierDecayAlt.P5.HerA
+  Formalism.FourierDecayAlt.P5.HerB Formalism.FourierDecayAlt.P5.HerC
   Formalism.FourierDecayAlt.P5.HerD
 
 theorem wave_outgoing_orbital : WaveOutJ := by
-  intro Wp Wq _ _ _ _ _ _ S _ _ P z z' π π' X μ L st l0 D hdat hl0 hle hz hz' hπ hπ' l hl u v hu hv c hc s Wv hW
+  intro Wp Wq _ _ _ _ _ _ S _ _ P z z' π π' X μ L st l0 D hdat hl0 hle hz hz' hπ hπ' l hl u v hu hv
+    c hc s Wv hW
   have hμ : B.IsHaarOn (Glev P.k P.r (Fin.last P.r)) μ := hdat.2.1
   haveI := sfinite_of_isHaarOn _ μ hμ
 
@@ -40,8 +43,13 @@ theorem wave_outgoing_orbital : WaveOutJ := by
     unfold LevelSquareIntegrable at h ⊢
     simp only [waveOut_pairAt_self μ hW hW1]
     exact h
-  have hd := dens_int μ hμ l (fun b => Wv (u b)) v (fun b => mul_lc hW _ (hl2u b).1)
-    (fun b => (hl2v b).1) c keyW keyv
+  have hd :=
+    dens_int μ hμ l
+      (fun b => Wv (u b))
+      v
+      (fun b => mul_lc hW _ (hl2u b).1)
+      (fun b => (hl2v b).1)
+      c keyW keyv
   rw [← hd.2]
   simp_rw [waveOut_dens μ l s hW u v c]
 

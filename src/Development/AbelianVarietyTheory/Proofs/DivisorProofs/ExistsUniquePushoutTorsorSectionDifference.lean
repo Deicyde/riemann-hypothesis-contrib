@@ -11,59 +11,83 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsPushou
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct WithConv
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct WithConv
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsTangent IsGrpPullback)
-open ReciprocityTheory.ChartRestriction.G.Semi (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
-open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv GlobalTheory.PtExt
+open ReciprocityTheory.ChartRestriction.G.Semi
+  (IsAbelianScheme LB RigLB CubicalStr Theta thφ thε thK x3)
+open GlobalTheory GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.PDiv
+  GlobalTheory.PtExt
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.PtExt
 
-theorem isSec_sub_root_eq {R : Type} [CommRing R] {A : Over (Sp R)} [GrpObj A] [IsCommMonObj A] {n : ℕ}
-    {b : Fn0 A} {D : Type} [CommRing D] [Algebra R D] {x : Pt A D} {s s' : RootFn A D}
-    (hs : IsSec n b x s) (hs' : IsSec n b x s') {D' : Type} [CommRing D'] [Algebra R D'] (φ : D →ₐ[R] D')
-    (z z' : Pt A D') (hz : z ^ n = spOver φ ≫ x) (hz' : z' ^ n = spOver φ ≫ x) :
-    s D' φ z' - s' D' φ z' = s D' φ z - s' D' φ z := by
+theorem isSec_sub_root_eq
+    {R : Type} [CommRing R]
+    {A : Over (Sp R)} [GrpObj A] [IsCommMonObj A]
+    {n : ℕ} {b : Fn0 A} {D : Type} [CommRing D] [Algebra R D]
+    {x : Pt A D} {s s' : RootFn A D} (hs : IsSec n b x s) (hs' : IsSec n b x s')
+    {D' : Type} [CommRing D'] [Algebra R D']
+    (φ : D →ₐ[R] D') (z z' : Pt A D') (hz : z ^ n = spOver φ ≫ x) (hz' : z' ^ n = spOver φ ≫ x)
+    : s D' φ z' - s' D' φ z' = s D' φ z - s' D' φ z := by
   have hw : (z⁻¹ * z') ^ n = 1 := by rw [mul_pow, inv_pow, hz, hz', inv_mul_cancel]
   have e : z' = z * (z⁻¹ * z') := (mul_inv_cancel_left z z').symm
   rw [e, hs.2 D' φ z _ hz hw, hs'.2 D' φ z _ hz hw]
   abel
 
-theorem isSec_sub_natural {R : Type} [CommRing R] {A : Over (Sp R)} [GrpObj A] {n : ℕ}
-    {b : Fn0 A} {D : Type} [CommRing D] [Algebra R D] {x : Pt A D} {s s' : RootFn A D}
-    (hs : IsSec n b x s) (hs' : IsSec n b x s') {D' : Type} [CommRing D'] [Algebra R D']
-    {D'' : Type} [CommRing D''] [Algebra R D''] (φ : D →ₐ[R] D') (ψ : D' →ₐ[R] D'')
-    (z : Pt A D') (hz : z ^ n = spOver φ ≫ x) :
-    s D'' (ψ.comp φ) (spOver ψ ≫ z) - s' D'' (ψ.comp φ) (spOver ψ ≫ z) = ψ (s D' φ z - s' D' φ z) := by
+theorem isSec_sub_natural
+    {R : Type} [CommRing R]
+    {A : Over (Sp R)} [GrpObj A]
+    {n : ℕ} {b : Fn0 A} {D : Type} [CommRing D] [Algebra R D]
+    {x : Pt A D} {s s' : RootFn A D} (hs : IsSec n b x s) (hs' : IsSec n b x s')
+    {D' : Type} [CommRing D'] [Algebra R D']
+    {D'' : Type} [CommRing D''] [Algebra R D'']
+    (φ : D →ₐ[R] D')
+    (ψ : D' →ₐ[R] D'')
+    (z : Pt A D') (hz : z ^ n = spOver φ ≫ x)
+    : s D'' (ψ.comp φ) (spOver ψ ≫ z) - s' D'' (ψ.comp φ) (spOver ψ ≫ z)
+      = ψ (s D' φ z - s' D' φ z) := by
   rw [hs.1 D' D'' φ ψ z hz, hs'.1 D' D'' φ ψ z hz, map_sub]
 
-theorem root_spOver {R : Type} [CommRing R] {A : Over (Sp R)} [GrpObj A] {n : ℕ}
-    {D : Type} [CommRing D] [Algebra R D] {x : Pt A D} {D' : Type} [CommRing D'] [Algebra R D']
-    {D'' : Type} [CommRing D''] [Algebra R D''] (φ : D →ₐ[R] D') (ψ : D' →ₐ[R] D'')
-    (z : Pt A D') (hz : z ^ n = spOver φ ≫ x) : (spOver ψ ≫ z) ^ n = spOver (ψ.comp φ) ≫ x := by
+theorem root_spOver
+    {R : Type} [CommRing R]
+    {A : Over (Sp R)} [GrpObj A]
+    {n : ℕ} {D : Type} [CommRing D] [Algebra R D]
+    {x : Pt A D} {D' : Type} [CommRing D'] [Algebra R D']
+    {D'' : Type} [CommRing D''] [Algebra R D'']
+    (φ : D →ₐ[R] D')
+    (ψ : D' →ₐ[R] D'')
+    (z : Pt A D') (hz : z ^ n = spOver φ ≫ x)
+    : (spOver ψ ≫ z) ^ n = spOver (ψ.comp φ) ≫ x := by
   rw [← MonObj.comp_pow z n (spOver ψ), hz, ← Category.assoc, spOver_comp]
 
 end GlobalTheory.PtExt
 
 namespace GlobalTheory.PtExt
 
-theorem isSec_sub_existsUnique : ∀ (R : Type) [CommRing R] (A : Over (Sp R)) [GrpObj A] [IsCommMonObj A] (n : ℕ),
-    HasRoots A n → ∀ (b : Fn0 A) (D : Type) [CommRing D] [Algebra R D] (x : Pt A D) (s s' : RootFn A D),
-    IsSec n b x s → IsSec n b x s' → ∃! e : D, ∀ (D' : Type) [CommRing D'] [Algebra R D'] (φ : D →ₐ[R] D')
-      (z : Pt A D'), z ^ n = spOver φ ≫ x → s D' φ z - s' D' φ z = φ e := by
+theorem isSec_sub_existsUnique
+    : ∀ (R : Type) [CommRing R] (A : Over (Sp R)) [GrpObj A] [IsCommMonObj A] (n : ℕ),
+      HasRoots A n
+        → ∀ (b : Fn0 A) (D : Type) [CommRing D] [Algebra R D] (x : Pt A D) (s s' : RootFn A D),
+          IsSec n b x s → IsSec n b x s'
+            → ∃! e : D, ∀ (D' : Type) [CommRing D'] [Algebra R D'] (φ : D →ₐ[R] D')
+              (z : Pt A D'), z ^ n = spOver φ ≫ x → s D' φ z - s' D' φ z = φ e := by
   intro R _ A _ _ n hR b D _ _ x s s' hs hs'
   obtain ⟨D₁, _, _, ψ, z₀, hψ, hz₀⟩ := hR D x
-  have hdesc := GlobalTheory.ff_descent_pairs R D D₁ ψ hψ (s D₁ ψ z₀ - s' D₁ ψ z₀) (fun E _ _ α β hαβ ↦ by
-    rw [← isSec_sub_natural hs hs' ψ α z₀ hz₀, ← isSec_sub_natural hs hs' ψ β z₀ hz₀]
-    have hα := root_spOver ψ α z₀ hz₀
-    have hβ := root_spOver ψ β z₀ hz₀
-    rw [hαβ] at hα ⊢
-    exact isSec_sub_root_eq hs hs' (β.comp ψ) (spOver β ≫ z₀) (spOver α ≫ z₀) hβ hα)
+  have hdesc :=
+    GlobalTheory.ff_descent_pairs R D D₁ ψ hψ (s D₁ ψ z₀ - s' D₁ ψ z₀) (fun E _ _ α β hαβ ↦ by
+      rw [← isSec_sub_natural hs hs' ψ α z₀ hz₀, ← isSec_sub_natural hs hs' ψ β z₀ hz₀]
+      have hα := root_spOver ψ α z₀ hz₀
+      have hβ := root_spOver ψ β z₀ hz₀
+      rw [hαβ] at hα ⊢
+      exact isSec_sub_root_eq hs hs' (β.comp ψ) (spOver β ≫ z₀) (spOver α ≫ z₀) hβ hα)
   obtain ⟨e, he, heu⟩ := hdesc
-  have key : ∀ (D' : Type) [CommRing D'] [Algebra R D'] (φ : D →ₐ[R] D') (z : Pt A D'), z ^ n = spOver φ ≫ x →
-      s D' φ z - s' D' φ z = φ e := by
+  have key
+      : ∀ (D' : Type) [CommRing D'] [Algebra R D'] (φ : D →ₐ[R] D') (z : Pt A D'),
+        z ^ n = spOver φ ≫ x → s D' φ z - s' D' φ z = φ e := by
     intro D' _ _ φ z hz
-    obtain ⟨E', _, _, ψ', φ', hψ', hsq⟩ := GlobalTheory.exists_pushout_faithfullyFlat R D D₁ D' ψ φ hψ
+    obtain ⟨E', _, _, ψ', φ', hψ', hsq⟩ :=
+      GlobalTheory.exists_pushout_faithfullyFlat R D D₁ D' ψ φ hψ
     have hinj : Function.Injective ψ' := by
       letI : Algebra D' E' := (ψ' : D' →+* E').toAlgebra
       haveI : Module.FaithfullyFlat D' E' := hψ'

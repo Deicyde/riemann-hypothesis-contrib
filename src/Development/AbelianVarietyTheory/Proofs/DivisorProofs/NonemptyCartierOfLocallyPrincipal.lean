@@ -6,13 +6,18 @@ public import Development.AbelianVarietyTheory.Definitions.ThetaMetrics.CoeNonze
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS
+open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
+  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.CechPic
+  GlobalTheory.Vanishing GlobalTheory.CompHS
 
 namespace GlobalTheory.CompHS
 
-theorem nonempty_cartier_of_locally_principal : ∀ (Y : Scheme.{0}) (I : Y.IdealSheafData),
-    (∀ y : Y, ∃ (W : Y.affineOpens) (a : Γ(Y, W.1)), y ∈ W.1 ∧ a ∈ nonZeroDivisors Γ(Y, W.1) ∧
-      I.ideal W = Ideal.span {a}) → Nonempty (Cartier I) := by
+theorem nonempty_cartier_of_locally_principal
+    : ∀ (Y : Scheme.{0}) (I : Y.IdealSheafData),
+      (∀ y : Y, ∃ (W : Y.affineOpens) (a : Γ(Y, W.1)),
+          y ∈ W.1 ∧ a ∈ nonZeroDivisors Γ(Y, W.1) ∧ I.ideal W = Ideal.span {a})
+        → Nonempty (Cartier I) := by
   intro Y I h
   obtain ⟨D, hD⟩ := GlobalTheory.EffCartierData.exists_idealSheaf_eq (I := I) h
   have hLB : D.lb.IsLB := by

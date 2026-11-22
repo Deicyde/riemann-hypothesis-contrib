@@ -6,16 +6,28 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
-theorem UpperTheory.V.Alg.cocycle_normal_form :
-    ∀ (k Γ M : Type) [CommRing k] [Group Γ] [TopologicalSpace Γ] [AddCommGroup M] [Module k M] (F : Frame Γ) (ρ : Representation k Γ M), (∀ m : M, IsLocallyConstant fun s => ρ s m) → (∀ q, ∀ n ∈ F.N q, ∀ m, ρ (F.ψ q n) m = m) →
-          ∀ x ∈ F.framedTwoCoboundaries ρ, ∃ (h : Γ → M) (y : F.T → M), IsLocallyConstant h ∧ y F.v0 = 0 ∧ x.1 = dOne ρ h ∧ (∀ v s, x.2.1 v s = h (F.φ v s) - (ρ (F.φ v s) (y v) - y v)) ∧ ∀ q, ∀ n ∈ F.N q, x.2.2 q n = h (F.ψ q n) := by
+theorem UpperTheory.V.Alg.cocycle_normal_form
+    : ∀ (k Γ M : Type) [CommRing k] [Group Γ] [TopologicalSpace Γ] [AddCommGroup M] [Module k M]
+        (F : Frame Γ) (ρ : Representation k Γ M),
+      (∀ m : M, IsLocallyConstant fun s => ρ s m) → (∀ q, ∀ n ∈ F.N q, ∀ m, ρ (F.ψ q n) m = m)
+        → ∀ x ∈ F.framedTwoCoboundaries ρ, ∃ (h : Γ → M) (y : F.T → M),
+          IsLocallyConstant h ∧ y F.v0 = 0 ∧ x.1 = dOne ρ h
+            ∧ (∀ v s, x.2.1 v s = h (F.φ v s) - (ρ (F.φ v s) (y v) - y v))
+            ∧ ∀ q, ∀ n ∈ F.N q, x.2.2 q n = h (F.ψ q n) := by
   intro k Γ M _ _ _ _ _ F ρ hρ hN x hx
   unfold Frame.framedTwoCoboundaries at hx
   induction hx using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨h, y, e, h1, h2, h3, h4, h5⟩ := hx
-    refine ⟨fun s => h s - (ρ s (y F.v0) - y F.v0), fun v => y v - y F.v0,
-      h1.sub ((hρ _).sub (IsLocallyConstant.const _)), sub_self _, ?_, fun v s => ?_, fun q n hn => ?_⟩
+    refine ⟨
+      fun s => h s - (ρ s (y F.v0) - y F.v0),
+      fun v => y v - y F.v0,
+      h1.sub ((hρ _).sub (IsLocallyConstant.const _)),
+      sub_self _,
+      ?_,
+      fun v s => ?_,
+      fun q n hn => ?_
+    ⟩
     · rw [h3]
       funext p
       simp only [dOne, map_sub, map_mul, Module.End.mul_apply]

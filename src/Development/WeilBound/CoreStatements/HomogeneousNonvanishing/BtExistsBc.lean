@@ -8,7 +8,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
+open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct
 open GlobalTheory.CompanionTheory.Ar.BT
 
 namespace PositivityTheory.UnitarySelfGeneration
@@ -18,8 +19,8 @@ open scoped CategoryTheory.Obj
 
 variable {R : Type} [CommRing R] [IsDomain R] {T : Type} [CommGroup T]
 
-noncomputable def genSec (Γ : QFGroup R T) (t : T) :
-    Spec (CommRingCat.of (FractionRing R)) ⟶ pullback Γ.G.hom (genPt R).hom :=
+noncomputable def genSec (Γ : QFGroup R T) (t : T)
+    : Spec (CommRingCat.of (FractionRing R)) ⟶ pullback Γ.G.hom (genPt R).hom :=
   pullback.lift (Γ.pt t).left (𝟙 _) (by rw [Category.id_comp]; exact Over.w (Γ.pt t))
 
 theorem genSec_fst (Γ : QFGroup R T) (t : T) : genSec Γ t ≫ pullback.fst _ _ = (Γ.pt t).left :=
@@ -28,17 +29,22 @@ theorem genSec_fst (Γ : QFGroup R T) (t : T) : genSec Γ t ≫ pullback.fst _ _
 theorem genSec_snd (Γ : QFGroup R T) (t : T) : genSec Γ t ≫ pullback.snd _ _ = 𝟙 _ :=
   pullback.lift_snd _ _ _
 
-theorem gen_asIdeal (z : Spec (CommRingCat.of (FractionRing R))) : ((genPt R).hom z).asIdeal = ⊥ := by
+theorem gen_asIdeal (z : Spec (CommRingCat.of (FractionRing R)))
+    : ((genPt R).hom z).asIdeal = ⊥ := by
   have hz : z.asIdeal = ⊥ := (Ideal.eq_bot_or_top z.asIdeal).resolve_right z.2.ne_top
   show Ideal.comap (algebraMap R (FractionRing R)) z.asIdeal = ⊥
   rw [hz]
   exact Ideal.comap_bot_of_injective _ (IsFractionRing.injective R (FractionRing R))
 
-theorem genSec_cover (Γ : QFGroup R T) (a : ↥(pullback Γ.G.hom (genPt R).hom)) : ∃ t z, genSec Γ t z = a := by
+theorem genSec_cover (Γ : QFGroup R T) (a : ↥(pullback Γ.G.hom (genPt R).hom))
+    : ∃ t z, genSec Γ t z = a := by
   haveI : IsPreimmersion (genPt R).hom := IsPreimmersion.of_isLocalization (nonZeroDivisors R)
-  have h1 : Γ.G.hom (pullback.fst Γ.G.hom (genPt R).hom a) = (genPt R).hom (pullback.snd Γ.G.hom (genPt R).hom a) := by
+  have h1
+      : Γ.G.hom (pullback.fst Γ.G.hom (genPt R).hom a)
+        = (genPt R).hom (pullback.snd Γ.G.hom (genPt R).hom a) := by
     rw [← Scheme.Hom.comp_apply, ← Scheme.Hom.comp_apply, pullback.condition]
-  obtain ⟨t, z, hz⟩ := Γ.pt_onto (pullback.fst Γ.G.hom (genPt R).hom a) (by rw [h1]; exact gen_asIdeal _)
+  obtain ⟨t, z, hz⟩ :=
+    Γ.pt_onto (pullback.fst Γ.G.hom (genPt R).hom a) (by rw [h1]; exact gen_asIdeal _)
   refine ⟨t, z, (pullback.fst Γ.G.hom (genPt R).hom).isEmbedding.injective ?_⟩
   rw [← Scheme.Hom.comp_apply, genSec_fst, hz]
 
@@ -78,52 +84,62 @@ theorem genSec_open [Finite T] (Γ : QFGroup R T) (t : T) : IsOpenImmersion (gen
 
 variable {R' : Type} [CommRing R'] [IsDomain R']
 
-noncomputable def fracMap {φ : R →+* R'} (hφ : Function.Injective φ) : FractionRing R →+* FractionRing R' :=
+noncomputable def fracMap {φ : R →+* R'} (hφ : Function.Injective φ)
+    : FractionRing R →+* FractionRing R' :=
   IsFractionRing.lift (g := (algebraMap R' (FractionRing R')).comp φ)
     ((IsFractionRing.injective R' (FractionRing R')).comp hφ)
 
-theorem fracMap_comp {φ : R →+* R'} (hφ : Function.Injective φ) :
-    (fracMap hφ).comp (algebraMap R (FractionRing R)) = (algebraMap R' (FractionRing R')).comp φ := by
+theorem fracMap_comp {φ : R →+* R'} (hφ : Function.Injective φ)
+    : (fracMap hφ).comp (algebraMap R (FractionRing R))
+      = (algebraMap R' (FractionRing R')).comp φ := by
   refine RingHom.ext fun a => ?_
   rw [RingHom.comp_apply, fracMap, IsFractionRing.lift_algebraMap]
 
-theorem fracMap_sq {φ : R →+* R'} (hφ : Function.Injective φ) :
-    spMap (fracMap hφ) ≫ (genPt R).hom = (genPt R').hom ≫ spMap φ := by
+theorem fracMap_sq {φ : R →+* R'} (hφ : Function.Injective φ)
+    : spMap (fracMap hφ) ≫ (genPt R).hom = (genPt R').hom ≫ spMap φ := by
   show spMap _ ≫ spMap _ = spMap _ ≫ spMap _
-  rw [← Spec.map_comp, ← Spec.map_comp, ← CommRingCat.ofHom_comp, ← CommRingCat.ofHom_comp, fracMap_comp]
+  rw [← Spec.map_comp, ← Spec.map_comp, ← CommRingCat.ofHom_comp, ← CommRingCat.ofHom_comp,
+    fracMap_comp]
 
-noncomputable def bcPt (Γ : QFGroup R T) {φ : R →+* R'} (hφ : Function.Injective φ) (t : T) :
-    genPt R' ⟶ (Over.pullback (spMap φ)).obj Γ.G :=
-  Over.homMk (pullback.lift (spMap (fracMap hφ) ≫ (Γ.pt t).left) (genPt R').hom (by
-    rw [Category.assoc, Over.w (Γ.pt t), fracMap_sq])) (pullback.lift_snd _ _ _)
+noncomputable def bcPt (Γ : QFGroup R T) {φ : R →+* R'} (hφ : Function.Injective φ) (t : T)
+    : genPt R' ⟶ (Over.pullback (spMap φ)).obj Γ.G :=
+  Over.homMk
+    (pullback.lift (spMap (fracMap hφ) ≫ (Γ.pt t).left) (genPt R').hom
+      (by rw [Category.assoc, Over.w (Γ.pt t), fracMap_sq]))
+    (pullback.lift_snd _ _ _)
 
-theorem bcPt_fst (Γ : QFGroup R T) {φ : R →+* R'} (hφ : Function.Injective φ) (t : T) :
-    (bcPt Γ hφ t).left ≫ pullback.fst Γ.G.hom (spMap φ) = spMap (fracMap hφ) ≫ (Γ.pt t).left :=
+theorem bcPt_fst (Γ : QFGroup R T) {φ : R →+* R'} (hφ : Function.Injective φ) (t : T)
+    : (bcPt Γ hφ t).left ≫ pullback.fst Γ.G.hom (spMap φ) = spMap (fracMap hφ) ≫ (Γ.pt t).left :=
   pullback.lift_fst _ _ _
 
-theorem bcPt_mul (Γ : QFGroup R T) {φ : R →+* R'} (hφ : Function.Injective φ) (s t : T) :
-    bcPt Γ hφ (s * t) = bcPt Γ hφ s * bcPt Γ hφ t := by
+theorem bcPt_mul (Γ : QFGroup R T) {φ : R →+* R'} (hφ : Function.Injective φ) (s t : T)
+    : bcPt Γ hφ (s * t) = bcPt Γ hφ s * bcPt Γ hφ t := by
   have h := isGrpPullback_pullback Γ.G (spMap φ)
-  let U : Over.mk ((genPt R').hom ≫ spMap φ) ⟶ genPt R := Over.homMk (spMap (fracMap hφ)) (fracMap_sq hφ)
+  let U : Over.mk ((genPt R').hom ≫ spMap φ) ⟶ genPt R :=
+    Over.homMk (spMap (fracMap hφ)) (fracMap_sq hφ)
   refine Over.OverMorphism.ext (h.1.hom_ext ?_ ?_)
-  · rw [← h.2 (genPt R') (bcPt Γ hφ s) (bcPt Γ hφ t) (U ≫ Γ.pt s) (U ≫ Γ.pt t) (bcPt_fst Γ hφ s).symm
-      (bcPt_fst Γ hφ t).symm, ← MonObj.comp_mul, ← map_mul]
+  · rw [← h.2 (genPt R') (bcPt Γ hφ s) (bcPt Γ hφ t) (U ≫ Γ.pt s) (U ≫ Γ.pt t)
+        (bcPt_fst Γ hφ s).symm (bcPt_fst Γ hφ t).symm,
+      ← MonObj.comp_mul, ← map_mul]
     exact bcPt_fst Γ hφ _
   · exact (Over.w _).trans (Over.w _).symm
 
-noncomputable def bcSec (Γ : QFGroup R T) {φ : R →+* R'} (hφ : Function.Injective φ) (t : T) :
-    Spec (CommRingCat.of (FractionRing R')) ⟶ pullback (pullback.snd Γ.G.hom (spMap φ)) (genPt R').hom :=
+noncomputable def bcSec (Γ : QFGroup R T) {φ : R →+* R'} (hφ : Function.Injective φ) (t : T)
+    : Spec (CommRingCat.of (FractionRing R'))
+      ⟶ pullback (pullback.snd Γ.G.hom (spMap φ)) (genPt R').hom :=
   pullback.lift (bcPt Γ hφ t).left (𝟙 _) (by rw [Category.id_comp]; exact Over.w (bcPt Γ hφ t))
 
-theorem bcSec_spec [Finite T] (Γ : QFGroup R T) {φ : R →+* R'} (hφ : Function.Injective φ) :
-    (∀ t, IsOpenImmersion (bcSec Γ hφ t)) ∧ ∀ a, ∃ t z, bcSec Γ hφ t z = a := by
-  let q : pullback (pullback.snd Γ.G.hom (spMap φ)) (genPt R').hom ⟶ pullback Γ.G.hom (genPt R).hom :=
+theorem bcSec_spec [Finite T] (Γ : QFGroup R T) {φ : R →+* R'} (hφ : Function.Injective φ)
+    : (∀ t, IsOpenImmersion (bcSec Γ hφ t)) ∧ ∀ a, ∃ t z, bcSec Γ hφ t z = a := by
+  let q
+      : pullback (pullback.snd Γ.G.hom (spMap φ)) (genPt R').hom ⟶ pullback Γ.G.hom (genPt R).hom :=
     pullback.lift (pullback.fst _ _ ≫ pullback.fst _ _) (pullback.snd _ _ ≫ spMap (fracMap hφ)) (by
       rw [Category.assoc, Category.assoc, fracMap_sq, pullback.condition, pullback.condition_assoc])
   have hq₁ : q ≫ pullback.fst _ _ = pullback.fst _ _ ≫ pullback.fst _ _ := pullback.lift_fst _ _ _
   have hq₂ : q ≫ pullback.snd _ _ = pullback.snd _ _ ≫ spMap (fracMap hφ) := pullback.lift_snd _ _ _
-  have big := (IsPullback.of_hasPullback (pullback.snd Γ.G.hom (spMap φ)) (genPt R').hom).paste_horiz
-    (IsPullback.of_hasPullback Γ.G.hom (spMap φ))
+  have big :=
+    (IsPullback.of_hasPullback (pullback.snd Γ.G.hom (spMap φ)) (genPt R').hom).paste_horiz
+      (IsPullback.of_hasPullback Γ.G.hom (spMap φ))
   rw [← hq₁, ← fracMap_sq hφ] at big
   have hq : IsPullback q (pullback.snd _ _) (pullback.snd _ _) (spMap (fracMap hφ)) :=
     big.of_right hq₂ (IsPullback.of_hasPullback Γ.G.hom (genPt R).hom)
@@ -143,24 +159,30 @@ theorem bcSec_spec [Finite T] (Γ : QFGroup R T) {φ : R →+* R'} (hφ : Functi
     obtain ⟨w, -, hw⟩ := Scheme.exists_preimage_of_isPullback (hs t) z a hz
     exact ⟨t, w, hw⟩
 
-noncomputable def bcGroup [Finite T] (Γ : QFGroup R T) {φ : R →+* R'} (hφ : Function.Injective φ) : QFGroup R' T where
+noncomputable def bcGroup [Finite T] (Γ : QFGroup R T) {φ : R →+* R'} (hφ : Function.Injective φ)
+    : QFGroup R' T where
   G := (Over.pullback (spMap φ)).obj Γ.G
   flat := haveI := Γ.flat; inferInstanceAs (Flat (pullback.snd Γ.G.hom (spMap φ)))
-  quasiFinite := haveI := Γ.quasiFinite; inferInstanceAs (LocallyQuasiFinite (pullback.snd Γ.G.hom (spMap φ)))
+  quasiFinite :=
+    haveI := Γ.quasiFinite; inferInstanceAs (LocallyQuasiFinite (pullback.snd Γ.G.hom (spMap φ)))
   separated := haveI := Γ.separated; inferInstanceAs (IsSeparated (pullback.snd Γ.G.hom (spMap φ)))
-  quasiCompact := haveI := Γ.quasiCompact; inferInstanceAs (QuasiCompact (pullback.snd Γ.G.hom (spMap φ)))
-  finPres := haveI := Γ.finPres; inferInstanceAs (LocallyOfFinitePresentation (pullback.snd Γ.G.hom (spMap φ)))
+  quasiCompact :=
+    haveI := Γ.quasiCompact; inferInstanceAs (QuasiCompact (pullback.snd Γ.G.hom (spMap φ)))
+  finPres :=
+    haveI := Γ.finPres
+    inferInstanceAs (LocallyOfFinitePresentation (pullback.snd Γ.G.hom (spMap φ)))
   pt := MonoidHom.mk' (bcPt Γ hφ) (bcPt_mul Γ hφ)
   pt_inj s t x y h := by
     refine Γ.pt_inj s t (spMap (fracMap hφ) x) (spMap (fracMap hφ) y) ?_
-    rw [← Scheme.Hom.comp_apply, ← Scheme.Hom.comp_apply, ← bcPt_fst, ← bcPt_fst, Scheme.Hom.comp_apply,
-      Scheme.Hom.comp_apply]
+    rw [← Scheme.Hom.comp_apply, ← Scheme.Hom.comp_apply, ← bcPt_fst, ← bcPt_fst,
+      Scheme.Hom.comp_apply, Scheme.Hom.comp_apply]
     exact congrArg _ h
   pt_onto g hg := by
     let z₀ : Spec (CommRingCat.of (FractionRing R')) := IsLocalRing.closedPoint (FractionRing R')
-    obtain ⟨a, ha, -⟩ := Scheme.exists_preimage_of_isPullback
-      (IsPullback.of_hasPullback (pullback.snd Γ.G.hom (spMap φ)) (genPt R').hom) g z₀
-      (PrimeSpectrum.ext (hg.trans (gen_asIdeal z₀).symm))
+    obtain ⟨a, ha, -⟩ :=
+      Scheme.exists_preimage_of_isPullback
+        (IsPullback.of_hasPullback (pullback.snd Γ.G.hom (spMap φ)) (genPt R').hom) g z₀
+        (PrimeSpectrum.ext (hg.trans (gen_asIdeal z₀).symm))
     obtain ⟨t, z, rfl⟩ := (bcSec_spec Γ hφ).2 a
     refine ⟨t, z, ?_⟩
     rw [← ha, ← Scheme.Hom.comp_apply]
@@ -176,12 +198,31 @@ noncomputable def bcGroup [Finite T] (Γ : QFGroup R T) {φ : R →+* R'} (hφ :
         (ConcreteCategory.bijective_of_isIso ((bcSec Γ hφ t).stalkMap z)).1
     exact isReduced_of_isReduced_stalk (pullback (pullback.snd Γ.G.hom (spMap φ)) (genPt R').hom)
 
-theorem bt_exists_bc : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T) (R' : Type) [CommRing R'] [IsDomain R'] (φ : R →+* R'), Function.Injective φ → ∃ (Γ' : QFGroup R' T) (F : Γ'.G.left ⟶ Γ.G.left), Γ'.IsBaseChange Γ φ F := by
+theorem bt_exists_bc
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T)
+        (R' : Type) [CommRing R'] [IsDomain R'] (φ : R →+* R'),
+      Function.Injective φ
+        → ∃ (Γ' : QFGroup R' T) (F : Γ'.G.left ⟶ Γ.G.left), Γ'.IsBaseChange Γ φ F := by
   intro R _ _ T _ _ Γ R' _ _ φ hφ
   have h := isGrpPullback_pullback Γ.G (spMap φ)
-  refine ⟨bcGroup Γ hφ, pullback.fst Γ.G.hom (spMap φ), h.1, h.2, FractionRing R, inferInstance, algebraMap R _,
-    RingHom.id _, fracMap hφ, fun t => (Γ.pt t).left, Function.injective_id, rfl, fracMap_comp hφ,
-    fun t => Over.w (Γ.pt t), fun t => ?_, fun t => (bcPt_fst Γ hφ t).symm⟩
+  refine ⟨
+    bcGroup Γ hφ,
+    pullback.fst Γ.G.hom (spMap φ),
+    h.1,
+    h.2,
+    FractionRing R,
+    inferInstance,
+    algebraMap R _,
+    RingHom.id _,
+    fracMap hφ,
+    fun t => (Γ.pt t).left,
+    Function.injective_id,
+    rfl,
+    fracMap_comp hφ,
+    fun t => Over.w (Γ.pt t),
+    fun t => ?_,
+    fun t => (bcPt_fst Γ hφ t).symm
+  ⟩
   rw [CommRingCat.ofHom_id, Spec.map_id, Category.id_comp]
 
 end PositivityTheory.UnitarySelfGeneration

@@ -14,8 +14,10 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.HasThetaConst
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 open GlobalTheory.ZM.NearBuild
@@ -23,17 +25,31 @@ open GlobalTheory.ZM.NearBuild
 noncomputable section
 namespace GlobalTheory.ZM.NearBuild
 
-theorem level_eq_of_gLies_of_hasTh : Out.Laws → Out.Laws2 → ∀ (g n j : ℕ) (J : Type), n.Prime → Odd n → 2 ≤ j → ∀ (o : Type) [CommRing o] (b : TBase o ((n ^ j) ^ 2)) (S S₁ : Scheme.{0}) (A : Over S) [GrpObj A] (L : LB A.left) (act : J → (A ⟶ A)) (Q : Fin (2 * g) → (Out.baseOver S ⟶ A)) (c : S₁ ⟶ S) (s₁ : S₁ ⟶ Sp o) (t₁ : TObj g ((n ^ j) ^ 2) J b s₁) (ψ₁ : t₁.A.left ⟶ A.left) (K : Type) [Field K] [IsAlgClosed K] (y y' : Sp K ⟶ S₁) (w : Ix g ((n ^ j) ^ 2) → K), L.IsLB → GLies A act Q c t₁ ψ₁ → LBIso t₁.L (L.pull ψ₁) → y ≫ c = y' ≫ c → y ≫ s₁ = y' ≫ s₁ → t₁.HasTh y w → t₁.HasTh y' w → ∀ i, y ≫ (t₁.pt i).left ≫ ψ₁ = y' ≫ (t₁.pt i).left ≫ ψ₁ := by
-  intro hL hL2 g n j J hn hodd hj o _ b S S₁ A _ L act Q c s₁ t₁ ψ₁ K _ _ y y' w hLB hG hI hc hs T T'
+theorem level_eq_of_gLies_of_hasTh
+    : Out.Laws → Out.Laws2
+      → ∀ (g n j : ℕ) (J : Type),
+        n.Prime → Odd n → 2 ≤ j
+          → ∀ (o : Type) [CommRing o] (b : TBase o ((n ^ j) ^ 2)) (S S₁ : Scheme.{0}) (A : Over S)
+              [GrpObj A] (L : LB A.left) (act : J → (A ⟶ A))
+              (Q : Fin (2 * g) → (Out.baseOver S ⟶ A)) (c : S₁ ⟶ S) (s₁ : S₁ ⟶ Sp o)
+              (t₁ : TObj g ((n ^ j) ^ 2) J b s₁) (ψ₁ : t₁.A.left ⟶ A.left) (K : Type) [Field K]
+              [IsAlgClosed K] (y y' : Sp K ⟶ S₁) (w : Ix g ((n ^ j) ^ 2) → K),
+            L.IsLB → GLies A act Q c t₁ ψ₁ → LBIso t₁.L (L.pull ψ₁) → y ≫ c = y' ≫ c
+              → y ≫ s₁ = y' ≫ s₁ → t₁.HasTh y w → t₁.HasTh y' w
+              → ∀ i, y ≫ (t₁.pt i).left ≫ ψ₁ = y' ≫ (t₁.pt i).left ≫ ψ₁ := by
+  intro hL hL2 g n j J hn hodd hj o _ b S S₁ A _ L act Q c s₁ t₁ ψ₁ K _ _ y y' w hLB hG hI hc hs T
+    T'
   obtain ⟨u, ψ, m, ⟨a₁, -, a₃⟩, l, p⟩ :=
     gLies_pull o g (n ^ j) J b S S₁ _ A L act Q c s₁ t₁ ψ₁ y (y ≫ s₁) hLB hG hI rfl
   obtain ⟨u', ψ', m', ⟨a₁', -, a₃'⟩, l', p'⟩ :=
     gLies_pull o g (n ^ j) J b S S₁ _ A L act Q c s₁ t₁ ψ₁ y' (y ≫ s₁) hLB hG hI hs.symm
   rw [← hc] at a₁' a₃'
   have U : u.HasTh (𝟙 _) w :=
-    (GlobalTheory.hasTh_iff_of_tmap o g (n ^ j) J b _ _ t₁ _ _ u _ K _ _ m).2 (by rwa [Category.id_comp])
+    (GlobalTheory.hasTh_iff_of_tmap o g (n ^ j) J b _ _ t₁ _ _ u _ K _ _ m).2
+      (by rwa [Category.id_comp])
   have U' : u'.HasTh (𝟙 _) w :=
-    (GlobalTheory.hasTh_iff_of_tmap o g (n ^ j) J b _ _ t₁ _ _ u' _ K _ _ m').2 (by rwa [Category.id_comp])
+    (GlobalTheory.hasTh_iff_of_tmap o g (n ^ j) J b _ _ t₁ _ _ u' _ K _ _ m').2
+      (by rwa [Category.id_comp])
   have hp := a₁.1
   let χ : u'.A.left ⟶ u.A.left := hp.lift ψ' u'.A.hom a₁'.1.w
   have e₁ : χ ≫ ψ = ψ' := hp.lift_fst _ _ _
@@ -49,7 +65,9 @@ theorem level_eq_of_gLies_of_hasTh : Out.Laws → Out.Laws2 → ∀ (g n j : ℕ
     apply hp.hom_ext
     · rw [Category.assoc, e₁, a₃', a₃]
     · rw [Category.assoc, e₂, Over.w, Over.w]
-  have c₅ := GlobalTheory.level_eq_of_pow_eq_of_hasTh hL hL2 g n j J hn hodd hj o b K _ u u' χ _ c₁ c₂ c₃ U U'
+  have c₅ :=
+    GlobalTheory.level_eq_of_pow_eq_of_hasTh hL hL2 g n j J hn hodd hj o b K _ u u' χ _ c₁ c₂ c₃ U
+      U'
   intro i
   rw [← p, ← p', ← c₅, Category.assoc, e₁]
 

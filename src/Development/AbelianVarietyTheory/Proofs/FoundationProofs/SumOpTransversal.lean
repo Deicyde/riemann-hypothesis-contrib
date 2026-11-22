@@ -49,15 +49,17 @@ private lemma quotient_out_sub_mem (A B : Submodule R X)
 open Classical in
 open scoped BigOperators in
 variable {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M] in
-theorem _root_.GlobalTheory.FinWeil.sumOp_eq_sum_transversal {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M}
+theorem _root_.GlobalTheory.FinWeil.sumOp_eq_sum_transversal
+    {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M}
     (h : _root_.GlobalTheory.FinWeil.IsHeis σ w γ W)
-    (A B : Submodule R X) (hB : _root_.GlobalTheory.FinWeil.SelfDual γ B) (v : M)
-    (hv : _root_.GlobalTheory.FinWeil.Fixes W A v) (ι : Type) [Fintype ι] (f : ι → X)
-    (hf : ∀ i, f i ∈ B) (ht : ∀ b ∈ B, ∃! i, b - f i ∈ A) :
-    _root_.GlobalTheory.FinWeil.sumOp W A B v = ∑ i, W (f i) v ∧
-      _root_.GlobalTheory.FinWeil.idx A B = Fintype.card ι := by
-  let φ : ι → B.toAddSubgroup ⧸ A.toAddSubgroup.addSubgroupOf B.toAddSubgroup :=
-    fun i => ((⟨f i, hf i⟩ : B.toAddSubgroup) : B.toAddSubgroup ⧸ _)
+    (A B : Submodule R X) (hB : _root_.GlobalTheory.FinWeil.SelfDual γ B)
+    (v : M) (hv : _root_.GlobalTheory.FinWeil.Fixes W A v)
+    (ι : Type) [Fintype ι]
+    (f : ι → X) (hf : ∀ i, f i ∈ B) (ht : ∀ b ∈ B, ∃! i, b - f i ∈ A)
+    : _root_.GlobalTheory.FinWeil.sumOp W A B v = ∑ i, W (f i) v
+      ∧ _root_.GlobalTheory.FinWeil.idx A B = Fintype.card ι := by
+  let φ : ι → B.toAddSubgroup ⧸ A.toAddSubgroup.addSubgroupOf B.toAddSubgroup := fun i =>
+    ((⟨f i, hf i⟩ : B.toAddSubgroup) : B.toAddSubgroup ⧸ _)
   have hφ : Function.Bijective φ := by
     constructor
     · intro i j hij
@@ -82,21 +84,27 @@ theorem _root_.GlobalTheory.FinWeil.sumOp_eq_sum_transversal {σ : R →+* R} {w
 open Classical in
 open scoped BigOperators in
 variable {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M] in
-theorem _root_.GlobalTheory.FinWeil.exists_transversal_of_idx_ne_zero (A B : Submodule R X)
-    (hi : _root_.GlobalTheory.FinWeil.idx A B ≠ 0) :
-    ∃ (n : ℕ) (f : Fin n → X), (∀ i, f i ∈ B) ∧ ∀ b ∈ B, ∃! i, b - f i ∈ A := by
+theorem _root_.GlobalTheory.FinWeil.exists_transversal_of_idx_ne_zero
+    (A B : Submodule R X) (hi : _root_.GlobalTheory.FinWeil.idx A B ≠ 0)
+    : ∃ (n : ℕ) (f : Fin n → X), (∀ i, f i ∈ B) ∧ ∀ b ∈ B, ∃! i, b - f i ∈ A := by
   unfold _root_.GlobalTheory.FinWeil.idx at hi
   rw [AddSubgroup.relIndex, AddSubgroup.index] at hi
   haveI := Nat.finite_of_card_ne_zero hi
   let e := Finite.equivFin (B.toAddSubgroup ⧸ A.toAddSubgroup.addSubgroupOf B.toAddSubgroup)
-  refine ⟨_, fun i => ((Quotient.out (e.symm i) : B.toAddSubgroup) : X),
-    fun i => (Quotient.out (e.symm i) : B.toAddSubgroup).2, ?_⟩
+  refine ⟨
+    _,
+    fun i => ((Quotient.out (e.symm i) : B.toAddSubgroup) : X),
+    fun i => (Quotient.out (e.symm i) : B.toAddSubgroup).2,
+    ?_
+  ⟩
   intro b hb
   refine ⟨e (⟨b, hb⟩ : B.toAddSubgroup), ?_, fun j hj => ?_⟩
   · have := quotient_out_sub_mem A B (e.symm (e (⟨b, hb⟩ : B.toAddSubgroup))) ⟨b, hb⟩ (by simp)
     simpa using A.neg_mem this
-  · have h1 : ((⟨b, hb⟩ : B.toAddSubgroup) :
-        B.toAddSubgroup ⧸ A.toAddSubgroup.addSubgroupOf B.toAddSubgroup) = e.symm j := by
+  · have h1
+        : ((⟨b, hb⟩ : B.toAddSubgroup)
+            : B.toAddSubgroup ⧸ A.toAddSubgroup.addSubgroupOf B.toAddSubgroup)
+          = e.symm j := by
       rw [← QuotientAddGroup.out_eq' (e.symm j), quotient_mk_eq_mk_iff_sub_mem]
       simpa using A.neg_mem hj
     rw [h1, Equiv.apply_symm_apply]
@@ -141,29 +149,52 @@ private lemma fixes_sumOp_of_selfDual {σ : R →+* R} {w : R} {γ : X → X →
 
 open Classical in
 open scoped BigOperators in
-theorem _root_.GlobalTheory.FinWeil.sumOp_transversal : ∀ {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X]
-    [AddCommGroup M] [Module ℂ M] {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M},
-    _root_.GlobalTheory.FinWeil.IsHeis σ w γ W → ∀ (A B : Submodule R X),
-    _root_.GlobalTheory.FinWeil.SelfDual γ B → (∀ v, _root_.GlobalTheory.FinWeil.Fixes W A v → ∀ (ι : Type) [Fintype ι]
-      (f : ι → X), (∀ i, f i ∈ B) → (∀ b ∈ B, ∃! i, b - f i ∈ A) →
-      _root_.GlobalTheory.FinWeil.sumOp W A B v = ∑ i, W (f i) v ∧
-        _root_.GlobalTheory.FinWeil.idx A B = Fintype.card ι) ∧
-    (_root_.GlobalTheory.FinWeil.idx A B ≠ 0 → (∃ (n : ℕ) (f : Fin n → X), (∀ i, f i ∈ B) ∧
-      ∀ b ∈ B, ∃! i, b - f i ∈ A) ∧
-      (∀ v, _root_.GlobalTheory.FinWeil.Fixes W A v →
-        _root_.GlobalTheory.FinWeil.Fixes W B (_root_.GlobalTheory.FinWeil.sumOp W A B v)) ∧
-      ∀ (c : ℂ) v, _root_.GlobalTheory.FinWeil.sumOp W A B (c • v) = c • _root_.GlobalTheory.FinWeil.sumOp W A B v) ∧
-    (B ≤ A → _root_.GlobalTheory.FinWeil.idx A B = 1 ∧
-      ∀ v, _root_.GlobalTheory.FinWeil.Fixes W A v → _root_.GlobalTheory.FinWeil.sumOp W A B v = v) := by
+theorem _root_.GlobalTheory.FinWeil.sumOp_transversal
+    : ∀ {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
+        {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M},
+      _root_.GlobalTheory.FinWeil.IsHeis σ w γ W
+        → ∀ (A B : Submodule R X),
+          _root_.GlobalTheory.FinWeil.SelfDual γ B
+            → (∀ v,
+                _root_.GlobalTheory.FinWeil.Fixes W A v
+                  → ∀ (ι : Type) [Fintype ι] (f : ι → X),
+                    (∀ i, f i ∈ B) → (∀ b ∈ B, ∃! i, b - f i ∈ A)
+                      → _root_.GlobalTheory.FinWeil.sumOp W A B v = ∑ i, W (f i) v
+                        ∧ _root_.GlobalTheory.FinWeil.idx A B = Fintype.card ι)
+              ∧ (_root_.GlobalTheory.FinWeil.idx A B ≠ 0
+                → (∃ (n : ℕ) (f : Fin n → X), (∀ i, f i ∈ B) ∧ ∀ b ∈ B, ∃! i, b - f i ∈ A)
+                  ∧ (∀ v,
+                    _root_.GlobalTheory.FinWeil.Fixes W A v
+                      → _root_.GlobalTheory.FinWeil.Fixes W B
+                        (_root_.GlobalTheory.FinWeil.sumOp W A B v))
+                  ∧ ∀ (c : ℂ) v,
+                    _root_.GlobalTheory.FinWeil.sumOp W A B (c • v)
+                      = c • _root_.GlobalTheory.FinWeil.sumOp W A B v)
+              ∧ (B ≤ A
+                → _root_.GlobalTheory.FinWeil.idx A B = 1
+                  ∧ ∀ v,
+                    _root_.GlobalTheory.FinWeil.Fixes W A v
+                      → _root_.GlobalTheory.FinWeil.sumOp W A B v = v) := by
   intro R X M _ _ _ _ _ σ w γ W h A B hB
-  have hunit : ∀ v, _root_.GlobalTheory.FinWeil.Fixes W A v → B ≤ A →
-      _root_.GlobalTheory.FinWeil.sumOp W A B v = ∑ _i : Unit, W 0 v ∧
-        _root_.GlobalTheory.FinWeil.idx A B = Fintype.card Unit := fun v hv hBA =>
-    _root_.GlobalTheory.FinWeil.sumOp_eq_sum_transversal h A B hB v hv Unit (fun _ => 0) (fun _ => B.zero_mem)
+  have hunit
+      : ∀ v,
+        _root_.GlobalTheory.FinWeil.Fixes W A v → B ≤ A
+          → _root_.GlobalTheory.FinWeil.sumOp W A B v = ∑ _i : Unit, W 0 v
+            ∧ _root_.GlobalTheory.FinWeil.idx A B = Fintype.card Unit := fun v hv hBA =>
+    _root_.GlobalTheory.FinWeil.sumOp_eq_sum_transversal h A B hB v hv Unit
+      (fun _ => 0)
+      (fun _ => B.zero_mem)
       (fun b hb => ⟨(), by simpa using hBA hb, fun _ _ => rfl⟩)
-  refine ⟨fun v hv ι _ f hf ht => _root_.GlobalTheory.FinWeil.sumOp_eq_sum_transversal h A B hB v hv ι f hf ht,
-    fun hi => ⟨_root_.GlobalTheory.FinWeil.exists_transversal_of_idx_ne_zero A B hi,
-      fun v hv => fixes_sumOp_of_selfDual h hB hv, fun c v => ?_⟩, fun hBA => ?_⟩
+  refine ⟨
+    fun v hv ι _ f hf ht =>
+      _root_.GlobalTheory.FinWeil.sumOp_eq_sum_transversal h A B hB v hv ι f hf ht,
+    fun hi => ⟨
+      _root_.GlobalTheory.FinWeil.exists_transversal_of_idx_ne_zero A B hi,
+      fun v hv => fixes_sumOp_of_selfDual h hB hv,
+      fun c v => ?_
+    ⟩,
+    fun hBA => ?_
+  ⟩
   · unfold _root_.GlobalTheory.FinWeil.sumOp
     simp_rw [map_smul]
     exact (smul_finsum c _).symm

@@ -19,8 +19,13 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Mov
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw GlobalTheory.StepData GlobalTheory.SymChain GlobalTheory.LocMod GlobalTheory.MiS GlobalTheory.MiTop GlobalTheory.Fam ValuativeRel
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev
+  Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw
+  GlobalTheory.StepData GlobalTheory.SymChain GlobalTheory.LocMod GlobalTheory.MiS
+  GlobalTheory.MiTop GlobalTheory.Fam ValuativeRel
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -32,13 +37,15 @@ open GlobalTheory.FinPl GlobalTheory.FinPl.KSplit
 
 variable {D : D7}
 
-theorem latV_congr (S : HSp D) (L : Lat S) {P P' : Pl D → Prop} (h : ∀ w, P w ↔ P' w) :
-    latV S L P = latV S L P' :=
+theorem latV_congr (S : HSp D) (L : Lat S) {P P' : Pl D → Prop} (h : ∀ w, P w ↔ P' w)
+    : latV S L P = latV S L P' :=
   le_antisymm (latV_mono S L fun w => (h w).1) (latV_mono S L fun w => (h w).2)
 
-theorem latV_le_of_int_smul_on (S : HSp D) (L M : Lat S) (d : ℤ) (hd : d ≠ 0)
-    (hLM : ∀ x ∈ L, d • x ∈ M) (R : Pl D → Prop) (hR : ∀ v, R v → ((d : 𝓞 D.host.F)) ∉ v.asIdeal) :
-    latV S L R ≤ latV S M R := by
+theorem latV_le_of_int_smul_on
+    (S : HSp D) (L M : Lat S)
+    (d : ℤ) (hd : d ≠ 0) (hLM : ∀ x ∈ L, d • x ∈ M)
+    (R : Pl D → Prop) (hR : ∀ v, R v → ((d : 𝓞 D.host.F)) ∉ v.asIdeal)
+    : latV S L R ≤ latV S M R := by
   rw [latV, latMul, AddSubgroup.closure_le]
   rintro y ⟨α, hα, hsupp, a, ha, x, hx, rfl⟩
   rw [Set.mem_singleton_iff] at ha
@@ -48,7 +55,8 @@ theorem latV_le_of_int_smul_on (S : HSp D) (L M : Lat S) (d : ℤ) (hd : d ≠ 0
   · intro w
     rw [map_smul]
     by_cases hw : R w
-    · have hval : Valued.v (algebraMap D.host.F (w.adicCompletion D.host.F) (d : D.host.F)) = 1 := by
+    · have hval
+          : Valued.v (algebraMap D.host.F (w.adicCompletion D.host.F) (d : D.host.F)) = 1 := by
         have h1 := (w.valuation_eq_one_iff_notMem (K := D.host.F)).mpr (hR w hw)
         have h2 := w.valuedAdicCompletion_eq_valuation' (K := D.host.F) ((d : D.host.F))
         have h4 : (((d : 𝓞 D.host.F)) : D.host.F) = ((d : D.host.F)) :=
@@ -65,9 +73,12 @@ theorem latV_le_of_int_smul_on (S : HSp D) (L M : Lat S) (d : ℤ) (hd : d ≠ 0
   · funext i
     exact pairA_tmul_int_gen d hd α (x i)
 
-theorem latV_le_finite (S : HSp D) (L N : Lat S) (d : ℤ) (hd : d ≠ 0) (hLN : ∀ x ∈ L, d • x ∈ N)
-    (P : Pl D → Prop) (hP : ∀ w, P w → latV S L (· = w) = latV S N (· = w)) (T : Finset (Pl D)) :
-    latV S L (fun p => P p ∧ p ∈ T) ≤ latV S N (fun p => P p ∧ p ∈ T) := by
+theorem latV_le_finite
+    (S : HSp D) (L N : Lat S)
+    (d : ℤ) (hd : d ≠ 0) (hLN : ∀ x ∈ L, d • x ∈ N)
+    (P : Pl D → Prop) (hP : ∀ w, P w → latV S L (· = w) = latV S N (· = w))
+    (T : Finset (Pl D))
+    : latV S L (fun p => P p ∧ p ∈ T) ≤ latV S N (fun p => P p ∧ p ∈ T) := by
   classical
   induction T using Finset.induction_on with
   | empty =>
@@ -103,22 +114,29 @@ theorem latV_le_finite (S : HSp D) (L N : Lat S) (d : ℤ) (hd : d ≠ 0) (hLN :
       rw [latV_congr S N hiff]
       exact ih h2
 
-theorem latV_le_of_local (S : HSp D) (L N : Lat S) (d : ℤ) (hd : d ≠ 0) (hLN : ∀ x ∈ L, d • x ∈ N)
-    (P : Pl D → Prop) (hP : ∀ w, P w → latV S L (· = w) = latV S N (· = w)) : latV S L P ≤ latV S N P := by
+theorem latV_le_of_local
+    (S : HSp D) (L N : Lat S)
+    (d : ℤ) (hd : d ≠ 0) (hLN : ∀ x ∈ L, d • x ∈ N)
+    (P : Pl D → Prop) (hP : ∀ w, P w → latV S L (· = w) = latV S N (· = w))
+    : latV S L P ≤ latV S N P := by
   classical
   set T := (finite_places_int (D := D) d hd).toFinset
   intro y hy
   have hs := GlobalTheory.FinPlLoc.latV_idAt hy
   obtain ⟨h1, h2⟩ := (mem_latV_iff_parts S L P T hs).1 hy
   rw [mem_latV_iff_parts S N P T hs]
-  refine ⟨latV_le_finite S L N d hd hLN P hP T h1, latV_le_of_int_smul_on S L N d hd hLN _ (fun v hv => ?_) h2⟩
+  refine ⟨
+    latV_le_finite S L N d hd hLN P hP T h1,
+    latV_le_of_int_smul_on S L N d hd hLN _ (fun v hv => ?_) h2
+  ⟩
   intro hmem
   exact hv.2 ((Set.Finite.mem_toFinset _).2 hmem)
 
-theorem latV_eq_of_local : ∀ {D : D7} (S : HSp D) (L N : GlobalTheory.FinPl.Lat S) (P : GlobalTheory.FinPl.Pl D → Prop),
-    Submodule.IsFullLattice D.host.E L → Submodule.IsFullLattice D.host.E N →
-    (∀ w, P w → GlobalTheory.FinPl.latV S L (· = w) = GlobalTheory.FinPl.latV S N (· = w)) →
-    GlobalTheory.FinPl.latV S L P = GlobalTheory.FinPl.latV S N P := by
+theorem latV_eq_of_local
+    : ∀ {D : D7} (S : HSp D) (L N : GlobalTheory.FinPl.Lat S) (P : GlobalTheory.FinPl.Pl D → Prop),
+      Submodule.IsFullLattice D.host.E L → Submodule.IsFullLattice D.host.E N
+        → (∀ w, P w → GlobalTheory.FinPl.latV S L (· = w) = GlobalTheory.FinPl.latV S N (· = w))
+        → GlobalTheory.FinPl.latV S L P = GlobalTheory.FinPl.latV S N P := by
   intro D S L N P hL hN hP
   obtain ⟨d₁, hd₁, h₁⟩ := exists_int_smul_le L N hL.fg hN.span_eq_top
   obtain ⟨d₂, hd₂, h₂⟩ := exists_int_smul_le N L hN.fg hL.span_eq_top

@@ -8,15 +8,19 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.NilProper
 
-theorem isSeparated_of_comp_surjective {X Y S : Scheme.{0}} (j : X ⟶ Y) (f : Y ⟶ S)
-    [Surjective j] [UniversallyClosed j] [IsSeparated (j ≫ f)] : IsSeparated f := by
+theorem isSeparated_of_comp_surjective
+    {X Y S : Scheme.{0}} (j : X ⟶ Y) (f : Y ⟶ S)
+    [Surjective j] [UniversallyClosed j] [IsSeparated (j ≫ f)]
+    : IsSeparated f := by
   let m := pullback.map (j ≫ f) (j ≫ f) f f j j (𝟙 S) (by simp) (by simp)
   have hm : UniversallyClosed m :=
     MorphismProperty.pullbackMap (P := @UniversallyClosed) ‹_› ‹_› rfl rfl
@@ -38,8 +42,8 @@ theorem isSeparated_of_comp_surjective {X Y S : Scheme.{0}} (j : X ⟶ Y) (f : Y
   rw [← key]
   exact m.isClosedMap _ (pullback.diagonal (j ≫ f)).isClosedEmbedding.isClosed_range
 
-theorem surjective_specMap_mk (A : Type) [CommRing A] (J : Ideal A) (hJ : IsNilpotent J) :
-    Surjective (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J))) := by
+theorem surjective_specMap_mk (A : Type) [CommRing A] (J : Ideal A) (hJ : IsNilpotent J)
+    : Surjective (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J))) := by
   obtain ⟨n, hn⟩ := hJ
   have hle : J ≤ nilradical A := fun x hx ↦ by
     rw [mem_nilradical]
@@ -48,22 +52,31 @@ theorem surjective_specMap_mk (A : Type) [CommRing A] (J : Ideal A) (hJ : IsNilp
     rwa [hn, Ideal.zero_eq_bot, Ideal.mem_bot] at this
   exact ⟨(PrimeSpectrum.comap_quotientMk_bijective_of_le_nilradical hle).2⟩
 
-theorem isProper_and_geometricallyConnected_of_isNilpotent :
-    ∀ (A : Type) [CommRing A] (J : Ideal A), IsNilpotent J → ∀ (Y : Over (Spec (CommRingCat.of A))) [LocallyOfFiniteType Y.hom], (IsProper (pullback.snd Y.hom (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J)))) → IsProper Y.hom) ∧ (GeometricallyConnected (pullback.snd Y.hom (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J)))) → GeometricallyConnected Y.hom) := by
+theorem isProper_and_geometricallyConnected_of_isNilpotent
+    : ∀ (A : Type) [CommRing A] (J : Ideal A),
+      IsNilpotent J
+        → ∀ (Y : Over (Spec (CommRingCat.of A))) [LocallyOfFiniteType Y.hom],
+          (IsProper (pullback.snd Y.hom (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J))))
+              → IsProper Y.hom)
+            ∧ (GeometricallyConnected (pullback.snd Y.hom
+                (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J))))
+              → GeometricallyConnected Y.hom) := by
   intro A _ J hJ Y _
   have hsq : Surjective (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J))) :=
     surjective_specMap_mk A J hJ
   have hci : IsClosedImmersion (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J))) :=
     IsClosedImmersion.spec_of_surjective _ Ideal.Quotient.mk_surjective
   refine ⟨fun hP ↦ ?_, fun hG ↦ ?_⟩
-  · have hcomp : IsProper (pullback.fst Y.hom (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J)))
-        ≫ Y.hom) := by
+  · have hcomp : IsProper
+        (pullback.fst Y.hom (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J))) ≫ Y.hom) := by
       rw [pullback.condition]
       infer_instance
     have : IsSeparated Y.hom :=
-      isSeparated_of_comp_surjective (pullback.fst Y.hom (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J)))) Y.hom
+      isSeparated_of_comp_surjective
+        (pullback.fst Y.hom (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J)))) Y.hom
     have : UniversallyClosed Y.hom :=
-      UniversallyClosed.of_comp_surjective (pullback.fst Y.hom (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J)))) Y.hom
+      UniversallyClosed.of_comp_surjective
+        (pullback.fst Y.hom (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk J)))) Y.hom
     exact { toIsSeparated := ‹_›, toUniversallyClosed := ‹_›, toLocallyOfFiniteType := ‹_› }
   · rw [geometricallyConnected_iff] at hG ⊢
     intro K _ y Z fst snd h

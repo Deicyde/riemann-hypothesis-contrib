@@ -9,8 +9,11 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PlaceDivisors
 
 set_option autoImplicit false
 noncomputable section
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.AddCurve
@@ -23,21 +26,24 @@ variable {k : Type} [CommRing k] {κ : Type} [Finite κ]
 def tj (m : ℕ) : MvPowerSeries κ k →ₐ[k] JetR k κ m :=
   (MvPowerSeries.truncTotalAlgHom κ k (m + 1)).restrictScalars k
 
-theorem tj_eq_iff (m : ℕ) (f g : MvPowerSeries κ k) :
-    tj m f = tj m g ↔ ∀ x : κ →₀ ℕ, x.degree < m + 1 → MvPowerSeries.coeff x f = MvPowerSeries.coeff x g :=
+theorem tj_eq_iff (m : ℕ) (f g : MvPowerSeries κ k)
+    : tj m f = tj m g
+      ↔ ∀ x : κ →₀ ℕ, x.degree < m + 1 → MvPowerSeries.coeff x f = MvPowerSeries.coeff x g :=
   limJ_tt_eq_iff m f g
 
 theorem tj_ext {f g : MvPowerSeries κ k} (h : ∀ m, tj m f = tj m g) : f = g := by
   ext x
   exact (tj_eq_iff x.degree f g).1 (h _) x (Nat.lt_succ_self _)
 
-theorem tj_eq_zero_iff (m : ℕ) (f : MvPowerSeries κ k) :
-    tj m f = 0 ↔ f ∈ Ideal.span (Set.range (MvPowerSeries.X : κ → MvPowerSeries κ k)) ^ (m + 1) := by
-  rw [← GlobalTheory.germIdeal_eq_span, GlobalTheory.mem_germIdeal_pow_iff, ← map_zero (tj (k := k) (κ := κ) m), tj_eq_iff]
+theorem tj_eq_zero_iff (m : ℕ) (f : MvPowerSeries κ k)
+    : tj m f = 0
+      ↔ f ∈ Ideal.span (Set.range (MvPowerSeries.X : κ → MvPowerSeries κ k)) ^ (m + 1) := by
+  rw [← GlobalTheory.germIdeal_eq_span, GlobalTheory.mem_germIdeal_pow_iff,
+    ← map_zero (tj (k := k) (κ := κ) m), tj_eq_iff]
   simp only [map_zero]
 
-theorem exists_tj (p : ∀ m, JetR k κ m) (hp : ∀ m, jetTruncR k κ m (p (m + 1)) = p m) :
-    ∃ f : MvPowerSeries κ k, ∀ m, tj m f = p m := by
+theorem exists_tj (p : ∀ m, JetR k κ m) (hp : ∀ m, jetTruncR k κ m (p (m + 1)) = p m)
+    : ∃ f : MvPowerSeries κ k, ∀ m, tj m f = p m := by
   choose P hP using fun m => Ideal.Quotient.mk_surjective (p m)
   have hck : ∀ (u : κ →₀ ℕ) m, u.degree ≤ m → (P m).coeff u = (P u.degree).coeff u := by
     intro u m hm

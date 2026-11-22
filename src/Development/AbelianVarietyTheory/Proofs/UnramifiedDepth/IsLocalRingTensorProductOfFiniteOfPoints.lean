@@ -5,31 +5,34 @@ public import ReciprocityTheory.DualLattices.FormalChartAtZero
 
 @[expose] public section
 
-open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
+open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
 
 namespace GlobalTheory
 
-private theorem tenLocal_sub_mem {O A : Type} [CommRing O] [CommRing A] [IsLocalRing O]
-    [IsLocalRing A] [Algebra O A] (φ : A →ₐ[O] O) (a : A) :
-    a - algebraMap O A (φ a) ∈ maximalIdeal A := by
+private theorem tenLocal_sub_mem
+    {O A : Type} [CommRing O] [CommRing A] [IsLocalRing O] [IsLocalRing A] [Algebra O A]
+    (φ : A →ₐ[O] O) (a : A)
+    : a - algebraMap O A (φ a) ∈ maximalIdeal A := by
   rw [mem_maximalIdeal, mem_nonunits_iff]
   intro h
   have h2 := h.map φ
   simp at h2
 
-theorem isLocalRing_tensorProduct_of_finite_of_points :
-  (∀ (O A A' : Type) [CommRing O] [CommRing A] [CommRing A'] [IsLocalRing O] [IsLocalRing A] [IsLocalRing A'] [Algebra O A] [Algebra O A']
-    [Module.Finite O A] [Module.Finite O A'], (A →ₐ[O] O) → (A' →ₐ[O] O) → IsLocalRing (A ⊗[O] A')) := by
+theorem isLocalRing_tensorProduct_of_finite_of_points
+    : (∀ (O A A' : Type) [CommRing O] [CommRing A] [CommRing A'] [IsLocalRing O] [IsLocalRing A]
+        [IsLocalRing A'] [Algebra O A] [Algebra O A'] [Module.Finite O A] [Module.Finite O A'],
+      (A →ₐ[O] O) → (A' →ₐ[O] O) → IsLocalRing (A ⊗[O] A')) := by
   intro O A A' _ _ _ _ _ _ _ _ _ _ φ φ'
   let Φ : A ⊗[O] A' →ₐ[O] O := Algebra.TensorProduct.productMap φ φ'
   have hsurj : Function.Surjective Φ := fun o => ⟨algebraMap _ _ o, Φ.commutes o⟩
-  have hM0 : ((maximalIdeal O).comap Φ).IsMaximal :=
-    Ideal.comap_isMaximal_of_surjective Φ hsurj
+  have hM0 : ((maximalIdeal O).comap Φ).IsMaximal := Ideal.comap_isMaximal_of_surjective Φ hsurj
   refine IsLocalRing.of_unique_max_ideal ⟨(maximalIdeal O).comap Φ, hM0, ?_⟩
   intro M hM
   have hint : Algebra.IsIntegral O (A ⊗[O] A') := Algebra.IsIntegral.of_finite _ _
-  have key : ∀ {B : Type} [CommRing B] [IsLocalRing B] [Algebra O B] (f : B →ₐ[O] A ⊗[O] A'),
-      M.comap f = maximalIdeal B := by
+  have key
+      : ∀ {B : Type} [CommRing B] [IsLocalRing B] [Algebra O B] (f : B →ₐ[O] A ⊗[O] A'),
+        M.comap f = maximalIdeal B := by
     intro B _ _ _ f
     have hf : (f : B →+* A ⊗[O] A').IsIntegral := by
       refine RingHom.IsIntegral.tower_top (algebraMap O B) _ ?_
@@ -54,11 +57,15 @@ theorem isLocalRing_tensorProduct_of_finite_of_points :
       have h2 := tenLocal_sub_mem φ' a'
       rw [← hA, Ideal.mem_comap, map_sub, AlgHom.commutes] at h1
       rw [← hA', Ideal.mem_comap, map_sub, AlgHom.commutes] at h2
-      have h3 := M.add_mem
-        (M.mul_mem_right ((Algebra.TensorProduct.includeRight : A' →ₐ[O] A ⊗[O] A') a') h1)
-        (M.mul_mem_left (algebraMap O (A ⊗[O] A') (φ a)) h2)
-      have e1 : a ⊗ₜ[O] a' = (Algebra.TensorProduct.includeLeft : A →ₐ[O] A ⊗[O] A') a *
-          (Algebra.TensorProduct.includeRight : A' →ₐ[O] A ⊗[O] A') a' := by simp
+      have h3 :=
+        M.add_mem
+          (M.mul_mem_right ((Algebra.TensorProduct.includeRight : A' →ₐ[O] A ⊗[O] A') a') h1)
+          (M.mul_mem_left (algebraMap O (A ⊗[O] A') (φ a)) h2)
+      have e1
+          : a ⊗ₜ[O] a'
+            = (Algebra.TensorProduct.includeLeft : A →ₐ[O] A ⊗[O] A') a
+              * (Algebra.TensorProduct.includeRight : A' →ₐ[O] A ⊗[O] A') a' := by
+        simp
       have e2 : Φ (a ⊗ₜ[O] a') = φ a * φ' a' := by simp [Φ]
       rw [e2, map_mul, e1]
       convert h3 using 1

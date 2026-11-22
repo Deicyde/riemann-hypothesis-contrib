@@ -10,10 +10,11 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights
 
-theorem ChartGram.det_eq_corner_mul_schur {K : Type*} [Field K] {e : ℕ}
-    (M : Matrix (Fin (e + 1)) (Fin (e + 1)) K) (h : M 0 0 ≠ 0) :
-    M.det = M 0 0 *
-      (Matrix.of fun i j : Fin e => M i.succ j.succ - M i.succ 0 * M 0 j.succ / M 0 0).det := by
+theorem ChartGram.det_eq_corner_mul_schur
+    {K : Type*} [Field K] {e : ℕ} (M : Matrix (Fin (e + 1)) (Fin (e + 1)) K) (h : M 0 0 ≠ 0)
+    : M.det
+      = M 0 0
+        * (Matrix.of fun i j : Fin e => M i.succ j.succ - M i.succ 0 * M 0 j.succ / M 0 0).det := by
   set c : Fin (e + 1) → K := fun i => if i = 0 then 0 else -(M i 0 / M 0 0) with hc
   set B : Matrix (Fin (e + 1)) (Fin (e + 1)) K := Matrix.of fun i j => M i j + c i * M 0 j with hB
   have hdet : B.det = M.det :=

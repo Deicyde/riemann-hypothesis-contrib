@@ -7,27 +7,32 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.MemSatM
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
 
 namespace GlobalTheory.NL.PhiSat
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL]
-    [CommRing O] [Algebra O LL] [TopologicalSpace LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    (W : LocWach PD LL O v n)
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} (W : LocWach PD LL O v n)
 
-theorem φD_smulA (T : LocLat G Qp LL O) (a : LetA O n) (y : W.DD T) :
-    W.φD T (a • y) = W.φA a • W.φD T y := by
+theorem φD_smulA (T : LocLat G Qp LL O) (a : LetA O n) (y : W.DD T)
+    : W.φD T (a • y) = W.φA a • W.φD T y := by
   have := W.φD_smul T (algebraMap (LetA O n) W.EE a) y
   rw [algebraMap_smul, W.φE_ext, algebraMap_smul] at this
   exact this
 
-theorem φD_map_Q {T₁ T₂ : LocLat G Qp LL O} (π : LatHom T₁.L T₂.L) (y : W.DD T₂)
-    (hy : y ∈ (W.N T₁).map (mapA W π)) : ∃ j : ℕ, W.Q ^ j • W.φD T₂ y ∈ (W.N T₁).map (mapA W π) := by
+theorem φD_map_Q
+    {T₁ T₂ : LocLat G Qp LL O}
+    (π : LatHom T₁.L T₂.L) (y : W.DD T₂) (hy : y ∈ (W.N T₁).map (mapA W π))
+    : ∃ j : ℕ, W.Q ^ j • W.φD T₂ y ∈ (W.N T₁).map (mapA W π) := by
   obtain ⟨n₁, hn₁, rfl⟩ := hy
   obtain ⟨j, hj⟩ := W.N_φ T₁ n₁ hn₁
   refine ⟨j, W.Q ^ j • W.φD T₁ n₁, hj, ?_⟩
@@ -35,29 +40,34 @@ theorem φD_map_Q {T₁ T₂ : LocLat G Qp LL O} (π : LatHom T₁.L T₂.L) (y 
   congr 1
   exact W.map_φ π n₁
 
-theorem φD_satM_gen (l : ℕ) (hlp : l.Prime) (hp : PD.p = l) {T₁ T₂ : LocLat G Qp LL O}
-    (π : LatHom T₁.L T₂.L) (x : W.DD T₂)
-    (hx : x ∈ GlobalTheory.NL.Coker.satM l ((W.N T₁).map (mapA W π)) (W.N T₂)) :
-    ∃ k : ℕ, W.Q ^ k • W.φD T₂ x ∈ GlobalTheory.NL.Coker.satM l ((W.N T₁).map (mapA W π)) (W.N T₂) := by
+theorem φD_satM_gen
+    (l : ℕ) (hlp : l.Prime) (hp : PD.p = l)
+    {T₁ T₂ : LocLat G Qp LL O} (π : LatHom T₁.L T₂.L) (x : W.DD T₂)
+    (hx : x ∈ GlobalTheory.NL.Coker.satM l ((W.N T₁).map (mapA W π)) (W.N T₂))
+    : ∃ k : ℕ,
+      W.Q ^ k • W.φD T₂ x ∈ GlobalTheory.NL.Coker.satM l ((W.N T₁).map (mapA W π)) (W.N T₂) := by
   set N'' := (W.N T₁).map (mapA W π) with hN''
   obtain ⟨hxN, k, hk1, hk2⟩ := hx
-  let J : Ideal (LetA O n) :=
-    { carrier := {a | ∃ j : ℕ, W.Q ^ j • a • W.φD T₂ x ∈ N''}
-      add_mem' := by
-        rintro a b ⟨i, hi⟩ ⟨j, hj⟩
-        refine ⟨i + j, ?_⟩
-        rw [add_smul, smul_add, pow_add]
-        refine N''.add_mem ?_ ?_
-        · rw [mul_comm, mul_smul]; exact N''.smul_mem _ hi
-        · rw [mul_smul]; exact N''.smul_mem _ hj
-      zero_mem' := ⟨0, by simp⟩
-      smul_mem' := by
-        rintro c a ⟨j, hj⟩
-        refine ⟨j, ?_⟩
-        rw [smul_eq_mul, mul_smul, smul_comm]
-        exact N''.smul_mem c hj }
-  have hJ : ∀ (a : LetA O n) (j : ℕ), W.Q ^ j • a • W.φD T₂ x ∈ N'' → ∀ (b : LetA O n) (E : ℕ), j ≤ E →
-      W.Q ^ E • (b * a) • W.φD T₂ x ∈ N'' := by
+  let J : Ideal (LetA O n) := {
+    carrier := {a | ∃ j : ℕ, W.Q ^ j • a • W.φD T₂ x ∈ N''}
+    add_mem' := by
+      rintro a b ⟨i, hi⟩ ⟨j, hj⟩
+      refine ⟨i + j, ?_⟩
+      rw [add_smul, smul_add, pow_add]
+      refine N''.add_mem ?_ ?_
+      · rw [mul_comm, mul_smul]; exact N''.smul_mem _ hi
+      · rw [mul_smul]; exact N''.smul_mem _ hj
+    zero_mem' := ⟨0, by simp⟩
+    smul_mem' := by
+      rintro c a ⟨j, hj⟩
+      refine ⟨j, ?_⟩
+      rw [smul_eq_mul, mul_smul, smul_comm]
+      exact N''.smul_mem c hj
+  }
+  have hJ
+      : ∀ (a : LetA O n) (j : ℕ),
+        W.Q ^ j • a • W.φD T₂ x ∈ N''
+          → ∀ (b : LetA O n) (E : ℕ), j ≤ E → W.Q ^ E • (b * a) • W.φD T₂ x ∈ N'' := by
     intro a j hj b E hjE
     have : W.Q ^ E • (b * a) • W.φD T₂ x = (W.Q ^ (E - j) * b) • (W.Q ^ j • a • W.φD T₂ x) := by
       rw [smul_smul, smul_smul, smul_smul]
@@ -104,7 +114,15 @@ theorem φD_satM_gen (l : ℕ) (hlp : l.Prime) (hp : PD.p = l) {T₁ T₂ : LocL
     rw [smul_comm]
     exact this
 
-theorem φD_satM_Q : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (l : ℕ) [Fact l.Prime] (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL), let W := (HW l).W K s LL h; ∀ (T₁ T₂ : Lt K LL) (π : LatHom T₁.L T₂.L), IsCrys ((D.loc l).PD K) T₁.ρ → IsCrys ((D.loc l).PD K) T₂.ρ → ∀ x ∈ GlobalTheory.NL.Coker.satM l ((W.N T₁).map (mapA W π)) (W.N T₂), ∃ k : ℕ, W.Q ^ k • W.φD T₂ x ∈ GlobalTheory.NL.Coker.satM l ((W.N T₁).map (mapA W π)) (W.N T₂) := by
+theorem φD_satM_Q
+    : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (l : ℕ)
+        [Fact l.Prime] (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL),
+      let W := (HW l).W K s LL h
+      ∀ (T₁ T₂ : Lt K LL) (π : LatHom T₁.L T₂.L),
+        IsCrys ((D.loc l).PD K) T₁.ρ → IsCrys ((D.loc l).PD K) T₂.ρ
+          → ∀ x ∈ GlobalTheory.NL.Coker.satM l ((W.N T₁).map (mapA W π)) (W.N T₂), ∃ k : ℕ,
+            W.Q ^ k • W.φD T₂ x
+              ∈ GlobalTheory.NL.Coker.satM l ((W.N T₁).map (mapA W π)) (W.N T₂) := by
   intro D HW F l _ K s LL h W T₁ T₂ π _hc₁ _hc₂ x hx
   exact φD_satM_gen W l Fact.out ((D.loc l).PD_p K) π x hx
 

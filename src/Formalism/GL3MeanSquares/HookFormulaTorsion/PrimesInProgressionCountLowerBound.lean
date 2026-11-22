@@ -577,15 +577,17 @@ theorem shortIntervalLowerBound : ShortIntervalLowerBound := by
   have hB1 : 1 ≤ B := by linarith
   have hB0 : 0 < B := by linarith
   have hcb2 : 0 < 2 / cb := by positivity
-  have hX60 : B ^ (60:ℝ) ≤ X :=
-    le_trans (Real.rpow_le_rpow_of_exponent_le hB1
-      (le_trans (by linarith) (le_max_right C₀ (60 + 2 / cb)))) hX
+  have hX60 : B ^ (60 : ℝ) ≤ X :=
+    le_trans
+      (Real.rpow_le_rpow_of_exponent_le hB1
+        (le_trans (by linarith) (le_max_right C₀ (60 + 2 / cb))))
+      hX
   have hXC0 : B ^ C₀ ≤ X := le_trans (Real.rpow_le_rpow_of_exponent_le hB1 (le_max_left _ _)) hX
   have hlogX : max C₀ (60 + 2 / cb) * Real.log B ≤ Real.log X := by
     have := Real.log_le_log (Real.rpow_pos_of_pos hB0 _) hX
     rwa [Real.log_rpow hB0] at this
-  have hQ' : ∀ Y : ℝ, X ≤ Y →
-      |G * ((π₁ Y : ℝ) + π₂ Y) - Emain θ β Y| ≤ rhoErr Cr cr B Y * Emain θ β Y :=
+  have hQ'
+      : ∀ Y : ℝ, X ≤ Y → |G * ((π₁ Y : ℝ) + π₂ Y) - Emain θ β Y| ≤ rhoErr Cr cr B Y * Emain θ β Y :=
     fun Y hY => hQ Y (le_trans hXC0 hY)
   by_cases hθ0 : θ = 0
   · subst hθ0
@@ -595,8 +597,8 @@ theorem shortIntervalLowerBound : ShortIntervalLowerBound := by
     simp only [hM] at hQ' ⊢
     refine ⟨Emain_lower_bound hθ' hB (by norm_num) (by norm_num) (by intro h; simp at h) hX60, ?_⟩
     intro h hh1 hρ hB7
-    exact gl2a4_claim2 hCr hcr hθ' hB hG1 hGB (by norm_num) (by norm_num)
-      (by intro h; simp at h) hX60 hπ₂ hQ' hh1 hρ hB7
+    exact gl2a4_claim2 hCr hcr hθ' hB hG1 hGB (by norm_num) (by norm_num) (by intro h; simp at h)
+      hX60 hπ₂ hQ' hh1 hρ hB7
   · obtain ⟨hβ1, hβ2, hβc⟩ := hβ hθ0
     have hd : θ = 1 → 2 / B ^ 2 ≤ (1 - β) * Real.log X := by
       intro _
@@ -613,6 +615,5 @@ theorem shortIntervalLowerBound : ShortIntervalLowerBound := by
     refine ⟨Emain_lower_bound hθ' hB hβ1 hβ2 hd hX60, ?_⟩
     intro h hh1 hρ hB7
     exact gl2a4_claim2 hCr hcr hθ' hB hG1 hGB hβ1 hβ2 hd hX60 hπ₂ hQ' hh1 hρ hB7
-
 
 end Formalism.HermitianLattices.GL2PrimeSums

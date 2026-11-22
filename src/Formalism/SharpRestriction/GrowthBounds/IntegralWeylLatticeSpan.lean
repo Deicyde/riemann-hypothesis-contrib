@@ -11,7 +11,8 @@ public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.BlockRatReal
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.G NumberField IsDedekindDomain Formalism.UG Formalism.L2.Forms Formalism.L2.G.Cmp Formalism.L2.Herm
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.G NumberField
+  IsDedekindDomain Formalism.UG Formalism.L2.Forms Formalism.L2.G.Cmp Formalism.L2.Herm
 
 namespace Formalism.L2.G.RelativeIndexFlags
 
@@ -23,21 +24,31 @@ theorem blockRationality_holds : Formalism.L2.G.BlockRationalityField := by
 
 section Rec
 
-variable {D : D7} {X : Formalism.L2.Herm.Herm0 D} {T : ∀ u : D.what₂.Word, Forms0 D u} {Gt : GatTies D} {I : CmpIn D X}
+variable
+  {D : D7} {X : Formalism.L2.Herm.Herm0 D}
+  {T : ∀ u : D.what₂.Word, Forms0 D u} {Gt : GatTies D} {I : CmpIn D X}
 
 end Rec
 
-variable (D : D7) (H : FullTiedNoG D)
-  (I0 : ∀ u (w : D.what₂.places.Pl), GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w) →
-    LocId (H.base.lev0 u) (D.what₂.places.resChar w) (nOrb (zH D.R.toFrame (hP D (D.what₂.places.resChar w))))
-      (WQ (D.what₂.places.resChar w) (nFr D (D.what₂.places.resChar w)))
-      (QQ (D.what₂.places.resChar w) (nFr D (D.what₂.places.resChar w))))
+variable
+  (D : D7) (H : FullTiedNoG D)
+  (I0 : ∀ u (w : D.what₂.places.Pl),
+    GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w)
+      → LocId (H.base.lev0 u) (D.what₂.places.resChar w)
+        (nOrb (zH D.R.toFrame (hP D (D.what₂.places.resChar w))))
+        (WQ (D.what₂.places.resChar w) (nFr D (D.what₂.places.resChar w)))
+        (QQ (D.what₂.places.resChar w) (nFr D (D.what₂.places.resChar w))))
   (B : GL (Fin D.R.k) D.host.E) (hBs : Cmp.StdB D B)
-  (sc : Scale) (Ce : ℝ) (T : ∀ u : D.what₂.Word, Forms0 D u)
-  (ψ : ∀ u (w : D.what₂.places.Pl), GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w) →
-    Formalism.L2.Herm.awayFrom₂ (H.base.lev0 u) (D.what₂.places.resChar w) →* (ORec D w (nFr D (D.what₂.places.resChar w)))ˣ)
-  (hd : ∀ u w h, ((packC D (fun u => H.base.lev0 u) (idStd D H I0 B hBs) ψ u w h).gat (rSc sc D.R.k (D.what₂.places.resChar w))
-    (epSc D.R sc Ce (D.what₂.places.resChar w))).d = Module.finrank ℂ (D.mem u).A.Mu0)
+  (sc : Scale) (Ce : ℝ)
+  (T : ∀ u : D.what₂.Word, Forms0 D u)
+  (ψ : ∀ u (w : D.what₂.places.Pl),
+    GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w)
+      → Formalism.L2.Herm.awayFrom₂ (H.base.lev0 u) (D.what₂.places.resChar w)
+        →* (ORec D w (nFr D (D.what₂.places.resChar w)))ˣ)
+  (hd : ∀ u w h,
+    ((packC D (fun u => H.base.lev0 u) (idStd D H I0 B hBs) ψ u w h).gat
+        (rSc sc D.R.k (D.what₂.places.resChar w)) (epSc D.R sc Ce (D.what₂.places.resChar w))).d
+      = Module.finrank ℂ (D.mem u).A.Mu0)
 
 variable {D H I0 B hBs sc Ce T ψ hd}
 

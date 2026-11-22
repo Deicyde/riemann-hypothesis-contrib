@@ -17,17 +17,19 @@ noncomputable section
 
 namespace GlobalTheory.ConjLoss
 
-theorem sum_padic_log_le (P : Finset ℕ) (hP : ∀ p ∈ P, p.Prime) (n : ℕ) :
-    ∑ p ∈ P, Real.log p * (padicValNat p n : ℝ) ≤ Real.log n := by
+theorem sum_padic_log_le (P : Finset ℕ) (hP : ∀ p ∈ P, p.Prime) (n : ℕ)
+    : ∑ p ∈ P, Real.log p * (padicValNat p n : ℝ) ≤ Real.log n := by
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · simp [Nat.padicValNat_def]
   · have hd : ∏ p ∈ P, p ^ padicValNat p n ∣ n := by
-      refine Finset.prod_dvd_of_isRelPrime ?_ fun p _ => (_root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat _ _))
+      refine Finset.prod_dvd_of_isRelPrime ?_ fun p _ =>
+        (_root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat _ _))
       intro p hp q hq hpq
-      exact Nat.coprime_iff_isRelPrime.1
-        (Nat.Coprime.pow _ _ ((Nat.coprime_primes (hP p hp) (hP q hq)).2 hpq))
-    have h1 : ∑ p ∈ P, Real.log p * (padicValNat p n : ℝ) =
-        Real.log (∏ p ∈ P, (p : ℝ) ^ padicValNat p n) := by
+      exact Nat.coprime_iff_isRelPrime.1 (Nat.Coprime.pow _ _
+        ((Nat.coprime_primes (hP p hp) (hP q hq)).2 hpq))
+    have h1
+        : ∑ p ∈ P, Real.log p * (padicValNat p n : ℝ)
+          = Real.log (∏ p ∈ P, (p : ℝ) ^ padicValNat p n) := by
       rw [Real.log_prod]
       · exact Finset.sum_congr rfl fun p _ => by rw [Real.log_pow, mul_comm]
       · intro p hp
@@ -40,16 +42,24 @@ theorem sum_padic_log_le (P : Finset ℕ) (hP : ∀ p ∈ P, p.Prime) (n : ℕ) 
       positivity
     · exact_mod_cast Nat.le_of_dvd hn hd
 
-theorem sum_primes_le (P : Finset ℕ) (hP : ∀ p ∈ P, p.Prime) (n : ℕ) (X a A W : ℝ) (hX : 0 ≤ X) (hXa : X ≤ a)
-    (ha : 1 ≤ a) (hA : 0 ≤ A) (hW : 0 ≤ W) :
-    ∑ p ∈ P, Real.log p * |(padicValNat p n : ℝ) +
-      (if (p : ℝ) ≤ X then A * Real.logb p a + W / ((p : ℝ) ^ 2 - 1) else 0)| ≤
-      Real.log n + X * (A * Real.log a) + 2 * (W * Real.log a) := by
+theorem sum_primes_le
+    (P : Finset ℕ) (hP : ∀ p ∈ P, p.Prime)
+    (n : ℕ)
+    (X a A W : ℝ) (hX : 0 ≤ X) (hXa : X ≤ a) (ha : 1 ≤ a) (hA : 0 ≤ A) (hW : 0 ≤ W)
+    : ∑ p ∈ P, Real.log p * |(padicValNat p n : ℝ) +
+        (if (p : ℝ) ≤ X then A * Real.logb p a + W / ((p : ℝ) ^ 2 - 1) else 0)|
+      ≤ Real.log n + X * (A * Real.log a) + 2 * (W * Real.log a) := by
   have hla : 0 ≤ Real.log a := Real.log_nonneg ha
-  have h1 : ∀ p ∈ P, Real.log p * |(padicValNat p n : ℝ) +
-      (if (p : ℝ) ≤ X then A * Real.logb p a + W / ((p : ℝ) ^ 2 - 1) else 0)| ≤
-      Real.log p * (padicValNat p n : ℝ) +
-      (if (p : ℝ) ≤ X then A * Real.log a + 2 * (W * Real.log a) * ((p : ℝ) ^ 2)⁻¹ else 0) := by
+  have h1
+      : ∀ p ∈ P,
+        Real.log p
+            * |(padicValNat p n : ℝ) +
+              (if (p : ℝ) ≤ X then A * Real.logb p a + W / ((p : ℝ) ^ 2 - 1) else 0)|
+          ≤ Real.log p * (padicValNat p n : ℝ)
+            + (if (p : ℝ) ≤ X then
+                 A * Real.log a + 2 * (W * Real.log a) * ((p : ℝ) ^ 2)⁻¹
+               else
+                 0) := by
     intro p hp
     have h2 : (2 : ℝ) ≤ p := by exact_mod_cast (hP p hp).two_le
     have hl : 0 < Real.log p := Real.log_pos (by linarith)
@@ -57,8 +67,7 @@ theorem sum_primes_le (P : Finset ℕ) (hP : ∀ p ∈ P, p.Prime) (n : ℕ) (X 
     split_ifs with h
     · have hb : 0 ≤ Real.logb p a := Real.logb_nonneg (by linarith) ha
       rw [abs_of_nonneg (by positivity), mul_add, mul_add]
-      have e1 : Real.log p * (A * Real.logb p a) = A * Real.log a := by
-        unfold Real.logb; field_simp
+      have e1 : Real.log p * (A * Real.logb p a) = A * Real.log a := by unfold Real.logb; field_simp
       have e2 : Real.log p ≤ Real.log a := Real.log_le_log (by linarith) (h.trans hXa)
       have e3 : W / ((p : ℝ) ^ 2 - 1) ≤ 2 * W * ((p : ℝ) ^ 2)⁻¹ := by
         rw [← div_eq_mul_inv, div_le_div_iff₀ hq (by positivity)]

@@ -25,8 +25,8 @@ private lemma coeff_prod_one_add (s : Multiset ℂ) (k : ℕ) :
     | zero => rw [coeff_X_mul_zero, ih, esymm_zero_deg, esymm_zero_deg, mul_zero, add_zero]
     | succ k => rw [coeff_X_mul, ih, ih, esymm_cons_succ]
 
-theorem esymm_add (s t : Multiset ℂ) (j : ℕ) :
-    (s + t).esymm j = ∑ a ∈ Finset.range (j + 1), s.esymm a * t.esymm (j - a) := by
+theorem esymm_add (s t : Multiset ℂ) (j : ℕ)
+    : (s + t).esymm j = ∑ a ∈ Finset.range (j + 1), s.esymm a * t.esymm (j - a) := by
   rw [← coeff_prod_one_add, Multiset.map_add (f := _), Multiset.prod_add, Polynomial.coeff_mul,
     Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk]
   simp only [coeff_prod_one_add]

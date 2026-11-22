@@ -9,20 +9,24 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.DeRhamP
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pst GlobalTheory.PMon TensorProduct
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  GlobalTheory.Pst GlobalTheory.PMon TensorProduct
 open scoped Formalism.Per
 
 namespace GlobalTheory.PMon
 
-theorem phiB_moore_det {l : ℕ} [Fact l.Prime] (P : LocPrime l) (n : ℕ) (a : Fin (n + 1) → P.R.B)
-    (ha : ∀ j, P.φB^[n + 1] (a j) = (l : P.R.B) * a j) :
-    P.φB (Matrix.of fun i j : Fin (n + 1) => P.φB^[i] (a j)).det =
-      (-1) ^ n * (l : P.R.B) * (Matrix.of fun i j : Fin (n + 1) => P.φB^[i] (a j)).det := by
+theorem phiB_moore_det
+    {l : ℕ} [Fact l.Prime]
+    (P : LocPrime l) (n : ℕ)
+    (a : Fin (n + 1) → P.R.B) (ha : ∀ j, P.φB^[n + 1] (a j) = (l : P.R.B) * a j)
+    : P.φB (Matrix.of fun i j : Fin (n + 1) => P.φB^[i] (a j)).det
+      = (-1) ^ n * (l : P.R.B) * (Matrix.of fun i j : Fin (n + 1) => P.φB^[i] (a j)).det := by
   set M := Matrix.of fun i j : Fin (n + 1) => P.φB^[i] (a j) with hM
-  have h1 : P.φB M.det = (M.map P.φB).det := by
-    rw [AlgHom.map_det]; rfl
-  have h2 : M.map P.φB = Matrix.diagonal (fun i : Fin (n + 1) => if i = Fin.last n then (l : P.R.B) else 1) *
-      M.submatrix (finRotate (n + 1)) id := by
+  have h1 : P.φB M.det = (M.map P.φB).det := by rw [AlgHom.map_det]; rfl
+  have h2
+      : M.map P.φB
+        = Matrix.diagonal (fun i : Fin (n + 1) => if i = Fin.last n then (l : P.R.B) else 1)
+          * M.submatrix (finRotate (n + 1)) id := by
     ext i j
     rw [Matrix.diagonal_mul, Matrix.map_apply, Matrix.submatrix_apply, finRotate_apply, id]
     simp only [hM, Matrix.of_apply]
@@ -35,7 +39,17 @@ theorem phiB_moore_det {l : ℕ} [Fact l.Prime] (P : LocPrime l) (n : ℕ) (a : 
   simp [Finset.prod_ite_eq']
   ring
 
-theorem mooreDeterminant_eq_unramified_mul_period_alt : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (T : LocTied l P AI) (h : ℕ), 0 < h → ∀ a : Fin h → P.R.B, (∀ j, P.φB^[h] (a j) = (l : P.R.B) * a j) → (∀ (i : ℕ) j, ev P i (a j) ∈ Fil P 0) → (Matrix.of fun i j : Fin h => P.φB^[i] (a j)).det ≠ 0 → P.ιB (Matrix.of fun i j : Fin h => P.φB^[i] (a j)).det ∈ Fil P 1 → ∃ κ : ↥(MaximalUnramifiedExtension l), κ ≠ 0 ∧ (Matrix.of fun i j : Fin h => P.φB^[i] (a j)).det = algebraMap ↥(MaximalUnramifiedExtension l) P.R.B κ * P.tB := by
+theorem mooreDeterminant_eq_unramified_mul_period_alt
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (T : LocTied l P AI) (h : ℕ),
+      0 < h
+        → ∀ a : Fin h → P.R.B,
+          (∀ j, P.φB^[h] (a j) = (l : P.R.B) * a j) → (∀ (i : ℕ) j, ev P i (a j) ∈ Fil P 0)
+            → (Matrix.of fun i j : Fin h => P.φB^[i] (a j)).det ≠ 0
+            → P.ιB (Matrix.of fun i j : Fin h => P.φB^[i] (a j)).det ∈ Fil P 1
+            → ∃ κ : ↥(MaximalUnramifiedExtension l),
+              κ ≠ 0
+                ∧ (Matrix.of fun i j : Fin h => P.φB^[i] (a j)).det
+                  = algebraMap ↥(MaximalUnramifiedExtension l) P.R.B κ * P.tB := by
   intro l _ P AI T h hh a ha _ hd hF
   obtain ⟨n, rfl⟩ : ∃ n, h = n + 1 := ⟨h - 1, by omega⟩
   set d := (Matrix.of fun i j : Fin (n + 1) => P.φB^[i] (a j)).det with hdd
@@ -48,8 +62,7 @@ theorem mooreDeterminant_eq_unramified_mul_period_alt : ∀ (l : ℕ) [Fact l.Pr
   have hφt : P.φB P.tB = (l : P.R.B) * P.tB := by
     rw [localPrime_frobenius_periodT, Algebra.smul_def, map_natCast]
   set c := d * ((ht.unit⁻¹ : P.R.Bˣ) : P.R.B) with hc
-  have hct : c * P.tB = d := by
-    rw [hc, mul_assoc, Units.inv_mul_of_eq ht.unit_spec, mul_one]
+  have hct : c * P.tB = d := by rw [hc, mul_assoc, Units.inv_mul_of_eq ht.unit_spec, mul_one]
   have hφc : P.φB c = (-1) ^ n * c := by
     apply (hl.mul ht).mul_right_cancel
     have e := congrArg P.φB hct
@@ -57,12 +70,13 @@ theorem mooreDeterminant_eq_unramified_mul_period_alt : ∀ (l : ℕ) [Fact l.Pr
     rw [show P.φB c * ((l : P.R.B) * P.tB) = P.φB c * ((l : P.R.B) * P.tB) from rfl]
     linear_combination e
   have hφ2 : P.φB^[2] c = c := by
-    rw [Function.iterate_succ_apply', Function.iterate_one, hφc, map_mul, hφc, map_pow, map_neg, map_one, ← mul_assoc,
-      ← mul_pow, neg_one_mul, neg_neg, one_pow, one_mul]
+    rw [Function.iterate_succ_apply', Function.iterate_one, hφc, map_mul, hφc, map_pow, map_neg,
+      map_one, ← mul_assoc, ← mul_pow, neg_one_mul, neg_neg, one_pow, one_mul]
   have hFc : P.ιB c ∈ Fil P 0 := by
     have e : tz P 1 * P.ιB c = P.ιB d := by
       rw [show tz P 1 = P.ιB P.tB by simp [tz], ← map_mul, mul_comm, hct]
-    have key := (GlobalTheory.T.deRhamPeriodRing_field_tPow_filtration_units l P AI T).2.2.1 0 1 (P.ιB c)
+    have key :=
+      (GlobalTheory.T.deRhamPeriodRing_field_tPow_filtration_units l P AI T).2.2.1 0 1 (P.ιB c)
     rw [zero_add, e] at key
     exact key.2 hF
   have hev : ∀ j < 2, ev P j c ∈ Fil P 0 := by
@@ -75,7 +89,8 @@ theorem mooreDeterminant_eq_unramified_mul_period_alt : ∀ (l : ℕ) [Fact l.Pr
       · rw [h1, neg_one_mul]
         simp only [Fil, SetLike.mem_coe] at hFc ⊢
         exact neg_mem hFc
-  obtain ⟨κ, -, hκ⟩ := GlobalTheory.T.unramified_of_frobeniusIterate_fixed_filZero l P AI T 2 two_pos c hφ2 hev
+  obtain ⟨κ, -, hκ⟩ :=
+    GlobalTheory.T.unramified_of_frobeniusIterate_fixed_filZero l P AI T 2 two_pos c hφ2 hev
   refine ⟨κ, ?_, ?_⟩
   · rintro rfl
     apply hd

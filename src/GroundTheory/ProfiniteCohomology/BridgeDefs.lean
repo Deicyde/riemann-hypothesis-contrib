@@ -15,8 +15,7 @@ universe u
 
 variable {k G : Type u} [CommRing k] [TopologicalSpace k] [Group G]
 
-abbrev underlyingRep (X : TopRep.{u} k G) : Rep.{u} k G :=
-  Rep.of X.ρ.toRepresentation
+abbrev underlyingRep (X : TopRep.{u} k G) : Rep.{u} k G := Rep.of X.ρ.toRepresentation
 
 section Discrete
 

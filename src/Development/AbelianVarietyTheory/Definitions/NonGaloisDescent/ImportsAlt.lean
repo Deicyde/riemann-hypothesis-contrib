@@ -16,7 +16,8 @@ variable {l : ℕ} [Fact l.Prime]
 
 def sh (x : Fl l) : ℂ_[l] := ((x.untilt : OC l) : ℂ_[l])
 
-def pw (k : ℤ) (x : Fl l) : Fl l := ((frobeniusEquiv (Fl l) l : RingAut (Fl l)) ^ k : RingAut (Fl l)) x
+def pw (k : ℤ) (x : Fl l) : Fl l :=
+  ((frobeniusEquiv (Fl l) l : RingAut (Fl l)) ^ k : RingAut (Fl l)) x
 
 def lam (h j : ℕ) (x : Fl l) : ℂ_[l] := ∑' n : ℤ, (l : ℂ_[l]) ^ (-n) * sh (pw (n * h + j) x)
 

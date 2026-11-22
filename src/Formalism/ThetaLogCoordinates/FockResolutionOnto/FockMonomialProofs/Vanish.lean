@@ -7,11 +7,15 @@ public import Formalism.ThetaLogCoordinates.FockResolutionOnto.FockMonomialProof
 
 namespace Formalism.InvariantFactorPaths.L4
 
-open Formalism.GM Formalism.GM.M Formalism.GM.TM Formalism.GM.MeanGammaLemmas Formalism.CountingSumsFrames MvPolynomial Finset
+open Formalism.GM Formalism.GM.M Formalism.GM.TM Formalism.GM.MeanGammaLemmas
+  Formalism.CountingSumsFrames MvPolynomial Finset
 
-theorem abs_wt_early {K r : ℕ} (LL : Letters (K + 1)) (o : ℕ) (c : Fin r) (m : Fin (K + 1) × Fin r →₀ ℕ)
-    (hm : MultiDeg (setLast LL o) m) :
-    |wt LL K c m| ≤ ∑ i : Fin (K + 1), if i = Fin.last K then 0 else (LL.deg i : ℤ) := by
+theorem abs_wt_early
+    {K r : ℕ} (LL : Letters (K + 1))
+    (o : ℕ)
+    (c : Fin r)
+    (m : Fin (K + 1) × Fin r →₀ ℕ) (hm : MultiDeg (setLast LL o) m)
+    : |wt LL K c m| ≤ ∑ i : Fin (K + 1), if i = Fin.last K then 0 else (LL.deg i : ℤ) := by
   unfold wt
   refine (Finset.abs_sum_le_sum_abs _ _).trans ?_
   refine Finset.sum_le_sum fun i _ => ?_
@@ -24,15 +28,18 @@ theorem abs_wt_early {K r : ℕ} (LL : Letters (K + 1)) (o : ℕ) (c : Fin r) (m
       simpa [setLast, Function.update_of_ne hi] using this
     have h1 : (m (i, c) : ℤ) ≤ (LL.deg i : ℤ) := by
       rw [← h2]
-      exact_mod_cast Finset.single_le_sum (f := fun c' => m (i, c')) (fun _ _ => Nat.zero_le _) (Finset.mem_univ c)
+      exact_mod_cast Finset.single_le_sum
+        (f := fun c' => m (i, c'))
+        (fun _ _ => Nat.zero_le _)
+        (Finset.mem_univ c)
     have h0 : (0 : ℤ) ≤ (m (i, c) : ℤ) := Int.natCast_nonneg _
     split_ifs
     · rw [abs_of_nonneg h0]; exact h1
     · rw [abs_neg, abs_of_nonneg h0]; exact h1
     · rw [abs_zero]; exact h0.trans h1
 
-theorem strip_sum (t b : ℕ → ℤ) (n : ℕ) (h : ∀ i, i + 1 < n → t (i + 1) ≤ t i - b i) :
-    ∀ k, k < n → ∑ i ∈ range (k + 1), b i ≤ t 0 - (t k - b k) := by
+theorem strip_sum (t b : ℕ → ℤ) (n : ℕ) (h : ∀ i, i + 1 < n → t (i + 1) ≤ t i - b i)
+    : ∀ k, k < n → ∑ i ∈ range (k + 1), b i ≤ t 0 - (t k - b k) := by
   intro k
   induction k with
   | zero => intro _; simp
@@ -55,24 +62,33 @@ theorem space_vanishing_holds : XVanish := by
   set S : Submodule ℚ_[p] (MvPolynomial (Fin (K + 1) × Fin r) ℚ_[p]) :=
     Pol p r (setLast LL o) ⊓ FreeOf p (Fin.last K, ρ) ⊓
       TypesLE p LL (K + 1) (univ.erase ρ) ((c : ℤ) : WithTop ℤ) with hS
-  have hmem : ∀ z, z ∈ S ↔ (z ∈ Pol p r (setLast LL o) ∧ z ∈ FreeOf p (Fin.last K, ρ)) ∧
-      z ∈ TypesLE p LL (K + 1) (univ.erase ρ) ((c : ℤ) : WithTop ℤ) := by
+  have hmem
+      : ∀ z,
+        z ∈ S
+          ↔ (z ∈ Pol p r (setLast LL o) ∧ z ∈ FreeOf p (Fin.last K, ρ))
+            ∧ z ∈ TypesLE p LL (K + 1) (univ.erase ρ) ((c : ℤ) : WithTop ℤ) := by
     intro z
     simp only [hS, Submodule.mem_inf]
-  have hstab : ∀ s ∈ univ.erase ρ, ∀ t ∈ univ.erase ρ, ∀ z ∈ S, glAct p (setLast LL o) (K + 1) s t z ∈ S := by
+  have hstab
+      : ∀ s ∈ univ.erase ρ, ∀ t ∈ univ.erase ρ, ∀ z ∈ S,
+        glAct p (setLast LL o) (K + 1) s t z ∈ S := by
     intro s hs t ht z hz
     rw [hmem] at hz ⊢
     obtain ⟨⟨h1, h2⟩, h3⟩ := hz
     refine ⟨⟨glAct_pol (setLast LL o) (K + 1) s t z h1, ?_⟩, ?_⟩
     · exact glAct_free LL (K + 1) s t _ (Finset.ne_of_mem_erase hs) (Finset.ne_of_mem_erase ht) z h2
     · exact typesLE_glStable LL (K + 1) _ _ s t hs ht z h3
-  obtain ⟨h, hhS, hh0, th, hhw⟩ := exists_hwC (setLast LL o) (K + 1) (univ.erase ρ) S
-    (fun z hz => ((hmem z).mp hz).1.1) hstab x hx hx0
+  obtain ⟨h, hhS, hh0, th, hhw⟩ :=
+    exists_hwC (setLast LL o) (K + 1) (univ.erase ρ) S
+      (fun z hz => ((hmem z).mp hz).1.1)
+      hstab x hx hx0
   rw [hWC_setLast] at hhw
   obtain ⟨⟨hP, hF⟩, hT⟩ := (hmem h).mp hhS
   have hth0 : th 0 ≤ c := by
-    have := first_weight_le_of_support LL (K + 1) (univ.erase ρ) h0ρ ((c : ℤ) : WithTop ℤ) th h hh0
-      (ycondC_le_supp LL (K + 1) _ _ (typesLE_le_ycondC LL (K + 1) _ h0ρ _ hT)) (Submodule.mem_inf.mp hhw).1
+    have :=
+      first_weight_le_of_support LL (K + 1) (univ.erase ρ) h0ρ ((c : ℤ) : WithTop ℤ) th h hh0
+        (ycondC_le_supp LL (K + 1) _ _ (typesLE_le_ycondC LL (K + 1) _ h0ρ _ hT))
+        (Submodule.mem_inf.mp hhw).1
     exact WithTop.coe_le_coe.mp this
   obtain ⟨β, hy, htop, m, hm, hmβ⟩ := exists_top h hh0
   have hβ : ∀ a, 0 ≤ β a := fun a => by rw [← hmβ]; exact Int.natCast_nonneg _
@@ -80,7 +96,9 @@ theorem space_vanishing_holds : XVanish := by
     rw [FreeOf, mem_restrictSupport_iff] at hF
     have := hF (Finset.mem_coe.mpr hm)
     simp only [Set.mem_ofPred_eq] at this
-    rw [← hmβ]; simp only [wp, this]; rfl
+    rw [← hmβ]
+    simp only [wp, this]
+    rfl
   rw [Pol, mem_restrictSupport_iff] at hP
   have hmd : MultiDeg (setLast LL o) m := hP (Finset.mem_coe.mpr hm)
   have hsum : ∑ a, β a = o := by
@@ -112,18 +130,23 @@ theorem space_vanishing_holds : XVanish := by
     simp only at this
     omega
   have hSb : ∑ a ∈ range (r - 1), bN a = o := by
-    rw [← sum_erase_last ρ hρ bN, ← hsum, ← Finset.add_sum_erase _ _ (Finset.mem_univ ρ), hβρ, zero_add]
+    rw [← sum_erase_last ρ hρ bN, ← hsum, ← Finset.add_sum_erase _ _ (Finset.mem_univ ρ), hβρ,
+      zero_add]
     exact Finset.sum_congr rfl fun a _ => hbN a
-  have key := strip_sum tN bN (r - 1) (by
-    intro i hi
-    have h1 := hstrip ⟨i, by omega⟩ (hCs i (by omega)) ⟨i + 1, by omega⟩ (hCs (i + 1) hi)
-      (by simp only [Fin.lt_def]; omega)
-    have h2 := htN ⟨i, by omega⟩
-    have h3 := htN ⟨i + 1, by omega⟩
-    have h4 := hbN ⟨i, by omega⟩
-    simp only at h2 h3 h4
-    rw [h2, h3, h4]
-    exact h1) (r - 2) (by omega)
+  have key :=
+    strip_sum tN bN (r - 1)
+      (by
+        intro i hi
+        have h1 :=
+          hstrip ⟨i, by omega⟩ (hCs i (by omega)) ⟨i + 1, by omega⟩ (hCs (i + 1) hi)
+            (by simp only [Fin.lt_def]; omega)
+        have h2 := htN ⟨i, by omega⟩
+        have h3 := htN ⟨i + 1, by omega⟩
+        have h4 := hbN ⟨i, by omega⟩
+        simp only at h2 h3 h4
+        rw [h2, h3, h4]
+        exact h1)
+      (r - 2) (by omega)
   have e1 : r - 2 + 1 = r - 1 := by omega
   rw [e1, hSb] at key
   have h5 := htN ⟨r - 2, by omega⟩

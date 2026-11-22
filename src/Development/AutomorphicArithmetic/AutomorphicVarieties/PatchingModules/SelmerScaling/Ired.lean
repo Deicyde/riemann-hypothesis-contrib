@@ -5,10 +5,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 @[expose] public section
 
-open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
+open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa
 
-theorem UpperTheory.V.Pa.aaCO :
-    ∀ (O B A : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O] [CommRing B] [Algebra O B] [IsCO O B] [CommRing A] [Algebra B A] [Module.Finite B A] (N : Submodule B A), Function.Injective (algebraMap B A) → _root_.IsCompl (1 : Submodule B A) N → (∀ a ∈ N, ∀ b ∈ N, ∃ c ∈ maximalIdeal B, a * b = algebraMap B A c) → ∀ [Algebra O A] [IsScalarTower O B A], ∃ _ : IsCO O A, (∀ a, a ∈ maximalIdeal A ↔ a ∈ (maximalIdeal B).map (algebraMap B A) ⊔ Ideal.span (N : Set A)) ∧ (ired N).map (algebraMap B A) ≤ maximalIdeal A ^ 2 := by
+theorem UpperTheory.V.Pa.aaCO
+    : ∀ (O B A : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (maximalIdeal O) O] [CommRing B] [Algebra O B] [IsCO O B] [CommRing A]
+        [Algebra B A] [Module.Finite B A] (N : Submodule B A),
+      Function.Injective (algebraMap B A) → _root_.IsCompl (1 : Submodule B A) N
+        → (∀ a ∈ N, ∀ b ∈ N, ∃ c ∈ maximalIdeal B, a * b = algebraMap B A c)
+        → ∀ [Algebra O A] [IsScalarTower O B A], ∃ _ : IsCO O A,
+          (∀ a,
+              a ∈ maximalIdeal A
+                ↔ a ∈ (maximalIdeal B).map (algebraMap B A) ⊔ Ideal.span (N : Set A))
+            ∧ (ired N).map (algebraMap B A) ≤ maximalIdeal A ^ 2 := by
   intro O B A _ _ _ _ _ _ _ _ _ _ N hinj hc hN _ _
   have hdec : ∀ a : A, ∃ b : B, ∃ n ∈ N, a = algebraMap B A b + n := by
     intro a
@@ -21,8 +31,13 @@ theorem UpperTheory.V.Pa.aaCO :
     rintro x a ⟨b, hb, n, hn, rfl⟩
     obtain ⟨b', n', hn', rfl⟩ := hdec x
     obtain ⟨c, hc', hcn⟩ := hN n' hn' n hn
-    refine ⟨b' * b + c, Ideal.add_mem _ (Ideal.mul_mem_left _ _ hb) hc', b' • n + b • n',
-      N.add_mem (N.smul_mem _ hn) (N.smul_mem _ hn'), ?_⟩
+    refine ⟨
+      b' * b + c,
+      Ideal.add_mem _ (Ideal.mul_mem_left _ _ hb) hc',
+      b' • n + b • n',
+      N.add_mem (N.smul_mem _ hn) (N.smul_mem _ hn'),
+      ?_
+    ⟩
     rw [Algebra.smul_def, Algebra.smul_def, map_add (f := _), map_mul, ← hcn]
     ring
   have hSadd : ∀ a a', a ∈ S → a' ∈ S → a + a' ∈ S := by
@@ -40,7 +55,7 @@ theorem UpperTheory.V.Pa.aaCO :
     have hb1 := hinj e
     rw [← hb1] at hb
     exact (IsLocalRing.mem_maximalIdeal _).mp hb isUnit_one
-  have hnon : ∀ a : A, a ∈ S → ¬IsUnit a := by
+  have hnon : ∀ a : A, a ∈ S → ¬ IsUnit a := by
     rintro a ha ⟨u, rfl⟩
     apply h1
     have := hSmul (↑u⁻¹) _ ha
@@ -72,7 +87,8 @@ theorem UpperTheory.V.Pa.aaCO :
     intro a
     rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
     exact ⟨fun h => by by_contra h'; exact h (hunit a h'), hnon a⟩
-  have hM : ∀ a : A, a ∈ S ↔ a ∈ (maximalIdeal B).map (algebraMap B A) ⊔ Ideal.span (N : Set A) := by
+  have hM
+      : ∀ a : A, a ∈ S ↔ a ∈ (maximalIdeal B).map (algebraMap B A) ⊔ Ideal.span (N : Set A) := by
     intro a
     constructor
     · rintro ⟨b, hb, n, hn, rfl⟩
@@ -80,8 +96,10 @@ theorem UpperTheory.V.Pa.aaCO :
         (Ideal.mem_sup_right (Ideal.subset_span hn))
     · intro ha
       refine (hmemS a).mp ?_
-      have hle : (maximalIdeal B).map (algebraMap B A) ⊔ Ideal.span (N : Set A) ≤ maximalIdeal A := by
-        refine sup_le (Ideal.map_le_iff_le_comap.mpr fun b hb => ?_) (Ideal.span_le.mpr fun n hn => ?_)
+      have hle
+          : (maximalIdeal B).map (algebraMap B A) ⊔ Ideal.span (N : Set A) ≤ maximalIdeal A := by
+        refine sup_le (Ideal.map_le_iff_le_comap.mpr fun b hb => ?_)
+          (Ideal.span_le.mpr fun n hn => ?_)
         · exact (hmemS _).mpr ⟨b, hb, 0, N.zero_mem, by simp⟩
         · exact (hmemS _).mpr ⟨0, zero_mem _, n, hn, by simp⟩
       exact hle ha

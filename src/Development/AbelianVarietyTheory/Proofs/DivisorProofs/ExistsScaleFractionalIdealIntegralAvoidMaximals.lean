@@ -7,14 +7,19 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.CTSmallCone
 
 open scoped TensorProduct Matrix
 open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.AdelicU
+open GlobalTheory.WeilM GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  GlobalTheory.AdelicU
 
 namespace GlobalTheory
 
-theorem exists_scale_integral_not_le_maximal :
-  ∀ (E : Type) [Field E] [NumberField E] (I : Submodule (𝓞 E) E), I.FG → I ≠ ⊥ →
-    ∀ (ι : Type) [Fintype ι] (Q : ι → Ideal (𝓞 E)), (∀ i, (Q i).IsMaximal) →
-    ∃ s : E, s ≠ 0 ∧ (∀ a ∈ I, IsIntegral ℤ (s * a)) ∧ ∀ i, ∃ a ∈ I, ∃ o : 𝓞 E, (o : E) = s * a ∧ o ∉ Q i := by
+theorem exists_scale_integral_not_le_maximal
+    : ∀ (E : Type) [Field E] [NumberField E] (I : Submodule (𝓞 E) E),
+      I.FG → I ≠ ⊥
+        → ∀ (ι : Type) [Fintype ι] (Q : ι → Ideal (𝓞 E)),
+          (∀ i, (Q i).IsMaximal)
+            → ∃ s : E,
+              s ≠ 0 ∧ (∀ a ∈ I, IsIntegral ℤ (s * a))
+                ∧ ∀ i, ∃ a ∈ I, ∃ o : 𝓞 E, (o : E) = s * a ∧ o ∉ Q i := by
   intro E _ _ I hfg hne ι _ Q hQ
   classical
   let F : FractionalIdeal (nonZeroDivisors (𝓞 E)) E := ⟨I, FractionalIdeal.isFractional_of_fg hfg⟩
@@ -30,19 +35,20 @@ theorem exists_scale_integral_not_le_maximal :
     rw [← FractionalIdeal.mem_coe, FractionalIdeal.coe_one] at h1
     obtain ⟨o, ho⟩ := Submodule.mem_one.1 h1
     exact ⟨o, ho⟩
-  have key : ∀ P : Ideal (𝓞 E), P ≠ ⊤ →
-      ∃ s ∈ F⁻¹, ∃ a ∈ I, ∃ o : 𝓞 E, (o : E) = s * a ∧ o ∉ P := by
+  have key : ∀ P : Ideal (𝓞 E), P ≠ ⊤ → ∃ s ∈ F⁻¹, ∃ a ∈ I, ∃ o : 𝓞 E, (o : E) = s * a ∧ o ∉ P := by
     intro P hP
     by_contra h
     push_neg at h
     apply hP
-    have hle : ((F * F⁻¹ : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Submodule (𝓞 E) E) ≤
-        Submodule.map (Algebra.linearMap (𝓞 E) E) P := by
+    have hle
+        : ((F * F⁻¹ : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Submodule (𝓞 E) E)
+          ≤ Submodule.map (Algebra.linearMap (𝓞 E) E) P := by
       rw [FractionalIdeal.coe_mul, Submodule.mul_le]
       intro m hm n hn
       obtain ⟨o, ho⟩ := hint n hn m hm
       refine Submodule.mem_map.2 ⟨o, h n hn m hm o ho, ?_⟩
-      rw [mul_comm, ← ho]; rfl
+      rw [mul_comm, ← ho]
+      rfl
     rw [mul_inv_cancel₀ hF0, FractionalIdeal.coe_one] at hle
     have h1 : (1 : E) ∈ (1 : Submodule (𝓞 E) E) := Submodule.mem_one.2 ⟨1, map_one _⟩
     obtain ⟨p, hp, hp1⟩ := Submodule.mem_map.1 (hle h1)
@@ -78,14 +84,16 @@ theorem exists_scale_integral_not_le_maximal :
   let s : E := ∑ P ∈ T, (u P : E) * sf P
   have hs : s ∈ F⁻¹ := by
     refine Submodule.sum_mem _ (fun P hP => ?_)
-    have := Submodule.smul_mem ((F⁻¹ : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Submodule (𝓞 E) E) (u P) (hsf P (hT P hP).ne_top)
+    have :=
+      Submodule.smul_mem ((F⁻¹ : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Submodule (𝓞 E) E)
+        (u P) (hsf P (hT P hP).ne_top)
     rwa [Algebra.smul_def] at this
 
   have main : ∀ P0 ∈ T, ∃ o : 𝓞 E, (o : E) = s * af P0 ∧ o ∉ P0 := by
     intro P0 hP0
     have hP0t := (hT P0 hP0).ne_top
-    have hterm : ∀ P ∈ T, ∃ o : 𝓞 E, (o : E) = sf P * af P0 :=
-      fun P hP => hint _ (hsf P (hT P hP).ne_top) _ (haf P0 hP0t)
+    have hterm : ∀ P ∈ T, ∃ o : 𝓞 E, (o : E) = sf P * af P0 := fun P hP =>
+      hint _ (hsf P (hT P hP).ne_top) _ (haf P0 hP0t)
     choose! w hw using hterm
     refine ⟨∑ P ∈ T, u P * w P, ?_, ?_⟩
     · push_cast
@@ -96,14 +104,16 @@ theorem exists_scale_integral_not_le_maximal :
       haveI := (hT P0 hP0).isPrime
       rw [← Finset.add_sum_erase _ _ hP0] at hmem
       have hrest : ∑ P ∈ T.erase P0, u P * w P ∈ P0 :=
-        Ideal.sum_mem _ (fun P hP => Ideal.mul_mem_right _ _
-          (hu2 P (Finset.mem_of_mem_erase hP) P0 hP0 (Finset.ne_of_mem_erase hP).symm))
+        Ideal.sum_mem _ (fun P hP =>
+          Ideal.mul_mem_right _ _
+            (hu2 P (Finset.mem_of_mem_erase hP) P0 hP0 (Finset.ne_of_mem_erase hP).symm))
       have h2 : u P0 * w P0 ∈ P0 := by
         have := P0.sub_mem hmem hrest
         simpa using this
-      have hwo : w P0 = of P0 := hinj (by
-        show (w P0 : E) = (of P0 : E)
-        rw [hw P0 hP0, hof P0 hP0t])
+      have hwo : w P0 = of P0 :=
+        hinj (by
+          show (w P0 : E) = (of P0 : E)
+          rw [hw P0 hP0, hof P0 hP0t])
       rcases Ideal.IsPrime.mem_or_mem ‹_› h2 with h3 | h3
       · exact hu1 P0 hP0 h3
       · exact hof' P0 hP0t (hwo ▸ h3)

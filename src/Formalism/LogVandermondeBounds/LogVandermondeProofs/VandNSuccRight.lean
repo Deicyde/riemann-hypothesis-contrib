@@ -220,7 +220,8 @@ theorem VandPlace_holds : VandPlace := by
   have hB1 : 1 ≤ Real.exp (x ^ ε) := Real.one_le_exp (Real.rpow_nonneg hx0.le _)
   have haB : Real.exp (x ^ ε) ≤ x * Real.exp (x ^ ε) := le_mul_of_one_le_left (by linarith) hx
   have ha1 : 1 ≤ x * Real.exp (x ^ ε) := le_trans hB1 haB
-  have hbgap : ∀ i j, i < j → j < q + 1 → 1 ≤ b j - b i := gap_of_step b (q + 1) (fun i hi => (hbstep i hi).2)
+  have hbgap : ∀ i j, i < j → j < q + 1 → 1 ≤ b j - b i :=
+    gap_of_step b (q + 1) (fun i hi => (hbstep i hi).2)
   have hK0 : 0 < ((p : ℝ) + 2) * (4 * Δ) := by positivity
   have hb0 : 0 < b 0 := (div_pos_iff_of_pos_right hx0).1 (lt_of_lt_of_le hK0 hkb)
   have hbpos : ∀ j, j < q + 1 → 0 < b j := by
@@ -261,33 +262,45 @@ theorem VandPlace_holds : VandPlace := by
       · exact (hu j (p + 1) h (by omega)).le
       · rw [show j = p + 1 by omega]
     linarith
-  have huv := vandN_le_pow_mul_pow_mul_vandN_of_interlace p u v _ hu hint (fun i hi => by linarith [hvstep i hi]) hDpair
-  have hrow := vandN_mul_prod_pow_le_vandN_rowPar (p + 2) (q + 1) v b (by simpa only [e1] using fun i hi => (hv i hi).1) hbpos hbgap
-    (by simpa only [e1] using hVv) (q + 1) le_rfl
+  have huv :=
+    vandN_le_pow_mul_pow_mul_vandN_of_interlace p u v _ hu hint
+      (fun i hi => by linarith [hvstep i hi])
+      hDpair
+  have hrow :=
+    vandN_mul_prod_pow_le_vandN_rowPar (p + 2) (q + 1) v b
+      (by simpa only [e1] using fun i hi => (hv i hi).1) hbpos hbgap (by simpa only [e1] using hVv)
+      (q + 1) le_rfl
   simp only [e1] at hrow
   have hP : 0 < ∏ j ∈ range (q + 1), b j ^ (p + 1) :=
     prod_pos fun j hj => pow_pos (hbpos j (mem_range.1 hj)) _
-  have hrow0 : 0 < vandN (rowPar (p + 2) v b) (p + 1 + (q + 1)) := lt_of_lt_of_le (mul_pos hVv hP) hrow
+  have hrow0 : 0 < vandN (rowPar (p + 2) v b) (p + 1 + (q + 1)) :=
+    lt_of_lt_of_le (mul_pos hVv hP) hrow
   refine ⟨hVu, hrow0, ?_⟩
   have h8 : 0 < 8 * (x * Real.exp (x ^ ε)) := by linarith
-  have hlr : Real.log (vandN v (p + 1)) + (p + 1) * ∑ j ∈ range (q + 1), Real.log (b j)
-      ≤ Real.log (vandN (rowPar (p + 2) v b) (p + 1 + (q + 1))) := by
+  have hlr
+      : Real.log (vandN v (p + 1)) + (p + 1) * ∑ j ∈ range (q + 1), Real.log (b j)
+        ≤ Real.log (vandN (rowPar (p + 2) v b) (p + 1 + (q + 1))) := by
     have := Real.log_le_log (mul_pos hVv hP) hrow
-    rw [Real.log_mul hVv.ne' hP.ne', Real.log_prod (fun j hj => (pow_pos (hbpos j (mem_range.1 hj)) _).ne')] at this
+    rw [Real.log_mul hVv.ne' hP.ne',
+        Real.log_prod (fun j hj => (pow_pos (hbpos j (mem_range.1 hj)) _).ne')]
+      at this
     simp only [Real.log_pow] at this
     rw [← mul_sum] at this
     push_cast at this
     linarith
-  have hlu : Real.log (vandN u (p + 2))
-      ≤ (p + 1) * Real.log (8 * (x * Real.exp (x ^ ε))) + p * Real.log (8 * (x * Real.exp (x ^ ε)))
-        + Real.log (vandN v (p + 1)) := by
+  have hlu
+      : Real.log (vandN u (p + 2))
+        ≤ (p + 1) * Real.log (8 * (x * Real.exp (x ^ ε)))
+          + p * Real.log (8 * (x * Real.exp (x ^ ε))) + Real.log (vandN v (p + 1)) := by
     have := Real.log_le_log hVu huv
     rw [Real.log_mul (by positivity) hVv.ne', Real.log_mul (by positivity) (by positivity),
-      Real.log_pow, Real.log_pow] at this
+        Real.log_pow, Real.log_pow]
+      at this
     push_cast at this
     linarith
   have hl8 : 0 ≤ Real.log (8 * (x * Real.exp (x ^ ε))) := Real.log_nonneg (by linarith)
-  have hlk : 0 ≤ Real.log ((p : ℝ) + 2) := Real.log_nonneg (by linarith [(p.cast_nonneg : (0 : ℝ) ≤ p)])
+  have hlk : 0 ≤ Real.log ((p : ℝ) + 2) :=
+    Real.log_nonneg (by linarith [(p.cast_nonneg : (0 : ℝ) ≤ p)])
   have hpk : 0 ≤ ((p : ℝ) + 2) * (1 + Real.log ((p : ℝ) + 2)) :=
     mul_nonneg (by positivity) (by linarith)
   nlinarith [hl8, hlk, hpk, (p.cast_nonneg : (0 : ℝ) ≤ p)]

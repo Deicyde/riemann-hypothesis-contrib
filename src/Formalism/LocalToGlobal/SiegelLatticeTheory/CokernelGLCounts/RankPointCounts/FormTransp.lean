@@ -12,7 +12,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedVolumeStatements
 
 noncomputable section
 
-open MeasureTheory Set Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.TermOp.Vanish
+open MeasureTheory Set Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.TermOp Formalism.L2.SG.TermOp.Vanish
 open scoped ENNReal
 
 namespace Formalism.L2.SG.Pf
@@ -21,26 +22,30 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 def RelCharC : Prop :=
   ∀ (D : D7) (X : HidaSetting D) (Y : Formalism.L2.SG.Full.Full X) (u u' : D.what₂.Word)
-    (t : GTerm X u u' (X.Fu u) (X.Fu u') (Y.what₂ u) (Y.what₂ u')), t.relevant →
-    ∀ r ∈ Rset t, X.psiInfU u r = X.psiInfU u' (t.pt.1⁻¹ * r * t.pt.1)
+      (t : GTerm X u u' (X.Fu u) (X.Fu u') (Y.what₂ u) (Y.what₂ u')),
+    t.relevant → ∀ r ∈ Rset t, X.psiInfU u r = X.psiInfU u' (t.pt.1⁻¹ * r * t.pt.1)
 
 namespace FormTranspose
 
 variable {D : D7} (X : HidaSetting D)
 
-theorem ninf_mul (u : D.what₂.Word) {a b : X.B.I.Ginf} (ha : a ∈ X.NinfU u) (hb : b ∈ X.NinfU u) : a * b ∈ X.NinfU u := (NinfSub X.eR (X.zR u)).mul_mem ha hb
+theorem ninf_mul (u : D.what₂.Word) {a b : X.B.I.Ginf} (ha : a ∈ X.NinfU u) (hb : b ∈ X.NinfU u)
+    : a * b ∈ X.NinfU u :=
+  (NinfSub X.eR (X.zR u)).mul_mem ha hb
 
-theorem ninf_inv (u : D.what₂.Word) {a : X.B.I.Ginf} (ha : a ∈ X.NinfU u) : a⁻¹ ∈ X.NinfU u := (NinfSub X.eR (X.zR u)).inv_mem ha
+theorem ninf_inv (u : D.what₂.Word) {a : X.B.I.Ginf} (ha : a ∈ X.NinfU u) : a⁻¹ ∈ X.NinfU u :=
+  (NinfSub X.eR (X.zR u)).inv_mem ha
 
-theorem sinf_conj (u : D.what₂.Word) {a : X.B.I.Ginf} (ha : a ∈ X.SinfU u) {n : X.B.I.Ginf} (hn : n ∈ X.NinfU u) :
-    a * n * a⁻¹ ∈ X.NinfU u := by
+theorem sinf_conj
+    (u : D.what₂.Word) {a : X.B.I.Ginf} (ha : a ∈ X.SinfU u) {n : X.B.I.Ginf} (hn : n ∈ X.NinfU u)
+    : a * n * a⁻¹ ∈ X.NinfU u := by
   obtain ⟨h, hh, m, hm, rfl⟩ := Sinf.levi X u ha
   have e : h * m * n * (h * m)⁻¹ = h * (m * n * m⁻¹) * h⁻¹ := by group
   rw [e]
   exact Sinf.conj_ninf X u hh (ninf_mul X u (ninf_mul X u hm hn) (ninf_inv X u hm))
 
-theorem sinf_conj_iff (u : D.what₂.Word) {a : X.B.I.Ginf} (ha : a ∈ X.SinfU u) (n : X.B.I.Ginf) :
-    a * n * a⁻¹ ∈ X.NinfU u ↔ n ∈ X.NinfU u := by
+theorem sinf_conj_iff (u : D.what₂.Word) {a : X.B.I.Ginf} (ha : a ∈ X.SinfU u) (n : X.B.I.Ginf)
+    : a * n * a⁻¹ ∈ X.NinfU u ↔ n ∈ X.NinfU u := by
   constructor
   · intro h
     have ha' : a⁻¹ ∈ X.SinfU u := (SinfSub X.B.I X.eR (X.zR u)).inv_mem ha
@@ -52,14 +57,21 @@ end FormTranspose
 
 open FormTranspose
 
-variable {D : D7} (X : HidaSetting D) (Y : Formalism.L2.SG.Full.Full X) (u u' : D.what₂.Word)
+variable
+  {D : D7} (X : HidaSetting D) (Y : Formalism.L2.SG.Full.Full X) (u u' : D.what₂.Word)
   (νq : X.B.I.Ginf → Measure X.B.I.Ginf) (κ : TermDef.Term D u u' (X.Fu u) (Y.what₂ u) → ℕ)
 
-theorem normRep_atPt (t : TermDef.Term D u u' (X.Fu u) (Y.what₂ u)) (w' : Formalism.MainNotions.S.Point D.host.E (D.R.rS + 1))
-    (F' : Formalism.MainNotions.S.Lat.LFlag (D.sp.Y 0) D.R.rS ((Formalism.MainNotions.S.Lat.Tu D u' : ℕ) : D.host.E)) (L U : Formalism.L2.SG.PairVal.MatR D)
-    (hN : Formalism.L2.SG.PairVal.NormRep t w' F' L U) (hG : t.G ≠ 0) : t.atPt w' := by
+theorem normRep_atPt
+    (t : TermDef.Term D u u' (X.Fu u) (Y.what₂ u))
+    (w' : Formalism.MainNotions.S.Point D.host.E (D.R.rS + 1))
+    (F' : Formalism.MainNotions.S.Lat.LFlag (D.sp.Y 0) D.R.rS
+      ((Formalism.MainNotions.S.Lat.Tu D u' : ℕ) : D.host.E))
+    (L U : Formalism.L2.SG.PairVal.MatR D) (hN : Formalism.L2.SG.PairVal.NormRep t w' F' L U)
+    (hG : t.G ≠ 0)
+    : t.atPt w' := by
   obtain ⟨⟨h, hmk⟩, -, hL, hU, hZ⟩ := hN
-  have hGF := (Formalism.L2.SG.Closed.TermFun_holds D u u' (X.Fu u) t.lam ((Y.rowsOK u).1 t.lam t.mem)).1
+  have hGF :=
+    (Formalism.L2.SG.Closed.TermFun_holds D u u' (X.Fu u) t.lam ((Y.rowsOK u).1 t.lam t.mem)).1
   have hG' : Formalism.MainNotions.S.Lat.Gval (lf D (X.Fu u)) F' ≠ 0 := by
     intro h0
     apply hG
@@ -68,15 +80,21 @@ theorem normRep_atPt (t : TermDef.Term D u u' (X.Fu u) (Y.what₂ u)) (w' : Form
     exact (TermDef.Gt_mk hGF ⟨F', h⟩).trans h0
   exact ⟨F', ⟨h, hmk⟩, hG', ⟨L, U, hL, hU, hZ⟩⟩
 
-theorem formTransp_any (hP : Formalism.L2.SG.RealObj.NuQPin X u u' νq) (hRC : RelCharC)
+theorem formTransp_any
+    (hP : Formalism.L2.SG.RealObj.NuQPin X u u' νq) (hRC : RelCharC)
     (t : GTerm X u u' (X.Fu u) (X.Fu u') (Y.what₂ u) (Y.what₂ u')) (hrel : t.relevant)
     (hreal : ∃ γ, Formalism.L2.SG.RealObj.IsPtRep X u u' (Formalism.L2.SG.PairVal.ptOf t.toTerm) γ)
-    (g : X.B.I.Ginf) (hg : g ∈ X.SinfU u) (g' : X.B.I.Ginf) (hg' : g' ∈ X.SinfU u')
-    (hdec : t.pt.1 = g * Formalism.L2.SG.RealObj.gamW X u u' (Formalism.L2.SG.PairVal.ptOf t.toTerm) * g'⁻¹) :
-    haveI := FiniteDimensional.complete ℂ (X.Vpi u)
-    ∃ c : ℝ, OOt t = c •
-      OO ((νq (Formalism.L2.SG.RealObj.gamW X u u' (Formalism.L2.SG.PairVal.ptOf t.toTerm))).map (fun x => g * x))
-        Set.univ (X.Wu u) (X.Wu u') t.pt.1 := by
+    (g : X.B.I.Ginf) (hg : g ∈ X.SinfU u)
+    (g' : X.B.I.Ginf) (hg' : g' ∈ X.SinfU u')
+    (hdec : t.pt.1
+      = g * Formalism.L2.SG.RealObj.gamW X u u' (Formalism.L2.SG.PairVal.ptOf t.toTerm) * g'⁻¹)
+    : haveI := FiniteDimensional.complete ℂ (X.Vpi u)
+      ∃ c : ℝ,
+        OOt t
+          = c • OO
+            ((νq (Formalism.L2.SG.RealObj.gamW X u u' (Formalism.L2.SG.PairVal.ptOf t.toTerm))).map
+              (fun x => g * x))
+            Set.univ (X.Wu u) (X.Wu u') t.pt.1 := by
   haveI := FiniteDimensional.complete ℂ (X.Vpi u)
   set w := Formalism.L2.SG.PairVal.ptOf t.toTerm with hw
   set γw := Formalism.L2.SG.RealObj.gamW X u u' w with hγw
@@ -107,12 +125,14 @@ theorem formTransp_any (hP : Formalism.L2.SG.RealObj.NuQPin X u u' νq) (hRC : R
       apply h2
       have := congrArg (fun m : Measure X.B.I.Ginf => m univ) h0
       simp only [hμR, Measure.map_apply hcjm MeasurableSet.univ, preimage_univ, Measure.coe_zero,
-        Pi.zero_apply] at this
+          Pi.zero_apply]
+        at this
       exact Measure.measure_univ_eq_zero.1 this
     · have hcje : ⇑((MeasurableEquiv.mulLeft g).trans (MeasurableEquiv.mulRight g⁻¹)) = cj := rfl
       rw [hμR, ← hcje, MeasurableEquiv.map_apply]
       refine measure_mono_null (fun z hz => ?_) h3
-      intro hzS; exact hz ((hRset z).2 hzS)
+      intro hzS
+      exact hz ((hRset z).2 hzS)
     · intro r hr
       set z := g⁻¹ * r * g with hz
       have hcz : cj z = r := by simp only [hcj, hz]; group
@@ -131,7 +151,8 @@ theorem formTransp_any (hP : Formalism.L2.SG.RealObj.NuQPin X u u' νq) (hRC : R
     rw [hν, lintegral_map hF (measurable_const_mul g)]
     have e1 : ∀ x0, ∫⁻ s, f (s * (g * x0)) ∂μR = ∫⁻ z, (fun y => f (g * y)) (z * x0) ∂μw := by
       intro x0
-      rw [hμR, lintegral_map (f := fun s => f (s * (g * x0))) (hf.comp (measurable_mul_const _)) hcjm]
+      rw [hμR,
+        lintegral_map (f := fun s => f (s * (g * x0))) (hf.comp (measurable_mul_const _)) hcjm]
       refine lintegral_congr fun z => ?_
       simp only [hcj]
       congr 1
@@ -151,24 +172,33 @@ theorem formTransp_any (hP : Formalism.L2.SG.RealObj.NuQPin X u u' νq) (hRC : R
     have h2 : (s0 * s'⁻¹) * (s' * r) ∈ FundOf t := by simpa [mul_assoc] using hs0F
     have := hFO.2.2 _ hs'F _ (Γ0.mul_mem hs0 (Γ0.inv_mem hs')) h2
     exact (mul_inv_eq_one.1 this).symm
-  have hFA := formAllC_holds D X Y u u' t μR ν (FundOf t) (hRC D X Y u u' t hrel) hHaar hQ' hFO.1 hKu
+  have hFA :=
+    formAllC_holds D X Y u u' t μR ν (FundOf t) (hRC D X Y u u' t hrel) hHaar hQ' hFO.1 hKu
   exact ⟨_, hFA⟩
 
-theorem formula_transport_term (hP : Formalism.L2.SG.RealObj.NuQPin X u u' νq) (hV : Formalism.L2.SG.VolPin.VolumeOddGeneric)
-    (hg3 : ∀ i, 3 ≤ D.host.g i) (hPH : Formalism.MainNotions.S.Lat.PrimeHyp D u (Formalism.MainNotions.S.Lat.Tu D u')) (hRC : RelCharC)
-    (hNR : Formalism.L2.SG.PairVal.NormRepExists D u u' (X.Fu u) (Y.what₂ u))
+theorem formula_transport_term
+    (hP : Formalism.L2.SG.RealObj.NuQPin X u u' νq) (hV : Formalism.L2.SG.VolPin.VolumeOddGeneric)
+    (hg3 : ∀ i, 3 ≤ D.host.g i)
+    (hPH : Formalism.MainNotions.S.Lat.PrimeHyp D u (Formalism.MainNotions.S.Lat.Tu D u'))
+    (hRC : RelCharC) (hNR : Formalism.L2.SG.PairVal.NormRepExists D u u' (X.Fu u) (Y.what₂ u))
     (hCPU : Formalism.L2.SG.PairVal.CellPtUnique D u u' (X.Fu u) (Y.what₂ u))
     (hNRat : ∀ (t : TermDef.Term D u u' (X.Fu u) (Y.what₂ u)) w' F' L U,
       Formalism.L2.SG.PairVal.NormRep t w' F' L U → t.G ≠ 0 → t.atPt w')
-    (t : GTerm X u u' (X.Fu u) (X.Fu u') (Y.what₂ u) (Y.what₂ u')) (hrel : t.relevant) (hgen : t.toTerm.generic)
-    (hG : t.G ≠ 0) (hat : t.toTerm.atPt (Formalism.L2.SG.PairVal.ptOf t.toTerm))
+    (t : GTerm X u u' (X.Fu u) (X.Fu u') (Y.what₂ u) (Y.what₂ u'))
+    (hrel : t.relevant) (hgen : t.toTerm.generic) (hG : t.G ≠ 0)
+    (hat : t.toTerm.atPt (Formalism.L2.SG.PairVal.ptOf t.toTerm))
     (hreal : ∃ γ, Formalism.L2.SG.RealObj.IsPtRep X u u' (Formalism.L2.SG.PairVal.ptOf t.toTerm) γ)
-    (g : X.B.I.Ginf) (hg : g ∈ X.SinfU u) (g' : X.B.I.Ginf) (hg' : g' ∈ X.SinfU u')
-    (hdec : t.pt.1 = g * Formalism.L2.SG.RealObj.gamW X u u' (Formalism.L2.SG.PairVal.ptOf t.toTerm) * g'⁻¹) :
-    haveI := FiniteDimensional.complete ℂ (X.Vpi u)
-    OOt t = ((Formalism.L2.SG.PairVal.vRdef D u u' (X.Fu u) (Y.what₂ u) Y.δ Y.M t.toTerm : ℝ) : ℂ) •
-      OO ((νq (Formalism.L2.SG.RealObj.gamW X u u' (Formalism.L2.SG.PairVal.ptOf t.toTerm))).map (fun x => g * x))
-        Set.univ (X.Wu u) (X.Wu u') t.pt.1 := by
+    (g : X.B.I.Ginf) (hg : g ∈ X.SinfU u)
+    (g' : X.B.I.Ginf) (hg' : g' ∈ X.SinfU u')
+    (hdec : t.pt.1
+      = g * Formalism.L2.SG.RealObj.gamW X u u' (Formalism.L2.SG.PairVal.ptOf t.toTerm) * g'⁻¹)
+    : haveI := FiniteDimensional.complete ℂ (X.Vpi u)
+      OOt t
+        = ((Formalism.L2.SG.PairVal.vRdef D u u' (X.Fu u) (Y.what₂ u) Y.δ Y.M t.toTerm : ℝ) : ℂ)
+          • OO
+            ((νq (Formalism.L2.SG.RealObj.gamW X u u' (Formalism.L2.SG.PairVal.ptOf t.toTerm))).map
+              (fun x => g * x))
+            Set.univ (X.Wu u) (X.Wu u') t.pt.1 := by
   haveI := FiniteDimensional.complete ℂ (X.Vpi u)
   set w := Formalism.L2.SG.PairVal.ptOf t.toTerm with hw
   set γw := Formalism.L2.SG.RealObj.gamW X u u' w with hγw
@@ -199,12 +229,14 @@ theorem formula_transport_term (hP : Formalism.L2.SG.RealObj.NuQPin X u u' νq) 
       apply h2
       have := congrArg (fun m : Measure X.B.I.Ginf => m univ) h0
       simp only [hμR, Measure.map_apply hcjm MeasurableSet.univ, preimage_univ, Measure.coe_zero,
-        Pi.zero_apply] at this
+          Pi.zero_apply]
+        at this
       exact Measure.measure_univ_eq_zero.1 this
     · have hcje : ⇑((MeasurableEquiv.mulLeft g).trans (MeasurableEquiv.mulRight g⁻¹)) = cj := rfl
       rw [hμR, ← hcje, MeasurableEquiv.map_apply]
       refine measure_mono_null (fun z hz => ?_) h3
-      intro hzS; exact hz ((hRset z).2 hzS)
+      intro hzS
+      exact hz ((hRset z).2 hzS)
     · intro r hr
       set z := g⁻¹ * r * g with hz
       have hcz : cj z = r := by simp only [hcj, hz]; group
@@ -223,7 +255,8 @@ theorem formula_transport_term (hP : Formalism.L2.SG.RealObj.NuQPin X u u' νq) 
     rw [hν, lintegral_map hF (measurable_const_mul g)]
     have e1 : ∀ x0, ∫⁻ s, f (s * (g * x0)) ∂μR = ∫⁻ z, (fun y => f (g * y)) (z * x0) ∂μw := by
       intro x0
-      rw [hμR, lintegral_map (f := fun s => f (s * (g * x0))) (hf.comp (measurable_mul_const _)) hcjm]
+      rw [hμR,
+        lintegral_map (f := fun s => f (s * (g * x0))) (hf.comp (measurable_mul_const _)) hcjm]
       refine lintegral_congr fun z => ?_
       simp only [hcj]
       congr 1
@@ -243,11 +276,15 @@ theorem formula_transport_term (hP : Formalism.L2.SG.RealObj.NuQPin X u u' νq) 
     have h2 : (s0 * s'⁻¹) * (s' * r) ∈ FundOf t := by simpa [mul_assoc] using hs0F
     have := hFO.2.2 _ hs'F _ (Γ0.mul_mem hs0 (Γ0.inv_mem hs')) h2
     exact (mul_inv_eq_one.1 this).symm
-  have hFA := formAllC_holds D X Y u u' t μR ν (FundOf t) (hRC D X Y u u' t hrel) hHaar hQ' hFO.1 hKu
+  have hFA :=
+    formAllC_holds D X Y u u' t μR ν (FundOf t) (hRC D X Y u u' t hrel) hHaar hQ' hFO.1 hKu
 
-  have hPin : Formalism.L2.SG.VolPin.IsPinnedR t w μR := ⟨γw, g, g', μw, hγwP, hg, hg', hdec, hμwH, hμwS, rfl⟩
+  have hPin : Formalism.L2.SG.VolPin.IsPinnedR t w μR :=
+    ⟨γw, g, g', μw, hγwP, hg, hg', hdec, hμwH, hμwS, rfl⟩
   have hNRex := hNR t.toTerm w hat hrel hgen
-  have hvR : Formalism.L2.SG.PairVal.vRdef D u u' (X.Fu u) (Y.what₂ u) Y.δ Y.M t.toTerm = (μR (FundOf t)).toReal := by
+  have hvR
+      : Formalism.L2.SG.PairVal.vRdef D u u' (X.Fu u) (Y.what₂ u) Y.δ Y.M t.toTerm
+        = (μR (FundOf t)).toReal := by
     unfold Formalism.L2.SG.PairVal.vRdef
     split_ifs with hc
     · have hx := hc.2.2.choose_spec
@@ -261,12 +298,15 @@ theorem formula_transport_term (hP : Formalism.L2.SG.RealObj.NuQPin X u u' νq) 
       exact hc ⟨hrel, hgen, ⟨(w, x.1, x.2.1, x.2.2), hx⟩⟩
   rw [hFA, hvR, Complex.coe_smul]
 
-theorem formula_transport_of_condition (hP : Formalism.L2.SG.RealObj.NuQPin X u u' νq) (hV : Formalism.L2.SG.VolPin.VolumeOddGeneric)
-    (hg3 : ∀ i, 3 ≤ D.host.g i) (hPH : Formalism.MainNotions.S.Lat.PrimeHyp D u (Formalism.MainNotions.S.Lat.Tu D u')) (hRC : RelCharC)
-    (hLD : RowForm.LiftDecompC X Y u u' κ) (hAt : RowForm.LiftAtSomeC X Y u u' κ)
+theorem formula_transport_of_condition
+    (hP : Formalism.L2.SG.RealObj.NuQPin X u u' νq) (hV : Formalism.L2.SG.VolPin.VolumeOddGeneric)
+    (hg3 : ∀ i, 3 ≤ D.host.g i)
+    (hPH : Formalism.MainNotions.S.Lat.PrimeHyp D u (Formalism.MainNotions.S.Lat.Tu D u'))
+    (hRC : RelCharC) (hLD : RowForm.LiftDecompC X Y u u' κ) (hAt : RowForm.LiftAtSomeC X Y u u' κ)
     (hNR : Formalism.L2.SG.PairVal.NormRepExists D u u' (X.Fu u) (Y.what₂ u))
-    (hCPU : Formalism.L2.SG.PairVal.CellPtUnique D u u' (X.Fu u) (Y.what₂ u)) :
-    RowForm.FormTranspC X Y u u' (Formalism.L2.SG.PairVal.vRdef D u u' (X.Fu u) (Y.what₂ u) Y.δ Y.M) νq κ := by
+    (hCPU : Formalism.L2.SG.PairVal.CellPtUnique D u u' (X.Fu u) (Y.what₂ u))
+    : RowForm.FormTranspC X Y u u'
+      (Formalism.L2.SG.PairVal.vRdef D u u' (X.Fu u) (Y.what₂ u) Y.δ Y.M) νq κ := by
   intro R ρ s hrel g hg g' hg' hdec
   have hat : s.1.toTerm.atPt (Formalism.L2.SG.PairVal.ptOf s.1.toTerm) := by
     obtain ⟨w0, hw0⟩ := hAt R ρ s hrel
@@ -276,9 +316,10 @@ theorem formula_transport_of_condition (hP : Formalism.L2.SG.RealObj.NuQPin X u 
     intro h0
     apply h1
     show Gt s.1 = 0
-    unfold Gt; rw [if_pos h0]
+    unfold Gt
+    rw [if_pos h0]
   exact formula_transport_term X Y u u' νq hP hV hg3 hPH hRC hNR hCPU
-    (fun t w' F' L U hN hG => normRep_atPt X Y u u' t w' F' L U hN hG) s.1 hrel s.2.2.1 hG hat (hLD R ρ s hrel).1
-    g hg g' hg' hdec
+    (fun t w' F' L U hN hG => normRep_atPt X Y u u' t w' F' L U hN hG)
+    s.1 hrel s.2.2.1 hG hat (hLD R ρ s hrel).1 g hg g' hg' hdec
 
 end Formalism.L2.SG.Pf

@@ -19,15 +19,14 @@ section Val
 
 variable {K : Type} [Field K] [NumberField K] (ψ : K →+* ℂ_[p])
 
-theorem valuation_eq_exp {x : K} (hx : x ≠ 0) :
-    (placeAt ψ).valuation K x = WithZero.exp (-vLa (placeAt ψ) x) := by
+theorem valuation_eq_exp {x : K} (hx : x ≠ 0)
+    : (placeAt ψ).valuation K x = WithZero.exp (- vLa (placeAt ψ) x) := by
   rw [vLa, neg_neg, WithZero.exp_log (((placeAt ψ).valuation K).ne_zero_iff.2 hx)]
 
 theorem exists_uniformizer : ∃ π : K, π ≠ 0 ∧ vLa (placeAt ψ) π = 1 ∧ ‖ψ π‖ < 1 := by
   set P := placeAt ψ
   obtain ⟨π, hπ⟩ := P.intValuation_exists_uniformizer
-  have hπ1 : P.intValuation π < 1 := by
-    rw [hπ, ← WithZero.exp_zero, WithZero.exp_lt_exp]; norm_num
+  have hπ1 : P.intValuation π < 1 := by rw [hπ, ← WithZero.exp_zero, WithZero.exp_lt_exp]; norm_num
   have hπn : ‖ψ (π : K)‖ < 1 := (mem_placeAt ψ π).1 ((P.intValuation_lt_one_iff_mem π).1 hπ1)
   have hνπ : P.valuation K (π : K) = WithZero.exp (-1) := by
     rw [← hπ]; exact HeightOneSpectrum.valuation_of_algebraMap P π
@@ -38,19 +37,20 @@ theorem exists_uniformizer : ∃ π : K, π ≠ 0 ∧ vLa (placeAt ψ) π = 1 �
   refine ⟨π, hπ0, ?_, hπn⟩
   simp [vLa, P, hνπ]
 
-theorem norm_eq_zpow {π : K} (hπ0 : π ≠ 0) (hπ : vLa (placeAt ψ) π = 1) {x : K} (hx : x ≠ 0) :
-    ‖ψ x‖ = ‖ψ π‖ ^ vLa (placeAt ψ) x := by
+theorem norm_eq_zpow {π : K} (hπ0 : π ≠ 0) (hπ : vLa (placeAt ψ) π = 1) {x : K} (hx : x ≠ 0)
+    : ‖ψ x‖ = ‖ψ π‖ ^ vLa (placeAt ψ) x := by
   set P := placeAt ψ
   set n := vLa P x
   set b := x * π ^ (-n) with hb
   have hb0 : b ≠ 0 := mul_ne_zero hx (zpow_ne_zero _ hπ0)
   have hνb : P.valuation K b = 1 := by
-    rw [hb, map_mul, map_zpow₀, valuation_eq_exp ψ hx, valuation_eq_exp ψ hπ0, hπ, ← WithZero.exp_zsmul,
-      ← WithZero.exp_add]
+    rw [hb, map_mul, map_zpow₀, valuation_eq_exp ψ hx, valuation_eq_exp ψ hπ0, hπ,
+      ← WithZero.exp_zsmul, ← WithZero.exp_add]
     simp only [smul_eq_mul, mul_neg, mul_one, neg_neg, n]
-    rw [show -vLa (placeAt ψ) x + vLa P x = 0 from neg_add_cancel _, WithZero.exp_zero]
+    rw [show - vLa (placeAt ψ) x + vLa P x = 0 from neg_add_cancel _, WithZero.exp_zero]
   have h1 : ‖ψ b‖ ≤ 1 := GlobalTheory.ReadingOver.norm_le_one_of_valuation_le_one ψ hνb.le
-  have h2 : ‖ψ b⁻¹‖ ≤ 1 := GlobalTheory.ReadingOver.norm_le_one_of_valuation_le_one ψ (by rw [map_inv₀, hνb, inv_one])
+  have h2 : ‖ψ b⁻¹‖ ≤ 1 :=
+    GlobalTheory.ReadingOver.norm_le_one_of_valuation_le_one ψ (by rw [map_inv₀, hνb, inv_one])
   have hpos : 0 < ‖ψ b‖ := norm_pos_iff.2 ((map_ne_zero ψ).2 hb0)
   have hb1 : ‖ψ b‖ = 1 := by
     rw [map_inv₀, norm_inv] at h2
@@ -65,8 +65,11 @@ section Unram
 
 variable {F F' : Type} [Field F] [NumberField F] [Field F'] [NumberField F'] [Algebra F F']
 
-theorem vLa_eq_of_mem_kurC (φ : F →+* ℂ_[p]) (φ' : F' →+* ℂ_[p]) (hcomp : ∀ a, φ' (algebraMap F F' a) = φ a)
-    (hk : ∀ x, φ' x ∈ kurC φ) (a : F) : vLa (placeAt φ') (algebraMap F F' a) = vLa (placeAt φ) a := by
+theorem vLa_eq_of_mem_kurC
+    (φ : F →+* ℂ_[p]) (φ' : F' →+* ℂ_[p])
+    (hcomp : ∀ a, φ' (algebraMap F F' a) = φ a) (hk : ∀ x, φ' x ∈ kurC φ)
+    (a : F)
+    : vLa (placeAt φ') (algebraMap F F' a) = vLa (placeAt φ) a := by
   by_cases ha : a = 0
   · subst ha; simp [vLa]
   obtain ⟨π, hπ0, hπ, hπn⟩ := exists_uniformizer φ
@@ -134,8 +137,8 @@ theorem adjRoots_mono {N M : ℕ} (h : N ∣ M) : adjRoots φ N ≤ adjRoots φ 
   show x ^ (N * k) = 1
   rw [pow_mul, hx', one_pow]
 
-theorem adjRoots_le_kurC {N : ℕ} (hN : 0 < N) (hpN : ¬ p ∣ N) (z : PAt φ) (hz : z ∈ adjRoots φ N) :
-    toCp φ z ∈ kurC φ := by
+theorem adjRoots_le_kurC {N : ℕ} (hN : 0 < N) (hpN : ¬ p ∣ N) (z : PAt φ) (hz : z ∈ adjRoots φ N)
+    : toCp φ z ∈ kurC φ := by
   let Kt : IntermediateField F (PAt φ) :=
     (show Subfield (PAt φ) from kurC φ).toIntermediateField fun a => mem_kurC φ a
   have hle : adjRoots φ N ≤ Kt := by
@@ -168,10 +171,11 @@ def kurAlg : Subfield ℂ_[p] where
     exact ⟨N, hN, hpN, inv_mem hx⟩
 
 theorem kurC_le : kurC φ ≤ (kurAlg φ).topologicalClosure := by
-  refine Subfield.topologicalClosure_minimal _ (sup_le ?_ ?_) (Subfield.isClosed_topologicalClosure _)
+  refine Subfield.topologicalClosure_minimal _ (sup_le ?_ ?_)
+    (Subfield.isClosed_topologicalClosure _)
   · rintro _ ⟨a, rfl⟩
-    exact Subfield.le_topologicalClosure _ ⟨1, one_pos, (Fact.out : p.Prime).not_dvd_one,
-      IntermediateField.algebraMap_mem _ a⟩
+    exact Subfield.le_topologicalClosure _
+      ⟨1, one_pos, (Fact.out : p.Prime).not_dvd_one, IntermediateField.algebraMap_mem _ a⟩
   · refine Subfield.topologicalClosure_minimal _ ?_ (Subfield.isClosed_topologicalClosure _)
     refine (Subfield.closure_le.2 ?_).trans (Subfield.le_topologicalClosure _)
     rintro ζ ⟨n, hn, hpn, hζ⟩
@@ -183,13 +187,21 @@ end GlobalTheory.KurApprox
 
 namespace GlobalTheory.KurApprox
 
-theorem kur_approx : ∀ (p : ℕ) [Fact p.Prime] (F : Type) [Field F] [NumberField F] (φ : F →+* ℂ_[p]) (n : ℕ)
-    (y : Fin n → ℂ_[p]), (∀ s, y s ∈ kurC φ) → ∀ ε : ℝ, 0 < ε →
-    ∃ (F' : Type) (_ : Field F') (_ : NumberField F') (_ : Algebra F F') (φ' : F' →+* ℂ_[p]),
-      (∀ a, φ' (algebraMap F F' a) = φ a) ∧ (∀ a : F, vLa (placeAt φ') (algebraMap F F' a) = vLa (placeAt φ) a) ∧
-      ∃ a' : Fin n → F', ∀ s, ‖y s - φ' (a' s)‖ < ε := by
+theorem kur_approx
+    : ∀ (p : ℕ) [Fact p.Prime] (F : Type) [Field F] [NumberField F] (φ : F →+* ℂ_[p]) (n : ℕ)
+        (y : Fin n → ℂ_[p]),
+      (∀ s, y s ∈ kurC φ)
+        → ∀ ε : ℝ,
+          0 < ε
+            → ∃ (F' : Type) (_ : Field F') (_ : NumberField F') (_ : Algebra F F')
+                (φ' : F' →+* ℂ_[p]),
+              (∀ a, φ' (algebraMap F F' a) = φ a)
+                ∧ (∀ a : F, vLa (placeAt φ') (algebraMap F F' a) = vLa (placeAt φ) a)
+                ∧ ∃ a' : Fin n → F', ∀ s, ‖y s - φ' (a' s)‖ < ε := by
   intro p _ F _ _ φ n y hy ε hε
-  have h1 : ∀ s, ∃ z : ℂ_[p], ∃ N : ℕ, 0 < N ∧ ¬ p ∣ N ∧ (show PAt φ from z) ∈ adjRoots φ N ∧ ‖y s - z‖ < ε := by
+  have h1
+      : ∀ s, ∃ z : ℂ_[p], ∃ N : ℕ,
+        0 < N ∧ ¬ p ∣ N ∧ (show PAt φ from z) ∈ adjRoots φ N ∧ ‖y s - z‖ < ε := by
     intro s
     have hs : y s ∈ closure ((kurAlg φ : Subfield ℂ_[p]) : Set ℂ_[p]) := kurC_le φ (hy s)
     obtain ⟨z, ⟨N, hN, hpN, hz⟩, hd⟩ := Metric.mem_closure_iff.1 hs ε hε
@@ -208,7 +220,16 @@ theorem kur_approx : ∀ (p : ℕ) [Fact p.Prime] (F : Type) [Field F] [NumberFi
   have hk : ∀ x : K, φ' x ∈ kurC φ := fun x => adjRoots_le_kurC φ hM0 hpM x x.2
   have hzM : ∀ s, (show PAt φ from z s) ∈ K := fun s =>
     adjRoots_mono φ (Finset.dvd_prod_of_mem N (Finset.mem_univ s)) (hz s)
-  exact ⟨K, inferInstance, inferInstance, inferInstance, φ', hcomp, vLa_eq_of_mem_kurC φ φ' hcomp hk,
-    fun s => ⟨z s, hzM s⟩, fun s => hd s⟩
+  exact ⟨
+    K,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    φ',
+    hcomp,
+    vLa_eq_of_mem_kurC φ φ' hcomp hk,
+    fun s => ⟨z s, hzM s⟩,
+    fun s => hd s
+  ⟩
 
 end GlobalTheory.KurApprox

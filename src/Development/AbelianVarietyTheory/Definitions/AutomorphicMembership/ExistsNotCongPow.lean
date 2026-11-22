@@ -20,16 +20,19 @@ variable {A : ValuationSubring Ω}
 theorem cong_symm {x y : Ω} (h : A.valuation (x - y) < 1) : A.valuation (y - x) < 1 := by
   rwa [Valuation.map_sub_swap]
 
-theorem cong_trans {x y z : Ω} (h : A.valuation (x - y) < 1) (h' : A.valuation (y - z) < 1) :
-    A.valuation (x - z) < 1 := by
+theorem cong_trans {x y z : Ω} (h : A.valuation (x - y) < 1) (h' : A.valuation (y - z) < 1)
+    : A.valuation (x - z) < 1 := by
   have e : x - z = (x - y) + (y - z) := by ring
-  rw [e]; exact Valuation.map_add_lt _ h h'
+  rw [e]
+  exact Valuation.map_add_lt _ h h'
 
 theorem val_pow_le_one {x : Ω} (hx : A.valuation x ≤ 1) (n : ℕ) : A.valuation (x ^ n) ≤ 1 := by
   rw [map_pow]; exact pow_le_one₀ zero_le hx
 
-theorem cong_pow {x y : Ω} (hx : A.valuation x ≤ 1) (hy : A.valuation y ≤ 1)
-    (h : A.valuation (x - y) < 1) (n : ℕ) : A.valuation (x ^ n - y ^ n) < 1 := by
+theorem cong_pow
+    {x y : Ω} (hx : A.valuation x ≤ 1) (hy : A.valuation y ≤ 1) (h : A.valuation (x - y) < 1)
+    (n : ℕ)
+    : A.valuation (x ^ n - y ^ n) < 1 := by
   induction n with
   | zero => simp
   | succ n ih =>
@@ -39,24 +42,25 @@ theorem cong_pow {x y : Ω} (hx : A.valuation x ≤ 1) (hy : A.valuation y ≤ 1
     · rw [map_mul]; exact lt_of_le_of_lt (mul_le_of_le_one_left' hx) ih
     · rw [map_mul]; exact lt_of_le_of_lt (mul_le_of_le_one_left' (val_pow_le_one hy n)) h
 
-theorem val_apply_le_one {σ : G E Ω} (hσ : σ ∈ Dec (F := E) A) {x : Ω}
-    (hx : A.valuation x ≤ 1) : A.valuation (σ x) ≤ 1 := by
+theorem val_apply_le_one {σ : G E Ω} (hσ : σ ∈ Dec (F := E) A) {x : Ω} (hx : A.valuation x ≤ 1)
+    : A.valuation (σ x) ≤ 1 := by
   rw [A.valuation_le_one_iff] at hx ⊢
   exact (apply_mem_iff_of_mem_Dec hσ x).mpr hx
 
-theorem exists_not_cong_pow [IsAlgClosed Ω] {m n : ℕ} (hn : 0 < n) (hmn : n < m) :
-    ∃ x : Ω, A.valuation x ≤ 1 ∧ ¬ A.valuation (x ^ m - x ^ n) < 1 := by
+theorem exists_not_cong_pow [IsAlgClosed Ω] {m n : ℕ} (hn : 0 < n) (hmn : n < m)
+    : ∃ x : Ω, A.valuation x ≤ 1 ∧ ¬ A.valuation (x ^ m - x ^ n) < 1 := by
   have hdeg : (Polynomial.X ^ m - (Polynomial.X ^ n + 1) : Polynomial Ω).degree = m := by
     rw [Polynomial.degree_sub_eq_left_of_degree_lt, Polynomial.degree_X_pow]
     rw [Polynomial.degree_X_pow, ← Polynomial.C_1, Polynomial.degree_X_pow_add_C hn]
     exact_mod_cast hmn
-  obtain ⟨x, hx⟩ := IsAlgClosed.exists_root
-    (Polynomial.X ^ m - (Polynomial.X ^ n + 1) : Polynomial Ω)
-    (by rw [hdeg]; exact_mod_cast (hn.trans hmn).ne')
+  obtain ⟨x, hx⟩ :=
+    IsAlgClosed.exists_root (Polynomial.X ^ m - (Polynomial.X ^ n + 1) : Polynomial Ω)
+      (by rw [hdeg]; exact_mod_cast (hn.trans hmn).ne')
   have hx' : x ^ m = x ^ n + 1 := by
     have := hx
     simp only [Polynomial.IsRoot.def, Polynomial.eval_sub, Polynomial.eval_add, Polynomial.eval_pow,
-      Polynomial.eval_X, Polynomial.eval_one] at this
+        Polynomial.eval_X, Polynomial.eval_one]
+      at this
     exact sub_eq_zero.mp this
   refine ⟨x, ?_, ?_⟩
   · by_contra hc
@@ -72,19 +76,18 @@ theorem exists_not_cong_pow [IsAlgClosed Ω] {m n : ℕ} (hn : 0 < n) (hmn : n <
 end Cong
 
 def ActsAs (A : ValuationSubring Ω) (q : ℕ) (σ : G E Ω) (a b : ℕ) : Prop :=
-  σ ∈ Dec (F := E) A ∧
-    ∀ x, A.valuation x ≤ 1 → A.valuation ((σ x) ^ (q ^ b) - x ^ (q ^ a)) < 1
+  σ ∈ Dec (F := E) A ∧ ∀ x, A.valuation x ≤ 1 → A.valuation ((σ x) ^ (q ^ b) - x ^ (q ^ a)) < 1
 
 section ActsAs
 
 variable {A : ValuationSubring Ω} {q : ℕ}
 
-theorem ActsAs.mul {σ τ : G E Ω} {a b c d : ℕ} (hσ : ActsAs A q σ a b) (hτ : ActsAs A q τ c d) :
-    ActsAs A q (σ * τ) (a + c) (b + d) := by
+theorem ActsAs.mul {σ τ : G E Ω} {a b c d : ℕ} (hσ : ActsAs A q σ a b) (hτ : ActsAs A q τ c d)
+    : ActsAs A q (σ * τ) (a + c) (b + d) := by
   refine ⟨(Dec (F := E) A).mul_mem hσ.1 hτ.1, fun x hx => ?_⟩
   have hy := val_apply_le_one hτ.1 hx
-  have h1 := cong_pow (val_pow_le_one (val_apply_le_one hσ.1 hy) _) (val_pow_le_one hy _)
-    (hσ.2 _ hy) (q ^ d)
+  have h1 :=
+    cong_pow (val_pow_le_one (val_apply_le_one hσ.1 hy) _) (val_pow_le_one hy _) (hσ.2 _ hy) (q ^ d)
   have h2 := cong_pow (val_pow_le_one hy _) (val_pow_le_one hx _) (hτ.2 _ hx) (q ^ a)
   rw [← pow_mul, ← pow_mul, ← pow_add, ← pow_add] at h1 h2
   rw [add_comm d a, add_comm c a] at h2
@@ -105,21 +108,25 @@ theorem actsAs_one_iff {σ : G E Ω} : ActsAs A q σ 1 0 ↔ IsFrob A q σ := by
   simp only [ActsAs, pow_zero, pow_one]
   exact Iff.rfl
 
-theorem ActsAs.unique [IsAlgClosed Ω] (hq : 1 < q) {σ : G E Ω} {a b c d : ℕ}
-    (h : ActsAs A q σ a b) (h' : ActsAs A q σ c d) : (a : ℤ) - b = (c : ℤ) - d := by
+theorem ActsAs.unique
+    [IsAlgClosed Ω]
+    (hq : 1 < q)
+    {σ : G E Ω} {a b c d : ℕ} (h : ActsAs A q σ a b) (h' : ActsAs A q σ c d)
+    : (a : ℤ) - b = (c : ℤ) - d := by
   have h1 := h.inv.mul h'
   rw [inv_mul_cancel] at h1
   have key : ∀ m n : ℕ, ActsAs A q (1 : G E Ω) m n → ¬ n < m := by
     intro m n hmn hlt
-    obtain ⟨x, hx, hx'⟩ := exists_not_cong_pow (A := A) (pow_pos (zero_lt_one.trans hq) n)
-      (pow_lt_pow_right₀ hq hlt)
+    obtain ⟨x, hx, hx'⟩ :=
+      exists_not_cong_pow (A := A) (pow_pos (zero_lt_one.trans hq) n) (pow_lt_pow_right₀ hq hlt)
     exact hx' (cong_symm (hmn.2 x hx))
   have k1 := key _ _ h1
   have k2 := key _ _ (by simpa using h1.inv)
   omega
 
-theorem ActsAs.cancel {φ : G E Ω} (hφ : IsFrob A q φ) {σ : G E Ω} {a b : ℕ} (n : ℕ)
-    (h : ActsAs A q σ (a + n) (b + n)) : ActsAs A q σ a b := by
+theorem ActsAs.cancel
+    {φ : G E Ω} (hφ : IsFrob A q φ) {σ : G E Ω} {a b : ℕ} (n : ℕ) (h : ActsAs A q σ (a + n) (b + n))
+    : ActsAs A q σ a b := by
   induction n with
   | zero => exact h
   | succ n ih =>
@@ -165,34 +172,39 @@ theorem mem_Weil_of_isFrob {σ : G E Ω} (hσ : IsFrob A (normV w) σ) : σ ∈ 
 
 def ineIncl : Ine (F := E) A →* Weil h := Subgroup.inclusion (Ine_le_Weil h)
 
-@[simp] theorem coe_ineIncl (σ : Ine (F := E) A) : (ineIncl h σ : G E Ω) = σ := rfl
+@[simp]
+theorem coe_ineIncl (σ : Ine (F := E) A) : (ineIncl h σ : G E Ω) = σ := rfl
 
 variable {h}
 
-def deg (σ : Weil h) : ℤ :=
-  (σ.2.choose : ℤ) - (σ.2.choose_spec.choose : ℤ)
+def deg (σ : Weil h) : ℤ := (σ.2.choose : ℤ) - (σ.2.choose_spec.choose : ℤ)
 
 variable [IsAlgClosure E Ω]
 
-theorem deg_eq {σ : Weil h} {a b : ℕ} (hσ : ActsAs A (normV w) (σ : G E Ω) a b) :
-    deg σ = (a : ℤ) - b :=
+theorem deg_eq {σ : Weil h} {a b : ℕ} (hσ : ActsAs A (normV w) (σ : G E Ω) a b)
+    : deg σ = (a : ℤ) - b :=
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed E
   ActsAs.unique (one_lt_normV w) σ.2.choose_spec.choose_spec hσ
 
-@[simp] theorem deg_mul (σ τ : Weil h) : deg (σ * τ) = deg σ + deg τ := by
+@[simp]
+theorem deg_mul (σ τ : Weil h) : deg (σ * τ) = deg σ + deg τ := by
   obtain ⟨a, b, hσ⟩ := σ.2
   obtain ⟨c, d, hτ⟩ := τ.2
   rw [deg_eq hσ, deg_eq hτ, deg_eq (σ := σ * τ) (hσ.mul hτ)]
-  push_cast; ring
+  push_cast
+  ring
 
-@[simp] theorem deg_one : deg (1 : Weil h) = 0 := by
+@[simp]
+theorem deg_one : deg (1 : Weil h) = 0 := by
   have := deg_mul (1 : Weil h) 1
-  rw [mul_one] at this; omega
+  rw [mul_one] at this
+  omega
 
-@[simp] theorem deg_inv (σ : Weil h) : deg σ⁻¹ = -deg σ := by
+@[simp]
+theorem deg_inv (σ : Weil h) : deg σ⁻¹ = - deg σ := by
   have := deg_mul σ σ⁻¹
-  rw [mul_inv_cancel, deg_one] at this; omega
-
+  rw [mul_inv_cancel, deg_one] at this
+  omega
 
 variable (h) in
 def degHom : Weil h →* Multiplicative ℤ where
@@ -200,17 +212,19 @@ def degHom : Weil h →* Multiplicative ℤ where
   map_one' := by simp
   map_mul' σ τ := by simp [ofAdd_add]
 
-@[simp] theorem degHom_apply (σ : Weil h) : degHom h σ = Multiplicative.ofAdd (deg σ) := rfl
+@[simp]
+theorem degHom_apply (σ : Weil h) : degHom h σ = Multiplicative.ofAdd (deg σ) := rfl
 
-@[simp] theorem deg_zpow (σ : Weil h) (n : ℤ) : deg (σ ^ n) = n * deg σ := by
+@[simp]
+theorem deg_zpow (σ : Weil h) (n : ℤ) : deg (σ ^ n) = n * deg σ := by
   have := congrArg Multiplicative.toAdd (map_zpow (degHom h) σ n)
   simpa using this
 
-@[simp] theorem deg_pow (σ : Weil h) (n : ℕ) : deg (σ ^ n) = n * deg σ := by
-  rw [← zpow_natCast, deg_zpow]
+@[simp]
+theorem deg_pow (σ : Weil h) (n : ℕ) : deg (σ ^ n) = n * deg σ := by rw [← zpow_natCast, deg_zpow]
 
-theorem actsAs_of_deg {σ : Weil h} {a b : ℕ} (hσ : deg σ = (a : ℤ) - b) :
-    ActsAs A (normV w) (σ : G E Ω) a b := by
+theorem actsAs_of_deg {σ : Weil h} {a b : ℕ} (hσ : deg σ = (a : ℤ) - b)
+    : ActsAs A (normV w) (σ : G E Ω) a b := by
   obtain ⟨φ, hφ⟩ := exists_isFrob h
   obtain ⟨c, d, hcd⟩ := σ.2
   rw [deg_eq hcd] at hσ
@@ -219,41 +233,41 @@ theorem actsAs_of_deg {σ : Weil h} {a b : ℕ} (hσ : deg σ = (a : ℤ) - b) :
   rw [mul_one, show c + b = a + d by omega, add_comm d b] at h2
   exact ActsAs.cancel hφ d h2
 
-theorem deg_eq_zero_iff {σ : Weil h} : deg σ = 0 ↔ (σ : G E Ω) ∈ Ine (F := E) A :=
-  ⟨fun hσ => actsAs_zero_iff.mp (actsAs_of_deg (a := 0) (b := 0) (by simpa using hσ)),
-    fun hσ => by simpa using deg_eq (actsAs_zero_iff.mpr hσ)⟩
+theorem deg_eq_zero_iff {σ : Weil h} : deg σ = 0 ↔ (σ : G E Ω) ∈ Ine (F := E) A := ⟨
+  fun hσ => actsAs_zero_iff.mp (actsAs_of_deg (a := 0) (b := 0) (by simpa using hσ)),
+  fun hσ => by simpa using deg_eq (actsAs_zero_iff.mpr hσ)
+⟩
 
-theorem deg_eq_one_iff {σ : Weil h} : deg σ = 1 ↔ IsFrob A (normV w) (σ : G E Ω) :=
-  ⟨fun hσ => actsAs_one_iff.mp (actsAs_of_deg (a := 1) (b := 0) (by simpa using hσ)),
-    fun hσ => by simpa using deg_eq (actsAs_one_iff.mpr hσ)⟩
+theorem deg_eq_one_iff {σ : Weil h} : deg σ = 1 ↔ IsFrob A (normV w) (σ : G E Ω) := ⟨
+  fun hσ => actsAs_one_iff.mp (actsAs_of_deg (a := 1) (b := 0) (by simpa using hσ)),
+  fun hσ => by simpa using deg_eq (actsAs_one_iff.mpr hσ)
+⟩
 
-@[simp] theorem deg_ineIncl (σ : Ine (F := E) A) : deg (ineIncl h σ) = 0 :=
-  deg_eq_zero_iff.mpr σ.2
-
+@[simp]
+theorem deg_ineIncl (σ : Ine (F := E) A) : deg (ineIncl h σ) = 0 := deg_eq_zero_iff.mpr σ.2
 
 variable (h) in
 def frob : Weil h := ⟨(exists_isFrob h).choose, mem_Weil_of_isFrob h (exists_isFrob h).choose_spec⟩
 
 theorem isFrob_frob : IsFrob A (normV w) (frob h : G E Ω) := (exists_isFrob h).choose_spec
 
-@[simp] theorem deg_frob : deg (frob h) = 1 := deg_eq_one_iff.mpr isFrob_frob
+@[simp]
+theorem deg_frob : deg (frob h) = 1 := deg_eq_one_iff.mpr isFrob_frob
 
-theorem deg_surjective : Function.Surjective (deg (h := h)) :=
-  fun n => ⟨frob h ^ n, by simp⟩
+theorem deg_surjective : Function.Surjective (deg (h := h)) := fun n => ⟨frob h ^ n, by simp⟩
 
-theorem exists_eq_zpow_mul {φ : Weil h} (hφ : deg φ = 1) (σ : Weil h) :
-    ∃ τ : Ine (F := E) A, σ = φ ^ deg σ * ineIncl h τ := by
+theorem exists_eq_zpow_mul {φ : Weil h} (hφ : deg φ = 1) (σ : Weil h)
+    : ∃ τ : Ine (F := E) A, σ = φ ^ deg σ * ineIncl h τ := by
   have h0 : deg ((φ ^ deg σ)⁻¹ * σ) = 0 := by simp [hφ]
   refine ⟨⟨_, deg_eq_zero_iff.mp h0⟩, ?_⟩
   rw [← inv_mul_eq_iff_eq_mul]
   rfl
 
-
 variable (h) in
 def unrChar (c : ℂˣ) : Weil h →* ℂˣ := (zpowersHom ℂˣ c).comp (degHom h)
 
-@[simp] theorem unrChar_apply (c : ℂˣ) (σ : Weil h) : unrChar h c σ = c ^ deg σ := rfl
-
+@[simp]
+theorem unrChar_apply (c : ℂˣ) (σ : Weil h) : unrChar h c σ = c ^ deg σ := rfl
 
 variable (w) in
 def qPow (s : ℝ) : ℂˣ :=
@@ -261,24 +275,22 @@ def qPow (s : ℝ) : ℂˣ :=
     rw [Ne, Complex.cpow_eq_zero_iff, not_and_or]
     exact Or.inl (Nat.cast_ne_zero.mpr (one_lt_normV w).ne_bot))
 
+omit [IsAlgClosure E Ω] in
+@[simp]
+theorem coe_qPow (s : ℝ) : (qPow w s : ℂ) = ((normV w : ℕ) : ℂ) ^ ((s : ℝ) : ℂ) := rfl
 
 omit [IsAlgClosure E Ω] in
-@[simp] theorem coe_qPow (s : ℝ) : (qPow w s : ℂ) = ((normV w : ℕ) : ℂ) ^ ((s : ℝ) : ℂ) := rfl
-
-
-omit [IsAlgClosure E Ω] in
-@[simp] theorem qPow_zero : qPow w 0 = 1 := Units.ext (by simp)
-
+@[simp]
+theorem qPow_zero : qPow w 0 = 1 := Units.ext (by simp)
 
 omit [IsAlgClosure E Ω] in
-theorem qPow_add (s t : ℝ) : qPow w (s + t) = qPow w s * qPow w t := Units.ext (by
-  simp only [coe_qPow, Units.val_mul, Complex.ofReal_add]
-  exact Complex.cpow_add _ _ (Nat.cast_ne_zero.mpr (one_lt_normV w).ne_bot))
-
+theorem qPow_add (s t : ℝ) : qPow w (s + t) = qPow w s * qPow w t :=
+  Units.ext (by
+    simp only [coe_qPow, Units.val_mul, Complex.ofReal_add]
+    exact Complex.cpow_add _ _ (Nat.cast_ne_zero.mpr (one_lt_normV w).ne_bot))
 
 omit [IsAlgClosure E Ω] in
 theorem coe_qPow_one : (qPow w 1 : ℂ) = ((normV w : ℕ) : ℂ) := by simp
-
 
 omit [IsAlgClosure E Ω] in
 theorem norm_qPow (s : ℝ) : ‖(qPow w s : ℂ)‖ = ((normV w : ℕ) : ℝ) ^ s := by

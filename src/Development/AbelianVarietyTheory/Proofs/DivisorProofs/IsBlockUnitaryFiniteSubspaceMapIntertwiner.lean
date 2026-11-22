@@ -10,10 +10,13 @@ open Formalism.BasicNotions.TH GlobalTheory.FockAlg GlobalTheory.RealLift Global
 
 namespace GlobalTheory.HoweR
 
-theorem unitOn_map : ∀ (ι M : Type) [Fintype ι] [DecidableEq ι] [AddCommGroup M] [Module ℂ M] (s : ι → Bool)
-    (F : ι → ι → Module.End ℂ M), ∀ (M' : Type) [AddCommGroup M'] [Module ℂ M'] (F' : ι → ι → Module.End ℂ M')
-    (f : M →ₗ[ℂ] M') (U : Submodule ℂ M), (∀ a b, s a = s b → ∀ x ∈ U, f (F a b x) = F' a b (f x)) →
-    UnitOn s F U → UnitOn s F' (U.map f) := by
+theorem unitOn_map
+    : ∀ (ι M : Type) [Fintype ι] [DecidableEq ι] [AddCommGroup M] [Module ℂ M] (s : ι → Bool)
+        (F : ι → ι → Module.End ℂ M),
+      ∀ (M' : Type) [AddCommGroup M'] [Module ℂ M'] (F' : ι → ι → Module.End ℂ M') (f : M →ₗ[ℂ] M')
+          (U : Submodule ℂ M),
+        (∀ a b, s a = s b → ∀ x ∈ U, f (F a b x) = F' a b (f x)) → UnitOn s F U
+          → UnitOn s F' (U.map f) := by
   intro ι M _ _ _ _ s F M' _ _ F' f U hF hU
   obtain ⟨hfd, hst, ip, hherm, hpos, hadj⟩ := hU
   let K : Submodule ℂ M := U ⊓ LinearMap.ker f
@@ -41,7 +44,8 @@ theorem unitOn_map : ∀ (ι M : Type) [Fintype ι] [DecidableEq ι] [AddCommGro
   have hinj : Function.Injective (ψ.comp K.subtype) := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro k hk
-    have hk1 : (k : M) ∈ U1 := Submodule.mem_inf.mpr ⟨hKU k k.2, LinearMap.mem_ker.mpr (by simpa using hk)⟩
+    have hk1 : (k : M) ∈ U1 :=
+      Submodule.mem_inf.mpr ⟨hKU k k.2, LinearMap.mem_ker.mpr (by simpa using hk)⟩
     have h0 := hA _ hk1 _ k.2
     by_contra hne
     have hne' : (k : M) ≠ 0 := fun h => hne (Subtype.ext h)
@@ -59,7 +63,8 @@ theorem unitOn_map : ∀ (ι M : Type) [Fintype ι] [DecidableEq ι] [AddCommGro
   have hinj1 : LinearMap.ker (f.comp U1.subtype) = ⊥ := by
     rw [LinearMap.ker_eq_bot']
     intro w hw
-    have hwK : (w : M) ∈ K := Submodule.mem_inf.mpr ⟨hU1U w w.2, LinearMap.mem_ker.mpr (by simpa using hw)⟩
+    have hwK : (w : M) ∈ K :=
+      Submodule.mem_inf.mpr ⟨hU1U w w.2, LinearMap.mem_ker.mpr (by simpa using hw)⟩
     have h0 := hA _ w.2 _ hwK
     by_contra hne
     have hne' : (w : M) ≠ 0 := fun h => hne (Subtype.ext h)

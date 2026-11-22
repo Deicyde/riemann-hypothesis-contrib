@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.Definitions.LatticeFrames.OnesRep
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.SymChain GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum
+open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx
+  GlobalTheory.StepData GlobalTheory.SymChain
+  GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum
 
 noncomputable section
 namespace GlobalTheory.SymChain.NonZeroAt
@@ -16,16 +18,17 @@ section Coords
 variable {ι ι' n n' : Type*} [Fintype n] [DecidableEq n] [Fintype n'] [DecidableEq n'] {c c' : ℕ}
 
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
-theorem typeFrame_bas_val (ϖ : kˣ) (ord : ι ≃ n ⊕ Fin c) :
-    (typeFrame ϖ ord).bas.val = diagonal (Sum.elim (fun _ => (1 : k)) fun i : Fin c => (ϖ : k) ^ (i.val + 1)) := by
+theorem typeFrame_bas_val (ϖ : kˣ) (ord : ι ≃ n ⊕ Fin c)
+    : (typeFrame ϖ ord).bas.val
+      = diagonal (Sum.elim (fun _ => (1 : k)) fun i : Fin c => (ϖ : k) ^ (i.val + 1)) := by
   change (fromBlocks 1 0 0 (diagonal _) : Matrix (n ⊕ Fin c) (n ⊕ Fin c) k) = _
   rw [← diagonal_one, fromBlocks_diagonal]
   congr 1
 
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
-theorem typeFrame_bas_inv_val (ϖ : kˣ) (ord : ι ≃ n ⊕ Fin c) :
-    ((typeFrame ϖ ord).bas⁻¹).val =
-      diagonal (Sum.elim (fun _ => (1 : k)) fun i : Fin c => ((ϖ : k) ^ (i.val + 1))⁻¹) := by
+theorem typeFrame_bas_inv_val (ϖ : kˣ) (ord : ι ≃ n ⊕ Fin c)
+    : ((typeFrame ϖ ord).bas⁻¹).val
+      = diagonal (Sum.elim (fun _ => (1 : k)) fun i : Fin c => ((ϖ : k) ^ (i.val + 1))⁻¹) := by
   refine Units.inv_eq_of_mul_eq_one_right ?_
   rw [typeFrame_bas_val, diagonal_mul_diagonal, ← diagonal_one]
   congr 1
@@ -43,7 +46,6 @@ end Ord
 
 section Chain
 variable {s κ : ℕ} (S : SymData k s κ) (t : Type) [Fintype t] [DecidableEq t]
-
 
 end Chain
 

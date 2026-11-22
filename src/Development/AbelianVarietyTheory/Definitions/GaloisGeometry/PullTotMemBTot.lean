@@ -37,38 +37,46 @@ abbrev Term (a q : ℕ) : Type (max u v) := CatH.Cn (OmF F q) a
 
 abbrev dH (a q : ℕ) : Term F a q →ₗ[R] Term F (a + 1) q := CatH.d (OmF F q) a
 
-def dV (a q : ℕ) : Term F a q →ₗ[R] Term F a (q + 1) :=
-  (CatH.Mor.ofNatTrans (dOmNat F q)).pullC a
+def dV (a q : ℕ) : Term F a q →ₗ[R] Term F a (q + 1) := (CatH.Mor.ofNatTrans (dOmNat F q)).pullC a
 
-theorem dV_apply {a q : ℕ} (c : Term F a q) (s : ComposableArrows C a) :
-    dV F a q c s = dOm R (F.obj (s.obj (Fin.last a))) q (c s) := rfl
+theorem dV_apply {a q : ℕ} (c : Term F a q) (s : ComposableArrows C a)
+    : dV F a q c s = dOm R (F.obj (s.obj (Fin.last a))) q (c s) :=
+  rfl
 
 abbrev Bidegree (n : ℕ) : Type := {p : ℕ × ℕ // p.1 + p.2 = n}
 
 abbrev Tot (n : ℕ) : Type (max u v) := ∀ p : Bidegree n, Term F p.1.1 p.1.2
 
 def totH (n : ℕ) : Tot F n →ₗ[R] Tot F (n + 1) :=
-  LinearMap.pi fun p ↦ match p with
+  LinearMap.pi fun p ↦
+    match p with
     | ⟨(0, _), _⟩ => 0
     | ⟨(a + 1, q), h⟩ => dH F a q ∘ₗ LinearMap.proj (⟨(a, q), by omega⟩ : Bidegree n)
 
 def totV (n : ℕ) : Tot F n →ₗ[R] Tot F (n + 1) :=
-  LinearMap.pi fun p ↦ match p with
+  LinearMap.pi fun p ↦
+    match p with
     | ⟨(_, 0), _⟩ => 0
-    | ⟨(a, q + 1), h⟩ => (-1 : ℤ) ^ a • (dV F a q ∘ₗ LinearMap.proj (⟨(a, q), by omega⟩ : Bidegree n))
+    | ⟨(a, q + 1), h⟩ =>
+      (-1 : ℤ) ^ a • (dV F a q ∘ₗ LinearMap.proj (⟨(a, q), by omega⟩ : Bidegree n))
 
 def dTot (n : ℕ) : Tot F n →ₗ[R] Tot F (n + 1) := totH F n + totV F n
 
 section
 variable {F} {n : ℕ} (c : Tot F n)
 
-@[simp] theorem totH_zero {q : ℕ} (h : 0 + q = n + 1) : totH F n c ⟨(0, q), h⟩ = 0 := rfl
+@[simp]
+theorem totH_zero {q : ℕ} (h : 0 + q = n + 1) : totH F n c ⟨(0, q), h⟩ = 0 := rfl
 
-@[simp] theorem totH_succ {a q : ℕ} (h : a + 1 + q = n + 1) :
-    totH F n c ⟨(a + 1, q), h⟩ = dH F a q (c ⟨(a, q), by omega⟩) := rfl
+@[simp]
+theorem totH_succ {a q : ℕ} (h : a + 1 + q = n + 1)
+    : totH F n c ⟨(a + 1, q), h⟩ = dH F a q (c ⟨(a, q), by omega⟩) :=
+  rfl
 
-@[simp] theorem totV_succ {a q : ℕ} (h : a + (q + 1) = n + 1) :
-    totV F n c ⟨(a, q + 1), h⟩ = (-1 : ℤ) ^ a • dV F a q (c ⟨(a, q), by omega⟩) := rfl
+@[simp]
+theorem totV_succ {a q : ℕ} (h : a + (q + 1) = n + 1)
+    : totV F n c ⟨(a, q + 1), h⟩ = (-1 : ℤ) ^ a • dV F a q (c ⟨(a, q), by omega⟩) :=
+  rfl
 
 theorem dTot_apply (p : Bidegree (n + 1)) : dTot F n c p = totH F n c p + totV F n c p := rfl
 
@@ -89,7 +97,6 @@ instance (n : ℕ) : Module R (Hyp F n) := inferInstanceAs (Module R (_ ⧸ _))
 def Hyp.mk (n : ℕ) : ZTot F n →ₗ[R] Hyp F n := Submodule.mkQ _
 
 theorem Hyp.mk_surjective (n : ℕ) : Function.Surjective (Hyp.mk F n) := Submodule.mkQ_surjective _
-
 
 variable {F} in
 theorem Hyp.mk_eq_zero {n : ℕ} {c : ZTot F n} : Hyp.mk F n c = 0 ↔ c.1 ∈ BTot F n :=
@@ -128,7 +135,6 @@ def HypF.mk (p n : ℕ) : ZF F p n →ₗ[R] HypF F p n := Submodule.mkQ _
 theorem HypF.mk_surjective (p n : ℕ) : Function.Surjective (HypF.mk F p n) :=
   Submodule.mkQ_surjective _
 
-
 variable {F} in
 theorem HypF.mk_eq_zero {p n : ℕ} {c : ZF F p n} : HypF.mk F p n c = 0 ↔ c.1 ∈ BF F p n :=
   Submodule.Quotient.mk_eq_zero _
@@ -138,10 +144,9 @@ def HypF.toHyp (p n : ℕ) : HypF F p n →ₗ[R] Hyp F n :=
 
 def Hyp.fil (p n : ℕ) : Submodule R (Hyp F n) := LinearMap.range (HypF.toHyp F p n)
 
-
 variable {F} in
-theorem Hyp.mem_fil {p n : ℕ} {x : Hyp F n} :
-    x ∈ Hyp.fil F p n ↔ ∃ c : ZTot F n, c.1 ∈ TotF F p n ∧ Hyp.mk F n c = x := by
+theorem Hyp.mem_fil {p n : ℕ} {x : Hyp F n}
+    : x ∈ Hyp.fil F p n ↔ ∃ c : ZTot F n, c.1 ∈ TotF F p n ∧ Hyp.mk F n c = x := by
   constructor
   · rintro ⟨y, rfl⟩
     obtain ⟨c, rfl⟩ := HypF.mk_surjective F p n y
@@ -149,14 +154,17 @@ theorem Hyp.mem_fil {p n : ℕ} {x : Hyp F n} :
   · rintro ⟨c, hc, rfl⟩
     exact ⟨HypF.mk F p n ⟨c.1, hc, c.2⟩, rfl⟩
 
-theorem Hyp.fil_zero (n : ℕ) : Hyp.fil F 0 n = ⊤ := eq_top_iff.2 fun x _ ↦ by
-  obtain ⟨c, rfl⟩ := Hyp.mk_surjective F n x
-  exact Hyp.mem_fil.2 ⟨c, by rw [TotF_zero]; trivial, rfl⟩
+theorem Hyp.fil_zero (n : ℕ) : Hyp.fil F 0 n = ⊤ :=
+  eq_top_iff.2 fun x _ ↦ by
+    obtain ⟨c, rfl⟩ := Hyp.mk_surjective F n x
+    exact Hyp.mem_fil.2 ⟨c, by rw [TotF_zero]; trivial, rfl⟩
 
-theorem Hyp.fil_eq_bot {p n : ℕ} (h : n < p) : Hyp.fil F p n = ⊥ := eq_bot_iff.2 fun x hx ↦ by
-  obtain ⟨c, hc, rfl⟩ := Hyp.mem_fil.1 hx
-  rw [TotF_eq_bot F h] at hc
-  rw [show c = 0 from Subtype.ext hc, map_zero]; rfl
+theorem Hyp.fil_eq_bot {p n : ℕ} (h : n < p) : Hyp.fil F p n = ⊥ :=
+  eq_bot_iff.2 fun x hx ↦ by
+    obtain ⟨c, hc, rfl⟩ := Hyp.mem_fil.1 hx
+    rw [TotF_eq_bot F h] at hc
+    rw [show c = 0 from Subtype.ext hc, map_zero]
+    rfl
 
 theorem dH_lead {a p n : ℕ} (h : a + p = n) (c : ZF F p n) : dH F a p (c.1 ⟨(a, p), h⟩) = 0 := by
   have e := congrFun (show dTot F n c.1 = 0 from c.2.2) ⟨(a + 1, p), by omega⟩
@@ -170,8 +178,11 @@ end Complex
 
 section Pull
 
-variable {R R' R'' : Type} [CommRing R] [CommRing R'] [CommRing R'']
-  {C : Type u} [Category.{v} C] {C' : Type u'} [Category.{v'} C'] {C'' : Type u''} [Category.{v''} C'']
+variable
+  {R R' R'' : Type} [CommRing R] [CommRing R'] [CommRing R'']
+  {C : Type u} [Category.{v} C]
+  {C' : Type u'} [Category.{v'} C']
+  {C'' : Type u''} [Category.{v''} C'']
   {σ : R →+* R'} {τ : R' →+* R''} {F : C ⥤ CommAlgCat.{0} R} {F' : C' ⥤ CommAlgCat.{0} R'}
   {F'' : C'' ⥤ CommAlgCat.{0} R''} (m : CoefMap σ F F')
 
@@ -190,11 +201,13 @@ def pullTot (n : ℕ) : Tot F n →ₛₗ[σ] Tot F' n where
 theorem pullTot_id {n : ℕ} (c : Tot F n) : pullTot (CoefMap.id F) n c = c :=
   funext fun b ↦ funext fun s ↦ SemiHom.mOm_id _ (fun _ ↦ rfl) (c b s)
 
-theorem pullTot_comp (m' : CoefMap τ F' F'') {n : ℕ} (c : Tot F n) :
-    pullTot (m.comp m') n c = pullTot m' n (pullTot m n c) :=
-  funext fun b ↦ funext fun s ↦
-    (SemiHom.mOm_mOm (semiHom_coef m _) (semiHom_coef m' _) _ (fun _ ↦ rfl)
-      (c b (s ⋙ m'.G ⋙ m.G))).symm
+theorem pullTot_comp (m' : CoefMap τ F' F'') {n : ℕ} (c : Tot F n)
+    : pullTot (m.comp m') n c = pullTot m' n (pullTot m n c) :=
+  funext fun b ↦
+    funext fun s ↦
+      (SemiHom.mOm_mOm (semiHom_coef m _) (semiHom_coef m' _) _
+        (fun _ ↦ rfl)
+        (c b (s ⋙ m'.G ⋙ m.G))).symm
 
 end Pull
 

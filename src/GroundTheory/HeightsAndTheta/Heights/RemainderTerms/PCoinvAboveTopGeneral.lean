@@ -13,16 +13,16 @@ open MvPolynomial Finset Coinv
 
 noncomputable section
 
-theorem CoinvAboveTopGeneral.proof (h1 : CoinvAboveTop.Statement) :
-    CoinvAboveTopGeneral.Statement := by
+theorem CoinvAboveTopGeneral.proof (h1 : CoinvAboveTop.Statement)
+    : CoinvAboveTopGeneral.Statement := by
   intro K _ _ β ι _ _ _ _ d H hH hd
   set eβ := Fintype.equivFin β
   set eι := Fintype.equivFin ι
   set ψ : β × ι ≃ Fin (Fintype.card β) × Fin (Fintype.card ι) := eβ.prodCongr eι with hψ
-  obtain ⟨Q', hQ'h, hQ'⟩ := h1 K (Fintype.card β) (Fintype.card ι) d (rename ψ H)
-    hH.rename_isHomogeneous hd
-  refine ⟨fun m b => rename ψ.symm (Q' m (eβ b)),
-    fun m b => (hQ'h m (eβ b)).rename_isHomogeneous, ?_⟩
+  obtain ⟨Q', hQ'h, hQ'⟩ :=
+    h1 K (Fintype.card β) (Fintype.card ι) d (rename ψ H) hH.rename_isHomogeneous hd
+  refine
+    ⟨fun m b => rename ψ.symm (Q' m (eβ b)), fun m b => (hQ'h m (eβ b)).rename_isHomogeneous, ?_⟩
   have hback : H = rename ψ.symm (rename ψ H) := by
     rw [rename_rename, Equiv.symm_comp_self, rename_id_apply]
   set_option synthInstance.maxHeartbeats 100000 in

@@ -6,13 +6,15 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.NotCompac
 
 @[expose] public section
 
-open Matrix Formalism.UG GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms GlobalTheory.RegSS
+open Matrix Formalism.UG GlobalTheory.IndefiniteRowSideFullHecke.CentralizerTensorForms
+  GlobalTheory.RegSS
 open scoped TensorProduct
 
 namespace GlobalTheory.RegSS
 
-theorem subtorusNotCentral_of (hU : UnitaryCommutant) (hL : SubtorusLaurent)
-    (hC : CharacterMonomial) : SubtorusNotCentral := by
+theorem subtorusNotCentral_of
+    (hU : UnitaryCommutant) (hL : SubtorusLaurent) (hC : CharacterMonomial)
+    : SubtorusNotCentral := by
   intro F E _ _ _ _ n _ _ σ J γ hreg hE s hs A
   by_contra hcon
   push Not at hcon
@@ -33,29 +35,37 @@ theorem subtorusNotCentral_of (hU : UnitaryCommutant) (hL : SubtorusLaurent)
       simp only [cT, Matrix.transpose_apply, Matrix.map_apply]
       exact (inclE_conj σ F _).symm
     have hdet : IsUnit (J.map (inclE (F := F) F)).det := isUnit_det_map _ hreg.nondeg
-    have hsc : ∀ t, (A.hom F t : Matrix n n (E ⊗[F] F)) =
-        ((A.hom F t : Matrix n n (E ⊗[F] F)) i i) • (1 : Matrix n n (E ⊗[F] F)) := by
+    have hsc
+        : ∀ t,
+          (A.hom F t : Matrix n n (E ⊗[F] F))
+            = ((A.hom F t : Matrix n n (E ⊗[F] F)) i i) • (1 : Matrix n n (E ⊗[F] F)) := by
       intro t
-      obtain ⟨c, hc⟩ := hU (E ⊗[F] F) hfield (sigR σ F) (sigR_sigR hreg.quad.invol F) n _ hH hdet
-        (A.hom F t : Matrix n n (E ⊗[F] F)) (fun g hg => congrArg Units.val (hcon g hg t))
-      rw [hc]; simp
+      obtain ⟨c, hc⟩ :=
+        hU (E ⊗[F] F) hfield (sigR σ F) (sigR_sigR hreg.quad.invol F) n _ hH hdet
+          (A.hom F t : Matrix n n (E ⊗[F] F)) (fun g hg => congrArg Units.val (hcon g hg t))
+      rw [hc]
+      simp
     letI := hfield.toField
-    let f : (Fin s → Fˣ) →* E ⊗[F] F :=
-      { toFun := fun t => (A.hom F t : Matrix n n (E ⊗[F] F)) i i
-        map_one' := by simp
-        map_mul' := fun a b => by
-          rw [map_mul, Units.val_mul, hsc a, smul_mul_assoc, one_mul]
-          simp }
+    let f : (Fin s → Fˣ) →* E ⊗[F] F := {
+      toFun := fun t => (A.hom F t : Matrix n n (E ⊗[F] F)) i i
+      map_one' := by simp
+      map_mul' := fun a b => by
+        rw [map_mul, Units.val_mul, hsc a, smul_mul_assoc, one_mul]
+        simp
+    }
     obtain ⟨S, C, hSC⟩ := hL F E n σ J γ s A
-    obtain ⟨a, ha⟩ := hC F (E ⊗[F] F) s f S (fun a => C a i i) (fun t => by
-      change (A.hom F t : Matrix n n (E ⊗[F] F)) i i = _
-      rw [hSC t, Matrix.sum_apply]
-      rfl)
-    have hfix : sigR σ F (f t₀) = f t₀ := by
-      rw [ha]; simp [sigR]
+    obtain ⟨a, ha⟩ :=
+      hC F (E ⊗[F] F) s f S
+        (fun a => C a i i)
+        (fun t => by
+          change (A.hom F t : Matrix n n (E ⊗[F] F)) i i = _
+          rw [hSC t, Matrix.sum_apply]
+          rfl)
+    have hfix : sigR σ F (f t₀) = f t₀ := by rw [ha]; simp [sigR]
     have hmem := (mem_UJ_iff_mul_adj (sigR σ F) hdet (A.hom F t₀)).1 (A.mem F t₀).1
-    have hadj : adj (sigR σ F) (J.map (inclE (F := F) F)) (A.hom F t₀ : Matrix n n (E ⊗[F] F)) =
-        (A.hom F t₀ : Matrix n n (E ⊗[F] F)) := by
+    have hadj
+        : adj (sigR σ F) (J.map (inclE (F := F) F)) (A.hom F t₀ : Matrix n n (E ⊗[F] F))
+          = (A.hom F t₀ : Matrix n n (E ⊗[F] F)) := by
       rw [hsc t₀, adj_smul, adj_one _ hdet]
       exact congrArg (· • (1 : Matrix n n (E ⊗[F] F))) hfix
     rw [hadj] at hmem

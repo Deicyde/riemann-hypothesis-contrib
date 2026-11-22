@@ -13,8 +13,8 @@ section Coprime
 
 variable {F : Type*} [Field F] (W : WeierstrassCurve F)
 
-theorem exists_equation_of_Ψ₂Sq_ne_zero [IsSepClosed F] {x : F} (hx : W.Ψ₂Sq.eval x ≠ 0) :
-    ∃ y, W.toAffine.Equation x y := by
+theorem exists_equation_of_Ψ₂Sq_ne_zero [IsSepClosed F] {x : F} (hx : W.Ψ₂Sq.eval x ≠ 0)
+    : ∃ y, W.toAffine.Equation x y := by
   set b := W.a₁ * x + W.a₃
   set c := x ^ 3 + W.a₂ * x ^ 2 + W.a₄ * x + W.a₆
   have hD : b ^ 2 + 4 * c = W.Ψ₂Sq.eval x := by
@@ -31,9 +31,10 @@ theorem exists_equation_of_Ψ₂Sq_ne_zero [IsSepClosed F] {x : F} (hx : W.Ψ₂
     refine ⟨C (-4 * (b ^ 2 + 4 * c)⁻¹), C (b ^ 2 + 4 * c)⁻¹ * (C 2 * X + C b), ?_⟩
     have e : (C 2 * X + C b) ^ 2 - 4 * q = C (b ^ 2 + 4 * c) := by
       simp only [q, map_add (f := _), map_pow, map_mul, map_ofNat]; ring
-    calc C (-4 * (b ^ 2 + 4 * c)⁻¹) * q + C (b ^ 2 + 4 * c)⁻¹ * (C 2 * X + C b) * (C 2 * X + C b)
-        = C (b ^ 2 + 4 * c)⁻¹ * ((C 2 * X + C b) ^ 2 - 4 * q) := by
-          simp only [map_mul, map_neg, map_ofNat]; ring
+    calc
+      C (-4 * (b ^ 2 + 4 * c)⁻¹) * q + C (b ^ 2 + 4 * c)⁻¹ * (C 2 * X + C b) * (C 2 * X + C b)
+          = C (b ^ 2 + 4 * c)⁻¹ * ((C 2 * X + C b) ^ 2 - 4 * q) := by
+        simp only [map_mul, map_neg, map_ofNat]; ring
       _ = 1 := by rw [e, ← C_mul, inv_mul_cancel₀ hD0, C_1]
   have hdeg : q.degree ≠ 0 := by
     have : q.natDegree = 2 := by simp only [q]; compute_degree!
@@ -64,11 +65,17 @@ theorem infinite_of_isSepClosed (k : Type*) [Field k] [IsSepClosed k] : Infinite
   have hdeg : p.natDegree = q := by
     simp only [p]
     rw [natDegree_sub_eq_left_of_natDegree_lt] <;> simp only [natDegree_X_pow]
-    calc (X + 1 : k[X]).natDegree ≤ 1 := by compute_degree
+    calc
+      (X + 1 : k[X]).natDegree
+        ≤ 1 := by compute_degree
       _ < q := hq1
-  obtain ⟨x, hx⟩ := IsSepClosed.exists_root p
-    (by rw [degree_eq_natDegree (fun h => by rw [h] at hdeg; simp at hdeg; omega), hdeg]; simp; omega)
-    hsep
+  obtain ⟨x, hx⟩ :=
+    IsSepClosed.exists_root p
+      (by
+        rw [degree_eq_natDegree (fun h => by rw [h] at hdeg; simp at hdeg; omega), hdeg]
+        simp
+        omega)
+      hsep
   simp only [IsRoot, p, eval_sub, eval_pow, eval_X, eval_add, eval_one] at hx
   rw [show x ^ q = x from FiniteField.pow_card x] at hx
   exact one_ne_zero (by linear_combination -hx : (1 : k) = 0)
@@ -90,8 +97,8 @@ theorem isCoprime_Φ_ΨSq (n : ℤ) : IsCoprime (W.Φ n) (W.ΨSq n) := by
     set b := W'.a₁ * a + W'.a₃
     set c := a ^ 3 + W'.a₂ * a ^ 2 + W'.a₄ * a + W'.a₆
     have hdeg : (X ^ 2 + C b * X - C c : K[X]).degree = 2 := by compute_degree!
-    obtain ⟨y, hy⟩ := IsAlgClosed.exists_root (X ^ 2 + C b * X - C c : K[X])
-      (by rw [hdeg]; exact two_ne_zero)
+    obtain ⟨y, hy⟩ :=
+      IsAlgClosed.exists_root (X ^ 2 + C b * X - C c : K[X]) (by rw [hdeg]; exact two_ne_zero)
     refine ⟨y, ?_⟩
     rw [equation_iff]
     simp only [IsRoot, eval_sub, eval_add, eval_mul, eval_pow, eval_C, eval_X, b, c] at hy
@@ -137,15 +144,14 @@ theorem Ψ₂Sq_ne_zero : W.Ψ₂Sq ≠ 0 := by
     have := congrArg (fun p : F[X] => p.coeff 0) h
     simp only [Ψ₂Sq, coeff_add, coeff_C_mul, coeff_X_pow, coeff_X, coeff_C, coeff_zero] at this
     simpa using this
-  have hΔ : W.Δ = 0 := by
-    rw [Δ, h2, h0]; linear_combination (-2 * W.b₄ ^ 3) * h3
+  have hΔ : W.Δ = 0 := by rw [Δ, h2, h0]; linear_combination (-2 * W.b₄ ^ 3) * h3
   exact W.isUnit_Δ.ne_zero hΔ
 
-
 omit [W.IsElliptic] in
-private theorem wronskian_coeff {n : ℤ} (hn : (n : F) ≠ 0) (h2 : 2 ≤ n.natAbs) :
-    (derivative (W.Φ n) * W.ΨSq n - W.Φ n * derivative (W.ΨSq n)).coeff
-      ((n.natAbs ^ 2 - 1) + (n.natAbs ^ 2 - 1)) = (n : F) ^ 2 := by
+private theorem wronskian_coeff {n : ℤ} (hn : (n : F) ≠ 0) (h2 : 2 ≤ n.natAbs)
+    : (derivative (W.Φ n) * W.ΨSq n - W.Φ n * derivative (W.ΨSq n)).coeff
+        ((n.natAbs ^ 2 - 1) + (n.natAbs ^ 2 - 1))
+      = (n : F) ^ 2 := by
   set m := n.natAbs ^ 2 - 1 with hm
   have h4 : 4 ≤ n.natAbs ^ 2 := by nlinarith
   have hm1 : n.natAbs ^ 2 = m + 1 := by omega
@@ -160,8 +166,7 @@ private theorem wronskian_coeff {n : ℤ} (hn : (n : F) ≠ 0) (h2 : 2 ≤ n.nat
   rw [coeff_sub, coeff_mul_add_eq_of_natDegree_le dΦ hΨ.le, coeff_derivative,
     show m + m = (m + 1) + (m - 1) by omega, coeff_mul_add_eq_of_natDegree_le hΦ.le dΨ,
     coeff_derivative, show m - 1 + 1 = m by omega, cΦ, cΨ]
-  have : ((m - 1 : ℕ) : F) + 1 = m := by
-    rw [Nat.cast_sub (by omega : 1 ≤ m)]; push_cast; ring
+  have : ((m - 1 : ℕ) : F) + 1 = m := by rw [Nat.cast_sub (by omega : 1 ≤ m)]; push_cast; ring
   rw [this]
   ring
 
@@ -169,11 +174,11 @@ end Count
 
 section Kernel
 
-variable {F : Type*} [Field F] [IsSepClosed F] [DecidableEq F] (W : WeierstrassCurve F)
-  [W.IsElliptic]
+variable
+  {F : Type*} [Field F] [IsSepClosed F] [DecidableEq F] (W : WeierstrassCurve F) [W.IsElliptic]
 
-theorem card_zsmul_eq_zero {n : ℤ} (hn : (n : F) ≠ 0) :
-    Nat.card {P : W.toAffine.Point // n • P = 0} = n.natAbs ^ 2 := by
+theorem card_zsmul_eq_zero {n : ℤ} (hn : (n : F) ≠ 0)
+    : Nat.card {P : W.toAffine.Point // n • P = 0} = n.natAbs ^ 2 := by
   classical
   have hn0 : n ≠ 0 := by rintro rfl; simp at hn
   rcases (by omega : n.natAbs = 1 ∨ 2 ≤ n.natAbs) with h1 | h2
@@ -186,7 +191,8 @@ theorem card_zsmul_eq_zero {n : ℤ} (hn : (n : F) ≠ 0) :
   have hcop := isCoprime_Φ_ΨSq W n
   set K := AlgebraicClosure F
   set ι := algebraMap F K
-  have hcopK := (Polynomial.isCoprime_iff_aeval_ne_zero_of_isAlgClosed F K (W.Φ n) (W.ΨSq n)).mp hcop
+  have hcopK :=
+    (Polynomial.isCoprime_iff_aeval_ne_zero_of_isAlgClosed F K (W.Φ n) (W.ΨSq n)).mp hcop
   have noCommon : ∀ x : F, (W.ΨSq n).eval x = 0 → (W.Φ n).eval x ≠ 0 := fun x h1 h2 => by
     obtain ⟨u, v, huv⟩ := hcop
     have := congrArg (eval x) huv
@@ -232,11 +238,13 @@ theorem card_zsmul_eq_zero {n : ℤ} (hn : (n : F) ≠ 0) :
   have hΨdeg : (W.ΨSq n).natDegree = n.natAbs ^ 2 - 1 := natDegree_ΨSq W hn
   have h4 : 4 ≤ n.natAbs ^ 2 := by nlinarith
   have hlt : (C t * W.ΨSq n).natDegree < (W.Φ n).natDegree := by
-    calc (C t * W.ΨSq n).natDegree ≤ (W.ΨSq n).natDegree := natDegree_C_mul_le _ _
+    calc
+      (C t * W.ΨSq n).natDegree
+        ≤ (W.ΨSq n).natDegree := natDegree_C_mul_le _ _
       _ < (W.Φ n).natDegree := by rw [hΦdeg, hΨdeg]; omega
-  have hGdeg : G.natDegree = n.natAbs ^ 2 := by rw [natDegree_sub_eq_left_of_natDegree_lt hlt, hΦdeg]
-  have hG0 : G ≠ 0 := by
-    intro h; rw [h, natDegree_zero] at hGdeg; omega
+  have hGdeg : G.natDegree = n.natAbs ^ 2 := by
+    rw [natDegree_sub_eq_left_of_natDegree_lt hlt, hΦdeg]
+  have hG0 : G ≠ 0 := by intro h; rw [h, natDegree_zero] at hGdeg; omega
   have hGsep : G.Separable := by
     rw [Polynomial.separable_def, Polynomial.isCoprime_iff_aeval_ne_zero_of_isAlgClosed F K]
     intro a
@@ -263,12 +271,14 @@ theorem card_zsmul_eq_zero {n : ℤ} (hn : (n : F) ≠ 0) :
     rw [Multiset.toFinset_card_of_nodup (nodup_roots hGsep), ← hGdeg]
     exact (splits_iff_card_roots.mp hsplit)
 
-  have root_facts : ∀ x ∈ G.roots.toFinset,
-      (W.ΨSq n).eval x ≠ 0 ∧ (W.Φ n).eval x / (W.ΨSq n).eval x = t ∧ W.Ψ₂Sq.eval x ≠ 0 := by
+  have root_facts
+      : ∀ x ∈ G.roots.toFinset,
+        (W.ΨSq n).eval x ≠ 0 ∧ (W.Φ n).eval x / (W.ΨSq n).eval x = t ∧ W.Ψ₂Sq.eval x ≠ 0 := by
     intro x hx
     rw [Multiset.mem_toFinset, mem_roots hG0, IsRoot] at hx
     simp only [G, eval_sub, eval_mul, eval_C] at hx
-    have hΨx : (W.ΨSq n).eval x ≠ 0 := fun h => noCommon x h (by rw [h, mul_zero, sub_zero] at hx; exact hx)
+    have hΨx : (W.ΨSq n).eval x ≠ 0 := fun h =>
+      noCommon x h (by rw [h, mul_zero, sub_zero] at hx; exact hx)
     have hq : (W.Φ n).eval x / (W.ΨSq n).eval x = t := by rw [div_eq_iff hΨx]; linear_combination hx
     refine ⟨hΨx, hq, fun h => ht ?_⟩
     refine Finset.mem_union_left _ (Finset.mem_image.mpr ⟨ι x, ?_, ?_⟩)
@@ -302,7 +312,7 @@ theorem card_zsmul_eq_zero {n : ℤ} (hn : (n : F) ≠ 0) :
     rw [← he] at hor
     rcases hor with hor | hor
     · exact ⟨_, hor, rfl⟩
-    · exact ⟨-Point.some x y h, by rw [zsmul_neg, hor, neg_neg], by rw [xOf_neg, xOf_some]⟩
+    · exact ⟨- Point.some x y h, by rw [zsmul_neg, hor, neg_neg], by rw [xOf_neg, xOf_some]⟩
 
   have hfib : Nat.card {Q : W.toAffine.Point // n • Q = R} = n.natAbs ^ 2 := by
     rw [← hcard, ← Nat.card_eq_finsetCard]
@@ -317,27 +327,28 @@ theorem card_zsmul_eq_zero {n : ℤ} (hn : (n : F) ≠ 0) :
       rw [← e1, ← e2] at hor
       rcases hor with hor | hor
       · exact Subtype.ext hor
-      · exfalso; apply hRR
+      · exfalso
+        apply hRR
         have : n • Q1 = -(n • Q2) := by rw [hor, zsmul_neg]
         rwa [hQ1, hQ2] at this
     · rintro ⟨x, hx⟩
       obtain ⟨Q, hQ, hxQ⟩ := root_fibre x hx
       exact ⟨⟨Q, hQ⟩, Subtype.ext hxQ⟩
-  obtain ⟨x0, hx0⟩ : G.roots.toFinset.Nonempty := by
-    rw [← Finset.card_pos, hcard]; positivity
+  obtain ⟨x0, hx0⟩ : G.roots.toFinset.Nonempty := by rw [← Finset.card_pos, hcard]; positivity
   obtain ⟨Q0, hQ0, -⟩ := root_fibre x0 hx0
   rw [← hfib]
-  exact Nat.card_congr
-    { toFun := fun P => ⟨P.1 + Q0, by rw [zsmul_add, P.2, hQ0, zero_add]⟩
-      invFun := fun Q => ⟨Q.1 - Q0, by rw [zsmul_sub, Q.2, hQ0, sub_self]⟩
-      left_inv := fun P => Subtype.ext (add_sub_cancel_right _ _)
-      right_inv := fun Q => Subtype.ext (sub_add_cancel _ _) }
-
+  exact Nat.card_congr {
+    toFun := fun P => ⟨P.1 + Q0, by rw [zsmul_add, P.2, hQ0, zero_add]⟩
+    invFun := fun Q => ⟨Q.1 - Q0, by rw [zsmul_sub, Q.2, hQ0, sub_self]⟩
+    left_inv := fun P => Subtype.ext (add_sub_cancel_right _ _)
+    right_inv := fun Q => Subtype.ext (sub_add_cancel _ _)
+  }
 
 omit [IsSepClosed F] [W.IsElliptic] in
-theorem zsmul_eq_zero_iff_ΨSq (n : ℤ) (P : W.toAffine.Point) :
-    n • P = 0 ↔ P = 0 ∨ ∃ (x y : F) (h : W.toAffine.Nonsingular x y),
-      P = .some x y h ∧ (W.ΨSq n).eval x = 0 := by
+theorem zsmul_eq_zero_iff_ΨSq (n : ℤ) (P : W.toAffine.Point)
+    : n • P = 0
+      ↔ P = 0
+        ∨ ∃ (x y : F) (h : W.toAffine.Nonsingular x y), P = .some x y h ∧ (W.ΨSq n).eval x = 0 := by
   cases P with
   | zero => rw [← Point.zero_def]; simp
   | some x y h =>

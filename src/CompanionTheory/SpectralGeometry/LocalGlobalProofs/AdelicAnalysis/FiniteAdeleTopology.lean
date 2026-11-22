@@ -24,7 +24,8 @@ theorem isOpen_Oh : IsOpen (Oh F) := by
     ⟨fun _ ↦ Valued.isOpen_valuationSubring _⟩
   exact RestrictedProduct.isOpen_forall_mem
     (R := fun v : HeightOneSpectrum (𝓞 F) => v.adicCompletion F)
-    (A := fun v => (v.adicCompletionIntegers F : Set (v.adicCompletion F))) Fact.out
+    (A := fun v => (v.adicCompletionIntegers F : Set (v.adicCompletion F)))
+    Fact.out
 
 theorem natCast_mul_mem_Oh (N : ℕ) {x : A F} (hx : x ∈ Oh F) : (N : A F) * x ∈ Oh F := by
   induction N with
@@ -45,8 +46,8 @@ theorem algebraMap_mem_Oh_iff (b : F) : algebraMap F (A F) b ∈ Oh F ↔ ∃ r 
   · rintro ⟨r, rfl⟩ v
     exact HeightOneSpectrum.coe_mem_adicCompletionIntegers v r
 
-theorem exists_mul_Oh_subset (U : Set (A F)) (hU : U ∈ 𝓝 (0 : A F)) :
-    ∃ N : ℕ, 0 < N ∧ ∀ x ∈ Oh F, (N : A F) * x ∈ U := by
+theorem exists_mul_Oh_subset (U : Set (A F)) (hU : U ∈ 𝓝 (0 : A F))
+    : ∃ N : ℕ, 0 < N ∧ ∀ x ∈ Oh F, (N : A F) * x ∈ U := by
   obtain ⟨h1, h2, h3, -⟩ := GlobalTheory.IntegralFinAdele.integral_finiteAdele_properties F
   let V : ℕ+ → Set (A F) := fun N => {a | ∃ c ∈ Oh F, a = ((N : ℕ) : A F) * c}
   have hV : Directed (· ⊇ ·) V := by
@@ -63,15 +64,16 @@ theorem exists_mul_Oh_subset (U : Set (A F)) (hU : U ∈ 𝓝 (0 : A F)) :
       simp only [V, Set.mem_setOf_eq, Set.mem_image, eq_comm]
     rw [this]
     exact (isCompact_Oh F).image (continuous_const.mul continuous_id)
-  obtain ⟨N, hN⟩ := exists_subset_nhds_of_isCompact' hV hc (fun N => h2 N N.pos) (U := U) (by
-    apply mem_nhdsSet_iff_forall.mpr
-    intro x hx
-    have : x = 0 := h3 x fun M hM => Set.mem_iInter.1 hx ⟨M, hM⟩
-    rwa [this])
+  obtain ⟨N, hN⟩ :=
+    exists_subset_nhds_of_isCompact' hV hc (fun N => h2 N N.pos) (U := U) (by
+      apply mem_nhdsSet_iff_forall.mpr
+      intro x hx
+      have : x = 0 := h3 x fun M hM => Set.mem_iInter.1 hx ⟨M, hM⟩
+      rwa [this])
   exact ⟨N, N.pos, fun x hx => hN ⟨x, hx, rfl⟩⟩
 
-theorem exists_mul_mem_Oh_of_isCompact (K : Set (A F)) (hK : IsCompact K) :
-    ∃ N : ℕ, 0 < N ∧ ∀ x ∈ K, (N : A F) * x ∈ Oh F := by
+theorem exists_mul_mem_Oh_of_isCompact (K : Set (A F)) (hK : IsCompact K)
+    : ∃ N : ℕ, 0 < N ∧ ∀ x ∈ K, (N : A F) * x ∈ Oh F := by
   let V : ℕ+ → Set (A F) := fun N => {a | ((N : ℕ) : A F) * a ∈ Oh F}
   have hV : Directed (· ⊆ ·) V := by
     intro M N
@@ -79,24 +81,29 @@ theorem exists_mul_mem_Oh_of_isCompact (K : Set (A F)) (hK : IsCompact K) :
     · have := natCast_mul_mem_Oh F N ha
       show (((M * N : ℕ+) : ℕ) : A F) * a ∈ Oh F
       convert this using 1
-      push_cast; ring
+      push_cast
+      ring
     · have := natCast_mul_mem_Oh F M ha
       show (((M * N : ℕ+) : ℕ) : A F) * a ∈ Oh F
       convert this using 1
-      push_cast; ring
-  obtain ⟨N, hN⟩ := hK.elim_directed_cover V
-    (fun N => (isOpen_Oh F).preimage (continuous_const.mul continuous_id)) (fun a _ => by
-      obtain ⟨M, hM, h⟩ := (GlobalTheory.IntegralFinAdele.integral_finiteAdele_properties F).2.2.2.2.1 a
-      exact Set.mem_iUnion.2 ⟨⟨M, hM⟩, h⟩) hV
+      push_cast
+      ring
+  obtain ⟨N, hN⟩ :=
+    hK.elim_directed_cover V
+      (fun N => (isOpen_Oh F).preimage (continuous_const.mul continuous_id))
+      (fun a _ => by
+        obtain ⟨M, hM, h⟩ :=
+          (GlobalTheory.IntegralFinAdele.integral_finiteAdele_properties F).2.2.2.2.1 a
+        exact Set.mem_iUnion.2 ⟨⟨M, hM⟩, h⟩)
+      hV
   exact ⟨N, N.pos, fun x hx => hN hx⟩
 
-theorem isOpen_mul_Oh (N : ℕ) (hN : 0 < N) :
-    IsOpen {x : A F | ∃ y ∈ Oh F, x = (N : A F) * y} := by
+theorem isOpen_mul_Oh (N : ℕ) (hN : 0 < N) : IsOpen {x : A F | ∃ y ∈ Oh F, x = (N : A F) * y} := by
   have hN' : (N : F) ≠ 0 := Nat.cast_ne_zero.2 hN.ne'
   have h1 : (N : A F) * algebraMap F (A F) (N : F)⁻¹ = 1 := by
     rw [← map_natCast (algebraMap F (A F)), ← map_mul, mul_inv_cancel₀ hN', map_one]
-  have : {x : A F | ∃ y ∈ Oh F, x = (N : A F) * y} =
-      (fun x => algebraMap F (A F) (N : F)⁻¹ * x) ⁻¹' Oh F := by
+  have : {x : A F | ∃ y ∈ Oh F, x = (N : A F) * y}
+      = (fun x => algebraMap F (A F) (N : F)⁻¹ * x) ⁻¹' Oh F := by
     ext x
     constructor
     · rintro ⟨y, hy, rfl⟩
@@ -123,10 +130,24 @@ theorem denseRange_algebraMap : DenseRange (algebraMap F (A F)) := by
     exact hy
   rwa [h3] at h2
 
-theorem finiteAdele_topology : ∀ (F : Type) [Field F] [NumberField F], LocallyCompactSpace (A F) ∧ SecondCountableTopology (A F) ∧ T2Space (A F) ∧ IsCompact (Oh F) ∧ IsOpen (Oh F) ∧ DenseRange (algebraMap F (A F)) ∧ (∀ b : F, algebraMap F (A F) b ∈ Oh F ↔ ∃ r : 𝓞 F, (r : F) = b) ∧ (∀ U ∈ 𝓝 (0 : A F), ∃ N : ℕ, 0 < N ∧ ∀ x ∈ Oh F, (N : A F) * x ∈ U) ∧ (∀ K : Set (A F), IsCompact K → ∃ N : ℕ, 0 < N ∧ ∀ x ∈ K, (N : A F) * x ∈ Oh F) ∧ ∀ N : ℕ, 0 < N → IsOpen {x : A F | ∃ y ∈ Oh F, x = (N : A F) * y} :=
-  fun F _ _ => ⟨GlobalTheory.AdelicUnitaryTop.locallyCompact_finiteAdele F,
-    GlobalTheory.AdelicUnitaryTop.secondCountable_finiteAdele F, GlobalTheory.AdelicUnitaryTop.t2Space_finiteAdeleRing_of_numberField F,
-    isCompact_Oh F, isOpen_Oh F, denseRange_algebraMap F, algebraMap_mem_Oh_iff F,
-    exists_mul_Oh_subset F, exists_mul_mem_Oh_of_isCompact F, isOpen_mul_Oh F⟩
+theorem finiteAdele_topology
+    : ∀ (F : Type) [Field F] [NumberField F],
+      LocallyCompactSpace (A F) ∧ SecondCountableTopology (A F) ∧ T2Space (A F) ∧ IsCompact (Oh F)
+        ∧ IsOpen (Oh F) ∧ DenseRange (algebraMap F (A F))
+        ∧ (∀ b : F, algebraMap F (A F) b ∈ Oh F ↔ ∃ r : 𝓞 F, (r : F) = b)
+        ∧ (∀ U ∈ 𝓝 (0 : A F), ∃ N : ℕ, 0 < N ∧ ∀ x ∈ Oh F, (N : A F) * x ∈ U)
+        ∧ (∀ K : Set (A F), IsCompact K → ∃ N : ℕ, 0 < N ∧ ∀ x ∈ K, (N : A F) * x ∈ Oh F)
+        ∧ ∀ N : ℕ, 0 < N → IsOpen {x : A F | ∃ y ∈ Oh F, x = (N : A F) * y} := fun F _ _ => ⟨
+  GlobalTheory.AdelicUnitaryTop.locallyCompact_finiteAdele F,
+  GlobalTheory.AdelicUnitaryTop.secondCountable_finiteAdele F,
+  GlobalTheory.AdelicUnitaryTop.t2Space_finiteAdeleRing_of_numberField F,
+  isCompact_Oh F,
+  isOpen_Oh F,
+  denseRange_algebraMap F,
+  algebraMap_mem_Oh_iff F,
+  exists_mul_Oh_subset F,
+  exists_mul_mem_Oh_of_isCompact F,
+  isOpen_mul_Oh F
+⟩
 
 end GlobalTheory.CompanionTheory.SW.Core.AfTop

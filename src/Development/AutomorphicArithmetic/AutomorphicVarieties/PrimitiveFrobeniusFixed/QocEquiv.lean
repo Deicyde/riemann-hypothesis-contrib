@@ -5,13 +5,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick UpperTheory.V.ML
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick
+  UpperTheory.V.ML
 open scoped nonZeroDivisors Pointwise TensorProduct
 
 section
 
-variable (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O]
-  [Module.Finite ℤ_[l] O]
+variable
+  (l : ℕ) [Fact l.Prime]
+  (O : Type)
+  [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O]
 
 private theorem qoc_inj : Function.Injective (algebraMap ℤ_[l] O) := by
   have hl : (l : O) ≠ 0 := by
@@ -23,8 +27,9 @@ private theorem qoc_inj : Function.Injective (algebraMap ℤ_[l] O) := by
       | tmul o q =>
         obtain ⟨r, rfl⟩ := Submodule.Quotient.mk_surjective _ q
         have hlq : (l : ℚ_[l]) ≠ 0 := by exact_mod_cast (Fact.out : l.Prime).ne_zero
-        have hr : (Submodule.Quotient.mk r : ℚ_[l] ⧸ ZlSub l) =
-            (l : ℤ_[l]) • Submodule.Quotient.mk (r / l) := by
+        have hr
+            : (Submodule.Quotient.mk r : ℚ_[l] ⧸ ZlSub l)
+              = (l : ℤ_[l]) • Submodule.Quotient.mk (r / l) := by
           rw [← Submodule.Quotient.mk_smul]
           congr 1
           rw [Algebra.smul_def, map_natCast, mul_div_cancel₀ _ hlq]
@@ -36,7 +41,8 @@ private theorem qoc_inj : Function.Injective (algebraMap ℤ_[l] O) := by
     have h4 := (UpperTheory.V.Base.qoFacts l O).2.2.2 ϖ
     rw [IsDiscreteValuationRing.addVal_uniformizer hϖ, Module.length_eq_zero] at h4
     exact zero_ne_one h4
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro x hx
   by_contra hne
   rw [PadicInt.unitCoeff_spec hne, map_mul, map_pow, map_natCast] at hx
@@ -95,9 +101,9 @@ private theorem qoc_ex (a : O) (ha : a ≠ 0) : ∃ w : QO l O, ∀ y : O, y •
   rw [hC y]
   exact ⟨fun h => hac.trans h, fun h => hca.trans h⟩
 
-private theorem length_quotient_span_eq_addVal' {R : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
-    (a : R) (ha : a ≠ 0) :
-    Module.length R (R ⧸ Ideal.span {a}) = IsDiscreteValuationRing.addVal R a := by
+private theorem length_quotient_span_eq_addVal'
+    {R : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] (a : R) (ha : a ≠ 0)
+    : Module.length R (R ⧸ Ideal.span {a}) = IsDiscreteValuationRing.addVal R a := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible R
   obtain ⟨n, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible ha hϖ
   rw [Ideal.span_singleton_mul_left_unit u.isUnit, ← Ideal.span_singleton_pow, ← hϖ.maximalIdeal_eq,
@@ -105,8 +111,12 @@ private theorem length_quotient_span_eq_addVal' {R : Type} [CommRing R] [IsDomai
     IsDiscreteValuationRing.addVal_eq_zero_iff.mpr u.isUnit, zero_add,
     IsDiscreteValuationRing.addVal_pow, IsDiscreteValuationRing.addVal_uniformizer hϖ, nsmul_one]
 
-private theorem qoc_gen (a : O) (w : QO l O) (ha : a ≠ 0) (h : ∀ y : O, y • w = 0 ↔ a ∣ y) (w' : QO l O)
-    (h' : a • w' = 0) : ∃ y : O, w' = y • w := by
+private theorem qoc_gen
+    (a : O)
+    (w : QO l O)
+    (ha : a ≠ 0) (h : ∀ y : O, y • w = 0 ↔ a ∣ y)
+    (w' : QO l O) (h' : a • w' = 0)
+    : ∃ y : O, w' = y • w := by
   set T := LinearMap.ker (a • LinearMap.id : QO l O →ₗ[O] QO l O) with hT
   have hTlen : Module.length O T = IsDiscreteValuationRing.addVal O a :=
     (UpperTheory.V.Base.qoFacts l O).2.2.2 a
@@ -120,7 +130,8 @@ private theorem qoc_gen (a : O) (w : QO l O) (ha : a ≠ 0) (h : ∀ y : O, y �
     rw [LinearMap.mem_ker, Ideal.mem_span_singleton, ← h y]
     simp [g, Subtype.ext_iff]
   have hrange : Module.length O (LinearMap.range g) = Module.length O T := by
-    rw [← (LinearMap.quotKerEquivRange g).length_eq, hker, length_quotient_span_eq_addVal' a ha, hTlen]
+    rw [← (LinearMap.quotKerEquivRange g).length_eq, hker, length_quotient_span_eq_addVal' a ha,
+      hTlen]
   have htop : LinearMap.range g = ⊤ := by
     have hfl : IsFiniteLength O T := Module.length_ne_top_iff.mp hfin
     haveI := (isFiniteLength_iff_isNoetherian_isArtinian.mp hfl).1
@@ -138,18 +149,25 @@ private theorem qoc_gen (a : O) (w : QO l O) (ha : a ≠ 0) (h : ∀ y : O, y �
 
 end
 
-theorem UpperTheory.V.ML.qoCyc :
-    ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O],
-    (∀ w : QO l O, ∃ a : O, a ≠ 0 ∧ ∀ y : O, y • w = 0 ↔ a ∣ y) ∧ (∀ a : O, a ≠ 0 → ∃ w : QO l O, ∀ y : O, y • w = 0 ↔ a ∣ y) ∧
-    (∀ (a : O) (w : QO l O), a ≠ 0 → (∀ y : O, y • w = 0 ↔ a ∣ y) → ∀ w' : QO l O, a • w' = 0 → ∃ y : O, w' = y • w) ∧
-    (∀ w w' : QO l O, (∃ y : O, w' = y • w) ∨ ∃ y : O, w = y • w') ∧
-    ∀ (V : Type) [AddCommGroup V] [Module O V] (f : V →ₗ[O] QO l O) (y : O), (∀ v, y • f v = 0) → Module.length O V ≤ Module.length O (LinearMap.ker f) + IsDiscreteValuationRing.addVal O y := by
+theorem UpperTheory.V.ML.qoCyc
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O],
+      (∀ w : QO l O, ∃ a : O, a ≠ 0 ∧ ∀ y : O, y • w = 0 ↔ a ∣ y)
+        ∧ (∀ a : O, a ≠ 0 → ∃ w : QO l O, ∀ y : O, y • w = 0 ↔ a ∣ y)
+        ∧ (∀ (a : O) (w : QO l O),
+          a ≠ 0 → (∀ y : O, y • w = 0 ↔ a ∣ y) → ∀ w' : QO l O, a • w' = 0 → ∃ y : O, w' = y • w)
+        ∧ (∀ w w' : QO l O, (∃ y : O, w' = y • w) ∨ ∃ y : O, w = y • w')
+        ∧ ∀ (V : Type) [AddCommGroup V] [Module O V] (f : V →ₗ[O] QO l O) (y : O),
+          (∀ v, y • f v = 0)
+            → Module.length O V
+              ≤ Module.length O (LinearMap.ker f) + IsDiscreteValuationRing.addVal O y := by
   intro l _ O _ _ _ _ _
   refine ⟨qoc_ann l O, qoc_ex l O, fun a w ha h w' h' => qoc_gen l O a w ha h w' h', ?_, ?_⟩
   · intro w w'
     obtain ⟨a, ha, hA⟩ := qoc_ann l O w
     obtain ⟨b, hb, hB⟩ := qoc_ann l O w'
-    rcases le_total (IsDiscreteValuationRing.addVal O a) (IsDiscreteValuationRing.addVal O b) with hab | hab
+    rcases le_total (IsDiscreteValuationRing.addVal O a) (IsDiscreteValuationRing.addVal O b) with
+      hab | hab
     · rw [IsDiscreteValuationRing.addVal_le_iff_dvd] at hab
       right
       exact qoc_gen l O b w' hb hB w ((hA b).mpr hab)
@@ -161,7 +179,8 @@ theorem UpperTheory.V.ML.qoCyc :
       rintro _ ⟨v, rfl⟩
       simp [hy v]
     rw [Module.length_eq_add_of_exact (LinearMap.ker f).subtype (LinearMap.ker f).mkQ
-      (Submodule.subtype_injective _) (Submodule.mkQ_surjective _) (LinearMap.exact_subtype_mkQ _),
+        (Submodule.subtype_injective _) (Submodule.mkQ_surjective _)
+        (LinearMap.exact_subtype_mkQ _),
       (LinearMap.quotKerEquivRange f).length_eq, ← (UpperTheory.V.Base.qoFacts l O).2.2.2 y]
     exact add_le_add le_rfl
       (Module.length_le_of_injective (Submodule.inclusion hle) (Submodule.inclusion_injective hle))

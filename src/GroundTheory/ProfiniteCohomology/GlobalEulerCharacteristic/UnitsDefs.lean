@@ -11,8 +11,8 @@ namespace GroundTheory.ProfCoh
 
 open NumberField IsDedekindDomain
 
-abbrev repAction {G M : Type*} [Group G] [AddCommGroup M] (ρ : Representation ℤ G M) :
-    DistribMulAction G M where
+abbrev repAction {G M : Type*} [Group G] [AddCommGroup M] (ρ : Representation ℤ G M)
+    : DistribMulAction G M where
   smul g x := ρ g x
   one_smul x := by
     change ρ 1 x = x
@@ -25,9 +25,9 @@ abbrev repAction {G M : Type*} [Group G] [AddCommGroup M] (ρ : Representation �
 
 variable {K L : Type*} [Field K] [Field L] [NumberField L] [Algebra K L]
 
-noncomputable abbrev sUnitAction (S : Set (HeightOneSpectrum (𝓞 L)))
-    (hS : ∀ (g : L ≃ₐ[K] L), ∀ w ∈ S, g • w ∈ S) :
-    DistribMulAction (L ≃ₐ[K] L) (Additive (S.unit L)) :=
+noncomputable abbrev sUnitAction
+    (S : Set (HeightOneSpectrum (𝓞 L))) (hS : ∀ (g : L ≃ₐ[K] L), ∀ w ∈ S, g • w ∈ S)
+    : DistribMulAction (L ≃ₐ[K] L) (Additive (S.unit L)) :=
   repAction (GroundTheory.Global.sUnitRep S hS)
 
 end GroundTheory.ProfCoh

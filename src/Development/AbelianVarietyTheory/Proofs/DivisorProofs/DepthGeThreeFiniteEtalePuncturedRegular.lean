@@ -39,19 +39,35 @@ lemma two_le_of_add_one {x y : WithBot ℕ∞} (h : x + 1 = y) (hy : 3 ≤ y) : 
         exact_mod_cast (by omega : 2 ≤ m)
     exact WithBot.coe_le_coe.mpr this
 
-theorem depth_three : ∀ (R : Type) [CommRing R] [IsRegularLocalRing R], IsAdicComplete (maximalIdeal R) R → 3 ≤ ringKrullDim R → ∀ f ∈ maximalIdeal R, f ∉ maximalIdeal R ^ 2 → ∀ [IsLocalRing (R ⧸ Ideal.span {f})], GlobalTheory.PurityFree (R ⧸ Ideal.span {f}) → ∀ (A : Type) [CommRing A] [Algebra R A] [Module.Finite R A], ReciprocityTheory.CA.ModDepthGE R A 2 → (∀ (p : Ideal R) [p.IsPrime], p ≠ maximalIdeal R → Algebra.Etale (Localization.AtPrime p) (TensorProduct R (Localization.AtPrime p) A)) → ReciprocityTheory.CA.ModDepthGE R A 3 := by
+theorem depth_three
+    : ∀ (R : Type) [CommRing R] [IsRegularLocalRing R],
+      IsAdicComplete (maximalIdeal R) R → 3 ≤ ringKrullDim R
+        → ∀ f ∈ maximalIdeal R,
+          f ∉ maximalIdeal R ^ 2
+            → ∀ [IsLocalRing (R ⧸ Ideal.span {f})],
+              GlobalTheory.PurityFree (R ⧸ Ideal.span {f})
+                → ∀ (A : Type) [CommRing A] [Algebra R A] [Module.Finite R A],
+                  ReciprocityTheory.CA.ModDepthGE R A 2
+                    → (∀ (p : Ideal R) [p.IsPrime],
+                      p ≠ maximalIdeal R
+                        → Algebra.Etale (Localization.AtPrime p)
+                          (TensorProduct R (Localization.AtPrime p) A))
+                    → ReciprocityTheory.CA.ModDepthGE R A 3 := by
   intro R _ _ hcomp hdim f hf hf2 _ hpur A _ _ _ hdep hEt
   have hf0 : f ≠ 0 := by
     rintro rfl
     exact hf2 (Ideal.zero_mem _)
   haveI : IsDomain R := ReciprocityTheory.CA.AB.RegA.IsRegularLocalRing.isDomain R
   have hreg : IsSMulRegular A f :=
-    GlobalTheory.T.isSMulRegular_of_etale_punctured_of_depth_pos' R A (ReciprocityTheory.CA.ModDepthGE.mono (by norm_num) hdep) hEt f hf0
+    GlobalTheory.T.isSMulRegular_of_etale_punctured_of_depth_pos' R A
+      (ReciprocityTheory.CA.ModDepthGE.mono (by norm_num) hdep) hEt f hf0
   haveI hRb : IsRegularLocalRing (R ⧸ Ideal.span {f}) :=
     ReciprocityTheory.CA.AB.RegA.IsRegularLocalRing.quotient_span_singleton hf hf2
   have hdimb : 2 ≤ ringKrullDim (R ⧸ Ideal.span {f}) :=
     two_le_of_add_one
-      (ReciprocityTheory.CA.AB.RegA.IsRegularLocalRing.ringKrullDim_quotient_span_singleton_add_one hf hf2) hdim
+      (ReciprocityTheory.CA.AB.RegA.IsRegularLocalRing.ringKrullDim_quotient_span_singleton_add_one
+        hf hf2)
+      hdim
   haveI : Module.Finite R (A ⧸ (Ideal.span {f}).map (algebraMap R A)) :=
     Module.Finite.of_surjective (Ideal.Quotient.mkₐ R ((Ideal.span {f}).map (algebraMap R A))).toLinearMap
       Ideal.Quotient.mk_surjective
@@ -59,9 +75,11 @@ theorem depth_three : ∀ (R : Type) [CommRing R] [IsRegularLocalRing R], IsAdic
     Module.Finite.of_restrictScalars_finite R _ _
   have hdepb := GlobalTheory.modDepthGE_quotient_map_span_singleton R A f hf hreg 1 hdep
   have hEtb := GlobalTheory.T.etale_quotient_of_etale_punctured' R A f hEt
-  obtain ⟨A', _, _, hA'fin, ι, hι, hdep', hEt', k, hk⟩ := GlobalTheory.T.exists_finite_depth_two_hull_of_etale_punctured_spectrum _ hdimb _ hdepb hEtb
+  obtain ⟨A', _, _, hA'fin, ι, hι, hdep', hEt', k, hk⟩ :=
+    GlobalTheory.T.exists_finite_depth_two_hull_of_etale_punctured_spectrum _ hdimb _ hdepb hEtb
   have hfree : Module.Free (R ⧸ Ideal.span {f}) A' := hpur A' hdep' hEt'
-  obtain ⟨_, _⟩ := GlobalTheory.isDomain_and_isIntegrallyClosed_of_isRegularLocalRing (R ⧸ Ideal.span {f})
+  obtain ⟨_, _⟩ :=
+    GlobalTheory.isDomain_and_isIntegrallyClosed_of_isRegularLocalRing (R ⧸ Ideal.span {f})
   have hnf : ¬ IsField (R ⧸ Ideal.span {f}) := by
     intro hF
     have := ringKrullDim_eq_zero_of_isField hF
@@ -74,35 +92,42 @@ theorem depth_three : ∀ (R : Type) [CommRing R] [IsRegularLocalRing R], IsAdic
     rw [hp] at h1
     rw [← h1] at hdimb
     exact absurd hdimb (by decide)
-  obtain ⟨B, _, _, hBfin, hBfree, hBet, ⟨e⟩⟩ := GlobalTheory.T.exists_finite_free_etale_lift_of_quotient_etale R hcomp f hf A'
-  let φ : A →ₐ[R] B ⧸ (Ideal.span {f}).map (algebraMap R B) :=
-    { toRingHom := e.symm.toRingHom.comp (ι.toRingHom.comp (Ideal.Quotient.mk _))
-      commutes' := fun r => by
-        have h1 : (Ideal.Quotient.mk ((Ideal.span {f}).map (algebraMap R A)) (algebraMap R A r)) =
-            algebraMap (R ⧸ Ideal.span {f}) _ (algebraMap R (R ⧸ Ideal.span {f}) r) := by
-          rw [← IsScalarTower.algebraMap_apply]; rfl
-        show e.symm (ι (Ideal.Quotient.mk _ (algebraMap R A r))) = _
-        rw [h1, ι.commutes, e.symm.commutes, ← IsScalarTower.algebraMap_apply] }
+  obtain ⟨B, _, _, hBfin, hBfree, hBet, ⟨e⟩⟩ :=
+    GlobalTheory.T.exists_finite_free_etale_lift_of_quotient_etale R hcomp f hf A'
+  let φ : A →ₐ[R] B ⧸ (Ideal.span {f}).map (algebraMap R B) := {
+    toRingHom := e.symm.toRingHom.comp (ι.toRingHom.comp (Ideal.Quotient.mk _))
+    commutes' := fun r => by
+      have h1
+          : (Ideal.Quotient.mk ((Ideal.span {f}).map (algebraMap R A)) (algebraMap R A r))
+            = algebraMap (R ⧸ Ideal.span {f}) _ (algebraMap R (R ⧸ Ideal.span {f}) r) := by
+        rw [← IsScalarTower.algebraMap_apply]; rfl
+      show e.symm (ι (Ideal.Quotient.mk _ (algebraMap R A r))) = _
+      rw [h1, ι.commutes, e.symm.commutes, ← IsScalarTower.algebraMap_apply]
+  }
   have hφ : ∀ a, φ a = e.symm (ι (Ideal.Quotient.mk _ a)) := fun a => rfl
-  obtain ⟨ψ, hψ⟩ := GlobalTheory.T.exists_lift_algHom_of_etale_punctured R hcomp hdim f hf hf0 A hEt B φ
-  have hψa : ∀ a, Ideal.Quotient.mk _ (ψ a) = φ a := fun a => by
-    rw [← hψ]; rfl
+  obtain ⟨ψ, hψ⟩ :=
+    GlobalTheory.T.exists_lift_algHom_of_etale_punctured R hcomp hdim f hf hf0 A hEt B φ
+  have hψa : ∀ a, Ideal.Quotient.mk _ (ψ a) = φ a := fun a => by rw [← hψ]; rfl
   have hBreg : IsSMulRegular B f := fun x y h => smul_right_injective B hf0 h
-  have hsat : ∀ a : A, ψ a ∈ (Ideal.span {f}).map (algebraMap R B) →
-      a ∈ (Ideal.span {f}).map (algebraMap R A) := by
+  have hsat
+      : ∀ a : A,
+        ψ a ∈ (Ideal.span {f}).map (algebraMap R B)
+          → a ∈ (Ideal.span {f}).map (algebraMap R A) := by
     intro a ha
-    have h1 : φ a = 0 := by
-      rw [← hψa]; exact Ideal.Quotient.eq_zero_iff_mem.mpr ha
+    have h1 : φ a = 0 := by rw [← hψa]; exact Ideal.Quotient.eq_zero_iff_mem.mpr ha
     rw [hφ] at h1
-    have h2 : ι (Ideal.Quotient.mk _ a) = 0 := by
-      simpa using h1
+    have h2 : ι (Ideal.Quotient.mk _ a) = 0 := by simpa using h1
     have h3 : Ideal.Quotient.mk ((Ideal.span {f}).map (algebraMap R A)) a = 0 :=
       hι (by rw [h2, map_zero])
     exact Ideal.Quotient.eq_zero_iff_mem.mp h3
-  obtain ⟨hinj, hfsat⟩ := GlobalTheory.T.injective_and_saturated_of_injective_mod_regular' R A B f hf hBreg ψ hsat
-  have hmap : (maximalIdeal R).map (Ideal.Quotient.mk (Ideal.span {f})) ≤ maximalIdeal (R ⧸ Ideal.span {f}) := by
+  obtain ⟨hinj, hfsat⟩ :=
+    GlobalTheory.T.injective_and_saturated_of_injective_mod_regular' R A B f hf hBreg ψ hsat
+  have hmap
+      : (maximalIdeal R).map (Ideal.Quotient.mk (Ideal.span {f}))
+        ≤ maximalIdeal (R ⧸ Ideal.span {f}) := by
     rw [Ideal.map_le_iff_le_comap]
-    have : (maximalIdeal (R ⧸ Ideal.span {f})).comap (Ideal.Quotient.mk (Ideal.span {f})) = maximalIdeal R := by
+    have : (maximalIdeal (R ⧸ Ideal.span {f})).comap (Ideal.Quotient.mk (Ideal.span {f}))
+        = maximalIdeal R := by
       haveI := Ideal.comap_isMaximal_of_surjective (Ideal.Quotient.mk (Ideal.span {f}))
         Ideal.Quotient.mk_surjective (K := maximalIdeal (R ⧸ Ideal.span {f}))
       exact IsLocalRing.eq_maximalIdeal this
@@ -112,7 +137,8 @@ theorem depth_three : ∀ (R : Type) [CommRing R] [IsRegularLocalRing R], IsAdic
     rw [Ideal.map_span, Set.image_singleton, Ideal.mem_span_singleton'] at hz
     obtain ⟨c, hc⟩ := hz
     exact ⟨c, by rw [Algebra.smul_def, ← hc, mul_comm]⟩
-  have hcok : ∃ k : ℕ, ∀ x ∈ maximalIdeal R ^ k, ∀ b : B, ∃ a : A, ∃ c : B, x • b = ψ a + f • c := by
+  have hcok
+      : ∃ k : ℕ, ∀ x ∈ maximalIdeal R ^ k, ∀ b : B, ∃ a : A, ∃ c : B, x • b = ψ a + f • c := by
     refine ⟨k, fun x hx b => ?_⟩
     have hx' : Ideal.Quotient.mk (Ideal.span {f}) x ∈ maximalIdeal (R ⧸ Ideal.span {f}) ^ k := by
       have := Ideal.mem_map_of_mem (Ideal.Quotient.mk (Ideal.span {f})) hx
@@ -124,10 +150,16 @@ theorem depth_three : ∀ (R : Type) [CommRing R] [IsRegularLocalRing R], IsAdic
     have h1 : Ideal.Quotient.mk ((Ideal.span {f}).map (algebraMap R B)) (x • b - ψ a) = 0 := by
       rw [map_sub, hψa, hφ]
       change Ideal.Quotient.mk _ (x • b) - e.symm (ι (Ideal.Quotient.mk _ a)) = 0
-      have habar' : ι (Ideal.Quotient.mk _ a) = Ideal.Quotient.mk (Ideal.span {f}) x • e (Ideal.Quotient.mk _ b) := habar
-      have h2 : ∀ z, e.symm (Ideal.Quotient.mk (Ideal.span {f}) x • e z) =
-          Ideal.Quotient.mk (Ideal.span {f}) x • z := fun z => by
-        rw [Algebra.smul_def, map_mul, AlgEquiv.commutes, AlgEquiv.symm_apply_apply, ← Algebra.smul_def]
+      have habar'
+          : ι (Ideal.Quotient.mk _ a)
+            = Ideal.Quotient.mk (Ideal.span {f}) x • e (Ideal.Quotient.mk _ b) :=
+        habar
+      have h2
+          : ∀ z,
+            e.symm (Ideal.Quotient.mk (Ideal.span {f}) x • e z)
+              = Ideal.Quotient.mk (Ideal.span {f}) x • z := fun z => by
+        rw [Algebra.smul_def, map_mul, AlgEquiv.commutes, AlgEquiv.symm_apply_apply,
+          ← Algebra.smul_def]
       rw [habar', h2]
       change Ideal.Quotient.mkₐ R _ (x • b) - _ = 0
       rw [map_smul, ← algebraMap_smul (R ⧸ Ideal.span {f}) x, Ideal.Quotient.algebraMap_eq]
@@ -135,11 +167,15 @@ theorem depth_three : ∀ (R : Type) [CommRing R] [IsRegularLocalRing R], IsAdic
     obtain ⟨c, hc⟩ := hspan _ (Ideal.Quotient.eq_zero_iff_mem.mp h1)
     exact ⟨c, by rw [← hc]; abel⟩
   have hdim1 : 1 ≤ ringKrullDim (R ⧸ Ideal.span {f}) := le_trans (by decide) hdimb
-  obtain ⟨s, hs0, hs⟩ := GlobalTheory.T.cokernel_torsion_of_finiteLength_mod_element R f hdim1 A B ψ hcok
-  have hEtB : ∀ (p : Ideal R) [p.IsPrime], p ≠ maximalIdeal R →
-      Algebra.Etale (Localization.AtPrime p) (TensorProduct R (Localization.AtPrime p) B) :=
+  obtain ⟨s, hs0, hs⟩ :=
+    GlobalTheory.T.cokernel_torsion_of_finiteLength_mod_element R f hdim1 A B ψ hcok
+  have hEtB
+      : ∀ (p : Ideal R) [p.IsPrime],
+        p ≠ maximalIdeal R
+          → Algebra.Etale (Localization.AtPrime p) (TensorProduct R (Localization.AtPrime p) B) :=
     fun p _ _ => inferInstance
-  obtain ⟨k2, hk2⟩ := GlobalTheory.T.finiteLength_coker_of_etale_punctured_spectrum R A B hEt hEtB ψ hinj ⟨s, hs0, hs⟩
+  obtain ⟨k2, hk2⟩ :=
+    GlobalTheory.T.finiteLength_coker_of_etale_punctured_spectrum R A B hEt hEtB ψ hinj ⟨s, hs0, hs⟩
   have hdesc : ∀ (n : ℕ) (b : B), f ^ n • b ∈ ψ.range → b ∈ ψ.range := by
     intro n
     induction n with

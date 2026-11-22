@@ -28,7 +28,8 @@ theorem intAt_iff_val (P : HeightOneSpectrum (𝓞 E)) (a : E) : IntAt P a ↔ P
     obtain ⟨n, d, hnd⟩ := P.exists_primeCompl_mul_eq_of_integer a h
     exact ⟨n, d, d.2, by rw [mul_comm]; exact hnd⟩
 
-theorem le_exp_neg_one_of_lt_one {x : WithZero (Multiplicative ℤ)} (h : x < 1) : x ≤ WithZero.exp (-1) := by
+theorem le_exp_neg_one_of_lt_one {x : WithZero (Multiplicative ℤ)} (h : x < 1)
+    : x ≤ WithZero.exp (-1) := by
   rcases eq_or_ne x 0 with rfl | hx
   · exact zero_le
   · rw [← WithZero.exp_log hx] at h ⊢
@@ -36,8 +37,8 @@ theorem le_exp_neg_one_of_lt_one {x : WithZero (Multiplicative ℤ)} (h : x < 1)
     rw [WithZero.exp_le_exp]
     omega
 
-theorem val_q {P : HeightOneSpectrum (𝓞 E)} (hP : DegOneUnram P) :
-    P.valuation E (qOf P : E) = WithZero.exp (-1) := by
+theorem val_q {P : HeightOneSpectrum (𝓞 E)} (hP : DegOneUnram P)
+    : P.valuation E (qOf P : E) = WithZero.exp (-1) := by
   have e : (qOf P : E) = algebraMap (𝓞 E) E (qOf P : 𝓞 E) := by rw [map_natCast]
   rw [e, HeightOneSpectrum.valuation_of_algebraMap]
   have h1 : P.intValuation (qOf P : 𝓞 E) < 1 :=
@@ -57,16 +58,19 @@ theorem val_q {P : HeightOneSpectrum (𝓞 E)} (hP : DegOneUnram P) :
 theorem q_ne_zero {P : HeightOneSpectrum (𝓞 E)} (hP : DegOneUnram P) : (qOf P : E) ≠ 0 :=
   Nat.cast_ne_zero.2 hP.1.ne_zero
 
-theorem exists_int_add_q_mul {P : HeightOneSpectrum (𝓞 E)} (hP : DegOneUnram P) {u : E} (hu : IntAt P u) :
-    ∃ (k : ℤ) (u' : E), IntAt P u' ∧ u = k + (qOf P : E) * u' := by
+theorem exists_int_add_q_mul
+    {P : HeightOneSpectrum (𝓞 E)} (hP : DegOneUnram P) {u : E} (hu : IntAt P u)
+    : ∃ (k : ℤ) (u' : E), IntAt P u' ∧ u = k + (qOf P : E) * u' := by
   obtain ⟨r, s, hs, h⟩ := hu
   haveI : Fact (qOf P).Prime := ⟨hP.1⟩
   have hc : Nat.card (𝓞 E ⧸ P.asIdeal) = qOf P := by
     rw [qOf, Ideal.absNorm_apply, Submodule.cardQuot_apply]
-  obtain ⟨k, hk⟩ := AddSubgroup.mem_zmultiples_iff.1
-    (mem_zmultiples_of_prime_card (g' := Ideal.Quotient.mk P.asIdeal r) hc (mk_ne_zero hs))
+  obtain ⟨k, hk⟩ :=
+    AddSubgroup.mem_zmultiples_iff.1 (mem_zmultiples_of_prime_card
+      (g' := Ideal.Quotient.mk P.asIdeal r) hc (mk_ne_zero hs))
   have hm : r - k * s ∈ P.asIdeal := by
-    rw [← Ideal.Quotient.eq_zero_iff_mem, map_sub, map_mul, map_intCast, ← hk, zsmul_eq_mul, sub_self]
+    rw [← Ideal.Quotient.eq_zero_iff_mem, map_sub, map_mul, map_intCast, ← hk, zsmul_eq_mul,
+      sub_self]
   have h1 : P.valuation E (algebraMap (𝓞 E) E s) = 1 := by
     rw [HeightOneSpectrum.valuation_of_algebraMap, HeightOneSpectrum.intValuation_eq_one_iff]
     exact hs
@@ -82,8 +86,9 @@ theorem exists_int_add_q_mul {P : HeightOneSpectrum (𝓞 E)} (hP : DegOneUnram 
   rw [intAt_iff_val, map_div₀, val_q hP]
   exact div_le_one_of_le₀ (le_exp_neg_one_of_lt_one h3) zero_le
 
-theorem exists_int_add_q_pow_mul {P : HeightOneSpectrum (𝓞 E)} (hP : DegOneUnram P) (j : ℕ) {u : E}
-    (hu : IntAt P u) : ∃ (k : ℤ) (u' : E), IntAt P u' ∧ u = k + (qOf P : E) ^ j * u' := by
+theorem exists_int_add_q_pow_mul
+    {P : HeightOneSpectrum (𝓞 E)} (hP : DegOneUnram P) (j : ℕ) {u : E} (hu : IntAt P u)
+    : ∃ (k : ℤ) (u' : E), IntAt P u' ∧ u = k + (qOf P : E) ^ j * u' := by
   induction j with
   | zero => exact ⟨0, u, hu, by simp⟩
   | succ j ih =>

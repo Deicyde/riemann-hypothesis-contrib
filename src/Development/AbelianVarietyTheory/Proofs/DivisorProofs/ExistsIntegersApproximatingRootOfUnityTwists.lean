@@ -13,19 +13,26 @@ noncomputable section
 
 namespace GlobalTheory.PrimePart
 
-open NumberField MvPowerSeries IsLocalRing ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.FGDepth GlobalTheory.CharDepth
-  GlobalTheory.FactorDepth GlobalTheory.IndefiniteRowSideFullHecke.TypedPartSplitPrimes
+open NumberField MvPowerSeries IsLocalRing ReciprocityTheory.PGsh
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.FGDepth
+  GlobalTheory.CharDepth GlobalTheory.FactorDepth
+  GlobalTheory.IndefiniteRowSideFullHecke.TypedPartSplitPrimes
 
-theorem v_pow_sub_pow_lt_one {C : Type} [Field C] (v : Valuation C NNReal) {x y : C} (hx : v x ≤ 1) (hy : v y ≤ 1)
-    (hxy : v (x - y) < 1) (n : ℕ) : v (x ^ n - y ^ n) < 1 := by
+theorem v_pow_sub_pow_lt_one
+    {C : Type} [Field C]
+    (v : Valuation C NNReal)
+    {x y : C} (hx : v x ≤ 1) (hy : v y ≤ 1) (hxy : v (x - y) < 1)
+    (n : ℕ)
+    : v (x ^ n - y ^ n) < 1 := by
   rw [← geom_sum₂_mul x y n, map_mul]
   have hs : v (∑ i ∈ Finset.range n, x ^ i * y ^ (n - 1 - i)) ≤ 1 := by
     apply Valuation.map_sum_le
     intro i _
     rw [map_mul, map_pow, map_pow]
     exact mul_le_one₀ (pow_le_one₀ zero_le hx) zero_le (pow_le_one₀ zero_le hy)
-  calc v (∑ i ∈ Finset.range n, x ^ i * y ^ (n - 1 - i)) * v (x - y) ≤ 1 * v (x - y) :=
-        mul_le_mul_of_nonneg_right hs zero_le
+  calc
+    v (∑ i ∈ Finset.range n, x ^ i * y ^ (n - 1 - i)) * v (x - y)
+      ≤ 1 * v (x - y) := mul_le_mul_of_nonneg_right hs zero_le
     _ = v (x - y) := one_mul _
     _ < 1 := hxy
 
@@ -39,8 +46,9 @@ private lemma exists_mem_sub_one_mem_of_maximal_ne {R : Type} [CommRing R] {P Q 
   rw [hb']
   exact Q.neg_mem hb
 
-theorem exists_sub_one_mem_and_mem {R ι : Type} [CommRing R] [Finite ι] (P : ι → Ideal R) (hP : ∀ i, (P i).IsMaximal)
-    (t : ι) : ∃ e : R, e - 1 ∈ P t ∧ ∀ i, P i ≠ P t → e ∈ P i := by
+theorem exists_sub_one_mem_and_mem
+    {R ι : Type} [CommRing R] [Finite ι] (P : ι → Ideal R) (hP : ∀ i, (P i).IsMaximal) (t : ι)
+    : ∃ e : R, e - 1 ∈ P t ∧ ∀ i, P i ≠ P t → e ∈ P i := by
   classical
   haveI := Fintype.ofFinite ι
   have hc : ∀ i, ∃ a : R, (P i ≠ P t → a ∈ P i) ∧ a - 1 ∈ P t := by
@@ -69,14 +77,30 @@ private lemma pow_pow_mul_eq_self_of_pow_sub_one_eq_one {C : Type} [Field C] {z 
     have hph : p ^ h = p ^ h - 1 + 1 := (Nat.sub_add_cancel (Nat.one_le_pow _ _ hp)).symm
     rw [hph, pow_succ, hz, one_mul]
 
-theorem exists_approx_root_twists : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (l : Level H) (c : Coeff l) (p : ℕ) [Fact p.Prime] (T : CDVR) (io : c.F →+* T.Fr) (X : ValExt T p), ∀ (τ : E →+* ℂ) (h : ℕ), 0 < h → ∀ (lab : ZMod h → (E →+* ℂ)), (∀ s a, X.v (embX io X (lab s) a - embX io X τ a ^ p ^ s.val) < 1) → ∀ z : X.C, z ^ (p ^ h - 1) = 1 → (∃ a₀ : 𝓞 E, X.v (embX io X τ a₀ - z) < 1) → ∀ r : ℝ, ∃ a : 𝓞 E, (∀ s, (r : WithTop ℝ) ≤ vX_vp X (embX io X (lab s) a - z ^ p ^ s.val)) ∧ ∀ σ, primeBelow io X σ ≠ primeBelow io X τ → (r : WithTop ℝ) ≤ vX_vp X (embX io X σ a) := by
+theorem exists_approx_root_twists
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (l : Level H) (c : Coeff l)
+        (p : ℕ) [Fact p.Prime] (T : CDVR) (io : c.F →+* T.Fr) (X : ValExt T p),
+      ∀ (τ : E →+* ℂ) (h : ℕ),
+        0 < h
+          → ∀ (lab : ZMod h → (E →+* ℂ)),
+            (∀ s a, X.v (embX io X (lab s) a - embX io X τ a ^ p ^ s.val) < 1)
+              → ∀ z : X.C,
+                z ^ (p ^ h - 1) = 1 → (∃ a₀ : 𝓞 E, X.v (embX io X τ a₀ - z) < 1)
+                  → ∀ r : ℝ, ∃ a : 𝓞 E,
+                    (∀ s, (r : WithTop ℝ) ≤ vX_vp X (embX io X (lab s) a - z ^ p ^ s.val))
+                      ∧ ∀ σ,
+                        primeBelow io X σ ≠ primeBelow io X τ
+                          → (r : WithTop ℝ) ≤ vX_vp X (embX io X σ a) := by
   intro E _ _ _ H l c p _ T io X τ h hh lab hlab z hz ha₀ r
   classical
   obtain ⟨a₀, ha₀⟩ := ha₀
   have hp : p.Prime := Fact.out
   haveI : NeZero h := ⟨hh.ne'⟩
-  obtain ⟨e, he1, he⟩ := exists_sub_one_mem_and_mem (fun σ : E →+* ℂ => primeBelow io X σ)
-    (fun σ => (primeBelow_isMaximal_card E H l c p T io X σ).1) τ
+  obtain ⟨e, he1, he⟩ :=
+    exists_sub_one_mem_and_mem
+      (fun σ : E →+* ℂ => primeBelow io X σ)
+      (fun σ => (primeBelow_isMaximal_card E H l c p T io X σ).1)
+      τ
   have hv1 : ∀ σ a, X.v (embX io X σ a) ≤ 1 := fun σ a => v_embX_le_one io X σ a
   have hvz : X.v z ≤ 1 := by
     have hn : p ^ h - 1 ≠ 0 := by
@@ -89,38 +113,49 @@ theorem exists_approx_root_twists : ∀ (E : Type) [Field E] [NumberField E] [Is
     have : X.v (embX io X τ (e - 1)) < 1 := he1
     rwa [map_sub, map_one] at this
   have hτb : X.v (embX io X τ (e * a₀) - z) < 1 := by
-    have hsplit : embX io X τ (e * a₀) - z =
-        (embX io X τ e - 1) * embX io X τ a₀ + (embX io X τ a₀ - z) := by rw [map_mul]; ring
+    have hsplit
+        : embX io X τ (e * a₀) - z
+          = (embX io X τ e - 1) * embX io X τ a₀ + (embX io X τ a₀ - z) := by
+      rw [map_mul]; ring
     rw [hsplit]
     refine Valuation.map_add_lt _ ?_ ha₀
     rw [map_mul]
     exact mul_lt_one_of_nonneg_of_lt_one_left zero_le he1' (hv1 τ a₀)
   have hlabb : ∀ s : ZMod h, X.v (embX io X (lab s) (e * a₀) - z ^ p ^ s.val) < 1 := by
     intro s
-    have hsplit : embX io X (lab s) (e * a₀) - z ^ p ^ s.val =
-        (embX io X (lab s) (e * a₀) - embX io X τ (e * a₀) ^ p ^ s.val) +
-          (embX io X τ (e * a₀) ^ p ^ s.val - z ^ p ^ s.val) := by ring
+    have hsplit
+        : embX io X (lab s) (e * a₀) - z ^ p ^ s.val
+          = (embX io X (lab s) (e * a₀) - embX io X τ (e * a₀) ^ p ^ s.val)
+            + (embX io X τ (e * a₀) ^ p ^ s.val - z ^ p ^ s.val) := by
+      ring
     rw [hsplit]
-    exact Valuation.map_add_lt _ (hlab s (e * a₀))
-      (v_pow_sub_pow_lt_one X.v (hv1 τ _) hvz hτb _)
+    exact Valuation.map_add_lt _ (hlab s (e * a₀)) (v_pow_sub_pow_lt_one X.v (hv1 τ _) hvz hτb _)
   have hoth : ∀ σ, primeBelow io X σ ≠ primeBelow io X τ → X.v (embX io X σ (e * a₀)) < 1 := by
     intro σ hσ
     have hmem : X.v (embX io X σ e) < 1 := he σ hσ
     rw [map_mul, map_mul]
     exact mul_lt_one_of_nonneg_of_lt_one_left zero_le hmem (hv1 σ a₀)
-  have hs : ∀ s : ZMod h, ∃ N₀ : ℕ, ∀ N, N₀ ≤ N → (r : WithTop ℝ) ≤
-      vX_vp X (embX io X (lab s) (e * a₀) ^ p ^ N - (z ^ p ^ s.val) ^ p ^ N) := by
+  have hs
+      : ∀ s : ZMod h, ∃ N₀ : ℕ, ∀ N,
+        N₀ ≤ N
+          → (r : WithTop ℝ)
+            ≤ vX_vp X (embX io X (lab s) (e * a₀) ^ p ^ N - (z ^ p ^ s.val) ^ p ^ N) := by
     intro s
-    exact GlobalTheory.T.exists_valuation_pow_primePow_sub_ge X.C (vX_vp X) p hp (vX_vp_p X) _ _ ((isIntV_iff X _).2 (hv1 _ _))
-      ((isIntV_iff X _).2 (hvzs _)) ((vX_vp_pos_iff X _).2 (hlabb s)) r
-  have hσ : ∀ σ : E →+* ℂ, ∃ N₀ : ℕ, ∀ N, N₀ ≤ N → primeBelow io X σ ≠ primeBelow io X τ →
-      (r : WithTop ℝ) ≤ vX_vp X (embX io X σ (e * a₀) ^ p ^ N) := by
+    exact GlobalTheory.T.exists_valuation_pow_primePow_sub_ge X.C (vX_vp X) p hp (vX_vp_p X) _ _
+      ((isIntV_iff X _).2 (hv1 _ _)) ((isIntV_iff X _).2 (hvzs _)) ((vX_vp_pos_iff X _).2 (hlabb s))
+      r
+  have hσ
+      : ∀ σ : E →+* ℂ, ∃ N₀ : ℕ, ∀ N,
+        N₀ ≤ N → primeBelow io X σ ≠ primeBelow io X τ
+          → (r : WithTop ℝ) ≤ vX_vp X (embX io X σ (e * a₀) ^ p ^ N) := by
     intro σ
     by_cases hne : primeBelow io X σ = primeBelow io X τ
     · exact ⟨0, fun _ _ h' => absurd hne h'⟩
     · have hlt : X.v (embX io X σ (e * a₀) - 0) < 1 := by rw [sub_zero]; exact hoth σ hne
-      obtain ⟨N₀, hN₀⟩ := GlobalTheory.T.exists_valuation_pow_primePow_sub_ge X.C (vX_vp X) p hp (vX_vp_p X) _ 0 ((isIntV_iff X _).2 (hv1 _ _))
-        ((isIntV_iff X _).2 (by simp)) ((vX_vp_pos_iff X _).2 hlt) r
+      obtain ⟨N₀, hN₀⟩ :=
+        GlobalTheory.T.exists_valuation_pow_primePow_sub_ge X.C (vX_vp X) p hp (vX_vp_p X) _ 0
+          ((isIntV_iff X _).2 (hv1 _ _)) ((isIntV_iff X _).2 (by simp)) ((vX_vp_pos_iff X _).2 hlt)
+          r
       refine ⟨N₀, fun N hN _ => ?_⟩
       have := hN₀ N hN
       rwa [zero_pow (pow_ne_zero _ hp.ne_zero), sub_zero] at this
@@ -132,13 +167,17 @@ theorem exists_approx_root_twists : ∀ (E : Type) [Field E] [NumberField E] [Is
   · have hzN : (z ^ p ^ s.val) ^ p ^ (h * M) = z ^ p ^ s.val := by
       rw [← pow_mul, mul_comm, pow_mul, pow_pow_mul_eq_self_of_pow_sub_one_eq_one p hp.pos hz M]
     have hle : Ns s ≤ h * M :=
-      le_trans (le_trans (Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ s))
-        (Nat.le_add_right _ _)) hMN
+      le_trans
+        (le_trans (Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ s))
+          (Nat.le_add_right _ _))
+        hMN
     have := hNs s (h * M) hle
     rwa [hzN, ← map_pow] at this
   · have hle : Nσ σ ≤ h * M :=
-      le_trans (le_trans (Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ σ))
-        (Nat.le_add_left _ _)) hMN
+      le_trans
+        (le_trans (Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ σ))
+          (Nat.le_add_left _ _))
+        hMN
     have := hNσ σ (h * M) hle hne
     rwa [← map_pow] at this
 

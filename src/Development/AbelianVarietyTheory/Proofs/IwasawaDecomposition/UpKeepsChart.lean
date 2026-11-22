@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MoveD
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Mem.Col2
@@ -18,8 +20,12 @@ section SameUp
 
 variable {X : Fields} {n : ℕ} {ST SG Q : Finset (HeightOneSpectrum (𝓞 X.E))}
 
-theorem SameG.up' {y : Ys X n} (p : PtY ST SG Q y) (P : ST) (hP : MoveHyp ST SG P) (q : 𝓞 X.E) {x : Sp X.E n}
-    (hx : x ∈ p.1.1.deco.1.N) : SameG p (p.mv (p.1.1.deco.up P q x)) := by
+theorem SameG.up'
+    {y : Ys X n} (p : PtY ST SG Q y)
+    (P : ST) (hP : MoveHyp ST SG P)
+    (q : 𝓞 X.E)
+    {x : Sp X.E n} (hx : x ∈ p.1.1.deco.1.N)
+    : SameG p (p.mv (p.1.1.deco.up P q x)) := by
   classical
   have hs : DecoSet.SameOn SG p.1.1.deco (p.1.1.deco.up P q x) :=
     DecoSet.sameOn_up _ P hP.ne (fun w hw => hP.sg ⟨w, hw⟩) q hx
@@ -28,8 +34,12 @@ theorem SameG.up' {y : Ys X n} (p : PtY ST SG Q y) (P : ST) (hP : MoveHyp ST SG 
     split_ifs with h
     · rfl
     · rfl
-  by_cases h : (∀ (w : Q) (z : Sp X.E n), p.1.1.1.2 w z ∈ (p.1.1.deco.up P q x).1.at w.1 ↔ z ∈ stdAt X.E n w.1) ∧ p.1.2 ∈ y.ys (p.1.1.deco.up P q x).1.N
-  · have e : p.mv (p.1.1.deco.up P q x) = ⟨(⟨(p.1.1.deco.up P q x, p.1.1.1.2), h.1⟩, p.1.2), h.2⟩ := dif_pos h
+  by_cases h
+    : (∀ (w : Q) (z : Sp X.E n),
+        p.1.1.1.2 w z ∈ (p.1.1.deco.up P q x).1.at w.1 ↔ z ∈ stdAt X.E n w.1)
+      ∧ p.1.2 ∈ y.ys (p.1.1.deco.up P q x).1.N
+  · have e : p.mv (p.1.1.deco.up P q x) = ⟨(⟨(p.1.1.deco.up P q x, p.1.1.1.2), h.1⟩, p.1.2), h.2⟩ :=
+      dif_pos h
     rw [e]
     exact ⟨rfl, rfl, fun w => hs w.1 w.2, hb⟩
   · have e : p.mv (p.1.1.deco.up P q x) = p := dif_neg h
@@ -40,31 +50,55 @@ end SameUp
 
 variable {B : Base} {X : PreX B.toPre} (I : TC B X)
 
-theorem TC.cosetIn_rep_up (hX : B.fields.Ok) (hPr : (B.primes X).Ok) (u : B.Word) (a : I.ι) (i : ℕ) (v : (B.primes X).vT u)
-    (c : (I.stp u a i).Cl) (x : ((I.atIn u a).A i).lv v c) :
-    cosetIn ((I.stp u a i).rep ((I.stp u a i).cl c.1 (((I.atIn u a).A i).upPt v c x))) =
-      cosetIn ((I.stp u a i).rep c) := by
+theorem TC.cosetIn_rep_up
+    (hX : B.fields.Ok) (hPr : (B.primes X).Ok)
+    (u : B.Word) (a : I.ι) (i : ℕ)
+    (v : (B.primes X).vT u) (c : (I.stp u a i).Cl) (x : ((I.atIn u a).A i).lv v c)
+    : cosetIn ((I.stp u a i).rep ((I.stp u a i).cl c.1 (((I.atIn u a).A i).upPt v c x)))
+      = cosetIn ((I.stp u a i).rep c) := by
   by_cases hj : i + 1 = B.R.m
-  · refine GStep.prefRep_eq_of_normal (I.stp0 u a i) c.1 (fun q' : (I.stp0 u a i).D c.1 => cosetIn q') (I.pref u a i c.1)
-      (GStep.prefRep_normal (I.stp0 u a i) c.1 _ _ (fun p hp => hp.2.1 hj) (I.pref_of_normalFor u a i hj c.1)) c.2 _ fun h => ?_
+  · refine GStep.prefRep_eq_of_normal (I.stp0 u a i) c.1
+      (fun q' : (I.stp0 u a i).D c.1 => cosetIn q')
+      (I.pref u a i c.1)
+      (GStep.prefRep_normal (I.stp0 u a i) c.1 _ _
+        (fun p hp => hp.2.1 hj)
+        (I.pref_of_normalFor u a i hj c.1))
+      c.2 _
+      fun h => ?_
     have r : SameG ((I.stp u a i).rep c) (((I.atIn u a).A i).upPt v c x) :=
       SameG.up' ((I.stp u a i).rep c) v (moveHyp_of_ok hPr u v) _ (Quotient.out x).2
     apply cosetIn_eq_of_sameG hX hPr
     refine ⟨?_, ?_, ?_, ?_⟩
-    · exact congrArg (fun F => fun P => (FrmG.incl _ _ h).1.1 * F P * ((FrmG.incl _ _ h).2.2 P)⁻¹.1) r.fr
+    · exact congrArg
+        (fun F => fun P => (FrmG.incl _ _ h).1.1 * F P * ((FrmG.incl _ _ h).2.2 P)⁻¹.1)
+        r.fr
     · exact congrArg (fun S => (fun v => h.1.1 v) '' S) r.ys
     · intro w
-      have locP_gmap_eq_of_locP_eq {E : Type} [Field E] [NumberField E] {n : ℕ} (P : HeightOneSpectrum (𝓞 E))
-          (g : Sp E n ≃ₗ[E] Sp E n) {N N' : Submodule (𝓞 E) (Sp E n)}
-          (h : Formalism.HermitianLatticesTheory.localization₂ P.asIdeal N' = Formalism.HermitianLatticesTheory.localization₂ P.asIdeal N) :
-          Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (Formalism.HermitianLatticesTheory.gmap g N') = Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (Formalism.HermitianLatticesTheory.gmap g N) := by
+      have locP_gmap_eq_of_locP_eq
+          {E : Type} [Field E] [NumberField E]
+          {n : ℕ}
+          (P : HeightOneSpectrum (𝓞 E))
+          (g : Sp E n ≃ₗ[E] Sp E n)
+          {N N' : Submodule (𝓞 E) (Sp E n)}
+          (h : Formalism.HermitianLatticesTheory.localization₂ P.asIdeal N'
+            = Formalism.HermitianLatticesTheory.localization₂ P.asIdeal N)
+          : Formalism.HermitianLatticesTheory.localization₂ P.asIdeal
+              (Formalism.HermitianLatticesTheory.gmap g N')
+            = Formalism.HermitianLatticesTheory.localization₂ P.asIdeal
+              (Formalism.HermitianLatticesTheory.gmap g N) := by
         have hs : ∀ (s : 𝓞 E) (z : Sp E n), g.symm (s • z) = s • g.symm z := fun s z =>
           ((g.symm : Sp E n →ₗ[E] Sp E n).restrictScalars (𝓞 E)).map_smul s z
-        have hmemL : ∀ (M : Submodule (𝓞 E) (Sp E n)) (x : Sp E n),
-            x ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal M ↔ ∃ s ∈ P.asIdeal.primeCompl, s • x ∈ M := fun _ _ => Iff.rfl
-      
-        have hmemg : ∀ (M : Submodule (𝓞 E) (Sp E n)) (x : Sp E n),
-            x ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (Formalism.HermitianLatticesTheory.gmap g M) ↔ g.symm x ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal M := by
+        have hmemL
+            : ∀ (M : Submodule (𝓞 E) (Sp E n)) (x : Sp E n),
+              x ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal M
+                ↔ ∃ s ∈ P.asIdeal.primeCompl, s • x ∈ M := fun _ _ =>
+          Iff.rfl
+
+        have hmemg
+            : ∀ (M : Submodule (𝓞 E) (Sp E n)) (x : Sp E n),
+              x ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal
+                  (Formalism.HermitianLatticesTheory.gmap g M)
+                ↔ g.symm x ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal M := by
           intro M x
           rw [hmemL, hmemL]
           constructor
@@ -79,7 +113,8 @@ theorem TC.cosetIn_rep_up (hX : B.fields.Ok) (hPr : (B.primes X).Ok) (u : B.Word
         ext x
         rw [hmemg, hmemg, h]
       exact locP_gmap_eq_of_locP_eq w.1 h.1.1 (r.at_eq w)
-    · exact congrArg (fun B => fun w x => ((FrmG.incl _ _ h).2.1 w).1.mulVec (B w (h.1.1.symm x))) r.be
+    · exact
+        congrArg (fun B => fun w x => ((FrmG.incl _ _ h).2.1 w).1.mulVec (B w (h.1.1.symm x))) r.be
   · have h0 : ∀ q : PtAt B.R I.sel (I.tup a) (I.cst a) u i, cosetIn q = fun _ => ∅ := by
       intro q
       funext P
@@ -95,7 +130,19 @@ end GlobalTheory.Mem.Col2
 
 namespace GlobalTheory.Mem.Col2
 
-theorem TC.up_keeps_chart : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → TC.Pins B X → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)) (u : B.Word) (a : I.ι) (i : ℕ) (hi : i ≤ B.R.m), ∀ {bad : Set (HeightOneSpectrum (𝓞 B.host.F))} {Ch : Type} (chOf : (I.stp u a i).Cl → Ch) (K : ∀ β : Ch, LevelChart (I.rec7 l Z) (B.T u) bad i hi (fun c : {c // chOf c = β} => (I.chain l u a).stab i c.1) (fun c => latCrd (I.rec7 l Z) i hi (I.latAt u a i c.1))), I.ReadsK l Z u a i hi chOf K → ∀ (v : (I.atT l u a).vT) (c : (I.chain l u a).cls i) (x : (I.fm l u a).lv i v c), (I.fm l u a).fv i v c x = 1 → chOf ((I.fm l u a).up i v c x) = chOf c := by
+theorem TC.up_keeps_chart
+    : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
+      I.Ok → TC.Pins B X
+        → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)) (u : B.Word) (a : I.ι) (i : ℕ)
+            (hi : i ≤ B.R.m),
+          ∀ {bad : Set (HeightOneSpectrum (𝓞 B.host.F))} {Ch : Type} (chOf : (I.stp u a i).Cl → Ch)
+              (K : ∀ β : Ch,
+                LevelChart (I.rec7 l Z) (B.T u) bad i hi
+                  (fun c : {c // chOf c = β} => (I.chain l u a).stab i c.1)
+                  (fun c => latCrd (I.rec7 l Z) i hi (I.latAt u a i c.1))),
+            I.ReadsK l Z u a i hi chOf K
+              → ∀ (v : (I.atT l u a).vT) (c : (I.chain l u a).cls i) (x : (I.fm l u a).lv i v c),
+                (I.fm l u a).fv i v c x = 1 → chOf ((I.fm l u a).up i v c x) = chOf c := by
   intro B X I _ _ l Z u a i hi bad Ch chOf K hR v c x _
   obtain ⟨k, hk⟩ := hR
   have hX : B.fields.Ok := (base_fields_primes_ok B X).1

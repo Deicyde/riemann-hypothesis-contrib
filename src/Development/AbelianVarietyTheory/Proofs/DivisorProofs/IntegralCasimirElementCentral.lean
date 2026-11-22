@@ -11,18 +11,18 @@ namespace GlobalTheory.CasimirOrder
 
 open Matrix
 
-theorem casimir_central : ∀ {O : Type} [Ring O] {r : ℕ} (x : Module.Basis (Fin r) ℤ O) (s : O →+ O) (φ : O →+ ℤ),
-    (∀ a b, s (a * b) = s b * s a) → (∀ a, s (s a) = a) → (∀ a b, φ (a * b) = φ (b * a)) →
-    (∀ a, φ (s a) = φ a) → (∀ a, a ≠ 0 → 0 < φ (s a * a)) →
-    ∀ a, a * casimir (⇑x) s φ = casimir (⇑x) s φ * a := by
+theorem casimir_central
+    : ∀ {O : Type} [Ring O] {r : ℕ} (x : Module.Basis (Fin r) ℤ O) (s : O →+ O) (φ : O →+ ℤ),
+      (∀ a b, s (a * b) = s b * s a) → (∀ a, s (s a) = a) → (∀ a b, φ (a * b) = φ (b * a))
+        → (∀ a, φ (s a) = φ a) → (∀ a, a ≠ 0 → 0 < φ (s a * a))
+        → ∀ a, a * casimir (⇑x) s φ = casimir (⇑x) s φ * a := by
   intro O _ r x s φ hs hss hφc hφs hpos a
   classical
   set b := form s φ with hbdef
   have hb : ∀ u v, b u v = b v u := form_symm hs hss hφs
   set G := gram (⇑x) s φ with hGdef
   have hA : ∀ i j, G.adjugate i j = G.adjugate j i := adjugate_gram_symm hs hss hφs
-  have hds : ∀ v, G.det • v = ∑ i, ∑ j, (G.adjugate i j * b (x i) v) • x j :=
-    det_smul_eq_sum x b hb
+  have hds : ∀ v, G.det • v = ∑ i, ∑ j, (G.adjugate i j * b (x i) v) • x j := det_smul_eq_sum x b hb
   have hδ : G.det ≠ 0 := by
     have h := (posDef_gram x b hb (fun w hw => hpos w hw)).det_pos
     rw [← Int.cast_det] at h
@@ -41,8 +41,10 @@ theorem casimir_central : ∀ {O : Type} [Ring O] {r : ℕ} (x : Module.Basis (F
     intro i j
     have e : a * (s (x i) * x j) = s (x i * s a) * x j := by rw [hs, hss, mul_assoc]
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [e, smul_comm, show G.det • (s (x i * s a) * x j) = s (G.det • (x i * s a)) * x j by
-      rw [map_zsmul, smul_mul_assoc], hds, map_sum, Finset.sum_mul, Finset.smul_sum]
+      rw [e, smul_comm,
+        show G.det • (s (x i * s a) * x j) = s (G.det • (x i * s a)) * x j by
+          rw [map_zsmul, smul_mul_assoc],
+        hds, map_sum, Finset.sum_mul, Finset.smul_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, Finset.sum_mul, Finset.smul_sum]
@@ -73,10 +75,11 @@ theorem casimir_central : ∀ {O : Type} [Ring O] {r : ℕ} (x : Module.Basis (F
     refine Finset.sum_congr rfl fun q _ => ?_
     rw [smul_mul_assoc, key2]
   rw [L, R]
-  calc ∑ i, ∑ j, ∑ k, ∑ l, F i j k l = ∑ i, ∑ k, ∑ j, ∑ l, F i j k l :=
-        Finset.sum_congr rfl fun i _ => Finset.sum_comm
+  calc
+    ∑ i, ∑ j, ∑ k, ∑ l, F i j k l
+      = ∑ i, ∑ k, ∑ j, ∑ l, F i j k l := Finset.sum_congr rfl fun i _ => Finset.sum_comm
     _ = ∑ i, ∑ k, ∑ l, ∑ j, F i j k l :=
-        Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => Finset.sum_comm
+      Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => Finset.sum_comm
     _ = ∑ k, ∑ i, ∑ l, ∑ j, F i j k l := Finset.sum_comm
     _ = ∑ k, ∑ l, ∑ i, ∑ j, F i j k l := Finset.sum_congr rfl fun k _ => Finset.sum_comm
     _ = ∑ l, ∑ k, ∑ i, ∑ j, F i j k l := Finset.sum_comm

@@ -16,7 +16,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.KerAlongIdIf
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.ZM GlobalTheory.SiegLev GlobalTheory.SiegelTor
 open scoped CategoryTheory.Obj
 open GlobalTheory.IndefiniteRowSideFullHecke.SiegelFamilyZetaUnit GlobalTheory.SiegelTypings
@@ -28,7 +29,11 @@ noncomputable section
 
 namespace GlobalTheory.KTrivFlatDescent
 
-theorem trivAlong_of_flat_surjective : ∀ {S S' S'' : Scheme.{0}} (G : Over S) [GrpObj G] (L : LB G.left) (g : S' ⟶ S) (f : S'' ⟶ S') [Flat f] [Surjective f], L.IsLB → GlobalTheory.KTrivSpread.TrivAlong G L (f ≫ g) → GlobalTheory.KTrivSpread.TrivAlong G L g := by
+theorem trivAlong_of_flat_surjective
+    : ∀ {S S' S'' : Scheme.{0}} (G : Over S) [GrpObj G] (L : LB G.left) (g : S' ⟶ S) (f : S'' ⟶ S')
+        [Flat f] [Surjective f],
+      L.IsLB → GlobalTheory.KTrivSpread.TrivAlong G L (f ≫ g)
+        → GlobalTheory.KTrivSpread.TrivAlong G L g := by
   intro S S' S'' G _ L g f _ _ _ h T a ha x hx
   let u := pullback.fst a f
   have hu : Epi u := Flat.epi_of_flat_of_surjective _

@@ -4,10 +4,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc UpperTheory.V.Published UpperTheory.V.Af.Sol
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep
+  GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc
+  UpperTheory.V.Published UpperTheory.V.Af.Sol
 
-theorem UpperTheory.galois_representation_image_spec :
-    UpperTheory.V.Af.Sol.GalRange := by
+theorem UpperTheory.galois_representation_image_spec : UpperTheory.V.Af.Sol.GalRange := by
   intro K M Ω _ _ _ _ _ _ _ _ _ _ _ _
   haveI : FiniteDimensional K M := Module.Finite.of_restrictScalars_finite ℚ K M
   let ρ : Gal(Ω/K) →* Gal(M/K) := AlgEquiv.restrictNormalHom M

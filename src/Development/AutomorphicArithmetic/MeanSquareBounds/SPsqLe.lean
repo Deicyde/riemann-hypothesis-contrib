@@ -7,12 +7,13 @@ public import Development.AutomorphicArithmetic.MeanSquareBounds.SumMinLeDiv
 
 @[expose] public section
 
-open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2 Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
+open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2
+  Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
 
 namespace QH
 
-private theorem sum_log_primes_le_mul_log_four (Y : ℕ) :
-    ∑ p ∈ (range (Y + 1)).filter Nat.Prime, Real.log p ≤ Y * Real.log 4 := by
+private theorem sum_log_primes_le_mul_log_four (Y : ℕ)
+    : ∑ p ∈ (range (Y + 1)).filter Nat.Prime, Real.log p ≤ Y * Real.log 4 := by
   rw [← Real.log_prod]
   · have h1 : ((primorial Y : ℕ) : ℝ) ≤ (4 : ℝ) ^ Y := by exact_mod_cast primorial_le_four_pow Y
     have h2 : ((primorial Y : ℕ) : ℝ) = ∏ p ∈ (range (Y + 1)).filter Nat.Prime, (p : ℝ) := by
@@ -24,8 +25,8 @@ private theorem sum_log_primes_le_mul_log_four (Y : ℕ) :
     have := (Finset.mem_filter.mp hp).2.pos
     positivity
 
-private theorem sum_sP_sq_large_primes_le (y : ℝ) (hy : 3 ≤ y) (N : ℕ) :
-    ∑ p ∈ ((Icc 1 N).filter Nat.Prime).filter (fun p => ¬ p ≤ ⌊y⌋₊), sP (cN y) N p ^ 2
+private theorem sum_sP_sq_large_primes_le (y : ℝ) (hy : 3 ≤ y) (N : ℕ)
+    : ∑ p ∈ ((Icc 1 N).filter Nat.Prime).filter (fun p => ¬ p ≤ ⌊y⌋₊), sP (cN y) N p ^ 2
       ≤ 96 * Real.log 4 * (y * Real.log y) := by
   set Y := ⌊y⌋₊ with hYdef
   have hY3 : 3 ≤ Y := Nat.le_floor (by exact_mod_cast hy)
@@ -34,7 +35,8 @@ private theorem sum_sP_sq_large_primes_le (y : ℝ) (hy : 3 ≤ y) (N : ℕ) :
   have hY3r : (3 : ℝ) ≤ Y := by exact_mod_cast hY3
   have hy0 : 0 < y := by linarith
   have hY0 : (0 : ℝ) < Y := by linarith
-  have hset : ((Icc 1 N).filter Nat.Prime).filter (fun p => ¬ p ≤ Y) = (Ioc Y N).filter Nat.Prime := by
+  have hset
+      : ((Icc 1 N).filter Nat.Prime).filter (fun p => ¬ p ≤ Y) = (Ioc Y N).filter Nat.Prime := by
     ext p
     simp only [mem_filter, mem_Icc, mem_Ioc]
     constructor
@@ -43,14 +45,17 @@ private theorem sum_sP_sq_large_primes_le (y : ℝ) (hy : 3 ≤ y) (N : ℕ) :
     · rintro ⟨⟨h1, h2⟩, hp⟩
       exact ⟨⟨⟨by omega, h2⟩, hp⟩, by omega⟩
   rw [hset]
-  have hterm : ∀ p ∈ (Ioc Y N).filter Nat.Prime,
-      sP (cN y) N p ^ 2 ≤ 4 * y ^ 2 * (Real.log p ^ 2 / (p : ℝ) ^ 2) := by
+  have hterm
+      : ∀ p ∈ (Ioc Y N).filter Nat.Prime,
+        sP (cN y) N p ^ 2 ≤ 4 * y ^ 2 * (Real.log p ^ 2 / (p : ℝ) ^ 2) := by
     intro p hp
     have hpp := (mem_filter.mp hp).2
     have h0 := sP_cN_nonneg y hy0.le N p
     have h1 := sP_cN_le_log_div y hy0.le N p hpp
     have hp0 : (0 : ℝ) < p := by exact_mod_cast hpp.pos
-    calc sP (cN y) N p ^ 2 ≤ (2 * y * Real.log p / p) ^ 2 := pow_le_pow_left₀ h0 h1 2
+    calc
+      sP (cN y) N p ^ 2
+        ≤ (2 * y * Real.log p / p) ^ 2 := pow_le_pow_left₀ h0 h1 2
       _ = 4 * y ^ 2 * (Real.log p ^ 2 / (p : ℝ) ^ 2) := by
         field_simp
         ring
@@ -58,7 +63,8 @@ private theorem sum_sP_sq_large_primes_le (y : ℝ) (hy : 3 ≤ y) (N : ℕ) :
   have hL : 0 < Real.log 4 := Real.log_pos (by norm_num)
   have hlogY : Real.log Y ≤ Real.log y := Real.log_le_log hY0 hYle
   have hlog2 : Real.log 2 ≤ Real.log y := Real.log_le_log (by norm_num) (by linarith)
-  have hq : 4 * Real.log 4 * (Real.log Y + 2 * Real.log 2) / Y ≤ 24 * Real.log 4 * Real.log y / y := by
+  have hq
+      : 4 * Real.log 4 * (Real.log Y + 2 * Real.log 2) / Y ≤ 24 * Real.log 4 * Real.log y / y := by
     rw [div_le_div_iff₀ hY0 hy0]
     have hly : 0 ≤ Real.log y := Real.log_nonneg (by linarith)
     have hE : Real.log Y + 2 * Real.log 2 ≤ 3 * Real.log y := by linarith
@@ -68,19 +74,24 @@ private theorem sum_sP_sq_large_primes_le (y : ℝ) (hy : 3 ≤ y) (N : ℕ) :
       mul_le_mul_of_nonneg_left (by linarith) (by positivity)
     have h3 := mul_le_mul_of_nonneg_left (h1.trans h2) (show 0 ≤ 4 * Real.log 4 by positivity)
     nlinarith
-  calc ∑ p ∈ (Ioc Y N).filter Nat.Prime, sP (cN y) N p ^ 2
-      ≤ ∑ p ∈ (Ioc Y N).filter Nat.Prime, 4 * y ^ 2 * (Real.log p ^ 2 / (p : ℝ) ^ 2) := sum_le_sum hterm
-    _ = 4 * y ^ 2 * ∑ p ∈ (Ioc Y N).filter Nat.Prime, Real.log p ^ 2 / (p : ℝ) ^ 2 := by rw [mul_sum]
+  calc
+    ∑ p ∈ (Ioc Y N).filter Nat.Prime, sP (cN y) N p ^ 2
+        ≤ ∑ p ∈ (Ioc Y N).filter Nat.Prime, 4 * y ^ 2 * (Real.log p ^ 2 / (p : ℝ) ^ 2) :=
+      sum_le_sum hterm
+    _ = 4 * y ^ 2 * ∑ p ∈ (Ioc Y N).filter Nat.Prime, Real.log p ^ 2 / (p : ℝ) ^ 2 := by
+      rw [mul_sum]
     _ ≤ 4 * y ^ 2 * (24 * Real.log 4 * Real.log y / y) := by
-        gcongr
-        exact htail.trans hq
+      gcongr
+      exact htail.trans hq
     _ = 96 * Real.log 4 * (y * Real.log y) := by
-        field_simp
-        ring
+      field_simp
+      ring
 
-private theorem sum_sP_sq_small_primes_le_of_bound (C0 : ℝ) (hC0 : 0 < C0)
-    (hb : ∀ (y : ℝ), 3 ≤ y → ∀ (N p : ℕ), sP (cN y) N p ≤ C0 * Real.log y) (y : ℝ) (hy : 3 ≤ y) (N : ℕ) :
-    ∑ p ∈ ((Icc 1 N).filter Nat.Prime).filter (fun p => p ≤ ⌊y⌋₊), sP (cN y) N p ^ 2
+private theorem sum_sP_sq_small_primes_le_of_bound
+    (C0 : ℝ) (hC0 : 0 < C0) (hb : ∀ (y : ℝ), 3 ≤ y → ∀ (N p : ℕ), sP (cN y) N p ≤ C0 * Real.log y)
+    (y : ℝ) (hy : 3 ≤ y)
+    (N : ℕ)
+    : ∑ p ∈ ((Icc 1 N).filter Nat.Prime).filter (fun p => p ≤ ⌊y⌋₊), sP (cN y) N p ^ 2
       ≤ (4 * C0 ^ 2 + 2 * C0 ^ 2 * Real.log 4) * (y * Real.log y) := by
   set Y := ⌊y⌋₊ with hYdef
   set S := ⌊Real.sqrt y⌋₊ with hSdef
@@ -99,14 +110,19 @@ private theorem sum_sP_sq_small_primes_le_of_bound (C0 : ℝ) (hC0 : 0 < C0)
     have := Real.log_le_sub_one_of_pos (show 0 < Real.sqrt y by linarith)
     rw [hlogsq] at this
     linarith
-  have hsub : ((Icc 1 N).filter Nat.Prime).filter (fun p => p ≤ Y) ⊆ (range (Y + 1)).filter Nat.Prime := by
+  have hsub
+      : ((Icc 1 N).filter Nat.Prime).filter (fun p => p ≤ Y)
+        ⊆ (range (Y + 1)).filter Nat.Prime := by
     intro p hp
     simp only [mem_filter, mem_Icc, mem_range] at hp ⊢
     exact ⟨by omega, hp.1.2⟩
-  have step1 := sum_le_sum_of_subset_of_nonneg hsub
-    (f := fun p => sP (cN y) N p ^ 2) (fun p _ _ => sq_nonneg _)
-  have hterm : ∀ p ∈ (range (Y + 1)).filter Nat.Prime, sP (cN y) N p ^ 2 ≤
-      (if p ≤ S then C0 ^ 2 * Real.log y ^ 2 else 0) + 2 * C0 ^ 2 * Real.log y * Real.log p := by
+  have step1 :=
+    sum_le_sum_of_subset_of_nonneg hsub (f := fun p => sP (cN y) N p ^ 2) (fun p _ _ => sq_nonneg _)
+  have hterm
+      : ∀ p ∈ (range (Y + 1)).filter Nat.Prime,
+        sP (cN y) N p ^ 2
+          ≤ (if p ≤ S then C0 ^ 2 * Real.log y ^ 2 else 0)
+            + 2 * C0 ^ 2 * Real.log y * Real.log p := by
     intro p hp
     have hpp := (mem_filter.mp hp).2
     have hp1 : (1 : ℝ) ≤ p := by exact_mod_cast hpp.one_lt.le
@@ -129,20 +145,22 @@ private theorem sum_sP_sq_small_primes_le_of_bound (C0 : ℝ) (hC0 : 0 < C0)
       linarith
   have step2 := sum_le_sum hterm
   rw [sum_add_distrib, ← mul_sum] at step2
-  have hite : ∑ p ∈ (range (Y + 1)).filter Nat.Prime, (if p ≤ S then C0 ^ 2 * Real.log y ^ 2 else 0)
-      ≤ ((S : ℝ) + 1) * (C0 ^ 2 * Real.log y ^ 2) := by
+  have hite
+      : ∑ p ∈ (range (Y + 1)).filter Nat.Prime, (if p ≤ S then C0 ^ 2 * Real.log y ^ 2 else 0)
+        ≤ ((S : ℝ) + 1) * (C0 ^ 2 * Real.log y ^ 2) := by
     rw [← sum_filter]
     have hsub2 : ((range (Y + 1)).filter Nat.Prime).filter (fun p => p ≤ S) ⊆ range (S + 1) := by
       intro p hp
       simp only [mem_filter, mem_range] at hp ⊢
       omega
-    calc ∑ p ∈ ((range (Y + 1)).filter Nat.Prime).filter (fun p => p ≤ S), C0 ^ 2 * Real.log y ^ 2
-        ≤ ∑ p ∈ range (S + 1), C0 ^ 2 * Real.log y ^ 2 :=
-          sum_le_sum_of_subset_of_nonneg hsub2 (fun _ _ _ => by positivity)
+    calc
+      ∑ p ∈ ((range (Y + 1)).filter Nat.Prime).filter (fun p => p ≤ S), C0 ^ 2 * Real.log y ^ 2
+          ≤ ∑ p ∈ range (S + 1), C0 ^ 2 * Real.log y ^ 2 :=
+        sum_le_sum_of_subset_of_nonneg hsub2 (fun _ _ _ => by positivity)
       _ = ((S : ℝ) + 1) * (C0 ^ 2 * Real.log y ^ 2) := by
-          rw [sum_const, card_range, nsmul_eq_mul]
-          push_cast
-          ring
+        rw [sum_const, card_range, nsmul_eq_mul]
+        push_cast
+        ring
   have htheta := sum_log_primes_le_mul_log_four Y
   have hL : 0 < Real.log 4 := Real.log_pos (by norm_num)
   have hA : ((S : ℝ) + 1) * Real.log y ≤ 4 * y := by
@@ -152,19 +170,25 @@ private theorem sum_sP_sq_small_primes_le_of_bound (C0 : ℝ) (hC0 : 0 < C0)
   have hA' : ((S : ℝ) + 1) * (C0 ^ 2 * Real.log y ^ 2) ≤ 4 * C0 ^ 2 * (y * Real.log y) := by
     have := mul_le_mul_of_nonneg_right hA (show 0 ≤ C0 ^ 2 * Real.log y by positivity)
     nlinarith
-  have hB : 2 * C0 ^ 2 * Real.log y * ∑ p ∈ (range (Y + 1)).filter Nat.Prime, Real.log p
-      ≤ 2 * C0 ^ 2 * Real.log 4 * (y * Real.log y) := by
+  have hB
+      : 2 * C0 ^ 2 * Real.log y * ∑ p ∈ (range (Y + 1)).filter Nat.Prime, Real.log p
+        ≤ 2 * C0 ^ 2 * Real.log 4 * (y * Real.log y) := by
     have h1 : ∑ p ∈ (range (Y + 1)).filter Nat.Prime, Real.log p ≤ y * Real.log 4 :=
       htheta.trans (mul_le_mul_of_nonneg_right hYle hL.le)
     have := mul_le_mul_of_nonneg_left h1 (show 0 ≤ 2 * C0 ^ 2 * Real.log y by positivity)
     nlinarith
-  calc _ ≤ _ := step1
+  calc
+    _ ≤ _ := step1
     _ ≤ _ := step2
     _ ≤ _ := by linarith
 
-theorem sPsq_le :
-    ∃ C : ℝ, 0 < C ∧ ∀ y : ℝ, 3 ≤ y → ∀ N : ℕ,
-      ∑ p ∈ (Icc 1 N).filter Nat.Prime, sP (cN y) N p ^ 2 ≤ C * y * Real.log y := by
+theorem sPsq_le
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ y : ℝ,
+          3 ≤ y
+            → ∀ N : ℕ,
+              ∑ p ∈ (Icc 1 N).filter Nat.Prime, sP (cN y) N p ^ 2 ≤ C * y * Real.log y := by
   obtain ⟨C0, hC0, hb⟩ := exists_primePowerSum_le_mul_log
   have hl4 : 0 < Real.log 4 := Real.log_pos (by norm_num)
   refine ⟨4 * C0 ^ 2 + 2 * C0 ^ 2 * Real.log 4 + 96 * Real.log 4, by positivity, ?_⟩

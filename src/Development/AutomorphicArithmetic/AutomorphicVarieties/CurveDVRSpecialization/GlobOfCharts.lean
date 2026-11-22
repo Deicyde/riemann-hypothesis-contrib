@@ -5,13 +5,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CurveDVRSpe
 @[expose] public section
 
 open IsLocalRing in
-theorem UpperTheory.V.Pr.globOfCharts :
-    UpperTheory.V.Pr.GlobOfCharts := by
+theorem UpperTheory.V.Pr.globOfCharts : UpperTheory.V.Pr.GlobOfCharts := by
   intro X _ M hTI hG x R _ _ _ f hC L hLT hLG hConcl
   have eG : ∀ P, P ∈ L.Good ↔ f P ∈ M.Good := fun P => by rw [hLG]; rfl
   have eT : ∀ P, P ∈ L.TI ↔ f P ∈ M.TI := fun P => by rw [hLT]; rfl
-  have hsub : ∀ P : PrimeSpectrum R, f P ∈ M.Good → closure {f P} ⊆ M.Good :=
-    fun P h => hG.closure_subset_iff.mpr (Set.singleton_subset_iff.mpr h)
+  have hsub : ∀ P : PrimeSpectrum R, f P ∈ M.Good → closure {f P} ⊆ M.Good := fun P h =>
+    hG.closure_subset_iff.mpr (Set.singleton_subset_iff.mpr h)
   have hmeet : ∀ P : PrimeSpectrum R, (closure {f P} ∩ M.TI).Nonempty → f P ∈ M.TI := by
     rintro P ⟨y, hy, hyT⟩
     obtain ⟨z, hzT, hz⟩ := mem_closure_iff.mp hy _ hTI hyT
@@ -27,8 +26,11 @@ theorem UpperTheory.V.Pr.globOfCharts :
     have h' := hConcl P hPG hPT (hD P hPm) P' ((eT P').mpr (hmeet P' hY'.2)) hP'm
     exact hsub P' ((eG P').mp h')
   · intro hall
-    refine ⟨irreducibleComponent x, ⟨irreducibleComponent_mem_irreducibleComponents x, ?_⟩,
-      mem_irreducibleComponent⟩
+    refine ⟨
+      irreducibleComponent x,
+      ⟨irreducibleComponent_mem_irreducibleComponents x, ?_⟩,
+      mem_irreducibleComponent
+    ⟩
     obtain ⟨P, hPm, hPY⟩ :=
       hC.onto _ (irreducibleComponent_mem_irreducibleComponents x) mem_irreducibleComponent
     refine ⟨f P, ?_, (eT P).mp (hall P hPm)⟩
@@ -51,5 +53,8 @@ theorem UpperTheory.V.Pr.globOfCharts :
       rw [← hz]
       exact hzT
     have hPG := hConcl I hIG hIT hID P hPT hPmin
-    exact ⟨closure {f P}, ⟨hC.min P hPmin, f P, subset_closure (Set.mem_singleton _), (eT P).mp hPT⟩,
-      hsub P ((eG P).mp hPG)⟩
+    exact ⟨
+      closure {f P},
+      ⟨hC.min P hPmin, f P, subset_closure (Set.mem_singleton _), (eT P).mp hPT⟩,
+      hsub P ((eG P).mp hPG)
+    ⟩

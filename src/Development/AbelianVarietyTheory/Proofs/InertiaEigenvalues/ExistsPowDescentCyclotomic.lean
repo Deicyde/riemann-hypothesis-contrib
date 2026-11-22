@@ -10,25 +10,25 @@ namespace GlobalTheory
 
 namespace CyclotomicKummerDescent
 
-theorem geom_sum_valuation {l : ℕ} (hl : l.Prime) {t : ℕ} (ht1 : 1 < t)
-    (ht : (l : ℤ) ^ 2 ∣ (t : ℤ) - 1) (r : ℕ) :
-    l ^ r ∣ ∑ i ∈ Finset.range (l ^ r), t ^ i ∧
-      ¬ l ^ (r + 1) ∣ ∑ i ∈ Finset.range (l ^ r), t ^ i := by
+theorem geom_sum_valuation
+    {l : ℕ} (hl : l.Prime) {t : ℕ} (ht1 : 1 < t) (ht : (l : ℤ) ^ 2 ∣ (t : ℤ) - 1) (r : ℕ)
+    : l ^ r ∣ ∑ i ∈ Finset.range (l ^ r), t ^ i
+      ∧ ¬ l ^ (r + 1) ∣ ∑ i ∈ Finset.range (l ^ r), t ^ i := by
   have hp : Prime (l : ℤ) := Nat.prime_iff_prime_int.mp hl
   have h1 : (l : ℤ) ∣ (t : ℤ) - 1 := (dvd_pow_self _ two_ne_zero).trans ht
   have h2 : ¬ (l : ℤ) ∣ (t : ℤ) := fun h => hp.not_dvd_one (by simpa using dvd_sub h h1)
-  have hlte : emultiplicity (l : ℤ) ((t : ℤ) ^ (l ^ r) - 1 ^ (l ^ r)) =
-      emultiplicity (l : ℤ) ((t : ℤ) - 1) + r := by
+  have hlte
+      : emultiplicity (l : ℤ) ((t : ℤ) ^ (l ^ r) - 1 ^ (l ^ r))
+        = emultiplicity (l : ℤ) ((t : ℤ) - 1) + r := by
     rcases hl.eq_two_or_odd' with rfl | hodd
-    · have h := Int.two_pow_sub_pow' (x := t) (y := 1) (2 ^ r) (by simpa using ht)
-        (by simpa using h2)
+    · have h :=
+        Int.two_pow_sub_pow' (x := t) (y := 1) (2 ^ r) (by simpa using ht) (by simpa using h2)
       have h3 : emultiplicity (2 : ℤ) ((2 ^ r : ℕ) : ℤ) = r := by
         push_cast
         exact emultiplicity_pow_self_of_prime Int.prime_two r
       rw [h3] at h
       simpa using h
-    · rw [Int.emultiplicity_pow_sub_pow hl hodd h1 h2,
-        emultiplicity_pow_self_of_prime hl.prime]
+    · rw [Int.emultiplicity_pow_sub_pow hl hodd h1 h2, emultiplicity_pow_self_of_prime hl.prime]
   rw [one_pow, ← geom_sum_mul, emultiplicity_mul hp, add_comm] at hlte
   have hfin : emultiplicity (l : ℤ) ((t : ℤ) - 1) ≠ ⊤ := by
     rw [← finiteMultiplicity_iff_emultiplicity_ne_top, Int.finiteMultiplicity_iff]
@@ -40,10 +40,12 @@ theorem geom_sum_valuation {l : ℕ} (hl : l.Prime) {t : ℕ} (ht1 : 1 < t)
   rw [emultiplicity_eq_coe] at h4
   exact_mod_cast h4
 
-theorem exists_aut {E K : Type} [Field E] [NumberField E] [Field K] [Algebra E K] {M : ℕ}
-    [NeZero M] [IsCyclotomicExtension {M} E K] {ζ : K} (hζ : IsPrimitiveRoot ζ M) {g : ℕ}
-    (hg : g.Coprime M) :
-    ∃ τ : K ≃ₐ[E] K, τ ζ = ζ ^ (g ^ (Module.finrank ℚ E).factorial) := by
+theorem exists_aut
+    {E K : Type} [Field E] [NumberField E] [Field K] [Algebra E K]
+    {M : ℕ} [NeZero M] [IsCyclotomicExtension {M} E K]
+    {ζ : K} (hζ : IsPrimitiveRoot ζ M)
+    {g : ℕ} (hg : g.Coprime M)
+    : ∃ τ : K ≃ₐ[E] K, τ ζ = ζ ^ (g ^ (Module.finrank ℚ E).factorial) := by
   haveI := IsCyclotomicExtension.finiteDimensional {M} E K
   haveI := IsCyclotomicExtension.isGalois {M} E K
   haveI : NumberField K := NumberField.of_module_finite E K
@@ -68,17 +70,19 @@ theorem exists_aut {E K : Type} [Field E] [NumberField E] [Field K] [Algebra E K
     exact H.pow_mem (H.pow_index_mem _) c
   obtain ⟨τ, hτ⟩ := hmem
   refine ⟨τ, ?_⟩
-  rw [← hζ.autToPow_spec E τ, hτ, Units.val_pow_eq_pow_val, ZMod.coe_unitOfCoprime,
-    ← Nat.cast_pow, ZMod.val_natCast]
+  rw [← hζ.autToPow_spec E τ, hτ, Units.val_pow_eq_pow_val, ZMod.coe_unitOfCoprime, ← Nat.cast_pow,
+    ZMod.val_natCast]
   exact (pow_eq_pow_mod _ hζ.pow_eq_one).symm
 
-theorem descent {E K : Type} [Field E] [Field K] [Algebra E K] {M : ℕ}
-    [NeZero M] [IsCyclotomicExtension {M} E K] {ζ : K} (hζ : IsPrimitiveRoot ζ M) {k n : ℕ}
-    (τ : K ≃ₐ[E] K) (hτ : τ ζ = ζ ^ (k + 1))
-    (hN : M ∣ (∑ i ∈ Finset.range n, (k + 1) ^ i) * k) {u : E} {w : K} (hw0 : w ≠ 0)
-    (hw : w ^ M = algebraMap E K u) :
-    ∃ (α : K) (v : E), α ^ M = 1 ∧ α ^ (∑ i ∈ Finset.range n, (k + 1) ^ i) = 1 ∧
-      algebraMap E K v * α = w ^ k := by
+theorem descent
+    {E K : Type} [Field E] [Field K] [Algebra E K]
+    {M : ℕ} [NeZero M] [IsCyclotomicExtension {M} E K]
+    {ζ : K} (hζ : IsPrimitiveRoot ζ M)
+    {k n : ℕ} (τ : K ≃ₐ[E] K) (hτ : τ ζ = ζ ^ (k + 1))
+    (hN : M ∣ (∑ i ∈ Finset.range n, (k + 1) ^ i) * k)
+    {u : E} {w : K} (hw0 : w ≠ 0) (hw : w ^ M = algebraMap E K u)
+    : ∃ (α : K) (v : E),
+      α ^ M = 1 ∧ α ^ (∑ i ∈ Finset.range n, (k + 1) ^ i) = 1 ∧ algebraMap E K v * α = w ^ k := by
   haveI := IsCyclotomicExtension.finiteDimensional {M} E K
   haveI := IsCyclotomicExtension.isGalois {M} E K
   have hext : ∀ σ σ' : K ≃ₐ[E] K, σ ζ = σ' ζ → σ = σ' := by
@@ -102,14 +106,16 @@ theorem descent {E K : Type} [Field E] [Field K] [Algebra E K] {M : ℕ}
     exact zero_ne_one ha
   obtain ⟨α, hαM, hα⟩ := hcoc τ
   have hα0 := hne α hαM
-  have hiter : ∀ m : ℕ, (τ ^ m) w = α ^ (∑ i ∈ Finset.range m, (k + 1) ^ i) * w ∧
-      (τ ^ m) ζ = ζ ^ ((k + 1) ^ m) := by
+  have hiter
+      : ∀ m : ℕ,
+        (τ ^ m) w = α ^ (∑ i ∈ Finset.range m, (k + 1) ^ i) * w
+          ∧ (τ ^ m) ζ = ζ ^ ((k + 1) ^ m) := by
     intro m
     induction m with
     | zero => simp
     | succ m ih =>
-      rw [pow_succ', AlgEquiv.mul_apply, AlgEquiv.mul_apply, ih.1, ih.2, map_mul, map_pow,
-        map_pow, hτ, hα, hroot α hαM, geom_sum_succ]
+      rw [pow_succ', AlgEquiv.mul_apply, AlgEquiv.mul_apply, ih.1, ih.2, map_mul, map_pow, map_pow,
+        hτ, hα, hroot α hαM, geom_sum_succ]
       constructor <;> ring
   have hgeom : ∀ m : ℕ, (k + 1) ^ m = (∑ i ∈ Finset.range m, (k + 1) ^ i) * k + 1 := by
     intro m
@@ -132,8 +138,7 @@ theorem descent {E K : Type} [Field E] [Field K] [Algebra E K] {M : ℕ}
     have h := congrArg (fun f : K ≃ₐ[E] K => f w) (hcomm σ)
     simp only [AlgEquiv.mul_apply] at h
     rw [hα, ha, map_mul, map_mul, ha, hα, hroot a haM] at h
-    have hσα : σ α = a ^ k * α :=
-      mul_right_cancel₀ (mul_ne_zero ha0 hw0) (by rw [h]; ring)
+    have hσα : σ α = a ^ k * α := mul_right_cancel₀ (mul_ne_zero ha0 hw0) (by rw [h]; ring)
     rw [map_div₀, map_pow, hσα, ha, mul_pow]
     field_simp
   obtain ⟨v, hv⟩ := (IsGalois.mem_range_algebraMap_iff_fixed _).mpr hfix
@@ -141,13 +146,17 @@ theorem descent {E K : Type} [Field E] [Field K] [Algebra E K] {M : ℕ}
 
 end CyclotomicKummerDescent
 
-
 open CyclotomicKummerDescent in
-theorem exists_pow_descent_cyclotomic :
-    ∀ (E : Type) [Field E] [NumberField E] (l r : ℕ), l.Prime → ∃ M : ℕ, 0 < M ∧ l ^ r ∣ M ∧
-    ∀ (Ω : Type) [Field Ω] [Algebra E Ω] (ζ : Ω), IsPrimitiveRoot ζ M → ∀ (u : E) (w : Ω),
-      w ∈ IntermediateField.adjoin E {ζ} → w ^ M = algebraMap E Ω u →
-        ∃ v : E, v ^ (l ^ r) = u := by
+theorem exists_pow_descent_cyclotomic
+    : ∀ (E : Type) [Field E] [NumberField E] (l r : ℕ),
+      l.Prime
+        → ∃ M : ℕ,
+          0 < M ∧ l ^ r ∣ M
+            ∧ ∀ (Ω : Type) [Field Ω] [Algebra E Ω] (ζ : Ω),
+              IsPrimitiveRoot ζ M
+                → ∀ (u : E) (w : Ω),
+                  w ∈ IntermediateField.adjoin E {ζ} → w ^ M = algebraMap E Ω u
+                    → ∃ v : E, v ^ (l ^ r) = u := by
   intro E _ _ l r hl
   set m := (Module.finrank ℚ E).factorial with hm
   have ht1 : 1 < (1 + l ^ 2) ^ m :=
@@ -186,8 +195,8 @@ theorem exists_pow_descent_cyclotomic :
     exact Nat.coprime_one_left l
   obtain ⟨τ, hτ⟩ := exists_aut (E := E) hζ' hg
   rw [← hm, hk] at hτ
-  obtain ⟨α, v, hαM, hαN, hv⟩ := descent hζ' (n := l ^ r) τ hτ
-    (by rw [pow_add]; exact mul_dvd_mul hN1 ⟨e, hke⟩) hw0 hw'
+  obtain ⟨α, v, hαM, hαN, hv⟩ :=
+    descent hζ' (n := l ^ r) τ hτ (by rw [pow_add]; exact mul_dvd_mul hN1 ⟨e, hke⟩) hw0 hw'
   have hαr : α ^ (l ^ r) = 1 := by
     obtain ⟨j, -, hj⟩ := (Nat.dvd_prime_pow hl).mp (orderOf_dvd_of_pow_eq_one hαM)
     have h1 := orderOf_dvd_of_pow_eq_one hαN
@@ -204,8 +213,8 @@ theorem exists_pow_descent_cyclotomic :
     congr 1
     ring
   have hco : IsCoprime (e : ℤ) ((l ^ r : ℕ) : ℤ) :=
-    Nat.isCoprime_iff_coprime.mpr
-      (Nat.Coprime.pow_right r ((Nat.Prime.coprime_iff_not_dvd hl).mpr he).symm)
+    Nat.isCoprime_iff_coprime.mpr (Nat.Coprime.pow_right r
+      ((Nat.Prime.coprime_iff_not_dvd hl).mpr he).symm)
   obtain ⟨a, b, hab⟩ := hco
   refine ⟨v ^ a * u ^ b, ?_⟩
   rw [mul_pow, ← zpow_natCast (v ^ a), ← zpow_natCast (u ^ b), ← zpow_mul, ← zpow_mul, mul_comm a,

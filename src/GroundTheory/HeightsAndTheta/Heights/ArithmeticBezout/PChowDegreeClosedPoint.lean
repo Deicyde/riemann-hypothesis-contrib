@@ -17,9 +17,11 @@ namespace ObjectsChow
 
 open MvPolynomial Vertical Vertical.NormFormIrreducible
 
-theorem aeval_smul_of_isHomogeneous {F K : Type*} [Field F] [Field K] [Algebra F K] {n d : ℕ}
-    {g : MvPolynomial (Fin n) F} (hg : g.IsHomogeneous d) (c : K) (y : Fin n → K) :
-    aeval (fun j => c * y j) g = c ^ d * aeval y g := by
+theorem aeval_smul_of_isHomogeneous
+    {F K : Type*} [Field F] [Field K] [Algebra F K]
+    {n d : ℕ} {g : MvPolynomial (Fin n) F} (hg : g.IsHomogeneous d)
+    (c : K) (y : Fin n → K)
+    : aeval (fun j => c * y j) g = c ^ d * aeval y g := by
   classical
   conv_lhs => rw [g.as_sum]
   conv_rhs => rw [g.as_sum]
@@ -35,8 +37,9 @@ theorem aeval_smul_of_isHomogeneous {F K : Type*} [Field F] [Field K] [Algebra F
   rw [Finsupp.prod_mul, Finsupp.prod, Finset.prod_pow_eq_pow_sum, hdeg]
   ring
 
-theorem ChowDegreeClosedPoint.proof (hField : ClosedPointChartField.Statement)
-    (hCone : ClosedPointConeCoord.Statement) : ChowDegreeClosedPoint.Statement := by
+theorem ChowDegreeClosedPoint.proof
+    (hField : ClosedPointChartField.Statement) (hCone : ClosedPointConeCoord.Statement)
+    : ChowDegreeClosedPoint.Statement := by
   classical
   intro F _ _ n I i hI hdim hXi
   obtain ⟨hfield, hfin⟩ := hField F n I i hI hdim hXi
@@ -59,12 +62,12 @@ theorem ChowDegreeClosedPoint.proof (hField : ClosedPointChartField.Statement)
     exact Ideal.Quotient.eq_zero_iff_mem.mpr this
   set t : Fin n → F := Pi.single i 1 with ht_def
   have ht : ∑ j, algebraMap F L (t j) * ξ j = 1 := by
-    rw [Finset.sum_eq_single i (fun j _ hj => by simp [ht_def, hj])
+    rw [Finset.sum_eq_single i
+      (fun j _ hj => by simp [ht_def, hj])
       (fun h => absurd (Finset.mem_univ i) h)]
     simp [ht_def, hξi]
   have hgen : Algebra.adjoin F (Set.range ξ) = ⊤ := by
-    have hr : Set.range ξ = Ideal.Quotient.mkₐ F J '' Set.range X := by
-      rw [← Set.range_comp]; rfl
+    have hr : Set.range ξ = Ideal.Quotient.mkₐ F J '' Set.range X := by rw [← Set.range_comp]; rfl
     rw [hr, ← AlgHom.map_adjoin, MvPolynomial.adjoin_range_X, Algebra.map_top, AlgHom.range_eq_top]
     exact Ideal.Quotient.mkₐ_surjective F J
 
@@ -104,15 +107,15 @@ theorem ChowDegreeClosedPoint.proof (hField : ClosedPointChartField.Statement)
       · rintro _ rfl
         simp [ys, hyi]
     let σ : L →ₐ[F] K := Ideal.Quotient.liftₐ J (aeval ys) fun g hg => hker hg
-    have hσ : ∀ j, σ (ξ j) = ys j := fun j =>
-      (Ideal.Quotient.lift_mk J _ _).trans (by simp [ys])
+    have hσ : ∀ j, σ (ξ j) = ys j := fun j => (Ideal.Quotient.lift_mk J _ _).trans (by simp [ys])
     rw [aeval_rename, aeval_def, ← eval_map, hprod, eval_prod]
     refine Finset.prod_eq_zero (Finset.mem_univ σ) ?_
     rw [eval_embForm]
     simp only [hσ, ys, Function.comp_apply, ι]
     have := hyu 0
-    calc ∑ j, u (0, j) * ((y i)⁻¹ * y j) = (y i)⁻¹ * ∑ j, u (0, j) * y j := by
-          rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun j _ => by ring
+    calc
+      ∑ j, u (0, j) * ((y i)⁻¹ * y j) = (y i)⁻¹ * ∑ j, u (0, j) * y j := by
+        rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun j _ => by ring
       _ = 0 := by rw [this, mul_zero]
 
   have hdvd2 : ∀ σ : L →ₐ[F] K, embForm σ ξ ∣ f₀.map (algebraMap F K) := by
@@ -120,8 +123,8 @@ theorem ChowDegreeClosedPoint.proof (hField : ClosedPointChartField.Statement)
     have hprime : Prime (embForm σ ξ) := (irreducible_embForm σ ht).prime
     have hspan : (Ideal.span {embForm σ ξ}).IsPrime :=
       (Ideal.span_singleton_prime hprime.ne_zero).mpr hprime
-    rw [← Ideal.mem_span_singleton, ← hspan.radical,
-      ← vanishingIdeal_zeroLocus_eq_radical (K := K), mem_vanishingIdeal_iff]
+    rw [← Ideal.mem_span_singleton, ← hspan.radical, ← vanishingIdeal_zeroLocus_eq_radical (K := K),
+      mem_vanishingIdeal_iff]
     intro u hu
     have hu0 : ∑ j, u j * σ (ξ j) = 0 := by
       have := hu _ (Ideal.mem_span_singleton_self _)
@@ -141,13 +144,14 @@ theorem ChowDegreeClosedPoint.proof (hField : ClosedPointChartField.Statement)
     rwa [rename_rename, show Prod.snd ∘ ι = id from rfl, rename_id_apply] at this
 
   have hf0 : f₀ ≠ 0 := fun h => hf.1 (by rw [← hsnd f, ← hf₀, h, map_zero])
-  have hmap0 : f₀.map (algebraMap F K) ≠ 0 :=
-    fun h => hf0 (map_injective _ (algebraMap F K).injective (by rw [h, map_zero]))
+  have hmap0 : f₀.map (algebraMap F K) ≠ 0 := fun h =>
+    hf0 (map_injective _ (algebraMap F K).injective (by rw [h, map_zero]))
   obtain ⟨h, hh⟩ := hdvd4
   obtain ⟨q, hq⟩ := hdvd3
   have hq1 : q * h.map (algebraMap F K) = 1 := by
     apply mul_left_cancel₀ hmap0
-    calc f₀.map (algebraMap F K) * (q * h.map (algebraMap F K))
+    calc
+      f₀.map (algebraMap F K) * (q * h.map (algebraMap F K))
         = (f₀.map (algebraMap F K) * h.map (algebraMap F K)) * q := by ring
       _ = N.map (algebraMap F K) * q := by rw [hh, map_mul]
       _ = f₀.map (algebraMap F K) * 1 := by rw [← hq, mul_one]

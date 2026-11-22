@@ -11,20 +11,25 @@ noncomputable section
 
 namespace PI.StabPairs.Conv
 
-open Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.C2 PI.StabPairsW
+open Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.C2
+  PI.StabPairsW
 
-theorem ut_last {r : ℕ} {u : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ} (hu : u ∈ UTset (r + 1)) (j : Fin (r + 1)) :
-    u (Fin.last r) j = if j = Fin.last r then 1 else 0 := by
+theorem ut_last
+    {r : ℕ} {u : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ} (hu : u ∈ UTset (r + 1)) (j : Fin (r + 1))
+    : u (Fin.last r) j = if j = Fin.last r then 1 else 0 := by
   split_ifs with h
   · subst h; exact hu.2 _
   · exact hu.1 _ _ (lt_of_le_of_ne (Fin.le_last j) h)
 
-theorem ut_det {r : ℕ} {u : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ} (hu : u ∈ UTset (r + 1)) : u.det = 1 := by
+theorem ut_det {r : ℕ} {u : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ} (hu : u ∈ UTset (r + 1))
+    : u.det = 1 := by
   rw [Matrix.det_of_isUpperTriangular (fun i j hij => hu.1 i j hij)]
   simp [hu.2]
 
-theorem ut_sub_one_last {r : ℕ} {u : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ} (hu : u ∈ UTset (r + 1))
-    (x : Fin (r + 1) → ℂ) : ((u - 1) *ᵥ x) (Fin.last r) = 0 := by
+theorem ut_sub_one_last
+    {r : ℕ} {u : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ}
+    (hu : u ∈ UTset (r + 1)) (x : Fin (r + 1) → ℂ)
+    : ((u - 1) *ᵥ x) (Fin.last r) = 0 := by
   simp only [Matrix.mulVec, dotProduct]
   refine Finset.sum_eq_zero fun j _ => ?_
   rw [Matrix.sub_apply, ut_last hu, Matrix.one_apply]
@@ -32,8 +37,10 @@ theorem ut_sub_one_last {r : ℕ} {u : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ} (
   · subst h; simp
   · simp [h, Ne.symm h]
 
-theorem ut_conj_fix {r : ℕ} {u : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ} (hu : u ∈ UTset (r + 1))
-    (v : Fin (r + 1) → ℂ) (hv : ∀ a : Fin (r + 1), a.val < r → v a = 0) : uᴴ *ᵥ v = v := by
+theorem ut_conj_fix
+    {r : ℕ} {u : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ}
+    (hu : u ∈ UTset (r + 1)) (v : Fin (r + 1) → ℂ) (hv : ∀ a : Fin (r + 1), a.val < r → v a = 0)
+    : uᴴ *ᵥ v = v := by
   ext a
   simp only [Matrix.mulVec, dotProduct, Matrix.conjTranspose_apply]
   rw [Finset.sum_eq_single (Fin.last r)]
@@ -46,20 +53,25 @@ theorem ut_conj_fix {r : ℕ} {u : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ} (hu :
     rw [hv b (lt_of_le_of_ne (Nat.lt_succ_iff.mp b.isLt) (fun e => hb (Fin.ext e))), mul_zero]
   · simp
 
-theorem cancel_of_pair {r : ℕ} {u u' Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ} (hu : u ∈ UTset (r + 1))
-    (hZ : IsUnit Z.det) (hp : uᴴ * Z * u' = Z) (c : Fin (r + 1) → ℂ)
-    (hc : ∀ a : Fin (r + 1), a.val < r → (Z *ᵥ c) a = 0) : (u' - 1) *ᵥ c = 0 := by
+theorem cancel_of_pair
+    {r : ℕ} {u u' Z : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ}
+    (hu : u ∈ UTset (r + 1)) (hZ : IsUnit Z.det) (hp : uᴴ * Z * u' = Z) (c : Fin (r + 1) → ℂ)
+    (hc : ∀ a : Fin (r + 1), a.val < r → (Z *ᵥ c) a = 0)
+    : (u' - 1) *ᵥ c = 0 := by
   have hA : IsUnit (uᴴ * Z).det := by
     rw [Matrix.det_mul, Matrix.det_conjTranspose, ut_det hu, star_one, one_mul]; exact hZ
   have h0 : (uᴴ * Z) *ᵥ ((u' - 1) *ᵥ c) = 0 := by
     rw [Matrix.mulVec_mulVec, Matrix.mul_sub, Matrix.mul_one, hp, Matrix.sub_mulVec,
       ← Matrix.mulVec_mulVec, ut_conj_fix hu _ hc, sub_self]
-  calc (u' - 1) *ᵥ c = ((uᴴ * Z)⁻¹ * (uᴴ * Z)) *ᵥ ((u' - 1) *ᵥ c) := by
-        rw [Matrix.nonsing_inv_mul _ hA, Matrix.one_mulVec]
+  calc
+    (u' - 1) *ᵥ c = ((uᴴ * Z)⁻¹ * (uᴴ * Z)) *ᵥ ((u' - 1) *ᵥ c) := by
+      rw [Matrix.nonsing_inv_mul _ hA, Matrix.one_mulVec]
     _ = 0 := by rw [← Matrix.mulVec_mulVec, h0, Matrix.mulVec_zero]
 
-theorem ut_adiag (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) {u : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ}
-    (hu : u ∈ UTset (r + 1)) : uᴴ * Adiag k r z * u = Adiag k r z := by
+theorem ut_adiag
+    (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ)
+    {u : Matrix (Fin (r + 1)) (Fin (r + 1)) ℂ} (hu : u ∈ UTset (r + 1))
+    : uᴴ * Adiag k r z * u = Adiag k r z := by
   ext a b
   rw [Adiag, Matrix.mul_apply]
   simp_rw [Matrix.mul_diagonal, Matrix.conjTranspose_apply]

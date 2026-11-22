@@ -11,19 +11,24 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.EqO
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry TopologicalSpace Filter Topology MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry TopologicalSpace Filter Topology
+  MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.Points GlobalTheory.ArInt GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.ProjSpace GlobalTheory.CompanionTheory.Ar.BaseZ
+open GlobalTheory GlobalTheory.Points GlobalTheory.ArInt GlobalTheory.Cartier GlobalTheory.CxPts
+  GlobalTheory.ProjSpace GlobalTheory.CompanionTheory.Ar.BaseZ
 
 namespace GlobalTheory.CompanionTheory.Metric
 
-theorem measure_eq_sum_map_of_embeddings {α : Type} [Fintype α] {Y : Type} [MeasurableSpace Y]
-    {Z : α → Type} [∀ a, MeasurableSpace (Z a)] {s : ∀ a, Z a → Y}
-    (hs : ∀ a, MeasurableEmbedding (s a)) (hu : ∀ y, ∃! a, y ∈ Set.range (s a))
+theorem measure_eq_sum_map_of_embeddings
+    {α : Type} [Fintype α]
+    {Y : Type} [MeasurableSpace Y]
+    {Z : α → Type} [∀ a, MeasurableSpace (Z a)]
+    {s : ∀ a, Z a → Y} (hs : ∀ a, MeasurableEmbedding (s a)) (hu : ∀ y, ∃! a, y ∈ Set.range (s a))
     {ν : Measure Y} {μ : ∀ a, Measure (Z a)}
-    (hν : ∀ a (S : Set (Z a)), MeasurableSet S → ν (s a '' S) = μ a S) :
-    ν = ∑ a, Measure.map (s a) (μ a) := by
+    (hν : ∀ a (S : Set (Z a)), MeasurableSet S → ν (s a '' S) = μ a S)
+    : ν = ∑ a, Measure.map (s a) (μ a) := by
   ext T hT
   rw [Measure.finsetSum_apply]
   have hcover : T = ⋃ a, T ∩ Set.range (s a) := by
@@ -48,15 +53,18 @@ theorem measure_eq_sum_map_of_embeddings {α : Type} [Fintype α] {Y : Type} [Me
   refine Finset.sum_congr rfl fun a _ => ?_
   rw [(hs a).map_apply, ← hν a _ ((hs a).measurable hT), Set.image_preimage_eq_inter_range]
 
-theorem integrableOn_and_setIntegral_of_embeddings :
-    ∀ (α : Type) [Finite α] (Y : Type) [MeasurableSpace Y] (Z : α → Type)
-      [∀ a, MeasurableSpace (Z a)] (s : ∀ a, Z a → Y), (∀ a, MeasurableEmbedding (s a)) →
-      (∀ y, ∃! a, y ∈ Set.range (s a)) → ∀ (ν : Measure Y) (μ : ∀ a, Measure (Z a)),
-      (∀ a (S : Set (Z a)), MeasurableSet S → ν (s a '' S) = μ a S) →
-      ∀ (S : Set Y), MeasurableSet S → ∀ f : Y → ℝ,
-      (IntegrableOn f S ν ↔ ∀ a, IntegrableOn (fun z => f (s a z)) (s a ⁻¹' S) (μ a)) ∧
-      (IntegrableOn f S ν →
-        ∫ y in S, f y ∂ν = ∑ᶠ a, ∫ z in s a ⁻¹' S, f (s a z) ∂(μ a)) := by
+theorem integrableOn_and_setIntegral_of_embeddings
+    : ∀ (α : Type) [Finite α] (Y : Type) [MeasurableSpace Y] (Z : α → Type)
+        [∀ a, MeasurableSpace (Z a)] (s : ∀ a, Z a → Y),
+      (∀ a, MeasurableEmbedding (s a)) → (∀ y, ∃! a, y ∈ Set.range (s a))
+        → ∀ (ν : Measure Y) (μ : ∀ a, Measure (Z a)),
+          (∀ a (S : Set (Z a)), MeasurableSet S → ν (s a '' S) = μ a S)
+            → ∀ (S : Set Y),
+              MeasurableSet S
+                → ∀ f : Y → ℝ,
+                  (IntegrableOn f S ν ↔ ∀ a, IntegrableOn (fun z => f (s a z)) (s a ⁻¹' S) (μ a))
+                    ∧ (IntegrableOn f S ν
+                      → ∫ y in S, f y ∂ν = ∑ᶠ a, ∫ z in s a ⁻¹' S, f (s a z) ∂(μ a)) := by
   intro α _ Y _ Z _ s hs hu ν μ hν S hS f
   haveI := Fintype.ofFinite α
   have hνeq := measure_eq_sum_map_of_embeddings hs hu hν

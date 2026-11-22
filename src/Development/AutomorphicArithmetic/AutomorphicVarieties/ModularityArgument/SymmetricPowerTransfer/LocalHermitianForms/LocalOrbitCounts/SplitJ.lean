@@ -7,12 +7,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open QuadraticAlgebra UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc
 
-private theorem core {L : Type} [CommRing L] [StarRing L] (ν : L) (P Q : Matrix (Fin 2) (Fin 2) L) (J : Matrix (Fin 2) (Fin 2) L)
-    (h1 : P * Q = 1) (h2 : Q * P = 1) (hν : IsUnit ν) (h3 : P.map star = ν • (P * J)) (X : Matrix (Fin 2) (Fin 2) L) :
-    J * X.map star = X * J ↔ (P * X * Q).map star = P * X * Q := by
+private theorem core
+    {L : Type} [CommRing L] [StarRing L]
+    (ν : L) (P Q : Matrix (Fin 2) (Fin 2) L) (J : Matrix (Fin 2) (Fin 2) L)
+    (h1 : P * Q = 1) (h2 : Q * P = 1) (hν : IsUnit ν) (h3 : P.map star = ν • (P * J))
+    (X : Matrix (Fin 2) (Fin 2) L)
+    : J * X.map star = X * J ↔ (P * X * Q).map star = P * X * Q := by
   have hm : ∀ A B : Matrix (Fin 2) (Fin 2) L, (A * B).map star = A.map star * B.map star := by
     intro A B
-    exact (Matrix.map_mul : (A * B).map (starRingEnd L) = A.map (starRingEnd L) * B.map (starRingEnd L))
+    exact (Matrix.map_mul
+      : (A * B).map (starRingEnd L) = A.map (starRingEnd L) * B.map (starRingEnd L))
   have h1s : P.map star * Q.map star = 1 := by
     rw [← hm, h1]
     simp
@@ -20,10 +24,11 @@ private theorem core {L : Type} [CommRing L] [StarRing L] (ν : L) (P Q : Matrix
     rw [← hm, h2]
     simp
   have hJQ : ν • (J * Q.map star) = Q := by
-    calc ν • (J * Q.map star) = Q * (P.map star * Q.map star) := by
-          rw [h3]
-          simp only [Matrix.mul_assoc, smul_mul_assoc, Matrix.mul_smul]
-          rw [← Matrix.mul_assoc Q P, h2, Matrix.one_mul]
+    calc
+      ν • (J * Q.map star) = Q * (P.map star * Q.map star) := by
+        rw [h3]
+        simp only [Matrix.mul_assoc, smul_mul_assoc, Matrix.mul_smul]
+        rw [← Matrix.mul_assoc Q P, h2, Matrix.one_mul]
       _ = Q := by rw [h1s, Matrix.mul_one]
   have hQP : Q * P.map star = ν • J := by
     rw [h3, Matrix.mul_smul, ← Matrix.mul_assoc, h2, Matrix.one_mul]
@@ -38,10 +43,12 @@ private theorem core {L : Type} [CommRing L] [StarRing L] (ν : L) (P Q : Matrix
     rw [hm, hm] at e
     have hL : Q * (P.map star * X.map star * Q.map star) * P.map star = ν • (J * X.map star) := by
       rw [show Q * (P.map star * X.map star * Q.map star) * P.map star
-          = (Q * P.map star) * X.map star * (Q.map star * P.map star) by simp only [Matrix.mul_assoc],
+            = (Q * P.map star) * X.map star * (Q.map star * P.map star) by
+          simp only [Matrix.mul_assoc],
         hQP, h2s, Matrix.mul_one, smul_mul_assoc]
     have hR : Q * (P * X * Q) * P.map star = ν • (X * J) := by
-      rw [show Q * (P * X * Q) * P.map star = (Q * P) * X * (Q * P.map star) by simp only [Matrix.mul_assoc],
+      rw [show Q * (P * X * Q) * P.map star = (Q * P) * X * (Q * P.map star) by
+          simp only [Matrix.mul_assoc],
         h2, hQP, Matrix.one_mul, Matrix.mul_smul]
     rw [hL, hR] at e
     exact hν.smul_left_cancel.1 e
@@ -77,8 +84,7 @@ theorem UpperTheory.V.Z.Sym.Loc.splitJ : UpperTheory.V.Z.Sym.Loc.SplitJ := by
     simp
   have hh2 : hh * 2 = 1 := by
     rw [hhdef, ← map_ofNat (algebraMap O (Lsq K Δ)) 2, ← hv, ← map_mul, Units.inv_mul, map_one]
-  have heu : e * U = 1 := by
-    rw [edef, hUdef, ← map_mul, Units.inv_mul, map_one]
+  have heu : e * U = 1 := by rw [edef, hUdef, ← map_mul, Units.inv_mul, map_one]
   have iw : IsIntegral O w := by
     refine (hdes w).1.2 ⟨?_, 1, ?_⟩
     · rw [hwdef]
@@ -93,7 +99,7 @@ theorem UpperTheory.V.Z.Sym.Loc.splitJ : UpperTheory.V.Z.Sym.Loc.SplitJ := by
     rw [edef]
     exact isIntegral_algebraMap
   have hνu : IsUnit ν :=
-    ⟨⟨ν, -star ν, by rw [mul_neg, hνν, neg_neg], by rw [neg_mul, mul_comm, hνν, neg_neg]⟩, rfl⟩
+    ⟨⟨ν, - star ν, by rw [mul_neg, hνν, neg_neg], by rw [neg_mul, mul_comm, hνν, neg_neg]⟩, rfl⟩
   let Pm : Matrix (Fin 2) (Fin 2) (Lsq K Δ) := !![1, star ν; w, -(star ν * w)]
   let Qm : Matrix (Fin 2) (Fin 2) (Lsq K Δ) := !![hh, hh * e * w; -(hh * ν), hh * e * ν * w]
   have hPQ : Pm * Qm = 1 := by
@@ -117,7 +123,7 @@ theorem UpperTheory.V.Z.Sym.Loc.splitJ : UpperTheory.V.Z.Sym.Loc.SplitJ := by
     · linear_combination -w * hνν
   refine ⟨⟨Pm, Qm, hPQ, hQP⟩, ?_, ?_⟩
   · intro i j
-    fin_cases i <;> fin_cases j <;> refine ⟨?_, ?_⟩ <;> simp [Pm, Qm] <;>
-      apply_rules [IsIntegral.mul, IsIntegral.neg, isIntegral_one]
+    fin_cases i <;> fin_cases j <;> refine ⟨?_, ?_⟩ <;> simp [Pm, Qm]
+      <;> apply_rules [IsIntegral.mul, IsIntegral.neg, isIntegral_one]
   · intro X
     exact core ν Pm Qm !![0, 1; -1, 0] hPQ hQP hνu h3 X

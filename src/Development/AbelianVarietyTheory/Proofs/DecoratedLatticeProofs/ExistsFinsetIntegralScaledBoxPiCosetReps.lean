@@ -15,26 +15,38 @@ open scoped Topology
 noncomputable section
 namespace GlobalTheory.BoxReps
 
-def boxSubgroup (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (n : Type) (s : kˣ) : AddSubgroup (n → k) where
+def boxSubgroup
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (n : Type) (s : kˣ)
+    : AddSubgroup (n → k) where
   carrier := box n s
   add_mem' hx hy i _ := add_mem_cball (hx i trivial) (hy i trivial)
   zero_mem' i _ := by simp [cball]
   neg_mem' hx i _ := neg_mem_cball (hx i trivial)
 
-theorem exists_finset_box_reps : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : Type) [Fintype n] (r R : kˣ), valuation k (r : k) ≤ valuation k (R : k) → ∃ S : Finset (n → k), (∀ b ∈ S, b ∈ box n R) ∧ ∀ a ∈ box n R, ∃! b, b ∈ S ∧ a - b ∈ box n r := by
+theorem exists_finset_box_reps
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : Type) [Fintype n] (r R : kˣ),
+      valuation k (r : k) ≤ valuation k (R : k)
+        → ∃ S : Finset (n → k),
+          (∀ b ∈ S, b ∈ box n R) ∧ ∀ a ∈ box n R, ∃! b, b ∈ S ∧ a - b ∈ box n r := by
   intro k _ _ _ _ n _ r R _
   classical
   set H := boxSubgroup k n r
   have hH : ∀ x, x ∈ H ↔ x ∈ box n r := fun _ => Iff.rfl
-  have hq : ∀ a b : n → k, (QuotientAddGroup.mk a : (n → k) ⧸ H) = QuotientAddGroup.mk b ↔ a - b ∈ box n r := by
+  have hq
+      : ∀ a b : n → k,
+        (QuotientAddGroup.mk a : (n → k) ⧸ H) = QuotientAddGroup.mk b ↔ a - b ∈ box n r := by
     intro a b
     rw [QuotientAddGroup.eq, ← hH, ← H.neg_mem_iff]
     simp [neg_add_eq_sub]
-  obtain ⟨T, hTsub, hTfin, hcov⟩ := (isCompact_box (n := n) R).elim_finite_subcover_image
-    (b := box n R) (c := fun a => (fun x => x - a) ⁻¹' box n r)
-    (fun a _ => (isOpen_box r).preimage (continuous_id.sub continuous_const))
-    (fun x hx => Set.mem_biUnion hx (show x - x ∈ box n r by rw [sub_self]; exact (boxSubgroup k n r).zero_mem))
+  obtain ⟨T, hTsub, hTfin, hcov⟩ :=
+    (isCompact_box (n := n) R).elim_finite_subcover_image (b := box n R)
+      (c := fun a => (fun x => x - a) ⁻¹' box n r)
+      (fun a _ => (isOpen_box r).preimage (continuous_id.sub continuous_const))
+      (fun x hx =>
+        Set.mem_biUnion hx
+          (show x - x ∈ box n r by rw [sub_self]; exact (boxSubgroup k n r).zero_mem))
   set π : (n → k) → (n → k) ⧸ H := QuotientAddGroup.mk
   let f : (n → k) ⧸ H → (n → k) := fun q =>
     if h : ∃ a ∈ box n R, π a = q then Classical.choose h else 0

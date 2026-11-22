@@ -6,14 +6,16 @@ public import ReciprocityTheory.L2DbarEstimates.PlurisubharmonicCharts.FlatCalcA
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.Up.RGF
 
-open Filter Topology Set ReciprocityTheory.L2DbarEstimates ReciprocityTheory.L2DbarEstimates.ChartWirtingerDerivatives ReciprocityTheory.L2DbarEstimates.Y
+open Filter Topology Set ReciprocityTheory.L2DbarEstimates
+  ReciprocityTheory.L2DbarEstimates.ChartWirtingerDerivatives ReciprocityTheory.L2DbarEstimates.Y
 open scoped ContDiff
 
 noncomputable section
 
-theorem gc_wdb_comp (n d : ℕ) (g : V d → ℂ) (F : V n → V d) (J : V n →L[ℂ] V d) (v : V n)
-    (hg : DifferentiableAt ℝ g (F v)) (hF : HasFDerivAt F J v) (j : Fin n) :
-    wdb n j (g ∘ F) v = ∑ a, wdb d a g (F v) * (starRingEnd ℂ) (J (bas n j) a) := by
+theorem gc_wdb_comp
+    (n d : ℕ) (g : V d → ℂ) (F : V n → V d) (J : V n →L[ℂ] V d) (v : V n)
+    (hg : DifferentiableAt ℝ g (F v)) (hF : HasFDerivAt F J v) (j : Fin n)
+    : wdb n j (g ∘ F) v = ∑ a, wdb d a g (F v) * (starRingEnd ℂ) (J (bas n j) a) := by
   have hd : fderiv ℝ (g ∘ F) v = (fderiv ℝ g (F v)).comp (J.restrictScalars ℝ) :=
     (hg.hasFDerivAt.comp v (hF.restrictScalars ℝ)).fderiv
   rw [wdb, hd]
@@ -29,9 +31,10 @@ theorem gc_wdb_comp (n d : ℕ) (g : V d → ℂ) (F : V n → V d) (J : V n →
     (D (bas d a) + Complex.I * D (Complex.I • bas d a)) / 2 * (starRingEnd ℂ) (c a) / 2) *
       Complex.I_sq
 
-theorem gc_wd_comp (n d : ℕ) (g : V d → ℂ) (F : V n → V d) (J : V n →L[ℂ] V d) (v : V n)
-    (hg : DifferentiableAt ℝ g (F v)) (hF : HasFDerivAt F J v) (j : Fin n) :
-    wd n j (g ∘ F) v = ∑ a, wd d a g (F v) * J (bas n j) a := by
+theorem gc_wd_comp
+    (n d : ℕ) (g : V d → ℂ) (F : V n → V d) (J : V n →L[ℂ] V d) (v : V n)
+    (hg : DifferentiableAt ℝ g (F v)) (hF : HasFDerivAt F J v) (j : Fin n)
+    : wd n j (g ∘ F) v = ∑ a, wd d a g (F v) * J (bas n j) a := by
   have hd : fderiv ℝ (g ∘ F) v = (fderiv ℝ g (F v)).comp (J.restrictScalars ℝ) :=
     (hg.hasFDerivAt.comp v (hF.restrictScalars ℝ)).fderiv
   rw [wd, hd]
@@ -47,8 +50,8 @@ theorem gc_wd_comp (n d : ℕ) (g : V d → ℂ) (F : V n → V d) (J : V n →L
     (D (bas d a) + Complex.I * D (Complex.I • bas d a)) / 2 * (starRingEnd ℂ) (c a) / 2) *
       Complex.I_sq
 
-theorem gc_toLp_apply (n d : ℕ) (J : V n →L[ℂ] V d) (ξ : Fin n → ℂ) (b : Fin d) :
-    J (WithLp.toLp 2 ξ) b = ∑ j, ξ j * J (bas n j) b := by
+theorem gc_toLp_apply (n d : ℕ) (J : V n →L[ℂ] V d) (ξ : Fin n → ℂ) (b : Fin d)
+    : J (WithLp.toLp 2 ξ) b = ∑ j, ξ j * J (bas n j) b := by
   have h : WithLp.toLp 2 ξ = ∑ j, ξ j • bas n j := by
     ext k
     simp [bas, Pi.single_apply]
@@ -56,33 +59,37 @@ theorem gc_toLp_apply (n d : ℕ) (J : V n →L[ℂ] V d) (ξ : Fin n → ℂ) (
     rw [h, map_sum]
   simp [map_smul]
 
-theorem gc_sum_wd_comp (n d : ℕ) (g : V d → ℂ) (F : V n → V d) (J : V n →L[ℂ] V d) (v : V n)
-    (hg : DifferentiableAt ℝ g (F v)) (hF : HasFDerivAt F J v) (ξ : Fin n → ℂ) :
-    ∑ j, wd n j (g ∘ F) v * ξ j = ∑ a, wd d a g (F v) * J (WithLp.toLp 2 ξ) a := by
+theorem gc_sum_wd_comp
+    (n d : ℕ) (g : V d → ℂ) (F : V n → V d) (J : V n →L[ℂ] V d) (v : V n)
+    (hg : DifferentiableAt ℝ g (F v)) (hF : HasFDerivAt F J v) (ξ : Fin n → ℂ)
+    : ∑ j, wd n j (g ∘ F) v * ξ j = ∑ a, wd d a g (F v) * J (WithLp.toLp 2 ξ) a := by
   simp only [gc_wd_comp n d g F J v hg hF, gc_toLp_apply, Finset.sum_mul, Finset.mul_sum]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun j _ => by ring
 
-theorem sum_four_indices_comm (n d : ℕ) (f : Fin n → Fin n → Fin d → Fin d → ℂ) :
-    ∑ j, ∑ k, ∑ a, ∑ b, f j k a b = ∑ b, ∑ a, ∑ j, ∑ k, f j k a b := by
-  calc ∑ j, ∑ k, ∑ a, ∑ b, f j k a b = ∑ j, ∑ k, ∑ b, ∑ a, f j k a b :=
-        Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => Finset.sum_comm
+theorem sum_four_indices_comm (n d : ℕ) (f : Fin n → Fin n → Fin d → Fin d → ℂ)
+    : ∑ j, ∑ k, ∑ a, ∑ b, f j k a b = ∑ b, ∑ a, ∑ j, ∑ k, f j k a b := by
+  calc
+    ∑ j, ∑ k, ∑ a, ∑ b, f j k a b = ∑ j, ∑ k, ∑ b, ∑ a, f j k a b :=
+      Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun k _ => Finset.sum_comm
     _ = ∑ j, ∑ b, ∑ k, ∑ a, f j k a b := Finset.sum_congr rfl fun j _ => Finset.sum_comm
     _ = ∑ b, ∑ j, ∑ k, ∑ a, f j k a b := Finset.sum_comm
     _ = ∑ b, ∑ j, ∑ a, ∑ k, f j k a b :=
-        Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun j _ => Finset.sum_comm
+      Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun j _ => Finset.sum_comm
     _ = ∑ b, ∑ a, ∑ j, ∑ k, f j k a b := Finset.sum_congr rfl fun b _ => Finset.sum_comm
 
-theorem gc_leviV_comp (n d : ℕ) (g : V d → ℂ) (F : V n → V d) (U : Set (V n)) (hU : IsOpen U)
-    (v : V n) (hv : v ∈ U) (hF : ContDiffOn ℂ 2 F U) (hg : ContDiffAt ℝ 2 g (F v))
-    (ξ : Fin n → ℂ) :
-    leviV n (g ∘ F) v ξ = leviV d g (F v) (fun b => fderiv ℂ F v (WithLp.toLp 2 ξ) b) := by
+theorem gc_leviV_comp
+    (n d : ℕ) (g : V d → ℂ) (F : V n → V d) (U : Set (V n)) (hU : IsOpen U) (v : V n)
+    (hv : v ∈ U) (hF : ContDiffOn ℂ 2 F U) (hg : ContDiffAt ℝ 2 g (F v)) (ξ : Fin n → ℂ)
+    : leviV n (g ∘ F) v ξ = leviV d g (F v) (fun b => fderiv ℂ F v (WithLp.toLp 2 ξ) b) := by
   have hFd : ∀ y ∈ U, HasFDerivAt F (fderiv ℂ F y) y := fun y hy =>
     (((hF.differentiableOn (by norm_num)) y hy).differentiableAt (hU.mem_nhds hy)).hasFDerivAt
   have hgev : ∀ᶠ y in 𝓝 v, ContDiffAt ℝ 2 g (F y) :=
     (hFd v hv).continuousAt.eventually (hg.eventually (by simp))
-  have hwdb : ∀ k, wdb n k (g ∘ F) =ᶠ[𝓝 v]
-      fun y => ∑ a, wdb d a g (F y) * (starRingEnd ℂ) (fderiv ℂ F y (bas n k) a) := by
+  have hwdb
+      : ∀ k,
+        wdb n k (g ∘ F) =ᶠ[𝓝 v]
+          fun y => ∑ a, wdb d a g (F y) * (starRingEnd ℂ) (fderiv ℂ F y (bas n k) a) := by
     intro k
     filter_upwards [hgev, hU.mem_nhds hv] with y hy hyU
     exact gc_wdb_comp n d g F _ y (hy.differentiableAt (by simp)) (hFd y hyU) k
@@ -104,18 +111,22 @@ theorem gc_leviV_comp (n d : ℕ) (g : V d → ℂ) (F : V n → V d) (U : Set (
       (by norm_num)
   have hPa : ∀ k a, DifferentiableAt ℂ (fun y => fderiv ℂ F y (bas n k) a) v := fun k a =>
     (differentiableAt_piLp 2).1 (hDF.clm_apply (differentiableAt_const _)) a
-  have hCa : ∀ k a, DifferentiableAt ℝ
-      (fun y => (starRingEnd ℂ) (fderiv ℂ F y (bas n k) a)) v := by
+  have hCa : ∀ k a, DifferentiableAt ℝ (fun y => (starRingEnd ℂ) (fderiv ℂ F y (bas n k) a)) v := by
     intro k a
     have := Complex.conjCLE.differentiableAt.comp v ((hPa k a).restrictScalars ℝ)
     simpa [Function.comp_def] using this
-  have step : ∀ j k, wd n j (wdb n k (g ∘ F)) v = ∑ a, ∑ b,
-      wd d b (wdb d a g) (F v) * fderiv ℂ F v (bas n j) b *
-        (starRingEnd ℂ) (fderiv ℂ F v (bas n k) a) := by
+  have step
+      : ∀ j k,
+        wd n j (wdb n k (g ∘ F)) v
+          = ∑ a, ∑ b,
+            wd d b (wdb d a g) (F v) * fderiv ℂ F v (bas n j) b *
+              (starRingEnd ℂ) (fderiv ℂ F v (bas n k) a) := by
     intro j k
     rw [wd_congr n j _ _ v (hwdb k),
-      fc_wd_sum n j Finset.univ (fun a y => wdb d a g (F y) *
-        (starRingEnd ℂ) (fderiv ℂ F y (bas n k) a)) v (fun a _ => (hWa a).mul (hCa k a))]
+      fc_wd_sum n j Finset.univ
+        (fun a y => wdb d a g (F y) * (starRingEnd ℂ) (fderiv ℂ F y (bas n k) a))
+        v
+        (fun a _ => (hWa a).mul (hCa k a))]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [wd_mul' n j _ _ v (hWa a) (hCa k a), wd_conj', fc_wdb_holo n _ v (hPa k a) j, map_zero,
       mul_zero, add_zero]

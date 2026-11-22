@@ -14,24 +14,31 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj DividedPowers
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.SqLift GlobalTheory.Published GlobalTheory.Published.GrothendieckMessing
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  DividedPowers
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.SqLift
+  GlobalTheory.Published GlobalTheory.Published.GrothendieckMessing
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.SqLift
 
-theorem corr_crysToDR_step_iff {R R₁ R₀ : Type} [CommRing R] [CommRing R₁] [CommRing R₀] {I : Ideal R}
-    {I₁ : Ideal R₁} {κ : DividedPowers I} {κ₁ : DividedPowers I₁} {π : R →+* R₀} {ρ : R →+* R₁}
-    {π₁ : R₁ →+* R₀} {A₀ : Over (Sp R₀)} [GrpObj A₀] {X₁ : Over (Sp R₁)} [GrpObj X₁] {X : Over (Sp R)}
-    [GrpObj X] {i₁ : A₀.left ⟶ X₁.left} {i₂ : X₁.left ⟶ X.left} {i : A₀.left ⟶ X.left}
+theorem corr_crysToDR_step_iff
+    {R R₁ R₀ : Type} [CommRing R] [CommRing R₁] [CommRing R₀]
+    {I : Ideal R} {I₁ : Ideal R₁} {κ : DividedPowers I} {κ₁ : DividedPowers I₁} {π : R →+* R₀}
+    {ρ : R →+* R₁} {π₁ : R₁ →+* R₀} {A₀ : Over (Sp R₀)} [GrpObj A₀]
+    {X₁ : Over (Sp R₁)} [GrpObj X₁]
+    {X : Over (Sp R)} [GrpObj X]
+    {i₁ : A₀.left ⟶ X₁.left} {i₂ : X₁.left ⟶ X.left} {i : A₀.left ⟶ X.left}
     (h₁ : IsGrpPullback A₀ X₁ (spMap π₁) i₁) (h₂ : IsGrpPullback X₁ X (spMap ρ) i₂)
     (h : IsGrpPullback A₀ X (spMap π) i) (e : i₁ ≫ i₂ = i)
     (M : GrpMor κ (spMap π) A₀ κ₁ (spMap π₁) A₀ ρ (𝟙 _) (𝟙 _))
-    (hs : Function.Surjective (liftMor κ h).pull) (d : Crys κ (spMap π) A₀) (d₁ : Crys κ₁ (spMap π₁) A₀) :
-    (redMor h₂).Corr (crysToDR κ h d) (crysToDR κ₁ h₁ d₁) ↔ M.Corr d d₁ := by
-  have k : GrpMor (dp0 R) (𝟙 _) X κ₁ (spMap π₁) A₀
-      (ρ.comp (RingHom.id R)) ((𝟙 _) ≫ spMap π) ((𝟙 _) ≫ i) := by
+    (hs : Function.Surjective (liftMor κ h).pull) (d : Crys κ (spMap π) A₀)
+    (d₁ : Crys κ₁ (spMap π₁) A₀)
+    : (redMor h₂).Corr (crysToDR κ h d) (crysToDR κ₁ h₁ d₁) ↔ M.Corr d d₁ := by
+  have k : GrpMor (dp0 R) (𝟙 _) X κ₁ (spMap π₁) A₀ (ρ.comp (RingHom.id R)) ((𝟙 _) ≫ spMap π)
+      ((𝟙 _) ≫ i) := by
     apply GrpMor.of_isGrpPullback
     · exact IsDPMorphism.comp _ M.dp (liftMor κ h).dp
     · simpa using M.base
@@ -50,10 +57,12 @@ theorem corr_crysToDR_step_iff {R R₁ R₀ : Type} [CommRing R] [CommRing R₁]
     rw [crysToDR_apply, crysToDR_apply, e1, ← e2]
     exact H _
 
-theorem liftObj_step : AbelianDeRham → AbelianUnobstructed → ∀ (R R₁ R₀ : Type) [CommRing R] [CommRing R₁]
-    [CommRing R₀] (I J : Ideal R) (I₁ : Ideal R₁) (κ : DividedPowers I) (π : R →+* R₀)
-    (hJ : J ^ 2 = 0) (ρ : R →+* R₁) (κ₁ : DividedPowers I₁) (π₁ : R₁ →+* R₀), IsStep κ π hJ ρ κ₁ π₁ →
-    LiftObj (divided₂ hJ) ρ → LiftObj κ₁ π₁ → LiftObj κ π := by
+theorem liftObj_step
+    : AbelianDeRham → AbelianUnobstructed
+      → ∀ (R R₁ R₀ : Type) [CommRing R] [CommRing R₁] [CommRing R₀] (I J : Ideal R) (I₁ : Ideal R₁)
+          (κ : DividedPowers I) (π : R →+* R₀) (hJ : J ^ 2 = 0) (ρ : R →+* R₁)
+          (κ₁ : DividedPowers I₁) (π₁ : R₁ →+* R₀),
+        IsStep κ π hJ ρ κ₁ π₁ → LiftObj (divided₂ hJ) ρ → LiftObj κ₁ π₁ → LiftObj κ π := by
   intro P U R R₁ R₀ _ _ _ I J I₁ κ π hJ ρ κ₁ π₁ S L₂ L₁
   intro g A₀ _ A' _ i' h' hA' hg F hF
   have hπ : Function.Surjective π := S.comp ▸ S.surj₁.comp S.surj
@@ -64,8 +73,10 @@ theorem liftObj_step : AbelianDeRham → AbelianUnobstructed → ∀ (R R₁ R�
     · simpa using hsp
     · simp
     · intro T x y x₀ y₀ hx hy
-      have mul_left {U : Over (Sp R₀)} (a b : U ⟶ A₀) :
-          (a * b).left = CategoryTheory.Limits.pullback.lift a.left b.left ((Over.w a).trans (Over.w b).symm) ≫ μ[A₀].left := by
+      have mul_left {U : Over (Sp R₀)} (a b : U ⟶ A₀)
+          : (a * b).left
+            = CategoryTheory.Limits.pullback.lift a.left b.left ((Over.w a).trans (Over.w b).symm)
+              ≫ μ[A₀].left := by
         rw [Hom.mul_def, Over.comp_left, Over.lift_left]
       rw [mul_left, mul_left]
       congr 1
@@ -74,14 +85,17 @@ theorem liftObj_step : AbelianDeRham → AbelianUnobstructed → ∀ (R R₁ R�
       · simpa using hy
 
   obtain ⟨A₁, _, i₁, i₂, h₁, h₂, e₁₂, hA₁, hg₁⟩ :=
-    GlobalTheory.T.exists_intermediate_grpPullback_abelianScheme R R₁ R₀ ρ π₁ g A₀ A' i' (by rw [S.comp]; exact h') hA' hg
+    GlobalTheory.T.exists_intermediate_grpPullback_abelianScheme R R₁ R₀ ρ π₁ g A₀ A' i'
+      (by rw [S.comp]; exact h') hA' hg
   obtain ⟨F₁, hF₁, hF₁F⟩ :=
-    GlobalTheory.T.group_scheme_divided_power_lift_tower P R R₁ R₀ I J I₁ κ π hJ ρ κ₁ π₁ S g A₀ A₁ A' i₁ i₂ i' h₁ h₂ h' e₁₂ hA' hg F hF
+    GlobalTheory.T.group_scheme_divided_power_lift_tower P R R₁ R₀ I J I₁ κ π hJ ρ κ₁ π₁ S g A₀ A₁
+      A' i₁ i₂ i' h₁ h₂ h' e₁₂ hA' hg F hF
 
   obtain ⟨B₁, _, j₁, k₁, hB₁, hgB₁, hfB₁⟩ := L₁ g A₀ A₁ i₁ h₁ hA₁ hg₁ F₁ hF₁
   obtain ⟨C, _, j₂, k₂, hC⟩ := U R J hJ R₁ ρ S.surj S.kerJ B₁ hB₁
   have hgC : SmoothOfRelativeDimension g C.hom :=
-    GlobalTheory.T.smoothOfRelativeDimension_of_nilpotent_reduction R R₁ ρ S.surj (by rw [S.kerJ]; exact ⟨2, hJ⟩) g C B₁ j₂ k₂.1 hC.smooth hgB₁
+    GlobalTheory.T.smoothOfRelativeDimension_of_nilpotent_reduction R R₁ ρ S.surj
+      (by rw [S.kerJ]; exact ⟨2, hJ⟩) g C B₁ j₂ k₂.1 hC.smooth hgB₁
   have kC : IsGrpPullback A₀ C (spMap π) (j₁ ≫ j₂) := (k₁.comp k₂).congr hsp.symm rfl
   have b' : Function.Bijective (crysToDR κ h') :=
     AbelianDeRham.Rigid.crysToDR_bijective hrig hA' hg S.nil hπ S.ker h'
@@ -120,9 +134,11 @@ theorem liftObj_step : AbelianDeRham → AbelianUnobstructed → ∀ (R R₁ R�
   have kA : IsGrpPullback A₀ A (spMap π) (j₁ ≫ j₃) := (k₁.comp k₃).congr hsp.symm rfl
   refine ⟨A, inferInstance, j₁ ≫ j₃, kA, hA, hgA, ?_⟩
   obtain ⟨N, -, hNC⟩ :=
-    GlobalTheory.T.deRham_crystal_two_reductions_agree P R R₁ R₀ I J I₁ κ π hJ ρ κ₁ π₁ S g A₀ B₁ C j₁ j₂ (j₁ ≫ j₂) k₁ k₂ kC rfl hC hgC
+    GlobalTheory.T.deRham_crystal_two_reductions_agree P R R₁ R₀ I J I₁ κ π hJ ρ κ₁ π₁ S g A₀ B₁ C
+      j₁ j₂ (j₁ ≫ j₂) k₁ k₂ kC rfl hC hgC
   obtain ⟨N', -, hNA⟩ :=
-    GlobalTheory.T.deRham_crystal_two_reductions_agree P R R₁ R₀ I J I₁ κ π hJ ρ κ₁ π₁ S g A₀ B₁ A j₁ j₃ (j₁ ≫ j₃) k₁ k₃ kA rfl hA hgA
+    GlobalTheory.T.deRham_crystal_two_reductions_agree P R R₁ R₀ I J I₁ κ π hJ ρ κ₁ π₁ S g A₀ B₁ A
+      j₁ j₃ (j₁ ≫ j₃) k₁ k₃ kA rfl hA hgA
   obtain rfl : N' = N := rfl
   ext d
   change crysToDR κ kA d ∈ Fil A ↔ d ∈ E

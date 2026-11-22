@@ -6,8 +6,10 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaLawProofs.ExistsHolom
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi
 attribute [local instance] Over.cartesianMonoidalCategory
 
 noncomputable section
@@ -37,16 +39,20 @@ theorem append_halves (v : Fin (g + g) → ℂ) : Fin.append (halfL g v) (halfR 
   · rw [Fin.append_right, halfR_apply]
 
 def sqLat (Λ : Submodule ℤ (Fin g → ℂ)) : Submodule ℤ (Fin (g + g) → ℂ) :=
-  Λ.comap ((halfL g).toLinearMap.restrictScalars ℤ) ⊓ Λ.comap ((halfR g).toLinearMap.restrictScalars ℤ)
+  Λ.comap ((halfL g).toLinearMap.restrictScalars ℤ)
+    ⊓ Λ.comap ((halfR g).toLinearMap.restrictScalars ℤ)
 
-theorem mem_sqLat (Λ : Submodule ℤ (Fin g → ℂ)) (v : Fin (g + g) → ℂ) :
-    v ∈ sqLat Λ ↔ halfL g v ∈ Λ ∧ halfR g v ∈ Λ := Iff.rfl
+theorem mem_sqLat (Λ : Submodule ℤ (Fin g → ℂ)) (v : Fin (g + g) → ℂ)
+    : v ∈ sqLat Λ ↔ halfL g v ∈ Λ ∧ halfR g v ∈ Λ :=
+  Iff.rfl
 
-theorem sqLat_discrete (Λ : Submodule ℤ (Fin g → ℂ)) [DiscreteTopology Λ] : DiscreteTopology (sqLat Λ) := by
+theorem sqLat_discrete (Λ : Submodule ℤ (Fin g → ℂ)) [DiscreteTopology Λ]
+    : DiscreteTopology (sqLat Λ) := by
   refine DiscreteTopology.of_continuous_injective (β := Λ × Λ)
     (f := fun z => (⟨halfL g z.1, z.2.1⟩, ⟨halfR g z.1, z.2.2⟩))
     (Continuous.prodMk (((halfL g).continuous.comp continuous_subtype_val).subtype_mk _)
-      (((halfR g).continuous.comp continuous_subtype_val).subtype_mk _)) fun z z' h => ?_
+      (((halfR g).continuous.comp continuous_subtype_val).subtype_mk _))
+    fun z z' h => ?_
   refine Subtype.ext ?_
   rw [← append_halves z.1, ← append_halves z'.1]
   simp only [Prod.mk.injEq] at h
@@ -58,61 +64,67 @@ def appendL (g : ℕ) : (Fin g → ℂ) →ₗ[ℝ] (Fin (g + g) → ℂ) where
   toFun x := Fin.append x 0
   map_add' x y := by
     funext q
-    refine Fin.addCases (fun k => ?_) (fun k => ?_) q <;>
-      simp only [Fin.append_left, Fin.append_right, Pi.add_apply, Pi.smul_apply, Pi.zero_apply, add_zero,
-        smul_zero, RingHom.id_apply]
+    refine Fin.addCases (fun k => ?_) (fun k => ?_) q
+      <;> simp only [Fin.append_left, Fin.append_right, Pi.add_apply, Pi.smul_apply, Pi.zero_apply,
+        add_zero, smul_zero, RingHom.id_apply]
   map_smul' c x := by
     funext q
-    refine Fin.addCases (fun k => ?_) (fun k => ?_) q <;>
-      simp only [Fin.append_left, Fin.append_right, Pi.add_apply, Pi.smul_apply, Pi.zero_apply, add_zero,
-        smul_zero, RingHom.id_apply]
+    refine Fin.addCases (fun k => ?_) (fun k => ?_) q
+      <;> simp only [Fin.append_left, Fin.append_right, Pi.add_apply, Pi.smul_apply, Pi.zero_apply,
+        add_zero, smul_zero, RingHom.id_apply]
 
 def appendR (g : ℕ) : (Fin g → ℂ) →ₗ[ℝ] (Fin (g + g) → ℂ) where
   toFun y := Fin.append 0 y
   map_add' x y := by
     funext q
-    refine Fin.addCases (fun k => ?_) (fun k => ?_) q <;>
-      simp only [Fin.append_left, Fin.append_right, Pi.add_apply, Pi.smul_apply, Pi.zero_apply, add_zero,
-        smul_zero, RingHom.id_apply]
+    refine Fin.addCases (fun k => ?_) (fun k => ?_) q
+      <;> simp only [Fin.append_left, Fin.append_right, Pi.add_apply, Pi.smul_apply, Pi.zero_apply,
+        add_zero, smul_zero, RingHom.id_apply]
   map_smul' c x := by
     funext q
-    refine Fin.addCases (fun k => ?_) (fun k => ?_) q <;>
-      simp only [Fin.append_left, Fin.append_right, Pi.add_apply, Pi.smul_apply, Pi.zero_apply, add_zero,
-        smul_zero, RingHom.id_apply]
+    refine Fin.addCases (fun k => ?_) (fun k => ?_) q
+      <;> simp only [Fin.append_left, Fin.append_right, Pi.add_apply, Pi.smul_apply, Pi.zero_apply,
+        add_zero, smul_zero, RingHom.id_apply]
 
-theorem sqLat_full (Λ : Submodule ℤ (Fin g → ℂ)) (h : Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤) :
-    Submodule.span ℝ (sqLat Λ : Set (Fin (g + g) → ℂ)) = ⊤ := by
+theorem sqLat_full (Λ : Submodule ℤ (Fin g → ℂ)) (h : Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤)
+    : Submodule.span ℝ (sqLat Λ : Set (Fin (g + g) → ℂ)) = ⊤ := by
   have hL : Set.range (appendL g) ⊆ Submodule.span ℝ (sqLat Λ : Set (Fin (g + g) → ℂ)) := by
-    have : (Submodule.span ℝ (Λ : Set (Fin g → ℂ))).map (appendL g) ≤ Submodule.span ℝ (sqLat Λ : Set _) := by
+    have : (Submodule.span ℝ (Λ : Set (Fin g → ℂ))).map (appendL g)
+        ≤ Submodule.span ℝ (sqLat Λ : Set _) := by
       rw [Submodule.map_span]
       refine Submodule.span_mono ?_
       rintro _ ⟨x, hx, rfl⟩
       refine ⟨?_, ?_⟩
       · change halfL g (Fin.append x 0) ∈ Λ
-        rw [halfL_append]; exact hx
+        rw [halfL_append]
+        exact hx
       · change halfR g (Fin.append x 0) ∈ Λ
-        rw [halfR_append]; exact Λ.zero_mem
+        rw [halfR_append]
+        exact Λ.zero_mem
     rintro _ ⟨x, rfl⟩
     exact this ⟨x, by rw [h]; trivial, rfl⟩
   have hR : Set.range (appendR g) ⊆ Submodule.span ℝ (sqLat Λ : Set (Fin (g + g) → ℂ)) := by
-    have : (Submodule.span ℝ (Λ : Set (Fin g → ℂ))).map (appendR g) ≤ Submodule.span ℝ (sqLat Λ : Set _) := by
+    have : (Submodule.span ℝ (Λ : Set (Fin g → ℂ))).map (appendR g)
+        ≤ Submodule.span ℝ (sqLat Λ : Set _) := by
       rw [Submodule.map_span]
       refine Submodule.span_mono ?_
       rintro _ ⟨x, hx, rfl⟩
       refine ⟨?_, ?_⟩
       · change halfL g (Fin.append 0 x) ∈ Λ
-        rw [halfL_append]; exact Λ.zero_mem
+        rw [halfL_append]
+        exact Λ.zero_mem
       · change halfR g (Fin.append 0 x) ∈ Λ
-        rw [halfR_append]; exact hx
+        rw [halfR_append]
+        exact hx
     rintro _ ⟨x, rfl⟩
     exact this ⟨x, by rw [h]; trivial, rfl⟩
   refine eq_top_iff.2 fun v _ => ?_
   have hv : v = appendL g (halfL g v) + appendR g (halfR g v) := by
     conv_lhs => rw [← append_halves v]
     funext q
-    refine Fin.addCases (fun k => ?_) (fun k => ?_) q <;>
-      simp only [appendL, appendR, LinearMap.coe_mk, AddHom.coe_mk, Pi.add_apply, Fin.append_left, Fin.append_right,
-        Pi.zero_apply, add_zero, zero_add]
+    refine Fin.addCases (fun k => ?_) (fun k => ?_) q
+      <;> simp only [appendL, appendR, LinearMap.coe_mk, AddHom.coe_mk, Pi.add_apply,
+        Fin.append_left, Fin.append_right, Pi.zero_apply, add_zero, zero_add]
   rw [hv]
   exact Submodule.add_mem _ (hL ⟨_, rfl⟩) (hR ⟨_, rfl⟩)
 
@@ -161,8 +173,6 @@ def sqUnif {L : LB A.left} (u : HolUnif A L g) : HolUnif (A ⊗ A) (trivLB (A �
   fr _ _ := 1
   fr_hol _ := differentiableOn_const _
   fr_ne _ _ _ := one_ne_zero
-  fr_compat i j z h := by
-    rw [Units.val_one, valAt'_one _ h, _root_.one_mul]
+  fr_compat i j z h := by rw [Units.val_one, valAt'_one _ h, _root_.one_mul]
 
 end GlobalTheory.ProdUnifSq
-

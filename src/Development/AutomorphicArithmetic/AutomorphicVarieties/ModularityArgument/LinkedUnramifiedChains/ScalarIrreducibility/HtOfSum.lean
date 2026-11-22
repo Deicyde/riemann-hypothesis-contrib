@@ -11,10 +11,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af UpperTheory.V.Pr UpperTheory.V.Alg UpperTheory.V.J
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp
+  IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af
+  UpperTheory.V.Pr UpperTheory.V.Alg UpperTheory.V.J
 
-private theorem ht_of_sum {h : ℕ∞} {N : ℕ} {D : WithBot ℕ∞} (hD : D = 1)
-    (e : (h : WithBot ℕ∞) + D = (N + 1 : ℕ)) : h = N := by
+private theorem ht_of_sum
+    {h : ℕ∞} {N : ℕ} {D : WithBot ℕ∞} (hD : D = 1) (e : (h : WithBot ℕ∞) + D = (N + 1 : ℕ))
+    : h = N := by
   subst hD
   have e2 : ((h + 1 : ℕ∞) : WithBot ℕ∞) = (((N + 1 : ℕ) : ℕ∞) : WithBot ℕ∞) := by
     rw [WithBot.coe_add, WithBot.coe_one, WithBot.coe_natCast]
@@ -35,10 +38,15 @@ private theorem le_of_add {a : ℕ∞} {b c : ℕ} (h : ((c + b : ℕ) : ℕ∞)
     norm_cast at h ⊢
     omega
 
-theorem UpperTheory.V.J.htLow :
-    ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) [Fr.IsCoef l c.O] (F : Fr.Frame l (ResidueField c.O)) (C₀ n : ℕ), F.Ok C₀ → (n = 2 ∨ n = 3) →
-        ∀ (S : Fr.Space c.O F n), ∀ (q x : Ideal S.A) (L : S.Loc x) (Q : Ideal L.R), Over S L q Q →
-          ((n * F.d + 1 : ℕ) : ℕ∞) ≤ q.height ∧ (Q.height ≤ ((n * F.d + 1 : ℕ) : ℕ∞) → ∀ P ∈ associatedPrimes S.A S.A, P ≤ q → P ∈ minimalPrimes S.A) := by
+theorem UpperTheory.V.J.htLow
+    : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) [Fr.IsCoef l c.O] (F : Fr.Frame l (ResidueField c.O))
+        (C₀ n : ℕ),
+      F.Ok C₀ → (n = 2 ∨ n = 3)
+        → ∀ (S : Fr.Space c.O F n), ∀ (q x : Ideal S.A) (L : S.Loc x) (Q : Ideal L.R),
+          Over S L q Q
+            → ((n * F.d + 1 : ℕ) : ℕ∞) ≤ q.height
+              ∧ (Q.height ≤ ((n * F.d + 1 : ℕ) : ℕ∞)
+                → ∀ P ∈ associatedPrimes S.A S.A, P ≤ q → P ∈ minimalPrimes S.A) := by
   intro l _ c _ F C₀ n hF hn S q x L Q hO
   obtain ⟨hQ, him, hmin, hdim⟩ := hO
   obtain ⟨N, N', p, f, hN, hp, hker⟩ := Fr.pres hF hn S x L

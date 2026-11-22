@@ -13,22 +13,31 @@ set_option synthInstance.maxHeartbeats 200000
 
 section
 noncomputable section
-open Formalism.BasicNotions Formalism.MainNotions GlobalTheory.BigTop GlobalTheory.BigTop.Fun GlobalTheory.SqTop NumberField
+open Formalism.BasicNotions Formalism.MainNotions GlobalTheory.BigTop GlobalTheory.BigTop.Fun
+  GlobalTheory.SqTop NumberField
 namespace GlobalTheory.BigTop.Fun.ThbTie
 end GlobalTheory.BigTop.Fun.ThbTie
 open GlobalTheory.BigTop.Fun.ThbTie in
-theorem GlobalTheory.BigTop.Fun.thb_tie_alt (hS : _root_.GlobalTheory.BigTop.Fun.SettingAtPoint)
-    (hd : Closed FamHyp fun Fm _ => _root_.GlobalTheory.BigTop.EventuallyAtPoints Fm fun x _ i _ => |(Fm.L x i).logDerivativeAtOne| ≤ (Fm.L x i).sc.x ^ (Fm.L x i).sc.eps)
-    (hT : ThbSt) : _root_.GlobalTheory.BigTop.Fun.LeafThetaBound @Comparison₂ := by
+theorem GlobalTheory.BigTop.Fun.thb_tie_alt
+    (hS : _root_.GlobalTheory.BigTop.Fun.SettingAtPoint)
+    (hd : Closed FamHyp fun Fm _ =>
+      _root_.GlobalTheory.BigTop.EventuallyAtPoints Fm fun x _ i _ =>
+        |(Fm.L x i).logDerivativeAtOne| ≤ (Fm.L x i).sc.x ^ (Fm.L x i).sc.eps)
+    (hT : ThbSt)
+    : _root_.GlobalTheory.BigTop.Fun.LeafThetaBound @Comparison₂ := by
   have hQ := _root_.GlobalTheory.T.forallLeaves_fitted_of_gBig _ hS hd hT
   refine _root_.GlobalTheory.BigTop.Fun.LeafConditions.mono hQ ?_
   intro D L hT' Gi Gl Kc Y cX ex Csz p CF d C CH _ htie
   refine ⟨htie, fun hq => ?_⟩
   obtain ⟨a, ha⟩ := htie.2
   have hsq := ha.sq
-  have hin : ∀ (ij : Sq D) (s : ℤ), 1 ≤ s → s ≤ GlobalTheory.FunObj.SqNum.halfRank D ij.1 ij.2 →
-      Formalism.PairingDivisionLocalBalance.HtLe (d.gT ij s) 1 (bTH D C p.Z.x p.Z.b) ∧
-        ∀ c, d.zTd ij c s ≠ 0 ∧ Formalism.PairingDivisionLocalBalance.HtLe (d.gT ij s) (d.zTd ij c s) (bTH D C p.Z.x p.Z.b) := by
+  have hin
+      : ∀ (ij : Sq D) (s : ℤ),
+        1 ≤ s → s ≤ GlobalTheory.FunObj.SqNum.halfRank D ij.1 ij.2
+          → Formalism.PairingDivisionLocalBalance.HtLe (d.gT ij s) 1 (bTH D C p.Z.x p.Z.b)
+            ∧ ∀ c,
+              d.zTd ij c s ≠ 0 ∧ Formalism.PairingDivisionLocalBalance.HtLe (d.gT ij s)
+                (d.zTd ij c s) (bTH D C p.Z.x p.Z.b) := by
     intro ij s h1 h2
     obtain ⟨n, rfl⟩ := Int.eq_ofNat_of_zero_le (by omega : (0 : ℤ) ≤ s)
     have h1' : 1 ≤ n := by omega

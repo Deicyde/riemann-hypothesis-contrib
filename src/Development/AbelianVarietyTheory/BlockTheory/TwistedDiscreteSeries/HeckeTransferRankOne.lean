@@ -13,8 +13,9 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.HeckeTransferRankOne
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.FWT
-  Formalism.L2.Pj
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.L2.DIV
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.FWT Formalism.L2.Pj
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -22,8 +23,11 @@ variable {D : D7}
 
 section Real
 
-variable {G : Type} [Group G] [Fintype G] {Pl0 T0 : Type} {A : FamIn D.what₂.LL G Pl0 T0 D.R.m}
-  {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks)
+variable
+  {G : Type} [Group G] [Fintype G]
+  {Pl0 T0 : Type} {A : FamIn D.what₂.LL G Pl0 T0 D.R.m} {Ks : Type}
+  [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+  (R : RealDat D A Ks)
 
 end Real
 

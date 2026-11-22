@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsP
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK
+  GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
 open scoped Formalism.Per
 
 noncomputable section
@@ -22,11 +24,14 @@ variable {l : ℕ} [Fact l.Prime] {LL : FinExt l}
 
 section Zl
 
-@[reducible] def zlT (T : QLat LL) : Module ℤ_[l] ↥T.L.T := Module.compHom _ (algebraMap ℤ_[l] ↥(OL LL))
+@[reducible]
+def zlT (T : QLat LL) : Module ℤ_[l] ↥T.L.T := Module.compHom _ (algebraMap ℤ_[l] ↥(OL LL))
 
-@[reducible] def zlV (T : QLat LL) : Module ℤ_[l] T.V := Module.compHom _ (algebraMap ℤ_[l] ℚ_[l])
+@[reducible]
+def zlV (T : QLat LL) : Module ℤ_[l] T.V := Module.compHom _ (algebraMap ℤ_[l] ℚ_[l])
 
-@[reducible] def zlB (Pl : LocPrime l) : Module ℤ_[l] Pl.R.B := Module.compHom _ (algebraMap ℤ_[l] ℚ_[l])
+@[reducible]
+def zlB (Pl : LocPrime l) : Module ℤ_[l] Pl.R.B := Module.compHom _ (algebraMap ℤ_[l] ℚ_[l])
 
 attribute [local instance] zlT zlV zlB
 
@@ -50,17 +55,21 @@ def incl (T : QLat LL) : ↥T.L.T →ₗ[ℤ_[l]] T.V where
       ← algebraMap_smul ↥LL.1 (algebraMap ℤ_[l] ℚ_[l] z) (x : T.V)]
     rfl
 
-theorem exists_pow_smul_mem (T : QLat LL) (v : T.V) :
-    ∃ n : ℕ, (l : ↥LL.1) ^ n • v ∈ T.L.T := by
+theorem exists_pow_smul_mem (T : QLat LL) (v : T.V) : ∃ n : ℕ, (l : ↥LL.1) ^ n • v ∈ T.L.T := by
   first
   | exact @_root_.GlobalTheory.IntegralPowerScalar.exists_pow_smul_mem
   | exact _root_.GlobalTheory.IntegralPowerScalar.exists_pow_smul_mem
   | (apply _root_.GlobalTheory.IntegralPowerScalar.exists_pow_smul_mem <;> assumption)
   | (intros; apply _root_.GlobalTheory.IntegralPowerScalar.exists_pow_smul_mem <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.IntegralPowerScalar.exists_pow_smul_mem <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.IntegralPowerScalar.exists_pow_smul_mem
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.IntegralPowerScalar.exists_pow_smul_mem ..)
 
-theorem zl_smul_V (T : QLat LL) (z : ℤ_[l]) (v : T.V) : z • v = algebraMap ℚ_[l] ↥LL.1 (z : ℚ_[l]) • v := by
+theorem zl_smul_V (T : QLat LL) (z : ℤ_[l]) (v : T.V)
+    : z • v = algebraMap ℚ_[l] ↥LL.1 (z : ℚ_[l]) • v := by
   change algebraMap ℤ_[l] ℚ_[l] z • v = _
   rw [← algebraMap_smul ↥LL.1 (algebraMap ℤ_[l] ℚ_[l] z) v]
   rfl
@@ -78,7 +87,8 @@ theorem isLoc (T : QLat LL) : IsLocalizedModule (nonZeroDivisors ℤ_[l]) (incl 
       rw [Module.algebraMap_end_apply, zl_smul_V, smul_smul, mul_inv_cancel₀ hs', one_smul]
   · obtain ⟨n, hn⟩ := exists_pow_smul_mem T y
     have hl : ((l : ℤ_[l]) ^ n) ∈ nonZeroDivisors ℤ_[l] :=
-      mem_nonZeroDivisors_of_ne_zero (pow_ne_zero _ (Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero))
+      mem_nonZeroDivisors_of_ne_zero (pow_ne_zero _
+        (Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero))
     refine ⟨(⟨_, hn⟩, ⟨_, hl⟩), ?_⟩
     show ((l : ℤ_[l]) ^ n) • y = (l : ↥LL.1) ^ n • y
     rw [zl_smul_V]
@@ -91,53 +101,69 @@ theorem hbc (T : QLat LL) : IsBaseChange ℚ_[l] (incl T) :=
 
 variable {Bc : Type} [CommRing Bc] [Algebra ℤ_[l] Bc] {Pl : LocPrime l}
 
-def ringLin (eB : Pl.R.B ≃+* Bc) (hz : ∀ z : ℤ_[l], eB (algebraMap ℚ_[l] Pl.R.B (z : ℚ_[l])) = algebraMap ℤ_[l] Bc z) :
-    Bc ≃ₗ[ℤ_[l]] Pl.R.B :=
-  { eB.symm.toAddEquiv with
-    map_smul' := fun z b => by
-      show eB.symm (z • b) = algebraMap ℤ_[l] ℚ_[l] z • eB.symm b
-      rw [Algebra.smul_def z b, map_mul, Algebra.smul_def]
-      congr 1
-      rw [RingEquiv.symm_apply_eq]
-      exact (hz z).symm }
+def ringLin
+    (eB : Pl.R.B ≃+* Bc)
+    (hz : ∀ z : ℤ_[l], eB (algebraMap ℚ_[l] Pl.R.B (z : ℚ_[l])) = algebraMap ℤ_[l] Bc z)
+    : Bc ≃ₗ[ℤ_[l]] Pl.R.B := {
+  eB.symm.toAddEquiv with
+  map_smul' := fun z b => by
+    show eB.symm (z • b) = algebraMap ℤ_[l] ℚ_[l] z • eB.symm b
+    rw [Algebra.smul_def z b, map_mul, Algebra.smul_def]
+    congr 1
+    rw [RingEquiv.symm_apply_eq]
+    exact (hz z).symm
+}
 
-def swapLat (T : QLat LL) : TW (↥(OL LL) ⊗[ℤ_[l]] Bc) T ≃ₗ[↥(OL LL)] ↥T.L.T ⊗[↥(OL LL)] (↥(OL LL) ⊗[ℤ_[l]] Bc) :=
+def swapLat (T : QLat LL)
+    : TW (↥(OL LL) ⊗[ℤ_[l]] Bc) T ≃ₗ[↥(OL LL)] ↥T.L.T ⊗[↥(OL LL)] (↥(OL LL) ⊗[ℤ_[l]] Bc) :=
   TensorProduct.comm ↥(OL LL) (↥(OL LL) ⊗[ℤ_[l]] Bc) ↥T.L.T
 
-def cancelCoeff (T : QLat LL) : ↥T.L.T ⊗[↥(OL LL)] (↥(OL LL) ⊗[ℤ_[l]] Bc) ≃ₗ[↥(OL LL)] ↥T.L.T ⊗[ℤ_[l]] Bc :=
+def cancelCoeff (T : QLat LL)
+    : ↥T.L.T ⊗[↥(OL LL)] (↥(OL LL) ⊗[ℤ_[l]] Bc) ≃ₗ[↥(OL LL)] ↥T.L.T ⊗[ℤ_[l]] Bc :=
   AlgebraTensorModule.cancelBaseChange ℤ_[l] ↥(OL LL) ↥(OL LL) ↥T.L.T Bc
 
-def changeRing (T : QLat LL) (eB : Pl.R.B ≃+* Bc)
-    (hz : ∀ z : ℤ_[l], eB (algebraMap ℚ_[l] Pl.R.B (z : ℚ_[l])) = algebraMap ℤ_[l] Bc z) :
-    ↥T.L.T ⊗[ℤ_[l]] Bc ≃ₗ[ℤ_[l]] Pl.R.B ⊗[ℤ_[l]] ↥T.L.T :=
-  (TensorProduct.congr (LinearEquiv.refl ℤ_[l] ↥T.L.T) (ringLin eB hz)).trans (TensorProduct.comm ℤ_[l] ↥T.L.T Pl.R.B)
-
+def changeRing
+    (T : QLat LL)
+    (eB : Pl.R.B ≃+* Bc)
+    (hz : ∀ z : ℤ_[l], eB (algebraMap ℚ_[l] Pl.R.B (z : ℚ_[l])) = algebraMap ℤ_[l] Bc z)
+    : ↥T.L.T ⊗[ℤ_[l]] Bc ≃ₗ[ℤ_[l]] Pl.R.B ⊗[ℤ_[l]] ↥T.L.T :=
+  (TensorProduct.congr (LinearEquiv.refl ℤ_[l] ↥T.L.T) (ringLin eB hz)).trans
+    (TensorProduct.comm ℤ_[l] ↥T.L.T Pl.R.B)
 
 variable (Pl) in
 def invertPrime (T : QLat LL) : Pl.R.B ⊗[ℤ_[l]] ↥T.L.T ≃ₗ[ℚ_[l]] T.V ⊗[ℚ_[l]] Pl.R.B :=
   (AlgebraTensorModule.cancelBaseChange ℤ_[l] ℚ_[l] ℚ_[l] Pl.R.B ↥T.L.T).symm.trans
-     ((TensorProduct.congr (LinearEquiv.refl ℚ_[l] Pl.R.B) (hbc T).equiv).trans
-       (TensorProduct.comm ℚ_[l] Pl.R.B T.V))
+    ((TensorProduct.congr (LinearEquiv.refl ℚ_[l] Pl.R.B) (hbc T).equiv).trans
+      (TensorProduct.comm ℚ_[l] Pl.R.B T.V))
 
-def addEquiv (T : QLat LL) (eB : Pl.R.B ≃+* Bc)
-    (hz : ∀ z : ℤ_[l], eB (algebraMap ℚ_[l] Pl.R.B (z : ℚ_[l])) = algebraMap ℤ_[l] Bc z) :
-    TW (↥(OL LL) ⊗[ℤ_[l]] Bc) T ≃+ T.V ⊗[ℚ_[l]] Pl.R.B :=
-  (((swapLat T).trans (cancelCoeff T)).toAddEquiv.trans (changeRing T eB hz).toAddEquiv).trans (invertPrime Pl T).toAddEquiv
-
-theorem addEquiv_tmul (T : QLat LL) (eB : Pl.R.B ≃+* Bc)
+def addEquiv
+    (T : QLat LL)
+    (eB : Pl.R.B ≃+* Bc)
     (hz : ∀ z : ℤ_[l], eB (algebraMap ℚ_[l] Pl.R.B (z : ℚ_[l])) = algebraMap ℤ_[l] Bc z)
-    (o : ↥(OL LL)) (b : Bc) (x : ↥T.L.T) :
-    addEquiv T eB hz ((o ⊗ₜ[ℤ_[l]] b) ⊗ₜ[↥(OL LL)] x) = (((o • x : ↥T.L.T)) : T.V) ⊗ₜ[ℚ_[l]] eB.symm b := by
-  simp [addEquiv, swapLat, cancelCoeff, changeRing, invertPrime, ringLin, IsBaseChange.equiv_tmul, incl]
+    : TW (↥(OL LL) ⊗[ℤ_[l]] Bc) T ≃+ T.V ⊗[ℚ_[l]] Pl.R.B :=
+  (((swapLat T).trans (cancelCoeff T)).toAddEquiv.trans (changeRing T eB hz).toAddEquiv).trans
+    (invertPrime Pl T).toAddEquiv
+
+theorem addEquiv_tmul
+    (T : QLat LL)
+    (eB : Pl.R.B ≃+* Bc)
+    (hz : ∀ z : ℤ_[l], eB (algebraMap ℚ_[l] Pl.R.B (z : ℚ_[l])) = algebraMap ℤ_[l] Bc z)
+    (o : ↥(OL LL)) (b : Bc) (x : ↥T.L.T)
+    : addEquiv T eB hz ((o ⊗ₜ[ℤ_[l]] b) ⊗ₜ[↥(OL LL)] x)
+      = (((o • x : ↥T.L.T)) : T.V) ⊗ₜ[ℚ_[l]] eB.symm b := by
+  simp [addEquiv, swapLat, cancelCoeff, changeRing, invertPrime, ringLin, IsBaseChange.equiv_tmul,
+    incl]
 
 end Zl
 
 variable {Pl : LocPrime l}
 
-theorem addEquiv_smul (T : QLat LL) (eB : Pl.R.B ≃+* Per.Bcris l)
+theorem addEquiv_smul
+    (T : QLat LL)
+    (eB : Pl.R.B ≃+* Per.Bcris l)
     (hz : ∀ z : ℤ_[l], eB (algebraMap ℚ_[l] Pl.R.B (z : ℚ_[l])) = algebraMap ℤ_[l] (Per.Bcris l) z)
-    (c : ↥(OL LL)) (w : TW (OB l ↥(OL LL)) T) :
-    addEquiv T eB hz (c • w) = c • addEquiv T eB hz w := by
+    (c : ↥(OL LL)) (w : TW (OB l ↥(OL LL)) T)
+    : addEquiv T eB hz (c • w) = c • addEquiv T eB hz w := by
   induction w using TensorProduct.induction_on with
   | zero => simp only [smul_zero, map_zero]
   | add x y hx hy =>
@@ -157,26 +183,38 @@ theorem addEquiv_smul (T : QLat LL) (eB : Pl.R.B ≃+* Per.Bcris l)
       rw [TensorProduct.smul_tmul', addEquiv_tmul, addEquiv_tmul, e]
       exact (TensorProduct.smul_tmul' (c : ↥LL.1) _ _).symm
 
-def linEquiv (T : QLat LL) (eB : Pl.R.B ≃+* Per.Bcris l)
-    (hz : ∀ z : ℤ_[l], eB (algebraMap ℚ_[l] Pl.R.B (z : ℚ_[l])) = algebraMap ℤ_[l] (Per.Bcris l) z) :
-    TW (OB l ↥(OL LL)) T ≃ₗ[↥(OL LL)] T.V ⊗[ℚ_[l]] Pl.R.B :=
+def linEquiv
+    (T : QLat LL)
+    (eB : Pl.R.B ≃+* Per.Bcris l)
+    (hz : ∀ z : ℤ_[l], eB (algebraMap ℚ_[l] Pl.R.B (z : ℚ_[l])) = algebraMap ℤ_[l] (Per.Bcris l) z)
+    : TW (OB l ↥(OL LL)) T ≃ₗ[↥(OL LL)] T.V ⊗[ℚ_[l]] Pl.R.B :=
   (addEquiv T eB hz).toLinearEquiv (addEquiv_smul T eB hz)
 
-theorem linEquiv_apply (T : QLat LL) (eB : Pl.R.B ≃+* Per.Bcris l)
+theorem linEquiv_apply
+    (T : QLat LL)
+    (eB : Pl.R.B ≃+* Per.Bcris l)
     (hz : ∀ z : ℤ_[l], eB (algebraMap ℚ_[l] Pl.R.B (z : ℚ_[l])) = algebraMap ℤ_[l] (Per.Bcris l) z)
-    (w : TW (OB l ↥(OL LL)) T) : linEquiv T eB hz w = addEquiv T eB hz w := rfl
+    (w : TW (OB l ↥(OL LL)) T)
+    : linEquiv T eB hz w = addEquiv T eB hz w :=
+  rfl
 
-theorem linEquiv_one (T : QLat LL) (eB : Pl.R.B ≃+* Per.Bcris l)
+theorem linEquiv_one
+    (T : QLat LL)
+    (eB : Pl.R.B ≃+* Per.Bcris l)
     (hz : ∀ z : ℤ_[l], eB (algebraMap ℚ_[l] Pl.R.B (z : ℚ_[l])) = algebraMap ℤ_[l] (Per.Bcris l) z)
-    (x : ↥T.L.T) :
-    linEquiv T eB hz ((1 : OB l ↥(OL LL)) ⊗ₜ[↥(OL LL)] x) = (x : T.V) ⊗ₜ[ℚ_[l]] (1 : Pl.R.B) := by
+    (x : ↥T.L.T)
+    : linEquiv T eB hz ((1 : OB l ↥(OL LL)) ⊗ₜ[↥(OL LL)] x) = (x : T.V) ⊗ₜ[ℚ_[l]] (1 : Pl.R.B) := by
   rw [linEquiv_apply, Algebra.TensorProduct.one_def, addEquiv_tmul, one_smul, map_one]
 
-theorem linEquiv_act (T : QLat LL) (eB : Pl.R.B ≃+* Per.Bcris l)
+theorem linEquiv_act
+    (T : QLat LL)
+    (eB : Pl.R.B ≃+* Per.Bcris l)
     (hz : ∀ z : ℤ_[l], eB (algebraMap ℚ_[l] Pl.R.B (z : ℚ_[l])) = algebraMap ℤ_[l] (Per.Bcris l) z)
     (hact : ∀ (g : GQ l) (b : Pl.R.B), eB (Pl.actQ g b) = Per.σB g (eB b))
-    (g : Gl l) (w : TW (OB l ↥(OL LL)) T) :
-    linEquiv T eB hz (actB (sQ l) T g w) = actVB (Pl.PD (Formalism.MainNotions.ElementDenominator.qlExt l)) T.ρ g (linEquiv T eB hz w) := by
+    (g : Gl l) (w : TW (OB l ↥(OL LL)) T)
+    : linEquiv T eB hz (actB (sQ l) T g w)
+      = actVB (Pl.PD (Formalism.MainNotions.ElementDenominator.qlExt l)) T.ρ g
+        (linEquiv T eB hz w) := by
   rw [linEquiv_apply, linEquiv_apply]
   induction w using TensorProduct.induction_on with
   | zero => simp only [map_zero]
@@ -190,23 +228,28 @@ theorem linEquiv_act (T : QLat LL) (eB : Pl.R.B ≃+* Per.Bcris l)
       rw [add_tmul, map_add (f := _), map_add (f := _), map_add (f := _), map_add (f := _)]
       exact congrArg₂ (· + ·) h₁ h₂
     | tmul o b =>
-      have h1 : actB (sQ l) T g ((o ⊗ₜ[ℤ_[l]] b) ⊗ₜ[↥(OL LL)] x) =
-          (o ⊗ₜ[ℤ_[l]] Per.σB (g : GQ l) b) ⊗ₜ[↥(OL LL)] T.actT g x := rfl
+      have h1
+          : actB (sQ l) T g ((o ⊗ₜ[ℤ_[l]] b) ⊗ₜ[↥(OL LL)] x)
+            = (o ⊗ₜ[ℤ_[l]] Per.σB (g : GQ l) b) ⊗ₜ[↥(OL LL)] T.actT g x :=
+        rfl
       rw [h1, addEquiv_tmul, addEquiv_tmul]
       simp only [actVB, AlgebraTensorModule.map_tmul]
       congr 1
-      · rw [Submodule.coe_smul, Submodule.coe_smul, ← algebraMap_smul ↥LL.1 o, ← algebraMap_smul ↥LL.1 o,
-          map_smul]
+      · rw [Submodule.coe_smul, Submodule.coe_smul, ← algebraMap_smul ↥LL.1 o,
+          ← algebraMap_smul ↥LL.1 o, map_smul]
         rfl
-      · rw [LinearMap.restrictScalars_apply, AlgHom.toLinearMap_apply, AlgEquiv.coe_toAlgHom, Pl.PD_actB,
-          RingEquiv.symm_apply_eq, hact, RingEquiv.apply_symm_apply]
+      · rw [LinearMap.restrictScalars_apply, AlgHom.toLinearMap_apply, AlgEquiv.coe_toAlgHom,
+          Pl.PD_actB, RingEquiv.symm_apply_eq, hact, RingEquiv.apply_symm_apply]
 
-theorem linEquiv_frob (T : QLat LL) (eB : Pl.R.B ≃+* Per.Bcris l)
+theorem linEquiv_frob
+    (T : QLat LL)
+    (eB : Pl.R.B ≃+* Per.Bcris l)
     (hz : ∀ z : ℤ_[l], eB (algebraMap ℚ_[l] Pl.R.B (z : ℚ_[l])) = algebraMap ℤ_[l] (Per.Bcris l) z)
     (hfr : ∀ b : Pl.R.B, eB (Pl.φB b) = Per.φB l (eB b))
-    (w : TW (OB l ↥(OL LL)) T) :
-    linEquiv T eB hz (TWmap (frobOB l ↥(OL LL)) T w) =
-      φVB (LL := ↥LL.1) (Pl.PD (Formalism.MainNotions.ElementDenominator.qlExt l)) (linEquiv T eB hz w) := by
+    (w : TW (OB l ↥(OL LL)) T)
+    : linEquiv T eB hz (TWmap (frobOB l ↥(OL LL)) T w)
+      = φVB (LL := ↥LL.1) (Pl.PD (Formalism.MainNotions.ElementDenominator.qlExt l))
+        (linEquiv T eB hz w) := by
   rw [linEquiv_apply, linEquiv_apply]
   induction w using TensorProduct.induction_on with
   | zero => simp only [map_zero]
@@ -220,11 +263,14 @@ theorem linEquiv_frob (T : QLat LL) (eB : Pl.R.B ≃+* Per.Bcris l)
       rw [add_tmul, map_add (f := _), map_add (f := _), map_add (f := _), map_add (f := _)]
       exact congrArg₂ (· + ·) h₁ h₂
     | tmul o b =>
-      have h1 : TWmap (frobOB l ↥(OL LL)) T ((o ⊗ₜ[ℤ_[l]] b) ⊗ₜ[↥(OL LL)] x) =
-          (o ⊗ₜ[ℤ_[l]] Per.φB l b) ⊗ₜ[↥(OL LL)] x := rfl
+      have h1
+          : TWmap (frobOB l ↥(OL LL)) T ((o ⊗ₜ[ℤ_[l]] b) ⊗ₜ[↥(OL LL)] x)
+            = (o ⊗ₜ[ℤ_[l]] Per.φB l b) ⊗ₜ[↥(OL LL)] x :=
+        rfl
       rw [h1, addEquiv_tmul, addEquiv_tmul]
       simp only [φVB, AlgebraTensorModule.map_tmul, LinearMap.id_apply]
       congr 1
-      rw [AlgHom.toLinearMap_apply, Pl.PD_φ, RingEquiv.symm_apply_eq, hfr, RingEquiv.apply_symm_apply]
+      rw [AlgHom.toLinearMap_apply, Pl.PD_φ, RingEquiv.symm_apply_eq, hfr,
+        RingEquiv.apply_symm_apply]
 
 end GlobalTheory.BKGal.CrisTensor

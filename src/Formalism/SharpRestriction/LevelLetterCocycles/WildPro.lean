@@ -10,9 +10,11 @@ noncomputable section
 namespace Formalism.MainNotions.N.KillingConditions
 
 def WildProP (E Ω : Type) [Field E] [Field Ω] [Algebra E Ω] : Prop :=
-  ∀ (A : ValuationSubring Ω) (p : ℕ), p.Prime → A.valuation ((p : ℕ) : Ω) < 1 →
-    ∀ σ : Ω ≃ₐ[E] Ω, (∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1) →
-    ∀ N : Subgroup (Ω ≃ₐ[E] Ω), IsOpen (N : Set (Ω ≃ₐ[E] Ω)) → ∃ k : ℕ, σ ^ (p ^ k) ∈ N
+  ∀ (A : ValuationSubring Ω) (p : ℕ),
+    p.Prime → A.valuation ((p : ℕ) : Ω) < 1
+      → ∀ σ : Ω ≃ₐ[E] Ω,
+        (∀ y : Ω, y ≠ 0 → A.valuation (σ y / y - 1) < 1)
+          → ∀ N : Subgroup (Ω ≃ₐ[E] Ω), IsOpen (N : Set (Ω ≃ₐ[E] Ω)) → ∃ k : ℕ, σ ^ (p ^ k) ∈ N
 
 end Formalism.MainNotions.N.KillingConditions
 
@@ -26,12 +28,12 @@ variable {A}
 
 theorem IsWild.one : IsWild A (1 : Ω ≃ₐ[E] Ω) := by
   intro y hy
-  have : (1 : Ω ≃ₐ[E] Ω) y / y - 1 = 0 := by
-    rw [AlgEquiv.one_apply, div_self hy, sub_self]
+  have : (1 : Ω ≃ₐ[E] Ω) y / y - 1 = 0 := by rw [AlgEquiv.one_apply, div_self hy, sub_self]
   rw [this, map_zero]
   exact zero_lt_one
 
-theorem IsWild.val_div {σ : Ω ≃ₐ[E] Ω} (h : IsWild A σ) {y : Ω} (hy : y ≠ 0) : A.valuation (σ y / y) = 1 := by
+theorem IsWild.val_div {σ : Ω ≃ₐ[E] Ω} (h : IsWild A σ) {y : Ω} (hy : y ≠ 0)
+    : A.valuation (σ y / y) = 1 := by
   have := Valuation.map_one_add_of_lt (v := A.valuation) (h y hy)
   rwa [add_sub_cancel] at this
 
@@ -55,8 +57,8 @@ theorem IsWild.pow {σ : Ω ≃ₐ[E] Ω} (h : IsWild A σ) (n : ℕ) : IsWild A
 theorem val_intCast_le (a : ℤ) : A.valuation ((a : ℤ) : Ω) ≤ 1 :=
   (A.valuation_le_one_iff _).2 (intCast_mem A a)
 
-theorem val_natCast_eq_one {p m : ℕ} (hpA : A.valuation ((p : ℕ) : Ω) < 1) (hm : Nat.Coprime m p) :
-    A.valuation ((m : ℕ) : Ω) = 1 := by
+theorem val_natCast_eq_one {p m : ℕ} (hpA : A.valuation ((p : ℕ) : Ω) < 1) (hm : Nat.Coprime m p)
+    : A.valuation ((m : ℕ) : Ω) = 1 := by
   have hle : A.valuation ((m : ℕ) : Ω) ≤ 1 := by
     exact (A.valuation_le_one_iff _).2 (natCast_mem A m)
   by_contra hne
@@ -65,7 +67,9 @@ theorem val_natCast_eq_one {p m : ℕ} (hpA : A.valuation ((p : ℕ) : Ω) < 1) 
     have := Nat.gcd_eq_gcd_ab m p
     rw [hm.gcd_eq_one] at this
     exact_mod_cast this.symm
-  have hb' : ((m : ℕ) : Ω) * ((Nat.gcdA m p : ℤ) : Ω) + ((p : ℕ) : Ω) * ((Nat.gcdB m p : ℤ) : Ω) = 1 := by
+  have hb'
+      : ((m : ℕ) : Ω) * ((Nat.gcdA m p : ℤ) : Ω) + ((p : ℕ) : Ω) * ((Nat.gcdB m p : ℤ) : Ω)
+        = 1 := by
     exact_mod_cast congrArg (fun z : ℤ => (z : Ω)) hb
   have h1 : A.valuation (1 : Ω) < 1 := by
     rw [← hb']
@@ -82,8 +86,11 @@ theorem pow_fix {τ : Ω ≃ₐ[E] Ω} {y : Ω} (h : τ y = y) (j : ℕ) : (τ ^
   | zero => rfl
   | succ j ih => rw [pow_succ, AlgEquiv.mul_apply, h, ih]
 
-theorem fix_of_coprime {p m : ℕ} (hpA : A.valuation ((p : ℕ) : Ω) < 1) (hm : Nat.Coprime m p) {τ : Ω ≃ₐ[E] Ω}
-    (hτ : IsWild A τ) (y : Ω) (hy : (τ ^ m) y = y) : τ y = y := by
+theorem fix_of_coprime
+    {p m : ℕ} (hpA : A.valuation ((p : ℕ) : Ω) < 1) (hm : Nat.Coprime m p)
+    {τ : Ω ≃ₐ[E] Ω} (hτ : IsWild A τ)
+    (y : Ω) (hy : (τ ^ m) y = y)
+    : τ y = y := by
   have hvm := val_natCast_eq_one (A := A) hpA hm
   have hm0 : ((m : ℕ) : Ω) ≠ 0 := by
     intro h0
@@ -109,26 +116,33 @@ theorem fix_of_coprime {p m : ℕ} (hpA : A.valuation ((p : ℕ) : Ω) < 1) (hm 
     rw [hz, map_sub, map_mul, map_natCast, pow_fix hτT i]
   have hsum : ∑ i ∈ Finset.range m, (τ ^ i) z = 0 := by
     simp only [hzi]
-    rw [Finset.sum_sub_distrib, ← Finset.mul_sum, Finset.sum_const, Finset.card_range, nsmul_eq_mul, sub_self]
+    rw [Finset.sum_sub_distrib, ← Finset.mul_sum, Finset.sum_const, Finset.card_range, nsmul_eq_mul,
+      sub_self]
   have hz0 : z = 0 := by
     by_contra hne
     have h1 : ∑ i ∈ Finset.range m, ((τ ^ i) z / z - 1) = -(m : Ω) := by
-      rw [Finset.sum_sub_distrib, ← Finset.sum_div, hsum, zero_div, Finset.sum_const, Finset.card_range, nsmul_eq_mul,
-        mul_one, zero_sub]
+      rw [Finset.sum_sub_distrib, ← Finset.sum_div, hsum, zero_div, Finset.sum_const,
+        Finset.card_range, nsmul_eq_mul, mul_one, zero_sub]
     have h2 : A.valuation (∑ i ∈ Finset.range m, ((τ ^ i) z / z - 1)) < 1 :=
       Valuation.map_sum_lt _ one_ne_zero fun i _ => (hτ.pow i) z hne
     rw [h1, Valuation.map_neg, hvm] at h2
     exact lt_irrefl _ h2
   have h5 : (m : Ω) * y = T := sub_eq_zero.1 hz0
-  have h6 : (m : Ω) * τ y = (m : Ω) * y := by
-    rw [h5, ← hτT, ← h5, map_mul, map_natCast]
+  have h6 : (m : Ω) * τ y = (m : Ω) * y := by rw [h5, ← hτT, ← h5, map_mul, map_natCast]
   exact mul_left_cancel₀ hm0 h6
 
-theorem exists_pow_fix (σ : Ω ≃ₐ[E] Ω) (y : Ω) (hy : IsIntegral E y) : ∃ n : ℕ, n ≠ 0 ∧ (σ ^ n) y = y := by
-  first | exact Bl.general_b_fact_right_version.goal1 .. | (apply Bl.general_b_fact_right_version.goal1 <;> assumption) | (intros; apply Bl.general_b_fact_right_version.goal1 <;> assumption)
+theorem exists_pow_fix (σ : Ω ≃ₐ[E] Ω) (y : Ω) (hy : IsIntegral E y)
+    : ∃ n : ℕ, n ≠ 0 ∧ (σ ^ n) y = y := by
+  first
+  | exact Bl.general_b_fact_right_version.goal1 ..
+  | (apply Bl.general_b_fact_right_version.goal1 <;> assumption)
+  | (intros; apply Bl.general_b_fact_right_version.goal1 <;> assumption)
 
-theorem exists_ppow_fix {p : ℕ} (hp : p.Prime) (hpA : A.valuation ((p : ℕ) : Ω) < 1) {σ : Ω ≃ₐ[E] Ω} (hσ : IsWild A σ)
-    (y : Ω) (hy : IsIntegral E y) : ∃ a : ℕ, ∀ k, a ≤ k → (σ ^ (p ^ k)) y = y := by
+theorem exists_ppow_fix
+    {p : ℕ} (hp : p.Prime) (hpA : A.valuation ((p : ℕ) : Ω) < 1)
+    {σ : Ω ≃ₐ[E] Ω} (hσ : IsWild A σ)
+    (y : Ω) (hy : IsIntegral E y)
+    : ∃ a : ℕ, ∀ k, a ≤ k → (σ ^ (p ^ k)) y = y := by
   obtain ⟨n, hn, hfix⟩ := exists_pow_fix σ y hy
   obtain ⟨a, m, hpm, rfl⟩ := Nat.exists_eq_pow_mul_and_not_dvd hn p hp.ne_one
   have hcop : Nat.Coprime m p := ((Nat.Prime.coprime_iff_not_dvd hp).2 hpm).symm
@@ -144,13 +158,14 @@ theorem exists_ppow_fix {p : ℕ} (hp : p.Prime) (hpA : A.valuation ((p : ℕ) :
   rw [h2]
   exact pow_fix h1 _
 
-theorem wildProP (E Ω : Type) [Field E] [Field Ω] [Algebra E Ω] : Formalism.MainNotions.N.KillingConditions.WildProP E Ω := by
+theorem wildProP (E Ω : Type) [Field E] [Field Ω] [Algebra E Ω]
+    : Formalism.MainNotions.N.KillingConditions.WildProP E Ω := by
   intro A p hp hpA σ hσ N hN
   have hnh : (N : Set (Ω ≃ₐ[E] Ω)) ∈ nhds (1 : Ω ≃ₐ[E] Ω) := hN.mem_nhds N.one_mem
   obtain ⟨L, hL, hLN⟩ := (krullTopology_mem_nhds_one_iff E Ω _).1 hnh
   obtain ⟨S, hS⟩ := (Module.finite_def.1 hL : (⊤ : Submodule E L).FG)
   have hint : ∀ s : L, IsIntegral E (s : Ω) := fun s =>
-    (isIntegral_algebraMap_iff ).2 (Algebra.IsIntegral.isIntegral s)
+    (isIntegral_algebraMap_iff).2 (Algebra.IsIntegral.isIntegral s)
   choose a ha using fun s : L => exists_ppow_fix hp hpA (σ := σ) hσ (s : Ω) (hint s)
   refine ⟨S.sup a, hLN ?_⟩
   show σ ^ (p ^ S.sup a) ∈ L.fixingSubgroup
@@ -162,10 +177,8 @@ theorem wildProP (E Ω : Type) [Field E] [Field Ω] [Algebra E Ω] : Formalism.M
     induction hu using Submodule.span_induction with
     | mem s hs => exact ha s _ (Finset.le_sup hs)
     | zero => simp
-    | add u v _ _ hu hv =>
-      rw [IntermediateField.coe_add, map_add (f := _), hu, hv]
-    | smul c u _ hu =>
-      rw [IntermediateField.coe_smul, map_smul, hu]
+    | add u v _ _ hu hv => rw [IntermediateField.coe_add, map_add (f := _), hu, hv]
+    | smul c u _ hu => rw [IntermediateField.coe_smul, map_smul, hu]
   exact key ⟨x, hx⟩ hx'
 
 end Formalism.MainNotions.N.KillingConditions.WildPf

@@ -11,10 +11,11 @@ open MvPolynomial
 
 namespace Formalism.UG
 
-def dualWeylRep (R : Type) [CommRing R] (r n : ℕ) (ν : Fin n → ℕ) :
-    Representation R (GL (Fin r) R) (Formalism.GradedWeylDivisibility.dualWeyl R r n ν) where
-  toFun g := (dwAct R r n g).toLinearMap.restrict
-    (fun f hf => Formalism.UG.P.dual_weyl_module_stable R r n ν g f hf)
+def dualWeylRep (R : Type) [CommRing R] (r n : ℕ) (ν : Fin n → ℕ)
+    : Representation R (GL (Fin r) R) (Formalism.GradedWeylDivisibility.dualWeyl R r n ν) where
+  toFun g :=
+    (dwAct R r n g).toLinearMap.restrict
+      (fun f hf => Formalism.UG.P.dual_weyl_module_stable R r n ν g f hf)
   map_one' := by
     apply LinearMap.ext
     intro f
@@ -26,14 +27,18 @@ def dualWeylRep (R : Type) [CommRing R] (r n : ℕ) (ν : Fin n → ℕ) :
     apply LinearMap.ext
     intro f
     apply Subtype.ext
-    change dwAct R r n (g * h) (f : MvPolynomial (Fin r × Fin n) R) =
-      dwAct R r n g (dwAct R r n h f)
+    change dwAct R r n (g * h) (f : MvPolynomial (Fin r × Fin n) R)
+      = dwAct R r n g (dwAct R r n h f)
     rw [(Formalism.UG.P.dual_weyl_action_mul R r n g h).1]
     rfl
 
-theorem dualWeylRep_apply (R : Type) [CommRing R] (r n : ℕ) (ν : Fin n → ℕ) (g : GL (Fin r) R)
-    (f : Formalism.GradedWeylDivisibility.dualWeyl R r n ν) :
-    ((dualWeylRep R r n ν g f : Formalism.GradedWeylDivisibility.dualWeyl R r n ν) : MvPolynomial (Fin r × Fin n) R) =
-      dwAct R r n g f := rfl
+theorem dualWeylRep_apply
+    (R : Type) [CommRing R]
+    (r n : ℕ) (ν : Fin n → ℕ)
+    (g : GL (Fin r) R) (f : Formalism.GradedWeylDivisibility.dualWeyl R r n ν)
+    : ((dualWeylRep R r n ν g f : Formalism.GradedWeylDivisibility.dualWeyl R r n ν)
+        : MvPolynomial (Fin r × Fin n) R)
+      = dwAct R r n g f :=
+  rfl
 
 end Formalism.UG

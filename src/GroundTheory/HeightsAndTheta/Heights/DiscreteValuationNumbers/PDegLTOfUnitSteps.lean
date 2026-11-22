@@ -9,11 +9,13 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.NumbersDVR
 
-theorem DegLTOfUnitSteps.degLT_diffStep (h1 : DiffStepExpansion.Statement)
-    (h2 : MixedDiffLinear.Statement) (h3 : DegLTClosure.Statement)
-    (K : Type) [Fintype K] [DecidableEq K] (n : ℕ) (f : (K → ℤ) → ℤ)
-    (hf : ∀ k, DegLT (diffStep (Pi.single k 1) f) n) (b : K → ℤ) :
-    DegLT (diffStep b f) n := by
+theorem DegLTOfUnitSteps.degLT_diffStep
+    (h1 : DiffStepExpansion.Statement) (h2 : MixedDiffLinear.Statement)
+    (h3 : DegLTClosure.Statement)
+    (K : Type) [Fintype K] [DecidableEq K]
+    (n : ℕ) (f : (K → ℤ) → ℤ) (hf : ∀ k, DegLT (diffStep (Pi.single k 1) f) n)
+    (b : K → ℤ)
+    : DegLT (diffStep b f) n := by
   obtain ⟨l, hl⟩ := h1 K b
   rw [hl f]
   clear hl
@@ -35,9 +37,10 @@ theorem DegLTOfUnitSteps.degLT_diffStep (h1 : DiffStepExpansion.Statement)
     exact (h3 K n _ (List.map (fun t => t.2 • shiftFn t.1.2 (diffStep (Pi.single t.1.1 1) f)) l).sum
       0 0).1 hc ih
 
-theorem DegLTOfUnitSteps.proof (h1 : DiffStepExpansion.Statement)
-    (h2 : MixedDiffLinear.Statement) (h3 : DegLTClosure.Statement) :
-    DegLTOfUnitSteps.Statement := by
+theorem DegLTOfUnitSteps.proof
+    (h1 : DiffStepExpansion.Statement) (h2 : MixedDiffLinear.Statement)
+    (h3 : DegLTClosure.Statement)
+    : DegLTOfUnitSteps.Statement := by
   intro K _ _ n f hf bs
   have key : mixedDiff bs f = mixedDiff (Fin.tail bs) (diffStep (bs 0) f) := by
     rw [(h2 K n (Fin.tail bs) f f 0 0 (bs 0)).2.2.2.1,

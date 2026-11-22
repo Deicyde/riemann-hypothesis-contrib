@@ -7,10 +7,39 @@ public import Formalism.LocalToGlobal.Columns.ChainTw
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory ValuativeRel Matrix Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.TwBridge
+open NumberField IsDedekindDomain MeasureTheory ValuativeRel Matrix Formalism.BasicNotions
+  Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col GlobalTheory.SplitWeil
+  GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.TwBridge
 open GlobalTheory.TwBridgeInhab in
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.exists_completionTwistData_chainColumns : ∀ (X : Fields) (Pr : Primes X) (R : Ranks) (Ch : Chars X Pr R.m) (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) (S₀ : Set ℕ) (mu : Tup X.F X.E X.K S₀) (cst : LocCst X (rowSG Pr sel mu)) (L : ChIdx X Pr R (QE sel (mu : Chr X.F X.E X.K))) (G : ChGlob X R.m) (s : ℕ), L.Ok Ch sel mu cst G s → ∀ (P : rowSG Pr sel mu), P.1 ∉ Pr.vGs → ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (ι : X.E →+* k) (ϖ : kˣ), GlobalTheory.SymBridge.IsCompl P.1 (qOf P.1) ι ϖ → GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.IsUnif ϖ → ∀ ψ : AddChar k Circle, Continuous ψ → HasConductor ψ 1 → (∀ (a : X.E) (b : ℤ) (n : ℕ), IntAt P.1 (G.xi0 * a - (b : X.E) / (qOf P.1 : X.E) ^ n) → (ψ (ι a) : ℂ) = Complex.exp (2 * Real.pi * Complex.I * b / (qOf P.1 : ℂ) ^ n)) → ∀ μ : ℕ → kˣ →* ℂˣ, (∀ i, i < R.m → (∀ (a : X.E) (u : kˣ), (u : k) = ι a → (μ (i + 1) u : ℂ) = G.σ₀ (muAt Ch sel mu cst i P a)) ∧ IsTame (μ (i + 1))) → ∃ W : TwData k, AtTwist (R := R) sel mu cst G.σ₀ P ι s W ∧ W.ϖ = ϖ ∧ W.ψ = ψ ∧ (∀ i, i < R.m → W.η (i + 1) * W.δ = μ (i + 1)) ∧ (W.sg = 1 ∨ W.sg = -1) := by
+theorem _root_.GlobalTheory.T.exists_completionTwistData_chainColumns
+    : ∀ (X : Fields) (Pr : Primes X) (R : Ranks) (Ch : Chars X Pr R.m)
+        (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) (S₀ : Set ℕ)
+        (mu : Tup X.F X.E X.K S₀) (cst : LocCst X (rowSG Pr sel mu))
+        (L : ChIdx X Pr R (QE sel (mu : Chr X.F X.E X.K))) (G : ChGlob X R.m) (s : ℕ),
+      L.Ok Ch sel mu cst G s
+        → ∀ (P : rowSG Pr sel mu),
+          P.1 ∉ Pr.vGs
+            → ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
+                [IsNonarchimedeanLocalField k] (ι : X.E →+* k) (ϖ : kˣ),
+              GlobalTheory.SymBridge.IsCompl P.1 (qOf P.1) ι ϖ
+                → GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum.IsUnif ϖ
+                → ∀ ψ : AddChar k Circle,
+                  Continuous ψ → HasConductor ψ 1
+                    → (∀ (a : X.E) (b : ℤ) (n : ℕ),
+                      IntAt P.1 (G.xi0 * a - (b : X.E) / (qOf P.1 : X.E) ^ n)
+                        → (ψ (ι a) : ℂ)
+                          = Complex.exp (2 * Real.pi * Complex.I * b / (qOf P.1 : ℂ) ^ n))
+                    → ∀ μ : ℕ → kˣ →* ℂˣ,
+                      (∀ i,
+                          i < R.m
+                            → (∀ (a : X.E) (u : kˣ),
+                                (u : k) = ι a → (μ (i + 1) u : ℂ) = G.σ₀ (muAt Ch sel mu cst i P a))
+                              ∧ IsTame (μ (i + 1)))
+                        → ∃ W : TwData k,
+                          AtTwist (R := R) sel mu cst G.σ₀ P ι s W ∧ W.ϖ = ϖ ∧ W.ψ = ψ
+                            ∧ (∀ i, i < R.m → W.η (i + 1) * W.δ = μ (i + 1))
+                            ∧ (W.sg = 1 ∨ W.sg = -1) := by
   intro X Pr R Ch sel S₀ mu cst L G s hL P hP k _ _ _ _ ι ϖ hc hϖ ψ hψc hψ1 hψt μ hμ
   have hm : R.m = s + 2 := hL.hm
   have hm0 : 0 < R.m := by omega
@@ -20,15 +49,14 @@ theorem _root_.GlobalTheory.T.exists_completionTwistData_chainColumns : ∀ (X :
   let δ : kˣ →* ℂˣ := μ 1 * (GlobalTheory.SmGL.unrChar k (μ 1 ϖ))⁻¹
   have hδ_unit (x : kˣ) (hx : valuation k (x : k) = 1) : δ x = μ 1 x := by
     simp [δ, GlobalTheory.SmGL.isUnram_unrChar k _ x hx]
-  have hμ_unit (i : ℕ) {a : X.E} (ha : IsUnit (redP P.1 a)) :
-      muAt Ch sel mu cst i P a = LocE.unitV (resChar (mu : Chr X.F X.E X.K) P.1)⁻¹ a := by
+  have hμ_unit (i : ℕ) {a : X.E} (ha : IsUnit (redP P.1 a))
+      : muAt Ch sel mu cst i P a = LocE.unitV (resChar (mu : Chr X.F X.E X.K) P.1)⁻¹ a := by
     unfold muAt
     rw [ite_eq_right hP]
     unfold LocE.locChar
     rw [GlobalTheory.LastSteps.vP_unit ha]
     simp
-  have hμ_uniformizer (i : ℕ) :
-      muAt Ch sel mu cst i P (qOf P.1 : X.E) = cst.muq (i + 1) P := by
+  have hμ_uniformizer (i : ℕ) : muAt Ch sel mu cst i P (qOf P.1 : X.E) = cst.muq (i + 1) P := by
     unfold muAt
     rw [ite_eq_right hP]
     unfold LocE.locChar
@@ -55,24 +83,31 @@ theorem _root_.GlobalTheory.T.exists_completionTwistData_chainColumns : ∀ (X :
     have hva : valuation k (ι a) = 1 := by
       have e : ι a = (ι a - x) + x := by ring
       rw [e, Valuation.map_add_eq_of_lt_right _ (by rw [hx]; exact ha), hx]
-    have ha0 : ι a ≠ 0 := by
-      intro h0; rw [h0, map_zero] at hva; exact zero_ne_one hva
+    have ha0 : ι a ≠ 0 := by intro h0; rw [h0, map_zero] at hva; exact zero_ne_one hva
     have hint : IntAt P.1 a := GlobalTheory.SymBridge.ComplRes.intAt_of_v hc (le_of_eq hva)
-    have hred : IsUnit (redP P.1 a) := (GlobalTheory.SymBridge.ComplRes.v_eq_one_iff_red hc hϖ hint).mp hva
+    have hred : IsUnit (redP P.1 a) :=
+      (GlobalTheory.SymBridge.ComplRes.v_eq_one_iff_red hc hϖ hint).mp hva
     have hn : valuation k (((Units.mk0 (ι a) ha0 : kˣ) : k) - x) < 1 := ha
     rw [← tame_near (hμ i hi).2 hx hn, ← tame_near ht1 hx hn]
     apply Units.ext
     rw [(hμ i hi).1 a _ rfl, hμ1 a _ rfl, hμ_unit i hred, hμ_unit 0 hred]
 
   have hsq : G.σ₀ (cst.sq P) ^ 2 = ((Real.sqrt (qOf P.1) : ℝ) : ℂ) ^ 2 := by
-    rw [← map_pow, hL.cst_ok.sq_sq P, map_natCast, ← Complex.ofReal_pow, Real.sq_sqrt (Nat.cast_nonneg _),
-      Complex.ofReal_natCast]
-  obtain ⟨sg, hsg1, hsg2⟩ : ∃ sg : ℂ, (sg = 1 ∨ sg = -1) ∧ G.σ₀ (cst.sq P) = sg * (Real.sqrt (qOf P.1) : ℂ) := by
+    rw [← map_pow, hL.cst_ok.sq_sq P, map_natCast, ← Complex.ofReal_pow,
+      Real.sq_sqrt (Nat.cast_nonneg _), Complex.ofReal_natCast]
+  obtain ⟨sg, hsg1, hsg2⟩
+      : ∃ sg : ℂ, (sg = 1 ∨ sg = -1) ∧ G.σ₀ (cst.sq P) = sg * (Real.sqrt (qOf P.1) : ℂ) := by
     rcases sq_eq_sq_iff_eq_or_eq_neg.mp hsq with h | h
     · exact ⟨1, Or.inl rfl, by rw [h, one_mul]⟩
     · exact ⟨-1, Or.inr rfl, by rw [h, neg_one_mul]⟩
-  refine ⟨⟨ϖ, hϖ, ψ, hψc, hψ1, δ, hδ_tame, eta μ R.m (δ),
-    eta_unram μ R.m _ hδ, sg⟩, ⟨hP, hm, hc, ?_, ?_, ?_, hsg2⟩, rfl, rfl, fun i hi => eta_mul μ R.m _ hi, hsg1⟩
+  refine ⟨
+    ⟨ϖ, hϖ, ψ, hψc, hψ1, δ, hδ_tame, eta μ R.m (δ), eta_unram μ R.m _ hδ, sg⟩,
+    ⟨hP, hm, hc, ?_, ?_, ?_, hsg2⟩,
+    rfl,
+    rfl,
+    fun i hi => eta_mul μ R.m _ hi,
+    hsg1
+  ⟩
   · intro a ha
     show (ψ (ι a) : ℂ) = G.σ₀ (cst.psi P a)
     have hxi : IntAt P.1 G.xi0 := (hL.xiUnitAtPrime P).1
@@ -83,8 +118,9 @@ theorem _root_.GlobalTheory.T.exists_completionTwistData_chainColumns : ∀ (X :
       rw [← GlobalTheory.SymBridge.ComplRes.unif_eq_cast hc]; exact ϖ.ne_zero
     have hint : IntAt P.1 (G.xi0 * a - ((i : ℤ) : X.E) / (qOf P.1 : X.E) ^ cst.D P) := by
       apply GlobalTheory.SymBridge.ComplRes.intAt_of_v hc
-      have e : ι (G.xi0 * ((qOf P.1 : X.E) ^ cst.D P * a)) - (i : k) =
-          ι (G.xi0 * a - ((i : ℤ) : X.E) / (qOf P.1 : X.E) ^ cst.D P) * (ϖ : k) ^ cst.D P := by
+      have e
+          : ι (G.xi0 * ((qOf P.1 : X.E) ^ cst.D P * a)) - (i : k)
+            = ι (G.xi0 * a - ((i : ℤ) : X.E) / (qOf P.1 : X.E) ^ cst.D P) * (ϖ : k) ^ cst.D P := by
         rw [GlobalTheory.SymBridge.ComplRes.unif_eq_cast hc]
         simp only [map_mul, map_sub, map_div₀, map_pow, map_intCast, map_natCast]
         push_cast

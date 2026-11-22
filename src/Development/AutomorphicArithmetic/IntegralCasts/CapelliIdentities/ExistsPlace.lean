@@ -4,21 +4,23 @@ public import Mathlib
 
 @[expose] public section
 
-@[reducible] noncomputable def UpperTheory.Reformulated.B.ExistsPlace.Plc :
-    (E : Type) → [Field E] → Type :=
-    fun (E : Type) [Field E] ↦ IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers E)
+@[reducible]
+noncomputable def UpperTheory.Reformulated.B.ExistsPlace.Plc : (E : Type) → [Field E] → Type :=
+  fun (E : Type) [Field E] ↦ IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers E)
 
-theorem UpperTheory.Reformulated.B.ExistsPlace.exists_place :
-    ∀ {E : Type} [inst : Field E] [inst_1 : NumberField E] [NumberField.IsCMField E] (q : ℕ),
-      Nat.Prime q → ∃ (w : UpperTheory.Reformulated.B.ExistsPlace.Plc E), (↑q : NumberField.RingOfIntegers E) ∈ w.asIdeal := by
+theorem UpperTheory.Reformulated.B.ExistsPlace.exists_place
+    : ∀ {E : Type} [inst : Field E] [inst_1 : NumberField E] [NumberField.IsCMField E] (q : ℕ),
+      Nat.Prime q
+        → ∃ (w : UpperTheory.Reformulated.B.ExistsPlace.Plc E),
+          (↑q : NumberField.RingOfIntegers E) ∈ w.asIdeal := by
   intro E _ _ _ q hq
-  have hne : (q : NumberField.RingOfIntegers E) ≠ 0 := by
-    exact_mod_cast hq.ne_zero
+  have hne : (q : NumberField.RingOfIntegers E) ≠ 0 := by exact_mod_cast hq.ne_zero
   have hnu : ¬ IsUnit (q : NumberField.RingOfIntegers E) := by
     intro h
     have h1 := h.map (Algebra.norm ℤ (S := NumberField.RingOfIntegers E))
-    have h2 : Algebra.norm ℤ (q : NumberField.RingOfIntegers E) =
-        (q : ℤ) ^ Module.finrank ℤ (NumberField.RingOfIntegers E) := by
+    have h2
+        : Algebra.norm ℤ (q : NumberField.RingOfIntegers E)
+          = (q : ℤ) ^ Module.finrank ℤ (NumberField.RingOfIntegers E) := by
       have := Algebra.norm_algebraMap (R := ℤ) (S := NumberField.RingOfIntegers E) (q : ℤ)
       simpa using this
     rw [h2] at h1

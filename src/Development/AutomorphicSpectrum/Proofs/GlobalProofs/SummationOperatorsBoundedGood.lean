@@ -10,7 +10,9 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 set_option autoImplicit false
 
-open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta GlobalTheory.CompanionTheory.Hypotheses₂.Shintani GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel
+open NumberField Formalism.MainNotions.ShortIntervalPrimes GlobalTheory.RayZeta
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani
+  GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel.AopProps
 
@@ -124,10 +126,11 @@ end GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel.AopProps
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.Shintani.Abel
 
-
 open AopProps in
-theorem aop_props : ∀ (r l : ℕ) (i : Fin r) (v : (Fin r → ℕ) → ℚ), 0 < l → GoodAt l i v → BddW v →
-    BddW (Aop l i v) ∧ BddW (Bop l i v) ∧ GoodAt l i (Aop l i v) := by
+theorem aop_props
+    : ∀ (r l : ℕ) (i : Fin r) (v : (Fin r → ℕ) → ℚ),
+      0 < l → GoodAt l i v → BddW v
+        → BddW (Aop l i v) ∧ BddW (Bop l i v) ∧ GoodAt l i (Aop l i v) := by
   intro r l i v hl hv ⟨C, hC⟩
   refine ⟨⟨l * C + l * C, fun m => ?_⟩, ⟨l * C, fun m => ?_⟩, Aop_goodAt hl i v hv⟩
   · unfold Aop

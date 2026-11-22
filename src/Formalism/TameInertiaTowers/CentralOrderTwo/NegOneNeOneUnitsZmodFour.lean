@@ -156,7 +156,7 @@ lemma phiE_ker (s : ℕ) : (phiE s).ker = Subgroup.zpowers ((-1, 1, 1) : GalL (s
 
 noncomputable def eGamE (s : ℕ) : GamE s ≃* Multiplicative (ZMod (2 ^ s)) × ℤˣ × ℤˣ :=
   ((QuotientGroup.quotientMulEquivOfEq (phiE_ker s).symm).trans
-    (QuotientGroup.quotientKerEquivOfSurjective _ (phiE_surj s))).trans
+      (QuotientGroup.quotientKerEquivOfSurjective _ (phiE_surj s))).trans
     (MulEquiv.prodCongr (eQQ s) (MulEquiv.refl _))
 
 private lemma card_int_units_eq_two : Nat.card ℤˣ = 2 := by
@@ -223,17 +223,16 @@ lemma um_w {s m : ℕ} (h : s ≤ m) :
   have h1 := pow_orderOf_eq_one (u5 (s + 2))
   rwa [ord5] at h1
 
-noncomputable def psi {s m : ℕ} (h : s ≤ m) :
-    ℤˣ × Multiplicative (ZMod (2 ^ (m - s))) →* GalL (m + 2) :=
-  MonoidHom.mk' (fun p => (iota (m + 2) p.1 * wgen s m ^ (Multiplicative.toAdd p.2).val, 1, 1))
-    (by
-      rintro ⟨e1, k1⟩ ⟨e2, k2⟩
-      simp only [Prod.mk_mul_mk, mul_one, toAdd_mul, map_mul]
-      congr 1
-      have key : ∀ n : ℕ, wgen s m ^ (n % 2 ^ (m - s)) = wgen s m ^ n := fun n => by
-        rw [← ord_w h, pow_mod_orderOf]
-      rw [ZMod.val_add, key, pow_add (wgen s m)]
-      exact mul_mul_mul_comm _ _ _ _)
+noncomputable def psi {s m : ℕ} (h : s ≤ m)
+    : ℤˣ × Multiplicative (ZMod (2 ^ (m - s))) →* GalL (m + 2) :=
+  MonoidHom.mk' (fun p => (iota (m + 2) p.1 * wgen s m ^ (Multiplicative.toAdd p.2).val, 1, 1)) (by
+    rintro ⟨e1, k1⟩ ⟨e2, k2⟩
+    simp only [Prod.mk_mul_mk, mul_one, toAdd_mul, map_mul]
+    congr 1
+    have key : ∀ n : ℕ, wgen s m ^ (n % 2 ^ (m - s)) = wgen s m ^ n := fun n => by
+      rw [← ord_w h, pow_mod_orderOf]
+    rw [ZMod.val_add, key, pow_add (wgen s m)]
+    exact mul_mul_mul_comm _ _ _ _)
 
 lemma psi_apply {s m : ℕ} (h : s ≤ m) (e : ℤˣ) (k : Multiplicative (ZMod (2 ^ (m - s)))) :
     psi h (e, k) = (iota (m + 2) e * wgen s m ^ (Multiplicative.toAdd k).val, 1, 1) := rfl
@@ -302,8 +301,11 @@ lemma range_eq_GG {s m : ℕ} (h : s ≤ m) : (psi h).range = GG h := by
 theorem ggModel : GGModel := by
   unfold GGModel
   intro s m h
-  refine ⟨card_GG h, ⟨(MulEquiv.subgroupCongr (range_eq_GG h)).symm.trans
-    (MonoidHom.ofInjective (psi_inj h)).symm⟩, le_antisymm ?_ (closure_le_GG h)⟩
+  refine ⟨
+    card_GG h,
+    ⟨(MulEquiv.subgroupCongr (range_eq_GG h)).symm.trans (MonoidHom.ofInjective (psi_inj h)).symm⟩,
+    le_antisymm ?_ (closure_le_GG h)
+  ⟩
   rw [← range_eq_GG h]
   exact range_le_closure h
 
@@ -324,8 +326,8 @@ theorem gamEModel : GamEModel := by
       rw [hJ, QuotientGroup.mk_one]
     · rw [Ne, QuotientGroup.eq_one_iff, mem_zpowers_sq gen_sq]
       unfold JJ
-      rintro (h1 | h1) <;>
-      · have h2 : (-1 : ℤˣ) = 1 := congrArg (fun x : GalL (s + 2) => x.2.1) h1
-        exact absurd h2 (by decide)
+      rintro (h1 | h1)
+        <;> · have h2 : (-1 : ℤˣ) = 1 := congrArg (fun x : GalL (s + 2) => x.2.1) h1
+              exact absurd h2 (by decide)
 
 end Formalism.TwoAdicCyclotomicDecomposition

@@ -8,18 +8,22 @@ open Matrix
 
 namespace GlobalTheory.CompanionTheory.LinAlg
 
-theorem exists_GL_lastRow_eq : ∀ (K : Type) [Field K] (n : ℕ) (a : Fin (n + 1) → K), a ≠ 0 →
-    ∃ m : GL (Fin (n + 1)) K, vecMul (Pi.single (Fin.last n) 1) (m : Matrix (Fin (n + 1)) (Fin (n + 1)) K) = a := by
+theorem exists_GL_lastRow_eq
+    : ∀ (K : Type) [Field K] (n : ℕ) (a : Fin (n + 1) → K),
+      a ≠ 0
+        → ∃ m : GL (Fin (n + 1)) K,
+          vecMul (Pi.single (Fin.last n) 1) (m : Matrix (Fin (n + 1)) (Fin (n + 1)) K) = a := by
   intro K _ n a ha
   classical
   set e : Fin (n + 1) → K := Pi.single (Fin.last n) 1 with he_def
   have he : e ≠ 0 := by simp [e]
   let f : (K ∙ e) ≃ₗ[K] (K ∙ a) :=
-    (LinearEquiv.toSpanNonzeroSingleton K _ e he).symm ≪≫ₗ
-      LinearEquiv.toSpanNonzeroSingleton K _ a ha
+    (LinearEquiv.toSpanNonzeroSingleton K _ e he).symm
+      ≪≫ₗ LinearEquiv.toSpanNonzeroSingleton K _ a ha
   obtain ⟨g, hg⟩ := Submodule.exists_linearEquiv_restrict_eq f
-  have h1 : (LinearEquiv.toSpanNonzeroSingleton K _ e he).symm
-      ⟨e, Submodule.mem_span_singleton_self e⟩ = 1 := by
+  have h1
+      : (LinearEquiv.toSpanNonzeroSingleton K _ e he).symm ⟨e, Submodule.mem_span_singleton_self e⟩
+        = 1 := by
     rw [LinearEquiv.symm_apply_eq, LinearEquiv.toSpanNonzeroSingleton_one]
   have hga : g e = a := by
     have hx := hg ⟨e, Submodule.mem_span_singleton_self e⟩

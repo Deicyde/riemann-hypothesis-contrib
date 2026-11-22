@@ -12,11 +12,12 @@ namespace UpperTheory.V.Lit.Dr
 theorem paramSmooth : ParamSmooth := by
   intro P F _ _ _ _ _ _ O S g hO hS hOS hg p₀ hp₀
   apply ContDiffAt.contDiffWithinAt
-  obtain ⟨u, v, hu, hv, hpu, hIv, huv⟩ := generalized_tube_lemma (isCompact_singleton (x := p₀))
-    (isCompact_Icc (a := (0 : ℝ)) (b := 1)) hS ((prod_mono (singleton_subset_iff.2 hp₀) subset_rfl).trans hOS)
-  have hI : Icc (0 : ℝ) 1 = closedBall (1 / 2) (1 / 2) := by
-    rw [Real.closedBall_eq_Icc]; norm_num
-  obtain ⟨ε, hε, hεv⟩ := (isCompact_Icc (a := (0 : ℝ)) (b := 1)).exists_cthickening_subset_open hv hIv
+  obtain ⟨u, v, hu, hv, hpu, hIv, huv⟩ :=
+    generalized_tube_lemma (isCompact_singleton (x := p₀)) (isCompact_Icc (a := (0 : ℝ)) (b := 1))
+      hS ((prod_mono (singleton_subset_iff.2 hp₀) subset_rfl).trans hOS)
+  have hI : Icc (0 : ℝ) 1 = closedBall (1 / 2) (1 / 2) := by rw [Real.closedBall_eq_Icc]; norm_num
+  obtain ⟨ε, hε, hεv⟩ :=
+    (isCompact_Icc (a := (0 : ℝ)) (b := 1)).exists_cthickening_subset_open hv hIv
   rw [hI, cthickening_closedBall hε.le (by norm_num)] at hεv
   let b : ContDiffBump (1 / 2 : ℝ) := ⟨1 / 2, ε + 1 / 2, by norm_num, by linarith⟩
   have hbs : tsupport b = closedBall (1 / 2 : ℝ) (ε + 1 / 2) := b.tsupport_eq
@@ -37,23 +38,22 @@ theorem paramSmooth : ParamSmooth := by
         (isClosed_closedBall.isOpen_compl.mem_nhds hq2)] with q' hq'
       simp only [K, hb0 q'.2 hq', zero_smul]
   have hf : LocallyIntegrable ((Ioc (0 : ℝ) 1).indicator fun _ => (1 : ℝ)) volume :=
-    ((integrable_indicator_iff measurableSet_Ioc).2 (integrableOn_const (by simp))).locallyIntegrable
+    ((integrable_indicator_iff measurableSet_Ioc).2
+      (integrableOn_const (by simp))).locallyIntegrable
   let k : Set ℝ := Neg.neg '' closedBall (1 / 2 : ℝ) (ε + 1 / 2)
-  have hgs : ∀ p, ∀ x, p ∈ u → x ∉ k →
-      (fun z (y : ℝ) => K (z, -y)) p x = 0 := by
+  have hgs : ∀ p, ∀ x, p ∈ u → x ∉ k → (fun z (y : ℝ) => K (z, -y)) p x = 0 := by
     intro p x _ hx
     have := hb0 (-x) (fun h => hx ⟨-x, h, by simp⟩)
     simp only [K, this, zero_smul]
   have hg' : ContDiffOn ℝ (⊤ : ℕ∞) (↿(fun z (y : ℝ) => K (z, -y))) (u ×ˢ Set.univ) := by
-    have h1 : ContDiff ℝ ∞ (fun p : P × ℝ => (p.1, -p.2)) :=
-      contDiff_fst.prodMk contDiff_snd.neg
+    have h1 : ContDiff ℝ ∞ (fun p : P × ℝ => (p.1, -p.2)) := contDiff_fst.prodMk contDiff_snd.neg
     refine hK.comp h1.contDiffOn ?_
     rintro ⟨p, x⟩ ⟨hp, -⟩
     exact ⟨hp, Set.mem_univ _⟩
   have hv0 : ContDiffOn ℝ (⊤ : ℕ∞) (fun _ : P => (0 : ℝ)) u := contDiffOn_const
-  have main := contDiffOn_convolution_right_with_param_comp (μ := volume)
-    (ContinuousLinearMap.lsmul ℝ ℝ) hv0 hu
-    ((isCompact_closedBall _ _).image continuous_neg) hgs hf hg'
+  have main :=
+    contDiffOn_convolution_right_with_param_comp (μ := volume) (ContinuousLinearMap.lsmul ℝ ℝ) hv0
+      hu ((isCompact_closedBall _ _).image continuous_neg) hgs hf hg'
   have fin : ContDiffOn ℝ ∞ (fun p => ∫ s in (0 : ℝ)..1, g (p, s)) u := by
     refine main.congr ?_
     intro z _

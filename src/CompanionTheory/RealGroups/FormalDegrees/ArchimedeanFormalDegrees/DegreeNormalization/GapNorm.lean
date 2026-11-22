@@ -34,8 +34,11 @@ theorem gapNorm_of (hD : DegPsi) : GapNorm := by
   have : Nontrivial (Hlam ε (PsiM T μ) T.w) := hDS.2.1
   obtain ⟨d, hd⟩ := G2.fdcGood_of_isDS hDS
   obtain ⟨x, hx⟩ := exists_ne (0 : Hlam ε (PsiM T μ) T.w)
-  have hΨ : ∀ μ' : Fin n → ℝ, IsHCParam μ' → GapAtLeast ε μ' (G2.thrS ε + 2) →
-      ∃ (T' : KType ε (lowK ε μ')) (Ψ : Matrix (Fin n) (Fin n) ℂ → (T'.V →L[ℂ] T'.V)), IsPsiFor ε μ' T' Ψ := by
+  have hΨ
+      : ∀ μ' : Fin n → ℝ,
+        IsHCParam μ' → GapAtLeast ε μ' (G2.thrS ε + 2)
+          → ∃ (T' : KType ε (lowK ε μ')) (Ψ : Matrix (Fin n) (Fin n) ℂ → (T'.V →L[ℂ] T'.V)),
+            IsPsiFor ε μ' T' Ψ := by
     intro μ' hμ' hg'
     obtain ⟨T'⟩ := HW.kType_exists ε μ' hμ'
     obtain ⟨m', -, hP'⟩ := G2.fdc_model hp hq hμ' hg' hh T'
@@ -49,7 +52,11 @@ theorem gapNorm_of (hD : DegPsi) : GapNorm := by
     positivity
   have h1 : (1 : Matrix (Fin n) (Fin n) ℂ) ∈ UJset ε := umat_mem_UJset ε 1
   refine hD n ε T.V (PsiM T μ) (Hlam ε (PsiM T μ) T.w) (sigLam ε (PsiM T μ) T.w)
-    (fun v => ⟨uniformisationL2 ε (PsiM T μ) T.w v, datumEmbedding_mem_Hlam hP v⟩) C (dimVlam lam) (muCD ε) hC0 (fun v v' => ?_) (fun g v v' => ?_) hd
+    (fun v => ⟨uniformisationL2 ε (PsiM T μ) T.w v, datumEmbedding_mem_Hlam hP v⟩)
+    C (dimVlam lam) (muCD ε) hC0
+    (fun v v' => ?_)
+    (fun g v v' => ?_)
+    hd
   · have e := G2.formulaF_sigLam hgap' hP hw h1 v v'
     rw [hP.2.1] at e
     simp only [ContinuousLinearMap.one_apply] at e

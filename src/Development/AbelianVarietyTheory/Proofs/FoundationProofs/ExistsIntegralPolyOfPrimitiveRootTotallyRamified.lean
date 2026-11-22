@@ -8,10 +8,11 @@ namespace GlobalTheory
 
 open Polynomial
 
-theorem valuation_term_le_sum_of_distinct {Ω Γ : Type} [Field Ω] [LinearOrderedCommGroupWithZero Γ]
+theorem valuation_term_le_sum_of_distinct
+    {Ω Γ : Type} [Field Ω] [LinearOrderedCommGroupWithZero Γ]
     (v : Valuation Ω Γ) (s : Finset ℕ) (f : ℕ → Ω)
-    (h : ∀ i ∈ s, ∀ j ∈ s, i ≠ j → f i ≠ 0 → v (f i) ≠ v (f j)) :
-    ∀ j ∈ s, v (f j) ≤ v (∑ i ∈ s, f i) := by
+    (h : ∀ i ∈ s, ∀ j ∈ s, i ≠ j → f i ≠ 0 → v (f i) ≠ v (f j))
+    : ∀ j ∈ s, v (f j) ≤ v (∑ i ∈ s, f i) := by
   classical
   intro j hj
   by_cases hall : ∀ i ∈ s, f i = 0
@@ -37,8 +38,19 @@ theorem valuation_term_le_sum_of_distinct {Ω Γ : Type} [Field Ω] [LinearOrder
   rw [hsum]
   exact hkmax j hj
 
-theorem exists_integral_poly_of_primitiveRoot_totally_ramified :
-    ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [CharZero Ω] (A : ValuationSubring Ω), A.valuation (l : Ω) < 1 → ∀ (K : Subfield Ω), (∀ x ∈ K, x ≠ 0 → ∃ k : ℤ, A.valuation x = A.valuation (l : Ω) ^ k) → ∀ (m : ℕ), 1 ≤ m → ∀ ζ : Ω, IsPrimitiveRoot ζ (l ^ m) → A.valuation (ζ - 1) ^ Nat.totient (l ^ m) = A.valuation (l : Ω) → ∀ u ∈ A, (∃ Q : Polynomial Ω, (∀ x ∈ Q.coeffs, x ∈ K) ∧ Q.eval ζ = u) → ∃ P : Polynomial Ω, (∀ x ∈ P.coeffs, x ∈ A ∧ x ∈ K) ∧ P.eval ζ = u := by
+theorem exists_integral_poly_of_primitiveRoot_totally_ramified
+    : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [CharZero Ω] (A : ValuationSubring Ω),
+      A.valuation (l : Ω) < 1
+        → ∀ (K : Subfield Ω),
+          (∀ x ∈ K, x ≠ 0 → ∃ k : ℤ, A.valuation x = A.valuation (l : Ω) ^ k)
+            → ∀ (m : ℕ),
+              1 ≤ m
+                → ∀ ζ : Ω,
+                  IsPrimitiveRoot ζ (l ^ m)
+                    → A.valuation (ζ - 1) ^ Nat.totient (l ^ m) = A.valuation (l : Ω)
+                    → ∀ u ∈ A,
+                      (∃ Q : Polynomial Ω, (∀ x ∈ Q.coeffs, x ∈ K) ∧ Q.eval ζ = u)
+                        → ∃ P : Polynomial Ω, (∀ x ∈ P.coeffs, x ∈ A ∧ x ∈ K) ∧ P.eval ζ = u := by
   classical
   intro l hfact Ω _ _ A hl K hK m hm ζ hζ hζv u hu hQ
   obtain ⟨Q, hQK, hQu⟩ := hQ
@@ -87,10 +99,9 @@ theorem exists_integral_poly_of_primitiveRoot_totally_ramified :
     exact (hζ.isRoot_cyclotomic hlm).eq_zero
   have hu1 : R2.eval₂ f w = u := by
     rw [hR2_def, Polynomial.eval₂_comp]
-    have h1 : (Polynomial.X + Polynomial.C 1 : Polynomial T).eval₂ f w = ζ := by
-      simp [hw_def]
-    rw [h1, hR1_def, Polynomial.eval₂_modByMonic_eq_self_of_root hΦζ, ← hQu,
-      ← Polynomial.eval_map, hQ'_def, Polynomial.map_toSubring]
+    have h1 : (Polynomial.X + Polynomial.C 1 : Polynomial T).eval₂ f w = ζ := by simp [hw_def]
+    rw [h1, hR1_def, Polynomial.eval₂_modByMonic_eq_self_of_root hΦζ, ← hQu, ← Polynomial.eval_map,
+      hQ'_def, Polynomial.map_toSubring]
   set c : ℕ → Ω := fun i => f (R2.coeff i) with hc_def
   have hsum : ∑ i ∈ Finset.range e, c i * w ^ i = u := by
     rw [← hu1, Polynomial.eval₂_eq_sum_range' f hR2]
@@ -100,8 +111,9 @@ theorem exists_integral_poly_of_primitiveRoot_totally_ramified :
     obtain ⟨k, hk⟩ := hK _ (hcK i) hi
     refine ⟨k, ?_⟩
     rw [hk, zpow_mul, zpow_natCast, hζv]
-  have hterm : ∀ i ∈ Finset.range e, ∀ j ∈ Finset.range e, i ≠ j →
-      c i * w ^ i ≠ 0 → v (c i * w ^ i) ≠ v (c j * w ^ j) := by
+  have hterm
+      : ∀ i ∈ Finset.range e, ∀ j ∈ Finset.range e,
+        i ≠ j → c i * w ^ i ≠ 0 → v (c i * w ^ i) ≠ v (c j * w ^ j) := by
     intro i hi j hj hij hne h
     have hci : c i ≠ 0 := left_ne_zero_of_mul hne
     obtain ⟨ki, hki⟩ := hcv i hci
@@ -130,7 +142,8 @@ theorem exists_integral_poly_of_primitiveRoot_totally_ramified :
     by_cases hci : c i = 0
     · rw [hci]
       exact A.zero_mem
-    have hle := valuation_term_le_sum_of_distinct v (Finset.range e) (fun i => c i * w ^ i) hterm i hi
+    have hle :=
+      valuation_term_le_sum_of_distinct v (Finset.range e) (fun i => c i * w ^ i) hterm i hi
     rw [hsum] at hle
     rw [← A.valuation_le_one_iff]
     obtain ⟨k, hk⟩ := hcv i hci
@@ -147,8 +160,9 @@ theorem exists_integral_poly_of_primitiveRoot_totally_ramified :
       rw [← h1] at h3
       exact absurd (hle.trans hvu) (not_le.2 h3)
     rw [hk]
-    have h4 := zpow_le_zpow_right_of_le_one₀ hγpos hγ1.le
-      (mul_nonneg (Int.natCast_nonneg e) hk0 : (0 : ℤ) ≤ (e : ℤ) * k)
+    have h4 :=
+      zpow_le_zpow_right_of_le_one₀ hγpos hγ1.le
+        (mul_nonneg (Int.natCast_nonneg e) hk0 : (0 : ℤ) ≤ (e : ℤ) * k)
     rwa [zpow_zero] at h4
   set S : Subring Ω := A.toSubring ⊓ K.toSubring with hS_def
   have hcS : ∀ i, c i ∈ S := by
@@ -174,7 +188,7 @@ theorem exists_integral_poly_of_primitiveRoot_totally_ramified :
   · rw [Polynomial.eval_map, Polynomial.eval₂_comp]
     have h1 : (Polynomial.X - Polynomial.C 1 : Polynomial S).eval₂ S.subtype ζ = w := by
       simp [hw_def]
-    rw [h1, ← Polynomial.eval_map, hR4_def, Polynomial.map_toSubring, hR3_def,
-      Polynomial.eval_map, hu1]
+    rw [h1, ← Polynomial.eval_map, hR4_def, Polynomial.map_toSubring, hR3_def, Polynomial.eval_map,
+      hu1]
 
 end GlobalTheory

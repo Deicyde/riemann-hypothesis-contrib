@@ -8,13 +8,15 @@ universe u_1 u_2
 
 namespace Bl.general_b_fact_second_bis_form
 
-theorem goal1 :
-  ∀ {E : Type u_1} {F : Type u_2} [inst : NormedAddCommGroup.{u_1} E] [inst_1 : NormedSpace.{0, u_1} Complex E]
-  [inst_2 : NormedAddCommGroup.{u_2} F] [inst_3 : NormedSpace.{0, u_2} Complex F] {f : E → F} {y : E} {δ M : Real},
-  LT.lt.{0} 0 δ →
-    DifferentiableOn.{0, u_1, u_2} Complex f (Metric.ball.{u_1} y δ) →
-      (∀ (z : E), Membership.mem.{u_1, u_1} (Metric.ball.{u_1} y δ) z → LE.le.{0} (Norm.norm.{u_2} (f z)) M) →
-        LE.le.{0} (Norm.norm.{max u_2 u_1} (fderiv.{0, u_1, u_2} Complex f y)) (HDiv.hDiv.{0, 0, 0} M δ) := by
+theorem goal1
+    : ∀ {E : Type u_1} {F : Type u_2} [inst : NormedAddCommGroup.{u_1} E]
+        [inst_1 : NormedSpace.{0, u_1} Complex E] [inst_2 : NormedAddCommGroup.{u_2} F]
+        [inst_3 : NormedSpace.{0, u_2} Complex F] {f : E → F} {y : E} {δ M : Real},
+      LT.lt.{0} 0 δ → DifferentiableOn.{0, u_1, u_2} Complex f (Metric.ball.{u_1} y δ)
+        → (∀ (z : E),
+          Membership.mem.{u_1, u_1} (Metric.ball.{u_1} y δ) z → LE.le.{0} (Norm.norm.{u_2} (f z)) M)
+        → LE.le.{0} (Norm.norm.{max u_2 u_1} (fderiv.{0, u_1, u_2} Complex f y))
+          (HDiv.hDiv.{0, 0, 0} M δ) := by
   intro E F _ _ _ _ f y δ M hδ hf hM
   have hM0 : 0 ≤ M := (norm_nonneg _).trans (hM y (Metric.mem_ball_self hδ))
   have hdy : DifferentiableAt ℂ f y :=
@@ -57,8 +59,9 @@ theorem goal1 :
     have h := Complex.norm_deriv_le_of_forall_mem_sphere_norm_le hR hcl hb
     rw [hderiv, div_div_eq_mul_div, le_div_iff₀ hr0] at h
     exact h
-  have ht : Filter.Tendsto (fun r : ℝ => ‖fderiv ℂ f y v‖ * r) (nhdsWithin δ (Set.Iio δ))
-      (nhds (‖fderiv ℂ f y v‖ * δ)) :=
+  have ht : Filter.Tendsto
+      (fun r : ℝ => ‖fderiv ℂ f y v‖ * r)
+      (nhdsWithin δ (Set.Iio δ)) (nhds (‖fderiv ℂ f y v‖ * δ)) :=
     ((continuous_const.mul continuous_id).tendsto δ).mono_left nhdsWithin_le_nhds
   have hev : ∀ᶠ r in nhdsWithin δ (Set.Iio δ), ‖fderiv ℂ f y v‖ * r ≤ M * ‖v‖ := by
     filter_upwards [Ioo_mem_nhdsLT hδ] with r h1 using hr r h1.1 h1.2

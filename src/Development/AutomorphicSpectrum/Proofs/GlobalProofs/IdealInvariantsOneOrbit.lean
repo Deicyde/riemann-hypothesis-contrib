@@ -9,6 +9,7 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.ComplexMultipl
 namespace GlobalTheory.CompanionTheory.CM
 
 theorem idealInvariantsOneOrbit : GlobalTheory.Published.IdealInvariantsOneOrbitSt :=
-  GlobalTheory.Published.ComplexMultiplicationJSt.oneOrbit GlobalTheory.T.complex_multiplication_jacquet_shalika
+  GlobalTheory.Published.ComplexMultiplicationJSt.oneOrbit
+    GlobalTheory.T.complex_multiplication_jacquet_shalika
 
 end GlobalTheory.CompanionTheory.CM

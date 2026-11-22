@@ -31,8 +31,8 @@ theorem torusTail_ge {r : ℕ} (c : Fin r → ℂ) {n : ℕ} (hn : r ≤ n) : to
   have := j.isLt
   omega
 
-theorem torusTail_succ {r : ℕ} (c : Fin r → ℂ) (a : Fin r) :
-    torusTail c a.val = c a * torusTail c (a.val + 1) := by
+theorem torusTail_succ {r : ℕ} (c : Fin r → ℂ) (a : Fin r)
+    : torusTail c a.val = c a * torusTail c (a.val + 1) := by
   unfold torusTail
   rw [← Finset.prod_insert (a := a) (by simp)]
   congr 1
@@ -43,20 +43,21 @@ theorem torusTail_succ {r : ℕ} (c : Fin r → ℂ) (a : Fin r) :
 def torusDiag (k : ℕ) {r : ℕ} (c : Fin r → ℂ) (i : Fin (2 * r + k + 1)) : ℂ :=
   if i.val ≤ r + k then torusTail c i.val else (star (torusTail c (2 * r + k - i.val)))⁻¹
 
-theorem torusDiag_ne (k : ℕ) {r : ℕ} {c : Fin r → ℂ} (hc : ∀ a, c a ≠ 0)
-    (i : Fin (2 * r + k + 1)) : torusDiag k c i ≠ 0 := by
+theorem torusDiag_ne (k : ℕ) {r : ℕ} {c : Fin r → ℂ} (hc : ∀ a, c a ≠ 0) (i : Fin (2 * r + k + 1))
+    : torusDiag k c i ≠ 0 := by
   unfold torusDiag
   split_ifs
   · exact torusTail_ne hc _
   · exact inv_ne_zero (star_ne_zero.2 (torusTail_ne hc _))
 
-theorem torusDiag_mid (k : ℕ) {r : ℕ} (c : Fin r → ℂ) (i : Fin (2 * r + k + 1))
-    (h1 : r ≤ i.val) (h2 : i.val ≤ r + k) : torusDiag k c i = 1 := by
+theorem torusDiag_mid
+    (k : ℕ) {r : ℕ} (c : Fin r → ℂ) (i : Fin (2 * r + k + 1)) (h1 : r ≤ i.val) (h2 : i.val ≤ r + k)
+    : torusDiag k c i = 1 := by
   unfold torusDiag
   rw [if_pos h2, torusTail_ge c h1]
 
-theorem torusDiag_tau (k : ℕ) {r : ℕ} {c : Fin r → ℂ} (hc : ∀ a, c a ≠ 0)
-    (i : Fin (2 * r + k + 1)) : star (torusDiag k c i) * torusDiag k c (tau k r i) = 1 := by
+theorem torusDiag_tau (k : ℕ) {r : ℕ} {c : Fin r → ℂ} (hc : ∀ a, c a ≠ 0) (i : Fin (2 * r + k + 1))
+    : star (torusDiag k c i) * torusDiag k c (tau k r i) = 1 := by
   have hi := i.isLt
   by_cases h1 : i.val < r
   · have e : (tau k r i).val = 2 * r + k - i.val := by
@@ -71,14 +72,13 @@ theorem torusDiag_tau (k : ℕ) {r : ℕ} {c : Fin r → ℂ} (hc : ∀ a, c a �
       unfold torusDiag
       rw [if_neg (by omega), if_pos (by omega), e, star_inv₀, star_star]
       exact inv_mul_cancel₀ (torusTail_ne hc _)
-    · have e : (tau k r i).val = i.val := by
-        unfold tau; simp only; rw [if_neg (by omega)]
+    · have e : (tau k r i).val = i.val := by unfold tau; simp only; rw [if_neg (by omega)]
       rw [torusDiag_mid k c i (by omega) (by omega),
         torusDiag_mid k c (tau k r i) (by omega) (by omega)]
       simp
 
-theorem torusDiag_uh (k : ℕ) {r : ℕ} {c : Fin r → ℂ} (hc : ∀ a, c a ≠ 0) :
-    Matrix.diagonal (torusDiag k c) ∈ UH (Hpk k r) := by
+theorem torusDiag_uh (k : ℕ) {r : ℕ} {c : Fin r → ℂ} (hc : ∀ a, c a ≠ 0)
+    : Matrix.diagonal (torusDiag k c) ∈ UH (Hpk k r) := by
   show (Matrix.diagonal (torusDiag k c))ᴴ * Hpk k r * Matrix.diagonal (torusDiag k c) = Hpk k r
   ext i j
   rw [Matrix.diagonal_conjTranspose, Matrix.mul_diagonal, Matrix.diagonal_mul, hpk_row]
@@ -89,17 +89,18 @@ theorem torusDiag_uh (k : ℕ) {r : ℕ} {c : Fin r → ℂ} (hc : ∀ a, c a �
     linear_combination (sgn k r i) * this
   · simp
 
-theorem torus_diagonal_inv {n : ℕ} {d : Fin n → ℂ} (hd : ∀ i, d i ≠ 0) :
-    (Matrix.diagonal d)⁻¹ = Matrix.diagonal (fun i => (d i)⁻¹) := by
+theorem torus_diagonal_inv {n : ℕ} {d : Fin n → ℂ} (hd : ∀ i, d i ≠ 0)
+    : (Matrix.diagonal d)⁻¹ = Matrix.diagonal (fun i => (d i)⁻¹) := by
   apply Matrix.inv_eq_right_inv
   rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
   congr 1
   funext i
   exact mul_inv_cancel₀ (hd i)
 
-theorem torus_col_conj {k r : ℕ} {d e : Fin (2 * r + k + 1) → ℂ} (hde : ∀ i, d i * e i = 1)
-    {m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hm : col k r m) :
-    col k r (Matrix.diagonal d * m * Matrix.diagonal e) := by
+theorem torus_col_conj
+    {k r : ℕ} {d e : Fin (2 * r + k + 1) → ℂ} (hde : ∀ i, d i * e i = 1)
+    {m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hm : col k r m)
+    : col k r (Matrix.diagonal d * m * Matrix.diagonal e) := by
   intro i j hj hi
   rw [Matrix.mul_diagonal, Matrix.diagonal_mul, hm i j hj hi]
   split_ifs with h
@@ -107,8 +108,16 @@ theorem torus_col_conj {k r : ℕ} {d e : Fin (2 * r + k + 1) → ℂ} (hde : �
     rw [mul_one, hde]
   · simp
 
-theorem torus_moves_character :
-    ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ), Formalism.QuantumDeterminants.inWb k r z → (∀ a, c a ≠ 0) → ∃ a ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r), (∀ h ∈ Formalism.QuantumDeterminants.UWset k r z, a * h = h * a) ∧ (∀ m ∈ Formalism.QuantumDeterminants.Nset k r, a * m * a⁻¹ ∈ Formalism.QuantumDeterminants.Nset k r ∧ a⁻¹ * m * a ∈ Formalism.QuantumDeterminants.Nset k r ∧ PI.BesselL2FixAtZero.psiGen k r z (fun _ => 1) (a * m * a⁻¹) = PI.BesselL2FixAtZero.psiGen k r z c m) := by
+theorem torus_moves_character
+    : ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ),
+      Formalism.QuantumDeterminants.inWb k r z → (∀ a, c a ≠ 0)
+        → ∃ a ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r),
+          (∀ h ∈ Formalism.QuantumDeterminants.UWset k r z, a * h = h * a)
+            ∧ (∀ m ∈ Formalism.QuantumDeterminants.Nset k r,
+              a * m * a⁻¹ ∈ Formalism.QuantumDeterminants.Nset k r
+                ∧ a⁻¹ * m * a ∈ Formalism.QuantumDeterminants.Nset k r
+                ∧ PI.BesselL2FixAtZero.psiGen k r z (fun _ => 1) (a * m * a⁻¹)
+                  = PI.BesselL2FixAtZero.psiGen k r z c m) := by
   intro k r z c hz hc
   have hU := torusDiag_uh k hc
   have hd := torusDiag_ne k hc

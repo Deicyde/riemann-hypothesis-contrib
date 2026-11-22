@@ -8,9 +8,13 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsSelfDua
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.FWT Formalism.L2.Pj
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.IndefR.FWT Formalism.L2.Pj
 open MeasureTheory IsDedekindDomain NumberField Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.ThFr GlobalTheory.Dict GlobalTheory.ClsVal
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.ThFr
+  GlobalTheory.Dict GlobalTheory.ClsVal
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Datum Level Moduli Coeff SABMap)
 open GlobalTheory.SW hiding Level
 open scoped TensorProduct ComplexConjugate
@@ -21,15 +25,16 @@ namespace GlobalTheory.OneMapRef.FactsLat
 
 variable {D : D7}
 
-theorem selfDual_frame_level_one_lattice_eq_standard {V : HSp D} {β : GL (Fin V.rank) (Formalism.IndefR.Lev.EAf D)}
-    {Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)} (h : IsSDFrame V β Λ 1) :
-    (Λ : Set (Fin V.rank → D.host.E)) = Formalism.MainNotions.StandardLattice.L0c D V := by
+theorem selfDual_frame_level_one_lattice_eq_standard
+    {V : HSp D} {β : GL (Fin V.rank) (Formalism.IndefR.Lev.EAf D)}
+    {Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)} (h : IsSDFrame V β Λ 1)
+    : (Λ : Set (Fin V.rank → D.host.E)) = Formalism.MainNotions.StandardLattice.L0c D V := by
   obtain ⟨c, -, -, -, h1, h2⟩ := h
   simp only [one_pow, Nat.cast_one, one_smul] at h1 h2
   exact Set.ext fun x => ⟨h2 x, h1 x⟩
 
-theorem pi_eq_stdL (E : Type) [Field E] [NumberField E] (n : ℕ) :
-    (Submodule.pi Set.univ fun _ => (1 : Submodule (𝓞 E) E)) = stdL E n := by
+theorem pi_eq_stdL (E : Type) [Field E] [NumberField E] (n : ℕ)
+    : (Submodule.pi Set.univ fun _ => (1 : Submodule (𝓞 E) E)) = stdL E n := by
   apply le_antisymm
   · intro x hx
     rw [← Finset.univ_sum_single x]
@@ -46,7 +51,8 @@ theorem pi_eq_stdL (E : Type) [Field E] [NumberField E] (n : ℕ) :
       exact Submodule.mem_one.2 ⟨1, by simp⟩
     · simp [h]
 
-theorem arr_injective {n : ℕ} {q : ℕ} (hq : q ≤ n) : Function.Injective (arr q : Fin n → Fin n) := by
+theorem arr_injective {n : ℕ} {q : ℕ} (hq : q ≤ n)
+    : Function.Injective (arr q : Fin n → Fin n) := by
   intro a b h
   have h' := congrArg Fin.val h
   have := a.2
@@ -57,15 +63,16 @@ theorem arr_injective {n : ℕ} {q : ℕ} (hq : q ≤ n) : Function.Injective (a
 
 section Model
 
-variable {V : HSp D} {S : D.what₂.Tau → SPar} (M : DSModel V S) {p q : ℕ} (hpq : p + q = V.rank)
-  (hε : ∀ τ a, M.ε τ a = decide ((a : ℕ) < p))
+variable
+  {V : HSp D} {S : D.what₂.Tau → SPar} (M : DSModel V S)
+  {p q : ℕ} (hpq : p + q = V.rank) (hε : ∀ τ a, M.ε τ a = decide ((a : ℕ) < p))
 include hpq hε
 
-theorem nNeg_eq (τ : D.what₂.Tau) : nNeg (M.ε τ) = q := by
-  rw [nNeg_shape (by omega) (hε τ)]; omega
+theorem nNeg_eq (τ : D.what₂.Tau) : nNeg (M.ε τ) = q := by rw [nNeg_shape (by omega) (hε τ)]; omega
 
-theorem negM_eq (τ : D.what₂.Tau) :
-    negM V q = diagonal fun c => (if M.ε τ (arr (nNeg (M.ε τ)) c) = true then (1 : ℂ) else -1) := by
+theorem negM_eq (τ : D.what₂.Tau)
+    : negM V q
+      = diagonal fun c => (if M.ε τ (arr (nNeg (M.ε τ)) c) = true then (1 : ℂ) else -1) := by
   unfold negM
   congr 1
   funext c
@@ -80,20 +87,28 @@ theorem isONeg_x0Mat : IsONeg V q (x0Mat M) := by
   have hu := (Matrix.isUnit_iff_isUnit_det _).1 (M.fr_unit τ)
   have h1 : M.fr τ * (M.fr τ)⁻¹ = 1 := Matrix.mul_nonsing_inv _ hu
   have h2 : (onb M τ)ᴴ * gramAt D V τ * onb M τ = Formalism.REAL.Jm (M.ε τ) := by
-    rw [← M.fr_gram τ]; unfold onb
-    calc _ = (M.fr τ * (M.fr τ)⁻¹)ᴴ * Formalism.REAL.Jm (M.ε τ) * (M.fr τ * (M.fr τ)⁻¹) := by
-          simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
+    rw [← M.fr_gram τ]
+    unfold onb
+    calc
+      _ = (M.fr τ * (M.fr τ)⁻¹)ᴴ * Formalism.REAL.Jm (M.ε τ) * (M.fr τ * (M.fr τ)⁻¹) := by
+        simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
       _ = _ := by rw [h1]; simp
-  have h3 : (x0Mat M τ)ᴴ * gramAt D V τ * x0Mat M τ =
-      ((onb M τ)ᴴ * gramAt D V τ * onb M τ).submatrix (arr (nNeg (M.ε τ))) (arr (nNeg (M.ε τ))) := rfl
-  rw [h3, h2, negM_eq M hpq hε τ, Formalism.REAL.Jm, Matrix.submatrix_diagonal _ _ (arr_injective (nNeg_le _))]
+  have h3
+      : (x0Mat M τ)ᴴ * gramAt D V τ * x0Mat M τ
+        = ((onb M τ)ᴴ * gramAt D V τ * onb M τ).submatrix (arr (nNeg (M.ε τ)))
+          (arr (nNeg (M.ε τ))) :=
+    rfl
+  rw [h3, h2, negM_eq M hpq hε τ, Formalism.REAL.Jm,
+    Matrix.submatrix_diagonal _ _ (arr_injective (nNeg_le _))]
   rfl
 
 theorem cart_eq_cartZ : cart M = cartZ V q (x0Mat M) := by
   funext τ
   have hn : negM V q * negM V q = 1 := by
     rw [negM_eq M hpq hε τ, Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
-    congr 1; funext a; split_ifs <;> simp
+    congr 1
+    funext a
+    split_ifs <;> simp
   have h1 : (negM V q * ((x0Mat M τ)ᴴ * gramAt D V τ)) * x0Mat M τ = 1 := by
     rw [Matrix.mul_assoc, isONeg_x0Mat M hpq hε τ, hn]
   have hu : IsUnit (x0Mat M τ).det := Matrix.isUnit_det_of_left_inverse h1
@@ -103,18 +118,23 @@ theorem cart_eq_cartZ : cart M = cartZ V q (x0Mat M) := by
 
 end Model
 
-theorem muVal_cast {V W : HSp D} (hV : V = W) {χ : (AE D)ˣ →* Circle} {mu : GA D V → ℂ} (h : MuVal V χ mu) :
-    MuVal W χ (castDict hV mu) := by
+theorem muVal_cast
+    {V W : HSp D} (hV : V = W) {χ : (AE D)ˣ →* Circle} {mu : GA D V → ℂ} (h : MuVal V χ mu)
+    : MuVal W χ (castDict hV mu) := by
   subst hV; exact h
 
-theorem latEmb_cast {V W : HSp D} (hV : V = W) {r : ℕ} (hr : V.rank = r) (hr' : W.rank = r) {La : Type} [AddCommGroup La]
-    [Module (𝓞 D.host.E) La] (ι : La →ₗ[𝓞 D.host.E] (Fin r → D.host.E))
-    (h : LatEmb V (LinearMap.funLeft (𝓞 D.host.E) D.host.E (Fin.cast hr) ∘ₗ ι)) :
-    LatEmb W (LinearMap.funLeft (𝓞 D.host.E) D.host.E (Fin.cast hr') ∘ₗ ι) := by
+theorem latEmb_cast
+    {V W : HSp D} (hV : V = W)
+    {r : ℕ} (hr : V.rank = r) (hr' : W.rank = r)
+    {La : Type} [AddCommGroup La] [Module (𝓞 D.host.E) La]
+    (ι : La →ₗ[𝓞 D.host.E] (Fin r → D.host.E))
+    (h : LatEmb V (LinearMap.funLeft (𝓞 D.host.E) D.host.E (Fin.cast hr) ∘ₗ ι))
+    : LatEmb W (LinearMap.funLeft (𝓞 D.host.E) D.host.E (Fin.cast hr') ∘ₗ ι) := by
   subst hV; exact h
 
-theorem isAA_span {k : ℕ} (L : Lt D.host.E k) : GlobalTheory.Ker.IsAA (Submodule.span (𝓞 D.host.E)
-    {w | ∃ a : D.host.E, a ∈ D.host.AA ∧ ∃ v ∈ L, w = a • v}) L := by
+theorem isAA_span {k : ℕ} (L : Lt D.host.E k)
+    : GlobalTheory.Ker.IsAA
+      (Submodule.span (𝓞 D.host.E) {w | ∃ a : D.host.E, a ∈ D.host.AA ∧ ∃ v ∈ L, w = a • v}) L := by
   intro v
   rw [← Submodule.mem_toAddSubgroup]
   constructor
@@ -135,8 +155,9 @@ theorem isAA_span {k : ℕ} (L : Lt D.host.E k) : GlobalTheory.Ker.IsAA (Submodu
   · intro hv
     exact (AddSubgroup.closure_le _).2 (fun x hx => Submodule.subset_span hx) hv
 
-theorem isMov_hLat (W : HSp D) (h : GA D W) :
-    GlobalTheory.Ker.IsMov (GlobalTheory.Ker.fmt W h) (Bridge.hLat W 1) (Bridge.hLat W (FWT.fin W h)) := by
+theorem isMov_hLat (W : HSp D) (h : GA D W)
+    : GlobalTheory.Ker.IsMov (GlobalTheory.Ker.fmt W h) (Bridge.hLat W 1)
+      (Bridge.hLat W (FWT.fin W h)) := by
   intro u
   rw [GlobalTheory.MovedLat.hLat_one]
   have := Set.ext_iff.1 (GlobalTheory.MovedLat.hat_hLat W (FWT.fin W h)) u

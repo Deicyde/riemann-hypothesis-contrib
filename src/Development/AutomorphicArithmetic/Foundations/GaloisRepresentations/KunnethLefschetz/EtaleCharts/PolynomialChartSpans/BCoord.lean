@@ -8,13 +8,15 @@ open CategoryTheory Limits MvPolynomial
 
 namespace UpperTheory.Gal.KunnethLefschetz.G
 
-private theorem etale_chart {A E B : Type} [CommRing A] [CommRing E] [CommRing B] {D : ℕ}
+private theorem etale_chart
+    {A E B : Type} [CommRing A] [CommRing E] [CommRing B]
+    {D : ℕ}
     (p : A →+* E) (ψ : E →+* B) (s : Fin D → E) (y : Fin D → B) (j : Fin D)
-    (hφ : (eval₂Hom p s).Etale)
-    (surj : Function.Surjective (eval₂Hom ψ y))
-    (ker : RingHom.ker (eval₂Hom ψ y) = Ideal.span (insert (X j - 1 : MvPolynomial (Fin D) E)
-      (Set.range fun k => MvPolynomial.C (s k) - MvPolynomial.C (s j) * X k))) :
-    (eval₂Hom (ψ.comp p) (Function.update y j (ψ (s j)))).Etale := by
+    (hφ : (eval₂Hom p s).Etale) (surj : Function.Surjective (eval₂Hom ψ y))
+    (ker : RingHom.ker (eval₂Hom ψ y)
+      = Ideal.span (insert (X j - 1 : MvPolynomial (Fin D) E)
+        (Set.range fun k => MvPolynomial.C (s k) - MvPolynomial.C (s j) * X k)))
+    : (eval₂Hom (ψ.comp p) (Function.update y j (ψ (s j)))).Etale := by
   classical
   let γ := eval₂Hom (ψ.comp p) (Function.update y j (ψ (s j)))
   let Z : Fin D → MvPolynomial (Fin D) A := Function.update X j 1
@@ -22,8 +24,9 @@ private theorem etale_chart {A E B : Type} [CommRing A] [CommRing E] [CommRing B
   let β' : MvPolynomial (ULift.{0} (Fin D)) A →+* MvPolynomial (Fin D) A :=
     eval₂Hom C (fun k => X j * Z k.down)
   have hα' : α'.Etale := by
-    have e1 : α' = (eval₂Hom p s).comp
-        (MvPolynomial.renameEquiv A Equiv.ulift).toRingEquiv.toRingHom := by
+    have e1
+        : α'
+          = (eval₂Hom p s).comp (MvPolynomial.renameEquiv A Equiv.ulift).toRingEquiv.toRingHom := by
       apply MvPolynomial.ringHom_ext
       · intro a
         simp [α']
@@ -31,8 +34,11 @@ private theorem etale_chart {A E B : Type} [CommRing A] [CommRing E] [CommRing B
         simp [α']
     rw [e1]
     exact RingHom.Etale.respectsIso.2 _ _ hφ
-  have hker : ∀ q ∈ Ideal.span (insert (X j - 1 : MvPolynomial (Fin D) E)
-      (Set.range fun k => C (s k) - C (s j) * X k)), eval₂Hom ψ y q = 0 := by
+  have hker
+      : ∀ q
+          ∈ Ideal.span (insert (X j - 1 : MvPolynomial (Fin D) E)
+            (Set.range fun k => C (s k) - C (s j) * X k)),
+        eval₂Hom ψ y q = 0 := by
     intro q hq
     rw [← ker] at hq
     exact hq
@@ -70,17 +76,22 @@ private theorem etale_chart {A E B : Type} [CommRing A] [CommRing E] [CommRing B
   letI : Algebra (MvPolynomial (ULift.{0} (Fin D)) A) E := α'.toAlgebra
   letI : Algebra (MvPolynomial (ULift.{0} (Fin D)) A) (MvPolynomial (Fin D) A) := β'.toAlgebra
   letI : Algebra (MvPolynomial (ULift.{0} (Fin D)) A) B := (γ.comp β').toAlgebra
-  have hbc := RingHom.Etale.isStableUnderBaseChange.tensorProduct (MvPolynomial (Fin D) A)
-    (R := MvPolynomial (ULift.{0} (Fin D)) A) (S := E) hα'
-  let fA : MvPolynomial (Fin D) A →ₐ[MvPolynomial (ULift.{0} (Fin D)) A] B :=
-    { γ with commutes' := fun _ => rfl }
-  let gA : E →ₐ[MvPolynomial (ULift.{0} (Fin D)) A] B :=
-    { ψ with commutes' := fun t => hcompat t }
+  have hbc :=
+    RingHom.Etale.isStableUnderBaseChange.tensorProduct (MvPolynomial (Fin D) A)
+      (R := MvPolynomial (ULift.{0} (Fin D)) A) (S := E) hα'
+  let fA : MvPolynomial (Fin D) A →ₐ[MvPolynomial (ULift.{0} (Fin D)) A] B := {
+    γ with
+    commutes' := fun _ => rfl
+  }
+  let gA : E →ₐ[MvPolynomial (ULift.{0} (Fin D)) A] B := { ψ with commutes' := fun t => hcompat t }
   let F := (Algebra.TensorProduct.lift fA gA (fun _ _ => Commute.all _ _)).toRingHom
   have hF : ∀ a e, F (TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) a e) = γ a * ψ e := by
     intro a e
     simp [F, fA, gA]
-  have hT : ∀ t, TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (1 : MvPolynomial (Fin D) A) (α' t) = TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (β' t) (1 : E) := by
+  have hT
+      : ∀ t,
+        TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (1 : MvPolynomial (Fin D) A) (α' t)
+          = TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (β' t) (1 : E) := by
     intro t
     have h1 : α' t = t • (1 : E) := by
       rw [Algebra.smul_def, mul_one]
@@ -89,16 +100,28 @@ private theorem etale_chart {A E B : Type} [CommRing A] [CommRing E] [CommRing B
       rw [Algebra.smul_def, mul_one]
       rfl
     rw [h1, h2, TensorProduct.smul_tmul]
-  have hTs : ∀ k, TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (1 : MvPolynomial (Fin D) A) (s k) = TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (X j * Z k) (1 : E) := by
+  have hTs
+      : ∀ k,
+        TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (1 : MvPolynomial (Fin D) A) (s k)
+          = TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (X j * Z k) (1 : E) := by
     intro k
     simpa [α', β'] using hT (X ⟨k⟩)
-  let G0 : MvPolynomial (Fin D) E →+* TensorProduct (MvPolynomial (ULift.{0} (Fin D)) A) (MvPolynomial (Fin D) A) E :=
-    eval₂Hom (Algebra.TensorProduct.includeRight :
-      E →ₐ[MvPolynomial (ULift.{0} (Fin D)) A] TensorProduct (MvPolynomial (ULift.{0} (Fin D)) A) (MvPolynomial (Fin D) A) E).toRingHom (fun k => TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (Z k) (1 : E))
-  have hG0C : ∀ e, G0 (C e) = TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (1 : MvPolynomial (Fin D) A) e := by
+  let G0
+      : MvPolynomial (Fin D) E
+        →+* TensorProduct (MvPolynomial (ULift.{0} (Fin D)) A) (MvPolynomial (Fin D) A) E :=
+    eval₂Hom
+      (Algebra.TensorProduct.includeRight
+        : E →ₐ[MvPolynomial (ULift.{0} (Fin D)) A] TensorProduct (MvPolynomial (ULift.{0} (Fin D)) A) (MvPolynomial (Fin D) A) E).toRingHom
+      (fun k => TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (Z k) (1 : E))
+  have hG0C
+      : ∀ e,
+        G0 (C e)
+          = TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (1 : MvPolynomial (Fin D) A)
+            e := by
     intro e
     simp [G0]
-  have hG0X : ∀ k, G0 (X k) = TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (Z k) (1 : E) := by
+  have hG0X
+      : ∀ k, G0 (X k) = TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (Z k) (1 : E) := by
     intro k
     simp [G0]
   have hG0 : RingHom.ker (eval₂Hom ψ y) ≤ RingHom.ker G0 := by
@@ -108,7 +131,11 @@ private theorem etale_chart {A E B : Type} [CommRing A] [CommRing E] [CommRing B
       simp [Z, Algebra.TensorProduct.one_def]
     · rw [SetLike.mem_coe, RingHom.mem_ker, map_sub, map_mul, hG0C, hG0C, hG0X,
         Algebra.TensorProduct.tmul_mul_tmul, one_mul, mul_one, hTs k]
-      have h3 : TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (Z k) (s j) = TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (Z k) (1 : E) * TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (1 : MvPolynomial (Fin D) A) (s j) := by
+      have h3
+          : TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (Z k) (s j)
+            = TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (Z k) (1 : E)
+              * TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (1 : MvPolynomial (Fin D) A)
+                (s j) := by
         rw [Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul]
       rw [h3, hTs j, Algebra.TensorProduct.tmul_mul_tmul]
       simp [Z, mul_comm]
@@ -117,15 +144,20 @@ private theorem etale_chart {A E B : Type} [CommRing A] [CommRing E] [CommRing B
       (RingHom.quotientKerEquivOfSurjective surj).symm.toRingHom
   have hG : ∀ q, G (eval₂Hom ψ y q) = G0 q := by
     intro q
-    have h4 : (RingHom.quotientKerEquivOfSurjective surj).symm (eval₂Hom ψ y q)
-        = Ideal.Quotient.mk _ q := by
+    have h4
+        : (RingHom.quotientKerEquivOfSurjective surj).symm (eval₂Hom ψ y q)
+          = Ideal.Quotient.mk _ q := by
       rw [RingEquiv.symm_apply_eq]
       rfl
     show Ideal.Quotient.lift _ G0 (fun q hq => hG0 hq)
       ((RingHom.quotientKerEquivOfSurjective surj).symm (eval₂Hom ψ y q)) = G0 q
     rw [h4]
     rfl
-  have hGψ : ∀ e, G (ψ e) = TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (1 : MvPolynomial (Fin D) A) e := by
+  have hGψ
+      : ∀ e,
+        G (ψ e)
+          = TensorProduct.tmul (MvPolynomial (ULift.{0} (Fin D)) A) (1 : MvPolynomial (Fin D) A)
+            e := by
     intro e
     rw [← eval₂Hom_C ψ y e, hG, hG0C]
   have hFG : F.comp G = RingHom.id B := by
@@ -187,7 +219,7 @@ private theorem etale_chart {A E B : Type} [CommRing A] [CommRing E] [CommRing B
 end UpperTheory.Gal.KunnethLefschetz.G
 
 open UpperTheory.Gal.DifferentialFormSections in
-theorem UpperTheory.Gal.KunnethLefschetz.G.bCoord :
-    UpperTheory.Gal.KunnethLefschetz.G.BCoord := by
+theorem UpperTheory.Gal.KunnethLefschetz.G.bCoord : UpperTheory.Gal.KunnethLefschetz.G.BCoord := by
   intro R _ Z W π D c b j
-  exact UpperTheory.Gal.KunnethLefschetz.G.etale_chart _ _ c.s (b.y j) j (dCoord R Z D c) (b.surj j) (b.ker j)
+  exact UpperTheory.Gal.KunnethLefschetz.G.etale_chart _ _ c.s (b.y j) j (dCoord R Z D c) (b.surj j)
+    (b.ker j)

@@ -88,14 +88,21 @@ theorem zero_spacing : Spacing := by
   · intro t ht
     have hsplit := sum_filter_add_sum_filter_not (P.erase t) (fun x => t < x) (fun x => 1 / |t - x|)
     rw [← hsplit]
-    have hR : ∑ x ∈ (P.erase t).filter (fun x => t < x), 1 / |t - x| ≤ 1 + Real.log (2 * T + 1) := by
-      have e : ∑ x ∈ (P.erase t).filter (fun x => t < x), 1 / |t - x| =
-          ∑ x ∈ (P.erase t).filter (fun x => t < x), 1 / (x - t) := by
+    have hR
+        : ∑ x ∈ (P.erase t).filter (fun x => t < x), 1 / |t - x| ≤ 1 + Real.log (2 * T + 1) := by
+      have e
+          : ∑ x ∈ (P.erase t).filter (fun x => t < x), 1 / |t - x|
+            = ∑ x ∈ (P.erase t).filter (fun x => t < x), 1 / (x - t) := by
         refine sum_congr rfl (fun x hx => ?_)
         rw [mem_filter] at hx
         rw [abs_sub_comm, abs_of_pos (by linarith [hx.2])]
       rw [e]
-      refine space_side _ (fun x => x - t) T hT (fun x hx => ?_) (fun x hx => ?_) (fun x hx y hy hne => ?_)
+      refine space_side _
+        (fun x => x - t)
+        T hT
+        (fun x hx => ?_)
+        (fun x hx => ?_)
+        (fun x hx y hy hne => ?_)
       · rw [mem_filter, mem_erase] at hx
         have := hsp x hx.1.2 t ht hx.1.1
         rw [abs_of_pos (by linarith [hx.2])] at this
@@ -108,15 +115,22 @@ theorem zero_spacing : Spacing := by
       · rw [mem_filter, mem_erase] at hx hy
         have := hsp x hx.1.2 y hy.1.2 hne
         rwa [show x - t - (y - t) = x - y by ring]
-    have hL : ∑ x ∈ (P.erase t).filter (fun x => ¬ t < x), 1 / |t - x| ≤ 1 + Real.log (2 * T + 1) := by
-      have e : ∑ x ∈ (P.erase t).filter (fun x => ¬ t < x), 1 / |t - x| =
-          ∑ x ∈ (P.erase t).filter (fun x => ¬ t < x), 1 / (t - x) := by
+    have hL
+        : ∑ x ∈ (P.erase t).filter (fun x => ¬ t < x), 1 / |t - x| ≤ 1 + Real.log (2 * T + 1) := by
+      have e
+          : ∑ x ∈ (P.erase t).filter (fun x => ¬ t < x), 1 / |t - x|
+            = ∑ x ∈ (P.erase t).filter (fun x => ¬ t < x), 1 / (t - x) := by
         refine sum_congr rfl (fun x hx => ?_)
         rw [mem_filter, mem_erase] at hx
         have hlt : x < t := lt_of_le_of_ne (not_lt.1 hx.2) hx.1.1
         rw [abs_of_pos (by linarith)]
       rw [e]
-      refine space_side _ (fun x => t - x) T hT (fun x hx => ?_) (fun x hx => ?_) (fun x hx y hy hne => ?_)
+      refine space_side _
+        (fun x => t - x)
+        T hT
+        (fun x hx => ?_)
+        (fun x hx => ?_)
+        (fun x hx y hy hne => ?_)
       · rw [mem_filter, mem_erase] at hx
         have hlt : x < t := lt_of_le_of_ne (not_lt.1 hx.2) hx.1.1
         have := hsp x hx.1.2 t ht hx.1.1
@@ -133,8 +147,8 @@ theorem zero_spacing : Spacing := by
         rwa [show t - x - (t - y) = -(x - y) by ring, abs_neg]
     linarith
 
-theorem space_card_char_le (M : ℕ) [NeZero M] :
-    ((Finset.univ : Finset (DirichletCharacter ℂ M)).card : ℝ) ≤ M := by
+theorem space_card_char_le (M : ℕ) [NeZero M]
+    : ((Finset.univ : Finset (DirichletCharacter ℂ M)).card : ℝ) ≤ M := by
   have h : (Finset.univ : Finset (DirichletCharacter ℂ M)).card = M.totient := by
     rw [Finset.card_univ, ← Nat.card_eq_fintype_card,
       DirichletCharacter.card_eq_totient_of_hasEnoughRootsOfUnity ℂ M]
@@ -144,7 +158,8 @@ theorem space_card_char_le (M : ℕ) [NeZero M] :
 theorem trivial_bound : Triv := by
   intro M _ T S hT hS hsp
   classical
-  have hfib : ∀ χ : DirichletCharacter ℂ M, ((S.filter (fun p => p.1 = χ)).card : ℝ) ≤ 2 * T + 1 := by
+  have hfib
+      : ∀ χ : DirichletCharacter ℂ M, ((S.filter (fun p => p.1 = χ)).card : ℝ) ≤ 2 * T + 1 := by
     intro χ
     set F := S.filter (fun p => p.1 = χ) with hF
     have hinj : Set.InjOn (fun p : DirichletCharacter ℂ M × ℂ => p.2.im) F := by
@@ -155,29 +170,37 @@ theorem trivial_bound : Triv := by
       simp only at h
       rw [h, sub_self, abs_zero] at this
       linarith
-    have hsp' := (zero_spacing (F.image (fun p => p.2.im)) T hT
-      (fun x hx => by
-        rw [mem_image] at hx
-        obtain ⟨p, hp, rfl⟩ := hx
-        exact hS p (mem_of_mem_filter _ hp))
-      (fun x hx y hy hne => by
-        rw [mem_image] at hx hy
-        obtain ⟨p, hp, rfl⟩ := hx
-        obtain ⟨p', hp', rfl⟩ := hy
-        have hpp : p ≠ p' := fun h => hne (by rw [h])
-        rw [hF, mem_filter] at hp hp'
-        exact hsp p hp.1 p' hp'.1 hpp (hp.2.trans hp'.2.symm))).1
+    have hsp' :=
+      (zero_spacing (F.image (fun p => p.2.im)) T hT
+        (fun x hx => by
+          rw [mem_image] at hx
+          obtain ⟨p, hp, rfl⟩ := hx
+          exact hS p (mem_of_mem_filter _ hp))
+        (fun x hx y hy hne => by
+          rw [mem_image] at hx hy
+          obtain ⟨p, hp, rfl⟩ := hx
+          obtain ⟨p', hp', rfl⟩ := hy
+          have hpp : p ≠ p' := fun h => hne (by rw [h])
+          rw [hF, mem_filter] at hp hp'
+          exact hsp p hp.1 p' hp'.1 hpp (hp.2.trans hp'.2.symm))).1
     rwa [card_image_of_injOn hinj] at hsp'
-  have hsum : (S.card : ℝ) = ∑ χ ∈ (Finset.univ : Finset (DirichletCharacter ℂ M)),
-      ((S.filter (fun p => p.1 = χ)).card : ℝ) := by
-    rw [card_eq_sum_card_fiberwise (f := fun p : DirichletCharacter ℂ M × ℂ => p.1) (t := Finset.univ)
+  have hsum
+      : (S.card : ℝ)
+        = ∑ χ ∈ (Finset.univ : Finset (DirichletCharacter ℂ M)),
+          ((S.filter (fun p => p.1 = χ)).card : ℝ) := by
+    rw [card_eq_sum_card_fiberwise
+      (f := fun p : DirichletCharacter ℂ M × ℂ => p.1)
+      (t := Finset.univ)
       (fun _ _ => Finset.mem_univ _)]
-    push_cast; rfl
+    push_cast
+    rfl
   rw [hsum]
-  calc ∑ χ ∈ (Finset.univ : Finset (DirichletCharacter ℂ M)), ((S.filter (fun p => p.1 = χ)).card : ℝ)
-      ≤ ∑ χ ∈ (Finset.univ : Finset (DirichletCharacter ℂ M)), (2 * T + 1) := sum_le_sum (fun χ _ => hfib χ)
+  calc
+    ∑ χ ∈ (Finset.univ : Finset (DirichletCharacter ℂ M)), ((S.filter (fun p => p.1 = χ)).card : ℝ)
+        ≤ ∑ χ ∈ (Finset.univ : Finset (DirichletCharacter ℂ M)), (2 * T + 1) :=
+      sum_le_sum (fun χ _ => hfib χ)
     _ = ((Finset.univ : Finset (DirichletCharacter ℂ M)).card : ℝ) * (2 * T + 1) := by
-        rw [sum_const, nsmul_eq_mul]
+      rw [sum_const, nsmul_eq_mul]
     _ ≤ (M : ℝ) * (2 * T + 1) := mul_le_mul_of_nonneg_right (space_card_char_le M) (by linarith)
 
 end Formalism.HermitianLattices.Ext.PrimesInProgressions.Dens

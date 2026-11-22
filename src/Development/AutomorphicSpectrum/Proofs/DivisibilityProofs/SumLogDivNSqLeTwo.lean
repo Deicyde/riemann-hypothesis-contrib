@@ -6,9 +6,9 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.Ar.Small
 
-theorem log_tail_step (x : ℝ) (hx : 1 ≤ x) :
-    Real.log (x + 1) / ((x + 1) * x) ≤
-      (Real.log x + 2) / x - (Real.log (x + 1) + 2) / (x + 1) := by
+theorem log_tail_step (x : ℝ) (hx : 1 ≤ x)
+    : Real.log (x + 1) / ((x + 1) * x)
+      ≤ (Real.log x + 2) / x - (Real.log (x + 1) + 2) / (x + 1) := by
   have hx0 : 0 < x := by linarith
   have hL : Real.log (x + 1) - Real.log x ≤ 1 / x := by
     rw [← Real.log_div (by positivity) (by positivity)]
@@ -24,17 +24,17 @@ theorem log_tail_step (x : ℝ) (hx : 1 ≤ x) :
       rw [mul_one_div, div_le_iff₀ hx0]
       linarith
     linarith
-  have hE : (Real.log x + 2) / x - (Real.log (x + 1) + 2) / (x + 1) - Real.log (x + 1) / ((x + 1) * x) =
-      (2 - (x + 1) * (Real.log (x + 1) - Real.log x)) / ((x + 1) * x) := by
+  have hE
+      : (Real.log x + 2) / x - (Real.log (x + 1) + 2) / (x + 1) - Real.log (x + 1) / ((x + 1) * x)
+        = (2 - (x + 1) * (Real.log (x + 1) - Real.log x)) / ((x + 1) * x) := by
     field_simp
     ring
   have hpos : 0 ≤ (2 - (x + 1) * (Real.log (x + 1) - Real.log x)) / ((x + 1) * x) :=
     div_nonneg (by linarith) (by positivity)
   linarith
 
-theorem log_tail_Icc (N : ℕ) (hN : 1 ≤ N) :
-    ∑ n ∈ Finset.Icc 2 N, Real.log n / ((n : ℝ) * ((n : ℝ) - 1)) ≤
-      2 - (Real.log N + 2) / N := by
+theorem log_tail_Icc (N : ℕ) (hN : 1 ≤ N)
+    : ∑ n ∈ Finset.Icc 2 N, Real.log n / ((n : ℝ) * ((n : ℝ) - 1)) ≤ 2 - (Real.log N + 2) / N := by
   induction N, hN using Nat.le_induction with
   | base =>
     rw [Finset.Icc_eq_empty (by norm_num)]
@@ -48,9 +48,8 @@ theorem log_tail_Icc (N : ℕ) (hN : 1 ≤ N) :
     rw [hc2]
     linarith
 
-theorem log_tail :
-    ∀ S : Finset ℕ, (∀ n ∈ S, 2 ≤ n) →
-      ∑ n ∈ S, Real.log n / ((n : ℝ) * ((n : ℝ) - 1)) ≤ 2 := by
+theorem log_tail
+    : ∀ S : Finset ℕ, (∀ n ∈ S, 2 ≤ n) → ∑ n ∈ S, Real.log n / ((n : ℝ) * ((n : ℝ) - 1)) ≤ 2 := by
   intro S hS
   have hN : 1 ≤ max 1 (S.sup id) := le_max_left _ _
   have hsub : S ⊆ Finset.Icc 2 (max 1 (S.sup id)) := by
@@ -66,11 +65,12 @@ theorem log_tail :
   have h1 : (1 : ℝ) ≤ ((max 1 (S.sup id) : ℕ) : ℝ) := by exact_mod_cast hN
   have hq : 0 ≤ (Real.log ((max 1 (S.sup id) : ℕ) : ℝ) + 2) / ((max 1 (S.sup id) : ℕ) : ℝ) :=
     div_nonneg (by linarith [Real.log_nonneg h1]) (by linarith)
-  calc ∑ n ∈ S, Real.log n / ((n : ℝ) * ((n : ℝ) - 1))
-      ≤ ∑ n ∈ Finset.Icc 2 (max 1 (S.sup id)), Real.log n / ((n : ℝ) * ((n : ℝ) - 1)) :=
-        Finset.sum_le_sum_of_subset_of_nonneg hsub (fun n hn _ => hnn n hn)
+  calc
+    ∑ n ∈ S, Real.log n / ((n : ℝ) * ((n : ℝ) - 1))
+        ≤ ∑ n ∈ Finset.Icc 2 (max 1 (S.sup id)), Real.log n / ((n : ℝ) * ((n : ℝ) - 1)) :=
+      Finset.sum_le_sum_of_subset_of_nonneg hsub (fun n hn _ => hnn n hn)
     _ ≤ 2 - (Real.log ((max 1 (S.sup id) : ℕ) : ℝ) + 2) / ((max 1 (S.sup id) : ℕ) : ℝ) :=
-        log_tail_Icc _ hN
+      log_tail_Icc _ hN
     _ ≤ 2 := by linarith
 
 end GlobalTheory.CompanionTheory.Ar.Small

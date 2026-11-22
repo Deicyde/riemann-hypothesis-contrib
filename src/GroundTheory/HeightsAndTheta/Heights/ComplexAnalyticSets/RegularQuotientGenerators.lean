@@ -13,12 +13,14 @@ open IsLocalRing Ideal
 
 universe u
 
-theorem spanFinrank_maximalIdeal_le_quotient_of_le_sq {R : Type u} [CommRing R] [IsLocalRing R]
-    [IsNoetherianRing R] {I : Ideal R} (hI : I ≤ maximalIdeal R ^ 2) [IsLocalRing (R ⧸ I)] :
-    (maximalIdeal R).spanFinrank ≤ (maximalIdeal (R ⧸ I)).spanFinrank := by
+theorem spanFinrank_maximalIdeal_le_quotient_of_le_sq
+    {R : Type u} [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
+    {I : Ideal R} (hI : I ≤ maximalIdeal R ^ 2) [IsLocalRing (R ⧸ I)]
+    : (maximalIdeal R).spanFinrank ≤ (maximalIdeal (R ⧸ I)).spanFinrank := by
   classical
-  obtain ⟨t, htc, hts⟩ := Submodule.FG.exists_span_finset_card_eq_spanFinrank
-    (IsNoetherian.noetherian (maximalIdeal (R ⧸ I)))
+  obtain ⟨t, htc, hts⟩ :=
+    Submodule.FG.exists_span_finset_card_eq_spanFinrank (IsNoetherian.noetherian (maximalIdeal
+      (R ⧸ I)))
   choose g hg using fun y : R ⧸ I => Ideal.Quotient.mk_surjective y
   set s : Finset R := t.image g with hs
   have hmk : ∀ a ∈ maximalIdeal R, Ideal.Quotient.mk I a ∈ maximalIdeal (R ⧸ I) := by
@@ -42,20 +44,23 @@ theorem spanFinrank_maximalIdeal_le_quotient_of_le_sq {R : Type u} [CommRing R] 
     have h1 : Ideal.Quotient.mk I a ∈ (Ideal.span (s : Set R)).map (Ideal.Quotient.mk I) :=
       hmap ▸ hmk a ha
     rw [← Ideal.mem_comap, Ideal.comap_map_of_surjective' _ Ideal.Quotient.mk_surjective,
-      Ideal.mk_ker] at h1
+        Ideal.mk_ker]
+      at h1
     exact sup_le_sup_left (hI.trans (le_of_eq (by rw [pow_two, Ideal.smul_eq_mul]))) _ h1
   have hm : maximalIdeal R = Ideal.span (s : Set R) :=
-    le_antisymm (Submodule.le_of_le_smul_of_le_jacobson_bot (IsNoetherian.noetherian _)
-      (jacobson_eq_maximalIdeal ⊥ bot_ne_top).ge hle) (Ideal.span_le.mpr hsm)
+    le_antisymm
+      (Submodule.le_of_le_smul_of_le_jacobson_bot (IsNoetherian.noetherian _)
+        (jacobson_eq_maximalIdeal ⊥ bot_ne_top).ge hle)
+      (Ideal.span_le.mpr hsm)
   rw [hm, ← htc]
   refine (Submodule.spanFinrank_span_le_ncard_of_finite s.finite_toSet).trans ?_
   rw [Set.ncard_coe_finset]
   exact Finset.card_image_le
 
-theorem exists_span_eq_of_isRegularLocalRing_quotient (n : ℕ) :
-    ∀ (R : Type u) [CommRing R] [IsRegularLocalRing R] (I : Ideal R) [IsRegularLocalRing (R ⧸ I)],
-      ringKrullDim R = ringKrullDim (R ⧸ I) + n →
-        ∃ f : Fin n → R, (∀ j, f j ∈ I) ∧ I = Ideal.span (Set.range f) := by
+theorem exists_span_eq_of_isRegularLocalRing_quotient (n : ℕ)
+    : ∀ (R : Type u) [CommRing R] [IsRegularLocalRing R] (I : Ideal R) [IsRegularLocalRing (R ⧸ I)],
+      ringKrullDim R = ringKrullDim (R ⧸ I) + n
+        → ∃ f : Fin n → R, (∀ j, f j ∈ I) ∧ I = Ideal.span (Set.range f) := by
   induction n with
   | zero =>
     intro R _ _ I _ hd
@@ -66,17 +71,21 @@ theorem exists_span_eq_of_isRegularLocalRing_quotient (n : ℕ) :
     obtain ⟨y, hyI, hy0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hI
     have h1 := ringKrullDim_quotient_succ_le_of_nonZeroDivisor (mem_nonZeroDivisors_of_ne_zero hy0)
     have h2 : ringKrullDim (R ⧸ I) ≤ ringKrullDim (R ⧸ Ideal.span {y}) :=
-      ringKrullDim_le_of_surjective (Ideal.Quotient.factor ((Ideal.span_singleton_le_iff_mem I).mpr hyI))
+      ringKrullDim_le_of_surjective
+        (Ideal.Quotient.factor ((Ideal.span_singleton_le_iff_mem I).mpr hyI))
         (Ideal.Quotient.factor_surjective _)
     have hR : ringKrullDim R = ((maximalIdeal R).spanFinrank : WithBot ℕ∞) :=
       ((isRegularLocalRing_iff R).mp inferInstance).symm
     rw [Nat.cast_zero, add_zero] at hd
     have h3 : ((maximalIdeal R).spanFinrank : WithBot ℕ∞) + 1 ≤ (maximalIdeal R).spanFinrank := by
       rw [← hR]
-      calc ringKrullDim R + 1 = ringKrullDim (R ⧸ I) + 1 := by rw [hd]
+      calc
+        ringKrullDim R + 1
+          = ringKrullDim (R ⧸ I) + 1 := by rw [hd]
         _ ≤ ringKrullDim (R ⧸ Ideal.span {y}) + 1 := by gcongr
         _ ≤ ringKrullDim R := h1
-    have h4 : (maximalIdeal R).spanFinrank + 1 ≤ (maximalIdeal R).spanFinrank := by exact_mod_cast h3
+    have h4 : (maximalIdeal R).spanFinrank + 1 ≤ (maximalIdeal R).spanFinrank := by
+      exact_mod_cast h3
     omega
   | succ n ih =>
     intro R _ _ I _ hd
@@ -105,16 +114,22 @@ theorem exists_span_eq_of_isRegularLocalRing_quotient (n : ℕ) :
     let e := DoubleQuot.quotQuotEquivQuotOfLE hxI'
     have : IsRegularLocalRing ((R ⧸ Ideal.span {x}) ⧸ I.map (Ideal.Quotient.mk (Ideal.span {x}))) :=
       IsRegularLocalRing.of_ringEquiv e.symm
-    have hR' : ringKrullDim (R ⧸ Ideal.span {x}) =
-        ((maximalIdeal (R ⧸ Ideal.span {x})).spanFinrank : WithBot ℕ∞) :=
+    have hR'
+        : ringKrullDim (R ⧸ Ideal.span {x})
+          = ((maximalIdeal (R ⧸ Ideal.span {x})).spanFinrank : WithBot ℕ∞) :=
       ((isRegularLocalRing_iff _).mp inferInstance).symm
-    have hd' : ringKrullDim (R ⧸ Ideal.span {x}) =
-        ringKrullDim ((R ⧸ Ideal.span {x}) ⧸ I.map (Ideal.Quotient.mk (Ideal.span {x}))) + n := by
+    have hd'
+        : ringKrullDim (R ⧸ Ideal.span {x})
+          = ringKrullDim ((R ⧸ Ideal.span {x}) ⧸ I.map (Ideal.Quotient.mk (Ideal.span {x})))
+            + n := by
       rw [ringKrullDim_eq_of_ringEquiv e, hRI, hR']
       rw [hR, hR'] at hdim
-      have h5 : (maximalIdeal (R ⧸ Ideal.span {x})).spanFinrank + 1 = (maximalIdeal R).spanFinrank := by
+      have h5
+          : (maximalIdeal (R ⧸ Ideal.span {x})).spanFinrank + 1 = (maximalIdeal R).spanFinrank := by
         exact_mod_cast hdim
-      have h6 : (maximalIdeal (R ⧸ Ideal.span {x})).spanFinrank = (maximalIdeal (R ⧸ I)).spanFinrank + n := by
+      have h6
+          : (maximalIdeal (R ⧸ Ideal.span {x})).spanFinrank
+            = (maximalIdeal (R ⧸ I)).spanFinrank + n := by
         omega
       rw [h6]
       push_cast
@@ -123,14 +138,22 @@ theorem exists_span_eq_of_isRegularLocalRing_quotient (n : ℕ) :
     have hlift : ∀ j, ∃ a ∈ I, Ideal.Quotient.mk (Ideal.span {x}) a = f' j := fun j =>
       (Ideal.mem_map_iff_of_surjective _ Ideal.Quotient.mk_surjective).mp (hf'I j)
     choose g hgI hg using hlift
-    refine ⟨(Fin.cons x g : Fin (n + 1) → R), Fin.forall_fin_succ.mpr ⟨by simpa using hxI, fun i => by simpa using hgI i⟩, ?_⟩
+    refine ⟨
+      (Fin.cons x g : Fin (n + 1) → R),
+      Fin.forall_fin_succ.mpr ⟨by simpa using hxI, fun i => by simpa using hgI i⟩,
+      ?_
+    ⟩
     rw [Fin.range_cons, Ideal.span_insert]
-    have hcomap : I = (I.map (Ideal.Quotient.mk (Ideal.span {x}))).comap (Ideal.Quotient.mk (Ideal.span {x})) := by
-      rw [Ideal.comap_map_of_surjective' _ Ideal.Quotient.mk_surjective, Ideal.mk_ker, sup_eq_left.mpr hxI']
+    have hcomap
+        : I
+          = (I.map (Ideal.Quotient.mk (Ideal.span {x}))).comap
+            (Ideal.Quotient.mk (Ideal.span {x})) := by
+      rw [Ideal.comap_map_of_surjective' _ Ideal.Quotient.mk_surjective, Ideal.mk_ker,
+        sup_eq_left.mpr hxI']
     have hrange : Set.range f' = Ideal.Quotient.mk (Ideal.span {x}) '' Set.range g := by
       rw [← Set.range_comp]
       exact congrArg Set.range (funext hg).symm
-    rw [hcomap, hf', hrange, ← Ideal.map_span, Ideal.comap_map_of_surjective' _ Ideal.Quotient.mk_surjective,
-      Ideal.mk_ker, sup_comm]
+    rw [hcomap, hf', hrange, ← Ideal.map_span,
+      Ideal.comap_map_of_surjective' _ Ideal.Quotient.mk_surjective, Ideal.mk_ker, sup_comm]
 
 end GroundTheory.Heights₂.Heights

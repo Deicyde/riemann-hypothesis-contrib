@@ -14,7 +14,8 @@ noncomputable section
 open Filter Asymptotics
 namespace GlobalTheory.BigTop.Fun
 theorem existsIntegralMultiple_holds_alt : _root_.GlobalTheory.BigTop.Fun.ScaleCondition := by
-  refine ⟨1, one_pos, fun eps he _ => ⟨⟨0, fun _ => 0, fun _ => 0, fun _ => 0⟩, fun Fm CH _ _ => ?_⟩⟩
+  refine
+    ⟨1, one_pos, fun eps he _ => ⟨⟨0, fun _ => 0, fun _ => 0, fun _ => 0⟩, fun Fm CH _ _ => ?_⟩⟩
   obtain ⟨x0, hx0⟩ := exists_log_le_two_rpow he
   refine ⟨x0, fun x hx hle i p _ => ?_⟩
   have hsx : (Fm.L x i).sc.x = x := Fm.L_x x i hx

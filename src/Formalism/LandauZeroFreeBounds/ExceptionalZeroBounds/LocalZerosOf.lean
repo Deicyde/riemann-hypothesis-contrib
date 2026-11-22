@@ -73,10 +73,13 @@ theorem localZeroSumBoundOfBounds : LocalZerosOf := by
     rw [hz₀re, show (11 / 10 : ℝ) / (11 / 10 - 1) = 11 by norm_num] at h
     have hpos : 0 < ‖DirichletCharacter.LFunction χ z₀‖ := norm_pos_iff.2 hf0
     rw [inv_le_comm₀ hpos (by norm_num)] at h
-    calc (1 / 11 : ℝ) = (11 : ℝ)⁻¹ := by norm_num
+    calc
+      (1 / 11 : ℝ)
+        = (11 : ℝ)⁻¹ := by norm_num
       _ ≤ _ := h
-  have hbound : ∀ z ∈ Metric.closedBall z₀ (3 / 5),
-      ‖DirichletCharacter.LFunction χ z‖ ≤ M * ‖DirichletCharacter.LFunction χ z₀‖ := by
+  have hbound
+      : ∀ z ∈ Metric.closedBall z₀ (3 / 5),
+        ‖DirichletCharacter.LFunction χ z‖ ≤ M * ‖DirichletCharacter.LFunction χ z₀‖ := by
     intro z hz
     have hre : 1 / 2 ≤ z.re := by
       have := re_sub_le_re_of_mem_closedBall hz
@@ -89,11 +92,13 @@ theorem localZeroSumBoundOfBounds : LocalZerosOf := by
       linarith
     have hq0 : (0 : ℝ) ≤ q := by linarith
     have hz0 : 0 ≤ ‖z‖ := norm_nonneg z
-    calc ‖DirichletCharacter.LFunction χ z‖ ≤ C * q * (1 + ‖z‖) := h1
+    calc
+      ‖DirichletCharacter.LFunction χ z‖
+        ≤ C * q * (1 + ‖z‖) := h1
       _ ≤ C₁ * q * (1 + ‖z‖) :=
-          mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right hCC hq0) (by linarith)
+        mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right hCC hq0) (by linarith)
       _ ≤ C₁ * q * (2 * (|t| + 2)) :=
-          mul_le_mul_of_nonneg_left (by linarith) (mul_nonneg (by linarith) hq0)
+        mul_le_mul_of_nonneg_left (by linarith) (mul_nonneg (by linarith) hq0)
       _ = M * (1 / 11) := by rw [hM]; ring
       _ ≤ M * ‖DirichletCharacter.LFunction χ z₀‖ := mul_le_mul_of_nonneg_left hlow (by linarith)
   obtain ⟨Z, m, hZ, hm1, hm2, -, happrox⟩ :=
@@ -104,7 +109,8 @@ theorem localZeroSumBoundOfBounds : LocalZerosOf := by
   · intro σ hσ1 hσ2
     set s : ℂ := (σ : ℂ) + t * I with hs
     have hsre : s.re = σ := by
-      rw [hs, Complex.add_re, Complex.ofReal_re, Complex.re_ofReal_mul, Complex.I_re, mul_zero, add_zero]
+      rw [hs, Complex.add_re, Complex.ofReal_re, Complex.re_ofReal_mul, Complex.I_re, mul_zero,
+        add_zero]
     have hsball : s ∈ Metric.closedBall z₀ ((3 / 5) / 6) := by
       rw [Metric.mem_closedBall, dist_eq_norm, show (3 / 5 : ℝ) / 6 = 1 / 10 by norm_num]
       have hd : s - z₀ = ((σ - 11 / 10 : ℝ) : ℂ) := by
@@ -119,23 +125,26 @@ theorem localZeroSumBoundOfBounds : LocalZerosOf := by
     have hpos2 : 0 < (q : ℝ) * (|t| + 2) := by positivity
     have hL : Real.log 2 ≤ Real.log ((q : ℝ) * (|t| + 2)) :=
       Real.log_le_log (by norm_num) (by nlinarith)
-    have hlogM : Real.log M ≤
-        (1 + Real.log (22 * C₁) / Real.log 2) * Real.log ((q : ℝ) * (|t| + 2)) := by
+    have hlogM
+        : Real.log M ≤ (1 + Real.log (22 * C₁) / Real.log 2) * Real.log ((q : ℝ) * (|t| + 2)) := by
       have hMe : M = (22 * C₁) * ((q : ℝ) * (|t| + 2)) := by rw [hM]; ring
       rw [hMe, Real.log_mul hpos1.ne' hpos2.ne']
       have := log_le_div_log_two_mul C₁ _ hC₁ hL
       nlinarith
-    have hre := Complex.abs_re_le_norm
-      (deriv (DirichletCharacter.LFunction χ) s / DirichletCharacter.LFunction χ s -
-        ∑ ρ ∈ Z, (m ρ : ℂ) / (s - ρ))
-    have hre' := neg_abs_le
-      (deriv (DirichletCharacter.LFunction χ) s / DirichletCharacter.LFunction χ s -
-        ∑ ρ ∈ Z, (m ρ : ℂ) / (s - ρ)).re
+    have hre :=
+      Complex.abs_re_le_norm
+        (deriv (DirichletCharacter.LFunction χ) s / DirichletCharacter.LFunction χ s
+          - ∑ ρ ∈ Z, (m ρ : ℂ) / (s - ρ))
+    have hre' :=
+      neg_abs_le
+        (deriv (DirichletCharacter.LFunction χ) s / DirichletCharacter.LFunction χ s
+          - ∑ ρ ∈ Z, (m ρ : ℂ) / (s - ρ)).re
     rw [Complex.sub_re, re_sum_div_sub] at hre hre'
     have h72 : 72 * Real.log M / (3 / 5) = 120 * Real.log M := by ring
     rw [h72] at hA
-    have hneg : (negLD χ s).re =
-        -(deriv (DirichletCharacter.LFunction χ) s / DirichletCharacter.LFunction χ s).re := by
+    have hneg
+        : (negLD χ s).re
+          = -(deriv (DirichletCharacter.LFunction χ) s / DirichletCharacter.LFunction χ s).re := by
       rw [negLD, Complex.neg_re]
     rw [hneg]
     nlinarith

@@ -5,21 +5,30 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff
 open scoped Classical
 
-private noncomputable def euF {F : Type} [Field F] (z : TR.Rinf F) (t : ℝ) : (TR.Rinf F)ˣ :=
-  ⟨fun w => Real.exp (t * z w), fun w => Real.exp (-(t * z w)),
-    funext fun w => by simp [← Real.exp_add], funext fun w => by simp [← Real.exp_add]⟩
+private noncomputable def euF {F : Type} [Field F] (z : TR.Rinf F) (t : ℝ) : (TR.Rinf F)ˣ := ⟨
+  fun w => Real.exp (t * z w),
+  fun w => Real.exp (-(t * z w)),
+  funext fun w => by simp [← Real.exp_add],
+  funext fun w => by simp [← Real.exp_add]
+⟩
 
-private noncomputable def euE {E : Type} [Field E] (s : Cinf E) (t : ℝ) : (Cinf E)ˣ :=
-  ⟨fun w => Complex.exp (t * s w), fun w => Complex.exp (-(t * s w)),
-    funext fun w => by simp [← Complex.exp_add], funext fun w => by simp [← Complex.exp_add]⟩
+private noncomputable def euE {E : Type} [Field E] (s : Cinf E) (t : ℝ) : (Cinf E)ˣ := ⟨
+  fun w => Complex.exp (t * s w),
+  fun w => Complex.exp (-(t * s w)),
+  funext fun w => by simp [← Complex.exp_add],
+  funext fun w => by simp [← Complex.exp_add]
+⟩
 
-private theorem inf_scalarF {F : Type} [Field F] [NumberField F] [IsTotallyReal F] (u : (TR.Rinf F)ˣ) :
-    TR.infGL F 2 (Matrix.GeneralLinearGroup.scalar (Fin 2) u) =
-      Matrix.GeneralLinearGroup.scalar (Fin 2) (TR.infId F u) := by
+private theorem inf_scalarF
+    {F : Type} [Field F] [NumberField F] [IsTotallyReal F] (u : (TR.Rinf F)ˣ)
+    : TR.infGL F 2 (Matrix.GeneralLinearGroup.scalar (Fin 2) u)
+      = Matrix.GeneralLinearGroup.scalar (Fin 2) (TR.infId F u) := by
   have h1 : TR.pInf F (TR.infId F u).val = u.val := by
     change TR.pInf F (1 - TR.sInf F 1 + TR.sInf F _) = _
     have h : ∀ x, TR.pInf F (TR.sInf F x) = x := fun x => (TR.infEq F).symm_apply_apply x
@@ -35,11 +44,14 @@ private theorem inf_scalarF {F : Type} [Field F] [NumberField F] [IsTotallyReal 
     ext i j
     by_cases e : i = j <;> simp [Matrix.diagonal_apply, e, h2]
 
-private theorem inf_scalarE {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (u : (Cinf E)ˣ) :
-    infGL E 2 (Matrix.GeneralLinearGroup.scalar (Fin 2) u) =
-      Matrix.GeneralLinearGroup.scalar (Fin 2) (infId E u) := by
-  have hd : infId E u =
-      Matrix.GeneralLinearGroup.det (infGL E 1 (Matrix.GeneralLinearGroup.scalar (Fin 1) u)) := by
+private theorem inf_scalarE
+    {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (u : (Cinf E)ˣ)
+    : infGL E 2 (Matrix.GeneralLinearGroup.scalar (Fin 2) u)
+      = Matrix.GeneralLinearGroup.scalar (Fin 2) (infId E u) := by
+  have hd
+      : infId E u
+        = Matrix.GeneralLinearGroup.det (infGL E 1
+          (Matrix.GeneralLinearGroup.scalar (Fin 1) u)) := by
     rw [det_infGL]
     congr 1
     exact Units.ext (by simp)
@@ -57,8 +69,10 @@ private theorem inf_scalarE {E : Type} [Field E] [NumberField E] [_root_.NumberF
     ext i j
     by_cases e : i = j <;> simp [Matrix.diagonal_apply, e, h2]
 
-private theorem ex_zE {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (s : Cinf E) (t : ℝ) :
-    ex (zE s) t = Matrix.GeneralLinearGroup.scalar (Fin 2) (euE s t) := by
+private theorem ex_zE
+    {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+    (s : Cinf E) (t : ℝ)
+    : ex (zE s) t = Matrix.GeneralLinearGroup.scalar (Fin 2) (euE s t) := by
   apply Units.ext
   have e : t • Matrix.of (zE s) = Matrix.diagonal (fun _ : Fin 2 => t • s) := by
     ext i j w
@@ -71,12 +85,16 @@ private theorem ex_zE {E : Type} [Field E] [NumberField E] [_root_.NumberField.I
     simp [euE, Pi.exp_def, Complex.exp_eq_exp_ℂ]
   · simp [Matrix.diagonal_apply, h]
 
-private theorem norm_euE {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (s : Cinf E) (t : ℝ) (v : InfinitePlace F) :
-    (∏ w : InfinitePlace E, if w.comap (algebraMap F E) = v then ‖(euE s t).val w‖ ^ 2 else 1) =
-      (euF (trI F s) t).val v := by
-  have h : ∀ w : InfinitePlace E, (if w.comap (algebraMap F E) = v then ‖(euE s t).val w‖ ^ 2 else 1) =
-      Real.exp (t * if w.comap (algebraMap F E) = v then 2 * (s w).re else 0) := by
+private theorem norm_euE
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F]
+    [_root_.NumberField.IsTotallyComplex E]
+    (s : Cinf E) (t : ℝ) (v : InfinitePlace F)
+    : (∏ w : InfinitePlace E, if w.comap (algebraMap F E) = v then ‖(euE s t).val w‖ ^ 2 else 1)
+      = (euF (trI F s) t).val v := by
+  have h
+      : ∀ w : InfinitePlace E,
+        (if w.comap (algebraMap F E) = v then ‖(euE s t).val w‖ ^ 2 else 1)
+          = Real.exp (t * if w.comap (algebraMap F E) = v then 2 * (s w).re else 0) := by
     intro w
     split_ifs
     · change ‖Complex.exp (t * s w)‖ ^ 2 = _
@@ -88,11 +106,17 @@ private theorem norm_euE {F E : Type} [Field F] [NumberField F] [Field E] [Numbe
   rw [← Real.exp_sum, ← Finset.mul_sum]
   rfl
 
-theorem UpperTheory.ConvolutionTheory.R2.Ff.cenExp :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (_D : Dat F E), CenExp F E := by
+theorem UpperTheory.ConvolutionTheory.R2.Ff.cenExp
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (_D : Dat F E),
+      CenExp F E := by
   intro F E _ _ _ _ _ _ _ D s
-  refine ⟨fun t => infId E (euE s t), fun t => Matrix.GeneralLinearGroup.scalar (Fin 2) (euF (trI F s) t),
-    ⟨fun a b => ?_, ?_⟩, fun t => ⟨?_, ?_⟩⟩
+  refine ⟨
+    fun t => infId E (euE s t),
+    fun t => Matrix.GeneralLinearGroup.scalar (Fin 2) (euF (trI F s) t),
+    ⟨fun a b => ?_, ?_⟩,
+    fun t => ⟨?_, ?_⟩
+  ⟩
   · have h : euF (trI F s) (a + b) = euF (trI F s) a * euF (trI F s) b := by
       refine Units.ext (funext fun w => ?_)
       change Real.exp ((a + b) * _) = Real.exp (a * _) * Real.exp (b * _)

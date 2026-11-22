@@ -6,10 +6,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 @[expose] public section
 
 open scoped nonZeroDivisors Matrix
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GroundTheory.Global GroundTheory.Global.IdeleGroup UpperTheory.Gal.TP.Skew
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GroundTheory.Global
+  GroundTheory.Global.IdeleGroup UpperTheory.Gal.TP.Skew
 
-theorem UpperTheory.Gal.TP.Skew.memDual :
-    UpperTheory.Gal.TP.Skew.MemDual := by
+theorem UpperTheory.Gal.TP.Skew.memDual : UpperTheory.Gal.TP.Skew.MemDual := by
   intro E _ _ z
   have h0 : (1 : FractionalIdeal (𝓞 E)⁰ E) ≠ 0 := one_ne_zero
   rw [FractionalIdeal.mem_dual h0]

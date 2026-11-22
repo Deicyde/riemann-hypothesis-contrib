@@ -14,12 +14,17 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.LogFactor
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MvPolynomial Formalism.BasicNotions Formalism.L2.DIV Formalism.DivisionValues GlobalTheory.TestLat Formalism.L2.Indef.Tree.ArchimedeanLeafBounds.Cuts
+open NumberField IsDedekindDomain MvPolynomial Formalism.BasicNotions Formalism.L2.DIV
+  Formalism.DivisionValues GlobalTheory.TestLat Formalism.L2.Indef.Tree.ArchimedeanLeafBounds.Cuts
 open scoped Matrix ComplexOrder
 
 namespace GlobalTheory
 
-theorem extNorm_eq_nat_log_le_bound : ∀ (K : Type) [Field K] [StarRing K] [CharZero K] (ι : Type) [Fintype ι] (n : ℕ) (lam : ι → DomWeight n) (R : ℝ), 1 ≤ R → SpreadLe lam R → ∃ s : ℕ, 0 < s ∧ extNorm K lam = (s : K) ∧ Real.log s ≤ bound (Fintype.card ι) n R := by
+theorem extNorm_eq_nat_log_le_bound
+    : ∀ (K : Type) [Field K] [StarRing K] [CharZero K] (ι : Type) [Fintype ι] (n : ℕ)
+        (lam : ι → DomWeight n) (R : ℝ),
+      1 ≤ R → SpreadLe lam R
+        → ∃ s : ℕ, 0 < s ∧ extNorm K lam = (s : K) ∧ Real.log s ≤ bound (Fintype.card ι) n R := by
   intro K _ _ _ ι _ n lam R hR hS
   have hR0 : 0 ≤ R := le_trans zero_le_one hR
   have hw : ∀ τ i, (lam τ).natW i ≤ ⌊R⌋₊ := by
@@ -41,11 +46,12 @@ theorem extNorm_eq_nat_log_le_bound : ∀ (K : Type) [Field K] [StarRing K] [Cha
     have hb := GlobalTheory.T.log_factorial_pow_mul_factorial_pow_le' n ⌊R⌋₊ R hR (Nat.floor_le hR0)
     have h1 : ∀ τ, Real.log (s τ) ≤ 4 * (n : ℝ) * R * Real.log (n * R) := fun τ =>
       le_trans (Real.log_le_log (by exact_mod_cast hs0 τ) (by exact_mod_cast hs1 τ)) hb
-    calc ∑ τ, Real.log (s τ) ≤ ∑ _τ : ι, 4 * (n : ℝ) * R * Real.log (n * R) :=
-          Finset.sum_le_sum fun τ _ => h1 τ
+    calc
+      ∑ τ, Real.log (s τ)
+        ≤ ∑ _τ : ι, 4 * (n : ℝ) * R * Real.log (n * R) := Finset.sum_le_sum fun τ _ => h1 τ
       _ = bound (Fintype.card ι) n R := by
-          rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
-          unfold bound
-          ring
+        rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+        unfold bound
+        ring
 
 end GlobalTheory

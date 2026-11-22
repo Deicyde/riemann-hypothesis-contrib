@@ -13,19 +13,25 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SelfIntersec
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr
 
 namespace GlobalTheory.NefShift
 
-theorem isNef_shift_mono : GlobalTheory.Published.ArCalc → ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X]
-    (p : X ⟶ Sp k) (D : ℕ), IsArithVar p D → ∀ (M : HermLB p) (t t' : ℝ), t ≤ t' →
-    (M.shift (fun _ => t) fun _ => rfl).IsNef D → (M.shift (fun _ => t') fun _ => rfl).IsNef D := by
+theorem isNef_shift_mono
+    : GlobalTheory.Published.ArCalc
+      → ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (D : ℕ),
+        IsArithVar p D
+          → ∀ (M : HermLB p) (t t' : ℝ),
+            t ≤ t' → (M.shift (fun _ => t) fun _ => rfl).IsNef D
+              → (M.shift (fun _ => t') fun _ => rfl).IsNef D := by
   intro _ k _ X _ p D hX M t t' htt h
   refine ⟨fun σ => ?_, h.vertical, ?_⟩
   · have := (h.semiPos σ).addFn_const (2 * (t' - t))
-    have e : (((M.shift (fun _ => t) fun _ => rfl).φ σ).addFn fun _ => 2 * (t' - t)) =
-        (M.shift (fun _ => t') fun _ => rfl).φ σ := by
+    have e
+        : (((M.shift (fun _ => t) fun _ => rfl).φ σ).addFn fun _ => 2 * (t' - t))
+          = (M.shift (fun _ => t') fun _ => rfl).φ σ := by
       simp only [HermLB.shift, Weight.addFn]
       congr 1
       funext a b

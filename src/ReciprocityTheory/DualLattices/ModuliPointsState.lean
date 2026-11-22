@@ -43,17 +43,18 @@ variable (B : BX R₀)
 
 def IsHeight {R : LAlg R₀} (Dp : DualPair R) (N : ℕ) (y : B.G R) (h : B.gg →ₗ[R₀] R) : Prop :=
   ∀ v : B.gg, ∃ z : (Dp.D : Type u)ˣ,
-    B.IsPairing N (B.tg Dp.π Dp.sqZero (v ⊗ₜ Dp.ηk)) (B.map Dp.σ y) z ∧ (z : Dp.D) = 1 + Dp.σ.1 (h v) * Dp.η
+    B.IsPairing N (B.tg Dp.π Dp.sqZero (v ⊗ₜ Dp.ηk)) (B.map Dp.σ y) z
+      ∧ (z : Dp.D) = 1 + Dp.σ.1 (h v) * Dp.η
 
 end BX
 
 def HighestWeightVectorUniformBounds (B : BX R₀) : Prop :=
-  ∀ (R : LAlg R₀) (Dp : DualPair R) (N : ℕ), (N : (R : Type u)) = 0 →
-    (∀ (y : B.G R) (v : B.gg) (u : B.P Dp.D (B.tg Dp.π Dp.sqZero (v ⊗ₜ Dp.ηk)) (B.map Dp.σ y)),
-      HEq (B.pmap Dp.π u) (B.zero1 y) →
-      HEq (B.nsmul1 u N) (B.zero1 (B.map Dp.σ y))) ∧
-    (∀ y : B.G R, N • y = 0 → ∃! h : B.gg →ₗ[R₀] R, B.IsHeight Dp N y h) ∧
-    (∀ (y y' : B.G R) (h h' : B.gg →ₗ[R₀] R), B.IsHeight Dp N y h → B.IsHeight Dp N y' h' →
-      B.IsHeight Dp N (y + y') (h + h'))
+  ∀ (R : LAlg R₀) (Dp : DualPair R) (N : ℕ),
+    (N : (R : Type u)) = 0
+      → (∀ (y : B.G R) (v : B.gg) (u : B.P Dp.D (B.tg Dp.π Dp.sqZero (v ⊗ₜ Dp.ηk)) (B.map Dp.σ y)),
+          HEq (B.pmap Dp.π u) (B.zero1 y) → HEq (B.nsmul1 u N) (B.zero1 (B.map Dp.σ y)))
+        ∧ (∀ y : B.G R, N • y = 0 → ∃! h : B.gg →ₗ[R₀] R, B.IsHeight Dp N y h)
+        ∧ (∀ (y y' : B.G R) (h h' : B.gg →ₗ[R₀] R),
+          B.IsHeight Dp N y h → B.IsHeight Dp N y' h' → B.IsHeight Dp N (y + y') (h + h'))
 
 end ReciprocityTheory.PGsh

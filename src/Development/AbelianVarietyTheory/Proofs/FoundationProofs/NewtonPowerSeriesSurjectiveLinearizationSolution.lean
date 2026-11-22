@@ -8,29 +8,41 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem newton_powerSeries_of_surjective_linearisation (k ι κ : Type) [Field k] [Fintype ι] [Fintype κ]
-    (G : (ι → PowerSeries k) → κ → PowerSeries k) (x₀ : ι → k) (L : (ι → k) →ₗ[k] (κ → k))
-    (hL : Function.Surjective L)
+theorem newton_powerSeries_of_surjective_linearisation
+    (k ι κ : Type) [Field k] [Fintype ι] [Fintype κ]
+    (G : (ι → PowerSeries k) → κ → PowerSeries k) (x₀ : ι → k)
+    (L : (ι → k) →ₗ[k] (κ → k)) (hL : Function.Surjective L)
     (h0 : ∀ e, PowerSeries.constantCoeff (G (fun i => PowerSeries.C (x₀ i)) e) = 0)
-    (hG : ∀ (x h : ι → PowerSeries k) (m : ℕ), 1 ≤ m → (∀ i, PowerSeries.constantCoeff (x i) = x₀ i) → ∀ e,
-      (PowerSeries.X : PowerSeries k) ^ (m + 1) ∣ G (fun i => x i + PowerSeries.X ^ m * h i) e - G x e -
-        PowerSeries.X ^ m * PowerSeries.C (L (fun i => PowerSeries.constantCoeff (h i)) e)) :
-    ∃ x : ι → PowerSeries k, (∀ i, PowerSeries.constantCoeff (x i) = x₀ i) ∧ ∀ e, G x e = 0 := by
+    (hG : ∀ (x h : ι → PowerSeries k) (m : ℕ),
+      1 ≤ m → (∀ i, PowerSeries.constantCoeff (x i) = x₀ i)
+        → ∀ e,
+          (PowerSeries.X : PowerSeries k) ^ (m + 1)
+            ∣ G (fun i => x i + PowerSeries.X ^ m * h i) e - G x e
+              - PowerSeries.X ^ m * PowerSeries.C (L (fun i => PowerSeries.constantCoeff (h i)) e))
+    : ∃ x : ι → PowerSeries k, (∀ i, PowerSeries.constantCoeff (x i) = x₀ i) ∧ ∀ e, G x e = 0 := by
   classical
   let r := Function.surjInv hL
   have hLr : ∀ v, L (r v) = v := Function.surjInv_eq hL
   let step : ℕ → (ι → PowerSeries k) → (ι → PowerSeries k) := fun m x i =>
-    x i + PowerSeries.X ^ m * PowerSeries.C (r (fun e => -PowerSeries.coeff m (G x e)) i)
+    x i + PowerSeries.X ^ m * PowerSeries.C (r (fun e => - PowerSeries.coeff m (G x e)) i)
   let sq : ℕ → (ι → PowerSeries k) := fun n =>
-    Nat.rec (motive := fun _ => ι → PowerSeries k) (fun i => PowerSeries.C (x₀ i)) (fun n x => step (n + 1) x) n
+    Nat.rec
+      (motive := fun _ => ι → PowerSeries k)
+      (fun i => PowerSeries.C (x₀ i))
+      (fun n x => step (n + 1) x)
+      n
   have sq_zero : sq 0 = fun i => PowerSeries.C (x₀ i) := rfl
   have sq_succ : ∀ n, sq (n + 1) = step (n + 1) (sq n) := fun n => rfl
-  have coeffXC : ∀ (m j : ℕ) (c : k),
-      PowerSeries.coeff j ((PowerSeries.X : PowerSeries k) ^ m * PowerSeries.C c) = if j = m then c else 0 := by
+  have coeffXC
+      : ∀ (m j : ℕ) (c : k),
+        PowerSeries.coeff j ((PowerSeries.X : PowerSeries k) ^ m * PowerSeries.C c)
+          = if j = m then c else 0 := by
     intro m j c
     rw [mul_comm, PowerSeries.coeff_C_mul_X_pow]
-  have inv : ∀ n, (∀ i, PowerSeries.constantCoeff (sq n i) = x₀ i) ∧
-      ∀ e, (PowerSeries.X : PowerSeries k) ^ (n + 1) ∣ G (sq n) e := by
+  have inv
+      : ∀ n,
+        (∀ i, PowerSeries.constantCoeff (sq n i) = x₀ i)
+          ∧ ∀ e, (PowerSeries.X : PowerSeries k) ^ (n + 1) ∣ G (sq n) e := by
     intro n
     induction n with
     | zero =>
@@ -50,8 +62,9 @@ theorem newton_powerSeries_of_surjective_linearisation (k ι κ : Type) [Field k
       rw [hcv, hLr] at key
       have hs : sq (n + 1) = fun i => x i + PowerSeries.X ^ (n + 1) * PowerSeries.C (r v i) := by
         rw [sq_succ]
-      have h2 : (PowerSeries.X : PowerSeries k) ^ (n + 1 + 1) ∣
-          G x e + PowerSeries.X ^ (n + 1) * PowerSeries.C (v e) := by
+      have h2
+          : (PowerSeries.X : PowerSeries k) ^ (n + 1 + 1)
+            ∣ G x e + PowerSeries.X ^ (n + 1) * PowerSeries.C (v e) := by
         rw [PowerSeries.X_pow_dvd_iff]
         intro j hj
         rw [map_add (f := _), coeffXC]
@@ -83,15 +96,18 @@ theorem newton_powerSeries_of_surjective_linearisation (k ι κ : Type) [Field k
   have hlim : ∀ n e, (PowerSeries.X : PowerSeries k) ^ (n + 1) ∣ G xl e := by
     intro n e
     choose d hd using hdiff n
-    have hx : xl = fun i => sq n i + PowerSeries.X ^ (n + 1) * d i := by
-      funext i; rw [← hd i]; ring
+    have hx : xl = fun i => sq n i + PowerSeries.X ^ (n + 1) * d i := by funext i; rw [← hd i]; ring
     have key := hG (sq n) d (n + 1) (by omega) (inv n).1 e
     rw [← hx] at key
     have k1 : (PowerSeries.X : PowerSeries k) ^ (n + 1) ∣ G xl e - G (sq n) e := by
-      have h3 : (PowerSeries.X : PowerSeries k) ^ (n + 1) ∣ (PowerSeries.X : PowerSeries k) ^ (n + 1 + 1) :=
+      have h3
+          : (PowerSeries.X : PowerSeries k) ^ (n + 1)
+            ∣ (PowerSeries.X : PowerSeries k) ^ (n + 1 + 1) :=
         pow_dvd_pow _ (by omega)
-      have := dvd_add (h3.trans key) (dvd_mul_right ((PowerSeries.X : PowerSeries k) ^ (n + 1))
-        (PowerSeries.C (L (fun i => PowerSeries.constantCoeff (d i)) e)))
+      have :=
+        dvd_add (h3.trans key)
+          (dvd_mul_right ((PowerSeries.X : PowerSeries k) ^ (n + 1))
+            (PowerSeries.C (L (fun i => PowerSeries.constantCoeff (d i)) e)))
       simpa using this
     have := dvd_add k1 ((inv n).2 e)
     simpa using this
@@ -104,11 +120,20 @@ theorem newton_powerSeries_of_surjective_linearisation (k ι κ : Type) [Field k
     rw [map_zero]
     exact PowerSeries.X_pow_dvd_iff.mp (hlim j e) j (by omega)
 
-theorem newton_powerSeries_target : ∀ (k ι κ : Type) [Field k] [Fintype ι] [Fintype κ] (G : (ι → PowerSeries k) → κ → PowerSeries k) (x₀ : ι → k) (L : (ι → k) →ₗ[k] (κ → k)), Function.Surjective L →
- (∀ e, PowerSeries.constantCoeff (G (fun i => PowerSeries.C (x₀ i)) e) = 0) →
- (∀ (x h : ι → PowerSeries k) (m : ℕ), 1 ≤ m → (∀ i, PowerSeries.constantCoeff (x i) = x₀ i) → ∀ e,
-   (PowerSeries.X : PowerSeries k) ^ (m + 1) ∣ G (fun i => x i + PowerSeries.X ^ m * h i) e - G x e - PowerSeries.X ^ m * PowerSeries.C (L (fun i => PowerSeries.constantCoeff (h i)) e)) →
- ∃ x : ι → PowerSeries k, (∀ i, PowerSeries.constantCoeff (x i) = x₀ i) ∧ ∀ e, G x e = 0 :=
-  fun k ι κ _ _ _ G x₀ L hL h0 hG => newton_powerSeries_of_surjective_linearisation k ι κ G x₀ L hL h0 hG
+theorem newton_powerSeries_target
+    : ∀ (k ι κ : Type) [Field k] [Fintype ι] [Fintype κ]
+        (G : (ι → PowerSeries k) → κ → PowerSeries k) (x₀ : ι → k) (L : (ι → k) →ₗ[k] (κ → k)),
+      Function.Surjective L
+        → (∀ e, PowerSeries.constantCoeff (G (fun i => PowerSeries.C (x₀ i)) e) = 0)
+        → (∀ (x h : ι → PowerSeries k) (m : ℕ),
+          1 ≤ m → (∀ i, PowerSeries.constantCoeff (x i) = x₀ i)
+            → ∀ e,
+              (PowerSeries.X : PowerSeries k) ^ (m + 1)
+                ∣ G (fun i => x i + PowerSeries.X ^ m * h i) e - G x e
+                  - PowerSeries.X ^ m
+                    * PowerSeries.C (L (fun i => PowerSeries.constantCoeff (h i)) e))
+        → ∃ x : ι → PowerSeries k, (∀ i, PowerSeries.constantCoeff (x i) = x₀ i) ∧ ∀ e, G x e = 0 :=
+  fun k ι κ _ _ _ G x₀ L hL h0 hG =>
+    newton_powerSeries_of_surjective_linearisation k ι κ G x₀ L hL h0 hG
 
 end GlobalTheory

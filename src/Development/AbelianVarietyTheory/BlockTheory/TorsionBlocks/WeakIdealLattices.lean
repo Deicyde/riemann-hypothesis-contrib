@@ -13,7 +13,8 @@ noncomputable section
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.LevelConstants
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  TensorProduct
 
 variable {l : ℕ} [Fact l.Prime]
 
@@ -46,8 +47,10 @@ end Ring
 
 section Generic
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp LL O : Type} [Field Qp] [Field LL]
-  [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp LL O : Type}
+  [Field Qp] [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
   {R : Type} [CommRing R] [Algebra O R]
 
 end Generic
@@ -57,7 +60,6 @@ section Hyp
 variable {K LL : FinExt l}
 
 variable {P : LocPrime l} (AI : LocAinf l P)
-
 
 end Hyp
 

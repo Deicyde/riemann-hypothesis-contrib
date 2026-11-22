@@ -16,7 +16,10 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.CardLeOfDiag
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain NumberField Finset
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.Theta IsDedekindDomain
+  NumberField Finset
 open Formalism.DivisionValues (vw)
 open Formalism.L2.Host (HChar)
 open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.RowTest
@@ -33,12 +36,13 @@ namespace GlobalTheory.IsoNegIdx
 
 open ReciprocityTheory.ChartRestriction.G GlobalTheory.Inertia
 
-theorem posIndex_of_hasSignature {n : Type} [Fintype n] [DecidableEq n] {M : Matrix n n ℂ} {p q : ℕ}
-    (h : Formalism.UG.HasSignature M p q) : posIndex M = p ∧ posIndex (-M) = q := by
+theorem posIndex_of_hasSignature
+    {n : Type} [Fintype n] [DecidableEq n]
+    {M : Matrix n n ℂ} {p q : ℕ} (h : Formalism.UG.HasSignature M p q)
+    : posIndex M = p ∧ posIndex (-M) = q := by
   obtain ⟨e, P, hP⟩ := h
   set A : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ := (P : Matrix _ _ ℂ).map (starRingEnd ℂ) with hA
-  have hAc : A.map (starRingEnd ℂ) = (P : Matrix _ _ ℂ) := by
-    ext i j; simp [hA]
+  have hAc : A.map (starRingEnd ℂ) = (P : Matrix _ _ ℂ) := by ext i j; simp [hA]
   have hdet : A.det ≠ 0 := by
     have hu := Matrix.isUnits_det_units P
     have h2 := RingHom.map_det (starRingEnd ℂ) (P : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ)
@@ -47,32 +51,39 @@ theorem posIndex_of_hasSignature {n : Type} [Fintype n] [DecidableEq n] {M : Mat
     exact (map_ne_zero _).2 hu.ne_zero
   have hc : A.transpose * M.reindex e e * A.map (starRingEnd ℂ) = Formalism.UG.Jpq p q := by
     rw [hAc, ← hP]; rfl
-  have hcn : A.transpose * (-M).reindex e e * A.map (starRingEnd ℂ) = -Formalism.UG.Jpq p q := by
+  have hcn : A.transpose * (-M).reindex e e * A.map (starRingEnd ℂ) = - Formalism.UG.Jpq p q := by
     rw [← hc]
     have : (-M).reindex e e = -(M.reindex e e) := by ext; simp
     rw [this, Matrix.mul_neg, Matrix.neg_mul]
   have hJ : Formalism.UG.Jpq p q = Matrix.diagonal (Sum.elim (fun _ => (1 : ℂ)) (fun _ => -1)) := by
     ext i j
-    rcases i with i | i <;> rcases j with j | j <;>
-      simp [Formalism.UG.Jpq, Matrix.one_apply, Matrix.diagonal_apply] <;> split_ifs <;> simp
-  have hJn : -Formalism.UG.Jpq p q = Matrix.diagonal (Sum.elim (fun _ => (-1 : ℂ)) (fun _ => 1)) := by
+    rcases i with i | i <;> rcases j with j | j
+      <;> simp [Formalism.UG.Jpq, Matrix.one_apply, Matrix.diagonal_apply] <;> split_ifs <;> simp
+  have hJn
+      : - Formalism.UG.Jpq p q = Matrix.diagonal (Sum.elim (fun _ => (-1 : ℂ)) (fun _ => 1)) := by
     rw [hJ, Matrix.diagonal_neg]
     congr 1
-    ext i; rcases i with i | i <;> simp
+    ext i
+    rcases i with i | i <;> simp
   have hre : ∀ N : Matrix n n ℂ, posIndex N = posIndex (N.reindex e e) := fun N =>
     (posIndex_submatrix_equiv N e.symm).symm
   constructor
-  · rw [hre, ← posIndex_congr _ hdet, hc, hJ, posIndex_diagonal, Finset.card_filter, Fintype.sum_sum_type]
+  · rw [hre, ← posIndex_congr _ hdet, hc, hJ, posIndex_diagonal, Finset.card_filter,
+      Fintype.sum_sum_type]
     simp
-  · rw [hre, ← posIndex_congr _ hdet, hcn, hJn, posIndex_diagonal, Finset.card_filter, Fintype.sum_sum_type]
+  · rw [hre, ← posIndex_congr _ hdet, hcn, hJn, posIndex_diagonal, Finset.card_filter,
+      Fintype.sum_sum_type]
     simp
 
-theorem hT_coords {E : Type} [Field E] [NumberField E] [StarRing E] (S : Formalism.BasicNotions.HSpace E) (u : Fin S.rank → E) :
-    S.hT (S.frame.equivFun.symm u) (S.frame.equivFun.symm u) = ∑ b, ∑ a, star (u a) * S.gram a b * u b := by
+theorem hT_coords
+    {E : Type} [Field E] [NumberField E] [StarRing E]
+    (S : Formalism.BasicNotions.HSpace E) (u : Fin S.rank → E)
+    : S.hT (S.frame.equivFun.symm u) (S.frame.equivFun.symm u)
+      = ∑ b, ∑ a, star (u a) * S.gram a b * u b := by
   rw [Module.Basis.equivFun_symm_apply]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul,
-    Finset.mul_sum, Formalism.BasicNotions.HSpace.gram]
+    simp only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.map_smulₛₗ, LinearMap.smul_apply,
+      smul_eq_mul, Finset.mul_sum, Formalism.BasicNotions.HSpace.gram]
   refine Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun a _ => ?_
   rw [starRingEnd_apply]
   ring
@@ -83,8 +94,9 @@ namespace GlobalTheory.IsoNegIdx
 
 open ReciprocityTheory.ChartRestriction.G GlobalTheory.Inertia
 
-theorem exists_isotropic_of_negIdx : ∀ (D : D7) (S : HSp D) (k : ℕ), NegIdx S k → 1 ≤ k → k + 1 ≤ S.rank → 3 ≤ S.rank →
-    ∃ x : S.V, x ≠ 0 ∧ S.hT x x = 0 := by
+theorem exists_isotropic_of_negIdx
+    : ∀ (D : D7) (S : HSp D) (k : ℕ),
+      NegIdx S k → 1 ≤ k → k + 1 ≤ S.rank → 3 ≤ S.rank → ∃ x : S.V, x ≠ 0 ∧ S.hT x x = 0 := by
   intro D S k hS hk1 hk2 hn
   letI : IsCMField D.host.E := D.host.isCMField_hostE
   have hst : ∀ x : D.host.E, star x = FD.cc x := fun _ => rfl
@@ -105,18 +117,21 @@ theorem exists_isotropic_of_negIdx : ∀ (D : D7) (S : HSp D) (k : ℕ), NegIdx 
   have hG : ∀ a b, FD.cc (G a b) = G b a := fun a b => by
     simp only [hGdef, Matrix.transpose_apply, ← hst]
     exact S.herm.eq _ _
-  have hform : ∀ u, S.hT (S.frame.equivFun.symm u) (S.frame.equivFun.symm u) = FD.herm G u u := fun u => by
+  have hform
+      : ∀ u, S.hT (S.frame.equivFun.symm u) (S.frame.equivFun.symm u) = FD.herm G u u := fun u => by
     rw [hT_coords, FD.herm]
     refine Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun a _ => ?_
     simp only [hGdef, Matrix.transpose_apply, hst]
     ring
-  have hGφ : ∀ φ : D.host.E →+* ℂ, G.map φ = S.gram.map (ComplexEmbedding.conjugate φ) := fun φ => by
+  have hGφ
+      : ∀ φ : D.host.E →+* ℂ, G.map φ = S.gram.map (ComplexEmbedding.conjugate φ) := fun φ => by
     ext a b
     simp only [Matrix.map_apply, ComplexEmbedding.conjugate_coe_eq]
     rw [← hG b a, GlobalTheory.Published.embedding_cc]
     rfl
   obtain ⟨P, d, hP, hPd, hd, -⟩ := GlobalTheory.HermDiag.exists_congr_diagonal_herm hG
-  have key : ∀ u, FD.herm G (P.mulVec u) (P.mulVec u) = FD.herm (Matrix.diagonal d) u u := fun u => by
+  have key
+      : ∀ u, FD.herm G (P.mulVec u) (P.mulVec u) = FD.herm (Matrix.diagonal d) u u := fun u => by
     rw [GlobalTheory.Published.LandherrSt.herm_mulVec, hPd]
   have hne : ∀ u, u ≠ 0 → S.frame.equivFun.symm (P.mulVec u) ≠ 0 := fun u hu h => by
     apply hu
@@ -135,19 +150,23 @@ theorem exists_isotropic_of_negIdx : ∀ (D : D7) (S : HSp D) (k : ℕ), NegIdx 
 
   have hs : ∀ φ : D.host.E →+* ℂ, (∃ i, 0 < (φ (d i)).re) ∧ ∃ j, (φ (d j)).re < 0 := by
     intro φ
-    have hc : (P.map φ).transpose * G.map φ * (P.map φ).map (starRingEnd ℂ) = Matrix.diagonal fun i => φ (d i) := by
+    have hc
+        : (P.map φ).transpose * G.map φ * (P.map φ).map (starRingEnd ℂ)
+          = Matrix.diagonal fun i => φ (d i) := by
       have h1 : (P.map φ).map (starRingEnd ℂ) = (P.map FD.cc).map φ := by
         ext a b
         simp [GlobalTheory.Published.embedding_cc]
-      rw [h1, ← Matrix.transpose_map, ← Matrix.map_mul, ← Matrix.map_mul, hPd, Matrix.diagonal_map (map_zero φ)]
+      rw [h1, ← Matrix.transpose_map, ← Matrix.map_mul, ← Matrix.map_mul, hPd,
+        Matrix.diagonal_map (map_zero φ)]
     have hdet : (P.map φ).det ≠ 0 := by
       have h2 := RingHom.map_det φ P
       rw [RingHom.mapMatrix_apply] at h2
       rw [← h2]
       exact (map_ne_zero φ).2 hP
     obtain ⟨hp, hq⟩ := posIndex_of_hasSignature (hGφ φ ▸ hsig (ComplexEmbedding.conjugate φ))
-    have hcn : (P.map φ).transpose * (-G.map φ) * (P.map φ).map (starRingEnd ℂ) =
-        Matrix.diagonal fun i => -φ (d i) := by
+    have hcn
+        : (P.map φ).transpose * (- G.map φ) * (P.map φ).map (starRingEnd ℂ)
+          = Matrix.diagonal fun i => - φ (d i) := by
       rw [Matrix.mul_neg, Matrix.neg_mul, hc, Matrix.diagonal_neg]
     rw [← posIndex_congr _ hdet, hc, posIndex_diagonal] at hp
     rw [← posIndex_congr _ hdet, hcn, posIndex_diagonal] at hq

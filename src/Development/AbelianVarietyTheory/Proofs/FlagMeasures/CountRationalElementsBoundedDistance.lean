@@ -8,12 +8,15 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TruncatedLeas
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
 
 namespace GlobalTheory.Dec.BoundedDistance
 
-theorem bound_le (s la R : ℝ) (m f : ℕ) (hs : 1 ≤ s) (hla : 0 < la) (hla1 : la ≤ 1) (hR : 0 ≤ R) (hf : 0 < f) :
-    (1 + 2 * s * Real.exp (R / f) / la) ^ (2 * (m * f)) ≤ (3 * s / la) ^ (2 * m * f) * Real.exp (2 * (m : ℝ) * R) := by
+theorem bound_le
+    (s la R : ℝ) (m f : ℕ) (hs : 1 ≤ s) (hla : 0 < la) (hla1 : la ≤ 1) (hR : 0 ≤ R) (hf : 0 < f)
+    : (1 + 2 * s * Real.exp (R / f) / la) ^ (2 * (m * f))
+      ≤ (3 * s / la) ^ (2 * m * f) * Real.exp (2 * (m : ℝ) * R) := by
   have hf' : (f : ℝ) ≠ 0 := by exact_mod_cast hf.ne'
   have he : 1 ≤ Real.exp (R / f) := Real.one_le_exp (div_nonneg hR (Nat.cast_nonneg _))
 
@@ -22,12 +25,15 @@ theorem bound_le (s la R : ℝ) (m f : ℕ) (hs : 1 ≤ s) (hla : 0 < la) (hla1 
     nlinarith
   have hbase0 : 0 ≤ 1 + 2 * s * Real.exp (R / f) / la := by positivity
   have hbase : 1 + 2 * s * Real.exp (R / f) / la ≤ 3 * s / la * Real.exp (R / f) := by
-    have h3 : 3 * s / la * Real.exp (R / f) =
-        s * Real.exp (R / f) / la + 2 * s * Real.exp (R / f) / la := by ring
+    have h3
+        : 3 * s / la * Real.exp (R / f)
+          = s * Real.exp (R / f) / la + 2 * s * Real.exp (R / f) / la := by
+      ring
     linarith
   have hk : 2 * (m * f) = 2 * m * f := by ring
   rw [hk]
-  calc (1 + 2 * s * Real.exp (R / f) / la) ^ (2 * m * f)
+  calc
+    (1 + 2 * s * Real.exp (R / f) / la) ^ (2 * m * f)
       ≤ (3 * s / la * Real.exp (R / f)) ^ (2 * m * f) := pow_le_pow_left₀ hbase0 hbase _
     _ = (3 * s / la) ^ (2 * m * f) * Real.exp (2 * (m : ℝ) * R) := by
       rw [mul_pow, ← Real.exp_nat_mul]
@@ -48,8 +54,9 @@ theorem countRat : CountRat := by
     exact Real.sqrt_le_sqrt (by exact_mod_cast hn)
   have hf : 0 < I.f := Module.finrank_pos
   have hla1 : tau1 I x * tau1 I y ≤ 1 := by nlinarith
-  have key := bound_le (Real.sqrt I.n) (tau1 I x * tau1 I y) (∑ v, r v) (I.n ^ 2) I.f hs
-    (mul_pos hx hy) hla1 (Finset.sum_nonneg fun v _ => hr v) hf
+  have key :=
+    bound_le (Real.sqrt I.n) (tau1 I x * tau1 I y) (∑ v, r v) (I.n ^ 2) I.f hs (mul_pos hx hy) hla1
+      (Finset.sum_nonneg fun v _ => hr v) hf
   push_cast at key
   exact ⟨hfin, hcard.trans key⟩
 

@@ -8,8 +8,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 
@@ -28,7 +31,10 @@ structure ArchFrame where
   r : InfinitePlace G.F → ℝ
   r_pos : ∀ v, 0 < r v
   act : ∀ (c : G.C) w v, th (L.rep c w) v = G.psi v c *ᵥ th w v
-  form : ∀ u w, ((D.EF.baseChange ℚ u w : ℚ) : ℝ) = ∑ v, r v * (-(sgnV L v) * Complex.I * hv (G.gram v) (th u v) (th w v)).re
+  form
+    : ∀ u w,
+      ((D.EF.baseChange ℚ u w : ℚ) : ℝ)
+        = ∑ v, r v * (-(sgnV L v) * Complex.I * hv (G.gram v) (th u v) (th w v)).re
   span : Submodule.span ℝ (Set.range th) = ⊤
   dim : Module.finrank ℝ (Arch G) = Module.finrank ℚ (VQ D)
   dimg : Module.finrank ℝ (Arch G) = 2 * D.g

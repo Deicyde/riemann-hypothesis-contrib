@@ -14,9 +14,12 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem hInv_quot_inf (q : ℕ) [NeZero q] (R : Type) [CommRing R] (I J : Ideal R)
-    (hq : IsUnit (q : R)) (hI : HInv q (R ⧸ I)) (hJ : HInv q (R ⧸ J))
-    (hIJ : HInv q (R ⧸ (I ⊔ J))) : HInv q (R ⧸ (I ⊓ J)) := by
+theorem hInv_quot_inf
+    (q : ℕ) [NeZero q]
+    (R : Type) [CommRing R]
+    (I J : Ideal R)
+    (hq : IsUnit (q : R)) (hI : HInv q (R ⧸ I)) (hJ : HInv q (R ⧸ J)) (hIJ : HInv q (R ⧸ (I ⊔ J)))
+    : HInv q (R ⧸ (I ⊓ J)) := by
   set K := I ⊓ J with hK
   let f := Ideal.Quotient.mk K
   have hqA : IsUnit (q : R ⧸ K) := by simpa using hq.map f
@@ -36,12 +39,15 @@ theorem hInv_quot_inf (q : ℕ) [NeZero q] (R : Type) [CommRing R] (I J : Ideal 
   have eIJ : (R ⧸ K) ⧸ (Ideal.map f I ⊔ Ideal.map f J) ≃+* R ⧸ (I ⊔ J) :=
     (Ideal.quotEquivOfEq (Ideal.map_sup f I J).symm).trans
       (DoubleQuot.quotQuotEquivQuotOfLE (inf_le_left.trans le_sup_left))
-  exact GlobalTheory.T.etaleHomotopyInvariantTwists_of_closedCover q (R ⧸ K) (Ideal.map f I) (Ideal.map f J) hinf hqA
-    (GlobalTheory.T.etaleHomotopyInvariantTwists_of_ringEquiv q _ _ eI.symm hI) (GlobalTheory.T.etaleHomotopyInvariantTwists_of_ringEquiv q _ _ eJ.symm hJ)
+  exact GlobalTheory.T.etaleHomotopyInvariantTwists_of_closedCover q (R ⧸ K) (Ideal.map f I)
+    (Ideal.map f J) hinf hqA
+    (GlobalTheory.T.etaleHomotopyInvariantTwists_of_ringEquiv q _ _ eI.symm hI)
+    (GlobalTheory.T.etaleHomotopyInvariantTwists_of_ringEquiv q _ _ eJ.symm hJ)
     (GlobalTheory.T.etaleHomotopyInvariantTwists_of_ringEquiv q _ _ eIJ.symm hIJ)
 
-theorem ringKrullDim_quot_sup_succ_le (R : Type) [CommRing R] (p J : Ideal R) [p.IsPrime]
-    (hJ : ¬ J ≤ p) : ringKrullDim (R ⧸ (p ⊔ J)) + 1 ≤ ringKrullDim (R ⧸ p) := by
+theorem ringKrullDim_quot_sup_succ_le
+    (R : Type) [CommRing R] (p J : Ideal R) [p.IsPrime] (hJ : ¬ J ≤ p)
+    : ringKrullDim (R ⧸ (p ⊔ J)) + 1 ≤ ringKrullDim (R ⧸ p) := by
   obtain ⟨x, hxJ, hxp⟩ := Set.not_subset.mp hJ
   let g := Ideal.Quotient.mk p
   have hx0 : g x ≠ 0 := fun h => hxp (Ideal.Quotient.eq_zero_iff_mem.mp h)
@@ -50,8 +56,8 @@ theorem ringKrullDim_quot_sup_succ_le (R : Type) [CommRing R] (p J : Ideal R) [p
   have hle : Ideal.span {g x} ≤ Ideal.map g (p ⊔ J) := by
     rw [Ideal.span_le, Set.singleton_subset_iff]
     exact Ideal.mem_map_of_mem g (Ideal.mem_sup_right hxJ)
-  have h2 : ringKrullDim ((R ⧸ p) ⧸ Ideal.map g (p ⊔ J)) ≤
-      ringKrullDim ((R ⧸ p) ⧸ Ideal.span {g x}) :=
+  have h2
+      : ringKrullDim ((R ⧸ p) ⧸ Ideal.map g (p ⊔ J)) ≤ ringKrullDim ((R ⧸ p) ⧸ Ideal.span {g x}) :=
     ringKrullDim_le_of_surjective (Ideal.Quotient.factor hle) (Ideal.Quotient.factor_surjective hle)
   have e : (R ⧸ p) ⧸ Ideal.map g (p ⊔ J) ≃+* R ⧸ (p ⊔ J) :=
     DoubleQuot.quotQuotEquivQuotOfLE le_sup_left
@@ -62,15 +68,16 @@ theorem ringKrullDim_quot_sup_succ_le (R : Type) [CommRing R] (p J : Ideal R) [p
     exact h3.trans h2
   exact h4.trans h1
 
-theorem withBot_lt_of_add_one_le (a : WithBot ℕ∞) (d : ℕ) (h : a + 1 ≤ (d : WithBot ℕ∞)) :
-    a < (d : WithBot ℕ∞) := by
+theorem withBot_lt_of_add_one_le (a : WithBot ℕ∞) (d : ℕ) (h : a + 1 ≤ (d : WithBot ℕ∞))
+    : a < (d : WithBot ℕ∞) := by
   induction a using WithBot.recBotCoe with
   | bot => exact WithBot.bot_lt_coe _
   | coe e =>
     induction e using ENat.recTopCoe with
     | top =>
       exfalso
-      have h2 : (((⊤ : ℕ∞) + 1 : ℕ∞) : WithBot ℕ∞) ≤ (((d : ℕ∞)) : WithBot ℕ∞) := by exact_mod_cast h
+      have h2 : (((⊤ : ℕ∞) + 1 : ℕ∞) : WithBot ℕ∞) ≤ (((d : ℕ∞)) : WithBot ℕ∞) := by
+        exact_mod_cast h
       rw [WithBot.coe_le_coe] at h2
       simp at h2
     | coe n =>
@@ -83,10 +90,14 @@ end GlobalTheory
 
 namespace GlobalTheory
 
-theorem hInv_of_domains_of_dim_lt : ∀ (q : ℕ) [NeZero q] (d : ℕ),
-    (∀ (R : Type) [CommRing R] [Algebra.FiniteType ℤ R], IsUnit (q : R) → ringKrullDim R < d → HInv q R) →
-    (∀ (D : Type) [CommRing D] [IsDomain D] [Algebra.FiniteType ℤ D], IsUnit (q : D) → ringKrullDim D ≤ d → HInv q D) →
-    ∀ (R : Type) [CommRing R] [Algebra.FiniteType ℤ R], IsUnit (q : R) → ringKrullDim R ≤ d → HInv q R := by
+theorem hInv_of_domains_of_dim_lt
+    : ∀ (q : ℕ) [NeZero q] (d : ℕ),
+      (∀ (R : Type) [CommRing R] [Algebra.FiniteType ℤ R],
+          IsUnit (q : R) → ringKrullDim R < d → HInv q R)
+        → (∀ (D : Type) [CommRing D] [IsDomain D] [Algebra.FiniteType ℤ D],
+          IsUnit (q : D) → ringKrullDim D ≤ d → HInv q D)
+        → ∀ (R : Type) [CommRing R] [Algebra.FiniteType ℤ R],
+          IsUnit (q : R) → ringKrullDim R ≤ d → HInv q R := by
   intro q _ d hlt hdom R _ _ hq hd
   have key : ∀ s : Finset (Ideal R), (∀ p ∈ s, p.IsPrime) → HInv q (R ⧸ s.inf id) := by
     intro s
@@ -111,11 +122,14 @@ theorem hInv_of_domains_of_dim_lt : ∀ (q : ℕ) [NeZero q] (d : ℕ),
           all_goals first | rfl | exact Subsingleton.elim _ _
         refine hInv_quot_inf q R p (s.inf id) hq ?_ ihs ?_
         · exact hdom (R ⧸ p) (by simpa using hq.map (Ideal.Quotient.mk p))
-            ((ringKrullDim_le_of_surjective (Ideal.Quotient.mk p) Ideal.Quotient.mk_surjective).trans hd)
-        · refine hlt (R ⧸ (p ⊔ s.inf id)) (by simpa using hq.map (Ideal.Quotient.mk (p ⊔ s.inf id))) ?_
+            ((ringKrullDim_le_of_surjective (Ideal.Quotient.mk p)
+              Ideal.Quotient.mk_surjective).trans hd)
+        · refine hlt (R ⧸ (p ⊔ s.inf id)) (by simpa using hq.map (Ideal.Quotient.mk (p ⊔ s.inf id)))
+            ?_
           refine withBot_lt_of_add_one_le _ d ?_
           exact (ringKrullDim_quot_sup_succ_le R p (s.inf id) hJ).trans
-            ((ringKrullDim_le_of_surjective (Ideal.Quotient.mk p) Ideal.Quotient.mk_surjective).trans hd)
+            ((ringKrullDim_le_of_surjective (Ideal.Quotient.mk p)
+              Ideal.Quotient.mk_surjective).trans hd)
   haveI : IsNoetherianRing R := Algebra.FiniteType.isNoetherianRing ℤ R
   have hfin := minimalPrimes.finite_of_isNoetherianRing R
   have hN : hfin.toFinset.inf id = nilradical R := by
@@ -126,6 +140,7 @@ theorem hInv_of_domains_of_dim_lt : ∀ (q : ℕ) [NeZero q] (d : ℕ),
     refine key _ (fun p hp => ?_)
     rw [Set.Finite.mem_toFinset] at hp
     exact hp.1.1
-  exact GlobalTheory.T.etaleHomotopyInvariantTwists_of_closedCover q R (nilradical R) (nilradical R) (by simp) hq hred hred (by rwa [sup_idem])
+  exact GlobalTheory.T.etaleHomotopyInvariantTwists_of_closedCover q R (nilradical R) (nilradical R)
+    (by simp) hq hred hred (by rwa [sup_idem])
 
 end GlobalTheory

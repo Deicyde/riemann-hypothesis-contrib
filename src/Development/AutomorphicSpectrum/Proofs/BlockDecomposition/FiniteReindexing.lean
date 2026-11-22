@@ -22,8 +22,9 @@ theorem exists_under (v : PlF E) : ∃ w : Pl E, w.under (𝓞 (maximalRealSubfi
     | exact FaithfulSMul.algebraMap_injective _ _
     | exact NoZeroSMulDivisors.algebraMap_injective _ _
   haveI : v.asIdeal.IsMaximal := v.isMaximal
-  obtain ⟨Q, hQmax, hQ⟩ := Ideal.exists_ideal_over_maximal_of_isIntegral v.asIdeal
-    (by rw [(RingHom.injective_iff_ker_eq_bot _).mp hinj]; exact bot_le)
+  obtain ⟨Q, hQmax, hQ⟩ :=
+    Ideal.exists_ideal_over_maximal_of_isIntegral v.asIdeal
+      (by rw [(RingHom.injective_iff_ker_eq_bot _).mp hinj]; exact bot_le)
   refine ⟨⟨Q, hQmax.isPrime, ?_⟩, ?_⟩
   · rintro rfl
     apply v.ne_bot
@@ -42,8 +43,8 @@ def secEquiv {S : Set (Pl E)} (hS : IsSection S) : S ≃ PlF E :=
       obtain ⟨u, ⟨hu, huw⟩, -⟩ := hS w
       exact ⟨⟨u, hu⟩, huw⟩)
 
-theorem secPl_eq {S : Set (Pl E)} (hS : IsSection S) (u : S) :
-    secPl S (secEquiv hS u) = some u.1 := by
+theorem secPl_eq {S : Set (Pl E)} (hS : IsSection S) (u : S)
+    : secPl S (secEquiv hS u) = some u.1 := by
   have hv : secEquiv hS u = u.1.under (𝓞 (maximalRealSubfield E)) := rfl
   have h : ∃ w ∈ S, w.under (𝓞 (maximalRealSubfield E)) = secEquiv hS u := ⟨u.1, u.2, hv.symm⟩
   rw [secPl, dite_eq_left h]

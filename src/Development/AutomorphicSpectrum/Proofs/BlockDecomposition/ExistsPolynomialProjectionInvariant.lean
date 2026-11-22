@@ -8,16 +8,20 @@ public import GroundTheory.AutomorphicForms.AnisotropicHeight
 
 noncomputable section
 
-open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Tf.Loc PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.D4 GlobalTheory.CompanionTheory.TorusCh
+open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  PositivityTheory.Rg.Tf.Loc PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.D4
+  GlobalTheory.CompanionTheory.TorusCh
 open scoped Pointwise
 
 namespace GlobalTheory.CompanionTheory.TorusCh
 
-theorem aeval_mulVec_mem_of_stable {K : Type} [Field K] {n : ℕ} (γ : Matrix (Fin n) (Fin n) K)
-    (W : Submodule K (Fin n → K)) (hW : W.map (Matrix.toLin' γ) ≤ W) (g : K[X]) :
-    ∀ y ∈ W, aeval γ g *ᵥ y ∈ W := by
-  have hγ : ∀ y ∈ W, γ *ᵥ y ∈ W := fun y hy =>
-    hW ⟨y, hy, by rw [Matrix.toLin'_apply]⟩
+theorem aeval_mulVec_mem_of_stable
+    {K : Type} [Field K]
+    {n : ℕ}
+    (γ : Matrix (Fin n) (Fin n) K) (W : Submodule K (Fin n → K)) (hW : W.map (Matrix.toLin' γ) ≤ W)
+    (g : K[X])
+    : ∀ y ∈ W, aeval γ g *ᵥ y ∈ W := by
+  have hγ : ∀ y ∈ W, γ *ᵥ y ∈ W := fun y hy => hW ⟨y, hy, by rw [Matrix.toLin'_apply]⟩
   induction g using Polynomial.induction_on with
   | C a =>
     intro y hy
@@ -34,26 +38,30 @@ theorem aeval_mulVec_mem_of_stable {K : Type} [Field K] {n : ℕ} (γ : Matrix (
     rw [this, ← Matrix.mulVec_mulVec]
     exact ih _ (hγ y hy)
 
-def stableIdeal {K : Type} [Field K] {n : ℕ} (γ : Matrix (Fin n) (Fin n) K) (v : Fin n → K)
-    (W : Submodule K (Fin n → K)) (hW : W.map (Matrix.toLin' γ) ≤ W) : Ideal K[X] where
+def stableIdeal
+    {K : Type} [Field K]
+    {n : ℕ} (γ : Matrix (Fin n) (Fin n) K) (v : Fin n → K) (W : Submodule K (Fin n → K))
+    (hW : W.map (Matrix.toLin' γ) ≤ W)
+    : Ideal K[X] where
   carrier := {h | aeval γ h *ᵥ v ∈ W}
   add_mem' := by
     intro a b ha hb
     simp only [Set.mem_setOf_eq] at ha hb ⊢
     rw [map_add (f := _), Matrix.add_mulVec]
     exact W.add_mem ha hb
-  zero_mem' := by
-    simp
+  zero_mem' := by simp
   smul_mem' := by
     intro c x hx
     simp only [Set.mem_setOf_eq, smul_eq_mul] at hx ⊢
     rw [map_mul, ← Matrix.mulVec_mulVec]
     exact aeval_mulVec_mem_of_stable γ W hW c _ hx
 
-theorem exists_idem_pol_range_eq : ∀ (K : Type) [Field K] (n : ℕ) (γ : Matrix (Fin n) (Fin n) K) (v : Fin n → K),
-    γ.charpoly.Separable → (∀ y : Fin n → K, ∃ h : K[X], y = aeval γ h *ᵥ v) →
-    ∀ W : Submodule K (Fin n → K), W.map (Matrix.toLin' γ) ≤ W →
-    ∃ π, IsPol γ π ∧ π * π = π ∧ LinearMap.range (Matrix.toLin' π) = W := by
+theorem exists_idem_pol_range_eq
+    : ∀ (K : Type) [Field K] (n : ℕ) (γ : Matrix (Fin n) (Fin n) K) (v : Fin n → K),
+      γ.charpoly.Separable → (∀ y : Fin n → K, ∃ h : K[X], y = aeval γ h *ᵥ v)
+        → ∀ W : Submodule K (Fin n → K),
+          W.map (Matrix.toLin' γ) ≤ W
+            → ∃ π, IsPol γ π ∧ π * π = π ∧ LinearMap.range (Matrix.toLin' π) = W := by
   intro K _ n γ v hsep hcyc W hW
   set I := stableIdeal γ v W hW with hI
   have hmemI : ∀ h : K[X], h ∈ I ↔ aeval γ h *ᵥ v ∈ W := fun h => Iff.rfl

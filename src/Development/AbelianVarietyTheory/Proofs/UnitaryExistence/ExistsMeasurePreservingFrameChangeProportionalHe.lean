@@ -11,7 +11,8 @@ noncomputable section
 
 namespace GlobalTheory.PeterssonFrameChange
 
-open MeasureTheory Topology Matrix NumberField ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume
+open MeasureTheory Topology Matrix NumberField ReciprocityTheory.ChartRestriction.G.FD
+  GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume
 open scoped ENNReal
 
 variable {r : ℕ}
@@ -105,25 +106,38 @@ set_option autoImplicit false in
 open MeasureTheory Topology Matrix NumberField in
 open scoped ENNReal in
 variable {r : ℕ} in
-theorem _root_.GlobalTheory.PeterssonFrameChange.frame_change : ∀ (E : Type) [Field E]
-    [NumberField E] [IsCMField E] (r : ℕ) (X X' : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r) (y : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame X.Ψ r)
-    (y' : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame X'.Ψ r), X.Ψ = X'.Ψ → X.p0 = X'.p0 → y ∈ _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.OrthFr X →
-    y' ∈ _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.OrthFr X' →
-    (∀ (τ : X.Ψ), ∃ t : ℝ, t ≠ 0 ∧ X'.Gm.map τ.1 = (t : ℂ) • X.Gm.map τ.1) →
-    ∃ (e : _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.RealGrp X ≃ᵐ _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.RealGrp X')
-      (α : _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.RealGrp X → _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.RealGrp X)
-      (u : _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.RealGrp X),
-      MeasurePreserving e (_root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.haarR X) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.haarR X') ∧
-      Measurable α ∧ (∀ t, α (α t) = u⁻¹ * t * u) ∧
-      ∀ t (τ : X.Ψ) (τ' : X'.Ψ), τ.1 = τ'.1 →
-        _root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' τ' * ((e (α t) τ' : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ) *
-            (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' τ')⁻¹ =
-          _root_.ReciprocityTheory.ChartRestriction.G.FD.mat y τ * ((t τ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ) * (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y τ)⁻¹ := by
+theorem _root_.GlobalTheory.PeterssonFrameChange.frame_change
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ)
+        (X X' : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r)
+        (y : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame X.Ψ r)
+        (y' : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame X'.Ψ r),
+      X.Ψ = X'.Ψ → X.p0 = X'.p0
+        → y ∈ _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.OrthFr X
+        → y' ∈ _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.OrthFr X'
+        → (∀ (τ : X.Ψ), ∃ t : ℝ, t ≠ 0 ∧ X'.Gm.map τ.1 = (t : ℂ) • X.Gm.map τ.1)
+        → ∃ (e : _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.RealGrp X
+            ≃ᵐ _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.RealGrp X')
+            (α : _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.RealGrp X
+              → _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.RealGrp X)
+            (u : _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.RealGrp X),
+          MeasurePreserving e
+              (_root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.haarR X)
+              (_root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.haarR X')
+            ∧ Measurable α ∧ (∀ t, α (α t) = u⁻¹ * t * u)
+            ∧ ∀ t (τ : X.Ψ) (τ' : X'.Ψ),
+              τ.1 = τ'.1
+                → _root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' τ'
+                    * ((e (α t) τ' : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ)
+                    * (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' τ')⁻¹
+                  = _root_.ReciprocityTheory.ChartRestriction.G.FD.mat y τ
+                    * ((t τ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ)
+                    * (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y τ)⁻¹ := by
   intro E _ _ _ r X X' y y' hΨ hp hy hy' hG
   choose tf htf hGt using hG
   set J := _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.sgnMat r X.p0 with hJdef
   have hJJ : J * J = 1 := by
-    rw [hJdef, _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.sgnMat, diagonal_mul_diagonal, ← diagonal_one]
+    rw [hJdef, _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.sgnMat,
+      diagonal_mul_diagonal, ← diagonal_one]
     congr 1
     funext a
     unfold _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn
@@ -134,21 +148,39 @@ theorem _root_.GlobalTheory.PeterssonFrameChange.frame_change : ∀ (E : Type) [
     rw [det_mul, h, zero_mul, det_one] at this
     exact zero_ne_one this
   let τ' : X.Ψ → X'.Ψ := fun τ => ⟨τ.1, hΨ ▸ τ.2⟩
-  have hy0 : ∀ τ : X.Ψ, _root_.ReciprocityTheory.ChartRestriction.G.FD.gram (τ : E →+* ℂ) X.Gm (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y τ) = J := hy
-  have hy0' : ∀ τ : X'.Ψ, _root_.ReciprocityTheory.ChartRestriction.G.FD.gram (τ : E →+* ℂ) X'.Gm (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' τ) =
-      _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.sgnMat r X'.p0 := hy'
-  have hM : ∀ τ : X.Ψ, (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y τ)ᵀ * X.Gm.map τ.1 * (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y τ).map (starRingEnd ℂ) = J := by
+  have hy0
+      : ∀ τ : X.Ψ,
+        _root_.ReciprocityTheory.ChartRestriction.G.FD.gram (τ : E →+* ℂ) X.Gm
+            (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y τ)
+          = J :=
+    hy
+  have hy0'
+      : ∀ τ : X'.Ψ,
+        _root_.ReciprocityTheory.ChartRestriction.G.FD.gram (τ : E →+* ℂ) X'.Gm
+            (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' τ)
+          = _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.sgnMat r X'.p0 :=
+    hy'
+  have hM
+      : ∀ τ : X.Ψ,
+        (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y τ)ᵀ * X.Gm.map τ.1
+            * (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y τ).map (starRingEnd ℂ)
+          = J := by
     intro τ
     have := hy0 τ
     rwa [_root_.ReciprocityTheory.ChartRestriction.G.FD.FrameDegreeData.gram_eq] at this
-  have hM' : ∀ τ : X.Ψ, (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ))ᵀ * X'.Gm.map τ.1 *
-      (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ)).map (starRingEnd ℂ) = J := by
+  have hM'
+      : ∀ τ : X.Ψ,
+        (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ))ᵀ * X'.Gm.map τ.1
+            * (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ)).map (starRingEnd ℂ)
+          = J := by
     intro τ
     have := hy0' (τ' τ)
     rw [_root_.ReciprocityTheory.ChartRestriction.G.FD.FrameDegreeData.gram_eq, ← hp] at this
     exact this
-  have hMdet : ∀ τ : X.Ψ, (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y τ).det ≠ 0 := fun τ => det_ne_zero_of_form_eq hJdet (hM τ)
-  have hM'det : ∀ τ : X.Ψ, (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ)).det ≠ 0 := fun τ => det_ne_zero_of_form_eq hJdet (hM' τ)
+  have hMdet : ∀ τ : X.Ψ, (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y τ).det ≠ 0 :=
+    fun τ => det_ne_zero_of_form_eq hJdet (hM τ)
+  have hM'det : ∀ τ : X.Ψ, (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ)).det ≠ 0 :=
+    fun τ => det_ne_zero_of_form_eq hJdet (hM' τ)
   set B : X.Ψ → Matrix (Fin r) (Fin r) ℂ := fun τ =>
     ((Real.sqrt |tf τ| : ℝ) : ℂ) • ((_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y τ)⁻¹ * _root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ)) with hBdef
   set s : X.Ψ → ℂ := fun τ => ((|tf τ| / tf τ : ℝ) : ℂ) with hsdef
@@ -159,19 +191,23 @@ theorem _root_.GlobalTheory.PeterssonFrameChange.frame_change : ∀ (E : Type) [
   have hs2 : ∀ τ, s τ * s τ = 1 := by
     intro τ
     simp only [hsdef]
-    rw [← Complex.ofReal_mul, ← sq, div_pow, sq_abs, div_self (pow_ne_zero _ (htf τ)), Complex.ofReal_one]
+    rw [← Complex.ofReal_mul, ← sq, div_pow, sq_abs, div_self (pow_ne_zero _ (htf τ)),
+      Complex.ofReal_one]
   have hsim : ∀ τ : X.Ψ, (B τ)ᵀ * J * (B τ).map (starRingEnd ℂ) = s τ • J := by
     intro τ
     have ht := htf τ
-    have h1 : (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ))ᵀ * X.Gm.map τ.1 * (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ)).map (starRingEnd ℂ) =
-        ((tf τ : ℝ) : ℂ)⁻¹ • J := by
+    have h1
+        : (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ))ᵀ * X.Gm.map τ.1
+            * (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ)).map (starRingEnd ℂ)
+          = ((tf τ : ℝ) : ℂ)⁻¹ • J := by
       have := hM' τ
       rw [hGt τ, form_smul_left_automorphic_membership] at this
       rw [← this, smul_smul, inv_mul_cancel₀ (by exact_mod_cast ht), one_smul]
     simp only [hBdef, hsdef]
     rw [form_smul_right_automorphic_membership, Real.sq_sqrt (abs_nonneg _)]
     conv_lhs => rw [← hM τ]
-    rw [← form_mul', mul_nonsing_inv_cancel_left _ _ (isUnit_iff_ne_zero.mpr (hMdet τ)), h1, smul_smul]
+    rw [← form_mul', mul_nonsing_inv_cancel_left _ _ (isUnit_iff_ne_zero.mpr (hMdet τ)), h1,
+      smul_smul]
     congr 1
     push_cast
     ring
@@ -185,20 +221,33 @@ theorem _root_.GlobalTheory.PeterssonFrameChange.frame_change : ∀ (E : Type) [
   have hBuinv : ∀ τ, (((Bu τ)⁻¹ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ) = (B τ)⁻¹ := by
     intro τ
     rw [Matrix.coe_units_inv, hBu]
-  have hmem : ∀ g : GL (Fin r) ℂ, g ∈ _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.Upq r X.p0 ↔
-      (g : Matrix (Fin r) (Fin r) ℂ)ᵀ * J * (g : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ) = J :=
-    fun g => Iff.rfl
-  have hαmem : ∀ (g : _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.Upq r X.p0) (τ : X.Ψ),
-      (Bu τ)⁻¹ * (g : GL (Fin r) ℂ) * Bu τ ∈ _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.Upq r X.p0 := by
+  have hmem
+      : ∀ g : GL (Fin r) ℂ,
+        g ∈ _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.Upq r X.p0
+          ↔ (g : Matrix (Fin r) (Fin r) ℂ)ᵀ * J * (g : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ)
+            = J := fun g =>
+    Iff.rfl
+  have hαmem
+      : ∀ (g : _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.Upq r X.p0)
+          (τ : X.Ψ),
+        (Bu τ)⁻¹ * (g : GL (Fin r) ℂ) * Bu τ
+          ∈ _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.Upq r X.p0 := by
     intro g τ
     rw [hmem, Units.val_mul, Units.val_mul, hBuinv, hBu]
     exact form_conj_eq_of_similitude (hs0 τ) (hBdet τ) (hsim τ) ((hmem g).mp g.2)
-  have humem : ∀ τ : X.Ψ, Bu τ * Bu τ ∈ _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.Upq r X.p0 := by
+  have humem
+      : ∀ τ : X.Ψ,
+        Bu τ * Bu τ
+          ∈ _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.Upq r X.p0 := by
     intro τ
-    rw [hmem, Units.val_mul, hBu, form_mul', hsim, form_smul_left_automorphic_membership, hsim, smul_smul, hs2, one_smul]
-  let α : _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.RealGrp X → _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.RealGrp X :=
-    fun t τ => ⟨(Bu τ)⁻¹ * (t τ : GL (Fin r) ℂ) * Bu τ, hαmem (t τ) τ⟩
-  let u : _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.RealGrp X := fun τ => ⟨Bu τ * Bu τ, humem τ⟩
+    rw [hmem, Units.val_mul, hBu, form_mul', hsim, form_smul_left_automorphic_membership, hsim,
+      smul_smul, hs2, one_smul]
+  let α
+      : _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.RealGrp X
+        → _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.RealGrp X := fun t τ =>
+    ⟨(Bu τ)⁻¹ * (t τ : GL (Fin r) ℂ) * Bu τ, hαmem (t τ) τ⟩
+  let u : _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.RealGrp X := fun τ =>
+    ⟨Bu τ * Bu τ, humem τ⟩
   obtain ⟨e, he, hecoe⟩ := exists_transport_haarU_pi (r := r) X.Ψ X'.Ψ X.p0 X'.p0 hΨ hp
   refine ⟨e, α, u, he, ?_, ?_, ?_⟩
   · have hcont : Continuous α := by
@@ -221,25 +270,36 @@ theorem _root_.GlobalTheory.PeterssonFrameChange.frame_change : ∀ (E : Type) [
     have hc0 : c ≠ 0 := by
       simp only [hc]
       exact_mod_cast (Real.sqrt_pos.mpr (abs_pos.mpr (htf τ))).ne'
-    have hMB : _root_.ReciprocityTheory.ChartRestriction.G.FD.mat y τ * B τ = c • _root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ) := by
+    have hMB
+        : _root_.ReciprocityTheory.ChartRestriction.G.FD.mat y τ * B τ
+          = c • _root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ) := by
       simp only [hBdef]
       rw [Matrix.mul_smul, mul_nonsing_inv_cancel_left _ _ (isUnit_iff_ne_zero.mpr (hMdet τ))]
-    have h1 : _root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ) * (B τ)⁻¹ = c⁻¹ • _root_.ReciprocityTheory.ChartRestriction.G.FD.mat y τ := by
-      have : _root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ) = c⁻¹ • (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y τ * B τ) := by
+    have h1
+        : _root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ) * (B τ)⁻¹
+          = c⁻¹ • _root_.ReciprocityTheory.ChartRestriction.G.FD.mat y τ := by
+      have : _root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ)
+          = c⁻¹ • (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y τ * B τ) := by
         rw [hMB, smul_smul, inv_mul_cancel₀ hc0, one_smul]
       rw [this, Matrix.smul_mul, Matrix.mul_assoc,
         mul_nonsing_inv _ (isUnit_iff_ne_zero.mpr (hBdet τ)), Matrix.mul_one]
-    have h2 : B τ * (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ))⁻¹ = c • (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y τ)⁻¹ := by
+    have h2
+        : B τ * (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ))⁻¹
+          = c • (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y τ)⁻¹ := by
       simp only [hBdef]
-      rw [Matrix.smul_mul, Matrix.mul_assoc,
-        mul_nonsing_inv _ (isUnit_iff_ne_zero.mpr (hM'det τ)), Matrix.mul_one]
-    calc _root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ) * ((B τ)⁻¹ * ((t τ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ) * B τ) *
-          (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ))⁻¹
-        = (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ) * (B τ)⁻¹) * ((t τ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ) *
-          (B τ * (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ))⁻¹) := by simp only [Matrix.mul_assoc]
+      rw [Matrix.smul_mul, Matrix.mul_assoc, mul_nonsing_inv _ (isUnit_iff_ne_zero.mpr (hM'det τ)),
+        Matrix.mul_one]
+    calc
+      _root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ)
+            * ((B τ)⁻¹ * ((t τ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ) * B τ)
+            * (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ))⁻¹
+          = (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ) * (B τ)⁻¹)
+            * ((t τ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ)
+            * (B τ * (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat y' (τ' τ))⁻¹) := by
+        simp only [Matrix.mul_assoc]
       _ = _ := by
         rw [h1, h2]
-        simp only [Matrix.smul_mul, Matrix.mul_smul, smul_smul, mul_inv_cancel₀ hc0, inv_mul_cancel₀ hc0,
-          one_smul]
+        simp only [Matrix.smul_mul, Matrix.mul_smul, smul_smul, mul_inv_cancel₀ hc0,
+          inv_mul_cancel₀ hc0, one_smul]
 
 end GlobalTheory.PeterssonFrameChange

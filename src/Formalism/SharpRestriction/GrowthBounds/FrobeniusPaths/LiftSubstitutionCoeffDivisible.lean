@@ -14,8 +14,8 @@ section Good
 
 variable {O : Type} [CommRing O] [IsDomain O] {σ : Type}
 
-def goodSub (w : O) (δ : (σ →₀ ℕ) → ℕ) (h0 : δ 0 = 0) (hadd : ∀ a b, δ (a + b) = δ a + δ b) :
-    Subalgebra O (MvPolynomial σ (KK O)) where
+def goodSub (w : O) (δ : (σ →₀ ℕ) → ℕ) (h0 : δ 0 = 0) (hadd : ∀ a b, δ (a + b) = δ a + δ b)
+    : Subalgebra O (MvPolynomial σ (KK O)) where
   carrier := {P | ∀ m, ∃ a : O, P.coeff m = algebraMap O (KK O) (w ^ δ m * a)}
   mul_mem' := by
     intro P Q hP hQ m
@@ -29,10 +29,12 @@ def goodSub (w : O) (δ : (σ →₀ ℕ) → ℕ) (h0 : δ 0 = 0) (hadd : ∀ a
     refine Finset.sum_congr rfl fun x hx => ?_
     rw [ha, hb, ← map_mul]
     congr 1
-    rw [← (mem_antidiagonal.mp hx), hadd, pow_add]; ring
+    rw [← (mem_antidiagonal.mp hx), hadd, pow_add]
+    ring
   add_mem' := by
     intro P Q hP hQ m
-    obtain ⟨a, ha⟩ := hP m; obtain ⟨b, hb⟩ := hQ m
+    obtain ⟨a, ha⟩ := hP m
+    obtain ⟨b, hb⟩ := hQ m
     exact ⟨a + b, by rw [MvPolynomial.coeff_add, ha, hb, ← map_add (f := _)]; congr 1; ring⟩
   algebraMap_mem' := by
     intro c m
@@ -146,7 +148,8 @@ lemma degUS_single {ι : Type} (LL : LiftLetters ι) (r : ℕ) (v : ι × Fin k)
   rw [degUS_eq_sum_ite, Finsupp.sum_single_index]
   all_goals (split_ifs <;> rfl)
 
-def usSub {ι : Type} (w : O) (LL : LiftLetters ι) (r : ℕ) : Subalgebra O (MvPolynomial (ι × Fin k) (KK O)) :=
+def usSub {ι : Type} (w : O) (LL : LiftLetters ι) (r : ℕ)
+    : Subalgebra O (MvPolynomial (ι × Fin k) (KK O)) :=
   goodSub w (degUS LL r) (degUS_zero LL r) (degUS_add LL r)
 
 lemma liftSubst_X_mem {ι : Type} (w : O) (LL : LiftLetters ι) (r : ℕ) (g : Matrix (Fin k) (Fin k) (WF p f))
@@ -173,9 +176,14 @@ lemma liftSubst_X_mem {ι : Type} (w : O) (LL : LiftLetters ι) (r : ℕ) (g : M
     · rw [sigMat_apply]
       exact C_mem_sub _ _
 
-theorem lift_substitution_coeff_divisible {ι : Type} (w : O) (LL : LiftLetters ι) (r : ℕ) (g : Matrix (Fin k) (Fin k) (WF p f))
-    (hg : IsGLW g) (F : MvPolynomial (ι × Fin k) (KK O)) (hF : InA F) (m : ι × Fin k →₀ ℕ) :
-    ∃ a : O, (liftSubst p f O w r LL g F).coeff m = algebraMap O (KK O) (w ^ degUS LL r m * a) := by
+theorem lift_substitution_coeff_divisible
+    {ι : Type}
+    (w : O) (LL : LiftLetters ι) (r : ℕ)
+    (g : Matrix (Fin k) (Fin k) (WF p f)) (hg : IsGLW g)
+    (F : MvPolynomial (ι × Fin k) (KK O)) (hF : InA F)
+    (m : ι × Fin k →₀ ℕ)
+    : ∃ a : O,
+      (liftSubst p f O w r LL g F).coeff m = algebraMap O (KK O) (w ^ degUS LL r m * a) := by
   have hmem : liftSubst p f O w r LL g F ∈ usSub O w LL r := by
     refine aeval_mem_sub (usSub O w LL r) _ (fun v => ?_) F hF
     have := liftSubst_X_mem p f O w LL r g hg v
@@ -248,13 +256,17 @@ lemma w_dvd_psi (S : UniformizedDVR p O) (s : ℤ) (x : WF p f) (h : WittVector.
   refine ⟨t * psiO p f O s y, ?_⟩
   rw [map_mul, map_natCast, ht, mul_assoc]
 
-
 open Classical in
 def dW {ι : Type} (w : O) (LL : LiftLetters ι) (r : ℕ) (l : ι) (b : Fin k) : O :=
   if (LL.vec l = true ∧ r ≤ b.val) ∨ (LL.vec l = false ∧ b.val < r) then w else 1
 
-def NO {ι : Type} (LL : LiftLetters ι) (g g' : Matrix (Fin k) (Fin k) (WF p f)) (l : ι) (c b : Fin k) : O :=
-  if LL.vec l then psiO p f O (LL.pos l) ((g'⁻¹ * g) c b) else psiO p f O (LL.pos l) ((g⁻¹ * g') b c)
+def NO
+    {ι : Type} (LL : LiftLetters ι) (g g' : Matrix (Fin k) (Fin k) (WF p f)) (l : ι) (c b : Fin k)
+    : O :=
+  if LL.vec l then
+    psiO p f O (LL.pos l) ((g'⁻¹ * g) c b)
+  else
+    psiO p f O (LL.pos l) ((g⁻¹ * g') b c)
 
 lemma exists_A {ι : Type} (S : UniformizedDVR p O) (LL : LiftLetters ι) (r : ℕ)
     (g g' : Matrix (Fin k) (Fin k) (WF p f)) (hg : IsGLW g) (hg' : IsGLW g')
@@ -289,8 +301,8 @@ lemma exists_A {ι : Type} (S : UniformizedDVR p O) (LL : LiftLetters ι) (r : �
   · rw [if_neg hb]
     exact ⟨_, one_mul _⟩
 
-def Theta {ι : Type} (A : ι → Fin k → Fin k → O) :
-    MvPolynomial (ι × Fin k) (KK O) →ₐ[KK O] MvPolynomial (ι × Fin k) (KK O) :=
+def Theta {ι : Type} (A : ι → Fin k → Fin k → O)
+    : MvPolynomial (ι × Fin k) (KK O) →ₐ[KK O] MvPolynomial (ι × Fin k) (KK O) :=
   aeval fun v => ∑ c : Fin k, X (v.1, c) * C (algebraMap O (KK O) (A v.1 c v.2))
 
 lemma Theta_X {ι : Type} (A : ι → Fin k → Fin k → O) (l : ι) (b : Fin k) :
@@ -422,10 +434,13 @@ lemma Theta_int {ι : Type} (A : ι → Fin k → Fin k → O) (P : MvPolynomial
   refine Subalgebra.sum_mem _ (fun c _ => Subalgebra.mul_mem _ ?_ (C_mem_sub _ _))
   exact X_mem_goodSub _ (by rfl)
 
-theorem lift_region_plane_invariant {ι : Type} (S : UniformizedDVR p O) (LL : LiftLetters ι) (r : ℕ)
-    (g g' : Matrix (Fin k) (Fin k) (WF p f)) (hg : IsGLW g) (hg' : IsGLW g')
-    (h : ratPlane p f r g = ratPlane p f r g') (F : MvPolynomial (ι × Fin k) (KK O))
-    (hF : InWjRg p f O S.w r LL g F 0) : InWjRg p f O S.w r LL g' F 0 := by
+theorem lift_region_plane_invariant
+    {ι : Type}
+    (S : UniformizedDVR p O) (LL : LiftLetters ι)
+    (r : ℕ) (g g' : Matrix (Fin k) (Fin k) (WF p f))
+    (hg : IsGLW g) (hg' : IsGLW g') (h : ratPlane p f r g = ratPlane p f r g')
+    (F : MvPolynomial (ι × Fin k) (KK O)) (hF : InWjRg p f O S.w r LL g F 0)
+    : InWjRg p f O S.w r LL g' F 0 := by
   unfold InWjRg at hF ⊢
   rw [InWj_zero_iff] at hF ⊢
   choose A hA using exists_A p f O S LL r g g' hg hg' h
@@ -437,7 +452,12 @@ end PartA
 theorem coefficientDependence (D : Formalism.BasicNotions.D7) : CoefficientDependence D := by
   unfold CoefficientDependence
   intro p f _ O _ _ _ _ S _ _ r K ι LL g g' hg hg'
-  exact ⟨fun h F => ⟨lift_region_plane_invariant p f O S LL r g g' hg hg' h F, lift_region_plane_invariant p f O S LL r g' g hg' hg h.symm F⟩,
-    fun F hF m => lift_substitution_coeff_divisible p f O S.w LL r g hg F hF m⟩
+  exact ⟨
+    fun h F => ⟨
+      lift_region_plane_invariant p f O S LL r g g' hg hg' h F,
+      lift_region_plane_invariant p f O S LL r g' g hg' hg h.symm F
+    ⟩,
+    fun F hF m => lift_substitution_coeff_divisible p f O S.w LL r g hg F hF m
+  ⟩
 
 end Formalism.MainNotions.LemmaBAlt

@@ -9,26 +9,34 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MonicSplitsV
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj Pointwise
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.HTLat GlobalTheory.Published GlobalTheory.Published.AbVarRed IsLocalRing
 attribute [local instance] Over.cartesianMonoidalCategory
 
 noncomputable section
 namespace GlobalTheory.InertiaRes
 
-def toV (R K Ω : Type) [CommRing R] [Field K] [Algebra R K] [Field Ω] [Algebra K Ω]
-    (V : ValuationSubring Ω) (hV : IsAbove R K V.toSubring) : R →+* V :=
+def toV
+    (R K Ω : Type) [CommRing R] [Field K] [Algebra R K] [Field Ω] [Algebra K Ω]
+    (V : ValuationSubring Ω) (hV : IsAbove R K V.toSubring)
+    : R →+* V :=
   ((algebraMap K Ω).comp (algebraMap R K)).codRestrict V (fun r => by
     have : algebraMap R K r ∈ V.toSubring.comap (algebraMap K Ω) := hV ▸ ⟨r, rfl⟩
     exact this)
 
-theorem coe_toV (R K Ω : Type) [CommRing R] [Field K] [Algebra R K] [Field Ω] [Algebra K Ω]
-    (V : ValuationSubring Ω) (hV : IsAbove R K V.toSubring) (r : R) :
-    ((toV R K Ω V hV r : V) : Ω) = algebraMap K Ω (algebraMap R K r) := rfl
+theorem coe_toV
+    (R K Ω : Type) [CommRing R] [Field K] [Algebra R K] [Field Ω] [Algebra K Ω]
+    (V : ValuationSubring Ω) (hV : IsAbove R K V.toSubring)
+    (r : R)
+    : ((toV R K Ω V hV r : V) : Ω) = algebraMap K Ω (algebraMap R K r) :=
+  rfl
 
-theorem isLocalHom_toV (R K Ω : Type) [CommRing R] [IsDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
-    [Field Ω] [Algebra K Ω] (V : ValuationSubring Ω) (hV : IsAbove R K V.toSubring) :
-    IsLocalHom (toV R K Ω V hV) := by
+theorem isLocalHom_toV
+    (R K Ω : Type)
+    [CommRing R] [IsDomain R] [Field K] [Algebra R K] [IsFractionRing R K] [Field Ω] [Algebra K Ω]
+    (V : ValuationSubring Ω) (hV : IsAbove R K V.toSubring)
+    : IsLocalHom (toV R K Ω V hV) := by
   constructor
   intro r hr
   obtain ⟨u, hu⟩ := hr
@@ -43,21 +51,25 @@ theorem isLocalHom_toV (R K Ω : Type) [CommRing R] [IsDomain R] [Field K] [Alge
     exact ((u⁻¹ : Vˣ) : V).2
   rw [hV] at hmem
   obtain ⟨s, hs⟩ := hmem
-  have h1 : r * s = 1 := IsFractionRing.injective R K (by rw [map_mul, hs, map_one, mul_inv_cancel₀ hx0])
+  have h1 : r * s = 1 :=
+    IsFractionRing.injective R K (by rw [map_mul, hs, map_one, mul_inv_cancel₀ hx0])
   exact ⟨⟨r, s, h1, by rw [mul_comm]; exact h1⟩, rfl⟩
 
-def resMap (R K Ω : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [Field K] [Algebra R K] [IsFractionRing R K]
-    [Field Ω] [Algebra K Ω] (V : ValuationSubring Ω) (hV : IsAbove R K V.toSubring) :
-    ResidueField R →+* ResidueField V :=
+def resMap
+    (R K Ω : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [Field K] [Algebra R K]
+    [IsFractionRing R K] [Field Ω] [Algebra K Ω]
+    (V : ValuationSubring Ω) (hV : IsAbove R K V.toSubring)
+    : ResidueField R →+* ResidueField V :=
   haveI := isLocalHom_toV R K Ω V hV
   ResidueField.map (toV R K Ω V hV)
 
 open Polynomial
 
-theorem residue_algebraic (R K Ω : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K]
-    [IsFractionRing R K] [Field Ω] [Algebra K Ω] [Algebra.IsAlgebraic K Ω] (V : ValuationSubring Ω)
-    (hV : IsAbove R K V.toSubring) (a : ResidueField V) :
-    ∃ p : Polynomial (ResidueField R), p ≠ 0 ∧ p.eval₂ (resMap R K Ω V hV) a = 0 := by
+theorem residue_algebraic
+    (R K Ω : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K]
+    [IsFractionRing R K] [Field Ω] [Algebra K Ω] [Algebra.IsAlgebraic K Ω]
+    (V : ValuationSubring Ω) (hV : IsAbove R K V.toSubring) (a : ResidueField V)
+    : ∃ p : Polynomial (ResidueField R), p ≠ 0 ∧ p.eval₂ (resMap R K Ω V hV) a = 0 := by
   haveI : IsLocalHom (toV R K Ω V hV) := isLocalHom_toV R K Ω V hV
   letI := UniqueFactorizationMonoid.normalizationMonoid (α := R)
   letI := UniqueFactorizationMonoid.toNormalizedGCDMonoid R
@@ -68,11 +80,11 @@ theorem residue_algebraic (R K Ω : Type) [CommRing R] [IsDomain R] [IsDiscreteV
   let b : nonZeroDivisors R := ⟨b, hbmem⟩
   set q := IsLocalization.integerNormalization (nonZeroDivisors R) p
   have hφinj : Function.Injective (toV R K Ω V hV) := fun x y h =>
-    IsFractionRing.injective R K ((algebraMap K Ω).injective (by
-      have := congrArg Subtype.val h
-      rwa [coe_toV, coe_toV] at this))
-  have hq0 : q ≠ 0 :=
-    (IsLocalization.integerNormalization_eq_zero_iff le_rfl p).not.mpr hp0
+    IsFractionRing.injective R K
+      ((algebraMap K Ω).injective (by
+        have := congrArg Subtype.val h
+        rwa [coe_toV, coe_toV] at this))
+  have hq0 : q ≠ 0 := (IsLocalization.integerNormalization_eq_zero_iff le_rfl p).not.mpr hp0
   have hcomp : V.subtype.comp (toV R K Ω V hV) = (algebraMap K Ω).comp (algebraMap R K) :=
     RingHom.ext fun r => coe_toV R K Ω V hV r
   have hqw : Polynomial.eval₂ (toV R K Ω V hV) w q = 0 := by
@@ -93,15 +105,18 @@ theorem residue_algebraic (R K Ω : Type) [CommRing R] [IsDomain R] [IsDiscreteV
     have hmem : pp ∈ RingHom.ker (Polynomial.mapRingHom (residue R)) := by
       simpa [RingHom.mem_ker] using h0
     rw [Polynomial.ker_mapRingHom, ker_residue, hϖ.maximalIdeal_eq, Ideal.map_span,
-      Set.image_singleton, Ideal.mem_span_singleton] at hmem
+        Set.image_singleton, Ideal.mem_span_singleton]
+      at hmem
     exact hϖ.not_isUnit (Polynomial.isPrimitive_primPart q ϖ hmem)
   · rw [Polynomial.eval₂_map]
     change Polynomial.eval₂ ((ResidueField.map (toV R K Ω V hV)).comp (residue R)) _ _ = 0
     rw [ResidueField.map_comp_residue, ← Polynomial.hom_eval₂, hpp, map_zero]
 
-theorem eq_of_residue_eq {A : Type} [CommRing A] [IsDomain A] [IsLocalRing A] (q : A[X])
-    (hs : (q.map (residue A)).Separable) (b c : A) (hb : q.IsRoot b) (hc : q.IsRoot c)
-    (h : residue A b = residue A c) : b = c := by
+theorem eq_of_residue_eq
+    {A : Type} [CommRing A] [IsDomain A] [IsLocalRing A]
+    (q : A[X]) (hs : (q.map (residue A)).Separable)
+    (b c : A) (hb : q.IsRoot b) (hc : q.IsRoot c) (h : residue A b = residue A c)
+    : b = c := by
   by_contra hne
   obtain ⟨q1, rfl⟩ := Polynomial.dvd_iff_isRoot.2 hb
   have hc1 : q1.IsRoot c := by
@@ -114,7 +129,13 @@ theorem eq_of_residue_eq {A : Type} [CommRing A] [IsDomain A] [IsLocalRing A] (q
   simp only [Polynomial.map_sub, map_X, map_C, h] at h2
   exact not_isUnit_X_sub_C _ (isCoprime_self.1 h2.isCoprime)
 
-theorem residueField_inertiaFixed_isAlgClosed : ∀ (R K Ω : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [PerfectField (ResidueField R)] [Field K] [Algebra R K] [IsFractionRing R K] [Field Ω] [Algebra K Ω] [IsSepClosure K Ω] (V : ValuationSubring Ω), IsAbove R K V.toSubring → IsAlgClosed (IsLocalRing.ResidueField (V.comap (algebraMap (IntermediateField.fixedField (inertia K V)) Ω))) := by
+theorem residueField_inertiaFixed_isAlgClosed
+    : ∀ (R K Ω : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
+        [PerfectField (ResidueField R)] [Field K] [Algebra R K] [IsFractionRing R K] [Field Ω]
+        [Algebra K Ω] [IsSepClosure K Ω] (V : ValuationSubring Ω),
+      IsAbove R K V.toSubring
+        → IsAlgClosed (IsLocalRing.ResidueField (V.comap (algebraMap
+          (IntermediateField.fixedField (inertia K V)) Ω))) := by
   intro R K Ω _ _ _ _ _ _ _ _ _ _ V hV
   haveI : IsSepClosed Ω := IsSepClosure.sep_closed K
   haveI : Algebra.IsSeparable K Ω := IsSepClosure.separable
@@ -125,8 +146,10 @@ theorem residueField_inertiaFixed_isAlgClosed : ∀ (R K Ω : Type) [CommRing R]
     exact ⟨p, hp, h⟩⟩
   haveI : PerfectField (ResidueField V) := Algebra.IsAlgebraic.perfectField (ResidueField R)
 
-  have hred : ∀ s : Multiset V, ((s.map fun b => X - C b).prod).map (residue V) =
-      ((s.map (residue V)).map fun a => X - C a).prod := by
+  have hred
+      : ∀ s : Multiset V,
+        ((s.map fun b => X - C b).prod).map (residue V)
+          = ((s.map (residue V)).map fun a => X - C a).prod := by
     intro s
     rw [Polynomial.map_multiset_prod, Multiset.map_map, Multiset.map_map]
     congr 1
@@ -177,15 +200,18 @@ theorem residueField_inertiaFixed_isAlgClosed : ∀ (R K Ω : Type) [CommRing R]
   have hsurj : Function.Surjective (ResidueField.map jV) := by
     intro a
     have hsep : (minpoly (ResidueField R) a).Separable := Algebra.IsSeparable.isSeparable _ a
-    have hmon : (minpoly (ResidueField R) a).Monic := minpoly.monic (Algebra.IsIntegral.isIntegral a)
-    obtain ⟨g, hg, -, hgm⟩ := Polynomial.lifts_and_natDegree_eq_and_monic
-      ((Polynomial.mem_lifts _).2 (Polynomial.map_surjective _ residue_surjective _)) hmon
+    have hmon : (minpoly (ResidueField R) a).Monic :=
+      minpoly.monic (Algebra.IsIntegral.isIntegral a)
+    obtain ⟨g, hg, -, hgm⟩ :=
+      Polynomial.lifts_and_natDegree_eq_and_monic
+        ((Polynomial.mem_lifts _).2 (Polynomial.map_surjective _ residue_surjective _)) hmon
     set gV := g.map (toV R K Ω V hV) with hgV
     have hgV' : gV.map (residue V) = (minpoly (ResidueField R) a).map (resMap R K Ω V hV) := by
       rw [hgV, Polynomial.map_map, ← ResidueField.map_comp_residue, ← Polynomial.map_map, hg]
       rfl
     have hsepV : (gV.map (residue V)).Separable := by rw [hgV']; exact hsep.map
-    obtain ⟨s, hs⟩ := GlobalTheory.T.monic_splits_valuationSubring_of_separable_reduction Ω V gV (hgm.map _) hsepV
+    obtain ⟨s, hs⟩ :=
+      GlobalTheory.T.monic_splits_valuationSubring_of_separable_reduction Ω V gV (hgm.map _) hsepV
     have hroot : a ∈ (gV.map (residue V)).roots := by
       rw [Polynomial.mem_roots ((hgm.map _).map _).ne_zero, hgV', IsRoot, Polynomial.eval_map]
       exact minpoly.aeval _ a
@@ -205,7 +231,9 @@ theorem residueField_inertiaFixed_isAlgClosed : ∀ (R K Ω : Type) [CommRing R]
         rw [← sub_eq_zero, ← map_sub, residue_eq_zero_iff, ValuationSubring.valuation_lt_one_iff]
         exact hlt
       have hcroot : gV.IsRoot c := by
-        have key : ∀ y : V, ((gV.eval y : V) : Ω) = g.eval₂ ((algebraMap K Ω).comp (algebraMap R K)) (y : Ω) := by
+        have key
+            : ∀ y : V,
+              ((gV.eval y : V) : Ω) = g.eval₂ ((algebraMap K Ω).comp (algebraMap R K)) (y : Ω) := by
           intro y
           rw [hgV, Polynomial.eval_map]
           change V.subtype _ = _
@@ -213,11 +241,13 @@ theorem residueField_inertiaFixed_isAlgClosed : ∀ (R K Ω : Type) [CommRing R]
           rfl
         have hb0 := key b
         rw [hbroot.eq_zero] at hb0
-        have hcomm : (σ : Ω →+* Ω).comp ((algebraMap K Ω).comp (algebraMap R K)) =
-            (algebraMap K Ω).comp (algebraMap R K) := by
+        have hcomm
+            : (σ : Ω →+* Ω).comp ((algebraMap K Ω).comp (algebraMap R K))
+              = (algebraMap K Ω).comp (algebraMap R K) := by
           ext r; simp
         apply Subtype.ext
-        rw [key c, show ((c : V) : Ω) = (σ : Ω →+* Ω) b from rfl, ← hcomm, ← Polynomial.hom_eval₂, ← hb0]
+        rw [key c, show ((c : V) : Ω) = (σ : Ω →+* Ω) b from rfl, ← hcomm, ← Polynomial.hom_eval₂,
+          ← hb0]
         simp
       have := eq_of_residue_eq gV hsepV c b hcroot hbroot hres
       exact congrArg Subtype.val this

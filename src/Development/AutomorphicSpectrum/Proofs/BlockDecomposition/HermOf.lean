@@ -28,8 +28,8 @@ def hermE (σ : E →ₐ[F] E) (n : ℕ) : Submodule F (Matrix (Fin n) (Fin n) E
     intro t c hc a b
     simp [hc a b]
 
-def hermIn (R : Type) [CommRing R] [Algebra F R] (σ : E →ₐ[F] E) (n : ℕ) :
-    hermE σ n →+ HermR R σ n where
+def hermIn (R : Type) [CommRing R] [Algebra F R] (σ : E →ₐ[F] E) (n : ℕ)
+    : hermE σ n →+ HermR R σ n where
   toFun c := hermOf R σ c.1 c.2
   map_zero' := by
     apply Subtype.ext
@@ -63,19 +63,22 @@ def Kc {n : ℕ} (c : Matrix (Fin n) (Fin n) E) : AddSubgroup (Fin n → 𝓞 E)
     obtain ⟨o, ho⟩ := hy i
     obtain ⟨p, hp⟩ := hz i
     refine ⟨o + p, ?_⟩
-    have : (fun j => algebraMap (𝓞 E) E ((y + z) j)) =
-        (fun j => algebraMap (𝓞 E) E (y j)) + fun j => algebraMap (𝓞 E) E (z j) := by
+    have : (fun j => algebraMap (𝓞 E) E ((y + z) j))
+        = (fun j => algebraMap (𝓞 E) E (y j)) + fun j => algebraMap (𝓞 E) E (z j) := by
       funext j
       simp
     rw [this, Matrix.mulVec_add, Pi.add_apply, ← ho, ← hp, map_add (f := _)]
-  zero_mem' := fun i => ⟨0, by
-    have h0 : (fun _ : Fin n => (0 : E)) = 0 := rfl
-    simp [h0, Matrix.mulVec_zero]⟩
+  zero_mem' := fun i => ⟨
+    0,
+    by
+      have h0 : (fun _ : Fin n => (0 : E)) = 0 := rfl
+      simp [h0, Matrix.mulVec_zero]
+  ⟩
   neg_mem' := by
     intro y hy i
     obtain ⟨o, ho⟩ := hy i
     refine ⟨-o, ?_⟩
-    have : (fun j => algebraMap (𝓞 E) E ((-y) j)) = -fun j => algebraMap (𝓞 E) E (y j) := by
+    have : (fun j => algebraMap (𝓞 E) E ((-y) j)) = - fun j => algebraMap (𝓞 E) E (y j) := by
       funext j
       simp
     rw [this, Matrix.mulVec_neg, Pi.neg_apply, ← ho, map_neg]

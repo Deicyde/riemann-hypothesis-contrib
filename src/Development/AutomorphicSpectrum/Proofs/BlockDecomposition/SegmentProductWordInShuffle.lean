@@ -10,7 +10,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SegmentP
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult Zc Zc.M
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult Zc Zc.M
 
 noncomputable section
 
@@ -20,43 +21,46 @@ open Zc.Comb
 
 variable {α β : Type*}
 
-theorem interleave_filter (f : β → α) (q : β → Bool) (P : List β) :
-    Interleave ((P.filter q).map f) ((P.filter fun p => !q p).map f) (P.map f) := by
+theorem interleave_filter (f : β → α) (q : β → Bool) (P : List β)
+    : Interleave ((P.filter q).map f) ((P.filter fun p => ! q p).map f) (P.map f) := by
   induction P with
   | nil => exact Zc.Comb.Interleave.nil
   | cons p P ih =>
     cases hq : q p with
     | true =>
-      simp only [List.filter_cons, hq, Bool.not_true, Bool.false_eq_true, ↓reduceIte,
+      simp only [List.filter_cons, hq, Bool.not_true, Bool.false_eq_true, ↓ reduceIte,
         List.map_cons]
       exact Zc.Comb.Interleave.left ih
     | false =>
-      simp only [List.filter_cons, hq, Bool.not_false, Bool.false_eq_true, ↓reduceIte,
+      simp only [List.filter_cons, hq, Bool.not_false, Bool.false_eq_true, ↓ reduceIte,
         List.map_cons]
       exact Zc.Comb.Interleave.right ih
 
-theorem shuffle_range (f : β → α) (c : β → ℕ) (n : ℕ) : ∀ (s : ℕ) (P : List β),
-    (∀ p ∈ P, s ≤ c p ∧ c p < s + n) →
-      Shuffle ((List.range' s n).map fun i => (P.filter fun p => c p = i).map f) (P.map f) := by
+theorem shuffle_range (f : β → α) (c : β → ℕ) (n : ℕ)
+    : ∀ (s : ℕ) (P : List β),
+      (∀ p ∈ P, s ≤ c p ∧ c p < s + n)
+        → Shuffle ((List.range' s n).map fun i => (P.filter fun p => c p = i).map f) (P.map f) := by
   induction n with
   | zero =>
     intro s P hP
-    have hnil : P = [] := List.eq_nil_iff_forall_not_mem.mpr fun p hp => by
-      have := hP p hp
-      omega
+    have hnil : P = [] :=
+      List.eq_nil_iff_forall_not_mem.mpr fun p hp => by
+        have := hP p hp
+        omega
     subst hnil
     exact Zc.Comb.Shuffle.nil
   | succ n ih =>
     intro s P hP
     simp only [List.range'_succ, List.map_cons]
-    refine Zc.Comb.Shuffle.cons (v := (P.filter fun p => !decide (c p = s)).map f) ?_
+    refine Zc.Comb.Shuffle.cons (v := (P.filter fun p => ! decide (c p = s)).map f) ?_
       (GlobalTheory.CompanionTheory.CuspShuffle.interleave_filter f (fun p => decide (c p = s)) P)
-    have h := ih (s + 1) (P.filter fun p => !decide (c p = s)) (by
-      intro p hp
-      rw [List.mem_filter] at hp
-      have h1 := hP p hp.1
-      have hne : c p ≠ s := by simpa using hp.2
-      omega)
+    have h :=
+      ih (s + 1) (P.filter fun p => ! decide (c p = s)) (by
+        intro p hp
+        rw [List.mem_filter] at hp
+        have h1 := hP p hp.1
+        have hne : c p ≠ s := by simpa using hp.2
+        omega)
     convert h using 1
     apply List.map_congr_left
     intro i hi
@@ -70,10 +74,15 @@ theorem shuffle_range (f : β → α) (c : β → ℕ) (n : ℕ) : ∀ (s : ℕ)
       simp [hc, his]
     · simp [hc]
 
-theorem shuffle_of_colouring {h : ℕ} (W : List α) (c : Fin W.length → Fin h) (D : Fin h → List α)
-    (hD : ∀ i, Zc.Cos.sub W c i = D i) : Shuffle (List.ofFn D) W := by
-  have key := GlobalTheory.CompanionTheory.CuspShuffle.shuffle_range W.get (fun p => (c p : ℕ)) h 0 (List.finRange W.length)
-    (fun p _ => ⟨Nat.zero_le _, by simpa using (c p).isLt⟩)
+theorem shuffle_of_colouring
+    {h : ℕ}
+    (W : List α) (c : Fin W.length → Fin h) (D : Fin h → List α) (hD : ∀ i, Zc.Cos.sub W c i = D i)
+    : Shuffle (List.ofFn D) W := by
+  have key :=
+    GlobalTheory.CompanionTheory.CuspShuffle.shuffle_range W.get
+      (fun p => (c p : ℕ))
+      h 0 (List.finRange W.length)
+      (fun p _ => ⟨Nat.zero_le _, by simpa using (c p).isLt⟩)
   convert key using 1
   · apply List.ext_getElem
     · simp
@@ -99,10 +108,13 @@ theorem decWord_eq_decW (Δ : Segment k) : Zc.Cos.decWord Δ = decW Δ := by
     simp only [Fin.val_rev, List.length_ofFn]
     omega
 
-theorem inShW_of_wd {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (hA : GlobalTheory.Published.IrreducibleAdmissibleGL) (hL : LSegJacquet k) {h N : ℕ} (x : Fin h → IrrGL (k := k))
-    (hd : ∑ a, (x a).1 = N) (Δ : Fin h → Segment k) (hΔ : ∀ i, IsLSeg (Δ i) (x i).rep) (w : List (IrrGL (k := k)))
-    (hc : ∀ c ∈ w, c.IsCusp) (hw : Wd (prodIrr x hd) w) : InShW (Finset.univ.val.map Δ) w := by
+theorem inShW_of_wd
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (hA : GlobalTheory.Published.IrreducibleAdmissibleGL) (hL : LSegJacquet k)
+    {h N : ℕ} (x : Fin h → IrrGL (k := k)) (hd : ∑ a, (x a).1 = N) (Δ : Fin h → Segment k)
+    (hΔ : ∀ i, IsLSeg (Δ i) (x i).rep)
+    (w : List (IrrGL (k := k))) (hc : ∀ c ∈ w, c.IsCusp) (hw : Wd (prodIrr x hd) w)
+    : InShW (Finset.univ.val.map Δ) w := by
   obtain ⟨hsum, hne⟩ := hw
   have hmult := GlobalTheory.T.segment_product_jacquet_shuffle_count hA hL Δ x hd hΔ w hc
   have hpos : Zc.Cos.jmL w (GlobalTheory.LocGL.prodIrr x hd) ≠ 0 := by

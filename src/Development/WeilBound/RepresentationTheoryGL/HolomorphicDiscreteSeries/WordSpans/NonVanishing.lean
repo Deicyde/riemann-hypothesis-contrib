@@ -12,16 +12,25 @@ open scoped InnerProductSpace ComplexConjugate
 
 namespace PositivityTheory.RgHe.SM.WordSpanNonVanishing
 
-open Formalism.REAL Formalism.MainNotions.S PositivityTheory.UnitaryDecomposition Formalism.FourierDecayAlt.P.CapelliAbstractCharacter CompanionTheory.D.DSIC PositivityTheory.UnitaryDecomposition.Com
+open Formalism.REAL Formalism.MainNotions.S PositivityTheory.UnitaryDecomposition
+  Formalism.FourierDecayAlt.P.CapelliAbstractCharacter CompanionTheory.D.DSIC
+  PositivityTheory.UnitaryDecomposition.Com
 
-theorem nonvan (hKey : KeyId) {N : ℕ} {ε : Fin (N + 2) → Bool} {ε' : Fin (N + 1) → Bool} {e : Fin (N + 1) ⊕ Unit ≃ Fin (N + 2)}
-    {lam : Fin (N + 2) → ℝ} {mu : Fin (N + 1) → ℝ} {H H' : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-    [NormedAddCommGroup H'] [InnerProductSpace ℂ H'] [CompleteSpace H'] {π : Matrix (Fin (N + 2)) (Fin (N + 2)) ℂ → (H →L[ℂ] H)}
-    {σ : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ → (H' →L[ℂ] H')} {S : Submodule ℂ H} {E : Fin (N + 2) → Fin (N + 2) → Module.End ℂ S}
-    {S' : Submodule ℂ H'} {E' : Fin (N + 1) → Fin (N + 1) → Module.End ℂ S'} {P : H →L[ℂ] H'} (hG : Gp ε lam ε' mu e)
-    (hπ : IsDS ε lam π) (hσ : IsDS ε' mu σ) (hS : IsSmMod ε π S E) (hS' : IsSmMod ε' σ S' E') (hP : Intertw ε' e π σ P)
-    (hP0 : P ≠ 0) (X : Dec ε' mu σ) (hκ : ∀ s, X.κ s = (mu s : ℂ) + (((N + 1 : ℕ) : ℂ) - 1) / 2) (j : Fin (N + 1))
-    (hj : j ∈ X.S) (hwall : ∀ s, mu j - 1 / 2 ≠ lam s) : ∃ η ∈ S, X.p j (phi E e P η) ≠ 0 := by
+theorem nonvan
+    (hKey : KeyId)
+    {N : ℕ} {ε : Fin (N + 2) → Bool} {ε' : Fin (N + 1) → Bool}
+    {e : Fin (N + 1) ⊕ Unit ≃ Fin (N + 2)} {lam : Fin (N + 2) → ℝ} {mu : Fin (N + 1) → ℝ}
+    {H H' : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    [NormedAddCommGroup H'] [InnerProductSpace ℂ H'] [CompleteSpace H']
+    {π : Matrix (Fin (N + 2)) (Fin (N + 2)) ℂ → (H →L[ℂ] H)}
+    {σ : Matrix (Fin (N + 1)) (Fin (N + 1)) ℂ → (H' →L[ℂ] H')} {S : Submodule ℂ H}
+    {E : Fin (N + 2) → Fin (N + 2) → Module.End ℂ S} {S' : Submodule ℂ H'}
+    {E' : Fin (N + 1) → Fin (N + 1) → Module.End ℂ S'} {P : H →L[ℂ] H'}
+    (hG : Gp ε lam ε' mu e) (hπ : IsDS ε lam π) (hσ : IsDS ε' mu σ) (hS : IsSmMod ε π S E)
+    (hS' : IsSmMod ε' σ S' E') (hP : Intertw ε' e π σ P) (hP0 : P ≠ 0)
+    (X : Dec ε' mu σ) (hκ : ∀ s, X.κ s = (mu s : ℂ) + (((N + 1 : ℕ) : ℂ) - 1) / 2)
+    (j : Fin (N + 1)) (hj : j ∈ X.S) (hwall : ∀ s, mu j - 1 / 2 ≠ lam s)
+    : ∃ η ∈ S, X.p j (phi E e P η) ≠ 0 := by
   classical
   set ι : Fin (N + 1) → Fin (N + 2) := fun a => e (Sum.inl a) with hι
   set z : Fin (N + 2) := zi e with hz
@@ -30,18 +39,18 @@ theorem nonvan (hKey : KeyId) {N : ℕ} {ε : Fin (N + 2) → Bool} {ε' : Fin (
     intro a h
     have := e.injective h
     simp at this
-  have hPS : ∀ v : S, P v ∈ S' := fun v =>
-    (hS'.mem _).2 (smooth_map hG.fits hP ((hS.mem _).1 v.2))
-  let f : S →ₗ[ℂ] S' :=
-    { toFun := fun v => ⟨P v, hPS v⟩
-      map_add' := by
-        intro x y
-        ext
-        simp
-      map_smul' := by
-        intro c x
-        ext
-        simp }
+  have hPS : ∀ v : S, P v ∈ S' := fun v => (hS'.mem _).2 (smooth_map hG.fits hP ((hS.mem _).1 v.2))
+  let f : S →ₗ[ℂ] S' := {
+    toFun := fun v => ⟨P v, hPS v⟩
+    map_add' := by
+      intro x y
+      ext
+      simp
+    map_smul' := by
+      intro c x
+      ext
+      simp
+  }
   have hfv : ∀ v : S, ((f v : S') : H') = P v := fun v => rfl
   have hf : ∀ (a b : Fin (N + 1)) (x : S), f (E (ι a) (ι b) x) = E' a b (f x) := by
     intro a b x
@@ -52,7 +61,7 @@ theorem nonvan (hKey : KeyId) {N : ℕ} {ε : Fin (N + 2) → Bool} {ε' : Fin (
   set mσ : Fin (N + 1) → ℂ := fun s => (mu s : ℂ) - (((N + 1 : ℕ) : ℂ) - 1) / 2 with hmσ
   have hcapπ : ∀ (u : ℂ) (v : S), qdet E u v = (∏ s, (u + mπ s)) • v := cap_of hG.hc hπ hS
   have hcapσ : ∀ (u : ℂ) (v : S'), qdet E' u v = (∏ s, (u + mσ s)) • v := cap_of hG.hc' hσ hS'
-  have hw0 : ∀ y : S', qdet E' (-mσ j) y = 0 := by
+  have hw0 : ∀ y : S', qdet E' (- mσ j) y = 0 := by
     intro y
     rw [hcapσ, Finset.prod_eq_zero (Finset.mem_univ j) (by ring), zero_smul]
   set cG : ℂ := ∏ s, (-mσ j + 1 + mπ s) with hcGdef
@@ -60,15 +69,22 @@ theorem nonvan (hKey : KeyId) {N : ℕ} {ε : Fin (N + 2) → Bool} {ε' : Fin (
     rw [hcGdef, Finset.prod_ne_zero_iff]
     intro s _ h
     apply hwall s
-    have h' : -((mu j : ℂ) - (((N + 1 : ℕ) : ℂ) - 1) / 2) + 1 + ((lam s : ℂ) - (((N + 2 : ℕ) : ℂ) - 1) / 2) = 0 := h
+    have h'
+        : -((mu j : ℂ) - (((N + 1 : ℕ) : ℂ) - 1) / 2) + 1
+            + ((lam s : ℂ) - (((N + 2 : ℕ) : ℂ) - 1) / 2)
+          = 0 :=
+      h
     push_cast at h'
     have h2 : ((mu j - 1 / 2 : ℝ) : ℂ) = (lam s : ℂ) := by
       push_cast
       linear_combination -h'
     exact_mod_cast h2
-  have hK : ∀ v : S, cG • f v = -∑ c : Fin (N + 1),
-      (Th E' (-mσ j)) (fun l => f ((E (ι l) z) ((E z (ι c)) v))) c :=
-    fun v => hKey S S' N E E' ι z f hS.gl hιinj hιz hf (-mσ j) cG (fun x => hcapπ _ x) hw0 v
+  have hK
+      : ∀ v : S,
+        cG • f v
+          = - ∑ c : Fin (N + 1),
+            (Th E' (-mσ j)) (fun l => f ((E (ι l) z) ((E z (ι c)) v))) c := fun v =>
+    hKey S S' N E E' ι z f hS.gl hιinj hιz hf (- mσ j) cG (fun x => hcapπ _ x) hw0 v
   by_contra hno
   push_neg at hno
   let lift : (Fin (N + 1) → H') → Fin (N + 1) → S' := fun y l =>
@@ -76,7 +92,7 @@ theorem nonvan (hKey : KeyId) {N : ℕ} {ε : Fin (N + 2) → Bool} {ε' : Fin (
   have hlift : ∀ y ∈ SmT ε' σ, ∀ l, ((lift y l : S') : H') = y l := by
     intro y hy l
     simp [lift, (hS'.mem _).2 (hy l)]
-  have hT0 : ∀ u : S, (Th E' (-mσ j)) (fun l => f ((E (ι l) z) u)) = 0 := by
+  have hT0 : ∀ u : S, (Th E' (- mσ j)) (fun l => f ((E (ι l) z) u)) = 0 := by
     intro u
     set x : Fin (N + 1) → H' := phi E e P (u : H) with hxdef
     have hxl : ∀ l, x l = P ((E (ι l) z) u) := by
@@ -90,8 +106,8 @@ theorem nonvan (hKey : KeyId) {N : ℕ} {ε : Fin (N + 2) → Bool} {ε' : Fin (
       funext l
       apply Subtype.ext
       rw [Finset.sum_apply, Submodule.coe_sum]
-      have : ∀ t ∈ X.S, ((lift (X.p t x) l : S') : H') = X.p t x l :=
-        fun t ht => hlift _ (X.p_sm t ht x hx) l
+      have : ∀ t ∈ X.S, ((lift (X.p t x) l : S') : H') = X.p t x l := fun t ht =>
+        hlift _ (X.p_sm t ht x hx) l
       rw [Finset.sum_congr rfl this, ← Finset.sum_apply, X.sum x hx, hxl, hfv]
     have heig : ∀ t ∈ X.S, (EE E') (lift (X.p t x)) = X.κ t • lift (X.p t x) := by
       intro t ht
@@ -131,11 +147,11 @@ theorem nonvan (hKey : KeyId) {N : ℕ} {ε : Fin (N + 2) → Bool} {ε' : Fin (
     push_cast
     have : (0 : ℝ) ≤ ((N : ℝ) + 2) ^ 3 := by positivity
     nlinarith
-  have hdense : Dense (S : Set H) :=
-    PositivityTheory.RgHe.SM.dense_sm (by omega) hG.hc hπ hgap hS
+  have hdense : Dense (S : Set H) := PositivityTheory.RgHe.SM.dense_sm (by omega) hG.hc hπ hgap hS
   apply hP0
-  have heq := Continuous.ext_on hdense P.continuous (continuous_const (y := (0 : H')))
-    (fun x hx => hPv ⟨x, hx⟩)
+  have heq :=
+    Continuous.ext_on hdense P.continuous (continuous_const (y := (0 : H')))
+      (fun x hx => hPv ⟨x, hx⟩)
   ext x
   simpa using congrFun heq x
 

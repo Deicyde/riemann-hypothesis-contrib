@@ -10,14 +10,16 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Ncard
 
 @[expose] public section
 
-open Finset ArithmeticFunction NumberField IsDedekindDomain Filter Topology GlobalTheory.Mem.An Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab
+open Finset ArithmeticFunction NumberField IsDedekindDomain Filter Topology GlobalTheory.Mem.An
+  Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab
 open scoped nonZeroDivisors
 
 namespace GlobalTheory.HostSplit
 
-theorem absNorm_eq_of_ncard_placesOver (E : Type) [Field E] [NumberField E] [IsGalois ℚ E] {p : ℕ}
-    (hp : p.Prime) (h : (placesOver E p).ncard = Module.finrank ℚ E) :
-    ∀ v ∈ placesOver E p, Ideal.absNorm v.asIdeal = p := by
+theorem absNorm_eq_of_ncard_placesOver
+    (E : Type) [Field E] [NumberField E] [IsGalois ℚ E]
+    {p : ℕ} (hp : p.Prime) (h : (placesOver E p).ncard = Module.finrank ℚ E)
+    : ∀ v ∈ placesOver E p, Ideal.absNorm v.asIdeal = p := by
   intro v hv
   have : IsGaloisGroup (E ≃ₐ[ℚ] E) ℤ (𝓞 E) := IsGaloisGroup.of_isFractionRing _ _ _ ℚ E
   have hmax : (Ideal.span {(p : ℤ)}).IsMaximal :=
@@ -29,10 +31,12 @@ theorem absNorm_eq_of_ncard_placesOver (E : Type) [Field E] [NumberField E] [IsG
     show algebraMap ℤ (𝓞 E) ((p : ℕ) : ℤ) ∈ v.asIdeal
     rw [map_natCast]
     exact hv
-  have hf := Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn (Ideal.span {(p : ℤ)}) (𝓞 E)
-    (E ≃ₐ[ℚ] E)
+  have hf :=
+    Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn (Ideal.span {(p : ℤ)}) (𝓞 E)
+      (E ≃ₐ[ℚ] E)
   rw [← ncard_placesOver E hp, h, IsGalois.card_aut_eq_finrank,
-    Ideal.inertiaDegIn_eq_inertiaDeg (Ideal.span {(p : ℤ)}) v.asIdeal (E ≃ₐ[ℚ] E)] at hf
+      Ideal.inertiaDegIn_eq_inertiaDeg (Ideal.span {(p : ℤ)}) v.asIdeal (E ≃ₐ[ℚ] E)]
+    at hf
   have hpos : 0 < Module.finrank ℚ E := Module.finrank_pos
   have h1 := Nat.eq_of_mul_eq_mul_left hpos (hf.trans (mul_one _).symm)
   have h2 := Nat.eq_one_of_mul_eq_one_left h1
@@ -41,10 +45,11 @@ theorem absNorm_eq_of_ncard_placesOver (E : Type) [Field E] [NumberField E] [IsG
   rw [← h3]
   simp
 
-theorem split_completely_of_modEq_one : ∀ (R : Ranks) (H : Host R) (p : ℕ), p.Prime →
-    p ≡ 1 [MOD H.QS * H.q * H.d] →
-    (placesOver H.E p).ncard = Module.finrank ℚ H.E ∧ H.cls p = PrimeClass.splitK ∧
-      ∀ v ∈ placesOver H.E p, Ideal.absNorm v.asIdeal = p := by
+theorem split_completely_of_modEq_one
+    : ∀ (R : Ranks) (H : Host R) (p : ℕ),
+      p.Prime → p ≡ 1 [MOD H.QS * H.q * H.d]
+        → (placesOver H.E p).ncard = Module.finrank ℚ H.E ∧ H.cls p = PrimeClass.splitK
+          ∧ ∀ v ∈ placesOver H.E p, Ideal.absNorm v.asIdeal = p := by
   intro R H p hp hc
   have hn : 0 < H.QS := H.QS_pos
   have hq : 0 < H.q := H.hyp.1.pos

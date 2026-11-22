@@ -21,12 +21,20 @@ public import Formalism.SharpRestriction.GenusPolyhedralBounds.RelativeIndexClas
 set_option autoImplicit false
 noncomputable section
 open AlgebraicGeometry CategoryTheory NumberField IsLocalRing IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.DVR ReciprocityTheory.ChartRestriction.G.DVR.QForm Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.MainNotions.Gaps.EtaleWeightGaps
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.DVR ReciprocityTheory.ChartRestriction.G.DVR.QForm
+  Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons
+  Formalism.MainNotions.Gaps.EtaleWeightGaps
 open GlobalTheory.PtTie
 namespace GlobalTheory.PtTie
 
-theorem exists_inPsi_iE_eq_embK : ∀ (D : D7) (T : Top D) (h : LawsP T) (hinj : Function.Injective D.what₂.OtoLL), ∃ τ : D.host.E →+* ℂ, InPsi T.Q.H τ ∧ ∀ x : 𝓞 D.host.E, ((iE D hinj (recB h.toLawsCore) x : 𝓞 T.Q.c.F) : T.Q.c.F) = embK T.Q.c τ x := by
+theorem exists_inPsi_iE_eq_embK
+    : ∀ (D : D7) (T : Top D) (h : LawsP T) (hinj : Function.Injective D.what₂.OtoLL),
+      ∃ τ : D.host.E →+* ℂ,
+        InPsi T.Q.H τ
+          ∧ ∀ x : 𝓞 D.host.E,
+            ((iE D hinj (recB h.toLawsCore) x : 𝓞 T.Q.c.F) : T.Q.c.F) = embK T.Q.c τ x := by
   intro D T h hinj
   obtain ⟨hH, -, hF, -⟩ := h.pins
   refine ⟨D.host.φ₀, ?_, fun x => ?_⟩

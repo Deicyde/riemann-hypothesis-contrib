@@ -40,8 +40,7 @@ private lemma exists_frob (p f : ℕ) (hp : p.Prime) (F : Type) [Field F] (h : (
   haveI : ExpChar F p := ExpChar.prime hp
   exact ⟨iterateFrobenius F p f, fun a => iterateFrobenius_def p f a⟩
 
-theorem UpperTheory.Gal.Mod.cycAll :
-    ResClosed → ValLift → CycRes → CycExt → CycAll := by
+theorem UpperTheory.Gal.Mod.cycAll : ResClosed → ValLift → CycRes → CycExt → CycAll := by
   intro hRC hVL hCR hCE p f n hp Y π T w hOne hPt hdense hbasic Ω _ _ x hgen
   obtain ⟨η, hη, hsp⟩ := hdense (pt x)
   obtain ⟨V, _, _, _, _, y, Ω', _, _, a, b, hpV, hsq⟩ := hVL p Y Ω x η hsp hη
@@ -54,22 +53,24 @@ theorem UpperTheory.Gal.Mod.cycAll :
   have hptB : pt (sp b ≫ resPt V ≫ y) = y (IsLocalRing.closedPoint V) := by
     change y (resPt V (sp b (IsLocalRing.closedPoint Ω'))) = _
     rw [sp_closedPoint, resPt_closedPoint]
-  have hyx : y (IsLocalRing.closedPoint V) = pt x := by
-    rw [← hptB, ← hsq, hptA]
+  have hyx : y (IsLocalRing.closedPoint V) = pt x := by rw [← hptB, ← hsq, hptA]
   have hpΩ := natCast_eq_zero_of_pt x hx0
   have hpΩ' := natCast_eq_zero_of_pt (sp a ≫ x) (by rw [hptA]; exact hx0)
-  have hpR := natCast_eq_zero_of_pt (resPt V ≫ y) (by
-    change y (resPt V (IsLocalRing.closedPoint _)) ∉ _
-    rw [resPt_closedPoint, hyx]
-    exact hx0)
+  have hpR :=
+    natCast_eq_zero_of_pt (resPt V ≫ y) (by
+      change y (resPt V (IsLocalRing.closedPoint _)) ∉ _
+      rw [resPt_closedPoint, hyx]
+      exact hx0)
   obtain ⟨φ, hφ⟩ := exists_frob p f hp Ω hpΩ
   obtain ⟨φ', hφ'⟩ := exists_frob p f hp Ω' hpΩ'
   obtain ⟨ψ, hψ⟩ := exists_frob p f hp (IsLocalRing.ResidueField V) hpR
   refine ⟨φ, hφ, ?_⟩
   have hW : ∀ j, IsWt (T j).p (w j) := fun j => (hOne j).1
   have h1 := hCR p (p ^ f) n Y π T w hOne hPt V hpV y (by rw [hyx]; exact hgen) ψ hψ
-  have h2 := (hCE p (p ^ f) n Y T w hW _ Ω' b ψ φ'
-    (RingHom.ext fun z => by simp [hψ, hφ', map_pow]) (resPt V ≫ y)).mp h1
+  have h2 :=
+    (hCE p (p ^ f) n Y T w hW _ Ω' b ψ φ' (RingHom.ext fun z => by simp [hψ, hφ', map_pow])
+      (resPt V ≫ y)).mp h1
   rw [← hsq] at h2
-  exact (hCE p (p ^ f) n Y T w hW Ω Ω' a φ φ'
-    (RingHom.ext fun z => by simp [hφ, hφ', map_pow]) x).mpr h2
+  exact
+    (hCE p (p ^ f) n Y T w hW Ω Ω' a φ φ' (RingHom.ext fun z => by simp [hφ, hφ', map_pow]) x).mpr
+      h2

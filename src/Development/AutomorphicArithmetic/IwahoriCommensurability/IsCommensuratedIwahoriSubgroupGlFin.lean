@@ -12,11 +12,12 @@ public import Development.AutomorphicArithmetic.IwahoriCommensurability.IsCommen
 
 open Formalism.UG
 
-theorem UpperTheory.isCommensurated_iwahoriSubgroup_gl_fin :
-    ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ), Formalism.UG.IsCommensurated (GlobalTheory.SmGL.iwahori k (Fin n)) := by
+theorem UpperTheory.isCommensurated_iwahoriSubgroup_gl_fin
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : ℕ),
+      Formalism.UG.IsCommensurated (GlobalTheory.SmGL.iwahori k (Fin n)) := by
   intro k _ _ _ _ n
-  have h : GlobalTheory.SmGL.iwahori k (Fin n) =
-      GroundTheory.Automorphic.GLnLocal.iwahori k n := by
+  have h : GlobalTheory.SmGL.iwahori k (Fin n) = GroundTheory.Automorphic.GLnLocal.iwahori k n := by
     ext g
     constructor
     · rintro ⟨u, hu, rfl⟩

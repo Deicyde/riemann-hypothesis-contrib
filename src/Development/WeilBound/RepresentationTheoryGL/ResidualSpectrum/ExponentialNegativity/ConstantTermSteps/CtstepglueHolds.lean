@@ -7,7 +7,8 @@ public import Development.WeilBound.RepresentationTheoryGL.ResidualSpectrum.Expo
 noncomputable section
 
 open NumberField MeasureTheory Filter Topology Polynomial
-open GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.AutomorphicForm
+open GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.AutomorphicForm
 open scoped NumberField.AdeleRing
 
 namespace PositivityTheory.Rg.Rs
@@ -24,8 +25,10 @@ theorem ctstepglue_holds : An.CtStepGlue := by
   intro b hb x hx q hq
   set S : ℝ := ∑ r' ∈ (Finset.range n).erase r, m r' * sr x r' with hS
   have hrmem : r ∈ Finset.range n := Finset.mem_range.2 hrn
-  have hsum : ∀ (f : ℕ → ℝ) (y : Fin n → ℝ), (∀ r' ≠ r, f r' = m r') → (∀ r' ≠ r, sr y r' = sr x r') →
-      ∑ r' ∈ Finset.range n, f r' * sr y r' = f r * sr y r + S := by
+  have hsum
+      : ∀ (f : ℕ → ℝ) (y : Fin n → ℝ),
+        (∀ r' ≠ r, f r' = m r') → (∀ r' ≠ r, sr y r' = sr x r')
+          → ∑ r' ∈ Finset.range n, f r' * sr y r' = f r * sr y r + S := by
     intro f y hf hy
     rw [← Finset.add_sum_erase _ _ hrmem, hS]
     congr 1
@@ -45,9 +48,12 @@ theorem ctstepglue_holds : An.CtStepGlue := by
     refine Finset.sum_congr rfl fun j _ => ?_
     simp only [hu, ← mul_assoc, aR_mul]
     congr 4
-    push_cast; ring
+    push_cast
+    ring
 
-  have hmove : ∀ (t : ℝ) (h : AdelicGLn.AdelicGL K n), ctn r φ (aR K n r t * (b * h)) = ctn r φ (b * (aR K n r t * h)) := by
+  have hmove
+      : ∀ (t : ℝ) (h : AdelicGLn.AdelicGL K n),
+        ctn r φ (aR K n r t * (b * h)) = ctn r φ (b * (aR K n r t * h)) := by
     intro t h
     obtain ⟨X, hX⟩ := borel_aR (r := r) (hωB hb) t
     have : aR K n r t * b = unipGL (-X) * (b * aR K n r t) := by
@@ -62,7 +68,8 @@ theorem ctstepglue_holds : An.CtStepGlue := by
       rw [hmove, ← mul_assoc (aR K n r j), ← tor_shift, hx',
         show shift r (shift r x (-(i : ℝ))) (j : ℝ) = shift r x ((j : ℝ) - i) from by
           funext l; simp only [shift]; split_ifs <;> ring]
-    have hsr : ∀ r', sr (shift r x ((j : ℝ) - i)) r' = sr x r' + if r' = r then (j : ℝ) - i else 0 :=
+    have hsr
+        : ∀ r', sr (shift r x ((j : ℝ) - i)) r' = sr x r' + if r' = r then (j : ℝ) - i else 0 :=
       sr_shift hr hrn x _
     have hx2 : ∀ r', -t₀ ≤ sr (shift r x ((j : ℝ) - i)) r' := by
       intro r'
@@ -79,16 +86,18 @@ theorem ctstepglue_holds : An.CtStepGlue := by
     have hv : |sr x r + ((j : ℝ) - i)| ≤ |t₀| + 1 + d := by
       rw [abs_le]; constructor <;> cases abs_cases t₀ <;> linarith
     have hexp : Real.exp (m r * (sr x r + ((j : ℝ) - i))) ≤ E := by
-      rw [hE]; apply Real.exp_le_exp.2
-      calc m r * (sr x r + ((j : ℝ) - i)) ≤ |m r * (sr x r + ((j : ℝ) - i))| := le_abs_self _
+      rw [hE]
+      apply Real.exp_le_exp.2
+      calc
+        m r * (sr x r + ((j : ℝ) - i))
+          ≤ |m r * (sr x r + ((j : ℝ) - i))| := le_abs_self _
         _ = |m r| * |sr x r + ((j : ℝ) - i)| := abs_mul _ _
         _ ≤ |m r| * (|t₀| + 1 + d) := mul_le_mul_of_nonneg_left hv (abs_nonneg _)
     have hC : C₁ ≤ max C₁ 0 := le_max_left _ _
     gcongr
   have hmain := hC₂ u M hrecu hinit hM0 i
   have heq : ctn r φ (b * tor K x * q) = u i := by
-    have : x = shift r x' (i : ℝ) := by
-      funext l; simp only [hx', shift]; split_ifs <;> ring
+    have : x = shift r x' (i : ℝ) := by funext l; simp only [hx', shift]; split_ifs <;> ring
     simp only [hu, hg₀]
     conv_lhs => rw [this, tor_shift]
     rw [mul_assoc b (tor K x') q, hmove]
@@ -98,7 +107,8 @@ theorem ctstepglue_holds : An.CtStepGlue := by
   rw [hsum (Function.update m r κ) x (fun r' h => Function.update_of_ne h _ _) (fun _ _ => rfl),
     Function.update_self, Real.exp_add, hM]
   have hk : Real.exp (κ * i) ≤ Real.exp (κ * sr x r) * Real.exp (|κ| * (|t₀| + 1)) := by
-    rw [← Real.exp_add]; apply Real.exp_le_exp.2
+    rw [← Real.exp_add]
+    apply Real.exp_le_exp.2
     have : |(i : ℝ) - sr x r| ≤ |t₀| + 1 := by
       rw [abs_le]; constructor <;> cases abs_cases t₀ <;> linarith
     have := mul_le_mul_of_nonneg_left this (abs_nonneg κ)
@@ -106,10 +116,14 @@ theorem ctstepglue_holds : An.CtStepGlue := by
       rw [← abs_mul]; exact le_abs_self _
     nlinarith
   have hE0 : 0 ≤ max C₁ 0 * E := by positivity
-  calc C₂ * Real.exp (κ * i) * (max C₁ 0 * E * Real.exp S)
-      ≤ C₂ * (Real.exp (κ * sr x r) * Real.exp (|κ| * (|t₀| + 1))) * (max C₁ 0 * E * Real.exp S) := by
-        gcongr
-    _ = C₂ * (max C₁ 0 * E) * Real.exp (|κ| * (|t₀| + 1)) * (Real.exp (κ * sr x r) * Real.exp S) := by ring
+  calc
+    C₂ * Real.exp (κ * i) * (max C₁ 0 * E * Real.exp S)
+        ≤ C₂ * (Real.exp (κ * sr x r) * Real.exp (|κ| * (|t₀| + 1)))
+          * (max C₁ 0 * E * Real.exp S) := by
+      gcongr
+    _ = C₂ * (max C₁ 0 * E) * Real.exp (|κ| * (|t₀| + 1))
+        * (Real.exp (κ * sr x r) * Real.exp S) := by
+      ring
 
 end PositivityTheory.Rg.Rs
 

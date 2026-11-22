@@ -5,19 +5,25 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Defin
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU
 open UpperTheory.Gal.Gen
 
-private theorem cAll_fin' {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ} {c : UA E n}
-    (hc : c ∈ finU (E := E) (n := n)) : cAll c = 1 := by
+private theorem cAll_fin'
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {n : ℕ} {c : UA E n} (hc : c ∈ finU (E := E) (n := n))
+    : cAll c = 1 := by
   funext v
   have : cInf c = 1 := hc
   simp [cAll, cEmb, this]
 
-theorem UpperTheory.Gal.Gen.frameW_pf :
-    UpperTheory.Gal.Gen.Kappa → UpperTheory.Gal.Gen.DenomBdd → UpperTheory.Gal.Gen.RhoBound → UpperTheory.Gal.Gen.LatFacts → UpperTheory.Gal.Gen.LevelEx → UpperTheory.Gal.Gen.FrameW := by
+theorem UpperTheory.Gal.Gen.frameW_pf
+    : UpperTheory.Gal.Gen.Kappa → UpperTheory.Gal.Gen.DenomBdd → UpperTheory.Gal.Gen.RhoBound
+      → UpperTheory.Gal.Gen.LatFacts → UpperTheory.Gal.Gen.LevelEx
+      → UpperTheory.Gal.Gen.FrameW := by
   intro hK hD hR hL hE E _ _ _ l _ ι a W J t ht
   classical
   have hlp : l.Prime := Fact.out
@@ -27,25 +33,42 @@ theorem UpperTheory.Gal.Gen.frameW_pf :
   let b : UA E a → {x : W.Sp // CoefLe ι 1 x.1} → W.Sp := fun g x => ρ (M g) x.1
   have hl1 : (1 : ℝ) ≤ (l : ℝ) := by exact_mod_cast hlp.one_lt.le
   have hpow : ∀ d : ℕ, (1 : ℝ) ≤ (l : ℝ) ^ d := fun d => one_le_pow₀ hl1
-  have hgrow : ∀ (c : UA E a) (d : ℕ), DenomLe l d c → ∀ x : W.Sp, CoefLe ι 1 x.1 →
-      CoefLe ι (((l : ℝ) ^ d) ^ (a * GlobalTheory.CongW.wtSize W.at)) (ρ (κ c) x).1 := fun c d hc x hx =>
-    hR E l ι a W (κ c) _ (hpow d) (fun τ i j => hκd c d hc τ i j) x hx
-  have hgrowInv : ∀ (c : UA E a) (d : ℕ), DenomLe l d c → ∀ x : W.Sp, CoefLe ι 1 x.1 →
-      CoefLe ι (((l : ℝ) ^ d) ^ (a * GlobalTheory.CongW.wtSize W.at)) (ρ (κ c)⁻¹ x).1 := fun c d hc x hx =>
-    hR E l ι a W (κ c)⁻¹ _ (hpow d) (fun τ i j => by
-      have h := hκd c d hc τ i j
-      simp only [Pi.inv_apply, inv_inv]
-      exact ⟨h.2, h.1⟩) x hx
-  have hval : ∀ f : algForms W, ∀ γ ∈ ratU E a, ∀ s x, x ∈ infU E a → ∀ c : finU (E := E) (n := a),
-      (∀ v g, f.1 v (g * (c : UA E a)) = f.1 v g) → ∀ v,
-      f.1 (ρ (M (γ * s * x * c)) v) (γ * s * x * c) = f.1 (ρ (M s) (ρ (κ (c : UA E a)) v)) s := by
+  have hgrow
+      : ∀ (c : UA E a) (d : ℕ),
+        DenomLe l d c
+          → ∀ x : W.Sp,
+            CoefLe ι 1 x.1
+              → CoefLe ι (((l : ℝ) ^ d) ^ (a * GlobalTheory.CongW.wtSize W.at)) (ρ (κ c) x).1 :=
+    fun c d hc x hx => hR E l ι a W (κ c) _ (hpow d) (fun τ i j => hκd c d hc τ i j) x hx
+  have hgrowInv
+      : ∀ (c : UA E a) (d : ℕ),
+        DenomLe l d c
+          → ∀ x : W.Sp,
+            CoefLe ι 1 x.1
+              → CoefLe ι (((l : ℝ) ^ d) ^ (a * GlobalTheory.CongW.wtSize W.at))
+                (ρ (κ c)⁻¹ x).1 := fun c d hc x hx =>
+    hR E l ι a W (κ c)⁻¹ _ (hpow d)
+      (fun τ i j => by
+        have h := hκd c d hc τ i j
+        simp only [Pi.inv_apply, inv_inv]
+        exact ⟨h.2, h.1⟩)
+      x hx
+  have hval
+      : ∀ f : algForms W, ∀ γ ∈ ratU E a, ∀ s x,
+        x ∈ infU E a
+          → ∀ c : finU (E := E) (n := a),
+            (∀ v g, f.1 v (g * (c : UA E a)) = f.1 v g)
+              → ∀ v,
+                f.1 (ρ (M (γ * s * x * c)) v) (γ * s * x * c)
+                  = f.1 (ρ (M s) (ρ (κ (c : UA E a)) v)) s := by
     intro f γ hγ s x hx c hf v
     have hM : cAll x * M (γ * s * x * c) = M s * κ (c : UA E a) := by
       simp only [M, map_mul, hκr γ hγ, hκi x hx, cAll_fin' c.2, mul_one]
       group
     have hA : ∀ v, f.1 v (γ * s * x * c) = f.1 v (s * c * x) := by
       intro v
-      rw [mul_assoc γ s, mul_assoc γ, (f.2.1 v).left γ hγ, mul_assoc s x, ← fin_mul_inf c.2 hx, ← mul_assoc]
+      rw [mul_assoc γ s, mul_assoc γ, (f.2.1 v).left γ hγ, mul_assoc s x, ← fin_mul_inf c.2 hx,
+        ← mul_assoc]
     have hB : ∀ v, f.1 v (s * c * x) = f.1 (W.rep ⟨x, hx⟩ v) (s * c) := by
       intro v
       rw [f.2.2 ⟨x, hx⟩ v]
@@ -67,7 +90,8 @@ theorem UpperTheory.Gal.Gen.frameW_pf :
       exact Subgroup.mem_subgroupOf.2 (hNC ⟨hx, x.2⟩)
     obtain ⟨S, hS⟩ := GlobalTheory.DefU.ClassFin.classSet_finite E a C₃ hC₃o
     let φ : UA E a → (W.Sp →ₗ[ℂ] ℂ) := fun s => (LinearMap.proj s) ∘ₗ f.1 ∘ₗ (ρ (M s))
-    have hφ : ∀ s, ∃ m : ℝ, 0 ≤ m ∧ ∀ (R : ℝ) (x : W.Sp), CoefLe ι R x.1 → ‖ι.symm (φ s x)‖ ≤ m * R :=
+    have hφ
+        : ∀ s, ∃ m : ℝ, 0 ≤ m ∧ ∀ (R : ℝ) (x : W.Sp), CoefLe ι R x.1 → ‖ι.symm (φ s x)‖ ≤ m * R :=
       fun s => (hL l ι _ (Formalism.L2.DIV.VV ℂ W)).1 (φ s)
     choose m hm0 hm using hφ
     refine ⟨(∑ s ∈ S, m s) * ((l : ℝ) ^ d) ^ (a * GlobalTheory.CongW.wtSize W.at), fun g i => ?_⟩
@@ -87,12 +111,14 @@ theorem UpperTheory.Gal.Gen.frameW_pf :
     have h1 := h0 g ⟨c • ρ (M g)⁻¹ v, hc⟩
     have h2 : b g ⟨c • ρ (M g)⁻¹ v, hc⟩ = c • v := by
       change ρ (M g) (c • ρ (M g)⁻¹ v) = c • v
-      rw [map_smul, ← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply]
+      rw [map_smul, ← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one,
+        Module.End.one_apply]
     rw [h2, map_smul, Pi.smul_apply, smul_eq_mul] at h1
     exact (mul_eq_zero.1 h1).resolve_left hc0
   · intro F R hF j g i
     have hR0 : 0 ≤ R := (norm_nonneg _).trans (hF g i)
-    have e : opOf (RU E a) (t j) (F (b g i)) g = ∑ h ∈ (t j).support, t j h * F (b g i) (g * h) := by
+    have e
+        : opOf (RU E a) (t j) (F (b g i)) g = ∑ h ∈ (t j).support, t j h * F (b g i) (g * h) := by
       simp only [opOf, Finsupp.sum, Finset.sum_apply, Pi.smul_apply, RU_apply, smul_eq_mul]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [e, map_sum]
@@ -106,16 +132,24 @@ theorem UpperTheory.Gal.Gen.frameW_pf :
     have hx : CoefLe ι 1 ((t j h • y : W.Sp) : Formalism.L2.DIV.Pol ℂ (InfinitePlace E) a) := by
       intro q
       have hq := hyc q
-      have e1 : AddMonoidAlgebra.coeff ((t j h • y : W.Sp) : Formalism.L2.DIV.Pol ℂ (InfinitePlace E) a) q =
-          t j h * AddMonoidAlgebra.coeff (y : Formalism.L2.DIV.Pol ℂ (InfinitePlace E) a) q := by
+      have e1
+          : AddMonoidAlgebra.coeff ((t j h • y : W.Sp) : Formalism.L2.DIV.Pol ℂ (InfinitePlace E) a)
+              q
+            = t j h
+              * AddMonoidAlgebra.coeff (y : Formalism.L2.DIV.Pol ℂ (InfinitePlace E) a) q := by
         simp [MvPolynomial.coeff_smul]
       rw [e1, map_mul, norm_mul]
       have hlpos : (0 : ℝ) < (l : ℝ) := by linarith
-      calc _ ≤ ((l : ℝ)⁻¹) ^ (a * d * GlobalTheory.CongW.wtSize W.at) * ((l : ℝ) ^ d) ^ (a * GlobalTheory.CongW.wtSize W.at) :=
-            mul_le_mul hn hq (norm_nonneg _) (by positivity)
+      calc
+        _ ≤ ((l : ℝ)⁻¹) ^ (a * d * GlobalTheory.CongW.wtSize W.at)
+            * ((l : ℝ) ^ d) ^ (a * GlobalTheory.CongW.wtSize W.at) :=
+          mul_le_mul hn hq (norm_nonneg _) (by positivity)
         _ = 1 := by
-            rw [← pow_mul, inv_pow, show d * (a * GlobalTheory.CongW.wtSize W.at) = a * d * GlobalTheory.CongW.wtSize W.at by ring]
-            exact inv_mul_cancel₀ (by positivity)
+          rw [← pow_mul, inv_pow,
+            show d * (a * GlobalTheory.CongW.wtSize W.at)
+                = a * d * GlobalTheory.CongW.wtSize W.at by
+              ring]
+          exact inv_mul_cancel₀ (by positivity)
     have hb : t j h * F (b g i) (g * h) = F (b (g * h) ⟨t j h • y, hx⟩) (g * h) := by
       have : b g i = ρ (M (g * h)) y := by
         change ρ (M g) i.1 = _

@@ -11,9 +11,10 @@ namespace Formalism.L2.Th1.F
 
 namespace Ker
 
-theorem matrix_data (L : PeriodPair) (α : ℂ) (h : MulStable L α) :
-    ∃ a b c d : ℤ, α * L.ω₁ = a * L.ω₁ + c * L.ω₂ ∧ α * L.ω₂ = b * L.ω₁ + d * L.ω₂ ∧
-      (2 * α.re = ((a + d : ℤ) : ℝ)) ∧ Complex.normSq α = ((a * d - b * c : ℤ) : ℝ) := by
+theorem matrix_data (L : PeriodPair) (α : ℂ) (h : MulStable L α)
+    : ∃ a b c d : ℤ,
+      α * L.ω₁ = a * L.ω₁ + c * L.ω₂ ∧ α * L.ω₂ = b * L.ω₁ + d * L.ω₂
+        ∧ (2 * α.re = ((a + d : ℤ) : ℝ)) ∧ Complex.normSq α = ((a * d - b * c : ℤ) : ℝ) := by
   obtain ⟨a, c, hac⟩ := PeriodPair.mem_lattice.1 (h _ L.ω₁_mem_lattice)
   obtain ⟨b, d, hbd⟩ := PeriodPair.mem_lattice.1 (h _ L.ω₂_mem_lattice)
   refine ⟨a, b, c, d, hac.symm, hbd.symm, ?_⟩
@@ -35,16 +36,18 @@ theorem matrix_data (L : PeriodPair) (α : ℂ) (h : MulStable L α) :
     · exact absurd h1 (mul_ne_zero hω1 hω2)
   by_cases him : α.im = 0
   · have hαr : α = (α.re : ℂ) := Complex.ext (by simp) (by simp [him])
-    obtain ⟨h1, h2⟩ := hind (α.re - a) (-c) (by
-      rw [Complex.real_smul, Complex.real_smul]
-      rw [hαr] at e1
-      push_cast
-      linear_combination e1)
-    obtain ⟨h3, h4⟩ := hind (-b) (α.re - d) (by
-      rw [Complex.real_smul, Complex.real_smul]
-      rw [hαr] at e2
-      push_cast
-      linear_combination e2)
+    obtain ⟨h1, h2⟩ :=
+      hind (α.re - a) (-c) (by
+        rw [Complex.real_smul, Complex.real_smul]
+        rw [hαr] at e1
+        push_cast
+        linear_combination e1)
+    obtain ⟨h3, h4⟩ :=
+      hind (-b) (α.re - d) (by
+        rw [Complex.real_smul, Complex.real_smul]
+        rw [hαr] at e2
+        push_cast
+        linear_combination e2)
     have ha : (a : ℝ) = α.re := by linarith
     have hd : (d : ℝ) = α.re := by linarith
     have hb : (b : ℝ) = 0 := by linarith
@@ -56,7 +59,9 @@ theorem matrix_data (L : PeriodPair) (α : ℂ) (h : MulStable L α) :
       push_cast
       rw [ha, hd, hb, hc]
       ring
-  · have hq' : (starRingEnd ℂ α) ^ 2 - ((a + d : ℤ) : ℂ) * starRingEnd ℂ α + ((a * d - b * c : ℤ) : ℂ) = 0 := by
+  · have hq'
+        : (starRingEnd ℂ α) ^ 2 - ((a + d : ℤ) : ℂ) * starRingEnd ℂ α + ((a * d - b * c : ℤ) : ℂ)
+          = 0 := by
       have := congrArg (starRingEnd ℂ) hq
       simpa using this
     have hne : α - starRingEnd ℂ α ≠ 0 := by
@@ -84,15 +89,15 @@ def mulEnd (L : PeriodPair) (α : ℂ) (h : MulStable L α) : L.lattice →ₗ[�
   map_add' x y := by ext; simp [mul_add]
   map_smul' n x := by ext; simp; ring
 
-theorem mulEnd_injective (L : PeriodPair) (α : ℂ) (hα : α ≠ 0) (h : MulStable L α) :
-    Function.Injective (mulEnd L α h) := by
+theorem mulEnd_injective (L : PeriodPair) (α : ℂ) (hα : α ≠ 0) (h : MulStable L α)
+    : Function.Injective (mulEnd L α h) := by
   intro x y hxy
   have := congrArg Subtype.val hxy
   apply Subtype.ext
   simpa [mulEnd, hα] using this
 
-theorem det_mulEnd (L : PeriodPair) (α : ℂ) (h : MulStable L α) :
-    ((LinearMap.det (mulEnd L α h) : ℤ) : ℝ) = Complex.normSq α := by
+theorem det_mulEnd (L : PeriodPair) (α : ℂ) (h : MulStable L α)
+    : ((LinearMap.det (mulEnd L α h) : ℤ) : ℝ) = Complex.normSq α := by
   obtain ⟨a, b, c, d, hac, hbd, -, hn⟩ := matrix_data L α h
   have h0 : mulEnd L α h (L.latticeBasis 0) = a • L.latticeBasis 0 + c • L.latticeBasis 1 := by
     apply Subtype.ext
@@ -105,20 +110,22 @@ theorem det_mulEnd (L : PeriodPair) (α : ℂ) (h : MulStable L α) :
     simp [LinearMap.toMatrix_apply, h0, h1] <;> ring
   rw [hn, key]
 
-theorem card_quot (L : PeriodPair) (α : ℂ) (hα : α ≠ 0) (h : MulStable L α) :
-    ((Nat.card (L.lattice ⧸ LinearMap.range (mulEnd L α h)) : ℕ) : ℝ) = Complex.normSq α := by
+theorem card_quot (L : PeriodPair) (α : ℂ) (hα : α ≠ 0) (h : MulStable L α)
+    : ((Nat.card (L.lattice ⧸ LinearMap.range (mulEnd L α h)) : ℕ) : ℝ) = Complex.normSq α := by
   haveI := Module.Free.of_basis L.latticeBasis
   haveI := Module.Finite.of_basis L.latticeBasis
-  have key : (LinearMap.det (mulEnd L α h)).natAbs =
-      Nat.card (L.lattice ⧸ LinearMap.range (mulEnd L α h)) := by
+  have key
+      : (LinearMap.det (mulEnd L α h)).natAbs
+        = Nat.card (L.lattice ⧸ LinearMap.range (mulEnd L α h)) := by
     rw [← Submodule.natAbs_det_equiv (LinearMap.range (mulEnd L α h))
       (LinearEquiv.ofInjective (mulEnd L α h) (mulEnd_injective L α hα h))]
     congr 2
   rw [← key, Nat.cast_natAbs, Int.cast_abs, det_mulEnd, abs_of_nonneg (Complex.normSq_nonneg α)]
 
-theorem mk_eq_iff (L : PeriodPair) (α : ℂ) (h : MulStable L α) (u v : L.lattice) :
-    (Submodule.Quotient.mk u : L.lattice ⧸ LinearMap.range (mulEnd L α h)) = Submodule.Quotient.mk v ↔
-      ∃ x ∈ L.lattice, (u : ℂ) - v = α * x := by
+theorem mk_eq_iff (L : PeriodPair) (α : ℂ) (h : MulStable L α) (u v : L.lattice)
+    : (Submodule.Quotient.mk u : L.lattice ⧸ LinearMap.range (mulEnd L α h))
+        = Submodule.Quotient.mk v
+      ↔ ∃ x ∈ L.lattice, (u : ℂ) - v = α * x := by
   rw [Submodule.Quotient.eq]
   constructor
   · rintro ⟨x, hx⟩
@@ -155,20 +162,25 @@ theorem kernel_reps_card : KerRepsCard := by
     rw [h0] at hc
     have hn : Complex.normSq α = 0 := by rw [← hc]; simp
     exact hα (Complex.normSq_eq_zero.1 hn)
-  have hout : ∀ q : L.lattice ⧸ LinearMap.range (mulEnd L α h), Submodule.Quotient.mk (Quotient.out q) = q :=
-    fun q => Quotient.out_eq' q
+  have hout
+      : ∀ q : L.lattice ⧸ LinearMap.range (mulEnd L α h),
+        Submodule.Quotient.mk (Quotient.out q) = q := fun q =>
+    Quotient.out_eq' q
   have hdiv : ∀ u : ℂ, α * (u / α) = u := fun u => by field_simp
   classical
   haveI := Fintype.ofFinite (L.lattice ⧸ LinearMap.range (mulEnd L α h))
-  have hφ0 : ∀ P : S, (Submodule.Quotient.mk (⟨α * P, (h1 P P.2).1⟩ : L.lattice) :
-      L.lattice ⧸ LinearMap.range (mulEnd L α h)) ≠ 0 := by
+  have hφ0
+      : ∀ P : S,
+        (Submodule.Quotient.mk (⟨α * P, (h1 P P.2).1⟩ : L.lattice)
+            : L.lattice ⧸ LinearMap.range (mulEnd L α h))
+          ≠ 0 := by
     intro P h0
     rw [← Submodule.Quotient.mk_zero, mk_eq_iff] at h0
     obtain ⟨x, hx, hxe⟩ := h0
     have hPx : (P : ℂ) = x := by simpa [hα] using hxe
     exact (h1 P P.2).2 (hPx ▸ hx)
-  let φ : S → {q : L.lattice ⧸ LinearMap.range (mulEnd L α h) // ¬ q = 0} :=
-    fun P => ⟨Submodule.Quotient.mk (⟨α * P, (h1 P P.2).1⟩ : L.lattice), hφ0 P⟩
+  let φ : S → {q : L.lattice ⧸ LinearMap.range (mulEnd L α h) // ¬ q = 0} := fun P =>
+    ⟨Submodule.Quotient.mk (⟨α * P, (h1 P P.2).1⟩ : L.lattice), hφ0 P⟩
   have hinj : Function.Injective φ := by
     intro P P' hPP
     have h6 := congrArg Subtype.val hPP
@@ -199,8 +211,9 @@ theorem kernel_reps_card : KerRepsCard := by
     ring
   have hcard : Nat.card S = Nat.card {q : L.lattice ⧸ LinearMap.range (mulEnd L α h) // ¬ q = 0} :=
     Nat.card_congr (Equiv.ofBijective φ ⟨hinj, hsurj⟩)
-  have hc1 : Nat.card {q : L.lattice ⧸ LinearMap.range (mulEnd L α h) // ¬ q = 0} + 1 =
-      Nat.card (L.lattice ⧸ LinearMap.range (mulEnd L α h)) := by
+  have hc1
+      : Nat.card {q : L.lattice ⧸ LinearMap.range (mulEnd L α h) // ¬ q = 0} + 1
+        = Nat.card (L.lattice ⧸ LinearMap.range (mulEnd L α h)) := by
     rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, Fintype.card_subtype_compl,
       Fintype.card_subtype_eq]
     have := Fintype.card_pos (α := L.lattice ⧸ LinearMap.range (mulEnd L α h))
@@ -220,13 +233,18 @@ theorem kernel_reps_exist : KerRepsExist := by
     rw [h0] at hc
     have hn : Complex.normSq α = 0 := by rw [← hc]; simp
     exact hα (Complex.normSq_eq_zero.1 hn)
-  have hout : ∀ q : L.lattice ⧸ LinearMap.range (mulEnd L α h), Submodule.Quotient.mk (Quotient.out q) = q :=
-    fun q => Quotient.out_eq' q
+  have hout
+      : ∀ q : L.lattice ⧸ LinearMap.range (mulEnd L α h),
+        Submodule.Quotient.mk (Quotient.out q) = q := fun q =>
+    Quotient.out_eq' q
   have hdiv : ∀ u : ℂ, α * (u / α) = u := fun u => by field_simp
   classical
   haveI := Fintype.ofFinite (L.lattice ⧸ LinearMap.range (mulEnd L α h))
-  refine ⟨(Finset.univ.filter (fun q : L.lattice ⧸ LinearMap.range (mulEnd L α h) => q ≠ 0)).image
-    (fun q => ((Quotient.out q : L.lattice) : ℂ) / α), ?_⟩
+  refine ⟨
+    (Finset.univ.filter (fun q : L.lattice ⧸ LinearMap.range (mulEnd L α h) => q ≠ 0)).image
+      (fun q => ((Quotient.out q : L.lattice) : ℂ) / α),
+    ?_
+  ⟩
   unfold IsKerReps
   refine ⟨?_, ?_, ?_⟩
   · intro P hP
@@ -245,8 +263,10 @@ theorem kernel_reps_exist : KerRepsExist := by
       exact ⟨_, hd, by rw [mul_sub, hdiv, hdiv]⟩
     rw [hqq]
   · intro z hz hzn
-    have hq0 : (Submodule.Quotient.mk (⟨α * z, hz⟩ : L.lattice) :
-        L.lattice ⧸ LinearMap.range (mulEnd L α h)) ≠ 0 := by
+    have hq0
+        : (Submodule.Quotient.mk (⟨α * z, hz⟩ : L.lattice)
+            : L.lattice ⧸ LinearMap.range (mulEnd L α h))
+          ≠ 0 := by
       intro h0
       rw [← Submodule.Quotient.mk_zero, mk_eq_iff] at h0
       obtain ⟨x, hx, hxe⟩ := h0

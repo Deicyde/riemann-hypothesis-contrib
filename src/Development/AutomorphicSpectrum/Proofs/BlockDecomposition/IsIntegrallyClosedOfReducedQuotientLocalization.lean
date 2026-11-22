@@ -8,10 +8,11 @@ namespace GlobalTheory.CompanionTheory.IntClosedAway
 
 open Polynomial
 
-theorem mem_span_of_eq_mul_integral {A K : Type*} [CommRing A] [IsDomain A] [Field K] [Algebra A K]
-    [IsFractionRing A K] (t a : A) (hred : IsReduced (A ⧸ Ideal.span {t})) (z : K)
-    (hz : IsIntegral A z) (h : algebraMap A K a = algebraMap A K t * z) :
-    a ∈ Ideal.span {t} := by
+theorem mem_span_of_eq_mul_integral
+    {A K : Type*} [CommRing A] [IsDomain A] [Field K] [Algebra A K] [IsFractionRing A K]
+    (t a : A) (hred : IsReduced (A ⧸ Ideal.span {t}))
+    (z : K) (hz : IsIntegral A z) (h : algebraMap A K a = algebraMap A K t * z)
+    : a ∈ Ideal.span {t} := by
   obtain ⟨p, hp, hpz⟩ := hz
   have hinj := IsFractionRing.injective A K
   have h1 : (p.scaleRoots t).eval a = 0 := by
@@ -33,11 +34,13 @@ theorem mem_span_of_eq_mul_integral {A K : Type*} [CommRing A] [IsDomain A] [Fie
     simpa using h4
   exact Ideal.Quotient.eq_zero_iff_mem.mp (IsReduced.eq_zero _ ⟨_, h3⟩)
 
-theorem isIntegrallyClosed_of_away :
-    ∀ (A : Type) [CommRing A] [IsDomain A] (t : A), t ≠ 0 → IsReduced (A ⧸ Ideal.span {t}) →
-      IsIntegrallyClosed (Localization.Away t) → IsIntegrallyClosed A := by
+theorem isIntegrallyClosed_of_away
+    : ∀ (A : Type) [CommRing A] [IsDomain A] (t : A),
+      t ≠ 0 → IsReduced (A ⧸ Ideal.span {t}) → IsIntegrallyClosed (Localization.Away t)
+        → IsIntegrallyClosed A := by
   intro A _ _ t ht hred hcl
-  have hle : Submonoid.powers t ≤ nonZeroDivisors A := powers_le_nonZeroDivisors_of_noZeroDivisors ht
+  have hle : Submonoid.powers t ≤ nonZeroDivisors A :=
+    powers_le_nonZeroDivisors_of_noZeroDivisors ht
   haveI : IsDomain (Localization.Away t) := IsLocalization.isDomain_localization hle
   let K := FractionRing A
   letI : Algebra (Localization.Away t) K :=
@@ -55,7 +58,8 @@ theorem isIntegrallyClosed_of_away :
   have hxa : algebraMap A K a = x * algebraMap A K t ^ n := by
     have h5 := congrArg (algebraMap (Localization.Away t) K) hna
     rw [map_mul, map_pow, hy, ← IsScalarTower.algebraMap_apply A (Localization.Away t) K,
-      ← IsScalarTower.algebraMap_apply A (Localization.Away t) K] at h5
+        ← IsScalarTower.algebraMap_apply A (Localization.Away t) K]
+      at h5
     exact h5.symm
   have ht' : algebraMap A K t ≠ 0 := by
     exact (map_ne_zero_iff _ (IsFractionRing.injective A K)).mpr ht
@@ -64,8 +68,7 @@ theorem isIntegrallyClosed_of_away :
   | zero => exact ⟨a, by simpa using hxa⟩
   | succ n ih =>
     have hz : IsIntegral A (x * algebraMap A K t ^ n) := hx.mul (isIntegral_algebraMap.pow n)
-    have hmem : a ∈ Ideal.span {t} :=
-      mem_span_of_eq_mul_integral t a hred _ hz (by rw [hxa]; ring)
+    have hmem : a ∈ Ideal.span {t} := mem_span_of_eq_mul_integral t a hred _ hz (by rw [hxa]; ring)
     obtain ⟨b, rfl⟩ := Ideal.mem_span_singleton'.mp hmem
     refine ih b (mul_left_injective₀ ht' ?_)
     simp only [map_mul] at hxa

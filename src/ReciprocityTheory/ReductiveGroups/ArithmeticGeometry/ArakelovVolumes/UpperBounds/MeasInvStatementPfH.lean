@@ -30,11 +30,12 @@ private lemma eq_of_mul_mul_eq_of_det_ne_zero {P Q X Y : Matrix (Fin n) (Fin n) 
     _ = P⁻¹ * (P * Y * Q) * Q⁻¹ := by rw [h]
     _ = Y := (e Y).symm
 
-theorem gram_upper_unique {ε : Fin n → ℂ} (hε : ∀ a, ε a * ε a = 1)
-    {β β' : Matrix (Fin n) (Fin n) ℂ} (hβ : β.BlockTriangular id) (hβ' : β'.BlockTriangular id)
-    (hd : β.det ≠ 0) (hd' : β'.det ≠ 0)
-    (h : β'ᵀ * diagonal ε * β'.map (starRingEnd ℂ) = βᵀ * diagonal ε * β.map (starRingEnd ℂ)) :
-    ∃ D : Fin n → ℂ, (∀ a, ‖D a‖ = 1) ∧ β' = diagonal D * β := by
+theorem gram_upper_unique
+    {ε : Fin n → ℂ} (hε : ∀ a, ε a * ε a = 1)
+    {β β' : Matrix (Fin n) (Fin n) ℂ}
+    (hβ : β.BlockTriangular id) (hβ' : β'.BlockTriangular id) (hd : β.det ≠ 0) (hd' : β'.det ≠ 0)
+    (h : β'ᵀ * diagonal ε * β'.map (starRingEnd ℂ) = βᵀ * diagonal ε * β.map (starRingEnd ℂ))
+    : ∃ D : Fin n → ℂ, (∀ a, ‖D a‖ = 1) ∧ β' = diagonal D * β := by
   classical
   have hε0 : ∀ a, ε a ≠ 0 := fun a h0 => by
     have := hε a
@@ -49,8 +50,9 @@ theorem gram_upper_unique {ε : Fin n → ℂ} (hε : ∀ a, ε a * ε a = 1)
     intro h0
     apply hd'
     rw [hγβ, Matrix.det_mul, h0, zero_mul]
-  have hbar : ∀ M : Matrix (Fin n) (Fin n) ℂ,
-      (M.map (starRingEnd ℂ)).det = starRingEnd ℂ M.det := fun M => by
+  have hbar
+      : ∀ M : Matrix (Fin n) (Fin n) ℂ,
+        (M.map (starRingEnd ℂ)).det = starRingEnd ℂ M.det := fun M => by
     rw [RingHom.map_det]; rfl
 
   have key : γᵀ * diagonal ε * γ.map (starRingEnd ℂ) = diagonal ε := by
@@ -71,7 +73,8 @@ theorem gram_upper_unique {ε : Fin n → ℂ} (hε : ∀ a, ε a * ε a = 1)
     rcases lt_or_gt_of_ne hij with hlt | hlt
     · have e := congrFun (congrFun key2 i) j
       rw [Matrix.diagonal_mul, Matrix.mul_diagonal, Matrix.transpose_apply, hγinv hlt, zero_mul,
-        Matrix.map_apply] at e
+          Matrix.map_apply]
+        at e
       exact (map_eq_zero _).mp ((mul_eq_zero.mp e).resolve_left (hε0 i))
     · exact hγ hlt
   have hγdiag : γ = diagonal (fun a => γ a a) := by
@@ -83,7 +86,8 @@ theorem gram_upper_unique {ε : Fin n → ℂ} (hε : ∀ a, ε a * ε a = 1)
   have e := congrFun (congrFun key a) a
   rw [hγdiag] at e
   simp only [Matrix.diagonal_transpose, Matrix.diagonal_map (map_zero _),
-    Matrix.diagonal_mul_diagonal, Matrix.diagonal_apply_eq] at e
+      Matrix.diagonal_mul_diagonal, Matrix.diagonal_apply_eq]
+    at e
   have h2 : γ a a * starRingEnd ℂ (γ a a) = 1 := by
     have : ε a * (γ a a * starRingEnd ℂ (γ a a)) = ε a * 1 := by linear_combination e
     exact mul_left_cancel₀ (hε0 a) this

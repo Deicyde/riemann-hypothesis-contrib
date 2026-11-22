@@ -6,8 +6,9 @@ public import Mathlib
 
 namespace GlobalTheory.NoetherianLocalHausdorff
 
-theorem noeth_local_hausdorff : ∀ (B : Type) [inst : CommRing B] [inst_1 : IsLocalRing B] [IsNoetherianRing B],
-    IsHausdorff (IsLocalRing.maximalIdeal B) B := by
+theorem noeth_local_hausdorff
+    : ∀ (B : Type) [inst : CommRing B] [inst_1 : IsLocalRing B] [IsNoetherianRing B],
+      IsHausdorff (IsLocalRing.maximalIdeal B) B := by
   intro B _ _ _
   refine ⟨fun x hx => ?_⟩
   have h : x ∈ ⨅ n : ℕ, (IsLocalRing.maximalIdeal B) ^ n := by

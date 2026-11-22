@@ -32,9 +32,9 @@ theorem supp_perm (g : Fin n → ℝ) (σ : Equiv.Perm (Fin n)) : supp (g ∘ σ
   rw [Equiv.sum_comp σ (fun a => ∑ b, |g a - g (σ b)|)]
   exact sum_congr rfl fun a _ => Equiv.sum_comp σ (fun b => |g a - g b|)
 
-theorem dot_table (g : Fin n → ℝ) (s : Fin n → Fin n → ℝ) (hs : ∀ a b, s b a = -s a b) :
-    ∑ a, g a * ∑ b, s a b = (∑ a, ∑ b, (g a - g b) * s a b) / 2 := by
-  have h1 : ∑ a, ∑ b, g b * s a b = -∑ a, g a * ∑ b, s a b := by
+theorem dot_table (g : Fin n → ℝ) (s : Fin n → Fin n → ℝ) (hs : ∀ a b, s b a = - s a b)
+    : ∑ a, g a * ∑ b, s a b = (∑ a, ∑ b, (g a - g b) * s a b) / 2 := by
+  have h1 : ∑ a, ∑ b, g b * s a b = - ∑ a, g a * ∑ b, s a b := by
     rw [sum_comm, ← sum_neg_distrib]
     refine sum_congr rfl fun a _ => ?_
     rw [mul_sum, ← sum_neg_distrib]
@@ -46,8 +46,8 @@ theorem dot_table (g : Fin n → ℝ) (s : Fin n → Fin n → ℝ) (hs : ∀ a 
   rw [h2, h1]
   ring
 
-theorem dot_rho_sub_le (B : Finset (Fin n × Fin n)) (hB : ∀ p ∈ B, p.1 < p.2) (g : Fin n → ℝ) :
-    dot (rhoV n - wtB B) g ≤ supp g := by
+theorem dot_rho_sub_le (B : Finset (Fin n × Fin n)) (hB : ∀ p ∈ B, p.1 < p.2) (g : Fin n → ℝ)
+    : dot (rhoV n - wtB B) g ≤ supp g := by
   have e : dot (rhoV n - wtB B) g = (∑ a, g a * ∑ b, sg B a b) / 2 := by
     simp only [dot, sum_sg, Pi.sub_apply, sum_div]
     refine sum_congr rfl fun a _ => ?_
@@ -85,10 +85,13 @@ theorem dot_antitone (g : Fin n → ℝ) (hg : Antitone g) : dot g (rhoV n) = su
   unfold supp
   ring
 
-theorem dot_swap (x g : Fin n → ℝ) {i j : Fin n} (hij : i ≠ j) :
-    dot (x ∘ Equiv.swap i j) g = dot x g + (x j - x i) * (g i - g j) := by
-  have h : ∀ a, x (Equiv.swap i j a) * g a - x a * g a =
-      (if a = i then (x j - x i) * g i else 0) + (if a = j then (x i - x j) * g j else 0) := by
+theorem dot_swap (x g : Fin n → ℝ) {i j : Fin n} (hij : i ≠ j)
+    : dot (x ∘ Equiv.swap i j) g = dot x g + (x j - x i) * (g i - g j) := by
+  have h
+      : ∀ a,
+        x (Equiv.swap i j a) * g a - x a * g a
+          = (if a = i then (x j - x i) * g i else 0)
+            + (if a = j then (x i - x j) * g j else 0) := by
     intro a
     by_cases h1 : a = i
     · subst h1
@@ -100,18 +103,22 @@ theorem dot_swap (x g : Fin n → ℝ) {i j : Fin n} (hij : i ≠ j) :
         ring
       · simp [h1, h2, Equiv.swap_apply_of_ne_of_ne]
   have h3 : dot (x ∘ Equiv.swap i j) g - dot x g = (x j - x i) * g i + (x i - x j) * g j := by
-    simp only [dot, Function.comp, ← sum_sub_distrib, h, sum_add_distrib, sum_ite_eq', mem_univ, if_true]
+    simp only [dot, Function.comp, ← sum_sub_distrib, h, sum_add_distrib, sum_ite_eq', mem_univ,
+      if_true]
   linarith
 
 theorem domC_anti (x : Fin n → ℝ) : Antitone (domC x) := by
   intro a b h
-  have := Tuple.monotone_sort (fun a => -x a) h
+  have := Tuple.monotone_sort (fun a => - x a) h
   simpa [domC] using this
 
-theorem maj_sort (c x : Fin n → ℝ) (hc : Antitone c) (hx : ∀ g, dot x g ≤ supp g) :
-    ∀ g, dot (domC (c + x) - c) g ≤ supp g := by
-  have key := Tuple.bubble_sort_induction (f := fun a => -(c + x) a)
-    (P := fun h => ∀ g, dot (-h - c) g ≤ supp g) ?_ ?_
+theorem maj_sort (c x : Fin n → ℝ) (hc : Antitone c) (hx : ∀ g, dot x g ≤ supp g)
+    : ∀ g, dot (domC (c + x) - c) g ≤ supp g := by
+  have key :=
+    Tuple.bubble_sort_induction
+      (f := fun a => - (c + x) a)
+      (P := fun h => ∀ g, dot (-h - c) g ≤ supp g)
+      ?_ ?_
   · intro g
     convert key g using 2
     funext a
@@ -142,14 +149,12 @@ theorem dot_sq_le (u v : Fin n → ℝ) : dot u v ^ 2 ≤ dot u u * dot v v := b
   have := Finset.sum_mul_sq_le_sq_mul_sq univ u v
   simpa [dot, sq] using this
 
-theorem dot_self_le (x : Fin n → ℝ) (hx : ∀ g, dot x g ≤ supp g) :
-    dot x x ≤ dot (rhoV n) (rhoV n) := by
+theorem dot_self_le (x : Fin n → ℝ) (hx : ∀ g, dot x g ≤ supp g)
+    : dot x x ≤ dot (rhoV n) (rhoV n) := by
   have h1 := hx x
-  have e1 : domC x = x ∘ Tuple.sort (fun a => -x a) := rfl
-  have h2 : supp x = dot (domC x) (rhoV n) := by
-    rw [dot_antitone _ (domC_anti x), e1, supp_perm]
-  have h3 : dot (domC x) (domC x) = dot x x := by
-    rw [e1, d_perm]
+  have e1 : domC x = x ∘ Tuple.sort (fun a => - x a) := rfl
+  have h2 : supp x = dot (domC x) (rhoV n) := by rw [dot_antitone _ (domC_anti x), e1, supp_perm]
+  have h3 : dot (domC x) (domC x) = dot x x := by rw [e1, d_perm]
   have h4 := dot_sq_le (domC x) (rhoV n)
   rw [h3, ← h2] at h4
   have h5 := d_self_nonneg x
@@ -158,9 +163,10 @@ theorem dot_self_le (x : Fin n → ℝ) (hx : ∀ g, dot x g ≤ supp g) :
   have hlt' := not_le.1 hlt
   nlinarith
 
-theorem exists_spin (ν : Fin n → ℝ) :
-    ∃ π : Equiv.Perm (Fin n), spinSq ν = dot (ν - rhoV n + rhoV n ∘ π) (ν - rhoV n + rhoV n ∘ π) := by
-  refine ⟨(Tuple.sort (fun a => -(ν - rhoV n) a))⁻¹, ?_⟩
+theorem exists_spin (ν : Fin n → ℝ)
+    : ∃ π : Equiv.Perm (Fin n),
+      spinSq ν = dot (ν - rhoV n + rhoV n ∘ π) (ν - rhoV n + rhoV n ∘ π) := by
+  refine ⟨(Tuple.sort (fun a => - (ν - rhoV n) a))⁻¹, ?_⟩
   set τ := Tuple.sort (fun a => -(ν - rhoV n) a) with hτ
   have e : domC (ν - rhoV n) + rhoV n = (ν - rhoV n + rhoV n ∘ (τ⁻¹ : Equiv.Perm (Fin n))) ∘ τ := by
     funext a
@@ -170,8 +176,8 @@ theorem exists_spin (ν : Fin n → ℝ) :
   rw [e, nsq_dot]
   exact d_perm _ _ τ
 
-theorem step_mono (p : Fin n → ℕ) (hs : ∀ a b : Fin n, (b : ℕ) = a + 1 → p a ≤ p b + 1) :
-    ∀ (d : ℕ) (a c : Fin n), (c : ℕ) = a + d → (a : ℕ) + p a ≤ c + p c := by
+theorem step_mono (p : Fin n → ℕ) (hs : ∀ a b : Fin n, (b : ℕ) = a + 1 → p a ≤ p b + 1)
+    : ∀ (d : ℕ) (a c : Fin n), (c : ℕ) = a + d → (a : ℕ) + p a ≤ c + p c := by
   intro d
   induction d with
   | zero =>
@@ -186,9 +192,10 @@ theorem step_mono (p : Fin n → ℕ) (hs : ∀ a b : Fin n, (b : ℕ) = a + 1 �
     simp only at h1 h2
     omega
 
-theorem key_lev (p : Fin n → ℕ) (hinj : Function.Injective p)
-    (hs : ∀ a b : Fin n, (b : ℕ) = a + 1 → p a ≤ p b + 1) :
-    ∀ (d : ℕ) (a c : Fin n), (c : ℕ) = a + d + 1 → p c < p a → (a : ℕ) + p a = c + p c := by
+theorem key_lev
+    (p : Fin n → ℕ)
+    (hinj : Function.Injective p) (hs : ∀ a b : Fin n, (b : ℕ) = a + 1 → p a ≤ p b + 1)
+    : ∀ (d : ℕ) (a c : Fin n), (c : ℕ) = a + d + 1 → p c < p a → (a : ℕ) + p a = c + p c := by
   intro d
   induction d with
   | zero =>
@@ -218,16 +225,19 @@ theorem key_lev (p : Fin n → ℕ) (hinj : Function.Injective p)
     have m2 := step_mono p hs (d + 2) a c (by omega)
     omega
 
-theorem two_rhoU (lev : Fin n → ℕ) (a : Fin n) :
-    2 * rhoU lev a = ∑ b, ((if lev a < lev b then (1 : ℝ) else 0) - (if lev b < lev a then (1 : ℝ) else 0)) := by
+theorem two_rhoU (lev : Fin n → ℕ) (a : Fin n)
+    : 2 * rhoU lev a
+      = ∑ b, ((if lev a < lev b then (1 : ℝ) else 0) - (if lev b < lev a then (1 : ℝ) else 0)) := by
   rw [sum_sub_distrib, sum_boole, sum_boole]
   unfold rhoU
   ring
 
-theorem harm_of_eq (lam : Fin n → ℤ) (hlam : Antitone lam) (π : Equiv.Perm (Fin n))
+theorem harm_of_eq
+    (lam : Fin n → ℤ) (hlam : Antitone lam)
+    (π : Equiv.Perm (Fin n))
     (hs : StrictAnti fun a => 2 * (lam a : ℝ) + 2 * rhoV n a + rhoV n (π a))
-    (he : ∑ a, (lam a : ℝ) * rhoV n (π a) = ∑ a, (lam a : ℝ) * rhoV n a) :
-    (fun a => 2 * (lam a : ℝ) + rhoV n a + rhoV n (π a)) ∈ harmSet lam := by
+    (he : ∑ a, (lam a : ℝ) * rhoV n (π a) = ∑ a, (lam a : ℝ) * rhoV n a)
+    : (fun a => 2 * (lam a : ℝ) + rhoV n a + rhoV n (π a)) ∈ harmSet lam := by
   have hX : Antitone fun a => (lam a : ℝ) := fun a b h => by
     show (lam b : ℝ) ≤ lam a
     exact_mod_cast hlam h
@@ -285,7 +295,7 @@ theorem harm_of_eq (lam : Fin n → ℤ) (hlam : Antitone lam) (π : Equiv.Perm 
 
   set F : Fin n → Fin n → ℝ := fun a b =>
     2 * ((if lev a < lev b then (1 : ℝ) else 0) - (if lev b < lev a then (1 : ℝ) else 0)) with hF
-  have hFa : ∀ a b, F b a = -F a b := fun a b => by
+  have hFa : ∀ a b, F b a = - F a b := fun a b => by
     simp only [hF]
     ring
   have hpos : ∀ a b : Fin n, a < b → F a b = s0 a b + s0 (π a) (π b) := by
@@ -300,8 +310,7 @@ theorem harm_of_eq (lam : Fin n → ℤ) (hlam : Antitone lam) (π : Equiv.Perm 
       simp [hF, hlv, hlv.not_gt, s0, hab, h1]
       norm_num
     · have hab' : (a : ℕ) < b := hab
-      have hlv : lev a = lev b :=
-        key_lev p hinj hstep ((b : ℕ) - a - 1) a b (by omega) h1
+      have hlv : lev a = lev b := key_lev p hinj hstep ((b : ℕ) - a - 1) a b (by omega) h1
       simp [hF, hlv, s0, hab, h1, asymm h1]
   have hall : ∀ a b : Fin n, F a b = s0 a b + s0 (π a) (π b) := by
     intro a b
@@ -314,8 +323,7 @@ theorem harm_of_eq (lam : Fin n → ℤ) (hlam : Antitone lam) (π : Equiv.Perm 
       linarith
   have hr : ∀ a, 2 * rhoU lev a = rhoV n a + rhoV n (π a) := by
     intro a
-    have h1 : ∑ b, F a b = 2 * (2 * rhoU lev a) := by
-      rw [two_rhoU, mul_sum]
+    have h1 : ∑ b, F a b = 2 * (2 * rhoU lev a) := by rw [two_rhoU, mul_sum]
     have h2 : ∑ b, F a b = 2 * rhoV n a + 2 * rhoV n (π a) := by
       simp only [hall, sum_add_distrib, sum_sign_eq_two_rho]
       rw [Equiv.sum_comp π (fun b => s0 (π a) b), sum_sign_eq_two_rho]
@@ -329,13 +337,14 @@ theorem harm_of_eq (lam : Fin n → ℤ) (hlam : Antitone lam) (π : Equiv.Perm 
   exact GlobalTheory.CompanionTheory.LevelCompress.muQ_mem_harmSet hIs
 
 theorem domC_of_anti (x : Fin n → ℝ) (hx : Antitone x) : domC x = x := by
-  have h : Tuple.sort (fun a => -x a) = Equiv.refl (Fin n) :=
+  have h : Tuple.sort (fun a => - x a) = Equiv.refl (Fin n) :=
     Tuple.sort_eq_refl_iff_monotone.2 fun a b hab => neg_le_neg (hx hab)
   unfold domC
   rw [h]
   rfl
 
-theorem rhoU_anti (lev : Fin n → ℕ) {a b : Fin n} (h : lev a ≤ lev b) : rhoU lev b ≤ rhoU lev a := by
+theorem rhoU_anti (lev : Fin n → ℕ) {a b : Fin n} (h : lev a ≤ lev b)
+    : rhoU lev b ≤ rhoU lev a := by
   have h1 : (univ.filter fun c => lev b < lev c).card ≤ (univ.filter fun c => lev a < lev c).card :=
     card_le_card fun c hc => by
       simp only [mem_filter, mem_univ, true_and] at hc ⊢
@@ -344,19 +353,26 @@ theorem rhoU_anti (lev : Fin n → ℕ) {a b : Fin n} (h : lev a ≤ lev b) : rh
     card_le_card fun c hc => by
       simp only [mem_filter, mem_univ, true_and] at hc ⊢
       omega
-  have h1' : ((univ.filter fun c => lev b < lev c).card : ℝ) ≤ ((univ.filter fun c => lev a < lev c).card : ℝ) := by
+  have h1'
+      : ((univ.filter fun c => lev b < lev c).card : ℝ)
+        ≤ ((univ.filter fun c => lev a < lev c).card : ℝ) := by
     exact_mod_cast h1
-  have h2' : ((univ.filter fun c => lev c < lev a).card : ℝ) ≤ ((univ.filter fun c => lev c < lev b).card : ℝ) := by
+  have h2'
+      : ((univ.filter fun c => lev c < lev a).card : ℝ)
+        ≤ ((univ.filter fun c => lev c < lev b).card : ℝ) := by
     exact_mod_cast h2
   unfold rhoU
   linarith
 
-def levi (lev : Fin n → ℕ) : Finset (Fin n × Fin n) := univ.filter fun p => p.1 < p.2 ∧ lev p.1 = lev p.2
+def levi (lev : Fin n → ℕ) : Finset (Fin n × Fin n) :=
+  univ.filter fun p => p.1 < p.2 ∧ lev p.1 = lev p.2
 
-theorem wtB_levi (lev : Fin n → ℕ) (hm : Monotone lev) (a : Fin n) :
-    wtB (levi lev) a = 2 * rhoV n a - 2 * rhoU lev a := by
-  have h : ∀ b, s0 a b - mB (levi lev) a b + mB (levi lev) b a =
-      (if lev a < lev b then (1 : ℝ) else 0) - (if lev b < lev a then (1 : ℝ) else 0) := by
+theorem wtB_levi (lev : Fin n → ℕ) (hm : Monotone lev) (a : Fin n)
+    : wtB (levi lev) a = 2 * rhoV n a - 2 * rhoU lev a := by
+  have h
+      : ∀ b,
+        s0 a b - mB (levi lev) a b + mB (levi lev) b a
+          = (if lev a < lev b then (1 : ℝ) else 0) - (if lev b < lev a then (1 : ℝ) else 0) := by
     intro b
     rcases lt_trichotomy a b with h | h | h
     · have h1 := hm h.le
@@ -372,7 +388,9 @@ theorem wtB_levi (lev : Fin n → ℕ) (hm : Monotone lev) (a : Fin n) :
       · have h2 : lev b < lev a := lt_of_le_of_ne h1 (Ne.symm he)
         simp [s0, mB, levi, h, asymm h, he, h2, h2.not_gt, Ne.symm he]
   have h2 := two_rhoU lev a
-  simp only [← h, sum_add_distrib, sum_sub_distrib, sum_sign_eq_two_rho, sum_row_count, sum_column_count] at h2
+  simp only [← h, sum_add_distrib, sum_sub_distrib, sum_sign_eq_two_rho, sum_row_count,
+      sum_column_count]
+    at h2
   unfold wtB
   linarith
 
@@ -390,7 +408,9 @@ theorem harm_sub (lam : Fin n → ℤ) (hlam : Antitone lam) : harmSet lam ⊆ t
     have h3 := rho_anti (n := n) hab
     simp only [Pi.add_apply, muQ]
     linarith
-  have hx : (fun a => 2 * (lam a : ℝ) + 2 * rhoV n a) + rhoV n - wtB (levi lev) = muQ lam lev + rhoV n := by
+  have hx
+      : (fun a => 2 * (lam a : ℝ) + 2 * rhoV n a) + rhoV n - wtB (levi lev)
+        = muQ lam lev + rhoV n := by
     funext a
     simp only [Pi.add_apply, Pi.sub_apply, muQ, wtB_levi lev hl'.1 a]
     ring
@@ -402,9 +422,10 @@ theorem harm_sub (lam : Fin n → ℤ) (hlam : Antitone lam) : harmSet lam ⊆ t
     simp
   · exact hanti
 
-theorem top_form (lam : Fin n → ℤ) (hlam : Antitone lam) {ν : Fin n → ℝ} (h : ν ∈ topTypes lam) :
-    ∃ η : Fin n → ℝ, (∀ g, dot η g ≤ supp g) ∧ ν = (fun a => 2 * (lam a : ℝ) + rhoV n a) + η ∧
-      StrictAnti (ν + rhoV n) := by
+theorem top_form (lam : Fin n → ℤ) (hlam : Antitone lam) {ν : Fin n → ℝ} (h : ν ∈ topTypes lam)
+    : ∃ η : Fin n → ℝ,
+      (∀ g, dot η g ≤ supp g) ∧ ν = (fun a => 2 * (lam a : ℝ) + rhoV n a) + η
+        ∧ StrictAnti (ν + rhoV n) := by
   unfold topTypes at h
   obtain ⟨h1, h2⟩ := mem_filter.1 h
   obtain ⟨B, hB, rfl⟩ := mem_image.1 h1
@@ -426,8 +447,8 @@ theorem top_form (lam : Fin n → ℤ) (hlam : Antitone lam) {ν : Fin n → ℝ
   simp only [Pi.add_apply, Pi.sub_apply, hc]
   ring
 
-theorem spin_le (lam : Fin n → ℤ) (hlam : Antitone lam) {ν : Fin n → ℝ} (h : ν ∈ topTypes lam) :
-    spinSq ν ≤ LSq lam ∧ (spinSq ν = LSq lam → ν ∈ harmSet lam) := by
+theorem spin_le (lam : Fin n → ℤ) (hlam : Antitone lam) {ν : Fin n → ℝ} (h : ν ∈ topTypes lam)
+    : spinSq ν ≤ LSq lam ∧ (spinSq ν = LSq lam → ν ∈ harmSet lam) := by
   obtain ⟨η, hη, rfl, hst⟩ := top_form lam hlam h
   obtain ⟨π, hπ⟩ := exists_spin ((fun a => 2 * (lam a : ℝ) + rhoV n a) + η)
   set X : Fin n → ℝ := fun a => (lam a : ℝ) with hXd
@@ -442,10 +463,10 @@ theorem spin_le (lam : Fin n → ℤ) (hlam : Antitone lam) {ν : Fin n → ℝ}
   have e2 : LSq lam = dot ((2 : ℝ) • X + (2 : ℝ) • rhoV n) ((2 : ℝ) • X + (2 : ℝ) • rhoV n) := by
     unfold LSq
     rw [nsq_dot]
-    congr 1 <;>
-    · funext a
-      simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, hXd]
-      ring
+    congr 1
+      <;> · funext a
+            simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, hXd]
+            ring
   have f1 := dot_self_le η hη
   have f2 : dot r r = dot (rhoV n) (rhoV n) := d_perm _ _ π
   have f3 : dot η X ≤ dot X (rhoV n) := by
@@ -470,7 +491,8 @@ theorem spin_le (lam : Fin n → ℤ) (hlam : Antitone lam) {ν : Fin n → ℝ}
       linarith
     have hηr : η = r := by
       funext a
-      have h0 := (sum_eq_zero_iff_of_nonneg fun a _ => mul_self_nonneg ((η - r) a)).1 hz a (mem_univ a)
+      have h0 :=
+        (sum_eq_zero_iff_of_nonneg fun a _ => mul_self_nonneg ((η - r) a)).1 hz a (mem_univ a)
       have := mul_self_eq_zero.1 h0
       simpa [sub_eq_zero] using this
     have hs : StrictAnti fun a => 2 * (lam a : ℝ) + 2 * rhoV n a + rhoV n (π a) := by
@@ -483,7 +505,6 @@ theorem spin_le (lam : Fin n → ℤ) (hlam : Antitone lam) {ν : Fin n → ℝ}
     funext a
     simp [hηr, hr]
 
-theorem lemmaHT : LemmaHT := fun _ lam hlam =>
-  ⟨harm_sub lam hlam, fun _ h => spin_le lam hlam h⟩
+theorem lemmaHT : LemmaHT := fun _ lam hlam => ⟨harm_sub lam hlam, fun _ h => spin_le lam hlam h⟩
 
 end GlobalTheory.CompanionTheory.SpinBound

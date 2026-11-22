@@ -14,13 +14,13 @@ noncomputable section
 
 universe u
 
-theorem localizedModule_quot_nontrivial {R : Type u} [CommRing R] (J W : Ideal R) [W.IsPrime]
-    (hJW : J ≤ W) : Nontrivial (LocalizedModule W.primeCompl (R ⧸ J)) := by
+theorem localizedModule_quot_nontrivial
+    {R : Type u} [CommRing R] (J W : Ideal R) [W.IsPrime] (hJW : J ≤ W)
+    : Nontrivial (LocalizedModule W.primeCompl (R ⧸ J)) := by
   refine ⟨⟨LocalizedModule.mk (1 : R ⧸ J) 1, 0, fun h => ?_⟩⟩
   rw [← LocalizedModule.zero_mk (1 : W.primeCompl), LocalizedModule.mk_eq] at h
   obtain ⟨v, hv⟩ := h
-  have hv' : ((v : R) : R ⧸ J) = 0 := by
-    simpa [Submonoid.smul_def, Algebra.smul_def] using hv
+  have hv' : ((v : R) : R ⧸ J) = 0 := by simpa [Submonoid.smul_def, Algebra.smul_def] using hv
   exact v.2 (hJW (Ideal.Quotient.eq_zero_iff_mem.mp hv'))
 
 theorem LocCyclePos.proof : LocCyclePos.Statement := by

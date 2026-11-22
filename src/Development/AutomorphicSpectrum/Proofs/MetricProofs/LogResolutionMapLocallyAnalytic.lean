@@ -9,7 +9,11 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.LogResolutionF
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 
 noncomputable section
@@ -18,14 +22,19 @@ namespace GlobalTheory.CompanionTheory.Ar.PB.CovMap
 
 section Orbit
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-  {P : Ideal (MRing ι)} {D e : ℕ} (R : AnLogRes P ⊤ D) {Y : Type*} [TopologicalSpace Y]
-  (B : FinHolAtlas e Y) {V : Y → Set Y} {μ : Y → Y → (Σ k, ι k) → ℂ} {h : Y → R.X}
+variable
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
+  {P : Ideal (MRing ι)} {D e : ℕ} (R : AnLogRes P ⊤ D)
+  {Y : Type*} [TopologicalSpace Y]
+  (B : FinHolAtlas e Y)
+  {V : Y → Set Y} {μ : Y → Y → (Σ k, ι k) → ℂ} {h : Y → R.X}
 
-theorem continuous_of_orbit_of_ne (hVo : ∀ y, IsOpen (V y)) (hVm : ∀ y, y ∈ V y)
-    (hμ : ∀ y q, B.HoloOn (V y) fun u => μ y u q) (hne : ∀ y k, ∃ i, μ y y ⟨k, i⟩ ≠ 0)
-    (hc : ∀ y y', ∀ u ∈ V y ∩ V y', SameOrbit (μ y u) (μ y' u))
-    (hh : ∀ y, SameOrbit (R.lift (h y) (h y)) (μ y y)) : Continuous h := by
+theorem continuous_of_orbit_of_ne
+    (hVo : ∀ y, IsOpen (V y)) (hVm : ∀ y, y ∈ V y) (hμ : ∀ y q, B.HoloOn (V y) fun u => μ y u q)
+    (hne : ∀ y k, ∃ i, μ y y ⟨k, i⟩ ≠ 0) (hc : ∀ y y', ∀ u ∈ V y ∩ V y', SameOrbit (μ y u) (μ y' u))
+    (hh : ∀ y, SameOrbit (R.lift (h y) (h y)) (μ y y))
+    : Continuous h := by
   rw [continuous_iff_continuousAt]
   intro y
   rw [ContinuousAt, tendsto_iff_ultrafilter]
@@ -34,8 +43,9 @@ theorem continuous_of_orbit_of_ne (hVo : ∀ y, IsOpen (V y)) (hVm : ∀ y, y �
   have hth : Tendsto h F (𝓝 x) := hx
   have hUx : ∀ᶠ y' in (F : Filter Y), h y' ∈ R.U x := hth ((R.isOpen_U x).mem_nhds (R.mem_U x))
   have hVy : ∀ᶠ y' in (F : Filter Y), y' ∈ V y := hF ((hVo y).mem_nhds (hVm y))
-  have hcr : ∀ k (i i' : ι k), R.lift x x ⟨k, i⟩ * μ y y ⟨k, i'⟩ =
-      R.lift x x ⟨k, i'⟩ * μ y y ⟨k, i⟩ := by
+  have hcr
+      : ∀ k (i i' : ι k),
+        R.lift x x ⟨k, i⟩ * μ y y ⟨k, i'⟩ = R.lift x x ⟨k, i'⟩ * μ y y ⟨k, i⟩ := by
     intro k i i'
     have t1 : ∀ q, Tendsto (fun y' => R.lift x (h y') q) F (𝓝 (R.lift x x q)) := fun q =>
       (Proj.continuousAt_of_holoOn R.A (R.holo x q) (R.mem_U x)).tendsto.comp hth
@@ -54,7 +64,16 @@ theorem continuous_of_orbit_of_ne (hVo : ∀ y, IsOpen (V y)) (hVm : ∀ y, y �
 
 end Orbit
 
-theorem holoMap_of_local_analytic : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (K' : Type) [Fintype K'] (ι' : K' → Type) [∀ k, Fintype (ι' k)] (P J : Ideal (MRing ι)) (P' J' : Ideal (MRing ι')) (D D' : ℕ) (R : AnLogRes P J D) (R' : AnLogRes P' J' D') (g : R'.X → R.X), J = ⊤ → (∀ x, ∃ (V : Set ((Σ k, ι' k) → ℂ)) (f : ((Σ k, ι' k) → ℂ) → (Σ k, ι k) → ℂ), IsOpen V ∧ R'.lift x x ∈ V ∧ AnalyticOnNhd ℂ f V ∧ ∀ z' ∈ V ∩ mcPts P', ∀ x', SameOrbit z' (R'.lift x' x') → SameOrbit (f z') (R.lift (g x') (g x'))) → HoloMap R'.A R.A g := by
+theorem holoMap_of_local_analytic
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (K' : Type) [Fintype K']
+        (ι' : K' → Type) [∀ k, Fintype (ι' k)] (P J : Ideal (MRing ι)) (P' J' : Ideal (MRing ι'))
+        (D D' : ℕ) (R : AnLogRes P J D) (R' : AnLogRes P' J' D') (g : R'.X → R.X),
+      J = ⊤
+        → (∀ x, ∃ (V : Set ((Σ k, ι' k) → ℂ)) (f : ((Σ k, ι' k) → ℂ) → (Σ k, ι k) → ℂ),
+          IsOpen V ∧ R'.lift x x ∈ V ∧ AnalyticOnNhd ℂ f V
+            ∧ ∀ z' ∈ V ∩ mcPts P', ∀ x',
+              SameOrbit z' (R'.lift x' x') → SameOrbit (f z') (R.lift (g x') (g x')))
+        → HoloMap R'.A R.A g := by
   intro K _ ι _ K' _ ι' _ P J P' J' D D' R R' g hJ hg
   subst hJ
   choose Vs f hVs hxV hf hcomp using hg
@@ -63,8 +82,7 @@ theorem holoMap_of_local_analytic : ∀ (K : Type) [Fintype K] (ι : K → Type)
       (Proj.continuousAt_of_holoOn R'.A (R'.holo y p) hx).continuousWithinAt
   let V : R'.X → Set R'.X := fun y => R'.U y ∩ R'.lift y ⁻¹' Vs y
   let μ : R'.X → R'.X → (Σ k, ι k) → ℂ := fun y u => f y (R'.lift y u)
-  have hVo : ∀ y, IsOpen (V y) := fun y =>
-    (hcl y).isOpen_inter_preimage (R'.isOpen_U y) (hVs y)
+  have hVo : ∀ y, IsOpen (V y) := fun y => (hcl y).isOpen_inter_preimage (R'.isOpen_U y) (hVs y)
   have hVm : ∀ y, y ∈ V y := fun y => ⟨R'.mem_U y, hxV y⟩
   have hμ : ∀ y q, R'.A.HoloOn (V y) fun u => μ y u q := by
     rintro y q j w ⟨hw, hwV⟩
@@ -72,7 +90,8 @@ theorem holoMap_of_local_analytic : ∀ (K : Type) [Fintype K] (ι : K → Type)
       AnalyticAt.pi fun p => R'.holo y p j w ⟨hw, hwV.1⟩
     have h2 : AnalyticAt ℂ (f y ∘ fun w' => R'.lift y ((R'.A.chart j).symm w')) w :=
       AnalyticAt.comp (hf y _ hwV.2) h1
-    exact (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : (Σ k, ι k) => ℂ) q).analyticAt _ |>.comp h2
+    exact (ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : (Σ k, ι k) => ℂ) q).analyticAt _
+      |>.comp h2
   have hor : ∀ y, ∀ u ∈ V y, SameOrbit (μ y u) (R.lift (g u) (g u)) := fun y u hu =>
     hcomp y _ ⟨hu.2, R'.mem y u hu.1⟩ u (R'.compat y u u ⟨hu.1, R'.mem_U u⟩)
   have hc : ∀ y y', ∀ u ∈ V y ∩ V y', SameOrbit (μ y u) (μ y' u) := fun y y' u hu =>

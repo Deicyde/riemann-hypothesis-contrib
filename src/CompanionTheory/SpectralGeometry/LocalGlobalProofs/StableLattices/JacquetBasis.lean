@@ -6,7 +6,8 @@ public import CompanionTheory.RealGroups.DiscreteSeries.DiscreteSeriesClassifica
 
 noncomputable section
 
-open Matrix CompanionTheory.RgExh CompanionTheory.RgExh.Dec CompanionTheory.RgExh.Dec.J Formalism.REAL GlobalTheory.SmGL
+open Matrix CompanionTheory.RgExh CompanionTheory.RgExh.Dec CompanionTheory.RgExh.Dec.J
+  Formalism.REAL GlobalTheory.SmGL
 
 namespace GlobalTheory.CompanionTheory.GradEig
 
@@ -19,7 +20,8 @@ theorem Jm_mul_self (ε : Fin n → Bool) : Jm ε * Jm ε = 1 := by
   funext a
   split_ifs <;> norm_num
 
-theorem trace_eq_zero {ε : Fin n → Bool} {A : Matrix (Fin n) (Fin n) ℂ} (h : IsGrad ε A) : A.trace = 0 := by
+theorem trace_eq_zero {ε : Fin n → Bool} {A : Matrix (Fin n) (Fin n) ℂ} (h : IsGrad ε A)
+    : A.trace = 0 := by
   obtain ⟨hG, hH, -, -⟩ := h
   have hG' : A.conjTranspose * Jm ε + Jm ε * A = 0 := hG
   rw [hH] at hG'
@@ -27,11 +29,13 @@ theorem trace_eq_zero {ε : Fin n → Bool} {A : Matrix (Fin n) (Fin n) ℂ} (h 
   have h2 : (A * Jm ε * Jm ε).trace = -(Jm ε * A * Jm ε).trace := by
     rw [h1, Matrix.neg_mul, Matrix.trace_neg]
   rw [Matrix.mul_assoc A, Jm_mul_self, Matrix.mul_one, Matrix.trace_mul_cycle, Jm_mul_self,
-    Matrix.one_mul] at h2
+      Matrix.one_mul]
+    at h2
   linear_combination h2 / 2
 
-theorem eigenvalue_cases {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.IsHermitian) (h3 : A * A * A = A) (i : Fin n) :
-    hA.eigenvalues i = -1 ∨ hA.eigenvalues i = 0 ∨ hA.eigenvalues i = 1 := by
+theorem eigenvalue_cases
+    {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.IsHermitian) (h3 : A * A * A = A) (i : Fin n)
+    : hA.eigenvalues i = -1 ∨ hA.eigenvalues i = 0 ∨ hA.eigenvalues i = 1 := by
   have hev := hA.mulVec_eigenvectorBasis i
   obtain ⟨v, hv⟩ : ∃ v, v = (hA.eigenvectorBasis i).ofLp := ⟨_, rfl⟩
   rw [← hv] at hev
@@ -63,27 +67,35 @@ theorem eigenvalue_cases {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.IsHermitian) (
     · exact Or.inr (Or.inr (by linarith))
   · exact Or.inl (by linarith)
 
-theorem exists_perm_blocks {c : Fin n → Fin 3} {d : Fin 3 → ℕ} (hd : ∑ i, d i = n)
-    (hc : ∀ i, Fintype.card {x // c x = i} = d i) :
-    ∃ σ : Fin n ≃ Fin n, ∀ p, c (σ p) = ((stdBlocks d hd).symm p).1 := by
+theorem exists_perm_blocks
+    {c : Fin n → Fin 3} {d : Fin 3 → ℕ}
+    (hd : ∑ i, d i = n) (hc : ∀ i, Fintype.card {x // c x = i} = d i)
+    : ∃ σ : Fin n ≃ Fin n, ∀ p, c (σ p) = ((stdBlocks d hd).symm p).1 := by
   classical
   let e : ∀ i, {x // c x = i} ≃ Fin (d i) := fun i => Fintype.equivFinOfCardEq (hc i)
   let τ : Fin n ≃ Fin n :=
     ((Equiv.sigmaFiberEquiv c).symm.trans (Equiv.sigmaCongrRight e)).trans (stdBlocks d hd)
   refine ⟨τ.symm, fun p => ?_⟩
-  have hτ : τ.symm p = (((e ((stdBlocks d hd).symm p).1).symm ((stdBlocks d hd).symm p).2) : Fin n) := rfl
+  have hτ
+      : τ.symm p = (((e ((stdBlocks d hd).symm p).1).symm ((stdBlocks d hd).symm p).2) : Fin n) :=
+    rfl
   rw [hτ]
   exact ((e _).symm _).2
 
-theorem exists_gradBasis {ε : Fin n → Bool} {A : Matrix (Fin n) (Fin n) ℂ} (h : IsGrad ε A) :
-    Nonempty (GradBasis A) := by
+theorem exists_gradBasis {ε : Fin n → Bool} {A : Matrix (Fin n) (Fin n) ℂ} (h : IsGrad ε A)
+    : Nonempty (GradBasis A) := by
   classical
   have htr := trace_eq_zero h
   obtain ⟨_, hH, h3, _⟩ := h
   have hA : A.IsHermitian := hH
   have hcase := eigenvalue_cases hA h3
   let c : Fin n → Fin 3 := fun x =>
-    if hA.eigenvalues x = -1 then 0 else if hA.eigenvalues x = 0 then 1 else 2
+    if hA.eigenvalues x = -1 then
+      0
+    else if hA.eigenvalues x = 0 then
+      1
+    else
+      2
   have hc0 : ∀ x, c x = 0 ↔ hA.eigenvalues x = -1 := by
     intro x; rcases hcase x with hx | hx | hx <;> norm_num [c, hx] <;> decide
   have hc1 : ∀ x, c x = 1 ↔ hA.eigenvalues x = 0 := by
@@ -99,21 +111,25 @@ theorem exists_gradBasis {ε : Fin n → Bool} {A : Matrix (Fin n) (Fin n) ℂ} 
     have h2 := congrArg Complex.re h1
     simpa [Complex.re_sum] using h2.symm
   have hk1 : (Finset.univ.filter fun x => hA.eigenvalues x = 1).card = j := by
-    have hs : ∑ x, hA.eigenvalues x = ∑ x, ((if hA.eigenvalues x = 1 then (1 : ℝ) else 0) -
-        (if hA.eigenvalues x = -1 then (1 : ℝ) else 0)) := by
+    have hs
+        : ∑ x, hA.eigenvalues x
+          = ∑ x, ((if hA.eigenvalues x = 1 then (1 : ℝ) else 0) -
+            (if hA.eigenvalues x = -1 then (1 : ℝ) else 0)) := by
       refine Finset.sum_congr rfl fun x _ => ?_
       rcases hcase x with hx | hx | hx <;> norm_num [hx]
     rw [Finset.sum_sub_distrib, Finset.sum_boole, Finset.sum_boole, hsumR, hj] at hs
     have hs' : ((Finset.univ.filter fun x => hA.eigenvalues x = 1).card : ℝ) = j := by linarith
     exact_mod_cast hs'
   have htot : j + (Finset.univ.filter fun x => hA.eigenvalues x = 0).card + j = n := by
-    have hs : ∑ x : Fin n, ((if hA.eigenvalues x = -1 then 1 else 0) +
-        (if hA.eigenvalues x = 0 then 1 else 0) + (if hA.eigenvalues x = 1 then 1 else 0) : ℕ) =
-        ∑ x : Fin n, 1 := by
+    have hs
+        : ∑ x : Fin n, ((if hA.eigenvalues x = -1 then 1 else 0) +
+            (if hA.eigenvalues x = 0 then 1 else 0) + (if hA.eigenvalues x = 1 then 1 else 0) : ℕ)
+          = ∑ x : Fin n, 1 := by
       refine Finset.sum_congr rfl fun x _ => ?_
       rcases hcase x with hx | hx | hx <;> norm_num [hx]
     rw [Finset.sum_add_distrib, Finset.sum_add_distrib, Finset.sum_boole, Finset.sum_boole,
-      Finset.sum_boole, hj, hk1] at hs
+        Finset.sum_boole, hj, hk1]
+      at hs
     simpa using hs
   have hcard : ∀ i, Fintype.card {x // c x = i} = dims n j i := by
     intro i
@@ -132,28 +148,39 @@ theorem exists_gradBasis {ε : Fin n → Bool} {A : Matrix (Fin n) (Fin n) ℂ} 
   obtain ⟨σ, hσ⟩ := exists_perm_blocks hd hcard
   have hs := hA.spectral_theorem
   rw [Unitary.conjStarAlgAut_apply] at hs
-  have hUU : (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) *
-      star (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) = 1 :=
+  have hUU
+      : (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ)
+          * star (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ)
+        = 1 :=
     Matrix.mem_unitaryGroup_iff.1 hA.eigenvectorUnitary.2
-  have hUU' : star (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) *
-      (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) = 1 :=
+  have hUU'
+      : star (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ)
+          * (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ)
+        = 1 :=
     Matrix.mem_unitaryGroup_iff'.1 hA.eigenvectorUnitary.2
-  have hdiag : (diagonal fun p => (![-1, 0, 1] : Fin 3 → ℂ) ((stdBlocks (dims n j) hd).symm p).fst) =
-      (diagonal (RCLike.ofReal ∘ hA.eigenvalues)).submatrix σ σ := by
+  have hdiag
+      : (diagonal fun p => (![-1, 0, 1] : Fin 3 → ℂ) ((stdBlocks (dims n j) hd).symm p).fst)
+        = (diagonal (RCLike.ofReal ∘ hA.eigenvalues)).submatrix σ σ := by
     rw [Matrix.submatrix_diagonal_equiv]
     congr 1
     funext p
     rw [← hσ p, hval]
     rfl
-  have e1 : (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ).submatrix id σ *
-      (star (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ)).submatrix σ id = 1 := by
+  have e1
+      : (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ).submatrix id σ
+          * (star (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ)).submatrix σ id
+        = 1 := by
     rw [← Matrix.submatrix_mul _ _ _ _ _ σ.bijective, hUU, Matrix.submatrix_id_id]
-  have e2 : (star (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ)).submatrix σ id *
-      (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ).submatrix id σ = 1 := by
+  have e2
+      : (star (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ)).submatrix σ id
+          * (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ).submatrix id σ
+        = 1 := by
     rw [← Matrix.submatrix_mul _ _ _ _ _ Function.bijective_id, hUU', Matrix.submatrix_one_equiv]
-  have e3 : A = ((hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ).submatrix id σ *
-      diagonal fun p => (![-1, 0, 1] : Fin 3 → ℂ) ((stdBlocks (dims n j) hd).symm p).fst) *
-      (star (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ)).submatrix σ id := by
+  have e3
+      : A
+        = ((hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ).submatrix id σ
+            * diagonal fun p => (![-1, 0, 1] : Fin 3 → ℂ) ((stdBlocks (dims n j) hd).symm p).fst)
+          * (star (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ)).submatrix σ id := by
     rw [hdiag, ← Matrix.submatrix_mul _ _ _ _ _ σ.bijective,
       ← Matrix.submatrix_mul _ _ _ _ _ σ.bijective, Matrix.submatrix_id_id]
     exact hs

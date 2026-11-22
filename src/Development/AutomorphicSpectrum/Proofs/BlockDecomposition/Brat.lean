@@ -10,15 +10,18 @@ open PositivityTheory.RgEis PositivityTheory.RgEis.So
 namespace GlobalTheory.CompanionTheory.EisBrat
 
 open scoped TensorProduct NumberField.AdeleRing
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM
+  GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  GlobalTheory.ThK.Dbl
 
 theorem brat : BRat := by
   intro F E _ _ _ _ _ σ χ c _ _ _ _
   refine ⟨fun y => ?_, fun e x h => ?_⟩
   · change (algebraMap F (AF F) y) ⊗ₜ[F] (1 : E) = (1 : AF F) ⊗ₜ[F] (algebraMap F E y)
     rw [Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one, TensorProduct.smul_tmul]
-  · obtain ⟨g, hg⟩ := (Algebra.linearMap F E).exists_leftInverse_of_injective
-      (LinearMap.ker_eq_bot.mpr (FaithfulSMul.algebraMap_injective F E))
+  · obtain ⟨g, hg⟩ :=
+      (Algebra.linearMap F E).exists_leftInverse_of_injective
+        (LinearMap.ker_eq_bot.mpr (FaithfulSMul.algebraMap_injective F E))
     have g1 : g 1 = 1 := by
       have := LinearMap.congr_fun hg (1 : F)
       simpa using this

@@ -14,58 +14,65 @@ noncomputable section
 
 variable {K : Type} [Fintype K] [Nonempty K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem segreW_mem_one_smul (P : Ideal (MvPolynomial (Σ k, ι k) ℂ)) (p : (k : K) → ι k) :
-    segreW P p ∈ segreGrading P (1 • 1) := by
+theorem segreW_mem_one_smul (P : Ideal (MvPolynomial (Σ k, ι k) ℂ)) (p : (k : K) → ι k)
+    : segreW P p ∈ segreGrading P (1 • 1) := by
   simpa using segreW_mem P p
 
-def toSpecC {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P) :
-    projX P hP ⟶ Spec (CommRingCat.of ℂ) :=
+def toSpecC {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P)
+    : projX P hP ⟶ Spec (CommRingCat.of ℂ) :=
   letI := segreGraded hP
   Proj.toSpecZero (segreGrading P) ≫ Spec.map (CommRingCat.ofHom (algebraMap ℂ (segreGrading P 0)))
 
-instance locallyOfFiniteType_toSpecC {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P) :
-    LocallyOfFiniteType (toSpecC hP) := by
+instance locallyOfFiniteType_toSpecC
+    {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P)
+    : LocallyOfFiniteType (toSpecC hP) := by
   classical
   letI := segreGraded hP
   have hsurj := segreGrading_algebraMap_surjective hP
   haveI := segreRing_finiteType hP
-  have h2 : LocallyOfFiniteType (Spec.map (CommRingCat.ofHom (algebraMap ℂ (segreGrading P 0)))) := by
+  have h2
+      : LocallyOfFiniteType (Spec.map (CommRingCat.ofHom (algebraMap ℂ (segreGrading P 0)))) := by
     rw [HasRingHomProperty.Spec_iff (P := @LocallyOfFiniteType)]
     exact RingHom.FiniteType.of_surjective _ hsurj
   have h1 : LocallyOfFiniteType (Proj.toSpecZero (segreGrading P)) := inferInstance
   exact @locallyOfFiniteType_comp _ _ _ (Proj.toSpecZero (segreGrading P)) _ h1 h2
 
-
 open Classical in
-def chartUpd (p : (k : K) → ι k) (q : Σ k, ι k) : (k : K) → ι k :=
-  Function.update p q.1 q.2
+def chartUpd (p : (k : K) → ι k) (q : Σ k, ι k) : (k : K) → ι k := Function.update p q.1 q.2
 
-def awayCoord {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P) (p : (k : K) → ι k)
-    (q : Σ k, ι k) :
-    letI := segreGraded hP
-    HomogeneousLocalization.Away (segreGrading P) (segreW P p) :=
+def awayCoord
+    {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P)
+    (p : (k : K) → ι k) (q : Σ k, ι k)
+    : letI := segreGraded hP
+      HomogeneousLocalization.Away (segreGrading P) (segreW P p) :=
   letI := segreGraded hP
   HomogeneousLocalization.Away.mk (segreGrading P) (segreW_mem P p) 1 (segreW P (chartUpd p q))
     (segreW_mem_one_smul P (chartUpd p q))
 
-def polyToAway {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P) (p : (k : K) → ι k) :
-    letI := segreGraded hP
-    MvPolynomial (Σ k, ι k) ℂ →+* HomogeneousLocalization.Away (segreGrading P) (segreW P p) :=
+def polyToAway
+    {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P) (p : (k : K) → ι k)
+    : letI := segreGraded hP
+      MvPolynomial (Σ k, ι k) ℂ →+* HomogeneousLocalization.Away (segreGrading P) (segreW P p) :=
   letI := segreGraded hP
-  eval₂Hom ((algebraMap (segreGrading P 0) _).comp (algebraMap ℂ (segreGrading P 0))) (awayCoord hP p)
+  eval₂Hom ((algebraMap (segreGrading P 0) _).comp (algebraMap ℂ (segreGrading P 0)))
+    (awayCoord hP p)
 
-theorem val_polyToAway {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P)
-    (p : (k : K) → ι k) (f : MvPolynomial (Σ k, ι k) ℂ) :
-    letI := segreGraded hP
-    (polyToAway hP p f).val = eval₂ (algebraMap ℂ (Localization.Away (segreW P p)))
-      (fun q => Localization.mk (segreW P (chartUpd p q)) 1 * invW P p) f := by
+theorem val_polyToAway
+    {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P)
+    (p : (k : K) → ι k) (f : MvPolynomial (Σ k, ι k) ℂ)
+    : letI := segreGraded hP
+      (polyToAway hP p f).val
+        = eval₂ (algebraMap ℂ (Localization.Away (segreW P p)))
+          (fun q => Localization.mk (segreW P (chartUpd p q)) 1 * invW P p)
+          f := by
   letI := segreGraded hP
   induction f using MvPolynomial.induction_on with
   | C c =>
     simp only [polyToAway, coe_eval₂Hom, eval₂_C, RingHom.coe_comp, Function.comp_apply]
     rw [HomogeneousLocalization.algebraMap_eq]
     rw [IsScalarTower.algebraMap_apply ℂ (MvPolynomial ((k : K) → ι k) ℂ ⧸ segreIdeal P)
-      (Localization.Away (segreW P p)), ← Localization.mk_one_eq_algebraMap]
+        (Localization.Away (segreW P p)),
+      ← Localization.mk_one_eq_algebraMap]
     rfl
   | add f g hf hg =>
     simp only [map_add (f := _), HomogeneousLocalization.val_add, hf, hg, eval₂_add]
@@ -75,10 +82,10 @@ theorem val_polyToAway {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMulti
     simp only [polyToAway, coe_eval₂Hom, eval₂_X, awayCoord, HomogeneousLocalization.Away.val_mk]
     rw [mk_pow_eq_mul_invW, pow_one]
 
-theorem chartIdeal_le_ker_polyToAway {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P)
-    (p : (k : K) → ι k) :
-    letI := segreGraded hP
-    chartIdeal P p ≤ RingHom.ker (polyToAway hP p) := by
+theorem chartIdeal_le_ker_polyToAway
+    {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P) (p : (k : K) → ι k)
+    : letI := segreGraded hP
+      chartIdeal P p ≤ RingHom.ker (polyToAway hP p) := by
   classical
   letI := segreGraded hP
   refine sup_le ?_ ?_
@@ -90,12 +97,15 @@ theorem chartIdeal_le_ker_polyToAway {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)}
     apply HomogeneousLocalization.val_injective
     rw [val_polyToAway, HomogeneousLocalization.val_zero,
       eval₂_mul_const_of_isHomogeneous _ _ _ (isHomogeneous_of_isMultiHomog ha)]
-    have hmem : aeval (fun q => (X (chartUpd p q) : MvPolynomial ((k : K) → ι k) ℂ)) s ∈ segreIdeal P := by
+    have hmem
+        : aeval (fun q => (X (chartUpd p q) : MvPolynomial ((k : K) → ι k) ℂ)) s
+          ∈ segreIdeal P := by
       show segreMap _ ∈ P
       simp only [chartUpd]
       rw [segreMap_aeval_update p ha]
       exact Ideal.mul_mem_left _ _ hsP
-    rw [eval₂_mk_one (segreIdeal P) _ (fun q => (X (chartUpd p q) : MvPolynomial ((k : K) → ι k) ℂ)),
+    rw [eval₂_mk_one (segreIdeal P) _
+        (fun q => (X (chartUpd p q) : MvPolynomial ((k : K) → ι k) ℂ)),
       Ideal.Quotient.eq_zero_iff_mem.mpr hmem, Localization.mk_zero, zero_mul]
   · rw [Ideal.span_le]
     rintro _ ⟨k, rfl⟩
@@ -105,21 +115,23 @@ theorem chartIdeal_le_ker_polyToAway {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)}
     rw [val_polyToAway, HomogeneousLocalization.val_zero, eval₂_sub, eval₂_X, eval₂_one, hu,
       mk_one_mul_invW, sub_self]
 
-def chartToAway {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P) (p : (k : K) → ι k) :
-    letI := segreGraded hP
-    chartRing P p →+* HomogeneousLocalization.Away (segreGrading P) (segreW P p) :=
+def chartToAway
+    {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P) (p : (k : K) → ι k)
+    : letI := segreGraded hP
+      chartRing P p →+* HomogeneousLocalization.Away (segreGrading P) (segreW P p) :=
   letI := segreGraded hP
   Ideal.Quotient.lift _ (polyToAway hP p) (chartIdeal_le_ker_polyToAway hP p)
 
-theorem chartToAway_mk {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P)
-    (p : (k : K) → ι k) (f : MvPolynomial (Σ k, ι k) ℂ) :
-    chartToAway hP p (Ideal.Quotient.mk _ f) = polyToAway hP p f :=
+theorem chartToAway_mk
+    {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P)
+    (p : (k : K) → ι k) (f : MvPolynomial (Σ k, ι k) ℂ)
+    : chartToAway hP p (Ideal.Quotient.mk _ f) = polyToAway hP p f :=
   rfl
 
-theorem chartToAway_bijective {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P)
-    (p : (k : K) → ι k) :
-    letI := segreGraded hP
-    Function.Bijective (chartToAway hP p) := by
+theorem chartToAway_bijective
+    {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P) (p : (k : K) → ι k)
+    : letI := segreGraded hP
+      Function.Bijective (chartToAway hP p) := by
   classical
   letI := segreGraded hP
   have hX1 : ∀ k, Ideal.Quotient.mk (chartIdeal P p) (X ⟨k, p k⟩) = 1 := fun k => by
@@ -136,22 +148,25 @@ theorem chartToAway_bijective {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : 
     rw [hψAW]
     exact Finset.prod_eq_one fun k _ => hX1 k
   have hu : IsUnit (ψA (segreW P p)) := hw ▸ isUnit_one
-  let ψL : Localization.Away (segreW P p) →+* chartRing P p := IsLocalization.Away.lift (segreW P p) hu
+  let ψL : Localization.Away (segreW P p) →+* chartRing P p :=
+    IsLocalization.Away.lift (segreW P p) hu
   have hψL : ∀ a (s : Submonoid.powers (segreW P p)), ψL (Localization.mk a s) = ψA a := by
     intro a s
     have hs : ψA (s : MvPolynomial ((k : K) → ι k) ℂ ⧸ segreIdeal P) = 1 := by
       obtain ⟨_, n, rfl⟩ := s
       rw [map_pow, hw, one_pow]
-    calc ψL (Localization.mk a s)
-        = ψL (Localization.mk a s) * ψA (s : MvPolynomial ((k : K) → ι k) ℂ ⧸ segreIdeal P) := by
-          rw [hs, mul_one]
-      _ = ψL (Localization.mk a s * algebraMap _ (Localization.Away (segreW P p))
+    calc
+      ψL (Localization.mk a s)
+          = ψL (Localization.mk a s) * ψA (s : MvPolynomial ((k : K) → ι k) ℂ ⧸ segreIdeal P) := by
+        rw [hs, mul_one]
+      _ = ψL
+          (Localization.mk a s * algebraMap _ (Localization.Away (segreW P p))
             (s : MvPolynomial ((k : K) → ι k) ℂ ⧸ segreIdeal P)) := by
-          rw [map_mul, IsLocalization.Away.lift_eq]
+        rw [map_mul, IsLocalization.Away.lift_eq]
       _ = ψL (algebraMap _ (Localization.Away (segreW P p)) a) := by
-          congr 1
-          rw [Localization.mk_eq_mk']
-          exact IsLocalization.mk'_spec _ a s
+        congr 1
+        rw [Localization.mk_eq_mk']
+        exact IsLocalization.mk'_spec _ a s
       _ = ψA a := IsLocalization.Away.lift_eq _ _ _
   let ψ : HomogeneousLocalization.Away (segreGrading P) (segreW P p) →+* chartRing P p :=
     ψL.comp (algebraMap _ (Localization.Away (segreW P p)))
@@ -161,22 +176,23 @@ theorem chartToAway_bijective {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : 
       apply Ideal.Quotient.ringHom_ext
       apply MvPolynomial.ringHom_ext
       · intro c
-        simp only [RingHom.comp_apply, RingHom.id_apply, chartToAway_mk, hψ,
-          val_polyToAway, eval₂_C]
+        simp only [RingHom.comp_apply, RingHom.id_apply, chartToAway_mk, hψ, val_polyToAway,
+          eval₂_C]
         rw [IsScalarTower.algebraMap_apply ℂ (MvPolynomial ((k : K) → ι k) ℂ ⧸ segreIdeal P),
           IsLocalization.Away.lift_eq]
         show Ideal.Quotient.mk _ (segreMap (C c)) = _
         rw [← MvPolynomial.algebraMap_eq, AlgHom.commutes]
         rfl
       · intro q
-        simp only [RingHom.comp_apply, RingHom.id_apply, chartToAway_mk, hψ,
-          val_polyToAway, eval₂_X, map_mul, hψL, map_one, mul_one, hψAW, chartUpd]
+        simp only [RingHom.comp_apply, RingHom.id_apply, chartToAway_mk, hψ, val_polyToAway,
+          eval₂_X, map_mul, hψL, map_one, mul_one, hψAW, chartUpd]
         rw [prod_update_eq (fun q => Ideal.Quotient.mk (chartIdeal P p) (X q)) p q.1 q.2,
           Finset.prod_eq_one fun k _ => hX1 k, mul_one]
     exact fun x => RingHom.congr_fun h x
   have hright : ∀ z, chartToAway hP p (ψ z) = z := by
     intro z
-    obtain ⟨n, a, ha, rfl⟩ := HomogeneousLocalization.Away.mk_surjective (segreGrading P) (segreW_mem P p) z
+    obtain ⟨n, a, ha, rfl⟩ :=
+      HomogeneousLocalization.Away.mk_surjective (segreGrading P) (segreW_mem P p) z
     obtain ⟨h, hh, rfl⟩ := Submodule.mem_map.mp ha
     have hhom : h.IsHomogeneous n := by
       simpa [smul_eq_mul, mul_one] using (mem_homogeneousSubmodule _ h).mp hh
@@ -184,21 +200,27 @@ theorem chartToAway_bijective {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : 
     rw [hψ, HomogeneousLocalization.Away.val_mk, hψL]
     simp only [AlgHom.toLinearMap_apply, Ideal.Quotient.mkₐ_eq_mk]
     rw [hψA, chartToAway_mk, val_polyToAway, mk_pow_eq_mul_invW]
-    have hseg : ∀ p' : (k : K) → ι k, eval₂ (algebraMap ℂ (Localization.Away (segreW P p)))
-        (fun q => Localization.mk (segreW P (chartUpd p q)) 1 * invW P p)
-        (segreMap (X p' : MvPolynomial ((k : K) → ι k) ℂ)) =
-        Localization.mk (segreW P p') 1 * invW P p := by
+    have hseg
+        : ∀ p' : (k : K) → ι k,
+          eval₂ (algebraMap ℂ (Localization.Away (segreW P p)))
+              (fun q => Localization.mk (segreW P (chartUpd p q)) 1 * invW P p)
+              (segreMap (X p' : MvPolynomial ((k : K) → ι k) ℂ))
+            = Localization.mk (segreW P p') 1 * invW P p := by
       intro p'
-      have E := congrArg (algebraMap (MvPolynomial ((k : K) → ι k) ℂ ⧸ segreIdeal P)
-        (Localization.Away (segreW P p))) (segreW_prod_update P p p')
+      have E :=
+        congrArg
+          (algebraMap (MvPolynomial ((k : K) → ι k) ℂ ⧸ segreIdeal P)
+            (Localization.Away (segreW P p)))
+          (segreW_prod_update P p p')
       simp only [map_mul, map_prod, map_pow] at E
       have ht := mk_one_mul_invW P p
       simp only [Localization.mk_one_eq_algebraMap] at ht ⊢
       rw [segreMap_X, eval₂_prod]
       simp only [eval₂_X, Finset.prod_mul_distrib, Finset.prod_const, Finset.card_univ]
       exact mul_pow_inv_eq _ _ _ _ _ E ht
-    have hc : (aeval (fun q => Localization.mk (segreW P (chartUpd p q)) 1 * invW P p)).comp segreMap =
-        aeval (fun p' => Localization.mk (segreW P p') 1 * invW P p) :=
+    have hc
+        : (aeval (fun q => Localization.mk (segreW P (chartUpd p q)) 1 * invW P p)).comp segreMap
+          = aeval (fun p' => Localization.mk (segreW P p') 1 * invW P p) :=
       MvPolynomial.algHom_ext fun p' => by
         rw [AlgHom.comp_apply, aeval_X, aeval_def]
         exact hseg p'
@@ -209,45 +231,54 @@ theorem chartToAway_bijective {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : 
     rw [eval₂_mk_one (segreIdeal P) _ X h, aeval_X_left_apply]
   exact ⟨fun x y hxy => by rw [← hleft x, ← hleft y, hxy], fun z => ⟨ψ z, hright z⟩⟩
 
-def awayEquiv {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P) (p : (k : K) → ι k) :
-    letI := segreGraded hP
-    chartRing P p ≃+* HomogeneousLocalization.Away (segreGrading P) (segreW P p) :=
+def awayEquiv {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P) (p : (k : K) → ι k)
+    : letI := segreGraded hP
+      chartRing P p ≃+* HomogeneousLocalization.Away (segreGrading P) (segreW P p) :=
   letI := segreGraded hP
   RingEquiv.ofBijective _ (chartToAway_bijective hP p)
 
-def gammaChart {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P) (p : (k : K) → ι k) :
-    Γ(projX P hP, (chartOpen hP p).1) ≃+* chartRing P p :=
+def gammaChart
+    {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P) (p : (k : K) → ι k)
+    : Γ(projX P hP, (chartOpen hP p).1) ≃+* chartRing P p :=
   letI := segreGraded hP
-  (Proj.basicOpenIsoAway (segreGrading P) (segreW P p) (segreW_mem P p) one_pos).commRingCatIsoToRingEquiv.symm.trans
-    (awayEquiv hP p).symm
+  (Proj.basicOpenIsoAway (segreGrading P) (segreW P p) (segreW_mem P p)
+    one_pos).commRingCatIsoToRingEquiv.symm.trans (awayEquiv hP p).symm
 
-def chartCoord {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P) (p : (k : K) → ι k)
-    (q : Σ k, ι k) : Γ(projX P hP, (chartOpen hP p).1) :=
+def chartCoord
+    {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P)
+    (p : (k : K) → ι k) (q : Σ k, ι k)
+    : Γ(projX P hP, (chartOpen hP p).1) :=
   (gammaChart hP p).symm (Ideal.Quotient.mk _ (X q))
 
-theorem gammaChart_symm_C {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P)
-    (p : (k : K) → ι k) (c : ℂ) :
-    (gammaChart hP p).symm (Ideal.Quotient.mk _ (C c)) = constSec (toSpecC hP) (chartOpen hP p).1 c := by
+theorem gammaChart_symm_C
+    {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P) (p : (k : K) → ι k) (c : ℂ)
+    : (gammaChart hP p).symm (Ideal.Quotient.mk _ (C c))
+      = constSec (toSpecC hP) (chartOpen hP p).1 c := by
   letI := segreGraded hP
   have hk := toSpecZero_appLE_basicOpen (segreGrading P) (segreW_mem P p) one_pos
-  have hC : (Scheme.ΓSpecIso (CommRingCat.of ℂ)).inv ≫ (toSpecC hP).appLE ⊤ (chartOpen hP p).1 le_top =
-      CommRingCat.ofHom (algebraMap ℂ (segreGrading P 0)) ≫
-        CommRingCat.ofHom (HomogeneousLocalization.fromZeroRingHom (segreGrading P)
-          (Submonoid.powers (segreW P p))) ≫ Proj.awayToSection (segreGrading P) (segreW P p) := by
-    have h3 := Scheme.Hom.comp_appLE (Proj.toSpecZero (segreGrading P))
-      (Spec.map (CommRingCat.ofHom (algebraMap ℂ (segreGrading P 0)))) ⊤
-      (Proj.basicOpen (segreGrading P) (segreW P p)) le_top
+  have hC
+      : (Scheme.ΓSpecIso (CommRingCat.of ℂ)).inv ≫ (toSpecC hP).appLE ⊤ (chartOpen hP p).1 le_top
+        = CommRingCat.ofHom (algebraMap ℂ (segreGrading P 0))
+          ≫ CommRingCat.ofHom (HomogeneousLocalization.fromZeroRingHom (segreGrading P)
+            (Submonoid.powers (segreW P p)))
+          ≫ Proj.awayToSection (segreGrading P) (segreW P p) := by
+    have h3 :=
+      Scheme.Hom.comp_appLE (Proj.toSpecZero (segreGrading P))
+        (Spec.map (CommRingCat.ofHom (algebraMap ℂ (segreGrading P 0)))) ⊤
+        (Proj.basicOpen (segreGrading P) (segreW P p)) le_top
     show (Scheme.ΓSpecIso (CommRingCat.of ℂ)).inv ≫ Scheme.Hom.appLE (Proj.toSpecZero (segreGrading P) ≫
       Spec.map (CommRingCat.ofHom (algebraMap ℂ (segreGrading P 0)))) ⊤
       (Proj.basicOpen (segreGrading P) (segreW P p)) le_top = _
     have h4 := Scheme.ΓSpecIso_inv_naturality (CommRingCat.ofHom (algebraMap ℂ (segreGrading P 0)))
     rw [h3, ← Category.assoc]
     refine (congrArg (· ≫ _) h4.symm).trans ?_
-    exact (Category.assoc _ _ _).trans (congrArg (CommRingCat.ofHom (algebraMap ℂ (segreGrading P 0)) ≫ ·) hk)
-  have hl : (gammaChart hP p).symm (Ideal.Quotient.mk _ (C c)) =
-      (Proj.awayToSection (segreGrading P) (segreW P p)).hom
-        (HomogeneousLocalization.fromZeroRingHom (segreGrading P) (Submonoid.powers (segreW P p))
-          (algebraMap ℂ (segreGrading P 0) c)) := by
+    exact (Category.assoc _ _ _).trans
+      (congrArg (CommRingCat.ofHom (algebraMap ℂ (segreGrading P 0)) ≫ ·) hk)
+  have hl
+      : (gammaChart hP p).symm (Ideal.Quotient.mk _ (C c))
+        = (Proj.awayToSection (segreGrading P) (segreW P p)).hom
+          (HomogeneousLocalization.fromZeroRingHom (segreGrading P) (Submonoid.powers (segreW P p))
+            (algebraMap ℂ (segreGrading P 0) c)) := by
     show (Proj.awayToSection (segreGrading P) (segreW P p)).hom (polyToAway hP p (C c)) = _
     simp only [polyToAway, coe_eval₂Hom, eval₂_C, RingHom.comp_apply]
     rfl
@@ -256,58 +287,78 @@ theorem gammaChart_symm_C {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMu
   rw [hC]
   rfl
 
-theorem gammaChart_symm_mk {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P)
-    (p : (k : K) → ι k) (f : MvPolynomial (Σ k, ι k) ℂ) :
-    (gammaChart hP p).symm (Ideal.Quotient.mk _ f) =
-      eval₂ (constSec (toSpecC hP) (chartOpen hP p).1) (chartCoord hP p) f := by
-  have h : (gammaChart hP p).symm.toRingHom.comp (Ideal.Quotient.mk (chartIdeal P p)) =
-      eval₂Hom (constSec (toSpecC hP) (chartOpen hP p).1) (chartCoord hP p) := by
+theorem gammaChart_symm_mk
+    {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P)
+    (p : (k : K) → ι k) (f : MvPolynomial (Σ k, ι k) ℂ)
+    : (gammaChart hP p).symm (Ideal.Quotient.mk _ f)
+      = eval₂ (constSec (toSpecC hP) (chartOpen hP p).1) (chartCoord hP p) f := by
+  have h
+      : (gammaChart hP p).symm.toRingHom.comp (Ideal.Quotient.mk (chartIdeal P p))
+        = eval₂Hom (constSec (toSpecC hP) (chartOpen hP p).1) (chartCoord hP p) := by
     apply MvPolynomial.ringHom_ext
     · intro c
-      simp only [RingHom.comp_apply, RingEquiv.toRingHom_eq_coe, RingEquiv.coe_toRingHom, coe_eval₂Hom,
-        eval₂_C]
+      simp only [RingHom.comp_apply, RingEquiv.toRingHom_eq_coe, RingEquiv.coe_toRingHom,
+        coe_eval₂Hom, eval₂_C]
       exact gammaChart_symm_C hP p c
     · intro q
-      simp only [RingHom.comp_apply, RingEquiv.toRingHom_eq_coe, RingEquiv.coe_toRingHom, coe_eval₂Hom,
-        eval₂_X]
+      simp only [RingHom.comp_apply, RingEquiv.toRingHom_eq_coe, RingEquiv.coe_toRingHom,
+        coe_eval₂Hom, eval₂_X]
       rfl
   exact RingHom.congr_fun h f
 
-theorem chartCoord_overlap {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P)
-    (p p' : (k : K) → ι k) (q : Σ k, ι k) :
-    (projX P hP).presheaf.map (homOfLE (inf_le_left : (chartOpen hP p).1 ⊓ (chartOpen hP p').1 ≤ _)).op
-        (chartCoord hP p q) *
-      (projX P hP).presheaf.map (homOfLE (inf_le_right : (chartOpen hP p).1 ⊓ (chartOpen hP p').1 ≤ _)).op
-        (chartCoord hP p' ⟨q.1, p q.1⟩) =
-    (projX P hP).presheaf.map (homOfLE (inf_le_right : (chartOpen hP p).1 ⊓ (chartOpen hP p').1 ≤ _)).op
+theorem chartCoord_overlap
+    {P : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hP : IsMultiHomogIdeal P)
+    (p p' : (k : K) → ι k) (q : Σ k, ι k)
+    : (projX P hP).presheaf.map
+          (homOfLE (inf_le_left : (chartOpen hP p).1 ⊓ (chartOpen hP p').1 ≤ _)).op
+          (chartCoord hP p q)
+        * (projX P hP).presheaf.map
+          (homOfLE (inf_le_right : (chartOpen hP p).1 ⊓ (chartOpen hP p').1 ≤ _)).op
+          (chartCoord hP p' ⟨q.1, p q.1⟩)
+      = (projX P hP).presheaf.map
+        (homOfLE (inf_le_right : (chartOpen hP p).1 ⊓ (chartOpen hP p').1 ≤ _)).op
         (chartCoord hP p' q) := by
   letI := segreGraded hP
   classical
-  have hcc : ∀ p₀ q₀, chartCoord hP p₀ q₀ =
-      (Proj.awayToSection (segreGrading P) (segreW P p₀)).hom (awayCoord hP p₀ q₀) := by
+  have hcc
+      : ∀ p₀ q₀,
+        chartCoord hP p₀ q₀
+          = (Proj.awayToSection (segreGrading P) (segreW P p₀)).hom (awayCoord hP p₀ q₀) := by
     intro p₀ q₀
     show (Proj.awayToSection (segreGrading P) (segreW P p₀)).hom (polyToAway hP p₀ (X q₀)) = _
     simp only [polyToAway, coe_eval₂Hom, eval₂_X]
-  have key : ∀ (V : (projX P hP).Opens) (h1 : V ≤ (chartOpen hP p).1) (h2 : V ≤ (chartOpen hP p').1),
-      V = Proj.basicOpen (segreGrading P) (segreW P p * segreW P p') →
-      (projX P hP).presheaf.map (homOfLE h1).op (chartCoord hP p q) *
-        (projX P hP).presheaf.map (homOfLE h2).op (chartCoord hP p' ⟨q.1, p q.1⟩) =
-      (projX P hP).presheaf.map (homOfLE h2).op (chartCoord hP p' q) := by
+  have key
+      : ∀ (V : (projX P hP).Opens) (h1 : V ≤ (chartOpen hP p).1) (h2 : V ≤ (chartOpen hP p').1),
+        V = Proj.basicOpen (segreGrading P) (segreW P p * segreW P p')
+          → (projX P hP).presheaf.map (homOfLE h1).op (chartCoord hP p q)
+              * (projX P hP).presheaf.map (homOfLE h2).op (chartCoord hP p' ⟨q.1, p q.1⟩)
+            = (projX P hP).presheaf.map (homOfLE h2).op (chartCoord hP p' q) := by
     rintro V h1 h2 rfl
-    have e1 : ∀ a, (projX P hP).presheaf.map (homOfLE h1).op
-        ((Proj.awayToSection (segreGrading P) (segreW P p)).hom a) =
-        (Proj.awayToSection (segreGrading P) (segreW P p * segreW P p')).hom
-          (HomogeneousLocalization.awayMap (segreGrading P) (segreW_mem P p') rfl a) := fun a =>
-      (congrArg (fun φ => φ.hom a) (Proj.awayMap_awayToSection (𝒜 := segreGrading P) (f := segreW P p)
-        (segreW_mem P p') (hx := rfl))).symm
-    have e2 : ∀ a, (projX P hP).presheaf.map (homOfLE h2).op
-        ((Proj.awayToSection (segreGrading P) (segreW P p')).hom a) =
-        (Proj.awayToSection (segreGrading P) (segreW P p * segreW P p')).hom
-          (HomogeneousLocalization.awayMap (segreGrading P) (segreW_mem P p) (mul_comm _ _) a) := fun a =>
-      (congrArg (fun φ => φ.hom a) (Proj.awayMap_awayToSection (𝒜 := segreGrading P) (f := segreW P p')
-        (segreW_mem P p) (hx := mul_comm _ _))).symm
+    have e1
+        : ∀ a,
+          (projX P hP).presheaf.map (homOfLE h1).op
+              ((Proj.awayToSection (segreGrading P) (segreW P p)).hom a)
+            = (Proj.awayToSection (segreGrading P) (segreW P p * segreW P p')).hom
+              (HomogeneousLocalization.awayMap (segreGrading P) (segreW_mem P p') rfl a) := fun a =>
+      (congrArg
+        (fun φ => φ.hom a)
+        (Proj.awayMap_awayToSection (𝒜 := segreGrading P) (f := segreW P p) (segreW_mem P p')
+          (hx := rfl))).symm
+    have e2
+        : ∀ a,
+          (projX P hP).presheaf.map (homOfLE h2).op
+              ((Proj.awayToSection (segreGrading P) (segreW P p')).hom a)
+            = (Proj.awayToSection (segreGrading P) (segreW P p * segreW P p')).hom
+              (HomogeneousLocalization.awayMap (segreGrading P) (segreW_mem P p) (mul_comm _ _)
+                a) := fun a =>
+      (congrArg
+        (fun φ => φ.hom a)
+        (Proj.awayMap_awayToSection (𝒜 := segreGrading P) (f := segreW P p') (segreW_mem P p)
+          (hx := mul_comm _ _))).symm
     rw [hcc, hcc, hcc, e1, e2, e2]
-    refine (map_mul (Proj.awayToSection (segreGrading P) (segreW P p * segreW P p')).hom _ _).symm.trans ?_
+    refine
+      (map_mul (Proj.awayToSection (segreGrading P) (segreW P p * segreW P p')).hom _ _).symm.trans
+        ?_
     congr 1
     apply HomogeneousLocalization.val_injective
     have E := segreW_exchange P p p' q

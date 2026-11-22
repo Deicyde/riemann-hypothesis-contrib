@@ -23,12 +23,9 @@ private lemma conj_eq_neg_of_sq {z : ℂ} {n : ℕ} (hn : 0 < n) (h : z ^ 2 = -(
     · exfalso; rw [h1] at hre; nlinarith [mul_self_nonneg z.re]
   apply Complex.ext <;> simp [hz]
 
-theorem UpperTheory.Reformulated.B.StarSqrtNeg.star_sqrt_neg :
-    ∀ {D : Formalism.L2.Ker.Car} (x : D.host.E) (n : ℕ),
-    (0 : ℕ) < n →
-      x ^ (2 : ℕ) = -(↑n : D.host.E) →
-        Star.star x =
-          -x := by
+theorem UpperTheory.Reformulated.B.StarSqrtNeg.star_sqrt_neg
+    : ∀ {D : Formalism.L2.Ker.Car} (x : D.host.E) (n : ℕ),
+      (0 : ℕ) < n → x ^ (2 : ℕ) = -(↑n : D.host.E) → Star.star x = -x := by
   intro D x n hn h
   haveI : NumberField.IsCMField D.host.E := D.host.isCMField_hostE
   obtain ⟨φ⟩ : Nonempty (D.host.E →+* ℂ) := inferInstance

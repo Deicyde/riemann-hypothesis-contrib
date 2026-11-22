@@ -14,32 +14,41 @@ noncomputable section
 
 section closure
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] {P : M.Par} {Bs : B.RealPlaceData P.k P.r Wp Wq}
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+  {P : M.Par} {Bs : B.RealPlaceData P.k P.r Wp Wq}
 
 theorem sliceLoc_zero : SliceLoc P Bs 0 := by
   intro Φ Φ' c c' _ _ _ ζ _
   simp
 
-theorem sliceLoc_add {T S : Module.End ℂ (Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π')} (hT : SliceLoc P Bs T)
-    (hS : SliceLoc P Bs S) : SliceLoc P Bs (T + S) := by
+theorem sliceLoc_add
+    {T S : Module.End ℂ (Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π')}
+    (hT : SliceLoc P Bs T) (hS : SliceLoc P Bs S)
+    : SliceLoc P Bs (T + S) := by
   intro Φ Φ' c c' hc hc' h ζ hζ
   simp only [LinearMap.add_apply, Submodule.coe_add, Pi.add_apply]
   rw [hT Φ Φ' c c' hc hc' h ζ hζ, hS Φ Φ' c c' hc hc' h ζ hζ]
 
-theorem sliceLoc_smul {T : Module.End ℂ (Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π')} (a : ℂ) (hT : SliceLoc P Bs T) :
-    SliceLoc P Bs (a • T) := by
+theorem sliceLoc_smul
+    {T : Module.End ℂ (Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π')} (a : ℂ) (hT : SliceLoc P Bs T)
+    : SliceLoc P Bs (a • T) := by
   intro Φ Φ' c c' hc hc' h ζ hζ
   simp only [LinearMap.smul_apply, Submodule.coe_smul, Pi.smul_apply]
   rw [hT Φ Φ' c c' hc hc' h ζ hζ]
 
-theorem sliceLoc_mul {T S : Module.End ℂ (Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π')} (hT : SliceLoc P Bs T)
-    (hS : SliceLoc P Bs S) : SliceLoc P Bs (T * S) := by
+theorem sliceLoc_mul
+    {T S : Module.End ℂ (Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π')}
+    (hT : SliceLoc P Bs T) (hS : SliceLoc P Bs S)
+    : SliceLoc P Bs (T * S) := by
   intro Φ Φ' c c' hc hc' h ζ hζ
   exact hT (S Φ) (S Φ') c c' hc hc' (hS Φ Φ' c c' hc hc' h) ζ hζ
 
-theorem sliceLoc_sum {ι : Type} (s : Finset ι) (T : ι → Module.End ℂ (Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π'))
-    (hT : ∀ i ∈ s, SliceLoc P Bs (T i)) : SliceLoc P Bs (∑ i ∈ s, T i) := by
+theorem sliceLoc_sum
+    {ι : Type} (s : Finset ι) (T : ι → Module.End ℂ (Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π'))
+    (hT : ∀ i ∈ s, SliceLoc P Bs (T i))
+    : SliceLoc P Bs (∑ i ∈ s, T i) := by
   classical
   induction s using Finset.induction_on with
   | empty =>
@@ -47,10 +56,13 @@ theorem sliceLoc_sum {ι : Type} (s : Finset ι) (T : ι → Module.End ℂ (Q.R
     exact sliceLoc_zero
   | insert i s hi ih =>
     rw [Finset.sum_insert hi]
-    exact sliceLoc_add (hT i (Finset.mem_insert_self _ _)) (ih fun j hj => hT j (Finset.mem_insert_of_mem hj))
+    exact sliceLoc_add (hT i (Finset.mem_insert_self _ _))
+      (ih fun j hj => hT j (Finset.mem_insert_of_mem hj))
 
-theorem sliceLoc_of_smul {T U : Module.End ℂ (Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π')} {a : ℂ} (ha : a ≠ 0)
-    (hU : U = a • T) (h : SliceLoc P Bs U) : SliceLoc P Bs T := by
+theorem sliceLoc_of_smul
+    {T U : Module.End ℂ (Q.RadSp P.k P.r Bs.z Bs.z' Bs.π Bs.π')} {a : ℂ}
+    (ha : a ≠ 0) (hU : U = a • T) (h : SliceLoc P Bs U)
+    : SliceLoc P Bs T := by
   have hTU : T = a⁻¹ • U := by rw [hU, smul_smul, inv_mul_cancel₀ ha, one_smul]
   rw [hTU]
   exact sliceLoc_smul _ h
@@ -91,9 +103,12 @@ theorem second_shift_slice_operator : GTSSLSliceSS := by
           rho_ne P hP b hi'.1 hl (fun e => hi'.2 (by simp [e]))
         intro h0
         apply hne
-        have : ((M.rho P b i : ℝ) : ℂ) = ((M.rho P b l : ℝ) : ℂ) := by rw [hY] at h0; linear_combination h0
+        have : ((M.rho P b i : ℝ) : ℂ) = ((M.rho P b l : ℝ) : ℂ) := by
+          rw [hY] at h0; linear_combination h0
         exact_mod_cast this
-      have hE : (Pj d a).1 * X.t Y 1 0 * (Pj d b).1 = M.xEx P {l} b Y • (Pj d a * d.SS l * Pj d b).1 := by
+      have hE
+          : (Pj d a).1 * X.t Y 1 0 * (Pj d b).1
+            = M.xEx P {l} b Y • (Pj d a * d.SS l * Pj d b).1 := by
         have h := congrArg (fstA _) (B1 hRel hl hUp Y)
         rw [map_mul, map_mul, map_smul] at h
         rw [e10]
@@ -123,7 +138,9 @@ theorem second_shift_slice_operator : GTSSLSliceSS := by
         have : ((M.rho P b i : ℝ) : ℂ) = ((M.rho P b l : ℝ) : ℂ) := by
           rw [hY] at h0; rw [hup]; linear_combination h0
         exact_mod_cast this
-      have hE : (Pj d a).1 * X.t Y 0 1 * (Pj d b).1 = M.xEx P {l} a Y • (Pj d a * star (d.SS l) * Pj d b).1 := by
+      have hE
+          : (Pj d a).1 * X.t Y 0 1 * (Pj d b).1
+            = M.xEx P {l} a Y • (Pj d a * star (d.SS l) * Pj d b).1 := by
         have h := congrArg (fstA _) (B4 hRel hl hUp Y)
         rw [map_mul, map_mul, map_smul] at h
         rw [e01]

@@ -6,23 +6,32 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Convolut
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain MvPolynomial Filter
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  UpperTheory.ConvolutionTheory.C PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo
 open GroundTheory.Global GroundTheory.Global.SemiLocal GroundTheory.Automorphic.Spherical
 open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.GM
 open scoped ComplexConjugate
 
-theorem UpperTheory.levF_isOpen_isCompact_le_integral :
-    ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (lev : ∀ v : Pl K, Subgroup (GL (Fin n) (v.adicCompletion K))) (S : Finset (Pl K)),
-      (∀ v ∈ S, IsOpen (lev v : Set (GL (Fin n) (v.adicCompletion K))) ∧ lev v ≤ GLnLocal.integralGL (v.adicCompletion K) n) →
-      (∀ v, v ∉ S → lev v = GLnLocal.integralGL (v.adicCompletion K) n) →
-      IsOpen (levF lev : Set (AdelicGLn.FiniteAdelicGL K n)) ∧ IsCompact (levF lev : Set (AdelicGLn.FiniteAdelicGL K n)) ∧
-        levF lev ≤ AdelicGLn.integralFiniteGL K n ∧
-        ∀ (w : Pl K) (J : Subgroup (GL (Fin n) (w.adicCompletion K))), J ≤ lev w → J.map (AdelicGLn.localEmbedding w) ≤ levF lev := by
+theorem UpperTheory.levF_isOpen_isCompact_le_integral
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ)
+        (lev : ∀ v : Pl K, Subgroup (GL (Fin n) (v.adicCompletion K))) (S : Finset (Pl K)),
+      (∀ v ∈ S,
+          IsOpen (lev v : Set (GL (Fin n) (v.adicCompletion K)))
+            ∧ lev v ≤ GLnLocal.integralGL (v.adicCompletion K) n)
+        → (∀ v, v ∉ S → lev v = GLnLocal.integralGL (v.adicCompletion K) n)
+        → IsOpen (levF lev : Set (AdelicGLn.FiniteAdelicGL K n))
+          ∧ IsCompact (levF lev : Set (AdelicGLn.FiniteAdelicGL K n))
+          ∧ levF lev ≤ AdelicGLn.integralFiniteGL K n
+          ∧ ∀ (w : Pl K) (J : Subgroup (GL (Fin n) (w.adicCompletion K))),
+            J ≤ lev w → J.map (AdelicGLn.localEmbedding w) ≤ levF lev := by
   classical
   intro K _ _ n lev S hS hS'
-  have hmem : ∀ h : AdelicGLn.FiniteAdelicGL K n,
-      h ∈ levF lev ↔ ∀ v, AdelicGLn.finiteRestrictedEquiv K n h v ∈ lev v := fun h => Iff.rfl
+  have hmem
+      : ∀ h : AdelicGLn.FiniteAdelicGL K n,
+        h ∈ levF lev ↔ ∀ v, AdelicGLn.finiteRestrictedEquiv K n h v ∈ lev v := fun h =>
+    Iff.rfl
   have hint : levF lev ≤ AdelicGLn.integralFiniteGL K n := by
     intro h hh
     rw [AdelicGLn.mem_integralFiniteGL_iff_forall]
@@ -31,13 +40,17 @@ theorem UpperTheory.levF_isOpen_isCompact_le_integral :
     by_cases hvS : v ∈ S
     · exact (hS v hvS).2 hv
     · rwa [hS' v hvS] at hv
-  have hev : ∀ v : Pl K, Continuous fun h : AdelicGLn.FiniteAdelicGL K n =>
-      (AdelicGLn.finiteRestrictedEquiv K n h v : GL (Fin n) (v.adicCompletion K)) := fun v =>
-    (_root_.RestrictedProduct.continuous_eval v).comp (AdelicGLn.finiteRestrictedEquiv K n).continuous
-  have hVo : IsOpen ((AdelicGLn.integralFiniteGL K n : Set (AdelicGLn.FiniteAdelicGL K n)) ∩
-      ⋂ v ∈ S, (fun h : AdelicGLn.FiniteAdelicGL K n =>
-        (AdelicGLn.finiteRestrictedEquiv K n h v : GL (Fin n) (v.adicCompletion K))) ⁻¹'
-          (lev v : Set (GL (Fin n) (v.adicCompletion K)))) :=
+  have hev
+      : ∀ v : Pl K,
+        Continuous fun h : AdelicGLn.FiniteAdelicGL K n =>
+          (AdelicGLn.finiteRestrictedEquiv K n h v : GL (Fin n) (v.adicCompletion K)) := fun v =>
+    (_root_.RestrictedProduct.continuous_eval v).comp
+      (AdelicGLn.finiteRestrictedEquiv K n).continuous
+  have hVo : IsOpen
+      ((AdelicGLn.integralFiniteGL K n : Set (AdelicGLn.FiniteAdelicGL K n))
+        ∩ ⋂ v ∈ S, (fun h : AdelicGLn.FiniteAdelicGL K n =>
+            (AdelicGLn.finiteRestrictedEquiv K n h v : GL (Fin n) (v.adicCompletion K))) ⁻¹'
+              (lev v : Set (GL (Fin n) (v.adicCompletion K)))) :=
     (AdelicGLn.isOpen_integralFiniteGL K n).inter
       (isOpen_biInter_finset fun v hv => (hS v hv).1.preimage (hev v))
   have hopen : IsOpen (levF lev : Set (AdelicGLn.FiniteAdelicGL K n)) := by

@@ -14,8 +14,9 @@ open NumberField UniqueFactorizationMonoid Formalism.L2.Pj
 namespace ReciprocityTheory.ChartRestriction.G.PullbackSections.Pf.ERam
 
 variable {E : Type} [Field E] [NumberField E]
-variable {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] {k : Type} [Field k] [Algebra V k]
-  [IsFractionRing V k]
+variable
+  {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+  {k : Type} [Field k] [Algebra V k] [IsFractionRing V k]
 
 theorem vV_alg_nonneg (v : V) : 0 ≤ vV V (algebraMap V k v) := by
   have hle : valV V (K' := k) (algebraMap V k v) ≤ 1 := by
@@ -60,11 +61,14 @@ def primeOf (ψ : E →+* k) (hψ : Function.Injective ψ) : Ideal (𝓞 E) wher
       · intro h
         by_contra hc
         have hc' := not_lt.mp hc
-        have h2 : WithZero.log (1 : WithZero (Multiplicative ℤ)) ≤ WithZero.log (valV V (K' := k) z) := by
+        have h2
+            : WithZero.log (1 : WithZero (Multiplicative ℤ))
+              ≤ WithZero.log (valV V (K' := k) z) := by
           rw [WithZero.log_one]
           linarith
         exact absurd ((WithZero.log_le_log one_ne_zero hz').mp h2) (not_le.mpr h)
-    have cz : ∀ z : 𝓞 E, z ≠ 0 → ψ (z : E) ≠ 0 := fun z hz => (map_ne_zero ψ).mpr (by exact_mod_cast hz)
+    have cz : ∀ z : 𝓞 E, z ≠ 0 → ψ (z : E) ≠ 0 := fun z hz =>
+      (map_ne_zero ψ).mpr (by exact_mod_cast hz)
     by_cases hab : a + b = 0
     · exact Or.inr hab
     left
@@ -81,8 +85,10 @@ def primeOf (ψ : E →+* k) (hψ : Function.Injective ψ) : Ideal (𝓞 E) wher
     rw [key _ (cz _ hab)]
     have hsum : ((a + b : 𝓞 E) : E) = (a : E) + (b : E) := by simp
     rw [hsum, map_add (f := _)]
-    calc valV V (K' := k) (ψ (a : E) + ψ (b : E))
-        ≤ max (valV V (K' := k) (ψ (a : E))) (valV V (K' := k) (ψ (b : E))) := (valV V (K' := k)).map_add _ _
+    calc
+      valV V (K' := k) (ψ (a : E) + ψ (b : E))
+          ≤ max (valV V (K' := k) (ψ (a : E))) (valV V (K' := k) (ψ (b : E))) :=
+        (valV V (K' := k)).map_add _ _
       _ < 1 := max_lt ((key _ (cz a ha0)).mp ha') ((key _ (cz b hb0)).mp hb')
   zero_mem' := Or.inr rfl
   smul_mem' := by
@@ -102,26 +108,30 @@ def primeOf (ψ : E →+* k) (hψ : Function.Injective ψ) : Ideal (𝓞 E) wher
     have hcv := w_nonneg (V := V) ψ c
     rw [hmul, map_mul]
     unfold vV at hcv hxv ⊢
-    rw [map_mul, WithZero.log_mul ((valV V (K' := k)).ne_zero_iff.mpr hcE)
-      ((valV V (K' := k)).ne_zero_iff.mpr hxE)]
+    rw [map_mul,
+      WithZero.log_mul ((valV V (K' := k)).ne_zero_iff.mpr hcE)
+        ((valV V (K' := k)).ne_zero_iff.mpr hxE)]
     linarith
 
 variable (V) in
-theorem mem_primeOf (ψ : E →+* k) (hψ : Function.Injective ψ) (x : 𝓞 E) :
-    x ∈ primeOf (V := V) ψ hψ ↔ 0 < vV V (ψ (x : E)) ∨ x = 0 := Iff.rfl
+theorem mem_primeOf (ψ : E →+* k) (hψ : Function.Injective ψ) (x : 𝓞 E)
+    : x ∈ primeOf (V := V) ψ hψ ↔ 0 < vV V (ψ (x : E)) ∨ x = 0 :=
+  Iff.rfl
 
-theorem psi_ne_zero (ψ : E →+* k) (hψ : Function.Injective ψ) {x : 𝓞 E} (hx : x ≠ 0) : ψ (x : E) ≠ 0 := by
+theorem psi_ne_zero (ψ : E →+* k) (hψ : Function.Injective ψ) {x : 𝓞 E} (hx : x ≠ 0)
+    : ψ (x : E) ≠ 0 := by
   exact (map_ne_zero ψ).2 (by exact_mod_cast hx)
 
-theorem primeOf_isPrime (ψ : E →+* k) (hψ : Function.Injective ψ) : (primeOf (V := V) ψ hψ).IsPrime := by
+theorem primeOf_isPrime (ψ : E →+* k) (hψ : Function.Injective ψ)
+    : (primeOf (V := V) ψ hψ).IsPrime := by
   have hmul : ∀ a b : k, a ≠ 0 → b ≠ 0 → vV V (a * b) = vV V a + vV V b := by
     intro a b ha hb
     unfold vV
-    rw [map_mul, WithZero.log_mul ((valV V (K' := k)).ne_zero_iff.mpr ha)
-      ((valV V (K' := k)).ne_zero_iff.mpr hb)]
+    rw [map_mul,
+      WithZero.log_mul ((valV V (K' := k)).ne_zero_iff.mpr ha)
+        ((valV V (K' := k)).ne_zero_iff.mpr hb)]
     ring
-  have hv1 : vV V (1 : k) = 0 := by
-    unfold vV; rw [map_one, WithZero.log_one]; simp
+  have hv1 : vV V (1 : k) = 0 := by unfold vV; rw [map_one, WithZero.log_one]; simp
   refine Ideal.isPrime_iff.2 ⟨(Ideal.ne_top_iff_one _).2 ?_, ?_⟩
   · rw [mem_primeOf]
     push_neg
@@ -143,53 +153,61 @@ theorem primeOf_isPrime (ψ : E →+* k) (hψ : Function.Injective ψ) : (primeO
     have := hno.2.1
     linarith
 
-theorem w_zero_of_not_mem (ψ : E →+* k) (hψ : Function.Injective ψ) {x : 𝓞 E}
-    (hx : x ∉ primeOf (V := V) ψ hψ) : vV V (ψ (x : E)) = 0 := by
+theorem w_zero_of_not_mem
+    (ψ : E →+* k) (hψ : Function.Injective ψ) {x : 𝓞 E} (hx : x ∉ primeOf (V := V) ψ hψ)
+    : vV V (ψ (x : E)) = 0 := by
   rw [mem_primeOf] at hx
   push_neg at hx
   exact le_antisymm hx.1 (w_nonneg ψ x)
 
-theorem mem_factors_of_mem {P : Ideal (𝓞 E)} (hP : P.IsPrime) (hP0 : P ≠ ⊥) {x : 𝓞 E} (hx0 : x ≠ 0) (hx : x ∈ P) :
-    0 < (normalizedFactors (Ideal.span {x})).count P := by
+theorem mem_factors_of_mem
+    {P : Ideal (𝓞 E)} (hP : P.IsPrime) (hP0 : P ≠ ⊥) {x : 𝓞 E} (hx0 : x ≠ 0) (hx : x ∈ P)
+    : 0 < (normalizedFactors (Ideal.span {x})).count P := by
   have hspan : Ideal.span {x} ≠ 0 := by
     rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]; exact hx0
   have hirr : Irreducible P := (Ideal.prime_of_isPrime hP0 hP).irreducible
   have hdvd : P ∣ Ideal.span {x} := Ideal.dvd_iff_le.2 ((Ideal.span_singleton_le_iff_mem _).2 hx)
-  obtain ⟨Q, hQ, hPQ⟩ := UniqueFactorizationMonoid.exists_mem_normalizedFactors_of_dvd hspan hirr hdvd
+  obtain ⟨Q, hQ, hPQ⟩ :=
+    UniqueFactorizationMonoid.exists_mem_normalizedFactors_of_dvd hspan hirr hdvd
   rw [associated_iff_eq] at hPQ
   rw [hPQ]
   exact Multiset.count_pos.2 hQ
 
-theorem count_zero_of_not_mem {P : Ideal (𝓞 E)} {x : 𝓞 E} (hx : x ∉ P) :
-    (normalizedFactors (Ideal.span {x})).count P = 0 := by
+theorem count_zero_of_not_mem {P : Ideal (𝓞 E)} {x : 𝓞 E} (hx : x ∉ P)
+    : (normalizedFactors (Ideal.span {x})).count P = 0 := by
   refine Multiset.count_eq_zero.2 fun hP => hx ?_
   have hdvd := UniqueFactorizationMonoid.dvd_of_mem_normalizedFactors hP
   exact (Ideal.le_of_dvd hdvd) (Ideal.mem_span_singleton_self x)
 
-theorem count_mul_span {P : Ideal (𝓞 E)} {x y : 𝓞 E} (hx : x ≠ 0) (hy : y ≠ 0) :
-    (normalizedFactors (Ideal.span {x * y})).count P =
-      (normalizedFactors (Ideal.span {x})).count P + (normalizedFactors (Ideal.span {y})).count P := by
+theorem count_mul_span {P : Ideal (𝓞 E)} {x y : 𝓞 E} (hx : x ≠ 0) (hy : y ≠ 0)
+    : (normalizedFactors (Ideal.span {x * y})).count P
+      = (normalizedFactors (Ideal.span {x})).count P
+        + (normalizedFactors (Ideal.span {y})).count P := by
   have hx' : Ideal.span {x} ≠ 0 := by
     rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]; exact hx
   have hy' : Ideal.span {y} ≠ 0 := by
     rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]; exact hy
-  rw [← Ideal.span_singleton_mul_span_singleton, UniqueFactorizationMonoid.normalizedFactors_mul hx' hy',
-    Multiset.count_add]
+  rw [← Ideal.span_singleton_mul_span_singleton,
+    UniqueFactorizationMonoid.normalizedFactors_mul hx' hy', Multiset.count_add]
 
-theorem w_eq_count (ψ : E →+* k) (hψ : Function.Injective ψ) (hP0 : primeOf (V := V) ψ hψ ≠ ⊥) :
-    ∃ π : 𝓞 E, π ≠ 0 ∧ ∀ (n : ℕ) (x : 𝓞 E), x ≠ 0 →
-      (normalizedFactors (Ideal.span {x})).count (primeOf (V := V) ψ hψ) = n →
-      vV V (ψ (x : E)) = n * vV V (ψ (π : E)) := by
+theorem w_eq_count (ψ : E →+* k) (hψ : Function.Injective ψ) (hP0 : primeOf (V := V) ψ hψ ≠ ⊥)
+    : ∃ π : 𝓞 E,
+      π ≠ 0
+        ∧ ∀ (n : ℕ) (x : 𝓞 E),
+          x ≠ 0 → (normalizedFactors (Ideal.span {x})).count (primeOf (V := V) ψ hψ) = n
+            → vV V (ψ (x : E)) = n * vV V (ψ (π : E)) := by
   set P := primeOf (V := V) ψ hψ with hPdef
   have hPp : P.IsPrime := primeOf_isPrime ψ hψ
-  have hmulv : ∀ a b : 𝓞 E, a ≠ 0 → b ≠ 0 →
-      vV V (ψ ((a * b : 𝓞 E) : E)) = vV V (ψ (a : E)) + vV V (ψ (b : E)) := by
+  have hmulv
+      : ∀ a b : 𝓞 E,
+        a ≠ 0 → b ≠ 0 → vV V (ψ ((a * b : 𝓞 E) : E)) = vV V (ψ (a : E)) + vV V (ψ (b : E)) := by
     intro a b ha hb
     have hab : ((a * b : 𝓞 E) : E) = (a : E) * (b : E) := by simp
     rw [hab, map_mul]
     unfold vV
-    rw [map_mul, WithZero.log_mul ((valV V (K' := k)).ne_zero_iff.mpr (psi_ne_zero ψ hψ ha))
-      ((valV V (K' := k)).ne_zero_iff.mpr (psi_ne_zero ψ hψ hb))]
+    rw [map_mul,
+      WithZero.log_mul ((valV V (K' := k)).ne_zero_iff.mpr (psi_ne_zero ψ hψ ha))
+        ((valV V (K' := k)).ne_zero_iff.mpr (psi_ne_zero ψ hψ hb))]
     ring
   have hspan : ∀ z : 𝓞 E, z ≠ 0 → Ideal.span {z} ≠ 0 := fun z hz => by
     rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]; exact hz
@@ -259,9 +277,11 @@ theorem w_eq_count (ψ : E →+* k) (hψ : Function.Injective ψ) (hP0 : primeOf
     push_cast
     linarith
 
-theorem exists_delta_count {P : Ideal (𝓞 E)} (hP : P.IsPrime) (hP0 : P ≠ ⊥) :
-    ∃ δ : 𝓞 E, δ ∈ differentIdeal ℤ (𝓞 E) ∧ δ ≠ 0 ∧
-      (normalizedFactors (Ideal.span {δ})).count P = (normalizedFactors (differentIdeal ℤ (𝓞 E))).count P := by
+theorem exists_delta_count {P : Ideal (𝓞 E)} (hP : P.IsPrime) (hP0 : P ≠ ⊥)
+    : ∃ δ : 𝓞 E,
+      δ ∈ differentIdeal ℤ (𝓞 E) ∧ δ ≠ 0
+        ∧ (normalizedFactors (Ideal.span {δ})).count P
+          = (normalizedFactors (differentIdeal ℤ (𝓞 E))).count P := by
   set Dif := differentIdeal ℤ (𝓞 E) with hDif
   have hD0 : Dif ≠ ⊥ := differentIdeal_ne_bot
 
@@ -290,11 +310,13 @@ theorem exists_delta_count {P : Ideal (𝓞 E)} (hP : P.IsPrime) (hP0 : P ≠ �
   rw [hK, UniqueFactorizationMonoid.normalizedFactors_mul (by rwa [Ne, Ideal.zero_eq_bot]) hK0,
     Multiset.count_add, hcK, add_zero]
 
-theorem exists_delta_val [IsGalois ℚ E] (ℓ a m : ℕ) (hℓ : ℓ.Prime) (hm : ¬ ℓ ∣ m)
-    (hdisc : (discr E).natAbs = ℓ ^ a * m) (ψ : E →+* k) (hψ : Function.Injective ψ)
-    (hℓψ : 0 < vV V (ψ (ℓ : E))) :
-    ∃ δ : 𝓞 E, δ ∈ differentIdeal ℤ (𝓞 E) ∧ δ ≠ 0 ∧
-      vV V (ψ (δ : E)) * Module.finrank ℚ E = a * vV V (ψ (ℓ : E)) := by
+theorem exists_delta_val
+    [IsGalois ℚ E]
+    (ℓ a m : ℕ) (hℓ : ℓ.Prime) (hm : ¬ ℓ ∣ m) (hdisc : (discr E).natAbs = ℓ ^ a * m)
+    (ψ : E →+* k) (hψ : Function.Injective ψ) (hℓψ : 0 < vV V (ψ (ℓ : E)))
+    : ∃ δ : 𝓞 E,
+      δ ∈ differentIdeal ℤ (𝓞 E) ∧ δ ≠ 0
+        ∧ vV V (ψ (δ : E)) * Module.finrank ℚ E = a * vV V (ψ (ℓ : E)) := by
   set P := primeOf (V := V) ψ hψ
   have hPp : P.IsPrime := primeOf_isPrime ψ hψ
   have hℓ0 : (ℓ : 𝓞 E) ≠ 0 := Nat.cast_ne_zero.2 hℓ.ne_zero
@@ -309,8 +331,10 @@ theorem exists_delta_val [IsGalois ℚ E] (ℓ a m : ℕ) (hℓ : ℓ.Prime) (hm
   have e : ((ℓ : 𝓞 E) : E) = (ℓ : E) := by simp
   rw [e] at h2
   rw [h1, h2, hδc]
-  have hex' : ((normalizedFactors (differentIdeal ℤ (𝓞 E))).count P : ℤ) * Module.finrank ℚ E =
-      a * (normalizedFactors (Ideal.span {(ℓ : 𝓞 E)})).count P := by exact_mod_cast hex
+  have hex'
+      : ((normalizedFactors (differentIdeal ℤ (𝓞 E))).count P : ℤ) * Module.finrank ℚ E
+        = a * (normalizedFactors (Ideal.span {(ℓ : 𝓞 E)})).count P := by
+    exact_mod_cast hex
   linear_combination vV V (ψ (π : E)) * hex'
 
 end ReciprocityTheory.ChartRestriction.G.PullbackSections.Pf.ERam

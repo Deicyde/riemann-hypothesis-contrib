@@ -382,8 +382,10 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.CechPic
-open Formalism.BasicNotions GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.ProjVar GlobalTheory.TrueGeo GlobalTheory.Mean4O GlobalTheory.CoverNorm GlobalTheory.VertForm
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.CechPic
+open Formalism.BasicNotions GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.ProjVar
+  GlobalTheory.TrueGeo GlobalTheory.Mean4O GlobalTheory.CoverNorm GlobalTheory.VertForm
 
 namespace GlobalTheory.NefHodgeTateAt
 
@@ -391,10 +393,14 @@ section Curves
 
 variable {k : Type} [CommRing k] [Module.Finite ℤ k] {X : Scheme.{0}} {p : X ⟶ Sp k}
 
-theorem topSelf_of_cls_eq_add (hp : IsProjOver p) {N A B : LB X} (hN : N.IsLB) (hA : A.IsLB) (hB : B.IsLB)
-    (h : cls N hN = cls A hA + cls B hB) (Z : Scheme.{0}) (i : Z ⟶ X) [IsClosedImmersion i] (κ : Type) [Field κ] [Finite κ]
-    [Algebra κ Γ(Z, ⊤)] (hd : topologicalKrullDim Z = 1) :
-    topSelfIntersection κ (N.pull i) 1 = topSelfIntersection κ (A.pull i) 1 + topSelfIntersection κ (B.pull i) 1 := by
+theorem topSelf_of_cls_eq_add
+    (hp : IsProjOver p)
+    {N A B : LB X} (hN : N.IsLB) (hA : A.IsLB) (hB : B.IsLB) (h : cls N hN = cls A hA + cls B hB)
+    (Z : Scheme.{0}) (i : Z ⟶ X) [IsClosedImmersion i]
+    (κ : Type) [Field κ] [Finite κ] [Algebra κ Γ(Z, ⊤)]
+    (hd : topologicalKrullDim Z = 1)
+    : topSelfIntersection κ (N.pull i) 1
+      = topSelfIntersection κ (A.pull i) 1 + topSelfIntersection κ (B.pull i) 1 := by
   obtain ⟨hpr, H, hH⟩ := (isProjOver_iff_isProper_and_exists_isAmpleLB p).1 hp
   have : IsFinite (spMap (Int.castRingHom k)) := by
     rw [spMap, IsFinite.SpecMap_iff]
@@ -403,31 +409,38 @@ theorem topSelf_of_cls_eq_add (hp : IsProjOver p) {N A B : LB X} (hN : N.IsLB) (
     specZIsTerminal.hom_ext _ _
   have : IsProper (strHom κ Z ≫ spMap (Int.castRingHom κ)) := by rw [e]; infer_instance
   have : IsProper (strHom κ (X := Z)) := IsProper.of_comp _ (spMap (Int.castRingHom κ))
-  have e2 (L : LB X) : topSelfIntersection κ (L.pull i) 1 = interNum κ (structureModule Z) ![L.pull i] := by
+  have e2 (L : LB X)
+      : topSelfIntersection κ (L.pull i) 1 = interNum κ (structureModule Z) ![L.pull i] := by
     rw [topSelf_def]
     congr 1
     funext j
     fin_cases j
     rfl
   rw [e2, e2, e2]
-  refine interNum_one_of_cls_eq_add (hH.pull_of_isClosedImmersion i) hd (LB.isLB_pull hN i) (LB.isLB_pull hA i)
-    (LB.isLB_pull hB i) ?_
+  refine interNum_one_of_cls_eq_add (hH.pull_of_isClosedImmersion i) hd (LB.isLB_pull hN i)
+    (LB.isLB_pull hA i) (LB.isLB_pull hB i) ?_
   rw [cls_pull hN, cls_pull hA, cls_pull hB, h, map_add (f := _)]
 
-theorem topSelf_pow (hp : IsProjOver p) (L : HermLB p) (m : ℕ) (Z : Scheme.{0}) (i : Z ⟶ X) [IsClosedImmersion i]
-    (κ : Type) [Field κ] [Finite κ] [Algebra κ Γ(Z, ⊤)] (hd : topologicalKrullDim Z = 1) :
-    topSelfIntersection κ ((L.pow m).B.pull i) 1 = m * topSelfIntersection κ (L.B.pull i) 1 := by
+theorem topSelf_pow
+    (hp : IsProjOver p) (L : HermLB p) (m : ℕ)
+    (Z : Scheme.{0}) (i : Z ⟶ X) [IsClosedImmersion i]
+    (κ : Type) [Field κ] [Finite κ] [Algebra κ Γ(Z, ⊤)]
+    (hd : topologicalKrullDim Z = 1)
+    : topSelfIntersection κ ((L.pow m).B.pull i) 1 = m * topSelfIntersection κ (L.B.pull i) 1 := by
   have c (n : ℕ) : cls (L.pow n).B (L.pow n).isLB = n • cls L.B L.isLB := cls_lbPow L.isLB n _
   induction m with
   | zero =>
-    have := topSelf_of_cls_eq_add hp (L.pow 0).isLB (L.pow 0).isLB (L.pow 0).isLB (by rw [c]; simp) Z i κ hd
+    have :=
+      topSelf_of_cls_eq_add hp (L.pow 0).isLB (L.pow 0).isLB (L.pow 0).isLB (by rw [c]; simp) Z i κ
+        hd
     simp only [Nat.cast_zero, zero_mul]
     linarith
   | succ n ih =>
-    rw [topSelf_of_cls_eq_add hp (L.pow (n + 1)).isLB (L.pow n).isLB L.isLB (by rw [c, c, succ_nsmul]) Z i κ hd, ih]
+    rw [topSelf_of_cls_eq_add hp (L.pow (n + 1)).isLB (L.pow n).isLB L.isLB
+        (by rw [c, c, succ_nsmul]) Z i κ hd,
+      ih]
     push_cast
     ring
-
 
 end Curves
 
@@ -437,7 +450,9 @@ variable {F : Type} [Field F] [NumberField F] {Y : Var F}
 
 end Covers
 
-open Formalism.MainNotions Formalism.L2.Pj Formalism.BasicNotions.TH Formalism.L2.Theta ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.CovTop GlobalTheory.CovHt GlobalTheory.Mean4
+open Formalism.MainNotions Formalism.L2.Pj Formalism.BasicNotions.TH Formalism.L2.Theta
+  ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.CompHt GlobalTheory.CovTop
+  GlobalTheory.CovHt GlobalTheory.Mean4
 open scoped ENNReal Classical
 
 end GlobalTheory.NefHodgeTateAt

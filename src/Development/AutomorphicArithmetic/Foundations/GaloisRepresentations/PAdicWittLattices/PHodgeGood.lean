@@ -4,12 +4,12 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC GlobalTheory.GalV
+  GlobalTheory.HodgeCoh TensorProduct UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (FEt Cover gen piece IsHEig)
 universe u v
 
-theorem UpperTheory.Gal.G3.pHodgeGood :
-    HodgeTr → HodgeInj → HodgeGood := by
+theorem UpperTheory.Gal.G3.pHodgeGood : HodgeTr → HodgeInj → HodgeGood := by
   intro hT hI k _ _ i j
   refine ⟨?_, ?_⟩
   · intro Z W p r c hc G _ _ a h

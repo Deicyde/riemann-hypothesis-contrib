@@ -7,9 +7,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.TorsionBoun
 
 open CategoryTheory UpperTheory.V.KH
 
-theorem UpperTheory.V.KH.indexLe :
-    ∀ (ι : Type) [Finite ι] (v : ι → (ι →₀ ℤ)) (b : ℕ), LinearIndependent ℤ v → (∀ i, l1 (v i) ≤ b) →
-      CardLe ((ι →₀ ℤ) ⧸ Submodule.span ℤ (Set.range v)) (b ^ Nat.card ι) := by
+theorem UpperTheory.V.KH.indexLe
+    : ∀ (ι : Type) [Finite ι] (v : ι → (ι →₀ ℤ)) (b : ℕ),
+      LinearIndependent ℤ v → (∀ i, l1 (v i) ≤ b)
+        → CardLe ((ι →₀ ℤ) ⧸ Submodule.span ℤ (Set.range v)) (b ^ Nat.card ι) := by
   intro ι _ v b hv hb
   classical
   haveI := Fintype.ofFinite ι

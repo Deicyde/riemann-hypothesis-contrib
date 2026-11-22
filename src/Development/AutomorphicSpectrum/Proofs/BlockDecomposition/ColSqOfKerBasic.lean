@@ -34,7 +34,9 @@ theorem colSq_of_kerBasic : KerBasic → ColSq := by
   have hsq : ∀ x, A x ^ 2 = ∑' γ : X.Γ, g (γ⁻¹ • x) := by
     intro x
     rw [sq]
-    calc A x * A x = (∑' γ : X.Γ, ‖φ (x⁻¹ * (γ : X.G) * y)‖ₑ) * A x := rfl
+    calc
+      A x * A x
+        = (∑' γ : X.Γ, ‖φ (x⁻¹ * (γ : X.G) * y)‖ₑ) * A x := rfl
       _ = ∑' γ : X.Γ, ‖φ (x⁻¹ * (γ : X.G) * y)‖ₑ * A x := ENNReal.tsum_mul_right.symm
       _ = ∑' γ : X.Γ, g (γ⁻¹ • x) := by
         refine tsum_congr fun γ => ?_
@@ -63,18 +65,18 @@ theorem colSq_of_kerBasic : KerBasic → ColSq := by
           rw [Set.indicator_of_mem hm]
           simpa using hBe _
       exact mul_le_mul' (hBe _) h2
-  calc ∫⁻ x, ‖ker X.Γ φ x y‖ₑ ^ 2 ∂X.ν ≤ ∫⁻ x, A x ^ 2 ∂X.ν :=
-        lintegral_mono fun x => pow_le_pow_left' (hker x y) 2
-    _ = ∫⁻ x in X.F, ∑' γ : X.Γ, g (γ⁻¹ • x) ∂X.μ := by
-        simp only [hsq]; rfl
+  calc
+    ∫⁻ x, ‖ker X.Γ φ x y‖ₑ ^ 2 ∂X.ν
+      ≤ ∫⁻ x, A x ^ 2 ∂X.ν := lintegral_mono fun x => pow_le_pow_left' (hker x y) 2
+    _ = ∫⁻ x in X.F, ∑' γ : X.Γ, g (γ⁻¹ • x) ∂X.μ := by simp only [hsq]; rfl
     _ = ∑' γ : X.Γ, ∫⁻ x in X.F, g (γ⁻¹ • x) ∂X.μ :=
-        lintegral_tsum fun γ => (hgm.comp (measurable_const_mul ((γ⁻¹ : X.Γ) : X.G))).aemeasurable
+      lintegral_tsum fun γ => (hgm.comp (measurable_const_mul ((γ⁻¹ : X.Γ) : X.G))).aemeasurable
     _ = ∫⁻ x, g x ∂X.μ := (X.fd.lintegral_eq_tsum' g).symm
     _ ≤ ∫⁻ x, (y • Ω⁻¹).indicator (fun _ => c) x ∂X.μ := lintegral_mono hg
     _ ≤ c * X.μ (y • Ω⁻¹) := lintegral_indicator_const_le _ _
     _ = ENNReal.ofReal B ^ 2 * X.μ Ω⁻¹ * cnt X.Γ (Ω⁻¹ * Ω) y := by
-        rw [measure_smul]
-        simp only [c]
-        ring
+      rw [measure_smul]
+      simp only [c]
+      ring
 
 end GlobalTheory.CompanionTheory.KernelColumn

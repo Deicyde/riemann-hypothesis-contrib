@@ -12,8 +12,7 @@ namespace GlobalTheory.RootEx.Radical
 section
 variable {k : Type*} [Field k] {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-def Uni (b : ι → ℕ) (M : Matrix ι ι k) : Prop :=
-  ∀ r s, b s ≤ b r → M r s = (1 : Matrix ι ι k) r s
+def Uni (b : ι → ℕ) (M : Matrix ι ι k) : Prop := ∀ r s, b s ≤ b r → M r s = (1 : Matrix ι ι k) r s
 
 omit [Fintype ι] in
 theorem Uni.blockTri {b : ι → ℕ} {M : Matrix ι ι k} (h : Uni b M) : M.BlockTriangular b := by
@@ -22,8 +21,8 @@ theorem Uni.blockTri {b : ι → ℕ} {M : Matrix ι ι k} (h : Uni b M) : M.Blo
   rintro rfl
   exact lt_irrefl _ hrs
 
-theorem Uni.mul {b : ι → ℕ} {M M' : Matrix ι ι k} (h : Uni b M) (h' : Uni b M') :
-    Uni b (M * M') := by
+theorem Uni.mul {b : ι → ℕ} {M M' : Matrix ι ι k} (h : Uni b M) (h' : Uni b M')
+    : Uni b (M * M') := by
   intro r s hrs
   have : (M * M') r s = ((1 : Matrix ι ι k) * M') r s := by
     simp only [Matrix.mul_apply]
@@ -58,8 +57,9 @@ theorem Uni.inv {b : ι → ℕ} {g : GL ι k} (h : Uni b g.val) : Uni b (g⁻¹
   rw [Matrix.mul_one, Units.inv_mul] at this
   exact this.symm
 
-theorem Uni.mul_apply_succ {b : ι → ℕ} {M M' : Matrix ι ι k} (h : Uni b M) (h' : Uni b M')
-    {r s : ι} (hrs : b s = b r + 1) : (M * M') r s = M r s + M' r s := by
+theorem Uni.mul_apply_succ
+    {b : ι → ℕ} {M M' : Matrix ι ι k} (h : Uni b M) (h' : Uni b M') {r s : ι} (hrs : b s = b r + 1)
+    : (M * M') r s = M r s + M' r s := by
   have e : (M * M') r s = (M * (1 : Matrix ι ι k)) r s + ((1 : Matrix ι ι k) * M') r s := by
     simp only [Matrix.mul_apply, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun t _ => ?_
@@ -89,8 +89,8 @@ theorem mem_N_iff (g : GL (n ⊕ Fin c) k) : g ∈ N k n c p ↔ InN p g := by
   · intro hg
     exact Subgroup.subset_closure hg
 
-theorem simpleSum_mul {g h : GL (n ⊕ Fin c) k} (hg : g ∈ N k n c p) (hh : h ∈ N k n c p) :
-    simpleSum (g * h) = simpleSum g + simpleSum h := by
+theorem simpleSum_mul {g h : GL (n ⊕ Fin c) k} (hg : g ∈ N k n c p) (hh : h ∈ N k n c p)
+    : simpleSum (g * h) = simpleSum g + simpleSum h := by
   rw [mem_N_iff] at hg hh
   simp only [simpleSum, ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
@@ -100,25 +100,24 @@ theorem simpleSum_mul {g h : GL (n ⊕ Fin c) k} (hg : g ∈ N k n c p) (hh : h 
 
 theorem embX_val (x : GL n k) : (embX c x).val = fromBlocks x.val 0 0 1 := rfl
 
-theorem toBlocks₁₁_of_mem {g : GL (n ⊕ Fin c) k} (hg : g ∈ N k n c p) :
-    g.val.toBlocks₁₁ = 1 := by
+theorem toBlocks₁₁_of_mem {g : GL (n ⊕ Fin c) k} (hg : g ∈ N k n c p) : g.val.toBlocks₁₁ = 1 := by
   rw [mem_N_iff] at hg
   ext r s
   simp only [Matrix.toBlocks₁₁, Matrix.of_apply]
   rw [hg _ _ (by simp [lev])]
   simp [Matrix.one_apply]
 
-theorem conj_val (x : GL n k) (g : GL (n ⊕ Fin c) k) :
-    (embX c x * g * (embX c x)⁻¹).val =
-      fromBlocks (x.val * g.val.toBlocks₁₁ * (x⁻¹).val) (x.val * g.val.toBlocks₁₂)
+theorem conj_val (x : GL n k) (g : GL (n ⊕ Fin c) k)
+    : (embX c x * g * (embX c x)⁻¹).val
+      = fromBlocks (x.val * g.val.toBlocks₁₁ * (x⁻¹).val) (x.val * g.val.toBlocks₁₂)
         (g.val.toBlocks₂₁ * (x⁻¹).val) g.val.toBlocks₂₂ := by
   rw [← map_inv, Units.val_mul, Units.val_mul, embX_val, embX_val]
   conv_lhs => rw [← Matrix.fromBlocks_toBlocks g.val]
   simp only [fromBlocks_multiply, Matrix.zero_mul, Matrix.mul_zero, add_zero, zero_add,
     Matrix.one_mul, Matrix.mul_one]
 
-theorem conj_mem (x : GL n k) {g : GL (n ⊕ Fin c) k} (hg : g ∈ N k n c p) :
-    embX c x * g * (embX c x)⁻¹ ∈ N k n c p := by
+theorem conj_mem (x : GL n k) {g : GL (n ⊕ Fin c) k} (hg : g ∈ N k n c p)
+    : embX c x * g * (embX c x)⁻¹ ∈ N k n c p := by
   have h11 := toBlocks₁₁_of_mem hg
   rw [mem_N_iff] at hg ⊢
   intro r s hrs
@@ -138,26 +137,27 @@ theorem conj_mem (x : GL n k) {g : GL (n ⊕ Fin c) k} (hg : g ∈ N k n c p) :
   · rw [fromBlocks_apply₂₂]
     exact hg _ _ hrs
 
-theorem simpleSum_conj (x : GL n k) (g : GL (n ⊕ Fin c) k) :
-    simpleSum (embX c x * g * (embX c x)⁻¹) = simpleSum g := by
+theorem simpleSum_conj (x : GL n k) (g : GL (n ⊕ Fin c) k)
+    : simpleSum (embX c x * g * (embX c x)⁻¹) = simpleSum g := by
   simp only [simpleSum, conj_val, fromBlocks_apply₂₂]
   rfl
 
-theorem exists_of_mem_R {r : GL (n ⊕ Fin c) k} (hr : r ∈ R k n c p) :
-    ∃ x : GL n k, ∃ g ∈ N k n c p, r = embX c x * g := by
-  let S : Subgroup (GL (n ⊕ Fin c) k) :=
-    { carrier := {r | ∃ x : GL n k, ∃ g ∈ N k n c p, r = embX c x * g}
-      one_mem' := ⟨1, 1, one_mem _, by simp⟩
-      mul_mem' := by
-        rintro _ _ ⟨x, g, hg, rfl⟩ ⟨y, h, hh, rfl⟩
-        refine ⟨x * y, _, mul_mem (conj_mem y⁻¹ hg) hh, ?_⟩
-        rw [map_mul, map_inv]
-        group
-      inv_mem' := by
-        rintro _ ⟨x, g, hg, rfl⟩
-        refine ⟨x⁻¹, _, conj_mem x (inv_mem hg), ?_⟩
-        rw [map_inv]
-        group }
+theorem exists_of_mem_R {r : GL (n ⊕ Fin c) k} (hr : r ∈ R k n c p)
+    : ∃ x : GL n k, ∃ g ∈ N k n c p, r = embX c x * g := by
+  let S : Subgroup (GL (n ⊕ Fin c) k) := {
+    carrier := {r | ∃ x : GL n k, ∃ g ∈ N k n c p, r = embX c x * g}
+    one_mem' := ⟨1, 1, one_mem _, by simp⟩
+    mul_mem' := by
+      rintro _ _ ⟨x, g, hg, rfl⟩ ⟨y, h, hh, rfl⟩
+      refine ⟨x * y, _, mul_mem (conj_mem y⁻¹ hg) hh, ?_⟩
+      rw [map_mul, map_inv]
+      group
+    inv_mem' := by
+      rintro _ ⟨x, g, hg, rfl⟩
+      refine ⟨x⁻¹, _, conj_mem x (inv_mem hg), ?_⟩
+      rw [map_inv]
+      group
+  }
   have : R k n c p ≤ S := by
     refine sup_le ?_ ?_
     · rintro _ ⟨x, rfl⟩
@@ -166,14 +166,14 @@ theorem exists_of_mem_R {r : GL (n ⊕ Fin c) k} (hr : r ∈ R k n c p) :
       exact ⟨1, g, hg, by simp⟩
   exact this hr
 
-theorem toBlocks₁₁_embX_mul (x : GL n k) {g : GL (n ⊕ Fin c) k} (hg : g ∈ N k n c p) :
-    (embX c x * g).val.toBlocks₁₁ = x.val := by
+theorem toBlocks₁₁_embX_mul (x : GL n k) {g : GL (n ⊕ Fin c) k} (hg : g ∈ N k n c p)
+    : (embX c x * g).val.toBlocks₁₁ = x.val := by
   rw [Units.val_mul, embX_val]
   conv_lhs => rw [← Matrix.fromBlocks_toBlocks g.val]
   simp [fromBlocks_multiply, toBlocks₁₁_of_mem hg]
 
-theorem existsUnique_of_mem_R {r : GL (n ⊕ Fin c) k} (hr : r ∈ R k n c p) :
-    ∃! xg : GL n k × N k n c p, r = embX c xg.1 * (xg.2 : GL (n ⊕ Fin c) k) := by
+theorem existsUnique_of_mem_R {r : GL (n ⊕ Fin c) k} (hr : r ∈ R k n c p)
+    : ∃! xg : GL n k × N k n c p, r = embX c xg.1 * (xg.2 : GL (n ⊕ Fin c) k) := by
   obtain ⟨x, g, hg, rfl⟩ := exists_of_mem_R hr
   refine ⟨(x, ⟨g, hg⟩), rfl, ?_⟩
   rintro ⟨y, h, hh⟩ e
@@ -186,9 +186,10 @@ theorem existsUnique_of_mem_R {r : GL (n ⊕ Fin c) k} (hr : r ∈ R k n c p) :
   subst this
   rfl
 
-theorem simpleSum_eq_zero {g : GL (n ⊕ Fin c) k}
-    (h : ∀ i j, g.val (Sum.inr i) (Sum.inr j) = (1 : Matrix (Fin c) (Fin c) k) i j) :
-    simpleSum g = 0 := by
+theorem simpleSum_eq_zero
+    {g : GL (n ⊕ Fin c) k}
+    (h : ∀ i j, g.val (Sum.inr i) (Sum.inr j) = (1 : Matrix (Fin c) (Fin c) k) i j)
+    : simpleSum g = 0 := by
   refine Finset.sum_eq_zero fun i _ => Finset.sum_eq_zero fun j _ => ?_
   split_ifs with hij
   · rw [h, Matrix.one_apply_ne]
@@ -203,7 +204,7 @@ theorem rowE_mem {l : ℕ} (u : n → k) (hl : l < p) : rowE c l u ∈ N k n c p
   · simp [rowE, lowU, Matrix.one_apply]
   · simp [rowE, lowU]
   · simp only [lev, Sum.elim_inl, Sum.elim_inr] at hrs
-    have : ¬ (r.val + 1 = l) := by omega
+    have : ¬(r.val + 1 = l) := by omega
     simp [rowE, lowU, this]
   · simp [rowE, lowU, Matrix.one_apply]
 
@@ -213,18 +214,36 @@ theorem colE_mem {i : ℕ} (β : n → k) (hi : p < i) : colE c i β ∈ N k n c
   rcases r with r | r <;> rcases s with s | s
   · simp [colE, upU, Matrix.one_apply]
   · simp only [lev, Sum.elim_inl, Sum.elim_inr] at hrs
-    have : ¬ (s.val + 1 = i) := by omega
+    have : ¬(s.val + 1 = i) := by omega
     simp [colE, upU, this]
   · simp [colE, upU]
   · simp [colE, upU, Matrix.one_apply]
 
-theorem unipotent_radical_basic : ∀ (k : Type) [Field k] (n : Type) [Fintype n] [DecidableEq n] (c p : ℕ), (∀ g : GL (n ⊕ Fin c) k, g ∈ N k n c p ↔ InN p g) ∧ (∀ g ∈ N k n c p, ∀ h ∈ N k n c p, simpleSum (g * h) = simpleSum g + simpleSum h) ∧ (∀ g ∈ N k n c p, Matrix.GeneralLinearGroup.det g = 1) ∧ (∀ (x : GL n k), ∀ g ∈ N k n c p, embX c x * g * (embX c x)⁻¹ ∈ N k n c p ∧ simpleSum (embX c x * g * (embX c x)⁻¹) = simpleSum g) ∧ (∀ r ∈ R k n c p, ∃! xg : GL n k × N k n c p, r = embX c xg.1 * (xg.2 : GL (n ⊕ Fin c) k)) ∧ (∀ (M : Matrix (n ⊕ Fin c) (n ⊕ Fin c) k), (∀ r s, lev p s ≤ lev p r → M r s = (1 : Matrix (n ⊕ Fin c) (n ⊕ Fin c) k) r s) → M.det = 1) ∧ (∀ (l : ℕ) (u : n → k), l < p → rowE c l u ∈ N k n c p ∧ simpleSum (rowE c l u) = 0) ∧ ∀ (i : ℕ) (β : n → k), p < i → colE c i β ∈ N k n c p ∧ simpleSum (colE c i β) = 0 := by
+theorem unipotent_radical_basic
+    : ∀ (k : Type) [Field k] (n : Type) [Fintype n] [DecidableEq n] (c p : ℕ),
+      (∀ g : GL (n ⊕ Fin c) k, g ∈ N k n c p ↔ InN p g)
+        ∧ (∀ g ∈ N k n c p, ∀ h ∈ N k n c p, simpleSum (g * h) = simpleSum g + simpleSum h)
+        ∧ (∀ g ∈ N k n c p, Matrix.GeneralLinearGroup.det g = 1)
+        ∧ (∀ (x : GL n k), ∀ g ∈ N k n c p,
+          embX c x * g * (embX c x)⁻¹ ∈ N k n c p
+            ∧ simpleSum (embX c x * g * (embX c x)⁻¹) = simpleSum g)
+        ∧ (∀ r ∈ R k n c p, ∃! xg : GL n k × N k n c p, r = embX c xg.1 * (xg.2 : GL (n ⊕ Fin c) k))
+        ∧ (∀ (M : Matrix (n ⊕ Fin c) (n ⊕ Fin c) k),
+          (∀ r s, lev p s ≤ lev p r → M r s = (1 : Matrix (n ⊕ Fin c) (n ⊕ Fin c) k) r s)
+            → M.det = 1)
+        ∧ (∀ (l : ℕ) (u : n → k), l < p → rowE c l u ∈ N k n c p ∧ simpleSum (rowE c l u) = 0)
+        ∧ ∀ (i : ℕ) (β : n → k), p < i → colE c i β ∈ N k n c p ∧ simpleSum (colE c i β) = 0 := by
   intro k _ n _ _ c p
-  refine ⟨mem_N_iff, fun g hg h hh => simpleSum_mul hg hh, fun g hg => ?_,
-    fun x g hg => ⟨conj_mem x hg, simpleSum_conj x g⟩, fun r hr => existsUnique_of_mem_R hr,
+  refine ⟨
+    mem_N_iff,
+    fun g hg h hh => simpleSum_mul hg hh,
+    fun g hg => ?_,
+    fun x g hg => ⟨conj_mem x hg, simpleSum_conj x g⟩,
+    fun r hr => existsUnique_of_mem_R hr,
     fun M hM => Uni.det (b := lev p) hM,
     fun l u hl => ⟨rowE_mem u hl, simpleSum_eq_zero fun _ _ => rfl⟩,
-    fun i β hi => ⟨colE_mem β hi, simpleSum_eq_zero fun _ _ => rfl⟩⟩
+    fun i β hi => ⟨colE_mem β hi, simpleSum_eq_zero fun _ _ => rfl⟩
+  ⟩
   apply Units.ext
   exact Uni.det (b := lev p) ((mem_N_iff g).1 hg)
 

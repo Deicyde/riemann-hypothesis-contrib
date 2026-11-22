@@ -20,52 +20,60 @@ open GlobalTheory.CxForm.FormMul GlobalTheory.CxForm.PullClosed
 
 variable {n m : ℕ}
 
-theorem delAt_sum_smul {ι : Type} [Fintype ι] {v : V n} {f : ι → V n → ℂ} (e : ι → Alt n)
-    (hf : ∀ i, DifferentiableAt ℝ (f i) v) :
-    delAt (fun x => ∑ i, f i x • e i) v = ∑ a, ∑ i, del (f i) v (coordVec a) • (dz a * e i) := by
+theorem delAt_sum_smul
+    {ι : Type} [Fintype ι]
+    {v : V n} {f : ι → V n → ℂ}
+    (e : ι → Alt n) (hf : ∀ i, DifferentiableAt ℝ (f i) v)
+    : delAt (fun x => ∑ i, f i x • e i) v = ∑ a, ∑ i, del (f i) v (coordVec a) • (dz a * e i) := by
   unfold delAt
   refine Finset.sum_congr rfl fun a _ => ?_
-  have h : coefwise (fun g => del g v (coordVec a)) (fun x => ∑ i, f i x • e i) =
-      ∑ i, del (f i) v (coordVec a) • e i := by
+  have h
+      : coefwise (fun g => del g v (coordVec a)) (fun x => ∑ i, f i x • e i)
+        = ∑ i, del (f i) v (coordVec a) • e i := by
     refine (bas n).ext_elem fun S => ?_
     set_option synthInstance.maxHeartbeats 100000 in
       rw [repr_coefwise, repr_sum_smul,
-      del_sum (A := fun i x => f i x * (bas n).repr (e i) S) fun i _ => (hf i).mul (differentiableAt_const _),
-      ContinuousLinearMap.sum_apply, map_sum, Finsupp.finsetSum_apply]
+        del_sum
+          (A := fun i x => f i x * (bas n).repr (e i) S)
+          fun i _ => (hf i).mul (differentiableAt_const _),
+        ContinuousLinearMap.sum_apply, map_sum, Finsupp.finsetSum_apply]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [del_mul (b := fun _ => (bas n).repr (e i) S) (hf i) (differentiableAt_const _), del_const]
     simp
   rw [h, Finset.mul_sum]
   simp only [mul_smul_comm]
 
-theorem delAt_add {v : V n} {F G : V n → Alt n} (hF : ∀ S, DifferentiableAt ℝ (fun x => (bas n).repr (F x) S) v)
-    (hG : ∀ S, DifferentiableAt ℝ (fun x => (bas n).repr (G x) S) v) :
-    delAt (fun x => F x + G x) v = delAt F v + delAt G v := by
+theorem delAt_add
+    {v : V n} {F G : V n → Alt n} (hF : ∀ S, DifferentiableAt ℝ (fun x => (bas n).repr (F x) S) v)
+    (hG : ∀ S, DifferentiableAt ℝ (fun x => (bas n).repr (G x) S) v)
+    : delAt (fun x => F x + G x) v = delAt F v + delAt G v := by
   unfold delAt
   rw [← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun a _ => ?_
   rw [← mul_add]
   congr 1
   refine (bas n).ext_elem fun S => ?_
-  rw [map_add (f := _), Finsupp.add_apply, repr_coefwise, repr_coefwise, repr_coefwise, ← ContinuousLinearMap.add_apply,
-    ← del_add (hF S) (hG S)]
+  rw [map_add (f := _), Finsupp.add_apply, repr_coefwise, repr_coefwise, repr_coefwise,
+    ← ContinuousLinearMap.add_apply, ← del_add (hF S) (hG S)]
   simp only [map_add (f := _), Finsupp.add_apply]
 
-theorem sum_symm_dz {s : Fin n → Fin n → ℂ} (hs : ∀ a c, s a c = s c a) :
-    ∑ a, ∑ c, s a c • (dz a * dz c : Alt n) = 0 := by
+theorem sum_symm_dz {s : Fin n → Fin n → ℂ} (hs : ∀ a c, s a c = s c a)
+    : ∑ a, ∑ c, s a c • (dz a * dz c : Alt n) = 0 := by
   have h := congrArg swap (sum_symm_dzb hs)
   set_option synthInstance.maxHeartbeats 100000 in
-    simpa only [map_sum, map_smul, map_mul, map_zero, fun a : Fin n => (swap_dz a).2] using h
+  simpa only [map_sum, map_smul, map_mul, map_zero, fun a : Fin n => (swap_dz a).2] using h
 
-theorem delAt_pull_of_contDiffAt {φ : V n → V m} {v : V n} (hφ : ContDiffAt ℂ 2 φ v) (θ : Alt m) :
-    delAt (fun x => pull (fderiv ℂ φ x) θ) v = 0 := by
+theorem delAt_pull_of_contDiffAt {φ : V n → V m} {v : V n} (hφ : ContDiffAt ℂ 2 φ v) (θ : Alt m)
+    : delAt (fun x => pull (fderiv ℂ φ x) θ) v = 0 := by
   have hD : DifferentiableAt ℂ (fderiv ℂ φ) v :=
     (hφ.fderiv_right (m := 1) (by norm_num)).differentiableAt one_ne_zero
-  have hJ (w : V n) (b : Fin m) : HasFDerivAt (fun x => fderiv ℂ φ x w b)
+  have hJ (w : V n) (b : Fin m) : HasFDerivAt
+      (fun x => fderiv ℂ φ x w b)
       (((EuclideanSpace.proj b : V m →L[ℂ] ℂ).comp (ContinuousLinearMap.apply ℂ (V m) w)).comp
-        (fderiv ℂ (fderiv ℂ φ) v)) v :=
-    ((EuclideanSpace.proj b : V m →L[ℂ] ℂ).comp (ContinuousLinearMap.apply ℂ (V m) w)).hasFDerivAt.comp v
-      hD.hasFDerivAt
+        (fderiv ℂ (fderiv ℂ φ) v))
+      v :=
+    ((EuclideanSpace.proj b : V m →L[ℂ] ℂ).comp
+      (ContinuousLinearMap.apply ℂ (V m) w)).hasFDerivAt.comp v hD.hasFDerivAt
   have hJR (w : V n) (b : Fin m) : DifferentiableAt ℝ (fun x => fderiv ℂ φ x w b) v :=
     (hJ w b).differentiableAt.restrictScalars ℝ
   have hJc (w : V n) (b : Fin m) : DifferentiableAt ℝ (fun x => conj (fderiv ℂ φ x w b)) v :=
@@ -110,10 +118,14 @@ theorem delAt_pull_of_contDiffAt {φ : V n → V m} {v : V n} (hφ : ContDiffAt 
   | mul a b ha hb => exact hmul a b ha hb
   | add a b ha hb => exact hadd a b ha hb
 
-theorem delAt_dbarAt_pull_fderiv : ∀ (m n : ℕ) (τ : V m → V n) (U : Set (V m)) (γ : Alt n), IsOpen U →
-    DifferentiableOn ℂ τ U →
-    ∀ v ∈ U, delAt (fun x => pull (fderiv ℂ τ x) γ) v = 0 ∧ dbarAt (fun x => pull (fderiv ℂ τ x) γ) v = 0 :=
-  fun _ _ _ _ γ hU hτ _ hv =>
-    ⟨delAt_pull_of_contDiffAt (analyticOnNhd_of_holo hU hτ _ hv).contDiffAt γ, dbarAt_pull_fderiv hU hτ hv γ⟩
+theorem delAt_dbarAt_pull_fderiv
+    : ∀ (m n : ℕ) (τ : V m → V n) (U : Set (V m)) (γ : Alt n),
+      IsOpen U → DifferentiableOn ℂ τ U
+        → ∀ v ∈ U,
+          delAt (fun x => pull (fderiv ℂ τ x) γ) v = 0
+            ∧ dbarAt (fun x => pull (fderiv ℂ τ x) γ) v = 0 := fun _ _ _ _ γ hU hτ _ hv => ⟨
+  delAt_pull_of_contDiffAt (analyticOnNhd_of_holo hU hτ _ hv).contDiffAt γ,
+  dbarAt_pull_fderiv hU hτ hv γ
+⟩
 
 end GlobalTheory.CxForm.PullDelClosed

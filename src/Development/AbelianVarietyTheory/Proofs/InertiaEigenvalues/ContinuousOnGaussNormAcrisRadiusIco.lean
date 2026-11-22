@@ -15,8 +15,8 @@ noncomputable section
 
 namespace GlobalTheory.PMon.Gauss
 
-theorem gC_zero_of_lt_one (l : ℕ) [Fact l.Prime] {ρ : ℝ} (h0 : 0 ≤ ρ) (h1 : ρ < 1) :
-    gC l ρ (0 : Formalism.Per.Acris l) = 0 := by
+theorem gC_zero_of_lt_one (l : ℕ) [Fact l.Prime] {ρ : ℝ} (h0 : 0 ≤ ρ) (h1 : ρ < 1)
+    : gC l ρ (0 : Formalism.Per.Acris l) = 0 := by
   unfold gC
   split_ifs with h
   · have hN := Classical.choose_spec h
@@ -34,8 +34,8 @@ theorem gC_zero_of_lt_one (l : ℕ) [Fact l.Prime] {ρ : ℝ} (h0 : 0 ≤ ρ) (h
     · exact h'
   · rfl
 
-theorem continuousOn_gC (l : ℕ) [Fact l.Prime] (x : Formalism.Per.Acris l) :
-    ContinuousOn (fun ρ => gC l ρ x) (Set.Ico (l : ℝ)⁻¹ 1) := by
+theorem continuousOn_gC (l : ℕ) [Fact l.Prime] (x : Formalism.Per.Acris l)
+    : ContinuousOn (fun ρ => gC l ρ x) (Set.Ico (l : ℝ)⁻¹ 1) := by
   have hl0 : (0 : ℝ) < (l : ℝ)⁻¹ := by
     have : (0 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).pos
     positivity
@@ -45,8 +45,11 @@ theorem continuousOn_gC (l : ℕ) [Fact l.Prime] (x : Formalism.Per.Acris l) :
     exact gC_zero_of_lt_one l (hl0.le.trans hρ.1) hρ.2
   intro ρ₀ hρ₀
   have hpos : 0 < ρ₀ := hl0.trans_le hρ₀.1
-  obtain ⟨⟨c, k, ρ₂, -, h02, -, hR⟩, hL⟩ := GlobalTheory.T.gaussNormAcris_locally_monomial l x hx ρ₀ hρ₀.1 hρ₀.2
-  have hS : Set.Ico (l : ℝ)⁻¹ 1 = (Set.Ico (l : ℝ)⁻¹ 1 ∩ Set.Iic ρ₀) ∪ (Set.Ico (l : ℝ)⁻¹ 1 ∩ Set.Ici ρ₀) := by
+  obtain ⟨⟨c, k, ρ₂, -, h02, -, hR⟩, hL⟩ :=
+    GlobalTheory.T.gaussNormAcris_locally_monomial l x hx ρ₀ hρ₀.1 hρ₀.2
+  have hS
+      : Set.Ico (l : ℝ)⁻¹ 1
+        = (Set.Ico (l : ℝ)⁻¹ 1 ∩ Set.Iic ρ₀) ∪ (Set.Ico (l : ℝ)⁻¹ 1 ∩ Set.Ici ρ₀) := by
     ext y
     simp only [Set.mem_union, Set.mem_inter_iff, Set.mem_Iic, Set.mem_Ici]
     constructor
@@ -73,9 +76,10 @@ theorem continuousOn_gC (l : ℕ) [Fact l.Prime] (x : Formalism.Per.Acris l) :
       (hg.mono Set.Icc_subset_Ici_self).congr (fun y hy => hR y hy) (hR ρ₀ ⟨le_rfl, h02.le⟩)
     exact (hg'.mono_of_mem_nhdsWithin (Icc_mem_nhdsGE h02)).mono Set.inter_subset_right
 
-theorem continuousOn_gC_target :
-    ∀ (l : ℕ) [Fact l.Prime] (x : Formalism.Per.Acris l), ContinuousOn (fun ρ => gC l ρ x) (Set.Ico (l : ℝ)⁻¹ 1) :=
-  fun l _ x => continuousOn_gC l x
+theorem continuousOn_gC_target
+    : ∀ (l : ℕ) [Fact l.Prime] (x : Formalism.Per.Acris l),
+      ContinuousOn (fun ρ => gC l ρ x) (Set.Ico (l : ℝ)⁻¹ 1) := fun l _ x =>
+  continuousOn_gC l x
 
 end GlobalTheory.PMon.Gauss
 

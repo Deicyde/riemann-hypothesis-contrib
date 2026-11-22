@@ -8,12 +8,14 @@ open UpperTheory.V.Z.Kato.Joint
 
 section
 
-open Formalism.ConjugateSelfDual GlobalTheory.KZ GlobalTheory.KummerEisensteinGalois GlobalTheory.LambdaValuationPowers UpperTheory.V.HV
+open Formalism.ConjugateSelfDual GlobalTheory.KZ GlobalTheory.KummerEisensteinGalois
+  GlobalTheory.LambdaValuationPowers UpperTheory.V.HV
 
 variable {l : ℕ} [Fact l.Prime]
 
-private theorem finSupp_comp_fop (k : ℕ) (χ : ℕ → Qbar l) (T : Letter)
-    (lam : (ℕ → Qbar l) →ₗ[Qbar l] Qbar l) (h : FinSupp lam) : FinSupp (lam ∘ₗ fop k l χ T) := by
+private theorem finSupp_comp_fop
+    (k : ℕ) (χ : ℕ → Qbar l) (T : Letter) (lam : (ℕ → Qbar l) →ₗ[Qbar l] Qbar l) (h : FinSupp lam)
+    : FinSupp (lam ∘ₗ fop k l χ T) := by
   obtain ⟨S, hS⟩ := h
   cases T with
   | T q =>
@@ -40,9 +42,9 @@ private theorem finSupp_comp_fop (k : ℕ) (χ : ℕ → Qbar l) (T : Letter)
     show (χ d • f) n = 0
     simp [hf n hn]
 
-private theorem finSupp_comp_lift (k : ℕ) (χ : ℕ → Qbar l) (P : FreeAlgebra (Qbar l) Letter) :
-    ∀ lam : (ℕ → Qbar l) →ₗ[Qbar l] Qbar l, FinSupp lam →
-      FinSupp (lam ∘ₗ FreeAlgebra.lift (Qbar l) (fop k l χ) P) := by
+private theorem finSupp_comp_lift (k : ℕ) (χ : ℕ → Qbar l) (P : FreeAlgebra (Qbar l) Letter)
+    : ∀ lam : (ℕ → Qbar l) →ₗ[Qbar l] Qbar l,
+      FinSupp lam → FinSupp (lam ∘ₗ FreeAlgebra.lift (Qbar l) (fop k l χ) P) := by
   induction P using FreeAlgebra.induction with
   | grade0 r =>
     intro lam h
@@ -70,14 +72,16 @@ private theorem exists_pow_mul_le (x : Qbar l) : ∃ k : ℕ, ‖((l : ℕ) : Qb
   refine ⟨k, ?_⟩
   rw [norm_mul, norm_l_pow]
   have hl : (0 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).pos
-  calc ((l : ℝ))⁻¹ ^ k * ‖x‖ ≤ ((l : ℝ))⁻¹ ^ k * (l : ℝ) ^ k := by gcongr
+  calc
+    ((l : ℝ))⁻¹ ^ k * ‖x‖
+      ≤ ((l : ℝ))⁻¹ ^ k * (l : ℝ) ^ k := by gcongr
     _ = 1 := by rw [← mul_pow, inv_mul_cancel₀ hl.ne', one_pow]
 
 end
 
-open Formalism.ConjugateSelfDual GlobalTheory.KZ GlobalTheory.KummerEisensteinGalois GlobalTheory.LambdaValuationPowers UpperTheory.V.HV in
-theorem UpperTheory.V.Z.Kato.Joint.finP :
-    UpperTheory.V.Z.Kato.Joint.FinP := by
+open Formalism.ConjugateSelfDual GlobalTheory.KZ GlobalTheory.KummerEisensteinGalois
+  GlobalTheory.LambdaValuationPowers UpperTheory.V.HV in
+theorem UpperTheory.V.Z.Kato.Joint.finP : UpperTheory.V.Z.Kato.Joint.FinP := by
   classical
   intro hub l _ ι k N B cc χE c₀ P _
   let lam₀ : (ℕ → Qbar l) →ₗ[Qbar l] Qbar l :=
@@ -85,7 +89,7 @@ theorem UpperTheory.V.Z.Kato.Joint.finP :
   have hlam₀ : ∀ a : ℕ → Qbar l, lam₀ a = ι.symm (GlobalTheory.EisM.lam B cc fun i => ι (a i)) := by
     intro a
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [lam₀, GlobalTheory.EisM.lam, map_sum, map_mul, LinearMap.sum_apply]
+    simp [lam₀, GlobalTheory.EisM.lam, map_sum, map_mul, LinearMap.sum_apply]
   have hfs₀ : FinSupp lam₀ := by
     refine ⟨Finset.range B, fun f hf => ?_⟩
     rw [hlam₀, GlobalTheory.EisM.lam, Finset.sum_eq_zero, map_zero]
@@ -96,10 +100,11 @@ theorem UpperTheory.V.Z.Kato.Joint.finP :
   obtain ⟨S, hS⟩ := hfs
   choose e he using exists_pow_mul_le (l := l)
   let g : ℕ → Qbar l := fun i => ((l : ℕ) : Qbar l) ^ e (lam (Pi.single i 1)) * lam (Pi.single i 1)
-  obtain ⟨c, hc₀, -, hcF⟩ := hub l c₀ c₀ (S.image g) (by
-    intro x hx
-    obtain ⟨i, -, rfl⟩ := Finset.mem_image.mp hx
-    exact he _)
+  obtain ⟨c, hc₀, -, hcF⟩ :=
+    hub l c₀ c₀ (S.image g) (by
+      intro x hx
+      obtain ⟨i, -, rfl⟩ := Finset.mem_image.mp hx
+      exact he _)
   have hl : (0 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).pos
   refine ⟨lam₀, lam, c, hc₀, hfs₀, ⟨S, hS⟩, ?_, hlam₀, fun a => rfl⟩
   intro i σ hσ _

@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.CdScaleTi
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix GlobalTheory.Mem.Vol
+open Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain
+  NumberField Matrix GlobalTheory.Mem.Vol
 open scoped TensorProduct
 
 namespace GlobalTheory.Mem.SignatureFactor
@@ -13,18 +15,24 @@ namespace GlobalTheory.Mem.SignatureFactor
 theorem Jpq_mul_self (p q : ℕ) : Formalism.UG.Jpq p q * Formalism.UG.Jpq p q = 1 := by
   simp [Formalism.UG.Jpq, Matrix.fromBlocks_multiply]
 
-theorem exists_factor : ∀ (M p q : ℕ) (G : Matrix (Fin M) (Fin M) ℂ), Formalism.UG.HasSignature G p q → p + q = M ∧ (∃ A : Matrix (Fin p ⊕ Fin q) (Fin M) ℂ, Aᴴ * Formalism.UG.Jpq p q * A = G) ∧ ∀ A : Matrix (Fin p ⊕ Fin q) (Fin M) ℂ, Aᴴ * Formalism.UG.Jpq p q * A = G → ∃ B : Matrix (Fin M) (Fin p ⊕ Fin q) ℂ, A * B = 1 ∧ B * A = 1 := by
+theorem exists_factor
+    : ∀ (M p q : ℕ) (G : Matrix (Fin M) (Fin M) ℂ),
+      Formalism.UG.HasSignature G p q
+        → p + q = M ∧ (∃ A : Matrix (Fin p ⊕ Fin q) (Fin M) ℂ, Aᴴ * Formalism.UG.Jpq p q * A = G)
+          ∧ ∀ A : Matrix (Fin p ⊕ Fin q) (Fin M) ℂ,
+            Aᴴ * Formalism.UG.Jpq p q * A = G
+              → ∃ B : Matrix (Fin M) (Fin p ⊕ Fin q) ℂ, A * B = 1 ∧ B * A = 1 := by
   intro M p q G h
   obtain ⟨e, P, hP⟩ := h
   have hP' : P.valᴴ * (reindex e e G) * P.val = Formalism.UG.Jpq p q := hP
   set Q : Matrix (Fin p ⊕ Fin q) (Fin p ⊕ Fin q) ℂ := Units.val (P⁻¹ : GL (Fin p ⊕ Fin q) ℂ) with hQ
-  have hPQ : P.val * Q = 1 := by
-    rw [hQ, ← Units.val_mul, mul_inv_cancel, Units.val_one]
+  have hPQ : P.val * Q = 1 := by rw [hQ, ← Units.val_mul, mul_inv_cancel, Units.val_one]
   have hG' : Qᴴ * Formalism.UG.Jpq p q * Q = reindex e e G := by
     rw [← hP']
-    calc Qᴴ * (P.valᴴ * (reindex e e G) * P.val) * Q
-        = (P.val * Q)ᴴ * (reindex e e G) * (P.val * Q) := by
-          simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
+    calc
+      Qᴴ * (P.valᴴ * (reindex e e G) * P.val) * Q
+          = (P.val * Q)ᴴ * (reindex e e G) * (P.val * Q) := by
+        simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
       _ = _ := by rw [hPQ]; simp
   have hdet : G.det ≠ 0 := by
     intro h0

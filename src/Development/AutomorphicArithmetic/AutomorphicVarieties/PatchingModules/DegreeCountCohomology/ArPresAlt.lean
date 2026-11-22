@@ -12,7 +12,9 @@ namespace UpperTheory.V.Pa
 
 variable {l : ℕ} [Fact l.Prime] {Lc : Loc} {G : Glob l Lc} {q d : ℕ}
 
-structure ArPres (a : ArData G q d) (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] where
+structure ArPres
+    (a : ArData G q d)
+    (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] where
   S : Set (HeightOneSpectrum (𝓞 F))
   above : ∀ v : HeightOneSpectrum (𝓞 F), ((l : ℕ) : 𝓞 F) ∈ v.asIdeal → v ∈ S
   e : GS Ω S ≃ₜ* G.Γ

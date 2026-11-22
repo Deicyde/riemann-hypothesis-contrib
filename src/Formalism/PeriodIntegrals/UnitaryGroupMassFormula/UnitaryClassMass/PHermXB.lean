@@ -14,12 +14,11 @@ theorem local_switching_lattice : LocSw := by
   intro F E _ _ _ _ _ _ σ hσ hfix V _ _ p hp t ht X
   have hσσ : ∀ a, σ (σ a) = a := fun a => by rw [hσ, hσ, star_star]
   have hinj : Function.Injective (algebraMap (𝓞 E) E) := IsFractionRing.injective (𝓞 E) E
-  have hcomm : ∀ c : 𝓞 F, algebraMap (𝓞 E) E (algebraMap (𝓞 F) (𝓞 E) c) =
-      algebraMap F E (algebraMap (𝓞 F) F c) := by
+  have hcomm
+      : ∀ c : 𝓞 F,
+        algebraMap (𝓞 E) E (algebraMap (𝓞 F) (𝓞 E) c) = algebraMap F E (algebraMap (𝓞 F) F c) := by
     intro c
-    first
-    | rfl
-    | rw [← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply]
+    first | rfl | rw [← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply]
   have hSw : Sw F E t ≤ hcompl (K := E) p := by
     intro s hs
     obtain ⟨c, hc, rfl⟩ := Submonoid.mem_map.1 hs
@@ -62,7 +61,8 @@ theorem local_switching_lattice : LocSw := by
       refine ⟨sb, Submonoid.mem_map.2 ⟨c', ?_, hc'⟩⟩
       rw [Ideal.mem_primeCompl_iff, ht, Ideal.mem_comap, hc']
       exact fun h' => (hp.isPrime.mem_or_mem h').elim hsbp hsp
-    | one => exact ⟨1, by rw [one_mul]; exact (Sw F E t).one_mem⟩
+    | one =>
+      exact ⟨1, by rw [one_mul]; exact (Sw F E t).one_mem⟩
     | mul x y _ _ hx hy =>
       obtain ⟨r1, h1⟩ := hx
       obtain ⟨r2, h2⟩ := hy

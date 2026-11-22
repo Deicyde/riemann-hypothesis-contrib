@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsC
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.CompHt GlobalTheory.AllWt
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.CompHt
+  GlobalTheory.AllWt
 
 noncomputable section
 
@@ -23,9 +25,13 @@ theorem norm_p_lt_one' {p : ℕ} [Fact p.Prime] : ‖(p : ℂ_[p])‖ < 1 := by
   rw [← h] at h2
   simpa using h2
 
-theorem mem_range_of_norm_le {p : ℕ} [Fact p.Prime] {W L : Type} [CommRing W] [IsDomain W]
-    [IsDiscreteValuationRing W] [Field L] [Algebra W L] [IsFractionRing W L] (kL : L →+* ℂ_[p])
-    (hW : ∀ w, ‖kL (algebraMap W L w)‖ ≤ 1) (x : L) (hx : ‖kL x‖ ≤ 1) : x ∈ Set.range (algebraMap W L) := by
+theorem mem_range_of_norm_le
+    {p : ℕ} [Fact p.Prime]
+    {W L : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field L] [Algebra W L]
+    [IsFractionRing W L]
+    (kL : L →+* ℂ_[p]) (hW : ∀ w, ‖kL (algebraMap W L w)‖ ≤ 1)
+    (x : L) (hx : ‖kL x‖ ≤ 1)
+    : x ∈ Set.range (algebraMap W L) := by
   by_contra hxr
   have hx0 : x ≠ 0 := by rintro rfl; exact hxr ⟨0, map_zero _⟩
   have hunit : ∀ u : Wˣ, ‖kL (algebraMap W L u)‖ = 1 := by
@@ -52,7 +58,8 @@ theorem mem_range_of_norm_le {p : ℕ} [Fact p.Prime] {W L : Type} [CommRing W] 
     rw [hyu, pow_zero, mul_one] at hy
     rw [map_units_inv, hy, inv_inv]
   have hy1 : ‖kL (algebraMap W L y)‖ = 1 := by
-    have h1 : kL x * kL (algebraMap W L y) = 1 := by rw [← map_mul, hy, mul_inv_cancel₀ hx0, map_one]
+    have h1 : kL x * kL (algebraMap W L y) = 1 := by
+      rw [← map_mul, hy, mul_inv_cancel₀ hx0, map_one]
     have h2 := congrArg norm h1
     rw [norm_mul, norm_one] at h2
     have a2 := hW y
@@ -78,7 +85,23 @@ end GlobalTheory.CdvrLiftCp
 
 namespace GlobalTheory.CdvrLiftCp
 
-theorem exists_cdvr_lift : ∀ (p : ℕ) [Fact p.Prime] (T : CDVR), T.FinRes → ∀ (kO : T.V →+* 𝓞_ℂ_[p]) (k : T.Fr →+* ℂ_[p]), (∀ a, algebraMap 𝓞_ℂ_[p] ℂ_[p] (kO a) = k (algebraMap T.V T.Fr a)) → ∀ (L : Type) [Field L] [Algebra T.Fr L] [FiniteDimensional T.Fr L] (kL : L →+* ℂ_[p]), (∀ a, kL (algebraMap T.Fr L a) = k a) → ∃ (T' : CDVR) (i : T.V →+* T'.V) (iF : T.Fr →+* T'.Fr) (ψ : L ≃+* T'.Fr) (kO' : T'.V →+* 𝓞_ℂ_[p]), T'.FinRes ∧ Function.Injective kO' ∧ (∀ a, algebraMap T'.V T'.Fr (i a) = iF (algebraMap T.V T.Fr a)) ∧ (∀ a, ψ (algebraMap T.Fr L a) = iF a) ∧ (∀ a, algebraMap 𝓞_ℂ_[p] ℂ_[p] (kO' a) = kL (ψ.symm (algebraMap T'.V T'.Fr a))) ∧ ∀ (A : Type) [CommRing A] (f : A →+* L), (∀ a, ‖kL (f a)‖ ≤ 1) → ∃ fO : A →+* T'.V, ∀ a, algebraMap T'.V T'.Fr (fO a) = ψ (f a) := by
+theorem exists_cdvr_lift
+    : ∀ (p : ℕ) [Fact p.Prime] (T : CDVR),
+      T.FinRes
+        → ∀ (kO : T.V →+* 𝓞_ℂ_[p]) (k : T.Fr →+* ℂ_[p]),
+          (∀ a, algebraMap 𝓞_ℂ_[p] ℂ_[p] (kO a) = k (algebraMap T.V T.Fr a))
+            → ∀ (L : Type) [Field L] [Algebra T.Fr L] [FiniteDimensional T.Fr L] (kL : L →+* ℂ_[p]),
+              (∀ a, kL (algebraMap T.Fr L a) = k a)
+                → ∃ (T' : CDVR) (i : T.V →+* T'.V) (iF : T.Fr →+* T'.Fr) (ψ : L ≃+* T'.Fr)
+                    (kO' : T'.V →+* 𝓞_ℂ_[p]),
+                  T'.FinRes ∧ Function.Injective kO'
+                    ∧ (∀ a, algebraMap T'.V T'.Fr (i a) = iF (algebraMap T.V T.Fr a))
+                    ∧ (∀ a, ψ (algebraMap T.Fr L a) = iF a)
+                    ∧ (∀ a,
+                      algebraMap 𝓞_ℂ_[p] ℂ_[p] (kO' a) = kL (ψ.symm (algebraMap T'.V T'.Fr a)))
+                    ∧ ∀ (A : Type) [CommRing A] (f : A →+* L),
+                      (∀ a, ‖kL (f a)‖ ≤ 1)
+                        → ∃ fO : A →+* T'.V, ∀ a, algebraMap T'.V T'.Fr (fO a) = ψ (f a) := by
   intro p _ T hT kO k hk L _ _ _ kL hkL
   haveI : CharZero T.Fr := algebraRat.charZero _
   obtain ⟨W, _, _, _, _, _, _, _, hc, hfin, hinj, hloc, -, -⟩ :=
@@ -94,7 +117,8 @@ theorem exists_cdvr_lift : ∀ (p : ℕ) [Fact p.Prime] (T : CDVR), T.FinRes →
   have hψs : ∀ w : W, ψ.symm (algebraMap W (FractionRing W) w) = algebraMap W L w := by
     intro w
     rw [← hψ, RingEquiv.symm_apply_apply]
-  have hφ : ∀ a, iF (algebraMap T.V T.Fr a) = algebraMap W (FractionRing W) (algebraMap T.V W a) := by
+  have hφ
+      : ∀ a, iF (algebraMap T.V T.Fr a) = algebraMap W (FractionRing W) (algebraMap T.V W a) := by
     intro a
     have h1 : algebraMap T.Fr L (algebraMap T.V T.Fr a) = algebraMap W L (algebraMap T.V W a) :=
       (RingHom.congr_fun hc a).symm
@@ -104,10 +128,13 @@ theorem exists_cdvr_lift : ∀ (p : ℕ) [Fact p.Prime] (T : CDVR), T.FinRes →
   have hint : ∀ w : W, kL (algebraMap W L w) ∈ 𝓞_ℂ_[p] := by
     intro w
     have hw : IsIntegral T.V w := Algebra.IsIntegral.isIntegral w
-    have hcomp : (algebraMap 𝓞_ℂ_[p] ℂ_[p]).comp kO = (kL.comp (algebraMap W L)).comp (algebraMap T.V W) := by
+    have hcomp
+        : (algebraMap 𝓞_ℂ_[p] ℂ_[p]).comp kO
+          = (kL.comp (algebraMap W L)).comp (algebraMap T.V W) := by
       ext a
       change algebraMap 𝓞_ℂ_[p] ℂ_[p] (kO a) = kL (algebraMap W L (algebraMap T.V W a))
-      rw [hk, ← hkL, ← RingHom.comp_apply (algebraMap W L), ← RingHom.comp_apply (algebraMap T.Fr L), hc]
+      rw [hk, ← hkL, ← RingHom.comp_apply (algebraMap W L),
+        ← RingHom.comp_apply (algebraMap T.Fr L), hc]
     have h1 : IsIntegral 𝓞_ℂ_[p] (kL (algebraMap W L w)) := IsIntegral.map_of_comp_eq kO _ hcomp hw
     exact (PadicComplexInt.integers p).mem_of_integral h1
   have hW : ∀ w : W, ‖kL (algebraMap W L w)‖ ≤ 1 := fun w => (mem_int_iff' _).1 (hint w)
@@ -124,10 +151,13 @@ theorem exists_cdvr_lift : ∀ (p : ℕ) [Fact p.Prime] (T : CDVR), T.FinRes →
     change algebraMap 𝓞_ℂ_[p] ℂ_[p] (kO' a) = kL (ψ.symm (algebraMap W (FractionRing W) a))
     rw [hkO', hψs]
   · intro A _ f hf
-    have hmem : ∀ a, f a ∈ (algebraMap W L).range := fun a => mem_range_of_norm_le kL hW (f a) (hf a)
+    have hmem : ∀ a, f a ∈ (algebraMap W L).range := fun a =>
+      mem_range_of_norm_le kL hW (f a) (hf a)
     let e : W ≃+* (algebraMap W L).range :=
-      RingEquiv.ofBijective (algebraMap W L).rangeRestrict
-        ⟨fun a b h => IsFractionRing.injective W L (congrArg Subtype.val h), (algebraMap W L).rangeRestrict_surjective⟩
+      RingEquiv.ofBijective (algebraMap W L).rangeRestrict ⟨
+        fun a b h => IsFractionRing.injective W L (congrArg Subtype.val h),
+        (algebraMap W L).rangeRestrict_surjective
+      ⟩
     refine ⟨e.symm.toRingHom.comp (f.codRestrict _ hmem), fun a => ?_⟩
     change algebraMap W (FractionRing W) (e.symm (f.codRestrict _ hmem a)) = ψ (f a)
     have h2 : algebraMap W L (e.symm (f.codRestrict _ hmem a)) = f a := by

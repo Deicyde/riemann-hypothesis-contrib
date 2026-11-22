@@ -12,9 +12,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CartierDivOf
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.LogPair
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.LogPair
 
 set_option autoImplicit false
 
@@ -22,28 +24,35 @@ noncomputable section
 
 namespace GlobalTheory.KodairaLemma
 
-theorem lineBundleGlobalSectionsDim_eq_zero_of_isEmpty (k : Type) [Field k] {Z : Scheme.{0}} [Algebra k Γ(Z, ⊤)] [IsEmpty Z]
-    (L : LB Z) : lbH0 k L = 0 := by
+theorem lineBundleGlobalSectionsDim_eq_zero_of_isEmpty
+    (k : Type) [Field k] {Z : Scheme.{0}} [Algebra k Γ(Z, ⊤)] [IsEmpty Z] (L : LB Z)
+    : lbH0 k L = 0 := by
   have e : (⊤ : Z.Opens) = ⊥ := Opens.ext (Set.eq_empty_of_isEmpty _)
   have : Subsingleton Γ(Z, ⊤) := by rw [e]; infer_instance
   have : Subsingleton L.Sec := Module.subsingleton Γ(Z, ⊤) _
-  have : Subsingleton (coh (twist (structureModule Z) L) 0) := (cohZeroTwistEquiv L).toEquiv.subsingleton
+  have : Subsingleton (coh (twist (structureModule Z) L) 0) :=
+    (cohZeroTwistEquiv L).toEquiv.subsingleton
   exact Module.finrank_zero_of_subsingleton
 
-theorem isEmpty_zeroScheme {X : Scheme.{0}} [IsIntegral X] (hd : topologicalKrullDim X ≤ 0) {L : LB X}
-    (hL : L.IsLB) (t : L.Sec) (ht : genericPoint X ∈ nonzeroLocus t) :
-    IsEmpty (GlobalTheory.ThickeningDetermines.secIdeal hL t).subscheme := by
+theorem isEmpty_zeroScheme
+    {X : Scheme.{0}} [IsIntegral X]
+    (hd : topologicalKrullDim X ≤ 0)
+    {L : LB X} (hL : L.IsLB) (t : L.Sec) (ht : genericPoint X ∈ nonzeroLocus t)
+    : IsEmpty (GlobalTheory.ThickeningDetermines.secIdeal hL t).subscheme := by
   refine ⟨fun z => ?_⟩
-  have hx : (GlobalTheory.ThickeningDetermines.secIdeal hL t).subschemeι z ∈
-      ((GlobalTheory.ThickeningDetermines.secIdeal hL t).support : Set X) := by
+  have hx
+      : (GlobalTheory.ThickeningDetermines.secIdeal hL t).subschemeι z
+        ∈ ((GlobalTheory.ThickeningDetermines.secIdeal hL t).support : Set X) := by
     rw [← (GlobalTheory.ThickeningDetermines.secIdeal hL t).range_subschemeι]; exact ⟨z, rfl⟩
   rw [coe_support_secIdeal] at hx
   set x := (GlobalTheory.ThickeningDetermines.secIdeal hL t).subschemeι z
-  have hmax := Order.krullDim_nonpos_iff_forall_isMax.1
-    (show Order.krullDim (IrreducibleCloseds X) ≤ 0 from hd)
+  have hmax :=
+    Order.krullDim_nonpos_iff_forall_isMax.1 (show Order.krullDim (IrreducibleCloseds X) ≤ 0 from
+      hd)
   have hst : genericPoint X ⤳ x := (genericPoint_spec X).specializes trivial
   let A : IrreducibleCloseds X := ⟨closure {x}, isIrreducible_singleton.closure, isClosed_closure⟩
-  let B : IrreducibleCloseds X := ⟨closure {genericPoint X}, isIrreducible_singleton.closure, isClosed_closure⟩
+  let B : IrreducibleCloseds X :=
+    ⟨closure {genericPoint X}, isIrreducible_singleton.closure, isClosed_closure⟩
   have hAB : A ≤ B := specializes_iff_closure_subset.1 hst
   have hBA : B ≤ A := hmax A hAB
   have hts : x ⤳ genericPoint X := specializes_iff_closure_subset.2 hBA
@@ -52,13 +61,22 @@ theorem isEmpty_zeroScheme {X : Scheme.{0}} [IsIntegral X] (hd : topologicalKrul
 open GlobalTheory.ThickeningDetermines (secIdeal)
 open GlobalTheory.QuotSep
 
-theorem exists_nsmul_cls_eq_add_toPic_of_isBig : ∀ (k : Type) [Field k] [Infinite k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k), IsProjOver p → ∀ (M A : LB X) (hM : letI := algebraΓOfHom p; IsBig k M) (hA : IsAmpleLB A), ∃ (a : ℕ) (D : CartierDiv X), 0 < a ∧ D.Eff ∧ a • cls M (letI := algebraΓOfHom p; hM.isLB) = cls A hA.isLB + toPic D := by
+theorem exists_nsmul_cls_eq_add_toPic_of_isBig
+    : ∀ (k : Type) [Field k] [Infinite k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k),
+      IsProjOver p
+        → ∀ (M A : LB X) (hM : letI := algebraΓOfHom p; IsBig k M) (hA : IsAmpleLB A),
+          ∃ (a : ℕ) (D : CartierDiv X),
+            0 < a ∧ D.Eff
+              ∧ a • cls M (letI := algebraΓOfHom p; hM.isLB) = cls A hA.isLB + toPic D := by
   intro k _ _ X _ p hp M A hM hA
   letI := algebraΓOfHom p
   have hp' : IsProjOver (strHom k (X := X)) := by rwa [strHom_eq (f := p) fun _ => rfl]
   have := isNoetherian_of_isProjOver hp'
-  suffices h : ∃ a : ℕ, 0 < a ∧ ∃ (N : LB X) (hN : N.IsLB),
-      cls N hN = a • cls M hM.isLB - cls A hA.isLB ∧ HasNonzeroSec N by
+  suffices h
+      : ∃ a : ℕ,
+        0 < a
+          ∧ ∃ (N : LB X) (hN : N.IsLB),
+            cls N hN = a • cls M hM.isLB - cls A hA.isLB ∧ HasNonzeroSec N by
     obtain ⟨a, ha, N, hN, e, hs⟩ := h
     obtain ⟨s, hs⟩ := hasNonzeroSec_iff.1 hs
     refine ⟨a, divOfSec hN s hs, ha, GlobalTheory.PairStep.eff_divOfSec_of_sec hN s hs, ?_⟩
@@ -76,8 +94,9 @@ theorem exists_nsmul_cls_eq_add_toPic_of_isBig : ∀ (k : Type) [Field k] [Infin
   obtain ⟨t, ht⟩ := hasNonzeroSec_iff.1 hPs
   have ht0 : t ≠ 0 := sec_ne_zero_of_mem ht
   letI := algebraΓAlong k (secIdeal hP t).subschemeι
-  obtain ⟨m, hm, hlt⟩ : ∃ m : ℕ, 0 < m ∧
-      lbH0 k ((lbPow M m).pull (secIdeal hP t).subschemeι) < lbH0 k (lbPow M m) := by
+  obtain ⟨m, hm, hlt⟩
+      : ∃ m : ℕ,
+        0 < m ∧ lbH0 k ((lbPow M m).pull (secIdeal hP t).subschemeι) < lbH0 k (lbPow M m) := by
     obtain ⟨D, hD, c, hc, hfreq⟩ := hM.growth
     rcases D with _ | d
     · have hd0 : topologicalKrullDim X ≤ 0 := by rw [hD]; rfl
@@ -89,15 +108,17 @@ theorem exists_nsmul_cls_eq_add_toPic_of_isBig : ∀ (k : Type) [Field k] [Infin
       exact_mod_cast h0
     · set ι := (secIdeal hP t).subschemeι
       have hMι := LB.isLB_pull hM.isLB ι
-      obtain ⟨C, hC⟩ := GlobalTheory.exists_hdim_twist_lbPow_zero_le k _ (isProjOver_along hp' ι) d (M.pull ι) hMι
-        (structureModule _) (by rw [QCoh.suppDim_structureModule]; exact dim_zeroScheme_le hP ht0 hD.le)
+      obtain ⟨C, hC⟩ :=
+        GlobalTheory.exists_hdim_twist_lbPow_zero_le k _ (isProjOver_along hp' ι) d (M.pull ι) hMι
+          (structureModule _)
+          (by rw [QCoh.suppDim_structureModule]; exact dim_zeroScheme_le hP ht0 hD.le)
       have hev : ∀ᶠ m : ℕ in atTop, (C : ℝ) * 2 ^ d < c * m :=
         (tendsto_natCast_atTop_atTop.const_mul_atTop hc).eventually_gt_atTop _
       obtain ⟨m, h₁, h₂, h₃⟩ := (hfreq.and_eventually (hev.and (eventually_ge_atTop 1))).exists
       refine ⟨m, h₃, ?_⟩
       have e₂ : lbH0 k ((lbPow M m).pull ι) = lbH0 k (lbPow (M.pull ι) m) :=
-        lineBundleGlobalSectionsDim_congr_picardClass (LB.isLB_pull (isLB_lbPow hM.isLB m) ι) (isLB_lbPow hMι m)
-          ((cls_eq_iff _ _).2 (lbIso_lbPow_pull hM.isLB ι m)).symm
+        lineBundleGlobalSectionsDim_congr_picardClass (LB.isLB_pull (isLB_lbPow hM.isLB m) ι)
+          (isLB_lbPow hMι m) ((cls_eq_iff _ _).2 (lbIso_lbPow_pull hM.isLB ι m)).symm
       rw [e₂]
       by_contra hle
       push_neg at hle
@@ -116,7 +137,14 @@ theorem exists_nsmul_cls_eq_add_toPic_of_isBig : ∀ (k : Type) [Field k] [Infin
   have e₁ := globalSections_dim_le_div_add_restriction hp' hP hB ht0
   have hpos : 0 < lbH0 k (LB.div (lbPow M m) (lbPow (lbPow A q) r)) := by omega
   have hD := LB.isLB_div hB hP
-  refine ⟨m, hm, _, isLB_tens hD hE, ?_, (lineBundleHasNonzeroSection_of_globalSectionsDim_pos hpos).tens hEs hD hE⟩
+  refine ⟨
+    m,
+    hm,
+    _,
+    isLB_tens hD hE,
+    ?_,
+    (lineBundleHasNonzeroSection_of_globalSectionsDim_pos hpos).tens hEs hD hE
+  ⟩
   rw [cls_tens hD hE, cls_div hB hP, cls_lbPow hM.isLB, cls_tens (isLB_dual hA.isLB) hP,
     cls_dual hA.isLB, cls_lbPow hAq.isLB, cls_lbPow hA.isLB]
   abel

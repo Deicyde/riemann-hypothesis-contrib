@@ -9,7 +9,9 @@ public import Formalism.SharpRestriction.ParConsts
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.HTW GlobalTheory.HTW.Rec Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.FrobeniusOrbits
+open NumberField IsDedekindDomain GlobalTheory.HTW GlobalTheory.HTW.Rec
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions
+  Formalism.BasicNotions.Loc Formalism.FrobeniusOrbits
 
 namespace GlobalTheory.HTW.Rec
 
@@ -30,17 +32,21 @@ theorem one_le_Sc {D : D7} (L : SizeData₂ D) : (1 : ℝ) ≤ L.Sc := by
   have hz : z1 < z0 := by exact_mod_cast hlt
   have hz1' : (0 : ℝ) ≤ (z1 : ℝ) := by
     have : (((P.v ⟨1, by omega⟩ : ℚ) : ℝ)) = (z1 : ℝ) := by rw [hz1]; push_cast; rfl
-    rw [← this]; exact c1
+    rw [← this]
+    exact c1
   have hz0' : (z0 : ℝ) ≤ L.Sc := by
     have : (((P.v ⟨0, by omega⟩ : ℚ) : ℝ)) = (z0 : ℝ) := by rw [hz0]; push_cast; rfl
-    rw [← this]; exact c0
+    rw [← this]
+    exact c0
   have : (0 : ℤ) ≤ z1 := by exact_mod_cast hz1'
   have : (1 : ℝ) ≤ (z0 : ℝ) := by exact_mod_cast (show (1 : ℤ) ≤ z0 by omega)
   linarith
 
-theorem recWord_small_pos : ∀ {D : D7} (L : SizeData₂ D) (C : ℝ) (j : Fin D.R.m) (ε : ℤˣ) {n : ℕ}
-    (g : ZMod n → D.R.GG) (ψ : D.R.GG), Roomy L C → IsOrbit g ψ →
-    Small (recWord L j ε g) ∧ 1 ≤ (recWord L j ε g).S ∧ 1 ≤ (recWord L j ε g).η := by
+theorem recWord_small_pos
+    : ∀ {D : D7} (L : SizeData₂ D) (C : ℝ) (j : Fin D.R.m) (ε : ℤˣ) {n : ℕ} (g : ZMod n → D.R.GG)
+        (ψ : D.R.GG),
+      Roomy L C → IsOrbit g ψ
+        → Small (recWord L j ε g) ∧ 1 ≤ (recWord L j ε g).S ∧ 1 ≤ (recWord L j ε g).η := by
   intro D L C j ε n g ψ hR _
   have hB := GlobalTheory.T.twistedDualOrbitPageWord_box L C j ε (1 : D.R.GG) (1 : D.R.GG) hR
   obtain ⟨b1, w1, bw, bη, bS, hsz⟩ := hB
@@ -54,6 +60,7 @@ theorem recWord_small_pos : ∀ {D : D7} (L : SizeData₂ D) (C : ℝ) (j : Fin 
     unfold sHat
     exact Nat.le_floor (by exact_mod_cast one_le_Sc L)
   · show 1 ≤ etaHat L
-    unfold etaHat; omega
+    unfold etaHat
+    omega
 
 end GlobalTheory.HTW.Rec

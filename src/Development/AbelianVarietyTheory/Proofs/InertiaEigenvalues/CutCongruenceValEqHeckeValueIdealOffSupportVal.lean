@@ -9,11 +9,16 @@ noncomputable section
 
 namespace GlobalTheory.Pass.CutEq
 
-open Formalism Formalism.MainNotions Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module GlobalTheory.Pass
-open Formalism.MainNotions.PairedCharacterCondition Formalism.MainNotions.PairedCharacterCondition.CongruenceModules
+open Formalism Formalism.MainNotions Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations NumberField IsDedekindDomain
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module GlobalTheory.Pass
+open Formalism.MainNotions.PairedCharacterCondition
+  Formalism.MainNotions.PairedCharacterCondition.CongruenceModules
 
-theorem main : ∀ (D : D7) (i : D.nd.Loc) (Xs : Set (D.nd.X i)) (π : D.nd.X i),
-    PairedCharacterCondition.CongruenceModules.vccCut i Xs π = GlobalTheory.Cut.vccOff i Xs π := by
+theorem main
+    : ∀ (D : D7) (i : D.nd.Loc) (Xs : Set (D.nd.X i)) (π : D.nd.X i),
+      PairedCharacterCondition.CongruenceModules.vccCut i Xs π
+        = GlobalTheory.Cut.vccOff i Xs π := by
   intro D i Xs π
   have h : ccAt (D.nd.T i) (cutLocus i Xs) π = GlobalTheory.Cut.ccOff i Xs π := by
     unfold ccAt GlobalTheory.Cut.ccOff Ideal.map

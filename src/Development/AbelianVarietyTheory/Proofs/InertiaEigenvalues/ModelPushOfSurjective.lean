@@ -11,10 +11,14 @@ open scoped LaurentSeries PowerSeries
 
 namespace GlobalTheory.Models
 
-theorem ModTh.model_push_of_surjective {k G : Type} [Field k] [Group G] {l n : ℕ} [Fact l.Prime] [CharP k l]
-    [NeZero n] {R : RingPG k l} (F : DFun R n G) {r : ℕ} {Dt : TopData n r} (M : ModTh F Dt) (A B : Ob k G)
-    (p : (Fin A.m → k) →ₗ[k] (Fin B.m → k)) (N : Lats k n A.m) (hp : IsHom A B p)
-    (hs : Function.Surjective p) (hN : M.Model A N) : M.Model B (F.push A B p N) := by
+theorem ModTh.model_push_of_surjective
+    {k G : Type} [Field k] [Group G]
+    {l n : ℕ} [Fact l.Prime] [CharP k l] [NeZero n]
+    {R : RingPG k l} (F : DFun R n G)
+    {r : ℕ} {Dt : TopData n r} (M : ModTh F Dt)
+    (A B : Ob k G) (p : (Fin A.m → k) →ₗ[k] (Fin B.m → k)) (N : Lats k n A.m)
+    (hp : IsHom A B p) (hs : Function.Surjective p) (hN : M.Model A N)
+    : M.Model B (F.push A B p N) := by
   obtain ⟨C, Nb, A₁, j, q, hb, hj, hji, hq, hqs, rfl⟩ := hN
   have hC : F.Obj C := M.base_obj C Nb hb
   have h1 : F.Obj A₁ := F.obj_sub A₁ C j hj hji hC

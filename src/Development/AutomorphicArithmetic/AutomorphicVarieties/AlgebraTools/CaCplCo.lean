@@ -9,12 +9,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools
 
-theorem UpperTheory.V.AlgebraTools.IsCplAt.isCO :
-    ∀ (R₀ R : Type) [CommRing R₀] [CommRing R] [Algebra R₀ R] (p₀ : Ideal R₀) (p : Ideal R)
-      (O B : Type) [CommRing O] [IsLocalRing O] [CommRing B] [IsLocalRing B] [Algebra R₀ O] [Algebra R B]
-      [Algebra O B] [Algebra R₀ B] [IsScalarTower R₀ R B] [IsScalarTower R₀ O B],
-      IsCplAt R₀ p₀ O → IsCplAt R p B → p.comap (algebraMap R₀ R) = p₀ →
-      (∀ x : R, ∃ a : R₀, x - algebraMap R₀ R a ∈ p) → UpperTheory.V.Alg.IsCO O B := by
+theorem UpperTheory.V.AlgebraTools.IsCplAt.isCO
+    : ∀ (R₀ R : Type) [CommRing R₀] [CommRing R] [Algebra R₀ R] (p₀ : Ideal R₀) (p : Ideal R)
+        (O B : Type) [CommRing O] [IsLocalRing O] [CommRing B] [IsLocalRing B] [Algebra R₀ O]
+        [Algebra R B] [Algebra O B] [Algebra R₀ B] [IsScalarTower R₀ R B] [IsScalarTower R₀ O B],
+      IsCplAt R₀ p₀ O → IsCplAt R p B → p.comap (algebraMap R₀ R) = p₀
+        → (∀ x : R, ∃ a : R₀, x - algebraMap R₀ R a ∈ p)
+        → UpperTheory.V.Alg.IsCO O B := by
   intro R₀ R _ _ _ p₀ p O B _ _ _ _ _ _ _ _ _ _ hO hB hp hsurj
   have hRB : ∀ r : R, algebraMap R B r ∈ maximalIdeal B ↔ r ∈ p := by
     intro r
@@ -57,18 +58,23 @@ theorem UpperTheory.V.AlgebraTools.IsCplAt.isCO :
       exact hs ((hRB s).1 hsum)
     obtain ⟨u, hu⟩ := hloc.map_nonunit _ hsu
     refine ⟨↑u⁻¹ * algebraMap R₀ O a₀, ?_⟩
-    have key : algebraMap O B (algebraMap R₀ O s₀) * x - algebraMap O B (algebraMap R₀ O a₀)
-        ∈ maximalIdeal B := by
-      have hid : algebraMap O B (algebraMap R₀ O s₀) * x - algebraMap O B (algebraMap R₀ O a₀) =
-          (algebraMap R B s * x - algebraMap R B a)
-            - (algebraMap R B s - algebraMap O B (algebraMap R₀ O s₀)) * x
-            + (algebraMap R B a - algebraMap O B (algebraMap R₀ O a₀)) := by ring
+    have key
+        : algebraMap O B (algebraMap R₀ O s₀) * x - algebraMap O B (algebraMap R₀ O a₀)
+          ∈ maximalIdeal B := by
+      have hid
+          : algebraMap O B (algebraMap R₀ O s₀) * x - algebraMap O B (algebraMap R₀ O a₀)
+            = (algebraMap R B s * x - algebraMap R B a)
+              - (algebraMap R B s - algebraMap O B (algebraMap R₀ O s₀)) * x
+              + (algebraMap R B a - algebraMap O B (algebraMap R₀ O a₀)) := by
+        ring
       rw [hid]
       exact Ideal.add_mem _ (Ideal.sub_mem _ hx (Ideal.mul_mem_right _ _ h1)) h2
     have hinv : algebraMap O B ↑u⁻¹ * algebraMap O B ↑u = 1 := by
       rw [← map_mul, Units.inv_mul, map_one]
-    have hid2 : x - algebraMap O B (↑u⁻¹ * algebraMap R₀ O a₀) = algebraMap O B ↑u⁻¹ *
-        (algebraMap O B (algebraMap R₀ O s₀) * x - algebraMap O B (algebraMap R₀ O a₀)) := by
+    have hid2
+        : x - algebraMap O B (↑u⁻¹ * algebraMap R₀ O a₀)
+          = algebraMap O B ↑u⁻¹
+            * (algebraMap O B (algebraMap R₀ O s₀) * x - algebraMap O B (algebraMap R₀ O a₀)) := by
       rw [← hu, map_mul]
       linear_combination (-x) * hinv
     rw [hid2]

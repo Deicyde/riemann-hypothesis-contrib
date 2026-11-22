@@ -13,8 +13,8 @@ open ReciprocityTheory.ChartRestriction.G.Geo
 
 variable {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)]
 
-theorem isSmoothHerm_tensor {A B : HermLine ι} (hA : IsSmoothHerm A) (hB : IsSmoothHerm B) :
-    IsSmoothHerm (A.tensor B) :=
+theorem isSmoothHerm_tensor {A B : HermLine ι} (hA : IsSmoothHerm A) (hB : IsSmoothHerm B)
+    : IsSmoothHerm (A.tensor B) :=
   ContDiffOn.mul hA hB
 
 end GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Inter

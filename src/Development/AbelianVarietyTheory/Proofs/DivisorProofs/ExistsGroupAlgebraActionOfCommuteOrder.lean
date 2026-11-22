@@ -6,9 +6,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PowEqPowOfMo
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKRes
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu
+  GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKRes
 open ReciprocityTheory.DiscreteGroups.LocalClassField
 open scoped TensorProduct
 open scoped TensorProduct
@@ -18,9 +21,12 @@ noncomputable section
 
 namespace GlobalTheory.LKGeo.CommBC
 
-theorem actOn_tmul_tmul {C V : Type} [Ring C] [Algebra ℚ C] [AddCommGroup V] [Module ℚ V]
-    (rep : C →ₐ[ℚ] Module.End ℚ V) (R : Type) [CommRing R] [Algebra ℚ R] (a b : R) (c : C) (v : V) :
-    actOn rep R (a ⊗ₜ c) (b ⊗ₜ v) = (a * b) ⊗ₜ rep c v := by
+theorem actOn_tmul_tmul
+    {C V : Type} [Ring C] [Algebra ℚ C] [AddCommGroup V] [Module ℚ V]
+    (rep : C →ₐ[ℚ] Module.End ℚ V)
+    (R : Type) [CommRing R] [Algebra ℚ R]
+    (a b : R) (c : C) (v : V)
+    : actOn rep R (a ⊗ₜ c) (b ⊗ₜ v) = (a * b) ⊗ₜ rep c v := by
   have : actOn rep R (a ⊗ₜ c) = Algebra.ofId R _ a * Module.End.baseChangeHom ℚ R V (rep c) :=
     Algebra.TensorProduct.lift_tmul _ _ _ a c
   rw [this, Module.End.mul_apply]
@@ -28,11 +34,14 @@ theorem actOn_tmul_tmul {C V : Type} [Ring C] [Algebra ℚ C] [AddCommGroup V] [
   change a • (LinearMap.baseChange R (rep c)) (b ⊗ₜ v) = _
   rw [LinearMap.baseChange_tmul, TensorProduct.smul_tmul', smul_eq_mul]
 
-theorem exists_actOn_eq {C V : Type} [Ring C] [Algebra ℚ C] [AddCommGroup V] [Module ℚ V] [Module.Finite ℚ V]
-    (rep : C →ₐ[ℚ] Module.End ℚ V) {ι' : Type} (S : ι' → Module.End ℚ V)
+theorem exists_actOn_eq
+    {C V : Type} [Ring C] [Algebra ℚ C] [AddCommGroup V] [Module ℚ V] [Module.Finite ℚ V]
+    (rep : C →ₐ[ℚ] Module.End ℚ V)
+    {ι' : Type} (S : ι' → Module.End ℚ V)
     (hrange : ∀ B : Module.End ℚ V, (∀ b, B * S b = S b * B) → ∃ x, rep x = B)
-    (R : Type) [CommRing R] [Algebra ℚ R] (A : Module.End R (R ⊗[ℚ] V))
-    (hA : ∀ b, A * (S b).baseChange R = (S b).baseChange R * A) : ∃ y, actOn rep R y = A := by
+    (R : Type) [CommRing R] [Algebra ℚ R]
+    (A : Module.End R (R ⊗[ℚ] V)) (hA : ∀ b, A * (S b).baseChange R = (S b).baseChange R * A)
+    : ∃ y, actOn rep R y = A := by
   classical
   let r := Module.Free.chooseBasis ℚ R
   let e : R ⊗[ℚ] V ≃ₗ[ℚ] (Module.Free.ChooseBasisIndex ℚ R →₀ V) :=
@@ -50,7 +59,8 @@ theorem exists_actOn_eq {C V : Type} [Ring C] [Algebra ℚ C] [AddCommGroup V] [
     | tmul a v => simp [he]
     | add x y hx hy => simp only [map_add (f := _), Finsupp.add_apply, hx, hy]
   have hcomm : ∀ k b, Ak k * S b = S b * Ak k := by
-    intro k b; ext v
+    intro k b
+    ext v
     simp only [Module.End.mul_apply, hAk]
     have := congrArg (fun f => f ((1 : R) ⊗ₜ v)) (hA b)
     simp only [Module.End.mul_apply, LinearMap.baseChange_tmul] at this
@@ -79,13 +89,15 @@ theorem exists_actOn_eq {C V : Type} [Ring C] [Algebra ℚ C] [AddCommGroup V] [
     · rw [hzero j hj, LinearMap.zero_apply]
   apply TensorProduct.AlgebraTensorModule.ext
   intro a v
-  have : a ⊗ₜ[ℚ] v = a • ((1 : R) ⊗ₜ v) := by rw [TensorProduct.smul_tmul', smul_eq_mul, _root_.mul_one]
+  have : a ⊗ₜ[ℚ] v = a • ((1 : R) ⊗ₜ v) := by
+    rw [TensorProduct.smul_tmul', smul_eq_mul, _root_.mul_one]
   rw [this, map_smul, map_smul, h1]
 
-theorem exists_actOn_eq_of_commute : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (G : HTGroup p) (L : Link D G)
-    (A : Module.End (AfP p) (AfP p ⊗[ℚ] VQ D)),
-    (∀ b : D.O, A * (actQ D b).baseChange (AfP p) = (actQ D b).baseChange (AfP p) * A) →
-    ∃ y, actOn L.rep (AfP p) y = A := by
+theorem exists_actOn_eq_of_commute
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (G : HTGroup p) (L : Link D G)
+        (A : Module.End (AfP p) (AfP p ⊗[ℚ] VQ D)),
+      (∀ b : D.O, A * (actQ D b).baseChange (AfP p) = (actQ D b).baseChange (AfP p) * A)
+        → ∃ y, actOn L.rep (AfP p) y = A := by
   intro p _ D G L A hA
   haveI := D.finLa
   exact exists_actOn_eq L.rep (actQ D) (fun B hB => (L.rep_range B).mpr hB) (AfP p) A hA

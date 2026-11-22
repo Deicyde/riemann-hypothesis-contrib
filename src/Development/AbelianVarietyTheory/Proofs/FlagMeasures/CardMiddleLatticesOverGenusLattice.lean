@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsFrameFi
 
 noncomputable section
 
-open NumberField Module Matrix Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt GlobalTheory.LoopC
+open NumberField Module Matrix Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt GlobalTheory.LoopC
 open scoped ENNReal Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -23,28 +24,33 @@ variable (D : D7)
 abbrev jz (z : (VS D).V) : ((D.sp.X 0).V × D.host.E) →ₗ[𝓞 D.host.E] (VS D).V :=
   ((D.sp.iXY 0).coprod (LinearMap.toSpanSingleton D.host.E (VS D).V z)).restrictScalars (𝓞 D.host.E)
 
-theorem jz_apply (z : (VS D).V) (p : (D.sp.X 0).V × D.host.E) :
-    jz D z p = D.sp.iXY 0 p.1 + p.2 • z := rfl
+theorem jz_apply (z : (VS D).V) (p : (D.sp.X 0).V × D.host.E)
+    : jz D z p = D.sp.iXY 0 p.1 + p.2 • z :=
+  rfl
 
-theorem mem_Wb (v : (hS D).V) : v ∈ Wb D ↔
-    (∀ a, (hS D).hT (D.sp.hypE a) v = 0) ∧ ∀ a, (hS D).hT (D.sp.hypF a) v = 0 := by
+theorem mem_Wb (v : (hS D).V)
+    : v ∈ Wb D ↔ (∀ a, (hS D).hT (D.sp.hypE a) v = 0) ∧ ∀ a, (hS D).hT (D.sp.hypF a) v = 0 := by
   unfold Wb
   rw [Formalism.MainNotions.mem_orth_iff]
   constructor
   · intro h
-    exact ⟨fun a => h _ (Submodule.subset_span (Or.inl ⟨a, rfl⟩)),
-      fun a => h _ (Submodule.subset_span (Or.inr ⟨a, rfl⟩))⟩
+    exact ⟨
+      fun a => h _ (Submodule.subset_span (Or.inl ⟨a, rfl⟩)),
+      fun a => h _ (Submodule.subset_span (Or.inr ⟨a, rfl⟩))
+    ⟩
   · rintro ⟨h1, h2⟩ x hx
-    have : Submodule.span D.host.E (Set.range D.sp.hypE ∪ Set.range D.sp.hypF) ≤
-        LinearMap.ker ((hS D).hT.flip v) := by
+    have : Submodule.span D.host.E (Set.range D.sp.hypE ∪ Set.range D.sp.hypF)
+        ≤ LinearMap.ker ((hS D).hT.flip v) := by
       refine Submodule.span_le.2 ?_
       rintro _ (⟨a, rfl⟩ | ⟨a, rfl⟩)
       · exact h1 a
       · exact h2 a
     exact this hx
 
-theorem eq_zero_of_mem_X {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T) (he : F0.e = D.sp.hypE)
-    {x : (hS D).V} (hx : x ∈ F0.X) (hw : x ∈ Wb D) : x = 0 := by
+theorem eq_zero_of_mem_X
+    {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T) (he : F0.e = D.sp.hypE)
+    {x : (hS D).V} (hx : x ∈ F0.X) (hw : x ∈ Wb D)
+    : x = 0 := by
   unfold FlagG.X at hx
   rw [he] at hx
   obtain ⟨c, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun _).1 hx
@@ -54,25 +60,33 @@ theorem eq_zero_of_mem_X {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T) (he : F0.e 
     have h := Formalism.MainNotions.hT_swap_zero (h2 b)
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply, D.sp.hyp_ef,
-      smul_eq_mul, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ,
-      if_true] at h
+          smul_eq_mul, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+        at h
     simpa using h
   simp [hc]
 
 theorem iXY_mem_Wb (w : (D.sp.X 0).V) : D.sp.iXY 0 w ∈ Wb D :=
-  (mem_Wb D _).2 ⟨fun a => Formalism.MainNotions.hT_swap_zero (D.sp.hyp_orthX a w).1,
-    fun a => Formalism.MainNotions.hT_swap_zero (D.sp.hyp_orthX a w).2⟩
+  (mem_Wb D _).2 ⟨
+    fun a => Formalism.MainNotions.hT_swap_zero (D.sp.hyp_orthX a w).1,
+    fun a => Formalism.MainNotions.hT_swap_zero (D.sp.hyp_orthX a w).2
+  ⟩
 
 theorem zmOf_mem_Wb (u : D.what₂.Word) : D.zmOf u ∈ Wb D :=
-  Submodule.smul_mem _ _ ((mem_Wb D _).2 ⟨fun a => Formalism.MainNotions.hT_swap_zero (D.sp.hyp_orthz a).1,
-    fun a => Formalism.MainNotions.hT_swap_zero (D.sp.hyp_orthz a).2⟩)
+  Submodule.smul_mem _ _
+    ((mem_Wb D _).2 ⟨
+      fun a => Formalism.MainNotions.hT_swap_zero (D.sp.hyp_orthz a).1,
+      fun a => Formalism.MainNotions.hT_swap_zero (D.sp.hyp_orthz a).2
+    ⟩)
 
 theorem jz_mem_Wb (u : D.what₂.Word) (p : (D.sp.X 0).V × D.host.E) : jz D (D.zmOf u) p ∈ Wb D := by
   rw [jz_apply]
   exact (Wb D).add_mem (iXY_mem_Wb D _) ((Wb D).smul_mem _ (zmOf_mem_Wb D u))
 
-theorem exists_jz (u : D.what₂.Word) (F0 : Fb D u) (hT : Tu D u ≠ 0) (he : F0.e = D.sp.hypE)
-    (hz : F0.z = D.zmOf u) {v : (hS D).V} (hv : v ∈ Wb D) : ∃ p, jz D (D.zmOf u) p = v := by
+theorem exists_jz
+    (u : D.what₂.Word) (F0 : Fb D u)
+    (hT : Tu D u ≠ 0) (he : F0.e = D.sp.hypE) (hz : F0.z = D.zmOf u)
+    {v : (hS D).V} (hv : v ∈ Wb D)
+    : ∃ p, jz D (D.zmOf u) p = v := by
   have hW := (Formalism.MainNotions.WHyp_Wsp D u hT (lf D F0) he hz).1
   have hT' : ((Tu D u : ℕ) : D.host.E) ≠ 0 := Nat.cast_ne_zero.2 hT
   set c : D.host.E := -((hS D).hT F0.z v) / ((Tu D u : ℕ) : D.host.E) with hc
@@ -96,9 +110,10 @@ theorem exists_jz (u : D.what₂.Word) (F0 : Fb D u) (hT : Tu D u ≠ 0) (he : F
   rw [jz_apply, hs]
   simp
 
-theorem comap_sup_X (u : D.what₂.Word) (F0 : Fb D u) (he : F0.e = D.sp.hypE)
-    (L : LatV D) (hL : L ≤ toO (hS D) (Wb D)) :
-    (L ⊔ toO (hS D) F0.X).comap (jz D (D.zmOf u)) = L.comap (jz D (D.zmOf u)) := by
+theorem comap_sup_X
+    (u : D.what₂.Word) (F0 : Fb D u) (he : F0.e = D.sp.hypE)
+    (L : LatV D) (hL : L ≤ toO (hS D) (Wb D))
+    : (L ⊔ toO (hS D) F0.X).comap (jz D (D.zmOf u)) = L.comap (jz D (D.zmOf u)) := by
   apply le_antisymm _ (Submodule.comap_mono le_sup_left)
   intro p hp
   obtain ⟨l, hl, x, hx, hs⟩ := Submodule.mem_sup.1 hp
@@ -109,21 +124,24 @@ theorem comap_sup_X (u : D.what₂.Word) (F0 : Fb D u) (he : F0.e = D.sp.hypE)
     exact (Wb D).sub_mem (jz_mem_Wb D u p) (hL hl)
   rw [hx0, add_zero] at hs
   change jz D (D.zmOf u) p ∈ L
-  rw [← hs]; exact hl
+  rw [← hs]
+  exact hl
 
-theorem mem_Lsub {T : D.host.E} (F : Fg D T) (Λ : LatV D) (v : (hS D).V) :
-    v ∈ Lsub Λ F ↔ v ∈ orth (hS D) (Xsp F) ∧
-      ∃ l ∈ Λ, l ∈ orth (hS D) (Xsp F) ∧ v - l ∈ Xsp F := by
+theorem mem_Lsub {T : D.host.E} (F : Fg D T) (Λ : LatV D) (v : (hS D).V)
+    : v ∈ Lsub Λ F
+      ↔ v ∈ orth (hS D) (Xsp F) ∧ ∃ l ∈ Λ, l ∈ orth (hS D) (Xsp F) ∧ v - l ∈ Xsp F := by
   constructor
   · rintro ⟨h1, h2⟩
     obtain ⟨l, hl, x, hx, hs⟩ := Submodule.mem_sup.1 h1
     refine ⟨h2, l, hl.1, hl.2, ?_⟩
-    rw [← hs]; simpa using hx
+    rw [← hs]
+    simpa using hx
   · rintro ⟨h2, l, hl, hl', hx⟩
     refine ⟨Submodule.mem_sup.2 ⟨l, ⟨hl, hl'⟩, v - l, hx, by abel⟩, h2⟩
 
-theorem Lsub_gmap {T : D.host.E} (F : Fg D T) (Λ : LatV D) (n : (hS D).V ≃ₗ[D.host.E] (hS D).V)
-    (hn : FixFr D F n) : Lsub (Formalism.HermitianLatticesTheory.gmap n Λ) F = Lsub Λ F := by
+theorem Lsub_gmap
+    {T : D.host.E} (F : Fg D T) (Λ : LatV D) (n : (hS D).V ≃ₗ[D.host.E] (hS D).V) (hn : FixFr D F n)
+    : Lsub (Formalism.HermitianLatticesTheory.gmap n Λ) F = Lsub Λ F := by
   obtain ⟨h1, h2, h3⟩ := hn
   have key : ∀ l, n l ∈ orth (hS D) (Xsp F) ↔ l ∈ orth (hS D) (Xsp F) := by
     intro l
@@ -136,11 +154,11 @@ theorem Lsub_gmap {T : D.host.E} (F : Fg D T) (Λ : LatV D) (n : (hS D).V ≃ₗ
     rw [Formalism.MainNotions.mem_orth_iff, Formalism.MainNotions.mem_orth_iff]
     constructor
     · intro h
-      exact Formalism.MainNotions.hT_zero_of_mem_X F.fl (fun a => by
-        rw [← he]; exact h _ (Submodule.subset_span ⟨a, rfl⟩))
+      exact Formalism.MainNotions.hT_zero_of_mem_X F.fl
+        (fun a => by rw [← he]; exact h _ (Submodule.subset_span ⟨a, rfl⟩))
     · intro h
-      exact Formalism.MainNotions.hT_zero_of_mem_X F.fl (fun a => by
-        rw [he]; exact h _ (Submodule.subset_span ⟨a, rfl⟩))
+      exact Formalism.MainNotions.hT_zero_of_mem_X F.fl
+        (fun a => by rw [he]; exact h _ (Submodule.subset_span ⟨a, rfl⟩))
   ext v
   rw [mem_Lsub, mem_Lsub]
   refine and_congr_right (fun _ => ⟨?_, ?_⟩)
@@ -157,16 +175,17 @@ theorem Lsub_gmap {T : D.host.E} (F : Fg D T) (Λ : LatV D) (n : (hS D).V ≃ₗ
     convert this using 1
     abel
 
-theorem le_Wb_of_mem (u : D.what₂.Word) {M : LatW D} {L : LatV D} (hL : L ∈ glueSet D u M) :
-    L ≤ toO (hS D) (Wb D) := by
+theorem le_Wb_of_mem (u : D.what₂.Word) {M : LatW D} {L : LatV D} (hL : L ∈ glueSet D u M)
+    : L ≤ toO (hS D) (Wb D) := by
   intro x hx
   change x ∈ Wb D
   rw [← hL.2.1]
   exact Submodule.subset_span hx
 
-theorem comap_jz_inl (z : (VS D).V) (L : LatV D) :
-    (L.comap (jz D z)).comap ((LinearMap.inl D.host.E (D.sp.X 0).V D.host.E).restrictScalars (𝓞 D.host.E)) =
-      L.comap ((D.sp.iXY 0).restrictScalars (𝓞 D.host.E)) := by
+theorem comap_jz_inl (z : (VS D).V) (L : LatV D)
+    : (L.comap (jz D z)).comap
+        ((LinearMap.inl D.host.E (D.sp.X 0).V D.host.E).restrictScalars (𝓞 D.host.E))
+      = L.comap ((D.sp.iXY 0).restrictScalars (𝓞 D.host.E)) := by
   ext w
   change jz D z (w, 0) ∈ L ↔ D.sp.iXY 0 w ∈ L
   rw [jz_apply]

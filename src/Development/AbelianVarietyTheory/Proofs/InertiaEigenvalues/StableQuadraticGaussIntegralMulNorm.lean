@@ -11,9 +11,20 @@ open scoped Pointwise ENNReal NNReal
 
 namespace GlobalTheory.JR.WeilQuad.GaussTrans
 
-theorem main : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (A : Et F E) (ψ : AddChar F ℂ) (x : A.Kˣ) (μ : Measure A.L) (ω : A.K → ℂ), Hyp A ψ x μ ω → ∀ (t s : A.Kˣ), (∃ ℓ : A.L, A.NL ℓ = s) → ∀ G : ℂ, IsStableGauss A ψ x μ t G → IsStableGauss A ψ x μ ((t * s : A.Kˣ) : A.K) (G * ((A.absK s : ℂ))⁻¹) := by
+theorem main
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (A : Et F E) (ψ : AddChar F ℂ) (x : A.Kˣ) (μ : Measure A.L)
+        (ω : A.K → ℂ),
+      Hyp A ψ x μ ω
+        → ∀ (t s : A.Kˣ),
+          (∃ ℓ : A.L, A.NL ℓ = s)
+            → ∀ G : ℂ,
+              IsStableGauss A ψ x μ t G
+                → IsStableGauss A ψ x μ ((t * s : A.Kˣ) : A.K) (G * ((A.absK s : ℂ))⁻¹) := by
   intro F E _ _ _ _ U A ψ x μ ω hH t s ⟨ℓ, hℓ⟩ G ⟨Λ₀, ho₀, hc₀, hG⟩
-  have := U.charZero; have := U.ultraF; have := U.lcF
+  have := U.charZero
+  have := U.ultraF
+  have := U.lcF
   have : ProperSpace F := .of_nontriviallyNormedField_of_weaklyLocallyCompactSpace F
   have := EtMeas.finite_L A
   obtain ⟨⟨b⟩, hinj, hN, -, -⟩ := GlobalTheory.JR.Et.quadratic_structure F E A
@@ -33,15 +44,17 @@ theorem main : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedF
       (by rw [hul]; exact hs')
   have hmap : μ.map (fun y => u • y) = (distribHaarChar A.L u⁻¹ : ℝ≥0∞) • μ := by
     ext S hS
-    rw [Measure.map_apply (measurable_const_smul u) hS, Set.preimage_smul, Measure.smul_apply, smul_eq_mul,
-      distribHaarChar_mul]
-  have hemb : MeasurableEmbedding (fun y : A.L => u • y) :=
-    (Homeomorph.smul u).measurableEmbedding
-  have key : ∀ Λ : AddSubgroup A.L, gaussInt A ψ x μ ((t * s : A.Kˣ) : A.K) Λ =
-      ((A.absK s : ℂ))⁻¹ * gaussInt A ψ x μ t (u • Λ : AddSubgroup A.L) := by
+    rw [Measure.map_apply (measurable_const_smul u) hS, Set.preimage_smul, Measure.smul_apply,
+      smul_eq_mul, distribHaarChar_mul]
+  have hemb : MeasurableEmbedding (fun y : A.L => u • y) := (Homeomorph.smul u).measurableEmbedding
+  have key
+      : ∀ Λ : AddSubgroup A.L,
+        gaussInt A ψ x μ ((t * s : A.Kˣ) : A.K) Λ
+          = ((A.absK s : ℂ))⁻¹ * gaussInt A ψ x μ t (u • Λ : AddSubgroup A.L) := by
     intro Λ
-    have h1 : gaussInt A ψ x μ ((t * s : A.Kˣ) : A.K) Λ =
-        ∫ y in (Λ : Set A.L), A.psiK ψ ((t : A.K) * x * A.NL (u • y)) ∂μ := by
+    have h1
+        : gaussInt A ψ x μ ((t * s : A.Kˣ) : A.K) Λ
+          = ∫ y in (Λ : Set A.L), A.psiK ψ ((t : A.K) * x * A.NL (u • y)) ∂μ := by
       unfold gaussInt
       refine integral_congr_ae (Eventually.of_forall fun y => ?_)
       have hNm : A.NL (u • y) = s * A.NL y := by
@@ -51,13 +64,19 @@ theorem main : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedF
         exact congrArg (· * _) hℓ
       simp only
       rw [hNm]
-      push_cast; ring_nf
-    have h2 := hemb.setIntegral_map (μ := μ) (fun z => A.psiK ψ ((t : A.K) * x * A.NL z)) ((u • Λ : AddSubgroup A.L) : Set A.L)
+      push_cast
+      ring_nf
+    have h2 :=
+      hemb.setIntegral_map (μ := μ)
+        (fun z => A.psiK ψ ((t : A.K) * x * A.NL z))
+        ((u • Λ : AddSubgroup A.L) : Set A.L)
     have hpre : (fun y => u • y) ⁻¹' ((u • Λ : AddSubgroup A.L) : Set A.L) = Λ := by
       ext y
       simp only [Set.mem_preimage, SetLike.mem_coe]
-      exact ⟨fun h => by simpa using (AddSubgroup.mem_pointwise_smul_iff_inv_smul_mem.1 h),
-        fun h => AddSubgroup.smul_mem_pointwise_smul _ _ _ h⟩
+      exact ⟨
+        fun h => by simpa using (AddSubgroup.mem_pointwise_smul_iff_inv_smul_mem.1 h),
+        fun h => AddSubgroup.smul_mem_pointwise_smul _ _ _ h
+      ⟩
     rw [hpre, hmap, Measure.restrict_smul, integral_smul_measure] at h2
     rw [h1, ← h2]
     unfold gaussInt
@@ -65,12 +84,15 @@ theorem main : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedF
     congr 1
     push_cast
     rfl
-  have hcoe : ∀ (v : A.Lˣ) (M : AddSubgroup A.L), ((v • M : AddSubgroup A.L) : Set A.L) = v • (M : Set A.L) :=
-    fun v M => AddSubgroup.coe_pointwise_smul v M
+  have hcoe
+      : ∀ (v : A.Lˣ) (M : AddSubgroup A.L),
+        ((v • M : AddSubgroup A.L) : Set A.L) = v • (M : Set A.L) := fun v M =>
+    AddSubgroup.coe_pointwise_smul v M
   refine ⟨u⁻¹ • Λ₀, ?_, ?_, fun Λ hoΛ hcΛ hle => ?_⟩
   · rw [hcoe]; exact ho₀.smul _
   · rw [hcoe]; exact hc₀.smul _
-  · rw [key, hG (u • Λ) (by rw [hcoe]; exact hoΛ.smul _) (by rw [hcoe]; exact hcΛ.smul _) ?_, mul_comm]
+  · rw [key, hG (u • Λ) (by rw [hcoe]; exact hoΛ.smul _) (by rw [hcoe]; exact hcΛ.smul _) ?_,
+      mul_comm]
     intro z hz
     have : u⁻¹ • z ∈ Λ := hle (AddSubgroup.smul_mem_pointwise_smul _ _ _ hz)
     exact AddSubgroup.mem_pointwise_smul_iff_inv_smul_mem.2 this

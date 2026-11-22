@@ -167,157 +167,193 @@ private lemma eventually_nhds_zero_comp_of_continuous {E F' : Type*} [Topologica
     {p : F' → Prop} (h : ∀ᶠ y in 𝓝 0, p y) : ∀ᶠ x in 𝓝 0, p (T x) :=
   (hT.tendsto' 0 0 h0).eventually h
 
-
 open Complex Matrix Filter Topology Asymptotics in
 open scoped BigOperators Real in
-theorem _root_.GlobalTheory.LocalCube.exists_third_difference :
-    (∀ (g : ℕ) (h : (Fin g → ℂ) → ℂ), AnalyticAt ℂ h 0 → h =O[𝓝 0] (fun z => ‖z‖ ^ 3) → ∃ k : (Fin g → ℂ) → ℂ, AnalyticAt ℂ k 0 ∧ k =O[𝓝 0] (fun z => ‖z‖ ^ 3) ∧ ∀ᶠ z in 𝓝 0, k ((2 : ℂ) • z) - 3 * k z - k (-z) = h z) → (∀ (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] (F : E → ℂ), F =O[𝓝 0] (fun z => ‖z‖ ^ 3) → (∀ᶠ z in 𝓝 0, F ((2 : ℂ) • z) = 3 * F z + F (-z)) → ∀ᶠ z in 𝓝 0, F z = 0) → (∀ (g : ℕ) (F : (Fin 3 → Fin g → ℂ) → ℂ), AnalyticAt ℂ F 0 → F 0 ≠ 0 → ((∀ a : Fin 3, ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), x a = 0 → F x = F 0) ∧ (∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), F ((2 : ℂ) • x) * (∏ I : Finset (Fin 3), F ![∑ a ∈ I, x a, ∑ a ∈ I, x a, -∑ a ∈ I, x a] ^ ((-1 : ℤ) ^ (3 - I.card))) * F 0 ^ 3 = F x ^ 3 * F (-x))) → ∃ k : (Fin g → ℂ) → ℂ, AnalyticAt ℂ k 0 ∧ k 0 = 0 ∧ ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), F x = F 0 * ∏ I : Finset (Fin 3), cexp (k (∑ a ∈ I, x a)) ^ ((-1 : ℤ) ^ (3 - I.card))) := by
-  intro hA hB g F hF hF0 hcond
-  obtain ⟨hax, heq⟩ := hcond
-  have hsign : ∑ I : Finset (Fin 3), ((((-1 : ℤ) ^ (3 - I.card) : ℤ)) : ℂ) = 0 := by
-    have h : ∑ I : Finset (Fin 3), (-1 : ℤ) ^ (3 - I.card) = 0 := by decide
-    rw [← Int.cast_sum, h, Int.cast_zero]
-  set L := Complex.log (F 0) with hL
-  have hL' : cexp L = F 0 := Complex.exp_log hF0
-  set f : (Fin 3 → Fin g → ℂ) → ℂ := fun x => Complex.log (F x / F 0) with hfdef
-  have hfa : AnalyticAt ℂ f 0 :=
-    (hF.div analyticAt_const hF0).clog (by simpa [hF0] using Complex.one_mem_slitPlane)
-  have hFne : ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), F x ≠ 0 := hF.continuousAt.eventually_ne hF0
-  have hFexp : ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), F x = cexp (L + f x) := by
-    filter_upwards [hFne] with x hx
-    rw [Complex.exp_add, hL']
-    simp only [hfdef]
-    rw [Complex.exp_log (div_ne_zero hx hF0)]
-    field_simp
-  have hfax : ∀ a, ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), x a = 0 → f x = 0 := by
-    intro a
-    filter_upwards [hax a] with x hx h0
-    simp only [hfdef, hx h0, div_self hF0, Complex.log_one]
-  have hfO : f =O[𝓝 0] fun z => ‖z‖ ^ 3 := isBigO_norm_cube_of_analytic_vanishing_coords hfa hfax
-  let M : (Fin g → ℂ) →L[ℂ] (Fin 3 → Fin g → ℂ) := ContinuousLinearMap.pi fun a : Fin 3 =>
-    ![ContinuousLinearMap.id ℂ (Fin g → ℂ), ContinuousLinearMap.id ℂ (Fin g → ℂ),
-      -ContinuousLinearMap.id ℂ (Fin g → ℂ)] a
-  have hM : ∀ s, M s = ![s, s, -s] := by
-    intro s
-    funext a
-    fin_cases a <;> simp [M]
-  let S : Finset (Fin 3) → (Fin 3 → Fin g → ℂ) →L[ℂ] (Fin g → ℂ) := fun I =>
-    ∑ a ∈ I, ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin 3 => Fin g → ℂ) a
-  have hS : ∀ I x, S I x = ∑ a ∈ I, x a := by
-    intro I x
-    simp [S]
-  let φ : (Fin g → ℂ) → ℂ := fun s => f (M s)
-  have hφa : AnalyticAt ℂ φ 0 := hfa.comp_of_eq (M.analyticAt 0) (map_zero M)
-  have hφO : φ =O[𝓝 0] fun z => ‖z‖ ^ 3 := isBigO_norm_cube_comp_clm hfO M
-  obtain ⟨k, hka, hkO, hkeq⟩ := hA g (fun s => -φ s) hφa.neg hφO.neg_left
-  have hk0 : k 0 = 0 := by
-    have : k =O[𝓝 (0 : Fin g → ℂ)] fun y => ‖y - 0‖ ^ 3 := by simpa using hkO
-    exact this.eq_zero_of_norm_pow (by norm_num)
-  let D : ((Fin g → ℂ) → ℂ) → (Fin 3 → Fin g → ℂ) → ℂ := fun w x =>
-    ∑ I : Finset (Fin 3), ((((-1 : ℤ) ^ (3 - I.card) : ℤ)) : ℂ) * w (∑ a ∈ I, x a)
-  have hDO : ∀ w : (Fin g → ℂ) → ℂ, w =O[𝓝 0] (fun z => ‖z‖ ^ 3) →
-      D w =O[𝓝 0] fun x => ‖x‖ ^ 3 := by
-    intro w hw
-    have : D w = ∑ I : Finset (Fin 3),
-        fun x => ((((-1 : ℤ) ^ (3 - I.card) : ℤ)) : ℂ) * w (S I x) := by
-      funext x
-      simp [D, hS]
-    rw [this]
-    exact IsBigO.sum fun I _ => (isBigO_norm_cube_comp_clm hw (S I)).const_mul_left _
-  let Gf : (Fin 3 → Fin g → ℂ) → ℂ := fun x => f x - D k x
-  have hGO : Gf =O[𝓝 0] fun x => ‖x‖ ^ 3 := hfO.sub (hDO k hkO)
-  have ev2 : ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), F ((2 : ℂ) • x) = cexp (L + f ((2 : ℂ) • x)) :=
-    eventually_nhds_zero_comp_of_continuous (T := fun x : Fin 3 → Fin g → ℂ => (2 : ℂ) • x)
-      (p := fun y => F y = cexp (L + f y)) (by fun_prop) (smul_zero _) hFexp
-  have evn : ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), F (-x) = cexp (L + f (-x)) :=
-    eventually_nhds_zero_comp_of_continuous (T := fun x : Fin 3 → Fin g → ℂ => -x)
-      (p := fun y => F y = cexp (L + f y)) (by fun_prop) neg_zero hFexp
-  have evI : ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), ∀ I : Finset (Fin 3),
-      F (M (∑ a ∈ I, x a)) = cexp (L + f (M (∑ a ∈ I, x a))) :=
-    Filter.eventually_all.2 fun I => eventually_nhds_zero_comp_of_continuous
-      (T := fun x : Fin 3 → Fin g → ℂ => M (∑ a ∈ I, x a))
-      (p := fun y => F y = cexp (L + f y))
-      (M.continuous.comp (continuous_finsetSum _ fun a _ => continuous_apply a)) (by simp) hFexp
-  have evk : ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), ∀ I : Finset (Fin 3),
-      k ((2 : ℂ) • ∑ a ∈ I, x a) - 3 * k (∑ a ∈ I, x a) - k (-∑ a ∈ I, x a) =
-        -φ (∑ a ∈ I, x a) :=
-    Filter.eventually_all.2 fun I => eventually_nhds_zero_comp_of_continuous
-      (T := fun x : Fin 3 → Fin g → ℂ => ∑ a ∈ I, x a)
-      (p := fun z => k ((2 : ℂ) • z) - 3 * k z - k (-z) = -φ z)
-      (continuous_finsetSum _ fun a _ => continuous_apply a) (by simp) hkeq
-  have hEt : ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ),
-      ‖f ((2 : ℂ) • x) + D φ x - 3 * f x - f (-x)‖ < 2 * π := by
-    have h2x : (fun x : Fin 3 → Fin g → ℂ => f ((2 : ℂ) • x)) =O[𝓝 0] fun x => ‖x‖ ^ 3 := by
-      have := isBigO_norm_cube_comp_clm hfO ((2 : ℂ) • ContinuousLinearMap.id ℂ (Fin 3 → Fin g → ℂ))
-      simpa only [ContinuousLinearMap.smul_apply, ContinuousLinearMap.id_apply] using this
-    have hnx : (fun x : Fin 3 → Fin g → ℂ => f (-x)) =O[𝓝 0] fun x => ‖x‖ ^ 3 := by
-      have := isBigO_norm_cube_comp_clm hfO (-ContinuousLinearMap.id ℂ (Fin 3 → Fin g → ℂ))
-      simpa only [ContinuousLinearMap.neg_apply, ContinuousLinearMap.id_apply] using this
-    have h3 : (fun x : Fin 3 → Fin g → ℂ => 3 * f x) =O[𝓝 0] fun x => ‖x‖ ^ 3 :=
-      hfO.const_mul_left 3
-    have hO : (fun x => f ((2 : ℂ) • x) + D φ x - 3 * f x - f (-x)) =O[𝓝 0]
-        fun x : Fin 3 → Fin g → ℂ => ‖x‖ ^ 3 :=
-      ((h2x.add (hDO φ hφO)).sub h3).sub hnx
-    have ht : Tendsto (fun x : Fin 3 → Fin g → ℂ => ‖x‖ ^ 3) (𝓝 0) (𝓝 0) := by
-      have hc : Continuous fun x : Fin 3 → Fin g → ℂ => ‖x‖ ^ 3 := by fun_prop
-      simpa using hc.tendsto 0
-    filter_upwards [(hO.trans_tendsto ht).eventually
-      (Metric.ball_mem_nhds 0 (by positivity : (0 : ℝ) < 2 * π))] with x hx
-    exact mem_ball_zero_iff.1 hx
-  have hE : ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), f ((2 : ℂ) • x) + D φ x - 3 * f x - f (-x) = 0 := by
-    filter_upwards [heq, hFexp, ev2, evn, evI, hEt] with x hx hx1 hx2 hx3 hx4 hx5
-    have hprod : ∏ I : Finset (Fin 3),
-        F ![∑ a ∈ I, x a, ∑ a ∈ I, x a, -∑ a ∈ I, x a] ^ ((-1 : ℤ) ^ (3 - I.card)) =
-          cexp (∑ I : Finset (Fin 3),
-            ((((-1 : ℤ) ^ (3 - I.card) : ℤ)) : ℂ) * (L + φ (∑ a ∈ I, x a))) := by
+theorem _root_.GlobalTheory.LocalCube.exists_third_difference
+    : (∀ (g : ℕ) (h : (Fin g → ℂ) → ℂ),
+        AnalyticAt ℂ h 0 → h =O[𝓝 0] (fun z => ‖z‖ ^ 3)
+          → ∃ k : (Fin g → ℂ) → ℂ,
+            AnalyticAt ℂ k 0 ∧ k =O[𝓝 0] (fun z => ‖z‖ ^ 3)
+              ∧ ∀ᶠ z in 𝓝 0, k ((2 : ℂ) • z) - 3 * k z - k (-z) = h z)
+      → (∀ (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] (F : E → ℂ),
+        F =O[𝓝 0] (fun z => ‖z‖ ^ 3) → (∀ᶠ z in 𝓝 0, F ((2 : ℂ) • z) = 3 * F z + F (-z))
+          → ∀ᶠ z in 𝓝 0, F z = 0)
+      → (∀ (g : ℕ) (F : (Fin 3 → Fin g → ℂ) → ℂ),
+        AnalyticAt ℂ F 0 → F 0 ≠ 0
+          → ((∀ a : Fin 3, ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), x a = 0 → F x = F 0)
+            ∧ (∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), F ((2 : ℂ) • x) * (∏ I : Finset (Fin 3), F ![∑ a ∈ I, x a, ∑ a ∈ I, x a, -∑ a ∈ I, x a] ^ ((-1 : ℤ) ^ (3 - I.card))) * F 0 ^ 3 = F x ^ 3 * F (-x)))
+          → ∃ k : (Fin g → ℂ) → ℂ,
+            AnalyticAt ℂ k 0 ∧ k 0 = 0
+              ∧ ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), F x = F 0 * ∏ I : Finset (Fin 3), cexp (k (∑ a ∈ I, x a)) ^ ((-1 : ℤ) ^ (3 - I.card))) :=
+  by
+    intro hA hB g F hF hF0 hcond
+    obtain ⟨hax, heq⟩ := hcond
+    have hsign : ∑ I : Finset (Fin 3), ((((-1 : ℤ) ^ (3 - I.card) : ℤ)) : ℂ) = 0 := by
+      have h : ∑ I : Finset (Fin 3), (-1 : ℤ) ^ (3 - I.card) = 0 := by decide
+      rw [← Int.cast_sum, h, Int.cast_zero]
+    set L := Complex.log (F 0) with hL
+    have hL' : cexp L = F 0 := Complex.exp_log hF0
+    set f : (Fin 3 → Fin g → ℂ) → ℂ := fun x => Complex.log (F x / F 0) with hfdef
+    have hfa : AnalyticAt ℂ f 0 :=
+      (hF.div analyticAt_const hF0).clog (by simpa [hF0] using Complex.one_mem_slitPlane)
+    have hFne : ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), F x ≠ 0 := hF.continuousAt.eventually_ne hF0
+    have hFexp : ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), F x = cexp (L + f x) := by
+      filter_upwards [hFne] with x hx
+      rw [Complex.exp_add, hL']
+      simp only [hfdef]
+      rw [Complex.exp_log (div_ne_zero hx hF0)]
+      field_simp
+    have hfax : ∀ a, ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), x a = 0 → f x = 0 := by
+      intro a
+      filter_upwards [hax a] with x hx h0
+      simp only [hfdef, hx h0, div_self hF0, Complex.log_one]
+    have hfO : f =O[𝓝 0] fun z => ‖z‖ ^ 3 := isBigO_norm_cube_of_analytic_vanishing_coords hfa hfax
+    let M : (Fin g → ℂ) →L[ℂ] (Fin 3 → Fin g → ℂ) :=
+      ContinuousLinearMap.pi fun a : Fin 3 =>
+        ![ContinuousLinearMap.id ℂ (Fin g → ℂ), ContinuousLinearMap.id ℂ (Fin g → ℂ),
+          -ContinuousLinearMap.id ℂ (Fin g → ℂ)]
+          a
+    have hM : ∀ s, M s = ![s, s, -s] := by
+      intro s
+      funext a
+      fin_cases a <;> simp [M]
+    let S : Finset (Fin 3) → (Fin 3 → Fin g → ℂ) →L[ℂ] (Fin g → ℂ) := fun I =>
+      ∑ a ∈ I, ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin 3 => Fin g → ℂ) a
+    have hS : ∀ I x, S I x = ∑ a ∈ I, x a := by
+      intro I x
+      simp [S]
+    let φ : (Fin g → ℂ) → ℂ := fun s => f (M s)
+    have hφa : AnalyticAt ℂ φ 0 := hfa.comp_of_eq (M.analyticAt 0) (map_zero M)
+    have hφO : φ =O[𝓝 0] fun z => ‖z‖ ^ 3 := isBigO_norm_cube_comp_clm hfO M
+    obtain ⟨k, hka, hkO, hkeq⟩ := hA g (fun s => - φ s) hφa.neg hφO.neg_left
+    have hk0 : k 0 = 0 := by
+      have : k =O[𝓝 (0 : Fin g → ℂ)] fun y => ‖y - 0‖ ^ 3 := by simpa using hkO
+      exact this.eq_zero_of_norm_pow (by norm_num)
+    let D : ((Fin g → ℂ) → ℂ) → (Fin 3 → Fin g → ℂ) → ℂ := fun w x =>
+      ∑ I : Finset (Fin 3), ((((-1 : ℤ) ^ (3 - I.card) : ℤ)) : ℂ) * w (∑ a ∈ I, x a)
+    have hDO
+        : ∀ w : (Fin g → ℂ) → ℂ, w =O[𝓝 0] (fun z => ‖z‖ ^ 3) → D w =O[𝓝 0] fun x => ‖x‖ ^ 3 := by
+      intro w hw
+      have : D w
+          = ∑ I : Finset (Fin 3),
+            fun x => ((((-1 : ℤ) ^ (3 - I.card) : ℤ)) : ℂ) * w (S I x) := by
+        funext x
+        simp [D, hS]
+      rw [this]
+      exact IsBigO.sum fun I _ => (isBigO_norm_cube_comp_clm hw (S I)).const_mul_left _
+    let Gf : (Fin 3 → Fin g → ℂ) → ℂ := fun x => f x - D k x
+    have hGO : Gf =O[𝓝 0] fun x => ‖x‖ ^ 3 := hfO.sub (hDO k hkO)
+    have ev2 : ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), F ((2 : ℂ) • x) = cexp (L + f ((2 : ℂ) • x)) :=
+      eventually_nhds_zero_comp_of_continuous
+        (T := fun x : Fin 3 → Fin g → ℂ => (2 : ℂ) • x)
+        (p := fun y => F y = cexp (L + f y))
+        (by fun_prop) (smul_zero _) hFexp
+    have evn : ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), F (-x) = cexp (L + f (-x)) :=
+      eventually_nhds_zero_comp_of_continuous
+        (T := fun x : Fin 3 → Fin g → ℂ => -x)
+        (p := fun y => F y = cexp (L + f y))
+        (by fun_prop) neg_zero hFexp
+    have evI
+        : ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), ∀ I : Finset (Fin 3),
+          F (M (∑ a ∈ I, x a)) = cexp (L + f (M (∑ a ∈ I, x a))) :=
+      Filter.eventually_all.2 fun I =>
+        eventually_nhds_zero_comp_of_continuous
+          (T := fun x : Fin 3 → Fin g → ℂ => M (∑ a ∈ I, x a))
+          (p := fun y => F y = cexp (L + f y))
+          (M.continuous.comp (continuous_finsetSum _ fun a _ => continuous_apply a)) (by simp) hFexp
+    have evk
+        : ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), ∀ I : Finset (Fin 3),
+          k ((2 : ℂ) • ∑ a ∈ I, x a) - 3 * k (∑ a ∈ I, x a) - k (-∑ a ∈ I, x a) =
+            -φ (∑ a ∈ I, x a) :=
+      Filter.eventually_all.2 fun I =>
+        eventually_nhds_zero_comp_of_continuous
+          (T := fun x : Fin 3 → Fin g → ℂ => ∑ a ∈ I, x a)
+          (p := fun z => k ((2 : ℂ) • z) - 3 * k z - k (-z) = - φ z)
+          (continuous_finsetSum _ fun a _ => continuous_apply a) (by simp) hkeq
+    have hEt
+        : ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ),
+          ‖f ((2 : ℂ) • x) + D φ x - 3 * f x - f (-x)‖ < 2 * π := by
+      have h2x : (fun x : Fin 3 → Fin g → ℂ => f ((2 : ℂ) • x)) =O[𝓝 0] fun x => ‖x‖ ^ 3 := by
+        have :=
+          isBigO_norm_cube_comp_clm hfO ((2 : ℂ) • ContinuousLinearMap.id ℂ (Fin 3 → Fin g → ℂ))
+        simpa only [ContinuousLinearMap.smul_apply, ContinuousLinearMap.id_apply] using this
+      have hnx : (fun x : Fin 3 → Fin g → ℂ => f (-x)) =O[𝓝 0] fun x => ‖x‖ ^ 3 := by
+        have := isBigO_norm_cube_comp_clm hfO (- ContinuousLinearMap.id ℂ (Fin 3 → Fin g → ℂ))
+        simpa only [ContinuousLinearMap.neg_apply, ContinuousLinearMap.id_apply] using this
+      have h3 : (fun x : Fin 3 → Fin g → ℂ => 3 * f x) =O[𝓝 0] fun x => ‖x‖ ^ 3 :=
+        hfO.const_mul_left 3
+      have hO
+          : (fun x => f ((2 : ℂ) • x) + D φ x - 3 * f x - f (-x)) =O[𝓝 0]
+            fun x : Fin 3 → Fin g → ℂ => ‖x‖ ^ 3 :=
+        ((h2x.add (hDO φ hφO)).sub h3).sub hnx
+      have ht : Tendsto (fun x : Fin 3 → Fin g → ℂ => ‖x‖ ^ 3) (𝓝 0) (𝓝 0) := by
+        have hc : Continuous fun x : Fin 3 → Fin g → ℂ => ‖x‖ ^ 3 := by fun_prop
+        simpa using hc.tendsto 0
+      filter_upwards [(hO.trans_tendsto ht).eventually
+        (Metric.ball_mem_nhds 0 (by positivity : (0 : ℝ) < 2 * π))] with x hx
+      exact mem_ball_zero_iff.1 hx
+    have hE
+        : ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), f ((2 : ℂ) • x) + D φ x - 3 * f x - f (-x) = 0 := by
+      filter_upwards [heq, hFexp, ev2, evn, evI, hEt] with x hx hx1 hx2 hx3 hx4 hx5
+      have hprod
+          : ∏ I : Finset (Fin 3),
+              F ![∑ a ∈ I, x a, ∑ a ∈ I, x a, -∑ a ∈ I, x a] ^ ((-1 : ℤ) ^ (3 - I.card))
+            = cexp
+              (∑ I : Finset (Fin 3),
+                ((((-1 : ℤ) ^ (3 - I.card) : ℤ)) : ℂ) * (L + φ (∑ a ∈ I, x a))) := by
+        rw [Complex.exp_sum]
+        refine Finset.prod_congr rfl fun I _ => ?_
+        rw [Complex.exp_int_mul, ← hM, hx4 I]
+      rw [hprod, hx2, hx3, hx1, ← hL'] at hx
+      rw [← Complex.exp_nat_mul, ← Complex.exp_nat_mul, ← Complex.exp_add, ← Complex.exp_add,
+          ← Complex.exp_add]
+        at hx
+      obtain ⟨n, hn⟩ := Complex.exp_eq_exp_iff_exists_int.1 hx
+      have hsum
+          : ∑ I : Finset (Fin 3),
+              ((((-1 : ℤ) ^ (3 - I.card) : ℤ)) : ℂ) * (L + φ (∑ a ∈ I, x a))
+            = D φ x := by
+        simp only [mul_add, Finset.sum_add_distrib, ← Finset.sum_mul, hsign, zero_mul, zero_add, D]
+      rw [hsum] at hn
+      have hEx : f ((2 : ℂ) • x) + D φ x - 3 * f x - f (-x) = n * (2 * π * Complex.I) := by
+        linear_combination hn
+      have hn0 : n = 0 := by
+        rw [hEx] at hx5
+        have h1 : ‖(n : ℂ) * (2 * π * Complex.I)‖ = |(n : ℝ)| * (2 * π) := by
+          simp [abs_of_pos Real.pi_pos]
+        rw [h1] at hx5
+        have h2 : |(n : ℝ)| < 1 := (mul_lt_iff_lt_one_left (by positivity)).1 hx5
+        have h3 : |n| < 1 := by exact_mod_cast h2
+        exact Int.abs_lt_one_iff.1 h3
+      rw [hEx, hn0]
+      simp
+    have hGeq : ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), Gf ((2 : ℂ) • x) = 3 * Gf x + Gf (-x) := by
+      filter_upwards [hE, evk] with x hx hk
+      have e1
+          : ∀ I : Finset (Fin 3), ∑ a ∈ I, ((2 : ℂ) • x) a = (2 : ℂ) • ∑ a ∈ I, x a := fun I => by
+        simp [Finset.smul_sum]
+      have e2 : ∀ I : Finset (Fin 3), ∑ a ∈ I, (-x) a = - ∑ a ∈ I, x a := fun I => by
+        simp [Finset.sum_neg_distrib]
+      have hD : D k ((2 : ℂ) • x) - 3 * D k x - D k (-x) = - D φ x := by
+        simp only [D, e1, e2]
+        rw [Finset.mul_sum, ← Finset.sum_sub_distrib, ← Finset.sum_sub_distrib,
+          ← Finset.sum_neg_distrib]
+        refine Finset.sum_congr rfl fun I _ => ?_
+        linear_combination ((((-1 : ℤ) ^ (3 - I.card) : ℤ)) : ℂ) * hk I
+      show f ((2 : ℂ) • x) - D k ((2 : ℂ) • x) = 3 * (f x - D k x) + (f (-x) - D k (-x))
+      linear_combination hx - hD
+    have hG0 := hB (Fin 3 → Fin g → ℂ) Gf hGO hGeq
+    refine ⟨k, hka, hk0, ?_⟩
+    filter_upwards [hG0, hFexp] with x hx hx1
+    have hprod2
+        : ∏ I : Finset (Fin 3), cexp (k (∑ a ∈ I, x a)) ^ ((-1 : ℤ) ^ (3 - I.card))
+          = cexp (D k x) := by
+      simp only [D]
       rw [Complex.exp_sum]
-      refine Finset.prod_congr rfl fun I _ => ?_
-      rw [Complex.exp_int_mul, ← hM, hx4 I]
-    rw [hprod, hx2, hx3, hx1, ← hL'] at hx
-    rw [← Complex.exp_nat_mul, ← Complex.exp_nat_mul, ← Complex.exp_add, ← Complex.exp_add,
-      ← Complex.exp_add] at hx
-    obtain ⟨n, hn⟩ := Complex.exp_eq_exp_iff_exists_int.1 hx
-    have hsum : ∑ I : Finset (Fin 3),
-        ((((-1 : ℤ) ^ (3 - I.card) : ℤ)) : ℂ) * (L + φ (∑ a ∈ I, x a)) = D φ x := by
-      simp only [mul_add, Finset.sum_add_distrib, ← Finset.sum_mul, hsign, zero_mul, zero_add, D]
-    rw [hsum] at hn
-    have hEx : f ((2 : ℂ) • x) + D φ x - 3 * f x - f (-x) = n * (2 * π * Complex.I) := by
-      linear_combination hn
-    have hn0 : n = 0 := by
-      rw [hEx] at hx5
-      have h1 : ‖(n : ℂ) * (2 * π * Complex.I)‖ = |(n : ℝ)| * (2 * π) := by
-        simp [abs_of_pos Real.pi_pos]
-      rw [h1] at hx5
-      have h2 : |(n : ℝ)| < 1 := (mul_lt_iff_lt_one_left (by positivity)).1 hx5
-      have h3 : |n| < 1 := by exact_mod_cast h2
-      exact Int.abs_lt_one_iff.1 h3
-    rw [hEx, hn0]
-    simp
-  have hGeq : ∀ᶠ x in 𝓝 (0 : Fin 3 → Fin g → ℂ), Gf ((2 : ℂ) • x) = 3 * Gf x + Gf (-x) := by
-    filter_upwards [hE, evk] with x hx hk
-    have e1 : ∀ I : Finset (Fin 3), ∑ a ∈ I, ((2 : ℂ) • x) a = (2 : ℂ) • ∑ a ∈ I, x a :=
-      fun I => by simp [Finset.smul_sum]
-    have e2 : ∀ I : Finset (Fin 3), ∑ a ∈ I, (-x) a = -∑ a ∈ I, x a :=
-      fun I => by simp [Finset.sum_neg_distrib]
-    have hD : D k ((2 : ℂ) • x) - 3 * D k x - D k (-x) = -D φ x := by
-      simp only [D, e1, e2]
-      rw [Finset.mul_sum, ← Finset.sum_sub_distrib, ← Finset.sum_sub_distrib,
-        ← Finset.sum_neg_distrib]
-      refine Finset.sum_congr rfl fun I _ => ?_
-      linear_combination ((((-1 : ℤ) ^ (3 - I.card) : ℤ)) : ℂ) * hk I
-    show f ((2 : ℂ) • x) - D k ((2 : ℂ) • x) = 3 * (f x - D k x) + (f (-x) - D k (-x))
-    linear_combination hx - hD
-  have hG0 := hB (Fin 3 → Fin g → ℂ) Gf hGO hGeq
-  refine ⟨k, hka, hk0, ?_⟩
-  filter_upwards [hG0, hFexp] with x hx hx1
-  have hprod2 : ∏ I : Finset (Fin 3), cexp (k (∑ a ∈ I, x a)) ^ ((-1 : ℤ) ^ (3 - I.card)) =
-      cexp (D k x) := by
-    simp only [D]
-    rw [Complex.exp_sum]
-    exact Finset.prod_congr rfl fun I _ => (Complex.exp_int_mul _ _).symm
-  rw [hx1, ← hL', hprod2, ← Complex.exp_add]
-  have hfx : f x - D k x = 0 := hx
-  congr 1
-  linear_combination hfx
+      exact Finset.prod_congr rfl fun I _ => (Complex.exp_int_mul _ _).symm
+    rw [hx1, ← hL', hprod2, ← Complex.exp_add]
+    have hfx : f x - D k x = 0 := hx
+    congr 1
+    linear_combination hfx
 
 end GlobalTheory.LocalCube

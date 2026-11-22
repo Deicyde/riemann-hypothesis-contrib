@@ -65,7 +65,8 @@ def ev (f : PowerSeries ℂ) (x : ℂ) : ℂ := ∑' n, PowerSeries.coeff n f * 
 def sub1 (c : ℂ) (k : ℕ) (f : PowerSeries ℂ) : PowerSeries ℂ := xp k (PowerSeries.rescale c f)
 
 def facSer (m : ℕ) (t : ℕ × ℕ × ℕ) : PowerSeries ℂ :=
-  xp m aC * sub1 (zetaC t.2.2 ^ t.2.1) (t.1 ^ 2) dC - sub1 (zetaC t.2.2 ^ t.2.1) (t.1 ^ 2) aC * xp m dC
+  xp m aC * sub1 (zetaC t.2.2 ^ t.2.1) (t.1 ^ 2) dC
+    - sub1 (zetaC t.2.2 ^ t.2.1) (t.1 ^ 2) aC * xp m dC
 
 def prodSer (m : ℕ) : PowerSeries ℂ := ∏ t ∈ Tm m, facSer m t
 

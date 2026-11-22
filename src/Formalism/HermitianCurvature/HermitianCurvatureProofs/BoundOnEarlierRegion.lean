@@ -9,7 +9,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.StandardPairingDecay
 
-open Formalism.FourierDecayAlt Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Matrix
+open Formalism.FourierDecayAlt Formalism.REAL Formalism.QuantumDeterminants
+  Formalism.FourierDecayAlt.B Matrix
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -21,7 +22,10 @@ theorem bound_on_earlier_region : OnOldBound := by
   | nil => intro A x c hx e; exact hM σ hσ A x c hx e
   | cons y ys ih =>
     intro A x c hx e
-    exact ih A (fun e' => x (Fin.cons (e (0 : Fin ((KB.plusW ys w).length + 1))) e')) c (fun e' => hx _)
+    exact ih A
+      (fun e' => x (Fin.cons (e (0 : Fin ((KB.plusW ys w).length + 1))) e'))
+      c
+      (fun e' => hx _)
       (fun a => e a.succ)
 
 end Formalism.FourierDecayAlt.P.StandardPairingDecay

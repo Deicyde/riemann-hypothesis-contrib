@@ -9,34 +9,40 @@ open scoped BigOperators
 
 namespace Formalism.L2.AlgTh
 
-theorem jet_succ_eq {K : Type} [Field K] [CharZero K] (F a : PowerSeries K)
-    (h : PowerSeries.derivative (R := K) F = a * F) (i : ℕ) :
-    (((i + 1).factorial : ℕ) : K) * PowerSeries.coeff (i + 1) F =
-      ∑ p ∈ Finset.HasAntidiagonal.antidiagonal i, ((i.choose p.1 : ℕ) : K) *
-        ((((p.1).factorial : ℕ) : K) * PowerSeries.coeff p.1 a) *
-        ((((p.2).factorial : ℕ) : K) * PowerSeries.coeff p.2 F) := by
+theorem jet_succ_eq
+    {K : Type} [Field K] [CharZero K]
+    (F a : PowerSeries K) (h : PowerSeries.derivative (R := K) F = a * F)
+    (i : ℕ)
+    : (((i + 1).factorial : ℕ) : K) * PowerSeries.coeff (i + 1) F
+      = ∑ p ∈ Finset.HasAntidiagonal.antidiagonal i, ((i.choose p.1 : ℕ) : K) *
+          ((((p.1).factorial : ℕ) : K) * PowerSeries.coeff p.1 a) *
+          ((((p.2).factorial : ℕ) : K) * PowerSeries.coeff p.2 F) := by
   have h1 := congrArg (PowerSeries.coeff i) h
   rw [PowerSeries.coeff_derivative, PowerSeries.coeff_mul] at h1
-  have key : ∀ p ∈ Finset.HasAntidiagonal.antidiagonal i,
-      ((i.choose p.1 : ℕ) : K) * (((p.1).factorial : ℕ) : K) * (((p.2).factorial : ℕ) : K) =
-        ((i.factorial : ℕ) : K) := by
+  have key
+      : ∀ p ∈ Finset.HasAntidiagonal.antidiagonal i,
+        ((i.choose p.1 : ℕ) : K) * (((p.1).factorial : ℕ) : K) * (((p.2).factorial : ℕ) : K)
+          = ((i.factorial : ℕ) : K) := by
     intro p hp
     rw [Finset.HasAntidiagonal.mem_antidiagonal] at hp
     have h2 : p.2 = i - p.1 := by omega
     rw [h2]
     exact_mod_cast Nat.choose_mul_factorial_mul_factorial (by omega : p.1 ≤ i)
-  calc (((i + 1).factorial : ℕ) : K) * PowerSeries.coeff (i + 1) F
-      = ((i.factorial : ℕ) : K) * (PowerSeries.coeff (i + 1) F * ((i : K) + 1)) := by
-        rw [Nat.factorial_succ]; push_cast; ring
-    _ = ((i.factorial : ℕ) : K) * ∑ p ∈ Finset.HasAntidiagonal.antidiagonal i,
-          PowerSeries.coeff p.1 a * PowerSeries.coeff p.2 F := by rw [h1]
+  calc
+    (((i + 1).factorial : ℕ) : K) * PowerSeries.coeff (i + 1) F
+        = ((i.factorial : ℕ) : K) * (PowerSeries.coeff (i + 1) F * ((i : K) + 1)) := by
+      rw [Nat.factorial_succ]; push_cast; ring
+    _ = ((i.factorial : ℕ) : K)
+        * ∑ p ∈ Finset.HasAntidiagonal.antidiagonal i,
+          PowerSeries.coeff p.1 a * PowerSeries.coeff p.2 F := by
+      rw [h1]
     _ = ∑ p ∈ Finset.HasAntidiagonal.antidiagonal i,
           ((i.factorial : ℕ) : K) * (PowerSeries.coeff p.1 a * PowerSeries.coeff p.2 F) := by
-        rw [Finset.mul_sum]
+      rw [Finset.mul_sum]
     _ = _ := by
-        refine Finset.sum_congr rfl (fun p hp => ?_)
-        rw [← key p hp]
-        ring
+      refine Finset.sum_congr rfl (fun p hp => ?_)
+      rw [← key p hp]
+      ring
 
 theorem log_derivative_jets_integral : LogDerJets := by
   intro K _ _ _ F a ρ hρ h hF0 ha i
@@ -55,11 +61,12 @@ theorem log_derivative_jets_integral : LogDerJets := by
       have h1 : ‖((i.choose p.1 : ℕ) : K)‖ ≤ 1 := IsUltrametricDist.norm_natCast_le_one K _
       have h2 := ha p.1
       have h3 := ih p.2 hq
-      calc ‖((i.choose p.1 : ℕ) : K)‖ * ‖(((p.1).factorial : ℕ) : K) * PowerSeries.coeff p.1 a‖ *
-            ‖(((p.2).factorial : ℕ) : K) * PowerSeries.coeff p.2 F‖
-          ≤ 1 * ρ * ρ ^ p.2 :=
-            mul_le_mul (mul_le_mul h1 h2 (norm_nonneg _) zero_le_one) h3 (norm_nonneg _)
-              (mul_nonneg zero_le_one hρ0)
+      calc
+        ‖((i.choose p.1 : ℕ) : K)‖ * ‖(((p.1).factorial : ℕ) : K) * PowerSeries.coeff p.1 a‖
+              * ‖(((p.2).factorial : ℕ) : K) * PowerSeries.coeff p.2 F‖
+            ≤ 1 * ρ * ρ ^ p.2 :=
+          mul_le_mul (mul_le_mul h1 h2 (norm_nonneg _) zero_le_one) h3 (norm_nonneg _)
+            (mul_nonneg zero_le_one hρ0)
         _ = ρ ^ (p.2 + 1) := by ring
         _ ≤ ρ ^ (i + 1) := pow_le_pow_right₀ hρ (by omega)
 

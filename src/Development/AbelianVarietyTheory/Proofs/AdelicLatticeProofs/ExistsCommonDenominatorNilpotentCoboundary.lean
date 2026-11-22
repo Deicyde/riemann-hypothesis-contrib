@@ -11,11 +11,12 @@ open scoped Kronecker ComplexOrder TensorProduct
 
 namespace GlobalTheory
 
-theorem exists_denominator_of_isField_localization (B A : Type) [CommRing B] [CommRing A]
-    [Algebra ℚ B] [Algebra B A] [Algebra.FiniteType B A] [IsReduced A] (M : Submonoid B)
-    (hF : IsField (Localization M)) (f : A)
-    (hf : IsNilpotent (f ⊗ₜ[B] (1 : A) - (1 : A) ⊗ₜ[B] f)) :
-    ∃ m ∈ M, ∃ b' : B, algebraMap B A m * f = algebraMap B A b' := by
+theorem exists_denominator_of_isField_localization
+    (B A : Type)
+    [CommRing B] [CommRing A] [Algebra ℚ B] [Algebra B A] [Algebra.FiniteType B A] [IsReduced A]
+    (M : Submonoid B) (hF : IsField (Localization M))
+    (f : A) (hf : IsNilpotent (f ⊗ₜ[B] (1 : A) - (1 : A) ⊗ₜ[B] f))
+    : ∃ m ∈ M, ∃ b' : B, algebraMap B A m * f = algebraMap B A b' := by
   letI : Field (Localization M) := hF.toField
   haveI : CharZero (Localization M) := algebraRat.charZero _
   let K := Localization M
@@ -49,8 +50,13 @@ theorem exists_denominator_of_isField_localization (B A : Type) [CommRing B] [Co
   refine ⟨u * t, M.mul_mem hu t.2, u * β, ?_⟩
   simpa [map_mul, mul_assoc] using hc
 
-theorem exists_common_denominator_of_isNilpotent :
-    ∀ (B A : Type) [CommRing B] [CommRing A] [Algebra ℚ B] [Algebra B A] [Algebra.FiniteType B A] [IsReduced A] [Nontrivial B], Function.Injective (algebraMap B A) → ∀ s : Finset A, (∀ f ∈ s, IsNilpotent (f ⊗ₜ[B] (1 : A) - (1 : A) ⊗ₜ[B] f)) → ∃ b : B, b ≠ 0 ∧ ∀ f ∈ s, ∃ b' : B, algebraMap B A b * f = algebraMap B A b' := by
+theorem exists_common_denominator_of_isNilpotent
+    : ∀ (B A : Type) [CommRing B] [CommRing A] [Algebra ℚ B] [Algebra B A] [Algebra.FiniteType B A]
+        [IsReduced A] [Nontrivial B],
+      Function.Injective (algebraMap B A)
+        → ∀ s : Finset A,
+          (∀ f ∈ s, IsNilpotent (f ⊗ₜ[B] (1 : A) - (1 : A) ⊗ₜ[B] f))
+            → ∃ b : B, b ≠ 0 ∧ ∀ f ∈ s, ∃ b' : B, algebraMap B A b * f = algebraMap B A b' := by
   intro B A _ _ _ _ _ _ _ hinj s hs
   classical
   haveI : IsReduced B := isReduced_of_injective (algebraMap B A) hinj
@@ -65,8 +71,9 @@ theorem exists_common_denominator_of_isNilpotent :
     | empty => exact ⟨1, one_mem _, by simp⟩
     | insert a s _ ih =>
       obtain ⟨b, hb, h⟩ := ih (fun f hf => hs f (Finset.mem_insert_of_mem hf))
-      obtain ⟨c, hc, c', hc'⟩ := exists_denominator_of_isField_localization B A p.primeCompl hF a
-        (hs a (Finset.mem_insert_self _ _))
+      obtain ⟨c, hc, c', hc'⟩ :=
+        exists_denominator_of_isField_localization B A p.primeCompl hF a
+          (hs a (Finset.mem_insert_self _ _))
       refine ⟨b * c, mul_mem hb hc, fun f hf => ?_⟩
       rcases Finset.mem_insert.1 hf with rfl | hf
       · exact ⟨b * c', by rw [map_mul, map_mul, mul_assoc, hc']⟩

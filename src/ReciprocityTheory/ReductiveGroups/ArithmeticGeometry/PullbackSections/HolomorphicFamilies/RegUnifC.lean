@@ -10,13 +10,16 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace ReciprocityTheory.ChartRestriction.G.PullbackSections.RegC
 
-open ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.DVR ReciprocityTheory.ChartRestriction.G.DVR.UUA
+open ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.DVR
+  ReciprocityTheory.ChartRestriction.G.DVR.UUA
 open ReciprocityTheory.ChartRestriction.G.DVR.SectionScalarValuation
 
 variable {R : Type} [CommRing R] [IsDomain R] (F : Type) [Field F] [Algebra (FractionRing R) F]
@@ -29,7 +32,8 @@ open IsLocalRing
 
 variable {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
 
-theorem exists_hasVal {ϖ : V} (hϖ : Irreducible ϖ) (x : FractionRing V) (hx : x ≠ 0) : ∃ n : ℤ, HasVal ϖ x n := by
+theorem exists_hasVal {ϖ : V} (hϖ : Irreducible ϖ) (x : FractionRing V) (hx : x ≠ 0)
+    : ∃ n : ℤ, HasVal ϖ x n := by
   obtain ⟨a, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := V) x
   have ha : a ≠ 0 := by
     rintro rfl
@@ -44,8 +48,9 @@ theorem exists_hasVal {ϖ : V} (hϖ : Irreducible ϖ) (x : FractionRing V) (hx :
   have hu2 : algebraMap V (FractionRing V) (u2 : V) ≠ 0 := by
     rw [Ne, ← map_zero (algebraMap V (FractionRing V))]
     exact fun h => u2.ne_zero (IsFractionRing.injective V (FractionRing V) h)
-  have hinv : algebraMap V (FractionRing V) ((u2⁻¹ : Vˣ) : V) =
-      (algebraMap V (FractionRing V) (u2 : V))⁻¹ :=
+  have hinv
+      : algebraMap V (FractionRing V) ((u2⁻¹ : Vˣ) : V)
+        = (algebraMap V (FractionRing V) (u2 : V))⁻¹ :=
     eq_inv_of_mul_eq_one_left (by rw [← map_mul, Units.inv_mul, map_one])
   simp only [Units.val_mul, map_mul, map_pow, hinv]
   rw [zpow_sub₀ hp, zpow_natCast, zpow_natCast]

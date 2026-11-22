@@ -29,12 +29,15 @@ def gen (y : (functor A B r).obj (op T)) (U : T.Opens) (b : B) : Sec A B y U :=
   ((y.2.1.subschemeι ≫ pullback.fst _ y.1).appLE ⊤ (subStr A B y ⁻¹ᵁ U) (by simp)).hom
     ((Scheme.ΓSpecIso (CommRingCat.of B)).inv.hom b)
 
-def coord {N : ℕ} (e : Module.Basis (Fin N) A B) (σ : Fin r ↪ Fin N)
-    (y : (functor A B r).obj (op T)) (U : T.Opens) : (Fin r → Γ(T, U)) →ₗ[Γ(T, U)] Sec A B y U :=
+def coord
+    {N : ℕ} (e : Module.Basis (Fin N) A B) (σ : Fin r ↪ Fin N)
+    (y : (functor A B r).obj (op T)) (U : T.Opens)
+    : (Fin r → Γ(T, U)) →ₗ[Γ(T, U)] Sec A B y U :=
   Fintype.linearCombination Γ(T, U) (fun k => gen A B y U (e (σ k)))
 
-theorem basic_iff {N : ℕ} (e : Module.Basis (Fin N) A B) (σ : Fin r ↪ Fin N)
-    (y : (functor A B r).obj (op T)) :
-    Basic A B e σ y ↔ ∀ U : T.affineOpens, Function.Bijective (coord A B e σ y U) := Iff.rfl
+theorem basic_iff
+    {N : ℕ} (e : Module.Basis (Fin N) A B) (σ : Fin r ↪ Fin N) (y : (functor A B r).obj (op T))
+    : Basic A B e σ y ↔ ∀ U : T.affineOpens, Function.Bijective (coord A B e σ y U) :=
+  Iff.rfl
 
 end GlobalTheory.HilbAff

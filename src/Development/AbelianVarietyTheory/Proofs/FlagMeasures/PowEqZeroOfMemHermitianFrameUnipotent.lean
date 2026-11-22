@@ -17,17 +17,18 @@ namespace GlobalTheory.FlagUnipotent
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 
-theorem hf_sub_left (L : LocE F E) {n : ℕ} (H : Matrix (Fin n) (Fin n) E) (a b y : Fin n → E) :
-    hf L H (a - b) y = hf L H a y - hf L H b y := by
+theorem hf_sub_left (L : LocE F E) {n : ℕ} (H : Matrix (Fin n) (Fin n) E) (a b y : Fin n → E)
+    : hf L H (a - b) y = hf L H a y - hf L H b y := by
   simp [hf, sub_mul, Finset.sum_sub_distrib]
 
-theorem hf_sub_right (L : LocE F E) {n : ℕ} (H : Matrix (Fin n) (Fin n) E) (x a b : Fin n → E) :
-    hf L H x (a - b) = hf L H x a - hf L H x b := by
+theorem hf_sub_right (L : LocE F E) {n : ℕ} (H : Matrix (Fin n) (Fin n) E) (x a b : Fin n → E)
+    : hf L H x (a - b) = hf L H x a - hf L H x b := by
   simp [hf, mul_sub, Finset.sum_sub_distrib]
 
-theorem pow_eq_zero_of_mem_Nof {L : LocE F E} {r k : ℕ} (S : Frames L r k)
-    (f : Fin (r + 1) → S.V) (g : S.GLV) (hg : g ∈ S.Nof f) :
-    ((g : S.V →ₗ[E] S.V) - 1) ^ (2 * r + 1) = 0 := by
+theorem pow_eq_zero_of_mem_Nof
+    {L : LocE F E} {r k : ℕ}
+    (S : Frames L r k) (f : Fin (r + 1) → S.V) (g : S.GLV) (hg : g ∈ S.Nof f)
+    : ((g : S.V →ₗ[E] S.V) - 1) ^ (2 * r + 1) = 0 := by
   obtain ⟨⟨hiso, hfl⟩, hmid⟩ := hg
   have hfl' : ∀ j, j < r → g ∈ unipOn (S.spanTo f (j + 1)) (S.spanTo f j) := fun j hj =>
     (Subgroup.mem_iInf.1 hfl) ⟨j, hj⟩
@@ -69,7 +70,11 @@ theorem pow_eq_zero_of_mem_Nof {L : LocE F E} {r k : ℕ} (S : Frames L r k)
   rw [e, pow_add, pow_add, pow_one, Module.End.mul_apply, Module.End.mul_apply, hAv]
   exact hc r le_rfl _ (hmid.2 _ (ha r le_rfl v))
 
-theorem main : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ (r k : ℕ) (S : Frames L r k), ∀ g ∈ S.N, ((g : S.V →ₗ[E] S.V) - 1) ^ (2 * r + 1) = 0 :=
-  fun _ _ _ S g hg => pow_eq_zero_of_mem_Nof S S.f g hg
+theorem main
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
+      ∀ (r k : ℕ) (S : Frames L r k), ∀ g ∈ S.N,
+        ((g : S.V →ₗ[E] S.V) - 1) ^ (2 * r + 1) = 0 := fun _ _ _ S g hg =>
+  pow_eq_zero_of_mem_Nof S S.f g hg
 
 end GlobalTheory.FlagUnipotent

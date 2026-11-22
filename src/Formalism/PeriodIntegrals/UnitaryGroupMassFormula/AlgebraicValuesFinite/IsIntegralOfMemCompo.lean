@@ -18,8 +18,7 @@ def compo (L : Type) [Field L] [NumberField L] : IntermediateField ℚ ℂ :=
 instance (φ : L →+* ℂ) : FiniteDimensional ℚ φ.toRatAlgHom.fieldRange :=
   LinearEquiv.finiteDimensional (AlgEquiv.ofInjectiveField φ.toRatAlgHom).toLinearEquiv
 
-instance : FiniteDimensional ℚ (compo L) := by
-  unfold compo; infer_instance
+instance : FiniteDimensional ℚ (compo L) := by unfold compo; infer_instance
 
 theorem mem_compo (φ : L →+* ℂ) (x : L) : φ x ∈ compo L :=
   (le_iSup (fun ψ : L →+* ℂ => ψ.toRatAlgHom.fieldRange) φ) (AlgHom.mem_fieldRange.mpr ⟨x, rfl⟩)
@@ -70,8 +69,8 @@ theorem assemble : Assemble L := by
     exact e
   let C : IntermediateField ℚ ℂ := compo L ⊔ IntermediateField.adjoin ℚ S
   have hCcompo : compo L ≤ C := le_sup_left
-  have hSsub : ∀ x ∈ S, x ∈ C := fun x hx => (le_sup_right : IntermediateField.adjoin ℚ S ≤ C)
-    (IntermediateField.subset_adjoin ℚ S hx)
+  have hSsub : ∀ x ∈ S, x ∈ C := fun x hx =>
+    (le_sup_right : IntermediateField.adjoin ℚ S ≤ C) (IntermediateField.subset_adjoin ℚ S hx)
   have hmu : ∀ z : ℂ, z ^ N = 1 → z ∈ C := fun z hz' =>
     hSsub z (Or.inl (by simp [Polynomial.mem_nthRoots hN0, hz']))
   have hf : ∀ i : U, f i ∈ C := fun i => hSsub _ (Or.inr ⟨i, rfl⟩)
@@ -99,7 +98,8 @@ theorem assemble : Assemble L := by
       have o2 : ordF hex.choose k = -1 := by rw [hkk]; simp [Ne.symm hvw]
       rw [Finset.prod_pair hvw, o1, o2, zpow_one, zpow_neg_one] at e
       rw [eq_of_key e]
-      exact C.mul_mem hwC (C.inv_mem (C.mul_mem (hCcompo (prod_mem_compo m (k : L))) (hmu _ (hz r hr))))
+      exact C.mul_mem hwC
+        (C.inv_mem (C.mul_mem (hCcompo (prod_mem_compo m (k : L))) (hmu _ (hz r hr))))
   have hint : ∀ x ∈ S, IsIntegral ℚ x := by
     intro x hx
     rcases hx with hx | ⟨i, rfl⟩
@@ -115,13 +115,14 @@ theorem assemble : Assemble L := by
     IntermediateField.finiteDimensional_adjoin hint
   haveI hC : FiniteDimensional ℚ C := IntermediateField.finiteDimensional_sup _ _
   refine ⟨C.toSubfield, ?_, fun v hv => ⟨⟨χ.valTw s v, hval v hv⟩, rfl⟩⟩
-  let e : C ≃ₗ[ℚ] C.toSubfield :=
-    { toFun := fun x => ⟨x.1, x.2⟩
-      invFun := fun x => ⟨x.1, x.2⟩
-      map_add' := fun x y => rfl
-      map_smul' := fun q x => rfl
-      left_inv := fun x => rfl
-      right_inv := fun x => rfl }
+  let e : C ≃ₗ[ℚ] C.toSubfield := {
+    toFun := fun x => ⟨x.1, x.2⟩
+    invFun := fun x => ⟨x.1, x.2⟩
+    map_add' := fun x y => rfl
+    map_smul' := fun q x => rfl
+    left_inv := fun x => rfl
+    right_inv := fun x => rfl
+  }
   exact LinearEquiv.finiteDimensional e
 
 end PI.AlgValsFin.W

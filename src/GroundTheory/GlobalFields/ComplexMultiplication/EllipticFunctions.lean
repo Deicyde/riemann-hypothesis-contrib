@@ -24,11 +24,9 @@ lemma Torus.mk_eq_mk_iff {z w : ℂ} : Torus.mk L z = Torus.mk L w ↔ z - w ∈
 lemma Torus.mk_surjective : Function.Surjective (Torus.mk L) :=
   QuotientAddGroup.mk_surjective
 
-def IsPeriodic {E : Type*} (f : ℂ → E) : Prop :=
-  ∀ z : ℂ, ∀ l ∈ L.lattice, f (z + l) = f z
+def IsPeriodic {E : Type*} (f : ℂ → E) : Prop := ∀ z : ℂ, ∀ l ∈ L.lattice, f (z + l) = f z
 
-def IsEllipticFunction (f : ℂ → ℂ) : Prop :=
-  Meromorphic f ∧ IsPeriodic L f
+def IsEllipticFunction (f : ℂ → ℂ) : Prop := Meromorphic f ∧ IsPeriodic L f
 
 variable {L}
 
@@ -60,12 +58,16 @@ lemma exists_sub_mem_fundamentalCompact (z : ℂ) :
   · rw [← ZSpan.fract_apply]
     exact ZSpan.fract_mem_fundamentalDomain _ _
 
-theorem isCompact_range_of_isPeriodic {E : Type*} [TopologicalSpace E] {f : ℂ → E}
-    (hc : Continuous f) (hf : IsPeriodic L f) : IsCompact (range f) :=
+theorem isCompact_range_of_isPeriodic
+    {E : Type*} [TopologicalSpace E] {f : ℂ → E} (hc : Continuous f) (hf : IsPeriodic L f)
+    : IsCompact (range f) :=
   IsZLattice.isCompact_range_of_periodic L.lattice f hc fun z w hw ↦ hf z w hw
 
-theorem eq_of_differentiable_of_isPeriodic {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    {f : ℂ → E} (hd : Differentiable ℂ f) (hf : IsPeriodic L f) (z w : ℂ) : f z = f w :=
+theorem eq_of_differentiable_of_isPeriodic
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {f : ℂ → E} (hd : Differentiable ℂ f) (hf : IsPeriodic L f)
+    (z w : ℂ)
+    : f z = f w :=
   hd.apply_eq_apply_of_bounded (isCompact_range_of_isPeriodic L hd.continuous hf).isBounded z w
 
 variable {L}
@@ -93,20 +95,24 @@ lemma IsPeriodic.meromorphicOrderAt_add {E : Type*} [NormedAddCommGroup E] [Norm
 def singularSet {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] (f : ℂ → E) : Set ℂ :=
   {z | ¬ AnalyticAt ℂ f z}
 
-theorem finite_inter_singularSet {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    [CompleteSpace E] {f : ℂ → E} (hf : Meromorphic f) {K : Set ℂ} (hK : IsCompact K) :
-    (K ∩ singularSet f).Finite := by
-  have h := hK.finite_sdiff_of_mem_codiscreteWithin
-    ((hf.meromorphicOn (s := K)).analyticAt_mem_codiscreteWithin)
+theorem finite_inter_singularSet
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] [CompleteSpace E]
+    {f : ℂ → E} (hf : Meromorphic f)
+    {K : Set ℂ} (hK : IsCompact K)
+    : (K ∩ singularSet f).Finite := by
+  have h :=
+    hK.finite_sdiff_of_mem_codiscreteWithin ((hf.meromorphicOn
+      (s := K)).analyticAt_mem_codiscreteWithin)
   exact h.subset fun z hz ↦ ⟨hz.1, hz.2⟩
 
 variable (L)
 
-theorem finite_image_singularSet {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
-    [CompleteSpace E] {f : ℂ → E} (hf : Meromorphic f) (hp : IsPeriodic L f) :
-    (Torus.mk L '' singularSet f).Finite := by
-  refine ((finite_inter_singularSet hf (isCompact_fundamentalCompact L)).image
-    (Torus.mk L)).subset ?_
+theorem finite_image_singularSet
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] [CompleteSpace E]
+    {f : ℂ → E} (hf : Meromorphic f) (hp : IsPeriodic L f)
+    : (Torus.mk L '' singularSet f).Finite := by
+  refine ((finite_inter_singularSet hf (isCompact_fundamentalCompact L)).image (Torus.mk L)).subset
+    ?_
   rintro _ ⟨z, hz, rfl⟩
   obtain ⟨l, hl, hzl⟩ := exists_sub_mem_fundamentalCompact L z
   refine ⟨z - l, ⟨hzl, fun h ↦ hz ?_⟩, ?_⟩

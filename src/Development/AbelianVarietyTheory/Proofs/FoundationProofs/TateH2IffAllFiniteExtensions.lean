@@ -11,30 +11,34 @@ noncomputable section
 
 namespace GlobalTheory.TateTopCompare
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N GlobalTheory.IndefiniteRowSideFullHecke.TateLocalDualityDegreeTwo
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N GlobalTheory.IndefiniteRowSideFullHecke.TateLocalDualityDegreeTwo
 
 section Transport
 
-variable {O O' G M M' : Type} [CommRing O] [CommRing O'] [Group G] [TopologicalSpace G]
-  [AddCommGroup M] [Module O M] [AddCommGroup M'] [Module O' M'] [TopologicalSpace M']
-  [DiscreteTopology M'] [IsTopologicalAddGroup M'] [ContinuousConstSMul O' M']
+variable
+  {O O' G M M' : Type} [CommRing O] [CommRing O'] [Group G] [TopologicalSpace G] [AddCommGroup M]
+  [Module O M] [AddCommGroup M'] [Module O' M'] [TopologicalSpace M'] [DiscreteTopology M']
+  [IsTopologicalAddGroup M'] [ContinuousConstSMul O' M']
   {σ : O →+* O'} {σ' : O' →+* O} [RingHomInvPair σ σ'] [RingHomInvPair σ' σ]
   (π : Representation O G M) (ρ : Representation O' G M') (e : M ≃ₛₗ[σ] M')
 
 variable (he : ∀ g x, e (π g x) = ρ g (e x))
 include he
 
-
 end Transport
 
 section Integers
 
-variable {l : ℕ} [Fact l.Prime] {LL O : Type} [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL]
-  [CommRing O] [Algebra O LL]
+variable
+  {l : ℕ} [Fact l.Prime]
+  {LL O : Type} [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
 
-theorem mem_range_of_norm_le (h : GoodO (Qp := ℚ_[l]) LL O) (L' : FinExt l)
-    (φ : LL ≃ₐ[ℚ_[l]] ↥L'.1) (x : LL) (hx : ‖((φ x : ↥L'.1) : Om l)‖ ≤ 1) :
-    x ∈ Set.range (algebraMap O LL) := by
+theorem mem_range_of_norm_le
+    (h : GoodO (Qp := ℚ_[l]) LL O)
+    (L' : FinExt l) (φ : LL ≃ₐ[ℚ_[l]] ↥L'.1)
+    (x : LL) (hx : ‖((φ x : ↥L'.1) : Om l)‖ ≤ 1)
+    : x ∈ Set.range (algebraMap O LL) := by
   obtain ⟨⟨hO, hdvr, hfr⟩, hfd, hmt, htr, hop⟩ := h
   obtain ⟨-, -, hmt', -, -⟩ := (GlobalTheory.LocalIntegers.good_integers l L').1
   have hcont : Continuous φ.symm :=
@@ -52,10 +56,11 @@ theorem mem_range_of_norm_le (h : GoodO (Qp := ℚ_[l]) LL O) (L' : FinExt l)
       push_cast
       rw [norm_mul, norm_pow]
       have h1 : ‖((algebraMap ℚ_[l] ↥L'.1 c : ↥L'.1) : Om l)‖ = ‖c‖ := PadicAlgCl.norm_extends l c
-      calc _ ≤ ‖c‖ * 1 := by
-            gcongr
-            · exact h1.le
-            · exact pow_le_one₀ (norm_nonneg _) hx
+      calc
+        _ ≤ ‖c‖ * 1 := by
+          gcongr
+          · exact h1.le
+          · exact pow_le_one₀ (norm_nonneg _) hx
         _ < ε := by simpa using hc
     simpa using hball this
   rcases ValuationRing.isInteger_or_isInteger O x with h | ⟨y, hy⟩
@@ -80,9 +85,9 @@ theorem mem_range_of_norm_le (h : GoodO (Qp := ℚ_[l]) LL O) (L' : FinExt l)
     rw [map_mul, map_pow, hy, hb, ha, inv_pow]
     field_simp
 
-theorem mem_range_iff (h : GoodO (Qp := ℚ_[l]) LL O) (L' : FinExt l)
-    (φ : LL ≃ₐ[ℚ_[l]] ↥L'.1) (x : LL) :
-    x ∈ Set.range (algebraMap O LL) ↔ φ x ∈ OL L' := by
+theorem mem_range_iff
+    (h : GoodO (Qp := ℚ_[l]) LL O) (L' : FinExt l) (φ : LL ≃ₐ[ℚ_[l]] ↥L'.1) (x : LL)
+    : x ∈ Set.range (algebraMap O LL) ↔ φ x ∈ OL L' := by
   have hO : φ x ∈ OL L' ↔ ‖((φ x : ↥L'.1) : Om l)‖ ≤ 1 := mem_integralClosure_padicInt_iff L'.1 _
   rw [hO]
   refine ⟨?_, mem_range_of_norm_le h L' φ x⟩
@@ -97,41 +102,43 @@ theorem mem_range_iff (h : GoodO (Qp := ℚ_[l]) LL O) (L' : FinExt l)
       intro h0
       rw [h0] at hlt
       norm_num at hlt
-    obtain ⟨b, hb⟩ := mem_range_of_norm_le h L' φ (w / algebraMap O LL a ^ k) (by
-      rw [map_div₀, map_pow]
-      push_cast
-      rw [norm_div, norm_pow, div_le_one hpos]
-      exact hk.le)
+    obtain ⟨b, hb⟩ :=
+      mem_range_of_norm_le h L' φ (w / algebraMap O LL a ^ k) (by
+        rw [map_div₀, map_pow]
+        push_cast
+        rw [norm_div, norm_pow, div_le_one hpos]
+        exact hk.le)
     exact ⟨b * a ^ k, by rw [map_mul, map_pow, hb]; field_simp⟩
   obtain ⟨⟨hO, hdvr, hfr⟩, -⟩ := h
   exact IsDiscreteValuationRing.not_isField O
     ((RingEquiv.ofBijective (algebraMap O LL)
       ⟨IsFractionRing.injective O LL, hsurj⟩).toMulEquiv.isField (Field.toIsField LL))
 
-theorem exists_finExt (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [FiniteDimensional ℚ_[l] LL] :
-    ∃ L' : FinExt l, Nonempty (LL ≃ₐ[ℚ_[l]] ↥L'.1) := by
+theorem exists_finExt (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [FiniteDimensional ℚ_[l] LL]
+    : ∃ L' : FinExt l, Nonempty (LL ≃ₐ[ℚ_[l]] ↥L'.1) := by
   let ψ : LL →ₐ[ℚ_[l]] Om l := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
-  exact ⟨⟨ψ.fieldRange, (AlgEquiv.ofInjectiveField ψ).toLinearEquiv.finiteDimensional⟩,
-    ⟨AlgEquiv.ofInjectiveField ψ⟩⟩
+  exact ⟨
+    ⟨ψ.fieldRange, (AlgEquiv.ofInjectiveField ψ).toLinearEquiv.finiteDimensional⟩,
+    ⟨AlgEquiv.ofInjectiveField ψ⟩
+  ⟩
 
 end Integers
 
 section Quotients
 
-variable {G LL O LL' O' M' : Type} [Group G] [TopologicalSpace G] [Field LL] [CommRing O]
-  [Algebra O LL] [Field LL'] [CommRing O'] [Algebra O' LL'] [AddCommGroup M'] [Module O' M']
-  [TopologicalSpace M'] [DiscreteTopology M'] [IsTopologicalAddGroup M']
-  [ContinuousConstSMul O' M']
-
+variable
+  {G LL O LL' O' M' : Type} [Group G] [TopologicalSpace G] [Field LL] [CommRing O] [Algebra O LL]
+  [Field LL'] [CommRing O'] [Algebra O' LL'] [AddCommGroup M'] [Module O' M'] [TopologicalSpace M']
+  [DiscreteTopology M'] [IsTopologicalAddGroup M'] [ContinuousConstSMul O' M']
 
 omit [TopologicalSpace G] in
-def rangeLattice (hinj : Function.Injective (algebraMap O LL)) (χ : G →* LLˣ)
-    (hχ : ∀ g, ((χ g : LLˣ) : LL) ∈ Set.range (algebraMap O LL)) :
-    Lattice (O := O) (charRep χ) where
+def rangeLattice
+    (hinj : Function.Injective (algebraMap O LL))
+    (χ : G →* LLˣ) (hχ : ∀ g, ((χ g : LLˣ) : LL) ∈ Set.range (algebraMap O LL))
+    : Lattice (O := O) (charRep χ) where
   T := LinearMap.range (Algebra.linearMap O LL)
   stable := by
     rintro g x ⟨y, rfl⟩
@@ -144,8 +151,9 @@ def rangeLattice (hinj : Function.Injective (algebraMap O LL)) (χ : G →* LLˣ
   span := by
     rw [eq_top_iff]
     intro x _
-    have : (1 : LL) ∈ Submodule.span LL ((LinearMap.range (Algebra.linearMap O LL) :
-        Submodule O LL) : Set LL) := Submodule.subset_span ⟨1, by simp⟩
+    have : (1 : LL) ∈ Submodule.span LL
+        ((LinearMap.range (Algebra.linearMap O LL) : Submodule O LL) : Set LL) :=
+      Submodule.subset_span ⟨1, by simp⟩
     simpa using Submodule.smul_mem _ x this
 
 end Quotients

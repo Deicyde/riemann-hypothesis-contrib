@@ -8,7 +8,8 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.SquareInte
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult Zc Zc.Cos
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult Zc Zc.Cos
 
 namespace PositivityTheory.PfEss.Zc2
 
@@ -16,8 +17,9 @@ section OrderFree
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem irrGL_eq_of_isLSeg_same {Δ : Segment k} {x y : IrrGL (k := k)} (hx : IsLSeg Δ x.rep) (hy : IsLSeg Δ y.rep) :
-    x = y := by
+theorem irrGL_eq_of_isLSeg_same
+    {Δ : Segment k} {x y : IrrGL (k := k)} (hx : IsLSeg Δ x.rep) (hy : IsLSeg Δ y.rep)
+    : x = y := by
   obtain ⟨n, a⟩ := x
   obtain ⟨m, b⟩ := y
   obtain rfl : n = m := hx.deg_eq.symm.trans hy.deg_eq
@@ -32,8 +34,9 @@ theorem irrGL_eq_of_isLSeg_same {Δ : Segment k} {x y : IrrGL (k := k)} (hx : Is
   rw [← ea, ← eb]
   exact key
 
-theorem perm_of_univ_map_eq {α : Type*} {l : ℕ} {x y : Fin l → α}
-    (h : Finset.univ.val.map y = Finset.univ.val.map x) : ∃ e : Equiv.Perm (Fin l), ∀ a, y a = x (e a) := by
+theorem perm_of_univ_map_eq
+    {α : Type*} {l : ℕ} {x y : Fin l → α} (h : Finset.univ.val.map y = Finset.univ.val.map x)
+    : ∃ e : Equiv.Perm (Fin l), ∀ a, y a = x (e a) := by
   classical
   have hc : ∀ b : α, Fintype.card {a // y a = b} = Fintype.card {a // x a = b} := by
     intro b
@@ -49,7 +52,9 @@ theorem perm_of_univ_map_eq {α : Type*} {l : ℕ} {x y : Fin l → α}
 
 end OrderFree
 
-theorem cs_orderfree : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k], GlobalTheory.Published.IrreducibleAdmissibleGL → LUnlinkedComm k → LOrderFree k := by
+theorem cs_orderfree
+    : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k],
+      GlobalTheory.Published.IrreducibleAdmissibleGL → LUnlinkedComm k → LOrderFree k := by
   intro k _ _ _ _ hIA hUC 𝔪 n N x hd hLF V _ _ π hL
   obtain ⟨m, x', hd', ⟨Δ', ⟨hm', hord'⟩, hseg'⟩, hcos⟩ := hL
   obtain ⟨Δ, ⟨hm, hord⟩, hseg⟩ := hLF
@@ -62,7 +67,7 @@ theorem cs_orderfree : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpa
   have hdσ : ∑ a, (x' (e a)).fst = N := by
     simp only [hxe]
     exact hd
-  have hordσ : ∀ i j, i < j → ¬(Δ' (e i)).Precedes (Δ' (e j)) := by
+  have hordσ : ∀ i j, i < j → ¬ (Δ' (e i)).Precedes (Δ' (e j)) := by
     intro i j hij
     rw [← he i, ← he j]
     exact hord i j hij

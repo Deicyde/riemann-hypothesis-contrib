@@ -21,7 +21,7 @@ theorem altE_add_left (H : Sesq V) (x y z : V) : altE H (x + y) z = altE H x z +
 theorem altE_add_right (H : Sesq V) (x y z : V) : altE H x (y + z) = altE H x y + altE H x z := by
   simp only [altE, map_add (f := _), Complex.add_im]
 
-theorem altE_neg_right (H : Sesq V) (x y : V) : altE H x (-y) = -altE H x y := by
+theorem altE_neg_right (H : Sesq V) (x y : V) : altE H x (-y) = - altE H x y := by
   simp only [altE, map_neg, Complex.neg_im]
 
 theorem altE_self (H : Sesq V) (hH : IsHerm H) (x : V) : altE H x x = 0 := by
@@ -36,29 +36,38 @@ theorem altE_nsmul_left (H : Sesq V) (k : ℕ) (x y : V) : altE H (k • x) y = 
 theorem altE_nsmul_right (H : Sesq V) (k : ℕ) (x y : V) : altE H x (k • y) = k * altE H x y := by
   simp [altE, map_nsmul, nsmul_eq_mul]
 
-theorem exp_eq_of_int {a c : ℂ} (n : ℤ) (h : a = c + (n : ℂ) * (2 * (Real.pi : ℂ) * Complex.I)) :
-    Complex.exp a = Complex.exp c := by
+theorem exp_eq_of_int {a c : ℂ} (n : ℤ) (h : a = c + (n : ℂ) * (2 * (Real.pi : ℂ) * Complex.I))
+    : Complex.exp a = Complex.exp c := by
   rw [h, Complex.exp_add, Complex.exp_int_mul_two_pi_mul_I, mul_one]
 
-theorem semi_sq {H : Sesq V} {Λ : AddSubgroup V} {α : V → ℂ} (hα : IsSemiChar H Λ α) {x : V}
-    (hx : x ∈ Λ) : α x * α x = 1 := by
+theorem semi_sq
+    {H : Sesq V} {Λ : AddSubgroup V} {α : V → ℂ} (hα : IsSemiChar H Λ α) {x : V} (hx : x ∈ Λ)
+    : α x * α x = 1 := by
   rcases hα.1 x hx with h | h <;> rw [h] <;> norm_num
 
-theorem semi_norm {H : Sesq V} {Λ : AddSubgroup V} {α : V → ℂ} (hα : IsSemiChar H Λ α) {x : V}
-    (hx : x ∈ Λ) : ‖α x‖ = 1 := by
+theorem semi_norm
+    {H : Sesq V} {Λ : AddSubgroup V} {α : V → ℂ} (hα : IsSemiChar H Λ α) {x : V} (hx : x ∈ Λ)
+    : ‖α x‖ = 1 := by
   rcases hα.1 x hx with h | h <;> rw [h] <;> simp
 
-theorem semi_nsmul {H : Sesq V} (hH : IsHerm H) {Λ : AddSubgroup V} {α : V → ℂ}
-    (hα : IsSemiChar H Λ α) {x : V} (hx : x ∈ Λ) (k : ℕ) : α (k • x) = α x ^ (k ^ 2) := by
+theorem semi_nsmul
+    {H : Sesq V} (hH : IsHerm H)
+    {Λ : AddSubgroup V} {α : V → ℂ} (hα : IsSemiChar H Λ α)
+    {x : V} (hx : x ∈ Λ)
+    (k : ℕ)
+    : α (k • x) = α x ^ (k ^ 2) := by
   have hs : α x ^ 2 = 1 := by rw [sq]; exact semi_sq hα hx
   induction k with
   | zero =>
     have h1 := hα.2 0 Λ.zero_mem 0 Λ.zero_mem
     have h2 := semi_sq hα Λ.zero_mem
     simp only [add_zero, altE, map_zero, LinearMap.zero_apply, Complex.zero_im, Complex.ofReal_zero,
-      mul_zero, Complex.exp_zero, mul_one] at h1
+        mul_zero, Complex.exp_zero, mul_one]
+      at h1
     rw [zero_nsmul]
-    calc α 0 = α 0 * α 0 := h1
+    calc
+      α 0
+        = α 0 * α 0 := h1
       _ = 1 := h2
       _ = α x ^ (0 ^ 2) := by simp
   | succ k ih =>
@@ -80,9 +89,14 @@ theorem triplePhaseQuadratic : PsiQuadratic := by
   have int₁ := (semicharacterBasic V H hH Λ₁ α hT.sc₁).2.2
   have int₂ := (semicharacterBasic V H hH Λ₂ α hT.sc₂).2.2
   have int₃ := (semicharacterBasic V H hH Λ₃ α hT.sc₃).2.2
-  have hadd : ∀ z ∈ Λ₃, ∀ y ∈ Λ₂, z + y ∈ Λ₁ → ∀ z' ∈ Λ₃, ∀ y' ∈ Λ₂, z' + y' ∈ Λ₁ →
-      psiT H α (z + z') (y + y') = psiT H α z y * psiT H α z' y'
-        * Complex.exp (2 * (Real.pi : ℂ) * Complex.I * (altE H y z' : ℂ)) := by
+  have hadd
+      : ∀ z ∈ Λ₃, ∀ y ∈ Λ₂,
+        z + y ∈ Λ₁
+          → ∀ z' ∈ Λ₃, ∀ y' ∈ Λ₂,
+            z' + y' ∈ Λ₁
+              → psiT H α (z + z') (y + y')
+                = psiT H α z y * psiT H α z' y'
+                  * Complex.exp (2 * (Real.pi : ℂ) * Complex.I * (altE H y z' : ℂ)) := by
     intro z hz y hy hzy z' hz' y' hy' hzy'
     obtain ⟨m, hm⟩ := int₃ hz z' hz'
     obtain ⟨k, hk⟩ := int₂ hy y' hy'
@@ -90,13 +104,14 @@ theorem triplePhaseQuadratic : PsiQuadratic := by
     simp only [psiT]
     rw [show z + z' + (y + y') = (z + y) + (z' + y') by abel, hT.sc₃.2 z hz z' hz',
       hT.sc₂.2 y hy y' hy', hT.sc₁.2 _ hzy _ hzy']
-    have key : Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H z z' : ℂ))
-        * Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H y y' : ℂ))
-        * Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H (z + y) (z' + y') : ℂ))
-        * Complex.exp (-(Real.pi : ℂ) * Complex.I * (altE H (z + z') (y + y') : ℂ))
-        = Complex.exp (-(Real.pi : ℂ) * Complex.I * (altE H z y : ℂ))
-        * Complex.exp (-(Real.pi : ℂ) * Complex.I * (altE H z' y' : ℂ))
-        * Complex.exp (2 * (Real.pi : ℂ) * Complex.I * (altE H y z' : ℂ)) := by
+    have key
+        : Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H z z' : ℂ))
+            * Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H y y' : ℂ))
+            * Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H (z + y) (z' + y') : ℂ))
+            * Complex.exp (-(Real.pi : ℂ) * Complex.I * (altE H (z + z') (y + y') : ℂ))
+          = Complex.exp (-(Real.pi : ℂ) * Complex.I * (altE H z y : ℂ))
+            * Complex.exp (-(Real.pi : ℂ) * Complex.I * (altE H z' y' : ℂ))
+            * Complex.exp (2 * (Real.pi : ℂ) * Complex.I * (altE H y z' : ℂ)) := by
       simp only [← Complex.exp_add]
       apply exp_eq_of_int (m + k)
       simp only [altE_add_left, altE_add_right, hsw, hm, hk]
@@ -116,7 +131,8 @@ theorem triplePhaseQuadratic : PsiQuadratic := by
     rw [norm_mul, norm_mul, norm_mul, semi_norm hT.sc₃ hz, semi_norm hT.sc₂ hy,
       semi_norm hT.sc₁ hzy,
       show -(Real.pi : ℂ) * Complex.I * (altE H z y : ℂ)
-        = ((-Real.pi * altE H z y : ℝ) : ℂ) * Complex.I by push_cast; ring,
+          = ((-Real.pi * altE H z y : ℝ) : ℂ) * Complex.I by
+        push_cast; ring,
       Complex.norm_exp_ofReal_mul_I]
     norm_num
   · intro z hz y hy hzy u' hu' u hu t ht
@@ -134,10 +150,12 @@ theorem triplePhaseQuadratic : PsiQuadratic := by
       simp only [psiT]
       rw [show u' + t + (u - t) = u' + u by abel, sub_eq_add_neg, hT.sc₃.2 u' hu'.2 t ht.2,
         hT.sc₂.2 u hu.2 (-t) (Λ₂.neg_mem ht.1), hT.sc₁.2 u' hu'.1 u hu.1, hneg]
-      have key : Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H u' t : ℂ))
-          * Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H u (-t) : ℂ))
-          * Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H u' u : ℂ))
-          * Complex.exp (-(Real.pi : ℂ) * Complex.I * (altE H (u' + t) (u + -t) : ℂ)) = 1 := by
+      have key
+          : Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H u' t : ℂ))
+              * Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H u (-t) : ℂ))
+              * Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H u' u : ℂ))
+              * Complex.exp (-(Real.pi : ℂ) * Complex.I * (altE H (u' + t) (u + -t) : ℂ))
+            = 1 := by
         simp only [← Complex.exp_add]
         rw [← Complex.exp_zero]
         apply exp_eq_of_int m
@@ -147,11 +165,13 @@ theorem triplePhaseQuadratic : PsiQuadratic := by
       have a1 := semi_sq hT.sc₁ hu'.1
       have a2 := semi_sq hT.sc₂ hu.2
       have a3 := semi_sq hT.sc₂ ht.1
-      calc _ = (α u' * α u') * (α u * α u) * (α t * α t)
+      calc
+        _ = (α u' * α u') * (α u * α u) * (α t * α t)
             * (Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H u' t : ℂ))
-          * Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H u (-t) : ℂ))
-          * Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H u' u : ℂ))
-          * Complex.exp (-(Real.pi : ℂ) * Complex.I * (altE H (u' + t) (u + -t) : ℂ))) := by ring
+              * Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H u (-t) : ℂ))
+              * Complex.exp ((Real.pi : ℂ) * Complex.I * (altE H u' u : ℂ))
+              * Complex.exp (-(Real.pi : ℂ) * Complex.I * (altE H (u' + t) (u + -t) : ℂ))) := by
+          ring
         _ = 1 := by rw [key, a1, a2, a3]; norm_num
     have h2 : Complex.exp (2 * (Real.pi : ℂ) * Complex.I * (altE H y (u' + t) : ℂ)) = 1 := by
       obtain ⟨m, hm⟩ := int₂ hy t ht.1
@@ -198,8 +218,8 @@ def rad (h : IsQuadFn0 φ b) : AddSubgroup M where
 
 theorem mem_rad (h : IsQuadFn0 φ b) (x : M) : x ∈ h.rad ↔ ∀ y, b x y = 1 := Iff.rfl
 
-theorem phi_rad [Fintype M] (h : IsQuadFn0 φ b) (hS : ∑ x, φ x ≠ 0) {r : M} (hr : r ∈ h.rad) :
-    φ r = 1 := by
+theorem phi_rad [Fintype M] (h : IsQuadFn0 φ b) (hS : ∑ x, φ x ≠ 0) {r : M} (hr : r ∈ h.rad)
+    : φ r = 1 := by
   have hb : ∀ x, b x r = 1 := fun x => (h.symm x r).trans ((h.mem_rad r).1 hr x)
   have hshift : ∑ x, φ (x + r) = ∑ x, φ x :=
     Fintype.sum_equiv (Equiv.addRight r) (fun x => φ (x + r)) φ (fun x => rfl)
@@ -267,7 +287,8 @@ theorem degenerateGaussSum : GaussDegenerate := by
       have hq : q = q' := by
         have h1 : ((q.out + (r : M) : M) : M ⧸ R) = ((q'.out + (r' : M) : M) : M ⧸ R) := by rw [hqr]
         rw [QuotientAddGroup.mk_add_of_mem _ r.2, QuotientAddGroup.mk_add_of_mem _ r'.2,
-          QuotientAddGroup.out_eq', QuotientAddGroup.out_eq'] at h1
+            QuotientAddGroup.out_eq', QuotientAddGroup.out_eq']
+          at h1
         exact h1
       subst hq
       have hr : (r : M) = r' := add_left_cancel hqr

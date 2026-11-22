@@ -8,31 +8,40 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.IsMaxim
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
 open Classical
 
 namespace GlobalTheory.ZH
 
 variable {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω]
 
-theorem ThetaSys.FF_mem_ring (S : ThetaSys o Ω) (T : AddSubgroup S.Gam) (c : T →+ ZMod S.N)
-    (k : S.J × (T → ZMod ((S.r * S.N) ^ 2))) : S.FF T c k ∈ S.R := by
+theorem ThetaSys.FF_mem_ring
+    (S : ThetaSys o Ω) (T : AddSubgroup S.Gam)
+    (c : T →+ ZMod S.N) (k : S.J × (T → ZMod ((S.r * S.N) ^ 2)))
+    : S.FF T c k ∈ S.R := by
   unfold ThetaSys.FF
   refine finsum_induction (· ∈ S.R) (zero_mem _) (fun _ _ => add_mem) fun t => ?_
   exact mul_mem (S.R.algebraMap_mem _)
     (sum_mem fun j _ => mul_mem (S.R.algebraMap_mem _) (S.ev_mem _ _))
 
-theorem RatModel.span_val_span {M : RatModel o Ω} {J : Type} {p : ℕ} [Fact p.Prime] {y : Sp (OO p) ⟶ M.Z}
-    {z : M.Z} (h : y (cPt p) = z) (w : Sp (PadicAlgCl p)) (G : Set (J → Ω))
-    (hG : ∀ v ∈ G, ∀ j, v j ∈ M.O ((gPt p ≫ y) w)) :
-    Submodule.span (OO p) ((fun (v : J → Ω) j => M.val (gPt p ≫ y) (v j)) '' (Submodule.span (M.O z) G)) =
-      Submodule.span (OO p) ((fun (v : J → Ω) j => M.val (gPt p ≫ y) (v j)) '' G) := by
+theorem RatModel.span_val_span
+    {M : RatModel o Ω} {J : Type} {p : ℕ} [Fact p.Prime]
+    {y : Sp (OO p) ⟶ M.Z} {z : M.Z} (h : y (cPt p) = z)
+    (w : Sp (PadicAlgCl p)) (G : Set (J → Ω)) (hG : ∀ v ∈ G, ∀ j, v j ∈ M.O ((gPt p ≫ y) w))
+    : Submodule.span (OO p)
+        ((fun (v : J → Ω) j => M.val (gPt p ≫ y) (v j)) '' (Submodule.span (M.O z) G))
+      = Submodule.span (OO p) ((fun (v : J → Ω) j => M.val (gPt p ≫ y) (v j)) '' G) := by
   have hs : ∀ w', (gPt p ≫ y) w' ⤳ (gPt p ≫ y) w :=
     RatModel.specializes_of_range_eq (RatModel.range_eq_singleton _ w)
-  refine le_antisymm (Submodule.span_le.2 ?_) (Submodule.span_mono (Set.image_mono Submodule.subset_span))
+  refine le_antisymm (Submodule.span_le.2 ?_)
+    (Submodule.span_mono (Set.image_mono Submodule.subset_span))
   rintro _ ⟨v, hv, rfl⟩
-  suffices H : (∀ j, v j ∈ M.O ((gPt p ≫ y) w)) ∧ (fun j => M.val (gPt p ≫ y) (v j)) ∈
-      Submodule.span (OO p) ((fun (v : J → Ω) j => M.val (gPt p ≫ y) (v j)) '' G) from H.2
+  suffices H
+      : (∀ j, v j ∈ M.O ((gPt p ≫ y) w))
+        ∧ (fun j => M.val (gPt p ≫ y) (v j))
+          ∈ Submodule.span (OO p) ((fun (v : J → Ω) j => M.val (gPt p ≫ y) (v j)) '' G) from
+    H.2
   induction hv using Submodule.span_induction with
   | mem v hv => exact ⟨hG v hv, Submodule.subset_span ⟨v, hv, rfl⟩⟩
   | zero =>
@@ -42,41 +51,50 @@ theorem RatModel.span_val_span {M : RatModel o Ω} {J : Type} {p : ℕ} [Fact p.
     exact zero_mem _
   | add u v _ _ hu hv =>
     refine ⟨fun j => add_mem (hu.1 j) (hv.1 j), ?_⟩
-    have : (fun j => M.val (gPt p ≫ y) ((u + v) j)) =
-        (fun j => M.val (gPt p ≫ y) (u j)) + fun j => M.val (gPt p ≫ y) (v j) :=
+    have : (fun j => M.val (gPt p ≫ y) ((u + v) j))
+        = (fun j => M.val (gPt p ≫ y) (u j)) + fun j => M.val (gPt p ≫ y) (v j) :=
       funext fun j => RatModel.val_add hs (hu.1 j) (hv.1 j)
     rw [this]
     exact add_mem hu.2 hv.2
   | smul a v _ hv =>
-    have ha : (a : Ω) ∈ M.O ((gPt p ≫ y) w) := RatModel.O_le_of_specializes (RatModel.gPt_specializes h w) a.2
+    have ha : (a : Ω) ∈ M.O ((gPt p ≫ y) w) :=
+      RatModel.O_le_of_specializes (RatModel.gPt_specializes h w) a.2
     refine ⟨fun j => mul_mem ha (hv.1 j), ?_⟩
-    have : (fun j => M.val (gPt p ≫ y) ((a • v) j)) =
-        (⟨M.val (gPt p ≫ y) a, (mem_OO_iff _).2 (RatModel.norm_val_le_one h a.2)⟩ : OO p) •
-          fun j => M.val (gPt p ≫ y) (v j) :=
+    have : (fun j => M.val (gPt p ≫ y) ((a • v) j))
+        = (⟨M.val (gPt p ≫ y) a, (mem_OO_iff _).2 (RatModel.norm_val_le_one h a.2)⟩ : OO p)
+          • fun j => M.val (gPt p ≫ y) (v j) :=
       funext fun j => RatModel.val_mul hs ha (hv.1 j)
     rw [this]
     exact Submodule.smul_mem _ _ hv.2
 
-theorem RatModel.val_div_mul {M : RatModel o Ω} {K : Type} [Field K] {y : Sp K ⟶ M.Z} {z : M.Z}
-    (h : ∀ w, y w ⤳ z) {a b c : Ω} (ha : a ∈ M.O z) (hb : b ∈ M.O z) (hb0 : b ≠ 0) (hb' : b⁻¹ ∈ M.O z)
-    (hc : c ∈ M.O z) : M.val y (a / b * c) = M.val y a / M.val y b * M.val y c := by
+theorem RatModel.val_div_mul
+    {M : RatModel o Ω} {K : Type} [Field K]
+    {y : Sp K ⟶ M.Z} {z : M.Z} (h : ∀ w, y w ⤳ z)
+    {a b c : Ω} (ha : a ∈ M.O z) (hb : b ∈ M.O z) (hb0 : b ≠ 0) (hb' : b⁻¹ ∈ M.O z) (hc : c ∈ M.O z)
+    : M.val y (a / b * c) = M.val y a / M.val y b * M.val y c := by
   have h1 : M.val y b⁻¹ = (M.val y b)⁻¹ := by
     refine eq_inv_of_mul_eq_one_right ?_
     rw [← RatModel.val_mul h hb hb', mul_inv_cancel₀ hb0, RatModel.val_one]
-  rw [div_eq_mul_inv, RatModel.val_mul h (mul_mem ha hb') hc, RatModel.val_mul h ha hb', h1, div_eq_mul_inv]
+  rw [div_eq_mul_inv, RatModel.val_mul h (mul_mem ha hb') hc, RatModel.val_mul h ha hb', h1,
+    div_eq_mul_inv]
 
-theorem ThetaSys.span_val_eq_testLattice (S : ThetaSys o Ω) (M : RatModel o Ω) (U₀ : M.Z.Opens)
-    (hA : S.admitted M U₀) {z : M.Z} {p : ℕ} [Fact p.Prime] {y : Sp (OO p) ⟶ M.Z} {y₀ : S.R →+* PadicAlgCl p}
-    (τ : S.Test p y₀) (hC : M.Cen U₀ z y) (hAt : S.At M y y₀)
-    (hI : ∀ x ∈ S.supI M z, ‖M.val (gPt p ≫ y) (S.th x)‖ = τ.δ)
+theorem ThetaSys.span_val_eq_testLattice
+    (S : ThetaSys o Ω) (M : RatModel o Ω) (U₀ : M.Z.Opens) (hA : S.admitted M U₀)
+    {z : M.Z} {p : ℕ} [Fact p.Prime]
+    {y : Sp (OO p) ⟶ M.Z} {y₀ : S.R →+* PadicAlgCl p} (τ : S.Test p y₀) (hC : M.Cen U₀ z y)
+    (hAt : S.At M y y₀) (hI : ∀ x ∈ S.supI M z, ‖M.val (gPt p ≫ y) (S.th x)‖ = τ.δ)
     (T : AddSubgroup S.Gam) (hT : T = S.perp τ.yy.ker) (hF : ∀ c : T →+ ZMod S.N, S.FF T c ≠ 0)
-    (hα : ∀ c : S.perp τ.yy.ker →+ ZMod S.N, ∃ α : τ.X, (∀ v₀, τ.q α ≤ τ.q (α + S.N • v₀)) ∧ τ.wt α = c)
-    (hv : ∀ (c : T →+ ZMod S.N) (k : _) (α : τ.X), M.Div (S.FF T c) k z → (∀ v₀, τ.q α ≤ τ.q (α + S.N • v₀)) →
-      (∀ (t : S.Gam) (h₁ : t ∈ T) (h₂ : t ∈ S.perp τ.yy.ker), c ⟨t, h₁⟩ = τ.wt α ⟨t, h₂⟩) →
-      ‖M.val (gPt p ≫ y) (S.FF T c k)‖ = τ.δ * Real.exp (-(τ.q α / S.N))) :
-    Submodule.span (OO p) ((fun (v : S.J → Ω) j => M.val (gPt p ≫ y) (v j)) '' (Submodule.span (M.O z)
-      {v | ∃ (c : T →+ ZMod S.N) (k : _) (x₀ : S.Gam) (i : S.J), M.Div (S.FF T c) k z ∧ x₀ ∈ S.supI M z ∧
-        v = fun j => S.th x₀ / S.FF _ c k * algebraMap o Ω (S.proj _ c j i)})) = τ.E := by
+    (hα : ∀ c : S.perp τ.yy.ker →+ ZMod S.N, ∃ α : τ.X,
+      (∀ v₀, τ.q α ≤ τ.q (α + S.N • v₀)) ∧ τ.wt α = c)
+    (hv : ∀ (c : T →+ ZMod S.N) (k : _) (α : τ.X),
+      M.Div (S.FF T c) k z → (∀ v₀, τ.q α ≤ τ.q (α + S.N • v₀))
+        → (∀ (t : S.Gam) (h₁ : t ∈ T) (h₂ : t ∈ S.perp τ.yy.ker), c ⟨t, h₁⟩ = τ.wt α ⟨t, h₂⟩)
+        → ‖M.val (gPt p ≫ y) (S.FF T c k)‖ = τ.δ * Real.exp (-(τ.q α / S.N)))
+    : Submodule.span (OO p)
+        ((fun (v : S.J → Ω) j => M.val (gPt p ≫ y) (v j)) '' (Submodule.span (M.O z)
+          {v | ∃ (c : T →+ ZMod S.N) (k : _) (x₀ : S.Gam) (i : S.J), M.Div (S.FF T c) k z ∧ x₀ ∈ S.supI M z ∧
+            v = fun j => S.th x₀ / S.FF _ c k * algebraMap o Ω (S.proj _ c j i)}))
+      = τ.E := by
   subst hT
   let w : Sp (PadicAlgCl p) := IsLocalRing.closedPoint (PadicAlgCl p)
   have hw : (gPt p ≫ y) w ∈ (U₀ : Set M.Z) := hC.2 ⟨w, rfl⟩
@@ -85,18 +103,25 @@ theorem ThetaSys.span_val_eq_testLattice (S : ThetaSys o Ω) (M : RatModel o Ω)
   have hR : S.R ≤ M.O ((gPt p ≫ y) w) := hA.1.le.trans (RatModel.ringOn_le_O hw)
   have hinv : ∀ c k, M.Div (S.FF (S.perp τ.yy.ker) c) k z → (S.FF _ c k)⁻¹ ∈ M.O ((gPt p ≫ y) w) :=
     fun c k hk => RatModel.ringOn_le_O hw (hA.1.FF_unit _ c k τ.isoFree hk.1)
-  have hval : ∀ c k x₀ i, M.Div (S.FF (S.perp τ.yy.ker) c) k z →
-      (fun j => M.val (gPt p ≫ y) (S.th x₀ / S.FF _ c k * algebraMap o Ω (S.proj _ c j i))) =
-      fun j => M.val (gPt p ≫ y) (S.th x₀) / M.val (gPt p ≫ y) (S.FF _ c k) *
-        y₀ (algebraMap o S.R (S.proj _ c j i)) := by
+  have hval
+      : ∀ c k x₀ i,
+        M.Div (S.FF (S.perp τ.yy.ker) c) k z
+          → (fun j => M.val (gPt p ≫ y) (S.th x₀ / S.FF _ c k * algebraMap o Ω (S.proj _ c j i)))
+            = fun j =>
+              M.val (gPt p ≫ y) (S.th x₀) / M.val (gPt p ≫ y) (S.FF _ c k)
+                * y₀ (algebraMap o S.R (S.proj _ c j i)) := by
     intro c k x₀ i hk
     funext j
     rw [RatModel.val_div_mul hs (hR (S.th_mem _)) (hR (S.FF_mem_ring _ _ _)) hk.1 (hinv c k hk)
-      (Subalgebra.algebraMap_mem _ _), hAt]
+        (Subalgebra.algebraMap_mem _ _),
+      hAt]
     rfl
-  have hnorm : ∀ α k x₀, M.Div (S.FF (S.perp τ.yy.ker) (τ.wt α)) k z → x₀ ∈ S.supI M z →
-      (∀ v₀, τ.q α ≤ τ.q (α + S.N • v₀)) →
-      ‖M.val (gPt p ≫ y) (S.th x₀) / M.val (gPt p ≫ y) (S.FF _ (τ.wt α) k)‖ = Real.exp (τ.q α / S.N) := by
+  have hnorm
+      : ∀ α k x₀,
+        M.Div (S.FF (S.perp τ.yy.ker) (τ.wt α)) k z → x₀ ∈ S.supI M z
+          → (∀ v₀, τ.q α ≤ τ.q (α + S.N • v₀))
+          → ‖M.val (gPt p ≫ y) (S.th x₀) / M.val (gPt p ≫ y) (S.FF _ (τ.wt α) k)‖
+            = Real.exp (τ.q α / S.N) := by
     intro α k x₀ hk hx hm
     rw [norm_div, hI x₀ hx, hv _ k α hk hm fun _ _ _ => rfl, Real.exp_neg]
     have := τ.δ_pos.ne'
@@ -118,8 +143,9 @@ theorem ThetaSys.span_val_eq_testLattice (S : ThetaSys o Ω) (M : RatModel o Ω)
       have hq : l / l₀ ∈ OO p := by
         rw [mem_OO_iff, norm_div, div_le_one hpos, hn]
         exact hl
-      have : (fun j => l * y₀ (algebraMap o S.R (S.proj _ (τ.wt α) j i))) =
-          (⟨l / l₀, hq⟩ : OO p) • fun j => l₀ * y₀ (algebraMap o S.R (S.proj _ (τ.wt α) j i)) := by
+      have : (fun j => l * y₀ (algebraMap o S.R (S.proj _ (τ.wt α) j i)))
+          = (⟨l / l₀, hq⟩ : OO p)
+            • fun j => l₀ * y₀ (algebraMap o S.R (S.proj _ (τ.wt α) j i)) := by
         funext j
         show _ = l / l₀ * (l₀ * _)
         rw [← _root_.mul_assoc, div_mul_cancel₀ _ h0]

@@ -9,10 +9,11 @@ open CrystallineSemistableComparison CrystallineSemistableComparison.Tw
 
 namespace GlobalTheory.CompanionTheory.TowerSeq
 
-theorem lseq_transport : ∀ (W : Type) [CommRing W] (l : ℕ) (S S' T T' : Sys.{1} W)
-    (e : Sys.Hom S T (RingHom.id W)) (e' : Sys.Hom S' T' (RingHom.id W)),
-    (∀ n, Function.Bijective (e.f n)) → (∀ n, Function.Bijective (e'.f n)) →
-    LSeq l S S' → Nonempty (LSeq l T T') := by
+theorem lseq_transport
+    : ∀ (W : Type) [CommRing W] (l : ℕ) (S S' T T' : Sys.{1} W) (e : Sys.Hom S T (RingHom.id W))
+        (e' : Sys.Hom S' T' (RingHom.id W)),
+      (∀ n, Function.Bijective (e.f n)) → (∀ n, Function.Bijective (e'.f n)) → LSeq l S S'
+        → Nonempty (LSeq l T T') := by
   intro W _ l S S' T T' e e' h h' L
   let E : ∀ n, S.M n ≃ₗ[W] T.M n := fun n => LinearEquiv.ofBijective (e.f n) (h n)
   let E' : ∀ n, S'.M n ≃ₗ[W] T'.M n := fun n => LinearEquiv.ofBijective (e'.f n) (h' n)
@@ -26,7 +27,15 @@ theorem lseq_transport : ∀ (W : Type) [CommRing W] (l : ℕ) (S S' T T' : Sys.
     ρ := fun c b => (E b).toLinearMap ∘ₗ L.ρ c b ∘ₗ (E c).symm.toLinearMap
     ν := fun a c => (E c).toLinearMap ∘ₗ L.ν a c ∘ₗ (E a).symm.toLinearMap
     δ := fun b a => (E' a).toLinearMap ∘ₗ L.δ b a ∘ₗ (E b).symm.toLinearMap
-    kill := ?_, ρ_self := ?_, ρ_succ := ?_, ν_ρ := ?_, ν_r := ?_, ex₁ := ?_, δ_r := ?_, ex₂ := ?_ }⟩
+    kill := ?_
+    ρ_self := ?_
+    ρ_succ := ?_
+    ν_ρ := ?_
+    ν_r := ?_
+    ex₁ := ?_
+    δ_r := ?_
+    ex₂ := ?_
+  }⟩
   · intro n x
     apply (E n).symm.injective
     rw [map_smul, L.kill, map_zero]

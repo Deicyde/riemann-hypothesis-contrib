@@ -14,21 +14,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 namespace GlobalTheory.ElementarySymmetricInverse
 
-theorem esymm_deg_zero (s : Multiset ℂ) : s.esymm 0 = 1 := by
-  simp [Multiset.esymm]
+theorem esymm_deg_zero (s : Multiset ℂ) : s.esymm 0 = 1 := by simp [Multiset.esymm]
 
-theorem esymm_cons_succ (x : ℂ) (s : Multiset ℂ) (k : ℕ) :
-    (x ::ₘ s).esymm (k + 1) = s.esymm (k + 1) + x * s.esymm k := by
-  simp only [Multiset.esymm, Multiset.powersetCard_cons, Multiset.map_add (f := _), Multiset.sum_add,
-    Multiset.map_map, Function.comp_def, Multiset.prod_cons, Multiset.sum_map_mul_left]
+theorem esymm_cons_succ (x : ℂ) (s : Multiset ℂ) (k : ℕ)
+    : (x ::ₘ s).esymm (k + 1) = s.esymm (k + 1) + x * s.esymm k := by
+  simp only [Multiset.esymm, Multiset.powersetCard_cons, Multiset.map_add (f := _),
+    Multiset.sum_add, Multiset.map_map, Function.comp_def, Multiset.prod_cons,
+    Multiset.sum_map_mul_left]
 
 theorem esymm_top (s : Multiset ℂ) (k : ℕ) (hk : Multiset.card s = k) : s.esymm k = s.prod := by
   subst hk
   simp [Multiset.esymm]
 
-theorem esymm_inv_mul_prod (s : Multiset ℂ) (hs : ∀ x ∈ s, x ≠ 0) :
-    ∀ i j : ℕ, i + j = Multiset.card s →
-      (s.map fun x => x⁻¹).esymm i * s.prod = s.esymm j := by
+theorem esymm_inv_mul_prod (s : Multiset ℂ) (hs : ∀ x ∈ s, x ≠ 0)
+    : ∀ i j : ℕ, i + j = Multiset.card s → (s.map fun x => x⁻¹).esymm i * s.prod = s.esymm j := by
   induction s using Multiset.induction_on with
   | empty =>
     intro i j h
@@ -52,8 +51,8 @@ theorem esymm_inv_mul_prod (s : Multiset ℂ) (hs : ∀ x ∈ s, x ≠ 0) :
     field_simp
     ring
 
-theorem half_pow (q a : ℕ) :
-    (((q : ℝ) ^ (((a : ℝ) - 1) / 2) : ℝ) : ℂ) ^ a = (q : ℂ) ^ Nat.choose a 2 := by
+theorem half_pow (q a : ℕ)
+    : (((q : ℝ) ^ (((a : ℝ) - 1) / 2) : ℝ) : ℂ) ^ a = (q : ℂ) ^ Nat.choose a 2 := by
   have h : ((q : ℝ) ^ (((a : ℝ) - 1) / 2)) ^ a = (q : ℝ) ^ Nat.choose a 2 := by
     rw [← Real.rpow_natCast, ← Real.rpow_mul (Nat.cast_nonneg q), ← Real.rpow_natCast,
       Nat.cast_choose_two]
@@ -61,18 +60,25 @@ theorem half_pow (q a : ℕ) :
     ring
   exact_mod_cast congrArg (fun r : ℝ => (r : ℂ)) h
 
-theorem algSat_eq (a q : ℕ) (B : Multiset ℂˣ) :
-    UpperTheory.V.Af.algSat a q B =
-      B.map fun b : ℂˣ => (((q : ℝ) ^ (((a : ℝ) - 1) / 2) : ℝ) : ℂ) * (b : ℂ) := by
+theorem algSat_eq (a q : ℕ) (B : Multiset ℂˣ)
+    : UpperTheory.V.Af.algSat a q B
+      = B.map fun b : ℂˣ => (((q : ℝ) ^ (((a : ℝ) - 1) / 2) : ℝ) : ℂ) * (b : ℂ) := by
   unfold UpperTheory.V.Af.algSat
   simp only [Multiset.pure_def, Multiset.bind_def, Multiset.bind_singleton, Multiset.map_map,
     Function.comp_def]
 
-theorem esymm_inv_algSat : ∀ {q : ℕ}, q ≠ (0 : ℕ) → ∀ {a : ℕ} {B : Multiset ℂˣ},
-    Multiset.card B = a → ∀ {j : ℕ}, j ≤ a → GlobalTheory.LFun.satEig q a B a ≠ (0 : ℂ) →
-    Multiset.esymm (Multiset.map (fun (x : ℂ) ↦ x⁻¹) (UpperTheory.V.Af.algSat a q B)) j =
-      Multiset.esymm (UpperTheory.V.Af.algSat a q B) (a - j) *
-        (((↑q : ℂ) ^ Nat.choose a (2 : ℕ))⁻¹ * (GlobalTheory.LFun.satEig q a B a)⁻¹) := by
+theorem esymm_inv_algSat
+    : ∀ {q : ℕ},
+      q ≠ (0 : ℕ)
+        → ∀ {a : ℕ} {B : Multiset ℂˣ},
+          Multiset.card B = a
+            → ∀ {j : ℕ},
+              j ≤ a → GlobalTheory.LFun.satEig q a B a ≠ (0 : ℂ)
+                → Multiset.esymm (Multiset.map (fun (x : ℂ) ↦ x⁻¹) (UpperTheory.V.Af.algSat a q B))
+                    j
+                  = Multiset.esymm (UpperTheory.V.Af.algSat a q B) (a - j)
+                    * (((↑q : ℂ) ^ Nat.choose a (2 : ℕ))⁻¹
+                      * (GlobalTheory.LFun.satEig q a B a)⁻¹) := by
   intro q hq a B hB j hj hne
   have hsat : GlobalTheory.LFun.satEig q a B a = (B.map fun b : ℂˣ => (b : ℂ)).prod := by
     unfold GlobalTheory.LFun.satEig
@@ -80,10 +86,11 @@ theorem esymm_inv_algSat : ∀ {q : ℕ}, q ≠ (0 : ℕ) → ∀ {a : ℕ} {B :
     simp
   have hcard : Multiset.card (UpperTheory.V.Af.algSat a q B) = a := by
     rw [algSat_eq, Multiset.card_map, hB]
-  have hprod : (UpperTheory.V.Af.algSat a q B).prod =
-      (q : ℂ) ^ Nat.choose a 2 * GlobalTheory.LFun.satEig q a B a := by
-    rw [hsat, ← half_pow, algSat_eq, Multiset.prod_map_mul,
-      Multiset.map_const', Multiset.prod_replicate, hB]
+  have hprod
+      : (UpperTheory.V.Af.algSat a q B).prod
+        = (q : ℂ) ^ Nat.choose a 2 * GlobalTheory.LFun.satEig q a B a := by
+    rw [hsat, ← half_pow, algSat_eq, Multiset.prod_map_mul, Multiset.map_const',
+      Multiset.prod_replicate, hB]
   have hq' : (q : ℂ) ^ Nat.choose a 2 ≠ 0 := pow_ne_zero _ (Nat.cast_ne_zero.mpr hq)
   have hP : (UpperTheory.V.Af.algSat a q B).prod ≠ 0 := by
     rw [hprod]

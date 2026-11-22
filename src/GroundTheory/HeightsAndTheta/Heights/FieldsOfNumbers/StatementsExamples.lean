@@ -15,28 +15,30 @@ noncomputable section
 
 universe u
 
-theorem relDim_bot {K : Type*} [Fintype K] [DecidableEq K] {ι : K → Type*} [∀ k, Fintype (ι k)]
-    {F : Type*} [Field F] :
-    relDim (⊥ : Ideal (MRing ι F)) =
-      (((Fintype.card (Σ k, ι k) : ℤ) - Fintype.card K : ℤ) : WithTop ℤ) := by
+theorem relDim_bot
+    {K : Type*} [Fintype K] [DecidableEq K]
+    {ι : K → Type*} [∀ k, Fintype (ι k)]
+    {F : Type*} [Field F]
+    : relDim (⊥ : Ideal (MRing ι F))
+      = (((Fintype.card (Σ k, ι k) : ℤ) - Fintype.card K : ℤ) : WithTop ℤ) := by
   unfold relDim
   rw [ringKrullDim_eq_of_ringEquiv (RingEquiv.quotientBot _),
-    MvPolynomial.ringKrullDim_of_isNoetherianRing_of_finite, ringKrullDim_eq_zero_of_field, zero_add,
-    Nat.card_eq_fintype_card]
+    MvPolynomial.ringKrullDim_of_isNoetherianRing_of_finite, ringKrullDim_eq_zero_of_field,
+    zero_add, Nat.card_eq_fintype_card]
   rfl
 
 abbrev ProjIdx (N : ℕ) : Unit → Type := fun _ => Fin (N + 1)
 
-theorem relDim_projectiveSpace {F : Type*} [Field F] (N : ℕ) :
-    relDim (⊥ : Ideal (MRing (ProjIdx N) F)) = (N : WithBot (WithTop ℤ)) := by
+theorem relDim_projectiveSpace {F : Type*} [Field F] (N : ℕ)
+    : relDim (⊥ : Ideal (MRing (ProjIdx N) F)) = (N : WithBot (WithTop ℤ)) := by
   rw [relDim_bot]
   simp [Fintype.card_sigma]
   rfl
 
 def binomFn (N : ℕ) (t : ℤ) : ℤ := if 0 ≤ t then ((t.toNat + N).choose N : ℤ) else 0
 
-theorem binomFn_sub (N : ℕ) (t : ℤ) :
-    binomFn (N + 1) t - binomFn (N + 1) (t - 1) = binomFn N t := by
+theorem binomFn_sub (N : ℕ) (t : ℤ)
+    : binomFn (N + 1) t - binomFn (N + 1) (t - 1) = binomFn N t := by
   unfold binomFn
   rcases lt_trichotomy t 0 with h | rfl | h
   · rw [if_neg (by omega), if_neg (by omega), if_neg (by omega)]
@@ -52,16 +54,16 @@ theorem binomFn_sub (N : ℕ) (t : ℤ) :
     push_cast
     ring
 
-theorem weight_projIdx (N : ℕ) (d : (Σ _ : Unit, ProjIdx N ()) →₀ ℕ) :
-    Finsupp.weight (blockWeight (ProjIdx N)) d () = ∑ x, d x := by
+theorem weight_projIdx (N : ℕ) (d : (Σ _ : Unit, ProjIdx N ()) →₀ ℕ)
+    : Finsupp.weight (blockWeight (ProjIdx N)) d () = ∑ x, d x := by
   rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by simp), Finset.sum_apply]
   simp [blockWeight]
 
-theorem finrank_gradedPiece_projectiveSpace (F : Type*) [Field F] (N a : ℕ) :
-    Module.finrank F (gradedPiece (⊥ : Ideal (MRing (ProjIdx N) F)) (fun _ => a)) =
-      (a + N).choose N := by
-  have hinj : Function.Injective
-      (Ideal.Quotient.mkₐ F (⊥ : Ideal (MRing (ProjIdx N) F))).toLinearMap := by
+theorem finrank_gradedPiece_projectiveSpace (F : Type*) [Field F] (N a : ℕ)
+    : Module.finrank F (gradedPiece (⊥ : Ideal (MRing (ProjIdx N) F)) (fun _ => a))
+      = (a + N).choose N := by
+  have hinj : Function.Injective (Ideal.Quotient.mkₐ F
+      (⊥ : Ideal (MRing (ProjIdx N) F))).toLinearMap := by
     intro x y h
     simpa [Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.eq, sub_eq_zero] using h
   unfold gradedPiece
@@ -82,13 +84,14 @@ theorem finrank_gradedPiece_projectiveSpace (F : Type*) [Field F] (N a : ℕ) :
         rw [weight_projIdx]
         exact h
   have : Fintype s := Fintype.ofEquiv _ e.symm
-  rw [LinearEquiv.finrank_eq (AddMonoidAlgebra.supportedEquivFinsupp (R := F) (S := F) s), Module.finrank_finsupp_self,
-    Fintype.card_congr e, Fintype.card_coe, Finset.card_finsuppAntidiag_nat_eq_choose]
+  rw [LinearEquiv.finrank_eq (AddMonoidAlgebra.supportedEquivFinsupp (R := F) (S := F) s),
+    Module.finrank_finsupp_self, Fintype.card_congr e, Fintype.card_coe,
+    Finset.card_finsuppAntidiag_nat_eq_choose]
   simp [Fintype.card_sigma]
   rw [add_comm, Nat.choose_symm_add]
 
-theorem hilbFn_projectiveSpace (F : Type*) [Field F] (N : ℕ) (m : Unit → ℤ) :
-    hilbFn (⊥ : Ideal (MRing (ProjIdx N) F)) m = binomFn N (m ()) := by
+theorem hilbFn_projectiveSpace (F : Type*) [Field F] (N : ℕ) (m : Unit → ℤ)
+    : hilbFn (⊥ : Ideal (MRing (ProjIdx N) F)) m = binomFn N (m ()) := by
   unfold hilbFn binomFn
   by_cases hm : 0 ≤ m ()
   · rw [if_pos (fun k => hm), if_pos hm]
@@ -96,9 +99,9 @@ theorem hilbFn_projectiveSpace (F : Type*) [Field F] (N : ℕ) (m : Unit → ℤ
     rw [this, finrank_gradedPiece_projectiveSpace]
   · rw [if_neg (fun h => hm (h ())), if_neg hm]
 
-theorem foldr_diffStep_binomFn (j N : ℕ) :
-    (List.replicate j (1 : Unit → ℤ)).foldr diffStep (fun m => binomFn (N + j) (m ())) =
-      fun m => binomFn N (m ()) := by
+theorem foldr_diffStep_binomFn (j N : ℕ)
+    : (List.replicate j (1 : Unit → ℤ)).foldr diffStep (fun m => binomFn (N + j) (m ()))
+      = fun m => binomFn N (m ()) := by
   induction j generalizing N with
   | zero => simp
   | succ j ih =>
@@ -107,8 +110,8 @@ theorem foldr_diffStep_binomFn (j N : ℕ) :
     simp only [diffStep, Pi.sub_apply, Pi.one_apply]
     exact binomFn_sub N (m ())
 
-theorem intNum_projectiveSpace (F : Type*) [Field F] (N : ℕ) :
-    intNum F (⊥ : Ideal (MRing (ProjIdx N) F)) (fun _ : Fin N => (1 : Unit → ℤ)) = 1 := by
+theorem intNum_projectiveSpace (F : Type*) [Field F] (N : ℕ)
+    : intNum F (⊥ : Ideal (MRing (ProjIdx N) F)) (fun _ : Fin N => (1 : Unit → ℤ)) = 1 := by
   have hh : hilbFn (⊥ : Ideal (MRing (ProjIdx N) F)) = fun m => binomFn (0 + N) (m ()) := by
     funext m
     rw [zero_add, hilbFn_projectiveSpace]
@@ -124,8 +127,8 @@ theorem intNum_projectiveSpace (F : Type*) [Field F] (N : ℕ) :
   obtain ⟨m, h1, h2⟩ := (hex.choose_spec.and hev).exists
   exact h1.symm.trans h2
 
-theorem blockIncl_injective {K K' : Type*} (j : K ↪ K') (ι' : K' → Type*) :
-    Function.Injective (blockIncl j ι') := by
+theorem blockIncl_injective {K K' : Type*} (j : K ↪ K') (ι' : K' → Type*)
+    : Function.Injective (blockIncl j ι') := by
   rintro ⟨a, x⟩ ⟨b, y⟩ h
   simp only [blockIncl, Sigma.mk.inj_iff] at h
   obtain ⟨h1, h2⟩ := h

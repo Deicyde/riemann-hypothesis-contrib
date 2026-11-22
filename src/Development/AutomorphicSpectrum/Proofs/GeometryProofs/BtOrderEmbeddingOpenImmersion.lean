@@ -19,33 +19,43 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.FlatLocalExt
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
+open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct
 open GlobalTheory.CompanionTheory.Ar.BT
 
 namespace GlobalTheory.CompanionTheory.Ar.BT
 
-theorem btEmb_localData (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] [IsNoetherianRing R]
-    (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T) (j : Γ.G.left ⟶ Spec (CommRingCat.of (Γ.btOrder ⊤)))
-    (hj : Γ.IsEmb (Γ.btOrder ⊤) j) (R' : Type) [CommRing R'] [IsDomain R'] [HenselianLocalRing R'] [Algebra R R']
-    [IsIntegrallyClosed R'] (hflat : Module.Flat R R') :
-    ∃ (Γ' : QFGroup R' T) (F : Γ'.G.left ⟶ Γ.G.left) (j' : Γ'.G.left ⟶ Spec (CommRingCat.of (Γ'.btOrder ⊤)))
-      (ψ : Γ.btOrder ⊤ →+* Γ'.btOrder ⊤) (U : Γ'.G.left.Opens),
-      (∀ (a : Γ.btOrder ⊤) (t : T), (ψ a).1 t = algebraMap R R' (a.1 t)) ∧
-      IsPullback (Spec.map (CommRingCat.ofHom ψ)) (Spec.map (CommRingCat.ofHom (algebraMap R' (Γ'.btOrder ⊤))))
-        (Spec.map (CommRingCat.ofHom (algebraMap R (Γ.btOrder ⊤)))) (Spec.map (CommRingCat.ofHom (algebraMap R R'))) ∧
-      IsPullback F j' j (Spec.map (CommRingCat.ofHom ψ)) ∧
-      IsOpenImmersion (U.ι ≫ j') ∧ Γ'.TranslatesCover (Γ'.btOrder ⊤) j' U ∧
-      ∀ x : Γ'.G.left, Spec.map (CommRingCat.ofHom (algebraMap R' (Γ'.btOrder ⊤))) (j' x) =
-        IsLocalRing.closedPoint R' → x ∈ U := by
+theorem btEmb_localData
+    (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] [IsNoetherianRing R]
+    (T : Type) [CommGroup T] [Finite T]
+    (Γ : QFGroup R T) (j : Γ.G.left ⟶ Spec (CommRingCat.of (Γ.btOrder ⊤)))
+    (hj : Γ.IsEmb (Γ.btOrder ⊤) j)
+    (R' : Type)
+    [CommRing R'] [IsDomain R'] [HenselianLocalRing R'] [Algebra R R'] [IsIntegrallyClosed R']
+    (hflat : Module.Flat R R')
+    : ∃ (Γ' : QFGroup R' T) (F : Γ'.G.left ⟶ Γ.G.left)
+        (j' : Γ'.G.left ⟶ Spec (CommRingCat.of (Γ'.btOrder ⊤))) (ψ : Γ.btOrder ⊤ →+* Γ'.btOrder ⊤)
+        (U : Γ'.G.left.Opens),
+      (∀ (a : Γ.btOrder ⊤) (t : T), (ψ a).1 t = algebraMap R R' (a.1 t))
+        ∧ IsPullback (Spec.map (CommRingCat.ofHom ψ))
+          (Spec.map (CommRingCat.ofHom (algebraMap R' (Γ'.btOrder ⊤))))
+          (Spec.map (CommRingCat.ofHom (algebraMap R (Γ.btOrder ⊤))))
+          (Spec.map (CommRingCat.ofHom (algebraMap R R')))
+        ∧ IsPullback F j' j (Spec.map (CommRingCat.ofHom ψ)) ∧ IsOpenImmersion (U.ι ≫ j')
+        ∧ Γ'.TranslatesCover (Γ'.btOrder ⊤) j' U
+        ∧ ∀ x : Γ'.G.left,
+          Spec.map (CommRingCat.ofHom (algebraMap R' (Γ'.btOrder ⊤))) (j' x)
+              = IsLocalRing.closedPoint R'
+            → x ∈ U := by
   have hA := GlobalTheory.CompanionTheory.Relay.btOrder_isHopfOrder_noetherian R T Γ
   have hinj : Function.Injective (algebraMap R R') := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro r hr
     by_contra hr0
     have hreg : IsSMulRegular R' r :=
       Module.Flat.isSMulRegular_of_nonZeroDivisors (M := R') (mem_nonZeroDivisors_of_ne_zero hr0)
-    have : r • (1 : R') = r • (0 : R') := by
-      simp [Algebra.smul_def, hr]
+    have : r • (1 : R') = r • (0 : R') := by simp [Algebra.smul_def, hr]
     exact one_ne_zero (hreg this)
   obtain ⟨Γ', F, hbc⟩ := GlobalTheory.T.exists_base_change_group R T Γ R' (algebraMap R R') hinj
   haveI := Γ'.quasiFinite
@@ -60,8 +70,9 @@ theorem btEmb_localData (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed
     obtain ⟨d, hd, hf⟩ := hA.full
     exact ⟨d, fun h => hd (hinj (by simpa using h)), hf⟩
   have hext := (GlobalTheory.T.hopf_order_scalar_extension R T R' (Γ.btOrder ⊤) hA hfull).2
-  have hext' : ∃ e : R' ⊗[R] (Γ.btOrder ⊤) ≃ₐ[R'] Γ'.btOrder ⊤,
-      ∀ (a : Γ.btOrder ⊤) (t : T), (e (1 ⊗ₜ a)).1 t = algebraMap R R' (a.1 t) := by
+  have hext'
+      : ∃ e : R' ⊗[R] (Γ.btOrder ⊤) ≃ₐ[R'] Γ'.btOrder ⊤, ∀ (a : Γ.btOrder ⊤) (t : T),
+        (e (1 ⊗ₜ a)).1 t = algebraMap R R' (a.1 t) := by
     rw [hbt]; exact hext
   obtain ⟨e, he⟩ := hext'
   let iL : R' →+* R' ⊗[R] (Γ.btOrder ⊤) := Algebra.TensorProduct.includeLeftRingHom
@@ -78,8 +89,9 @@ theorem btEmb_localData (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed
   haveI : IsIso eH := (e.toRingEquiv.toCommRingCatIso).isIso_hom
   have hb : Spec.map (CommRingCat.ofHom ψ) = Spec.map eH ≫ Spec.map (CommRingCat.ofHom iR) := by
     rw [← Spec.map_comp]; rfl
-  have hq : Spec.map (CommRingCat.ofHom (algebraMap R' (Γ'.btOrder ⊤))) =
-      Spec.map eH ≫ Spec.map (CommRingCat.ofHom iL) := by
+  have hq
+      : Spec.map (CommRingCat.ofHom (algebraMap R' (Γ'.btOrder ⊤)))
+        = Spec.map eH ≫ Spec.map (CommRingCat.ofHom iL) := by
     rw [← Spec.map_comp]
     congr 2
     ext r t
@@ -88,7 +100,8 @@ theorem btEmb_localData (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed
       (Spec.map (CommRingCat.ofHom (algebraMap R' (Γ'.btOrder ⊤))))
       (Spec.map (CommRingCat.ofHom (algebraMap R (Γ.btOrder ⊤))))
       (Spec.map (CommRingCat.ofHom (algebraMap R R'))) := by
-    refine IsPullback.of_iso sq.flip (asIso (Spec.map eH)).symm (Iso.refl _) (Iso.refl _) (Iso.refl _) ?_ ?_ ?_ ?_
+    refine IsPullback.of_iso sq.flip (asIso (Spec.map eH)).symm (Iso.refl _) (Iso.refl _)
+      (Iso.refl _) ?_ ?_ ?_ ?_
     · simp [hb]
     · simp [hq]
     · simp
@@ -104,10 +117,16 @@ theorem btEmb_localData (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed
   rw [← hj'.isOver]
   simpa using hx
 
-theorem btEmb_specMap_asIdeal {A B : Type} [CommRing A] [CommRing B] (φ : A →+* B) (x : Spec (CommRingCat.of B)) :
-    (Spec.map (CommRingCat.ofHom φ) x).asIdeal = Ideal.comap φ x.asIdeal := rfl
+theorem btEmb_specMap_asIdeal
+    {A B : Type} [CommRing A] [CommRing B] (φ : A →+* B) (x : Spec (CommRingCat.of B))
+    : (Spec.map (CommRingCat.ofHom φ) x).asIdeal = Ideal.comap φ x.asIdeal :=
+  rfl
 
-theorem isOpenImmersion_emb_and_translatesCover : ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] [IsNoetherianRing R] (T : Type) [CommGroup T] [Finite T] (Γ : QFGroup R T) (j : Γ.G.left ⟶ Spec (CommRingCat.of (Γ.btOrder ⊤))), Γ.IsEmb (Γ.btOrder ⊤) j → IsOpenImmersion j ∧ Γ.TranslatesCover (Γ.btOrder ⊤) j ⊤ := by
+theorem isOpenImmersion_emb_and_translatesCover
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] [IsNoetherianRing R] (T : Type)
+        [CommGroup T] [Finite T] (Γ : QFGroup R T)
+        (j : Γ.G.left ⟶ Spec (CommRingCat.of (Γ.btOrder ⊤))),
+      Γ.IsEmb (Γ.btOrder ⊤) j → IsOpenImmersion j ∧ Γ.TranslatesCover (Γ.btOrder ⊤) j ⊤ := by
   intro R _ _ _ _ T _ _ Γ j hj
   have hA := GlobalTheory.CompanionTheory.Relay.btOrder_isHopfOrder_noetherian R T Γ
   refine ⟨?_, ?_⟩
@@ -119,20 +138,42 @@ theorem isOpenImmersion_emb_and_translatesCover : ∀ (R : Type) [CommRing R] [I
       rw [hj.isOver]; exact Γ.finPres
     haveI := GlobalTheory.TangentCrit.locallyOfFinitePresentation_of_comp j
       (Spec.map (CommRingCat.ofHom (algebraMap R (Γ.btOrder ⊤))))
-    refine GlobalTheory.T.flat_local_extension_exists R Γ.G.left _ j (Spec.map (CommRingCat.ofHom (algebraMap R (Γ.btOrder ⊤)))) ?_
+    refine GlobalTheory.T.flat_local_extension_exists R Γ.G.left _ j
+      (Spec.map (CommRingCat.ofHom (algebraMap R (Γ.btOrder ⊤)))) ?_
     intro P _
-    obtain ⟨R', _, _, _, _, hic, hflat, hcomap⟩ := GlobalTheory.T.exists_henselian_flat_over_prime R P
+    obtain ⟨R', _, _, _, _, hic, hflat, hcomap⟩ :=
+      GlobalTheory.T.exists_henselian_flat_over_prime R P
     obtain ⟨Γ', F, j', ψ, U, -, hsq, hsq2, ho, -, hcl⟩ := btEmb_localData R T Γ j hj R' hflat
-    exact ⟨R', inferInstance, inferInstance, inferInstance, Γ'.G.left, _, j', _, F, _, U, hflat, hcomap, hsq, hsq2, ho, hcl⟩
+    exact ⟨
+      R',
+      inferInstance,
+      inferInstance,
+      inferInstance,
+      Γ'.G.left,
+      _,
+      j',
+      _,
+      F,
+      _,
+      U,
+      hflat,
+      hcomap,
+      hsq,
+      hsq2,
+      ho,
+      hcl
+    ⟩
   · intro P
     let p : Ideal R := P.asIdeal.comap (algebraMap R (Γ.btOrder ⊤))
     haveI : p.IsPrime := Ideal.comap_isPrime _ _
-    obtain ⟨R', _, _, _, _, hic, hflat, hcomap⟩ := GlobalTheory.T.exists_henselian_flat_over_prime R p
+    obtain ⟨R', _, _, _, _, hic, hflat, hcomap⟩ :=
+      GlobalTheory.T.exists_henselian_flat_over_prime R p
     obtain ⟨Γ', F, j', ψ, U, hψ, hsq, hsq2, -, hTC, -⟩ := btEmb_localData R T Γ j hj R' hflat
-    obtain ⟨z, hz1, hz2⟩ := Scheme.Pullback.exists_preimage_pullback
-      (f := Spec.map (CommRingCat.ofHom (algebraMap R (Γ.btOrder ⊤))))
-      (g := Spec.map (CommRingCat.ofHom (algebraMap R R'))) P (IsLocalRing.closedPoint R')
-      (PrimeSpectrum.ext hcomap.symm)
+    obtain ⟨z, hz1, hz2⟩ :=
+      Scheme.Pullback.exists_preimage_pullback
+        (f := Spec.map (CommRingCat.ofHom (algebraMap R (Γ.btOrder ⊤))))
+        (g := Spec.map (CommRingCat.ofHom (algebraMap R R'))) P (IsLocalRing.closedPoint R')
+        (PrimeSpectrum.ext hcomap.symm)
     let Q := hsq.isoPullback.inv z
     have hQ : Spec.map (CommRingCat.ofHom ψ) Q = P := by
       rw [← hz1]

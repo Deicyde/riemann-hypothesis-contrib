@@ -18,16 +18,20 @@ variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberFi
 def toK (K : Type) {F : Type} [Field K] [Field F] [Algebra F K] (t : 𝓞 F) : K :=
   algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) t)
 
-private theorem algebraMap_int_F_to_K_eq_algebraMap_coe (t : 𝓞 F) :
-    algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) t) = algebraMap F K (t : F) := rfl
+private theorem algebraMap_int_F_to_K_eq_algebraMap_coe (t : 𝓞 F)
+    : algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) t) = algebraMap F K (t : F) :=
+  rfl
 
-theorem mem_hcompl_of_notMem (hF : IsFixF K F) {P : Ideal (𝓞 K)} (hP : P.IsPrime) {t : 𝓞 F}
-    (ht : t ∉ P.comap (algebraMap (𝓞 F) (𝓞 K))) :
-    algebraMap (𝓞 F) (𝓞 K) t ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P := by
+theorem mem_hcompl_of_notMem
+    (hF : IsFixF K F)
+    {P : Ideal (𝓞 K)} (hP : P.IsPrime)
+    {t : 𝓞 F} (ht : t ∉ P.comap (algebraMap (𝓞 F) (𝓞 K)))
+    : algebraMap (𝓞 F) (𝓞 K) t ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P := by
   apply Submonoid.subset_closure
   refine ⟨ht, fun u hu => ?_⟩
-  have hfix : star (algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) t)) =
-      algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) t) := by
+  have hfix
+      : star (algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) t))
+        = algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) t) := by
     rw [algebraMap_int_F_to_K_eq_algebraMap_coe]
     exact (hF _).2 ⟨(t : F), rfl⟩
   rw [hfix] at hu
@@ -35,14 +39,17 @@ theorem mem_hcompl_of_notMem (hF : IsFixF K F) {P : Ideal (𝓞 K)} (hP : P.IsPr
   rw [hu']
   exact ht
 
-theorem div_mem_locRing {P : Ideal (𝓞 K)} (hP : P.IsPrime) (r : 𝓞 K) {s : 𝓞 K}
-    (hs : s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P) :
-    algebraMap (𝓞 K) K r / algebraMap (𝓞 K) K s ∈ locRing P :=
-  show _ ∈ Formalism.HermitianLatticesTheory.locR (K := K) P from (WA.mem_locR_iff hP _).2 ⟨r, s, hs, rfl⟩
+theorem div_mem_locRing
+    {P : Ideal (𝓞 K)} (hP : P.IsPrime)
+    (r : 𝓞 K)
+    {s : 𝓞 K} (hs : s ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P)
+    : algebraMap (𝓞 K) K r / algebraMap (𝓞 K) K s ∈ locRing P :=
+  show _ ∈ Formalism.HermitianLatticesTheory.locR (K := K) P from
+    (WA.mem_locR_iff hP _).2 ⟨r, s, hs, rfl⟩
 
-private theorem exists_int_preimage_of_star_fixed (hF : IsFixF K F) (x : 𝓞 K)
-    (hx : star (algebraMap (𝓞 K) K x) = algebraMap (𝓞 K) K x) :
-    ∃ t : 𝓞 F, algebraMap (𝓞 F) (𝓞 K) t = x := by
+private theorem exists_int_preimage_of_star_fixed
+    (hF : IsFixF K F) (x : 𝓞 K) (hx : star (algebraMap (𝓞 K) K x) = algebraMap (𝓞 K) K x)
+    : ∃ t : 𝓞 F, algebraMap (𝓞 F) (𝓞 K) t = x := by
   obtain ⟨f, hf⟩ := (hF _).1 hx
   have h1 : IsIntegral ℤ (algebraMap F K f) := by
     rw [hf]
@@ -53,13 +60,16 @@ private theorem exists_int_preimage_of_star_fixed (hF : IsFixF K F) (x : 𝓞 K)
   apply NumberField.RingOfIntegers.ext
   exact hf
 
-theorem exists_frac_of_fixed (hF : IsFixF K F) {P : Ideal (𝓞 K)} (hP : P.IsPrime) {a : K}
-    (ha : a ∈ locRing P) (hfix : star a = a) :
-    ∃ t s : 𝓞 F, s ∉ P.comap (algebraMap (𝓞 F) (𝓞 K)) ∧ a = toK K t / toK K s := by
+theorem exists_frac_of_fixed
+    (hF : IsFixF K F)
+    {P : Ideal (𝓞 K)} (hP : P.IsPrime)
+    {a : K} (ha : a ∈ locRing P) (hfix : star a = a)
+    : ∃ t s : 𝓞 F, s ∉ P.comap (algebraMap (𝓞 F) (𝓞 K)) ∧ a = toK K t / toK K s := by
   haveI := hP
   obtain ⟨r, s, hs, rfl⟩ := (WA.mem_locR_iff hP _).1 ha
   have hs1 : s ∉ P := Formalism.HermitianLatticesTheory.locBasic_hcompl_not_mem P s hs
-  have hs2 : conjO K s ∉ P := Formalism.HermitianLatticesTheory.locBasic_hcompl_not_mem P _ (WA.conjO_mem_hcompl hs)
+  have hs2 : conjO K s ∉ P :=
+    Formalism.HermitianLatticesTheory.locBasic_hcompl_not_mem P _ (WA.conjO_mem_hcompl hs)
   have hsK : algebraMap (𝓞 K) K s ≠ 0 := WA.algebraMap_ne_zero_of_mem_hcompl hP hs
   have hs'K : algebraMap (𝓞 K) K (conjO K s) ≠ 0 :=
     WA.algebraMap_ne_zero_of_mem_hcompl hP (WA.conjO_mem_hcompl hs)
@@ -67,8 +77,9 @@ theorem exists_frac_of_fixed (hF : IsFixF K F) {P : Ideal (𝓞 K)} (hP : P.IsPr
   have hNfix : star (algebraMap (𝓞 K) K (s * conjO K s)) = algebraMap (𝓞 K) K (s * conjO K s) := by
     rw [map_mul, hconj, star_mul, star_star, mul_comm]
   have hMfix : star (algebraMap (𝓞 K) K (r * conjO K s)) = algebraMap (𝓞 K) K (r * conjO K s) := by
-    have e : algebraMap (𝓞 K) K (r * conjO K s) =
-        (algebraMap (𝓞 K) K r / algebraMap (𝓞 K) K s) * algebraMap (𝓞 K) K (s * conjO K s) := by
+    have e
+        : algebraMap (𝓞 K) K (r * conjO K s)
+          = (algebraMap (𝓞 K) K r / algebraMap (𝓞 K) K s) * algebraMap (𝓞 K) K (s * conjO K s) := by
       rw [map_mul, map_mul]
       field_simp
     rw [e, star_mul', hfix, hNfix]
@@ -81,12 +92,13 @@ theorem exists_frac_of_fixed (hF : IsFixF K F) {P : Ideal (𝓞 K)} (hP : P.IsPr
   · unfold toK
     rw [htM, htN, map_mul, map_mul, mul_div_mul_right _ _ hs'K]
 
-theorem exists_isUnif (hF : IsFixF K F) {P : Ideal (𝓞 K)}
-    (hP : P.IsMaximal) :
-    ∃ π : K, IsUnif (locRing P) π ∧
-      (∀ z ∈ extP K (P.comap (algebraMap (𝓞 F) (𝓞 K))), Dv (locRing P) π (algebraMap (𝓞 K) K z)) ∧
-      ∀ z : 𝓞 K, Dv (locRing P) π (algebraMap (𝓞 K) K z * π⁻¹) →
-        z ∈ extP K (P.comap (algebraMap (𝓞 F) (𝓞 K))) ^ 2 := by
+theorem exists_isUnif (hF : IsFixF K F) {P : Ideal (𝓞 K)} (hP : P.IsMaximal)
+    : ∃ π : K,
+      IsUnif (locRing P) π
+        ∧ (∀ z ∈ extP K (P.comap (algebraMap (𝓞 F) (𝓞 K))), Dv (locRing P) π (algebraMap (𝓞 K) K z))
+        ∧ ∀ z : 𝓞 K,
+          Dv (locRing P) π (algebraMap (𝓞 K) K z * π⁻¹)
+            → z ∈ extP K (P.comap (algebraMap (𝓞 F) (𝓞 K))) ^ 2 := by
   have hPp : P.IsPrime := hP.isPrime
   haveI := hPp
   have hPne : P ≠ ⊥ := (Ideal.bot_lt_of_maximal P (NumberField.RingOfIntegers.not_isField K)).ne'
@@ -106,38 +118,44 @@ theorem exists_isUnif (hF : IsFixF K F) {P : Ideal (𝓞 K)}
     rcases mul_eq_zero.1 e with h1 | h1
     · exact hx0 (IsFractionRing.injective (𝓞 K) K (by rw [h1, map_zero]))
     · exact hx0 (IsFractionRing.injective (𝓞 K) K (by rw [star_eq_zero.1 h1, map_zero]))
-  have h𝔭ne : P.comap (algebraMap (𝓞 F) (𝓞 K)) ≠ ⊥ := fun h => hn0ne (by
-    rw [h] at hn0mem
-    exact (Submodule.mem_bot _).1 hn0mem)
+  have h𝔭ne : P.comap (algebraMap (𝓞 F) (𝓞 K)) ≠ ⊥ := fun h =>
+    hn0ne (by
+      rw [h] at hn0mem
+      exact (Submodule.mem_bot _).1 hn0mem)
   have h𝔭p : (P.comap (algebraMap (𝓞 F) (𝓞 K))).IsPrime := inferInstance
   have h𝔭max : (P.comap (algebraMap (𝓞 F) (𝓞 K))).IsMaximal := h𝔭p.isMaximal h𝔭ne
   have h𝔭top : P.comap (algebraMap (𝓞 F) (𝓞 K)) ≠ ⊤ := h𝔭max.ne_top
-  have hlt := Ideal.pow_right_strictAnti (P.comap (algebraMap (𝓞 F) (𝓞 K))) h𝔭ne h𝔭top
-    (show 1 < 2 by norm_num)
+  have hlt :=
+    Ideal.pow_right_strictAnti (P.comap (algebraMap (𝓞 F) (𝓞 K))) h𝔭ne h𝔭top
+      (show 1 < 2 by norm_num)
   obtain ⟨π₀, hπ₀, hπ₀2⟩ := SetLike.exists_of_lt hlt
   replace hπ₀ : π₀ ∈ P.comap (algebraMap (𝓞 F) (𝓞 K)) := by simpa using hπ₀
   replace hπ₀2 : π₀ ∉ P.comap (algebraMap (𝓞 F) (𝓞 K)) ^ 2 := hπ₀2
   have hdvd : P.comap (algebraMap (𝓞 F) (𝓞 K)) ∣ Ideal.span {π₀} :=
     Ideal.dvd_iff_le.2 ((Ideal.span_singleton_le_iff_mem _).2 hπ₀)
   obtain ⟨𝔞, h𝔞⟩ := hdvd
-  have hnle : ¬ 𝔞 ≤ P.comap (algebraMap (𝓞 F) (𝓞 K)) := fun hle => hπ₀2 (by
-    have hs : Ideal.span {π₀} ≤ P.comap (algebraMap (𝓞 F) (𝓞 K)) ^ 2 := by
-      rw [h𝔞, sq]
-      exact Ideal.mul_mono_right hle
-    exact hs (Ideal.mem_span_singleton_self π₀))
+  have hnle : ¬ 𝔞 ≤ P.comap (algebraMap (𝓞 F) (𝓞 K)) := fun hle =>
+    hπ₀2 (by
+      have hs : Ideal.span {π₀} ≤ P.comap (algebraMap (𝓞 F) (𝓞 K)) ^ 2 := by
+        rw [h𝔞, sq]
+        exact Ideal.mul_mono_right hle
+      exact hs (Ideal.mem_span_singleton_self π₀))
   obtain ⟨c, hc𝔞, hc𝔭⟩ := SetLike.not_le_iff_exists.1 hnle
-  have hA : ∀ z ∈ extP K (P.comap (algebraMap (𝓞 F) (𝓞 K))),
-      ∃ w : 𝓞 K, algebraMap (𝓞 F) (𝓞 K) c * z = algebraMap (𝓞 F) (𝓞 K) π₀ * w := by
+  have hA
+      : ∀ z ∈ extP K (P.comap (algebraMap (𝓞 F) (𝓞 K))), ∃ w : 𝓞 K,
+        algebraMap (𝓞 F) (𝓞 K) c * z = algebraMap (𝓞 F) (𝓞 K) π₀ * w := by
     intro z hz
     have hle : Ideal.span {c} * P.comap (algebraMap (𝓞 F) (𝓞 K)) ≤ Ideal.span {π₀} :=
       Ideal.span_singleton_mul_le_iff.2 fun y hy => by
         rw [h𝔞, mul_comm c y]
         exact Ideal.mul_mem_mul hy hc𝔞
-    have hmap : Ideal.span {algebraMap (𝓞 F) (𝓞 K) c} * extP K (P.comap (algebraMap (𝓞 F) (𝓞 K))) ≤
-        Ideal.span {algebraMap (𝓞 F) (𝓞 K) π₀} := by
+    have hmap
+        : Ideal.span {algebraMap (𝓞 F) (𝓞 K) c} * extP K (P.comap (algebraMap (𝓞 F) (𝓞 K)))
+          ≤ Ideal.span {algebraMap (𝓞 F) (𝓞 K) π₀} := by
       unfold extP
       have e1 := Ideal.map_mono (f := algebraMap (𝓞 F) (𝓞 K)) hle
-      rw [Ideal.map_mul, Ideal.map_span, Ideal.map_span, Set.image_singleton, Set.image_singleton] at e1
+      rw [Ideal.map_mul, Ideal.map_span, Ideal.map_span, Set.image_singleton, Set.image_singleton]
+        at e1
       exact e1
     have hm : algebraMap (𝓞 F) (𝓞 K) c * z ∈ Ideal.span {algebraMap (𝓞 F) (𝓞 K) π₀} :=
       hmap (Ideal.mul_mem_mul (Ideal.mem_span_singleton_self _) hz)
@@ -149,15 +167,19 @@ theorem exists_isUnif (hF : IsFixF K F) {P : Ideal (𝓞 K)}
     intro h
     rw [algebraMap_int_F_to_K_eq_algebraMap_coe, map_eq_zero] at h
     exact hπ₀ne (NumberField.RingOfIntegers.coe_eq_zero_iff.1 h)
-  have hπfix : star (algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) π₀)) =
-      algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) π₀) := by
+  have hπfix
+      : star (algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) π₀))
+        = algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) π₀) := by
     rw [algebraMap_int_F_to_K_eq_algebraMap_coe]
     exact (hF _).2 ⟨_, rfl⟩
-  have hcH : algebraMap (𝓞 F) (𝓞 K) c ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P := mem_hcompl_of_notMem hF hPp hc𝔭
+  have hcH : algebraMap (𝓞 F) (𝓞 K) c ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P :=
+    mem_hcompl_of_notMem hF hPp hc𝔭
   have hcK : algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) c) ≠ 0 :=
     WA.algebraMap_ne_zero_of_mem_hcompl hPp hcH
   refine ⟨algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) π₀), ⟨?_, hπfix, hπne, ?_, ?_⟩, ?_, ?_⟩
-  · have h1 := div_mem_locRing hPp (algebraMap (𝓞 F) (𝓞 K) π₀) (Formalism.HermitianLatticesTheory.hcompl (K := K) P).one_mem
+  · have h1 :=
+      div_mem_locRing hPp (algebraMap (𝓞 F) (𝓞 K) π₀)
+        (Formalism.HermitianLatticesTheory.hcompl (K := K) P).one_mem
     rwa [map_one, div_one] at h1
   · intro s hs hsfix
     obtain ⟨t, n, hn, hst⟩ := exists_frac_of_fixed hF hPp hs hsfix
@@ -170,8 +192,10 @@ theorem exists_isUnif (hF : IsFixF K F) {P : Ideal (𝓞 K)}
       show s * (algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) π₀))⁻¹ ∈ locRing P
       have e := congrArg (algebraMap (𝓞 K) K) hw
       rw [map_mul, map_mul] at e
-      have e2 : s * (algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) π₀))⁻¹ =
-          algebraMap (𝓞 K) K w / algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) c * algebraMap (𝓞 F) (𝓞 K) n) := by
+      have e2
+          : s * (algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) π₀))⁻¹
+            = algebraMap (𝓞 K) K w
+              / algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) c * algebraMap (𝓞 F) (𝓞 K) n) := by
         rw [hst, map_mul]
         unfold toK
         field_simp
@@ -191,21 +215,28 @@ theorem exists_isUnif (hF : IsFixF K F) {P : Ideal (𝓞 K)}
     have hs' : s ∈ Formalism.HermitianLatticesTheory.locR (K := K) P := hs
     obtain ⟨r, u, hu, rfl⟩ := (WA.mem_locR_iff hPp _).1 hs'
     have hu1 : u ∉ P := Formalism.HermitianLatticesTheory.locBasic_hcompl_not_mem P u hu
-    have hu2 : conjO K u ∉ P := Formalism.HermitianLatticesTheory.locBasic_hcompl_not_mem P _ (WA.conjO_mem_hcompl hu)
+    have hu2 : conjO K u ∉ P :=
+      Formalism.HermitianLatticesTheory.locBasic_hcompl_not_mem P _ (WA.conjO_mem_hcompl hu)
     have huK : algebraMap (𝓞 K) K u ≠ 0 := WA.algebraMap_ne_zero_of_mem_hcompl hPp hu
-    have hvP : u + algebraMap (𝓞 F) (𝓞 K) π₀ * r ∉ P := fun h => hu1 (by
-      have h2 := P.sub_mem h (P.mul_mem_right r hιπ₀P)
-      rwa [add_sub_cancel_right] at h2)
+    have hvP : u + algebraMap (𝓞 F) (𝓞 K) π₀ * r ∉ P := fun h =>
+      hu1 (by
+        have h2 := P.sub_mem h (P.mul_mem_right r hιπ₀P)
+        rwa [add_sub_cancel_right] at h2)
     have hcu : algebraMap (𝓞 K) K (conjO K u) = star (algebraMap (𝓞 K) K u) := rfl
     have hcr : algebraMap (𝓞 K) K (conjO K r) = star (algebraMap (𝓞 K) K r) := rfl
-    have hcv : algebraMap (𝓞 K) K (conjO K (u + algebraMap (𝓞 F) (𝓞 K) π₀ * r)) =
-        star (algebraMap (𝓞 K) K (u + algebraMap (𝓞 F) (𝓞 K) π₀ * r)) := rfl
-    have hconjv : conjO K (u + algebraMap (𝓞 F) (𝓞 K) π₀ * r) =
-        conjO K u + algebraMap (𝓞 F) (𝓞 K) π₀ * conjO K r := by
+    have hcv
+        : algebraMap (𝓞 K) K (conjO K (u + algebraMap (𝓞 F) (𝓞 K) π₀ * r))
+          = star (algebraMap (𝓞 K) K (u + algebraMap (𝓞 F) (𝓞 K) π₀ * r)) :=
+      rfl
+    have hconjv
+        : conjO K (u + algebraMap (𝓞 F) (𝓞 K) π₀ * r)
+          = conjO K u + algebraMap (𝓞 F) (𝓞 K) π₀ * conjO K r := by
       apply IsFractionRing.injective (𝓞 K) K
       rw [hcv]
       simp only [map_add (f := _), map_mul, star_add, star_mul', hπfix, hcu, hcr]
-    have hvH : u + algebraMap (𝓞 F) (𝓞 K) π₀ * r ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P := by
+    have hvH
+        : u + algebraMap (𝓞 F) (𝓞 K) π₀ * r
+          ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P := by
       apply Submonoid.subset_closure
       refine ⟨hvP, fun t ht => ?_⟩
       have htv : t = conjO K (u + algebraMap (𝓞 F) (𝓞 K) π₀ * r) :=
@@ -217,9 +248,10 @@ theorem exists_isUnif (hF : IsFixF K F) {P : Ideal (𝓞 K)}
         rwa [add_sub_cancel_right] at h2)
     have hvK : algebraMap (𝓞 K) K (u + algebraMap (𝓞 F) (𝓞 K) π₀ * r) ≠ 0 :=
       WA.algebraMap_ne_zero_of_mem_hcompl hPp hvH
-    have e : 1 + algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) π₀) *
-        (algebraMap (𝓞 K) K r / algebraMap (𝓞 K) K u) =
-        algebraMap (𝓞 K) K (u + algebraMap (𝓞 F) (𝓞 K) π₀ * r) / algebraMap (𝓞 K) K u := by
+    have e
+        : 1 + algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) π₀)
+            * (algebraMap (𝓞 K) K r / algebraMap (𝓞 K) K u)
+          = algebraMap (𝓞 K) K (u + algebraMap (𝓞 F) (𝓞 K) π₀ * r) / algebraMap (𝓞 K) K u := by
       rw [map_add (f := _), map_mul]
       field_simp
     rw [e]
@@ -231,15 +263,19 @@ theorem exists_isUnif (hF : IsFixF K F) {P : Ideal (𝓞 K)}
     show algebraMap (𝓞 K) K z * (algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) π₀))⁻¹ ∈ locRing P
     have e := congrArg (algebraMap (𝓞 K) K) hw
     rw [map_mul, map_mul] at e
-    have e2 : algebraMap (𝓞 K) K z * (algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) π₀))⁻¹ =
-        algebraMap (𝓞 K) K w / algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) c) := by
+    have e2
+        : algebraMap (𝓞 K) K z * (algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) π₀))⁻¹
+          = algebraMap (𝓞 K) K w / algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) c) := by
       field_simp
       linear_combination e
     rw [e2]
     exact div_mem_locRing hPp w hcH
   · intro z hz
-    have hz' : algebraMap (𝓞 K) K z * (algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) π₀))⁻¹ *
-        (algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) π₀))⁻¹ ∈ Formalism.HermitianLatticesTheory.locR (K := K) P := hz
+    have hz'
+        : algebraMap (𝓞 K) K z * (algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) π₀))⁻¹
+            * (algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) π₀))⁻¹
+          ∈ Formalism.HermitianLatticesTheory.locR (K := K) P :=
+      hz
     obtain ⟨r, u, hu, hru⟩ := (WA.mem_locR_iff hPp _).1 hz'
     have huK : algebraMap (𝓞 K) K u ≠ 0 := WA.algebraMap_ne_zero_of_mem_hcompl hPp hu
     have e1 : z * u = r * (algebraMap (𝓞 F) (𝓞 K) π₀) ^ 2 := by
@@ -248,9 +284,11 @@ theorem exists_isUnif (hF : IsFixF K F) {P : Ideal (𝓞 K)}
       field_simp at hru
       linear_combination hru
     have hu1 : u ∉ P := Formalism.HermitianLatticesTheory.locBasic_hcompl_not_mem P u hu
-    have hu2 : conjO K u ∉ P := Formalism.HermitianLatticesTheory.locBasic_hcompl_not_mem P _ (WA.conjO_mem_hcompl hu)
+    have hu2 : conjO K u ∉ P :=
+      Formalism.HermitianLatticesTheory.locBasic_hcompl_not_mem P _ (WA.conjO_mem_hcompl hu)
     have hcu : algebraMap (𝓞 K) K (conjO K u) = star (algebraMap (𝓞 K) K u) := rfl
-    have hNfix : star (algebraMap (𝓞 K) K (u * conjO K u)) = algebraMap (𝓞 K) K (u * conjO K u) := by
+    have hNfix
+        : star (algebraMap (𝓞 K) K (u * conjO K u)) = algebraMap (𝓞 K) K (u * conjO K u) := by
       rw [map_mul, hcu, star_mul, star_star, mul_comm]
     obtain ⟨n, hn⟩ := exists_int_preimage_of_star_fixed hF _ hNfix
     have hn𝔭 : n ∉ P.comap (algebraMap (𝓞 F) (𝓞 K)) := by
@@ -268,9 +306,12 @@ theorem exists_isUnif (hF : IsFixF K F) {P : Ideal (𝓞 K)}
       exact Ideal.mul_mem_mul (Ideal.mem_map_of_mem _ hi) (Ideal.mem_map_of_mem _ hi)
     have h1 : (1 : 𝓞 F) = y * (y * n + 2 * i) * n + i * i := by
       linear_combination (-(y * n + i + 1)) * hyi
-    have hz2 : z = algebraMap (𝓞 F) (𝓞 K) (y * (y * n + 2 * i)) * (z * algebraMap (𝓞 F) (𝓞 K) n) +
-        z * algebraMap (𝓞 F) (𝓞 K) (i * i) := by
-      calc z = z * algebraMap (𝓞 F) (𝓞 K) 1 := by rw [map_one, mul_one]
+    have hz2
+        : z
+          = algebraMap (𝓞 F) (𝓞 K) (y * (y * n + 2 * i)) * (z * algebraMap (𝓞 F) (𝓞 K) n)
+            + z * algebraMap (𝓞 F) (𝓞 K) (i * i) := by
+      calc
+        z = z * algebraMap (𝓞 F) (𝓞 K) 1 := by rw [map_one, mul_one]
         _ = _ := by
           rw [h1]
           simp only [map_add (f := _), map_mul]

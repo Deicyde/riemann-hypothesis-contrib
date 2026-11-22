@@ -9,9 +9,11 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem algebraMap_surjective_of_unramified_of_unique_point (K A : Type) [Field K] [IsAlgClosed K]
-    [CommRing A] [Algebra K A] [Module.Finite K A] [Algebra.FormallyUnramified K A]
-    (φ : A →ₐ[K] K) (hφ : ∀ ψ : A →ₐ[K] K, ψ = φ) : Function.Surjective (algebraMap K A) := by
+theorem algebraMap_surjective_of_unramified_of_unique_point
+    (K A : Type) [Field K] [IsAlgClosed K] [CommRing A] [Algebra K A] [Module.Finite K A]
+    [Algebra.FormallyUnramified K A]
+    (φ : A →ₐ[K] K) (hφ : ∀ ψ : A →ₐ[K] K, ψ = φ)
+    : Function.Surjective (algebraMap K A) := by
   haveI : IsReduced A := Algebra.FormallyUnramified.isReduced_of_field K A
   have hker : ∀ a : A, φ a = 0 → a = 0 := by
     intro a ha
@@ -32,13 +34,15 @@ theorem algebraMap_surjective_of_unramified_of_unique_point (K A : Type) [Field 
   apply hker
   simp
 
-theorem nontrivial_tensor_of_mem_support (R C K : Type) [CommRing R] [AddCommGroup C] [Module R C]
-    [Module.Finite R C] [Field K] [Algebra R K] (p : PrimeSpectrum R)
-    (hp : RingHom.ker (algebraMap R K) = p.asIdeal) (h : p ∈ Module.support R C) :
-    Nontrivial (K ⊗[R] C) := by
+theorem nontrivial_tensor_of_mem_support
+    (R C K : Type)
+    [CommRing R] [AddCommGroup C] [Module R C] [Module.Finite R C] [Field K] [Algebra R K]
+    (p : PrimeSpectrum R)
+    (hp : RingHom.ker (algebraMap R K) = p.asIdeal) (h : p ∈ Module.support R C)
+    : Nontrivial (K ⊗[R] C) := by
   rw [Module.mem_support_iff_nontrivial_residueField_tensorProduct] at h
-  let g : p.asIdeal.ResidueField →+* K := Ideal.ResidueField.lift p.asIdeal (algebraMap R K)
-    hp.ge (by
+  let g : p.asIdeal.ResidueField →+* K :=
+    Ideal.ResidueField.lift p.asIdeal (algebraMap R K) hp.ge (by
       intro r hr
       have : algebraMap R K r ≠ 0 := fun h0 => hr (hp.le h0)
       exact (isUnit_iff_ne_zero.mpr this))
@@ -153,15 +157,14 @@ private lemma exists_smul_mem_range_algebraMap_of_unique_lift {R B : Type} [Comm
   obtain ⟨a, ha⟩ := h0
   exact ⟨a, by simpa using ha.symm⟩
 
-
 open scoped TensorProduct in
-theorem _root_.GlobalTheory.algebraMap_bijective_of_unramified_of_unique_geometric_point :
-    ∀ (R B : Type) [CommRing R] [IsReduced R] [CommRing B] [Algebra R B] [Module.Finite R B]
-      [Algebra.FormallyUnramified R B] (P : Set (Ideal R)),
-      (∀ (q : Ideal R) (f : R), q.IsPrime → f ∉ q → ∃ p ∈ P, p.IsPrime ∧ q ≤ p ∧ f ∉ p) →
-      (∀ q ∈ P, ∃ (K : Type) (_ : Field K) (_ : IsAlgClosed K) (x : R →+* K),
-        RingHom.ker x = q ∧ ∃! y : B →+* K, y.comp (algebraMap R B) = x) →
-      Function.Bijective (algebraMap R B) := by
+theorem _root_.GlobalTheory.algebraMap_bijective_of_unramified_of_unique_geometric_point
+    : ∀ (R B : Type) [CommRing R] [IsReduced R] [CommRing B] [Algebra R B] [Module.Finite R B]
+        [Algebra.FormallyUnramified R B] (P : Set (Ideal R)),
+      (∀ (q : Ideal R) (f : R), q.IsPrime → f ∉ q → ∃ p ∈ P, p.IsPrime ∧ q ≤ p ∧ f ∉ p)
+        → (∀ q ∈ P, ∃ (K : Type) (_ : Field K) (_ : IsAlgClosed K) (x : R →+* K),
+          RingHom.ker x = q ∧ ∃! y : B →+* K, y.comp (algebraMap R B) = x)
+        → Function.Bijective (algebraMap R B) := by
   intro R B _ _ _ _ _ _ P hP hpt
   have hdense : _root_.GlobalTheory.ZM.DenseP P := by
     intro a ha
@@ -177,18 +180,22 @@ theorem _root_.GlobalTheory.algebraMap_bijective_of_unramified_of_unique_geometr
   have hs : Ideal.span s = ⊤ := by
     by_contra hne
     obtain ⟨m, hm, hsm⟩ := Ideal.exists_le_maximal _ hne
-    obtain ⟨p, hpP, -, hmp, h1p⟩ := hP m 1 hm.isPrime
-      (fun h => hm.ne_top ((Ideal.eq_top_iff_one m).mpr h))
+    obtain ⟨p, hpP, -, hmp, h1p⟩ :=
+      hP m 1 hm.isPrime (fun h => hm.ne_top ((Ideal.eq_top_iff_one m).mpr h))
     have hpm : p = m := (hm.eq_of_le ((Ideal.ne_top_iff_one p).mpr h1p) hmp).symm
     obtain ⟨K, _, _, x, hx, hy⟩ := hpt p hpP
     obtain ⟨f, hf, hfb⟩ := exists_smul_mem_range_algebraMap_of_unique_lift x hy
     apply hf
     rw [hx, hpm]
     exact hsm (Ideal.subset_span (hfb b))
-  have hb := Submodule.mem_of_span_eq_top_of_smul_pow_mem M s hs b (fun r => ⟨1, by
-    obtain ⟨a, ha⟩ := r.2
-    rw [pow_one, ha]
-    exact ⟨a, rfl⟩⟩)
+  have hb :=
+    Submodule.mem_of_span_eq_top_of_smul_pow_mem M s hs b (fun r => ⟨
+      1,
+      by
+        obtain ⟨a, ha⟩ := r.2
+        rw [pow_one, ha]
+        exact ⟨a, rfl⟩
+    ⟩)
   obtain ⟨a, ha⟩ := hb
   exact ⟨a, ha⟩
 

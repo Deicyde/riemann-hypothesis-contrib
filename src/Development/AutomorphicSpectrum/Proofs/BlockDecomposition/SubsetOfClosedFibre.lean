@@ -31,16 +31,20 @@ lemma isClosed_badSet {X : Scheme.{0}} {P : X.Modules} (S : Subobject P) : IsClo
   rw [← isOpen_compl_iff, badSet_compl_eq]
   exact isOpen_biUnion fun V _ => (V : X.Opens).isOpen
 
-theorem subset_of_closedFibre {A : Type} [CommRing A] (I : Ideal A) (hI : IsAdicComplete I A)
-    {X : Scheme.{0}} [X.Over (Spec (.of A))] [IsProper (X ↘ Spec (.of A))] (O : X.Opens) (C : Set X)
-    (hC : IsClosed C) (h : ∀ x ∈ C, I ≤ ((X ↘ Spec (.of A)).base x).asIdeal → x ∈ (O : Set X)) :
-    C ⊆ O := by
-
-  have hZ := GlobalTheory.CompanionTheory.ClosedFibre.closed_missing_closedFibre_empty A I hI
-    (Over.mk (X ↘ Spec (.of A))) (inferInstanceAs (UniversallyClosed (X ↘ Spec (.of A))))
-    (C ∩ (O : Set X)ᶜ) (hC.inter O.isOpen.isClosed_compl) (by
-      rintro x ⟨hxC, hxO⟩ hIx
-      exact hxO (h x hxC hIx))
+theorem subset_of_closedFibre
+    {A : Type} [CommRing A]
+    (I : Ideal A) (hI : IsAdicComplete I A)
+    {X : Scheme.{0}} [X.Over (Spec (.of A))] [IsProper (X ↘ Spec (.of A))]
+    (O : X.Opens) (C : Set X)
+    (hC : IsClosed C) (h : ∀ x ∈ C, I ≤ ((X ↘ Spec (.of A)).base x).asIdeal → x ∈ (O : Set X))
+    : C ⊆ O := by
+  have hZ :=
+    GlobalTheory.CompanionTheory.ClosedFibre.closed_missing_closedFibre_empty A I hI
+      (Over.mk (X ↘ Spec (.of A))) (inferInstanceAs (UniversallyClosed (X ↘ Spec (.of A))))
+      (C ∩ (O : Set X)ᶜ) (hC.inter O.isOpen.isClosed_compl)
+      (by
+        rintro x ⟨hxC, hxO⟩ hIx
+        exact hxO (h x hxC hIx))
   intro x hx
   by_contra hxO
   have hx' : x ∈ C ∩ (O : Set X)ᶜ := ⟨hx, hxO⟩

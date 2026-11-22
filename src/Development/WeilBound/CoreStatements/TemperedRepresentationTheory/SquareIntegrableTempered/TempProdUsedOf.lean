@@ -14,11 +14,15 @@ open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.Loc
 
 namespace PositivityTheory.Zltwo
 
-theorem essSqIntUsed_of (hE : GlobalTheory.Published.LanglandsExhaustionGL)
-    (hS : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [CharZero k],
+theorem essSqIntUsed_of
+    (hE : GlobalTheory.Published.LanglandsExhaustionGL)
+    (hS : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
+        [IsNonarchimedeanLocalField k] [CharZero k],
       Zc.LSocleGL k)
-    (hL : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [CharZero k],
-      Zc.LSegExists k) : EssSqIntUsed := by
+    (hL : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
+        [IsNonarchimedeanLocalField k] [CharZero k],
+      Zc.LSegExists k)
+    : EssSqIntUsed := by
   intro k _ _ _ _ _ δ h1 hδ
   exact Zz.sqInt_isLSeg hE k (hS k) (Zl.JC.casselmanNecSq_holds k) (hL k) δ h1 hδ
 

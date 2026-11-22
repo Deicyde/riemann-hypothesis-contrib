@@ -25,9 +25,10 @@ theorem ggens_mono (T : Tower p Ω) {m n : ℕ} (h : m ≤ n) : ggens T m ⊆ gg
   unfold ggens
   gcongr
 
-theorem fixes_ggens (T : Tower p Ω) (N : ℕ) (g : Gal p Ω)
-    (hg : g ∈ Ggeo p Ω ⊓ MulAction.stabilizer (Gal p Ω) (T.qq N)) :
-    ∀ a ∈ ggens T N, g a = a := by
+theorem fixes_ggens
+    (T : Tower p Ω) (N : ℕ) (g : Gal p Ω)
+    (hg : g ∈ Ggeo p Ω ⊓ MulAction.stabilizer (Gal p Ω) (T.qq N))
+    : ∀ a ∈ ggens T N, g a = a := by
   have hgeo : ∀ x : Ω, IsAlgZp p x → g x = x := (Subgroup.mem_inf.mp hg).1
   have hq : g (T.qq N) = T.qq N := (Subgroup.mem_inf.mp hg).2
   rintro a ((⟨r, rfl⟩ | ha) | ⟨i, hi, rfl⟩)
@@ -36,9 +37,9 @@ theorem fixes_ggens (T : Tower p Ω) (N : ℕ) (g : Gal p Ω)
   · have hi' : i + (N - i) = N := Nat.add_sub_cancel' hi
     rw [GlobalTheory.K5.FinLevel.qq_eq_pow T i (N - i), hi', map_pow, hq]
 
-theorem exists_level_of_fixed (hClo : IsClo p Ω) (T : Tower p Ω) (y : Ω)
-    (hy : ∀ h ∈ Ggeo p Ω ⊓ ⨅ n, Gn T n, h y = y) :
-    ∃ N, ∀ g ∈ Ggeo p Ω ⊓ MulAction.stabilizer (Gal p Ω) (T.qq N), g y = y := by
+theorem exists_level_of_fixed
+    (hClo : IsClo p Ω) (T : Tower p Ω) (y : Ω) (hy : ∀ h ∈ Ggeo p Ω ⊓ ⨅ n, Gn T n, h y = y)
+    : ∃ N, ∀ g ∈ Ggeo p Ω ⊓ MulAction.stabilizer (Gal p Ω) (T.qq N), g y = y := by
   haveI := GlobalTheory.K5.FinLevel.charZero_of_tower T
   let L : IntermediateField ℚ Ω := IntermediateField.adjoin ℚ (⋃ n, ggens T n)
   have hmemL : ∀ a ∈ ⋃ n, ggens T n, a ∈ L := fun a ha => IntermediateField.subset_adjoin ℚ _ ha
@@ -68,8 +69,10 @@ theorem exists_level_of_fixed (hClo : IsClo p Ω) (T : Tower p Ω) (y : Ω)
       let g : Gal p Ω := AlgEquiv.ofRingEquiv (f := f.toRingEquiv) (fun r => f.commutes (φ r))
       have hfix : ∀ a ∈ ⋃ n, ggens T n, g a = a := fun a ha => f.commutes ⟨a, hmemL a ha⟩
       have hg : g ∈ Ggeo p Ω ⊓ ⨅ n, Gn T n := by
-        refine Subgroup.mem_inf.mpr ⟨fun x hx => hfix x (Set.mem_iUnion.mpr ⟨0, Or.inl (Or.inr hx)⟩),
-          Subgroup.mem_iInf.mpr fun n => Subgroup.mem_inf.mpr ⟨?_, ?_⟩⟩
+        refine Subgroup.mem_inf.mpr ⟨
+          fun x hx => hfix x (Set.mem_iUnion.mpr ⟨0, Or.inl (Or.inr hx)⟩),
+          Subgroup.mem_iInf.mpr fun n => Subgroup.mem_inf.mpr ⟨?_, ?_⟩
+        ⟩
         · exact hfix _ (Set.mem_iUnion.mpr ⟨0, Or.inl (Or.inr (isAlgZp_zeta T n))⟩)
         · exact hfix _ (Set.mem_iUnion.mpr ⟨n, Or.inr ⟨n, Set.mem_Iic.mpr le_rfl, rfl⟩⟩)
       exact hy g hg
@@ -84,7 +87,8 @@ theorem exists_level_of_fixed (hClo : IsClo p Ω) (T : Tower p Ω) (y : Ω)
   have hyN : y ∈ IntermediateField.adjoin ℚ (ggens T (S.sup m)) :=
     IntermediateField.adjoin.mono ℚ _ _ hSN hyS
   let gq : Ω ≃ₐ[ℚ] Ω := AlgEquiv.ofRingEquiv (f := g.toRingEquiv) (fun q => by simp)
-  have hle : Algebra.adjoin ℚ (ggens T (S.sup m)) ≤ AlgHom.equalizer (gq : Ω →ₐ[ℚ] Ω) (AlgHom.id ℚ Ω) :=
+  have hle
+      : Algebra.adjoin ℚ (ggens T (S.sup m)) ≤ AlgHom.equalizer (gq : Ω →ₐ[ℚ] Ω) (AlgHom.id ℚ Ω) :=
     Algebra.adjoin_le fun a ha => fixes_ggens T _ g hg a ha
   obtain ⟨r, hr, s, hs, rfl⟩ := IntermediateField.mem_adjoin_iff_div.mp hyN
   have hr' : g r = r := hle hr
@@ -93,25 +97,33 @@ theorem exists_level_of_fixed (hClo : IsClo p Ω) (T : Tower p Ω) (y : Ω)
 
 end GlobalTheory.K5.GeoLevel
 
-theorem GlobalTheory.K5.geo_invariants_from_finite_level :
-    ∀ (p : ℕ) [Fact p.Prime], p ≠ 2 → ∀ (Ω : Type) [Field Ω] [Algebra (O0 p) Ω], IsClo p Ω →
-  ∀ (T : Tower p Ω) (k j : ℕ), 1 ≤ j → ∀ x : Ω, IsInt (p := p) x →
-  (∀ g ∈ Ggeo p Ω ⊓ ⨅ n, Gn T n, Cong (p := p) k (g x) x) →
-  ∃ y : Ω, IsInt (p := p) y ∧ (∃ N, ∀ g ∈ Ggeo p Ω ⊓ MulAction.stabilizer (Gal p Ω) (T.qq N), g y = y) ∧
-    Cong (p := p) k ((T.ζ j - 1) * x) y := by
+theorem GlobalTheory.K5.geo_invariants_from_finite_level
+    : ∀ (p : ℕ) [Fact p.Prime],
+      p ≠ 2
+        → ∀ (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
+          IsClo p Ω
+            → ∀ (T : Tower p Ω) (k j : ℕ),
+              1 ≤ j
+                → ∀ x : Ω,
+                  IsInt (p := p) x → (∀ g ∈ Ggeo p Ω ⊓ ⨅ n, Gn T n, Cong (p := p) k (g x) x)
+                    → ∃ y : Ω,
+                      IsInt (p := p) y
+                        ∧ (∃ N, ∀ g ∈ Ggeo p Ω ⊓ MulAction.stabilizer (Gal p Ω) (T.qq N), g y = y)
+                        ∧ Cong (p := p) k ((T.ζ j - 1) * x) y := by
   intro p _ hp2 Ω _ _ hClo T k j hj x hx hfix
   obtain ⟨y₀, E, hy₀, hEH, huniq, hsum⟩ :=
-    GlobalTheory.T.smallTraces_subgroup_galois_towerTop p Ω hp2 hClo T (Ggeo p Ω ⊓ ⨅ n, Gn T n) inf_le_right {x} j hj
+    GlobalTheory.T.smallTraces_subgroup_galois_towerTop p Ω hp2 hClo T (Ggeo p Ω ⊓ ⨅ n, Gn T n)
+      inf_le_right {x} j hj
   have hgi : ∀ (g : Gal p Ω) (z : Ω), IsInt (p := p) z → IsInt (p := p) (g z) := fun g z hz =>
     hz.map (g : Ω →ₐ[O0 p] Ω)
   refine ⟨∑ g ∈ E, g (y₀ * x), ?_, ?_, ?_⟩
   · exact IsIntegral.sum _ fun g _ => hgi g _ (hy₀.mul hx)
   · exact GlobalTheory.K5.GeoLevel.exists_level_of_fixed hClo T _
       (GlobalTheory.K5.FinLevel.sum_fixed _ E y₀ x hEH huniq)
-  · have hz : ∀ g ∈ E, ∃ z : Ω, IsInt (p := p) z ∧ g x - x = (p : Ω) ^ k * z :=
-      fun g hg => hfix g (hEH g hg)
+  · have hz : ∀ g ∈ E, ∃ z : Ω, IsInt (p := p) z ∧ g x - x = (p : Ω) ^ k * z := fun g hg =>
+      hfix g (hEH g hg)
     choose! z hzi hzx using hz
-    refine ⟨-∑ g ∈ E, g y₀ * z g, ?_, ?_⟩
+    refine ⟨- ∑ g ∈ E, g y₀ * z g, ?_, ?_⟩
     · exact (IsIntegral.sum _ fun g hg => (hgi g _ hy₀).mul (hzi g hg)).neg
     · rw [← hsum, Finset.sum_mul, ← Finset.sum_sub_distrib, mul_neg, Finset.mul_sum,
         ← Finset.sum_neg_distrib]

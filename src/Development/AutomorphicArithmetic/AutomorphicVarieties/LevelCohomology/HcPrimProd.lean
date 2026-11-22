@@ -5,10 +5,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.X
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.X
 
-theorem UpperTheory.V.X.primProd :
-    ∀ (O : Type) [CommRing O] [IsDomain O] (M N : ℕ) [NeZero M] [NeZero N] (χ : DirichletCharacter O M) (θ : DirichletCharacter O N), ∃ (f : ℕ) (φ : DirichletCharacter O f), φ.IsPrimitive ∧ f ∣ M * θ.conductor ∧ (∀ t : ℕ, χ ^ t = 1 → θ ^ t = 1 → φ ^ t = 1) ∧ ∀ a : ℤ, IsCoprime a (M * N : ℕ) → φ a = χ a * θ a := by
+theorem UpperTheory.V.X.primProd
+    : ∀ (O : Type) [CommRing O] [IsDomain O] (M N : ℕ) [NeZero M] [NeZero N]
+        (χ : DirichletCharacter O M) (θ : DirichletCharacter O N),
+      ∃ (f : ℕ) (φ : DirichletCharacter O f),
+        φ.IsPrimitive ∧ f ∣ M * θ.conductor ∧ (∀ t : ℕ, χ ^ t = 1 → θ ^ t = 1 → φ ^ t = 1)
+          ∧ ∀ a : ℤ, IsCoprime a (M * N : ℕ) → φ a = χ a * θ a := by
   intro O _ _ M N _ _ χ θ
   have hc0 : θ.conductor ≠ 0 := θ.conductor_ne_zero
   haveI : NeZero θ.conductor := ⟨hc0⟩
@@ -18,7 +23,14 @@ theorem UpperTheory.V.X.primProd :
   have hC : θ.conductor ∣ M * θ.conductor := dvd_mul_left _ M
   set ψ : DirichletCharacter O (M * θ.conductor) :=
     DirichletCharacter.changeLevel hM χ * DirichletCharacter.changeLevel hC θ' with hψe
-  refine ⟨ψ.conductor, ψ.primitiveCharacter, ψ.primitiveCharacter_isPrimitive, ψ.conductor_dvd_level, ?_, ?_⟩
+  refine ⟨
+    ψ.conductor,
+    ψ.primitiveCharacter,
+    ψ.primitiveCharacter_isPrimitive,
+    ψ.conductor_dvd_level,
+    ?_,
+    ?_
+  ⟩
   · intro t hχ hθ
     have hθ1 : θ' ^ t = 1 := by
       rw [← DirichletCharacter.changeLevel_eq_one_iff θ.conductor_dvd_level, map_pow,

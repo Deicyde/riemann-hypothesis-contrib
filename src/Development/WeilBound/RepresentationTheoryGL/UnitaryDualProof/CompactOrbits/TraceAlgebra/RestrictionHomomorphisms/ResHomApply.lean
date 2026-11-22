@@ -12,10 +12,11 @@ namespace PositivityTheory.RgUd.T.Alg.Iso2
 
 variable {k : Type} [Field k] [CharZero k]
 
-theorem iso_of_field {K W W' : Type} [Field K] [Algebra k K] [FiniteDimensional k K]
-    [AddCommGroup W] [Module k W] [FiniteDimensional k W] [AddCommGroup W'] [Module k W'] [FiniteDimensional k W']
-    (σ : K →ₐ[k] Module.End k W) (σ' : K →ₐ[k] Module.End k W') (h : finrank k W = finrank k W') :
-    ∃ φ : W ≃ₗ[k] W', ∀ c w, φ (σ c w) = σ' c (φ w) := by
+theorem iso_of_field
+    {K W W' : Type} [Field K] [Algebra k K] [FiniteDimensional k K] [AddCommGroup W] [Module k W]
+    [FiniteDimensional k W] [AddCommGroup W'] [Module k W'] [FiniteDimensional k W']
+    (σ : K →ₐ[k] Module.End k W) (σ' : K →ₐ[k] Module.End k W') (h : finrank k W = finrank k W')
+    : ∃ φ : W ≃ₗ[k] W', ∀ c w, φ (σ c w) = σ' c (φ w) := by
   classical
   letI : Module K W := Module.compHom W σ.toRingHom
   letI : Module K W' := Module.compHom W' σ'.toRingHom
@@ -39,20 +40,22 @@ theorem iso_of_field {K W W' : Type} [Field K] [Algebra k K] [FiniteDimensional 
 
 variable {n : ℕ} {R : Type} [CommRing R] [Algebra k R]
 
-def resHom (ρ : R →ₐ[k] Module.End k (Fin n → k)) (e : R) :
-    R →ₐ[k] Module.End k (LinearMap.range (ρ e)) where
-  toFun r := (ρ r).restrict (p := LinearMap.range (ρ e)) (q := LinearMap.range (ρ e)) (fun x hx => by
-    obtain ⟨y, rfl⟩ := hx
-    refine ⟨ρ r y, ?_⟩
-    rw [← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul, ← map_mul, mul_comm])
+def resHom (ρ : R →ₐ[k] Module.End k (Fin n → k)) (e : R)
+    : R →ₐ[k] Module.End k (LinearMap.range (ρ e)) where
+  toFun r :=
+    (ρ r).restrict (p := LinearMap.range (ρ e)) (q := LinearMap.range (ρ e)) (fun x hx => by
+      obtain ⟨y, rfl⟩ := hx
+      refine ⟨ρ r y, ?_⟩
+      rw [← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul, ← map_mul, mul_comm])
   map_one' := by ext x; simp
   map_mul' a b := by ext x; simp
   map_zero' := by ext x; simp
   map_add' a b := by ext x; simp
   commutes' c := by ext x; simp [Algebra.algebraMap_eq_smul_one]
 
-theorem resHom_apply (ρ : R →ₐ[k] Module.End k (Fin n → k)) (e r : R) (x : LinearMap.range (ρ e)) :
-    ((resHom ρ e r x : LinearMap.range (ρ e)) : Fin n → k) = ρ r x := rfl
+theorem resHom_apply (ρ : R →ₐ[k] Module.End k (Fin n → k)) (e r : R) (x : LinearMap.range (ρ e))
+    : ((resHom ρ e r x : LinearMap.range (ρ e)) : Fin n → k) = ρ r x :=
+  rfl
 
 end PositivityTheory.RgUd.T.Alg.Iso2
 
@@ -62,9 +65,13 @@ open Module
 
 variable {k : Type} [Field k] [CharZero k]
 
-theorem proj_of_mem {n : ℕ} {R : Type} [CommRing R] [Algebra k R] (ρ : R →ₐ[k] Module.End k (Fin n → k))
-    {ι : Type} [DecidableEq ι] (e : ι → R) (he : ∀ I J, e I * e J = if I = J then e I else 0) (I J : ι)
-    (x : Fin n → k) (hx : x ∈ LinearMap.range (ρ (e I))) : ρ (e J) x = if I = J then x else 0 := by
+theorem proj_of_mem
+    {n : ℕ} {R : Type} [CommRing R] [Algebra k R]
+    (ρ : R →ₐ[k] Module.End k (Fin n → k))
+    {ι : Type} [DecidableEq ι]
+    (e : ι → R) (he : ∀ I J, e I * e J = if I = J then e I else 0)
+    (I J : ι) (x : Fin n → k) (hx : x ∈ LinearMap.range (ρ (e I)))
+    : ρ (e J) x = if I = J then x else 0 := by
   obtain ⟨y, rfl⟩ := hx
   rw [← Module.End.mul_apply, ← map_mul, he J I]
   by_cases h : I = J
@@ -72,12 +79,15 @@ theorem proj_of_mem {n : ℕ} {R : Type} [CommRing R] [Algebra k R] (ρ : R →�
     simp
   · simp [h, Ne.symm h]
 
-private theorem comp_lemma {n : ℕ} {R : Type} [CommRing R] [Algebra k R] [FiniteDimensional k R]
-    (ρ ρ' : R →ₐ[k] Module.End k (Fin n → k)) (e : R) (he : e * e = e)
-    (m : Ideal R) [m.IsMaximal] (hm : ∀ a ∈ m, a * e = 0)
-    (htr : LinearMap.trace k (Fin n → k) (ρ e) = LinearMap.trace k (Fin n → k) (ρ' e)) :
-    ∃ φ : LinearMap.range (ρ e) ≃ₗ[k] LinearMap.range (ρ' e),
-      ∀ r x, φ (resHom ρ e r x) = resHom ρ' e r (φ x) := by
+private theorem comp_lemma
+    {n : ℕ} {R : Type} [CommRing R] [Algebra k R] [FiniteDimensional k R]
+    (ρ ρ' : R →ₐ[k] Module.End k (Fin n → k))
+    (e : R) (he : e * e = e)
+    (m : Ideal R) [m.IsMaximal]
+    (hm : ∀ a ∈ m, a * e = 0)
+    (htr : LinearMap.trace k (Fin n → k) (ρ e) = LinearMap.trace k (Fin n → k) (ρ' e))
+    : ∃ φ : LinearMap.range (ρ e) ≃ₗ[k] LinearMap.range (ρ' e), ∀ r x,
+      φ (resHom ρ e r x) = resHom ρ' e r (φ x) := by
   letI : Field (R ⧸ m) := Ideal.Quotient.field m
   haveI : FiniteDimensional k (R ⧸ m) :=
     Module.Finite.of_surjective (Ideal.Quotient.mkₐ k m).toLinearMap (Ideal.Quotient.mkₐ_surjective k m)
@@ -93,34 +103,50 @@ private theorem comp_lemma {n : ℕ} {R : Type} [CommRing R] [Algebra k R] [Fini
   have hdim : finrank k (LinearMap.range (ρ e)) = finrank k (LinearMap.range (ρ' e)) := by
     have h1 := htr
     rw [(LinearMap.IsIdempotentElem.isProj_range _ (hI ρ)).trace,
-      (LinearMap.IsIdempotentElem.isProj_range _ (hI ρ')).trace] at h1
+        (LinearMap.IsIdempotentElem.isProj_range _ (hI ρ')).trace]
+      at h1
     exact_mod_cast h1
-  obtain ⟨φ, hφ⟩ := iso_of_field (Ideal.Quotient.liftₐ m (resHom ρ e) (h0 ρ))
-    (Ideal.Quotient.liftₐ m (resHom ρ' e) (h0 ρ')) hdim
+  obtain ⟨φ, hφ⟩ :=
+    iso_of_field (Ideal.Quotient.liftₐ m (resHom ρ e) (h0 ρ))
+      (Ideal.Quotient.liftₐ m (resHom ρ' e) (h0 ρ')) hdim
   refine ⟨φ, fun r x => ?_⟩
   exact hφ (Ideal.Quotient.mk m r) x
 
-private theorem mul_eq_mul_of_ratio_eq_one {n : ℕ} {R : Type} [CommRing R] [Algebra k R]
-    (ρ ρ' : R →ₐ[k] Module.End k (Fin n → k)) {ι : Type} [Fintype ι] [DecidableEq ι] (e : ι → R)
-    (he : ∀ I J, e I * e J = if I = J then e I else 0) (hs : ∑ i, e i = 1)
-    (φ : ∀ i, LinearMap.range (ρ (e i)) ≃ₗ[k] LinearMap.range (ρ' (e i))) (v : Fin n → k) :
-    (∑ i, (LinearMap.range (ρ (e i))).subtype ∘ₗ (φ i).symm.toLinearMap ∘ₗ (ρ' (e i)).rangeRestrict)
-      ((∑ i, (LinearMap.range (ρ' (e i))).subtype ∘ₗ (φ i).toLinearMap ∘ₗ (ρ (e i)).rangeRestrict) v) = v := by
-  have inner : ∀ i j, (((φ j).symm ((ρ' (e j)).rangeRestrict
-      ((φ i ((ρ (e i)).rangeRestrict v) : LinearMap.range (ρ' (e i))) : Fin n → k)) :
-        LinearMap.range (ρ (e j))) : Fin n → k) = if i = j then ρ (e i) v else 0 := by
+private theorem mul_eq_mul_of_ratio_eq_one
+    {n : ℕ} {R : Type} [CommRing R] [Algebra k R]
+    (ρ ρ' : R →ₐ[k] Module.End k (Fin n → k))
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (e : ι → R) (he : ∀ I J, e I * e J = if I = J then e I else 0) (hs : ∑ i, e i = 1)
+    (φ : ∀ i, LinearMap.range (ρ (e i)) ≃ₗ[k] LinearMap.range (ρ' (e i)))
+    (v : Fin n → k)
+    : (∑ i, (LinearMap.range (ρ (e i))).subtype ∘ₗ (φ i).symm.toLinearMap ∘ₗ (ρ' (e i)).rangeRestrict)
+        ((∑ i, (LinearMap.range (ρ' (e i))).subtype ∘ₗ (φ i).toLinearMap ∘ₗ (ρ (e i)).rangeRestrict)
+          v)
+      = v := by
+  have inner
+      : ∀ i j,
+        (((φ j).symm
+                ((ρ' (e j)).rangeRestrict
+                  ((φ i ((ρ (e i)).rangeRestrict v) : LinearMap.range (ρ' (e i))) : Fin n → k))
+              : LinearMap.range (ρ (e j)))
+            : Fin n → k)
+          = if i = j then ρ (e i) v else 0 := by
     intro i j
     by_cases h : i = j
     · subst h
-      have h1 : (ρ' (e i)).rangeRestrict ((φ i ((ρ (e i)).rangeRestrict v) : LinearMap.range (ρ' (e i))) : Fin n → k)
-          = φ i ((ρ (e i)).rangeRestrict v) := by
+      have h1
+          : (ρ' (e i)).rangeRestrict
+              ((φ i ((ρ (e i)).rangeRestrict v) : LinearMap.range (ρ' (e i))) : Fin n → k)
+            = φ i ((ρ (e i)).rangeRestrict v) := by
         apply Subtype.ext
         have := proj_of_mem ρ' e he i i _ (φ i ((ρ (e i)).rangeRestrict v)).2
         simpa using this
       rw [h1, LinearEquiv.symm_apply_apply, if_pos rfl]
       rfl
-    · have h1 : (ρ' (e j)).rangeRestrict ((φ i ((ρ (e i)).rangeRestrict v) : LinearMap.range (ρ' (e i))) : Fin n → k)
-          = 0 := by
+    · have h1
+          : (ρ' (e j)).rangeRestrict
+              ((φ i ((ρ (e i)).rangeRestrict v) : LinearMap.range (ρ' (e i))) : Fin n → k)
+            = 0 := by
         apply Subtype.ext
         have := proj_of_mem ρ' e he i j _ (φ i ((ρ (e i)).rangeRestrict v)).2
         simpa [h] using this
@@ -128,7 +154,7 @@ private theorem mul_eq_mul_of_ratio_eq_one {n : ℕ} {R : Type} [CommRing R] [Al
       rfl
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [LinearMap.sum_apply, LinearMap.comp_apply, map_sum, Submodule.coe_subtype,
-    LinearEquiv.coe_coe]
+      LinearEquiv.coe_coe]
   simp only [Submodule.coe_sum, inner]
   simp
   set_option synthInstance.maxHeartbeats 100000 in
@@ -175,8 +201,10 @@ theorem isoOfTrace : IsoOfTrace k := by
       have h0 : E a x = 0 := Ideal.Quotient.eq_zero_iff_mem.2 ha
       rw [h0, zero_mul]
     · rw [Pi.single_eq_of_ne h, mul_zero]
-  have hc : ∀ m : MaximalSpectrum R, ∃ φ : LinearMap.range (ρ (e m)) ≃ₗ[k] LinearMap.range (ρ' (e m)),
-      ∀ r x, φ (resHom ρ (e m) r x) = resHom ρ' (e m) r (φ x) := fun m => by
+  have hc
+      : ∀ m : MaximalSpectrum R, ∃ φ : LinearMap.range (ρ (e m)) ≃ₗ[k] LinearMap.range (ρ' (e m)),
+        ∀ r x,
+          φ (resHom ρ (e m) r x) = resHom ρ' (e m) r (φ x) := fun m => by
     haveI := m.isMaximal
     exact comp_lemma ρ ρ' (e m) (by simpa using he m m) m.asIdeal (hm m) (htr _)
   choose φ hφ using hc
@@ -184,14 +212,15 @@ theorem isoOfTrace : IsoOfTrace k := by
     ∑ i, (LinearMap.range (ρ' (e i))).subtype ∘ₗ (φ i).toLinearMap ∘ₗ (ρ (e i)).rangeRestrict
   let Ψ : (Fin n → k) →ₗ[k] (Fin n → k) :=
     ∑ i, (LinearMap.range (ρ (e i))).subtype ∘ₗ (φ i).symm.toLinearMap ∘ₗ (ρ' (e i)).rangeRestrict
-  have h1 : Ψ ∘ₗ Φ = LinearMap.id := LinearMap.ext fun v => mul_eq_mul_of_ratio_eq_one ρ ρ' e he hs φ v
+  have h1 : Ψ ∘ₗ Φ = LinearMap.id :=
+    LinearMap.ext fun v => mul_eq_mul_of_ratio_eq_one ρ ρ' e he hs φ v
   have h2 : Φ ∘ₗ Ψ = LinearMap.id :=
     LinearMap.ext fun v => mul_eq_mul_of_ratio_eq_one ρ' ρ e he hs (fun i => (φ i).symm) v
   refine ⟨LinearEquiv.ofLinear Φ Ψ h2 h1, fun r v => ?_⟩
   show Φ (ρ r v) = ρ' r (Φ v)
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [Φ, LinearMap.sum_apply, LinearMap.comp_apply, map_sum, Submodule.coe_subtype,
-    LinearEquiv.coe_coe]
+      LinearEquiv.coe_coe]
   refine Finset.sum_congr rfl fun i _ => ?_
   have h3 : (ρ (e i)).rangeRestrict (ρ r v) = resHom ρ (e i) r ((ρ (e i)).rangeRestrict v) := by
     apply Subtype.ext

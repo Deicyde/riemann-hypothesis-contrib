@@ -12,8 +12,11 @@ public import Development.DiscreteGroups.PiInvariants.CompactSupportTwists.TwtrC
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
-open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.Desc
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC
+  PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.F
+  PositivityTheory.Rg.BcB.Desc
 open PositivityTheory.RgTw (Mat G)
 open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.Zero.ConvolutionTheory.EB
 open UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi UpperTheory.Zero.ConvolutionTheory.EB
@@ -78,8 +81,7 @@ private lemma trace_sum {J : Type*} (s : Finset J) (c : J → ℂ) (L : J → V 
 end UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.TS
 
 open UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.TS in
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.twTrSum_pf :
-    TwTrSum := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.twTrSum_pf : TwTrSum := by
   intro E _ _ _ n D π J s c φ t h
   have hL := fun j (hj : j ∈ s) => (h j hj).2
   choose! L e f ht using hL
@@ -87,7 +89,8 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.twTrSum_pf :
   haveI : IsLocallyFiniteMeasure D.μ := D.haar.2.2.2
   refine ⟨∑ j ∈ s, c j • L j, fun ψ x => ?_, hT.1, ?_⟩
   · have hc : Continuous fun g : GA E n => ψ.1.1 (thetaA E n g) :=
-      (DiscreteGroups.T1.G.twtr_cont_of_mem π ψ.2).comp (PositivityTheory.Rg.BcB.E1.thetaBasic_holds E n).1
+      (DiscreteGroups.T1.G.twtr_cont_of_mem π ψ.2).comp
+        (PositivityTheory.Rg.BcB.E1.thetaBasic_holds E n).1
     have hi : ∀ j ∈ s, Integrable (fun y => φ j y * ψ.1.1 (thetaA E n (x * y.1))) D.μ := fun j hj =>
       DiscreteGroups.T1.G.twtr_integrable D.μ (h j hj).1 hc x
     have hv : ((∑ j ∈ s, c j • L j) ψ).1.1 x = ∑ j ∈ s, c j * (L j ψ).1.1 x := by

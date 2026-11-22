@@ -4,15 +4,18 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.EqZeroOfFora
 
 @[expose] public section
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat
 
 namespace GlobalTheory
 
-theorem trunc'_eval_dvd_of_order :
-    ∀ (p : ℕ) (B : Type) [CommRing B] (σ : Type) [Fintype σ] [DecidableEq σ] (z : σ → B),
-      (∀ i, ∃ N : ℕ, (p : B) ∣ z i ^ N) → ∃ L : ℕ, ∀ (k : ℕ) (h : MvPowerSeries σ B),
-        (∀ α : σ →₀ ℕ, α.degree < L * k → coeff α h = 0) →
-          ∀ n : σ →₀ ℕ, (p : B) ^ k ∣ MvPolynomial.eval z (trunc' B n h) := by
+theorem trunc'_eval_dvd_of_order
+    : ∀ (p : ℕ) (B : Type) [CommRing B] (σ : Type) [Fintype σ] [DecidableEq σ] (z : σ → B),
+      (∀ i, ∃ N : ℕ, (p : B) ∣ z i ^ N)
+        → ∃ L : ℕ, ∀ (k : ℕ) (h : MvPowerSeries σ B),
+          (∀ α : σ →₀ ℕ, α.degree < L * k → coeff α h = 0)
+            → ∀ n : σ →₀ ℕ, (p : B) ^ k ∣ MvPolynomial.eval z (trunc' B n h) := by
   intro p B _ σ _ _ z hz
   choose N hN using hz
   set N₀ : ℕ := ∑ i, N i + 1 with hN₀
@@ -39,13 +42,17 @@ theorem trunc'_eval_dvd_of_order :
         push_neg at hne
         apply hdeg
         rw [Finsupp.degree_eq_sum]
-        calc ∑ i, β i ≤ ∑ _i : σ, N₀ * k := Finset.sum_le_sum (fun i _ => (hne i).le)
+        calc
+          ∑ i, β i
+            ≤ ∑ _i : σ, N₀ * k := Finset.sum_le_sum (fun i _ => (hne i).le)
           _ = Fintype.card σ * N₀ * k := by simp [Finset.sum_const, mul_assoc]
           _ < (Fintype.card σ * N₀ + 1) * k := by nlinarith
       obtain ⟨i, hi⟩ := this
       apply Dvd.dvd.mul_left
       have h1 : (p : B) ^ k ∣ z i ^ β i := by
-        calc (p : B) ^ k ∣ (z i ^ N₀) ^ k := pow_dvd_pow_of_dvd (hdiv i) k
+        calc
+          (p : B) ^ k
+            ∣ (z i ^ N₀) ^ k := pow_dvd_pow_of_dvd (hdiv i) k
           _ = z i ^ (N₀ * k) := (pow_mul _ _ _).symm
           _ ∣ z i ^ β i := pow_dvd_pow _ hi
       have hmem : i ∈ β.support := by

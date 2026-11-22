@@ -6,20 +6,26 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Domai
 
 @[expose] public section
 
-open Matrix NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.ChartRestriction.G.AR.Inst GlobalTheory.ScalarPoin
+open Matrix NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.ChartRestriction.G.AR.Inst
+  GlobalTheory.ScalarPoin
 
 namespace GlobalTheory.ScalarPoin.BlockFree
 
-theorem eq_one_of_gm_toBlocks₁₂ : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r)
-    (x0 : Frame X.Ψ r), IsOrth X x0 → ∀ γ ∈ X.Γ, (∀ τ, (KU.gm X x0 γ τ).toBlocks₁₂ = 0) → γ = 1 := by
+theorem eq_one_of_gm_toBlocks₁₂
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r)
+        (x0 : Frame X.Ψ r),
+      IsOrth X x0 → ∀ γ ∈ X.Γ, (∀ τ, (KU.gm X x0 γ τ).toBlocks₁₂ = 0) → γ = 1 := by
   intro E _ _ _ r X x0 ho γ hγ h
   have hj : r - X.p0 ≤ r := Nat.sub_le _ _
   have hp : r - (r - X.p0) = X.p0 := Nat.sub_sub_self X.p0_le
   have hx := IC.orth_mem_dom X ho
   have hx' := IC.orth_mem_dom X (KU.isOrth_lact X hγ ho)
-  have key : ∀ τ : X.Ψ, ∃ b t : Matrix (Fin r) (Fin r) ℂ, b.det ≠ 0 ∧
-      (∀ a c : Fin r, (c : ℕ) < r - (r - X.p0) → ¬ (a : ℕ) < r - (r - X.p0) → b a c = 0) ∧
-      (∀ a c, c < a → t a c = 0) ∧ (mat x0 τ)⁻¹ * mat (lact γ x0) τ * b = b * t := by
+  have key
+      : ∀ τ : X.Ψ, ∃ b t : Matrix (Fin r) (Fin r) ℂ,
+        b.det ≠ 0
+          ∧ (∀ a c : Fin r, (c : ℕ) < r - (r - X.p0) → ¬ (a : ℕ) < r - (r - X.p0) → b a c = 0)
+          ∧ (∀ a c, c < a → t a c = 0) ∧ (mat x0 τ)⁻¹ * mat (lact γ x0) τ * b = b * t := by
     intro τ
     refine GlobalTheory.FreeOnDomain.exists_conj_block hj _ ?_
     ext u v
@@ -28,7 +34,8 @@ theorem eq_one_of_gm_toBlocks₁₂ : ∀ (E : Type) [Field E] [NumberField E] [
       rw [GlobalTheory.TrueCx.idx_symm_inl, KU.eT_inl]
       simp only [ExF.qI]
       omega
-    have e2 : (GlobalTheory.TrueCx.idx hj).symm (Sum.inr v) = KU.eT X (Sum.inr (Fin.cast hp v)) := by
+    have e2
+        : (GlobalTheory.TrueCx.idx hj).symm (Sum.inr v) = KU.eT X (Sum.inr (Fin.cast hp v)) := by
       apply Fin.ext
       rw [GlobalTheory.TrueCx.idx_symm_inr, KU.eT_inr]
       simp
@@ -41,8 +48,11 @@ theorem eq_one_of_gm_toBlocks₁₂ : ∀ (E : Type) [Field E] [NumberField E] [
   have e' : ∀ τ, mat (lact γ x0) τ * b τ = mat x0 τ * b τ * t τ := fun τ => by
     rw [Matrix.mul_assoc, ← e, Matrix.mul_assoc, mul_nonsing_inv_cancel_left _ _ (hx τ).1.isUnit]
   refine X.Γ_free γ hγ (rmul x0 fun τ => b τ)
-    (GlobalTheory.PointOfFrames.rmul_mem_dom X hx _ hb (fun τ a c h1 h2 => hb0 τ a c (by rw [hp]; exact h1)
-      (by rw [hp]; exact h2))) (fun τ => t τ) (fun τ => ⟨?_, ht τ⟩) ?_
+    (GlobalTheory.PointOfFrames.rmul_mem_dom X hx _ hb
+      (fun τ a c h1 h2 => hb0 τ a c (by rw [hp]; exact h1) (by rw [hp]; exact h2)))
+    (fun τ => t τ)
+    (fun τ => ⟨?_, ht τ⟩)
+    ?_
   · intro h0
     have h1 := congrArg det (e' τ)
     have h0' : (t τ).det = 0 := h0

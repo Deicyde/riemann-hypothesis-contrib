@@ -20,16 +20,25 @@ section Shape
 
 variable {ν : ℕ}
 
-def alG (TT : Finset (ZMod (2 * ν))) (colN : ZMod (2 * ν) → ℕ) (hts : ∀ s, Fin (colN s) → ℕ)
-    (s : ZMod (2 * ν)) : ℕ :=
+def alG
+    (TT : Finset (ZMod (2 * ν)))
+    (colN : ZMod (2 * ν) → ℕ) (hts : ∀ s, Fin (colN s) → ℕ)
+    (s : ZMod (2 * ν))
+    : ℕ :=
   if s ∈ TT then (univ.filter (fun c => hts s c = 1)).card else 0
 
-def capG (TT : Finset (ZMod (2 * ν))) (colN : ZMod (2 * ν) → ℕ) (hts : ∀ s, Fin (colN s) → ℕ)
-    (s : ZMod (2 * ν)) : ℕ :=
+def capG
+    (TT : Finset (ZMod (2 * ν)))
+    (colN : ZMod (2 * ν) → ℕ) (hts : ∀ s, Fin (colN s) → ℕ)
+    (s : ZMod (2 * ν))
+    : ℕ :=
   colN s - alG TT colN hts s
 
-def lsG (TT : Finset (ZMod (2 * ν))) (colN : ZMod (2 * ν) → ℕ) (hts : ∀ s, Fin (colN s) → ℕ)
-    (s : ZMod (2 * ν)) : ℕ :=
+def lsG
+    (TT : Finset (ZMod (2 * ν)))
+    (colN : ZMod (2 * ν) → ℕ) (hts : ∀ s, Fin (colN s) → ℕ)
+    (s : ZMod (2 * ν))
+    : ℕ :=
   ∑ c, hts s c - alG TT colN hts s
 
 end Shape

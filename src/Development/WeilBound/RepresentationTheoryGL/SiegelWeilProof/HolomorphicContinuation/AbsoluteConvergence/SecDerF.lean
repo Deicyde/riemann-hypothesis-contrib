@@ -26,17 +26,17 @@ theorem isCompact_TK : IsCompact (TK n) := by
       rw [Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose]
       exact hM.1
     simpa using entry_norm_bound_of_unitary hU i j
-  refine (isCompact_univ_pi fun _ => isCompact_univ_pi fun _ =>
-    isCompact_closedBall (0 : ℂ) 1).of_isClosed_subset ?_ hsub
+  refine (isCompact_univ_pi fun _ =>
+    isCompact_univ_pi fun _ => isCompact_closedBall (0 : ℂ) 1).of_isClosed_subset ?_ hsub
   have hc1 : IsClosed {M : M2 n | Mᴴ * M = 1} :=
     isClosed_eq (continuous_id.matrix_conjTranspose.matrix_mul continuous_id) continuous_const
   have hc2 : IsClosed {M : M2 n | Mᴴ * JJ n * M = JJ n} :=
-    isClosed_eq ((continuous_id.matrix_conjTranspose.matrix_mul continuous_const).matrix_mul
-      continuous_id) continuous_const
+    isClosed_eq
+      ((continuous_id.matrix_conjTranspose.matrix_mul continuous_const).matrix_mul continuous_id)
+      continuous_const
   exact hc1.inter hc2
 
-def toGR (M : TK n) : GR n :=
-  ⟨⟨M.1, M.1ᴴ, mul_eq_one_comm.mp M.2.1, M.2.1⟩, M.2.2⟩
+def toGR (M : TK n) : GR n := ⟨⟨M.1, M.1ᴴ, mul_eq_one_comm.mp M.2.1, M.2.1⟩, M.2.2⟩
 
 theorem continuous_toGR : Continuous (toGR (n := n)) := by
   refine Continuous.subtype_mk ?_ _

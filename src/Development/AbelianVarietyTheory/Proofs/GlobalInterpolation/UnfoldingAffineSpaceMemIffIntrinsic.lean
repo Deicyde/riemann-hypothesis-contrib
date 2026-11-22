@@ -10,12 +10,13 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Unipot
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col GlobalTheory.QNormal
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.L2.DIV Formalism.L2.Col GlobalTheory.QNormal
 
 namespace GlobalTheory.Proof.exists_xx1_eq_iff_inX_eN_Ufl_conditions
 
-theorem eN_eq_single {F : Type} [Field F] {N i : ℕ} (h : i < N) :
-    Loc.eN F N i = Pi.single (⟨i, h⟩ : Fin N) 1 := by
+theorem eN_eq_single {F : Type} [Field F] {N i : ℕ} (h : i < N)
+    : Loc.eN F N i = Pi.single (⟨i, h⟩ : Fin N) 1 := by
   funext l
   simp only [Loc.eN, Pi.single_apply, Fin.ext_iff]
 
@@ -24,8 +25,8 @@ theorem eN_eq_zero {F : Type} [Field F] {N i : ℕ} (h : ¬ i < N) : Loc.eN F N 
   have hl : l.1 ≠ i := fun e => h (e ▸ l.2)
   simp only [Loc.eN, hl, if_false, Pi.zero_apply]
 
-theorem inX_single {F : Type} [Field F] {n c : ℕ} (s : Fin (n + c)) (hs : s.1 < n) :
-    Loc.inX F n c (Pi.single ⟨s.1, hs⟩ 1) = Pi.single s 1 := by
+theorem inX_single {F : Type} [Field F] {n c : ℕ} (s : Fin (n + c)) (hs : s.1 < n)
+    : Loc.inX F n c (Pi.single ⟨s.1, hs⟩ 1) = Pi.single s 1 := by
   funext l
   rw [inX_apply]
   by_cases hl : l.1 < n
@@ -33,18 +34,33 @@ theorem inX_single {F : Type} [Field F] {n c : ℕ} (s : Fin (n + c)) (hs : s.1 
   · have hne : l ≠ s := fun e => hl (e ▸ hs)
     simp only [hl, dif_neg, not_false_eq_true, Pi.single_apply, hne, if_false]
 
-theorem unfoldingAffineSpace_mem_iff_intrinsic : ∀ (F : Type) [Field F] (n' c' n c : ℕ), 1 ≤ c → c' = c + 1 → ∀ (xj : (Fin n' → F) →ₗ[F] (Fin n → F)) (x : (Fin (n' + c') → F) →ₗ[F] (Fin (n + c) → F)), (∃ t : Loc.FC n' c' n c → F, x = Loc.xx1 xj t) ↔ ((∀ v, x (Loc.inX F n' c' v) = Loc.inX F n c (xj v)) ∧ x (Loc.eN F (n' + c') n') = Loc.eN F (n + c) n ∧ ∀ s : ℕ, x (Loc.eN F (n' + c') (n' + s)) - Loc.eN F (n + c) (n + s) ∈ Loc.Ufl F n c s) := by
+theorem unfoldingAffineSpace_mem_iff_intrinsic
+    : ∀ (F : Type) [Field F] (n' c' n c : ℕ),
+      1 ≤ c → c' = c + 1
+        → ∀ (xj : (Fin n' → F) →ₗ[F] (Fin n → F)) (x : (Fin (n' + c') → F) →ₗ[F] (Fin (n + c) → F)),
+          (∃ t : Loc.FC n' c' n c → F, x = Loc.xx1 xj t)
+            ↔ ((∀ v, x (Loc.inX F n' c' v) = Loc.inX F n c (xj v))
+              ∧ x (Loc.eN F (n' + c') n') = Loc.eN F (n + c) n
+              ∧ ∀ s : ℕ,
+                x (Loc.eN F (n' + c') (n' + s)) - Loc.eN F (n + c) (n + s) ∈ Loc.Ufl F n c s) := by
   intro F _ n' c' n c hc hc' xj x
   subst hc'
-  have hy : ∀ {a b : ℕ} (y : (Fin a → F) →ₗ[F] (Fin b → F)) (s : Fin a) (l : Fin b),
-      y (Pi.single s 1) l = LinearMap.toMatrix' y l s := by
+  have hy
+      : ∀ {a b : ℕ} (y : (Fin a → F) →ₗ[F] (Fin b → F)) (s : Fin a) (l : Fin b),
+        y (Pi.single s 1) l = LinearMap.toMatrix' y l s := by
     intro a b y s l
     rw [LinearMap.toMatrix'_apply]
-  have hM : ∀ (t : Loc.FC n' (c + 1) n c → F) (l : Fin (n + c)) (s : Fin (n' + (c + 1))),
-      LinearMap.toMatrix' (Loc.xx1 xj t) l s =
-        if hf : Loc.IsFree n' n c l.1 s.1 then t ⟨(l, s), hf⟩
-        else if hs : s.1 < n' then (if hl : l.1 < n then LinearMap.toMatrix' xj ⟨l.1, hl⟩ ⟨s.1, hs⟩ else 0)
-        else if l.1 = n + (s.1 - n') then 1 else 0 := by
+  have hM
+      : ∀ (t : Loc.FC n' (c + 1) n c → F) (l : Fin (n + c)) (s : Fin (n' + (c + 1))),
+        LinearMap.toMatrix' (Loc.xx1 xj t) l s
+          = if hf : Loc.IsFree n' n c l.1 s.1 then
+              t ⟨(l, s), hf⟩
+            else if hs : s.1 < n' then
+              (if hl : l.1 < n then LinearMap.toMatrix' xj ⟨l.1, hl⟩ ⟨s.1, hs⟩ else 0)
+            else if l.1 = n + (s.1 - n') then
+              1
+            else
+              0 := by
     intro t l s
     simp only [Loc.xx1, LinearMap.toMatrix'_toLin', Matrix.of_apply]
   constructor
@@ -110,7 +126,8 @@ theorem unfoldingAffineSpace_mem_iff_intrinsic : ∀ (F : Type) [Field F] (n' c'
       · rw [dif_neg hl, dif_neg hl]
     rw [dif_neg hs]
     have hsj : s.1 = n' + (s.1 - n') := by omega
-    have hsingle : (Pi.single s 1 : Fin (n' + (c + 1)) → F) = Loc.eN F (n' + (c + 1)) (n' + (s.1 - n')) := by
+    have hsingle
+        : (Pi.single s 1 : Fin (n' + (c + 1)) → F) = Loc.eN F (n' + (c + 1)) (n' + (s.1 - n')) := by
       rw [eN_eq_single (show n' + (s.1 - n') < n' + (c + 1) by omega)]
       congr 1
       exact Fin.ext hsj
@@ -120,9 +137,10 @@ theorem unfoldingAffineSpace_mem_iff_intrinsic : ∀ (F : Type) [Field F] (n' c'
       change x (Loc.eN F (n' + (c + 1)) n') l = if l.1 = n then 1 else 0
       rw [h2]
       simp only [Loc.eN]
-    · have hmem := (mem_Ufl).1 (h3 (s.1 - n')) l (by
-        simp only [Loc.IsFree] at hf
-        omega)
+    · have hmem :=
+        (mem_Ufl).1 (h3 (s.1 - n')) l (by
+          simp only [Loc.IsFree] at hf
+          omega)
       rw [Pi.sub_apply, sub_eq_zero] at hmem
       rw [hmem]
       simp only [Loc.eN]

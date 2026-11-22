@@ -43,46 +43,60 @@ def Ext.ev (z : Φ.Ext) : B := Prod.fst z
 
 def Ext.od (z : Φ.Ext) : N := Prod.snd z
 
-@[ext] theorem ext {z w : Φ.Ext} (hev : z.ev = w.ev) (hod : z.od = w.od) : z = w :=
-  Prod.ext hev hod
+@[ext]
+theorem ext {z w : Φ.Ext} (hev : z.ev = w.ev) (hod : z.od = w.od) : z = w := Prod.ext hev hod
 
 instance : One Φ.Ext := ⟨Φ.el 1 0⟩
 instance : Mul Φ.Ext := ⟨fun z w => Φ.el (z.ev * w.ev + Φ.be z.od w.od) (z.ev • w.od + w.ev • z.od)⟩
 
-@[simp] theorem ev_one : (1 : Φ.Ext).ev = 1 := rfl
-@[simp] theorem od_one : (1 : Φ.Ext).od = 0 := rfl
-@[simp] theorem ev_zero : (0 : Φ.Ext).ev = 0 := rfl
-@[simp] theorem od_zero : (0 : Φ.Ext).od = 0 := rfl
-@[simp] theorem ev_add (z w : Φ.Ext) : (z + w).ev = z.ev + w.ev := rfl
-@[simp] theorem od_add (z w : Φ.Ext) : (z + w).od = z.od + w.od := rfl
-@[simp] theorem ev_smul (c : B) (z : Φ.Ext) : (c • z).ev = c * z.ev := rfl
-@[simp] theorem od_smul (c : B) (z : Φ.Ext) : (c • z).od = c • z.od := rfl
-@[simp] theorem ev_mul (z w : Φ.Ext) : (z * w).ev = z.ev * w.ev + Φ.be z.od w.od := rfl
-@[simp] theorem od_mul (z w : Φ.Ext) : (z * w).od = z.ev • w.od + w.ev • z.od := rfl
+@[simp]
+theorem ev_one : (1 : Φ.Ext).ev = 1 := rfl
+@[simp]
+theorem od_one : (1 : Φ.Ext).od = 0 := rfl
+@[simp]
+theorem ev_zero : (0 : Φ.Ext).ev = 0 := rfl
+@[simp]
+theorem od_zero : (0 : Φ.Ext).od = 0 := rfl
+@[simp]
+theorem ev_add (z w : Φ.Ext) : (z + w).ev = z.ev + w.ev := rfl
+@[simp]
+theorem od_add (z w : Φ.Ext) : (z + w).od = z.od + w.od := rfl
+@[simp]
+theorem ev_smul (c : B) (z : Φ.Ext) : (c • z).ev = c * z.ev := rfl
+@[simp]
+theorem od_smul (c : B) (z : Φ.Ext) : (c • z).od = c • z.od := rfl
+@[simp]
+theorem ev_mul (z w : Φ.Ext) : (z * w).ev = z.ev * w.ev + Φ.be z.od w.od := rfl
+@[simp]
+theorem od_mul (z w : Φ.Ext) : (z * w).od = z.ev • w.od + w.ev • z.od := rfl
 
-instance : CommRing Φ.Ext :=
-  { (inferInstance : AddCommGroup Φ.Ext), (inferInstance : One Φ.Ext), (inferInstance : Mul Φ.Ext) with
-    mul_assoc := fun x y z => by
-      ext
-      · simp; ring
-      · simp only [od_mul, ev_mul, add_smul, smul_add, smul_smul]
-        rw [Φ.assoc x.od y.od z.od, mul_comm z.ev x.ev, mul_comm z.ev y.ev]; abel
-    one_mul := fun x => by ext <;> simp
-    mul_one := fun x => by ext <;> simp
-    zero_mul := fun x => by ext <;> simp
-    mul_zero := fun x => by ext <;> simp
-    left_distrib := fun x y z => by
-      ext
-      · simp; ring
-      · simp [add_smul]; abel
-    right_distrib := fun x y z => by
-      ext
-      · simp; ring
-      · simp [add_smul]; abel
-    mul_comm := fun x y => by
-      ext
-      · simp [mul_comm, Φ.symm x.od]
-      · simp [add_comm] }
+instance : CommRing Φ.Ext := {
+  (inferInstance : AddCommGroup Φ.Ext),
+  (inferInstance : One Φ.Ext),
+  (inferInstance : Mul Φ.Ext) with
+  mul_assoc := fun x y z => by
+    ext
+    · simp; ring
+    · simp only [od_mul, ev_mul, add_smul, smul_add, smul_smul]
+      rw [Φ.assoc x.od y.od z.od, mul_comm z.ev x.ev, mul_comm z.ev y.ev]
+      abel
+  one_mul := fun x => by ext <;> simp
+  mul_one := fun x => by ext <;> simp
+  zero_mul := fun x => by ext <;> simp
+  mul_zero := fun x => by ext <;> simp
+  left_distrib := fun x y z => by
+    ext
+    · simp; ring
+    · simp [add_smul]; abel
+  right_distrib := fun x y z => by
+    ext
+    · simp; ring
+    · simp [add_smul]; abel
+  mul_comm := fun x y => by
+    ext
+    · simp [mul_comm, Φ.symm x.od]
+    · simp [add_comm]
+}
 
 instance : Algebra B Φ.Ext :=
   Algebra.ofModule
@@ -131,8 +145,13 @@ theorem corner_eq (i : ι) (y : E) : U.ep i * y * U.ep i = T.tr (U.ep i * y * U.
   rw [hb, map_smul, U.tr_ep, smul_eq_mul, mul_one]
 
 def oddForm (p q : ι) : OddForm B (corner B (U.ep p) (U.ep q)) where
-  be := LinearMap.mk₂ B (fun b b' => T.tr (b.1 * T.st b'.1))
-    (fun _ _ _ => by simp [add_mul]) (fun _ _ _ => by simp) (fun _ _ _ => by simp [mul_add]) (fun _ _ _ => by simp)
+  be :=
+    LinearMap.mk₂ B
+      (fun b b' => T.tr (b.1 * T.st b'.1))
+      (fun _ _ _ => by simp [add_mul])
+      (fun _ _ _ => by simp)
+      (fun _ _ _ => by simp [mul_add])
+      (fun _ _ _ => by simp)
   symm b b' := by
     simp only [LinearMap.mk₂_apply]
     rw [← T.tr_st, T.st_mul, T.st_st]
@@ -145,26 +164,30 @@ def oddForm (p q : ι) : OddForm B (corner B (U.ep p) (U.ep q)) where
     have hq' : ∀ z, U.ep q * (U.ep q * z) = U.ep q * z := fun z => by rw [← mul_assoc, hq]
     have h1 := U.corner_eq p (y * U.ep q * T.st y')
     have h2 := U.corner_eq q (T.st y' * U.ep p * y'')
-    have h3 : T.tr (U.ep p * (y' * U.ep q) * T.st (U.ep p * (y'' * U.ep q))) =
-        T.tr (U.ep q * (T.st y' * U.ep p * y'') * U.ep q) := by
+    have h3
+        : T.tr (U.ep p * (y' * U.ep q) * T.st (U.ep p * (y'' * U.ep q)))
+          = T.tr (U.ep q * (T.st y' * U.ep p * y'') * U.ep q) := by
       rw [← T.tr_st, T.st_mul, T.st_st, T.tr_comm]
       simp only [T.st_mul, U.st_ep, mul_assoc, hp']
-    have h4 : T.tr (U.ep p * (y * U.ep q) * T.st (U.ep p * (y' * U.ep q))) =
-        T.tr (U.ep p * (y * U.ep q * T.st y') * U.ep p) := by
+    have h4
+        : T.tr (U.ep p * (y * U.ep q) * T.st (U.ep p * (y' * U.ep q)))
+          = T.tr (U.ep p * (y * U.ep q * T.st y') * U.ep p) := by
       simp only [T.st_mul, U.st_ep, mul_assoc, hq']
-    simp only [LinearMap.mk₂_apply, LinearMap.comp_apply, LinearMap.mulLeft_apply, LinearMap.mulRight_apply,
-      SetLike.val_smul]
+    simp only [LinearMap.mk₂_apply, LinearMap.comp_apply, LinearMap.mulLeft_apply,
+      LinearMap.mulRight_apply, SetLike.val_smul]
     rw [h3, h4]
-    calc _ = (T.tr (U.ep p * (y * U.ep q * T.st y') * U.ep p) • U.ep p) * (y'' * U.ep q) := by
-          rw [smul_mul_assoc]
+    calc
+      _ = (T.tr (U.ep p * (y * U.ep q * T.st y') * U.ep p) • U.ep p) * (y'' * U.ep q) := by
+        rw [smul_mul_assoc]
       _ = U.ep p * y * (U.ep q * (T.st y' * U.ep p * y'') * U.ep q) := by
-          rw [← h1]; simp only [mul_assoc]
+        rw [← h1]; simp only [mul_assoc]
       _ = _ := by rw [h2, mul_smul_comm, ← h2, mul_assoc (U.ep p)]
 
-def vr (p q : ι) (y : E) : Matrix ι ι (U.oddForm p q).Ext := Matrix.of fun i j =>
-  (U.oddForm p q).el (T.tr (U.x i * y * T.st (U.x j)))
-    (cornerProj B (U.ep p) (U.ep q) (U.x i * y * T.st (U.x j)) +
-      cornerProj B (U.ep p) (U.ep q) (T.st (U.x i * y * T.st (U.x j))))
+def vr (p q : ι) (y : E) : Matrix ι ι (U.oddForm p q).Ext :=
+  Matrix.of fun i j =>
+    (U.oddForm p q).el (T.tr (U.x i * y * T.st (U.x j)))
+      (cornerProj B (U.ep p) (U.ep q) (U.x i * y * T.st (U.x j))
+        + cornerProj B (U.ep p) (U.ep q) (T.st (U.x i * y * T.st (U.x j))))
 
 end TrInv.Units
 

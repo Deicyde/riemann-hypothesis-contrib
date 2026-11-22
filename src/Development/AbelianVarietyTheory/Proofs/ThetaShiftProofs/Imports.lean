@@ -11,14 +11,17 @@ open scoped ComplexConjugate
 
 namespace GlobalTheory.ComplementTypes
 
-
 open NumberField in
 open scoped ComplexConjugate in
-theorem _root_.GlobalTheory.ComplementTypes.types (E : Type) [Field E] [NumberField E]
-    [IsCMField E] (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (p q r g g' : ℕ)
-    (ty : Fin g → (E →+* ℂ)) (ty' : Fin g' → (E →+* ℂ)) (hty : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsTypeFn H p q ty)
-    (h : ∀ a : 𝓞 E, ∑ i, ty i (a : E) = (r : ℂ) * ∑ τ : E →+* ℂ, τ (H.bar a : E) + ∑ j, ty' j (a : E)) :
-    r ≤ p ∧ r ≤ q ∧ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsTypeFn H (p - r) (q - r) ty' := by
+theorem _root_.GlobalTheory.ComplementTypes.types
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (p q r g g' : ℕ)
+    (ty : Fin g → (E →+* ℂ)) (ty' : Fin g' → (E →+* ℂ))
+    (hty : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsTypeFn H p q ty)
+    (h : ∀ a : 𝓞 E,
+      ∑ i, ty i (a : E) = (r : ℂ) * ∑ τ : E →+* ℂ, τ (H.bar a : E) + ∑ j, ty' j (a : E))
+    : r ≤ p ∧ r ≤ q
+      ∧ _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsTypeFn H (p - r) (q - r) ty' := by
   classical
   let c : E →+* E := (IsCMField.complexConj E).toAlgHom.toRingHom
   have hcc : ∀ x, c (c x) = x := fun x => by simp [c]
@@ -33,10 +36,12 @@ theorem _root_.GlobalTheory.ComplementTypes.types (E : Type) [Field E] [NumberFi
     have hc1 : ∀ σ : E →+* ℂ, σ.comp c = τ ↔ σ = τ.comp c := fun σ =>
       ⟨fun hσ => by ext x; rw [← hσ]; simp [hcc], fun hσ => by ext x; rw [hσ]; simp [hcc]⟩
     rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card,
-      Fintype.card_congr (e.subtypeEquiv (p := fun i => ty i = τ) (q := fun k => t k = τ) fun i => by
-        simp only [he]), Fintype.card_subtype,
-      Fintype.card_subtype, Finset.card_filter, Finset.card_filter, Fintype.sum_sum_type,
-      Fintype.sum_prod_type]
+      Fintype.card_congr (e.subtypeEquiv
+        (p := fun i => ty i = τ)
+        (q := fun k => t k = τ)
+        fun i => by simp only [he]),
+      Fintype.card_subtype, Fintype.card_subtype, Finset.card_filter, Finset.card_filter,
+      Fintype.sum_sum_type, Fintype.sum_prod_type]
     simp only [t, Sum.elim_inl, Sum.elim_inr, hc1, Finset.sum_ite_eq', Finset.sum_ite_eq,
       Finset.mem_univ, if_true, Finset.sum_const, Finset.card_univ, Fintype.card_fin, smul_eq_mul,
       mul_one]

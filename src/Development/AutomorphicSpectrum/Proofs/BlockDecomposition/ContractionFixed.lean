@@ -10,37 +10,42 @@ open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.RepTensor
 
-theorem extTensor_left {G H V W : Type} [Group G] [Group H] [AddCommGroup V] [Module ℂ V]
-    [AddCommGroup W] [Module ℂ W] (ρ : Representation ℂ G V) (σ : Representation ℂ H W) (k : G) :
-    extTensor ρ σ (k, 1) = TensorProduct.map (ρ k) LinearMap.id :=
+theorem extTensor_left
+    {G H V W : Type} [Group G] [Group H] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    (ρ : Representation ℂ G V) (σ : Representation ℂ H W) (k : G)
+    : extTensor ρ σ (k, 1) = TensorProduct.map (ρ k) LinearMap.id :=
   TensorProduct.ext' fun a b => by simp [extTensor_tmul]
 
-theorem extTensor_right {G H V W : Type} [Group G] [Group H] [AddCommGroup V] [Module ℂ V]
-    [AddCommGroup W] [Module ℂ W] (ρ : Representation ℂ G V) (σ : Representation ℂ H W) (h : H) :
-    extTensor ρ σ (1, h) = TensorProduct.map LinearMap.id (σ h) :=
+theorem extTensor_right
+    {G H V W : Type} [Group G] [Group H] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    (ρ : Representation ℂ G V) (σ : Representation ℂ H W) (h : H)
+    : extTensor ρ σ (1, h) = TensorProduct.map LinearMap.id (σ h) :=
   TensorProduct.ext' fun a b => by simp [extTensor_tmul]
 
-theorem contr_left {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
-    (A : Module.End ℂ V) (l : Module.Dual ℂ W) (v : V ⊗[ℂ] W) :
-    A (TensorProduct.rid ℂ V (LinearMap.lTensor V l v)) =
-      TensorProduct.rid ℂ V (LinearMap.lTensor V l (TensorProduct.map A LinearMap.id v)) := by
+theorem contr_left
+    {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    (A : Module.End ℂ V) (l : Module.Dual ℂ W) (v : V ⊗[ℂ] W)
+    : A (TensorProduct.rid ℂ V (LinearMap.lTensor V l v))
+      = TensorProduct.rid ℂ V (LinearMap.lTensor V l (TensorProduct.map A LinearMap.id v)) := by
   induction v using TensorProduct.induction_on with
   | zero => simp
   | tmul x w => simp
   | add a b ha hb => simp only [map_add (f := _), ha, hb]
 
-theorem contr_right {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
-    (B : Module.End ℂ W) (l : Module.Dual ℂ V) (v : V ⊗[ℂ] W) :
-    B (TensorProduct.lid ℂ W (LinearMap.rTensor W l v)) =
-      TensorProduct.lid ℂ W (LinearMap.rTensor W l (TensorProduct.map LinearMap.id B v)) := by
+theorem contr_right
+    {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    (B : Module.End ℂ W) (l : Module.Dual ℂ V) (v : V ⊗[ℂ] W)
+    : B (TensorProduct.lid ℂ W (LinearMap.rTensor W l v))
+      = TensorProduct.lid ℂ W (LinearMap.rTensor W l (TensorProduct.map LinearMap.id B v)) := by
   induction v using TensorProduct.induction_on with
   | zero => simp
   | tmul x w => simp
   | add a b ha hb => simp only [map_add (f := _), ha, hb]
 
-theorem mem_fixed_iff' {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
-    {ρ : Representation ℂ G V} {K : Subgroup G} {v : V} :
-    v ∈ fixed ρ K ↔ ∀ k ∈ K, ρ k v = v := by
+theorem mem_fixed_iff'
+    {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
+    {ρ : Representation ℂ G V} {K : Subgroup G} {v : V}
+    : v ∈ fixed ρ K ↔ ∀ k ∈ K, ρ k v = v := by
   constructor
   · intro h k hk
     have := h ⟨k, hk⟩

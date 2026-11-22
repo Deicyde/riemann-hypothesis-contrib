@@ -134,18 +134,21 @@ lemma term_two_real_nonneg {q : ℕ} [NeZero q] (χ₁ χ₂ : DirichletCharacte
 theorem negLogDerivPositivity : Positivity := by
   intro q _ σ hσ
   have hs1 : 1 < ((σ : ℂ)).re := by simpa using hσ
-  have H1 : ∀ χ : DirichletCharacter ℂ q, HasSum (fun n ↦ (term (↗χ * ↗Λ) (σ : ℂ) n).re)
-      (negLD χ (σ : ℂ)).re := fun χ => hasSum_re_term χ hs1
+  have H1
+      : ∀ χ : DirichletCharacter ℂ q,
+        HasSum (fun n ↦ (term (↗χ * ↗Λ) (σ : ℂ) n).re) (negLD χ (σ : ℂ)).re := fun χ =>
+    hasSum_re_term χ hs1
   refine ⟨fun χ t => ?_, fun χ hχ => ?_, fun χ₁ χ₂ h₁ h₂ => ?_⟩
   · have hs2 : 1 < ((σ : ℂ) + t * I).re := by simpa using hσ
     have hs3 : 1 < ((σ : ℂ) + ((2 * t : ℝ) : ℂ) * I).re := by simpa using hσ
-    have HS := (((H1 1).mul_left 3).add ((hasSum_re_term χ hs2).mul_left 4)).add
-      (hasSum_re_term (χ ^ 2) hs3)
+    have HS :=
+      (((H1 1).mul_left 3).add ((hasSum_re_term χ hs2).mul_left 4)).add (hasSum_re_term (χ ^ 2) hs3)
     have e : ((σ : ℂ) + 2 * t * I) = (σ : ℂ) + ((2 * t : ℝ) : ℂ) * I := by push_cast; ring
     rw [e]
     exact HasSum.nonneg (fun n => term_three_four_one_nonneg χ σ t n) HS
   · exact HasSum.nonneg (fun n => term_one_add_real_nonneg χ hχ σ n) ((H1 1).add (H1 χ))
-  · exact HasSum.nonneg (fun n => term_two_real_nonneg χ₁ χ₂ h₁ h₂ σ n)
+  · exact HasSum.nonneg
+      (fun n => term_two_real_nonneg χ₁ χ₂ h₁ h₂ σ n)
       ((((H1 1).add (H1 χ₁)).add (H1 χ₂)).add (H1 (χ₁ * χ₂)))
 
 end Formalism.ZeroFreeDirichlet

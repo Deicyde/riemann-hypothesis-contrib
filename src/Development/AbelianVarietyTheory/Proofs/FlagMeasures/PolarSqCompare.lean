@@ -12,7 +12,10 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Quadri
 
 @[expose] public section
 
-open MeasureTheory Matrix Filter Topology Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.IndefiniteRowSideFullHecke.PerpendicularEmbedding GlobalTheory.CompactDualQuot GlobalTheory.GaugeQuot GlobalTheory.Mem.Vol.Scale
+open MeasureTheory Matrix Filter Topology Formalism.BasicNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.IndefiniteRowSideFullHecke.PerpendicularEmbedding GlobalTheory.CompactDualQuot
+  GlobalTheory.GaugeQuot GlobalTheory.Mem.Vol.Scale
 open scoped ENNReal NNReal
 
 namespace GlobalTheory.PolarCompare
@@ -25,10 +28,10 @@ theorem abs_qf_le_sum_sq {P Q : ℕ} (z : Sp P Q) : |qf z| ≤ ∑ i, ‖z i‖ 
   rw [abs_le]
   constructor <;> linarith
 
-theorem sq_compare_left {T S N r s : ℝ} (hT : 0 ≤ T) (hS : 0 ≤ S) (hN : 0 ≤ N)
-    (hr0 : 0 < r) (hr1 : r < 1 / 2) (hr : 3 * r < 1 - s) (h1 : N ≤ T + S)
-    (h : T ^ 2 + 2 * S < s * r ^ 2) : N ^ 2 + 2 * S < r ^ 2 := by
-
+theorem sq_compare_left
+    {T S N r s : ℝ} (hT : 0 ≤ T) (hS : 0 ≤ S) (hN : 0 ≤ N) (hr0 : 0 < r) (hr1 : r < 1 / 2)
+    (hr : 3 * r < 1 - s) (h1 : N ≤ T + S) (h : T ^ 2 + 2 * S < s * r ^ 2)
+    : N ^ 2 + 2 * S < r ^ 2 := by
   have hr2 : 0 < r ^ 2 := by positivity
   have hs : s < 1 := by linarith
   have hsr : s * r ^ 2 < r ^ 2 := by nlinarith
@@ -39,16 +42,15 @@ theorem sq_compare_left {T S N r s : ℝ} (hT : 0 ≤ T) (hS : 0 ≤ S) (hN : 0 
   have a1 : T * S ≤ r * S := mul_le_mul_of_nonneg_right hTr.le hS
   have a2 : r * (2 * S) ≤ r * r ^ 2 := mul_le_mul_of_nonneg_left hS2.le hr0.le
   have a3 : (2 * S) * (2 * S) ≤ r ^ 2 * r ^ 2 := mul_self_le_mul_self (by linarith) hS2.le
-  have a4 : r * r ^ 2 * r ≤ r * r ^ 2 * (1 / 2) :=
-    mul_le_mul_of_nonneg_left hr1.le (by positivity)
+  have a4 : r * r ^ 2 * r ≤ r * r ^ 2 * (1 / 2) := mul_le_mul_of_nonneg_left hr1.le (by positivity)
   have a5 : 3 * r * r ^ 2 < (1 - s) * r ^ 2 := mul_lt_mul_of_pos_right hr hr2
   nlinarith [mul_pos hr0 hr2]
 
-theorem sq_compare_right {T S N E r s : ℝ} (hT : 0 ≤ T) (hS : 0 ≤ S) (hN : 0 ≤ N)
-    (hr0 : 0 < r) (hr1 : r < 1 / 2) (hr : 11 * r < s - 1) (h1 : E ≤ N + S) (h2 : T ≤ 2 * E)
-    (h3 : T ≤ 2 → T - T ^ 3 / 16 ≤ E)
-    (h : N ^ 2 + 2 * S < r ^ 2) : T ^ 2 + 2 * S < s * r ^ 2 := by
-
+theorem sq_compare_right
+    {T S N E r s : ℝ}
+    (hT : 0 ≤ T) (hS : 0 ≤ S) (hN : 0 ≤ N) (hr0 : 0 < r) (hr1 : r < 1 / 2) (hr : 11 * r < s - 1)
+    (h1 : E ≤ N + S) (h2 : T ≤ 2 * E) (h3 : T ≤ 2 → T - T ^ 3 / 16 ≤ E) (h : N ^ 2 + 2 * S < r ^ 2)
+    : T ^ 2 + 2 * S < s * r ^ 2 := by
   have hr2 : 0 < r ^ 2 := by positivity
   have hS2 : 2 * S < r ^ 2 := by nlinarith
   have hNr : N < r := by nlinarith
@@ -61,15 +63,12 @@ theorem sq_compare_right {T S N E r s : ℝ} (hT : 0 ≤ T) (hS : 0 ≤ S) (hN :
   have hb0 : 0 ≤ S + T ^ 3 / 16 := by positivity
   have hb2 : S + T ^ 3 / 16 ≤ 2 * r ^ 2 := by nlinarith
   have hTNb : T ≤ N + (S + T ^ 3 / 16) := by linarith
-  have hT2 : T * T ≤ (N + (S + T ^ 3 / 16)) * (N + (S + T ^ 3 / 16)) :=
-    mul_self_le_mul_self hT hTNb
-  have a1 : N * (S + T ^ 3 / 16) ≤ r * (S + T ^ 3 / 16) :=
-    mul_le_mul_of_nonneg_right hNr.le hb0
+  have hT2 : T * T ≤ (N + (S + T ^ 3 / 16)) * (N + (S + T ^ 3 / 16)) := mul_self_le_mul_self hT hTNb
+  have a1 : N * (S + T ^ 3 / 16) ≤ r * (S + T ^ 3 / 16) := mul_le_mul_of_nonneg_right hNr.le hb0
   have a2 : r * (S + T ^ 3 / 16) ≤ r * (2 * r ^ 2) := mul_le_mul_of_nonneg_left hb2 hr0.le
   have a3 : (S + T ^ 3 / 16) * (S + T ^ 3 / 16) ≤ (2 * r ^ 2) * (2 * r ^ 2) :=
     mul_self_le_mul_self hb0 hb2
-  have a4 : r * r ^ 2 * r ≤ r * r ^ 2 * (1 / 2) :=
-    mul_le_mul_of_nonneg_left hr1.le (by positivity)
+  have a4 : r * r ^ 2 * r ≤ r * r ^ 2 * (1 / 2) := mul_le_mul_of_nonneg_left hr1.le (by positivity)
   have a5 : 11 * r * r ^ 2 < (s - 1) * r ^ 2 := mul_lt_mul_of_pos_right hr hr2
   nlinarith [mul_pos hr0 hr2]
 

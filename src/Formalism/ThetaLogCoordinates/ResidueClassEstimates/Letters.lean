@@ -20,7 +20,8 @@ def Interl (n : ℕ) (la mu : ℕ → ℤ) : Prop := ∀ l, l < n → la l ≤ m
 
 def wsize (n : ℕ) (la : ℕ → ℤ) : ℤ := ∑ m ∈ range n, la m
 
-def tailPos (n : ℕ) (la : ℕ → ℤ) (u : ℕ) : ℤ := ∑ m ∈ (range n).filter (fun m => u ≤ m), max (la m) 0
+def tailPos (n : ℕ) (la : ℕ → ℤ) (u : ℕ) : ℤ :=
+  ∑ m ∈ (range n).filter (fun m => u ≤ m), max (la m) 0
 
 def tailNeg (n : ℕ) (la : ℕ → ℤ) (u : ℕ) : ℤ :=
   ∑ m ∈ (range n).filter (fun m => u ≤ m), max (-(la (n - 1 - m))) 0
@@ -46,8 +47,8 @@ def k (D : Letters) : ℕ := D.r + D.K
 def n0 (D : Letters) : ℕ := D.Ns - D.r
 
 def Wf (D : Letters) : Prop :=
-  1 ≤ D.r ∧ 1 ≤ D.K ∧ 3 * D.r ≤ D.Ns ∧ (∀ i, 1 ≤ i → i ≤ D.r → D.vec i = true) ∧
-  ∀ i, D.n0 < i → i ≤ D.Ns → D.vec i = true
+  1 ≤ D.r ∧ 1 ≤ D.K ∧ 3 * D.r ≤ D.Ns ∧ (∀ i, 1 ≤ i → i ≤ D.r → D.vec i = true)
+    ∧ ∀ i, D.n0 < i → i ≤ D.Ns → D.vec i = true
 
 def be (D : Letters) : ℕ := ∑ i ∈ Icc 1 D.n0, D.B i
 
@@ -59,7 +60,7 @@ def latestV (D : Letters) (i : ℕ) : List ℕ :=
   (((List.range' 1 (min i D.n0)).filter fun l => D.vec l).reverse).map D.B
 
 def latestC (D : Letters) (i : ℕ) : List ℕ :=
-  (((List.range' 1 (min i D.n0)).filter fun l => !D.vec l).reverse).map D.B
+  (((List.range' 1 (min i D.n0)).filter fun l => ! D.vec l).reverse).map D.B
 
 def SPos (D : Letters) (u i : ℕ) : ℕ := ((D.latestV i).drop u).sum
 
@@ -75,14 +76,15 @@ def ent {D : Letters} (mu : D.Stages) (i m : ℕ) : ℤ :=
   if h : i < D.Ns + 1 ∧ m < D.k then mu ⟨i, h.1⟩ ⟨m, h.2⟩ else 0
 
 def IsPATH (D : Letters) (mu : D.Stages) : Prop :=
-  (∀ m, ent mu 0 m = 0) ∧ (∀ i, i ≤ D.Ns → Dom D.k (ent mu i)) ∧
-  (∀ i, 1 ≤ i → i ≤ D.Ns → D.vec i = true → HStrip D.k (ent mu (i - 1)) (ent mu i)) ∧
-  (∀ i, 1 ≤ i → i ≤ D.Ns → D.vec i = false → HStrip D.k (ent mu i) (ent mu (i - 1))) ∧
-  (∀ i, 1 ≤ i → i ≤ D.n0 → D.vec i = true →
-    wsize D.k (ent mu i) - wsize D.k (ent mu (i - 1)) = D.B i) ∧
-  (∀ i, 1 ≤ i → i ≤ D.n0 → D.vec i = false →
-    wsize D.k (ent mu (i - 1)) - wsize D.k (ent mu i) = D.B i) ∧
-  ∀ i', 1 ≤ i' → i' ≤ D.r → ∀ m, m < i' → ent mu (D.n0 + i') m = D.be
+  (∀ m, ent mu 0 m = 0) ∧ (∀ i, i ≤ D.Ns → Dom D.k (ent mu i))
+    ∧ (∀ i, 1 ≤ i → i ≤ D.Ns → D.vec i = true → HStrip D.k (ent mu (i - 1)) (ent mu i))
+    ∧ (∀ i, 1 ≤ i → i ≤ D.Ns → D.vec i = false → HStrip D.k (ent mu i) (ent mu (i - 1)))
+    ∧ (∀ i,
+      1 ≤ i → i ≤ D.n0 → D.vec i = true → wsize D.k (ent mu i) - wsize D.k (ent mu (i - 1)) = D.B i)
+    ∧ (∀ i,
+      1 ≤ i → i ≤ D.n0 → D.vec i = false
+        → wsize D.k (ent mu (i - 1)) - wsize D.k (ent mu i) = D.B i)
+    ∧ ∀ i', 1 ≤ i' → i' ≤ D.r → ∀ m, m < i' → ent mu (D.n0 + i') m = D.be
 
 def stLen (D : Letters) (i : ℕ) : ℕ := D.k - (i - D.n0)
 
@@ -93,21 +95,28 @@ def kaRows {D : Letters} (mu : D.Stages) (i : ℕ) : ℕ → ℤ := fun l => ent
 def wt {D : Letters} (mu : D.Stages) : ℝ := weylDim D.K (kaRows mu D.Ns)
 
 def Typical (D : Letters) (X : ℕ → ℝ) (mu : D.Stages) : Prop :=
-  (∀ i, 1 ≤ i → i ≤ D.Ns → D.vec i = false →
-    ((tailPos (D.stLen (i - 1)) (stage mu (i - 1)) 0 - tailPos (D.stLen i) (stage mu i) 0 : ℤ) : ℝ) ≤ X i) ∧
-  (∀ i, D.r < i → i ≤ D.Ns → D.vec i = true →
-    ((tailNeg (D.stLen (i - 1)) (stage mu (i - 1)) 0 - tailNeg (D.stLen i) (stage mu i) 0 : ℤ) : ℝ) ≤ X i) ∧
-  ∀ i, D.r < i → i ≤ D.Ns → (2 / 3 : ℝ) * (D.Bo i : ℝ) ≤ (ent mu (i - 1) (D.r - 1) : ℝ)
+  (∀ i,
+      1 ≤ i → i ≤ D.Ns → D.vec i = false
+        → ((tailPos (D.stLen (i - 1)) (stage mu (i - 1)) 0 - tailPos (D.stLen i) (stage mu i) 0 : ℤ)
+            : ℝ)
+          ≤ X i)
+    ∧ (∀ i,
+      D.r < i → i ≤ D.Ns → D.vec i = true
+        → ((tailNeg (D.stLen (i - 1)) (stage mu (i - 1)) 0 - tailNeg (D.stLen i) (stage mu i) 0 : ℤ)
+            : ℝ)
+          ≤ X i)
+    ∧ ∀ i, D.r < i → i ≤ D.Ns → (2 / 3 : ℝ) * (D.Bo i : ℝ) ≤ (ent mu (i - 1) (D.r - 1) : ℝ)
 
 def Hyp (D : Letters) (a : ℝ) (p : ℕ) : Prop :=
-  3 ≤ a ∧ p.Prime ∧ 13 ≤ p ∧
-  (∀ i, 1 ≤ i → i ≤ D.n0 → D.k ≤ D.B i ∧ (D.B i : ℝ) ≤ 2 * a) ∧
-  (∀ l, l + 1 < (D.latestV D.n0).length →
-    p ^ 2 * (D.latestV D.n0).getD (l + 1) 0 ≤ 5 * (D.latestV D.n0).getD l 0) ∧
-  (∀ l, l + 1 < (D.latestC D.n0).length →
-    p ^ 2 * (D.latestC D.n0).getD (l + 1) 0 ≤ 5 * (D.latestC D.n0).getD l 0) ∧
-  (∀ i, D.n0 - D.r < i → i ≤ D.n0 → D.vec i = true) ∧ D.Ns + D.r ≤ D.K ∧ 2 * D.r ≤ D.Ns ∧
-  D.k ≤ 2 * (D.K - 2 * D.Ns) ∧ (D.Ns : ℝ) ≤ a
+  3 ≤ a ∧ p.Prime ∧ 13 ≤ p ∧ (∀ i, 1 ≤ i → i ≤ D.n0 → D.k ≤ D.B i ∧ (D.B i : ℝ) ≤ 2 * a)
+    ∧ (∀ l,
+      l + 1 < (D.latestV D.n0).length
+        → p ^ 2 * (D.latestV D.n0).getD (l + 1) 0 ≤ 5 * (D.latestV D.n0).getD l 0)
+    ∧ (∀ l,
+      l + 1 < (D.latestC D.n0).length
+        → p ^ 2 * (D.latestC D.n0).getD (l + 1) 0 ≤ 5 * (D.latestC D.n0).getD l 0)
+    ∧ (∀ i, D.n0 - D.r < i → i ≤ D.n0 → D.vec i = true) ∧ D.Ns + D.r ≤ D.K ∧ 2 * D.r ≤ D.Ns
+    ∧ D.k ≤ 2 * (D.K - 2 * D.Ns) ∧ (D.Ns : ℝ) ≤ a
 
 def k' (D : Letters) : ℕ := D.K - 2 * D.Ns
 

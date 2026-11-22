@@ -5,7 +5,8 @@ public import ReciprocityTheory.DualLattices.PSerFrobStatement
 
 @[expose] public section
 
-open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
+open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
 
 namespace GlobalTheory
 
@@ -58,20 +59,32 @@ private lemma fgInv_mulVec_eq {S : Type} [CommRing S] {g : ℕ} (M : Matrix (Fin
     exact key _ (hM k j)
   rwa [Matrix.sub_mulVec, Matrix.one_mulVec, sub_eq_zero] at h
 
-theorem nsmulF_add_sqZero_eq :
-  (∀ {R₀ : Type} [CommRing R₀] {ι : Type} [Fintype ι] [DecidableEq ι] (f : MvPowerSeries ι R₀) (S : Type) [CommRing S] [Algebra R₀ S] (a : ι → S),
-    (∀ N : ℕ, (∀ i, a i ^ N = 0) → nEval f a = tEval N f a) ∧
-    ((∀ i, IsNilpotent (a i)) → (∀ (S' : Type) [CommRing S'] [Algebra R₀ S'] (φ : S →ₐ[R₀] S'), φ (nEval f a) = nEval f (fun i => φ (a i))) ∧
-      nEval f a - algebraMap R₀ S (MvPowerSeries.coeff 0 f) ∈ Ideal.span (Set.range a))) →
-  (∀ {R₀ : Type} [CommRing R₀] {g : ℕ} {B : BX R₀} {K : LAlg R₀} (ch : FormalChartAtZero B K g) (S : Type) [CommRing S] [Algebra R₀ S] (a : Fin g → S), (∀ i, IsNilpotent (a i)) →
-    ∃ M : Matrix (Fin g) (Fin g) S, (∀ k j, M k j - (1 : Matrix (Fin g) (Fin g) S) k j ∈ Ideal.span (Set.range a)) ∧
-      ∀ e : Fin g → S, (∀ i j, e i * e j = 0) → fAdd ch.F a e = a + M *ᵥ e) →
-  (∀ {R₀ : Type} [CommRing R₀] {g : ℕ} {B : BX R₀} {K : LAlg R₀} (ch : FormalChartAtZero B K g) (n : ℕ) (S : Type) [CommRing S] [Algebra R₀ S], (n : S) = 0 → ∀ a e : Fin g → S, (∀ i, IsNilpotent (a i)) →
-    (∀ i j, e i * e j = 0) → nsmulF ch.F (a + e) n = nsmulF ch.F a n) := by
+theorem nsmulF_add_sqZero_eq
+    : (∀ {R₀ : Type} [CommRing R₀] {ι : Type} [Fintype ι] [DecidableEq ι] (f : MvPowerSeries ι R₀)
+          (S : Type) [CommRing S] [Algebra R₀ S] (a : ι → S),
+        (∀ N : ℕ, (∀ i, a i ^ N = 0) → nEval f a = tEval N f a)
+          ∧ ((∀ i, IsNilpotent (a i))
+            → (∀ (S' : Type) [CommRing S'] [Algebra R₀ S'] (φ : S →ₐ[R₀] S'),
+                φ (nEval f a) = nEval f (fun i => φ (a i)))
+              ∧ nEval f a - algebraMap R₀ S (MvPowerSeries.coeff 0 f) ∈ Ideal.span (Set.range a)))
+      → (∀ {R₀ : Type} [CommRing R₀] {g : ℕ} {B : BX R₀} {K : LAlg R₀}
+          (ch : FormalChartAtZero B K g) (S : Type) [CommRing S] [Algebra R₀ S] (a : Fin g → S),
+        (∀ i, IsNilpotent (a i))
+          → ∃ M : Matrix (Fin g) (Fin g) S,
+            (∀ k j, M k j - (1 : Matrix (Fin g) (Fin g) S) k j ∈ Ideal.span (Set.range a))
+              ∧ ∀ e : Fin g → S, (∀ i j, e i * e j = 0) → fAdd ch.F a e = a + M *ᵥ e)
+      → (∀ {R₀ : Type} [CommRing R₀] {g : ℕ} {B : BX R₀} {K : LAlg R₀}
+          (ch : FormalChartAtZero B K g) (n : ℕ) (S : Type) [CommRing S] [Algebra R₀ S],
+        (n : S) = 0
+          → ∀ a e : Fin g → S,
+            (∀ i, IsNilpotent (a i)) → (∀ i j, e i * e j = 0)
+              → nsmulF ch.F (a + e) n = nsmulF ch.F a n) := by
   intro H1 H2 R₀ _ g B K ch n S _ _ hn a e ha he
   have h0 : ∀ i : Fin g, IsNilpotent ((0 : Fin g → S) i) := fun _ => IsNilpotent.zero
-  have hnil : ∀ x y : Fin g → S, (∀ i, IsNilpotent (x i)) → (∀ i, IsNilpotent (y i)) →
-      ∀ i, IsNilpotent (fAdd ch.F x y i) := by
+  have hnil
+      : ∀ x y : Fin g → S,
+        (∀ i, IsNilpotent (x i)) → (∀ i, IsNilpotent (y i))
+          → ∀ i, IsNilpotent (fAdd ch.F x y i) := by
     intro x y hx hy k
     have hxy := fgInv_elim_nil x y hx hy
     have h00 := fgInv_elim_nil (0 : Fin g → S) (0 : Fin g → S) h0 h0
@@ -83,14 +96,16 @@ theorem nsmulF_add_sqZero_eq :
     have e4 := (nilradical S).sub_mem e1 e2
     rw [sub_sub_sub_cancel_right, sub_zero] at e4
     exact mem_nilradical.1 e4
-  have hns : ∀ x : Fin g → S, (∀ i, IsNilpotent (x i)) → ∀ m,
-      ∀ i, IsNilpotent (nsmulF ch.F x m i) := by
+  have hns
+      : ∀ x : Fin g → S, (∀ i, IsNilpotent (x i)) → ∀ m, ∀ i, IsNilpotent (nsmulF ch.F x m i) := by
     intro x hx m
     induction m with
     | zero => exact h0
     | succ m ih => exact hnil _ _ ih hx
-  have hdist : ∀ x y : Fin g → S, (∀ i, IsNilpotent (x i)) → (∀ i, IsNilpotent (y i)) → ∀ m,
-      nsmulF ch.F (fAdd ch.F x y) m = fAdd ch.F (nsmulF ch.F x m) (nsmulF ch.F y m) := by
+  have hdist
+      : ∀ x y : Fin g → S,
+        (∀ i, IsNilpotent (x i)) → (∀ i, IsNilpotent (y i))
+          → ∀ m, nsmulF ch.F (fAdd ch.F x y) m = fAdd ch.F (nsmulF ch.F x m) (nsmulF ch.F y m) := by
     intro x y hx hy m
     induction m with
     | zero => exact (ch.F_unit S 0 h0).symm
@@ -99,12 +114,10 @@ theorem nsmulF_add_sqZero_eq :
       have hY := hns y hy m
       show fAdd ch.F (nsmulF ch.F (fAdd ch.F x y) m) (fAdd ch.F x y) =
         fAdd ch.F (fAdd ch.F (nsmulF ch.F x m) x) (fAdd ch.F (nsmulF ch.F y m) y)
-      rw [ih, ch.F_assoc S _ _ _ hX hY (hnil _ _ hx hy),
-        ch.F_assoc S _ _ _ hX hx (hnil _ _ hY hy),
+      rw [ih, ch.F_assoc S _ _ _ hX hY (hnil _ _ hx hy), ch.F_assoc S _ _ _ hX hx (hnil _ _ hY hy),
         ← ch.F_assoc S _ _ _ hY hx hy, ← ch.F_assoc S _ _ _ hx hY hy, ch.F_comm S _ _ hY hx]
   obtain ⟨M, hM, hMe⟩ := H2 ch S a ha
-  have hdet : IsUnit M.det :=
-    fgInv_det_unit M fun k j => fgInv_span_le_nil a ha (hM k j)
+  have hdet : IsUnit M.det := fgInv_det_unit M fun k j => fgInv_span_le_nil a ha (hM k j)
   set u : Fin g → S := M⁻¹ *ᵥ e with hu
   have huu : ∀ i j, u i * u j = 0 := fgInv_mulVec_sq _ e he
   have hun : ∀ i, IsNilpotent (u i) := fun i => ⟨2, by rw [pow_two, huu]⟩

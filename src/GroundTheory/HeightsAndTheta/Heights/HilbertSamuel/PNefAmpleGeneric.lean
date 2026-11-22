@@ -17,7 +17,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I1
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry ReciprocityTheory.ChartRestriction.G.AI.I1
 
 noncomputable section
 
@@ -25,10 +26,13 @@ namespace NefAmpleGeneric
 
 attribute [local instance] MvPolynomial.algebraMvPolynomial
 
-theorem isArithVar_comap_of_isProjVarF {K : Type} [Fintype K] [Nonempty K] {ι : K → Type}
-    [∀ k, Fintype (ι k)] {W : Ideal (MRingOver ℚ ι)} {d : ℕ} (hW : IsProjVarF W d) :
-    IsArithVar (W.comap (MvPolynomial.map (Int.castRingHom ℚ))) (d + 1) ∧
-      (W.comap (MvPolynomial.map (Int.castRingHom ℚ))).map (MvPolynomial.map (Int.castRingHom ℚ)) = W := by
+theorem isArithVar_comap_of_isProjVarF
+    {K : Type} [Fintype K] [Nonempty K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {W : Ideal (MRingOver ℚ ι)} {d : ℕ} (hW : IsProjVarF W d)
+    : IsArithVar (W.comap (MvPolynomial.map (Int.castRingHom ℚ))) (d + 1)
+      ∧ (W.comap (MvPolynomial.map (Int.castRingHom ℚ))).map (MvPolynomial.map (Int.castRingHom ℚ))
+        = W := by
   classical
   obtain ⟨⟨hprime, hhom, hrel⟩, hdim⟩ := hW
   set φ : MRing ι →+* MRingOver ℚ ι := MvPolynomial.map (Int.castRingHom ℚ) with hφdef
@@ -66,12 +70,14 @@ theorem isArithVar_comap_of_isProjVarF {K : Type} [Fintype K] [Nonempty K] {ι :
     simp only [Ideal.mem_comap, Ideal.mem_bot]
     exact ⟨hch m, fun h => by rw [h, map_zero]; exact P.zero_mem⟩
   · have hext : ReciprocityTheory.AnForm.R.extQ P = W := hmap
-    rw [← hd, hext, hdim, show d + 1 + Fintype.card K = (d + Fintype.card K) + 1 by omega, Nat.cast_succ]
+    rw [← hd, hext, hdim, show d + 1 + Fintype.card K = (d + Fintype.card K) + 1 by omega,
+      Nat.cast_succ]
 
 end NefAmpleGeneric
 
-theorem NefAmpleGeneric.proof (hKA : KH.KAmpStatement)
-    (hDG : GroundTheory.Heights₂.Heights.Inter.DegreeGeneric.Statement) : NefAmpleGeneric.Statement := by
+theorem NefAmpleGeneric.proof
+    (hKA : KH.KAmpStatement) (hDG : GroundTheory.Heights₂.Heights.Inter.DegreeGeneric.Statement)
+    : NefAmpleGeneric.Statement := by
   intro K _ _ ι _ _ Ω _ _ y D M P0 b a hV hP0 hs hb ha
   classical
   have : Nonempty K := hV.1
@@ -84,7 +90,9 @@ theorem NefAmpleGeneric.proof (hKA : KH.KAmpStatement)
       Ideal.map_le_iff_le_comap.mp hle
     have h0 : 0 ≤ geomDeg (W.comap (MvPolynomial.map (Int.castRingHom ℚ))) M 1 :=
       NefOnGenericOfSemipos.proof K ι _ P0 M hP0 hs _ hWar hPW
-    have hdeg := hDG K ι (W.comap (MvPolynomial.map (Int.castRingHom ℚ))) 1 ![M] hWar (fun j => by fin_cases j; exact hs.1)
+    have hdeg :=
+      hDG K ι (W.comap (MvPolynomial.map (Int.castRingHom ℚ))) 1 ![M] hWar
+        (fun j => by fin_cases j; exact hs.1)
     rw [hWmap] at hdeg
     have hpot : pot ![M] = fun (_ : Fin 1) z => Real.log (M.h z) := by
       funext j z

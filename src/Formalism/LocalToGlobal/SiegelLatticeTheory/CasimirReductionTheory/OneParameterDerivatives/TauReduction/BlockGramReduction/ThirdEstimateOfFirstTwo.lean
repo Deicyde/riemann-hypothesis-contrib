@@ -25,7 +25,8 @@ theorem exists_ne_zero_mem_L (I : AutInst) (hn : 1 ≤ I.n) : ∃ l ∈ I.L, l �
   haveI : Nonempty (Fin I.n) := ⟨⟨0, hn⟩⟩
   exact bot_ne_top h
 
-theorem third_estimate_of_first_two (h0 : LatticeCommensurable) (h1 : LatticeFinitelyGenerated) : SubmoduleExists := by
+theorem third_estimate_of_first_two (h0 : LatticeCommensurable) (h1 : LatticeFinitelyGenerated)
+    : SubmoduleExists := by
   intro I hn x
   obtain ⟨m, hm1, _, hLm⟩ := h0 I x
   obtain ⟨M, _, hM⟩ := h1 I x
@@ -40,7 +41,8 @@ theorem third_estimate_of_first_two (h0 : LatticeCommensurable) (h1 : LatticeFin
     by_contra h
     rw [Set.not_nonempty_iff_eq_empty] at h
     rw [h, Submodule.span_empty] at hspan
-    have h2 : ((m : I.E) • l) ∈ Submodule.span I.E (M : Set (Fin I.n → I.E)) := Submodule.subset_span hml
+    have h2 : ((m : I.E) • l) ∈ Submodule.span I.E (M : Set (Fin I.n → I.E)) :=
+      Submodule.subset_span hml
     rw [← hspan] at h2
     exact hm0 ((Submodule.mem_bot _).mp h2)
   haveI := htfin.fintype

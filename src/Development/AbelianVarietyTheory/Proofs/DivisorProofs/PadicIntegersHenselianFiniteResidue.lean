@@ -11,9 +11,10 @@ open IsDedekindDomain IsLocalRing
 
 namespace GlobalTheory.IntAdicHensel
 
-theorem henselianLocalRing_and_finite_residueField :
-    ∀ (v : HeightOneSpectrum ℤ), HenselianLocalRing (v.adicCompletionIntegers ℚ) ∧
-      Finite (IsLocalRing.ResidueField (v.adicCompletionIntegers ℚ)) := by
+theorem henselianLocalRing_and_finite_residueField
+    : ∀ (v : HeightOneSpectrum ℤ),
+      HenselianLocalRing (v.adicCompletionIntegers ℚ)
+        ∧ Finite (IsLocalRing.ResidueField (v.adicCompletionIntegers ℚ)) := by
   intro v
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible (v.adicCompletionIntegers ℚ)
   haveI : IsPrecomplete (maximalIdeal (v.adicCompletionIntegers ℚ)) (v.adicCompletionIntegers ℚ) :=

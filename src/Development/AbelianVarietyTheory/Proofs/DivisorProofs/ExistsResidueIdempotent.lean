@@ -11,8 +11,9 @@ open scoped TensorProduct
 
 namespace GlobalTheory.AzumayaResidue
 
-theorem isSimpleRing_of_isAzumaya (k B : Type) [Field k] [Ring B] [Algebra k B]
-    [IsAzumaya k B] [Nontrivial B] : IsSimpleRing B := by
+theorem isSimpleRing_of_isAzumaya
+    (k B : Type) [Field k] [Ring B] [Algebra k B] [IsAzumaya k B] [Nontrivial B]
+    : IsSimpleRing B := by
   refine IsSimpleRing.of_eq_bot_or_eq_top fun I => ?_
   by_cases h : I = ⊥
   · exact Or.inl h
@@ -29,8 +30,7 @@ theorem isSimpleRing_of_isAzumaya (k B : Type) [Field k] [Ring B] [Algebra k B]
     push_neg at hc
     exact hz0 ((Module.forall_dual_apply_eq_zero_iff k z).1 hc)
   let f : B →ₗ[k] B := (φ z)⁻¹ • φ.smulRight (1 : B)
-  have hf : f z = 1 := by
-    simp [f, hφ]
+  have hf : f z = 1 := by simp [f, hφ]
   obtain ⟨t, ht⟩ := (IsAzumaya.bij (R := k) (A := B)).2 f
   have key : ∀ t : B ⊗[k] Bᵐᵒᵖ, AlgHom.mulLeftRight k B t z ∈ I := by
     intro t
@@ -45,15 +45,15 @@ theorem isSimpleRing_of_isAzumaya (k B : Type) [Field k] [Ring B] [Algebra k B]
   rw [← TwoSidedIdeal.one_mem_iff, ← hf, ← ht]
   exact key t
 
-theorem exists_rankOne_idempotent (k B : Type) [Field k] [Finite k] [Ring B] [Algebra k B]
-    [IsAzumaya k B] [Nontrivial B] :
-    ∃ x : B, x * x = x ∧ (∀ y : B, ∃ c : k, x * y * x = c • x) ∧
-      ∃ (N : ℕ) (a b : Fin N → B), ∑ i, a i * x * b i = 1 := by
+theorem exists_rankOne_idempotent
+    (k B : Type) [Field k] [Finite k] [Ring B] [Algebra k B] [IsAzumaya k B] [Nontrivial B]
+    : ∃ x : B,
+      x * x = x ∧ (∀ y : B, ∃ c : k, x * y * x = c • x)
+        ∧ ∃ (N : ℕ) (a b : Fin N → B), ∑ i, a i * x * b i = 1 := by
   classical
   haveI : IsSimpleRing B := isSimpleRing_of_isAzumaya k B
   haveI : IsArtinianRing B := IsArtinianRing.of_finite k B
-  obtain ⟨n, hn, D, _, _, _, ⟨e⟩⟩ :=
-    IsSimpleRing.exists_algEquiv_matrix_divisionRing_finite k B
+  obtain ⟨n, hn, D, _, _, _, ⟨e⟩⟩ := IsSimpleRing.exists_algEquiv_matrix_divisionRing_finite k B
   haveI : Finite D := Module.finite_of_finite k
   have hcomm : ∀ a b : D, a * b = b * a := (littleWedderburn D).mul_comm
   have hD : ∀ d : D, ∃ c : k, algebraMap k D c = d := by
@@ -73,8 +73,15 @@ theorem exists_rankOne_idempotent (k B : Type) [Field k] [Finite k] [Ring B] [Al
     simpa [Matrix.algebraMap_eq_diagonal] using h3
   let i₀ : Fin n := ⟨0, Nat.pos_of_ne_zero hn.out⟩
   let E : Matrix (Fin n) (Fin n) D := Matrix.single i₀ i₀ 1
-  refine ⟨e.symm E, ?_, ?_, n, fun i => e.symm (Matrix.single i i₀ 1),
-    fun i => e.symm (Matrix.single i₀ i 1), ?_⟩
+  refine ⟨
+    e.symm E,
+    ?_,
+    ?_,
+    n,
+    fun i => e.symm (Matrix.single i i₀ 1),
+    fun i => e.symm (Matrix.single i₀ i 1),
+    ?_
+  ⟩
   · rw [← map_mul]
     simp [E, Matrix.single_mul_single_same]
   · intro y
@@ -86,30 +93,47 @@ theorem exists_rankOne_idempotent (k B : Type) [Field k] [Finite k] [Ring B] [Al
     rw [Algebra.algebraMap_eq_smul_one]
   · apply e.injective
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [E, map_sum, Matrix.single_mul_single_same, Matrix.sum_single_one]
+    simp [E, map_sum, Matrix.single_mul_single_same, Matrix.sum_single_one]
 
 end GlobalTheory.AzumayaResidue
 
 namespace GlobalTheory.AzumayaResidue
 
-theorem mem_smul_top_of_one_tmul_eq_zero (A : Type) [CommRing A] [IsLocalRing A] (Λ : Type)
-    [Ring Λ] [Algebra A Λ] (y : Λ) (h : (1 : ResidueField A) ⊗ₜ[A] y = 0) :
-    y ∈ (maximalIdeal A) • (⊤ : Submodule A Λ) := by
+theorem mem_smul_top_of_one_tmul_eq_zero
+    (A : Type) [CommRing A] [IsLocalRing A]
+    (Λ : Type) [Ring Λ] [Algebra A Λ]
+    (y : Λ) (h : (1 : ResidueField A) ⊗ₜ[A] y = 0)
+    : y ∈ (maximalIdeal A) • (⊤ : Submodule A Λ) := by
   have := TensorProduct.quotTensorEquivQuotSMul_mk_one_tmul (M := Λ) (maximalIdeal A) y
   rw [← Submodule.Quotient.mk_eq_zero, ← this]
   exact (congrArg (TensorProduct.quotTensorEquivQuotSMul Λ (maximalIdeal A)) h).trans (map_zero _)
 
-theorem one_tmul_surjective (A : Type) [CommRing A] [IsLocalRing A] (Λ : Type)
-    [Ring Λ] [Algebra A Λ] (z : ResidueField A ⊗[A] Λ) : ∃ y : Λ, (1 : ResidueField A) ⊗ₜ[A] y = z := by
+theorem one_tmul_surjective
+    (A : Type) [CommRing A] [IsLocalRing A]
+    (Λ : Type) [Ring Λ] [Algebra A Λ]
+    (z : ResidueField A ⊗[A] Λ)
+    : ∃ y : Λ, (1 : ResidueField A) ⊗ₜ[A] y = z := by
   first
   | exact @_root_.GlobalTheory.OneTensorExistence.exists_one_tmul_eq
   | exact _root_.GlobalTheory.OneTensorExistence.exists_one_tmul_eq
   | (apply _root_.GlobalTheory.OneTensorExistence.exists_one_tmul_eq <;> assumption)
   | (intros; apply _root_.GlobalTheory.OneTensorExistence.exists_one_tmul_eq <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.OneTensorExistence.exists_one_tmul_eq <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.OneTensorExistence.exists_one_tmul_eq
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.OneTensorExistence.exists_one_tmul_eq ..)
 
-theorem exists_residue_idempotent : ∀ (A : Type) [CommRing A] [IsLocalRing A] [Finite (IsLocalRing.ResidueField A)] (Λ : Type) [Ring Λ] [Algebra A Λ] [IsAzumaya A Λ] [Module.Free A Λ] [Nontrivial Λ], ∃ x : Λ, x * x - x ∈ (IsLocalRing.maximalIdeal A) • (⊤ : Submodule A Λ) ∧ (∀ y : Λ, ∃ c : A, x * y * x - c • x ∈ (IsLocalRing.maximalIdeal A) • (⊤ : Submodule A Λ)) ∧ ∃ (N : ℕ) (a b : Fin N → Λ), ∑ i, a i * x * b i - 1 ∈ (IsLocalRing.maximalIdeal A) • (⊤ : Submodule A Λ) := by
+theorem exists_residue_idempotent
+    : ∀ (A : Type) [CommRing A] [IsLocalRing A] [Finite (IsLocalRing.ResidueField A)] (Λ : Type)
+        [Ring Λ] [Algebra A Λ] [IsAzumaya A Λ] [Module.Free A Λ] [Nontrivial Λ],
+      ∃ x : Λ,
+        x * x - x ∈ (IsLocalRing.maximalIdeal A) • (⊤ : Submodule A Λ)
+          ∧ (∀ y : Λ, ∃ c : A,
+            x * y * x - c • x ∈ (IsLocalRing.maximalIdeal A) • (⊤ : Submodule A Λ))
+          ∧ ∃ (N : ℕ) (a b : Fin N → Λ),
+            ∑ i, a i * x * b i - 1 ∈ (IsLocalRing.maximalIdeal A) • (⊤ : Submodule A Λ) := by
   intro A _ _ _ Λ _ _ _ _ _
   classical
   let k := ResidueField A
@@ -134,9 +158,9 @@ theorem exists_residue_idempotent : ∀ (A : Type) [CommRing A] [IsLocalRing A] 
   · obtain ⟨cb, hc⟩ := hxy (π y)
     obtain ⟨c, rfl⟩ := IsLocalRing.residue_surjective cb
     refine ⟨c, hker _ ?_⟩
-    rw [map_sub, map_mul, map_mul, hc, map_smul, ← ResidueField.algebraMap_eq,
-      algebraMap_smul, sub_self]
+    rw [map_sub, map_mul, map_mul, hc, map_smul, ← ResidueField.algebraMap_eq, algebraMap_smul,
+      sub_self]
   set_option synthInstance.maxHeartbeats 100000 in
-    · simp only [map_sub, map_sum, map_mul, map_one, ha, hb, hsum, sub_self]
+  · simp only [map_sub, map_sum, map_mul, map_one, ha, hb, hsum, sub_self]
 
 end GlobalTheory.AzumayaResidue

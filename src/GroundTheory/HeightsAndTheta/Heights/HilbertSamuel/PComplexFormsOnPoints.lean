@@ -13,8 +13,9 @@ namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
 open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
 
-theorem ComplexFormsOnPoints.proof (hR : PrimeComplexRadical.Statement)
-    (hM : ComplexMinimalPrimesContract.Statement) : ComplexFormsOnPoints.Statement := by
+theorem ComplexFormsOnPoints.proof
+    (hR : PrimeComplexRadical.Statement) (hM : ComplexMinimalPrimesContract.Statement)
+    : ComplexFormsOnPoints.Statement := by
   intro K _ ι _ P hP hrel F hF
   have hrad := hR (Σ k, ι k) P hP
   apply hrad
@@ -43,8 +44,7 @@ theorem ComplexFormsOnPoints.proof (hR : PrimeComplexRadical.Statement)
     intro z hz
     have hz : ∀ p ∈ Q, eval z p = 0 := hz
     change eval z _ = 0
-    have hzh : eval z (map (Int.castRingHom ℂ) h0) = ∏ k, z ⟨k, i k⟩ := by
-      simp [h0, map_prod]
+    have hzh : eval z (map (Int.castRingHom ℂ) h0) = ∏ k, z ⟨k, i k⟩ := by simp [h0, map_prod]
     by_cases h0z : eval z (map (Int.castRingHom ℂ) h0) = 0
     · rw [map_mul, h0z, mul_zero]
     · have hne : ∀ k, z ⟨k, i k⟩ ≠ 0 := by

@@ -17,7 +17,9 @@ public import Formalism.LocalToGlobal.KernelLattices.KernelLocalFactors.ThDistC
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 
 set_option maxHeartbeats 800000
@@ -26,7 +28,23 @@ namespace GlobalTheory.Mem.Col2.TC
 
 open GlobalTheory.LvT.Built.KMap
 
-theorem rho_jet_mem : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → TC.Pins B X → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)), ColIn.JetsIn I → ∀ (u : B.Word) (a : I.ι) (i : ℕ), i < B.R.m → ∀ (c : (I.stp u a i).Cl) (c' : (I.stp u a (i + 1)).Cl) (e : DVar B.fields.Tau (B.R.N i) (B.R.N (i + 1)) →₀ ℕ), (∀ τ, (monoDeg e τ : ℤ) = nuDeg B u i τ) → ∃ k : B.LL, B.embLL k = (I.rho u a i c.1 ((I.stp u a i).rep c) * I.rho' u a i c'.1 ((I.stp u a (i + 1)).rep c')) * jetC I.J.cD (I.th u a i c.1 c'.1 ((I.stp u a i).rep c) ((I.stp u a (i + 1)).rep c')) e := by
+theorem rho_jet_mem
+    : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
+      I.Ok → TC.Pins B X
+        → ∀ (l : I.Laws) (Z : TC.Later B (I.cols l)),
+          ColIn.JetsIn I
+            → ∀ (u : B.Word) (a : I.ι) (i : ℕ),
+              i < B.R.m
+                → ∀ (c : (I.stp u a i).Cl) (c' : (I.stp u a (i + 1)).Cl)
+                    (e : DVar B.fields.Tau (B.R.N i) (B.R.N (i + 1)) →₀ ℕ),
+                  (∀ τ, (monoDeg e τ : ℤ) = nuDeg B u i τ)
+                    → ∃ k : B.LL,
+                      B.embLL k
+                        = (I.rho u a i c.1 ((I.stp u a i).rep c)
+                            * I.rho' u a i c'.1 ((I.stp u a (i + 1)).rep c'))
+                          * jetC I.J.cD
+                            (I.th u a i c.1 c'.1 ((I.stp u a i).rep c) ((I.stp u a (i + 1)).rep c'))
+                            e := by
   classical
   intro B X I h hP l Z hJ u a i hi c c' e he
   obtain ⟨hX, hPr, -⟩ := base_fields_primes_ok B X
@@ -37,9 +55,12 @@ theorem rho_jet_mem : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → T
   have hN' : IsSdLat p'.1.1.deco.1.N := ⟨p'.1.1.deco.2.lat, p'.1.1.deco.2.uni⟩
   have hA : 0 < cAof (Pr := B.primes X) I.sel (I.tup a) (I.cst a) :=
     pow_pos (Finset.prod_pos fun P _ => qOf_pos P.1) _
-  have hB : 0 < cBof (Pr := B.primes X) I.sel (I.tup a) (I.cst a) u := GlobalTheory.MoveCompare.cBof_pos hPr _ _ _ u
-  have hbox := GlobalTheory.LvT.Built.Box.inBox_xiAt B.fields (B.primes X) B.R I.Ch I.sel I.S (I.tup a) (I.cst a) (I.idx a) _ _ u i hX hPr
-    h.sel_ok (h.T_mem u) h.g_mem (h.idx_ok a) hi ⟨_, _, _, _, h.ch_tied⟩ c.1 c'.1 p p'
+  have hB : 0 < cBof (Pr := B.primes X) I.sel (I.tup a) (I.cst a) u :=
+    GlobalTheory.MoveCompare.cBof_pos hPr _ _ _ u
+  have hbox :=
+    GlobalTheory.LvT.Built.Box.inBox_xiAt B.fields (B.primes X) B.R I.Ch I.sel I.S (I.tup a)
+      (I.cst a) (I.idx a) _ _ u i hX hPr h.sel_ok (h.T_mem u) h.g_mem (h.idx_ok a) hi
+      ⟨_, _, _, _, h.ch_tied⟩ c.1 c'.1 p p'
   set N := p.1.1.deco.1.N
   set N' := p'.1.1.deco.1.N
   set cA := cAof (Pr := B.primes X) I.sel (I.tup a) (I.cst a)
@@ -51,10 +72,13 @@ theorem rho_jet_mem : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → T
     let W := Submodule.span B.fields.E (N : Set (Sp B.fields.E (B.R.N i)))
     change W = ⊤
     by_contra hspan
-    let e : Sp B.fields.E (B.R.N i) ≃ₗ⋆[B.fields.E] Sp B.fields.E (B.R.N i) := starLinearEquiv B.fields.E
+    let e : Sp B.fields.E (B.R.N i) ≃ₗ⋆[B.fields.E] Sp B.fields.E (B.R.N i) :=
+      starLinearEquiv B.fields.E
     let g : Sp B.fields.E (B.R.N i) →ₗ[B.fields.E] Module.Dual B.fields.E W :=
       (LinearMap.domRestrict' W).comp ((hStd B.fields.E (B.R.N i)).comp e.toLinearMap)
-    have hdim : Module.finrank B.fields.E (Module.Dual B.fields.E W) < Module.finrank B.fields.E (Sp B.fields.E (B.R.N i)) := by
+    have hdim
+        : Module.finrank B.fields.E (Module.Dual B.fields.E W)
+          < Module.finrank B.fields.E (Sp B.fields.E (B.R.N i)) := by
       rw [Subspace.dual_finrank_eq]
       exact Submodule.finrank_lt hspan
     obtain ⟨x, hx, hx₀⟩ :=
@@ -64,20 +88,32 @@ theorem rho_jet_mem : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → T
       intro y hy
       apply hStd_mem_one_symm
       have hxy : hStd B.fields.E (B.R.N i) (e x) y = 0 :=
-        congrArg (fun f : Module.Dual B.fields.E W => f ⟨y, Submodule.subset_span hy⟩) (LinearMap.mem_ker.mp hx)
+        congrArg
+          (fun f : Module.Dual B.fields.E W => f ⟨y, Submodule.subset_span hy⟩)
+          (LinearMap.mem_ker.mp hx)
       simp [LinearMap.map_smulₛₗ, LinearMap.smul_apply, hxy]
     let j : B.fields.E →ₗ[𝓞 B.fields.E] N :=
-      ((LinearMap.toSpanSingleton B.fields.E _ (e x)).restrictScalars (𝓞 B.fields.E)).codRestrict N hsmul
+      ((LinearMap.toSpanSingleton B.fields.E _ (e x)).restrictScalars (𝓞 B.fields.E)).codRestrict N
+        hsmul
     let : Module.Finite (𝓞 B.fields.E) N := Module.Finite.iff_fg.mpr hN.1.fg
-    let : Module.Finite (𝓞 B.fields.E) B.fields.E := Module.Finite.of_injective j fun a b hab =>
-      smul_left_injective B.fields.E (fun hzero => hx₀ (e.map_eq_zero_iff.mp hzero)) (congrArg Subtype.val hab)
+    let : Module.Finite (𝓞 B.fields.E) B.fields.E :=
+      Module.Finite.of_injective j fun a b hab =>
+        smul_left_injective B.fields.E
+          (fun hzero => hx₀ (e.map_eq_zero_iff.mp hzero))
+          (congrArg Subtype.val hab)
     exact RingOfIntegers.not_isField B.fields.E
-      (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 B.fields.E) B.fields.E) (Field.toIsField B.fields.E))
-  have hth := GlobalTheory.latSum_thInd_eq_thC B.fields I.A _ _ (I.Sb a u) N N' cA cB (fun x => I.A.σ₀ (Ξ x))
-    (indTieD_of_la I.A _ _ _ _ (Nat.mul_pos hA hB) hLa) hN hN' hA hB (volC_pos_of_laHyp I.A _ _ _ hLa hN hN')
-    (GlobalTheory.finite_divLat_quot_mulLat_homAt _ _ _ _ _ _ _ _ hNfull hN'.1 hA hB) (fun x hx => hbox.1 x ((map_ne_zero _).1 hx))
-    (fun x y hy => congrArg I.A.σ₀ (hbox.2 x y hy))
-  have hfin := GlobalTheory.finite_divLat_quot_mulLat_homAt _ _ _ (I.Sb a u) N N' cA cB hNfull hN'.1 hA hB
+      (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 B.fields.E) B.fields.E)
+        (Field.toIsField B.fields.E))
+  have hth :=
+    GlobalTheory.latSum_thInd_eq_thC B.fields I.A _ _ (I.Sb a u) N N' cA cB
+      (fun x => I.A.σ₀ (Ξ x))
+      (indTieD_of_la I.A _ _ _ _ (Nat.mul_pos hA hB) hLa) hN hN' hA hB
+      (volC_pos_of_laHyp I.A _ _ _ hLa hN hN')
+      (GlobalTheory.finite_divLat_quot_mulLat_homAt _ _ _ _ _ _ _ _ hNfull hN'.1 hA hB)
+      (fun x hx => hbox.1 x ((map_ne_zero _).1 hx))
+      (fun x y hy => congrArg I.A.σ₀ (hbox.2 x y hy))
+  have hfin :=
+    GlobalTheory.finite_divLat_quot_mulLat_homAt _ _ _ (I.Sb a u) N N' cA cB hNfull hN'.1 hA hB
   let _ := @Fintype.ofFinite _ hfin
   rw [show I.th u a i c.1 c'.1 p p' = fun z => _ from funext fun z => (hth z).symm]
   unfold latSum
@@ -85,7 +121,8 @@ theorem rho_jet_mem : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → T
   set r := Function.surjInv (Submodule.Quotient.mk_surjective
     ((Formalism.L2.Col.mulLat cB (homAt (I.Sb a u) N N')).comap (divLat cA (homAt (I.Sb a u) N N')).subtype))
   have hs : ∀ q (k : ℕ), ContDiff ℂ k (I.A.thInd (I.Sb a u) N N' cB (r q)) := fun q =>
-    indSmooth_of I.A _ _ (I.Sb a u) (cA * cB) hE N N' cB (r q) ⟨hN, hN', hB, Dvd.intro_left _ rfl, divLat_mul_of cA cB _ (r q).2⟩
+    indSmooth_of I.A _ _ (I.Sb a u) (cA * cB) hE N N' cB (r q)
+      ⟨hN, hN', hB, Dvd.intro_left _ rfl, divLat_mul_of cA cB _ (r q).2⟩
   rw [show I.J.cD = I.A.cD from rfl, jetC_sum _ _ _ hs]
   have hr := rhoIs I h a u hi c.1 p c'.1 p'
   rw [show I.rho u a i c.1 p * I.rho' u a i c'.1 p' = _ from hr]
@@ -94,8 +131,9 @@ theorem rho_jet_mem : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → T
   apply RingHom.mem_fieldRange.1
   rw [mul_assoc, Finset.mul_sum]
   refine Subfield.mul_mem _ (RingHom.mem_fieldRange_self _ _) (Subfield.sum_mem _ fun q _ => ?_)
-  obtain ⟨y, hy⟩ := hJ.exists_eq (a := a) (u := u) (N := N) (N' := N') (c := cB) (x := (r q).1) (e := e) hi
-    ⟨hN, hN', hB, Dvd.intro_left _ rfl, divLat_mul_of cA cB _ (r q).2⟩ he
+  obtain ⟨y, hy⟩ :=
+    hJ.exists_eq (a := a) (u := u) (N := N) (N' := N') (c := cB) (x := (r q).1) (e := e) hi
+      ⟨hN, hN', hB, Dvd.intro_left _ rfl, divLat_mul_of cA cB _ (r q).2⟩ he
   rw [mul_left_comm]
   refine Subfield.mul_mem _ (RingHom.mem_fieldRange_self _ _) ?_
   exact ⟨y, hy⟩

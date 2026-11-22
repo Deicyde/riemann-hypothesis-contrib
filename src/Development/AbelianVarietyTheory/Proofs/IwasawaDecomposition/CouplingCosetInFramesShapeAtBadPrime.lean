@@ -6,7 +6,10 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IntAtNatC
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC GlobalTheory.Mem.Col2.AdT Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC GlobalTheory.Mem.Col2.AdT
+  Matrix
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Mem.Col2.AdT.CosShape
@@ -15,30 +18,37 @@ section Gen
 
 variable {E : Type} [Field E] [NumberField E] {n : ℕ}
 
-theorem pow_smul_mem (S : Submodule (𝓞 E) (Sp E n)) (r : 𝓞 E) (k : ℕ) {x : Sp E n} (hx : x ∈ S) :
-    ((r : E) ^ k) • x ∈ S := by
-
+theorem pow_smul_mem (S : Submodule (𝓞 E) (Sp E n)) (r : 𝓞 E) (k : ℕ) {x : Sp E n} (hx : x ∈ S)
+    : ((r : E) ^ k) • x ∈ S := by
   have h : ((r : E) ^ k) • x = (r ^ k) • x := by
     rw [← algebraMap_smul E (r ^ k) x]
     simp
   rw [h]
   exact S.smul_mem _ hx
 
-theorem core (S₀ L : Submodule (𝓞 E) (Sp E n)) (F : Sp E n ≃ₗ[E] Sp E n) (hF : ∀ w ∈ L, F.symm w ∈ S₀)
-    (c : E) (hc : c ≠ 0) (hpow : ∀ (S : Submodule (𝓞 E) (Sp E n)) (k : ℕ) (x : Sp E n), x ∈ S → c ^ k • x ∈ S)
-    (Y : Set (Sp E n)) (y₀ : Sp E n) (e e' : ℕ) (hY0 : y₀ ∈ Y) (hY : ∀ y ∈ Y, (c ^ e)⁻¹ • (y - y₀) ∈ L)
-    (hy₀ : c ^ e' • y₀ ∈ L) (C : Set (Sp E n)) (hC : ∀ z, z ∈ C ↔ ∃ y ∈ Y, (c ^ e)⁻¹ • (z - F.symm y) ∈ S₀) :
-    C.Nonempty ∧ (∀ y ∈ Y, F.symm y ∈ C) ∧ ∀ z ∈ C, (∀ z', z' ∈ C ↔ (c ^ e)⁻¹ • (z' - z) ∈ S₀) ∧
-      ∀ (g g' : Sp E n ≃ₗ[E] Sp E n) (D : ℕ), (∀ x, g' x ∈ S₀ ↔ x ∈ S₀) →
-        (∀ x ∈ S₀, (c ^ D)⁻¹ • (g x - g' x) ∈ S₀) → e + e' ≤ D →
-        (c ^ e)⁻¹ • (g z - z) ∈ S₀ → ∀ z', g' z' ∈ C ↔ z' ∈ C := by
-
+theorem core
+    (S₀ L : Submodule (𝓞 E) (Sp E n)) (F : Sp E n ≃ₗ[E] Sp E n) (hF : ∀ w ∈ L, F.symm w ∈ S₀)
+    (c : E) (hc : c ≠ 0)
+    (hpow : ∀ (S : Submodule (𝓞 E) (Sp E n)) (k : ℕ) (x : Sp E n), x ∈ S → c ^ k • x ∈ S)
+    (Y : Set (Sp E n))
+    (y₀ : Sp E n)
+    (e e' : ℕ)
+    (hY0 : y₀ ∈ Y) (hY : ∀ y ∈ Y, (c ^ e)⁻¹ • (y - y₀) ∈ L) (hy₀ : c ^ e' • y₀ ∈ L)
+    (C : Set (Sp E n)) (hC : ∀ z, z ∈ C ↔ ∃ y ∈ Y, (c ^ e)⁻¹ • (z - F.symm y) ∈ S₀)
+    : C.Nonempty ∧ (∀ y ∈ Y, F.symm y ∈ C)
+      ∧ ∀ z ∈ C,
+        (∀ z', z' ∈ C ↔ (c ^ e)⁻¹ • (z' - z) ∈ S₀)
+          ∧ ∀ (g g' : Sp E n ≃ₗ[E] Sp E n) (D : ℕ),
+            (∀ x, g' x ∈ S₀ ↔ x ∈ S₀) → (∀ x ∈ S₀, (c ^ D)⁻¹ • (g x - g' x) ∈ S₀) → e + e' ≤ D
+              → (c ^ e)⁻¹ • (g z - z) ∈ S₀
+              → ∀ z', g' z' ∈ C ↔ z' ∈ C := by
   have hYY : ∀ y ∈ Y, ∀ y' ∈ Y, (c ^ e)⁻¹ • (F.symm y - F.symm y') ∈ S₀ := by
     intro y hy y' hy'
     have h1 := hF _ (hY y hy)
     have h2 := hF _ (hY y' hy')
-    have h3 : (c ^ e)⁻¹ • (F.symm y - F.symm y') =
-        F.symm ((c ^ e)⁻¹ • (y - y₀)) - F.symm ((c ^ e)⁻¹ • (y' - y₀)) := by
+    have h3
+        : (c ^ e)⁻¹ • (F.symm y - F.symm y')
+          = F.symm ((c ^ e)⁻¹ • (y - y₀)) - F.symm ((c ^ e)⁻¹ • (y' - y₀)) := by
       simp only [LinearEquiv.map_smul, map_sub]
       rw [← smul_sub]
       congr 1
@@ -113,14 +123,29 @@ end GlobalTheory.Mem.Col2.AdT.CosShape
 
 namespace GlobalTheory.Mem.Col2.AdT.CosShape
 
-
 set_option maxHeartbeats 1600000 in
 open Classical in
-theorem cosShape : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → ∀ (u : B.Word) (a : I.ι) (i : ℕ) (p : PtAt B.R I.sel (I.tup a) (I.cst a) u i) (P : SBof I a), (i + 1 ≠ B.R.m → cosetIn p P = ∅) ∧ (i + 1 = B.R.m → (cosetIn p P).Nonempty ∧ (∀ y ∈ p.1.2, (frsF I.sel (I.tup a) p.1.1 P).symm y ∈ cosetIn p P) ∧ ∀ z ∈ cosetIn p P, (∀ z', z' ∈ cosetIn p P ↔ GlobalTheory.TwU.SameCoset I.sel (I.tup a) (I.cst a) P z' z) ∧ ∀ g g' : Sp B.fields.E (B.R.N i) ≃ₗ[B.fields.E] Sp B.fields.E (B.R.N i), g' ∈ Formalism.L2.Col.GLint B.fields.E (B.R.N i) P.1 → CongE P.1 ((I.cst a).D P) g g' → GlobalTheory.TwU.SameCoset I.sel (I.tup a) (I.cst a) P (g z) z → ∀ z', g' z' ∈ cosetIn p P ↔ z' ∈ cosetIn p P) := by
+theorem cosShape
+    : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X),
+      I.Ok
+        → ∀ (u : B.Word) (a : I.ι) (i : ℕ) (p : PtAt B.R I.sel (I.tup a) (I.cst a) u i)
+            (P : SBof I a),
+          (i + 1 ≠ B.R.m → cosetIn p P = ∅)
+            ∧ (i + 1 = B.R.m
+              → (cosetIn p P).Nonempty
+                ∧ (∀ y ∈ p.1.2, (frsF I.sel (I.tup a) p.1.1 P).symm y ∈ cosetIn p P)
+                ∧ ∀ z ∈ cosetIn p P,
+                  (∀ z',
+                      z' ∈ cosetIn p P
+                        ↔ GlobalTheory.TwU.SameCoset I.sel (I.tup a) (I.cst a) P z' z)
+                    ∧ ∀ g g' : Sp B.fields.E (B.R.N i) ≃ₗ[B.fields.E] Sp B.fields.E (B.R.N i),
+                      g' ∈ Formalism.L2.Col.GLint B.fields.E (B.R.N i) P.1
+                        → CongE P.1 ((I.cst a).D P) g g'
+                        → GlobalTheory.TwU.SameCoset I.sel (I.tup a) (I.cst a) P (g z) z
+                        → ∀ z', g' z' ∈ cosetIn p P ↔ z' ∈ cosetIn p P) := by
   intro B X I hI u a i p P
   refine ⟨fun hi => ?_, fun hi => ?_⟩
-  ·
-    have h0 : p.1.2 = ∅ := by
+  · have h0 : p.1.2 = ∅ := by
       have h := p.2
       rw [ysAt_ys_of_ne (h := hi)] at h
       exact Set.mem_singleton_iff.mp h
@@ -130,22 +155,28 @@ theorem cosShape : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → ∀ 
     unfold ybSet at hY
     obtain ⟨y₀, hy₀, hYeq⟩ := hY
 
-    have hfr : ∀ x, (frsF I.sel (I.tup a) p.1.1 P) x ∈ Formalism.HermitianLatticesTheory.localization₂ P.1.asIdeal p.1.1.deco.1.N ↔
-        x ∈ stdAt B.fields.E (B.R.N i) P.1 := by
+    have hfr
+        : ∀ x,
+          (frsF I.sel (I.tup a) p.1.1 P) x
+              ∈ Formalism.HermitianLatticesTheory.localization₂ P.1.asIdeal p.1.1.deco.1.N
+            ↔ x ∈ stdAt B.fields.E (B.R.N i) P.1 := by
       intro x
       simp only [frsF]
       split_ifs with h
       · exact (GlobalTheory.TopStep.liftFr_spec p.1.1.deco.2 ⟨P.1, h⟩).1 x
       · exact p.1.1.2 ⟨P.1, (Finset.mem_union.mp P.2).resolve_left h⟩ x
-    have hF : ∀ w ∈ Formalism.HermitianLatticesTheory.localization₂ P.1.asIdeal p.1.1.deco.1.N,
-        (frsF I.sel (I.tup a) p.1.1 P).symm w ∈ stdAt B.fields.E (B.R.N i) P.1 := by
+    have hF
+        : ∀ w ∈ Formalism.HermitianLatticesTheory.localization₂ P.1.asIdeal p.1.1.deco.1.N,
+          (frsF I.sel (I.tup a) p.1.1 P).symm w ∈ stdAt B.fields.E (B.R.N i) P.1 := by
       intro w hw
       rw [← hfr, LinearEquiv.apply_symm_apply]
       exact hw
     have hc : ((qOf P.1 : ℕ) : B.fields.E) ≠ 0 := by
       exact_mod_cast (GlobalTheory.GO.ChRoot.qOf_pos P.1).ne'
-    have hpow : ∀ (S : Submodule (𝓞 B.fields.E) (Sp B.fields.E (B.R.N i))) (k : ℕ) (x : Sp B.fields.E (B.R.N i)),
-        x ∈ S → ((qOf P.1 : ℕ) : B.fields.E) ^ k • x ∈ S := by
+    have hpow
+        : ∀ (S : Submodule (𝓞 B.fields.E) (Sp B.fields.E (B.R.N i))) (k : ℕ)
+            (x : Sp B.fields.E (B.R.N i)),
+          x ∈ S → ((qOf P.1 : ℕ) : B.fields.E) ^ k • x ∈ S := by
       intro S k x hx
       have h := pow_smul_mem S ((qOf P.1 : ℕ) : 𝓞 B.fields.E) k hx
       simpa using h
@@ -153,57 +184,83 @@ theorem cosShape : ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), I.Ok → ∀ 
       rw [hYeq, Set.mem_setOf_eq, sub_self]
       exact zero_mem _
     have hY1 := (mem_locLat _ _ _ _).1 hy₀ P
-    have hGL : ∀ g' : Sp B.fields.E (B.R.N i) ≃ₗ[B.fields.E] Sp B.fields.E (B.R.N i),
-        g' ∈ Formalism.L2.Col.GLint B.fields.E (B.R.N i) P.1 →
-          ∀ x, g' x ∈ stdAt B.fields.E (B.R.N i) P.1 ↔ x ∈ stdAt B.fields.E (B.R.N i) P.1 := by
+    have hGL
+        : ∀ g' : Sp B.fields.E (B.R.N i) ≃ₗ[B.fields.E] Sp B.fields.E (B.R.N i),
+          g' ∈ Formalism.L2.Col.GLint B.fields.E (B.R.N i) P.1
+            → ∀ x, g' x ∈ stdAt B.fields.E (B.R.N i) P.1 ↔ x ∈ stdAt B.fields.E (B.R.N i) P.1 := by
       intro g' hg'
       exact hg'
     by_cases hP : P.1 ∈ (B.primes X).vGs
-    ·
-      have hYl : ∀ y ∈ p.1.2, (((qOf P.1 : ℕ) : B.fields.E) ^ 0)⁻¹ • (y - y₀) ∈ Formalism.HermitianLatticesTheory.localization₂ P.1.asIdeal p.1.1.deco.1.N := by
+    · have hYl
+          : ∀ y ∈ p.1.2,
+            (((qOf P.1 : ℕ) : B.fields.E) ^ 0)⁻¹ • (y - y₀)
+              ∈ Formalism.HermitianLatticesTheory.localization₂ P.1.asIdeal p.1.1.deco.1.N := by
         intro y hy
         rw [hYeq, Set.mem_setOf_eq] at hy
         have h := (mem_locLat _ _ _ _).1 hy P
         simpa [hP] using h
-      have hy₀' : ((qOf P.1 : ℕ) : B.fields.E) ^ 1 • y₀ ∈ Formalism.HermitianLatticesTheory.localization₂ P.1.asIdeal p.1.1.deco.1.N := by
+      have hy₀'
+          : ((qOf P.1 : ℕ) : B.fields.E) ^ 1 • y₀
+            ∈ Formalism.HermitianLatticesTheory.localization₂ P.1.asIdeal p.1.1.deco.1.N := by
         simpa [hP] using hY1
-      have hC : ∀ z, z ∈ cosetIn p P ↔ ∃ y ∈ p.1.2,
-          (((qOf P.1 : ℕ) : B.fields.E) ^ 0)⁻¹ • (z - (frsF I.sel (I.tup a) p.1.1 P).symm y) ∈
-            stdAt B.fields.E (B.R.N i) P.1 := by
+      have hC
+          : ∀ z,
+            z ∈ cosetIn p P
+              ↔ ∃ y ∈ p.1.2,
+                (((qOf P.1 : ℕ) : B.fields.E) ^ 0)⁻¹ • (z - (frsF I.sel (I.tup a) p.1.1 P).symm y)
+                  ∈ stdAt B.fields.E (B.R.N i) P.1 := by
         intro z
         simp only [cosetIn, Set.mem_setOf_eq, if_pos hP]
-      have hSC : ∀ x y : Sp B.fields.E (B.R.N i), GlobalTheory.TwU.SameCoset I.sel (I.tup a) (I.cst a) P x y ↔
-          (((qOf P.1 : ℕ) : B.fields.E) ^ 0)⁻¹ • (x - y) ∈ stdAt B.fields.E (B.R.N i) P.1 := by
+      have hSC
+          : ∀ x y : Sp B.fields.E (B.R.N i),
+            GlobalTheory.TwU.SameCoset I.sel (I.tup a) (I.cst a) P x y
+              ↔ (((qOf P.1 : ℕ) : B.fields.E) ^ 0)⁻¹ • (x - y)
+                ∈ stdAt B.fields.E (B.R.N i) P.1 := by
         intro x y
         rw [GlobalTheory.GO.ChRoot.mem_stdAt']
         simp only [GlobalTheory.TwU.SameCoset, if_pos hP, Pi.smul_apply, smul_eq_mul]
-      obtain ⟨k1, k2, k3⟩ := core (stdAt B.fields.E (B.R.N i) P.1) (Formalism.HermitianLatticesTheory.localization₂ P.1.asIdeal p.1.1.deco.1.N)
-        (frsF I.sel (I.tup a) p.1.1 P) hF _ hc hpow p.1.2 y₀ 0 1 hY0 hYl hy₀' (cosetIn p P) hC
+      obtain ⟨k1, k2, k3⟩ :=
+        core (stdAt B.fields.E (B.R.N i) P.1)
+          (Formalism.HermitianLatticesTheory.localization₂ P.1.asIdeal p.1.1.deco.1.N)
+          (frsF I.sel (I.tup a) p.1.1 P) hF _ hc hpow p.1.2 y₀ 0 1 hY0 hYl hy₀' (cosetIn p P) hC
       refine ⟨k1, k2, fun z hz => ⟨fun z' => ((k3 z hz).1 z').trans (hSC z' z).symm, ?_⟩⟩
       intro g g' hg' hcong hgz z'
       have hD1 := (hI.idx_ok a).depthG P hP
       exact (k3 z hz).2 g g' _ (hGL g' hg') hcong (by omega) ((hSC _ _).1 hgz) z'
-    ·
-      have hYl : ∀ y ∈ p.1.2, (((qOf P.1 : ℕ) : B.fields.E) ^ (I.cst a).M)⁻¹ • (y - y₀) ∈
-          Formalism.HermitianLatticesTheory.localization₂ P.1.asIdeal p.1.1.deco.1.N := by
+    · have hYl
+          : ∀ y ∈ p.1.2,
+            (((qOf P.1 : ℕ) : B.fields.E) ^ (I.cst a).M)⁻¹ • (y - y₀)
+              ∈ Formalism.HermitianLatticesTheory.localization₂ P.1.asIdeal p.1.1.deco.1.N := by
         intro y hy
         rw [hYeq, Set.mem_setOf_eq] at hy
         have h := (mem_locLat _ _ _ _).1 hy P
         simpa [hP] using h
-      have hy₀' : ((qOf P.1 : ℕ) : B.fields.E) ^ (I.cst a).M • y₀ ∈ Formalism.HermitianLatticesTheory.localization₂ P.1.asIdeal p.1.1.deco.1.N := by
+      have hy₀'
+          : ((qOf P.1 : ℕ) : B.fields.E) ^ (I.cst a).M • y₀
+            ∈ Formalism.HermitianLatticesTheory.localization₂ P.1.asIdeal p.1.1.deco.1.N := by
         simpa [hP] using hY1
-      have hC : ∀ z, z ∈ cosetIn p P ↔ ∃ y ∈ p.1.2,
-          (((qOf P.1 : ℕ) : B.fields.E) ^ (I.cst a).M)⁻¹ • (z - (frsF I.sel (I.tup a) p.1.1 P).symm y) ∈
-            stdAt B.fields.E (B.R.N i) P.1 := by
+      have hC
+          : ∀ z,
+            z ∈ cosetIn p P
+              ↔ ∃ y ∈ p.1.2,
+                (((qOf P.1 : ℕ) : B.fields.E) ^ (I.cst a).M)⁻¹
+                    • (z - (frsF I.sel (I.tup a) p.1.1 P).symm y)
+                  ∈ stdAt B.fields.E (B.R.N i) P.1 := by
         intro z
         simp only [cosetIn, Set.mem_setOf_eq, if_neg hP]
-      have hSC : ∀ x y : Sp B.fields.E (B.R.N i), GlobalTheory.TwU.SameCoset I.sel (I.tup a) (I.cst a) P x y ↔
-          (((qOf P.1 : ℕ) : B.fields.E) ^ (I.cst a).M)⁻¹ • (x - y) ∈ stdAt B.fields.E (B.R.N i) P.1 := by
+      have hSC
+          : ∀ x y : Sp B.fields.E (B.R.N i),
+            GlobalTheory.TwU.SameCoset I.sel (I.tup a) (I.cst a) P x y
+              ↔ (((qOf P.1 : ℕ) : B.fields.E) ^ (I.cst a).M)⁻¹ • (x - y)
+                ∈ stdAt B.fields.E (B.R.N i) P.1 := by
         intro x y
         rw [GlobalTheory.GO.ChRoot.mem_stdAt']
         simp only [GlobalTheory.TwU.SameCoset, if_neg hP, Pi.smul_apply, smul_eq_mul]
-      obtain ⟨k1, k2, k3⟩ := core (stdAt B.fields.E (B.R.N i) P.1) (Formalism.HermitianLatticesTheory.localization₂ P.1.asIdeal p.1.1.deco.1.N)
-        (frsF I.sel (I.tup a) p.1.1 P) hF _ hc hpow p.1.2 y₀ (I.cst a).M (I.cst a).M hY0 hYl hy₀' (cosetIn p P) hC
+      obtain ⟨k1, k2, k3⟩ :=
+        core (stdAt B.fields.E (B.R.N i) P.1)
+          (Formalism.HermitianLatticesTheory.localization₂ P.1.asIdeal p.1.1.deco.1.N)
+          (frsF I.sel (I.tup a) p.1.1 P) hF _ hc hpow p.1.2 y₀ (I.cst a).M (I.cst a).M hY0 hYl hy₀'
+          (cosetIn p P) hC
       refine ⟨k1, k2, fun z hz => ⟨fun z' => ((k3 z hz).1 z').trans (hSC z' z).symm, ?_⟩⟩
       intro g g' hg' hcong hgz z'
       have hD2 := (hI.idx_ok a).depthQ P hP

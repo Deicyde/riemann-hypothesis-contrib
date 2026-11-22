@@ -6,23 +6,25 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.Cint
 
 namespace GlobalTheory.SumRefinement
 
-theorem finsum_fst {X F : Type} [Finite F] (g : X → ℂ) (hg : (Function.support g).Finite) :
-    ∑ᶠ p : X × F, g p.1 = (Nat.card F : ℂ) * ∑ᶠ x, g x := by
+theorem finsum_fst {X F : Type} [Finite F] (g : X → ℂ) (hg : (Function.support g).Finite)
+    : ∑ᶠ p : X × F, g p.1 = (Nat.card F : ℂ) * ∑ᶠ x, g x := by
   classical
   let _ : Fintype F := Fintype.ofFinite F
   rw [finsum_eq_sum_of_support_subset (s := hg.toFinset ×ˢ Finset.univ) _ ?_,
-    finsum_eq_sum_of_support_subset (s := hg.toFinset) _ (by simp),
-    Finset.sum_product, Finset.mul_sum]
+    finsum_eq_sum_of_support_subset (s := hg.toFinset) _ (by simp), Finset.sum_product,
+    Finset.mul_sum]
   · refine Finset.sum_congr rfl fun x _ => ?_
     simp only [Finset.sum_const, Finset.card_univ, nsmul_eq_mul, Nat.card_eq_fintype_card]
   · intro p hp
     simp only [Function.mem_support] at hp
     simp [hp]
 
-theorem sum_refine {W : Type} [AddCommGroup W] {A B C : AddSubgroup W} {φ : W → ℂ}
-    (h : GlobalTheory.IdxInt.Fine A φ B) (hCB : C ≤ B) (hi : AddSubgroup.relIndex C B ≠ 0) :
-    ∑ᶠ (c : W ⧸ C), φ (Quotient.out c) =
-      (AddSubgroup.relIndex C B : ℂ) * ∑ᶠ (c : W ⧸ B), φ (Quotient.out c) := by
+theorem sum_refine
+    {W : Type} [AddCommGroup W]
+    {A B C : AddSubgroup W} {φ : W → ℂ}
+    (h : GlobalTheory.IdxInt.Fine A φ B) (hCB : C ≤ B) (hi : AddSubgroup.relIndex C B ≠ 0)
+    : ∑ᶠ (c : W ⧸ C), φ (Quotient.out c)
+      = (AddSubgroup.relIndex C B : ℂ) * ∑ᶠ (c : W ⧸ B), φ (Quotient.out c) := by
   classical
   obtain ⟨-, -, hinv, hfin⟩ := h
   set e := AddSubgroup.quotientEquivProdOfLE hCB with he

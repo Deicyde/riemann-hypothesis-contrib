@@ -130,13 +130,16 @@ theorem lfunction_deriv_near_one : LDerivNearOne := by
   have hL := two_le_log_three_mul q hq
   have hLpos : 0 < Real.log (3 * q) := by linarith
   have hρ : 0 < 1 / (2 * Real.log (3 * q)) := by positivity
-  have hd : DiffContOnCl ℂ (DirichletCharacter.LFunction χ) (Metric.ball (σ : ℂ) (1 / (2 * Real.log (3 * q)))) :=
+  have hd : DiffContOnCl ℂ (DirichletCharacter.LFunction χ)
+      (Metric.ball (σ : ℂ) (1 / (2 * Real.log (3 * q)))) :=
     (DirichletCharacter.differentiable_LFunction hχ).diffContOnCl
-  have hC : ∀ z ∈ Metric.sphere (σ : ℂ) (1 / (2 * Real.log (3 * q))),
-      ‖DirichletCharacter.LFunction χ z‖ ≤ 38 * Real.exp (3 / 2) * Real.log (3 * q) := by
+  have hC
+      : ∀ z ∈ Metric.sphere (σ : ℂ) (1 / (2 * Real.log (3 * q))),
+        ‖DirichletCharacter.LFunction χ z‖ ≤ 38 * Real.exp (3 / 2) * Real.log (3 * q) := by
     intro z hz
     rw [mem_sphere_iff_norm] at hz
-    have hre : |(z - σ).re| ≤ 1 / (2 * Real.log (3 * q)) := by rw [← hz]; exact Complex.abs_re_le_norm _
+    have hre : |(z - σ).re| ≤ 1 / (2 * Real.log (3 * q)) := by
+      rw [← hz]; exact Complex.abs_re_le_norm _
     rw [Complex.sub_re, Complex.ofReal_re] at hre
     have h1 : 1 / Real.log (3 * q) ≤ 1 / 2 := by rw [div_le_iff₀ hLpos]; linarith
     have h2 : 1 / (2 * Real.log (3 * q)) ≤ 1 / 4 := by rw [div_le_iff₀ (by positivity)]; linarith
@@ -147,14 +150,17 @@ theorem lfunction_deriv_near_one : LDerivNearOne := by
     apply lfunction_norm_le_near_one χ hχ z
     · rw [e3]; linarith
     · linarith
-    · calc ‖z‖ = ‖(z - σ) + σ‖ := by rw [sub_add_cancel]
+    · calc
+        ‖z‖
+          = ‖(z - σ) + σ‖ := by rw [sub_add_cancel]
         _ ≤ ‖z - σ‖ + ‖(σ : ℂ)‖ := norm_add_le _ _
         _ ≤ 1 / 4 + 1 := by
           rw [hz, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (by linarith)]
           linarith
         _ ≤ 2 := by norm_num
   have := Complex.norm_deriv_le_of_forall_mem_sphere_norm_le hρ hd hC
-  calc _ ≤ 38 * Real.exp (3 / 2) * Real.log (3 * q) / (1 / (2 * Real.log (3 * q))) := this
+  calc
+    _ ≤ 38 * Real.exp (3 / 2) * Real.log (3 * q) / (1 / (2 * Real.log (3 * q))) := this
     _ = 76 * Real.exp (3 / 2) * Real.log (3 * q) ^ 2 := by field_simp; try ring
 
 end Formalism.ZeroFreeDirichlet

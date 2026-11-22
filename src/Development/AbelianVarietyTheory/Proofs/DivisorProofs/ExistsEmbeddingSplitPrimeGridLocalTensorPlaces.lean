@@ -8,15 +8,20 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.Hermitian
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
 open IsDedekindDomain NumberField
 open GlobalTheory.FunObj GlobalTheory.ChiGrid GlobalTheory.AdelicU
 
 namespace GlobalTheory.LocPlTau
 
-theorem exists_splitPrime_locPl : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {μ₀ : T}
-    (_hL : L.Is μ₀) (t : T) (v : HeightOneSpectrum (𝓞 D.host.F)), (∃ w ∈ locPl G t, w.under (𝓞 D.host.F) = v) →
-    ∃ τ : D.host.E →ₐ[D.host.F] Fv D.host.F v, ∀ w ∈ locPl G t, w.under (𝓞 D.host.F) = v → splitPrime τ = w := by
+theorem exists_splitPrime_locPl
+    : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {μ₀ : T}
+        (_hL : L.Is μ₀) (t : T) (v : HeightOneSpectrum (𝓞 D.host.F)),
+      (∃ w ∈ locPl G t, w.under (𝓞 D.host.F) = v)
+        → ∃ τ : D.host.E →ₐ[D.host.F] Fv D.host.F v, ∀ w ∈ locPl G t,
+          w.under (𝓞 D.host.F) = v → splitPrime τ = w := by
   intro D T L sc G μ₀ hL t v ⟨w, hw, hv⟩
   subst hv
   obtain ⟨τ⟩ := GlobalTheory.LocPlSplit.locPl_split hL t w hw

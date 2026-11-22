@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.DivisorSuppo
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex Simplicial TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  Simplicial TensorProduct GlobalTheory.EtC
 
 namespace GlobalTheory.EtC
 

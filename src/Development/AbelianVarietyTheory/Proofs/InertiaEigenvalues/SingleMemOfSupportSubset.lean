@@ -9,10 +9,12 @@ open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibl
 
 namespace GlobalTheory.Per
 
-theorem single_mem_of_support_subset {LL D : Type} [Field LL] [AddCommGroup D] [Module LL D]
-    (u : LL) (Λ : Submodule LL (ℤ → D)) (hu : u ≠ 0) (hr : ∀ k : ℤ, k ≠ 0 → u ^ k ≠ 1)
-    (hγ : ∀ x ∈ Λ, (fun k => u ^ k • x k) ∈ Λ) (S : Finset ℤ) :
-    ∀ x ∈ Λ, (∀ k, k ∉ S → x k = 0) → ∀ k, Pi.single k (x k) ∈ Λ := by
+theorem single_mem_of_support_subset
+    {LL D : Type} [Field LL] [AddCommGroup D] [Module LL D]
+    (u : LL) (Λ : Submodule LL (ℤ → D))
+    (hu : u ≠ 0) (hr : ∀ k : ℤ, k ≠ 0 → u ^ k ≠ 1) (hγ : ∀ x ∈ Λ, (fun k => u ^ k • x k) ∈ Λ)
+    (S : Finset ℤ)
+    : ∀ x ∈ Λ, (∀ k, k ∉ S → x k = 0) → ∀ k, Pi.single k (x k) ∈ Λ := by
   induction S using Finset.induction_on with
   | empty =>
     intro x _ hx k
@@ -39,8 +41,9 @@ theorem single_mem_of_support_subset {LL D : Type} [Field LL] [AddCommGroup D] [
       intro k hk
       have h1 := ih _ hyΛ hy k
       rw [hyv] at h1
-      have e : Pi.single k (x k) =
-          (u ^ k - u ^ a)⁻¹ • (Pi.single k ((u ^ k - u ^ a) • x k) : ℤ → D) := by
+      have e
+          : Pi.single k (x k)
+            = (u ^ k - u ^ a)⁻¹ • (Pi.single k ((u ^ k - u ^ a) • x k) : ℤ → D) := by
         rw [Pi.single_smul, smul_smul, inv_mul_cancel₀ (hne k hk), one_smul]
       rw [e]
       exact Λ.smul_mem _ h1

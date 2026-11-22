@@ -51,19 +51,21 @@ lemma single_zero_mem_reesSubmodule (m : M) :
     simp
   · exact zero_mem _
 
-theorem reesSubmodule_eq_span :
-    reesSubmodule I M =
-      Submodule.span (reesAlgebra I) (Set.range (PolynomialModule.single A 0 : M → _)) := by
+theorem reesSubmodule_eq_span
+    : reesSubmodule I M
+      = Submodule.span (reesAlgebra I) (Set.range (PolynomialModule.single A 0 : M → _)) := by
   apply le_antisymm
   · intro p hp
-    have key : ∀ n, ∀ x ∈ I ^ n • (⊤ : Submodule A M), PolynomialModule.single A n x ∈
-        Submodule.span (reesAlgebra I) (Set.range (PolynomialModule.single A 0 : M → _)) := by
+    have key
+        : ∀ n, ∀ x ∈ I ^ n • (⊤ : Submodule A M),
+          PolynomialModule.single A n x
+            ∈ Submodule.span (reesAlgebra I) (Set.range (PolynomialModule.single A 0 : M → _)) := by
       intro n x hx
       refine Submodule.smul_induction_on hx ?_ ?_
       · intro a ha m _
         have hmem : monomial n a ∈ reesAlgebra I := reesAlgebra.monomial_mem.2 ha
-        have : PolynomialModule.single A n (a • m) =
-            (⟨monomial n a, hmem⟩ : reesAlgebra I) • PolynomialModule.single A 0 m := by
+        have : PolynomialModule.single A n (a • m)
+            = (⟨monomial n a, hmem⟩ : reesAlgebra I) • PolynomialModule.single A 0 m := by
           change _ = monomial n a • PolynomialModule.single A 0 m
           rw [PolynomialModule.monomial_smul_single, add_zero]
         rw [this]

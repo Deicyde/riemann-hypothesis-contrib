@@ -11,16 +11,35 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open NumberField IsDedekindDomain AlgebraicGeometry CategoryTheory Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.Pj Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.DivisionValues Formalism.EigenvalueLevelCeiling
+open NumberField IsDedekindDomain AlgebraicGeometry CategoryTheory Formalism.BasicNotions
+  Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.Pj Formalism.L2.Indef
+  Formalism.L2.Indef.Tree Formalism.DivisionValues Formalism.EigenvalueLevelCeiling
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Datum Level Moduli Coeff SABMap)
 open GlobalTheory.FormTies
 open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem scaledSpan_clauses : ∀ (D : D7) (B : WeightFamilies.Prov D) (P6 : ModuliIntegralCharts.Prov D) (j : ℕ) (X : WeightAlgebra.PJ D B P6 j) (hinj : Function.Injective D.what₂.OtoLL) (EX : ErrX D) (p : ℕ) (ka wL wF : WeightFamilies.Wt D j) (T : ℕ) (K : Type) [Field K] [NumberField K] [StarRing K] [Algebra B.KO K] (Bs : DefBase K) (Df : DefSide Bs) (S : IndefData Df) (P : Type) [Group P] [Finite P] (oc : OnConst) (O : OnObj S P oc) (v : HeightOneSpectrum (𝓞 K)) (i : Bs.J) (z : (Fin (O.nZ i) → K) ≃ₗ[K] K ⊗[B.KO] B.Cusp j ka) (act : P → B.Cusp j ka → B.Cusp j ka), FormTie X hinj EX p ka wL wF T O v i z act → WeightAlgebra.IsF' ka wL wF T wF.n → ka.n = wF.n + T * wL.n → WeightFamilies.dimY D j ≤ T → WeightAlgebra.H2 X (scalOfP B hinj EX p ka wL wF T) ka wL wF → (∀ g F, X.inc ka F ∈ X.Theta (scalOfP B hinj EX p ka wL wF T) ka wL wF T → X.inc ka (act g F) ∈ X.Theta (scalOfP B hinj EX p ka wL wF T) ka wL wF T) → O.Th v i ≤ O.Ms i ∧ (∀ g : P, (O.Th v i).map ((O.ρ i g).restrictScalars (𝓞 K)) ≤ O.Th v i) ∧ O.σ v i ≠ 0 ∧ O.Th v i ≤ Formalism.EigenvalueLevelCeiling.sc (O.σ v i) (O.ThK v i) := by
+theorem scaledSpan_clauses
+    : ∀ (D : D7) (B : WeightFamilies.Prov D) (P6 : ModuliIntegralCharts.Prov D) (j : ℕ)
+        (X : WeightAlgebra.PJ D B P6 j) (hinj : Function.Injective D.what₂.OtoLL) (EX : ErrX D)
+        (p : ℕ) (ka wL wF : WeightFamilies.Wt D j) (T : ℕ) (K : Type) [Field K] [NumberField K]
+        [StarRing K] [Algebra B.KO K] (Bs : DefBase K) (Df : DefSide Bs) (S : IndefData Df)
+        (P : Type) [Group P] [Finite P] (oc : OnConst) (O : OnObj S P oc)
+        (v : HeightOneSpectrum (𝓞 K)) (i : Bs.J)
+        (z : (Fin (O.nZ i) → K) ≃ₗ[K] K ⊗[B.KO] B.Cusp j ka) (act : P → B.Cusp j ka → B.Cusp j ka),
+      FormTie X hinj EX p ka wL wF T O v i z act → WeightAlgebra.IsF' ka wL wF T wF.n
+        → ka.n = wF.n + T * wL.n → WeightFamilies.dimY D j ≤ T
+        → WeightAlgebra.H2 X (scalOfP B hinj EX p ka wL wF T) ka wL wF
+        → (∀ g F,
+          X.inc ka F ∈ X.Theta (scalOfP B hinj EX p ka wL wF T) ka wL wF T
+            → X.inc ka (act g F) ∈ X.Theta (scalOfP B hinj EX p ka wL wF T) ka wL wF T)
+        → O.Th v i ≤ O.Ms i ∧ (∀ g : P, (O.Th v i).map ((O.ρ i g).restrictScalars (𝓞 K)) ≤ O.Th v i)
+          ∧ O.σ v i ≠ 0 ∧ O.Th v i ≤ Formalism.EigenvalueLevelCeiling.sc (O.σ v i) (O.ThK v i) := by
   intro D B P6 j X hinj EX p ka wL wF T K _ _ _ _ Bs Df S P _ _ oc O v i z act h hF hn hD h2 hact
-  obtain ⟨hσ, hsig⟩ := GlobalTheory.T.theta_scaled_span_le_sigma_smul_unscaled_span D B P6 j X hinj EX p ka wL wF T hF hn hD
+  obtain ⟨hσ, hsig⟩ :=
+    GlobalTheory.T.theta_scaled_span_le_sigma_smul_unscaled_span D B P6 j X hinj EX p ka wL wF T hF
+      hn hD
   have hle := Formalism.MainNotions.Gaps.T0.theta_le_msup X _ h2 hF rfl hn hD
   have hσK : (((sigRec B hinj EX ka wL wF T : 𝓞 B.KO) : B.KO)) ≠ 0 := by
     intro h0

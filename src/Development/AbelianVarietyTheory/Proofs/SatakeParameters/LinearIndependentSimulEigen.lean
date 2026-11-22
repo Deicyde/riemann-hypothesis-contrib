@@ -14,8 +14,10 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.LinearInd
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong
 open scoped Pointwise
@@ -24,28 +26,57 @@ noncomputable section
 
 namespace GlobalTheory.Cong
 
-theorem linearIndependent_simulEigen {J V : Type} [AddCommGroup V] [Module ℂ V] (T : J → V →ₗ[ℂ] V)
-    (S : Set (J → ℂ)) (v : S → V) (hv : ∀ χ, v χ ≠ 0)
-    (hT : ∀ (χ : S) j, T j (v χ) = (χ : J → ℂ) j • v χ) : LinearIndependent ℂ v := by
+theorem linearIndependent_simulEigen
+    {J V : Type} [AddCommGroup V] [Module ℂ V]
+    (T : J → V →ₗ[ℂ] V) (S : Set (J → ℂ)) (v : S → V)
+    (hv : ∀ χ, v χ ≠ 0) (hT : ∀ (χ : S) j, T j (v χ) = (χ : J → ℂ) j • v χ)
+    : LinearIndependent ℂ v := by
   first
-  | exact @_root_.GlobalTheory.JointEigenvectorsIndependentSatakeParameters.linearIndependent_jointEigenvectors
-  | exact _root_.GlobalTheory.JointEigenvectorsIndependentSatakeParameters.linearIndependent_jointEigenvectors
-  | (apply _root_.GlobalTheory.JointEigenvectorsIndependentSatakeParameters.linearIndependent_jointEigenvectors <;> assumption)
-  | (intros; apply _root_.GlobalTheory.JointEigenvectorsIndependentSatakeParameters.linearIndependent_jointEigenvectors <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.JointEigenvectorsIndependentSatakeParameters.linearIndependent_jointEigenvectors <;> first | assumption | infer_instance)
-  | (intros; exact _root_.GlobalTheory.JointEigenvectorsIndependentSatakeParameters.linearIndependent_jointEigenvectors ..)
+  | exact
+      @_root_.GlobalTheory.JointEigenvectorsIndependentSatakeParameters.linearIndependent_jointEigenvectors
+  | exact
+      _root_.GlobalTheory.JointEigenvectorsIndependentSatakeParameters.linearIndependent_jointEigenvectors
+  | (
+      apply
+          _root_.GlobalTheory.JointEigenvectorsIndependentSatakeParameters.linearIndependent_jointEigenvectors
+        <;> assumption
+    )
+  | (
+      intros
+      apply
+          _root_.GlobalTheory.JointEigenvectorsIndependentSatakeParameters.linearIndependent_jointEigenvectors
+        <;> assumption
+    )
+  | (
+      intros
+      apply
+          @_root_.GlobalTheory.JointEigenvectorsIndependentSatakeParameters.linearIndependent_jointEigenvectors
+        <;> first | assumption | infer_instance
+    )
+  | (
+      intros
+      exact
+        _root_.GlobalTheory.JointEigenvectorsIndependentSatakeParameters.linearIndependent_jointEigenvectors
+          ..
+    )
 
-def opLin {Γ V : Type} [Group Γ] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ Γ V) (f : Γ →₀ ℂ) :
-    V →ₗ[ℂ] V :=
+def opLin
+    {Γ V : Type} [Group Γ] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ Γ V) (f : Γ →₀ ℂ)
+    : V →ₗ[ℂ] V :=
   f.sum fun g c => c • ρ g
 
-theorem opLin_apply {Γ V : Type} [Group Γ] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ Γ V) (f : Γ →₀ ℂ)
-    (v : V) : opLin ρ f v = opOf ρ f v := by
+theorem opLin_apply
+    {Γ V : Type} [Group Γ] [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ Γ V) (f : Γ →₀ ℂ) (v : V)
+    : opLin ρ f v = opOf ρ f v := by
   simp [opLin, opOf, Finsupp.sum, LinearMap.sum_apply]
 
-theorem eq_zero_of_finU {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ} {φ : UA E n → ℂ}
-    (hφ : IsAutFormU φ) (h0 : ∀ g ∈ finU (E := E) (n := n), φ g = 0) : φ = 0 := by
-  refine Continuous.ext_on (GlobalTheory.UnitarySplit.dense_and_split E n).1 hφ.cont continuous_const ?_
+theorem eq_zero_of_finU
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {n : ℕ} {φ : UA E n → ℂ} (hφ : IsAutFormU φ) (h0 : ∀ g ∈ finU (E := E) (n := n), φ g = 0)
+    : φ = 0 := by
+  refine Continuous.ext_on (GlobalTheory.UnitarySplit.dense_and_split E n).1 hφ.cont
+    continuous_const ?_
   rintro x ⟨γ, hγ, g, hg, rfl⟩
   simp only [Pi.zero_apply]
   rw [hφ.left γ hγ g]
@@ -63,7 +94,8 @@ theorem finU_holds : FinU := by
   choose φ' hφ' hφ'eq using fun σ : ℂ ≃+* ℂ => exists_conj_isAutFormU E a σ φ hφ
   obtain ⟨M, hMfin, hM⟩ := GlobalTheory.T.conjugates_automorphicForm_span_finiteDimensional E a φ hφ
   have heig' : ∀ σ j, opOf (RU E a) (t j) (φ' σ) = σ (η U j) • φ' σ := fun σ j =>
-    GlobalTheory.T.definiteUnitaryRationalHecke_commute_complexAutomorphism E a σ (t j) (ht j) φ (φ' σ) (η U j) hφ (hφ' σ) (hφ'eq σ) (heig j)
+    GlobalTheory.T.definiteUnitaryRationalHecke_commute_complexAutomorphism E a σ (t j) (ht j) φ
+      (φ' σ) (η U j) hφ (hφ' σ) (hφ'eq σ) (heig j)
   have hne : ∀ σ, φ' σ ≠ 0 := by
     intro σ h
     have e := hφ'eq σ g₀ hg₀
@@ -82,7 +114,8 @@ theorem finU_holds : FinU := by
     have hli' : LinearIndependent ℂ v' := LinearIndependent.of_comp M.subtype hli
     have : Finite S := hli'.finite
     exact Set.toFinite S
-  obtain ⟨L, hL, hLmem⟩ := GlobalTheory.T.finite_automorphism_orbit_mem_finite_extension_padic l ι J (η U) hfin
+  obtain ⟨L, hL, hLmem⟩ :=
+    GlobalTheory.T.finite_automorphism_orbit_mem_finite_extension_padic l ι J (η U) hfin
   exact ⟨⟨L, hL⟩, hLmem⟩
 
 end GlobalTheory.Cong

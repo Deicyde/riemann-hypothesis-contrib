@@ -13,26 +13,31 @@ namespace Formalism.FourierDecayAlt.P.CutMP.JA
 
 noncomputable section
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity PI.UnitaryCorollaryDerivatives.CRH Formalism.FourierDecayAlt.P.AdmissibleLieWords
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P.BetaSesquilinearity PI.UnitaryCorollaryDerivatives.CRH
+  Formalism.FourierDecayAlt.P.AdmissibleLieWords
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 section
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
 
 def regE (D : B.RealPlaceData k r Wp Wq) (ε : ℝ) : Set (B.Mat k r) :=
   {g | g ∈ B.GV k r ∧ ε ≤ Gf k r D.z D.z' g}
 
 theorem regE_sub (D : B.RealPlaceData k r Wp Wq) (ε : ℝ) : regE D ε ⊆ B.GV k r := fun _ hg => hg.1
 
-theorem scal_bound_of_ubl (D : B.RealPlaceData k r Wp Wq) (φ : B.Mat k r → ℂ) (e γ : ℕ) (Bg : ℝ)
-    (hBg : (e : ℝ) + γ ≤ Bg) (ε : ℝ)
-    (h0 : ∃ C0 : ℝ, ∀ g ∈ regE D ε, ‖φ g‖ ≤ C0) (hU : ∀ n : ℕ, UBL φ (regE D ε) n e γ) (m : ℕ) :
-    ∃ C : ℝ, ∀ u w : List (B.Mat k r),
-      (∀ X ∈ u, B.unitLie k r X) → (∀ X ∈ w, B.unitLie k r X) → u.length + w.length ≤ m →
-      ∀ g ∈ B.GV k r, ε ≤ Gf k r D.z D.z' g → ‖B.dLR u w φ g‖ ≤ C * B.gN g ^ (Bg * m) := by
+theorem scal_bound_of_ubl
+    (D : B.RealPlaceData k r Wp Wq) (φ : B.Mat k r → ℂ)
+    (e γ : ℕ) (Bg : ℝ) (hBg : (e : ℝ) + γ ≤ Bg)
+    (ε : ℝ) (h0 : ∃ C0 : ℝ, ∀ g ∈ regE D ε, ‖φ g‖ ≤ C0) (hU : ∀ n : ℕ, UBL φ (regE D ε) n e γ)
+    (m : ℕ)
+    : ∃ C : ℝ, ∀ u w : List (B.Mat k r),
+      (∀ X ∈ u, B.unitLie k r X) → (∀ X ∈ w, B.unitLie k r X) → u.length + w.length ≤ m
+        → ∀ g ∈ B.GV k r, ε ≤ Gf k r D.z D.z' g → ‖B.dLR u w φ g‖ ≤ C * B.gN g ^ (Bg * m) := by
   rcases Nat.eq_zero_or_pos m with hm | hm
   · subst hm
     obtain ⟨C0, hC0⟩ := h0
@@ -60,42 +65,61 @@ theorem scal_bound_of_ubl (D : B.RealPlaceData k r Wp Wq) (φ : B.Mat k r → �
     nlinarith [mul_le_mul_of_nonneg_left hl' hγ, mul_le_mul_of_nonneg_left hm1 he,
       mul_le_mul_of_nonneg_right hBg (by linarith : (0 : ℝ) ≤ m)]
 
-theorem dlast_pos (D : B.RealPlaceData k r Wp Wq) {ε : ℝ} (hε : 0 < ε) {g : B.Mat k r} (hg : ε ≤ Gf k r D.z D.z' g) :
-    ε ≤ Complex.normSq (Dmin k r D.z D.z' g (Fin.last (r + 1))) :=
+theorem dlast_pos
+    (D : B.RealPlaceData k r Wp Wq)
+    {ε : ℝ} (hε : 0 < ε)
+    {g : B.Mat k r} (hg : ε ≤ Gf k r D.z D.z' g)
+    : ε ≤ Complex.normSq (Dmin k r D.z D.z' g (Fin.last (r + 1))) :=
   Formalism.FourierDecayAlt.P.gram_function_last_minor k r D.z D.z' D.T_pos.le D.T'_pos.le g ε hg
 
-theorem dlast_ne (D : B.RealPlaceData k r Wp Wq) {g : B.Mat k r} (hg : g ∈ B.GPos D) :
-    Dmin k r D.z D.z' g (Fin.last (r + 1)) ≠ 0 := by
+theorem dlast_ne (D : B.RealPlaceData k r Wp Wq) {g : B.Mat k r} (hg : g ∈ B.GPos D)
+    : Dmin k r D.z D.z' g (Fin.last (r + 1)) ≠ 0 := by
   intro h
   have := dlast_pos D hg.2 (le_refl _)
   rw [h, map_zero] at this
   linarith [hg.2]
 
-theorem open_dlast (z z' : Fin (2 * r + k + 1) → ℂ) :
-    IsOpen {g : B.Mat k r | Dmin k r z z' g (Fin.last (r + 1)) ≠ 0} :=
+theorem open_dlast (z z' : Fin (2 * r + k + 1) → ℂ)
+    : IsOpen {g : B.Mat k r | Dmin k r z z' g (Fin.last (r + 1)) ≠ 0} :=
   isOpen_ne_fun (Formalism.FourierDecayAlt.P.JCx1.contDiff_Dmin z z' _).continuous continuous_const
 
 theorem ckOn_phiR (D : B.RealPlaceData k r Wp Wq) : B.CkOn ⊤ (B.GPos D) (phiR k r D.z D.z') := by
   intro g₀ hg₀
-  refine ⟨{g : B.Mat k r | Dmin k r D.z D.z' g (Fin.last (r + 1)) ≠ 0}, phiR k r D.z D.z', open_dlast D.z D.z',
-    dlast_ne D hg₀, ?_, fun _ _ _ => rfl⟩
+  refine ⟨
+    {g : B.Mat k r | Dmin k r D.z D.z' g (Fin.last (r + 1)) ≠ 0},
+    phiR k r D.z D.z',
+    open_dlast D.z D.z',
+    dlast_ne D hg₀,
+    ?_,
+    fun _ _ _ => rfl
+  ⟩
   have h0 := Formalism.FourierDecayAlt.P.JCx1.contDiff_Dmin (k := k) (r := r) D.z D.z' ⟨r, by omega⟩
-  have h1 := Formalism.FourierDecayAlt.P.JCx1.contDiff_Dmin (k := k) (r := r) D.z D.z' (Fin.last (r + 1))
+  have h1 :=
+    Formalism.FourierDecayAlt.P.JCx1.contDiff_Dmin (k := k) (r := r) D.z D.z' (Fin.last (r + 1))
   refine (h0.contDiffOn.mul (h1.contDiffOn.inv (fun x hx => hx))).congr (fun x _ => ?_)
   simp [phiR, div_eq_mul_inv]
 
 theorem ckOn_phiD (D : B.RealPlaceData k r Wp Wq) : B.CkOn ⊤ (B.GPos D) (phiD k r D.z D.z') := by
   intro g₀ hg₀
-  refine ⟨{g : B.Mat k r | Dmin k r D.z D.z' g (Fin.last (r + 1)) ≠ 0}, phiD k r D.z D.z', open_dlast D.z D.z',
-    dlast_ne D hg₀, ?_, fun _ _ _ => rfl⟩
-  have h1 := Formalism.FourierDecayAlt.P.JCx1.contDiff_Dmin (k := k) (r := r) D.z D.z' (Fin.last (r + 1))
-  have h2 : ContDiff ℝ (⊤ : ℕ∞) (fun g : B.Mat k r => (starRingEnd ℂ) (Dmin k r D.z D.z' g (Fin.last (r + 1)))) :=
+  refine ⟨
+    {g : B.Mat k r | Dmin k r D.z D.z' g (Fin.last (r + 1)) ≠ 0},
+    phiD k r D.z D.z',
+    open_dlast D.z D.z',
+    dlast_ne D hg₀,
+    ?_,
+    fun _ _ _ => rfl
+  ⟩
+  have h1 :=
+    Formalism.FourierDecayAlt.P.JCx1.contDiff_Dmin (k := k) (r := r) D.z D.z' (Fin.last (r + 1))
+  have h2 : ContDiff ℝ (⊤ : ℕ∞)
+      (fun g : B.Mat k r => (starRingEnd ℂ) (Dmin k r D.z D.z' g (Fin.last (r + 1)))) :=
     Complex.conjCLE.contDiff.comp h1
-  refine (h1.contDiffOn.mul (h2.contDiffOn.inv (fun x hx => by simpa using hx))).congr (fun x _ => ?_)
+  refine (h1.contDiffOn.mul (h2.contDiffOn.inv (fun x hx => by simpa using hx))).congr
+    (fun x _ => ?_)
   simp [phiD, div_eq_mul_inv]
 
-theorem phiR_le (D : B.RealPlaceData k r Wp Wq) {ε : ℝ} (hε : 0 < ε) :
-    ∃ C0 : ℝ, ∀ g ∈ regE D ε, ‖phiR k r D.z D.z' g‖ ≤ C0 := by
+theorem phiR_le (D : B.RealPlaceData k r Wp Wq) {ε : ℝ} (hε : 0 < ε)
+    : ∃ C0 : ℝ, ∀ g ∈ regE D ε, ‖phiR k r D.z D.z' g‖ ≤ C0 := by
   set T := Tz k r D.z * Tz k r D.z' with hT
   have hT0 : 0 < T := mul_pos D.T_pos D.T'_pos
   refine ⟨1 + 1 / T, fun g hg => ?_⟩
@@ -115,14 +139,14 @@ theorem phiR_le (D : B.RealPlaceData k r Wp Wq) {ε : ℝ} (hε : 0 < ε) :
   have hx := norm_nonneg (phiR k r D.z D.z' g)
   nlinarith [sq_nonneg (‖phiR k r D.z D.z' g‖ - 1)]
 
-theorem phiD_le (D : B.RealPlaceData k r Wp Wq) (ε : ℝ) :
-    ∃ C0 : ℝ, ∀ g ∈ regE D ε, ‖phiD k r D.z D.z' g‖ ≤ C0 := by
+theorem phiD_le (D : B.RealPlaceData k r Wp Wq) (ε : ℝ)
+    : ∃ C0 : ℝ, ∀ g ∈ regE D ε, ‖phiD k r D.z D.z' g‖ ≤ C0 := by
   refine ⟨1, fun g _ => ?_⟩
   simp only [phiD, norm_div, Complex.norm_conj]
   exact div_self_le_one _
 
-theorem ubl_phiR (D : B.RealPlaceData k r Wp Wq) {ε : ℝ} (hε : 0 < ε) (n : ℕ) :
-    UBL (phiR k r D.z D.z') (regE D ε) n r (r + 1) := by
+theorem ubl_phiR (D : B.RealPlaceData k r Wp Wq) {ε : ℝ} (hε : 0 < ε) (n : ℕ)
+    : UBL (phiR k r D.z D.z') (regE D ε) n r (r + 1) := by
   have hP0 : U.IsPolyDeg r (fun g : B.Mat k r => Dmin k r D.z D.z' g ⟨r, by omega⟩) :=
     Formalism.FourierDecayAlt.P.minor_polynomial_property k r D.z D.z' ⟨r, by omega⟩
   have hP1 : U.IsPolyDeg (r + 1) (fun g : B.Mat k r => Dmin k r D.z D.z' g (Fin.last (r + 1))) := by
@@ -131,24 +155,31 @@ theorem ubl_phiR (D : B.RealPlaceData k r Wp Wq) {ε : ℝ} (hε : 0 < ε) (n : 
   have ha := ubl_poly hP0 (regE D ε) (regE_sub D ε) n (r + 1)
   have hb := ubl_invpow hP1 (regE_sub D ε) hε (fun g hg => dlast_pos D hε hg.2) 1 n
   have hm := ubl_mul (regE_sub D ε) ha hb
-  have e : phiR k r D.z D.z' = fun g => Dmin k r D.z D.z' g ⟨r, by omega⟩ *
-      (Dmin k r D.z D.z' g (Fin.last (r + 1)))⁻¹ ^ 1 := by
+  have e
+      : phiR k r D.z D.z'
+        = fun g =>
+          Dmin k r D.z D.z' g ⟨r, by omega⟩ * (Dmin k r D.z D.z' g (Fin.last (r + 1)))⁻¹ ^ 1 := by
     funext g; simp [phiR, div_eq_mul_inv]
   rw [e]
   simpa using hm
 
-theorem ubl_phiD (D : B.RealPlaceData k r Wp Wq) {ε : ℝ} (hε : 0 < ε) (n : ℕ) :
-    UBL (phiD k r D.z D.z') (regE D ε) n (r + 1) (r + 1) := by
+theorem ubl_phiD (D : B.RealPlaceData k r Wp Wq) {ε : ℝ} (hε : 0 < ε) (n : ℕ)
+    : UBL (phiD k r D.z D.z') (regE D ε) n (r + 1) (r + 1) := by
   have hP1 : U.IsPolyDeg (r + 1) (fun g : B.Mat k r => Dmin k r D.z D.z' g (Fin.last (r + 1))) := by
     have := Formalism.FourierDecayAlt.P.minor_polynomial_property k r D.z D.z' (Fin.last (r + 1))
     simpa using this
   have hP2 := Formalism.FourierDecayAlt.P.CutMP.jdh_pd_star hP1
   have ha := ubl_poly hP1 (regE D ε) (regE_sub D ε) n (r + 1)
-  have hb := ubl_invpow hP2 (regE_sub D ε) hε
-    (fun g hg => by simpa [Complex.star_def] using dlast_pos D hε hg.2) 1 n
+  have hb :=
+    ubl_invpow hP2 (regE_sub D ε) hε
+      (fun g hg => by simpa [Complex.star_def] using dlast_pos D hε hg.2)
+      1 n
   have hm := ubl_mul (regE_sub D ε) ha hb
-  have e : phiD k r D.z D.z' = fun g => Dmin k r D.z D.z' g (Fin.last (r + 1)) *
-      (star (Dmin k r D.z D.z' g (Fin.last (r + 1))))⁻¹ ^ 1 := by
+  have e
+      : phiD k r D.z D.z'
+        = fun g =>
+          Dmin k r D.z D.z' g (Fin.last (r + 1))
+            * (star (Dmin k r D.z D.z' g (Fin.last (r + 1))))⁻¹ ^ 1 := by
     funext g; simp [phiD, div_eq_mul_inv]
   rw [e]
   simpa using hm
@@ -161,9 +192,11 @@ theorem scalar_transfer_bound_holds : JAScalBound := by
   have hr : (0 : ℝ) ≤ r := Nat.cast_nonneg _
   refine ⟨⟨ckOn_phiR D, fun ε hε m => ?_⟩, ⟨ckOn_phiD D, fun ε hε m => ?_⟩⟩
   · exact scal_bound_of_ubl D _ r (r + 1) Bg (by push_cast; linarith) ε (phiR_le D hε)
-      (fun n => ubl_phiR D hε n) m
+      (fun n => ubl_phiR D hε n)
+      m
   · exact scal_bound_of_ubl D _ (r + 1) (r + 1) Bg (by push_cast; linarith) ε (phiD_le D ε)
-      (fun n => ubl_phiD D hε n) m
+      (fun n => ubl_phiD D hε n)
+      m
 
 end
 

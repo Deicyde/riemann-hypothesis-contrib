@@ -20,8 +20,15 @@ theorem group_vector_space : GVGrp := by
   · rw [Matrix.smul_mul, Matrix.one_mul, smul_add, ← add_smul]
     norm_num
   · have hdet : IsUnit g₀.det := Formalism.FourierDecayAlt.P.PBG.isUnit_det_of_UH hg₀
-    refine ⟨Matrix.nonsing_inv_mul g₀ hdet, fun h hh => ⟨Formalism.FourierDecayAlt.P.TwoByOneBlock.UH_mul hg₀ hh,
-      Formalism.FourierDecayAlt.P.TwoByOneBlock.UH_mul (Formalism.FourierDecayAlt.P.PBM.GV_inv_mem g₀ hg₀) hh, ?_⟩⟩
+    refine ⟨
+      Matrix.nonsing_inv_mul g₀ hdet,
+      fun h hh => ⟨
+        Formalism.FourierDecayAlt.P.TwoByOneBlock.UH_mul hg₀ hh,
+        Formalism.FourierDecayAlt.P.TwoByOneBlock.UH_mul
+          (Formalism.FourierDecayAlt.P.PBM.GV_inv_mem g₀ hg₀) hh,
+        ?_
+      ⟩
+    ⟩
     rw [← Matrix.mul_assoc, Matrix.mul_nonsing_inv g₀ hdet, Matrix.one_mul]
 
 end Formalism.FourierDecayAlt.P.CutMP.SmoothTransferRegularity

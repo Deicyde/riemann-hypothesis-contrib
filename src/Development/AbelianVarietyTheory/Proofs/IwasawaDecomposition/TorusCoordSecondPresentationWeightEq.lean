@@ -16,8 +16,11 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Expan
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField IsLocalRing Formalism.L2.Pj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.ShFam GlobalTheory.Models GlobalTheory.LN GlobalTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.ShFam GlobalTheory.Models GlobalTheory.LN
+  GlobalTheory
 open MonoidalCategory CartesianMonoidalCategory MonObj
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -36,12 +39,15 @@ lemma appLE_congr {A B : Scheme.{0}} {f g : A ⟶ B} (h : f = g) {U : B.Opens} {
 
 section Core
 
-variable {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {D D' : DegPre R} {e : ℕ}
-  {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {I : Ideal R} {D D' : DegPre R} {e : ℕ} {G : Over (Spec (CommRingCat.of R))}
+  [GrpObj G] [IsCommMonObj G]
 
-def chg (θ : WeightPf.Te D' I e ≅ WeightPf.Te D I e) :
-    WeightPf.Te D I e ⊗ thickObj R I e G ⟶ WeightPf.Te D' I e ⊗ thickObj R I e G :=
-  lift (fst (WeightPf.Te D I e) (thickObj R I e G) ≫ θ.inv) (snd (WeightPf.Te D I e) (thickObj R I e G))
+def chg (θ : WeightPf.Te D' I e ≅ WeightPf.Te D I e)
+    : WeightPf.Te D I e ⊗ thickObj R I e G ⟶ WeightPf.Te D' I e ⊗ thickObj R I e G :=
+  lift (fst (WeightPf.Te D I e) (thickObj R I e G) ≫ θ.inv)
+    (snd (WeightPf.Te D I e) (thickObj R I e G))
 
 lemma chg_fst (θ : WeightPf.Te D' I e ≅ WeightPf.Te D I e) :
     chg (G := G) θ ≫ fst (WeightPf.Te D' I e) (thickObj R I e G) =
@@ -73,8 +79,10 @@ end Core
 
 section Weight
 
-variable {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {D D' : DegPre R} {e : ℕ}
-  {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {I : Ideal R} {D D' : DegPre R} {e : ℕ} {G : Over (Spec (CommRingCat.of R))}
+  [GrpObj G] [IsCommMonObj G]
 
 lemma chg_weight (g : GtCoord I D e G) (g' : GtCoord I D' e G) (θ : WeightPf.Te D' I e ≅ WeightPf.Te D I e)
     (hi : θ.hom ≫ g.i = g'.i) (x₀ : D'.X → D.X)
@@ -136,7 +144,33 @@ lemma chg_weight (g : GtCoord I D e G) (g' : GtCoord I D' e G) (θ : WeightPf.Te
 
 end Weight
 
-theorem wt_second : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R], IsCN R → ∀ (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G], IsSemiAbelian G → ∀ (D D' : DegData R (maximalIdeal R)) (A A' : PolAV (Sp (FractionRing R))) (U : Unif (maximalIdeal R) D A G) (U' : Unif (maximalIdeal R) D' A' G) (e : ℕ) (xe : D'.toPre.X ≃+ D.toPre.X), GlobalTheory.CharAgree.Match (U.gt e) (U'.gt e) xe → ∀ (α' : D'.toPre.X) (jt : Fin 4 → D'.toPre.P.L.ι), LB.Coh D'.toPre.P.L (D'.toPre.Oφ (U'.gt e).pG α') jt → ∀ (W' : (WeightPf.Te D.toPre (maximalIdeal R) e ⊗ thickObj R (maximalIdeal R) e G).left.Opens) (hs : W' ≤ (snd (WeightPf.Te D.toPre (maximalIdeal R) e) (thickObj R (maximalIdeal R) e G)).left ⁻¹ᵁ LB.wchart D'.toPre.P.L (D'.toPre.Oφ (U'.gt e).pG α') jt) (ha : W' ≤ (WeightPf.act (U.gt e)).left ⁻¹ᵁ LB.wchart D'.toPre.P.L (D'.toPre.Oφ (U'.gt e).pG α') jt), ((WeightPf.act (U.gt e)).left.appLE _ W' ha).hom (((U'.gt e).t α').s jt).val = ((WeightPf.Te D.toPre (maximalIdeal R) e ⊗ thickObj R (maximalIdeal R) e G).left.presheaf.map (homOfLE le_top).op).hom (TorusInj.chiP D.toPre.X (thickObj R (maximalIdeal R) e G) (xe α')) * ((snd (WeightPf.Te D.toPre (maximalIdeal R) e) (thickObj R (maximalIdeal R) e G)).left.appLE _ W' hs).hom (((U'.gt e).t α').s jt).val := by
+theorem wt_second
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R],
+      IsCN R
+        → ∀ (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G],
+          IsSemiAbelian G
+            → ∀ (D D' : DegData R (maximalIdeal R)) (A A' : PolAV (Sp (FractionRing R)))
+                (U : Unif (maximalIdeal R) D A G) (U' : Unif (maximalIdeal R) D' A' G) (e : ℕ)
+                (xe : D'.toPre.X ≃+ D.toPre.X),
+              GlobalTheory.CharAgree.Match (U.gt e) (U'.gt e) xe
+                → ∀ (α' : D'.toPre.X) (jt : Fin 4 → D'.toPre.P.L.ι),
+                  LB.Coh D'.toPre.P.L (D'.toPre.Oφ (U'.gt e).pG α') jt
+                    → ∀ (W' : (WeightPf.Te D.toPre (maximalIdeal R) e
+                        ⊗ thickObj R (maximalIdeal R) e G).left.Opens)
+                        (hs : W'
+                          ≤ (snd (WeightPf.Te D.toPre (maximalIdeal R) e)
+                              (thickObj R (maximalIdeal R) e G)).left
+                            ⁻¹ᵁ LB.wchart D'.toPre.P.L (D'.toPre.Oφ (U'.gt e).pG α') jt)
+                        (ha : W'
+                          ≤ (WeightPf.act (U.gt e)).left
+                            ⁻¹ᵁ LB.wchart D'.toPre.P.L (D'.toPre.Oφ (U'.gt e).pG α') jt),
+                      ((WeightPf.act (U.gt e)).left.appLE _ W' ha).hom (((U'.gt e).t α').s jt).val
+                        = ((WeightPf.Te D.toPre (maximalIdeal R) e ⊗ thickObj R (maximalIdeal R) e
+                              G).left.presheaf.map (homOfLE le_top).op).hom
+                            (TorusInj.chiP D.toPre.X (thickObj R (maximalIdeal R) e G) (xe α'))
+                          * ((snd (WeightPf.Te D.toPre (maximalIdeal R) e)
+                              (thickObj R (maximalIdeal R) e G)).left.appLE _ W' hs).hom
+                            (((U'.gt e).t α').s jt).val := by
   intro R _ _ _ hCN G _ _ hG D D' A A' U U' e xe hM α' jt hjt W' hs ha
   have hR := admissibleBase_of_completeNormalLocalCharZero hCN
   obtain ⟨hN, -, -, -⟩ := hR
@@ -153,10 +187,12 @@ theorem wt_second : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R], Is
     let τ := (U'.gt e).isKernel.lift a (toUnit _) ((CharAgree.comp_q_eq_one_iff (U'.gt e) a).2 h')
     have hτ : τ ≫ (U'.gt e).i = a := (U'.gt e).isKernel.lift_fst _ _ _
     have hτ' : (τ ≫ θ.hom) ≫ (U.gt e).i = a := by rw [Category.assoc, hi, hτ]
-    have k := (TorusCoord.val_torus_point_and_translate R (maximalIdeal R) D.toPre e G (U.gt e) FinalForm
-      (τ ≫ θ.hom) 1 z J hJ (x₀ x)).1
-    have k' := (TorusCoord.val_torus_point_and_translate R (maximalIdeal R) D'.toPre e G (U'.gt e) FinalForm
-      τ 1 z J' hJ' x).1
+    have k :=
+      (TorusCoord.val_torus_point_and_translate R (maximalIdeal R) D.toPre e G (U.gt e) FinalForm
+        (τ ≫ θ.hom) 1 z J hJ (x₀ x)).1
+    have k' :=
+      (TorusCoord.val_torus_point_and_translate R (maximalIdeal R) D'.toPre e G (U'.gt e) FinalForm
+        τ 1 z J' hJ' x).1
     rw [hτ'] at k
     rw [hτ] at k'
     refine k.trans (Eq.trans (Units.ext ?_) k'.symm)

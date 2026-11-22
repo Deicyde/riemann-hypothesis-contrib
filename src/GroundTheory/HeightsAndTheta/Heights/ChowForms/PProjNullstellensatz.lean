@@ -11,8 +11,8 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial
 
-theorem ProjNullstellensatz.proof (h₁ : FGNullstellensatz.Statement) :
-    ProjNullstellensatz.Statement := by
+theorem ProjNullstellensatz.proof (h₁ : FGNullstellensatz.Statement)
+    : ProjNullstellensatz.Statement := by
   intro F _ n P hP
   have : P.IsPrime := hP.isPrime
   obtain ⟨j, hj⟩ := hP.isRelevant
@@ -27,7 +27,8 @@ theorem ProjNullstellensatz.proof (h₁ : FGNullstellensatz.Statement) :
     by_contra h
     exact hne ⟨φ, h⟩
   obtain ⟨φ, hφj⟩ := hφ
-  have hcomp : φ.comp (Ideal.Quotient.mkₐ F P) = aeval (fun i => φ (Ideal.Quotient.mk P (X i))) := by
+  have hcomp
+      : φ.comp (Ideal.Quotient.mkₐ F P) = aeval (fun i => φ (Ideal.Quotient.mk P (X i))) := by
     apply MvPolynomial.algHom_ext
     intro i
     rw [AlgHom.comp_apply, aeval_X]
@@ -36,7 +37,7 @@ theorem ProjNullstellensatz.proof (h₁ : FGNullstellensatz.Statement) :
   · intro h0
     exact hφj (congrFun h0 j)
   · intro g hg
-    rw [← hcomp, AlgHom.comp_apply, Ideal.Quotient.mkₐ_eq_mk,
-      Ideal.Quotient.eq_zero_iff_mem.mpr hg, map_zero]
+    rw [← hcomp, AlgHom.comp_apply, Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.eq_zero_iff_mem.mpr hg,
+      map_zero]
 
 end GroundTheory.Heights₂.Heights

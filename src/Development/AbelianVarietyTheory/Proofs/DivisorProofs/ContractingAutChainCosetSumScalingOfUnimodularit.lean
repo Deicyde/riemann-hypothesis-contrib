@@ -10,17 +10,19 @@ open Formalism.UG GlobalTheory.SatakeWeyl
 
 namespace GlobalTheory.SatakeWeyl
 
-theorem finsum_out_inv_congr {A : Type} [Group A] (U V : Subgroup A) (e : MulAut A) (f : A → ℂ)
-    (he : ∀ a, a ∈ U ↔ e a ∈ V) (hV : ∀ v ∈ V, ∀ a, f (v * a) = f a) :
-    ∑ᶠ y : A ⧸ U, f (e y.out)⁻¹ = ∑ᶠ y : A ⧸ V, f y.out⁻¹ := by
-  let E : A ⧸ U ≃ A ⧸ V := Quotient.congr e.toEquiv (fun a b => by
-    rw [QuotientGroup.leftRel_apply, QuotientGroup.leftRel_apply, he, map_mul, map_inv]
-    rfl)
+theorem finsum_out_inv_congr
+    {A : Type} [Group A]
+    (U V : Subgroup A) (e : MulAut A) (f : A → ℂ)
+    (he : ∀ a, a ∈ U ↔ e a ∈ V) (hV : ∀ v ∈ V, ∀ a, f (v * a) = f a)
+    : ∑ᶠ y : A ⧸ U, f (e y.out)⁻¹ = ∑ᶠ y : A ⧸ V, f y.out⁻¹ := by
+  let E : A ⧸ U ≃ A ⧸ V :=
+    Quotient.congr e.toEquiv (fun a b => by
+      rw [QuotientGroup.leftRel_apply, QuotientGroup.leftRel_apply, he, map_mul, map_inv]
+      rfl)
   have hE : ∀ a : A, E (QuotientGroup.mk a) = QuotientGroup.mk (e a) := fun a => rfl
   rw [← finsum_comp_equiv E]
   refine finsum_congr fun y => ?_
-  have h1 : E y = QuotientGroup.mk (e y.out) := by
-    rw [← hE, QuotientGroup.out_eq']
+  have h1 : E y = QuotientGroup.mk (e y.out) := by rw [← hE, QuotientGroup.out_eq']
   obtain ⟨v, hv⟩ := QuotientGroup.mk_out_eq_mul V (e y.out)
   rw [h1, hv, mul_inv_rev, hV _ (V.inv_mem v.2)]
 
@@ -28,7 +30,8 @@ theorem chainSum_of_unimod : Unimod → ChainIndex → ChainSum := by
   classical
   intro hUn hCh A _ U c Q d f hc hQ hind hex hV hU hfin
   have hchain := hCh A U c Q hc hind
-  have hmem : ∀ (j : ℤ) (a : A), a ∈ U.comap (c ^ j).toMonoidHom ↔ (c ^ j) a ∈ U := fun j a => Iff.rfl
+  have hmem : ∀ (j : ℤ) (a : A), a ∈ U.comap (c ^ j).toMonoidHom ↔ (c ^ j) a ∈ U := fun j a =>
+    Iff.rfl
   have hmono : ∀ j j' : ℤ, j ≤ j' → U.comap (c ^ j).toMonoidHom ≤ U.comap (c ^ j').toMonoidHom := by
     intro j j' h
     have := (hchain j (j' - j).toNat).1
@@ -39,7 +42,8 @@ theorem chainSum_of_unimod : Unimod → ChainIndex → ChainSum := by
   choose J hJ using hex
   obtain ⟨k, hkd, hk⟩ : ∃ k : ℕ, d ≤ k ∧ ∀ y : A ⧸ U, f y.out ≠ 0 → J y.out ≤ k := by
     refine ⟨hfin.toFinset.sup (fun y => J y.out) + d.toNat, by omega, fun y hy => ?_⟩
-    exact le_trans (Finset.le_sup (f := fun y : A ⧸ U => J y.out) (hfin.mem_toFinset.2 hy)) (Nat.le_add_right _ _)
+    exact le_trans (Finset.le_sup (f := fun y : A ⧸ U => J y.out) (hfin.mem_toFinset.2 hy))
+      (Nat.le_add_right _ _)
   obtain ⟨l, hl⟩ : ∃ l : ℕ, d + l = k := ⟨(k - d).toNat, by omega⟩
   have hUΓ : U ≤ U.comap (c ^ (k : ℤ)).toMonoidHom := by
     have := hmono 0 k (by omega)
@@ -60,11 +64,14 @@ theorem chainSum_of_unimod : Unimod → ChainIndex → ChainSum := by
       exact hJ _
     rw [hu] at h2
     exact (Subgroup.mul_mem_cancel_right _ (hUΓ u.2)).1 h2
-  have key := hUn A _ U (U.comap (c ^ d).toMonoidHom) f hUΓ (hmono d k hkd)
-    (by rw [iU]; exact pow_ne_zero _ hQ) (by rw [iV]; exact pow_ne_zero _ hQ) hsupp
-    (fun v hv => hV v hv) hU
-  rw [finsum_out_inv_congr U (U.comap (c ^ d).toMonoidHom) (c ^ (-d)) f (fun a => by
-    rw [hmem, ← MulAut.mul_apply, ← zpow_add, add_neg_cancel, zpow_zero, MulAut.one_apply])
+  have key :=
+    hUn A _ U (U.comap (c ^ d).toMonoidHom) f hUΓ (hmono d k hkd)
+      (by rw [iU]; exact pow_ne_zero _ hQ) (by rw [iV]; exact pow_ne_zero _ hQ) hsupp
+      (fun v hv => hV v hv)
+      hU
+  rw [finsum_out_inv_congr U (U.comap (c ^ d).toMonoidHom) (c ^ (-d)) f
+    (fun a => by
+      rw [hmem, ← MulAut.mul_apply, ← zpow_add, add_neg_cancel, zpow_zero, MulAut.one_apply])
     (fun v hv => hV v hv)]
   rw [iU, iV] at key
   have hQ' : (Q : ℂ) ≠ 0 := by exact_mod_cast hQ

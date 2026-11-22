@@ -11,8 +11,9 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem nonempty_cEmb_of_pos_nV : ∀ (p : ℕ) [Fact p.Prime] (G : Formalism.MainNotions.G.GAtP p), 0 < G.P.nV →
-    Nonempty (Formalism.L2.G.Pend.CEmb G) := by
+theorem nonempty_cEmb_of_pos_nV
+    : ∀ (p : ℕ) [Fact p.Prime] (G : Formalism.MainNotions.G.GAtP p),
+      0 < G.P.nV → Nonempty (Formalism.L2.G.Pend.CEmb G) := by
   intro p _ G hV
   let v : Fin G.P.nV := ⟨0, hV⟩
   have S := G.P.setting v
@@ -42,7 +43,8 @@ theorem nonempty_cEmb_of_pos_nV : ∀ (p : ℕ) [Fact p.Prime] (G : Formalism.Ma
 
   letI : Algebra (G.P.W v) G.O := (G.P.j v).toAlgebra
   haveI : Module.Finite (G.P.W v) G.O := S.finite
-  have hcomap : (maximalIdeal G.O).comap (algebraMap (G.P.W v) G.O) = Ideal.span {(p : G.P.W v)} := by
+  have hcomap
+      : (maximalIdeal G.O).comap (algebraMap (G.P.W v) G.O) = Ideal.span {(p : G.P.W v)} := by
     have hmax : ((maximalIdeal G.O).comap (algebraMap (G.P.W v) G.O)).IsMaximal :=
       Ideal.isMaximal_under_of_isIntegral_of_isMaximal (R := G.P.W v) _
     rw [IsLocalRing.eq_maximalIdeal hmax, S.p_unif.maximalIdeal_eq]
@@ -67,14 +69,19 @@ theorem nonempty_cEmb_of_pos_nV : ∀ (p : ℕ) [Fact p.Prime] (G : Formalism.Ma
       intro hu
       exact (mem_maximalIdeal _).1 hpO (by simpa using hu.map e₀.symm)
     rw [mem_maximalIdeal_integralClosure_iff, map_natCast] at h1
-    have h2 : (((p : integralClosure ℤ_[p'] K₀) : K₀) : PadicAlgCl p') =
-        algebraMap ℚ_[p'] (PadicAlgCl p') p := by simp
+    have h2
+        : (((p : integralClosure ℤ_[p'] K₀) : K₀) : PadicAlgCl p')
+          = algebraMap ℚ_[p'] (PadicAlgCl p') p := by
+      simp
     rw [h2, PadicAlgCl.norm_extends, Padic.norm_natCast_lt_one_iff] at h1
     exact (Nat.prime_dvd_prime_iff_eq hp'.out Fact.out).1 h1
   subst hpp
 
-  refine ⟨⟨(algebraMap (PadicAlgCl p') ℂ_[p']).comp (K₀.val.toRingHom.comp e.toRingHom), fun x => ?_⟩⟩
-  have hx : ((e (algebraMap G.O G.Kf x) : K₀) : PadicAlgCl p') = (((e₀ x : integralClosure ℤ_[p'] K₀) : K₀) : PadicAlgCl p') := by
+  refine
+    ⟨⟨(algebraMap (PadicAlgCl p') ℂ_[p']).comp (K₀.val.toRingHom.comp e.toRingHom), fun x => ?_⟩⟩
+  have hx
+      : ((e (algebraMap G.O G.Kf x) : K₀) : PadicAlgCl p')
+        = (((e₀ x : integralClosure ℤ_[p'] K₀) : K₀) : PadicAlgCl p') := by
     rw [he x]
   simp only [RingHom.comp_apply]
   show ‖algebraMap (PadicAlgCl p') ℂ_[p'] ((e (algebraMap G.O G.Kf x) : K₀) : PadicAlgCl p')‖ ≤ 1

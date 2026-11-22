@@ -24,32 +24,55 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 @[expose] public section
 
 noncomputable section
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.HeightCounting GlobalTheory.Pst
-  GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp Neutral.B1 Formalism.L2.Host GlobalTheory.HeckeGal
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.HeightCounting GlobalTheory.Pst GlobalTheory.CuspRep GlobalTheory.WeilDeligne
+  GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp Neutral.B1 Formalism.L2.Host
+  GlobalTheory.HeckeGal
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 namespace GlobalTheory.GalFirstClause
 
-variable {E Ω : Type} [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] {l : ℕ} [Fact l.Prime] {a : ℕ}
+variable
+  {E Ω : Type} [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+  {l : ℕ} [Fact l.Prime]
+  {a : ℕ}
 
-theorem finextRep : ∀ (l : ℕ) [Fact l.Prime] (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
-    (a : ℕ) (r : G E Ω →* GL (Fin a) (Om l)), Continuous (fun g => (r g : Matrix (Fin a) (Fin a) (Om l))) →
-    ∃ (K : FinExt l) (ρ : G E Ω →* GL (Fin a) ↥K.1), Continuous (fun g => (ρ g : Matrix (Fin a) (Fin a) ↥K.1)) ∧
-      mapRep (algebraMap ↥K.1 (Om l)) ρ = r := by
+theorem finextRep
+    : ∀ (l : ℕ) [Fact l.Prime] (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
+        [IsAlgClosure E Ω] (a : ℕ) (r : G E Ω →* GL (Fin a) (Om l)),
+      Continuous (fun g => (r g : Matrix (Fin a) (Fin a) (Om l)))
+        → ∃ (K : FinExt l) (ρ : G E Ω →* GL (Fin a) ↥K.1),
+          Continuous (fun g => (ρ g : Matrix (Fin a) (Fin a) ↥K.1))
+            ∧ mapRep (algebraMap ↥K.1 (Om l)) ρ = r := by
   intro l _ E Ω _ _ _ _ _ a r hr
-  obtain ⟨L, -, hL⟩ := GlobalTheory.CompactRepField.exists_finExt_entries_mem l (G E Ω) a r hr (GlobalTheory.Pst.adjExt 0)
+  obtain ⟨L, -, hL⟩ :=
+    GlobalTheory.CompactRepField.exists_finExt_entries_mem l (G E Ω) a r hr
+      (GlobalTheory.Pst.adjExt 0)
   let f : ↥L.1 →+* Om l := algebraMap ↥L.1 (Om l)
-  let M : G E Ω → Matrix (Fin a) (Fin a) ↥L.1 := fun g => Matrix.of fun i j => ⟨(r g : Matrix (Fin a) (Fin a) (Om l)) i j, hL g i j⟩
-  have hinj : Function.Injective (f.mapMatrix : Matrix (Fin a) (Fin a) ↥L.1 →+* Matrix (Fin a) (Fin a) (Om l)) :=
-    fun A B h => Matrix.ext fun i j => f.injective (by simpa using congrFun (congrFun h i) j)
-  have hM : ∀ g, f.mapMatrix (M g) = (r g : Matrix (Fin a) (Fin a) (Om l)) := fun g => Matrix.ext fun i j => rfl
-  let ρ : G E Ω →* GL (Fin a) ↥L.1 :=
-    { toFun := fun g => ⟨M g, M g⁻¹,
-        hinj (by rw [map_mul, hM, hM, map_one, ← Units.val_mul, ← map_mul, mul_inv_cancel, map_one, Units.val_one]),
-        hinj (by rw [map_mul, hM, hM, map_one, ← Units.val_mul, ← map_mul, inv_mul_cancel, map_one, Units.val_one])⟩
-      map_one' := Units.ext (hinj (by rw [hM, map_one, Units.val_one, Units.val_one, map_one]))
-      map_mul' := fun g h => Units.ext (hinj (by
+  let M : G E Ω → Matrix (Fin a) (Fin a) ↥L.1 := fun g =>
+    Matrix.of fun i j => ⟨(r g : Matrix (Fin a) (Fin a) (Om l)) i j, hL g i j⟩
+  have hinj : Function.Injective
+      (f.mapMatrix : Matrix (Fin a) (Fin a) ↥L.1 →+* Matrix (Fin a) (Fin a) (Om l)) := fun A B h =>
+    Matrix.ext fun i j => f.injective (by simpa using congrFun (congrFun h i) j)
+  have hM : ∀ g, f.mapMatrix (M g) = (r g : Matrix (Fin a) (Fin a) (Om l)) := fun g =>
+    Matrix.ext fun i j => rfl
+  let ρ : G E Ω →* GL (Fin a) ↥L.1 := {
+    toFun := fun g => ⟨
+      M g,
+      M g⁻¹,
+      hinj (by
+        rw [map_mul, hM, hM, map_one, ← Units.val_mul, ← map_mul, mul_inv_cancel, map_one,
+          Units.val_one]),
+      hinj (by
+        rw [map_mul, hM, hM, map_one, ← Units.val_mul, ← map_mul, inv_mul_cancel, map_one,
+          Units.val_one])
+    ⟩
+    map_one' := Units.ext (hinj (by rw [hM, map_one, Units.val_one, Units.val_one, map_one]))
+    map_mul' := fun g h =>
+      Units.ext (hinj (by
         show f.mapMatrix (M (g * h)) = f.mapMatrix (M g * M h)
-        rw [map_mul, hM, hM, hM, map_mul, Units.val_mul])) }
+        rw [map_mul, hM, hM, hM, map_mul, Units.val_mul]))
+  }
   refine ⟨L, ρ, ?_, ?_⟩
   · refine continuous_pi fun i => continuous_pi fun j => ?_
     exact continuous_induced_rng.2 ((continuous_apply j).comp ((continuous_apply i).comp hr))
@@ -68,12 +91,12 @@ variable {l : ℕ} [Fact l.Prime] {E : Type} [Field E] [NumberField E]
 def tensLift (φ : E →+* Om l) : ℚ_[l] ⊗[ℚ] E →ₐ[ℚ_[l]] Om l :=
   Algebra.TensorProduct.lift (Algebra.ofId ℚ_[l] (Om l)) φ.toRatAlgHom (fun _ _ => Commute.all _ _)
 
-theorem tensLift_tmul (φ : E →+* Om l) (a : ℚ_[l]) (y : E) :
-    tensLift φ (a ⊗ₜ y) = algebraMap ℚ_[l] (Om l) a * φ y := by
+theorem tensLift_tmul (φ : E →+* Om l) (a : ℚ_[l]) (y : E)
+    : tensLift φ (a ⊗ₜ y) = algebraMap ℚ_[l] (Om l) a * φ y := by
   simp [tensLift]
 
-theorem exists_approx (φ ψ : E →+* Om l) (t : ℚ_[l] ⊗[ℚ] E) :
-    ∀ ε : ℝ, 0 < ε → ∃ x : E, ‖tensLift φ t - φ x‖ < ε ∧ ‖tensLift ψ t - ψ x‖ < ε := by
+theorem exists_approx (φ ψ : E →+* Om l) (t : ℚ_[l] ⊗[ℚ] E)
+    : ∀ ε : ℝ, 0 < ε → ∃ x : E, ‖tensLift φ t - φ x‖ < ε ∧ ‖tensLift ψ t - ψ x‖ < ε := by
   induction t using TensorProduct.inductionOn with
   | tmul a y =>
     intro ε hε
@@ -82,14 +105,16 @@ theorem exists_approx (φ ψ : E →+* Om l) (t : ℚ_[l] ⊗[ℚ] E) :
     refine ⟨(q : E) * y, ?_, ?_⟩
     · rw [tensLift_tmul, map_mul, map_ratCast, ← map_ratCast (algebraMap ℚ_[l] (Om l)) q, ← sub_mul,
         ← map_sub, norm_mul, PadicAlgCl.norm_extends]
-      calc ‖a - (q : ℚ_[l])‖ * ‖φ y‖ ≤ ‖a - (q : ℚ_[l])‖ * (‖φ y‖ + ‖ψ y‖ + 1) := by
-            gcongr; linarith [norm_nonneg (ψ y)]
+      calc
+        ‖a - (q : ℚ_[l])‖ * ‖φ y‖
+          ≤ ‖a - (q : ℚ_[l])‖ * (‖φ y‖ + ‖ψ y‖ + 1) := by gcongr; linarith [norm_nonneg (ψ y)]
         _ < ε / (‖φ y‖ + ‖ψ y‖ + 1) * (‖φ y‖ + ‖ψ y‖ + 1) := by gcongr
         _ = ε := div_mul_cancel₀ _ hM.ne'
     · rw [tensLift_tmul, map_mul, map_ratCast, ← map_ratCast (algebraMap ℚ_[l] (Om l)) q, ← sub_mul,
         ← map_sub, norm_mul, PadicAlgCl.norm_extends]
-      calc ‖a - (q : ℚ_[l])‖ * ‖ψ y‖ ≤ ‖a - (q : ℚ_[l])‖ * (‖φ y‖ + ‖ψ y‖ + 1) := by
-            gcongr; linarith [norm_nonneg (φ y)]
+      calc
+        ‖a - (q : ℚ_[l])‖ * ‖ψ y‖
+          ≤ ‖a - (q : ℚ_[l])‖ * (‖φ y‖ + ‖ψ y‖ + 1) := by gcongr; linarith [norm_nonneg (φ y)]
         _ < ε / (‖φ y‖ + ‖ψ y‖ + 1) * (‖φ y‖ + ‖ψ y‖ + 1) := by gcongr
         _ = ε := div_mul_cancel₀ _ hM.ne'
   | add t₁ t₂ h₁ h₂ =>
@@ -97,15 +122,21 @@ theorem exists_approx (φ ψ : E →+* Om l) (t : ℚ_[l] ⊗[ℚ] E) :
     obtain ⟨x₁, a₁, b₁⟩ := h₁ (ε / 2) (half_pos hε)
     obtain ⟨x₂, a₂, b₂⟩ := h₂ (ε / 2) (half_pos hε)
     refine ⟨x₁ + x₂, ?_, ?_⟩
-    · have e : tensLift φ (t₁ + t₂) - φ (x₁ + x₂) = (tensLift φ t₁ - φ x₁) + (tensLift φ t₂ - φ x₂) := by
+    · have e
+          : tensLift φ (t₁ + t₂) - φ (x₁ + x₂)
+            = (tensLift φ t₁ - φ x₁) + (tensLift φ t₂ - φ x₂) := by
         rw [map_add (f := _), map_add (f := _)]; ring
-      rw [e]; linarith [norm_add_le (tensLift φ t₁ - φ x₁) (tensLift φ t₂ - φ x₂)]
-    · have e : tensLift ψ (t₁ + t₂) - ψ (x₁ + x₂) = (tensLift ψ t₁ - ψ x₁) + (tensLift ψ t₂ - ψ x₂) := by
+      rw [e]
+      linarith [norm_add_le (tensLift φ t₁ - φ x₁) (tensLift φ t₂ - φ x₂)]
+    · have e
+          : tensLift ψ (t₁ + t₂) - ψ (x₁ + x₂)
+            = (tensLift ψ t₁ - ψ x₁) + (tensLift ψ t₂ - ψ x₂) := by
         rw [map_add (f := _), map_add (f := _)]; ring
-      rw [e]; linarith [norm_add_le (tensLift ψ t₁ - ψ x₁) (tensLift ψ t₂ - ψ x₂)]
+      rw [e]
+      linarith [norm_add_le (tensLift ψ t₁ - ψ x₁) (tensLift ψ t₂ - ψ x₂)]
 
-theorem norm_tensLift_le (φ ψ : E →+* Om l) (h : ∀ x, ‖φ x‖ = ‖ψ x‖) (t : ℚ_[l] ⊗[ℚ] E) :
-    ‖tensLift ψ t‖ ≤ ‖tensLift φ t‖ := by
+theorem norm_tensLift_le (φ ψ : E →+* Om l) (h : ∀ x, ‖φ x‖ = ‖ψ x‖) (t : ℚ_[l] ⊗[ℚ] E)
+    : ‖tensLift ψ t‖ ≤ ‖tensLift φ t‖ := by
   refine le_of_forall_pos_le_add fun ε hε => ?_
   obtain ⟨x, h₁, h₂⟩ := exists_approx φ ψ t (ε / 2) (half_pos hε)
   have e1 : ‖tensLift ψ t‖ ≤ ‖tensLift ψ t - ψ x‖ + ‖ψ x‖ := by
@@ -124,13 +155,18 @@ open scoped TensorProduct
 
 variable {l : ℕ} [Fact l.Prime] {E : Type} [Field E] [NumberField E]
 
-theorem norm_eq_of_samePlace (τ φ : E →+* Om l) (w : HeightOneSpectrum (𝓞 E)) (hw : w ∈ placesOver E l)
-    (hτ : ∀ x : 𝓞 E, ‖τ (x : E)‖ < 1 ↔ x ∈ w.asIdeal) (hφ : ∀ x : 𝓞 E, ‖φ (x : E)‖ < 1 ↔ x ∈ w.asIdeal)
-    (x : E) : ‖τ x‖ = ‖φ x‖ := by
-  have e1 := PI.CompDegEF.isEquiv_adicAbv_normAbv τ w hw
-    (fun x => ⟨PI.CompDegEF.norm_le_one_of_integer τ x, hτ x⟩)
-  have e2 := PI.CompDegEF.isEquiv_adicAbv_normAbv φ w hw
-    (fun x => ⟨PI.CompDegEF.norm_le_one_of_integer φ x, hφ x⟩)
+theorem norm_eq_of_samePlace
+    (τ φ : E →+* Om l) (w : HeightOneSpectrum (𝓞 E))
+    (hw : w ∈ placesOver E l) (hτ : ∀ x : 𝓞 E, ‖τ (x : E)‖ < 1 ↔ x ∈ w.asIdeal)
+    (hφ : ∀ x : 𝓞 E, ‖φ (x : E)‖ < 1 ↔ x ∈ w.asIdeal)
+    (x : E)
+    : ‖τ x‖ = ‖φ x‖ := by
+  have e1 :=
+    PI.CompDegEF.isEquiv_adicAbv_normAbv τ w hw
+      (fun x => ⟨PI.CompDegEF.norm_le_one_of_integer τ x, hτ x⟩)
+  have e2 :=
+    PI.CompDegEF.isEquiv_adicAbv_normAbv φ w hw
+      (fun x => ⟨PI.CompDegEF.norm_le_one_of_integer φ x, hφ x⟩)
   obtain ⟨c, hc, hce⟩ := AbsoluteValue.isEquiv_iff_exists_rpow_eq.1 (e1.symm.trans e2)
   have hl := congrFun hce ((l : ℕ) : E)
   simp only [PI.CompDegEF.normAbv_apply, map_natCast] at hl
@@ -151,10 +187,14 @@ namespace GlobalTheory.GalFirstClause.Emb
 
 open scoped TensorProduct
 
-theorem exists_isInduced : ∀ (l : ℕ) [Fact l.Prime] (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
-    (τ : E →+* Om l), ∃ w ∈ placesOver E l, ∀ (A : ValuationSubring Ω), IsPlaceOver A w →
-      ∀ (O : Type) [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O] (Bw : LocBridge l E Ω (Dec (F := E) A) O),
-        Induces Bw → ∃ τ' : ↥Bw.Kw.1 →ₐ[ℚ_[l]] ↥Bw.LL.1, IsInduced Bw τ τ' := by
+theorem exists_isInduced
+    : ∀ (l : ℕ) [Fact l.Prime] (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
+        [IsAlgClosure E Ω] (τ : E →+* Om l),
+      ∃ w ∈ placesOver E l, ∀ (A : ValuationSubring Ω),
+        IsPlaceOver A w
+          → ∀ (O : Type) [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O]
+              (Bw : LocBridge l E Ω (Dec (F := E) A) O),
+            Induces Bw → ∃ τ' : ↥Bw.Kw.1 →ₐ[ℚ_[l]] ↥Bw.LL.1, IsInduced Bw τ τ' := by
   intro l _ E Ω _ _ _ _ _ τ
   refine ⟨PI.CompDegEF.plOf τ, PI.CompDegEF.natCast_mem_plIdeal τ, ?_⟩
   intro A hA O _ _ _ Bw hj
@@ -164,8 +204,10 @@ theorem exists_isInduced : ∀ (l : ℕ) [Fact l.Prime] (E Ω : Type) [Field E] 
     (hj.valuation_lt_one_iff _).symm.trans (hA x)
   have iso := norm_eq_of_samePlace τ jE _ hw (fun x => Iff.rfl) hjE
   have hker : ∀ t ∈ RingHom.ker (tensLift jE), tensLift τ t = 0 := fun t ht =>
-    norm_eq_zero.1 (le_antisymm ((norm_tensLift_le jE τ (fun x => (iso x).symm) t).trans
-      (by rw [RingHom.mem_ker.1 ht, norm_zero])) (norm_nonneg _))
+    norm_eq_zero.1 (le_antisymm
+      ((norm_tensLift_le jE τ (fun x => (iso x).symm) t).trans
+        (by rw [RingHom.mem_ker.1 ht, norm_zero]))
+      (norm_nonneg _))
   have hrange : (tensLift jE).range ≤ Bw.Kw.1.toSubalgebra := by
     rintro _ ⟨t, rfl⟩
     induction t using TensorProduct.inductionOn with
@@ -188,15 +230,17 @@ theorem exists_isInduced : ∀ (l : ℕ) [Fact l.Prime] (E Ω : Type) [Field E] 
     ((Ideal.Quotient.liftₐ (RingHom.ker (tensLift jE)) (tensLift τ) hker).comp
       (Ideal.quotientKerEquivRange (tensLift jE)).symm.toAlgHom).comp (Subalgebra.inclusion hle)
   refine ⟨σ.codRestrict Bw.LL.1.toSubalgebra (fun y => Bw.LL_split σ y), fun x => ?_⟩
-  have key : (Ideal.quotientKerEquivRange (tensLift jE)).symm
-      (Subalgebra.inclusion hle ⟨jE x, Bw.j_E x⟩) = Ideal.Quotient.mk _ (1 ⊗ₜ x) := by
+  have key
+      : (Ideal.quotientKerEquivRange (tensLift jE)).symm (Subalgebra.inclusion hle ⟨jE x, Bw.j_E x⟩)
+        = Ideal.Quotient.mk _ (1 ⊗ₜ x) := by
     rw [AlgEquiv.symm_apply_eq]
     apply Subtype.ext
     change jE x = tensLift jE (1 ⊗ₜ x)
     rw [tensLift_tmul, map_one, one_mul]
   change τ x = σ ⟨jE x, Bw.j_E x⟩
-  change τ x = Ideal.Quotient.liftₐ _ (tensLift τ) hker ((Ideal.quotientKerEquivRange (tensLift jE)).symm
-    (Subalgebra.inclusion hle ⟨jE x, Bw.j_E x⟩))
+  change τ x
+    = Ideal.Quotient.liftₐ _ (tensLift τ) hker
+      ((Ideal.quotientKerEquivRange (tensLift jE)).symm (Subalgebra.inclusion hle ⟨jE x, Bw.j_E x⟩))
   rw [key, Ideal.Quotient.liftₐ_apply]
   change τ x = tensLift τ (1 ⊗ₜ x)
   rw [tensLift_tmul, map_one, one_mul]
@@ -205,12 +249,17 @@ end GlobalTheory.GalFirstClause.Emb
 
 namespace GlobalTheory.GalFirstClause
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.Pst
+open Formalism.BasicNotions Formalism.BasicNotions.Loc NumberField IsDedekindDomain
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.Pst
 
-theorem existsIsInduced : ∀ (l : ℕ) [Fact l.Prime] (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
-    (τ : E →+* Om l), ∃ w ∈ placesOver E l, ∀ (A : ValuationSubring Ω), IsPlaceOver A w →
-      ∀ (O : Type) [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O] (Bw : LocBridge l E Ω (Dec (F := E) A) O),
-        Induces Bw → ∃ τ' : ↥Bw.Kw.1 →ₐ[ℚ_[l]] ↥Bw.LL.1, IsInduced Bw τ τ' :=
+theorem existsIsInduced
+    : ∀ (l : ℕ) [Fact l.Prime] (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
+        [IsAlgClosure E Ω] (τ : E →+* Om l),
+      ∃ w ∈ placesOver E l, ∀ (A : ValuationSubring Ω),
+        IsPlaceOver A w
+          → ∀ (O : Type) [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O]
+              (Bw : LocBridge l E Ω (Dec (F := E) A) O),
+            Induces Bw → ∃ τ' : ↥Bw.Kw.1 →ₐ[ℚ_[l]] ↥Bw.LL.1, IsInduced Bw τ τ' :=
   Emb.exists_isInduced
 
 end GlobalTheory.GalFirstClause

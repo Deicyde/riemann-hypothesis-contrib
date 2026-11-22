@@ -26,7 +26,8 @@ abbrev BdRp (l : ℕ) [Fact (Nat.Prime l)] : Type := BdRPlus l (PadicComplexInt 
 
 abbrev BdR (l : ℕ) [Fact (Nat.Prime l)] : Type := Reformulated.AutPerF.BdR l (PadicComplexInt l)
 
-abbrev Acris0 (l : ℕ) [Fact (Nat.Prime l)] : Subalgebra (Ainf l) (AinfP l) := acrisZero l (PadicComplexInt l)
+abbrev Acris0 (l : ℕ) [Fact (Nat.Prime l)] : Subalgebra (Ainf l) (AinfP l) :=
+  acrisZero l (PadicComplexInt l)
 
 abbrev Acris (l : ℕ) [Fact (Nat.Prime l)] : Type := Reformulated.AutPerF.Acris l (PadicComplexInt l)
 
@@ -37,7 +38,8 @@ abbrev Gq (l : ℕ) [Fact (Nat.Prime l)] : Type := PadicAlgCl l ≃ₐ[ℚ_[l]] 
 def zP (l : ℕ) [Fact (Nat.Prime l)] : ℤ_[l] →+* AinfP l := algebraMap ℤ_[l] (AinfP l)
 
 def θP (l : ℕ) [Fact (Nat.Prime l)] : AinfP l →+* ℂ_[l] :=
-  (IsUnitBall.awayEquiv (PadicComplexInt l) l).toRingEquiv.toRingHom.comp (AinfInv.theta l (PadicComplexInt l))
+  (IsUnitBall.awayEquiv (PadicComplexInt l) l).toRingEquiv.toRingHom.comp
+    (AinfInv.theta l (PadicComplexInt l))
 
 def pD (l : ℕ) [Fact (Nat.Prime l)] : AinfP l →+* BdR l :=
   (algebraMap (BdRp l) (BdR l)).comp (algebraMap (AinfP l) (BdRp l))

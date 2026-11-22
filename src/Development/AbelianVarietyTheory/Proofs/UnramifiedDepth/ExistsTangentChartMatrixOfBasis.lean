@@ -20,8 +20,11 @@ public import Development.AbelianVarietyTheory.BlockTheory.PoincareCuspForms.Eta
 set_option autoImplicit false
 noncomputable section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry TensorProduct Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  TensorProduct Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -29,16 +32,24 @@ attribute [local instance] Over.cartesianMonoidalCategory
 namespace GlobalTheory.ChF
 
 open GlobalTheory.IndefiniteRowSideFullHecke.EtaDualPairing in
-private theorem ker_red_eq {R₀ : Type} [CommRing R₀] (O : LAlg R₀) (x : (dual O : Type))
-    (hx : (red O).1 x = 0) :
-    x = (incl O).1 (TrivSqZeroExt.snd (R := (O : Type)) (M := (O : Type)) x) * eta O := by
-  have key : ∀ b : DualNumber (O : Type), TrivSqZeroExt.fst b = 0 →
-      b = (TrivSqZeroExt.inl (TrivSqZeroExt.snd b) : DualNumber (O : Type)) * DualNumber.eps :=
-    fun b hb => by ext <;> simp [hb]
+private theorem ker_red_eq
+    {R₀ : Type} [CommRing R₀] (O : LAlg R₀) (x : (dual O : Type)) (hx : (red O).1 x = 0)
+    : x = (incl O).1 (TrivSqZeroExt.snd (R := (O : Type)) (M := (O : Type)) x) * eta O := by
+  have key
+      : ∀ b : DualNumber (O : Type),
+        TrivSqZeroExt.fst b = 0
+          → b
+            = (TrivSqZeroExt.inl (TrivSqZeroExt.snd b) : DualNumber (O : Type))
+              * DualNumber.eps := fun b hb => by
+    ext <;> simp [hb]
   exact key x hx
 
-private def liftAlg {R₀ : Type} [CommRing R₀] {O R : Type} [CommRing O] [CommRing R] [Algebra R₀ O]
-    [Algebra R₀ R] (s : O →ₐ[R₀] R) (i : R) (hi : i * i = 0) : DualNumber O →ₐ[R₀] R where
+private def liftAlg
+    {R₀ : Type} [CommRing R₀]
+    {O R : Type} [CommRing O] [CommRing R] [Algebra R₀ O] [Algebra R₀ R]
+    (s : O →ₐ[R₀] R)
+    (i : R) (hi : i * i = 0)
+    : DualNumber O →ₐ[R₀] R where
   toFun x := s x.fst + s x.snd * i
   map_one' := by simp
   map_mul' x y := by
@@ -50,13 +61,19 @@ private def liftAlg {R₀ : Type} [CommRing R₀] {O R : Type} [CommRing O] [Com
   commutes' r := by simp [TrivSqZeroExt.algebraMap_eq_inl']
 
 open GlobalTheory.IndefiniteRowSideFullHecke.EtaDualPairing in
-private theorem exists_lift {R₀ : Type} [CommRing R₀] {O R : LAlg R₀} (s : LHom O R) (i : (R : Type))
-    (hi : i * i = 0) : ∃ f : LHom (dual O) R, f.comp (incl O) = s ∧ f.1 (eta O) = i := by
+private theorem exists_lift
+    {R₀ : Type} [CommRing R₀] {O R : LAlg R₀} (s : LHom O R) (i : (R : Type)) (hi : i * i = 0)
+    : ∃ f : LHom (dual O) R, f.comp (incl O) = s ∧ f.1 (eta O) = i := by
   refine ⟨⟨liftAlg s.1 i hi, ⟨fun x hx => ?_⟩⟩, Subtype.ext (AlgHom.ext fun x => ?_), ?_⟩
-  · have hx' : IsUnit (s.1 (TrivSqZeroExt.fst (R := (O : Type)) (M := (O : Type)) x) +
-      s.1 (TrivSqZeroExt.snd (R := (O : Type)) (M := (O : Type)) x) * i) := hx
-    have hn : IsNilpotent (-(s.1 (TrivSqZeroExt.snd (R := (O : Type)) (M := (O : Type)) x) * i)) :=
-      ⟨2, by linear_combination (s.1 (TrivSqZeroExt.snd (R := (O : Type)) (M := (O : Type)) x)) ^ 2 * hi⟩
+  · have hx' : IsUnit
+        (s.1 (TrivSqZeroExt.fst (R := (O : Type)) (M := (O : Type)) x)
+          + s.1 (TrivSqZeroExt.snd (R := (O : Type)) (M := (O : Type)) x) * i) :=
+      hx
+    have hn
+        : IsNilpotent (-(s.1 (TrivSqZeroExt.snd (R := (O : Type)) (M := (O : Type)) x) * i)) := ⟨
+      2,
+      by linear_combination (s.1 (TrivSqZeroExt.snd (R := (O : Type)) (M := (O : Type)) x)) ^ 2 * hi
+    ⟩
     have h2 := hn.isUnit_add_left_of_commute hx' (Commute.all _ _)
     rw [add_neg_cancel_right] at h2
     exact TrivSqZeroExt.isUnit_iff_isUnit_fst.2 (s.2.map_nonunit _ h2)
@@ -65,27 +82,38 @@ private theorem exists_lift {R₀ : Type} [CommRing R₀] {O R : LAlg R₀} (s :
   · change s.1 0 + s.1 1 * i = i
     simp
 
-private theorem chart_add {R₀ : Type} [CommRing R₀] {B : BX R₀} {O : LAlg R₀} {g : ℕ}
-    {F : FGLaw (O : Type) g} {Y : ∀ R : LAlg R₀, LHom O R → (Fin g → (R : Type)) → B.G R}
-    (h : BXChart B O F.F Y) (R : LAlg R₀) (s : LHom O R) (e : (R : Type)) (he : e * e = 0)
-    (a b : Fin g → (R : Type)) :
-    Y R s (fun k => a k * e) + Y R s (fun k => b k * e) = Y R s (fun k => (a k + b k) * e) := by
+private theorem chart_add
+    {R₀ : Type} [CommRing R₀]
+    {B : BX R₀} {O : LAlg R₀} {g : ℕ} {F : FGLaw (O : Type) g}
+    {Y : ∀ R : LAlg R₀, LHom O R → (Fin g → (R : Type)) → B.G R} (h : BXChart B O F.F Y)
+    (R : LAlg R₀) (s : LHom O R) (e : (R : Type)) (he : e * e = 0) (a b : Fin g → (R : Type))
+    : Y R s (fun k => a k * e) + Y R s (fun k => b k * e) = Y R s (fun k => (a k + b k) * e) := by
   have hn : ∀ c : (R : Type), IsNilpotent (c * e) := fun c => ⟨2, by linear_combination c ^ 2 * he⟩
-  have key : ∀ (a b : Fin g → (R : Type)) (k : Fin g),
-      nv s.1.toRingHom (F.F k) ![fun k => a k * e, fun k => b k * e] =
-        (∑ j, s.1 (MvPowerSeries.coeff (Finsupp.single ((0 : Fin 2), j) 1) (F.F k)) * a j +
-          ∑ j, s.1 (MvPowerSeries.coeff (Finsupp.single ((1 : Fin 2), j) 1) (F.F k)) * b j) * e := by
+  have key
+      : ∀ (a b : Fin g → (R : Type)) (k : Fin g),
+        nv s.1.toRingHom (F.F k) ![fun k => a k * e, fun k => b k * e]
+          = (∑ j, s.1 (MvPowerSeries.coeff (Finsupp.single ((0 : Fin 2), j) 1) (F.F k)) * a j
+              + ∑ j, s.1 (MvPowerSeries.coeff (Finsupp.single ((1 : Fin 2), j) 1) (F.F k)) * b j)
+            * e := by
     intro a b k
-    have h1 := (nv_calculus _ _ s.1.toRingHom 2 g ![fun k => a k * e, fun k => b k * e]
-      (fun i j => by fin_cases i <;> exact hn _)).2.2.2.2.2 (fun i j i' j' => by
-        have : ∀ c d : (R : Type), c * e * (d * e) = 0 := fun c d => by linear_combination c * d * he
-        fin_cases i <;> fin_cases i' <;> exact this _ _) (F.F k)
+    have h1 :=
+      (nv_calculus _ _ s.1.toRingHom 2 g ![fun k => a k * e, fun k => b k * e]
+          (fun i j => by fin_cases i <;> exact hn _)).2.2.2.2.2
+        (fun i j i' j' => by
+          have : ∀ c d : (R : Type), c * e * (d * e) = 0 := fun c d => by
+            linear_combination c * d * he
+          fin_cases i <;> fin_cases i' <;> exact this _ _)
+        (F.F k)
     rw [h1, F.const, map_zero, zero_add, Fintype.sum_prod_type, Fin.sum_univ_two, add_mul,
       Finset.sum_mul, Finset.sum_mul]
     simp [_root_.mul_assoc]
-  have law : ∀ a b : Fin g → (R : Type), Y R s (fun k => a k * e) + Y R s (fun k => b k * e) =
-      Y R s (fun k => (∑ j, s.1 (MvPowerSeries.coeff (Finsupp.single ((0 : Fin 2), j) 1) (F.F k)) * a j +
-          ∑ j, s.1 (MvPowerSeries.coeff (Finsupp.single ((1 : Fin 2), j) 1) (F.F k)) * b j) * e) := by
+  have law
+      : ∀ a b : Fin g → (R : Type),
+        Y R s (fun k => a k * e) + Y R s (fun k => b k * e)
+          = Y R s (fun k =>
+            (∑ j, s.1 (MvPowerSeries.coeff (Finsupp.single ((0 : Fin 2), j) 1) (F.F k)) * a j
+                + ∑ j, s.1 (MvPowerSeries.coeff (Finsupp.single ((1 : Fin 2), j) 1) (F.F k)) * b j)
+              * e) := by
     intro a b
     rw [h.law R s _ _ (fun _ => hn _) (fun _ => hn _)]
     simp only [key]
@@ -105,16 +133,23 @@ private theorem chart_add {R₀ : Type} [CommRing R₀] {B : BX R₀} {O : LAlg 
   simp only [Pi.zero_apply, mul_zero, Finset.sum_const_zero, add_zero, zero_add] at h1 h2
   rw [add_mul, add_mul, ← h1, ← h2]
 
-
 open GlobalTheory.IndefiniteRowSideFullHecke.EtaDualPairing in
-theorem exists_tanMat : ∀ (R₀ : Type) [CommRing R₀] (B : BX R₀) (O : LAlg R₀) (g : ℕ) (F : FGLaw (O : Type) g) (Y : ∀ R : LAlg R₀, LHom O R → (Fin g → (R : Type)) → B.G R), BXChart B O F.F Y → ∀ gb : Module.Basis (Fin g) R₀ B.gg, ∃ S : Matrix (Fin g) (Fin g) (O : Type), IsUnit S ∧ TanMat B O Y gb S := by
+theorem exists_tanMat
+    : ∀ (R₀ : Type) [CommRing R₀] (B : BX R₀) (O : LAlg R₀) (g : ℕ) (F : FGLaw (O : Type) g)
+        (Y : ∀ R : LAlg R₀, LHom O R → (Fin g → (R : Type)) → B.G R),
+      BXChart B O F.F Y
+        → ∀ gb : Module.Basis (Fin g) R₀ B.gg, ∃ S : Matrix (Fin g) (Fin g) (O : Type),
+          IsUnit S ∧ TanMat B O Y gb S := by
   intro R₀ _ B O g F Y h gb
   have hee := eta_mul_eta O
-  have hn : ∀ c : (dual O : Type), IsNilpotent (c * eta O) :=
-    fun c => ⟨2, by linear_combination c ^ 2 * hee⟩
+  have hn : ∀ c : (dual O : Type), IsNilpotent (c * eta O) := fun c =>
+    ⟨2, by linear_combination c ^ 2 * hee⟩
   have hη : (red O).1 (eta O) = 0 := rfl
-  have hex : ∀ l, ∃ a : Fin g → (dual O : Type), (∀ i, (red O).1 (a i) = 0) ∧
-      B.tg (red O) (red_sqZero O) (gb l ⊗ₜ[R₀] ⟨eta O, hη⟩) = Y (dual O) (incl O) a := fun l =>
+  have hex
+      : ∀ l, ∃ a : Fin g → (dual O : Type),
+        (∀ i, (red O).1 (a i) = 0)
+          ∧ B.tg (red O) (red_sqZero O) (gb l ⊗ₜ[R₀] ⟨eta O, hη⟩)
+            = Y (dual O) (incl O) a := fun l =>
     h.surj (dual O) O (incl O) (red O) (incl O) (red_comp_incl O) (by rw [red_comp_incl]; rfl)
       (red_sqZero O) _ ((B.tg_ker _ _ _).2 ⟨_, rfl⟩)
   choose a ha0 ha using hex
@@ -144,10 +179,12 @@ theorem exists_tanMat : ∀ (R₀ : Type) [CommRing R₀] (B : BX R₀) (O : LAl
     rw [map_mul, hf2, ← hf1]
     rfl
   refine ⟨S, Matrix.mulVec_surjective_iff_isUnit.1 fun v => ?_, hT⟩
-  have hP : ∀ w, ∃ c : Fin g → (O : Type), B.tg (red O) (red_sqZero O) w =
-      Y (dual O) (incl O) (fun k => (incl O).1 ((S *ᵥ c) k) * eta O) := by
-    let P : B.G (dual O) → Prop := fun x => ∃ c : Fin g → (O : Type),
-      x = Y (dual O) (incl O) (fun k => (incl O).1 ((S *ᵥ c) k) * eta O)
+  have hP
+      : ∀ w, ∃ c : Fin g → (O : Type),
+        B.tg (red O) (red_sqZero O) w
+          = Y (dual O) (incl O) (fun k => (incl O).1 ((S *ᵥ c) k) * eta O) := by
+    let P : B.G (dual O) → Prop := fun x =>
+      ∃ c : Fin g → (O : Type), x = Y (dual O) (incl O) (fun k => (incl O).1 ((S *ᵥ c) k) * eta O)
     have P0 : P 0 := ⟨0, by rw [← h.zero (dual O) (incl O)]; congr 1; funext k; simp⟩
     have Padd : ∀ x y, P x → P y → P (x + y) := by
       rintro _ _ ⟨c, rfl⟩ ⟨c', rfl⟩
@@ -177,16 +214,21 @@ theorem exists_tanMat : ∀ (R₀ : Type) [CommRing R₀] (B : BX R₀) (O : LAl
     rw [h.nat _ _ _ _ _ (fun _ => hn _), ← h.zero O ((red O).comp (incl O))]
     congr 1
     funext k
-    rw [map_mul, hη, mul_zero]; rfl
+    rw [map_mul, hη, mul_zero]
+    rfl
   obtain ⟨w, hw⟩ := (B.tg_ker _ (red_sqZero O) _).1 hx
   obtain ⟨c, hc⟩ := hP w
   have h3 := h.inj _ _ _ _ (fun _ => hn _) (fun _ => hn _) (hc.symm.trans hw)
   refine ⟨c, funext fun k => ?_⟩
   have h4 := congrArg (TrivSqZeroExt.snd (R := (O : Type)) (M := (O : Type))) (congrFun h3 k)
-  have key : ∀ t : (O : Type), TrivSqZeroExt.snd (R := (O : Type)) (M := (O : Type))
-      ((incl O).1 t * eta O) = t := fun t => by
-    have : TrivSqZeroExt.snd ((TrivSqZeroExt.inl t : DualNumber (O : Type)) *
-      (DualNumber.eps : DualNumber (O : Type))) = t := by simp
+  have key
+      : ∀ t : (O : Type),
+        TrivSqZeroExt.snd (R := (O : Type)) (M := (O : Type)) ((incl O).1 t * eta O)
+          = t := fun t => by
+    have : TrivSqZeroExt.snd
+          ((TrivSqZeroExt.inl t : DualNumber (O : Type)) * (DualNumber.eps : DualNumber (O : Type)))
+        = t := by
+      simp
     exact this
   rwa [key, key] at h4
 

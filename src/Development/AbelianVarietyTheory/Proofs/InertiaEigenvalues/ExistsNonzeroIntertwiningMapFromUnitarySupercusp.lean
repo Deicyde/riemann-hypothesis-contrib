@@ -15,20 +15,23 @@ namespace GlobalTheory.CuspBack
 
 variable {G W V : Type} [Group G] [AddCommGroup W] [Module ℂ W] [AddCommGroup V] [Module ℂ V]
 
-theorem form_inv (ρ : Representation ℂ G V) (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ)
-    (hi : ∀ g v w, B (ρ g v) (ρ g w) = B v w) (g : G) (v w : V) : B (ρ g⁻¹ v) w = B v (ρ g w) := by
+theorem form_inv
+    (ρ : Representation ℂ G V) (B : V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ) (hi : ∀ g v w, B (ρ g v) (ρ g w) = B v w)
+    (g : G) (v w : V)
+    : B (ρ g⁻¹ v) w = B v (ρ g w) := by
   have h : ρ g (ρ g⁻¹ v) = v := by
     rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply]
   rw [← hi g, h]
 
-private theorem exists_intertwiningMap_bound (π : Representation ℂ G W) (ρ : Representation ℂ G V) (H : Subgroup G)
-    (F : V → G → W) (hH : ∀ v g h, h ∈ H → F v (g * h) = F v g)
+private theorem exists_intertwiningMap_bound
+    (π : Representation ℂ G W) (ρ : Representation ℂ G V) (H : Subgroup G) (F : V → G → W)
+    (hH : ∀ v g h, h ∈ H → F v (g * h) = F v g)
     (hfin : ∀ v, ∃ t : Finset G, ∀ g, F v g ≠ 0 → ∃ c ∈ t, c⁻¹ * g ∈ H)
     (hadd : ∀ v v' g, F (v + v') g = F v g + F v' g)
     (hsmul : ∀ (a : ℂ) v g, F (a • v) g = a • F v g)
-    (heq : ∀ h v g, F (ρ h v) g = π h (F v (h⁻¹ * g))) :
-    ∃ ι : ρ.IntertwiningMap π, ∀ (Ψ : W →+ ℝ) (v : V), (∀ g, 0 ≤ Ψ (F v g)) → Ψ (F v 1) ≤ Ψ (ι v) := by
-
+    (heq : ∀ h v g, F (ρ h v) g = π h (F v (h⁻¹ * g)))
+    : ∃ ι : ρ.IntertwiningMap π, ∀ (Ψ : W →+ ℝ) (v : V),
+      (∀ g, 0 ≤ Ψ (F v g)) → Ψ (F v 1) ≤ Ψ (ι v) := by
   have hwd : ∀ v (a b : G), a⁻¹ * b ∈ H → F v a = F v b := by
     intro v a b hab
     have := hH v a (a⁻¹ * b) hab
@@ -58,14 +61,15 @@ private theorem exists_intertwiningMap_bound (π : Representation ℂ G W) (ρ :
     obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective q
     exact heq h v g
 
-  let L : V →ₗ[ℂ] W :=
-    { toFun := fun v => ∑ᶠ q, Fq v q
-      map_add' := fun v v' => by
-        simp only [hadd']
-        exact finsum_add_distrib (hsupp v) (hsupp v')
-      map_smul' := fun a v => by
-        simp only [hsmul', RingHom.id_apply]
-        exact (smul_finsum' a (hsupp v)).symm }
+  let L : V →ₗ[ℂ] W := {
+    toFun := fun v => ∑ᶠ q, Fq v q
+    map_add' := fun v v' => by
+      simp only [hadd']
+      exact finsum_add_distrib (hsupp v) (hsupp v')
+    map_smul' := fun a v => by
+      simp only [hsmul', RingHom.id_apply]
+      exact (smul_finsum' a (hsupp v)).symm
+  }
   refine ⟨L.intertwiningMap_of_isIntertwiningMap ρ π (fun h v => ?_), fun Ψ v hΨ => ?_⟩
   · show ∑ᶠ q, Fq (ρ h v) q = π h (∑ᶠ q, Fq v q)
     simp only [heq']
@@ -81,7 +85,13 @@ private theorem exists_intertwiningMap_bound (π : Representation ℂ G W) (ρ :
         obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective q
         exact hΨ g)
 
-theorem exists_back : ∀ (G W V : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup W] [Module ℂ W] [AddCommGroup V] [Module ℂ V] (π : Representation ℂ G W) (ρ : Representation ℂ G V) (p : π.IntertwiningMap ρ), IsSmooth π → IsSupercuspidal ρ → IsUnitarisable ρ → (∀ z ∈ Subgroup.center G, ∃ c : ℂ, ∀ w, π z w = c • w) → p ≠ 0 → ∃ ι : ρ.IntertwiningMap π, ι ≠ 0 := by
+theorem exists_back
+    : ∀ (G W V : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup W]
+        [Module ℂ W] [AddCommGroup V] [Module ℂ V] (π : Representation ℂ G W)
+        (ρ : Representation ℂ G V) (p : π.IntertwiningMap ρ),
+      IsSmooth π → IsSupercuspidal ρ → IsUnitarisable ρ
+        → (∀ z ∈ Subgroup.center G, ∃ c : ℂ, ∀ w, π z w = c • w) → p ≠ 0
+        → ∃ ι : ρ.IntertwiningMap π, ι ≠ 0 := by
   classical
   intro G W V _ _ _ _ _ _ _ π ρ p hπ hρ hu hc hp
   obtain ⟨B, hB1, hB2, hB3⟩ := hu
@@ -91,31 +101,33 @@ theorem exists_back : ∀ (G W V : Type) [Group G] [TopologicalSpace G] [IsTopol
     push_neg at h
     exact hp (Representation.IntertwiningMap.ext (LinearMap.ext fun x => h x))
 
-  let K : Subgroup G :=
-    { carrier := {g | π g w = w}
-      mul_mem' := fun {a b} ha hb => by
-        have ha' : π a w = w := ha
-        have hb' : π b w = w := hb
-        show π (a * b) w = w
-        rw [map_mul, Module.End.mul_apply, hb', ha']
-      one_mem' := by
-        show π 1 w = w
-        rw [map_one, Module.End.one_apply]
-      inv_mem' := fun {a} ha => by
-        have ha' : π a w = w := ha
-        show π a⁻¹ w = w
-        nth_rewrite 1 [← ha']
-        rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply] }
+  let K : Subgroup G := {
+    carrier := {g | π g w = w}
+    mul_mem' := fun {a b} ha hb => by
+      have ha' : π a w = w := ha
+      have hb' : π b w = w := hb
+      show π (a * b) w = w
+      rw [map_mul, Module.End.mul_apply, hb', ha']
+    one_mem' := by
+      show π 1 w = w
+      rw [map_one, Module.End.one_apply]
+    inv_mem' := fun {a} ha => by
+      have ha' : π a w = w := ha
+      show π a⁻¹ w = w
+      nth_rewrite 1 [← ha']
+      rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply]
+  }
   have hKopen : IsOpen (K : Set G) := hπ w
   have hKu : ∀ k ∈ K, ρ k (p w) = p w := by
     intro k hk
     have hk' : π k w = w := hk
     rw [← p.isIntertwining, hk']
 
-  let l : Module.Dual ℂ V :=
-    { toFun := fun x => B x (p w)
-      map_add' := fun x y => by simp
-      map_smul' := fun a x => by simp }
+  let l : Module.Dual ℂ V := {
+    toFun := fun x => B x (p w)
+    map_add' := fun x y => by simp
+    map_smul' := fun a x => by simp
+  }
   have hKl : ∀ k ∈ K, ρ.dual k l = l := by
     intro k hk
     ext y
@@ -126,7 +138,8 @@ theorem exists_back : ∀ (G W V : Type) [Group G] [TopologicalSpace G] [IsTopol
     rw [isOpen_iff_mem_nhds]
     intro g hg
     have hg' : ρ.dual g l = l := hg
-    have ho : IsOpen ((fun x => g⁻¹ * x) ⁻¹' (K : Set G)) := hKopen.preimage (continuous_const_mul g⁻¹)
+    have ho : IsOpen ((fun x => g⁻¹ * x) ⁻¹' (K : Set G)) :=
+      hKopen.preimage (continuous_const_mul g⁻¹)
     refine Filter.mem_of_superset (ho.mem_nhds ?_) ?_
     · show g⁻¹ * g ∈ K
       rw [inv_mul_cancel]
@@ -162,23 +175,24 @@ theorem exists_back : ∀ (G W V : Type) [Group G] [TopologicalSpace G] [IsTopol
     simp only [mul_inv_rev, map_mul, Module.End.mul_apply]
     rw [form_inv ρ B hB3 z (ρ g⁻¹ v) (p w), hρz, hcw w, map_smulₛₗ (B (ρ g⁻¹ v)) c (p w),
       map_smul (π g) c w, smul_smul, smul_eq_mul, mul_right_comm, hcc, one_mul]
-  let S : Subgroup G :=
-    { carrier := {h | ∀ v g, F v (g * h) = F v g}
-      mul_mem' := fun {a b} ha hb => by
-        have ha' : ∀ v g, F v (g * a) = F v g := ha
-        have hb' : ∀ v g, F v (g * b) = F v g := hb
-        show ∀ v g, F v (g * (a * b)) = F v g
-        intro v g
-        rw [← mul_assoc, hb', ha']
-      one_mem' := by
-        show ∀ v g, F v (g * 1) = F v g
-        intro v g
-        rw [mul_one]
-      inv_mem' := fun {a} ha => by
-        have ha' : ∀ v g, F v (g * a) = F v g := ha
-        show ∀ v g, F v (g * a⁻¹) = F v g
-        intro v g
-        rw [← ha' v (g * a⁻¹), inv_mul_cancel_right] }
+  let S : Subgroup G := {
+    carrier := {h | ∀ v g, F v (g * h) = F v g}
+    mul_mem' := fun {a b} ha hb => by
+      have ha' : ∀ v g, F v (g * a) = F v g := ha
+      have hb' : ∀ v g, F v (g * b) = F v g := hb
+      show ∀ v g, F v (g * (a * b)) = F v g
+      intro v g
+      rw [← mul_assoc, hb', ha']
+    one_mem' := by
+      show ∀ v g, F v (g * 1) = F v g
+      intro v g
+      rw [mul_one]
+    inv_mem' := fun {a} ha => by
+      have ha' : ∀ v g, F v (g * a) = F v g := ha
+      show ∀ v g, F v (g * a⁻¹) = F v g
+      intro v g
+      rw [← ha' v (g * a⁻¹), inv_mul_cancel_right]
+  }
   have hHS : Subgroup.center G ⊔ K ≤ S := by
     refine sup_le ?_ ?_
     · intro z hz
@@ -196,9 +210,11 @@ theorem exists_back : ∀ (G W V : Type) [Group G] [TopologicalSpace G] [IsTopol
   have hfin : ∀ v, ∃ t : Finset G, ∀ g, F v g ≠ 0 → ∃ c ∈ t, c⁻¹ * g ∈ Subgroup.center G ⊔ K := by
     intro v
     obtain ⟨C, hC, hCs⟩ := hρc v l hl
-    obtain ⟨t, ht⟩ := hC.elim_finite_subcover (fun c : G => (fun x => x * c⁻¹) ⁻¹' (K : Set G))
-      (fun c => hKopen.preimage (continuous_mul_const c⁻¹))
-      (fun c _ => Set.mem_iUnion.2 ⟨c, by simp⟩)
+    obtain ⟨t, ht⟩ :=
+      hC.elim_finite_subcover
+        (fun c : G => (fun x => x * c⁻¹) ⁻¹' (K : Set G))
+        (fun c => hKopen.preimage (continuous_mul_const c⁻¹))
+        (fun c _ => Set.mem_iUnion.2 ⟨c, by simp⟩)
     refine ⟨t.image (fun c => c⁻¹), fun g hg => ?_⟩
     have hne : l (ρ g⁻¹ v) ≠ 0 := by
       intro h0
@@ -229,16 +245,19 @@ theorem exists_back : ∀ (G W V : Type) [Group G] [TopologicalSpace G] [IsTopol
   have heqv : ∀ h v g, F (ρ h v) g = π h (F v (h⁻¹ * g)) := by
     intro h v g
     show B (ρ g⁻¹ (ρ h v)) (p w) • π g w = π h (B (ρ (h⁻¹ * g)⁻¹ v) (p w) • π (h⁻¹ * g) w)
-    rw [map_smul, ← Module.End.mul_apply (π h), ← map_mul, mul_inv_cancel_left, mul_inv_rev, inv_inv,
-      map_mul, Module.End.mul_apply]
-  obtain ⟨ι, hι⟩ := exists_intertwiningMap_bound π ρ (Subgroup.center G ⊔ K) F hH hfin hadd hsmul heqv
+    rw [map_smul, ← Module.End.mul_apply (π h), ← map_mul, mul_inv_cancel_left, mul_inv_rev,
+      inv_inv, map_mul, Module.End.mul_apply]
+  obtain ⟨ι, hι⟩ :=
+    exists_intertwiningMap_bound π ρ (Subgroup.center G ⊔ K) F hH hfin hadd hsmul heqv
   refine ⟨ι, fun h0 => ?_⟩
 
-  let Ψ : W →+ ℝ :=
-    { toFun := fun x => (B (p x) (p w)).re
-      map_zero' := by simp
-      map_add' := fun x y => by simp }
-  have key : ∀ g, Ψ (F (p w) g) = (starRingEnd ℂ (B (ρ g (p w)) (p w)) * B (ρ g (p w)) (p w)).re := by
+  let Ψ : W →+ ℝ := {
+    toFun := fun x => (B (p x) (p w)).re
+    map_zero' := by simp
+    map_add' := fun x y => by simp
+  }
+  have key
+      : ∀ g, Ψ (F (p w) g) = (starRingEnd ℂ (B (ρ g (p w)) (p w)) * B (ρ g (p w)) (p w)).re := by
     intro g
     show (B (p (B (ρ g⁻¹ (p w)) (p w) • π g w)) (p w)).re = _
     rw [map_smul, p.isIntertwining, map_smul, LinearMap.smul_apply, smul_eq_mul,

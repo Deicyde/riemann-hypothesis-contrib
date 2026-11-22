@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsClassFam
 open NumberField IsDedekindDomain
 open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker
 open GlobalTheory.IndefiniteRowSideFullHecke GlobalTheory.ColumnNormCompare
-open GlobalTheory.IndefiniteRowSideFullHecke.BadPrimesPeriodBound (recFields recPrimes recWts recSeam recGlob Twist)
+open GlobalTheory.IndefiniteRowSideFullHecke.BadPrimesPeriodBound
+  (recFields recPrimes recWts recSeam recGlob Twist)
 
 namespace GlobalTheory.ColumnNormCompare.SizeRows
 
@@ -19,7 +20,8 @@ theorem one_le_b (s : Scale) : 1 ≤ s.b := by
   have := s.one_lt_alt
   exact Real.one_le_exp (by positivity)
 
-theorem condE_le_b (P : ParameterChoice' D large₂) : (LevelStarExponents.condE D : ℝ) ≤ large₂.sc.b := by
+theorem condE_le_b (P : ParameterChoice' D large₂)
+    : (LevelStarExponents.condE D : ℝ) ≤ large₂.sc.b := by
   have h := P.condE_le
   have hb := one_le_b large₂.sc
   have h1 : large₂.sc.b ^ ((1 : ℝ) / 2) ≤ large₂.sc.b := by
@@ -27,17 +29,21 @@ theorem condE_le_b (P : ParameterChoice' D large₂) : (LevelStarExponents.condE
   have ht : (1 : ℝ) ≤ (D.R.t : ℝ) ^ 150 := one_le_pow₀ large₂.t_win.1
   have hc : (LevelStarExponents.condE D : ℝ) ≤ (LevelStarExponents.condE D : ℝ) ^ 36 := by
     exact_mod_cast Nat.le_self_pow (by norm_num) _
-  have h2 : (LevelStarExponents.condE D : ℝ) ^ 36 ≤ (LevelStarExponents.condE D : ℝ) ^ 36 * (D.R.t : ℝ) ^ 150 :=
+  have h2
+      : (LevelStarExponents.condE D : ℝ) ^ 36
+        ≤ (LevelStarExponents.condE D : ℝ) ^ 36 * (D.R.t : ℝ) ^ 150 :=
     le_mul_of_one_le_right (by positivity) ht
   linarith
 
-theorem log_le_L_of_le_cond (P : ParameterChoice' D large₂) {p : ℕ} (hp : 0 < p) (h : p ≤ LevelStarExponents.condE D) :
-    Real.log p ≤ large₂.sc.L := by
+theorem log_le_L_of_le_cond
+    (P : ParameterChoice' D large₂) {p : ℕ} (hp : 0 < p) (h : p ≤ LevelStarExponents.condE D)
+    : Real.log p ≤ large₂.sc.L := by
   have h1 : (p : ℝ) ≤ Real.exp large₂.sc.L := le_trans (by exact_mod_cast h) (condE_le_b P)
   exact (Real.log_le_iff_le_exp (by exact_mod_cast hp)).2 h1
 
-theorem f_mul_N_le_b (P : ParameterChoice' D large₂) (h4 : 4 * placeRankTwoOne.NN D ^ 3 ≤ large₂.etaSz) :
-    (D.R.f : ℝ) * (D.R.N D.R.m : ℝ) ≤ large₂.sc.b := by
+theorem f_mul_N_le_b
+    (P : ParameterChoice' D large₂) (h4 : 4 * placeRankTwoOne.NN D ^ 3 ≤ large₂.etaSz)
+    : (D.R.f : ℝ) * (D.R.N D.R.m : ℝ) ≤ large₂.sc.b := by
   have hk : 5 ≤ D.R.k := by have := D.R.m_add_three_le_k; have := D.R.two_le_m; omega
   have hk' : (1 : ℝ) ≤ D.R.k := by exact_mod_cast (by omega : 1 ≤ D.R.k)
   have hf : (0 : ℝ) < D.R.f := by
@@ -57,7 +63,9 @@ theorem f_mul_N_le_b (P : ParameterChoice' D large₂) (h4 : 4 * placeRankTwoOne
   have h5 : (D.R.N D.R.m : ℝ) ≤ large₂.etaSz := by linarith
   have h6 : (1 : ℝ) ≤ (D.R.t : ℝ) ^ 3 := one_le_pow₀ ht
   have h7 : (1 : ℝ) ≤ (D.R.k : ℝ) ^ 3 := one_le_pow₀ hk'
-  calc (D.R.f : ℝ) * (D.R.N D.R.m : ℝ) = (D.R.N D.R.m : ℝ) * (1 * D.R.f * 1) := by ring
+  calc
+    (D.R.f : ℝ) * (D.R.N D.R.m : ℝ)
+      = (D.R.N D.R.m : ℝ) * (1 * D.R.f * 1) := by ring
     _ ≤ large₂.etaSz * ((D.R.t : ℝ) ^ 3 * D.R.f * (D.R.k : ℝ) ^ 3) := by gcongr
     _ ≤ _ := h
 
@@ -65,8 +73,9 @@ theorem eTau_tauPl (z : RPl D.R) : (D.eTau (tauPl D z) : D.R.GG) = G.plGG D z :=
   unfold tauPl
   rw [Equiv.apply_symm_apply]
 
-theorem not_top_of (z : RPl D.R) (hz : ¬ PlaceLogThetaBounds.IsTopPl (numDatumOfParameters D large₂) z) :
-    (D.eTau (tauPl D z) : D.R.GG) ∉ D.host.topPlaces := by
+theorem not_top_of
+    (z : RPl D.R) (hz : ¬ PlaceLogThetaBounds.IsTopPl (numDatumOfParameters D large₂) z)
+    : (D.eTau (tauPl D z) : D.R.GG) ∉ D.host.topPlaces := by
   rw [eTau_tauPl]
   intro h
   unfold Host.topPlaces at h

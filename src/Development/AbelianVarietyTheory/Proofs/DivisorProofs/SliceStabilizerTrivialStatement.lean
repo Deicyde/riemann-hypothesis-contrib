@@ -6,13 +6,14 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OmAOneApply
 
 @[expose] public section
 
-open Matrix MeasureTheory ValuativeRel GlobalTheory.SplitFlip GlobalTheory.SmGL GlobalTheory.WeilM GlobalTheory.RankFibre GlobalTheory.SplitWeil GlobalTheory.RankFibreKer
+open Matrix MeasureTheory ValuativeRel GlobalTheory.SplitFlip GlobalTheory.SmGL GlobalTheory.WeilM
+  GlobalTheory.RankFibre GlobalTheory.SplitWeil GlobalTheory.RankFibreKer
 
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.slice_stabilizer_trivial : ∀ (k : Type) [Field k]
-    [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (a d : ℕ) (Z : Matrix (Fin a) (Fin d) k) (g : GL (Fin a) k),
-    Z ∈ slice (k := k) a d → g.val * Z ∈ slice (k := k) a d → g = 1 := by
+theorem _root_.GlobalTheory.T.slice_stabilizer_trivial
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (a d : ℕ) (Z : Matrix (Fin a) (Fin d) k) (g : GL (Fin a) k),
+      Z ∈ slice (k := k) a d → g.val * Z ∈ slice (k := k) a d → g = 1 := by
   rintro k _ _ _ _ a d Z g ⟨J, hJ, hZ⟩ ⟨J', hJ', hgZ⟩
   have hminor : minor Z J = 1 := by rw [minor, hJ, det_one]
   have hminor' : minor (g.val * Z) J' = 1 := by rw [minor, hJ', det_one]
@@ -24,8 +25,8 @@ theorem _root_.GlobalTheory.T.slice_stabilizer_trivial : ∀ (k : Type) [Field k
   have hslice : valuation k (minor Z J') = 1 := by
     refine le_antisymm (hZ J').1 ?_
     calc
-      (1 : ValueGroupWithZero k) = valuation k (g.val.det) * valuation k (minor Z J') :=
-        hproduct.symm
+      (1 : ValueGroupWithZero k)
+        = valuation k (g.val.det) * valuation k (minor Z J') := hproduct.symm
       _ ≤ 1 * valuation k (minor Z J') := mul_le_mul_of_nonneg_right hdet_le zero_le
       _ = valuation k (minor Z J') := one_mul _
   have hdet : valuation k (g.val.det) = 1 := by rwa [hslice, mul_one] at hproduct

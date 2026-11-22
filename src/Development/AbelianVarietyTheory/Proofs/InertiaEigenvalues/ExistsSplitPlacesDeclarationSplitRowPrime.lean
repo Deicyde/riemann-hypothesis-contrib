@@ -11,16 +11,21 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SplitRo
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Module
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations Module
 open Classical
 
 namespace GlobalTheory.SplitDecl
 
-variable {D : D7} {i : D.nd.Loc} {w : HeightOneSpectrum (𝓞 D.host.E)}
+variable
+  {D : D7} {i : D.nd.Loc} {w : HeightOneSpectrum (𝓞 D.host.E)}
   {hw : w ∈ placesOver D.host.E (D.nd.l i)}
 
-theorem embTypeUc_iff (τ : Br.Kw D.nbr i w hw →ₐ[ℚ_[D.nd.l i]] Br.LL D.nbr i w hw) :
-    EmbeddingTypes.EmbTypeUc τ ↔ GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes.EmbIn (N := D.nd) D.nbr i false w hw τ := by
+theorem embTypeUc_iff (τ : Br.Kw D.nbr i w hw →ₐ[ℚ_[D.nd.l i]] Br.LL D.nbr i w hw)
+    : EmbeddingTypes.EmbTypeUc τ
+      ↔ GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes.EmbIn (N := D.nd) D.nbr i false w hw
+        τ := by
   constructor
   · rintro ⟨h1, φ, hφ, h2⟩
     refine ⟨h1, (starRingEnd ℂ).comp φ, ?_, fun x y hy => by simpa using h2 x y hy⟩
@@ -29,30 +34,35 @@ theorem embTypeUc_iff (τ : Br.Kw D.nbr i w hw →ₐ[ℚ_[D.nd.l i]] Br.LL D.nb
     have : ((starRingEnd ℂ).comp φ).comp (D.host.conj : D.host.E →+* D.host.E) = φ := by
       ext1 x
       simp [GlobalTheory.SplitRowProbe.conj_sqrt]
-    rw [this]; exact hφ
+    rw [this]
+    exact hφ
   · rintro ⟨h1, ψ, hψ, h2⟩
     refine ⟨h1, ψ.comp (D.host.conj : D.host.E →+* D.host.E), hψ, fun x y hy => ?_⟩
     rw [h2 x y hy]
     simp [GlobalTheory.SplitRowProbe.conj_sqrt]
 
-theorem embTypeUe_iff (ep : Bool) (τ : Br.Kw D.nbr i w hw →ₐ[ℚ_[D.nd.l i]] Br.LL D.nbr i w hw) :
-    EmbeddingTypes.EmbTypeUe ep τ ↔ GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes.EmbIn (N := D.nd) D.nbr i ep w hw τ := by
+theorem embTypeUe_iff (ep : Bool) (τ : Br.Kw D.nbr i w hw →ₐ[ℚ_[D.nd.l i]] Br.LL D.nbr i w hw)
+    : EmbeddingTypes.EmbTypeUe ep τ
+      ↔ GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes.EmbIn (N := D.nd) D.nbr i ep w hw
+        τ := by
   cases ep
   · simp only [EmbeddingTypes.EmbTypeUe, Bool.false_eq_true, if_false]
     exact embTypeUc_iff τ
   · simp only [EmbeddingTypes.EmbTypeUe, if_true]
     rfl
 
-theorem plTypeUe_iff (ep : Bool) :
-    EmbeddingTypes.PlTypeUe i w hw ep ↔ GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes.PlIn (N := D.nd) D.nbr i ep w hw := by
+theorem plTypeUe_iff (ep : Bool)
+    : EmbeddingTypes.PlTypeUe i w hw ep
+      ↔ GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes.PlIn (N := D.nd) D.nbr i ep w
+        hw := by
   constructor
   · intro h
     exact ⟨GlobalTheory.SplitRowProbe.nonempty_emb D i w hw, fun τ => (embTypeUe_iff ep τ).1 (h τ)⟩
   · intro h τ
     exact (embTypeUe_iff ep τ).2 (h.2 τ)
 
-theorem placesOver_finite (E : Type) [Field E] [NumberField E] (p : ℕ) (hp : p ≠ 0) :
-    (placesOver E p).Finite := by
+theorem placesOver_finite (E : Type) [Field E] [NumberField E] (p : ℕ) (hp : p ≠ 0)
+    : (placesOver E p).Finite := by
   have h0 : Ideal.span {((p : ℕ) : 𝓞 E)} ≠ 0 := by
     rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]
     exact_mod_cast hp
@@ -61,11 +71,14 @@ theorem placesOver_finite (E : Type) [Field E] [NumberField E] (p : ℕ) (hp : p
   rw [Ideal.dvd_iff_le, Ideal.span_singleton_le_iff_mem]
   exact hv
 
-def decl (D : D7) (i : D.nd.Loc) (hl : D.nd.l i ≠ 0) (ep : Bool) : TruncatedSeriesCountingIdentities.Decl D i where
-  row := (placesOver_finite D.host.E (D.nd.l i) hl).toFinset.filter
-    (fun v => v ∉ GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes.columns (N := D.nd) D.nbr i ep)
-  col := (placesOver_finite D.host.E (D.nd.l i) hl).toFinset.filter
-    (fun v => v ∈ GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes.columns (N := D.nd) D.nbr i ep)
+def decl (D : D7) (i : D.nd.Loc) (hl : D.nd.l i ≠ 0) (ep : Bool)
+    : TruncatedSeriesCountingIdentities.Decl D i where
+  row :=
+    (placesOver_finite D.host.E (D.nd.l i) hl).toFinset.filter (fun v =>
+      v ∉ GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes.columns (N := D.nd) D.nbr i ep)
+  col :=
+    (placesOver_finite D.host.E (D.nd.l i) hl).toFinset.filter (fun v =>
+      v ∈ GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes.columns (N := D.nd) D.nbr i ep)
   disj := by
     rw [Finset.disjoint_left]
     intro v h1 h2
@@ -75,18 +88,25 @@ def decl (D : D7) (i : D.nd.Loc) (hl : D.nd.l i ≠ 0) (ep : Bool) : TruncatedSe
     simp only [Finset.mem_filter, Set.Finite.mem_toFinset]
     tauto
 
-theorem mem_col (D : D7) (i : D.nd.Loc) (hl : D.nd.l i ≠ 0) (ep : Bool) (v) :
-    v ∈ (decl D i hl ep).col ↔ v ∈ placesOver D.host.E (D.nd.l i) ∧
-      v ∈ GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes.columns (N := D.nd) D.nbr i ep := by
+theorem mem_col (D : D7) (i : D.nd.Loc) (hl : D.nd.l i ≠ 0) (ep : Bool) (v)
+    : v ∈ (decl D i hl ep).col
+      ↔ v ∈ placesOver D.host.E (D.nd.l i)
+        ∧ v ∈ GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes.columns (N := D.nd) D.nbr i
+          ep := by
   simp [decl]
 
-theorem mem_row (D : D7) (i : D.nd.Loc) (hl : D.nd.l i ≠ 0) (ep : Bool) (v) :
-    v ∈ (decl D i hl ep).row ↔ v ∈ placesOver D.host.E (D.nd.l i) ∧
-      v ∉ GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes.columns (N := D.nd) D.nbr i ep := by
+theorem mem_row (D : D7) (i : D.nd.Loc) (hl : D.nd.l i ≠ 0) (ep : Bool) (v)
+    : v ∈ (decl D i hl ep).row
+      ↔ v ∈ placesOver D.host.E (D.nd.l i)
+        ∧ v ∉ GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes.columns (N := D.nd) D.nbr i
+          ep := by
   simp [decl]
 
-theorem main : ∀ (D : D7) (i : D.nd.Loc) (ep : Bool), GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes.SplitRowPrime D.host (D.nd.l i) →
-    (∃ dc : TruncatedSeriesCountingIdentities.Decl D i, EmbeddingTypes.hypDecl i dc ep) ∧ EmbeddingTypes.hypL i := by
+theorem main
+    : ∀ (D : D7) (i : D.nd.Loc) (ep : Bool),
+      GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes.SplitRowPrime D.host (D.nd.l i)
+        → (∃ dc : TruncatedSeriesCountingIdentities.Decl D i, EmbeddingTypes.hypDecl i dc ep)
+          ∧ EmbeddingTypes.hypL i := by
   intro D i ep hs
   obtain ⟨hPl, hTy⟩ := GlobalTheory.SplitRowAll.splitRow_at D
   have hP := hPl _ hs
@@ -106,11 +126,17 @@ theorem main : ∀ (D : D7) (i : D.nd.Loc) (ep : Bool), GlobalTheory.IndefiniteR
     · rintro ⟨hv, hnc⟩
       obtain ⟨-, ⟨v', hv', hc⟩, -⟩ := hP v hv
       have hx := (hT.2.2.2 ep).1 v hv v' hc
-      have hv'c : v' ∈ GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes.columns (N := D.nd) D.nbr i ep := by
+      have hv'c
+          : v' ∈ GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes.columns (N := D.nd) D.nbr i
+            ep := by
         rcases hx with h | h
         · exact absurd h.1 hnc
         · exact h.1
-      exact ⟨v', (mem_col D i hl ep v').2 ⟨hv', hv'c⟩, GlobalTheory.Proof.ConjugatePlaces.isConjPl_symm hc⟩
+      exact ⟨
+        v',
+        (mem_col D i hl ep v').2 ⟨hv', hv'c⟩,
+        GlobalTheory.Proof.ConjugatePlaces.isConjPl_symm hc
+      ⟩
     · rintro ⟨u, hu, hc⟩
       obtain ⟨hu, huc⟩ := (mem_col D i hl ep u).1 hu
       obtain ⟨-, ⟨u', hu', hc'⟩, -⟩ := hP u hu

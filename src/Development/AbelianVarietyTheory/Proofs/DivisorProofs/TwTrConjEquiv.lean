@@ -23,19 +23,24 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
 open scoped Classical TensorProduct
 
 namespace GlobalTheory.BCT
 
-theorem twTr_conj_equiv : ∀ (G : Type) [Group G] (V V' : Type) [AddCommGroup V] [Module ℂ V] [AddCommGroup V'] [Module ℂ V'] (ρ : Representation ℂ G V) (ρ' : Representation ℂ G V') (e : ρ.Equiv ρ') (K K' : Subgroup G) (f : G → ℂ) (A : V →ₗ[ℂ] V), twTr ρ' K K' f (e.toLinearEquiv.toLinearMap ∘ₗ A ∘ₗ e.toLinearEquiv.symm.toLinearMap) = twTr ρ K K' f A := by
+theorem twTr_conj_equiv
+    : ∀ (G : Type) [Group G] (V V' : Type) [AddCommGroup V] [Module ℂ V] [AddCommGroup V']
+        [Module ℂ V'] (ρ : Representation ℂ G V) (ρ' : Representation ℂ G V') (e : ρ.Equiv ρ')
+        (K K' : Subgroup G) (f : G → ℂ) (A : V →ₗ[ℂ] V),
+      twTr ρ' K K' f (e.toLinearEquiv.toLinearMap ∘ₗ A ∘ₗ e.toLinearEquiv.symm.toLinearMap)
+        = twTr ρ K K' f A := by
   intro G _ V V' _ _ _ _ ρ ρ' e K K' f A
   set φ := e.toLinearEquiv with hφ
   have hint : ∀ g v, φ (ρ g v) = ρ' g (φ v) := fun g v => by
     have h := LinearMap.congr_fun (e.isIntertwining' g) v
     simpa [hφ] using h
-  have hint' : ∀ g v', ρ' g v' = φ (ρ g (φ.symm v')) := fun g v' => by
-    rw [hint, φ.apply_symm_apply]
+  have hint' : ∀ g v', ρ' g v' = φ (ρ g (φ.symm v')) := fun g v' => by rw [hint, φ.apply_symm_apply]
   have hmem : ∀ v', v' ∈ fixed ρ' K' ↔ φ.symm v' ∈ fixed ρ K' := by
     intro v'
     show (∀ h : K', ρ' h v' = ((1 : K' →* ℂˣ) h : ℂ) • v') ↔
@@ -65,7 +70,8 @@ theorem twTr_conj_equiv : ∀ (G : Type) [Group G] (V V' : Type) [AddCommGroup V
     ext v'
     rw [Submodule.mem_map_equiv, hmem]
   set L := levOp ρ K K' f A with hL
-  have hc : (∀ v ∈ fixed ρ' K', φ.conj L v ∈ fixed ρ' K') ↔ (∀ v ∈ fixed ρ K', L v ∈ fixed ρ K') := by
+  have hc
+      : (∀ v ∈ fixed ρ' K', φ.conj L v ∈ fixed ρ' K') ↔ (∀ v ∈ fixed ρ K', L v ∈ fixed ρ K') := by
     constructor
     · intro H v hv
       have h1 : φ v ∈ fixed ρ' K' := (hmem _).2 (by simpa using hv)

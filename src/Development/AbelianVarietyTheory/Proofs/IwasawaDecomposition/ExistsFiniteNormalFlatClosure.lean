@@ -11,7 +11,14 @@ open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.
 
 namespace GlobalTheory.GraphClosure
 
-theorem exists_normalisation_of_locallyClosed : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] (P U : Scheme.{0}) (s : P ⟶ Sp O) (Ω : P.Opens) (j : U ⟶ Ω.toScheme), IsProjOver s → IsClosedImmersion j → ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme U → Flat (j ≫ Ω.ι ≫ s) → ∃ (Z' : Scheme.{0}) (ν : Z' ⟶ P) (e : U ⟶ Z'), IsFinite ν ∧ ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme Z' ∧ IsProjOver (ν ≫ s) ∧ Flat (ν ≫ s) ∧ IsPullback e j ν Ω.ι ∧ Dense (Set.range e) := by
+theorem exists_normalisation_of_locallyClosed
+    : ∀ (O : Type) [CommRing O] [IsDedekindDomain O] [CharZero O] (P U : Scheme.{0}) (s : P ⟶ Sp O)
+        (Ω : P.Opens) (j : U ⟶ Ω.toScheme),
+      IsProjOver s → IsClosedImmersion j
+        → ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme U → Flat (j ≫ Ω.ι ≫ s)
+        → ∃ (Z' : Scheme.{0}) (ν : Z' ⟶ P) (e : U ⟶ Z'),
+          IsFinite ν ∧ ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme Z'
+            ∧ IsProjOver (ν ≫ s) ∧ Flat (ν ≫ s) ∧ IsPullback e j ν Ω.ι ∧ Dense (Set.range e) := by
   intro O _ _ _ P U s Ω j hs _ hn hfl
   have : IsProper s := ((isProjOver_iff_isProper_and_exists_isAmpleLB s).mp hs).1
   have := GlobalTheory.IsNormalScheme.of_pred hn
@@ -23,13 +30,21 @@ theorem exists_normalisation_of_locallyClosed : ∀ (O : Type) [CommRing O] [IsD
   have : LocallyOfFiniteType h := eh ▸ inferInstance
   have : Flat (h ≫ s) := by rw [eh, Category.assoc]; exact hfl
   have : IsFinite h.fromNormalization :=
-    isFinite_fromNormalization_of_locallyOfFiniteType (o := CommRingCat.of O) h s
-      fun x hx => charZero_residueField_of_flat (h ≫ s) hx
+    isFinite_fromNormalization_of_locallyOfFiniteType (o := CommRingCat.of O) h s fun x hx =>
+      charZero_residueField_of_flat (h ≫ s) hx
   have : Flat (h.toNormalization ≫ h.fromNormalization ≫ s) := by
     rw [Scheme.Hom.toNormalization_fromNormalization_assoc]
     infer_instance
-  exact ⟨h.normalization, h.fromNormalization, h.toNormalization, inferInstance,
-    IsNormalScheme.pred _, isProjOver_comp_of_isFinite _ hs, flat_normalization h _,
-    isPullback_toNormalization_of_mono j Ω.ι h eh, h.toNormalization.denseRange⟩
+  exact ⟨
+    h.normalization,
+    h.fromNormalization,
+    h.toNormalization,
+    inferInstance,
+    IsNormalScheme.pred _,
+    isProjOver_comp_of_isFinite _ hs,
+    flat_normalization h _,
+    isPullback_toNormalization_of_mono j Ω.ι h eh,
+    h.toNormalization.denseRange
+  ⟩
 
 end GlobalTheory.GraphClosure

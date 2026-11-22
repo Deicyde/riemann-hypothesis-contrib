@@ -11,12 +11,19 @@ namespace Formalism.HermitianLattices.Ext.L3.HU
 variable {K : Type*} [Field K] [StarRing K] {S : Subring K} {ϖ : K}
 variable {n : Type*} [Fintype n] [DecidableEq n]
 
-theorem Cayley.exists_det_one_add (hS : IsLocUnif S ϖ) {M : Matrix n n K} (hM : Ent S M) :
-    ∃ s ∈ S, (1 + ϖ • M).det = 1 + ϖ * s := by
+theorem Cayley.exists_det_one_add (hS : IsLocUnif S ϖ) {M : Matrix n n K} (hM : Ent S M)
+    : ∃ s ∈ S, (1 + ϖ • M).det = 1 + ϖ * s := by
   obtain ⟨M₀, rfl⟩ := hM.exists_map
   let ϖ₀ : S := ⟨ϖ, hS.mem⟩
-  refine ⟨((Matrix.trace M₀ + (Matrix.det (1 + (Polynomial.X : Polynomial S) •
-      M₀.map Polynomial.C)).divX.divX.eval ϖ₀ * ϖ₀ : S) : K), SetLike.coe_mem _, ?_⟩
+  refine ⟨
+    ((Matrix.trace M₀
+          + (Matrix.det (1 + (Polynomial.X : Polynomial S) • M₀.map Polynomial.C)).divX.divX.eval ϖ₀
+            * ϖ₀
+        : S)
+      : K),
+    SetLike.coe_mem _,
+    ?_
+  ⟩
   have hmap : (1 : Matrix n n K) + ϖ • M₀.map S.subtype = S.subtype.mapMatrix (1 + ϖ₀ • M₀) := by
     ext i j
     by_cases h : i = j <;> simp [h, ϖ₀]
@@ -25,20 +32,22 @@ theorem Cayley.exists_det_one_add (hS : IsLocUnif S ϖ) {M : Matrix n n K} (hM :
   simp only [Subring.coe_add, Subring.coe_mul, ϖ₀]
   ring
 
-theorem Cayley.exists_inv_one_add (hS : IsLocUnif S ϖ) {M : Matrix n n K} (hM : Ent S M) :
-    ∃ Q : Matrix n n K, Ent S Q ∧ (1 + ϖ • M) * Q = 1 := by
+theorem Cayley.exists_inv_one_add (hS : IsLocUnif S ϖ) {M : Matrix n n K} (hM : Ent S M)
+    : ∃ Q : Matrix n n K, Ent S Q ∧ (1 + ϖ • M) * Q = 1 := by
   obtain ⟨s, hs, hdet⟩ := Cayley.exists_det_one_add hS hM
   obtain ⟨hne, hinv⟩ := hS.rad s hs
   have hA : Ent S (1 + ϖ • M) := Ent.add Ent.one (Ent.smul hS.mem hM)
   refine ⟨(1 + ϖ * s)⁻¹ • (1 + ϖ • M).adjugate, Ent.smul hinv hA.adjugate, ?_⟩
   rw [Matrix.mul_smul, Matrix.mul_adjugate, hdet, smul_smul, inv_mul_cancel₀ hne, one_smul]
 
-theorem exists_cayley (hS : IsLocUnif S ϖ) {H E : Matrix n n K} (hH : Hᴴ = H) (hHS : Ent S H)
-    (hES : Ent S E) {e l N : ℕ} (hHE : H * E = ϖ ^ e • (1 : Matrix n n K)) (hN : 2 * l + e + 1 ≤ N)
+theorem exists_cayley
+    (hS : IsLocUnif S ϖ)
+    {H E : Matrix n n K} (hH : Hᴴ = H) (hHS : Ent S H) (hES : Ent S E)
+    {e l N : ℕ} (hHE : H * E = ϖ ^ e • (1 : Matrix n n K)) (hN : 2 * l + e + 1 ≤ N)
     {X Z W' : Matrix n n K} (hX : Ent S X) (hZ : Ent S Z) (hXZ : Xᴴ * H * X = H + ϖ ^ N • Z)
-    {c : K} (hc : c ∈ S) (hcc : c + star c = 1) (hW' : Ent S W')
-    (hWW : (c • (1 : Matrix n n K) + star c • X) * W' = ϖ ^ l • (1 : Matrix n n K)) :
-    ∃ G D : Matrix n n K, Ent S D ∧ Gᴴ * H * G = H ∧ G = X + ϖ ^ (N - 2 * l - e) • D := by
+    {c : K} (hc : c ∈ S) (hcc : c + star c = 1)
+    (hW' : Ent S W') (hWW : (c • (1 : Matrix n n K) + star c • X) * W' = ϖ ^ l • (1 : Matrix n n K))
+    : ∃ G D : Matrix n n K, Ent S D ∧ Gᴴ * H * G = H ∧ G = X + ϖ ^ (N - 2 * l - e) • D := by
   classical
   set j := N - 2 * l - e with hj
   have hj1 : 1 ≤ j := by omega
@@ -57,8 +66,9 @@ theorem exists_cayley (hS : IsLocUnif S ϖ) {H E : Matrix n n K} (hH : Hᴴ = H)
       rw [Matrix.mul_smul, hWW, smul_smul, inv_mul_cancel₀ hne, one_smul]
     have h2 : ((ϖ ^ l)⁻¹ • W') * A = 1 := mul_eq_one_comm.mp h1
     rw [Matrix.smul_mul] at h2
-    calc W' * A = ϖ ^ l • ((ϖ ^ l)⁻¹ • (W' * A)) := by
-          rw [smul_smul, mul_inv_cancel₀ hne, one_smul]
+    calc
+      W' * A
+        = ϖ ^ l • ((ϖ ^ l)⁻¹ • (W' * A)) := by rw [smul_smul, mul_inv_cancel₀ hne, one_smul]
       _ = ϖ ^ l • (1 : Matrix n n K) := by rw [h2]
   have hAW : ∀ M : Matrix n n K, Aᴴ * (W'ᴴ * M) = ϖ ^ l • M := by
     intro M
@@ -69,8 +79,8 @@ theorem exists_cayley (hS : IsLocUnif S ϖ) {H E : Matrix n n K} (hH : Hᴴ = H)
     rw [← Matrix.mul_assoc, hHE, Matrix.smul_mul, Matrix.one_mul]
   have hZh : Zᴴ = Z := by
     have h1 : (Xᴴ * H * X)ᴴ = Xᴴ * H * X := by
-      rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, hH,
-        Matrix.mul_assoc]
+      rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose,
+        hH, Matrix.mul_assoc]
     rw [hXZ, Matrix.conjTranspose_add, Matrix.conjTranspose_smul, hH, hstar] at h1
     exact smul_right_injective _ (pow_ne_zero N hϖ0) (add_left_cancel h1)
   obtain ⟨D₁, hD₁⟩ : ∃ D₁ : Matrix n n K, D₁ = E * (W'ᴴ * (Z * W')) := ⟨_, rfl⟩
@@ -90,8 +100,8 @@ theorem exists_cayley (hS : IsLocUnif S ϖ) {H E : Matrix n n K} (hH : Hᴴ = H)
     ring
   have key2 : Δᴴ * (H * A) = (star c * ϖ ^ N) • Z := by
     have h : Δᴴ * (H * A) = (Aᴴ * (H * Δ))ᴴ := by
-      rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, hH,
-        Matrix.mul_assoc]
+      rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose,
+        hH, Matrix.mul_assoc]
     rw [h, key1, Matrix.conjTranspose_smul, hZh, star_mul', hstar]
   have hAh : Aᴴ = star c • (1 : Matrix n n K) + c • Xᴴ := by
     rw [hA, Matrix.conjTranspose_add, Matrix.conjTranspose_smul, Matrix.conjTranspose_smul,
@@ -99,8 +109,8 @@ theorem exists_cayley (hS : IsLocUnif S ϖ) {H E : Matrix n n K} (hH : Hᴴ = H)
   have k1 : star c • (H * Δ) + c • (Xᴴ * (H * Δ)) = (c * ϖ ^ N) • Z := by
     rw [← key1, hAh, Matrix.add_mul, Matrix.smul_mul, Matrix.smul_mul, Matrix.one_mul]
   have k2 : c • (Δᴴ * H) + star c • (Δᴴ * (H * X)) = (star c * ϖ ^ N) • Z := by
-    rw [← key2, hA, Matrix.mul_add, Matrix.mul_add, Matrix.mul_smul, Matrix.mul_smul, Matrix.mul_smul,
-      Matrix.mul_smul, Matrix.mul_one]
+    rw [← key2, hA, Matrix.mul_add, Matrix.mul_add, Matrix.mul_smul, Matrix.mul_smul,
+      Matrix.mul_smul, Matrix.mul_smul, Matrix.mul_one]
   have k0 : Xᴴ * (H * X) = H + ϖ ^ N • Z := by rw [← Matrix.mul_assoc, hXZ]
   have hTR : (X - c • Δ)ᴴ * H * (X - c • Δ) = (1 + star c • Δ)ᴴ * H * (1 + star c • Δ) := by
     simp only [Matrix.conjTranspose_sub, Matrix.conjTranspose_add, Matrix.conjTranspose_smul,
@@ -116,8 +126,7 @@ theorem exists_cayley (hS : IsLocUnif S ϖ) {H E : Matrix n n K} (hH : Hᴴ = H)
     rw [← pow_succ']
     congr 1
     omega
-  have hR : (1 : Matrix n n K) + ϖ • ((star c * c * ϖ ^ (j - 1)) • (D₁ * A)) =
-      1 + star c • Δ := by
+  have hR : (1 : Matrix n n K) + ϖ • ((star c * c * ϖ ^ (j - 1)) • (D₁ * A)) = 1 + star c • Δ := by
     rw [hΔ, smul_smul, smul_smul]
     congr 2
     rw [← hjj]
@@ -127,22 +136,26 @@ theorem exists_cayley (hS : IsLocUnif S ϖ) {H E : Matrix n n K} (hH : Hᴴ = H)
     have h := hRQ
     rw [Matrix.add_mul, Matrix.one_mul, Matrix.smul_mul] at h
     exact h
-  refine ⟨(X - c • Δ) * Q, -(star c * c) • (X * (D₁ * (A * Q))) - (c * c) • (D₁ * (A * Q)), ?_, ?_, ?_⟩
-  · exact Ent.sub (Ent.smul (neg_mem (mul_mem hcs hc)) (Ent.mul hX (Ent.mul hD₁ent (Ent.mul hAent hQent))))
+  refine
+    ⟨(X - c • Δ) * Q, -(star c * c) • (X * (D₁ * (A * Q))) - (c * c) • (D₁ * (A * Q)), ?_, ?_, ?_⟩
+  · exact Ent.sub
+      (Ent.smul (neg_mem (mul_mem hcs hc)) (Ent.mul hX (Ent.mul hD₁ent (Ent.mul hAent hQent))))
       (Ent.smul (mul_mem hc hc) (Ent.mul hD₁ent (Ent.mul hAent hQent)))
   · rw [Matrix.conjTranspose_mul]
-    calc Qᴴ * (X - c • Δ)ᴴ * H * ((X - c • Δ) * Q)
+    calc
+      Qᴴ * (X - c • Δ)ᴴ * H * ((X - c • Δ) * Q)
         = Qᴴ * ((X - c • Δ)ᴴ * H * (X - c • Δ)) * Q := by simp only [Matrix.mul_assoc]
       _ = Qᴴ * ((1 + star c • Δ)ᴴ * H * (1 + star c • Δ)) * Q := by rw [hTR]
       _ = ((1 + star c • Δ) * Q)ᴴ * H * ((1 + star c • Δ) * Q) := by
-          simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
+        simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
       _ = H := by rw [hRQ]; simp
-  · calc (X - c • Δ) * Q = X * (Q + star c • (Δ * Q)) - star c • (X * (Δ * Q)) - c • (Δ * Q) := by
-          simp only [Matrix.sub_mul, Matrix.mul_add, Matrix.smul_mul, Matrix.mul_smul]
-          abel
+  · calc
+      (X - c • Δ) * Q = X * (Q + star c • (Δ * Q)) - star c • (X * (Δ * Q)) - c • (Δ * Q) := by
+        simp only [Matrix.sub_mul, Matrix.mul_add, Matrix.smul_mul, Matrix.mul_smul]
+        abel
       _ = X + ϖ ^ j • (-(star c * c) • (X * (D₁ * (A * Q))) - (c * c) • (D₁ * (A * Q))) := by
-          rw [hRQ', Matrix.mul_one, hΔ]
-          simp only [Matrix.smul_mul, Matrix.mul_smul, Matrix.mul_assoc]
-          module
+        rw [hRQ', Matrix.mul_one, hΔ]
+        simp only [Matrix.smul_mul, Matrix.mul_smul, Matrix.mul_assoc]
+        module
 
 end Formalism.HermitianLattices.Ext.L3.HU

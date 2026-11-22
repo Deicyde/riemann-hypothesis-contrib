@@ -14,13 +14,16 @@ namespace PI.UnitaryGroupMassFormula.CntFormula.DeltaC
 
 open NumberField IsDedekindDomain ValuativeRel Formalism.MainNotions.S.Loc
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {sig : E →ₐ[F] E} {p : HeightOneSpectrum (𝓞 F)}
 
-theorem mem_of_isIntegral_fp (L : LocAt F E sig p) {s : L.Fp} (hs : IsIntegral 𝒪[L.Fp] s) : s ∈ 𝒪[L.Fp] := by
+theorem mem_of_isIntegral_fp (L : LocAt F E sig p) {s : L.Fp} (hs : IsIntegral 𝒪[L.Fp] s)
+    : s ∈ 𝒪[L.Fp] := by
   exact (Valuation.integer.integers (ValuativeRel.valuation L.Fp)).mem_of_integral hs
 
-theorem trace_mem (L : LocAt F E sig p) {y : L.Ep} (hy : y ∈ L.O) : Algebra.trace L.Fp L.Ep y ∈ 𝒪[L.Fp] := by
+theorem trace_mem (L : LocAt F E sig p) {y : L.Ep} (hy : y ∈ L.O)
+    : Algebra.trace L.Fp L.Ep y ∈ 𝒪[L.Fp] := by
   haveI := L.free
   haveI := PI.ProdFormulaE.Base.finite L
   let b : Module.Basis (Fin 2) L.Fp L.Ep := Module.finBasisOfFinrankEq L.Fp L.Ep L.rank

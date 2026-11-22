@@ -9,25 +9,27 @@ namespace ReciprocityTheory.AnForm
 open scoped ContDiff
 open Set Metric
 
-theorem exists_chart_partition {X : Type*} [TopologicalSpace X] [T2Space X] [CompactSpace X]
-    {D m : ℕ} (e : Fin m → OpenPartialHomeomorph X (Fin D → ℂ))
-    (hcov : ∀ x, ∃ i, x ∈ (e i).source)
-    (htr : ∀ i j, ContDiffOn ℝ ∞ (e j ∘ (e i).symm)
-      ((e i).target ∩ (e i).symm ⁻¹' (e j).source)) :
-    ∃ χ : Fin m → X → ℝ, (∀ i x, 0 ≤ χ i x) ∧ (∀ x, ∑ i, χ i x = 1) ∧
-      (∀ i, tsupport (χ i) ⊆ (e i).source) ∧
-      (∀ i j, ContDiffOn ℝ ∞ (χ i ∘ (e j).symm) (e j).target) := by
+theorem exists_chart_partition
+    {X : Type*} [TopologicalSpace X] [T2Space X] [CompactSpace X]
+    {D m : ℕ} (e : Fin m → OpenPartialHomeomorph X (Fin D → ℂ)) (hcov : ∀ x, ∃ i, x ∈ (e i).source)
+    (htr : ∀ i j, ContDiffOn ℝ ∞ (e j ∘ (e i).symm) ((e i).target ∩ (e i).symm ⁻¹' (e j).source))
+    : ∃ χ : Fin m → X → ℝ,
+      (∀ i x, 0 ≤ χ i x) ∧ (∀ x, ∑ i, χ i x = 1) ∧ (∀ i, tsupport (χ i) ⊆ (e i).source)
+        ∧ (∀ i j, ContDiffOn ℝ ∞ (χ i ∘ (e j).symm) (e j).target) := by
   classical
-  have hext : ∀ (k : Fin m) (g : (Fin D → ℂ) → ℝ), ContDiff ℝ ∞ g → HasCompactSupport g →
-      tsupport g ⊆ (e k).target →
-      tsupport (fun p => if p ∈ (e k).source then g (e k p) else 0) ⊆ (e k).source ∧
-      ∀ j, ContDiffOn ℝ ∞ ((fun p => if p ∈ (e k).source then g (e k p) else 0) ∘ (e j).symm)
-        (e j).target := by
+  have hext
+      : ∀ (k : Fin m) (g : (Fin D → ℂ) → ℝ),
+        ContDiff ℝ ∞ g → HasCompactSupport g → tsupport g ⊆ (e k).target
+          → tsupport (fun p => if p ∈ (e k).source then g (e k p) else 0) ⊆ (e k).source
+            ∧ ∀ j,
+              ContDiffOn ℝ ∞ ((fun p => if p ∈ (e k).source then g (e k p) else 0) ∘ (e j).symm)
+                (e j).target := by
     intro k g hg hgc hgt
     set G : X → ℝ := fun p => if p ∈ (e k).source then g (e k p) else 0 with hG
     set T : Set X := (e k).symm '' tsupport g with hT
     have hTc : IsCompact T :=
-      (show IsCompact (tsupport g) from hgc).image_of_continuousOn ((e k).continuousOn_symm.mono hgt)
+      (show IsCompact (tsupport g) from hgc).image_of_continuousOn
+        ((e k).continuousOn_symm.mono hgt)
     have hTs : T ⊆ (e k).source := by
       rintro _ ⟨y, hy, rfl⟩
       exact (e k).map_target (hgt hy)
@@ -44,24 +46,33 @@ theorem exists_chart_partition {X : Type*} [TopologicalSpace X] [T2Space X] [Com
     apply contDiffOn_of_locally_contDiffOn
     intro y hy
     by_cases hp : (e j).symm y ∈ (e k).source
-    · refine ⟨(e j).target ∩ (e j).symm ⁻¹' (e k).source,
-        (e j).isOpen_inter_preimage_symm (e k).open_source, ⟨hy, hp⟩, ?_⟩
-      have h1 : ContDiffOn ℝ ∞ (g ∘ (e k ∘ (e j).symm))
-          ((e j).target ∩ (e j).symm ⁻¹' (e k).source) := hg.comp_contDiffOn (htr j k)
+    · refine ⟨
+        (e j).target ∩ (e j).symm ⁻¹' (e k).source,
+        (e j).isOpen_inter_preimage_symm (e k).open_source,
+        ⟨hy, hp⟩,
+        ?_
+      ⟩
+      have h1
+          : ContDiffOn ℝ ∞ (g ∘ (e k ∘ (e j).symm)) ((e j).target ∩ (e j).symm ⁻¹' (e k).source) :=
+        hg.comp_contDiffOn (htr j k)
       refine (h1.mono Set.inter_subset_right).congr ?_
       intro y' hy'
       have hc : (e j).symm y' ∈ (e k).source := hy'.2.2
       simp only [Function.comp, hG, if_pos hc]
-    · refine ⟨(e j).target ∩ (e j).symm ⁻¹' Tᶜ,
+    · refine ⟨
+        (e j).target ∩ (e j).symm ⁻¹' Tᶜ,
         (e j).isOpen_inter_preimage_symm hTc.isClosed.isOpen_compl,
-        ⟨hy, fun hT' => hp (hTs hT')⟩, ?_⟩
+        ⟨hy, fun hT' => hp (hTs hT')⟩,
+        ?_
+      ⟩
       refine (contDiffOn_const (c := (0 : ℝ))).congr ?_
       intro y' hy'
       have h2 : ¬ G ((e j).symm y') ≠ 0 := fun h => hy'.2.2 (hsupp h)
       exact not_not.mp h2
-  have hb : ∀ x : X, ∃ k : Fin m, ∃ g : (Fin D → ℂ) → ℝ, x ∈ (e k).source ∧
-      tsupport g ⊆ (e k).target ∧ HasCompactSupport g ∧ ContDiff ℝ ∞ g ∧
-      Set.range g ⊆ Set.Icc 0 1 ∧ g (e k x) = 1 := by
+  have hb
+      : ∀ x : X, ∃ k : Fin m, ∃ g : (Fin D → ℂ) → ℝ,
+        x ∈ (e k).source ∧ tsupport g ⊆ (e k).target ∧ HasCompactSupport g ∧ ContDiff ℝ ∞ g
+          ∧ Set.range g ⊆ Set.Icc 0 1 ∧ g (e k x) = 1 := by
     intro x
     obtain ⟨k, hk⟩ := hcov x
     obtain ⟨g, h1, h2, h3, h4, h5⟩ :=
@@ -86,8 +97,8 @@ theorem exists_chart_partition {X : Type*} [TopologicalSpace X] [T2Space X] [Com
     show (1 : ℝ) / 2 < g x (e (κ x) x)
     rw [hg1 x]
     norm_num
-  obtain ⟨t, ht⟩ := isCompact_univ.elim_finite_subcover O hO
-    (fun p _ => Set.mem_iUnion.mpr ⟨p, hxO p⟩)
+  obtain ⟨t, ht⟩ :=
+    isCompact_univ.elim_finite_subcover O hO (fun p _ => Set.mem_iUnion.mpr ⟨p, hxO p⟩)
   have hOψ : ∀ x p, p ∈ O x → 1 / 2 < ψ x p := by
     intro x p hp
     simp only [ψ, if_pos hp.1]
@@ -112,7 +123,8 @@ theorem exists_chart_partition {X : Type*} [TopologicalSpace X] [T2Space X] [Com
     refine (closure_minimal ?_ hC).trans ?_
     · intro p hp
       rw [Function.mem_support] at hp
-      have hnum : ∑ x ∈ t.filter (fun x => κ x = k), ψ x p ≠ 0 := fun h => hp (by simp only [h, zero_div])
+      have hnum : ∑ x ∈ t.filter (fun x => κ x = k), ψ x p ≠ 0 := fun h =>
+        hp (by simp only [h, zero_div])
       obtain ⟨x, hx, hxp⟩ := Finset.exists_ne_zero_of_sum_ne_zero hnum
       exact Set.mem_biUnion hx (subset_tsupport _ hxp)
     · intro p hp
@@ -123,8 +135,10 @@ theorem exists_chart_partition {X : Type*} [TopologicalSpace X] [T2Space X] [Com
       rw [hk] at hsrc
       exact hsrc
   · intro k j
-    have hnum : ContDiffOn ℝ ∞ (fun y => ∑ x ∈ t.filter (fun x => κ x = k), ψ x ((e j).symm y))
-        (e j).target := ContDiffOn.sum fun x _ => (hψext x).2 j
+    have hnum : ContDiffOn ℝ ∞
+        (fun y => ∑ x ∈ t.filter (fun x => κ x = k), ψ x ((e j).symm y))
+        (e j).target :=
+      ContDiffOn.sum fun x _ => (hψext x).2 j
     have hden : ContDiffOn ℝ ∞ (fun y => ∑ x ∈ t, ψ x ((e j).symm y)) (e j).target :=
       ContDiffOn.sum fun x _ => (hψext x).2 j
     exact hnum.div hden fun y _ => (hS _).ne'

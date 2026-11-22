@@ -12,8 +12,12 @@ noncomputable section
 namespace MainStatements.WeightKernel.PShiftT
 
 def rho (S : ℂ → ℝ) (z : ℂ) : ℂ :=
-  if 1 < ‖z‖ then ((Real.sqrt (S z) : ℝ) : ℂ)
-  else if ‖z‖ < 1 then (((Real.sqrt (S (star z)⁻¹) : ℝ) : ℂ))⁻¹ else 1
+  if 1 < ‖z‖ then
+    ((Real.sqrt (S z) : ℝ) : ℂ)
+  else if ‖z‖ < 1 then
+    (((Real.sqrt (S (star z)⁻¹) : ℝ) : ℂ))⁻¹
+  else
+    1
 
 lemma key (S : ℂ → ℝ) (hS : ∀ z, 0 < S z) (z w : ℂ) (h : star z * w = 1) :
     star (rho S z) * rho S w = 1 := by
@@ -70,11 +74,15 @@ theorem shiftT : ShiftT := by
     by_cases h0 : J i j = 0
     · simp [h0]
     have e1 : star (l i) * l j = 1 := by
-      have : (star (l i) * l j) * J i j = 1 * J i j := by rw [one_mul]; calc _ = star (l i) * J i j * l j := by ring
+      have : (star (l i) * l j) * J i j = 1 * J i j := by
+        rw [one_mul]
+        calc
+          _ = star (l i) * J i j * l j := by ring
           _ = J i j := hij
       exact mul_right_cancel₀ h0 this
     have e2 : star (rho S (l i)) * rho S (l j) = 1 := key S hSpos _ _ e1
-    calc _ = (star (rho S (l i)) * rho S (l j)) * J i j := by ring
+    calc
+      _ = (star (rho S (l i)) * rho S (l j)) * J i j := by ring
       _ = J i j := by rw [e2, one_mul]
   · intro i hi
     show ‖rho S (l i)‖ ^ 2 = σ i

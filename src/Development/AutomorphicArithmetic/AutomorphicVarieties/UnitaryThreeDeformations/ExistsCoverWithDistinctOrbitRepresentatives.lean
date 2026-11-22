@@ -6,9 +6,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open UpperTheory.V.Alg
 
-private theorem sameOrbit_trans {O A K : Type} [CommRing O] [CommRing A] [Algebra O A] (𝒜 : ℤ → Submodule O A)
-    [GradedAlgebra 𝒜] [Field K] [Algebra O K] {ξ ξ' ξ'' : A →ₐ[O] K}
-    (h : SameOrbit 𝒜 ξ ξ') (h' : SameOrbit 𝒜 ξ' ξ'') : SameOrbit 𝒜 ξ ξ'' := by
+private theorem sameOrbit_trans
+    {O A K : Type} [CommRing O] [CommRing A] [Algebra O A]
+    (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] [Field K] [Algebra O K]
+    {ξ ξ' ξ'' : A →ₐ[O] K} (h : SameOrbit 𝒜 ξ ξ') (h' : SameOrbit 𝒜 ξ' ξ'')
+    : SameOrbit 𝒜 ξ ξ'' := by
   obtain ⟨t, rfl⟩ := h
   obtain ⟨s, rfl⟩ := h'
   refine ⟨s * t, ?_⟩
@@ -20,9 +22,12 @@ private theorem sameOrbit_trans {O A K : Type} [CommRing O] [CommRing A] [Algebr
     rw [act_of_mem 𝒜 _ _ a.2, act_of_mem 𝒜 _ _ a.2, act_of_mem 𝒜 _ _ a.2]
     simp only [zpowersHom_apply, toAdd_ofAdd, mul_zpow, Units.val_mul, mul_assoc]
 
-theorem UpperTheory.exists_cover_with_distinct_orbit_representatives :
-    ∀ (O A K : Type) [CommRing O] [CommRing A] [Algebra O A] (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] [Field K] [Algebra O K] (I : Ideal A) (T : Finset (A →ₐ[O] K)),
-        Covers 𝒜 I T → ∃ T' : Finset (A →ₐ[O] K), Covers 𝒜 I T' ∧ ∀ ξ ∈ T', ∀ ξ' ∈ T', SameOrbit 𝒜 ξ ξ' → ξ = ξ' := by
+theorem UpperTheory.exists_cover_with_distinct_orbit_representatives
+    : ∀ (O A K : Type) [CommRing O] [CommRing A] [Algebra O A] (𝒜 : ℤ → Submodule O A)
+        [GradedAlgebra 𝒜] [Field K] [Algebra O K] (I : Ideal A) (T : Finset (A →ₐ[O] K)),
+      Covers 𝒜 I T
+        → ∃ T' : Finset (A →ₐ[O] K),
+          Covers 𝒜 I T' ∧ ∀ ξ ∈ T', ∀ ξ' ∈ T', SameOrbit 𝒜 ξ ξ' → ξ = ξ' := by
   intro O A K _ _ _ 𝒜 _ _ _ I T hT
   classical
   induction T using Finset.strongInduction with

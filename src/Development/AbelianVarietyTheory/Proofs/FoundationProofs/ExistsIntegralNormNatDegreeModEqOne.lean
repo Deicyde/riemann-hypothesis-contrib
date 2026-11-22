@@ -11,28 +11,35 @@ open Polynomial
 
 namespace GlobalTheory
 
-
 open Polynomial in
-theorem _root_.GlobalTheory.exists_integral_norm_natDegree_mod_eq_one :
-    ∀ (k K : Type) [Field k] [IsAlgClosed k] [CharZero k] [Field K] [Algebra k[X] K] [Algebra (RatFunc k) K]
-      [IsScalarTower k[X] (RatFunc k) K] [FiniteDimensional (RatFunc k) K] (N : ℕ), 1 ≤ N →
-      ∃ f : FunctionField.ringOfIntegers k K, f ≠ 0 ∧ (Algebra.norm k[X] f).natDegree % N = 1 % N := by
+theorem _root_.GlobalTheory.exists_integral_norm_natDegree_mod_eq_one
+    : ∀ (k K : Type) [Field k] [IsAlgClosed k] [CharZero k] [Field K] [Algebra k[X] K]
+        [Algebra (RatFunc k) K] [IsScalarTower k[X] (RatFunc k) K] [FiniteDimensional (RatFunc k) K]
+        (N : ℕ),
+      1 ≤ N
+        → ∃ f : FunctionField.ringOfIntegers k K,
+          f ≠ 0 ∧ (Algebra.norm k[X] f).natDegree % N = 1 % N := by
   intro k K _ _ _ _ _ _ _ _ N hN
   set O := FunctionField.ringOfIntegers k K
   have hC1 : _root_.GlobalTheory.NeedB.IsFirstChernClassOfLineBundle (RatFunc k) := by
     unfold _root_.GlobalTheory.NeedB.IsFirstChernClassOfLineBundle
     intro n d f hf hd hdn
-    obtain ⟨x, hx, h⟩ := _root_.GlobalTheory.tsenLang_ratFunc k n 1 d (fun _ => f) (fun _ => hf) hd (by simpa using hdn)
+    obtain ⟨x, hx, h⟩ :=
+      _root_.GlobalTheory.tsenLang_ratFunc k n 1 d (fun _ => f) (fun _ => hf) hd (by
+        simpa using hdn)
     exact ⟨x, hx, h 0⟩
-  obtain ⟨x, hx⟩ := _root_.GlobalTheory.norm_surjective_of_is_c1 (RatFunc k) K hC1
-    RatFunc.X RatFunc.X_ne_zero
+  obtain ⟨x, hx⟩ :=
+    _root_.GlobalTheory.norm_surjective_of_is_c1 (RatFunc k) K hC1 RatFunc.X RatFunc.X_ne_zero
   haveI : Module.IsTorsionFree k[X] K := .trans_faithfulSMul k[X] (RatFunc k) K
   haveI : Module.Free k[X] O := Module.free_of_finite_type_torsion_free'
   haveI := IsIntegralClosure.isLocalization k[X] (RatFunc k) K O
-  have hnorm : ∀ a : O, algebraMap k[X] (RatFunc k) (Algebra.norm k[X] a) =
-      Algebra.norm (RatFunc k) (algebraMap O K a) := fun a =>
+  have hnorm
+      : ∀ a : O,
+        algebraMap k[X] (RatFunc k) (Algebra.norm k[X] a)
+          = Algebra.norm (RatFunc k) (algebraMap O K a) := fun a =>
     (Algebra.norm_localization k[X] (nonZeroDivisors k[X]) (Rₘ := RatFunc k) (Sₘ := K) a).symm
-  obtain ⟨⟨a, s⟩, hxa⟩ := IsLocalization.surj (Algebra.algebraMapSubmonoid O (nonZeroDivisors k[X])) x
+  obtain ⟨⟨a, s⟩, hxa⟩ :=
+    IsLocalization.surj (Algebra.algebraMapSubmonoid O (nonZeroDivisors k[X])) x
   obtain ⟨b, hb, hbs⟩ := s.2
   simp only at hxa
   have hb0 : b ≠ 0 := nonZeroDivisors.ne_zero hb

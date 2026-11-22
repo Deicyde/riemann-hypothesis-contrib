@@ -28,8 +28,8 @@ variable {m : ℕ}
 def cj (d : Fin m → ℂ) (g : Matrix (Fin m) (Fin m) ℂ) : Matrix (Fin m) (Fin m) ℂ :=
   diagonal (star d) * g * diagonal d
 
-theorem cj_apply (d : Fin m → ℂ) (g : Matrix (Fin m) (Fin m) ℂ) (i j : Fin m) :
-    cj d g i j = star (d i) * g i j * d j := by
+theorem cj_apply (d : Fin m → ℂ) (g : Matrix (Fin m) (Fin m) ℂ) (i j : Fin m)
+    : cj d g i j = star (d i) * g i j * d j := by
   simp [cj, Matrix.mul_diagonal, Matrix.diagonal_mul]
 
 def Uni (d : Fin m → ℂ) : Prop := ∀ i, star (d i) * d i = 1
@@ -37,11 +37,14 @@ def Uni (d : Fin m → ℂ) : Prop := ∀ i, star (d i) * d i = 1
 theorem Uni.st {d : Fin m → ℂ} (h : Uni d) : Uni (star d) := fun i => by
   have := h i
   simp only [Pi.star_apply, star_star]
-  rw [mul_comm]; exact this
+  rw [mul_comm]
+  exact this
 
 theorem Uni.l {d : Fin m → ℂ} (h : Uni d) : diagonal (star d) * diagonal d = 1 := by
   rw [diagonal_mul_diagonal, ← diagonal_one]
-  congr 1; funext i; exact h i
+  congr 1
+  funext i
+  exact h i
 
 theorem Uni.r {d : Fin m → ℂ} (h : Uni d) : diagonal d * diagonal (star d) = 1 := by
   have := h.st.l
@@ -58,25 +61,32 @@ theorem Uni.nrm {d : Fin m → ℂ} (h : Uni d) (i : Fin m) : ‖d i‖ = 1 := b
   rw [norm_mul, norm_star, norm_one] at h1
   nlinarith [norm_nonneg (d i)]
 
-theorem cj_mul {d : Fin m → ℂ} (h : Uni d) (a b : Matrix (Fin m) (Fin m) ℂ) : cj d (a * b) = cj d a * cj d b := by
+theorem cj_mul {d : Fin m → ℂ} (h : Uni d) (a b : Matrix (Fin m) (Fin m) ℂ)
+    : cj d (a * b) = cj d a * cj d b := by
   unfold cj
-  calc diagonal (star d) * (a * b) * diagonal d
-      = diagonal (star d) * a * (diagonal d * diagonal (star d)) * b * diagonal d := by
-        rw [h.r]; simp only [Matrix.mul_one, Matrix.mul_assoc]
+  calc
+    diagonal (star d) * (a * b) * diagonal d
+        = diagonal (star d) * a * (diagonal d * diagonal (star d)) * b * diagonal d := by
+      rw [h.r]; simp only [Matrix.mul_one, Matrix.mul_assoc]
     _ = _ := by simp only [Matrix.mul_assoc]
 
-theorem cj_inv {d : Fin m → ℂ} (h : Uni d) (a : Matrix (Fin m) (Fin m) ℂ) : cj d a⁻¹ = (cj d a)⁻¹ := by
+theorem cj_inv {d : Fin m → ℂ} (h : Uni d) (a : Matrix (Fin m) (Fin m) ℂ)
+    : cj d a⁻¹ = (cj d a)⁻¹ := by
   unfold cj
   rw [Matrix.mul_inv_rev, Matrix.mul_inv_rev, h.inv, h.inv', Matrix.mul_assoc]
 
-theorem cj_star_cj {d : Fin m → ℂ} (h : Uni d) (a : Matrix (Fin m) (Fin m) ℂ) : cj (star d) (cj d a) = a := by
+theorem cj_star_cj {d : Fin m → ℂ} (h : Uni d) (a : Matrix (Fin m) (Fin m) ℂ)
+    : cj (star d) (cj d a) = a := by
   unfold cj
   rw [star_star]
-  calc diagonal d * (diagonal (star d) * a * diagonal d) * diagonal (star d)
-      = (diagonal d * diagonal (star d)) * a * (diagonal d * diagonal (star d)) := by simp only [Matrix.mul_assoc]
+  calc
+    diagonal d * (diagonal (star d) * a * diagonal d) * diagonal (star d)
+        = (diagonal d * diagonal (star d)) * a * (diagonal d * diagonal (star d)) := by
+      simp only [Matrix.mul_assoc]
     _ = a := by rw [h.r]; simp
 
-theorem cj_cj_star {d : Fin m → ℂ} (h : Uni d) (a : Matrix (Fin m) (Fin m) ℂ) : cj d (cj (star d) a) = a := by
+theorem cj_cj_star {d : Fin m → ℂ} (h : Uni d) (a : Matrix (Fin m) (Fin m) ℂ)
+    : cj d (cj (star d) a) = a := by
   have := cj_star_cj h.st a
   rwa [star_star] at this
 
@@ -85,30 +95,33 @@ theorem cj_conjTranspose (d : Fin m → ℂ) (a : Matrix (Fin m) (Fin m) ℂ) : 
   simp only [conjTranspose_apply, cj_apply, star_mul', star_star]
   ring
 
-theorem cj_one {d : Fin m → ℂ} (h : Uni d) : cj d 1 = 1 := by
-  unfold cj; rw [Matrix.mul_one, h.l]
+theorem cj_one {d : Fin m → ℂ} (h : Uni d) : cj d 1 = 1 := by unfold cj; rw [Matrix.mul_one, h.l]
 
-theorem cj_mulVec (d : Fin m → ℂ) (a : Matrix (Fin m) (Fin m) ℂ) (v : Fin m → ℂ) :
-    cj d a *ᵥ v = diagonal (star d) *ᵥ (a *ᵥ (diagonal d *ᵥ v)) := by
+theorem cj_mulVec (d : Fin m → ℂ) (a : Matrix (Fin m) (Fin m) ℂ) (v : Fin m → ℂ)
+    : cj d a *ᵥ v = diagonal (star d) *ᵥ (a *ᵥ (diagonal d *ᵥ v)) := by
   simp only [cj, Matrix.mulVec_mulVec, Matrix.mul_assoc]
 
-theorem cj_mem_unitary {d : Fin m → ℂ} (h : Uni d) {g : Matrix (Fin m) (Fin m) ℂ}
-    (hg : g ∈ Matrix.unitaryGroup (Fin m) ℂ) : cj d g ∈ Matrix.unitaryGroup (Fin m) ℂ := by
+theorem cj_mem_unitary
+    {d : Fin m → ℂ} (h : Uni d)
+    {g : Matrix (Fin m) (Fin m) ℂ} (hg : g ∈ Matrix.unitaryGroup (Fin m) ℂ)
+    : cj d g ∈ Matrix.unitaryGroup (Fin m) ℂ := by
   rw [Matrix.mem_unitaryGroup_iff'] at hg ⊢
   rw [star_eq_conjTranspose] at hg ⊢
   rw [cj_conjTranspose, ← cj_mul h, hg, cj_one h]
 
-theorem cj_exp {d : Fin m → ℂ} (h : Uni d) (X : Matrix (Fin m) (Fin m) ℂ) :
-    NormedSpace.exp (cj d X) = cj d (NormedSpace.exp X) := by
+theorem cj_exp {d : Fin m → ℂ} (h : Uni d) (X : Matrix (Fin m) (Fin m) ℂ)
+    : NormedSpace.exp (cj d X) = cj d (NormedSpace.exp X) := by
   unfold cj
   rw [← h.inv]
   exact Matrix.exp_conj' _ _ (IsUnit.of_mul_eq_one _ h.r)
 
-theorem cj_smul (d : Fin m → ℂ) (c : ℂ) (X : Matrix (Fin m) (Fin m) ℂ) : cj d (c • X) = c • cj d X := by
+theorem cj_smul (d : Fin m → ℂ) (c : ℂ) (X : Matrix (Fin m) (Fin m) ℂ)
+    : cj d (c • X) = c • cj d X := by
   unfold cj; simp
 
-theorem measurable_cj (d : Fin m → ℂ) :
-    Measurable (fun x : Fin m → Fin m → ℂ => (fun i j => cj d (Matrix.of x) i j : Fin m → Fin m → ℂ)) := by
+theorem measurable_cj (d : Fin m → ℂ)
+    : Measurable (fun x : Fin m → Fin m → ℂ =>
+      (fun i j => cj d (Matrix.of x) i j : Fin m → Fin m → ℂ)) := by
   simp only [cj_apply, Matrix.of_apply]
   fun_prop
 
@@ -120,11 +133,12 @@ def cjE {d : Fin m → ℂ} (h : Uni d) : (Fin m → Fin m → ℂ) ≃ᵐ (Fin 
   measurable_toFun := measurable_cj d
   measurable_invFun := measurable_cj (star d)
 
-theorem of_cjE {d : Fin m → ℂ} (h : Uni d) (x : Fin m → Fin m → ℂ) :
-    Matrix.of (cjE h x) = cj d (Matrix.of x) := rfl
+theorem of_cjE {d : Fin m → ℂ} (h : Uni d) (x : Fin m → Fin m → ℂ)
+    : Matrix.of (cjE h x) = cj d (Matrix.of x) :=
+  rfl
 
-def cjR (d : Fin m → ℂ) :
-    EuclideanSpace ℝ (Fin m × Fin m × Bool) →ₗ[ℝ] EuclideanSpace ℝ (Fin m × Fin m × Bool) where
+def cjR (d : Fin m → ℂ)
+    : EuclideanSpace ℝ (Fin m × Fin m × Bool) →ₗ[ℝ] EuclideanSpace ℝ (Fin m × Fin m × Bool) where
   toFun x := (WithLp.equiv 2 _).symm (realifyFun (cj d (unrealify x)))
   map_add' x y := by
     ext ⟨i, j, b⟩
@@ -133,16 +147,17 @@ def cjR (d : Fin m → ℂ) :
     ext ⟨i, j, b⟩
     cases b <;> simp [realifyFun, cj_apply, unrealify] <;> ring
 
-theorem unrealify_realify (X : Matrix (Fin m) (Fin m) ℂ) :
-    unrealify ((WithLp.equiv 2 _).symm (realifyFun X)) = X := by
+theorem unrealify_realify (X : Matrix (Fin m) (Fin m) ℂ)
+    : unrealify ((WithLp.equiv 2 _).symm (realifyFun X)) = X := by
   ext i j
   simp [unrealify, realifyFun]
 
-theorem unrealify_cjR (d : Fin m → ℂ) (x : EuclideanSpace ℝ (Fin m × Fin m × Bool)) :
-    unrealify (cjR d x) = cj d (unrealify x) := unrealify_realify _
+theorem unrealify_cjR (d : Fin m → ℂ) (x : EuclideanSpace ℝ (Fin m × Fin m × Bool))
+    : unrealify (cjR d x) = cj d (unrealify x) :=
+  unrealify_realify _
 
-theorem norm_sq_unrealify (x : EuclideanSpace ℝ (Fin m × Fin m × Bool)) :
-    ‖x‖ ^ 2 = ∑ i, ∑ j, ‖unrealify x i j‖ ^ 2 := by
+theorem norm_sq_unrealify (x : EuclideanSpace ℝ (Fin m × Fin m × Bool))
+    : ‖x‖ ^ 2 = ∑ i, ∑ j, ‖unrealify x i j‖ ^ 2 := by
   rw [EuclideanSpace.norm_sq_eq, Fintype.sum_prod_type]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Fintype.sum_prod_type]
@@ -151,15 +166,16 @@ theorem norm_sq_unrealify (x : EuclideanSpace ℝ (Fin m × Fin m × Bool)) :
   simp only [unrealify, Real.norm_eq_abs, sq_abs]
   ring
 
-theorem norm_cjR {d : Fin m → ℂ} (h : Uni d) (x : EuclideanSpace ℝ (Fin m × Fin m × Bool)) :
-    ‖cjR d x‖ = ‖x‖ := by
+theorem norm_cjR {d : Fin m → ℂ} (h : Uni d) (x : EuclideanSpace ℝ (Fin m × Fin m × Bool))
+    : ‖cjR d x‖ = ‖x‖ := by
   have : ‖cjR d x‖ ^ 2 = ‖x‖ ^ 2 := by
     rw [norm_sq_unrealify, norm_sq_unrealify, unrealify_cjR]
     simp only [cj_apply, norm_mul, norm_star, h.nrm, one_mul, mul_one]
   exact (pow_left_inj₀ (norm_nonneg _) (norm_nonneg _) two_ne_zero).1 this
 
-theorem cjR_mem {d : Fin m → ℂ} (h : Uni d) {S : Set (Matrix (Fin m) (Fin m) ℂ)} (hS : ∀ g ∈ S, cj d g ∈ S) :
-    ∀ x ∈ lieE S, cjR d x ∈ lieE S := by
+theorem cjR_mem
+    {d : Fin m → ℂ} (h : Uni d) {S : Set (Matrix (Fin m) (Fin m) ℂ)} (hS : ∀ g ∈ S, cj d g ∈ S)
+    : ∀ x ∈ lieE S, cjR d x ∈ lieE S := by
   intro x hx
   have : lieE S ≤ (lieE S).comap (cjR d) := by
     unfold lieE
@@ -173,8 +189,11 @@ theorem cjR_mem {d : Fin m → ℂ} (h : Uni d) {S : Set (Matrix (Fin m) (Fin m)
 
 end Conj
 
-theorem haarLie_map_cj {k r : ℕ} {d : Fin (2 * r + k + 1) → ℂ} (h : Uni d) {S : Set (Mx k r)}
-    (hS : ∀ g ∈ S, cj d g ∈ S) (κ : ENNReal) : (haarLie S κ).map (cjE h) = haarLie S κ := by
+theorem haarLie_map_cj
+    {k r : ℕ} {d : Fin (2 * r + k + 1) → ℂ} (h : Uni d)
+    {S : Set (Mx k r)} (hS : ∀ g ∈ S, cj d g ∈ S)
+    (κ : ENNReal)
+    : (haarLie S κ).map (cjE h) = haarLie S κ := by
   unfold haarLie
   rw [Measure.map_smul _ (cjE h).measurable.aemeasurable]
   congr 1
@@ -188,20 +207,25 @@ theorem haarLie_map_cj {k r : ℕ} {d : Fin (2 * r + k + 1) → ℂ} (h : Uni d)
       show cj d (NormedSpace.exp (unrealify (x : EuclideanSpace ℝ _))) = NormedSpace.exp (unrealify (cjR d x))
       rw [unrealify_cjR, cj_exp h]
     rw [AEMeasurable.map_map_of_aemeasurable (cjE h).measurable.aemeasurable hm, e,
-      ← AEMeasurable.map_map_of_aemeasurable (by rwa [hΦ.map_eq]) hΦ.measurable.aemeasurable, hΦ.map_eq]
+      ← AEMeasurable.map_map_of_aemeasurable (by rwa [hΦ.map_eq]) hΦ.measurable.aemeasurable,
+      hΦ.map_eq]
   · exfalso
     apply hm
-    have hu : Continuous (unrealify : EuclideanSpace ℝ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1) × Bool) → Mx k r) := by
+    have hu : Continuous
+        (unrealify
+          : EuclideanSpace ℝ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1) × Bool) → Mx k r) := by
       refine continuous_pi fun i => continuous_pi fun j => ?_
-      have he : (fun x : EuclideanSpace ℝ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1) × Bool) => unrealify x i j) =
-          fun x => ((x (i, j, false) : ℝ) : ℂ) + ((x (i, j, true) : ℝ) : ℂ) * Complex.I := by
+      have he
+          : (fun x : EuclideanSpace ℝ (Fin (2 * r + k + 1) × Fin (2 * r + k + 1) × Bool) =>
+              unrealify x i j)
+            = fun x => ((x (i, j, false) : ℝ) : ℂ) + ((x (i, j, true) : ℝ) : ℂ) * Complex.I := by
         funext x
         apply Complex.ext <;> simp [unrealify]
       rw [he]
       fun_prop
     have hexp : Continuous (fun X : Mx k r => NormedSpace.exp X) := by
       open scoped Matrix.Norms.Operator in
-        exact NormedSpace.exp_continuous
+      exact NormedSpace.exp_continuous
     have : Continuous E := hexp.comp (hu.comp continuous_subtype_val)
     exact this.measurable.aemeasurable
 
@@ -216,9 +240,11 @@ structure Tor (k r : ℕ) (d : Fin (2 * r + k + 1) → ℂ) : Prop where
 
 variable {d : Fin (2 * r + k + 1) → ℂ}
 
-theorem Tor.st (h : Tor k r d) : Tor k r (star d) :=
-  ⟨h.uni.st, fun i j a b => by simp only [Pi.star_apply, h.sym i j a b],
-    fun i a b => by simp only [Pi.star_apply, h.mid i a b, star_one]⟩
+theorem Tor.st (h : Tor k r d) : Tor k r (star d) := ⟨
+  h.uni.st,
+  fun i j a b => by simp only [Pi.star_apply, h.sym i j a b],
+  fun i a b => by simp only [Pi.star_apply, h.mid i a b, star_one]
+⟩
 
 theorem cj_Hpk (h : Tor k r d) : cj d (Hpk k r) = Hpk k r := by
   ext i j
@@ -249,7 +275,8 @@ theorem cj_mem_N (h : Tor k r d) {g : Mx k r} (hg : g ∈ Nset k r) : cj d g ∈
     · rw [← e, mul_one, h.uni i]
     · simp
 
-theorem diag_wb (h : Tor k r d) {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) : diagonal d *ᵥ z = z := by
+theorem diag_wb (h : Tor k r d) {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z)
+    : diagonal d *ᵥ z = z := by
   funext i
   rw [mulVec_diagonal]
   by_cases hi : i.val < r ∨ r + k < i.val
@@ -263,22 +290,32 @@ theorem diag_bvec {m : ℕ} (d : Fin m → ℂ) (i : Fin m) : diagonal d *ᵥ bv
   · subst e; simp
   · simp [bvec, e]
 
-theorem cj_fix {m : ℕ} {d : Fin m → ℂ} (h : Uni d) {g : Matrix (Fin m) (Fin m) ℂ} {i : Fin m}
-    (hg : g *ᵥ bvec i = bvec i) : cj d g *ᵥ bvec i = bvec i := by
-  rw [cj_mulVec, diag_bvec, mulVec_smul, hg, mulVec_smul, diag_bvec, smul_smul, Pi.star_apply, mul_comm, h i, one_smul]
+theorem cj_fix
+    {m : ℕ} {d : Fin m → ℂ} (h : Uni d)
+    {g : Matrix (Fin m) (Fin m) ℂ} {i : Fin m} (hg : g *ᵥ bvec i = bvec i)
+    : cj d g *ᵥ bvec i = bvec i := by
+  rw [cj_mulVec, diag_bvec, mulVec_smul, hg, mulVec_smul, diag_bvec, smul_smul, Pi.star_apply,
+    mul_comm, h i, one_smul]
 
-theorem cj_mem_UW (h : Tor k r d) {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) {g : Mx k r}
-    (hg : g ∈ UWset k r z) : cj d g ∈ UWset k r z := by
+theorem cj_mem_UW
+    (h : Tor k r d)
+    {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z)
+    {g : Mx k r} (hg : g ∈ UWset k r z)
+    : cj d g ∈ UWset k r z := by
   refine ⟨cj_mem_UH h hg.1, fun a => ⟨cj_fix h.uni (hg.2.1 a).1, cj_fix h.uni (hg.2.1 a).2⟩, ?_⟩
   rw [cj_mulVec, diag_wb h hz, hg.2.2, diag_wb h.st hz]
 
-theorem cj_frame (h : Tor k r d) {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) {g : Mx k r}
-    (hg : IsFrameW k r z g) : IsFrameW k r z (cj d g) := by
+theorem cj_frame
+    (h : Tor k r d)
+    {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z)
+    {g : Mx k r} (hg : IsFrameW k r z g)
+    : IsFrameW k r z (cj d g) := by
   refine ⟨cj_mem_UH h hg.1, fun a => ⟨cj_fix h.uni (hg.2.1 a).1, cj_fix h.uni (hg.2.1 a).2⟩, ?_⟩
-  rw [cj_mulVec, mulVec_smul, diag_bvec, h.mid (wI k r (Fin.last k)) (by simp [wI]) (by simp [wI]), one_smul, hg.2.2,
-    diag_wb h.st hz]
+  rw [cj_mulVec, mulVec_smul, diag_bvec, h.mid (wI k r (Fin.last k)) (by simp [wI]) (by simp [wI]),
+    one_smul, hg.2.2, diag_wb h.st hz]
 
-theorem cj_blockW (h : Tor k r d) (x : Matrix (Fin k) (Fin k) ℂ) : cj d (blockW k r x) = blockW k r x := by
+theorem cj_blockW (h : Tor k r d) (x : Matrix (Fin k) (Fin k) ℂ)
+    : cj d (blockW k r x) = blockW k r x := by
   ext i j
   rw [cj_apply]
   unfold blockW
@@ -288,8 +325,8 @@ theorem cj_blockW (h : Tor k r d) (x : Matrix (Fin k) (Fin k) ℂ) : cj d (block
   · rw [← h3, mul_one, h.uni i]
   · simp
 
-theorem cj_bigCell (h : Tor k r d) (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) :
-    cj d (bigCell k r c μ) = bigCell k r c μ := by
+theorem cj_bigCell (h : Tor k r d) (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
+    : cj d (bigCell k r c μ) = bigCell k r c μ := by
   ext i j
   rw [cj_apply]
   unfold bigCell
@@ -303,20 +340,28 @@ theorem cj_bigCell (h : Tor k r d) (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)
     rw [← this, mul_right_comm, h.uni i, one_mul]
   · simp
 
-theorem isHCTypeW_cj (h : Tor k r d) {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) {u : Fin k → ℝ} {π : Mx k r → (H →L[ℂ] H)}
-    (hπ : IsHCTypeW k r z u π) : IsHCTypeW k r z u (fun g => π (cj (star d) g)) := by
+theorem isHCTypeW_cj
+    (h : Tor k r d)
+    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z)
+    {u : Fin k → ℝ} {π : Mx k r → (H →L[ℂ] H)} (hπ : IsHCTypeW k r z u π)
+    : IsHCTypeW k r z u (fun g => π (cj (star d) g)) := by
   obtain ⟨g, hg, hU⟩ := hπ
   refine ⟨cj d g, cj_frame h hz hg, ?_⟩
-  have e : ∀ x, cj (star d) (cj d g * blockW k r x * (cj d g)⁻¹) = g * blockW k r x * g⁻¹ := fun x => by
+  have e
+      : ∀ x,
+        cj (star d) (cj d g * blockW k r x * (cj d g)⁻¹) = g * blockW k r x * g⁻¹ := fun x => by
     conv_lhs => rw [← cj_blockW h x]
     rw [← cj_inv h.uni, ← cj_mul h.uni, ← cj_mul h.uni, cj_star_cj h.uni]
   simp only [e]
   exact hU
 
-theorem isDSHpk_cj (h : Tor k r d) {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+theorem isDSHpk_cj
+    (h : Tor k r d)
+    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
     {ε : Fin (2 * r + k + 1) → Bool} {lam : Fin (2 * r + k + 1) → ℝ} {σ : Mx k r → (H →L[ℂ] H)}
-    (hσ : IsDSHpk k r ε lam σ) : IsDSHpk k r ε lam (fun g => σ (cj (star d) g)) := by
+    (hσ : IsDSHpk k r ε lam σ)
+    : IsDSHpk k r ε lam (fun g => σ (cj (star d) g)) := by
   obtain ⟨P, ⟨⟨hP1, hP2⟩, hP3⟩, hD⟩ := hσ
   refine ⟨P * diagonal d, ⟨⟨hP1.mul (IsUnit.of_mul_eq_one _ h.uni.r), ?_⟩, ?_⟩, ?_⟩
   · have := cj_Hpk h
@@ -324,7 +369,8 @@ theorem isDSHpk_cj (h : Tor k r d) {H : Type*} [NormedAddCommGroup H] [InnerProd
     simp only [Matrix.mul_assoc]
   · refine mul_mem hP3 ?_
     rw [Matrix.mem_unitaryGroup_iff', star_eq_conjTranspose, diagonal_conjTranspose, h.uni.l]
-  · have e : ∀ g, cj (star d) ((P * diagonal d)⁻¹ * g * (P * diagonal d)) = P⁻¹ * g * P := fun g => by
+  · have e
+        : ∀ g, cj (star d) ((P * diagonal d)⁻¹ * g * (P * diagonal d)) = P⁻¹ * g * P := fun g => by
       conv_rhs => rw [← cj_star_cj h.uni (P⁻¹ * g * P)]
       congr 1
       rw [Matrix.mul_inv_rev, h.uni.inv, cj]
@@ -332,9 +378,11 @@ theorem isDSHpk_cj (h : Tor k r d) {H : Type*} [NormedAddCommGroup H] [InnerProd
     simp only [e]
     exact hD
 
-theorem isKFin_cj (h : Tor k r d) {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    {σ : Mx k r → (H →L[ℂ] H)} {v : H} (hv : IsKFinHpk (k := k) (r := r) σ v) :
-    IsKFinHpk (k := k) (r := r) (fun g => σ (cj (star d) g)) v := by
+theorem isKFin_cj
+    (h : Tor k r d)
+    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    {σ : Mx k r → (H →L[ℂ] H)} {v : H} (hv : IsKFinHpk (k := k) (r := r) σ v)
+    : IsKFinHpk (k := k) (r := r) (fun g => σ (cj (star d) g)) v := by
   obtain ⟨S, h1, h2, h3⟩ := hv
   exact ⟨S, h1, h2, fun g hg x hx => h3 _ ⟨cj_mem_UH h.st hg.1, cj_mem_unitary h.uni.st hg.2⟩ x hx⟩
 
@@ -344,9 +392,11 @@ theorem measurable_lmulM (s : Mx k r) : Measurable (lmulM (k := k) (r := r) s) :
   simp only [Matrix.mul_apply, Matrix.of_apply]
   fun_prop
 
-theorem isHaarOn_cj (h : Uni d) {S : Set (Mx k r)} (hS : ∀ g ∈ S, cj d g ∈ S) (hS' : ∀ g ∈ S, cj (star d) g ∈ S)
-    {μ : Measure (Mt k r)} (hμ : IsHaarOn S μ ∧ μ Set.univ = 1) :
-    IsHaarOn S (μ.map (cjE h)) ∧ (μ.map (cjE h)) Set.univ = 1 := by
+theorem isHaarOn_cj
+    (h : Uni d)
+    {S : Set (Mx k r)} (hS : ∀ g ∈ S, cj d g ∈ S) (hS' : ∀ g ∈ S, cj (star d) g ∈ S)
+    {μ : Measure (Mt k r)} (hμ : IsHaarOn S μ ∧ μ Set.univ = 1)
+    : IsHaarOn S (μ.map (cjE h)) ∧ (μ.map (cjE h)) Set.univ = 1 := by
   obtain ⟨⟨h1, h2, h3, h4⟩, h5⟩ := hμ
   have hu : (μ.map (cjE h)) Set.univ = 1 := by rw [MeasurableEquiv.map_apply, Set.preimage_univ, h5]
   refine ⟨⟨(cjE h).sigmaFinite_map, fun e => by simp [e] at hu, ?_, fun s hs => ?_⟩, hu⟩
@@ -359,8 +409,8 @@ theorem isHaarOn_cj (h : Uni d) {S : Set (Mx k r)} (hS : ∀ g ∈ S, cj d g ∈
     rw [Measure.map_map (measurable_lmulM s) (cjE h).measurable, e,
       ← Measure.map_map (cjE h).measurable (measurable_lmulM _), h4 _ (hS' s hs)]
 
-theorem herm_diag (h : Tor k r d) (y x : Fin (2 * r + k + 1) → ℂ) :
-    herm (Hpk k r) (diagonal (star d) *ᵥ y) x = herm (Hpk k r) y (diagonal d *ᵥ x) := by
+theorem herm_diag (h : Tor k r d) (y x : Fin (2 * r + k + 1) → ℂ)
+    : herm (Hpk k r) (diagonal (star d) *ᵥ y) x = herm (Hpk k r) y (diagonal d *ᵥ x) := by
   unfold herm
   have e : Hpk k r * diagonal (star d) = diagonal (star d) * Hpk k r := by
     conv_rhs => rw [← cj_Hpk h.st, cj, star_star, ← Matrix.mul_assoc, ← Matrix.mul_assoc, h.uni.l, Matrix.one_mul]
@@ -388,16 +438,16 @@ theorem tor_dT (k r : ℕ) : Tor k r (dT k r) := by
 theorem dT_eI (a : Fin r) : dT k r (eI k r a) = (-Complex.I) ^ (r - a.val) := by
   unfold dT; congr 1; simp only [eI]; omega
 
-theorem diag_fvec {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (a : Fin (r + 1)) :
-    diagonal (dT k r) *ᵥ fvec k r z a = (-Complex.I) ^ (r - a.val) • fvec k r z a := by
+theorem diag_fvec {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (a : Fin (r + 1))
+    : diagonal (dT k r) *ᵥ fvec k r z a = (-Complex.I) ^ (r - a.val) • fvec k r z a := by
   unfold fvec
   split_ifs with h
   · rw [diag_bvec, dT_eI]
   · have : r - a.val = 0 := by omega
     rw [diag_wb (tor_dT k r) hz, this, pow_zero, one_smul]
 
-theorem ell_cj {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (g : Mx k r) :
-    ell k r z (cj (dT k r) g) = Complex.I * ell k r z g := by
+theorem ell_cj {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (g : Mx k r)
+    : ell k r z (cj (dT k r) g) = Complex.I * ell k r z g := by
   unfold ell
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun a _ => ?_
@@ -410,54 +460,65 @@ theorem ell_cj {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (g : Mx k r) 
     rw [cj_mulVec, diag_wb (tor_dT k r) hz, mulVec_diagonal, Pi.star_apply, dT_eI, this]
     simp
 
-theorem psi_cj {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (c : ℂ) (g : Mx k r) :
-    psi k r z (-Complex.I * c) (cj (dT k r) g) = psi k r z c g := by
+theorem psi_cj {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (c : ℂ) (g : Mx k r)
+    : psi k r z (-Complex.I * c) (cj (dT k r) g) = psi k r z c g := by
   unfold psi
   rw [ell_cj hz]
   have : -Complex.I * c * (Complex.I * ell k r z g) = c * ell k r z g := by
     linear_combination (-(c * ell k r z g)) * Complex.I_mul_I
   rw [this]
 
-theorem Zhat_cj {z z' : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hz' : inWb k r z') (g : Mx k r)
-    (a b : Fin (r + 1)) :
-    Formalism.QuantumDeterminants.Zhat k r z z' (cj (dT k r) g) a b =
-      Complex.I ^ (2 * r) * (-Complex.I) ^ (a.val + b.val) * ZhatO k r z z' g a b := by
+theorem Zhat_cj
+    {z z' : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hz' : inWb k r z')
+    (g : Mx k r) (a b : Fin (r + 1))
+    : Formalism.QuantumDeterminants.Zhat k r z z' (cj (dT k r) g) a b
+      = Complex.I ^ (2 * r) * (-Complex.I) ^ (a.val + b.val) * ZhatO k r z z' g a b := by
   unfold ZhatO Formalism.QuantumDeterminants.Zhat
   rw [cj_mulVec, herm_diag (tor_dT k r), diag_fvec hz, diag_fvec hz', mulVec_smul]
   unfold herm
-  rw [mulVec_smul, star_smul, smul_dotProduct, dotProduct_smul, smul_eq_mul, smul_eq_mul, ← mul_assoc, ← mul_assoc]
+  rw [mulVec_smul, star_smul, smul_dotProduct, dotProduct_smul, smul_eq_mul, smul_eq_mul,
+    ← mul_assoc, ← mul_assoc]
   congr 1
-  have e : 2 * r = (r - a.val) + (r - b.val) + (a.val + b.val) := by have := a.isLt; have := b.isLt; omega
-  have e2 : Complex.I ^ (a.val + b.val) * (-Complex.I) ^ (a.val + b.val) = 1 := by rw [← mul_pow]; simp
-  rw [e, pow_add, mul_assoc (Complex.I ^ _), e2, mul_one, pow_add, star_pow, neg_pow Complex.I (r - b.val)]
+  have e : 2 * r = (r - a.val) + (r - b.val) + (a.val + b.val) := by
+    have := a.isLt; have := b.isLt; omega
+  have e2 : Complex.I ^ (a.val + b.val) * (-Complex.I) ^ (a.val + b.val) = 1 := by
+    rw [← mul_pow]; simp
+  rw [e, pow_add, mul_assoc (Complex.I ^ _), e2, mul_one, pow_add, star_pow,
+    neg_pow Complex.I (r - b.val)]
   simp only [star_neg, Complex.star_def, Complex.conj_I, neg_neg]
   ring
 
-theorem flagMat_cj {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (g : Mx k r) (a b : Fin (r + 1)) :
-    flagMat k r z (cj (dT k r) g) a b =
-      (star ((-Complex.I) ^ (r - a.val)) * (-Complex.I) ^ (r - b.val)) * flagMat k r z g a b := by
+theorem flagMat_cj {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (g : Mx k r) (a b : Fin (r + 1))
+    : flagMat k r z (cj (dT k r) g) a b
+      = (star ((-Complex.I) ^ (r - a.val)) * (-Complex.I) ^ (r - b.val)) * flagMat k r z g a b := by
   unfold flagMat
   split_ifs with h1 h2
-  · rw [cj_mulVec, diag_fvec hz, mulVec_smul, mulVec_diagonal, Pi.star_apply, dT_eI, Pi.smul_apply, smul_eq_mul, mul_assoc]
+  · rw [cj_mulVec, diag_fvec hz, mulVec_smul, mulVec_diagonal, Pi.star_apply, dT_eI, Pi.smul_apply,
+      smul_eq_mul, mul_assoc]
   · rw [← h2, uni_pow, one_mul]
   · simp
 
 def turnB (w : ℂ) (bs : List (ℂ × ℕ)) : List (ℂ × ℕ) :=
-  bs.foldr (fun b (F : ℂ → List (ℂ × ℕ)) w =>
-    (w * (-Complex.I) ^ (b.2 - 1) * b.1, b.2) :: F (w * (-Complex.I) ^ (2 * b.2))) (fun _ => []) w
+  bs.foldr
+    (fun b (F : ℂ → List (ℂ × ℕ)) w =>
+      (w * (-Complex.I) ^ (b.2 - 1) * b.1, b.2) :: F (w * (-Complex.I) ^ (2 * b.2)))
+    (fun _ => [])
+    w
 
 theorem turnB_nil (w : ℂ) : turnB w [] = [] := rfl
 
-theorem turnB_cons (w t : ℂ) (s : ℕ) (bs : List (ℂ × ℕ)) :
-    turnB w ((t, s) :: bs) = (w * (-Complex.I) ^ (s - 1) * t, s) :: turnB (w * (-Complex.I) ^ (2 * s)) bs := rfl
+theorem turnB_cons (w t : ℂ) (s : ℕ) (bs : List (ℂ × ℕ))
+    : turnB w ((t, s) :: bs)
+      = (w * (-Complex.I) ^ (s - 1) * t, s) :: turnB (w * (-Complex.I) ^ (2 * s)) bs :=
+  rfl
 
 theorem turnB_snd (bs : List (ℂ × ℕ)) : ∀ w, (turnB w bs).map Prod.snd = bs.map Prod.snd := by
   induction bs with
   | nil => intro w; rfl
   | cons b bs ih => intro w; obtain ⟨t, s⟩ := b; simp [turnB_cons, ih]
 
-theorem turnB_ok (bs : List (ℂ × ℕ)) : ∀ w, w ≠ 0 → (∀ b ∈ bs, b.1 ≠ 0 ∧ 1 ≤ b.2) →
-    ∀ b ∈ turnB w bs, b.1 ≠ 0 ∧ 1 ≤ b.2 := by
+theorem turnB_ok (bs : List (ℂ × ℕ))
+    : ∀ w, w ≠ 0 → (∀ b ∈ bs, b.1 ≠ 0 ∧ 1 ≤ b.2) → ∀ b ∈ turnB w bs, b.1 ≠ 0 ∧ 1 ≤ b.2 := by
   induction bs with
   | nil => intro w _ _ b hb; simp [turnB_nil] at hb
   | cons b bs ih =>
@@ -468,10 +529,11 @@ theorem turnB_ok (bs : List (ℂ × ℕ)) : ∀ w, w ≠ 0 → (∀ b ∈ bs, b.
     rw [turnB_cons, List.mem_cons] at hb'
     rcases hb' with rfl | hb'
     · exact ⟨mul_ne_zero (mul_ne_zero hw (pow_ne_zero _ hI)) h0.1, h0.2⟩
-    · exact ih _ (mul_ne_zero hw (pow_ne_zero _ hI)) (fun b hb => h b (List.mem_cons_of_mem _ hb)) _ hb'
+    · exact
+        ih _ (mul_ne_zero hw (pow_ne_zero _ hI)) (fun b hb => h b (List.mem_cons_of_mem _ hb)) _ hb'
 
-theorem ptEntry_turnB (bs : List (ℂ × ℕ)) : ∀ w i j,
-    ptEntry (turnB w bs) i j = w * (-Complex.I) ^ (i + j) * ptEntry bs i j := by
+theorem ptEntry_turnB (bs : List (ℂ × ℕ))
+    : ∀ w i j, ptEntry (turnB w bs) i j = w * (-Complex.I) ^ (i + j) * ptEntry bs i j := by
   induction bs with
   | nil => intro w i j; simp [turnB_nil, ptEntry]
   | cons b bs ih =>
@@ -491,37 +553,45 @@ theorem blockIdx_turnB (bs : List (ℂ × ℕ)) : ∀ w p, blockIdx (turnB w bs)
   | nil => intro w p; rfl
   | cons b bs ih => intro w p; obtain ⟨t, s⟩ := b; rw [turnB_cons, blockIdx, blockIdx, ih]
 
-theorem ptWeightFrom_turnB (T T' : ℝ) (bs : List (ℂ × ℕ)) : ∀ w a, ‖w‖ = 1 →
-    ptWeightFrom k r T T' a (turnB w bs) = ptWeightFrom k r T T' a bs := by
+theorem ptWeightFrom_turnB (T T' : ℝ) (bs : List (ℂ × ℕ))
+    : ∀ w a, ‖w‖ = 1 → ptWeightFrom k r T T' a (turnB w bs) = ptWeightFrom k r T T' a bs := by
   induction bs with
   | nil => intro w a _; rfl
   | cons b bs ih =>
     intro w a hw
     obtain ⟨t, s⟩ := b
     have e : ‖w * (-Complex.I) ^ (s - 1) * t‖ = ‖t‖ := by simp [hw]
-    rw [turnB_cons, ptWeightFrom, ptWeightFrom, ih _ _ (by simp [hw]), Complex.normSq_eq_norm_sq, Complex.normSq_eq_norm_sq, e]
+    rw [turnB_cons, ptWeightFrom, ptWeightFrom, ih _ _ (by simp [hw]), Complex.normSq_eq_norm_sq,
+      Complex.normSq_eq_norm_sq, e]
 
-def turnP (p : Point ℂ (r + 1)) : Point ℂ (r + 1) :=
-  ⟨turnB (Complex.I ^ (2 * r)) p.1, turnB_ok _ _ (pow_ne_zero _ Complex.I_ne_zero) p.2.1, by rw [turnB_snd]; exact p.2.2⟩
+def turnP (p : Point ℂ (r + 1)) : Point ℂ (r + 1) := ⟨
+  turnB (Complex.I ^ (2 * r)) p.1,
+  turnB_ok _ _ (pow_ne_zero _ Complex.I_ne_zero) p.2.1,
+  by rw [turnB_snd]; exact p.2.2
+⟩
 
-theorem ptMat_turnP (p : Point ℂ (r + 1)) (a b : Fin (r + 1)) :
-    ptMat (turnP p) a b = Complex.I ^ (2 * r) * (-Complex.I) ^ (a.val + b.val) * ptMat p a b :=
+theorem ptMat_turnP (p : Point ℂ (r + 1)) (a b : Fin (r + 1))
+    : ptMat (turnP p) a b = Complex.I ^ (2 * r) * (-Complex.I) ^ (a.val + b.val) * ptMat p a b :=
   ptEntry_turnB _ _ _ _
 
-theorem ptWeight_turnP (T T' : ℝ) (p : Point ℂ (r + 1)) : ptWeight k r T T' (turnP p) = ptWeight k r T T' p :=
+theorem ptWeight_turnP (T T' : ℝ) (p : Point ℂ (r + 1))
+    : ptWeight k r T T' (turnP p) = ptWeight k r T T' p :=
   ptWeightFrom_turnB _ _ _ _ _ (by simp)
 
 theorem rootPat_turnP (p : Point ℂ (r + 1)) : rootPat (turnP p) = rootPat p := by
   unfold rootPat turnP
   simp only [blockIdx_turnB]
 
-theorem normSq_leadMinor_turnP (p : Point ℂ (r + 1)) (l : ℕ) (hl : l ≤ r + 1) :
-    Complex.normSq (leadMinor (ptMat (turnP p)) l hl) = Complex.normSq (leadMinor (ptMat p) l hl) := by
+theorem normSq_leadMinor_turnP (p : Point ℂ (r + 1)) (l : ℕ) (hl : l ≤ r + 1)
+    : Complex.normSq (leadMinor (ptMat (turnP p)) l hl)
+      = Complex.normSq (leadMinor (ptMat p) l hl) := by
   unfold leadMinor
-  have e : (ptMat (turnP p)).submatrix (Fin.castLE hl) (Fin.castLE hl) =
-      Matrix.of (fun i j : Fin l => (Complex.I ^ (2 * r) * (-Complex.I) ^ i.val) *
-        (Matrix.of (fun i j : Fin l => (-Complex.I) ^ j.val *
-          ((ptMat p).submatrix (Fin.castLE hl) (Fin.castLE hl)) i j)) i j) := by
+  have e
+      : (ptMat (turnP p)).submatrix (Fin.castLE hl) (Fin.castLE hl)
+        = Matrix.of (fun i j : Fin l =>
+          (Complex.I ^ (2 * r) * (-Complex.I) ^ i.val) * (Matrix.of (fun i j : Fin l =>
+              (-Complex.I) ^ j.val * ((ptMat p).submatrix (Fin.castLE hl) (Fin.castLE hl)) i j))
+            i j) := by
     ext a b
     simp only [submatrix_apply, ptMat_turnP, of_apply, Fin.val_castLE, pow_add]
     ring
@@ -532,34 +602,55 @@ theorem GPoint_turnP (T T' : ℝ) (p : Point ℂ (r + 1)) : Gpt T T' (turnP p) =
   unfold Gpt
   rw [normSq_leadMinor_turnP, normSq_leadMinor_turnP]
 
-def turnL (L : LocBessel k r) : LocBessel k r :=
-  { L with
-    σ := fun g => L.σ (cj (star (dT k r)) g)
-    hσ := isDSHpk_cj (tor_dT k r) L.hσ
-    π := fun g => L.π (cj (star (dT k r)) g)
-    hπ := isHCTypeW_cj (tor_dT k r) L.hz.1 L.hπ
-    π' := fun g => L.π' (cj (star (dT k r)) g)
-    hπ' := isHCTypeW_cj (tor_dT k r) L.hz'.1 L.hπ'
-    c := -Complex.I * L.c
-    μW := L.μW.map (cjE (tor_dT k r).uni)
-    μW' := L.μW'.map (cjE (tor_dT k r).uni)
-    hμW := isHaarOn_cj _ (fun _ => cj_mem_UW (tor_dT k r) L.hz.1) (fun _ => cj_mem_UW (tor_dT k r).st L.hz.1) L.hμW
-    hμW' := isHaarOn_cj _ (fun _ => cj_mem_UW (tor_dT k r) L.hz'.1) (fun _ => cj_mem_UW (tor_dT k r).st L.hz'.1) L.hμW' }
+def turnL (L : LocBessel k r) : LocBessel k r := {
+  L with
+  σ := fun g => L.σ (cj (star (dT k r)) g)
+  hσ := isDSHpk_cj (tor_dT k r) L.hσ
+  π := fun g => L.π (cj (star (dT k r)) g)
+  hπ := isHCTypeW_cj (tor_dT k r) L.hz.1 L.hπ
+  π' := fun g => L.π' (cj (star (dT k r)) g)
+  hπ' := isHCTypeW_cj (tor_dT k r) L.hz'.1 L.hπ'
+  c := -Complex.I * L.c
+  μW := L.μW.map (cjE (tor_dT k r).uni)
+  μW' := L.μW'.map (cjE (tor_dT k r).uni)
+  hμW :=
+    isHaarOn_cj _
+      (fun _ => cj_mem_UW (tor_dT k r) L.hz.1)
+      (fun _ => cj_mem_UW (tor_dT k r).st L.hz.1)
+      L.hμW
+  hμW' :=
+    isHaarOn_cj _
+      (fun _ => cj_mem_UW (tor_dT k r) L.hz'.1)
+      (fun _ => cj_mem_UW (tor_dT k r).st L.hz'.1)
+      L.hμW'
+}
 
-def turnF (L : LocBessel k r) (f : Mx k r → (L.Wq →L[ℂ] L.Wp)) : Mx k r → ((turnL L).Wq →L[ℂ] (turnL L).Wp) :=
-  fun g => f (cj (star (dT k r)) g)
+def turnF (L : LocBessel k r) (f : Mx k r → (L.Wq →L[ℂ] L.Wp))
+    : Mx k r → ((turnL L).Wq →L[ℂ] (turnL L).Wp) := fun g =>
+  f (cj (star (dT k r)) g)
 
-theorem isKFinCoef_turn (L : LocBessel k r) {f : Mx k r → (L.Wq →L[ℂ] L.Wp)} (hf : IsKFinCoefH L.σ f) :
-    IsKFinCoefH (turnL L).σ (turnF L f) := by
+theorem isKFinCoef_turn
+    (L : LocBessel k r) {f : Mx k r → (L.Wq →L[ℂ] L.Wp)} (hf : IsKFinCoefH L.σ f)
+    : IsKFinCoefH (turnL L).σ (turnF L f) := by
   obtain ⟨P, Q, h1, h2, h3⟩ := hf
-  exact ⟨P, Q, fun w => isKFin_cj (tor_dT k r) (h1 w), fun w => isKFin_cj (tor_dT k r) (h2 w), fun g => h3 _⟩
+  exact ⟨
+    P,
+    Q,
+    fun w => isKFin_cj (tor_dT k r) (h1 w),
+    fun w => isKFin_cj (tor_dT k r) (h2 w),
+    fun g => h3 _
+  ⟩
 
 def cj4 (k r : ℕ) : PairSp k r ≃ᵐ PairSp k r :=
   ((cjE (tor_dT k r).uni).prodCongr (cjE (tor_dT k r).uni)).prodCongr
     ((cjE (tor_dT k r).uni).prodCongr (cjE (tor_dT k r).uni))
 
-theorem conj_four_apply (p : PairSp k r) : cj4 k r p =
-    ((cjE (tor_dT k r).uni p.1.1, cjE (tor_dT k r).uni p.1.2), (cjE (tor_dT k r).uni p.2.1, cjE (tor_dT k r).uni p.2.2)) :=
+theorem conj_four_apply (p : PairSp k r)
+    : cj4 k r p
+      = (
+        (cjE (tor_dT k r).uni p.1.1, cjE (tor_dT k r).uni p.1.2),
+        (cjE (tor_dT k r).uni p.2.1, cjE (tor_dT k r).uni p.2.2)
+      ) :=
   rfl
 
 theorem pairMeas_turn (L : LocBessel k r) : pairMeas (turnL L) = (pairMeas L).map (cj4 k r) := by
@@ -576,27 +667,33 @@ theorem pairMeas_turn (L : LocBessel k r) : pairMeas (turnL L) = (pairMeas L).ma
     Measure.map_prod_map _ _ (hm.prodMap hm) (hm.prodMap hm)]
   rfl
 
-theorem besselIntg_turn (L : LocBessel k r) (f : Mx k r → (L.Wq →L[ℂ] L.Wp)) (g : Mx k r) (p : PairSp k r) :
-    besselIntg (turnL L) (turnF L f) (cj (dT k r) g) (cj4 k r p) = besselIntg L f g p := by
+theorem besselIntg_turn
+    (L : LocBessel k r) (f : Mx k r → (L.Wq →L[ℂ] L.Wp)) (g : Mx k r) (p : PairSp k r)
+    : besselIntg (turnL L) (turnF L f) (cj (dT k r) g) (cj4 k r p) = besselIntg L f g p := by
   have h := (tor_dT k r).uni
   rw [conj_four_apply]
   unfold besselIntg turnF
   simp only [of_cjE]
-  rw [← cj_inv h, ← cj_inv h, ← cj_inv h, ← cj_mul h, ← cj_mul h, ← cj_mul h, ← cj_mul h, cj_star_cj h]
+  rw [← cj_inv h, ← cj_inv h, ← cj_inv h, ← cj_mul h, ← cj_mul h, ← cj_mul h, ← cj_mul h,
+    cj_star_cj h]
   show (psi k r L.z (-Complex.I * L.c) _ * star (psi k r L.z' (-Complex.I * L.c) _)) •
     (L.π (cj _ _)).comp ((f _).comp (L.π' (cj _ _))) = _
   rw [psi_cj L.hz.1, psi_cj L.hz'.1, cj_star_cj h, cj_star_cj h]
 
-theorem orbInt_turn (L : LocBessel k r) (f : Mx k r → (L.Wq →L[ℂ] L.Wp)) (g : Mx k r) (ν : Measure (PairSp k r)) :
-    OrbInt (turnL L) (turnF L f) (cj (dT k r) g) (ν.map (cj4 k r)) = OrbInt L f g ν := by
+theorem orbInt_turn
+    (L : LocBessel k r) (f : Mx k r → (L.Wq →L[ℂ] L.Wp)) (g : Mx k r) (ν : Measure (PairSp k r))
+    : OrbInt (turnL L) (turnF L f) (cj (dT k r) g) (ν.map (cj4 k r)) = OrbInt L f g ν := by
   unfold OrbInt
   rw [integral_map_equiv]
   simp only [besselIntg_turn]
   rfl
 
-theorem jNorm2_turn (L : LocBessel k r) (f : Mx k r → (L.Wq →L[ℂ] L.Wp))
-    (μsec : ℂ → Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ) : jNorm2 (turnL L) (turnF L f) μsec = jNorm2 L f μsec := by
-  have e : ∀ c μ, (turnL L).J (turnF L f) (bigCell k r c μ) = L.J f (bigCell k r c μ) := fun c μ => by
+theorem jNorm2_turn
+    (L : LocBessel k r) (f : Mx k r → (L.Wq →L[ℂ] L.Wp))
+    (μsec : ℂ → Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
+    : jNorm2 (turnL L) (turnF L f) μsec = jNorm2 L f μsec := by
+  have e
+      : ∀ c μ, (turnL L).J (turnF L f) (bigCell k r c μ) = L.J f (bigCell k r c μ) := fun c μ => by
     have := orbInt_turn L f (bigCell k r c μ) (pairMeas L)
     rw [← pairMeas_turn, cj_bigCell (tor_dT k r)] at this
     exact this
@@ -610,24 +707,26 @@ section Orb
 
 variable {k r : ℕ}
 
-theorem cj_mem_RStab {d : Fin (2 * r + k + 1) → ℂ} (h : Tor k r d) {g a : Mx k r} (ha : a ∈ RStab k r g) :
-    cj d a ∈ RStab k r (cj d g) := by
+theorem cj_mem_RStab
+    {d : Fin (2 * r + k + 1) → ℂ} (h : Tor k r d) {g a : Mx k r} (ha : a ∈ RStab k r g)
+    : cj d a ∈ RStab k r (cj d g) := by
   refine ⟨cj_mem_N h ha.1, ?_⟩
   rw [← cj_inv h.uni, ← cj_mul h.uni, ← cj_mul h.uni]
   exact cj_mem_N h ha.2
 
-theorem isRelStab_turn (L : LocBessel k r) {g : Mx k r} (hg : IsRelStab L g) :
-    IsRelStab (turnL L) (cj (dT k r) g) := by
+theorem isRelStab_turn (L : LocBessel k r) {g : Mx k r} (hg : IsRelStab L g)
+    : IsRelStab (turnL L) (cj (dT k r) g) := by
   intro a ha
   have h := tor_dT k r
   have h1 := cj_mem_RStab h.st ha
   rw [cj_star_cj h.uni] at h1
   have h2 := hg _ h1
-  rw [← psi_cj L.hz.1, ← psi_cj L.hz'.1, cj_mul h.uni, cj_mul h.uni, cj_cj_star h.uni, cj_inv h.uni] at h2
+  rw [← psi_cj L.hz.1, ← psi_cj L.hz'.1, cj_mul h.uni, cj_mul h.uni, cj_cj_star h.uni, cj_inv h.uni]
+    at h2
   exact h2
 
-theorem measurable_flag (z : Fin (2 * r + k + 1) → ℂ) (S : Finset (Fin (r + 1) × Fin (r + 1))) :
-    Measurable (fun x : Mt k r => fun q : S => flagMat k r z (Matrix.of x) q.1.1 q.1.2) := by
+theorem measurable_flag (z : Fin (2 * r + k + 1) → ℂ) (S : Finset (Fin (r + 1) × Fin (r + 1)))
+    : Measurable (fun x : Mt k r => fun q : S => flagMat k r z (Matrix.of x) q.1.1 q.1.2) := by
   refine Measurable.of_eval fun q => ?_
   unfold flagMat
   split_ifs
@@ -639,45 +738,62 @@ theorem measurable_flag (z : Fin (2 * r + k + 1) → ℂ) (S : Finset (Fin (r + 
 theorem mp_mul_unit {u : ℂ} (hu : ‖u‖ = 1) : MeasurePreserving (fun x : ℂ => u * x) volume volume :=
   (rotation ⟨u, by simpa [Submonoid.unitSphere] using hu⟩).measurePreserving
 
-theorem root_map_turn {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (S : Finset (Fin (r + 1) × Fin (r + 1)))
-    (μ : Measure (Mt k r)) (c : ENNReal)
-    (hμ : μ.map (fun x : Mt k r => fun q : S => flagMat k r z (Matrix.of x) q.1.1 q.1.2) = c • volume) :
-    (μ.map (cjE (tor_dT k r).uni)).map (fun x : Mt k r => fun q : S => flagMat k r z (Matrix.of x) q.1.1 q.1.2) =
-      c • volume := by
-  have hp : MeasurePreserving (fun (y : S → ℂ) (q : S) =>
-      (star ((-Complex.I) ^ (r - q.1.1.val)) * (-Complex.I) ^ (r - q.1.2.val)) * y q) volume volume :=
+theorem root_map_turn
+    {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z)
+    (S : Finset (Fin (r + 1) × Fin (r + 1))) (μ : Measure (Mt k r)) (c : ENNReal)
+    (hμ
+      : μ.map (fun x : Mt k r => fun q : S => flagMat k r z (Matrix.of x) q.1.1 q.1.2) = c • volume)
+    : (μ.map (cjE (tor_dT k r).uni)).map
+        (fun x : Mt k r => fun q : S => flagMat k r z (Matrix.of x) q.1.1 q.1.2)
+      = c • volume := by
+  have hp : MeasurePreserving
+      (fun (y : S → ℂ) (q : S) =>
+        (star ((-Complex.I) ^ (r - q.1.1.val)) * (-Complex.I) ^ (r - q.1.2.val)) * y q)
+      volume volume :=
     volume_preserving_pi fun q : S => mp_mul_unit (by simp)
-  have e : (fun x : Mt k r => fun q : S => flagMat k r z (Matrix.of x) q.1.1 q.1.2) ∘ cjE (tor_dT k r).uni =
-      (fun (y : S → ℂ) (q : S) => (star ((-Complex.I) ^ (r - q.1.1.val)) * (-Complex.I) ^ (r - q.1.2.val)) * y q) ∘
-        (fun x : Mt k r => fun q : S => flagMat k r z (Matrix.of x) q.1.1 q.1.2) := by
+  have e
+      : (fun x : Mt k r => fun q : S => flagMat k r z (Matrix.of x) q.1.1 q.1.2)
+          ∘ cjE (tor_dT k r).uni
+        = (fun (y : S → ℂ) (q : S) =>
+            (star ((-Complex.I) ^ (r - q.1.1.val)) * (-Complex.I) ^ (r - q.1.2.val)) * y q)
+          ∘ (fun x : Mt k r => fun q : S => flagMat k r z (Matrix.of x) q.1.1 q.1.2) := by
     funext x q
     exact flagMat_cj hz (Matrix.of x) _ _
   rw [Measure.map_map (measurable_flag z S) (cjE _).measurable, e,
-    ← Measure.map_map hp.measurable (measurable_flag z S), hμ, Measure.map_smul _ hp.measurable.aemeasurable, hp.map_eq]
+    ← Measure.map_map hp.measurable (measurable_flag z S), hμ,
+    Measure.map_smul _ hp.measurable.aemeasurable, hp.map_eq]
 
-theorem isRootMeas_turn (L : LocBessel k r) {p : Point ℂ (r + 1)} {g : Mx k r} {μ : Measure (Mt k r)}
-    (hμ : IsRootMeas L p g μ) :
-    IsRootMeas (turnL L) (turnP p) (cj (dT k r) g) (μ.map (cjE (tor_dT k r).uni)) := by
+theorem isRootMeas_turn
+    (L : LocBessel k r)
+    {p : Point ℂ (r + 1)} {g : Mx k r} {μ : Measure (Mt k r)} (hμ : IsRootMeas L p g μ)
+    : IsRootMeas (turnL L) (turnP p) (cj (dT k r) g) (μ.map (cjE (tor_dT k r).uni)) := by
   refine ⟨?_, ?_⟩
   · rw [MeasurableEquiv.map_apply]
-    exact measure_mono_null (t := {x | Matrix.of x ∉ RStab k r g}) (fun x hx hx' => hx (cj_mem_RStab (tor_dT k r) hx')) hμ.1
+    exact measure_mono_null (t := {x | Matrix.of x ∉ RStab k r g})
+      (fun x hx hx' => hx (cj_mem_RStab (tor_dT k r) hx'))
+      hμ.1
   · have hc : ‖(turnL L).c‖ = ‖L.c‖ := by
       show ‖-Complex.I * L.c‖ = _
       simp
-    have key : ∀ S : Finset (Fin (r + 1) × Fin (r + 1)), S = rootPat p →
-        (μ.map (cjE (tor_dT k r).uni)).map (fun x : Mt k r => fun q : S => flagMat k r L.z (Matrix.of x) q.1.1 q.1.2) =
-          ENNReal.ofReal ((‖L.c‖ / (2 * Real.pi)) ^ S.card) • volume := by
+    have key
+        : ∀ S : Finset (Fin (r + 1) × Fin (r + 1)),
+          S = rootPat p
+            → (μ.map (cjE (tor_dT k r).uni)).map
+                (fun x : Mt k r => fun q : S => flagMat k r L.z (Matrix.of x) q.1.1 q.1.2)
+              = ENNReal.ofReal ((‖L.c‖ / (2 * Real.pi)) ^ S.card) • volume := by
       rintro S rfl
       exact root_map_turn L.hz.1 _ _ _ hμ.2
     rw [hc]
     exact key _ (rootPat_turnP p)
 
-theorem isOrbQuot_turn (L : LocBessel k r) {g : Mx k r} {μ : Measure (Mt k r)} {ν : Measure (PairSp k r)}
-    (hν : IsOrbQuot L g μ ν) :
-    IsOrbQuot (turnL L) (cj (dT k r) g) (μ.map (cjE (tor_dT k r).uni)) (ν.map (cj4 k r)) := by
+theorem isOrbQuot_turn
+    (L : LocBessel k r)
+    {g : Mx k r} {μ : Measure (Mt k r)} {ν : Measure (PairSp k r)} (hν : IsOrbQuot L g μ ν)
+    : IsOrbQuot (turnL L) (cj (dT k r) g) (μ.map (cjE (tor_dT k r).uni)) (ν.map (cj4 k r)) := by
   intro f hf
   have h := (tor_dT k r).uni
-  rw [pairMeas_turn, lintegral_map_equiv, lintegral_map_equiv, hν (fun x => f (cj4 k r x)) (hf.comp (cj4 k r).measurable)]
+  rw [pairMeas_turn, lintegral_map_equiv, lintegral_map_equiv,
+    hν (fun x => f (cj4 k r x)) (hf.comp (cj4 k r).measurable)]
   refine lintegral_congr fun x => ?_
   rw [lintegral_map_equiv]
   refine lintegral_congr fun a => ?_
@@ -688,13 +804,22 @@ theorem isOrbQuot_turn (L : LocBessel k r) {g : Mx k r} {μ : Measure (Mt k r)} 
   rw [← cj_inv h, ← cj_mul h, ← cj_mul h, ← cj_mul h, ← cj_mul h]
   rfl
 
-theorem orbSqO_le_turn (L : LocBessel k r) (f : Mx k r → (L.Wq →L[ℂ] L.Wp)) (p : Point ℂ (r + 1)) :
-    Bridge.orbSqO L f p ≤ orbSq (turnL L) (turnF L f) (turnP p) := by
+theorem orbSqO_le_turn (L : LocBessel k r) (f : Mx k r → (L.Wq →L[ℂ] L.Wp)) (p : Point ℂ (r + 1))
+    : Bridge.orbSqO L f p ≤ orbSq (turnL L) (turnF L f) (turnP p) := by
   unfold Bridge.orbSqO orbSq
   refine iSup_le fun g => iSup_le fun μ => iSup_le fun ν => iSup_le fun hh => ?_
   obtain ⟨h1, h2, h3, h4⟩ := hh
-  refine le_iSup_of_le (cj (dT k r) g) (le_iSup_of_le (μ.map (cjE (tor_dT k r).uni)) (le_iSup_of_le (ν.map (cj4 k r))
-    (le_iSup_of_le ⟨⟨cj_mem_UH (tor_dT k r) h1.1, ?_⟩, isRelStab_turn L h2, isRootMeas_turn L h3, isOrbQuot_turn L h4⟩ ?_)))
+  refine le_iSup_of_le (cj (dT k r) g)
+    (le_iSup_of_le (μ.map (cjE (tor_dT k r).uni))
+      (le_iSup_of_le (ν.map (cj4 k r))
+        (le_iSup_of_le
+          ⟨
+            ⟨cj_mem_UH (tor_dT k r) h1.1, ?_⟩,
+            isRelStab_turn L h2,
+            isRootMeas_turn L h3,
+            isOrbQuot_turn L h4
+          ⟩
+          ?_)))
   · ext a b
     rw [ptMat_turnP, ← h1.2]
     exact Zhat_cj L.hz.1 L.hz'.1 g a b
@@ -703,39 +828,56 @@ theorem orbSqO_le_turn (L : LocBessel k r) (f : Mx k r → (L.Wq →L[ℂ] L.Wp)
 
 end Orb
 
-theorem gap_near {n : ℕ} {ε : Fin n → Bool} {lam lam0 : Fin n → ℝ} {x y δ : ℝ} (h : GapAtLeast ε lam0 x)
-    (hd : l1dist lam lam0 ≤ δ) (hy : y + 2 * δ ≤ x) : GapAtLeast ε lam y := by
+theorem gap_near
+    {n : ℕ} {ε : Fin n → Bool} {lam lam0 : Fin n → ℝ} {x y δ : ℝ}
+    (h : GapAtLeast ε lam0 x) (hd : l1dist lam lam0 ≤ δ) (hy : y + 2 * δ ≤ x)
+    : GapAtLeast ε lam y := by
   intro a b hab
   have h1 := h a b hab
   have h2 : ∀ s, |lam s - lam0 s| ≤ δ := fun s =>
-    (Finset.single_le_sum (f := fun s => |lam s - lam0 s|) (fun _ _ => abs_nonneg _) (Finset.mem_univ s)).trans hd
+    (Finset.single_le_sum
+      (f := fun s => |lam s - lam0 s|)
+      (fun _ _ => abs_nonneg _)
+      (Finset.mem_univ s)).trans hd
   have h3 : |lam0 a - lam0 b| ≤ |lam a - lam b| + |lam a - lam0 a| + |lam b - lam0 b| := by
     have e : lam0 a - lam0 b = (lam a - lam b) - (lam a - lam0 a) + (lam b - lam0 b) := by ring
     rw [e]
     exact (abs_add_le _ _).trans (add_le_add (abs_sub _ _) le_rfl)
   linarith [h2 a, h2 b]
 
-theorem size_le (k r : ℕ) : (k : ℝ) * ((2 * r + 2 : ℕ) : ℝ) ^ 3 ≤ ((2 * r + 2 : ℕ) : ℝ) ^ ((9 : ℝ) / 2) *
-    (((3 * (r + 1) : ℕ) : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2 + ((2 * r + k + 1 : ℕ) : ℝ) ^ 3) := by
+theorem size_le (k r : ℕ)
+    : (k : ℝ) * ((2 * r + 2 : ℕ) : ℝ) ^ 3
+      ≤ ((2 * r + 2 : ℕ) : ℝ) ^ ((9 : ℝ) / 2)
+        * (((3 * (r + 1) : ℕ) : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2
+          + ((2 * r + k + 1 : ℕ) : ℝ) ^ 3) := by
   have h1 : (1 : ℝ) ≤ ((2 * r + 2 : ℕ) : ℝ) := by exact_mod_cast (by omega : 1 ≤ 2 * r + 2)
   have h2 : ((2 * r + 2 : ℕ) : ℝ) ^ 3 ≤ ((2 * r + 2 : ℕ) : ℝ) ^ ((9 : ℝ) / 2) := by
     rw [← Real.rpow_natCast]
     exact Real.rpow_le_rpow_of_exponent_le h1 (by norm_num)
-  have h3 : k ≤ (2 * r + k + 1) ^ 3 := (by omega : k ≤ 2 * r + k + 1).trans (Nat.le_self_pow (by norm_num) _)
+  have h3 : k ≤ (2 * r + k + 1) ^ 3 :=
+    (by omega : k ≤ 2 * r + k + 1).trans (Nat.le_self_pow (by norm_num) _)
   have h4 : (k : ℝ) ≤ ((2 * r + k + 1 : ℕ) : ℝ) ^ 3 := by exact_mod_cast h3
   rw [mul_comm]
-  refine mul_le_mul h2 (h4.trans (le_add_of_nonneg_left (by positivity))) (by positivity) (by positivity)
+  refine mul_le_mul h2 (h4.trans (le_add_of_nonneg_left (by positivity))) (by positivity)
+    (by positivity)
 
-theorem max_inv_scale {s B G : ℝ} (hB : 1 ≤ B) (hs : 0 < s) (hsB : s⁻¹ ≤ B) :
-    max 1 (1 / (s * G)) ≤ B * max 1 (1 / G) := by
+theorem max_inv_scale {s B G : ℝ} (hB : 1 ≤ B) (hs : 0 < s) (hsB : s⁻¹ ≤ B)
+    : max 1 (1 / (s * G)) ≤ B * max 1 (1 / G) := by
   have h1 : 1 ≤ max 1 (1 / G) := le_max_left _ _
   refine max_le (by nlinarith) ?_
   rw [one_div, mul_inv, ← one_div G]
-  calc s⁻¹ * (1 / G) ≤ s⁻¹ * max 1 (1 / G) := mul_le_mul_of_nonneg_left (le_max_right _ _) (inv_pos.2 hs).le
+  calc
+    s⁻¹ * (1 / G)
+      ≤ s⁻¹ * max 1 (1 / G) := mul_le_mul_of_nonneg_left (le_max_right _ _) (inv_pos.2 hs).le
     _ ≤ _ := mul_le_mul_of_nonneg_right hsB (by linarith)
 
-theorem frameChange_of_frames : ∀ Ch Cgf Cf : ℝ, 0 ≤ Ch → 0 ≤ Cf → ∃ Cf' : ℝ, 0 ≤ Cf' ∧ ∀ Cn : ℝ, ∃ Cs₀ : ℝ,
-    ∀ Cs ≥ Cs₀, ∀ D : D7, OnePlaceEstimates.FrameBesselBound D Cgf Cf → Bridge.FrameChange D Ch Cs Cn Cf' := by
+theorem frameChange_of_frames
+    : ∀ Ch Cgf Cf : ℝ,
+      0 ≤ Ch → 0 ≤ Cf
+        → ∃ Cf' : ℝ,
+          0 ≤ Cf'
+            ∧ ∀ Cn : ℝ, ∃ Cs₀ : ℝ, ∀ Cs ≥ Cs₀, ∀ D : D7,
+              OnePlaceEstimates.FrameBesselBound D Cgf Cf → Bridge.FrameChange D Ch Cs Cn Cf' := by
   intro Ch Cgf Cf hCh hCf
   refine ⟨2 * Ch * Cf + Ch, by positivity, fun Cn => ⟨Cgf + 2 * |Cn|, fun Cs hCs D hFr => ?_⟩⟩
   intro L lam0 f ka b hb hka hka1 hka2 hc hκ hε hκ0 hStd hl1 hf
@@ -747,30 +889,49 @@ theorem frameChange_of_frames : ∀ Ch Cgf Cf : ℝ, 0 ≤ Ch → 0 ≤ Cf → �
   rw [hm] at hl1 ⊢
   have hb1 : 1 ≤ b := (Real.one_le_exp zero_le_one).trans hb
   have hb0 : 0 < b := by linarith
-  have hgap : GapAtLeast L.ε L.lam (Cgf * ((2 * D.R.rS + 2 : ℕ) : ℝ) ^ ((9 : ℝ) / 2) *
-      (((3 * (D.R.rS + 1) : ℕ) : ℝ) * ((2 * D.R.rS + D.R.k + 1 : ℕ) : ℝ) ^ 2 +
-        ((2 * D.R.rS + D.R.k + 1 : ℕ) : ℝ) ^ 3)) := by
+  have hgap : GapAtLeast L.ε L.lam
+      (Cgf * ((2 * D.R.rS + 2 : ℕ) : ℝ) ^ ((9 : ℝ) / 2)
+        * (((3 * (D.R.rS + 1) : ℕ) : ℝ) * ((2 * D.R.rS + D.R.k + 1 : ℕ) : ℝ) ^ 2
+          + ((2 * D.R.rS + D.R.k + 1 : ℕ) : ℝ) ^ 3)) := by
     refine gap_near hStd.2.2.2.2.2.2.2.2.2.2.2.2.2.2.1 hl1 ?_
     have h1 := size_le D.R.k D.R.rS
     have h0 : 0 ≤ (D.R.k : ℝ) * ((2 * D.R.rS + 2 : ℕ) : ℝ) ^ 3 := by positivity
     rw [mul_assoc Cgf, mul_assoc Cs, mul_assoc Cn]
     generalize (D.R.k : ℝ) * ((2 * D.R.rS + 2 : ℕ) : ℝ) ^ 3 = Y at h1 h0 ⊢
-    generalize ((2 * D.R.rS + 2 : ℕ) : ℝ) ^ ((9 : ℝ) / 2) *
-      (((3 * (D.R.rS + 1) : ℕ) : ℝ) * ((2 * D.R.rS + D.R.k + 1 : ℕ) : ℝ) ^ 2 +
-        ((2 * D.R.rS + D.R.k + 1 : ℕ) : ℝ) ^ 3) = X at h1 ⊢
+    generalize ((2 * D.R.rS + 2 : ℕ) : ℝ) ^ ((9 : ℝ) / 2)
+          * (((3 * (D.R.rS + 1) : ℕ) : ℝ) * ((2 * D.R.rS + D.R.k + 1 : ℕ) : ℝ) ^ 2
+            + ((2 * D.R.rS + D.R.k + 1 : ℕ) : ℝ) ^ 3)
+        = X
+      at h1 ⊢
     have h2 : Cn * Y ≤ |Cn| * X :=
-      (mul_le_mul_of_nonneg_right (le_abs_self Cn) h0).trans (mul_le_mul_of_nonneg_left h1 (abs_nonneg _))
+      (mul_le_mul_of_nonneg_right (le_abs_self Cn) h0).trans
+        (mul_le_mul_of_nonneg_left h1 (abs_nonneg _))
     have h3 : (Cgf + 2 * |Cn|) * X ≤ Cs * X := mul_le_mul_of_nonneg_right hCs (h0.trans h1)
     linarith
   have hc' : (turnL L).c = cOfDpsi (ka : ℂ) := by
     show -Complex.I * L.c = _
-    rw [hc, cOfDpsi]; push_cast; ring
+    rw [hc, cOfDpsi]
+    push_cast
+    ring
   obtain ⟨L₁, f₁, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, hsec⟩ :=
-    hFr (turnL L) (turnF L f) ka ka⁻¹ (ka ^ D.R.rS) hka (inv_pos.2 hka) (pow_pos hka _) hc' hκ0 hκ hε hgap
-      (isKFinCoef_turn L hf)
+    hFr (turnL L) (turnF L f) ka ka⁻¹ (ka ^ D.R.rS) hka (inv_pos.2 hka) (pow_pos hka _) hc' hκ0 hκ
+      hε hgap (isKFinCoef_turn L hf)
   have eT : ∀ T : ℝ, (ka ^ D.R.rS) ^ 2 * T = T * ka ^ (2 * D.R.rS) := fun T => by ring
-  refine ⟨L₁, f₁, e1, e2, e3, e4, by rw [e5, inv_mul_cancel₀ hka.ne'], e6, e7, e8.trans (eT _), e9.trans (eT _), e10,
-    fun μsec hμ => ?_⟩
+  refine ⟨
+    L₁,
+    f₁,
+    e1,
+    e2,
+    e3,
+    e4,
+    by rw [e5, inv_mul_cancel₀ hka.ne'],
+    e6,
+    e7,
+    e8.trans (eT _),
+    e9.trans (eT _),
+    e10,
+    fun μsec hμ => ?_
+  ⟩
   obtain ⟨μsec₁, hμ₁, K₁, hK, hj, hpt⟩ := hsec μsec hμ
   rw [jNorm2_turn] at hj
   refine ⟨μsec₁, hμ₁, K₁, hK, hj.le, fun h0 => ?_, fun p hp => ?_⟩
@@ -782,8 +943,11 @@ theorem frameChange_of_frames : ∀ Ch Cgf Cf : ℝ, 0 ≤ Ch → 0 ≤ Cf → �
   set M : ℝ := ((2 * D.R.rS + 2 : ℕ) : ℝ) with hM
   have hrM : (D.R.rS : ℝ) ≤ M := by rw [hM]; exact_mod_cast (by omega : D.R.rS ≤ 2 * D.R.rS + 2)
   have hM0 : 0 ≤ M := by positivity
-  have hs : ka⁻¹ ^ (2 * D.R.rS * (D.R.rS + 1)) * (ka ^ D.R.rS) ^ (4 * (D.R.rS + 1)) = ka ^ (2 * D.R.rS * (D.R.rS + 1)) := by
-    have : D.R.rS * (4 * (D.R.rS + 1)) = 2 * D.R.rS * (D.R.rS + 1) + 2 * D.R.rS * (D.R.rS + 1) := by ring
+  have hs
+      : ka⁻¹ ^ (2 * D.R.rS * (D.R.rS + 1)) * (ka ^ D.R.rS) ^ (4 * (D.R.rS + 1))
+        = ka ^ (2 * D.R.rS * (D.R.rS + 1)) := by
+    have : D.R.rS * (4 * (D.R.rS + 1)) = 2 * D.R.rS * (D.R.rS + 1) + 2 * D.R.rS * (D.R.rS + 1) := by
+      ring
     rw [← pow_mul, this, pow_add, ← mul_assoc, ← mul_pow, inv_mul_cancel₀ hka.ne', one_pow, one_mul]
   rw [hs] at hG
   have hpw : ∀ {x : ℝ} (n : ℕ), 0 ≤ x → x ≤ b ^ Ch → x ^ n ≤ b ^ (Ch * n) := fun n h0 h1 => by
@@ -804,19 +968,23 @@ theorem frameChange_of_frames : ∀ Ch Cgf Cf : ℝ, 0 ≤ Ch → 0 ≤ Cf → �
   · have h1 : max ka⁻¹ ka⁻¹⁻¹ ≤ b ^ Ch := max_le hka2 (by rwa [inv_inv])
     have h2 : max (ka ^ D.R.rS) (ka ^ D.R.rS)⁻¹ ≤ b ^ (Ch * D.R.rS) :=
       max_le (hpw _ hka.le hka1) (by rw [← inv_pow]; exact hpw _ (inv_pos.2 hka).le hka2)
-    have h3 : max ka⁻¹ ka⁻¹⁻¹ ^ (Cf * M ^ 2) * max (ka ^ D.R.rS) (ka ^ D.R.rS)⁻¹ ^ (Cf * M) ≤ b ^ ((2 * Ch * Cf + Ch) * M ^ 2) := by
-      calc _ ≤ (b ^ Ch) ^ (Cf * M ^ 2) * (b ^ (Ch * D.R.rS)) ^ (Cf * M) :=
-            mul_le_mul (Real.rpow_le_rpow (le_max_of_le_left (inv_pos.2 hka).le) h1 (by positivity))
-              (Real.rpow_le_rpow (le_max_of_le_left (pow_pos hka _).le) h2 (by positivity))
-              (Real.rpow_nonneg (le_max_of_le_left (pow_pos hka _).le) _) (by positivity)
+    have h3
+        : max ka⁻¹ ka⁻¹⁻¹ ^ (Cf * M ^ 2) * max (ka ^ D.R.rS) (ka ^ D.R.rS)⁻¹ ^ (Cf * M)
+          ≤ b ^ ((2 * Ch * Cf + Ch) * M ^ 2) := by
+      calc
+        _ ≤ (b ^ Ch) ^ (Cf * M ^ 2) * (b ^ (Ch * D.R.rS)) ^ (Cf * M) :=
+          mul_le_mul (Real.rpow_le_rpow (le_max_of_le_left (inv_pos.2 hka).le) h1 (by positivity))
+            (Real.rpow_le_rpow (le_max_of_le_left (pow_pos hka _).le) h2 (by positivity))
+            (Real.rpow_nonneg (le_max_of_le_left (pow_pos hka _).le) _) (by positivity)
         _ = b ^ (Ch * (Cf * M ^ 2) + Ch * D.R.rS * (Cf * M)) := by
-            rw [← Real.rpow_mul hb0.le, ← Real.rpow_mul hb0.le, ← Real.rpow_add hb0]
+          rw [← Real.rpow_mul hb0.le, ← Real.rpow_mul hb0.le, ← Real.rpow_add hb0]
         _ ≤ _ := by
-            refine Real.rpow_le_rpow_of_exponent_le hb1 ?_
-            have h4 := mul_le_mul_of_nonneg_left hrM (mul_nonneg hCC hM0)
-            have h5 : 0 ≤ Ch * M ^ 2 := by positivity
-            nlinarith
-    rw [ENNReal.ofReal_mul hK.le, ENNReal.ofReal_mul (Real.rpow_nonneg hb0.le _), mul_assoc, mul_assoc]
+          refine Real.rpow_le_rpow_of_exponent_le hb1 ?_
+          have h4 := mul_le_mul_of_nonneg_left hrM (mul_nonneg hCC hM0)
+          have h5 : 0 ≤ Ch * M ^ 2 := by positivity
+          nlinarith
+    rw [ENNReal.ofReal_mul hK.le, ENNReal.ofReal_mul (Real.rpow_nonneg hb0.le _), mul_assoc,
+      mul_assoc]
     refine le_trans ?_ (hw.trans (mul_le_mul_left (ENNReal.ofReal_le_ofReal h3) _))
     exact mul_le_mul_right (mul_le_mul_right (orbSqO_le_turn L f p) _) _
 

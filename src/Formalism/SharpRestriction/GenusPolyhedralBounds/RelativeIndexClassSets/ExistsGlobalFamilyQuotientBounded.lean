@@ -12,9 +12,12 @@ namespace Formalism.MainNotions.Gaps.EtaleWeightGaps
 
 section LinAlgQ
 
-theorem exists_den {R K V : Type*} [CommRing R] [IsDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
-    [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V] (M : Submodule R V)
-    (hM : Submodule.span K (M : Set V) = ⊤) (v : V) : ∃ s ∈ nonZeroDivisors R, s • v ∈ M := by
+theorem exists_den
+    {R K V : Type*} [CommRing R] [IsDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+    [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
+    (M : Submodule R V) (hM : Submodule.span K (M : Set V) = ⊤)
+    (v : V)
+    : ∃ s ∈ nonZeroDivisors R, s • v ∈ M := by
   have hv : v ∈ Submodule.span K (M : Set V) := by rw [hM]; trivial
   induction hv using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_mem _, by rwa [one_smul]⟩
@@ -33,16 +36,19 @@ theorem exists_den {R K V : Type*} [CommRing R] [IsDomain R] [Field K] [Algebra 
     have hd0 : algebraMap R K d ≠ 0 :=
       (map_ne_zero_iff _ (IsFractionRing.injective R K)).mpr (nonZeroDivisors.ne_zero hd)
     have h1 : (d * s) • ((algebraMap R K n / algebraMap R K d) • x) = n • (s • x) := by
-      rw [← algebraMap_smul K (d * s), ← algebraMap_smul K n, ← algebraMap_smul K s, smul_smul, smul_smul, map_mul]
+      rw [← algebraMap_smul K (d * s), ← algebraMap_smul K n, ← algebraMap_smul K s, smul_smul,
+        smul_smul, map_mul]
       congr 1
       field_simp
     rw [h1]
     exact M.smul_mem _ hsx
 
-theorem finrank_quot_eq {R K V : Type*} [CommRing R] [IsDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
-    [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V] (M : Submodule R V)
-    (hM : Submodule.span K (M : Set V) = ⊤) (W : Submodule K V) :
-    finrank R (M ⧸ (W.restrictScalars R).comap M.subtype) = finrank K (V ⧸ W) := by
+theorem finrank_quot_eq
+    {R K V : Type*} [CommRing R] [IsDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+    [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
+    (M : Submodule R V) (hM : Submodule.span K (M : Set V) = ⊤)
+    (W : Submodule K V)
+    : finrank R (M ⧸ (W.restrictScalars R).comap M.subtype) = finrank K (V ⧸ W) := by
   let g : M →ₗ[R] (V ⧸ W) := (W.mkQ.restrictScalars R).comp M.subtype
   have hker : LinearMap.ker g = (W.restrictScalars R).comap M.subtype := by
     ext x
@@ -70,11 +76,15 @@ theorem finrank_quot_eq {R K V : Type*} [CommRing R] [IsDomain R] [Field K] [Alg
       obtain ⟨s, hs, hsv⟩ := exists_den (K := K) M hM v
       refine ⟨(Submodule.Quotient.mk ⟨s • v, hsv⟩, ⟨s, hs⟩), ?_⟩
       rfl
-  rw [IsLocalization.finrank_eq K (nonZeroDivisors R) le_rfl, IsLocalizedModule.finrank_eq (nonZeroDivisors R) f le_rfl]
+  rw [IsLocalization.finrank_eq K (nonZeroDivisors R) le_rfl,
+    IsLocalizedModule.finrank_eq (nonZeroDivisors R) f le_rfl]
 
-theorem exists_sub_basis {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
-    (Sh : Finset V) (hS : Submodule.span K (Sh : Set V) = ⊤) (W : Submodule K V) :
-    ∃ e : Fin (finrank K (V ⧸ W)) → V, (∀ i, e i ∈ Sh) ∧ Submodule.span K (Set.range e) ⊔ W = ⊤ := by
+theorem exists_sub_basis
+    {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
+    (Sh : Finset V) (hS : Submodule.span K (Sh : Set V) = ⊤)
+    (W : Submodule K V)
+    : ∃ e : Fin (finrank K (V ⧸ W)) → V,
+      (∀ i, e i ∈ Sh) ∧ Submodule.span K (Set.range e) ⊔ W = ⊤ := by
   classical
   obtain ⟨b, hb, hspan, hli⟩ := exists_linearIndependent K (W.mkQ '' (Sh : Set V))
   have htop : Submodule.span K b = ⊤ := by
@@ -95,29 +105,44 @@ end LinAlgQ
 
 variable {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ}
 
-theorem rhoP_eq_finrank (B : WeightFamilies.Prov D) (CR T c : ℝ) (j : ℕ) (ka : WeightFamilies.Wt D j)
-    (hM : Submodule.span B.KO (B.Mlat j ka : Set (B.Cusp j ka)) = ⊤) :
-    WeightFamilies.rhoP B CR T c j ka = finrank B.KO (B.Cusp j ka ⧸ WeightFamilies.MggK B CR T c j ka) :=
+theorem rhoP_eq_finrank
+    (B : WeightFamilies.Prov D)
+    (CR T c : ℝ)
+    (j : ℕ) (ka : WeightFamilies.Wt D j)
+    (hM : Submodule.span B.KO (B.Mlat j ka : Set (B.Cusp j ka)) = ⊤)
+    : WeightFamilies.rhoP B CR T c j ka
+      = finrank B.KO (B.Cusp j ka ⧸ WeightFamilies.MggK B CR T c j ka) :=
   finrank_quot_eq (B.Mlat j ka) hM (WeightFamilies.MggK B CR T c j ka)
 
-theorem exists_global_family_quotient_bounded {X : PJ D B P j} {ka wL wF : WeightFamilies.Wt D j} (G0 : GlobalFamilyData X ka wL wF) (large₂ : SizeData₂ D) (S : Scal B)
-    (CRm : ℝ) (T : ℕ) (c be Ch Ah : ℝ)
-    (hS4 : ShortG X ka (X.Thc S.sK ka) be)
-    (hM : X.Thc S.sK ka ≤ B.Mlat j ka)
-    (hbe : be ≤ WeightFamilies.PPv D large₂ Ch Ah * ka.size) :
-    ∃ th : Fin (WeightFamilies.rhoP B CRm T c j ka) → B.Mlat j ka,
-      ({ G0 with rq := WeightFamilies.rhoP B CRm T c j ka, th := th } : GlobalFamilyData X ka wL wF).TiedQ large₂ S CRm T c Ch Ah := by
+theorem exists_global_family_quotient_bounded
+    {X : PJ D B P j} {ka wL wF : WeightFamilies.Wt D j} (G0 : GlobalFamilyData X ka wL wF)
+    (large₂ : SizeData₂ D)
+    (S : Scal B)
+    (CRm : ℝ) (T : ℕ)
+    (c be Ch Ah : ℝ) (hS4 : ShortG X ka (X.Thc S.sK ka) be)
+    (hM : X.Thc S.sK ka ≤ B.Mlat j ka) (hbe : be ≤ WeightFamilies.PPv D large₂ Ch Ah * ka.size)
+    : ∃ th : Fin (WeightFamilies.rhoP B CRm T c j ka) → B.Mlat j ka,
+      ({ G0 with rq := WeightFamilies.rhoP B CRm T c j ka, th := th }
+        : GlobalFamilyData X ka wL wF).TiedQ large₂ S CRm T c Ch Ah := by
   obtain ⟨Sh, hSh, hspan, hshort⟩ := hS4
   have hMtop : Submodule.span B.KO (B.Mlat j ka : Set (B.Cusp j ka)) = ⊤ :=
     top_le_iff.mp (hspan ▸ Submodule.span_mono fun x hx => hM (hSh hx))
   have hex := exists_sub_basis Sh hspan (WeightFamilies.MggK B CRm T c j ka)
   rw [← rhoP_eq_finrank B CRm T c j ka hMtop] at hex
   obtain ⟨e, he, hsup⟩ := hex
-  exact ⟨fun i => ⟨e i, hM (hSh (he i))⟩, rfl, fun i => hSh (he i), hsup, fun i => (hshort _ (he i)).trans hbe⟩
+  exact ⟨
+    fun i => ⟨e i, hM (hSh (he i))⟩,
+    rfl,
+    fun i => hSh (he i),
+    hsup,
+    fun i => (hshort _ (he i)).trans hbe
+  ⟩
 
 section Unchanged
 
-variable {X : PJ D B P j} {ka wL wF : WeightFamilies.Wt D j} (G0 : GlobalFamilyData X ka wL wF) (rq : ℕ) (th : Fin rq → B.Mlat j ka)
+variable
+  {X : PJ D B P j} {ka wL wF : WeightFamilies.Wt D j} (G0 : GlobalFamilyData X ka wL wF)
+  (rq : ℕ) (th : Fin rq → B.Mlat j ka)
 
 variable {G0} {la : HeightOneSpectrum (𝓞 B.KO)} (Q : LocalPointData G0 la)
 

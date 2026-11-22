@@ -10,9 +10,12 @@ open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.
 
 namespace GlobalTheory.InertiaPowers
 
-theorem cycMod_Ine_surjective (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω]
-    [IsAlgClosure ℚ Ω] (A : ValuationSubring Ω) (hA : A.valuation (l : Ω) < 1) (n : ℕ) :
-    Function.Surjective ((cycMod ℚ Ω l n).comp (Ine (F := ℚ) A).subtype) := by
+theorem cycMod_Ine_surjective
+    (l : ℕ) [Fact l.Prime]
+    (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    (A : ValuationSubring Ω) (hA : A.valuation (l : Ω) < 1)
+    (n : ℕ)
+    : Function.Surjective ((cycMod ℚ Ω l n).comp (Ine (F := ℚ) A).subtype) := by
   intro u
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · haveI : Subsingleton (ZMod (l ^ 0)) := by rw [pow_zero]; infer_instance

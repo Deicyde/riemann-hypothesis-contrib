@@ -61,14 +61,16 @@ private lemma aux (f : ℝ → ℂ) (hc : Continuous f)
   rw [Complex.exp_neg] at hcst
   exact (mul_inv_eq_one₀ (Complex.exp_ne_zero _)).mp hcst
 
-theorem goal1 :
-  ∀ (f : Real → Complex),
-  Continuous.{0, 0} f →
-    (∀ (s t : Real), Eq.{1} (f (HAdd.hAdd.{0, 0, 0} s t)) (HMul.hMul.{0, 0, 0} (f s) (f t))) →
-      (∀ (s : Real), Eq.{1} (Norm.norm.{0} (f s)) 1) →
-        Exists.{1} fun (b : Real) ↦
+theorem goal1
+    : ∀ (f : Real → Complex),
+      Continuous.{0, 0} f
+        → (∀ (s t : Real), Eq.{1} (f (HAdd.hAdd.{0, 0, 0} s t)) (HMul.hMul.{0, 0, 0} (f s) (f t)))
+        → (∀ (s : Real), Eq.{1} (Norm.norm.{0} (f s)) 1)
+        → Exists.{1} fun (b : Real) ↦
           ∀ (s : Real),
-            Eq.{1} (f s) (Complex.exp (HMul.hMul.{0, 0, 0} (Complex.ofReal (HMul.hMul.{0, 0, 0} b s)) Complex.I)) := by
+            Eq.{1} (f s)
+              (Complex.exp (HMul.hMul.{0, 0, 0} (Complex.ofReal (HMul.hMul.{0, 0, 0} b s))
+                Complex.I)) := by
   intro f hc hm hn
   obtain ⟨a, ha⟩ := aux f hc hm hn
   have hre : a.re = 0 := by

@@ -6,24 +6,25 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConvEqOneOfF
 
 @[expose] public section
 
-open CategoryTheory Coalgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.HTPair
+open CategoryTheory Coalgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup
+  GlobalTheory.HTPair
 open scoped TensorProduct
 
 noncomputable section
 
 namespace GlobalTheory.ConstFibreFree
 
-theorem finrank_tensor_tower (O k K M : Type) [CommRing O] [Field k] [Field K] [Algebra O k]
-    [Algebra O K] [Algebra k K] [IsScalarTower O k K] [AddCommGroup M] [Module O M]
-    [Module.Finite O M] :
-    Module.finrank K (K ⊗[O] M) = Module.finrank k (k ⊗[O] M) := by
+theorem finrank_tensor_tower
+    (O k K M : Type) [CommRing O] [Field k] [Field K] [Algebra O k] [Algebra O K] [Algebra k K]
+    [IsScalarTower O k K] [AddCommGroup M] [Module O M] [Module.Finite O M]
+    : Module.finrank K (K ⊗[O] M) = Module.finrank k (k ⊗[O] M) := by
   rw [← (TensorProduct.AlgebraTensorModule.cancelBaseChange O k K K M).finrank_eq]
   exact Module.finrank_baseChange
 
-theorem fibreDim_closedPoint (O M : Type) [CommRing O] [IsLocalRing O] [AddCommGroup M]
-    [Module O M] [Module.Finite O M] :
-    fibreDim M (IsLocalRing.closedPoint O) =
-      Module.finrank (IsLocalRing.ResidueField O) (IsLocalRing.ResidueField O ⊗[O] M) := by
+theorem fibreDim_closedPoint
+    (O M : Type) [CommRing O] [IsLocalRing O] [AddCommGroup M] [Module O M] [Module.Finite O M]
+    : fibreDim M (IsLocalRing.closedPoint O)
+      = Module.finrank (IsLocalRing.ResidueField O) (IsLocalRing.ResidueField O ⊗[O] M) := by
   let q := IsLocalRing.closedPoint O
   let φ : IsLocalRing.ResidueField O →+* q.asIdeal.ResidueField :=
     Ideal.Quotient.lift _ (algebraMap O q.asIdeal.ResidueField) fun a ha => by
@@ -33,8 +34,10 @@ theorem fibreDim_closedPoint (O M : Type) [CommRing O] [IsLocalRing O] [AddCommG
     IsScalarTower.of_algebraMap_eq fun a => (Ideal.Quotient.lift_mk _ _ _).symm
   exact finrank_tensor_tower O _ _ M
 
-theorem exists_one_tmul (O M : Type) [CommRing O] [IsLocalRing O] [AddCommGroup M] [Module O M]
-    (y : IsLocalRing.ResidueField O ⊗[O] M) : ∃ m : M, (1 : IsLocalRing.ResidueField O) ⊗ₜ[O] m = y := by
+theorem exists_one_tmul
+    (O M : Type) [CommRing O] [IsLocalRing O] [AddCommGroup M] [Module O M]
+    (y : IsLocalRing.ResidueField O ⊗[O] M)
+    : ∃ m : M, (1 : IsLocalRing.ResidueField O) ⊗ₜ[O] m = y := by
   induction y using TensorProduct.induction_on with
   | zero => exact ⟨0, TensorProduct.tmul_zero _ _⟩
   | tmul c m =>
@@ -47,12 +50,13 @@ theorem exists_one_tmul (O M : Type) [CommRing O] [IsLocalRing O] [AddCommGroup 
     obtain ⟨m₂, h₂⟩ := hz
     exact ⟨m₁ + m₂, by rw [TensorProduct.tmul_add, h₁, h₂]⟩
 
-theorem nonempty_equiv_fin (O : Type) [CommRing O] [IsDomain O] [IsLocalRing O] (M : Type)
-    [AddCommGroup M] [Module O M] [Module.Finite O M] (n : ℕ)
-    (h : ∀ q : PrimeSpectrum O, fibreDim M q = n) : Nonempty (M ≃ₗ[O] (Fin n → O)) := by
+theorem nonempty_equiv_fin
+    (O : Type) [CommRing O] [IsDomain O] [IsLocalRing O]
+    (M : Type) [AddCommGroup M] [Module O M] [Module.Finite O M]
+    (n : ℕ) (h : ∀ q : PrimeSpectrum O, fibreDim M q = n)
+    : Nonempty (M ≃ₗ[O] (Fin n → O)) := by
   let k := IsLocalRing.ResidueField O
-  have hk : Module.finrank k (k ⊗[O] M) = n :=
-    (fibreDim_closedPoint O M).symm.trans (h _)
+  have hk : Module.finrank k (k ⊗[O] M) = n := (fibreDim_closedPoint O M).symm.trans (h _)
   let b : Module.Basis (Fin n) k (k ⊗[O] M) := Module.finBasisOfFinrankEq k _ hk
   choose f hf using fun i => exists_one_tmul O M (b i)
   let g : (Fin n → O) →ₗ[O] M := Fintype.linearCombination O f
@@ -82,10 +86,11 @@ theorem nonempty_equiv_fin (O : Type) [CommRing O] [IsDomain O] [IsLocalRing O] 
     exact hO (by simpa using h4)
   exact ⟨(LinearEquiv.ofBijective g ⟨hinj, hg⟩).symm⟩
 
-theorem projective_and_rankAtStalk_of_fibreDim :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsLocalRing O] (M : Type) [AddCommGroup M] [Module O M]
-      [Module.Finite O M] (n : ℕ), (∀ q : PrimeSpectrum O, fibreDim M q = n) →
-      Module.Projective O M ∧ ∀ q : PrimeSpectrum O, Module.rankAtStalk M q = n := by
+theorem projective_and_rankAtStalk_of_fibreDim
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsLocalRing O] (M : Type) [AddCommGroup M]
+        [Module O M] [Module.Finite O M] (n : ℕ),
+      (∀ q : PrimeSpectrum O, fibreDim M q = n)
+        → Module.Projective O M ∧ ∀ q : PrimeSpectrum O, Module.rankAtStalk M q = n := by
   intro O _ _ _ M _ _ _ n h
   obtain ⟨e⟩ := nonempty_equiv_fin O M n h
   haveI : Module.Free O M := Module.Free.of_equiv e.symm

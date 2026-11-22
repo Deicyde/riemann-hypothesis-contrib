@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LocalCompone
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -64,20 +65,24 @@ def finPtHom : UE E n →* finU (E := E) (n := n) where
 
 theorem finPtHom_apply (γ : UE E n) : finPtHom γ = finPt γ := rfl
 
-theorem wAt_mul (lam : InfinitePlace E → DomWeight n) (a b : UE E n) :
-    GlobalTheory.BCT.TrKer.wAt lam (a * b) = GlobalTheory.BCT.TrKer.wAt lam a ∘ₗ GlobalTheory.BCT.TrKer.wAt lam b := by
+theorem wAt_mul (lam : InfinitePlace E → DomWeight n) (a b : UE E n)
+    : GlobalTheory.BCT.TrKer.wAt lam (a * b)
+      = GlobalTheory.BCT.TrKer.wAt lam a ∘ₗ GlobalTheory.BCT.TrKer.wAt lam b := by
   unfold GlobalTheory.BCT.TrKer.wAt
   rw [← PiTensorProduct.map_comp]
   refine congrArg PiTensorProduct.map (funext fun v => ?_)
-  change GlobalTheory.Branching.sqRep ℂ n (lam v) (GeneralLinearGroup.map v.embedding (a.1 * b.1)) = _
+  change GlobalTheory.Branching.sqRep ℂ n (lam v) (GeneralLinearGroup.map v.embedding (a.1 * b.1))
+    = _
   rw [map_mul, map_mul, Module.End.mul_eq_comp]
 
-theorem wAt_one (lam : InfinitePlace E → DomWeight n) : GlobalTheory.BCT.TrKer.wAt lam 1 = LinearMap.id := by
+theorem wAt_one (lam : InfinitePlace E → DomWeight n)
+    : GlobalTheory.BCT.TrKer.wAt lam 1 = LinearMap.id := by
   unfold GlobalTheory.BCT.TrKer.wAt
   simp only [OneMemClass.coe_one, map_one]
   exact PiTensorProduct.map_id
 
-def wDual (lam : InfinitePlace E → DomWeight n) : Representation ℂ (UE E n) (Module.Dual ℂ (GlobalTheory.BCT.TrKer.Wsp lam)) where
+def wDual (lam : InfinitePlace E → DomWeight n)
+    : Representation ℂ (UE E n) (Module.Dual ℂ (GlobalTheory.BCT.TrKer.Wsp lam)) where
   toFun γ := (GlobalTheory.BCT.TrKer.wAt lam γ⁻¹).dualMap
   map_one' := by
     rw [inv_one, wAt_one]

@@ -14,9 +14,12 @@ open Polynomial
 namespace GlobalTheory
 open GroundTheory.FunctionField GroundTheory.Arith.SchemeCoh KaehlerDifferential
 
-theorem ringKrullDim_eq_one_of_isDedekindDomain_of_not_isField (A : Type) [CommRing A] [IsDedekindDomain A] (h : ¬ IsField A) : ringKrullDim A = 1 := by
+theorem ringKrullDim_eq_one_of_isDedekindDomain_of_not_isField
+    (A : Type) [CommRing A] [IsDedekindDomain A] (h : ¬ IsField A)
+    : ringKrullDim A = 1 := by
   have hle : ringKrullDim A ≤ 1 := Ring.krullDimLE_iff.mp (inferInstance : Ring.KrullDimLE 1 A)
-  have h0 : ringKrullDim A ≠ 0 := fun h0 => h (by
+  have h0 : ringKrullDim A ≠ 0 := fun h0 =>
+    h (by
       have : Ring.KrullDimLE 0 A := by
         rw [Ring.krullDimLE_iff, h0]
         rfl
@@ -31,8 +34,9 @@ theorem ringKrullDim_eq_one_of_isDedekindDomain_of_not_isField (A : Type) [CommR
     rw [le_antisymm h1 (Order.one_le_iff_ne_zero.mpr h2)]
     rfl
 
-theorem exists_aeval_finite_of_ringKrullDim_eq_one : ∀ (k A : Type) [Field k] [CommRing A] [IsDomain A] [Algebra k A] [Algebra.FiniteType k A],
-    ringKrullDim A = 1 → ∃ t : A, (Polynomial.aeval (R := k) t).Finite := by
+theorem exists_aeval_finite_of_ringKrullDim_eq_one
+    : ∀ (k A : Type) [Field k] [CommRing A] [IsDomain A] [Algebra k A] [Algebra.FiniteType k A],
+      ringKrullDim A = 1 → ∃ t : A, (Polynomial.aeval (R := k) t).Finite := by
   intro k A _ _ _ _ _ hdim
   obtain ⟨s, g, hg, hfin⟩ := exists_finite_inj_algHom_of_fg k A
   have hs : ringKrullDim A = s := by
@@ -60,10 +64,13 @@ theorem exists_aeval_finite_of_ringKrullDim_eq_one : ∀ (k A : Type) [Field k] 
   rw [hcomp]
   exact RingHom.Finite.comp hfin (RingHom.Finite.of_surjective _ he)
 
-theorem aeval_injective_of_finite_of_not_isField : ∀ (k A : Type) [Field k] [CommRing A] [IsDomain A] [Algebra k A] (y : A),
-    (Polynomial.aeval (R := k) y).Finite → ¬ IsField A → Function.Injective (Polynomial.aeval (R := k) y) := by
+theorem aeval_injective_of_finite_of_not_isField
+    : ∀ (k A : Type) [Field k] [CommRing A] [IsDomain A] [Algebra k A] (y : A),
+      (Polynomial.aeval (R := k) y).Finite → ¬ IsField A
+        → Function.Injective (Polynomial.aeval (R := k) y) := by
   intro k A _ _ _ _ y hy hA
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   by_contra hne
   push_neg at hne
   obtain ⟨p, hp, hp0⟩ := hne
@@ -90,11 +97,14 @@ theorem aeval_injective_of_finite_of_not_isField : ∀ (k A : Type) [Field k] [C
       rw [e]
       exact hf
     exact isIntegral_trans x hxB
-  exact hA ((Algebra.IsIntegral.isField_iff_isField (algebraMap k A).injective).1 (Field.toIsField k))
+  exact hA ((Algebra.IsIntegral.isField_iff_isField (algebraMap k A).injective).1
+    (Field.toIsField k))
 
-theorem exists_D_algebraMap_fractionRing_ne_zero : ∀ (k A : Type) [Field k] [CommRing A] [IsDomain A] [Algebra k A]
-    [IsFunctionField k (FractionRing A)],
-    ∃ a : A, D k (FractionRing A) (algebraMap A (FractionRing A) a) ≠ 0 := by
+theorem exists_D_algebraMap_fractionRing_ne_zero
+    : ∀ (k A : Type) [Field k] [CommRing A] [IsDomain A] [Algebra k A]
+        [IsFunctionField k (FractionRing A)],
+      ∃ a : A,
+        D k (FractionRing A) (algebraMap A (FractionRing A) a) ≠ 0 := by
   intro k A _ _ _ _ _
   have hnt := kaehlerDifferential_nontrivial (k := k) (K := FractionRing A)
   by_contra h
@@ -112,12 +122,14 @@ theorem exists_D_algebraMap_fractionRing_ne_zero : ∀ (k A : Type) [Field k] [C
   have hmem : ω ∈ (⊥ : Submodule (FractionRing A) Ω[FractionRing A⁄k]) := htop ▸ Submodule.mem_top
   exact hω ((Submodule.mem_bot _).1 hmem)
 
-theorem isFunctionField_fractionRing_of_ringKrullDim_eq_one (k A : Type) [Field k] [CommRing A]
-    [IsDomain A] [Algebra k A] [Algebra.FiniteType k A] (hR : ringKrullDim A = 1) :
-    IsFunctionField k (FractionRing A) := by
+theorem isFunctionField_fractionRing_of_ringKrullDim_eq_one
+    (k A : Type) [Field k] [CommRing A] [IsDomain A] [Algebra k A] [Algebra.FiniteType k A]
+    (hR : ringKrullDim A = 1)
+    : IsFunctionField k (FractionRing A) := by
   have htrA : Algebra.trdeg k A = 1 := by
     obtain ⟨s, g, hg, hfin⟩ := exists_finite_inj_algHom_of_fg k A
-    have hs := GroundTheory.Arith.Abelian.Jacobian.ringKrullDim_eq_of_normalization k g hg hfin.to_isIntegral
+    have hs :=
+      GroundTheory.Arith.Abelian.Jacobian.ringKrullDim_eq_of_normalization k g hg hfin.to_isIntegral
     rw [hR] at hs
     have hs1 : s = 1 := by exact_mod_cast hs.symm
     subst hs1
@@ -128,8 +140,8 @@ theorem isFunctionField_fractionRing_of_ringKrullDim_eq_one (k A : Type) [Field 
       (faithfulSMul_iff_algebraMap_injective _ _).2 (IsFractionRing.injective A _)
     have : Algebra.IsAlgebraic A (FractionRing A) :=
       IsLocalization.isAlgebraic (FractionRing A) (nonZeroDivisors A)
-    rw [← trdeg_add_eq k A (A := FractionRing A), htrA, trdeg_eq_zero (R := A) (A := FractionRing A),
-      add_zero]
+    rw [← trdeg_add_eq k A (A := FractionRing A), htrA,
+      trdeg_eq_zero (R := A) (A := FractionRing A), add_zero]
   have : Algebra.Transcendental k (FractionRing A) := by
     rw [← trdeg_ne_zero_iff, htr]
     exact one_ne_zero
@@ -148,23 +160,40 @@ theorem isFunctionField_fractionRing_of_ringKrullDim_eq_one (k A : Type) [Field 
     Algebra.EssFiniteType.of_comp k _ (FractionRing A)
   exact Algebra.finite_of_essFiniteType_of_isAlgebraic
 
-theorem exists_separable_normalisation_reduced_fibres : ∀ (k A : Type) [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A] [Algebra.FiniteType k A], ¬ IsField A → ∃ y : A, (Polynomial.aeval (R := k) y).Finite ∧ ∃ δ : k[X], δ ≠ 0 ∧ ∀ α : k, δ.eval α ≠ 0 → ∀ Q : Ideal A, Q.IsMaximal → y - algebraMap k A α ∉ Q ^ 2 := by
+theorem exists_separable_normalisation_reduced_fibres
+    : ∀ (k A : Type) [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A]
+        [Algebra.FiniteType k A],
+      ¬ IsField A
+        → ∃ y : A,
+          (Polynomial.aeval (R := k) y).Finite
+            ∧ ∃ δ : k[X],
+              δ ≠ 0
+                ∧ ∀ α : k,
+                  δ.eval α ≠ 0 → ∀ Q : Ideal A, Q.IsMaximal → y - algebraMap k A α ∉ Q ^ 2 := by
   intro k A _ _ _ _ _ _ hA
   have hdim : ringKrullDim A = 1 := ringKrullDim_eq_one_of_isDedekindDomain_of_not_isField A hA
   haveI : IsFunctionField k (FractionRing A) :=
     isFunctionField_fractionRing_of_ringKrullDim_eq_one k A hdim
   obtain ⟨t, ht⟩ := exists_aeval_finite_of_ringKrullDim_eq_one k A hdim
   obtain ⟨a, ha⟩ := exists_D_algebraMap_fractionRing_ne_zero k A
-  have key : ∃ y : A, (Polynomial.aeval (R := k) y).Finite ∧
-      D k (FractionRing A) (algebraMap A (FractionRing A) y) ≠ 0 := by
+  have key
+      : ∃ y : A,
+        (Polynomial.aeval (R := k) y).Finite
+          ∧ D k (FractionRing A) (algebraMap A (FractionRing A) y) ≠ 0 := by
     by_cases hD : D k (FractionRing A) (algebraMap A (FractionRing A) t) = 0
     · obtain ⟨M, hM⟩ := GlobalTheory.T.noether_normalization_finite_aeval_pow_add k A t a ht
       refine ⟨t ^ M + a, hM, ?_⟩
-      rw [map_add (f := _), map_pow, map_add (f := _), Derivation.leibniz_pow, hD, smul_zero, smul_zero, zero_add]
+      rw [map_add (f := _), map_pow, map_add (f := _), Derivation.leibniz_pow, hD, smul_zero,
+        smul_zero, zero_add]
       exact ha
     · exact ⟨t, ht, hD⟩
   obtain ⟨y, hy, hDy⟩ := key
   haveI := isSeparable_of_D_ne_zero hDy
-  exact ⟨y, hy, GlobalTheory.T.reduced_fibres_almost_all_of_separable_dedekind_curve k A y hy (aeval_injective_of_finite_of_not_isField k A y hy hA) this⟩
+  exact ⟨
+    y,
+    hy,
+    GlobalTheory.T.reduced_fibres_almost_all_of_separable_dedekind_curve k A y hy
+      (aeval_injective_of_finite_of_not_isField k A y hy hA) this
+  ⟩
 
 end GlobalTheory

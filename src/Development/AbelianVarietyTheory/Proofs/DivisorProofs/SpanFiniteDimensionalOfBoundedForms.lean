@@ -8,9 +8,10 @@ open Topology Filter
 
 namespace GlobalTheory
 
-theorem span_finiteDimensional_of_bounded_forms {V : Type} [AddCommGroup V] [Module ℂ V]
-    (s : Set V) (hs : ∀ l : V →ₗ[ℂ] ℂ, ∃ C : ℝ, ∀ x ∈ s, ‖l x‖ ≤ C) :
-    FiniteDimensional ℂ (Submodule.span ℂ s) := by
+theorem span_finiteDimensional_of_bounded_forms
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (s : Set V) (hs : ∀ l : V →ₗ[ℂ] ℂ, ∃ C : ℝ, ∀ x ∈ s, ‖l x‖ ≤ C)
+    : FiniteDimensional ℂ (Submodule.span ℂ s) := by
   classical
   obtain ⟨t, hts, hspan, hli⟩ := exists_linearIndependent ℂ s
   have ht : t.Finite := by
@@ -24,8 +25,7 @@ theorem span_finiteDimensional_of_bounded_forms {V : Type} [AddCommGroup V] [Mod
     obtain ⟨C, hC⟩ := hs (b.constr ℂ v)
     have key : ∀ k : ℕ, b.constr ℂ v ((e k : t) : V) = (k : ℂ) := by
       intro k
-      have hmem : ((e k : t) : V) ∈ hli'.extend (Set.subset_univ t) :=
-        hli'.subset_extend _ (e k).2
+      have hmem : ((e k : t) : V) ∈ hli'.extend (Set.subset_univ t) := hli'.subset_extend _ (e k).2
       have hb : b ⟨_, hmem⟩ = ((e k : t) : V) := by simp [b, Module.Basis.coe_extend]
       rw [← hb, Module.Basis.constr_basis]
       have h : ∃ j : ℕ, ((e j : t) : V) = ((⟨_, hmem⟩ : hli'.extend (Set.subset_univ t)) : V) :=

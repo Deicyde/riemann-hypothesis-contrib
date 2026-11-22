@@ -28,13 +28,15 @@ theorem identTwo : IdentTwo := by
   have hfc : Continuous f := by
     have h1 : Continuous fun z : H => z⁻¹ * s * z := by fun_prop
     have h2 : Continuous fun z : H => z⁻¹ * h := by fun_prop
-    exact (hφc.comp h1).mul (Complex.continuous_ofReal.comp (hBc.comp ((hc.comp h1).prodMk (hc.comp h2))))
+    exact (hφc.comp h1).mul
+      (Complex.continuous_ofReal.comp (hBc.comp ((hc.comp h1).prodMk (hc.comp h2))))
   obtain ⟨K, hK, hKp⟩ := hB.proper (tsupport φ) {h⁻¹ * s * h} hφs isCompact_singleton
   have hfs : HasCompactSupport f := by
     refine HasCompactSupport.intro (hK.image (f := fun k => h * k⁻¹) (by fun_prop)) fun z hz => ?_
     by_contra hne
     apply hz
-    have hne' : φ (z⁻¹ * s * z) * (B (matCoord ι (z⁻¹ * s * z), matCoord ι (z⁻¹ * h)) : ℂ) ≠ 0 := hne
+    have hne' : φ (z⁻¹ * s * z) * (B (matCoord ι (z⁻¹ * s * z), matCoord ι (z⁻¹ * h)) : ℂ) ≠ 0 :=
+      hne
     have m1 : z⁻¹ * s * z ∈ tsupport φ := subset_tsupport _ (left_ne_zero_of_mul hne')
     have m2 : B (matCoord ι (z⁻¹ * s * z), matCoord ι (z⁻¹ * h)) ≠ 0 := by
       intro h0; apply hne'; rw [h0]; simp
@@ -51,10 +53,16 @@ theorem identTwo : IdentTwo := by
       intro t
       have hts := mem_cent.1 t.2
       have : (t : H)⁻¹ * s * t = s := by rw [mul_assoc, ← hts, inv_mul_cancel_left]
-      calc ((t : H) * x)⁻¹ * s * ((t : H) * x) = x⁻¹ * ((t : H)⁻¹ * s * t) * x := by group
+      calc
+        ((t : H) * x)⁻¹ * s * ((t : H) * x)
+          = x⁻¹ * ((t : H)⁻¹ * s * t) * x := by group
         _ = x⁻¹ * s * x := by rw [this]
-    have e2 : ∀ t : cent s, f (t * x) = φ (x⁻¹ * s * x) *
-        (B (matCoord ι s, matCoord ι ((((⟨t₀, ht₀⟩ : cent s)⁻¹ * t : cent s) : H)⁻¹)) : ℂ) := by
+    have e2
+        : ∀ t : cent s,
+          f (t * x)
+            = φ (x⁻¹ * s * x)
+              * (B (matCoord ι s, matCoord ι ((((⟨t₀, ht₀⟩ : cent s)⁻¹ * t : cent s) : H)⁻¹))
+                : ℂ) := by
       intro t
       have hs' := hsh (t : H)⁻¹ (inv_mem t.2)
       simp only [inv_one, one_mul, mul_one] at hs'
@@ -65,8 +73,10 @@ theorem identTwo : IdentTwo := by
     simp_rw [e2]
     rw [integral_const_mul]
     congr 1
-    exact integral_mul_left_eq_self (fun t : cent s => (B (matCoord ι s, matCoord ι ((t : H))⁻¹) : ℂ)) _
-  have hfun : (fun x => ∫ t : cent s, f (t * x) ∂dt) = fun x => conjFn s φ x * κ := funext fun x => hfib x
+    exact
+      integral_mul_left_eq_self (fun t : cent s => (B (matCoord ι s, matCoord ι ((t : H))⁻¹) : ℂ)) _
+  have hfun : (fun x => ∫ t : cent s, f (t * x) ∂dt) = fun x => conjFn s φ x * κ :=
+    funext fun x => hfib x
   show ∫ k, F k ∂μ = 0
   rw [hsub, ← hW, hfun]
   have h0 := hO.2

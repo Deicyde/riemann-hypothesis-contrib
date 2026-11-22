@@ -21,12 +21,16 @@ variable {n : ℕ}
 abbrev Ix (n : ℕ) := Bool × Fin n × Fin n
 
 def hm (p : Ix n) : Mat n :=
-  if p.1 then Matrix.single p.2.1 p.2.2 1 + Matrix.single p.2.2 p.2.1 1
-  else Matrix.single p.2.1 p.2.2 Complex.I - Matrix.single p.2.2 p.2.1 Complex.I
+  if p.1 then
+    Matrix.single p.2.1 p.2.2 1 + Matrix.single p.2.2 p.2.1 1
+  else
+    Matrix.single p.2.1 p.2.2 Complex.I - Matrix.single p.2.2 p.2.1 Complex.I
 
 def sk (p : Ix n) : Mat n :=
-  if p.1 then Matrix.single p.2.1 p.2.2 1 - Matrix.single p.2.2 p.2.1 1
-  else Matrix.single p.2.1 p.2.2 Complex.I + Matrix.single p.2.2 p.2.1 Complex.I
+  if p.1 then
+    Matrix.single p.2.1 p.2.2 1 - Matrix.single p.2.2 p.2.1 1
+  else
+    Matrix.single p.2.1 p.2.2 Complex.I + Matrix.single p.2.2 p.2.1 Complex.I
 
 section Calc
 

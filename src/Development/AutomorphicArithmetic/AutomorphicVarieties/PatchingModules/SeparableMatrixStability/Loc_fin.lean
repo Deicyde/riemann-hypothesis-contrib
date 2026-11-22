@@ -9,10 +9,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa
 
-theorem UpperTheory.V.Pa.loc_fin :
-    ∀ (l : ℕ) [Fact l.Prime] (Y : Type) [Group Y] [TopologicalSpace Y] [IsTopologicalGroup Y] [CompactSpace Y] [TotallyDisconnectedSpace Y] (H : Subgroup Y) [H.Normal], IsOpen (H : Set Y) → PhiCond Y l → ∃ (P : Subgroup Y) (_ : P.Normal), TopFG (Y ⧸ P) ∧ ∀ (Z : Type) [Group Z] [TopologicalSpace Z] [IsTopologicalGroup Z] [CompactSpace Z] [TotallyDisconnectedSpace Z] (f : Y →* Z) (H' : Subgroup Z), Continuous f → PL l H' = ⊥ → H ≤ H'.comap f → P ≤ f.ker := by
+theorem UpperTheory.V.Pa.loc_fin
+    : ∀ (l : ℕ) [Fact l.Prime] (Y : Type) [Group Y] [TopologicalSpace Y] [IsTopologicalGroup Y]
+        [CompactSpace Y] [TotallyDisconnectedSpace Y] (H : Subgroup Y) [H.Normal],
+      IsOpen (H : Set Y) → PhiCond Y l
+        → ∃ (P : Subgroup Y) (_ : P.Normal),
+          TopFG (Y ⧸ P)
+            ∧ ∀ (Z : Type) [Group Z] [TopologicalSpace Z] [IsTopologicalGroup Z] [CompactSpace Z]
+                [TotallyDisconnectedSpace Z] (f : Y →* Z) (H' : Subgroup Z),
+              Continuous f → PL l H' = ⊥ → H ≤ H'.comap f → P ≤ f.ker := by
   intro l _ Y _ _ _ _ _ H _ hH hphi
   obtain ⟨hPn, hPc, hPH, -, -, -⟩ := pl_props l Y H hH
   refine ⟨PL l H, hPn, ?_, ?_⟩
@@ -42,14 +50,16 @@ theorem UpperTheory.V.Pa.loc_fin :
     have hmem : f g ∈ PL l H' := by
       simp only [PL, Subgroup.mem_iInf] at hg ⊢
       intro U hU
-      let V : OpenNormalSubgroup Y :=
-        { toOpenSubgroup := U.toOpenSubgroup.comap f hf
-          isNormal' := Subgroup.Normal.comap U.isNormal' f }
+      let V : OpenNormalSubgroup Y := {
+        toOpenSubgroup := U.toOpenSubgroup.comap f hf
+        isNormal' := Subgroup.Normal.comap U.isNormal' f
+      }
       have hV : ∀ y : Y, y ∈ V ↔ f y ∈ U := fun y => Iff.rfl
-      have := hg V (by
-        intro h hh
-        obtain ⟨e, he⟩ := hU (f h) (hle hh)
-        exact ⟨e, (hV _).mpr (by simpa using he)⟩)
+      have :=
+        hg V (by
+          intro h hh
+          obtain ⟨e, he⟩ := hU (f h) (hle hh)
+          exact ⟨e, (hV _).mpr (by simpa using he)⟩)
       exact (hV g).mp this
     rw [hPL] at hmem
     exact (Subgroup.mem_bot).mp hmem

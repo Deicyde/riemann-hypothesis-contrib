@@ -9,7 +9,8 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing Polynomial Matrix UpperTheory.V UpperTheory.V.HV UpperTheory.V.Alg GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  Polynomial Matrix UpperTheory.V UpperTheory.V.HV UpperTheory.V.Alg GlobalTheory.GalOfCusp
 
 namespace UpperTheory.V.Th.Det
 
@@ -70,14 +71,25 @@ private lemma charpoly_pow {K : Type} [Field K] {n : ℕ} (M : Matrix (Fin n) (F
 
 end UpperTheory.V.Th.Det
 
-theorem UpperTheory.V.Th.Det.n3small :
-    ∀ {l : ℕ} [Fact l.Prime] {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G] [TotallyDisconnectedSpace G] {n : ℕ}, n ≤ 3 → ∀ (G' : Subgroup G) (ρ : G →* GL (Fin n) (Qbar l)), Continuous ρ → (∀ U : Subgroup G, IsOpen (U : Set G) → U3.MatIrr (U ⊓ G') (W.mat ρ)) → (∃ u ∈ G', ∃ α : Fin n → (Qbar l)ˣ, Pr.FreeRatios α ∧ (W.mat ρ u).charpoly = ∏ i, (X - C ((α i : (Qbar l)ˣ) : Qbar l))) → ∀ U : Set G, IsOpen U → (U ∩ (G' : Set G)).Nonempty → ∃ σ ∈ U ∩ (G' : Set G), (W.mat ρ σ).charpoly.Separable := by
+theorem UpperTheory.V.Th.Det.n3small
+    : ∀ {l : ℕ} [Fact l.Prime] {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+        [CompactSpace G] [TotallyDisconnectedSpace G] {n : ℕ},
+      n ≤ 3
+        → ∀ (G' : Subgroup G) (ρ : G →* GL (Fin n) (Qbar l)),
+          Continuous ρ → (∀ U : Subgroup G, IsOpen (U : Set G) → U3.MatIrr (U ⊓ G') (W.mat ρ))
+            → (∃ u ∈ G', ∃ α : Fin n → (Qbar l)ˣ,
+              Pr.FreeRatios α ∧ (W.mat ρ u).charpoly = ∏ i, (X - C ((α i : (Qbar l)ˣ) : Qbar l)))
+            → ∀ U : Set G,
+              IsOpen U → (U ∩ (G' : Set G)).Nonempty
+                → ∃ σ ∈ U ∩ (G' : Set G), (W.mat ρ σ).charpoly.Separable := by
   intro l _ G _ _ _ _ _ n hn G' ρ hρ hirr ⟨u, hu, α, hα, hch⟩ U hU hne
   have hc : Pr.LinClosed (Pr.gm ρ) := by
     intro f
     have h1 : Continuous (Pr.gm ρ) := Units.continuous_val.comp hρ
     have h2 : Continuous fun g => f (Pr.gm ρ g) := by
-      have e : (fun g => f (Pr.gm ρ g)) = fun g => ∑ i, ∑ j, Pr.gm ρ g i j * f (Matrix.single i j 1) := by
+      have e
+          : (fun g => f (Pr.gm ρ g))
+            = fun g => ∑ i, ∑ j, Pr.gm ρ g i j * f (Matrix.single i j 1) := by
         funext g
         conv_lhs => rw [Matrix.matrix_eq_sum_single (Pr.gm ρ g)]
         set_option synthInstance.maxHeartbeats 100000 in
@@ -92,7 +104,8 @@ theorem UpperTheory.V.Th.Det.n3small :
   intro V hV
   haveI : Finite (G ⧸ V) := Subgroup.quotient_finite_of_isOpen V hV
   haveI : V.FiniteIndex := Subgroup.finiteIndex_of_finite_quotient
-  obtain ⟨d, hd, -, hdV⟩ := Subgroup.exists_pow_mem_of_index_ne_zero (Subgroup.FiniteIndex.index_ne_zero (H := V)) u
+  obtain ⟨d, hd, -, hdV⟩ :=
+    Subgroup.exists_pow_mem_of_index_ne_zero (Subgroup.FiniteIndex.index_ne_zero (H := V)) u
   refine ⟨u ^ d, ⟨hdV, G'.pow_mem hu d⟩, fun i => α i ^ d, ?_, ?_⟩
   · intro i j hij m hm
     simp only [← pow_mul]

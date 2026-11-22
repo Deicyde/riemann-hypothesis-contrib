@@ -9,8 +9,10 @@ noncomputable section
 
 open scoped Classical
 open Module Matrix
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full Formalism.FourierDecayAlt
-  Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.NGCut Formalism.L2.SG.TermOp
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full
+  Formalism.FourierDecayAlt Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.NGCut
+  Formalism.L2.SG.TermOp
 
 set_option linter.dupNamespace false
 set_option maxHeartbeats 1600000
@@ -21,31 +23,38 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7} {X : HidaSetting D} (Y : Full X) {u u' : D.what₂.Word}
 
-theorem Hp_eq_Hsp (t : TauC Y u u') (Λ : Submodule (𝓞 D.host.E) (VS D).V) (hΛ : Submodule.IsFullLattice D.host.E Λ)
-    (hL : IsLift Λ (lf D (X.Fu u))) (hL' : IsLift Λ t.frame) :
-    Hp Λ (lf D (X.Fu u)) t.frame = Hsp (X.Fu u) t.frame.fl := by
+theorem Hp_eq_Hsp
+    (t : TauC Y u u') (Λ : Submodule (𝓞 D.host.E) (VS D).V)
+    (hΛ : Submodule.IsFullLattice D.host.E Λ) (hL : IsLift Λ (lf D (X.Fu u)))
+    (hL' : IsLift Λ t.frame)
+    : Hp Λ (lf D (X.Fu u)) t.frame = Hsp (X.Fu u) t.frame.fl := by
   unfold Hp Hsp
   rw [UUE_eq_Asp Λ (by first | exact hΛ | exact hΛ.toIsLattice) _ _ hL hL']
 
-theorem lemmaG3_of_inputs (hT : 3 ≤ Tu D u) (hT' : 3 ≤ Tu D u') (t0 t1 t2 : TauC Y u u') (h0 : Gt t0 ≠ 0) (h1 : Gt t1 ≠ 0)
-    (h2 : Gt t2 ≠ 0) (hR1 : RelC Y u u' t0 t1) (hR2 : RelC Y u u' t0 t2) (hG1 : t1.G = t0.G) (hG2 : t2.G = t0.G)
-    (σ s' : (VS D).V ≃ₗ[D.host.E] (VS D).V) (hσ : σ ∈ SRat (lf D (X.Fu u))) (hs' : s' ∈ SRat (lf D (X.Fu u')))
-    (he : t2.lin = σ * t1.lin * s') (ha : coefA Y u u' t0 t1 = coefA Y u u' t0 t2)
-    (ha' : coefA' Y u u' t0 t1 = coefA' Y u u' t0 t2) :
-    σ (omp (X.Fu u) t1.frame.fl) - omp (X.Fu u) t1.frame.fl ∈ (X.Fu u).X ∧
-    (t1.lin * s'⁻¹ * t1.lin⁻¹) (omp t1.frame.fl (X.Fu u)) - omp t1.frame.fl (X.Fu u) ∈ t1.frame.fl.X ∧
-    ∀ w ∈ Hsp (X.Fu u) t1.frame.fl, ∃ w0 ∈ Hsp (X.Fu u) t1.frame.fl,
-      σ w - w0 ∈ (X.Fu u).X ∧ (t1.lin * s'⁻¹ * t1.lin⁻¹) w - w0 ∈ t1.frame.fl.X := by
-  have line_occ (t0 t : TauC Y u u') (h0 : Gt t0 ≠ 0) (h : Gt t ≠ 0) (hR : RelC Y u u' t0 t) (hG : t.G = t0.G)
-      (hT : 3 ≤ Tu D u) (hT' : 3 ≤ Tu D u') :
-      (yT Y u u' t - coefA Y u u' t0 t • yT Y u u' t0 ∈ (X.Fu u).X ∧
-        coefA Y u u' t0 t * star (coefA Y u u' t0 t) = 1) ∧
-      (yT' Y u u' t - coefA' Y u u' t0 t • yT' Y u u' t0 ∈ (X.Fu u').X ∧
-        coefA' Y u u' t0 t * star (coefA' Y u u' t0 t) = 1) := by
+theorem lemmaG3_of_inputs
+    (hT : 3 ≤ Tu D u) (hT' : 3 ≤ Tu D u')
+    (t0 t1 t2 : TauC Y u u') (h0 : Gt t0 ≠ 0) (h1 : Gt t1 ≠ 0) (h2 : Gt t2 ≠ 0)
+    (hR1 : RelC Y u u' t0 t1) (hR2 : RelC Y u u' t0 t2) (hG1 : t1.G = t0.G) (hG2 : t2.G = t0.G)
+    (σ s' : (VS D).V ≃ₗ[D.host.E] (VS D).V) (hσ : σ ∈ SRat (lf D (X.Fu u)))
+    (hs' : s' ∈ SRat (lf D (X.Fu u'))) (he : t2.lin = σ * t1.lin * s')
+    (ha : coefA Y u u' t0 t1 = coefA Y u u' t0 t2) (ha' : coefA' Y u u' t0 t1 = coefA' Y u u' t0 t2)
+    : σ (omp (X.Fu u) t1.frame.fl) - omp (X.Fu u) t1.frame.fl ∈ (X.Fu u).X
+      ∧ (t1.lin * s'⁻¹ * t1.lin⁻¹) (omp t1.frame.fl (X.Fu u)) - omp t1.frame.fl (X.Fu u)
+        ∈ t1.frame.fl.X
+      ∧ ∀ w ∈ Hsp (X.Fu u) t1.frame.fl, ∃ w0 ∈ Hsp (X.Fu u) t1.frame.fl,
+        σ w - w0 ∈ (X.Fu u).X ∧ (t1.lin * s'⁻¹ * t1.lin⁻¹) w - w0 ∈ t1.frame.fl.X := by
+  have line_occ
+      (t0 t : TauC Y u u') (h0 : Gt t0 ≠ 0) (h : Gt t ≠ 0) (hR : RelC Y u u' t0 t) (hG : t.G = t0.G)
+      (hT : 3 ≤ Tu D u) (hT' : 3 ≤ Tu D u')
+      : (yT Y u u' t - coefA Y u u' t0 t • yT Y u u' t0 ∈ (X.Fu u).X
+          ∧ coefA Y u u' t0 t * star (coefA Y u u' t0 t) = 1)
+        ∧ (yT' Y u u' t - coefA' Y u u' t0 t • yT' Y u u' t0 ∈ (X.Fu u').X
+          ∧ coefA' Y u u' t0 t * star (coefA' Y u u' t0 t) = 1) := by
     have hdim := Formalism.L2.SG.Corank.finrank_VS D
     obtain ⟨hrow, hs0⟩ := hR
     have hlam : t.lam = t0.lam := congrArg (fun r => (r.1 : Submodule (𝓞 D.host.E) (VS D).V)) hrow
-    have hlam' : t.lam' = t0.lam' := congrArg (fun r => (r.2.1 : Submodule (𝓞 D.host.E) (VS D).V)) hrow
+    have hlam' : t.lam' = t0.lam' :=
+      congrArg (fun r => (r.2.1 : Submodule (𝓞 D.host.E) (VS D).V)) hrow
     have hlat : Submodule.IsFullLattice D.host.E t0.lam := ((Y.rowsOK u).1 t0.lam t0.mem).1.1
     have hLF : IsLift t0.lam (lf D (X.Fu u)) := ((Y.rowsOK u).1 t0.lam t0.mem).2.1.2.2.1
     have hL1 : IsLift t0.lam t0.frame := t0.rep.2.2.2.2.1
@@ -55,7 +64,8 @@ theorem lemmaG3_of_inputs (hT : 3 ≤ Tu D u) (hT' : 3 ≤ Tu D u') (t0 t1 t2 : 
       apply h0
       simp only [Formalism.L2.SG.TermOp.Gt]
       rw [if_pos]
-      exact (Formalism.L2.SG.TermDef.Gt_mk (PI.TermAttrConst.UnitaryGroupMassFormula.gFun_all _ _ _) _).trans hG
+      exact (Formalism.L2.SG.TermDef.Gt_mk (PI.TermAttrConst.UnitaryGroupMassFormula.gFun_all _ _ _)
+        _).trans hG
     have hG12 : Gval (lf D (X.Fu u)) t.frame = Gval (lf D (X.Fu u)) t0.frame := by
       rw [← Formalism.L2.SG.Pf.SatGram.gterm_G Y t, ← Formalism.L2.SG.Pf.SatGram.gterm_G Y t0, hG]
     have hs0' : Lat.s0 t0.lam (lf D (X.Fu u)) t0.frame t.frame (t.lin * t0.lin⁻¹) D.R.k = 1 := by
@@ -63,15 +73,19 @@ theorem lemmaG3_of_inputs (hT : 3 ≤ Tu D u) (hT' : 3 ≤ Tu D u') (t0 t1 t2 : 
       unfold Formalism.L2.SG.TermOp.s0T at h1
       rw [if_pos ⟨hlam.symm, hlam'.symm⟩] at h1
       exact h1
-    have hTh := (CorankRelation.s0_eq_one_iff_Th_eq_Hp D.R.k hdim t0.lam
-      (by first | exact hlat | exact hlat.toIsLattice) _ t0.frame t.frame _ hLF hL1 hG1).1 hs0'
+    have hTh :=
+      (CorankRelation.s0_eq_one_iff_Th_eq_Hp D.R.k hdim t0.lam
+        (by first | exact hlat | exact hlat.toIsLattice) _ t0.frame t.frame _ hLF hL1 hG1).1 hs0'
     have hTE : ((Tu D u : ℕ) : D.host.E) ≠ 0 := Nat.cast_ne_zero.2 (by omega)
     have hTE' : ((Tu D u' : ℕ) : D.host.E) ≠ 0 := Nat.cast_ne_zero.2 (by omega)
     have hTs : star ((Tu D u : ℕ) : D.host.E) = ((Tu D u : ℕ) : D.host.E) := star_natCast _
     have hTs' : star ((Tu D u' : ℕ) : D.host.E) = ((Tu D u' : ℕ) : D.host.E) := star_natCast _
-    refine ⟨line_pair D.R.k hdim t0.lam (by first | exact hlat | exact hlat.toIsLattice) (lf D (X.Fu u)) t0.frame t.frame _ hLF hL1 hL2 hG1 hG12 hTE hTs hTh,
-      line_pair' D.R.k hdim t0.lam (by first | exact hlat | exact hlat.toIsLattice) (lf D (X.Fu u)) (lf D (X.Fu u')) t0.lin t.lin t0.rep.2.2.1 t.rep.2.2.1 hLF
-        hL1 hL2 hG1 hG12 hTE' hTs' hTh⟩
+    refine ⟨
+      line_pair D.R.k hdim t0.lam (by first | exact hlat | exact hlat.toIsLattice) (lf D (X.Fu u))
+        t0.frame t.frame _ hLF hL1 hL2 hG1 hG12 hTE hTs hTh,
+      line_pair' D.R.k hdim t0.lam (by first | exact hlat | exact hlat.toIsLattice) (lf D (X.Fu u))
+        (lf D (X.Fu u')) t0.lin t.lin t0.rep.2.2.1 t.rep.2.2.1 hLF hL1 hL2 hG1 hG12 hTE' hTs' hTh
+    ⟩
   obtain ⟨⟨l1, -⟩, ⟨l1', -⟩⟩ := line_occ t0 t1 h0 h1 hR1 hG1 hT hT'
   obtain ⟨⟨l2, -⟩, ⟨l2', -⟩⟩ := line_occ t0 t2 h0 h2 hR2 hG2 hT hT'
   have hy : yT Y u u' t2 - yT Y u u' t1 ∈ (X.Fu u).X := by
@@ -98,16 +112,20 @@ theorem lemmaG3_of_inputs (hT : 3 ≤ Tu D u) (hT' : 3 ≤ Tu D u') (t0 t1 t2 : 
     show σ v = σ (t1.lin (s' (s'.symm (t1.lin.symm v))))
     simp
   refine ⟨?_, ?_, ?_⟩
-  · have e : yT Y u u' t2 - yT Y u u' t1 =
-        ((Tu D u : ℕ) : D.host.E) • (σ (omp (X.Fu u) t1.frame.fl) - omp (X.Fu u) t1.frame.fl) := by
+  · have e
+        : yT Y u u' t2 - yT Y u u' t1
+          = ((Tu D u : ℕ) : D.host.E)
+            • (σ (omp (X.Fu u) t1.frame.fl) - omp (X.Fu u) t1.frame.fl) := by
       simp only [yT, yv, o1, o2, smul_sub]
       abel
     rw [e] at hy
     exact (Submodule.smul_mem_iff _ hTE).1 hy
   · set ω := omp t1.frame.fl (X.Fu u) with hω
-    have e : yT' Y u u' t2 - yT' Y u u' t1 =
-        ((Tu D u' : ℕ) : D.host.E) • (s'.symm (t1.lin.symm ω) - t1.lin.symm ω) := by
-      simp only [yT', yv, o3, o4, frame_z_eq_lin_zu, map_add (f := _), map_smul, LinearEquiv.symm_apply_apply, hsymm, smul_sub]
+    have e
+        : yT' Y u u' t2 - yT' Y u u' t1
+          = ((Tu D u' : ℕ) : D.host.E) • (s'.symm (t1.lin.symm ω) - t1.lin.symm ω) := by
+      simp only [yT', yv, o3, o4, frame_z_eq_lin_zu, map_add (f := _), map_smul,
+        LinearEquiv.symm_apply_apply, hsymm, smul_sub]
       abel
     rw [e] at hy'
     have hv := (Submodule.smul_mem_iff _ hTE').1 hy'
@@ -124,11 +142,11 @@ theorem lemmaG3_of_inputs (hT : 3 ≤ Tu D u) (hT' : 3 ≤ Tu D u') (t0 t1 t2 : 
     have hH1 := Hp_eq_Hsp Y t1 t0.lam hlat hLF hL1
     have hH2 := Hp_eq_Hsp Y t2 t0.lam hlat hLF hL2
 
-    have hX1A : t1.frame.fl.X ≤ Asp (X.Fu u) t1.frame.fl := by
-      rw [← Asp_symm]; exact X_le_Asp _ _
-    have hz1A : t1.frame.fl.z ∈ Asp (X.Fu u) t1.frame.fl := by
-      rw [← Asp_symm]; exact z_mem_Asp _ _
-    have hAsp : Asp (X.Fu u) t2.frame.fl ≤ (Asp (X.Fu u) t1.frame.fl).map (σ : (VS D).V →ₗ[D.host.E] (VS D).V) := by
+    have hX1A : t1.frame.fl.X ≤ Asp (X.Fu u) t1.frame.fl := by rw [← Asp_symm]; exact X_le_Asp _ _
+    have hz1A : t1.frame.fl.z ∈ Asp (X.Fu u) t1.frame.fl := by rw [← Asp_symm]; exact z_mem_Asp _ _
+    have hAsp
+        : Asp (X.Fu u) t2.frame.fl
+          ≤ (Asp (X.Fu u) t1.frame.fl).map (σ : (VS D).V →ₗ[D.host.E] (VS D).V) := by
       rw [Asp, Submodule.span_le]
       rintro _ ⟨i, rfl⟩
       cases i with
@@ -136,8 +154,9 @@ theorem lemmaG3_of_inputs (hT : 3 ≤ Tu D u) (hT' : 3 ≤ Tu D u') (t0 t1 t2 : 
         refine ⟨σ.symm ((X.Fu u).fvec a), ?_, by simp⟩
         induction a using Fin.lastCases with
         | last =>
-          have e : σ.symm ((X.Fu u).fvec (Fin.last _)) =
-              (X.Fu u).z + (σ.symm (X.Fu u).z - (X.Fu u).z) := by
+          have e
+              : σ.symm ((X.Fu u).fvec (Fin.last _))
+                = (X.Fu u).z + (σ.symm (X.Fu u).z - (X.Fu u).z) := by
             simp [FlagG.fvec, Fin.snoc_last]
           rw [e]
           exact Submodule.add_mem _ (z_mem_Asp _ _) (X_le_Asp _ _ (SRat_inv (lf D (X.Fu u)) hσ).2.2)
@@ -149,8 +168,9 @@ theorem lemmaG3_of_inputs (hT : 3 ≤ Tu D u) (hT' : 3 ≤ Tu D u') (t0 t1 t2 : 
         refine ⟨t1.lin (s' ((X.Fu u').fvec b)), ?_, ?_⟩
         · induction b using Fin.lastCases with
           | last =>
-            have e : t1.lin (s' ((X.Fu u').fvec (Fin.last _))) =
-                t1.frame.fl.z + t1.lin (s' (X.Fu u').z - (X.Fu u').z) := by
+            have e
+                : t1.lin (s' ((X.Fu u').fvec (Fin.last _)))
+                  = t1.frame.fl.z + t1.lin (s' (X.Fu u').z - (X.Fu u').z) := by
               rw [frame_z_eq_lin_zu, map_sub]; simp [FlagG.fvec, Fin.snoc_last]
             rw [e]
             refine Submodule.add_mem _ hz1A (hX1A ((mem_frameX Y t1 _).2 ?_))

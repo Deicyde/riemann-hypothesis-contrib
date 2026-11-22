@@ -10,8 +10,10 @@ open GlobalTheory.UnitLemma Polynomial
 
 namespace GlobalTheory.UnitLemma
 
-theorem isIntegral_iff_forall_maximalSpectrum (K : UQ) (B : InvAlg K) (hred : IsReduced B.A) (x : B.A) :
-    IsIntegral K.O x ↔ ∀ m : MaximalSpectrum B.A, IsIntegral K.O (Ideal.Quotient.mk m.asIdeal x) := by
+theorem isIntegral_iff_forall_maximalSpectrum
+    (K : UQ) (B : InvAlg K) (hred : IsReduced B.A) (x : B.A)
+    : IsIntegral K.O x
+      ↔ ∀ m : MaximalSpectrum B.A, IsIntegral K.O (Ideal.Quotient.mk m.asIdeal x) := by
   haveI : IsArtinianRing B.A := IsArtinianRing.of_finite K.E B.A
   constructor
   · intro h m

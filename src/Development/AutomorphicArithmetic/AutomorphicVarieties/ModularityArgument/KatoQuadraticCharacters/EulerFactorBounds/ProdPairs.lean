@@ -5,12 +5,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open scoped MatrixGroups Matrix Classical
-open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym UpperTheory.Kd.K4 UpperTheory.V.Z.Kato.Nb
+open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym UpperTheory.Kd.K4
+  UpperTheory.V.Z.Kato.Nb
 
 namespace UpperTheory.V.Z.Kato.Nb
 
-private theorem tp_inj (p M : ℕ) [NeZero p] [NeZero M] (s t : ZMod p)
-    (h : ((M * s.val : ℕ) : ZMod (p * M)) = ((M * t.val : ℕ) : ZMod (p * M))) : s = t := by
+private theorem tp_inj
+    (p M : ℕ) [NeZero p] [NeZero M]
+    (s t : ZMod p) (h : ((M * s.val : ℕ) : ZMod (p * M)) = ((M * t.val : ℕ) : ZMod (p * M)))
+    : s = t := by
   have hM : 0 < M := Nat.pos_of_ne_zero (NeZero.ne M)
   have hlt : ∀ u : ZMod p, M * u.val < p * M := fun u => by
     rw [mul_comm p M]
@@ -18,8 +21,10 @@ private theorem tp_inj (p M : ℕ) [NeZero p] [NeZero M] (s t : ZMod p)
   rw [ZMod.natCast_eq_natCast_iff', Nat.mod_eq_of_lt (hlt s), Nat.mod_eq_of_lt (hlt t)] at h
   exact ZMod.val_injective p (Nat.eq_of_mul_eq_mul_left hM h)
 
-private theorem tp_surj (p M : ℕ) [NeZero p] [NeZero M] (w : ZMod (p * M))
-    (h : ZMod.castHom (dvd_mul_left M p) (ZMod M) w = 0) : ∃ t : ZMod p, w = ((M * t.val : ℕ) : ZMod (p * M)) := by
+private theorem tp_surj
+    (p M : ℕ) [NeZero p] [NeZero M]
+    (w : ZMod (p * M)) (h : ZMod.castHom (dvd_mul_left M p) (ZMod M) w = 0)
+    : ∃ t : ZMod p, w = ((M * t.val : ℕ) : ZMod (p * M)) := by
   have hw : M ∣ w.val := by
     rw [ZMod.castHom_apply, ZMod.cast_eq_val, CharP.cast_eq_zero_iff (ZMod M) M] at h
     exact h
@@ -31,17 +36,21 @@ private theorem tp_surj (p M : ℕ) [NeZero p] [NeZero M] (w : ZMod (p * M))
   refine ⟨(k : ZMod p), ?_⟩
   rw [ZMod.val_natCast, Nat.mod_eq_of_lt hkp, ← hk, ZMod.natCast_zmod_val]
 
-private theorem dn_up (p M : ℕ) [NeZero p] [NeZero M] (x : Row M) (i : Fin 2) :
-    ZMod.castHom (dvd_mul_left M p) (ZMod M) (up p M x i) = ((p : ZMod M) • x) i := by
+private theorem dn_up (p M : ℕ) [NeZero p] [NeZero M] (x : Row M) (i : Fin 2)
+    : ZMod.castHom (dvd_mul_left M p) (ZMod M) (up p M x i) = ((p : ZMod M) • x) i := by
   unfold up
   rw [map_natCast]
   simp
 
-private theorem prod_fib {G : Type} [CommMonoid G] (p M : ℕ) [NeZero p] [NeZero M] [NeZero (p * M)] (x : Row M)
-    (S : Finset (Row (p * M))) (hS : ∀ z, z ∈ S ↔ dn p M z = (p : ZMod M) • x) (f : Row (p * M) → G) :
-    ∏ z ∈ S, f z = ∏ t : Fin 2 → ZMod p, f (up p M x + tp p M t) := by
-  have htp : ∀ (t : Fin 2 → ZMod p) (i : Fin 2),
-      ZMod.castHom (dvd_mul_left M p) (ZMod M) (tp p M t i) = 0 := by
+private theorem prod_fib
+    {G : Type} [CommMonoid G]
+    (p M : ℕ) [NeZero p] [NeZero M] [NeZero (p * M)]
+    (x : Row M) (S : Finset (Row (p * M))) (hS : ∀ z, z ∈ S ↔ dn p M z = (p : ZMod M) • x)
+    (f : Row (p * M) → G)
+    : ∏ z ∈ S, f z = ∏ t : Fin 2 → ZMod p, f (up p M x + tp p M t) := by
+  have htp
+      : ∀ (t : Fin 2 → ZMod p) (i : Fin 2),
+        ZMod.castHom (dvd_mul_left M p) (ZMod M) (tp p M t i) = 0 := by
     intro t i
     show ZMod.castHom (dvd_mul_left M p) (ZMod M) ((M * (t i).val : ℕ) : ZMod (p * M)) = 0
     rw [map_natCast, Nat.cast_mul, ZMod.natCast_self, zero_mul]
@@ -61,7 +70,8 @@ private theorem prod_fib {G : Type} [CommMonoid G] (p M : ℕ) [NeZero p] [NeZer
     have hex : ∀ i, ∃ s : ZMod p, z i - up p M x i = ((M * s.val : ℕ) : ZMod (p * M)) := by
       intro i
       apply tp_surj p M
-      have hzi : ZMod.castHom (dvd_mul_left M p) (ZMod M) (z i) = ((p : ZMod M) • x) i := congrFun hz i
+      have hzi : ZMod.castHom (dvd_mul_left M p) (ZMod M) (z i) = ((p : ZMod M) • x) i :=
+        congrFun hz i
       rw [map_sub, dn_up, hzi, sub_self]
     choose t ht using hex
     refine ⟨t, Finset.mem_univ _, ?_⟩
@@ -78,8 +88,11 @@ private theorem lin_ne (p N : ℕ) [Fact p.Prime] (o : Option (Fin p)) : lin p N
   | none => simpa [lin] using congrFun h 1
   | some j => simpa [lin] using congrFun h 0
 
-private theorem lin_eq (p N : ℕ) [Fact p.Prime] (hN : (N : ZMod p) ≠ 0) (o o' : Option (Fin p)) (i i' : ZMod p) (hi : i ≠ 0)
-    (h : i • lin p N o = i' • lin p N o') : o = o' := by
+private theorem lin_eq
+    (p N : ℕ) [Fact p.Prime]
+    (hN : (N : ZMod p) ≠ 0)
+    (o o' : Option (Fin p)) (i i' : ZMod p) (hi : i ≠ 0) (h : i • lin p N o = i' • lin p N o')
+    : o = o' := by
   have h0 := congrFun h 0
   have h1 := congrFun h 1
   cases o with
@@ -109,8 +122,10 @@ private theorem lin_eq (p N : ℕ) [Fact p.Prime] (hN : (N : ZMod p) ≠ 0) (o o
       rw [ZMod.natCast_eq_natCast_iff', Nat.mod_eq_of_lt j.isLt, Nat.mod_eq_of_lt j'.isLt] at h3
       rw [Fin.ext h3]
 
-private theorem lin_dep (p N : ℕ) [Fact p.Prime] (o : Option (Fin p)) (w : Fin 2 → ZMod p)
-    (h : lin p N o 0 * w 1 - lin p N o 1 * w 0 = 0) : ∃ j : ZMod p, w = j • lin p N o := by
+private theorem lin_dep
+    (p N : ℕ) [Fact p.Prime]
+    (o : Option (Fin p)) (w : Fin 2 → ZMod p) (h : lin p N o 0 * w 1 - lin p N o 1 * w 0 = 0)
+    : ∃ j : ZMod p, w = j • lin p N o := by
   cases o with
   | none =>
     refine ⟨w 1, ?_⟩
@@ -126,24 +141,29 @@ private theorem lin_dep (p N : ℕ) [Fact p.Prime] (o : Option (Fin p)) (w : Fin
     · simp [lin] at h ⊢
       linear_combination h
 
-private theorem lin_surj (p N : ℕ) [Fact p.Prime] (hN : (N : ZMod p) ≠ 0) (w : Fin 2 → ZMod p) :
-    ∃ (o : Option (Fin p)) (j : ZMod p), w = j • lin p N o := by
+private theorem lin_surj (p N : ℕ) [Fact p.Prime] (hN : (N : ZMod p) ≠ 0) (w : Fin 2 → ZMod p)
+    : ∃ (o : Option (Fin p)) (j : ZMod p), w = j • lin p N o := by
   by_cases h0 : w 0 = 0
   · exact ⟨none, lin_dep p N none w (by simp [lin, h0])⟩
   · refine ⟨some ⟨(w 1 / w 0 / N).val, ZMod.val_lt _⟩, lin_dep p N _ w ?_⟩
     simp only [lin]
-    simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, Nat.cast_mul, ZMod.natCast_val, ZMod.cast_id', id]
+    simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, Nat.cast_mul,
+      ZMod.natCast_val, ZMod.cast_id', id]
     field_simp
     ring
 
-private theorem prod_dep {G : Type} [CommMonoid G] (p N : ℕ) [Fact p.Prime] (hN : (N : ZMod p) ≠ 0)
-    (F : (Fin 2 → ZMod p) → (Fin 2 → ZMod p) → G) :
-    ∏ o : Option (Fin p), ∏ ij ∈ (Finset.univ : Finset (ZMod p × ZMod p)).erase 0, F (ij.1 • lin p N o) (ij.2 • lin p N o) =
-      ∏ tt ∈ (Finset.univ.filter (fun tt : (Fin 2 → ZMod p) × (Fin 2 → ZMod p) =>
-        ¬ (tt.1 0 * tt.2 1 - tt.1 1 * tt.2 0 ≠ 0))).erase 0, F tt.1 tt.2 := by
-  rw [← Finset.prod_product' (s := Finset.univ) (t := (Finset.univ : Finset (ZMod p × ZMod p)).erase 0)
+private theorem prod_dep
+    {G : Type} [CommMonoid G]
+    (p N : ℕ) [Fact p.Prime]
+    (hN : (N : ZMod p) ≠ 0) (F : (Fin 2 → ZMod p) → (Fin 2 → ZMod p) → G)
+    : ∏ o : Option (Fin p), ∏ ij ∈ (Finset.univ : Finset (ZMod p × ZMod p)).erase 0, F (ij.1 • lin p N o) (ij.2 • lin p N o)
+      = ∏ tt ∈ (Finset.univ.filter (fun tt : (Fin 2 → ZMod p) × (Fin 2 → ZMod p) =>
+          ¬ (tt.1 0 * tt.2 1 - tt.1 1 * tt.2 0 ≠ 0))).erase 0, F tt.1 tt.2 := by
+  rw [← Finset.prod_product' (s := Finset.univ)
+    (t := (Finset.univ : Finset (ZMod p × ZMod p)).erase 0)
     (fun o ij => F (ij.1 • lin p N o) (ij.2 • lin p N o))]
-  refine Finset.prod_bij (fun oij _ => (oij.2.1 • lin p N oij.1, oij.2.2 • lin p N oij.1)) ?_ ?_ ?_ ?_
+  refine
+    Finset.prod_bij (fun oij _ => (oij.2.1 • lin p N oij.1, oij.2.2 • lin p N oij.1)) ?_ ?_ ?_ ?_
   · rintro ⟨o, i, j⟩ h
     have hne : ((i, j) : ZMod p × ZMod p) ≠ 0 := Finset.ne_of_mem_erase (Finset.mem_product.1 h).2
     rw [Finset.mem_erase, Finset.mem_filter]
@@ -218,47 +238,59 @@ private theorem prod_dep {G : Type} [CommMonoid G] (p N : ℕ) [Fact p.Prime] (h
   · intro _ _
     rfl
 
-private theorem prod_pairs {G : Type} [CommMonoid G] (p N : ℕ) [Fact p.Prime] (hN : (N : ZMod p) ≠ 0)
-    (F : (Fin 2 → ZMod p) → (Fin 2 → ZMod p) → G) :
-    (∏ tt ∈ Finset.univ.filter (fun tt : (Fin 2 → ZMod p) × (Fin 2 → ZMod p) =>
-        tt.1 0 * tt.2 1 - tt.1 1 * tt.2 0 ≠ 0), F tt.1 tt.2) *
-      ∏ o : Option (Fin p), ∏ i : ZMod p, ∏ j : ZMod p, F (i • lin p N o) (j • lin p N o) =
-      (∏ t, ∏ t', F t t') * F 0 0 ^ p := by
-  have hinner : ∀ o : Option (Fin p), ∏ i : ZMod p, ∏ j : ZMod p, F (i • lin p N o) (j • lin p N o) =
-      (∏ ij ∈ (Finset.univ : Finset (ZMod p × ZMod p)).erase 0, F (ij.1 • lin p N o) (ij.2 • lin p N o)) * F 0 0 := by
+private theorem prod_pairs
+    {G : Type} [CommMonoid G]
+    (p N : ℕ) [Fact p.Prime]
+    (hN : (N : ZMod p) ≠ 0) (F : (Fin 2 → ZMod p) → (Fin 2 → ZMod p) → G)
+    : (∏ tt ∈ Finset.univ.filter (fun tt : (Fin 2 → ZMod p) × (Fin 2 → ZMod p) =>
+          tt.1 0 * tt.2 1 - tt.1 1 * tt.2 0 ≠ 0), F tt.1 tt.2)
+        * ∏ o : Option (Fin p), ∏ i : ZMod p, ∏ j : ZMod p, F (i • lin p N o) (j • lin p N o)
+      = (∏ t, ∏ t', F t t') * F 0 0 ^ p := by
+  have hinner
+      : ∀ o : Option (Fin p),
+        ∏ i : ZMod p, ∏ j : ZMod p, F (i • lin p N o) (j • lin p N o)
+          = (∏ ij ∈ (Finset.univ : Finset (ZMod p × ZMod p)).erase 0, F (ij.1 • lin p N o) (ij.2 • lin p N o))
+            * F 0 0 := by
     intro o
     rw [← Fintype.prod_prod_type' (fun i j => F (i • lin p N o) (j • lin p N o))]
-    rw [← Finset.mul_prod_erase Finset.univ (fun ij : ZMod p × ZMod p => F (ij.1 • lin p N o) (ij.2 • lin p N o))
+    rw [← Finset.mul_prod_erase Finset.univ
+      (fun ij : ZMod p × ZMod p => F (ij.1 • lin p N o) (ij.2 • lin p N o))
       (Finset.mem_univ 0)]
     rw [mul_comm]
     congr 1
     simp
-  have hmem : (0 : (Fin 2 → ZMod p) × (Fin 2 → ZMod p)) ∈ Finset.univ.filter
-      (fun tt : (Fin 2 → ZMod p) × (Fin 2 → ZMod p) => ¬ (tt.1 0 * tt.2 1 - tt.1 1 * tt.2 0 ≠ 0)) := by
+  have hmem
+      : (0 : (Fin 2 → ZMod p) × (Fin 2 → ZMod p))
+        ∈ Finset.univ.filter (fun tt : (Fin 2 → ZMod p) × (Fin 2 → ZMod p) =>
+          ¬(tt.1 0 * tt.2 1 - tt.1 1 * tt.2 0 ≠ 0)) := by
     simp
-  have hfull : ∏ t, ∏ t', F t t' =
-      (∏ tt ∈ Finset.univ.filter (fun tt : (Fin 2 → ZMod p) × (Fin 2 → ZMod p) =>
-        tt.1 0 * tt.2 1 - tt.1 1 * tt.2 0 ≠ 0), F tt.1 tt.2) *
-      (F 0 0 * ∏ tt ∈ (Finset.univ.filter (fun tt : (Fin 2 → ZMod p) × (Fin 2 → ZMod p) =>
-        ¬ (tt.1 0 * tt.2 1 - tt.1 1 * tt.2 0 ≠ 0))).erase 0, F tt.1 tt.2) := by
+  have hfull
+      : ∏ t, ∏ t', F t t'
+        = (∏ tt ∈ Finset.univ.filter (fun tt : (Fin 2 → ZMod p) × (Fin 2 → ZMod p) =>
+            tt.1 0 * tt.2 1 - tt.1 1 * tt.2 0 ≠ 0), F tt.1 tt.2)
+          * (F 0 0
+            * ∏ tt ∈ (Finset.univ.filter (fun tt : (Fin 2 → ZMod p) × (Fin 2 → ZMod p) =>
+              ¬ (tt.1 0 * tt.2 1 - tt.1 1 * tt.2 0 ≠ 0))).erase 0, F tt.1 tt.2) := by
     rw [← Fintype.prod_prod_type' F]
     rw [← Finset.prod_filter_mul_prod_filter_not Finset.univ
       (fun tt : (Fin 2 → ZMod p) × (Fin 2 → ZMod p) => tt.1 0 * tt.2 1 - tt.1 1 * tt.2 0 ≠ 0)]
     congr 1
-    exact (Finset.mul_prod_erase _ (fun tt : (Fin 2 → ZMod p) × (Fin 2 → ZMod p) => F tt.1 tt.2) hmem).symm
+    exact (Finset.mul_prod_erase _
+      (fun tt : (Fin 2 → ZMod p) × (Fin 2 → ZMod p) => F tt.1 tt.2)
+      hmem).symm
   rw [Finset.prod_congr rfl (fun o _ => hinner o), Finset.prod_mul_distrib, Finset.prod_const,
     Finset.card_univ, Fintype.card_option, Fintype.card_fin, prod_dep p N hN F, hfull, pow_succ]
   simp only [mul_assoc, mul_comm, mul_left_comm]
 
 end UpperTheory.V.Z.Kato.Nb
 
-theorem UpperTheory.V.Z.Kato.Nb.sPairs :
-    UpperTheory.V.Z.Kato.Nb.SPairs := by
+theorem UpperTheory.V.Z.Kato.Nb.sPairs : UpperTheory.V.Z.Kato.Nb.SPairs := by
   intro Ω _ _ ε X p N M₀ _ _ hcop a x y
   have hN : (N : ZMod p) ≠ 0 := by
     intro h
     rw [CharP.cast_eq_zero_iff (ZMod p) p] at h
-    exact (Nat.Prime.coprime_iff_not_dvd Fact.out).1 (Nat.Coprime.coprime_dvd_right (dvd_mul_right N M₀) hcop) h
+    exact (Nat.Prime.coprime_iff_not_dvd Fact.out).1
+      (Nat.Coprime.coprime_dvd_right (dvd_mul_right N M₀) hcop) h
   have htp0 : tp p M₀ 0 = 0 := by
     funext i
     simp [tp]
@@ -269,6 +301,8 @@ theorem UpperTheory.V.Z.Kato.Nb.sPairs :
   rw [prod_fib p M₀ x (Finset.univ.filter fun x' => dn p M₀ x' = (p : ZMod M₀) • x) (by simp)
     (fun x' => ∏ y' ∈ Finset.univ.filter (fun y' => dn p M₀ y' = (p : ZMod M₀) • y), a x' y')]
   refine Finset.prod_congr rfl (fun t _ => ?_)
-  have hy := prod_fib p M₀ y (Finset.univ.filter fun y' => dn p M₀ y' = (p : ZMod M₀) • y)
-    (fun z => by simp) (a (up p M₀ x + tp p M₀ t))
+  have hy :=
+    prod_fib p M₀ y (Finset.univ.filter fun y' => dn p M₀ y' = (p : ZMod M₀) • y)
+      (fun z => by simp)
+      (a (up p M₀ x + tp p M₀ t))
   exact hy.symm

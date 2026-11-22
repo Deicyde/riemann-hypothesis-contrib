@@ -12,12 +12,14 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WachFun
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions Formalism.MainNotions.N
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions Formalism.MainNotions.N
 
 namespace GlobalTheory
 
-theorem fontaine_litFont_assembled :
-    ∀ (D : D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW), Formalism.MainNotions.InvariantsGenerators.LitFont D HW F := by
+theorem fontaine_litFont_assembled
+    : ∀ (D : D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW),
+      Formalism.MainNotions.InvariantsGenerators.LitFont D HW F := by
   intro D HW F
   unfold Formalism.MainNotions.InvariantsGenerators.LitFont
   intro l _ K LL hA

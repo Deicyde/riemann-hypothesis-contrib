@@ -11,8 +11,7 @@ open TensorProduct
 
 namespace UpperTheory.Gal.crystallineComparison
 
-theorem detRingS_of :
-    RingS := by
+theorem detRingS_of : RingS := by
   intro F L U B C _ _ _ _ _ _ _ _ _ _ _ τL τU h
   letI : Algebra U C := τU.toAlgebra
   let S := TensorProduct U C B
@@ -27,16 +26,16 @@ theorem detRingS_of :
       rfl
     rw [e, TensorProduct.smul_tmul, Algebra.algebraMap_eq_smul_one]
   letI : Algebra F S := (ψ.comp (algebraMap F B)).toAlgebra
-  let φ : L →ₐ[F] S :=
-    { (algebraMap C S).comp τL with
-      commutes' := by
-        intro z
-        change algebraMap C S (τL (algebraMap F L z)) = ψ (algebraMap F B z)
-        rw [h z, key, IsScalarTower.algebraMap_apply F U B z]
-        rfl }
+  let φ : L →ₐ[F] S := {
+    (algebraMap C S).comp τL with
+    commutes' := by
+      intro z
+      change algebraMap C S (τL (algebraMap F L z)) = ψ (algebraMap F B z)
+      rw [h z, key, IsScalarTower.algebraMap_apply F U B z]
+      rfl
+  }
   let ψ' : B →ₐ[F] S := { ψ with commutes' := fun _ => rfl }
-  let π : L ⊗[F] B →+* S :=
-    (Algebra.TensorProduct.lift φ ψ' (fun _ _ => Commute.all _ _)).toRingHom
+  let π : L ⊗[F] B →+* S := (Algebra.TensorProduct.lift φ ψ' (fun _ _ => Commute.all _ _)).toRingHom
   refine ⟨S, inferInstance, inferInstance, π, hS, ?_, ?_⟩
   · intro x
     change φ x * ψ' 1 = _

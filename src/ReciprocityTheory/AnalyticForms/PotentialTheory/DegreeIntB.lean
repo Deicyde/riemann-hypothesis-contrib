@@ -18,15 +18,21 @@ theorem dI_secondCountable (A : FinHolAtlas e X) : SecondCountableTopology X := 
   have hcov : ⋃ k, (A.chart k).source = Set.univ :=
     Set.eq_univ_of_forall fun x => Set.mem_iUnion.mpr (A.cover x)
   exact TopologicalSpace.secondCountableTopology_of_countable_cover
-    (fun k => (A.chart k).open_source) hcov
+    (fun k => (A.chart k).open_source)
+    hcov
 
-theorem dI_sheets [CompactSpace Y] [T2Space Y] [T2Space X]
-    {A : FinHolAtlas e X} {B : FinHolAtlas e Y} {h : Y → X} (hh : HoloMap B A h) {d : ℕ}
-    {S : Set X} (hd : IsDegreeOff A B h d S) (x : X) (hx : x ∉ S) :
-    ∃ V : Set X, IsOpen V ∧ x ∈ V ∧ Disjoint V S ∧ ∃ k : Fin A.n, V ⊆ (A.chart k).source ∧
-      ∃ W : Fin d → Set Y, ∃ j : Fin d → Fin B.n, (∀ i, IsOpen (W i)) ∧
-        Pairwise (Function.onFun Disjoint W) ∧ h ⁻¹' V = ⋃ i, W i ∧
-        ∀ i, Set.BijOn h (W i) V ∧ W i ⊆ (B.chart (j i)).source := by
+theorem dI_sheets
+    [CompactSpace Y] [T2Space Y] [T2Space X]
+    {A : FinHolAtlas e X} {B : FinHolAtlas e Y} {h : Y → X} (hh : HoloMap B A h)
+    {d : ℕ} {S : Set X} (hd : IsDegreeOff A B h d S)
+    (x : X) (hx : x ∉ S)
+    : ∃ V : Set X,
+      IsOpen V ∧ x ∈ V ∧ Disjoint V S
+        ∧ ∃ k : Fin A.n,
+          V ⊆ (A.chart k).source
+            ∧ ∃ W : Fin d → Set Y, ∃ j : Fin d → Fin B.n,
+              (∀ i, IsOpen (W i)) ∧ Pairwise (Function.onFun Disjoint W) ∧ h ⁻¹' V = ⋃ i, W i
+                ∧ ∀ i, Set.BijOn h (W i) V ∧ W i ⊆ (B.chart (j i)).source := by
   have hO : ∃ O : Set X, IsOpen O ∧ x ∈ O ∧ Disjoint O S := by
     obtain ⟨W, hWo, hxW, r, f, hf, hSW⟩ := hd.1 x
     have hex : ∃ i, f i x ≠ 0 := by
@@ -39,8 +45,10 @@ theorem dI_sheets [CompactSpace Y] [T2Space Y] [T2Space X]
     obtain ⟨j, hj⟩ := A.cover x
     have hcont : ContinuousAt (f i) x := by
       have h1 : AnalyticAt ℂ (f i ∘ (A.chart j).symm) (A.chart j x) :=
-        hf i j (A.chart j x) ⟨(A.chart j).map_source hj, by
-          simp only [Set.mem_preimage, (A.chart j).left_inv hj]; exact hxW⟩
+        hf i j (A.chart j x) ⟨
+          (A.chart j).map_source hj,
+          by simp only [Set.mem_preimage, (A.chart j).left_inv hj]; exact hxW
+        ⟩
       have h2 : ContinuousAt ((f i ∘ (A.chart j).symm) ∘ A.chart j) x :=
         h1.continuousAt.comp ((A.chart j).continuousAt hj)
       refine h2.congr ?_
@@ -54,9 +62,12 @@ theorem dI_sheets [CompactSpace Y] [T2Space Y] [T2Space X]
     have hw2 : w ∈ S ∩ W := ⟨hwS, hwW⟩
     rw [hSW] at hw2
     exact ht hwt (hw2.2 i)
-  have loc : ∀ y : Y, ∃ U : Set Y, IsOpen U ∧ y ∈ U ∧ (h y ∉ S →
-      ∃ j, U ⊆ (B.chart j).source ∧ Set.InjOn h U ∧
-        ∀ U' ⊆ U, IsOpen U' → IsOpen (h '' U')) := by
+  have loc
+      : ∀ y : Y, ∃ U : Set Y,
+        IsOpen U ∧ y ∈ U
+          ∧ (h y ∉ S
+            → ∃ j,
+              U ⊆ (B.chart j).source ∧ Set.InjOn h U ∧ ∀ U' ⊆ U, IsOpen U' → IsOpen (h '' U')) := by
     intro y
     by_cases hyS : h y ∈ S
     · exact ⟨Set.univ, isOpen_univ, Set.mem_univ _, fun h' => absurd hyS h'⟩
@@ -68,8 +79,9 @@ theorem dI_sheets [CompactSpace Y] [T2Space Y] [T2Space X]
     have han : AnalyticAt ℂ φ (B.chart j y) :=
       hh.2 j k (B.chart j y) ⟨hzt, by simp only [Set.mem_preimage, hzy]; exact hk⟩
     have hdet := hd.2.2.2.2.2 j k (B.chart j y) hzt (by rw [hzy]; exact hyS) (by rw [hzy]; exact hk)
-    let L := (LinearMap.equivOfDetNeZero
-      (fderiv ℂ φ (B.chart j y) : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)) hdet).toContinuousLinearEquiv
+    let L :=
+      (LinearMap.equivOfDetNeZero (fderiv ℂ φ (B.chart j y) : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ))
+        hdet).toContinuousLinearEquiv
     have hL : HasStrictFDerivAt φ (L : (Fin e → ℂ) →L[ℂ] (Fin e → ℂ)) (B.chart j y) := by
       have hLe : (L : (Fin e → ℂ) →L[ℂ] (Fin e → ℂ)) = fderiv ℂ φ (B.chart j y) :=
         ContinuousLinearMap.ext fun v => rfl
@@ -79,8 +91,9 @@ theorem dI_sheets [CompactSpace Y] [T2Space Y] [T2Space X]
     have hPc : (P : (Fin e → ℂ) → (Fin e → ℂ)) = φ := hL.toOpenPartialHomeomorph_coe
     have hPs : B.chart j y ∈ P.source := hL.mem_toOpenPartialHomeomorph_source
     let U := (B.chart j).source ∩ (B.chart j) ⁻¹' P.source ∩ h ⁻¹' (A.chart k).source
-    have hUo : IsOpen U := ((B.chart j).isOpen_inter_preimage P.open_source).inter
-      (hh.1.isOpen_preimage _ (A.chart k).open_source)
+    have hUo : IsOpen U :=
+      ((B.chart j).isOpen_inter_preimage P.open_source).inter
+        (hh.1.isOpen_preimage _ (A.chart k).open_source)
     have key : ∀ y' ∈ U, (A.chart k).symm (P (B.chart j y')) = h y' := by
       intro y' hy'
       have e1 := (B.chart j).left_inv hy'.1.1
@@ -91,7 +104,8 @@ theorem dI_sheets [CompactSpace Y] [T2Space Y] [T2Space X]
       intro y1 h1 y2 h2 he
       have hP : P (B.chart j y1) = P (B.chart j y2) := by
         rw [hPc, hφ]
-        simp only [Function.comp_apply, (B.chart j).left_inv h1.1.1, (B.chart j).left_inv h2.1.1, he]
+        simp only [Function.comp_apply, (B.chart j).left_inv h1.1.1, (B.chart j).left_inv h2.1.1,
+          he]
       exact (B.chart j).injOn h1.1.1 h2.1.1 (P.injOn h1.1.2 h2.1.2 hP)
     have hopen : ∀ U' ⊆ U, IsOpen U' → IsOpen (h '' U') := by
       intro U' hU' hU'o
@@ -122,8 +136,7 @@ theorem dI_sheets [CompactSpace Y] [T2Space Y] [T2Space X]
     intro z hz
     obtain ⟨y, hy, hzy⟩ := Set.mem_iUnion₂.mp (hFt hz)
     obtain ⟨_, _, hinj, _⟩ := hUp y (hFS y (htF y hy))
-    have hzy' : z = y := hinj hzy (hyU y)
-      (by rw [show h z = x from hz, show h y = x from htF y hy])
+    have hzy' : z = y := hinj hzy (hyU y) (by rw [show h z = x from hz, show h y = x from htF y hy])
     rw [hzy']
     exact hy
   have hcard : hFfin.toFinset.card = d := by
@@ -148,8 +161,12 @@ theorem dI_sheets [CompactSpace Y] [T2Space Y] [T2Space X]
   have hGp : ∀ i, ∃ j, G i ⊆ (B.chart j).source ∧ Set.InjOn h (G i) ∧ IsOpen (h '' G i) := by
     intro i
     obtain ⟨j, hj, hinj, hop⟩ := hUp (σ i) (hFS _ (hσF i))
-    exact ⟨j, Set.inter_subset_left.trans hj, hinj.mono Set.inter_subset_left,
-      hop _ Set.inter_subset_left (hGo i)⟩
+    exact ⟨
+      j,
+      Set.inter_subset_left.trans hj,
+      hinj.mono Set.inter_subset_left,
+      hop _ Set.inter_subset_left (hGo i)
+    ⟩
   choose jj hjj hGinj hGop using hGp
   obtain ⟨k, hk⟩ := A.cover x
   obtain ⟨O, hOo, hxO, hOS⟩ := hO
@@ -161,15 +178,27 @@ theorem dI_sheets [CompactSpace Y] [T2Space Y] [T2Space X]
     obtain ⟨i, rfl⟩ := hσsurj y hyx
     exact hyK (Set.mem_iUnion.mpr ⟨i, hGm i⟩)
   let V := (A.chart k).source ∩ O ∩ (h '' K)ᶜ ∩ ⋂ i, h '' G i
-  have hVo : IsOpen V := (((A.chart k).open_source.inter hOo).inter hhK.isOpen_compl).inter
-    (isOpen_iInter_of_finite hGop)
+  have hVo : IsOpen V :=
+    (((A.chart k).open_source.inter hOo).inter hhK.isOpen_compl).inter
+      (isOpen_iInter_of_finite hGop)
   have hxV : x ∈ V := ⟨⟨⟨hk, hxO⟩, hxK⟩, Set.mem_iInter.mpr fun i => ⟨σ i, hGm i, hσF i⟩⟩
-  refine ⟨V, hVo, hxV, Set.disjoint_left.mpr fun v hv hvS => Set.disjoint_left.mp hOS hv.1.1.2 hvS,
-    k, fun v hv => hv.1.1.1, fun i => G i ∩ h ⁻¹' V, jj,
+  refine ⟨
+    V,
+    hVo,
+    hxV,
+    Set.disjoint_left.mpr fun v hv hvS => Set.disjoint_left.mp hOS hv.1.1.2 hvS,
+    k,
+    fun v hv => hv.1.1.1,
+    fun i => G i ∩ h ⁻¹' V,
+    jj,
     fun i => (hGo i).inter (hh.1.isOpen_preimage _ hVo),
-    fun a b hab => Disjoint.mono Set.inter_subset_left Set.inter_subset_left (hGd a b hab), ?_,
-    fun i => ⟨⟨fun y hy => hy.2, (hGinj i).mono Set.inter_subset_left, fun v hv => ?_⟩,
-      Set.inter_subset_left.trans (hjj i)⟩⟩
+    fun a b hab => Disjoint.mono Set.inter_subset_left Set.inter_subset_left (hGd a b hab),
+    ?_,
+    fun i => ⟨
+      ⟨fun y hy => hy.2, (hGinj i).mono Set.inter_subset_left, fun v hv => ?_⟩,
+      Set.inter_subset_left.trans (hjj i)
+    ⟩
+  ⟩
   · ext y
     simp only [Set.mem_preimage, Set.mem_iUnion, Set.mem_inter_iff]
     constructor
@@ -184,8 +213,9 @@ theorem dI_sheets [CompactSpace Y] [T2Space Y] [T2Space X]
   · obtain ⟨y, hyG, rfl⟩ := Set.mem_iInter.mp hv.2 i
     exact ⟨y, ⟨hyG, hv⟩, rfl⟩
 
-theorem dI_sum_ind_le (E : ℕ → Set X) (hd : Pairwise (Function.onFun Disjoint E)) (g : X → ℝ)
-    (x : X) (N : ℕ) : ∑ m ∈ Finset.range N, |(E m).indicator g x| ≤ |g x| := by
+theorem dI_sum_ind_le
+    (E : ℕ → Set X) (hd : Pairwise (Function.onFun Disjoint E)) (g : X → ℝ) (x : X) (N : ℕ)
+    : ∑ m ∈ Finset.range N, |(E m).indicator g x| ≤ |g x| := by
   classical
   by_cases hx : ∃ m ∈ Finset.range N, x ∈ E m
   · obtain ⟨m0, hm0, hxm0⟩ := hx

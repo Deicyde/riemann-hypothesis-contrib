@@ -11,10 +11,12 @@ namespace GlobalTheory.BesselChar.JointSplit
 
 variable {A R₁ R₂ : Type} [CommRing A] [CommRing R₁] [CommRing R₂]
 
-theorem fwd (f : A →+* R₁) (g : A →+* R₂) (hinj : ∀ y, f y = 0 → g y = 0 → y = 0)
-    (hsurj : ∀ a b, ∃ y, f y = a ∧ g y = b) {n ρ : ℕ} (E : Matrix (Fin n) (Fin ρ) A)
-    (K : Matrix (Fin ρ) (Fin n) A) (M : Matrix (Fin n) (Fin n) A) (h : GlobalTheory.BesselChar.Unip E K M) :
-    GlobalTheory.BesselChar.Unip (E.map f) (K.map f) (M.map f) := by
+theorem fwd
+    (f : A →+* R₁) (g : A →+* R₂)
+    (hinj : ∀ y, f y = 0 → g y = 0 → y = 0) (hsurj : ∀ a b, ∃ y, f y = a ∧ g y = b)
+    {n ρ : ℕ} (E : Matrix (Fin n) (Fin ρ) A) (K : Matrix (Fin ρ) (Fin n) A)
+    (M : Matrix (Fin n) (Fin n) A) (h : GlobalTheory.BesselChar.Unip E K M)
+    : GlobalTheory.BesselChar.Unip (E.map f) (K.map f) (M.map f) := by
   obtain ⟨⟨T, hT, hMT⟩, h2⟩ := h
   refine ⟨⟨T.map f, fun j i hij => by simp [hT j i hij], ?_⟩, fun y₁ hy₁ => ?_⟩
   · rw [← Matrix.map_mul, hMT, Matrix.map_add _ (map_add f), Matrix.map_mul]
@@ -37,22 +39,28 @@ theorem fwd (f : A →+* R₁) (g : A →+* R₂) (hinj : ∀ y, f y = 0 → g y
     funext i
     simp only [Pi.add_apply, map_add (f := _)]
 
-theorem bwd (f : A →+* R₁) (g : A →+* R₂) (hinj : ∀ y, f y = 0 → g y = 0 → y = 0)
-    (hsurj : ∀ a b, ∃ y, f y = a ∧ g y = b) {n ρ : ℕ} (E : Matrix (Fin n) (Fin ρ) A)
-    (K : Matrix (Fin ρ) (Fin n) A) (M : Matrix (Fin n) (Fin n) A)
-    (h1 : GlobalTheory.BesselChar.Unip (E.map f) (K.map f) (M.map f))
-    (h2 : GlobalTheory.BesselChar.Unip (E.map g) (K.map g) (M.map g)) : GlobalTheory.BesselChar.Unip E K M := by
+theorem bwd
+    (f : A →+* R₁) (g : A →+* R₂)
+    (hinj : ∀ y, f y = 0 → g y = 0 → y = 0) (hsurj : ∀ a b, ∃ y, f y = a ∧ g y = b)
+    {n ρ : ℕ} (E : Matrix (Fin n) (Fin ρ) A) (K : Matrix (Fin ρ) (Fin n) A)
+    (M : Matrix (Fin n) (Fin n) A) (h1 : GlobalTheory.BesselChar.Unip (E.map f) (K.map f) (M.map f))
+    (h2 : GlobalTheory.BesselChar.Unip (E.map g) (K.map g) (M.map g))
+    : GlobalTheory.BesselChar.Unip E K M := by
   choose l hl1 hl2 using hsurj
   have l00 : l 0 0 = 0 := hinj _ (hl1 0 0) (hl2 0 0)
-  have extM : ∀ {p q : ℕ} (X Y : Matrix (Fin p) (Fin q) A), X.map f = Y.map f → X.map g = Y.map g → X = Y := by
+  have extM
+      : ∀ {p q : ℕ} (X Y : Matrix (Fin p) (Fin q) A),
+        X.map f = Y.map f → X.map g = Y.map g → X = Y := by
     intro p q X Y hf hg
     ext i j
     rw [← sub_eq_zero]
     apply hinj
     · rw [map_sub, sub_eq_zero]; exact congrFun (congrFun hf i) j
     · rw [map_sub, sub_eq_zero]; exact congrFun (congrFun hg i) j
-  have extV : ∀ {p : ℕ} (x z : Fin p → A), (fun i => f (x i)) = (fun i => f (z i)) →
-      (fun i => g (x i)) = (fun i => g (z i)) → x = z := by
+  have extV
+      : ∀ {p : ℕ} (x z : Fin p → A),
+        (fun i => f (x i)) = (fun i => f (z i)) → (fun i => g (x i)) = (fun i => g (z i))
+          → x = z := by
     intro p x z hf hg
     funext i
     rw [← sub_eq_zero]
@@ -88,9 +96,21 @@ theorem bwd (f : A →+* R₁) (g : A →+* R₂) (hinj : ∀ y, f y = 0 → g y
       funext i
       simp only [Pi.add_apply, map_add (f := _)]
 
-theorem unip_iff_of_joint : ∀ {A R₁ R₂ : Type} [CommRing A] [CommRing R₁] [CommRing R₂] (f : A →+* R₁) (g : A →+* R₂), (∀ y, f y = 0 → g y = 0 → y = 0) → (∀ a b, ∃ y, f y = a ∧ g y = b) → ∀ {n ρ : ℕ} (E : Matrix (Fin n) (Fin ρ) A) (K : Matrix (Fin ρ) (Fin n) A) (M : Matrix (Fin n) (Fin n) A), GlobalTheory.BesselChar.Unip E K M ↔ GlobalTheory.BesselChar.Unip (E.map f) (K.map f) (M.map f) ∧ GlobalTheory.BesselChar.Unip (E.map g) (K.map g) (M.map g) := by
+theorem unip_iff_of_joint
+    : ∀ {A R₁ R₂ : Type} [CommRing A] [CommRing R₁] [CommRing R₂] (f : A →+* R₁) (g : A →+* R₂),
+      (∀ y, f y = 0 → g y = 0 → y = 0) → (∀ a b, ∃ y, f y = a ∧ g y = b)
+        → ∀ {n ρ : ℕ} (E : Matrix (Fin n) (Fin ρ) A) (K : Matrix (Fin ρ) (Fin n) A)
+            (M : Matrix (Fin n) (Fin n) A),
+          GlobalTheory.BesselChar.Unip E K M
+            ↔ GlobalTheory.BesselChar.Unip (E.map f) (K.map f) (M.map f)
+              ∧ GlobalTheory.BesselChar.Unip (E.map g) (K.map g) (M.map g) := by
   intro A R₁ R₂ _ _ _ f g hinj hsurj n ρ E K M
-  refine ⟨fun h => ⟨fwd f g hinj hsurj E K M h, fwd g f (fun y hg hf => hinj y hf hg)
-    (fun a b => (hsurj b a).imp fun _ h => h.symm) E K M h⟩, fun h => bwd f g hinj hsurj E K M h.1 h.2⟩
+  refine ⟨
+    fun h => ⟨
+      fwd f g hinj hsurj E K M h,
+      fwd g f (fun y hg hf => hinj y hf hg) (fun a b => (hsurj b a).imp fun _ h => h.symm) E K M h
+    ⟩,
+    fun h => bwd f g hinj hsurj E K M h.1 h.2
+  ⟩
 
 end GlobalTheory.BesselChar.JointSplit

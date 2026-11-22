@@ -10,16 +10,22 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.God
 
 noncomputable section
 
-open NumberField Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.SiegelSet
+open NumberField Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU GlobalTheory.SiegelSet
 open Formalism.UG (cT bc)
 open scoped TensorProduct NNReal
 
 namespace GlobalTheory.SphEis
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) {j m : ℕ}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+  {j m : ℕ}
 
-structure Fr (C D : Matrix (Fin n) (Fin j) E) (Z : Matrix (Fin n) (Fin m) E) (J₀ : Matrix (Fin m) (Fin m) E) : Prop where
+structure Fr
+    (C D : Matrix (Fin n) (Fin j) E) (Z : Matrix (Fin n) (Fin m) E) (J₀ : Matrix (Fin m) (Fin m) E)
+    : Prop where
   cm : IsCMExt F E σ
   herm : IsHermND σ J
   herm₀ : IsHermND σ J₀
@@ -32,7 +38,10 @@ structure Fr (C D : Matrix (Fin n) (Fin j) E) (Z : Matrix (Fin n) (Fin m) E) (J�
   zc : cT (σ : E →+* E) Z * J * C = 0
   zd : cT (σ : E →+* E) Z * J * D = 0
   zz : cT (σ : E →+* E) Z * J * Z = J₀
-  sum : C * (cT (σ : E →+* E) D * J) + Z * (J₀⁻¹ * (cT (σ : E →+* E) Z * J)) + D * (cT (σ : E →+* E) C * J) = 1
+  sum
+    : C * (cT (σ : E →+* E) D * J) + Z * (J₀⁻¹ * (cT (σ : E →+* E) Z * J))
+        + D * (cT (σ : E →+* E) C * J)
+      = 1
   dim : m + 2 * j = n
 
 def fixG {k : ℕ} (C : Matrix (Fin n) (Fin k) E) : Subgroup (GAd σ J) where
@@ -44,29 +53,35 @@ def fixG {k : ℕ} (C : Matrix (Fin n) (Fin k) E) : Subgroup (GAd σ J) where
   inv_mem' := fun {a} ha => by
     change _ * _ = _ at ha ⊢
     conv_lhs => rw [← ha]
-    rw [← Matrix.mul_assoc, ← Units.val_mul, ← map_mul, inv_mul_cancel, map_one, Units.val_one, Matrix.one_mul]
+    rw [← Matrix.mul_assoc, ← Units.val_mul, ← map_mul, inv_mul_cancel, map_one, Units.val_one,
+      Matrix.one_mul]
 
-structure IsLv (C D : Matrix (Fin n) (Fin j) E) (Z : Matrix (Fin n) (Fin m) E)
-    (lv : GL (Fin j) (AF F ⊗[F] E) →* GAd σ J) : Prop where
+structure IsLv
+    (C D : Matrix (Fin n) (Fin j) E) (Z : Matrix (Fin n) (Fin m) E)
+    (lv : GL (Fin j) (AF F ⊗[F] E) →* GAd σ J)
+    : Prop where
   cont : Continuous lv
   onC : ∀ α, (matHom _ σ J (lv α)).1 * adMat F C = adMat F C * α.1
   onD : ∀ α, (matHom _ σ J (lv α)).1 * adMat F D = adMat F D * cT (sigR (AF F) σ) (α⁻¹).1
   onZ : ∀ α, (matHom _ σ J (lv α)).1 * adMat F Z = adMat F Z
   rat : ∀ δ : GL (Fin j) E, lv (bc (inclR (F := F) (AF F)) δ) ∈ ratPts σ J
 
-def plus (J₀ : Matrix (Fin m) (Fin m) E) (b : Matrix (Fin j) (Fin m) (AF F ⊗[F] E)) : Matrix (Fin m) (Fin j) (AF F ⊗[F] E) :=
+def plus (J₀ : Matrix (Fin m) (Fin m) E) (b : Matrix (Fin j) (Fin m) (AF F ⊗[F] E))
+    : Matrix (Fin m) (Fin j) (AF F ⊗[F] E) :=
   adMat F J₀⁻¹ * cT (sigR (AF F) σ) b
 
-structure Crd (C D : Matrix (Fin n) (Fin j) E) (Z : Matrix (Fin n) (Fin m) E) (J₀ : Matrix (Fin m) (Fin m) E) (u : GAd σ J)
-    (b : Matrix (Fin j) (Fin m) (AF F ⊗[F] E)) (c : Matrix (Fin j) (Fin j) (AF F ⊗[F] E)) : Prop where
+structure Crd
+    (C D : Matrix (Fin n) (Fin j) E) (Z : Matrix (Fin n) (Fin m) E) (J₀ : Matrix (Fin m) (Fin m) E)
+    (u : GAd σ J) (b : Matrix (Fin j) (Fin m) (AF F ⊗[F] E))
+    (c : Matrix (Fin j) (Fin j) (AF F ⊗[F] E))
+    : Prop where
   onC : (matHom _ σ J u).1 * adMat F C = adMat F C
   onZ : (matHom _ σ J u).1 * adMat F Z = adMat F Z + adMat F C * b
   onD : (matHom _ σ J u).1 * adMat F D = adMat F D - adMat F Z * plus σ J₀ b + adMat F C * c
 
-
 variable (F E) in
-abbrev tor (l : Fin j → ℤ) : GL (Fin j) (AF F ⊗[F] E) := GlobalTheory.Eis.Conv.dg (GlobalTheory.Eis.Conv.halfE F E) l
-
+abbrev tor (l : Fin j → ℤ) : GL (Fin j) (AF F ⊗[F] E) :=
+  GlobalTheory.Eis.Conv.dg (GlobalTheory.Eis.Conv.halfE F E) l
 
 variable (F) in
 abbrev bse : ℝ := 4 ^ Fintype.card (InfinitePlace F)

@@ -8,12 +8,16 @@ namespace PositivityTheory.Rg.Rs.ctstepglue
 
 open Matrix
 
-theorem conj_block {R : Type*} [CommRing R] {n : ℕ} (r : ℕ) (b : GL (Fin n) R)
-    (hb : (b : Matrix (Fin n) (Fin n) R).BlockTriangular id) (d : Fin n → Rˣ)
-    (hd : ∀ i j : Fin n, ((i : ℕ) < r ↔ (j : ℕ) < r) → d i = d j) :
-    ∃ Y : Matrix (Fin n) (Fin n) R, (∀ i j : Fin n, ¬((i : ℕ) < r ∧ r ≤ (j : ℕ)) → Y i j = 0) ∧
-      (b : Matrix (Fin n) (Fin n) R) * diagonal (fun i => (d i : R)) =
-        (1 + Y) * (diagonal (fun i => (d i : R)) * (b : Matrix (Fin n) (Fin n) R)) := by
+theorem conj_block
+    {R : Type*} [CommRing R]
+    {n : ℕ}
+    (r : ℕ)
+    (b : GL (Fin n) R) (hb : (b : Matrix (Fin n) (Fin n) R).BlockTriangular id)
+    (d : Fin n → Rˣ) (hd : ∀ i j : Fin n, ((i : ℕ) < r ↔ (j : ℕ) < r) → d i = d j)
+    : ∃ Y : Matrix (Fin n) (Fin n) R,
+      (∀ i j : Fin n, ¬((i : ℕ) < r ∧ r ≤ (j : ℕ)) → Y i j = 0)
+        ∧ (b : Matrix (Fin n) (Fin n) R) * diagonal (fun i => (d i : R))
+          = (1 + Y) * (diagonal (fun i => (d i : R)) * (b : Matrix (Fin n) (Fin n) R)) := by
   classical
   set D : Matrix (Fin n) (Fin n) R := diagonal fun i => (d i : R) with hD
   set Di : Matrix (Fin n) (Fin n) R := diagonal fun i => (((d i)⁻¹ : Rˣ) : R) with hDi'
@@ -23,8 +27,7 @@ theorem conj_block {R : Type*} [CommRing R] {n : ℕ} (r : ℕ) (b : GL (Fin n) 
     rw [hD, hDi', diagonal_mul_diagonal]
     convert diagonal_one (n := Fin n) (α := R) using 2
     simp
-  have hBi : Bi * B = 1 := by
-    rw [hBi', hB, ← Units.val_mul, inv_mul_cancel, Units.val_one]
+  have hBi : Bi * B = 1 := by rw [hBi', hB, ← Units.val_mul, inv_mul_cancel, Units.val_one]
   have hbi : Bi.BlockTriangular id := by
     rw [hBi', Matrix.coe_units_inv]
     exact Matrix.blockTriangular_inv_of_blockTriangular hb
@@ -43,8 +46,7 @@ theorem conj_block {R : Type*} [CommRing R] {n : ℕ} (r : ℕ) (b : GL (Fin n) 
       rw [Matrix.mul_apply]
       refine Finset.sum_eq_zero fun k _ => ?_
       by_cases hk : (i : ℕ) < r ∧ r ≤ (k : ℕ)
-      · have hj : (j : ℕ) < r := by
-          by_contra hj; exact h ⟨hk.1, by omega⟩
+      · have hj : (j : ℕ) < r := by by_contra hj; exact h ⟨hk.1, by omega⟩
         rw [hbi (show j < k by rw [Fin.lt_def]; omega), mul_zero]
       · rw [hZ i k hk, zero_mul]
     rw [hDi', mul_diagonal, hZB, zero_mul]

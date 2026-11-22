@@ -11,8 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Exist
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 noncomputable section
@@ -24,8 +26,10 @@ variable {V W : Type} [CommRing V] [IsLocalRing V] [CommRing W] [IsLocalRing W] 
 end Ext
 
 section Tors
-variable {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {D : DegPre R}
-  {A : PolAV (Spec (CommRingCat.of (FractionRing R)))} {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {I : Ideal R} {D : DegPre R} {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
+  {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
   {F : Type} [Field F] [Algebra (FractionRing R) F]
 
 theorem isNsmul_b {k : ℕ} {g h : GtPtF D F} (H : GtPtF.IsNsmul k g h) : h.b = g.b ^ k := by

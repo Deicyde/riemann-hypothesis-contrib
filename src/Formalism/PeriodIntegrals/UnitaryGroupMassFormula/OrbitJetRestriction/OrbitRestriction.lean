@@ -12,7 +12,8 @@ namespace PI.OrbJet.OrbW
 
 open Formalism.BasicNotions Formalism.MainNotions.G MvPowerSeries Finsupp PI.OrbJet PI.OrbShared
 
-theorem orbitRestriction : ∀ (D : Formalism.BasicNotions.D7) (E : PI.OrbJet.Ent D), PI.OrbJet.OrbitRestriction E := by
+theorem orbitRestriction
+    : ∀ (D : Formalism.BasicNotions.D7) (E : PI.OrbJet.Ent D), PI.OrbJet.OrbitRestriction E := by
   intro D E
   unfold PI.OrbJet.OrbitRestriction
   intro p _ h u i R hR ep sg be hbe Th hB r hr
@@ -27,7 +28,8 @@ theorem orbitRestriction : ∀ (D : Formalism.BasicNotions.D7) (E : PI.OrbJet.En
   refine ⟨_, ?_, key⟩
   intro m
   change (ZMod (nP D p) × Fin (D.R.N i) × Fin (D.R.N (i + 1)) →₀ ℕ) at m
-  change ‖MvPowerSeries.coeff m (killCompl (orbEmb D p r (Fin (D.R.N i) × Fin (D.R.N (i + 1)))) U)‖ ≤ 1
+  change ‖MvPowerSeries.coeff m (killCompl (orbEmb D p r (Fin (D.R.N i) × Fin (D.R.N (i + 1)))) U)‖
+    ≤ 1
   rw [MvPowerSeries.coeff_killCompl]
   exact hU _
 

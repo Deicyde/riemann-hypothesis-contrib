@@ -20,30 +20,36 @@ open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LFun GlobalTheory.SplitWei
 
 variable {E : Type} [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E))
 
-def toFun {n : ℕ} (χ : Fin n → (w.adicCompletion E)ˣ →* ℂˣ) :
-    IndSp (points (Fin n)) ((ofChar (torusChar χ)).comp (leviTorus (w.adicCompletion E) (Fin n)).symm.toMonoidHom)
-      →ₗ[ℂ] (GL (Fin n) (w.adicCompletion E) → ℂ) where
+def toFun {n : ℕ} (χ : Fin n → (w.adicCompletion E)ˣ →* ℂˣ)
+    : IndSp (points (Fin n)) ((ofChar (torusChar χ)).comp (leviTorus (w.adicCompletion E) (Fin n)).symm.toMonoidHom)
+        →ₗ[ℂ] (GL (Fin n) (w.adicCompletion E) → ℂ) where
   toFun f := f.1.1
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-theorem toFun_injective {n : ℕ} (χ : Fin n → (w.adicCompletion E)ˣ →* ℂˣ) : Function.Injective (toFun w χ) :=
-  fun _ _ h => Subtype.ext (Subtype.ext h)
+theorem toFun_injective {n : ℕ} (χ : Fin n → (w.adicCompletion E)ˣ →* ℂˣ)
+    : Function.Injective (toFun w χ) := fun _ _ h =>
+  Subtype.ext (Subtype.ext h)
 
-theorem toFun_intertwines {n : ℕ} (χ : Fin n → (w.adicCompletion E)ˣ →* ℂˣ) (g) (f) :
-    toFun w χ (prinSeries χ g f) = rightReg ℂ _ ℂ g (toFun w χ f) := rfl
+theorem toFun_intertwines {n : ℕ} (χ : Fin n → (w.adicCompletion E)ˣ →* ℂˣ) (g) (f)
+    : toFun w χ (prinSeries χ g f) = rightReg ℂ _ ℂ g (toFun w χ f) :=
+  rfl
 
-theorem hasSatGL_prinSeries {n : ℕ} (α : Fin n → ℂˣ) :
-    HasSatGL w (prinSeries fun i => unrChar (w.adicCompletion E) (α i)) (Finset.univ.val.map α) := by
+theorem hasSatGL_prinSeries {n : ℕ} (α : Fin n → ℂˣ)
+    : HasSatGL w (prinSeries fun i => unrChar (w.adicCompletion E) (α i))
+      (Finset.univ.val.map α) := by
   have hK : KO (w.adicCompletion E) (Fin n) = KGL w (n := n) := SphCompletion.KO_completion w n
   constructor
-  · obtain ⟨φ, h, h1, -⟩ := Formalism.UG.Final.SphericalExists E w n (fun i => (α i : ℂ)) fun i => (α i).ne_zero
+  · obtain ⟨φ, h, h1, -⟩ :=
+      Formalism.UG.Final.SphericalExists E w n (fun i => (α i : ℂ)) fun i => (α i).ne_zero
     obtain ⟨f, hf, rfl⟩ := (SphCompletion.isSpherical_iff E w n α _).1 h
     refine (Submodule.ne_bot_iff _).2 ⟨f, hK ▸ hf, fun h0 => ?_⟩
     subst h0
     simp at h1
   · intro x hx h0
-    have hx' : x ∈ fixed (prinSeries fun i => unrChar (w.adicCompletion E) (α i)) (KO (w.adicCompletion E) (Fin n)) :=
+    have hx'
+        : x ∈ fixed (prinSeries fun i => unrChar (w.adicCompletion E) (α i))
+          (KO (w.adicCompletion E) (Fin n)) :=
       hK ▸ hx
     have hs := (SphCompletion.isSpherical_iff E w n α x.1.1).2 ⟨x, hx', rfl⟩
     exact IsSatVecGL.of_map (toFun w _) (toFun_intertwines w _) (toFun_injective w _)
@@ -60,8 +66,9 @@ variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchim
 theorem mem_parab_one (g : GL (Fin 1) k) : g ∈ parab k (points (Fin 1)) :=
   mem_parab_iff.2 fun a b _ _ hab => absurd hab (by rw [Subsingleton.elim a b]; exact lt_irrefl _)
 
-theorem cB_one (μ : kˣ →* ℂˣ) (p : parab k (points (Fin 1))) :
-    PrinProd.cB (fun _ : Fin 1 => μ) p = μ (Matrix.GeneralLinearGroup.det (p : GL (Fin 1) k)) := by
+theorem cB_one (μ : kˣ →* ℂˣ) (p : parab k (points (Fin 1)))
+    : PrinProd.cB (fun _ : Fin 1 => μ) p
+      = μ (Matrix.GeneralLinearGroup.det (p : GL (Fin 1) k)) := by
   rw [PrinProd.cB_eq, Fin.prod_univ_one, Fin.prod_univ_one]
   have h : PrinProd.dg p 0 = Matrix.GeneralLinearGroup.det (p : GL (Fin 1) k) := by
     ext
@@ -70,24 +77,35 @@ theorem cB_one (μ : kˣ →* ℂˣ) (p : parab k (points (Fin 1))) :
   rw [h]
   simp
 
-def oneEquiv (μ : kˣ →* ℂˣ) (hμ : IsSmoothChar μ) :
-    (detRep (Fin 1) μ).Equiv (prinSeries fun _ : Fin 1 => μ) := by
-  let Ψ : ℂ →ₗ[ℂ] IndSp (points (Fin 1))
-      ((ofChar (torusChar fun _ : Fin 1 => μ)).comp (leviTorus k (Fin 1)).symm.toMonoidHom) :=
-    { toFun := fun c => ⟨⟨fun g => (μ (Matrix.GeneralLinearGroup.det g) : ℂ) * c, fun p g => by
+def oneEquiv (μ : kˣ →* ℂˣ) (hμ : IsSmoothChar μ)
+    : (detRep (Fin 1) μ).Equiv (prinSeries fun _ : Fin 1 => μ) := by
+  let Ψ
+      : ℂ →ₗ[ℂ] IndSp (points (Fin 1))
+        ((ofChar (torusChar fun _ : Fin 1 => μ)).comp (leviTorus k (Fin 1)).symm.toMonoidHom) := {
+    toFun := fun c => ⟨
+      ⟨
+        fun g => (μ (Matrix.GeneralLinearGroup.det g) : ℂ) * c,
+        fun p g => by
           show _ = PrinProd.sB (fun _ : Fin 1 => μ) p _
           rw [PrinProd.sB_apply, cB_one]
           beta_reduce
-          rw [map_mul, map_mul, Units.val_mul, mul_assoc]⟩,
-        MultiIrr.mem_smooth_of_eventually _ (Filter.mem_of_superset
-          (IsOpen.mem_nhds (hμ.detChar (n := Fin 1)) (one_mem _)) fun u hu x => by
-            have hu' : detChar (Fin 1) μ u = 1 := hu
-            show (μ (Matrix.GeneralLinearGroup.det (x * u)) : ℂ) * c = (μ (Matrix.GeneralLinearGroup.det x) : ℂ) * c
-            rw [map_mul (Matrix.GeneralLinearGroup.det), map_mul, ← detChar_apply (n := Fin 1) μ u, hu', mul_one])⟩
-      map_add' := fun c d => Subtype.ext (Subtype.ext (funext fun g => mul_add _ _ _))
-      map_smul' := fun c d => Subtype.ext (Subtype.ext (funext fun g => mul_left_comm _ _ _)) }
-  refine Representation.Equiv.mk' ⟨Ψ, fun g => LinearMap.ext fun c => Subtype.ext (Subtype.ext (funext fun x => ?_))⟩
-    (fun F => F.1.1 1) (fun c => ?_) (fun F => Subtype.ext (Subtype.ext (funext fun g => ?_)))
+          rw [map_mul, map_mul, Units.val_mul, mul_assoc]
+      ⟩,
+      MultiIrr.mem_smooth_of_eventually _
+        (Filter.mem_of_superset (IsOpen.mem_nhds (hμ.detChar (n := Fin 1)) (one_mem _)) fun u hu x => by
+          have hu' : detChar (Fin 1) μ u = 1 := hu
+          show (μ (Matrix.GeneralLinearGroup.det (x * u)) : ℂ) * c = (μ (Matrix.GeneralLinearGroup.det x) : ℂ) * c
+          rw [map_mul (Matrix.GeneralLinearGroup.det), map_mul, ← detChar_apply (n := Fin 1) μ u,
+            hu', mul_one])
+    ⟩
+    map_add' := fun c d => Subtype.ext (Subtype.ext (funext fun g => mul_add _ _ _))
+    map_smul' := fun c d => Subtype.ext (Subtype.ext (funext fun g => mul_left_comm _ _ _))
+  }
+  refine Representation.Equiv.mk'
+    ⟨Ψ, fun g => LinearMap.ext fun c => Subtype.ext (Subtype.ext (funext fun x => ?_))⟩
+    (fun F => F.1.1 1)
+    (fun c => ?_)
+    (fun F => Subtype.ext (Subtype.ext (funext fun g => ?_)))
   · show (μ (Matrix.GeneralLinearGroup.det x) : ℂ) * (detRep (Fin 1) μ g c) =
       (μ (Matrix.GeneralLinearGroup.det (x * g)) : ℂ) * c
     simp [detRep, ofChar_apply, mul_assoc]
@@ -106,18 +124,22 @@ namespace GlobalTheory.PrinSat
 
 open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LFun GlobalTheory.SplitWeil
 
-theorem hasSatGL_of_equiv {E : Type} [Field E] [NumberField E] {w : HeightOneSpectrum (𝓞 E)} {n : ℕ}
-    {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+theorem hasSatGL_of_equiv
+    {E : Type} [Field E] [NumberField E]
+    {w : HeightOneSpectrum (𝓞 E)} {n : ℕ} {V W : Type}
+    [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
     {ρ : Representation ℂ (GL (Fin n) (w.adicCompletion E)) V}
-    {σ : Representation ℂ (GL (Fin n) (w.adicCompletion E)) W}
-    (e : ρ.Equiv σ) {B : Multiset ℂˣ} (h : HasSatGL w σ B) : HasSatGL w ρ B := by
+    {σ : Representation ℂ (GL (Fin n) (w.adicCompletion E)) W} (e : ρ.Equiv σ)
+    {B : Multiset ℂˣ} (h : HasSatGL w σ B)
+    : HasSatGL w ρ B := by
   let f : V →ₗ[ℂ] W := e.toLinearEquiv.toLinearMap
   have hi : ∀ g y, f (ρ g y) = σ g (f y) := fun g y => e.toIntertwiningMap.isIntertwining _ _ g y
   have inj : Function.Injective f := e.toLinearEquiv.injective
   constructor
   · obtain ⟨y, hy⟩ := h.exists_vec
     have hfy : f (e.toLinearEquiv.symm y) = y := e.toLinearEquiv.apply_symm_apply y
-    have hs : IsSatVecGL w ρ (e.toLinearEquiv.symm y) B := IsSatVecGL.of_map f hi inj (by rw [hfy]; exact hy)
+    have hs : IsSatVecGL w ρ (e.toLinearEquiv.symm y) B :=
+      IsSatVecGL.of_map f hi inj (by rw [hfy]; exact hy)
     exact (Submodule.ne_bot_iff _).2 ⟨_, hs.2.1, hs.1⟩
   · intro x hx h0
     have hfx : f x ∈ fixed σ (KGL w (n := n)) :=
@@ -126,10 +148,10 @@ theorem hasSatGL_of_equiv {E : Type} [Field E] [NumberField E] {w : HeightOneSpe
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem eq_unrChar_of_ord {χ : kˣ →* ℂˣ} (h : IsUnram χ) {ϖ : kˣ} (hϖ : ord k ϖ = 1) :
-    χ = unrChar k (χ ϖ) := by
-  let o : kˣ →* Multiplicative ℤ := MonoidHom.mk' (fun x => .ofAdd (ord k x)) fun x y => by
-    rw [ord_mul, ofAdd_add]
+theorem eq_unrChar_of_ord {χ : kˣ →* ℂˣ} (h : IsUnram χ) {ϖ : kˣ} (hϖ : ord k ϖ = 1)
+    : χ = unrChar k (χ ϖ) := by
+  let o : kˣ →* Multiplicative ℤ :=
+    MonoidHom.mk' (fun x => .ofAdd (ord k x)) fun x y => by rw [ord_mul, ofAdd_add]
   refine MonoidHom.ext fun x => ?_
   have h1 : o (x / ϖ ^ ord k x) = 1 := by
     rw [map_div, map_zpow, show o ϖ = .ofAdd 1 from congrArg Multiplicative.ofAdd hϖ, ← ofAdd_zsmul,
@@ -139,10 +161,14 @@ theorem eq_unrChar_of_ord {χ : kˣ →* ℂˣ} (h : IsUnram χ) {ϖ : kˣ} (hϖ
   rw [map_div, map_zpow, div_eq_one] at h2
   exact h2
 
-theorem ord_unif {E : Type} [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) :
-    ord (w.adicCompletion E) (Formalism.L2.Host.atFin w (Formalism.L2.Host.unif w)) = 1 := by
-  have h : Valued.v ((Formalism.L2.Host.atFin w (Formalism.L2.Host.unif w) : (w.adicCompletion E)ˣ) : w.adicCompletion E) =
-      WithZero.exp (-1 : ℤ) := Formalism.L2.Host.unif_spec w
+theorem ord_unif {E : Type} [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E))
+    : ord (w.adicCompletion E) (Formalism.L2.Host.atFin w (Formalism.L2.Host.unif w)) = 1 := by
+  have h
+      : Valued.v
+          ((Formalism.L2.Host.atFin w (Formalism.L2.Host.unif w) : (w.adicCompletion E)ˣ)
+            : w.adicCompletion E)
+        = WithZero.exp (-1 : ℤ) :=
+    Formalism.L2.Host.unif_spec w
   rw [SphCompletion.ord_completion, h, WithZero.log_exp, neg_neg]
 
 end GlobalTheory.PrinSat

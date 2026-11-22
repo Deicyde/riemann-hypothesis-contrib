@@ -9,8 +9,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 namespace UpperTheory.Gal.ToralGalois
 
-theorem inq_holds : Inq := ⟨UpperTheory.Gal.Int.Inp.inp_holds, UpperTheory.Gal.GamX.charLiftPrime_holds⟩
+theorem inq_holds : Inq :=
+  ⟨UpperTheory.Gal.Int.Inp.inp_holds, UpperTheory.Gal.GamX.charLiftPrime_holds⟩
 
-theorem galoisCompat_unlinkedSupport_of_spherical : GlobalTheory.RoadU.CoreAll → GlobalTheory.DeRhamOfPlainTorus.R1 := GalTw.GlobalTheory.DeRhamOfPlainTorus.galoisCompat_unlinkedSupport_of_spherical inq_holds
+theorem galoisCompat_unlinkedSupport_of_spherical
+    : GlobalTheory.RoadU.CoreAll → GlobalTheory.DeRhamOfPlainTorus.R1 :=
+  GalTw.GlobalTheory.DeRhamOfPlainTorus.galoisCompat_unlinkedSupport_of_spherical inq_holds
 
 end UpperTheory.Gal.ToralGalois

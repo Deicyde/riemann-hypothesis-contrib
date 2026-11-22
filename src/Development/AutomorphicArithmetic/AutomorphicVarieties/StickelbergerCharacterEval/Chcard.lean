@@ -6,32 +6,42 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Stickelberg
 
 open Finset UpperTheory.V.Bern UpperTheory.V.B4 UpperTheory.V.B5
 
-private def chOne {Ω : Type} [Field Ω] {Γ : Type} [CommGroup Γ] (c : Γ) :
-    Ch Ω c 1 ≃ ((Γ ⧸ Subgroup.zpowers c) →* Ωˣ) where
-  toFun χ := QuotientGroup.lift (Subgroup.zpowers c) χ.1 (by
-    have h : χ.1 c = 1 := Units.ext (by simpa using χ.2)
-    rintro _ ⟨n, rfl⟩
-    simp [h])
-  invFun ψ := ⟨ψ.comp (QuotientGroup.mk' _), by
-    have h : (QuotientGroup.mk c : Γ ⧸ Subgroup.zpowers c) = 1 :=
-      (QuotientGroup.eq_one_iff c).2 (Subgroup.mem_zpowers c)
-    simp [h]⟩
+private def chOne {Ω : Type} [Field Ω] {Γ : Type} [CommGroup Γ] (c : Γ)
+    : Ch Ω c 1 ≃ ((Γ ⧸ Subgroup.zpowers c) →* Ωˣ) where
+  toFun χ :=
+    QuotientGroup.lift (Subgroup.zpowers c) χ.1 (by
+      have h : χ.1 c = 1 := Units.ext (by simpa using χ.2)
+      rintro _ ⟨n, rfl⟩
+      simp [h])
+  invFun ψ := ⟨
+    ψ.comp (QuotientGroup.mk' _),
+    by
+      have h : (QuotientGroup.mk c : Γ ⧸ Subgroup.zpowers c) = 1 :=
+        (QuotientGroup.eq_one_iff c).2 (Subgroup.mem_zpowers c)
+      simp [h]
+  ⟩
   left_inv χ := Subtype.ext (MonoidHom.ext fun g => rfl)
-  right_inv ψ := MonoidHom.ext fun g => by
-    induction g using QuotientGroup.induction_on with
-    | H g => rfl
+  right_inv ψ :=
+    MonoidHom.ext fun g => by
+      induction g using QuotientGroup.induction_on with
+      | H g => rfl
 
-private def chMul {Ω : Type} [Field Ω] {Γ : Type} [CommGroup Γ] (c : Γ) (ε : ℤ) (χ₀ : Ch Ω c ε) :
-    Ch Ω c 1 ≃ Ch Ω c ε where
+private def chMul {Ω : Type} [Field Ω] {Γ : Type} [CommGroup Γ] (c : Γ) (ε : ℤ) (χ₀ : Ch Ω c ε)
+    : Ch Ω c 1 ≃ Ch Ω c ε where
   toFun χ := ⟨χ₀.1 * χ.1, by simp [χ₀.2, χ.2]⟩
-  invFun χ := ⟨χ₀.1⁻¹ * χ.1, by
-    have h : χ.1 c = χ₀.1 c := Units.ext (χ.2.trans χ₀.2.symm)
-    simp [h]⟩
+  invFun χ := ⟨
+    χ₀.1⁻¹ * χ.1,
+    by
+      have h : χ.1 c = χ₀.1 c := Units.ext (χ.2.trans χ₀.2.symm)
+      simp [h]
+  ⟩
   left_inv χ := Subtype.ext (inv_mul_cancel_left _ _)
   right_inv χ := Subtype.ext (mul_inv_cancel_left _ _)
 
-theorem UpperTheory.V.B5.card_signedInvolutionChar_eq_card_involutionQuotient :
-    ∀ {Ω : Type} [Field Ω] {Γ : Type} [CommGroup Γ] [Finite Γ] [HasEnoughRootsOfUnity Ω (Monoid.exponent Γ)] (c : Γ) (ε : ℤ), c * c = 1 → c ≠ 1 → ε * ε = 1 → Fintype.card (Ch Ω c ε) = Fintype.card (Qc c) := by
+theorem UpperTheory.V.B5.card_signedInvolutionChar_eq_card_involutionQuotient
+    : ∀ {Ω : Type} [Field Ω] {Γ : Type} [CommGroup Γ] [Finite Γ]
+        [HasEnoughRootsOfUnity Ω (Monoid.exponent Γ)] (c : Γ) (ε : ℤ),
+      c * c = 1 → c ≠ 1 → ε * ε = 1 → Fintype.card (Ch Ω c ε) = Fintype.card (Qc c) := by
   intro Ω _ Γ _ _ _ c ε h2 hc hε
   classical
   have hne₀ : Nonempty (Ch Ω c ε) := by

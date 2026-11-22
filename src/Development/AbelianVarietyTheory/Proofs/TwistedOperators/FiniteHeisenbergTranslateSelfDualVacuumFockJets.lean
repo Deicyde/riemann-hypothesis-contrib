@@ -29,8 +29,11 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsSelfDua
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest
+  GlobalTheory.RowClaim
 open Formalism.L2.Host (HChar)
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -47,8 +50,10 @@ open GlobalTheory.FockPos
 
 variable {D : D7}
 
-theorem latO_negSp_le (S T : HSp D) (LS : Set (Fin S.rank → D.host.E)) (LT : Set (Fin T.rank → D.host.E))
-    (P : HeightOneSpectrum (𝓞 D.host.F) → Prop) : latO (negSp S) T LS LT P ≤ latO S T LS LT P := by
+theorem latO_negSp_le
+    (S T : HSp D) (LS : Set (Fin S.rank → D.host.E)) (LT : Set (Fin T.rank → D.host.E))
+    (P : HeightOneSpectrum (𝓞 D.host.F) → Prop)
+    : latO (negSp S) T LS LT P ≤ latO S T LS LT P := by
   unfold latO
   rw [AddSubgroup.closure_le]
   rintro w ⟨α, hα, hP, a, ha, s, hs, t, ht, rfl⟩
@@ -57,15 +62,24 @@ theorem latO_negSp_le (S T : HSp D) (LS : Set (Fin S.rank → D.host.E)) (LT : S
   funext i j
   simp [negSp_gram, Finset.sum_neg_distrib, TensorProduct.tmul_neg]
 
-theorem applyAt0_scale {N N' : ℕ} (G : Formalism.MainNotions.TaylorLogMetric.VC D N N' → ℂ) (hG : Differentiable ℂ G) (c a : ℂ)
-    (k : Formalism.MainNotions.GL3Theta.Idx D N N' →₀ ℕ) :
-    Formalism.MainNotions.GL3Theta.applyAt0 D (MvPolynomial.monomial k 1) (fun z => c * G (a • z)) =
-      c * a ^ (k.sum fun _ n => n) * Formalism.MainNotions.GL3Theta.applyAt0 D (MvPolynomial.monomial k 1) G := by
-  have hc : ContDiff ℂ (Multiset.card (Finsupp.toMultiset k)) (fun z : Formalism.MainNotions.TaylorLogMetric.VC D N N' => G (a • z)) :=
-    ((ReciprocityTheory.ChartRestriction.G.I2.contDiff_of_diff hG).comp (contDiff_const_smul a)).of_le (by exact_mod_cast le_top)
-  have h1 : Formalism.MainNotions.TaylorLogMetric.taylor D (fun z => c * G (a • z)) k = c * Formalism.MainNotions.TaylorLogMetric.taylor D (fun z => G (a • z)) k := by
+theorem applyAt0_scale
+    {N N' : ℕ} (G : Formalism.MainNotions.TaylorLogMetric.VC D N N' → ℂ) (hG : Differentiable ℂ G)
+    (c a : ℂ) (k : Formalism.MainNotions.GL3Theta.Idx D N N' →₀ ℕ)
+    : Formalism.MainNotions.GL3Theta.applyAt0 D (MvPolynomial.monomial k 1) (fun z => c * G (a • z))
+      = c * a ^ (k.sum fun _ n => n)
+        * Formalism.MainNotions.GL3Theta.applyAt0 D (MvPolynomial.monomial k 1) G := by
+  have hc : ContDiff ℂ (Multiset.card (Finsupp.toMultiset k))
+      (fun z : Formalism.MainNotions.TaylorLogMetric.VC D N N' => G (a • z)) :=
+    ((ReciprocityTheory.ChartRestriction.G.I2.contDiff_of_diff hG).comp
+      (contDiff_const_smul a)).of_le (by exact_mod_cast le_top)
+  have h1
+      : Formalism.MainNotions.TaylorLogMetric.taylor D (fun z => c * G (a • z)) k
+        = c * Formalism.MainNotions.TaylorLogMetric.taylor D (fun z => G (a • z)) k := by
     unfold Formalism.MainNotions.TaylorLogMetric.taylor
-    have e : (fun z : Formalism.MainNotions.TaylorLogMetric.VC D N N' => c * G (a • z)) = c • (fun z => G (a • z)) := rfl
+    have e
+        : (fun z : Formalism.MainNotions.TaylorLogMetric.VC D N N' => c * G (a • z))
+          = c • (fun z => G (a • z)) :=
+      rfl
     rw [e, iteratedFDeriv_const_smul_apply (hc.contDiffAt)]
     simp only [ContinuousMultilinearMap.smul_apply, smul_eq_mul, mul_div_assoc]
   rw [applyAt0_monomial', applyAt0_monomial', h1, taylor_comp_smul' D G hG a k]
@@ -182,96 +196,157 @@ open GlobalTheory.FockPos
 
 variable {D : D7}
 
-theorem coreNeg (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (S T : HSp D)
-    (sS : D.what₂.Tau → Matrix (Fin S.rank) (Fin S.rank) ℂ) (sT : D.what₂.Tau → Matrix (Fin T.rank) (Fin T.rank) ℂ)
-    (frS : GL (Fin S.rank) D.host.E) (frT : GL (Fin T.rank) D.host.E)
+theorem coreNeg
+    (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D)
+    (S T : HSp D) (sS : D.what₂.Tau → Matrix (Fin S.rank) (Fin S.rank) ℂ)
+    (sT : D.what₂.Tau → Matrix (Fin T.rank) (Fin T.rank) ℂ) (frS : GL (Fin S.rank) D.host.E)
+    (frT : GL (Fin T.rank) D.host.E)
     (hS : Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) frS.1 * S.gram * frS.1 = 1)
     (hT : Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) frT.1 * T.gram * frT.1 = 1)
     (hcS : ∀ τ, IsCartanInv (gramAt D S τ) (sS τ)) (hcT : ∀ τ, IsCartanInv (gramAt D T τ) (sT τ))
-    (Ls : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)) (Lt : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E))
-    (hLs : SD D Ls) (hLt : SD D Lt) (δ : ℂ) (hδ : δ ≠ 0)
-    (Θ₀ : Formalism.MainNotions.TaylorLogMetric.VC D S.rank T.rank → ℂ) (hΘ : Differentiable ℂ Θ₀) (c : ℂ) (F : WO (negSp S) T → ℂ)
-    (hF : IsVacO ψ θ (negSp S) T (fun τ => -sS τ) sT (GlobalTheory.MovedDict.inV frS Ls) (GlobalTheory.MovedDict.inV frT Lt) F)
-    (hj : ∀ k : FVar D T.rank S.rank →₀ ℕ, pureTensorO ψ θ (negSp S) T (fun τ => -sS τ) sT (GlobalTheory.FockPos.frAt frS)
-      (GlobalTheory.FockPos.frAt frT) F (MvPolynomial.monomial k 1) 0 =
-        c * starRingEnd ℂ ((k.prod fun v e => GlobalTheory.FunObj.period δ v.1 ^ e) *
-          Formalism.MainNotions.GL3Theta.applyAt0 D (MvPolynomial.monomial k 1) Θ₀))
-    (n : ℕ) (hn : 0 < n) (w : WO S T)
-    (hw : n • w ∈ latO (negSp S) T (GlobalTheory.MovedDict.inV frS Ls) (GlobalTheory.MovedDict.inV frT Lt) (fun _ => True)) :
-    ∃ (ζ : ℂ) (s : Formalism.MainNotions.TaylorLogMetric.VC D S.rank T.rank), (∃ m : ℕ, 0 < m ∧ ζ ^ m = 1) ∧
-      n • s ∈ Formalism.MainNotions.TaylorLogMetric.La D (Formalism.MainNotions.TaylorLogMetric.tor0 D D.host.ccK δ) Ls Lt ∧
-      ∀ k : FVar D T.rank S.rank →₀ ℕ, pureTensorO ψ θ (negSp S) T (fun τ => -sS τ) sT (GlobalTheory.FockPos.frAt frS)
-        (GlobalTheory.FockPos.frAt frT) (heisO ψ (negSp S) T w F) (MvPolynomial.monomial k 1) 0 =
-        c * starRingEnd ℂ ((k.prod fun v e => GlobalTheory.FunObj.period δ v.1 ^ e) *
-          Formalism.MainNotions.GL3Theta.applyAt0 D (MvPolynomial.monomial k 1)
-          (fun z => ζ * Formalism.MainNotions.TaylorLogMetric.U D (Formalism.MainNotions.TaylorLogMetric.tor0 D D.host.ccK δ) s Θ₀ z)) := by
+    (Ls : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
+    (Lt : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)) (hLs : SD D Ls) (hLt : SD D Lt)
+    (δ : ℂ) (hδ : δ ≠ 0)
+    (Θ₀ : Formalism.MainNotions.TaylorLogMetric.VC D S.rank T.rank → ℂ) (hΘ : Differentiable ℂ Θ₀)
+    (c : ℂ) (F : WO (negSp S) T → ℂ)
+    (hF : IsVacO ψ θ (negSp S) T
+      (fun τ => - sS τ)
+      sT (GlobalTheory.MovedDict.inV frS Ls) (GlobalTheory.MovedDict.inV frT Lt) F)
+    (hj : ∀ k : FVar D T.rank S.rank →₀ ℕ,
+      pureTensorO ψ θ (negSp S) T
+          (fun τ => - sS τ)
+          sT (GlobalTheory.FockPos.frAt frS) (GlobalTheory.FockPos.frAt frT) F
+          (MvPolynomial.monomial k 1) 0
+        = c * starRingEnd ℂ
+          ((k.prod fun v e => GlobalTheory.FunObj.period δ v.1 ^ e)
+            * Formalism.MainNotions.GL3Theta.applyAt0 D (MvPolynomial.monomial k 1) Θ₀))
+    (n : ℕ) (hn : 0 < n)
+    (w : WO S T)
+    (hw : n • w ∈ latO (negSp S) T (GlobalTheory.MovedDict.inV frS Ls)
+      (GlobalTheory.MovedDict.inV frT Lt) (fun _ => True))
+    : ∃ (ζ : ℂ) (s : Formalism.MainNotions.TaylorLogMetric.VC D S.rank T.rank),
+      (∃ m : ℕ, 0 < m ∧ ζ ^ m = 1)
+        ∧ n • s ∈ Formalism.MainNotions.TaylorLogMetric.La D
+          (Formalism.MainNotions.TaylorLogMetric.tor0 D D.host.ccK δ) Ls Lt
+        ∧ ∀ k : FVar D T.rank S.rank →₀ ℕ,
+          pureTensorO ψ θ (negSp S) T
+              (fun τ => - sS τ)
+              sT (GlobalTheory.FockPos.frAt frS) (GlobalTheory.FockPos.frAt frT)
+              (heisO ψ (negSp S) T w F) (MvPolynomial.monomial k 1) 0
+            = c * starRingEnd ℂ
+              ((k.prod fun v e => GlobalTheory.FunObj.period δ v.1 ^ e)
+                * Formalism.MainNotions.GL3Theta.applyAt0 D (MvPolynomial.monomial k 1) (fun z =>
+                  ζ * Formalism.MainNotions.TaylorLogMetric.U D
+                    (Formalism.MainNotions.TaylorLogMetric.tor0 D D.host.ccK δ) s Θ₀ z)) := by
   have hvac' := GlobalTheory.VacConj.isVacO_conj_negSp ψ θ S T sS sT _ _ F hF
   have hψn : ∀ a, ‖ψ a‖ = 1 := hF.1.1.2.1
   have hθ : IsInfFam θ := hF.2.inf
-  have hj2 : ∀ k : FVar D T.rank S.rank →₀ ℕ, pureTensorO ψ θ S T sS sT (GlobalTheory.FockPos.frAt frS)
-      (GlobalTheory.FockPos.frAt frT) (fun w => starRingEnd ℂ (F w)) (MvPolynomial.monomial k 1) 0 =
-        starRingEnd ℂ c * ((k.prod fun v e => GlobalTheory.FunObj.period δ v.1 ^ e) *
-          Formalism.MainNotions.GL3Theta.applyAt0 D (MvPolynomial.monomial k 1) Θ₀) := by
+  have hj2
+      : ∀ k : FVar D T.rank S.rank →₀ ℕ,
+        pureTensorO ψ θ S T sS sT (GlobalTheory.FockPos.frAt frS) (GlobalTheory.FockPos.frAt frT)
+            (fun w => starRingEnd ℂ (F w))
+            (MvPolynomial.monomial k 1) 0
+          = starRingEnd ℂ c
+            * ((k.prod fun v e => GlobalTheory.FunObj.period δ v.1 ^ e)
+              * Formalism.MainNotions.GL3Theta.applyAt0 D (MvPolynomial.monomial k 1) Θ₀) := by
     intro k
     have h3 := hj k
     rw [GlobalTheory.FockConj.pureTensorO_negSp_monomial ψ θ S T sS sT _ _ F hF.1 hθ k 0] at h3
     have h4 := congrArg (starRingEnd ℂ) h3
     rw [Complex.conj_conj, map_mul, Complex.conj_conj] at h4
     exact h4
-  obtain ⟨ζ, s, hζ, hs, hk⟩ := core ψ θ S T sS sT frS frT hS hT hcS hcT Ls Lt hLs hLt δ hδ Θ₀ hΘ _ _ hvac' hj2 n hn w
-    (latO_negSp_le S T _ _ _ hw)
+  obtain ⟨ζ, s, hζ, hs, hk⟩ :=
+    core ψ θ S T sS sT frS frT hS hT hcS hcT Ls Lt hLs hLt δ hδ Θ₀ hΘ _ _ hvac' hj2 n hn w
+      (latO_negSp_le S T _ _ _ hw)
   refine ⟨ζ, s, hζ, hs, fun k => ?_⟩
-  rw [GlobalTheory.FockConj.pureTensorO_negSp_monomial ψ θ S T sS sT _ _ _ hF.1 hθ k 0, ← GlobalTheory.VacConj.heisO_conj ψ hψn S T w F,
-    hk k, map_mul, Complex.conj_conj]
+  rw [GlobalTheory.FockConj.pureTensorO_negSp_monomial ψ θ S T sS sT _ _ _ hF.1 hθ k 0,
+    ← GlobalTheory.VacConj.heisO_conj ψ hψn S T w F, hk k, map_mul, Complex.conj_conj]
 
 end GlobalTheory.HeisTrans
 
 namespace GlobalTheory.HeisTrans
 
-theorem qbar_of_root {ζ : ℂ} (h : ∃ m : ℕ, 0 < m ∧ ζ ^ m = 1) :
-    ∃ ζ' : Qbar, (ζ' : ℂ) = ζ ∧ ∃ m : ℕ, 0 < m ∧ ζ' ^ m = 1 := by
+theorem qbar_of_root {ζ : ℂ} (h : ∃ m : ℕ, 0 < m ∧ ζ ^ m = 1)
+    : ∃ ζ' : Qbar, (ζ' : ℂ) = ζ ∧ ∃ m : ℕ, 0 < m ∧ ζ' ^ m = 1 := by
   obtain ⟨m, hm, hζ⟩ := h
-  have hint : IsIntegral ℚ ζ := ⟨Polynomial.X ^ m - 1, Polynomial.monic_X_pow_sub_C 1 hm.ne', by simp [hζ]⟩
+  have hint : IsIntegral ℚ ζ :=
+    ⟨Polynomial.X ^ m - 1, Polynomial.monic_X_pow_sub_C 1 hm.ne', by simp [hζ]⟩
   refine ⟨⟨ζ, mem_algebraicClosure_iff.2 hint.isAlgebraic⟩, rfl, m, hm, ?_⟩
   apply Subtype.ext
   simp [hζ]
 
 end GlobalTheory.HeisTrans
 
-theorem GlobalTheory.HeisTrans.main : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : GlobalTheory.ChiGrid.Consts} {G : GlobalTheory.ChiGrid.GridData L sc} {W : G.Weil}
-    (S : GridChoice W Set.univ) (p : GlobalTheory.ChiGrid.Pair T), DefPair D.R.m p →
-    ∀ (Ls : Submodule (𝓞 D.host.E) (Fin (G.pS p).rank → D.host.E)) (Lt : Submodule (𝓞 D.host.E) (Fin (G.pT p).rank → D.host.E))
-    (κ : ℂ) (F : WO (G.pS p) (G.pT p) → ℂ), SD D Ls → SD D Lt →
-    Differentiable ℂ (Iop D (tor0 D D.host.ccK S.Z.δ) (La0 D (tor0 D D.host.ccK S.Z.δ) _ _) (Formalism.MainNotions.TaylorLogMetric.La D (tor0 D D.host.ccK S.Z.δ) Ls Lt) (S.Z.e0 p)) →
-    IsVacO W.ψ W.θ _ _ (G.cartS W.cart p) (G.onT W.cart p) (inV (frS S.N p) Ls) (inV (frT S.N p) Lt) F →
-    (∀ k : FVar D (G.pT p).rank (G.pS p).rank →₀ ℕ, fockIn W S.N.frC p F (MvPolynomial.monomial k 1) 0 =
-      S.Z.c0 p * opp p ((k.prod fun v e => period S.Z.δ v.1 ^ e) * Formalism.MainNotions.GL3Theta.applyAt0 D (MvPolynomial.monomial k 1) fun z =>
-        κ * Iop D (tor0 D D.host.ccK S.Z.δ) (La0 D (tor0 D D.host.ccK S.Z.δ) _ _) (Formalism.MainNotions.TaylorLogMetric.La D (tor0 D D.host.ccK S.Z.δ) Ls Lt) (S.Z.e0 p) z)) →
-    ∀ (n : ℕ), 0 < n → ∀ w : WO (G.pS p) (G.pT p), n • w ∈ latO _ _ (inV (frS S.N p) Ls) (inV (frT S.N p) Lt) (fun _ => True) →
-    ∃ (ζ : Qbar) (s : VC D (G.pS p).rank (G.pT p).rank), (∃ m : ℕ, 0 < m ∧ ζ ^ m = 1) ∧ n • s ∈ Formalism.MainNotions.TaylorLogMetric.La D (tor0 D D.host.ccK S.Z.δ) Ls Lt ∧
-    ∀ k : FVar D (G.pT p).rank (G.pS p).rank →₀ ℕ, fockIn W S.N.frC p (heisO W.ψ _ _ w F) (MvPolynomial.monomial k 1) 0 =
-      S.Z.c0 p * opp p ((k.prod fun v e => period S.Z.δ v.1 ^ e) * Formalism.MainNotions.GL3Theta.applyAt0 D (MvPolynomial.monomial k 1) fun z =>
-        κ * ((ζ : ℂ) * Formalism.MainNotions.TaylorLogMetric.U D (tor0 D D.host.ccK S.Z.δ) s
-          (Iop D (tor0 D D.host.ccK S.Z.δ) (La0 D (tor0 D D.host.ccK S.Z.δ) _ _) (Formalism.MainNotions.TaylorLogMetric.La D (tor0 D D.host.ccK S.Z.δ) Ls Lt) (S.Z.e0 p)) z)) := by
+theorem GlobalTheory.HeisTrans.main
+    : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : GlobalTheory.ChiGrid.Consts}
+        {G : GlobalTheory.ChiGrid.GridData L sc} {W : G.Weil} (S : GridChoice W Set.univ)
+        (p : GlobalTheory.ChiGrid.Pair T),
+      DefPair D.R.m p
+        → ∀ (Ls : Submodule (𝓞 D.host.E) (Fin (G.pS p).rank → D.host.E))
+            (Lt : Submodule (𝓞 D.host.E) (Fin (G.pT p).rank → D.host.E)) (κ : ℂ)
+            (F : WO (G.pS p) (G.pT p) → ℂ),
+          SD D Ls → SD D Lt
+            → Differentiable ℂ
+              (Iop D (tor0 D D.host.ccK S.Z.δ) (La0 D (tor0 D D.host.ccK S.Z.δ) _ _)
+                (Formalism.MainNotions.TaylorLogMetric.La D (tor0 D D.host.ccK S.Z.δ) Ls Lt)
+                (S.Z.e0 p))
+            → IsVacO W.ψ W.θ _ _ (G.cartS W.cart p) (G.onT W.cart p) (inV (frS S.N p) Ls)
+              (inV (frT S.N p) Lt) F
+            → (∀ k : FVar D (G.pT p).rank (G.pS p).rank →₀ ℕ,
+              fockIn W S.N.frC p F (MvPolynomial.monomial k 1) 0
+                = S.Z.c0 p * opp p
+                  ((k.prod fun v e => period S.Z.δ v.1 ^ e)
+                    * Formalism.MainNotions.GL3Theta.applyAt0 D (MvPolynomial.monomial k 1) fun z =>
+                      κ * Iop D (tor0 D D.host.ccK S.Z.δ) (La0 D (tor0 D D.host.ccK S.Z.δ) _ _)
+                        (Formalism.MainNotions.TaylorLogMetric.La D (tor0 D D.host.ccK S.Z.δ) Ls Lt)
+                        (S.Z.e0 p) z))
+            → ∀ (n : ℕ),
+              0 < n
+                → ∀ w : WO (G.pS p) (G.pT p),
+                  n • w ∈ latO _ _ (inV (frS S.N p) Ls) (inV (frT S.N p) Lt) (fun _ => True)
+                    → ∃ (ζ : Qbar) (s : VC D (G.pS p).rank (G.pT p).rank),
+                      (∃ m : ℕ, 0 < m ∧ ζ ^ m = 1)
+                        ∧ n • s ∈ Formalism.MainNotions.TaylorLogMetric.La D
+                          (tor0 D D.host.ccK S.Z.δ) Ls Lt
+                        ∧ ∀ k : FVar D (G.pT p).rank (G.pS p).rank →₀ ℕ,
+                          fockIn W S.N.frC p (heisO W.ψ _ _ w F) (MvPolynomial.monomial k 1) 0
+                            = S.Z.c0 p * opp p
+                              ((k.prod fun v e => period S.Z.δ v.1 ^ e)
+                                * Formalism.MainNotions.GL3Theta.applyAt0 D
+                                  (MvPolynomial.monomial k 1)
+                                  fun z =>
+                                    κ * ((ζ : ℂ) * Formalism.MainNotions.TaylorLogMetric.U D
+                                      (tor0 D D.host.ccK S.Z.δ) s
+                                      (Iop D (tor0 D D.host.ccK S.Z.δ)
+                                        (La0 D (tor0 D D.host.ccK S.Z.δ) _ _)
+                                        (Formalism.MainNotions.TaylorLogMetric.La D
+                                          (tor0 D D.host.ccK S.Z.δ) Ls Lt)
+                                        (S.Z.e0 p))
+                                      z)) := by
   intro D T L sc G W S p hp Ls Lt κ F hLs hLt hdiff hvac hjets n hn w hw
   have hδ : S.Z.δ ≠ 0 := GlobalTheory.InertSign.delta_ne_zero S.Z.crv
   set Θ₀ := fun z => κ * Iop D (tor0 D D.host.ccK S.Z.δ) (La0 D (tor0 D D.host.ccK S.Z.δ) _ _)
     (Formalism.MainNotions.TaylorLogMetric.La D (tor0 D D.host.ccK S.Z.δ) Ls Lt) (S.Z.e0 p) z with hΘ₀
   have hΘ : Differentiable ℂ Θ₀ := hdiff.const_mul κ
-  have hU : ∀ (s : VC D (G.pS p).rank (G.pT p).rank) (ζ : ℂ),
-      (fun z => ζ * Formalism.MainNotions.TaylorLogMetric.U D (tor0 D D.host.ccK S.Z.δ) s Θ₀ z) = fun z =>
-        κ * (ζ * Formalism.MainNotions.TaylorLogMetric.U D (tor0 D D.host.ccK S.Z.δ) s
-          (Iop D (tor0 D D.host.ccK S.Z.δ) (La0 D (tor0 D D.host.ccK S.Z.δ) _ _)
-            (Formalism.MainNotions.TaylorLogMetric.La D (tor0 D D.host.ccK S.Z.δ) Ls Lt) (S.Z.e0 p)) z) := by
+  have hU
+      : ∀ (s : VC D (G.pS p).rank (G.pT p).rank) (ζ : ℂ),
+        (fun z => ζ * Formalism.MainNotions.TaylorLogMetric.U D (tor0 D D.host.ccK S.Z.δ) s Θ₀ z)
+          = fun z =>
+            κ * (ζ * Formalism.MainNotions.TaylorLogMetric.U D (tor0 D D.host.ccK S.Z.δ) s
+              (Iop D (tor0 D D.host.ccK S.Z.δ) (La0 D (tor0 D D.host.ccK S.Z.δ) _ _)
+                (Formalism.MainNotions.TaylorLogMetric.La D (tor0 D D.host.ccK S.Z.δ) Ls Lt)
+                (S.Z.e0 p))
+              z) := by
     intro s ζ; funext z; simp only [hΘ₀, Formalism.MainNotions.TaylorLogMetric.U]; ring
   cases p with
   | top t j =>
     have hj : j + 1 ≤ D.R.m := hp
     have hcS := W.cart_is (.top j) (show j ≤ D.R.m by omega)
     have hcT := W.cart_is (.top (j + 1)) hj
-    obtain ⟨ζ, s, hζ, hs, hk⟩ := GlobalTheory.HeisTrans.core W.ψ W.θ _ _ _ _ (S.N.fr (.top j)) (S.N.fr (.top (j + 1)))
-      (S.N.fr_on _ (show j ≤ D.R.m by omega)) (S.N.fr_on _ hj) hcS hcT Ls Lt hLs hLt S.Z.δ hδ Θ₀ hΘ (S.Z.c0 (.top t j))
-      F hvac hjets n hn w hw
+    obtain ⟨ζ, s, hζ, hs, hk⟩ :=
+      GlobalTheory.HeisTrans.core W.ψ W.θ _ _ _ _ (S.N.fr (.top j)) (S.N.fr (.top (j + 1)))
+        (S.N.fr_on _ (show j ≤ D.R.m by omega)) (S.N.fr_on _ hj) hcS hcT Ls Lt hLs hLt S.Z.δ hδ Θ₀
+        hΘ (S.Z.c0 (.top t j)) F hvac hjets n hn w hw
     obtain ⟨ζ', hζ', hroot⟩ := GlobalTheory.HeisTrans.qbar_of_root hζ
     refine ⟨ζ', s, hroot, hs, fun k => ?_⟩
     have := hk k
@@ -280,10 +355,12 @@ theorem GlobalTheory.HeisTrans.main : ∀ {D : D7} {T : Type} {L : LevCh D T} {s
     exact this
   | chi i j =>
     obtain ⟨hi, rfl⟩ : i + 1 ≤ D.R.m ∧ j = D.R.m := hp
-    obtain ⟨ζ, s, hζ, hs, hk⟩ := GlobalTheory.HeisTrans.coreNeg W.ψ W.θ _ _ _ _ (S.N.fr (.grid (i + 1) D.R.m))
-      (S.N.fr (.grid i D.R.m)) (S.N.fr_on _ ⟨hi, rfl⟩) (S.N.fr_on _ ⟨by omega, rfl⟩)
-      (W.cart_is (.grid (i + 1) D.R.m) ⟨hi, le_rfl⟩) (W.cart_is (.grid i D.R.m) ⟨by omega, le_rfl⟩) Ls Lt hLs hLt
-      S.Z.δ hδ Θ₀ hΘ (S.Z.c0 (.chi i D.R.m)) F hvac hjets n hn w hw
+    obtain ⟨ζ, s, hζ, hs, hk⟩ :=
+      GlobalTheory.HeisTrans.coreNeg W.ψ W.θ _ _ _ _ (S.N.fr (.grid (i + 1) D.R.m))
+        (S.N.fr (.grid i D.R.m)) (S.N.fr_on _ ⟨hi, rfl⟩) (S.N.fr_on _ ⟨by omega, rfl⟩)
+        (W.cart_is (.grid (i + 1) D.R.m) ⟨hi, le_rfl⟩)
+        (W.cart_is (.grid i D.R.m) ⟨by omega, le_rfl⟩) Ls Lt hLs hLt S.Z.δ hδ Θ₀ hΘ
+        (S.Z.c0 (.chi i D.R.m)) F hvac hjets n hn w hw
     obtain ⟨ζ', hζ', hroot⟩ := GlobalTheory.HeisTrans.qbar_of_root hζ
     refine ⟨ζ', s, hroot, hs, fun k => ?_⟩
     have := hk k

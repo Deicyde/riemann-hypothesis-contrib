@@ -10,8 +10,8 @@ public import Development.WeilBound.RepresentationTheoryGL.JacquetShalikaBounds.
 
 open NumberField IsDedekindDomain Formalism.L2.Host GlobalTheory.CuspRep UpperTheory.CBC
 
-theorem UpperTheory.ConvolutionTheory.Sph.unlinked :
-    UpperTheory.ConvolutionTheory.Sph.Unlinked := by
+theorem UpperTheory.ConvolutionTheory.Sph.unlinked
+    : UpperTheory.ConvolutionTheory.Sph.Unlinked := by
   intro K _ _ _ n hn π v B hB a ha b hb hab
   have hB' : (CG.mk π).HasSat v B := hB
   obtain ⟨ν, hν, h⟩ := PositivityTheory.RgJS.unit_exponent_holds K
@@ -19,8 +19,7 @@ theorem UpperTheory.ConvolutionTheory.Sph.unlinked :
   have hχ : ((ν t)⁻¹).UnrAt v := fun x hx => by
     change ((ν t).loc v x)⁻¹ = 1
     rw [(hν t).1 v x hx, inv_one]
-  have e0 : (CG.mk π).twist (ν t)⁻¹ = π₀ := by
-    rw [he, ← CG.twist_mul, mul_inv_cancel, CG.twist_one]
+  have e0 : (CG.mk π).twist (ν t)⁻¹ = π₀ := by rw [he, ← CG.twist_mul, mul_inv_cancel, CG.twist_one]
   have hS : π₀.HasSat v (B.map (· * ((ν t)⁻¹).val v)) :=
     e0 ▸ PositivityTheory.RgJS.satake_twist_holds K n (CG.mk π) (ν t)⁻¹ v B hχ hB'
   have hJ := PositivityTheory.JacquetShalikaLocal.jacquetShalikaBound K n π₀ hu v _ hS
@@ -34,8 +33,9 @@ theorem UpperTheory.ConvolutionTheory.Sph.unlinked :
     rw [hab, norm_mul]
     simp
   rw [ha', mul_assoc] at h1
-  have h3 : (Ideal.absNorm v.asIdeal : ℝ) * (Ideal.absNorm v.asIdeal : ℝ) ^ (-(1 / 2) : ℝ) =
-      (Ideal.absNorm v.asIdeal : ℝ) ^ (1 / 2 : ℝ) := by
+  have h3
+      : (Ideal.absNorm v.asIdeal : ℝ) * (Ideal.absNorm v.asIdeal : ℝ) ^ (-(1 / 2) : ℝ)
+        = (Ideal.absNorm v.asIdeal : ℝ) ^ (1 / 2 : ℝ) := by
     nth_rewrite 1 [← Real.rpow_one (Ideal.absNorm v.asIdeal : ℝ)]
     rw [← Real.rpow_add hq0]
     norm_num

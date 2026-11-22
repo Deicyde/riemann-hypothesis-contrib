@@ -8,23 +8,37 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.RayCla
 
 @[expose] public section
 
-open Complex ArithmeticFunction MeasureTheory Filter Topology NumberField GlobalTheory.Hk GlobalTheory.Mem
+open Complex ArithmeticFunction MeasureTheory Filter Topology NumberField GlobalTheory.Hk
+  GlobalTheory.Mem
 open scoped Classical
 
 namespace GlobalTheory.HkLocal
 
-theorem analyticOrderNatAt_comp_affine (g : ℂ → ℂ) (c ρ w : ℂ) (hρ : ρ ≠ 0) :
-    analyticOrderNatAt (fun z => g (c + ρ * z)) w = analyticOrderNatAt g (c + ρ * w) := by
+theorem analyticOrderNatAt_comp_affine (g : ℂ → ℂ) (c ρ w : ℂ) (hρ : ρ ≠ 0)
+    : analyticOrderNatAt (fun z => g (c + ρ * z)) w = analyticOrderNatAt g (c + ρ * w) := by
   unfold analyticOrderNatAt
   congr 1
   have hd : HasDerivAt (fun z : ℂ => c + ρ * z) ρ w := by
     simpa using ((hasDerivAt_id w).const_mul ρ).const_add c
-  have h := analyticOrderAt_comp_of_deriv_ne_zero (f := g) (g := fun z : ℂ => c + ρ * z) (z₀ := w)
-    (by fun_prop) (by rw [hd.deriv]; exact hρ)
+  have h :=
+    analyticOrderAt_comp_of_deriv_ne_zero (f := g)
+      (g := fun z : ℂ => c + ρ * z)
+      (z₀ := w) (by fun_prop) (by rw [hd.deriv]; exact hρ)
   exact h
 
-theorem logDeriv_local : ∃ C : ℝ, 0 < C ∧ ∀ (𝓕 : LFam) (χ : AddChar 𝓕.G ℂ) (t : ℝ), {w : ℂ | ‖w - (5 / 4 + t * I)‖ ≤ 3 / 5 ∧ 𝓕.F χ w = 0}.Finite ∧ (∑ᶠ w ∈ {w : ℂ | ‖w - (5 / 4 + t * I)‖ ≤ 3 / 5 ∧ 𝓕.F χ w = 0}, (analyticOrderNatAt (𝓕.F χ) w : ℝ)) ≤ C * 𝓕.ell t ∧ ∀ s : ℂ, ‖s - (5 / 4 + t * I)‖ ≤ 1 / 2 → 𝓕.F χ s ≠ 0 → ‖deriv (𝓕.F χ) s / 𝓕.F χ s - ∑ᶠ w ∈ {w : ℂ | ‖w - (5 / 4 + t * I)‖ ≤ 3 / 5 ∧ 𝓕.F χ w = 0}, (analyticOrderNatAt (𝓕.F χ) w : ℂ) / (s - w)‖ ≤ C * 𝓕.ell t := by
-  obtain ⟨C, hC, H⟩ := GlobalTheory.LogDerivZeros.main (5/7) (6/7) (by norm_num) (by norm_num) (by norm_num)
+theorem logDeriv_local
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ (𝓕 : LFam) (χ : AddChar 𝓕.G ℂ) (t : ℝ),
+          {w : ℂ | ‖w - (5 / 4 + t * I)‖ ≤ 3 / 5 ∧ 𝓕.F χ w = 0}.Finite
+            ∧ (∑ᶠ w ∈ {w : ℂ | ‖w - (5 / 4 + t * I)‖ ≤ 3 / 5 ∧ 𝓕.F χ w = 0}, (analyticOrderNatAt (𝓕.F χ) w : ℝ))
+              ≤ C * 𝓕.ell t
+            ∧ ∀ s : ℂ,
+              ‖s - (5 / 4 + t * I)‖ ≤ 1 / 2 → 𝓕.F χ s ≠ 0
+                → ‖deriv (𝓕.F χ) s / 𝓕.F χ s - ∑ᶠ w ∈ {w : ℂ | ‖w - (5 / 4 + t * I)‖ ≤ 3 / 5 ∧ 𝓕.F χ w = 0}, (analyticOrderNatAt (𝓕.F χ) w : ℂ) / (s - w)‖
+                  ≤ C * 𝓕.ell t := by
+  obtain ⟨C, hC, H⟩ :=
+    GlobalTheory.LogDerivZeros.main (5 / 7) (6 / 7) (by norm_num) (by norm_num) (by norm_num)
   refine ⟨12 * C, by positivity, ?_⟩
   intro 𝓕 χ t
   obtain ⟨han, hLS, hgr, -⟩ := GlobalTheory.T.rayClassLFunctionFamily_continuation_growth 𝓕 χ
@@ -44,7 +58,8 @@ theorem logDeriv_local : ∃ C : ℝ, 0 < C ∧ ∀ (𝓕 : LFam) (χ : AddChar 
     have h1 : ‖ρ * z‖ ≤ 7 / 10 := by rw [norm_mul, hρn]; linarith
     have := (abs_le.1 ((Complex.abs_re_le_norm _).trans h1)).1
     refine ⟨?_, h1⟩
-    rw [add_re, hcre]; linarith
+    rw [add_re, hcre]
+    linarith
   have hf : AnalyticOnNhd ℂ (fun z => 𝓕.F χ (c + ρ * z)) (Metric.closedBall 0 1) := by
     intro z hz
     have h1 : AnalyticAt ℂ (𝓕.F χ) (c + ρ * z) :=
@@ -62,14 +77,15 @@ theorem logDeriv_local : ∃ C : ℝ, 0 < C ∧ ∀ (𝓕 : LFam) (χ : AddChar 
         linarith
       · norm_num
     have h4 : 1 / 25 ≤ ‖LSeries (𝓕.aChi χ) c‖ := le_trans (by norm_num) h2
-    calc (1 / 100 : ℝ) = (1 / 4) * (1 / 25) := by norm_num
+    calc
+      (1 / 100 : ℝ)
+        = (1 / 4) * (1 / 25) := by norm_num
       _ ≤ _ := by gcongr
   have hf0 : 𝓕.F χ (c + ρ * 0) ≠ 0 := by
     intro h
     rw [h, norm_zero] at hlow
     linarith
-  have hM : ∀ z ∈ Metric.closedBall (0 : ℂ) 1,
-      ‖𝓕.F χ (c + ρ * z)‖ ≤ 300 * 𝓕.B * (|t| + 3) ^ 2 := by
+  have hM : ∀ z ∈ Metric.closedBall (0 : ℂ) 1, ‖𝓕.F χ (c + ρ * z)‖ ≤ 300 * 𝓕.B * (|t| + 3) ^ 2 := by
     intro z hz
     obtain ⟨h1, h2⟩ := hre z hz
     have hn : ‖c + ρ * z‖ + 1 ≤ |t| + 3 := by
@@ -78,8 +94,9 @@ theorem logDeriv_local : ∃ C : ℝ, 0 < C ∧ ∀ (𝓕 : LFam) (χ : AddChar 
     refine (hgr _ h1).trans ?_
     gcongr
   obtain ⟨⟨hfin, hcnt⟩, hb⟩ := H _ _ hf hf0 hM
-  have hset : {w : ℂ | ‖w - c‖ ≤ 3 / 5 ∧ 𝓕.F χ w = 0} =
-      (fun z => c + ρ * z) '' {w : ℂ | ‖w‖ ≤ 6 / 7 ∧ 𝓕.F χ (c + ρ * w) = 0} := by
+  have hset
+      : {w : ℂ | ‖w - c‖ ≤ 3 / 5 ∧ 𝓕.F χ w = 0}
+        = (fun z => c + ρ * z) '' {w : ℂ | ‖w‖ ≤ 6 / 7 ∧ 𝓕.F χ (c + ρ * w) = 0} := by
     ext w
     constructor
     · rintro ⟨h1, h2⟩
@@ -93,8 +110,9 @@ theorem logDeriv_local : ∃ C : ℝ, 0 < C ∧ ∀ (𝓕 : LFam) (χ : AddChar 
       linarith
   have hinj : Set.InjOn (fun z => c + ρ * z) {w : ℂ | ‖w‖ ≤ 6 / 7 ∧ 𝓕.F χ (c + ρ * w) = 0} :=
     fun a _ b _ h => mul_left_cancel₀ hρ0 (add_left_cancel h)
-  have hlog : 1 + Real.log (300 * 𝓕.B * (|t| + 3) ^ 2 / ‖𝓕.F χ (c + ρ * 0)‖) ≤ 8 * 𝓕.ell t ∧
-      0 ≤ 𝓕.ell t := by
+  have hlog
+      : 1 + Real.log (300 * 𝓕.B * (|t| + 3) ^ 2 / ‖𝓕.F χ (c + ρ * 0)‖) ≤ 8 * 𝓕.ell t
+        ∧ 0 ≤ 𝓕.ell t := by
     unfold LFam.ell
     set X : ℝ := 𝓕.B * (|t| + 2) with hX
     have hX8 : 8 ≤ X := by rw [hX]; nlinarith
@@ -112,7 +130,9 @@ theorem logDeriv_local : ∃ C : ℝ, 0 < C ∧ ∀ (𝓕 : LFam) (χ : AddChar 
       have h7 : (|t| + 3) ^ 2 ≤ (9 / 4) * (|t| + 2) ^ 2 := by nlinarith
       have h9 : 𝓕.B * (|t| + 3) ^ 2 ≤ 𝓕.B * ((9 / 4) * (|t| + 2) ^ 2) := by gcongr
       have h10 : 0 ≤ X ^ 2 := by positivity
-      calc 300 * 𝓕.B * (|t| + 3) ^ 2 ≤ 8 ^ 5 * X ^ 2 * (1 / 100) := by nlinarith
+      calc
+        300 * 𝓕.B * (|t| + 3) ^ 2
+          ≤ 8 ^ 5 * X ^ 2 * (1 / 100) := by nlinarith
         _ ≤ X ^ 5 * X ^ 2 * ‖𝓕.F χ (c + ρ * 0)‖ := by gcongr
         _ = _ := by ring
     have h9 := Real.log_le_log (by positivity) h8
@@ -120,8 +140,10 @@ theorem logDeriv_local : ∃ C : ℝ, 0 < C ∧ ∀ (𝓕 : LFam) (χ : AddChar 
     push_cast at h9
     constructor <;> linarith
   obtain ⟨hlog, hell⟩ := hlog
-  have hCl : C * (1 + Real.log (300 * 𝓕.B * (|t| + 3) ^ 2 / ‖𝓕.F χ (c + ρ * 0)‖)) ≤
-      C * (8 * 𝓕.ell t) := by gcongr
+  have hCl
+      : C * (1 + Real.log (300 * 𝓕.B * (|t| + 3) ^ 2 / ‖𝓕.F χ (c + ρ * 0)‖))
+        ≤ C * (8 * 𝓕.ell t) := by
+    gcongr
   have hCe : 0 ≤ C * 𝓕.ell t := by positivity
   rw [hset]
   refine ⟨hfin.image _, ?_, ?_⟩
@@ -136,7 +158,8 @@ theorem logDeriv_local : ∃ C : ℝ, 0 < C ∧ ∀ (𝓕 : LFam) (χ : AddChar 
       linarith
     have hb' := hb ((s - c) / ρ) hz (by simpa only [e] using hLs)
     have hsre : 1 / 2 < s.re := by
-      have := (hre ((s - c) / ρ) (by simpa only [mem_closedBall_zero_iff] using hz.trans (by norm_num))).1
+      have :=
+        (hre ((s - c) / ρ) (by simpa only [mem_closedBall_zero_iff] using hz.trans (by norm_num))).1
       rw [e] at this
       linarith
     have hder : deriv (fun z => 𝓕.F χ (c + ρ * z)) ((s - c) / ρ) = ρ * deriv (𝓕.F χ) s := by
@@ -150,8 +173,10 @@ theorem logDeriv_local : ∃ C : ℝ, 0 < C ∧ ∀ (𝓕 : LFam) (χ : AddChar 
     rw [finsum_mem_image hinj]
     simp only [analyticOrderNatAt_comp_affine _ _ _ _ hρ0, hder, e] at hb'
     rw [finsum_mem_eq_finite_toFinset_sum _ hfin] at hb' ⊢
-    have e2 : ∀ w : ℂ, (analyticOrderNatAt (𝓕.F χ) (c + ρ * w) : ℂ) / ((s - c) / ρ - w) =
-        ρ * ((analyticOrderNatAt (𝓕.F χ) (c + ρ * w) : ℂ) / (s - (c + ρ * w))) := by
+    have e2
+        : ∀ w : ℂ,
+          (analyticOrderNatAt (𝓕.F χ) (c + ρ * w) : ℂ) / ((s - c) / ρ - w)
+            = ρ * ((analyticOrderNatAt (𝓕.F χ) (c + ρ * w) : ℂ) / (s - (c + ρ * w))) := by
       intro w
       have : s - (c + ρ * w) = ρ * ((s - c) / ρ - w) := by field_simp; ring
       rw [this, ← mul_div_assoc, mul_div_mul_left _ _ hρ0]

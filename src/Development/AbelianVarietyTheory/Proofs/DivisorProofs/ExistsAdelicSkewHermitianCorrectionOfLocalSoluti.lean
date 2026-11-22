@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AntiCols
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped TensorProduct Matrix
 
 noncomputable section
@@ -15,46 +17,70 @@ namespace GlobalTheory.TransportBack
 
 open Matrix
 
-theorem map_mul_gen {R S Fh : Type*} [CommRing R] [CommRing S] [FunLike Fh R S]
-    [NonUnitalRingHomClass Fh R S] (f : Fh) {m k p : Type*} [Fintype k]
-    (X : Matrix m k R) (Y : Matrix k p R) : (X * Y).map f = X.map f * Y.map f := by
+theorem map_mul_gen
+    {R S Fh : Type*} [CommRing R] [CommRing S] [FunLike Fh R S] [NonUnitalRingHomClass Fh R S]
+    (f : Fh)
+    {m k p : Type*} [Fintype k]
+    (X : Matrix m k R) (Y : Matrix k p R)
+    : (X * Y).map f = X.map f * Y.map f := by
   ext i j; simp [Matrix.mul_apply, map_sum, map_mul]
 
-theorem map_mulVec_gen {R S Fh : Type*} [CommRing R] [CommRing S] [FunLike Fh R S]
-    [NonUnitalRingHomClass Fh R S] (f : Fh) {m k : Type*} [Fintype k]
-    (X : Matrix m k R) (a : k → R) : X.map f *ᵥ (fun i => f (a i)) = fun i => f ((X *ᵥ a) i) := by
+theorem map_mulVec_gen
+    {R S Fh : Type*} [CommRing R] [CommRing S] [FunLike Fh R S] [NonUnitalRingHomClass Fh R S]
+    (f : Fh)
+    {m k : Type*} [Fintype k]
+    (X : Matrix m k R) (a : k → R)
+    : X.map f *ᵥ (fun i => f (a i)) = fun i => f ((X *ᵥ a) i) := by
   ext i; simp [Matrix.mulVec, dotProduct, map_sum, map_mul]
 
-theorem map_add_gen {R S Fh : Type*} [CommRing R] [CommRing S] [FunLike Fh R S]
-    [NonUnitalRingHomClass Fh R S] (f : Fh) {m k : Type*}
-    (X Y : Matrix m k R) : (X + Y).map f = X.map f + Y.map f := by
+theorem map_add_gen
+    {R S Fh : Type*} [CommRing R] [CommRing S] [FunLike Fh R S] [NonUnitalRingHomClass Fh R S]
+    (f : Fh)
+    {m k : Type*} (X Y : Matrix m k R)
+    : (X + Y).map f = X.map f + Y.map f := by
   ext i j; simp
 
-theorem map_one_eq {R S : Type*} [CommRing R] [CommRing S] (ι : R →ₙ+* S) {n : Type*} [DecidableEq n] :
-    (1 : Matrix n n R).map ι = ι 1 • (1 : Matrix n n S) := by
+theorem map_one_eq
+    {R S : Type*} [CommRing R] [CommRing S] (ι : R →ₙ+* S) {n : Type*} [DecidableEq n]
+    : (1 : Matrix n n R).map ι = ι 1 • (1 : Matrix n n S) := by
   ext i j; by_cases h : i = j <;> simp [Matrix.one_apply, h]
 
-theorem map_neg_one_eq {R S : Type*} [CommRing R] [CommRing S] (ι : R →ₙ+* S) {n : Type*} [DecidableEq n] :
-    (-1 : Matrix n n R).map ι = -(ι 1 • (1 : Matrix n n S)) := by
+theorem map_neg_one_eq
+    {R S : Type*} [CommRing R] [CommRing S] (ι : R →ₙ+* S) {n : Type*} [DecidableEq n]
+    : (-1 : Matrix n n R).map ι = -(ι 1 • (1 : Matrix n n S)) := by
   ext i j; by_cases h : i = j <;> simp [Matrix.one_apply, h]
 
-theorem assoc_a {R : Type*} [CommRing R] {a b c d e : Type*} [Fintype b] [Fintype c] [Fintype d]
-    (A : Matrix a b R) (B : Matrix b c R) (C : Matrix c d R) (D : Matrix d e R) :
-    A * B * C * D = A * (B * (C * D)) := by simp only [Matrix.mul_assoc]
-
-theorem assoc_b {R : Type*} [CommRing R] {a b c d : Type*} [Fintype b] [Fintype c] [Fintype d]
-    (A : Matrix a b R) (B : Matrix b c R) (C : Matrix c d R) (P₁ Y Q₁ P₂ : Matrix d d R) :
-    A * B * C * (P₁ * Y * Q₁) * P₂ = A * (B * (C * (P₁ * (Y * (Q₁ * P₂))))) := by
+theorem assoc_a
+    {R : Type*} [CommRing R]
+    {a b c d e : Type*} [Fintype b] [Fintype c] [Fintype d]
+    (A : Matrix a b R) (B : Matrix b c R) (C : Matrix c d R) (D : Matrix d e R)
+    : A * B * C * D = A * (B * (C * D)) := by
   simp only [Matrix.mul_assoc]
 
-theorem smul_mid_of {R : Type*} [CommRing R] {a b d : Type*} [Fintype b] [DecidableEq b]
-    (s : R) (A : Matrix a b R) (B : Matrix b b R) (C : Matrix b d R) (h : s • B = s • 1) :
-    s • (A * B * C) = s • (A * C) := by
+theorem assoc_b
+    {R : Type*} [CommRing R]
+    {a b c d : Type*} [Fintype b] [Fintype c] [Fintype d]
+    (A : Matrix a b R) (B : Matrix b c R) (C : Matrix c d R) (P₁ Y Q₁ P₂ : Matrix d d R)
+    : A * B * C * (P₁ * Y * Q₁) * P₂ = A * (B * (C * (P₁ * (Y * (Q₁ * P₂))))) := by
+  simp only [Matrix.mul_assoc]
+
+theorem smul_mid_of
+    {R : Type*} [CommRing R]
+    {a b d : Type*} [Fintype b] [DecidableEq b]
+    (s : R)
+    (A : Matrix a b R)
+    (B : Matrix b b R)
+    (C : Matrix b d R) (h : s • B = s • 1)
+    : s • (A * B * C) = s • (A * C) := by
   rw [← Matrix.smul_mul, ← Matrix.mul_smul, h, Matrix.mul_smul, Matrix.mul_one, Matrix.smul_mul]
 
-theorem smul_last_of {R : Type*} [CommRing R] {a b c d e : Type*} [Fintype b] [Fintype c] [Fintype d]
-    (s : R) (A : Matrix a b R) (B : Matrix b c R) (C : Matrix c d R) (Z : Matrix d e R) (h : s • Z = 0) :
-    s • (A * B * C * Z) = 0 := by
+theorem smul_last_of
+    {R : Type*} [CommRing R]
+    {a b c d e : Type*} [Fintype b] [Fintype c] [Fintype d]
+    (s : R)
+    (A : Matrix a b R) (B : Matrix b c R) (C : Matrix c d R)
+    (Z : Matrix d e R) (h : s • Z = 0)
+    : s • (A * B * C * Z) = 0 := by
   rw [← Matrix.mul_smul, h, Matrix.mul_zero]
 
 end GlobalTheory.TransportBack

@@ -17,16 +17,18 @@ namespace PositivityTheory.Rg.Bc.ArchbcB.B.M4
 
 namespace Rig
 
-theorem diag_comm_entry {L : Type*} [CommRing L] {n : ℕ} (D D' H : Matrix (Fin n) (Fin n) L)
-    (hD : ∀ i j, i ≠ j → D i j = 0) (hD' : ∀ i j, i ≠ j → D' i j = 0) (hc : D * H = H * D') (i j : Fin n) :
-    D i i * H i j = H i j * D' j j := by
+theorem diag_comm_entry
+    {L : Type*} [CommRing L]
+    {n : ℕ} (D D' H : Matrix (Fin n) (Fin n) L) (hD : ∀ i j, i ≠ j → D i j = 0)
+    (hD' : ∀ i j, i ≠ j → D' i j = 0) (hc : D * H = H * D') (i j : Fin n)
+    : D i i * H i j = H i j * D' j j := by
   have h := congrFun (congrFun hc i) j
   simp only [Matrix.mul_apply] at h
   rwa [Finset.sum_eq_single i (fun k _ hk => by rw [hD i k (Ne.symm hk), zero_mul]) (by simp),
-    Finset.sum_eq_single j (fun k _ hk => by rw [hD' k j hk, mul_zero]) (by simp)] at h
+      Finset.sum_eq_single j (fun k _ hk => by rw [hD' k j hk, mul_zero]) (by simp)]
+    at h
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
-
 
 end Rig
 
@@ -34,12 +36,13 @@ open Rig
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-
 omit [IsCMField E] in
-theorem diagonal_conj_distinct_valuations_eq (w : Pl E) (n : ℕ) (v : Fin n → ℤ) (hv : Function.Injective v) (d d' h : GLw n w)
+theorem diagonal_conj_distinct_valuations_eq
+    (w : Pl E) (n : ℕ) (v : Fin n → ℤ) (hv : Function.Injective v) (d d' h : GLw n w)
     (hd : (∀ i j : Fin n, i ≠ j → d.val i j = 0) ∧ ∀ i, ordL (d.val i i) = v i)
     (hd' : (∀ i j : Fin n, i ≠ j → d'.val i j = 0) ∧ ∀ i, ordL (d'.val i i) = v i)
-    (hh : h⁻¹ * d * h = d') : d = d' ∧ ∀ i j : Fin n, i ≠ j → h.val i j = 0 := by
+    (hh : h⁻¹ * d * h = d')
+    : d = d' ∧ ∀ i j : Fin n, i ≠ j → h.val i j = 0 := by
   obtain ⟨hd0, hdv⟩ := hd
   obtain ⟨hd'0, hd'v⟩ := hd'
   have hc : d.val * h.val = h.val * d'.val := by

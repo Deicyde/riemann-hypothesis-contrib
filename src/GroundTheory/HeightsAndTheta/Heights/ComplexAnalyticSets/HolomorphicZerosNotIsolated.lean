@@ -11,9 +11,9 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open Topology Filter Metric
 
-theorem analyticAt_det_fderiv {k : ℕ} {f : (Fin k → ℂ) → Fin k → ℂ} {x : Fin k → ℂ}
-    (hf : AnalyticAt ℂ f x) :
-    AnalyticAt ℂ (fun z => LinearMap.det (fderiv ℂ f z : (Fin k → ℂ) →ₗ[ℂ] Fin k → ℂ)) x := by
+theorem analyticAt_det_fderiv
+    {k : ℕ} {f : (Fin k → ℂ) → Fin k → ℂ} {x : Fin k → ℂ} (hf : AnalyticAt ℂ f x)
+    : AnalyticAt ℂ (fun z => LinearMap.det (fderiv ℂ f z : (Fin k → ℂ) →ₗ[ℂ] Fin k → ℂ)) x := by
   have hd : AnalyticAt ℂ (fderiv ℂ f) x := hf.fderiv
   have he : ∀ i j : Fin k, AnalyticAt ℂ (fun z => fderiv ℂ f z (Pi.single j 1) i) x := by
     intro i j
@@ -22,9 +22,11 @@ theorem analyticAt_det_fderiv {k : ℕ} {f : (Fin k → ℂ) → Fin k → ℂ} 
         (ContinuousLinearMap.apply ℂ (Fin k → ℂ) (Pi.single j 1))
     show AnalyticAt ℂ (L ∘ fderiv ℂ f) x
     exact (L.analyticAt _).comp hd
-  have heq : (fun z => LinearMap.det (fderiv ℂ f z : (Fin k → ℂ) →ₗ[ℂ] Fin k → ℂ)) =
-      fun z => ∑ σ : Equiv.Perm (Fin k),
-        ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ i, fderiv ℂ f z (Pi.single i 1) (σ i) := by
+  have heq
+      : (fun z => LinearMap.det (fderiv ℂ f z : (Fin k → ℂ) →ₗ[ℂ] Fin k → ℂ))
+        = fun z =>
+          ∑ σ : Equiv.Perm (Fin k),
+            ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ i, fderiv ℂ f z (Pi.single i 1) (σ i) := by
     funext z
     rw [← LinearMap.det_toMatrix', Matrix.det_apply]
     refine Finset.sum_congr rfl fun σ _ => ?_
@@ -34,9 +36,11 @@ theorem analyticAt_det_fderiv {k : ℕ} {f : (Fin k → ℂ) → Fin k → ℂ} 
   exact Finset.analyticAt_fun_sum _ fun σ _ =>
     analyticAt_const.mul (Finset.analyticAt_fun_prod _ fun i _ => he (σ i) i)
 
-theorem exists_zero_ne_near {k : ℕ} (hk : 2 ≤ k) {J : (Fin k → ℂ) → ℂ} {c : Fin k → ℂ}
-    (hJ : AnalyticAt ℂ J c) (hc : J c = 0) {W : Set (Fin k → ℂ)} (hW : W ∈ 𝓝 c) :
-    ∃ z ∈ W, z ≠ c ∧ J z = 0 := by
+theorem exists_zero_ne_near
+    {k : ℕ} (hk : 2 ≤ k)
+    {J : (Fin k → ℂ) → ℂ} {c : Fin k → ℂ} (hJ : AnalyticAt ℂ J c) (hc : J c = 0)
+    {W : Set (Fin k → ℂ)} (hW : W ∈ 𝓝 c)
+    : ∃ z ∈ W, z ≠ c ∧ J z = 0 := by
   have : Nonempty (Fin k) := ⟨⟨0, by omega⟩⟩
   by_cases h0 : ∀ᶠ y in 𝓝 c, J y = 0
   · have h1 : ∀ᶠ y in 𝓝[≠] c, y ∈ W ∧ J y = 0 := nhdsWithin_le_nhds (Filter.inter_mem hW h0)
@@ -72,7 +76,9 @@ theorem exists_zero_ne_near {k : ℕ} (hk : 2 ≤ k) {J : (Fin k → ℂ) → �
   have hmem : ∀ s t : ℂ, ‖s • u‖ < ρ / 2 → ‖t‖ ≤ r → c + s • u + t • v ∈ ball c ρ := by
     intro s t hs ht
     rw [mem_ball, dist_eq_norm, add_assoc, add_sub_cancel_left]
-    calc ‖s • u + t • v‖ ≤ ‖s • u‖ + ‖t‖ * ‖v‖ := (norm_add_le _ _).trans (le_of_eq (by rw [norm_smul t v]))
+    calc
+      ‖s • u + t • v‖
+        ≤ ‖s • u‖ + ‖t‖ * ‖v‖ := (norm_add_le _ _).trans (le_of_eq (by rw [norm_smul t v]))
       _ < ρ / 2 + ρ / 2 := add_lt_add_of_lt_of_le hs (by nlinarith [norm_nonneg v])
       _ = ρ := by ring
   have hballR : ball c ρ ⊆ ball c R := ball_subset_ball (min_le_left _ _)
@@ -91,7 +97,8 @@ theorem exists_zero_ne_near {k : ℕ} (hk : 2 ≤ k) {J : (Fin k → ℂ) → �
   have hcontK : ContinuousOn (fun t : ℂ => ‖J (c + t • v)‖) (sphere 0 r) := by
     intro t ht
     have hp := hline t (mem_sphere_zero_iff_norm.1 ht).le
-    exact (ContinuousAt.comp (f := fun t : ℂ => c + t • v) (hcontJ _ hp) (by fun_prop)).norm.continuousWithinAt
+    exact (ContinuousAt.comp (f := fun t : ℂ => c + t • v) (hcontJ _ hp) (by
+      fun_prop)).norm.continuousWithinAt
   obtain ⟨t0, ht0K, ht0min⟩ := hK.exists_isMinOn hKne hcontK
   set m := ‖J (c + t0 • v)‖ with hm
   have hm0 : 0 < m := norm_pos_iff.2 (hF0 t0 ht0K)
@@ -106,8 +113,9 @@ theorem exists_zero_ne_near {k : ℕ} (hk : 2 ≤ k) {J : (Fin k → ℂ) → �
     exact hcont.norm.eventually (lt_mem_nhds (by simp only [zero_smul, add_zero]; linarith))
   have hcen : ∀ᶠ s in 𝓝 (0 : ℂ), ‖J (c + s • u)‖ < m / 2 := by
     have hcont : ContinuousAt (fun s : ℂ => J (c + s • u)) 0 :=
-      ContinuousAt.comp (f := fun s : ℂ => c + s • u) (by simpa using hcontJ c (mem_ball_self hρ0))
-        (by fun_prop)
+      ContinuousAt.comp
+        (f := fun s : ℂ => c + s • u)
+        (by simpa using hcontJ c (mem_ball_self hρ0)) (by fun_prop)
     have h1 : ‖J (c + (0 : ℂ) • u)‖ < m / 2 := by simpa [hc] using half_pos hm0
     exact hcont.norm.eventually (gt_mem_nhds h1)
   have hsmall : ∀ᶠ s in 𝓝 (0 : ℂ), ‖s • u‖ < ρ / 2 := by
@@ -130,12 +138,13 @@ theorem exists_zero_ne_near {k : ℕ} (hk : 2 ≤ k) {J : (Fin k → ℂ) → �
       exact (hcomp.inv (hne t ht)).differentiableWithinAt
     have hdc : DiffContOnCl ℂ (fun t : ℂ => (J (c + s • u + t • v))⁻¹) (ball 0 r) :=
       hdiff.diffContOnCl_ball subset_rfl
-    have hbd := Complex.norm_le_of_forall_mem_frontier_norm_le isBounded_ball hdc (C := (m / 2)⁻¹)
-      (fun t ht => by
-        rw [frontier_ball 0 hr0.ne'] at ht
-        rw [norm_inv]
-        exact inv_anti₀ (half_pos hm0) (hs1 t ht).le)
-      (subset_closure (mem_ball_self hr0))
+    have hbd :=
+      Complex.norm_le_of_forall_mem_frontier_norm_le isBounded_ball hdc (C := (m / 2)⁻¹)
+        (fun t ht => by
+          rw [frontier_ball 0 hr0.ne'] at ht
+          rw [norm_inv]
+          exact inv_anti₀ (half_pos hm0) (hs1 t ht).le)
+        (subset_closure (mem_ball_self hr0))
     have hJs : J (c + s • u) ≠ 0 := by simpa using hne 0 (mem_closedBall_self hr0.le)
     simp only [zero_smul, add_zero, norm_inv] at hbd
     have := inv_lt_inv₀ (half_pos hm0) (norm_pos_iff.2 hJs) |>.2 hs2
@@ -152,7 +161,9 @@ theorem exists_zero_ne_near {k : ℕ} (hk : 2 ≤ k) {J : (Fin k → ℂ) → �
     have hs : s ≠ 0 := by simpa using hs0
     rw [Submodule.mem_span_singleton]
     refine ⟨-(s⁻¹ * t), ?_⟩
-    calc -(s⁻¹ * t) • v = s⁻¹ • (-(t • v)) := by rw [smul_neg, smul_smul, neg_smul]
+    calc
+      -(s⁻¹ * t) • v
+        = s⁻¹ • (-(t • v)) := by rw [smul_neg, smul_smul, neg_smul]
       _ = s⁻¹ • (s • u) := by rw [h1]
       _ = u := by rw [smul_smul, inv_mul_cancel₀ hs, one_smul]
 

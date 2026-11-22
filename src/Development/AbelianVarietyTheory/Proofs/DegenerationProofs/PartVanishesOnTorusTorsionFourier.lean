@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.Finsupp
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
 attribute [local instance] SplitExt.free SplitExt.finite MvPolynomial.gradedAlgebra
 
 namespace GlobalTheory.TorsionFourier
@@ -18,20 +19,21 @@ namespace GlobalTheory.TorsionFourier
 section Val
 variable {F : Type} [Field F] {X : Scheme.{0}} {x : Sp F ⟶ X} {U : X.Opens}
 
-theorem valF_sum (h : ⊤ ≤ x ⁻¹ᵁ U) {J : Type} (A : Finset J) (a : J → Γ(X, U)) :
-    valF x U (∑ j ∈ A, a j) = ∑ j ∈ A, valF x U (a j) := by
+theorem valF_sum (h : ⊤ ≤ x ⁻¹ᵁ U) {J : Type} (A : Finset J) (a : J → Γ(X, U))
+    : valF x U (∑ j ∈ A, a j) = ∑ j ∈ A, valF x U (a j) := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [valF, dif_pos h, map_sum]
+  simp only [valF, dif_pos h, map_sum]
 
-theorem valF_ne_zero_iff_le (h : ⊤ ≤ x ⁻¹ᵁ U) (a : Γ(X, U)) :
-    valF x U a ≠ 0 ↔ ⊤ ≤ x ⁻¹ᵁ X.basicOpen a := by
+theorem valF_ne_zero_iff_le (h : ⊤ ≤ x ⁻¹ᵁ U) (a : Γ(X, U))
+    : valF x U a ≠ 0 ↔ ⊤ ≤ x ⁻¹ᵁ X.basicOpen a := by
   have e1 := Scheme.basicOpen_appLE x ⊤ U h a
   rw [top_inf_eq] at e1
   have e2 : (Scheme.ΓSpecIso (CommRingCat.of F)).inv.hom (valF x U a) = (x.appLE U ⊤ h).hom a := by
     rw [valF, dif_pos h]
     exact (Scheme.ΓSpecIso (CommRingCat.of F)).hom_inv_id_apply _
-  have e3 : x ⁻¹ᵁ X.basicOpen a =
-      (Sp F).basicOpen ((Scheme.ΓSpecIso (CommRingCat.of F)).inv.hom (valF x U a)) := by
+  have e3
+      : x ⁻¹ᵁ X.basicOpen a
+        = (Sp F).basicOpen ((Scheme.ΓSpecIso (CommRingCat.of F)).inv.hom (valF x U a)) := by
     rw [e2]; exact e1.symm
   rw [e3]
   constructor
@@ -41,8 +43,8 @@ theorem valF_ne_zero_iff_le (h : ⊤ ≤ x ⁻¹ᵁ U) (a : Γ(X, U)) :
     rw [h0, map_zero, Scheme.basicOpen_zero] at hle
     exact hle (show (IsLocalRing.closedPoint F : Sp F) ∈ (⊤ : (Sp F).Opens) from trivial)
 
-theorem le_nonzeroLocus_iff {H : LB X} (s : H.Sec) (x : Sp F ⟶ X) :
-    ⊤ ≤ x ⁻¹ᵁ Out.nonzeroLocus s ↔ ∃ l, ⊤ ≤ x ⁻¹ᵁ H.U l ∧ valF x (H.U l) (s.f l) ≠ 0 := by
+theorem le_nonzeroLocus_iff {H : LB X} (s : H.Sec) (x : Sp F ⟶ X)
+    : ⊤ ≤ x ⁻¹ᵁ Out.nonzeroLocus s ↔ ∃ l, ⊤ ≤ x ⁻¹ᵁ H.U l ∧ valF x (H.U l) (s.f l) ≠ 0 := by
   constructor
   · intro h
     have hp : x (IsLocalRing.closedPoint F) ∈ Out.nonzeroLocus s :=
@@ -61,7 +63,14 @@ theorem le_nonzeroLocus_iff {H : LB X} (s : H.Sec) (x : Sp F ⟶ X) :
 
 end Val
 
-theorem part_vanishes_on_torsion : (∀ (k : Type) [Field k] [IsAlgClosed k] (Φ : FibPre k) (d n : ℕ), (n : k) ≠ 0 → ∀ φ : (Φ.H d).Sec, (∀ α ∈ Φ.supp φ, ∀ β ∈ Φ.supp φ, (∃ w, α = β + n • w) → α = β) → (∀ x : Φ.Pt, x ^ n = 1 → ¬ ⊤ ≤ x.left ⁻¹ᵁ Out.nonzeroLocus φ) → ∀ α ψ, Φ.IsPart α φ ψ → ∀ x : Φ.Pt, x ^ n = 1 → ¬ ⊤ ≤ x.left ⁻¹ᵁ Out.nonzeroLocus ψ) := by
+theorem part_vanishes_on_torsion
+    : (∀ (k : Type) [Field k] [IsAlgClosed k] (Φ : FibPre k) (d n : ℕ),
+      (n : k) ≠ 0
+        → ∀ φ : (Φ.H d).Sec,
+          (∀ α ∈ Φ.supp φ, ∀ β ∈ Φ.supp φ, (∃ w, α = β + n • w) → α = β)
+            → (∀ x : Φ.Pt, x ^ n = 1 → ¬ ⊤ ≤ x.left ⁻¹ᵁ Out.nonzeroLocus φ)
+            → ∀ α ψ,
+              Φ.IsPart α φ ψ → ∀ x : Φ.Pt, x ^ n = 1 → ¬ ⊤ ≤ x.left ⁻¹ᵁ Out.nonzeroLocus ψ) := by
   intro k _ _ Φ d n hn φ hinc hφ α ψ hψ x hx hle
   classical
   obtain ⟨hex, hfin, hext, hsum⟩ := GlobalTheory.ZH.WtPart.weight_parts k Φ d
@@ -97,18 +106,20 @@ theorem part_vanishes_on_torsion : (∀ (k : Type) [Field k] [IsAlgClosed k] (Φ
   let c : Φ.E.X →₀ k := Finsupp.indicator A fun β _ => v β
   have hcs : c.support ⊆ A := Finsupp.support_indicator_subset _ _
   have hc : c = 0 := by
-    refine GlobalTheory.finsupp_eq_zero_of_sum_torsion_characters_eq_zero k Φ.E.X n ζ (Nat.pos_of_ne_zero hn0) hζ k c
-      (fun a ha b hb => hinc a ((hA a).1 (hcs ha)) b ((hA b).1 (hcs hb))) fun t ht => ?_
+    refine GlobalTheory.finsupp_eq_zero_of_sum_torsion_characters_eq_zero k Φ.E.X n ζ
+      (Nat.pos_of_ne_zero hn0) hζ k c
+      (fun a ha b hb => hinc a ((hA a).1 (hcs ha)) b ((hA b).1 (hcs hb)))
+      fun t ht => ?_
     obtain ⟨a, -, ha, hat⟩ := GlobalTheory.TorusTranslate.exists_point_translate_pure k Φ t
-    have hax : (a * x) ^ n = 1 := by
-      rw [mul_pow, ha n ht, hx, _root_.one_mul]
+    have hax : (a * x) ^ n = 1 := by rw [mul_pow, ha n ht, hx, _root_.one_mul]
     have hl' := (hat d α ψ hψ.1 x l hl).1
     have h0 : valF (F := k) (a * x).left ((Φ.H d).U l) (φ.f l) = 0 := by
       by_contra h
       exact hφ _ hax ((le_nonzeroLocus_iff (F := k) φ (a * x).left).2 ⟨l, hl', h⟩)
     rw [Finsupp.sum_of_support_subset c hcs _ (fun _ _ => smul_zero _), ← h0]
     have h1 := hsum φ A p' (fun β hβ => (hA β).2 hβ) (fun β _ => hp' β) l
-    refine Eq.trans ?_ ((congrArg (valF (F := k) (a * x).left _) h1).trans (valF_sum (F := k) hl' _ _)).symm
+    refine Eq.trans ?_
+      ((congrArg (valF (F := k) (a * x).left _) h1).trans (valF_sum (F := k) hl' _ _)).symm
     refine Finset.sum_congr rfl fun β hβ => ?_
     rw [Finsupp.indicator_of_mem hβ]
     exact (hat d β (p' β) (hp' β).1 x l hl).2.symm

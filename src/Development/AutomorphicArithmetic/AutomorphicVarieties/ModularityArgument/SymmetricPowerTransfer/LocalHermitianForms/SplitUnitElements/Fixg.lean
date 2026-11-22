@@ -6,11 +6,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open QuadraticAlgebra Matrix UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc
 
-theorem UpperTheory.V.Z.Sym.Loc.One.fixg :
-    ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] (Δ τ : K), IsLoc O Δ →
-        ∀ (c : K) (d m : EL Δ τ) (δ : U3 Δ) (ι : (Etau K τ)ˣ →* U3 Δ) (P : Sp Δ τ ≃ₗ[Lsq K Δ] (Fin 3 → Lsq K Δ)), Models c d m δ ι P →
-        ∀ g : U3 Δ, g⁻¹ * δ * theta Δ g ∈ KU O Δ →
-        IsFix O c d m {x | ∀ i, IsInt O ((((g⁻¹ : U3 Δ) : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) *ᵥ P x) i)} := by
+theorem UpperTheory.V.Z.Sym.Loc.One.fixg
+    : ∀ (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+        (Δ τ : K),
+      IsLoc O Δ
+        → ∀ (c : K) (d m : EL Δ τ) (δ : U3 Δ) (ι : (Etau K τ)ˣ →* U3 Δ)
+            (P : Sp Δ τ ≃ₗ[Lsq K Δ] (Fin 3 → Lsq K Δ)),
+          Models c d m δ ι P
+            → ∀ g : U3 Δ,
+              g⁻¹ * δ * theta Δ g ∈ KU O Δ
+                → IsFix O c d m
+                  {x | ∀ i, IsInt O ((((g⁻¹ : U3 Δ) : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) *ᵥ P x) i)} := by
   intro O K _ _ _ _ _ Δ τ hL c d m δ ι P hM g hg
   classical
   let M : Matrix (Fin 3) (Fin 3) (Lsq K Δ) := ((g⁻¹ : U3 Δ) : Matrix (Fin 3) (Fin 3) (Lsq K Δ))
@@ -26,30 +32,37 @@ theorem UpperTheory.V.Z.Sym.Loc.One.fixg :
   have hIsum : ∀ (f : Fin 3 → Lsq K Δ), (∀ i, IsInt O (f i)) → IsInt O (∑ i, f i) := by
     intro f hf
     exact IsIntegral.sum _ fun i _ => hf i
-  have hImul : ∀ a b : Lsq K Δ, IsInt O a → IsInt O b → IsInt O (a * b) := fun a b ha hb => ha.mul hb
+  have hImul : ∀ a b : Lsq K Δ, IsInt O a → IsInt O b → IsInt O (a * b) := fun a b ha hb =>
+    ha.mul hb
   have hIstar : ∀ a : Lsq K Δ, IsInt O a ↔ IsInt O (star a) := by
     intro a
     refine ⟨fun h => OE.int_star hL h, fun h => ?_⟩
     simpa using OE.int_star hL h
-  have hU : ∀ (h : U3 Δ) (a b : Fin 3 → Lsq K Δ),
-      ((h : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) *ᵥ a) ⬝ᵥ star ((h : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) *ᵥ b)
-        = a ⬝ᵥ star b := by
+  have hU
+      : ∀ (h : U3 Δ) (a b : Fin 3 → Lsq K Δ),
+        ((h : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) *ᵥ a)
+            ⬝ᵥ star ((h : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) *ᵥ b)
+          = a ⬝ᵥ star b := by
     intro h a b
-    have hu : (h : Matrix (Fin 3) (Fin 3) (Lsq K Δ))ᴴ * (h : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) = 1 :=
+    have hu
+        : (h : Matrix (Fin 3) (Fin 3) (Lsq K Δ))ᴴ * (h : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) = 1 :=
       Matrix.mem_unitaryGroup_iff'.mp h.2
     rw [Matrix.star_mulVec, dotProduct_comm, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, hu,
       Matrix.one_mulVec, dotProduct_comm]
-  have hsv : ∀ (N : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) (v : Fin 3 → Lsq K Δ),
-      star (N *ᵥ v) = N.map star *ᵥ star v := by
+  have hsv
+      : ∀ (N : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) (v : Fin 3 → Lsq K Δ),
+        star (N *ᵥ v) = N.map star *ᵥ star v := by
     intro N v
     funext i
     simp [Matrix.mulVec, dotProduct, star_sum, star_mul']
-  have hIvec : ∀ (N : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) (v : Fin 3 → Lsq K Δ),
-      (∀ i j, IsInt O (N i j)) → (∀ j, IsInt O (v j)) → ∀ i, IsInt O ((N *ᵥ v) i) := by
+  have hIvec
+      : ∀ (N : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) (v : Fin 3 → Lsq K Δ),
+        (∀ i j, IsInt O (N i j)) → (∀ j, IsInt O (v j)) → ∀ i, IsInt O ((N *ᵥ v) i) := by
     intro N v hN hv i
     exact hIsum _ fun j => hImul _ _ (hN i j) (hv j)
-  have hsingle : ∀ (j : Fin 3) (u : Lsq K Δ), IsInt O u →
-      ∀ i, IsInt O ((Pi.single j u : Fin 3 → Lsq K Δ) i) := by
+  have hsingle
+      : ∀ (j : Fin 3) (u : Lsq K Δ),
+        IsInt O u → ∀ i, IsInt O ((Pi.single j u : Fin 3 → Lsq K Δ) i) := by
     intro j u hu i
     by_cases hij : i = j
     · subst hij; simpa using hu
@@ -83,22 +96,23 @@ theorem UpperTheory.V.Z.Sym.Loc.One.fixg :
     rfl
   refine ⟨?_, ?_, ?_⟩
   · obtain ⟨u, s0, hs0, hΔ⟩ := hL.even
-    have hs : Δ * s0⁻¹ ^ 2 = algebraMap O K (u : O) := by
-      rw [hΔ]; field_simp
+    have hs : Δ * s0⁻¹ ^ 2 = algebraMap O K (u : O) := by rw [hΔ]; field_simp
     have hdesc := descent O K Δ hL s0⁻¹ u hs
     let w : Lsq K Δ := ⟨0, s0⁻¹⟩
     have hw : IsInt O w := by
       refine (hdesc w).1.mpr ⟨⟨0, map_zero _⟩, 1, ?_⟩
       show s0⁻¹ = s0⁻¹ * algebraMap O K 1
       rw [map_one, mul_one]
-    have hdec : ∀ z : Lsq K Δ, IsInt O z →
-        ∃ a b : O, z = algebraMap O (Lsq K Δ) a + algebraMap O (Lsq K Δ) b * w := by
+    have hdec
+        : ∀ z : Lsq K Δ,
+          IsInt O z → ∃ a b : O, z = algebraMap O (Lsq K Δ) a + algebraMap O (Lsq K Δ) b * w := by
       intro z hz
       obtain ⟨⟨a, ha⟩, b, hb⟩ := (hdesc z).1.mp hz
       refine ⟨a, b, ?_⟩
       ext <;> simp [w, ← ha, hb, IsScalarTower.algebraMap_apply O K (Lsq K Δ)] <;> ring
     let R : Fin 3 → Lsq K Δ → Sp Δ τ := fun i v => P.symm (G *ᵥ Pi.single i v)
-    let S : Finset (Sp Δ τ) := Finset.univ.image (fun i => R i 1) ∪ Finset.univ.image (fun i => R i w)
+    let S : Finset (Sp Δ τ) :=
+      Finset.univ.image (fun i => R i 1) ∪ Finset.univ.image (fun i => R i w)
     refine ⟨S, ?_⟩
     ext x
     constructor
@@ -107,16 +121,19 @@ theorem UpperTheory.V.Z.Sym.Loc.One.fixg :
       have hxe : x = ∑ i, R i (Q x i) := by
         show x = ∑ i, P.symm (G *ᵥ Pi.single i (Q x i))
         set_option synthInstance.maxHeartbeats 100000 in
-          rw [← map_sum, ← Matrix.mulVec_sum, Finset.univ_sum_single, hPQ, P.symm_apply_apply]
+        rw [← map_sum, ← Matrix.mulVec_sum, Finset.univ_sum_single, hPQ, P.symm_apply_apply]
       rw [hxe]
       refine Submodule.sum_mem _ fun i _ => ?_
       obtain ⟨a, b, hab⟩ := hdec _ (hx' i)
       have h1S : R i 1 ∈ (S : Set (Sp Δ τ)) :=
         Finset.mem_coe.mpr (Finset.mem_union_left _ (Finset.mem_image_of_mem _ (Finset.mem_univ i)))
       have hwS : R i w ∈ (S : Set (Sp Δ τ)) :=
-        Finset.mem_coe.mpr (Finset.mem_union_right _ (Finset.mem_image_of_mem _ (Finset.mem_univ i)))
-      have hsp : (Pi.single i (Q x i) : Fin 3 → Lsq K Δ)
-          = algebraMap O (Lsq K Δ) a • Pi.single i 1 + algebraMap O (Lsq K Δ) b • Pi.single i w := by
+        Finset.mem_coe.mpr (Finset.mem_union_right _
+          (Finset.mem_image_of_mem _ (Finset.mem_univ i)))
+      have hsp
+          : (Pi.single i (Q x i) : Fin 3 → Lsq K Δ)
+            = algebraMap O (Lsq K Δ) a • Pi.single i 1
+              + algebraMap O (Lsq K Δ) b • Pi.single i w := by
         rw [hab]
         funext j
         by_cases hij : j = i
@@ -126,8 +143,8 @@ theorem UpperTheory.V.Z.Sym.Loc.One.fixg :
         · simp [hij]
       have hR : R i (Q x i) = a • R i 1 + b • R i w := by
         show P.symm (G *ᵥ Pi.single i (Q x i)) = a • R i 1 + b • R i w
-        rw [hsp, Matrix.mulVec_add, Matrix.mulVec_smul, Matrix.mulVec_smul, map_add (f := _), map_smul, map_smul,
-          ← algebra_compatible_smul, ← algebra_compatible_smul]
+        rw [hsp, Matrix.mulVec_add, Matrix.mulVec_smul, Matrix.mulVec_smul, map_add (f := _),
+          map_smul, map_smul, ← algebra_compatible_smul, ← algebra_compatible_smul]
       rw [hR]
       exact add_mem (Submodule.smul_mem _ _ (Submodule.subset_span h1S))
         (Submodule.smul_mem _ _ (Submodule.subset_span hwS))
@@ -164,16 +181,19 @@ theorem UpperTheory.V.Z.Sym.Loc.One.fixg :
       rw [hform]
       exact hIsum _ fun i => hImul _ _ (hx i) ((hIstar _).mp (hy i))
     · intro h i
-      have he : P.symm (G *ᵥ Pi.single i 1) ∈
-          {x : Sp Δ τ | ∀ i, IsInt O ((((g⁻¹ : U3 Δ) : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) *ᵥ P x) i)} := by
-        intro j
-        show IsInt O (Q (P.symm (G *ᵥ Pi.single i 1)) j)
-        rw [hQS]
-        exact hsingle i 1 isIntegral_one j
+      have he
+          : P.symm (G *ᵥ Pi.single i 1)
+            ∈ {x : Sp Δ τ | ∀ i, IsInt O ((((g⁻¹ : U3 Δ) : Matrix (Fin 3) (Fin 3) (Lsq K Δ)) *ᵥ P x) i)} :=
+        by
+          intro j
+          show IsInt O (Q (P.symm (G *ᵥ Pi.single i 1)) j)
+          rw [hQS]
+          exact hsingle i 1 isIntegral_one j
       have h2 := h _ he
       rw [hform, hQS] at h2
       simp only [dotProduct, Pi.single_apply, Pi.star_apply, ite_mul, one_mul, zero_mul,
-        Finset.sum_ite_eq', Finset.mem_univ, if_true] at h2
+          Finset.sum_ite_eq', Finset.mem_univ, if_true]
+        at h2
       exact (hIstar _).mpr h2
   · ext y
     constructor

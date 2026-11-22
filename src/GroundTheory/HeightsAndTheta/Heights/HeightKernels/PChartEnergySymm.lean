@@ -20,8 +20,9 @@ noncomputable section
 
 namespace ChartEnergySymmetry
 
-theorem cxHessian_sub {D : ℕ} {f g : (Fin D → ℂ) → ℝ} (hf : ContDiff ℝ 2 f) (hg : ContDiff ℝ 2 g)
-    (y : Fin D → ℂ) : cxHessian (fun y' => f y' - g y') y = cxHessian f y - cxHessian g y := by
+theorem cxHessian_sub
+    {D : ℕ} {f g : (Fin D → ℂ) → ℝ} (hf : ContDiff ℝ 2 f) (hg : ContDiff ℝ 2 g) (y : Fin D → ℂ)
+    : cxHessian (fun y' => f y' - g y') y = cxHessian f y - cxHessian g y := by
   have h1 : fderiv ℝ (fun y' => f y' - g y') = fun z => fderiv ℝ f z - fderiv ℝ g z := by
     funext z
     exact fderiv_sub (hf.differentiable (by norm_num) z) (hg.differentiable (by norm_num) z)
@@ -29,8 +30,9 @@ theorem cxHessian_sub {D : ℕ} {f g : (Fin D → ℂ) → ℝ} (hf : ContDiff �
     (hf.fderiv_right (m := 1) (by norm_num)).differentiable (by norm_num)
   have hg' : Differentiable ℝ (fderiv ℝ g) :=
     (hg.fderiv_right (m := 1) (by norm_num)).differentiable (by norm_num)
-  have h2 : fderiv ℝ (fderiv ℝ (fun y' => f y' - g y')) y =
-      fderiv ℝ (fderiv ℝ f) y - fderiv ℝ (fderiv ℝ g) y := by
+  have h2
+      : fderiv ℝ (fderiv ℝ (fun y' => f y' - g y')) y
+        = fderiv ℝ (fderiv ℝ f) y - fderiv ℝ (fderiv ℝ g) y := by
     rw [h1]
     exact fderiv_sub (hf' y) (hg' y)
   ext i j
@@ -38,16 +40,19 @@ theorem cxHessian_sub {D : ℕ} {f g : (Fin D → ℂ) → ℝ} (hf : ContDiff �
   push_cast
   ring
 
-theorem mixedDisc_update_sub {D : ℕ} (A : Fin D → Matrix (Fin D) (Fin D) ℂ) (k : Fin D)
-    (X Y : Matrix (Fin D) (Fin D) ℂ) :
-    mixedDisc (Function.update A k (X - Y)) =
-      mixedDisc (Function.update A k X) - mixedDisc (Function.update A k Y) := by
+theorem mixedDisc_update_sub
+    {D : ℕ} (A : Fin D → Matrix (Fin D) (Fin D) ℂ) (k : Fin D) (X Y : Matrix (Fin D) (Fin D) ℂ)
+    : mixedDisc (Function.update A k (X - Y))
+      = mixedDisc (Function.update A k X) - mixedDisc (Function.update A k Y) := by
   obtain ⟨M, hM⟩ := (by
     show ∃ F : MultilinearMap (RingHom.id ℂ)
         (fun _ : Fin D => Matrix (Fin D) (Fin D) ℂ) ℂ,
         ⇑F = _root_.ReciprocityTheory.AnForm.mdisc
-    refine ⟨MultilinearMap.mk' _root_.ReciprocityTheory.AnForm.mdisc
-      _root_.ReciprocityTheory.AnForm.A.mdisc_update_add ?_, rfl⟩
+    refine ⟨
+      MultilinearMap.mk' _root_.ReciprocityTheory.AnForm.mdisc
+        _root_.ReciprocityTheory.AnForm.A.mdisc_update_add ?_,
+      rfl
+    ⟩
     intro A k c B
     simpa only [RingHom.id_apply, smul_eq_mul] using
       (_root_.ReciprocityTheory.AnForm.A.mdisc_update_smul A k c B))
@@ -56,19 +61,23 @@ theorem mixedDisc_update_sub {D : ℕ} (A : Fin D → Matrix (Fin D) (Fin D) ℂ
     rfl
   simp only [e, map_sub]
 
-theorem maDensity_update_sub {D : ℕ} (Φ : Fin D → (Fin D → ℂ) → ℝ) (p : Fin D) {f g : (Fin D → ℂ) → ℝ}
-    (hf : ContDiff ℝ 2 f) (hg : ContDiff ℝ 2 g) (y : Fin D → ℂ) :
-    maDensity (Function.update Φ p f) y - maDensity (Function.update Φ p g) y =
-      maDensity (Function.update Φ p fun y' => f y' - g y') y := by
-  have key : ∀ h : (Fin D → ℂ) → ℝ, (fun k => cxHessian (Function.update Φ p h k) y) =
-      Function.update (fun k => cxHessian (Φ k) y) p (cxHessian h y) := fun h => by
+theorem maDensity_update_sub
+    {D : ℕ} (Φ : Fin D → (Fin D → ℂ) → ℝ) (p : Fin D)
+    {f g : (Fin D → ℂ) → ℝ} (hf : ContDiff ℝ 2 f) (hg : ContDiff ℝ 2 g)
+    (y : Fin D → ℂ)
+    : maDensity (Function.update Φ p f) y - maDensity (Function.update Φ p g) y
+      = maDensity (Function.update Φ p fun y' => f y' - g y') y := by
+  have key
+      : ∀ h : (Fin D → ℂ) → ℝ,
+        (fun k => cxHessian (Function.update Φ p h k) y)
+          = Function.update (fun k => cxHessian (Φ k) y) p (cxHessian h y) := fun h => by
     funext k
     exact Function.apply_update (fun _ h' => cxHessian h' y) Φ p h k
   simp only [maDensity, key, cxHessian_sub hf hg y, mixedDisc_update_sub, Complex.sub_re]
   ring
 
-theorem update_comp_swap {α : Type*} {n : ℕ} (Φ : Fin (n + 1) → α) (p : Fin (n + 1)) (f : α) :
-    Function.update Φ p f ∘ Equiv.swap 0 p = Fin.cons f (fun i => Φ (Equiv.swap 0 p i.succ)) := by
+theorem update_comp_swap {α : Type*} {n : ℕ} (Φ : Fin (n + 1) → α) (p : Fin (n + 1)) (f : α)
+    : Function.update Φ p f ∘ Equiv.swap 0 p = Fin.cons f (fun i => Φ (Equiv.swap 0 p i.succ)) := by
   funext i
   refine Fin.cases ?_ (fun i => ?_) i
   · simp
@@ -81,7 +90,6 @@ theorem update_comp_swap {α : Type*} {n : ℕ} (Φ : Fin (n + 1) → α) (p : F
 
 end ChartEnergySymmetry
 
-
 open ChartEnergySymmetry in
 theorem ChartEnergySymm.proof (hI : ChartIbpSymm.Statement) : ChartEnergySymm.Statement := by
   intro e A B C D T p hA hB hC hD hT
@@ -89,18 +97,28 @@ theorem ChartEnergySymm.proof (hI : ChartIbpSymm.Statement) : ChartEnergySymm.St
   set σ : Equiv.Perm (Fin (n + 1)) := Equiv.swap 0 p with hσ
   set T' : Fin n → Matrix (Fin (n + 1 + 1)) (Fin (n + 1 + 1)) ℂ := fun i => T (σ i.succ) with hT'def
   have hT' : ∀ i, (T' i).PosDef := fun i => hT _
-  have hpot : ∀ X, (fun j => hermChartPot (Function.update T p X j)) =
-      Function.update (fun j => hermChartPot (T j)) p (hermChartPot X) := fun X => by
+  have hpot
+      : ∀ X,
+        (fun j => hermChartPot (Function.update T p X j))
+          = Function.update (fun j => hermChartPot (T j)) p (hermChartPot X) := fun X => by
     funext j
     exact Function.apply_update (fun _ M => hermChartPot M) T p X j
-  have hdiff : ∀ X Y : Matrix (Fin (n + 1 + 1)) (Fin (n + 1 + 1)) ℂ, X.PosDef → Y.PosDef → ∀ y,
-      maDensity (fun j => hermChartPot (Function.update T p X j)) y -
-          maDensity (fun j => hermChartPot (Function.update T p Y j)) y =
-        maDensity (Fin.cons (fun y' => hermChartPot X y' - hermChartPot Y y')
-          fun i => hermChartPot (T' i)) y := by
+  have hdiff
+      : ∀ X Y : Matrix (Fin (n + 1 + 1)) (Fin (n + 1 + 1)) ℂ,
+        X.PosDef → Y.PosDef
+          → ∀ y,
+            maDensity (fun j => hermChartPot (Function.update T p X j)) y
+                - maDensity (fun j => hermChartPot (Function.update T p Y j)) y
+              = maDensity
+                (Fin.cons
+                  (fun y' => hermChartPot X y' - hermChartPot Y y')
+                  fun i => hermChartPot (T' i))
+                y := by
     intro X Y hX hY y
-    rw [hpot, hpot, maDensity_update_sub _ _ (ChartEnergySwapHessian.contDiff_hermChartPot X hX)
-      (ChartEnergySwapHessian.contDiff_hermChartPot Y hY), ← Inter.maDensity_comp_perm _ σ, update_comp_swap]
+    rw [hpot, hpot,
+      maDensity_update_sub _ _ (ChartEnergySwapHessian.contDiff_hermChartPot X hX)
+        (ChartEnergySwapHessian.contDiff_hermChartPot Y hY),
+      ← Inter.maDensity_comp_perm _ σ, update_comp_swap]
   simp_rw [hdiff C D hC hD, hdiff A B hA hB]
   exact hI n A B C D T' hA hB hC hD hT'
 

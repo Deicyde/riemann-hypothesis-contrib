@@ -20,8 +20,8 @@ theorem fT_zero (k' : ℕ) : fT k' 0 = 0 := by
   have hj1 : (0 : ℝ) < j := by exact_mod_cast (Finset.mem_Icc.mp hj).1
   rw [zero_add, div_self hj1.ne', Real.log_one]
 
-theorem fT_succ (k' : ℕ) (y : ℝ) :
-    fT (k' + 1) y = fT k' y + Real.log ((y + ((k' + 1 : ℕ) : ℝ)) / ((k' + 1 : ℕ) : ℝ)) := by
+theorem fT_succ (k' : ℕ) (y : ℝ)
+    : fT (k' + 1) y = fT k' y + Real.log ((y + ((k' + 1 : ℕ) : ℝ)) / ((k' + 1 : ℕ) : ℝ)) := by
   unfold fT
   rw [Finset.sum_Icc_succ_top (by omega)]
 
@@ -36,8 +36,10 @@ theorem fT_nat (k' y : ℕ) : fT k' y = Real.log ((y + k').choose k') := by
     rw [fT_succ, ih, ← Real.log_mul hc.ne' (by positivity)]
     congr 1
     have h := Nat.add_one_mul_choose_eq (y + n) n
-    have h' : (((y + n).succ : ℕ) : ℝ) * ((y + n).choose n : ℝ) =
-        (((y + n).succ.choose n.succ : ℕ) : ℝ) * ((n.succ : ℕ) : ℝ) := by exact_mod_cast h
+    have h'
+        : (((y + n).succ : ℕ) : ℝ) * ((y + n).choose n : ℝ)
+          = (((y + n).succ.choose n.succ : ℕ) : ℝ) * ((n.succ : ℕ) : ℝ) := by
+      exact_mod_cast h
     have e1 : (((y + n).succ : ℕ) : ℝ) = (y : ℝ) + ((n + 1 : ℕ) : ℝ) := by push_cast; ring
     rw [e1] at h'
     have e2 : y + (n + 1) = (y + n).succ := rfl
@@ -96,14 +98,14 @@ theorem fT'_pos (k' : ℕ) (y : ℝ) (hy : 0 ≤ y) (hk : 1 ≤ k') : 0 < fT' k'
   have hk' : (0 : ℝ) < k' := by exact_mod_cast hk
   exact lt_of_lt_of_le (by positivity) (fT'_lower k' y hy)
 
-theorem fT'_lower2 (k' : ℕ) (y : ℝ) (hy : (k' : ℝ) ≤ y) (hk : 1 ≤ k') :
-    (k' : ℝ) / (2 * y) ≤ fT' k' y := by
+theorem fT'_lower2 (k' : ℕ) (y : ℝ) (hy : (k' : ℝ) ≤ y) (hk : 1 ≤ k')
+    : (k' : ℝ) / (2 * y) ≤ fT' k' y := by
   have hk' : (0 : ℝ) < k' := by exact_mod_cast hk
   refine le_trans ?_ (fT'_lower k' y (by linarith))
   apply div_le_div_of_nonneg_left hk'.le (by linarith) (by linarith)
 
-theorem fT'_half (k' : ℕ) (y y' : ℝ) (hy : (k' : ℝ) ≤ y) (h : 4 * y ≤ y') :
-    fT' k' y' ≤ fT' k' y / 2 := by
+theorem fT'_half (k' : ℕ) (y y' : ℝ) (hy : (k' : ℝ) ≤ y) (h : 4 * y ≤ y')
+    : fT' k' y' ≤ fT' k' y / 2 := by
   unfold fT'
   rw [Finset.sum_div]
   apply Finset.sum_le_sum
@@ -114,8 +116,8 @@ theorem fT'_half (k' : ℕ) (y y' : ℝ) (hy : (k' : ℝ) ≤ y) (h : 4 * y ≤ 
   rw [div_div]
   apply one_div_le_one_div_of_le (by positivity) (by linarith)
 
-theorem fT_concave (k' : ℕ) (x y : ℝ) (hx : 0 ≤ x) (hy : 0 ≤ y) :
-    fT k' x - fT k' y ≤ fT' k' y * (x - y) := by
+theorem fT_concave (k' : ℕ) (x y : ℝ) (hx : 0 ≤ x) (hy : 0 ≤ y)
+    : fT k' x - fT k' y ≤ fT' k' y * (x - y) := by
   unfold fT fT'
   rw [← Finset.sum_sub_distrib, Finset.sum_mul]
   apply Finset.sum_le_sum
@@ -132,24 +134,34 @@ theorem fT_concave (k' : ℕ) (x y : ℝ) (hx : 0 ≤ x) (hy : 0 ≤ y) :
 
 theorem logBinomialProperties : LogBinomialProperties := by
   intro k'
-  exact ⟨fT_zero k', fT_nat k', fT_hasDerivAt k', fT'_pos k', fT'_anti k',
-    fun y hy _ => ⟨fT'_lower k' y hy, fT'_upper k' y hy⟩, fT'_lower2 k', fT'_half k', fT_concave k'⟩
+  exact ⟨
+    fT_zero k',
+    fT_nat k',
+    fT_hasDerivAt k',
+    fT'_pos k',
+    fT'_anti k',
+    fun y hy _ => ⟨fT'_lower k' y hy, fT'_upper k' y hy⟩,
+    fT'_lower2 k',
+    fT'_half k',
+    fT_concave k'
+  ⟩
 
-theorem sum_incr (g : ℕ → ℝ) (L : ℕ) :
-    ∑ u ∈ range (L + 1), (g u - (if u = 0 then 0 else g (u - 1))) = g L := by
+theorem sum_incr (g : ℕ → ℝ) (L : ℕ)
+    : ∑ u ∈ range (L + 1), (g u - (if u = 0 then 0 else g (u - 1))) = g L := by
   induction L with
   | zero => simp
   | succ n ih => rw [Finset.sum_range_succ, ih]; simp
 
-theorem abel_tails (g d : ℕ → ℝ) (L : ℕ) :
-    ∑ l ∈ range L, g l * d l =
-      ∑ u ∈ range L, (g u - (if u = 0 then 0 else g (u - 1))) * ∑ l ∈ Ico u L, d l := by
+theorem abel_tails (g d : ℕ → ℝ) (L : ℕ)
+    : ∑ l ∈ range L, g l * d l
+      = ∑ u ∈ range L, (g u - (if u = 0 then 0 else g (u - 1))) * ∑ l ∈ Ico u L, d l := by
   induction L with
   | zero => simp
   | succ n ih =>
-    have h1 : ∑ u ∈ range (n + 1), (g u - (if u = 0 then 0 else g (u - 1))) * ∑ l ∈ Ico u (n + 1), d l =
-        ∑ u ∈ range (n + 1), ((g u - (if u = 0 then 0 else g (u - 1))) * ∑ l ∈ Ico u n, d l +
-          (g u - (if u = 0 then 0 else g (u - 1))) * d n) := by
+    have h1
+        : ∑ u ∈ range (n + 1), (g u - (if u = 0 then 0 else g (u - 1))) * ∑ l ∈ Ico u (n + 1), d l
+          = ∑ u ∈ range (n + 1), ((g u - (if u = 0 then 0 else g (u - 1))) * ∑ l ∈ Ico u n, d l +
+              (g u - (if u = 0 then 0 else g (u - 1))) * d n) := by
       apply Finset.sum_congr rfl
       intro u hu
       have hu' : u ≤ n := Nat.lt_succ_iff.mp (Finset.mem_range.mp hu)
@@ -162,8 +174,9 @@ theorem logBinomialDeficit : LogBinomialDeficit := by
   intro k' L al Bs hk hal hBs h4 hDe
   have hk0 : (0 : ℝ) < k' := by exact_mod_cast hk
   have hB0 : ∀ l, l < L → 0 ≤ Bs l := fun l hl => le_trans hk0.le (hBs l hl)
-  have hc : ∀ u, u < L →
-      fT' k' (Bs u) / 2 ≤ fT' k' (Bs u) - (if u = 0 then 0 else fT' k' (Bs (u - 1))) := by
+  have hc
+      : ∀ u,
+        u < L → fT' k' (Bs u) / 2 ≤ fT' k' (Bs u) - (if u = 0 then 0 else fT' k' (Bs (u - 1))) := by
     intro u hu
     have hn := fT'_nonneg k' (Bs u) (hB0 u hu)
     by_cases h0 : u = 0
@@ -178,17 +191,21 @@ theorem logBinomialDeficit : LogBinomialDeficit := by
     intro u hu
     have hn := fT'_nonneg k' (Bs u) (hB0 u hu)
     linarith [hc u hu]
-  have hmain : (∑ l ∈ range L, fT k' (al l)) - (∑ l ∈ range L, fT k' (Bs l)) ≤
-      ∑ u ∈ range L, (fT' k' (Bs u) - (if u = 0 then 0 else fT' k' (Bs (u - 1)))) *
-        ((∑ l ∈ Ico u L, al l) - (∑ l ∈ Ico u L, Bs l)) := by
+  have hmain
+      : (∑ l ∈ range L, fT k' (al l)) - (∑ l ∈ range L, fT k' (Bs l))
+        ≤ ∑ u ∈ range L, (fT' k' (Bs u) - (if u = 0 then 0 else fT' k' (Bs (u - 1)))) *
+            ((∑ l ∈ Ico u L, al l) - (∑ l ∈ Ico u L, Bs l)) := by
     have h := abel_tails (fun l => fT' k' (Bs l)) (fun l => al l - Bs l) L
     simp only [Finset.sum_sub_distrib] at h
     rw [← h, ← Finset.sum_sub_distrib]
     apply Finset.sum_le_sum
     intro l hl
     exact fT_concave k' (al l) (Bs l) (hal l) (hB0 l (Finset.mem_range.mp hl))
-  have hterm : ∀ u ∈ range L, (fT' k' (Bs u) - (if u = 0 then 0 else fT' k' (Bs (u - 1)))) *
-        ((∑ l ∈ Ico u L, al l) - (∑ l ∈ Ico u L, Bs l)) ≤ 0 := by
+  have hterm
+      : ∀ u ∈ range L,
+        (fT' k' (Bs u) - (if u = 0 then 0 else fT' k' (Bs (u - 1))))
+            * ((∑ l ∈ Ico u L, al l) - (∑ l ∈ Ico u L, Bs l))
+          ≤ 0 := by
     intro u hu
     have hu' := Finset.mem_range.mp hu
     exact mul_nonpos_of_nonneg_of_nonpos (hc0 u hu') (hDe u hu')
@@ -196,10 +213,13 @@ theorem logBinomialDeficit : LogBinomialDeficit := by
   intro u₀ X hu₀ hX hdef
   constructor
   · refine le_trans hmain ?_
-    have h1 := Finset.single_le_sum
-      (f := fun u => -((fT' k' (Bs u) - (if u = 0 then 0 else fT' k' (Bs (u - 1)))) *
-        ((∑ l ∈ Ico u L, al l) - (∑ l ∈ Ico u L, Bs l))))
-      (fun u hu => neg_nonneg.mpr (hterm u hu)) (Finset.mem_range.mpr hu₀)
+    have h1 :=
+      Finset.single_le_sum
+        (f := fun u =>
+          -((fT' k' (Bs u) - (if u = 0 then 0 else fT' k' (Bs (u - 1))))
+            * ((∑ l ∈ Ico u L, al l) - (∑ l ∈ Ico u L, Bs l))))
+        (fun u hu => neg_nonneg.mpr (hterm u hu))
+        (Finset.mem_range.mpr hu₀)
     rw [Finset.sum_neg_distrib] at h1
     have h2 := mul_le_mul_of_nonneg_left hdef (hc0 u₀ hu₀)
     have h3 := mul_le_mul_of_nonneg_right (hc u₀ hu₀) hX
@@ -213,15 +233,17 @@ theorem logBinomialDeficit : LogBinomialDeficit := by
     have := mul_le_mul_of_nonneg_left h hX
     linarith
 
-theorem fT_add_bounds (k' : ℕ) (y : ℝ) (hy : 0 ≤ y) (d : ℕ) :
-    0 ≤ fT (k' + d) y - fT k' y ∧ fT (k' + d) y - fT k' y ≤ (d : ℝ) * Real.log (1 + y) := by
+theorem fT_add_bounds (k' : ℕ) (y : ℝ) (hy : 0 ≤ y) (d : ℕ)
+    : 0 ≤ fT (k' + d) y - fT k' y ∧ fT (k' + d) y - fT k' y ≤ (d : ℝ) * Real.log (1 + y) := by
   induction d with
   | zero => simp
   | succ n ih =>
     have hN : (1 : ℝ) ≤ ((k' + n + 1 : ℕ) : ℝ) := by exact_mod_cast Nat.succ_le_succ (Nat.zero_le _)
     have hN0 : (0 : ℝ) < ((k' + n + 1 : ℕ) : ℝ) := by linarith
-    have e : fT (k' + (n + 1)) y = fT (k' + n) y +
-        Real.log ((y + ((k' + n + 1 : ℕ) : ℝ)) / ((k' + n + 1 : ℕ) : ℝ)) := fT_succ (k' + n) y
+    have e
+        : fT (k' + (n + 1)) y
+          = fT (k' + n) y + Real.log ((y + ((k' + n + 1 : ℕ) : ℝ)) / ((k' + n + 1 : ℕ) : ℝ)) :=
+      fT_succ (k' + n) y
     have h1 : 1 ≤ (y + ((k' + n + 1 : ℕ) : ℝ)) / ((k' + n + 1 : ℕ) : ℝ) := by
       rw [le_div_iff₀ hN0]; linarith
     have h2 : (y + ((k' + n + 1 : ℕ) : ℝ)) / ((k' + n + 1 : ℕ) : ℝ) ≤ 1 + y := by
@@ -259,8 +281,9 @@ theorem logRankEstimate : LogRankEstimate := by
   · apply Finset.sum_nonneg
     intro i _
     exact (fT_add_bounds D.k' (D.B i) (Nat.cast_nonneg _) d).1
-  · have h1 : ∑ i ∈ Icc 1 D.n0, (fT (D.k' + d) (D.B i) - fT D.k' (D.B i)) ≤
-        ∑ _i ∈ Icc 1 D.n0, ((D.r : ℝ) + 2 * D.Ns) * Real.log (1 + A0) := by
+  · have h1
+        : ∑ i ∈ Icc 1 D.n0, (fT (D.k' + d) (D.B i) - fT D.k' (D.B i))
+          ≤ ∑ _i ∈ Icc 1 D.n0, ((D.r : ℝ) + 2 * D.Ns) * Real.log (1 + A0) := by
       apply Finset.sum_le_sum
       intro i hi
       have hi' := Finset.mem_Icc.mp hi

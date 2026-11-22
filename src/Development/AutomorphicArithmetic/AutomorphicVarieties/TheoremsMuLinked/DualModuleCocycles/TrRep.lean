@@ -9,10 +9,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 @[expose] public section
 
-open Matrix IsLocalRing UpperTheory.V UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.Pa UpperTheory.V.Th UpperTheory.V.Th.Coc
+open Matrix IsLocalRing UpperTheory.V UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.Pa
+  UpperTheory.V.Th UpperTheory.V.Th.Coc
 
-theorem UpperTheory.V.Th.Coc.trRep :
-    ∀ {O R G : Type} [CommRing O] [CommRing R] [Algebra O R] [Group G] {n : ℕ} (D : GDet n R G) (x : R →ₐ[O] O) (ρ : G →* Matrix (Fin n) (Fin n) O), 1 ≤ n → D.map x.toRingHom = GDet.ofRep ρ → (∀ y, (repR x ρ y).trace = x (D.tr y)) ∧ (∀ (r : R) y, repR x ρ (r • y) = x r • repR x ρ y) ∧ ∃ t : MonoidAlgebra R G →ₗ[R] R, ∀ y, t y = D.tr y := by
+theorem UpperTheory.V.Th.Coc.trRep
+    : ∀ {O R G : Type} [CommRing O] [CommRing R] [Algebra O R] [Group G] {n : ℕ} (D : GDet n R G)
+        (x : R →ₐ[O] O) (ρ : G →* Matrix (Fin n) (Fin n) O),
+      1 ≤ n → D.map x.toRingHom = GDet.ofRep ρ
+        → (∀ y, (repR x ρ y).trace = x (D.tr y))
+          ∧ (∀ (r : R) y, repR x ρ (r • y) = x r • repR x ρ y)
+          ∧ ∃ t : MonoidAlgebra R G →ₗ[R] R, ∀ y, t y = D.tr y := by
   intro O R G _ _ _ _ n D x ρ hn h
   refine ⟨fun y => ?_, fun r y => ?_, ?_⟩
   · have h1 := (((CA.d_gmap D).2.2.1 x.toRingHom y).2 1)

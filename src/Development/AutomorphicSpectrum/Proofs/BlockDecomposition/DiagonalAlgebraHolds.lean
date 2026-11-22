@@ -9,9 +9,9 @@ open PositivityTheory.Rg.BcB.F.Eig
 
 namespace GlobalTheory.CompanionTheory.BlockScalars
 
-theorem diagOp_apply {ι : Type} {d : ℕ} (blk : Fin d → ι) (c : ι → ℂ)
-    (x : EuclideanSpace ℂ (Fin d)) (j : Fin d) :
-    (diagOp blk c x) j = c (blk j) * x j := by
+theorem diagOp_apply
+    {ι : Type} {d : ℕ} (blk : Fin d → ι) (c : ι → ℂ) (x : EuclideanSpace ℂ (Fin d)) (j : Fin d)
+    : (diagOp blk c x) j = c (blk j) * x j := by
   simp [diagOp, Matrix.toLpLin_apply, Matrix.mulVec_diagonal]
 
 theorem diagAlg : DiagAlg := by

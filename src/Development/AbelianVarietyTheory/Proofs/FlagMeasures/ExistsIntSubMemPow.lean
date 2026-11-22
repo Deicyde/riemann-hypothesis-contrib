@@ -6,8 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory.IntSubMemPow
 
-theorem exists_int_sub_mem {R : Type} [CommRing R] {p : ℕ} (hp : p.Prime) (P : Ideal R)
-    (hP : P ≠ ⊤) (hc : Nat.card (R ⧸ P) = p) (a : R) : ∃ m : ℤ, a - (m : R) ∈ P := by
+theorem exists_int_sub_mem
+    {R : Type} [CommRing R]
+    {p : ℕ} (hp : p.Prime)
+    (P : Ideal R) (hP : P ≠ ⊤) (hc : Nat.card (R ⧸ P) = p)
+    (a : R)
+    : ∃ m : ℤ, a - (m : R) ∈ P := by
   have : Nontrivial (R ⧸ P) := Ideal.Quotient.nontrivial_iff.mpr hP
   have : Finite (R ⧸ P) := Nat.finite_of_card_ne_zero (by rw [hc]; exact hp.ne_zero)
 
@@ -26,9 +30,11 @@ theorem exists_int_sub_mem {R : Type} [CommRing R] {p : ℕ} (hp : p.Prime) (P :
   refine ⟨m, ?_⟩
   rw [← Ideal.Quotient.eq_zero_iff_mem, map_sub, map_intCast, ← hm, zsmul_one, sub_self]
 
-theorem span_sup_sq_eq {R : Type} [CommRing R] [IsDedekindDomain R] (P : Ideal R)
-    (hP : P.IsMaximal) (h0 : P ≠ ⊥) (x : R) (hx : x ∈ P) (hx2 : x ∉ P ^ 2) :
-    Ideal.span {x} ⊔ P ^ 2 = P := by
+theorem span_sup_sq_eq
+    {R : Type} [CommRing R] [IsDedekindDomain R]
+    (P : Ideal R) (hP : P.IsMaximal) (h0 : P ≠ ⊥)
+    (x : R) (hx : x ∈ P) (hx2 : x ∉ P ^ 2)
+    : Ideal.span {x} ⊔ P ^ 2 = P := by
   have hprime : Prime P := Ideal.prime_of_isPrime h0 hP.isPrime
   have hle : Ideal.span {x} ⊔ P ^ 2 ≤ P :=
     sup_le ((Ideal.span_singleton_le_iff_mem P).mpr hx) (Ideal.pow_le_self two_ne_zero)
@@ -68,27 +74,32 @@ private lemma pow_le_span_pow_sup_pow_succ {R : Type} [CommRing R] (P : Ideal R)
     · have : b * (c' * x + e) ∈ P ^ (k + 1) * P := Ideal.mul_mem_mul hb hs
       rwa [← pow_succ] at this
 
-theorem exists_sub_mul_pow_mem {R : Type} [CommRing R] (P : Ideal R) (x : R) (hx : x ∈ P)
-    (h : Ideal.span {x} ⊔ P ^ 2 = P) (k : ℕ) :
-    ∀ y ∈ P ^ k, ∃ c : R, y - c * x ^ k ∈ P ^ (k + 1) := by
+theorem exists_sub_mul_pow_mem
+    {R : Type} [CommRing R]
+    (P : Ideal R) (x : R) (hx : x ∈ P) (h : Ideal.span {x} ⊔ P ^ 2 = P)
+    (k : ℕ)
+    : ∀ y ∈ P ^ k, ∃ c : R, y - c * x ^ k ∈ P ^ (k + 1) := by
   intro y hy
   obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.mp (pow_le_span_pow_sup_pow_succ P x hx h k hy)
   obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.mp ha
   exact ⟨c, by simpa using hb⟩
 
-theorem exists_int_sub_mem_pow {E : Type} [Field E] [NumberField E] {p : ℕ} (hp : Nat.Prime p)
-    (P : Ideal (NumberField.RingOfIntegers E)) (hP : Ideal.IsMaximal P)
-    (hpP : (p : NumberField.RingOfIntegers E) ∈ P) (hN : Ideal.absNorm P = p)
-    (hp2 : (p : NumberField.RingOfIntegers E) ∉ P ^ (2 : ℕ)) (k : ℕ)
-    (a : NumberField.RingOfIntegers E) :
-    ∃ m : ℤ, a - (m : NumberField.RingOfIntegers E) ∈ P ^ k := by
+theorem exists_int_sub_mem_pow
+    {E : Type} [Field E] [NumberField E]
+    {p : ℕ} (hp : Nat.Prime p)
+    (P : Ideal (NumberField.RingOfIntegers E))
+    (hP : Ideal.IsMaximal P) (hpP : (p : NumberField.RingOfIntegers E) ∈ P)
+    (hN : Ideal.absNorm P = p) (hp2 : (p : NumberField.RingOfIntegers E) ∉ P ^ (2 : ℕ))
+    (k : ℕ) (a : NumberField.RingOfIntegers E)
+    : ∃ m : ℤ, a - (m : NumberField.RingOfIntegers E) ∈ P ^ k := by
   have h0 : P ≠ ⊥ := by
     rintro rfl
     rw [Ideal.absNorm_bot] at hN
     exact hp.ne_zero hN.symm
   have hcard : Nat.card (NumberField.RingOfIntegers E ⧸ P) = p := by
     rw [← hN, Ideal.absNorm_apply, Submodule.cardQuot_apply]
-  have hgen : Ideal.span {(p : NumberField.RingOfIntegers E)} ⊔ P ^ 2 = P := span_sup_sq_eq P hP h0 _ hpP hp2
+  have hgen : Ideal.span {(p : NumberField.RingOfIntegers E)} ⊔ P ^ 2 = P :=
+    span_sup_sq_eq P hP h0 _ hpP hp2
   induction k with
   | zero => exact ⟨0, by simp⟩
   | succ k ih =>
@@ -97,12 +108,18 @@ theorem exists_int_sub_mem_pow {E : Type} [Field E] [NumberField E] {p : ℕ} (h
     obtain ⟨c, hc⟩ := exists_sub_mul_pow_mem P _ hpP hgen k _ hm
     obtain ⟨n, hn⟩ := exists_int_sub_mem hp P hP.ne_top hcard c
     refine ⟨m + n * (p : ℤ) ^ k, ?_⟩
-    have hrest : (c - (n : NumberField.RingOfIntegers E)) * (p : NumberField.RingOfIntegers E) ^ k ∈ P ^ (k + 1) := by
-      have : (c - (n : NumberField.RingOfIntegers E)) * (p : NumberField.RingOfIntegers E) ^ k ∈ P * P ^ k :=
+    have hrest
+        : (c - (n : NumberField.RingOfIntegers E)) * (p : NumberField.RingOfIntegers E) ^ k
+          ∈ P ^ (k + 1) := by
+      have : (c - (n : NumberField.RingOfIntegers E)) * (p : NumberField.RingOfIntegers E) ^ k
+          ∈ P * P ^ k :=
         Ideal.mul_mem_mul hn (Ideal.pow_mem_pow hpP k)
       rwa [← pow_succ'] at this
-    have heq : a - ((m + n * (p : ℤ) ^ k : ℤ) : NumberField.RingOfIntegers E) =
-        (a - (m : NumberField.RingOfIntegers E) - c * (p : NumberField.RingOfIntegers E) ^ k) + (c - (n : NumberField.RingOfIntegers E)) * (p : NumberField.RingOfIntegers E) ^ k := by
+    have heq
+        : a - ((m + n * (p : ℤ) ^ k : ℤ) : NumberField.RingOfIntegers E)
+          = (a - (m : NumberField.RingOfIntegers E) - c * (p : NumberField.RingOfIntegers E) ^ k)
+            + (c - (n : NumberField.RingOfIntegers E))
+              * (p : NumberField.RingOfIntegers E) ^ k := by
       push_cast; ring
     rw [heq]
     exact Ideal.add_mem _ hc hrest

@@ -24,14 +24,21 @@ theorem wordLiftOfParts : WordLiftOfParts := by
     intro hw e
     have hw' : admitted st w := by
       obtain ⟨h1, h2, h3, h4⟩ := hw
-      refine ⟨?_, fun l' hl' => h2 l' (List.mem_cons_of_mem _ hl'),
-        fun l' hl' => h3 l' (List.mem_cons_of_mem _ hl'), h4.of_cons⟩
+      refine ⟨
+        ?_,
+        fun l' hl' => h2 l' (List.mem_cons_of_mem _ hl'),
+        fun l' hl' => h3 l' (List.mem_cons_of_mem _ hl'),
+        h4.of_cons
+      ⟩
       simp only [List.map_cons, List.nodup_cons] at h1
       exact h1.2
     rw [hstep A S r L st l w hA hw e, Matrix.mul_apply]
     refine Finset.sum_induction _ (Lf _ _) (fun a b ha hb => hL.add ha hb) (hL.zero _ _) ?_
     intro f _
-    have hcoef : Lf n (9 * (r + 1) * n) ((∑ i : Fin 2, eU l.intersection_update_fsHerm_neg_one i 0 * letterCol L st l w i : SlopeTestRemainingChoices S A) e f) := by
+    have hcoef : Lf n (9 * (r + 1) * n)
+        ((∑ i : Fin 2, eU l.intersection_update_fsHerm_neg_one i 0 * letterCol L st l w i
+            : SlopeTestRemainingChoices S A)
+          e f) := by
       rw [Matrix.sum_apply]
       refine Finset.sum_induction _ (Lf _ _) (fun a b ha hb => hL.add ha hb) (hL.zero _ _) ?_
       intro i _

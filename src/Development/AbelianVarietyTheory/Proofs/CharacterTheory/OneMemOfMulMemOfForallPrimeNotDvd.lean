@@ -6,9 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem one_mem_of_mul_mem_of_forall_prime_not_dvd (X : Type) [Finite X]
+theorem one_mem_of_mul_mem_of_forall_prime_not_dvd
+    (X : Type) [Finite X]
     (S : AddSubgroup (X → ℤ)) (hmul : ∀ f ∈ S, ∀ g ∈ S, f * g ∈ S)
-    (hp : ∀ (x : X) (p : ℕ), p.Prime → ∃ f ∈ S, ¬ (p : ℤ) ∣ f x) : (1 : X → ℤ) ∈ S := by
+    (hp : ∀ (x : X) (p : ℕ), p.Prime → ∃ f ∈ S, ¬ (p : ℤ) ∣ f x)
+    : (1 : X → ℤ) ∈ S := by
   classical
   have h1 : ∀ x : X, ∃ f ∈ S, f x = 1 := by
     intro x
@@ -41,8 +43,10 @@ theorem one_mem_of_mul_mem_of_forall_prime_not_dvd (X : Type) [Finite X]
     | empty => simp
     | insert a s ha ih =>
       rw [Finset.prod_insert ha]
-      have e : 1 - (1 - f a) * ∏ x ∈ s, (1 - f x)
-          = f a + (1 - ∏ x ∈ s, (1 - f x)) - f a * (1 - ∏ x ∈ s, (1 - f x)) := by ring
+      have e
+          : 1 - (1 - f a) * ∏ x ∈ s, (1 - f x)
+            = f a + (1 - ∏ x ∈ s, (1 - f x)) - f a * (1 - ∏ x ∈ s, (1 - f x)) := by
+        ring
       rw [e]
       exact S.sub_mem (S.add_mem (hfS a) ih) (hmul _ (hfS a) _ ih)
   haveI := Fintype.ofFinite X

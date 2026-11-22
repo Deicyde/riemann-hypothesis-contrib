@@ -13,10 +13,13 @@ open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
 
 noncomputable section
 
-theorem TwistedDualGensExpress.sum_mul_mem_localized {R Ω : Type*} [CommRing R] [Field Ω] [Algebra R Ω]
-    (A : Subalgebra R Ω) {f : Ω} (hf : f ∈ A) {r : ℕ} (a t : Fin r → Ω)
-    (ha : ∀ q, ∃ n : ℕ, f ^ n * a q ∈ A) (ht : ∀ q, ∃ n : ℕ, f ^ n * t q ∈ A) :
-    ∃ n : ℕ, f ^ n * ∑ q, a q * t q ∈ A := by
+theorem TwistedDualGensExpress.sum_mul_mem_localized
+    {R Ω : Type*} [CommRing R] [Field Ω] [Algebra R Ω]
+    (A : Subalgebra R Ω)
+    {f : Ω} (hf : f ∈ A)
+    {r : ℕ}
+    (a t : Fin r → Ω) (ha : ∀ q, ∃ n : ℕ, f ^ n * a q ∈ A) (ht : ∀ q, ∃ n : ℕ, f ^ n * t q ∈ A)
+    : ∃ n : ℕ, f ^ n * ∑ q, a q * t q ∈ A := by
   refine Finset.sum_induction _ (fun x => ∃ n : ℕ, f ^ n * x ∈ A) ?_ ⟨0, by simp⟩ ?_
   · rintro x z ⟨n, hn⟩ ⟨m, hm⟩
     refine ⟨n + m, ?_⟩
@@ -44,8 +47,9 @@ theorem TwistedDualGensExpress.proof : TwistedDualGensExpress.Statement := by
     obtain ⟨s, hs, hsv⟩ := hφ'.sections c hc m v hv
     have : ψ v = s := by
       rw [hψ, LinearMap.smul_apply, hsv, smul_eq_mul, mul_comm s, ← mul_assoc,
-        ← Finset.prod_mul_distrib, Finset.prod_eq_one (fun k _ => by
-          rw [zpow_neg, inv_mul_cancel₀ (zpow_ne_zero _ (hy k))]), one_mul]
+        ← Finset.prod_mul_distrib,
+        Finset.prod_eq_one (fun k _ => by rw [zpow_neg, inv_mul_cancel₀ (zpow_ne_zero _ (hy k))]),
+        one_mul]
     rw [this]
     exact hs
   obtain ⟨k0, f, cc, hf, hcc, hsum, hb⟩ := B.frame c hc
@@ -54,10 +58,18 @@ theorem TwistedDualGensExpress.proof : TwistedDualGensExpress.Statement := by
     intro l q
     by_cases hl : f l = 0
     · exact ⟨0, fun h => (h hl).elim⟩
-    obtain ⟨e, he⟩ := (hiff l (b l q)).2 ⟨Pi.single q 1, fun q' => ⟨0, by
-        by_cases h : q' = q
-        · subst h; simp
-        · simp [h]⟩, by simp [Pi.single_apply]⟩
+    obtain ⟨e, he⟩ :=
+      (hiff l (b l q)).2 ⟨
+        Pi.single q 1,
+        fun q' => ⟨
+          0,
+          by
+            by_cases h : q' = q
+            · subst h; simp
+            · simp [h]
+        ⟩,
+        by simp [Pi.single_apply]
+      ⟩
     obtain ⟨n, hn⟩ := (hsame c hc).1 _ he
     refine ⟨n, fun _ => ⟨e, ?_⟩⟩
     have h := hψA _ hn
@@ -76,14 +88,18 @@ theorem TwistedDualGensExpress.proof : TwistedDualGensExpress.Statement := by
     by_cases hl : f l = 0
     · exact ⟨1, by simp [hl]⟩
     obtain ⟨a'', ha'', hrep⟩ := (hiff l v).1 ⟨0, by simpa using hv⟩
-    obtain ⟨e, he⟩ := TwistedDualGensExpress.sum_mul_mem_localized A (hf l) a''
-      (fun q => w ^ n * ψ (b l q)) ha'' (fun q => by
-        obtain ⟨e, he⟩ := hnb l q hl
-        refine ⟨e, ?_⟩
-        rw [← pow_sub_mul_pow w (hle l q)]
-        rw [show f l ^ e * (w ^ (n - nb l q) * w ^ nb l q * ψ (b l q)) =
-          w ^ (n - nb l q) * (f l ^ e * (w ^ nb l q * ψ (b l q))) by ring]
-        exact mul_mem (pow_mem hwA _) he)
+    obtain ⟨e, he⟩ :=
+      TwistedDualGensExpress.sum_mul_mem_localized A (hf l) a''
+        (fun q => w ^ n * ψ (b l q))
+        ha''
+        (fun q => by
+          obtain ⟨e, he⟩ := hnb l q hl
+          refine ⟨e, ?_⟩
+          rw [← pow_sub_mul_pow w (hle l q)]
+          rw [show f l ^ e * (w ^ (n - nb l q) * w ^ nb l q * ψ (b l q))
+              = w ^ (n - nb l q) * (f l ^ e * (w ^ nb l q * ψ (b l q))) by
+            ring]
+          exact mul_mem (pow_mem hwA _) he)
     refine ⟨e, ?_⟩
     have : w ^ n * ψ v = ∑ q, a'' q * (w ^ n * ψ (b l q)) := by
       set_option synthInstance.maxHeartbeats 100000 in

@@ -11,20 +11,25 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.Targets
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I2
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I2
 
 noncomputable section
 
 namespace CurveVerticalPointLength
 
-theorem maximal_and_mult_eq (hCh : CurveVertPointChart.Statement) (hMC : CurveVertPointMultChart.Statement)
-    (hSQ : CurveSectionQuotLocal.Statement) {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-    {Ω : Type} [Field Ω] {y : (Σ k, ι k) → Ω} {s : MRing ι} {d : K → ℕ}
+theorem maximal_and_mult_eq
+    (hCh : CurveVertPointChart.Statement) (hMC : CurveVertPointMultChart.Statement)
+    (hSQ : CurveSectionQuotLocal.Statement)
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {Ω : Type} [Field Ω]
+    {y : (Σ k, ι k) → Ω} {s : MRing ι} {d : K → ℕ}
     (hP : IsArithVar (mCoordIdeal y) 1) (hs : IsMultiHomog s d) (hsP : s ∉ mCoordIdeal y)
-    {W : Ideal (MRing ι)} (hW : W ∈ divSupp (mCoordIdeal y) s) :
-    (curvePtIdeal y W).IsMaximal ∧
-      multAt (mCoordIdeal y ⊔ Ideal.span {s}) W =
-        locLen (curvePtIdeal y W) (curveSectionQuot y (fun k => (d k : ℤ)) (aeval y s)) := by
+    {W : Ideal (MRing ι)} (hW : W ∈ divSupp (mCoordIdeal y) s)
+    : (curvePtIdeal y W).IsMaximal
+      ∧ multAt (mCoordIdeal y ⊔ Ideal.span {s}) W
+        = locLen (curvePtIdeal y W) (curveSectionQuot y (fun k => (d k : ℤ)) (aeval y s)) := by
   choose c hc using hW.2
   obtain ⟨hmax, hrat, hmem⟩ := hCh K ι Ω y s d hP hs hsP W hW c hc
   have hPW : mCoordIdeal y ≤ W := le_trans le_sup_left hW.1.1.2
@@ -37,13 +42,20 @@ theorem maximal_and_mult_eq (hCh : CurveVertPointChart.Statement) (hMC : CurveVe
 
 end CurveVerticalPointLength
 
-theorem CurveVertPointLength.proof (hCh : CurveVertPointChart.Statement) (hInj : CurveVertPointInj.Statement)
+theorem CurveVertPointLength.proof
+    (hCh : CurveVertPointChart.Statement) (hInj : CurveVertPointInj.Statement)
     (hSurj : CurveVertPointSurj.Statement) (hMC : CurveVertPointMultChart.Statement)
-    (hSQ : CurveSectionQuotLocal.Statement) : CurveVertPointLength.Statement := by
+    (hSQ : CurveSectionQuotLocal.Statement)
+    : CurveVertPointLength.Statement := by
   intro K _ ι _ Ω _ y s d hP hs hsP
-  refine ⟨⟨fun W hW => ?_, hInj K ι Ω y s d hP hs hsP,
-      fun m hm => hSurj K ι Ω y s d hP hs hsP m hm.1 hm.2⟩,
-    fun W hW => (CurveVerticalPointLength.maximal_and_mult_eq hCh hMC hSQ hP hs hsP hW).2⟩
+  refine ⟨
+    ⟨
+      fun W hW => ?_,
+      hInj K ι Ω y s d hP hs hsP,
+      fun m hm => hSurj K ι Ω y s d hP hs hsP m hm.1 hm.2
+    ⟩,
+    fun W hW => (CurveVerticalPointLength.maximal_and_mult_eq hCh hMC hSQ hP hs hsP hW).2
+  ⟩
   obtain ⟨hmax, hmult⟩ := CurveVerticalPointLength.maximal_and_mult_eq hCh hMC hSQ hP hs hsP hW
   exact ⟨hmax, hmult ▸ (IndefiniteRowSideFullHecke.Inter.multAt_pos_of_mem_divSupp hW).ne'⟩
 

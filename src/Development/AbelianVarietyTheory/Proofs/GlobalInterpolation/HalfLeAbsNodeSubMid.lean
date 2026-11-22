@@ -8,13 +8,17 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ConstM
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.LevelStarExponents Formalism.MainNotions
+  Formalism.MainNotions.Inhab GlobalTheory.EX NumberField
 
 namespace GlobalTheory.EX
 
-theorem lowsFar_poly {y n t N l k d : ℝ} (hy : 28 ≤ y) (hn0 : 0 ≤ n) (ht0 : 0 ≤ t) (hN0 : 0 ≤ N) (hl0 : 0 ≤ l)
-    (hk0 : 0 ≤ k) (hd0 : 0 ≤ d) (hn : n ≤ y) (ht : t ≤ y) (hN : N ≤ y) (hl : l ≤ y) (hk : k ≤ y) (hd : d ≤ 2 * y) :
-    2 * (n * t ^ 2 * (N + t) * l ^ 2 + k * n ^ 2 * (k * (4 * d) + t + l)) + t / 2 + 3 ≤ y ^ 7 := by
+theorem lowsFar_poly
+    {y n t N l k d : ℝ}
+    (hy : 28 ≤ y) (hn0 : 0 ≤ n) (ht0 : 0 ≤ t) (hN0 : 0 ≤ N) (hl0 : 0 ≤ l) (hk0 : 0 ≤ k)
+    (hd0 : 0 ≤ d) (hn : n ≤ y) (ht : t ≤ y) (hN : N ≤ y) (hl : l ≤ y) (hk : k ≤ y) (hd : d ≤ 2 * y)
+    : 2 * (n * t ^ 2 * (N + t) * l ^ 2 + k * n ^ 2 * (k * (4 * d) + t + l)) + t / 2 + 3
+      ≤ y ^ 7 := by
   have hy0 : 0 ≤ y := by linarith
   have hy1 : 1 ≤ y := by linarith
   have h1 : n * t ^ 2 * (N + t) * l ^ 2 ≤ y * y ^ 2 * (y + y) * y ^ 2 := by gcongr
@@ -25,21 +29,26 @@ theorem lowsFar_poly {y n t N l k d : ℝ} (hy : 28 ≤ y) (hn0 : 0 ≤ n) (ht0 
   have p4 : y ^ 4 ≤ y ^ 6 := pow_le_pow_right₀ hy1 (by norm_num)
   have p1 : y ^ 1 ≤ y ^ 6 := pow_le_pow_right₀ hy1 (by norm_num)
   have p7 : 28 * y ^ 6 ≤ y ^ 7 := by
-    calc 28 * y ^ 6 ≤ y * y ^ 6 := by gcongr
+    calc
+      28 * y ^ 6
+        ≤ y * y ^ 6 := by gcongr
       _ = y ^ 7 := by ring
   rw [pow_one] at p1
   linarith
 
-theorem half_le_abs_node_sub_mid (b : ℝ) (i j : ℕ) (H : ℝ) (hH : 0 ≤ H) :
-    H ≤ |(b + i * (2 * H)) - (b + j * (2 * H) + 2 * H / 2)| := by
+theorem half_le_abs_node_sub_mid (b : ℝ) (i j : ℕ) (H : ℝ) (hH : 0 ≤ H)
+    : H ≤ |(b + i * (2 * H)) - (b + j * (2 * H) + 2 * H / 2)| := by
   rcases Nat.lt_or_ge j i with h | h
   · have : (j : ℝ) + 1 ≤ i := by exact_mod_cast h
     exact le_abs.2 (Or.inl (by nlinarith))
   · have : (i : ℝ) ≤ j := by exact_mod_cast h
     exact le_abs.2 (Or.inr (by nlinarith))
 
-theorem szRow_lowsFar : SzRow (fun C D L => (∀ τ (i j : Fin D.R.m),
-    2 * L.sc.b / lStar L + (D.R.t : ℝ) / 2 + 3 ≤ |(((D.hc τ).b i - (D.hc τ).e j : ℚ) : ℝ)|)) := by
+theorem szRow_lowsFar
+    : SzRow (fun C D L =>
+      (∀ τ (i j : Fin D.R.m),
+        2 * L.sc.b / lStar L + (D.R.t : ℝ) / 2 + 3
+          ≤ |(((D.hc τ).b i - (D.hc τ).e j : ℚ) : ℝ)|)) := by
   intro eps he0 he1 C _
   obtain ⟨x1, hx1⟩ := GlobalTheory.T.explicitRanks_basic_bounds_large_scale eps he0 he1
   refine ⟨402, fun cD hcD => ⟨cD * 7, fun ch hch => ⟨max x1 28, fun D L he hx V τ i j => ?_⟩⟩⟩
@@ -51,27 +60,29 @@ theorem szRow_lowsFar : SzRow (fun C D L => (∀ τ (i j : Fin D.R.m),
     Real.rpow_le_rpow_of_exponent_le hx1' (le_trans ha hcD)
   have hxy : L.sc.x ≤ L.sc.x ^ cD := by simpa using up 1 (by norm_num)
   have hn : (D.R.n : ℝ) ≤ L.sc.x ^ cD := by
-    have : (D.R.n : ℝ) ≤ D.R.f := by
-      unfold Ranks.f; exact_mod_cast (by omega)
+    have : (D.R.n : ℝ) ≤ D.R.f := by unfold Ranks.f; exact_mod_cast (by omega)
     exact this.trans (hf.trans (up _ (by norm_num)))
   have hk : (D.R.k : ℝ) ≤ L.sc.x ^ cD := by
     have : (D.R.k : ℝ) ≤ D.R.r := by exact_mod_cast hkr
     exact this.trans (hr.trans (up _ (by norm_num)))
   have hd : ((Delv L.sc cD : ℕ) : ℝ) ≤ 2 * L.sc.x ^ cD := by
     have := Nat.ceil_lt_add_one (a := L.sc.x ^ cD) (by linarith)
-    unfold Delv; linarith
-  have key := lowsFar_poly (y := L.sc.x ^ cD) (by linarith) (Nat.cast_nonneg _) (Nat.cast_nonneg _)
-    (Nat.cast_nonneg _) (by linarith) (Nat.cast_nonneg _) (Nat.cast_nonneg _) hn
-    (ht.trans (up _ (by norm_num))) (hN.trans (up _ (by norm_num))) (hLx.trans hxy) hk hd
+    unfold Delv
+    linarith
+  have key :=
+    lowsFar_poly (y := L.sc.x ^ cD) (by linarith) (Nat.cast_nonneg _) (Nat.cast_nonneg _)
+      (Nat.cast_nonneg _) (by linarith) (Nat.cast_nonneg _) (Nat.cast_nonneg _) hn
+      (ht.trans (up _ (by norm_num))) (hN.trans (up _ (by norm_num))) (hLx.trans hxy) hk hd
   have h7 : (L.sc.x ^ cD) ^ 7 ≤ (⌈L.sc.x ^ ch⌉₊ : ℝ) := by
     refine le_trans ?_ (Nat.le_ceil _)
     rw [← Real.rpow_natCast, ← Real.rpow_mul (by linarith)]
     exact Real.rpow_le_rpow_of_exponent_le hx1' (by simpa using hch)
   obtain ⟨-, -, ⟨b1, hb, -⟩, -⟩ := V.hc
   have hdist := half_le_abs_node_sub_mid (b1 τ : ℝ) i.1 j.1 (⌈L.sc.x ^ ch⌉₊ : ℝ) (Nat.cast_nonneg _)
-  have heq : (((D.hc τ).b i - (D.hc τ).e j : ℚ) : ℝ) =
-      ((b1 τ : ℝ) + i.1 * (2 * (⌈L.sc.x ^ ch⌉₊ : ℝ))) -
-        ((b1 τ : ℝ) + j.1 * (2 * (⌈L.sc.x ^ ch⌉₊ : ℝ)) + 2 * (⌈L.sc.x ^ ch⌉₊ : ℝ) / 2) := by
+  have heq
+      : (((D.hc τ).b i - (D.hc τ).e j : ℚ) : ℝ)
+        = ((b1 τ : ℝ) + i.1 * (2 * (⌈L.sc.x ^ ch⌉₊ : ℝ)))
+          - ((b1 τ : ℝ) + j.1 * (2 * (⌈L.sc.x ^ ch⌉₊ : ℝ)) + 2 * (⌈L.sc.x ^ ch⌉₊ : ℝ) / 2) := by
     rw [(hb τ j).2, (hb τ i).1, (hb τ j).1]
     unfold h0v
     push_cast

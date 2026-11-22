@@ -11,7 +11,13 @@ open scoped BigOperators ComplexConjugate Real Classical
 
 namespace GlobalTheory.UnitaryTheta
 
-theorem integral_cexp_gaussian_plane : ∀ l u v : ℂ, 0 < l.re → Integrable (fun z : ℂ => cexp (-(π : ℂ) * l * (z * conj z) + π * (u * conj z) + π * (z * conj v))) ∧ ∫ z : ℂ, cexp (-(π : ℂ) * l * (z * conj z) + π * (u * conj z) + π * (z * conj v)) = l⁻¹ * cexp (π * (u * conj v) / l) := by
+theorem integral_cexp_gaussian_plane
+    : ∀ l u v : ℂ,
+      0 < l.re
+        → Integrable (fun z : ℂ =>
+            cexp (-(π : ℂ) * l * (z * conj z) + π * (u * conj z) + π * (z * conj v)))
+          ∧ ∫ z : ℂ, cexp (-(π : ℂ) * l * (z * conj z) + π * (u * conj z) + π * (z * conj v))
+            = l⁻¹ * cexp (π * (u * conj v) / l) := by
   intro l u v hl
   have hl0 : l ≠ 0 := by
     intro h
@@ -24,14 +30,14 @@ theorem integral_cexp_gaussian_plane : ∀ l u v : ℂ, 0 < l.re → Integrable 
   set g : ℝ → ℂ := fun y => cexp ((-(π : ℂ) * l) * y ^ 2 + (π * I * (conj v - u)) * y + 0) with hg
   have hfi : Integrable f := integrable_cexp_quadratic' hb _ _
   have hgi : Integrable g := integrable_cexp_quadratic' hb _ _
-  have key : (fun z : ℂ => cexp (-(π : ℂ) * l * (z * conj z) + π * (u * conj z) + π * (z * conj v)))
-      = (fun p : ℝ × ℝ => f p.1 * g p.2) ∘ Complex.measurableEquivRealProd := by
+  have key
+      : (fun z : ℂ => cexp (-(π : ℂ) * l * (z * conj z) + π * (u * conj z) + π * (z * conj v)))
+        = (fun p : ℝ × ℝ => f p.1 * g p.2) ∘ Complex.measurableEquivRealProd := by
     funext z
     simp only [hf, hg, Function.comp, Complex.measurableEquivRealProd_apply, ← Complex.exp_add]
     congr 1
     have hz : z = z.re + z.im * I := (Complex.re_add_im z).symm
-    have hc : conj z = z.re - z.im * I := by
-      apply Complex.ext <;> simp
+    have hc : conj z = z.re - z.im * I := by apply Complex.ext <;> simp
     rw [hc]
     generalize (z.re : ℂ) = a at hz ⊢
     generalize (z.im : ℂ) = b at hz ⊢

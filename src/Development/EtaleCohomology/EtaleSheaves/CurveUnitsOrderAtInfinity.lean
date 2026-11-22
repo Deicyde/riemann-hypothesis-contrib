@@ -20,10 +20,12 @@ theorem minpolyCoeff : LateralTheory.E.E4.LeafMinpolyCoeff := by
   exact ((minpoly (Algebra.adjoin k {s}) x).coeff i).2
 
 theorem ordInfHom : LateralTheory.E.E4.LeafOrdInfHom :=
-  LateralTheory.E.E4.LeafOrdInfHom_of_local (LateralTheory.E.E4.LeafOrdInfLocal_of' LateralTheory.E.E4.LeafFinInf_of LateralTheory.E.E4.LeafFinVal_of)
+  LateralTheory.E.E4.LeafOrdInfHom_of_local (LateralTheory.E.E4.LeafOrdInfLocal_of'
+    LateralTheory.E.E4.LeafFinInf_of LateralTheory.E.E4.LeafFinVal_of)
 
 theorem LeafUnits_of : LateralTheory.E.E4.LeafUnits :=
-  LateralTheory.E.E4.LeafUnits_of (LateralTheory.E.E4.LeafUnitsFG_of_dim LateralTheory.E.E4.LeafNoetherDim_of
+  LateralTheory.E.E4.LeafUnits_of (LateralTheory.E.E4.LeafUnitsFG_of_dim
+    LateralTheory.E.E4.LeafNoetherDim_of
     (LateralTheory.E.E4.LeafOrdAtInfinity_of_cut ordInfHom minpolyCoeff))
 
 end LateralTheory.E.CurveUnitsOrderAtInfinity

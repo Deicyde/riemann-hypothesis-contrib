@@ -18,31 +18,40 @@ def posCone : PointedCone ℝ C_c(X, ℝ) where
   add_mem' := fun hf hg x => by simpa using add_nonneg (hf x) (hg x)
   smul_mem' := fun ⟨c, hc⟩ g hg x => by simpa using mul_nonneg hc (hg x)
 
-theorem im_L (A : Submodule ℂ (X → ℂ)) (hA : ∀ f ∈ A, Continuous f ∧ HasCompactSupport f)
+theorem im_L
+    (A : Submodule ℂ (X → ℂ)) (hA : ∀ f ∈ A, Continuous f ∧ HasCompactSupport f)
     (hbump : ∀ C, IsCompact C → ∃ f ∈ A, (∀ x, 0 ≤ (f x).re ∧ (f x).im = 0) ∧ ∀ x ∈ C, f x = 1)
-    (L : A →ₗ[ℂ] ℂ) (hpos : ∀ f : A, (∀ x, 0 ≤ (f.1 x).re ∧ (f.1 x).im = 0) → 0 ≤ (L f).re ∧ (L f).im = 0)
-    (f : AR A) : (L ⟨f.1, f.2.1⟩).im = 0 := by
-  obtain ⟨b, hbA, hb0, M, hM, hMb⟩ := dom A hbump (y := fun x => (f.1 x).re)
-    (Complex.continuous_re.comp (hA _ f.2.1).1) ((hA _ f.2.1).2.comp_left Complex.zero_re)
+    (L : A →ₗ[ℂ] ℂ)
+    (hpos : ∀ f : A, (∀ x, 0 ≤ (f.1 x).re ∧ (f.1 x).im = 0) → 0 ≤ (L f).re ∧ (L f).im = 0)
+    (f : AR A)
+    : (L ⟨f.1, f.2.1⟩).im = 0 := by
+  obtain ⟨b, hbA, hb0, M, hM, hMb⟩ :=
+    dom A hbump
+      (y := fun x => (f.1 x).re)
+      (Complex.continuous_re.comp (hA _ f.2.1).1) ((hA _ f.2.1).2.comp_left Complex.zero_re)
   set F : A := ⟨f.1, f.2.1⟩
   set Bb : A := ⟨b, hbA⟩
-  have h1 := hpos ((M : ℂ) • Bb - F) (fun x => by
-    have := f.2.2 x
-    simp only [Submodule.coe_sub, Submodule.coe_smul, Pi.sub_apply, Pi.smul_apply, smul_eq_mul,
-      Complex.sub_re, Complex.sub_im, Complex.mul_re, Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im,
-      Bb, F, (hb0 x).2, this]
-    constructor <;> linarith [(hMb x).2])
-  have h2 := hpos ((M : ℂ) • Bb) (fun x => by
-    simp only [Submodule.coe_smul, Pi.smul_apply, smul_eq_mul, Complex.mul_re, Complex.mul_im,
-      Complex.ofReal_re, Complex.ofReal_im, Bb, (hb0 x).2]
-    constructor <;> nlinarith [(hb0 x).1])
+  have h1 :=
+    hpos ((M : ℂ) • Bb - F) (fun x => by
+      have := f.2.2 x
+      simp only [Submodule.coe_sub, Submodule.coe_smul, Pi.sub_apply, Pi.smul_apply, smul_eq_mul,
+        Complex.sub_re, Complex.sub_im, Complex.mul_re, Complex.mul_im, Complex.ofReal_re,
+        Complex.ofReal_im, Bb, F, (hb0 x).2, this]
+      constructor <;> linarith [(hMb x).2])
+  have h2 :=
+    hpos ((M : ℂ) • Bb) (fun x => by
+      simp only [Submodule.coe_smul, Pi.smul_apply, smul_eq_mul, Complex.mul_re, Complex.mul_im,
+        Complex.ofReal_re, Complex.ofReal_im, Bb, (hb0 x).2]
+      constructor <;> nlinarith [(hb0 x).1])
   have : L F = L ((M : ℂ) • Bb) - L ((M : ℂ) • Bb - F) := by rw [map_sub]; ring
   rw [this, Complex.sub_im, h1.2, h2.2, sub_zero]
 
-theorem extend (A : Submodule ℂ (X → ℂ)) (hA : ∀ f ∈ A, Continuous f ∧ HasCompactSupport f)
+theorem extend
+    (A : Submodule ℂ (X → ℂ)) (hA : ∀ f ∈ A, Continuous f ∧ HasCompactSupport f)
     (hbump : ∀ C, IsCompact C → ∃ f ∈ A, (∀ x, 0 ≤ (f x).re ∧ (f x).im = 0) ∧ ∀ x ∈ C, f x = 1)
-    (L : A →ₗ[ℂ] ℂ) (hpos : ∀ f : A, (∀ x, 0 ≤ (f.1 x).re ∧ (f.1 x).im = 0) → 0 ≤ (L f).re ∧ (L f).im = 0) :
-    ∃ Λ : C_c(X, ℝ) →ₚ[ℝ] ℝ, ∀ a : AR A, Λ (reC A hA a) = (L ⟨a.1, a.2.1⟩).re := by
+    (L : A →ₗ[ℂ] ℂ)
+    (hpos : ∀ f : A, (∀ x, 0 ≤ (f.1 x).re ∧ (f.1 x).im = 0) → 0 ≤ (L f).re ∧ (L f).im = 0)
+    : ∃ Λ : C_c(X, ℝ) →ₚ[ℝ] ℝ, ∀ a : AR A, Λ (reC A hA a) = (L ⟨a.1, a.2.1⟩).re := by
   set φ := reC A hA
   let e := LinearEquiv.ofInjective φ (reC_inj A hA)
   let fP : C_c(X, ℝ) →ₗ.[ℝ] ℝ := ⟨LinearMap.range φ, reL A L ∘ₗ e.symm.toLinearMap⟩

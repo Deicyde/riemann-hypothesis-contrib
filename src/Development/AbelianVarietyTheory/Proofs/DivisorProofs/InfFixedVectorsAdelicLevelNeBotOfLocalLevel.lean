@@ -9,29 +9,37 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemOpenNhdOn
 
 noncomputable section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.FixLev
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-theorem ext_fin {x y : UA E n} (hx : x ∈ finU (E := E) (n := n)) (hy : y ∈ finU (E := E) (n := n)) (h : ∀ v : Pl E, cLoc v x = cLoc v y) : x = y := by
+theorem ext_fin
+    {x y : UA E n} (hx : x ∈ finU (E := E) (n := n)) (hy : y ∈ finU (E := E) (n := n))
+    (h : ∀ v : Pl E, cLoc v x = cLoc v y)
+    : x = y := by
   have hx' : cInf x = 1 := hx
   have hy' : cInf y = 1 := hy
   apply Subtype.ext
   apply ga_ext
   · exact hx'.trans hy'.symm
-  · exact Units.ext (Matrix.ext fun i j => FiniteAdeleRing.ext _ fun v =>
-      by
-        have := congrArg (fun z : GLw n v => (z : Matrix (Fin n) (Fin n) (v.adicCompletion E)) i j) (h v)
+  · exact Units.ext (Matrix.ext fun i j =>
+      FiniteAdeleRing.ext _ fun v => by
+        have :=
+          congrArg (fun z : GLw n v => (z : Matrix (Fin n) (Fin n) (v.adicCompletion E)) i j) (h v)
         exact this)
 
-theorem integral_eventually (g : UA E n) : ∀ᶠ v in cofinite, ∀ i j : Fin n,
-    (cLoc v g) i j ∈ v.adicCompletionIntegers E ∧ (cLoc v g)⁻¹ i j ∈ v.adicCompletionIntegers E := by
-  have h1 : ∀ x : Af E, ∀ᶠ v in cofinite, pLoc E v x ∈ v.adicCompletionIntegers E := fun x => x.2
-  have h2 : ∀ i j : Fin n, ∀ᶠ v in cofinite,
+theorem integral_eventually (g : UA E n)
+    : ∀ᶠ v in cofinite, ∀ i j : Fin n,
       (cLoc v g) i j ∈ v.adicCompletionIntegers E ∧ (cLoc v g)⁻¹ i j ∈ v.adicCompletionIntegers E := by
+  have h1 : ∀ x : Af E, ∀ᶠ v in cofinite, pLoc E v x ∈ v.adicCompletionIntegers E := fun x => x.2
+  have h2
+      : ∀ i j : Fin n,
+        ∀ᶠ v in cofinite,
+          (cLoc v g) i j ∈ v.adicCompletionIntegers E ∧ (cLoc v g)⁻¹ i j ∈ v.adicCompletionIntegers E := by
     intro i j
     filter_upwards [h1 (pFin E ((g : GA E n) i j)), h1 (pFin E (((g⁻¹ : UA E n) : GA E n) i j))] with v hv hv'
     refine ⟨hv, ?_⟩
@@ -42,8 +50,10 @@ theorem integral_eventually (g : UA E n) : ∀ᶠ v in cofinite, ∀ i j : Fin n
 def fib (B : Finset (Pl E)) : Set (Pl E) :=
   {u | ∃ t ∈ B, u.under (𝓞 (maximalRealSubfield E)) = t.under (𝓞 (maximalRealSubfield E))}
 
-theorem fib_closed (B : Finset (Pl E)) (u v : Pl E)
-    (h : u.under (𝓞 (maximalRealSubfield E)) = v.under (𝓞 (maximalRealSubfield E))) (hu : u ∈ fib B) : v ∈ fib B := by
+theorem fib_closed
+    (B : Finset (Pl E)) (u v : Pl E)
+    (h : u.under (𝓞 (maximalRealSubfield E)) = v.under (𝓞 (maximalRealSubfield E))) (hu : u ∈ fib B)
+    : v ∈ fib B := by
   obtain ⟨t, ht, e⟩ := hu
   exact ⟨t, ht, h.symm.trans e⟩
 
@@ -60,30 +70,39 @@ def stabU (φ : UA E n → ℂ) : Subgroup (UA E n) where
     conv_lhs => rw [← ha]
     rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply]
 
-theorem one_entry_mem (v : Pl E) (i j : Fin n) : (1 : GLw n v) i j ∈ v.adicCompletionIntegers E := by
+theorem one_entry_mem (v : Pl E) (i j : Fin n)
+    : (1 : GLw n v) i j ∈ v.adicCompletionIntegers E := by
   change (1 : Matrix (Fin n) (Fin n) (v.adicCompletion E)) i j ∈ _
   rw [Matrix.one_apply]
   split_ifs
   · exact one_mem _
   · exact zero_mem _
 
-theorem local_fixed (S : Set (Pl E)) (hS : IsSection S) (K' : ∀ w : Pl E, Subgroup (UL n w)) (φ : UA E n → ℂ)
-    (hφ : ∀ w ∈ S, ∀ x ∈ locU n w, (∃ k ∈ K' w, k.1 = cLoc w x) → RU E n x φ = φ) (B : Finset (Pl E)) :
-    ∀ h : UA E n, h ∈ finU (E := E) (n := n) → (∀ w ∈ S, ∃ k ∈ K' w, k.1 = cLoc w h) → (∀ v, v ∉ fib B → cLoc v h = 1) →
-      h ∈ stabU φ := by
+theorem local_fixed
+    (S : Set (Pl E)) (hS : IsSection S)
+    (K' : ∀ w : Pl E, Subgroup (UL n w)) (φ : UA E n → ℂ)
+    (hφ : ∀ w ∈ S, ∀ x ∈ locU n w, (∃ k ∈ K' w, k.1 = cLoc w x) → RU E n x φ = φ)
+    (B : Finset (Pl E))
+    : ∀ h : UA E n,
+      h ∈ finU (E := E) (n := n) → (∀ w ∈ S, ∃ k ∈ K' w, k.1 = cLoc w h)
+        → (∀ v, v ∉ fib B → cLoc v h = 1)
+        → h ∈ stabU φ := by
   induction B using Finset.induction_on with
   | empty =>
     intro h hfin _ h1
-    have : h = 1 := ext_fin hfin (one_mem _) fun v => by
-      rw [h1 v (by rintro ⟨t, ht, _⟩; simp at ht), map_one]
+    have : h = 1 :=
+      ext_fin hfin (one_mem _) fun v => by rw [h1 v (by rintro ⟨t, ht, _⟩; simp at ht), map_one]
     rw [this]
     exact one_mem _
   | insert t B _ ih =>
     intro h hfin hK h1
     obtain ⟨wt, ⟨hwtS, hwt⟩, _⟩ := hS t
-    obtain ⟨x, hxfin, hx⟩ := GlobalTheory.T.exists_finiteAdelicUnitaryPoint_cut_to_fibreUnion E n (fib {t}) (fib_closed {t}) h hfin
+    obtain ⟨x, hxfin, hx⟩ :=
+      GlobalTheory.T.exists_finiteAdelicUnitaryPoint_cut_to_fibreUnion E n (fib {t})
+        (fib_closed {t}) h hfin
     have hxloc : x ∈ locU n wt := by
-      refine Subgroup.mem_inf.2 ⟨hxfin, Subgroup.mem_iInf.2 fun u => Subgroup.mem_iInf.2 fun hu => ?_⟩
+      refine Subgroup.mem_inf.2
+        ⟨hxfin, Subgroup.mem_iInf.2 fun u => Subgroup.mem_iInf.2 fun hu => ?_⟩
       rw [MonoidHom.mem_ker, hx u, if_neg]
       rintro ⟨t', ht', e⟩
       rw [Finset.mem_singleton] at ht'
@@ -115,9 +134,13 @@ theorem local_fixed (S : Set (Pl E)) (hS : IsSection S) (K' : ∀ w : Pl E, Subg
     rw [this]
     exact mul_mem hxS hrest
 
-theorem inf_fixed_globLev_ne_bot : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (S : Set (Pl E)), IsSection S →
-    ∀ (K' : ∀ w : Pl E, Subgroup (UL n w)), IsLevelFam (fun w : Pl E => MonoidHom.id (UL n w)) (KL n) K' →
-    ∀ π : Submodule ℂ (UA E n → ℂ), IsAutRepU π → HasLevel S π K' → π ⊓ fixed (RF E n) (globLev S K') ≠ ⊥ := by
+theorem inf_fixed_globLev_ne_bot
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (S : Set (Pl E)),
+      IsSection S
+        → ∀ (K' : ∀ w : Pl E, Subgroup (UL n w)),
+          IsLevelFam (fun w : Pl E => MonoidHom.id (UL n w)) (KL n) K'
+            → ∀ π : Submodule ℂ (UA E n → ℂ),
+              IsAutRepU π → HasLevel S π K' → π ⊓ fixed (RF E n) (globLev S K') ≠ ⊥ := by
   intro E _ _ _ n S hS K' _ π hπ hL
   obtain ⟨φ, hφπ, hφ0, hφfix⟩ := hL
   have hlev := (hπ.aut φ hφπ).level
@@ -129,10 +152,13 @@ theorem inf_fixed_globLev_ne_bot : ∀ (E : Type) [Field E] [NumberField E] [IsC
       rw [Subgroup.mem_comap] at h1
       obtain ⟨k, hk, e⟩ := Subgroup.mem_map.1 h1
       exact ⟨k, hk, e⟩
-    obtain ⟨T, hT⟩ := GlobalTheory.T.mem_open_nhd_one_of_integral_eq_one_on_finset E n _ hlev (by simp)
+    obtain ⟨T, hT⟩ :=
+      GlobalTheory.T.mem_open_nhd_one_of_integral_eq_one_on_finset E n _ hlev (by simp)
     have hbad := Filter.eventually_cofinite.1 (integral_eventually (g : UA E n))
     let B : Finset (Pl E) := T ∪ hbad.toFinset
-    obtain ⟨x, hxfin, hx⟩ := GlobalTheory.T.exists_finiteAdelicUnitaryPoint_cut_to_fibreUnion E n (fib B) (fib_closed B) (g : UA E n) g.2
+    obtain ⟨x, hxfin, hx⟩ :=
+      GlobalTheory.T.exists_finiteAdelicUnitaryPoint_cut_to_fibreUnion E n (fib B) (fib_closed B)
+        (g : UA E n) g.2
     have hxS : x ∈ stabU φ := by
       refine local_fixed S hS K' φ hφfix B x hxfin ?_ ?_
       · intro w hw
@@ -148,8 +174,12 @@ theorem inf_fixed_globLev_ne_bot : ∀ (E : Type) [Field E] [NumberField E] [IsC
       split_ifs
       · exact inv_mul_cancel _
       · rw [inv_one, one_mul]
-    have hint : ∀ v, v ∉ fib B → ∀ i j : Fin n, (cLoc v (g : UA E n)) i j ∈ v.adicCompletionIntegers E ∧
-        (cLoc v (g : UA E n))⁻¹ i j ∈ v.adicCompletionIntegers E := by
+    have hint
+        : ∀ v,
+          v ∉ fib B
+            → ∀ i j : Fin n,
+              (cLoc v (g : UA E n)) i j ∈ v.adicCompletionIntegers E
+                ∧ (cLoc v (g : UA E n))⁻¹ i j ∈ v.adicCompletionIntegers E := by
       intro v hv
       by_contra hc'
       exact hv ⟨v, Finset.mem_union_right _ (hbad.mem_toFinset.2 hc'), rfl⟩

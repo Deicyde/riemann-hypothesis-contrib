@@ -6,11 +6,21 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.FinTen
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix GlobalTheory.LatVac
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+  GlobalTheory.LatVac
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.scaled_matrix_mem_rational_lattice : ∀ (D : D7) (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)) (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)), Submodule.IsFullLattice D.host.E ΛS → Submodule.IsFullLattice D.host.E ΛT → ∀ M : Matrix (Fin T.rank) (Fin S.rank) D.host.E, ∃ N : ℕ, 0 < N ∧ N • M ∈ latRat S T (ΛS : Set (Fin S.rank → D.host.E)) (ΛT : Set (Fin T.rank → D.host.E)) := by
+theorem _root_.GlobalTheory.T.scaled_matrix_mem_rational_lattice
+    : ∀ (D : D7) (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
+        (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)),
+      Submodule.IsFullLattice D.host.E ΛS → Submodule.IsFullLattice D.host.E ΛT
+        → ∀ M : Matrix (Fin T.rank) (Fin S.rank) D.host.E, ∃ N : ℕ,
+          0 < N
+            ∧ N • M ∈ latRat S T (ΛS : Set (Fin S.rank → D.host.E))
+              (ΛT : Set (Fin T.rank → D.host.E)) := by
   intro D S T ΛS ΛT hS hT M
   first
   | exact GlobalTheory.LatVacFull.latRat_full D S T ΛS ΛT hS hT M

@@ -14,17 +14,28 @@ noncomputable section
 
 universe u
 
-theorem b (n : ℕ) (Y : Type u) [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y] (ι : Type*) (La : Type*) [AddCommGroup La] (hS : SAll.{u} n) (hE : EXTStatement n) (hN : EXTNullStatement n)
-    (hLSE : LSEAll.{u} n) (hMVI : MVIntStatement n) : BStatement n Y ι La := by
+theorem b
+    (n : ℕ)
+    (Y : Type u)
+    [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y]
+    (ι : Type*)
+    (La : Type*) [AddCommGroup La]
+    (hS : SAll.{u} n) (hE : EXTStatement n) (hN : EXTNullStatement n) (hLSE : LSEAll.{u} n)
+    (hMVI : MVIntStatement n)
+    : BStatement n Y ι La := by
   classical
   intro A L mu0 N w w0 s De σ T f hn hD hF hX hσ hpos hT hf hint hvan
   have h0 := A.start_int hMVI hn hD hf hT hint hvan
-  have key : ∀ m, m ≤ T - n → ∃ hh : (Fin m → Fin n) → ι → Y → ℂ,
-      (∀ q, A.IsSec (mu0 + (T - m) • L) (hh q) ∧
-        ∫⁻ y, ENNReal.ofReal (A.nsq (mu0 + (T - m) • L) (hh q) y *
-          A.sqn L s y ^ (-(((T - m : ℕ) : ℝ) - 1 / 2)) * A.sqn L w y ^ (-(1 / 2 : ℝ))) ∂A.mu
-            < ⊤) ∧
-      ∀ i y, y ∈ (A.chart i).source → f i y = ∑ q, (∏ j, s (q j) i y) * hh q i y := by
+  have key
+      : ∀ m,
+        m ≤ T - n
+          → ∃ hh : (Fin m → Fin n) → ι → Y → ℂ,
+            (∀ q,
+                A.IsSec (mu0 + (T - m) • L) (hh q)
+                  ∧ ∫⁻ y, ENNReal.ofReal (A.nsq (mu0 + (T - m) • L) (hh q) y *
+                      A.sqn L s y ^ (-(((T - m : ℕ) : ℝ) - 1 / 2)) * A.sqn L w y ^ (-(1 / 2 : ℝ))) ∂A.mu
+                    < ⊤)
+              ∧ ∀ i y, y ∈ (A.chart i).source → f i y = ∑ q, (∏ j, s (q j) i y) * hh q i y := by
     intro m
     induction m with
     | zero =>
@@ -60,17 +71,20 @@ theorem b (n : ℕ) (Y : Type u) [TopologicalSpace Y] [T2Space Y] [SecondCountab
   rw [eT] at hhP
   set cnt : (Fin (T - n) → Fin n) → Fin n → ℕ :=
     fun q k => (Finset.univ.filter (fun j => q j = k)).card with hcnt
-  refine ⟨fun α i y => ∑ q ∈ Finset.univ.filter (fun q => cnt q = α), hh q i y,
-    fun α _ => ⟨?_, ?_⟩, ?_⟩
+  refine
+    ⟨fun α i y => ∑ q ∈ Finset.univ.filter (fun q => cnt q = α), hh q i y, fun α _ => ⟨?_, ?_⟩, ?_⟩
   · exact A.isSec_sum _ (fun q _ => (hhP q).1)
-  · exact A.sum_int _ hh (fun q _ => (hhP q).1) (fun y => A.sqn L w y ^ (-(n : ℝ)))
+  · exact A.sum_int _ hh
+      (fun q _ => (hhP q).1)
+      (fun y => A.sqn L w y ^ (-(n : ℝ)))
       ((A.continuous_sqn hD.sec_w).measurable.pow_const _)
       (fun y => Real.rpow_nonneg (A.sqn_nonneg _ _ y) _)
       (fun q _ => A.end_int (by omega) hD (hhP q).2)
   · intro i y hy
     rw [hsum i y hy]
-    have hmaps : ∀ q ∈ (Finset.univ : Finset (Fin (T - n) → Fin n)),
-        cnt q ∈ Finset.Nat.antidiagonalTuple n (T - n) := by
+    have hmaps
+        : ∀ q ∈ (Finset.univ : Finset (Fin (T - n) → Fin n)),
+          cnt q ∈ Finset.Nat.antidiagonalTuple n (T - n) := by
       intro q _
       rw [Finset.Nat.mem_antidiagonalTuple]
       simp only [cnt]

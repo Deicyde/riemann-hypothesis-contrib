@@ -6,33 +6,37 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison CrystallineSemistableComparison.R
+open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison
+  CrystallineSemistableComparison.R
 open Polynomial in
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.newton_approximation_of_dichotomy : ∀ {S : Type} [CommRing S] (ϖ : S), ϖ ∈ (⊥ : Ideal S).jacobson → ϖ ∈ nonZeroDivisors S → Dich ϖ → Aic (S := S ⧸ Ideal.span {ϖ ^ 2}) → Step ϖ := by
+theorem _root_.GlobalTheory.T.newton_approximation_of_dichotomy
+    : ∀ {S : Type} [CommRing S] (ϖ : S),
+      ϖ ∈ (⊥ : Ideal S).jacobson → ϖ ∈ nonZeroDivisors S → Dich ϖ
+        → Aic (S := S ⧸ Ideal.span {ϖ ^ 2})
+        → Step ϖ := by
   intro S _ ϖ hj hnz hD hA
   have hStep : Step ϖ := by
     intro Q n hQ hd hn
     have hRoots : Roots ϖ := GlobalTheory.T.polynomial_roots_of_closed_quotient ϖ hj hnz hD hA
     have hq0 : Q.coeff 0 = Q.eval 0 := Polynomial.coeff_zero_eq_eval_zero Q
-    have hspan : ϖ ^ (n + 1) ∈ Ideal.span {Q.coeff 0, ϖ ^ (n + 1)} :=
-      Ideal.subset_span (by simp)
+    have hspan : ϖ ^ (n + 1) ∈ Ideal.span {Q.coeff 0, ϖ ^ (n + 1)} := Ideal.subset_span (by simp)
     rcases hD (Q.coeff 0) (ϖ ^ (n + 1)) ⟨n + 1, hspan⟩ with hdiv | hdiv
     · refine ⟨0, ?_, ?_⟩
       · rw [← hq0]; exact hdiv
       · rw [zero_pow hd.ne']; exact dvd_zero _
-    ·
-      have hpow : ϖ ^ (n + 1) ∈ nonZeroDivisors S := pow_mem hnz _
+    · have hpow : ϖ ^ (n + 1) ∈ nonZeroDivisors S := pow_mem hnz _
       have hcancel : ∀ x : S, Q.coeff 0 * x = 0 → x = 0 := by
         intro x hx
         obtain ⟨e, he⟩ := hdiv
-        have h0 : ϖ ^ (n + 1) * x = 0 := by
-          rw [he]; linear_combination e * hx
+        have h0 : ϖ ^ (n + 1) * x = 0 := by rw [he]; linear_combination e * hx
         exact (mem_nonZeroDivisors_iff_right.mp hpow) x (by rw [mul_comm]; exact h0)
-      obtain ⟨c, hc1, i0, hi1, hi2, hi3⟩ := GlobalTheory.T.newton_polygon_slope_existence ϖ hD hRoots (fun i => Q.coeff i)
-        Q.natDegree (n + 1) hd hQ.coeff_natDegree hdiv
-      have hs : ∀ i, ∃ t, (i = 0 → t = 1) ∧
-          (i ≤ Q.natDegree → Q.coeff i * c ^ i = Q.coeff 0 * t) := by
+      obtain ⟨c, hc1, i0, hi1, hi2, hi3⟩ :=
+        GlobalTheory.T.newton_polygon_slope_existence ϖ hD hRoots
+          (fun i => Q.coeff i)
+          Q.natDegree (n + 1) hd hQ.coeff_natDegree hdiv
+      have hs
+          : ∀ i, ∃ t, (i = 0 → t = 1) ∧ (i ≤ Q.natDegree → Q.coeff i * c ^ i = Q.coeff 0 * t) := by
         intro i
         rcases Nat.eq_zero_or_pos i with rfl | hi
         · exact ⟨1, fun _ => rfl, fun _ => by simp⟩
@@ -49,8 +53,9 @@ theorem _root_.GlobalTheory.T.newton_approximation_of_dichotomy : ∀ {S : Type}
           linear_combination -ht
         have h7 := hcancel _ h5
         exact IsUnit.of_mul_eq_one t (by linear_combination h7)
-      let R : Polynomial S := ∑ i ∈ Finset.range (Q.natDegree + 1),
-        Polynomial.C (s i) * Polynomial.X ^ i
+      let R : Polynomial S :=
+        ∑ i ∈ Finset.range (Q.natDegree + 1),
+          Polynomial.C (s i) * Polynomial.X ^ i
       have hRc : ∀ j, j ≤ Q.natDegree → R.coeff j = s j := by
         intro j hj'
         simp only [R, Polynomial.finsetSum_coeff, Polynomial.coeff_C_mul_X_pow]
@@ -73,8 +78,10 @@ theorem _root_.GlobalTheory.T.newton_approximation_of_dichotomy : ∀ {S : Type}
         · exact ⟨0, Subsingleton.elim _ _⟩
         have hAdd : ∀ a b : T, IsUnit (a + b) → IsUnit a ∨ IsUnit b :=
           GlobalTheory.CompanionTheory.NewtonStep.isUnit_or_of_add_quot ϖ hj hD
-        have unitRoot : ∀ (d : ℕ) (F : Polynomial T), F.Monic → F.natDegree = d →
-            ∀ k < d, IsUnit (F.coeff k) → ∃ u : Tˣ, F.eval (u : T) = 0 := by
+        have unitRoot
+            : ∀ (d : ℕ) (F : Polynomial T),
+              F.Monic → F.natDegree = d
+                → ∀ k < d, IsUnit (F.coeff k) → ∃ u : Tˣ, F.eval (u : T) = 0 := by
           intro d
           induction d with
           | zero =>
@@ -103,13 +110,11 @@ theorem _root_.GlobalTheory.T.newton_approximation_of_dichotomy : ∀ {S : Type}
               rcases hAdd _ _ hcoeff with hGu | hneg
               · obtain ⟨u, hu⟩ := ih G hG hGdeg k (by omega) hGu
                 exact ⟨u, by rw [← hfactor, eval_mul, hu, mul_zero]⟩
-              · have hprod : IsUnit (x * G.coeff (k + 1)) := by
-                  simpa only [neg_neg] using hneg.neg
+              · have hprod : IsUnit (x * G.coeff (k + 1)) := by simpa only [neg_neg] using hneg.neg
                 exact (hxu (isUnit_of_mul_isUnit_left hprod)).elim
         have htd : P.natTrailingDegree = 0 :=
           Nat.le_zero.mp (natTrailingDegree_le_of_ne_zero (by rw [hP0]; exact one_ne_zero))
-        have hmon : P.reverse.Monic := by
-          rw [Monic, reverse_leadingCoeff, trailingCoeff, htd, hP0]
+        have hmon : P.reverse.Monic := by rw [Monic, reverse_leadingCoeff, trailingCoeff, htd, hP0]
         have hdeg : P.reverse.natDegree = P.natDegree := by
           rw [reverse_natDegree, htd, Nat.sub_zero]
         have hle : i0 ≤ P.natDegree := le_natDegree_of_ne_zero hPi.ne_zero
@@ -117,8 +122,8 @@ theorem _root_.GlobalTheory.T.newton_approximation_of_dichotomy : ∀ {S : Type}
           rw [coeff_reverse, revAt_le (Nat.sub_le _ _)]
           congr 1
           omega
-        obtain ⟨u, hu⟩ := unitRoot P.natDegree P.reverse hmon hdeg (P.natDegree - i0)
-          (by omega) (hcoeff.symm ▸ hPi)
+        obtain ⟨u, hu⟩ :=
+          unitRoot P.natDegree P.reverse hmon hdeg (P.natDegree - i0) (by omega) (hcoeff.symm ▸ hPi)
         refine ⟨↑(u⁻¹), ?_⟩
         let : Invertible ((u⁻¹ : Tˣ) : T) := (u⁻¹).invertible
         have hre := eval₂_reverse_mul_pow (RingHom.id T) ((u⁻¹ : Tˣ) : T) P

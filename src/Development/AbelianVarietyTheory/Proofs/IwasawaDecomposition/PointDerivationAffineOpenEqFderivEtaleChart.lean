@@ -5,8 +5,11 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SpanP
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ShFam.Pad GlobalTheory.ShFam.Hor GlobalTheory.ShFam.Hor.LogCh
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj GlobalTheory GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ShFam.Pad
+  GlobalTheory.ShFam.Hor GlobalTheory.ShFam.Hor.LogCh
 open scoped Matrix CategoryTheory.Obj Topology
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -17,8 +20,10 @@ namespace GlobalTheory.PointDer
 open CxPts
 open ReciprocityTheory.ChartRestriction.G.DVR.FlatBC (algX)
 
-def dualHom {A : Type} [CommRing A] (e : A →+* ℂ) (D : A →+ ℂ)
-    (hm : ∀ f f', D (f * f') = e f * D f' + e f' * D f) : A →+* DualNumber ℂ where
+def dualHom
+    {A : Type} [CommRing A]
+    (e : A →+* ℂ) (D : A →+ ℂ) (hm : ∀ f f', D (f * f') = e f * D f' + e f' * D f)
+    : A →+* DualNumber ℂ where
   toFun f := TrivSqZeroExt.inl (e f) + TrivSqZeroExt.inr (D f)
   map_one' := by
     have h1 : D 1 = 0 := by simpa using hm 1 1
@@ -27,19 +32,28 @@ def dualHom {A : Type} [CommRing A] (e : A →+* ℂ) (D : A →+ ℂ)
   map_zero' := by ext <;> simp
   map_add' f f' := by ext <;> simp
 
-@[simp] theorem dualHom_fst {A : Type} [CommRing A] (e : A →+* ℂ) (D : A →+ ℂ)
-    (hm : ∀ f f', D (f * f') = e f * D f' + e f' * D f) (f : A) : (dualHom e D hm f).fst = e f := by
+@[simp]
+theorem dualHom_fst
+    {A : Type} [CommRing A]
+    (e : A →+* ℂ) (D : A →+ ℂ) (hm : ∀ f f', D (f * f') = e f * D f' + e f' * D f)
+    (f : A)
+    : (dualHom e D hm f).fst = e f := by
   simp [dualHom]
 
-@[simp] theorem dualHom_snd {A : Type} [CommRing A] (e : A →+* ℂ) (D : A →+ ℂ)
-    (hm : ∀ f f', D (f * f') = e f * D f' + e f' * D f) (f : A) : (dualHom e D hm f).snd = D f := by
+@[simp]
+theorem dualHom_snd
+    {A : Type} [CommRing A]
+    (e : A →+* ℂ) (D : A →+ ℂ) (hm : ∀ f f', D (f * f') = e f * D f' + e f' * D f)
+    (f : A)
+    : (dualHom e D hm f).snd = D f := by
   simp [dualHom]
 
-theorem derivation_eq_zero_of_etale {k A : Type} [CommRing k] [CommRing A] {g : ℕ}
-    (φ : MvPolynomial (Fin g) k →+* A) (hφ : φ.Etale) (e : A →+* ℂ) (D : A →+ ℂ)
-    (h0 : ∀ a, D (φ (MvPolynomial.C a)) = 0)
-    (hm : ∀ f f', D (f * f') = e f * D f' + e f' * D f)
-    (hX : ∀ i, D (φ (MvPolynomial.X i)) = 0) : D = 0 := by
+theorem derivation_eq_zero_of_etale
+    {k A : Type} [CommRing k] [CommRing A]
+    {g : ℕ} (φ : MvPolynomial (Fin g) k →+* A) (hφ : φ.Etale)
+    (e : A →+* ℂ) (D : A →+ ℂ) (h0 : ∀ a, D (φ (MvPolynomial.C a)) = 0)
+    (hm : ∀ f f', D (f * f') = e f * D f' + e f' * D f) (hX : ∀ i, D (φ (MvPolynomial.X i)) = 0)
+    : D = 0 := by
   have hP : ∀ q, D (φ q) = 0 := by
     intro q
     induction q using MvPolynomial.induction_on with
@@ -64,8 +78,9 @@ theorem derivation_eq_zero_of_etale {k A : Type} [CommRing k] [CommRing A] {g : 
     have hy' : y.fst = 0 := hy
     rw [Ideal.mem_bot]
     ext <;> simp [hx', hy']
-  have hG : G = G₀ := Algebra.FormallyUnramified.ext' (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom hnil G G₀
-    (fun x => by simp [G, G₀, F, F₀])
+  have hG : G = G₀ :=
+    Algebra.FormallyUnramified.ext' (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom hnil G G₀
+      (fun x => by simp [G, G₀, F, F₀])
   ext f
   have := congrArg (fun H : A →ₐ[MvPolynomial (Fin g) k] DualNumber ℂ => (H f).snd) hG
   simpa [G, G₀, F, F₀, TrivSqZeroExt.algebraMap_eq_inl] using this
@@ -77,11 +92,22 @@ namespace GlobalTheory.PointDer
 open CxPts
 open ReciprocityTheory.ChartRestriction.G.DVR.FlatBC (algX)
 
-theorem exists_eq_fderiv : ∀ (k : Type) [CommRing k] (Y : Scheme.{0}) (p : Y ⟶ Sp k) (n : ℕ) (σ : k →+* ℂ) (c : AlgChart p σ n) (x₀ : CxPts p σ), x₀ ∈ c.e.source → ∀ (U : Y.affineOpens), x₀ ∈ CxPts.ptsIn p σ U.1 → ∀ δ : Γ(Y, U.1) →+ ℂ, (∀ a : k, δ (ReciprocityTheory.ChartRestriction.G.DVR.FlatBC.algX p U.1 a) = 0) → (∀ g h : Γ(Y, U.1), δ (g * h) = CxPts.ev p σ U.1 g x₀ * δ h + CxPts.ev p σ U.1 h x₀ * δ g) → ∃ v : ReciprocityTheory.L2DbarEstimates.V n, ∀ g : Γ(Y, U.1), δ g = fderiv ℂ (CxPts.ev p σ U.1 g ∘ c.e.symm) (c.e x₀) v := by
+theorem exists_eq_fderiv
+    : ∀ (k : Type) [CommRing k] (Y : Scheme.{0}) (p : Y ⟶ Sp k) (n : ℕ) (σ : k →+* ℂ)
+        (c : AlgChart p σ n) (x₀ : CxPts p σ),
+      x₀ ∈ c.e.source
+        → ∀ (U : Y.affineOpens),
+          x₀ ∈ CxPts.ptsIn p σ U.1
+            → ∀ δ : Γ(Y, U.1) →+ ℂ,
+              (∀ a : k, δ (ReciprocityTheory.ChartRestriction.G.DVR.FlatBC.algX p U.1 a) = 0)
+                → (∀ g h : Γ(Y, U.1),
+                  δ (g * h) = CxPts.ev p σ U.1 g x₀ * δ h + CxPts.ev p σ U.1 h x₀ * δ g)
+                → ∃ v : ReciprocityTheory.L2DbarEstimates.V n, ∀ g : Γ(Y, U.1),
+                  δ g = fderiv ℂ (CxPts.ev p σ U.1 g ∘ c.e.symm) (c.e x₀) v := by
   intro k _ Y p n σ c x₀ hx₀ U hU δ hδ0 hδm
   have hxc : x₀ ∈ ptsIn p σ c.U := c.source_subset hx₀
-  obtain ⟨f, g, hfg, hxf⟩ := exists_basicOpen_le_affine_inter U.2 c.affine _
-    ⟨mem_ptsIn.1 hU, mem_ptsIn.1 hxc⟩
+  obtain ⟨f, g, hfg, hxf⟩ :=
+    exists_basicOpen_le_affine_inter U.2 c.affine _ ⟨mem_ptsIn.1 hU, mem_ptsIn.1 hxc⟩
   have hWc : Y.basicOpen g ≤ c.U := Y.basicOpen_le g
   have hWU : Y.basicOpen g ≤ U.1 := hfg ▸ Y.basicOpen_le f
   have hxW : x₀ ∈ ptsIn p σ (Y.basicOpen g) := mem_ptsIn.2 (hfg ▸ hxf)
@@ -104,7 +130,8 @@ theorem exists_eq_fderiv : ∀ (k : Type) [CommRing k] (Y : Scheme.{0}) (p : Y �
     rw [hψW, dualHom_fst, ← ev_eq, ← ev_eq, ev_res _ hxW]
   have hfst (a : Γ(Y, Y.basicOpen g)) : (ψW a).fst = evHom hxW a := RingHom.congr_fun hψW1 a
 
-  let v : ReciprocityTheory.L2DbarEstimates.V n := WithLp.toLp 2 (fun b => (ψW (resG Y hWc (c.x b))).snd)
+  let v : ReciprocityTheory.L2DbarEstimates.V n :=
+    WithLp.toLp 2 (fun b => (ψW (resG Y hWc (c.x b))).snd)
 
   have hdW := fun a : Γ(Y, Y.basicOpen g) => c.differentiableAt_ev a hx₀ hxW
   let dW : Γ(Y, Y.basicOpen g) → ℂ := fun a => fderiv ℂ (ev p σ _ a ∘ c.e.symm) (c.e x₀) v
@@ -118,12 +145,16 @@ theorem exists_eq_fderiv : ∀ (k : Type) [CommRing k] (Y : Scheme.{0}) (p : Y �
     simp only [dW, e, fderiv_mul (hdW a) (hdW b), Function.comp_apply, c.e.left_inv hx₀,
       ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply, smul_eq_mul, ← ev_eq hxW]
   have hn : ∀ᶠ w in 𝓝 (c.e x₀), c.e.symm w ∈ ptsIn p σ (Y.basicOpen g) :=
-    Filter.eventually_of_mem ((ChartGlue.isOpen_over c.e (isOpen_ptsIn _)).mem_nhds
-      (ChartGlue.mem_over c.e hx₀ hxW)) fun _ h => h.2
+    Filter.eventually_of_mem
+      ((ChartGlue.isOpen_over c.e (isOpen_ptsIn _)).mem_nhds (ChartGlue.mem_over c.e hx₀ hxW))
+      fun _ h => h.2
 
-  let Dd : Γ(Y, Y.basicOpen g) →+ ℂ := AddMonoidHom.mk' (fun a => (ψW a).snd - dW a) fun a b => by
-    simp only [map_add (f := _), TrivSqZeroExt.snd_add, hdadd]
-    ring
+  let Dd : Γ(Y, Y.basicOpen g) →+ ℂ :=
+    AddMonoidHom.mk'
+      (fun a => (ψW a).snd - dW a)
+      fun a b => by
+        simp only [map_add (f := _), TrivSqZeroExt.snd_add, hdadd]
+        ring
   have hD : Dd = 0 := by
     refine derivation_eq_zero_of_etale ((resG Y hWc).comp (MvPolynomial.eval₂Hom (algX p c.U) c.x))
       ?_ (evHom hxW) Dd ?_ ?_ ?_
@@ -134,8 +165,9 @@ theorem exists_eq_fderiv : ∀ (k : Type) [CommRing k] (Y : Scheme.{0}) (p : Y �
         exact RingHom.etale_algebraMap.2 (Algebra.Etale.of_isLocalizationAway g)
       exact RingHom.Etale.stableUnderComposition _ _ c.etale hR
     · intro a
-      have e1 : (resG Y hWc) (MvPolynomial.eval₂Hom (algX p c.U) c.x (MvPolynomial.C a)) =
-          resG Y hWU (algX p U.1 a) := by
+      have e1
+          : (resG Y hWc) (MvPolynomial.eval₂Hom (algX p c.U) c.x (MvPolynomial.C a))
+            = resG Y hWU (algX p U.1 a) := by
         rw [MvPolynomial.eval₂Hom_C, ← RingHom.comp_apply, GlobalTheory.TopForm.resG_comp_algX,
           ← RingHom.comp_apply, GlobalTheory.TopForm.resG_comp_algX]
       have e2 : dW (resG Y hWU (algX p U.1 a)) = 0 := by
@@ -146,15 +178,17 @@ theorem exists_eq_fderiv : ∀ (k : Type) [CommRing k] (Y : Scheme.{0}) (p : Y �
         show fderiv ℂ _ _ v = 0
         rw [e.fderiv_eq]
         simp
-      simp only [Dd, AddMonoidHom.mk'_apply, RingHom.comp_apply, e1, hψW, ψU, dualHom_snd, hδ0, e2, sub_zero]
+      simp only [Dd, AddMonoidHom.mk'_apply, RingHom.comp_apply, e1, hψW, ψU, dualHom_snd, hδ0, e2,
+        sub_zero]
     · intro a b
-      simp only [Dd, AddMonoidHom.mk'_apply, map_mul, TrivSqZeroExt.snd_mul, hfst, hdmul, smul_eq_mul,
-        MulOpposite.smul_eq_mul_unop, MulOpposite.unop_op]
+      simp only [Dd, AddMonoidHom.mk'_apply, map_mul, TrivSqZeroExt.snd_mul, hfst, hdmul,
+        smul_eq_mul, MulOpposite.smul_eq_mul_unop, MulOpposite.unop_op]
       ring
     · intro i
       have e2 : dW (resG Y hWc (c.x i)) = v i := by
-        have e : ev p σ _ (resG Y hWc (c.x i)) ∘ c.e.symm =ᶠ[𝓝 (c.e x₀)]
-            EuclideanSpace.proj (𝕜 := ℂ) i := by
+        have e
+            : ev p σ _ (resG Y hWc (c.x i)) ∘ c.e.symm =ᶠ[𝓝 (c.e x₀)]
+              EuclideanSpace.proj (𝕜 := ℂ) i := by
           filter_upwards [hn, c.e.open_target.mem_nhds (c.e.map_source hx₀)] with w hw hwt
           rw [Function.comp_apply, ev_res hWc hw, ← c.apply_eq _ (c.e.map_target hwt) i,
             c.e.right_inv hwt]
@@ -165,7 +199,8 @@ theorem exists_eq_fderiv : ∀ (k : Type) [CommRing k] (Y : Scheme.{0}) (p : Y �
       simp [v]
   refine ⟨v, fun a => ?_⟩
   have h1 := congrArg (fun D : Γ(Y, Y.basicOpen g) →+ ℂ => D (resG Y hWU a)) hD
-  simp only [Dd, AddMonoidHom.mk'_apply, AddMonoidHom.zero_apply, hψW, dualHom_snd, sub_eq_zero] at h1
+  simp only [Dd, AddMonoidHom.mk'_apply, AddMonoidHom.zero_apply, hψW, dualHom_snd, sub_eq_zero]
+    at h1
   rw [show δ a = (ψU a).snd from (dualHom_snd _ _ _ a).symm, h1]
   have e : ev p σ _ (resG Y hWU a) ∘ c.e.symm =ᶠ[𝓝 (c.e x₀)] ev p σ U.1 a ∘ c.e.symm := by
     filter_upwards [hn] with w hw

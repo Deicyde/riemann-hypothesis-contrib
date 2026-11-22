@@ -14,8 +14,11 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.InverseP
 @[expose] public section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 open GlobalTheory.SiegelFormula
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -25,26 +28,39 @@ noncomputable section
 namespace GlobalTheory.CompanionTheory.WeilCount
 open NumberField IsDedekindDomain Matrix
 
-theorem lattice_sum {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {I : Type} [Fintype I] (τ : I → (E →+* ℂ)) (hτ : Function.Surjective fun i => InfinitePlace.mk (τ i))
-    {n : ℕ} {ι : Type} [Fintype ι] (R : Matrix ι (Fin n) E) (R' : Matrix (Fin n) ι E) (hR : R' * R = 1)
-    (L : Set (Matrix (Fin n) (Fin 1) (Af F ⊗[F] E))) (hL : IsCompact L) :
-    ∃ K : ℝ, 0 < K ∧ ∀ (s : ι → ℝ), (∀ i, 0 < s i) → ∀ (U : Matrix (Fin n) (Fin 1) E → ℝ), (∀ ξ, 0 ≤ U ξ) →
-      (∀ ξ, ξ.map (fun x => (1 : Af F) ⊗ₜ[F] x) ∈ L → ∀ ρ i, ‖τ ρ ((R * ξ) i 0)‖ ≤ s i * U ξ) →
-      ∀ N, 2 * (Fintype.card ι * Module.finrank ℚ E) ≤ N →
-      ∑' ξ : Matrix (Fin n) (Fin 1) E, ENNReal.ofReal (((1 + U ξ) ^ N)⁻¹ *
-          Set.indicator L (fun _ => (1 : ℝ)) (ξ.map (fun x => (1 : Af F) ⊗ₜ[F] x))) ≤
-        ENNReal.ofReal (∏ i, (1 + K * s i) ^ Module.finrank ℚ E) := by
+theorem lattice_sum
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {I : Type} [Fintype I]
+    (τ : I → (E →+* ℂ)) (hτ : Function.Surjective fun i => InfinitePlace.mk (τ i))
+    {n : ℕ} {ι : Type} [Fintype ι]
+    (R : Matrix ι (Fin n) E) (R' : Matrix (Fin n) ι E) (hR : R' * R = 1)
+    (L : Set (Matrix (Fin n) (Fin 1) (Af F ⊗[F] E))) (hL : IsCompact L)
+    : ∃ K : ℝ,
+      0 < K
+        ∧ ∀ (s : ι → ℝ),
+          (∀ i, 0 < s i)
+            → ∀ (U : Matrix (Fin n) (Fin 1) E → ℝ),
+              (∀ ξ, 0 ≤ U ξ)
+                → (∀ ξ,
+                  ξ.map (fun x => (1 : Af F) ⊗ₜ[F] x) ∈ L → ∀ ρ i, ‖τ ρ ((R * ξ) i 0)‖ ≤ s i * U ξ)
+                → ∀ N,
+                  2 * (Fintype.card ι * Module.finrank ℚ E) ≤ N
+                    → ∑' ξ : Matrix (Fin n) (Fin 1) E, ENNReal.ofReal (((1 + U ξ) ^ N)⁻¹ *
+                          Set.indicator L (fun _ => (1 : ℝ)) (ξ.map (fun x => (1 : Af F) ⊗ₜ[F] x)))
+                      ≤ ENNReal.ofReal (∏ i, (1 + K * s i) ^ Module.finrank ℚ E) := by
   classical
-  have hev : ∀ j : Fin n, Continuous fun M : Matrix (Fin n) (Fin 1) (Af F ⊗[F] E) => M j 0 := fun j =>
-    (continuous_apply 0).comp (continuous_apply j)
-  have hC : IsCompact ((⋃ j, (fun M : Matrix (Fin n) (Fin 1) (Af F ⊗[F] E) => M j 0) '' L) ∪
-      Set.range fun p : ι × Fin n => (1 : Af F) ⊗ₜ[F] R p.1 p.2) :=
+  have hev : ∀ j : Fin n, Continuous fun M : Matrix (Fin n) (Fin 1) (Af F ⊗[F] E) => M j 0 :=
+    fun j => (continuous_apply 0).comp (continuous_apply j)
+  have hC : IsCompact
+      ((⋃ j, (fun M : Matrix (Fin n) (Fin 1) (Af F ⊗[F] E) => M j 0) '' L)
+        ∪ Set.range fun p : ι × Fin n => (1 : Af F) ⊗ₜ[F] R p.1 p.2) :=
     (isCompact_iUnion fun j => hL.image (hev j)).union (Set.finite_range _).isCompact
   obtain ⟨d, hd, hden⟩ := GlobalTheory.T.compact_adelic_denominator F E _ hC
   obtain ⟨K₀, hK₀, hco⟩ := GlobalTheory.T.integer_coordinates_bound τ hτ
-  have hint : ∀ ξ : Matrix (Fin n) (Fin 1) E, ξ.map (fun x => (1 : Af F) ⊗ₜ[F] x) ∈ L → ∀ i,
-      ∃ y : 𝓞 E, ((d * d : ℕ) : E) * (R * ξ) i 0 = y := by
+  have hint
+      : ∀ ξ : Matrix (Fin n) (Fin 1) E,
+        ξ.map (fun x => (1 : Af F) ⊗ₜ[F] x) ∈ L
+          → ∀ i, ∃ y : 𝓞 E, ((d * d : ℕ) : E) * (R * ξ) i 0 = y := by
     intro ξ hξ i
     choose y₁ hy₁ using fun j => hden (R i j) (Or.inr ⟨(i, j), rfl⟩)
     choose y₂ hy₂ using fun j => hden (ξ j 0) (Or.inl (Set.mem_iUnion.2 ⟨j, _, hξ, rfl⟩))
@@ -52,7 +68,8 @@ theorem lattice_sum {F E : Type} [Field F] [NumberField F] [Field E] [NumberFiel
     set_option synthInstance.maxHeartbeats 100000 in
       rw [Matrix.mul_apply, Finset.mul_sum, RingOfIntegers.coe_eq_algebraMap, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
-    rw [map_mul, ← RingOfIntegers.coe_eq_algebraMap, ← RingOfIntegers.coe_eq_algebraMap, ← hy₁ j, ← hy₂ j]
+    rw [map_mul, ← RingOfIntegers.coe_eq_algebraMap, ← RingOfIntegers.coe_eq_algebraMap, ← hy₁ j,
+      ← hy₂ j]
     push_cast
     ring
   have hdd : (0 : ℝ) < ((d * d : ℕ) : ℝ) := by exact_mod_cast Nat.mul_pos hd hd
@@ -61,17 +78,21 @@ theorem lattice_sum {F E : Type} [Field F] [NumberField F] [Field E] [NumberFiel
   refine ⟨2 * (K₀ * D₀), by positivity, fun s hs U hU hb N hN => ?_⟩
   let e : Matrix (Fin n) (Fin 1) E → ι → 𝓞 E := fun ξ i =>
     if h : ∃ y : 𝓞 E, ((d * d : ℕ) : E) * (R * ξ) i 0 = y then h.choose else 0
-  have he : ∀ ξ : Matrix (Fin n) (Fin 1) E, ξ.map (fun x => (1 : Af F) ⊗ₜ[F] x) ∈ L → ∀ i,
-      ((e ξ i : 𝓞 E) : E) = ((d * d : ℕ) : E) * (R * ξ) i 0 := fun ξ hξ i => by
+  have he
+      : ∀ ξ : Matrix (Fin n) (Fin 1) E,
+        ξ.map (fun x => (1 : Af F) ⊗ₜ[F] x) ∈ L
+          → ∀ i, ((e ξ i : 𝓞 E) : E) = ((d * d : ℕ) : E) * (R * ξ) i 0 := fun ξ hξ i => by
     have h := hint ξ hξ i
     simp only [e, dif_pos h]
     exact h.choose_spec.symm
   let κ := Module.Free.ChooseBasisIndex ℤ (𝓞 E)
-  let m : Matrix (Fin n) (Fin 1) E → ι × κ → ℤ := fun ξ p => (RingOfIntegers.basis E).repr (e ξ p.1) p.2
+  let m : Matrix (Fin n) (Fin 1) E → ι × κ → ℤ := fun ξ p =>
+    (RingOfIntegers.basis E).repr (e ξ p.1) p.2
   let b : ι × κ → ℝ := fun p => K₀ * D₀ * s p.1
   have hbp : ∀ p, 0 < b p := fun p => mul_pos (by positivity) (hs p.1)
-  let h : Matrix (Fin n) (Fin 1) E → ℝ≥0∞ := fun ξ => ENNReal.ofReal (((1 + U ξ) ^ N)⁻¹ *
-    Set.indicator L (fun _ => (1 : ℝ)) (ξ.map (fun x => (1 : Af F) ⊗ₜ[F] x)))
+  let h : Matrix (Fin n) (Fin 1) E → ℝ≥0∞ := fun ξ =>
+    ENNReal.ofReal
+      (((1 + U ξ) ^ N)⁻¹ * Set.indicator L (fun _ => (1 : ℝ)) (ξ.map (fun x => (1 : Af F) ⊗ₜ[F] x)))
   have hsupp : ∀ ξ, h ξ ≠ 0 → ξ.map (fun x => (1 : Af F) ⊗ₜ[F] x) ∈ L := fun ξ h0 => by
     by_contra hn
     exact h0 (by simp [h, Set.indicator_of_notMem hn])
@@ -87,7 +108,8 @@ theorem lattice_sum {F E : Type} [Field F] [NumberField F] [Field E] [NumberFiel
       have := congrArg (fun y : 𝓞 E => (y : E)) (h1 i)
       simp only [he ξ hξ1 i, he ξ' hξ2 i] at this
       exact mul_left_cancel₀ hddE this
-    calc ξ = R' * (R * ξ) := by rw [← Matrix.mul_assoc, hR, Matrix.one_mul]
+    calc
+      ξ = R' * (R * ξ) := by rw [← Matrix.mul_assoc, hR, Matrix.one_mul]
       _ = R' * (R * ξ') := by rw [h2]
       _ = ξ' := by rw [← Matrix.mul_assoc, hR, Matrix.one_mul]
   have hh : ∀ ξ, h ξ ≤ ∏ p, ENNReal.ofReal (((1 + |(m ξ p : ℝ)| / b p) ^ 2)⁻¹) := by
@@ -104,7 +126,9 @@ theorem lattice_sum {F E : Type} [Field F] [NumberField F] [Field E] [NumberFiel
           exact mul_le_mul_of_nonneg_left (hb ξ hξ ρ p.1) hdd.le
         have h3 : |(m ξ p : ℝ)| / b p ≤ U ξ := by
           rw [div_le_iff₀ (hbp p)]
-          calc |(m ξ p : ℝ)| ≤ K₀ * (D₀ * (s p.1 * U ξ)) := h2
+          calc
+            |(m ξ p : ℝ)|
+              ≤ K₀ * (D₀ * (s p.1 * U ξ)) := h2
             _ = U ξ * b p := by simp only [b]; ring
         have h4 : 0 ≤ |(m ξ p : ℝ)| / b p := div_nonneg (abs_nonneg _) (hbp p).le
         refine inv_anti₀ (by positivity) (pow_le_pow_left₀ (by positivity) (by linarith) 2)

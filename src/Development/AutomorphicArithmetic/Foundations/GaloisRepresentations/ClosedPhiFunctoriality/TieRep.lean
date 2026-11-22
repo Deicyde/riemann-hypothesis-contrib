@@ -6,7 +6,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong GlobalTheory.WeilDeligne Matrix
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  Formalism.MainNotions.N TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal
+  GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc GlobalTheory.Pst GlobalTheory.BKLim
+  GlobalTheory.Cong GlobalTheory.WeilDeligne Matrix
 open scoped Formalism.Per NNReal
 open UpperTheory.Gal.ClosedPhiFromClosedTrace
 
@@ -68,8 +72,8 @@ private lemma coord_sum {P : LocPrime l} {L : FinExt l} {a d : ℕ}
 end UpperTheory.Gal.ClosedPhiFromClosedTrace
 
 set_option maxHeartbeats 4000000 in
-theorem UpperTheory.Gal.ClosedPhiFromClosedTrace.tieRep_holds :
-    TrLin → CoordEx → CoordWD → ColInv → WeilPhi2 → TestTr → TieRep2 := by
+theorem UpperTheory.Gal.ClosedPhiFromClosedTrace.tieRep_holds
+    : TrLin → CoordEx → CoordWD → ColInv → WeilPhi2 → TestTr → TieRep2 := by
   intro hTr hCE hCW hCI hWP hTT l _ ι P AI T E Ω _ _ _ _ _ w A h O _ _ _ Bw hj g n₁ n₂ hα L a d R _
     hdim ρ b e hb he s V hOp
   classical
@@ -83,26 +87,34 @@ theorem UpperTheory.Gal.ClosedPhiFromClosedTrace.tieRep_holds :
     hCI l P AI T Bw.Kw L a d ρ R (fun i i' => b i i' k) (fun g j => hb g j k) U hU j
   choose x hx₂ hx₁ using fun (j : Fin d) (k : Fin a) =>
     hWP l P E Ω w A h O Bw g n₁ n₂ hα L a R _ (hcol j k).1
-  have hψ₂ : ∀ j k i', ψ (wdMk P ι R (x j k)) i' =
-      ∑ i, ((b i i' k : ↥L.1) : Om l) ⊗ₜ[↥(MaximalUnramifiedExtension l)]
-        (Polynomial.C (T.eB.symm ((U.map ⇑(Per.φB l ^ n₂)) i j)) : Bst P) := by
+  have hψ₂
+      : ∀ j k i',
+        ψ (wdMk P ι R (x j k)) i'
+          = ∑ i, ((b i i' k : ↥L.1) : Om l) ⊗ₜ[↥(MaximalUnramifiedExtension l)]
+              (Polynomial.C (T.eB.symm ((U.map ⇑(Per.φB l ^ n₂)) i j)) : Bst P) := by
     intro j k i'
     rw [hψm, hx₂, (hcol j k).2 n₂]
     exact coord_sum hψ₀ _ _ i'
-  have hψ₁ : ∀ j k i', ψ (wdRho P ι Bw h hj R g (wdMk P ι R (x j k))) i' =
-      ∑ i, ((b i i' k : ↥L.1) : Om l) ⊗ₜ[↥(MaximalUnramifiedExtension l)]
-        (Polynomial.C (T.eB.symm ((U.map ⇑(Per.φB l ^ n₁)) i j)) : Bst P) := by
+  have hψ₁
+      : ∀ j k i',
+        ψ (wdRho P ι Bw h hj R g (wdMk P ι R (x j k))) i'
+          = ∑ i, ((b i i' k : ↥L.1) : Om l) ⊗ₜ[↥(MaximalUnramifiedExtension l)]
+              (Polynomial.C (T.eB.symm ((U.map ⇑(Per.φB l ^ n₁)) i j)) : Bst P) := by
     intro j k i'
     rw [wdRho_mk, hψm, hx₁, (hcol j k).2 n₁]
     exact coord_sum hψ₀ _ _ i'
-  let κ : ℂ →+* OB P := (Algebra.TensorProduct.includeLeftRingHom :
-    Om l →+* Om l ⊗[↥(MaximalUnramifiedExtension l)] Bst P).comp ι.symm.toRingHom
-  let β : Per.Bcris l → OB P := fun y => (1 : Om l) ⊗ₜ[↥(MaximalUnramifiedExtension l)] (Polynomial.C (T.eB.symm y) : Bst P)
+  let κ : ℂ →+* OB P :=
+    (Algebra.TensorProduct.includeLeftRingHom
+      : Om l →+* Om l ⊗[↥(MaximalUnramifiedExtension l)] Bst P).comp ι.symm.toRingHom
+  let β : Per.Bcris l → OB P := fun y =>
+    (1 : Om l) ⊗ₜ[↥(MaximalUnramifiedExtension l)] (Polynomial.C (T.eB.symm y) : Bst P)
   have hframe : ∀ i i', ∑ j, β (w₀ j) * ψ (wdMk P ι R (x j i')) i = if i = i' then 1 else 0 := by
     intro i i'
-    have h1 : ∑ j, β (w₀ j) * ψ (wdMk P ι R (x j i')) i = ∑ j, β (w₀ j) *
-        ∑ i₂, ((b i₂ i i' : ↥L.1) : Om l) ⊗ₜ[↥(MaximalUnramifiedExtension l)]
-          (Polynomial.C (T.eB.symm ((U.map ⇑(Per.φB l ^ n₂)) i₂ j)) : Bst P) :=
+    have h1
+        : ∑ j, β (w₀ j) * ψ (wdMk P ι R (x j i')) i
+          = ∑ j, β (w₀ j) *
+            ∑ i₂, ((b i₂ i i' : ↥L.1) : Om l) ⊗ₜ[↥(MaximalUnramifiedExtension l)]
+              (Polynomial.C (T.eB.symm ((U.map ⇑(Per.φB l ^ n₂)) i₂ j)) : Bst P) :=
       Finset.sum_congr rfl fun j _ => by rw [hψ₂]
     rw [h1, key_sum T _ w₀ (fun i₂ => ((b i₂ i i' : ↥L.1) : Om l)), hw₀]
     simp only [tmul_zB T L]
@@ -117,14 +129,20 @@ theorem UpperTheory.Gal.ClosedPhiFromClosedTrace.tieRep_holds :
     split_ifs
     · rfl
     · exact TensorProduct.zero_tmul _ _
-  have hmain := hTr ℂ (OB P) (WDSpace P ι R) (Fin d) a hdim κ ψ hψs (wdRho P ι Bw h hj R g)
-    (fun j k => wdMk P ι R (x j k)) (fun j => β (w₀ j)) hframe
+  have hmain :=
+    hTr ℂ (OB P) (WDSpace P ι R) (Fin d) a hdim κ ψ hψs (wdRho P ι Bw h hj R g)
+      (fun j k => wdMk P ι R (x j k))
+      (fun j => β (w₀ j))
+      hframe
   refine hTT l P AI T d s _ ((U.map ⇑(Per.φB l ^ n₁)) *ᵥ w₀) _ _ hv₀ (Eq.trans ?_ hmain)
-  have h3 : ∀ i, ∑ j, β (w₀ j) * ψ (wdRho P ι Bw h hj R g (wdMk P ι R (x j i))) i =
-      ∑ i₂, ((b i₂ i i : ↥L.1) : Om l) ⊗ₜ[↥(MaximalUnramifiedExtension l)]
-        (Polynomial.C (T.eB.symm (((U.map ⇑(Per.φB l ^ n₁)) *ᵥ w₀) i₂)) : Bst P) := fun i => by
-    rw [← key_sum T _ w₀ (fun i₂ => ((b i₂ i i : ↥L.1) : Om l))]
-    exact Finset.sum_congr rfl fun j _ => by rw [hψ₁]
+  have h3
+      : ∀ i,
+        ∑ j, β (w₀ j) * ψ (wdRho P ι Bw h hj R g (wdMk P ι R (x j i))) i
+          = ∑ i₂, ((b i₂ i i : ↥L.1) : Om l) ⊗ₜ[↥(MaximalUnramifiedExtension l)]
+              (Polynomial.C (T.eB.symm (((U.map ⇑(Per.φB l ^ n₁)) *ᵥ w₀) i₂)) : Bst P) := fun i =>
+    by
+      rw [← key_sum T _ w₀ (fun i₂ => ((b i₂ i i : ↥L.1) : Om l))]
+      exact Finset.sum_congr rfl fun j _ => by rw [hψ₁]
   simp only [h3]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i₂ _ => ?_

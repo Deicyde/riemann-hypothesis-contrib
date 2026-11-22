@@ -9,15 +9,15 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem exists_piTensor_shuffle_equiv (ι : Type) [Fintype ι] (F V : ι → Type)
-    [∀ τ, AddCommGroup (F τ)] [∀ τ, Module ℂ (F τ)] [∀ τ, AddCommGroup (V τ)]
-    [∀ τ, Module ℂ (V τ)] :
-    ∃ e : ((⨂[ℂ] τ, F τ) ⊗[ℂ] (⨂[ℂ] τ, V τ)) ≃ₗ[ℂ] (⨂[ℂ] τ, (F τ ⊗[ℂ] V τ)),
+theorem exists_piTensor_shuffle_equiv
+    (ι : Type) [Fintype ι]
+    (F V : ι → Type)
+    [∀ τ, AddCommGroup (F τ)] [∀ τ, Module ℂ (F τ)] [∀ τ, AddCommGroup (V τ)] [∀ τ, Module ℂ (V τ)]
+    : ∃ e : ((⨂[ℂ] τ, F τ) ⊗[ℂ] (⨂[ℂ] τ, V τ)) ≃ₗ[ℂ] (⨂[ℂ] τ, (F τ ⊗[ℂ] V τ)),
       ∀ (f : ∀ τ, F τ) (v : ∀ τ, V τ),
         e (PiTensorProduct.tprod ℂ f ⊗ₜ[ℂ] PiTensorProduct.tprod ℂ v)
           = PiTensorProduct.tprod ℂ (fun τ => f τ ⊗ₜ[ℂ] v τ) := by
   classical
-
   let bF := fun τ => Module.Basis.ofVectorSpace ℂ (F τ)
   let bV := fun τ => Module.Basis.ofVectorSpace ℂ (V τ)
   let b₁ := (Basis.piTensorProduct bF).tensorProduct (Basis.piTensorProduct bV)
@@ -25,9 +25,10 @@ theorem exists_piTensor_shuffle_equiv (ι : Type) [Fintype ι] (F V : ι → Typ
 
   let Φ : ((⨂[ℂ] τ, F τ) ⊗[ℂ] (⨂[ℂ] τ, V τ)) →ₗ[ℂ] (⨂[ℂ] τ, (F τ ⊗[ℂ] V τ)) :=
     TensorProduct.lift (PiTensorProduct.map₂ (fun τ => TensorProduct.mk ℂ (F τ) (V τ)))
-  have hΦ : ∀ (f : ∀ τ, F τ) (v : ∀ τ, V τ),
-      Φ (PiTensorProduct.tprod ℂ f ⊗ₜ[ℂ] PiTensorProduct.tprod ℂ v)
-        = PiTensorProduct.tprod ℂ (fun τ => f τ ⊗ₜ[ℂ] v τ) := by
+  have hΦ
+      : ∀ (f : ∀ τ, F τ) (v : ∀ τ, V τ),
+        Φ (PiTensorProduct.tprod ℂ f ⊗ₜ[ℂ] PiTensorProduct.tprod ℂ v)
+          = PiTensorProduct.tprod ℂ (fun τ => f τ ⊗ₜ[ℂ] v τ) := by
     intro f v
     simp only [Φ, TensorProduct.lift.tmul, PiTensorProduct.map₂_tprod_tprod, TensorProduct.mk_apply]
 

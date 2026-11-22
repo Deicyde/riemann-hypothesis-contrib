@@ -12,9 +12,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TvELeft
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField IsLocalRing
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField IsLocalRing
 open scoped CategoryTheory.Obj Matrix TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.PullbackSections (TanM tv)
 open GlobalTheory.KS (rsT pbT C1 IsCoc IsCob)
 open GlobalTheory.LogKS (IsField)
@@ -29,18 +32,23 @@ namespace GlobalTheory.VertCoeffRing
 
 open TrivSqZeroExt (inl inr)
 
-theorem existsUnique_coeff_alg {R : Type} [CommRing R] {G : Over (Sp R)} [GrpObj G] [IsCommMonObj G]
-    [Smooth G.hom] {n : ℕ} {v : Fin n → (epsR R ⟶ G)} (hv : IsLieBasis v) {dd : Fin n → Fld G.left}
+theorem existsUnique_coeff_alg
+    {R : Type} [CommRing R]
+    {G : Over (Sp R)} [GrpObj G] [IsCommMonObj G] [Smooth G.hom]
+    {n : ℕ} {v : Fin n → (epsR R ⟶ G)} (hv : IsLieBasis v)
+    {dd : Fin n → Fld G.left}
     (hdd : ∀ (B : Type) [CommRing B] [Algebra R B] (e : Fin n → B) (he : ∀ i j, e i * e j = 0)
-      (z : ReciprocityTheory.ChartRestriction.G.Chart.sp (R₀ := R) B ⟶ G) (O : G.left.Opens) (h : ⊤ ≤ z.left ⁻¹ᵁ O),
+        (z : ReciprocityTheory.ChartRestriction.G.Chart.sp (R₀ := R) B ⟶ G) (O : G.left.Opens)
+        (h : ⊤ ≤ z.left ⁻¹ᵁ O),
       ∃ h' : ⊤ ≤ (GlobalTheory.SqZero.lieExp v e (fun i => he i i) * z).left ⁻¹ᵁ O, ∀ f,
         evalPt _ O h' f = evalPt z.left O h f + ∑ i, e i * evalPt z.left O h (dd i O f))
-    {C : Type} [CommRing C] [Algebra R C] (y : ReciprocityTheory.ChartRestriction.G.Chart.sp (R₀ := R) C ⟶ G)
+    {C : Type} [CommRing C] [Algebra R C]
+    (y : ReciprocityTheory.ChartRestriction.G.Chart.sp (R₀ := R) C ⟶ G)
     {V : G.left.Opens} (hV : IsAffineOpen V) (h : ⊤ ≤ y.left ⁻¹ᵁ V) (δ : Γ(G.left, V) → C)
     (hadd : ∀ f f', δ (f + f') = δ f + δ f')
     (hmul : ∀ f f', δ (f * f') = evalPt y.left V h f * δ f' + evalPt y.left V h f' * δ f)
-    (hbase : ∀ r, δ (constFn G.hom V r) = 0) :
-    ∃! c : Fin n → C, ∀ f, δ f = ∑ a, c a * evalPt y.left V h (dd a V f) := by
+    (hbase : ∀ r, δ (constFn G.hom V r) = 0)
+    : ∃! c : Fin n → C, ∀ f, δ f = ∑ a, c a * evalPt y.left V h (dd a V f) := by
   let z : ReciprocityTheory.ChartRestriction.G.Chart.sp (R₀ := R) (DualNumber C) ⟶ G :=
     ReciprocityTheory.ChartRestriction.G.Chart.spMap (TrivSqZeroExt.inlAlgHom R C C) ≫ y
   have hz : ⊤ ≤ z.left ⁻¹ᵁ V := fun t _ => h (Set.mem_univ _)
@@ -48,18 +56,26 @@ theorem existsUnique_coeff_alg {R : Type} [CommRing R] {G : Over (Sp R)} [GrpObj
     evalPt_spMap_comp (TrivSqZeroExt.inlAlgHom R C C).toRingHom y.left V h hz s
   obtain ⟨ψ, hψ⟩ := GlobalTheory.InvFieldBasis.exists_dualHom (evalPt y.left V h) δ hadd hmul
   obtain ⟨x, hx, ex⟩ := exists_evalPt_eq hV ψ
-  have hxp : x ≫ G.hom = (ReciprocityTheory.ChartRestriction.G.Chart.sp (R₀ := R) (DualNumber C)).hom := by
+  have hxp
+      : x ≫ G.hom
+        = (ReciprocityTheory.ChartRestriction.G.Chart.sp (R₀ := R) (DualNumber C)).hom := by
     refine (eq_spMap_of_evalPt _ (algebraMap R (DualNumber C)) fun a => ?_).trans rfl
     rw [← evalPt_constFn G.hom x V hx, ex, hψ, hbase, evalPt_constFn G.hom y.left V h a,
       GlobalTheory.InvFieldBasis.evalPt_congr (Over.w y) ⊤ le_rfl le_rfl]
-    have e2 : evalPt (ReciprocityTheory.ChartRestriction.G.Chart.sp (R₀ := R) C).hom ⊤ le_rfl
-        ((Scheme.ΓSpecIso (CommRingCat.of R)).inv.hom a) = algebraMap R C a :=
+    have e2
+        : evalPt (ReciprocityTheory.ChartRestriction.G.Chart.sp (R₀ := R) C).hom ⊤ le_rfl
+            ((Scheme.ΓSpecIso (CommRingCat.of R)).inv.hom a)
+          = algebraMap R C a :=
       evalPt_spMap (algebraMap R C) a
     rw [e2, TrivSqZeroExt.inr_zero, add_zero]
     exact (TrivSqZeroExt.algebraMap_eq_inl' R C C _).symm
-  let w : ReciprocityTheory.ChartRestriction.G.Chart.sp (R₀ := R) (DualNumber C) ⟶ G := Over.homMk x hxp
-  have ext : ∀ {B : Type} [CommRing B] [Algebra R B] (u u' : ReciprocityTheory.ChartRestriction.G.Chart.sp (R₀ := R) B ⟶ G),
-      u.left = u'.left → u = u' := fun u u' e => Over.OverMorphism.ext e
+  let w : ReciprocityTheory.ChartRestriction.G.Chart.sp (R₀ := R) (DualNumber C) ⟶ G :=
+    Over.homMk x hxp
+  have ext
+      : ∀ {B : Type} [CommRing B] [Algebra R B]
+          (u u' : ReciprocityTheory.ChartRestriction.G.Chart.sp (R₀ := R) B ⟶ G),
+        u.left = u'.left → u = u' := fun u u' e =>
+    Over.OverMorphism.ext e
   let fstR : DualNumber C →ₐ[R] C := TrivSqZeroExt.fstHom R C C
   let J : Ideal (DualNumber C) := RingHom.ker fstR
   have memJ : ∀ a : DualNumber C, a ∈ J ↔ a.fst = 0 := fun a => RingHom.mem_ker
@@ -88,21 +104,29 @@ theorem existsUnique_coeff_alg {R : Type} [CommRing R] {G : Over (Sp R)} [GrpObj
     refine (evalPt_spMap_comp _ x V hx h' f).trans ?_
     rw [ex, hψ]
     exact add_zero _
-  have hred : ReciprocityTheory.ChartRestriction.G.Chart.spMap (Ideal.Quotient.mkₐ R J) ≫ z =
-      ReciprocityTheory.ChartRestriction.G.Chart.spMap (Ideal.Quotient.mkₐ R J) ≫ w := by
-    rw [hg, ← ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp, Category.assoc, Category.assoc, t1, t2]
+  have hred
+      : ReciprocityTheory.ChartRestriction.G.Chart.spMap (Ideal.Quotient.mkₐ R J) ≫ z
+        = ReciprocityTheory.ChartRestriction.G.Chart.spMap (Ideal.Quotient.mkₐ R J) ≫ w := by
+    rw [hg, ← ReciprocityTheory.ChartRestriction.G.Chart.spMap_comp, Category.assoc, Category.assoc,
+      t1, t2]
   obtain ⟨c, hc, hcu⟩ := GlobalTheory.SqZero.existsUnique_eq_lieExp_mul hv hJ hred
-  have key : ∀ c' : Fin n → C, (w = GlobalTheory.SqZero.lieExp v (fun i => inr (c' i))
-      (fun i => TrivSqZeroExt.inr_mul_inr _ _ _) * z) ↔
-      ∀ f, δ f = ∑ a, c' a * evalPt y.left V h (dd a V f) := by
+  have key
+      : ∀ c' : Fin n → C,
+        (w = GlobalTheory.SqZero.lieExp v
+              (fun i => inr (c' i))
+              (fun i => TrivSqZeroExt.inr_mul_inr _ _ _)
+            * z)
+          ↔ ∀ f, δ f = ∑ a, c' a * evalPt y.left V h (dd a V f) := by
     intro c'
-    obtain ⟨h₁, H₁⟩ := hdd (DualNumber C) (fun i => inr (c' i))
-      (fun _ _ => TrivSqZeroExt.inr_mul_inr _ _ _) z V hz
+    obtain ⟨h₁, H₁⟩ :=
+      hdd (DualNumber C) (fun i => inr (c' i)) (fun _ _ => TrivSqZeroExt.inr_mul_inr _ _ _) z V hz
     constructor
     · intro e f
       have := H₁ f
-      rw [← GlobalTheory.InvFieldBasis.evalPt_congr (show x = _ from congrArg (fun u => u.left) e) V hx h₁,
-        ex, hψ] at this
+      rw [← GlobalTheory.InvFieldBasis.evalPt_congr (show x = _ from congrArg (fun u => u.left) e) V
+            hx h₁,
+          ex, hψ]
+        at this
       simp only [ez] at this
       exact (GlobalTheory.InvFieldBasis.dual_eq_iff _ _ _ _).1 this
     · intro e
@@ -115,20 +139,34 @@ theorem existsUnique_coeff_alg {R : Type} [CommRing R] {G : Over (Sp R)} [GrpObj
   have hinr : ∀ a : J, (a : DualNumber C) = inr (a : DualNumber C).snd := fun a =>
     TrivSqZeroExt.ext ((memJ _).1 a.2) rfl
   refine ⟨fun i => (c i : DualNumber C).snd, (key _).1 (hc.trans ?_), fun c' hc' => ?_⟩
-  · rw [GlobalTheory.SqZero.lieExp_congr v (fun i => hinr (c i)) _ (fun i => TrivSqZeroExt.inr_mul_inr _ _ _)]
+  · rw [GlobalTheory.SqZero.lieExp_congr v
+      (fun i => hinr (c i))
+      _
+      (fun i => TrivSqZeroExt.inr_mul_inr _ _ _)]
   · have hmem : ∀ i, inr (c' i) ∈ J := fun i => (memJ _).2 rfl
     have := hcu (fun i => ⟨inr (c' i), hmem i⟩) ((key c').2 hc')
     funext i
     exact congrArg (fun d : Fin n → J => (d i : DualNumber C).snd) this
 
-theorem existsUnique_coeff_affine_ring : ∀ {R : Type} [CommRing R] {G : Over (Sp R)} [GrpObj G] [IsCommMonObj G] [Smooth G.hom] {n : ℕ} (v : Fin n → (epsR R ⟶ G)), IsLieBasis v → ∀ (dd : Fin n → Fld G.left),
-    (∀ (B : Type) [CommRing B] [Algebra R B] (e : Fin n → B) (he : ∀ i j, e i * e j = 0) (z : ReciprocityTheory.ChartRestriction.G.Chart.sp (R₀ := R) B ⟶ G) (O : G.left.Opens) (h : ⊤ ≤ z.left ⁻¹ᵁ O),
-      ∃ h' : ⊤ ≤ (GlobalTheory.SqZero.lieExp v e (fun i => he i i) * z).left ⁻¹ᵁ O, ∀ f,
-        GlobalTheory.TangentOrigin.evalPt _ O h' f = GlobalTheory.TangentOrigin.evalPt z.left O h f + ∑ i, e i * GlobalTheory.TangentOrigin.evalPt z.left O h (dd i O f)) →
-    ∀ (V V' : G.left.Opens), IsAffineOpen V → IsAffineOpen V' → V' ≤ V → ∀ (δ : Γ(G.left, V) → Γ(G.left, V')),
-    (∀ f f', δ (f + f') = δ f + δ f') → (∀ f f', δ (f * f') = rsT f V' * δ f' + rsT f' V' * δ f) →
-    (∀ r, δ (constFn G.hom V r) = 0) →
-    ∃! c : Fin n → Γ(G.left, V'), ∀ f, δ f = ∑ a, c a * rsT (dd a V f) V' := by
+theorem existsUnique_coeff_affine_ring
+    : ∀ {R : Type} [CommRing R] {G : Over (Sp R)} [GrpObj G] [IsCommMonObj G] [Smooth G.hom] {n : ℕ}
+        (v : Fin n → (epsR R ⟶ G)),
+      IsLieBasis v
+        → ∀ (dd : Fin n → Fld G.left),
+          (∀ (B : Type) [CommRing B] [Algebra R B] (e : Fin n → B) (he : ∀ i j, e i * e j = 0)
+                (z : ReciprocityTheory.ChartRestriction.G.Chart.sp (R₀ := R) B ⟶ G)
+                (O : G.left.Opens) (h : ⊤ ≤ z.left ⁻¹ᵁ O),
+              ∃ h' : ⊤ ≤ (GlobalTheory.SqZero.lieExp v e (fun i => he i i) * z).left ⁻¹ᵁ O, ∀ f,
+                GlobalTheory.TangentOrigin.evalPt _ O h' f
+                  = GlobalTheory.TangentOrigin.evalPt z.left O h f
+                    + ∑ i, e i * GlobalTheory.TangentOrigin.evalPt z.left O h (dd i O f))
+            → ∀ (V V' : G.left.Opens),
+              IsAffineOpen V → IsAffineOpen V' → V' ≤ V
+                → ∀ (δ : Γ(G.left, V) → Γ(G.left, V')),
+                  (∀ f f', δ (f + f') = δ f + δ f')
+                    → (∀ f f', δ (f * f') = rsT f V' * δ f' + rsT f' V' * δ f)
+                    → (∀ r, δ (constFn G.hom V r) = 0)
+                    → ∃! c : Fin n → Γ(G.left, V'), ∀ f, δ f = ∑ a, c a * rsT (dd a V f) V' := by
   intro R _ G _ _ _ n v hv dd hdd V V' hV hV' hle δ hadd hmul hbase
   obtain ⟨t, ht, et⟩ := exists_evalPt_eq (R := Γ(G.left, V')) hV' (RingHom.id _)
   letI : Algebra R Γ(G.left, V') := (Spec.preimage (t ≫ G.hom)).hom.toAlgebra

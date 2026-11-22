@@ -11,7 +11,9 @@ public import Development.WeilBound.RepresentationTheoryGL.CasimirAlgebra.KugaCo
 
 namespace PositivityTheory.Rg.Cz
 
-theorem clozelCohomological_of_three (hw : WhitLie) (hkg : KugaGlue) (hco : Cochain) : GlobalTheory.Published.ClozelCohomological :=
-  clozelCohomological_of_rest kType_holds GK.gkData_holds hw kugaAbs_holds hkg coefGlue_holds hco casBound_holds
+theorem clozelCohomological_of_three (hw : WhitLie) (hkg : KugaGlue) (hco : Cochain)
+    : GlobalTheory.Published.ClozelCohomological :=
+  clozelCohomological_of_rest kType_holds GK.gkData_holds hw kugaAbs_holds hkg coefGlue_holds hco
+    casBound_holds
 
 end PositivityTheory.Rg.Cz

@@ -13,8 +13,10 @@ namespace PositivityTheory.Rg.BcB.N3.Pee
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem extremeSph_of (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (hC : SphConst k) (hS : SphEmb k) (hU : UniqSub k) : ExtremeSph k := by
+theorem extremeSph_of
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (hC : SphConst k) (hS : SphEmb k) (hU : UniqSub k)
+    : ExtremeSph k := by
   intro h0 n ξ hm V _ _ π hs hi ⟨f, hf⟩
   obtain ⟨W, _, _, σ, hσs, hσi, hσsph, hσq⟩ := hC n ξ
   obtain ⟨g, hg⟩ := hS n ξ hm W σ hσs hσi hσsph hσq
@@ -37,13 +39,20 @@ theorem extremeSph_of (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
   have h5 := congrArg e.toLinearEquiv ((Submodule.mem_bot ℂ).1 hv)
   rwa [LinearEquiv.apply_symm_apply, map_zero] at h5
 
-theorem galois_fixed_adelic_matrices_descend (hE : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k], ExpEmb k)
-    (hX : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k], ExtremeSph k)
-    (hL : SatLink) : N3 := by
+theorem galois_fixed_adelic_matrices_descend
+    (hE
+      : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k],
+        ExpEmb k)
+    (hX
+      : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k],
+        ExtremeSph k)
+    (hL : SatLink)
+    : N3 := by
   intro E _ _ w c n N h σ P ξ hq he hm
   obtain ⟨f, hf⟩ := hE (w.adicCompletion E) n P.V P.ρ ξ P.smooth he
   have hc : CharZero (w.adicCompletion E) :=
     charZero_of_injective_algebraMap (algebraMap E (w.adicCompletion E)).injective
-  exact hL E w c n N h σ P ξ hq (hX (w.adicCompletion E) hc n ξ hm P.V P.ρ P.smooth P.irred ⟨f, hf⟩) ⟨f, hf⟩
+  exact hL E w c n N h σ P ξ hq (hX (w.adicCompletion E) hc n ξ hm P.V P.ρ P.smooth P.irred ⟨f, hf⟩)
+    ⟨f, hf⟩
 
 end PositivityTheory.Rg.BcB.N3.Pee

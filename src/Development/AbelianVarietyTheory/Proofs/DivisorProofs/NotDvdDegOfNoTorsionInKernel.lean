@@ -13,21 +13,28 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PowEqOneOfPo
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic GlobalTheory.AV GlobalTheory.AV.AbVar
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic
+  GlobalTheory.AV GlobalTheory.AV.AbVar
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.AV.AbVar.DegPrime
 
-theorem pow_comp_mon {S : Scheme.{0}} {G H Z : Over S} [GrpObj G] [GrpObj H] (φ : G ⟶ H) [IsMonHom φ]
-    (x : Z ⟶ G) (n : ℕ) : (x ^ n) ≫ φ = (x ≫ φ) ^ n := by
+theorem pow_comp_mon
+    {S : Scheme.{0}} {G H Z : Over S} [GrpObj G] [GrpObj H]
+    (φ : G ⟶ H) [IsMonHom φ]
+    (x : Z ⟶ G) (n : ℕ)
+    : (x ^ n) ≫ φ = (x ≫ φ) ^ n := by
   induction n with
   | zero => simp [pow_zero, MonObj.one_comp]
   | succ n ih => rw [pow_succ, pow_succ, MonObj.mul_comp, ih]
 
-theorem pow_prime_pow {K : Type} [Field K] (l : ℕ) {A B : AbVar K} (f : A ⟶ B)
-    (hf : ∀ x : A.Pt, x ^ l = 1 → x ≫ f.hom = 1 → x = 1) :
-    ∀ (b : ℕ) (x : A.Pt), x ^ (l ^ b) = 1 → x ≫ f.hom = 1 → x = 1 := by
+theorem pow_prime_pow
+    {K : Type} [Field K]
+    (l : ℕ)
+    {A B : AbVar K} (f : A ⟶ B) (hf : ∀ x : A.Pt, x ^ l = 1 → x ≫ f.hom = 1 → x = 1)
+    : ∀ (b : ℕ) (x : A.Pt), x ^ (l ^ b) = 1 → x ≫ f.hom = 1 → x = 1 := by
   intro b
   induction b with
   | zero => intro x hx _; simpa using hx
@@ -40,9 +47,11 @@ theorem pow_prime_pow {K : Type} [Field K] (l : ℕ) {A B : AbVar K} (f : A ⟶ 
 
 end GlobalTheory.AV.AbVar.DegPrime
 
-theorem GlobalTheory.AV.AbVar.not_dvd_deg_of_no_torsion_in_kernel : ∀ (K : Type) [Field K] (l : ℕ) [Fact l.Prime], (l : K) ≠ 0 →
-    ∀ (A B : AbVar K) (h : A ⟶ B), IsIsogeny h → (∀ x : A.Pt, x ^ l = 1 → x ≫ h.hom = 1 → x = 1) →
-      ¬ l ∣ deg h := by
+theorem GlobalTheory.AV.AbVar.not_dvd_deg_of_no_torsion_in_kernel
+    : ∀ (K : Type) [Field K] (l : ℕ) [Fact l.Prime],
+      (l : K) ≠ 0
+        → ∀ (A B : AbVar K) (h : A ⟶ B),
+          IsIsogeny h → (∀ x : A.Pt, x ^ l = 1 → x ≫ h.hom = 1 → x = 1) → ¬ l ∣ deg h := by
   intro K _ l hl hlK A B h hh hker
   have hp : l.Prime := hl.out
   obtain ⟨hdim, -, -, -⟩ := GlobalTheory.AV.AbVar.isogeny_flat_finrank K A B h hh
@@ -53,20 +62,21 @@ theorem GlobalTheory.AV.AbVar.not_dvd_deg_of_no_torsion_in_kernel : ∀ (K : Typ
     · rw [h0, mul_zero] at hNm; omega
     · exact h0
   have hlb : ((l ^ b : ℕ) : K) ≠ 0 := by rw [Nat.cast_pow]; exact pow_ne_zero _ hlK
-  have hpts := GlobalTheory.AV.TorsKer.pow_eq_one_of_points K A B h (l ^ b) 1 hlb
-    (fun x hx hxf => by rw [pow_one]; exact GlobalTheory.AV.AbVar.DegPrime.pow_prime_pow l h hker b x hx hxf)
+  have hpts :=
+    GlobalTheory.AV.TorsKer.pow_eq_one_of_points K A B h (l ^ b) 1 hlb (fun x hx hxf => by
+      rw [pow_one]; exact GlobalTheory.AV.AbVar.DegPrime.pow_prime_pow l h hker b x hx hxf)
   have hkm : ∀ (T : Over (Sp K)) (x : T ⟶ A.X), x ≫ h.hom = 1 → x ^ m = 1 := by
     intro T x hx
-    have h1 : (x ^ m) ^ (l ^ b) = 1 := by
-      rw [← pow_mul, mul_comm, ← hNm]; exact hkill T x hx
+    have h1 : (x ^ m) ^ (l ^ b) = 1 := by rw [← pow_mul, mul_comm, ← hNm]; exact hkill T x hx
     have h2 : (x ^ m) ≫ h.hom = 1 := by
       rw [GlobalTheory.AV.AbVar.DegPrime.pow_comp_mon, hx, one_pow]
     simpa using hpts T (x ^ m) h1 h2
   have hB := B.smooth
   have hA := A.smooth
   rw [hdim] at hA
-  obtain ⟨h', hh', hhh', -⟩ := GlobalTheory.IsogenyQuasiInverse.exists_quasiInverse K A.X B.X B.dim A.ab B.ab hA hB
-    h.hom inferInstance m hm hkm
+  obtain ⟨h', hh', hhh', -⟩ :=
+    GlobalTheory.IsogenyQuasiInverse.exists_quasiInverse K A.X B.X B.dim A.ab B.ab hA hB h.hom
+      inferInstance m hm hkm
   let g : B ⟶ A := Hom.mk (A := B) (B := A) h' (h := hh')
   have e1 : h ≫ g = ((m : ℤ)) • 𝟙 A := by
     apply Subtype.ext

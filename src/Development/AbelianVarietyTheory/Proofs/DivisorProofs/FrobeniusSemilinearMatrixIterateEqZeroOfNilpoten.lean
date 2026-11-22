@@ -8,18 +8,26 @@ namespace GlobalTheory
 
 open Matrix
 
-theorem frobSemilinear_iterate_eq_zero : ∀ (p : ℕ) [Fact p.Prime] (S : Type) [CommRing S] [CharP S p] (ι : Type) [Fintype ι] [DecidableEq ι] (Q : Matrix ι ι S) (N : ℕ), (∀ j i, IsNilpotent ((fun w : ι → S => Q.mulVec fun k => frobenius S p (w k))^[N] (Pi.single j 1) i)) → ∃ K : ℕ, ∀ z : ι → S, (fun w : ι → S => Q.mulVec fun k => frobenius S p (w k))^[K] z = 0 := by
+theorem frobSemilinear_iterate_eq_zero
+    : ∀ (p : ℕ) [Fact p.Prime] (S : Type) [CommRing S] [CharP S p] (ι : Type) [Fintype ι]
+        [DecidableEq ι] (Q : Matrix ι ι S) (N : ℕ),
+      (∀ j i,
+          IsNilpotent ((fun w : ι → S => Q.mulVec fun k => frobenius S p (w k))^[N] (Pi.single j 1)
+            i))
+        → ∃ K : ℕ, ∀ z : ι → S,
+          (fun w : ι → S => Q.mulVec fun k => frobenius S p (w k))^[K] z = 0 := by
   intro p _ S _ _ ι _ _ Q N hN
   set L : (ι → S) → (ι → S) := fun w => Q.mulVec fun k => frobenius S p (w k) with hL
-  let F : AddMonoid.End (ι → S) :=
-    { toFun := L
-      map_zero' := by
-        simp only [L, Pi.zero_apply, map_zero]
-        exact Matrix.mulVec_zero Q
-      map_add' := by
-        intro x y
-        simp only [L, Pi.add_apply, map_add (f := _)]
-        exact Matrix.mulVec_add Q _ _ }
+  let F : AddMonoid.End (ι → S) := {
+    toFun := L
+    map_zero' := by
+      simp only [L, Pi.zero_apply, map_zero]
+      exact Matrix.mulVec_zero Q
+    map_add' := by
+      intro x y
+      simp only [L, Pi.add_apply, map_add (f := _)]
+      exact Matrix.mulVec_add Q _ _
+  }
   have hF : ∀ n, ⇑(F ^ n) = L^[n] := fun n => AddMonoid.End.coe_pow (M := ι → S) F n
   have hsmul : ∀ (a : S) (w : ι → S), L (a • w) = a ^ p • L w := by
     intro a w
@@ -34,7 +42,8 @@ theorem frobSemilinear_iterate_eq_zero : ∀ (p : ℕ) [Fact p.Prime] (S : Type)
     | zero => intro a w; simp
     | succ n ih =>
       intro a w
-      rw [Function.iterate_succ_apply, hsmul, ih, ← pow_mul, ← pow_succ', Function.iterate_succ_apply]
+      rw [Function.iterate_succ_apply, hsmul, ih, ← pow_mul, ← pow_succ',
+        Function.iterate_succ_apply]
   have hdecomp : ∀ w : ι → S, L^[N] w = ∑ j, (w j) ^ (p ^ N) • L^[N] (Pi.single j 1) := by
     intro w
     conv_lhs => rw [← Finset.univ_sum_single w]
@@ -58,8 +67,7 @@ theorem frobSemilinear_iterate_eq_zero : ∀ (p : ℕ) [Fact p.Prime] (S : Type)
     rw [hdecomp w, Finset.sum_apply]
     refine Ideal.sum_mem _ fun j _ => ?_
     rw [Pi.smul_apply, smul_eq_mul, pow_succ]
-    exact Ideal.mul_mem_mul
-      (Ideal.pow_mem_of_mem _ (hw j) _ (pow_pos (Fact.out : p.Prime).pos _))
+    exact Ideal.mul_mem_mul (Ideal.pow_mem_of_mem _ (hw j) _ (pow_pos (Fact.out : p.Prime).pos _))
       (Ideal.subset_span ⟨(j, i), rfl⟩)
   have hall : ∀ k (z : ι → S), ∀ i, L^[N * k] z i ∈ J ^ k := by
     intro k

@@ -28,9 +28,11 @@ def per (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)) 
   o := oK
   P := (algebraMap (BdRp l) (BdR l)).range
 
-def PeriodRingFacts : Prop := ∀ (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)), (per l K).Facts
+def PeriodRingFacts : Prop :=
+  ∀ (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)), (per l K).Facts
 
-def BcrisRegularPeriodRing : Prop := ∀ (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)) [FiniteDimensional ℚ_[l] K],
-  (per l K).Reg (Bcr l)
+def BcrisRegularPeriodRing : Prop :=
+  ∀ (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)) [FiniteDimensional ℚ_[l] K],
+    (per l K).Reg (Bcr l)
 
 end CrystallineSemistableComparison

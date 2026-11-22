@@ -13,8 +13,9 @@ namespace Formalism.L2
 
 variable {D : D7} {C : Host.CharFrame D} {nch : NChoice D}
 
-theorem qPl_tup (Tp : Host.TupTied D C nch) (μ : D.what₂.Tup) (j : Fin D.R.m) :
-    qPl D (Tp.tup μ j) = {v | v ∉ gPl D ∧ ∃ w : PlE D.host, NG.OverPl w v ∧ ¬ (Tp.xi μ).UnrAt w} := by
+theorem qPl_tup (Tp : Host.TupTied D C nch) (μ : D.what₂.Tup) (j : Fin D.R.m)
+    : qPl D (Tp.tup μ j)
+      = {v | v ∉ gPl D ∧ ∃ w : PlE D.host, NG.OverPl w v ∧ ¬ (Tp.xi μ).UnrAt w} := by
   ext v
   simp only [qPl, Set.mem_ofPred_eq, Host.TupTied.tup]
   refine and_congr_right fun hv => exists_congr fun w => and_congr_right fun hw => not_congr ?_

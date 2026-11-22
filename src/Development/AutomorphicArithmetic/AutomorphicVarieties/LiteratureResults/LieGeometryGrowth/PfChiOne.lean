@@ -7,10 +7,12 @@ public import GroundTheory.GlobalFields.IdeleGroups.NormOneCompact
 
 open UpperTheory.V.Lit.Geo
 
-
 open NumberField Formalism.L2.Host GroundTheory.Global in
-private theorem norm_of_normOne {E : Type} [Field E] [NumberField E] (χ : HChar E) {y : IdeleGroup E}
-    (hy : y ∈ IdeleGroup.normOneSubgroup E) : ‖((χ.1 y : ℂˣ) : ℂ)‖ = 1 := by
+private theorem norm_of_normOne
+    {E : Type} [Field E] [NumberField E]
+    (χ : HChar E)
+    {y : IdeleGroup E} (hy : y ∈ IdeleGroup.normOneSubgroup E)
+    : ‖((χ.1 y : ℂˣ) : ℂ)‖ = 1 := by
   obtain ⟨D, hD, -, hxD⟩ := IdeleGroup.exists_isCompact_normOneSubgroup E
   have hc : Continuous fun z : IdeleGroup E => ((χ.1 z : ℂˣ) : ℂ) := Units.continuous_val.comp χ.2.1
   obtain ⟨M, hM⟩ := hD.exists_bound_of_continuousOn hc.continuousOn
@@ -33,7 +35,6 @@ private theorem norm_of_normOne {E : Type} [Field E] [NumberField E] (χ : HChar
   rw [h6, Units.val_inv_eq_inv_val, norm_inv, inv_le_one₀ (norm_pos_iff.2 (Units.ne_zero _))] at h5
   exact le_antisymm (hle _ hy) h5
 
-theorem UpperTheory.V.Lit.Geo.Pf.chiOne :
-    UpperTheory.V.Lit.Geo.Pf.ChiOne := by
+theorem UpperTheory.V.Lit.Geo.Pf.chiOne : UpperTheory.V.Lit.Geo.Pf.ChiOne := by
   intro E _ _ _ a χ s _ g
   exact norm_of_normOne χ g.2

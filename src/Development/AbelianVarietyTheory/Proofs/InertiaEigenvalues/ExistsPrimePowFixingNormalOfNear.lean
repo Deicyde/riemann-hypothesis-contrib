@@ -9,13 +9,19 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.ProdOneSubPrimitive
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BK
+  GlobalTheory.BKReal GlobalTheory.BKGal GlobalTheory.Per Matrix
 open scoped Formalism.Per
 
 namespace GlobalTheory.PowFixNear
 open GlobalTheory.MemLoc GlobalTheory.MemLoc.FrobLaws
 
-theorem main : ∀ (l : ℕ) [Fact l.Prime] (F : FinExt l), Normal ℚ_[l] ↥F.1 → ∀ g : GQ l, (∀ x ∈ F.1, x ≠ 0 → ‖g x - x‖ < ‖x‖) → ∃ s : ℕ, ∀ x ∈ F.1, (g ^ l ^ s) x = x := by
+theorem main
+    : ∀ (l : ℕ) [Fact l.Prime] (F : FinExt l),
+      Normal ℚ_[l] ↥F.1
+        → ∀ g : GQ l,
+          (∀ x ∈ F.1, x ≠ 0 → ‖g x - x‖ < ‖x‖) → ∃ s : ℕ, ∀ x ∈ F.1, (g ^ l ^ s) x = x := by
   intro l _ F hF g hg
   haveI := F.2
   haveI : Normal ℚ_[l] ↥F.1 := hF
@@ -28,11 +34,13 @@ theorem main : ∀ (l : ℕ) [Fact l.Prime] (F : FinExt l), Normal ℚ_[l] ↥F.
         rw [pow_succ, AlgEquiv.mul_apply, map_sub (g ^ i)]; ring
       rw [e]
       refine (IsUltrametricDist.norm_add_le_max _ _).trans_lt (max_lt ?_ ih)
-      rw [norm_gal]; exact hg x hx hx0
+      rw [norm_gal]
+      exact hg x hx hx0
   have hst : ∀ (h : GQ l) (x : Om l), x ∈ F.1 → h x ∈ F.1 := by
     intro h x hx
     have e := AlgEquiv.restrictNormal_commutes h (↥F.1) ⟨x, hx⟩
-    have e' : h x = (algebraMap (↥F.1) (Om l)) ((AlgEquiv.restrictNormal h (↥F.1)) ⟨x, hx⟩) := e.symm
+    have e' : h x = (algebraMap (↥F.1) (Om l)) ((AlgEquiv.restrictNormal h (↥F.1)) ⟨x, hx⟩) :=
+      e.symm
     rw [e']
     exact ((AlgEquiv.restrictNormal h (↥F.1)) ⟨x, hx⟩).2
   set r := AlgEquiv.restrictNormalHom (F := ℚ_[l]) (K₁ := Om l) (↥F.1) with hr
@@ -50,7 +58,11 @@ theorem main : ∀ (l : ℕ) [Fact l.Prime] (F : FinExt l), Normal ℚ_[l] ↥F.
     simpa using e.symm
   obtain ⟨s, N', hN', hNe⟩ := Nat.exists_eq_pow_mul_and_not_dvd hN0 l (Fact.out : l.Prime).ne_one
   refine ⟨s, fun y hy => ?_⟩
-  refine GlobalTheory.TameInertiaCyclic.fix_of_near F (g ^ l ^ s) (hst _) (fun x hx hx0 => hpow _ x hx hx0) hN' (fun x hx => ?_) y hy
+  refine GlobalTheory.TameInertiaCyclic.fix_of_near F (g ^ l ^ s) (hst _)
+    (fun x hx hx0 => hpow _ x hx hx0)
+    hN'
+    (fun x hx => ?_)
+    y hy
   rw [← pow_mul, ← hNe]
   exact hgN x hx
 

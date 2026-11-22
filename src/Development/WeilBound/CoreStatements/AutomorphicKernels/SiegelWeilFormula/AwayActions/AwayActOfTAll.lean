@@ -9,10 +9,12 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeil
 
 namespace PositivityTheory.SiegelWeilFormula.KAway
 
-theorem awayAct_of_tAll (hT : PositivityTheory.SiegelWeilFormula.TAll) : PositivityTheory.SiegelWeilFormula.AwayAct :=
+theorem awayAct_of_tAll (hT : PositivityTheory.SiegelWeilFormula.TAll)
+    : PositivityTheory.SiegelWeilFormula.AwayAct :=
   awayAct_of hT PositivityTheory.SiegelWeilFormula.kfour.auxEx adDecomp
 
-theorem finAct_of_tAll (hT : PositivityTheory.SiegelWeilFormula.TAll) : PositivityTheory.SiegelWeilFormula.FinAct :=
+theorem finAct_of_tAll (hT : PositivityTheory.SiegelWeilFormula.TAll)
+    : PositivityTheory.SiegelWeilFormula.FinAct :=
   finAct_of hT PositivityTheory.SiegelWeilFormula.kfour.auxEx adDecomp
 
 end PositivityTheory.SiegelWeilFormula.KAway

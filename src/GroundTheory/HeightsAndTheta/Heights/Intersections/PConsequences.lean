@@ -17,15 +17,17 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.Inter
 
-open MvPolynomial MeasureTheory ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I2
+open MvPolynomial MeasureTheory ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I2
 
 variable {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)]
 
-
 omit [∀ k, Fintype (ι k)] in
-theorem ptsIntegral_congr_pts (P : Ideal (MRing ι)) {e : ℕ} (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ)
-    {g g' : ((Σ k, ι k) → ℂ) → ℝ} (hg : ∀ z ∈ mcPts P, g z = g' z) :
-    ptsIntegral P φ g = ptsIntegral P φ g' := by
+theorem ptsIntegral_congr_pts
+    (P : Ideal (MRing ι))
+    {e : ℕ} (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ)
+    {g g' : ((Σ k, ι k) → ℂ) → ℝ} (hg : ∀ z ∈ mcPts P, g z = g' z)
+    : ptsIntegral P φ g = ptsIntegral P φ g' := by
   unfold ptsIntegral ptsIntegralAt
   split_ifs with hΨ
   · congr 1
@@ -38,18 +40,23 @@ theorem ptsIntegral_congr_pts (P : Ideal (MRing ι)) {e : ℕ} (φ : Fin e → (
     · rfl
   · rfl
 
-theorem cycR_sub_vertR (I : Ideal (MRing ι) → (n : ℕ) → (Fin n → HermLine ι) → ℝ) (P : Ideal (MRing ι))
-    {n : ℕ} (L : Fin n → HermLine ι) (s : MRing ι) [DecidablePred (IsHorizontal (ι := ι))] :
-    cycR I P L s - vertR P L s = ∑ W ∈ (divSupp_finite P s).toFinset.filter IsHorizontal,
-      (multAt (P ⊔ Ideal.span {s}) W : ℝ) * I W n L := by
+theorem cycR_sub_vertR
+    (I : Ideal (MRing ι) → (n : ℕ) → (Fin n → HermLine ι) → ℝ) (P : Ideal (MRing ι))
+    {n : ℕ} (L : Fin n → HermLine ι)
+    (s : MRing ι)
+    [DecidablePred (IsHorizontal (ι := ι))]
+    : cycR I P L s - vertR P L s
+      = ∑ W ∈ (divSupp_finite P s).toFinset.filter IsHorizontal,
+        (multAt (P ⊔ Ideal.span {s}) W : ℝ) * I W n L := by
   unfold cycR vertR
   rw [finsum_mem_eq_finite_toFinset_sum _ (divSupp_finite P s),
-    finsum_mem_eq_finite_toFinset_sum _ (divSupp_finite P s), ← Finset.sum_sub_distrib, Finset.sum_filter]
+    finsum_mem_eq_finite_toFinset_sum _ (divSupp_finite P s), ← Finset.sum_sub_distrib,
+    Finset.sum_filter]
   refine Finset.sum_congr rfl fun W _ ↦ ?_
   split_ifs <;> ring
 
-theorem tensor_sqMetric_a {A : HermLine ι} {α β : K → ℕ} (h : ∀ k, (α k : ℤ) - β k = A.a k) (k : K) :
-    (A.tensor (HermLine.sqMetric β)).a k = α k := by
+theorem tensor_sqMetric_a {A : HermLine ι} {α β : K → ℕ} (h : ∀ k, (α k : ℤ) - β k = A.a k) (k : K)
+    : (A.tensor (HermLine.sqMetric β)).a k = α k := by
   show A.a k + (β k : ℤ) = α k
   rw [← h k]
   ring
@@ -71,8 +78,9 @@ theorem InductiveIntersectionFormula.proof : InductiveIntersectionFormula.Statem
     show Real.log (‖eval z (map (Int.castRingHom ℂ) f)‖ / (A.h z * (HermLine.sqMetric β).h z)) =
       Real.log (‖eval z (map (Int.castRingHom ℂ) g)‖ / (HermLine.sqMetric β).h z)
     rw [hnorm z hz, mul_comm (A.h z), mul_div_mul_right _ _ hApos.ne']
-  have hS : (divSupp_finite P f).toFinset.filter IsHorizontal =
-      (divSupp_finite P g).toFinset.filter IsHorizontal := by
+  have hS
+      : (divSupp_finite P f).toFinset.filter IsHorizontal
+        = (divSupp_finite P g).toFinset.filter IsHorizontal := by
     ext W
     simp only [Finset.mem_filter, Set.Finite.mem_toFinset]
     exact ⟨fun h ↦ ⟨(hhor W h.2).1 h.1, h.2⟩, fun h ↦ ⟨(hhor W h.2).2 h.1, h.2⟩⟩
@@ -84,15 +92,17 @@ theorem InductiveIntersectionFormula.proof : InductiveIntersectionFormula.Statem
   rw [recR_eq] at hRf hRg
   linarith
 
-theorem ae_eval_ne_zero {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {P : Ideal (MRing ι)} {e : ℕ} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)}
-    (hP : IsArithVar P (e + 1)) (hΨ : IsGoodProj P Ψ) {h : MRing ι} (hh : ∃ a, IsMultiHomog h a)
-    (hhP : h ∉ P) :
-    ∀ᵐ y : Fin e → ℂ, ∀ z ∈ mcPts P, Ψ (segre z) = Fin.cons 1 y →
-      eval z (map (Int.castRingHom ℂ) h) ≠ 0 := by
+theorem ae_eval_ne_zero
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {P : Ideal (MRing ι)} {e : ℕ} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)}
+    (hP : IsArithVar P (e + 1)) (hΨ : IsGoodProj P Ψ)
+    {h : MRing ι} (hh : ∃ a, IsMultiHomog h a) (hhP : h ∉ P)
+    : ∀ᵐ y : Fin e → ℂ, ∀ z ∈ mcPts P, Ψ (segre z) = Fin.cons 1 y →
+        eval z (map (Int.castRingHom ℂ) h) ≠ 0 := by
   have hJ : IsMultiHomogIdeal (Ideal.span {h} : Ideal (MRing ι)) :=
     ⟨{h}, fun f hf ↦ by rw [Set.mem_singleton_iff.mp hf]; exact hh, rfl⟩
-  have hJP : ¬ (Ideal.span {h} : Ideal (MRing ι)) ≤ P := by
-    rwa [Ideal.span_singleton_le_iff_mem]
+  have hJP : ¬ (Ideal.span {h} : Ideal (MRing ι)) ≤ P := by rwa [Ideal.span_singleton_le_iff_mem]
   have hnull := projB_null Ψ hP hΨ hJ hJP
   refine ae_iff.mpr (measure_mono_null (fun y hy ↦ ?_) hnull)
   simp only [Set.mem_ofPred_eq, not_forall, not_not] at hy
@@ -109,8 +119,9 @@ theorem RatR.proof (hInt : PtsIntegrableStatement) : RatR.Statement := by
   have hRf := hR P n L _ f α hP hL hAB (tensor_sqMetric_a hαβ) hf hfP
   have hRg := hR P n L _ g β hP hL hB (fun k ↦ rfl) hg hgP
   have hsum := hAdd P n L A _ hP hL hA hB
-  have hint : arInt P f (A.tensor (HermLine.sqMetric β)) L - arInt P g (HermLine.sqMetric β) L =
-      ptsIntegral P (pot L) (logNormRat A f g) := by
+  have hint
+      : arInt P f (A.tensor (HermLine.sqMetric β)) L - arInt P g (HermLine.sqMetric β) L
+        = ptsIntegral P (pot L) (logNormRat A f g) := by
     show ptsIntegral P (pot L) _ - ptsIntegral P (pot L) _ = _
     unfold ptsIntegral
     split_ifs with hΨ

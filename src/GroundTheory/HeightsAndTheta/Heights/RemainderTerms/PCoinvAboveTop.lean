@@ -11,9 +11,10 @@ namespace GroundTheory.Heights₂.Heights.RestTerms
 
 open MvPolynomial Finset Coinv
 
-theorem CoinvAboveTop.proof (h1 : CoinvPolynomialReduction.Statement)
-    (h2 : CoinvIdealComponent.Statement) (h3 : CoinvStaircaseComponent.Statement) :
-    CoinvAboveTop.Statement := by
+theorem CoinvAboveTop.proof
+    (h1 : CoinvPolynomialReduction.Statement) (h2 : CoinvIdealComponent.Statement)
+    (h3 : CoinvStaircaseComponent.Statement)
+    : CoinvAboveTop.Statement := by
   intro K _ _ f n d H hH hd
   obtain ⟨v, hv, hJ⟩ := h1 K f n H
   obtain ⟨Q, hQ, hcomp⟩ := h2 K f n (H - v) hJ d

@@ -8,24 +8,35 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.LieModelExis
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.CombEig
 
-theorem pt_sum {S : Scheme.{0}} {G : Over S} [GrpObj G] {R : Type} [CommRing R] {x : Sp R ⟶ S} {V : Type}
-    [AddCommGroup V] [Module R V] (M : LieModel G x V) :
-    ∀ {n : ℕ} (e : Fin n → V), M.pt (∑ i, e i) = (List.ofFn fun i => M.pt (e i)).prod
+theorem pt_sum
+    {S : Scheme.{0}} {G : Over S} [GrpObj G]
+    {R : Type} [CommRing R]
+    {x : Sp R ⟶ S} {V : Type} [AddCommGroup V] [Module R V]
+    (M : LieModel G x V)
+    : ∀ {n : ℕ} (e : Fin n → V), M.pt (∑ i, e i) = (List.ofFn fun i => M.pt (e i)).prod
   | 0, e => by simpa using M.pt_zero
-  | n + 1, e => by
-    rw [Fin.sum_univ_succ, List.ofFn_succ, List.prod_cons, M.add, pt_sum M]
+  | n + 1, e => by rw [Fin.sum_univ_succ, List.ofFn_succ, List.prod_cons, M.add, pt_sum M]
 
-theorem isEigVec_comb : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (F : Type) [Field F] (x : Sp F ⟶ S) (P : Type) [CommRing P] (act : OAct P G) (σ : P →+* F) (n : ℕ) (v : Fin n → (epsAt x ⟶ G)) (cf : Fin n → F) (w : epsAt x ⟶ G), (∀ i, IsEigVec act x σ (v i)) → IsComb cf v w → IsEigVec act x σ w := by
+theorem isEigVec_comb
+    : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonObj G] (F : Type) [Field F]
+        (x : Sp F ⟶ S) (P : Type) [CommRing P] (act : OAct P G) (σ : P →+* F) (n : ℕ)
+        (v : Fin n → (epsAt x ⟶ G)) (cf : Fin n → F) (w : epsAt x ⟶ G),
+      (∀ i, IsEigVec act x σ (v i)) → IsComb cf v w → IsEigVec act x σ w := by
   intro S G _ _ F _ x P _ act σ n v cf w hv hc
-  have key : ∀ y : epsAt x ⟶ G, IsEigVec act x σ y ↔
-      (IsTanAt G x y ∧ ∀ a, y ≫ act.act a = LieTangent.epsScale x (σ a) ≫ y) := by
+  have key
+      : ∀ y : epsAt x ⟶ G,
+        IsEigVec act x σ y
+          ↔ (IsTanAt G x y ∧ ∀ a, y ≫ act.act a = LieTangent.epsScale x (σ a) ≫ y) := by
     intro y
     unfold IsEigVec
     refine and_congr_right fun _ => forall_congr' fun a => ?_
@@ -37,8 +48,10 @@ theorem isEigVec_comb : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonO
     · intro h
       rw [h]
       rfl
-  have hcomm : ∀ c d : F, LieTangent.epsScale x c ≫ LieTangent.epsScale x d =
-      LieTangent.epsScale x d ≫ LieTangent.epsScale x c := by
+  have hcomm
+      : ∀ c d : F,
+        LieTangent.epsScale x c ≫ LieTangent.epsScale x d
+          = LieTangent.epsScale x d ≫ LieTangent.epsScale x c := by
     intro c d
     have hr : (epsMul c).comp (epsMul d) = (epsMul d).comp (epsMul c) := by
       refine RingHom.ext fun a => TrivSqZeroExt.ext ?_ ?_
@@ -55,8 +68,8 @@ theorem isEigVec_comb : ∀ (S : Scheme.{0}) (G : Over S) [GrpObj G] [IsCommMonO
     rw [hu i]
     rfl
   rw [key]
-  apply List.prod_induction
-    (fun y => IsTanAt G x y ∧ ∀ a, y ≫ act.act a = LieTangent.epsScale x (σ a) ≫ y)
+  apply List.prod_induction (fun y =>
+    IsTanAt G x y ∧ ∀ a, y ≫ act.act a = LieTangent.epsScale x (σ a) ≫ y)
   · rintro y z ⟨hy, hy'⟩ ⟨hz, hz'⟩
     refine ⟨LieTangent.isTanAt_mul hy hz, fun a => ?_⟩
     haveI := act.hom a

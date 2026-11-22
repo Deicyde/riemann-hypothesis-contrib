@@ -15,12 +15,16 @@ noncomputable section
 
 namespace GlobalTheory.ExpImage
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc
 open scoped Formalism.Per
 
-theorem norm_le_of_qB_mem_Lat (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P)
-    (T : LocTied l P AI) (M n : ℕ) (hM : 1 ≤ M) (z : ℚ_[l]) (hz : qB P z ∈ Lat AI M n) :
-    ‖z‖ ≤ (l : ℝ) ^ (-(n : ℤ)) := by
+theorem norm_le_of_qB_mem_Lat
+    (l : ℕ) [Fact l.Prime]
+    (P : LocPrime l) (AI : LocAinf l P) (T : LocTied l P AI)
+    (M n : ℕ) (hM : 1 ≤ M)
+    (z : ℚ_[l]) (hz : qB P z ∈ Lat AI M n)
+    : ‖z‖ ≤ (l : ℝ) ^ (-(n : ℤ)) := by
   let J : ThetaL P AI := GlobalTheory.ThetaTie.thetaL T
   obtain ⟨a, ha⟩ := hz
   have hq : ∀ c : ℚ_[l], ‖J.θ (qB P c)‖ = ‖c‖ := by

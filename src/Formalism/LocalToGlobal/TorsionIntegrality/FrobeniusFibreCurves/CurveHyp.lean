@@ -27,13 +27,13 @@ def prim (f : PowerSeries K) : PowerSeries K :=
 abbrev dz (f : PowerSeries K) : PowerSeries K := PowerSeries.derivative (R := K) f
 
 def IsWp (g2 g3 : K) (P : PowerSeries K) : Prop :=
-  PowerSeries.constantCoeff P = 0 ∧ (∀ n, Odd n → PowerSeries.coeff n P = 0) ∧
-    (-2 + PowerSeries.X ^ 3 * dz P) ^ 2 =
-      4 * (1 + PowerSeries.X ^ 2 * P) ^ 3 -
-        PowerSeries.C g2 * PowerSeries.X ^ 4 * (1 + PowerSeries.X ^ 2 * P) -
-        PowerSeries.C g3 * PowerSeries.X ^ 6
+  PowerSeries.constantCoeff P = 0 ∧ (∀ n, Odd n → PowerSeries.coeff n P = 0)
+    ∧ (-2 + PowerSeries.X ^ 3 * dz P) ^ 2
+      = 4 * (1 + PowerSeries.X ^ 2 * P) ^ 3
+        - PowerSeries.C g2 * PowerSeries.X ^ 4 * (1 + PowerSeries.X ^ 2 * P)
+        - PowerSeries.C g3 * PowerSeries.X ^ 6
 
-def sigS (P : PowerSeries K) : PowerSeries K := -prim (prim P)
+def sigS (P : PowerSeries K) : PowerSeries K := - prim (prim P)
 
 def sigma (P : PowerSeries K) : PowerSeries K := PowerSeries.X * fExp (sigS P)
 
@@ -41,14 +41,14 @@ def sgStar (s2 : K) (P : PowerSeries K) : PowerSeries K :=
   sigma P * fExp (-(PowerSeries.C (s2 / 2) * PowerSeries.X ^ 2))
 
 def IsW (A kap : K) (w : PowerSeries K) : Prop :=
-  PowerSeries.constantCoeff w = 0 ∧ PowerSeries.coeff 2 w = 1 ∧
-    dz w ^ 2 = 4 * w + 4 * PowerSeries.C A * w ^ 2 + 4 * PowerSeries.C kap * w ^ 3
+  PowerSeries.constantCoeff w = 0 ∧ PowerSeries.coeff 2 w = 1
+    ∧ dz w ^ 2 = 4 * w + 4 * PowerSeries.C A * w ^ 2 + 4 * PowerSeries.C kap * w ^ 3
 
 def wOf (e1 : K) (P : PowerSeries K) : PowerSeries K :=
   PowerSeries.X ^ 2 * (1 + PowerSeries.X ^ 2 * P - PowerSeries.C e1 * PowerSeries.X ^ 2)⁻¹
 
 def sigmaOneSeries (e1 kap : K) (w : PowerSeries K) : PowerSeries K :=
-  -prim (prim (PowerSeries.C e1 + PowerSeries.C kap * w))
+  - prim (prim (PowerSeries.C e1 + PowerSeries.C kap * w))
 
 def sigma1 (e1 kap : K) (w : PowerSeries K) : PowerSeries K := fExp (sigmaOneSeries e1 kap w)
 
@@ -58,15 +58,14 @@ def atS (f : PowerSeries K) : MvPowerSeries (Fin 2) K :=
 def atD (f : PowerSeries K) : MvPowerSeries (Fin 2) K :=
   PowerSeries.subst (MvPowerSeries.X 0 - MvPowerSeries.X 1 : MvPowerSeries (Fin 2) K) f
 
-def par0 (f : PowerSeries K) : MvPowerSeries (Fin 2) K :=
-  atS f + atD f - 2 * at1 0 f - 2 * at1 1 f
+def par0 (f : PowerSeries K) : MvPowerSeries (Fin 2) K := atS f + atD f - 2 * at1 0 f - 2 * at1 1 f
 
 def wpDiff (P : PowerSeries K) : MvPowerSeries (Fin 2) K :=
-  MvPowerSeries.X 0 ^ 2 - MvPowerSeries.X 1 ^ 2 +
-    MvPowerSeries.X 0 ^ 2 * MvPowerSeries.X 1 ^ 2 * (at1 1 P - at1 0 P)
+  MvPowerSeries.X 0 ^ 2 - MvPowerSeries.X 1 ^ 2
+    + MvPowerSeries.X 0 ^ 2 * MvPowerSeries.X 1 ^ 2 * (at1 1 P - at1 0 P)
 
-def dq (P : PowerSeries K) : MvPowerSeries (Fin 2) K :=
-  fun n => if Even (n 0) ∧ Even (n 1) then PowerSeries.coeff (n 0 + n 1 + 2) P else 0
+def dq (P : PowerSeries K) : MvPowerSeries (Fin 2) K := fun n =>
+  if Even (n 0) ∧ Even (n 1) then PowerSeries.coeff (n 0 + n 1 + 2) P else 0
 
 def ev0 (h : MvPowerSeries (Fin 2) K) : PowerSeries K :=
   MvPowerSeries.subst ![(PowerSeries.X : PowerSeries K), 0] h
@@ -77,10 +76,10 @@ abbrev pd {ι : Type} (i : ι) (h : MvPowerSeries ι K) : MvPowerSeries ι K :=
 def lU (l : PowerSeries K) : PowerSeries K := PowerSeries.mk fun n => PowerSeries.coeff (n + 1) l
 
 def phO (s2 : K) (P l : PowerSeries K) : PowerSeries K :=
-  -PowerSeries.subst l (sigS P) + PowerSeries.C (s2 / 2) * l ^ 2 - fLog (lU l)
+  - PowerSeries.subst l (sigS P) + PowerSeries.C (s2 / 2) * l ^ 2 - fLog (lU l)
 
 def phE (s2 e1 kap : K) (w l : PowerSeries K) : PowerSeries K :=
-  -PowerSeries.subst l (sigmaOneSeries e1 kap w) + PowerSeries.C (s2 / 2) * l ^ 2
+  - PowerSeries.subst l (sigmaOneSeries e1 kap w) + PowerSeries.C (s2 / 2) * l ^ 2
 
 def FI (F : MvPowerSeries (Fin 2) K) (i : PowerSeries K) : MvPowerSeries (Fin 2) K :=
   MvPowerSeries.subst ![(MvPowerSeries.X 0 : MvPowerSeries (Fin 2) K), at1 1 i] F
@@ -99,22 +98,23 @@ open Formalism.DworkPowerSeriesWeights (Integral)
 variable {K : Type} [NormedField K]
 
 def LawLog (F : MvPowerSeries (Fin 2) K) (l : PowerSeries K) : Prop :=
-  MvPowerSeries.constantCoeff F = 0 ∧ Integral F ∧ PowerSeries.constantCoeff l = 0 ∧
-    PowerSeries.coeff 1 l = 1 ∧ cob F l = 0
+  MvPowerSeries.constantCoeff F = 0 ∧ Integral F ∧ PowerSeries.constantCoeff l = 0
+    ∧ PowerSeries.coeff 1 l = 1 ∧ cob F l = 0
 
 def IsInv (l i : PowerSeries K) : Prop :=
   PowerSeries.constantCoeff i = 0 ∧ Integral (ι := Unit) i ∧ PowerSeries.subst i l = -l
 
 def IsHalf (l h : PowerSeries K) : Prop :=
-  PowerSeries.constantCoeff h = 0 ∧ Integral (ι := Unit) h ∧
-    PowerSeries.subst h l = PowerSeries.C (2 : K)⁻¹ * l
+  PowerSeries.constantCoeff h = 0 ∧ Integral (ι := Unit) h
+    ∧ PowerSeries.subst h l = PowerSeries.C (2 : K)⁻¹ * l
 
 def CurveHyp (F : MvPowerSeries (Fin 2) K) (i l P ep : PowerSeries K) (c0 : K) : Prop :=
-  Integral (ι := Unit) ep ∧ PowerSeries.constantCoeff ep = 1 ∧
-    PowerSeries.X ^ 2 * (1 + l ^ 2 * PowerSeries.subst l P) =
-      l ^ 2 * (ep + PowerSeries.C c0 * PowerSeries.X ^ 2) ∧
-    ∃ c : MvPowerSeries (Fin 2) K, Integral c ∧ MvPowerSeries.constantCoeff c = -1 ∧
-      MvPowerSeries.X 1 ^ 2 * at1 0 ep - MvPowerSeries.X 0 ^ 2 * at1 1 ep = c * F * FI F i
+  Integral (ι := Unit) ep ∧ PowerSeries.constantCoeff ep = 1
+    ∧ PowerSeries.X ^ 2 * (1 + l ^ 2 * PowerSeries.subst l P)
+      = l ^ 2 * (ep + PowerSeries.C c0 * PowerSeries.X ^ 2)
+    ∧ ∃ c : MvPowerSeries (Fin 2) K,
+      Integral c ∧ MvPowerSeries.constantCoeff c = -1
+        ∧ MvPowerSeries.X 1 ^ 2 * at1 0 ep - MvPowerSeries.X 0 ^ 2 * at1 1 ep = c * F * FI F i
 
 end Norm
 

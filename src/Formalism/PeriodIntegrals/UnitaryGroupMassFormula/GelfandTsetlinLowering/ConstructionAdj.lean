@@ -14,8 +14,8 @@ namespace PI.WGL
 
 open Formalism.BasicNotions MvPolynomial PI.WGL.Adj
 
-theorem adjointBr_of (h3 : PI.HwIrred) (h5 : PI.SchurFock) (hN : Numbers) (hX : XiFacts) :
-    AdjointBr := by
+theorem adjointBr_of (h3 : PI.HwIrred) (h5 : PI.SchurFock) (hN : Numbers) (hX : XiFacts)
+    : AdjointBr := by
   intro n N h lam sg hI io hio hext hlast
   obtain ⟨hioV, hioEq⟩ := hio
   obtain ⟨hc0, hcB, -⟩ := hN n N h lam sg hI
@@ -36,47 +36,57 @@ theorem adjointBr_of (h3 : PI.HwIrred) (h5 : PI.SchurFock) (hN : Numbers) (hX : 
   have hT : ∀ s ∈ nablaSq ℂ n sg, ∀ f, normFock lam (io s) f = normFock sg s (br f) := by
     intro s hs f
     have e := hexp s hs
-    calc normFock lam (io s) f = normFock lam (io (∑ k, normFock sg s (b k) • b k)) f := by rw [← e]
+    calc
+      normFock lam (io s) f
+        = normFock lam (io (∑ k, normFock sg s (b k) • b k)) f := by rw [← e]
       _ = ∑ k, normFock sg s (b k) * normFock lam (io (b k)) f := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_sum]
-          simp only [map_smul]
-          rw [nf_sum_smul_left]
+        set_option synthInstance.maxHeartbeats 100000 in
+          rw [map_sum]
+        simp only [map_smul]
+        rw [nf_sum_smul_left]
       _ = normFock sg s (br f) := by
-          rw [hbr, nf_sum_smul_right]
-          refine Finset.sum_congr rfl fun k _ => ?_
-          rw [← nf_herm, mul_comm]
-  have hsep : ∀ x y, x ∈ nablaSq ℂ n sg → y ∈ nablaSq ℂ n sg →
-      (∀ s ∈ nablaSq ℂ n sg, normFock sg s x = normFock sg s y) → x = y := by
+        rw [hbr, nf_sum_smul_right]
+        refine Finset.sum_congr rfl fun k _ => ?_
+        rw [← nf_herm, mul_comm]
+  have hsep
+      : ∀ x y,
+        x ∈ nablaSq ℂ n sg → y ∈ nablaSq ℂ n sg
+          → (∀ s ∈ nablaSq ℂ n sg, normFock sg s x = normFock sg s y)
+          → x = y := by
     intro x y hx hy hxy
     have hd : x - y ∈ nablaSq ℂ n sg := Submodule.sub_mem _ hx hy
     have h0 : normFock sg (x - y) (x - y) = 0 := by rw [nf_sub_right, hxy _ hd, sub_self]
     exact sub_eq_zero.mp (nf_self_eq_zero sg _ h0)
 
-  have hB4 : ∀ (g : GL (Fin n) ℂ) (f : MvPolynomial (Fin N × Fin N) ℂ),
-      br (sqAct ℂ N lam (embGL ℂ n N h g) f) = sqAct ℂ n sg g (br f) := by
+  have hB4
+      : ∀ (g : GL (Fin n) ℂ) (f : MvPolynomial (Fin N × Fin N) ℂ),
+        br (sqAct ℂ N lam (embGL ℂ n N h g) f) = sqAct ℂ n sg g (br f) := by
     intro g f
     refine hsep _ _ (hbrV _) (sqAct_mem_nabla sg g _ (hbrV f)) fun s hs => ?_
     have hs' : sqAct ℂ n sg (gStar g) s ∈ nablaSq ℂ n sg := sqAct_mem_nabla sg _ s hs
     rw [← hT s hs, nf_sqAct_adj' lam (embGL ℂ n N h g) (io s) f, ← embGL_gStar, ← hioEq _ s hs,
       hT _ hs', nf_sqAct_adj' sg g s (br f)]
-  have hB5 : ∀ (a : ℂˣ) (f : MvPolynomial (Fin N × Fin N) ℂ),
-      br (sqAct ℂ N lam (lastGL ℂ N a) f) = ((a ^ degZ lam sg : ℂˣ) : ℂ) • br f := by
+  have hB5
+      : ∀ (a : ℂˣ) (f : MvPolynomial (Fin N × Fin N) ℂ),
+        br (sqAct ℂ N lam (lastGL ℂ N a) f) = ((a ^ degZ lam sg : ℂˣ) : ℂ) • br f := by
     intro a f
     refine hsep _ _ (hbrV _) (Submodule.smul_mem _ _ (hbrV f)) fun s hs => ?_
-    rw [← hT s hs, nf_sqAct_adj' lam (lastGL ℂ N a) (io s) f, ← lastGL_cU, hlast _ s hs, nf_smul_left,
-      nf_smul_right, hT s hs, cU_zpow_val]
+    rw [← hT s hs, nf_sqAct_adj' lam (lastGL ℂ N a) (io s) f, ← lastGL_cU, hlast _ s hs,
+      nf_smul_left, nf_smul_right, hT s hs, cU_zpow_val]
 
   have hextV : extremal ℂ n sg ∈ nablaSq ℂ n sg := extremal_mem sg
   have hext0 : extremal ℂ n sg ≠ 0 := extremal_ne sg
   let Tm : Module.End ℂ (nablaSq ℂ n sg) :=
-    LinearMap.codRestrict (nablaSq ℂ n sg) ((br ∘ₗ io) ∘ₗ (nablaSq ℂ n sg).subtype) (fun x => hbrV _)
+    LinearMap.codRestrict (nablaSq ℂ n sg) ((br ∘ₗ io) ∘ₗ (nablaSq ℂ n sg).subtype)
+      (fun x => hbrV _)
   haveI : FiniteDimensional ℂ (nablaSq ℂ n sg) := PI.WHw.bC_fd n n sg.natW
   haveI : Nontrivial (nablaSq ℂ n sg) :=
     ⟨⟨⟨_, hextV⟩, 0, fun h0 => hext0 (congrArg Subtype.val h0)⟩⟩
   obtain ⟨κ, hκ⟩ := Module.End.exists_eigenvalue Tm
   obtain ⟨v, hv⟩ := hκ.exists_hasEigenvector
-  have hv1 : br (io (v : MvPolynomial (Fin n × Fin n) ℂ)) = κ • (v : MvPolynomial (Fin n × Fin n) ℂ) := by
+  have hv1
+      : br (io (v : MvPolynomial (Fin n × Fin n) ℂ))
+        = κ • (v : MvPolynomial (Fin n × Fin n) ℂ) := by
     have := Module.End.HasEigenvector.apply_eq_smul hv
     exact congrArg Subtype.val this
   have hv0 : (v : MvPolynomial (Fin n × Fin n) ℂ) ≠ 0 := fun h0 => hv.2 (Subtype.ext h0)
@@ -109,13 +119,13 @@ theorem adjointBr_of (h3 : PI.HwIrred) (h5 : PI.SchurFock) (hN : Numbers) (hX : 
       exact this.symm
     intro s hs
     rw [hT s hs, hall s hs, nf_smul_right, hK]
-  have hKre : K.re = ‖((cBr h lam sg : ℤ) : ℂ)‖ ^ 2 * (normFock lam (xi ℂ h lam sg) (xi ℂ h lam sg)).re := by
+  have hKre
+      : K.re
+        = ‖((cBr h lam sg : ℤ) : ℂ)‖ ^ 2 * (normFock lam (xi ℂ h lam sg) (xi ℂ h lam sg)).re := by
     rw [hKdef, hext, PI.GTS.re_normFock_smul]
   have hKreal : K = ((K.re : ℝ) : ℂ) := by rw [hKdef]; exact nf_self_eq_re lam _
-  have hcpos : 0 < ‖((cBr h lam sg : ℤ) : ℂ)‖ := by
-    rw [norm_pos_iff]; exact_mod_cast hc0
-  have hKpos : 0 < K.re := by
-    rw [hKre]; exact mul_pos (pow_pos hcpos 2) (nf_self_re_pos lam _ hxi0)
+  have hcpos : 0 < ‖((cBr h lam sg : ℤ) : ℂ)‖ := by rw [norm_pos_iff]; exact_mod_cast hc0
+  have hKpos : 0 < K.re := by rw [hKre]; exact mul_pos (pow_pos hcpos 2) (nf_self_re_pos lam _ hxi0)
   have hKle : K.re ≤ brBd h lam sg ^ 2 := by
     have hc2 : ‖((cBr h lam sg : ℤ) : ℂ)‖ ^ 2 ≤ cBd h lam sg ^ 2 := by
       have hcn : ‖((cBr h lam sg : ℤ) : ℂ)‖ = |((cBr h lam sg : ℤ) : ℝ)| := by
@@ -128,15 +138,13 @@ theorem adjointBr_of (h3 : PI.HwIrred) (h5 : PI.SchurFock) (hN : Numbers) (hX : 
     rw [hKre, hbb]
     exact mul_le_mul hc2 hSF (nf_self_re_nonneg lam _) (sq_nonneg _)
   refine ⟨?_, br, ⟨?_, ?_, ?_, ?_, ?_⟩, ?_⟩
-  ·
-    intro s hs
+  · intro s hs
     rw [hnorm s hs, hKreal, Complex.re_ofReal_mul]
     exact mul_le_mul_of_nonneg_right hKle (nf_self_re_nonneg sg s)
-  ·
-    intro f _
-    rw [hdel_sg]; exact hbrV f
-  ·
-    refine ⟨io (extremal ℂ n sg), ?_, ?_⟩
+  · intro f _
+    rw [hdel_sg]
+    exact hbrV f
+  · refine ⟨io (extremal ℂ n sg), ?_, ?_⟩
     · rw [hdel_lam]; exact hioV _ hextV
     · intro h0
       have := hT _ hextV (io (extremal ℂ n sg))
@@ -144,14 +152,11 @@ theorem adjointBr_of (h3 : PI.HwIrred) (h5 : PI.SchurFock) (hN : Numbers) (hX : 
       rw [← hKdef] at this
       rw [this] at hKpos
       simp at hKpos
-  ·
-    intro g f _
+  · intro g f _
     exact hB4 g f
-  ·
-    intro a f _
+  · intro a f _
     exact hB5 a f
-  ·
-    intro f _
+  · intro f _
     set u := br f with hu
     have huV : u ∈ nablaSq ℂ n sg := hbrV f
     have hTu : normFock lam (io u) f = normFock sg u u := hT u huV f
@@ -159,7 +164,8 @@ theorem adjointBr_of (h3 : PI.HwIrred) (h5 : PI.SchurFock) (hN : Numbers) (hX : 
     have hnA : ‖normFock sg u u‖ = (normFock sg u u).re := by
       conv_lhs => rw [nf_self_eq_re sg u]
       exact Complex.norm_of_nonneg (nf_self_re_nonneg sg u)
-    rw [nf_herm lam (io u) f, hTu, norm_star, hnA, hnorm u huV, hKreal, Complex.re_ofReal_mul] at hCS
+    rw [nf_herm lam (io u) f, hTu, norm_star, hnA, hnorm u huV, hKreal, Complex.re_ofReal_mul]
+      at hCS
     have hA := nf_self_re_nonneg sg u
     have hF := nf_self_re_nonneg lam f
     have hAle : (normFock sg u u).re ≤ K.re * (normFock lam f f).re := by
@@ -167,10 +173,11 @@ theorem adjointBr_of (h3 : PI.HwIrred) (h5 : PI.SchurFock) (hN : Numbers) (hX : 
       · refine le_of_mul_le_mul_left ?_ hApos
         nlinarith
       · rw [← hA0]; exact mul_nonneg hKpos.le hF
-    calc (normFock sg u u).re ≤ K.re * (normFock lam f f).re := hAle
+    calc
+      (normFock sg u u).re
+        ≤ K.re * (normFock lam f f).re := hAle
       _ ≤ brBd h lam sg ^ 2 * (normFock lam f f).re := mul_le_mul_of_nonneg_right hKle hF
-  ·
-    intro s hs f _
+  · intro s hs f _
     exact hT s hs f
 
 end PI.WGL

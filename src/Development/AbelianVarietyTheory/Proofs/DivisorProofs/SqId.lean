@@ -8,25 +8,44 @@ namespace GlobalTheory.SquareDistanceExpansion
 
 open Matrix
 
-theorem expand {R : Type} [CommRing R] {n : ℕ} (X Y X' Y' : Matrix (Fin n) (Fin n) R) :
-    (1 + X + Y) * (1 + X' + Y') = 1 + X + Y + X' + Y' + X * X' + X * Y' + Y * X' + Y * Y' := by
+theorem expand {R : Type} [CommRing R] {n : ℕ} (X Y X' Y' : Matrix (Fin n) (Fin n) R)
+    : (1 + X + Y) * (1 + X' + Y') = 1 + X + Y + X' + Y' + X * X' + X * Y' + Y * X' + Y * Y' := by
   noncomm_ring
 
-theorem sq_id {R : Type} [CommRing R] {d : ℕ} (H H' : Matrix (Fin d) (Fin d) R) :
-    H * H' - 1 = (H - 1) + (H' - 1) + (H - 1) * (H' - 1) := by
+theorem sq_id {R : Type} [CommRing R] {d : ℕ} (H H' : Matrix (Fin d) (Fin d) R)
+    : H * H' - 1 = (H - 1) + (H' - 1) + (H - 1) * (H' - 1) := by
   noncomm_ring
 
-theorem prod_eq {R : Type} [CommRing R] {n d : ℕ} (a c : Matrix (Fin n) (Fin d) R)
-    (α γ : Matrix (Fin d) (Fin n) R) (M N : Matrix (Fin d) (Fin d) R) :
-    a * M * α * (c * N * γ) = a * M * (α * c) * N * γ := by
+theorem prod_eq
+    {R : Type} [CommRing R]
+    {n d : ℕ} (a c : Matrix (Fin n) (Fin d) R) (α γ : Matrix (Fin d) (Fin n) R)
+    (M N : Matrix (Fin d) (Fin d) R)
+    : a * M * α * (c * N * γ) = a * M * (α * c) * N * γ := by
   simp only [Matrix.mul_assoc]
 
-theorem dist {R : Type} [CommRing R] {n d : ℕ} (a : Matrix (Fin n) (Fin d) R)
-    (α : Matrix (Fin d) (Fin n) R) (A B : Matrix (Fin d) (Fin d) R) :
-    a * (A + B + A * B) * α = a * A * α + a * B * α + a * A * B * α := by
+theorem dist
+    {R : Type} [CommRing R]
+    {n d : ℕ}
+    (a : Matrix (Fin n) (Fin d) R) (α : Matrix (Fin d) (Fin n) R) (A B : Matrix (Fin d) (Fin d) R)
+    : a * (A + B + A * B) * α = a * A * α + a * B * α + a * A * B * α := by
   simp only [Matrix.mul_add, Matrix.add_mul, Matrix.mul_assoc]
 
-theorem main : (let d1 : {R : Type} → [CommRing R] → {n d : ℕ} → Matrix (Fin n) (Fin d) R → Matrix (Fin n) (Fin d) R → Matrix (Fin d) (Fin n) R → Matrix (Fin d) (Fin n) R → Matrix (Fin d) (Fin d) R → Matrix (Fin d) (Fin d) R → Matrix (Fin n) (Fin n) R := @(fun {R : Type} [CommRing R] {n d : ℕ} (a b : Matrix (Fin n) (Fin d) R) (α β : Matrix (Fin d) (Fin n) R) (H K : Matrix (Fin d) (Fin d) R) ↦ (1 : Matrix (Fin n) (Fin n) R) + a * (H - (1 : Matrix (Fin d) (Fin d) R)) * α + b * (K - (1 : Matrix (Fin d) (Fin d) R)) * β); ∀ {R : Type} [inst : CommRing R] {n d : ℕ} {a b : Matrix (Fin n) (Fin d) R} {α β : Matrix (Fin d) (Fin n) R}, α * a = (1 : Matrix (Fin d) (Fin d) R) → β * b = (1 : Matrix (Fin d) (Fin d) R) → α * b = (0 : Matrix (Fin d) (Fin d) R) → β * a = (0 : Matrix (Fin d) (Fin d) R) → ∀ (H K H' K' : Matrix (Fin d) (Fin d) R), d1 a b α β H K * d1 a b α β H' K' = d1 a b α β (H * H') (K * K')) := by
+theorem main
+    : (let d1
+           : {R : Type} → [CommRing R] → {n d : ℕ} → Matrix (Fin n) (Fin d) R
+             → Matrix (Fin n) (Fin d) R → Matrix (Fin d) (Fin n) R → Matrix (Fin d) (Fin n) R
+             → Matrix (Fin d) (Fin d) R → Matrix (Fin d) (Fin d) R
+             → Matrix (Fin n) (Fin n) R :=
+         @(fun {R : Type} [CommRing R] {n d : ℕ} (a b : Matrix (Fin n) (Fin d) R)
+             (α β : Matrix (Fin d) (Fin n) R) (H K : Matrix (Fin d) (Fin d) R) ↦
+           (1 : Matrix (Fin n) (Fin n) R) + a * (H - (1 : Matrix (Fin d) (Fin d) R)) * α
+             + b * (K - (1 : Matrix (Fin d) (Fin d) R)) * β)
+       ∀ {R : Type} [inst : CommRing R] {n d : ℕ} {a b : Matrix (Fin n) (Fin d) R}
+           {α β : Matrix (Fin d) (Fin n) R},
+         α * a = (1 : Matrix (Fin d) (Fin d) R) → β * b = (1 : Matrix (Fin d) (Fin d) R)
+           → α * b = (0 : Matrix (Fin d) (Fin d) R) → β * a = (0 : Matrix (Fin d) (Fin d) R)
+           → ∀ (H K H' K' : Matrix (Fin d) (Fin d) R),
+             d1 a b α β H K * d1 a b α β H' K' = d1 a b α β (H * H') (K * K')) := by
   dsimp only
   intro R _ n d a b α β hαa hβb hαb hβa H K H' K'
   have e1 := prod_eq a a α α (H - 1) (H' - 1)

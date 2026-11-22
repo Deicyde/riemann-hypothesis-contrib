@@ -6,10 +6,13 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 
 namespace GlobalTheory.LowerIntegralMul
 
-theorem intLow_mul {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E] [Algebra F E]
-    [TopologicalSpace E] [MeasurableSpace E] (Mp : Formalism.MainNotions.S.Loc.Model F E) {n : ℕ}
-    {l l' : Matrix (Fin n) (Fin n) E} (hl : Formalism.MainNotions.S.TieN.IntLow Mp l) (hl' : Formalism.MainNotions.S.TieN.IntLow Mp l') :
-    Formalism.MainNotions.S.TieN.IntLow Mp (l * l') := by
+theorem intLow_mul
+    {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E] [Algebra F E]
+    [TopologicalSpace E] [MeasurableSpace E]
+    (Mp : Formalism.MainNotions.S.Loc.Model F E)
+    {n : ℕ} {l l' : Matrix (Fin n) (Fin n) E} (hl : Formalism.MainNotions.S.TieN.IntLow Mp l)
+    (hl' : Formalism.MainNotions.S.TieN.IntLow Mp l')
+    : Formalism.MainNotions.S.TieN.IntLow Mp (l * l') := by
   unfold Formalism.MainNotions.S.TieN.IntLow at *
   obtain ⟨h1, h2, h3⟩ := hl
   obtain ⟨h1', h2', h3'⟩ := hl'

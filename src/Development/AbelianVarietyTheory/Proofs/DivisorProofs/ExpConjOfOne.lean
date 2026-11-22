@@ -10,8 +10,11 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsKsFor
 set_option autoImplicit false
 noncomputable section
 open NumberField IsDedekindDomain
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.Pj Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Cx
-open Formalism.IndefR.FWT GlobalTheory.BigTop GlobalTheory.OntoChain GlobalTheory.RealIndexBound GlobalTheory.OnTies GlobalTheory.SeriesTie
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.Pj
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Cx
+open Formalism.IndefR.FWT GlobalTheory.BigTop GlobalTheory.OntoChain GlobalTheory.RealIndexBound
+  GlobalTheory.OnTies GlobalTheory.SeriesTie
 open GlobalTheory.BigOn GlobalTheory.BigOn.Exp Formalism.L2.Theta GlobalTheory.ExportSeries
 open scoped TensorProduct
 set_option synthInstance.maxHeartbeats 400000
@@ -20,19 +23,27 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.BigOn.Exp
 
-theorem conj_sum_zero (D : D7) (Γ : Type) [Group Γ] [Fintype Γ] (Pl0 I0 T : Type)
-    (A3 : FamIn3 D.what₂.LL Γ Pl0 I0 (List ℕ) T D.R.m) (Ks : Type) [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
-    (Rl : RealDat3 D A3 Ks) (cG : G0 Rl.Pg D.R.r ≃* G0g D.nd) (S : NX.RatDat D.ntw) (YS : NX.NExpRealS Rl cG S)
+theorem conj_sum_zero
+    (D : D7)
+    (Γ : Type) [Group Γ] [Fintype Γ]
+    (Pl0 I0 T : Type) (A3 : FamIn3 D.what₂.LL Γ Pl0 I0 (List ℕ) T D.R.m)
+    (Ks : Type) [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+    (Rl : RealDat3 D A3 Ks) (cG : G0 Rl.Pg D.R.r ≃* G0g D.nd)
+    (S : NX.RatDat D.ntw) (YS : NX.NExpRealS Rl cG S)
     (v₀ : ∀ (j : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), (Rl.MW j σ).Vec) (j : Fin D.R.m)
-    (hU : Rl.toRealDat.LUnif) (hW : Rl.toRealDat.models_HW) (hv : FWT.IsChosenExtremalVector Rl.toRealDat j (sg0 D A3.A) (v₀ j _))
-    (hK : (S.A ((j : ℕ) + 1)).IsKsForm) (τ : ℂ ≃+* ℂ) (hτ : ∀ y, τ (Formalism.L2.Host.embLL0 D y) = Formalism.L2.Host.embLL0 D y)
+    (hU : Rl.toRealDat.LUnif) (hW : Rl.toRealDat.models_HW)
+    (hv : FWT.IsChosenExtremalVector Rl.toRealDat j (sg0 D A3.A) (v₀ j _))
+    (hK : (S.A ((j : ℕ) + 1)).IsKsForm)
+    (τ : ℂ ≃+* ℂ) (hτ : ∀ y, τ (Formalism.L2.Host.embLL0 D y) = Formalism.L2.Host.embLL0 D y)
     (n : ℕ) (c : Fin n → ℂ) (g : Fin n → NX.FmK S ((j : ℕ) + 1))
-    (h0 : ∑ k, c k • evW YS v₀ j (g k).val = 0) : ∑ k, τ (c k) • evW YS v₀ j (g k).val = 0 := by
+    (h0 : ∑ k, c k • evW YS v₀ j (g k).val = 0)
+    : ∑ k, τ (c k) • evW YS v₀ j (g k).val = 0 := by
   classical
-  let L : (Rl.HW j (sg0 D A3.A)).H →ₗ[ℂ] (GA D (Wc D j) → ℂ) :=
-    { toFun := fun x => (Rl.HW j (sg0 D A3.A)).e x (v₀ j _)
-      map_add' := fun x y => by rw [map_add (f := _)]; rfl
-      map_smul' := fun c x => by rw [map_smul]; rfl }
+  let L : (Rl.HW j (sg0 D A3.A)).H →ₗ[ℂ] (GA D (Wc D j) → ℂ) := {
+    toFun := fun x => (Rl.HW j (sg0 D A3.A)).e x (v₀ j _)
+    map_add' := fun x y => by rw [map_add (f := _)]; rfl
+    map_smul' := fun c x => by rw [map_smul]; rfl
+  }
   have hL : LinearMap.ker L = ⊥ :=
     LinearMap.ker_eq_bot.2 fun x y h => GlobalTheory.LiftScalarCompare.eval_inj hW hv h
   obtain ⟨m, bb, -, hKs, hspan, hLL, -⟩ := hK
@@ -56,8 +67,10 @@ theorem conj_sum_zero (D : D7) (Γ : Type) [Group Γ] [Fintype Γ] (Pl0 I0 T : T
       rw [Submodule.coe_sum, map_sum]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [Submodule.coe_smul, ← algebraMap_smul D.what₂.LL, evW_smul, hbK]
-  have hexp : ∀ d : Fin n → ℂ, ∑ k, d k • evW YS v₀ j (g k).val =
-      ∑ a, (∑ k, d k * σ (bK.repr (g k) a)) • φ a := fun d => by
+  have hexp
+      : ∀ d : Fin n → ℂ,
+        ∑ k, d k • evW YS v₀ j (g k).val
+          = ∑ a, (∑ k, d k * σ (bK.repr (g k) a)) • φ a := fun d => by
     simp only [hg, Finset.smul_sum, smul_smul, Finset.sum_smul]
     exact Finset.sum_comm
   have hz : ∀ a, ∑ k, c k * σ (bK.repr (g k) a) = 0 := fun a =>

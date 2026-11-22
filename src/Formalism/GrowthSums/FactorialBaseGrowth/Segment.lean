@@ -65,16 +65,16 @@ theorem segment_bound_holds : SegmentBound := by
       rw [hD, show a + (b + n - a) = b + n by omega, Nat.add_mod_right]
       exact Nat.mod_eq_of_lt (by omega)
   refine ⟨hDG.1, hDG.2, ?_⟩
-  calc (T ∩ (range (D + 1)).image (fun j => (a + j) % n)).card
-      ≤ (T ∩ window n a G').card := by
-        apply card_le_card
-        apply inter_subset_inter_left
-        unfold window
-        apply image_subset_image
-        have h3 := hDG.1
-        intro x hx
-        rw [mem_range] at hx ⊢
-        omega
+  calc
+    (T ∩ (range (D + 1)).image (fun j => (a + j) % n)).card ≤ (T ∩ window n a G').card := by
+      apply card_le_card
+      apply inter_subset_inter_left
+      unfold window
+      apply image_subset_image
+      have h3 := hDG.1
+      intro x hx
+      rw [mem_range] at hx ⊢
+      omega
     _ ≤ N₁ := hInt a (by omega)
 
 end Formalism.GrowthSums

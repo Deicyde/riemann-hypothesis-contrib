@@ -23,8 +23,8 @@ theorem proof : ChartParAlgebraic.Statement := by
     algebraMap K L (u (p.1, p.2.1))) with hB
   have hzB : ∀ m, z m ∈ B := fun m =>
     Subalgebra.algebraMap_mem B (⟨z m, Algebra.subset_adjoin ⟨m, rfl⟩⟩ : A₀)
-  have hwB : ∀ p : Fin e × {j : Fin n // j ≠ j₀}, algebraMap K L (u (p.1, p.2.1)) ∈ B :=
-    fun p => Algebra.subset_adjoin ⟨p, rfl⟩
+  have hwB : ∀ p : Fin e × {j : Fin n // j ≠ j₀}, algebraMap K L (u (p.1, p.2.1)) ∈ B := fun p =>
+    Algebra.subset_adjoin ⟨p, rfl⟩
   have hFB : ∀ c : F, algebraMap F L c ∈ B := fun c => by
     rw [IsScalarTower.algebraMap_apply F A₀ L]
     exact Subalgebra.algebraMap_mem B _
@@ -34,8 +34,10 @@ theorem proof : ChartParAlgebraic.Statement := by
     · rw [hj]
       have hsum : ∑ j, algebraMap K L (u (i, j)) * z j = 0 := by
         simp only [hzm, ← mul_assoc, ← Finset.sum_mul, hrel i, zero_mul]
-      have h1 := Finset.add_sum_erase Finset.univ (fun j => algebraMap K L (u (i, j)) * z j)
-        (Finset.mem_univ j₀)
+      have h1 :=
+        Finset.add_sum_erase Finset.univ
+          (fun j => algebraMap K L (u (i, j)) * z j)
+          (Finset.mem_univ j₀)
       simp only [hz0, mul_one] at h1
       rw [hsum, ← eq_neg_iff_add_eq_zero] at h1
       rw [h1]

@@ -15,10 +15,14 @@ open scoped Classical
 
 namespace GlobalTheory.Shin
 
-theorem clifford_prime_index : ∀ (G Γ : Type) [Group G] [Finite G] [Group Γ] [Fintype Γ] (φ : Γ →* MulAut G) (s : Γ),
-    (Nat.card Γ).Prime → s ≠ 1 → ∀ χ : G ⋊[φ] Γ → ℂ, IsIrrChar ℂ ℂ χ →
-      (∀ δ, χ (inl δ * inr s) = 0) ∨ (IsIrrChar ℂ ℂ (fun g => χ (inl g)) ∧
-        ∑ᶠ g, χ (inl g * inr s) * star (χ (inl g * inr s)) = (Nat.card G : ℂ)) := by
+theorem clifford_prime_index
+    : ∀ (G Γ : Type) [Group G] [Finite G] [Group Γ] [Fintype Γ] (φ : Γ →* MulAut G) (s : Γ),
+      (Nat.card Γ).Prime → s ≠ 1
+        → ∀ χ : G ⋊[φ] Γ → ℂ,
+          IsIrrChar ℂ ℂ χ
+            → (∀ δ, χ (inl δ * inr s) = 0)
+              ∨ (IsIrrChar ℂ ℂ (fun g => χ (inl g))
+                ∧ ∑ᶠ g, χ (inl g * inr s) * star (χ (inl g * inr s)) = (Nat.card G : ℂ)) := by
   intro G Γ _ _ _ _ φ s hl hs χ hχ
   haveI : Finite (G ⋊[φ] Γ) := Finite.of_equiv _ SemidirectProduct.equivProd.symm
   haveI := Fintype.ofFinite (G ⋊[φ] Γ)
@@ -36,7 +40,8 @@ theorem clifford_prime_index : ∀ (G Γ : Type) [Group G] [Finite G] [Group Γ]
     rw [htop]
     trivial
   have hl0 : Nat.card Γ ≠ 0 := hl.ne_zero
-  have hζ : IsPrimitiveRoot (Complex.exp (2 * Real.pi * Complex.I / (Nat.card Γ : ℂ))) (Nat.card Γ) :=
+  have hζ
+      : IsPrimitiveRoot (Complex.exp (2 * Real.pi * Complex.I / (Nat.card Γ : ℂ))) (Nat.card Γ) :=
     Complex.isPrimitiveRoot_exp _ hl0
   obtain ⟨η, hη1, hηs, hF⟩ := GlobalTheory.Shin.CosetFourier.fourier_coset_sums G Γ φ s hgen _ hζ
   set ζ := Complex.exp (2 * Real.pi * Complex.I / (Nat.card Γ : ℂ)) with hζdef
@@ -64,15 +69,18 @@ theorem clifford_prime_index : ∀ (G Γ : Type) [Group G] [Finite G] [Group Γ]
     intro a
     have h := isChar_mul_complex hχchar (isChar_monoidHom_complex (η ^ a))
     convert h using 1
-  have hψnorm : ∀ a : ℕ, ∑ᶠ x, (fun x => χ x * (η x : ℂ) ^ a) x * star ((fun x => χ x * (η x : ℂ) ^ a) x) =
-      (Nat.card (G ⋊[φ] Γ) : ℂ) := by
+  have hψnorm
+      : ∀ a : ℕ,
+        ∑ᶠ x, (fun x => χ x * (η x : ℂ) ^ a) x * star ((fun x => χ x * (η x : ℂ) ^ a) x)
+          = (Nat.card (G ⋊[φ] Γ) : ℂ) := by
     intro a
     rw [← hnorm]
     congr 1
     funext x
     dsimp only
     rw [star_mul, star_pow]
-    calc χ x * (η x : ℂ) ^ a * (star (η x : ℂ) ^ a * star (χ x))
+    calc
+      χ x * (η x : ℂ) ^ a * (star (η x : ℂ) ^ a * star (χ x))
         = χ x * star (χ x) * ((η x : ℂ) * star (η x : ℂ)) ^ a := by ring
       _ = χ x * star (χ x) := by rw [hηstar, one_pow, mul_one]
   have hψirr : ∀ a : ℕ, IsIrrChar ℂ ℂ (fun x => χ x * (η x : ℂ) ^ a) := fun a =>
@@ -89,8 +97,8 @@ theorem clifford_prime_index : ∀ (G Γ : Type) [Group G] [Finite G] [Group Γ]
     exact (mul_eq_zero.1 h2).resolve_right (sub_ne_zero.2 hζa)
   · right
     push_neg at hcase
-    have hNa : ∀ a ∈ Finset.range (Nat.card Γ), a ≠ 0 →
-        ∑ᶠ x, χ x * star (χ x * (η x : ℂ) ^ a) = 0 := by
+    have hNa
+        : ∀ a ∈ Finset.range (Nat.card Γ), a ≠ 0 → ∑ᶠ x, χ x * star (χ x * (η x : ℂ) ^ a) = 0 := by
       intro a ha ha0
       have hne := hcase a (Nat.pos_of_ne_zero ha0) (Finset.mem_range.1 ha)
       have hp := pair_eq_zero_of_isIrrChar_ne _ χ _ hχ (hψirr a) (Ne.symm hne)
@@ -105,9 +113,13 @@ theorem clifford_prime_index : ∀ (G Γ : Type) [Group G] [Finite G] [Group Γ]
       simpa using hnorm
     have h0mem : 0 ∈ Finset.range (Nat.card Γ) := Finset.mem_range.2 (Nat.pos_of_ne_zero hl0)
     obtain ⟨hA, hB⟩ := hF χ χ
-    rw [Finset.sum_eq_single 0 (fun a ha ha0 => hNa a ha ha0) (fun h => absurd h0mem h), hN0, hH] at hA
-    rw [Finset.sum_eq_single 0 (fun a ha ha0 => by rw [hNa a ha ha0, mul_zero]) (fun h => absurd h0mem h),
-      pow_zero, one_mul, hN0, hH] at hB
+    rw [Finset.sum_eq_single 0 (fun a ha ha0 => hNa a ha ha0) (fun h => absurd h0mem h), hN0, hH]
+      at hA
+    rw [Finset.sum_eq_single 0
+          (fun a ha ha0 => by rw [hNa a ha ha0, mul_zero])
+          (fun h => absurd h0mem h),
+        pow_zero, one_mul, hN0, hH]
+      at hB
     have hlc : (Nat.card Γ : ℂ) ≠ 0 := Nat.cast_ne_zero.2 hl0
     push_cast at hA hB
     have hSG : ∑ᶠ g, χ (inl g) * star (χ (inl g)) = (Nat.card G : ℂ) :=

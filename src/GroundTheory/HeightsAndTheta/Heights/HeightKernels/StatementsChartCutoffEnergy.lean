@@ -19,10 +19,12 @@ def chartCutoff {D : ℕ} (k : ℕ) (y : Fin D → ℂ) : ℝ :=
   Real.smoothTransition (2 - (∑ i, ‖y i‖ ^ 2) / ((k : ℝ) + 1) ^ 2)
 
 def ChartCutoffEnergy.Statement : Prop :=
-  ∀ (n : ℕ) (T : Fin n → Matrix (Fin (n + 1 + 1)) (Fin (n + 1 + 1)) ℂ), (∀ i, (T i).PosDef) →
-    ∃ K : ℝ, ∀ k : ℕ,
-      ∫ y : Fin (n + 1) → ℂ,
-        ReciprocityTheory.AnForm.A.gradDens (fun i => hermChartPot (T i)) (chartCutoff k) (chartCutoff k) y ≤ K
+  ∀ (n : ℕ) (T : Fin n → Matrix (Fin (n + 1 + 1)) (Fin (n + 1 + 1)) ℂ),
+    (∀ i, (T i).PosDef)
+      → ∃ K : ℝ, ∀ k : ℕ,
+        ∫ y : Fin (n + 1) → ℂ,
+          ReciprocityTheory.AnForm.A.gradDens (fun i => hermChartPot (T i)) (chartCutoff k) (chartCutoff k) y
+          ≤ K
 
 end
 

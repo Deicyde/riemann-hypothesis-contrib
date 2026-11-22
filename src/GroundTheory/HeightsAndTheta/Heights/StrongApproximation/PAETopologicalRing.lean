@@ -13,14 +13,15 @@ namespace GroundTheory.Heights₂.Heights
 
 namespace StrongApprox
 
-open Matrix NumberField IsDedekindDomain TensorProduct Topology ReciprocityTheory.ChartRestriction.G.SA
+open Matrix NumberField IsDedekindDomain TensorProduct Topology
+  ReciprocityTheory.ChartRestriction.G.SA
 
 section
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem AETopologicalRing.aut_mul_self (c : E ≃ₐ[F] E) (h2 : Module.finrank F E = 2) (hc : c ≠ 1) :
-    c * c = 1 := by
+theorem AETopologicalRing.aut_mul_self (c : E ≃ₐ[F] E) (h2 : Module.finrank F E = 2) (hc : c ≠ 1)
+    : c * c = 1 := by
   classical
   have : FiniteDimensional F E := Module.finite_of_finrank_eq_succ h2
   by_contra h
@@ -33,8 +34,8 @@ theorem AETopologicalRing.aut_mul_self (c : E ≃ₐ[F] E) (h2 : Module.finrank 
   have := AlgEquiv.card_le (F := F) (K := E)
   omega
 
-theorem AETopologicalRing.exists_anti (c : E ≃ₐ[F] E) (h2 : Module.finrank F E = 2) (hc : c ≠ 1) :
-    ∃ δ : E, c δ = -δ ∧ δ ≠ 0 := by
+theorem AETopologicalRing.exists_anti (c : E ≃ₐ[F] E) (h2 : Module.finrank F E = 2) (hc : c ≠ 1)
+    : ∃ δ : E, c δ = -δ ∧ δ ≠ 0 := by
   have hcc := AETopologicalRing.aut_mul_self c h2 hc
   obtain ⟨x, hx⟩ : ∃ x, c x ≠ x := by
     by_contra h
@@ -45,10 +46,10 @@ theorem AETopologicalRing.exists_anti (c : E ≃ₐ[F] E) (h2 : Module.finrank F
   rw [map_sub, hx2]
   ring
 
-
 omit [NumberField F] in
-theorem AETopologicalRing.linearIndependent_one_anti (c : E ≃ₐ[F] E) {δ : E} (hδ : c δ = -δ)
-    (h0 : δ ≠ 0) : LinearIndependent F ![(1 : E), δ] := by
+theorem AETopologicalRing.linearIndependent_one_anti
+    (c : E ≃ₐ[F] E) {δ : E} (hδ : c δ = -δ) (h0 : δ ≠ 0)
+    : LinearIndependent F ![(1 : E), δ] := by
   rw [LinearIndependent.pair_iff]
   intro s t hst
   rw [Algebra.smul_def, Algebra.smul_def, mul_one] at hst
@@ -62,13 +63,12 @@ theorem AETopologicalRing.linearIndependent_one_anti (c : E ≃ₐ[F] E) {δ : E
   simp only [map_zero, zero_mul, add_zero] at hst
   exact ⟨(map_eq_zero_iff _ (algebraMap F E).injective).1 hst, rfl⟩
 
-def AETopologicalRing.sigALinear (c : E ≃ₐ[F] E) :
-    AE F E →ₗ[FiniteAdeleRing (𝓞 F) F] AE F E :=
+def AETopologicalRing.sigALinear (c : E ≃ₐ[F] E) : AE F E →ₗ[FiniteAdeleRing (𝓞 F) F] AE F E :=
   LinearMap.baseChange (FiniteAdeleRing (𝓞 F) F) c.toLinearMap
 
 omit [NumberField E] in
-theorem AETopologicalRing.sigALinear_apply (c : E ≃ₐ[F] E) (a : AE F E) :
-    AETopologicalRing.sigALinear c a = sigA c a := by
+theorem AETopologicalRing.sigALinear_apply (c : E ≃ₐ[F] E) (a : AE F E)
+    : AETopologicalRing.sigALinear c a = sigA c a := by
   induction a using TensorProduct.induction_on with
   | zero => simp
   | tmul x y => rfl
@@ -76,12 +76,12 @@ theorem AETopologicalRing.sigALinear_apply (c : E ≃ₐ[F] E) (a : AE F E) :
 
 end
 
-
 open scoped RestrictedProduct in
-theorem AETopologicalRing.t2Space_finiteAdeleRing (F : Type) [Field F] [NumberField F] :
-    T2Space (FiniteAdeleRing (𝓞 F) F) :=
-  inferInstanceAs (T2Space (Πʳ v : HeightOneSpectrum (𝓞 F),
-    [v.adicCompletion F, v.adicCompletionIntegers F]))
+theorem AETopologicalRing.t2Space_finiteAdeleRing (F : Type) [Field F] [NumberField F]
+    : T2Space (FiniteAdeleRing (𝓞 F) F) :=
+  inferInstanceAs (T2Space
+    (Πʳ v : HeightOneSpectrum (𝓞 F),
+      [v.adicCompletion F, v.adicCompletionIntegers F]))
 
 theorem AETopologicalRing.proof : AETopologicalRing.Statement := by
   intro F E _ _ _ _ _ c h2 hc _ _
@@ -89,8 +89,9 @@ theorem AETopologicalRing.proof : AETopologicalRing.Statement := by
   have : IsTopologicalRing (AE F E) :=
     IsModuleTopology.isTopologicalRing (FiniteAdeleRing (𝓞 F) F) (AE F E)
   have hσ : Continuous (sigA c) := by
-    have := IsModuleTopology.continuous_of_linearMap (R := FiniteAdeleRing (𝓞 F) F)
-      (AETopologicalRing.sigALinear c)
+    have :=
+      IsModuleTopology.continuous_of_linearMap (R := FiniteAdeleRing (𝓞 F) F)
+        (AETopologicalRing.sigALinear c)
     convert this using 1
     funext a
     exact (AETopologicalRing.sigALinear_apply c a).symm
@@ -105,8 +106,10 @@ theorem AETopologicalRing.proof : AETopologicalRing.Statement := by
     simp [B, b, Algebra.TensorProduct.basis_apply]
     rfl
   have := AETopologicalRing.t2Space_finiteAdeleRing F
-  have : T2Space (AE F E) := T2Space.of_injective_continuous B.equivFun.injective
-    (IsModuleTopology.continuous_of_linearMap (R := FiniteAdeleRing (𝓞 F) F) B.equivFun.toLinearMap)
+  have : T2Space (AE F E) :=
+    T2Space.of_injective_continuous B.equivFun.injective
+      (IsModuleTopology.continuous_of_linearMap (R := FiniteAdeleRing (𝓞 F) F)
+        B.equivFun.toLinearMap)
   refine ⟨inferInstance, hσ, ⟨δ, hδ, fun a => ⟨(B.repr a 0, B.repr a 1), ?_, ?_⟩⟩, fun N J => ?_⟩
   · have := B.sum_repr a
     rw [Fin.sum_univ_two, hB0, hB1] at this
@@ -114,12 +117,20 @@ theorem AETopologicalRing.proof : AETopologicalRing.Statement := by
   · rintro ⟨p₁, p₂⟩ hp
     rw [hp, ← hB0, ← hB1]
     simp
-  · have hmul : Continuous (fun p : Matrix (Fin N) (Fin N) (AE F E) × Matrix (Fin N) (Fin N) (AE F E) =>
-        p.1 * p.2) := continuous_fst.matrix_mul continuous_snd
+  · have hmul : Continuous
+        (fun p : Matrix (Fin N) (Fin N) (AE F E) × Matrix (Fin N) (Fin N) (AE F E) => p.1 * p.2) :=
+      continuous_fst.matrix_mul continuous_snd
     have hform : Continuous (fun g : Matrix (Fin N) (Fin N) (AE F E) => gᵀ * J * g.map (sigA c)) :=
-      (continuous_id.matrix_transpose.matrix_mul continuous_const).matrix_mul (continuous_id.matrix_map hσ)
-    have hdet : Continuous (fun g : Matrix (Fin N) (Fin N) (AE F E) => g.det) := continuous_id.matrix_det
-    exact ⟨hmul, hform, hdet, (isClosed_eq hdet continuous_const).inter (isClosed_eq hform continuous_const)⟩
+      (continuous_id.matrix_transpose.matrix_mul continuous_const).matrix_mul
+        (continuous_id.matrix_map hσ)
+    have hdet : Continuous (fun g : Matrix (Fin N) (Fin N) (AE F E) => g.det) :=
+      continuous_id.matrix_det
+    exact ⟨
+      hmul,
+      hform,
+      hdet,
+      (isClosed_eq hdet continuous_const).inter (isClosed_eq hform continuous_const)
+    ⟩
 
 end StrongApprox
 

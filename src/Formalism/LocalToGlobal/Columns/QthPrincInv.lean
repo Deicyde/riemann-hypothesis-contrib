@@ -16,25 +16,31 @@ section Ext
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] (P : HeightOneSpectrum (𝓞 E)) {n c : ℕ}
 
-theorem qth_ext_close (g : Sp E n ≃ₗ[E] Sp E n) (N : ℕ) (hg : lqPrinc P N g) (i l : Fin (n + c)) :
-    P.valuation E ((((toGLm E (n + c) (twZrExt (c := c) g) : GL (Fin (n + c)) E) : Matrix (Fin (n + c)) (Fin (n + c)) E) - 1) i l) ≤
-      WithZero.exp (-(N : ℤ)) := by
-  have hcoe : ∀ W : Sp E (n + c) ≃ₗ[E] Sp E (n + c),
-      ((toGLm E (n + c) W : GL (Fin (n + c)) E) : Matrix (Fin (n + c)) (Fin (n + c)) E) =
-        LinearMap.toMatrix' (W : Sp E (n + c) →ₗ[E] Sp E (n + c)) := by
+theorem qth_ext_close (g : Sp E n ≃ₗ[E] Sp E n) (N : ℕ) (hg : lqPrinc P N g) (i l : Fin (n + c))
+    : P.valuation E
+        ((((toGLm E (n + c) (twZrExt (c := c) g) : GL (Fin (n + c)) E)
+              : Matrix (Fin (n + c)) (Fin (n + c)) E)
+            - 1)
+          i l)
+      ≤ WithZero.exp (-(N : ℤ)) := by
+  have hcoe
+      : ∀ W : Sp E (n + c) ≃ₗ[E] Sp E (n + c),
+        ((toGLm E (n + c) W : GL (Fin (n + c)) E) : Matrix (Fin (n + c)) (Fin (n + c)) E)
+          = LinearMap.toMatrix' (W : Sp E (n + c) →ₗ[E] Sp E (n + c)) := by
     intro W
-    simp only [toGLm, Matrix.GeneralLinearGroup.toLin, LinearMap.GeneralLinearGroup.generalLinearEquiv,
-      MulEquiv.trans_apply, MulEquiv.symm_symm, MulEquiv.symm_mk, MulEquiv.coe_mk, Equiv.coe_fn_symm_mk,
-      Units.coe_map, MonoidHom.coe_coe]
+    simp only [toGLm, Matrix.GeneralLinearGroup.toLin,
+      LinearMap.GeneralLinearGroup.generalLinearEquiv, MulEquiv.trans_apply, MulEquiv.symm_symm,
+      MulEquiv.symm_mk, MulEquiv.coe_mk, Equiv.coe_fn_symm_mk, Units.coe_map, MonoidHom.coe_coe]
     rfl
   set u : Fin (n + c) → E := Pi.single l 1 with hu0
   have hpi : ∀ y : Fin n → E, (Loc.inX E n c y) i = if h : (i : ℕ) < n then y ⟨i, h⟩ else 0 := by
     intro y
     simp only [Loc.inX, LinearMap.pi_apply]
     split_ifs <;> rfl
-  have hval : ((twZrExt (c := c) g) u) i =
-      Loc.inX E n c (g (LinearMap.funLeft E E (Fin.castAdd c) u)) i +
-        (u i - Loc.inX E n c (LinearMap.funLeft E E (Fin.castAdd c) u) i) := by
+  have hval
+      : ((twZrExt (c := c) g) u) i
+        = Loc.inX E n c (g (LinearMap.funLeft E E (Fin.castAdd c) u)) i
+          + (u i - Loc.inX E n c (LinearMap.funLeft E E (Fin.castAdd c) u) i) := by
     rw [twZrExt_apply]
     rfl
   rw [hcoe, Matrix.sub_apply, LinearMap.toMatrix'_apply, LinearEquiv.coe_coe, ← hu0, hval, hpi, hpi]
@@ -47,8 +53,9 @@ theorem qth_ext_close (g : Sp E n ≃ₗ[E] Sp E n) (N : ℕ) (hg : lqPrinc P N 
         ext j
         simp [hu0, LinearMap.funLeft_apply, Pi.single_apply, Fin.ext_iff]
       rw [hu']
-      have h1 : (1 : Matrix (Fin (n + c)) (Fin (n + c)) E) i l =
-          (1 : Matrix (Fin n) (Fin n) E) ⟨i, hi⟩ ⟨l, hl⟩ := by
+      have h1
+          : (1 : Matrix (Fin (n + c)) (Fin (n + c)) E) i l
+            = (1 : Matrix (Fin n) (Fin n) E) ⟨i, hi⟩ ⟨l, hl⟩ := by
         simp [Matrix.one_apply, Fin.ext_iff]
       rw [h1]
       have h2 := hg ⟨i, hi⟩ ⟨l, hl⟩
@@ -56,7 +63,8 @@ theorem qth_ext_close (g : Sp E n ≃ₗ[E] Sp E n) (N : ℕ) (hg : lqPrinc P N 
       exact h2
     · have hu' : LinearMap.funLeft E E (Fin.castAdd c) u = 0 := by
         ext j
-        simp only [hu0, LinearMap.funLeft_apply, Pi.single_apply, Pi.zero_apply, Function.comp_apply]
+        simp only [hu0, LinearMap.funLeft_apply, Pi.single_apply, Pi.zero_apply,
+          Function.comp_apply]
         rw [if_neg]
         intro h
         apply hl
@@ -76,8 +84,8 @@ theorem qth_ext_close (g : Sp E n ≃ₗ[E] Sp E n) (N : ℕ) (hg : lqPrinc P N 
     rw [h3, map_zero]
     exact zero_le'
 
-theorem qth_princ_inv {N : ℕ} (g : ↥(GLint E n P)) (hg : lqPrinc P N (g : Sp E n ≃ₗ[E] Sp E n)) :
-    lqPrinc P N ((g⁻¹ : ↥(GLint E n P)) : Sp E n ≃ₗ[E] Sp E n) := by
+theorem qth_princ_inv {N : ℕ} (g : ↥(GLint E n P)) (hg : lqPrinc P N (g : Sp E n ≃ₗ[E] Sp E n))
+    : lqPrinc P N ((g⁻¹ : ↥(GLint E n P)) : Sp E n ≃ₗ[E] Sp E n) := by
   unfold lqPrinc at hg ⊢
   intro i j
   set A := LinearMap.toMatrix' ((g : Sp E n ≃ₗ[E] Sp E n) : Sp E n →ₗ[E] Sp E n) with hA
@@ -85,8 +93,10 @@ theorem qth_princ_inv {N : ℕ} (g : ↥(GLint E n P)) (hg : lqPrinc P N (g : Sp
     ((((g⁻¹ : GLint E n P)) : Sp E n ≃ₗ[E] Sp E n) : Sp E n →ₗ[E] Sp E n) with hB
   have hBA : B * A = 1 := by
     rw [hA, hB, ← LinearMap.toMatrix'_comp]
-    have hc : ((((g⁻¹ : GLint E n P)) : Sp E n ≃ₗ[E] Sp E n) : Sp E n →ₗ[E] Sp E n).comp
-        ((g : Sp E n ≃ₗ[E] Sp E n) : Sp E n →ₗ[E] Sp E n) = LinearMap.id := by
+    have hc
+        : ((((g⁻¹ : GLint E n P)) : Sp E n ≃ₗ[E] Sp E n) : Sp E n →ₗ[E] Sp E n).comp
+            ((g : Sp E n ≃ₗ[E] Sp E n) : Sp E n →ₗ[E] Sp E n)
+          = LinearMap.id := by
       refine LinearMap.ext fun x => ?_
       have hx : ((((g⁻¹ * g : GLint E n P)) : Sp E n ≃ₗ[E] Sp E n)) x = x := by
         rw [inv_mul_cancel]
@@ -111,12 +121,12 @@ theorem qth_princ_inv {N : ℕ} (g : ↥(GLint E n P)) (hg : lqPrinc P N (g : Sp
     have h3 := (mem_localization_standardLattice P _).1 h2 a
     rw [qth_intAt_iff] at h3
     exact h3
-  have hBm : B - 1 = -(B * (A - 1)) := by
-    rw [Matrix.mul_sub, hBA, Matrix.mul_one, neg_sub]
+  have hBm : B - 1 = -(B * (A - 1)) := by rw [Matrix.mul_sub, hBA, Matrix.mul_one, neg_sub]
   rw [hBm, Matrix.neg_apply, Valuation.map_neg, Matrix.mul_apply]
   refine Valuation.map_sum_le _ (fun k _ => ?_)
   rw [map_mul]
-  calc _ ≤ 1 * P.valuation E ((A - 1) k j) := mul_le_mul' (hBle i k) le_rfl
+  calc
+    _ ≤ 1 * P.valuation E ((A - 1) k j) := mul_le_mul' (hBle i k) le_rfl
     _ ≤ _ := by rw [one_mul]; exact hg k j
 
 end Ext

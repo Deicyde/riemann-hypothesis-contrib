@@ -10,10 +10,12 @@ noncomputable section
 
 namespace Formalism.GradedWeylDivisibility
 
-private theorem isWeightedHomogeneous_of_map_of_injective {R S : Type*} [CommRing R] [CommRing S]
-    {φ : R →+* S} (hφ : Function.Injective φ) {σ M : Type*} [AddCommMonoid M] {w : σ → M}
-    {m : M} {f : MvPolynomial σ R} (hf : IsWeightedHomogeneous w (map φ f) m) :
-    IsWeightedHomogeneous w f m := by
+private theorem isWeightedHomogeneous_of_map_of_injective
+    {R S : Type*} [CommRing R] [CommRing S]
+    {φ : R →+* S} (hφ : Function.Injective φ)
+    {σ M : Type*} [AddCommMonoid M]
+    {w : σ → M} {m : M} {f : MvPolynomial σ R} (hf : IsWeightedHomogeneous w (map φ f) m)
+    : IsWeightedHomogeneous w f m := by
   intro d hd
   apply hf
   rw [MvPolynomial.coeff_map]

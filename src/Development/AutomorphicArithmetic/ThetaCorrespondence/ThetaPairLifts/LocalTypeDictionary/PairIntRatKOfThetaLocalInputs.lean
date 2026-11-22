@@ -28,12 +28,17 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 @[expose] public section
 
 section
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim GlobalTheory.TestLat GlobalTheory.SumSize
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.RowClaim GlobalTheory.TestLat GlobalTheory.SumSize
 open GlobalTheory.SumSize.TopInt
 open Formalism.DivisionValues (vw lw)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-theorem _root_.GlobalTheory.T.pairIntRatK_of_thetaLocalInputs : _root_.GlobalTheory.FunPr.ThetaLocalInputs → (∀ D, GlobalTheory.NormSum.Inp D) → DictK → GlobalTheory.SumSize.PairInt.PairIntRatK := by
+theorem _root_.GlobalTheory.T.pairIntRatK_of_thetaLocalInputs
+    : _root_.GlobalTheory.FunPr.ThetaLocalInputs → (∀ D, GlobalTheory.NormSum.Inp D) → DictK
+      → GlobalTheory.SumSize.PairInt.PairIntRatK := by
   intro hP hI hD
   obtain ⟨C1, hC1, hPL⟩ := _root_.UpperTheory.WildA.ker_wild_ramification_map
   obtain ⟨C0, hC0, hS⟩ := UpperTheory.WildA.lossOne C1 hC1
@@ -53,24 +58,29 @@ theorem _root_.GlobalTheory.T.pairIntRatK_of_thetaLocalInputs : _root_.GlobalThe
   obtain ⟨-, -, -, -, hm2, -, -, h12⟩ := GlobalTheory.SizesOfRows.sizes_of_sizeRows large₂ hs.size
   refine ⟨_, ⟨l1, l2, fun s => (l3 s).trans ?_⟩, ?_⟩
   · have hlog : 0 ≤ Real.log large₂.sc.b := Real.log_nonneg (by linarith)
-    have hsig : 0 ≤ sig ch.G := Finset.sum_nonneg fun v _ => mul_nonneg (Nat.cast_nonneg _) (Real.log_natCast_nonneg _)
+    have hsig : 0 ≤ sig ch.G :=
+      Finset.sum_nonneg fun v _ => mul_nonneg (Nat.cast_nonneg _) (Real.log_natCast_nonneg _)
     have hm : (1 : ℝ) ≤ D.R.m := by exact_mod_cast (by omega : 1 ≤ D.R.m)
     have hCC : C0 ≤ C := le_of_max_le_left hC
     have h1 : C0 ≤ C * D.R.m := by nlinarith
-    have h2 : (0 : ℝ) ≤ D.R.f * (bigN D : ℝ) ^ 2 * (Real.log large₂.sc.b + sig ch.G) * large₂.sc.b := by
+    have h2
+        : (0 : ℝ) ≤ D.R.f * (bigN D : ℝ) ^ 2 * (Real.log large₂.sc.b + sig ch.G) * large₂.sc.b := by
       have : (0 : ℝ) ≤ large₂.sc.b := by linarith
       positivity
     have := mul_le_mul_of_nonneg_right h1 h2
     unfold bOne
     linarith
   · intro t p hp w hw k d hk hcos hz hPl hdep x y hr a v hv
-    have key := hPL D large₂ Γ Pl0 T A Ks R F hs ch CF hch hsc hfo hP (hI D) dict S δ hL t p hp k d hk hcos hz hPl x y hr
-      w (primeUnder w) (primeUnder_prime w) (primeUnder_mem w) hw a v hv
+    have key :=
+      hPL D large₂ Γ Pl0 T A Ks R F hs ch CF hch hsc hfo hP (hI D) dict S δ hL t p hp k d hk hcos hz
+        hPl x y hr w (primeUnder w) (primeUnder_prime w) (primeUnder_mem w) hw a v hv
     refine inLat_mono key ?_
-    have h1 := kerLoss_mono ch.G δ C1 large₂.sc.b p.small p.big (primeUnder w)
-      (hdep _ (primeUnder_prime w) (primeUnder_mem w))
+    have h1 :=
+      kerLoss_mono ch.G δ C1 large₂.sc.b p.small p.big (primeUnder w)
+        (hdep _ (primeUnder_prime w) (primeUnder_mem w))
     have h2 := (mul_le_mul_of_nonneg_left h1 hC1.le).trans (hh p hp _ (primeUnder_prime w))
-    have h0 : (0 : ℝ) ≤ (vw w ((primeUnder w : ℕ) : D.what₂.LL) : ℝ) := by exact_mod_cast vw_natCast_nonneg w _
+    have h0 : (0 : ℝ) ≤ (vw w ((primeUnder w : ℕ) : D.what₂.LL) : ℝ) := by
+      exact_mod_cast vw_natCast_nonneg w _
     have h3 := mul_le_mul_of_nonneg_left h2 h0
     rw [mul_assoc]
     linarith

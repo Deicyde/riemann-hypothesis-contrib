@@ -36,7 +36,8 @@ theorem weber_function_root : WeberRoot := by
   refine ⟨?_, ?_⟩
   · let R := integralClosure ℤ ℂ
     let jR : R := ⟨j, hj⟩
-    let q : Polynomial R := (Polynomial.X - Polynomial.C (s : R)) ^ 3 - Polynomial.C jR * Polynomial.X
+    let q : Polynomial R :=
+      (Polynomial.X - Polynomial.C (s : R)) ^ 3 - Polynomial.C jR * Polynomial.X
     have hq : q.Monic := by
       apply Polynomial.Monic.sub_of_left ((Polynomial.monic_X_sub_C _).pow 3)
       rw [Polynomial.degree_pow, Polynomial.degree_X_sub_C]

@@ -8,7 +8,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TwLMulSe
 
 @[expose] public section
 
-open Finset PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD GlobalTheory.CompanionTheory.LvChain
+open Finset PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD
+  GlobalTheory.CompanionTheory.LvChain
 open CompanionTheory.D.LK (Pos)
 open scoped InnerProductSpace
 
@@ -16,10 +17,13 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.LvChain
 
-theorem adCL_mem_omU {n : ℕ} {lev : Fin n → ℕ} {p q : Fin n} (hpq : p < q) (hl : lev p = lev q) {l k : Lt n}
-    (hc : adCL false p q l k ≠ 0) (hm : l ∈ omU lev) : k ∈ omU lev ∧ k ≠ l := by
-  have hcase : (q = l.2.1.1 ∧ k.1 = xor false l.1 ∧ k.2.1 = (p, l.2.1.2)) ∨
-      (l.2.1.2 = p ∧ k.1 = xor false l.1 ∧ k.2.1 = (l.2.1.1, q)) := by
+theorem adCL_mem_omU
+    {n : ℕ} {lev : Fin n → ℕ} {p q : Fin n} (hpq : p < q) (hl : lev p = lev q)
+    {l k : Lt n} (hc : adCL false p q l k ≠ 0) (hm : l ∈ omU lev)
+    : k ∈ omU lev ∧ k ≠ l := by
+  have hcase
+      : (q = l.2.1.1 ∧ k.1 = xor false l.1 ∧ k.2.1 = (p, l.2.1.2))
+        ∨ (l.2.1.2 = p ∧ k.1 = xor false l.1 ∧ k.2.1 = (l.2.1.1, q)) := by
     by_contra hn
     rw [not_or] at hn
     exact hc (by simp only [adCL, if_neg hn.1, if_neg hn.2, sub_self])
@@ -35,10 +39,12 @@ theorem adCL_mem_omU {n : ℕ} {lev : Fin n → ℕ} {p q : Fin n} (hpq : p < q)
     · rw [e2]; show lev l.2.1.1 < lev q; rw [← hl, ← e1]; exact h2
     · rw [e] at e2; exact hne (e1.symm.trans (congrArg Prod.snd e2))
 
-theorem Lv_single_omU : ∀ (n : ℕ) (lev : Fin n → ℕ) (V : Type) [AddCommGroup V] [Module ℂ V]
-    (E1 E2 : Fin n → Fin n → Module.End ℂ V) (u : V),
-    (∀ a b : Fin n, a < b → kA E1 E2 a b u = 0) → ∀ p q : Fin n, p < q → lev p = lev q →
-      Lv lev E1 E2 p q (Pi.single (omU lev) u : Cq n V) = 0 := by
+theorem Lv_single_omU
+    : ∀ (n : ℕ) (lev : Fin n → ℕ) (V : Type) [AddCommGroup V] [Module ℂ V]
+        (E1 E2 : Fin n → Fin n → Module.End ℂ V) (u : V),
+      (∀ a b : Fin n, a < b → kA E1 E2 a b u = 0)
+        → ∀ p q : Fin n,
+          p < q → lev p = lev q → Lv lev E1 E2 p q (Pi.single (omU lev) u : Cq n V) = 0 := by
   intro n lev V _ _ E1 E2 u hu p q hpq hl
   have h1 : liftL n (kA E1 E2 p q) (Pi.single (omU lev) u : Cq n V) = 0 := by
     funext A

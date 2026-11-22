@@ -22,8 +22,8 @@ theorem nhdsNE_neBot : (𝓝[≠] (0 : F)).NeBot := by
   obtain ⟨s, hs⟩ := GlobalTheory.SplitWeil.exists_cball_subset ht
   exact ⟨s, hs (show valuation F (s : F) ≤ valuation F (s : F) from le_refl _), s.ne_zero⟩
 
-theorem isOpen_sphere {γ : ValueGroupWithZero F} (hγ : γ ≠ 0) :
-    IsOpen {y : F | valuation F y = γ} := by
+theorem isOpen_sphere {γ : ValueGroupWithZero F} (hγ : γ ≠ 0)
+    : IsOpen {y : F | valuation F y = γ} := by
   rw [isOpen_iff_mem_nhds]
   intro y hy
   rw [IsValuativeTopology.mem_nhds_iff']
@@ -40,18 +40,20 @@ theorem absE_ne_zero {x : F} (hx : x ≠ 0) : absE x ≠ 0 := by
   simp only [absE, dif_neg hx, ne_eq, ENNReal.coe_eq_zero]
   exact (distribHaarChar_pos (A := F) (g := Units.mk0 x hx)).ne'
 
-theorem absE_ne_top (x : F) : absE x ≠ ∞ := by
-  unfold absE; split_ifs <;> simp
+theorem absE_ne_top (x : F) : absE x ≠ ∞ := by unfold absE; split_ifs <;> simp
 
 theorem absE_inv {x : F} (hx : x ≠ 0) : absE x⁻¹ = (absE x)⁻¹ := by
   simp only [absE, dif_neg hx, dif_neg (inv_ne_zero hx)]
   rw [← ENNReal.coe_inv (distribHaarChar_pos (A := F) (g := Units.mk0 x hx)).ne', ← map_inv]
   congr 3
-  ext; simp
+  ext
+  simp
 
 theorem absE_eq_one {x : F} (hx : valuation F x = 1) : absE x = 1 := by
   have hx0 : x ≠ 0 := by rintro rfl; simp at hx
-  have h := GlobalTheory.SplitWeil.nabs_eq_one_of_valuation_eq_one (x := Units.mk0 x hx0) (by simpa using hx)
+  have h :=
+    GlobalTheory.SplitWeil.nabs_eq_one_of_valuation_eq_one (x := Units.mk0 x hx0)
+      (by simpa using hx)
   simp only [GlobalTheory.SplitWeil.nabs, NNReal.coe_eq_one] at h
   simp [absE, hx0, h]
 
@@ -61,8 +63,7 @@ theorem absE_eq_of_val_eq {x y : F} (h : valuation F y = valuation F x) : absE y
     have : y = 0 := by simpa using h
     rw [this]
   have hy : y ≠ 0 := by rintro rfl; exact hx (by simpa using h.symm)
-  have hu : valuation F (y / x) = 1 := by
-    rw [map_div₀, h, div_self (by simpa using hx)]
+  have hu : valuation F (y / x) = 1 := by rw [map_div₀, h, div_self (by simpa using hx)]
   have e1 := absE_eq_one hu
   have hyx : Units.mk0 y hy = Units.mk0 x hx * Units.mk0 (y / x) (div_ne_zero hy hx) := by
     ext; simp [mul_div_cancel₀ _ hx]
@@ -72,55 +73,61 @@ theorem absE_eq_of_val_eq {x y : F} (h : valuation F y = valuation F x) : absE y
 section Meas
 variable [MeasurableSpace F] [BorelSpace F]
 
-theorem measurableSet_preimage_valuation (S : Set (ValueGroupWithZero F)) :
-    MeasurableSet (valuation F ⁻¹' S) := by
+theorem measurableSet_preimage_valuation (S : Set (ValueGroupWithZero F))
+    : MeasurableSet (valuation F ⁻¹' S) := by
   haveI := GlobalTheory.SplitWeil.t2Space F
   have e : valuation F ⁻¹' S = valuation F ⁻¹' (S \ {0}) ∪ valuation F ⁻¹' (S ∩ {0}) := by
     rw [← Set.preimage_union, Set.diff_union_inter]
   rw [e]
   refine MeasurableSet.union (IsOpen.measurableSet ?_) ?_
-  · have : valuation F ⁻¹' (S \ {0}) = ⋃ γ ∈ S \ {0}, {y : F | valuation F y = γ} := by
-      ext y; simp
+  · have : valuation F ⁻¹' (S \ {0}) = ⋃ γ ∈ S \ {0}, {y : F | valuation F y = γ} := by ext y; simp
     rw [this]
     exact isOpen_biUnion fun γ hγ ↦ isOpen_sphere hγ.2
   · by_cases h0 : (0 : ValueGroupWithZero F) ∈ S
-    · have : valuation F ⁻¹' (S ∩ {0}) = {0} := by
-        ext y; simp [h0]
-      rw [this]; exact measurableSet_singleton 0
+    · have : valuation F ⁻¹' (S ∩ {0}) = {0} := by ext y; simp [h0]
+      rw [this]
+      exact measurableSet_singleton 0
     · have : valuation F ⁻¹' (S ∩ {0}) = ∅ := by
-        ext y; simp only [Set.mem_preimage, Set.mem_inter_iff, Set.mem_singleton_iff,
+        ext y
+        simp only [Set.mem_preimage, Set.mem_inter_iff, Set.mem_singleton_iff,
           Set.mem_empty_iff_false, iff_false, not_and]
-        intro hy h'; exact h0 (h' ▸ hy)
-      rw [this]; exact MeasurableSet.empty
+        intro hy h'
+        exact h0 (h' ▸ hy)
+      rw [this]
+      exact MeasurableSet.empty
 
 theorem measurable_absE : Measurable (absE : F → ℝ≥0∞) := by
   intro T _
   have : absE ⁻¹' T = valuation F ⁻¹' (valuation F '' (absE ⁻¹' T)) := by
-    ext x; constructor
+    ext x
+    constructor
     · intro hx; exact ⟨x, hx, rfl⟩
     · rintro ⟨y, hy, hxy⟩
       simp only [Set.mem_preimage] at hy ⊢
       rwa [← absE_eq_of_val_eq hxy]
-  rw [this]; exact measurableSet_preimage_valuation _
+  rw [this]
+  exact measurableSet_preimage_valuation _
 
-theorem lintegral_comp_mul_left (μ : Measure F)
-    (hμ : ∀ x : F, x ≠ 0 → μ.map (fun y ↦ x * y) = (absE x)⁻¹ • μ) {f : F → ℝ≥0∞}
-    (hf : Measurable f) {x : F} (hx : x ≠ 0) :
-    ∫⁻ t, f (x * t) ∂μ = (absE x)⁻¹ * ∫⁻ t, f t ∂μ := by
-  calc ∫⁻ t, f (x * t) ∂μ = ∫⁻ t, f t ∂(μ.map (fun y ↦ x * y)) :=
-        (lintegral_map hf (measurable_const_mul x)).symm
+theorem lintegral_comp_mul_left
+    (μ : Measure F) (hμ : ∀ x : F, x ≠ 0 → μ.map (fun y ↦ x * y) = (absE x)⁻¹ • μ)
+    {f : F → ℝ≥0∞} (hf : Measurable f)
+    {x : F} (hx : x ≠ 0)
+    : ∫⁻ t, f (x * t) ∂μ = (absE x)⁻¹ * ∫⁻ t, f t ∂μ := by
+  calc
+    ∫⁻ t, f (x * t) ∂μ
+      = ∫⁻ t, f t ∂(μ.map (fun y ↦ x * y)) := (lintegral_map hf (measurable_const_mul x)).symm
     _ = _ := by rw [hμ x hx, lintegral_smul_measure]; rfl
 
-theorem map_mul_haar (lam : Measure F) [lam.IsAddHaarMeasure] {x : F} (hx : x ≠ 0) :
-    lam.map (fun y ↦ x * y) = (absE x)⁻¹ • lam := by
+theorem map_mul_haar (lam : Measure F) [lam.IsAddHaarMeasure] {x : F} (hx : x ≠ 0)
+    : lam.map (fun y ↦ x * y) = (absE x)⁻¹ • lam := by
   haveI := GlobalTheory.SplitWeil.secondCountable F
   haveI := GlobalTheory.SplitWeil.t2Space F
   ext s hs
   rw [Measure.map_apply (measurable_const_mul x) hs, Measure.smul_apply, smul_eq_mul]
   have hset : (fun y ↦ x * y) ⁻¹' s = (Units.mk0 x hx)⁻¹ • s := by
     ext y
-    rw [Set.mem_preimage, Set.mem_smul_set_iff_inv_smul_mem, inv_inv, Units.smul_def,
-      Units.val_mk0, smul_eq_mul]
+    rw [Set.mem_preimage, Set.mem_smul_set_iff_inv_smul_mem, inv_inv, Units.smul_def, Units.val_mk0,
+      smul_eq_mul]
   rw [hset, ← distribHaarChar_mul, absE, dif_neg hx, map_inv,
     ENNReal.coe_inv (distribHaarChar_pos (A := F) (g := Units.mk0 x hx)).ne']
 
@@ -130,13 +137,14 @@ theorem measurableSet_U : MeasurableSet (U : Set F) := by
   haveI := GlobalTheory.SplitWeil.t2Space F
   exact (isOpen_sphere one_ne_zero).measurableSet
 
-theorem inv_mem_U_iff (t : F) : t⁻¹ ∈ (U : Set F) ↔ t ∈ U := by
-  simp [U, map_inv₀]
+theorem inv_mem_U_iff (t : F) : t⁻¹ ∈ (U : Set F) ↔ t ∈ U := by simp [U, map_inv₀]
 
-theorem measure_mul_measure_units_eq (lam : Measure F) [lam.IsAddHaarMeasure] (n : Measure F) [SFinite n]
+theorem measure_mul_measure_units_eq
+    (lam : Measure F) [lam.IsAddHaarMeasure]
+    (n : Measure F) [SFinite n]
     (hn0 : n {0} = 0) (hn : ∀ x : F, x ≠ 0 → n.map (fun y ↦ x * y) = (absE x)⁻¹ • n)
-    {A : Set F} (hA : MeasurableSet A) :
-    n A * lam U = n U * lam A := by
+    {A : Set F} (hA : MeasurableSet A)
+    : n A * lam U = n U * lam A := by
   haveI := GlobalTheory.SplitWeil.secondCountable F
   haveI := GlobalTheory.SplitWeil.t2Space F
   haveI := nhdsNE_neBot (F := F)
@@ -154,8 +162,7 @@ theorem measure_mul_measure_units_eq (lam : Measure F) [lam.IsAddHaarMeasure] (n
     (hIU.comp measurable_snd).mul (hIA.comp (measurable_fst.mul measurable_snd))
 
   have h1 : ∫⁻ x, ∫⁻ y, K x y ∂lam ∂n = n A * lam U := by
-    have h0 : ∀ᵐ x ∂n, x ≠ 0 := by
-      rw [ae_iff]; simpa using hn0
+    have h0 : ∀ᵐ x ∂n, x ≠ 0 := by rw [ae_iff]; simpa using hn0
     have : ∀ᵐ x ∂n, ∫⁻ y, K x y ∂lam = A.indicator 1 x * lam U := by
       filter_upwards [h0] with x hx
       simp only [K]
@@ -166,8 +173,7 @@ theorem measure_mul_measure_units_eq (lam : Measure F) [lam.IsAddHaarMeasure] (n
     rw [lintegral_congr_ae this, lintegral_mul_const _ hIA, lintegral_indicator_one hA]
 
   have h2 : ∫⁻ y, ∫⁻ x, K x y ∂n ∂lam = ∫⁻ y, ∫⁻ t, G y t ∂n ∂lam := by
-    have h0 : ∀ᵐ y ∂lam, y ≠ 0 := by
-      rw [ae_iff]; simpa using hlam0
+    have h0 : ∀ᵐ y ∂lam, y ≠ 0 := by rw [ae_iff]; simpa using hlam0
     apply lintegral_congr_ae
     filter_upwards [h0] with y hy
     have hf : Measurable fun x ↦ K x y := hK.comp (measurable_id.prodMk measurable_const)
@@ -182,13 +188,15 @@ theorem measure_mul_measure_units_eq (lam : Measure F) [lam.IsAddHaarMeasure] (n
           rw [map_mul, show valuation F t = 1 from ht, mul_one]
         rw [absE_eq_of_val_eq hv, Set.indicator_of_mem ((inv_mem_U_iff t).mpr ht),
           Set.indicator_of_mem ht]
-        simp only [Pi.one_apply]; ring
+        simp only [Pi.one_apply]
+        ring
       · rw [Set.indicator_of_notMem (fun h ↦ ht ((inv_mem_U_iff t).mp h)),
           Set.indicator_of_notMem ht]
         simp
     simp only [hpt] at hsub
-    rw [lintegral_const_mul _ (show Measurable fun t ↦ G y t from
-      hG.comp (measurable_const.prodMk measurable_id))] at hsub
+    rw [lintegral_const_mul _
+        (show Measurable fun t ↦ G y t from hG.comp (measurable_const.prodMk measurable_id))]
+      at hsub
     have hne := absE_ne_zero hy
     have hnt := absE_ne_top y
 
@@ -201,7 +209,8 @@ theorem measure_mul_measure_units_eq (lam : Measure F) [lam.IsAddHaarMeasure] (n
       intro t
       simp only [G]
       rw [lintegral_const_mul]
-      swap; · exact hIA.comp (measurable_mul_const t)
+      swap
+      · exact hIA.comp (measurable_mul_const t)
       by_cases ht : t ∈ (U : Set F)
       · have ht0 : t ≠ 0 := by rintro rfl; simp [U] at ht
         simp_rw [mul_comm _ t]
@@ -210,16 +219,17 @@ theorem measure_mul_measure_units_eq (lam : Measure F) [lam.IsAddHaarMeasure] (n
       · simp [Set.indicator_of_notMem ht]
     simp_rw [this]
     rw [lintegral_mul_const _ hIU, lintegral_indicator_one hU]
-  rw [← h1, lintegral_lintegral_swap hK.aemeasurable, h2,
-    lintegral_lintegral_swap hG.aemeasurable, h3]
+  rw [← h1, lintegral_lintegral_swap hK.aemeasurable, h2, lintegral_lintegral_swap hG.aemeasurable,
+    h3]
 
 end Meas
 
-theorem eq_smul_haar_of_homog : ∀ (F : Type) [Field F] [CharZero F] [ValuativeRel F]
-    [TopologicalSpace F] [IsNonarchimedeanLocalField F] [MeasurableSpace F] [BorelSpace F]
-    (lam : Measure F) [lam.IsAddHaarMeasure] (n : Measure F) [IsFiniteMeasureOnCompacts n],
-    n {0} = 0 → (∀ u : Fˣ, n.map (fun x => (u : F) * x) = (distribHaarChar F u)⁻¹ • n) →
-    ∃ r : NNReal, n = r • lam := by
+theorem eq_smul_haar_of_homog
+    : ∀ (F : Type) [Field F] [CharZero F] [ValuativeRel F] [TopologicalSpace F]
+        [IsNonarchimedeanLocalField F] [MeasurableSpace F] [BorelSpace F] (lam : Measure F)
+        [lam.IsAddHaarMeasure] (n : Measure F) [IsFiniteMeasureOnCompacts n],
+      n {0} = 0 → (∀ u : Fˣ, n.map (fun x => (u : F) * x) = (distribHaarChar F u)⁻¹ • n)
+        → ∃ r : NNReal, n = r • lam := by
   intro F _ _ _ _ _ _ _ lam _ n _ hn0 hn
   haveI := GlobalTheory.SplitWeil.secondCountable F
   haveI := GlobalTheory.SplitWeil.t2Space F
@@ -227,16 +237,17 @@ theorem eq_smul_haar_of_homog : ∀ (F : Type) [Field F] [CharZero F] [Valuative
     intro x hx
     have h := hn (Units.mk0 x hx)
     simp only [Units.val_mk0] at h
-    rw [h, absE, dif_neg hx, ← ENNReal.coe_inv (distribHaarChar_pos (A := F) (g := Units.mk0 x hx)).ne']
-    ext s; rw [Measure.smul_apply, Measure.smul_apply, ENNReal.smul_def]
+    rw [h, absE, dif_neg hx,
+      ← ENNReal.coe_inv (distribHaarChar_pos (A := F) (g := Units.mk0 x hx)).ne']
+    ext s
+    rw [Measure.smul_apply, Measure.smul_apply, ENNReal.smul_def]
   have hUO : (U : Set F) ⊆ (𝒪[F] : Set F) := fun y hy ↦
     (Valuation.mem_integer_iff _ _).mpr (le_of_eq hy)
   have hnU : n U ≠ ∞ :=
     ((measure_mono hUO).trans_lt (GlobalTheory.SplitWeil.isCompact_int F).measure_lt_top).ne
   have hlU : lam U ≠ ∞ :=
     ((measure_mono hUO).trans_lt (GlobalTheory.SplitWeil.isCompact_int F).measure_lt_top).ne
-  have hlU0 : lam U ≠ 0 :=
-    ((isOpen_sphere (F := F) one_ne_zero).measure_pos lam ⟨1, by simp⟩).ne'
+  have hlU0 : lam U ≠ 0 := ((isOpen_sphere (F := F) one_ne_zero).measure_pos lam ⟨1, by simp⟩).ne'
   refine ⟨(n U / lam U).toNNReal, ?_⟩
   ext s hs
   rw [Measure.smul_apply, ENNReal.smul_def, ENNReal.coe_toNNReal (ENNReal.div_ne_top hnU hlU0),

@@ -28,8 +28,9 @@ lemma coeff_prod_one_sub_eq_zero {R ι : Type*} [CommRing R] (a : ι → R) (s :
       PowerSeries.coeff_succ_X_mul, ih _ (by omega), ih _ (by omega), mul_zero, sub_zero]
 
 def ec (n : ℕ) (i : Fin n) (r : ℕ) : MvPolynomial (Fin n) ℤ :=
-  PowerSeries.coeff r (∏ k ∈ univ.erase i,
-    (1 - PowerSeries.C (MvPolynomial.X k : MvPolynomial (Fin n) ℤ) * PowerSeries.X))
+  PowerSeries.coeff r
+    (∏ k ∈ univ.erase i,
+      (1 - PowerSeries.C (MvPolynomial.X k : MvPolynomial (Fin n) ℤ) * PowerSeries.X))
 
 lemma ec_eq_zero {n : ℕ} (i : Fin n) {r : ℕ} (hr : n ≤ r) : ec n i r = 0 := by
   apply coeff_prod_one_sub_eq_zero
@@ -108,10 +109,10 @@ end GlobalTheory.JSW.Bialt
 
 namespace GlobalTheory.JSW
 
-theorem schur_mul_det_eq_det (n : ℕ) (l : Fin n → ℕ) (_hl : Antitone l) :
-    schur n l * Matrix.det (Matrix.of fun i j : Fin n =>
-        (MvPolynomial.X i : MvPolynomial (Fin n) ℤ) ^ (n - 1 - (j : ℕ))) =
-      Matrix.det (Matrix.of fun i j : Fin n =>
+theorem schur_mul_det_eq_det (n : ℕ) (l : Fin n → ℕ) (_hl : Antitone l)
+    : schur n l * Matrix.det (Matrix.of fun i j : Fin n =>
+        (MvPolynomial.X i : MvPolynomial (Fin n) ℤ) ^ (n - 1 - (j : ℕ)))
+      = Matrix.det (Matrix.of fun i j : Fin n =>
         (MvPolynomial.X i : MvPolynomial (Fin n) ℤ) ^ (l j + n - 1 - (j : ℕ))) := by
   have h0 := Bialt.det_pow_matrix n (fun _ => 0)
   simp only [zero_add, Bialt.schur_zero, mul_one] at h0

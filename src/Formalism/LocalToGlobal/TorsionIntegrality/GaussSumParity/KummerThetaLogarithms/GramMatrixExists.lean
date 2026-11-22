@@ -22,9 +22,11 @@ namespace OrbitCoverLemmas
 def blk {K : Type} [Field K] (lam : K) (k x : Bool) : K :=
   if x = false then (if k = false then 1 else lam) else (if k = false then 2⁻¹ else -lam * 2⁻¹)
 
-theorem blk_gram {K : Type} [Field K] (σ : K →+* K) (lam : K) (h2 : (2 : K) ≠ 0)
-    (h : lam * σ lam = -1) (x x' : Bool) :
-    ∑ k, blk lam k x * σ (blk lam k x') = if x ≠ x' then 1 else 0 := by
+theorem blk_gram
+    {K : Type} [Field K]
+    (σ : K →+* K) (lam : K)
+    (h2 : (2 : K) ≠ 0) (h : lam * σ lam = -1) (x x' : Bool)
+    : ∑ k, blk lam k x * σ (blk lam k x') = if x ≠ x' then 1 else 0 := by
   have s2 : σ 2 = 2 := map_ofNat σ 2
   cases x <;> cases x' <;> simp [blk, map_inv₀, s2]
   · linear_combination h
@@ -32,9 +34,12 @@ theorem blk_gram {K : Type} [Field K] (σ : K →+* K) (lam : K) (h2 : (2 : K) �
   · field_simp; linear_combination -h
   · field_simp; linear_combination h
 
-theorem lam_spec {K : Type} [Field K] (σ : K →+* K) (m : ℕ) (hm : 0 < m) (ζ : K)
-    (hζ : IsPrimitiveRoot ζ ((2 * m + 1) ^ 2 - 1)) (hσ : σ ζ = ζ ^ (2 * m + 1)) :
-    (ζ ^ m) * σ (ζ ^ m) = -1 := by
+theorem lam_spec
+    {K : Type} [Field K]
+    (σ : K →+* K)
+    (m : ℕ) (hm : 0 < m)
+    (ζ : K) (hζ : IsPrimitiveRoot ζ ((2 * m + 1) ^ 2 - 1)) (hσ : σ ζ = ζ ^ (2 * m + 1))
+    : (ζ ^ m) * σ (ζ ^ m) = -1 := by
   have e : (2 * m + 1) ^ 2 - 1 = (m * (2 * m + 2)) * 2 := by
     have : (2 * m + 1) ^ 2 = (m * (2 * m + 2)) * 2 + 1 := by ring
     omega
@@ -42,10 +47,12 @@ theorem lam_spec {K : Type} [Field K] (σ : K →+* K) (m : ℕ) (hm : 0 < m) (�
     have := hζ.pow_of_dvd (p := m * (2 * m + 2)) (by positivity) (by rw [e]; exact Dvd.intro _ rfl)
     rwa [e, Nat.mul_div_cancel_left _ (by positivity)] at this
   have := hp.eq_neg_one_of_two_right
-  rw [map_pow, hσ, ← this]; ring
+  rw [map_pow, hσ, ← this]
+  ring
 
-theorem norm_two {K : Type} [NormedField K] [IsUltrametricDist K] (m : ℕ)
-    (h : ‖((2 * m + 1 : ℕ) : K)‖ < 1) : ‖(2 : K)‖ = 1 := by
+theorem norm_two
+    {K : Type} [NormedField K] [IsUltrametricDist K] (m : ℕ) (h : ‖((2 * m + 1 : ℕ) : K)‖ < 1)
+    : ‖(2 : K)‖ = 1 := by
   have h2 : ‖(2 : K)‖ ≤ 1 := by
     have := IsUltrametricDist.norm_natCast_le_one K 2
     simpa using this
@@ -58,7 +65,9 @@ theorem norm_two {K : Type} [NormedField K] [IsUltrametricDist K] (m : ℕ)
     rw [e]
     refine lt_of_le_of_lt (IsUltrametricDist.norm_add_le_max _ _) (max_lt h ?_)
     rw [norm_neg, norm_mul]
-    calc ‖(2 : K)‖ * ‖(m : K)‖ ≤ ‖(2 : K)‖ * 1 := by gcongr
+    calc
+      ‖(2 : K)‖ * ‖(m : K)‖
+        ≤ ‖(2 : K)‖ * 1 := by gcongr
       _ < 1 := by rwa [mul_one]
   rw [norm_one] at h1
   exact lt_irrefl _ h1
@@ -91,11 +100,14 @@ theorem gram_matrix_exists : GramExists := by
   have h2 : (2 : K) ≠ 0 := two_ne_zero
   have nlam : ‖ζ ^ m‖ = 1 := by rw [norm_pow, nζ, one_pow]
   have s2 : σ 2 = 2 := map_ofNat σ 2
-  have hblk : ∀ k x : Bool, ‖OrbitCoverLemmas.blk (ζ ^ m) k x‖ ≤ 1 ∧
-      σ (σ (OrbitCoverLemmas.blk (ζ ^ m) k x)) = OrbitCoverLemmas.blk (ζ ^ m) k x := by
+  have hblk
+      : ∀ k x : Bool,
+        ‖OrbitCoverLemmas.blk (ζ ^ m) k x‖ ≤ 1
+          ∧ σ (σ (OrbitCoverLemmas.blk (ζ ^ m) k x)) = OrbitCoverLemmas.blk (ζ ^ m) k x := by
     intro k x
     cases k <;> cases x <;> simp [OrbitCoverLemmas.blk, nlam, hσσ, n2, s2, map_inv₀]
-  refine ⟨fun k x => if k.2 = x.2 then OrbitCoverLemmas.blk (ζ ^ m) k.1 x.1 else 0, fun k x => ?_, ?_⟩
+  refine
+    ⟨fun k x => if k.2 = x.2 then OrbitCoverLemmas.blk (ζ ^ m) k.1 x.1 else 0, fun k x => ?_, ?_⟩
   · dsimp only
     split_ifs
     · exact hblk _ _
@@ -105,9 +117,11 @@ theorem gram_matrix_exists : GramExists := by
     dsimp only
     by_cases h : e = e'
     · subst h
-      have h3 : ∀ k : Bool, ∑ y : E, (if y = e then OrbitCoverLemmas.blk (ζ ^ m) k b else 0) *
-          σ (if y = e then OrbitCoverLemmas.blk (ζ ^ m) k b' else 0) =
-          OrbitCoverLemmas.blk (ζ ^ m) k b * σ (OrbitCoverLemmas.blk (ζ ^ m) k b') := by
+      have h3
+          : ∀ k : Bool,
+            ∑ y : E, (if y = e then OrbitCoverLemmas.blk (ζ ^ m) k b else 0) *
+                σ (if y = e then OrbitCoverLemmas.blk (ζ ^ m) k b' else 0)
+              = OrbitCoverLemmas.blk (ζ ^ m) k b * σ (OrbitCoverLemmas.blk (ζ ^ m) k b') := by
         intro k
         rw [Finset.sum_eq_single e]
         · simp

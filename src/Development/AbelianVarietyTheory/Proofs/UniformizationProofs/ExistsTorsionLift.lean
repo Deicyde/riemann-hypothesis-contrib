@@ -4,25 +4,31 @@ public import Mathlib
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry IsLocalRing
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry IsLocalRing
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 noncomputable section
 namespace GlobalTheory.UT.ExactTerm
 
-theorem exists_ringHom_lift (F : Type) [Field F] [IsAlgClosed F] {O : Type} [CommRing O] [IsDomain O] [IsLocalRing O]
-    [IsIntegrallyClosed O] [Algebra O F] [IsFractionRing O F] {A : Type} [CommRing A] [Algebra O A] [Module.Finite O A] [Module.Flat O A] (φ : A →+* ResidueField O)
-    (hφ : φ.comp (algebraMap O A) = residue O) :
-    ∃ ψ : A →+* O, ψ.comp (algebraMap O A) = RingHom.id O ∧ (residue O).comp ψ = φ := by
+theorem exists_ringHom_lift
+    (F : Type) [Field F] [IsAlgClosed F]
+    {O : Type} [CommRing O] [IsDomain O] [IsLocalRing O] [IsIntegrallyClosed O] [Algebra O F]
+    [IsFractionRing O F]
+    {A : Type} [CommRing A] [Algebra O A] [Module.Finite O A] [Module.Flat O A]
+    (φ : A →+* ResidueField O) (hφ : φ.comp (algebraMap O A) = residue O)
+    : ∃ ψ : A →+* O, ψ.comp (algebraMap O A) = RingHom.id O ∧ (residue O).comp ψ = φ := by
   have : (RingHom.ker φ).IsPrime := RingHom.ker_isPrime φ
-  have : (RingHom.ker φ).LiesOver (maximalIdeal O) := ⟨by
-    show maximalIdeal O = Ideal.comap (algebraMap O A) (RingHom.ker φ)
-    rw [RingHom.comap_ker, hφ, ker_residue]⟩
-  obtain ⟨P, hPQ, hP, hPlo⟩ := (RingHom.ker φ).exists_ideal_le_liesOver_of_le
-    (p := (⊥ : Ideal O)) (q := maximalIdeal O) bot_le
+  have : (RingHom.ker φ).LiesOver (maximalIdeal O) :=
+    ⟨by
+      show maximalIdeal O = Ideal.comap (algebraMap O A) (RingHom.ker φ)
+      rw [RingHom.comap_ker, hφ, ker_residue]⟩
+  obtain ⟨P, hPQ, hP, hPlo⟩ :=
+    (RingHom.ker φ).exists_ideal_le_liesOver_of_le (p := (⊥ : Ideal O)) (q := maximalIdeal O) bot_le
   have hjinj : Function.Injective (algebraMap O P.ResidueField) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro y hy
     have h1 : algebraMap O A y ∈ P := by
       rw [← Ideal.algebraMap_residueField_eq_zero, ← IsScalarTower.algebraMap_apply]
@@ -33,14 +39,17 @@ theorem exists_ringHom_lift (F : Type) [Field F] [IsAlgClosed F] {O : Type} [Com
   let : Algebra F P.ResidueField := (IsFractionRing.lift (K := F) hjinj).toAlgebra
   have : IsScalarTower O F P.ResidueField :=
     IsScalarTower.of_algebraMap_eq fun y => (IsFractionRing.lift_algebraMap hjinj y).symm
-  have hrange : ∀ a : A, ∃ y : O, algebraMap O P.ResidueField y = algebraMap A P.ResidueField a := by
+  have hrange
+      : ∀ a : A, ∃ y : O, algebraMap O P.ResidueField y = algebraMap A P.ResidueField a := by
     intro a
     have hO : IsIntegral O (algebraMap A P.ResidueField a) :=
       (Algebra.IsIntegral.isIntegral a).algebraMap
     have hF : IsIntegral F (algebraMap A P.ResidueField a) := hO.tower_top
-    obtain ⟨r, hr⟩ := (IsAlgClosed.algebraMap_bijective_of_isIntegral (k := F)
-      (K := integralClosure F P.ResidueField)).2 ⟨_, hF⟩
-    have hr' : algebraMap F P.ResidueField r = algebraMap A P.ResidueField a := congrArg Subtype.val hr
+    obtain ⟨r, hr⟩ :=
+      (IsAlgClosed.algebraMap_bijective_of_isIntegral (k := F)
+        (K := integralClosure F P.ResidueField)).2 ⟨_, hF⟩
+    have hr' : algebraMap F P.ResidueField r = algebraMap A P.ResidueField a :=
+      congrArg Subtype.val hr
     have hrO : IsIntegral O r := by
       rw [← isIntegral_algHom_iff (IsScalarTower.toAlgHom O F P.ResidueField)
         (algebraMap F P.ResidueField).injective]
@@ -74,10 +83,14 @@ theorem exists_ringHom_lift (F : Type) [Field F] [IsAlgClosed F] {O : Type} [Com
       exact (RingHom.mem_ker).mp hmem
     rw [← h1, ← RingHom.comp_apply φ (algebraMap O A), hφ]
 
-theorem exists_section_lift {F : Type} [Field F] [IsAlgClosed F] (O : ValuationSubring F) {H : Scheme.{0}}
-    (f : H ⟶ Spec (CommRingCat.of O)) [IsFinite f] [Flat f] (p : Spec (CommRingCat.of (ResidueField O)) ⟶ H)
-    (hp : p ≫ f = Spec.map (CommRingCat.ofHom (residue O))) :
-    ∃ q : Spec (CommRingCat.of O) ⟶ H, q ≫ f = 𝟙 _ ∧ Spec.map (CommRingCat.ofHom (residue O)) ≫ q = p := by
+theorem exists_section_lift
+    {F : Type} [Field F] [IsAlgClosed F]
+    (O : ValuationSubring F)
+    {H : Scheme.{0}} (f : H ⟶ Spec (CommRingCat.of O)) [IsFinite f] [Flat f]
+    (p : Spec (CommRingCat.of (ResidueField O)) ⟶ H)
+    (hp : p ≫ f = Spec.map (CommRingCat.ofHom (residue O)))
+    : ∃ q : Spec (CommRingCat.of O) ⟶ H,
+      q ≫ f = 𝟙 _ ∧ Spec.map (CommRingCat.ofHom (residue O)) ≫ q = p := by
   have : IsAffine H := isAffine_of_isAffineHom f
   obtain ⟨φ, hφ⟩ : ∃ φ, Spec.map φ = H.isoSpec.inv ≫ f := ⟨_, Spec.map_preimage _⟩
   have hfin : φ.hom.Finite := by
@@ -96,31 +109,37 @@ theorem exists_section_lift {F : Type} [Field F] [IsAlgClosed F] (O : ValuationS
     exact congrArg CommRingCat.Hom.hom (Spec.map_injective h1)
   obtain ⟨ψ, hψ1, hψ2⟩ := exists_ringHom_lift F χ.hom hcomp
   refine ⟨Spec.map (CommRingCat.ofHom ψ) ≫ H.isoSpec.inv, ?_, ?_⟩
-  · have h2 : φ ≫ CommRingCat.ofHom ψ = 𝟙 _ := by
-      exact CommRingCat.hom_ext hψ1
+  · have h2 : φ ≫ CommRingCat.ofHom ψ = 𝟙 _ := by exact CommRingCat.hom_ext hψ1
     rw [Category.assoc, ← hφ, ← Spec.map_comp, h2, Spec.map_id]
   · have h3 : CommRingCat.ofHom ψ ≫ CommRingCat.ofHom (residue O) = χ := by
       exact CommRingCat.hom_ext hψ2
-    rw [← Category.assoc, ← Spec.map_comp, h3, hχ, Category.assoc, Iso.hom_inv_id,
-      Category.comp_id]
+    rw [← Category.assoc, ← Spec.map_comp, h3, hχ, Category.assoc, Iso.hom_inv_id, Category.comp_id]
 
-theorem exists_torsion_lift {F : Type} [Field F] [IsAlgClosed F] (O : ValuationSubring F) {S : Scheme.{0}}
-    (G : Over S) [GrpObj G] (n : ℕ) [IsFinite ((𝟙 G) ^ n : G ⟶ G).left] [Flat ((𝟙 G) ^ n : G ⟶ G).left]
+theorem exists_torsion_lift
+    {F : Type} [Field F] [IsAlgClosed F]
+    (O : ValuationSubring F)
+    {S : Scheme.{0}} (G : Over S) [GrpObj G]
+    (n : ℕ) [IsFinite ((𝟙 G) ^ n : G ⟶ G).left] [Flat ((𝟙 G) ^ n : G ⟶ G).left]
     (t : Spec (CommRingCat.of O) ⟶ S)
-    (x : Over.mk (Spec.map (CommRingCat.ofHom (residue O)) ≫ t) ⟶ G) (hx : x ^ n = 1) :
-    ∃ y : Over.mk t ⟶ G, y ^ n = 1 ∧ Spec.map (CommRingCat.ofHom (residue O)) ≫ y.left = x.left := by
+    (x : Over.mk (Spec.map (CommRingCat.ofHom (residue O)) ≫ t) ⟶ G) (hx : x ^ n = 1)
+    : ∃ y : Over.mk t ⟶ G,
+      y ^ n = 1 ∧ Spec.map (CommRingCat.ofHom (residue O)) ≫ y.left = x.left := by
   have hpow : ∀ {Y : Over S} (z : Y ⟶ G), z ^ n = z ≫ (𝟙 G) ^ n := fun z => by
     rw [MonObj.comp_pow, Category.comp_id]
-  have hxm : x.left ≫ ((𝟙 G) ^ n : G ⟶ G).left =
-      Spec.map (CommRingCat.ofHom (residue O)) ≫ t ≫ η[G].left := by
-    have h1 : (x ≫ (𝟙 G) ^ n).left = (1 : Over.mk (Spec.map (CommRingCat.ofHom (residue O)) ≫ t) ⟶ G).left := by
+  have hxm
+      : x.left ≫ ((𝟙 G) ^ n : G ⟶ G).left
+        = Spec.map (CommRingCat.ofHom (residue O)) ≫ t ≫ η[G].left := by
+    have h1
+        : (x ≫ (𝟙 G) ^ n).left
+          = (1 : Over.mk (Spec.map (CommRingCat.ofHom (residue O)) ≫ t) ⟶ G).left := by
       rw [← hpow, hx]
     rw [Over.comp_left, CategoryTheory.Hom.one_def, Over.comp_left, Over.toUnit_left] at h1
     rw [h1]
     exact Category.assoc _ _ _
-  obtain ⟨q, hq1, hq2⟩ := exists_section_lift O
-    (pullback.snd ((𝟙 G) ^ n : G ⟶ G).left (t ≫ η[G].left))
-    (pullback.lift x.left (Spec.map (CommRingCat.ofHom (residue O))) hxm) (pullback.lift_snd _ _ _)
+  obtain ⟨q, hq1, hq2⟩ :=
+    exists_section_lift O (pullback.snd ((𝟙 G) ^ n : G ⟶ G).left (t ≫ η[G].left))
+      (pullback.lift x.left (Spec.map (CommRingCat.ofHom (residue O))) hxm)
+      (pullback.lift_snd _ _ _)
   have hw : ((𝟙 G) ^ n : G ⟶ G).left ≫ G.hom = G.hom := Over.w _
   have he : η[G].left ≫ G.hom = 𝟙 S := Over.w η[G]
   refine ⟨Over.homMk (q ≫ pullback.fst _ _) ?_, ?_, ?_⟩

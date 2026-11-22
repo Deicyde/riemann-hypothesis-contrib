@@ -38,8 +38,9 @@ theorem second_descent_statement_holds : Stat2 := by
     obtain ⟨U, hU⟩ : ∃ U, c + 2 + t - i = U := ⟨_, rfl⟩
     have hU' : c + 2 + t = i + U := by omega
     rw [hU]
-    have e : S.π ^ t * (((ℓ : A) * S.w) ^ i * (S.π ^ (ℓ - 1)) ^ U * ((c + 2 + t).choose i : A)) =
-        (S.w ^ i * ((c + 2 + t).choose i : A)) * ((ℓ : A) ^ i * S.π ^ ((ℓ - 1) * U + t)) := by
+    have e
+        : S.π ^ t * (((ℓ : A) * S.w) ^ i * (S.π ^ (ℓ - 1)) ^ U * ((c + 2 + t).choose i : A))
+          = (S.w ^ i * ((c + 2 + t).choose i : A)) * ((ℓ : A) ^ i * S.π ^ ((ℓ - 1) * U + t)) := by
       rw [← pow_mul, pow_add, mul_pow]
       ring
     rw [e, mul_smul]
@@ -55,7 +56,8 @@ theorem second_descent_statement_holds : Stat2 := by
         push_cast at this
         linarith
       have hpos : (0 : ℝ) < ((ℓ : ℝ) - 1) ^ 2 := by nlinarith
-      have hsl : (s : ℝ) * ℓ ≤ ((ℓ : ℝ) - 1) * t * ℓ := mul_le_mul_of_nonneg_right htsR (by linarith)
+      have hsl : (s : ℝ) * ℓ ≤ ((ℓ : ℝ) - 1) * t * ℓ :=
+        mul_le_mul_of_nonneg_right htsR (by linarith)
       have hcU : (0 : ℝ) ≤ U * ((ℓ : ℝ) - 1) := mul_nonneg hU0 (by linarith)
       have hj' : (((ℓ - 1) * U + t : ℕ) : ℝ) = ((ℓ : ℝ) - 1) * U + t := by
         push_cast [hℓ1]
@@ -66,12 +68,15 @@ theorem second_descent_statement_holds : Stat2 := by
         nlinarith
       linarith
   have hR1 := hkey _ (h1 n hn)
-  have hR2 : (S.π ^ (Mi + hi + c + 2) * (S.π ^ t * S.q ^ (c + 2 + t))) • (S.q ^ Mi • S.φ n) ∈ S.R' := by
+  have hR2
+      : (S.π ^ (Mi + hi + c + 2) * (S.π ^ t * S.q ^ (c + 2 + t))) • (S.q ^ Mi • S.φ n) ∈ S.R' := by
     rw [mul_smul]
     exact Submodule.smul_mem _ _ hR1
   have hsp := h2 _ hR2
-  have hφ : S.φ (S.π ^ (Mi + hi + c + 2 + t) • n) = S.q ^ hi •
-      ((S.π ^ (Mi + hi + c + 2) * (S.π ^ t * S.q ^ (c + 2 + t))) • (S.q ^ Mi • S.φ n)) := by
+  have hφ
+      : S.φ (S.π ^ (Mi + hi + c + 2 + t) • n)
+        = S.q ^ hi
+          • ((S.π ^ (Mi + hi + c + 2) * (S.π ^ t * S.q ^ (c + 2 + t))) • (S.q ^ Mi • S.φ n)) := by
     rw [S.φ_smul, map_pow, S.φπ, smul_smul, smul_smul]
     congr 1
     ring

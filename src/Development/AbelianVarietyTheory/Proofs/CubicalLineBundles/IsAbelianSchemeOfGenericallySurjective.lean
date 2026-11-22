@@ -5,16 +5,18 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory
 
 theorem surjective_of_generic_fibre_subset_range
     {V K : Type} [CommRing V] [IsDomain V] [Field K] [Algebra V K] [IsFractionRing V K]
     {X Y : Scheme.{0}} (f : X ⟶ Y) (g : Y ⟶ Sp V) [UniversallyClosed f] [Flat g]
-    (h : ∀ y : Y, g y ∈ Set.range (spMap (algebraMap V K)) → y ∈ Set.range f) :
-    Surjective f := by
+    (h : ∀ y : Y, g y ∈ Set.range (spMap (algebraMap V K)) → y ∈ Set.range f)
+    : Surjective f := by
   refine ⟨fun y => ?_⟩
   have hcl : IsClosed (Set.range f) := f.isClosedMap.isClosed_range
   let e : Sp V := (⊥ : PrimeSpectrum V)
@@ -27,12 +29,13 @@ theorem surjective_of_generic_fibre_subset_range
   change Ideal.comap (algebraMap V K) ⊥ = ⊥
   exact Ideal.comap_bot_of_injective _ (IsFractionRing.injective V K)
 
-theorem isAbelianScheme_of_generically_surjective :
-    ∀ (V K : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K]
-      [IsFractionRing V K] (B G : Over (Sp V)) [GrpObj B] [GrpObj G],
-      IsAbelianScheme B → IsSemiAbelian G → ∀ ψ : B ⟶ G,
-      (∀ x : G.left, G.hom x ∈ Set.range (spMap (algebraMap V K)) → x ∈ Set.range ψ.left) →
-      IsAbelianScheme G := by
+theorem isAbelianScheme_of_generically_surjective
+    : ∀ (V K : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K]
+        [IsFractionRing V K] (B G : Over (Sp V)) [GrpObj B] [GrpObj G],
+      IsAbelianScheme B → IsSemiAbelian G
+        → ∀ ψ : B ⟶ G,
+          (∀ x : G.left, G.hom x ∈ Set.range (spMap (algebraMap V K)) → x ∈ Set.range ψ.left)
+            → IsAbelianScheme G := by
   intro V K _ _ _ _ _ _ B G _ _ hB hG ψ h
   have := hB.proper
   have := hG.smooth

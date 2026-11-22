@@ -10,17 +10,25 @@ public import Development.DiscreteGroups.GlobalIrreducibility.DzIneEq
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial GlobalTheory.WeilDeligne GlobalTheory.LocGL GlobalTheory.LocLanglands GlobalTheory.GLq
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
+  GlobalTheory.WeilDeligne GlobalTheory.LocGL GlobalTheory.LocLanglands GlobalTheory.GLq
 
-theorem UpperTheory.exists_numberField_extension_place_frobenius_degree :
-    ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω)
-        (w : HeightOneSpectrum (𝓞 E)), IsPlaceOver A w → ∀ (n : ℕ), 2 ≤ n → ∀ (φ : G E Ω), IsFrob A (normV w) φ →
-        ∀ (c : 𝓞 E), c ∉ w.asIdeal ^ 2 →
-        ∃ (L : Type) (_ : Field L) (_ : NumberField L) (_ : Algebra E L) (_ : Algebra L Ω) (_ : IsScalarTower E L Ω)
-          (_ : IsAlgClosure L Ω) (u : HeightOneSpectrum (𝓞 L)) (_ : IsPlaceOver A u) (s : L ≃ₐ[E] L),
-          (∀ x : L, φ (algebraMap L Ω x) = algebraMap L Ω (s x)) ∧
-          (∀ t ∈ Ine (F := E) A, ∀ x : L, t (algebraMap L Ω x) = algebraMap L Ω x) ∧
-          algebraMap (𝓞 E) (𝓞 L) c ∉ u.asIdeal ^ 2 ∧ normV u = normV w ^ n := by
+theorem UpperTheory.exists_numberField_extension_place_frobenius_degree
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)),
+      IsPlaceOver A w
+        → ∀ (n : ℕ),
+          2 ≤ n
+            → ∀ (φ : G E Ω),
+              IsFrob A (normV w) φ
+                → ∀ (c : 𝓞 E),
+                  c ∉ w.asIdeal ^ 2
+                    → ∃ (L : Type) (_ : Field L) (_ : NumberField L) (_ : Algebra E L)
+                        (_ : Algebra L Ω) (_ : IsScalarTower E L Ω) (_ : IsAlgClosure L Ω)
+                        (u : HeightOneSpectrum (𝓞 L)) (_ : IsPlaceOver A u) (s : L ≃ₐ[E] L),
+                      (∀ x : L, φ (algebraMap L Ω x) = algebraMap L Ω (s x))
+                        ∧ (∀ t ∈ Ine (F := E) A, ∀ x : L, t (algebraMap L Ω x) = algebraMap L Ω x)
+                        ∧ algebraMap (𝓞 E) (𝓞 L) c ∉ u.asIdeal ^ 2 ∧ normV u = normV w ^ n := by
   classical
   intro E Ω _ _ _ _ _ A w h n hn φ hφ c hc
   have hAC : IsAlgClosed Ω := IsAlgClosure.isAlgClosed E
@@ -44,20 +52,20 @@ theorem UpperTheory.exists_numberField_extension_place_frobenius_degree :
   have hN1 : A.valuation (((q ^ n - 1 : ℕ)) : Ω) = 1 := by
     rw [Nat.cast_sub (by omega), Nat.cast_one, ← neg_sub, Valuation.map_neg,
       Valuation.map_one_sub_of_lt _ hQΩ]
-  have hN' : ¬ A.valuation (((q ^ n - 1 : ℕ)) : Ω) < 1 := by
-    rw [hN1]; exact lt_irrefl 1
+  have hN' : ¬ A.valuation (((q ^ n - 1 : ℕ)) : Ω) < 1 := by rw [hN1]; exact lt_irrefl 1
   haveI : NeZero (((q ^ n - 1 : ℕ)) : Ω) := ⟨by exact_mod_cast (show q ^ n - 1 ≠ 0 by omega)⟩
   haveI : NeZero (q ^ n - 1) := ⟨by omega⟩
   obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot Ω (q ^ n - 1)
-  have hζ1 : A.valuation ζ = 1 := ReciprocityTheory.Gal.valuation_eq_one_of_pow_eq_one A (by omega) hζ.pow_eq_one
+  have hζ1 : A.valuation ζ = 1 :=
+    ReciprocityTheory.Gal.valuation_eq_one_of_pow_eq_one A (by omega) hζ.pow_eq_one
   have hζA : A.valuation ζ ≤ 1 := hζ1.le
   let f : ℤ[X] := X ^ (q ^ n - 1) - C 1
   have hf : f.Monic := monic_X_pow_sub_C 1 (by omega)
   have hfζ : aeval ζ f = 0 := by simp [f, hζ.pow_eq_one]
   have hder : ¬ A.valuation (aeval ζ (derivative f)) < 1 := by
     simp only [f]
-    rw [derivative_sub, derivative_X_pow, derivative_C, sub_zero, map_mul, aeval_C, map_pow, aeval_X,
-      Valuation.map_mul, Valuation.map_pow, hζ1, one_pow, mul_one]
+    rw [derivative_sub, derivative_X_pow, derivative_C, sub_zero, map_mul, aeval_C, map_pow,
+      aeval_X, Valuation.map_mul, Valuation.map_pow, hζ1, one_pow, mul_one]
     have e : algebraMap ℤ Ω (((q ^ n - 1 : ℕ) : ℤ)) = (((q ^ n - 1 : ℕ)) : Ω) := by simp
     rw [e, hN1]
     exact lt_irrefl 1
@@ -70,13 +78,18 @@ theorem UpperTheory.exists_numberField_extension_place_frobenius_degree :
   haveI hcyc : IsCyclotomicExtension {q ^ n - 1} E L := hζ.intermediateField_adjoin_isCyclotomicExtension E
   haveI hgal : IsGalois E L := IsCyclotomicExtension.isGalois {q ^ n - 1} E L
 
-  have hroot : ∀ τ : Ω ≃ₐ[E] Ω, τ ∈ ReciprocityTheory.Gal.Dec (F := E) A → A.valuation (τ ζ - ζ) < 1 → τ ζ = ζ := by
+  have hroot
+      : ∀ τ : Ω ≃ₐ[E] Ω,
+        τ ∈ ReciprocityTheory.Gal.Dec (F := E) A → A.valuation (τ ζ - ζ) < 1 → τ ζ = ζ := by
     intro τ hτ hlt
     have hτA : A.valuation (τ ζ) ≤ 1 := by
-      rw [A.valuation_le_one_iff, ReciprocityTheory.Gal.apply_mem_iff_of_mem_Dec hτ, ← A.valuation_le_one_iff]
+      rw [A.valuation_le_one_iff, ReciprocityTheory.Gal.apply_mem_iff_of_mem_Dec hτ,
+        ← A.valuation_le_one_iff]
       exact hζA
-    refine (GlobalTheory.T.eq_of_roots_congr_of_derivative_unit A f ζ (τ ζ) hζA hτA hfζ (GlobalTheory.UnrCycExt.aeval_apply_eq_zero τ f hfζ) hder ?_).symm
-    rw [Valuation.map_sub_swap]; exact hlt
+    refine (GlobalTheory.T.eq_of_roots_congr_of_derivative_unit A f ζ (τ ζ) hζA hτA hfζ
+      (GlobalTheory.UnrCycExt.aeval_apply_eq_zero τ f hfζ) hder ?_).symm
+    rw [Valuation.map_sub_swap]
+    exact hlt
   have hine : ∀ t ∈ Ine (F := E) A, ∀ x : L, t (algebraMap L Ω x) = algebraMap L Ω x := by
     intro t ht e
     have htζ : t ζ = ζ := hroot t ht.1 (ht.2 ζ hζA)
@@ -103,8 +116,7 @@ theorem UpperTheory.exists_numberField_extension_place_frobenius_degree :
   have hq0 : ((q : ℕ) : 𝓞 L) ≠ 0 := by
     have : q ≠ 0 := by omega
     exact_mod_cast this
-  have hqv : A.valuation (algebraMap L Ω (((q : ℕ) : 𝓞 L) : L)) < 1 := by
-    simpa using hqΩ
+  have hqv : A.valuation (algebraMap L Ω (((q : ℕ) : 𝓞 L) : L)) < 1 := by simpa using hqΩ
   let u := GlobalTheory.UnrCycExt.placeBelow L A ((q : ℕ) : 𝓞 L) hq0 hqv
   have hu : IsPlaceOver A u := GlobalTheory.UnrCycExt.isPlaceOver_placeBelow L A _ hq0 hqv
   let ζL : L := ⟨ζ, IntermediateField.mem_adjoin_simple_self E ζ⟩
@@ -112,8 +124,22 @@ theorem UpperTheory.exists_numberField_extension_place_frobenius_degree :
     IsPrimitiveRoot.of_map_of_injective (f := algebraMap L Ω) hζ (algebraMap L Ω).injective
   have hζint : IsIntegral ℤ ζL := hζL.isIntegral (by omega)
   let ζ' : 𝓞 L := ⟨ζL, hζint⟩
-  refine ⟨L, inferInstance, hNF, inferInstance, inferInstance, inferInstance, hAC', u, hu,
-    AlgEquiv.restrictNormal φ L, ?_, hine, ?_, ?_⟩
+  refine ⟨
+    L,
+    inferInstance,
+    hNF,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    hAC',
+    u,
+    hu,
+    AlgEquiv.restrictNormal φ L,
+    ?_,
+    hine,
+    ?_,
+    ?_
+  ⟩
   · intro x
     exact (AlgEquiv.restrictNormal_commutes φ L x).symm
   · have hmap : ∀ p : ℤ[X], algebraMap L Ω ((aeval ζ' p : 𝓞 L) : L) = aeval ζ p := by
@@ -132,20 +158,22 @@ theorem UpperTheory.exists_numberField_extension_place_frobenius_degree :
       show A.valuation (algebraMap L Ω ((algebraMap (𝓞 E) (𝓞 L) x : 𝓞 L) : L)) < 1 ↔ _
       rw [show ((algebraMap (𝓞 E) (𝓞 L) x : 𝓞 L) : L) = algebraMap E L (x : E) from rfl,
         ← IsScalarTower.algebraMap_apply]
-    have hder' : aeval ζ' (derivative f) ∉ u.asIdeal := fun hm => hder (by
-      rw [← hmap]; exact hm)
-    exact GlobalTheory.T.algebraMap_not_mem_sq_of_derivative_not_mem E L w u ζ' f hf hfζ' (GlobalTheory.UnrCycExt.adjoin_gen_eq_top E ζ hζE) hover hder' c hc
+    have hder' : aeval ζ' (derivative f) ∉ u.asIdeal := fun hm => hder (by rw [← hmap]; exact hm)
+    exact GlobalTheory.T.algebraMap_not_mem_sq_of_derivative_not_mem E L w u ζ' f hf hfζ'
+      (GlobalTheory.UnrCycExt.adjoin_gen_eq_top E ζ hζE) hover hder' c hc
   · show Nat.card (𝓞 L ⧸ u.asIdeal) = q ^ n
     haveI : u.asIdeal.IsMaximal := u.isMaximal
-    refine GlobalTheory.T.card_quotient_eq_of_pow_sub_self_mem' u.asIdeal (q ^ n) ζ' (by omega) ?_ ?_ ?_
+    refine GlobalTheory.T.card_quotient_eq_of_pow_sub_self_mem' u.asIdeal (q ^ n) ζ' (by omega) ?_
+      ?_ ?_
     · apply Subtype.ext
       exact hζL.pow_eq_one
     · intro j hj0 hjq hm
       have hm1 : A.valuation (algebraMap L Ω (algebraMap (𝓞 L) L (ζ' ^ j - 1))) < 1 := hm
       rw [map_sub, map_pow, map_one, map_sub, map_pow, map_one] at hm1
       have hm' : A.valuation (ζ ^ j - 1) < 1 := hm1
-      have := ReciprocityTheory.Gal.eq_of_pow_eq_one A hN'
-        (by rw [← pow_mul, mul_comm, pow_mul, hζ.pow_eq_one, one_pow]) (one_pow _) hm'
+      have :=
+        ReciprocityTheory.Gal.eq_of_pow_eq_one A hN'
+          (by rw [← pow_mul, mul_comm, pow_mul, hζ.pow_eq_one, one_pow]) (one_pow _) hm'
       have hd := hζ.dvd_of_pow_eq_one j this
       exact absurd (Nat.le_of_dvd hj0 hd) (by omega)
     · intro y

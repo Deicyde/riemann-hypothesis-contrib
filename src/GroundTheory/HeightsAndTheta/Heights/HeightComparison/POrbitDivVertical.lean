@@ -12,13 +12,16 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial ReciprocityTheory.ChartRestriction.G
 
-theorem exists_int_poly_coeff_zero_ne_zero {τ : AlgebraicClosure ℚ} (hτ : τ ≠ 0) :
-    ∃ P : Polynomial ℤ, P.coeff 0 ≠ 0 ∧ Polynomial.aeval τ P = 0 := by
+theorem exists_int_poly_coeff_zero_ne_zero {τ : AlgebraicClosure ℚ} (hτ : τ ≠ 0)
+    : ∃ P : Polynomial ℤ, P.coeff 0 ≠ 0 ∧ Polynomial.aeval τ P = 0 := by
   have := IsLocalization.isAlgebraic ℚ (nonZeroDivisors ℤ)
-  obtain ⟨Q, hQ, hQτ⟩ :=
-    ((AlgebraicClosure.isAlgebraic ℚ).isAlgebraic τ⁻¹).restrictScalars (R := ℤ)
+  obtain ⟨Q, hQ, hQτ⟩ := ((AlgebraicClosure.isAlgebraic ℚ).isAlgebraic τ⁻¹).restrictScalars (R := ℤ)
   have : Invertible τ⁻¹ := invertibleOfNonzero (inv_ne_zero hτ)
-  refine ⟨Q.reverse, by rw [Polynomial.coeff_zero_reverse]; exact Polynomial.leadingCoeff_ne_zero.mpr hQ, ?_⟩
+  refine ⟨
+    Q.reverse,
+    by rw [Polynomial.coeff_zero_reverse]; exact Polynomial.leadingCoeff_ne_zero.mpr hQ,
+    ?_
+  ⟩
   have h := (Polynomial.eval₂_reverse_eq_zero_iff (algebraMap ℤ (AlgebraicClosure ℚ)) τ⁻¹ Q).mpr hQτ
   rwa [invOf_eq_inv, inv_inv] at h
 
@@ -44,18 +47,20 @@ theorem OrbitDivVertical.proof : OrbitDivVertical.Statement := by
   set μ := eval₂ (Int.castRingHom (AlgebraicClosure ℚ)) y M
   have hφs : Geo.mConeMap (ι := blockIdx n) y s = C σ * T := mConeMap_of_isMultiHomog y s a hsa
   have hφM : Geo.mConeMap (ι := blockIdx n) y M = C μ * T := mConeMap_of_isMultiHomog y M a hMa
-  have hσ : σ ≠ 0 := fun h ↦ hsW (by
-    rw [orbitIdeal, Geo.mCoordIdeal, RingHom.mem_ker, hφs, h, map_zero, zero_mul])
-  have hμ : μ ≠ 0 := fun h ↦ hMV (hWV (by
-    rw [orbitIdeal, Geo.mCoordIdeal, RingHom.mem_ker, hφM, h, map_zero, zero_mul]))
+  have hσ : σ ≠ 0 := fun h ↦
+    hsW (by rw [orbitIdeal, Geo.mCoordIdeal, RingHom.mem_ker, hφs, h, map_zero, zero_mul])
+  have hμ : μ ≠ 0 := fun h ↦
+    hMV (hWV (by rw [orbitIdeal, Geo.mCoordIdeal, RingHom.mem_ker, hφM, h, map_zero, zero_mul]))
   obtain ⟨P, hP0, hP⟩ := exists_int_poly_coeff_zero_ne_zero (div_ne_zero hσ hμ)
   set m := P.natDegree
   let f : ℕ → MvPolynomial (Coord n) ℤ := fun j ↦ C (P.coeff j) * s ^ j * M ^ (m - j)
   have hfW : ∑ j ∈ Finset.range (m + 1), f j ∈ orbitIdeal x := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [orbitIdeal, Geo.mCoordIdeal, RingHom.mem_ker, map_sum]
-    have hterm : ∀ j ∈ Finset.range (m + 1), Geo.mConeMap (ι := blockIdx n) y (f j) =
-        C (algebraMap ℤ (AlgebraicClosure ℚ) (P.coeff j) * (σ / μ) ^ j * μ ^ m) * T ^ m := by
+    have hterm
+        : ∀ j ∈ Finset.range (m + 1),
+          Geo.mConeMap (ι := blockIdx n) y (f j)
+            = C (algebraMap ℤ (AlgebraicClosure ℚ) (P.coeff j) * (σ / μ) ^ j * μ ^ m) * T ^ m := by
       intro j hj
       have hjm : j ≤ m := Nat.lt_succ_iff.mp (Finset.mem_range.mp hj)
       have e1 : (σ / μ) ^ j * μ ^ m = σ ^ j * μ ^ (m - j) := by
@@ -67,8 +72,10 @@ theorem OrbitDivVertical.proof : OrbitDivVertical.Statement := by
       ring
     set_option synthInstance.maxHeartbeats 100000 in
       rw [Finset.sum_congr rfl hterm, ← Finset.sum_mul, ← map_sum, ← Finset.sum_mul]
-    have hPτ : ∑ j ∈ Finset.range (m + 1), algebraMap ℤ (AlgebraicClosure ℚ) (P.coeff j) *
-        (σ / μ) ^ j = 0 := by
+    have hPτ
+        : ∑ j ∈ Finset.range (m + 1), algebraMap ℤ (AlgebraicClosure ℚ) (P.coeff j) *
+            (σ / μ) ^ j
+          = 0 := by
       rw [← hP, Polynomial.aeval_eq_sum_range]
       simp [Algebra.smul_def]
       rfl

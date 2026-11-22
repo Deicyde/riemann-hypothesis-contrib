@@ -4,13 +4,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThre
 
 @[expose] public section
 
-open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.U3 UpperTheory.V.Alg UpperTheory.V.UnitaryThreeInertia
+open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.U3 UpperTheory.V.Alg
+  UpperTheory.V.UnitaryThreeInertia
 
 section
-variable {O R : Type} [CommRing O] [CommRing R] [Algebra O R] (𝒜 : ℤ → Submodule O R) [GradedAlgebra 𝒜]
+variable
+  {O R : Type} [CommRing O] [CommRing R] [Algebra O R] (𝒜 : ℤ → Submodule O R) [GradedAlgebra 𝒜]
 
-private theorem gr_mul {X Y : Matrix (Fin 3) (Fin 3) R} (hX : GrMat 𝒜 X) (hY : GrMat 𝒜 Y) :
-    GrMat 𝒜 (X * Y) := by
+private theorem gr_mul {X Y : Matrix (Fin 3) (Fin 3) R} (hX : GrMat 𝒜 X) (hY : GrMat 𝒜 Y)
+    : GrMat 𝒜 (X * Y) := by
   intro a b
   simp only [Matrix.mul_apply]
   refine Submodule.sum_mem _ fun c _ => ?_
@@ -29,14 +31,14 @@ private theorem gr_one : GrMat 𝒜 (1 : Matrix (Fin 3) (Fin 3) R) := by
   · rw [Matrix.one_apply_ne h]
     exact zero_mem _
 
-private theorem gr_pow {g : GL (Fin 3) R} (hg : GrMat 𝒜 (g : Matrix (Fin 3) (Fin 3) R)) (n : ℕ) :
-    GrMat 𝒜 ((g ^ n : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R) := by
+private theorem gr_pow {g : GL (Fin 3) R} (hg : GrMat 𝒜 (g : Matrix (Fin 3) (Fin 3) R)) (n : ℕ)
+    : GrMat 𝒜 ((g ^ n : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R) := by
   induction n with
   | zero => rw [pow_zero]; exact gr_one 𝒜
   | succ n ih => rw [pow_succ, Units.val_mul]; exact gr_mul 𝒜 ih hg
 
-private theorem gr_inv [Finite R] {g : GL (Fin 3) R} (hg : GrMat 𝒜 (g : Matrix (Fin 3) (Fin 3) R)) :
-    GrMat 𝒜 ((g⁻¹ : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R) := by
+private theorem gr_inv [Finite R] {g : GL (Fin 3) R} (hg : GrMat 𝒜 (g : Matrix (Fin 3) (Fin 3) R))
+    : GrMat 𝒜 ((g⁻¹ : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R) := by
   have hn := orderOf_pos g
   have e : g⁻¹ = g ^ (orderOf g - 1) := by
     symm
@@ -45,12 +47,13 @@ private theorem gr_inv [Finite R] {g : GL (Fin 3) R} (hg : GrMat 𝒜 (g : Matri
   rw [e]
   exact gr_pow 𝒜 hg _
 
-private theorem gr_theta [Finite R] {g : GL (Fin 3) R} (hg : GrMat 𝒜 (g : Matrix (Fin 3) (Fin 3) R)) :
-    GrMat 𝒜 ((theta g : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R) := by
+private theorem gr_theta [Finite R] {g : GL (Fin 3) R} (hg : GrMat 𝒜 (g : Matrix (Fin 3) (Fin 3) R))
+    : GrMat 𝒜 ((theta g : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R) := by
   rw [theta_val]
   have hi := gr_inv 𝒜 hg
-  have key : ∀ (M : Matrix (Fin 3) (Fin 3) R) (a b : Fin 3),
-      (Jmat R 3 * Mᵀ * Jmat R 3) a b = M b.rev a.rev := by
+  have key
+      : ∀ (M : Matrix (Fin 3) (Fin 3) R) (a b : Fin 3),
+        (Jmat R 3 * Mᵀ * Jmat R 3) a b = M b.rev a.rev := by
     intro M a b
     fin_cases a <;> fin_cases b <;> simp [Matrix.mul_apply, Jmat, Fin.sum_univ_three, Fin.rev]
   intro a b
@@ -59,17 +62,18 @@ private theorem gr_theta [Finite R] {g : GL (Fin 3) R} (hg : GrMat 𝒜 (g : Mat
   rw [← e]
   exact hi _ _
 
-private theorem gr_act [Finite R] (s : ℤˣ) {g : GL (Fin 3) R} (hg : GrMat 𝒜 (g : Matrix (Fin 3) (Fin 3) R)) :
-    GrMat 𝒜 ((sgnAct 3 R s g : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R) := by
+private theorem gr_act
+    [Finite R] (s : ℤˣ) {g : GL (Fin 3) R} (hg : GrMat 𝒜 (g : Matrix (Fin 3) (Fin 3) R))
+    : GrMat 𝒜 ((sgnAct 3 R s g : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R) := by
   rcases Int.units_eq_one_or s with rfl | rfl
   · rw [sgnAct_one]; exact hg
   · rw [sgnAct_neg_one]; exact gr_theta 𝒜 hg
 
 end
 
-theorem UpperTheory.graded_matrix_mul_inv :
-    ∀ {O R : Type} [CommRing O] [CommRing R] [Algebra O R] [Finite R]
-      (𝒜 : ℤ → Submodule O R) [GradedAlgebra 𝒜] (x y : GG (m := 3) (R := R)),
+theorem UpperTheory.graded_matrix_mul_inv
+    : ∀ {O R : Type} [CommRing O] [CommRing R] [Algebra O R] [Finite R] (𝒜 : ℤ → Submodule O R)
+        [GradedAlgebra 𝒜] (x y : GG (m := 3) (R := R)),
       GrMat 𝒜 x.mat → GrMat 𝒜 y.mat → GrMat 𝒜 (x * y).mat ∧ GrMat 𝒜 (x⁻¹).mat := by
   intro O R _ _ _ _ 𝒜 _ x y hx hy
   unfold GG.mat at *

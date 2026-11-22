@@ -9,31 +9,39 @@ open Formalism.BasicNotions IsDedekindDomain NumberField
 
 namespace GlobalTheory.LocGen
 
-theorem exists_gen_mul_of_isIntegral {R S : Type*} [CommRing R] [CommRing S] [IsDedekindDomain S] [Algebra R S]
-    [Algebra.IsIntegral R S] (hinj : Function.Injective (algebraMap R S)) (p : Ideal R) [p.IsPrime] (hp : p ≠ ⊥)
-    (J : Ideal S) (hJ : J ≠ ⊥) :
-    ∃ y ∈ J, y ≠ 0 ∧ ∃ c : R, c ∉ p ∧ ∀ j ∈ J, ∃ o : S, algebraMap R S c * j = y * o := by
+theorem exists_gen_mul_of_isIntegral
+    {R S : Type*}
+    [CommRing R] [CommRing S] [IsDedekindDomain S] [Algebra R S] [Algebra.IsIntegral R S]
+    (hinj : Function.Injective (algebraMap R S))
+    (p : Ideal R) [p.IsPrime]
+    (hp : p ≠ ⊥)
+    (J : Ideal S) (hJ : J ≠ ⊥)
+    : ∃ y ∈ J, y ≠ 0 ∧ ∃ c : R, c ∉ p ∧ ∀ j ∈ J, ∃ o : S, algebraMap R S c * j = y * o := by
   obtain ⟨r, hr, hr0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hp
   have hr'0 : algebraMap R S r ≠ 0 := fun h => hr0 (hinj (by rw [h, map_zero]))
   have hJ0 : J ≠ 0 := hJ
   have hIv0 : J * Ideal.span {algebraMap R S r} ≠ 0 :=
     mul_ne_zero hJ0 (by rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]; exact hr'0)
-  obtain ⟨y, hy⟩ := exists_sup_span_eq (Ideal.mul_le_left : J * Ideal.span {algebraMap R S r} ≤ J) hIv0
+  obtain ⟨y, hy⟩ :=
+    exists_sup_span_eq (Ideal.mul_le_left : J * Ideal.span {algebraMap R S r} ≤ J) hIv0
   have hyJ : y ∈ J := hy ▸ Ideal.mem_sup_right (Ideal.mem_span_singleton_self y)
-  obtain ⟨K, hK⟩ : J ∣ Ideal.span {y} := Ideal.dvd_iff_le.mpr ((Ideal.span_singleton_le_iff_mem _).mpr hyJ)
+  obtain ⟨K, hK⟩ : J ∣ Ideal.span {y} :=
+    Ideal.dvd_iff_le.mpr ((Ideal.span_singleton_le_iff_mem _).mpr hyJ)
   have key : ¬ Ideal.comap (algebraMap R S) K ≤ p := by
     intro h
     obtain ⟨Q, hKQ, hQ, hQp⟩ := Ideal.exists_ideal_over_prime_of_isIntegral p K h
     have hrQ : algebraMap R S r ∈ Q := by
       change r ∈ Ideal.under R Q
-      rw [hQp]; exact hr
+      rw [hQp]
+      exact hr
     have h1 : J * Ideal.span {algebraMap R S r} ≤ J * Q :=
       Ideal.mul_mono_right ((Ideal.span_singleton_le_iff_mem _).mpr hrQ)
     have h2 : Ideal.span {y} ≤ J * Q := hK ▸ Ideal.mul_mono_right hKQ
-    have h3 : J ≤ J * Q := calc J = _ := hy.symm
-      _ ≤ J * Q := sup_le h1 h2
-    have h4 : J * Q = J * ⊤ := by
-      rw [Ideal.mul_top]; exact le_antisymm Ideal.mul_le_left h3
+    have h3 : J ≤ J * Q :=
+      calc
+        J = _ := hy.symm
+        _ ≤ J * Q := sup_le h1 h2
+    have h4 : J * Q = J * ⊤ := by rw [Ideal.mul_top]; exact le_antisymm Ideal.mul_le_left h3
     exact hQ.ne_top (mul_left_cancel₀ hJ0 h4)
   rw [SetLike.not_le_iff_exists] at key
   obtain ⟨c, hcK, hcp⟩ := key
@@ -53,16 +61,23 @@ end GlobalTheory.LocGen
 
 namespace GlobalTheory
 
-
 open GlobalTheory.LocGen in
-theorem fracIdeal_locGen : ∀ (D : D7) (I : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E), I ≠ 0 →
-    ∀ v : HeightOneSpectrum (𝓞 D.host.F), ∃ a : D.host.E, a ≠ 0 ∧ ∃ c : 𝓞 D.host.F, c ∉ v.asIdeal ∧
-      ((c : D.host.F) : D.host.E) * a ∈ I ∧
-      ∀ b ∈ I, ∃ o : 𝓞 D.host.E, ((c : D.host.F) : D.host.E) * b = a * (o : D.host.E) := by
+theorem fracIdeal_locGen
+    : ∀ (D : D7) (I : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E),
+      I ≠ 0
+        → ∀ v : HeightOneSpectrum (𝓞 D.host.F), ∃ a : D.host.E,
+          a ≠ 0
+            ∧ ∃ c : 𝓞 D.host.F,
+              c ∉ v.asIdeal ∧ ((c : D.host.F) : D.host.E) * a ∈ I
+                ∧ ∀ b ∈ I, ∃ o : 𝓞 D.host.E,
+                  ((c : D.host.F) : D.host.E) * b = a * (o : D.host.E) := by
   intro D I hI v
   letI : Algebra (𝓞 D.host.F) (𝓞 D.host.E) := (RingOfIntegers.mapRingHom D.host.F.subtype).toAlgebra
-  have hφ : ∀ c : 𝓞 D.host.F, ((algebraMap (𝓞 D.host.F) (𝓞 D.host.E) c : 𝓞 D.host.E) : D.host.E) =
-      ((c : D.host.F) : D.host.E) := fun c => rfl
+  have hφ
+      : ∀ c : 𝓞 D.host.F,
+        ((algebraMap (𝓞 D.host.F) (𝓞 D.host.E) c : 𝓞 D.host.E) : D.host.E)
+          = ((c : D.host.F) : D.host.E) := fun c =>
+    rfl
   haveI : Algebra.IsIntegral (𝓞 D.host.F) (𝓞 D.host.E) := Algebra.IsIntegral.tower_top (R := ℤ)
   have hinj : Function.Injective (algebraMap (𝓞 D.host.F) (𝓞 D.host.E)) := by
     intro x y h
@@ -74,10 +89,8 @@ theorem fracIdeal_locGen : ∀ (D : D7) (I : FractionalIdeal (nonZeroDivisors (�
     rintro rfl
     exact hI (by rw [FractionalIdeal.coeIdeal_bot, mul_zero])
   obtain ⟨y, hyJ, hy0, c, hcv, hc⟩ := exists_gen_mul_of_isIntegral hinj v.asIdeal v.ne_bot J hJ
-  have hd' : ((d : 𝓞 D.host.E) : D.host.E) ≠ 0 := by
-    rwa [Ne, RingOfIntegers.coe_eq_zero_iff]
-  have hy' : ((y : 𝓞 D.host.E) : D.host.E) ≠ 0 := by
-    rwa [Ne, RingOfIntegers.coe_eq_zero_iff]
+  have hd' : ((d : 𝓞 D.host.E) : D.host.E) ≠ 0 := by rwa [Ne, RingOfIntegers.coe_eq_zero_iff]
+  have hy' : ((y : 𝓞 D.host.E) : D.host.E) ≠ 0 := by rwa [Ne, RingOfIntegers.coe_eq_zero_iff]
   refine ⟨(y : D.host.E) * (d : D.host.E)⁻¹, mul_ne_zero hy' (inv_ne_zero hd'), c, hcv, ?_, ?_⟩
   · rw [FractionalIdeal.mem_singleton_mul]
     refine ⟨algebraMap (𝓞 D.host.E) D.host.E (algebraMap (𝓞 D.host.F) (𝓞 D.host.E) c * y), ?_, ?_⟩
@@ -96,7 +109,8 @@ theorem fracIdeal_locGen : ∀ (D : D7) (I : FractionalIdeal (nonZeroDivisors (�
       have h3 := congrArg (algebraMap (𝓞 D.host.E) D.host.E) ho
       rw [map_mul, map_mul] at h3
       exact h3
-    calc ((c : D.host.F) : D.host.E) * (((d : 𝓞 D.host.E) : D.host.E)⁻¹ * (j : D.host.E))
+    calc
+      ((c : D.host.F) : D.host.E) * (((d : 𝓞 D.host.E) : D.host.E)⁻¹ * (j : D.host.E))
         = (d : D.host.E)⁻¹ * (((c : D.host.F) : D.host.E) * (j : D.host.E)) := by ring
       _ = (d : D.host.E)⁻¹ * ((y : D.host.E) * (o : D.host.E)) := by rw [h2]
       _ = _ := by ring

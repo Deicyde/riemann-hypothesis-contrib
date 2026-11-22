@@ -4,13 +4,15 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.TwistedL
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel Matrix GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets UpperTheory.ConvolutionTheory.Loc
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil ValuativeRel Matrix
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets UpperTheory.ConvolutionTheory.Loc
 
 section SlopeTestRemainingChoices
 
 variable {E : Type} [Field E] {Γ : Type} [LinearOrderedCommGroupWithZero Γ] {n : ℕ}
 
-private def Bd (v : Valuation E Γ) (X : Matrix (Fin n) (Fin n) E) (c : Γ) : Prop := ∀ i j, v (X i j) ≤ c
+private def Bd (v : Valuation E Γ) (X : Matrix (Fin n) (Fin n) E) (c : Γ) : Prop :=
+  ∀ i j, v (X i j) ≤ c
 
 private lemma Bd.add {v : Valuation E Γ} {X Y : Matrix (Fin n) (Fin n) E} {c : Γ} (hX : Bd v X c) (hY : Bd v Y c) :
     Bd v (X + Y) c := fun i j => by
@@ -85,13 +87,17 @@ private lemma intertwine (v : Valuation E Γ) {A B g : Matrix (Fin n) (Fin n) E}
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.ConvolutionTheory.Loc.rootConj :
-    ∀ (E : Type) [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] (n : ℕ) (q : ℕ) (r : ValueGroupWithZero E), r < valuation E (q : E) →
-      ∀ u ∈ ball n r, ∀ u' ∈ ball n r, ∀ g : GL (Fin n) E, g⁻¹ * u ^ q * g = u' ^ q → g⁻¹ * u * g = u' := by
+theorem UpperTheory.ConvolutionTheory.Loc.rootConj
+    : ∀ (E : Type) [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E]
+        (n : ℕ) (q : ℕ) (r : ValueGroupWithZero E),
+      r < valuation E (q : E)
+        → ∀ u ∈ ball n r, ∀ u' ∈ ball n r, ∀ g : GL (Fin n) E,
+          g⁻¹ * u ^ q * g = u' ^ q → g⁻¹ * u * g = u' := by
   intro E _ _ _ _ n q r hq u hu u' hu' g h
   have h1 : u ^ q * g = g * u' ^ q := by rw [← h]; group
   have h2 : (u : Matrix (Fin n) (Fin n) E) * g = g * u' :=
-    intertwine (valuation E) hq (fun i j => hu i j) (fun i j => hu' i j)
-      (by simpa using congrArg Units.val h1)
+    intertwine (valuation E) hq (fun i j => hu i j) (fun i j => hu' i j) (by
+      simpa using congrArg Units.val h1)
   have h3 : u * g = g * u' := Units.ext (by simpa using h2)
-  rw [mul_assoc, h3]; group
+  rw [mul_assoc, h3]
+  group

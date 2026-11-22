@@ -7,16 +7,22 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.SegreChartBu
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField TensorProduct Filter Topology Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField TensorProduct Filter Topology Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 open GlobalTheory.CompanionTheory.Ar.TorusUnif
 open scoped CategoryTheory.Obj
 
 namespace PositivityTheory.Xgn.CoordinateMapFiniteType
 
-theorem finiteType_of_range {A Ω R : Type} [CommRing A] [Field Ω] [CommRing R] (φ : A →+* Ω)
-    (hφ : Function.Injective φ) (s : Set Ω) (hs : s.Finite)
-    (h : ∀ a : Ω, a ∈ Algebra.adjoin ℤ s ↔ a ∈ φ.range) (ψ : R →+* A) : ψ.FiniteType := by
+theorem finiteType_of_range
+    {A Ω R : Type} [CommRing A] [Field Ω] [CommRing R]
+    (φ : A →+* Ω) (hφ : Function.Injective φ)
+    (s : Set Ω) (hs : s.Finite) (h : ∀ a : Ω, a ∈ Algebra.adjoin ℤ s ↔ a ∈ φ.range)
+    (ψ : R →+* A)
+    : ψ.FiniteType := by
   have h1 : Algebra.FiniteType ℤ (Algebra.adjoin ℤ s) :=
     (Subalgebra.fg_iff_finiteType _).1 (Subalgebra.fg_def.2 ⟨s, hs, rfl⟩)
   have hr : φ.toIntAlgHom.range = Algebra.adjoin ℤ s := by
@@ -31,9 +37,13 @@ theorem finiteType_of_range {A Ω R : Type} [CommRing A] [Field Ω] [CommRing R]
     exact RingHom.finiteType_algebraMap.2 h2
   exact RingHom.FiniteType.of_comp_finiteType h3
 
-theorem main {X Y : Scheme.{0}} [IsAffine Y] (f : X ⟶ Y) {Ω : Type} [Field Ω] {κ : Type} [Finite κ] {x : κ → Ω}
-    {ξ : Spec (CommRingCat.of Ω) ⟶ X} (hq : ∀ q : X, genPt ξ ⤳ q) (hT : CoordTie ℤ ξ x) :
-    LocallyOfFiniteType f ∧ QuasiCompact f := by
+theorem main
+    {X Y : Scheme.{0}} [IsAffine Y]
+    (f : X ⟶ Y)
+    {Ω : Type} [Field Ω]
+    {κ : Type} [Finite κ]
+    {x : κ → Ω} {ξ : Spec (CommRingCat.of Ω) ⟶ X} (hq : ∀ q : X, genPt ξ ⤳ q) (hT : CoordTie ℤ ξ x)
+    : LocallyOfFiniteType f ∧ QuasiCompact f := by
   choose U h hU hUq _ hinj hran using fun c : {c // x c ≠ 0} => TieFrame.exists_chart hT c.2
   have hcov : ∀ q : X, ∃ c, q ∈ U c := fun q => by
     obtain ⟨c, hc⟩ := hT.cover ⟨q, hq q⟩
@@ -44,7 +54,8 @@ theorem main {X Y : Scheme.{0}} [IsAffine Y] (f : X ⟶ Y) {Ω : Type} [Field Ω
       obtain ⟨c, hc⟩ := hcov q
       exact TopologicalSpace.Opens.mem_iSup.2 ⟨c, hc⟩
     refine (HasRingHomProperty.iff_of_iSup_eq_top (P := @LocallyOfFiniteType)
-      (fun c => (⟨U c, hU c⟩ : X.affineOpens)) htop).2 fun c => ?_
+      (fun c => (⟨U c, hU c⟩ : X.affineOpens))
+      htop).2 fun c => ?_
     exact finiteType_of_range _ (hinj c) _ (Set.finite_range _) (hran c) _
   · have : CompactSpace X := by
       refine ⟨?_⟩
@@ -56,8 +67,10 @@ theorem main {X Y : Scheme.{0}} [IsAffine Y] (f : X ⟶ Y) {Ω : Type} [Field Ω
 
 end PositivityTheory.Xgn.CoordinateMapFiniteType
 
-theorem PositivityTheory.Xgn.coordinate_map_finite_type : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)]
-    (y : (Σ k, J k) → Ω) (ξ : Sp Ω ⟶ X), (∀ q : X, genPt ξ ⤳ q) →
-    CoordTie ℤ ξ (fun c' : (k : K) → J k => ∏ k, y ⟨k, c' k⟩) → LocallyOfFiniteType (toZ X) ∧ QuasiCompact (toZ X) := by
+theorem PositivityTheory.Xgn.coordinate_map_finite_type
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (K : Type) [Fintype K] (J : K → Type)
+        [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω) (ξ : Sp Ω ⟶ X),
+      (∀ q : X, genPt ξ ⤳ q) → CoordTie ℤ ξ (fun c' : (k : K) → J k => ∏ k, y ⟨k, c' k⟩)
+        → LocallyOfFiniteType (toZ X) ∧ QuasiCompact (toZ X) := by
   intro X Ω _ K _ J _ y ξ hq hT
   exact PositivityTheory.Xgn.CoordinateMapFiniteType.main (toZ X) hq hT

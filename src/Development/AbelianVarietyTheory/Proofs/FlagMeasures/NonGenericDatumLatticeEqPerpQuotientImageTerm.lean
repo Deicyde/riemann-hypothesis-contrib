@@ -11,9 +11,11 @@ noncomputable section
 
 namespace GlobalTheory.InnerRead
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
   {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
-  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V)
+  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+  (H : HermSp M V)
 
 def hL (y : V) : V →+ E := ⟨⟨fun x => H.h x y, H.h_zero_left y⟩, fun x x' => H.h_add_left x x' y⟩
 
@@ -38,8 +40,7 @@ lemma mkW_eq {r : ℕ} {f : Fin (r + 1) → V} (x y : ↥(H.perp (H.X f))) (h : 
   rw [Submodule.mkQ_apply, Submodule.mkQ_apply, Submodule.Quotient.eq]
   simpa using h
 
-def Good (X : Submodule E V) (u : V ≃ₗ[E] V) : Prop :=
-  IsUnitary H u ∧ ∀ v ∈ H.perp X, u v - v ∈ X
+def Good (X : Submodule E V) (u : V ≃ₗ[E] V) : Prop := IsUnitary H u ∧ ∀ v ∈ H.perp X, u v - v ∈ X
 
 lemma good_map_le {X : Submodule E V} {u : V ≃ₗ[E] V} (hX : X ≤ H.perp X) (hu : Good H X u) :
     ∀ x ∈ X, u x ∈ X := by
@@ -153,8 +154,8 @@ lemma sub_prF_mem (v : V) (hv : v ∈ H.perp (H.X Fr.f)) : v - Fr.prF v ∈ H.X 
   simp only [h2, zero_smul, Finset.sum_const_zero, add_zero]
   exact Submodule.sum_mem _ fun a _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, rfl⟩)
 
-theorem Lset_LamStd (L : Submodule M.L.O (H.Wb Fr.f)) :
-    H.Lset (Fr.LamStd L) Fr.f = (L : Set (H.Wb Fr.f)) := by
+theorem Lset_LamStd (L : Submodule M.L.O (H.Wb Fr.f))
+    : H.Lset (Fr.LamStd L) Fr.f = (L : Set (H.Wb Fr.f)) := by
   ext w
   constructor
   · rintro ⟨x, hxΛ, rfl⟩
@@ -164,32 +165,41 @@ theorem Lset_LamStd (L : Submodule M.L.O (H.Wb Fr.f)) :
       | mem v hv =>
         obtain ⟨-, -, w, hw, hwL⟩ := hv
         have e : (⟨Fr.prF v, prF_perp Fr v⟩ : ↥(H.perp (H.X Fr.f))) = w := Subtype.ext hw.symm
-        rw [e]; exact hwL
+        rw [e]
+        exact hwL
       | zero =>
         have e : (⟨Fr.prF 0, prF_perp Fr 0⟩ : ↥(H.perp (H.X Fr.f))) = 0 :=
           Subtype.ext (by simpa using prF_smul Fr 0 0)
-        rw [e, map_zero]; exact L.zero_mem
+        rw [e, map_zero]
+        exact L.zero_mem
       | add x y _ _ hx hy =>
-        have e : (⟨Fr.prF (x + y), prF_perp Fr _⟩ : ↥(H.perp (H.X Fr.f))) =
-            ⟨Fr.prF x, prF_perp Fr x⟩ + ⟨Fr.prF y, prF_perp Fr y⟩ := Subtype.ext (prF_add Fr x y)
-        rw [e, map_add (f := _)]; exact L.add_mem hx hy
+        have e
+            : (⟨Fr.prF (x + y), prF_perp Fr _⟩ : ↥(H.perp (H.X Fr.f)))
+              = ⟨Fr.prF x, prF_perp Fr x⟩ + ⟨Fr.prF y, prF_perp Fr y⟩ :=
+          Subtype.ext (prF_add Fr x y)
+        rw [e, map_add (f := _)]
+        exact L.add_mem hx hy
       | smul c x _ hx =>
-        have e : (⟨Fr.prF (c • x), prF_perp Fr _⟩ : ↥(H.perp (H.X Fr.f))) =
-            (c : E) • ⟨Fr.prF x, prF_perp Fr x⟩ := Subtype.ext (prF_smul Fr (c : E) x)
+        have e
+            : (⟨Fr.prF (c • x), prF_perp Fr _⟩ : ↥(H.perp (H.X Fr.f)))
+              = (c : E) • ⟨Fr.prF x, prF_perp Fr x⟩ :=
+          Subtype.ext (prF_smul Fr (c : E) x)
         rw [e, map_smul]
         exact L.smul_mem c hx
     have := hQ x hxΛ
-    rwa [mkW_eq H ⟨Fr.prF x, prF_perp Fr x⟩ x (by
-      have := (H.X Fr.f).neg_mem (sub_prF_mem Fr x x.2); simpa using this)] at this
+    rwa [mkW_eq H ⟨Fr.prF x, prF_perp Fr x⟩ x
+        (by have := (H.X Fr.f).neg_mem (sub_prF_mem Fr x x.2); simpa using this)]
+      at this
   · intro hw
     obtain ⟨x0, rfl⟩ := Submodule.mkQ_surjective _ w
     refine ⟨⟨Fr.prF x0, prF_perp Fr x0⟩, ?_, ?_⟩
     · have hp : Fr.prF (Fr.prF x0) = Fr.prF x0 := prF_of Fr _ (prF_es Fr x0) (prF_e Fr x0)
-      refine Submodule.subset_span ⟨fun a => ?_, fun a => ?_, ⟨Fr.prF x0, prF_perp Fr x0⟩, hp.symm, ?_⟩
+      refine Submodule.subset_span
+        ⟨fun a => ?_, fun a => ?_, ⟨Fr.prF x0, prF_perp Fr x0⟩, hp.symm, ?_⟩
       · change H.h (Fr.prF x0) (Fr.es a) ∈ _; rw [prF_es]; exact zero_mem _
       · change H.h (Fr.prF x0) (Fr.e a) ∈ _; rw [prF_e]; exact zero_mem _
-      · rw [mkW_eq H ⟨Fr.prF x0, prF_perp Fr x0⟩ x0 (by
-          have := (H.X Fr.f).neg_mem (sub_prF_mem Fr x0 x0.2); simpa using this)]
+      · rw [mkW_eq H ⟨Fr.prF x0, prF_perp Fr x0⟩ x0
+          (by have := (H.X Fr.f).neg_mem (sub_prF_mem Fr x0 x0.2); simpa using this)]
         exact hw
     · have := (H.X Fr.f).neg_mem (sub_prF_mem Fr x0 x0.2)
       show H.mkW Fr.f _ = H.mkW Fr.f x0
@@ -210,8 +220,8 @@ lemma mem_img (u : V ≃ₗ[E] V) (Λ : Submodule M.L.O V) (x : V) :
   rw [Submodule.mem_map]
   rfl
 
-theorem Lset_img {u : V ≃ₗ[E] V} (hu : u ∈ Fr.N) (Λ : Submodule M.L.O V) :
-    H.Lset (img u Λ) Fr.f = H.Lset Λ Fr.f := by
+theorem Lset_img {u : V ≃ₗ[E] V} (hu : u ∈ Fr.N) (Λ : Submodule M.L.O V)
+    : H.Lset (img u Λ) Fr.f = H.Lset Λ Fr.f := by
   have hX := X_le_perp Fr
   have g1 := good_of_mem_N Fr hu
   have g2 := good_inv H hX g1
@@ -229,10 +239,17 @@ theorem Lset_img {u : V ≃ₗ[E] V} (hu : u ∈ Fr.N) (Λ : Submodule M.L.O V) 
     rw [← hyx]
     exact g1.2 y hyp
   · rintro ⟨y, hyΛ, rfl⟩
-    exact ⟨⟨u y, good_perp H hX g1 y y.2⟩, (mem_img u Λ _).2 ⟨y, hyΛ, rfl⟩,
-      mkW_eq H _ _ (g1.2 y y.2)⟩
+    exact
+      ⟨⟨u y, good_perp H hX g1 y y.2⟩, (mem_img u Λ _).2 ⟨y, hyΛ, rfl⟩, mkW_eq H _ _ (g1.2 y y.2)⟩
 
-theorem datum_eq_Lset : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] {M : Loc.Model F E} {V : Type} [AddCommGroup V] [Module E V] (H : Loc.HermSp M V) (r : ℕ) (P : LocNG.FPair H r) (d : LocNG.Datum P) (τ : Loc.Term V M r), LocNG.IsTermOver P d τ → (d.L : Set (H.Wb P.A.f)) = H.Lset τ.abelian₂ P.A.f ∧ (d.L' : Set (H.Wb P.B.f)) = H.Lset τ.abelian₂ P.B.f := by
+theorem datum_eq_Lset
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] {M : Loc.Model F E} {V : Type}
+        [AddCommGroup V] [Module E V] (H : Loc.HermSp M V) (r : ℕ) (P : LocNG.FPair H r)
+        (d : LocNG.Datum P) (τ : Loc.Term V M r),
+      LocNG.IsTermOver P d τ
+        → (d.L : Set (H.Wb P.A.f)) = H.Lset τ.abelian₂ P.A.f
+          ∧ (d.L' : Set (H.Wb P.B.f)) = H.Lset τ.abelian₂ P.B.f := by
   intro F _ _ _ E _ _ _ _ M V _ _ H r P d τ hτ
   obtain ⟨-, -, ⟨n, hn, -, hΛ⟩, ⟨n', hn', -, hΛ'⟩, -⟩ := hτ
   constructor

@@ -14,13 +14,14 @@ noncomputable section
 
 section Transitive
 
-variable {F E : Type*} [Field F] [Field E] [NumberField E] [Algebra F E]
-  [Algebra.IsQuadraticExtension F E]
+variable
+  {F E : Type*} [Field F] [Field E] [NumberField E] [Algebra F E] [Algebra.IsQuadraticExtension F E]
 variable {W : Type*} [AddCommGroup W] [Module E W]
 
 def HyperbolicPairTransitive.Statement [FiniteDimensional E W] (h : HermitianForm F E W) : Prop :=
-  ∀ v w v' w' : W, IsHyperbolicPair h v w → IsHyperbolicPair h v' w' →
-    ∃ g : h.unitaryGroup, g • v = v' ∧ g • w = w'
+  ∀ v w v' w' : W,
+    IsHyperbolicPair h v w → IsHyperbolicPair h v' w'
+      → ∃ g : h.unitaryGroup, g • v = v' ∧ g • w = w'
 
 end Transitive
 

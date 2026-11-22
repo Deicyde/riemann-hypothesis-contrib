@@ -35,47 +35,61 @@ namespace GroundTheory.Heights₂.Heights.AnalyticLimit
 
 open MeasureTheory Filter Topology
 open scoped ContDiff
-open ReciprocityTheory.AnForm.M (FinHolAtlas LocPot IsPotential IsSection IsSNC mInt MIntegrable logNormSec)
+open ReciprocityTheory.AnForm.M
+  (FinHolAtlas LocPot IsPotential IsSection IsSNC mInt MIntegrable logNormSec)
 
 noncomputable section
 
-variable {e : ℕ} {W : Type} [TopologicalSpace W] {A : FinHolAtlas e W} {L : LocPot W}
-  {s : W → W → ℂ}
+variable
+  {e : ℕ} {W : Type} [TopologicalSpace W] {A : FinHolAtlas e W} {L : LocPot W} {s : W → W → ℂ}
 
-theorem secNorm_eq_local (hs : IsSection A L s) {x y : W} (hy : y ∈ L.U x) :
-    secNorm L s y = ‖s x y‖ * Real.exp (-L.φ x y) :=
+theorem secNorm_eq_local (hs : IsSection A L s) {x y : W} (hy : y ∈ L.U x)
+    : secNorm L s y = ‖s x y‖ * Real.exp (- L.φ x y) :=
   hs.2 y x y ⟨L.mem_U y, hy⟩
 
-theorem smooth_secNorm_sq (hL : IsPotential A L) (hs : IsSection A L s) :
-    A.Smooth fun x => secNorm L s x ^ 2 := by
+theorem smooth_secNorm_sq (hL : IsPotential A L) (hs : IsSection A L s)
+    : A.Smooth fun x => secNorm L s x ^ 2 := by
   intro j
   refine contDiffOn_of_locally_contDiffOn fun y hy => ?_
-  refine ⟨(A.chart j).target ∩ (A.chart j).symm ⁻¹' L.U ((A.chart j).symm y),
-    (A.chart j).isOpen_inter_preimage_symm (L.isOpen_U _), ⟨hy.1, L.mem_U _⟩, ?_⟩
+  refine ⟨
+    (A.chart j).target ∩ (A.chart j).symm ⁻¹' L.U ((A.chart j).symm y),
+    (A.chart j).isOpen_inter_preimage_symm (L.isOpen_U _),
+    ⟨hy.1, L.mem_U _⟩,
+    ?_
+  ⟩
   set p := (A.chart j).symm y
-  have h1 : ContDiffOn ℝ ∞ (fun z => ‖s p ((A.chart j).symm z)‖ ^ 2)
+  have h1 : ContDiffOn ℝ ∞
+      (fun z => ‖s p ((A.chart j).symm z)‖ ^ 2)
       ((A.chart j).target ∩ (A.chart j).symm ⁻¹' L.U p) :=
-    contDiff_norm_sq ℝ |>.comp_contDiffOn
-      (((hs.1 p j).contDiffOn_of_completeSpace (n := ∞)).restrict_scalars ℝ)
-  have h2 : ContDiffOn ℝ ∞ (fun z => Real.exp (-L.φ p ((A.chart j).symm z)) ^ 2)
+    contDiff_norm_sq ℝ
+      |>.comp_contDiffOn (((hs.1 p j).contDiffOn_of_completeSpace (n := ∞)).restrict_scalars ℝ)
+  have h2 : ContDiffOn ℝ ∞
+      (fun z => Real.exp (- L.φ p ((A.chart j).symm z)) ^ 2)
       ((A.chart j).target ∩ (A.chart j).symm ⁻¹' L.U p) :=
     (Real.contDiff_exp.comp_contDiffOn (hL.1 p j).neg).pow 2
-  refine ((h1.mul h2).mono (fun z (hz : z ∈ ((A.chart j).target ∩ (A.chart j).symm ⁻¹' Set.univ) ∩ ((A.chart j).target ∩ (A.chart j).symm ⁻¹' L.U p)) => hz.2)).congr fun z hz => ?_
+  refine ((h1.mul h2).mono
+    (fun z
+        (hz
+          : z
+            ∈ ((A.chart j).target ∩ (A.chart j).symm ⁻¹' Set.univ)
+              ∩ ((A.chart j).target ∩ (A.chart j).symm ⁻¹' L.U p)) =>
+      hz.2)).congr fun z hz => ?_
   simp only [Function.comp_apply]
   rw [secNorm_eq_local hs hz.2.2, mul_pow]
 
-theorem smooth_log_secNorm_sq_add (hL : IsPotential A L) (hs : IsSection A L s) {ε : ℝ}
-    (hε : 0 < ε) : A.Smooth fun x => Real.log (secNorm L s x ^ 2 + ε) := by
+theorem smooth_log_secNorm_sq_add (hL : IsPotential A L) (hs : IsSection A L s) {ε : ℝ} (hε : 0 < ε)
+    : A.Smooth fun x => Real.log (secNorm L s x ^ 2 + ε) := by
   intro j
-  have h1 : ContDiffOn ℝ ∞ (fun z => secNorm L s ((A.chart j).symm z) ^ 2 + ε)
+  have h1 : ContDiffOn ℝ ∞
+      (fun z => secNorm L s ((A.chart j).symm z) ^ 2 + ε)
       ((A.chart j).target ∩ (A.chart j).symm ⁻¹' Set.univ) :=
     (smooth_secNorm_sq hL hs j).add contDiffOn_const
   exact h1.log fun z _ => (add_pos_of_nonneg_of_pos (sq_nonneg _) hε).ne'
 
 def secZero (L : LocPot W) (s : W → W → ℂ) : Set W := {x | secNorm L s x = 0}
 
-theorem mem_secZero_iff_local (hs : IsSection A L s) {x y : W} (hy : y ∈ L.U x) :
-    y ∈ secZero L s ↔ s x y = 0 := by
+theorem mem_secZero_iff_local (hs : IsSection A L s) {x y : W} (hy : y ∈ L.U x)
+    : y ∈ secZero L s ↔ s x y = 0 := by
   show secNorm L s y = 0 ↔ _
   rw [secNorm_eq_local hs hy, mul_eq_zero, norm_eq_zero]
   simp [(Real.exp_pos _).ne']
@@ -91,8 +105,9 @@ theorem isAnalyticSubset_secZero (hs : IsSection A L s) : A.IsAnalyticSubset (se
   · rintro ⟨hy, h⟩
     exact ⟨(mem_secZero_iff_local hs hy).2 (h 0), hy⟩
 
-theorem interior_secZero {r : ℕ} {m : Fin r → ℕ} {Δ : Fin r → Set W} (hs : IsSection A L s)
-    (hsnc : IsSNC A L s m Δ) : interior (secZero L s) = ∅ := by
+theorem interior_secZero
+    {r : ℕ} {m : Fin r → ℕ} {Δ : Fin r → Set W} (hs : IsSection A L s) (hsnc : IsSNC A L s m Δ)
+    : interior (secZero L s) = ∅ := by
   refine Set.eq_empty_iff_forall_notMem.2 fun x hx => ?_
   obtain ⟨U, hUZ, hU, hxU⟩ := mem_interior.1 hx
   obtain ⟨ψ, -, hxψ, hψL, σ, -, -, v, -, hv0, hsx⟩ := hsnc x
@@ -109,8 +124,7 @@ theorem interior_secZero {r : ℕ} {m : Fin r → ℕ} {Δ : Fin r → Set W} (h
         simp only [hσ] at hk
         exact ⟨i, eq_zero_of_pow_eq_zero hk⟩
   have hO : IsOpen (ψ.target ∩ ψ.symm ⁻¹' U) := ψ.isOpen_inter_preimage_symm hU
-  have hxO : ψ x ∈ ψ.target ∩ ψ.symm ⁻¹' U :=
-    ⟨ψ.map_source hxψ, by simp [ψ.left_inv hxψ, hxU]⟩
+  have hxO : ψ x ∈ ψ.target ∩ ψ.symm ⁻¹' U := ⟨ψ.map_source hxψ, by simp [ψ.left_inv hxψ, hxU]⟩
   obtain ⟨δ, hδ, hball⟩ := Metric.isOpen_iff.1 hO _ hxO
   let w : Fin e → ℂ := fun i => if ψ x i = 0 then ((δ / 2 : ℝ) : ℂ) else ψ x i
   have hw0 : ∀ i, w i ≠ 0 := by
@@ -138,8 +152,8 @@ theorem interior_secZero {r : ℕ} {m : Fin r → ℕ} {Δ : Fin r → Set W} (h
 def greenSplit (L : LocPot W) (s : W → W → ℂ) (ε : ℝ) (x : W) : ℝ :=
   (-2) * logNormSec L s x + Real.log (secNorm L s x ^ 2 + ε)
 
-theorem greenEp_eq_split {ε : ℝ} (hε : 0 < ε) {x : W} (hx : x ∉ secZero L s) :
-    greenEp L s ε x = greenSplit L s ε x := by
+theorem greenEp_eq_split {ε : ℝ} (hε : 0 < ε) {x : W} (hx : x ∉ secZero L s)
+    : greenEp L s ε x = greenSplit L s ε x := by
   have hn : secNorm L s x ≠ 0 := hx
   have hn2 : secNorm L s x ^ 2 ≠ 0 := pow_ne_zero 2 hn
   have hlog : logNormSec L s x = Real.log (secNorm L s x) := rfl
@@ -149,31 +163,40 @@ theorem greenEp_eq_split {ε : ℝ} (hε : 0 < ε) {x : W} (hx : x ∉ secZero L
   push_cast
   ring
 
-theorem mIntegrable_greenSplit [CompactSpace W] [T2Space W] {r : ℕ} {m : Fin r → ℕ}
-    {Δ : Fin r → Set W} (hL : IsPotential A L) (hs : IsSection A L s) (hsnc : IsSNC A L s m Δ)
-    {ε : ℝ} (hε : 0 < ε) (Φ : Fin e → LocPot W) (hΦ : ∀ i, IsPotential A (Φ i)) :
-    MIntegrable A Φ (greenSplit L s ε) := by
+theorem mIntegrable_greenSplit
+    [CompactSpace W] [T2Space W]
+    {r : ℕ} {m : Fin r → ℕ} {Δ : Fin r → Set W}
+    (hL : IsPotential A L) (hs : IsSection A L s) (hsnc : IsSNC A L s m Δ)
+    {ε : ℝ} (hε : 0 < ε)
+    (Φ : Fin e → LocPot W) (hΦ : ∀ i, IsPotential A (Φ i))
+    : MIntegrable A Φ (greenSplit L s ε) := by
   have h1 := ReciprocityTheory.AnForm.M.logNormIntegrable A L s m Δ hL hs hsnc Φ hΦ
-  have h2 := ReciprocityTheory.AnForm.M.mIntegrableCont A Φ hΦ _
-    (ReciprocityTheory.AnForm.M.PLC.continuous_of_smooth A (smooth_log_secNorm_sq_add hL hs hε))
+  have h2 :=
+    ReciprocityTheory.AnForm.M.mIntegrableCont A Φ hΦ _
+      (ReciprocityTheory.AnForm.M.PLC.continuous_of_smooth A (smooth_log_secNorm_sq_add hL hs hε))
   intro j K hK hc
-  have : IntegrableOn (fun y => -2 * (logNormSec L s ((A.chart j).symm y) *
-      ReciprocityTheory.AnForm.M.locDens A Φ j y) + Real.log (secNorm L s ((A.chart j).symm y) ^ 2 + ε) *
-      ReciprocityTheory.AnForm.M.locDens A Φ j y) K :=
+  have : IntegrableOn
+      (fun y =>
+        -2 * (logNormSec L s ((A.chart j).symm y) * ReciprocityTheory.AnForm.M.locDens A Φ j y)
+          + Real.log (secNorm L s ((A.chart j).symm y) ^ 2 + ε)
+            * ReciprocityTheory.AnForm.M.locDens A Φ j y)
+      K :=
     ((h1 j K hK hc).const_mul (-2)).add (h2 j K hK hc)
   refine this.congr_fun (fun y _ => ?_) hc.measurableSet
   simp only [greenSplit]
   ring
 
-theorem mInt_greenEp_eq_split {r : ℕ} {m : Fin r → ℕ} {Δ : Fin r → Set W} (hs : IsSection A L s)
-    (hsnc : IsSNC A L s m Δ) {ε : ℝ} (hε : 0 < ε) (Φ : Fin e → LocPot W) :
-    mInt A Φ (greenEp L s ε) = mInt A Φ (greenSplit L s ε) :=
-  by
-    unfold ReciprocityTheory.AnForm.M.mInt
-    split_ifs with h
-    · exact ReciprocityTheory.AnForm.M.integralWith_congr_null A h.some Φ
-        (isAnalyticSubset_secZero hs) (interior_secZero hs hsnc) (fun _ hx => greenEp_eq_split hε hx)
-    · rfl
+theorem mInt_greenEp_eq_split
+    {r : ℕ} {m : Fin r → ℕ} {Δ : Fin r → Set W}
+    (hs : IsSection A L s) (hsnc : IsSNC A L s m Δ)
+    {ε : ℝ} (hε : 0 < ε)
+    (Φ : Fin e → LocPot W)
+    : mInt A Φ (greenEp L s ε) = mInt A Φ (greenSplit L s ε) := by
+  unfold ReciprocityTheory.AnForm.M.mInt
+  split_ifs with h
+  · exact ReciprocityTheory.AnForm.M.integralWith_congr_null A h.some Φ
+      (isAnalyticSubset_secZero hs) (interior_secZero hs hsnc) (fun _ hx => greenEp_eq_split hε hx)
+  · rfl
 
 end
 

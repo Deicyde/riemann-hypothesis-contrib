@@ -15,9 +15,11 @@ open Formalism.L2.PairingIndexBounds.Eq.SqG
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {N : ℕ}
 
-theorem crt_exists (R : Subring (Matrix (Fin N) (Fin N) E)) (f : ℕ → Matrix (Fin N) (Fin N) E) (K : ℕ)
-    (S : Finset ℕ) : (∀ p ∈ S, p.Prime) → (∀ p ∈ S, f p ∈ R) →
-    ∃ e ∈ R, ∀ p ∈ S, ∃ d ∈ R, e = f p + ((p : ℤ) ^ K) • d := by
+theorem crt_exists
+    (R : Subring (Matrix (Fin N) (Fin N) E)) (f : ℕ → Matrix (Fin N) (Fin N) E) (K : ℕ)
+    (S : Finset ℕ)
+    : (∀ p ∈ S, p.Prime) → (∀ p ∈ S, f p ∈ R)
+      → ∃ e ∈ R, ∀ p ∈ S, ∃ d ∈ R, e = f p + ((p : ℤ) ^ K) • d := by
   intro hprime hf
   classical
   obtain ⟨Q, hQdef⟩ : ∃ Q : ℕ → ℤ, Q = fun p => ∏ q ∈ S.erase p, ((q : ℤ) ^ K) := ⟨_, rfl⟩
@@ -28,8 +30,9 @@ theorem crt_exists (R : Subring (Matrix (Fin N) (Fin N) E)) (f : ℕ → Matrix 
       apply IsCoprime.prod_right
       intro q hq
       apply IsCoprime.pow
-      exact Nat.isCoprime_iff_coprime.2 ((Nat.coprime_primes (hprime p hp)
-        (hprime q (Finset.mem_of_mem_erase hq))).2 (Finset.ne_of_mem_erase hq).symm)
+      exact Nat.isCoprime_iff_coprime.2
+        ((Nat.coprime_primes (hprime p hp) (hprime q (Finset.mem_of_mem_erase hq))).2
+          (Finset.ne_of_mem_erase hq).symm)
     exact h
   choose! a b hab using hcop
   refine ⟨∑ q ∈ S, (b q * Q q) • f q, ?_, ?_⟩
@@ -42,14 +45,18 @@ theorem crt_exists (R : Subring (Matrix (Fin N) (Fin N) E)) (f : ℕ → Matrix 
       rw [hQdef]
       exact hd
     choose! t ht using hdiv
-    refine ⟨(-a p) • f p + ∑ q ∈ S.erase p, (b q * t q) • f q,
+    refine ⟨
+      (- a p) • f p + ∑ q ∈ S.erase p, (b q * t q) • f q,
       add_mem (zsmul_mem (hf p hp) _)
-        (sum_mem fun q hq => zsmul_mem (hf q (Finset.mem_of_mem_erase hq)) _), ?_⟩
+        (sum_mem fun q hq => zsmul_mem (hf q (Finset.mem_of_mem_erase hq)) _),
+      ?_
+    ⟩
     have hsplit := Finset.add_sum_erase S (fun q => (b q * Q q) • f q) hp
     rw [← hsplit]
-    have e1 : b p * Q p = 1 + (p : ℤ) ^ K * (-a p) := by linear_combination hab p hp
-    have e2 : ∑ q ∈ S.erase p, (b q * Q q) • f q
-        = ((p : ℤ) ^ K) • ∑ q ∈ S.erase p, (b q * t q) • f q := by
+    have e1 : b p * Q p = 1 + (p : ℤ) ^ K * (- a p) := by linear_combination hab p hp
+    have e2
+        : ∑ q ∈ S.erase p, (b q * Q q) • f q
+          = ((p : ℤ) ^ K) • ∑ q ∈ S.erase p, (b q * t q) • f q := by
       rw [Finset.smul_sum]
       refine Finset.sum_congr rfl fun q hq => ?_
       rw [smul_smul, ht q hq]
@@ -64,9 +71,11 @@ theorem sqPairGlue_main : PI.SqPair.PLocalAll → SplitPairGen := by
   choose! f hf1 hf2 hf3 using hloc
   have hstar : ∀ x ∈ lam L' L'', xᴴ ∈ lam L' L'' := fun x hx => conjTranspose_mem_lam hL' hL'' hx
   obtain ⟨D, hD0, hD⟩ := exists_den hL' hL'' hn
-  obtain ⟨e, heR, he⟩ := crt_exists (lam L' L'') f D D.primeFactors
-    (fun p hp => Nat.prime_of_mem_primeFactors hp) (fun p hp => ⟨hf1 p (Nat.prime_of_mem_primeFactors hp),
-      hf2 p (Nat.prime_of_mem_primeFactors hp)⟩)
+  obtain ⟨e, heR, he⟩ :=
+    crt_exists (lam L' L'') f D D.primeFactors
+      (fun p hp => Nat.prime_of_mem_primeFactors hp)
+      (fun p hp =>
+        ⟨hf1 p (Nat.prime_of_mem_primeFactors hp), hf2 p (Nat.prime_of_mem_primeFactors hp)⟩)
   refine ⟨e, heR.1, heR.2, ?_⟩
   intro M hM y hy
 
@@ -99,8 +108,9 @@ theorem sqPairGlue_main : PI.SqPair.PLocalAll → SplitPairGen := by
         rcases hpZ.dvd_or_dvd hdvd with h | h
         · exact hps h
         · exact hpD' (Int.natCast_dvd_natCast.mp h)
-      · have e1 : (s * (D' : ℤ)) • (M *ᵥ y) =
-            (D' : ℤ) • (s • (M' *ᵥ y)) + (s * (p : ℤ) ^ (D - a)) • ((D : ℤ) • (r *ᵥ y)) := by
+      · have e1
+            : (s * (D' : ℤ)) • (M *ᵥ y)
+              = (D' : ℤ) • (s • (M' *ᵥ y)) + (s * (p : ℤ) ^ (D - a)) • ((D : ℤ) • (r *ᵥ y)) := by
           have hpow : (p : ℤ) ^ D = (p : ℤ) ^ (D - a) * (p : ℤ) ^ a := by
             rw [← pow_add, Nat.sub_add_cancel ha]
           have hDZ : (D : ℤ) = (p : ℤ) ^ a * (D' : ℤ) := by rw [hDa]; push_cast; ring

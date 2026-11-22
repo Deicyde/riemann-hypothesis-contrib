@@ -17,7 +17,8 @@ noncomputable section
 
 namespace GlobalTheory.EtC.KumSurj
 
-theorem unitSec_mul' {U : Scheme.{0}} (u v : (Γ(U, ⊤))ˣ) : unitSec (u * v) = unitSec u + unitSec v := by
+theorem unitSec_mul' {U : Scheme.{0}} (u v : (Γ(U, ⊤))ˣ)
+    : unitSec (u * v) = unitSec u + unitSec v := by
   unfold unitSec
   exact map_add ((toSheafify Scheme.etaleTopology (Scheme.Γ ⋙ unitsF)).app (op U)).hom
     (ULift.up (Additive.ofMul u)) (ULift.up (Additive.ofMul v))
@@ -34,17 +35,24 @@ theorem inv_sp (q : ℕ) (A : Type) [CommRing A] (hq : IsUnit (q : A)) : Inv q (
 
 end GlobalTheory.EtC.KumSurj
 
-
 open GlobalTheory.EtC.KumSurj in
-theorem GlobalTheory.EtC.kum_surjective : ∀ (q : ℕ) [NeZero q] (A : Type) [CommRing A], IsUnit (q : A) → (∀ c : CommRing.Pic A, c ^ q = 1 → c = 1) → ∀ x : Ht q (sp A) 1 1, ∃ u : (Γ(Spec (CommRingCat.of A), ⊤))ˣ, kum q u = x := by
+theorem GlobalTheory.EtC.kum_surjective
+    : ∀ (q : ℕ) [NeZero q] (A : Type) [CommRing A],
+      IsUnit (q : A) → (∀ c : CommRing.Pic A, c ^ q = 1 → c = 1)
+        → ∀ x : Ht q (sp A) 1 1, ∃ u : (Γ(Spec (CommRingCat.of A), ⊤))ˣ, kum q u = x := by
   intro q _ A _ hq hp x
-  obtain ⟨κ, hκ, bd, hbd, hex, ⟨s, hs⟩, hlast⟩ := GlobalTheory.T.exists_kummer_boundary_etale_cohomology q
+  obtain ⟨κ, hκ, bd, hbd, hex, ⟨s, hs⟩, hlast⟩ :=
+    GlobalTheory.T.exists_kummer_boundary_etale_cohomology q
   have hE : Inv q (sp A) := inv_sp q A hq
   have hqX : IsUnit (q : Γ(Spec (CommRingCat.of A), ⊤)) := by
     simpa using hq.map (Scheme.ΓSpecIso (CommRingCat.of A)).inv.hom
   obtain ⟨_, h2, h3⟩ := hex (sp A) hE 0
-  obtain ⟨_, _, _, hpc, _⟩ := GlobalTheory.T.hypercohomologyCoefficientMap_functorial_additive ℤ ((chains ℤ).obj (sp A)) (0 + 1)
-  obtain ⟨hpid, _⟩ := GlobalTheory.T.hypercohomologyCoefficientMap_functorial_additive ℤ ((chains ℤ).obj (sp A)) (0 + 1)
+  obtain ⟨_, _, _, hpc, _⟩ :=
+    GlobalTheory.T.hypercohomologyCoefficientMap_functorial_additive ℤ ((chains ℤ).obj (sp A))
+      (0 + 1)
+  obtain ⟨hpid, _⟩ :=
+    GlobalTheory.T.hypercohomologyCoefficientMap_functorial_additive ℤ ((chains ℤ).obj (sp A))
+      (0 + 1)
   set y := HK.post ℤ ((chains ℤ).obj (sp A)) κ (0 + 1) (restrH (Int.castRingHom (ZMod q)) (sp A) (tw q 1) (0 + 1) x) with hy
   have hqy : (q : ℤ) • y = 0 := by
     have := (h3 y).2 ⟨x, rfl⟩
@@ -62,7 +70,8 @@ theorem GlobalTheory.EtC.kum_surjective : ∀ (q : ℕ) [NeZero q] (A : Type) [C
     rw [map_zero]
     exact congrArg Additive.ofMul this
   obtain ⟨g, hg⟩ := (h2 x).1 hy0
-  obtain ⟨-, hbij, hadd, -, -⟩ := GlobalTheory.T.degreeZeroSectionClass_properties ℤ Gm (Spec (CommRingCat.of A))
+  obtain ⟨-, hbij, hadd, -, -⟩ :=
+    GlobalTheory.T.degreeZeroSectionClass_properties ℤ Gm (Spec (CommRingCat.of A))
   obtain ⟨b, rfl⟩ := hbij.2 g
   obtain ⟨u, rfl⟩ := unitSec_surj b
   have hsu := hs _ u hqX
@@ -70,8 +79,10 @@ theorem GlobalTheory.EtC.kum_surjective : ∀ (q : ℕ) [NeZero q] (A : Type) [C
   · exact ⟨u, by rw [← hg, hsu, one_smul]⟩
   · refine ⟨u⁻¹, ?_⟩
     have hsi := hs _ u⁻¹ hqX
-    have hsum : bd (sch.obj (Spec (CommRingCat.of A))) 0 (secClass Gm (unitSec u⁻¹)) +
-        bd (sch.obj (Spec (CommRingCat.of A))) 0 (secClass Gm (unitSec u)) = 0 := by
+    have hsum
+        : bd (sch.obj (Spec (CommRingCat.of A))) 0 (secClass Gm (unitSec u⁻¹))
+            + bd (sch.obj (Spec (CommRingCat.of A))) 0 (secClass Gm (unitSec u))
+          = 0 := by
       rw [← map_add (f := _), ← hadd, ← unitSec_mul', inv_mul_cancel]
       have h0 : unitSec (1 : (Γ(Spec (CommRingCat.of A), ⊤))ˣ) = 0 := by
         have := unitSec_mul' (1 : (Γ(Spec (CommRingCat.of A), ⊤))ˣ) 1

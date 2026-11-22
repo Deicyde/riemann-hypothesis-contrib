@@ -11,15 +11,19 @@ public import Formalism.LocalRingCardinality.SpanPowerMembership.ExampleLayerExi
 noncomputable section
 
 open scoped Classical
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.DataCut Formalism.L2.SG.LsDatumB
-  Formalism.L2.SG.TermLoc Formalism.L2.SG.Pf.PCount Formalism.L2.SG.Pf.FrameGlobalPatching
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.DataCut
+  Formalism.L2.SG.LsDatumB Formalism.L2.SG.TermLoc Formalism.L2.SG.Pf.PCount
+  Formalism.L2.SG.Pf.FrameGlobalPatching
 
 namespace Formalism.L2.SG.Pf.FrameGlobalPatching.FStar
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-variable {D : Formalism.BasicNotions.D7} (Zd : LocDat D) {u u' : D.what₂.Word} {F0 : FlagG (VS D) D.R.rS (CntLocal.Tn u)}
-  {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
+variable
+  {D : Formalism.BasicNotions.D7} (Zd : LocDat D)
+  {u u' : D.what₂.Word}
+  {F0 : FlagG (VS D) D.R.rS (CntLocal.Tn u)} {what₂ : Finset (Submodule (𝓞 D.host.E) (VS D).V)}
 
 theorem bwdN_zorth : F0.z ∈ orth (VS D) (Xsp (lf D F0)) :=
   (PI.UnitaryGroupMassFormula.BetaLUniq.mem_orth (VS D)).2 fun x hx => by
@@ -49,10 +53,14 @@ theorem bwdN_holds : BwdN Zd u u' F0 what₂ := by
     BwdNP.unit_of_frame Zd p γ (ht1 p).1.2.1 a
   have hSDl : ∀ p, (locH Zd p).IsSelfDual (lattice₂ D Zd.M p γ.lam) := fun p => (ht1 p).1.1
   have hSDl₂ : ∀ p, (locH Zd p).IsSelfDual (lattice₂ D Zd.M p Λ₂) := fun p => (hloc₂ p).1.1.1
-  have hpr : ∀ p, (locH Zd p).Prim (lattice₂ D Zd.M p γ.lam) (tLoc Zd p γ).f := fun p => (ht1 p).1.2.1.1
-  have hpr₂ : ∀ p, (locH Zd p).Prim (lattice₂ D Zd.M p Λ₂) (tLoc Zd p γ).f := fun p => (hloc₂ p).1.1.2.1.1
-  have hLset : ∀ p, (locH Zd p).Lset (lattice₂ D Zd.M p γ.lam) (tLoc Zd p γ).f =
-      (locH Zd p).Lset (lattice₂ D Zd.M p Λ₂) (tLoc Zd p γ).f := fun p => by
+  have hpr : ∀ p, (locH Zd p).Prim (lattice₂ D Zd.M p γ.lam) (tLoc Zd p γ).f := fun p =>
+    (ht1 p).1.2.1.1
+  have hpr₂ : ∀ p, (locH Zd p).Prim (lattice₂ D Zd.M p Λ₂) (tLoc Zd p γ).f := fun p =>
+    (hloc₂ p).1.1.2.1.1
+  have hLset
+      : ∀ p,
+        (locH Zd p).Lset (lattice₂ D Zd.M p γ.lam) (tLoc Zd p γ).f
+          = (locH Zd p).Lset (lattice₂ D Zd.M p Λ₂) (tLoc Zd p γ).f := fun p => by
     have h := (hloc₂ p).2.1
     rw [hφ p] at h
     rw [← h]
@@ -63,17 +71,22 @@ theorem bwdN_holds : BwdN Zd u u' F0 what₂ := by
   have hXiso : ∀ x ∈ X, ∀ y ∈ X, (VS D).hT x y = 0 := fun x hx y hy => NMoveP.hT_X_X F0 hx hy
   have hXX : ∀ {w : (VS D).V}, w ∈ orth (VS D) (orth (VS D) X) → w ∈ X := fun {w} hw =>
     BwdNA.mem_of_orth_orth (VS D) X fun v hv => by
-      rw [BwdNA.hsw (VS D) v w, (PI.UnitaryGroupMassFormula.BetaLUniq.mem_orth (VS D)).1 hw v hv, star_zero]
+      rw [BwdNA.hsw (VS D) v w, (PI.UnitaryGroupMassFormula.BetaLUniq.mem_orth (VS D)).1 hw v hv,
+        star_zero]
   have hXo := BwdNA.X_le_orth (VS D) X hXiso
   have hL : ∀ x ∈ Λ₂, x ∈ orth (VS D) X → ∃ y ∈ γ.lam, y - x ∈ X := fun x hx hxo => by
-    obtain ⟨w, hw, hxw⟩ := BwdNA.dual_sum (VS D) γ.lam inferInstance hSD (orth (VS D) X) x
-      (fun m hmΛ hmU => BwdNP.pair_int Zd γ hSDl (fun p => (hLset p).symm.subset) hx hxo hmΛ hmU)
+    obtain ⟨w, hw, hxw⟩ :=
+      BwdNA.dual_sum (VS D) γ.lam inferInstance hSD (orth (VS D) X) x
+        (fun m hmΛ hmU => BwdNP.pair_int Zd γ hSDl (fun p => (hLset p).symm.subset) hx hxo hmΛ hmU)
     refine ⟨w, hw, ?_⟩
     have h2 := X.neg_mem (hXX hxw)
     rwa [neg_sub] at h2
-  have hL' : ∀ y ∈ γ.lam, y ∈ orth (VS D) X → ∃ x ∈ Λ₂, x ∈ orth (VS D) X ∧ y - x ∈ X := fun y hy hyo => by
-    obtain ⟨w, hw, hyw⟩ := BwdNA.dual_sum (VS D) Λ₂ inferInstance hSD₂ (orth (VS D) X) y
-      (fun m hmΛ hmU => BwdNP.pair_int Zd γ hSDl₂ (fun p => (hLset p).subset) hy hyo hmΛ hmU)
+  have hL'
+      : ∀ y ∈ γ.lam,
+        y ∈ orth (VS D) X → ∃ x ∈ Λ₂, x ∈ orth (VS D) X ∧ y - x ∈ X := fun y hy hyo => by
+    obtain ⟨w, hw, hyw⟩ :=
+      BwdNA.dual_sum (VS D) Λ₂ inferInstance hSD₂ (orth (VS D) X) y
+        (fun m hmΛ hmU => BwdNP.pair_int Zd γ hSDl₂ (fun p => (hLset p).subset) hy hyo hmΛ hmU)
     have hX1 := hXX hyw
     refine ⟨w, hw, ?_, hX1⟩
     have e : w = y - (y - w) := by abel
@@ -87,10 +100,12 @@ theorem bwdN_holds : BwdN Zd u u' F0 what₂ := by
     refine ⟨(c : D.host.E), RingOfIntegers.isIntegral_coe c, ?_⟩
     rw [Formalism.BasicNotions.Examples₂.star_eq_conj (H := D.host)]
     exact hc
-  obtain ⟨n, hiso, hnX, hnz, hno, himg⟩ := BwdNA.main (VS D) X hXiso F0.z bwdN_zorth γ.lam Λ₂
-    inferInstance inferInstance hSD hSD₂ hXm
-    (BwdNP.z_mem Zd γ (Λ := γ.lam) inferInstance hpr) (BwdNP.z_mem Zd γ (Λ := Λ₂) inferInstance hpr₂) hL hL' hy htr
-  refine ⟨n, ⟨hiso, fun j x hx => ?_, hno, fun a => hnX _ (Submodule.subset_span ⟨a, rfl⟩), hnz⟩, himg⟩
+  obtain ⟨n, hiso, hnX, hnz, hno, himg⟩ :=
+    BwdNA.main (VS D) X hXiso F0.z bwdN_zorth γ.lam Λ₂ inferInstance inferInstance hSD hSD₂ hXm
+      (BwdNP.z_mem Zd γ (Λ := γ.lam) inferInstance hpr)
+      (BwdNP.z_mem Zd γ (Λ := Λ₂) inferInstance hpr₂) hL hL' hy htr
+  refine
+    ⟨n, ⟨hiso, fun j x hx => ?_, hno, fun a => hnX _ (Submodule.subset_span ⟨a, rfl⟩), hnz⟩, himg⟩
   have hxX : x ∈ X := Submodule.span_mono (Set.image_subset_range _ _) hx
   rw [hnX x hxX, sub_self]
   exact zero_mem _

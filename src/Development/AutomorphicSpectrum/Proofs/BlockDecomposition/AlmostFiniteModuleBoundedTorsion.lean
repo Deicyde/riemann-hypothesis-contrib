@@ -6,7 +6,8 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers CrystallineSemistableComparison CrystallineSemistableComparison.Pb
+open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory.LogCris DividedPowers
+  CrystallineSemistableComparison CrystallineSemistableComparison.Pb
 
 namespace GlobalTheory.CompanionTheory.AlmostFinite
 
@@ -15,15 +16,19 @@ universe w
 variable {R : Type} [CommRing R]
 
 def BS (c : R) (M : Type w) [AddCommGroup M] [Module R M] : Prop :=
-  ∃ k : ℕ, (∀ (x : M) (n : ℕ), c ^ n • x = 0 → c ^ k • x = 0) ∧
-    ∀ x : M, (∀ n : ℕ, ∃ y, x = c ^ n • y) → c ^ k • x = 0
+  ∃ k : ℕ,
+    (∀ (x : M) (n : ℕ), c ^ n • x = 0 → c ^ k • x = 0)
+      ∧ ∀ x : M, (∀ n : ℕ, ∃ y, x = c ^ n • y) → c ^ k • x = 0
 
-theorem BS.of_pow {c : R} {M : Type w} [AddCommGroup M] [Module R M] (k : ℕ)
-    (h : ∀ x : M, c ^ k • x = 0) : BS c M :=
+theorem BS.of_pow
+    {c : R} {M : Type w} [AddCommGroup M] [Module R M] (k : ℕ) (h : ∀ x : M, c ^ k • x = 0)
+    : BS c M :=
   ⟨k, fun x _ _ => h x, fun x _ => h x⟩
 
-theorem BS.ext {c : R} {M : Type w} [AddCommGroup M] [Module R M] (N : Submodule R M)
-    (h₁ : BS c N) (h₂ : BS c (M ⧸ N)) : BS c M := by
+theorem BS.ext
+    {c : R} {M : Type w} [AddCommGroup M] [Module R M]
+    (N : Submodule R M) (h₁ : BS c N) (h₂ : BS c (M ⧸ N))
+    : BS c M := by
   obtain ⟨k₁, t₁, s₁⟩ := h₁
   obtain ⟨k₂, t₂, s₂⟩ := h₂
   have key : ∀ (y : M) (n : ℕ), c ^ n • y ∈ N → c ^ k₂ • y ∈ N := by
@@ -46,9 +51,10 @@ theorem BS.ext {c : R} {M : Type w} [AddCommGroup M] [Module R M] (N : Submodule
     rw [pow_add, mul_smul, h1]
   · intro x hx
     have hx2 : c ^ k₂ • x ∈ N := by
-      have h0 : c ^ k₂ • N.mkQ x = 0 := s₂ _ (fun m => by
-        obtain ⟨y, hy⟩ := hx m
-        exact ⟨N.mkQ y, by rw [hy, map_smul]⟩)
+      have h0 : c ^ k₂ • N.mkQ x = 0 :=
+        s₂ _ (fun m => by
+          obtain ⟨y, hy⟩ := hx m
+          exact ⟨N.mkQ y, by rw [hy, map_smul]⟩)
       rw [← map_smul] at h0
       exact (Submodule.Quotient.mk_eq_zero N).1 h0
     have hw : ∀ n : ℕ, ∃ w : N, x = c ^ n • (w : M) := by
@@ -60,16 +66,20 @@ theorem BS.ext {c : R} {M : Type w} [AddCommGroup M] [Module R M] (N : Submodule
         exact hx2
       exact ⟨⟨_, hy2⟩, by rw [hy, pow_add, mul_smul]⟩
     obtain ⟨w₀, hw₀⟩ := hw 0
-    have hxN : x ∈ N := by
-      rw [hw₀]; simp
-    have h1 := congrArg Subtype.val (s₁ ⟨x, hxN⟩ (fun n => by
-      obtain ⟨w, hw'⟩ := hw n
-      exact ⟨w, Subtype.ext (by simpa using hw')⟩))
+    have hxN : x ∈ N := by rw [hw₀]; simp
+    have h1 :=
+      congrArg Subtype.val
+        (s₁ ⟨x, hxN⟩ (fun n => by
+          obtain ⟨w, hw'⟩ := hw n
+          exact ⟨w, Subtype.ext (by simpa using hw')⟩))
     simp only [Submodule.coe_smul, Submodule.coe_zero] at h1
     rw [add_comm, pow_add, mul_smul, h1, smul_zero]
 
-theorem BS.of_submodule {c : R} {M : Type w} [AddCommGroup M] [Module R M] (N : Submodule R M)
-    (a : ℕ) (hN : ∀ x : M, c ^ a • x ∈ N) (h : BS c N) : BS c M := by
+theorem BS.of_submodule
+    {c : R} {M : Type w} [AddCommGroup M] [Module R M]
+    (N : Submodule R M) (a : ℕ) (hN : ∀ x : M, c ^ a • x ∈ N)
+    (h : BS c N)
+    : BS c M := by
   obtain ⟨k, t, s⟩ := h
   refine ⟨k + a, ?_, ?_⟩
   · intro x n hx
@@ -81,11 +91,13 @@ theorem BS.of_submodule {c : R} {M : Type w} [AddCommGroup M] [Module R M] (N : 
     simp only [Submodule.coe_smul, Submodule.coe_zero] at h1
     rw [pow_add, mul_smul, h1]
   · intro x hx
-    have h1 := congrArg Subtype.val (s ⟨_, hN x⟩ (fun n => by
-      obtain ⟨y, hy⟩ := hx n
-      refine ⟨⟨_, hN y⟩, Subtype.ext ?_⟩
-      simp only [Submodule.coe_smul]
-      rw [hy, smul_comm]))
+    have h1 :=
+      congrArg Subtype.val
+        (s ⟨_, hN x⟩ (fun n => by
+          obtain ⟨y, hy⟩ := hx n
+          refine ⟨⟨_, hN y⟩, Subtype.ext ?_⟩
+          simp only [Submodule.coe_smul]
+          rw [hy, smul_comm]))
     simp only [Submodule.coe_smul, Submodule.coe_zero] at h1
     rw [pow_add, mul_smul, h1]
 
@@ -93,11 +105,13 @@ section Base
 
 variable {I : Ideal R} {c : R}
 
-theorem BS.cyclic (hI : I.IsPrime) (hc : c ∉ I)
-    (hv : ∀ x : R, x ∉ I → ∃ n : ℕ, c ^ n ∈ Ideal.span {x} ⊔ I)
+theorem BS.cyclic
+    (hI : I.IsPrime) (hc : c ∉ I) (hv : ∀ x : R, x ∉ I → ∃ n : ℕ, c ^ n ∈ Ideal.span {x} ⊔ I)
     (hs : ∀ x : R, (∀ n : ℕ, x ∈ Ideal.span {c ^ n} ⊔ I) → x ∈ I)
-    {M : Type w} [AddCommGroup M] [Module R M] (hM : ∀ i ∈ I, ∀ x : M, i • x = 0)
-    (m : M) (hm : ∀ x : M, ∃ r : R, x = r • m) : BS c M := by
+    {M : Type w} [AddCommGroup M] [Module R M]
+    (hM : ∀ i ∈ I, ∀ x : M, i • x = 0)
+    (m : M) (hm : ∀ x : M, ∃ r : R, x = r • m)
+    : BS c M := by
   by_cases hJ : ∀ t : R, t • m = 0 → t ∈ I
   · refine ⟨0, ?_, ?_⟩
     · intro x n hx
@@ -127,11 +141,12 @@ theorem BS.cyclic (hI : I.IsPrime) (hc : c ∉ I)
     obtain ⟨r, rfl⟩ := hm x
     rw [smul_comm, ← hai, add_smul, mul_smul, ht, smul_zero, hM i hi m, add_zero, smul_zero]
 
-theorem BS.of_gens (hI : I.IsPrime) (hc : c ∉ I)
-    (hv : ∀ x : R, x ∉ I → ∃ n : ℕ, c ^ n ∈ Ideal.span {x} ⊔ I)
-    (hs : ∀ x : R, (∀ n : ℕ, x ∈ Ideal.span {c ^ n} ⊔ I) → x ∈ I) (a : ℕ) :
-    ∀ (M : Type w) [AddCommGroup M] [Module R M], (∀ i ∈ I, ∀ x : M, i • x = 0) →
-      ∀ g : Fin a → M, Submodule.span R (Set.range g) = ⊤ → BS c M := by
+theorem BS.of_gens
+    (hI : I.IsPrime) (hc : c ∉ I) (hv : ∀ x : R, x ∉ I → ∃ n : ℕ, c ^ n ∈ Ideal.span {x} ⊔ I)
+    (hs : ∀ x : R, (∀ n : ℕ, x ∈ Ideal.span {c ^ n} ⊔ I) → x ∈ I) (a : ℕ)
+    : ∀ (M : Type w) [AddCommGroup M] [Module R M],
+      (∀ i ∈ I, ∀ x : M, i • x = 0)
+        → ∀ g : Fin a → M, Submodule.span R (Set.range g) = ⊤ → BS c M := by
   induction a with
   | zero =>
     intro M _ _ _ g hg
@@ -143,8 +158,10 @@ theorem BS.of_gens (hI : I.IsPrime) (hc : c ∉ I)
   | succ a ih =>
     intro M _ _ hM g hg
     refine BS.ext (Submodule.span R {g 0}) ?_ ?_
-    · refine BS.cyclic hI hc hv hs (fun i hi x => Subtype.ext (by simpa using hM i hi x))
-        ⟨g 0, Submodule.mem_span_singleton_self _⟩ (fun x => ?_)
+    · refine BS.cyclic hI hc hv hs
+        (fun i hi x => Subtype.ext (by simpa using hM i hi x))
+        ⟨g 0, Submodule.mem_span_singleton_self _⟩
+        (fun x => ?_)
       obtain ⟨r, hr⟩ := Submodule.mem_span_singleton.1 x.2
       exact ⟨r, Subtype.ext (by simpa using hr.symm)⟩
     · refine ih _ (fun i hi x => ?_) (fun j => Submodule.mkQ _ (g j.succ)) ?_
@@ -160,11 +177,12 @@ theorem BS.of_gens (hI : I.IsPrime) (hc : c ∉ I)
           exact Submodule.zero_mem _
         · exact Submodule.subset_span ⟨j, rfl⟩
 
-theorem BS.of_finite (hfg : I.FG) (hI : I.IsPrime) (hc : c ∉ I)
+theorem BS.of_finite
+    (hfg : I.FG) (hI : I.IsPrime) (hc : c ∉ I)
     (hv : ∀ x : R, x ∉ I → ∃ n : ℕ, c ^ n ∈ Ideal.span {x} ⊔ I)
-    (hs : ∀ x : R, (∀ n : ℕ, x ∈ Ideal.span {c ^ n} ⊔ I) → x ∈ I) (s : ℕ) :
-    ∀ (M : Type w) [AddCommGroup M] [Module R M], Module.Finite R M →
-      (∀ r ∈ I ^ s, ∀ x : M, r • x = 0) → BS c M := by
+    (hs : ∀ x : R, (∀ n : ℕ, x ∈ Ideal.span {c ^ n} ⊔ I) → x ∈ I) (s : ℕ)
+    : ∀ (M : Type w) [AddCommGroup M] [Module R M],
+      Module.Finite R M → (∀ r ∈ I ^ s, ∀ x : M, r • x = 0) → BS c M := by
   induction s with
   | zero =>
     intro M _ _ _ hM
@@ -191,11 +209,13 @@ theorem BS.of_finite (hfg : I.FG) (hI : I.IsPrime) (hc : c ∉ I)
 
 end Base
 
-theorem limit_of_cauchy {c : R} (hc : IsPrecomplete (Ideal.span {c}) R)
-    {M : Type w} [AddCommGroup M] [Module R M] (N : Submodule R M) (hfg : N.FG) (a : ℕ)
-    (hN : ∀ x : M, c ^ a • x ∈ N) (x : ℕ → M)
-    (hx : ∀ n, ∃ y, x (n + 1) - x n = c ^ n • y) :
-    ∃ z : M, ∀ n, ∃ y, z - c ^ a • x n = c ^ n • y := by
+theorem limit_of_cauchy
+    {c : R} (hc : IsPrecomplete (Ideal.span {c}) R)
+    {M : Type w} [AddCommGroup M] [Module R M]
+    (N : Submodule R M) (hfg : N.FG)
+    (a : ℕ) (hN : ∀ x : M, c ^ a • x ∈ N)
+    (x : ℕ → M) (hx : ∀ n, ∃ y, x (n + 1) - x n = c ^ n • y)
+    : ∃ z : M, ∀ n, ∃ y, z - c ^ a • x n = c ^ n • y := by
   obtain ⟨m, g, hg⟩ := Submodule.fg_iff_exists_fin_generating_family.1 hfg
   choose y hy using hx
   have hr : ∀ n, ∃ r : Fin m → R, ∑ i, r i • g i = c ^ a • y n := by
@@ -205,8 +225,9 @@ theorem limit_of_cauchy {c : R} (hc : IsPrecomplete (Ideal.span {c}) R)
     exact (Submodule.mem_span_range_iff_exists_fun R).1 this
   choose r hr using hr
   let S : Fin m → ℕ → R := fun i n => ∑ j ∈ Finset.range n, c ^ j * r j i
-  have hmod : ∀ (u v : R) (n : ℕ),
-      u ≡ v [SMOD ((Ideal.span {c}) ^ n • ⊤ : Submodule R R)] ↔ ∃ t, u - v = c ^ n * t := by
+  have hmod
+      : ∀ (u v : R) (n : ℕ),
+        u ≡ v [SMOD ((Ideal.span {c}) ^ n • ⊤ : Submodule R R)] ↔ ∃ t, u - v = c ^ n * t := by
     intro u v n
     rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
       Ideal.mem_span_singleton']
@@ -215,14 +236,15 @@ theorem limit_of_cauchy {c : R} (hc : IsPrecomplete (Ideal.span {c}) R)
     · rintro ⟨t, ht⟩; exact ⟨t, by rw [ht, mul_comm]⟩
   have hlim : ∀ i, ∃ s : R, ∀ n, ∃ t, S i n - s = c ^ n * t := by
     intro i
-    obtain ⟨L, hL⟩ := hc.prec' (S i) (fun {p q} hpq => by
-      rw [hmod]
-      obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hpq
-      refine ⟨- ∑ j ∈ Finset.range d, c ^ j * r (p + j) i, ?_⟩
-      simp only [S]
-      rw [Finset.sum_range_add, mul_neg, Finset.mul_sum]
-      simp only [pow_add, mul_assoc]
-      ring)
+    obtain ⟨L, hL⟩ :=
+      hc.prec' (S i) (fun {p q} hpq => by
+        rw [hmod]
+        obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hpq
+        refine ⟨- ∑ j ∈ Finset.range d, c ^ j * r (p + j) i, ?_⟩
+        simp only [S]
+        rw [Finset.sum_range_add, mul_neg, Finset.mul_sum]
+        simp only [pow_add, mul_assoc]
+        ring)
     exact ⟨L, fun n => (hmod _ _ _).1 (hL n)⟩
   choose s t ht using hlim
   have hpart : ∀ n, c ^ a • x n = c ^ a • x 0 + ∑ i, S i n • g i := by
@@ -242,16 +264,22 @@ theorem limit_of_cauchy {c : R} (hc : IsPrecomplete (Ideal.span {c}) R)
   refine ⟨c ^ a • x 0 + ∑ i, s i • g i, fun n => ⟨∑ i, (- t i n) • g i, ?_⟩⟩
   rw [hpart n, add_sub_add_left_eq_sub, ← Finset.sum_sub_distrib, Finset.smul_sum]
   refine Finset.sum_congr rfl (fun i _ => ?_)
-  rw [← sub_smul, smul_smul, show s i - S i n = c ^ n * - t i n by
-    rw [mul_neg, ← ht i n]; ring]
+  rw [← sub_smul, smul_smul, show s i - S i n = c ^ n * - t i n by rw [mul_neg, ← ht i n]; ring]
 
-theorem afg_separated_complete :
-    ∀ (R : Type) [CommRing R] (I : Ideal R) (c : R), I.FG → IsNilpotent I → I.IsPrime →
-    (∀ x y : R, x ∈ Ideal.span {y} ⊔ I ∨ y ∈ Ideal.span {x} ⊔ I) → (∀ x : R, x ∉ I → ∃ n : ℕ, c ^ n ∈ Ideal.span {x} ⊔ I) →
-    IsPrecomplete (Ideal.span {c}) R → (∀ x : R, (∀ n : ℕ, x ∈ Ideal.span {c ^ n} ⊔ I) → x ∈ I) →
-    ∀ (M : Type 1) [AddCommGroup M] [Module R M], AFG c M → ∃ k : ℕ,
-      (∀ (x : M) (n : ℕ), c ^ n • x = 0 → c ^ k • x = 0) ∧ (∀ x : M, (∀ n : ℕ, ∃ y, x = c ^ n • y) → c ^ k • x = 0) ∧
-      ∀ x : ℕ → M, (∀ n, ∃ y, x (n + 1) - x n = c ^ n • y) → ∃ z : M, ∀ n, ∃ y, z - c ^ k • x n = c ^ n • y := by
+theorem afg_separated_complete
+    : ∀ (R : Type) [CommRing R] (I : Ideal R) (c : R),
+      I.FG → IsNilpotent I → I.IsPrime
+        → (∀ x y : R, x ∈ Ideal.span {y} ⊔ I ∨ y ∈ Ideal.span {x} ⊔ I)
+        → (∀ x : R, x ∉ I → ∃ n : ℕ, c ^ n ∈ Ideal.span {x} ⊔ I) → IsPrecomplete (Ideal.span {c}) R
+        → (∀ x : R, (∀ n : ℕ, x ∈ Ideal.span {c ^ n} ⊔ I) → x ∈ I)
+        → ∀ (M : Type 1) [AddCommGroup M] [Module R M],
+          AFG c M
+            → ∃ k : ℕ,
+              (∀ (x : M) (n : ℕ), c ^ n • x = 0 → c ^ k • x = 0)
+                ∧ (∀ x : M, (∀ n : ℕ, ∃ y, x = c ^ n • y) → c ^ k • x = 0)
+                ∧ ∀ x : ℕ → M,
+                  (∀ n, ∃ y, x (n + 1) - x n = c ^ n • y)
+                    → ∃ z : M, ∀ n, ∃ y, z - c ^ k • x n = c ^ n • y := by
   intro R _ I c hfg hnil hprime _ hv hpre hsep M _ _ hM
   obtain ⟨a, N, hN, hx⟩ := hM
   obtain ⟨s, hs⟩ := hnil

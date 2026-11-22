@@ -9,10 +9,11 @@ open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestrictio
 
 namespace GlobalTheory
 
-theorem exists_prime_eq_span_of_coheight_le_one (R : Type) [CommRing R] [IsDomain R]
-    [UniqueFactorizationMonoid R] (X : Scheme.{0}) (q : X ⟶ Sp R) (hq : GeneralizingMap q)
-    (x : X) (hx : Order.coheight x ≤ 1) (hne : (q x).asIdeal ≠ ⊥) :
-    ∃ π : R, Prime π ∧ (q x).asIdeal = Ideal.span {π} := by
+theorem exists_prime_eq_span_of_coheight_le_one
+    (R : Type) [CommRing R] [IsDomain R] [UniqueFactorizationMonoid R]
+    (X : Scheme.{0}) (q : X ⟶ Sp R) (hq : GeneralizingMap q) (x : X)
+    (hx : Order.coheight x ≤ 1) (hne : (q x).asIdeal ≠ ⊥)
+    : ∃ π : R, Prime π ∧ (q x).asIdeal = Ideal.span {π} := by
   obtain ⟨π, hπP, hπ⟩ := Ideal.IsPrime.exists_mem_prime_of_ne_bot (q x).isPrime hne
   refine ⟨π, hπ, ?_⟩
   by_contra hQP
@@ -40,7 +41,9 @@ theorem exists_prime_eq_span_of_coheight_le_one (R : Type) [CommRing R] [IsDomai
   have c1 := Order.coheight_add_one_le h1
   have c2 := Order.coheight_add_one_le h2
   have : (2 : ℕ∞) ≤ Order.coheight x := by
-    calc (2 : ℕ∞) = 0 + 1 + 1 := by norm_num
+    calc
+      (2 : ℕ∞)
+        = 0 + 1 + 1 := by norm_num
       _ ≤ Order.coheight x'' + 1 + 1 := by gcongr; exact bot_le
       _ ≤ Order.coheight x' + 1 := by gcongr
       _ ≤ Order.coheight x := c1

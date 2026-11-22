@@ -24,10 +24,7 @@ theorem chartLocDomain : ChartLocDomain.Statement :=
   ChartLocDomain.proof (IncIdealBelow.proof ChowFormMultiHomog.full) ChartIncDomain.proof
     (ChartKernel.proof IncidenceGeneric.full ChartIncDomain.proof)
 
-
 end ChartFracSeparableInhabited
-
-
 
 end
 

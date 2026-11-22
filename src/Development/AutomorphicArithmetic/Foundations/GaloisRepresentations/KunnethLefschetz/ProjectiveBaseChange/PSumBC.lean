@@ -5,18 +5,20 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.EtaleTrace CrystallineSemistableComparison ReciprocityTheory.ChartRestriction.G.Geo.Tor UpperTheory.Gal.KunnethLefschetz
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC LateralTheory.EtaleTrace
+  CrystallineSemistableComparison ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  UpperTheory.Gal.KunnethLefschetz
 open scoped TensorProduct DirectSum
 
-private theorem range_eq_preimage {P X Y Z : Scheme.{0}} {a : P ⟶ X} {b : P ⟶ Y} {f : X ⟶ Z} {g : Y ⟶ Z}
-    (h : IsPullback a b f g) : Set.range a = f ⁻¹' Set.range g := by
+private theorem range_eq_preimage
+    {P X Y Z : Scheme.{0}} {a : P ⟶ X} {b : P ⟶ Y} {f : X ⟶ Z} {g : Y ⟶ Z} (h : IsPullback a b f g)
+    : Set.range a = f ⁻¹' Set.range g := by
   have e := h.isoPullback_hom_fst
   rw [← e, Scheme.Hom.comp_base, TopCat.coe_comp, Set.range_comp,
     Set.range_eq_univ.mpr (fun y => ⟨h.isoPullback.inv y, by simp⟩), Set.image_univ,
     Scheme.Pullback.range_fst]
 
-theorem UpperTheory.Gal.KunnethLefschetz.sumBC_holds :
-    UpperTheory.Gal.KunnethLefschetz.SumBC := by
+theorem UpperTheory.Gal.KunnethLefschetz.sumBC_holds : UpperTheory.Gal.KunnethLefschetz.SumBC := by
   unfold UpperTheory.Gal.KunnethLefschetz.SumBC
   intro X' X r Y' Y j' j f u h hj
   obtain ⟨ho, hc, hd⟩ := hj

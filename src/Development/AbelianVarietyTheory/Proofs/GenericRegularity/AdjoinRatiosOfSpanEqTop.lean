@@ -6,11 +6,22 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem adjoin_ratios_of_span_eq_top :
-    ∀ (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω] (R : Subalgebra K Ω) (m : ℕ) (w : Fin m → R) (k : Fin m), Ideal.span (Set.range w) = ⊤ → (w k : Ω) ≠ 0 → ∀ R' : Subalgebra K Ω, R' = Algebra.adjoin K ((R : Set Ω) ∪ Set.range fun i => (w i : Ω) / (w k : Ω)) → ∃ h : R ≤ R', (w k : Ω)⁻¹ ∈ R' ∧ (Algebra.Smooth K R → Algebra.Smooth K R') ∧ ∀ (L : Type) [Field L] [Algebra K L] (ψ : R →ₐ[K] L), ψ (w k) ≠ 0 → ∃ ψ' : R' →ₐ[K] L, ψ'.comp (Subalgebra.inclusion h) = ψ ∧ ∀ i (hi : (w i : Ω) / (w k : Ω) ∈ R'), ψ' ⟨_, hi⟩ = ψ (w i) / ψ (w k) := by
+theorem adjoin_ratios_of_span_eq_top
+    : ∀ (K Ω : Type) [Field K] [Field Ω] [Algebra K Ω] (R : Subalgebra K Ω) (m : ℕ) (w : Fin m → R)
+        (k : Fin m),
+      Ideal.span (Set.range w) = ⊤ → (w k : Ω) ≠ 0
+        → ∀ R' : Subalgebra K Ω,
+          R' = Algebra.adjoin K ((R : Set Ω) ∪ Set.range fun i => (w i : Ω) / (w k : Ω))
+            → ∃ h : R ≤ R',
+              (w k : Ω)⁻¹ ∈ R' ∧ (Algebra.Smooth K R → Algebra.Smooth K R')
+                ∧ ∀ (L : Type) [Field L] [Algebra K L] (ψ : R →ₐ[K] L),
+                  ψ (w k) ≠ 0
+                    → ∃ ψ' : R' →ₐ[K] L,
+                      ψ'.comp (Subalgebra.inclusion h) = ψ
+                        ∧ ∀ i (hi : (w i : Ω) / (w k : Ω) ∈ R'),
+                          ψ' ⟨_, hi⟩ = ψ (w i) / ψ (w k) := by
   intro K Ω _ _ _ R m w k hspan hk R' hR'
-  have h : R ≤ R' := by
-    rw [hR']; intro x hx; exact Algebra.subset_adjoin (Or.inl hx)
+  have h : R ≤ R' := by rw [hR']; intro x hx; exact Algebra.subset_adjoin (Or.inl hx)
   have hrat : ∀ i, (w i : Ω) / (w k : Ω) ∈ R' := by
     intro i; rw [hR']; exact Algebra.subset_adjoin (Or.inr ⟨i, rfl⟩)
   have hinv : (w k : Ω)⁻¹ ∈ R' := by
@@ -34,19 +45,22 @@ theorem adjoin_ratios_of_span_eq_top :
       rcases hx with hx | ⟨i, rfl⟩
       · exact ⟨0, ⟨x, hx⟩, by simp⟩
       · exact ⟨1, w i, by field_simp⟩
-    | algebraMap r => exact ⟨0, algebraMap K R r, by simp⟩
+    | algebraMap r =>
+      exact ⟨0, algebraMap K R r, by simp⟩
     | add x y _ _ hx hy =>
       obtain ⟨n, a, ha⟩ := hx
       obtain ⟨n', b, hb⟩ := hy
       refine ⟨n + n', a * w k ^ n' + b * w k ^ n, ?_⟩
       push_cast
-      rw [← ha, ← hb]; ring
+      rw [← ha, ← hb]
+      ring
     | mul x y _ _ hx hy =>
       obtain ⟨n, a, ha⟩ := hx
       obtain ⟨n', b, hb⟩ := hy
       refine ⟨n + n', a * b, ?_⟩
       push_cast
-      rw [← ha, ← hb]; ring
+      rw [← ha, ← hb]
+      ring
   haveI hloc : IsLocalization.Away (w k) R' := by
     refine IsLocalization.Away.mk (w k) ?_ ?_ ?_
     · refine IsUnit.of_mul_eq_one ⟨_, hinv⟩ ?_

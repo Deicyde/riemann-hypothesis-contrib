@@ -7,13 +7,16 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SumUnitsP
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ PowerSeries GlobalTheory.KZ.Cmp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ PowerSeries GlobalTheory.KZ.Cmp
 
 namespace GlobalTheory.TeichDec
 
 variable {l : ℕ} [Fact l.Prime]
 
-noncomputable def emb (l : ℕ) [Fact l.Prime] : ℤ_[l] →+* Qbar l := (algebraMap ℚ_[l] (Qbar l)).comp PadicInt.Coe.ringHom
+noncomputable def emb (l : ℕ) [Fact l.Prime] : ℤ_[l] →+* Qbar l :=
+  (algebraMap ℚ_[l] (Qbar l)).comp PadicInt.Coe.ringHom
 
 theorem norm_emb (x : ℤ_[l]) : ‖emb l x‖ = ‖x‖ := PadicAlgCl.norm_extends l (x : ℚ_[l])
 
@@ -34,7 +37,9 @@ theorem norm_eq_one_of_pow {x : Qbar l} (hx : x ^ (l - 1) = 1) : ‖x‖ = 1 := 
   rw [norm_pow, norm_one] at h1
   exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) (by omega)).1 h1
 
-theorem eq_of_pow_eq_one {x y : Qbar l} (hx : x ^ (l - 1) = 1) (hy : y ^ (l - 1) = 1) (h : ‖x - y‖ < 1) : x = y := by
+theorem eq_of_pow_eq_one
+    {x y : Qbar l} (hx : x ^ (l - 1) = 1) (hy : y ^ (l - 1) = 1) (h : ‖x - y‖ < 1)
+    : x = y := by
   have h2 := (Fact.out : l.Prime).two_le
   by_contra hne
   have hx1 := norm_eq_one_of_pow hx
@@ -60,10 +65,12 @@ theorem eq_of_pow_eq_one {x y : Qbar l} (hx : x ^ (l - 1) = 1) (hy : y ^ (l - 1)
     refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg zero_le_one fun k _ => ?_
     rw [norm_pow, hzn, one_pow]
   have hsum : (1 : Qbar l) = (l : Qbar l) + ∑ i ∈ Finset.range (l - 1), (z ^ i - 1) := by
-    rw [Finset.sum_sub_distrib, hs, Finset.sum_const, Finset.card_range, nsmul_eq_mul, Nat.cast_sub (by omega)]
+    rw [Finset.sum_sub_distrib, hs, Finset.sum_const, Finset.card_range, nsmul_eq_mul,
+      Nat.cast_sub (by omega)]
     push_cast
     ring
-  have h3 := IsUltrametricDist.norm_add_le_max (l : Qbar l) (∑ i ∈ Finset.range (l - 1), (z ^ i - 1))
+  have h3 :=
+    IsUltrametricDist.norm_add_le_max (l : Qbar l) (∑ i ∈ Finset.range (l - 1), (z ^ i - 1))
   rw [← hsum, norm_one] at h3
   exact absurd h3 (not_le.2 (max_lt norm_l_lt_one (hb.trans_lt (hzd ▸ h))))
 
@@ -72,11 +79,15 @@ theorem norm_natCast_eq_one {n : ℕ} (hn : ¬ l ∣ n) : ‖(n : ℤ_[l])‖ = 
   have h1 : ‖((n : ℤ) : ℤ_[l])‖ < 1 := by simpa using h
   exact Int.natCast_dvd_natCast.1 ((PadicInt.norm_int_lt_one_iff_dvd _).1 h1)
 
-theorem exists_root {c : ℕ} (hc : ¬ l ∣ c) : ∃ z : ℤ_[l], z ^ (l - 1) = 1 ∧ (l : ℤ_[l]) ∣ z - c := by
+theorem exists_root {c : ℕ} (hc : ¬ l ∣ c)
+    : ∃ z : ℤ_[l], z ^ (l - 1) = 1 ∧ (l : ℤ_[l]) ∣ z - c := by
   have hp : l.Prime := Fact.out
   have h2 := hp.two_le
-  have hd : ‖Polynomial.aeval (c : ℤ_[l]) (Polynomial.derivative (Polynomial.X ^ (l - 1) - 1 : Polynomial ℤ_[l]))‖ = 1 := by
-    have : Polynomial.aeval (c : ℤ_[l]) (Polynomial.derivative (Polynomial.X ^ (l - 1) - 1 : Polynomial ℤ_[l]))
+  have hd
+      : ‖Polynomial.aeval (c : ℤ_[l]) (Polynomial.derivative (Polynomial.X ^ (l - 1) - 1 : Polynomial ℤ_[l]))‖
+        = 1 := by
+    have : Polynomial.aeval (c : ℤ_[l])
+          (Polynomial.derivative (Polynomial.X ^ (l - 1) - 1 : Polynomial ℤ_[l]))
         = (((l - 1) * c ^ (l - 1 - 1) : ℕ) : ℤ_[l]) := by
       simp [Polynomial.derivative_X_pow]
     rw [this]
@@ -91,21 +102,26 @@ theorem exists_root {c : ℕ} (hc : ¬ l ∣ c) : ∃ z : ℤ_[l], z ^ (l - 1) =
     rw [this, PadicInt.norm_int_lt_one_iff_dvd, ← ZMod.intCast_zmod_eq_zero_iff_dvd]
     push_cast
     rw [ZMod.pow_card_sub_one_eq_one (by rwa [Ne, ZMod.natCast_eq_zero_iff]), sub_self]
-  obtain ⟨z, hz, hz1, -⟩ := hensels_lemma (F := (Polynomial.X ^ (l - 1) - 1 : Polynomial ℤ_[l])) (a := (c : ℤ_[l]))
-    (by rw [hd, one_pow]; exact hv)
+  obtain ⟨z, hz, hz1, -⟩ :=
+    hensels_lemma (F := (Polynomial.X ^ (l - 1) - 1 : Polynomial ℤ_[l])) (a := (c : ℤ_[l]))
+      (by rw [hd, one_pow]; exact hv)
   rw [hd] at hz1
   refine ⟨z, ?_, (PadicInt.norm_lt_one_iff_dvd _).1 hz1⟩
   simpa [sub_eq_zero] using hz
 
-theorem exists_decomp (hl : l ≠ 2) (R : ℕ) {j : ℕ} (hj : ¬ l ∣ j) :
-    ∃ c t : ℕ, ¬ l ∣ c ∧ j ≡ c ^ (l ^ R) * (1 + l) ^ t [MOD l ^ (R + 1)] := by
+theorem exists_decomp (hl : l ≠ 2) (R : ℕ) {j : ℕ} (hj : ¬ l ∣ j)
+    : ∃ c t : ℕ, ¬ l ∣ c ∧ j ≡ c ^ (l ^ R) * (1 + l) ^ t [MOD l ^ (R + 1)] := by
   classical
   have hp : l.Prime := Fact.out
   haveI : NeZero (l ^ (R + 1)) := ⟨pow_ne_zero _ hp.ne_zero⟩
-  have h := GlobalTheory.sum_units_primePow_teichmuller_reindex l hl R ℕ
-    (fun x => if x = (j : ZMod (l ^ (R + 1))) then 1 else 0)
-  have hcop : Nat.Coprime j (l ^ (R + 1)) := Nat.Coprime.pow_right _ ((hp.coprime_iff_not_dvd).2 hj).symm
-  have hne : ∑ b : (ZMod (l ^ (R + 1)))ˣ, (if (b : ZMod (l ^ (R + 1))) = (j : ZMod (l ^ (R + 1))) then 1 else 0 : ℕ) ≠ 0 := by
+  have h :=
+    GlobalTheory.sum_units_primePow_teichmuller_reindex l hl R ℕ
+      (fun x => if x = (j : ZMod (l ^ (R + 1))) then 1 else 0)
+  have hcop : Nat.Coprime j (l ^ (R + 1)) :=
+    Nat.Coprime.pow_right _ ((hp.coprime_iff_not_dvd).2 hj).symm
+  have hne
+      : ∑ b : (ZMod (l ^ (R + 1)))ˣ, (if (b : ZMod (l ^ (R + 1))) = (j : ZMod (l ^ (R + 1))) then 1 else 0 : ℕ)
+        ≠ 0 := by
     intro h0
     have := Finset.sum_eq_zero_iff.1 h0 (ZMod.unitOfCoprime j hcop) (Finset.mem_univ _)
     simp at this
@@ -124,11 +140,17 @@ theorem dvd_of_modEq {n a b : ℕ} (h : a ≡ b [MOD n]) : (n : ℤ_[l]) ∣ (b 
   have h1 := map_dvd (Int.castRingHom ℤ_[l]) (Nat.modEq_iff_dvd.1 h)
   simpa using h1
 
-theorem teich : ∀ (l : ℕ) [Fact l.Prime] (φ : DirichletCharacter (Qbar l) l) (e R j : ℕ), l ≠ 2 →
-    ∃ (ε : Qbar l) (t : ℕ), (ε = 0 ∨ ε ^ (l - 1) = 1) ∧
-      Cg R (φ (j : ZMod l) * (j : Qbar l) ^ e) (ε * ((1 + (l : Qbar l)) ^ e) ^ t) ∧
-      ∀ m, 1 ≤ m → m ≤ R → ∀ ψ : DirichletCharacter (Qbar l) (l ^ m), InComp φ e ψ →
-        ψ⁻¹ (j : ZMod (l ^ m)) = ε * (ψ⁻¹ (1 + (l : ZMod (l ^ m)))) ^ t := by
+theorem teich
+    : ∀ (l : ℕ) [Fact l.Prime] (φ : DirichletCharacter (Qbar l) l) (e R j : ℕ),
+      l ≠ 2
+        → ∃ (ε : Qbar l) (t : ℕ),
+          (ε = 0 ∨ ε ^ (l - 1) = 1)
+            ∧ Cg R (φ (j : ZMod l) * (j : Qbar l) ^ e) (ε * ((1 + (l : Qbar l)) ^ e) ^ t)
+            ∧ ∀ m,
+              1 ≤ m → m ≤ R
+                → ∀ ψ : DirichletCharacter (Qbar l) (l ^ m),
+                  InComp φ e ψ
+                    → ψ⁻¹ (j : ZMod (l ^ m)) = ε * (ψ⁻¹ (1 + (l : ZMod (l ^ m)))) ^ t := by
   intro l _ φ e R j hl
   have hp : l.Prime := Fact.out
   by_cases hj : l ∣ j
@@ -148,9 +170,12 @@ theorem teich : ∀ (l : ℕ) [Fact l.Prime] (φ : DirichletCharacter (Qbar l) l
   have hw1 : w ^ (l - 1) = 1 := by rw [hw, ← pow_mul, mul_comm, pow_mul, hz, one_pow]
   have hwb : (l : ℤ_[l]) ^ (R + 1) ∣ w - b := by
     have := dvd_sub_pow_of_dvd_sub hzc R
-    rw [hb]; push_cast; exact this
+    rw [hb]
+    push_cast
+    exact this
   have hj0 : (j : ZMod l) ≠ 0 := by rwa [Ne, ZMod.natCast_eq_zero_iff]
-  have hφ : φ (j : ZMod l) ^ (l - 1) = 1 := by rw [← map_pow, ZMod.pow_card_sub_one_eq_one hj0, map_one]
+  have hφ : φ (j : ZMod l) ^ (l - 1) = 1 := by
+    rw [← map_pow, ZMod.pow_card_sub_one_eq_one hj0, map_one]
   have hφn := norm_eq_one_of_pow hφ
   have hε : (emb l w ^ e * φ (j : ZMod l)) ^ (l - 1) = 1 := by
     rw [mul_pow, hφ, mul_one, ← pow_mul, mul_comm, pow_mul, ← map_pow, hw1, map_one, one_pow]
@@ -158,7 +183,8 @@ theorem teich : ∀ (l : ℕ) [Fact l.Prime] (φ : DirichletCharacter (Qbar l) l
   · have h1 : (l : ℤ_[l]) ^ (R + 1) ∣ (j : ℤ_[l]) - w * (1 + l) ^ t := by
       have h2 := dvd_of_modEq (l := l) hjc.symm
       push_cast at h2
-      have h3 : (j : ℤ_[l]) - w * (1 + l) ^ t = (j - b * (1 + l) ^ t) - (w - b) * (1 + l) ^ t := by ring
+      have h3 : (j : ℤ_[l]) - w * (1 + l) ^ t = (j - b * (1 + l) ^ t) - (w - b) * (1 + l) ^ t := by
+        ring
       rw [h3]
       exact dvd_sub h2 (hwb.mul_right _)
     have h4 : (l : ℤ_[l]) ^ R ∣ (j : ℤ_[l]) ^ e - (w * (1 + l) ^ t) ^ e :=
@@ -166,8 +192,11 @@ theorem teich : ∀ (l : ℕ) [Fact l.Prime] (φ : DirichletCharacter (Qbar l) l
     have h5 := norm_emb_le_of_dvd h4
     simp only [map_sub, map_pow, map_mul, map_add (f := _), map_one, map_natCast] at h5
     unfold Cg
-    have h6 : φ (j : ZMod l) * (j : Qbar l) ^ e - emb l w ^ e * φ (j : ZMod l) * ((1 + (l : Qbar l)) ^ e) ^ t
-        = φ (j : ZMod l) * ((j : Qbar l) ^ e - (emb l w * (1 + (l : Qbar l)) ^ t) ^ e) := by ring
+    have h6
+        : φ (j : ZMod l) * (j : Qbar l) ^ e
+            - emb l w ^ e * φ (j : ZMod l) * ((1 + (l : Qbar l)) ^ e) ^ t
+          = φ (j : ZMod l) * ((j : Qbar l) ^ e - (emb l w * (1 + (l : Qbar l)) ^ t) ^ e) := by
+      ring
     rw [h6, norm_mul, hφn, one_mul]
     exact h5
   · haveI : NeZero (l ^ m) := ⟨pow_ne_zero _ hp.ne_zero⟩
@@ -187,8 +216,11 @@ theorem teich : ∀ (l : ℕ) [Fact l.Prime] (φ : DirichletCharacter (Qbar l) l
     rw [ZMod.coe_unitOfCoprime, ZMod.val_natCast] at h7
     have hvb : b % l ^ m ≡ b [MOD l] := (Nat.mod_modEq b (l ^ m)).of_dvd hld
     have hbj : (b : ZMod l) = (j : ZMod l) := by
-      have := (ZMod.natCast_eq_natCast_iff _ _ _).2 (hjc.of_dvd (dvd_pow_self l (Nat.succ_ne_zero R)))
-      rw [this]; push_cast; simp
+      have :=
+        (ZMod.natCast_eq_natCast_iff _ _ _).2 (hjc.of_dvd (dvd_pow_self l (Nat.succ_ne_zero R)))
+      rw [this]
+      push_cast
+      simp
     rw [(ZMod.natCast_eq_natCast_iff _ _ _).2 hvb, hbj] at h7
     have h8 : (l : ℤ_[l]) ∣ ((b % l ^ m : ℕ) : ℤ_[l]) ^ e - w ^ e := by
       refine Dvd.dvd.trans ?_ (sub_dvd_pow_sub_pow _ _ _)
@@ -201,9 +233,11 @@ theorem teich : ∀ (l : ℕ) [Fact l.Prime] (φ : DirichletCharacter (Qbar l) l
     have hψb : ψ⁻¹ (b : ZMod (l ^ m)) ^ (l - 1) = 1 := by rw [← map_pow, hb2, map_one]
     have h10 : ψ⁻¹ (b : ZMod (l ^ m)) = emb l w ^ e * φ (j : ZMod l) := by
       refine eq_of_pow_eq_one hψb hε ?_
-      have h3 : ψ⁻¹ (b : ZMod (l ^ m)) - emb l w ^ e * φ (j : ZMod l) =
-          (ψ⁻¹ (b : ZMod (l ^ m)) - ((b % l ^ m : ℕ) : Qbar l) ^ e * φ (j : ZMod l)) +
-            (((b % l ^ m : ℕ) : Qbar l) ^ e - emb l w ^ e) * φ (j : ZMod l) := by ring
+      have h3
+          : ψ⁻¹ (b : ZMod (l ^ m)) - emb l w ^ e * φ (j : ZMod l)
+            = (ψ⁻¹ (b : ZMod (l ^ m)) - ((b % l ^ m : ℕ) : Qbar l) ^ e * φ (j : ZMod l))
+              + (((b % l ^ m : ℕ) : Qbar l) ^ e - emb l w ^ e) * φ (j : ZMod l) := by
+        ring
       rw [h3]
       refine (IsUltrametricDist.norm_add_le_max _ _).trans_lt (max_lt h7 ?_)
       rw [norm_mul, hφn, mul_one]

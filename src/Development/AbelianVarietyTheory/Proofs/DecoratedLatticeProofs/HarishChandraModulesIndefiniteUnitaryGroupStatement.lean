@@ -6,5 +6,6 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.SameBlock
 
 @[expose] public section
 
-theorem GlobalTheory.T.harishChandraModules_indefiniteUnitaryGroup : GlobalTheory.Published.HarishChandraModules :=
+theorem GlobalTheory.T.harishChandraModules_indefiniteUnitaryGroup
+    : GlobalTheory.Published.HarishChandraModules :=
   GlobalTheory.HcPort.print_harishChandraModules

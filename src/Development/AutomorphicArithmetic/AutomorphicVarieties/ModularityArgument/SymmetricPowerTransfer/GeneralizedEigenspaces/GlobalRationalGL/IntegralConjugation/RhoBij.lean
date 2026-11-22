@@ -5,8 +5,10 @@ public import GroundTheory.GlobalFields.SemilocalAlgebras.Finite
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil Formalism.BasicNotions Matrix
-open UpperTheory.V UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict UpperTheory.V.Z.Sym.Dict.Br UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep
+  GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil Formalism.BasicNotions Matrix
+open UpperTheory.V UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict UpperTheory.V.Z.Sym.Dict.Br
+  UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
 open UpperTheory.V.W (Plc Lp)
 open scoped TensorProduct
 open GroundTheory.Global.SemiLocal
@@ -26,11 +28,13 @@ private theorem lies {v : Pl (Lp L)} {w : Plc L} (h : un w = v) : w.asIdeal.Lies
 private theorem unOf {v : Pl (Lp L)} {w : Plc L} (h : w.asIdeal.LiesOver v.asIdeal) : un w = v :=
   HeightOneSpectrum.ext h.over.symm
 
-private theorem phi_eq (P : Pre L) (v : Pl (Lp L)) (w : Plc L) (h : un w = v)
-    [w.asIdeal.LiesOver v.asIdeal] (a : Kv v) : P.φ v w h a = completionMap v w a := by
+private theorem phi_eq
+    (P : Pre L) (v : Pl (Lp L)) (w : Plc L) (h : un w = v) [w.asIdeal.LiesOver v.asIdeal] (a : Kv v)
+    : P.φ v w h a = completionMap v w a := by
   have hd := IsDedekindDomain.HeightOneSpectrum.denseRange_algebraMap (R := 𝓞 (Lp L)) (Lp L) v
-  have key : (P.φ v w h) ∘ algebraMap (Lp L) (Kv v) =
-      (completionMap v w) ∘ algebraMap (Lp L) (Kv v) := by
+  have key
+      : (P.φ v w h) ∘ algebraMap (Lp L) (Kv v)
+        = (completionMap v w) ∘ algebraMap (Lp L) (Kv v) := by
     funext x
     simp only [Function.comp_apply]
     rw [completionMap_algebraMap]
@@ -55,8 +59,9 @@ private theorem bas_one (P : Pre L) : bas P 1 = P.e QuadraticAlgebra.omega := by
 private def tt (P : Pre L) (v : Pl (Lp L)) (x : Lsq (Kv v) (cv v P.Δ)) : Kv v ⊗[Lp L] L :=
   x.re ⊗ₜ 1 + x.im ⊗ₜ P.e QuadraticAlgebra.omega
 
-private theorem tt_apply (P : Pre L) (v : Pl (Lp L)) (x : Lsq (Kv v) (cv v P.Δ)) (p : PlacesOver L v) :
-    tensorEquiv L v (tt P v x) p = P.rho v p.1 (unOf p.2) x := by
+private theorem tt_apply
+    (P : Pre L) (v : Pl (Lp L)) (x : Lsq (Kv v) (cv v P.Δ)) (p : PlacesOver L v)
+    : tensorEquiv L v (tt P v x) p = P.rho v p.1 (unOf p.2) x := by
   simp only [tt, map_add (f := _), tensorEquiv_tmul, map_one, mul_one, Pi.add_apply, Pi.mul_apply]
   haveI := p.2
   show completionMap v p.1 x.re + completionMap v p.1 x.im * algebraMap L _ (P.e QuadraticAlgebra.omega) =
@@ -64,8 +69,8 @@ private theorem tt_apply (P : Pre L) (v : Pl (Lp L)) (x : Lsq (Kv v) (cv v P.Δ)
   rw [phi_eq P v p.1 (unOf p.2), phi_eq P v p.1 (unOf p.2)]
   rfl
 
-private theorem tt_eq (P : Pre L) (v : Pl (Lp L)) (x : Lsq (Kv v) (cv v P.Δ)) :
-    tt P v x = (Algebra.TensorProduct.basis (Kv v) (bas P)).equivFun.symm ![x.re, x.im] := by
+private theorem tt_eq (P : Pre L) (v : Pl (Lp L)) (x : Lsq (Kv v) (cv v P.Δ))
+    : tt P v x = (Algebra.TensorProduct.basis (Kv v) (bas P)).equivFun.symm ![x.re, x.im] := by
   rw [Module.Basis.equivFun_symm_apply, Fin.sum_univ_two]
   simp only [Algebra.TensorProduct.basis_apply, bas_zero, bas_one, Matrix.cons_val_zero,
     Matrix.cons_val_one, TensorProduct.smul_tmul', smul_eq_mul, mul_one]
@@ -95,8 +100,10 @@ end UpperTheory.V.Z.Sym.Dict.Br
 
 end
 
-theorem UpperTheory.V.Z.Sym.Dict.Br.rhoBij :
-    ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (P : Pre L), ∀ v : Pl (Lp L), Function.Bijective fun (x : Lsq (Kv v) (cv v P.Δ)) (w : {w : Plc L // un w = v}) => P.rho v w.1 w.2 x := by
+theorem UpperTheory.V.Z.Sym.Dict.Br.rhoBij
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (P : Pre L), ∀ v : Pl (Lp L),
+      Function.Bijective fun (x : Lsq (Kv v) (cv v P.Δ)) (w : {w : Plc L // un w = v}) =>
+        P.rho v w.1 w.2 x := by
   intro L _ _ _ P v
   constructor
   · intro x y hxy

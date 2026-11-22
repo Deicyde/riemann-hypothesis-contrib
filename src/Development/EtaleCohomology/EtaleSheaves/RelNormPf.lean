@@ -9,18 +9,27 @@ open CategoryTheory Limits AlgebraicGeometry
 
 namespace LateralTheory.E.RelNormPf
 
-theorem closedAt_comp {X N T : Scheme.{0}} (c' : X ⟶ N) (k' : N ⟶ T) (V : T.Opens)
-    (h : ClosedAt c' (k' ⁻¹ᵁ V)) (hs : Function.Surjective (k'.app V)) : ClosedAt (c' ≫ k') V := by
+theorem closedAt_comp
+    {X N T : Scheme.{0}} (c' : X ⟶ N) (k' : N ⟶ T) (V : T.Opens) (h : ClosedAt c' (k' ⁻¹ᵁ V))
+    (hs : Function.Surjective (k'.app V))
+    : ClosedAt (c' ≫ k') V := by
   intro b hb
   obtain ⟨p, hm, hp⟩ := hb
-  obtain ⟨a', ha'⟩ := h b ⟨p.map (k'.app V).hom, hm.map _, (Polynomial.eval₂_map (p := p) (k'.app V).hom (c'.app (k' ⁻¹ᵁ V)).hom b).trans hp⟩
+  obtain ⟨a', ha'⟩ :=
+    h b ⟨
+      p.map (k'.app V).hom,
+      hm.map _,
+      (Polynomial.eval₂_map (p := p) (k'.app V).hom (c'.app (k' ⁻¹ᵁ V)).hom b).trans hp
+    ⟩
   obtain ⟨a, rfl⟩ := hs a'
   exact ⟨a, ha'⟩
 
 theorem normClosed : NormClosed := by
   intro Z S g _ _ _ V hV
-  have H : g = g.toNormalization.toNormalization ≫
-      (g.toNormalization.fromNormalization ≫ g.fromNormalization) := by
+  have H
+      : g
+        = g.toNormalization.toNormalization
+          ≫ (g.toNormalization.fromNormalization ≫ g.fromNormalization) := by
     rw [← Category.assoc, Scheme.Hom.toNormalization_fromNormalization,
       Scheme.Hom.toNormalization_fromNormalization]
   let h := g.normalizationDesc _ _ H

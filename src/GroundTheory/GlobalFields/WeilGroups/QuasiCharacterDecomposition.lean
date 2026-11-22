@@ -21,8 +21,8 @@ def toUnitary (ψ : QuasiCharacter K) (h : ∀ c, ‖((ψ c : ℂˣ) : ℂ)‖ =
   map_mul' c d := Circle.ext (by simp only [map_mul, Units.val_mul]; rfl)
   continuous_toFun := (Units.continuous_val.comp ψ.continuous).subtype_mk _
 
-theorem ofUnitary_toUnitary (ψ : QuasiCharacter K) (h : ∀ c, ‖((ψ c : ℂˣ) : ℂ)‖ = 1) :
-    ofUnitary (toUnitary ψ h) = ψ := by
+theorem ofUnitary_toUnitary (ψ : QuasiCharacter K) (h : ∀ c, ‖((ψ c : ℂˣ) : ℂ)‖ = 1)
+    : ofUnitary (toUnitary ψ h) = ψ := by
   ext c
   rfl
 
@@ -30,14 +30,14 @@ theorem mul_modulePow_zero (ψ : QuasiCharacter K) : ψ * modulePow (0 : ℂ) = 
   ext c
   simp
 
-theorem norm_ofUnitary_mul_modulePow (χ : HeckeCharacter K) (σ : ℝ) (c : IdeleClassGroup K) :
-    ‖(((ofUnitary χ * modulePow (σ : ℂ) : QuasiCharacter K) c : ℂˣ) : ℂ)‖ =
-      (IdeleClassGroup.ideleModule K c : ℝ) ^ σ := by
+theorem norm_ofUnitary_mul_modulePow (χ : HeckeCharacter K) (σ : ℝ) (c : IdeleClassGroup K)
+    : ‖(((ofUnitary χ * modulePow (σ : ℂ) : QuasiCharacter K) c : ℂˣ) : ℂ)‖
+      = (IdeleClassGroup.ideleModule K c : ℝ) ^ σ := by
   rw [ContinuousMonoidHom.mul_apply, Units.val_mul, norm_mul, norm_ofUnitary, one_mul,
     norm_modulePow_ofReal]
 
-theorem exists_ofUnitary_mul_modulePow (ψ : QuasiCharacter K) :
-    ∃ (χ : HeckeCharacter K) (σ : ℝ), ofUnitary χ * modulePow (σ : ℂ) = ψ := by
+theorem exists_ofUnitary_mul_modulePow (ψ : QuasiCharacter K)
+    : ∃ (χ : HeckeCharacter K) (σ : ℝ), ofUnitary χ * modulePow (σ : ℂ) = ψ := by
   obtain ⟨σ, hσ⟩ := ψ.exists_norm_eq_rpow
   have h : ∀ c, ‖(((ψ * modulePow (-(σ : ℂ)) : QuasiCharacter K) c : ℂˣ) : ℂ)‖ = 1 := by
     intro c
@@ -47,9 +47,10 @@ theorem exists_ofUnitary_mul_modulePow (ψ : QuasiCharacter K) :
   refine ⟨toUnitary _ h, σ, ?_⟩
   rw [ofUnitary_toUnitary, mul_assoc, ← modulePow_add, neg_add_cancel, mul_modulePow_zero]
 
-theorem eq_of_ofUnitary_mul_modulePow_eq {χ χ' : HeckeCharacter K} {σ σ' : ℝ}
-    (h : ofUnitary χ * modulePow (σ : ℂ) = ofUnitary χ' * modulePow (σ' : ℂ)) :
-    χ = χ' ∧ σ = σ' := by
+theorem eq_of_ofUnitary_mul_modulePow_eq
+    {χ χ' : HeckeCharacter K} {σ σ' : ℝ}
+    (h : ofUnitary χ * modulePow (σ : ℂ) = ofUnitary χ' * modulePow (σ' : ℂ))
+    : χ = χ' ∧ σ = σ' := by
   obtain ⟨c, hc⟩ := IdeleClassGroup.ideleModule_surjective K ⟨Real.exp 1, Real.exp_pos 1⟩
   have hn := congrArg (fun ψ : QuasiCharacter K ↦ ‖((ψ c : ℂˣ) : ℂ)‖) h
   simp only [norm_ofUnitary_mul_modulePow, hc] at hn
@@ -64,19 +65,18 @@ theorem eq_of_ofUnitary_mul_modulePow_eq {χ χ' : HeckeCharacter K} {σ σ' : �
 def ofUnitaryMulModulePow : HeckeCharacter K × Multiplicative ℝ →* QuasiCharacter K where
   toFun p := ofUnitary p.1 * modulePow ((p.2.toAdd : ℝ) : ℂ)
   map_one' := by
-    simp only [Prod.fst_one, Prod.snd_one, toAdd_one, Complex.ofReal_zero, mul_modulePow_zero, map_one]
+    simp only [Prod.fst_one, Prod.snd_one, toAdd_one, Complex.ofReal_zero, mul_modulePow_zero,
+      map_one]
   map_mul' p q := by
     simp only [Prod.fst_mul, Prod.snd_mul, toAdd_mul, map_mul, Complex.ofReal_add, modulePow_add]
     exact mul_mul_mul_comm (ofUnitary p.1) (ofUnitary q.1) _ _
 
-theorem ofUnitaryMulModulePow_bijective :
-    Function.Bijective (ofUnitaryMulModulePow (K := K)) := by
+theorem ofUnitaryMulModulePow_bijective : Function.Bijective (ofUnitaryMulModulePow (K := K)) := by
   refine ⟨fun p q h ↦ ?_, fun ψ ↦ ?_⟩
   · obtain ⟨h1, h2⟩ := eq_of_ofUnitary_mul_modulePow_eq h
     exact Prod.ext h1 (Multiplicative.toAdd.injective h2)
   · obtain ⟨χ, σ, h⟩ := ψ.exists_ofUnitary_mul_modulePow
     exact ⟨(χ, Multiplicative.ofAdd σ), h⟩
-
 
 variable (K) in
 def unitaryDecomposition : QuasiCharacter K ≃* HeckeCharacter K × Multiplicative ℝ :=
@@ -88,12 +88,13 @@ def unitaryPart : HeckeCharacter K := (unitaryDecomposition K ψ).1
 
 def exponent : ℝ := (unitaryDecomposition K ψ).2.toAdd
 
-theorem ofUnitary_unitaryPart_mul_modulePow_exponent :
-    ofUnitary ψ.unitaryPart * modulePow (ψ.exponent : ℂ) = ψ :=
-  MulEquiv.ofBijective_apply_symm_apply (n := ψ) ofUnitaryMulModulePow ofUnitaryMulModulePow_bijective
+theorem ofUnitary_unitaryPart_mul_modulePow_exponent
+    : ofUnitary ψ.unitaryPart * modulePow (ψ.exponent : ℂ) = ψ :=
+  MulEquiv.ofBijective_apply_symm_apply (n := ψ) ofUnitaryMulModulePow
+    ofUnitaryMulModulePow_bijective
 
-theorem norm_apply (c : IdeleClassGroup K) :
-    ‖((ψ c : ℂˣ) : ℂ)‖ = (IdeleClassGroup.ideleModule K c : ℝ) ^ ψ.exponent := by
+theorem norm_apply (c : IdeleClassGroup K)
+    : ‖((ψ c : ℂˣ) : ℂ)‖ = (IdeleClassGroup.ideleModule K c : ℝ) ^ ψ.exponent := by
   conv_lhs => rw [← ψ.ofUnitary_unitaryPart_mul_modulePow_exponent]
   exact norm_ofUnitary_mul_modulePow _ _ _
 

@@ -7,13 +7,20 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.LeastSplitAu
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SplitFlip GlobalTheory.SplitWeil
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField GlobalTheory.FunObj.borelKw
-  GlobalTheory.FunObj.borelSpaceKw
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SplitFlip
+  GlobalTheory.SplitWeil
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField GlobalTheory.FunObj.borelKw GlobalTheory.FunObj.borelSpaceKw
 
-theorem UpperTheory.abs_hc_exponent_le_and_abs_center_le_of_sizeRows :
-    ∀ (D : D7) (large₂ : SizeData₂ D), GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup.SizeRows large₂ → HostHyp D → (∀ τ l, |(((D.hc τ).e l : ℚ) : ℝ)| ≤ 4 * large₂.sc.b) ∧ ∀ τ i, 1 ≤ i → i ≤ D.R.m → |((cen D 1 τ i : ℤ) : ℝ)| ≤ 2 * large₂.sc.b := by
+theorem UpperTheory.abs_hc_exponent_le_and_abs_center_le_of_sizeRows
+    : ∀ (D : D7) (large₂ : SizeData₂ D),
+      GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup.SizeRows large₂ → HostHyp D
+        → (∀ τ l, |(((D.hc τ).e l : ℚ) : ℝ)| ≤ 4 * large₂.sc.b)
+          ∧ ∀ τ i, 1 ≤ i → i ≤ D.R.m → |((cen D 1 τ i : ℤ) : ℝ)| ≤ 2 * large₂.sc.b := by
   intro D large₂ hS hH
   obtain ⟨-, -, -, -, -, -, -, -, -, -, -, hb, he, -⟩ := hS
   have hbpos : 0 < large₂.sc.b := by
@@ -37,7 +44,8 @@ theorem UpperTheory.abs_hc_exponent_le_and_abs_center_le_of_sizeRows :
     have hv : 0 ≤ G.v 2 ∧ ((G.v 2 : ℚ) : ℝ) ≤ large₂.Sc := by
       by_cases hk : 0 < D.R.k - 1
       · have hv2 : G.v 2 = ⌊(D.hc τ).v ⟨0, hk⟩⌋ := by
-          simp [hG, GlobalTheory.SignedHC.GridData.ofHCParam, GlobalTheory.SignedHC.GridData.extend, hk]
+          simp [hG, GlobalTheory.SignedHC.GridData.ofHCParam, GlobalTheory.SignedHC.GridData.extend,
+            hk]
         obtain ⟨h0, h1⟩ := large₂.cloud_v τ ⟨0, hk⟩
         have h0' : (0 : ℚ) ≤ (D.hc τ).v ⟨0, hk⟩ := by exact_mod_cast h0
         refine ⟨?_, ?_⟩
@@ -45,11 +53,13 @@ theorem UpperTheory.abs_hc_exponent_le_and_abs_center_le_of_sizeRows :
           exact Int.floor_nonneg.mpr h0'
         · rw [hv2]
           have hfl : ((⌊(D.hc τ).v ⟨0, hk⟩⌋ : ℤ) : ℚ) ≤ (D.hc τ).v ⟨0, hk⟩ := Int.floor_le _
-          have hfl' : ((((⌊(D.hc τ).v ⟨0, hk⟩⌋ : ℤ) : ℚ)) : ℝ) ≤ (((D.hc τ).v ⟨0, hk⟩ : ℚ) : ℝ) := by
+          have hfl'
+              : ((((⌊(D.hc τ).v ⟨0, hk⟩⌋ : ℤ) : ℚ)) : ℝ) ≤ (((D.hc τ).v ⟨0, hk⟩ : ℚ) : ℝ) := by
             exact_mod_cast hfl
           linarith
       · have hv2 : G.v 2 = 0 := by
-          simp [hG, GlobalTheory.SignedHC.GridData.ofHCParam, GlobalTheory.SignedHC.GridData.extend, hk]
+          simp [hG, GlobalTheory.SignedHC.GridData.ofHCParam, GlobalTheory.SignedHC.GridData.extend,
+            hk]
         rw [hv2]
         refine ⟨le_rfl, ?_⟩
         simpa using large₂.Sc_pos.le
@@ -63,13 +73,17 @@ theorem UpperTheory.abs_hc_exponent_le_and_abs_center_le_of_sizeRows :
       have : (0 : ℚ) ≤ ((D.R.m : ℚ) + 1 - i) * G.ga := mul_nonneg (by linarith) hga0
       linarith
     have hmid1 : ((G.mid i : ℚ) : ℝ) ≤ large₂.sc.b := by
-      have e1 : ((G.mid i : ℚ) : ℝ) = ((G.v 2 : ℚ) : ℝ) + 1 / 2 + (((D.R.m : ℝ) + 1 - i) * (gap D 1 : ℝ)) + (gap D 1 : ℝ) / 2 := by
+      have e1
+          : ((G.mid i : ℚ) : ℝ)
+            = ((G.v 2 : ℚ) : ℝ) + 1 / 2 + (((D.R.m : ℝ) + 1 - i) * (gap D 1 : ℝ))
+              + (gap D 1 : ℝ) / 2 := by
         rw [hmid, ha, hm, hga]
         push_cast
         ring
       have hgr : (0 : ℝ) ≤ (gap D 1 : ℝ) := by positivity
       have hir : (1 : ℝ) ≤ i := by exact_mod_cast hi
-      have : ((D.R.m : ℝ) + 1 - i) * (gap D 1 : ℝ) + (gap D 1 : ℝ) / 2 ≤ ((D.R.m : ℝ) + 1) * (gap D 1 : ℝ) := by
+      have : ((D.R.m : ℝ) + 1 - i) * (gap D 1 : ℝ) + (gap D 1 : ℝ) / 2
+          ≤ ((D.R.m : ℝ) + 1) * (gap D 1 : ℝ) := by
         nlinarith
       linarith
     have hf0 : 0 ≤ cen D 1 τ i := by

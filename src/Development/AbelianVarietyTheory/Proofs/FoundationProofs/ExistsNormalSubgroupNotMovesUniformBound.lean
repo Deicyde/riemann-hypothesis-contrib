@@ -12,8 +12,8 @@ namespace GlobalTheory.AlmostEt
 
 variable {L : Type} [Field L] {G : Type} [Group G] [MulSemiringAction G L]
 
-theorem not_moves_top_iff (v : Valuation L ℝ≥0) (σ : G) :
-    ¬ Moves v ⊤ σ ↔ ∃ r : ℝ≥0, r < 1 ∧ ∀ x : L, v x ≤ 1 → v (σ • x - x) ≤ r := by
+theorem not_moves_top_iff (v : Valuation L ℝ≥0) (σ : G)
+    : ¬ Moves v ⊤ σ ↔ ∃ r : ℝ≥0, r < 1 ∧ ∀ x : L, v x ≤ 1 → v (σ • x - x) ≤ r := by
   unfold Moves
   push_neg
   constructor
@@ -35,8 +35,7 @@ def smallSubgroup (v : Valuation L ℝ≥0) (hv : ∀ (g : G) (x : L), v (g • 
     obtain ⟨s, hs, h2⟩ := hτ
     refine ⟨max r s, max_lt hr hs, fun x hx => ?_⟩
     have hτx : v (τ • x) ≤ 1 := by rw [hv]; exact hx
-    have e : (σ * τ) • x - x = (σ • (τ • x) - τ • x) + (τ • x - x) := by
-      rw [mul_smul]; ring
+    have e : (σ * τ) • x - x = (σ • (τ • x) - τ • x) + (τ • x - x) := by rw [mul_smul]; ring
     rw [e]
     exact (v.map_add _ _).trans (max_le_max (h1 _ hτx) (h2 _ hx))
   inv_mem' := by
@@ -45,13 +44,12 @@ def smallSubgroup (v : Valuation L ℝ≥0) (hv : ∀ (g : G) (x : L), v (g • 
     obtain ⟨r, hr, h1⟩ := hσ
     refine ⟨r, hr, fun x hx => ?_⟩
     have hy : v (σ⁻¹ • x) ≤ 1 := by rw [hv]; exact hx
-    have e : σ⁻¹ • x - x = -(σ • (σ⁻¹ • x) - σ⁻¹ • x) := by
-      rw [smul_inv_smul]; ring
+    have e : σ⁻¹ • x - x = -(σ • (σ⁻¹ • x) - σ⁻¹ • x) := by rw [smul_inv_smul]; ring
     rw [e, Valuation.map_neg]
     exact h1 _ hy
 
-theorem smallSubgroup_normal (v : Valuation L ℝ≥0) (hv : ∀ (g : G) (x : L), v (g • x) = v x) :
-    (smallSubgroup v hv).Normal := by
+theorem smallSubgroup_normal (v : Valuation L ℝ≥0) (hv : ∀ (g : G) (x : L), v (g • x) = v x)
+    : (smallSubgroup v hv).Normal := by
   constructor
   intro σ hσ g
   change ¬ Moves v ⊤ σ at hσ
@@ -65,15 +63,16 @@ theorem smallSubgroup_normal (v : Valuation L ℝ≥0) (hv : ∀ (g : G) (x : L)
   rw [e, hv]
   exact h1 _ hy
 
-theorem exists_normal_not_moves_uniform :
-    ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) (G : Type) [Group G] [MulSemiringAction G L]
-      [Finite G], (∀ (g : G) (x : L), v (g • x) = v x) →
-      ∃ N : Subgroup G, N.Normal ∧ (∀ σ : G, σ ∈ N ↔ ¬ Moves v ⊤ σ) ∧
-        ∃ i : ℝ≥0, i < 1 ∧ ∀ τ ∈ N, ∀ x : L, v x ≤ 1 → v (τ • x - x) ≤ i := by
+theorem exists_normal_not_moves_uniform
+    : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) (G : Type) [Group G] [MulSemiringAction G L]
+        [Finite G],
+      (∀ (g : G) (x : L), v (g • x) = v x)
+        → ∃ N : Subgroup G,
+          N.Normal ∧ (∀ σ : G, σ ∈ N ↔ ¬ Moves v ⊤ σ)
+            ∧ ∃ i : ℝ≥0, i < 1 ∧ ∀ τ ∈ N, ∀ x : L, v x ≤ 1 → v (τ • x - x) ≤ i := by
   intro L _ v G _ _ _ hv
   refine ⟨smallSubgroup v hv, smallSubgroup_normal v hv, fun σ => Iff.rfl, ?_⟩
-  have hc : ∀ τ : G, ∃ r : ℝ≥0, r < 1 ∧
-      (¬ Moves v ⊤ τ → ∀ x : L, v x ≤ 1 → v (τ • x - x) ≤ r) := by
+  have hc : ∀ τ : G, ∃ r : ℝ≥0, r < 1 ∧ (¬ Moves v ⊤ τ → ∀ x : L, v x ≤ 1 → v (τ • x - x) ≤ r) := by
     intro τ
     by_cases h : Moves v ⊤ τ
     · exact ⟨0, zero_lt_one, fun h' => absurd h h'⟩

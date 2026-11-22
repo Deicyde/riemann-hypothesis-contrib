@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CharacterSum
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker GlobalTheory.IndefiniteRowSideFullHecke.PlaceLogThetaBounds GlobalTheory.ColNorms
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV
+  Formalism.L2.Col Formalism.L2.Ker GlobalTheory.IndefiniteRowSideFullHecke.PlaceLogThetaBounds
+  GlobalTheory.ColNorms
 open scoped ComplexOrder
 
 namespace GlobalTheory.ColNorms.MovedDatum
@@ -17,8 +19,8 @@ section Gen
 
 variable {E K : Type} [Field E] [NumberField E] [Field K] {P : HeightOneSpectrum (𝓞 E)}
 
-theorem norm_unitV (χ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ) {a : E} (h : IsUnit (redP P a)) (σ : K →+* ℂ) :
-    ‖σ (LocE.unitV χ a)‖ = 1 := by
+theorem norm_unitV (χ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ) {a : E} (h : IsUnit (redP P a)) (σ : K →+* ℂ)
+    : ‖σ (LocE.unitV χ a)‖ = 1 := by
   unfold LocE.unitV
   rw [dite_eq_left h]
   have : Finite (𝓞 E ⧸ P.asIdeal) := Ideal.finiteQuotientOfFreeOfNeBot _ P.ne_bot
@@ -31,12 +33,15 @@ theorem norm_unitV (χ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ) {a : E} (h : IsUnit 
 
 variable [StarRing E]
 
-theorem locSmall_om {a b : ℕ} {e e' : ℕ → ℤ} (cq sq : K) (χ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ)
+theorem locSmall_om
+    {a b : ℕ} {e e' : ℕ → ℤ}
+    (cq sq : K) (χ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ)
     {g : Sp E a ≃ₗ[E] Sp E a} {g' : Sp E b ≃ₗ[E] Sp E b}
-    (hg : g ∈ stabL E a (LocE.sclLat P (qOf P) a e)) (hg' : g' ∈ stabL E b (LocE.sclLat P (qOf P) b e'))
+    (hg : g ∈ stabL E a (LocE.sclLat P (qOf P) a e))
+    (hg' : g' ∈ stabL E b (LocE.sclLat P (qOf P) b e'))
     {Φ : HomE E a b → K} {β : ℝ}
-    (hΦ : LocSmall (qOf P) (LocE.sclLat P (qOf P) a e) (LocE.sclLat P (qOf P) b e') Φ β) :
-    LocSmall (qOf P) (LocE.sclLat P (qOf P) a e) (LocE.sclLat P (qOf P) b e')
+    (hΦ : LocSmall (qOf P) (LocE.sclLat P (qOf P) a e) (LocE.sclLat P (qOf P) b e') Φ β)
+    : LocSmall (qOf P) (LocE.sclLat P (qOf P) a e) (LocE.sclLat P (qOf P) b e')
       (Loc.om (LocE.locChar (qOf P) cq χ) (LocE.vP P (qOf P)) sq g g' Φ) β := by
   have hu := GlobalTheory.LastSteps.isUnit_det_of_stab hg
   have hu' := GlobalTheory.LastSteps.isUnit_det_of_stab hg'
@@ -48,20 +53,22 @@ theorem locSmall_om {a b : ℕ} {e e' : ℕ → ℤ} (cq sq : K) (χ : (𝓞 E �
     simpa using h5
   · unfold Loc.om
     congr 1
-    have h4 := h2 (g'.symm.toLinearMap ∘ₗ x ∘ₗ g.toLinearMap) (g'.symm.toLinearMap ∘ₗ z ∘ₗ g.toLinearMap) fun y hy =>
-      (hg' _).1 (by simpa using hz _ ((hg y).2 hy))
+    have h4 :=
+      h2 (g'.symm.toLinearMap ∘ₗ x ∘ₗ g.toLinearMap) (g'.symm.toLinearMap ∘ₗ z ∘ₗ g.toLinearMap)
+        fun y hy => (hg' _).1 (by simpa using hz _ ((hg y).2 hy))
     rw [← h4]
     congr 1
     refine LinearMap.ext fun y => ?_
-    simp only [LinearMap.comp_apply, LinearMap.add_apply, LinearMap.smul_apply, map_add (f := _), map_smul]
-  · have locChar_eq_unitV {x : E} (hx : IsUnit (redP P x)) :
-        LocE.locChar (qOf P) cq χ x = LocE.unitV χ x := by
+    simp only [LinearMap.comp_apply, LinearMap.add_apply, LinearMap.smul_apply, map_add (f := _),
+      map_smul]
+  · have locChar_eq_unitV {x : E} (hx : IsUnit (redP P x))
+        : LocE.locChar (qOf P) cq χ x = LocE.unitV χ x := by
       simp [LocE.locChar, GlobalTheory.LastSteps.vP_unit hx]
     unfold Loc.om
     rw [locChar_eq_unitV hu, locChar_eq_unitV hu', GlobalTheory.LastSteps.vP_unit hu,
       GlobalTheory.LastSteps.vP_unit hu']
-    simp only [neg_zero, zero_mul, zpow_zero, mul_one, map_mul, map_inv₀, norm_mul, norm_inv, norm_unitV χ hu,
-      norm_unitV χ hu', inv_one, one_mul]
+    simp only [neg_zero, zero_mul, zpow_zero, mul_one, map_mul, map_inv₀, norm_mul, norm_inv,
+      norm_unitV χ hu, norm_unitV χ hu', inv_one, one_mul]
     exact h3 σ _
 
 end Gen

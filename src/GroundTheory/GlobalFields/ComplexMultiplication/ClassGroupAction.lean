@@ -6,8 +6,7 @@ public import GroundTheory.GlobalFields.ComplexMultiplication.JInvariantHomothet
 
 @[expose] public section
 
-abbrev cmRingOfEmbedding {K : Type*} [Field K] [NumberField K]
-    (σ : K →+* ℂ) : Subring ℂ :=
+abbrev cmRingOfEmbedding {K : Type*} [Field K] [NumberField K] (σ : K →+* ℂ) : Subring ℂ :=
   (σ.comp (algebraMap (NumberField.RingOfIntegers K) K)).range
 
 open NumberField Module WeierstrassCurve GroundTheory.Arith.Abelian
@@ -18,9 +17,9 @@ noncomputable section
 namespace GroundTheory.Global
 namespace Elliptic
 
-theorem exists_variableChange_iff_homothetic (L L' : PeriodPair) :
-    (∃ C : VariableChange ℂ, C • weierstrassCurve L = weierstrassCurve L') ↔
-      ∃ c : ℂ, c ≠ 0 ∧ (L'.lattice : Set ℂ) = (c * ·) '' L.lattice := by
+theorem exists_variableChange_iff_homothetic (L L' : PeriodPair)
+    : (∃ C : VariableChange ℂ, C • weierstrassCurve L = weierstrassCurve L')
+      ↔ ∃ c : ℂ, c ≠ 0 ∧ (L'.lattice : Set ℂ) = (c * ·) '' L.lattice := by
   rw [← weierstrassCurve_j_eq_iff]
   constructor
   · rintro ⟨C, hC⟩
@@ -29,8 +28,9 @@ theorem exists_variableChange_iff_homothetic (L L' : PeriodPair) :
   · intro h
     exact exists_variableChange_of_j_eq _ _ h
 
-theorem latticeEnd_eq_of_homothetic {L L' : PeriodPair} {c : ℂ} (hc : c ≠ 0)
-    (h : (L'.lattice : Set ℂ) = (c * ·) '' L.lattice) : periodLatticeEnd L' = periodLatticeEnd L := by
+theorem latticeEnd_eq_of_homothetic
+    {L L' : PeriodPair} {c : ℂ} (hc : c ≠ 0) (h : (L'.lattice : Set ℂ) = (c * ·) '' L.lattice)
+    : periodLatticeEnd L' = periodLatticeEnd L := by
   have hmem : ∀ z, z ∈ L'.lattice ↔ ∃ l ∈ L.lattice, c * l = z := fun z ↦ by
     rw [← SetLike.mem_coe, h]; rfl
   ext α
@@ -46,15 +46,17 @@ theorem latticeEnd_eq_of_homothetic {L L' : PeriodPair} {c : ℂ} (hc : c ≠ 0)
 
 variable {K : Type*} [Field K] [NumberField K] (σ : K →+* ℂ)
 
-theorem idealLattice_mul_homothetic (I J : FractionalIdeal (𝓞 K)⁰ K) {c : ℂ} {Λ : Submodule ℤ ℂ}
-    (h : (Λ : Set ℂ) = (c * ·) '' idealLattice σ I) :
-    ((idealLattice σ J * Λ : Submodule ℤ ℂ) : Set ℂ) = (c * ·) '' idealLattice σ (J * I) := by
+theorem idealLattice_mul_homothetic
+    (I J : FractionalIdeal (𝓞 K)⁰ K)
+    {c : ℂ} {Λ : Submodule ℤ ℂ} (h : (Λ : Set ℂ) = (c * ·) '' idealLattice σ I)
+    : ((idealLattice σ J * Λ : Submodule ℤ ℂ) : Set ℂ) = (c * ·) '' idealLattice σ (J * I) := by
   have hΛ : Λ = (idealLattice σ I).map (LinearMap.mulLeft ℤ c) := by
     apply SetLike.coe_injective
     rw [h, Submodule.map_coe]
     rfl
-  have key : idealLattice σ J * (idealLattice σ I).map (LinearMap.mulLeft ℤ c) =
-      (idealLattice σ J * idealLattice σ I).map (LinearMap.mulLeft ℤ c) := by
+  have key
+      : idealLattice σ J * (idealLattice σ I).map (LinearMap.mulLeft ℤ c)
+        = (idealLattice σ J * idealLattice σ I).map (LinearMap.mulLeft ℤ c) := by
     apply le_antisymm
     · rw [Submodule.mul_le]
       intro m hm x hx
@@ -72,20 +74,19 @@ theorem idealLattice_mul_homothetic (I J : FractionalIdeal (𝓞 K)⁰ K) {c : �
 variable (K)
 
 structure CMCurve where
-
   curve : WeierstrassCurve ℂ
   [isElliptic : curve.IsElliptic]
-
   endIso : Nonempty (isogEnd curve ≃+* 𝓞 K)
 
 attribute [instance] CMCurve.isElliptic
 
 def CMCurve.setoid : Setoid (CMCurve K) where
   r E E' := ∃ C : VariableChange ℂ, C • E.curve = E'.curve
-  iseqv :=
-    { refl := fun E ↦ ⟨1, one_smul _ _⟩
-      symm := fun ⟨C, h⟩ ↦ ⟨C⁻¹, inv_smul_eq_of_smul_eq C h⟩
-      trans := fun ⟨C, h⟩ ⟨C', h'⟩ ↦ ⟨C' * C, by rw [mul_smul, h, h']⟩ }
+  iseqv := {
+    refl := fun E ↦ ⟨1, one_smul _ _⟩
+    symm := fun ⟨C, h⟩ ↦ ⟨C⁻¹, inv_smul_eq_of_smul_eq C h⟩
+    trans := fun ⟨C, h⟩ ⟨C', h'⟩ ↦ ⟨C' * C, by rw [mul_smul, h, h']⟩
+  }
 
 def ELL : Type _ := Quotient (CMCurve.setoid K)
 
@@ -93,22 +94,26 @@ variable {K}
 
 def CMCurve.toEll (E : CMCurve K) : ELL K := Quotient.mk (CMCurve.setoid K) E
 
-theorem CMCurve.toEll_eq_iff (E E' : CMCurve K) :
-    E.toEll = E'.toEll ↔ ∃ C : VariableChange ℂ, C • E.curve = E'.curve :=
+theorem CMCurve.toEll_eq_iff (E E' : CMCurve K)
+    : E.toEll = E'.toEll ↔ ∃ C : VariableChange ℂ, C • E.curve = E'.curve :=
   Quotient.eq (r := CMCurve.setoid K)
 
-theorem ELL.exists_eq (x : ELL K) : ∃ E : CMCurve K, E.toEll = x :=
-  Quotient.exists_rep x
+theorem ELL.exists_eq (x : ELL K) : ∃ E : CMCurve K, E.toEll = x := Quotient.exists_rep x
 
-def CMCurve.ofLattice (L : PeriodPair) (hL : periodLatticeEnd L = cmRingOfEmbedding σ) : CMCurve K where
+def CMCurve.ofLattice (L : PeriodPair) (hL : periodLatticeEnd L = cmRingOfEmbedding σ)
+    : CMCurve K where
   curve := weierstrassCurve L
-  endIso := ⟨(latticeEndEquiv L).symm.trans ((RingEquiv.subringCongr hL).trans (cmRingEquiv σ).symm)⟩
+  endIso :=
+    ⟨(latticeEndEquiv L).symm.trans ((RingEquiv.subringCongr hL).trans (cmRingEquiv σ).symm)⟩
 
-def ellOf (L : PeriodPair) (hL : periodLatticeEnd L = cmRingOfEmbedding σ) : ELL K := (CMCurve.ofLattice σ L hL).toEll
+def ellOf (L : PeriodPair) (hL : periodLatticeEnd L = cmRingOfEmbedding σ) : ELL K :=
+  (CMCurve.ofLattice σ L hL).toEll
 
-theorem ellOf_eq_ellOf_iff {L L' : PeriodPair} (hL : periodLatticeEnd L = cmRingOfEmbedding σ)
-    (hL' : periodLatticeEnd L' = cmRingOfEmbedding σ) :
-    ellOf σ L hL = ellOf σ L' hL' ↔ ∃ c : ℂ, c ≠ 0 ∧ (L'.lattice : Set ℂ) = (c * ·) '' L.lattice := by
+theorem ellOf_eq_ellOf_iff
+    {L L' : PeriodPair} (hL : periodLatticeEnd L = cmRingOfEmbedding σ)
+    (hL' : periodLatticeEnd L' = cmRingOfEmbedding σ)
+    : ellOf σ L hL = ellOf σ L' hL'
+      ↔ ∃ c : ℂ, c ≠ 0 ∧ (L'.lattice : Set ℂ) = (c * ·) '' L.lattice := by
   rw [ellOf, ellOf, CMCurve.toEll_eq_iff]
   exact exists_variableChange_iff_homothetic L L'
 
@@ -117,32 +122,34 @@ section Quadratic
 variable (hK : finrank ℚ K = 2) [_root_.NumberField.IsTotallyComplex K]
 include hK
 
-theorem CMCurve.exists_lattice (E : CMCurve K) :
-    ∃ (L : PeriodPair) (C : VariableChange ℂ) (hL : periodLatticeEnd L = cmRingOfEmbedding σ),
+theorem CMCurve.exists_lattice (E : CMCurve K)
+    : ∃ (L : PeriodPair) (C : VariableChange ℂ) (hL : periodLatticeEnd L = cmRingOfEmbedding σ),
       C • E.curve = weierstrassCurve L ∧ (CMCurve.ofLattice σ L hL).toEll = E.toEll := by
   obtain ⟨L, C, hC⟩ := exists_variableChange_eq_weierstrassCurve E.curve
-  have hL : periodLatticeEnd L = cmRingOfEmbedding σ := latticeEnd_eq_cmRing_of_ringEquiv σ hK L
-    ((latticeEndEquiv L).trans ((vcEndEquiv C hC).symm.trans E.endIso.some))
+  have hL : periodLatticeEnd L = cmRingOfEmbedding σ :=
+    latticeEnd_eq_cmRing_of_ringEquiv σ hK L
+      ((latticeEndEquiv L).trans ((vcEndEquiv C hC).symm.trans E.endIso.some))
   refine ⟨L, C, hL, hC, ?_⟩
   rw [CMCurve.toEll_eq_iff]
   exact ⟨C⁻¹, inv_smul_eq_of_smul_eq C hC⟩
 
-theorem latticeEnd_ideal (I : (FractionalIdeal (𝓞 K)⁰ K)ˣ) :
-    periodLatticeEnd (idealPeriodPair σ hK I) = cmRingOfEmbedding σ :=
+theorem latticeEnd_ideal (I : (FractionalIdeal (𝓞 K)⁰ K)ˣ)
+    : periodLatticeEnd (idealPeriodPair σ hK I) = cmRingOfEmbedding σ :=
   latticeEnd_idealPeriodPair σ hK I
 
 def ellOfIdeal (I : (FractionalIdeal (𝓞 K)⁰ K)ˣ) : ELL K :=
   ellOf σ (idealPeriodPair σ hK I⁻¹) (latticeEnd_ideal σ hK I⁻¹)
 
-theorem ellOfIdeal_eq_iff (I J : (FractionalIdeal (𝓞 K)⁰ K)ˣ) :
-    ellOfIdeal σ hK I = ellOfIdeal σ hK J ↔ ClassGroup.mk K I = ClassGroup.mk K J := by
+theorem ellOfIdeal_eq_iff (I J : (FractionalIdeal (𝓞 K)⁰ K)ˣ)
+    : ellOfIdeal σ hK I = ellOfIdeal σ hK J ↔ ClassGroup.mk K I = ClassGroup.mk K J := by
   rw [ellOfIdeal, ellOfIdeal, ellOf_eq_ellOf_iff, lattice_idealPeriodPair, lattice_idealPeriodPair,
     ← classGroup_mk_eq_iff σ hK, map_inv, map_inv, inv_inj]
 
-theorem ellOf_eq_ellOfIdeal {L : PeriodPair} (hL : periodLatticeEnd L = cmRingOfEmbedding σ)
-    {I : (FractionalIdeal (𝓞 K)⁰ K)ˣ} {c : ℂ} (hc : c ≠ 0)
-    (h : (L.lattice : Set ℂ) = (c * ·) '' idealLattice σ I) :
-    ellOf σ L hL = ellOfIdeal σ hK I⁻¹ := by
+theorem ellOf_eq_ellOfIdeal
+    {L : PeriodPair} (hL : periodLatticeEnd L = cmRingOfEmbedding σ)
+    {I : (FractionalIdeal (𝓞 K)⁰ K)ˣ} {c : ℂ}
+    (hc : c ≠ 0) (h : (L.lattice : Set ℂ) = (c * ·) '' idealLattice σ I)
+    : ellOf σ L hL = ellOfIdeal σ hK I⁻¹ := by
   rw [ellOfIdeal, ellOf_eq_ellOf_iff, inv_inv, lattice_idealPeriodPair]
   refine ⟨c⁻¹, inv_ne_zero hc, ?_⟩
   rw [h, Set.image_image]
@@ -154,55 +161,59 @@ theorem ellOfIdeal_surjective (x : ELL K) : ∃ I, ellOfIdeal σ hK I = x := by
   obtain ⟨I, c, hc, h⟩ := exists_idealLattice_of_latticeEnd_eq σ hK L hL
   exact ⟨I⁻¹, by rw [← hE, ← ellOf, ellOf_eq_ellOfIdeal σ hK hL hc h]⟩
 
-theorem classGroup_mk_surjective (a : ClassGroup (𝓞 K)) :
-    ∃ I : (FractionalIdeal (𝓞 K)⁰ K)ˣ, ClassGroup.mk K I = a :=
+theorem classGroup_mk_surjective (a : ClassGroup (𝓞 K))
+    : ∃ I : (FractionalIdeal (𝓞 K)⁰ K)ˣ, ClassGroup.mk K I = a :=
   ClassGroup.induction (K := K) (P := fun a ↦ ∃ I, ClassGroup.mk K I = a) (fun I ↦ ⟨I, rfl⟩) a
 
 def classToEll (a : ClassGroup (𝓞 K)) : ELL K :=
   ellOfIdeal σ hK (classGroup_mk_surjective hK a).choose
 
-theorem classToEll_mk (I : (FractionalIdeal (𝓞 K)⁰ K)ˣ) :
-    classToEll σ hK (ClassGroup.mk K I) = ellOfIdeal σ hK I :=
+theorem classToEll_mk (I : (FractionalIdeal (𝓞 K)⁰ K)ˣ)
+    : classToEll σ hK (ClassGroup.mk K I) = ellOfIdeal σ hK I :=
   (ellOfIdeal_eq_iff σ hK _ _).2 (classGroup_mk_surjective hK _).choose_spec
 
 def ellEquiv : ClassGroup (𝓞 K) ≃ ELL K :=
-  Equiv.ofBijective (classToEll σ hK)
-    ⟨fun a b hab ↦ by
+  Equiv.ofBijective (classToEll σ hK) ⟨
+    fun a b hab ↦ by
       obtain ⟨I, rfl⟩ := classGroup_mk_surjective hK a
       obtain ⟨J, rfl⟩ := classGroup_mk_surjective hK b
       rwa [classToEll_mk, classToEll_mk, ellOfIdeal_eq_iff] at hab,
     fun x ↦ by
       obtain ⟨I, rfl⟩ := ellOfIdeal_surjective σ hK x
-      exact ⟨ClassGroup.mk K I, classToEll_mk σ hK I⟩⟩
+      exact ⟨ClassGroup.mk K I, classToEll_mk σ hK I⟩
+  ⟩
 
-theorem ellEquiv_mk (I : (FractionalIdeal (𝓞 K)⁰ K)ˣ) :
-    ellEquiv σ hK (ClassGroup.mk K I) = ellOfIdeal σ hK I :=
+theorem ellEquiv_mk (I : (FractionalIdeal (𝓞 K)⁰ K)ˣ)
+    : ellEquiv σ hK (ClassGroup.mk K I) = ellOfIdeal σ hK I :=
   classToEll_mk σ hK I
 
 def ellMulAction : MulAction (ClassGroup (𝓞 K)) (ELL K) :=
   (ellEquiv σ hK).symm.mulAction (ClassGroup (𝓞 K))
 
-theorem ellMulAction_smul (a : ClassGroup (𝓞 K)) (x : ELL K) :
-    (ellMulAction σ hK).smul a x = ellEquiv σ hK (a * (ellEquiv σ hK).symm x) :=
+theorem ellMulAction_smul (a : ClassGroup (𝓞 K)) (x : ELL K)
+    : (ellMulAction σ hK).smul a x = ellEquiv σ hK (a * (ellEquiv σ hK).symm x) :=
   rfl
 
-theorem exists_lattice_mul (L : PeriodPair) (hL : periodLatticeEnd L = cmRingOfEmbedding σ)
-    (𝔞 : (FractionalIdeal (𝓞 K)⁰ K)ˣ) :
-    ∃ L' : PeriodPair, L'.lattice = idealLattice σ ↑𝔞⁻¹ * L.lattice ∧ periodLatticeEnd L' = cmRingOfEmbedding σ := by
+theorem exists_lattice_mul
+    (L : PeriodPair) (hL : periodLatticeEnd L = cmRingOfEmbedding σ)
+    (𝔞 : (FractionalIdeal (𝓞 K)⁰ K)ˣ)
+    : ∃ L' : PeriodPair,
+      L'.lattice = idealLattice σ ↑𝔞⁻¹ * L.lattice ∧ periodLatticeEnd L' = cmRingOfEmbedding σ := by
   obtain ⟨I, c, hc, h⟩ := exists_idealLattice_of_latticeEnd_eq σ hK L hL
   have h' := idealLattice_mul_homothetic σ (I : FractionalIdeal (𝓞 K)⁰ K) (↑𝔞⁻¹) h
   let P := idealPeriodPair σ hK (𝔞⁻¹ * I)
-  let L' : PeriodPair :=
-    { ω₁ := c * P.ω₁
-      ω₂ := c * P.ω₂
-      indep := by
-        have := P.indep
-        rw [LinearIndependent.pair_iff] at this ⊢
-        intro s t hst
-        apply this s t
-        have hst' : c * (s • P.ω₁ + t • P.ω₂) = 0 := by
-          rw [← hst]; simp only [Complex.real_smul]; ring
-        exact (mul_eq_zero.1 hst').resolve_left hc }
+  let L' : PeriodPair := {
+    ω₁ := c * P.ω₁
+    ω₂ := c * P.ω₂
+    indep := by
+      have := P.indep
+      rw [LinearIndependent.pair_iff] at this ⊢
+      intro s t hst
+      apply this s t
+      have hst' : c * (s • P.ω₁ + t • P.ω₂) = 0 := by
+        rw [← hst]; simp only [Complex.real_smul]; ring
+      exact (mul_eq_zero.1 hst').resolve_left hc
+  }
   have hlat : (L'.lattice : Set ℂ) = (c * ·) '' P.lattice := by
     ext z
     simp only [SetLike.mem_coe, PeriodPair.mem_lattice, Set.mem_image, L']
@@ -217,10 +228,11 @@ theorem exists_lattice_mul (L : PeriodPair) (hL : periodLatticeEnd L = cmRingOfE
   · rw [latticeEnd_eq_of_homothetic hc hlat]
     exact latticeEnd_ideal σ hK _
 
-theorem classGroup_smul_ellOf (L L' : PeriodPair) (hL : periodLatticeEnd L = cmRingOfEmbedding σ)
-    (hL' : periodLatticeEnd L' = cmRingOfEmbedding σ) (𝔞 : (FractionalIdeal (𝓞 K)⁰ K)ˣ)
-    (h : L'.lattice = idealLattice σ ↑𝔞⁻¹ * L.lattice) :
-    (ellMulAction σ hK).smul (ClassGroup.mk K 𝔞) (ellOf σ L hL) = ellOf σ L' hL' := by
+theorem classGroup_smul_ellOf
+    (L L' : PeriodPair) (hL : periodLatticeEnd L = cmRingOfEmbedding σ)
+    (hL' : periodLatticeEnd L' = cmRingOfEmbedding σ)
+    (𝔞 : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (h : L'.lattice = idealLattice σ ↑𝔞⁻¹ * L.lattice)
+    : (ellMulAction σ hK).smul (ClassGroup.mk K 𝔞) (ellOf σ L hL) = ellOf σ L' hL' := by
   obtain ⟨I, c, hc, hI⟩ := exists_idealLattice_of_latticeEnd_eq σ hK L hL
   have h' := idealLattice_mul_homothetic σ (I : FractionalIdeal (𝓞 K)⁰ K) (↑𝔞⁻¹) hI
   rw [← h, ← Units.val_mul] at h'
@@ -232,16 +244,16 @@ theorem classGroup_smul_ellOf (L L' : PeriodPair) (hL : periodLatticeEnd L = cmR
   congr 1
   rw [mul_inv_rev, inv_inv, map_mul, mul_comm]
 
-theorem existsUnique_smul_eq (x y : ELL K) :
-    ∃! a : ClassGroup (𝓞 K), (ellMulAction σ hK).smul a x = y := by
+theorem existsUnique_smul_eq (x y : ELL K)
+    : ∃! a : ClassGroup (𝓞 K), (ellMulAction σ hK).smul a x = y := by
   refine ⟨(ellEquiv σ hK).symm y * ((ellEquiv σ hK).symm x)⁻¹, ?_, ?_⟩
   · simp only [ellMulAction_smul, inv_mul_cancel_right, Equiv.apply_symm_apply]
   · intro a ha
     rw [ellMulAction_smul] at ha
     rw [← ha, Equiv.symm_apply_apply, mul_inv_cancel_right]
 
-theorem ell_smul_eq_self_iff (a : ClassGroup (𝓞 K)) (x : ELL K) :
-    (ellMulAction σ hK).smul a x = x ↔ a = 1 := by
+theorem ell_smul_eq_self_iff (a : ClassGroup (𝓞 K)) (x : ELL K)
+    : (ellMulAction σ hK).smul a x = x ↔ a = 1 := by
   constructor
   · intro h
     exact (existsUnique_smul_eq σ hK x x).unique h

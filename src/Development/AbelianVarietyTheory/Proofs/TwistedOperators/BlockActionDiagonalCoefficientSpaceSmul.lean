@@ -26,9 +26,13 @@ lemma weight_colW_apply {r n : ℕ} (m : Fin r × Fin n →₀ ℕ) (t : Fin n) 
     simp [Formalism.GradedWeylDivisibility.colW, Pi.single_apply, Ne.symm hs]
   · simp
 
-theorem rowAct_scalar_dualWeyl {r n : ℕ} (ν : Fin n → ℕ) (c : ℂ) (F : MvPolynomial (Fin r × Fin n) ℂ)
-    (hF : F ∈ Formalism.GradedWeylDivisibility.dualWeyl ℂ r n ν) :
-    Formalism.GradedWeylDivisibility.rowAct ℂ (Matrix.diagonal fun _ : Fin r => c) F = c ^ (∑ t, ν t) • F := by
+theorem rowAct_scalar_dualWeyl
+    {r n : ℕ} (ν : Fin n → ℕ)
+    (c : ℂ)
+    (F : MvPolynomial (Fin r × Fin n) ℂ)
+    (hF : F ∈ Formalism.GradedWeylDivisibility.dualWeyl ℂ r n ν)
+    : Formalism.GradedWeylDivisibility.rowAct ℂ (Matrix.diagonal fun _ : Fin r => c) F
+      = c ^ (∑ t, ν t) • F := by
   have hw : IsWeightedHomogeneous (Formalism.GradedWeylDivisibility.colW r n) F ν :=
     (mem_weightedHomogeneousSubmodule _ _ _ _).1 (Submodule.mem_inf.1 hF).1
   ext m
@@ -47,19 +51,26 @@ end GlobalTheory.CoefScale
 
 namespace GlobalTheory
 
-theorem blockAct_diag_mem_VV {ι : Type} [Fintype ι] {n : ℕ} (lam : ι → Formalism.BasicNotions.DomWeight n) (c : ι → ℂ)
-    (Q : Formalism.L2.DIV.Pol ℂ ι n) (hQ : Q ∈ Formalism.L2.DIV.VV ℂ lam) :
-    Formalism.GradedWeylDivisibility.blockAct ℂ (fun τ => Matrix.diagonal fun _ : Fin n => c τ) Q =
-      (∏ τ, c τ ^ ∑ a, (lam τ).natW a) • Q := by
+theorem blockAct_diag_mem_VV
+    {ι : Type} [Fintype ι]
+    {n : ℕ} (lam : ι → Formalism.BasicNotions.DomWeight n)
+    (c : ι → ℂ)
+    (Q : Formalism.L2.DIV.Pol ℂ ι n) (hQ : Q ∈ Formalism.L2.DIV.VV ℂ lam)
+    : Formalism.GradedWeylDivisibility.blockAct ℂ (fun τ => Matrix.diagonal fun _ : Fin n => c τ) Q
+      = (∏ τ, c τ ^ ∑ a, (lam τ).natW a) • Q := by
   unfold Formalism.L2.DIV.VV Formalism.GradedWeylDivisibility.tensorLat at hQ
   induction hQ using Submodule.span_induction with
   | mem P hP =>
     obtain ⟨F, hF, rfl⟩ := hP
-    have h1 := (Formalism.GradedWeylDivisibility.blockActTensor ℂ ℂ ι n n (fun τ => Matrix.diagonal fun _ : Fin n => c τ)).1
+    have h1 :=
+      (Formalism.GradedWeylDivisibility.blockActTensor ℂ ℂ ι n n
+        (fun τ => Matrix.diagonal fun _ : Fin n => c τ)).1
     rw [map_prod]
     simp_rw [h1]
-    have h2 : ∀ τ, Formalism.GradedWeylDivisibility.rowAct ℂ (Matrix.diagonal fun _ : Fin n => c τ) (F τ) =
-        c τ ^ (∑ a, (lam τ).natW a) • F τ := fun τ =>
+    have h2
+        : ∀ τ,
+          Formalism.GradedWeylDivisibility.rowAct ℂ (Matrix.diagonal fun _ : Fin n => c τ) (F τ)
+            = c τ ^ (∑ a, (lam τ).natW a) • F τ := fun τ =>
       GlobalTheory.CoefScale.rowAct_scalar_dualWeyl _ _ _ (hF τ)
     simp_rw [h2, map_smul, Algebra.smul_def, Finset.prod_mul_distrib, map_prod]
   | zero => simp

@@ -11,15 +11,20 @@ noncomputable section
 
 open scoped ENNReal
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology Polynomial
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs GlobalTheory.CompanionTheory.Conc
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.AutomorphicForm
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs
+  GlobalTheory.CompanionTheory.Conc
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.AutomorphicForm
 
 namespace GlobalTheory.CompanionTheory.Conc
 
-theorem continuous_sm_uFam {K : Type} [Field K] [NumberField K] {n : ℕ}
-    [MeasurableSpace (archGroup K n)] [BorelSpace (archGroup K n)] (ν : Measure (archGroup K n))
-    [ν.IsHaarMeasure] {β : archGroup K n → ℝ} (hβ : Ker ν β) {f : AdelicGLn.AdelicGL K n → ℂ}
-    (hf : Continuous f) : Continuous (sm ν β f) := by
+theorem continuous_sm_uFam
+    {K : Type} [Field K] [NumberField K]
+    {n : ℕ} [MeasurableSpace (archGroup K n)] [BorelSpace (archGroup K n)]
+    (ν : Measure (archGroup K n)) [ν.IsHaarMeasure]
+    {β : archGroup K n → ℝ} (hβ : Ker ν β)
+    {f : AdelicGLn.AdelicGL K n → ℂ} (hf : Continuous f)
+    : Continuous (sm ν β f) := by
   have hF : Continuous (Function.uncurry fun (x : AdelicGLn.AdelicGL K n) (y : archGroup K n) =>
       (β y : ℂ) * f (x * infEmb K n y)) := by
     refine (Complex.continuous_ofReal.comp (hβ.cont.comp continuous_snd)).mul (hf.comp ?_)
@@ -31,9 +36,11 @@ theorem continuous_sm_uFam {K : Type} [Field K] [NumberField K] {n : ℕ}
   have : β y = 0 := image_eq_zero_of_notMem_tsupport hy
   simp [this]
 
-theorem uFam_sm : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) [MeasurableSpace (archGroup K n)]
-    [BorelSpace (archGroup K n)] (ν : Measure (archGroup K n)) [ν.IsHaarMeasure] (β : archGroup K n → ℝ)
-    (ι : Type) (f : ι → AdelicGLn.AdelicGL K n → ℂ), Ker ν β → UFam f → UFam (fun i => sm ν β (f i)) := by
+theorem uFam_sm
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) [MeasurableSpace (archGroup K n)]
+        [BorelSpace (archGroup K n)] (ν : Measure (archGroup K n)) [ν.IsHaarMeasure]
+        (β : archGroup K n → ℝ) (ι : Type) (f : ι → AdelicGLn.AdelicGL K n → ℂ),
+      Ker ν β → UFam f → UFam (fun i => sm ν β (f i)) := by
   intro K _ _ n _ _ ν _ β ι f hβ hf
   refine ⟨fun i => continuous_sm_uFam ν hβ (hf.cont i), fun i γ x => ?_, ?_⟩
   · simp only [sm, mul_assoc]

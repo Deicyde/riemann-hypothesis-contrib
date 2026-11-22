@@ -27,26 +27,30 @@ theorem fockL_self (f : MvPolynomial σ ℂ) : fockL f f = (fockN f : ℂ) := by
   push_cast
   rfl
 
-theorem fockN_eq_sum (f : MvPolynomial σ ℂ) (S : Finset (σ →₀ ℕ)) (h : f.support ⊆ S) :
-    fockN f = ∑ m ∈ S, ‖AddMonoidAlgebra.coeff f m‖ ^ 2 * (mfact m : ℝ) := by
+theorem fockN_eq_sum (f : MvPolynomial σ ℂ) (S : Finset (σ →₀ ℕ)) (h : f.support ⊆ S)
+    : fockN f = ∑ m ∈ S, ‖AddMonoidAlgebra.coeff f m‖ ^ 2 * (mfact m : ℝ) := by
   unfold fockN
   refine Finset.sum_subset h fun m _ hm => ?_
   rw [notMem_support_iff.1 hm]
   simp
 
-theorem cauchy_schwarz_finite_sum {β : Type} [Fintype β] (c z : β → ℂ) : ‖∑ b, c b * z b‖ ^ 2 ≤ (∑ b, ‖c b‖ ^ 2) * ∑ b, ‖z b‖ ^ 2 := by
+theorem cauchy_schwarz_finite_sum {β : Type} [Fintype β] (c z : β → ℂ)
+    : ‖∑ b, c b * z b‖ ^ 2 ≤ (∑ b, ‖c b‖ ^ 2) * ∑ b, ‖z b‖ ^ 2 := by
   have h1 : ‖∑ b, c b * z b‖ ≤ ∑ b, ‖c b‖ * ‖z b‖ :=
     (norm_sum_le _ _).trans (le_of_eq (Finset.sum_congr rfl fun b _ => norm_mul _ _))
   have h2 := Finset.sum_mul_sq_le_sq_mul_sq Finset.univ (fun b => ‖c b‖) (fun b => ‖z b‖)
   exact (pow_le_pow_left₀ (norm_nonneg _) h1 2).trans h2
 
-theorem fockN_lin_le {β : Type} [Fintype β] (c : β → ℂ) (G : β → MvPolynomial σ ℂ) :
-    fockN (∑ b, C (c b) * G b) ≤ (∑ b, ‖c b‖ ^ 2) * ∑ b, fockN (G b) := by
+theorem fockN_lin_le {β : Type} [Fintype β] (c : β → ℂ) (G : β → MvPolynomial σ ℂ)
+    : fockN (∑ b, C (c b) * G b) ≤ (∑ b, ‖c b‖ ^ 2) * ∑ b, fockN (G b) := by
   classical
   set S : Finset (σ →₀ ℕ) := (∑ b, C (c b) * G b).support ∪ Finset.univ.biUnion fun b => (G b).support with hS
   rw [fockN_eq_sum _ S Finset.subset_union_left]
-  have hG : ∀ b, fockN (G b) = ∑ m ∈ S, ‖AddMonoidAlgebra.coeff (G b) m‖ ^ 2 * (mfact m : ℝ) := fun b =>
-    fockN_eq_sum _ S ((Finset.subset_biUnion_of_mem (fun b => (G b).support) (Finset.mem_univ b)).trans Finset.subset_union_right)
+  have hG
+      : ∀ b, fockN (G b) = ∑ m ∈ S, ‖AddMonoidAlgebra.coeff (G b) m‖ ^ 2 * (mfact m : ℝ) := fun b =>
+    fockN_eq_sum _ S
+      ((Finset.subset_biUnion_of_mem (fun b => (G b).support) (Finset.mem_univ b)).trans
+        Finset.subset_union_right)
   simp only [hG]
   rw [Finset.sum_comm, Finset.mul_sum]
   refine Finset.sum_le_sum fun m _ => ?_
@@ -58,14 +62,15 @@ theorem fockN_lin_le {β : Type} [Fintype β] (c : β → ℂ) (G : β → MvPol
 
 variable [DecidableEq σ]
 
-theorem coeff_X_mul_pderiv_columns (v : σ) (F : MvPolynomial σ ℂ) (m : σ →₀ ℕ) :
-    AddMonoidAlgebra.coeff (X v * pderiv v F) m = (m v : ℂ) * AddMonoidAlgebra.coeff F m := by
+theorem coeff_X_mul_pderiv_columns (v : σ) (F : MvPolynomial σ ℂ) (m : σ →₀ ℕ)
+    : AddMonoidAlgebra.coeff (X v * pderiv v F) m = (m v : ℂ) * AddMonoidAlgebra.coeff F m := by
   induction F using MvPolynomial.induction_on' with
   | monomial u c =>
     rw [pderiv_monomial, coeff_X_mul', coeff_monomial, coeff_monomial]
     by_cases hv : v ∈ m.support
     · have h1 : 1 ≤ m v := Nat.one_le_iff_ne_zero.2 (Finsupp.mem_support_iff.1 hv)
-      have hm : m - Finsupp.single v 1 + Finsupp.single v 1 = m := tsub_add_cancel_of_le (Finsupp.single_le_iff.2 h1)
+      have hm : m - Finsupp.single v 1 + Finsupp.single v 1 = m :=
+        tsub_add_cancel_of_le (Finsupp.single_le_iff.2 h1)
       rw [if_pos hv]
       by_cases hu : u = m
       · subst hu
@@ -84,10 +89,12 @@ theorem coeff_X_mul_pderiv_columns (v : σ) (F : MvPolynomial σ ℂ) (m : σ �
         · rw [if_neg h2]
     · rw [if_neg hv, Finsupp.notMem_support_iff.1 hv]
       simp
-  | add p q hp hq => rw [map_add (f := _), mul_add, MvPolynomial.coeff_add, MvPolynomial.coeff_add, hp, hq]; ring
+  | add p q hp hq =>
+    rw [map_add (f := _), mul_add, MvPolynomial.coeff_add, MvPolynomial.coeff_add, hp, hq]; ring
 
-theorem coeff_pderiv_eq_coeff_add_single_mul (v : σ) (F : MvPolynomial σ ℂ) (m : σ →₀ ℕ) :
-    AddMonoidAlgebra.coeff (pderiv v F) m = AddMonoidAlgebra.coeff F (m + Finsupp.single v 1) * ((m v : ℂ) + 1) := by
+theorem coeff_pderiv_eq_coeff_add_single_mul (v : σ) (F : MvPolynomial σ ℂ) (m : σ →₀ ℕ)
+    : AddMonoidAlgebra.coeff (pderiv v F) m
+      = AddMonoidAlgebra.coeff F (m + Finsupp.single v 1) * ((m v : ℂ) + 1) := by
   have h := coeff_X_mul_pderiv_columns v F (m + Finsupp.single v 1)
   rw [coeff_X_mul', if_pos (by simp), add_tsub_cancel_right] at h
   rw [h]
@@ -106,7 +113,9 @@ def blkE (τ : ι) (F : MvPolynomial (ι × Fin n × Fin n) ℂ) : MvPolynomial 
 def BlockHomogeneous (F : MvPolynomial (ι × Fin n × Fin n) ℂ) (d : ι → ℕ) : Prop :=
   ∀ m, AddMonoidAlgebra.coeff F m ≠ 0 → ∀ τ, ∑ a, ∑ s, m (τ, a, s) = d τ
 
-theorem blkE_of_hom {F : MvPolynomial (ι × Fin n × Fin n) ℂ} {d : ι → ℕ} (h : BlockHomogeneous F d) (τ : ι) : blkE τ F = (d τ : ℂ) • F := by
+theorem blkE_of_hom
+    {F : MvPolynomial (ι × Fin n × Fin n) ℂ} {d : ι → ℕ} (h : BlockHomogeneous F d) (τ : ι)
+    : blkE τ F = (d τ : ℂ) • F := by
   classical
   ext m
   unfold blkE
@@ -119,8 +128,10 @@ theorem blkE_of_hom {F : MvPolynomial (ι × Fin n × Fin n) ℂ} {d : ι → �
     push_cast
     rfl
 
-theorem blkE_blockAct (U : ι → Matrix (Fin n) (Fin n) ℂ) (τ : ι) (F : MvPolynomial (ι × Fin n × Fin n) ℂ) :
-    blkE τ (Formalism.GradedWeylDivisibility.blockAct ℂ U F) = Formalism.GradedWeylDivisibility.blockAct ℂ U (blkE τ F) := by
+theorem blkE_blockAct
+    (U : ι → Matrix (Fin n) (Fin n) ℂ) (τ : ι) (F : MvPolynomial (ι × Fin n × Fin n) ℂ)
+    : blkE τ (Formalism.GradedWeylDivisibility.blockAct ℂ U F)
+      = Formalism.GradedWeylDivisibility.blockAct ℂ U (blkE τ F) := by
   classical
   unfold blkE
   set_option synthInstance.maxHeartbeats 100000 in
@@ -132,8 +143,9 @@ theorem blkE_blockAct (U : ι → Matrix (Fin n) (Fin n) ℂ) (τ : ι) (F : MvP
   refine Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun a _ => ?_
   ring
 
-theorem fockN_euler (τ : ι) (G : MvPolynomial (ι × Fin n × Fin n) ℂ) (c : ℕ) (hE : blkE τ G = (c : ℂ) • G) :
-    ∑ a, ∑ t, fockN (pderiv (τ, a, t) G) = (c : ℝ) * fockN G := by
+theorem fockN_euler
+    (τ : ι) (G : MvPolynomial (ι × Fin n × Fin n) ℂ) (c : ℕ) (hE : blkE τ G = (c : ℂ) • G)
+    : ∑ a, ∑ t, fockN (pderiv (τ, a, t) G) = (c : ℝ) * fockN G := by
   classical
   have : ((∑ a, ∑ t, fockN (pderiv (τ, a, t) G) : ℝ) : ℂ) = (((c : ℝ) * fockN G : ℝ) : ℂ) := by
     push_cast
@@ -141,12 +153,16 @@ theorem fockN_euler (τ : ι) (G : MvPolynomial (ι × Fin n × Fin n) ℂ) (c :
     have e : ∑ a, ∑ t, fockL G (X (τ, a, t) * pderiv (τ, a, t) G) = fockL G (blkE τ G) := by
       unfold blkE
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum]
+      simp only [map_sum]
     rw [e, hE, map_smul, smul_eq_mul]
   exact_mod_cast this
 
-theorem blkHom_pderiv {F : MvPolynomial (ι × Fin n × Fin n) ℂ} {d : ι → ℕ} [DecidableEq ι] (h : BlockHomogeneous F d) (τ₀ : ι) (e : ℕ) (he : d τ₀ = e + 1)
-    (b t : Fin n) : BlockHomogeneous (pderiv (τ₀, b, t) F) (Function.update d τ₀ e) := by
+theorem blkHom_pderiv
+    {F : MvPolynomial (ι × Fin n × Fin n) ℂ} {d : ι → ℕ} [DecidableEq ι]
+    (h : BlockHomogeneous F d)
+    (τ₀ : ι) (e : ℕ) (he : d τ₀ = e + 1)
+    (b t : Fin n)
+    : BlockHomogeneous (pderiv (τ₀, b, t) F) (Function.update d τ₀ e) := by
   intro m hm τ
   rw [coeff_pderiv_eq_coeff_add_single_mul] at hm
   have h1 := h _ (left_ne_zero_of_mul hm) τ
@@ -177,9 +193,13 @@ theorem blkHom_pderiv {F : MvPolynomial (ι × Fin n × Fin n) ℂ} {d : ι → 
       exact hτ (by simpa using (congrArg (fun z : ι × Fin n × Fin n => z.1) h').symm)
     omega
 
-theorem fock_norm_substitution_bound (U : ι → Matrix (Fin n) (Fin n) ℂ) : ∀ (D : ℕ) (d : ι → ℕ), ∑ τ, d τ = D →
-    ∀ F : MvPolynomial (ι × Fin n × Fin n) ℂ, BlockHomogeneous F d →
-      fockN (Formalism.GradedWeylDivisibility.blockAct ℂ U F) ≤ (∏ τ, hsN (U τ) ^ d τ) * fockN F := by
+theorem fock_norm_substitution_bound (U : ι → Matrix (Fin n) (Fin n) ℂ)
+    : ∀ (D : ℕ) (d : ι → ℕ),
+      ∑ τ, d τ = D
+        → ∀ F : MvPolynomial (ι × Fin n × Fin n) ℂ,
+          BlockHomogeneous F d
+            → fockN (Formalism.GradedWeylDivisibility.blockAct ℂ U F)
+              ≤ (∏ τ, hsN (U τ) ^ d τ) * fockN F := by
   classical
   intro D
   induction D with
@@ -221,8 +241,11 @@ theorem fock_norm_substitution_bound (U : ι → Matrix (Fin n) (Fin n) ℂ) : �
     have hprod : ∏ τ, hsN (U τ) ^ d τ = hsN (U τ₀) * ∏ τ, hsN (U τ) ^ d' τ := by
       rw [← Finset.mul_prod_erase Finset.univ (fun τ => hsN (U τ) ^ d τ) (Finset.mem_univ τ₀),
         ← Finset.mul_prod_erase Finset.univ (fun τ => hsN (U τ) ^ d' τ) (Finset.mem_univ τ₀)]
-      have e1 : ∏ τ ∈ Finset.univ.erase τ₀, hsN (U τ) ^ d' τ = ∏ τ ∈ Finset.univ.erase τ₀, hsN (U τ) ^ d τ :=
-        Finset.prod_congr rfl fun τ hτ => by rw [hd', Function.update_of_ne (Finset.ne_of_mem_erase hτ)]
+      have e1
+          : ∏ τ ∈ Finset.univ.erase τ₀, hsN (U τ) ^ d' τ
+            = ∏ τ ∈ Finset.univ.erase τ₀, hsN (U τ) ^ d τ :=
+        Finset.prod_congr rfl fun τ hτ => by
+          rw [hd', Function.update_of_ne (Finset.ne_of_mem_erase hτ)]
       rw [e1, hd', Function.update_self, he, pow_succ]
       ring
     set G := Formalism.GradedWeylDivisibility.blockAct ℂ U F with hG
@@ -230,29 +253,43 @@ theorem fock_norm_substitution_bound (U : ι → Matrix (Fin n) (Fin n) ℂ) : �
       rw [hG, blkE_blockAct, blkE_of_hom hF τ₀, map_smul, he]
     have h1 := fockN_euler τ₀ G (e + 1) hEG
     have h2 := fockN_euler τ₀ F (e + 1) (by rw [blkE_of_hom hF τ₀, he])
-    have h3 : ∀ a t, fockN (pderiv (τ₀, a, t) G) ≤
-        (∑ b, ‖U τ₀ b a‖ ^ 2) * ∑ b, fockN (Formalism.GradedWeylDivisibility.blockAct ℂ U (pderiv (τ₀, b, t) F)) := by
-      intro a t
-      rw [hG, pderiv_blockAct]
-      exact fockN_lin_le _ _
-    have h4 : ∀ b t, fockN (Formalism.GradedWeylDivisibility.blockAct ℂ U (pderiv (τ₀, b, t) F)) ≤ (∏ τ, hsN (U τ) ^ d' τ) * fockN (pderiv (τ₀, b, t) F) :=
-      fun b t => ih d' hsum _ (blkHom_pderiv hF τ₀ e he b t)
+    have h3
+        : ∀ a t,
+          fockN (pderiv (τ₀, a, t) G)
+            ≤ (∑ b, ‖U τ₀ b a‖ ^ 2)
+              * ∑ b, fockN (Formalism.GradedWeylDivisibility.blockAct ℂ U (pderiv (τ₀, b, t) F)) :=
+      by
+        intro a t
+        rw [hG, pderiv_blockAct]
+        exact fockN_lin_le _ _
+    have h4
+        : ∀ b t,
+          fockN (Formalism.GradedWeylDivisibility.blockAct ℂ U (pderiv (τ₀, b, t) F))
+            ≤ (∏ τ, hsN (U τ) ^ d' τ) * fockN (pderiv (τ₀, b, t) F) := fun b t =>
+      ih d' hsum _ (blkHom_pderiv hF τ₀ e he b t)
     have hP : 0 ≤ ∏ τ, hsN (U τ) ^ d' τ := Finset.prod_nonneg fun τ _ => pow_nonneg (hsN_nonneg _) _
-    have h5 : ((e + 1 : ℕ) : ℝ) * fockN G ≤ ((e + 1 : ℕ) : ℝ) * ((∏ τ, hsN (U τ) ^ d τ) * fockN F) := by
+    have h5
+        : ((e + 1 : ℕ) : ℝ) * fockN G ≤ ((e + 1 : ℕ) : ℝ) * ((∏ τ, hsN (U τ) ^ d τ) * fockN F) := by
       rw [← h1]
-      calc ∑ a, ∑ t, fockN (pderiv (τ₀, a, t) G)
-          ≤ ∑ a, ∑ t, (∑ b, ‖U τ₀ b a‖ ^ 2) * ∑ b, (∏ τ, hsN (U τ) ^ d' τ) * fockN (pderiv (τ₀, b, t) F) :=
-            Finset.sum_le_sum fun a _ => Finset.sum_le_sum fun t _ => (h3 a t).trans
-              (mul_le_mul_of_nonneg_left (Finset.sum_le_sum fun b _ => h4 b t) (Finset.sum_nonneg fun _ _ => by positivity))
-        _ = (∑ a, ∑ b, ‖U τ₀ b a‖ ^ 2) * ((∏ τ, hsN (U τ) ^ d' τ) * ∑ t, ∑ b, fockN (pderiv (τ₀, b, t) F)) := by
-            simp only [← Finset.mul_sum, ← Finset.sum_mul]
+      calc
+        ∑ a, ∑ t, fockN (pderiv (τ₀, a, t) G)
+            ≤ ∑ a, ∑ t, (∑ b, ‖U τ₀ b a‖ ^ 2) * ∑ b, (∏ τ, hsN (U τ) ^ d' τ) * fockN (pderiv (τ₀, b, t) F) :=
+          Finset.sum_le_sum fun a _ =>
+            Finset.sum_le_sum fun t _ =>
+              (h3 a t).trans
+                (mul_le_mul_of_nonneg_left (Finset.sum_le_sum fun b _ => h4 b t)
+                  (Finset.sum_nonneg fun _ _ => by positivity))
+        _ = (∑ a, ∑ b, ‖U τ₀ b a‖ ^ 2)
+            * ((∏ τ, hsN (U τ) ^ d' τ) * ∑ t, ∑ b, fockN (pderiv (τ₀, b, t) F)) := by
+          simp only [← Finset.mul_sum, ← Finset.sum_mul]
         _ = hsN (U τ₀) * ((∏ τ, hsN (U τ) ^ d' τ) * ∑ b, ∑ t, fockN (pderiv (τ₀, b, t) F)) := by
-            unfold hsN
-            rw [Finset.sum_comm, Finset.sum_comm (f := fun t b => fockN (pderiv (τ₀, b, t) F))]
+          unfold hsN
+          rw [Finset.sum_comm, Finset.sum_comm (f := fun t b => fockN (pderiv (τ₀, b, t) F))]
         _ = _ := by rw [h2, hprod]; ring
     exact le_of_mul_le_mul_left h5 (by positivity)
 
-theorem fockSubNorm : FockSubNorm := fun ι _ n U d F hF => fock_norm_substitution_bound U _ d rfl F hF
+theorem fockSubNorm : FockSubNorm := fun ι _ n U d F hF =>
+  fock_norm_substitution_bound U _ d rfl F hF
 
 end Block
 

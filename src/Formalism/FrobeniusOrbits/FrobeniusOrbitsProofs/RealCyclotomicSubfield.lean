@@ -263,7 +263,8 @@ lemma maxReal_iff {e : ℕ} {ζ : L} (hζ : IsPrimitiveRoot ζ (2 ^ (e + 2))) :
 end RealCyclotomicSubfield
 
 open RealCyclotomicSubfield in
-theorem real_subfield_of_galois_spec (hSpec : HostGalSpec) : TwoPowerCyclotomicLayerRealSubfieldCharacterization := by
+theorem real_subfield_of_galois_spec (hSpec : HostGalSpec)
+    : TwoPowerCyclotomicLayerRealSubfieldCharacterization := by
   intro e q d hq L _ _ ζ a b h
   have hζ : IsPrimitiveRoot ζ (2 ^ (e + 2)) := h.1
   refine ⟨?_, maxReal_iff hζ, finrank_real_subfield hζ, real_subfield_real_embeddings hζ, ?_⟩
@@ -306,11 +307,10 @@ theorem hostCMType_of (hGal : HostGalois) (hSpec : HostGalSpec) : HostCMType := 
     simpa using h2c
   have hroots : ∀ φ : hostE ζ a b →+* ℂ, φ (bE ζ a b) = c ∨ φ (bE ζ a b) = -c := by
     intro φ
-    have hsq : (φ (bE ζ a b)) ^ 2 = c ^ 2 := by
-      rw [hc2, ← map_pow, hbE, map_neg, map_natCast]
+    have hsq : (φ (bE ζ a b)) ^ 2 = c ^ 2 := by rw [hc2, ← map_pow, hbE, map_neg, map_natCast]
     exact sq_eq_sq_iff_eq_or_eq_neg.mp hsq
-  have ha : ∀ φ : hostE ζ a b →+* ℂ,
-      φ ∈ cmType ζ a b d ↔ (starRingEnd ℂ).comp φ ∉ cmType ζ a b d := by
+  have ha
+      : ∀ φ : hostE ζ a b →+* ℂ, φ ∈ cmType ζ a b d ↔ (starRingEnd ℂ).comp φ ∉ cmType ζ a b d := by
     intro φ
     show φ (bE ζ a b) = c ↔ ¬ ((starRingEnd ℂ).comp φ) (bE ζ a b) = c
     rw [RingHom.comp_apply]
@@ -326,14 +326,18 @@ theorem hostCMType_of (hGal : HostGalois) (hSpec : HostGalSpec) : HostCMType := 
     have hpre : f ⁻¹' (cmType ζ a b d) = (cmType ζ a b d)ᶜ := by
       ext φ
       simp only [Set.mem_preimage, Set.mem_compl_iff]
-      exact ⟨fun h1 h2 => ((ha φ).mp h2) h1, fun h1 => by
-        by_contra h2
-        exact h1 ((ha φ).mpr h2)⟩
+      exact ⟨
+        fun h1 h2 => ((ha φ).mp h2) h1,
+        fun h1 => by
+          by_contra h2
+          exact h1 ((ha φ).mpr h2)
+      ⟩
     have himg : f '' (cmType ζ a b d) = (cmType ζ a b d)ᶜ := by
       rw [Set.image_eq_preimage_of_inverse hinv.leftInverse hinv.rightInverse, hpre]
     have hcard := Set.ncard_add_ncard_compl (cmType ζ a b d)
     rw [← himg, Set.ncard_image_of_injective _ hinv.injective, Nat.card_eq_fintype_card,
-      NumberField.Embeddings.card, hfin, pow_succ] at hcard
+        NumberField.Embeddings.card, hfin, pow_succ]
+      at hcard
     omega
   · intro φ hφ σ
     have hφ' : φ (bE ζ a b) = c := hφ

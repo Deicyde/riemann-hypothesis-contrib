@@ -14,7 +14,9 @@ namespace UpperTheory.V.Lit.Dr
 
 section
 
-variable {Γ V S : Type} [Group Γ] [NormedAddCommGroup V] [NormedSpace ℝ V] {d : ℕ} {G : Geo Γ V S d} {u : S → V → ℝ}
+variable
+  {Γ V S : Type} [Group Γ] [NormedAddCommGroup V] [NormedSpace ℝ V]
+  {d : ℕ} {G : Geo Γ V S d} {u : S → V → ℝ}
 
 end
 
@@ -22,8 +24,9 @@ theorem average : Average := by
   intro Γ V S _ _ _ d G u hu q
   have hu' := hu
   obtain ⟨hsm, hfin, hone⟩ := hu
-  have hfs : ∀ (c : Γ → G.Om q) s p, Function.HasFiniteSupport
-      (fun g => u (G.σ g⁻¹ s) (G.ρ g⁻¹ p) • (c g).1 s p) := by
+  have hfs
+      : ∀ (c : Γ → G.Om q) s p,
+        Function.HasFiniteSupport (fun g => u (G.σ g⁻¹ s) (G.ρ g⁻¹ p) • (c g).1 s p) := by
     intro c s p
     by_cases hp : p ∈ G.Y
     · obtain ⟨N, hN, hNfin⟩ := hfin s p hp
@@ -37,31 +40,32 @@ theorem average : Average := by
       intro g hg
       apply hg
       simp only [((c g).2 _).2 _ hp, smul_zero]
-  let A : (Γ → G.Om q) →ₗ[ℂ] G.Om q :=
-    { toFun := fun c => ⟨fun s p => ∑ᶠ γ, u (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) • (c γ).1 s p,
-        avgMem Γ V S d G u hu' q c⟩
-      map_add' := by
-        intro a b
-        apply Subtype.ext
-        funext s p
-        show ∑ᶠ γ, u (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) • (a γ + b γ).1 s p =
-          ∑ᶠ γ, u (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) • (a γ).1 s p + ∑ᶠ γ, u (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) • (b γ).1 s p
-        simp only [Submodule.coe_add, Pi.add_apply, smul_add]
-        exact finsum_add_distrib (hfs a s p) (hfs b s p)
-      map_smul' := by
-        intro z a
-        apply Subtype.ext
-        funext s p
-        show ∑ᶠ γ, u (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) • (z • a γ).1 s p =
-          z • ∑ᶠ γ, u (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) • (a γ).1 s p
-        have hm := map_finsum (DistribSMul.toAddMonoidHom (V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) z)
-          (hfs a s p)
-        simp only [DistribSMul.toAddMonoidHom_apply] at hm
-        rw [hm]
-        congr 1
-        funext i
-        simp only [Submodule.coe_smul, Pi.smul_apply]
-        exact smul_comm _ _ _ }
+  let A : (Γ → G.Om q) →ₗ[ℂ] G.Om q := {
+    toFun := fun c =>
+      ⟨fun s p => ∑ᶠ γ, u (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) • (c γ).1 s p, avgMem Γ V S d G u hu' q c⟩
+    map_add' := by
+      intro a b
+      apply Subtype.ext
+      funext s p
+      show ∑ᶠ γ, u (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) • (a γ + b γ).1 s p =
+        ∑ᶠ γ, u (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) • (a γ).1 s p + ∑ᶠ γ, u (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) • (b γ).1 s p
+      simp only [Submodule.coe_add, Pi.add_apply, smul_add]
+      exact finsum_add_distrib (hfs a s p) (hfs b s p)
+    map_smul' := by
+      intro z a
+      apply Subtype.ext
+      funext s p
+      show ∑ᶠ γ, u (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) • (z • a γ).1 s p =
+        z • ∑ᶠ γ, u (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) • (a γ).1 s p
+      have hm :=
+        map_finsum (DistribSMul.toAddMonoidHom (V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) z) (hfs a s p)
+      simp only [DistribSMul.toAddMonoidHom_apply] at hm
+      rw [hm]
+      congr 1
+      funext i
+      simp only [Submodule.coe_smul, Pi.smul_apply]
+      exact smul_comm _ _ _
+  }
   refine ⟨A, ?_, ?_⟩
   · intro x
     apply Subtype.ext

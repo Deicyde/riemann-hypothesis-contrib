@@ -21,23 +21,24 @@ variable {d : ℕ} {ι : Type*} [Fintype ι]
 theorem real_inner_eq_re (x y : EuclideanSpace ℂ ι) : inner ℝ x y = (inner ℂ x y).re := by
   simp [PiLp.inner_apply, Complex.re_sum, Complex.inner]
 
-theorem adjoint_restrictScalars (S : EuclideanSpace ℂ (Fin d) →ₗ[ℂ] EuclideanSpace ℂ ι) :
-    LinearMap.adjoint (S.restrictScalars ℝ) = (LinearMap.adjoint S).restrictScalars ℝ := by
+theorem adjoint_restrictScalars (S : EuclideanSpace ℂ (Fin d) →ₗ[ℂ] EuclideanSpace ℂ ι)
+    : LinearMap.adjoint (S.restrictScalars ℝ) = (LinearMap.adjoint S).restrictScalars ℝ := by
   symm
   rw [LinearMap.eq_adjoint_iff]
   intro x y
   rw [LinearMap.restrictScalars_apply, LinearMap.restrictScalars_apply, real_inner_eq_re,
     real_inner_eq_re, LinearMap.adjoint_inner_left]
 
-theorem areaJacobian_restrictScalars (S : EuclideanSpace ℂ (Fin d) →ₗ[ℂ] EuclideanSpace ℂ ι) :
-    areaJacobian (S.restrictScalars ℝ) = ‖LinearMap.det (LinearMap.adjoint S ∘ₗ S)‖ := by
+theorem areaJacobian_restrictScalars (S : EuclideanSpace ℂ (Fin d) →ₗ[ℂ] EuclideanSpace ℂ ι)
+    : areaJacobian (S.restrictScalars ℝ) = ‖LinearMap.det (LinearMap.adjoint S ∘ₗ S)‖ := by
   rw [areaJacobian, adjoint_restrictScalars, ← LinearMap.restrictScalars_comp,
     LinearMap.det_restrictScalars, Algebra.norm_complex_apply, Complex.norm_def]
 
-theorem det_adjoint_comp (S : EuclideanSpace ℂ (Fin d) →ₗ[ℂ] EuclideanSpace ℂ ι) :
-    LinearMap.det (LinearMap.adjoint S ∘ₗ S) =
-      (Matrix.of fun i j : Fin d => inner ℂ (S (EuclideanSpace.basisFun (Fin d) ℂ i))
-        (S (EuclideanSpace.basisFun (Fin d) ℂ j))).det := by
+theorem det_adjoint_comp (S : EuclideanSpace ℂ (Fin d) →ₗ[ℂ] EuclideanSpace ℂ ι)
+    : LinearMap.det (LinearMap.adjoint S ∘ₗ S)
+      = (Matrix.of fun i j : Fin d =>
+        inner ℂ (S (EuclideanSpace.basisFun (Fin d) ℂ i))
+          (S (EuclideanSpace.basisFun (Fin d) ℂ j))).det := by
   rw [← LinearMap.det_toMatrix (EuclideanSpace.basisFun (Fin d) ℂ).toBasis]
   congr 1
   ext i j
@@ -47,27 +48,31 @@ theorem det_adjoint_comp (S : EuclideanSpace ℂ (Fin d) →ₗ[ℂ] EuclideanSp
 
 end FrameJacobianSumAlt
 
-
 open FrameJacobianSumAlt in
 theorem FrameJacobianSum.proof : FrameJacobianSum.Statement := by
   intro d n T b
   classical
   set e := EuclideanSpace.basisFun (Fin d) ℂ
   set N : Matrix (Fin n) (Fin d) ℂ := Matrix.of fun k j => inner ℂ (b k) (T (e j)) with hN
-  have hI : ∀ (I : Finset (Fin n)) (h : I.card = d),
-      areaJacobian ((frameProjLin b I ∘ₗ T).restrictScalars ℝ) = ‖(rowsOf N ⟨I, h⟩).det‖ ^ 2 := by
+  have hI
+      : ∀ (I : Finset (Fin n)) (h : I.card = d),
+        areaJacobian ((frameProjLin b I ∘ₗ T).restrictScalars ℝ) = ‖(rowsOf N ⟨I, h⟩).det‖ ^ 2 := by
     intro I h
     rw [areaJacobian_restrictScalars, det_adjoint_comp]
-    have hG : (Matrix.of fun i j : Fin d => inner ℂ ((frameProjLin b I ∘ₗ T) (e i))
-        ((frameProjLin b I ∘ₗ T) (e j))) = (rowsOf N ⟨I, h⟩)ᴴ * rowsOf N ⟨I, h⟩ := by
+    have hG
+        : (Matrix.of fun i j : Fin d =>
+            inner ℂ ((frameProjLin b I ∘ₗ T) (e i)) ((frameProjLin b I ∘ₗ T) (e j)))
+          = (rowsOf N ⟨I, h⟩)ᴴ * rowsOf N ⟨I, h⟩ := by
       ext i j
-      rw [Matrix.of_apply, PiLp.inner_apply, Matrix.mul_apply, ← (I.orderIsoOfFin h).toEquiv.sum_comp]
+      rw [Matrix.of_apply, PiLp.inner_apply, Matrix.mul_apply,
+        ← (I.orderIsoOfFin h).toEquiv.sum_comp]
       refine Finset.sum_congr rfl fun m _ => ?_
       simp [rowsOf, hN, frameProjLin, conjTranspose_apply, e, RCLike.inner_apply, mul_comm]
     rw [hG, det_mul, det_conjTranspose, Complex.star_def, Complex.conj_mul', norm_pow,
       Complex.norm_real, norm_norm]
-  have hT : LinearMap.det (LinearMap.adjoint T ∘ₗ T) =
-      ∑ I : {I : Finset (Fin n) // I.card = d}, ((‖(rowsOf N I).det‖ ^ 2 : ℝ) : ℂ) := by
+  have hT
+      : LinearMap.det (LinearMap.adjoint T ∘ₗ T)
+        = ∑ I : {I : Finset (Fin n) // I.card = d}, ((‖(rowsOf N I).det‖ ^ 2 : ℝ) : ℂ) := by
     rw [det_adjoint_comp]
     have hG : (Matrix.of fun i j : Fin d => inner ℂ (T (e i)) (T (e j))) = Nᴴ * N := by
       ext i j
@@ -84,7 +89,8 @@ theorem FrameJacobianSum.proof : FrameJacobianSum.Statement := by
     rfl
   rw [areaJacobian_restrictScalars, hT, ← Complex.ofReal_sum, Complex.norm_real,
     Real.norm_of_nonneg (Finset.sum_nonneg fun _ _ => by positivity),
-    Finset.sum_subtype (univ.powersetCard d) (p := fun I : Finset (Fin n) => I.card = d)
+    Finset.sum_subtype (univ.powersetCard d)
+      (p := fun I : Finset (Fin n) => I.card = d)
       (fun I => by simp [mem_powersetCard])]
   exact Finset.sum_congr rfl fun I _ => (hI I.1 I.2).symm
 

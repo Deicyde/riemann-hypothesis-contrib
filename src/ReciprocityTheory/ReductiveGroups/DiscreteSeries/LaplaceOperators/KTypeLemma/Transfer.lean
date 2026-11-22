@@ -61,8 +61,10 @@ theorem transfer (n : ℕ) : TransferStatement n := by
   have hcpt : CompactSpace (KG ε) := compactSpace_KG ε
   set x₀ := g₀⁻¹ * toMK k₀ with hx₀def
   have hx₀ : x₀ ∈ U := (hWU g₀ hg₀W).2
-  have hA : ∀ i, rWord ε (D i) (PsiM T μ) g₀ (v i) =
-      T.op k₀ (lWord ((D i).map Neg.neg) (psM T μ) x₀ (v i)) := fun i => by
+  have hA
+      : ∀ i,
+        rWord ε (D i) (PsiM T μ) g₀ (v i)
+          = T.op k₀ (lWord ((D i).map Neg.neg) (psM T μ) x₀ (v i)) := fun i => by
     rw [tt_rWord_local T μ hU hW (fun D => (hword D).1) hWU hloc (D i) g₀ hg₀W hg₀]
     rfl
   set_option synthInstance.maxHeartbeats 100000 in
@@ -71,29 +73,47 @@ theorem transfer (n : ℕ) : TransferStatement n := by
   have hopc : Continuous fun k : KG ε => T.op k := continuous_subtype_val.comp T.cont
   have hAc : Continuous fun k : KG ε => T.op k * projW T * T.op k⁻¹ :=
     (hopc.mul continuous_const).mul (hopc.comp continuous_inv)
-  have hint : ∀ i, Integrable (fun k : KG ε =>
-      lWord (adW ε k ((D i).map Neg.neg)) (PhiM μ) (toMK k⁻¹ * x₀ * toMK k) •
-        (T.op k * projW T * T.op k⁻¹)) (muK ε) := fun i =>
-    integrableOn_univ.mp ((((hword _).2.1 x₀ hx₀).smul hAc).continuousOn.integrableOn_compact isCompact_univ)
-  have hint' : ∀ i ∈ (univ : Finset (Fin N)), Integrable (fun k : KG ε =>
-      lWord (adW ε k ((D i).map Neg.neg)) (PhiM μ) (toMK k⁻¹ * x₀ * toMK k) •
-        (T.op k * projW T * T.op k⁻¹) (v i)) (muK ε) := fun i _ =>
-    integrableOn_univ.mp ((((hword _).2.1 x₀ hx₀).smul (hAc.clm_apply continuous_const)).continuousOn.integrableOn_compact
+  have hint
+      : ∀ i,
+        Integrable
+          (fun k : KG ε =>
+            lWord (adW ε k ((D i).map Neg.neg)) (PhiM μ) (toMK k⁻¹ * x₀ * toMK k)
+              • (T.op k * projW T * T.op k⁻¹))
+          (muK ε) := fun i =>
+    integrableOn_univ.mp ((((hword _).2.1 x₀ hx₀).smul hAc).continuousOn.integrableOn_compact
       isCompact_univ)
-  have hterm : ∀ i, lWord ((D i).map Neg.neg) (psM T μ) x₀ (v i) =
-      ((Module.finrank ℂ T.V : ℂ) / ((muK ε Set.univ).toReal : ℂ)) •
-        ∫ k, lWord (adW ε k ((D i).map Neg.neg)) (PhiM μ) (toMK k⁻¹ * x₀ * toMK k) •
-          (T.op k * projW T * T.op k⁻¹) (v i) ∂(muK ε) := by
+  have hint'
+      : ∀ i ∈ (univ : Finset (Fin N)),
+        Integrable
+          (fun k : KG ε =>
+            lWord (adW ε k ((D i).map Neg.neg)) (PhiM μ) (toMK k⁻¹ * x₀ * toMK k)
+              • (T.op k * projW T * T.op k⁻¹) (v i))
+          (muK ε) := fun i _ =>
+    integrableOn_univ.mp ((((hword _).2.1 x₀ hx₀).smul
+      (hAc.clm_apply continuous_const)).continuousOn.integrableOn_compact isCompact_univ)
+  have hterm
+      : ∀ i,
+        lWord ((D i).map Neg.neg) (psM T μ) x₀ (v i)
+          = ((Module.finrank ℂ T.V : ℂ) / ((muK ε Set.univ).toReal : ℂ))
+            • ∫ k, lWord (adW ε k ((D i).map Neg.neg)) (PhiM μ) (toMK k⁻¹ * x₀ * toMK k) •
+                (T.op k * projW T * T.op k⁻¹) (v i) ∂(muK ε) := by
     intro i
-    rw [(hword _).2.2 x₀ hx₀, ContinuousLinearMap.smul_apply, ContinuousLinearMap.integral_apply (hint i)]
+    rw [(hword _).2.2 x₀ hx₀, ContinuousLinearMap.smul_apply,
+      ContinuousLinearMap.integral_apply (hint i)]
     rfl
-  rw [Finset.sum_congr rfl fun i _ => hterm i, ← Finset.smul_sum, ← MeasureTheory.integral_finsetSum _ hint']
-  have hAv : ∀ (k : KG ε) (u : T.V), (T.op k * projW T * T.op k⁻¹) u = ⟪T.op k T.w, u⟫_ℂ • T.op k T.w := by
+  rw [Finset.sum_congr rfl fun i _ => hterm i, ← Finset.smul_sum,
+    ← MeasureTheory.integral_finsetSum _ hint']
+  have hAv
+      : ∀ (k : KG ε) (u : T.V),
+        (T.op k * projW T * T.op k⁻¹) u = ⟪T.op k T.w, u⟫_ℂ • T.op k T.w := by
     intro k u
     simp only [ContinuousLinearMap.mul_apply, projW, ContinuousLinearMap.smulRight_apply,
       innerSL_apply_apply, map_smul, op_inv_eq_adjoint, ContinuousLinearMap.adjoint_inner_right]
-  have hzero : ∀ k : KG ε, ∑ i, lWord (adW ε k ((D i).map Neg.neg)) (PhiM μ) (toMK k⁻¹ * x₀ * toMK k) •
-      (T.op k * projW T * T.op k⁻¹) (v i) = 0 := by
+  have hzero
+      : ∀ k : KG ε,
+        ∑ i, lWord (adW ε k ((D i).map Neg.neg)) (PhiM μ) (toMK k⁻¹ * x₀ * toMK k) •
+            (T.op k * projW T * T.op k⁻¹) (v i)
+          = 0 := by
     intro k
     have hy : toMK k⁻¹ * x₀ * toMK k ∈ OmegaSet n := hconj x₀ hx₀ k
     have hyd : IsUnit (toMK k⁻¹ * x₀ * toMK k).det :=
@@ -102,19 +122,24 @@ theorem transfer (n : ℕ) : TransferStatement n := by
       Matrix.nonsing_inv_nonsing_inv _ hyd
     have hz : (toMK k⁻¹ * x₀ * toMK k)⁻¹ ∈ OmegaP n := by
       show (toMK k⁻¹ * x₀ * toMK k)⁻¹⁻¹ ∈ OmegaSet n
-      rw [hinv]; exact hy
-    have e : ∀ i, hWord (adW ε k (D i)) (PhiP μ) (toMK k⁻¹ * x₀ * toMK k)⁻¹ =
-        lWord (adW ε k ((D i).map Neg.neg)) (PhiM μ) (toMK k⁻¹ * x₀ * toMK k) := fun i => by
+      rw [hinv]
+      exact hy
+    have e
+        : ∀ i,
+          hWord (adW ε k (D i)) (PhiP μ) (toMK k⁻¹ * x₀ * toMK k)⁻¹
+            = lWord (adW ε k ((D i).map Neg.neg)) (PhiM μ) (toMK k⁻¹ * x₀ * toMK k) := fun i => by
       rw [tb_hWord_phiP μ _ _ hz, ← tt_adW_neg, hinv]
     have h := hyp k _ hz
     simp only [e] at h
-    calc ∑ i, lWord (adW ε k ((D i).map Neg.neg)) (PhiM μ) (toMK k⁻¹ * x₀ * toMK k) •
-          (T.op k * projW T * T.op k⁻¹) (v i)
-        = (∑ i, ⟪T.op k T.w, v i⟫_ℂ * lWord (adW ε k ((D i).map Neg.neg)) (PhiM μ)
-            (toMK k⁻¹ * x₀ * toMK k)) • T.op k T.w := by
-          rw [Finset.sum_smul]
-          refine Finset.sum_congr rfl fun i _ => ?_
-          rw [hAv, smul_smul, mul_comm]
+    calc
+      ∑ i, lWord (adW ε k ((D i).map Neg.neg)) (PhiM μ) (toMK k⁻¹ * x₀ * toMK k) •
+       (T.op k * projW T * T.op k⁻¹) (v i)
+          = (∑ i, ⟪T.op k T.w, v i⟫_ℂ * lWord (adW ε k ((D i).map Neg.neg)) (PhiM μ)
+              (toMK k⁻¹ * x₀ * toMK k))
+            • T.op k T.w := by
+        rw [Finset.sum_smul]
+        refine Finset.sum_congr rfl fun i _ => ?_
+        rw [hAv, smul_smul, mul_comm]
       _ = 0 := by rw [h, zero_smul]
   simp only [hzero, integral_zero, smul_zero]
 

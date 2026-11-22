@@ -26,7 +26,15 @@ theorem stTop : StTop := by
   refine ⟨(S ×ˢ T).image (fun p => p.1 * p.2), fun x => ?_⟩
   obtain ⟨γ, hγ, s, hs, k, hk, rfl⟩ := hS x
   obtain ⟨t, ht, u, hu, rfl⟩ := hT k hk
-  refine ⟨γ, hγ, s * t, Finset.mem_image.mpr ⟨(s, t), Finset.mem_product.mpr ⟨hs, ht⟩, rfl⟩, u, hgU hu, ?_⟩
+  refine ⟨
+    γ,
+    hγ,
+    s * t,
+    Finset.mem_image.mpr ⟨(s, t), Finset.mem_product.mpr ⟨hs, ht⟩, rfl⟩,
+    u,
+    hgU hu,
+    ?_
+  ⟩
   simp only [mul_assoc]
 
 theorem stGenusOf : StGenusOf := by
@@ -34,8 +42,9 @@ theorem stGenusOf : StGenusOf := by
   classical
   obtain ⟨Λ, hΛ1, hΛ2, hΛ3⟩ := hD I
   obtain ⟨T, hT⟩ := hH I.F I.E I.cm I.n I.J I.J_herm I.J_det
-  have huniq : ∀ {g : GL (Fin I.n) I.E} {A B B' : Submodule (𝓞 I.E) (Fin I.n → I.E)},
-      IsImg g A B → IsImg g A B' → B = B' := by
+  have huniq
+      : ∀ {g : GL (Fin I.n) I.E} {A B B' : Submodule (𝓞 I.E) (Fin I.n → I.E)},
+        IsImg g A B → IsImg g A B' → B = B' := by
     intro g A B B' h h'
     ext v
     exact (h v).trans (h' v).symm

@@ -8,14 +8,17 @@ open UpperTheory.ConvolutionTheory.G UpperTheory.ConvolutionTheory.T4
 open MeasureTheory
 open scoped ENNReal NNReal
 
-private theorem haar_inv_eq_self {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [LocallyCompactSpace G] [T2Space G] [SecondCountableTopology G] [MeasurableSpace G]
-    [BorelSpace G] (μ : Measure G) [μ.IsHaarMeasure] [μ.IsMulRightInvariant] : μ.inv = μ := by
+private theorem haar_inv_eq_self
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+    [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+    (μ : Measure G) [μ.IsHaarMeasure] [μ.IsMulRightInvariant]
+    : μ.inv = μ := by
   obtain ⟨c, hc⟩ : ∃ c : ℝ≥0, μ.inv = c • μ :=
     ⟨Measure.haarScalarFactor μ.inv μ, Measure.isMulLeftInvariant_eq_smul _ _⟩
   have hinv : μ.inv.inv = μ := Measure.inv_inv μ
   have hsq : μ = (c * c) • μ := by
-    calc μ = μ.inv.inv := hinv.symm
+    calc
+      μ = μ.inv.inv := hinv.symm
       _ = (c • μ).inv := by rw [hc]
       _ = c • μ.inv := by
         simpa only [Measure.inv_def] using Measure.map_smul c (μ := μ) measurable_inv.aemeasurable
@@ -36,8 +39,7 @@ private theorem haar_inv_eq_self {G : Type} [Group G] [TopologicalSpace G] [IsTo
     exact (pow_eq_one_iff_of_nonneg (zero_le : (0 : ℝ≥0) ≤ c) two_ne_zero).1 h4
   rw [hc, h5, one_smul]
 
-theorem UpperTheory.haar_unimodular_criterion :
-    UniOf := by
+theorem UpperTheory.haar_unimodular_criterion : UniOf := by
   intro G _ _ _ _ _ _ _ _ μ hμ
   have key : μ.IsMulRightInvariant → Uni μ := fun hr => ⟨hμ, ⟨haar_inv_eq_self μ⟩⟩
   refine ⟨key, fun hcomm => key ⟨fun g => ?_⟩⟩

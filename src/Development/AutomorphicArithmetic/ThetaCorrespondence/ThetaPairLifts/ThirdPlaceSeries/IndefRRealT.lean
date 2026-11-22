@@ -14,13 +14,19 @@ set_option synthInstance.maxHeartbeats 200000
 section
 noncomputable section
 open Formalism.BasicNotions Formalism.MainNotions NumberField IsDedekindDomain
-open Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.IndefR.Links Formalism.IndefR.Cx
+open Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.IndefR.Links
+  Formalism.IndefR.Cx
 namespace Formalism.IndefR
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : MainNotions.G.Inst D L} {Gl : MainNotions.G.LatInst D} {K : MainNotions.G.Consts} {Y : DivX D}
-  {cX : ExtraC} {ex : Extra D L hT Gi Gl K Y cX}
-def pwOf_alt {Rc : _root_.Formalism.L2.RecTAlt ex} (S : _root_.Formalism.L2.SG.SpectralTiesReal.STiesRAlt Rc)
-    (hin : ∀ u, Formalism.L2.SG.PoincareInHH.PoincareSetting.InHH S.X u S.Y.hK) (u : D.what₂.Word) : Formalism.IndefR.Cx.PerW S.X S.Y.hK u where
+variable
+  {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : MainNotions.G.Inst D L}
+  {Gl : MainNotions.G.LatInst D} {K : MainNotions.G.Consts} {Y : DivX D} {cX : ExtraC}
+  {ex : Extra D L hT Gi Gl K Y cX}
+def pwOf_alt
+    {Rc : _root_.Formalism.L2.RecTAlt ex} (S : _root_.Formalism.L2.SG.SpectralTiesReal.STiesRAlt Rc)
+    (hin : ∀ u, Formalism.L2.SG.PoincareInHH.PoincareSetting.InHH S.X u S.Y.hK)
+    (u : D.what₂.Word)
+    : Formalism.IndefR.Cx.PerW S.X S.Y.hK u where
   Dt := S.Y.Dt u
   hD := S.Y.reps u
   hin := hin u
@@ -91,12 +97,20 @@ structure IndefiniteRealisation (Rc : _root_.Formalism.L2.RecTAlt ex) (P : RowSi
       ((faceT P Dcf Spf Zscf).fc (Rl.toCx3 (faceT P Dcf Spf Zscf)).zs).Z.F0 w
   vpos : ∀ i, (Vc D i).IsPosDef
 namespace RealT
-variable {Rc : _root_.Formalism.L2.RecTAlt ex} {P : RowSideFamily ex} {Dcf : ∀ Zs : DefSub P.A3.fam3.amb3, DefCols (P.A3.side3 P.Ps P.ψs Zs)}
-  {Spf : ∀ Zs : DefSub P.A3.fam3.amb3, SPer (Dcf Zs)} {Zscf : DefSub P.A3.fam3.amb3 → IndefScale P.A3.fam3.base3}
-  {S : _root_.Formalism.L2.SG.SpectralTiesReal.STiesRAlt Rc} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
+variable
+  {Rc : _root_.Formalism.L2.RecTAlt ex} {P : RowSideFamily ex}
+  {Dcf : ∀ Zs : DefSub P.A3.fam3.amb3, DefCols (P.A3.side3 P.Ps P.ψs Zs)}
+  {Spf : ∀ Zs : DefSub P.A3.fam3.amb3, SPer (Dcf Zs)}
+  {Zscf : DefSub P.A3.fam3.amb3 → IndefScale P.A3.fam3.base3}
+  {S : _root_.Formalism.L2.SG.SpectralTiesReal.STiesRAlt Rc} {Ks : Type}
+  [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL]
   (R : _root_.Formalism.IndefR.IndefiniteRealisation Rc P Dcf Spf Zscf S Ks)
-abbrev _root_.Formalism.IndefR.IndefiniteRealisation.F (_R : _root_.Formalism.IndefR.IndefiniteRealisation Rc P Dcf Spf Zscf S Ks) : Face3 D P.A3 := faceT P Dcf Spf Zscf
-def _root_.Formalism.IndefR.IndefiniteRealisation.FramesEx : Prop := Formalism.IndefR.Seed.Frm.FramesExistDiagonal D R.Rl.Pg
+abbrev _root_.Formalism.IndefR.IndefiniteRealisation.F
+    (_R : _root_.Formalism.IndefR.IndefiniteRealisation Rc P Dcf Spf Zscf S Ks)
+    : Face3 D P.A3 :=
+  faceT P Dcf Spf Zscf
+def _root_.Formalism.IndefR.IndefiniteRealisation.FramesEx : Prop :=
+  Formalism.IndefR.Seed.Frm.FramesExistDiagonal D R.Rl.Pg
 end RealT
 end Formalism.IndefR
 end

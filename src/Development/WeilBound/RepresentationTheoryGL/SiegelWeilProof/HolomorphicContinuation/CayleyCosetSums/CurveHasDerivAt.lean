@@ -11,22 +11,22 @@ open scoped ContDiff
 
 namespace PositivityTheory.Rg.Sw.HSt.FL
 
-open PositivityTheory.Rg.Sw PositivityTheory.Rg.Sw.LVs PositivityTheory.Rg.Sw.AbsSt PositivityTheory.Rg.Sw.HSt
+open PositivityTheory.Rg.Sw PositivityTheory.Rg.Sw.LVs PositivityTheory.Rg.Sw.AbsSt
+  PositivityTheory.Rg.Sw.HSt
 open PositivityTheory.Rg.Sw.LVs.II (cE cE_hasDerivAt0 cE_add cE_zero cE_continuous mulL mulL_apply)
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 variable {n : ℕ}
 
-private theorem cd_det_lemma {ι : Type} [Fintype ι] [DecidableEq ι] :
-    ContDiff ℂ ∞ (fun x : Matrix ι ι ℂ => x.det) := by
+private theorem cd_det_lemma {ι : Type} [Fintype ι] [DecidableEq ι]
+    : ContDiff ℂ ∞ (fun x : Matrix ι ι ℂ => x.det) := by
   have he : ∀ i j : ι, ContDiff ℂ ∞ (fun x : Matrix ι ι ℂ => x i j) := fun i j =>
     contDiff_apply_apply ℂ i j
   simp_rw [Matrix.det_apply']
   exact ContDiff.sum (fun σ _ => contDiff_const.mul (contDiff_prod (fun i _ => he _ _)))
 
-theorem cd_det : ContDiff ℂ ∞ (fun x : M2 n => x.det) := by
-  exact cd_det_lemma
+theorem cd_det : ContDiff ℂ ∞ (fun x : M2 n => x.det) := by exact cd_det_lemma
 
 theorem cd_detu1 : ContDiff ℂ ∞ (fun x : M2 n => (u1 x).det) := by
   exact cd_det_lemma.comp contDiff_first_cayley_block
@@ -36,8 +36,8 @@ theorem curve_hasDerivAt (X x : M2 n) : HasDerivAt (fun s : ℝ => x * cE X s) (
   simp only [Function.comp_def, mulL_apply] at h
   exact h
 
-theorem curve_deriv (Ψ : M2 n → ℂ) (hΨ : ContDiff ℂ ∞ Ψ) (X x : M2 n) :
-    HasDerivAt (fun s : ℝ => Ψ (x * cE X s)) (fderiv ℂ Ψ x (x * X)) 0 := by
+theorem curve_deriv (Ψ : M2 n → ℂ) (hΨ : ContDiff ℂ ∞ Ψ) (X x : M2 n)
+    : HasDerivAt (fun s : ℝ => Ψ (x * cE X s)) (fderiv ℂ Ψ x (x * X)) 0 := by
   have hd : HasFDerivAt Ψ (fderiv ℂ Ψ x) (x * cE X 0) := by
     rw [cE_zero, Matrix.mul_one]
     exact (hΨ.differentiable (by simp)).differentiableAt.hasFDerivAt
@@ -56,18 +56,22 @@ def rD (X x : M2 n) : ℂ := fderiv ℂ (fun x : M2 n => x.det) x (x * X) / x.de
 
 def rA (X x : M2 n) : ℂ := fderiv ℂ (fun x : M2 n => (u1 x).det) x (x * X) / (u1 x).det
 
-private theorem rD_mul_left_eq_of_det_ne_zero (P A X : M2 n) (hP : P.det ≠ 0) : rD X (P * A) = rD X A := by
+private theorem rD_mul_left_eq_of_det_ne_zero (P A X : M2 n) (hP : P.det ≠ 0)
+    : rD X (P * A) = rD X A := by
   unfold rD
   let L : M2 n →L[ℂ] M2 n := LinearMap.toContinuousLinearMap (LinearMap.mulLeft ℂ P)
   have hL : ∀ y, L y = P * y := fun y => rfl
-  have hdet : ∀ B : M2 n, HasFDerivAt (fun x : M2 n => x.det) (fderiv ℂ (fun x : M2 n => x.det) B) B :=
+  have hdet
+      : ∀ B : M2 n, HasFDerivAt (fun x : M2 n => x.det) (fderiv ℂ (fun x : M2 n => x.det) B) B :=
     fun B => ((cd_det (n := n)).differentiable (by simp) B).hasFDerivAt
-  have h1 : HasFDerivAt (fun y : M2 n => (P * y).det)
+  have h1 : HasFDerivAt
+      (fun y : M2 n => (P * y).det)
       ((fderiv ℂ (fun x : M2 n => x.det) (P * A)).comp L) A := by
     have := (hdet (P * A)).comp A (L.hasFDerivAt (x := A))
     simp only [Function.comp_def, hL] at this
     exact this
-  have h2 : HasFDerivAt (fun y : M2 n => (P * y).det)
+  have h2 : HasFDerivAt
+      (fun y : M2 n => (P * y).det)
       (P.det • fderiv ℂ (fun x : M2 n => x.det) A) A := by
     simp_rw [Matrix.det_mul]
     exact (hdet A).const_mul P.det
@@ -78,19 +82,24 @@ private theorem rD_mul_left_eq_of_det_ne_zero (P A X : M2 n) (hP : P.det ≠ 0) 
 theorem rD_up (X : M2 n) (p k : GR n) : rD X (mR p * mR k) = rD X (mR k) := by
   exact rD_mul_left_eq_of_det_ne_zero _ _ X (det_mR_ne' p)
 
-private theorem rA_mul_left_eq_of_u1_mul (D : Matrix (Fin n) (Fin n) ℂ) (P A X : M2 n) (hD : D.det ≠ 0)
-    (hu : ∀ y, u1 (P * y) = D * u1 y) : rA X (P * A) = rA X A := by
+private theorem rA_mul_left_eq_of_u1_mul
+    (D : Matrix (Fin n) (Fin n) ℂ) (P A X : M2 n) (hD : D.det ≠ 0) (hu : ∀ y, u1 (P * y) = D * u1 y)
+    : rA X (P * A) = rA X A := by
   unfold rA
   let L : M2 n →L[ℂ] M2 n := LinearMap.toContinuousLinearMap (LinearMap.mulLeft ℂ P)
   have hL : ∀ y, L y = P * y := fun y => rfl
-  have hdet : ∀ B : M2 n, HasFDerivAt (fun x : M2 n => (u1 x).det) (fderiv ℂ (fun x : M2 n => (u1 x).det) B) B :=
+  have hdet
+      : ∀ B : M2 n,
+        HasFDerivAt (fun x : M2 n => (u1 x).det) (fderiv ℂ (fun x : M2 n => (u1 x).det) B) B :=
     fun B => ((cd_detu1 (n := n)).differentiable (by simp) B).hasFDerivAt
-  have h1 : HasFDerivAt (fun y : M2 n => (u1 (P * y)).det)
+  have h1 : HasFDerivAt
+      (fun y : M2 n => (u1 (P * y)).det)
       ((fderiv ℂ (fun x : M2 n => (u1 x).det) (P * A)).comp L) A := by
     have := (hdet (P * A)).comp A (L.hasFDerivAt (x := A))
     simp only [Function.comp_def, hL] at this
     exact this
-  have h2 : HasFDerivAt (fun y : M2 n => (u1 (P * y)).det)
+  have h2 : HasFDerivAt
+      (fun y : M2 n => (u1 (P * y)).det)
       (D.det • fderiv ℂ (fun x : M2 n => (u1 x).det) A) A := by
     simp_rw [hu, Matrix.det_mul]
     exact (hdet A).const_mul D.det

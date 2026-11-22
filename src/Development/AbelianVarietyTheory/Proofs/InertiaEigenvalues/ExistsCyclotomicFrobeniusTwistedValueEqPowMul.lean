@@ -12,38 +12,51 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsC
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc GlobalTheory.ExpImage
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc
+  GlobalTheory.ExpImage
 
 namespace GlobalTheory.ExpImage
 
-theorem cycVal_add {l : ℕ} [Fact l.Prime] (P : LocPrime l) (K : FinExt l) (s e : ℕ)
-    (lam lam' : ℕ → ↥(K0 K)) (d d' : ↥(K0 K)) :
-    cycVal P K s e (fun a => lam a + lam' a) (d + d') =
-      cycVal P K s e lam d + cycVal P K s e lam' d' := by
+theorem cycVal_add
+    {l : ℕ} [Fact l.Prime]
+    (P : LocPrime l)
+    (K : FinExt l)
+    (s e : ℕ) (lam lam' : ℕ → ↥(K0 K)) (d d' : ↥(K0 K))
+    : cycVal P K s e (fun a => lam a + lam' a) (d + d')
+      = cycVal P K s e lam d + cycVal P K s e lam' d' := by
   unfold cycVal
   simp only [map_add (f := _)]
   push_cast
   simp only [add_mul, Finset.sum_add_distrib, mul_add]
   ring
 
-theorem cycVal_neg {l : ℕ} [Fact l.Prime] (P : LocPrime l) (K : FinExt l) (s e : ℕ)
-    (lam : ℕ → ↥(K0 K)) (d : ↥(K0 K)) :
-    cycVal P K s e (fun a => -lam a) (-d) = -cycVal P K s e lam d := by
+theorem cycVal_neg
+    {l : ℕ} [Fact l.Prime]
+    (P : LocPrime l)
+    (K : FinExt l)
+    (s e : ℕ) (lam : ℕ → ↥(K0 K)) (d : ↥(K0 K))
+    : cycVal P K s e (fun a => - lam a) (-d) = - cycVal P K s e lam d := by
   unfold cycVal
   simp only [map_neg]
   push_cast
   simp only [neg_mul, Finset.sum_neg_distrib, mul_neg]
   ring
 
-theorem cycVal_zero {l : ℕ} [Fact l.Prime] (P : LocPrime l) (K : FinExt l) (s e : ℕ) :
-    cycVal P K s e (fun _ => 0) 0 = 0 := by
+theorem cycVal_zero {l : ℕ} [Fact l.Prime] (P : LocPrime l) (K : FinExt l) (s e : ℕ)
+    : cycVal P K s e (fun _ => 0) 0 = 0 := by
   simp [cycVal]
 
-theorem exists_cycVal_eq_pow_mul (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K : FinExt l) (s e : ℕ)
-    (hs : 1 ≤ s) (α : Om l) (hα : α ∈ Ks K s) (hn : ‖α‖ ≤ 1) :
-    ∃ (lam : ℕ → ↥(K0 K)) (d : ↥(K0 K)), (∀ a, ‖(lam a : Om l)‖ ≤ 1) ∧ ‖(d : Om l)‖ ≤ 1 ∧
-      d - (l : ↥(K0 K)) ^ e * frK P K d = (frK P K ^ s) (∑ a ∈ primeTo l s, lam a) ∧
-      cycVal P K s e lam d = (l : Om l) ^ ((e + 1) * (s - 1)) * α := by
+theorem exists_cycVal_eq_pow_mul
+    (l : ℕ) [Fact l.Prime]
+    (P : LocPrime l)
+    (K : FinExt l)
+    (s e : ℕ) (hs : 1 ≤ s)
+    (α : Om l) (hα : α ∈ Ks K s) (hn : ‖α‖ ≤ 1)
+    : ∃ (lam : ℕ → ↥(K0 K)) (d : ↥(K0 K)),
+      (∀ a, ‖(lam a : Om l)‖ ≤ 1) ∧ ‖(d : Om l)‖ ≤ 1
+        ∧ d - (l : ↥(K0 K)) ^ e * frK P K d = (frK P K ^ s) (∑ a ∈ primeTo l s, lam a)
+        ∧ cycVal P K s e lam d = (l : Om l) ^ ((e + 1) * (s - 1)) * α := by
   have hl1 : 1 < l := (Fact.out : l.Prime).one_lt
   have hsum := GlobalTheory.ExpImage.Values.sum_zeta P
   have hgeom : ∑ r ∈ Finset.range l, P.ζQ 1 ^ r = 0 := by
@@ -66,7 +79,8 @@ theorem exists_cycVal_eq_pow_mul (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K : 
     exact (Nat.cast_ne_zero.mpr (by omega : l ≠ 0)) hz
   have hchain : ∀ j, P.ζQ (j + 1) ^ l = P.ζQ j := fun j => by
     simpa using GlobalTheory.ExpImage.Values.zeta_pow P j 1
-  have hmem := GlobalTheory.T.cyclotomicLevel_integers_mem_closure_levels l K P.ζQ h0 h1 hchain s hs α hα hn
+  have hmem :=
+    GlobalTheory.T.cyclotomicLevel_integers_mem_closure_levels l K P.ζQ h0 h1 hchain s hs α hα hn
   clear hα hn
   induction hmem using AddSubgroup.closure_induction with
   | mem x hx =>
@@ -90,7 +104,7 @@ theorem exists_cycVal_eq_pow_mul (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K : 
       ring
   | neg x _ ih =>
     obtain ⟨lam, d, hlam, hd, hfr, hv⟩ := ih
-    refine ⟨fun a => -lam a, -d, fun a => by simpa using hlam a, by simpa using hd, ?_, ?_⟩
+    refine ⟨fun a => - lam a, -d, fun a => by simpa using hlam a, by simpa using hd, ?_, ?_⟩
     · simp only [map_neg, Finset.sum_neg_distrib]
       rw [← hfr]
       ring

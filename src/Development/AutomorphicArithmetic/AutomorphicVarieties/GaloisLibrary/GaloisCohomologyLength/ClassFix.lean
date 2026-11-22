@@ -6,10 +6,16 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBoun
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
+open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+  Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
 
-theorem UpperTheory.V.LDataCardLeFinrank.classFix :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (N : ℕ) [NeZero N] (K : Type) [Field K] [NumberField K] [IsCyclotomicExtension {N} ℚ K] (φ : F →ₐ[ℚ] K) (g : Ω ≃+* Ω) (h : (ZMod N)ˣ), (∀ ζ : Ω, ζ ^ N = 1 → g ζ = ζ ^ (h : ZMod N).val) → ((∀ x : F, g (algebraMap F Ω x) = algebraMap F Ω x) ↔ h ∈ KStar.TotallyRealRoots.fieldSubgroup N K φ.fieldRange) := by
+theorem UpperTheory.V.LDataCardLeFinrank.classFix
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (N : ℕ)
+        [NeZero N] (K : Type) [Field K] [NumberField K] [IsCyclotomicExtension {N} ℚ K]
+        (φ : F →ₐ[ℚ] K) (g : Ω ≃+* Ω) (h : (ZMod N)ˣ),
+      (∀ ζ : Ω, ζ ^ N = 1 → g ζ = ζ ^ (h : ZMod N).val)
+        → ((∀ x : F, g (algebraMap F Ω x) = algebraMap F Ω x)
+          ↔ h ∈ KStar.TotallyRealRoots.fieldSubgroup N K φ.fieldRange) := by
   intro F Ω _ _ _ _ _ N _ K _ _ _ φ g h hg
   haveI : CharZero Ω := (RingHom.charZero_iff (algebraMap F Ω).injective).mp inferInstance
   letI : Algebra F K := φ.toRingHom.toAlgebra
@@ -18,8 +24,7 @@ theorem UpperTheory.V.LDataCardLeFinrank.classFix :
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed F
   let ι : K →ₐ[F] Ω := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   have hι : ∀ x : F, ι (φ x) = algebraMap F Ω x := fun x => ι.commutes x
   set σ : Gal(K/ℚ) := (IsCyclotomicExtension.Rat.galEquivZMod N K).symm h with hσ
@@ -28,8 +33,9 @@ theorem UpperTheory.V.LDataCardLeFinrank.classFix :
     have := IsCyclotomicExtension.Rat.galEquivZMod_apply_of_pow_eq N K σ hy
     rw [this, hσ, MulEquiv.apply_symm_apply]
   have hcomm : ∀ y : K, g (ι y) = ι (σ y) := by
-    have key : (g.toRingHom.toRatAlgHom).comp (ι.toRingHom.toRatAlgHom) =
-        (ι.toRingHom.toRatAlgHom).comp σ.toAlgHom := by
+    have key
+        : (g.toRingHom.toRatAlgHom).comp (ι.toRingHom.toRatAlgHom)
+          = (ι.toRingHom.toRatAlgHom).comp σ.toAlgHom := by
       refine AlgHom.ext_of_adjoin_eq_top (s := {b : K | ∃ n ∈ ({N} : Set ℕ), n ≠ 0 ∧ b ^ n = 1})
         (Algebra.eq_top_iff.mpr IsCyclotomicExtension.adjoin_roots) ?_
       rintro b ⟨n, hn, -, hb⟩

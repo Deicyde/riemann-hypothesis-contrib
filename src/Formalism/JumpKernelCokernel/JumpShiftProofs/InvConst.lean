@@ -6,10 +6,11 @@ public import Formalism.JumpKernelCokernel.Statement
 
 namespace Formalism.KernelCokernelLengths
 
-theorem fil_eq_of_noJump {K D : Type} [Field K] [AddCommGroup D] [Module K D]
+theorem fil_eq_of_noJump
+    {K D : Type} [Field K] [AddCommGroup D] [Module K D]
     (Fil : ℤ → Submodule K D) (b η : ℕ)
-    (hj : ∀ j : ℤ, -(b : ℤ) < j → j < -(η : ℤ) → Fil j = Fil (j + 1)) :
-    ∀ k : ℕ, ∀ j : ℤ, -(b : ℤ) < j → j + k = -(η : ℤ) → Fil j = Fil (-(η : ℤ)) := by
+    (hj : ∀ j : ℤ, -(b : ℤ) < j → j < -(η : ℤ) → Fil j = Fil (j + 1))
+    : ∀ k : ℕ, ∀ j : ℤ, -(b : ℤ) < j → j + k = -(η : ℤ) → Fil j = Fil (-(η : ℤ)) := by
   intro k
   induction k with
   | zero =>

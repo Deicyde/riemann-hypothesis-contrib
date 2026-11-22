@@ -7,11 +7,14 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsL
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
 
 namespace GlobalTheory.NL.LetterFree
 
-theorem letters_free : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW), WachLatticeFreeGlobal D HW F := by
+theorem letters_free
+    : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW),
+      WachLatticeFreeGlobal D HW F := by
   intro D HW F l _ K s LL h T hT
   obtain ⟨hd, -, hb⟩ := letters_loc (HW l) K s LL h T hT
   refine ⟨hd.2.symm, fun i => ?_⟩

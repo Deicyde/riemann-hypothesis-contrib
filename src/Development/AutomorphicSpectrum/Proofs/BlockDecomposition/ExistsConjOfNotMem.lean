@@ -38,15 +38,19 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SpehSha
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
-open PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG PositivityTheory.Rg.BcB.G8
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG
+  PositivityTheory.Rg.BcB.G8
 open PositivityTheory.RgTw (Mat G)
 open PositivityTheory.Rg.BcB.SpectralAccumulation (Hf)
 open scoped Classical
 
 set_option synthInstance.maxHeartbeats 200000
 
-open PositivityTheory.Rg.BcB.One PositivityTheory.Rg.BcB.F.F5 PositivityTheory.Rg.BcB.F.Tail PositivityTheory.Rg.BcB.F.RS PositivityTheory.Rg.BcB.F.Eig PositivityTheory.Rg.BcB.SpectralAccumulation
+open PositivityTheory.Rg.BcB.One PositivityTheory.Rg.BcB.F.F5 PositivityTheory.Rg.BcB.F.Tail
+  PositivityTheory.Rg.BcB.F.RS PositivityTheory.Rg.BcB.F.Eig
+  PositivityTheory.Rg.BcB.SpectralAccumulation
 open PositivityTheory.Rg.BcN.F2 PositivityTheory.Rg.Bc.ArchbcB.B
 open PositivityTheory.Rg.BcB.Desc
 open PositivityTheory.Rg.BcB.F
@@ -57,23 +61,27 @@ attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalDat
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-
-
 section Conj
 
-open GlobalTheory.SplitPts GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorLiftConclusion GlobalTheory.ConjPairLoc GlobalTheory.CuspRep.ParLaws
+open GlobalTheory.SplitPts GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorLiftConclusion
+  GlobalTheory.ConjPairLoc GlobalTheory.CuspRep.ParLaws
 
 end Conj
 
 section Int
 
-open GlobalTheory.SplitPts GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorLiftConclusion GlobalTheory.ConjPairLoc GlobalTheory.CuspRep.ParLaws
+open GlobalTheory.SplitPts GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorLiftConclusion
+  GlobalTheory.ConjPairLoc GlobalTheory.CuspRep.ParLaws
 
-theorem mem_KGL_map_conj (u : Pl E) (g : GLw n (conjSrc (conjE E) u)) :
-    GeneralLinearGroup.map (conjLoc (conjE E) u) g ∈ GlobalTheory.LFun.KGL u (n := n) ↔ g ∈ GlobalTheory.LFun.KGL (conjSrc (conjE E) u) (n := n) := by
-  have hv : ∀ x : (conjSrc (conjE E) u).adicCompletion E,
-      conjLoc (conjE E) u x ∈ u.adicCompletionIntegers E ↔ x ∈ (conjSrc (conjE E) u).adicCompletionIntegers E := fun x => by
-    rw [HeightOneSpectrum.mem_adicCompletionIntegers, HeightOneSpectrum.mem_adicCompletionIntegers, (conjLoc_spec (conjE E) u).2.2 x]
+theorem mem_KGL_map_conj (u : Pl E) (g : GLw n (conjSrc (conjE E) u))
+    : GeneralLinearGroup.map (conjLoc (conjE E) u) g ∈ GlobalTheory.LFun.KGL u (n := n)
+      ↔ g ∈ GlobalTheory.LFun.KGL (conjSrc (conjE E) u) (n := n) := by
+  have hv
+      : ∀ x : (conjSrc (conjE E) u).adicCompletion E,
+        conjLoc (conjE E) u x ∈ u.adicCompletionIntegers E
+          ↔ x ∈ (conjSrc (conjE E) u).adicCompletionIntegers E := fun x => by
+    rw [HeightOneSpectrum.mem_adicCompletionIntegers, HeightOneSpectrum.mem_adicCompletionIntegers,
+      (conjLoc_spec (conjE E) u).2.2 x]
   rw [GlobalTheory.AdelicU.mem_GLint_iff, GlobalTheory.AdelicU.mem_GLint_iff]
   refine and_congr (forall₂_congr fun a b => hv _) (forall₂_congr fun a b => ?_)
   rw [← map_inv]
@@ -83,13 +91,15 @@ end Int
 
 section Int2
 
-open GlobalTheory.SplitPts GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorLiftConclusion GlobalTheory.ConjPairLoc GlobalTheory.CuspRep.ParLaws
+open GlobalTheory.SplitPts GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorLiftConclusion
+  GlobalTheory.ConjPairLoc GlobalTheory.CuspRep.ParLaws
 
 end Int2
 
 section Main
 
-open GlobalTheory.SplitPts GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorLiftConclusion GlobalTheory.ConjPairLoc GlobalTheory.CuspRep.ParLaws
+open GlobalTheory.SplitPts GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorLiftConclusion
+  GlobalTheory.ConjPairLoc GlobalTheory.CuspRep.ParLaws
 open PositivityTheory.Rg.BcB.F.F5.Bo
 
 variable {d : LocData E n}
@@ -98,7 +108,8 @@ end Main
 
 section Core
 
-open GlobalTheory.SplitPts GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorLiftConclusion GlobalTheory.ConjPairLoc GlobalTheory.CuspRep.ParLaws
+open GlobalTheory.SplitPts GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorLiftConclusion
+  GlobalTheory.ConjPairLoc GlobalTheory.CuspRep.ParLaws
 open PositivityTheory.Rg.BcB.F.F5.Bo
 
 end Core

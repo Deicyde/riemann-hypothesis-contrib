@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SlashIntM
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 noncomputable section
@@ -95,8 +96,9 @@ lemma per (L : ℕ) (χ : ℤ → ℂ) (hχ : ∀ d, χ (d + L) = χ d) (m : ℤ
 
 end GlobalTheory.LevelLower
 
-theorem GlobalTheory.Uo_lowers_level : ∀ (k L l : ℕ) (χ : ℤ → ℂ) (a : ℕ → ℂ), 1 ≤ k → l.Prime → l ∣ L →
-    (∀ d, χ (d + L) = χ d) → MF k (L * l) χ a → MF k L χ (Uo l a) := by
+theorem GlobalTheory.Uo_lowers_level
+    : ∀ (k L l : ℕ) (χ : ℤ → ℂ) (a : ℕ → ℂ),
+      1 ≤ k → l.Prime → l ∣ L → (∀ d, χ (d + L) = χ d) → MF k (L * l) χ a → MF k L χ (Uo l a) := by
   intro k L l χ a hk hl hlL hχ hMF
   obtain ⟨hP, hI⟩ := hMF
   haveI : NeZero l := ⟨hl.ne_zero⟩
@@ -123,18 +125,23 @@ theorem GlobalTheory.Uo_lowers_level : ∀ (k L l : ℕ) (χ : ℤ → ℂ) (a :
     push_cast at h1 hc0 ⊢
     rw [hc0, mul_zero, sub_zero] at h1
     exact h1
-  let e : Fin l ≃ Fin l := Equiv.ofBijective (GlobalTheory.LevelLower.idx l (γ 0 1) (γ 1 1))
-    (Finite.injective_iff_bijective.mp (GlobalTheory.LevelLower.idx_inj l _ _ _ had))
-  have key : ∀ (τ : ℍ) (j : Fin l), slz k (γ : M2) (slz k (repU l j) (qs a)) τ =
-      χ (γ 1 1) * slz k (repU l (e j)) (qs a) τ := by
+  let e : Fin l ≃ Fin l :=
+    Equiv.ofBijective (GlobalTheory.LevelLower.idx l (γ 0 1) (γ 1 1))
+      (Finite.injective_iff_bijective.mp (GlobalTheory.LevelLower.idx_inj l _ _ _ had))
+  have key
+      : ∀ (τ : ℍ) (j : Fin l),
+        slz k (γ : M2) (slz k (repU l j) (qs a)) τ = χ (γ 1 1) * slz k (repU l (e j)) (qs a) τ := by
     intro τ j
     obtain ⟨γ', h1, h2, h3⟩ := GlobalTheory.LevelLower.coset L l hlL γ hc j
     rw [← hcoc _ _ (hdU j) (hdγ γ), h3, hcoc _ _ (hdγ γ') (hdU _), hI' γ' h1,
       GlobalTheory.LevelLower.slz_smul, h2]
     obtain ⟨m, hm⟩ := hc
-    have : χ (γ 1 1 - γ 1 0 * ((GlobalTheory.LevelLower.idx l (γ 0 1) (γ 1 1) j : ℕ) : ℤ)) = χ (γ 1 1) := by
-      rw [hm, show γ 1 1 - (L : ℤ) * m * ((GlobalTheory.LevelLower.idx l (γ 0 1) (γ 1 1) j : ℕ) : ℤ) =
-        γ 1 1 + (-(m * ((GlobalTheory.LevelLower.idx l (γ 0 1) (γ 1 1) j : ℕ) : ℤ))) * L by ring,
+    have : χ (γ 1 1 - γ 1 0 * ((GlobalTheory.LevelLower.idx l (γ 0 1) (γ 1 1) j : ℕ) : ℤ))
+        = χ (γ 1 1) := by
+      rw [hm,
+        show γ 1 1 - (L : ℤ) * m * ((GlobalTheory.LevelLower.idx l (γ 0 1) (γ 1 1) j : ℕ) : ℤ)
+            = γ 1 1 + (-(m * ((GlobalTheory.LevelLower.idx l (γ 0 1) (γ 1 1) j : ℕ) : ℤ))) * L by
+          ring,
         GlobalTheory.LevelLower.per L χ hχ]
     rw [this]
     rfl

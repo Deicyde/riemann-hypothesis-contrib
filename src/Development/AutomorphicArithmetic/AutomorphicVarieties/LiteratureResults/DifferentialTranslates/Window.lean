@@ -28,20 +28,25 @@ private def geoStab (G : Geo Γ V S d) (s : S) : Geo (stab G s) V Unit d where
   isOpen := G.isOpen
   maps γ := G.maps γ.1
 
-private theorem geoStab_proper (G : Geo Γ V S d) (hG : G.Proper) (s : S) : (geoStab G s).Proper := by
+private theorem geoStab_proper (G : Geo Γ V S d) (hG : G.Proper) (s : S)
+    : (geoStab G s).Proper := by
   intro K hK hKc u u'
-  refine ((hG K hK hKc s s).preimage (f := fun γ : stab G s => γ.1) Subtype.val_injective.injOn).subset ?_
+  refine
+    ((hG K hK hKc s s).preimage (f := fun γ : stab G s => γ.1) Subtype.val_injective.injOn).subset
+      ?_
   rintro γ ⟨-, h⟩
   exact ⟨γ.2, h⟩
 
-private theorem exists_rep (G : Geo Γ V S d) :
-    ∃ r : S → S, (∀ s, ∃ δ : Γ, G.σ δ⁻¹ s = r s) ∧ ∀ (γ : Γ) s, r (G.σ γ s) = r s := by
-  let R : Setoid S :=
-    { r := fun a b => ∃ γ : Γ, G.σ γ a = b
-      iseqv :=
-        ⟨fun a => ⟨1, by simp⟩,
-          fun ⟨γ, h⟩ => ⟨γ⁻¹, by rw [map_inv, Equiv.Perm.inv_eq_iff_eq, h]⟩,
-          fun ⟨γ, h⟩ ⟨δ, h'⟩ => ⟨δ * γ, by rw [map_mul, Equiv.Perm.mul_apply, h, h']⟩⟩ }
+private theorem exists_rep (G : Geo Γ V S d)
+    : ∃ r : S → S, (∀ s, ∃ δ : Γ, G.σ δ⁻¹ s = r s) ∧ ∀ (γ : Γ) s, r (G.σ γ s) = r s := by
+  let R : Setoid S := {
+    r := fun a b => ∃ γ : Γ, G.σ γ a = b
+    iseqv := ⟨
+      fun a => ⟨1, by simp⟩,
+      fun ⟨γ, h⟩ => ⟨γ⁻¹, by rw [map_inv, Equiv.Perm.inv_eq_iff_eq, h]⟩,
+      fun ⟨γ, h⟩ ⟨δ, h'⟩ => ⟨δ * γ, by rw [map_mul, Equiv.Perm.mul_apply, h, h']⟩
+    ⟩
+  }
   refine ⟨fun s => (Quotient.mk R s).out, fun s => ?_, fun γ s => ?_⟩
   · obtain ⟨γ, h⟩ : R.r (Quotient.mk R s).out s := Quotient.exact (Quotient.out_eq _)
     exact ⟨γ, by rw [map_inv, Equiv.Perm.inv_eq_iff_eq, h]⟩
@@ -73,8 +78,11 @@ theorem window : Window := by
     exact hh
   · obtain ⟨δ, hδ⟩ := hr s
     obtain ⟨N, hN, hfin⟩ := (hW (r s)).2.2 () _ (G.maps δ⁻¹ p hp)
-    refine ⟨G.ρ δ⁻¹ ⁻¹' N, (G.ρ δ⁻¹).continuous.continuousAt.preimage_mem_nhds hN,
-      (hfin.image fun h => δ * h.1).subset ?_⟩
+    refine ⟨
+      G.ρ δ⁻¹ ⁻¹' N,
+      (G.ρ δ⁻¹).continuous.continuousAt.preimage_mem_nhds hN,
+      (hfin.image fun h => δ * h.1).subset ?_
+    ⟩
     rintro γ ⟨x, hx, hγ⟩
     beta_reduce at hγ
     split_ifs at hγ with h0

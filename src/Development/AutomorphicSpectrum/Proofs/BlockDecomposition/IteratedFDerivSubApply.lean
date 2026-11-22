@@ -9,20 +9,20 @@ open Filter
 
 namespace GlobalTheory.CompanionTheory.SchwartzBaire
 
-variable {E F : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
-  [NormedAddCommGroup F] [NormedSpace ℝ F]
+variable
+  {E F : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [NormedAddCommGroup F] [NormedSpace ℝ F]
 
-theorem iteratedFDeriv_sub_apply' (f g : 𝓢(E, F)) (l : ℕ) (x : E) :
-    iteratedFDeriv ℝ l (⇑(f - g)) x = iteratedFDeriv ℝ l f x - iteratedFDeriv ℝ l g x := by
+theorem iteratedFDeriv_sub_apply' (f g : 𝓢(E, F)) (l : ℕ) (x : E)
+    : iteratedFDeriv ℝ l (⇑(f - g)) x = iteratedFDeriv ℝ l f x - iteratedFDeriv ℝ l g x := by
   have h : (⇑(f - g) : E → F) = ⇑f - ⇑g := by
     ext x
     simp
   rw [h]
   exact iteratedFDeriv_sub_apply (f.smooth l).contDiffAt (g.smooth l).contDiffAt
 
-theorem cauchy_weighted (f : ℕ → 𝓢(E, F)) (hf : CauchySeq f) (k l : ℕ) {ε : ℝ} (hε : 0 < ε) :
-    ∃ N, ∀ m ≥ N, ∀ m' ≥ N, ∀ x, ‖x‖ ^ k *
-      ‖iteratedFDeriv ℝ l (f m) x - iteratedFDeriv ℝ l (f m') x‖ ≤ ε := by
+theorem cauchy_weighted (f : ℕ → 𝓢(E, F)) (hf : CauchySeq f) (k l : ℕ) {ε : ℝ} (hε : 0 < ε)
+    : ∃ N, ∀ m ≥ N, ∀ m' ≥ N, ∀ x,
+      ‖x‖ ^ k * ‖iteratedFDeriv ℝ l (f m) x - iteratedFDeriv ℝ l (f m') x‖ ≤ ε := by
   have h0 := hf.tendsto_uniformity
   rw [uniformity_eq_comap_nhds_zero 𝓢(E, F), tendsto_comap_iff] at h0
   have h1 := ((schwartz_withSeminorms ℝ E F).tendsto_nhds _ 0).1 h0 (k, l) ε hε
@@ -33,8 +33,8 @@ theorem cauchy_weighted (f : ℕ → 𝓢(E, F)) (hf : CauchySeq f) (k l : ℕ) 
   rw [← iteratedFDeriv_sub_apply']
   exact (SchwartzMap.le_seminorm ℝ k l (f m - f m') x).trans hmm.le
 
-theorem exists_tendsto [CompleteSpace F] (f : ℕ → 𝓢(E, F)) (hf : CauchySeq f) :
-    ∃ g : 𝓢(E, F), Tendsto f atTop (𝓝 g) := by
+theorem exists_tendsto [CompleteSpace F] (f : ℕ → 𝓢(E, F)) (hf : CauchySeq f)
+    : ∃ g : 𝓢(E, F), Tendsto f atTop (𝓝 g) := by
   have hpt : ∀ l x, CauchySeq (fun n => iteratedFDeriv ℝ l (f n) x) := by
     intro l x
     rw [Metric.cauchySeq_iff']
@@ -46,12 +46,14 @@ theorem exists_tendsto [CompleteSpace F] (f : ℕ → 𝓢(E, F)) (hf : CauchySe
     rw [dist_eq_norm]
     linarith
   choose G hG using fun l x => cauchySeq_tendsto_of_complete (hpt l x)
-  have hlim : ∀ k l {δ : ℝ}, 0 < δ → ∃ N, ∀ m ≥ N, ∀ x,
-      ‖x‖ ^ k * ‖iteratedFDeriv ℝ l (f m) x - G l x‖ ≤ δ := by
+  have hlim
+      : ∀ k l {δ : ℝ},
+        0 < δ → ∃ N, ∀ m ≥ N, ∀ x, ‖x‖ ^ k * ‖iteratedFDeriv ℝ l (f m) x - G l x‖ ≤ δ := by
     intro k l δ hδ
     obtain ⟨N, hN⟩ := cauchy_weighted f hf k l hδ
     refine ⟨N, fun m hm x => ?_⟩
-    have ht : Tendsto (fun m' => ‖x‖ ^ k * ‖iteratedFDeriv ℝ l (f m) x - iteratedFDeriv ℝ l (f m') x‖)
+    have ht : Tendsto
+        (fun m' => ‖x‖ ^ k * ‖iteratedFDeriv ℝ l (f m) x - iteratedFDeriv ℝ l (f m') x‖)
         atTop (𝓝 (‖x‖ ^ k * ‖iteratedFDeriv ℝ l (f m) x - G l x‖)) :=
       ((tendsto_const_nhds.sub (hG l x)).norm).const_mul _
     exact le_of_tendsto ht (eventually_atTop.2 ⟨N, fun m' hm' => hN m hm m' hm' x⟩)
@@ -69,14 +71,22 @@ theorem exists_tendsto [CompleteSpace F] (f : ℕ → 𝓢(E, F)) (hf : CauchySe
   let p : E → FormalMultilinearSeries ℝ E F := fun x l => G l x
   have hT : HasFTaylorSeriesUpTo ((⊤ : ℕ∞) : WithTop ℕ∞) g₀ p := by
     refine ⟨fun x => rfl, fun m _ x => ?_, fun m _ => ?_⟩
-    · have hU : TendstoUniformly (fun n y => (iteratedFDeriv ℝ (m + 1) (f n) y).curryLeft)
-          (fun y => (G (m + 1) y).curryLeft) atTop :=
-        (continuousMultilinearCurryLeftEquiv ℝ (fun _ : Fin (m + 1) => E) F).isometry.uniformContinuous.comp_tendstoUniformly
-          (hunif (m + 1))
-      exact hasFDerivAt_of_tendstoUniformly (f := fun n y => iteratedFDeriv ℝ m (f n) y) hU
-        (fun n y => ((f n).smooth ⊤).ftaylorSeries.fderiv m (WithTop.coe_lt_coe.2 (ENat.natCast_lt_top m)) y)
-        (fun y => hG m y) x
-    · exact (hunif m).continuous (Frequently.of_forall fun n => ((f n).smooth m).continuous_iteratedFDeriv le_rfl)
+    · have hU : TendstoUniformly
+          (fun n y => (iteratedFDeriv ℝ (m + 1) (f n) y).curryLeft)
+          (fun y => (G (m + 1) y).curryLeft)
+          atTop :=
+        (continuousMultilinearCurryLeftEquiv ℝ
+          (fun _ : Fin (m + 1) => E)
+          F).isometry.uniformContinuous.comp_tendstoUniformly (hunif (m + 1))
+      exact hasFDerivAt_of_tendstoUniformly
+        (f := fun n y => iteratedFDeriv ℝ m (f n) y)
+        hU
+        (fun n y =>
+          ((f n).smooth ⊤).ftaylorSeries.fderiv m (WithTop.coe_lt_coe.2 (ENat.natCast_lt_top m)) y)
+        (fun y => hG m y)
+        x
+    · exact (hunif m).continuous
+        (Frequently.of_forall fun n => ((f n).smooth m).continuous_iteratedFDeriv le_rfl)
   have hg : ∀ l x, iteratedFDeriv ℝ l g₀ x = G l x := fun l x =>
     (hT.eq_iteratedFDeriv (WithTop.coe_le_coe.2 le_top) x).symm
   have hdecay : ∀ k l : ℕ, ∃ C : ℝ, ∀ x, ‖x‖ ^ k * ‖iteratedFDeriv ℝ l g₀ x‖ ≤ C := by
@@ -87,8 +97,9 @@ theorem exists_tendsto [CompleteSpace F] (f : ℕ → 𝓢(E, F)) (hf : CauchySe
     have h1 := hN N le_rfl x
     have h2 := SchwartzMap.le_seminorm ℝ k l (f N) x
     have h3 : ‖G l x‖ ≤ ‖iteratedFDeriv ℝ l (f N) x‖ + ‖iteratedFDeriv ℝ l (f N) x - G l x‖ := by
-      calc ‖G l x‖ = ‖iteratedFDeriv ℝ l (f N) x - (iteratedFDeriv ℝ l (f N) x - G l x)‖ := by
-            rw [sub_sub_cancel]
+      calc
+        ‖G l x‖ = ‖iteratedFDeriv ℝ l (f N) x - (iteratedFDeriv ℝ l (f N) x - G l x)‖ := by
+          rw [sub_sub_cancel]
         _ ≤ _ := norm_sub_le _ _
     have hxk : 0 ≤ ‖x‖ ^ k := by positivity
     nlinarith [mul_le_mul_of_nonneg_left h3 hxk]

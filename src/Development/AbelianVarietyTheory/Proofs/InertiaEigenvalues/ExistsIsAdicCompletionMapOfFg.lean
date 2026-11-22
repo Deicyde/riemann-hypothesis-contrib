@@ -6,19 +6,21 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Delt
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 namespace GlobalTheory.BSP.AdicComplExists
 
 variable {L : Type} [CommRing L] {J : Ideal L}
 
-theorem evalₐ_algebraMap' (n : ℕ) (r : L) :
-    AdicCompletion.evalₐ J n (algebraMap L (AdicCompletion J L) r) = Ideal.Quotient.mk _ r := by
+theorem evalₐ_algebraMap' (n : ℕ) (r : L)
+    : AdicCompletion.evalₐ J n (algebraMap L (AdicCompletion J L) r) = Ideal.Quotient.mk _ r := by
   rw [AlgHom.commutes]; rfl
 
-theorem mem_map_pow_iff (hfg : J.FG) (n : ℕ) (y : AdicCompletion J L) :
-    y ∈ (J ^ n).map (algebraMap L (AdicCompletion J L)) ↔ AdicCompletion.evalₐ J n y = 0 := by
+theorem mem_map_pow_iff (hfg : J.FG) (n : ℕ) (y : AdicCompletion J L)
+    : y ∈ (J ^ n).map (algebraMap L (AdicCompletion J L)) ↔ AdicCompletion.evalₐ J n y = 0 := by
   rw [← Submodule.restrictScalars_mem L, ← Ideal.smul_top_eq_map,
     AdicCompletion.pow_smul_top_eq_ker_eval hfg, LinearMap.mem_ker]
   have h' : (J ^ n • ⊤ : Ideal L) = J ^ n := by ext x; simp
@@ -26,10 +28,10 @@ theorem mem_map_pow_iff (hfg : J.FG) (n : ℕ) (y : AdicCompletion J L) :
 
 end GlobalTheory.BSP.AdicComplExists
 
-
 open GlobalTheory.BSP.AdicComplExists in
-theorem GlobalTheory.BSP.isCompl_exists : ∀ (L : Type) [CommRing L] (J : Ideal L), J.FG →
-    ∃ (Q : Type) (_ : CommRing Q) (i : L →+* Q), IsCompl i J := by
+theorem GlobalTheory.BSP.isCompl_exists
+    : ∀ (L : Type) [CommRing L] (J : Ideal L),
+      J.FG → ∃ (Q : Type) (_ : CommRing Q) (i : L →+* Q), IsCompl i J := by
   intro L _ J hfg
   refine ⟨AdicCompletion J L, inferInstance, algebraMap L (AdicCompletion J L), ⟨?_, ?_, ?_⟩⟩
   · rw [IsAdicComplete.map_algebraMap_iff]

@@ -9,30 +9,40 @@ open scoped ComplexOrder ENNReal Pointwise
 
 namespace GlobalTheory
 
-theorem offDiagonal_matrixUnits_irreducible :
-    (∀ (r p : ℕ), 0 < p → p < r → ∀ W : Submodule ℂ (Fin r → ℂ),
-      (∀ j k : Fin r, (j : ℕ) < p → p ≤ (k : ℕ) → ∀ v ∈ W,
-        (Matrix.single j k (1 : ℂ)).mulVec v ∈ W ∧ (Matrix.single k j (1 : ℂ)).mulVec v ∈ W) →
-      W = ⊥ ∨ W = ⊤) := by
+theorem offDiagonal_matrixUnits_irreducible
+    : (∀ (r p : ℕ),
+      0 < p → p < r
+        → ∀ W : Submodule ℂ (Fin r → ℂ),
+          (∀ j k : Fin r,
+              (j : ℕ) < p → p ≤ (k : ℕ)
+                → ∀ v ∈ W,
+                  (Matrix.single j k (1 : ℂ)).mulVec v ∈ W
+                    ∧ (Matrix.single k j (1 : ℂ)).mulVec v ∈ W)
+            → W = ⊥ ∨ W = ⊤) := by
   intro r p hp hpr W h
-  have hs : ∀ (j k : Fin r) (v : Fin r → ℂ),
-      (Matrix.single j k (1 : ℂ)).mulVec v = v k • (Pi.single j (1 : ℂ) : Fin r → ℂ) := by
+  have hs
+      : ∀ (j k : Fin r) (v : Fin r → ℂ),
+        (Matrix.single j k (1 : ℂ)).mulVec v = v k • (Pi.single j (1 : ℂ) : Fin r → ℂ) := by
     intro j k v
     ext i
     rw [Matrix.single_mulVec]
     by_cases hi : i = j
     · subst hi; simp
     · simp [hi]
-  have key : ∀ (j k : Fin r) (v : Fin r → ℂ), v k ≠ 0 →
-      (Matrix.single j k (1 : ℂ)).mulVec v ∈ W → (Pi.single j (1 : ℂ) : Fin r → ℂ) ∈ W := by
+  have key
+      : ∀ (j k : Fin r) (v : Fin r → ℂ),
+        v k ≠ 0 → (Matrix.single j k (1 : ℂ)).mulVec v ∈ W
+          → (Pi.single j (1 : ℂ) : Fin r → ℂ) ∈ W := by
     intro j k v hv hm
     rw [hs] at hm
     exact (W.smul_mem_iff hv).1 hm
-  have up : ∀ (j k : Fin r) (v : Fin r → ℂ), (j : ℕ) < p → p ≤ (k : ℕ) → v ∈ W → v k ≠ 0 →
-      (Pi.single j (1 : ℂ) : Fin r → ℂ) ∈ W :=
+  have up
+      : ∀ (j k : Fin r) (v : Fin r → ℂ),
+        (j : ℕ) < p → p ≤ (k : ℕ) → v ∈ W → v k ≠ 0 → (Pi.single j (1 : ℂ) : Fin r → ℂ) ∈ W :=
     fun j k v hj hk hv hvk => key j k v hvk (h j k hj hk v hv).1
-  have down : ∀ (j k : Fin r) (v : Fin r → ℂ), (j : ℕ) < p → p ≤ (k : ℕ) → v ∈ W → v j ≠ 0 →
-      (Pi.single k (1 : ℂ) : Fin r → ℂ) ∈ W :=
+  have down
+      : ∀ (j k : Fin r) (v : Fin r → ℂ),
+        (j : ℕ) < p → p ≤ (k : ℕ) → v ∈ W → v j ≠ 0 → (Pi.single k (1 : ℂ) : Fin r → ℂ) ∈ W :=
     fun j k v hj hk hv hvj => key k j v hvj (h j k hj hk v hv).2
   by_cases hW : W = ⊥
   · exact Or.inl hW

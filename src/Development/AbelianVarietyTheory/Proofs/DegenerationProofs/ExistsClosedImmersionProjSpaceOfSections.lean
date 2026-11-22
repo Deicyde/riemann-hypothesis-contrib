@@ -10,12 +10,21 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.IsClose
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.ZH ReciprocityTheory.ChartRestriction.G.Out Classical
 
 namespace GlobalTheory.ZH.ImmProj
 
-theorem exists_closedImmersion_of_immBy : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) (p : X ⟶ Sp k) (H : LB X) (J : Type) (s : J → H.Sec) (m : ℕ) (e : Fin (m + 1) ≃ J), ImmBy p H s Set.univ → ∃ φ : X ⟶ PSpace k m, IsClosedImmersion φ ∧ φ ≫ PSpace.str k m = p ∧ ∀ (K : Type) [Field K] (x : Sp K ⟶ X) (v : J → K), Crd H s x v → Crd (ProjSpace.O1 k m) (ProjSpace.coord k m) (x ≫ φ) (fun i => v (e i)) := by
+theorem exists_closedImmersion_of_immBy
+    : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) (p : X ⟶ Sp k) (H : LB X) (J : Type)
+        (s : J → H.Sec) (m : ℕ) (e : Fin (m + 1) ≃ J),
+      ImmBy p H s Set.univ
+        → ∃ φ : X ⟶ PSpace k m,
+          IsClosedImmersion φ ∧ φ ≫ PSpace.str k m = p
+            ∧ ∀ (K : Type) [Field K] (x : Sp K ⟶ X) (v : J → K),
+              Crd H s x v
+                → Crd (ProjSpace.O1 k m) (ProjSpace.coord k m) (x ≫ φ) (fun i => v (e i)) := by
   intro k _ X p H J s m e ⟨hc, hi⟩
   have hs : ⨆ i, nonzeroLocus (s (e i)) = ⊤ := by
     rw [e.iSup_comp (g := fun j => nonzeroLocus (s j))]
@@ -33,7 +42,8 @@ theorem exists_closedImmersion_of_immBy : ∀ (k : Type) [CommRing k] (X : Schem
     have hu := (CrdCalc.crd_isUnit_iff (e i) hv).2 hx
     have hle := (ProjSpace.toProj_preimage_chart p (fun i => s (e i)) hs i).ge
     refine ⟨i, hu.unit, hx.trans (x.preimage_mono hle), fun j => ?_⟩
-    have h1 := CrdCalc.crd_ratio (i := e i) (j := e j) hv (ProjSpace.secRatio_spec (s (e i)) (s (e j))) hx
+    have h1 :=
+      CrdCalc.crd_ratio (i := e i) (j := e j) hv (ProjSpace.secRatio_spec (s (e i)) (s (e j))) hx
     beta_reduce
     rw [h1, IsUnit.unit_spec, mul_comm, ← ProjSpace.pullRatio_toProj p (fun i => s (e i)) hs i j]
     exact congrArg _ (Points.valR_appLE x _ hle hx _)

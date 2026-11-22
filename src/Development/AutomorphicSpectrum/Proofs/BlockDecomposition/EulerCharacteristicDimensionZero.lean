@@ -14,16 +14,21 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PointIde
 set_option autoImplicit false
 noncomputable section
 open CategoryTheory AlgebraicGeometry Limits TopologicalSpace MvPolynomial
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.ProjSpace GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.ArInt
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.ProjSpace GlobalTheory.CxPts
+  GlobalTheory.Cartier GlobalTheory.ArInt
 open GroundTheory.Arith.SchemeCoh GroundTheory.Arith.SchemeCoh.ProjSpace
-open ReciprocityTheory.ChartRestriction.G.Geo (MRing IsMultiHomog IsRelevant IsMultiProjPrime divSupp multAt geoNum charOf)
-open GlobalTheory.CompanionTheory.MPDict GlobalTheory.CompanionTheory.MixZ GlobalTheory GlobalTheory.ProjBlowup
+open ReciprocityTheory.ChartRestriction.G.Geo
+  (MRing IsMultiHomog IsRelevant IsMultiProjPrime divSupp multAt geoNum charOf)
+open GlobalTheory.CompanionTheory.MPDict GlobalTheory.CompanionTheory.MixZ GlobalTheory
+  GlobalTheory.ProjBlowup
 
 namespace GlobalTheory.CompanionTheory.MixZ.VertBase
 
-theorem isField_of_subsingleton_primeSpectrum {R : Type} [CommRing R] [IsDomain R]
-    (h : Subsingleton (PrimeSpectrum R)) : IsField R := by
+theorem isField_of_subsingleton_primeSpectrum
+    {R : Type} [CommRing R] [IsDomain R] (h : Subsingleton (PrimeSpectrum R))
+    : IsField R := by
   obtain ⟨M, hM⟩ := Ideal.exists_maximal R
   have hP : (⟨M, hM.isPrime⟩ : PrimeSpectrum R) = ⟨⊥, Ideal.isPrime_bot⟩ := Subsingleton.elim _ _
   have hMb : M = ⊥ := congrArg PrimeSpectrum.asIdeal hP
@@ -48,8 +53,8 @@ theorem eq_genericPoint (hd : topologicalKrullDim Z = (0 : ℕ)) (x : Z) : x = g
   exact (hs1.antisymm hs2).eq
 
 theorem isAffineOpen_top (hd : topologicalKrullDim Z = (0 : ℕ)) : IsAffineOpen (⊤ : Z.Opens) := by
-  obtain ⟨U, hU, hxU, -⟩ := exists_isAffineOpen_mem_and_subset
-    (show genericPoint Z ∈ (⊤ : Z.Opens) from Set.mem_univ _)
+  obtain ⟨U, hU, hxU, -⟩ :=
+    exists_isAffineOpen_mem_and_subset (show genericPoint Z ∈ (⊤ : Z.Opens) from Set.mem_univ _)
   have hUt : U = ⊤ := eq_top_iff.mpr fun y _ => by rw [eq_genericPoint Z hd y]; exact hxU
   exact hUt ▸ hU
 
@@ -58,12 +63,12 @@ theorem isField_top (hd : topologicalKrullDim Z = (0 : ℕ)) : IsField Γ(Z, ⊤
   have hsub : Subsingleton (PrimeSpectrum Γ(Z, ⊤)) := by
     constructor
     intro p q
-    exact hA.fromSpec.isOpenEmbedding.injective
-      ((eq_genericPoint Z hd _).trans (eq_genericPoint Z hd _).symm)
+    exact hA.fromSpec.isOpenEmbedding.injective ((eq_genericPoint Z hd _).trans
+      (eq_genericPoint Z hd _).symm)
   exact isField_of_subsingleton_primeSpectrum hsub
 
-theorem bijective_top (hd : topologicalKrullDim Z = (0 : ℕ)) :
-    Function.Bijective ((IsLocalRing.residue (Z.presheaf.stalk (genericPoint Z))).comp
+theorem bijective_top (hd : topologicalKrullDim Z = (0 : ℕ))
+    : Function.Bijective ((IsLocalRing.residue (Z.presheaf.stalk (genericPoint Z))).comp
       (algebraMap Γ(Z, ⊤) Z.functionField)) := by
   have hF := isField_top Z hd
   constructor
@@ -71,8 +76,11 @@ theorem bijective_top (hd : topologicalKrullDim Z = (0 : ℕ)) :
     intro a ha
     by_contra h
     obtain ⟨b, hb⟩ := hF.mul_inv_cancel h
-    have h1 := congrArg ((IsLocalRing.residue (Z.presheaf.stalk (genericPoint Z))).comp
-      (algebraMap Γ(Z, ⊤) Z.functionField)) hb
+    have h1 :=
+      congrArg
+        ((IsLocalRing.residue (Z.presheaf.stalk (genericPoint Z))).comp
+          (algebraMap Γ(Z, ⊤) Z.functionField))
+        hb
     rw [map_mul, ha, zero_mul, map_one] at h1
     exact zero_ne_one h1
   · intro y
@@ -82,10 +90,12 @@ theorem bijective_top (hd : topologicalKrullDim Z = (0 : ℕ)) :
     subst hU
     exact ⟨s, by rw [RingHom.comp_apply, ← hs]; rfl⟩
 
-theorem chi_eq_geoNum : ∀ (m : ℕ) (n : Fin (m + 1) → ℕ) (Z : Scheme.{0}) [IsIntegral Z] (f : Z ⟶ MP ℤ m n)
-    [IsClosedImmersion f] (p : ℕ) [Fact p.Prime] [Algebra (ZMod p) Γ(Z, ⊤)],
-    topologicalKrullDim Z = (0 : ℕ) → ∀ a : Fin 0 → Fin (m + 1) → ℤ,
-      chi (ZMod p) (structureModule Z) = geoNum 0 (ptIdeal (f (genericPoint Z))) a := by
+theorem chi_eq_geoNum
+    : ∀ (m : ℕ) (n : Fin (m + 1) → ℕ) (Z : Scheme.{0}) [IsIntegral Z] (f : Z ⟶ MP ℤ m n)
+        [IsClosedImmersion f] (p : ℕ) [Fact p.Prime] [Algebra (ZMod p) Γ(Z, ⊤)],
+      topologicalKrullDim Z = (0 : ℕ)
+        → ∀ a : Fin 0 → Fin (m + 1) → ℤ,
+          chi (ZMod p) (structureModule Z) = geoNum 0 (ptIdeal (f (genericPoint Z))) a := by
   intro m n Z _ f _ p _ _ hd a
   have hp : p.Prime := Fact.out
   have hA := isAffineOpen_top Z hd
@@ -101,22 +111,30 @@ theorem chi_eq_geoNum : ∀ (m : ℕ) (n : Fin (m + 1) → ℕ) (Z : Scheme.{0})
   rw [GlobalTheory.chi_structureModule_of_isAffine Z (ZMod p)]
   have hb := bijective_top Z hd
   have hRes : CharP (Z.residueField (genericPoint Z)) p :=
-    (RingHom.charP_iff_charP (((IsLocalRing.residue (Z.presheaf.stalk (genericPoint Z))).comp
-      (algebraMap Γ(Z, ⊤) Z.functionField)).comp (algebraMap (ZMod p) Γ(Z, ⊤))) p).mp inferInstance
+    (RingHom.charP_iff_charP
+      (((IsLocalRing.residue (Z.presheaf.stalk (genericPoint Z))).comp
+        (algebraMap Γ(Z, ⊤) Z.functionField)).comp (algebraMap (ZMod p) Γ(Z, ⊤)))
+      p).mp inferInstance
   haveI hΩ : CharP ((MP ℤ m n).residueField (f (genericPoint Z))) p :=
     (RingHom.charP_iff_charP (f.residueFieldMap (genericPoint Z)).hom p).mpr hRes
-  have hcomap : (ptIdeal (f (genericPoint Z))).comap (C : ℤ →+* MRing (Bk n)) =
-      Ideal.span {(p : ℤ)} := by
+  have hcomap
+      : (ptIdeal (f (genericPoint Z))).comap (C : ℤ →+* MRing (Bk n)) = Ideal.span {(p : ℤ)} := by
     ext z
     rw [Ideal.mem_comap, Ideal.mem_span_singleton,
       ← CharP.intCast_eq_zero_iff ((MP ℤ m n).residueField (f (genericPoint Z))) p]
-    simp only [ptIdeal, ReciprocityTheory.ChartRestriction.G.Geo.mCoordIdeal, RingHom.mem_ker, ReciprocityTheory.ChartRestriction.G.Geo.mConeMap,
-      MvPolynomial.aeval_C, MvPolynomial.algebraMap_apply, MvPolynomial.C_eq_zero, eq_intCast]
-    rw [map_intCast, ← map_intCast (MvPolynomial.C : (MP ℤ m n).residueField (f (genericPoint Z)) →+*
-      MvPolynomial (Fin (m + 1)) ((MP ℤ m n).residueField (f (genericPoint Z)))), MvPolynomial.C_eq_zero]
+    simp only [ptIdeal, ReciprocityTheory.ChartRestriction.G.Geo.mCoordIdeal, RingHom.mem_ker,
+      ReciprocityTheory.ChartRestriction.G.Geo.mConeMap, MvPolynomial.aeval_C,
+      MvPolynomial.algebraMap_apply, MvPolynomial.C_eq_zero, eq_intCast]
+    rw [map_intCast,
+      ← map_intCast
+        (MvPolynomial.C
+          : (MP ℤ m n).residueField (f (genericPoint Z))
+            →+* MvPolynomial (Fin (m + 1)) ((MP ℤ m n).residueField (f (genericPoint Z)))),
+      MvPolynomial.C_eq_zero]
   have hchar : charOf (ptIdeal (f (genericPoint Z))) = p := by
-    have key : ∀ I : Ideal ℤ, I = Ideal.span {(p : ℤ)} →
-        (Submodule.IsPrincipal.generator I).natAbs = p := by
+    have key
+        : ∀ I : Ideal ℤ,
+          I = Ideal.span {(p : ℤ)} → (Submodule.IsPrincipal.generator I).natAbs = p := by
       rintro I rfl
       have hg := Submodule.IsPrincipal.span_singleton_generator (Ideal.span {(p : ℤ)})
       have hass : Associated (Submodule.IsPrincipal.generator (Ideal.span {(p : ℤ)})) (p : ℤ) :=
@@ -133,9 +151,11 @@ theorem chi_eq_geoNum : ∀ (m : ℕ) (n : Fin (m + 1) → ℕ) (Z : Scheme.{0})
   rw [hcard] at hL
   have hlogp : Real.log p ≠ 0 := (Real.log_pos (by exact_mod_cast hp.one_lt)).ne'
   by_cases hfin : Module.Finite (ZMod p) Γ(Z, ⊤)
-  · rw [Module.natCard_eq_pow_finrank (K := ZMod p), Nat.card_zmod, Nat.cast_pow, Real.log_pow] at hL
-    have hg : (geoNum 0 (ptIdeal (f (genericPoint Z))) a : ℝ) =
-        (Module.finrank (ZMod p) Γ(Z, ⊤) : ℝ) := mul_right_cancel₀ hlogp hL
+  · rw [Module.natCard_eq_pow_finrank (K := ZMod p), Nat.card_zmod, Nat.cast_pow, Real.log_pow]
+      at hL
+    have hg
+        : (geoNum 0 (ptIdeal (f (genericPoint Z))) a : ℝ) = (Module.finrank (ZMod p) Γ(Z, ⊤) : ℝ) :=
+      mul_right_cancel₀ hlogp hL
     exact_mod_cast hg.symm
   · rw [Module.finrank_of_not_finite hfin]
     haveI : Infinite Γ(Z, ⊤) := by

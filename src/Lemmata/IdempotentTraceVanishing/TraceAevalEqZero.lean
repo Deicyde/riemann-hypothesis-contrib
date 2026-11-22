@@ -72,8 +72,7 @@ private lemma key {K : Type} [Field K] [CharZero K] {a : ℕ} (M : Matrix (Fin a
         rw [map_mul (Polynomial.aeval M) (Polynomial.X ^ k), map_pow, Polynomial.aeval_X]
     _ = 0 := by rw [hE0, mul_zero, map_mul, hrM, mul_zero, add_zero]
 
-theorem goal1 :
-  PI.SSAscent.UnitaryGroupMassFormula.TraceNilStep := by
+theorem goal1 : PI.SSAscent.UnitaryGroupMassFormula.TraceNilStep := by
   intro K _ _ a M h
   exact key M h
 

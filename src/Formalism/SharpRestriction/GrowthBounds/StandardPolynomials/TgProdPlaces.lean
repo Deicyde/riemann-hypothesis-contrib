@@ -16,13 +16,14 @@ def tgTop (X : Loc) : TgPlace X → X.TT
   | ⟨j, none⟩ => topEnd X j
   | ⟨j, some i⟩ => topOdd X j i
 
-theorem tg_end_ne_odd (X : Loc) (j : Fin (numSeg X.TT)) (i : Fin (segS X.TT j)) : topEnd X j ≠ topOdd X j i := by
+theorem tg_end_ne_odd (X : Loc) (j : Fin (numSeg X.TT)) (i : Fin (segS X.TT j))
+    : topEnd X j ≠ topOdd X j i := by
   intro h
   have e : segNext X.TT j = segPos X.TT j i := congrArg Subtype.val h
   exact (pos_mem X.TT j i).2 (e ▸ (next_mem X.TT j).2)
 
-theorem tgTop_mem (X : Loc) (pl : TgPlace X) (b : Bool) (c : Fin (X.m + 1)) :
-    ((tgTop X pl, b), c) ∈ segVars X pl.1 := by
+theorem tgTop_mem (X : Loc) (pl : TgPlace X) (b : Bool) (c : Fin (X.m + 1))
+    : ((tgTop X pl, b), c) ∈ segVars X pl.1 := by
   obtain ⟨j, a⟩ := pl
   cases a with
   | none => exact Or.inl rfl
@@ -67,24 +68,25 @@ theorem tgTop_surj (X : Loc) (h2 : 2 ≤ numSeg X.TT) : Function.Surjective (tgT
 theorem tgTop_bij (X : Loc) (h2 : 2 ≤ numSeg X.TT) : Function.Bijective (tgTop X) :=
   ⟨tgTop_inj X, tgTop_surj X h2⟩
 
-theorem tg_prod_places {M : Type} [CommMonoid M] (X : Loc) (h2 : 2 ≤ numSeg X.TT) (f : X.TT → M) :
-    ∏ t, f t = ∏ j, (f (topEnd X j) * ∏ i, f (topOdd X j i)) := by
+theorem tg_prod_places {M : Type} [CommMonoid M] (X : Loc) (h2 : 2 ≤ numSeg X.TT) (f : X.TT → M)
+    : ∏ t, f t = ∏ j, (f (topEnd X j) * ∏ i, f (topOdd X j i)) := by
   rw [← (tgTop_bij X h2).prod_comp f, Fintype.prod_sigma]
   refine Finset.prod_congr rfl fun j _ => ?_
   rw [Fintype.prod_option]
   rfl
 
-theorem tg_mono_split (O : Type) [CommRing O] [IsDomain O] (X : Loc) (h2 : 2 ≤ numSeg X.TT) (A : MonH X) :
-    (monomial A (1 : KK O) : RHH O X) = ∏ j, segMon O X j A := by
-  rw [MvPolynomial.monomial_eq, C_1, one_mul, Finsupp.prod_fintype _ _ (fun _ => pow_zero _), Fintype.prod_prod_type,
-    Fintype.prod_prod_type, tg_prod_places X h2]
+theorem tg_mono_split
+    (O : Type) [CommRing O] [IsDomain O] (X : Loc) (h2 : 2 ≤ numSeg X.TT) (A : MonH X)
+    : (monomial A (1 : KK O) : RHH O X) = ∏ j, segMon O X j A := by
+  rw [MvPolynomial.monomial_eq, C_1, one_mul, Finsupp.prod_fintype _ _ (fun _ => pow_zero _),
+    Fintype.prod_prod_type, Fintype.prod_prod_type, tg_prod_places X h2]
   refine Finset.prod_congr rfl fun j _ => ?_
   unfold segMon
   simp only [Fintype.prod_bool, Finset.prod_mul_distrib]
   ring
 
-theorem tg_prod_uTop {M : Type} [CommMonoid M] {s : ℕ} (S : SegData s) (g : Fin s → M) :
-    ∏ l : Fin S.t, g (uTop S l) = ∏ i : Fin s, if S.sigma ≤ i.val then g i else 1 := by
+theorem tg_prod_uTop {M : Type} [CommMonoid M] {s : ℕ} (S : SegData s) (g : Fin s → M)
+    : ∏ l : Fin S.t, g (uTop S l) = ∏ i : Fin s, if S.sigma ≤ i.val then g i else 1 := by
   rw [← Finset.prod_filter]
   refine Finset.prod_nbij (fun l => uTop S l) ?_ ?_ ?_ (fun _ _ => rfl)
   · intro l _
@@ -94,7 +96,11 @@ theorem tg_prod_uTop {M : Type} [CommMonoid M] {s : ℕ} (S : SegData s) (g : Fi
     exact Fin.ext (by omega)
   · intro i hi
     have hi' : S.sigma ≤ i.val := (Finset.mem_filter.1 (Finset.mem_coe.1 hi)).2
-    refine ⟨⟨i.val - S.sigma, by unfold SegData.t; have := i.2; omega⟩, Finset.mem_coe.2 (Finset.mem_univ _), ?_⟩
+    refine ⟨
+      ⟨i.val - S.sigma, by unfold SegData.t; have := i.2; omega⟩,
+      Finset.mem_coe.2 (Finset.mem_univ _),
+      ?_
+    ⟩
     apply Fin.ext
     show S.sigma + (i.val - S.sigma) = i.val
     omega

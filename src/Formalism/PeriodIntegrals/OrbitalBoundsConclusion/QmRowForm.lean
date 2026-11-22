@@ -7,5 +7,7 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.RowFormPermutati
 @[expose] public section
 
 theorem quantum_minor_row_form : PI.QmRowForm :=
-  PI.UnitaryGroupMassFormula.QmRowForm.qmRowForm_of PI.UnitaryGroupMassFormula.QmRowForm.double_row_decreasing PI.UnitaryGroupMassFormula.QmRowForm.double_row_increasing
+  PI.UnitaryGroupMassFormula.QmRowForm.qmRowForm_of
+    PI.UnitaryGroupMassFormula.QmRowForm.double_row_decreasing
+    PI.UnitaryGroupMassFormula.QmRowForm.double_row_increasing
     PI.UnitaryGroupMassFormula.QmRowForm.double_row_permutation

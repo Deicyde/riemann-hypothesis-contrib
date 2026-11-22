@@ -5,13 +5,15 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 namespace UpperTheory.Gal.productCup_of_system
 
 section
-variable {F V V' : Type} [Field F] [Algebra ℂ F] [AddCommGroup V] [Module F V] [Module ℂ V]
+variable
+  {F V V' : Type} [Field F] [Algebra ℂ F] [AddCommGroup V] [Module F V] [Module ℂ V]
   [IsScalarTower ℂ F V] [AddCommGroup V'] [Module F V'] [Module ℂ V'] [IsScalarTower ℂ F V']
 
 private lemma actF_tmul (a b : F) (v : V) (v' : V') :
@@ -126,18 +128,21 @@ end
 
 end UpperTheory.Gal.productCup_of_system
 
-theorem UpperTheory.Gal.productCup_of_system.regLat_of :
-    Reg0 → Ker0 → RegLat := by
+theorem UpperTheory.Gal.productCup_of_system.regLat_of : Reg0 → Ker0 → RegLat := by
   intro h0 hK F _ _ d x hx V V' _ _ _ _ _ _ _ _ I J M M' hL hL' j hjI hjJ
   obtain ⟨hA, n, v, φ, hv, hφ, hdec⟩ := hL
   obtain ⟨hA', n', v', φ', hv', hφ', hdec'⟩ := hL'
-  have back : ∀ (T : Set (F ⊗[ℂ] F)) (t : V ⊗[ℂ] V'), t ∈ Submodule.map₂ (TensorProduct.mk ℂ _ _) M M' →
-      (∀ k l, Ph (φ k) (φ' l) t ∈ sm (Algebra.lmul ℂ (F ⊗[ℂ] F)) (Subalgebra.toSubmodule (R0 x I J)) T) →
-      t ∈ sm (actF F V V') (Submodule.map₂ (TensorProduct.mk ℂ _ _) M M') T := by
+  have back
+      : ∀ (T : Set (F ⊗[ℂ] F)) (t : V ⊗[ℂ] V'),
+        t ∈ Submodule.map₂ (TensorProduct.mk ℂ _ _) M M'
+          → (∀ k l,
+            Ph (φ k) (φ' l) t
+              ∈ sm (Algebra.lmul ℂ (F ⊗[ℂ] F)) (Subalgebra.toSubmodule (R0 x I J)) T)
+          → t ∈ sm (actF F V V') (Submodule.map₂ (TensorProduct.mk ℂ _ _) M M') T := by
     intro T t ht h
     rw [decomp hdec hdec' ht]
-    exact Submodule.sum_mem _ fun k _ => Submodule.sum_mem _ fun l _ =>
-      act_sm hA hA' (hv k) (hv' l) (h k l)
+    exact Submodule.sum_mem _ fun k _ =>
+      Submodule.sum_mem _ fun l _ => act_sm hA hA' (hv k) (hv' l) (h k l)
   refine ⟨?_, ?_⟩
   · intro k m hm hk
     refine back _ m hm fun a b => ?_

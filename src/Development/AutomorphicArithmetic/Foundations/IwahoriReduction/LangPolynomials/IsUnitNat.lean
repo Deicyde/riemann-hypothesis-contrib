@@ -7,30 +7,33 @@ public import Development.AutomorphicArithmetic.Foundations.IwahoriReduction.Lan
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col UpperTheory.Kd.C7
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2 GlobalTheory.KZ GlobalTheory.Col UpperTheory.Kd.C7
 
 namespace UpperTheory.Kd.C7
 
 section
 variable {R : Type} [CommRing R]
 
-private theorem sb_one_add (b : ℕ) : sb (R := R) b (1 + PowerSeries.X) = (1 + PowerSeries.X) ^ b := by
+private theorem sb_one_add (b : ℕ)
+    : sb (R := R) b (1 + PowerSeries.X) = (1 + PowerSeries.X) ^ b := by
   rw [map_add (f := _), map_one, sb, PowerSeries.substAlgHom_X]; ring
 
 private theorem sb_C (b : ℕ) (a : R) : sb b (PowerSeries.C a : PowerSeries R) = PowerSeries.C a :=
   (sb (R := R) b).commutes a
 
-private theorem sb_eval₂ (b : ℕ) (P : Polynomial R) :
-    sb b (P.eval₂ PowerSeries.C (1 + PowerSeries.X)) =
-      (Polynomial.expand R b P).eval₂ PowerSeries.C (1 + PowerSeries.X) := by
+private theorem sb_eval₂ (b : ℕ) (P : Polynomial R)
+    : sb b (P.eval₂ PowerSeries.C (1 + PowerSeries.X))
+      = (Polynomial.expand R b P).eval₂ PowerSeries.C (1 + PowerSeries.X) := by
   induction P using Polynomial.induction_on' with
   | add f g hf hg => simp only [Polynomial.eval₂_add, map_add (f := _), hf, hg]
   | monomial n a =>
-    rw [Polynomial.expand_monomial, Polynomial.eval₂_monomial, Polynomial.eval₂_monomial, map_mul, map_pow,
-      sb_one_add, sb_C, ← pow_mul, mul_comm b n]
+    rw [Polynomial.expand_monomial, Polynomial.eval₂_monomial, Polynomial.eval₂_monomial, map_mul,
+      map_pow, sb_one_add, sb_C, ← pow_mul, mul_comm b n]
 
-private theorem map_sb' {S : Type} [CommRing S] (τ : R →+* S) (b : ℕ) (h : PowerSeries R) :
-    PowerSeries.map τ (sb b h) = sb b (PowerSeries.map τ h) := by
+private theorem map_sb' {S : Type} [CommRing S] (τ : R →+* S) (b : ℕ) (h : PowerSeries R)
+    : PowerSeries.map τ (sb b h) = sb b (PowerSeries.map τ h) := by
   unfold sb
   rw [PowerSeries.coe_substAlgHom, PowerSeries.coe_substAlgHom]
   refine Eq.trans (PowerSeries.map_subst (hasSubst_pow (R := R) b) (h := τ) h) ?_
@@ -38,22 +41,24 @@ private theorem map_sb' {S : Type} [CommRing S] (τ : R →+* S) (b : ℕ) (h : 
   change PowerSeries.map τ _ = _
   simp
 
-private theorem dd_sb (b : ℕ) (hb : b ≠ 0) (f : PowerSeries R) :
-    dd (sb b f) = (b : PowerSeries R) * sb b (dd f) := by
+private theorem dd_sb (b : ℕ) (hb : b ≠ 0) (f : PowerSeries R)
+    : dd (sb b f) = (b : PowerSeries R) * sb b (dd f) := by
   obtain ⟨k, rfl⟩ := Nat.exists_eq_succ_of_ne_zero hb
   unfold dd
   rw [map_mul, sb_one_add]
   unfold sb
   rw [PowerSeries.coe_substAlgHom, PowerSeries.derivative_subst (hasSubst_pow (R := R) _)]
-  simp only [map_sub, Derivation.leibniz_pow, map_add (f := _), Derivation.map_one_eq_zero, PowerSeries.derivative_X,
-    smul_eq_mul, nsmul_eq_mul, Nat.succ_sub_one, Nat.succ_eq_add_one]
+  simp only [map_sub, Derivation.leibniz_pow, map_add (f := _), Derivation.map_one_eq_zero,
+    PowerSeries.derivative_X, smul_eq_mul, nsmul_eq_mul, Nat.succ_sub_one, Nat.succ_eq_add_one]
   ring
 
-private theorem dl_sb (b : ℕ) (hb : b ≠ 0) (f : PowerSeries R) (hf : IsUnit f) :
-    dl (sb b f) = (b : PowerSeries R) * sb b (dl f) := by
+private theorem dl_sb (b : ℕ) (hb : b ≠ 0) (f : PowerSeries R) (hf : IsUnit f)
+    : dl (sb b f) = (b : PowerSeries R) * sb b (dl f) := by
   obtain ⟨u, rfl⟩ := hf
   unfold dl
-  have h1 : Ring.inverse (sb b (u : PowerSeries R)) = sb b ((u⁻¹ : (PowerSeries R)ˣ) : PowerSeries R) := by
+  have h1
+      : Ring.inverse (sb b (u : PowerSeries R))
+        = sb b ((u⁻¹ : (PowerSeries R)ˣ) : PowerSeries R) := by
     have := Ring.inverse_unit (Units.map (sb (R := R) b : PowerSeries R →* PowerSeries R) u)
     simpa using this
   rw [dd_sb b hb, h1, Ring.inverse_unit, map_mul, mul_assoc]
@@ -64,8 +69,11 @@ private theorem isUnit_nat {l : ℕ} [Fact l.Prime] (b : ℕ) (hb : ¬ l ∣ b) 
   have : ‖((b : ℤ) : ℤ_[l])‖ < 1 := by simpa using h
   exact_mod_cast (PadicInt.norm_int_lt_one_iff_dvd (b : ℤ)).1 this
 
-private theorem lc_sb {l : ℕ} [Fact l.Prime] [Algebra ℤ_[l] R] (b : ℕ) (hb : ¬ l ∣ b) (m n : ℕ) (f g : PowerSeries R)
-    (h : LC l m n f g) : LC l m n ((b : PowerSeries R) * sb b f) ((b : PowerSeries R) * sb b g) := by
+private theorem lc_sb
+    {l : ℕ} [Fact l.Prime] [Algebra ℤ_[l] R]
+    (b : ℕ) (hb : ¬ l ∣ b)
+    (m n : ℕ) (f g : PowerSeries R) (h : LC l m n f g)
+    : LC l m n ((b : PowerSeries R) * sb b f) ((b : PowerSeries R) * sb b g) := by
   obtain ⟨u, hu⟩ := isUnit_nat b hb
   unfold LC at h ⊢
   obtain ⟨y, hy⟩ := Ideal.mem_span_singleton'.1 h
@@ -78,11 +86,11 @@ end
 
 end UpperTheory.Kd.C7
 
-theorem UpperTheory.Kd.C7.pRepTr :
-    UpperTheory.Kd.C7.SRepTr := by
+theorem UpperTheory.Kd.C7.pRepTr : UpperTheory.Kd.C7.SRepTr := by
   intro l _ hl Ω _ _ _ A hA j Φ c β ζ hζ Z hZ b hb D hD
   have hb0 : b ≠ 0 := by rintro rfl; exact hb (dvd_zero l)
-  have h1 : Rep Φ β ζ (fun r s x => (b : Qbar l) * tr b hb Z r s x)
+  have h1 : Rep Φ β ζ
+      (fun r s x => (b : Qbar l) * tr b hb Z r s x)
       (fun i => (b : PowerSeries Φ.R) * sb b (D i)) := by
     obtain ⟨c₁, m₁, H⟩ := hD
     refine ⟨c₁, max m₁ 1, fun m hm => ?_⟩
@@ -93,7 +101,9 @@ theorem UpperTheory.Kd.C7.pRepTr :
     have e1 : Φ.ser (Polynomial.expand (R0 A) b (P i)) = sb b (Φ.ser (P i)) := by
       unfold Fr.ser
       rw [sb_eval₂, Polynomial.map_expand]
-    have e2 : Φ.tw m ((b : PowerSeries Φ.R) * sb b (D i)) = (b : PowerSeries Φ.R) * sb b (Φ.tw m (D i)) := by
+    have e2
+        : Φ.tw m ((b : PowerSeries Φ.R) * sb b (D i))
+          = (b : PowerSeries Φ.R) * sb b (Φ.tw m (D i)) := by
       unfold Fr.tw
       rw [map_mul, map_natCast, map_sb']
     rw [e1, e2, dl_sb b hb0 _ hu]
@@ -121,5 +131,6 @@ theorem UpperTheory.Kd.C7.pRepTr :
     rw [hm, Finset.sum_eq_single i]
     · rw [Matrix.diagonal_apply_eq, ← mul_assoc, h3, one_mul]
     · intro k _ hk
-      rw [Matrix.diagonal_apply_ne _ hk.symm]; simp
+      rw [Matrix.diagonal_apply_ne _ hk.symm]
+      simp
     · intro h; exact absurd (Finset.mem_univ i) h

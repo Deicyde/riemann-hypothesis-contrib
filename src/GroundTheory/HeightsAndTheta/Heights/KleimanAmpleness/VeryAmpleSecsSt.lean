@@ -15,8 +15,9 @@ universe u w
 
 def VeryAmpleSecs.Statement : Prop :=
   ∀ (k : Type u) [Field k] (Ω : Type w) [Field Ω] [Algebra k Ω] (N : ℕ) (x : Fin (N + 1) → Ω)
-    (Nb : LineBundle k x) (r : ℕ) (h : Fin (r + 1) → Ω), IsVeryAmpleBy Nb.toSubSystem h →
-    ∀ n : ℕ, (Nb.toSubSystem.pow n).secs = ((twistSys k h 1).pow n).secs
+      (Nb : LineBundle k x) (r : ℕ) (h : Fin (r + 1) → Ω),
+    IsVeryAmpleBy Nb.toSubSystem h
+      → ∀ n : ℕ, (Nb.toSubSystem.pow n).secs = ((twistSys k h 1).pow n).secs
 
 end
 

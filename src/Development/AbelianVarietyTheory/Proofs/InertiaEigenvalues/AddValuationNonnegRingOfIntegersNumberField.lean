@@ -8,8 +8,8 @@ open NumberField
 
 namespace GlobalTheory
 
-theorem addValuation_nonneg_of_ringOfIntegers :
-    ∀ (L : Type) [Field L] [NumberField L] (v : AddValuation L (WithTop ℤ)) (a : 𝓞 L),
+theorem addValuation_nonneg_of_ringOfIntegers
+    : ∀ (L : Type) [Field L] [NumberField L] (v : AddValuation L (WithTop ℤ)) (a : 𝓞 L),
       0 ≤ v (a : L) := by
   intro L _ _ v a
   have hZ : ∀ m : ℤ, 0 ≤ v (m : L) := by
@@ -40,19 +40,22 @@ theorem addValuation_nonneg_of_ringOfIntegers :
     subst hc
     simp at hf
   simp only [Polynomial.eval₂_eq_sum_range, Finset.sum_range_succ, hm.coeff_natDegree, map_one,
-    one_mul, add_eq_zero_iff_eq_neg] at hf
+      one_mul, add_eq_zero_iff_eq_neg]
+    at hf
   apply_fun v at hf
   rw [AddValuation.map_neg, AddValuation.map_pow, ← hk] at hf
-  have hlt : ((f.natDegree • k : ℤ) : WithTop ℤ) <
-      v (∑ i ∈ Finset.range f.natDegree, (algebraMap ℤ L) (f.coeff i) * x ^ i) := by
+  have hlt
+      : ((f.natDegree • k : ℤ) : WithTop ℤ)
+        < v (∑ i ∈ Finset.range f.natDegree, (algebraMap ℤ L) (f.coeff i) * x ^ i) := by
     apply AddValuation.map_lt_sum v (WithTop.coe_ne_top)
     intro i hi
     rw [Finset.mem_range] at hi
     rw [AddValuation.map_mul, AddValuation.map_pow, ← hk, eq_intCast]
-    calc ((f.natDegree • k : ℤ) : WithTop ℤ) < ((i • k : ℤ) : WithTop ℤ) := by
-          rw [WithTop.coe_lt_coe, nsmul_eq_mul, nsmul_eq_mul]
-          have : (i : ℤ) < f.natDegree := by exact_mod_cast hi
-          nlinarith
+    calc
+      ((f.natDegree • k : ℤ) : WithTop ℤ) < ((i • k : ℤ) : WithTop ℤ) := by
+        rw [WithTop.coe_lt_coe, nsmul_eq_mul, nsmul_eq_mul]
+        have : (i : ℤ) < f.natDegree := by exact_mod_cast hi
+        nlinarith
       _ = i • (k : WithTop ℤ) := by rw [WithTop.coe_nsmul]
       _ ≤ v ((f.coeff i : ℤ) : L) + i • (k : WithTop ℤ) := le_add_of_nonneg_left (hZ _)
   rw [WithTop.coe_nsmul, hf] at hlt

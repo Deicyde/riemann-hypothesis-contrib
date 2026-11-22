@@ -6,9 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory.DerivativeOfAdditiveContinuous
 
-theorem hasDerivAt_of_continuous_of_map_add (χ : ℝ → ℂ) (hc : Continuous χ)
-    (hadd : ∀ s t : ℝ, χ (s + t) = χ s * χ t) (h0 : χ (0 : ℝ) = (1 : ℂ)) (s : ℝ) :
-    HasDerivAt χ (deriv χ (0 : ℝ) * χ s) s := by
+theorem hasDerivAt_of_continuous_of_map_add
+    (χ : ℝ → ℂ)
+    (hc : Continuous χ) (hadd : ∀ s t : ℝ, χ (s + t) = χ s * χ t) (h0 : χ (0 : ℝ) = (1 : ℂ))
+    (s : ℝ)
+    : HasDerivAt χ (deriv χ (0 : ℝ) * χ s) s := by
   obtain ⟨δ, hδ, hball⟩ := Metric.continuous_iff.mp hc 0 (1 / 2) (by norm_num)
   set η := δ / 2 with hη
   have hη0 : 0 < η := by positivity

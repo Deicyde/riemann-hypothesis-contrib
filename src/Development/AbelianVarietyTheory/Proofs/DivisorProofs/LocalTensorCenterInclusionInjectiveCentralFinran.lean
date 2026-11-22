@@ -7,12 +7,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FormalGroupA
 
 @[expose] public section
 
-open Matrix NumberField IsDedekindDomain GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.OrbFinAf
+open Matrix NumberField IsDedekindDomain GlobalTheory.LKTrip GlobalTheory.LKMid
+  GlobalTheory.OrbFinAf
 open scoped TensorProduct Classical
 
 namespace GlobalTheory.OrbFinAf
 
-theorem iotaF_props : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (v : AwayP p), Function.Injective (iotaF G v) ∧ (∀ z x, Commute (iotaF G v z) x) ∧ Module.finrank (Qv v) (Qv v ⊗[ℚ] G.C) = G.n ^ 2 * Module.finrank (Qv v) (Qv v ⊗[ℚ] G.F) := by
+theorem iotaF_props
+    : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (v : AwayP p),
+      Function.Injective (iotaF G v) ∧ (∀ z x, Commute (iotaF G v z) x)
+        ∧ Module.finrank (Qv v) (Qv v ⊗[ℚ] G.C)
+          = G.n ^ 2 * Module.finrank (Qv v) (Qv v ⊗[ℚ] G.F) := by
   intro p _ G v
   haveI : IsSimpleRing G.C := G.simpleC
   haveI : Nontrivial G.C := inferInstance
@@ -35,7 +40,7 @@ theorem iotaF_props : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (v : AwayP p)
         show (a ⊗ₜ[ℚ] algebraMap G.F G.C f) * (b ⊗ₜ[ℚ] c) = (b ⊗ₜ[ℚ] c) * (a ⊗ₜ[ℚ] algebraMap G.F G.C f)
         rw [Algebra.TensorProduct.tmul_mul_tmul, Algebra.TensorProduct.tmul_mul_tmul, mul_comm a b,
           Algebra.commutes]
-  · rw [Module.finrank_baseChange, Module.finrank_baseChange, ← Module.finrank_mul_finrank ℚ G.F G.C,
-      G.rankC, mul_comm]
+  · rw [Module.finrank_baseChange, Module.finrank_baseChange,
+      ← Module.finrank_mul_finrank ℚ G.F G.C, G.rankC, mul_comm]
 
 end GlobalTheory.OrbFinAf

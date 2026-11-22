@@ -15,15 +15,17 @@ variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {n : �
 
 theorem mem_intL_iff {x : L} : x ∈ Formalism.UG.intL L ↔ Valued.v x ≤ 1 := Iff.rfl
 
-theorem det_updateRow_one (i : Fin n) (ρ : Fin n → L) :
-    ((1 : Matrix (Fin n) (Fin n) L).updateRow i ρ).det = ρ i := by
-  rw [← Matrix.det_transpose, ← Matrix.updateCol_transpose, Matrix.transpose_one, ← Matrix.cramer_apply,
-    Matrix.cramer_one]
+theorem det_updateRow_one (i : Fin n) (ρ : Fin n → L)
+    : ((1 : Matrix (Fin n) (Fin n) L).updateRow i ρ).det = ρ i := by
+  rw [← Matrix.det_transpose, ← Matrix.updateCol_transpose, Matrix.transpose_one,
+    ← Matrix.cramer_apply, Matrix.cramer_one]
   rfl
 
-theorem rowLat_updateRow {M : Matrix (Fin n) (Fin n) L} {ρ : Fin n → L} {i : Fin n}
-    (h0 : ρ i ≠ 0) (h1 : Valued.v (ρ i)⁻¹ ≤ 1) (h2 : ∀ j, Valued.v (ρ j) ≤ Valued.v (ρ i)) :
-    rowLat M ⊔ Submodule.span (Formalism.UG.intL L) {ρ ᵥ* M} = rowLat (M.updateRow i (ρ ᵥ* M)) := by
+theorem rowLat_updateRow
+    {M : Matrix (Fin n) (Fin n) L} {ρ : Fin n → L} {i : Fin n}
+    (h0 : ρ i ≠ 0) (h1 : Valued.v (ρ i)⁻¹ ≤ 1) (h2 : ∀ j, Valued.v (ρ j) ≤ Valued.v (ρ i))
+    : rowLat M ⊔ Submodule.span (Formalism.UG.intL L) {ρ ᵥ* M}
+      = rowLat (M.updateRow i (ρ ᵥ* M)) := by
   set w := ρ ᵥ* M with hw
   apply le_antisymm
   · refine sup_le (rowLat_le.2 fun j => ?_) ((Submodule.span_singleton_le_iff_mem _ _).2 ?_)
@@ -38,8 +40,9 @@ theorem rowLat_updateRow {M : Matrix (Fin n) (Fin n) L} {ρ : Fin n → L} {i : 
             rw [mem_intL_iff, map_mul, map_inv₀]
             exact mul_inv_le_one_of_le₀ (h2 l) zero_le'
         · rw [Matrix.vecMul_eq_sum, ← Finset.add_sum_erase _ _ (Finset.mem_univ j)]
-          have e1 : ∑ l ∈ Finset.univ.erase j, (if l = j then (ρ j)⁻¹ else -(ρ l * (ρ j)⁻¹)) • (M.updateRow j w) l
-              = ∑ l ∈ Finset.univ.erase j, (-(ρ l * (ρ j)⁻¹)) • M l :=
+          have e1
+              : ∑ l ∈ Finset.univ.erase j, (if l = j then (ρ j)⁻¹ else -(ρ l * (ρ j)⁻¹)) • (M.updateRow j w) l
+                = ∑ l ∈ Finset.univ.erase j, (-(ρ l * (ρ j)⁻¹)) • M l :=
             Finset.sum_congr rfl fun l hl => by
               have := Finset.ne_of_mem_erase hl
               simp [this, Matrix.updateRow_ne]
@@ -70,7 +73,8 @@ theorem addVec : AddVec := by
   by_cases e0 : e = 0
   · subst e0
     refine ⟨M, by simpa using hM, ?_⟩
-    refine sup_eq_left.2 ((Submodule.span_singleton_le_iff_mem _ _).2 (mem_rowLat.2 ⟨ρ, fun i => ?_, rfl⟩))
+    refine sup_eq_left.2 ((Submodule.span_singleton_le_iff_mem _ _).2
+      (mem_rowLat.2 ⟨ρ, fun i => ?_, rfl⟩))
     exact mem_intL_iff.2 (by simpa using hρ i)
   · obtain ⟨i, hi⟩ := he.resolve_left e0
     have h0 : ρ i ≠ 0 := fun h => by

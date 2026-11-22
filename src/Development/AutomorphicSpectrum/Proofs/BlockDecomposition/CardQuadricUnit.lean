@@ -11,8 +11,8 @@ namespace GlobalTheory.CompanionTheory.SW.QuadricUnit
 
 open GlobalTheory.CompanionTheory.SW.QuadricCount
 
-theorem char_sum {k α : Type} [AddCommGroup k] (ψ : AddChar k ℂ) (s : Finset α) (f : α → k) :
-    ψ (∑ i ∈ s, f i) = ∏ i ∈ s, ψ (f i) := by
+theorem char_sum {k α : Type} [AddCommGroup k] (ψ : AddChar k ℂ) (s : Finset α) (f : α → k)
+    : ψ (∑ i ∈ s, f i) = ∏ i ∈ s, ψ (f i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
@@ -22,8 +22,8 @@ section OneVar
 
 variable {k : Type} [Field k] [Fintype k] [DecidableEq k]
 
-theorem sum_sq_eq (hchar : ringChar k ≠ 2) (ψ : AddChar k ℂ) (hψ : ψ ≠ 1) {c : k} (hc : c ≠ 0) :
-    ∑ y : k, ψ (c * (y * y)) = ∑ z : k, (quadraticChar k z : ℂ) * ψ (c * z) := by
+theorem sum_sq_eq (hchar : ringChar k ≠ 2) (ψ : AddChar k ℂ) (hψ : ψ ≠ 1) {c : k} (hc : c ≠ 0)
+    : ∑ y : k, ψ (c * (y * y)) = ∑ z : k, (quadraticChar k z : ℂ) * ψ (c * z) := by
   have h1 : ∑ y : k, ψ (c * (y * y)) = ∑ z : k, ((quadraticChar k z : ℂ) + 1) * ψ (c * z) := by
     rw [← Finset.sum_fiberwise (s := Finset.univ) (g := fun y : k => y ^ 2)]
     refine Finset.sum_congr rfl fun z _ => ?_
@@ -48,9 +48,9 @@ theorem sum_sq_eq (hchar : ringChar k ≠ 2) (ψ : AddChar k ℂ) (hψ : ψ ≠ 
     simp [hc]
   rw [h5, add_zero]
 
-theorem sum_sq_scale (hchar : ringChar k ≠ 2) (ψ : AddChar k ℂ) (hψ : ψ ≠ 1) {c t : k}
-    (hc : c ≠ 0) (ht : t ≠ 0) :
-    ∑ y : k, ψ ((t * c) * (y * y)) = (quadraticChar k t : ℂ) * ∑ y : k, ψ (c * (y * y)) := by
+theorem sum_sq_scale
+    (hchar : ringChar k ≠ 2) (ψ : AddChar k ℂ) (hψ : ψ ≠ 1) {c t : k} (hc : c ≠ 0) (ht : t ≠ 0)
+    : ∑ y : k, ψ ((t * c) * (y * y)) = (quadraticChar k t : ℂ) * ∑ y : k, ψ (c * (y * y)) := by
   rw [sum_sq_eq hchar ψ hψ (mul_ne_zero ht hc), sum_sq_eq hchar ψ hψ hc, Finset.mul_sum]
   refine Fintype.sum_equiv (Equiv.mulLeft₀ t ht) _ _ fun z => ?_
   have h1 : (quadraticChar k t : ℂ) * (quadraticChar k t : ℂ) = 1 := by
@@ -67,10 +67,13 @@ section Form
 
 variable {k : Type} [Field k] [Fintype k] {ι : Type} [Fintype ι] [DecidableEq ι]
 
-theorem gauss_scale (hchar : ringChar k ≠ 2) (ψ : AddChar k ℂ) (hψ : ψ ≠ 1)
-    {B : Matrix ι ι k} (hB : B.IsSymm) (hdet : B.det ≠ 0) {M : ℕ}
-    (hM : Fintype.card ι = 2 * M) {t : k} (ht : t ≠ 0) :
-    ∑ x, ψ (t * quadForm B x) = ∑ x, ψ (quadForm B x) := by
+theorem gauss_scale
+    (hchar : ringChar k ≠ 2)
+    (ψ : AddChar k ℂ) (hψ : ψ ≠ 1)
+    {B : Matrix ι ι k} (hB : B.IsSymm) (hdet : B.det ≠ 0)
+    {M : ℕ} (hM : Fintype.card ι = 2 * M)
+    {t : k} (ht : t ≠ 0)
+    : ∑ x, ψ (t * quadForm B x) = ∑ x, ψ (quadForm B x) := by
   classical
   have h2 : (2 : k) ≠ 0 := Ring.two_ne_zero hchar
   haveI : Invertible (2 : k) := invertibleOfNonzero h2
@@ -104,28 +107,31 @@ theorem gauss_scale (hchar : ringChar k ≠ 2) (ψ : AddChar k ℂ) (hψ : ψ �
   obtain ⟨w, ⟨e⟩⟩ := Q.equivalent_weightedSumSquares_units_of_nondegenerate' hsep
   have hsum : ∀ u : k, ∑ x, ψ (u * quadForm B x) = ∏ i, ∑ y : k, ψ ((u * (w i : k)) * (y * y)) := by
     intro u
-    calc ∑ x, ψ (u * quadForm B x)
-        = ∑ y : Fin (Module.finrank k (ι → k)) → k, ψ (u * ∑ i, (w i : k) * (y i * y i)) := by
-          refine Fintype.sum_equiv e.toLinearEquiv.toEquiv _ _ fun x => ?_
-          have h3 := e.map_app x
-          rw [hQ, QuadraticMap.weightedSumSquares_apply] at h3
-          simp only [Units.smul_def, smul_eq_mul] at h3
-          rw [← h3]
-          rfl
+    calc
+      ∑ x, ψ (u * quadForm B x)
+          = ∑ y : Fin (Module.finrank k (ι → k)) → k, ψ (u * ∑ i, (w i : k) * (y i * y i)) := by
+        refine Fintype.sum_equiv e.toLinearEquiv.toEquiv _ _ fun x => ?_
+        have h3 := e.map_app x
+        rw [hQ, QuadraticMap.weightedSumSquares_apply] at h3
+        simp only [Units.smul_def, smul_eq_mul] at h3
+        rw [← h3]
+        rfl
       _ = ∑ y : Fin (Module.finrank k (ι → k)) → k,
             ∏ i, ψ ((u * (w i : k)) * (y i * y i)) := by
-          refine Finset.sum_congr rfl fun y _ => ?_
-          rw [Finset.mul_sum, char_sum]
-          refine Finset.prod_congr rfl fun i _ => ?_
-          rw [mul_assoc]
+        refine Finset.sum_congr rfl fun y _ => ?_
+        rw [Finset.mul_sum, char_sum]
+        refine Finset.prod_congr rfl fun i _ => ?_
+        rw [mul_assoc]
       _ = ∏ i, ∑ y : k, ψ ((u * (w i : k)) * (y * y)) := by
-          rw [Finset.prod_univ_sum, Fintype.piFinset_univ]
+        rw [Finset.prod_univ_sum, Fintype.piFinset_univ]
   have h1 := hsum 1
   simp only [one_mul] at h1
   rw [hsum t, h1]
-  have hsc : ∀ i, ∑ y : k, ψ ((t * (w i : k)) * (y * y)) =
-      (quadraticChar k t : ℂ) * ∑ y : k, ψ ((w i : k) * (y * y)) :=
-    fun i => sum_sq_scale hchar ψ hψ (w i).ne_zero ht
+  have hsc
+      : ∀ i,
+        ∑ y : k, ψ ((t * (w i : k)) * (y * y))
+          = (quadraticChar k t : ℂ) * ∑ y : k, ψ ((w i : k) * (y * y)) := fun i =>
+    sum_sq_scale hchar ψ hψ (w i).ne_zero ht
   simp_rw [hsc]
   have hfr : Fintype.card (Fin (Module.finrank k (ι → k))) = 2 * M := by
     rw [Fintype.card_fin, Module.finrank_fintype_fun_eq_card, hM]
@@ -134,21 +140,24 @@ theorem gauss_scale (hchar : ringChar k ≠ 2) (ψ : AddChar k ℂ) (hψ : ψ �
     exact_mod_cast congrArg (Int.cast : ℤ → ℂ) (quadraticChar_sq_one ht)
   rw [h3, one_pow, one_mul]
 
-theorem card_quadric_unit (hchar : ringChar k ≠ 2) (M : ℕ) (hM : Fintype.card ι = 2 * M)
-    (hM1 : 1 ≤ M) (B : Matrix ι ι k) (hB : B.IsSymm) (hdet : B.det ≠ 0) {s : k} (hs : s ≠ 0) :
-    |(Nat.card {x : ι → k // (2 : k)⁻¹ * (x ⬝ᵥ (B *ᵥ x)) = s} : ℝ) -
-      (Fintype.card k : ℝ) ^ (2 * M - 1)| ≤ (Fintype.card k : ℝ) ^ (M - 1) := by
+theorem card_quadric_unit
+    (hchar : ringChar k ≠ 2)
+    (M : ℕ) (hM : Fintype.card ι = 2 * M) (hM1 : 1 ≤ M)
+    (B : Matrix ι ι k) (hB : B.IsSymm) (hdet : B.det ≠ 0)
+    {s : k} (hs : s ≠ 0)
+    : |(Nat.card {x : ι → k // (2 : k)⁻¹ * (x ⬝ᵥ (B *ᵥ x)) = s} : ℝ) -
+        (Fintype.card k : ℝ) ^ (2 * M - 1)|
+      ≤ (Fintype.card k : ℝ) ^ (M - 1) := by
   classical
   have h2 : (2 : k) ≠ 0 := Ring.two_ne_zero hchar
-  obtain ⟨ψ, hψ⟩ : ∃ ψ : AddChar k ℂ, ψ 1 ≠ 1 :=
-    AddChar.exists_apply_ne_zero.mpr one_ne_zero
+  obtain ⟨ψ, hψ⟩ : ∃ ψ : AddChar k ℂ, ψ 1 ≠ 1 := AddChar.exists_apply_ne_zero.mpr one_ne_zero
   have hψ1 : ψ ≠ 1 := fun h => hψ (by simp [h])
   have hq : (0 : ℝ) < (Fintype.card k : ℝ) := by exact_mod_cast Fintype.card_pos
   set N : ℕ := Nat.card {x : ι → k // quadForm B x = s} with hNdef
   have hcount := count_mul_card ψ hψ1 B s
   rw [← hNdef, ← Finset.add_sum_erase Finset.univ _ (Finset.mem_univ (0 : k))] at hcount
-  have hzero : ψ (-((0 : k) * s)) * ∑ x, ψ ((0 : k) * quadForm B x) =
-      (Fintype.card k : ℂ) ^ (2 * M) := by
+  have hzero
+      : ψ (-((0 : k) * s)) * ∑ x, ψ ((0 : k) * quadForm B x) = (Fintype.card k : ℂ) ^ (2 * M) := by
     simp [hM]
   rw [hzero] at hcount
   set G : ℂ := ∑ x, ψ (quadForm B x) with hG
@@ -156,8 +165,9 @@ theorem card_quadric_unit (hchar : ringChar k ≠ 2) (M : ℕ) (hM : Fintype.car
     have := norm_gauss ψ hψ1 h2 hB hdet hM (t := 1) one_ne_zero
     simpa [hG] using this
   have hrest : ∑ t ∈ Finset.univ.erase (0 : k), ψ (-(t * s)) * ∑ x, ψ (t * quadForm B x) = -G := by
-    have e1 : ∀ t ∈ Finset.univ.erase (0 : k),
-        ψ (-(t * s)) * ∑ x, ψ (t * quadForm B x) = ψ (t * (-s)) * G := by
+    have e1
+        : ∀ t ∈ Finset.univ.erase (0 : k),
+          ψ (-(t * s)) * ∑ x, ψ (t * quadForm B x) = ψ (t * (-s)) * G := by
       intro t ht
       rw [gauss_scale hchar ψ hψ1 hB hdet hM (Finset.ne_of_mem_erase ht), mul_neg]
     rw [Finset.sum_congr rfl e1, ← Finset.sum_mul]
@@ -171,20 +181,24 @@ theorem card_quadric_unit (hchar : ringChar k ≠ 2) (M : ℕ) (hM : Fintype.car
     rw [e3]
     ring
   rw [hrest] at hcount
-  have hreal : ((((N : ℝ) * (Fintype.card k : ℝ) - (Fintype.card k : ℝ) ^ (2 * M) : ℝ)) : ℂ) = -G := by
+  have hreal
+      : ((((N : ℝ) * (Fintype.card k : ℝ) - (Fintype.card k : ℝ) ^ (2 * M) : ℝ)) : ℂ) = -G := by
     push_cast
     rw [hcount]
     ring
-  have habs : |(N : ℝ) * (Fintype.card k : ℝ) - (Fintype.card k : ℝ) ^ (2 * M)| =
-      (Fintype.card k : ℝ) ^ M := by
+  have habs
+      : |(N : ℝ) * (Fintype.card k : ℝ) - (Fintype.card k : ℝ) ^ (2 * M)|
+        = (Fintype.card k : ℝ) ^ M := by
     rw [← Real.norm_eq_abs, ← Complex.norm_real, hreal, norm_neg, hGn]
-  have hpow : (Fintype.card k : ℝ) ^ (2 * M) =
-      (Fintype.card k : ℝ) ^ (2 * M - 1) * (Fintype.card k : ℝ) := by
+  have hpow
+      : (Fintype.card k : ℝ) ^ (2 * M)
+        = (Fintype.card k : ℝ) ^ (2 * M - 1) * (Fintype.card k : ℝ) := by
     rw [← pow_succ]
     congr 1
     omega
-  have hfac : (N : ℝ) * (Fintype.card k : ℝ) - (Fintype.card k : ℝ) ^ (2 * M) =
-      ((N : ℝ) - (Fintype.card k : ℝ) ^ (2 * M - 1)) * (Fintype.card k : ℝ) := by
+  have hfac
+      : (N : ℝ) * (Fintype.card k : ℝ) - (Fintype.card k : ℝ) ^ (2 * M)
+        = ((N : ℝ) - (Fintype.card k : ℝ) ^ (2 * M - 1)) * (Fintype.card k : ℝ) := by
     rw [hpow]
     ring
   have hpM : (Fintype.card k : ℝ) ^ M = (Fintype.card k : ℝ) ^ (M - 1) * (Fintype.card k : ℝ) := by

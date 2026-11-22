@@ -9,13 +9,14 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.AlgRepEndIrreducible
 open scoped TensorProduct
 
-private theorem expSq {n : ℕ} (N : Matrix (Fin n) (Fin n) ℂ) (h : N * N = 0) :
-    NormedSpace.exp N = 1 + N :=
+private theorem expSq {n : ℕ} (N : Matrix (Fin n) (Fin n) ℂ) (h : N * N = 0)
+    : NormedSpace.exp N = 1 + N :=
   _root_.UpperTheory.Reformulated.B.Qf11.expSq N h
 
-theorem UpperTheory.V.AlgRepEndIrreducible.expGenC :
-    ∀ (n : ℕ) (H : Submonoid (Matrix (Fin n) (Fin n) ℂ)), (∀ X : Matrix (Fin n) (Fin n) ℂ, NormedSpace.exp X ∈ H) →
-      ∀ g : Matrix (Fin n) (Fin n) ℂ, g.det ≠ 0 → g ∈ H := by
+theorem UpperTheory.V.AlgRepEndIrreducible.expGenC
+    : ∀ (n : ℕ) (H : Submonoid (Matrix (Fin n) (Fin n) ℂ)),
+      (∀ X : Matrix (Fin n) (Fin n) ℂ, NormedSpace.exp X ∈ H)
+        → ∀ g : Matrix (Fin n) (Fin n) ℂ, g.det ≠ 0 → g ∈ H := by
   intro n H hH g hg
   refine Matrix.diagonal_transvection_induction_of_det_ne_zero (fun M => M ∈ H) g hg ?_ ?_ ?_
   · intro D hD

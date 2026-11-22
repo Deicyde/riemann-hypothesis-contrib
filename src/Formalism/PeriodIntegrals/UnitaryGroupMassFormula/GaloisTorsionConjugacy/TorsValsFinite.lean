@@ -18,8 +18,8 @@ theorem mulStable_nat (L : PeriodPair) (n : ℕ) : MulStable L (n : ℂ) := by
   rw [← nsmul_eq_mul]
   exact nsmul_mem hω n
 
-theorem tors_vals_finite (L : PeriodPair) (n : ℕ) (hn : 0 < n) :
-    {v : ℂ | ∃ s, (n : ℂ) * s ∈ L.lattice ∧ s ∉ L.lattice ∧ L.weierstrassP s = v}.Finite := by
+theorem tors_vals_finite (L : PeriodPair) (n : ℕ) (hn : 0 < n)
+    : {v : ℂ | ∃ s, (n : ℂ) * s ∈ L.lattice ∧ s ∉ L.lattice ∧ L.weierstrassP s = v}.Finite := by
   have hα : (n : ℂ) ≠ 0 := by exact_mod_cast hn.ne'
   obtain ⟨S, hS⟩ := kerRepsExist L (n : ℂ) hα (mulStable_nat L n)
   refine (S.finite_toSet.image L.weierstrassP).subset ?_
@@ -29,8 +29,8 @@ theorem tors_vals_finite (L : PeriodPair) (n : ℕ) (hn : 0 < n) :
   have e : s = P + (s - P) := by ring
   rw [e, wp_add_mem L P hsP]
 
-theorem shift_emb (M : IntermediateField ℚ ℂ) (x : ℂ) (hx : Transcendental M x) (k : ℕ) :
-    ∃ σ : IntermediateField.adjoin M {x} →ₐ[M] ℂ,
+theorem shift_emb (M : IntermediateField ℚ ℂ) (x : ℂ) (hx : Transcendental M x) (k : ℕ)
+    : ∃ σ : IntermediateField.adjoin M {x} →ₐ[M] ℂ,
       σ (IntermediateField.AdjoinSimple.gen M x) = x + k := by
   have hk : Transcendental M (x + k) := by
     intro halg
@@ -43,26 +43,32 @@ theorem shift_emb (M : IntermediateField ℚ ℂ) (x : ℂ) (hx : Transcendental
     simp only [Submonoid.mem_comap, mem_nonZeroDivisors_iff_ne_zero] at hp ⊢
     intro h0
     exact hk ⟨p, hp, h0⟩
-  refine ⟨(RatFunc.liftAlgHom (aeval (x + k) : M[X] →ₐ[M] ℂ) hφ).comp
-    (RatFunc.algEquivOfTranscendental x hx).symm.toAlgHom, ?_⟩
+  refine ⟨
+    (RatFunc.liftAlgHom (aeval (x + k) : M[X] →ₐ[M] ℂ) hφ).comp
+      (RatFunc.algEquivOfTranscendental x hx).symm.toAlgHom,
+    ?_
+  ⟩
   rw [AlgHom.comp_apply]
   change RatFunc.liftAlgHom _ hφ ((RatFunc.algEquivOfTranscendental x hx).symm _) = _
   rw [RatFunc.algEquivOfTranscendental_symm_gen]
   have := RatFunc.liftAlgHom_apply_div (aeval (x + k) : M[X] →ₐ[M] ℂ) hφ X 1
   simpa using this
 
-def rsHom (M : IntermediateField ℚ ℂ) (E : IntermediateField M ℂ) (σ : E →ₐ[M] ℂ) :
-    E.restrictScalars ℚ →ₐ[ℚ] ℂ :=
-  RingHom.toRatAlgHom
-    { toFun := fun z => σ ⟨z, z.2⟩
-      map_one' := σ.map_one
-      map_mul' := fun a b => σ.map_mul ⟨a, a.2⟩ ⟨b, b.2⟩
-      map_zero' := σ.map_zero
-      map_add' := fun a b => σ.map_add ⟨a, a.2⟩ ⟨b, b.2⟩ }
+def rsHom (M : IntermediateField ℚ ℂ) (E : IntermediateField M ℂ) (σ : E →ₐ[M] ℂ)
+    : E.restrictScalars ℚ →ₐ[ℚ] ℂ :=
+  RingHom.toRatAlgHom {
+    toFun := fun z => σ ⟨z, z.2⟩
+    map_one' := σ.map_one
+    map_mul' := fun a b => σ.map_mul ⟨a, a.2⟩ ⟨b, b.2⟩
+    map_zero' := σ.map_zero
+    map_add' := fun a b => σ.map_add ⟨a, a.2⟩ ⟨b, b.2⟩
+  }
 
-theorem alg_of_sq {F : Type*} [Field F] [Algebra F ℂ] {x y a b : ℂ}
-    (hsq : y ^ 2 = 4 * x ^ 3 - a * x - b)
-    (hx : IsAlgebraic F x) (ha : IsAlgebraic F a) (hb : IsAlgebraic F b) : IsAlgebraic F y := by
+theorem alg_of_sq
+    {F : Type*} [Field F] [Algebra F ℂ]
+    {x y a b : ℂ} (hsq : y ^ 2 = 4 * x ^ 3 - a * x - b) (hx : IsAlgebraic F x)
+    (ha : IsAlgebraic F a) (hb : IsAlgebraic F b)
+    : IsAlgebraic F y := by
   have hx' := mem_algebraicClosure_iff.mpr hx
   have ha' := mem_algebraicClosure_iff.mpr ha
   have hb' := mem_algebraicClosure_iff.mpr hb
@@ -74,9 +80,10 @@ theorem alg_of_sq {F : Type*} [Field F] [Algebra F ℂ] {x y a b : ℂ}
   rw [← hsq] at hw
   exact IsAlgebraic.of_pow two_pos (mem_algebraicClosure_iff.mp hw)
 
-theorem wp_isAlgebraic (L : PeriodPair) (M : IntermediateField ℚ ℂ) (hg2 : L.g₂ ∈ M)
-    (hg3 : L.g₃ ∈ M) (n : ℕ) (t : ℂ) (hn : 0 < n) (hnt : (n : ℂ) * t ∈ L.lattice)
-    (ht : t ∉ L.lattice) : IsAlgebraic M (L.weierstrassP t) := by
+theorem wp_isAlgebraic
+    (L : PeriodPair) (M : IntermediateField ℚ ℂ) (hg2 : L.g₂ ∈ M) (hg3 : L.g₃ ∈ M)
+    (n : ℕ) (t : ℂ) (hn : 0 < n) (hnt : (n : ℂ) * t ∈ L.lattice) (ht : t ∉ L.lattice)
+    : IsAlgebraic M (L.weierstrassP t) := by
   by_contra htr
   apply (tors_vals_finite L n hn).not_infinite
   refine Set.infinite_of_injective_forall_mem (f := fun k : ℕ => L.weierstrassP t + k) ?_ ?_
@@ -85,7 +92,8 @@ theorem wp_isAlgebraic (L : PeriodPair) (M : IntermediateField ℚ ℂ) (hg2 : L
     exact_mod_cast add_left_cancel hab
   intro k
   obtain ⟨σ, hσ⟩ := shift_emb M (L.weierstrassP t) htr k
-  let Mx : IntermediateField ℚ ℂ := (IntermediateField.adjoin M {L.weierstrassP t}).restrictScalars ℚ
+  let Mx : IntermediateField ℚ ℂ :=
+    (IntermediateField.adjoin M {L.weierstrassP t}).restrictScalars ℚ
   have hMx : ∀ z ∈ M, z ∈ Mx := fun z hz =>
     (IntermediateField.adjoin M {L.weierstrassP t}).algebraMap_mem ⟨z, hz⟩
   have hxMx : L.weierstrassP t ∈ Mx := IntermediateField.mem_adjoin_simple_self M _
@@ -99,15 +107,14 @@ theorem wp_isAlgebraic (L : PeriodPair) (M : IntermediateField ℚ ℂ) (hg2 : L
   have hg3₂ : L.g₃ ∈ M₂ := hle (hMx _ hg3)
   have hx₂ : L.weierstrassP t ∈ M₂ := hle hxMx
   have hy₂ : L.derivWeierstrassP t ∈ M₂ := by
-    have hsq : L.derivWeierstrassP t ^ 2
-        = 4 * L.weierstrassP t ^ 3 - L.g₂ * L.weierstrassP t - L.g₃ := by
+    have hsq
+        : L.derivWeierstrassP t ^ 2
+          = 4 * L.weierstrassP t ^ 3 - L.g₂ * L.weierstrassP t - L.g₃ := by
       have e := L.derivWeierstrassP_sq t ht
       linear_combination e
     show L.derivWeierstrassP t ∈ algebraicClosure Mx ℂ
-    exact mem_algebraicClosure_iff.mpr (alg_of_sq hsq
-      (isAlgebraic_algebraMap (⟨_, hxMx⟩ : Mx))
-      (isAlgebraic_algebraMap (⟨_, hMx _ hg2⟩ : Mx))
-      (isAlgebraic_algebraMap (⟨_, hMx _ hg3⟩ : Mx)))
+    exact mem_algebraicClosure_iff.mpr (alg_of_sq hsq (isAlgebraic_algebraMap (⟨_, hxMx⟩ : Mx))
+      (isAlgebraic_algebraMap (⟨_, hMx _ hg2⟩ : Mx)) (isAlgebraic_algebraMap (⟨_, hMx _ hg3⟩ : Mx)))
   have hfix : ∀ z (hz : z ∈ M) (hz₂ : z ∈ M₂), ρ₂ ⟨z, hz₂⟩ = z := by
     intro z hz hz₂
     have e1 : (⟨z, hz₂⟩ : M₂) = IntermediateField.inclusion hle ⟨z, hMx z hz⟩ := rfl
@@ -119,8 +126,8 @@ theorem wp_isAlgebraic (L : PeriodPair) (M : IntermediateField ℚ ℂ) (hg2 : L
     exact hσ
   have hg2' : L.g₂ = ρ₂ ⟨_, hg2₂⟩ := (hfix _ hg2 hg2₂).symm
   have hg3' : L.g₃ = ρ₂ ⟨_, hg3₂⟩ := (hfix _ hg3 hg3₂).symm
-  obtain ⟨t₂, hst⟩ := st_exists (L := L) (L' := L) (M := M₂) (ρ := ρ₂) pOnto hg2₂ hg3₂ hg2' hg3' t
-    (Or.inr ⟨hx₂, hy₂⟩)
+  obtain ⟨t₂, hst⟩ :=
+    st_exists (L := L) (L' := L) (M := M₂) (ρ := ρ₂) pOnto hg2₂ hg3₂ hg2' hg3' t (Or.inr ⟨hx₂, hy₂⟩)
   have hn₂ := (st_mem_iff (st_nsmul addLaw dblLaw hg2₂ hg2' hst n)).mp hnt
   rcases hst with ⟨h1, -⟩ | ⟨-, h2, hx', hy', e1, -⟩
   · exact absurd h1 ht

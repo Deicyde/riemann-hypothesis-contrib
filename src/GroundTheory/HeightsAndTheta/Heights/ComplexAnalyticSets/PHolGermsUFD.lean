@@ -21,11 +21,13 @@ open Topology Filter Polynomial
 
 noncomputable section
 
-theorem coe_mkGerm {τ : Type} [Fintype τ] (f : (τ → ℂ) → ℂ) (hf : AnalyticAt ℂ f 0) :
-    ((mkGerm f hf : holGerms (0 : τ → ℂ)) : Germ (𝓝 (0 : τ → ℂ)) ℂ) = ↑f := rfl
+theorem coe_mkGerm {τ : Type} [Fintype τ] (f : (τ → ℂ) → ℂ) (hf : AnalyticAt ℂ f 0)
+    : ((mkGerm f hf : holGerms (0 : τ → ℂ)) : Germ (𝓝 (0 : τ → ℂ)) ℂ) = ↑f :=
+  rfl
 
-theorem isUnit_mkGerm {τ : Type} [Fintype τ] (e : (τ → ℂ) → ℂ) (he : AnalyticAt ℂ e 0) (he0 : e 0 ≠ 0) :
-    IsUnit (mkGerm e he) := by
+theorem isUnit_mkGerm
+    {τ : Type} [Fintype τ] (e : (τ → ℂ) → ℂ) (he : AnalyticAt ℂ e 0) (he0 : e 0 ≠ 0)
+    : IsUnit (mkGerm e he) := by
   refine IsUnit.of_mul_eq_one (mkGerm (fun x => (e x)⁻¹) (he.inv he0)) (Subtype.ext ?_)
   show ((fun x => e x * (e x)⁻¹ : (τ → ℂ) → ℂ) : Germ (𝓝 (0 : τ → ℂ)) ℂ) =
     ((fun _ => (1 : ℂ) : (τ → ℂ) → ℂ) : Germ (𝓝 (0 : τ → ℂ)) ℂ)
@@ -33,11 +35,12 @@ theorem isUnit_mkGerm {τ : Type} [Fintype τ] (e : (τ → ℂ) → ℂ) (he : 
     filter_upwards [he.continuousAt.eventually_ne he0] with x hx
     exact mul_inv_cancel₀ hx)
 
-theorem uniqueFactorizationMonoid_holGerms_option (hN : AnalyticGermsNoetherian.Statement)
-    (hG : GeneralLinearCoordinates.Statement) (hP : WeierstrassPreparation.Statement)
-    (hD : WeierstrassDivision.Statement) (σ : Type) [Fintype σ]
-    (hR : UniqueFactorizationMonoid (holGerms (0 : σ → ℂ))) :
-    UniqueFactorizationMonoid (holGerms (0 : Option σ → ℂ)) := by
+theorem uniqueFactorizationMonoid_holGerms_option
+    (hN : AnalyticGermsNoetherian.Statement) (hG : GeneralLinearCoordinates.Statement)
+    (hP : WeierstrassPreparation.Statement) (hD : WeierstrassDivision.Statement)
+    (σ : Type) [Fintype σ]
+    (hR : UniqueFactorizationMonoid (holGerms (0 : σ → ℂ)))
+    : UniqueFactorizationMonoid (holGerms (0 : Option σ → ℂ)) := by
   have := hN (Option σ) 0
   have := hR
   refine { irreducible_iff_prime := fun {φ} => ⟨fun hφ => ?_, Prime.irreducible⟩ }
@@ -79,16 +82,17 @@ theorem uniqueFactorizationMonoid_holGerms_option (hN : AnalyticGermsNoetherian.
   obtain ⟨g₀, hg₀, hg₀g⟩ := g.2
   obtain ⟨q, a, hq, ha, hdiv⟩ := hD σ d (f ∘ A) g₀ hfA hg₀ hAd
   refine ⟨mkGerm (q * e) (hq.mul he), finPoly fun j => mkGerm (a j) (ha j), Subtype.ext ?_⟩
-  rw [Subring.coe_add, Subring.coe_mul, polyToGerm_weierstrassPoly, polyToGerm_finPoly, coe_mkGerm, ← hg₀g,
-    ← Germ.coe_mul, ← Germ.coe_add]
+  rw [Subring.coe_add, Subring.coe_mul, polyToGerm_weierstrassPoly, polyToGerm_finPoly, coe_mkGerm,
+    ← hg₀g, ← Germ.coe_mul, ← Germ.coe_add]
   exact Germ.coe_eq.2 (by
     filter_upwards [hdiv, hfe] with x hx hx'
     simp only [Pi.add_apply, Pi.mul_apply]
     rw [hx, hx']
     ring)
 
-theorem HolGermsUFD.proof (hP : WeierstrassPreparation.Statement) (hD : WeierstrassDivision.Statement) :
-    HolGermsUFD.Statement := by
+theorem HolGermsUFD.proof
+    (hP : WeierstrassPreparation.Statement) (hD : WeierstrassDivision.Statement)
+    : HolGermsUFD.Statement := by
   have hG := GeneralLinearCoordinates.proof
   have hN := AnalyticGermsNoetherian.proof hD hG
   have hfin : ∀ n : ℕ, UniqueFactorizationMonoid (holGerms (0 : Fin n → ℂ)) := by
@@ -99,7 +103,7 @@ theorem HolGermsUFD.proof (hP : WeierstrassPreparation.Statement) (hD : Weierstr
       infer_instance
     | succ n ih =>
       exact (germAffineEquiv (LinearEquiv.funCongrLeft ℂ ℂ (finSuccEquiv n)).toContinuousLinearEquiv
-        (0 : Fin (n + 1) → ℂ)).symm.toMulEquiv.uniqueFactorizationMonoid
+          (0 : Fin (n + 1) → ℂ)).symm.toMulEquiv.uniqueFactorizationMonoid
         (uniqueFactorizationMonoid_holGerms_option hN hG hP hD (Fin n) ih)
   intro σ _ w
   exact (germAffineEquiv (LinearEquiv.funCongrLeft ℂ ℂ (Fintype.equivFin σ)).toContinuousLinearEquiv

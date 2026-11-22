@@ -13,37 +13,41 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric GlobalTheory.QCoh
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.FlagBundle
+  GlobalTheory.GoodMetric GlobalTheory.QCoh
 
 namespace GlobalTheory.FlagPush
 
-def IsPull {Z W : Scheme.{0}} [IsIntegral Z] [IsIntegral W] (q : Z ⟶ W) [IsDominant q] (D : CartierDiv Z)
-    (E : CartierDiv W) : Prop :=
+def IsPull
+    {Z W : Scheme.{0}} [IsIntegral Z] [IsIntegral W]
+    (q : Z ⟶ W) [IsDominant q]
+    (D : CartierDiv Z) (E : CartierDiv W)
+    : Prop :=
   ∀ y b, E.IsEqn y b → ∀ x, q x = y → D.IsEqn x (Units.map (functionFieldMap q).toMonoidHom b)
 
 variable {F : Type} [Field F]
 
 structure Dbl (Y : Var F) where
-
   Z : Scheme.{0}
   [integral : IsIntegral Z]
-
   p₁ : Z ⟶ Y.X
-
   p₂ : Z ⟶ Y.X
-
   δ : Y.X ⟶ Z
   str_eq : p₁ ≫ Y.str = p₂ ≫ Y.str
   proj : IsProjOver (p₁ ≫ Y.str)
   closed : IsClosedImmersion δ
   δ₁ : δ ≫ p₁ = 𝟙 _
   δ₂ : δ ≫ p₂ = 𝟙 _
-  diag : ∀ (K : Type) [Field K] (w : Sp K ⟶ Z), w ≫ p₁ = w ≫ p₂ → w (IsLocalRing.closedPoint K) ∈ Set.range δ
+  diag
+    : ∀ (K : Type) [Field K] (w : Sp K ⟶ Z),
+      w ≫ p₁ = w ≫ p₂ → w (IsLocalRing.closedPoint K) ∈ Set.range δ
 
 attribute [instance] Dbl.integral Dbl.closed
 
-theorem isDominant_of_section {Z W : Scheme.{0}} {p : Z ⟶ W} {s : W ⟶ Z} (h : s ≫ p = 𝟙 _) : IsDominant p :=
+theorem isDominant_of_section {Z W : Scheme.{0}} {p : Z ⟶ W} {s : W ⟶ Z} (h : s ≫ p = 𝟙 _)
+    : IsDominant p :=
   ⟨Function.Surjective.denseRange fun y => ⟨s y, by rw [← Scheme.Hom.comp_apply, h]; rfl⟩⟩
 
 namespace Dbl
@@ -95,21 +99,27 @@ def Dbl.prod (Y : Var F) : Dbl Y where
   closed := inferInstance
   δ₁ := pullback.diagonal_fst _
   δ₂ := pullback.diagonal_snd _
-  diag K _ w h := ⟨(w ≫ pullback.fst _ _) (IsLocalRing.closedPoint K), by
-    have e : (w ≫ pullback.fst _ _) ≫ pullback.diagonal Y.str = w := by
-      apply pullback.hom_ext <;> simp [h]
-    exact (Scheme.Hom.comp_apply _ _ _).symm.trans
-      (congrArg (fun u : Sp K ⟶ _ => u (IsLocalRing.closedPoint K)) e)⟩
+  diag K _ w h := ⟨
+    (w ≫ pullback.fst _ _) (IsLocalRing.closedPoint K),
+    by
+      have e : (w ≫ pullback.fst _ _) ≫ pullback.diagonal Y.str = w := by
+        apply pullback.hom_ext <;> simp [h]
+      exact (Scheme.Hom.comp_apply _ _ _).symm.trans
+        (congrArg (fun u : Sp K ⟶ _ => u (IsLocalRing.closedPoint K)) e)
+  ⟩
 
 theorem Dbl.prod_dim (Y : Var F) : topologicalKrullDim (Dbl.prod Y).Z = (Y.dim + Y.dim : ℕ) := by
   have h1 := smoothOfRelativeDimension_isStableUnderBaseChange.{0} Y.dim
   have : SmoothOfRelativeDimension Y.dim (pullback.fst Y.str Y.str) :=
     MorphismProperty.of_isPullback (P := @SmoothOfRelativeDimension Y.dim)
       (IsPullback.of_hasPullback Y.str Y.str).flip Y.smooth
-  have : SmoothOfRelativeDimension (Y.dim + Y.dim) (pullback.fst Y.str Y.str ≫ Y.str) := inferInstance
+  have : SmoothOfRelativeDimension (Y.dim + Y.dim) (pullback.fst Y.str Y.str ≫ Y.str) :=
+    inferInstance
   have := SmoothOfRelativeDimension.smooth Y.dim (pullback.fst Y.str Y.str)
-  have : GeometricallyConnected (pullback.fst Y.str Y.str ≫ Y.str) := GeometricallyConnected.comp _ _
-  obtain ⟨V, e, hd, -⟩ := Var.exists_iso (pullback.fst Y.str Y.str ≫ Y.str) (Y.dim + Y.dim) (Dbl.prod Y).proj
+  have : GeometricallyConnected (pullback.fst Y.str Y.str ≫ Y.str) :=
+    GeometricallyConnected.comp _ _
+  obtain ⟨V, e, hd, -⟩ :=
+    Var.exists_iso (pullback.fst Y.str Y.str ≫ Y.str) (Y.dim + Y.dim) (Dbl.prod Y).proj
   rw [← hd, ← V.topologicalKrullDim_eq]
   exact IsHomeomorph.topologicalKrullDim_eq _ e.hom.homeomorph.isHomeomorph
 
@@ -120,9 +130,15 @@ theorem Dbl.prod_small (Y : Var F) (h : Y.dim ≤ 1) : (Dbl.prod Y).Small := by
 
 theorem Dbl.prod_ne (Y : Var F) (h : 0 < Y.dim) : (Dbl.prod Y).p₁ ≠ (Dbl.prod Y).p₂ := fun e => by
   have e' : pullback.fst Y.str Y.str = pullback.snd Y.str Y.str := e
-  let i : pullback Y.str Y.str ≅ Y.X := ⟨pullback.fst _ _, pullback.diagonal Y.str,
-    by apply pullback.hom_ext <;> simp [← e'], pullback.diagonal_fst _⟩
-  have h2 := (IsHomeomorph.topologicalKrullDim_eq _ (Scheme.homeoOfIso i).isHomeomorph).trans Y.topologicalKrullDim_eq
+  let i : pullback Y.str Y.str ≅ Y.X := ⟨
+    pullback.fst _ _,
+    pullback.diagonal Y.str,
+    by apply pullback.hom_ext <;> simp [← e'],
+    pullback.diagonal_fst _
+  ⟩
+  have h2 :=
+    (IsHomeomorph.topologicalKrullDim_eq _ (Scheme.homeoOfIso i).isHomeomorph).trans
+      Y.topologicalKrullDim_eq
   have h3 := (Dbl.prod_dim Y).symm.trans h2
   have : Y.dim + Y.dim = Y.dim := by exact_mod_cast h3
   omega
@@ -130,18 +146,19 @@ theorem Dbl.prod_ne (Y : Var F) (h : 0 < Y.dim) : (Dbl.prod Y).p₁ ≠ (Dbl.pro
 end Square
 
 def GenPair (Y : Var F) {K : Type} [Field K] (ψ₁ ψ₂ : Y.Fn →+* K) : Prop :=
-  ψ₁.comp (algebraMap F Y.Fn) = ψ₂.comp (algebraMap F Y.Fn) ∧
-    ∃ (V : ValuationSubring K) (v₁ v₂ : Sp V ⟶ Y.X), spMap (algebraMap V K) ≫ v₁ = spMap ψ₁ ≫ (ratOf Y).pt ∧
-      spMap (algebraMap V K) ≫ v₂ = spMap ψ₂ ≫ (ratOf Y).pt ∧
-      spMap (IsLocalRing.residue V) ≫ v₁ = spMap (IsLocalRing.residue V) ≫ v₂ ∧
-      v₁ (IsLocalRing.closedPoint V) = genericPoint Y.X
+  ψ₁.comp (algebraMap F Y.Fn) = ψ₂.comp (algebraMap F Y.Fn)
+    ∧ ∃ (V : ValuationSubring K) (v₁ v₂ : Sp V ⟶ Y.X),
+      spMap (algebraMap V K) ≫ v₁ = spMap ψ₁ ≫ (ratOf Y).pt
+        ∧ spMap (algebraMap V K) ≫ v₂ = spMap ψ₂ ≫ (ratOf Y).pt
+        ∧ spMap (IsLocalRing.residue V) ≫ v₁ = spMap (IsLocalRing.residue V) ≫ v₂
+        ∧ v₁ (IsLocalRing.closedPoint V) = genericPoint Y.X
 
 variable {ι : Type} {m : ι → ℕ}
 
 def AlmostLow (τ : ι) (a b : Fin (m τ)) {K : Type} [Field K] (C : Mat m K) : Prop :=
-  (∀ σ, (C σ).det ≠ 0) ∧ C τ a b ≠ 0 ∧
-    ∀ σ (i j : Fin (m σ)), i < j → ¬ ((⟨σ, i⟩ : Root m) = ⟨τ, a⟩ ∧ (⟨σ, j⟩ : Root m) = ⟨τ, b⟩) → C σ i j = 0
-
+  (∀ σ, (C σ).det ≠ 0) ∧ C τ a b ≠ 0
+    ∧ ∀ σ (i j : Fin (m σ)),
+      i < j → ¬((⟨σ, i⟩ : Root m) = ⟨τ, a⟩ ∧ (⟨σ, j⟩ : Root m) = ⟨τ, b⟩) → C σ i j = 0
 
 open Classical in
 def shear (τ : ι) (a b : Fin (m τ)) {K : Type} [CommRing K] (t : K) : Mat m K := fun σ =>

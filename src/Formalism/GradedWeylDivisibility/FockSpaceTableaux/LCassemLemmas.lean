@@ -10,10 +10,12 @@ namespace Formalism.GradedWeylDivisibility
 
 open scoped MonomialOrder
 
-theorem lcassem_sub_lt {σ R : Type*} [CommRing R] (o : MonomialOrder σ) {f g : MvPolynomial σ R}
-    (hdeg : o.degree g = o.degree f) (hlc : o.leadingCoeff g = 1)
-    (hne : f - o.leadingCoeff f • g ≠ 0) :
-    o.degree (f - o.leadingCoeff f • g) ≺[o] o.degree f := by
+theorem lcassem_sub_lt
+    {σ R : Type*} [CommRing R]
+    (o : MonomialOrder σ)
+    {f g : MvPolynomial σ R} (hdeg : o.degree g = o.degree f) (hlc : o.leadingCoeff g = 1)
+    (hne : f - o.leadingCoeff f • g ≠ 0)
+    : o.degree (f - o.leadingCoeff f • g) ≺[o] o.degree f := by
   have hle : o.toSyn (o.degree (f - o.leadingCoeff f • g)) ≤ o.toSyn (o.degree f) := by
     refine (MonomialOrder.degree_sub_le (m := o)).trans (sup_le le_rfl ?_)
     rw [← hdeg]

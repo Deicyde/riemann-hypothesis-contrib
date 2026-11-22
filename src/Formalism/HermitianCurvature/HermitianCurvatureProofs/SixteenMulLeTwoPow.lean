@@ -112,11 +112,11 @@ namespace Formalism.FourierDecayAlt.P
 
 open Finset Formalism.FourierDecayAlt.Sz Formalism.FourierDecayAlt.P.Sz9
 
-
 set_option maxHeartbeats 1000000 in
-theorem sz_sizesMain_of (hCorA : CorA) (hBeta : BetaOnCut) (hAZ : AZeroBound)
-    (hIL : Interlacing) (hLA : LamAnti) (hTP : ThresholdProducts) (hTL : ThetaLower) (hThP : ThetaPower)
-    (hFS : FinalSmall) : SizesMain := by
+theorem sz_sizesMain_of
+    (hCorA : CorA) (hBeta : BetaOnCut) (hAZ : AZeroBound) (hIL : Interlacing) (hLA : LamAnti)
+    (hTP : ThresholdProducts) (hTL : ThetaLower) (hThP : ThetaPower) (hFS : FinalSmall)
+    : SizesMain := by
   intro CA C0 CG CDel cT Cb hCA hC0 hCG hCDel hcT hCb hcTCb
   have hc : 0 < cExp CDel cT Cb := by
     unfold cExp
@@ -125,7 +125,8 @@ theorem sz_sizesMain_of (hCorA : CorA) (hBeta : BetaOnCut) (hAZ : AZeroBound)
   obtain ⟨Ct, hCt⟩ : ∃ Ct : ℝ, Ct = 2 * C0 * Real.exp (1 / 4) := ⟨_, rfl⟩
   have hCt1 : 1 ≤ Ct := by
     have : 1 ≤ Real.exp (1 / 4) := Real.one_le_exp (by norm_num)
-    rw [hCt]; nlinarith
+    rw [hCt]
+    nlinarith
   obtain ⟨k1, hk1⟩ := hThP CA 160 Ct CDel cT Cb hCA (by norm_num) hCt1 hCDel hcT hCb hcTCb
   obtain ⟨k2, hk2⟩ := hFS CA (cExp CDel cT Cb) hCA hc
   refine ⟨max 7 (max k1 k2), ?_⟩
@@ -151,7 +152,8 @@ theorem sz_sizesMain_of (hCorA : CorA) (hBeta : BetaOnCut) (hAZ : AZeroBound)
     have h3 : ((G.k : ℝ) ^ (Cb / 2)) ^ 2 = (G.k : ℝ) ^ Cb := by
       rw [← Real.rpow_natCast, ← Real.rpow_mul (by positivity)]
       congr 1
-      push_cast; ring
+      push_cast
+      ring
     have h4 : ((G.k : ℝ) ^ (Cb / 2)) ^ 2 ≤ bb ^ 2 := by rw [h3]; exact h1.trans h2
     exact (pow_le_pow_iff_left₀ (by positivity) (by linarith) (by norm_num)).1 h4
   have hpw : 1 < bb ^ (cT * (G.m : ℝ)) := by
@@ -170,20 +172,18 @@ theorem sz_sizesMain_of (hCorA : CorA) (hBeta : BetaOnCut) (hAZ : AZeroBound)
     rw [sq]
     exact mul_le_mul hT hT' (by linarith) (by linarith)
   have hTTpos : (0 : ℝ) < (T : ℝ) * T' := mul_pos (by linarith) (by linarith)
-  have hNm : G.N = 10 * (G.m : ℝ) := by
-    unfold Glob.N Glob.m; push_cast; ring
+  have hNm : G.N = 10 * (G.m : ℝ) := by unfold Glob.N Glob.m; push_cast; ring
   have hN20 : 20 ≤ G.N := by
     unfold Glob.N
     have : (0 : ℝ) ≤ G.r := Nat.cast_nonneg _
     linarith
   have hN : 0 < G.N := by linarith
-  obtain ⟨hCpi, hmin⟩ := hk1 G.k G.m G.f bb G.N G.lenI G.Del ((T : ℝ) * T') hkk1 hm2 H.hmf H.hfk
-    hNm rfl hbbk H.hDel hTT
+  obtain ⟨hCpi, hmin⟩ :=
+    hk1 G.k G.m G.f bb G.N G.lenI G.Del ((T : ℝ) * T') hkk1 hm2 H.hmf H.hfk hNm rfl hbbk H.hDel hTT
   have hkc1 : 1 ≤ (G.k : ℝ) ^ cExp CDel cT Cb := Real.one_le_rpow (by linarith) hc.le
 
   have hDelBig : 160 ^ 2 * ((G.k : ℝ) * G.N ^ 3) ≤ G.Del := by
-    have h1 : (G.k : ℝ) ^ cExp CDel cT Cb ≤
-        Real.sqrt (G.Del / (G.k * G.N ^ 3)) / (Ct * CA * 160) :=
+    have h1 : (G.k : ℝ) ^ cExp CDel cT Cb ≤ Real.sqrt (G.Del / (G.k * G.N ^ 3)) / (Ct * CA * 160) :=
       le_trans hmin (le_trans (min_le_left _ _) (min_le_left _ _))
     have hpos : 0 < Ct * CA * 160 := by positivity
     have h2 : Ct * CA * 160 ≤ Real.sqrt (G.Del / (G.k * G.N ^ 3)) := by
@@ -212,11 +212,11 @@ theorem sz_sizesMain_of (hCorA : CorA) (hBeta : BetaOnCut) (hAZ : AZeroBound)
   have hg2N : 4 ≤ G.g2 := by exact_mod_cast hg2R
   have hg16 : 16 ≤ G.g := by
     have := mul_le_mul hg1R hg2R (by norm_num) (by linarith)
-    unfold Glob.g; linarith
+    unfold Glob.g
+    linarith
   have h2pig : 2 * Real.pi ≤ G.g := by linarith [Real.pi_le_four]
   have hgpos : 0 < G.g := by linarith
-  have hka : G.ka = 2 * Real.pi / (2 * G.v) := by
-    unfold Glob.ka; field_simp
+  have hka : G.ka = 2 * Real.pi / (2 * G.v) := by unfold Glob.ka; field_simp
   have hkapos : 0 < G.ka := by unfold Glob.ka; positivity
   have hkapi : G.ka ≤ Real.pi := by
     unfold Glob.ka
@@ -241,16 +241,32 @@ theorem sz_sizesMain_of (hCorA : CorA) (hBeta : BetaOnCut) (hAZ : AZeroBound)
 
   have hsm := small_f G.f G.k H.hfk hk7
   have hlogbb : 0 ≤ Real.log bb := Real.log_nonneg hbb.le
-  have hOkS : (G.size de T du).Ok :=
-    ⟨(by omega : 1 ≤ G.k), (by linarith : 0 < G.v), H.hdF, (by omega : 2 ≤ G.g1),
-      (by omega : 2 ≤ G.g2), hT2, H.hvol, hVu⟩
-  have hOkS' : (G.size de' T' du').Ok :=
-    ⟨(by omega : 1 ≤ G.k), (by linarith : 0 < G.v), H.hdF, (by omega : 2 ≤ G.g1),
-      (by omega : 2 ≤ G.g2), hT2', H.hvol, hVu'⟩
-  have hA := hCorA ι (G.size de T du) C0 CG C' (Real.log bb) hOkS hMR hLB hCC hdsig
-    (by omega : 2 ≤ G.k) hg1N hg2N hC0 hCG hlogbb hC' hkbig hsm hCh
-  have hA' := hCorA ι (G.size de' T' du') C0 CG C' (Real.log bb) hOkS' hMR hLB hCC' hdsig
-    (by omega : 2 ≤ G.k) hg1N hg2N hC0 hCG hlogbb hC' hkbig hsm hCh'
+  have hOkS : (G.size de T du).Ok := ⟨
+    (by omega : 1 ≤ G.k),
+    (by linarith : 0 < G.v),
+    H.hdF,
+    (by omega : 2 ≤ G.g1),
+    (by omega : 2 ≤ G.g2),
+    hT2,
+    H.hvol,
+    hVu
+  ⟩
+  have hOkS' : (G.size de' T' du').Ok := ⟨
+    (by omega : 1 ≤ G.k),
+    (by linarith : 0 < G.v),
+    H.hdF,
+    (by omega : 2 ≤ G.g1),
+    (by omega : 2 ≤ G.g2),
+    hT2',
+    H.hvol,
+    hVu'
+  ⟩
+  have hA :=
+    hCorA ι (G.size de T du) C0 CG C' (Real.log bb) hOkS hMR hLB hCC hdsig (by omega : 2 ≤ G.k) hg1N
+      hg2N hC0 hCG hlogbb hC' hkbig hsm hCh
+  have hA' :=
+    hCorA ι (G.size de' T' du') C0 CG C' (Real.log bb) hOkS' hMR hLB hCC' hdsig (by omega : 2 ≤ G.k)
+      hg1N hg2N hC0 hCG hlogbb hC' hkbig hsm hCh'
   have hP : ∏ w, ((G.size de T du).Tcrit w / (T : ℝ)) ≤ Ct := by
     rw [hCt]; exact le_trans hA.2.1 hA.2.2
   have hP' : ∏ w, ((G.size de' T' du').Tcrit w / (T' : ℝ)) ≤ Ct := by
@@ -259,12 +275,15 @@ theorem sz_sizesMain_of (hCorA : CorA) (hBeta : BetaOnCut) (hAZ : AZeroBound)
     tcrit_nonneg _ _ _ _ _ _ _ hkapos (by show 0 < 2 * G.v; linarith) hgpos (hVV w) (hVu w)
   have hTc' : ∀ w, 0 ≤ (G.size de' T' du').Tcrit w := fun w =>
     tcrit_nonneg _ _ _ _ _ _ _ hkapos (by show 0 < 2 * G.v; linarith) hgpos (hVV w) (hVu' w)
-  obtain ⟨t, ht⟩ : ∃ t : ι → ℝ, t = fun w =>
-      tv (G.place w) de de' G.ka (2 * G.v) G.g ((G.size de T du).VV w) T T' := ⟨_, rfl⟩
-  have ht0 : ∀ w, 0 ≤ t w := by
-    intro w; rw [ht]; exact Real.sqrt_nonneg _
-  have htsq : ∀ w, t w ^ 2 =
-      ((G.size de T du).Tcrit w / (T : ℝ)) * ((G.size de' T' du').Tcrit w / (T' : ℝ)) := by
+  obtain ⟨t, ht⟩
+      : ∃ t : ι → ℝ,
+        t = fun w => tv (G.place w) de de' G.ka (2 * G.v) G.g ((G.size de T du).VV w) T T' :=
+    ⟨_, rfl⟩
+  have ht0 : ∀ w, 0 ≤ t w := by intro w; rw [ht]; exact Real.sqrt_nonneg _
+  have htsq
+      : ∀ w,
+        t w ^ 2
+          = ((G.size de T du).Tcrit w / (T : ℝ)) * ((G.size de' T' du').Tcrit w / (T' : ℝ)) := by
     intro w
     rw [ht]
     show (Real.sqrt ((G.size de T du).Tcrit w * (G.size de' T' du').Tcrit w /
@@ -277,18 +296,24 @@ theorem sz_sizesMain_of (hCorA : CorA) (hBeta : BetaOnCut) (hAZ : AZeroBound)
       exact prod_nonneg fun w _ => div_nonneg (hTc' w) (by linarith)
     exact (pow_le_pow_iff_left₀ (prod_nonneg fun w _ => ht0 w) (by linarith) (by norm_num)).1 h1
 
-  have hbd : ∀ (w : ι) (D : ℝ), D ≤ G.Del / 2 → ∀ Y : ℝ, 5 / 2 ≤ (G.place w).v l + Y →
-      (G.place w).v l + Y ≤ D →
-      0 ≤ G.g ^ G.m * (G.place w).be G.ka de de' T T' Y ∧
-        G.g ^ G.m * (G.place w).be G.ka de de' T T' Y ≤
-          160 * t w * Real.sqrt G.k * Real.sqrt (D / G.Del) := by
+  have hbd
+      : ∀ (w : ι) (D : ℝ),
+        D ≤ G.Del / 2
+          → ∀ Y : ℝ,
+            5 / 2 ≤ (G.place w).v l + Y → (G.place w).v l + Y ≤ D
+              → 0 ≤ G.g ^ G.m * (G.place w).be G.ka de de' T T' Y
+                ∧ G.g ^ G.m * (G.place w).be G.ka de de' T T' Y
+                  ≤ 160 * t w * Real.sqrt G.k * Real.sqrt (D / G.Del) := by
     intro w D hD Y hY1 hY2
     rw [ht]
-    exact beta_bound hBeta hAZ (G.place w) G.r bb de de' G.ka (2 * G.v) G.g
-      ((G.size de T du).VV w) T T' l (H.hplace w) rfl (H.hsmall w) hde hde' (by linarith) hka h2pig
-      (hFD w) (by linarith) (by linarith) hl1 hl2 hdl D hD Y hY1 hY2
-  have hB1 : ∀ w, 0 ≤ G.cutSupLong de de' T T' l w ∧ G.cutSupLong de de' T T' l w ≤
-      160 * t w * Real.sqrt G.k * Real.sqrt (G.N ^ 3 / G.Del) := by
+    exact beta_bound hBeta hAZ (G.place w) G.r bb de de' G.ka (2 * G.v) G.g ((G.size de T du).VV w)
+      T T' l (H.hplace w) rfl (H.hsmall w) hde hde' (by linarith) hka h2pig (hFD w) (by linarith)
+      (by linarith) hl1 hl2 hdl D hD Y hY1 hY2
+  have hB1
+      : ∀ w,
+        0 ≤ G.cutSupLong de de' T T' l w
+          ∧ G.cutSupLong de de' T T' l w
+            ≤ 160 * t w * Real.sqrt G.k * Real.sqrt (G.N ^ 3 / G.Del) := by
     intro w
     unfold Glob.cutSupLong
     constructor
@@ -300,12 +325,13 @@ theorem sz_sizesMain_of (hCorA : CorA) (hBeta : BetaOnCut) (hAZ : AZeroBound)
         exact (hbd w _ hN3Del Y hY1 hY2).2
       · have := ht0 w
         positivity
-  have hB : ∀ w, 0 ≤ G.supI de de' T T' l w ∧ G.supI de de' T T' l w ≤
-      160 * t w * Real.sqrt G.k := by
+  have hB
+      : ∀ w, 0 ≤ G.supI de de' T T' l w ∧ G.supI de de' T T' l w ≤ 160 * t w * Real.sqrt G.k := by
     intro w
     have hs1 : Real.sqrt (G.Del / 2 / G.Del) ≤ 1 := by
       apply Real.sqrt_le_one.2
-      rw [div_le_one hDelpos]; linarith
+      rw [div_le_one hDelpos]
+      linarith
     have h0 : 0 ≤ 160 * t w * Real.sqrt G.k := by
       have := ht0 w
       positivity
@@ -319,9 +345,10 @@ theorem sz_sizesMain_of (hCorA : CorA) (hBeta : BetaOnCut) (hAZ : AZeroBound)
         exact le_trans (hbd w _ le_rfl Y hY1 hY2).2 (mul_le_of_le_one_right h0 hs1)
       · exact h0
 
-  have key := fun i s : ℕ => hTP ι t (G.cutSupLong de de' T T' l) (G.supI de de' T T' l) G.k CA 160 Ct
-    G.ka G.N G.lenI G.g G.Del ((T : ℝ) * T') i s hCA (by norm_num) (by linarith) hkapos hkapi hN hI
-    (by linarith) hDelpos hTTpos hCpi ht0 htprod hB1 hB
+  have key := fun i s : ℕ =>
+    hTP ι t (G.cutSupLong de de' T T' l) (G.supI de de' T T' l) G.k CA 160 Ct G.ka G.N G.lenI G.g
+      G.Del ((T : ℝ) * T') i s hCA (by norm_num) (by linarith) hkapos hkapi hN hI (by linarith)
+      hDelpos hTTpos hCpi ht0 htprod hB1 hB
   have hTheta : (G.k : ℝ) ^ cExp CDel cT Cb ≤ Th := by
     refine le_trans hmin ?_
     apply hTL G.f G.k CA 160 Ct G.N G.lenI G.Del ((T : ℝ) * T') Th (by omega) (by omega) hCA
@@ -337,7 +364,7 @@ theorem sz_sizesMain_of (hCorA : CorA) (hBeta : BetaOnCut) (hAZ : AZeroBound)
   exact hk2 G.k G.r G.f bb Cf Th hkk2 H.hmf hbb.le h16 hCf hTheta
 
 theorem size_bounds_conclusion : Formalism.FourierDecayAlt.Sz.SizesMain :=
-  sz_sizesMain_of corollary_a_of_proposition_a beta_bound_on_boundary a_zero_le_one_sixty interlacing
-    lamStrictAnti threshold_products theta_lower_bound theta_power_bound final_smallness
+  sz_sizesMain_of corollary_a_of_proposition_a beta_bound_on_boundary a_zero_le_one_sixty
+    interlacing lamStrictAnti threshold_products theta_lower_bound theta_power_bound final_smallness
 
 end Formalism.FourierDecayAlt.P

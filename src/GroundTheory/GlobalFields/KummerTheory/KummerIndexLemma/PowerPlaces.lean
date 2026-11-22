@@ -21,64 +21,62 @@ section Radical
 
 variable (K : Type*) [Field K] (p : ℕ)
 
-def radicalGroup (y : Kˣ) : Subgroup Kˣ :=
-  Subgroup.zpowers y ⊔ unitsPow K p
+def radicalGroup (y : Kˣ) : Subgroup Kˣ := Subgroup.zpowers y ⊔ unitsPow K p
 
 variable {K p}
 
-theorem unitsPow_le_radicalGroup (y : Kˣ) : unitsPow K p ≤ radicalGroup K p y :=
-  le_sup_right
+theorem unitsPow_le_radicalGroup (y : Kˣ) : unitsPow K p ≤ radicalGroup K p y := le_sup_right
 
 theorem mem_radicalGroup_self (y : Kˣ) : y ∈ radicalGroup K p y :=
   le_sup_left (a := Subgroup.zpowers y) (Subgroup.mem_zpowers y)
 
-theorem radicalGroup_le {y : Kˣ} {H : Subgroup Kˣ} (hy : y ∈ H) (hH : unitsPow K p ≤ H) :
-    radicalGroup K p y ≤ H :=
+theorem radicalGroup_le {y : Kˣ} {H : Subgroup Kˣ} (hy : y ∈ H) (hH : unitsPow K p ≤ H)
+    : radicalGroup K p y ≤ H :=
   sup_le ((Subgroup.zpowers_le).2 hy) hH
 
-theorem radicalClasses_radicalGroup (y : Kˣ) :
-    radicalClasses K p (radicalGroup K p y) =
-      Subgroup.zpowers (QuotientGroup.mk' (unitsPow K p) y) := by
+theorem radicalClasses_radicalGroup (y : Kˣ)
+    : radicalClasses K p (radicalGroup K p y)
+      = Subgroup.zpowers (QuotientGroup.mk' (unitsPow K p) y) := by
   rw [radicalClasses, radicalGroup, Subgroup.map_sup, MonoidHom.map_zpowers,
     QuotientGroup.map_mk'_self, sup_bot_eq]
 
-theorem natCard_radicalQuotient (y : Kˣ) :
-    Nat.card (radicalGroup K p y ⧸ (unitsPow K p).subgroupOf (radicalGroup K p y)) =
-      orderOf (QuotientGroup.mk' (unitsPow K p) y) := by
+theorem natCard_radicalQuotient (y : Kˣ)
+    : Nat.card (radicalGroup K p y ⧸ (unitsPow K p).subgroupOf (radicalGroup K p y))
+      = orderOf (QuotientGroup.mk' (unitsPow K p) y) := by
   rw [Nat.card_congr (radicalQuotientEquiv K p _).toEquiv, radicalClasses_radicalGroup,
     Nat.card_zpowers]
 
-instance finite_radicalQuotient [NeZero p] (y : Kˣ) :
-    Finite (radicalGroup K p y ⧸ (unitsPow K p).subgroupOf (radicalGroup K p y)) := by
+instance finite_radicalQuotient [NeZero p] (y : Kˣ)
+    : Finite (radicalGroup K p y ⧸ (unitsPow K p).subgroupOf (radicalGroup K p y)) := by
   apply Nat.finite_of_card_ne_zero
   rw [natCard_radicalQuotient]
   exact (orderOf_pos_iff.2 (isOfFinOrder_iff_pow_eq_one.2
     ⟨p, NeZero.pos p, UnitsModPow.pow_eq_one _ _ _⟩)).ne'
 
-theorem natCard_radicalQuotient_of_not_mem [Fact p.Prime] {y : Kˣ} (hy : y ∉ unitsPow K p) :
-    Nat.card (radicalGroup K p y ⧸ (unitsPow K p).subgroupOf (radicalGroup K p y)) = p := by
+theorem natCard_radicalQuotient_of_not_mem [Fact p.Prime] {y : Kˣ} (hy : y ∉ unitsPow K p)
+    : Nat.card (radicalGroup K p y ⧸ (unitsPow K p).subgroupOf (radicalGroup K p y)) = p := by
   rw [natCard_radicalQuotient]
   refine orderOf_eq_prime (UnitsModPow.pow_eq_one _ _ _) ?_
   rwa [ne_eq, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
 
-variable [Fact p.Prime] [HasEnoughRootsOfUnity K p] (Ω : Type*) [Field Ω] [Algebra K Ω]
-  [IsSepClosed Ω]
+variable
+  [Fact p.Prime] [HasEnoughRootsOfUnity K p] (Ω : Type*) [Field Ω] [Algebra K Ω] [IsSepClosed Ω]
 
-theorem finrank_kummerExtension_radicalGroup {y : Kˣ} (hy : y ∉ unitsPow K p) :
-    finrank K (kummerExtension K p Ω (radicalGroup K p y)) = p := by
+theorem finrank_kummerExtension_radicalGroup {y : Kˣ} (hy : y ∉ unitsPow K p)
+    : finrank K (kummerExtension K p Ω (radicalGroup K p y)) = p := by
   rw [finrank_kummerExtension, natCard_radicalQuotient_of_not_mem hy]
 
-theorem isCyclic_kummerExtension_radicalGroup {y : Kˣ} (hy : y ∉ unitsPow K p) :
-    IsCyclic Gal(kummerExtension K p Ω (radicalGroup K p y)/K) :=
-  isCyclic_of_prime_card (p := p) (by
-    rw [IsGalois.card_aut_eq_finrank, finrank_kummerExtension_radicalGroup Ω hy])
+theorem isCyclic_kummerExtension_radicalGroup {y : Kˣ} (hy : y ∉ unitsPow K p)
+    : IsCyclic Gal(kummerExtension K p Ω (radicalGroup K p y)/K) :=
+  isCyclic_of_prime_card (p := p)
+    (by rw [IsGalois.card_aut_eq_finrank, finrank_kummerExtension_radicalGroup Ω hy])
 
-theorem unitsPowIn_kummerExtension_radicalGroup (y : Kˣ) :
-    unitsPowIn K p (kummerExtension K p Ω (radicalGroup K p y)) = radicalGroup K p y :=
+theorem unitsPowIn_kummerExtension_radicalGroup (y : Kˣ)
+    : unitsPowIn K p (kummerExtension K p Ω (radicalGroup K p y)) = radicalGroup K p y :=
   unitsPowIn_kummerExtension K p Ω _ (unitsPow_le_radicalGroup y)
 
-theorem exists_pow_eq_kummerExtension_radicalGroup (y : Kˣ) :
-    ∃ α : kummerExtension K p Ω (radicalGroup K p y), α ^ p = algebraMap K _ (y : K) := by
+theorem exists_pow_eq_kummerExtension_radicalGroup (y : Kˣ)
+    : ∃ α : kummerExtension K p Ω (radicalGroup K p y), α ^ p = algebraMap K _ (y : K) := by
   have h := mem_radicalGroup_self (p := p) y
   rw [← unitsPowIn_kummerExtension_radicalGroup Ω y] at h
   exact mem_unitsPowIn.1 h
@@ -94,19 +92,18 @@ universe u
 variable {K : Type u} [Field K] [NumberField K] {p : ℕ} [Fact p.Prime] [HasEnoughRootsOfUnity K p]
 
 theorem _root_.GroundTheory.Global.FirstInequality.exists_place_mem_unitsPowIn_not_mem
-    (hFI : FirstInequality.{u}) {a x : Kˣ} (hx : x ∉ radicalGroup K p a)
-    {S : Set (HeightOneSpectrum (𝓞 K))} (hS : S.Finite)
-    (hpS : ∀ v, (p : 𝓞 K) ∈ v.asIdeal → v ∈ S)
-    (haS : ∀ v ∉ S, v.valuation K (a : K) = 1) (hxS : ∀ v ∉ S, v.valuation K (x : K) = 1) :
-    ∃ v ∉ S, a ∈ unitsPowIn K p (v.adicCompletion K) ∧
-      x ∉ unitsPowIn K p (v.adicCompletion K) := by
+    (hFI : FirstInequality.{u})
+    {a x : Kˣ} (hx : x ∉ radicalGroup K p a)
+    {S : Set (HeightOneSpectrum (𝓞 K))} (hS : S.Finite) (hpS : ∀ v, (p : 𝓞 K) ∈ v.asIdeal → v ∈ S)
+    (haS : ∀ v ∉ S, v.valuation K (a : K) = 1) (hxS : ∀ v ∉ S, v.valuation K (x : K) = 1)
+    : ∃ v ∉ S,
+      a ∈ unitsPowIn K p (v.adicCompletion K) ∧ x ∉ unitsPowIn K p (v.adicCompletion K) := by
   classical
   by_contra hcon
   simp only [not_exists, not_and, not_not] at hcon
   let Ω := AlgebraicClosure K
   let L := kummerExtension K p Ω (radicalGroup K p a)
-  have hL : unitsPowIn K p L = radicalGroup K p a :=
-    unitsPowIn_kummerExtension_radicalGroup Ω a
+  have hL : unitsPowIn K p L = radicalGroup K p a := unitsPowIn_kummerExtension_radicalGroup Ω a
   obtain ⟨α, hα⟩ := exists_pow_eq_kummerExtension_radicalGroup (p := p) Ω a
   have : HasEnoughRootsOfUnity L p := hasEnoughRootsOfUnity_of_ringHom (algebraMap K L) p
   let xL : Lˣ := Units.map (algebraMap K L : K →* L) x
@@ -139,8 +136,9 @@ theorem _root_.GroundTheory.Global.FirstInequality.exists_place_mem_unitsPowIn_n
     apply Units.ext
     simp only [ιv, ιK, κ, Units.coe_map, MonoidHom.coe_coe]
     exact (IsScalarTower.algebraMap_apply K (v.adicCompletion K) (w.adicCompletion L) _).symm
-  have hxLw : ((ιK x : (w.adicCompletion L)ˣ) : w.adicCompletion L) =
-      algebraMap L (w.adicCompletion L) (xL : L) := by
+  have hxLw
+      : ((ιK x : (w.adicCompletion L)ˣ) : w.adicCompletion L)
+        = algebraMap L (w.adicCompletion L) (xL : L) := by
     simp only [ιK, xL, Units.coe_map, MonoidHom.coe_coe]
     exact IsScalarTower.algebraMap_apply K L (w.adicCompletion L) _
   suffices h : ιK x ∈ unitsPow (w.adicCompletion L) p by
@@ -153,8 +151,9 @@ theorem _root_.GroundTheory.Global.FirstInequality.exists_place_mem_unitsPowIn_n
     rw [← map_pow, hb]
     exact hικ x
   · have ha' : κ a ∉ unitsPow (v.adicCompletion K) p := fun h ↦ ha (Subgroup.mem_comap.2 h)
-    obtain ⟨k, hk⟩ := exists_mul_zpow_inv_mem_unitsPow v p hpv
-      (units_map_mem_localUnits v (haS v hw)) (units_map_mem_localUnits v (hxS v hw)) ha'
+    obtain ⟨k, hk⟩ :=
+      exists_mul_zpow_inv_mem_unitsPow v p hpv (units_map_mem_localUnits v (haS v hw))
+        (units_map_mem_localUnits v (hxS v hw)) ha'
     obtain ⟨b, hb⟩ := mem_unitsPow.1 hk
     have hα0 : algebraMap L (w.adicCompletion L) (α : L) ≠ 0 := by
       rw [ne_eq, map_eq_zero]

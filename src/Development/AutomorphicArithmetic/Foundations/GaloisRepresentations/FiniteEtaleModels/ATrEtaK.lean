@@ -6,16 +6,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsIntIntCast
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
 open UpperTheory.Gal.Int.Geo
 open UpperTheory.Gal.G3 (sp)
 open GlobalTheory.UPel.HT.HeckeAd (IsTranslA heckeSubA)
 open scoped TensorProduct
 open UpperTheory.Gal.FiniteEtaleModels
 
-theorem UpperTheory.Gal.FiniteEtaleModels.trEtaK_holds :
-    TrEtaK := by
+theorem UpperTheory.Gal.FiniteEtaleModels.trEtaK_holds : TrEtaK := by
   intro p _ D G L R _ _ gb h X s M₁ M₂ o' o ψ hT n κ c₁ c₂ hM1 hM2 x y hxy
   obtain ⟨v, hv, hxv⟩ := hxy
   haveI : IsMonHom ψ := hT.1
@@ -56,7 +58,8 @@ theorem UpperTheory.Gal.FiniteEtaleModels.trEtaK_holds :
   have hpow : (a * b⁻¹) ^ ((M₁ : ℕ) * (M₂ : ℕ)) = 1 := by
     rw [mul_pow, _root_.inv_pow, _root_.pow_mul, haN, _root_.mul_comm (M₁ : ℕ), _root_.pow_mul, hbN,
       _root_.one_pow, _root_.one_pow, inv_one, _root_.mul_one]
-  have := GlobalTheory.TorsGeomPow.pow_eq_one_of_geometric_points X o.A o.ab _ hunit _ (a * b⁻¹) hpow 1 ?_
+  have :=
+    GlobalTheory.TorsGeomPow.pow_eq_one_of_geometric_points X o.A o.ab _ hunit _ (a * b⁻¹) hpow 1 ?_
   · simpa using this
   intro k _ _ ξ
   rw [_root_.pow_one, MonObj.comp_mul, GrpObj.comp_inv, _root_.mul_inv_eq_one]
@@ -65,7 +68,8 @@ theorem UpperTheory.Gal.FiniteEtaleModels.trEtaK_holds :
   obtain ⟨I', I'', h1, h2, hev⟩ := hT.2.2.2.2 k (ξ ≫ (𝟙_ (Over X)).hom) β hβ
   have e1 : I'.ev (M₁ : ℕ) (c₁ • x) = I'.ev (n * κ) x :=
     (KerBy.ev_nsmul _ (I'.add _) c₁ x).trans
-      ((congrArg (fun m => I'.ev m x ^ c₁) hM1).trans (I'.tower (n * κ) c₁ (Nat.mul_pos hn0 hκ0) hc10 x))
+      ((congrArg (fun m => I'.ev m x ^ c₁) hM1).trans
+        (I'.tower (n * κ) c₁ (Nat.mul_pos hn0 hκ0) hc10 x))
   have e2 : I''.ev (M₂ : ℕ) (c₂ • y) = I''.ev n y :=
     (KerBy.ev_nsmul _ (I''.add _) c₂ y).trans
       ((congrArg (fun m => I''.ev m y ^ c₂) hM2).trans (I''.tower n c₂ hn0 hc20 y))

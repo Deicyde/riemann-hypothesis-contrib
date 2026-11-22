@@ -6,12 +6,19 @@ public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerPr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.Published.SiegelOneVector GlobalTheory.CompanionTheory.Hypotheses₂.OneV
+open NumberField IsDedekindDomain MeasureTheory
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.Published.SiegelOneVector
+  GlobalTheory.CompanionTheory.Hypotheses₂.OneV
 open scoped TensorProduct ENNReal NNReal Topology
 
 namespace GlobalTheory.CompanionTheory.HaarScale
 
-theorem unit_mul_map_haar : ∀ (F : Type) [Field F] [NumberField F] (e : Ainf F ≃+* (InfinitePlace F → ℝ)), IsHomeomorph e → ∀ (lam : Measure (Ainf F)), lam.IsAddHaarMeasure → ∀ t : Ainf F, IsUnit t → lam.map (fun y => t * y) = (∏ w, ‖e t w‖₊)⁻¹ • lam := by
+theorem unit_mul_map_haar
+    : ∀ (F : Type) [Field F] [NumberField F] (e : Ainf F ≃+* (InfinitePlace F → ℝ)),
+      IsHomeomorph e
+        → ∀ (lam : Measure (Ainf F)),
+          lam.IsAddHaarMeasure
+            → ∀ t : Ainf F, IsUnit t → lam.map (fun y => t * y) = (∏ w, ‖e t w‖₊)⁻¹ • lam := by
   intro F _ _ e he lam hlam t ht
   classical
   haveI : BorelSpace (Ainf F) := ⟨rfl⟩
@@ -22,12 +29,12 @@ theorem unit_mul_map_haar : ∀ (F : Type) [Field F] [NumberField F] (e : Ainf F
       funext y
       have h1 : e (h.symm y) = y := h.apply_symm_apply y
       exact e.symm_apply_eq.2 h1.symm
-    rw [this]; exact h.symm.continuous
+    rw [this]
+    exact h.symm.continuous
   have hm : Measurable e := hc.measurable
   have hms : Measurable e.symm := hcs.measurable
   have hmul : Measurable (fun y : Ainf F => t * y) := by
-    have : (fun y : Ainf F => t * y) = fun y => e.symm (e t * e y) := by
-      funext y; simp
+    have : (fun y : Ainf F => t * y) = fun y => e.symm (e t * e y) := by funext y; simp
     rw [this]
     exact hcs.measurable.comp (hm.const_mul _)
   obtain ⟨D, hD⟩ : ∃ D : InfinitePlace F → ℝ, D = e t := ⟨_, rfl⟩
@@ -45,10 +52,8 @@ theorem unit_mul_map_haar : ∀ (F : Type) [Field F] [NumberField F] (e : Ainf F
   have hL : ∀ x, L x = D * x := fun x => by
     funext w
     simp [L, Matrix.toLin'_apply, Matrix.mulVec_diagonal]
-  have hdet : LinearMap.det L = ∏ w, D w := by
-    simp [L, LinearMap.det_toLin', Matrix.det_diagonal]
-  have hdet0 : LinearMap.det L ≠ 0 := by
-    rw [hdet]; exact Finset.prod_ne_zero_iff.2 fun w _ => hD0 w
+  have hdet : LinearMap.det L = ∏ w, D w := by simp [L, LinearMap.det_toLin', Matrix.det_diagonal]
+  have hdet0 : LinearMap.det L ≠ 0 := by rw [hdet]; exact Finset.prod_ne_zero_iff.2 fun w _ => hD0 w
   have hscale := Measure.map_linearMap_addHaar_eq_smul_addHaar (μ := lam.map e) hdet0
   have hconst : ENNReal.ofReal |(LinearMap.det L)⁻¹| = (((∏ w, ‖e t w‖₊)⁻¹ : ℝ≥0) : ℝ≥0∞) := by
     have : |(LinearMap.det L)⁻¹| = (((∏ w, ‖e t w‖₊)⁻¹ : ℝ≥0) : ℝ) := by

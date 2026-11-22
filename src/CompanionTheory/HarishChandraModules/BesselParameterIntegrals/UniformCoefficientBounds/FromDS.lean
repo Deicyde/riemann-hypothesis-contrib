@@ -47,13 +47,17 @@ theorem thrStar_le {n : ℕ} (hn : 1 ≤ n) (ε : Fin n → Bool) : thrStar ε �
     have h5 : 16 * (n : ℝ) * S7.q0 ε ≤ 16 * n * n := by gcongr
     nlinarith
 
-theorem dsigW_SK {k r : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (σ : Mx k r → (H →L[ℂ] H)) : ∀ (W : List (Mx k r)) (v : H),
-    Formalism.MainNotions.S.dsigW (k := k) (r := r) σ W v = PI.UpqRep.dsigW (k := k) (r := r) σ W v
+theorem dsigW_SK
+    {k r : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] (σ : Mx k r → (H →L[ℂ] H))
+    : ∀ (W : List (Mx k r)) (v : H),
+      Formalism.MainNotions.S.dsigW (k := k) (r := r) σ W v
+        = PI.UpqRep.dsigW (k := k) (r := r) σ W v
   | [], _ => rfl
   | X :: W, v => by
-    change Formalism.MainNotions.S.dsig σ X (Formalism.MainNotions.S.dsigW σ W v) = PI.UpqRep.dsig σ X (PI.UpqRep.dsigW σ W v)
-    rw [dsigW_SK σ W v]; rfl
+    change Formalism.MainNotions.S.dsig σ X (Formalism.MainNotions.S.dsigW σ W v)
+      = PI.UpqRep.dsig σ X (PI.UpqRep.dsigW σ W v)
+    rw [dsigW_SK σ W v]
+    rfl
 
 theorem decay_infinite_range : DecInf := by
   intro k r ε lam h H _ _ _ σ hlam hσ hgap hok v0 hv0
@@ -74,9 +78,10 @@ theorem decay_infinite_range : DecInf := by
   have h1 := hC w hw v0 hv0s x hx
   simp only [dsigW_SK] at h1
   set M := (Ws.map fun W => ‖PI.UpqRep.dsigW (k := k) (r := r) σ W w‖).sum
-  have hM : 0 ≤ M := List.sum_nonneg fun t ht => by
-    obtain ⟨W, -, rfl⟩ := List.mem_map.1 ht
-    exact norm_nonneg _
+  have hM : 0 ≤ M :=
+    List.sum_nonneg fun t ht => by
+      obtain ⟨W, -, rfl⟩ := List.mem_map.1 ht
+      exact norm_nonneg _
   have hg1 : 1 ≤ B.gN x := Formalism.FourierDecayAlt.P.BetaSesquilinearity.gN_ge_one hx
   have h2 : B.gN x ^ (aOf r h - 1) ≤ B.gN x ^ (⌊aOf r h⌋₊ : ℕ) := by
     rw [← Real.rpow_natCast]

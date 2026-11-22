@@ -10,11 +10,12 @@ namespace PI.UnitaryGroupMassFormula.CntFormula.DeltaB
 
 open Polynomial
 
-variable {R K A : Type} [CommRing R] [Field K] [CommRing A] [Algebra R K] [Algebra K A] [Algebra R A]
+variable
+  {R K A : Type} [CommRing R] [Field K] [CommRing A] [Algebra R K] [Algebra K A] [Algebra R A]
   [IsScalarTower R K A]
 
-theorem trace_isIntegral_rank2 (b : Module.Basis (Fin 2) K A) {y : A} (hy : IsIntegral R y) :
-    IsIntegral R (Algebra.trace K A y) := by
+theorem trace_isIntegral_rank2 (b : Module.Basis (Fin 2) K A) {y : A} (hy : IsIntegral R y)
+    : IsIntegral R (Algebra.trace K A y) := by
   classical
   obtain ⟨p, hpm, hp⟩ := hy
   let L := AlgebraicClosure K
@@ -26,8 +27,11 @@ theorem trace_isIntegral_rank2 (b : Module.Basis (Fin 2) K A) {y : A} (hy : IsIn
     rw [hpy, map_zero] at h1
     exact h1
   have hpM' : Polynomial.aeval M' p = 0 := by
-    have h1 := Polynomial.aeval_algHom_apply
-      (((Algebra.ofId K L).mapMatrix : Matrix (Fin 2) (Fin 2) K →ₐ[K] Matrix (Fin 2) (Fin 2) L).restrictScalars R) M p
+    have h1 :=
+      Polynomial.aeval_algHom_apply
+        (((Algebra.ofId K L).mapMatrix
+          : Matrix (Fin 2) (Fin 2) K →ₐ[K] Matrix (Fin 2) (Fin 2) L).restrictScalars R)
+        M p
     rw [hpM, map_zero] at h1
     exact h1
   have hroot : ∀ μ ∈ M'.charpoly.roots, IsIntegral R μ := by

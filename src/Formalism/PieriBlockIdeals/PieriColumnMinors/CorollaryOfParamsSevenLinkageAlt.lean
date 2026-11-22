@@ -8,8 +8,11 @@ public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.PrimeCount
 
 namespace Formalism.CohomologicalDescent.Top
 
-theorem prime_count_bound_rs : Formalism.CohomologicalDescent.LogSmallConstantBounds.PrimeCountingBound := prime_count_bound
+theorem prime_count_bound_rs
+    : Formalism.CohomologicalDescent.LogSmallConstantBounds.PrimeCountingBound :=
+  prime_count_bound
 
-theorem inclusion_w_seven_real_holds : HidaLatticeInclusionAtCoarseWeightBound := Formalism.CohomologicalDescent.Down7.inclusion_w_seven_real_holds
+theorem inclusion_w_seven_real_holds : HidaLatticeInclusionAtCoarseWeightBound :=
+  Formalism.CohomologicalDescent.Down7.inclusion_w_seven_real_holds
 
 end Formalism.CohomologicalDescent.Top

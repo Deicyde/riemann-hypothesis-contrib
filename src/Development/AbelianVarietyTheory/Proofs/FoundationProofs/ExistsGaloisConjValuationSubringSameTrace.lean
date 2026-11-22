@@ -25,8 +25,7 @@ variable {F L : Type} [Field F] [Field L] [Algebra F L]
 
 def core (F : Type) [Field F] [Algebra F L] (W₁ W₂ : ValuationSubring L) : Subring L where
   carrier := {x | ∀ σ : L ≃ₐ[F] L, σ x ∈ W₁ ∧ σ x ∈ W₂}
-  mul_mem' ha hb σ := by
-    rw [map_mul]; exact ⟨mul_mem (ha σ).1 (hb σ).1, mul_mem (ha σ).2 (hb σ).2⟩
+  mul_mem' ha hb σ := by rw [map_mul]; exact ⟨mul_mem (ha σ).1 (hb σ).1, mul_mem (ha σ).2 (hb σ).2⟩
   one_mem' σ := by rw [map_one]; exact ⟨one_mem _, one_mem _⟩
   add_mem' ha hb σ := by
     rw [map_add (f := _)]; exact ⟨add_mem (ha σ).1 (hb σ).1, add_mem (ha σ).2 (hb σ).2⟩
@@ -250,17 +249,17 @@ private lemma mem_of_mem_of_inv_core_mem [FiniteDimensional F L] (W₁ W₂ U U'
     rw [← U.valuation_le_one_iff, map_inv₀, h1, inv_one]
   exact (valuation_lt_one_iff_inv_not_mem' U' s hs0).1 h2 (hcen s hsS hs0 hsU)
 
-
 open scoped MatrixGroups TensorProduct in
 open Matrix in
 open Finset in
 open scoped Pointwise in
 variable {F L : Type} [Field F] [Field L] [Algebra F L] in
 open scoped Pointwise in
-theorem _root_.GlobalTheory.KZ.ES.exists_conj_of_same_trace : ∀ (F L : Type) [Field F] [Field L]
-    [Algebra F L] [FiniteDimensional F L] [IsGalois F L] (W₁ W₂ : ValuationSubring L),
-    (∀ a : F, algebraMap F L a ∈ W₁ ↔ algebraMap F L a ∈ W₂) →
-      ∃ σ : L ≃ₐ[F] L, ∀ x : L, σ x ∈ W₂ ↔ x ∈ W₁ := by
+theorem _root_.GlobalTheory.KZ.ES.exists_conj_of_same_trace
+    : ∀ (F L : Type) [Field F] [Field L] [Algebra F L] [FiniteDimensional F L] [IsGalois F L]
+        (W₁ W₂ : ValuationSubring L),
+      (∀ a : F, algebraMap F L a ∈ W₁ ↔ algebraMap F L a ∈ W₂)
+        → ∃ σ : L ≃ₐ[F] L, ∀ x : L, σ x ∈ W₂ ↔ x ∈ W₁ := by
   intro F L _ _ _ _ _ W₁ W₂ hW
   classical
   set S := _root_.GlobalTheory.ValConj.core F W₁ W₂ with hSdef
@@ -272,17 +271,18 @@ theorem _root_.GlobalTheory.KZ.ES.exists_conj_of_same_trace : ∀ (F L : Type) [
   haveI : SMulCommClass (L ≃ₐ[F] L) A S := ⟨fun g a s => by
     rw [Algebra.smul_def, Algebra.smul_def, smul_mul']
     exact congrArg (· * g • s) (a.2 g)⟩
-  have hcentre : ∀ (W : ValuationSubring L) (h : S ≤ W.toSubring) (s : S),
-      s ∈ _root_.GlobalTheory.ValConj.centre S W h ↔ W.valuation (s : L) < 1 :=
-    fun W h s => W.valuation_lt_one_iff _
+  have hcentre
+      : ∀ (W : ValuationSubring L) (h : S ≤ W.toSubring) (s : S),
+        s ∈ _root_.GlobalTheory.ValConj.centre S W h ↔ W.valuation (s : L) < 1 := fun W h s =>
+    W.valuation_lt_one_iff _
   have hcoe : ∀ (g : L ≃ₐ[F] L) (s : S), ((g • s : S) : L) = g (s : L) := fun _ _ => rfl
-  have hunder : Ideal.under A (_root_.GlobalTheory.ValConj.centre S W₁ hS₁) =
-      Ideal.under A (_root_.GlobalTheory.ValConj.centre S W₂ hS₂) := by
+  have hunder
+      : Ideal.under A (_root_.GlobalTheory.ValConj.centre S W₁ hS₁)
+        = Ideal.under A (_root_.GlobalTheory.ValConj.centre S W₂ hS₂) := by
     ext a
     simp only [Ideal.under, Ideal.mem_comap]
     rw [hcentre, hcentre]
-    have hfix : ∀ σ : L ≃ₐ[F] L, σ ((a : S) : L) = ((a : S) : L) := fun σ => by
-      rw [← hcoe, a.2 σ]
+    have hfix : ∀ σ : L ≃ₐ[F] L, σ ((a : S) : L) = ((a : S) : L) := fun σ => by rw [← hcoe, a.2 σ]
     obtain ⟨f, hf⟩ := IntermediateField.mem_bot.1 (((IsGalois.mem_bot_iff_fixed _).2 hfix))
     change W₁.valuation ((a : S) : L) < 1 ↔ W₂.valuation ((a : S) : L) < 1
     rw [← hf]
@@ -300,37 +300,45 @@ theorem _root_.GlobalTheory.KZ.ES.exists_conj_of_same_trace : ∀ (F L : Type) [
     have hgs0 : g⁻¹ s ≠ 0 := by simpa using hs0
     rw [valuation_lt_one_iff_inv_not_mem' _ _ hs0, valuation_lt_one_iff_inv_not_mem' _ _ hgs0] at h
     exact not_iff_not.1 h
-  have hgF : ∀ (τ : L ≃ₐ[F] L) (f : F), τ (algebraMap F L f) = algebraMap F L f :=
-    fun τ f => τ.commutes f
+  have hgF : ∀ (τ : L ≃ₐ[F] L) (f : F), τ (algebraMap F L f) = algebraMap F L f := fun τ f =>
+    τ.commutes f
   refine ⟨g, fun x => ⟨fun hx => ?_, fun hx => ?_⟩⟩
-  · have := mem_of_mem_of_inv_core_mem (F := F) W₁ W₂ W₂ (W₁.comap (g⁻¹ : L ≃ₐ[F] L).toRingEquiv.toRingHom)
-      (fun f hf => (hW f).2 hf) (fun f hf => hf)
-      (fun f hf => by
-        rw [ValuationSubring.mem_comap]
-        simpa [hgF] using (hW f).2 hf)
-      (fun s hs hs0 h => by
-        rw [ValuationSubring.mem_comap]
-        simpa [map_inv₀] using (hcen s hs hs0).1 h) (g x) hx
+  · have :=
+      mem_of_mem_of_inv_core_mem (F := F) W₁ W₂ W₂
+        (W₁.comap (g⁻¹ : L ≃ₐ[F] L).toRingEquiv.toRingHom)
+        (fun f hf => (hW f).2 hf)
+        (fun f hf => hf)
+        (fun f hf => by
+          rw [ValuationSubring.mem_comap]
+          simpa [hgF] using (hW f).2 hf)
+        (fun s hs hs0 h => by
+          rw [ValuationSubring.mem_comap]
+          simpa [map_inv₀] using (hcen s hs hs0).1 h)
+        (g x) hx
     rw [ValuationSubring.mem_comap] at this
     simpa using this
-  · have := mem_of_mem_of_inv_core_mem (F := F) W₁ W₂ (W₁.comap (g⁻¹ : L ≃ₐ[F] L).toRingEquiv.toRingHom) W₂
-      (fun f hf => by
-        rw [ValuationSubring.mem_comap] at hf
-        change (g⁻¹ : L ≃ₐ[F] L) (algebraMap F L f) ∈ W₁ at hf
-        rwa [AlgEquiv.commutes] at hf)
-      (fun f hf => by
-        rw [ValuationSubring.mem_comap] at hf
-        change (g⁻¹ : L ≃ₐ[F] L) (algebraMap F L f) ∈ W₁ at hf
-        rw [AlgEquiv.commutes] at hf
-        exact (hW f).1 hf)
-      (fun f hf => by
-        rw [ValuationSubring.mem_comap] at hf
-        change (g⁻¹ : L ≃ₐ[F] L) (algebraMap F L f) ∈ W₁ at hf
-        rw [AlgEquiv.commutes] at hf
-        exact (hW f).1 hf)
-      (fun s hs hs0 h => by
-        rw [ValuationSubring.mem_comap] at h
-        exact (hcen s hs hs0).2 (by simpa [map_inv₀] using h)) (g x) (by
-        rw [ValuationSubring.mem_comap]
-        simpa using hx)
+  · have :=
+      mem_of_mem_of_inv_core_mem (F := F) W₁ W₂ (W₁.comap (g⁻¹ : L ≃ₐ[F] L).toRingEquiv.toRingHom)
+        W₂
+        (fun f hf => by
+          rw [ValuationSubring.mem_comap] at hf
+          change (g⁻¹ : L ≃ₐ[F] L) (algebraMap F L f) ∈ W₁ at hf
+          rwa [AlgEquiv.commutes] at hf)
+        (fun f hf => by
+          rw [ValuationSubring.mem_comap] at hf
+          change (g⁻¹ : L ≃ₐ[F] L) (algebraMap F L f) ∈ W₁ at hf
+          rw [AlgEquiv.commutes] at hf
+          exact (hW f).1 hf)
+        (fun f hf => by
+          rw [ValuationSubring.mem_comap] at hf
+          change (g⁻¹ : L ≃ₐ[F] L) (algebraMap F L f) ∈ W₁ at hf
+          rw [AlgEquiv.commutes] at hf
+          exact (hW f).1 hf)
+        (fun s hs hs0 h => by
+          rw [ValuationSubring.mem_comap] at h
+          exact (hcen s hs hs0).2 (by simpa [map_inv₀] using h))
+        (g x)
+        (by
+          rw [ValuationSubring.mem_comap]
+          simpa using hx)
     exact this

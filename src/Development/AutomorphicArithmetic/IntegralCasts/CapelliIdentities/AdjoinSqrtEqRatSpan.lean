@@ -4,8 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.adjoin_sqrt_eq_rat_span :
-    ∀ (E : Type) [Field E] [CharZero E] (d : ℕ) (s : E), s ^ 2 = -(d : E) → ∀ x : E, x ∈ IntermediateField.adjoin ℚ ({s} : Set E) → ∃ a b : ℚ, x = (a : E) + (b : E) * s := by
+theorem UpperTheory.adjoin_sqrt_eq_rat_span
+    : ∀ (E : Type) [Field E] [CharZero E] (d : ℕ) (s : E),
+      s ^ 2 = -(d : E)
+        → ∀ x : E,
+          x ∈ IntermediateField.adjoin ℚ ({s} : Set E) → ∃ a b : ℚ, x = (a : E) + (b : E) * s := by
   intro E _ _ d s hs x hx
   have hint : IsIntegral ℚ s := by
     apply IsIntegral.of_pow (n := 2) (by norm_num)
@@ -21,7 +24,8 @@ theorem UpperTheory.adjoin_sqrt_eq_rat_span :
   | mem y hy =>
     rw [Set.mem_singleton_iff] at hy
     exact ⟨0, 1, by simp [hy]⟩
-  | algebraMap r => exact ⟨r, 0, by simp⟩
+  | algebraMap r =>
+    exact ⟨r, 0, by simp⟩
   | add y z _ _ hy hz =>
     obtain ⟨a, b, rfl⟩ := hy
     obtain ⟨c, e, rfl⟩ := hz

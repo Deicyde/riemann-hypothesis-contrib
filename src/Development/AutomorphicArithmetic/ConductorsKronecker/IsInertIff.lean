@@ -5,7 +5,10 @@ public import Development.AutomorphicArithmetic.PrimitiveCosets.ToEBij
 
 @[expose] public section
 
-open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5 Formalism.LFunctionChainParameters.characterSumData Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LHost NumberField Ideal
+open UpperTheory.Comparison₂ Deduction.CH Formalism Formalism.HC Formalism.D5
+  Formalism.LFunctionChainParameters.characterSumData
+  Formalism.LFunctionChainParameters.ThickSetMeanBounds Formalism.LFunctionChainParameters.LHost
+  NumberField Ideal
 
 private lemma notInPhi_iff {φ : Frame} (H : HostAx φ) {p : ℕ} (hp : p.Prime) (h2 : p ≠ 2) (hd : p ≠ H.d) :
     ¬ Formalism.D5.InPhi ((arith H.toHostRaw).frob p) ↔ jacobiSym (-(H.d : ℤ)) p = -1 := by
@@ -36,13 +39,19 @@ private lemma notInPhi_iff {φ : Frame} (H : HostAx φ) {p : ℕ} (hp : p.Prime)
   · rw [hs]; simp
   · rw [hs]; simp
 
-theorem UpperTheory.GL.isInert_iff :
-    ∀ {φ : Frame} (H : HostAx φ) (p : ℕ), IsInert (arith H.toHostRaw) p ↔ p.Prime ∧ ¬ p ∣ H.condN ∧ jacobiSym (-(H.d : ℤ)) p = -1 := by
+theorem UpperTheory.GL.isInert_iff
+    : ∀ {φ : Frame} (H : HostAx φ) (p : ℕ),
+      IsInert (arith H.toHostRaw) p ↔ p.Prime ∧ ¬ p ∣ H.condN ∧ jacobiSym (-(H.d : ℤ)) p = -1 := by
   intro φ H p
   constructor
   · rintro ⟨hp, h2, -, hd, h⟩
     have hj := (notInPhi_iff H hp h2 hd).1 h
     exact ⟨hp, H.not_dvd_condN_of_inert hp h2 hj, hj⟩
   · rintro ⟨hp, hN, hj⟩
-    exact ⟨hp, HostRaw.ne_two_of_not_dvd hN, HostRaw.ne_q_of_not_dvd hN, HostRaw.ne_d_of_not_dvd hN,
-      (notInPhi_iff H hp (HostRaw.ne_two_of_not_dvd hN) (HostRaw.ne_d_of_not_dvd hN)).2 hj⟩
+    exact ⟨
+      hp,
+      HostRaw.ne_two_of_not_dvd hN,
+      HostRaw.ne_q_of_not_dvd hN,
+      HostRaw.ne_d_of_not_dvd hN,
+      (notInPhi_iff H hp (HostRaw.ne_two_of_not_dvd hN) (HostRaw.ne_d_of_not_dvd hN)).2 hj
+    ⟩

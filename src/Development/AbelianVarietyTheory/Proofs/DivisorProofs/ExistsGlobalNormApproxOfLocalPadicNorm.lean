@@ -11,10 +11,12 @@ open scoped TensorProduct Classical
 
 namespace GlobalTheory.LocalApprox
 
-theorem isUnit_of_isUnit_one_tmul (E : Type) [CommRing E] [Algebra ℚ E] [FiniteDimensional ℚ E]
-    (ℓ : ℕ) [Fact ℓ.Prime] (b : E) (hb : IsUnit ((1 : ℚ_[ℓ]) ⊗ₜ[ℚ] b)) : IsUnit b := by
-  have hinj : Function.Injective
-      (Algebra.TensorProduct.includeRight : E →ₐ[ℚ] ℚ_[ℓ] ⊗[ℚ] E) :=
+theorem isUnit_of_isUnit_one_tmul
+    (E : Type) [CommRing E] [Algebra ℚ E] [FiniteDimensional ℚ E]
+    (ℓ : ℕ) [Fact ℓ.Prime]
+    (b : E) (hb : IsUnit ((1 : ℚ_[ℓ]) ⊗ₜ[ℚ] b))
+    : IsUnit b := by
+  have hinj : Function.Injective (Algebra.TensorProduct.includeRight : E →ₐ[ℚ] ℚ_[ℓ] ⊗[ℚ] E) :=
     Algebra.TensorProduct.includeRight_injective (algebraMap ℚ ℚ_[ℓ]).injective
   have h1 : Function.Injective (LinearMap.mulLeft ℚ b) := by
     intro x y hxy
@@ -26,8 +28,9 @@ theorem isUnit_of_isUnit_one_tmul (E : Type) [CommRing E] [Algebra ℚ E] [Finit
   have hw' : b * w = 1 := hw
   exact ⟨⟨b, w, hw', by rw [mul_comm]; exact hw'⟩, rfl⟩
 
-theorem exists_rat_mul_unit (ℓ : ℕ) [Fact ℓ.Prime] (u : ℚ_[ℓ]ˣ) :
-    ∃ c : ℚ, c ≠ 0 ∧ ∃ r : ℤ_[ℓ]ˣ, (u : ℚ_[ℓ]) = algebraMap ℚ ℚ_[ℓ] c * ((r : ℤ_[ℓ]) : ℚ_[ℓ]) := by
+theorem exists_rat_mul_unit (ℓ : ℕ) [Fact ℓ.Prime] (u : ℚ_[ℓ]ˣ)
+    : ∃ c : ℚ,
+      c ≠ 0 ∧ ∃ r : ℤ_[ℓ]ˣ, (u : ℚ_[ℓ]) = algebraMap ℚ ℚ_[ℓ] c * ((r : ℤ_[ℓ]) : ℚ_[ℓ]) := by
   have hu : 0 < ‖(u : ℚ_[ℓ])‖ := norm_pos_iff.2 u.ne_zero
   obtain ⟨c, hc⟩ := Padic.rat_dense ℓ (u : ℚ_[ℓ]) hu
   have hn : ‖(c : ℚ_[ℓ])‖ = ‖(u : ℚ_[ℓ])‖ := by
@@ -39,12 +42,18 @@ theorem exists_rat_mul_unit (ℓ : ℕ) [Fact ℓ.Prime] (u : ℚ_[ℓ]ˣ) :
   refine ⟨c, fun h => hc0 (by simp [h]), PadicInt.mkUnits h1, ?_⟩
   rw [PadicInt.mkUnits_eq, eq_ratCast, mul_div_cancel₀ _ hc0]
 
-theorem main : ∀ (E : Type) [CommRing E] [Algebra ℚ E] [FiniteDimensional ℚ E] (τ : E →ₐ[ℚ] E) (ℓ : ℕ) [Fact ℓ.Prime]
-    (a : E) (u : ℚ_[ℓ]ˣ) (z : (ℚ_[ℓ] ⊗[ℚ] E)ˣ), IsUnit a →
-    (1 : ℚ_[ℓ]) ⊗ₜ[ℚ] a = algebraMap ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] E) (u : ℚ_[ℓ]) *
-      ((z : ℚ_[ℓ] ⊗[ℚ] E) * Algebra.TensorProduct.map (AlgHom.id ℚ_[ℓ] ℚ_[ℓ]) τ (z : ℚ_[ℓ] ⊗[ℚ] E)) →
-    ∃ (c : ℚ) (b x y : E), c ≠ 0 ∧ IsUnit b ∧ a = x * (algebraMap ℚ E c * (b * τ b)) ∧
-      algebraMap ℚ E c * (b * τ b) = y * a ∧ ∃ d : ℕ, ¬ ℓ ∣ d ∧ IsIntegral ℤ ((d : E) * x) ∧ IsIntegral ℤ ((d : E) * y) := by
+theorem main
+    : ∀ (E : Type) [CommRing E] [Algebra ℚ E] [FiniteDimensional ℚ E] (τ : E →ₐ[ℚ] E) (ℓ : ℕ)
+        [Fact ℓ.Prime] (a : E) (u : ℚ_[ℓ]ˣ) (z : (ℚ_[ℓ] ⊗[ℚ] E)ˣ),
+      IsUnit a
+        → (1 : ℚ_[ℓ]) ⊗ₜ[ℚ] a
+          = algebraMap ℚ_[ℓ] (ℚ_[ℓ] ⊗[ℚ] E) (u : ℚ_[ℓ])
+            * ((z : ℚ_[ℓ] ⊗[ℚ] E)
+              * Algebra.TensorProduct.map (AlgHom.id ℚ_[ℓ] ℚ_[ℓ]) τ (z : ℚ_[ℓ] ⊗[ℚ] E))
+        → ∃ (c : ℚ) (b x y : E),
+          c ≠ 0 ∧ IsUnit b ∧ a = x * (algebraMap ℚ E c * (b * τ b))
+            ∧ algebraMap ℚ E c * (b * τ b) = y * a
+            ∧ ∃ d : ℕ, ¬ ℓ ∣ d ∧ IsIntegral ℤ ((d : E) * x) ∧ IsIntegral ℤ ((d : E) * y) := by
   intro E _ _ _ τ ℓ _ a u z ha hau
   set S := ℚ_[ℓ] ⊗[ℚ] E
   set τℓ : S →ₐ[ℚ_[ℓ]] S := Algebra.TensorProduct.map (AlgHom.id ℚ_[ℓ] ℚ_[ℓ]) τ with hτℓ
@@ -52,8 +61,10 @@ theorem main : ∀ (E : Type) [CommRing E] [Algebra ℚ E] [FiniteDimensional �
   have hιapp : ∀ w : E, ι w = (1 : ℚ_[ℓ]) ⊗ₜ[ℚ] w := fun w => rfl
   have hτι : ∀ w : E, τℓ (ι w) = ι (τ w) := fun w => by
     show Algebra.TensorProduct.map (AlgHom.id ℚ_[ℓ] ℚ_[ℓ]) τ ((1 : ℚ_[ℓ]) ⊗ₜ[ℚ] w) = (1 : ℚ_[ℓ]) ⊗ₜ[ℚ] τ w
-    rw [Algebra.TensorProduct.map_tmul]; rfl
-  have hιq : ∀ q : ℚ, ι (algebraMap ℚ E q) = algebraMap ℚ_[ℓ] S (algebraMap ℚ ℚ_[ℓ] q) := fun q => by
+    rw [Algebra.TensorProduct.map_tmul]
+    rfl
+  have hιq
+      : ∀ q : ℚ, ι (algebraMap ℚ E q) = algebraMap ℚ_[ℓ] S (algebraMap ℚ ℚ_[ℓ] q) := fun q => by
     rw [ι.commutes, IsScalarTower.algebraMap_apply ℚ ℚ_[ℓ] S]
   have hint : ∀ t : ℤ_[ℓ], IsIntegral ℤ_[ℓ] (algebraMap ℚ_[ℓ] S (t : ℚ_[ℓ])) := fun t => by
     rw [show (t : ℚ_[ℓ]) = algebraMap ℤ_[ℓ] ℚ_[ℓ] t from rfl, ← IsScalarTower.algebraMap_apply]
@@ -68,8 +79,9 @@ theorem main : ∀ (E : Type) [CommRing E] [Algebra ℚ E] [FiniteDimensional �
     refine isIntegral_one.add (IsIntegral.mul ?_ hs)
     rw [show (ℓ : S) = algebraMap ℤ_[ℓ] S ℓ by simp]
     exact isIntegral_algebraMap
-  have hbU : IsUnit b := isUnit_of_isUnit_one_tmul E ℓ b (by
-    rw [hb]; exact z.isUnit.mul ⟨⟨_, ρ, hρ, by rw [mul_comm]; exact hρ⟩, rfl⟩)
+  have hbU : IsUnit b :=
+    isUnit_of_isUnit_one_tmul E ℓ b
+      (by rw [hb]; exact z.isUnit.mul ⟨⟨_, ρ, hρ, by rw [mul_comm]; exact hρ⟩, rfl⟩)
   set m : E := algebraMap ℚ E c * (b * τ b) with hm
   have hmU : IsUnit m := ((isUnit_iff_ne_zero.2 hc0).map (algebraMap ℚ E)).mul (hbU.mul (hbU.map τ))
   obtain ⟨mi, hmi⟩ : ∃ mi : E, m * mi = 1 := ⟨_, hmU.mul_val_inv⟩
@@ -102,12 +114,14 @@ theorem main : ∀ (E : Type) [CommRing E] [Algebra ℚ E] [FiniteDimensional �
       linear_combination (C * (z : S) * v * τℓ z * τℓ v) * hRRi
     rw [map_mul]
     linear_combination (-ι ai) * hK + (Ri * v * τℓ v) * h3'
-  obtain ⟨d1, hd1, hx1⟩ := GlobalTheory.T.exists_coprime_mul_isIntegral_of_padic_integral E ℓ (a * mi) (by
-    rw [← hιapp, hx]
-    exact ((hint _).mul hρint).mul (hτint _ hρint))
-  obtain ⟨d2, hd2, hy2⟩ := GlobalTheory.T.exists_coprime_mul_isIntegral_of_padic_integral E ℓ (m * ai) (by
-    rw [← hιapp, hy]
-    exact ((hint _).mul hvint).mul (hτint _ hvint))
+  obtain ⟨d1, hd1, hx1⟩ :=
+    GlobalTheory.T.exists_coprime_mul_isIntegral_of_padic_integral E ℓ (a * mi) (by
+      rw [← hιapp, hx]
+      exact ((hint _).mul hρint).mul (hτint _ hρint))
+  obtain ⟨d2, hd2, hy2⟩ :=
+    GlobalTheory.T.exists_coprime_mul_isIntegral_of_padic_integral E ℓ (m * ai) (by
+      rw [← hιapp, hy]
+      exact ((hint _).mul hvint).mul (hτint _ hvint))
   refine ⟨c, b, a * mi, m * ai, hc0, hbU, ?_, ?_, d1 * d2, ?_, ?_, ?_⟩
   · linear_combination (-a) * hmi
   · linear_combination (-m) * hai

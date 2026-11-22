@@ -12,9 +12,12 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ExistsDes
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef
-open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx Formalism.IndefR.Links
+open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+  Formalism.IndefR.Links
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.RawLift
@@ -30,9 +33,11 @@ theorem psi_ne_zero (hψ : IsStdChar D ψ (-1)) (a : AF D.host.F) : ψ a ≠ 0 :
   rw [h, norm_zero] at this
   exact zero_ne_one this
 
-theorem isTheta_star_mul_mul (hψ : IsStdChar D ψ (-1)) {g h f : WO S T → ℂ} (hg : IsThetaFunO ψ S T g)
-    (hh : IsThetaFunO ψ S T h) (hf : IsThetaFunO ψ S T f) :
-    IsThetaFunO ψ S T (fun x => star (g x) * h x * f x) := {
+theorem isTheta_star_mul_mul
+    (hψ : IsStdChar D ψ (-1))
+    {g h f : WO S T → ℂ}
+    (hg : IsThetaFunO ψ S T g) (hh : IsThetaFunO ψ S T h) (hf : IsThetaFunO ψ S T f)
+    : IsThetaFunO ψ S T (fun x => star (g x) * h x * f x) := {
   quasi γ w := by
     rw [hg.quasi, hh.quasi, hf.quasi, star_mul']
     linear_combination (star (g w) * h w * f w * ψ (-(symplOH S T (ratW T S γ) w))) *
@@ -54,10 +59,11 @@ theorem isTheta_star_mul_mul (hψ : IsStdChar D ψ (-1)) {g h f : WO S T → ℂ
   smooth k L hL hL0 w := by
     have hs : ContDiff ℝ ∞ (fun t => star (g (w + L t))) :=
       Complex.conjCLE.contDiff.comp (hg.smooth k L hL hL0 w)
-    exact ContDiff.mul (ContDiff.mul hs (hh.smooth k L hL hL0 w)) (hf.smooth k L hL hL0 w) }
+    exact ContDiff.mul (ContDiff.mul hs (hh.smooth k L hL hL0 w)) (hf.smooth k L hL hL0 w)
+}
 
-theorem exists_bound (hψ : IsStdChar D ψ (-1)) {f : WO S T → ℂ} (hf : IsThetaFunO ψ S T f) :
-    ∃ C : ℝ, ∀ x, ‖f x‖ ≤ C := by
+theorem exists_bound (hψ : IsStdChar D ψ (-1)) {f : WO S T → ℂ} (hf : IsThetaFunO ψ S T f)
+    : ∃ C : ℝ, ∀ x, ‖f x‖ ≤ C := by
   obtain ⟨i1, i2, i3, i4, i5, K, hK, hKc⟩ := GlobalTheory.AdelicMatrixLattice.lattice D T S
   have hp : ∀ γ ∈ ratL T S, ∀ w, ‖f (γ + w)‖ = ‖f w‖ := by
     rintro _ ⟨γ, rfl⟩ w
@@ -68,8 +74,11 @@ theorem exists_bound (hψ : IsStdChar D ψ (-1)) {f : WO S T → ℂ} (hf : IsTh
   rw [← hp γ hγ w]
   exact hC _ h
 
-theorem integrable_sq (hψ : IsStdChar D ψ (-1)) {μ : Measure (WO S T)} {𝓕 : Set (WO S T)} (h1 : μ 𝓕 = 1)
-    {f : WO S T → ℂ} (hf : IsThetaFunO ψ S T f) : Integrable (fun w => ‖f w‖ ^ 2) (μ.restrict 𝓕) := by
+theorem integrable_sq
+    (hψ : IsStdChar D ψ (-1))
+    {μ : Measure (WO S T)} {𝓕 : Set (WO S T)} (h1 : μ 𝓕 = 1)
+    {f : WO S T → ℂ} (hf : IsThetaFunO ψ S T f)
+    : Integrable (fun w => ‖f w‖ ^ 2) (μ.restrict 𝓕) := by
   haveI : BorelSpace (WO S T) := ⟨rfl⟩
   haveI : IsFiniteMeasure (μ.restrict 𝓕) := ⟨by rw [Measure.restrict_apply_univ, h1]; exact ENNReal.one_lt_top⟩
   obtain ⟨C, hC⟩ := exists_bound hψ hf
@@ -78,9 +87,11 @@ theorem integrable_sq (hψ : IsStdChar D ψ (-1)) {μ : Measure (WO S T)} {𝓕 
   rw [Real.norm_eq_abs, abs_of_nonneg (by positivity)]
   exact pow_le_pow_left₀ (norm_nonneg _) (hC w) 2
 
-theorem thetaFunction_eq_zero_of_meanSquare_zero (hψ : IsStdChar D ψ (-1)) {μ : Measure (WO S T)} {𝓕 : Set (WO S T)}
-    (hcv : IsCovolOne (ratL T S) μ 𝓕) {f : WO S T → ℂ} (hf : IsThetaFunO ψ S T f) (h0 : nrm2 μ 𝓕 f = 0) :
-    f = 0 := by
+theorem thetaFunction_eq_zero_of_meanSquare_zero
+    (hψ : IsStdChar D ψ (-1))
+    {μ : Measure (WO S T)} {𝓕 : Set (WO S T)} (hcv : IsCovolOne (ratL T S) μ 𝓕)
+    {f : WO S T → ℂ} (hf : IsThetaFunO ψ S T f) (h0 : nrm2 μ 𝓕 f = 0)
+    : f = 0 := by
   obtain ⟨hμ, h𝓕, h1⟩ := hcv
   obtain ⟨i1, i2, i3, i4, i5, -⟩ := GlobalTheory.AdelicMatrixLattice.lattice D T S
   haveI : BorelSpace (WO S T) := ⟨rfl⟩
@@ -112,9 +123,12 @@ namespace GlobalTheory.ThetaSchurBdd
 
 variable {D : D7} {ψ : AddChar (AF D.host.F) ℂ} {S T : HSp D}
 
-theorem trig_approx (hψ : IsStdChar D ψ (-1)) {q : WO S T → ℂ} (hq : Continuous q)
-    (hqp : ∀ γ ∈ ratL T S, ∀ x, q (γ + x) = q x) {δ : ℝ} (hδ : 0 < δ) :
-    ∃ (s : Finset (ratL T S)) (c : ratL T S → ℂ), ∀ x, ‖q x - ∑ a ∈ s, c a * ψ (symplO S T x a)‖ ≤ δ := by
+theorem trig_approx
+    (hψ : IsStdChar D ψ (-1))
+    {q : WO S T → ℂ} (hq : Continuous q) (hqp : ∀ γ ∈ ratL T S, ∀ x, q (γ + x) = q x)
+    {δ : ℝ} (hδ : 0 < δ)
+    : ∃ (s : Finset (ratL T S)) (c : ratL T S → ℂ), ∀ x,
+      ‖q x - ∑ a ∈ s, c a * ψ (symplO S T x a)‖ ≤ δ := by
   obtain ⟨i1, i2, i3, i4, i5, K, hK, hKc⟩ := GlobalTheory.AdelicMatrixLattice.lattice D T S
   haveI : BorelSpace (WO S T) := ⟨rfl⟩
   obtain ⟨l1, l2, -, l4, -⟩ := GlobalTheory.OrientedFormLaws.symplOH_laws D S T
@@ -132,15 +146,17 @@ theorem trig_approx (hψ : IsStdChar D ψ (-1)) {q : WO S T → ℂ} (hq : Conti
       simp only [← l4, AddSubgroup.coe_add, l2, AddChar.map_add_eq_mul]
       ring)
     (fun x => by
-      simp only [← l4, AddSubgroup.coe_zero, GlobalTheory.WeilVacMove.symplOH_zero_right, add_zero, AddChar.map_zero_eq_one])
+      simp only [← l4, AddSubgroup.coe_zero, GlobalTheory.WeilVacMove.symplOH_zero_right, add_zero,
+        AddChar.map_zero_eq_one])
     (fun γ x => hψ.1.2.1 _)
     (fun x => by
       rw [← GlobalTheory.RatAnnih.ratL_annihilator D ψ hψ S T x]
       exact ⟨fun h γ hγ => h ⟨γ, hγ⟩, fun h γ => h γ γ.2⟩)
     q hq hqp δ hδ
 
-theorem trig_mul_eq (s : Finset (ratL T S)) (c : ratL T S → ℂ) {f : WO S T → ℂ} (hf : IsThetaFunO ψ S T f) :
-    (fun x => (∑ a ∈ s, c a * ψ (symplO S T x a)) * f x) = ∑ a ∈ s, c a • heisO ψ S T a f := by
+theorem trig_mul_eq
+    (s : Finset (ratL T S)) (c : ratL T S → ℂ) {f : WO S T → ℂ} (hf : IsThetaFunO ψ S T f)
+    : (fun x => (∑ a ∈ s, c a * ψ (symplO S T x a)) * f x) = ∑ a ∈ s, c a • heisO ψ S T a f := by
   funext x
   rw [Finset.sum_apply, Finset.sum_mul]
   refine Finset.sum_congr rfl fun a _ => ?_

@@ -13,9 +13,10 @@ open scoped IntermediateField
 
 namespace GlobalTheory.CMSqrtNeg
 
-theorem finrank_adjoin_sq {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω] (c : E) (t : Ω)
-    (ht : t ^ 2 = algebraMap E Ω c) (hn : t ∉ Set.range (algebraMap E Ω)) :
-    IsIntegral E t ∧ Module.finrank E E⟮t⟯ = 2 := by
+theorem finrank_adjoin_sq
+    {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω]
+    (c : E) (t : Ω) (ht : t ^ 2 = algebraMap E Ω c) (hn : t ∉ Set.range (algebraMap E Ω))
+    : IsIntegral E t ∧ Module.finrank E E⟮t⟯ = 2 := by
   have hm : (Polynomial.X ^ 2 - Polynomial.C c).Monic := Polynomial.monic_X_pow_sub_C c two_ne_zero
   have h0 : Polynomial.aeval t (Polynomial.X ^ 2 - Polynomial.C c) = 0 := by simp [ht]
   have hi : IsIntegral E t := ⟨_, hm, by simpa [Polynomial.aeval_def] using h0⟩
@@ -27,9 +28,13 @@ theorem finrank_adjoin_sq {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω] (c :
   have h2 : 2 ≤ (minpoly E t).natDegree := (minpoly.two_le_natDegree_iff hi).2 (by simpa using hn)
   omega
 
-theorem exists_qcm_adjoin_sqrt_neg : ∀ (E Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω]
-    [IsAlgClosure E Ω] (p : ℕ), 0 < p → ∀ δ : Ω, δ ^ 2 = -(p : Ω) → δ ∉ Set.range (algebraMap E Ω) →
-    ∃ Q : GlobalTheory.RealGal.QCM E Ω, Q.K = IntermediateField.adjoin E {δ} := by
+theorem exists_qcm_adjoin_sqrt_neg
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω]
+        [IsAlgClosure E Ω] (p : ℕ),
+      0 < p
+        → ∀ δ : Ω,
+          δ ^ 2 = -(p : Ω) → δ ∉ Set.range (algebraMap E Ω)
+            → ∃ Q : GlobalTheory.RealGal.QCM E Ω, Q.K = IntermediateField.adjoin E {δ} := by
   intro E Ω _ _ _ _ _ _ p hp δ hδ hδn
   have hδ' : δ ^ 2 = algebraMap E Ω (-(p : E)) := by simp [hδ]
   obtain ⟨hint, htwo⟩ := finrank_adjoin_sq (-(p : E)) δ hδ' hδn
@@ -37,8 +42,10 @@ theorem exists_qcm_adjoin_sqrt_neg : ∀ (E Ω : Type) [Field E] [NumberField E]
   haveI nf : NumberField E⟮δ⟯ := NumberField.of_module_finite E _
   obtain ⟨d, s, hs, hsn, hneg⟩ := GlobalTheory.CMGen.exists_sqrt_totallyNegative E
   have hs0 : s ≠ 0 := fun h => hsn (h ▸ zero_mem _)
-  let t : E⟮δ⟯ := ⟨δ * algebraMap E Ω s,
-    mul_mem (IntermediateField.subset_adjoin E {δ} rfl) (IntermediateField.algebraMap_mem _ s)⟩
+  let t : E⟮δ⟯ := ⟨
+    δ * algebraMap E Ω s,
+    mul_mem (IntermediateField.subset_adjoin E {δ} rfl) (IntermediateField.algebraMap_mem _ s)
+  ⟩
   let d' : maximalRealSubfield E := -(p : maximalRealSubfield E) * (d : maximalRealSubfield E)
   have ht : t ^ 2 = algebraMap E E⟮δ⟯ (algebraMap (maximalRealSubfield E) E d') := by
     apply Subtype.ext

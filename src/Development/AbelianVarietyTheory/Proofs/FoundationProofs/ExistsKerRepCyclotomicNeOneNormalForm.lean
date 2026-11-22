@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NormUni
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2
 open scoped Matrix
 
 namespace GlobalTheory.Ord2.ImZ
@@ -19,10 +21,15 @@ variable {l : ℕ} [Fact l.Prime]
 theorem norm_coe_unit (u : ℤ_[l]ˣ) : ‖((u : ℤ_[l]) : ℚ_[l])‖ = 1 := by
   exact PadicInt.norm_def.symm.trans (PadicInt.isUnit_iff.mp u.isUnit)
 
-def logU (u : ℤ_[l]ˣ) : ℤ_[l] :=
-  ⟨Formalism.MainNotions.LocalSituation.logZl l ((u : ℤ_[l]) : ℚ_[l]), (GlobalTheory.PadicLogUnits.logZl_hom l).2.2.1 _ (norm_coe_unit u)⟩
+def logU (u : ℤ_[l]ˣ) : ℤ_[l] := ⟨
+  Formalism.MainNotions.LocalSituation.logZl l ((u : ℤ_[l]) : ℚ_[l]),
+  (GlobalTheory.PadicLogUnits.logZl_hom l).2.2.1 _ (norm_coe_unit u)
+⟩
 
-theorem coe_logU (u : ℤ_[l]ˣ) : ((logU u : ℤ_[l]) : ℚ_[l]) = Formalism.MainNotions.LocalSituation.logZl l ((u : ℤ_[l]) : ℚ_[l]) := rfl
+theorem coe_logU (u : ℤ_[l]ˣ)
+    : ((logU u : ℤ_[l]) : ℚ_[l])
+      = Formalism.MainNotions.LocalSituation.logZl l ((u : ℤ_[l]) : ℚ_[l]) :=
+  rfl
 
 theorem logU_mul (u w : ℤ_[l]ˣ) : logU (u * w) = logU u + logU w := by
   apply Subtype.ext
@@ -42,13 +49,15 @@ def logHom : ℤ_[l]ˣ →* Multiplicative ℤ_[l] where
 
 theorem continuous_logHom : Continuous (logHom (l := l)) := by
   have h1 : Continuous fun u : ℤ_[l]ˣ => ((u : ℤ_[l]) : ℚ_[l]) :=
-    (continuous_subtype_val : Continuous (fun x : ℤ_[l] => (x : ℚ_[l]))).comp (Units.continuous_val (M := ℤ_[l]))
-  have h2 : Continuous fun u : ℤ_[l]ˣ => Formalism.MainNotions.LocalSituation.logZl l ((u : ℤ_[l]) : ℚ_[l]) :=
+    (continuous_subtype_val : Continuous (fun x : ℤ_[l] => (x : ℚ_[l]))).comp
+      (Units.continuous_val (M := ℤ_[l]))
+  have h2 : Continuous fun u : ℤ_[l]ˣ =>
+      Formalism.MainNotions.LocalSituation.logZl l ((u : ℤ_[l]) : ℚ_[l]) :=
     (GlobalTheory.PadicLogUnits.logZl_hom l).2.1.comp_continuous h1 (fun u => norm_coe_unit u)
   exact continuous_ofAdd.comp (h2.subtype_mk _)
 
-theorem cycZ_eq_one_of_eps {Ω : Type} [Field Ω] [Algebra ℚ Ω] {z : G ℚ Ω} (h : eps l z = 1) :
-    cycZ ℚ Ω l z = 1 := by
+theorem cycZ_eq_one_of_eps {Ω : Type} [Field Ω] [Algebra ℚ Ω] {z : G ℚ Ω} (h : eps l z = 1)
+    : cycZ ℚ Ω l z = 1 := by
   have h' : ((cycZ ℚ Ω l z : ℤ_[l]) : ℚ_[l]) = 1 := by
     have h2 := h
     simp [eps, cycBar] at h2
@@ -56,16 +65,20 @@ theorem cycZ_eq_one_of_eps {Ω : Type} [Field Ω] [Algebra ℚ Ω] {z : G ℚ Ω
   apply Units.ext
   exact PadicInt.ext (h'.trans PadicInt.coe_one.symm)
 
-theorem isIrr_of_comp {Γ k : Type} [Group Γ] [Field k] {n : ℕ} (r : Γ →* GL (Fin n) k) (H : Subgroup Γ)
-    (h : IsIrr (r.comp H.subtype)) : IsIrr r := by
+theorem isIrr_of_comp
+    {Γ k : Type} [Group Γ] [Field k]
+    {n : ℕ} (r : Γ →* GL (Fin n) k)
+    (H : Subgroup Γ) (h : IsIrr (r.comp H.subtype))
+    : IsIrr r := by
   obtain ⟨h1, _, h3⟩ := h
   exact ⟨h1, fun _ _ _ => Submodule.mem_top, fun W' hW' hinv => h3 W' hW' fun g v hv => hinv g v hv⟩
 
-theorem exists_cycZ_nat (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (hl : l ≠ 2) :
-    ∃ (σ : G ℚ Ω) (n : ℕ), 2 ≤ n ∧ ((cycZ ℚ Ω l σ : ℤ_[l]) = n) := by
+theorem exists_cycZ_nat (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (hl : l ≠ 2)
+    : ∃ (σ : G ℚ Ω) (n : ℕ), 2 ≤ n ∧ ((cycZ ℚ Ω l σ : ℤ_[l]) = n) := by
   haveI : (Ideal.span {((2 : ℕ) : ℤ)}).IsMaximal := Int.ideal_span_isMaximal_of_prime 2
-  obtain ⟨M, hM, hc⟩ := Ideal.exists_ideal_over_maximal_of_isIntegral (S := 𝓞 ℚ) (Ideal.span {((2 : ℕ) : ℤ)})
-    (by rw [(RingHom.injective_iff_ker_eq_bot _).1 (algebraMap ℤ (𝓞 ℚ)).injective_int]; exact bot_le)
+  obtain ⟨M, hM, hc⟩ :=
+    Ideal.exists_ideal_over_maximal_of_isIntegral (S := 𝓞 ℚ) (Ideal.span {((2 : ℕ) : ℤ)}) (by
+      rw [(RingHom.injective_iff_ker_eq_bot _).1 (algebraMap ℤ (𝓞 ℚ)).injective_int]; exact bot_le)
   let v : HeightOneSpectrum (𝓞 ℚ) :=
     ⟨M, hM.isPrime, Ring.ne_bot_of_isMaximal_of_not_isField hM (RingOfIntegers.not_isField ℚ)⟩
   have hlv : ((l : ℕ) : 𝓞 ℚ) ∉ v.asIdeal := by
@@ -91,8 +104,8 @@ theorem exists_cycZ_nat (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure �
     exact not_subsingleton _ hs
   omega
 
-theorem logHom_ne_one (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (hl : l ≠ 2) :
-    ∃ σ : G ℚ Ω, logHom (cycZ ℚ Ω l σ) ≠ 1 := by
+theorem logHom_ne_one (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (hl : l ≠ 2)
+    : ∃ σ : G ℚ Ω, logHom (cycZ ℚ Ω l σ) ≠ 1 := by
   obtain ⟨σ, n, hn, hσ⟩ := exists_cycZ_nat (l := l) Ω hl
   refine ⟨σ ^ (l - 1), fun h => ?_⟩
   have hl1 : 1 ≤ l - 1 := by have := (Fact.out : l.Prime).two_le; omega
@@ -122,8 +135,10 @@ theorem logHom_ne_one (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ 
     rw [ZMod.pow_card_sub_one_eq_one (by simpa using hz), sub_self]
   have hnorm := (Padic.norm_int_le_pow_iff_dvd (p := l) _ 1).mpr hdvd
   have hle : ‖((n ^ (l - 1) : ℕ) : ℚ_[l]) - 1‖ ≤ (l : ℝ) ^ (-((1 : ℕ) : ℤ)) := by
-    have : ((((n : ℤ) ^ (l - 1) - 1 : ℤ)) : ℚ_[l]) = ((n ^ (l - 1) : ℕ) : ℚ_[l]) - 1 := by push_cast; ring
-    rw [← this]; exact hnorm
+    have : ((((n : ℤ) ^ (l - 1) - 1 : ℤ)) : ℚ_[l]) = ((n ^ (l - 1) : ℕ) : ℚ_[l]) - 1 := by
+      push_cast; ring
+    rw [← this]
+    exact hnorm
   have heq := (GlobalTheory.PadicLogUnits.logZl_hom l).2.2.2 1 le_rfl (fun h2 => absurd h2 hl) _ hle
   rw [h0', norm_zero] at heq
   have hne : ((n ^ (l - 1) : ℕ) : ℚ_[l]) - 1 ≠ 0 := by
@@ -138,10 +153,11 @@ end GlobalTheory.Ord2.ImZ
 
 namespace GlobalTheory.Ord2
 
-
 open GlobalTheory.Ord2.ImZ in
-theorem exists_ker_eps_ne_one : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (e : ℕ)
-    (S : Finset Pl) (A : ValuationSubring Ω) (W : R2 Ω l), Nf e S A W → ∃ z ∈ W.ker, eps l z ≠ 1 := by
+theorem exists_ker_eps_ne_one
+    : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (e : ℕ)
+        (S : Finset Pl) (A : ValuationSubring Ω) (W : R2 Ω l),
+      Nf e S A W → ∃ z ∈ W.ker, eps l z ≠ 1 := by
   intro l _ Ω _ _ _ e S A W h
   by_contra hne
   push_neg at hne
@@ -157,7 +173,9 @@ theorem exists_ker_eps_ne_one : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field 
     rw [MonoidHom.mem_ker]
     show logHom (cycZ ℚ Ω l z) = 1
     rw [cycZ_eq_one_of_eps (hne z hz), map_one]
-  have hlam := GlobalTheory.T.hom_padicInt_trivial_of_irreducible_compact_rep l c (G ℚ Ω) W lam h.cont hc hdet (isIrr_of_comp W _ h.irr) hlamc hker
+  have hlam :=
+    GlobalTheory.T.hom_padicInt_trivial_of_irreducible_compact_rep l c (G ℚ Ω) W lam h.cont hc hdet
+      (isIrr_of_comp W _ h.irr) hlamc hker
   obtain ⟨σ, hσ⟩ := logHom_ne_one (l := l) Ω h.l_odd
   exact hσ (DFunLike.congr_fun hlam σ)
 

@@ -20,14 +20,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OrdQMapDomai
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 namespace GlobalTheory.AdjCodimTwo
 
-theorem irreducible_of_ord_one {k K : Type} [Field k] [Field K] {c : k →+* K} (P : Place c)
-    (x : P.ring) (hx : P.ord (x : K) = 1) : Irreducible x := by
+theorem irreducible_of_ord_one
+    {k K : Type} [Field k] [Field K]
+    {c : k →+* K} (P : Place c) (x : P.ring) (hx : P.ord (x : K) = 1)
+    : Irreducible x := by
   have hx0 : x ≠ 0 := by
     rintro rfl
     simp [Place.ord] at hx
@@ -44,41 +48,61 @@ theorem irreducible_of_ord_one {k K : Type} [Field k] [Field K] {c : k →+* K} 
   rw [pow_one]
   exact (irreducible_isUnit_mul v.isUnit).2 hπ
 
-theorem disc_residue_eq : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ →+* L) (cK : ℂ →+* K) (n : ℕ) (Q : Subring L) (hQ : IsLocModel cL Q) (t u : Q)
-  (S E : Place cL) (ψ : S.ring →+* K) (f : S.ring) (w : Fin n → S.ring) (θ : S.ring →₀ ℚ),
-  Ideal.span {t, u} = (letI := hQ.isLocalRing; IsLocalRing.maximalIdeal Q) →
-  ringKrullDim Q = 2 → S.IsPrimeOf Q → E.IsPrimeOf Q → S.ord (t : L) = 1 → E.ord (u : L) = 1 →
-  Function.Surjective ψ → (∀ a, ψ (S.const a) = cK a) → Irreducible f → TrBasis cK (fun i => ψ (w i)) →
-  (∀ g ∈ θ.support, ψ g ≠ 0) →
-  (∀ P : Place cL, P.IsPrimeOf Q → P.ring ≠ S.ring → P.ring ≠ E.ring →
-    P.disc (dForm cL (Fin.cons (f : L) (fun i => (w i : L)) : Fin (n + 1) → L))
-      (Finsupp.mapDomain (fun g : S.ring => (g : L)) θ + Finsupp.single (f : L) 1) = 0) →
-  ∃ F : Place cK, (∀ a : K, a ∈ F.ring ↔ ∃ q : S.ring, (q : L) ∈ Q ∧ ψ q = a) ∧
-    F.disc (dForm cK (fun i => ψ (w i))) (Finsupp.mapDomain ψ θ) =
-      E.disc (dForm cL (Fin.cons (f : L) (fun i => (w i : L)) : Fin (n + 1) → L))
-        (Finsupp.mapDomain (fun g : S.ring => (g : L)) θ + Finsupp.single (f : L) 1) := by
+theorem disc_residue_eq
+    : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ →+* L) (cK : ℂ →+* K) (n : ℕ) (Q : Subring L)
+        (hQ : IsLocModel cL Q) (t u : Q) (S E : Place cL) (ψ : S.ring →+* K) (f : S.ring)
+        (w : Fin n → S.ring) (θ : S.ring →₀ ℚ),
+      Ideal.span {t, u} = (letI := hQ.isLocalRing; IsLocalRing.maximalIdeal Q) → ringKrullDim Q = 2
+        → S.IsPrimeOf Q → E.IsPrimeOf Q → S.ord (t : L) = 1 → E.ord (u : L) = 1
+        → Function.Surjective ψ → (∀ a, ψ (S.const a) = cK a) → Irreducible f
+        → TrBasis cK (fun i => ψ (w i)) → (∀ g ∈ θ.support, ψ g ≠ 0)
+        → (∀ P : Place cL,
+          P.IsPrimeOf Q → P.ring ≠ S.ring → P.ring ≠ E.ring
+            → P.disc (dForm cL (Fin.cons (f : L) (fun i => (w i : L)) : Fin (n + 1) → L))
+                (Finsupp.mapDomain (fun g : S.ring => (g : L)) θ + Finsupp.single (f : L) 1)
+              = 0)
+        → ∃ F : Place cK,
+          (∀ a : K, a ∈ F.ring ↔ ∃ q : S.ring, (q : L) ∈ Q ∧ ψ q = a)
+            ∧ F.disc (dForm cK (fun i => ψ (w i))) (Finsupp.mapDomain ψ θ)
+              = E.disc (dForm cL (Fin.cons (f : L) (fun i => (w i : L)) : Fin (n + 1) → L))
+                (Finsupp.mapDomain (fun g : S.ring => (g : L)) θ + Finsupp.single (f : L) 1) := by
   intro L K _ _ cL cK n Q hQ t u S E ψ f w θ hm hd hS hE hSt hEu hψ hc hf hw hθ hP
   classical
-  obtain ⟨hA1, hA2⟩ := GlobalTheory.T.twoDimLocalModel_primePlaces_along_parameters cL Q hQ t u hm hd
-  obtain ⟨m, z, hzU, hzG⟩ := GlobalTheory.T.isFreeModuleGenerator_kaehlerWedge_regularPair_cons cL Q hQ t u hm hd
-  have hxe : (fun i => ((Fin.cons t (Fin.cons u z : Fin (m + 1) → Q) : Fin (m + 2) → Q) i : L)) =
-      (Fin.cons (t : L) (Fin.cons (u : L) (fun i => (z i : L)) : Fin (m + 1) → L) : Fin (m + 2) → L) := by
+  obtain ⟨hA1, hA2⟩ :=
+    GlobalTheory.T.twoDimLocalModel_primePlaces_along_parameters cL Q hQ t u hm hd
+  obtain ⟨m, z, hzU, hzG⟩ :=
+    GlobalTheory.T.isFreeModuleGenerator_kaehlerWedge_regularPair_cons cL Q hQ t u hm hd
+  have hxe
+      : (fun i => ((Fin.cons t (Fin.cons u z : Fin (m + 1) → Q) : Fin (m + 2) → Q) i : L))
+        = (Fin.cons (t : L) (Fin.cons (u : L) (fun i => (z i : L)) : Fin (m + 1) → L)
+          : Fin (m + 2) → L) := by
     funext i
     refine Fin.cases rfl (fun j => ?_) i
     refine Fin.cases rfl (fun k => rfl) j
-  have hzT := GlobalTheory.T.isTranscendenceBasis_of_kaehlerWedge_freeGenerator cL Q hQ _ _ (by omega) hzG
+  have hzT :=
+    GlobalTheory.T.isTranscendenceBasis_of_kaehlerWedge_freeGenerator cL Q hQ _ _ (by omega) hzG
   have hzO := GlobalTheory.T.formOrd_freeTopForm_eq_zero_of_isPrimeOf cL Q hQ _ _ hzG
   rw [hxe] at hzT hzO
-  obtain ⟨F, hFr, hFu⟩ := GlobalTheory.T.exists_residuePlace_of_twoDimLocalModel cL cK Q hQ t u hm hd S ψ hS hSt hψ hc
+  obtain ⟨F, hFr, hFu⟩ :=
+    GlobalTheory.T.exists_residuePlace_of_twoDimLocalModel cL cK Q hQ t u hm hd S ψ hS hSt hψ hc
   have hQS : ∀ q : Q, (q : L) ∈ S.ring := fun q => hS.1 q q.2
   let us : S.ring := ⟨u, hQS u⟩
   let ts : S.ring := ⟨t, hQS t⟩
   let zs : Fin m → S.ring := fun i => ⟨z i, hQS (z i)⟩
   have hF1 : F.ord (ψ us) = 1 := hFu us rfl
-  have hB4 := GlobalTheory.T.residuePlace_eval_ne_zero_inv_mem_of_isUnit cL cK Q hQ S ψ F hS.1 hc hFr m z zs (fun _ => rfl) hzU
+  have hB4 :=
+    GlobalTheory.T.residuePlace_eval_ne_zero_inv_mem_of_isUnit cL cK Q hQ S ψ F hS.1 hc hFr m z zs
+      (fun _ => rfl)
+      hzU
   have hzF : ∀ i, ψ (zs i) ∈ F.ring := fun i => (hFr _).2 ⟨zs i, (z i).2, rfl⟩
-  have hTK := GlobalTheory.T.isTranscendenceBasis_residueField_uniformiser_cons cL cK S ψ hψ hc F m (ψ us) (fun i => ψ (zs i)) ⟨_, hzT⟩ hF1 hzF hB4
-  have hFO := GlobalTheory.T.formOrd_kaehlerWedge_uniformiser_residueIndependent_eq_zero cK F m (ψ us) (fun i => ψ (zs i)) hF1 hzF hB4 hTK
+  have hTK :=
+    GlobalTheory.T.isTranscendenceBasis_residueField_uniformiser_cons cL cK S ψ hψ hc F m (ψ us)
+      (fun i => ψ (zs i))
+      ⟨_, hzT⟩ hF1 hzF hB4
+  have hFO :=
+    GlobalTheory.T.formOrd_kaehlerWedge_uniformiser_residueIndependent_eq_zero cK F m (ψ us)
+      (fun i => ψ (zs i))
+      hF1 hzF hB4 hTK
   obtain rfl : n = m + 1 := by
     letI := cK.toAlgebra
     have h1 := IsTranscendenceBasis.cardinalMk_eq_trdeg (R := ℂ) hw
@@ -89,8 +113,10 @@ theorem disc_residue_eq : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ →+* L
   have hv : (fun i => ψ (v i)) = (Fin.cons (ψ us) (fun i => ψ (zs i)) : Fin (m + 1) → K) := by
     funext i
     exact Fin.cases rfl (fun _ => rfl) i
-  have htv : (Fin.cons (ts : L) (fun i => (v i : L)) : Fin (m + 2) → L) =
-      (Fin.cons (t : L) (Fin.cons (u : L) (fun i => (z i : L)) : Fin (m + 1) → L) : Fin (m + 2) → L) := by
+  have htv
+      : (Fin.cons (ts : L) (fun i => (v i : L)) : Fin (m + 2) → L)
+        = (Fin.cons (t : L) (Fin.cons (u : L) (fun i => (z i : L)) : Fin (m + 1) → L)
+          : Fin (m + 2) → L) := by
     funext i
     refine Fin.cases rfl (fun j => ?_) i
     exact Fin.cases rfl (fun _ => rfl) j
@@ -99,11 +125,14 @@ theorem disc_residue_eq : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ →+* L
   have hfreeL := (GlobalTheory.T.dvrPlace_topForm_orders_api cL (m + 2) _ hzT).1
   obtain ⟨H, hH⟩ := hfreeL.2 η
   have ht_irr : Irreducible ts := irreducible_of_ord_one S ts hSt
-  obtain ⟨h, hhf, hhw⟩ := GlobalTheory.T.residue_topForm_along_primeDivisor_adjunction cL cK (m + 1) S ψ hψ hc ts f v w H ht_irr hf (hv ▸ hTK)
-    (htv ▸ hzT) (by rw [htv]; exact hH.symm)
+  obtain ⟨h, hhf, hhw⟩ :=
+    GlobalTheory.T.residue_topForm_along_primeDivisor_adjunction cL cK (m + 1) S ψ hψ hc ts f v w H
+      ht_irr hf (hv ▸ hTK) (htv ▸ hzT) (by rw [htv]; exact hH.symm)
   rw [hv] at hhw
-  have hne : ∀ {A M : Type} [CommRing A] [Nontrivial A] [AddCommGroup M] [Module A M] {ω : M},
-      IsFreeGen A ω → ω ≠ 0 := fun hω h0 => one_ne_zero (hω.1 (a₁ := 1) (a₂ := 0) (by simp [h0]))
+  have hne
+      : ∀ {A M : Type} [CommRing A] [Nontrivial A] [AddCommGroup M] [Module A M] {ω : M},
+        IsFreeGen A ω → ω ≠ 0 := fun hω h0 =>
+    one_ne_zero (hω.1 (a₁ := 1) (a₂ := 0) (by simp [h0]))
   have hIK := GlobalTheory.T.dvrPlace_topForm_orders_api cK (m + 1) _ hTK
   have hIL := GlobalTheory.T.dvrPlace_topForm_orders_api cL (m + 2) _ hzT
   have hwne := hne (GlobalTheory.T.dvrPlace_topForm_orders_api cK (m + 1) _ hw).1
@@ -121,8 +150,9 @@ theorem disc_residue_eq : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ →+* L
     rw [zero_mul] at hhf
     exact mul_ne_zero hh0 hf0 hhf
   have hFw : F.formOrd (dForm cK (fun i => ψ (w i))) = F.ord (ψ h) := by
-    have hs : F.formOrd (ψ h • dForm cK (Fin.cons (ψ us) (fun i => ψ (zs i)))) =
-        F.ord (ψ h) + F.formOrd (dForm cK (Fin.cons (ψ us) (fun i => ψ (zs i)))) := by
+    have hs
+        : F.formOrd (ψ h • dForm cK (Fin.cons (ψ us) (fun i => ψ (zs i))))
+          = F.ord (ψ h) + F.formOrd (dForm cK (Fin.cons (ψ us) (fun i => ψ (zs i)))) := by
       simpa only [Place.formOrd] using (hIK.2 F).2.2.1 _ _ hvne hψh
     rw [hhw, hs]
     simpa only [Place.formOrd, hFO, add_zero]
@@ -149,14 +179,19 @@ theorem disc_residue_eq : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ →+* L
     · rw [Finset.mem_singleton.1 (Finsupp.support_single_subset hg)]
       exact hψh
     · exact hθ g hg
-  have hmc : Finsupp.mapDomain (fun g : S.ring => (g : L)) (Finsupp.single h 1 - θ) =
-      Finsupp.single (h : L) 1 - θ' := by
+  have hmc
+      : Finsupp.mapDomain (fun g : S.ring => (g : L)) (Finsupp.single h 1 - θ)
+        = Finsupp.single (h : L) 1 - θ' := by
     rw [Finsupp.mapDomain_sub, Finsupp.mapDomain_single]
-  have hmψ : Finsupp.mapDomain ψ (Finsupp.single h 1 - θ) =
-      Finsupp.single (ψ h) 1 - Finsupp.mapDomain ψ θ := by
+  have hmψ
+      : Finsupp.mapDomain ψ (Finsupp.single h 1 - θ)
+        = Finsupp.single (ψ h) 1 - Finsupp.mapDomain ψ θ := by
     rw [Finsupp.mapDomain_sub, Finsupp.mapDomain_single]
-  have hφP : ∀ P : Place cL, P.IsPrimeOf Q → P.ring ≠ S.ring → P.ring ≠ E.ring →
-      P.ordQ (Finsupp.mapDomain (fun g : S.ring => (g : L)) (Finsupp.single h 1 - θ)) = 0 := by
+  have hφP
+      : ∀ P : Place cL,
+        P.IsPrimeOf Q → P.ring ≠ S.ring → P.ring ≠ E.ring
+          → P.ordQ (Finsupp.mapDomain (fun g : S.ring => (g : L)) (Finsupp.single h 1 - θ))
+            = 0 := by
     intro P hPQ hPS hPE
     have h1 := hP P hPQ hPS hPE
     rw [Place.disc, map_add (f := _), Place.ordQ_single, hPη P hPQ] at h1
@@ -171,7 +206,9 @@ theorem disc_residue_eq : ∀ {L K : Type} [Field L] [Field K] (cL : ℂ →+* L
       rw [← h2]; push_cast; ring
     rw [h3]
     linarith
-  have hE2 := GlobalTheory.T.ordQ_mapDomain_residuePlace_transport cL cK Q u S E ψ F hS.1 hSu hu0 hψ hFr hFu hE1 _ hφs hφP
+  have hE2 :=
+    GlobalTheory.T.ordQ_mapDomain_residuePlace_transport cL cK Q u S E ψ F hS.1 hSu hu0 hψ hFr hFu
+      hE1 _ hφs hφP
   rw [hmc, hmψ, map_sub, map_sub, Place.ordQ_single, Place.ordQ_single] at hE2
   refine ⟨F, hFr, ?_⟩
   rw [Place.disc, Place.disc, hFw, map_add (f := _), Place.ordQ_single, hPη E hE]

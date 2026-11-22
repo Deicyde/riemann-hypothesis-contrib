@@ -16,7 +16,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 namespace UpperTheory.Gal.TP.Chr
 
-theorem chrEx_holds : ChrEx := chrEx muEmb readEx readLoc readRes readExp absFacts (typProd typVal) expInj
+theorem chrEx_holds : ChrEx :=
+  chrEx muEmb readEx readLoc readRes readExp absFacts (typProd typVal) expInj
 
 theorem chrPairs_holds : UpperTheory.Gal.TP.Sub.ChrPairs := chrPairs chrEx_holds typVal
 

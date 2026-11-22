@@ -18,11 +18,17 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.HL.ClassMass
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-  [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] {L : LocE F E} {r k : ℕ}
+variable
+  {F : Type}
+  [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F]
+  {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
+  {L : LocE F E} {r k : ℕ}
 
-theorem M_eq_Mof (S : Frames L r k) {C : Set S.FrP} {p : S.FrP} (hp : p ∈ C) {d : S.Datum}
-    {Λ : Submodule L.O S.V} (hC : S.Fr d Λ = C) : S.M d Λ = S.Mof p.1 p.2 := by
+theorem M_eq_Mof
+    (S : Frames L r k)
+    {C : Set S.FrP} {p : S.FrP} (hp : p ∈ C)
+    {d : S.Datum} {Λ : Submodule L.O S.V} (hC : S.Fr d Λ = C)
+    : S.M d Λ = S.Mof p.1 p.2 := by
   subst hC
   exact ((GlobalTheory.HL.FrameClass.frame_classes L r k S (S.fr d Λ) (S.fr' d Λ)).2.1 p hp).2.symm
 

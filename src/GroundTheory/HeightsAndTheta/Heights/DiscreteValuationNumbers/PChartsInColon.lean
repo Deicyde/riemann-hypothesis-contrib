@@ -19,8 +19,9 @@ section
 
 variable {A : Type*} [CommRing A] {L : Type*} [Field L] [Algebra A L]
 
-theorem ChartsInColon.prod_mem_pow {ι : Type*} (M : Submodule A L) (s : Finset ι) (x : ι → L)
-    (hx : ∀ i ∈ s, x i ∈ M) : ∏ i ∈ s, x i ∈ M ^ s.card := by
+theorem ChartsInColon.prod_mem_pow
+    {ι : Type*} (M : Submodule A L) (s : Finset ι) (x : ι → L) (hx : ∀ i ∈ s, x i ∈ M)
+    : ∏ i ∈ s, x i ∈ M ^ s.card := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using Submodule.one_le.mp (le_refl (1 : Submodule A L))
@@ -29,10 +30,13 @@ theorem ChartsInColon.prod_mem_pow {ι : Type*} (M : Submodule A L) (s : Finset 
     exact Submodule.mul_mem_mul (hx i (Finset.mem_insert_self i s))
       (ih fun k hk => hx k (Finset.mem_insert_of_mem hk))
 
-theorem ChartsInColon.exists_mul_pow_mem {J : Type*} (a : J → A) (j : J) (hj : algebraMap A L (a j) ≠ 0)
-    {g : L} (hg : g ∈ Algebra.adjoin A (Set.range fun k => algebraMap A L (a k) / algebraMap A L (a j))) :
-    ∃ m : ℕ, g * algebraMap A L (a j) ^ m ∈
-      (Submodule.map (Algebra.linearMap A L) (Ideal.span (Set.range a))) ^ m := by
+theorem ChartsInColon.exists_mul_pow_mem
+    {J : Type*} (a : J → A) (j : J) (hj : algebraMap A L (a j) ≠ 0)
+    {g : L}
+    (hg : g ∈ Algebra.adjoin A (Set.range fun k => algebraMap A L (a k) / algebraMap A L (a j)))
+    : ∃ m : ℕ,
+      g * algebraMap A L (a j) ^ m
+        ∈ (Submodule.map (Algebra.linearMap A L) (Ideal.span (Set.range a))) ^ m := by
   set I := Submodule.map (Algebra.linearMap A L) (Ideal.span (Set.range a)) with hI
   have hmem : ∀ k, algebraMap A L (a k) ∈ I := fun k =>
     Submodule.mem_map_of_mem (f := Algebra.linearMap A L) (Ideal.subset_span ⟨k, rfl⟩)
@@ -95,12 +99,14 @@ theorem ChartsInColon.proof : ChartsInColon.Statement.{u} := by
       rw [List.prod_ofFn]
       exact Finset.prod_congr rfl fun i _ => (hk i).symm
     rw [hx']
-    obtain ⟨j, hj⟩ := Fintype.exists_lt_card_fiber_of_mul_lt_card (f := k) (n := M)
-      (by rw [Fintype.card_fin]; omega)
+    obtain ⟨j, hj⟩ :=
+      Fintype.exists_lt_card_fiber_of_mul_lt_card (f := k) (n := M)
+        (by rw [Fintype.card_fin]; omega)
     set s := Finset.univ.filter fun i => k i = j with hs
     set t := Finset.univ.filter fun i => ¬ k i = j with ht
     have hsplit : ∏ i, b (k i) = b j ^ s.card * ∏ i ∈ t, b (k i) := by
-      rw [← Finset.prod_filter_mul_prod_filter_not Finset.univ (fun i => k i = j), ← Finset.prod_const]
+      rw [← Finset.prod_filter_mul_prod_filter_not Finset.univ (fun i => k i = j),
+        ← Finset.prod_const]
       congr 1
       exact Finset.prod_congr rfl fun i hi => by rw [(Finset.mem_filter.mp hi).2]
     have hcard : s.card + t.card = Fintype.card J * M + 1 := by
@@ -112,8 +118,9 @@ theorem ChartsInColon.proof : ChartsInColon.Statement.{u} := by
     · rw [hbj, zero_pow (by omega), zero_mul, mul_zero]
       exact zero_mem _
     · have hmj : m j ≤ M := Finset.single_le_sum (fun _ _ => Nat.zero_le _) (Finset.mem_univ j)
-      have h1 := Submodule.mul_mem_mul
-        (Submodule.mul_mem_mul (hm j hbj) (Submodule.pow_mem_pow I (hmem j) (s.card - m j))) ht'
+      have h1 :=
+        Submodule.mul_mem_mul
+          (Submodule.mul_mem_mul (hm j hbj) (Submodule.pow_mem_pow I (hmem j) (s.card - m j))) ht'
       rw [← pow_add, ← pow_add, Nat.add_sub_cancel' (by omega), hcard] at h1
       convert h1 using 1
       have hc : s.card - m j + m j = s.card := Nat.sub_add_cancel (by omega)

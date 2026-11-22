@@ -4,5 +4,4 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.BesselLeviAction
 
 @[expose] public section
 
-theorem bessel_levi_formula : PI.BesselLevi.BesselLevi :=
-  PI.UnitaryGroupMassFormula.BesselLevi.main
+theorem bessel_levi_formula : PI.BesselLevi.BesselLevi := PI.UnitaryGroupMassFormula.BesselLevi.main

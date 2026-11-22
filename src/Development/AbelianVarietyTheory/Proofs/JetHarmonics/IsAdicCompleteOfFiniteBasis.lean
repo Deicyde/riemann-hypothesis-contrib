@@ -10,9 +10,10 @@ open GlobalTheory.AdicColimit
 
 namespace GlobalTheory.FlatComplete
 
-theorem mem_smul_top_iff_repr {O M ι : Type} [CommRing O] [AddCommGroup M] [Module O M] [Fintype ι]
-    (b : Module.Basis ι O M) (J : Ideal O) (x : M) :
-    x ∈ J • (⊤ : Submodule O M) ↔ ∀ i, b.repr x i ∈ J := by
+theorem mem_smul_top_iff_repr
+    {O M ι : Type} [CommRing O] [AddCommGroup M] [Module O M] [Fintype ι]
+    (b : Module.Basis ι O M) (J : Ideal O) (x : M)
+    : x ∈ J • (⊤ : Submodule O M) ↔ ∀ i, b.repr x i ∈ J := by
   constructor
   · intro hx
     refine Submodule.smul_induction_on (p := fun y => ∀ i, b.repr y i ∈ J) hx ?_ ?_
@@ -26,13 +27,17 @@ theorem mem_smul_top_iff_repr {O M ι : Type} [CommRing O] [AddCommGroup M] [Mod
     rw [← b.sum_repr x]
     exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem_smul (h i) Submodule.mem_top
 
-theorem isAdicComplete_of_finite_basis {O M ι : Type} [CommRing O] [AddCommGroup M] [Module O M]
-    [Fintype ι] (b : Module.Basis ι O M) (J : Ideal O) [hO : IsAdicComplete J O] :
-    IsAdicComplete J M := by
+theorem isAdicComplete_of_finite_basis
+    {O M ι : Type} [CommRing O] [AddCommGroup M] [Module O M] [Fintype ι]
+    (b : Module.Basis ι O M)
+    (J : Ideal O) [hO : IsAdicComplete J O]
+    : IsAdicComplete J M := by
   have hR : ∀ (n : ℕ) (r : O), r ∈ (J ^ n • ⊤ : Submodule O O) ↔ r ∈ J ^ n := fun n r => by
     rw [smul_eq_mul, Ideal.mul_top]
-  have key : ∀ (n : ℕ) (x y : M), x ≡ y [SMOD (J ^ n • ⊤ : Submodule O M)] ↔
-      ∀ i, b.repr x i ≡ b.repr y i [SMOD (J ^ n • ⊤ : Submodule O O)] := fun n x y => by
+  have key
+      : ∀ (n : ℕ) (x y : M),
+        x ≡ y [SMOD (J ^ n • ⊤ : Submodule O M)]
+          ↔ ∀ i, b.repr x i ≡ b.repr y i [SMOD (J ^ n • ⊤ : Submodule O O)] := fun n x y => by
     simp only [SModEq.sub_mem, hR, mem_smul_top_iff_repr b (J ^ n), map_sub, Finsupp.sub_apply]
   rw [isAdicComplete_iff]
   refine ⟨isHausdorff_iff.2 fun x hx => ?_, isPrecomplete_iff.2 fun f hf => ?_⟩
@@ -49,9 +54,11 @@ theorem isAdicComplete_of_finite_basis {O M ι : Type} [CommRing O] [AddCommGrou
     rw [← b.equivFun_apply (b.equivFun.symm L), LinearEquiv.apply_symm_apply]
     exact hL i n
 
-theorem isAdicComplete_of_finite_flat (O : Type) [CommRing O] [IsLocalRing O] (J : Ideal O)
-    (hO : IsAdicComplete J O) (A : Type) [CommRing A] [Algebra O A] [Module.Finite O A]
-    [Module.Flat O A] : IsAdicComplete (J.map (algebraMap O A)) A := by
+theorem isAdicComplete_of_finite_flat
+    (O : Type) [CommRing O] [IsLocalRing O]
+    (J : Ideal O) (hO : IsAdicComplete J O)
+    (A : Type) [CommRing A] [Algebra O A] [Module.Finite O A] [Module.Flat O A]
+    : IsAdicComplete (J.map (algebraMap O A)) A := by
   have : Module.Free O A := Module.free_of_flat_of_isLocalRing
   have := hO
   exact (IsAdicComplete.map_algebraMap_iff (I := J) (M := A)).2

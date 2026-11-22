@@ -5,13 +5,14 @@ public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerPr
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.SW.HermOne
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 theorem exists_ne (h : IsCMExt F E σ) : ∃ x : E, σ x ≠ x := by
   by_contra hc
@@ -26,8 +27,8 @@ theorem exists_ne (h : IsCMExt F E σ) : ∃ x : E, σ x ≠ x := by
     rw [← h.2.2.2, hc]
   exact NumberField.InfinitePlace.not_isReal_iff_isComplex.2 (h.2.1.isComplex w) hreal
 
-theorem exists_eq_algebraMap (h : IsCMExt F E σ) {x : E} (hx : σ x = x) :
-    ∃ β : F, x = algebraMap F E β := by
+theorem exists_eq_algebraMap (h : IsCMExt F E σ) {x : E} (hx : σ x = x)
+    : ∃ β : F, x = algebraMap F E β := by
   by_contra hc
   push_neg at hc
   have hli : LinearIndependent F ![(1 : E), x] := by
@@ -44,8 +45,7 @@ theorem exists_eq_algebraMap (h : IsCMExt F E σ) {x : E} (hx : σ x = x) :
     refine ⟨?_, ht⟩
     rw [ht, map_zero, zero_mul, add_zero] at hst
     exact (map_eq_zero_iff _ (algebraMap F E).injective).1 hst
-  have hcard : Fintype.card (Fin 2) = Module.finrank F E := by
-    rw [Fintype.card_fin, h.2.2.1]
+  have hcard : Fintype.card (Fin 2) = Module.finrank F E := by rw [Fintype.card_fin, h.2.2.1]
   obtain ⟨y, hy⟩ := exists_ne h
   have hid : σ.toLinearMap = LinearMap.id := by
     refine (basisOfLinearIndependentOfCardEqFinrank hli hcard).ext fun i ↦ ?_
@@ -56,7 +56,14 @@ end GlobalTheory.CompanionTheory.SW.HermOne
 
 namespace GlobalTheory.CompanionTheory.SW
 
-theorem hermOne_eq_scal : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (T : Matrix (Fin 1) (Fin 1) E) (hT : ∀ a b, σ (T b a) = T a b), ∃ β : F, T = (fun _ _ => algebraMap F E β) ∧ (T.det ≠ 0 → β ≠ 0) ∧ ∀ (R : Type) [CommRing R] [Algebra F R], hermOf R σ T hT = hermScal R σ (algebraMap F R β) := by
+theorem hermOne_eq_scal
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (T : Matrix (Fin 1) (Fin 1) E) (hT : ∀ a b, σ (T b a) = T a b), ∃ β : F,
+          T = (fun _ _ => algebraMap F E β) ∧ (T.det ≠ 0 → β ≠ 0)
+            ∧ ∀ (R : Type) [CommRing R] [Algebra F R],
+              hermOf R σ T hT = hermScal R σ (algebraMap F R β) := by
   intro F E _ _ _ _ _ σ h T hT
   obtain ⟨β, hβ⟩ := HermOne.exists_eq_algebraMap h (hT 0 0)
   have hTβ : T = fun _ _ => algebraMap F E β := by

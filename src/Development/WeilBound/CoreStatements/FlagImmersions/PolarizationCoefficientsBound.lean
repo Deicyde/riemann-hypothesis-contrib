@@ -9,10 +9,10 @@ open MvPolynomial Filter Topology GlobalTheory.CompanionTheory.Ar.Top
 
 namespace RootFieldNumerics
 
-theorem pa_neg_lin_pow {J : Type} [Fintype J] [DecidableEq J] (d : ℕ) (c : J → ℝ) :
-    ((-∑ x, C (c x) * X x : MvPolynomial J ℝ)) ^ d =
-      ∑ m ∈ Finset.finsuppAntidiag (Finset.univ : Finset J) d,
-        ((-1) ^ d * (m.multinomial : ℝ) * m.prod (fun r e => c r ^ e)) • monomial m (1 : ℝ) := by
+theorem pa_neg_lin_pow {J : Type} [Fintype J] [DecidableEq J] (d : ℕ) (c : J → ℝ)
+    : ((- ∑ x, C (c x) * X x : MvPolynomial J ℝ)) ^ d
+      = ∑ m ∈ Finset.finsuppAntidiag (Finset.univ : Finset J) d,
+          ((-1) ^ d * (m.multinomial : ℝ) * m.prod (fun r e => c r ^ e)) • monomial m (1 : ℝ) := by
   rw [neg_pow, Finset.sum_pow_eq_sum_piAntidiag, Finset.mul_sum]
   refine Finset.sum_nbij' (fun g => Finsupp.equivFunOnFinite.symm g) (fun m => ⇑m) ?_ ?_ ?_ ?_ ?_
   · intro g hg
@@ -33,11 +33,18 @@ theorem pa_neg_lin_pow {J : Type} [Fintype J] [DecidableEq J] (d : ℕ) (c : J �
     have hg : g = ⇑m := by simp [hm]
     rw [hg, Finsupp.multinomial_of_support_subset (Finset.subset_univ _),
       Finsupp.prod_fintype _ _ (by simp), monomial_eq, Finsupp.prod_fintype _ _ (by simp)]
-    simp only [mul_pow, Finset.prod_mul_distrib, smul_eq_C_mul, map_mul, map_prod, map_pow, map_natCast,
-      map_neg, map_one]
+    simp only [mul_pow, Finset.prod_mul_distrib, smul_eq_C_mul, map_mul, map_prod, map_pow,
+      map_natCast, map_neg, map_one]
     ring
 
-theorem polarization_coefficients_bound : ∀ (J : Type) [Fintype J] [DecidableEq J] (d : ℕ) (Φ : MvPolynomial J ℝ →ₗ[ℝ] ℝ), ∃ Pl : MvPolynomial J ℝ, Pl.IsHomogeneous d ∧ (∀ c : J → ℝ, eval c Pl = Φ ((-∑ x, C (c x) * X x) ^ d)) ∧ (∀ m : J →₀ ℕ, m.degree = d → AddMonoidAlgebra.coeff Pl m = (-1) ^ d * (m.multinomial : ℝ) * Φ (monomial m 1)) ∧ ∀ m : J →₀ ℕ, m.degree = d → |Φ (monomial m 1)| ≤ |Pl.coeff m| := by
+theorem polarization_coefficients_bound
+    : ∀ (J : Type) [Fintype J] [DecidableEq J] (d : ℕ) (Φ : MvPolynomial J ℝ →ₗ[ℝ] ℝ),
+      ∃ Pl : MvPolynomial J ℝ,
+        Pl.IsHomogeneous d ∧ (∀ c : J → ℝ, eval c Pl = Φ ((- ∑ x, C (c x) * X x) ^ d))
+          ∧ (∀ m : J →₀ ℕ,
+            m.degree = d
+              → AddMonoidAlgebra.coeff Pl m = (-1) ^ d * (m.multinomial : ℝ) * Φ (monomial m 1))
+          ∧ ∀ m : J →₀ ℕ, m.degree = d → |Φ (monomial m 1)| ≤ |Pl.coeff m| := by
   intro J _ _ d Φ
   set S := Finset.finsuppAntidiag (Finset.univ : Finset J) d with hSdef
   have hS : ∀ m : J →₀ ℕ, m ∈ S ↔ m.degree = d := by

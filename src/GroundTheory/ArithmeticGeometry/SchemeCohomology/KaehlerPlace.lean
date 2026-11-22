@@ -11,7 +11,6 @@ open GroundTheory.FunctionField KaehlerDifferential IntermediateField
 
 variable {k K : Type*} [Field k] [Field K] [Algebra k K]
 
-
 variable (k) in
 def spanDField (x : K) : IntermediateField k K where
   carrier := {y | D k K y ∈ Submodule.span K {D k K x}}
@@ -28,15 +27,14 @@ def spanDField (x : K) : IntermediateField k K where
     simp only [Set.mem_ofPred_eq, Derivation.leibniz_inv] at *
     exact Submodule.smul_mem _ _ ha
 
-theorem D_mem_span_of_mem_adjoin (x : K) {y : K} (hy : y ∈ k⟮x⟯) :
-    D k K y ∈ Submodule.span K {D k K x} := by
+theorem D_mem_span_of_mem_adjoin (x : K) {y : K} (hy : y ∈ k⟮x⟯)
+    : D k K y ∈ Submodule.span K {D k K x} := by
   have : k⟮x⟯ ≤ spanDField k x := by
     rw [adjoin_le_iff, Set.singleton_subset_iff]
     exact Submodule.subset_span rfl
   exact this hy
 
-theorem span_D_eq_top (x : K) [Algebra.IsSeparable k⟮x⟯ K] :
-    Submodule.span K {D k K x} = ⊤ := by
+theorem span_D_eq_top (x : K) [Algebra.IsSeparable k⟮x⟯ K] : Submodule.span K {D k K x} = ⊤ := by
   have : Algebra.FormallyUnramified k⟮x⟯ K := .of_isSeparable _ _
   refine eq_top_iff.mpr fun ω hω ↦ ?_
   clear hω
@@ -53,8 +51,10 @@ theorem span_D_eq_top (x : K) [Algebra.IsSeparable k⟮x⟯ K] :
       obtain ⟨e, rfl⟩ := h
       rw [map_D]
       exact D_mem_span_of_mem_adjoin x e.2
-    | zero => simp
-    | add _ _ _ _ h₁ h₂ => simpa only [map_add] using add_mem h₁ h₂
+    | zero =>
+      simp
+    | add _ _ _ _ h₁ h₂ =>
+      simpa only [map_add] using add_mem h₁ h₂
     | smul c _ _ h =>
       rw [map_smul, algebra_compatible_smul K c]
       exact Submodule.smul_mem _ _ h
@@ -83,7 +83,6 @@ section Perfect
 
 variable [PerfectField k]
 
-
 variable (k K) in
 theorem exists_isSeparable_adjoin : ∃ x : K, Algebra.IsSeparable k⟮x⟯ K := by
   have : Algebra.EssFiniteType k K := essFiniteType
@@ -96,18 +95,16 @@ theorem exists_isSeparable_adjoin : ∃ x : K, Algebra.IsSeparable k⟮x⟯ K :=
   refine ⟨x, ?_⟩
   convert hsep <;> simp
 
-
 variable (k K) in
 theorem finrank_kaehlerDifferential : Module.finrank K Ω[K⁄k] = 1 := by
   obtain ⟨x, hx⟩ := exists_isSeparable_adjoin k K
-  rw [← finrank_top, ← span_D_eq_top (k := k) x, finrank_span_singleton (D_ne_zero_of_isSeparable x)]
+  rw [← finrank_top, ← span_D_eq_top (k := k) x,
+    finrank_span_singleton (D_ne_zero_of_isSeparable x)]
 
-theorem span_D_eq_top_of_ne_zero {z : K} (hz : D k K z ≠ 0) :
-    Submodule.span K {D k K z} = ⊤ :=
+theorem span_D_eq_top_of_ne_zero {z : K} (hz : D k K z ≠ 0) : Submodule.span K {D k K z} = ⊤ :=
   have : FiniteDimensional K Ω[K⁄k] :=
     Module.finite_of_finrank_pos (by rw [finrank_kaehlerDifferential]; norm_num)
-  Submodule.eq_top_of_finrank_eq (by
-    rw [finrank_span_singleton hz, finrank_kaehlerDifferential])
+  Submodule.eq_top_of_finrank_eq (by rw [finrank_span_singleton hz, finrank_kaehlerDifferential])
 
 theorem isSeparable_of_D_ne_zero {z : K} (hz : D k K z ≠ 0) : Algebra.IsSeparable k⟮z⟯ K := by
   have hsub : Subsingleton Ω[K⁄k⟮z⟯] := by

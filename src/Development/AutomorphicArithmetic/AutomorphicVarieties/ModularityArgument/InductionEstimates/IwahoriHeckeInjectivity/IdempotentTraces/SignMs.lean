@@ -5,13 +5,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum GroundTheory.Global GroundTheory.Global.SemiLocal
-open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1 PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo PositivityTheory.Rg.Tf.Adel PositivityTheory.Rg.Tf.IntegralApplyAeEq
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  GroundTheory.Global GroundTheory.Global.SemiLocal
+open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1
+  PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo PositivityTheory.Rg.Tf.Adel
+  PositivityTheory.Rg.Tf.IntegralApplyAeEq
 open GlobalTheory.CuspRep UpperTheory.V.Published
 open scoped ComplexConjugate Classical
 
-open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
+open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E
 
 private theorem neg_ne_self_unit (a : ℂˣ) : -a ≠ a := by
   intro h
@@ -19,8 +24,9 @@ private theorem neg_ne_self_unit (a : ℂˣ) : -a ≠ a := by
   have h2 : (a : ℂ) = 0 := by linear_combination (-1 / 2 : ℂ) * h1
   exact a.ne_zero h2
 
-private theorem half_of_neg_stable (n : ℕ) : ∀ A : Multiset ℂˣ, A.card ≤ n → A.map (fun x => -x) = A →
-    ∃ B' : Multiset ℂˣ, A = B' + B'.map fun b => -b := by
+private theorem half_of_neg_stable (n : ℕ)
+    : ∀ A : Multiset ℂˣ,
+      A.card ≤ n → A.map (fun x => -x) = A → ∃ B' : Multiset ℂˣ, A = B' + B'.map fun b => -b := by
   induction n with
   | zero =>
     intro A hA _
@@ -47,8 +53,7 @@ private theorem half_of_neg_stable (n : ℕ) : ∀ A : Multiset ℂˣ, A.card �
     refine ⟨a ::ₘ B', ?_⟩
     rw [Multiset.map_cons, Multiset.cons_add, Multiset.add_cons, ← hB']
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E.signMs :
-    SignMs := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.E.signMs : SignMs := by
   intro A B _ _ hs hq
   obtain ⟨B', hB'⟩ := half_of_neg_stable _ A le_rfl hs
   refine ⟨B', ?_, hB'⟩

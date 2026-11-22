@@ -6,11 +6,15 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 @[expose] public section
 
 open scoped TensorProduct Matrix Classical
-open NumberField MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.BasicNotions Formalism.BasicNotions.TH GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.FockAlg GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK GlobalTheory.RealLift UpperTheory.TP.RP
+open NumberField MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.BasicNotions Formalism.BasicNotions.TH GlobalTheory.WeilM GlobalTheory.AdelicU
+  GlobalTheory.LFun GlobalTheory.FockAlg GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  GlobalTheory.ThK GlobalTheory.RealLift UpperTheory.TP.RP
 
-theorem UpperTheory.TP.RP.embBij :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (B : Base (maximalRealSubfield E) E),
-      Function.Bijective (fun w : InfinitePlace (maximalRealSubfield E) => InfinitePlace.mk (B.emb w).1) := by
+theorem UpperTheory.TP.RP.embBij
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (B : Base (maximalRealSubfield E) E),
+      Function.Bijective (fun w : InfinitePlace (maximalRealSubfield E) =>
+        InfinitePlace.mk (B.emb w).1) := by
   intro E _ _ _ B
   have key : ∀ w, IsCMField.equivInfinitePlace E (InfinitePlace.mk (B.emb w).1) = w := by
     intro w

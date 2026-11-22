@@ -6,5 +6,6 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.JacquetO
 
 @[expose] public section
 
-theorem PositivityTheory.Geo.geometricLemmaFiltration : GlobalTheory.Published.GeometricLemmaFiltration :=
-  fun k _ _ _ _ => GlobalTheory.CompanionTheory.GeoAssembly.jacquetOfInducedFiltration k
+theorem PositivityTheory.Geo.geometricLemmaFiltration
+    : GlobalTheory.Published.GeometricLemmaFiltration := fun k _ _ _ _ =>
+  GlobalTheory.CompanionTheory.GeoAssembly.jacquetOfInducedFiltration k

@@ -32,7 +32,6 @@ lemma _root_.GlobalTheory.PerMove.inv_mulVec_apply {r : ℕ} (A : Matrix (Fin r)
   rw [Matrix.inv_def, Matrix.smul_mulVec, Pi.smul_apply, smul_eq_mul, Ring.inverse_eq_inv',
     ← Matrix.cramer_eq_adjugate_mulVec, Matrix.cramer_apply]
 
-
 open NumberField Matrix in
 open scoped nonZeroDivisors in
 open scoped ComplexConjugate in
@@ -50,7 +49,6 @@ open scoped ComplexConjugate in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
 lemma _root_.GlobalTheory.PerMove.map_cc (τ : E →+* ℂ) (z : E) : τ (_root_.ReciprocityTheory.ChartRestriction.G.FD.cc z) = conj (τ z) :=
   NumberField.IsCMField.complexEmbedding_complexConj (K := E) τ z
-
 
 open NumberField Matrix in
 open scoped nonZeroDivisors in
@@ -249,75 +247,131 @@ private lemma sum_ite_fst_eq_sum_symm {Ψ : Finset (E →+* ℂ)} [DecidableEq �
     simp [hτ]
   · intro h; exact absurd (Finset.mem_univ σ) h
 
-
 open NumberField Matrix in
 open scoped nonZeroDivisors in
 open scoped ComplexConjugate in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
-theorem _root_.GlobalTheory.per_move :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H
-        : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (D
-        : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H) (r : ℕ) (ξ : E) (Gm
-        : Matrix (Fin r) (Fin r) E) (φ : D.La →ₗ[𝓞 E] (Fin r → E)) (Ψ : Finset (E →+* ℂ)) (hΨ
-        : ∀ τ, τ ∈ Ψ ↔ τ (H.rt : E) = H.rt0) (g : ℕ) (idx : Fin g ≃ Ψ × Fin r) (ty : Fin g → (E →+*
-        ℂ)) (hty : ∀ k, ty k = if ((idx k).2 : ℕ) < D.q then ComplexEmbedding.conjugate (idx
-        k).1.1 else (idx
-        k).1.1), _root_.ReciprocityTheory.ChartRestriction.G.FD.cc ξ = -ξ → (∀ τ ∈ Ψ, 0 < (τ
-        ξ).im) → (Function.Injective φ ∧ Submodule.span E (Set.range φ) = ⊤ ∧
-        (∀ a b, _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (Gm a b) = Gm b a) ∧ Gm.det ≠ 0 ∧
-        ∀ x y, ((D.EF x y : ℤ) : ℚ) = Algebra.trace ℚ E (ξ *
-        _root_.ReciprocityTheory.ChartRestriction.G.FD.herm Gm (φ x) (φ
-        y))) → (∀ P : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame Ψ r → (D.La →+ (Fin g →
-        ℂ)), (∀ x, (∀ v k, P x v k = if ((idx k).2
-        : ℕ) < D.q then _root_.ReciprocityTheory.ChartRestriction.G.FD.hermC (idx
-        k).1.1 Gm (_root_.ReciprocityTheory.ChartRestriction.G.FD.col
-        (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x (idx k).1) (idx
-        k).2) (_root_.ReciprocityTheory.ChartRestriction.G.FD.Data.emb (idx k).1.1 (φ
-        v)) else ((_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x (idx k).1)⁻¹ *ᵥ
-        _root_.ReciprocityTheory.ChartRestriction.G.FD.Data.emb (idx k).1.1 (φ v)) (idx
-        k).2)) → ∀ v, DifferentiableOn ℂ (fun x => P x v) (_root_.ReciprocityTheory.ChartRestriction.G.FD.GG
-        Ψ Gm D.q)) ∧ (∀ (x : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame Ψ r) (γ : GL (Fin
-        r) E) (P P' : D.La →+ (Fin g →
-        ℂ)), (∀ u v, _root_.ReciprocityTheory.ChartRestriction.G.FD.herm Gm ((γ : Matrix (Fin
-        r) (Fin r) E) *ᵥ u) ((γ : Matrix (Fin r) (Fin r) E) *ᵥ
-        v) = _root_.ReciprocityTheory.ChartRestriction.G.FD.herm Gm u v) → (∀ v k, P v k = if ((idx
-        k).2 : ℕ) < D.q then _root_.ReciprocityTheory.ChartRestriction.G.FD.hermC (idx
-        k).1.1 Gm (_root_.ReciprocityTheory.ChartRestriction.G.FD.col
-        (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x (idx k).1) (idx
-        k).2) (_root_.ReciprocityTheory.ChartRestriction.G.FD.Data.emb (idx k).1.1 (φ
-        v)) else ((_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x (idx k).1)⁻¹ *ᵥ
-        _root_.ReciprocityTheory.ChartRestriction.G.FD.Data.emb (idx k).1.1 (φ v)) (idx
-        k).2) → (∀ v k, P' v k = if ((idx k).2
-        : ℕ) < D.q then _root_.ReciprocityTheory.ChartRestriction.G.FD.hermC (idx
-        k).1.1 Gm (_root_.ReciprocityTheory.ChartRestriction.G.FD.col
-        (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat
-        (_root_.ReciprocityTheory.ChartRestriction.G.FD.lact γ x) (idx k).1) (idx
-        k).2) (_root_.ReciprocityTheory.ChartRestriction.G.FD.Data.emb (idx k).1.1 (φ
-        v)) else ((_root_.ReciprocityTheory.ChartRestriction.G.FD.mat
-        (_root_.ReciprocityTheory.ChartRestriction.G.FD.lact γ x) (idx k).1)⁻¹ *ᵥ
-        _root_.ReciprocityTheory.ChartRestriction.G.FD.Data.emb (idx k).1.1 (φ v)) (idx
-        k).2) → ∀ v v', φ v' = (γ : Matrix (Fin r) (Fin
-        r) E) *ᵥ φ v → P' v' = P v) ∧ ∀ x ∈ _root_.ReciprocityTheory.ChartRestriction.G.FD.GG Ψ Gm D.q, ∀ b ∈ _root_.ReciprocityTheory.ChartRestriction.G.FD.Bor Ψ r, ∀ (P
-        P' : D.La →+ (Fin g → ℂ)), (∀ v k, P v k = if ((idx k).2
-        : ℕ) < D.q then _root_.ReciprocityTheory.ChartRestriction.G.FD.hermC (idx
-        k).1.1 Gm (_root_.ReciprocityTheory.ChartRestriction.G.FD.col
-        (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x (idx k).1) (idx
-        k).2) (_root_.ReciprocityTheory.ChartRestriction.G.FD.Data.emb (idx k).1.1 (φ
-        v)) else ((_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x (idx k).1)⁻¹ *ᵥ
-        _root_.ReciprocityTheory.ChartRestriction.G.FD.Data.emb (idx k).1.1 (φ v)) (idx
-        k).2) → (∀ v k, P' v k = if ((idx k).2
-        : ℕ) < D.q then _root_.ReciprocityTheory.ChartRestriction.G.FD.hermC (idx
-        k).1.1 Gm (_root_.ReciprocityTheory.ChartRestriction.G.FD.col
-        (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat
-        (_root_.ReciprocityTheory.ChartRestriction.G.FD.rmul x b) (idx k).1) (idx
-        k).2) (_root_.ReciprocityTheory.ChartRestriction.G.FD.Data.emb (idx k).1.1 (φ
-        v)) else ((_root_.ReciprocityTheory.ChartRestriction.G.FD.mat
-        (_root_.ReciprocityTheory.ChartRestriction.G.FD.rmul x b) (idx k).1)⁻¹ *ᵥ
-        _root_.ReciprocityTheory.ChartRestriction.G.FD.Data.emb (idx k).1.1 (φ v)) (idx
-        k).2) → _root_.ReciprocityTheory.ChartRestriction.G.FD.rmul x b ∈ _root_.ReciprocityTheory.ChartRestriction.G.FD.GG Ψ Gm D.q ∧ ∃ h : Matrix (Fin
-        g) (Fin g) ℂ, (∀ v, P' v = h *ᵥ P v) ∧ (∀ k, h k k = if ((idx k).2 : ℕ) < D.q then b (idx
-        k).1 (idx k).2 (idx k).2 else (b (idx k).1 (idx k).2 (idx
-        k).2)⁻¹) ∧ h.det = ∏ k, h k k := by
+theorem _root_.GlobalTheory.per_move
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
+        (D : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H) (r : ℕ) (ξ : E)
+        (Gm : Matrix (Fin r) (Fin r) E) (φ : D.La →ₗ[𝓞 E] (Fin r → E)) (Ψ : Finset (E →+* ℂ))
+        (hΨ : ∀ τ, τ ∈ Ψ ↔ τ (H.rt : E) = H.rt0) (g : ℕ) (idx : Fin g ≃ Ψ × Fin r)
+        (ty : Fin g → (E →+* ℂ))
+        (hty : ∀ k,
+          ty k
+            = if ((idx k).2 : ℕ) < D.q then
+                ComplexEmbedding.conjugate (idx k).1.1
+              else
+                (idx k).1.1),
+      _root_.ReciprocityTheory.ChartRestriction.G.FD.cc ξ = -ξ → (∀ τ ∈ Ψ, 0 < (τ ξ).im)
+        → (Function.Injective φ ∧ Submodule.span E (Set.range φ) = ⊤
+          ∧ (∀ a b, _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (Gm a b) = Gm b a)
+          ∧ Gm.det ≠ 0
+          ∧ ∀ x y,
+            ((D.EF x y : ℤ) : ℚ)
+              = Algebra.trace ℚ E
+                (ξ * _root_.ReciprocityTheory.ChartRestriction.G.FD.herm Gm (φ x) (φ y)))
+        → (∀ P : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame Ψ r → (D.La →+ (Fin g → ℂ)),
+            (∀ x,
+                (∀ v k,
+                  P x v k
+                    = if ((idx k).2 : ℕ) < D.q then
+                        _root_.ReciprocityTheory.ChartRestriction.G.FD.hermC (idx k).1.1 Gm
+                          (_root_.ReciprocityTheory.ChartRestriction.G.FD.col
+                            (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x (idx k).1)
+                            (idx k).2)
+                          (_root_.ReciprocityTheory.ChartRestriction.G.FD.Data.emb (idx k).1.1
+                            (φ v))
+                      else
+                        ((_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x (idx k).1)⁻¹
+                            *ᵥ _root_.ReciprocityTheory.ChartRestriction.G.FD.Data.emb (idx k).1.1
+                              (φ v))
+                          (idx k).2))
+              → ∀ v,
+                DifferentiableOn ℂ
+                  (fun x => P x v)
+                  (_root_.ReciprocityTheory.ChartRestriction.G.FD.GG Ψ Gm D.q))
+          ∧ (∀ (x : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame Ψ r) (γ : GL (Fin r) E)
+              (P P' : D.La →+ (Fin g → ℂ)),
+            (∀ u v,
+                _root_.ReciprocityTheory.ChartRestriction.G.FD.herm Gm
+                    ((γ : Matrix (Fin r) (Fin r) E) *ᵥ u) ((γ : Matrix (Fin r) (Fin r) E) *ᵥ v)
+                  = _root_.ReciprocityTheory.ChartRestriction.G.FD.herm Gm u v)
+              → (∀ v k,
+                P v k
+                  = if ((idx k).2 : ℕ) < D.q then
+                      _root_.ReciprocityTheory.ChartRestriction.G.FD.hermC (idx k).1.1 Gm
+                        (_root_.ReciprocityTheory.ChartRestriction.G.FD.col
+                          (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x (idx k).1)
+                          (idx k).2)
+                        (_root_.ReciprocityTheory.ChartRestriction.G.FD.Data.emb (idx k).1.1 (φ v))
+                    else
+                      ((_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x (idx k).1)⁻¹
+                          *ᵥ _root_.ReciprocityTheory.ChartRestriction.G.FD.Data.emb (idx k).1.1
+                            (φ v))
+                        (idx k).2)
+              → (∀ v k,
+                P' v k
+                  = if ((idx k).2 : ℕ) < D.q then
+                      _root_.ReciprocityTheory.ChartRestriction.G.FD.hermC (idx k).1.1 Gm
+                        (_root_.ReciprocityTheory.ChartRestriction.G.FD.col
+                          (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat
+                            (_root_.ReciprocityTheory.ChartRestriction.G.FD.lact γ x) (idx k).1)
+                          (idx k).2)
+                        (_root_.ReciprocityTheory.ChartRestriction.G.FD.Data.emb (idx k).1.1 (φ v))
+                    else
+                      ((_root_.ReciprocityTheory.ChartRestriction.G.FD.mat
+                            (_root_.ReciprocityTheory.ChartRestriction.G.FD.lact γ x) (idx k).1)⁻¹
+                          *ᵥ _root_.ReciprocityTheory.ChartRestriction.G.FD.Data.emb (idx k).1.1
+                            (φ v))
+                        (idx k).2)
+              → ∀ v v', φ v' = (γ : Matrix (Fin r) (Fin r) E) *ᵥ φ v → P' v' = P v)
+          ∧ ∀ x ∈ _root_.ReciprocityTheory.ChartRestriction.G.FD.GG Ψ Gm D.q,
+            ∀ b ∈ _root_.ReciprocityTheory.ChartRestriction.G.FD.Bor Ψ r,
+              ∀ (P P' : D.La →+ (Fin g → ℂ)),
+                (∀ v k,
+                    P v k
+                      = if ((idx k).2 : ℕ) < D.q then
+                          _root_.ReciprocityTheory.ChartRestriction.G.FD.hermC (idx k).1.1 Gm
+                            (_root_.ReciprocityTheory.ChartRestriction.G.FD.col
+                              (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x (idx k).1)
+                              (idx k).2)
+                            (_root_.ReciprocityTheory.ChartRestriction.G.FD.Data.emb (idx k).1.1
+                              (φ v))
+                        else
+                          ((_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x (idx k).1)⁻¹
+                              *ᵥ _root_.ReciprocityTheory.ChartRestriction.G.FD.Data.emb (idx k).1.1
+                                (φ v))
+                            (idx k).2)
+                  → (∀ v k,
+                    P' v k
+                      = if ((idx k).2 : ℕ) < D.q then
+                          _root_.ReciprocityTheory.ChartRestriction.G.FD.hermC (idx k).1.1 Gm
+                            (_root_.ReciprocityTheory.ChartRestriction.G.FD.col
+                              (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat
+                                (_root_.ReciprocityTheory.ChartRestriction.G.FD.rmul x b) (idx k).1)
+                              (idx k).2)
+                            (_root_.ReciprocityTheory.ChartRestriction.G.FD.Data.emb (idx k).1.1
+                              (φ v))
+                        else
+                          ((_root_.ReciprocityTheory.ChartRestriction.G.FD.mat
+                                (_root_.ReciprocityTheory.ChartRestriction.G.FD.rmul x b)
+                                (idx k).1)⁻¹
+                              *ᵥ _root_.ReciprocityTheory.ChartRestriction.G.FD.Data.emb (idx k).1.1
+                                (φ v))
+                            (idx k).2)
+                  → _root_.ReciprocityTheory.ChartRestriction.G.FD.rmul x b
+                      ∈ _root_.ReciprocityTheory.ChartRestriction.G.FD.GG Ψ Gm D.q
+                    ∧ ∃ h : Matrix (Fin g) (Fin g) ℂ,
+                      (∀ v, P' v = h *ᵥ P v)
+                        ∧ (∀ k,
+                          h k k
+                            = if ((idx k).2 : ℕ) < D.q then
+                                b (idx k).1 (idx k).2 (idx k).2
+                              else
+                                (b (idx k).1 (idx k).2 (idx k).2)⁻¹)
+                        ∧ h.det = ∏ k, h k k := by
   intro E _ _ _ H D r ξ Gm φ Ψ hΨ g idx ty hty _ _ _
   refine ⟨?_, ?_, ?_⟩
   · intro P hP v
@@ -330,28 +384,40 @@ theorem _root_.GlobalTheory.per_move :
   · intro x γ P P' hγ hP hP' v v' hv
     funext k
     rw [hP', hP, hv]
-    have hmat : _root_.ReciprocityTheory.ChartRestriction.G.FD.mat (_root_.ReciprocityTheory.ChartRestriction.G.FD.lact γ x) (idx k).1 =
-        (γ : Matrix (Fin r) (Fin r) E).map (idx k).1.1 * _root_.ReciprocityTheory.ChartRestriction.G.FD.mat x (idx k).1 := rfl
+    have hmat
+        : _root_.ReciprocityTheory.ChartRestriction.G.FD.mat
+            (_root_.ReciprocityTheory.ChartRestriction.G.FD.lact γ x) (idx k).1
+          = (γ : Matrix (Fin r) (Fin r) E).map (idx k).1.1
+            * _root_.ReciprocityTheory.ChartRestriction.G.FD.mat x (idx k).1 :=
+      rfl
     rw [hmat, _root_.GlobalTheory.PerMove.emb_mulVec]
     split_ifs
     · rw [_root_.GlobalTheory.PerMove.col_mul, _root_.GlobalTheory.PerMove.hermC_unitary _ _ _ hγ]
     · have hunit : IsUnit ((γ : Matrix (Fin r) (Fin r) E).map (idx k).1.1).det := by
-        rw [show ((γ : Matrix (Fin r) (Fin r) E).map (idx k).1.1).det =
-            (idx k).1.1 (γ : Matrix (Fin r) (Fin r) E).det from (RingHom.map_det _ _).symm]
+        rw [show ((γ : Matrix (Fin r) (Fin r) E).map (idx k).1.1).det
+            = (idx k).1.1 (γ : Matrix (Fin r) (Fin r) E).det from
+          (RingHom.map_det _ _).symm]
         exact ((Matrix.isUnit_iff_isUnit_det _).mp γ.isUnit).map _
-      rw [Matrix.mul_inv_rev, Matrix.mulVec_mulVec, Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hunit,
-        Matrix.mul_one]
+      rw [Matrix.mul_inv_rev, Matrix.mulVec_mulVec, Matrix.mul_assoc,
+        Matrix.nonsing_inv_mul _ hunit, Matrix.mul_one]
   · intro x hx b hb P P' hP hP'
     refine ⟨_root_.GlobalTheory.PerMove.rmul_mem_GG hx hb, ?_⟩
     classical
     let coeff : Fin g → Fin r → ℂ := fun k c =>
-      if ((idx k).2 : ℕ) < D.q then _root_.ReciprocityTheory.ChartRestriction.G.FD.mat b (idx k).1 c (idx k).2
-      else (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat b (idx k).1)⁻¹ (idx k).2 c
+      if ((idx k).2 : ℕ) < D.q then
+        _root_.ReciprocityTheory.ChartRestriction.G.FD.mat b (idx k).1 c (idx k).2
+      else
+        (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat b (idx k).1)⁻¹ (idx k).2 c
     let h : Matrix (Fin g) (Fin g) ℂ :=
       Matrix.of fun k l => if (idx l).1 = (idx k).1 then coeff k (idx l).2 else 0
     refine ⟨h, fun v => ?_, fun k => ?_, ?_⟩
     · funext k
-      have hmat : _root_.ReciprocityTheory.ChartRestriction.G.FD.mat (_root_.ReciprocityTheory.ChartRestriction.G.FD.rmul x b) (idx k).1 = _root_.ReciprocityTheory.ChartRestriction.G.FD.mat x (idx k).1 * _root_.ReciprocityTheory.ChartRestriction.G.FD.mat b (idx k).1 := rfl
+      have hmat
+          : _root_.ReciprocityTheory.ChartRestriction.G.FD.mat
+              (_root_.ReciprocityTheory.ChartRestriction.G.FD.rmul x b) (idx k).1
+            = _root_.ReciprocityTheory.ChartRestriction.G.FD.mat x (idx k).1
+              * _root_.ReciprocityTheory.ChartRestriction.G.FD.mat b (idx k).1 :=
+        rfl
       rw [hP', hmat, show (h *ᵥ P v) k = ∑ l, h k l * P v l from rfl]
       simp only [h, Matrix.of_apply]
       rw [sum_ite_fst_eq_sum_symm]
@@ -361,13 +427,18 @@ theorem _root_.GlobalTheory.per_move :
         refine Finset.sum_congr rfl fun c _ => ?_
         split_ifs with hc
         · rfl
-        · rw [show _root_.ReciprocityTheory.ChartRestriction.G.FD.mat b (idx k).1 c (idx k).2 = 0 from _root_.GlobalTheory.PerMove.bor_tri hb _ (by
-            simp only [id_eq, Fin.lt_def]; omega), zero_mul, zero_mul]
+        · rw [show _root_.ReciprocityTheory.ChartRestriction.G.FD.mat b (idx k).1 c (idx k).2
+                = 0 from
+              _root_.GlobalTheory.PerMove.bor_tri hb _ (by simp only [id_eq, Fin.lt_def]; omega),
+            zero_mul, zero_mul]
       · rw [Matrix.mul_inv_rev, ← Matrix.mulVec_mulVec, Matrix.mulVec, dotProduct]
         refine Finset.sum_congr rfl fun c _ => ?_
         split_ifs with hc
-        · rw [show (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat b (idx k).1)⁻¹ (idx k).2 c = 0 from _root_.GlobalTheory.PerMove.bor_inv_tri hb _ (by
-            simp only [id_eq, Fin.lt_def]; omega), zero_mul, zero_mul]
+        · rw [show (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat b (idx k).1)⁻¹ (idx k).2 c
+                = 0 from
+              _root_.GlobalTheory.PerMove.bor_inv_tri hb _
+                (by simp only [id_eq, Fin.lt_def]; omega),
+            zero_mul, zero_mul]
         · rfl
     · simp only [h, coeff, Matrix.of_apply, if_true]
       split_ifs
@@ -394,8 +465,10 @@ theorem _root_.GlobalTheory.per_move :
           simp only [key] at hk
           simp only [coeff]
           split_ifs with ha
-          · exact _root_.GlobalTheory.PerMove.bor_tri hb _ (by simp only [id_eq, Fin.lt_def]; split_ifs at hk <;> omega)
-          · exact _root_.GlobalTheory.PerMove.bor_inv_tri hb _ (by simp only [id_eq, Fin.lt_def]; split_ifs at hk <;> omega)
+          · exact _root_.GlobalTheory.PerMove.bor_tri hb _
+              (by simp only [id_eq, Fin.lt_def]; split_ifs at hk <;> omega)
+          · exact _root_.GlobalTheory.PerMove.bor_inv_tri hb _
+              (by simp only [id_eq, Fin.lt_def]; split_ifs at hk <;> omega)
         · rfl
 
 end GlobalTheory

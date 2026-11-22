@@ -11,36 +11,35 @@ namespace GlobalTheory.PeriodicPartition
 
 variable {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
 
-
 open Complex Matrix in
 open scoped ContDiff BigOperators Real Topology Manifold in
 open scoped Pointwise in
 variable {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] in
-theorem _root_.GlobalTheory.PeriodicPartition.locallyFinite_support_translate (Λ : Submodule ℤ E) [DiscreteTopology Λ] (φ : E → ℝ)
-    (hφ : HasCompactSupport φ) :
-    LocallyFinite fun l : Λ => Function.support fun z : E => φ (z + l) := by
+theorem _root_.GlobalTheory.PeriodicPartition.locallyFinite_support_translate
+    (Λ : Submodule ℤ E) [DiscreteTopology Λ] (φ : E → ℝ) (hφ : HasCompactSupport φ)
+    : LocallyFinite fun l : Λ => Function.support fun z : E => φ (z + l) := by
   intro x
   refine ⟨Metric.closedBall x 1, Metric.closedBall_mem_nhds x one_pos, ?_⟩
-  have hclosed : IsClosed (Λ : Set E) :=
-    (Λ.toAddSubgroup).isClosed_of_discreteTopology
+  have hclosed : IsClosed (Λ : Set E) := (Λ.toAddSubgroup).isClosed_of_discreteTopology
   have hfin : ((tsupport φ - Metric.closedBall x 1) ∩ (Λ : Set E)).Finite :=
     Metric.finite_isBounded_inter_isClosed DiscreteTopology.isDiscrete
       (hφ.isBounded.sub Metric.isBounded_closedBall) hclosed
   refine (hfin.preimage Subtype.val_injective.injOn).subset ?_
   rintro l ⟨z, hz, hzb⟩
   refine ⟨?_, l.2⟩
-  have hmem := Set.sub_mem_sub (subset_tsupport φ (show z + (l : E) ∈ Function.support φ from hz)) hzb
+  have hmem :=
+    Set.sub_mem_sub (subset_tsupport φ (show z + (l : E) ∈ Function.support φ from hz)) hzb
   rwa [add_sub_cancel_left] at hmem
-
 
 open Complex Matrix in
 open scoped ContDiff BigOperators Real Topology Manifold in
 open scoped Pointwise in
 variable {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] in
-theorem _root_.GlobalTheory.PeriodicPartition.exists_finite_subcover (Λ : Submodule ℤ E) [DiscreteTopology Λ] [IsZLattice ℝ Λ]
+theorem _root_.GlobalTheory.PeriodicPartition.exists_finite_subcover
+    (Λ : Submodule ℤ E) [DiscreteTopology Λ] [IsZLattice ℝ Λ]
     {κ : Type} (V : κ → Set E) (hV : ∀ k, IsOpen (V k))
-    (hper : ∀ k (l : Λ) z, z ∈ V k → z + l ∈ V k) (hcov : ∀ z, ∃ k, z ∈ V k) :
-    ∃ t : Finset κ, ∀ z, ∃ k ∈ t, z ∈ V k := by
+    (hper : ∀ k (l : Λ) z, z ∈ V k → z + l ∈ V k) (hcov : ∀ z, ∃ k, z ∈ V k)
+    : ∃ t : Finset κ, ∀ z, ∃ k ∈ t, z ∈ V k := by
   classical
   let b := Module.Free.chooseBasis ℤ Λ
   let b' := b.ofZLatticeBasis ℝ Λ
@@ -48,7 +47,8 @@ theorem _root_.GlobalTheory.PeriodicPartition.exists_finite_subcover (Λ : Submo
     (ZSpan.fundamentalDomain_isBounded b').isCompact_closure
   obtain ⟨t, ht⟩ := hK.elim_finite_subcover V hV (fun z _ => Set.mem_iUnion.2 (hcov z))
   refine ⟨t, fun z => ?_⟩
-  obtain ⟨k, hk, hz⟩ := Set.mem_iUnion₂.1 (ht (subset_closure (ZSpan.fract_mem_fundamentalDomain b' z)))
+  obtain ⟨k, hk, hz⟩ :=
+    Set.mem_iUnion₂.1 (ht (subset_closure (ZSpan.fract_mem_fundamentalDomain b' z)))
   have hmem : (ZSpan.floor b' z : E) ∈ Λ := by
     exact (b.ofZLatticeBasis_span ℝ Λ).le (ZSpan.floor b' z).2
   refine ⟨k, hk, ?_⟩
@@ -62,18 +62,19 @@ open Complex Matrix in
 open scoped ContDiff BigOperators Real Topology Manifold in
 open scoped Pointwise in
 variable {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] in
-private theorem hasFiniteSupport_lattice_translate (Λ : Submodule ℤ E) [DiscreteTopology Λ] (φ : E → ℝ)
-    (hφ : HasCompactSupport φ) (z : E) :
-    Function.HasFiniteSupport fun l : Λ => φ (z + l) :=
+private theorem hasFiniteSupport_lattice_translate
+    (Λ : Submodule ℤ E) [DiscreteTopology Λ] (φ : E → ℝ) (hφ : HasCompactSupport φ) (z : E)
+    : Function.HasFiniteSupport fun l : Λ => φ (z + l) :=
   (_root_.GlobalTheory.PeriodicPartition.locallyFinite_support_translate Λ φ hφ).point_finite z
 
 open Complex Matrix in
 open scoped ContDiff BigOperators Real Topology Manifold in
 open scoped Pointwise in
 variable {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] in
-private theorem contDiff_finsum_of_locallyFinite_support {ι : Type} {f : ι → E → ℝ}
-    (hf : ∀ i, ContDiff ℝ ∞ (f i)) (hlf : LocallyFinite fun i => Function.support (f i)) :
-    ContDiff ℝ ∞ fun x => ∑ᶠ i, f i x := by
+private theorem contDiff_finsum_of_locallyFinite_support
+    {ι : Type} {f : ι → E → ℝ}
+    (hf : ∀ i, ContDiff ℝ ∞ (f i)) (hlf : LocallyFinite fun i => Function.support (f i))
+    : ContDiff ℝ ∞ fun x => ∑ᶠ i, f i x := by
   rw [contDiff_iff_contDiffAt]
   intro x
   obtain ⟨s, hs⟩ := finsum_eventually_eq_sum hlf x
@@ -83,18 +84,20 @@ open Complex Matrix in
 open scoped ContDiff BigOperators Real Topology Manifold in
 open scoped Pointwise in
 variable {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] in
-private theorem contDiff_finsum_lattice_translate (Λ : Submodule ℤ E) [DiscreteTopology Λ] (φ : E → ℝ)
-    (hφ : HasCompactSupport φ) (hs : ContDiff ℝ ∞ φ) :
-    ContDiff ℝ ∞ fun z => ∑ᶠ l : Λ, φ (z + l) :=
-  contDiff_finsum_of_locallyFinite_support (fun l => hs.comp (contDiff_id.add contDiff_const))
+private theorem contDiff_finsum_lattice_translate
+    (Λ : Submodule ℤ E) [DiscreteTopology Λ]
+    (φ : E → ℝ) (hφ : HasCompactSupport φ) (hs : ContDiff ℝ ∞ φ)
+    : ContDiff ℝ ∞ fun z => ∑ᶠ l : Λ, φ (z + l) :=
+  contDiff_finsum_of_locallyFinite_support
+    (fun l => hs.comp (contDiff_id.add contDiff_const))
     (_root_.GlobalTheory.PeriodicPartition.locallyFinite_support_translate Λ φ hφ)
 
 open Complex Matrix in
 open scoped ContDiff BigOperators Real Topology Manifold in
 open scoped Pointwise in
 variable {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] in
-private theorem finsum_lattice_translate_add (Λ : Submodule ℤ E) (φ : E → ℝ) (l : Λ) (z : E) :
-    ∑ᶠ m : Λ, φ (z + l + m) = ∑ᶠ m : Λ, φ (z + m) := by
+private theorem finsum_lattice_translate_add (Λ : Submodule ℤ E) (φ : E → ℝ) (l : Λ) (z : E)
+    : ∑ᶠ m : Λ, φ (z + l + m) = ∑ᶠ m : Λ, φ (z + m) := by
   rw [← finsum_comp_equiv (Equiv.addLeft l) (f := fun m : Λ => φ (z + m))]
   simp [add_assoc]
 
@@ -102,13 +105,15 @@ open Complex Matrix in
 open scoped ContDiff BigOperators Real Topology Manifold in
 open scoped Pointwise in
 variable {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] in
-private theorem tsupport_finsum_lattice_translate_subset (Λ : Submodule ℤ E) [DiscreteTopology Λ]
-    (φ : E → ℝ) (hφ : HasCompactSupport φ) (U : Set E) (hU : tsupport φ ⊆ U)
-    (hper : ∀ (l : Λ) z, z ∈ U → z + l ∈ U) :
-    tsupport (fun z => ∑ᶠ l : Λ, φ (z + l)) ⊆ U := by
+private theorem tsupport_finsum_lattice_translate_subset
+    (Λ : Submodule ℤ E) [DiscreteTopology Λ]
+    (φ : E → ℝ) (hφ : HasCompactSupport φ)
+    (U : Set E) (hU : tsupport φ ⊆ U) (hper : ∀ (l : Λ) z, z ∈ U → z + l ∈ U)
+    : tsupport (fun z => ∑ᶠ l : Λ, φ (z + l)) ⊆ U := by
   have hlf := _root_.GlobalTheory.PeriodicPartition.locallyFinite_support_translate Λ φ hφ
-  have h1 : Function.support (fun z => ∑ᶠ l : Λ, φ (z + l)) ⊆
-      ⋃ l : Λ, Function.support fun z => φ (z + l) := by
+  have h1
+      : Function.support (fun z => ∑ᶠ l : Λ, φ (z + l))
+        ⊆ ⋃ l : Λ, Function.support fun z => φ (z + l) := by
     intro z hz
     by_contra h
     simp only [Set.mem_iUnion, Function.mem_support, not_exists, not_not] at h
@@ -120,27 +125,37 @@ private theorem tsupport_finsum_lattice_translate_subset (Λ : Submodule ℤ E) 
   have hl' : z + l ∈ tsupport φ := tsupport_comp_subset_preimage φ (continuous_add_const (l : E)) hl
   simpa using hper (-l) _ (hU hl')
 
-
 open Complex Matrix in
 open scoped ContDiff BigOperators Real Topology Manifold in
-theorem _root_.GlobalTheory.exists_smooth_periodic_partition_of_unity :
-    ∀ (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)), DiscreteTopology Λ → Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤ → ∀ (ι : Type) (U : ι → Set (Fin g → ℂ)), (∀ i, IsOpen (U i)) → (∀ i (l : Λ) z, z ∈ U i → z + l ∈ U i) → (∀ z, ∃ i, z ∈ U i) → ∃ (s : Finset ι) (ρ : ι → (Fin g → ℂ) → ℝ), (∀ i, ContDiff ℝ ∞ (ρ i) ∧ (∀ (l : Λ) z, ρ i (z + l) = ρ i z) ∧ tsupport (ρ i) ⊆ U i) ∧ ∀ z, ∑ i ∈ s, ρ i z = 1 := by
+theorem _root_.GlobalTheory.exists_smooth_periodic_partition_of_unity
+    : ∀ (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)),
+      DiscreteTopology Λ → Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤
+        → ∀ (ι : Type) (U : ι → Set (Fin g → ℂ)),
+          (∀ i, IsOpen (U i)) → (∀ i (l : Λ) z, z ∈ U i → z + l ∈ U i) → (∀ z, ∃ i, z ∈ U i)
+            → ∃ (s : Finset ι) (ρ : ι → (Fin g → ℂ) → ℝ),
+              (∀ i, ContDiff ℝ ∞ (ρ i) ∧ (∀ (l : Λ) z, ρ i (z + l) = ρ i z) ∧ tsupport (ρ i) ⊆ U i)
+                ∧ ∀ z, ∑ i ∈ s, ρ i z = 1 := by
   intro g Λ hdisc hspan ι U hU hper hcov
   haveI := hdisc
   haveI : IsZLattice ℝ Λ := ⟨hspan⟩
-  obtain ⟨t, ht⟩ := _root_.GlobalTheory.PeriodicPartition.exists_finite_subcover Λ
-    (fun x : Fin g → ℂ => {z | ∃ l : Λ, z + (l : Fin g → ℂ) ∈ Metric.ball x 1})
-    (fun x => by
-      have hset : {z | ∃ l : Λ, z + (l : Fin g → ℂ) ∈ Metric.ball x 1} =
-          ⋃ l : Λ, (· + (l : Fin g → ℂ)) ⁻¹' Metric.ball x 1 := by
-        ext z; simp
-      rw [hset]
-      exact isOpen_iUnion fun l => Metric.isOpen_ball.preimage (continuous_add_const _))
-    (fun x l z ⟨m, hm⟩ => ⟨m - l, by
-      have hzm : z + (l : Fin g → ℂ) + ((m - l : Λ) : Fin g → ℂ) = z + m := by push_cast; abel
-      rw [hzm]
-      exact hm⟩)
-    (fun z => ⟨z, 0, by simp⟩)
+  obtain ⟨t, ht⟩ :=
+    _root_.GlobalTheory.PeriodicPartition.exists_finite_subcover Λ
+      (fun x : Fin g → ℂ => {z | ∃ l : Λ, z + (l : Fin g → ℂ) ∈ Metric.ball x 1})
+      (fun x => by
+        have hset
+            : {z | ∃ l : Λ, z + (l : Fin g → ℂ) ∈ Metric.ball x 1}
+              = ⋃ l : Λ, (· + (l : Fin g → ℂ)) ⁻¹' Metric.ball x 1 := by
+          ext z; simp
+        rw [hset]
+        exact isOpen_iUnion fun l => Metric.isOpen_ball.preimage (continuous_add_const _))
+      (fun x l z ⟨m, hm⟩ => ⟨
+        m - l,
+        by
+          have hzm : z + (l : Fin g → ℂ) + ((m - l : Λ) : Fin g → ℂ) = z + m := by push_cast; abel
+          rw [hzm]
+          exact hm
+      ⟩)
+      (fun z => ⟨z, 0, by simp⟩)
   let β : (Fin g → ℂ) → (Fin g → ℂ) → ℝ := fun x => ⇑(⟨1, 2, one_pos, one_lt_two⟩ : ContDiffBump x)
   let θ : (Fin g → ℂ) → ℝ := fun z => ∑ x ∈ t, β x z
   have hθs : ContDiff ℝ ∞ θ := ContDiff.sum fun x _ => ContDiffBump.contDiff _
@@ -157,8 +172,9 @@ theorem _root_.GlobalTheory.exists_smooth_periodic_partition_of_unity :
     have h1 : β x y = 1 := ContDiffBump.one_of_mem_closedBall _ (Metric.ball_subset_closedBall hy)
     show 1 ≤ ∑ x ∈ t, β x y
     linarith
-  obtain ⟨p, hp⟩ := SmoothPartitionOfUnity.exists_isSubordinate 𝓘(ℝ, Fin g → ℂ) isClosed_univ U hU
-    (fun z _ => Set.mem_iUnion.2 (hcov z))
+  obtain ⟨p, hp⟩ :=
+    SmoothPartitionOfUnity.exists_isSubordinate 𝓘(ℝ, Fin g → ℂ) isClosed_univ U hU
+      (fun z _ => Set.mem_iUnion.2 (hcov z))
   have hps : ∀ i, ContDiff ℝ ∞ (p i) := fun i => contMDiff_iff_contDiff.1 (p i).contMDiff
   have hsfin := p.locallyFinite.finite_nonempty_inter_compact hθc
   let s := hsfin.toFinset
@@ -180,8 +196,9 @@ theorem _root_.GlobalTheory.exists_smooth_periodic_partition_of_unity :
   have hΘpos : ∀ z, 0 < Θ z := by
     intro z
     obtain ⟨x, hx, l, hl⟩ := ht z
-    exact lt_of_lt_of_le one_pos ((hθ1 x hx _ hl).trans
-      (single_le_finsum l (hasFiniteSupport_lattice_translate Λ θ hθc z) fun m => hθn _))
+    exact lt_of_lt_of_le one_pos
+      ((hθ1 x hx _ hl).trans
+        (single_le_finsum l (hasFiniteSupport_lattice_translate Λ θ hθc z) fun m => hθn _))
   have hΘs : ContDiff ℝ ∞ Θ := contDiff_finsum_lattice_translate Λ θ hθc hθs
   refine ⟨s, fun i z => (∑ᶠ l : Λ, a i (z + l)) / Θ z, fun i => ⟨?_, ?_, ?_⟩, ?_⟩
   · exact (contDiff_finsum_lattice_translate Λ (a i) (hac i) (has i)).div hΘs fun z => (hΘpos z).ne'
@@ -189,16 +206,18 @@ theorem _root_.GlobalTheory.exists_smooth_periodic_partition_of_unity :
     simp only [Θ]
     rw [finsum_lattice_translate_add, finsum_lattice_translate_add]
   · show tsupport (fun z => (∑ᶠ l : Λ, a i (z + l)) / Θ z) ⊆ U i
-    have hfun : (fun z => (∑ᶠ l : Λ, a i (z + l)) / Θ z) =
-        fun z => (∑ᶠ l : Λ, a i (z + l)) * (Θ z)⁻¹ := by
+    have hfun
+        : (fun z => (∑ᶠ l : Λ, a i (z + l)) / Θ z)
+          = fun z => (∑ᶠ l : Λ, a i (z + l)) * (Θ z)⁻¹ := by
       ext z; rw [div_eq_mul_inv]
     rw [hfun]
-    exact tsupport_mul_subset_left.trans
-      (tsupport_finsum_lattice_translate_subset Λ (a i) (hac i) (U i) (hat i) (hper i))
+    exact tsupport_mul_subset_left.trans (tsupport_finsum_lattice_translate_subset Λ (a i) (hac i)
+      (U i) (hat i) (hper i))
   · intro z
     show ∑ i ∈ s, (∑ᶠ l : Λ, a i (z + l)) / Θ z = 1
     rw [← Finset.sum_div, div_eq_one_iff_eq (hΘpos z).ne',
-      ← finsum_sum_comm s (fun (l : Λ) i => a i (z + l))
+      ← finsum_sum_comm s
+        (fun (l : Λ) i => a i (z + l))
         (fun i _ => hasFiniteSupport_lattice_translate Λ (a i) (hac i) z)]
     apply finsum_congr
     intro l

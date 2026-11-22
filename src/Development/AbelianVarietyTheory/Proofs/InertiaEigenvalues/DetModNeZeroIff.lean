@@ -16,19 +16,23 @@ section Field
 
 variable {k : Type} [Field k]
 
-theorem card_isCompl [Finite k] {V : Type} [AddCommGroup V] [Module k V] [FiniteDimensional k V]
-    (R : Submodule k V) :
-    Nat.card {U : Submodule k V // IsCompl R U} =
-      Nat.card k ^ (finrank k (V ⧸ R) * finrank k R) := by
+theorem card_isCompl
+    [Finite k] {V : Type} [AddCommGroup V] [Module k V] [FiniteDimensional k V] (R : Submodule k V)
+    : Nat.card {U : Submodule k V // IsCompl R U}
+      = Nat.card k ^ (finrank k (V ⧸ R) * finrank k R) := by
   obtain ⟨f₀, hf₀⟩ := R.subtype.exists_leftInverse_of_injective R.ker_subtype
   have h₀ : ∀ x : R, f₀ x = x := fun x => LinearMap.congr_fun hf₀ x
   rw [Nat.card_congr R.isComplEquivProj, ← Module.finrank_linearMap k k,
     ← Module.natCard_eq_pow_finrank (K := k)]
   symm
   refine Nat.card_congr (Equiv.ofBijective
-    (fun g => ⟨f₀ + g.comp R.mkQ, fun x => by
-      have : R.mkQ x = 0 := (Submodule.Quotient.mk_eq_zero R).2 x.2
-      rw [LinearMap.add_apply, LinearMap.comp_apply, this, map_zero, add_zero, h₀]⟩) ⟨?_, ?_⟩)
+    (fun g => ⟨
+      f₀ + g.comp R.mkQ,
+      fun x => by
+        have : R.mkQ x = 0 := (Submodule.Quotient.mk_eq_zero R).2 x.2
+        rw [LinearMap.add_apply, LinearMap.comp_apply, this, map_zero, add_zero, h₀]
+    ⟩)
+    ⟨?_, ?_⟩)
   · intro g g' h
     have h1 : g.comp R.mkQ = g'.comp R.mkQ := add_left_cancel (congrArg Subtype.val h)
     exact R.linearMap_qext h1
@@ -37,12 +41,13 @@ theorem card_isCompl [Finite k] {V : Type} [AddCommGroup V] [Module k V] [Finite
     · rw [LinearMap.mem_ker, LinearMap.sub_apply, hf ⟨x, hx⟩, h₀ ⟨x, hx⟩, sub_self]
     · simp
 
-theorem card_sup_eq_top [Finite k] (r t : ℕ) (R : Submodule k (Fin (r + t) → k))
-    (hR : finrank k R ≤ r) :
-    Nat.card {U : Submodule k (Fin (r + t) → k) // finrank k U = t ∧ R ⊔ U = ⊤} =
-      if finrank k R = r then Nat.card k ^ (r * t) else 0 := by
-  have key : ∀ U : Submodule k (Fin (r + t) → k), R ⊔ U = ⊤ →
-      r + t + finrank k ↥(R ⊓ U) = finrank k R + finrank k U := fun U h => by
+theorem card_sup_eq_top
+    [Finite k] (r t : ℕ) (R : Submodule k (Fin (r + t) → k)) (hR : finrank k R ≤ r)
+    : Nat.card {U : Submodule k (Fin (r + t) → k) // finrank k U = t ∧ R ⊔ U = ⊤}
+      = if finrank k R = r then Nat.card k ^ (r * t) else 0 := by
+  have key
+      : ∀ U : Submodule k (Fin (r + t) → k),
+        R ⊔ U = ⊤ → r + t + finrank k ↥(R ⊓ U) = finrank k R + finrank k U := fun U h => by
     have := Submodule.finrank_sup_add_finrank_inf_eq R U
     rwa [h, finrank_top, finrank_fin_fun] at this
   split_ifs with h

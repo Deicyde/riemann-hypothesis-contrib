@@ -18,7 +18,8 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.BoxCompare
 
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Semi.LB
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Semi.LB
 open GlobalTheory.IndefiniteRowSideFullHecke.PowerGroupDatum (PowerDatum IsNormSymm)
 
 section Units
@@ -79,10 +80,11 @@ lemma ofIso_le (j : Fin 2 → L.ι) :
 def symEquiv : SymGen L f ≃ LB.Iso L (L.pull f) where
   toFun sy := ⟨fun p => res (toIso_le L f p) (ts sy ![p.1 ⟨⟩, p.2])⟩
   invFun w := ⟨fun j => res (ofIso_le L f j) (w.s (fun _ => j 0, j 1))⟩
-  left_inv sy := gen_ext fun j => by
-    refine (res_res _ _ _).trans ((res_gen_congr sy ?_ _ le_rfl).trans (res_self _ _))
-    funext k
-    fin_cases k <;> rfl
+  left_inv sy :=
+    gen_ext fun j => by
+      refine (res_res _ _ _).trans ((res_gen_congr sy ?_ _ le_rfl).trans (res_self _ _))
+      funext k
+      fin_cases k <;> rfl
   right_inv w := gen_ext fun p => (res_res _ _ _).trans (res_self _ _)
 
 lemma restrict_lineBundleSymmetryUnitsEquivIso_apply (sy : SymGen L f) (p : (PUnit.{1} → L.ι) × L.ι) {W : X.Opens}
@@ -111,10 +113,10 @@ lemma res_dg_pull (p q : (PUnit.{1} → L.ι) × L.ι) {W : X.Opens}
 
 def SymCompat (sy : SymGen L f) : Prop :=
   ∀ (a b a' b' : L.ι) (W : X.Opens) (h₁ : W ≤ f ⁻¹ᵁ (L.U a ⊓ L.U a')) (h₂ : W ≤ L.U b ⊓ L.U b')
-    (h₃ : W ≤ wchart L (K := Fin 2) ![f, 𝟙 X] ![a, b])
-    (h₄ : W ≤ wchart L (K := Fin 2) ![f, 𝟙 X] ![a', b']),
-    res h₃ (ts sy ![a, b]) =
-      res h₁ (pullU f _ (L.g a a')) * (res h₂ (L.g b b'))⁻¹ * res h₄ (ts sy ![a', b'])
+      (h₃ : W ≤ wchart L (K := Fin 2) ![f, 𝟙 X] ![a, b])
+      (h₄ : W ≤ wchart L (K := Fin 2) ![f, 𝟙 X] ![a', b']),
+    res h₃ (ts sy ![a, b])
+      = res h₁ (pullU f _ (L.g a a')) * (res h₂ (L.g b b'))⁻¹ * res h₄ (ts sy ![a', b'])
 
 lemma isGen_iff_symCompat (sy : SymGen L f) : sy.IsGen ↔ SymCompat L f sy := by
   rw [isGen_iff]
@@ -164,8 +166,8 @@ def DiagOne (sy : SymGen L f) : Prop :=
 
 def FixesRig (sy : SymGen L f) (r : LB.Gen (L.pull e)) : Prop :=
   ∀ (a b : L.ι) (W : T.Opens) (ha : W ≤ wchart L (fun _ : PUnit.{1} => e) (fun _ => a))
-    (hb : W ≤ wchart L (fun _ : PUnit.{1} => e) (fun _ => b))
-    (h : W ≤ e ⁻¹ᵁ wchart L (K := Fin 2) ![f, 𝟙 X] ![a, b]),
+      (hb : W ≤ wchart L (fun _ : PUnit.{1} => e) (fun _ => b))
+      (h : W ≤ e ⁻¹ᵁ wchart L (K := Fin 2) ![f, 𝟙 X] ![a, b]),
     res ha (ts r (fun _ => a)) = res h (pullU e _ (ts sy ![a, b])) * res hb (ts r (fun _ => b))
 
 lemma corr_iff_diagOne (he : e ≫ f = e) (sy : SymGen L f) :
@@ -269,12 +271,14 @@ lemma maps_iff_fixesRig (L : LB G.left) (r : LB.Gen (L.pull (eSec G)))
 def IsCanonSym (L : LB G.left) (sy : SymGen L (ι[G]).left) : Prop :=
   sy.IsGen ∧ LB.Gen.Corr L _ _ _ _ (LB.pullGen L _ _ sy (eSec G)) (LB.oneGen L)
 
-theorem isNormSymm_iff (L : RigLB G) (sy : SymGen L.L (ι[G]).left) :
-    IsNormSymm L (symEquiv L.L _ sy) ↔ IsCanonSym L.L sy := by
-  have he : eSec G ≫ (ι[G]).left = eSec G := GlobalTheory.IndefiniteRowSideFullHecke.PowerGroupDatum.eSec_inv.trans (Category.id_comp _)
+theorem isNormSymm_iff (L : RigLB G) (sy : SymGen L.L (ι[G]).left)
+    : IsNormSymm L (symEquiv L.L _ sy) ↔ IsCanonSym L.L sy := by
+  have he : eSec G ≫ (ι[G]).left = eSec G :=
+    GlobalTheory.IndefiniteRowSideFullHecke.PowerGroupDatum.eSec_inv.trans (Category.id_comp _)
   refine (and_congr (isGen_symEquiv L.L _ sy) (maps_iff_fixesRig L.L L.rig sy)).trans ?_
-  exact and_congr_right fun hsy => ((corr_iff_diagOne L.L _ _ he sy).trans
-    (diagOne_iff_fixesRig L.L _ _ L.isLB sy hsy L.rig L.rigGen)).symm
+  exact and_congr_right fun hsy =>
+    ((corr_iff_diagOne L.L _ _ he sy).trans
+      (diagOne_iff_fixesRig L.L _ _ L.isLB sy hsy L.rig L.rigGen)).symm
 
 end GroupNorm
 
@@ -290,8 +294,8 @@ end Pow
 
 section Clauses
 
-variable {S : Scheme.{0}} {G' G : Over S} [GrpObj G'] [IsCommMonObj G'] [GrpObj G]
-  [IsCommMonObj G] {j : ℕ}
+variable
+  {S : Scheme.{0}} {G' G : Over S} [GrpObj G'] [IsCommMonObj G'] [GrpObj G] [IsCommMonObj G] {j : ℕ}
 
 end Clauses
 

@@ -5,8 +5,12 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsBlockN
 @[expose] public section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -14,19 +18,21 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.WeilSiegel.Deg.NF
 
-theorem exists_radical_basis {K : Type*} [Field K] {r : ℕ} (B : Matrix (Fin r) (Fin r) K)
-    (hd : B.det = 0) :
-    ∃ (t k : ℕ) (e : Module.Basis (Fin t ⊕ Fin k) K (Fin r → K)), 0 < k ∧
-      (∀ j, B *ᵥ e (Sum.inr j) = 0) ∧
-      (∀ w : Fin t → K, B *ᵥ (∑ j, w j • e (Sum.inl j)) = 0 → w = 0) := by
+theorem exists_radical_basis
+    {K : Type*} [Field K] {r : ℕ} (B : Matrix (Fin r) (Fin r) K) (hd : B.det = 0)
+    : ∃ (t k : ℕ) (e : Module.Basis (Fin t ⊕ Fin k) K (Fin r → K)),
+      0 < k ∧ (∀ j, B *ᵥ e (Sum.inr j) = 0)
+        ∧ (∀ w : Fin t → K, B *ᵥ (∑ j, w j • e (Sum.inl j)) = 0 → w = 0) := by
   obtain ⟨N, hN⟩ : ∃ N : Submodule K (Fin r → K), N = LinearMap.ker B.mulVecLin := ⟨_, rfl⟩
   have hmemN : ∀ v, v ∈ N ↔ B *ᵥ v = 0 := fun v => by
     rw [hN, LinearMap.mem_ker, Matrix.mulVecLin_apply]
   obtain ⟨C, hC⟩ := Submodule.exists_isCompl N
   obtain ⟨bN⟩ : Nonempty (Module.Basis (Fin (Module.finrank K N)) K N) := ⟨Module.finBasis K N⟩
   obtain ⟨bC⟩ : Nonempty (Module.Basis (Fin (Module.finrank K C)) K C) := ⟨Module.finBasis K C⟩
-  obtain ⟨e, he⟩ : ∃ e : Module.Basis (Fin (Module.finrank K C) ⊕ Fin (Module.finrank K N)) K (Fin r → K),
-      e = (bC.prod bN).map (Submodule.prodEquivOfIsCompl C N hC.symm) := ⟨_, rfl⟩
+  obtain ⟨e, he⟩
+      : ∃ e : Module.Basis (Fin (Module.finrank K C) ⊕ Fin (Module.finrank K N)) K (Fin r → K),
+        e = (bC.prod bN).map (Submodule.prodEquivOfIsCompl C N hC.symm) :=
+    ⟨_, rfl⟩
   have he_inl : ∀ j, e (Sum.inl j) = (bC j : Fin r → K) := fun j => by
     rw [he, Module.Basis.map_apply, Module.Basis.prod_apply, Submodule.coe_prodEquivOfIsCompl']
     simp
@@ -43,8 +49,7 @@ theorem exists_radical_basis {K : Type*} [Field K] {r : ℕ} (B : Matrix (Fin r)
     exact (hmemN _).mp (bN j).2
   · intro w hw
     simp only [he_inl] at hw
-    have hc : ((∑ j, w j • bC j : C) : Fin r → K) = ∑ j, w j • (bC j : Fin r → K) := by
-      simp
+    have hc : ((∑ j, w j • bC j : C) : Fin r → K) = ∑ j, w j • (bC j : Fin r → K) := by simp
     have hNmem : ((∑ j, w j • bC j : C) : Fin r → K) ∈ N := by
       rw [hmemN, hc]
       exact hw
@@ -53,11 +58,13 @@ theorem exists_radical_basis {K : Type*} [Field K] {r : ℕ} (B : Matrix (Fin r)
     funext j
     exact Fintype.linearIndependent_iff.mp bC.linearIndependent w (Submodule.coe_eq_zero.mp h0) j
 
-theorem exists_blockNF {K : Type*} [Field K] (s : K →+* K) (hs : ∀ x, s (s x) = x) {r : ℕ}
-    (B : Matrix (Fin r) (Fin r) K) (hB : (B.map s)ᵀ = B) (hd : B.det = 0) :
-    ∃ (P : Matrix (Fin r) (Fin r) K) (t : ℕ) (h : t < r), P.det ≠ 0 ∧
-      (∀ i j : Fin r, (t ≤ i.1 ∨ t ≤ j.1) → ((P.map s)ᵀ * B * P) i j = 0) ∧
-      (((P.map s)ᵀ * B * P).submatrix (Fin.castLE h.le) (Fin.castLE h.le)).det ≠ 0 := by
+theorem exists_blockNF
+    {K : Type*} [Field K]
+    (s : K →+* K) (hs : ∀ x, s (s x) = x)
+    {r : ℕ} (B : Matrix (Fin r) (Fin r) K) (hB : (B.map s)ᵀ = B) (hd : B.det = 0)
+    : ∃ (P : Matrix (Fin r) (Fin r) K) (t : ℕ) (h : t < r),
+      P.det ≠ 0 ∧ (∀ i j : Fin r, (t ≤ i.1 ∨ t ≤ j.1) → ((P.map s)ᵀ * B * P) i j = 0)
+        ∧ (((P.map s)ᵀ * B * P).submatrix (Fin.castLE h.le) (Fin.castLE h.le)).det ≠ 0 := by
   obtain ⟨t, k, e, hk, hker, hinj⟩ := exists_radical_basis B hd
   have hcard : t + k = r := by
     have h1 := Module.finrank_eq_card_basis e
@@ -83,13 +90,14 @@ theorem exists_blockNF {K : Type*} [Field K] (s : K →+* K) (hs : ∀ x, s (s x
     intro j
     have h1 : Fin.castLE ht.le j = Fin.castAdd k j := Fin.ext rfl
     rw [h1, finSumFinEquiv_symm_apply_castAdd]
-  obtain ⟨P, hP⟩ : ∃ P : Matrix (Fin (t + k)) (Fin (t + k)) K,
-      ∀ a b, P a b = e (finSumFinEquiv.symm b) a :=
+  obtain ⟨P, hP⟩
+      : ∃ P : Matrix (Fin (t + k)) (Fin (t + k)) K, ∀ a b, P a b = e (finSumFinEquiv.symm b) a :=
     ⟨Matrix.of fun a b => e (finSumFinEquiv.symm b) a, fun _ _ => rfl⟩
-  have hBab : ∀ a b, s (B b a) = B a b := fun a b => by
-    simpa using congrFun (congrFun hB a) b
-  have hentry : ∀ i j, ((P.map s)ᵀ * B * P) i j =
-      (fun a => s (e (finSumFinEquiv.symm i) a)) ⬝ᵥ (B *ᵥ e (finSumFinEquiv.symm j)) := by
+  have hBab : ∀ a b, s (B b a) = B a b := fun a b => by simpa using congrFun (congrFun hB a) b
+  have hentry
+      : ∀ i j,
+        ((P.map s)ᵀ * B * P) i j
+          = (fun a => s (e (finSumFinEquiv.symm i) a)) ⬝ᵥ (B *ᵥ e (finSumFinEquiv.symm j)) := by
     intro i j
     rw [Matrix.mul_assoc]
     simp only [Matrix.mul_apply, dotProduct, Matrix.mulVec, Matrix.transpose_apply,
@@ -99,8 +107,9 @@ theorem exists_blockNF {K : Type*} [Field K] (s : K →+* K) (hs : ∀ x, s (s x
     ext b
     have h0 : (B *ᵥ e (Sum.inr i')) b = 0 := by rw [hker i', Pi.zero_apply]
     simp only [Matrix.vecMul, dotProduct, Pi.zero_apply]
-    calc ∑ a, s (e (Sum.inr i') a) * B a b = ∑ a, s (B b a * e (Sum.inr i') a) :=
-          Finset.sum_congr rfl fun a _ => by rw [map_mul, hBab, mul_comm]
+    calc
+      ∑ a, s (e (Sum.inr i') a) * B a b = ∑ a, s (B b a * e (Sum.inr i') a) :=
+        Finset.sum_congr rfl fun a _ => by rw [map_mul, hBab, mul_comm]
       _ = s (∑ a, B b a * e (Sum.inr i') a) := (map_sum s _ _).symm
       _ = s ((B *ᵥ e (Sum.inr i')) b) := rfl
       _ = 0 := by rw [h0, map_zero]
@@ -127,8 +136,9 @@ theorem exists_blockNF {K : Type*} [Field K] (s : K →+* K) (hs : ∀ x, s (s x
   have hPs : ((P.map s)ᵀ).det ≠ 0 := by
     rw [Matrix.det_transpose, ← RingHom.mapMatrix_apply, ← RingHom.map_det]
     exact (map_ne_zero s).mpr hPdet
-  have hTy : ∀ i (y : Fin (t + k) → K),
-      ((P.map s)ᵀ *ᵥ y) i = (fun a => s (e (finSumFinEquiv.symm i) a)) ⬝ᵥ y := by
+  have hTy
+      : ∀ i (y : Fin (t + k) → K),
+        ((P.map s)ᵀ *ᵥ y) i = (fun a => s (e (finSumFinEquiv.symm i) a)) ⬝ᵥ y := by
     intro i y
     simp only [Matrix.mulVec, dotProduct, Matrix.transpose_apply, Matrix.map_apply, hP]
   refine ⟨P, t, ht, hPdet, hzero, ?_⟩
@@ -138,8 +148,10 @@ theorem exists_blockNF {K : Type*} [Field K] (s : K →+* K) (hs : ∀ x, s (s x
   apply hinj w
   obtain ⟨u, hu⟩ : ∃ u : Fin (t + k) → K, u = ∑ j, w j • e (Sum.inl j) := ⟨_, rfl⟩
   rw [← hu]
-  have hexp : ∀ i, (fun a => s (e (finSumFinEquiv.symm i) a)) ⬝ᵥ (B *ᵥ u) =
-      ∑ j, ((P.map s)ᵀ * B * P) i (Fin.castLE ht.le j) * w j := by
+  have hexp
+      : ∀ i,
+        (fun a => s (e (finSumFinEquiv.symm i) a)) ⬝ᵥ (B *ᵥ u)
+          = ∑ j, ((P.map s)ᵀ * B * P) i (Fin.castLE ht.le j) * w j := by
     intro i
     rw [hu, Matrix.mulVec_sum, dotProduct_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
@@ -164,11 +176,11 @@ end GlobalTheory.CompanionTheory.WeilSiegel.Deg.NF
 
 namespace GlobalTheory.CompanionTheory.WeilSiegel.Deg
 
-theorem exists_congrH_isBlockNF (D : D7) (r : ℕ) (β : HermE D r) (hd : β.1.det = 0) :
-    ∃ (a : Matrix (Fin r) (Fin r) D.host.E) (t : ℕ) (γ : HermE D r),
+theorem exists_congrH_isBlockNF (D : D7) (r : ℕ) (β : HermE D r) (hd : β.1.det = 0)
+    : ∃ (a : Matrix (Fin r) (Fin r) D.host.E) (t : ℕ) (γ : HermE D r),
       a.det ≠ 0 ∧ IsBlockNF t γ ∧ β = congrH a γ := by
-  obtain ⟨P, t, ht, hP, hzero, hblock⟩ := NF.exists_blockNF (D.sp.cm.sig : D.host.E →+* D.host.E)
-    (fun x => star_star x) β.1 β.2 hd
+  obtain ⟨P, t, ht, hP, hzero, hblock⟩ :=
+    NF.exists_blockNF (D.sp.cm.sig : D.host.E →+* D.host.E) (fun x => star_star x) β.1 β.2 hd
   have hu : IsUnit P.det := isUnit_iff_ne_zero.mpr hP
   refine ⟨P⁻¹, t, congrH P β, ?_, ⟨ht, hzero, hblock⟩, ?_⟩
   · intro h0
@@ -176,10 +188,13 @@ theorem exists_congrH_isBlockNF (D : D7) (r : ℕ) (β : HermE D r) (hd : β.1.d
     rw [Matrix.det_mul, h0, zero_mul, Matrix.det_one] at h1
     exact zero_ne_one h1
   · apply Subtype.ext
-    change β.1 = ((P⁻¹).map (D.sp.cm.sig : D.host.E →+* D.host.E))ᵀ *
-      ((P.map (D.sp.cm.sig : D.host.E →+* D.host.E))ᵀ * β.1 * P) * P⁻¹
-    have h1 : ((P⁻¹).map (D.sp.cm.sig : D.host.E →+* D.host.E))ᵀ *
-        (P.map (D.sp.cm.sig : D.host.E →+* D.host.E))ᵀ = 1 := by
+    change β.1
+      = ((P⁻¹).map (D.sp.cm.sig : D.host.E →+* D.host.E))ᵀ
+        * ((P.map (D.sp.cm.sig : D.host.E →+* D.host.E))ᵀ * β.1 * P) * P⁻¹
+    have h1
+        : ((P⁻¹).map (D.sp.cm.sig : D.host.E →+* D.host.E))ᵀ
+            * (P.map (D.sp.cm.sig : D.host.E →+* D.host.E))ᵀ
+          = 1 := by
       rw [← Matrix.transpose_mul, ← Matrix.map_mul, Matrix.mul_nonsing_inv P hu,
         Matrix.map_one _ (map_zero _) (map_one _), Matrix.transpose_one]
     rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, h1, Matrix.one_mul, Matrix.mul_assoc,

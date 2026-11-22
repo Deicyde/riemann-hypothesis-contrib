@@ -11,23 +11,26 @@ open scoped ENNReal NNReal Matrix Pointwise
 
 namespace GlobalTheory.CompanionTheory.SW.CharacterTrivial
 
-theorem eq_one_of_isFundamentalDomain :
-    ∀ (G₁ : Type) [Group G₁] [TopologicalSpace G₁] [IsTopologicalGroup G₁] [LocallyCompactSpace G₁]
-      [SecondCountableTopology G₁] [T2Space G₁] [MeasurableSpace G₁] [BorelSpace G₁]
-      (Γ₁ : Subgroup G₁) [Countable Γ₁] (μ₁ : Measure G₁) [μ₁.IsHaarMeasure] (𝓕₁ : Set G₁),
-      IsFundamentalDomain Γ₁ 𝓕₁ μ₁ → μ₁ 𝓕₁ < ⊤ → ∀ δ : G₁ →* ℝ≥0, Measurable δ →
-        (∀ γ ∈ Γ₁, δ γ = 1) → ∀ u, δ u = 1 := by
+theorem eq_one_of_isFundamentalDomain
+    : ∀ (G₁ : Type) [Group G₁] [TopologicalSpace G₁] [IsTopologicalGroup G₁]
+        [LocallyCompactSpace G₁] [SecondCountableTopology G₁] [T2Space G₁] [MeasurableSpace G₁]
+        [BorelSpace G₁] (Γ₁ : Subgroup G₁) [Countable Γ₁] (μ₁ : Measure G₁) [μ₁.IsHaarMeasure]
+        (𝓕₁ : Set G₁),
+      IsFundamentalDomain Γ₁ 𝓕₁ μ₁ → μ₁ 𝓕₁ < ⊤
+        → ∀ δ : G₁ →* ℝ≥0, Measurable δ → (∀ γ ∈ Γ₁, δ γ = 1) → ∀ u, δ u = 1 := by
   intro G₁ _ _ _ _ _ _ _ _ Γ₁ _ μ₁ _ 𝓕₁ h𝓕₁ hfin δ hδ hγ
   obtain ⟨h0, hR, -⟩ :=
-    GlobalTheory.CompanionTheory.SW.LatticeUnimod.unimodular_of_isFundamentalDomain G₁ Γ₁ μ₁ 𝓕₁ h𝓕₁ hfin
+    GlobalTheory.CompanionTheory.SW.LatticeUnimod.unimodular_of_isFundamentalDomain G₁ Γ₁ μ₁ 𝓕₁ h𝓕₁
+      hfin
   have hinv : ∀ u, δ u * δ u⁻¹ = 1 := fun u => by rw [← map_mul, mul_inv_cancel, map_one]
   have hpos : ∀ u, 0 < (δ u : ℝ) := by
     intro u
     have h : δ u ≠ 0 := left_ne_zero_of_mul_eq_one (hinv u)
     exact_mod_cast pos_iff_ne_zero.2 h
   have hδr : Measurable (fun u => (δ u : ℝ)) := measurable_coe_nnreal_real.comp hδ
-  have hind : ∀ (A B : Set G₁) (x y : G₁), (x ∈ A ↔ y ∈ B) →
-      A.indicator (1 : G₁ → ℝ≥0∞) x = B.indicator (1 : G₁ → ℝ≥0∞) y := by
+  have hind
+      : ∀ (A B : Set G₁) (x y : G₁),
+        (x ∈ A ↔ y ∈ B) → A.indicator (1 : G₁ → ℝ≥0∞) x = B.indicator (1 : G₁ → ℝ≥0∞) y := by
     intro A B x y h
     by_cases hx : x ∈ A
     · rw [Set.indicator_of_mem hx, Set.indicator_of_mem (h.1 hx)]; rfl
@@ -43,20 +46,22 @@ theorem eq_one_of_isFundamentalDomain :
       intro n u
       have e : (δ (u * u₀) : ℝ) = δ u * t := by rw [map_mul, htdef]; push_cast; rfl
       simp only [C, Set.mem_preimage, Set.mem_Ico, e]
-      rw [zpow_add_one₀ ht0.ne' n, zpow_add_one₀ ht0.ne' (n + 1),
-        mul_le_mul_iff_of_pos_right ht0, mul_lt_mul_iff_of_pos_right ht0, zpow_add_one₀ ht0.ne' n]
+      rw [zpow_add_one₀ ht0.ne' n, zpow_add_one₀ ht0.ne' (n + 1), mul_le_mul_iff_of_pos_right ht0,
+        mul_lt_mul_iff_of_pos_right ht0, zpow_add_one₀ ht0.ne' n]
     have hshift : ∀ n, (μ₁.restrict 𝓕₁) (C n) = (μ₁.restrict 𝓕₁) (C (n + 1)) := by
       intro n
-      have hinvar : ∀ γ ∈ Γ₁, ∀ u, (C (n + 1)).indicator (1 : G₁ → ℝ≥0∞) (γ * u) =
-          (C (n + 1)).indicator (1 : G₁ → ℝ≥0∞) u := by
+      have hinvar
+          : ∀ γ ∈ Γ₁, ∀ u,
+            (C (n + 1)).indicator (1 : G₁ → ℝ≥0∞) (γ * u)
+              = (C (n + 1)).indicator (1 : G₁ → ℝ≥0∞) u := by
         intro γ hg u
         have e : γ * u ∈ C (n + 1) ↔ u ∈ C (n + 1) := by
           simp only [C, Set.mem_preimage, map_mul, hγ γ hg, one_mul]
         exact hind _ _ _ _ e
-      have e := GlobalTheory.CompanionTheory.SW.Averaging.setLIntegral_mul_right_eq μ₁ Γ₁ 𝓕₁ h𝓕₁
-        ((C (n + 1)).indicator 1) hinvar u₀
-      have e' : (fun u => (C (n + 1)).indicator (1 : G₁ → ℝ≥0∞) (u * u₀)) =
-          (C n).indicator 1 := by
+      have e :=
+        GlobalTheory.CompanionTheory.SW.Averaging.setLIntegral_mul_right_eq μ₁ Γ₁ 𝓕₁ h𝓕₁
+          ((C (n + 1)).indicator 1) hinvar u₀
+      have e' : (fun u => (C (n + 1)).indicator (1 : G₁ → ℝ≥0∞) (u * u₀)) = (C n).indicator 1 := by
         funext u
         exact hind _ _ _ _ (hmem n u)
       rw [e', lintegral_indicator_one (hCm n), lintegral_indicator_one (hCm (n + 1))] at e

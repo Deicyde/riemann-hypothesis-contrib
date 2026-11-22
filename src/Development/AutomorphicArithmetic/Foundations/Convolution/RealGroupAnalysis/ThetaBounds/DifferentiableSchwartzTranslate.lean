@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff
 open scoped Classical
 
@@ -22,26 +24,32 @@ variable [IsTotallyReal F]
 
 private noncomputable def ell : (Fin 4 → TR.Rinf F) →L[ℝ] (Fin 4 → mixedEmbedding.mixedSpace F) :=
   AddMonoidHom.toRealLinearMap
-    { toFun := fun x => infPartPi fun i => TR.sInf F (x i)
+    {
+      toFun := fun x => infPartPi fun i => TR.sInf F (x i)
       map_zero' := by
         funext i
         simp only [infPartPi, map_zero, Pi.zero_apply, homeomorphMixedSpace_apply]
         exact map_zero (InfiniteAdeleRing.ringEquiv_mixedSpace F)
       map_add' := fun x y => by
-        have : (fun i => TR.sInf F ((x + y) i)) = (fun i => TR.sInf F (x i)) + fun i => TR.sInf F (y i) := by
+        have : (fun i => TR.sInf F ((x + y) i))
+            = (fun i => TR.sInf F (x i)) + fun i => TR.sInf F (y i) := by
           funext i
           simp only [Pi.add_apply, map_add (f := _)]
-        rw [this, infPart_add] }
-    (continuous_pi fun i => (homeomorphMixedSpace F).continuous.comp
-      ((TR.continuous_infEq F).comp (continuous_apply i)))
+        rw [this, infPart_add]
+    }
+    (continuous_pi fun i =>
+      (homeomorphMixedSpace F).continuous.comp ((TR.continuous_infEq F).comp (continuous_apply i)))
 
-private theorem differentiable_schwartz_translate (v : V4 F) {Φ : V4 F → ℂ} (h : Φ ∈ schwartzBruhatPi (K := F) (ι := Fin 4)) :
-    Differentiable ℝ fun x : Fin 4 → TR.Rinf F => Φ fun i => v i + TR.sInf F (x i) := by
+private theorem differentiable_schwartz_translate
+    (v : V4 F) {Φ : V4 F → ℂ} (h : Φ ∈ schwartzBruhatPi (K := F) (ι := Fin 4))
+    : Differentiable ℝ fun x : Fin 4 → TR.Rinf F => Φ fun i => v i + TR.sInf F (x i) := by
   induction h using Submodule.span_induction with
   | mem G hG =>
     obtain ⟨f, g, hg, rfl⟩ := hG
-    have e : ∀ x : Fin 4 → TR.Rinf F, schwartzBruhatTensorPi f g (fun i => v i + TR.sInf F (x i)) =
-        f (infPartPi v + ell x) * g (finPartPi v) := by
+    have e
+        : ∀ x : Fin 4 → TR.Rinf F,
+          schwartzBruhatTensorPi f g (fun i => v i + TR.sInf F (x i))
+            = f (infPartPi v + ell x) * g (finPartPi v) := by
       intro x
       have h1 : infPartPi (fun i => v i + TR.sInf F (x i)) = infPartPi v + ell x :=
         infPart_add v fun i => TR.sInf F (x i)
@@ -57,8 +65,8 @@ private theorem differentiable_schwartz_translate (v : V4 F) {Φ : V4 F → ℂ}
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.ConvolutionTheory.R2.Ff.sDiff :
-    ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (O : Fo.Ops F), SDiff O := by
+theorem UpperTheory.ConvolutionTheory.R2.Ff.sDiff
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (O : Fo.Ops F), SDiff O := by
   intro F _ _ _ O φ v x x' h0 hx
   set G : (Fin 4 → TR.Rinf F) → ℂ := fun y => φ.1 fun i => v i + TR.sInf F (y i) with hG
   have hd : DifferentiableAt ℝ G 0 := differentiable_schwartz_translate v φ.2 0
@@ -94,7 +102,8 @@ theorem UpperTheory.ConvolutionTheory.R2.Ff.sDiff :
     exact (HasDerivAt.unique (by simpa [Function.comp_def, hfun] using h1) h2)
   have hs : x' = ∑ i, ∑ w, x' i w • (Pi.single i (Pi.single w 1) : Fin 4 → TR.Rinf F) := by
     funext i w
-    have h1 : ∀ c, c ≠ i → (∑ u, x' c u • (Pi.single c (Pi.single u 1) : Fin 4 → TR.Rinf F)) i = 0 := by
+    have h1
+        : ∀ c, c ≠ i → (∑ u, x' c u • (Pi.single c (Pi.single u 1) : Fin 4 → TR.Rinf F)) i = 0 := by
       intro c hc
       simp [Finset.sum_apply, Pi.single_eq_of_ne hc.symm]
     have h2 : (∑ u, x' i u • (Pi.single i (Pi.single u 1) : Fin 4 → TR.Rinf F)) i w = x' i w := by
@@ -103,6 +112,6 @@ theorem UpperTheory.ConvolutionTheory.R2.Ff.sDiff :
   have key : fderiv ℝ G 0 x' = ∑ i, ∑ w, ((x' i w : ℝ) : ℂ) * (O.d w i φ).1 v := by
     conv_lhs => rw [hs]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, hb, Complex.real_smul]
+    simp only [map_sum, map_smul, hb, Complex.real_smul]
   rw [← key]
   exact hc

@@ -5,25 +5,27 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.TraceSpl
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
-open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC UpperTheory.Gal.InertialTypesAlt
+open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
+open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC
+  UpperTheory.Gal.InertialTypesAlt
 open scoped Classical
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem UpperTheory.Gal.InertialTypesAlt.resDeg :
-    CardRes → ResDeg := by
+theorem UpperTheory.Gal.InertialTypesAlt.resDeg : CardRes → ResDeg := by
   intro hcard K M _ _ _ _ _ _ hn v w hns hunr _
   classical
   have hw : (w : HeightOneSpectrum (𝓞 M)).asIdeal.LiesOver v.asIdeal := w.2
   set f := (w : HeightOneSpectrum (𝓞 M)).asIdeal.inertiaDeg (𝓞 K) with hf
-  have hfconst : ∀ u : PlacesOver M v,
-      (u : HeightOneSpectrum (𝓞 M)).asIdeal.inertiaDeg (𝓞 K) = f := by
+  have hfconst
+      : ∀ u : PlacesOver M v, (u : HeightOneSpectrum (𝓞 M)).asIdeal.inertiaDeg (𝓞 K) = f := by
     intro u
     haveI := u.2
     exact Ideal.inertiaDeg_eq_of_isGaloisGroup v.asIdeal _ _ Gal(M/K)
-  have heone : ∀ u : PlacesOver M v,
-      (u : HeightOneSpectrum (𝓞 M)).asIdeal.ramificationIdx (𝓞 K) = 1 := by
+  have heone
+      : ∀ u : PlacesOver M v, (u : HeightOneSpectrum (𝓞 M)).asIdeal.ramificationIdx (𝓞 K) = 1 := by
     intro u
     haveI := hunr u
     exact Ideal.ramificationIdx_eq_one _ _
@@ -38,13 +40,16 @@ theorem UpperTheory.Gal.InertialTypesAlt.resDeg :
     apply hns
     intro u
     haveI := u.2
-    have hrk := GroundTheory.Global.SemiLocal.finrank_eq_ramificationIdx_mul_inertiaDeg M v
-      (u : HeightOneSpectrum (𝓞 M))
+    have hrk :=
+      GroundTheory.Global.SemiLocal.finrank_eq_ramificationIdx_mul_inertiaDeg M v
+        (u : HeightOneSpectrum (𝓞 M))
     rw [heone u, hfconst u, h1, one_mul] at hrk
     have htop := Subalgebra.bot_eq_top_of_finrank_eq_one hrk
     intro y
-    have hy : y ∈ (⊥ : Subalgebra (HeightOneSpectrum.adicCompletion K v)
-        (HeightOneSpectrum.adicCompletion M (u : HeightOneSpectrum (𝓞 M)))) := by
+    have hy
+        : y
+          ∈ (⊥ : Subalgebra (HeightOneSpectrum.adicCompletion K v)
+            (HeightOneSpectrum.adicCompletion M (u : HeightOneSpectrum (𝓞 M)))) := by
       rw [htop]
       trivial
     obtain ⟨x, hx⟩ := Algebra.mem_bot.mp hy
@@ -53,8 +58,8 @@ theorem UpperTheory.Gal.InertialTypesAlt.resDeg :
   have hnormK : normV v = v.asIdeal.absNorm := by
     rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]
     rfl
-  have hnormM : normV (w : HeightOneSpectrum (𝓞 M)) =
-      (w : HeightOneSpectrum (𝓞 M)).asIdeal.absNorm := by
+  have hnormM
+      : normV (w : HeightOneSpectrum (𝓞 M)) = (w : HeightOneSpectrum (𝓞 M)).asIdeal.absNorm := by
     rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]
     rfl
   have hpow : v.asIdeal.absNorm ^ f = (w : HeightOneSpectrum (𝓞 M)).asIdeal.absNorm :=
@@ -69,8 +74,9 @@ theorem UpperTheory.Gal.InertialTypesAlt.resDeg :
       rw [Ne, Ideal.absNorm_eq_one_iff]
       exact v.isPrime.ne_top
     omega
-  have hcardM : Nat.card 𝓀[HeightOneSpectrum.adicCompletion M (w : HeightOneSpectrum (𝓞 M))] =
-      Nat.card 𝓀[HeightOneSpectrum.adicCompletion K v] ^ Module.finrank K M := by
+  have hcardM
+      : Nat.card 𝓀[HeightOneSpectrum.adicCompletion M (w : HeightOneSpectrum (𝓞 M))]
+        = Nat.card 𝓀[HeightOneSpectrum.adicCompletion K v] ^ Module.finrank K M := by
     rw [hM, hK, hnormM, hnormK, ← hpow, hfn]
   haveI : Finite 𝓀[HeightOneSpectrum.adicCompletion K v] :=
     Nat.finite_of_card_ne_zero (by rw [hK, hnormK]; omega)
@@ -81,8 +87,9 @@ theorem UpperTheory.Gal.InertialTypesAlt.resDeg :
       𝓀[HeightOneSpectrum.adicCompletion M (w : HeightOneSpectrum (𝓞 M))] :=
     Module.Finite.of_finite
   refine ⟨?_, ?_⟩
-  · have hc := Module.natCard_eq_pow_finrank (K := 𝓀[HeightOneSpectrum.adicCompletion K v])
-      (V := 𝓀[HeightOneSpectrum.adicCompletion M (w : HeightOneSpectrum (𝓞 M))])
+  · have hc :=
+      Module.natCard_eq_pow_finrank (K := 𝓀[HeightOneSpectrum.adicCompletion K v])
+        (V := 𝓀[HeightOneSpectrum.adicCompletion M (w : HeightOneSpectrum (𝓞 M))])
     rw [hcardM] at hc
     have h2 : 2 ≤ Nat.card 𝓀[HeightOneSpectrum.adicCompletion K v] := by
       rw [hK, hnormK]

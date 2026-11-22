@@ -13,11 +13,14 @@ open IsLocalRing TensorProduct RingTheory.Sequence
 set_option autoImplicit false
 namespace GlobalTheory.CompanionTheory.CIFlatPf
 
-theorem isRegular_fibre (k E : Type) [Field k] [CommRing E] [Algebra k E] (g : ℕ)
-    [Algebra.IsStandardSmoothOfRelativeDimension g k E] (f : Fin g → E)
-    (hA : IsArtinianRing (E ⧸ Ideal.span (Set.range f))) (Q : Ideal E) [Q.IsPrime]
-    (hQ : Ideal.span (Set.range f) ≤ Q) :
-    IsRegular (Localization.AtPrime Q) (List.ofFn fun i => algebraMap E (Localization.AtPrime Q) (f i)) := by
+theorem isRegular_fibre
+    (k E : Type) [Field k] [CommRing E] [Algebra k E]
+    (g : ℕ) [Algebra.IsStandardSmoothOfRelativeDimension g k E]
+    (f : Fin g → E) (hA : IsArtinianRing (E ⧸ Ideal.span (Set.range f)))
+    (Q : Ideal E) [Q.IsPrime]
+    (hQ : Ideal.span (Set.range f) ≤ Q)
+    : IsRegular (Localization.AtPrime Q)
+      (List.ofFn fun i => algebraMap E (Localization.AtPrime Q) (f i)) := by
   haveI : IsRegularRing k := GroundTheory.Arith.SchemeCoh.isRegularRing_of_smooth_field k k
   haveI : Algebra.IsStandardSmooth k E :=
     Algebra.IsStandardSmoothOfRelativeDimension.isStandardSmooth g
@@ -51,7 +54,8 @@ theorem isRegular_fibre (k E : Type) [Field k] [CommRing E] [Algebra k E] (g : �
     simp [hys, List.mem_ofFn]
   have hIm : Ideal.ofList ys ≤ IsLocalRing.maximalIdeal (Localization.AtPrime Q) := by
     rw [hofList, Ideal.map_le_iff_le_comap]
-    calc I ≤ Q := hQ
+    calc
+      I ≤ Q := hQ
       _ = _ := (Localization.AtPrime.under_maximalIdeal (I := Q)).symm
   have hrad : (Ideal.ofList ys).radical = IsLocalRing.maximalIdeal (Localization.AtPrime Q) := by
     rw [Ideal.radical_eq_sInf]
@@ -64,10 +68,11 @@ theorem isRegular_fibre (k E : Type) [Field k] [CommRing E] [Algebra k E] (g : �
         rw [← Ideal.map_le_iff_le_comap, ← hofList]
         exact hJ
       have hPQ : J.comap (algebraMap E (Localization.AtPrime Q)) ≤ Q := by
-        calc J.comap (algebraMap E (Localization.AtPrime Q))
-            ≤ (IsLocalRing.maximalIdeal (Localization.AtPrime Q)).comap
+        calc
+          J.comap (algebraMap E (Localization.AtPrime Q))
+              ≤ (IsLocalRing.maximalIdeal (Localization.AtPrime Q)).comap
                 (algebraMap E (Localization.AtPrime Q)) :=
-              Ideal.comap_mono (IsLocalRing.le_maximalIdeal hJp.ne_top)
+            Ideal.comap_mono (IsLocalRing.le_maximalIdeal hJp.ne_top)
           _ = Q := Localization.AtPrime.under_maximalIdeal
       have hPmax := hmaxOf _ hP hIP
       have hPeq : J.comap (algebraMap E (Localization.AtPrime Q)) = Q :=
@@ -84,18 +89,20 @@ theorem isRegular_fibre (k E : Type) [Field k] [CommRing E] [Algebra k E] (g : �
     rfl
   exact GlobalTheory.isRegular_of_radical_eq_maximalIdeal hrad hlen
 
-theorem residueField_exists (R : Type) [CommRing R] (p : Ideal R) [p.IsPrime] (x : p.ResidueField) :
-    ∃ a : R, ∃ b : R, b ∉ p ∧ b • x = algebraMap R p.ResidueField a := by
+theorem residueField_exists (R : Type) [CommRing R] (p : Ideal R) [p.IsPrime] (x : p.ResidueField)
+    : ∃ a : R, ∃ b : R, b ∉ p ∧ b • x = algebraMap R p.ResidueField a := by
   have hsurj : Function.Surjective (algebraMap (Localization.AtPrime p) p.ResidueField) :=
     IsLocalRing.residue_surjective
   obtain ⟨y, rfl⟩ := hsurj x
   obtain ⟨⟨a, s⟩, rfl⟩ := IsLocalization.mk'_surjective p.primeCompl y
   refine ⟨a, s, s.2, ?_⟩
-  rw [Algebra.smul_def, IsScalarTower.algebraMap_apply R (Localization.AtPrime p) p.ResidueField (s : R),
-    ← map_mul, IsLocalization.mk'_spec', ← IsScalarTower.algebraMap_apply]
+  rw [Algebra.smul_def,
+    IsScalarTower.algebraMap_apply R (Localization.AtPrime p) p.ResidueField (s : R), ← map_mul,
+    IsLocalization.mk'_spec', ← IsScalarTower.algebraMap_apply]
 
-theorem fibre_exists (R C : Type) [CommRing R] [CommRing C] [Algebra R C] (p : Ideal R) [p.IsPrime]
-    (e : p.Fiber C) : ∃ b : R, b ∉ p ∧ ∃ c : C, b • e = (1 : p.ResidueField) ⊗ₜ[R] c := by
+theorem fibre_exists
+    (R C : Type) [CommRing R] [CommRing C] [Algebra R C] (p : Ideal R) [p.IsPrime] (e : p.Fiber C)
+    : ∃ b : R, b ∉ p ∧ ∃ c : C, b • e = (1 : p.ResidueField) ⊗ₜ[R] c := by
   induction e using TensorProduct.induction_on with
   | zero => exact ⟨1, p.primeCompl.one_mem, 0, by simp⟩
   | tmul x c =>
@@ -112,13 +119,16 @@ theorem fibre_exists (R C : Type) [CommRing R] [CommRing C] [Algebra R C] (p : I
       rw [mul_smul, hc₂, TensorProduct.tmul_smul]
     rw [smul_add, k₁, k₂, TensorProduct.tmul_add]
 
-theorem exists_localization_fibre (R C : Type) [CommRing R] [CommRing C] [Algebra R C] (q : Ideal C) [q.IsPrime] :
-    ∃ (Q : Ideal ((q.under R).Fiber C)) (_ : Q.IsPrime)
-      (e : Localization.AtPrime Q ≃+* (Localization.AtPrime q ⧸
-        (q.under R).map (algebraMap R (Localization.AtPrime q)))),
-      (∀ c ∈ q, (1 : (q.under R).ResidueField) ⊗ₜ[R] c ∈ Q) ∧
-      ∀ c : C, e (algebraMap _ _ ((1 : (q.under R).ResidueField) ⊗ₜ[R] c)) =
-        Ideal.Quotient.mk _ (algebraMap C (Localization.AtPrime q) c) := by
+theorem exists_localization_fibre
+    (R C : Type) [CommRing R] [CommRing C] [Algebra R C] (q : Ideal C) [q.IsPrime]
+    : ∃ (Q : Ideal ((q.under R).Fiber C)) (_ : Q.IsPrime)
+        (e : Localization.AtPrime Q
+          ≃+* (Localization.AtPrime q ⧸
+                (q.under R).map (algebraMap R (Localization.AtPrime q)))),
+      (∀ c ∈ q, (1 : (q.under R).ResidueField) ⊗ₜ[R] c ∈ Q)
+        ∧ ∀ c : C,
+          e (algebraMap _ _ ((1 : (q.under R).ResidueField) ⊗ₜ[R] c))
+            = Ideal.Quotient.mk _ (algebraMap C (Localization.AtPrime q) c) := by
   set p := q.under R with hp
   let B := Localization.AtPrime q
   let J : Ideal B := p.map (algebraMap R B)
@@ -141,12 +151,12 @@ theorem exists_localization_fibre (R C : Type) [CommRing R] [CommRing C] [Algebr
     intro r hr
     have : IsUnit (algebraMap C B (algebraMap R C r)) := hmem _ hr
     exact (this.map (Ideal.Quotient.mk J))
-  let hA : p.ResidueField →ₐ[R] B ⧸ J :=
-    { Ideal.ResidueField.lift p (algebraMap R (B ⧸ J)) h1 h2 with
-      commutes' := fun r => Ideal.ResidueField.lift_algebraMap p _ h1 h2 r }
+  let hA : p.ResidueField →ₐ[R] B ⧸ J := {
+    Ideal.ResidueField.lift p (algebraMap R (B ⧸ J)) h1 h2 with
+    commutes' := fun r => Ideal.ResidueField.lift_algebraMap p _ h1 h2 r
+  }
   let θ : p.Fiber C →ₐ[R] B ⧸ J := Algebra.TensorProduct.productMap hA cA
-  have hθ : ∀ c, θ ((1 : p.ResidueField) ⊗ₜ[R] c) = cA c := fun c => by
-    simp [θ]
+  have hθ : ∀ c, θ ((1 : p.ResidueField) ⊗ₜ[R] c) = cA c := fun c => by simp [θ]
   letI : Algebra (p.Fiber C) (B ⧸ J) := θ.toRingHom.toAlgebra
   have hal : ∀ x, algebraMap (p.Fiber C) (B ⧸ J) x = θ x := fun _ => rfl
   let Q : Ideal (p.Fiber C) := (maximalIdeal (B ⧸ J)).comap (algebraMap (p.Fiber C) (B ⧸ J))
@@ -157,14 +167,15 @@ theorem exists_localization_fibre (R C : Type) [CommRing R] [CommRing C] [Algebr
     rw [hθ, hcA] at h4
     exact h4 ((hmem t ht).map (Ideal.Quotient.mk J))
   have hzero : ∀ w ∈ p.map (algebraMap R C), (1 : p.ResidueField) ⊗ₜ[R] w = (0 : p.Fiber C) := by
-    have : p.map (algebraMap R C) ≤ RingHom.ker
-        (Algebra.TensorProduct.includeRight : C →ₐ[R] p.Fiber C).toRingHom := by
+    have : p.map (algebraMap R C)
+        ≤ RingHom.ker (Algebra.TensorProduct.includeRight : C →ₐ[R] p.Fiber C).toRingHom := by
       rw [Ideal.map_le_iff_le_comap]
       intro r hr
       rw [Ideal.mem_comap, RingHom.mem_ker]
       change (1 : p.ResidueField) ⊗ₜ[R] (algebraMap R C r) = 0
-      rw [Algebra.algebraMap_eq_smul_one, TensorProduct.tmul_smul, TensorProduct.smul_tmul', ← Algebra.algebraMap_eq_smul_one,
-        Ideal.algebraMap_residueField_eq_zero.mpr hr, TensorProduct.zero_tmul]
+      rw [Algebra.algebraMap_eq_smul_one, TensorProduct.tmul_smul, TensorProduct.smul_tmul',
+        ← Algebra.algebraMap_eq_smul_one, Ideal.algebraMap_residueField_eq_zero.mpr hr,
+        TensorProduct.zero_tmul]
     exact fun w hw => this hw
   have hloc : IsLocalization Q.primeCompl (B ⧸ J) := by
     refine ⟨⟨?_, ?_, ?_⟩⟩
@@ -175,27 +186,35 @@ theorem exists_localization_fibre (R C : Type) [CommRing R] [CommRing C] [Algebr
       obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective z
       obtain ⟨⟨c, t⟩, hct⟩ := IsLocalization.surj q.primeCompl b
       refine ⟨⟨(1 : p.ResidueField) ⊗ₜ[R] c, ⟨(1 : p.ResidueField) ⊗ₜ[R] (t : C), hunit t t.2⟩⟩, ?_⟩
-      change Ideal.Quotient.mk J b * θ ((1 : p.ResidueField) ⊗ₜ[R] (t : C)) = θ ((1 : p.ResidueField) ⊗ₜ[R] c)
+      change Ideal.Quotient.mk J b * θ ((1 : p.ResidueField) ⊗ₜ[R] (t : C))
+        = θ ((1 : p.ResidueField) ⊗ₜ[R] c)
       rw [hθ, hθ, hcA, hcA, ← map_mul, hct]
     · intro x y hxy
       have he : θ (x - y) = 0 := by
         rw [map_sub, sub_eq_zero]
         exact hxy
       obtain ⟨b, hb, c, hc⟩ := fibre_exists R C p (x - y)
-      have hc0 : cA c = 0 := by
-        rw [← hθ, ← hc, map_smul, he, smul_zero]
+      have hc0 : cA c = 0 := by rw [← hθ, ← hc, map_smul, he, smul_zero]
       have hcJ : algebraMap C B c ∈ (p.map (algebraMap R C)).map (algebraMap C B) := by
         have : algebraMap C B c ∈ J := Ideal.Quotient.eq_zero_iff_mem.mp hc0
         rwa [Ideal.map_map, ← IsScalarTower.algebraMap_eq]
-      obtain ⟨m, hm, hmc⟩ := (IsLocalization.algebraMap_mem_map_algebraMap_iff q.primeCompl B _ c).mp hcJ
+      obtain ⟨m, hm, hmc⟩ :=
+        (IsLocalization.algebraMap_mem_map_algebraMap_iff q.primeCompl B _ c).mp hcJ
       have hz : (1 : p.ResidueField) ⊗ₜ[R] (m * c) = (0 : p.Fiber C) := hzero _ hmc
       have hs : ((1 : p.ResidueField) ⊗ₜ[R] m : p.Fiber C) * (x - y) = 0 := by
         have h3 : b • (((1 : p.ResidueField) ⊗ₜ[R] m : p.Fiber C) * (x - y)) = 0 := by
           rw [← mul_smul_comm, hc, Algebra.TensorProduct.tmul_mul_tmul, one_mul, hz]
         rw [← algebraMap_smul p.ResidueField b] at h3
-        exact (smul_eq_zero.mp h3).resolve_left fun h => hb (Ideal.algebraMap_residueField_eq_zero.mp h)
+        exact (smul_eq_zero.mp h3).resolve_left fun h =>
+          hb (Ideal.algebraMap_residueField_eq_zero.mp h)
       exact ⟨⟨_, hunit m hm⟩, by rw [← sub_eq_zero, ← mul_sub]; exact hs⟩
-  refine ⟨Q, hQ, (IsLocalization.algEquiv Q.primeCompl (Localization.AtPrime Q) (B ⧸ J)).toRingEquiv, ?_, fun c => ?_⟩
+  refine ⟨
+    Q,
+    hQ,
+    (IsLocalization.algEquiv Q.primeCompl (Localization.AtPrime Q) (B ⧸ J)).toRingEquiv,
+    ?_,
+    fun c => ?_
+  ⟩
   · intro c hc
     change θ ((1 : p.ResidueField) ⊗ₜ[R] c) ∈ maximalIdeal (B ⧸ J)
     rw [hθ, hcA]
@@ -208,12 +227,17 @@ theorem exists_localization_fibre (R C : Type) [CommRing R] [CommRing C] [Algebr
     have h7 := (maximalIdeal B).sub_mem (Ideal.mul_mem_right b _ h6) (hJ hy)
     rw [sub_sub_cancel] at h7
     exact (IsLocalRing.maximalIdeal.isMaximal B).ne_top ((Ideal.eq_top_iff_one _).mpr h7)
-  have h5 := (IsLocalization.algEquiv Q.primeCompl (Localization.AtPrime Q) (B ⧸ J)).commutes ((1 : p.ResidueField) ⊗ₜ[R] c)
+  have h5 :=
+    (IsLocalization.algEquiv Q.primeCompl (Localization.AtPrime Q) (B ⧸ J)).commutes
+      ((1 : p.ResidueField) ⊗ₜ[R] c)
   exact h5.trans ((hθ c).trans (hcA c))
 
-theorem isArtinianRing_fibre_quotient (R C : Type) [CommRing R] [CommRing C] [Algebra R C] (p : Ideal R) [p.IsPrime]
-    {g : ℕ} (f : Fin g → C) [Algebra.QuasiFinite R (C ⧸ Ideal.span (Set.range f))] :
-    IsArtinianRing (p.Fiber C ⧸ Ideal.span (Set.range fun i => (1 : p.ResidueField) ⊗ₜ[R] f i)) := by
+theorem isArtinianRing_fibre_quotient
+    (R C : Type) [CommRing R] [CommRing C] [Algebra R C]
+    (p : Ideal R) [p.IsPrime]
+    {g : ℕ} (f : Fin g → C) [Algebra.QuasiFinite R (C ⧸ Ideal.span (Set.range f))]
+    : IsArtinianRing
+      (p.Fiber C ⧸ Ideal.span (Set.range fun i => (1 : p.ResidueField) ⊗ₜ[R] f i)) := by
   set I : Ideal C := Ideal.span (Set.range f) with hI
   set J : Ideal (p.ResidueField ⊗[R] C) :=
     Ideal.span (Set.range fun i => (1 : p.ResidueField) ⊗ₜ[R] f i) with hJ
@@ -249,76 +273,88 @@ theorem isArtinianRing_fibre_quotient (R C : Type) [CommRing R] [CommRing C] [Al
       exact ⟨s + s', by rw [map_add (f := _), hs, hs', map_add (f := _)]⟩
   exact hsurj.isArtinianRing
 
-theorem flat_localization (R C : Type) [CommRing R] [IsNoetherianRing R] [CommRing C] [Algebra R C] (g : ℕ)
-    [Algebra.IsStandardSmoothOfRelativeDimension g R C] (f : Fin g → C)
-    [Algebra.QuasiFinite R (C ⧸ Ideal.span (Set.range f))] (q : Ideal C) [q.IsPrime] :
-    Module.Flat R (Localization.AtPrime q ⧸ (Ideal.span (Set.range f)).map (algebraMap C (Localization.AtPrime q))) := by
-  have : Algebra.IsStandardSmooth R C := Algebra.IsStandardSmoothOfRelativeDimension.isStandardSmooth g
-  by_cases hq : Ideal.span (Set.range f) ≤ q
-  swap
-  · obtain ⟨x, hx, hxq⟩ := SetLike.not_le_iff_exists.mp hq
-    have hu : IsUnit (algebraMap C (Localization.AtPrime q) x) :=
-      IsLocalization.map_units (M := q.primeCompl) _ ⟨x, hxq⟩
-    have htop := Ideal.eq_top_of_isUnit_mem _ (Ideal.mem_map_of_mem (algebraMap C (Localization.AtPrime q)) hx) hu
-    rw [htop]
-    have : Subsingleton (Localization.AtPrime q ⧸ (⊤ : Ideal (Localization.AtPrime q))) :=
-      Ideal.Quotient.subsingleton_iff.mpr rfl
-    have : Module.Free R (Localization.AtPrime q ⧸ (⊤ : Ideal (Localization.AtPrime q))) :=
-      Module.Free.of_subsingleton _ _
-    exact Module.Flat.of_free
-  let p := q.under R
-  let B := Localization.AtPrime q
-  let A := Localization.AtPrime p
-  letI : Algebra A B := Localization.AtPrime.algebraOfLiesOver p q
-  have : IsNoetherianRing C := Algebra.FiniteType.isNoetherianRing R C
-  have : IsNoetherianRing A := IsLocalization.isNoetherianRing p.primeCompl A inferInstance
-  have : IsNoetherianRing B := IsLocalization.isNoetherianRing q.primeCompl B inferInstance
-  have : Module.Flat R B := Module.Flat.trans R C B
-  have : Module.Flat A B := (Module.flat_iff_of_isLocalization A p.primeCompl B).mpr inferInstance
-  let rs : List B := List.ofFn fun i => algebraMap C B (f i)
-  have hofl : Ideal.ofList rs = (Ideal.span (Set.range f)).map (algebraMap C B) := by
-    rw [Ideal.map_span, Ideal.ofList]
-    congr 1
-    ext x
-    simp [rs, List.mem_ofFn]
-  have hrs : ∀ r ∈ rs, r ∈ maximalIdeal B := by
-    intro r hr
-    obtain ⟨i, rfl⟩ := (List.mem_ofFn' _ _).mp hr
-    exact (IsLocalization.AtPrime.to_map_mem_maximal_iff B q _).mpr (hq (Ideal.subset_span ⟨i, rfl⟩))
-  have hmA : (maximalIdeal A).map (algebraMap A B) = p.map (algebraMap R B) := by
-    rw [← Localization.AtPrime.map_eq_maximalIdeal, Ideal.map_map, ← IsScalarTower.algebraMap_eq]
-  have hW : IsWeaklyRegular (B ⧸ (maximalIdeal A).map (algebraMap A B)) rs := by
-    rw [hmA]
-    obtain ⟨Q, hQ, e, hcQ, he⟩ := exists_localization_fibre R C q
-    have hreg := isRegular_fibre p.ResidueField (p.Fiber C) g
-      (fun i => (1 : p.ResidueField) ⊗ₜ[R] f i) (isArtinianRing_fibre_quotient R C p f) Q (by
-        rw [Ideal.span_le]
-        rintro _ ⟨i, rfl⟩
-        exact hcQ _ (hq (Ideal.subset_span ⟨i, rfl⟩)))
-    rw [← isWeaklyRegular_map_algebraMap_iff (B ⧸ p.map (algebraMap R B))]
-    haveI i1 := RingHomInvPair.of_ringEquiv e
-    haveI i2 := RingHomInvPair.symm (e : Localization.AtPrime Q →+* (B ⧸ p.map (algebraMap R B)))
-      (e.symm : (B ⧸ p.map (algebraMap R B)) →+* Localization.AtPrime Q)
-    have h2 := (LinearEquiv.isWeaklyRegular_congr' e.toSemilinearEquiv _).mp hreg.1
-    convert h2 using 1
-    simp only [rs, List.map_ofFn]
-    congr 1
-    ext i
-    exact (he (f i)).symm
-  have h := GlobalTheory.flat_quotient_ofList_of_isWeaklyRegular_closedFibre A B rs hrs hW
-  rw [hofl] at h
-  exact Module.Flat.trans R A _
+theorem flat_localization
+    (R C : Type) [CommRing R] [IsNoetherianRing R] [CommRing C] [Algebra R C]
+    (g : ℕ) [Algebra.IsStandardSmoothOfRelativeDimension g R C]
+    (f : Fin g → C) [Algebra.QuasiFinite R (C ⧸ Ideal.span (Set.range f))]
+    (q : Ideal C) [q.IsPrime]
+    : Module.Flat R
+      (Localization.AtPrime q ⧸ (Ideal.span (Set.range f)).map (algebraMap C (Localization.AtPrime q))) :=
+  by
+    have : Algebra.IsStandardSmooth R C :=
+      Algebra.IsStandardSmoothOfRelativeDimension.isStandardSmooth g
+    by_cases hq : Ideal.span (Set.range f) ≤ q
+    swap
+    · obtain ⟨x, hx, hxq⟩ := SetLike.not_le_iff_exists.mp hq
+      have hu : IsUnit (algebraMap C (Localization.AtPrime q) x) :=
+        IsLocalization.map_units (M := q.primeCompl) _ ⟨x, hxq⟩
+      have htop :=
+        Ideal.eq_top_of_isUnit_mem _
+          (Ideal.mem_map_of_mem (algebraMap C (Localization.AtPrime q)) hx) hu
+      rw [htop]
+      have : Subsingleton (Localization.AtPrime q ⧸ (⊤ : Ideal (Localization.AtPrime q))) :=
+        Ideal.Quotient.subsingleton_iff.mpr rfl
+      have : Module.Free R (Localization.AtPrime q ⧸ (⊤ : Ideal (Localization.AtPrime q))) :=
+        Module.Free.of_subsingleton _ _
+      exact Module.Flat.of_free
+    let p := q.under R
+    let B := Localization.AtPrime q
+    let A := Localization.AtPrime p
+    letI : Algebra A B := Localization.AtPrime.algebraOfLiesOver p q
+    have : IsNoetherianRing C := Algebra.FiniteType.isNoetherianRing R C
+    have : IsNoetherianRing A := IsLocalization.isNoetherianRing p.primeCompl A inferInstance
+    have : IsNoetherianRing B := IsLocalization.isNoetherianRing q.primeCompl B inferInstance
+    have : Module.Flat R B := Module.Flat.trans R C B
+    have : Module.Flat A B := (Module.flat_iff_of_isLocalization A p.primeCompl B).mpr inferInstance
+    let rs : List B := List.ofFn fun i => algebraMap C B (f i)
+    have hofl : Ideal.ofList rs = (Ideal.span (Set.range f)).map (algebraMap C B) := by
+      rw [Ideal.map_span, Ideal.ofList]
+      congr 1
+      ext x
+      simp [rs, List.mem_ofFn]
+    have hrs : ∀ r ∈ rs, r ∈ maximalIdeal B := by
+      intro r hr
+      obtain ⟨i, rfl⟩ := (List.mem_ofFn' _ _).mp hr
+      exact (IsLocalization.AtPrime.to_map_mem_maximal_iff B q _).mpr
+        (hq (Ideal.subset_span ⟨i, rfl⟩))
+    have hmA : (maximalIdeal A).map (algebraMap A B) = p.map (algebraMap R B) := by
+      rw [← Localization.AtPrime.map_eq_maximalIdeal, Ideal.map_map, ← IsScalarTower.algebraMap_eq]
+    have hW : IsWeaklyRegular (B ⧸ (maximalIdeal A).map (algebraMap A B)) rs := by
+      rw [hmA]
+      obtain ⟨Q, hQ, e, hcQ, he⟩ := exists_localization_fibre R C q
+      have hreg :=
+        isRegular_fibre p.ResidueField (p.Fiber C) g
+          (fun i => (1 : p.ResidueField) ⊗ₜ[R] f i)
+          (isArtinianRing_fibre_quotient R C p f) Q
+          (by
+            rw [Ideal.span_le]
+            rintro _ ⟨i, rfl⟩
+            exact hcQ _ (hq (Ideal.subset_span ⟨i, rfl⟩)))
+      rw [← isWeaklyRegular_map_algebraMap_iff (B ⧸ p.map (algebraMap R B))]
+      haveI i1 := RingHomInvPair.of_ringEquiv e
+      haveI i2 := RingHomInvPair.symm (e : Localization.AtPrime Q →+* (B ⧸ p.map (algebraMap R B)))
+        (e.symm : (B ⧸ p.map (algebraMap R B)) →+* Localization.AtPrime Q)
+      have h2 := (LinearEquiv.isWeaklyRegular_congr' e.toSemilinearEquiv _).mp hreg.1
+      convert h2 using 1
+      simp only [rs, List.map_ofFn]
+      congr 1
+      ext i
+      exact (he (f i)).symm
+    have h := GlobalTheory.flat_quotient_ofList_of_isWeaklyRegular_closedFibre A B rs hrs hW
+    rw [hofl] at h
+    exact Module.Flat.trans R A _
 
 theorem ciFlat : CompanionTheory.ObstructionTrivialLocus.CIFlat := by
   intro R C _ _ _ _ g _ f _
-  have : Algebra.IsStandardSmooth R C := Algebra.IsStandardSmoothOfRelativeDimension.isStandardSmooth g
+  have : Algebra.IsStandardSmooth R C :=
+    Algebra.IsStandardSmoothOfRelativeDimension.isStandardSmooth g
   have : Module.Flat R C := inferInstance
   refine Module.flat_of_isLocalized_maximal C (C ⧸ Ideal.span (Set.range f))
     (fun q _ => Localization.AtPrime q ⊗[C] (C ⧸ Ideal.span (Set.range f)))
-    (fun q _ => TensorProduct.mk C _ _ 1) fun q _ => ?_
+    (fun q _ => TensorProduct.mk C _ _ 1)
+    fun q _ => ?_
   have h := flat_localization R C g f q
-  exact Module.Flat.of_linearEquiv
-    (((Algebra.TensorProduct.quotIdealMapEquivTensorQuot (Localization.AtPrime q)
-      (Ideal.span (Set.range f))).restrictScalars R).toLinearEquiv.symm)
+  exact Module.Flat.of_linearEquiv (((Algebra.TensorProduct.quotIdealMapEquivTensorQuot
+    (Localization.AtPrime q) (Ideal.span (Set.range f))).restrictScalars R).toLinearEquiv.symm)
 
 end GlobalTheory.CompanionTheory.CIFlatPf

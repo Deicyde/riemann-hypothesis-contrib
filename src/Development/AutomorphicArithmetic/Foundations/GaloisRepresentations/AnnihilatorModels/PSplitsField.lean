@@ -8,8 +8,9 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open CategoryTheory AlgebraicGeometry TensorProduct
 open UpperTheory.Gal.crystallineComparison
 
-private theorem exists_forall_algHom_pi_eq_apply_of_finite {K P : Type} [Field K] [Finite P] (ψ : (P → K) →ₐ[K] K) :
-    ∃ p, ∀ x, ψ x = x p := by
+private theorem exists_forall_algHom_pi_eq_apply_of_finite
+    {K P : Type} [Field K] [Finite P] (ψ : (P → K) →ₐ[K] K)
+    : ∃ p, ∀ x, ψ x = x p := by
   classical
   have hex : ∃ p, ψ (Pi.single p 1) ≠ 0 := by
     by_contra h
@@ -38,8 +39,7 @@ private theorem exists_forall_algHom_pi_eq_apply_of_finite {K P : Type} [Field K
   rw [map_mul, map_mul, AlgHom.commutes, hid] at h3
   simpa using h3
 
-theorem UpperTheory.Gal.crystallineComparison.splitsField_of :
-    SplitsField := by
+theorem UpperTheory.Gal.crystallineComparison.splitsField_of : SplitsField := by
   intro R S K _ _ _ _ _ _ hE
   classical
   have hfin : Module.Finite K (K ⊗[R] S) := Algebra.FormallyUnramified.finite_of_free K (K ⊗[R] S)
@@ -73,7 +73,8 @@ theorem UpperTheory.Gal.crystallineComparison.splitsField_of :
     have h1 := hLe ψ (e.symm (Pi.single p 1))
     rw [hg] at h1
     simp only [g, AlgHom.comp_apply, AlgEquiv.coe_toAlgHom, AlgHom.coe_coe,
-      AlgEquiv.apply_symm_apply, Pi.evalAlgHom_apply] at h1
+        AlgEquiv.apply_symm_apply, Pi.evalAlgHom_apply]
+      at h1
     by_contra hne
     simp [Pi.single_apply, hne] at h1
   refine ⟨Finite.of_injective q qinj, ?_⟩

@@ -10,27 +10,35 @@ open Polynomial Matrix IsLocalRing TensorProduct UpperTheory.V.AlgebraTools
 
 section aux
 
-variable {B E : Type} [CommRing B] [Ring E] [Algebra B E] {T : TrInv B E} {ι : Type} [Fintype ι] [DecidableEq ι]
-  {o : ι → ι} (U : T.Units ι o) (p q : ι)
+variable
+  {B E : Type} [CommRing B] [Ring E] [Algebra B E]
+  {T : TrInv B E} {ι : Type} [Fintype ι] [DecidableEq ι]
+  {o : ι → ι} (U : T.Units ι o)
+  (p q : ι)
 
 private noncomputable def vrEnt (w : E) : (U.oddForm p q).Ext :=
   (U.oddForm p q).el (T.tr w)
     (cornerProj B (U.ep p) (U.ep q) w + cornerProj B (U.ep p) (U.ep q) (T.st w))
 
 private noncomputable def vrRec (a b : ι) (z : (U.oddForm p q).Ext) : E :=
-  if a = b then z.ev • U.ep a else if a = p then z.od.1 else T.st z.od.1
+  if a = b then
+    z.ev • U.ep a
+  else if a = p then
+    z.od.1
+  else
+    T.st z.od.1
 
 omit [DecidableEq ι] in
-private theorem vrEnt_od (w : E) :
-    (vrEnt U p q w).od.1 = U.ep p * w * U.ep q + U.ep p * T.st w * U.ep q := by
+private theorem vrEnt_od (w : E)
+    : (vrEnt U p q w).od.1 = U.ep p * w * U.ep q + U.ep p * T.st w * U.ep q := by
   simp only [mul_assoc]; rfl
 
 omit [DecidableEq ι] in
 private theorem vrEnt_ev (w : E) : (vrEnt U p q w).ev = T.tr w := rfl
 
 omit [DecidableEq ι] in
-private theorem sand (a b c d : ι) (w : E) (hw : U.ep a * w * U.ep b = w) (h : c ≠ a ∨ b ≠ d) :
-    U.ep c * w * U.ep d = 0 := by
+private theorem sand (a b c d : ι) (w : E) (hw : U.ep a * w * U.ep b = w) (h : c ≠ a ∨ b ≠ d)
+    : U.ep c * w * U.ep d = 0 := by
   rw [← hw]
   simp only [mul_assoc]
   rcases h with h | h
@@ -38,15 +46,17 @@ private theorem sand (a b c d : ι) (w : E) (hw : U.ep a * w * U.ep b = w) (h : 
   · rw [U.coi.ortho h, mul_zero, mul_zero, mul_zero]
 
 omit [DecidableEq ι] in
-private theorem sand_st (a b : ι) (w : E) (hw : U.ep a * w * U.ep b = w) :
-    U.ep b * T.st w * U.ep a = T.st w := by
+private theorem sand_st (a b : ι) (w : E) (hw : U.ep a * w * U.ep b = w)
+    : U.ep b * T.st w * U.ep a = T.st w := by
   conv_rhs => rw [← hw]
   rw [T.st_mul, T.st_mul, U.st_ep, U.st_ep, mul_assoc]
 
-private theorem ent_spec (hpq : p ≠ q) (a b : ι) (ha : a = p ∨ a = q) (hb : b = p ∨ b = q) (w : E)
-    (hw : U.ep a * w * U.ep b = w) :
-    ((a = b → (vrEnt U p q w).od = 0) ∧ (a ≠ b → (vrEnt U p q w).ev = 0)) ∧
-      vrRec U p q a b (vrEnt U p q w) = w := by
+private theorem ent_spec
+    (hpq : p ≠ q)
+    (a b : ι) (ha : a = p ∨ a = q) (hb : b = p ∨ b = q)
+    (w : E) (hw : U.ep a * w * U.ep b = w)
+    : ((a = b → (vrEnt U p q w).od = 0) ∧ (a ≠ b → (vrEnt U p q w).ev = 0))
+      ∧ vrRec U p q a b (vrEnt U p q w) = w := by
   have hst := sand_st U a b w hw
   refine ⟨⟨fun hab => ?_, fun hab => ?_⟩, ?_⟩
   · rw [← hab] at hw hst
@@ -72,9 +82,12 @@ private theorem ent_spec (hpq : p ≠ q) (a b : ι) (ha : a = p ∨ a = q) (hb :
       rw [ha', hb'] at hw hst
       rw [vrEnt_od, sand U q p p q w hw (Or.inl hpq), zero_add, hst, T.st_st]
 
-private theorem rec_spec (hpq : p ≠ q) (a b : ι) (ha : a = p ∨ a = q) (hb : b = p ∨ b = q)
-    (z : (U.oddForm p q).Ext) (hz : (a = b → z.od = 0) ∧ (a ≠ b → z.ev = 0)) :
-    U.ep a * vrRec U p q a b z * U.ep b = vrRec U p q a b z ∧ vrEnt U p q (vrRec U p q a b z) = z := by
+private theorem rec_spec
+    (hpq : p ≠ q)
+    (a b : ι) (ha : a = p ∨ a = q) (hb : b = p ∨ b = q)
+    (z : (U.oddForm p q).Ext) (hz : (a = b → z.od = 0) ∧ (a ≠ b → z.ev = 0))
+    : U.ep a * vrRec U p q a b z * U.ep b = vrRec U p q a b z
+      ∧ vrEnt U p q (vrRec U p q a b z) = z := by
   have hid : ∀ i, U.ep i * U.ep i = U.ep i := fun i => (U.coi.idem i).eq
   have hmem : U.ep p * (z.od : E) * U.ep q = z.od := by
     obtain ⟨y, hy⟩ := z.od.2
@@ -126,12 +139,17 @@ private theorem rec_spec (hpq : p ≠ q) (a b : ι) (ha : a = p ∨ a = q) (hb :
 
 end aux
 
-theorem UpperTheory.V.AlgebraTools.vr_range :
-    ∀ {B E : Type} [CommRing B] [Ring E] [Algebra B E] (T : TrInv B E) {ι : Type} [Fintype ι] [DecidableEq ι] (o : ι → ι) (U : T.Units ι o) (p q : ι), p ≠ q → (∀ i, o i = p ∨ o i = q) → Function.Injective (U.vr p q) ∧ ∀ Y : Matrix ι ι (U.oddForm p q).Ext, Y ∈ Set.range (U.vr p q) ↔ ∀ i j, (o i = o j → (Y i j).od = 0) ∧ (o i ≠ o j → (Y i j).ev = 0) := by
+theorem UpperTheory.V.AlgebraTools.vr_range
+    : ∀ {B E : Type} [CommRing B] [Ring E] [Algebra B E] (T : TrInv B E) {ι : Type} [Fintype ι]
+        [DecidableEq ι] (o : ι → ι) (U : T.Units ι o) (p q : ι),
+      p ≠ q → (∀ i, o i = p ∨ o i = q)
+        → Function.Injective (U.vr p q)
+          ∧ ∀ Y : Matrix ι ι (U.oddForm p q).Ext,
+            Y ∈ Set.range (U.vr p q)
+              ↔ ∀ i j, (o i = o j → (Y i j).od = 0) ∧ (o i ≠ o j → (Y i j).ev = 0) := by
   intro B E _ _ _ T ι _ _ o U p q hpq ho
   obtain ⟨hxx, -, -, -, -, hsum, hcor⟩ := units_basic T o U
-  have hvr : ∀ w i j, U.vr p q w i j = vrEnt U p q (U.x i * w * T.st (U.x j)) :=
-    fun _ _ _ => rfl
+  have hvr : ∀ w i j, U.vr p q w i j = vrEnt U p q (U.x i * w * T.st (U.x j)) := fun _ _ _ => rfl
   have hrec : ∀ w i j, vrRec U p q (o i) (o j) (U.vr p q w i j) = U.x i * w * T.st (U.x j) := by
     intro w i j
     rw [hvr]
@@ -153,15 +171,15 @@ theorem UpperTheory.V.AlgebraTools.vr_range :
     refine Matrix.ext (fun i j => ?_)
     rw [hvr]
     have hr := rec_spec U p q hpq (o i) (o j) (ho i) (ho j) (Y i j) (hY i j)
-    have key : U.x i * (∑ k, ∑ l, T.st (U.x k) * vrRec U p q (o k) (o l) (Y k l) * U.x l) *
-        T.st (U.x j) = vrRec U p q (o i) (o j) (Y i j) := by
-      calc U.x i * (∑ k, ∑ l, T.st (U.x k) * vrRec U p q (o k) (o l) (Y k l) * U.x l) *
-            T.st (U.x j)
-          = ∑ k, ∑ l, (U.x i * T.st (U.x k)) * vrRec U p q (o k) (o l) (Y k l) *
-              (U.x l * T.st (U.x j)) := by
-            simp only [Finset.mul_sum, Finset.sum_mul, mul_assoc]
-        _ = U.ep (o i) * vrRec U p q (o i) (o j) (Y i j) * U.ep (o j) := by
-            simp [hx]
+    have key
+        : U.x i * (∑ k, ∑ l, T.st (U.x k) * vrRec U p q (o k) (o l) (Y k l) * U.x l) * T.st (U.x j)
+          = vrRec U p q (o i) (o j) (Y i j) := by
+      calc
+        U.x i * (∑ k, ∑ l, T.st (U.x k) * vrRec U p q (o k) (o l) (Y k l) * U.x l) * T.st (U.x j)
+            = ∑ k, ∑ l, (U.x i * T.st (U.x k)) * vrRec U p q (o k) (o l) (Y k l) *
+                (U.x l * T.st (U.x j)) := by
+          simp only [Finset.mul_sum, Finset.sum_mul, mul_assoc]
+        _ = U.ep (o i) * vrRec U p q (o i) (o j) (Y i j) * U.ep (o j) := by simp [hx]
         _ = vrRec U p q (o i) (o j) (Y i j) := hr.1
     rw [key]
     exact hr.2

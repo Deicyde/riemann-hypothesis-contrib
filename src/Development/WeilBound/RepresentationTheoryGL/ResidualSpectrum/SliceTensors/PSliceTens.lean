@@ -16,7 +16,8 @@ public import GroundTheory.PAdicHodge.NormalizedTrace
 noncomputable section
 
 open NumberField MeasureTheory Formalism.L2.Host
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec GlobalTheory.CompanionTheory.CTFin PositivityTheory.Affgl
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec
+  GlobalTheory.CompanionTheory.CTFin PositivityTheory.Affgl
 
 namespace PositivityTheory.Rg.Rs
 
@@ -37,36 +38,50 @@ theorem sliceTens_holds : SliceTens := by
   have : FiniteDimensional ℂ S := by
     have := hAφ.kfin
     refine Submodule.finiteDimensional_of_le
-      (S₂ := (Submodule.span ℂ (Set.range fun κ => cptRep E (r + s) κ φ)).map T) (Submodule.span_le.2 ?_)
+      (S₂ := (Submodule.span ℂ (Set.range fun κ => cptRep E (r + s) κ φ)).map T)
+      (Submodule.span_le.2 ?_)
     rintro _ ⟨κ, rfl⟩
     exact ⟨_, Submodule.subset_span ⟨κ, rfl⟩, hT.equiv (.cpt κ) φ hφ⟩
-  let ρ := GlobalTheory.PRep.sub (cptRep E (r + s)) S (GlobalTheory.CuspRep.LocEx.orbSpan_stable (T φ))
-  have hρ : GlobalTheory.Published.AutFin.IsContRep ρ := GlobalTheory.CuspRep.LocEx.isContRep_sub S _
-  have hC : ∀ g : GA E (r + s), (fun κ : Kinf E (r + s) => (cptRep E (r + s) κ (T φ)).1 g) ∈
-      GlobalTheory.Published.AutFin.coeffSpan ρ := fun g =>
-    GlobalTheory.Published.AutFinGL.type_of_map ρ S.subtype (fun _ _ => rfl) ⟨T φ, Submodule.subset_span ⟨1, by simp⟩⟩ g
+  let ρ :=
+    GlobalTheory.PRep.sub (cptRep E (r + s)) S (GlobalTheory.CuspRep.LocEx.orbSpan_stable (T φ))
+  have hρ : GlobalTheory.Published.AutFin.IsContRep ρ :=
+    GlobalTheory.CuspRep.LocEx.isContRep_sub S _
+  have hC
+      : ∀ g : GA E (r + s),
+        (fun κ : Kinf E (r + s) => (cptRep E (r + s) κ (T φ)).1 g)
+          ∈ GlobalTheory.Published.AutFin.coeffSpan ρ := fun g =>
+    GlobalTheory.Published.AutFinGL.type_of_map ρ S.subtype
+      (fun _ _ => rfl)
+      ⟨T φ, Submodule.subset_span ⟨1, by simp⟩⟩ g
 
   have hsc : ∀ (τ : E →+* ℂ) (u : ℂ), ∃ c : ℂ, ∀ ψ ∈ V, cap τ u ψ = c • ψ := fun τ u =>
-    GlobalTheory.DiscLocEx.exists_scalarD hV (Algebra.subset_adjoin ⟨τ, u, rfl⟩) (GlobalTheory.SpehInfChar.cap_commute_act τ u)
+    GlobalTheory.DiscLocEx.exists_scalarD hV (Algebra.subset_adjoin ⟨τ, u, rfl⟩)
+      (GlobalTheory.SpehInfChar.cap_commute_act τ u)
   choose cc hcc using hsc
   let J : Set (Module.End ℂ (Sm E (r + s))) :=
     {z | ∃ (τ : E →+* ℂ) (u : ℂ), z = Polynomial.aeval (cap (a := r + s) τ u) (Polynomial.X - Polynomial.C (cc τ u))}
   have hJZ : J ⊆ Zalg E (r + s) := by
     rintro _ ⟨τ, u, rfl⟩
     exact aeval_mem_Zalg (cap_mem_Zalg τ u) _
-  have hJ : Cofin J := GlobalTheory.CompanionTheory.CTFin.MonicCofin.cofin_of_monic E (r + s) J hJZ fun τ u =>
-    ⟨_, Polynomial.monic_X_sub_C _, τ, u, rfl⟩
+  have hJ : Cofin J :=
+    GlobalTheory.CompanionTheory.CTFin.MonicCofin.cofin_of_monic E (r + s) J hJZ fun τ u =>
+      ⟨_, Polynomial.monic_X_sub_C _, τ, u, rfl⟩
   have hZ : ∀ z ∈ J, z (T φ) = 0 := by
     rintro _ ⟨τ, u, rfl⟩
-    simp only [map_sub, Polynomial.aeval_X, Polynomial.aeval_C, LinearMap.sub_apply, Module.algebraMap_end_apply]
-    rw [← GlobalTheory.SpehInfChar.cap_comm_quot (fun X ψ hψ => hV.stable (.lie X) ψ hψ) T hT.equiv τ u φ hφ,
+    simp only [map_sub, Polynomial.aeval_X, Polynomial.aeval_C, LinearMap.sub_apply,
+      Module.algebraMap_end_apply]
+    rw [← GlobalTheory.SpehInfChar.cap_comm_quot
+        (fun X ψ hψ => hV.stable (.lie X) ψ hψ)
+        T hT.equiv τ u φ hφ,
       hcc τ u φ hφ, map_smul, sub_self]
   obtain ⟨J₁, -, c₁, -, k₁, -⟩ := centre J hJ
 
   let L₁ := Slice1.levelOne s L g
   let ρ₁ := ρ.comp (Slice1.levK E r s)
-  have := PositivityTheory.Rg.HF.GL.genFin E r L₁ (Slice1.isOpen_levelOne hLo g) S ρ₁
-    (fun ℓ w => (hρ ℓ w).comp Slice1.continuous_levK) J₁ c₁
+  have :=
+    PositivityTheory.Rg.HF.GL.genFin E r L₁ (Slice1.isOpen_levelOne hLo g) S ρ₁
+      (fun ℓ w => (hρ ℓ w).comp Slice1.continuous_levK)
+      J₁ c₁
   let S₁ := tw (A2 E r) z₁ ⊓ Submodule.span ℂ (genSpace L₁ ρ₁ J₁)
   have : FiniteDimensional ℂ S₁ := Submodule.finiteDimensional_of_le inf_le_right
   let U := S₁.map (Sm E r).subtype
@@ -78,7 +93,8 @@ theorem sliceTens_holds : SliceTens := by
     obtain ⟨ψ, hψA, hψ, -⟩ := hT.left φ hφ k g m₂
     obtain ⟨ψ', hA', hS', e'⟩ := (hL2 φ hφ k g).1 m₂
     have hmem : ψ ∈ genSpace L₁ ρ₁ J₁ := by
-      refine SliceTensor.slice_mem ρ hJZ k₁ (T φ) (hT.unipInv φ hφ) hLv hC hZ g k m₂ ψ hψA fun m₁ => ?_
+      refine SliceTensor.slice_mem ρ hJZ k₁ (T φ) (hT.unipInv φ hφ) hLv hC hZ g k m₂ ψ hψA fun m₁ =>
+        ?_
       rw [hψ, infGL_comm, mul_assoc]
     have htw : ψ ∈ tw (A2 E r) z₁ := by
       refine ⟨ψ', Submodule.subset_span ⟨hA', hS'⟩, Subtype.ext (funext fun m₁ => ?_)⟩

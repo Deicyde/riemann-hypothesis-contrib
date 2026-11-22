@@ -8,7 +8,8 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.GlobalTheory.Be
 
 namespace GlobalTheory
 
-theorem bernsteinZelevinskyFiniteness_holds : GlobalTheory.Published.BernsteinZelevinskyFiniteness :=
+theorem bernsteinZelevinskyFiniteness_holds
+    : GlobalTheory.Published.BernsteinZelevinskyFiniteness :=
   GlobalTheory.CompanionTheory.Published.bernsteinZelevinskyFiniteness
 
 end GlobalTheory

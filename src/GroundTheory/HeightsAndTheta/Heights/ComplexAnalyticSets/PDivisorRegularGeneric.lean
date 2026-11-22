@@ -14,7 +14,8 @@ open MvPolynomial Filter Topology ComplexSets
 
 noncomputable section
 
-theorem DivisorRegularGeneric.proof (hG : FrameGraphGeneric.Statement) : DivisorRegularGeneric.Statement := by
+theorem DivisorRegularGeneric.proof (hG : FrameGraphGeneric.Statement)
+    : DivisorRegularGeneric.Statement := by
   classical
   intro n d J u hJ hdim hu
   set L : Ideal (MvPolynomial (Fin n) ℂ) := J ⊔ Ideal.span {linForm u} with hL
@@ -23,13 +24,14 @@ theorem DivisorRegularGeneric.proof (hG : FrameGraphGeneric.Statement) : Divisor
   have hmemT : ∀ W, W ∈ T ↔ W ∈ L.minimalPrimes := fun W => hfinM.mem_toFinset
   have hevL : ∀ x : Fin n → ℂ, eval x (linForm u) = linEval u x := fun x => by
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [linForm, linEval, map_sum]
+    simp [linForm, linEval, map_sum]
 
   have hdimW : ∀ W ∈ L.minimalPrimes, ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ W) = (d : ℕ) := by
     intro W hW
-    have key := ringKrullDim_quotient_minimalPrime_add_one hu hW (fun h => by
-      rw [hdim] at h
-      exact ENat.natCast_ne_top _ (WithBot.coe_injective h))
+    have key :=
+      ringKrullDim_quotient_minimalPrime_add_one hu hW (fun h => by
+        rw [hdim] at h
+        exact ENat.natCast_ne_top _ (WithBot.coe_injective h))
     rw [hdim] at key
     exact ReciprocityTheory.ChartRestriction.G.AI.I1.cyc_withBot_eq_of_add_one key
   choose! hh hhW hhchart using fun W (hW : W ∈ L.minimalPrimes) =>
@@ -46,7 +48,8 @@ theorem DivisorRegularGeneric.proof (hG : FrameGraphGeneric.Statement) : Divisor
     intro W hW hmem
     have : W.IsPrime := hW.1.1
     obtain ⟨V, hV, hgV⟩ := Ideal.IsPrime.prod_mem_iff.mp hmem
-    exact hggW W hW V ((hmemT V).mp (Finset.mem_of_mem_erase hV)) (Finset.ne_of_mem_erase hV).symm hgV
+    exact hggW W hW V ((hmemT V).mp (Finset.mem_of_mem_erase hV)) (Finset.ne_of_mem_erase hV).symm
+      hgV
   have heV : ∀ W ∈ L.minimalPrimes, ∀ V ∈ L.minimalPrimes, W ≠ V → e W ∈ V := by
     intro W hW V hV hne
     have : V.IsPrime := hV.1.1
@@ -68,8 +71,10 @@ theorem DivisorRegularGeneric.proof (hG : FrameGraphGeneric.Statement) : Divisor
 
   have hcomp : ∀ x ∈ zeroSet J, linEval u x = 0 → ∃ W ∈ L.minimalPrimes, x ∈ zeroSet W := by
     intro x hxJ hxu
-    have hxL : L ≤ RingHom.ker (eval x) := sup_le (fun p hp => RingHom.mem_ker.mpr (hxJ p hp))
-      (Ideal.span_le.mpr (by simpa [hevL] using hxu))
+    have hxL : L ≤ RingHom.ker (eval x) :=
+      sup_le
+        (fun p hp => RingHom.mem_ker.mpr (hxJ p hp))
+        (Ideal.span_le.mpr (by simpa [hevL] using hxu))
     have : (RingHom.ker (eval x)).IsPrime := RingHom.ker_isPrime _
     obtain ⟨W, hW, hWx⟩ := Ideal.exists_minimalPrimes_le hxL
     exact ⟨W, hW, fun p hp => RingHom.mem_ker.mp (hWx hp)⟩

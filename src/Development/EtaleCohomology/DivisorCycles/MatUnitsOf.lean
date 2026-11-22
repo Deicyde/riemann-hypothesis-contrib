@@ -14,7 +14,8 @@ variable {C : Type} [Field C] {N n : ℕ}
 def Pr (A : Subalgebra C (Mat C N)) (p : Fin n → Mat C N) (i j : Fin n) (x y : Mat C N) : Prop :=
   x ∈ A ∧ y ∈ A ∧ p i * x * p j = x ∧ p j * y * p i = y ∧ x * y = p i ∧ y * x = p j
 
-def rel (A : Subalgebra C (Mat C N)) (p : Fin n → Mat C N) (i j : Fin n) : Prop := ∃ x y, Pr A p i j x y
+def rel (A : Subalgebra C (Mat C N)) (p : Fin n → Mat C N) (i j : Fin n) : Prop :=
+  ∃ x y, Pr A p i j x y
 
 section
 variable {A : Subalgebra C (Mat C N)} {p : Fin n → Mat C N}
@@ -124,10 +125,12 @@ theorem MatUnits_of : MatrixUnits₂ := by
   intro C _ N n A p hp hc hA
   have heq := rel_equiv hp hc
   let s : Setoid (Fin n) := ⟨rel A p, heq⟩
-  obtain ⟨r, hr, hreq⟩ : ∃ r : Fin n → Fin n, (∀ i, ∃ x y, Pr A p i (r i) x y) ∧
-      ∀ i j, rel A p i j → r i = r j :=
-    ⟨fun i => (Quotient.mk s i).out, fun i => heq.symm (Quotient.mk_out (s := s) i),
-      fun i j h => congrArg Quotient.out (Quotient.sound (s := s) h)⟩
+  obtain ⟨r, hr, hreq⟩
+      : ∃ r : Fin n → Fin n, (∀ i, ∃ x y, Pr A p i (r i) x y) ∧ ∀ i j, rel A p i j → r i = r j := ⟨
+    fun i => (Quotient.mk s i).out,
+    fun i => heq.symm (Quotient.mk_out (s := s) i),
+    fun i j h => congrArg Quotient.out (Quotient.sound (s := s) h)
+  ⟩
   choose X Y hXY using hr
   have pairE : ∀ i j, rel A p i j → Pr A p i j (X i * Y j) (X j * Y i) := by
     intro i j h
@@ -173,8 +176,9 @@ theorem MatUnits_of : MatrixUnits₂ := by
     · refine ⟨0, ?_⟩
       simp only [if_neg h, smul_zero]
       by_contra h'
-      obtain ⟨w, hw⟩ := partner (i := i) (j := j) hp hc hA (A.mul_mem (A.mul_mem (hc.1 i) ha) (hc.1 j))
-        (by simp only [mul_assoc, idemL hp i]) (by rw [mul_assoc _ (p j), idem hp j]) h'
+      obtain ⟨w, hw⟩ :=
+        partner (i := i) (j := j) hp hc hA (A.mul_mem (A.mul_mem (hc.1 i) ha) (hc.1 j))
+          (by simp only [mul_assoc, idemL hp i]) (by rw [mul_assoc _ (p j), idem hp j]) h'
       exact h ⟨_, _, hw⟩
 
 end LateralTheory.DivDb.MatrixUnitConstruction

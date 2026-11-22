@@ -16,6 +16,7 @@ theorem rayClassFieldSt : GlobalTheory.Published.RayClassFieldSt :=
   GlobalTheory.Published.GlobalArtinReciprocity.rayClassFieldSt CompanionTheory.FamInh.globalArtin
 
 theorem heckeLAdicCharacter : GlobalTheory.Published.HeckeLAdicCharacter :=
-  GlobalTheory.Published.GlobalArtinReciprocity.heckeLAdicCharacter CompanionTheory.FamInh.globalArtin
+  GlobalTheory.Published.GlobalArtinReciprocity.heckeLAdicCharacter
+    CompanionTheory.FamInh.globalArtin
 
 end PositivityTheory.Stage1.PM

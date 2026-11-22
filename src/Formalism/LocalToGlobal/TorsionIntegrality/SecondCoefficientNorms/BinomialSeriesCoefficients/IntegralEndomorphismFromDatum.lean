@@ -18,25 +18,28 @@ section Below
 
 variable {K : Type} [Field K] {R : Subring K}
 
-theorem below_mul {n : ℕ} {f h : PowerSeries K} (hf : ∀ m < n, coeff m f ∈ R)
-    (hh : ∀ m < n, coeff m h ∈ R) : ∀ m < n, coeff m (f * h) ∈ R := by
+theorem below_mul
+    {n : ℕ} {f h : PowerSeries K} (hf : ∀ m < n, coeff m f ∈ R) (hh : ∀ m < n, coeff m h ∈ R)
+    : ∀ m < n, coeff m (f * h) ∈ R := by
   intro m hm
   rw [PowerSeries.coeff_mul]
   refine Subring.sum_mem _ fun p hp => ?_
   have := Finset.HasAntidiagonal.mem_antidiagonal.mp hp
   exact R.mul_mem (hf _ (by omega)) (hh _ (by omega))
 
-theorem below_subst {n : ℕ} {A a : PowerSeries K} (hA : IntPS R A)
-    (ha0 : constantCoeff a = 0) (ha : ∀ m < n, coeff m a ∈ R) :
-    ∀ m < n, coeff m (A.subst a) ∈ R := by
+theorem below_subst
+    {n : ℕ} {A a : PowerSeries K}
+    (hA : IntPS R A) (ha0 : constantCoeff a = 0) (ha : ∀ m < n, coeff m a ∈ R)
+    : ∀ m < n, coeff m (A.subst a) ∈ R := by
   intro m hm
   rw [PowerSeries.coeff_subst' (HasSubst.of_constantCoeff_zero' ha0)]
   refine finsum_induction (· ∈ R) R.zero_mem (fun _ _ => R.add_mem) fun k => ?_
   rw [smul_eq_mul]
   exact R.mul_mem (hA k) (Pts.coeff_pow_mem ha k m hm)
 
-theorem below_shift {n : ℕ} {g : PowerSeries K} {al : K} (hal : al ∈ R)
-    (hg : ∀ m < n, coeff m g ∈ R) : ∀ m < n + 1, coeff m (C al * X * g) ∈ R := by
+theorem below_shift
+    {n : ℕ} {g : PowerSeries K} {al : K} (hal : al ∈ R) (hg : ∀ m < n, coeff m g ∈ R)
+    : ∀ m < n + 1, coeff m (C al * X * g) ∈ R := by
   intro m hm
   have h : C al * X * g = X * (C al * g) := by ring
   rw [h]
@@ -44,16 +47,20 @@ theorem below_shift {n : ℕ} {g : PowerSeries K} {al : K} (hal : al ∈ R)
   | zero => rw [coeff_zero_X_mul]; exact R.zero_mem
   | succ m => rw [coeff_succ_X_mul, coeff_C_mul]; exact R.mul_mem hal (hg m (by omega))
 
-theorem coeff_of_sq {n : ℕ} {g : PowerSeries K} (h2 : (2 : K)⁻¹ ∈ R) (h20 : (2 : K) ≠ 0)
-    (hg0 : constantCoeff g = 1) (hg : ∀ m < n, coeff m g ∈ R) (hgg : coeff n (g * g) ∈ R) :
-    coeff n g ∈ R := by
+theorem coeff_of_sq
+    {n : ℕ} {g : PowerSeries K}
+    (h2 : (2 : K)⁻¹ ∈ R) (h20 : (2 : K) ≠ 0) (hg0 : constantCoeff g = 1)
+    (hg : ∀ m < n, coeff m g ∈ R) (hgg : coeff n (g * g) ∈ R)
+    : coeff n g ∈ R := by
   have h1 : IntPS R (1 : PowerSeries K) := by simpa using USideA.intPS_X_pow (R := R) (K := K) 0
   have hh0 : coeff 0 (g - 1) = 0 := by
     rw [coeff_zero_eq_constantCoeff_apply, map_sub, hg0, map_one, sub_self]
   have hh : ∀ m < n, coeff m (g - 1) ∈ R := fun m hm => by
     rw [map_sub]; exact R.sub_mem (hg m hm) (h1 m)
-  have hid : coeff n (g - 1) = (2 : K)⁻¹ * (coeff n (g * g) - coeff n (1 : PowerSeries K)
-      - coeff n ((g - 1) * (g - 1))) := by
+  have hid
+      : coeff n (g - 1)
+        = (2 : K)⁻¹
+          * (coeff n (g * g) - coeff n (1 : PowerSeries K) - coeff n ((g - 1) * (g - 1))) := by
     have : g * g - 1 - (g - 1) * (g - 1) = (g - 1) + (g - 1) := by ring
     rw [← map_sub, ← map_sub, this, map_add (f := _)]
     field_simp
@@ -71,14 +78,15 @@ theorem coeff_of_sq {n : ℕ} {g : PowerSeries K} (h2 : (2 : K)⁻¹ ∈ R) (h20
   rw [this, map_add (f := _)]
   exact R.add_mem hk (h1 n)
 
-theorem int_of_eq {A V g : PowerSeries K} {al : K} (h2 : (2 : K)⁻¹ ∈ R) (h20 : (2 : K) ≠ 0)
-    (hA : IntPS R A) (hV : IsOneUnit R V) (hal : al ∈ R) (hg0 : constantCoeff g = 1)
-    (hEq : A.subst (C al * X * g) = g * g * V) : IntPS R g := by
+theorem int_of_eq
+    {A V g : PowerSeries K} {al : K}
+    (h2 : (2 : K)⁻¹ ∈ R) (h20 : (2 : K) ≠ 0) (hA : IntPS R A) (hV : IsOneUnit R V) (hal : al ∈ R)
+    (hg0 : constantCoeff g = 1) (hEq : A.subst (C al * X * g) = g * g * V)
+    : IntPS R g := by
   have hne : constantCoeff V ≠ 0 := by rw [hV.1]; exact one_ne_zero
   have hinv : V * V⁻¹ = 1 := PowerSeries.mul_inv_cancel V hne
   have hW : IntPS R V⁻¹ := USideA.intPS_of_mul_eq_one hV.2 hV.1 hinv
-  have hgg : g * g = A.subst (C al * X * g) * V⁻¹ := by
-    rw [hEq, mul_assoc, hinv, mul_one]
+  have hgg : g * g = A.subst (C al * X * g) * V⁻¹ := by rw [hEq, mul_assoc, hinv, mul_one]
   have ha0 : constantCoeff (C al * X * g) = 0 := by simp
   have key : ∀ n, ∀ m < n, coeff m g ∈ R := by
     intro n
@@ -91,31 +99,38 @@ theorem int_of_eq {A V g : PowerSeries K} {al : K} (h2 : (2 : K)⁻¹ ∈ R) (h2
       · subst h
         refine coeff_of_sq h2 h20 hg0 ih ?_
         rw [hgg]
-        exact below_mul (below_subst hA ha0 (below_shift hal ih)) (fun k _ => hW k) m
-          (Nat.lt_succ_self m)
+        exact below_mul (below_subst hA ha0 (below_shift hal ih))
+          (fun k _ => hW k)
+          m (Nat.lt_succ_self m)
   exact fun n => key (n + 1) n (Nat.lt_succ_self n)
 
-theorem isOneUnit_veluXs {A : PowerSeries K} {ι : Type} [Fintype ι] {xs : ι → PowerSeries K}
-    {xP : ι → K} {r : K} (hA : IsOneUnit R A) (hxs : ∀ P, IntPS R (xs P)) (hxP : ∀ P, xP P ∈ R)
-    (hr : r ∈ R) : IsOneUnit R (veluXs A xs xP r) := by
+theorem isOneUnit_veluXs
+    {A : PowerSeries K} {ι : Type} [Fintype ι]
+    {xs : ι → PowerSeries K} {xP : ι → K} {r : K}
+    (hA : IsOneUnit R A) (hxs : ∀ P, IntPS R (xs P)) (hxP : ∀ P, xP P ∈ R) (hr : r ∈ R)
+    : IsOneUnit R (veluXs A xs xP r) := by
   refine ⟨by simp [veluXs, hA.1], ?_⟩
-  exact USideA.intPS_add hA.2 (USideA.intPS_mul (USideA.intPS_X_pow 2)
-    (USideA.intPS_sub (USideA.intPS_sum _ fun P _ =>
-      USideA.intPS_sub (hxs P) (USideA.intPS_C (hxP P))) (USideA.intPS_C hr)))
+  exact USideA.intPS_add hA.2
+    (USideA.intPS_mul (USideA.intPS_X_pow 2)
+      (USideA.intPS_sub
+        (USideA.intPS_sum _ fun P _ => USideA.intPS_sub (hxs P) (USideA.intPS_C (hxP P)))
+        (USideA.intPS_C hr)))
 
-theorem exists_mulBy_eq {l linv : PowerSeries K} (h : IsLogPair l linv) {al : K} (hal : al ≠ 0) :
-    ∃ g : PowerSeries K, constantCoeff g = 1 ∧ mulBy l linv al = C al * X * g := by
+theorem exists_mulBy_eq {l linv : PowerSeries K} (h : IsLogPair l linv) {al : K} (hal : al ≠ 0)
+    : ∃ g : PowerSeries K, constantCoeff g = 1 ∧ mulBy l linv al = C al * X * g := by
   have ha0 : constantCoeff (C al * l) = 0 := by rw [map_mul, h.1, mul_zero]
   have hv0 : coeff 0 (mulBy l linv al) = 0 := by
     rw [coeff_zero_eq_constantCoeff_apply]
     exact Pts.constantCoeff_mulBy h al
   have hv1 : coeff 1 (mulBy l linv al) = al := by
-    have hc := IntegralMvPolynomialLemmas.coeff_subst_congr (g := linv) (h := (X : PowerSeries K)) (a := C al * l) ha0
-      (Finsupp.single () 1) (fun k hk => by
-        rw [Finsupp.degree_single] at hk
-        interval_cases k
-        · simp [h.2.2.1]
-        · rw [Pts.coeff_one_linv h, coeff_one_X])
+    have hc :=
+      IntegralMvPolynomialLemmas.coeff_subst_congr (g := linv) (h := (X : PowerSeries K))
+        (a := C al * l) ha0 (Finsupp.single () 1)
+        (fun k hk => by
+          rw [Finsupp.degree_single] at hk
+          interval_cases k
+          · simp [h.2.2.1]
+          · rw [Pts.coeff_one_linv h, coeff_one_X])
     rw [PowerSeries.subst_X (Pts.hasSubst ha0)] at hc
     have h1 : coeff 1 (mulBy l linv al) = coeff 1 (C al * l) := hc
     rw [h1, coeff_C_mul, h.2.1, mul_one]
@@ -130,8 +145,11 @@ theorem exists_mulBy_eq {l linv : PowerSeries K} (h : IsLogPair l linv) {al : K}
 
 end Below
 
-theorem ne_zero_of_isEndoR {K : Type} [Field K] [CharZero K] {ι : Type} [Fintype ι] {al albar : K}
-    (hN : al * albar = (Fintype.card ι : K) + 1) : al ≠ 0 := by
+theorem ne_zero_of_isEndoR
+    {K : Type} [Field K] [CharZero K]
+    {ι : Type} [Fintype ι]
+    {al albar : K} (hN : al * albar = (Fintype.card ι : K) + 1)
+    : al ≠ 0 := by
   intro h
   rw [h, zero_mul] at hN
   exact (Nat.cast_add_one_ne_zero (R := K) (Fintype.card ι)) hN.symm
@@ -149,11 +167,9 @@ theorem velu_x_coordinate_integral : VeluIntegralX := by
     rw [constantCoeff_C, map_zero] at this
     exact pow_ne_zero 2 hal0 this
   have hX : (X : PowerSeries K) ^ 2 ≠ 0 := pow_ne_zero 2 X_ne_zero
-  have h0 : C (al ^ 2) * X ^ 2 *
-      (A.subst (C al * X * g) - g * g * veluXs A xs xP r) = 0 := by
-    have : C (al ^ 2) * X ^ 2 * (A.subst (C al * X * g) - g * g * veluXs A xs xP r) =
-        C (al ^ 2) * A.subst (C al * X * g) * X ^ 2 -
-          (C al * X * g) ^ 2 * veluXs A xs xP r := by
+  have h0 : C (al ^ 2) * X ^ 2 * (A.subst (C al * X * g) - g * g * veluXs A xs xP r) = 0 := by
+    have : C (al ^ 2) * X ^ 2 * (A.subst (C al * X * g) - g * g * veluXs A xs xP r)
+        = C (al ^ 2) * A.subst (C al * X * g) * X ^ 2 - (C al * X * g) ^ 2 * veluXs A xs xP r := by
       rw [map_pow]; ring
     rw [this, hEq, sub_self]
   exact sub_eq_zero.mp ((mul_eq_zero.mp h0).resolve_left (mul_ne_zero hC hX))
@@ -185,12 +201,14 @@ theorem phi_norm_from_datum : PhNormFromDatum := by
   exact this
 
 theorem endoAllFromData_of (hA : EndoAll) : EndoAllFromData := by
-  intro K _ _ _ _ R hR e s2 l linv ph A c0 hF hF1 hPh hX hA1 O _ _ _ τ hτ hstar hself h2 h2O hsum
-    Dn hDn hdata
+  intro K _ _ _ _ R hR e s2 l linv ph A c0 hF hF1 hPh hX hA1 O _ _ _ τ hτ hstar hself h2 h2O hsum Dn
+    hDn hdata
   refine hA K R hR l linv ph hF hF1 O τ hτ hstar hself h2 h2O hsum Dn hDn ?_
   intro α hα
   obtain ⟨ι, _, neg, xP, w, xs, hD, hs⟩ := hdata α hα
-  exact ⟨integral_endomorphism_from_datum K R e l linv A c0 ι neg xP w xs _ _ hF.1 hX hA1 h2 hD,
-    phi_norm_from_datum K R e s2 l linv ph A c0 ι neg xP w xs _ _ hF.1 hPh hX hA1 h2 hD hs⟩
+  exact ⟨
+    integral_endomorphism_from_datum K R e l linv A c0 ι neg xP w xs _ _ hF.1 hX hA1 h2 hD,
+    phi_norm_from_datum K R e s2 l linv ph A c0 ι neg xP w xs _ _ hF.1 hPh hX hA1 h2 hD hs
+  ⟩
 
 end Formalism.L2.Th1.C

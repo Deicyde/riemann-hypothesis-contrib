@@ -43,7 +43,8 @@ structure Parts : Prop where
 theorem Parts.hodgeKill (h : Parts) : HodgeKill :=
   have zr := h.zarRel h.site h.on h.zar
   h.killOf h.site h.cup (h.lift h.site h.on) (h.inj h.site h.mv h.cov zr h.chart h.bij h.iso)
-    (h.kill h.site h.cov zr h.aff h.nat (h.affRel h.site h.on h.aff h.nat h.laws) h.laws h.dw h.dl h.fc h.c1 h.div (h.cone h.surj))
+    (h.kill h.site h.cov zr h.aff h.nat (h.affRel h.site h.on h.aff h.nat h.laws) h.laws h.dw h.dl
+      h.fc h.c1 h.div (h.cone h.surj))
 
 theorem Parts.slant' (h : Parts) : Slant :=
   h.slant h.site h.mv h.cov h.zar h.aff (h.kunAff h.site h.aff h.nat h.laws h.fc h.kun)

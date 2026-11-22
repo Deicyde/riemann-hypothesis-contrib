@@ -12,12 +12,11 @@ open scoped ENNReal Classical
 
 namespace GlobalTheory.HL
 
-def resPi {ι : Type} {G : ι → Type} [∀ i, Group (G i)] (A : ∀ i, Subgroup (G i)) :
-    Subgroup (∀ i, G i) where
+def resPi {ι : Type} {G : ι → Type} [∀ i, Group (G i)] (A : ∀ i, Subgroup (G i))
+    : Subgroup (∀ i, G i) where
   carrier := {g | {i | g i ∉ A i}.Finite}
   one_mem' := by
-    have : {i | (1 : ∀ i, G i) i ∉ A i} = ∅ := by
-      ext i; simp [one_mem]
+    have : {i | (1 : ∀ i, G i) i ∉ A i} = ∅ := by ext i; simp [one_mem]
     simp only [Set.mem_setOf_eq, this, Set.finite_empty]
   mul_mem' := by
     intro a b ha hb
@@ -30,29 +29,34 @@ def resPi {ι : Type} {G : ι → Type} [∀ i, Group (G i)] (A : ∀ i, Subgrou
     refine Set.Finite.subset ha (fun i hi => ?_)
     simpa using hi
 
-theorem pi_le_resPi {ι : Type} {G : ι → Type} [∀ i, Group (G i)] (A U : ∀ i, Subgroup (G i))
-    (h : {i | A i ≠ U i}.Finite) : Subgroup.pi Set.univ U ≤ resPi A := by
+theorem pi_le_resPi
+    {ι : Type} {G : ι → Type} [∀ i, Group (G i)]
+    (A U : ∀ i, Subgroup (G i)) (h : {i | A i ≠ U i}.Finite)
+    : Subgroup.pi Set.univ U ≤ resPi A := by
   intro g hg
   refine Set.Finite.subset h (fun i hi hAU => hi ?_)
   rw [hAU]
   exact hg i (Set.mem_univ i)
 
-theorem exists_finset_cosets {G : Type} [Group G] (K L : Subgroup G) (h : L.relIndex K ≠ 0) :
-    ∃ T : Finset G, ∀ k ∈ K, ∃ t ∈ T, t⁻¹ * k ∈ L := by
+theorem exists_finset_cosets {G : Type} [Group G] (K L : Subgroup G) (h : L.relIndex K ≠ 0)
+    : ∃ T : Finset G, ∀ k ∈ K, ∃ t ∈ T, t⁻¹ * k ∈ L := by
   haveI : (L.subgroupOf K).FiniteIndex := ⟨h⟩
   haveI : Fintype (K ⧸ L.subgroupOf K) := Fintype.ofFinite _
   refine ⟨Finset.univ.image (fun q : K ⧸ L.subgroupOf K => ((Quotient.out q : K) : G)), ?_⟩
   intro k hk
   refine ⟨_, Finset.mem_image_of_mem _ (Finset.mem_univ (QuotientGroup.mk ⟨k, hk⟩)), ?_⟩
-  have h1 : ((Quotient.out (QuotientGroup.mk ⟨k, hk⟩ : K ⧸ L.subgroupOf K) : K) :
-      K ⧸ L.subgroupOf K) = QuotientGroup.mk ⟨k, hk⟩ := QuotientGroup.out_eq' _
+  have h1
+      : ((Quotient.out (QuotientGroup.mk ⟨k, hk⟩ : K ⧸ L.subgroupOf K) : K) : K ⧸ L.subgroupOf K)
+        = QuotientGroup.mk ⟨k, hk⟩ :=
+    QuotientGroup.out_eq' _
   have h2 := QuotientGroup.eq.1 h1
   simpa [Subgroup.mem_subgroupOf] using h2
 
-theorem double_cosets_transfer {G : Type} [Group G] (Γ KA K0 : Subgroup G)
-    (h : K0.relIndex KA ≠ 0)
-    (hS : ∃ S : Finset G, ∀ g : G, ∃ a ∈ S, ∃ γ ∈ Γ, ∃ κ ∈ KA, g = γ * a * κ) :
-    ∃ S : Finset G, ∀ g : G, ∃ a ∈ S, ∃ γ ∈ Γ, ∃ κ ∈ K0, g = γ * a * κ := by
+theorem double_cosets_transfer
+    {G : Type} [Group G]
+    (Γ KA K0 : Subgroup G) (h : K0.relIndex KA ≠ 0)
+    (hS : ∃ S : Finset G, ∀ g : G, ∃ a ∈ S, ∃ γ ∈ Γ, ∃ κ ∈ KA, g = γ * a * κ)
+    : ∃ S : Finset G, ∀ g : G, ∃ a ∈ S, ∃ γ ∈ Γ, ∃ κ ∈ K0, g = γ * a * κ := by
   obtain ⟨S, hS⟩ := hS
   obtain ⟨T, hT⟩ := exists_finset_cosets KA K0 h
   refine ⟨Finset.image₂ (· * ·) S T, fun g => ?_⟩
@@ -60,9 +64,12 @@ theorem double_cosets_transfer {G : Type} [Group G] (Γ KA K0 : Subgroup G)
   obtain ⟨t, ht, htκ⟩ := hT κ hκ
   exact ⟨a * t, Finset.mem_image₂_of_mem ha ht, γ, hγ, t⁻¹ * κ, htκ, by group⟩
 
-theorem finite_conj_transfer {G : Type} [Group G] (Γ KA K0 : Subgroup G)
-    (h : KA.relIndex K0 ≠ 0) (hF : ∀ a : G, {γ | γ ∈ Γ ∧ a⁻¹ * γ * a ∈ KA}.Finite) (a : G) :
-    {γ | γ ∈ Γ ∧ a⁻¹ * γ * a ∈ K0}.Finite := by
+theorem finite_conj_transfer
+    {G : Type} [Group G]
+    (Γ KA K0 : Subgroup G)
+    (h : KA.relIndex K0 ≠ 0) (hF : ∀ a : G, {γ | γ ∈ Γ ∧ a⁻¹ * γ * a ∈ KA}.Finite)
+    (a : G)
+    : {γ | γ ∈ Γ ∧ a⁻¹ * γ * a ∈ K0}.Finite := by
   obtain ⟨T, hT⟩ := exists_finset_cosets K0 KA h
   have hpiece : ∀ t ∈ T, {γ | γ ∈ Γ ∧ a⁻¹ * γ * a ∈ K0 ∧ t⁻¹ * (a⁻¹ * γ * a) ∈ KA}.Finite := by
     intro t _
@@ -82,26 +89,29 @@ theorem finite_conj_transfer {G : Type} [Group G] (Γ KA K0 : Subgroup G)
   obtain ⟨t, ht, htk⟩ := hT _ hk
   exact Set.mem_biUnion ht ⟨hγ, hk, htk⟩
 
-theorem invVol_subgroupOf {G : Type} [Group G] (R K L : Subgroup G) (hK : K ≤ R) (hL : L ≤ R) :
-    invVol (K.subgroupOf R) (L.subgroupOf R) = invVol K L := by
+theorem invVol_subgroupOf {G : Type} [Group G] (R K L : Subgroup G) (hK : K ≤ R) (hL : L ≤ R)
+    : invVol (K.subgroupOf R) (L.subgroupOf R) = invVol K L := by
   simp only [invVol, Subgroup.relIndex_subgroupOf hK, Subgroup.relIndex_subgroupOf hL]
 
-theorem tsum_quot_out {Y : Type} (r : Y → Y → Prop) (s : Setoid Y) (hr : ∀ a b, r a b ↔ s.r a b)
-    (F : Y → ℝ≥0∞) : ∑' o : Quot r, F o.out = ∑' o : Quotient s, F o.out := by
+theorem tsum_quot_out
+    {Y : Type} (r : Y → Y → Prop) (s : Setoid Y) (hr : ∀ a b, r a b ↔ s.r a b) (F : Y → ℝ≥0∞)
+    : ∑' o : Quot r, F o.out = ∑' o : Quotient s, F o.out := by
   obtain rfl : r = s.r := by
     funext a b
     exact propext (hr a b)
   rfl
 
-theorem stabilizer_pi {ι : Type} {G : ι → Type} [∀ i, Group (G i)] {X : ι → Type}
-    [∀ i, MulAction (G i) (X i)] (x : ∀ i, X i) :
-    MulAction.stabilizer (∀ i, G i) x =
-      Subgroup.pi Set.univ (fun i => MulAction.stabilizer (G i) (x i)) := by
+theorem stabilizer_pi
+    {ι : Type} {G : ι → Type} [∀ i, Group (G i)]
+    {X : ι → Type} [∀ i, MulAction (G i) (X i)]
+    (x : ∀ i, X i)
+    : MulAction.stabilizer (∀ i, G i) x
+      = Subgroup.pi Set.univ (fun i => MulAction.stabilizer (G i) (x i)) := by
   ext g
   simp [MulAction.mem_stabilizer_iff, Subgroup.mem_pi, funext_iff]
 
-theorem stabilizer_res {P : Type} [Group P] (R : Subgroup P) {Y : Type} [MulAction P Y] (y : Y) :
-    MulAction.stabilizer R y = (MulAction.stabilizer P y).subgroupOf R := by
+theorem stabilizer_res {P : Type} [Group P] (R : Subgroup P) {Y : Type} [MulAction P Y] (y : Y)
+    : MulAction.stabilizer R y = (MulAction.stabilizer P y).subgroupOf R := by
   ext g
   simp [MulAction.mem_stabilizer_iff, Subgroup.mem_subgroupOf, Subgroup.smul_def]
 

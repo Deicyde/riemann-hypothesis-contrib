@@ -6,15 +6,18 @@ public import CompanionTheory.EightfoldTheory.VariationTheory.AutomorphicForms.N
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory
 
-theorem norm_le_of_bounded_two_step_recursion (x y : ℂ) (c : ℕ → ℂ) (C R : ℝ) (hR : 0 ≤ R)
-    (h0 : c 0 = 1) (h1 : c 1 = x + y)
-    (hrec : ∀ r, c (r + 2) = (x + y) * c (r + 1) - x * y * c r)
-    (hb : ∀ r, ‖c r‖ ≤ C * R ^ r) : ‖x‖ ≤ R := by
+theorem norm_le_of_bounded_two_step_recursion
+    (x y : ℂ) (c : ℕ → ℂ)
+    (C R : ℝ) (hR : 0 ≤ R)
+    (h0 : c 0 = 1) (h1 : c 1 = x + y) (hrec : ∀ r, c (r + 2) = (x + y) * c (r + 1) - x * y * c r)
+    (hb : ∀ r, ‖c r‖ ≤ C * R ^ r)
+    : ‖x‖ ≤ R := by
   have hd : ∀ r : ℕ, c (r + 1) - y * c r = x ^ (r + 1) := by
     intro r
     induction r with
@@ -24,12 +27,14 @@ theorem norm_le_of_bounded_two_step_recursion (x y : ℂ) (c : ℕ → ℂ) (C R
       linear_combination hrec n + x * ih
   have key : ∀ r : ℕ, ‖x‖ ^ (r + 1) ≤ C * (R + ‖y‖) * R ^ r := by
     intro r
-    calc ‖x‖ ^ (r + 1) = ‖c (r + 1) - y * c r‖ := by rw [hd r, norm_pow]
+    calc
+      ‖x‖ ^ (r + 1)
+        = ‖c (r + 1) - y * c r‖ := by rw [hd r, norm_pow]
       _ ≤ ‖c (r + 1)‖ + ‖y‖ * ‖c r‖ := by
-          refine (norm_sub_le _ _).trans ?_
-          rw [norm_mul]
+        refine (norm_sub_le _ _).trans ?_
+        rw [norm_mul]
       _ ≤ C * R ^ (r + 1) + ‖y‖ * (C * R ^ r) :=
-          add_le_add (hb _) (mul_le_mul_of_nonneg_left (hb _) (norm_nonneg _))
+        add_le_add (hb _) (mul_le_mul_of_nonneg_left (hb _) (norm_nonneg _))
       _ = C * (R + ‖y‖) * R ^ r := by ring
   by_contra hlt
   push_neg at hlt
@@ -46,13 +51,16 @@ theorem norm_le_of_bounded_two_step_recursion (x y : ℂ) (c : ℕ → ℂ) (C R
   have : ‖x‖ ≤ 0 := ge_of_tendsto' ht hle
   linarith
 
-theorem roots_norm_le_of_bounded_two_step_recursion :
-    ∀ (x y : ℂ) (c : ℕ → ℂ) (C R : ℝ), 0 ≤ R → c 0 = 1 → c 1 = x + y →
-      (∀ r, c (r + 2) = (x + y) * c (r + 1) - x * y * c r) → (∀ r, ‖c r‖ ≤ C * R ^ r) →
-      ‖x‖ ≤ R ∧ ‖y‖ ≤ R := by
+theorem roots_norm_le_of_bounded_two_step_recursion
+    : ∀ (x y : ℂ) (c : ℕ → ℂ) (C R : ℝ),
+      0 ≤ R → c 0 = 1 → c 1 = x + y → (∀ r, c (r + 2) = (x + y) * c (r + 1) - x * y * c r)
+        → (∀ r, ‖c r‖ ≤ C * R ^ r)
+        → ‖x‖ ≤ R ∧ ‖y‖ ≤ R := by
   intro x y c C R hR h0 h1 hrec hb
-  refine ⟨norm_le_of_bounded_two_step_recursion x y c C R hR h0 h1 hrec hb,
-    norm_le_of_bounded_two_step_recursion y x c C R hR h0 (by rw [h1, add_comm]) ?_ hb⟩
+  refine ⟨
+    norm_le_of_bounded_two_step_recursion x y c C R hR h0 h1 hrec hb,
+    norm_le_of_bounded_two_step_recursion y x c C R hR h0 (by rw [h1, add_comm]) ?_ hb
+  ⟩
   intro r
   rw [hrec r]
   ring

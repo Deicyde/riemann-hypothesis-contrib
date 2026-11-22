@@ -16,8 +16,10 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Surje
 
 set_option autoImplicit false
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.UU
@@ -38,46 +40,80 @@ end Alg
 section Rep
 variable {S X : Scheme.{0}} {L : LB X} {Y : Over S}
 
-def Rep (L : LB X) (Y : Over S) (F : ∀ (U : Type) [CommGroup U], ((Y.left ⟶ X) → U) → U)
-    (v : ∀ (T : Over S), (T ⟶ Y) → ∀ z : T.left, ((T.left ⟶ X) → L.ι) → (T.left.presheaf.stalk z)ˣ) : Prop :=
-  ∃ (K : Type) (_ : Fintype K) (φ : K → (Y.left ⟶ X)) (ε : K → ℤ) (t : LB.Gen (LB.LinComb L φ ε)), t.IsGen ∧
-    (∀ (U : Type) [CommGroup U] (h : (Y.left ⟶ X) → U), ∏ k, h (φ k) ^ ε k = F U h) ∧
-    ∀ (T : Over S) (σ : T ⟶ Y) (z : T.left) (J), Good L z J → val t σ.left z J = v T σ z J
+def Rep
+    (L : LB X) (Y : Over S) (F : ∀ (U : Type) [CommGroup U], ((Y.left ⟶ X) → U) → U)
+    (v : ∀ (T : Over S), (T ⟶ Y) → ∀ z : T.left, ((T.left ⟶ X) → L.ι) → (T.left.presheaf.stalk z)ˣ)
+    : Prop :=
+  ∃ (K : Type) (_ : Fintype K) (φ : K → (Y.left ⟶ X)) (ε : K → ℤ) (t : LB.Gen (LB.LinComb L φ ε)),
+    t.IsGen ∧ (∀ (U : Type) [CommGroup U] (h : (Y.left ⟶ X) → U), ∏ k, h (φ k) ^ ε k = F U h)
+      ∧ ∀ (T : Over S) (σ : T ⟶ Y) (z : T.left) (J), Good L z J → val t σ.left z J = v T σ z J
 
-variable {F F' : ∀ (U : Type) [CommGroup U], ((Y.left ⟶ X) → U) → U}
+variable
+  {F F' : ∀ (U : Type) [CommGroup U], ((Y.left ⟶ X) → U) → U}
   {v v' : ∀ (T : Over S), (T ⟶ Y) → ∀ z : T.left, ((T.left ⟶ X) → L.ι) → (T.left.presheaf.stalk z)ˣ}
 
-theorem Rep.mul (h : Rep L Y F v) (h' : Rep L Y F' v') :
-    Rep L Y (fun U _ k => F U k * F' U k) (fun T σ z J => v T σ z J * v' T σ z J) := by
+theorem Rep.mul (h : Rep L Y F v) (h' : Rep L Y F' v')
+    : Rep L Y (fun U _ k => F U k * F' U k) (fun T σ z J => v T σ z J * v' T σ z J) := by
   obtain ⟨K, _, φ, ε, t, ht, hF, hv⟩ := h
   obtain ⟨K', _, φ', ε', t', ht', hF', hv'⟩ := h'
-  exact ⟨K ⊕ K', inferInstance, _, _, LB.mulGen L φ ε φ' ε' t t', DVR.mulGen_isGen _ _ _ _ _ _ _ ht ht',
-    fun U _ k => DVR.prod_sum₂ _ (hF U k) (hF' U k), fun T σ z J hJ =>
-      (val_mul hJ _ _ _).trans (congrArg₂ (· * ·) (hv T σ z J hJ) (hv' T σ z J hJ))⟩
+  exact ⟨
+    K ⊕ K',
+    inferInstance,
+    _,
+    _,
+    LB.mulGen L φ ε φ' ε' t t',
+    DVR.mulGen_isGen _ _ _ _ _ _ _ ht ht',
+    fun U _ k => DVR.prod_sum₂ _ (hF U k) (hF' U k),
+    fun T σ z J hJ => (val_mul hJ _ _ _).trans (congrArg₂ (· * ·) (hv T σ z J hJ) (hv' T σ z J hJ))
+  ⟩
 
-theorem Rep.inv (h : Rep L Y F v) : Rep L Y (fun U _ k => (F U k)⁻¹) (fun T σ z J => (v T σ z J)⁻¹) := by
+theorem Rep.inv (h : Rep L Y F v)
+    : Rep L Y (fun U _ k => (F U k)⁻¹) (fun T σ z J => (v T σ z J)⁻¹) := by
   obtain ⟨K, _, φ, ε, t, ht, hF, hv⟩ := h
-  refine ⟨K, inferInstance, _, _, LB.invGen L φ ε t, DVR.invGen_isGen _ _ _ _ ht, fun U _ k => ?_, fun T σ z J hJ =>
-    (val_inv _ _).trans (congrArg (·⁻¹) (hv T σ z J hJ))⟩
+  refine ⟨
+    K,
+    inferInstance,
+    _,
+    _,
+    LB.invGen L φ ε t,
+    DVR.invGen_isGen _ _ _ _ ht,
+    fun U _ k => ?_,
+    fun T σ z J hJ => (val_inv _ _).trans (congrArg (·⁻¹) (hv T σ z J hJ))
+  ⟩
   show _ = (F U k)⁻¹
   rw [← hF U k, ← Finset.prod_inv_distrib]
   exact Finset.prod_congr rfl fun a _ => zpow_neg _ _
 
-theorem Rep.pull {K : Type} [Fintype K] {Y' : Over S} {φ : K → (Y'.left ⟶ X)} {ε : K → ℤ}
-    {t : LB.Gen (LB.LinComb L φ ε)} (ht : t.IsGen) (p : Y ⟶ Y')
-    (hF : ∀ (U : Type) [CommGroup U] (h : (Y.left ⟶ X) → U), ∏ k, h (p.left ≫ φ k) ^ ε k = F U h) :
-    Rep L Y F (fun _ σ z J => val t (σ ≫ p).left z J) :=
-  ⟨K, inferInstance, _, _, LB.pullGen L φ ε t p.left, DVR.pullGen_isGen _ _ _ _ ht _, hF,
-    fun _ _ _ _ hJ => val_pull hJ _ _ _⟩
+theorem Rep.pull
+    {K : Type} [Fintype K]
+    {Y' : Over S} {φ : K → (Y'.left ⟶ X)} {ε : K → ℤ} {t : LB.Gen (LB.LinComb L φ ε)}
+    (ht : t.IsGen) (p : Y ⟶ Y')
+    (hF : ∀ (U : Type) [CommGroup U] (h : (Y.left ⟶ X) → U), ∏ k, h (p.left ≫ φ k) ^ ε k = F U h)
+    : Rep L Y F (fun _ σ z J => val t (σ ≫ p).left z J) := ⟨
+  K,
+  inferInstance,
+  _,
+  _,
+  LB.pullGen L φ ε t p.left,
+  DVR.pullGen_isGen _ _ _ _ ht _,
+  hF,
+  fun _ _ _ _ hJ => val_pull hJ _ _ _
+⟩
 
-theorem Rep.eq_one (hL : L.IsLB) (hY : Function.Surjective Y.hom.appTop.hom) (h : Rep L Y F v)
-    (hF : ∀ (U : Type) [CommGroup U] (h : (Y.left ⟶ X) → U), F U h = 1) (e : 𝟙_ (Over S) ⟶ Y)
-    (he : ∀ z J, Good L z J → v _ e z J = 1) (T : Over S) (σ : T ⟶ Y) (z : T.left) (J) (hJ : Good L z J) :
-    v T σ z J = 1 := by
+theorem Rep.eq_one
+    (hL : L.IsLB) (hY : Function.Surjective Y.hom.appTop.hom)
+    (h : Rep L Y F v) (hF : ∀ (U : Type) [CommGroup U] (h : (Y.left ⟶ X) → U), F U h = 1)
+    (e : 𝟙_ (Over S) ⟶ Y) (he : ∀ z J, Good L z J → v _ e z J = 1)
+    (T : Over S) (σ : T ⟶ Y) (z : T.left)
+    (J) (hJ : Good L z J)
+    : v T σ z J = 1 := by
   obtain ⟨K, _, φ, ε, t, ht, hF', hv⟩ := h
-  refine (hv T σ z J hJ).symm.trans ((gen_unique' hL (fun U _ k => ?_) Y.hom e.left (Over.w e) hY ht
-    (LB.isGen_oneGen L) (fun y I hI => (hv _ e y I hI).trans ((he y I hI).trans (val_one _).symm)) _ σ.left z J hJ).trans
-    (val_one _))
+  refine (hv T σ z J hJ).symm.trans
+    ((gen_unique' hL
+      (fun U _ k => ?_)
+      Y.hom e.left (Over.w e) hY ht (LB.isGen_oneGen L)
+      (fun y I hI => (hv _ e y I hI).trans ((he y I hI).trans (val_one _).symm))
+      _ σ.left z J hJ).trans (val_one _))
   rw [hF', hF]
   exact Fintype.prod_empty _
 
@@ -91,9 +127,11 @@ variable {H : Over S} [GrpObj H] [IsCommMonObj H] {P : CP G} {i : H ⟶ G} [IsMo
 end Quad
 
 section DVR
-variable {V K : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K]
-  [IsFractionRing V K] {G : Over (Spec (CommRingCat.of V))} [GrpObj G] [IsCommMonObj G]
-  [Smooth G.hom] [IsSeparated G.hom] [GeometricallyConnected G.hom]
+variable
+  {V K : Type}
+  [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K] [IsFractionRing V K]
+  {G : Over (Spec (CommRingCat.of V))}
+  [GrpObj G] [IsCommMonObj G] [Smooth G.hom] [IsSeparated G.hom] [GeometricallyConnected G.hom]
 
 end DVR
 

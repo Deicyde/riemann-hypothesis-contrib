@@ -8,8 +8,9 @@ open NumberField MeasureTheory GlobalTheory.CuspRep GlobalTheory.HCF Topology
 
 namespace GlobalTheory.HCF
 
-theorem expSol_eq_zero_of_eqOn_Ioo :
-    ∀ (l : List ℂ) (f : ℝ → ℂ), f ∈ expSol l → ∀ s t : ℝ, s < t → (∀ x ∈ Set.Ioo s t, f x = 0) → f = 0 := by
+theorem expSol_eq_zero_of_eqOn_Ioo
+    : ∀ (l : List ℂ) (f : ℝ → ℂ),
+      f ∈ expSol l → ∀ s t : ℝ, s < t → (∀ x ∈ Set.Ioo s t, f x = 0) → f = 0 := by
   intro l
   induction l with
   | nil => intro f hf _ _ _ _; exact mem_expSol_nil.1 hf
@@ -27,7 +28,8 @@ theorem expSol_eq_zero_of_eqOn_Ioo :
       have h1 := congrFun hg0 x
       simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at h1
       have e : deriv f x = c * f x := sub_eq_zero.1 h1
-      rw [← e]; exact (hd x).hasDerivAt
+      rw [← e]
+      exact (hd x).hasDerivAt
     set k : ℝ → ℂ := fun x => Complex.exp (-c * x) * f x with hk
     have hkd : ∀ x, HasDerivAt k 0 x := by
       intro x

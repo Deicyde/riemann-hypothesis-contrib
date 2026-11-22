@@ -11,31 +11,40 @@ set_option autoImplicit false
 
 namespace GlobalTheory.BalancedTwist
 
-open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1 Matrix
+open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1 Matrix
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 
-theorem pairing_eq {S : Type} [CommRing S] {d : ℕ} (M : Fin d → Fin d → S) (v w : Fin d → S) :
-    ∑ i, ∑ j, M i j * v i * w j = v ⬝ᵥ (Matrix.of M *ᵥ w) := by
+theorem pairing_eq {S : Type} [CommRing S] {d : ℕ} (M : Fin d → Fin d → S) (v w : Fin d → S)
+    : ∑ i, ∑ j, M i j * v i * w j = v ⬝ᵥ (Matrix.of M *ᵥ w) := by
   simp only [dotProduct, mulVec, Matrix.of_apply, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
-theorem balanced_iff (c : Coeff l) {S : Type} [CommRing S] [Algebra c.F S] {d : ℕ}
-    (A : 𝓞 E → Matrix (Fin d) (Fin d) S) (u : Lt1 Dw → Fin d → S)
+theorem balanced_iff
+    (c : Coeff l)
+    {S : Type} [CommRing S] [Algebra c.F S]
+    {d : ℕ} (A : 𝓞 E → Matrix (Fin d) (Fin d) S) (u : Lt1 Dw → Fin d → S)
     (heig : ∀ (a : 𝓞 E) (ℓ : Lt1 Dw), A a *ᵥ u ℓ = algebraMap c.F S (embK c ℓ.1 a) • u ℓ)
-    (hsp : ∀ v : Fin d → S, ∃ a : Lt1 Dw → S, ∀ j, ∑ ℓ, a ℓ * u ℓ j = v j)
-    (M : Fin d → Fin d → S) :
-    (∀ a, (A a)ᵀ * Matrix.of M = Matrix.of M * A (H.bar a)) ↔
-      ∀ ℓ ℓ' : Lt1 Dw, ∑ i, ∑ j, M i j * u ℓ i * u ℓ' j ≠ 0 → ℓ'.1 = ComplexEmbedding.conjugate ℓ.1 := by
-  have eL : ∀ a ℓ ℓ', u ℓ ⬝ᵥ (((A a)ᵀ * Matrix.of M) *ᵥ u ℓ') =
-      algebraMap c.F S (embK c ℓ.1 a) * (u ℓ ⬝ᵥ (Matrix.of M *ᵥ u ℓ')) := by
+    (hsp : ∀ v : Fin d → S, ∃ a : Lt1 Dw → S, ∀ j, ∑ ℓ, a ℓ * u ℓ j = v j) (M : Fin d → Fin d → S)
+    : (∀ a, (A a)ᵀ * Matrix.of M = Matrix.of M * A (H.bar a))
+      ↔ ∀ ℓ ℓ' : Lt1 Dw,
+        ∑ i, ∑ j, M i j * u ℓ i * u ℓ' j ≠ 0 → ℓ'.1 = ComplexEmbedding.conjugate ℓ.1 := by
+  have eL
+      : ∀ a ℓ ℓ',
+        u ℓ ⬝ᵥ (((A a)ᵀ * Matrix.of M) *ᵥ u ℓ')
+          = algebraMap c.F S (embK c ℓ.1 a) * (u ℓ ⬝ᵥ (Matrix.of M *ᵥ u ℓ')) := by
     intro a ℓ ℓ'
     rw [← mulVec_mulVec, dotProduct_mulVec, vecMul_transpose, heig, smul_dotProduct, smul_eq_mul]
-  have eR : ∀ a ℓ ℓ', u ℓ ⬝ᵥ ((Matrix.of M * A a) *ᵥ u ℓ') =
-      algebraMap c.F S (embK c ℓ'.1 a) * (u ℓ ⬝ᵥ (Matrix.of M *ᵥ u ℓ')) := by
+  have eR
+      : ∀ a ℓ ℓ',
+        u ℓ ⬝ᵥ ((Matrix.of M * A a) *ᵥ u ℓ')
+          = algebraMap c.F S (embK c ℓ'.1 a) * (u ℓ ⬝ᵥ (Matrix.of M *ᵥ u ℓ')) := by
     intro a ℓ ℓ'
     rw [← mulVec_mulVec, heig, mulVec_smul, dotProduct_smul, smul_eq_mul]
-  have cc : ∀ τ : E →+* ℂ, ComplexEmbedding.conjugate (ComplexEmbedding.conjugate τ) = τ := fun τ => by
+  have cc
+      : ∀ τ : E →+* ℂ, ComplexEmbedding.conjugate (ComplexEmbedding.conjugate τ) = τ := fun τ => by
     ext x; simp [ComplexEmbedding.conjugate]
   constructor
   · intro h ℓ ℓ' hne
@@ -72,16 +81,22 @@ theorem balanced_iff (c : Coeff l) {S : Type} [CommRing S] [Algebra c.F S] {d : 
     exact h2
 
 theorem frTruncFix_iff : FrTruncFixSt ↔ FrTruncFixBSt := by
-  have key : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
-      (Xo : Moduli Dw l) (c : Coeff l) [StarRing (𝓞 E)]
-      (S : Type) [CommRing S] [Algebra c.F S] [Algebra ℚ S] (y : FrPt Xo c S) (C : ChartAt Xo c y)
-      (M : Fin C.d → Fin C.d → S),
-      (∀ a, (TB.dLin (C.B.A.act a))ᵀ * Matrix.of M = Matrix.of M * TB.dLin (C.B.A.act (H.bar a))) ↔
-      ∀ ℓ ℓ' : Lt1 Dw, ∑ i, ∑ j, M i j * C.uvec ℓ i * C.uvec ℓ' j ≠ 0 →
-        ℓ'.1 = ComplexEmbedding.conjugate ℓ.1 := by
+  have key
+      : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
+          (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) [StarRing (𝓞 E)] (S : Type) [CommRing S]
+          [Algebra c.F S] [Algebra ℚ S] (y : FrPt Xo c S) (C : ChartAt Xo c y)
+          (M : Fin C.d → Fin C.d → S),
+        (∀ a, (TB.dLin (C.B.A.act a))ᵀ * Matrix.of M = Matrix.of M * TB.dLin (C.B.A.act (H.bar a)))
+          ↔ ∀ ℓ ℓ' : Lt1 Dw,
+            ∑ i, ∑ j, M i j * C.uvec ℓ i * C.uvec ℓ' j ≠ 0
+              → ℓ'.1 = ComplexEmbedding.conjugate ℓ.1 := by
     intro E _ _ _ H Dw l Xo c _ S _ _ _ y C M
-    refine balanced_iff c (fun a => TB.dLin (C.B.A.act a)) C.uvec (fun a ℓ => ?_)
-      (fun v => (C.chart.basis v).exists) M
+    refine balanced_iff c
+      (fun a => TB.dLin (C.B.A.act a))
+      C.uvec
+      (fun a ℓ => ?_)
+      (fun v => (C.chart.basis v).exists)
+      M
     funext i
     exact GlobalTheory.EigDir.linEig_holds E H Dw l Xo c S y C a ℓ i
   constructor

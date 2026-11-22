@@ -9,7 +9,9 @@ public import Formalism.LocalRingCardinality.ConjSqrtMinusD
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links
 open IsDedekindDomain NumberField Matrix
 open scoped TensorProduct nonZeroDivisors Pointwise
 
@@ -34,13 +36,18 @@ theorem cmHost_imaginaryGenerator_ne_zero : D.host.xi0 ≠ 0 := by
   unfold Formalism.BasicNotions.Host.xi0
   exact div_ne_zero (by norm_num) (mul_ne_zero h1 h2)
 
-@[reducible] def negSp (V : HSp D) : HSp D where
+@[reducible]
+def negSp (V : HSp D) : HSp D where
   V := V.V
   hT := -V.hT
-  herm := ⟨fun x y => by
-    simp only [LinearMap.neg_apply, map_neg]
-    rw [V.herm.eq]⟩
-  nondeg := ⟨fun x hx => V.nondeg.1 x fun y => by simpa using hx y, fun y hy => V.nondeg.2 y fun x => by simpa using hy x⟩
+  herm :=
+    ⟨fun x y => by
+      simp only [LinearMap.neg_apply, map_neg]
+      rw [V.herm.eq]⟩
+  nondeg := ⟨
+    fun x hx => V.nondeg.1 x fun y => by simpa using hx y,
+    fun y hy => V.nondeg.2 y fun x => by simpa using hy x
+  ⟩
   rank := V.rank
   rank_eq := V.rank_eq
   frame := V.frame
@@ -49,17 +56,21 @@ theorem cmHost_imaginaryGenerator_ne_zero : D.host.xi0 ≠ 0 := by
   standardTuple_isLattice := V.standardTuple_isLattice
   baseLattice_isUnimodular := by
     have h := V.baseLattice_isUnimodular
-    unfold Formalism.HermitianLatticesTheory.IsUnimodular Formalism.HermitianLatticesTheory.dual Formalism.E.hdual at h ⊢
+    unfold Formalism.HermitianLatticesTheory.IsUnimodular Formalism.HermitianLatticesTheory.dual
+        Formalism.E.hdual
+      at h ⊢
     refine Eq.trans ?_ h
     ext x
-    simp only [Submodule.mem_iInf, Submodule.mem_comap, LinearMap.restrictScalars_apply, LinearMap.neg_apply, neg_mem_iff]
+    simp only [Submodule.mem_iInf, Submodule.mem_comap, LinearMap.restrictScalars_apply,
+      LinearMap.neg_apply, neg_mem_iff]
 
 theorem negSp_gram (V : HSp D) : (negSp V).gram = -V.gram := rfl
 
-theorem HR_neg (V : HSp D) :
-    HR (AF D.host.F) D.sp.cm.sig V.gram = HR (AF D.host.F) D.sp.cm.sig (negSp V).gram := by
+theorem HR_neg (V : HSp D)
+    : HR (AF D.host.F) D.sp.cm.sig V.gram = HR (AF D.host.F) D.sp.cm.sig (negSp V).gram := by
   ext g
-  have e : JR (F := D.host.F) (AF D.host.F) (-V.gram) = -JR (F := D.host.F) (AF D.host.F) V.gram := by
+  have e
+      : JR (F := D.host.F) (AF D.host.F) (-V.gram) = - JR (F := D.host.F) (AF D.host.F) V.gram := by
     ext i j; simp [JR]
   show Formalism.UG.cT _ g.1 * JR (AF D.host.F) V.gram * g.1 = JR (AF D.host.F) V.gram ↔
     Formalism.UG.cT _ g.1 * JR (AF D.host.F) (-V.gram) * g.1 = JR (AF D.host.F) (-V.gram)
@@ -70,12 +81,16 @@ def negGA (V : HSp D) : GA D V ≃* GA D (negSp V) := MulEquiv.subgroupCongr (HR
 theorem mt_negGA (V : HSp D) (g : GA D V) : mt (negSp V) (negGA V g) = mt V g := rfl
 
 theorem continuous_negGA (V : HSp D) : Continuous (negGA V) :=
-  Continuous.subtype_mk (continuous_subtype_val (p := fun g => g ∈ HR (AF D.host.F) D.sp.cm.sig V.gram)) _
+  Continuous.subtype_mk
+    (continuous_subtype_val (p := fun g => g ∈ HR (AF D.host.F) D.sp.cm.sig V.gram)) _
 
-theorem isSelfDualC_neg {V : HSp D} {Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)} (h : IsSelfDualC V Λ) :
-    IsSelfDualC (negSp V) Λ := by
+theorem isSelfDualC_neg
+    {V : HSp D} {Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)} (h : IsSelfDualC V Λ)
+    : IsSelfDualC (negSp V) Λ := by
   refine ⟨h.1, fun y => (h.2 y).trans (forall₂_congr fun x _ => ?_)⟩
-  have e : ∑ i, ∑ j, star (x i) * (negSp V).gram i j * y j = -∑ i, ∑ j, star (x i) * V.gram i j * y j := by
+  have e
+      : ∑ i, ∑ j, star (x i) * (negSp V).gram i j * y j
+        = - ∑ i, ∑ j, star (x i) * V.gram i j * y j := by
     rw [← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [← Finset.sum_neg_distrib]
@@ -85,67 +100,63 @@ theorem isSelfDualC_neg {V : HSp D} {Λ : Submodule (𝓞 D.host.E) (Fin V.rank 
   rw [e]
   exact ⟨fun ⟨b, hb⟩ => ⟨-b, by simp [hb]⟩, fun ⟨b, hb⟩ => ⟨-b, by simp [hb]⟩⟩
 
-
 variable (D) in
 structure LSp where
-
   sp : HSp D
-
   lat : Submodule (𝓞 D.host.E) (Fin sp.rank → D.host.E)
 
 structure LSp.IsV (X : LSp D) (ν q : ℕ) : Prop where
-
   rank : X.sp.rank = ν
-
   sigOK : X.sp.SigOK
-
   sig : ∀ τ, X.sp.sig τ = (ν - q, q)
-
   sd : IsSelfDualC X.sp X.lat
 
-def antiDiagonalSignGramMatrix {R : Type} [Zero R] [One R] (c : ℕ) (ε : R) : Matrix (Fin c) (Fin c) R :=
-  fun p q => if p.1 + q.1 + 1 = c then (if p = q then ε else 1) else 0
+def antiDiagonalSignGramMatrix {R : Type} [Zero R] [One R] (c : ℕ) (ε : R)
+    : Matrix (Fin c) (Fin c) R := fun p q =>
+  if p.1 + q.1 + 1 = c then (if p = q then ε else 1) else 0
 
 structure HermitianOrthogonalExtensionData (A B : HSp D) (c : ℕ) (ε : D.host.E) where
-
   ι : A.V →ₗ[D.host.E] B.V
-
   isom : HSpace.IsIsomEmb A B ι
-
   a : Matrix (Fin B.rank) (Fin c) D.host.E
-
-  gram : Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) a * B.gram * a = antiDiagonalSignGramMatrix c ε
-
+  gram
+    : Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) a * B.gram * a
+      = antiDiagonalSignGramMatrix c ε
   perp : Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) (frameMat B A ι) * B.gram * a = 0
-
   rank : A.rank + c = B.rank
 
-def sumLat {n k c : ℕ} (M : Matrix (Fin n) (Fin k) D.host.E) (Λ : Submodule (𝓞 D.host.E) (Fin k → D.host.E))
-    (a : Matrix (Fin n) (Fin c) D.host.E) (𝔟 : Fin c → FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) :
-    Submodule (𝓞 D.host.E) (Fin n → D.host.E) where
+def sumLat
+    {n k c : ℕ}
+    (M : Matrix (Fin n) (Fin k) D.host.E) (Λ : Submodule (𝓞 D.host.E) (Fin k → D.host.E))
+    (a : Matrix (Fin n) (Fin c) D.host.E) (𝔟 : Fin c → FractionalIdeal (𝓞 D.host.E)⁰ D.host.E)
+    : Submodule (𝓞 D.host.E) (Fin n → D.host.E) where
   carrier := {x | ∃ y ∈ Λ, ∃ u : Fin c → D.host.E, (∀ p, u p ∈ 𝔟 p) ∧ x = M *ᵥ y + a *ᵥ u}
   zero_mem' := ⟨0, Λ.zero_mem, 0, fun p => (𝔟 p).zero_mem, by simp⟩
   add_mem' := by
     rintro _ _ ⟨y, hy, u, hu, rfl⟩ ⟨y', hy', u', hu', rfl⟩
     refine ⟨y + y', Λ.add_mem hy hy', u + u', fun p => (𝔟 p).val.add_mem (hu p) (hu' p), ?_⟩
-    rw [mulVec_add, mulVec_add]; abel
+    rw [mulVec_add, mulVec_add]
+    abel
   smul_mem' := by
     rintro r _ ⟨y, hy, u, hu, rfl⟩
     refine ⟨r • y, Λ.smul_mem r hy, r • u, fun p => (𝔟 p).val.smul_mem r (hu p), ?_⟩
     rw [mulVec_smul, mulVec_smul, smul_add]
 
-def stairId (𝔞 𝔞' : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) (c : ℕ) (p : Fin c) : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E :=
+def stairId (𝔞 𝔞' : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) (c : ℕ) (p : Fin c)
+    : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E :=
   𝔞 ^ (c - p.1) * (𝔞' ^ (p.1 + 1))⁻¹
 
-theorem stairId_succ {𝔞 𝔞' : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E} (h : 𝔞' ≠ 0) {c : ℕ} (p q : Fin c)
-    (hpq : q.1 = p.1 + 1) : stairId 𝔞 𝔞' c p = 𝔞 * 𝔞' * stairId 𝔞 𝔞' c q := by
+theorem stairId_succ
+    {𝔞 𝔞' : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E} (h : 𝔞' ≠ 0)
+    {c : ℕ} (p q : Fin c) (hpq : q.1 = p.1 + 1)
+    : stairId 𝔞 𝔞' c p = 𝔞 * 𝔞' * stairId 𝔞 𝔞' c q := by
   have h1 : c - p.1 = (c - q.1) + 1 := by have := q.2; omega
   unfold stairId
   rw [h1, hpq, pow_succ 𝔞' (p.1 + 1), pow_succ 𝔞]
   field_simp
 
-theorem stairId_rev (𝔞 𝔞' : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) {c : ℕ} (p : Fin c) :
-    stairId 𝔞' 𝔞 c p.rev = (stairId 𝔞 𝔞' c p)⁻¹ := by
+theorem stairId_rev (𝔞 𝔞' : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) {c : ℕ} (p : Fin c)
+    : stairId 𝔞' 𝔞 c p.rev = (stairId 𝔞 𝔞' c p)⁻¹ := by
   have h1 : c - p.rev.1 = p.1 + 1 := by have := p.2; rw [Fin.val_rev]; omega
   have h2 : p.rev.1 + 1 = c - p.1 := by have := p.2; rw [Fin.val_rev]; omega
   unfold stairId
@@ -155,16 +166,19 @@ namespace HermitianOrthogonalExtensionData
 
 variable {A B : HSp D} {c : ℕ} {ε : D.host.E} (d : HermitianOrthogonalExtensionData A B c ε)
 
-def lat (Λ : Submodule (𝓞 D.host.E) (Fin A.rank → D.host.E)) (𝔟 : Fin c → FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) :
-    Submodule (𝓞 D.host.E) (Fin B.rank → D.host.E) :=
+def lat
+    (Λ : Submodule (𝓞 D.host.E) (Fin A.rank → D.host.E))
+    (𝔟 : Fin c → FractionalIdeal (𝓞 D.host.E)⁰ D.host.E)
+    : Submodule (𝓞 D.host.E) (Fin B.rank → D.host.E) :=
   sumLat (frameMat B A d.ι) Λ d.a 𝔟
 
 def iso (ρ : ℕ) (h : 2 * ρ ≤ c) : Matrix (Fin B.rank) (Fin ρ) D.host.E :=
   d.a.submatrix id (Fin.castLE (by omega))
 
-theorem gram_sub {k l : ℕ} (f : Fin k → Fin c) (g : Fin l → Fin c) :
-    Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) (d.a.submatrix id f) * B.gram * d.a.submatrix id g =
-      (antiDiagonalSignGramMatrix c ε).submatrix f g := by
+theorem gram_sub {k l : ℕ} (f : Fin k → Fin c) (g : Fin l → Fin c)
+    : Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) (d.a.submatrix id f) * B.gram
+        * d.a.submatrix id g
+      = (antiDiagonalSignGramMatrix c ε).submatrix f g := by
   rw [← d.gram]; rfl
 
 theorem isIsoSub_iso (ρ : ℕ) (h : 2 * ρ ≤ c) : IsIsoSub B (d.iso ρ h) := by
@@ -172,23 +186,33 @@ theorem isIsoSub_iso (ρ : ℕ) (h : 2 * ρ ≤ c) : IsIsoSub B (d.iso ρ h) := 
   · refine Fintype.linearIndependent_iff.2 fun u hu i => ?_
     have h1 : d.iso ρ h *ᵥ u = 0 := by
       rw [← hu]; funext k; simp [mulVec, dotProduct, Finset.sum_apply, mul_comm]
-    have h2 := d.gram_sub (fun q : Fin ρ => (Fin.castLE (by omega) q : Fin c).rev) (Fin.castLE (by omega) : Fin ρ → Fin c)
-    have h3 : (antiDiagonalSignGramMatrix c ε).submatrix (fun q : Fin ρ => (Fin.castLE (by omega) q : Fin c).rev)
-        (Fin.castLE (by omega) : Fin ρ → Fin c) = 1 := by
+    have h2 :=
+      d.gram_sub
+        (fun q : Fin ρ => (Fin.castLE (by omega) q : Fin c).rev)
+        (Fin.castLE (by omega) : Fin ρ → Fin c)
+    have h3
+        : (antiDiagonalSignGramMatrix c ε).submatrix
+            (fun q : Fin ρ => (Fin.castLE (by omega) q : Fin c).rev)
+            (Fin.castLE (by omega) : Fin ρ → Fin c)
+          = 1 := by
       refine Matrix.ext fun p q => ?_
-      have := p.2; have := q.2
+      have := p.2
+      have := q.2
       have hp : p.1 + 1 ≤ c := by omega
       have hrev : ρ ≤ c - (p.1 + 1) := by omega
-      simp only [submatrix_apply, antiDiagonalSignGramMatrix, Fin.val_rev, Fin.val_castLE, Matrix.one_apply, Fin.ext_iff]
+      simp only [submatrix_apply, antiDiagonalSignGramMatrix, Fin.val_rev, Fin.val_castLE,
+        Matrix.one_apply, Fin.ext_iff]
       split_ifs <;> first | rfl | omega
     have h4 := congrArg (· *ᵥ u) (h2.trans h3)
     simp only [one_mulVec, ← mulVec_mulVec] at h4
-    rw [show d.a.submatrix id (Fin.castLE (by omega) : Fin ρ → Fin c) = d.iso ρ h from rfl, h1, mulVec_zero,
-      mulVec_zero] at h4
+    rw [show d.a.submatrix id (Fin.castLE (by omega) : Fin ρ → Fin c) = d.iso ρ h from rfl, h1,
+        mulVec_zero, mulVec_zero]
+      at h4
     exact (congrFun h4 i).symm
   · refine (d.gram_sub _ _).trans ?_
     refine Matrix.ext fun p q => ?_
-    have := p.2; have := q.2
+    have := p.2
+    have := q.2
     simp only [submatrix_apply, antiDiagonalSignGramMatrix, Fin.val_castLE, Matrix.zero_apply]
     rw [if_neg (by omega)]
 
@@ -229,12 +253,17 @@ section Cong
 
 open Formalism.L2.Herm Formalism.L2.DIV
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E] {n : ℕ}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+  {n : ℕ}
 
-def congLev (hc : CMData F E) (J : Matrix (Fin n) (Fin n) E) (Λ : Submodule (𝓞 E) (Fin n → E)) (𝔪 : Ideal (𝓞 E)) :
-    Subgroup (GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) where
-  carrier := {g | g ∈ UA hc J ∧ g ∈ Formalism.UG.stabGL (hatL (F := F) Λ) ∧
-    ∀ x ∈ hatL (F := F) Λ, g.1 *ᵥ x - x ∈ hatL (F := F) (𝔪 • Λ)}
+def congLev
+    (hc : CMData F E) (J : Matrix (Fin n) (Fin n) E) (Λ : Submodule (𝓞 E) (Fin n → E))
+    (𝔪 : Ideal (𝓞 E))
+    : Subgroup (GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)) where
+  carrier :=
+    {g | g ∈ UA hc J ∧ g ∈ Formalism.UG.stabGL (hatL (F := F) Λ) ∧
+      ∀ x ∈ hatL (F := F) Λ, g.1 *ᵥ x - x ∈ hatL (F := F) (𝔪 • Λ)}
   one_mem' := ⟨Subgroup.one_mem _, Subgroup.one_mem _, fun x _ => by simp⟩
   mul_mem' := by
     rintro g h ⟨g1, g2, g3⟩ ⟨h1, h2, h3⟩
@@ -251,14 +280,17 @@ def congLev (hc : CMData F E) (J : Matrix (Fin n) (Fin n) E) (Λ : Submodule (�
 
 variable {hc : CMData F E} {J : Matrix (Fin n) (Fin n) E} {Λ : Submodule (𝓞 E) (Fin n → E)}
 
-theorem mem_congLev {𝔪 : Ideal (𝓞 E)} {g : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)} : g ∈ congLev hc J Λ 𝔪 ↔
-    g ∈ UA hc J ∧ g ∈ Formalism.UG.stabGL (hatL (F := F) Λ) ∧
-    ∀ x ∈ hatL (F := F) Λ, g.1 *ᵥ x - x ∈ hatL (F := F) (𝔪 • Λ) := Iff.rfl
+theorem mem_congLev {𝔪 : Ideal (𝓞 E)} {g : GL (Fin n) (E ⊗[F] Formalism.L2.Herm.Af F)}
+    : g ∈ congLev hc J Λ 𝔪
+      ↔ g ∈ UA hc J ∧ g ∈ Formalism.UG.stabGL (hatL (F := F) Λ)
+        ∧ ∀ x ∈ hatL (F := F) Λ, g.1 *ᵥ x - x ∈ hatL (F := F) (𝔪 • Λ) :=
+  Iff.rfl
 
 theorem congLev_top : congLev hc J Λ ⊤ = UA hc J ⊓ Formalism.UG.stabGL (hatL (F := F) Λ) := by
   ext g
   rw [mem_congLev, Submodule.top_smul]
-  exact ⟨fun h => ⟨h.1, h.2.1⟩, fun h => ⟨h.1, h.2, fun x hx => Submodule.sub_mem _ ((h.2 x).1 hx) hx⟩⟩
+  exact
+    ⟨fun h => ⟨h.1, h.2.1⟩, fun h => ⟨h.1, h.2, fun x hx => Submodule.sub_mem _ ((h.2 x).1 hx) hx⟩⟩
 
 theorem congLev_mono {𝔪 𝔫 : Ideal (𝓞 E)} (h : 𝔪 ≤ 𝔫) : congLev hc J Λ 𝔪 ≤ congLev hc J Λ 𝔫 := by
   rintro g ⟨g1, g2, g3⟩
@@ -268,64 +300,95 @@ theorem congLev_mono {𝔪 𝔫 : Ideal (𝓞 E)} (h : 𝔪 ≤ 𝔫) : congLev 
 
 end Cong
 
-def homLat {m n : ℕ} (Λ : Submodule (𝓞 D.host.E) (Fin n → D.host.E)) (Λ' : Submodule (𝓞 D.host.E) (Fin m → D.host.E)) :
-    Submodule (𝓞 D.host.E) (Matrix (Fin m) (Fin n) D.host.E) where
+def homLat
+    {m n : ℕ}
+    (Λ : Submodule (𝓞 D.host.E) (Fin n → D.host.E)) (Λ' : Submodule (𝓞 D.host.E) (Fin m → D.host.E))
+    : Submodule (𝓞 D.host.E) (Matrix (Fin m) (Fin n) D.host.E) where
   carrier := {x | ∀ y ∈ Λ, x *ᵥ y ∈ Λ'}
   zero_mem' := fun y _ => by simp
   add_mem' := fun hx hx' y hy => by rw [add_mulVec]; exact Λ'.add_mem (hx y hy) (hx' y hy)
   smul_mem' := fun r x hx y hy => by rw [smul_mulVec]; exact Λ'.smul_mem r (hx y hy)
 
-def Cos {m n : ℕ} (Λ : Submodule (𝓞 D.host.E) (Fin n → D.host.E)) (Λ' : Submodule (𝓞 D.host.E) (Fin m → D.host.E))
-    (𝔪 : Ideal (𝓞 D.host.E)) : Type :=
+def Cos
+    {m n : ℕ}
+    (Λ : Submodule (𝓞 D.host.E) (Fin n → D.host.E)) (Λ' : Submodule (𝓞 D.host.E) (Fin m → D.host.E))
+    (𝔪 : Ideal (𝓞 D.host.E))
+    : Type :=
   homLat Λ Λ' ⧸ (𝔪 • ⊤ : Submodule (𝓞 D.host.E) (homLat Λ Λ'))
 
-def Cos.mk {m n : ℕ} {Λ : Submodule (𝓞 D.host.E) (Fin n → D.host.E)} {Λ' : Submodule (𝓞 D.host.E) (Fin m → D.host.E)}
-    (𝔪 : Ideal (𝓞 D.host.E)) (x : homLat Λ Λ') : Cos Λ Λ' 𝔪 := Submodule.Quotient.mk x
+def Cos.mk
+    {m n : ℕ}
+    {Λ : Submodule (𝓞 D.host.E) (Fin n → D.host.E)} {Λ' : Submodule (𝓞 D.host.E) (Fin m → D.host.E)}
+    (𝔪 : Ideal (𝓞 D.host.E)) (x : homLat Λ Λ')
+    : Cos Λ Λ' 𝔪 :=
+  Submodule.Quotient.mk x
 
-instance {m n : ℕ} (Λ : Submodule (𝓞 D.host.E) (Fin n → D.host.E)) (Λ' : Submodule (𝓞 D.host.E) (Fin m → D.host.E))
-    (𝔪 : Ideal (𝓞 D.host.E)) : Inhabited (Cos Λ Λ' 𝔪) := ⟨Cos.mk 𝔪 0⟩
+instance
+    {m n : ℕ}
+    (Λ : Submodule (𝓞 D.host.E) (Fin n → D.host.E)) (Λ' : Submodule (𝓞 D.host.E) (Fin m → D.host.E))
+    (𝔪 : Ideal (𝓞 D.host.E))
+    : Inhabited (Cos Λ Λ' 𝔪) :=
+  ⟨Cos.mk 𝔪 0⟩
 
-def hatMx {m n : ℕ} (M : Submodule (𝓞 D.host.E) (Matrix (Fin m) (Fin n) D.host.E)) : AddSubgroup (Mx D m n) :=
-  AddSubgroup.closure {w | ∃ α ∈ intAf D.host.F, ∃ x ∈ M,
-    w = Matrix.of fun i j => (pairA D.host.F 0 α) ⊗ₜ[D.host.F] x i j}
+def hatMx {m n : ℕ} (M : Submodule (𝓞 D.host.E) (Matrix (Fin m) (Fin n) D.host.E))
+    : AddSubgroup (Mx D m n) :=
+  AddSubgroup.closure
+    {w | ∃ α ∈ intAf D.host.F, ∃ x ∈ M,
+      w = Matrix.of fun i j => (pairA D.host.F 0 α) ⊗ₜ[D.host.F] x i j}
 
-def cosSet (e : AE D) {m n : ℕ} {Λ : Submodule (𝓞 D.host.E) (Fin n → D.host.E)}
-    {Λ' : Submodule (𝓞 D.host.E) (Fin m → D.host.E)} {𝔪 : Ideal (𝓞 D.host.E)} (κ : Cos Λ Λ' 𝔪) : Set (Mx D m n) :=
+def cosSet
+    (e : AE D)
+    {m n : ℕ} {Λ : Submodule (𝓞 D.host.E) (Fin n → D.host.E)}
+    {Λ' : Submodule (𝓞 D.host.E) (Fin m → D.host.E)} {𝔪 : Ideal (𝓞 D.host.E)} (κ : Cos Λ Λ' 𝔪)
+    : Set (Mx D m n) :=
   {x | IsHalf e x ∧ ∃ x₀ : homLat Λ Λ', Cos.mk 𝔪 x₀ = κ ∧
     x - e • (x₀ : Matrix (Fin m) (Fin n) D.host.E).map (incA D) ∈ hatMx (𝔪 • homLat Λ Λ')}
 
-def cosInd (e : AE D) {m n : ℕ} {Λ : Submodule (𝓞 D.host.E) (Fin n → D.host.E)}
-    {Λ' : Submodule (𝓞 D.host.E) (Fin m → D.host.E)} {𝔪 : Ideal (𝓞 D.host.E)} (κ : Cos Λ Λ' 𝔪) : Mx D m n → ℂ :=
+def cosInd
+    (e : AE D)
+    {m n : ℕ} {Λ : Submodule (𝓞 D.host.E) (Fin n → D.host.E)}
+    {Λ' : Submodule (𝓞 D.host.E) (Fin m → D.host.E)} {𝔪 : Ideal (𝓞 D.host.E)} (κ : Cos Λ Λ' 𝔪)
+    : Mx D m n → ℂ :=
   (cosSet e κ).indicator 1
 
-theorem homLat_fg {m n : ℕ} {Λ : Submodule (𝓞 D.host.E) (Fin n → D.host.E)}
-    {Λ' : Submodule (𝓞 D.host.E) (Fin m → D.host.E)} (h : Submodule.IsFullLattice D.host.E Λ) (h' : Λ'.FG) :
-    Module.Finite (𝓞 D.host.E) (homLat Λ Λ') := by
+theorem homLat_fg
+    {m n : ℕ} {Λ : Submodule (𝓞 D.host.E) (Fin n → D.host.E)}
+    {Λ' : Submodule (𝓞 D.host.E) (Fin m → D.host.E)}
+    (h : Submodule.IsFullLattice D.host.E Λ) (h' : Λ'.FG)
+    : Module.Finite (𝓞 D.host.E) (homLat Λ Λ') := by
   obtain ⟨s, hs⟩ := h.fg
   haveI : Module.Finite (𝓞 D.host.E) Λ' := Module.Finite.iff_fg.2 h'
-  let f : homLat Λ Λ' →ₗ[𝓞 D.host.E] (s → Λ') :=
-    { toFun := fun x y => ⟨x.1 *ᵥ y.1, x.2 _ (hs ▸ Submodule.subset_span y.2)⟩
-      map_add' := fun x x' => funext fun y => Subtype.ext (add_mulVec x.1 x'.1 y.1)
-      map_smul' := fun r x => funext fun y => Subtype.ext (smul_mulVec r x.1 y.1) }
+  let f : homLat Λ Λ' →ₗ[𝓞 D.host.E] (s → Λ') := {
+    toFun := fun x y => ⟨x.1 *ᵥ y.1, x.2 _ (hs ▸ Submodule.subset_span y.2)⟩
+    map_add' := fun x x' => funext fun y => Subtype.ext (add_mulVec x.1 x'.1 y.1)
+    map_smul' := fun r x => funext fun y => Subtype.ext (smul_mulVec r x.1 y.1)
+  }
   refine Module.Finite.of_injective f ((injective_iff_map_eq_zero f).2 fun x hx => Subtype.ext ?_)
   have h1 : Submodule.span D.host.E (s : Set (Fin n → D.host.E)) = ⊤ := by
     rw [← h.span_eq_top, ← hs, Submodule.span_span_of_tower]
-  have h2 : Matrix.mulVecLin x.1 = 0 := LinearMap.ext_on h1 fun y hy => congrArg Subtype.val (congrFun hx ⟨y, hy⟩)
+  have h2 : Matrix.mulVecLin x.1 = 0 :=
+    LinearMap.ext_on h1 fun y hy => congrArg Subtype.val (congrFun hx ⟨y, hy⟩)
   exact Matrix.toLin'.injective (by rw [Matrix.toLin'_apply', h2]; simp)
 
-theorem finite_cos {m n : ℕ} {Λ : Submodule (𝓞 D.host.E) (Fin n → D.host.E)}
-    {Λ' : Submodule (𝓞 D.host.E) (Fin m → D.host.E)} (h : Submodule.IsFullLattice D.host.E Λ) (h' : Λ'.FG)
-    {𝔪 : Ideal (𝓞 D.host.E)} (h𝔪 : 𝔪 ≠ ⊥) : Finite (Cos Λ Λ' 𝔪) := by
+theorem finite_cos
+    {m n : ℕ} {Λ : Submodule (𝓞 D.host.E) (Fin n → D.host.E)}
+    {Λ' : Submodule (𝓞 D.host.E) (Fin m → D.host.E)}
+    (h : Submodule.IsFullLattice D.host.E Λ) (h' : Λ'.FG)
+    {𝔪 : Ideal (𝓞 D.host.E)} (h𝔪 : 𝔪 ≠ ⊥)
+    : Finite (Cos Λ Λ' 𝔪) := by
   haveI := homLat_fg h h'
   haveI : Finite (𝓞 D.host.E ⧸ 𝔪) := Ideal.finiteQuotientOfFreeOfNeBot 𝔪 h𝔪
   haveI : Module.Finite (𝓞 D.host.E ⧸ 𝔪) (homLat Λ Λ' ⧸ (𝔪 • ⊤ : Submodule (𝓞 D.host.E) (homLat Λ Λ'))) :=
     Module.Finite.of_restrictScalars_finite (𝓞 D.host.E) _ _
-  exact Module.finite_of_finite (𝓞 D.host.E ⧸ 𝔪) (M := homLat Λ Λ' ⧸ (𝔪 • ⊤ : Submodule (𝓞 D.host.E) (homLat Λ Λ')))
+  exact Module.finite_of_finite (𝓞 D.host.E ⧸ 𝔪)
+    (M := homLat Λ Λ' ⧸ (𝔪 • ⊤ : Submodule (𝓞 D.host.E) (homLat Λ Λ')))
 
-abbrev diagSp (D : D7) (n : ℕ) (neg : Fin n → Bool) (p q : ℕ) : HSp D := Examples₂.stdSpace Examples₂.star_isIntegral n neg p q
+abbrev diagSp (D : D7) (n : ℕ) (neg : Fin n → Bool) (p q : ℕ) : HSp D :=
+  Examples₂.stdSpace Examples₂.star_isIntegral n neg p q
 
-theorem diagSp_gram (n : ℕ) (neg : Fin n → Bool) (p q : ℕ) :
-    (diagSp D n neg p q).gram = Matrix.diagonal fun i : Fin n => (Examples₂.sgn (neg i) : D.host.E) :=
+theorem diagSp_gram (n : ℕ) (neg : Fin n → Bool) (p q : ℕ)
+    : (diagSp D n neg p q).gram
+      = Matrix.diagonal fun i : Fin n => (Examples₂.sgn (neg i) : D.host.E) :=
   Matrix.ext fun i j => Examples₂.stdSpace_gram_apply _ n neg p q i j
 
 end GlobalTheory.ChiGrid

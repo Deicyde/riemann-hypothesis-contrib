@@ -9,5 +9,16 @@ public import Development.AbelianVarietyTheory.BlockTheory.GlobalSignature.Invar
 open MeasureTheory GlobalTheory.IndefiniteRowSideFullHecke.InvariantRadonFibre
 open scoped ENNReal
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.existsUnique_haar_subgroup_quotient_integral_formula : NormaliseSubgroupClause := by
-  first | exact @GlobalTheory.Proof.existsUnique_haar_subgroup_quotient_integral_formula.normaliseSubgroupClause | exact GlobalTheory.Proof.existsUnique_haar_subgroup_quotient_integral_formula.normaliseSubgroupClause | (intros; apply GlobalTheory.Proof.existsUnique_haar_subgroup_quotient_integral_formula.normaliseSubgroupClause <;> assumption)
+theorem _root_.GlobalTheory.T.existsUnique_haar_subgroup_quotient_integral_formula
+    : NormaliseSubgroupClause := by
+  first
+  | exact
+      @GlobalTheory.Proof.existsUnique_haar_subgroup_quotient_integral_formula.normaliseSubgroupClause
+  | exact
+      GlobalTheory.Proof.existsUnique_haar_subgroup_quotient_integral_formula.normaliseSubgroupClause
+  | (
+      intros
+      apply
+          GlobalTheory.Proof.existsUnique_haar_subgroup_quotient_integral_formula.normaliseSubgroupClause
+        <;> assumption
+    )

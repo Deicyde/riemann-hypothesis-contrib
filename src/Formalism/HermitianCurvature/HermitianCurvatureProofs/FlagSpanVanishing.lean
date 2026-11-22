@@ -32,7 +32,12 @@ lemma mulVec_bvec (M : B.Mat k r) (x : Fin (2 * r + k + 1)) : M *ᵥ bvec x = fu
   funext i; simp [bvec, Matrix.mulVec, dotProduct, Pi.single_apply]
 
 def wpart (s : B.Mat k r) : B.Mat k r := fun i j =>
-  if r ≤ i.val ∧ i.val ≤ r + k ∧ r ≤ j.val ∧ j.val ≤ r + k then s i j else if i = j then 1 else 0
+  if r ≤ i.val ∧ i.val ≤ r + k ∧ r ≤ j.val ∧ j.val ≤ r + k then
+    s i j
+  else if i = j then
+    1
+  else
+    0
 
 lemma zero_block (s : B.Mat k r) (hs : s ∈ B.GV k r)
     (hcol : ∀ (a : Fin r) (i : Fin (2 * r + k + 1)), a.val ≤ i.val → s i (eI k r a) = if i = eI k r a then 1 else 0)
@@ -150,31 +155,39 @@ theorem standard_flag_property : C2.SFlag := by
   ext s
   constructor
   · rintro ⟨hs, hfl⟩
-    have hcol : ∀ (a : Fin r) (i : Fin (2 * r + k + 1)), a.val ≤ i.val →
-        s i (eI k r a) = if i = eI k r a then 1 else 0 := by
+    have hcol
+        : ∀ (a : Fin r) (i : Fin (2 * r + k + 1)),
+          a.val ≤ i.val → s i (eI k r a) = if i = eI k r a then 1 else 0 := by
       intro a i hi
       have h := flagSpan_vanish z (Fin.castSucc a) _ (hfl (Fin.castSucc a)) i (by simpa using hi)
-      have hf : fvec k r z (Fin.castSucc a) = bvec (eI k r a) := by rw [fvec, dif_pos (by simp)]; rfl
+      have hf : fvec k r z (Fin.castSucc a) = bvec (eI k r a) := by
+        rw [fvec, dif_pos (by simp)]; rfl
       rw [hf, mulVec_bvec, Pi.sub_apply, sub_eq_zero] at h
-      rw [h]; simp [bvec, Pi.single_apply]
+      rw [h]
+      simp [bvec, Pi.single_apply]
     have hzc : ∀ i : Fin (2 * r + k + 1), r ≤ i.val → (s *ᵥ z) i = z i := by
       intro i hi
       have h := flagSpan_vanish z (Fin.last r) _ (hfl (Fin.last r)) i (by simpa using hi)
       have hf : fvec k r z (Fin.last r) = z := by rw [fvec, dite_eq_right (by simp)]
-      rw [hf, Pi.sub_apply, sub_eq_zero] at h; exact h
-    have hA : ∀ p j : Fin (2 * r + k + 1), r + k < p.val → r ≤ j.val → j.val ≤ r + k → s p j = 0 := by
+      rw [hf, Pi.sub_apply, sub_eq_zero] at h
+      exact h
+    have hA
+        : ∀ p j : Fin (2 * r + k + 1), r + k < p.val → r ≤ j.val → j.val ≤ r + k → s p j = 0 := by
       intro p j hp hj1 hj2
       have hpa : 2 * r + k - p.val < r := by omega
       have e : esI k r ⟨2 * r + k - p.val, hpa⟩ = p := Fin.ext (by simp [esI]; omega)
-      rw [← e]; exact zero_block s hs hcol j hj1 hj2 _ _ rfl
+      rw [← e]
+      exact zero_block s hs hcol j hj1 hj2 _ _ rfl
     have hhU := wpart_uh s hs hA
     set h := wpart s with hh
     have hhW : h ∈ UWset k r z := by
       refine ⟨hhU, fun a => ⟨?_, ?_⟩, ?_⟩
-      · rw [mulVec_bvec]; funext i
+      · rw [mulVec_bvec]
+        funext i
         simp only [hh, wpart, bvec, Pi.single_apply]
         rw [if_neg (by intro h'; have := h'.2.2.1; simp only [eI] at this; omega)]
-      · rw [mulVec_bvec]; funext i
+      · rw [mulVec_bvec]
+        funext i
         simp only [hh, wpart, bvec, Pi.single_apply]
         rw [if_neg (by intro h'; have := h'.2.2.2; simp only [esI] at this; omega)]
       · funext i
@@ -190,7 +203,8 @@ theorem standard_flag_property : C2.SFlag := by
           rw [Finset.sum_eq_single i]
           · simp only [hh, wpart]; rw [if_neg (fun h' => hi ⟨h'.1, h'.2.1⟩)]; simp
           · intro j _ hj
-            simp only [hh, wpart]; rw [if_neg (fun h' => hi ⟨h'.1, h'.2.1⟩), if_neg (Ne.symm hj), zero_mul]
+            simp only [hh, wpart]
+            rw [if_neg (fun h' => hi ⟨h'.1, h'.2.1⟩), if_neg (Ne.symm hj), zero_mul]
           · simp
     have hhu : IsUnit h.det := WeylGroupFacts.isUnit_of_uh hhU
     have hblk := WeylGroupFacts.uw_block (WeylGroupFacts.uw_inv hhW)
@@ -209,12 +223,14 @@ theorem standard_flag_property : C2.SFlag := by
             rw [this, mul_zero, mul_zero]
         simp only [hterm, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq, Finset.mem_univ, if_true]
         have := hcol ⟨j.val, hjr⟩ i (by simp; omega)
-        rw [e] at this; exact this
+        rw [e] at this
+        exact this
       · have hir : r ≤ i.val := by omega
         have hterm : ∀ p, h⁻¹ i p * s p j = h⁻¹ i p * h p j := by
           intro p
           by_cases hpr : p.val < r
-          · rw [hblk.1 i p (Or.inl hpr), if_neg (fun e' => by rw [e'] at hir; omega), zero_mul, zero_mul]
+          · rw [hblk.1 i p (Or.inl hpr), if_neg (fun e' => by rw [e'] at hir; omega), zero_mul,
+              zero_mul]
           · by_cases hpk : p.val ≤ r + k
             · simp only [hh, wpart]
               rw [if_pos ⟨by omega, hpk, by omega, hj⟩]
@@ -240,6 +256,7 @@ theorem standard_flag_property : C2.SFlag := by
         rcases eq_or_lt_of_le (not_lt.mp hca) with e | e
         · rw [← e, hU2, if_pos rfl, sub_self]
         · rw [hU1 c a e, if_neg (ne_of_gt e), sub_self]
-      rw [this, zero_smul]; exact Submodule.zero_mem _
+      rw [this, zero_smul]
+      exact Submodule.zero_mem _
 
 end Formalism.FourierDecayAlt.P

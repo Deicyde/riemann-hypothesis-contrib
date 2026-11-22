@@ -10,8 +10,8 @@ namespace ReciprocityTheory.MultiplicativeHeights
 
 open MvPolynomial DerivationAlgebraicIndependence
 
-theorem trdeg_sField {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] (D m : ℕ) :
-    Algebra.trdeg K (SField Ω D m) = Algebra.trdeg K Ω + ((1 + (D + 1) * m : ℕ) : Cardinal) := by
+theorem trdeg_sField {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] (D m : ℕ)
+    : Algebra.trdeg K (SField Ω D m) = Algebra.trdeg K Ω + ((1 + (D + 1) * m : ℕ) : Cardinal) := by
   classical
   haveI : FaithfulSMul K Ω :=
     (faithfulSMul_iff_algebraMap_injective K Ω).2 (algebraMap K Ω).injective
@@ -23,10 +23,9 @@ theorem trdeg_sField {K Ω : Type} [Field K] [Field Ω] [Algebra K Ω] (D m : �
   have h1 := trdeg_add_eq K (MvPolynomial (SVars D m) Ω) (A := SField Ω D m)
   have h2 := trdeg_add_eq K Ω (A := MvPolynomial (SVars D m) Ω)
   have h3 : Algebra.trdeg (MvPolynomial (SVars D m) Ω) (SField Ω D m) = 0 :=
-    trdeg_eq_zero_iff.2
-      (IsLocalization.isAlgebraic _ (nonZeroDivisors (MvPolynomial (SVars D m) Ω)))
-  have h4 : Algebra.trdeg Ω (MvPolynomial (SVars D m) Ω) =
-      ((1 + (D + 1) * m : ℕ) : Cardinal) := by
+    trdeg_eq_zero_iff.2 (IsLocalization.isAlgebraic _
+      (nonZeroDivisors (MvPolynomial (SVars D m) Ω)))
+  have h4 : Algebra.trdeg Ω (MvPolynomial (SVars D m) Ω) = ((1 + (D + 1) * m : ℕ) : Cardinal) := by
     rw [MvPolynomial.trdeg_of_isDomain, Cardinal.lift_id, Cardinal.mk_fintype]
     congr 1
     simp [SVars, Fintype.card_sum, Fintype.card_prod]
@@ -39,8 +38,9 @@ theorem genericImageFinite : FieldOfSStatement := by
   obtain ⟨J, hJ⟩ := hJ
   set v : Fin D → KaehlerDifferential K Ω := fun a => KaehlerDifferential.D K Ω (x (J a)) with hv
   have hli : LinearIndependent Ω v := hJ
-  have hφ : ∀ a : Fin D, ∃ φ : KaehlerDifferential K Ω →ₗ[Ω] Ω,
-      ∀ b, φ (v b) = if a = b then 1 else 0 := by
+  have hφ
+      : ∀ a : Fin D, ∃ φ : KaehlerDifferential K Ω →ₗ[Ω] Ω, ∀ b,
+        φ (v b) = if a = b then 1 else 0 := by
     intro a
     obtain ⟨g, hg⟩ := LinearMap.exists_extend ((Finsupp.lapply a).comp hli.repr)
     refine ⟨g, fun b => ?_⟩
@@ -55,9 +55,9 @@ theorem genericImageFinite : FieldOfSStatement := by
   have hg := DerivationAlgebraicIndependence.gFam_indep (K := K) x J δ hδ
   have hind : AlgebraicIndependent K (sImage (D := D) x) := by
     have h1 := hg.comp _ (DerivationAlgebraicIndependence.eIdx_injective D m)
-    have h2 := h1.map'
-      (f := IsScalarTower.toAlgHom K (MvPolynomial (SVars D m) Ω) (SField Ω D m))
-      (IsFractionRing.injective _ _)
+    have h2 :=
+      h1.map' (f := IsScalarTower.toAlgHom K (MvPolynomial (SVars D m) Ω) (SField Ω D m))
+        (IsFractionRing.injective _ _)
     convert h2 using 1
     funext p
     simp [DerivationAlgebraicIndependence.sImage_eq]
@@ -78,8 +78,9 @@ theorem genericImageFinite : FieldOfSStatement := by
   let f : Ω →ₐ[K] SField Ω D m :=
     (IsScalarTower.toAlgHom K (MvPolynomial (SVars D m) Ω) (SField Ω D m)).comp
       (IsScalarTower.toAlgHom K Ω (MvPolynomial (SVars D m) Ω))
-  let S : Set (SField Ω D m) := f '' (s : Set Ω) ∪
-    Set.range (fun i => algebraMap (MvPolynomial (SVars D m) Ω) (SField Ω D m) (MvPolynomial.X i))
+  let S : Set (SField Ω D m) :=
+    f '' (s : Set Ω) ∪ Set.range (fun i =>
+      algebraMap (MvPolynomial (SVars D m) Ω) (SField Ω D m) (MvPolynomial.X i))
   have hSfin : S.Finite := (s.finite_toSet.image _).union (Set.finite_range _)
   haveI : Finite S := hSfin.to_subtype
   let L := IntermediateField.adjoin E S
@@ -93,8 +94,9 @@ theorem genericImageFinite : FieldOfSStatement := by
       (IntermediateField.mem_map _).2 ⟨ω, by rw [hs]; trivial, rfl⟩
     rw [IntermediateField.adjoin_map] at h1
     exact hK h1
-  have hP : ∀ p : MvPolynomial (SVars D m) Ω,
-      algebraMap (MvPolynomial (SVars D m) Ω) (SField Ω D m) p ∈ L := by
+  have hP
+      : ∀ p : MvPolynomial (SVars D m) Ω,
+        algebraMap (MvPolynomial (SVars D m) Ω) (SField Ω D m) p ∈ L := by
     intro p
     induction p using MvPolynomial.induction_on with
     | C a =>

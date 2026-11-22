@@ -9,12 +9,13 @@ open MeasureTheory NumberField Finset
 
 namespace GlobalTheory.SimplexVolume
 
-theorem volume_l1_ball (ι : Type) [Fintype ι] [Nonempty ι] (L : ℝ) (hL : 0 ≤ L) :
-    volume {x : ι → ℝ | ∑ i, |x i| ≤ L} =
-      2 ^ Fintype.card ι * ENNReal.ofReal (L ^ Fintype.card ι / (Fintype.card ι).factorial) := by
+theorem volume_l1_ball (ι : Type) [Fintype ι] [Nonempty ι] (L : ℝ) (hL : 0 ≤ L)
+    : volume {x : ι → ℝ | ∑ i, |x i| ≤ L}
+      = 2 ^ Fintype.card ι * ENNReal.ofReal (L ^ Fintype.card ι / (Fintype.card ι).factorial) := by
   have h := MeasureTheory.volume_sum_rpow_le ι (p := 1) le_rfl L
   simp only [Real.rpow_one, div_one, one_add_one_eq_two, Real.Gamma_two, mul_one,
-    Real.Gamma_nat_eq_factorial] at h
+      Real.Gamma_nat_eq_factorial]
+    at h
   rw [h, ← ENNReal.ofReal_pow hL, ← ENNReal.ofReal_mul (by positivity)]
   have h2 : (2 : ENNReal) ^ Fintype.card ι = ENNReal.ofReal (2 ^ Fintype.card ι) := by
     rw [ENNReal.ofReal_pow (by norm_num)]; simp
@@ -22,9 +23,9 @@ theorem volume_l1_ball (ι : Type) [Fintype ι] [Nonempty ι] (L : ℝ) (hL : 0 
   congr 1
   ring
 
-theorem volume_pos_simplex_le (ι : Type) [Fintype ι] [Nonempty ι] (L : ℝ) (hL : 0 ≤ L) :
-    volume {x : ι → ℝ | (∀ i, 0 < x i) ∧ ∑ i, x i ≤ L} ≤
-      ENNReal.ofReal (L ^ Fintype.card ι / (Fintype.card ι).factorial) := by
+theorem volume_pos_simplex_le (ι : Type) [Fintype ι] [Nonempty ι] (L : ℝ) (hL : 0 ≤ L)
+    : volume {x : ι → ℝ | (∀ i, 0 < x i) ∧ ∑ i, x i ≤ L}
+      ≤ ENNReal.ofReal (L ^ Fintype.card ι / (Fintype.card ι).factorial) := by
   classical
   set S : Set (ι → ℝ) := {x : ι → ℝ | (∀ i, 0 < x i) ∧ ∑ i, x i ≤ L} with hS
   have hSm : MeasurableSet S := by
@@ -66,15 +67,16 @@ theorem volume_pos_simplex_le (ι : Type) [Fintype ι] [Nonempty ι] (L : ℝ) (
   rw [hU, volume_l1_ball ι L hL] at hle
   exact (ENNReal.mul_le_mul_iff_right (by simp) (by simp)).1 hle
 
-theorem volume_simplex_le (ι : Type) [Fintype ι] (a : ι → ℝ) (L : ℝ) (hL : 0 ≤ L) :
-    volume {t : ι → ℝ | (∀ i, a i ≤ t i) ∧ ∑ i, (t i - a i) ≤ L} ≤
-      ENNReal.ofReal (L ^ Fintype.card ι / (Fintype.card ι).factorial) := by
+theorem volume_simplex_le (ι : Type) [Fintype ι] (a : ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
+    : volume {t : ι → ℝ | (∀ i, a i ≤ t i) ∧ ∑ i, (t i - a i) ≤ L}
+      ≤ ENNReal.ofReal (L ^ Fintype.card ι / (Fintype.card ι).factorial) := by
   rcases isEmpty_or_nonempty ι with hι | hι
   · refine le_trans (measure_mono (Set.subset_univ _)) ?_
     simp [volume_pi]
-  · have hsub : {t : ι → ℝ | (∀ i, a i ≤ t i) ∧ ∑ i, (t i - a i) ≤ L} ⊆
-        ((fun t => t - a) ⁻¹' {x : ι → ℝ | (∀ i, 0 < x i) ∧ ∑ i, x i ≤ L}) ∪
-          ⋃ i, {t : ι → ℝ | t i = a i} := by
+  · have hsub
+        : {t : ι → ℝ | (∀ i, a i ≤ t i) ∧ ∑ i, (t i - a i) ≤ L}
+          ⊆ ((fun t => t - a) ⁻¹' {x : ι → ℝ | (∀ i, 0 < x i) ∧ ∑ i, x i ≤ L})
+            ∪ ⋃ i, {t : ι → ℝ | t i = a i} := by
       intro t ht
       by_cases h : ∃ i, t i = a i
       · exact Or.inr (Set.mem_iUnion.2 h)

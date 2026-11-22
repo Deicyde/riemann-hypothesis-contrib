@@ -206,9 +206,13 @@ lemma prod_dvd_of_iso {R : Type} [CommRing R] [IsLocalRing R] {m n : ℕ} (c : F
     Ideal.span_singleton_mul_right_unit (hunit d)]
   exact Ideal.mul_mem_right _ _ core
 
-theorem hasLen_unique {C : Type} [Field C] {v : Valuation C NNReal} {R : Type} [CommRing R]
-    [Algebra R C] (hv : v.Integers R) {M : Type} [AddCommGroup M] [Module R M] {x y : NNReal}
-    (hx : HasLen v R M x) (hy : HasLen v R M y) : x = y := by
+theorem hasLen_unique
+    {C : Type} [Field C]
+    {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C]
+    (hv : v.Integers R)
+    {M : Type} [AddCommGroup M] [Module R M]
+    {x y : NNReal} (hx : HasLen v R M x) (hy : HasLen v R M y)
+    : x = y := by
   obtain ⟨m, c, ⟨φ⟩, rfl⟩ := hx
   obtain ⟨n, d, ⟨ψ⟩, rfl⟩ := hy
   haveI : Nontrivial R := by

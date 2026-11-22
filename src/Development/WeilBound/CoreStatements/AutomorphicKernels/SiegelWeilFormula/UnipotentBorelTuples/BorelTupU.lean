@@ -9,7 +9,9 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeil
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.TowU
+open NumberField MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+  GlobalTheory.TowU
 
 namespace PositivityTheory.SiegelWeilFormula.TW.Twu
 
@@ -39,13 +41,16 @@ theorem uniq : Uniq := by
     rw [← h1, hop.left _ hm]
   letI : MeasurableSpace (d.κ → AF F) := borel _
   obtain ⟨hμ, hint⟩ := map_haar d τ ν hν
-  obtain ⟨c, hc⟩ := translation_invariant_functional_haar d.B.ψ hψ d.κ (ν.map (cmap d τ)) hμ (Λ ∘ₗ S0') (hop.adm' Λ hΛ) (by
-    intro a φ hφ
-    have e0 := coordinates_frame d τ (cinv d τ a)
-    have ea : (fun k => d.crd (cinv d τ a) (τ k)) = a := cmap_cinv d τ a
-    rw [ea] at e0
-    rw [← schr_zero_right, ← e0, LinearMap.comp_apply, LinearMap.comp_apply, rhoS' _ φ hφ]
-    exact hinv _ _ (hop.pres' φ hφ))
+  obtain ⟨c, hc⟩ :=
+    translation_invariant_functional_haar d.B.ψ hψ d.κ (ν.map (cmap d τ)) hμ (Λ ∘ₗ S0')
+      (hop.adm' Λ hΛ)
+      (by
+        intro a φ hφ
+        have e0 := coordinates_frame d τ (cinv d τ a)
+        have ea : (fun k => d.crd (cinv d τ a) (τ k)) = a := cmap_cinv d τ a
+        rw [ea] at e0
+        rw [← schr_zero_right, ← e0, LinearMap.comp_apply, LinearMap.comp_apply, rhoS' _ φ hφ]
+        exact hinv _ _ (hop.pres' φ hφ))
   refine ⟨c / C, fun Φ hΦ => ?_⟩
   have h1 := hc (S0 Φ) (hop.pres Φ hΦ)
   rw [LinearMap.comp_apply, hop.left Φ hΦ] at h1

@@ -8,9 +8,9 @@ open Matrix Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.SmoothGlob G
 
 namespace PositivityTheory.CW
 
-private theorem exp_smul_diagonal_I_single_eq_diagonal_exp {n : ℕ} (a : Fin n) (t : ℝ) :
-    NormedSpace.exp (t • (Matrix.diagonal fun j : Fin n => if j = a then Complex.I else 0)) =
-      Matrix.diagonal fun j => if j = a then Complex.exp (t * Complex.I) else 1 := by
+private theorem exp_smul_diagonal_I_single_eq_diagonal_exp {n : ℕ} (a : Fin n) (t : ℝ)
+    : NormedSpace.exp (t • (Matrix.diagonal fun j : Fin n => if j = a then Complex.I else 0))
+      = Matrix.diagonal fun j => if j = a then Complex.exp (t * Complex.I) else 1 := by
   rw [← Matrix.diagonal_smul, Matrix.exp_diagonal, Pi.exp_def]
   congr 1
   funext j
@@ -41,7 +41,8 @@ theorem c3b : HighestWeightIntegral := by
     rw [mul_smul]
   set u : ℝ → Matrix (Fin n) (Fin n) ℂ :=
     fun t => Matrix.diagonal fun j => if j = a then Complex.exp (t * Complex.I) else 1 with hu
-  have hexp : ∀ t : ℝ, NormedSpace.exp (t • Y) = u t := fun t => exp_smul_diagonal_I_single_eq_diagonal_exp a t
+  have hexp : ∀ t : ℝ, NormedSpace.exp (t • Y) = u t := fun t =>
+    exp_smul_diagonal_I_single_eq_diagonal_exp a t
   have huU : ∀ t, u t ∈ UJset ε := by
     intro t
     show (u t)ᴴ * Formalism.REAL.Jm ε * u t = Formalism.REAL.Jm ε
@@ -108,8 +109,7 @@ theorem c3b : HighestWeightIntegral := by
       have := hF s (r - s)
       simp only [add_sub_cancel] at this
       exact this.symm
-    have h4 : σ (u s) (c • (v : H)) = c • F s := by
-      rw [map_smul]
+    have h4 : σ (u s) (c • (v : H)) = c • F s := by rw [map_smul]
     have h5 : HasDerivAt (fun r => σ (u s) (F (r - s))) (c • F s) s := by
       convert h3 using 1
       · rfl
@@ -124,10 +124,13 @@ theorem c3b : HighestWeightIntegral := by
     have := h1.smul (hderF t)
     convert this using 1
     symm
-    rw [smul_smul, ← add_smul, show Complex.exp (-c * t) * c + Complex.exp (-c * t) * -c = 0 by ring,
-      zero_smul]
-  have hGc := is_const_of_deriv_eq_zero (fun t => (hGd t).differentiableAt)
-    (fun t => (hGd t).deriv) (2 * Real.pi) 0
+    rw [smul_smul, ← add_smul,
+      show Complex.exp (-c * t) * c + Complex.exp (-c * t) * -c = 0 by ring, zero_smul]
+  have hGc :=
+    is_const_of_deriv_eq_zero
+      (fun t => (hGd t).differentiableAt)
+      (fun t => (hGd t).deriv)
+      (2 * Real.pi) 0
   have hG0 : G 0 = (v : H) := by
     simp only [hG, hFdef, hu0, hU.1.1, one_apply_eq_self, Complex.ofReal_zero, mul_zero,
       Complex.exp_zero, one_smul]

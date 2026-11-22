@@ -9,12 +9,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Stickelberg
 
 open Finset UpperTheory.V.Bern UpperTheory.V.B4 UpperTheory.V.B5
 
-theorem UpperTheory.V.B5.algebraMap_signedInvolutionQuotientDet_mem_span :
-    ∀ {A : Type} [CommRing A] {Γ : Type} [CommGroup Γ] [Finite Γ] (c : Γ) (ε : ℤ), c * c = 1 → c ≠ 1 → ε * ε = 1 → ∀ z : MonoidAlgebra A Γ, algebraMap A (MonoidAlgebra A Γ) (detR c ε z) ∈ Ideal.span {rel A c ε, z} := by
+theorem UpperTheory.V.B5.algebraMap_signedInvolutionQuotientDet_mem_span
+    : ∀ {A : Type} [CommRing A] {Γ : Type} [CommGroup Γ] [Finite Γ] (c : Γ) (ε : ℤ),
+      c * c = 1 → c ≠ 1 → ε * ε = 1
+        → ∀ z : MonoidAlgebra A Γ,
+          algebraMap A (MonoidAlgebra A Γ) (detR c ε z) ∈ Ideal.span {rel A c ε, z} := by
   intro A _ Γ _ _ c ε h1 h2 h3 z
-  obtain ⟨e, he⟩ := UpperTheory.V.B5.exists_linearEquiv_quotientByOrderTwo_coords (A := A) c ε h1 h2 h3
-  have hsc : ∀ (d : A) (w : MonoidAlgebra A Γ),
-      coord c ε (algebraMap A (MonoidAlgebra A Γ) d * w) = d • coord c ε w := by
+  obtain ⟨e, he⟩ :=
+    UpperTheory.V.B5.exists_linearEquiv_quotientByOrderTwo_coords (A := A) c ε h1 h2 h3
+  have hsc
+      : ∀ (d : A) (w : MonoidAlgebra A Γ),
+        coord c ε (algebraMap A (MonoidAlgebra A Γ) d * w) = d • coord c ε w := by
     intro d w
     funext i
     simp [coord, Algebra.algebraMap_eq_smul_one]
@@ -25,8 +30,8 @@ theorem UpperTheory.V.B5.algebraMap_signedInvolutionQuotientDet_mem_span :
     rw [← he]
     exact hy
   have hcoord : coord c ε (z * u) = coord c ε (algebraMap A _ (detR c ε z) * 1) := by
-    rw [UpperTheory.V.B5.coords_mul_eq_quotientMatrix_mulVec c ε h1 h2 h3, hu, Matrix.mulVec_mulVec, Matrix.mul_adjugate, hsc,
-      Matrix.smul_mulVec, Matrix.one_mulVec]
+    rw [UpperTheory.V.B5.coords_mul_eq_quotientMatrix_mulVec c ε h1 h2 h3, hu, Matrix.mulVec_mulVec,
+      Matrix.mul_adjugate, hsc, Matrix.smul_mulVec, Matrix.one_mulVec]
     rfl
   rw [mul_one] at hcoord
   have hcls : cls A c ε (algebraMap A _ (detR c ε z)) = cls A c ε (z * u) := by
@@ -34,8 +39,7 @@ theorem UpperTheory.V.B5.algebraMap_signedInvolutionQuotientDet_mem_span :
     rw [he, he, hcoord]
   have hmem : algebraMap A _ (detR c ε z) - z * u ∈ Ideal.span {rel A c ε} :=
     Ideal.Quotient.eq.mp hcls
-  have hsub : Ideal.span {rel A c ε} ≤ Ideal.span {rel A c ε, z} :=
-    Ideal.span_mono (by simp)
+  have hsub : Ideal.span {rel A c ε} ≤ Ideal.span {rel A c ε, z} := Ideal.span_mono (by simp)
   have hz : z * u ∈ Ideal.span {rel A c ε, z} :=
     Ideal.mul_mem_right u _ (Ideal.subset_span (by simp))
   have := Ideal.add_mem _ (hsub hmem) hz

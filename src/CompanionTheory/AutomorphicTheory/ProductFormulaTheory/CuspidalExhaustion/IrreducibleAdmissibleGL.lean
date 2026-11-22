@@ -13,38 +13,48 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.InducedCellSem
 
 noncomputable section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult Zc
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult Zc
 
 namespace CompanionTheory.Exh
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem geometricLemmaGL : GlobalTheory.Published.GeometricLemma :=
-  fun k _ _ _ _ => ⟨GlobalTheory.T.jacquet_of_induced_filtration k, GlobalTheory.T.induced_cell_semisimplification k⟩
+theorem geometricLemmaGL : GlobalTheory.Published.GeometricLemma := fun k _ _ _ _ =>
+  ⟨GlobalTheory.T.jacquet_of_induced_filtration k, GlobalTheory.T.induced_cell_semisimplification k⟩
 
-theorem embL_of_eq {x : IrrGL (k := k)} {l : List (IrrGL (k := k))} {y : Fin l.length → IrrGL (k := k)} (e : y = l.get)
-    (hd : ∑ a, (y a).1 = x.1) (f : x.rep.IntertwiningMap (prodIrr y hd)) (hf : Function.Injective f) : EmbL x l := by
+theorem embL_of_eq
+    {x : IrrGL (k := k)} {l : List (IrrGL (k := k))} {y : Fin l.length → IrrGL (k := k)}
+    (e : y = l.get) (hd : ∑ a, (y a).1 = x.1) (f : x.rep.IntertwiningMap (prodIrr y hd))
+    (hf : Function.Injective f)
+    : EmbL x l := by
   subst e
   exact ⟨hd, f, hf⟩
 
-theorem embL_pair {x : IrrGL (k := k)} {y : Fin 2 → IrrGL (k := k)} {hd : ∑ a, (y a).1 = x.1}
-    {f : x.rep.IntertwiningMap (prodIrr y hd)} (hf : Function.Injective f) : EmbL x [y 0, y 1] :=
+theorem embL_pair
+    {x : IrrGL (k := k)} {y : Fin 2 → IrrGL (k := k)} {hd : ∑ a, (y a).1 = x.1}
+    {f : x.rep.IntertwiningMap (prodIrr y hd)} (hf : Function.Injective f)
+    : EmbL x [y 0, y 1] :=
   embL_of_eq (l := [y 0, y 1]) (y := y) (funext fun i => by fin_cases i <;> rfl) hd f hf
 
 theorem embL_nil (x : IrrGL (k := k)) (h0 : x.1 = 0) : EmbL x [] := by
   obtain ⟨n, c⟩ := x
   obtain rfl : n = 0 := h0
   have hd : ∑ a, (([] : List (IrrGL (k := k))).get a).1 = (⟨0, c⟩ : IrrGL (k := k)).1 := by simp
-  obtain ⟨φ⟩ := exh_equiv_zero (stdBlocks (fun a => (([] : List (IrrGL (k := k))).get a).1) hd)
-    (piTensor fun a => (([] : List (IrrGL (k := k))).get a).rep) (PiTensorProduct.isEmptyEquiv (Fin 0)) c.rep.ρ c.rep.irr
+  obtain ⟨φ⟩ :=
+    exh_equiv_zero (stdBlocks (fun a => (([] : List (IrrGL (k := k))).get a).1) hd)
+      (piTensor fun a => (([] : List (IrrGL (k := k))).get a).rep)
+      (PiTensorProduct.isEmptyEquiv (Fin 0)) c.rep.ρ c.rep.irr
   exact ⟨hd, φ.symm.toIntertwiningMap, fun v w h => φ.symm.toLinearEquiv.injective h⟩
 
-
 variable (k) in
-theorem cuspEmbP (hA : GlobalTheory.Published.IrreducibleAdmissibleGL) (hR : RefineP k) : CuspEmbP k := by
+theorem cuspEmbP (hA : GlobalTheory.Published.IrreducibleAdmissibleGL) (hR : RefineP k)
+    : CuspEmbP k := by
   have hJ : JacquetSubLeft k := GlobalTheory.T.jacquet_sub_left_of_admissible hA
-  suffices H : ∀ n : ℕ, ∀ x : IrrGL (k := k), x.1 = n → ∃ l : List (IrrGL (k := k)), (∀ ρ ∈ l, ρ.IsCusp) ∧ EmbL x l from
-    fun x => H _ x rfl
+  suffices H
+      : ∀ n : ℕ, ∀ x : IrrGL (k := k),
+        x.1 = n → ∃ l : List (IrrGL (k := k)), (∀ ρ ∈ l, ρ.IsCusp) ∧ EmbL x l from fun x =>
+    H _ x rfl
   intro n
   induction n using Nat.strong_induction_on with
   | _ n ih =>
@@ -62,7 +72,6 @@ theorem cuspEmbP (hA : GlobalTheory.Published.IrreducibleAdmissibleGL) (hR : Ref
       exacts [hc, hl ρ hρ]
     · simpa using hR x (y 1) [y 0] l [] hy (by simpa using embL_pair hf)
 
-
 variable (k) in
 theorem suppP : SuppP k := by
   intro x a y l 𝔫 hl hx hxy hy Δ hΔ
@@ -74,14 +83,18 @@ theorem suppP : SuppP k := by
     hasSupport_of_isSubquotient x.2.rep.irr (fun i => hl _ (List.get_mem l i)) (.of_injective f hf)
   obtain ⟨h, z, hdz, ⟨D, ⟨hD, -⟩, hz⟩, hcos⟩ := hy
   have hsy : HasSupport y.rep (∑ i, (D i).ms) :=
-    GlobalTheory.CompanionTheory.Hypotheses₂.TD.hasSupport_of_isSubquotient_prodIrr (fun i => (hz i).hasSupport) y.2.rep.irr
-      hcos.isSubquotient
+    GlobalTheory.CompanionTheory.Hypotheses₂.TD.hasSupport_of_isSubquotient_prodIrr
+      (fun i => (hz i).hasSupport)
+      y.2.rep.irr hcos.isSubquotient
   obtain ⟨sa, hsa⟩ := GlobalTheory.CompanionTheory.Hypotheses₂.TD.exists_hasSupport hBZ hG a
-  have ht : ∀ i, HasSupport (([a, y] : List (IrrGL (k := k))).get i).rep (![sa, ∑ i, (D i).ms] i) := by
+  have ht
+      : ∀ i, HasSupport (([a, y] : List (IrrGL (k := k))).get i).rep (![sa, ∑ i, (D i).ms] i) := by
     intro i
     fin_cases i
     exacts [hsa, hsy]
-  have h2 := GlobalTheory.CompanionTheory.Hypotheses₂.TD.hasSupport_of_isSubquotient_prodIrr ht x.2.rep.irr (.of_injective g hg)
+  have h2 :=
+    GlobalTheory.CompanionTheory.Hypotheses₂.TD.hasSupport_of_isSubquotient_prodIrr ht x.2.rep.irr
+      (.of_injective g hg)
   have heq := GlobalTheory.CompanionTheory.Hypotheses₂.TD.hasSupport_unique hG hBZ h1 h2
   rw [← hD] at hΔ
   obtain ⟨j, -, rfl⟩ := Multiset.mem_map.1 hΔ
@@ -97,10 +110,8 @@ theorem suppP : SuppP k := by
 theorem irreducibleAdmissibleGL : GlobalTheory.Published.IrreducibleAdmissibleGL :=
   fun k _ _ _ _ n => GlobalTheory.T.irreducible_smooth_admissible_GL k (Fin n)
 
-
 variable (k) in
-theorem cuspEmbP_of_refine (hR : RefineP k) : CuspEmbP k :=
-  cuspEmbP k irreducibleAdmissibleGL hR
+theorem cuspEmbP_of_refine (hR : RefineP k) : CuspEmbP k := cuspEmbP k irreducibleAdmissibleGL hR
 
 end CompanionTheory.Exh
 

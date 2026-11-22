@@ -13,8 +13,9 @@ namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
 open ReciprocityTheory.ChartRestriction.G.Geo
 
-theorem MixedKleiman.atDim_of_steps (hL : MixedKleimanLow.Statement) (hT : MixedKleimanTop.Statement) :
-    ∀ d, MixedKleiman.AtDim d := by
+theorem MixedKleiman.atDim_of_steps
+    (hL : MixedKleimanLow.Statement) (hT : MixedKleimanTop.Statement)
+    : ∀ d, MixedKleiman.AtDim d := by
   intro d
   induction d with
   | zero => exact MixedKleiman.atDim_zero
@@ -37,9 +38,10 @@ theorem MixedKleiman.atDim_of_steps (hL : MixedKleimanLow.Statement) (hT : Mixed
         simpa [e] using hW
       · exact hT (n + 1) (by omega) ih' hLow K ι P P0 M II hII h1 hP h0 hsM hnM hcM hhM
 
-theorem MixedKleiman.proof (hL : MixedKleimanLow.Statement) (hT : MixedKleimanTop.Statement) :
-    MixedKleiman.Statement := by
+theorem MixedKleiman.proof (hL : MixedKleimanLow.Statement) (hT : MixedKleimanTop.Statement)
+    : MixedKleiman.Statement := by
   intro K _ ι _ P P0 d M A a II hII h1 hP h0 hsM hnM hcM hhM haA hsA hmA hcA j hj
-  exact MixedKleiman.atDim_of_steps hL hT d K ι P P0 M A a II hII h1 hP h0 hsM hnM hcM hhM haA hsA hmA hcA j hj
+  exact MixedKleiman.atDim_of_steps hL hT d K ι P P0 M A a II hII h1 hP h0 hsM hnM hcM hhM haA hsA
+    hmA hcA j hj
 
 end GroundTheory.Heights₂.Heights.HilbertSamuel

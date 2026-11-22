@@ -14,27 +14,43 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.IndefR.Datum
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 open GlobalTheory.ChainOnto GlobalTheory.ChainTw
-open GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting (SplitProj IsProjAt IsIdemOf LiftsChar rdA grpCo frCo gAt)
+open GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting
+  (SplitProj IsProjAt IsIdemOf LiftsChar rdA grpCo frCo gAt)
 open GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection (Blocks parahoric datum)
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField
 open GlobalTheory.LiftRows (Given)
-open GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting (FinPl IsBase onHalf phiQ rdQ)
+open GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting
+  (FinPl IsBase onHalf phiQ rdQ)
 
 noncomputable section
 
 namespace GlobalTheory.NrmVol
 
-theorem phiQ_mul_conj_eq_indicator : ∀ (D : D7) (PP : Pl D.host.E) (v : FinPl D) (φ : SplitProj D v), IsProjAt φ PP → ∀ (a b r : ℕ) (ξ : (kP PP)ˣ →* ℂˣ) (mu : (Fv D.host.F v)ˣ →* ℂˣ), LiftsChar φ PP mu ξ → ∀ x : Matrix (Fin b) (Fin a) (Fv D.host.F v), phiQ v r mu x * (starRingEnd ℂ) (phiQ v r mu x) = (GlobalTheory.NrmVol.suppQ v r).indicator (fun _ => (1 : ℂ)) x := by
+theorem phiQ_mul_conj_eq_indicator
+    : ∀ (D : D7) (PP : Pl D.host.E) (v : FinPl D) (φ : SplitProj D v),
+      IsProjAt φ PP
+        → ∀ (a b r : ℕ) (ξ : (kP PP)ˣ →* ℂˣ) (mu : (Fv D.host.F v)ˣ →* ℂˣ),
+          LiftsChar φ PP mu ξ
+            → ∀ x : Matrix (Fin b) (Fin a) (Fv D.host.F v),
+              phiQ v r mu x * (starRingEnd ℂ) (phiQ v r mu x)
+                = (GlobalTheory.NrmVol.suppQ v r).indicator (fun _ => (1 : ℂ)) x := by
   intro D PP v φ hP a b r ξ mu hL x
   by_cases hx : x ∈ GlobalTheory.NrmVol.suppQ v r
   · rw [Set.indicator_of_mem hx]
-    have h : IsUnit (topL r x).det ∧ Valued.v (topL r x).det = 1 ∧
-        (∀ i j, x i j ∈ v.adicCompletionIntegers D.host.F) ∧
-        ∀ i j, r ≤ i.val → j.val < r → Valued.v (x i j) < 1 := hx
+    have h
+        : IsUnit (topL r x).det ∧ Valued.v (topL r x).det = 1
+          ∧ (∀ i j, x i j ∈ v.adicCompletionIntegers D.host.F)
+          ∧ ∀ i j, r ≤ i.val → j.val < r → Valued.v (x i j) < 1 :=
+      hx
     unfold phiQ
     rw [dite_eq_left h]
     obtain ⟨⟨red, -, -, hrel, -⟩, -⟩ := GlobalTheory.PlaceRed.red_dict D v φ PP hP
@@ -50,7 +66,8 @@ theorem phiQ_mul_conj_eq_indicator : ∀ (D : D7) (PP : Pl D.host.E) (v : FinPl 
       ⟨⟨⟨_, hint⟩, ⟨_, hint'⟩, Subtype.ext (by simp), Subtype.ext (by simp)⟩, rfl⟩
     haveI : Finite (kP PP) := PP.asIdeal.finiteQuotientOfFreeOfNeBot PP.ne_bot
     set k := (hunit.map red).unit with hk
-    have hR : GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting.RedRel φ PP (u : Fv D.host.F v) (k : kP PP) :=
+    have hR : GlobalTheory.IndefiniteRowSideFullHecke.RestrictedTensorSplitting.RedRel φ PP
+        (u : Fv D.host.F v) (k : kP PP) :=
       (hrel _ _).2 ⟨hint, (IsUnit.unit_spec (hunit.map red)).symm⟩
     have hmu : mu u = ξ k := hL u k hR
     haveI : Finite (kP PP)ˣ := Finite.of_injective _ Units.val_injective

@@ -46,38 +46,45 @@ lemma conjP_isClosedEmbedding (hP : IsUnit P) : IsClosedEmbedding (conjPrime₂ 
 lemma conjP_measurableEmbedding (hP : IsUnit P) : MeasurableEmbedding (conjPrime₂ ε P) :=
   (conjP_isClosedEmbedding ε P hP).measurableEmbedding
 
-theorem haar_transport (hP : IsUnit P) (μ : Measure (Fin n → Fin n → ℂ)) [SigmaFinite μ] (h0 : μ ≠ 0)
-    (hconc : μ {x | Matrix.of x ∉ PI.UpqRep.UH (Pᴴ * Jm ε * P)} = 0)
-    (hinv : ∀ s ∈ PI.UpqRep.UH (Pᴴ * Jm ε * P), μ.map (fun x => Matrix.of.symm (s * Matrix.of x)) = μ) :
-    ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ∞ ∧ μ = (c • muG ε).map (conjPrime₂ ε P) := by
+theorem haar_transport
+    (hP : IsUnit P)
+    (μ : Measure (Fin n → Fin n → ℂ)) [SigmaFinite μ]
+    (h0 : μ ≠ 0) (hconc : μ {x | Matrix.of x ∉ PI.UpqRep.UH (Pᴴ * Jm ε * P)} = 0)
+    (hinv
+      : ∀ s ∈ PI.UpqRep.UH (Pᴴ * Jm ε * P), μ.map (fun x => Matrix.of.symm (s * Matrix.of x)) = μ)
+    : ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ∞ ∧ μ = (c • muG ε).map (conjPrime₂ ε P) := by
   have hdet : IsUnit P.det := (Matrix.isUnit_iff_isUnit_det P).mp hP
   have h1 : P⁻¹ * P = 1 := Matrix.nonsing_inv_mul P hdet
   have h2 : P * P⁻¹ = 1 := Matrix.mul_nonsing_inv P hdet
   have hE := conjP_measurableEmbedding ε P hP
   set ψ := conjPrime₂ ε P with hψdef
 
-  have hrange : {x : Fin n → Fin n → ℂ | Matrix.of x ∈ PI.UpqRep.UH (Pᴴ * Jm ε * P)} ⊆ Set.range ψ := by
+  have hrange
+      : {x : Fin n → Fin n → ℂ | Matrix.of x ∈ PI.UpqRep.UH (Pᴴ * Jm ε * P)} ⊆ Set.range ψ := by
     intro x hx
     have hx' : (Matrix.of x)ᴴ * (Pᴴ * Jm ε * P) * Matrix.of x = Pᴴ * Jm ε * P := hx
     have hin : inUJ ε (P * Matrix.of x * P⁻¹) := by
       show (P * Matrix.of x * P⁻¹)ᴴ * Jm ε * (P * Matrix.of x * P⁻¹) = Jm ε
-      calc (P * Matrix.of x * P⁻¹)ᴴ * Jm ε * (P * Matrix.of x * P⁻¹)
-          = (P⁻¹)ᴴ * ((Matrix.of x)ᴴ * (Pᴴ * Jm ε * P) * Matrix.of x) * P⁻¹ := by
-            simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
+      calc
+        (P * Matrix.of x * P⁻¹)ᴴ * Jm ε * (P * Matrix.of x * P⁻¹)
+            = (P⁻¹)ᴴ * ((Matrix.of x)ᴴ * (Pᴴ * Jm ε * P) * Matrix.of x) * P⁻¹ := by
+          simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
         _ = (P⁻¹)ᴴ * (Pᴴ * Jm ε * P) * P⁻¹ := by rw [hx']
         _ = (P * P⁻¹)ᴴ * Jm ε * (P * P⁻¹) := by
-            simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
+          simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
         _ = Jm ε := by rw [h2]; simp
     have hr := (isClosedEmbeddingMatrix n ε).2
-    have hmem : P * Matrix.of x * P⁻¹ ∈
-        Set.range (fun g : UJ ε => ((g : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)) := by
+    have hmem
+        : P * Matrix.of x * P⁻¹ ∈ Set.range (fun g : UJ ε =>
+          ((g : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)) := by
       rw [hr]; exact hin
     obtain ⟨g, hg⟩ := hmem
     refine ⟨g, ?_⟩
     show Matrix.of.symm (P⁻¹ * toM g * P) = x
     have hg' : toM g = P * Matrix.of x * P⁻¹ := hg
     rw [hg']
-    calc Matrix.of.symm (P⁻¹ * (P * Matrix.of x * P⁻¹) * P)
+    calc
+      Matrix.of.symm (P⁻¹ * (P * Matrix.of x * P⁻¹) * P)
         = Matrix.of.symm ((P⁻¹ * P) * Matrix.of x * (P⁻¹ * P)) := by simp only [Matrix.mul_assoc]
       _ = x := by rw [h1, Matrix.one_mul, Matrix.mul_one]; rfl
 
@@ -86,11 +93,12 @@ theorem haar_transport (hP : IsUnit P) (μ : Measure (Fin n → Fin n → ℂ)) 
     have hg : (toM g)ᴴ * Jm ε * toM g = Jm ε := g.2
     show (P⁻¹ * toM g * P)ᴴ * (Pᴴ * Jm ε * P) * (P⁻¹ * toM g * P) = Pᴴ * Jm ε * P
     have hPP : (P⁻¹)ᴴ * Pᴴ = 1 := by rw [← Matrix.conjTranspose_mul, h2, Matrix.conjTranspose_one]
-    calc (P⁻¹ * toM g * P)ᴴ * (Pᴴ * Jm ε * P) * (P⁻¹ * toM g * P)
-        = Pᴴ * (toM g)ᴴ * ((P⁻¹)ᴴ * Pᴴ) * Jm ε * (P * P⁻¹) * toM g * P := by
-          simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
+    calc
+      (P⁻¹ * toM g * P)ᴴ * (Pᴴ * Jm ε * P) * (P⁻¹ * toM g * P)
+          = Pᴴ * (toM g)ᴴ * ((P⁻¹)ᴴ * Pᴴ) * Jm ε * (P * P⁻¹) * toM g * P := by
+        simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
       _ = Pᴴ * ((toM g)ᴴ * Jm ε * toM g) * P := by
-          rw [hPP, h2]; simp only [Matrix.mul_one, Matrix.mul_assoc]
+        rw [hPP, h2]; simp only [Matrix.mul_one, Matrix.mul_assoc]
       _ = Pᴴ * Jm ε * P := by rw [hg]
 
   set ν := μ.comap ψ with hνdef
@@ -105,25 +113,29 @@ theorem haar_transport (hP : IsUnit P) (μ : Measure (Fin n → Fin n → ℂ)) 
       by_contra h'
       exact hc h'
     exact hx (hrange hc')
-  have hσν : SigmaFinite ν := SigmaFinite.of_map ν hE.measurable.aemeasurable (by rw [hmapν]; infer_instance)
+  have hσν : SigmaFinite ν :=
+    SigmaFinite.of_map ν hE.measurable.aemeasurable (by rw [hmapν]; infer_instance)
   have hinj : ∀ a b : Measure (UJ ε), a.map ψ = b.map ψ → a = b := by
     intro a b hab
     rw [← hE.comap_map a, ← hE.comap_map b, hab]
   have hleft : ν.IsMulLeftInvariant := by
     refine ⟨fun g => ?_⟩
     apply hinj
-    have hcomp : ψ ∘ (fun h : UJ ε => g * h) =
-        (fun x => Matrix.of.symm ((P⁻¹ * toM g * P) * Matrix.of x)) ∘ ψ := by
+    have hcomp
+        : ψ ∘ (fun h : UJ ε => g * h)
+          = (fun x => Matrix.of.symm ((P⁻¹ * toM g * P) * Matrix.of x)) ∘ ψ := by
       funext h
       show Matrix.of.symm (P⁻¹ * toM (g * h) * P) =
         Matrix.of.symm ((P⁻¹ * toM g * P) * (P⁻¹ * toM h * P))
       congr 1
       show P⁻¹ * (toM g * toM h) * P = (P⁻¹ * toM g * P) * (P⁻¹ * toM h * P)
-      calc P⁻¹ * (toM g * toM h) * P = P⁻¹ * toM g * (P * P⁻¹) * toM h * P := by
-            rw [h2, Matrix.mul_one]; simp only [Matrix.mul_assoc]
+      calc
+        P⁻¹ * (toM g * toM h) * P = P⁻¹ * toM g * (P * P⁻¹) * toM h * P := by
+          rw [h2, Matrix.mul_one]; simp only [Matrix.mul_assoc]
         _ = (P⁻¹ * toM g * P) * (P⁻¹ * toM h * P) := by simp only [Matrix.mul_assoc]
     have hmul : Measurable (fun h : UJ ε => g * h) := measurable_const_mul g
-    have hlm : Measurable (fun x : Fin n → Fin n → ℂ => Matrix.of.symm ((P⁻¹ * toM g * P) * Matrix.of x)) := by
+    have hlm : Measurable (fun x : Fin n → Fin n → ℂ =>
+        Matrix.of.symm ((P⁻¹ * toM g * P) * Matrix.of x)) := by
       apply Continuous.measurable
       show Continuous fun x : Fin n → Fin n → ℂ => (P⁻¹ * toM g * P) * Matrix.of x
       exact continuous_const.matrix_mul continuous_id
@@ -164,25 +176,44 @@ theorem schur_orthogonality_relations : WlocSk.SchurG := by
   obtain ⟨_, hσ, _, _, hG, _⟩ := hyp
   obtain ⟨P, ⟨⟨hPu, hPJ⟩, _⟩, hDS⟩ := hσ
   have : Nontrivial H := hDS.2.1
-  obtain ⟨d₀, hd₀, hF⟩ := PIW.HCFdeg.formal_degree_abstract_form _ (Formalism.MainNotions.CayleySignature.eps48 k r) H (fun g => σ (P⁻¹ * g * P))
-    hDS.2.2.1 hDS.2.2.2.1 hDS.2.2.2.2.1
+  obtain ⟨d₀, hd₀, hF⟩ :=
+    PIW.HCFdeg.formal_degree_abstract_form _ (Formalism.MainNotions.CayleySignature.eps48 k r) H
+      (fun g => σ (P⁻¹ * g * P))
+      hDS.2.2.1 hDS.2.2.2.1 hDS.2.2.2.2.1
   have : SigmaFinite μG := hG.1
-  have hPJ' : Pᴴ * PI.UpqRep.Jm (Formalism.MainNotions.CayleySignature.eps48 k r) * P = PI.UpqRep.Hpk k r := hPJ
-  have hconc : μG {x | Matrix.of x ∉ PI.UpqRep.UH (Pᴴ * PI.UpqRep.Jm (Formalism.MainNotions.CayleySignature.eps48 k r) * P)} = 0 := by
+  have hPJ'
+      : Pᴴ * PI.UpqRep.Jm (Formalism.MainNotions.CayleySignature.eps48 k r) * P
+        = PI.UpqRep.Hpk k r :=
+    hPJ
+  have hconc
+      : μG
+          {x | Matrix.of x ∉ PI.UpqRep.UH (Pᴴ * PI.UpqRep.Jm (Formalism.MainNotions.CayleySignature.eps48 k r) * P)}
+        = 0 := by
     rw [hPJ']; exact hG.2.2.1
-  have hinv : ∀ s ∈ PI.UpqRep.UH (Pᴴ * PI.UpqRep.Jm (Formalism.MainNotions.CayleySignature.eps48 k r) * P),
-      μG.map (fun x => Matrix.of.symm (s * Matrix.of x)) = μG := by
+  have hinv
+      : ∀ s
+          ∈ PI.UpqRep.UH (Pᴴ * PI.UpqRep.Jm (Formalism.MainNotions.CayleySignature.eps48 k r) * P),
+        μG.map (fun x => Matrix.of.symm (s * Matrix.of x)) = μG := by
     rw [hPJ']; intro s hs; exact hG.2.2.2 s hs
-  obtain ⟨cc, hc0, hctop, hμ⟩ := haar_transport (Formalism.MainNotions.CayleySignature.eps48 k r) P hPu μG hG.2.1 hconc hinv
+  obtain ⟨cc, hc0, hctop, hμ⟩ :=
+    haar_transport (Formalism.MainNotions.CayleySignature.eps48 k r) P hPu μG hG.2.1 hconc hinv
   have hE := conjP_measurableEmbedding (Formalism.MainNotions.CayleySignature.eps48 k r) P hPu
   have hct : 0 < cc.toReal := ENNReal.toReal_pos hc0 hctop
   refine ⟨d₀ / cc.toReal, div_pos hd₀ hct, fun v₁ w₁ v₂ w₂ => ?_⟩
   obtain ⟨hI, hV⟩ := hF v₁ w₁ v₂ w₂
-  have hfun : (fun g : UJ (Formalism.MainNotions.CayleySignature.eps48 k r) =>
-      (fun x : Formalism.QuantumDeterminants.Mt k r => ⟪w₁, σ (Matrix.of x) v₁⟫_ℂ * star ⟪w₂, σ (Matrix.of x) v₂⟫_ℂ)
-        (conjPrime₂ (Formalism.MainNotions.CayleySignature.eps48 k r) P g)) =
-      fun g => coefOn (ε := Formalism.MainNotions.CayleySignature.eps48 k r) (fun g => σ (P⁻¹ * g * P)) v₁ w₁ g *
-        star (coefOn (ε := Formalism.MainNotions.CayleySignature.eps48 k r) (fun g => σ (P⁻¹ * g * P)) v₂ w₂ g) := rfl
+  have hfun
+      : (fun g : UJ (Formalism.MainNotions.CayleySignature.eps48 k r) =>
+          (fun x : Formalism.QuantumDeterminants.Mt k r =>
+              ⟪w₁, σ (Matrix.of x) v₁⟫_ℂ * star ⟪w₂, σ (Matrix.of x) v₂⟫_ℂ)
+            (conjPrime₂ (Formalism.MainNotions.CayleySignature.eps48 k r) P g))
+        = fun g =>
+          coefOn (ε := Formalism.MainNotions.CayleySignature.eps48 k r)
+              (fun g => σ (P⁻¹ * g * P))
+              v₁ w₁ g
+            * star (coefOn (ε := Formalism.MainNotions.CayleySignature.eps48 k r)
+              (fun g => σ (P⁻¹ * g * P))
+              v₂ w₂ g) :=
+    rfl
   rw [hμ]
   refine ⟨?_, ?_⟩
   · rw [hE.integrable_map_iff]

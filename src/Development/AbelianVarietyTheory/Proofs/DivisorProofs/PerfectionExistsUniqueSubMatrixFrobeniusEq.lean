@@ -8,8 +8,9 @@ namespace GlobalTheory
 
 open Matrix
 
-theorem sub_apply_bijective_of_iterate_eq_zero {M : Type} [AddCommGroup M] (L : M →+ M) (K : ℕ)
-    (hK : ∀ z, (⇑L)^[K] z = 0) : Function.Bijective (fun z => z - L z) := by
+theorem sub_apply_bijective_of_iterate_eq_zero
+    {M : Type} [AddCommGroup M] (L : M →+ M) (K : ℕ) (hK : ∀ z, (⇑L)^[K] z = 0)
+    : Function.Bijective (fun z => z - L z) := by
   constructor
   · intro a b hab
     have hab' : a - L a = b - L b := hab
@@ -34,35 +35,51 @@ theorem sub_apply_bijective_of_iterate_eq_zero {M : Type} [AddCommGroup M] (L : 
     rw [← Finset.sum_sub_distrib, Finset.sum_range_sub', hK, sub_zero]
     rfl
 
-noncomputable def perfLevelOp (p : ℕ) [Fact p.Prime] (S : Type) [CommRing S] [CharP S p]
-    {ι : Type} [Fintype ι] (Q : Matrix ι ι (Perfection S p)) (n : ℕ) : (ι → S) →+ (ι → S) where
+noncomputable def perfLevelOp
+    (p : ℕ) [Fact p.Prime]
+    (S : Type) [CommRing S] [CharP S p]
+    {ι : Type} [Fintype ι]
+    (Q : Matrix ι ι (Perfection S p)) (n : ℕ)
+    : (ι → S) →+ (ι → S) where
   toFun w := (Q.map (Perfection.coeff S p n)).mulVec fun k => frobenius S p (w k)
   map_zero' := by ext i; simp [Matrix.mulVec, dotProduct]
   map_add' a b := by ext i; simp [Matrix.mulVec, dotProduct, mul_add, Finset.sum_add_distrib]
 
-theorem perfLevelOp_apply (p : ℕ) [Fact p.Prime] (S : Type) [CommRing S] [CharP S p]
-    {ι : Type} [Fintype ι] (Q : Matrix ι ι (Perfection S p)) (n : ℕ) (w : ι → S) :
-    perfLevelOp p S Q n w = (Q.map (Perfection.coeff S p n)).mulVec fun k => frobenius S p (w k) :=
+theorem perfLevelOp_apply
+    (p : ℕ) [Fact p.Prime]
+    (S : Type) [CommRing S] [CharP S p]
+    {ι : Type} [Fintype ι]
+    (Q : Matrix ι ι (Perfection S p)) (n : ℕ) (w : ι → S)
+    : perfLevelOp p S Q n w
+      = (Q.map (Perfection.coeff S p n)).mulVec fun k => frobenius S p (w k) :=
   rfl
 
-theorem perfLevelOp_coeff (p : ℕ) [Fact p.Prime] (S : Type) [CommRing S] [CharP S p]
-    {ι : Type} [Fintype ι] (Q : Matrix ι ι (Perfection S p)) (n : ℕ) (x : ι → Perfection S p) :
-    (fun i => Perfection.coeff S p n ((x - Q.mulVec (fun k => frobenius (Perfection S p) p (x k))) i))
+theorem perfLevelOp_coeff
+    (p : ℕ) [Fact p.Prime]
+    (S : Type) [CommRing S] [CharP S p]
+    {ι : Type} [Fintype ι]
+    (Q : Matrix ι ι (Perfection S p)) (n : ℕ) (x : ι → Perfection S p)
+    : (fun i =>
+        Perfection.coeff S p n ((x - Q.mulVec (fun k => frobenius (Perfection S p) p (x k))) i))
       = (fun i => Perfection.coeff S p n (x i))
         - perfLevelOp p S Q n (fun i => Perfection.coeff S p n (x i)) := by
   ext i
   simp only [Pi.sub_apply, map_sub, perfLevelOp_apply]
   congr 1
   rw [RingHom.map_mulVec]
-  have hc : (Perfection.coeff S p n) ∘ (fun k => frobenius (Perfection S p) p (x k))
-      = fun k => frobenius S p (Perfection.coeff S p n (x k)) := by
+  have hc
+      : (Perfection.coeff S p n) ∘ (fun k => frobenius (Perfection S p) p (x k))
+        = fun k => frobenius S p (Perfection.coeff S p n (x k)) := by
     funext k
     simp [frobenius_def, map_pow]
   rw [hc]
 
-theorem perfLevelOp_frobenius (p : ℕ) [Fact p.Prime] (S : Type) [CommRing S] [CharP S p]
-    {ι : Type} [Fintype ι] (Q : Matrix ι ι (Perfection S p)) (n : ℕ) (w : ι → S) :
-    (fun i => frobenius S p ((w - perfLevelOp p S Q (n + 1) w) i))
+theorem perfLevelOp_frobenius
+    (p : ℕ) [Fact p.Prime]
+    (S : Type) [CommRing S] [CharP S p]
+    {ι : Type} [Fintype ι]
+    (Q : Matrix ι ι (Perfection S p)) (n : ℕ) (w : ι → S)
+    : (fun i => frobenius S p ((w - perfLevelOp p S Q (n + 1) w) i))
       = (fun i => frobenius S p (w i)) - perfLevelOp p S Q n (fun i => frobenius S p (w i)) := by
   ext i
   simp only [perfLevelOp_apply, Pi.sub_apply, map_sub]
@@ -74,15 +91,23 @@ theorem perfLevelOp_frobenius (p : ℕ) [Fact p.Prime] (S : Type) [CommRing S] [
   congr 1
   rw [frobenius_def, Perfection.coeff_pow_p']
 
-theorem perfection_frobenius_solve : ∀ (p : ℕ) [Fact p.Prime] (S : Type) [CommRing S] [CharP S p] (ι : Type) [Fintype ι] (Q : Matrix ι ι (Perfection S p)), (∀ n : ℕ, ∃ K : ℕ, ∀ z : ι → S, (fun w : ι → S => (Q.map (Perfection.coeff S p n)).mulVec fun k => frobenius S p (w k))^[K] z = 0) → ∀ c : ι → Perfection S p, ∃! x : ι → Perfection S p, x - Q.mulVec (fun k => frobenius (Perfection S p) p (x k)) = c := by
+theorem perfection_frobenius_solve
+    : ∀ (p : ℕ) [Fact p.Prime] (S : Type) [CommRing S] [CharP S p] (ι : Type) [Fintype ι]
+        (Q : Matrix ι ι (Perfection S p)),
+      (∀ n : ℕ, ∃ K : ℕ, ∀ z : ι → S,
+          (fun w : ι → S => (Q.map (Perfection.coeff S p n)).mulVec fun k => frobenius S p (w k))^[K]
+              z
+            = 0)
+        → ∀ c : ι → Perfection S p,
+          ∃! x : ι → Perfection S p, x - Q.mulVec (fun k => frobenius (Perfection S p) p (x k)) = c := by
   intro p _ S _ _ ι _ Q hnil c
   have bij : ∀ n, Function.Bijective (fun z => z - perfLevelOp p S Q n z) := by
     intro n
     obtain ⟨K, hK⟩ := hnil n
     exact sub_apply_bijective_of_iterate_eq_zero _ K hK
   let z : ℕ → ι → S := fun n => Function.surjInv (bij n).2 (fun i => Perfection.coeff S p n (c i))
-  have hz : ∀ n, z n - perfLevelOp p S Q n (z n) = fun i => Perfection.coeff S p n (c i) :=
-    fun n => Function.surjInv_eq (bij n).2 _
+  have hz : ∀ n, z n - perfLevelOp p S Q n (z n) = fun i => Perfection.coeff S p n (c i) := fun n =>
+    Function.surjInv_eq (bij n).2 _
   have compat : ∀ n k, z (n + 1) k ^ p = z n k := by
     intro n
     have h : (fun k => frobenius S p (z (n + 1) k)) = z n := by

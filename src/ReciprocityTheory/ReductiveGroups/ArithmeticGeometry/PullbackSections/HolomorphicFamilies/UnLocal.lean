@@ -9,21 +9,22 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.PullbackSections
 
-open AlgebraicGeometry CategoryTheory NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.TB.ValAt
+open AlgebraicGeometry CategoryTheory NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.TB.ValAt
 
-theorem valAt'_spMap {A : Type} [CommRing A] (ψ : A →+* ℂ) (a : A) :
-    valAt' (spMap ψ) ⊤ ((Scheme.ΓSpecIso (CommRingCat.of A)).inv a) = ψ a := by
+theorem valAt'_spMap {A : Type} [CommRing A] (ψ : A →+* ℂ) (a : A)
+    : valAt' (spMap ψ) ⊤ ((Scheme.ΓSpecIso (CommRingCat.of A)).inv a) = ψ a := by
   unfold valAt'
   rw [dite_eq_left (by simp)]
   unfold valAt
   have h1 : (spMap ψ).appLE ⊤ ⊤ (by simp) = (spMap ψ).appTop := by
     rw [Scheme.Hom.appTop, Scheme.Hom.app_eq_appLE]
-    first
-      | rfl
-      | simp
+    first | rfl | simp
   rw [h1]
-  have h2 := congrArg (fun f => (CommRingCat.Hom.hom f) ((Scheme.ΓSpecIso (CommRingCat.of A)).inv a))
-    (Scheme.ΓSpecIso_naturality (CommRingCat.ofHom ψ))
+  have h2 :=
+    congrArg
+      (fun f => (CommRingCat.Hom.hom f) ((Scheme.ΓSpecIso (CommRingCat.of A)).inv a))
+      (Scheme.ΓSpecIso_naturality (CommRingCat.ofHom ψ))
   simp only [CommRingCat.hom_comp, RingHom.comp_apply, CommRingCat.hom_ofHom] at h2
   refine h2.trans ?_
   simp
@@ -137,17 +138,23 @@ private lemma alg_lemma_5 {A : Type} [CommRing A] (ψ : A →+* ℂ) (g' : Γ(Sp
   rw [hx] at h2
   exact h0.trans h2
 
-theorem isHolTo_spMap {A : Type} [CommRing A] {m : ℕ} {B : Set (Fin m → ℂ)} (hB : IsOpen B) {Ψ : (Fin m → ℂ) → (A →+* ℂ)}
-    (h : ∀ a, DifferentiableOn ℂ (fun b => Ψ b a) B) : IsHolTo B fun b => spMap (Ψ b) := by
+theorem isHolTo_spMap
+    {A : Type} [CommRing A]
+    {m : ℕ} {B : Set (Fin m → ℂ)} (hB : IsOpen B)
+    {Ψ : (Fin m → ℂ) → (A →+* ℂ)} (h : ∀ a, DifferentiableOn ℂ (fun b => Ψ b a) B)
+    : IsHolTo B fun b => spMap (Ψ b) := by
   unfold IsHolTo
   intro U f
-  have nbhd : ∀ b0 ∈ {b | b ∈ B ∧ ⊤ ≤ spMap (Ψ b) ⁻¹ᵁ U}, ∃ g : A, Ψ b0 g ≠ 0 ∧
-      (Sp A).basicOpen ((Scheme.ΓSpecIso (CommRingCat.of A)).inv g) ≤ U :=
+  have nbhd
+      : ∀ b0 ∈ {b | b ∈ B ∧ ⊤ ≤ spMap (Ψ b) ⁻¹ᵁ U}, ∃ g : A,
+        Ψ b0 g ≠ 0 ∧ (Sp A).basicOpen ((Scheme.ΓSpecIso (CommRingCat.of A)).inv g) ≤ U :=
     fun b0 hb0 => local_lemma_4 (Ψ b0) hb0.2
-  have hopen : ∀ g : A, IsOpen (B ∩ (fun b => Ψ b g) ⁻¹' {0}ᶜ) :=
-    fun g => ((h g).continuousOn).isOpen_inter_preimage hB isOpen_compl_singleton
-  have hsub : ∀ g : A, (Sp A).basicOpen ((Scheme.ΓSpecIso (CommRingCat.of A)).inv g) ≤ U →
-      B ∩ (fun b => Ψ b g) ⁻¹' {0}ᶜ ⊆ {b | b ∈ B ∧ ⊤ ≤ spMap (Ψ b) ⁻¹ᵁ U} := by
+  have hopen : ∀ g : A, IsOpen (B ∩ (fun b => Ψ b g) ⁻¹' {0}ᶜ) := fun g =>
+    ((h g).continuousOn).isOpen_inter_preimage hB isOpen_compl_singleton
+  have hsub
+      : ∀ g : A,
+        (Sp A).basicOpen ((Scheme.ΓSpecIso (CommRingCat.of A)).inv g) ≤ U
+          → B ∩ (fun b => Ψ b g) ⁻¹' {0}ᶜ ⊆ {b | b ∈ B ∧ ⊤ ≤ spMap (Ψ b) ⁻¹ᵁ U} := by
     intro g hD b hb
     exact ⟨hb.1, (topLe_lemma_3 (Ψ b) g hb.2).trans (preMono_lemma_8 (Ψ b) hD)⟩
   refine ⟨?_, ?_⟩
@@ -160,29 +167,39 @@ theorem isHolTo_spMap {A : Type} [CommRing A] {m : ℕ} {B : Set (Fin m → ℂ)
     obtain ⟨g, hg, hD⟩ := nbhd b0 hb0
     refine ⟨_, hopen g, ⟨hb0.1, hg⟩, ?_⟩
     haveI := (isAffineOpen_top (Sp A)).isLocalization_basicOpen ((Scheme.ΓSpecIso (CommRingCat.of A)).inv g)
-    obtain ⟨⟨h', m⟩, hm⟩ := IsLocalization.surj (Submonoid.powers ((Scheme.ΓSpecIso (CommRingCat.of A)).inv g))
-      ((Sp A).presheaf.map (homOfLE hD).op f)
+    obtain ⟨⟨h', m⟩, hm⟩ :=
+      IsLocalization.surj (Submonoid.powers ((Scheme.ΓSpecIso (CommRingCat.of A)).inv g))
+        ((Sp A).presheaf.map (homOfLE hD).op f)
     dsimp only at hm
-    obtain ⟨n, hn⟩ : ∃ n : ℕ, (Scheme.ΓSpecIso (CommRingCat.of A)).inv g ^ n = (m : Γ(Sp A, ⊤)) := by
+    obtain ⟨n, hn⟩
+        : ∃ n : ℕ, (Scheme.ΓSpecIso (CommRingCat.of A)).inv g ^ n = (m : Γ(Sp A, ⊤)) := by
       first
-        | exact (Submonoid.mem_powers_iff _ _).mp m.2
-        | exact m.2
-        | simpa using m.2
-        | (obtain ⟨k, hk⟩ := m.2; exact ⟨k, hk⟩)
-    have key : ∀ b ∈ {b | b ∈ B ∧ ⊤ ≤ spMap (Ψ b) ⁻¹ᵁ U} ∩ (B ∩ (fun b => Ψ b g) ⁻¹' {0}ᶜ),
-        valAt' (spMap (Ψ b)) U f = Ψ b ((Scheme.ΓSpecIso (CommRingCat.of A)).hom h') * (Ψ b g ^ n)⁻¹ := by
+      | exact (Submonoid.mem_powers_iff _ _).mp m.2
+      | exact m.2
+      | simpa using m.2
+      | (obtain ⟨k, hk⟩ := m.2; exact ⟨k, hk⟩)
+    have key
+        : ∀ b ∈ {b | b ∈ B ∧ ⊤ ≤ spMap (Ψ b) ⁻¹ᵁ U} ∩ (B ∩ (fun b => Ψ b g) ⁻¹' {0}ᶜ),
+          valAt' (spMap (Ψ b)) U f
+            = Ψ b ((Scheme.ΓSpecIso (CommRingCat.of A)).hom h') * (Ψ b g ^ n)⁻¹ := by
       intro b hb
       have hgb : Ψ b g ≠ 0 := hb.2.2
       have eD := topLe_lemma_3 (Ψ b) g hgb
       rw [← div_eq_mul_inv, eq_div_iff (pow_ne_zero _ hgb), ← vRes_lemma_2 (Ψ b) hD eD f]
       have hm' := congrArg (valAt' (spMap (Ψ b)) _) hm
-      rw [vMul_lemma_6 (Ψ b) eD, ← hn, map_pow, vPow_lemma_7 (Ψ b) eD, alg_lemma_5 (Ψ b) _ eD, alg_lemma_5 (Ψ b) _ eD] at hm'
-      have hg' : (Scheme.ΓSpecIso (CommRingCat.of A)).hom ((Scheme.ΓSpecIso (CommRingCat.of A)).inv g) = g := by
+      rw [vMul_lemma_6 (Ψ b) eD, ← hn, map_pow, vPow_lemma_7 (Ψ b) eD, alg_lemma_5 (Ψ b) _ eD,
+          alg_lemma_5 (Ψ b) _ eD]
+        at hm'
+      have hg'
+          : (Scheme.ΓSpecIso (CommRingCat.of A)).hom ((Scheme.ΓSpecIso (CommRingCat.of A)).inv g)
+            = g := by
         simp
       rw [hg'] at hm'
       exact hm'
     refine DifferentiableOn.congr ?_ key
-    exact ((((h _).mono Set.inter_subset_left).mul ((((h g).mono Set.inter_subset_left).pow n).inv
-      (fun b (hb : b ∈ B ∩ (fun b => Ψ b g) ⁻¹' {0}ᶜ) => pow_ne_zero n hb.2))).mono Set.inter_subset_right)
+    exact ((((h _).mono Set.inter_subset_left).mul
+        ((((h g).mono Set.inter_subset_left).pow n).inv
+          (fun b (hb : b ∈ B ∩ (fun b => Ψ b g) ⁻¹' {0}ᶜ) => pow_ne_zero n hb.2))).mono
+      Set.inter_subset_right)
 
 end ReciprocityTheory.ChartRestriction.G.PullbackSections

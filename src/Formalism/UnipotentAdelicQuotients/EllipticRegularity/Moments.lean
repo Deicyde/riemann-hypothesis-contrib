@@ -9,9 +9,9 @@ namespace ZetaZeros.D.EllReg
 open MeasureTheory Metric Filter Topology
 open scoped ContDiff FourierTransform ENNReal
 
-theorem moments_integrable_of_nrm {d : ℕ} (F : E d → ℂ) (hF : Continuous F)
-    (h : ∀ s : ℕ, nrm (s : ℝ) 0 0 F < ⊤) (n : ℕ) :
-    Integrable (fun v : E d => ‖v‖ ^ n * ‖F v‖) := by
+theorem moments_integrable_of_nrm
+    {d : ℕ} (F : E d → ℂ) (hF : Continuous F) (h : ∀ s : ℕ, nrm (s : ℝ) 0 0 F < ⊤) (n : ℕ)
+    : Integrable (fun v : E d => ‖v‖ ^ n * ‖F v‖) := by
   set m : ℕ := n + (d + 1) with hm
   let A : E d → ℝ := fun v => (1 + ‖v‖ ^ 2) ^ m * ‖F v‖ ^ 2
   let B : E d → ℝ := fun v => (1 + ‖v‖ ^ 2) ^ (-(2 * ((d : ℝ) + 1)) / 2)
@@ -30,9 +30,10 @@ theorem moments_integrable_of_nrm {d : ℕ} (F : E d → ℂ) (hF : Continuous F
     congr 1
     simp only [A]
     congr 1
-    simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, zero_mul, add_zero, zero_div, neg_zero,
-      Real.rpow_zero, mul_one]
-    rw [← Real.rpow_natCast ((1 + ‖v‖ ^ 2) ^ ((m : ℝ) / 2)), ← Real.rpow_mul ht0, ← Real.rpow_natCast]
+    simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, zero_mul, add_zero,
+      zero_div, neg_zero, Real.rpow_zero, mul_one]
+    rw [← Real.rpow_natCast ((1 + ‖v‖ ^ 2) ^ ((m : ℝ) / 2)), ← Real.rpow_mul ht0,
+      ← Real.rpow_natCast]
     congr 1
     push_cast
     ring
@@ -40,14 +41,15 @@ theorem moments_integrable_of_nrm {d : ℕ} (F : E d → ℂ) (hF : Continuous F
     apply integrable_rpow_neg_one_add_norm_sq
     rw [finrank_euclideanSpace_fin]
     linarith
-  refine (hA.add hB).mono' ((continuous_norm.pow n).mul (continuous_norm.comp hF)).aestronglyMeasurable ?_
+  refine (hA.add hB).mono'
+    ((continuous_norm.pow n).mul (continuous_norm.comp hF)).aestronglyMeasurable ?_
   refine Filter.Eventually.of_forall (fun v => ?_)
   have ht1 : (1 : ℝ) ≤ 1 + ‖v‖ ^ 2 := by nlinarith [sq_nonneg ‖v‖]
   have ht0 : (0 : ℝ) < 1 + ‖v‖ ^ 2 := by linarith
   have hBv : B v = ((1 + ‖v‖ ^ 2) ^ (d + 1))⁻¹ := by
     simp only [B]
-    rw [show -(2 * ((d : ℝ) + 1)) / 2 = -(((d + 1 : ℕ) : ℝ)) by push_cast; ring, Real.rpow_neg ht0.le,
-      Real.rpow_natCast]
+    rw [show -(2 * ((d : ℝ) + 1)) / 2 = -(((d + 1 : ℕ) : ℝ)) by push_cast; ring,
+      Real.rpow_neg ht0.le, Real.rpow_natCast]
   have hAB : A v * B v = (1 + ‖v‖ ^ 2) ^ n * ‖F v‖ ^ 2 := by
     rw [hBv]
     simp only [A, hm, pow_add]

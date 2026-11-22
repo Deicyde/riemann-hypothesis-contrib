@@ -15,13 +15,13 @@ noncomputable section
 
 def ChartIncDomain.Statement : Prop :=
   ∀ (F : Type) [Field F] (n e : ℕ) (I : Ideal (MvPolynomial (Fin n) F)) (t : Fin n → F),
-    IsProjPrime I → linForm t ∉ I →
-      IsDomain (ChartInc I t e) ∧ RingHom.ker (chartX I t e) = I ⊔ Ideal.span {linForm t - 1}
+    IsProjPrime I → linForm t ∉ I
+      → IsDomain (ChartInc I t e) ∧ RingHom.ker (chartX I t e) = I ⊔ Ideal.span {linForm t - 1}
 
 def ChartKernel.Statement : Prop :=
   ∀ (F : Type) [Field F] (n e : ℕ) (I : Ideal (MvPolynomial (Fin n) F)) (t : Fin n → F),
-    IsProjPrime I → linForm t ∉ I →
-      RingHom.ker (algebraMap (MvPolynomial (Fin e × Fin n) F) (ChartInc I t e)) = incIdeal I e
+    IsProjPrime I → linForm t ∉ I
+      → RingHom.ker (algebraMap (MvPolynomial (Fin e × Fin n) F) (ChartInc I t e)) = incIdeal I e
 
 section Inhabitants
 

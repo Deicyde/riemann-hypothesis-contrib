@@ -12,14 +12,18 @@ open scoped ContDiff ComplexConjugate Topology
 
 namespace GlobalTheory.CxForm
 
-theorem pullback_eq_chart : ∀ (M M' : Type) [TopologicalSpace M] [TopologicalSpace M'] (n n' : ℕ) (A : HolAtlas M n) (A' : HolAtlas M' n')
-    (f : M' → M) (α : A.Fld), A.IsHolo A' f → A.IsForm α →
-    ∀ (x : A'.Pt) (i : A.ι) (h : f x.pt ∈ (A.e i).source),
-      A.pullback A' f α x = pull (fderiv ℂ (A.e i ∘ f ∘ x.ch.symm) x.crd) (α ⟨(i, f x.pt), h⟩) := by
+theorem pullback_eq_chart
+    : ∀ (M M' : Type) [TopologicalSpace M] [TopologicalSpace M'] (n n' : ℕ) (A : HolAtlas M n)
+        (A' : HolAtlas M' n') (f : M' → M) (α : A.Fld),
+      A.IsHolo A' f → A.IsForm α
+        → ∀ (x : A'.Pt) (i : A.ι) (h : f x.pt ∈ (A.e i).source),
+          A.pullback A' f α x
+            = pull (fderiv ℂ (A.e i ∘ f ∘ x.ch.symm) x.crd) (α ⟨(i, f x.pt), h⟩) := by
   intro M M' _ _ n n' A A' f α hf hα x i h
-  have key : ∀ (j : A.ι) (hj : f x.pt ∈ (A.e j).source),
-      pull (fderiv ℂ (A.e j ∘ f ∘ x.ch.symm) x.crd) (α ⟨(j, f x.pt), hj⟩) =
-        pull (fderiv ℂ (A.e i ∘ f ∘ x.ch.symm) x.crd) (α ⟨(i, f x.pt), h⟩) := by
+  have key
+      : ∀ (j : A.ι) (hj : f x.pt ∈ (A.e j).source),
+        pull (fderiv ℂ (A.e j ∘ f ∘ x.ch.symm) x.crd) (α ⟨(j, f x.pt), hj⟩)
+          = pull (fderiv ℂ (A.e i ∘ f ∘ x.ch.symm) x.crd) (α ⟨(i, f x.pt), h⟩) := by
     intro j hj
     have hc := hα.compat ⟨(j, f x.pt), hj⟩ ⟨(i, f x.pt), h⟩ rfl
     rw [hc, ← GlobalTheory.T.pullbackComplexFormsLinearMap_comp]
@@ -41,11 +45,11 @@ theorem pullback_eq_chart : ∀ (M M' : Type) [TopologicalSpace M] [TopologicalS
       exact h
     have hd2 : DifferentiableAt ℂ (A.e i ∘ (A.e j).symm) (A.e j (f x.pt)) :=
       (A.holo j i).differentiableAt (hopen2.mem_nhds hmem2)
-    have hpt : (A.e j ∘ f ∘ x.ch.symm) x.crd = A.e j (f x.pt) := by
-      simp only [Function.comp, hx]
+    have hpt : (A.e j ∘ f ∘ x.ch.symm) x.crd = A.e j (f x.pt) := by simp only [Function.comp, hx]
     have hcomp := fderiv_comp x.crd (hpt ▸ hd2) hd1
     rw [hpt] at hcomp
-    have hev : (A.e i ∘ (A.e j).symm) ∘ (A.e j ∘ f ∘ x.ch.symm) =ᶠ[𝓝 x.crd] A.e i ∘ f ∘ x.ch.symm := by
+    have hev
+        : (A.e i ∘ (A.e j).symm) ∘ (A.e j ∘ f ∘ x.ch.symm) =ᶠ[𝓝 x.crd] A.e i ∘ f ∘ x.ch.symm := by
       filter_upwards [hopen.mem_nhds hmem] with v hv
       have hv' : f (x.ch.symm v) ∈ (A.e j).source := hv.2
       simp only [Function.comp, (A.e j).left_inv hv']

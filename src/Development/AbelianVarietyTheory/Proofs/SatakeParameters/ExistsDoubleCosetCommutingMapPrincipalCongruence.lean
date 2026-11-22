@@ -8,14 +8,35 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsDee
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 noncomputable section
 
 namespace GlobalTheory.HeckeIsoMap
 
-theorem isoMap : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (a : NG.AlgWt L n) (S₁ S₂ : Submodule ℂ (GAf L n → a.W)), NG.IsIrrRep a.ρ S₁ → NG.IsoRep S₁ S₂ → ∀ N : ℕ, 0 < N → (∃ f ∈ S₁, (∀ κ, NG.Cong L n N κ → NG.rt L n κ f = f) ∧ f ≠ 0) → ∃ φ : (GAf L n → a.W) →ₗ[ℂ] (GAf L n → a.W), (∀ f ∈ S₁, (∀ κ, NG.Cong L n N κ → NG.rt L n κ f = f) → φ f ∈ S₂ ∧ ∀ κ, NG.Cong L n N κ → NG.rt L n κ (φ f) = φ f) ∧ (∃ f ∈ S₁, (∀ κ, NG.Cong L n N κ → NG.rt L n κ f = f) ∧ φ f ≠ 0) ∧ (∀ (g : GAf L n) (f : GAf L n → a.W), f ∈ S₁ → (∀ κ, NG.Cong L n N κ → NG.rt L n κ f = f) → φ (NG.heckeD (GlobalTheory.IsotOrth.congSub L n N) {x | ∃ u ∈ GlobalTheory.IsotOrth.congSub L n N, ∃ u' ∈ GlobalTheory.IsotOrth.congSub L n N, x = u * g * u'} f) = NG.heckeD (GlobalTheory.IsotOrth.congSub L n N) {x | ∃ u ∈ GlobalTheory.IsotOrth.congSub L n N, ∃ u' ∈ GlobalTheory.IsotOrth.congSub L n N, x = u * g * u'} (φ f)) := by
+theorem isoMap
+    : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ) (a : NG.AlgWt L n)
+        (S₁ S₂ : Submodule ℂ (GAf L n → a.W)),
+      NG.IsIrrRep a.ρ S₁ → NG.IsoRep S₁ S₂
+        → ∀ N : ℕ,
+          0 < N → (∃ f ∈ S₁, (∀ κ, NG.Cong L n N κ → NG.rt L n κ f = f) ∧ f ≠ 0)
+            → ∃ φ : (GAf L n → a.W) →ₗ[ℂ] (GAf L n → a.W),
+              (∀ f ∈ S₁,
+                  (∀ κ, NG.Cong L n N κ → NG.rt L n κ f = f)
+                    → φ f ∈ S₂ ∧ ∀ κ, NG.Cong L n N κ → NG.rt L n κ (φ f) = φ f)
+                ∧ (∃ f ∈ S₁, (∀ κ, NG.Cong L n N κ → NG.rt L n κ f = f) ∧ φ f ≠ 0)
+                ∧ (∀ (g : GAf L n) (f : GAf L n → a.W),
+                  f ∈ S₁ → (∀ κ, NG.Cong L n N κ → NG.rt L n κ f = f)
+                    → φ (NG.heckeD (GlobalTheory.IsotOrth.congSub L n N)
+                        {x | ∃ u ∈ GlobalTheory.IsotOrth.congSub L n N, ∃ u' ∈ GlobalTheory.IsotOrth.congSub L n N, x = u * g * u'}
+                        f)
+                      = NG.heckeD (GlobalTheory.IsotOrth.congSub L n N)
+                        {x | ∃ u ∈ GlobalTheory.IsotOrth.congSub L n N, ∃ u' ∈ GlobalTheory.IsotOrth.congSub L n N, x = u * g * u'}
+                        (φ f)) := by
   classical
   intro L _ _ _ n a S₁ S₂ hS₁ hiso N hN hex
   obtain ⟨T, hT⟩ := hiso
@@ -47,12 +68,19 @@ theorem isoMap : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ
     set D : Set (GAf L n) := {x | ∃ u ∈ J, ∃ u' ∈ J, x = u * g * u'} with hD
     obtain ⟨M, hM, hMc⟩ := GlobalTheory.ConjCong.exists_cong_conj L n N g hN
     have hfin : {c : GAf L n ⧸ J | ∃ x ∈ D, (x : GAf L n ⧸ J) = c}.Finite := by
-      refine ((GlobalTheory.HeckeRecon.finite_cosets (L := L) (n := n) (N * M) (Nat.mul_pos hN hM)).image
-        (fun c : GAf L n ⧸ GlobalTheory.IsotOrth.congSub L n (N * M) => ((c.out * g : GAf L n) : GAf L n ⧸ J))).subset ?_
+      refine
+        ((GlobalTheory.HeckeRecon.finite_cosets (L := L) (n := n) (N * M) (Nat.mul_pos hN hM)).image
+          (fun c : GAf L n ⧸ GlobalTheory.IsotOrth.congSub L n (N * M) =>
+            ((c.out * g : GAf L n) : GAf L n ⧸ J))).subset ?_
       rintro _ ⟨x, ⟨u, hu, u', hu', rfl⟩, rfl⟩
-      refine ⟨(u : GAf L n ⧸ GlobalTheory.IsotOrth.congSub L n (N * M)), ⟨u, (show NG.Cong L n N u from hu).1, rfl⟩, ?_⟩
-      obtain ⟨k, hk⟩ : ∃ k ∈ GlobalTheory.IsotOrth.congSub L n (N * M),
-          (Quotient.out (u : GAf L n ⧸ GlobalTheory.IsotOrth.congSub L n (N * M))) = u * k := by
+      refine ⟨
+        (u : GAf L n ⧸ GlobalTheory.IsotOrth.congSub L n (N * M)),
+        ⟨u, (show NG.Cong L n N u from hu).1, rfl⟩,
+        ?_
+      ⟩
+      obtain ⟨k, hk⟩
+          : ∃ k ∈ GlobalTheory.IsotOrth.congSub L n (N * M),
+            (Quotient.out (u : GAf L n ⧸ GlobalTheory.IsotOrth.congSub L n (N * M))) = u * k := by
         have h1 := QuotientGroup.out_eq' (u : GAf L n ⧸ GlobalTheory.IsotOrth.congSub L n (N * M))
         rw [QuotientGroup.eq] at h1
         exact ⟨_, Subgroup.inv_mem _ h1, by group⟩
@@ -63,8 +91,11 @@ theorem isoMap : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] (n : ℕ
       have : (u * k * g)⁻¹ * (u * g * u') = (g⁻¹ * k * g)⁻¹ * u' := by group
       rw [this]
       exact J.mul_mem (J.inv_mem hc) hu'
-    have hsum : ∀ F : GAf L n → a.W, NG.heckeD J D F = ∑ c ∈ hfin.toFinset,
-        (if hc : ∃ x ∈ D, (x : GAf L n ⧸ J) = c then NG.rt L n hc.choose F else 0) := by
+    have hsum
+        : ∀ F : GAf L n → a.W,
+          NG.heckeD J D F
+            = ∑ c ∈ hfin.toFinset,
+              (if hc : ∃ x ∈ D, (x : GAf L n ⧸ J) = c then NG.rt L n hc.choose F else 0) := by
       intro F
       funext x
       rw [GlobalTheory.HeckeRecon.heckeD_eq_sum J D hfin, Finset.sum_apply]

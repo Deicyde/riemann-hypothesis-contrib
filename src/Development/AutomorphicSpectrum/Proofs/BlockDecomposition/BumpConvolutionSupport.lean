@@ -19,15 +19,18 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 namespace GlobalTheory.CompanionTheory.WaveMult
 
-theorem hasCompactSupport_of_isBump {g : ℝ → ℝ} {T : ℝ} (hg : IsBump g T) : HasCompactSupport g := by
+theorem hasCompactSupport_of_isBump {g : ℝ → ℝ} {T : ℝ} (hg : IsBump g T)
+    : HasCompactSupport g := by
   refine HasCompactSupport.intro (isCompact_closedBall (0 : ℝ) T) fun x hx => hg.2.2 x ?_
   rw [Metric.mem_closedBall, Real.dist_eq, sub_zero, not_le] at hx
   exact hx
 
-theorem isBump_gconv : ∀ (g g' : ℝ → ℝ) (T T' : ℝ), IsBump g T → IsBump g' T' → IsBump (gconv g g') (T + T') := by
+theorem isBump_gconv
+    : ∀ (g g' : ℝ → ℝ) (T T' : ℝ), IsBump g T → IsBump g' T' → IsBump (gconv g g') (T + T') := by
   intro g g' T T' hg hg'
   refine ⟨?_, ?_, ?_⟩
-  · have hconv : gconv g g' = MeasureTheory.convolution g g' (ContinuousLinearMap.mul ℝ ℝ) volume := by
+  · have hconv
+        : gconv g g' = MeasureTheory.convolution g g' (ContinuousLinearMap.mul ℝ ℝ) volume := by
       funext r
       simp [gconv, MeasureTheory.convolution]
     rw [hconv]
@@ -35,7 +38,9 @@ theorem isBump_gconv : ∀ (g g' : ℝ → ℝ) (T T' : ℝ), IsBump g T → IsB
       hg.1.continuous.locallyIntegrable hg'.1
   · intro r
     unfold gconv
-    calc ∫ t, g t * g' (-r - t) = ∫ t, g (-t) * g' (-r - -t) := (integral_neg_eq_self _ _).symm
+    calc
+      ∫ t, g t * g' (-r - t)
+        = ∫ t, g (-t) * g' (-r - -t) := (integral_neg_eq_self _ _).symm
       _ = ∫ t, g t * g' (r - t) := by
         congr 1
         funext t

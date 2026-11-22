@@ -9,8 +9,8 @@ open GlobalTheory.SeqCx Matrix
 
 namespace GlobalTheory.UniSeqBasic
 
-theorem perm_lift {α β : Type} (f : α → β) {l l' : List β} (h : l.Perm l') :
-    ∀ γ : List α, γ.map f = l → ∃ γ' : List α, γ.Perm γ' ∧ γ'.map f = l' := by
+theorem perm_lift {α β : Type} (f : α → β) {l l' : List β} (h : l.Perm l')
+    : ∀ γ : List α, γ.map f = l → ∃ γ' : List α, γ.Perm γ' ∧ γ'.map f = l' := by
   induction h with
   | nil => intro γ hγ; exact ⟨γ, List.Perm.refl _, hγ⟩
   | cons x _ ih =>
@@ -33,15 +33,16 @@ theorem perm_lift {α β : Type} (f : α → β) {l l' : List β} (h : l.Perm l'
     obtain ⟨γ2, p2, e2⟩ := ih2 γ1 e1
     exact ⟨γ2, p1.trans p2, e2⟩
 
-def Orth (R M : Type) [CommRing R] [AddCommGroup M] [Module R M]
-    (a b : M × (M →ₗ[R] R)) : Prop := a.2 b.1 = 0 ∧ b.2 a.1 = 0
+def Orth (R M : Type) [CommRing R] [AddCommGroup M] [Module R M] (a b : M × (M →ₗ[R] R)) : Prop :=
+  a.2 b.1 = 0 ∧ b.2 a.1 = 0
 
-theorem orth_symm (R M : Type) [CommRing R] [AddCommGroup M] [Module R M] :
-    Symmetric (Orth R M) := fun _ _ h => ⟨h.2, h.1⟩
+theorem orth_symm (R M : Type) [CommRing R] [AddCommGroup M] [Module R M] : Symmetric (Orth R M) :=
+  fun _ _ h => ⟨h.2, h.1⟩
 
-theorem mem_uniM_iff (R M : Type) [CommRing R] [AddCommGroup M] [Module R M] (l : List M) :
-    l ∈ uniM R M ↔ ∃ γ : List (M × (M →ₗ[R] R)), γ.map Prod.fst = l ∧
-      (∀ p ∈ γ, p.2 p.1 = 1) ∧ γ.Pairwise (Orth R M) := by
+theorem mem_uniM_iff (R M : Type) [CommRing R] [AddCommGroup M] [Module R M] (l : List M)
+    : l ∈ uniM R M
+      ↔ ∃ γ : List (M × (M →ₗ[R] R)),
+        γ.map Prod.fst = l ∧ (∀ p ∈ γ, p.2 p.1 = 1) ∧ γ.Pairwise (Orth R M) := by
   constructor
   · rintro ⟨f, hf⟩
     refine ⟨(List.finRange l.length).map (fun i => (l.get i, f i)), ?_, ?_, ?_⟩
@@ -66,7 +67,10 @@ theorem mem_uniM_iff (R M : Type) [CommRing R] [AddCommGroup M] [Module R M] (l 
       · exact (hpw _ _ hi hj h).1
       · exact (hpw _ _ hj hi h).2
 
-theorem main : ∀ (R M : Type) [CommRing R] [AddCommGroup M] [Module R M], SubClosed (uniM R M) ∧ (∀ l l' : List M, l.Perm l' → l ∈ uniM R M → l' ∈ uniM R M) ∧ ∀ (ψ : M ≃ₗ[R] M) (l : List M), l.map ψ ∈ uniM R M ↔ l ∈ uniM R M := by
+theorem main
+    : ∀ (R M : Type) [CommRing R] [AddCommGroup M] [Module R M],
+      SubClosed (uniM R M) ∧ (∀ l l' : List M, l.Perm l' → l ∈ uniM R M → l' ∈ uniM R M)
+        ∧ ∀ (ψ : M ≃ₗ[R] M) (l : List M), l.map ψ ∈ uniM R M ↔ l ∈ uniM R M := by
   intro R M _ _ _
   have key : ∀ (ψ : M ≃ₗ[R] M) (l : List M), l ∈ uniM R M → l.map ψ ∈ uniM R M := by
     intro ψ l hl
@@ -101,7 +105,10 @@ end GlobalTheory.UniSeqBasic
 
 section
 open GlobalTheory.SeqCx Matrix
-theorem _root_.GlobalTheory.T.subClosed_and_perm_and_linearEquiv_invariant_uniM : ∀ (R M : Type) [CommRing R] [AddCommGroup M] [Module R M], SubClosed (uniM R M) ∧ (∀ l l' : List M, l.Perm l' → l ∈ uniM R M → l' ∈ uniM R M) ∧ ∀ (ψ : M ≃ₗ[R] M) (l : List M), l.map ψ ∈ uniM R M ↔ l ∈ uniM R M := by
+theorem _root_.GlobalTheory.T.subClosed_and_perm_and_linearEquiv_invariant_uniM
+    : ∀ (R M : Type) [CommRing R] [AddCommGroup M] [Module R M],
+      SubClosed (uniM R M) ∧ (∀ l l' : List M, l.Perm l' → l ∈ uniM R M → l' ∈ uniM R M)
+        ∧ ∀ (ψ : M ≃ₗ[R] M) (l : List M), l.map ψ ∈ uniM R M ↔ l ∈ uniM R M := by
   first
   | exact @GlobalTheory.UniSeqBasic.main
   | exact @GlobalTheory.UniSeqBasic.mem_uniM_iff

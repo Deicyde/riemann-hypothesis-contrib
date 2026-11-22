@@ -6,15 +6,20 @@ public import Development.AutomorphicSpectrum.Definitions.MetricPeriods.IsPeriod
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 
 namespace GlobalTheory.CompanionTheory.Ar.ComplexPlace
 
-theorem exists_ringHom_of_finiteType {A B : Type} [CommRing A] [CommRing B] [Algebra A B]
-    [Algebra.FiniteType A B] (v : A →+* ℂ) (hv : (RingHom.ker v).IsMaximal) (M : Ideal B)
-    (hMm : M.IsMaximal) (hM : ∀ a, v a = 0 → algebraMap A B a ∈ M) :
-    ∃ ψ : B →+* ℂ, ∀ a, ψ (algebraMap A B a) = v a := by
+theorem exists_ringHom_of_finiteType
+    {A B : Type} [CommRing A] [CommRing B] [Algebra A B] [Algebra.FiniteType A B]
+    (v : A →+* ℂ) (hv : (RingHom.ker v).IsMaximal)
+    (M : Ideal B) (hMm : M.IsMaximal) (hM : ∀ a, v a = 0 → algebraMap A B a ∈ M)
+    : ∃ ψ : B →+* ℂ, ∀ a, ψ (algebraMap A B a) = v a := by
   letI κF : Field (A ⧸ RingHom.ker v) := Ideal.Quotient.field _
   letI KF : Field (B ⧸ M) := Ideal.Quotient.field _
   let φ : A ⧸ RingHom.ker v →+* B ⧸ M :=
@@ -31,15 +36,14 @@ theorem exists_ringHom_of_finiteType {A B : Type} [CommRing A] [CommRing B] [Alg
   letI : Algebra (A ⧸ RingHom.ker v) ℂ := (RingHom.kerLift v).toAlgebra
   let g : (B ⧸ M) →ₐ[A ⧸ RingHom.ker v] ℂ := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   refine ⟨g.toRingHom.comp (Ideal.Quotient.mk M), fun a => ?_⟩
   exact g.commutes (Ideal.Quotient.mk (RingHom.ker v) a)
 
-theorem isLocalRing_and_ker {L : Type} [Field L] (O : Subring L) (v : O →+* ℂ)
-    (hv : ∀ s : O, v s ≠ 0 → (s : L)⁻¹ ∈ O) :
-    ∃ _ : IsLocalRing O, RingHom.ker v = IsLocalRing.maximalIdeal O := by
+theorem isLocalRing_and_ker
+    {L : Type} [Field L] (O : Subring L) (v : O →+* ℂ) (hv : ∀ s : O, v s ≠ 0 → (s : L)⁻¹ ∈ O)
+    : ∃ _ : IsLocalRing O, RingHom.ker v = IsLocalRing.maximalIdeal O := by
   have hunit : ∀ s : O, IsUnit s ↔ v s ≠ 0 := by
     intro s
     constructor
@@ -69,11 +73,15 @@ theorem isLocalRing_and_ker {L : Type} [Field L] (O : Subring L) (v : O →+* �
   rw [RingHom.mem_ker, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, hunit]
   simp
 
-theorem exists_valuationSubring_place (L : Type) [Field L] (O : Subring L) (v : O →+* ℂ)
-    (hv : ∀ s : O, v s ≠ 0 → (s : L)⁻¹ ∈ O) :
-    ∃ V : ValuationSubring L, (∀ s ∈ O, s ∈ V) ∧ ∀ T : Finset L, (∀ t ∈ T, t ∈ V) →
-      ∃ (R : Subring L) (hO : O ≤ R) (ψ : R →+* ℂ), (∀ t ∈ T, t ∈ R) ∧
-        (∀ s : O, ψ (Subring.inclusion hO s) = v s) ∧ ∀ t ∈ T, t ≠ 0 → t⁻¹ ∈ V → t⁻¹ ∈ R := by
+theorem exists_valuationSubring_place
+    (L : Type) [Field L] (O : Subring L) (v : O →+* ℂ) (hv : ∀ s : O, v s ≠ 0 → (s : L)⁻¹ ∈ O)
+    : ∃ V : ValuationSubring L,
+      (∀ s ∈ O, s ∈ V)
+        ∧ ∀ T : Finset L,
+          (∀ t ∈ T, t ∈ V)
+            → ∃ (R : Subring L) (hO : O ≤ R) (ψ : R →+* ℂ),
+              (∀ t ∈ T, t ∈ R) ∧ (∀ s : O, ψ (Subring.inclusion hO s) = v s)
+                ∧ ∀ t ∈ T, t ≠ 0 → t⁻¹ ∈ V → t⁻¹ ∈ R := by
   obtain ⟨hloc, hker⟩ := isLocalRing_and_ker O v hv
   obtain ⟨V, hV, hlocal⟩ := IsLocalRing.exists_factor_valuationRing O.subtype
   refine ⟨V, fun s hs => hV ⟨s, hs⟩, fun T hT => ?_⟩
@@ -85,17 +93,17 @@ theorem exists_valuationSubring_place (L : Type) [Field L] (O : Subring L) (v : 
     · obtain ⟨t, ht, rfl⟩ := Finset.mem_image.mp h
       exact (Finset.mem_filter.mp ht).2
   let B : Subalgebra O L := Algebra.adjoin O (S : Set L)
-  let VA : Subalgebra O L :=
-    { V.toSubring with algebraMap_mem' := fun s => hV s }
+  let VA : Subalgebra O L := { V.toSubring with algebraMap_mem' := fun s => hV s }
   have hBV : B ≤ VA := Algebra.adjoin_le (fun x hx => hSV x hx)
   haveI : Algebra.FiniteType O B :=
     (Subalgebra.fg_iff_finiteType B).1 (Subalgebra.fg_adjoin_finset S)
-  let f : B →+* V :=
-    { toFun := fun x => ⟨x.1, hBV x.2⟩
-      map_one' := rfl
-      map_mul' := fun _ _ => rfl
-      map_zero' := rfl
-      map_add' := fun _ _ => rfl }
+  let f : B →+* V := {
+    toFun := fun x => ⟨x.1, hBV x.2⟩
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
   let n : Ideal B := (IsLocalRing.maximalIdeal V).comap f
   have hn : n ≠ ⊤ := by
     intro h

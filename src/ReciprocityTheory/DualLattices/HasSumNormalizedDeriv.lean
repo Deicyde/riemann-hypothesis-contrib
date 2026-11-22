@@ -19,9 +19,10 @@ lemma qParam_one_pow_eq_cexp (z : ℂ) (m : ℕ) :
   push_cast
   ring
 
-theorem hasSum_normalizedDeriv {F : ℍ → ℂ} {c : ℕ → ℂ}
-    (hF : ∀ τ : ℍ, HasSum (fun m ↦ c m • 𝕢 1 τ ^ m) (F τ)) (τ : ℍ) :
-    HasSum (fun m : ℕ ↦ ((m : ℂ) * c m) • 𝕢 1 τ ^ m)
+theorem hasSum_normalizedDeriv
+    {F : ℍ → ℂ} {c : ℕ → ℂ} (hF : ∀ τ : ℍ, HasSum (fun m ↦ c m • 𝕢 1 τ ^ m) (F τ)) (τ : ℍ)
+    : HasSum
+      (fun m : ℕ ↦ ((m : ℂ) * c m) • 𝕢 1 τ ^ m)
       (Derivative.normalizedDerivOfComplex F τ) := by
   set y0 : ℝ := τ.im / 2 with hy0
   have hy0pos : 0 < y0 := by have := τ.im_pos; positivity
@@ -67,8 +68,7 @@ theorem hasSum_normalizedDeriv {F : ℍ → ℂ} {c : ℕ → ℂ}
   simp only [hderiv] at hmain
   have hfin := hmain.mul_left (2 * π * I)⁻¹
   unfold Derivative.normalizedDerivOfComplex
-  have h2pi : (2 * π * I : ℂ) ≠ 0 := by
-    simp [Real.pi_ne_zero, I_ne_zero]
+  have h2pi : (2 * π * I : ℂ) ≠ 0 := by simp [Real.pi_ne_zero, I_ne_zero]
   refine hfin.congr_fun fun m ↦ ?_
   rw [smul_eq_mul, qParam_one_pow_eq_cexp]
   field_simp

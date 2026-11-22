@@ -56,7 +56,8 @@ end Grp
 
 section Unit
 
-variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+variable
+  {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
 
 lemma inner_sig_sig (hσ : IsURepOn (UJset ε) σ) {g : Matrix (Fin n) (Fin n) ℂ} (hg : inUJ ε g)
@@ -92,15 +93,19 @@ end Unit
 
 section Op
 
-variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+variable
+  {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {W : Type*} [NormedAddCommGroup W] [InnerProductSpace ℂ W] [FiniteDimensional ℂ W]
   {D : Submodule ℂ H} {V : Submodule ℂ D}
 
-abbrev ob (W : Type*) [NormedAddCommGroup W] [InnerProductSpace ℂ W] [FiniteDimensional ℂ W] :
-    OrthonormalBasis (Fin (Module.finrank ℂ W)) ℂ W := stdOrthonormalBasis ℂ W
+abbrev ob (W : Type*) [NormedAddCommGroup W] [InnerProductSpace ℂ W] [FiniteDimensional ℂ W]
+    : OrthonormalBasis (Fin (Module.finrank ℂ W)) ℂ W :=
+  stdOrthonormalBasis ℂ W
 
-def opC (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (ι : V ≃ₗ[ℂ] W)
-    (h : Matrix (Fin n) (Fin n) ℂ) (B : Module.End ℂ D) : W →L[ℂ] W :=
+def opC
+    (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (ι : V ≃ₗ[ℂ] W) (h : Matrix (Fin n) (Fin n) ℂ)
+    (B : Module.End ℂ D)
+    : W →L[ℂ] W :=
   ∑ i, ∑ j, ⟪(((ι.symm (ob W i) : V) : D) : H), σ h ((B ((ι.symm (ob W j) : V) : D) : D) : H)⟫_ℂ •
     (innerSL ℂ (ob W j)).smulRight (ob W i)
 
@@ -152,7 +157,8 @@ end Op
 
 section Deriv
 
-variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+variable
+  {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {W : Type*} [NormedAddCommGroup W] [InnerProductSpace ℂ W] [FiniteDimensional ℂ W]
   {D : Submodule ℂ H} {V : Submodule ℂ D} {ε : Fin n → Bool}
   {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {E : Fin n → Fin n → Module.End ℂ D}

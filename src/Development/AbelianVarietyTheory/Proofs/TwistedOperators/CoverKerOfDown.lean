@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.DerivedAd
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
 open Matrix MeasureTheory GlobalTheory.Chain GlobalTheory.Chain.RealIt
 open GlobalTheory.IndefiniteRowSideFullHecke.KTypeExtension (kFin KVec KMap maxCpt rep_mem_kFin)
 open scoped TensorProduct InnerProductSpace Classical
@@ -20,15 +22,21 @@ namespace GlobalTheory.Chain.IoLift.CoverKernel
 
 variable {p q r s : ℕ}
 
-theorem exists_real_imag (Z : Mat p q) : ∃ X Y : Mat p q, X ∈ upq p q ∧ Y ∈ upq p q ∧
-    Z = X + Complex.I • Y ∧ adjZ Z = -X + Complex.I • Y := by
-  have hs : star ((2:ℂ)⁻¹) = (2:ℂ)⁻¹ := by simp
-  have hs' : star (-(Complex.I * (2:ℂ)⁻¹)) = Complex.I * (2:ℂ)⁻¹ := by
-    simp [Complex.conj_I]
-  have hc : Complex.I * -(Complex.I * (2:ℂ)⁻¹) = (2:ℂ)⁻¹ := by
+theorem exists_real_imag (Z : Mat p q)
+    : ∃ X Y : Mat p q,
+      X ∈ upq p q ∧ Y ∈ upq p q ∧ Z = X + Complex.I • Y ∧ adjZ Z = -X + Complex.I • Y := by
+  have hs : star ((2 : ℂ)⁻¹) = (2 : ℂ)⁻¹ := by simp
+  have hs' : star (-(Complex.I * (2 : ℂ)⁻¹)) = Complex.I * (2 : ℂ)⁻¹ := by simp [Complex.conj_I]
+  have hc : Complex.I * -(Complex.I * (2 : ℂ)⁻¹) = (2 : ℂ)⁻¹ := by
     linear_combination (-(2:ℂ)⁻¹) * Complex.I_sq
-  refine ⟨(2:ℂ)⁻¹ • (Z - adjZ Z), (-(Complex.I * (2:ℂ)⁻¹)) • (Z + adjZ Z),
-    mem_upq_of_adjZ ?_, mem_upq_of_adjZ ?_, ?_, ?_⟩
+  refine ⟨
+    (2 : ℂ)⁻¹ • (Z - adjZ Z),
+    (-(Complex.I * (2 : ℂ)⁻¹)) • (Z + adjZ Z),
+    mem_upq_of_adjZ ?_,
+    mem_upq_of_adjZ ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [adjZ_smul, adjZ_sub, adjZ_adjZ, hs]
     module
   · rw [adjZ_smul, adjZ_add, adjZ_adjZ, hs']
@@ -38,61 +46,78 @@ theorem exists_real_imag (Z : Mat p q) : ∃ X Y : Mat p q, X ∈ upq p q ∧ Y 
   · rw [smul_smul, hc]
     module
 
-theorem adjRule_of_pair {N : GKMod r s} {Z : Type} [NormedAddCommGroup Z] [InnerProductSpace ℂ Z]
-    {B : Pol p q r s →ₗ[ℂ] N.V →ₛₗ[starRingEnd ℂ] Z} (h : IsCoverPair N B) : AdjRule B := by
+theorem adjRule_of_pair
+    {N : GKMod r s} {Z : Type} [NormedAddCommGroup Z] [InnerProductSpace ℂ Z]
+    {B : Pol p q r s →ₗ[ℂ] N.V →ₛₗ[starRingEnd ℂ] Z} (h : IsCoverPair N B)
+    : AdjRule B := by
   intro X P P' y y'
   obtain ⟨A, C, hA, hC, rfl, hadj⟩ := exists_real_imag X
   rw [hadj]
   have sA := h.skew A hA P P' y y'
   have sC := h.skew C hC P P' y y'
-  simp only [map_add (f := _), map_smul, map_neg, LinearMap.add_apply, LinearMap.smul_apply, LinearMap.neg_apply,
-    inner_add_left, inner_add_right, inner_smul_left, inner_smul_right, inner_neg_right, Complex.conj_I]
+  simp only [map_add (f := _), map_smul, map_neg, LinearMap.add_apply, LinearMap.smul_apply,
+    LinearMap.neg_apply, inner_add_left, inner_add_right, inner_smul_left, inner_smul_right,
+    inner_neg_right, Complex.conj_I]
   linear_combination sA - Complex.I * sC
 
-theorem invRule_of_pair {N : GKMod r s} {Z : Type} [NormedAddCommGroup Z] [InnerProductSpace ℂ Z]
-    {B : Pol p q r s →ₗ[ℂ] N.V →ₛₗ[starRingEnd ℂ] Z} (h : IsCoverPair N B) : InvRule N B := by
+theorem invRule_of_pair
+    {N : GKMod r s} {Z : Type} [NormedAddCommGroup Z] [InnerProductSpace ℂ Z]
+    {B : Pol p q r s →ₗ[ℂ] N.V →ₛₗ[starRingEnd ℂ] Z} (h : IsCoverPair N B)
+    : InvRule N B := by
   intro Y P y
   obtain ⟨A, C, hA, hC, rfl, hadj⟩ := exists_real_imag Y
   rw [hadj]
   have iA := eq_neg_of_add_eq_zero_left (h.inv A hA P y)
   have iC := eq_neg_of_add_eq_zero_left (h.inv C hC P y)
-  simp only [map_add (f := _), map_smul, map_neg, map_smulₛₗ, LinearMap.add_apply, LinearMap.smul_apply,
-    LinearMap.neg_apply, Complex.conj_I]
+  simp only [map_add (f := _), map_smul, map_neg, map_smulₛₗ, LinearMap.add_apply,
+    LinearMap.smul_apply, LinearMap.neg_apply, Complex.conj_I]
   rw [iA, iC]
   module
 
-def pairSum {U Y Z₁ Z₂ : Type} [AddCommGroup U] [Module ℂ U] [AddCommGroup Y] [Module ℂ Y]
-    [NormedAddCommGroup Z₁] [InnerProductSpace ℂ Z₁] [NormedAddCommGroup Z₂] [InnerProductSpace ℂ Z₂]
-    (B₁ : U →ₗ[ℂ] Y →ₛₗ[starRingEnd ℂ] Z₁) (B₂ : U →ₗ[ℂ] Y →ₛₗ[starRingEnd ℂ] Z₂) :
-    U →ₗ[ℂ] Y →ₛₗ[starRingEnd ℂ] WithLp 2 (Z₁ × Z₂) :=
-  LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ) (fun P y => WithLp.toLp 2 (B₁ P y, B₂ P y))
+def pairSum
+    {U Y Z₁ Z₂ : Type}
+    [AddCommGroup U] [Module ℂ U] [AddCommGroup Y] [Module ℂ Y] [NormedAddCommGroup Z₁]
+    [InnerProductSpace ℂ Z₁] [NormedAddCommGroup Z₂] [InnerProductSpace ℂ Z₂]
+    (B₁ : U →ₗ[ℂ] Y →ₛₗ[starRingEnd ℂ] Z₁) (B₂ : U →ₗ[ℂ] Y →ₛₗ[starRingEnd ℂ] Z₂)
+    : U →ₗ[ℂ] Y →ₛₗ[starRingEnd ℂ] WithLp 2 (Z₁ × Z₂) :=
+  LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ)
+    (fun P y => WithLp.toLp 2 (B₁ P y, B₂ P y))
     (fun _ _ _ => by simp [← WithLp.toLp_add])
     (fun _ _ _ => by simp [← WithLp.toLp_smul])
     (fun _ _ _ => by simp [← WithLp.toLp_add])
     (fun _ _ _ => by simp [← WithLp.toLp_smul])
 
-theorem pairSum_apply {U Y Z₁ Z₂ : Type} [AddCommGroup U] [Module ℂ U] [AddCommGroup Y] [Module ℂ Y]
-    [NormedAddCommGroup Z₁] [InnerProductSpace ℂ Z₁] [NormedAddCommGroup Z₂] [InnerProductSpace ℂ Z₂]
-    (B₁ : U →ₗ[ℂ] Y →ₛₗ[starRingEnd ℂ] Z₁) (B₂ : U →ₗ[ℂ] Y →ₛₗ[starRingEnd ℂ] Z₂) (P : U) (y : Y) :
-    pairSum B₁ B₂ P y = WithLp.toLp 2 (B₁ P y, B₂ P y) := rfl
+theorem pairSum_apply
+    {U Y Z₁ Z₂ : Type}
+    [AddCommGroup U] [Module ℂ U] [AddCommGroup Y] [Module ℂ Y] [NormedAddCommGroup Z₁]
+    [InnerProductSpace ℂ Z₁] [NormedAddCommGroup Z₂] [InnerProductSpace ℂ Z₂]
+    (B₁ : U →ₗ[ℂ] Y →ₛₗ[starRingEnd ℂ] Z₁) (B₂ : U →ₗ[ℂ] Y →ₛₗ[starRingEnd ℂ] Z₂) (P : U) (y : Y)
+    : pairSum B₁ B₂ P y = WithLp.toLp 2 (B₁ P y, B₂ P y) :=
+  rfl
 
-theorem contr_tmul {A V H : Type} [AddCommGroup A] [Module ℂ A] [AddCommGroup V] [Module ℂ V] [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] (ι : V →ₗ[ℂ] H) (y : V) (a : A) (v : V) :
-    contr ι y (a ⊗ₜ[ℂ] v) = ⟪ι y, ι v⟫_ℂ • a := by
+theorem contr_tmul
+    {A V H : Type} [AddCommGroup A] [Module ℂ A] [AddCommGroup V] [Module ℂ V]
+    [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (ι : V →ₗ[ℂ] H) (y : V) (a : A) (v : V)
+    : contr ι y (a ⊗ₜ[ℂ] v) = ⟪ι y, ι v⟫_ℂ • a := by
   simp [contr]
 
-theorem contr_map_left {A A' V H : Type} [AddCommGroup A] [Module ℂ A] [AddCommGroup A'] [Module ℂ A']
-    [AddCommGroup V] [Module ℂ V] [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] (ι : V →ₗ[ℂ] H) (y : V) (g : A →ₗ[ℂ] A') (t : A ⊗[ℂ] V) :
-    contr ι y (TensorProduct.map g LinearMap.id t) = g (contr ι y t) := by
+theorem contr_map_left
+    {A A' V H : Type} [AddCommGroup A] [Module ℂ A] [AddCommGroup A'] [Module ℂ A'] [AddCommGroup V]
+    [Module ℂ V] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (ι : V →ₗ[ℂ] H) (y : V) (g : A →ₗ[ℂ] A') (t : A ⊗[ℂ] V)
+    : contr ι y (TensorProduct.map g LinearMap.id t) = g (contr ι y t) := by
   induction t using TensorProduct.induction_on with
   | zero => simp
   | tmul a v => simp only [TensorProduct.map_tmul, LinearMap.id_apply, contr_tmul, map_smul]
   | add x w hx hw => simp only [map_add (f := _), hx, hw]
 
-theorem contr_map_right {A : Type} [AddCommGroup A] [Module ℂ A] {T : GrpData r s} (R : DSRep T)
-    (Y : Mat r s) (y : R.HK.V) (t : A ⊗[ℂ] R.HK.V) :
-    contr R.ι y (TensorProduct.map LinearMap.id (R.HK.act Y) t) = contr R.ι (R.HK.act (adjZ Y) y) t := by
+theorem contr_map_right
+    {A : Type} [AddCommGroup A] [Module ℂ A]
+    {T : GrpData r s} (R : DSRep T)
+    (Y : Mat r s) (y : R.HK.V) (t : A ⊗[ℂ] R.HK.V)
+    : contr R.ι y (TensorProduct.map LinearMap.id (R.HK.act Y) t)
+      = contr R.ι (R.HK.act (adjZ Y) y) t := by
   induction t using TensorProduct.induction_on with
   | zero => simp
   | tmul a v =>
@@ -103,9 +128,12 @@ theorem contr_map_right {A : Type} [AddCommGroup A] [Module ℂ A] {T : GrpData 
     exact key.symm
   | add x w hx hw => simp only [map_add (f := _), hx, hw]
 
-private theorem inner_eq_inner_of_eq_on_spanning {V W : Type} [AddCommGroup V] [Module ℂ V] [NormedAddCommGroup W]
-    [InnerProductSpace ℂ W] {S : Set V} (hS : Submodule.span ℂ S = ⊤) (f g k l : V →ₗ[ℂ] W)
-    (h : ∀ x ∈ S, ∀ w ∈ S, ⟪f x, g w⟫_ℂ = ⟪k x, l w⟫_ℂ) (x w : V) : ⟪f x, g w⟫_ℂ = ⟪k x, l w⟫_ℂ := by
+private theorem inner_eq_inner_of_eq_on_spanning
+    {V W : Type} [AddCommGroup V] [Module ℂ V] [NormedAddCommGroup W] [InnerProductSpace ℂ W]
+    {S : Set V} (hS : Submodule.span ℂ S = ⊤)
+    (f g k l : V →ₗ[ℂ] W) (h : ∀ x ∈ S, ∀ w ∈ S, ⟪f x, g w⟫_ℂ = ⟪k x, l w⟫_ℂ)
+    (x w : V)
+    : ⟪f x, g w⟫_ℂ = ⟪k x, l w⟫_ℂ := by
   have hx : x ∈ Submodule.span ℂ S := by
     rw [hS]
     exact Submodule.mem_top
@@ -123,7 +151,12 @@ private theorem inner_eq_inner_of_eq_on_spanning {V W : Type} [AddCommGroup V] [
   | add a b _ _ ha hb => simp only [map_add (f := _), inner_add_left, ha, hb]
   | smul c a _ ha => simp only [map_smul, inner_smul_left, ha]
 
-theorem coverKer_of_down : ∀ (X : ProvA) (p q r s : ℕ) (lam : Ix p q → ℚ) (lam' : Ix r s → ℚ), Formalism.MainNotions.SchurIrreducible.ARiiiDown X lam lam' → Formalism.MainNotions.SchurIrreducible.IrrGK (X.ds p q lam).HK → UnitaryImage p q r s → FiniteSupport p q (X.ds r s lam') → TensorForm → CoverKer p q (X.ds r s lam').HK := by
+theorem coverKer_of_down
+    : ∀ (X : ProvA) (p q r s : ℕ) (lam : Ix p q → ℚ) (lam' : Ix r s → ℚ),
+      Formalism.MainNotions.SchurIrreducible.ARiiiDown X lam lam'
+        → Formalism.MainNotions.SchurIrreducible.IrrGK (X.ds p q lam).HK → UnitaryImage p q r s
+        → FiniteSupport p q (X.ds r s lam') → TensorForm
+        → CoverKer p q (X.ds r s lam').HK := by
   intro X p q r s lam lam' hD hIrr hU hF hT Z₁ Z₂ _ _ _ _ B₁ B₂ h₁ h₂ hne
   unfold Formalism.MainNotions.SchurIrreducible.ARiiiDown at hD
   unfold Formalism.MainNotions.SchurIrreducible.IrrGK at hIrr
@@ -147,19 +180,23 @@ theorem coverKer_of_down : ∀ (X : ProvA) (p q r s : ℕ) (lam : Ix p q → ℚ
     rw [hjB, hjB]
     exact invRule_of_pair hB Y P y
 
-  obtain ⟨hsep, hfac⟩ := hT (Pol p q r s) A.M.V (X.ds r s lam').HK.V (X.ds r s lam').U.H
-    (X.ds r s lam').ι (X.ds r s lam').ι_inj
+  obtain ⟨hsep, hfac⟩ :=
+    hT (Pol p q r s) A.M.V (X.ds r s lam').HK.V (X.ds r s lam').U.H (X.ds r s lam').ι
+      (X.ds r s lam').ι_inj
   obtain ⟨f, hf⟩ := hfac B' (hF A.M.V B' hinv')
-  have hint1 : ∀ Y : Mat p q,
-      f ∘ₗ (X.fock p q r s).act1 Y = TensorProduct.map (A.M.act Y) LinearMap.id ∘ₗ f := by
+  have hint1
+      : ∀ Y : Mat p q,
+        f ∘ₗ (X.fock p q r s).act1 Y = TensorProduct.map (A.M.act Y) LinearMap.id ∘ₗ f := by
     intro Y
     refine LinearMap.ext fun P => ?_
     rw [← sub_eq_zero]
     refine hsep _ fun y => ?_
     rw [map_sub, sub_eq_zero, LinearMap.comp_apply, LinearMap.comp_apply, contr_map_left, hf, hf]
     exact hB'act Y P y
-  have hint2 : ∀ Y : Mat r s,
-      f ∘ₗ (X.fock p q r s).act2 Y = TensorProduct.map LinearMap.id ((X.ds r s lam').HK.act Y) ∘ₗ f := by
+  have hint2
+      : ∀ Y : Mat r s,
+        f ∘ₗ (X.fock p q r s).act2 Y
+          = TensorProduct.map LinearMap.id ((X.ds r s lam').HK.act Y) ∘ₗ f := by
     intro Y
     refine LinearMap.ext fun P => ?_
     rw [← sub_eq_zero]
@@ -200,10 +237,12 @@ theorem coverKer_of_down : ∀ (X : ProvA) (p q r s : ℕ) (lam : Ix p q → ℚ
   have hψ₁ : ∀ P y, ψ₁ (B' P y) = B₁ P y := fun P y => congrArg Prod.fst (hψ P y)
   have hψ₂ : ∀ P y, ψ₂ (B' P y) = B₂ P y := fun P y => congrArg Prod.snd (hψ P y)
 
-  have hsesq : ∀ (Y : Mat p q) (x w : A.M.V),
-      ⟪ψ₁ (A.M.act Y x), ψ₁ w⟫_ℂ = ⟪ψ₁ x, ψ₁ (A.M.act (adjZ Y) w)⟫_ℂ := by
+  have hsesq
+      : ∀ (Y : Mat p q) (x w : A.M.V),
+        ⟪ψ₁ (A.M.act Y x), ψ₁ w⟫_ℂ = ⟪ψ₁ x, ψ₁ (A.M.act (adjZ Y) w)⟫_ℂ := by
     intro Y
-    refine inner_eq_inner_of_eq_on_spanning hspan (ψ₁ ∘ₗ A.M.act Y) ψ₁ ψ₁ (ψ₁ ∘ₗ A.M.act (adjZ Y)) ?_
+    refine inner_eq_inner_of_eq_on_spanning hspan (ψ₁ ∘ₗ A.M.act Y) ψ₁ ψ₁ (ψ₁ ∘ₗ A.M.act (adjZ Y))
+      ?_
     rintro _ ⟨P, y, rfl⟩ _ ⟨P', y', rfl⟩
     simp only [LinearMap.comp_apply]
     rw [← hB'act, ← hB'act]

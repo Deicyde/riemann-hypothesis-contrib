@@ -6,14 +6,17 @@ public import Mathlib
 
 open NumberField
 
-theorem UpperTheory.unramified_anti_invariant_local :
-    ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E),
-      Module.finrank F E = 2 →
-      Algebra.Unramified (NumberField.RingOfIntegers F) (NumberField.RingOfIntegers E) →
-      ∀ (ξ : E), ξ ≠ 0 → σ ξ = -ξ →
-      ∀ (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)),
-        ∃ (a b : NumberField.RingOfIntegers E) (n : NumberField.RingOfIntegers F),
-          n ∉ v.asIdeal ∧ σ (a : E) = -(a : E) ∧ (a : E) * (b : E) = algebraMap F E (n : F) := by
+theorem UpperTheory.unramified_anti_invariant_local
+    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      Module.finrank F E = 2
+        → Algebra.Unramified (NumberField.RingOfIntegers F) (NumberField.RingOfIntegers E)
+        → ∀ (ξ : E),
+          ξ ≠ 0 → σ ξ = -ξ
+            → ∀ (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)),
+              ∃ (a b : NumberField.RingOfIntegers E) (n : NumberField.RingOfIntegers F),
+                n ∉ v.asIdeal ∧ σ (a : E) = -(a : E)
+                  ∧ (a : E) * (b : E) = algebraMap F E (n : F) := by
   intro F E _ _ _ _ _ σ hr hU ξ hξ hσ v
   have hne : σ ξ ≠ ξ := by
     intro h
@@ -62,7 +65,7 @@ theorem UpperTheory.unramified_anti_invariant_local :
     rw [this, map_sub, hinv, neg_sub]
   obtain ⟨c, hc⟩ := hfix ((a : E) * a) (by rw [map_mul, hσa, neg_mul_neg])
   have hci : IsIntegral ℤ c := by
-    rw [← isIntegral_algebraMap_iff (B := E) , hc]
+    rw [← isIntegral_algebraMap_iff (B := E), hc]
     exact a.isIntegral_coe.mul a.isIntegral_coe
   refine ⟨a, a, ⟨c, hci⟩, ?_, hσa, hc.symm⟩
   intro hn

@@ -59,5 +59,6 @@ theorem UpperTheory.V.Z.Sym.Unl.eisCj : UpperTheory.V.Z.Sym.Unl.EisCj := by
   · set_option synthInstance.maxHeartbeats 100000 in
     rw [(eisCoef N k hk _ hsa).2 n hn, (eisCoef N k hk _ ha).2 n hn, map_sum]
     refine Finset.sum_congr rfl fun e _ => ?_
-    rw [map_mul σ, map_pow σ, map_natCast σ, map_add σ, map_mul σ, map_pow σ, map_neg σ, map_one σ, hs, hs, hu]
+    rw [map_mul σ, map_pow σ, map_natCast σ, map_add σ, map_mul σ, map_pow σ, map_neg σ, map_one σ,
+      hs, hs, hu]
     simp only [mul_assoc, mul_neg]

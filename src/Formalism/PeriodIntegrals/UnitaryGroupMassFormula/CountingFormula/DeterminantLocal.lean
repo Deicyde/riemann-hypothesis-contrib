@@ -34,7 +34,8 @@ theorem determinant_local : DetLocal := by
     | mem s hs =>
       obtain ⟨t, ht, rfl⟩ := hs
       exact (hfix _).2 ⟨(t : F), rfl⟩
-    | one => simp
+    | one =>
+      simp
     | mul s s' _ _ h1 h2 =>
       rw [show ((s * s' : 𝓞 K) : K) = (s : K) * (s' : K) from rfl, star_mul', h1, h2]
 
@@ -63,13 +64,13 @@ theorem determinant_local : DetLocal := by
     refine Finset.prod_ne_zero_iff.mpr fun j _ => ?_
     rw [map_ne_zero_iff _ (algebraMap F K).injective]
     exact_mod_cast ha0 j
-  have hCdet : C.det ≠ 0 := by
-    intro h0; apply ha0'; rw [hdetb, h0]; simp
-  have hsCdet : star C.det ≠ 0 := by
-    intro h0; apply hCdet; rw [← star_star C.det, h0, star_zero]
-  have hlocmem : ∀ v, v ∈ locF 𝔭 (Submodule.span (𝓞 K) (Set.range b)) ↔ ∃ s ∈ S, s • v ∈ pbLat x 𝔞 := by
+  have hCdet : C.det ≠ 0 := by intro h0; apply ha0'; rw [hdetb, h0]; simp
+  have hsCdet : star C.det ≠ 0 := by intro h0; apply hCdet; rw [← star_star C.det, h0, star_zero]
+  have hlocmem
+      : ∀ v, v ∈ locF 𝔭 (Submodule.span (𝓞 K) (Set.range b)) ↔ ∃ s ∈ S, s • v ∈ pbLat x 𝔞 := by
     intro v; rw [hloc]; exact Iff.rfl
-  have hlocmem2 : ∀ v, v ∈ locF 𝔭 (pbLat x 𝔞) ↔ ∃ s ∈ S, s • v ∈ Submodule.span (𝓞 K) (Set.range b) := by
+  have hlocmem2
+      : ∀ v, v ∈ locF 𝔭 (pbLat x 𝔞) ↔ ∃ s ∈ S, s • v ∈ Submodule.span (𝓞 K) (Set.range b) := by
     intro v; rw [← hloc]; exact Iff.rfl
   have hcoeS : ∀ o : 𝓞 K, ∀ v : V, ((o : K)) • v = o • v := fun o v => algebraMap_smul K o v
 
@@ -91,21 +92,29 @@ theorem determinant_local : DetLocal := by
     det_mem_prod 𝔞 _ fun i k => by rw [Matrix.mul_diagonal]; exact hrow i k
   rw [Matrix.det_mul, Matrix.det_diagonal] at hM
   have hT : (∏ k, t k) ∈ S := Submonoid.prod_mem S fun k _ => htS k
-  have hTc : (∏ k, (t k : K)) = ((∏ k, t k : 𝓞 K) : K) := by
-    rw [← map_prod (algebraMap (𝓞 K) K)]
+  have hTc : (∏ k, (t k : K)) = ((∏ k, t k : 𝓞 K) : K) := by rw [← map_prod (algebraMap (𝓞 K) K)]
   have hT0 : (∏ k, (t k : K)) ≠ 0 := by
-    rw [hTc]; intro h0
+    rw [hTc]
+    intro h0
     apply hS1 _ hT
     have : (∏ k, t k : 𝓞 K) = 0 := by exact_mod_cast h0
-    rw [this]; exact P.asIdeal.zero_mem
-  have hcT : FractionalIdeal.count K P (FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K)) (∏ k, (t k : K))) = 0 := by
+    rw [this]
+    exact P.asIdeal.zero_mem
+  have hcT
+      : FractionalIdeal.count K P
+          (FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K)) (∏ k, (t k : K)))
+        = 0 := by
     rw [hTc]; exact count_span_unit P _ (hS1 _ hT)
-  have hB1 : FractionalIdeal.count K P (∏ i, 𝔞 i) ≤
-      FractionalIdeal.count K P (FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K)) C.det) := by
+  have hB1
+      : FractionalIdeal.count K P (∏ i, 𝔞 i)
+        ≤ FractionalIdeal.count K P
+          (FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K)) C.det) := by
     have := count_le_of_mem (K := K) P hM (mul_ne_zero hCdet hT0)
     rwa [count_span_mul P hCdet hT0, hcT, add_zero] at this
-  have hB2 : FractionalIdeal.count K P (∏ i, 𝔞 i) ≤
-      FractionalIdeal.count K P (FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K)) (star C.det)) := by
+  have hB2
+      : FractionalIdeal.count K P (∏ i, 𝔞 i)
+        ≤ FractionalIdeal.count K P
+          (FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K)) (star C.det)) := by
     have hsM := sStable_prod Finset.univ 𝔞 (fun i => hstar i) _ hM
     have hsT : star (∏ k, (t k : K)) = ∏ k, (t k : K) := by rw [hTc]; exact hS2 _ hT
     rw [star_mul', hsT] at hsM
@@ -114,7 +123,8 @@ theorem determinant_local : DetLocal := by
 
   have hb'det : (gram h b').det ≠ 0 := by
     rw [hgdiag, Matrix.det_diagonal, Equiv.prod_comp σ (fun j => algebraMap F K ((a j : 𝓞 F) : F))]
-    rw [← map_prod]; exact ha0'
+    rw [← map_prod]
+    exact ha0'
   have hbind : LinearIndependent K b' := linearIndependent_of_det_gram h b' hb'det
   have hCinv : C * C⁻¹ = 1 := Matrix.mul_nonsing_inv C (isUnit_iff_ne_zero.mpr hCdet)
   have hx : ∀ i, x i = ∑ k, C⁻¹ k i • b' k := by
@@ -127,8 +137,11 @@ theorem determinant_local : DetLocal := by
       exact Finset.sum_congr rfl fun k _ => mul_comm _ _
     simp_rw [← Finset.sum_smul, e4, Matrix.one_apply]
     simp
-  have hint2 : ∀ z : ι → K, (∀ i, z i ∈ 𝔞 i) → ∃ s ∈ S,
-      (C.det)⁻¹ * (s : K) * ∏ i, z i ∈ (1 : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) := by
+  have hint2
+      : ∀ z : ι → K,
+        (∀ i, z i ∈ 𝔞 i)
+          → ∃ s ∈ S,
+            (C.det)⁻¹ * (s : K) * ∏ i, z i ∈ (1 : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) := by
     intro z hz
     have h1 : ∀ i, ∃ s ∈ S, ∃ e : Fin (finrank K X) → 𝓞 K, ∑ j, e j • b j = s • (z i • x i) := by
       intro i
@@ -139,7 +152,8 @@ theorem determinant_local : DetLocal := by
     choose s hsS e he using h1
     have hcoord : ∀ i k, ((e i (σ k) : 𝓞 K) : K) = C⁻¹ k i * ((s i : K) * z i) := by
       intro i k
-      have e3 : ∑ k, ((e i (σ k) : 𝓞 K) : K) • b' k = ∑ k, (C⁻¹ k i * ((s i : K) * z i)) • b' k := by
+      have e3
+          : ∑ k, ((e i (σ k) : 𝓞 K) : K) • b' k = ∑ k, (C⁻¹ k i * ((s i : K) * z i)) • b' k := by
         have l1 : ∑ k, ((e i (σ k) : 𝓞 K) : K) • b' k = ∑ j, e i j • b j := by
           rw [← Equiv.sum_comp σ (fun j => e i j • b j)]
           exact Finset.sum_congr rfl fun k _ => hcoeS _ _
@@ -157,7 +171,8 @@ theorem determinant_local : DetLocal := by
       exact hcoord i k
     have hdY := congrArg Matrix.det hY
     rw [← RingHom.mapMatrix_apply, ← RingHom.map_det, Matrix.det_mul, Matrix.det_diagonal,
-      Matrix.det_nonsing_inv, Ring.inverse_eq_inv'] at hdY
+        Matrix.det_nonsing_inv, Ring.inverse_eq_inv']
+      at hdY
     rw [FractionalIdeal.mem_one_iff]
     refine ⟨Yo.det, ?_⟩
     rw [hdY, Finset.prod_mul_distrib, ← map_prod (algebraMap (𝓞 K) K) s]
@@ -168,7 +183,8 @@ theorem determinant_local : DetLocal := by
     FractionalIdeal.count_prod K P _ _ (fun i _ => hne i)
   obtain ⟨s1, hs1, hw1⟩ := hint2 y hyI
   obtain ⟨s2, hs2, hw2⟩ := hint2 (fun i => star (y i)) (fun i => hstar i _ (hyI i))
-  have hw2' : (star C.det)⁻¹ * (s2 : K) * ∏ i, y i ∈ (1 : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) := by
+  have hw2'
+      : (star C.det)⁻¹ * (s2 : K) * ∏ i, y i ∈ (1 : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) := by
     have h3 := sStable_one (K := K) _ hw2
     have hsp : star (∏ i, star (y i)) = ∏ i, y i := by
       rw [← starRingEnd_apply, map_prod]

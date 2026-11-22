@@ -20,31 +20,32 @@ variable {W : Type*} [NormedAddCommGroup W] [InnerProductSpace ℝ W] [FiniteDim
 
 def Sep (L : Submodule ℤ W) (lam : ℝ) : Prop := ∀ x ∈ L, x ≠ 0 → lam ≤ ‖x‖
 
-
 omit [InnerProductSpace ℝ W] [FiniteDimensional ℝ W] in
-theorem discreteTopology_of_sep {L : Submodule ℤ W} {lam : ℝ} (hlam : 0 < lam) (h : Sep L lam) :
-    DiscreteTopology L := by
+theorem discreteTopology_of_sep {L : Submodule ℤ W} {lam : ℝ} (hlam : 0 < lam) (h : Sep L lam)
+    : DiscreteTopology L := by
   refine DiscreteTopology.of_forall_le_dist hlam fun x y hxy => ?_
   show lam ≤ dist x y
   rw [Subtype.dist_eq, dist_eq_norm]
   have hne : (x : W) - y ≠ 0 := sub_ne_zero.2 fun h' => hxy (Subtype.ext h')
   exact h _ (L.sub_mem x.2 y.2) hne
 
-theorem finite_of_sep {L : Submodule ℤ W} {lam : ℝ} (hlam : 0 < lam) (h : Sep L lam) (r : ℝ) :
-    {x : W | x ∈ L ∧ ‖x‖ ≤ r}.Finite := by
+theorem finite_of_sep {L : Submodule ℤ W} {lam : ℝ} (hlam : 0 < lam) (h : Sep L lam) (r : ℝ)
+    : {x : W | x ∈ L ∧ ‖x‖ ≤ r}.Finite := by
   have := discreteTopology_of_sep hlam h
   letI : MeasurableSpace W := borel W
   letI : BorelSpace W := ⟨rfl⟩
   exact GroundTheory.Heights₂.Heights.finite_lattice_closedBall L r
 
-theorem linearIndependent_real_of_int {n : ℕ} {b : Fin n → W} (hb : LinearIndependent ℤ b)
-    (hd : DiscreteTopology (span ℤ (Set.range b))) : LinearIndependent ℝ b := by
+theorem linearIndependent_real_of_int
+    {n : ℕ} {b : Fin n → W}
+    (hb : LinearIndependent ℤ b) (hd : DiscreteTopology (span ℤ (Set.range b)))
+    : LinearIndependent ℝ b := by
   have h1 := Real.finrank_eq_int_finrank_of_discrete hd
   rw [linearIndependent_iff_card_eq_finrank_span]
   rw [h1, Set.finrank, finrank_span_eq_card hb]
 
-theorem exists_basis_of_discrete (L : Submodule ℤ W) [DiscreteTopology L] :
-    ∃ (n : ℕ) (c : Fin n → W), LinearIndependent ℝ c ∧ span ℤ (Set.range c) = L := by
+theorem exists_basis_of_discrete (L : Submodule ℤ W) [DiscreteTopology L]
+    : ∃ (n : ℕ) (c : Fin n → W), LinearIndependent ℝ c ∧ span ℤ (Set.range c) = L := by
   let b := Module.finBasis ℤ L
   have hspan : span ℤ (Set.range fun i => (b i : W)) = L := by
     rw [show (Set.range fun i => (b i : W)) = L.subtype '' Set.range b by
@@ -56,19 +57,19 @@ theorem exists_basis_of_discrete (L : Submodule ℤ W) [DiscreteTopology L] :
   rw [hspan]
   infer_instance
 
-
 omit [FiniteDimensional ℝ W] in
-theorem gram_comb {k l : Type*} [Fintype k] [Fintype l] (A : Matrix k l ℝ) (b : l → W) :
-    gram ℝ (fun i => ∑ j, A i j • b j) = A * gram ℝ b * Aᵀ := by
+theorem gram_comb {k l : Type*} [Fintype k] [Fintype l] (A : Matrix k l ℝ) (b : l → W)
+    : gram ℝ (fun i => ∑ j, A i j • b j) = A * gram ℝ b * Aᵀ := by
   ext i i'
   simp only [gram, of_apply, Matrix.mul_apply, transpose_apply, sum_inner, inner_sum,
     real_inner_smul_left, real_inner_smul_right, Finset.sum_mul]
   refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun j' _ => by ring
 
-
 omit [FiniteDimensional ℝ W] in
-theorem det_gram_eq_of_span_eq {n : ℕ} {b b' : Fin n → W} (hb : LinearIndependent ℤ b)
-    (h : span ℤ (Set.range b) = span ℤ (Set.range b')) : (gram ℝ b).det = (gram ℝ b').det := by
+theorem det_gram_eq_of_span_eq
+    {n : ℕ} {b b' : Fin n → W}
+    (hb : LinearIndependent ℤ b) (h : span ℤ (Set.range b) = span ℤ (Set.range b'))
+    : (gram ℝ b).det = (gram ℝ b').det := by
   have hP : ∀ i, ∃ c : Fin n → ℤ, ∑ j, c j • b' j = b i := fun i =>
     (mem_span_range_iff_exists_fun ℤ).1 (h ▸ subset_span ⟨i, rfl⟩)
   have hQ : ∀ i, ∃ c : Fin n → ℤ, ∑ j, c j • b j = b' i := fun i =>
@@ -77,8 +78,9 @@ theorem det_gram_eq_of_span_eq {n : ℕ} {b b' : Fin n → W} (hb : LinearIndepe
   choose Q hQ using hQ
   have hPQ : (Matrix.of P) * (Matrix.of Q) = 1 := by
     ext i l
-    have key : ∑ l, ((Matrix.of P * Matrix.of Q) i l - (1 : Matrix (Fin n) (Fin n) ℤ) i l) • b l
-        = 0 := by
+    have key
+        : ∑ l, ((Matrix.of P * Matrix.of Q) i l - (1 : Matrix (Fin n) (Fin n) ℤ) i l) • b l
+          = 0 := by
       simp only [sub_smul, Finset.sum_sub_distrib, Matrix.mul_apply, of_apply, Finset.sum_smul,
         mul_smul]
       rw [Finset.sum_comm]
@@ -109,7 +111,6 @@ def proj (v : W) : W →ₗ[ℝ] W where
 omit [FiniteDimensional ℝ W] in
 theorem proj_apply (v x : W) : proj v x = x - (inner ℝ v x / ‖v‖ ^ 2) • v := rfl
 
-
 omit [FiniteDimensional ℝ W] in
 theorem inner_proj (v x : W) (hv : v ≠ 0) : inner ℝ v (proj v x) = 0 := by
   have hn : ‖v‖ ^ 2 ≠ 0 := pow_ne_zero _ (norm_ne_zero_iff.2 hv)
@@ -123,30 +124,27 @@ theorem proj_smul_self (v : W) (t : ℝ) (hv : v ≠ 0) : proj v (t • v) = 0 :
     mul_one, sub_self]
 
 omit [FiniteDimensional ℝ W] in
-theorem proj_self (v : W) (hv : v ≠ 0) : proj v v = 0 := by
-  simpa using proj_smul_self v 1 hv
-
+theorem proj_self (v : W) (hv : v ≠ 0) : proj v v = 0 := by simpa using proj_smul_self v 1 hv
 
 omit [FiniteDimensional ℝ W] in
-theorem norm_sq_proj_add (v x : W) (hv : v ≠ 0) (s : ℝ) :
-    ‖proj v x + s • v‖ ^ 2 = ‖proj v x‖ ^ 2 + s ^ 2 * ‖v‖ ^ 2 := by
+theorem norm_sq_proj_add (v x : W) (hv : v ≠ 0) (s : ℝ)
+    : ‖proj v x + s • v‖ ^ 2 = ‖proj v x‖ ^ 2 + s ^ 2 * ‖v‖ ^ 2 := by
   rw [norm_add_sq_real, real_inner_smul_right, real_inner_comm, inner_proj v x hv, norm_smul,
     Real.norm_eq_abs, mul_pow, sq_abs]
   ring
 
-
 omit [FiniteDimensional ℝ W] in
-theorem sub_round_smul (v x : W) :
-    x - (round (inner ℝ v x / ‖v‖ ^ 2)) • v =
-      proj v x + (inner ℝ v x / ‖v‖ ^ 2 - round (inner ℝ v x / ‖v‖ ^ 2)) • v := by
+theorem sub_round_smul (v x : W)
+    : x - (round (inner ℝ v x / ‖v‖ ^ 2)) • v
+      = proj v x + (inner ℝ v x / ‖v‖ ^ 2 - round (inner ℝ v x / ‖v‖ ^ 2)) • v := by
   rw [proj_apply, sub_smul, ← Int.cast_smul_eq_zsmul ℝ]
   abel
 
-
 omit [FiniteDimensional ℝ W] in
-theorem mem_zsmul_of_proj_eq_zero {L : Submodule ℤ W} {v : W} (hvL : v ∈ L) (hv : v ≠ 0)
-    (hmin : ∀ x ∈ L, x ≠ 0 → ‖v‖ ≤ ‖x‖) {y : W} (hy : y ∈ L) (h0 : proj v y = 0) :
-    ∃ k : ℤ, y = k • v := by
+theorem mem_zsmul_of_proj_eq_zero
+    {L : Submodule ℤ W} {v : W} (hvL : v ∈ L) (hv : v ≠ 0) (hmin : ∀ x ∈ L, x ≠ 0 → ‖v‖ ≤ ‖x‖)
+    {y : W} (hy : y ∈ L) (h0 : proj v y = 0)
+    : ∃ k : ℤ, y = k • v := by
   refine ⟨round (inner ℝ v y / ‖v‖ ^ 2), ?_⟩
   have hd := sub_round_smul v y
   rw [h0, zero_add] at hd
@@ -158,11 +156,11 @@ theorem mem_zsmul_of_proj_eq_zero {L : Submodule ℤ W} {v : W} (hvL : v ∈ L) 
   have hvpos : 0 < ‖v‖ := norm_pos_iff.2 hv
   nlinarith
 
-
 omit [FiniteDimensional ℝ W] in
-theorem half_le_norm_proj {L : Submodule ℤ W} {v : W} (hvL : v ∈ L) (hv : v ≠ 0)
-    (hmin : ∀ x ∈ L, x ≠ 0 → ‖v‖ ≤ ‖x‖) {x : W} (hx : x ∈ L) (h0 : proj v x ≠ 0) :
-    ‖v‖ / 2 ≤ ‖proj v x‖ := by
+theorem half_le_norm_proj
+    {L : Submodule ℤ W} {v : W} (hvL : v ∈ L) (hv : v ≠ 0) (hmin : ∀ x ∈ L, x ≠ 0 → ‖v‖ ≤ ‖x‖)
+    {x : W} (hx : x ∈ L) (h0 : proj v x ≠ 0)
+    : ‖v‖ / 2 ≤ ‖proj v x‖ := by
   have hd := sub_round_smul v x
   have hmem : x - round (inner ℝ v x / ‖v‖ ^ 2) • v ∈ L := L.sub_mem hx (L.smul_mem _ hvL)
   have hne : x - round (inner ℝ v x / ‖v‖ ^ 2) • v ≠ 0 := by
@@ -184,45 +182,49 @@ theorem half_le_norm_proj {L : Submodule ℤ W} {v : W} (hvL : v ∈ L) (hv : v 
   have hlt' := lt_of_not_ge hlt
   nlinarith [norm_nonneg (proj v x), sq_nonneg ‖v‖]
 
-
 omit [FiniteDimensional ℝ W] in
-theorem exists_lift {L : Submodule ℤ W} {v : W} (hvL : v ∈ L) (hv : v ≠ 0) {x : W} (hx : x ∈ L) :
-    ∃ y ∈ L, proj v y = proj v x ∧ ‖y‖ ≤ ‖proj v x‖ + ‖v‖ / 2 := by
+theorem exists_lift {L : Submodule ℤ W} {v : W} (hvL : v ∈ L) (hv : v ≠ 0) {x : W} (hx : x ∈ L)
+    : ∃ y ∈ L, proj v y = proj v x ∧ ‖y‖ ≤ ‖proj v x‖ + ‖v‖ / 2 := by
   refine ⟨x - round (inner ℝ v x / ‖v‖ ^ 2) • v, L.sub_mem hx (L.smul_mem _ hvL), ?_, ?_⟩
   · rw [map_sub, map_zsmul, proj_self v hv, smul_zero, sub_zero]
   · rw [sub_round_smul]
-    have h1 := norm_add_le (proj v x)
-      ((inner ℝ v x / ‖v‖ ^ 2 - round (inner ℝ v x / ‖v‖ ^ 2)) • v)
+    have h1 := norm_add_le (proj v x) ((inner ℝ v x / ‖v‖ ^ 2 - round (inner ℝ v x / ‖v‖ ^ 2)) • v)
     have h2 : ‖(inner ℝ v x / ‖v‖ ^ 2 - round (inner ℝ v x / ‖v‖ ^ 2)) • v‖ ≤ ‖v‖ / 2 := by
       rw [norm_smul, Real.norm_eq_abs]
       have := abs_sub_round (inner ℝ v x / ‖v‖ ^ 2)
       nlinarith [norm_nonneg v]
     linarith
 
-
 omit [FiniteDimensional ℝ W] in
-theorem det_gram_cons_orth {m : ℕ} (v : W) (c : Fin m → W) (hc : ∀ i, inner ℝ v (c i) = 0) :
-    (gram ℝ (Fin.cons v c : Fin (m + 1) → W)).det = ‖v‖ ^ 2 * (gram ℝ c).det := by
+theorem det_gram_cons_orth {m : ℕ} (v : W) (c : Fin m → W) (hc : ∀ i, inner ℝ v (c i) = 0)
+    : (gram ℝ (Fin.cons v c : Fin (m + 1) → W)).det = ‖v‖ ^ 2 * (gram ℝ c).det := by
   rw [det_succ_row_zero, Fin.sum_univ_succ]
   have h0 : ∀ j : Fin m, gram ℝ (Fin.cons v c : Fin (m + 1) → W) 0 j.succ = 0 := fun j => by
     simp [gram, hc]
   simp only [h0, mul_zero, zero_mul, Finset.sum_const_zero, add_zero]
-  have hsub : (gram ℝ (Fin.cons v c : Fin (m + 1) → W)).submatrix Fin.succ (Fin.succAbove 0) =
-      gram ℝ c := by
+  have hsub
+      : (gram ℝ (Fin.cons v c : Fin (m + 1) → W)).submatrix Fin.succ (Fin.succAbove 0)
+        = gram ℝ c := by
     ext i j
     simp [gram]
   rw [hsub]
   simp [gram]
 
-
 omit [FiniteDimensional ℝ W] in
-theorem det_gram_cons_add {m : ℕ} (v : W) (c : Fin m → W) (t : Fin m → ℝ) :
-    (gram ℝ (Fin.cons v (fun i => c i + t i • v) : Fin (m + 1) → W)).det =
-      (gram ℝ (Fin.cons v c : Fin (m + 1) → W)).det := by
+theorem det_gram_cons_add {m : ℕ} (v : W) (c : Fin m → W) (t : Fin m → ℝ)
+    : (gram ℝ (Fin.cons v (fun i => c i + t i • v) : Fin (m + 1) → W)).det
+      = (gram ℝ (Fin.cons v c : Fin (m + 1) → W)).det := by
   let T : Matrix (Fin (m + 1)) (Fin (m + 1)) ℝ :=
-    Matrix.of fun i j => if i = j then 1 else if j = 0 then (Fin.cons 0 t : Fin (m + 1) → ℝ) i else 0
-  have hT : (Fin.cons v (fun i => c i + t i • v) : Fin (m + 1) → W) =
-      fun i => ∑ j, T i j • (Fin.cons v c : Fin (m + 1) → W) j := by
+    Matrix.of fun i j =>
+      if i = j then
+        1
+      else if j = 0 then
+        (Fin.cons 0 t : Fin (m + 1) → ℝ) i
+      else
+        0
+  have hT
+      : (Fin.cons v (fun i => c i + t i • v) : Fin (m + 1) → W)
+        = fun i => ∑ j, T i j • (Fin.cons v c : Fin (m + 1) → W) j := by
     funext i
     refine Fin.cases ?_ (fun i => ?_) i
     · have h0 : ∀ x : Fin m, (0 : Fin (m + 1)) ≠ x.succ := fun x => (Fin.succ_ne_zero x).symm
@@ -242,13 +244,14 @@ theorem det_gram_cons_add {m : ℕ} (v : W) (c : Fin m → W) (t : Fin m → ℝ
   rw [hT, gram_comb, det_mul, det_mul, det_transpose, hdet]
   ring
 
-theorem decompose {m : ℕ} (b : Fin (m + 1) → W) (hb : LinearIndependent ℝ b) {lam : ℝ}
-    (hlam : 0 < lam) (hsep : Sep (span ℤ (Set.range b)) lam) :
-    ∃ (v : W) (c : Fin m → W), v ∈ span ℤ (Set.range b) ∧ v ≠ 0 ∧ lam ≤ ‖v‖ ∧
-      (∀ x ∈ span ℤ (Set.range b), x ≠ 0 → ‖v‖ ≤ ‖x‖) ∧ LinearIndependent ℝ c ∧
-      (∀ u, u ∈ span ℤ (Set.range c) ↔ ∃ x ∈ span ℤ (Set.range b), proj v x = u) ∧
-      Sep (span ℤ (Set.range c)) (lam / 2) ∧
-      (gram ℝ b).det = ‖v‖ ^ 2 * (gram ℝ c).det := by
+theorem decompose
+    {m : ℕ} (b : Fin (m + 1) → W) (hb : LinearIndependent ℝ b)
+    {lam : ℝ} (hlam : 0 < lam) (hsep : Sep (span ℤ (Set.range b)) lam)
+    : ∃ (v : W) (c : Fin m → W),
+      v ∈ span ℤ (Set.range b) ∧ v ≠ 0 ∧ lam ≤ ‖v‖ ∧ (∀ x ∈ span ℤ (Set.range b), x ≠ 0 → ‖v‖ ≤ ‖x‖)
+        ∧ LinearIndependent ℝ c
+        ∧ (∀ u, u ∈ span ℤ (Set.range c) ↔ ∃ x ∈ span ℤ (Set.range b), proj v x = u)
+        ∧ Sep (span ℤ (Set.range c)) (lam / 2) ∧ (gram ℝ b).det = ‖v‖ ^ 2 * (gram ℝ c).det := by
   set L := span ℤ (Set.range b) with hL
   have hb0 : b 0 ≠ 0 := hb.ne_zero 0
   have hb0L : b 0 ∈ L := subset_span ⟨0, rfl⟩
@@ -306,8 +309,7 @@ theorem decompose {m : ℕ} (b : Fin (m + 1) → W) (hb : LinearIndependent ℝ 
         rw [hcspan]
         exact (hmemL' _).2 ⟨x, hx, rfl⟩
       obtain ⟨k, hk⟩ := (mem_span_range_iff_exists_fun ℤ).1 hpx
-      have hyL : x - ∑ i, k i • w i ∈ L :=
-        L.sub_mem hx (L.sum_mem fun i _ => L.smul_mem _ (hwL i))
+      have hyL : x - ∑ i, k i • w i ∈ L := L.sub_mem hx (L.sum_mem fun i _ => L.smul_mem _ (hwL i))
       have hy0 : proj v (x - ∑ i, k i • w i) = 0 := by
         set_option synthInstance.maxHeartbeats 100000 in
           rw [map_sub, map_sum]
@@ -328,22 +330,39 @@ theorem decompose {m : ℕ} (b : Fin (m + 1) → W) (hb : LinearIndependent ℝ 
     rw [hsp, h2] at h1
     simpa using h1
   subst hnm
-  refine ⟨v, c, hvL, hv, hsep v hvL hv, hmin, hc, fun u => by rw [hcspan]; exact hmemL' u,
-    hcspan ▸ hsepL', ?_⟩
+  refine ⟨
+    v,
+    c,
+    hvL,
+    hv,
+    hsep v hvL hv,
+    hmin,
+    hc,
+    fun u => by rw [hcspan]; exact hmemL' u,
+    hcspan ▸ hsepL',
+    ?_
+  ⟩
   have hZ : LinearIndependent ℤ b := hb.restrict_scalars' (R := ℤ)
   rw [det_gram_eq_of_span_eq hZ hspan'.symm]
   have hwc : w = fun i => c i + (inner ℝ v (w i) / ‖v‖ ^ 2) • v := by
     funext i
     rw [← hw i, proj_apply]
     abel
-  rw [hwc, det_gram_cons_add, det_gram_cons_orth v c (fun i => by rw [← hw i]; exact inner_proj v _ hv)]
+  rw [hwc, det_gram_cons_add,
+    det_gram_cons_orth v c (fun i => by rw [← hw i]; exact inner_proj v _ hv)]
 
-theorem bounds (m : ℕ) :
-    (∀ lam : ℝ, 0 < lam → ∃ g : ℝ, 0 < g ∧ ∀ b : Fin m → W, LinearIndependent ℝ b →
-        Sep (span ℤ (Set.range b)) lam → g ≤ (gram ℝ b).det) ∧
-    (∀ lam : ℝ, 0 < lam → ∀ C : ℝ, ∃ R : ℝ, ∀ b : Fin m → W, LinearIndependent ℝ b →
-        Sep (span ℤ (Set.range b)) lam → (gram ℝ b).det ≤ C →
-        span ℤ (Set.range b) ≤ span ℤ {x | x ∈ span ℤ (Set.range b) ∧ ‖x‖ ≤ R}) := by
+theorem bounds (m : ℕ)
+    : (∀ lam : ℝ,
+        0 < lam
+          → ∃ g : ℝ,
+            0 < g
+              ∧ ∀ b : Fin m → W,
+                LinearIndependent ℝ b → Sep (span ℤ (Set.range b)) lam → g ≤ (gram ℝ b).det)
+      ∧ (∀ lam : ℝ,
+        0 < lam
+          → ∀ C : ℝ, ∃ R : ℝ, ∀ b : Fin m → W,
+            LinearIndependent ℝ b → Sep (span ℤ (Set.range b)) lam → (gram ℝ b).det ≤ C
+              → span ℤ (Set.range b) ≤ span ℤ {x | x ∈ span ℤ (Set.range b) ∧ ‖x‖ ≤ R}) := by
   induction m with
   | zero =>
     refine ⟨fun lam _ => ⟨1, one_pos, fun b _ _ => by simp⟩, fun lam _ C => ⟨0, fun b _ _ _ => ?_⟩⟩
@@ -365,8 +384,9 @@ theorem bounds (m : ℕ) :
       have hgc := hgb c hc hsepc
       have hv2 : ‖v‖ ^ 2 ≤ C / g := by
         rw [le_div_iff₀ hg]
-        calc ‖v‖ ^ 2 * g ≤ ‖v‖ ^ 2 * (gram ℝ c).det :=
-              mul_le_mul_of_nonneg_left hgc (sq_nonneg _)
+        calc
+          ‖v‖ ^ 2 * g
+            ≤ ‖v‖ ^ 2 * (gram ℝ c).det := mul_le_mul_of_nonneg_left hgc (sq_nonneg _)
           _ = (gram ℝ b).det := hdet.symm
           _ ≤ C := hC
       have hvR : ‖v‖ ≤ Real.sqrt (C / g) := (le_abs_self _).trans (Real.abs_le_sqrt hv2)
@@ -380,8 +400,8 @@ theorem bounds (m : ℕ) :
       set N := span ℤ {x | x ∈ L ∧ ‖x‖ ≤ |R'| + Real.sqrt (C / g)} with hN
       have hNL : N ≤ L := span_le.2 fun x hx => hx.1
       have hvN : v ∈ N := subset_span ⟨hvL, by linarith [abs_nonneg R']⟩
-      have hlift : ∀ u ∈ span ℤ {x | x ∈ span ℤ (Set.range c) ∧ ‖x‖ ≤ R'},
-          ∃ y ∈ N, proj v y = u := by
+      have hlift
+          : ∀ u ∈ span ℤ {x | x ∈ span ℤ (Set.range c) ∧ ‖x‖ ≤ R'}, ∃ y ∈ N, proj v y = u := by
         intro u hu
         induction hu using Submodule.span_induction with
         | mem u hu =>
@@ -390,7 +410,8 @@ theorem bounds (m : ℕ) :
           obtain ⟨y, hyL, hy, hyn⟩ := exists_lift hvL hv hx
           refine ⟨y, subset_span ⟨hyL, ?_⟩, hy⟩
           linarith [le_abs_self R', norm_nonneg v]
-        | zero => exact ⟨0, N.zero_mem, map_zero _⟩
+        | zero =>
+          exact ⟨0, N.zero_mem, map_zero _⟩
         | add u u' _ _ hu hu' =>
           obtain ⟨y, hy, rfl⟩ := hu
           obtain ⟨y', hy', rfl⟩ := hu'

@@ -19,8 +19,8 @@ variable (D : Dat A n r)
 
 variable {D}
 
-theorem pX_of_span (H : D.Hyp) {x : n → A} (hx : x ∈ Submodule.span A (Set.range D.e)) :
-    D.pX x = x := by
+theorem pX_of_span (H : D.Hyp) {x : n → A} (hx : x ∈ Submodule.span A (Set.range D.e))
+    : D.pX x = x := by
   induction hx using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨b, rfl⟩ := hx

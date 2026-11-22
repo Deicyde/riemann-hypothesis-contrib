@@ -15,8 +15,8 @@ open PI Submodule NumberField
 def volSet {m : Type} [Fintype m] [DecidableEq m] (Λ : AddSubgroup (m → ℂ)) : Set ℂ :=
   {z | ∃ v : m → m → ℂ, (∀ j, v j ∈ Λ) ∧ z = (Matrix.of v).det}
 
-def vol (F : IntermediateField ℚ ℂ) {m : Type} [Fintype m] [DecidableEq m] (Λ : AddSubgroup (m → ℂ)) :
-    Submodule (𝓞 F) ℂ :=
+def vol (F : IntermediateField ℚ ℂ) {m : Type} [Fintype m] [DecidableEq m] (Λ : AddSubgroup (m → ℂ))
+    : Submodule (𝓞 F) ℂ :=
   Submodule.span (𝓞 F) (volSet Λ)
 
 section Princ

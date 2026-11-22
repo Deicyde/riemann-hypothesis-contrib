@@ -7,8 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.Formall
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
@@ -51,10 +53,12 @@ lemma quasiCompact_tensorHom {X Y X' Y' : Over S} (f : X ⟶ Y) (g : X' ⟶ Y')
   rw [Over.tensorHom_left]
   exact MorphismProperty.pullbackMap (P := @QuasiCompact) hf hg (Over.w f).symm (Over.w g).symm
 
-theorem exists_grpObj {A H Q : Over S} [GrpObj A] [IsCommMonObj A] [GrpObj H] (i : H ⟶ A)
-    [IsMonHom i] (q : A ⟶ Q) [Flat q.left] [Surjective q.left] [QuasiCompact q.left]
-    (hq : IsPullback ((fst H A ≫ i) * snd H A) (snd H A) q q) :
-    ∃ _ : GrpObj Q, IsCommMonObj Q ∧ IsMonHom q ∧ IsPullback i (toUnit H) q η[Q] := by
+theorem exists_grpObj
+    {A H Q : Over S} [GrpObj A] [IsCommMonObj A] [GrpObj H]
+    (i : H ⟶ A) [IsMonHom i]
+    (q : A ⟶ Q) [Flat q.left] [Surjective q.left] [QuasiCompact q.left]
+    (hq : IsPullback ((fst H A ≫ i) * snd H A) (snd H A) q q)
+    : ∃ _ : GrpObj Q, IsCommMonObj Q ∧ IsMonHom q ∧ IsPullback i (toUnit H) q η[Q] := by
   have rel : ∀ {W : Over S} (a b : W ⟶ A), a ≫ q = b ≫ q ↔ ∃ t : W ⟶ H, a = (t ≫ i) * b := by
     intro W a b
     constructor
@@ -72,19 +76,21 @@ theorem exists_grpObj {A H Q : Over S} [GrpObj A] [IsCommMonObj A] [GrpObj H] (i
   have := FlatQuotient.epi_of_flat_surjective q
   have := FlatQuotient.epi_tensorHom q q
   have := FlatQuotient.epi_tensorHom (q ⊗ₘ q) q
-  obtain ⟨m, hm⟩ := exists_desc (q ⊗ₘ q) (μ[A] ≫ q) (by
-    intro W a b h
-    obtain ⟨s, hs⟩ := (rel (a ≫ fst A A) (b ≫ fst A A)).1 (by simpa using h =≫ fst Q Q)
-    obtain ⟨t, ht⟩ := (rel (a ≫ snd A A) (b ≫ snd A A)).1 (by simpa using h =≫ snd Q Q)
-    rw [← Category.assoc, ← Category.assoc, rel]
-    refine ⟨s * t, ?_⟩
-    rw [MonObj.mul_eq_mul, comp_mul, comp_mul, hs, ht, mul_comp, _root_.mul_mul_mul_comm])
-  obtain ⟨n, hn⟩ := exists_desc q (GrpObj.inv ≫ q) (by
-    intro W a b h
-    obtain ⟨s, hs⟩ := (rel a b).1 h
-    rw [← Category.assoc, ← Category.assoc, rel]
-    refine ⟨s⁻¹, ?_⟩
-    rw [← Hom.inv_def, ← Hom.inv_def, hs, GrpObj.inv_comp, mul_inv])
+  obtain ⟨m, hm⟩ :=
+    exists_desc (q ⊗ₘ q) (μ[A] ≫ q) (by
+      intro W a b h
+      obtain ⟨s, hs⟩ := (rel (a ≫ fst A A) (b ≫ fst A A)).1 (by simpa using h =≫ fst Q Q)
+      obtain ⟨t, ht⟩ := (rel (a ≫ snd A A) (b ≫ snd A A)).1 (by simpa using h =≫ snd Q Q)
+      rw [← Category.assoc, ← Category.assoc, rel]
+      refine ⟨s * t, ?_⟩
+      rw [MonObj.mul_eq_mul, comp_mul, comp_mul, hs, ht, mul_comp, _root_.mul_mul_mul_comm])
+  obtain ⟨n, hn⟩ :=
+    exists_desc q (GrpObj.inv ≫ q) (by
+      intro W a b h
+      obtain ⟨s, hs⟩ := (rel a b).1 h
+      rw [← Category.assoc, ← Category.assoc, rel]
+      refine ⟨s⁻¹, ?_⟩
+      rw [← Hom.inv_def, ← Hom.inv_def, hs, GrpObj.inv_comp, mul_inv])
   have key : ∀ {W : Over S} (a b : W ⟶ A), lift (a ≫ q) (b ≫ q) ≫ m = (a * b) ≫ q := by
     intro W a b
     rw [← lift_map, Category.assoc, hm, Hom.mul_def, Category.assoc]
@@ -188,18 +194,18 @@ lemma smooth_of_grpObj_of_flat (Q : Over S) [GrpObj Q] [Flat Q.hom]
 
 end AbelianQuotient
 
-
 open AbelianQuotient in
-theorem quotient_isAbelianScheme_of_quotientScheme :
-    (∀ (X S : Scheme.{0}) (f : X ⟶ S), Smooth f → GeometricallyConnected f →
-      GeometricallyIntegral f) →
-    (∀ (R : Type) [CommRing R] [IsNoetherianRing R] (P : PolAV (Spec (CommRingCat.of R)))
-      (H : Over (Spec (CommRingCat.of R))) [GrpObj H] (i : H ⟶ P.A), IsMonHom i → Mono i →
-      IsFinite H.hom → Flat H.hom →
-      ∃ (Q : Over (Spec (CommRingCat.of R))) (q : P.A ⟶ Q), IsFinite q.left ∧ Flat q.left ∧
-        Surjective q.left ∧ IsSeparated Q.hom ∧ LocallyOfFiniteType Q.hom ∧
-        IsPullback ((fst H P.A ≫ i) * snd H P.A) (snd H P.A) q q) →
-    QuotientSt := by
+theorem quotient_isAbelianScheme_of_quotientScheme
+    : (∀ (X S : Scheme.{0}) (f : X ⟶ S),
+        Smooth f → GeometricallyConnected f → GeometricallyIntegral f)
+      → (∀ (R : Type) [CommRing R] [IsNoetherianRing R] (P : PolAV (Spec (CommRingCat.of R)))
+          (H : Over (Spec (CommRingCat.of R))) [GrpObj H] (i : H ⟶ P.A),
+        IsMonHom i → Mono i → IsFinite H.hom → Flat H.hom
+          → ∃ (Q : Over (Spec (CommRingCat.of R))) (q : P.A ⟶ Q),
+            IsFinite q.left ∧ Flat q.left ∧ Surjective q.left ∧ IsSeparated Q.hom
+              ∧ LocallyOfFiniteType Q.hom
+              ∧ IsPullback ((fst H P.A ≫ i) * snd H P.A) (snd H P.A) q q)
+      → QuotientSt := by
   intro hint hquot R _ _ P H _ i hi hmono hfin hflat
   obtain ⟨Q, q, h1, h2, h3, h4, h5, hq⟩ := hquot R P H i hi hmono hfin hflat
   have := P.isAb.comm

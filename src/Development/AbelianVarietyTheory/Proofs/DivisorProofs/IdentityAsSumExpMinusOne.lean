@@ -8,10 +8,11 @@ open scoped ContDiff
 
 namespace GlobalTheory.ExpDivision
 
-theorem hasTemperateGrowth_of_closed (S : Set (ℝ → ℂ))
-    (hd : ∀ f ∈ S, Differentiable ℝ f) (hc : ∀ f ∈ S, deriv f ∈ S)
+theorem hasTemperateGrowth_of_closed
+    (S : Set (ℝ → ℂ)) (hd : ∀ f ∈ S, Differentiable ℝ f) (hc : ∀ f ∈ S, deriv f ∈ S)
     (hb : ∀ f ∈ S, ∃ (k : ℕ) (C : ℝ), ∀ x, ‖f x‖ ≤ C * (1 + ‖x‖) ^ k)
-    {f : ℝ → ℂ} (hf : f ∈ S) : f.HasTemperateGrowth := by
+    {f : ℝ → ℂ} (hf : f ∈ S)
+    : f.HasTemperateGrowth := by
   have hi : ∀ n, iteratedDeriv n f ∈ S := by
     intro n
     induction n with
@@ -21,8 +22,8 @@ theorem hasTemperateGrowth_of_closed (S : Set (ℝ → ℂ))
   obtain ⟨k, C, h⟩ := hb _ (hi n)
   exact ⟨k, C, fun x => by rw [norm_iteratedFDeriv_eq_norm_iteratedDeriv]; exact h x⟩
 
-theorem hasTemperateGrowth_deriv {f : ℝ → ℂ} (hf : f.HasTemperateGrowth) :
-    (deriv f).HasTemperateGrowth := by
+theorem hasTemperateGrowth_deriv {f : ℝ → ℂ} (hf : f.HasTemperateGrowth)
+    : (deriv f).HasTemperateGrowth := by
   refine ⟨(contDiff_infty_iff_deriv.1 hf.1).2, fun n => ?_⟩
   obtain ⟨k, C, h⟩ := hf.2 (n + 1)
   refine ⟨k, C, fun x => ?_⟩
@@ -30,9 +31,11 @@ theorem hasTemperateGrowth_deriv {f : ℝ → ℂ} (hf : f.HasTemperateGrowth) :
   rw [norm_iteratedFDeriv_eq_norm_iteratedDeriv] at this ⊢
   rwa [iteratedDeriv_succ'] at this
 
-theorem hasTemperateGrowth_div {E g : ℝ → ℂ} (hE : E.HasTemperateGrowth)
-    (h0 : ∀ x, E x ≠ 0) {N : ℕ} {M : ℝ} (hM : ∀ x, ‖(E x)⁻¹‖ ≤ M * (1 + ‖x‖) ^ N)
-    (hg : g.HasTemperateGrowth) : (fun x => g x / E x).HasTemperateGrowth := by
+theorem hasTemperateGrowth_div
+    {E g : ℝ → ℂ} (hE : E.HasTemperateGrowth) (h0 : ∀ x, E x ≠ 0)
+    {N : ℕ} {M : ℝ} (hM : ∀ x, ‖(E x)⁻¹‖ ≤ M * (1 + ‖x‖) ^ N)
+    (hg : g.HasTemperateGrowth)
+    : (fun x => g x / E x).HasTemperateGrowth := by
   have hEd : Differentiable ℝ E := hE.1.differentiable (by simp)
   refine hasTemperateGrowth_of_closed
     {f | ∃ (m : ℕ) (u : ℝ → ℂ), u.HasTemperateGrowth ∧ f = fun x => u x / E x ^ m} ?_ ?_ ?_
@@ -44,8 +47,12 @@ theorem hasTemperateGrowth_div {E g : ℝ → ℂ} (hE : E.HasTemperateGrowth)
     have hud : Differentiable ℝ u := hu.1.differentiable (by simp)
     have hp : (fun x => E x ^ m).HasTemperateGrowth := hE.pow m
     have hpd : Differentiable ℝ (fun x => E x ^ m) := hp.1.differentiable (by simp)
-    refine ⟨m * 2, fun x => deriv u x * E x ^ m - u x * deriv (fun x => E x ^ m) x,
-      ((hasTemperateGrowth_deriv hu).mul hp).sub (hu.mul (hasTemperateGrowth_deriv hp)), ?_⟩
+    refine ⟨
+      m * 2,
+      fun x => deriv u x * E x ^ m - u x * deriv (fun x => E x ^ m) x,
+      ((hasTemperateGrowth_deriv hu).mul hp).sub (hu.mul (hasTemperateGrowth_deriv hp)),
+      ?_
+    ⟩
     funext x
     rw [pow_mul]
     exact deriv_fun_div (hud x) (hpd x) (pow_ne_zero _ (h0 x))
@@ -55,17 +62,19 @@ theorem hasTemperateGrowth_div {E g : ℝ → ℂ} (hE : E.HasTemperateGrowth)
     have h1 : ‖u x‖ ≤ C * (1 + ‖x‖) ^ k := by simpa using h x
     have h2 := hM x
     have h3 : 0 ≤ C * (1 + ‖x‖) ^ k := (norm_nonneg _).trans h1
-    calc ‖u x / E x ^ m‖ = ‖u x‖ * ‖(E x)⁻¹‖ ^ m := by
-          rw [div_eq_mul_inv, norm_mul, ← inv_pow, norm_pow]
+    calc
+      ‖u x / E x ^ m‖
+        = ‖u x‖ * ‖(E x)⁻¹‖ ^ m := by rw [div_eq_mul_inv, norm_mul, ← inv_pow, norm_pow]
       _ ≤ (C * (1 + ‖x‖) ^ k) * (M * (1 + ‖x‖) ^ N) ^ m := by gcongr
       _ = _ := by rw [mul_pow, ← pow_mul, pow_add]; ring
 
-theorem hasTemperateGrowth_of_entire {F : ℂ → ℂ} (hF : Differentiable ℂ F)
-    (hb : ∀ R : ℝ, ∃ C : ℝ, ∀ z : ℂ, |z.im| ≤ R → ‖F z‖ ≤ C) :
-    (fun t : ℝ => F t).HasTemperateGrowth := by
+theorem hasTemperateGrowth_of_entire
+    {F : ℂ → ℂ} (hF : Differentiable ℂ F) (hb : ∀ R : ℝ, ∃ C : ℝ, ∀ z : ℂ, |z.im| ≤ R → ‖F z‖ ≤ C)
+    : (fun t : ℝ => F t).HasTemperateGrowth := by
   refine hasTemperateGrowth_of_closed
     {f | ∃ G : ℂ → ℂ, Differentiable ℂ G ∧ (∀ R : ℝ, ∃ C : ℝ, ∀ z : ℂ, |z.im| ≤ R → ‖G z‖ ≤ C) ∧
-      f = fun t : ℝ => G t} ?_ ?_ ?_ ⟨F, hF, hb, rfl⟩
+      f = fun t : ℝ => G t}
+    ?_ ?_ ?_ ⟨F, hF, hb, rfl⟩
   · rintro f ⟨G, hG, -, rfl⟩ x
     exact (hG x).hasDerivAt.comp_ofReal.differentiableAt
   · rintro f ⟨G, hG, hB, rfl⟩
@@ -94,10 +103,12 @@ theorem mul_quot (a : ℝ) (z : ℂ) : z * quot a z = Complex.exp (Complex.I * (
   simpa [quot] using this
 
 theorem quot_zero (a : ℝ) : quot a 0 = Complex.I * a := by
-  have h : HasDerivAt (fun z : ℂ => Complex.exp (Complex.I * (a * z)))
+  have h : HasDerivAt
+      (fun z : ℂ => Complex.exp (Complex.I * (a * z)))
       (Complex.exp (Complex.I * (a * 0)) * (Complex.I * (a * 1))) 0 :=
     (((hasDerivAt_id (0 : ℂ)).const_mul (a : ℂ)).const_mul Complex.I).cexp
-  rw [quot, dslope_same, h.deriv]; simp
+  rw [quot, dslope_same, h.deriv]
+  simp
 
 theorem differentiable_quot (a : ℝ) : Differentiable ℂ (quot a) := by
   rw [← differentiableOn_univ, quot, Complex.differentiableOn_dslope Filter.univ_mem]
@@ -105,8 +116,9 @@ theorem differentiable_quot (a : ℝ) : Differentiable ℂ (quot a) := by
 
 theorem hasTemperateGrowth_quot (a : ℝ) : (fun t : ℝ => quot a t).HasTemperateGrowth := by
   refine hasTemperateGrowth_of_entire (differentiable_quot a) fun R => ?_
-  obtain ⟨C, hC⟩ := (isCompact_closedBall (0 : ℂ) 1).exists_bound_of_continuousOn
-    (differentiable_quot a).continuous.continuousOn
+  obtain ⟨C, hC⟩ :=
+    (isCompact_closedBall (0 : ℂ) 1).exists_bound_of_continuousOn
+      (differentiable_quot a).continuous.continuousOn
   refine ⟨max C (Real.exp (|a| * R) + 1), fun z hz => ?_⟩
   by_cases h : ‖z‖ ≤ 1
   · exact (hC z (by simpa using h)).trans (le_max_left _ _)
@@ -134,12 +146,14 @@ theorem quot_neg (a t : ℝ) : quot (-a) t = (starRingEnd ℂ) (quot a t) := by
     rw [this, mul_quot, map_sub, ← Complex.exp_conj]
     simp
 
-theorem norm_exp_sub_one_ge (x : ℝ) :
-    4 * |x - round x| ≤ ‖Complex.exp (Complex.I * ((2 * Real.pi * x : ℝ) : ℂ)) - 1‖ := by
-  have h1 : Complex.exp (Complex.I * ((2 * Real.pi * x : ℝ) : ℂ)) =
-      Complex.exp (Complex.I * ((2 * Real.pi * (x - round x) : ℝ) : ℂ)) := by
-    have : Complex.I * ((2 * Real.pi * x : ℝ) : ℂ) =
-        Complex.I * ((2 * Real.pi * (x - round x) : ℝ) : ℂ) + (round x : ℤ) * (2 * Real.pi * Complex.I) := by
+theorem norm_exp_sub_one_ge (x : ℝ)
+    : 4 * |x - round x| ≤ ‖Complex.exp (Complex.I * ((2 * Real.pi * x : ℝ) : ℂ)) - 1‖ := by
+  have h1
+      : Complex.exp (Complex.I * ((2 * Real.pi * x : ℝ) : ℂ))
+        = Complex.exp (Complex.I * ((2 * Real.pi * (x - round x) : ℝ) : ℂ)) := by
+    have : Complex.I * ((2 * Real.pi * x : ℝ) : ℂ)
+        = Complex.I * ((2 * Real.pi * (x - round x) : ℝ) : ℂ)
+          + (round x : ℤ) * (2 * Real.pi * Complex.I) := by
       push_cast; ring
     rw [this, Complex.exp_add, Complex.exp_int_mul_two_pi_mul_I, mul_one]
   rw [h1, Complex.norm_exp_I_mul_ofReal_sub_one]
@@ -147,8 +161,7 @@ theorem norm_exp_sub_one_ge (x : ℝ) :
   set d := x - round x
   have hp := Real.pi_pos
   have e : 2 * Real.pi * d / 2 = Real.pi * d := by ring
-  have h3 : |Real.pi * d| ≤ Real.pi / 2 := by
-    rw [abs_mul, abs_of_pos hp]; nlinarith
+  have h3 : |Real.pi * d| ≤ Real.pi / 2 := by rw [abs_mul, abs_of_pos hp]; nlinarith
   have h4 := Real.mul_abs_le_abs_sin h3
   rw [abs_mul, abs_of_pos hp] at h4
   have e2 : 2 / Real.pi * (Real.pi * |d|) = 2 * |d| := by field_simp
@@ -156,8 +169,8 @@ theorem norm_exp_sub_one_ge (x : ℝ) :
   rw [e, norm_mul, Real.norm_eq_abs, Real.norm_eq_abs, abs_two]
   linarith
 
-theorem dioph (t : ℝ) (hp : round t ≠ 0) :
-    1 ≤ 6 * (1 + |t|) * (|t - round t| + |√2 * t - round (√2 * t)|) := by
+theorem dioph (t : ℝ) (hp : round t ≠ 0)
+    : 1 ≤ 6 * (1 + |t|) * (|t - round t| + |√2 * t - round (√2 * t)|) := by
   set p := round t with hpdef
   set q := round (√2 * t) with hqdef
   have h1 : |t - p| ≤ 1 / 2 := abs_sub_round t
@@ -193,12 +206,14 @@ theorem dioph (t : ℝ) (hp : round t ≠ 0) :
     rw [abs_mul, abs_mul, abs_of_pos hs0, abs_two] at this
     rw [abs_mul, abs_of_pos hs0]
     nlinarith [abs_nonneg (t - p), abs_nonneg t]
-  calc (1 : ℝ) ≤ _ := h3
+  calc
+    (1 : ℝ)
+      ≤ _ := h3
     _ ≤ (2 * (|t - p| + |√2 * t - q|)) * (3 * (1 + |t|)) := by gcongr
     _ = _ := by ring
 
-theorem lower (t : ℝ) :
-    1 ≤ 2 * (1 + |t|) ^ 2 * (‖quot (2 * Real.pi) t‖ + ‖quot (2 * Real.pi * √2) t‖) := by
+theorem lower (t : ℝ)
+    : 1 ≤ 2 * (1 + |t|) ^ 2 * (‖quot (2 * Real.pi) t‖ + ‖quot (2 * Real.pi * √2) t‖) := by
   have a0 := abs_nonneg t
   have n1 := norm_nonneg (quot (2 * Real.pi) t)
   have n2 := norm_nonneg (quot (2 * Real.pi * √2) t)
@@ -208,7 +223,8 @@ theorem lower (t : ℝ) :
   have e2 : 4 * |√2 * t - round (√2 * t)| ≤ |t| * ‖quot (2 * Real.pi * √2) t‖ := by
     have := norm_exp_sub_one_ge (√2 * t)
     rwa [← mul_assoc, Complex.ofReal_mul _ t, ← mul_quot, norm_mul, Complex.norm_real,
-      Real.norm_eq_abs] at this
+        Real.norm_eq_abs]
+      at this
   by_cases hp : round t = 0
   · have h1 : 1 ≤ ‖quot (2 * Real.pi) t‖ := by
       by_cases ht : t = 0
@@ -232,9 +248,10 @@ theorem lower (t : ℝ) :
     have h3 : 0 ≤ (1 + |t|) ^ 2 * s := by positivity
     nlinarith
 
-theorem exists_division : ∃ (n : ℕ) (a : Fin n → ℝ) (A : Fin n → ℝ → ℂ),
-    (∀ j, Function.HasTemperateGrowth (A j)) ∧
-    ∀ t : ℝ, (t : ℂ) = ∑ j, (Complex.exp (Complex.I * ((a j * t : ℝ) : ℂ)) - 1) * A j t := by
+theorem exists_division
+    : ∃ (n : ℕ) (a : Fin n → ℝ) (A : Fin n → ℝ → ℂ),
+      (∀ j, Function.HasTemperateGrowth (A j))
+        ∧ ∀ t : ℝ, (t : ℂ) = ∑ j, (Complex.exp (Complex.I * ((a j * t : ℝ) : ℂ)) - 1) * A j t := by
   set a : ℝ := 2 * Real.pi with ha
   set b : ℝ := 2 * Real.pi * √2 with hb
   set E : ℝ → ℂ := fun t => quot a t * quot (-a) t + quot b t * quot (-b) t with hE
@@ -245,7 +262,8 @@ theorem exists_division : ∃ (n : ℕ) (a : Fin n → ℝ) (A : Fin n → ℝ �
     intro t
     have : E t = ((‖quot a t‖ ^ 2 + ‖quot b t‖ ^ 2 : ℝ) : ℂ) := by
       simp only [hE, quot_neg, Complex.mul_conj']
-      push_cast; ring
+      push_cast
+      ring
     rw [this, Complex.norm_real, Real.norm_of_nonneg (by positivity)]
   have hl : ∀ t, 1 ≤ 8 * (1 + ‖t‖) ^ 4 * ‖E t‖ := by
     intro t
@@ -255,7 +273,9 @@ theorem exists_division : ∃ (n : ℕ) (a : Fin n → ℝ) (A : Fin n → ℝ �
     have h2 := one_le_pow₀ (n := 2) h
     have h3 : (‖quot a t‖ + ‖quot b t‖) ^ 2 ≤ 2 * (‖quot a t‖ ^ 2 + ‖quot b t‖ ^ 2) := by
       nlinarith [sq_nonneg (‖quot a t‖ - ‖quot b t‖)]
-    calc (1 : ℝ) ≤ _ := h2
+    calc
+      (1 : ℝ)
+        ≤ _ := h2
       _ = 4 * (1 + |t|) ^ 4 * (‖quot a t‖ + ‖quot b t‖) ^ 2 := by ring
       _ ≤ 4 * (1 + |t|) ^ 4 * (2 * (‖quot a t‖ ^ 2 + ‖quot b t‖ ^ 2)) := by gcongr
       _ = _ := by ring

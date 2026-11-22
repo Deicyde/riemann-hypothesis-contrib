@@ -22,20 +22,24 @@ namespace PointsBilinear
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem contDiffAt_comp {D : ℕ} {u : ((Σ k, ι k) → ℂ) → ℝ} (hu : IsDegZeroSmooth u)
+theorem contDiffAt_comp
+    {D : ℕ} {u : ((Σ k, ι k) → ℂ) → ℝ} (hu : IsDegZeroSmooth u)
     {γ : (Fin D → ℂ) → (Σ k, ι k) → ℂ} {y : Fin D → ℂ}
-    (hγ : ∀ᶠ y' in 𝓝 y, DifferentiableAt ℂ γ y') (hy : ∀ k, ∃ i, γ y ⟨k, i⟩ ≠ 0) :
-    ContDiffAt ℝ 2 (fun y' => u (γ y')) y := by
+    (hγ : ∀ᶠ y' in 𝓝 y, DifferentiableAt ℂ γ y') (hy : ∀ k, ∃ i, γ y ⟨k, i⟩ ≠ 0)
+    : ContDiffAt ℝ 2 (fun y' => u (γ y')) y := by
   obtain ⟨U, hU, hUo, hyU⟩ := eventually_nhds_iff.mp hγ
   have hdU : DifferentiableOn ℂ γ U := fun y' h => (hU y' h).differentiableWithinAt
   have hc : ContDiffAt ℝ ∞ γ y :=
-    ((ReciprocityTheory.ChartRestriction.DS.S7.cca_contDiffOn hUo hdU).contDiffAt (hUo.mem_nhds hyU)).restrict_scalars ℝ
+    ((ReciprocityTheory.ChartRestriction.DS.S7.cca_contDiffOn hUo hdU).contDiffAt
+      (hUo.mem_nhds hyU)).restrict_scalars ℝ
   have hρ : ContDiffAt ℝ ∞ u (γ y) := hu.1.contDiffAt (isOpen_blockNonzero.mem_nhds hy)
   exact_mod_cast (contDiffAt_infty.mp (hρ.comp y hc)) 2
 
-theorem cxHessian_sum {D : ℕ} {T : Type} [Fintype T] (f : T → (Fin D → ℂ) → ℝ) {y : Fin D → ℂ}
-    (hf : ∀ t, ∀ᶠ y' in 𝓝 y, ContDiffAt ℝ 2 (f t) y') :
-    cxHessian (fun y' => ∑ t, f t y') y = ∑ t, cxHessian (f t) y := by
+theorem cxHessian_sum
+    {D : ℕ} {T : Type} [Fintype T]
+    (f : T → (Fin D → ℂ) → ℝ)
+    {y : Fin D → ℂ} (hf : ∀ t, ∀ᶠ y' in 𝓝 y, ContDiffAt ℝ 2 (f t) y')
+    : cxHessian (fun y' => ∑ t, f t y') y = ∑ t, cxHessian (f t) y := by
   have h1 : fderiv ℝ (fun y' => ∑ t, f t y') =ᶠ[𝓝 y] fun y' => ∑ t, fderiv ℝ (f t) y' := by
     filter_upwards [eventually_all.mpr hf] with y' hy'
     exact fderiv_fun_sum fun t _ => (hy' t).differentiableAt (by norm_num)
@@ -51,15 +55,19 @@ theorem cxHessian_sum {D : ℕ} {T : Type} [Fintype T] (f : T → (Fin D → ℂ
   simp only [Finset.sum_add_distrib]
   rw [← Finset.sum_sub_distrib, Finset.mul_sum]
 
-theorem mixedDisc_update_sum {D : ℕ} {T : Type} [Fintype T] (A : Fin D → Matrix (Fin D) (Fin D) ℂ)
-    (k : Fin D) (B : T → Matrix (Fin D) (Fin D) ℂ) :
-    mixedDisc (Function.update A k (∑ t, B t)) = ∑ t, mixedDisc (Function.update A k (B t)) := by
+theorem mixedDisc_update_sum
+    {D : ℕ} {T : Type} [Fintype T]
+    (A : Fin D → Matrix (Fin D) (Fin D) ℂ) (k : Fin D) (B : T → Matrix (Fin D) (Fin D) ℂ)
+    : mixedDisc (Function.update A k (∑ t, B t)) = ∑ t, mixedDisc (Function.update A k (B t)) := by
   obtain ⟨M, hM⟩ := (by
     show ∃ F : MultilinearMap (RingHom.id ℂ)
         (fun _ : Fin D => Matrix (Fin D) (Fin D) ℂ) ℂ,
         ⇑F = _root_.ReciprocityTheory.AnForm.mdisc
-    refine ⟨MultilinearMap.mk' _root_.ReciprocityTheory.AnForm.mdisc
-      _root_.ReciprocityTheory.AnForm.A.mdisc_update_add ?_, rfl⟩
+    refine ⟨
+      MultilinearMap.mk' _root_.ReciprocityTheory.AnForm.mdisc
+        _root_.ReciprocityTheory.AnForm.A.mdisc_update_add ?_,
+      rfl
+    ⟩
     intro A k c B
     simpa only [RingHom.id_apply, smul_eq_mul] using
       (_root_.ReciprocityTheory.AnForm.A.mdisc_update_smul A k c B))
@@ -67,15 +75,19 @@ theorem mixedDisc_update_sum {D : ℕ} {T : Type} [Fintype T] (A : Fin D → Mat
     rw [MultilinearMap.toLinearMap_apply, hM]
     rfl
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [e, map_sum]
+  simp only [e, map_sum]
 
-theorem cxHessian_cons {n : ℕ} (L : Fin n → HermLine ι) (f v : ((Σ k, ι k) → ℂ) → ℝ)
-    (γ : (Fin (n + 1) → ℂ) → (Σ k, ι k) → ℂ) (y : Fin (n + 1) → ℂ) :
-    (fun k => cxHessian
-        (fun y' => (Fin.cons f (pot L) : Fin (n + 1) → ((Σ k, ι k) → ℂ) → ℝ) k (γ y')) y) =
-      Function.update (fun k => cxHessian
-        (fun y' => (Fin.cons v (pot L) : Fin (n + 1) → ((Σ k, ι k) → ℂ) → ℝ) k (γ y')) y) 0
-        (cxHessian (fun y' => f (γ y')) y) := by
+theorem cxHessian_cons
+    {n : ℕ} (L : Fin n → HermLine ι)
+    (f v : ((Σ k, ι k) → ℂ) → ℝ) (γ : (Fin (n + 1) → ℂ) → (Σ k, ι k) → ℂ) (y : Fin (n + 1) → ℂ)
+    : (fun k =>
+        cxHessian (fun y' => (Fin.cons f (pot L) : Fin (n + 1) → ((Σ k, ι k) → ℂ) → ℝ) k (γ y')) y)
+      = Function.update
+        (fun k =>
+          cxHessian
+            (fun y' => (Fin.cons v (pot L) : Fin (n + 1) → ((Σ k, ι k) → ℂ) → ℝ) k (γ y'))
+            y)
+        0 (cxHessian (fun y' => f (γ y')) y) := by
   funext k
   refine Fin.cases ?_ (fun j => ?_) k
   · rw [Function.update_self]
@@ -83,14 +95,18 @@ theorem cxHessian_cons {n : ℕ} (L : Fin n → HermLine ι) (f v : ((Σ k, ι k
   · rw [Function.update_of_ne (Fin.succ_ne_zero j)]
     simp only [Fin.cons_succ]
 
-theorem maDensity_cons_sum {n : ℕ} (L : Fin n → HermLine ι) {T : Type} [Fintype T]
+theorem maDensity_cons_sum
+    {n : ℕ} (L : Fin n → HermLine ι)
+    {T : Type} [Fintype T]
     {u : T → ((Σ k, ι k) → ℂ) → ℝ} (hu : ∀ t, IsDegZeroSmooth (u t))
     {γ : (Fin (n + 1) → ℂ) → (Σ k, ι k) → ℂ} {y : Fin (n + 1) → ℂ}
-    (hγ : ∀ᶠ y' in 𝓝 y, DifferentiableAt ℂ γ y' ∧ ∀ k, ∃ i, γ y' ⟨k, i⟩ ≠ 0) :
-    maDensity (fun j y' => (Fin.cons (fun z => ∑ t, u t z) (pot L) :
-        Fin (n + 1) → ((Σ k, ι k) → ℂ) → ℝ) j (γ y')) y =
-      ∑ t, maDensity (fun j y' => (Fin.cons (u t) (pot L) :
-        Fin (n + 1) → ((Σ k, ι k) → ℂ) → ℝ) j (γ y')) y := by
+    (hγ : ∀ᶠ y' in 𝓝 y, DifferentiableAt ℂ γ y' ∧ ∀ k, ∃ i, γ y' ⟨k, i⟩ ≠ 0)
+    : maDensity
+        (fun j y' =>
+          (Fin.cons (fun z => ∑ t, u t z) (pot L) : Fin (n + 1) → ((Σ k, ι k) → ℂ) → ℝ) j (γ y'))
+        y
+      = ∑ t, maDensity (fun j y' => (Fin.cons (u t) (pot L) :
+          Fin (n + 1) → ((Σ k, ι k) → ℂ) → ℝ) j (γ y')) y := by
   have hev := hγ.eventually_nhds
   have hc : ∀ t, ∀ᶠ y' in 𝓝 y, ContDiffAt ℝ 2 (fun y'' => u t (γ y'')) y' := fun t => by
     filter_upwards [hev] with y' hy'
@@ -102,24 +118,28 @@ theorem maDensity_cons_sum {n : ℕ} (L : Fin n → HermLine ι) {T : Type} [Fin
   refine Finset.sum_congr rfl fun t _ => ?_
   rw [cxHessian_cons L (u t) (fun _ => 0) γ y]
 
-
 omit [∀ k, Fintype (ι k)] in
-theorem sheetDensity_sum_left {n : ℕ} (P : Ideal (MRing ι))
-    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (n + 1) → ℂ)) (φ : Fin n → ((Σ k, ι k) → ℂ) → ℝ)
-    {T : Type} [Fintype T] (u : T → ((Σ k, ι k) → ℂ) → ℝ) (y : Fin n → ℂ)
-    (w : ((k : K) → ι k) → ℂ) :
-    sheetDensity P Ψ φ (fun z => ∑ t, u t z) y w = ∑ t, sheetDensity P Ψ φ (u t) y w := by
+theorem sheetDensity_sum_left
+    {n : ℕ}
+    (P : Ideal (MRing ι)) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (n + 1) → ℂ))
+    (φ : Fin n → ((Σ k, ι k) → ℂ) → ℝ)
+    {T : Type} [Fintype T]
+    (u : T → ((Σ k, ι k) → ℂ) → ℝ) (y : Fin n → ℂ) (w : ((k : K) → ι k) → ℂ)
+    : sheetDensity P Ψ φ (fun z => ∑ t, u t z) y w = ∑ t, sheetDensity P Ψ φ (u t) y w := by
   unfold sheetDensity
   by_cases h : ∃ γ, IsSheet P Ψ y w γ
   · simp only [dif_pos h, Finset.sum_mul]
   · simp only [dif_neg h, Finset.sum_const_zero]
 
-theorem sheetDensity_sum_right {n : ℕ} (P : Ideal (MRing ι))
-    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (n + 1 + 1) → ℂ)) (L : Fin n → HermLine ι)
-    {T : Type} [Fintype T] {u : T → ((Σ k, ι k) → ℂ) → ℝ} (hu : ∀ t, IsDegZeroSmooth (u t))
-    (g : ((Σ k, ι k) → ℂ) → ℝ) (y : Fin (n + 1) → ℂ) (w : ((k : K) → ι k) → ℂ) :
-    sheetDensity P Ψ (Fin.cons (fun z => ∑ t, u t z) (pot L)) g y w =
-      ∑ t, sheetDensity P Ψ (Fin.cons (u t) (pot L)) g y w := by
+theorem sheetDensity_sum_right
+    {n : ℕ}
+    (P : Ideal (MRing ι)) (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (n + 1 + 1) → ℂ))
+    (L : Fin n → HermLine ι)
+    {T : Type} [Fintype T]
+    {u : T → ((Σ k, ι k) → ℂ) → ℝ} (hu : ∀ t, IsDegZeroSmooth (u t))
+    (g : ((Σ k, ι k) → ℂ) → ℝ) (y : Fin (n + 1) → ℂ) (w : ((k : K) → ι k) → ℂ)
+    : sheetDensity P Ψ (Fin.cons (fun z => ∑ t, u t z) (pot L)) g y w
+      = ∑ t, sheetDensity P Ψ (Fin.cons (u t) (pot L)) g y w := by
   unfold sheetDensity
   by_cases h : ∃ γ, IsSheet P Ψ y w γ
   · simp only [dif_pos h]
@@ -129,35 +149,45 @@ theorem sheetDensity_sum_right {n : ℕ} (P : Ideal (MRing ι))
     rw [maDensity_cons_sum L hu hγ, Finset.mul_sum]
   · simp only [dif_neg h, Finset.sum_const_zero]
 
-theorem finsum_mem_sum_comm {α T : Type*} [Fintype T] {S : Set α} (hS : S.Finite) (F : T → α → ℝ) :
-    ∑ᶠ w ∈ S, ∑ t, F t w = ∑ t, ∑ᶠ w ∈ S, F t w := by
+theorem finsum_mem_sum_comm {α T : Type*} [Fintype T] {S : Set α} (hS : S.Finite) (F : T → α → ℝ)
+    : ∑ᶠ w ∈ S, ∑ t, F t w = ∑ t, ∑ᶠ w ∈ S, F t w := by
   rw [finsum_mem_eq_finite_toFinset_sum _ hS, Finset.sum_comm]
   exact Finset.sum_congr rfl fun t _ => (finsum_mem_eq_finite_toFinset_sum _ hS).symm
 
-theorem isSmoothHerm_ofWeight {w : ((Σ k, ι k) → ℂ) → ℝ}
+theorem isSmoothHerm_ofWeight
+    {w : ((Σ k, ι k) → ℂ) → ℝ}
     (hw : ∀ (c : K → ℂ) z, (∀ k, c k ≠ 0) → w (fun p => c p.1 * z p) = w z)
-    (hs : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) w {z | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0}) :
-    IsSmoothHerm (HermLine.ofWeight w hw) := by
-  have e : (HermLine.ofWeight w hw).h = fun z => Real.exp (-w z) := rfl
+    (hs : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) w {z | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0})
+    : IsSmoothHerm (HermLine.ofWeight w hw) := by
+  have e : (HermLine.ofWeight w hw).h = fun z => Real.exp (- w z) := rfl
   unfold IsSmoothHerm
   rw [e]
   exact Real.contDiff_exp.comp_contDiffOn hs.neg
 
-theorem integrable_fibreSum (hInt : PtsIntegrableStatement) {P : Ideal (MRing ι)} {n : ℕ}
+theorem integrable_fibreSum
+    (hInt : PtsIntegrableStatement)
+    {P : Ideal (MRing ι)} {n : ℕ}
     (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (n + 1 + 1) → ℂ)) (L : Fin n → HermLine ι)
-    {f g : ((Σ k, ι k) → ℂ) → ℝ} (hP : IsArithVar P (n + 2)) (hΨ : IsGoodProj P Ψ)
-    (hL : ∀ j, IsSmoothHerm (L j)) (hf : IsDegZeroSmooth f) (hg : IsDegZeroSmooth g) :
-    Integrable (fun y => ∑ᶠ w ∈ fibre P Ψ y, sheetDensity P Ψ (Fin.cons f (pot L)) g y w) := by
-  have hf' : ∀ (c : K → ℂ) z, (∀ k, c k ≠ 0) → -f (fun p => c p.1 * z p) = -f z :=
-    fun c z hc => by simp only [hf.2 c z hc]
-  have hF := isSmoothHerm_ofWeight (w := fun z => -f z) hf' hf.1.neg
+    {f g : ((Σ k, ι k) → ℂ) → ℝ}
+    (hP : IsArithVar P (n + 2)) (hΨ : IsGoodProj P Ψ) (hL : ∀ j, IsSmoothHerm (L j))
+    (hf : IsDegZeroSmooth f) (hg : IsDegZeroSmooth g)
+    : Integrable (fun y => ∑ᶠ w ∈ fibre P Ψ y, sheetDensity P Ψ (Fin.cons f (pot L)) g y w) := by
+  have hf'
+      : ∀ (c : K → ℂ) z, (∀ k, c k ≠ 0) → - f (fun p => c p.1 * z p) = - f z := fun c z hc => by
+    simp only [hf.2 c z hc]
+  have hF := isSmoothHerm_ofWeight (w := fun z => - f z) hf' hf.1.neg
   have hG := isSmoothHerm_ofWeight hg.2 hg.1
-  have hLF : ∀ j, IsSmoothHerm ((Fin.cons (HermLine.ofWeight (fun z => -f z) hf') L : Fin (n + 1) → HermLine ι) j) := by
+  have hLF
+      : ∀ j,
+        IsSmoothHerm
+          ((Fin.cons (HermLine.ofWeight (fun z => - f z) hf') L : Fin (n + 1) → HermLine ι) j) := by
     intro j
     refine Fin.cases ?_ (fun j => ?_) j
     · simpa only [Fin.cons_zero] using hF
     · simpa only [Fin.cons_succ] using hL j
-  have hpot : pot (Fin.cons (HermLine.ofWeight (fun z => -f z) hf') L : Fin (n + 1) → HermLine ι) = Fin.cons f (pot L) := by
+  have hpot
+      : pot (Fin.cons (HermLine.ofWeight (fun z => - f z) hf') L : Fin (n + 1) → HermLine ι)
+        = Fin.cons f (pot L) := by
     funext j z
     refine Fin.cases ?_ (fun j => ?_) j
     · simp [pot, HermLine.ofWeight, Real.log_exp]
@@ -179,10 +209,10 @@ theorem integrable_fibreSum (hInt : PtsIntegrableStatement) {P : Ideal (MRing ι
 
 end PointsBilinear
 
-
 open PointsBilinear in
-theorem PtsBilinear.proof (hAbs : Inter.PtsAbsIntegrable.Statement) (hMeas : PtsSumMeasurable.Statement) :
-    PtsBilinear.Statement := by
+theorem PtsBilinear.proof
+    (hAbs : Inter.PtsAbsIntegrable.Statement) (hMeas : PtsSumMeasurable.Statement)
+    : PtsBilinear.Statement := by
   have hInt := PtsIntegrable.of_found hAbs hMeas
   intro K _ ι _ P n L T _ u v hP hL hu hv
   unfold ptsIntegral

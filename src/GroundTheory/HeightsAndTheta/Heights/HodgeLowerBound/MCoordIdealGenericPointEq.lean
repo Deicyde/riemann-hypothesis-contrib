@@ -29,8 +29,11 @@ variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
 section Boundary
 
-theorem mcPts_torus {B : Ideal (MRing ι)} (hB : IsMultiHomogIdeal B) {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts B)
-    {c : K → ℂ} (hc : ∀ k, c k ≠ 0) : torusSmul c z ∈ mcPts B := by
+theorem mcPts_torus
+    {B : Ideal (MRing ι)} (hB : IsMultiHomogIdeal B)
+    {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts B)
+    {c : K → ℂ} (hc : ∀ k, c k ≠ 0)
+    : torusSmul c z ∈ mcPts B := by
   refine ⟨fun k => ?_, fun f hf => ?_⟩
   · obtain ⟨i, hi⟩ := hz.1 k
     exact ⟨i, mul_ne_zero (hc k) hi⟩
@@ -40,8 +43,8 @@ theorem mcPts_torus {B : Ideal (MRing ι)} (hB : IsMultiHomogIdeal B) {z : (Σ k
     obtain ⟨a, ha⟩ := hS s hs
     rw [eval_map]
     unfold torusSmul
-    rw [IndefiniteRowSideFullHecke.HeightsSet.CurveComplexPoint.eval₂_smul_homog s a ha, ← eval_map, hz.2 s (Ideal.subset_span hs),
-      mul_zero]
+    rw [IndefiniteRowSideFullHecke.HeightsSet.CurveComplexPoint.eval₂_smul_homog s a ha, ← eval_map,
+      hz.2 s (Ideal.subset_span hs), mul_zero]
   | zero => simp
   | add x y _ _ hx hy => rw [map_add (f := _), eval_add, hx, hy, add_zero]
   | smul r x _ hx => rw [smul_eq_mul, map_mul, eval_mul, hx, mul_zero]

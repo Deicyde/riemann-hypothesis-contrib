@@ -9,7 +9,10 @@ open GlobalTheory.KeyKa
 
 namespace GlobalTheory.KeyKa
 
-theorem torsSq_map : ∀ (R Ix : Type) [CommRing R] [Fintype Ix] [DecidableEq Ix] (deg : Ix → ℕ) (D : Matrix Ix Ix R) (R' : Type) [CommRing R'] (f : R →+* R') (t : R), TorsSq deg D t → TorsSq deg (D.map f) (f t) := by
+theorem torsSq_map
+    : ∀ (R Ix : Type) [CommRing R] [Fintype Ix] [DecidableEq Ix] (deg : Ix → ℕ) (D : Matrix Ix Ix R)
+        (R' : Type) [CommRing R'] (f : R →+* R') (t : R),
+      TorsSq deg D t → TorsSq deg (D.map f) (f t) := by
   intro R Ix _ _ _ deg D R' _ f t H
   obtain ⟨h, h1, h2, e, h3⟩ := H
   refine ⟨h.map f, ?_, ?_, e, ?_⟩

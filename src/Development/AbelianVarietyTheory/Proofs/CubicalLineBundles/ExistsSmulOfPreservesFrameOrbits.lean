@@ -7,27 +7,35 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj
+open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj
 open scoped Matrix
 
 namespace GlobalTheory.OrbitScalar
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
-
 open NumberField in
 open scoped Matrix in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
-theorem _root_.GlobalTheory.OrbitScalar.exists_mem_dom (X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r) : X.dom.Nonempty := by
+theorem _root_.GlobalTheory.OrbitScalar.exists_mem_dom
+    (X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r)
+    : X.dom.Nonempty := by
   choose P hP hG using X.signature
   refine ⟨fun τ => P τ, fun τ => ⟨hP τ, fun i => ?_⟩⟩
-  change 0 < _root_.ReciprocityTheory.ChartRestriction.G.FD.psgn X.p0 i * (_root_.ReciprocityTheory.ChartRestriction.G.FD.lminor (_root_.ReciprocityTheory.ChartRestriction.G.FD.gram τ X.Gm (P τ)) i).re
+  change 0
+    < _root_.ReciprocityTheory.ChartRestriction.G.FD.psgn X.p0 i
+      * (_root_.ReciprocityTheory.ChartRestriction.G.FD.lminor
+        (_root_.ReciprocityTheory.ChartRestriction.G.FD.gram τ X.Gm (P τ)) i).re
   rw [hG τ]
-  unfold _root_.ReciprocityTheory.ChartRestriction.G.FD.lminor _root_.ReciprocityTheory.ChartRestriction.G.FD.psgn
+  unfold _root_.ReciprocityTheory.ChartRestriction.G.FD.lminor
+    _root_.ReciprocityTheory.ChartRestriction.G.FD.psgn
   rw [Matrix.submatrix_diagonal _ _ (Fin.castLE_injective _), Matrix.det_diagonal]
   simp only [Function.comp_apply, Fin.coe_castLE]
   rw [← Complex.ofReal_prod, Complex.ofReal_re,
-    Fin.prod_univ_eq_prod_range (fun a => _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 a) i]
+    Fin.prod_univ_eq_prod_range
+      (fun a => _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 a)
+      i]
   refine mul_self_pos.mpr (Finset.prod_ne_zero_iff.mpr fun a _ => ?_)
   unfold _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn
   split_ifs <;> norm_num
@@ -158,10 +166,15 @@ private lemma exists_eq_smul_of_parallel_on_open {n : ℕ} (A B : Matrix (Fin n)
 open NumberField in
 open scoped Matrix in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
-theorem _root_.GlobalTheory.OrbitScalar.exists_smul_of_orbits : ∀ (E : Type) [Field E] [NumberField E]
-    [IsCMField E] (r : ℕ) (X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r) (γ : GL (Fin r) E),
-    (∀ x ∈ X.dom, ∃ γ' ∈ X.Γ, ∃ b ∈ _root_.ReciprocityTheory.ChartRestriction.G.FD.Bor X.Ψ r, _root_.ReciprocityTheory.ChartRestriction.G.FD.lact γ x = _root_.ReciprocityTheory.ChartRestriction.G.FD.rmul (_root_.ReciprocityTheory.ChartRestriction.G.FD.lact γ' x) b) →
-      ∃ γ' ∈ X.Γ, ∃ u : E, (γ' : Matrix (Fin r) (Fin r) E) = u • (γ : Matrix (Fin r) (Fin r) E) := by
+theorem _root_.GlobalTheory.OrbitScalar.exists_smul_of_orbits
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ)
+        (X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r) (γ : GL (Fin r) E),
+      (∀ x ∈ X.dom, ∃ γ' ∈ X.Γ, ∃ b ∈ _root_.ReciprocityTheory.ChartRestriction.G.FD.Bor X.Ψ r,
+          _root_.ReciprocityTheory.ChartRestriction.G.FD.lact γ x
+            = _root_.ReciprocityTheory.ChartRestriction.G.FD.rmul
+              (_root_.ReciprocityTheory.ChartRestriction.G.FD.lact γ' x) b)
+        → ∃ γ' ∈ X.Γ, ∃ u : E,
+          (γ' : Matrix (Fin r) (Fin r) E) = u • (γ : Matrix (Fin r) (Fin r) E) := by
   intro E _ _ _ r X γ hγ
   classical
   rcases Nat.eq_zero_or_pos r with rfl | hr
@@ -172,15 +185,16 @@ theorem _root_.GlobalTheory.OrbitScalar.exists_smul_of_orbits : ∀ (E : Type) [
     Function.Injective.countable (f := fun g : GL (Fin r) E => fun i j => (g : Matrix (Fin r) (Fin r) E) i j)
       fun g h e => Units.ext (Matrix.ext fun i j => congrFun (congrFun e i) j)
   let col : (X.Ψ → Fin r → Fin r → ℂ) → X.Ψ → Fin r → ℂ := fun x τ a => x τ a i0
-  let C : X.Γ → Set (X.Ψ → Fin r → Fin r → ℂ) := fun g => {x | ∀ τ : X.Ψ, ∀ i j,
-    (((γ : Matrix (Fin r) (Fin r) E).map τ) *ᵥ col x τ) i *
-      ((((g : GL (Fin r) E) : Matrix (Fin r) (Fin r) E).map τ) *ᵥ col x τ) j =
-    (((γ : Matrix (Fin r) (Fin r) E).map τ) *ᵥ col x τ) j *
-      ((((g : GL (Fin r) E) : Matrix (Fin r) (Fin r) E).map τ) *ᵥ col x τ) i}
+  let C : X.Γ → Set (X.Ψ → Fin r → Fin r → ℂ) := fun g =>
+    {x | ∀ τ : X.Ψ, ∀ i j,
+      (((γ : Matrix (Fin r) (Fin r) E).map τ) *ᵥ col x τ) i *
+        ((((g : GL (Fin r) E) : Matrix (Fin r) (Fin r) E).map τ) *ᵥ col x τ) j =
+      (((γ : Matrix (Fin r) (Fin r) E).map τ) *ᵥ col x τ) j *
+        ((((g : GL (Fin r) E) : Matrix (Fin r) (Fin r) E).map τ) *ᵥ col x τ) i}
   have hCclosed : ∀ g, IsClosed (C g) := fun g => by
     simp only [C, Set.setOf_forall]
-    exact isClosed_iInter fun τ => isClosed_iInter fun i => isClosed_iInter fun j =>
-      isClosed_eq (by fun_prop) (by fun_prop)
+    exact isClosed_iInter fun τ =>
+      isClosed_iInter fun i => isClosed_iInter fun j => isClosed_eq (by fun_prop) (by fun_prop)
   let f : Option X.Γ → Set (X.Ψ → Fin r → Fin r → ℂ) := fun o =>
     o.elim (X.dom : Set (X.Ψ → Fin r → Fin r → ℂ))ᶜ C
   have hfc : ∀ o, IsClosed (f o) := by
@@ -194,27 +208,35 @@ theorem _root_.GlobalTheory.OrbitScalar.exists_smul_of_orbits : ∀ (E : Type) [
       refine Set.mem_iUnion.mpr ⟨some ⟨g, hg⟩, ?_⟩
       show ∀ τ : X.Ψ, ∀ i j, _
       intro τ i j
-      have hcol : ((γ : Matrix (Fin r) (Fin r) E).map τ) *ᵥ col x τ =
-          b τ i0 i0 • (((g : Matrix (Fin r) (Fin r) E).map τ) *ᵥ col x τ) := by
+      have hcol
+          : ((γ : Matrix (Fin r) (Fin r) E).map τ) *ᵥ col x τ
+            = b τ i0 i0 • (((g : Matrix (Fin r) (Fin r) E).map τ) *ᵥ col x τ) := by
         funext a
         have h := congrFun (congrFun (congrFun heq τ) a) i0
-        unfold _root_.ReciprocityTheory.ChartRestriction.G.FD.lact _root_.ReciprocityTheory.ChartRestriction.G.FD.rmul _root_.ReciprocityTheory.ChartRestriction.G.FD.mat at h
+        unfold _root_.ReciprocityTheory.ChartRestriction.G.FD.lact
+            _root_.ReciprocityTheory.ChartRestriction.G.FD.rmul
+            _root_.ReciprocityTheory.ChartRestriction.G.FD.mat
+          at h
         simp only [Matrix.mul_apply, Matrix.of_apply] at h
         have hR : ∀ F : Fin r → ℂ, ∑ k, F k * b τ k i0 = F i0 * b τ i0 i0 := fun F =>
-          Finset.sum_eq_single i0 (fun k _ hk => by
-            rw [(hb τ).2 k i0 (Fin.lt_def.mpr (Nat.pos_of_ne_zero fun h0 => hk (Fin.ext h0))),
-              mul_zero]) (by simp)
+          Finset.sum_eq_single i0
+            (fun k _ hk => by
+              rw [(hb τ).2 k i0 (Fin.lt_def.mpr (Nat.pos_of_ne_zero fun h0 => hk (Fin.ext h0))),
+                mul_zero])
+            (by simp)
         rw [hR] at h
         simp only [Matrix.mulVec, dotProduct, col, Pi.smul_apply, smul_eq_mul, Matrix.of_apply,
-          Matrix.mul_apply] at h ⊢
+            Matrix.mul_apply]
+          at h ⊢
         rw [h, mul_comm]
         rfl
       rw [hcol]
       simp only [Pi.smul_apply, smul_eq_mul]
       ring
     · exact Set.mem_iUnion.mpr ⟨none, hx⟩
-  obtain ⟨x, hxdom, hxint⟩ := (dense_iUnion_interior_of_closed hfc hcover).inter_open_nonempty _
-    (isOpen_dom_cubical_line_bundles X) (_root_.GlobalTheory.OrbitScalar.exists_mem_dom X)
+  obtain ⟨x, hxdom, hxint⟩ :=
+    (dense_iUnion_interior_of_closed hfc hcover).inter_open_nonempty _
+      (isOpen_dom_cubical_line_bundles X) (_root_.GlobalTheory.OrbitScalar.exists_mem_dom X)
   obtain ⟨o, ho⟩ := Set.mem_iUnion.mp hxint
   rcases o with _ | g
   · exact absurd hxdom (interior_subset ho)
@@ -251,12 +273,16 @@ theorem _root_.GlobalTheory.OrbitScalar.exists_smul_of_orbits : ∀ (E : Type) [
     rw [← h]
     exact (map_ne_zero _).mpr
       ((Matrix.isUnit_iff_isUnit_det _).mp (g : GL (Fin r) E).isUnit).ne_zero
-  obtain ⟨c, hc⟩ := exists_eq_smul_of_parallel_on_open _ _ hdet U hU hUne fun v hv i j => by
-    have hmem : upd v ∈ C g := interior_subset hv
-    have := hmem τ0 i j
-    rwa [hcolupd] at this
-  have hent : ∀ a b, (τ0 : E →+* ℂ) ((γ : Matrix (Fin r) (Fin r) E) a b) =
-      c * (τ0 : E →+* ℂ) (((g : GL (Fin r) E) : Matrix (Fin r) (Fin r) E) a b) := fun a b => by
+  obtain ⟨c, hc⟩ :=
+    exists_eq_smul_of_parallel_on_open _ _ hdet U hU hUne fun v hv i j => by
+      have hmem : upd v ∈ C g := interior_subset hv
+      have := hmem τ0 i j
+      rwa [hcolupd] at this
+  have hent
+      : ∀ a b,
+        (τ0 : E →+* ℂ) ((γ : Matrix (Fin r) (Fin r) E) a b)
+          = c
+            * (τ0 : E →+* ℂ) (((g : GL (Fin r) E) : Matrix (Fin r) (Fin r) E) a b) := fun a b => by
     have h := congrFun (congrFun hc a) b
     simpa [Matrix.map_apply] using h
   haveI : Nonempty (Fin r) := ⟨i0⟩
@@ -275,10 +301,10 @@ theorem _root_.GlobalTheory.OrbitScalar.exists_smul_of_orbits : ∀ (E : Type) [
   have hcu : c = (τ0 : E →+* ℂ) u0 := by
     rw [hu0def, map_div₀, hent k l]
     field_simp
-  have hγg : (γ : Matrix (Fin r) (Fin r) E) =
-      u0 • ((g : GL (Fin r) E) : Matrix (Fin r) (Fin r) E) :=
-    Matrix.ext fun a b => (τ0 : E →+* ℂ).injective (by
-      rw [hent, hcu, Matrix.smul_apply, smul_eq_mul, map_mul])
+  have hγg
+      : (γ : Matrix (Fin r) (Fin r) E) = u0 • ((g : GL (Fin r) E) : Matrix (Fin r) (Fin r) E) :=
+    Matrix.ext fun a b =>
+      (τ0 : E →+* ℂ).injective (by rw [hent, hcu, Matrix.smul_apply, smul_eq_mul, map_mul])
   have hu0 : u0 ≠ 0 := fun h0 => hne0 γ (by rw [hγg, h0, zero_smul])
   refine ⟨g, g.2, u0⁻¹, ?_⟩
   rw [hγg, smul_smul, inv_mul_cancel₀ hu0, one_smul]

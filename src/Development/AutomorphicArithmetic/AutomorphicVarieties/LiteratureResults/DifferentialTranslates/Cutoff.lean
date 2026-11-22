@@ -29,16 +29,17 @@ theorem cutoff : Cutoff := by
     rw [← finsum_comp_equiv (Equiv.mulLeft δ) (f := fun γ => φ (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p))]
     congr 1
     funext γ
-    change φ (G.σ γ⁻¹ (G.σ δ⁻¹ s)) (G.ρ γ⁻¹ (G.ρ δ⁻¹ p)) =
-      φ (G.σ (δ * γ)⁻¹ s) (G.ρ (δ * γ)⁻¹ p)
+    change φ (G.σ γ⁻¹ (G.σ δ⁻¹ s)) (G.ρ γ⁻¹ (G.ρ δ⁻¹ p)) = φ (G.σ (δ * γ)⁻¹ s) (G.ρ (δ * γ)⁻¹ p)
     rw [mul_inv_rev, hmulσ, hmulρ]
-  have hloc : ∀ s, ∀ p ∈ G.Y, ∃ N ∈ nhds p, ∃ F : Finset Γ, ∀ x ∈ N, ∀ γ,
-      φ (G.σ γ⁻¹ s) (G.ρ γ⁻¹ x) ≠ 0 → γ ∈ F := by
+  have hloc
+      : ∀ s, ∀ p ∈ G.Y, ∃ N ∈ nhds p, ∃ F : Finset Γ, ∀ x ∈ N, ∀ γ,
+        φ (G.σ γ⁻¹ s) (G.ρ γ⁻¹ x) ≠ 0 → γ ∈ F := by
     intro s p hp
     obtain ⟨N, hN, hNf⟩ := hWf s p hp
     exact ⟨N, hN, hNf.toFinset, fun x hx γ hγ => hNf.mem_toFinset.2 ⟨x, hx, (hne _ _).1 hγ⟩⟩
-  have hΦeq : ∀ s (F : Finset Γ) x, (∀ γ, φ (G.σ γ⁻¹ s) (G.ρ γ⁻¹ x) ≠ 0 → γ ∈ F) →
-      Φ s x = ∑ γ ∈ F, φ (G.σ γ⁻¹ s) (G.ρ γ⁻¹ x) :=
+  have hΦeq
+      : ∀ s (F : Finset Γ) x,
+        (∀ γ, φ (G.σ γ⁻¹ s) (G.ρ γ⁻¹ x) ≠ 0 → γ ∈ F) → Φ s x = ∑ γ ∈ F, φ (G.σ γ⁻¹ s) (G.ρ γ⁻¹ x) :=
     fun s F x h => finsum_eq_sum_of_support_subset _ (fun γ hγ => h γ hγ)
   have hpos : ∀ s, ∀ p ∈ G.Y, 0 < Φ s p := by
     intro s p hp
@@ -46,7 +47,8 @@ theorem cutoff : Cutoff := by
     rw [hΦeq s F p (hF p (mem_of_mem_nhds hN))]
     obtain ⟨γ, hγ⟩ := hWc s p hp
     have h0 : φ (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) ≠ 0 := (hne _ _).2 hγ
-    exact Finset.sum_pos' (fun i _ => hnn _ _)
+    exact Finset.sum_pos'
+      (fun i _ => hnn _ _)
       ⟨γ, hF p (mem_of_mem_nhds hN) γ h0, lt_of_le_of_ne (hnn _ _) (Ne.symm h0)⟩
   have hsmooth : ∀ s, ∀ p ∈ G.Y, ContDiffAt ℝ ∞ (Φ s) p := by
     intro s p hp
@@ -63,8 +65,11 @@ theorem cutoff : Cutoff := by
     refine ⟨N, hN, hNf.subset ?_⟩
     rintro γ ⟨x, hx, hne0⟩
     exact ⟨x, hx, (hne _ _).1 (fun h => hne0 (by simp only [h, zero_div]))⟩
-  · have e : ∀ γ : Γ, φ (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) / Φ (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) =
-        φ (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) * (Φ s p)⁻¹ := fun γ => by rw [hinv, div_eq_mul_inv]
+  · have e
+        : ∀ γ : Γ,
+          φ (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) / Φ (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p)
+            = φ (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) * (Φ s p)⁻¹ := fun γ => by
+      rw [hinv, div_eq_mul_inv]
     show ∑ᶠ γ, φ (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) / Φ (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p) = 1
     rw [finsum_congr e, ← finsum_mul]
     exact mul_inv_cancel₀ (hpos s p hp).ne'

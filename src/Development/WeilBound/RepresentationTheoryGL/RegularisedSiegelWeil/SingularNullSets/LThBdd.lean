@@ -9,10 +9,14 @@ public import Development.WeilBound.RepresentationTheoryGL.RegularisedSiegelWeil
 noncomputable section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct Topology
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory Filter
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open IsDedekindDomain NumberField
@@ -20,20 +24,32 @@ open GlobalTheory.RegSch (ikS projS Lvl)
 
 namespace PositivityTheory.Rg.Rsw.L.LThBdd
 
-variable {D : D7} {n : ℕ} {W : HSp D} {θ : InfFam D} {ω : G D n →* Module.End ℂ (schwartzA θ W.rank n)}
+variable
+  {D : D7} {n : ℕ} {W : HSp D} {θ : InfFam D} {ω : G D n →* Module.End ℂ (schwartzA θ W.rank n)}
 
-theorem bound_all {v : Pl D} (U : Subgroup (G D n)) (hUo : IsOpen (U : Set (G D n))) (Φ : schwartzA θ W.rank n)
-    (hrat : ∀ γ ∈ GF D n, ∀ g h, theta ω Φ (γ * g) h = theta ω Φ g h)
+theorem bound_all
+    {v : Pl D}
+    (U : Subgroup (G D n)) (hUo : IsOpen (U : Set (G D n)))
+    (Φ : schwartzA θ W.rank n) (hrat : ∀ γ ∈ GF D n, ∀ g h, theta ω Φ (γ * g) h = theta ω Φ g h)
     (hfix : ∀ k ∈ U, k ∈ atPts D.sp.cm.sig (Jst D n) {v} → ω k Φ = Φ)
-    (hU : ∀ k k' : G D n, GlobalTheory.AdelicU.proj D.sp.cm.sig (Jst D n) v k = GlobalTheory.AdelicU.proj D.sp.cm.sig (Jst D n) v k' →
-      k ∈ U → k' ∈ U)
-    (hdec : ∀ g : G D n, ∃ γ ∈ GF D n, ∃ g' : G D n, GlobalTheory.AdelicU.proj D.sp.cm.sig (Jst D n) v g' = 1 ∧
-      ∃ k ∈ U, k ∈ atPts D.sp.cm.sig (Jst D n) {v} ∧ g = γ * g' * k)
-    (hb : ∀ Q : Set (G D n), IsCompact Q → ∃ b : ℝ, ∀ g ∈ Q, GlobalTheory.AdelicU.proj D.sp.cm.sig (Jst D n) v g = 1 →
-      ∀ h, ‖theta ω Φ g h‖ ≤ b)
-    (K₀ : Set (G D n)) (hK₀ : IsCompact K₀) : ∃ b : ℝ, ∀ g ∈ K₀, ∀ h, ‖theta ω Φ g h‖ ≤ b := by
-  have hred : ∀ γ ∈ GF D n, ∀ g' k, k ∈ U → k ∈ atPts D.sp.cm.sig (Jst D n) {v} → ∀ h,
-      theta ω Φ (γ * g' * k) h = theta ω Φ g' h := by
+    (hU : ∀ k k' : G D n,
+      GlobalTheory.AdelicU.proj D.sp.cm.sig (Jst D n) v k
+          = GlobalTheory.AdelicU.proj D.sp.cm.sig (Jst D n) v k'
+        → k ∈ U
+        → k' ∈ U)
+    (hdec : ∀ g : G D n, ∃ γ ∈ GF D n, ∃ g' : G D n,
+      GlobalTheory.AdelicU.proj D.sp.cm.sig (Jst D n) v g' = 1
+        ∧ ∃ k ∈ U, k ∈ atPts D.sp.cm.sig (Jst D n) {v} ∧ g = γ * g' * k)
+    (hb : ∀ Q : Set (G D n),
+      IsCompact Q
+        → ∃ b : ℝ, ∀ g ∈ Q,
+          GlobalTheory.AdelicU.proj D.sp.cm.sig (Jst D n) v g = 1 → ∀ h, ‖theta ω Φ g h‖ ≤ b)
+    (K₀ : Set (G D n)) (hK₀ : IsCompact K₀)
+    : ∃ b : ℝ, ∀ g ∈ K₀, ∀ h, ‖theta ω Φ g h‖ ≤ b := by
+  have hred
+      : ∀ γ ∈ GF D n, ∀ g' k,
+        k ∈ U → k ∈ atPts D.sp.cm.sig (Jst D n) {v}
+          → ∀ h, theta ω Φ (γ * g' * k) h = theta ω Φ g' h := by
     intro γ hγ g' k hk hkv h
     rw [mul_assoc, hrat γ hγ]
     unfold theta
@@ -63,9 +79,11 @@ theorem bound_all {v : Pl D} (U : Subgroup (G D n)) (hUo : IsOpen (U : Set (G D 
     show ε * (locPart v ε)⁻¹ * locPart v ε = ε
     group
   have hkU : kf g₀ * εv ∈ U := mul_mem (hkf g₀) (hU ε εv (proj_locPart v ε).symm (hW₀U hεW))
-  have hkv : kf g₀ * εv ∈ atPts D.sp.cm.sig (Jst D n) {v} := mul_mem (hkvf g₀) (locPart_mem_atPts v ε)
+  have hkv : kf g₀ * εv ∈ atPts D.sp.cm.sig (Jst D n) {v} :=
+    mul_mem (hkvf g₀) (locPart_mem_atPts v ε)
   have heq : g = γf g₀ * (g'f g₀ * ε') * (kf g₀ * εv) := by
-    calc g = g₀ * ε := by rw [hε]; group
+    calc
+      g = g₀ * ε := by rw [hε]; group
       _ = γf g₀ * g'f g₀ * kf g₀ * (ε' * εv) := by rw [← hgf g₀, hsplit]
       _ = γf g₀ * g'f g₀ * (kf g₀ * ε') * εv := by simp only [mul_assoc]
       _ = γf g₀ * g'f g₀ * (ε' * kf g₀) * εv := by rw [hc]
@@ -83,13 +101,19 @@ theorem thBdd : WMaj → LatBound → WeakApproximationFinitePlace → ThBdd := 
   intro hWM hLB hWA D n W ψ hψ χ hχ hη θ hθ μ hμ ω hω nb hnb v C hC Ψ Ψ' hΨ hΨ'
   obtain ⟨𝓕, hμ'⟩ := hμ
   have hW := hWM D n W ψ hψ χ hχ hη θ hθ μ ⟨𝓕, hμ'⟩ ω hω Ψ'
-  have hrat : ∀ γ ∈ GF D n, ∀ g h, theta ω Ψ' (γ * g) h = theta ω Ψ' g h :=
-    fun γ hγ g h => theta_rat hψ hχ hθ hμ' hω Ψ' hγ g h
+  have hrat : ∀ γ ∈ GF D n, ∀ g h, theta ω Ψ' (γ * g) h = theta ω Ψ' g h := fun γ hγ g h =>
+    theta_rat hψ hχ hθ hμ' hω Ψ' hγ g h
   have hfix : ∀ k ∈ Ucut nb v C.s, k ∈ atPts D.sp.cm.sig (Jst D n) {v} → ω k Ψ' = Ψ' :=
     fun k hk hkv => fix_open hnb C Ψ Ψ' hΨ hΨ' hk hkv
-  refine ⟨theta_cont hθ Ψ' hW.1 hW.2, hrat, ⟨Ucut nb v C.s, isOpen_Ucut _ _ _, hfix⟩, fun K₀ hK₀ => ?_,
-    fun x g hg => ⟨omega_cut hω hnb C Ψ Ψ' hΨ' hg, theta_nb hω hnb C hC Ψ Ψ' hΨ hΨ' x hg⟩⟩
-  exact bound_all (Ucut nb v C.s) (isOpen_Ucut _ _ _) Ψ' hrat hfix (fun k k' e hk => mem_Ucut_of_proj e hk)
+  refine ⟨
+    theta_cont hθ Ψ' hW.1 hW.2,
+    hrat,
+    ⟨Ucut nb v C.s, isOpen_Ucut _ _ _, hfix⟩,
+    fun K₀ hK₀ => ?_,
+    fun x g hg => ⟨omega_cut hω hnb C Ψ Ψ' hΨ' hg, theta_nb hω hnb C hC Ψ Ψ' hΨ hΨ' x hg⟩
+  ⟩
+  exact bound_all (Ucut nb v C.s) (isOpen_Ucut _ _ _) Ψ' hrat hfix
+    (fun k k' e hk => mem_Ucut_of_proj e hk)
     (fun g => hWA D n v (Ucut nb v C.s) (isOpen_Ucut _ _ _) g)
     (bound_triv hω hnb C hC Ψ Ψ' hΨ hΨ' hLB hθ hW.2) K₀ hK₀
 

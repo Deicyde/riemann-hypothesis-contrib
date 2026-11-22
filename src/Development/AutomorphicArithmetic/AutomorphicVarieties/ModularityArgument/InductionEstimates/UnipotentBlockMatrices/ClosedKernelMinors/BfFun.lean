@@ -7,24 +7,29 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open MeasureTheory NumberField Set Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
-open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel PositivityTheory.Rg.Tf.IntegralApplyAeEq
+open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel
+  PositivityTheory.Rg.Tf.IntegralApplyAeEq
 open scoped ENNReal NumberField.AdeleRing InnerProductSpace ComplexConjugate
 namespace UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
 
-theorem bfFun :
-    ∀ {K : Type} [Field K] [NumberField K] (f : G1 K (2 + 2) → ℂ) (β : ℝ → ℂ),
-      SFun f → Continuous β → HasCompactSupport β →
-        PFun (bf β f) ∧ InBand (bf β f) ∧ Decays (bf β f) := by
+theorem bfFun
+    : ∀ {K : Type} [Field K] [NumberField K] (f : G1 K (2 + 2) → ℂ) (β : ℝ → ℂ),
+      SFun f → Continuous β → HasCompactSupport β
+        → PFun (bf β f) ∧ InBand (bf β f) ∧ Decays (bf β f) := by
   intro K _ _ f β hf hβ hc
   obtain ⟨h1, -, h3, h4, -⟩ := hpSpec (K := K)
   obtain ⟨-, -, hl, -⟩ := blkLaws (K := K)
-  obtain ⟨w, hw⟩ : ∃ w : ℝ → ℂ, w = fun t => β t * Complex.exp ((((2 + 2 : ℕ) : ℝ) / 2 * t : ℝ) : ℂ) := ⟨_, rfl⟩
+  obtain ⟨w, hw⟩
+      : ∃ w : ℝ → ℂ, w = fun t => β t * Complex.exp ((((2 + 2 : ℕ) : ℝ) / 2 * t : ℝ) : ℂ) :=
+    ⟨_, rfl⟩
   have hbf : ∀ g, bf β f g = w (HH g) * f g := fun g => by rw [hw]; rfl
   have hwc : Continuous w := by
     rw [hw]
-    exact hβ.mul (Complex.continuous_exp.comp (Complex.continuous_ofReal.comp (continuous_const.mul continuous_id)))
+    exact hβ.mul (Complex.continuous_exp.comp (Complex.continuous_ofReal.comp (continuous_const.mul
+      continuous_id)))
   have hws : HasCompactSupport w := by
     rw [hw]
     exact hc.mul_right
@@ -63,7 +68,8 @@ theorem bfFun :
     refine ⟨B * C, fun x hx => ?_⟩
     obtain ⟨γ, hγ, h⟩ := hC x hx
     refine ⟨γ, hγ, ?_⟩
-    refine (mul_le_mul_of_nonneg_right (hle x) (pow_nonneg (AutomorphicForm.height_pos _).le N)).trans ?_
+    refine
+      (mul_le_mul_of_nonneg_right (hle x) (pow_nonneg (AutomorphicForm.height_pos _).le N)).trans ?_
     rw [mul_assoc]
     exact mul_le_mul_of_nonneg_left h hB0
 

@@ -20,8 +20,8 @@ private theorem cent_sg_up (σ : R ≃ₐ[k] R) (γ : GL (Fin n) k) : sg σ (up 
   ext a b
   simp [sg, up, Matrix.GeneralLinearGroup.map_apply]
 
-private theorem cent_nm_sg (σ : R ≃ₐ[k] R) (q : ℕ) (d : GL (Fin n) R) :
-    nm σ q (sg σ d) = sg σ (nm σ q d) := by
+private theorem cent_nm_sg (σ : R ≃ₐ[k] R) (q : ℕ) (d : GL (Fin n) R)
+    : nm σ q (sg σ d) = sg σ (nm σ q d) := by
   unfold nm
   rw [map_list_prod, List.map_map]
   congr 1
@@ -30,16 +30,20 @@ private theorem cent_nm_sg (σ : R ≃ₐ[k] R) (q : ℕ) (d : GL (Fin n) R) :
   change (σ ^ m) (σ _) = σ ((σ ^ m) _)
   rw [← AlgEquiv.mul_apply, ← AlgEquiv.mul_apply, ← pow_succ, ← pow_succ']
 
-private theorem cent_up_inj (h : Function.Injective (algebraMap k R)) :
-    Function.Injective (up R : GL (Fin n) k → GL (Fin n) R) := by
+private theorem cent_up_inj (h : Function.Injective (algebraMap k R))
+    : Function.Injective (up R : GL (Fin n) k → GL (Fin n) R) := by
   intro s t hst
   ext a b
   exact h (congrArg (fun g : GL (Fin n) R => (g : Matrix (Fin n) (Fin n) R) a b) hst)
 
-private theorem cent_descend {σ : R ≃ₐ[k] R} {q : ℕ} (hσ : IsGal σ q) (x : GL (Fin n) R) (hx : sg σ x = x) :
-    ∃ t : GL (Fin n) k, x = up R t := by
-  have key : ∀ y : GL (Fin n) R, sg σ y = y → ∃ M : Matrix (Fin n) (Fin n) k,
-      M.map (algebraMap k R) = (y : Matrix (Fin n) (Fin n) R) := by
+private theorem cent_descend
+    {σ : R ≃ₐ[k] R} {q : ℕ} (hσ : IsGal σ q) (x : GL (Fin n) R) (hx : sg σ x = x)
+    : ∃ t : GL (Fin n) k, x = up R t := by
+  have key
+      : ∀ y : GL (Fin n) R,
+        sg σ y = y
+          → ∃ M : Matrix (Fin n) (Fin n) k,
+            M.map (algebraMap k R) = (y : Matrix (Fin n) (Fin n) R) := by
     intro y hy
     have h : ∀ a b, ∃ c, algebraMap k R c = (y : Matrix (Fin n) (Fin n) R) a b := fun a b =>
       hσ.fix _ (congrArg (fun g : GL (Fin n) R => (g : Matrix (Fin n) (Fin n) R) a b) hy)
@@ -58,8 +62,7 @@ end
 
 end UpperTheory.ConvolutionTheory.D
 
-theorem UpperTheory.ConvolutionTheory.D.nmCent :
-    UpperTheory.ConvolutionTheory.D.NmCent := by
+theorem UpperTheory.ConvolutionTheory.D.nmCent : UpperTheory.ConvolutionTheory.D.NmCent := by
   intro k R _ _ _ _ σ q hσ n a γ hsep ha x
   haveI : Module.Finite k R := (galBase k R k σ q hσ).1
   have hs : ((up R γ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R).charpoly.Separable := by

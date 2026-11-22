@@ -6,9 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory.LiftDeriv
 
-theorem krullDimLE_and_isLocalRing_quotient {P : Type} [CommRing P] (Q S : Ideal P) [hQ : Q.IsMaximal]
-    (n : ℕ) (h1 : Q ^ (n + 1) ≤ S) (h2 : S ≤ Q) :
-    Ring.KrullDimLE 0 (P ⧸ S) ∧ IsLocalRing (P ⧸ S) := by
+theorem krullDimLE_and_isLocalRing_quotient
+    {P : Type} [CommRing P]
+    (Q S : Ideal P) [hQ : Q.IsMaximal]
+    (n : ℕ) (h1 : Q ^ (n + 1) ≤ S)
+    (h2 : S ≤ Q)
+    : Ring.KrullDimLE 0 (P ⧸ S) ∧ IsLocalRing (P ⧸ S) := by
   have hSt : S ≠ ⊤ := fun h => hQ.ne_top (top_le_iff.1 (h ▸ h2))
   have : Nontrivial (P ⧸ S) := Ideal.Quotient.nontrivial_iff.2 hSt
   have key : ∀ M : Ideal (P ⧸ S), M.IsPrime → M = Q.map (Ideal.Quotient.mk S) := by
@@ -24,9 +27,23 @@ theorem krullDimLE_and_isLocalRing_quotient {P : Type} [CommRing P] (Q S : Ideal
   exact ((Ring.krullDimLE_zero_and_isLocalRing_tfae (P ⧸ S)).out 2 1 rfl rfl).mp
     ⟨M, hM.isPrime, fun M' hM' => (key M' hM').trans (key M hM.isPrime).symm⟩
 
-theorem exists_derivation_extending : ∀ (A P R K : Type) [CommRing A] [CommRing P] [IsNoetherianRing P] [CommRing R] [Field K] [Algebra A P] [Algebra A R] [Algebra P R] [IsScalarTower A P R] [Algebra R K] [Algebra P K] [IsScalarTower P R K] [Algebra A K] [IsScalarTower A P K], Function.Surjective (algebraMap P R) → Function.Surjective (algebraMap R K) → (∀ (C C₀ : Type) [CommRing C] [IsLocalRing C] [IsArtinianRing C] [CommRing C₀] (π : C →+* C₀), Function.Surjective π → RingHom.ker π ^ 2 = ⊥ → ∀ (β : A →+* C) (φ₀ : R →+* C₀), φ₀.comp (algebraMap A R) = π.comp β → ∃ φ : R →+* C, π.comp φ = φ₀ ∧ φ.comp (algebraMap A R) = β) → ∀ ℓ : RingHom.ker (algebraMap P R) →ₗ[P] K, ∃ D : Derivation A P K, ∀ i : RingHom.ker (algebraMap P R), D i = ℓ i := by
+theorem exists_derivation_extending
+    : ∀ (A P R K : Type) [CommRing A] [CommRing P] [IsNoetherianRing P] [CommRing R] [Field K]
+        [Algebra A P] [Algebra A R] [Algebra P R] [IsScalarTower A P R] [Algebra R K] [Algebra P K]
+        [IsScalarTower P R K] [Algebra A K] [IsScalarTower A P K],
+      Function.Surjective (algebraMap P R) → Function.Surjective (algebraMap R K)
+        → (∀ (C C₀ : Type) [CommRing C] [IsLocalRing C] [IsArtinianRing C] [CommRing C₀]
+            (π : C →+* C₀),
+          Function.Surjective π → RingHom.ker π ^ 2 = ⊥
+            → ∀ (β : A →+* C) (φ₀ : R →+* C₀),
+              φ₀.comp (algebraMap A R) = π.comp β
+                → ∃ φ : R →+* C, π.comp φ = φ₀ ∧ φ.comp (algebraMap A R) = β)
+        → ∀ ℓ : RingHom.ker (algebraMap P R) →ₗ[P] K, ∃ D : Derivation A P K,
+          ∀ i : RingHom.ker (algebraMap P R),
+            D i = ℓ i := by
   intro A P R K _ _ _ _ _ _ _ _ _ _ _ _ _ _ hf hg hlift ℓ
-  have hPK : algebraMap P K = (algebraMap R K).comp (algebraMap P R) := IsScalarTower.algebraMap_eq P R K
+  have hPK : algebraMap P K = (algebraMap R K).comp (algebraMap P R) :=
+    IsScalarTower.algebraMap_eq P R K
   have hQm : (RingHom.ker (algebraMap P K)).IsMaximal :=
     RingHom.ker_isMaximal_of_surjective _ (by rw [hPK]; exact hg.comp hf)
   have hIQ : RingHom.ker (algebraMap P R) ≤ RingHom.ker (algebraMap P K) := fun x hx => by
@@ -79,7 +96,8 @@ theorem exists_derivation_extending : ∀ (A P R K : Type) [CommRing A] [CommRin
     obtain ⟨i', hi', z', hz', rfl⟩ := Submodule.mem_sup.1 hy
     have e : (i + z) * (i' + z') = i * i' + (i * z' + z * (i' + z')) := by ring
     rw [e]
-    refine S.add_mem (Ideal.mem_sup_left (hQIJ (Ideal.mul_mem_mul (hIQ hi) hi'))) (Ideal.mem_sup_right ?_)
+    refine S.add_mem (Ideal.mem_sup_left (hQIJ (Ideal.mul_mem_mul (hIQ hi) hi')))
+      (Ideal.mem_sup_right ?_)
     exact (Q ^ (k + 1)).add_mem (Ideal.mul_mem_left _ _ hz') (Ideal.mul_mem_right _ _ hz)
   have hsq : RingHom.ker π ^ 2 = ⊥ := by
     rw [pow_two, eq_bot_iff]
@@ -126,15 +144,18 @@ theorem exists_derivation_extending : ∀ (A P R K : Type) [CommRing A] [CommRin
       have : δ a * δ b ∈ RingHom.ker π ^ 2 := by rw [pow_two]; exact Ideal.mul_mem_mul (hδ a) (hδ b)
       rw [hsq] at this
       exact (Ideal.mem_bot.1 this)
-    change (Ideal.Quotient.mk S a - φ (algebraMap P R a)) * (Ideal.Quotient.mk S b - φ (algebraMap P R b)) = 0 at h0
+    change (Ideal.Quotient.mk S a - φ (algebraMap P R a))
+          * (Ideal.Quotient.mk S b - φ (algebraMap P R b))
+        = 0
+      at h0
     show Ideal.Quotient.mk S (a * b) - φ (algebraMap P R (a * b)) =
       Ideal.Quotient.mk S a * (Ideal.Quotient.mk S b - φ (algebraMap P R b)) +
         Ideal.Quotient.mk S b * (Ideal.Quotient.mk S a - φ (algebraMap P R a))
     rw [map_mul, map_mul, map_mul]
     linear_combination -h0
 
-  let Rl : P ⧸ S → K → Prop := fun c v => ∃ (i : P) (hi : i ∈ I), ∃ z ∈ Q ^ (k + 1),
-    Ideal.Quotient.mk S (i + z) = c ∧ ℓ ⟨i, hi⟩ = v
+  let Rl : P ⧸ S → K → Prop := fun c v =>
+    ∃ (i : P) (hi : i ∈ I), ∃ z ∈ Q ^ (k + 1), Ideal.Quotient.mk S (i + z) = c ∧ ℓ ⟨i, hi⟩ = v
   have huniq : ∀ c v v', Rl c v → Rl c v' → v = v' := by
     rintro c v v' ⟨i, hi, z, hz, rfl, rfl⟩ ⟨i', hi', z', hz', he, rfl⟩
     rw [Ideal.Quotient.eq] at he
@@ -165,8 +186,8 @@ theorem exists_derivation_extending : ∀ (A P R K : Type) [CommRing A] [CommRin
     · rw [← map_mul]; congr 1; ring
     · rw [← map_smul]; rfl
   have hR0 : Rl 0 0 := ⟨0, I.zero_mem, 0, (Q ^ (k + 1)).zero_mem, by simp, map_zero ℓ⟩
-  have hRI : ∀ i (hi : i ∈ I), Rl (Ideal.Quotient.mk S i) (ℓ ⟨i, hi⟩) :=
-    fun i hi => ⟨i, hi, 0, (Q ^ (k + 1)).zero_mem, by rw [add_zero], rfl⟩
+  have hRI : ∀ i (hi : i ∈ I), Rl (Ideal.Quotient.mk S i) (ℓ ⟨i, hi⟩) := fun i hi =>
+    ⟨i, hi, 0, (Q ^ (k + 1)).zero_mem, by rw [add_zero], rfl⟩
   let D0 : P → K := fun a => Classical.choose (hex (δ a) (hδ a))
   have hD0 : ∀ a v, Rl (δ a) v → D0 a = v := fun a v h =>
     huniq _ _ _ (Classical.choose_spec (hex (δ a) (hδ a))) h
@@ -182,12 +203,14 @@ theorem exists_derivation_extending : ∀ (A P R K : Type) [CommRing A] [CommRin
       show Ideal.Quotient.mk S (algebraMap A P r) - φ (algebraMap P R (algebraMap A P r)) = 0
       rw [← IsScalarTower.algebraMap_apply A P R r, ← RingHom.comp_apply φ, hφA, sub_eq_zero]
       rfl
-    rw [this]; exact hR0
-  let Dl : P →ₗ[A] K :=
-    { toFun := D0
-      map_add' := hDadd
-      map_smul' := fun r a => by
-        rw [Algebra.smul_def, hDmul, hDA, smul_zero, add_zero, RingHom.id_apply, algebraMap_smul] }
+    rw [this]
+    exact hR0
+  let Dl : P →ₗ[A] K := {
+    toFun := D0
+    map_add' := hDadd
+    map_smul' := fun r a => by
+      rw [Algebra.smul_def, hDmul, hDA, smul_zero, add_zero, RingHom.id_apply, algebraMap_smul]
+  }
   refine ⟨Derivation.mk' Dl hDmul, fun ⟨i, hi⟩ => ?_⟩
   show D0 i = ℓ ⟨i, hi⟩
   refine hD0 _ _ ?_
@@ -195,6 +218,7 @@ theorem exists_derivation_extending : ∀ (A P R K : Type) [CommRing A] [CommRin
     show Ideal.Quotient.mk S i - φ (algebraMap P R i) = _
     have hi0 : algebraMap P R i = 0 := by rw [← RingHom.mem_ker, hI]; exact hi
     rw [hi0, map_zero, sub_zero]
-  rw [this]; exact hRI i hi
+  rw [this]
+  exact hRI i hi
 
 end GlobalTheory.LiftDeriv

@@ -6,7 +6,8 @@ public import GroundTheory.AutomorphicForms.MeasuresModulus
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -17,18 +18,22 @@ open scoped NNReal Pointwise
 
 namespace GlobalTheory.DetScale
 
-theorem integral_comp_linearEquiv {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k]
-    {V : Type} [AddCommGroup V] [Module k V] [Module.Finite k V] [TopologicalSpace V] [IsModuleTopology k V]
-    [MeasurableSpace V] [BorelSpace V] (μ : Measure V) [μ.IsAddHaarMeasure] (L : V ≃ₗ[k] V) (f : V → ℂ) :
-    ∫ y, f (L y) ∂μ = (((distribHaarChar k (LinearEquiv.det L) : ℝ≥0) : ℝ) : ℂ)⁻¹ * ∫ y, f y ∂μ := by
+theorem integral_comp_linearEquiv
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {V : Type} [AddCommGroup V] [Module k V] [Module.Finite k V] [TopologicalSpace V]
+    [IsModuleTopology k V] [MeasurableSpace V] [BorelSpace V]
+    (μ : Measure V) [μ.IsAddHaarMeasure]
+    (L : V ≃ₗ[k] V) (f : V → ℂ)
+    : ∫ y, f (L y) ∂μ
+      = (((distribHaarChar k (LinearEquiv.det L) : ℝ≥0) : ℝ) : ℂ)⁻¹ * ∫ y, f y ∂μ := by
   haveI : IsTopologicalAddGroup V := IsModuleTopology.topologicalAddGroup k V
   let n := Module.finrank k V
   let e0 : V ≃ₗ[k] (Fin n → k) := (Module.finBasis k V).equivFun
-  let e : V ≃L[k] (Fin n → k) :=
-    { e0 with
-      continuous_toFun := IsModuleTopology.continuous_of_linearMap e0.toLinearMap
-      continuous_invFun := IsModuleTopology.continuous_of_linearMap e0.symm.toLinearMap }
+  let e : V ≃L[k] (Fin n → k) := {
+    e0 with
+    continuous_toFun := IsModuleTopology.continuous_of_linearMap e0.toLinearMap
+    continuous_invFun := IsModuleTopology.continuous_of_linearMap e0.symm.toLinearMap
+  }
   borelize (Fin n → k)
   let ν : Measure (Fin n → k) := μ.map e
   haveI : ν.IsAddHaarMeasure := e.isAddHaarMeasure_map μ
@@ -37,10 +42,11 @@ theorem integral_comp_linearEquiv {k : Type} [Field k] [ValuativeRel k] [Topolog
   have hd : distribHaarChar (Fin n → k) L' = c := by
     rw [GroundTheory.Automorphic.Measures.distribHaarChar_pi_eq, LinearEquiv.det_conj]
   have hc0 : c ≠ 0 := (distribHaarChar_pos (A := k) (g := LinearEquiv.det L)).ne'
-  let Lh : V ≃ₜ V :=
-    { L.toEquiv with
-      continuous_toFun := IsModuleTopology.continuous_of_linearMap L.toLinearMap
-      continuous_invFun := IsModuleTopology.continuous_of_linearMap L.symm.toLinearMap }
+  let Lh : V ≃ₜ V := {
+    L.toEquiv with
+    continuous_toFun := IsModuleTopology.continuous_of_linearMap L.toLinearMap
+    continuous_invFun := IsModuleTopology.continuous_of_linearMap L.symm.toLinearMap
+  }
   have hν : ∀ s : Set V, ν (e '' s) = μ s := fun s => by
     have h := e.toHomeomorph.toMeasurableEquiv.map_apply (μ := μ) (e '' s)
     refine h.trans ?_
@@ -65,15 +71,20 @@ theorem integral_comp_linearEquiv {k : Type} [Field k] [ValuativeRel k] [Topolog
       ENNReal.coe_one, one_mul]
     rfl
   have e1 : ∫ y, f (L y) ∂μ = ∫ y, f (Lh.toMeasurableEquiv y) ∂μ := rfl
-  rw [e1, ← integral_map_equiv, hm, integral_smul_nnreal_measure, NNReal.smul_def, Complex.real_smul]
+  rw [e1, ← integral_map_equiv, hm, integral_smul_nnreal_measure, NNReal.smul_def,
+    Complex.real_smul]
   push_cast
   rfl
 
-theorem integral_comp_matrix : ∀ (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-    (a b : ℕ) (L : Matrix (Fin a) (Fin b) F →ₗ[F] Matrix (Fin a) (Fin b) F) (hL : LinearMap.det L ≠ 0)
-    (φ : Matrix (Fin a) (Fin b) F → ℂ) (μ : @MeasureTheory.Measure (Matrix (Fin a) (Fin b) F) (borel _)),
-    @MeasureTheory.Measure.IsAddHaarMeasure _ _ _ (borel _) μ →
-    ∫ x, φ (L x) ∂μ = ((((MeasureTheory.distribHaarChar F (Units.mk0 _ hL) : NNReal) : ℝ) : ℂ))⁻¹ * ∫ x, φ x ∂μ := by
+theorem integral_comp_matrix
+    : ∀ (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        (a b : ℕ) (L : Matrix (Fin a) (Fin b) F →ₗ[F] Matrix (Fin a) (Fin b) F)
+        (hL : LinearMap.det L ≠ 0) (φ : Matrix (Fin a) (Fin b) F → ℂ)
+        (μ : @MeasureTheory.Measure (Matrix (Fin a) (Fin b) F) (borel _)),
+      @MeasureTheory.Measure.IsAddHaarMeasure _ _ _ (borel _) μ
+        → ∫ x, φ (L x) ∂μ
+          = ((((MeasureTheory.distribHaarChar F (Units.mk0 _ hL) : NNReal) : ℝ) : ℂ))⁻¹
+            * ∫ x, φ x ∂μ := by
   intro F _ _ _ _ a b L hL φ μ hμ
   letI : MeasurableSpace (Matrix (Fin a) (Fin b) F) := borel _
   haveI : BorelSpace (Matrix (Fin a) (Fin b) F) := ⟨rfl⟩

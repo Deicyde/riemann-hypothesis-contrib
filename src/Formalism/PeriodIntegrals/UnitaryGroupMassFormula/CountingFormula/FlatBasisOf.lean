@@ -12,17 +12,19 @@ namespace PI.UnitaryGroupMassFormula.CntFormula
 open Formalism.MainNotions.S Module
 open ValuativeRel
 
-theorem flb_main {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E]
-    [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Loc.Model F E)
+theorem flb_main
+    {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E] [Algebra F E]
+    [TopologicalSpace E] [MeasurableSpace E]
+    (M : Loc.Model F E)
     (hE : ∀ x : E, x ≠ 0 → IsUnit x) (hnt : Nontrivial E)
-    (hden : ∀ x : E, ∃ s ∈ M.L.O, s ≠ 0 ∧ s * x ∈ M.L.O)
-    (hpid : IsPrincipalIdealRing M.L.O)
-    (V : Type) [AddCommGroup V] [Module E V] (H : Loc.HermSp M V) (Λ : Submodule M.L.O V)
-    (hΛ : H.IsSelfDual Λ) :
-      ∃ b : Fin (Module.finrank E V) → V, (∀ k, b k ∈ Λ) ∧ LinearIndependent E b ∧
-        (∀ x ∈ Λ, ∃ c : Fin (Module.finrank E V) → E, (∀ k, c k ∈ M.L.O) ∧ x = ∑ k, c k • b k) ∧
-        ∃ Q : Matrix (Fin (Module.finrank E V)) (Fin (Module.finrank E V)) E, (∀ k l, Q k l ∈ M.L.O) ∧
-          Q * Matrix.of (fun k l => H.h (b k) (b l)) = 1 := by
+    (hden : ∀ x : E, ∃ s ∈ M.L.O, s ≠ 0 ∧ s * x ∈ M.L.O) (hpid : IsPrincipalIdealRing M.L.O)
+    (V : Type) [AddCommGroup V] [Module E V]
+    (H : Loc.HermSp M V) (Λ : Submodule M.L.O V) (hΛ : H.IsSelfDual Λ)
+    : ∃ b : Fin (Module.finrank E V) → V,
+      (∀ k, b k ∈ Λ) ∧ LinearIndependent E b
+        ∧ (∀ x ∈ Λ, ∃ c : Fin (Module.finrank E V) → E, (∀ k, c k ∈ M.L.O) ∧ x = ∑ k, c k • b k)
+        ∧ ∃ Q : Matrix (Fin (Module.finrank E V)) (Fin (Module.finrank E V)) E,
+          (∀ k l, Q k l ∈ M.L.O) ∧ Q * Matrix.of (fun k l => H.h (b k) (b l)) = 1 := by
   classical
   haveI : NoZeroDivisors E := ⟨fun {a b} hab => by
     by_contra hne
@@ -95,8 +97,8 @@ theorem flb_main {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [C
   let b : Fin (Module.finrank E V) → V := fun k => bb (eι.symm k)
   have hbΛ : ∀ k, b k ∈ Λ := fun k => (B (eι.symm k)).2
   have hlib : LinearIndependent E b := hli.comp _ eι.symm.injective
-  have hexpb : ∀ x ∈ Λ, ∃ c : Fin (Module.finrank E V) → E, (∀ k, c k ∈ M.L.O) ∧
-      x = ∑ k, c k • b k := by
+  have hexpb
+      : ∀ x ∈ Λ, ∃ c : Fin (Module.finrank E V) → E, (∀ k, c k ∈ M.L.O) ∧ x = ∑ k, c k • b k := by
     intro x hx
     refine ⟨fun k => ((B.repr ⟨x, hx⟩ (eι.symm k) : M.L.O) : E), fun k => Subtype.property _, ?_⟩
     exact (hexp x hx).trans

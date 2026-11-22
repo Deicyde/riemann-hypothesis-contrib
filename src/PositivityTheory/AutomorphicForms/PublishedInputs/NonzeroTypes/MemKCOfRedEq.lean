@@ -8,7 +8,8 @@ noncomputable section
 
 open scoped Classical
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel Matrix
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+  Matrix
 
 namespace UpperTheory.TNZ.Grp.P_V0fin
 
@@ -21,14 +22,15 @@ lemma lift_spec {n : ℕ} (g : ↥(KO k (Fin n))) :
     Matrix.GeneralLinearGroup.map (algebraMap 𝒪[k] k) (lift g) = (g : GL (Fin n) k) :=
   Classical.choose_spec g.2
 
-def red {n : ℕ} (r : ℕ) (g : ↥(KO k (Fin n))) :
-    Matrix (Fin n) (Fin n) (𝒪[k] ⧸ IsLocalRing.maximalIdeal 𝒪[k] ^ r) :=
+def red {n : ℕ} (r : ℕ) (g : ↥(KO k (Fin n)))
+    : Matrix (Fin n) (Fin n) (𝒪[k] ⧸ IsLocalRing.maximalIdeal 𝒪[k] ^ r) :=
   ((lift g : GL (Fin n) 𝒪[k]) : Matrix (Fin n) (Fin n) 𝒪[k]).map (Ideal.Quotient.mk _)
 
 instance finQuot (r : ℕ) : Finite (𝒪[k] ⧸ IsLocalRing.maximalIdeal 𝒪[k] ^ r) :=
   IsLocalRing.finite_quotient_iff.mpr ⟨r, le_rfl⟩
 
-instance finRed (n r : ℕ) : Finite (Matrix (Fin n) (Fin n) (𝒪[k] ⧸ IsLocalRing.maximalIdeal 𝒪[k] ^ r)) :=
+instance finRed (n r : ℕ)
+    : Finite (Matrix (Fin n) (Fin n) (𝒪[k] ⧸ IsLocalRing.maximalIdeal 𝒪[k] ^ r)) :=
   inferInstanceAs (Finite (Fin n → Fin n → (𝒪[k] ⧸ IsLocalRing.maximalIdeal 𝒪[k] ^ r)))
 
 lemma mem_KC_of_red_eq {n : ℕ} (r : ℕ) (g g' : ↥(KO k (Fin n))) (h : red r g = red r g') :

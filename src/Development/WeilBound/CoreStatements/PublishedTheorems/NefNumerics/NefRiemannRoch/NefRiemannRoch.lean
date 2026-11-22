@@ -16,7 +16,8 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.NefNumerics
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter Asymptotics
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.QCoh GlobalTheory.CechPic GlobalTheory.Twist
 
 namespace GlobalTheory
@@ -29,7 +30,8 @@ theorem nefRiemannRoch : GlobalTheory.Published.NefRiemannRoch := by
       intro m
       have h := hC m
       simp only [Nat.factorial_zero, Nat.cast_one, one_mul, pow_zero, mul_one, Nat.cast_zero,
-        zero_mul, mul_zero, abs_nonpos_iff, sub_eq_zero] at h
+          zero_mul, mul_zero, abs_nonpos_iff, sub_eq_zero]
+        at h
       exact h
     refine (Asymptotics.isBigO_zero _ _).congr_left ?_
     intro m
@@ -43,8 +45,9 @@ theorem nefRiemannRoch : GlobalTheory.Published.NefRiemannRoch := by
     filter_upwards [Filter.eventually_ge_atTop 1] with m hm
     have h := hC m
     rw [Nat.add_sub_cancel] at h
-    have hR : |((n + 1).factorial : ℝ) * (lbH0 k (lbPow L m) : ℝ) - (topSelfIntersection k L (n + 1) : ℝ) * (m : ℝ) ^ (n + 1)|
-        ≤ (C : ℝ) * (((n : ℝ) + 1) * ((m : ℝ) + 1) ^ n) := by
+    have hR
+        : |((n + 1).factorial : ℝ) * (lbH0 k (lbPow L m) : ℝ) - (topSelfIntersection k L (n + 1) : ℝ) * (m : ℝ) ^ (n + 1)|
+          ≤ (C : ℝ) * (((n : ℝ) + 1) * ((m : ℝ) + 1) ^ n) := by
       exact_mod_cast h
     have hf : (0 : ℝ) < (n + 1).factorial := by exact_mod_cast Nat.factorial_pos _
     have hm1 : (1 : ℝ) ≤ m := by exact_mod_cast hm
@@ -52,16 +55,22 @@ theorem nefRiemannRoch : GlobalTheory.Published.NefRiemannRoch := by
       rw [← mul_pow]
       exact pow_le_pow_left₀ (by positivity) (by linarith) n
     rw [Real.norm_eq_abs, Real.norm_eq_abs, abs_of_nonneg (by positivity : (0 : ℝ) ≤ (m : ℝ) ^ n)]
-    have key : (lbH0 k (lbPow L m) : ℝ) - (topSelfIntersection k L (n + 1) : ℝ) * (m : ℝ) ^ (n + 1) / ((n + 1).factorial : ℝ)
-        = (((n + 1).factorial : ℝ) * (lbH0 k (lbPow L m) : ℝ) - (topSelfIntersection k L (n + 1) : ℝ) * (m : ℝ) ^ (n + 1))
-          / ((n + 1).factorial : ℝ) := by
+    have key
+        : (lbH0 k (lbPow L m) : ℝ)
+            - (topSelfIntersection k L (n + 1) : ℝ) * (m : ℝ) ^ (n + 1) / ((n + 1).factorial : ℝ)
+          = (((n + 1).factorial : ℝ) * (lbH0 k (lbPow L m) : ℝ)
+              - (topSelfIntersection k L (n + 1) : ℝ) * (m : ℝ) ^ (n + 1))
+            / ((n + 1).factorial : ℝ) := by
       field_simp
     rw [key, abs_div, abs_of_pos hf, div_le_iff₀ hf]
-    have hrhs : (C : ℝ) * (n + 1) * 2 ^ n / ((n + 1).factorial : ℝ) * (m : ℝ) ^ n * ((n + 1).factorial : ℝ)
-        = (C : ℝ) * (((n : ℝ) + 1) * (2 ^ n * (m : ℝ) ^ n)) := by
+    have hrhs
+        : (C : ℝ) * (n + 1) * 2 ^ n / ((n + 1).factorial : ℝ) * (m : ℝ) ^ n
+            * ((n + 1).factorial : ℝ)
+          = (C : ℝ) * (((n : ℝ) + 1) * (2 ^ n * (m : ℝ) ^ n)) := by
       field_simp
     rw [hrhs]
-    calc _ ≤ (C : ℝ) * (((n : ℝ) + 1) * ((m : ℝ) + 1) ^ n) := hR
+    calc
+      _ ≤ (C : ℝ) * (((n : ℝ) + 1) * ((m : ℝ) + 1) ^ n) := hR
       _ ≤ _ := by gcongr
 
 end GlobalTheory

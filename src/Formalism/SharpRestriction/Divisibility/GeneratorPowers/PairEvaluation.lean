@@ -16,13 +16,15 @@ variable {S : Type} [CommRing S] {d : ℕ}
 
 abbrev Io (S σ : Type) [CommRing S] : Ideal (MvPolynomial σ S) := idealOfVars σ S
 
-def xs (S : Type) [CommRing S] {n : ℕ} (d : ℕ) (k : Fin n) : Fin d → MvPolynomial (Fin n × Fin d) S :=
-  fun i => X (k, i)
+def xs (S : Type) [CommRing S] {n : ℕ} (d : ℕ) (k : Fin n)
+    : Fin d → MvPolynomial (Fin n × Fin d) S := fun i =>
+  X (k, i)
 
 def lin {n : ℕ} (A : Fin d → Fin d → S) (k : Fin n) : Fin d → MvPolynomial (Fin n × Fin d) S :=
   fun i => ∑ l, C (A i l) * X (k, l)
 
-def ev2 {τ : Type} (h : MvPolynomial (Fin 2 × Fin d) S) (u v : Fin d → MvPolynomial τ S) : MvPolynomial τ S :=
+def ev2 {τ : Type} (h : MvPolynomial (Fin 2 × Fin d) S) (u v : Fin d → MvPolynomial τ S)
+    : MvPolynomial τ S :=
   aeval (fun p : Fin 2 × Fin d => ![u, v] p.1 p.2) h
 
 lemma eval_pair_one {τ : Type} (u v : Fin d → MvPolynomial τ S) : ev2 (1 : MvPolynomial (Fin 2 × Fin d) S) u v = 1 := by

@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsHeckeC
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.FWT Formalism.L2.Pj
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.FWT Formalism.L2.Pj
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 noncomputable section
 open NumberField
@@ -19,30 +20,39 @@ namespace GlobalTheory.ComplOffPlace
 open IsDedekindDomain
 open scoped TensorProduct
 
-private theorem valued_v_coe_inv_le_one_of_not_mem {E : Type} [Field E] [NumberField E] (Q : HeightOneSpectrum (𝓞 E))
-    {x : 𝓞 E} (hx : x ∉ Q.asIdeal) : Valued.v ((((x : E)⁻¹ : E)) : Q.adicCompletion E) ≤ 1 := by
+private theorem valued_v_coe_inv_le_one_of_not_mem
+    {E : Type} [Field E] [NumberField E]
+    (Q : HeightOneSpectrum (𝓞 E))
+    {x : 𝓞 E} (hx : x ∉ Q.asIdeal)
+    : Valued.v ((((x : E)⁻¹ : E)) : Q.adicCompletion E) ≤ 1 := by
   rw [HeightOneSpectrum.adicCompletion.valued_coe, map_inv₀, RingOfIntegers.coe_eq_algebraMap,
     (HeightOneSpectrum.valuation_eq_one_iff_notMem (v := Q) (K := E)).mpr hx, inv_one]
 
-private theorem adicCompletion_coe_inv_mul_coe {E : Type} [Field E] [NumberField E] (Q : HeightOneSpectrum (𝓞 E))
-    {x : E} (hx : x ≠ 0) : ((x⁻¹ : E) : Q.adicCompletion E) * ((x : E) : Q.adicCompletion E) = 1 := by
-  rw [← HeightOneSpectrum.adicCompletion.coe_mul, inv_mul_cancel₀ hx, HeightOneSpectrum.adicCompletion.coe_one]
+private theorem adicCompletion_coe_inv_mul_coe
+    {E : Type} [Field E] [NumberField E] (Q : HeightOneSpectrum (𝓞 E)) {x : E} (hx : x ≠ 0)
+    : ((x⁻¹ : E) : Q.adicCompletion E) * ((x : E) : Q.adicCompletion E) = 1 := by
+  rw [← HeightOneSpectrum.adicCompletion.coe_mul, inv_mul_cancel₀ hx,
+    HeightOneSpectrum.adicCompletion.coe_one]
 
-theorem exists_comb {E : Type} [Field E] [NumberField E] (P : HeightOneSpectrum (𝓞 E))
-    (f : FiniteAdeleRing (𝓞 E) E) (h1 : f P = 1) (h0 : ∀ Q, Q ≠ P → f Q = 0) :
-    ∃ x ∈ P.asIdeal, ∃ y ∈ P.asIdeal, ∃ b c : FiniteAdeleRing (𝓞 E) E, (∀ Q, Valued.v (b Q) ≤ 1) ∧
-      (∀ Q, Valued.v (c Q) ≤ 1) ∧
-      1 - f = b * algebraMap E _ (x : E) + c * algebraMap E _ (y : E) := by
+theorem exists_comb
+    {E : Type} [Field E] [NumberField E]
+    (P : HeightOneSpectrum (𝓞 E)) (f : FiniteAdeleRing (𝓞 E) E)
+    (h1 : f P = 1) (h0 : ∀ Q, Q ≠ P → f Q = 0)
+    : ∃ x ∈ P.asIdeal, ∃ y ∈ P.asIdeal, ∃ b c : FiniteAdeleRing (𝓞 E) E,
+      (∀ Q, Valued.v (b Q) ≤ 1) ∧ (∀ Q, Valued.v (c Q) ≤ 1)
+        ∧ 1 - f = b * algebraMap E _ (x : E) + c * algebraMap E _ (y : E) := by
   classical
   obtain ⟨x, hxP, hx0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot P.ne_bot
 
   have hfin : {Q : HeightOneSpectrum (𝓞 E) | Q.asIdeal ∣ Ideal.span {x}}.Finite :=
     Ideal.finite_factors (by rwa [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot])
 
-  have hcov : ¬ ((P.asIdeal : Set (𝓞 E)) ⊆
-      ⋃ Q ∈ ((hfin.toFinset.erase P : Finset (HeightOneSpectrum (𝓞 E))) : Set (HeightOneSpectrum (𝓞 E))),
-        ((fun Q : HeightOneSpectrum (𝓞 E) => Q.asIdeal) Q : Set (𝓞 E))) := by
-    rw [Ideal.subset_union_prime (f := fun Q : HeightOneSpectrum (𝓞 E) => Q.asIdeal) P P
+  have hcov : ¬((P.asIdeal : Set (𝓞 E))
+      ⊆ ⋃ Q ∈ ((hfin.toFinset.erase P : Finset (HeightOneSpectrum (𝓞 E))) : Set (HeightOneSpectrum (𝓞 E))),
+          ((fun Q : HeightOneSpectrum (𝓞 E) => Q.asIdeal) Q : Set (𝓞 E))) := by
+    rw [Ideal.subset_union_prime
+      (f := fun Q : HeightOneSpectrum (𝓞 E) => Q.asIdeal)
+      P P
       (fun Q _ _ _ => Q.isPrime)]
     rintro ⟨Q, hQS, hle⟩
     exact (Finset.mem_erase.mp hQS).1
@@ -56,9 +66,19 @@ theorem exists_comb {E : Type} [Field E] [NumberField E] (P : HeightOneSpectrum 
     exact ⟨Ideal.dvd_iff_le.mpr ((Ideal.span_singleton_le_iff_mem _).mpr hxQ), hQ⟩
 
   let bf : ∀ Q : HeightOneSpectrum (𝓞 E), Q.adicCompletion E := fun Q =>
-    if Q = P then 0 else if x ∈ Q.asIdeal then 0 else (((x : E)⁻¹ : E) : Q.adicCompletion E)
+    if Q = P then
+      0
+    else if x ∈ Q.asIdeal then
+      0
+    else
+      (((x : E)⁻¹ : E) : Q.adicCompletion E)
   let cf : ∀ Q : HeightOneSpectrum (𝓞 E), Q.adicCompletion E := fun Q =>
-    if Q = P then 0 else if x ∈ Q.asIdeal then (((y : E)⁻¹ : E) : Q.adicCompletion E) else 0
+    if Q = P then
+      0
+    else if x ∈ Q.asIdeal then
+      (((y : E)⁻¹ : E) : Q.adicCompletion E)
+    else
+      0
   have hbf : ∀ Q, Valued.v (bf Q) ≤ 1 := by
     intro Q
     show Valued.v (if Q = P then 0 else if x ∈ Q.asIdeal then 0 else (((x : E)⁻¹ : E) : Q.adicCompletion E)) ≤ 1
@@ -92,11 +112,20 @@ theorem exists_comb {E : Type} [Field E] [NumberField E] (P : HeightOneSpectrum 
     · simp only [bf, cf, if_neg hQ, if_neg hxQ, h0 Q hQ, sub_zero, zero_mul, add_zero]
       exact (adicCompletion_coe_inv_mul_coe Q (hxQ' hxQ)).symm
 
-theorem mul_smul_mem_hat (D : D7) {n : ℕ} (I : Ideal (𝓞 D.host.E)) (L : Submodule (𝓞 D.host.E) (Fin n → D.host.E))
-    {a : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E} (ha : a ∈ intAE D) {t : 𝓞 D.host.E} (ht : t ∈ I)
-    {y : Fin n → GlobalTheory.AdLat.RA D.host.F D.host.E} (hy : y ∈ GlobalTheory.AdLat.hat D.host.F (L : Set (Fin n → D.host.E))) :
-    (a * (1 : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F) ⊗ₜ[D.host.F] (t : D.host.E)) • y ∈
-      GlobalTheory.AdLat.hat D.host.F ((I • L : Submodule (𝓞 D.host.E) (Fin n → D.host.E)) : Set (Fin n → D.host.E)) := by
+theorem mul_smul_mem_hat
+    (D : D7)
+    {n : ℕ}
+    (I : Ideal (𝓞 D.host.E))
+    (L : Submodule (𝓞 D.host.E) (Fin n → D.host.E))
+    {a : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E}
+    (ha : a ∈ intAE D)
+    {t : 𝓞 D.host.E} (ht : t ∈ I)
+    {y : Fin n → GlobalTheory.AdLat.RA D.host.F D.host.E}
+    (hy : y ∈ GlobalTheory.AdLat.hat D.host.F (L : Set (Fin n → D.host.E)))
+    : (a * (1 : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F) ⊗ₜ[D.host.F] (t : D.host.E))
+        • y
+      ∈ GlobalTheory.AdLat.hat D.host.F
+        ((I • L : Submodule (𝓞 D.host.E) (Fin n → D.host.E)) : Set (Fin n → D.host.E)) := by
   unfold intAE at ha
   unfold GlobalTheory.AdLat.hat at hy ⊢
   induction hy using AddSubgroup.closure_induction with
@@ -105,12 +134,18 @@ theorem mul_smul_mem_hat (D : D7) {n : ℕ} (I : Ideal (𝓞 D.host.E)) (L : Sub
     induction ha using AddSubgroup.closure_induction with
     | mem w hw =>
       obtain ⟨c, hc, s, rfl⟩ := hw
-      refine AddSubgroup.subset_closure ⟨c * b, fun v => mul_mem (hc v) (hb v),
-        (s * t) • x, Submodule.smul_mem_smul (I.mul_mem_left s ht) hx, ?_⟩
+      refine AddSubgroup.subset_closure ⟨
+        c * b,
+        fun v => mul_mem (hc v) (hb v),
+        (s * t) • x,
+        Submodule.smul_mem_smul (I.mul_mem_left s ht) hx,
+        ?_
+      ⟩
       funext i
-      simp only [Pi.smul_apply, smul_eq_mul, Algebra.TensorProduct.tmul_mul_tmul, mul_one, Algebra.smul_def,
-        map_mul, ← RingOfIntegers.coe_eq_algebraMap]
-    | zero => simp
+      simp only [Pi.smul_apply, smul_eq_mul, Algebra.TensorProduct.tmul_mul_tmul, mul_one,
+        Algebra.smul_def, map_mul, ← RingOfIntegers.coe_eq_algebraMap]
+    | zero =>
+      simp
     | add u w _ _ hu hw =>
       rw [add_mul, add_smul]
       exact AddSubgroup.add_mem _ hu hw
@@ -127,9 +162,14 @@ theorem mul_smul_mem_hat (D : D7) {n : ℕ} (I : Ideal (𝓞 D.host.E)) (L : Sub
     rw [smul_neg]
     exact AddSubgroup.neg_mem _ hu
 
-theorem one_sub_smul_mem : ∀ (D : D7) (P : Formalism.L2.DIV.Pl D.host.E) (e : AE D) (n : ℕ) (L : Submodule (𝓞 D.host.E) (Fin n → D.host.E)),
-    Formalism.L2.NTheta.IsIdemAt e P → ∀ y ∈ GlobalTheory.AdLat.hat D.host.F (L : Set (Fin n → D.host.E)),
-      (1 - finPart D e) • y ∈ GlobalTheory.AdLat.hat D.host.F ((P.asIdeal • L : Submodule (𝓞 D.host.E) (Fin n → D.host.E)) : Set (Fin n → D.host.E)) := by
+theorem one_sub_smul_mem
+    : ∀ (D : D7) (P : Formalism.L2.DIV.Pl D.host.E) (e : AE D) (n : ℕ)
+        (L : Submodule (𝓞 D.host.E) (Fin n → D.host.E)),
+      Formalism.L2.NTheta.IsIdemAt e P
+        → ∀ y ∈ GlobalTheory.AdLat.hat D.host.F (L : Set (Fin n → D.host.E)),
+          (1 - finPart D e) • y ∈ GlobalTheory.AdLat.hat D.host.F
+            ((P.asIdeal • L : Submodule (𝓞 D.host.E) (Fin n → D.host.E))
+              : Set (Fin n → D.host.E)) := by
   intro D P e n L he y hy
   obtain ⟨Φ, hΦ⟩ := GlobalTheory.IdemSupport.exists_comp D
   obtain ⟨-, h1, h0⟩ := GlobalTheory.IdemSupport.delta_of_isIdemAt hΦ he
@@ -152,7 +192,10 @@ theorem one_sub_smul_mem : ∀ (D : D7) (P : Formalism.L2.DIV.Pl D.host.E) (e : 
       ((Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.pairA D.host.F 0 1) ⊗ₜ[D.host.F] (1 : D.host.E)) = 1
     rw [Algebra.TensorProduct.map_tmul, AlgHom.id_apply]
     exact Algebra.TensorProduct.one_def.symm
-  have hinc : ∀ z : D.host.E, finPart D (incA D z) = (1 : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F) ⊗ₜ[D.host.F] z := by
+  have hinc
+      : ∀ z : D.host.E,
+        finPart D (incA D z)
+          = (1 : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F) ⊗ₜ[D.host.F] z := by
     intro z
     show Algebra.TensorProduct.map (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.sndA D.host.F) (AlgHom.id D.host.F D.host.E)
       ((1 : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF D.host.F) ⊗ₜ[D.host.F] z) = _
@@ -161,14 +204,20 @@ theorem one_sub_smul_mem : ∀ (D : D7) (P : Formalism.L2.DIV.Pl D.host.E) (e : 
     apply hΦ.ext'
     · simp only [map_mul, hsi, mul_zero]
     · intro Q
-      have hΦe : Φ ((1 - e) * s) = Φ ((zb * incA D (x : D.host.E) + zc * incA D (x' : D.host.E)) * s) := by
+      have hΦe
+          : Φ ((1 - e) * s)
+            = Φ ((zb * incA D (x : D.host.E) + zc * incA D (x' : D.host.E)) * s) := by
         simp only [map_mul, map_sub, map_one, map_add (f := _), hΦ.inc, hzb, hzc, hbc]
       rw [hΦe]
-  have key' : 1 - finPart D e =
-      finPart D zb * ((1 : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F) ⊗ₜ[D.host.F] (x : D.host.E)) +
-        finPart D zc * ((1 : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F) ⊗ₜ[D.host.F] (x' : D.host.E)) := by
-    have h := congrArg (finPart D) key
-    simpa only [map_mul, map_sub, map_one, map_add (f := _), hsf, mul_one, hinc] using h
+  have key'
+      : 1 - finPart D e
+        = finPart D zb
+            * ((1 : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F) ⊗ₜ[D.host.F] (x : D.host.E))
+          + finPart D zc
+            * ((1 : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F) ⊗ₜ[D.host.F] (x' : D.host.E)) :=
+    by
+      have h := congrArg (finPart D) key
+      simpa only [map_mul, map_sub, map_one, map_add (f := _), hsf, mul_one, hinc] using h
   rw [key', add_smul]
   exact AddSubgroup.add_mem _ (mul_smul_mem_hat D P.asIdeal L hzbi hx hy)
     (mul_smul_mem_hat D P.asIdeal L hzci hx' hy)

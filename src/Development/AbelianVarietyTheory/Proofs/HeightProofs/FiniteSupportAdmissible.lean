@@ -14,11 +14,13 @@ namespace GlobalTheory
 
 namespace AdmissibleFiniteSupport
 
-variable {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι]
+variable
+  {K : Type} [Field K] [NumberField K]
+  {ι : Type} [Fintype ι]
   {Ω : ι → Type} [∀ c, Field (Ω c)] [∀ c, Algebra K (Ω c)]
   {WT : Type} [AddCommGroup WT]
-  {A : ι → Type} [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)]
-  [∀ c, Algebra (𝓞 K) (A c)]
+  {A : ι → Type}
+  [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)] [∀ c, Algebra (𝓞 K) (A c)]
 
 end AdmissibleFiniteSupport
 
@@ -266,7 +268,6 @@ private lemma polynomial_value_over_prime_lemma_4 {K Ω : Type} [Field K] [Numbe
     refine addValuation_sum_pos_of_forall_pos v _ _ fun m _ => ?_
     rw [v.map_mul]
     exact lt_of_lt_of_le ((hla _).2 (hcoeff m)) (le_add_of_nonneg_right (hmono m))
-
 
 open NumberField in
 open scoped TensorProduct in

@@ -24,16 +24,21 @@ variable {n : ℕ}
 
 section Data
 
-variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] {ε : Fin n → Bool}
-  {lam : Fin n → ℝ} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {D : Submodule ℂ H}
-  {E : Fin n → Fin n → Module.End ℂ D} {V : Submodule ℂ D}
+variable
+  {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+  {ε : Fin n → Bool} {lam : Fin n → ℝ} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
+  {D : Submodule ℂ H} {E : Fin n → Fin n → Module.End ℂ D} {V : Submodule ℂ D}
 
-theorem kType_map_of_inj {μ : Fin n → ℝ} {S : Submodule ℂ H} (hS : Formalism.MainNotions.S.IsKTypeOf ε σ μ S)
-    (f : H →ₗ[ℂ] H) (hf : ∀ k ∈ Formalism.REAL.Kset ε, ∀ x, f (σ k x) = σ k (f x))
-    (hinj : ∀ x ∈ S, f x = 0 → x = 0) : Formalism.MainNotions.S.IsKTypeOf ε σ μ (S.map f) := by
+theorem kType_map_of_inj
+    {μ : Fin n → ℝ} {S : Submodule ℂ H} (hS : Formalism.MainNotions.S.IsKTypeOf ε σ μ S)
+    (f : H →ₗ[ℂ] H)
+    (hf : ∀ k ∈ Formalism.REAL.Kset ε, ∀ x, f (σ k x) = σ k (f x)) (hinj : ∀ x ∈ S, f x = 0 → x = 0)
+    : Formalism.MainNotions.S.IsKTypeOf ε σ μ (S.map f) := by
   obtain ⟨hfd, hst, hirr, ⟨v, hvS, hv0, hvw⟩, hwt⟩ := hS
-  have hwt' : ∀ x ∈ S, ∀ ν, Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ ν (f x) →
-      Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ ν x := by
+  have hwt'
+      : ∀ x ∈ S, ∀ ν,
+        Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ ν (f x)
+          → Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ ν x := by
     intro x hx ν h θ hθ
     have h1 := h θ hθ
     rw [← hf _ hθ, ← map_smul] at h1
@@ -44,11 +49,13 @@ theorem kType_map_of_inj {μ : Fin n → ℝ} {S : Submodule ℂ H} (hS : Formal
     exact ⟨σ g x, hst g hg x hx, hf g hg x⟩
   · intro S' hS' hK
     let T : Submodule ℂ H := S ⊓ S'.comap f
-    have hT : Formalism.MainNotions.S.IsKStableOn ε σ T := fun g hg x hx =>
-      ⟨hst g hg x hx.1, by
+    have hT : Formalism.MainNotions.S.IsKStableOn ε σ T := fun g hg x hx => ⟨
+      hst g hg x hx.1,
+      by
         show f (σ g x) ∈ S'
         rw [hf g hg]
-        exact hK g hg _ hx.2⟩
+        exact hK g hg _ hx.2
+    ⟩
     rcases hirr T inf_le_left hT with h | h
     · left
       rw [eq_bot_iff]
@@ -68,10 +75,12 @@ theorem kType_map_of_inj {μ : Fin n → ℝ} {S : Submodule ℂ H} (hS : Formal
   · rintro ν _ ⟨x, hx, rfl⟩ h0 hν
     exact hwt ν x hx (fun h => h0 (by rw [h, map_zero])) (hwt' x hx ν hν)
 
-theorem exists_khw_genSub_of_kType (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
-    (hVf : FiniteDimensional ℂ V) (hVk : IsKStableSub ε E V) {μ : Fin n → ℝ} {S : Submodule ℂ H}
-    (hS : S ≤ closGen E V) (hST : Formalism.MainNotions.S.IsKTypeOf ε σ μ S) :
-    ∃ w : D, w ∈ genSub E V ∧ w ≠ 0 ∧ IsKHWVec ε E μ w := by
+theorem exists_khw_genSub_of_kType
+    (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E) (hVf : FiniteDimensional ℂ V)
+    (hVk : IsKStableSub ε E V)
+    {μ : Fin n → ℝ} {S : Submodule ℂ H}
+    (hS : S ≤ closGen E V) (hST : Formalism.MainNotions.S.IsKTypeOf ε σ μ S)
+    : ∃ w : D, w ∈ genSub E V ∧ w ≠ 0 ∧ IsKHWVec ε E μ w := by
   classical
   have hE := hD.glRep
   obtain ⟨v, hvS, hv0, -⟩ := hST.2.2.2.1
@@ -101,16 +110,20 @@ theorem exists_khw_genSub_of_kType (hσ : IsURepOn (UJset ε) σ) (hD : IsDerive
   have hWoK : ∀ k ∈ Kset ε, ∀ x ∈ Wᗮ, σ k x ∈ Wᗮ := by
     intro k hk
     obtain ⟨hk', hkk⟩ := UnitaryGroupOfForm.K_inv hk
-    exact UnitaryGroupOfForm.orth_stable hσ (UnitaryGroupOfForm.K_mem_UJ hk) (UnitaryGroupOfForm.K_mem_UJ hk') hkk W (hWK _ hk')
-  have hPc : ∀ k ∈ Formalism.REAL.Kset ε, ∀ x, W.starProjection.toLinearMap (σ k x) =
-      σ k (W.starProjection.toLinearMap x) := fun k hk x =>
+    exact UnitaryGroupOfForm.orth_stable hσ (UnitaryGroupOfForm.K_mem_UJ hk)
+      (UnitaryGroupOfForm.K_mem_UJ hk') hkk W (hWK _ hk')
+  have hPc
+      : ∀ k ∈ Formalism.REAL.Kset ε, ∀ x,
+        W.starProjection.toLinearMap (σ k x) = σ k (W.starProjection.toLinearMap x) := fun k hk x =>
     UnitaryGroupOfForm.proj_comm W (σ k) (hWK k hk) (hWoK k hk) x
   have hyW : (y : H) ∈ W := ⟨y, hym, rfl⟩
   have hinj : ∀ x ∈ S, W.starProjection.toLinearMap x = 0 → x = 0 := by
     intro x hx hPx
     let T : Submodule ℂ H := S ⊓ LinearMap.ker W.starProjection.toLinearMap
-    have hT : Formalism.MainNotions.S.IsKStableOn ε σ T := fun g hg z hz =>
-      ⟨hST.2.1 g hg z hz.1, LinearMap.mem_ker.2 (by rw [hPc g hg, LinearMap.mem_ker.1 hz.2, map_zero])⟩
+    have hT : Formalism.MainNotions.S.IsKStableOn ε σ T := fun g hg z hz => ⟨
+      hST.2.1 g hg z hz.1,
+      LinearMap.mem_ker.2 (by rw [hPc g hg, LinearMap.mem_ker.1 hz.2, map_zero])
+    ⟩
     rcases hST.2.2.1 T inf_le_left hT with h | h
     · have hxT : x ∈ T := ⟨hx, hPx⟩
       rw [h, Submodule.mem_bot] at hxT
@@ -135,44 +148,58 @@ theorem exists_khw_genSub_of_kType (hσ : IsURepOn (UJset ε) σ) (hD : IsDerive
   have huw : u = w := Subtype.ext (e'.trans e)
   exact layer_le_genSub m (huw ▸ hu)
 
-theorem data_casValK_gap (hgap : StdGap ε lam) (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
+theorem data_casValK_gap
+    (hgap : StdGap ε lam) (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
     (hV : IsKIrrHW ε E (lowK ε lam) V) (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v)
-    (hVK : ∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v) {h : ℝ} (hh : GapAtLeast ε lam h)
-    (hbig : (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 < h) {μ : Fin n → ℝ} (S : Submodule ℂ H)
-    (hS : S ≤ closGen E V) (hST : Formalism.MainNotions.S.IsKTypeOf ε σ μ S) (hμ : μ ≠ lowK ε lam) :
-    casValK ε (lowK ε lam) + 2 * (h - n + 1) ≤ casValK ε μ := by
+    (hVK : ∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v)
+    {h : ℝ} (hh : GapAtLeast ε lam h) (hbig : (n : ℝ) * (pOf ε : ℝ) * (qOf ε : ℝ) + 1 < h)
+    {μ : Fin n → ℝ}
+    (S : Submodule ℂ H) (hS : S ≤ closGen E V) (hST : Formalism.MainNotions.S.IsKTypeOf ε σ μ S)
+    (hμ : μ ≠ lowK ε lam)
+    : casValK ε (lowK ε lam) + 2 * (h - n + 1) ≤ casValK ε μ := by
   obtain ⟨w, hwg, hw0, hwK⟩ := exists_khw_genSub_of_kType hσ hD hV.1 hV.2.1 hS hST
-  obtain ⟨j, -, hpos, hle⟩ := casimir_gap_at_noncompact_weight hD.glRep (isInfUnitary_of_isDerivedOn hσ hD) hV hc hgap.1 hh hbig
-    hwg hw0 hwK hμ
+  obtain ⟨j, -, hpos, hle⟩ :=
+    casimir_gap_at_noncompact_weight hD.glRep (isInfUnitary_of_isDerivedOn hσ hD) hV hc hgap.1 hh
+      hbig hwg hw0 hwK hμ
   have hj : (0 : ℝ) ≤ j := Nat.cast_nonneg j
   nlinarith
 
-theorem data_vogan (hgap : StdGap ε lam) (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
+theorem data_vogan
+    (hgap : StdGap ε lam) (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
     (hV : IsKIrrHW ε E (lowK ε lam) V) (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v)
-    (hVK : ∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v) {μ : Fin n → ℝ} (S : Submodule ℂ H) (hS : S ≤ closGen E V)
-    (hST : Formalism.MainNotions.S.IsKTypeOf ε σ μ S) :
-    Formalism.MainNotions.S.vNormSq ε (Formalism.QuantumDeterminants.lowK ε lam) ≤ Formalism.MainNotions.S.vNormSq ε μ := by
+    (hVK : ∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v)
+    {μ : Fin n → ℝ}
+    (S : Submodule ℂ H) (hS : S ≤ closGen E V) (hST : Formalism.MainNotions.S.IsKTypeOf ε σ μ S)
+    : Formalism.MainNotions.S.vNormSq ε (Formalism.QuantumDeterminants.lowK ε lam)
+      ≤ Formalism.MainNotions.S.vNormSq ε μ := by
   obtain ⟨w, hwg, hw0, hwK⟩ := exists_khw_genSub_of_kType hσ hD hV.1 hV.2.1 hS hST
   exact vogan_min hD.glRep (isInfUnitary_of_isDerivedOn hσ hD) hV hc hgap hwg hw0 hwK
 
-theorem data_isKTypeOf (hgap : StdGap ε lam) (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
+theorem data_isKTypeOf
+    (hgap : StdGap ε lam) (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
     (hV : IsKIrrHW ε E (lowK ε lam) V) (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v)
-    (hVK : ∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v) : Formalism.MainNotions.S.IsKTypeOf ε σ (lowK ε lam) (V.map D.subtype) := by
+    (hVK : ∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v)
+    : Formalism.MainNotions.S.IsKTypeOf ε σ (lowK ε lam) (V.map D.subtype) := by
   exact isKTypeOf_of_isKIrrHW hσ hD hV hVK (fun μ x hx hx0 hμ =>
     weights_le_of_irr_hw hD.glRep (isInfUnitary_of_isDerivedOn hσ hD) hV hx hx0 hμ)
 
-theorem data_casU (hgap : StdGap ε lam) (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
+theorem data_casU
+    (hgap : StdGap ε lam) (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
     (hV : IsKIrrHW ε E (lowK ε lam) V) (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v)
-    (hVK : ∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v) (x : D) (hx : x ∈ genSub E V) :
-    casU ε σ (x : H) = ((casVal lam : ℝ) : ℂ) • (x : H) := by
+    (hVK : ∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v)
+    (x : D) (hx : x ∈ genSub E V)
+    : casU ε σ (x : H) = ((casVal lam : ℝ) : ℂ) • (x : H) := by
   rw [casU_eq_casimir hD x, casimir_genSub hD.glRep hc x hx, Submodule.coe_smul]
 
-theorem data_closGen_eq_top (hgap : StdGap ε lam) (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
+theorem data_closGen_eq_top
+    (hgap : StdGap ε lam) (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
     (hV : IsKIrrHW ε E (lowK ε lam) V) (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v)
-    (hVK : ∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v) (hirr : Formalism.MainNotions.S.IsIrredOn (UJset ε) σ) (hV0 : V ≠ ⊥) :
-    closGen E V = ⊤ := by
+    (hVK : ∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v)
+    (hirr : Formalism.MainNotions.S.IsIrredOn (UJset ε) σ) (hV0 : V ≠ ⊥)
+    : closGen E V = ⊤ := by
   rcases hirr (closGen E V) (Submodule.isClosed_topologicalClosure _)
-      (closGen_stable hgap hσ hD hV hc hVK) with h | h
+      (closGen_stable hgap hσ hD hV hc hVK)
+    with h | h
   · exfalso
     obtain ⟨w, hw, hw0, -⟩ := hV.2.2.2
     have hwc : (w : H) ∈ closGen E V := UnitaryGroupOfForm.mem_closGen (E := E) V w hw
@@ -184,11 +211,12 @@ end Data
 
 section Two
 
-variable {ε : Fin n → Bool} {lam : Fin n → ℝ}
-  {H₁ : Type*} [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁] [CompleteSpace H₁]
+variable
+  {ε : Fin n → Bool} {lam : Fin n → ℝ} {H₁ : Type*}
+  [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁] [CompleteSpace H₁]
   {σ₁ : Matrix (Fin n) (Fin n) ℂ → (H₁ →L[ℂ] H₁)} {D₁ : Submodule ℂ H₁}
-  {E₁ : Fin n → Fin n → Module.End ℂ D₁} {V₁ : Submodule ℂ D₁}
-  {H₂ : Type*} [NormedAddCommGroup H₂] [InnerProductSpace ℂ H₂] [CompleteSpace H₂]
+  {E₁ : Fin n → Fin n → Module.End ℂ D₁} {V₁ : Submodule ℂ D₁} {H₂ : Type*}
+  [NormedAddCommGroup H₂] [InnerProductSpace ℂ H₂] [CompleteSpace H₂]
   {σ₂ : Matrix (Fin n) (Fin n) ℂ → (H₂ →L[ℂ] H₂)} {D₂ : Submodule ℂ H₂}
   {E₂ : Fin n → Fin n → Module.End ℂ D₂} {V₂ : Submodule ℂ D₂}
 

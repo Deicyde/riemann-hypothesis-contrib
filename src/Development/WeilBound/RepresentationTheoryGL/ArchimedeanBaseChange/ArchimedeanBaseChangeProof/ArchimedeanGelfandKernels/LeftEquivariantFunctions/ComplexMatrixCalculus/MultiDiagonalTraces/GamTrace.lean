@@ -13,8 +13,8 @@ namespace PositivityTheory.RgBcC
 
 open PositivityTheory.RgBcC.Cxi
 
-private theorem gamM_mul' {n : ℕ} (A B : Matrix (Md n) (Md n) ℂ) :
-    gamM (A * B) = gamM A * gamM B := by
+private theorem gamM_mul' {n : ℕ} (A B : Matrix (Md n) (Md n) ℂ)
+    : gamM (A * B) = gamM A * gamM B := by
   unfold gamM
   rw [Matrix.toLin'_mul, ← ExteriorAlgebra.map_comp_map]
   show LinearMap.toMatrix (fb n) (fb n)
@@ -29,10 +29,11 @@ private theorem gamM_one' {n : ℕ} : gamM (1 : Matrix (Md n) (Md n) ℂ) = 1 :=
   rw [Matrix.toLin'_one, ExteriorAlgebra.map_id]
   exact LinearMap.toMatrix_id _
 
-private theorem trace_gamM_conj_eq_of_mul_eq_one {n : ℕ} (A P Q : Matrix (Md n) (Md n) ℂ) (h : Q * P = 1) :
-    (gamM (P * A * Q)).trace = (gamM A).trace := by
-  rw [gamM_mul', gamM_mul', Matrix.trace_mul_comm, ← Matrix.mul_assoc, ← gamM_mul', h,
-    gamM_one', Matrix.one_mul]
+private theorem trace_gamM_conj_eq_of_mul_eq_one
+    {n : ℕ} (A P Q : Matrix (Md n) (Md n) ℂ) (h : Q * P = 1)
+    : (gamM (P * A * Q)).trace = (gamM A).trace := by
+  rw [gamM_mul', gamM_mul', Matrix.trace_mul_comm, ← Matrix.mul_assoc, ← gamM_mul', h, gamM_one',
+    Matrix.one_mul]
 
 theorem gamTrace : GamTrace := by
   intro n z hz
@@ -64,11 +65,12 @@ theorem gamTrace : GamTrace := by
       ← basis_toMatrix_mul_linearMap_toMatrix_mul_basis_toMatrix (hbB n) (stdB n) (hbB n) (stdB n),
       toMatrix_stdB, Matrix.transpose_mul, Matrix.transpose_mul, diagonal_transpose,
       ← Matrix.mul_assoc,
-      trace_gamM_conj_eq_of_mul_eq_one _ _ _ (by rw [← Matrix.transpose_mul, Module.Basis.toMatrix_mul_toMatrix_flip,
-        Matrix.transpose_one]),
+      trace_gamM_conj_eq_of_mul_eq_one _ _ _ (by
+        rw [← Matrix.transpose_mul, Module.Basis.toMatrix_mul_toMatrix_flip, Matrix.transpose_one]),
       Cxi.trace_gam_diag,
       Fintype.prod_equiv finProdFinEquiv.symm _
-        (fun p : Fin n × Fin n => 1 + (z p.1)⁻¹ * conj ((z p.2)⁻¹)) (fun m => rfl),
+        (fun p : Fin n × Fin n => 1 + (z p.1)⁻¹ * conj ((z p.2)⁻¹))
+        (fun m => rfl),
       Fintype.prod_prod_type, Finset.prod_comm]
     refine Finset.prod_congr rfl (fun a _ => Finset.prod_congr rfl (fun b _ => ?_))
     rw [map_inv₀, hc, inv_inv]

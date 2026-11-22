@@ -7,12 +7,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open Polynomial UpperTheory.V.Z.Sym.Wt
 
-private theorem hs_opt {σ : Type} [Fintype σ] [DecidableEq σ] (x : Option σ → ℂ) (j : ℕ) :
-    MvPolynomial.eval x (MvPolynomial.hsymm (Option σ) ℂ (j + 1)) =
-      x none * MvPolynomial.eval x (MvPolynomial.hsymm (Option σ) ℂ j) +
-        MvPolynomial.eval (x ∘ some) (MvPolynomial.hsymm σ ℂ (j + 1)) := by
-  have ev : ∀ (τ : Type) [Fintype τ] [DecidableEq τ] (y : τ → ℂ) (n : ℕ),
-      MvPolynomial.eval y (MvPolynomial.hsymm τ ℂ n) = ∑ s : Sym τ n, ((s : Multiset τ).map y).prod := by
+private theorem hs_opt {σ : Type} [Fintype σ] [DecidableEq σ] (x : Option σ → ℂ) (j : ℕ)
+    : MvPolynomial.eval x (MvPolynomial.hsymm (Option σ) ℂ (j + 1))
+      = x none * MvPolynomial.eval x (MvPolynomial.hsymm (Option σ) ℂ j)
+        + MvPolynomial.eval (x ∘ some) (MvPolynomial.hsymm σ ℂ (j + 1)) := by
+  have ev
+      : ∀ (τ : Type) [Fintype τ] [DecidableEq τ] (y : τ → ℂ) (n : ℕ),
+        MvPolynomial.eval y (MvPolynomial.hsymm τ ℂ n)
+          = ∑ s : Sym τ n, ((s : Multiset τ).map y).prod := by
     intro τ _ _ y n
     set_option synthInstance.maxHeartbeats 100000 in
       rw [MvPolynomial.hsymm, map_sum]
@@ -30,12 +32,14 @@ private theorem hs_opt {σ : Type} [Fintype σ] [DecidableEq σ] (x : Option σ 
     show ((Multiset.map some (s : Multiset σ)).map x).prod = _
     rw [Multiset.map_map]
 
-private theorem hs_succ {d : ℕ} (x : Fin (d + 1) → ℂ) (k : Fin (d + 1)) (j : ℕ) :
-    MvPolynomial.eval x (MvPolynomial.hsymm (Fin (d + 1)) ℂ (j + 1)) =
-      x k * MvPolynomial.eval x (MvPolynomial.hsymm (Fin (d + 1)) ℂ j) +
-        MvPolynomial.eval (x ∘ k.succAbove) (MvPolynomial.hsymm (Fin d) ℂ (j + 1)) := by
-  have e1 : ∀ n, MvPolynomial.hsymm (Fin (d + 1)) ℂ n =
-      MvPolynomial.rename (finSuccEquiv' k).symm (MvPolynomial.hsymm (Option (Fin d)) ℂ n) :=
+private theorem hs_succ {d : ℕ} (x : Fin (d + 1) → ℂ) (k : Fin (d + 1)) (j : ℕ)
+    : MvPolynomial.eval x (MvPolynomial.hsymm (Fin (d + 1)) ℂ (j + 1))
+      = x k * MvPolynomial.eval x (MvPolynomial.hsymm (Fin (d + 1)) ℂ j)
+        + MvPolynomial.eval (x ∘ k.succAbove) (MvPolynomial.hsymm (Fin d) ℂ (j + 1)) := by
+  have e1
+      : ∀ n,
+        MvPolynomial.hsymm (Fin (d + 1)) ℂ n
+          = MvPolynomial.rename (finSuccEquiv' k).symm (MvPolynomial.hsymm (Option (Fin d)) ℂ n) :=
     fun n => (MvPolynomial.rename_hsymm (Option (Fin d)) ℂ n (finSuccEquiv' k).symm).symm
   rw [e1, e1, MvPolynomial.eval_rename, MvPolynomial.eval_rename, hs_opt]
   have h1 : (x ∘ (finSuccEquiv' k).symm) none = x k := by simp
@@ -44,8 +48,7 @@ private theorem hs_succ {d : ℕ} (x : Fin (d + 1) → ℂ) (k : Fin (d + 1)) (j
     simp
   rw [h1, h2]
 
-theorem UpperTheory.V.Z.Sym.Wt.hqThree :
-    UpperTheory.V.Z.Sym.Wt.HqThree := by
+theorem UpperTheory.V.Z.Sym.Wt.hqThree : UpperTheory.V.Z.Sym.Wt.HqThree := by
   intro j a b
   have hv : (![a, 1, b] ∘ (1 : Fin 3).succAbove) = ![a, b] := by
     ext i

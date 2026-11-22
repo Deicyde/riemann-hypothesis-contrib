@@ -10,12 +10,15 @@ open scoped Pointwise
 
 namespace GlobalTheory
 
-theorem crt_approx_integral : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
-    [IsAlgClosure E Ω] (K : IntermediateField E Ω) [FiniteDimensional E K] (A : ValuationSubring Ω)
-    (c : ℕ), c ≠ 0 →
-    ∃ t ∈ K, IsIntegral ℤ t ∧ A.valuation (t - 1) ≤ A.valuation (c : Ω) ∧
-      ∀ σ : G E Ω, (∃ x ∈ K, IsIntegral ℤ x ∧ ¬(A.valuation (σ x) < 1 ↔ A.valuation x < 1)) →
-        A.valuation (σ t) ≤ A.valuation (c : Ω) := by
+theorem crt_approx_integral
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (K : IntermediateField E Ω) [FiniteDimensional E K] (A : ValuationSubring Ω) (c : ℕ),
+      c ≠ 0
+        → ∃ t ∈ K,
+          IsIntegral ℤ t ∧ A.valuation (t - 1) ≤ A.valuation (c : Ω)
+            ∧ ∀ σ : G E Ω,
+              (∃ x ∈ K, IsIntegral ℤ x ∧ ¬(A.valuation (σ x) < 1 ↔ A.valuation x < 1))
+                → A.valuation (σ t) ≤ A.valuation (c : Ω) := by
   intro E Ω _ _ _ _ _ K _ A c hc
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap E Ω).injective
   haveI : NumberField K := { to_charZero := inferInstance, to_finiteDimensional := Module.Finite.trans E K }
@@ -35,8 +38,9 @@ theorem crt_approx_integral : ∀ (E Ω : Type) [Field E] [NumberField E] [Field
   have memPg : ∀ g hg r, r ∈ Pg g hg ↔ A.valuation (g r) < 1 := fun g hg r => by
     simp only [Pg, Ideal.mem_comap]; exact A.valuation_lt_one_iff _
   have primePg : ∀ g hg, (Pg g hg).IsPrime := fun g hg => Ideal.comap_isPrime _ _
-  have key : ∀ (g : 𝓞 K →+* Ω) (hg : ∀ r, IsIntegral ℤ (g r)) (s u : 𝓞 K), s ∉ Pg g hg →
-      s * u ∈ Ideal.span {(c : 𝓞 K)} → A.valuation (g u) ≤ A.valuation (c : Ω) := by
+  have key
+      : ∀ (g : 𝓞 K →+* Ω) (hg : ∀ r, IsIntegral ℤ (g r)) (s u : 𝓞 K),
+        s ∉ Pg g hg → s * u ∈ Ideal.span {(c : 𝓞 K)} → A.valuation (g u) ≤ A.valuation (c : Ω) := by
     intro g hg s u hs hsu
     obtain ⟨w, hw⟩ := Ideal.mem_span_singleton'.1 hsu
     have hs1 : A.valuation (g s) = 1 :=
@@ -51,8 +55,7 @@ theorem crt_approx_integral : ∀ (E Ω : Type) [Field E] [NumberField E] [Field
     rw [h, Ideal.mem_bot] at h'
     exact hc (by exact_mod_cast h')
   haveI hPmax : (Pg f fint).IsMaximal := Ideal.IsPrime.isMaximal (primePg f fint) hPne
-  have hI : Ideal.span {(c : 𝓞 K)} ≠ ⊥ := by
-    rw [Ne, Ideal.span_singleton_eq_bot]; exact_mod_cast hc
+  have hI : Ideal.span {(c : 𝓞 K)} ≠ ⊥ := by rw [Ne, Ideal.span_singleton_eq_bot]; exact_mod_cast hc
   classical
   obtain ⟨J, hPJ, hIJ⟩ := Ideal.eq_prime_pow_mul_coprime hI (Pg f fint)
   set a := Multiset.count (Pg f fint)
@@ -67,7 +70,8 @@ theorem crt_approx_integral : ∀ (E Ω : Type) [Field E] [NumberField E] [Field
     exact hPmax.ne_top hPJ
   have hz1 : z - 1 ∈ Pg f fint ^ a := by
     have e : z - 1 = -y := by rw [← hzy]; ring
-    rw [e]; exact neg_mem hy
+    rw [e]
+    exact neg_mem hy
   refine ⟨f z, (algebraMap (𝓞 K) K z).2, fint z, ?_, ?_⟩
   · have := key f fint s (z - 1) hsP (by rw [hIJ, mul_comm s]; exact Ideal.mul_mem_mul hz1 hsJ)
     simpa only [map_sub, map_one] using this

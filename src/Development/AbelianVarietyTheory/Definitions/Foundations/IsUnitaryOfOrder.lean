@@ -18,8 +18,8 @@ variable (L : Type) [Field L] [NumberField L]
 def hcharSub : Subgroup (Ideles L →* ℂˣ) where
   carrier := {χ | Continuous χ ∧ ∀ k : Lˣ, χ (diagUnits L k) = 1}
   one_mem' := ⟨continuous_const, fun _ => rfl⟩
-  mul_mem' := fun {a b} ha hb => ⟨ha.1.mul hb.1, fun k => by
-    rw [MonoidHom.mul_apply, ha.2 k, hb.2 k, one_mul]⟩
+  mul_mem' := fun {a b} ha hb =>
+    ⟨ha.1.mul hb.1, fun k => by rw [MonoidHom.mul_apply, ha.2 k, hb.2 k, one_mul]⟩
   inv_mem' := fun {a} ha => ⟨ha.1.inv, fun k => by rw [MonoidHom.inv_apply, ha.2 k, inv_one]⟩
 
 abbrev HChar : Type := ↥(hcharSub L)
@@ -38,7 +38,7 @@ def IsUnitAt (v : HeightOneSpectrum (𝓞 L)) (x : (v.adicCompletion L)ˣ) : Pro
 def IsUnifAt (v : HeightOneSpectrum (𝓞 L)) (x : (v.adicCompletion L)ˣ) : Prop :=
   Valued.v (x : v.adicCompletion L) = WithZero.exp (-1 : ℤ)
 
-def ordF (v : HeightOneSpectrum (𝓞 L)) (k : Lˣ) : ℤ := -WithZero.log (v.valuation L (k : L))
+def ordF (v : HeightOneSpectrum (𝓞 L)) (k : Lˣ) : ℤ := - WithZero.log (v.valuation L (k : L))
 
 def infDiag : Lˣ →* Ideles L := ∏ w : InfinitePlace L, (infIdele L w).comp (atInf w)
 
@@ -70,10 +70,11 @@ def locK (v : HeightOneSpectrum (𝓞 L)) : Lˣ →* ℂˣ := (χ.loc v).comp (a
 def inf : Lˣ →* ℂˣ := χ.1.comp infDiag
 
 def LevelLe (v : HeightOneSpectrum (𝓞 L)) (n : ℕ) : Prop :=
-  ∀ x : (v.adicCompletion L)ˣ, IsUnitAt v x →
-    Valued.v ((x : v.adicCompletion L) - 1) ≤ WithZero.exp (-(n : ℤ)) → χ.loc v x = 1
+  ∀ x : (v.adicCompletion L)ˣ,
+    IsUnitAt v x → Valued.v ((x : v.adicCompletion L) - 1) ≤ WithZero.exp (-(n : ℤ)) → χ.loc v x = 1
 
-def UnrAt (v : HeightOneSpectrum (𝓞 L)) : Prop := ∀ x : (v.adicCompletion L)ˣ, IsUnitAt v x → χ.loc v x = 1
+def UnrAt (v : HeightOneSpectrum (𝓞 L)) : Prop :=
+  ∀ x : (v.adicCompletion L)ˣ, IsUnitAt v x → χ.loc v x = 1
 
 def TameAt (v : HeightOneSpectrum (𝓞 L)) : Prop := χ.LevelLe v 1
 
@@ -93,17 +94,27 @@ def HasInfQ {I : Type} [Fintype I] (φ : I → L →+* ℂ) (a : I → ℚ) : Pr
   ∃ n : I → ℤ, (∀ i, (n i : ℚ) = 2 * a i) ∧ χ.HasInf φ n
 
 def IsAbsPow (s : ℝ) : Prop :=
-  (∀ v, χ.UnrAt v) ∧ (∀ v, ((χ.val v : ℂˣ) : ℂ) = ((Ideal.absNorm v.asIdeal : ℕ) : ℂ) ^ (-(s : ℂ))) ∧
-    ∀ k : Lˣ, ((χ.inf k : ℂˣ) : ℂ) = ∏ φ : L →+* ℂ, ((‖φ (k : L)‖ : ℝ) : ℂ) ^ (s : ℂ)
+  (∀ v, χ.UnrAt v) ∧ (∀ v, ((χ.val v : ℂˣ) : ℂ) = ((Ideal.absNorm v.asIdeal : ℕ) : ℂ) ^ (-(s : ℂ)))
+    ∧ ∀ k : Lˣ, ((χ.inf k : ℂˣ) : ℂ) = ∏ φ : L →+* ℂ, ((‖φ (k : L)‖ : ℝ) : ℂ) ^ (s : ℂ)
 
 def ProductRule : Prop :=
-  ∀ S : Finset (HeightOneSpectrum (𝓞 L)), (∀ v, v ∉ S → χ.UnrAt v) → ∀ k : Lˣ,
-    χ.inf k * (∏ v ∈ S, χ.locK v k) * (∏ᶠ (v : HeightOneSpectrum (𝓞 L)) (_ : v ∉ S), χ.val v ^ ordF v k) = 1
+  ∀ S : Finset (HeightOneSpectrum (𝓞 L)),
+    (∀ v, v ∉ S → χ.UnrAt v)
+      → ∀ k : Lˣ,
+        χ.inf k * (∏ v ∈ S, χ.locK v k)
+            * (∏ᶠ (v : HeightOneSpectrum (𝓞 L)) (_ : v ∉ S), χ.val v ^ ordF v k)
+          = 1
 
-@[simp] theorem val_mul (χ χ' : HChar L) (v : HeightOneSpectrum (𝓞 L)) : (χ * χ').val v = χ.val v * χ'.val v := rfl
-@[simp] theorem val_inv (χ : HChar L) (v : HeightOneSpectrum (𝓞 L)) : (χ⁻¹).val v = (χ.val v)⁻¹ := rfl
-@[simp] theorem inf_mul (χ χ' : HChar L) (k : Lˣ) : (χ * χ').inf k = χ.inf k * χ'.inf k := rfl
-@[simp] theorem inf_inv (χ : HChar L) (k : Lˣ) : (χ⁻¹).inf k = (χ.inf k)⁻¹ := rfl
+@[simp]
+theorem val_mul (χ χ' : HChar L) (v : HeightOneSpectrum (𝓞 L))
+    : (χ * χ').val v = χ.val v * χ'.val v :=
+  rfl
+@[simp]
+theorem val_inv (χ : HChar L) (v : HeightOneSpectrum (𝓞 L)) : (χ⁻¹).val v = (χ.val v)⁻¹ := rfl
+@[simp]
+theorem inf_mul (χ χ' : HChar L) (k : Lˣ) : (χ * χ').inf k = χ.inf k * χ'.inf k := rfl
+@[simp]
+theorem inf_inv (χ : HChar L) (k : Lˣ) : (χ⁻¹).inf k = (χ.inf k)⁻¹ := rfl
 
 end HChar
 
@@ -111,16 +122,16 @@ section Res
 
 variable (F : Type) [Field F] [NumberField F] [Algebra F L]
 
-theorem finite_aboveF (v : HeightOneSpectrum (𝓞 F)) :
-    {P : HeightOneSpectrum (𝓞 L) | P.under (𝓞 F) = v}.Finite := by
+theorem finite_aboveF (v : HeightOneSpectrum (𝓞 F))
+    : {P : HeightOneSpectrum (𝓞 L) | P.under (𝓞 F) = v}.Finite := by
   have hfin := IsDedekindDomain.primesOver_finite v.asIdeal (𝓞 L)
   refine (hfin.preimage (f := HeightOneSpectrum.asIdeal)
     (fun _ _ _ _ h => HeightOneSpectrum.ext h)).subset ?_
   rintro P rfl
   exact ⟨P.isPrime, ⟨rfl⟩⟩
 
-def aboveF (v : HeightOneSpectrum (𝓞 F)) : Finset (HeightOneSpectrum (𝓞 L)) := (finite_aboveF F v).toFinset
-
+def aboveF (v : HeightOneSpectrum (𝓞 F)) : Finset (HeightOneSpectrum (𝓞 L)) :=
+  (finite_aboveF F v).toFinset
 
 open Classical in
 def aboveInf (w : InfinitePlace F) : Finset (InfinitePlace L) :=
@@ -139,7 +150,8 @@ def HChar.resInf (χ : HChar L) (w : InfinitePlace F) : Fˣ →* ℂˣ :=
 variable (F)
 
 def HChar.TrivOn (χ : HChar L) : Prop :=
-  (∀ (v : HeightOneSpectrum (𝓞 F)) (k : Fˣ), χ.resFin v k = 1) ∧ ∀ (w : InfinitePlace F) (k : Fˣ), χ.resInf w k = 1
+  (∀ (v : HeightOneSpectrum (𝓞 F)) (k : Fˣ), χ.resFin v k = 1)
+    ∧ ∀ (w : InfinitePlace F) (k : Fˣ), χ.resInf w k = 1
 
 def etaFin (v : HeightOneSpectrum (𝓞 F)) (k : Fˣ) : ℂˣ :=
   if (aboveF (L := L) F v).card = 1 then (-1) ^ ordF v k else 1
@@ -147,8 +159,8 @@ def etaFin (v : HeightOneSpectrum (𝓞 F)) (k : Fˣ) : ℂˣ :=
 def etaInf (w : InfinitePlace F) (k : Fˣ) : ℂˣ := if (w.embedding (k : F)).re < 0 then -1 else 1
 
 def HChar.ResEta (χ : HChar L) : Prop :=
-  (∀ (v : HeightOneSpectrum (𝓞 F)) (k : Fˣ), χ.resFin v k = etaFin (L := L) F v k) ∧
-    ∀ (w : InfinitePlace F) (k : Fˣ), χ.resInf w k = etaInf F w k
+  (∀ (v : HeightOneSpectrum (𝓞 F)) (k : Fˣ), χ.resFin v k = etaFin (L := L) F v k)
+    ∧ ∀ (w : InfinitePlace F) (k : Fˣ), χ.resInf w k = etaInf F w k
 
 end Res
 
@@ -192,7 +204,9 @@ structure PiBar where
   pb : Fin 2 → HeightOneSpectrum (𝓞 H.K)
   pb_over : ∀ k, ((H.g k : ℕ) : 𝓞 H.K) ∈ (pb k).asIdeal
 
-def PiBar.Div {H : Formalism.BasicNotions.Host R} (P : PiBar H) (k : Fin 2) (w : HeightOneSpectrum (𝓞 H.E)) : Prop :=
+def PiBar.Div
+    {H : Formalism.BasicNotions.Host R} (P : PiBar H) (k : Fin 2) (w : HeightOneSpectrum (𝓞 H.E))
+    : Prop :=
   w.under (𝓞 H.K) = P.pb k
 
 structure Omg where
@@ -204,13 +218,17 @@ variable {H}
 structure IsMu0 (P : PiBar H) (W : Omg H) (e : R.Psi → ℚ) (j : ℕ) (χ : HChar H.E) : Prop where
   unitary : χ.IsUnitary
   triv : χ.TrivOn H.F
-  inf : χ.HasInfQ (embPsi H) (fun τ => -e τ)
+  inf : χ.HasInfQ (embPsi H) (fun τ => - e τ)
   unr : ∀ v, (∀ k, ¬ OverP H (H.g k) v) → χ.UnrAt v
   tame : ∀ v, χ.TameAt v
-  atg : ∀ (k : Fin 2) (w : HeightOneSpectrum (𝓞 H.E)), P.Div k w → ∀ (a : ℕ) (ha : a.Coprime (H.g k)) (x : H.Eˣ),
-    (x : H.E) = (a : H.E) → χ.locK w x = (W.om k (ZMod.unitOfCoprime a ha) ^ (2 * (j + 1)))⁻¹
+  atg
+    : ∀ (k : Fin 2) (w : HeightOneSpectrum (𝓞 H.E)),
+      P.Div k w
+        → ∀ (a : ℕ) (ha : a.Coprime (H.g k)) (x : H.Eˣ),
+          (x : H.E) = (a : H.E) → χ.locK w x = (W.om k (ZMod.unitOfCoprime a ha) ^ (2 * (j + 1)))⁻¹
 
-def Mu0Exists (P : PiBar H) (W : Omg H) (e : R.Psi → ℚ) (j : ℕ) : Prop := ∃ χ : HChar H.E, IsMu0 P W e j χ
+def Mu0Exists (P : PiBar H) (W : Omg H) (e : R.Psi → ℚ) (j : ℕ) : Prop :=
+  ∃ χ : HChar H.E, IsMu0 P W e j χ
 
 structure IsDelta (p : ℕ) (χ : HChar H.E) : Prop where
   fin : ∃ n : ℕ, 0 < n ∧ χ.OrderDvd n
@@ -247,22 +265,23 @@ variable {L : Type} [Field L] [NumberField L] {F : Type} [Field F] [NumberField 
 
 namespace HChar
 
-theorem resFin_apply (χ : HChar L) (v : HeightOneSpectrum (𝓞 F)) (k : Fˣ) :
-    χ.resFin v k = ∏ P ∈ aboveF (L := L) F v, χ.locK P (upF F k) := by
+theorem resFin_apply (χ : HChar L) (v : HeightOneSpectrum (𝓞 F)) (k : Fˣ)
+    : χ.resFin v k = ∏ P ∈ aboveF (L := L) F v, χ.locK P (upF F k) := by
   simp [HChar.resFin]
 
-theorem resInf_apply (χ : HChar L) (w : InfinitePlace F) (k : Fˣ) :
-    χ.resInf w k = ∏ w' ∈ aboveInf (L := L) F w, χ.locInf w' (atInf w' (upF F k)) := by
+theorem resInf_apply (χ : HChar L) (w : InfinitePlace F) (k : Fˣ)
+    : χ.resInf w k = ∏ w' ∈ aboveInf (L := L) F w, χ.locInf w' (atInf w' (upF F k)) := by
   simp [HChar.resInf]
 
-theorem LevelLe.mul {χ χ' : HChar L} {v : HeightOneSpectrum (𝓞 L)} {n : ℕ} (h : χ.LevelLe v n) (h' : χ'.LevelLe v n) :
-    (χ * χ').LevelLe v n := fun x hx hx' => by
+theorem LevelLe.mul
+    {χ χ' : HChar L} {v : HeightOneSpectrum (𝓞 L)} {n : ℕ} (h : χ.LevelLe v n) (h' : χ'.LevelLe v n)
+    : (χ * χ').LevelLe v n := fun x hx hx' => by
   change χ.1 (localIdele L v x) * χ'.1 (localIdele L v x) = 1
   change χ.loc v x * χ'.loc v x = 1
   rw [h x hx hx', h' x hx hx', one_mul]
 
-theorem LevelLe.inv {χ : HChar L} {v : HeightOneSpectrum (𝓞 L)} {n : ℕ} (h : χ.LevelLe v n) :
-    (χ⁻¹).LevelLe v n := fun x hx hx' => by
+theorem LevelLe.inv {χ : HChar L} {v : HeightOneSpectrum (𝓞 L)} {n : ℕ} (h : χ.LevelLe v n)
+    : (χ⁻¹).LevelLe v n := fun x hx hx' => by
   change (χ.1 (localIdele L v x))⁻¹ = 1
   change (χ.loc v x)⁻¹ = 1
   rw [h x hx hx', inv_one]
@@ -273,8 +292,10 @@ end General
 
 variable {R : Ranks} {H : Formalism.BasicNotions.Host R}
 
-theorem isUnitAt_nat {p a : ℕ} {w : HeightOneSpectrum (𝓞 H.E)} (hw : OverP H p w) (ha : a.Coprime p) {x : H.Eˣ}
-    (hx : (x : H.E) = (a : H.E)) : IsUnitAt w (atFin w x) := by
+theorem isUnitAt_nat
+    {p a : ℕ} {w : HeightOneSpectrum (𝓞 H.E)} (hw : OverP H p w) (ha : a.Coprime p)
+    {x : H.Eˣ} (hx : (x : H.E) = (a : H.E))
+    : IsUnitAt w (atFin w x) := by
   have hna : ((a : ℕ) : 𝓞 H.E) ∉ w.asIdeal := by
     intro hmem
     obtain ⟨u, v, huv⟩ := (Nat.isCoprime_iff_coprime.mpr ha)
@@ -291,13 +312,13 @@ theorem isUnitAt_nat {p a : ℕ} {w : HeightOneSpectrum (𝓞 H.E)} (hw : OverP 
   rw [hx]
   simpa using h
 
-theorem HChar.isUnitary_of_order {L : Type} [Field L] [NumberField L] {χ : HChar L} {n : ℕ} (hn : 0 < n) (h : χ.OrderDvd n) :
-    χ.IsUnitary := fun x => by
+theorem HChar.isUnitary_of_order
+    {L : Type} [Field L] [NumberField L] {χ : HChar L} {n : ℕ} (hn : 0 < n) (h : χ.OrderDvd n)
+    : χ.IsUnitary := fun x => by
   have h1 : (χ.1 x) ^ n = 1 := by
     have := congrArg (fun ξ : HChar L => ξ.1 x) h
     exact this
-  have h2 : ‖((χ.1 x : ℂˣ) : ℂ)‖ ^ n = 1 := by
-    rw [← norm_pow, ← Units.val_pow_eq_pow_val, h1]; simp
+  have h2 : ‖((χ.1 x : ℂˣ) : ℂ)‖ ^ n = 1 := by rw [← norm_pow, ← Units.val_pow_eq_pow_val, h1]; simp
   exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) hn.ne').mp h2
 
 theorem IsDelta.unitary {p : ℕ} {χ : HChar H.E} (h : IsDelta (H := H) p χ) : χ.IsUnitary := by

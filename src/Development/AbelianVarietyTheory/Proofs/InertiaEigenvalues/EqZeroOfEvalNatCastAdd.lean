@@ -8,9 +8,12 @@ namespace GlobalTheory.EvalNatCastZero
 
 open Polynomial
 
-theorem eq_zero_of_eval_natCast_add {R : Type} [CommRing R]
-    (hR : ∀ n : ℕ, n ≠ 0 → IsUnit (n : R)) (n : ℕ) (F : Polynomial R) (hF : F.natDegree ≤ n)
-    (m : ℕ) (h : ∀ k : ℕ, Polynomial.eval ((m + k : ℕ) : R) F = 0) : F = 0 := by
+theorem eq_zero_of_eval_natCast_add
+    {R : Type} [CommRing R]
+    (hR : ∀ n : ℕ, n ≠ 0 → IsUnit (n : R))
+    (n : ℕ) (F : Polynomial R) (hF : F.natDegree ≤ n)
+    (m : ℕ) (h : ∀ k : ℕ, Polynomial.eval ((m + k : ℕ) : R) F = 0)
+    : F = 0 := by
   nontriviality R
   induction n generalizing F m with
   | zero =>
@@ -20,8 +23,7 @@ theorem eq_zero_of_eval_natCast_add {R : Type} [CommRing R]
     rw [h0, C_0]
   | succ n ih =>
     have hroot : F.IsRoot (m : R) := by simpa using h 0
-    have hfac : (X - C (m : R)) * (F /ₘ (X - C (m : R))) = F :=
-      mul_divByMonic_eq_iff_isRoot.2 hroot
+    have hfac : (X - C (m : R)) * (F /ₘ (X - C (m : R))) = F := mul_divByMonic_eq_iff_isRoot.2 hroot
     have hdeg : (F /ₘ (X - C (m : R))).natDegree ≤ n := by
       rw [natDegree_divByMonic F (monic_X_sub_C _), natDegree_X_sub_C]
       omega

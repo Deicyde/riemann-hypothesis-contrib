@@ -8,8 +8,12 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.HodgeAt
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Crv GlobalTheory.CompanionTheory.Ar.Conj GlobalTheory.CompanionTheory.Ar.Flat GlobalTheory.CompanionTheory.Ar.Fl
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Crv GlobalTheory.CompanionTheory.Ar.Conj
+  GlobalTheory.CompanionTheory.Ar.Flat GlobalTheory.CompanionTheory.Ar.Fl
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.CompanionTheory.Ar.Flat.CPoint
@@ -17,8 +21,11 @@ open GlobalTheory.CompanionTheory.Ar.Flat.CPoint
 noncomputable section
 namespace GlobalTheory.CompanionTheory.Ar.Flat.CPoint
 
-theorem exists_emb_through_coeff : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (l : Level H) (c : Coeff l) (p : Nat.Primes)
-    (κ : c.F →+* ℂ_[p]) (s : E →+* ℂ_[p]), ∃ τ : E →+* ℂ, s = κ.comp (inE c τ) := by
+theorem exists_emb_through_coeff
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (l : Level H) (c : Coeff l)
+        (p : Nat.Primes) (κ : c.F →+* ℂ_[p]) (s : E →+* ℂ_[p]),
+      ∃ τ : E →+* ℂ,
+        s = κ.comp (inE c τ) := by
   intro E _ _ _ H l c p κ s
   haveI : CharZero ℂ_[p] := charZero_of_injective_ringHom κ.injective
   have hinj : Function.Injective (fun τ : E →+* ℂ => κ.comp (inE c τ)) := by

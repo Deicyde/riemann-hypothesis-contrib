@@ -20,22 +20,26 @@ namespace Formalism.HN
 
 namespace PlaceOperatorNorms
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K]
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
   {V ι : Type} [AddCommGroup V] [Module K V] [Fintype ι] [DecidableEq ι]
   {W κ : Type} [AddCommGroup W] [Module K W] [Fintype κ] [DecidableEq κ]
 
-theorem realize_apply0 (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (x : V)
-    (v : InfinitePlace K) (i : ι) :
-    (Formalism.HermitianLatticesTheory.realize b X x) (v, i, 0) = (Formalism.HermitianLatticesTheory.fcoord b X v x i).re := by
+theorem realize_apply0
+    (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (x : V) (v : InfinitePlace K) (i : ι)
+    : (Formalism.HermitianLatticesTheory.realize b X x) (v, i, 0)
+      = (Formalism.HermitianLatticesTheory.fcoord b X v x i).re := by
   simp [Formalism.HermitianLatticesTheory.realize, Formalism.HermitianLatticesTheory.realizeRaw]
 
-theorem realize_apply1 (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (x : V)
-    (v : InfinitePlace K) (i : ι) :
-    (Formalism.HermitianLatticesTheory.realize b X x) (v, i, 1) = (Formalism.HermitianLatticesTheory.fcoord b X v x i).im := by
+theorem realize_apply1
+    (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (x : V) (v : InfinitePlace K) (i : ι)
+    : (Formalism.HermitianLatticesTheory.realize b X x) (v, i, 1)
+      = (Formalism.HermitianLatticesTheory.fcoord b X v x i).im := by
   simp [Formalism.HermitianLatticesTheory.realize, Formalism.HermitianLatticesTheory.realizeRaw]
 
-theorem norm_sq_realize (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (x : V) :
-    ‖Formalism.HermitianLatticesTheory.realize b X x‖ ^ 2 = ∑ v, Formalism.HermitianLatticesTheory.normAt b X v x ^ 2 := by
+theorem norm_sq_realize (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (x : V)
+    : ‖Formalism.HermitianLatticesTheory.realize b X x‖ ^ 2
+      = ∑ v, Formalism.HermitianLatticesTheory.normAt b X v x ^ 2 := by
   rw [EuclideanSpace.norm_eq, Real.sq_sqrt (Finset.sum_nonneg fun _ _ => by positivity)]
   simp only [Formalism.HermitianLatticesTheory.normAt, Formalism.HermitianLatticesTheory.cnorm]
   rw [Fintype.sum_prod_type]
@@ -46,44 +50,55 @@ theorem norm_sq_realize (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι
     sq_abs, Complex.sq_norm, Complex.normSq_apply]
   ring
 
-theorem cnorm_eq (u : κ → ℂ) : Formalism.HermitianLatticesTheory.cnorm u = ‖(WithLp.toLp 2 u : EuclideanSpace ℂ κ)‖ := by
+theorem cnorm_eq (u : κ → ℂ)
+    : Formalism.HermitianLatticesTheory.cnorm u = ‖(WithLp.toLp 2 u : EuclideanSpace ℂ κ)‖ := by
   simp [Formalism.HermitianLatticesTheory.cnorm, EuclideanSpace.norm_eq]
 
-theorem fcoord_map (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (b' : Basis κ K W)
-    (X' : InfinitePlace K → Matrix κ κ ℂ) (hX : ∀ v, IsUnit (X v).det) (v : InfinitePlace K)
-    (φ : V →ₗ[K] W) (x : V) :
-    Formalism.HermitianLatticesTheory.fcoord b' X' v (φ x) =
-      ((X' v)⁻¹ * (LinearMap.toMatrix b b' φ).map v.embedding * X v).mulVec
+theorem fcoord_map
+    (b : Basis ι K V)
+    (X : InfinitePlace K → Matrix ι ι ℂ)
+    (b' : Basis κ K W) (X' : InfinitePlace K → Matrix κ κ ℂ) (hX : ∀ v, IsUnit (X v).det)
+    (v : InfinitePlace K) (φ : V →ₗ[K] W) (x : V)
+    : Formalism.HermitianLatticesTheory.fcoord b' X' v (φ x)
+      = ((X' v)⁻¹ * (LinearMap.toMatrix b b' φ).map v.embedding * X v).mulVec
         (Formalism.HermitianLatticesTheory.fcoord b X v x) := by
-  have hv : Formalism.HermitianLatticesTheory.vecAt b' v (φ x) =
-      ((LinearMap.toMatrix b b' φ).map v.embedding).mulVec (Formalism.HermitianLatticesTheory.vecAt b v x) := by
+  have hv
+      : Formalism.HermitianLatticesTheory.vecAt b' v (φ x)
+        = ((LinearMap.toMatrix b b' φ).map v.embedding).mulVec
+          (Formalism.HermitianLatticesTheory.vecAt b v x) := by
     funext i
     simp only [Formalism.HermitianLatticesTheory.vecAt]
     rw [← LinearMap.toMatrix_mulVec_repr b b' φ x]
     first
-      | simp [Matrix.mulVec, dotProduct, map_sum, map_mul, Formalism.HermitianLatticesTheory.vecAt]
-      | simp [Matrix.mulVec, Matrix.dotProduct, map_sum, map_mul, Formalism.HermitianLatticesTheory.vecAt]
-  simp only [Formalism.HermitianLatticesTheory.fcoord, hv, Matrix.mulVec_mulVec, Matrix.mul_assoc, Matrix.mul_nonsing_inv _ (hX v),
-    Matrix.mul_one]
+    | simp [Matrix.mulVec, dotProduct, map_sum, map_mul, Formalism.HermitianLatticesTheory.vecAt]
+    | simp [Matrix.mulVec, Matrix.dotProduct, map_sum, map_mul,
+        Formalism.HermitianLatticesTheory.vecAt]
+  simp only [Formalism.HermitianLatticesTheory.fcoord, hv, Matrix.mulVec_mulVec, Matrix.mul_assoc,
+    Matrix.mul_nonsing_inv _ (hX v), Matrix.mul_one]
 
-theorem normAt_map_le (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (b' : Basis κ K W)
-    (X' : InfinitePlace K → Matrix κ κ ℂ) (hX : ∀ v, IsUnit (X v).det) (v : InfinitePlace K)
-    (φ : V →ₗ[K] W) (x : V) :
-    Formalism.HermitianLatticesTheory.normAt b' X' v (φ x) ≤ opNormAt b X b' X' v φ * Formalism.HermitianLatticesTheory.normAt b X v x := by
-  rw [Formalism.HermitianLatticesTheory.normAt, Formalism.HermitianLatticesTheory.normAt, fcoord_map b X b' X' hX v φ x, cnorm_eq, cnorm_eq, opNormAt]
-  have := (LinearMap.toContinuousLinearMap (Matrix.toEuclideanLin
-    ((X' v)⁻¹ * (LinearMap.toMatrix b b' φ).map v.embedding * X v))).le_opNorm
+theorem normAt_map_le
+    (b : Basis ι K V)
+    (X : InfinitePlace K → Matrix ι ι ℂ)
+    (b' : Basis κ K W) (X' : InfinitePlace K → Matrix κ κ ℂ) (hX : ∀ v, IsUnit (X v).det)
+    (v : InfinitePlace K) (φ : V →ₗ[K] W) (x : V)
+    : Formalism.HermitianLatticesTheory.normAt b' X' v (φ x)
+      ≤ opNormAt b X b' X' v φ * Formalism.HermitianLatticesTheory.normAt b X v x := by
+  rw [Formalism.HermitianLatticesTheory.normAt, Formalism.HermitianLatticesTheory.normAt,
+    fcoord_map b X b' X' hX v φ x, cnorm_eq, cnorm_eq, opNormAt]
+  have :=
+    (LinearMap.toContinuousLinearMap (Matrix.toEuclideanLin
+        ((X' v)⁻¹ * (LinearMap.toMatrix b b' φ).map v.embedding * X v))).le_opNorm
       (WithLp.toLp 2 (Formalism.HermitianLatticesTheory.fcoord b X v x))
   convert this using 1
-  all_goals first
-    | rfl
-    | simp [Matrix.toEuclideanLin_apply]
-    | (congr 1; simp [Matrix.toEuclideanLin_apply])
+  all_goals
+    first | rfl | simp [Matrix.toEuclideanLin_apply] | (congr 1; simp [Matrix.toEuclideanLin_apply])
 
-theorem opNormAt_smul (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (b' : Basis κ K W)
-    (X' : InfinitePlace K → Matrix κ κ ℂ) (hX' : ∀ v, IsUnit (X' v).det) (c : InfinitePlace K → ℝ)
-    (hc : ∀ v, 0 < c v) (v : InfinitePlace K) (φ : V →ₗ[K] W) :
-    opNormAt b X b' (fun w => ((c w : ℂ)) • X' w) v φ = (c v)⁻¹ * opNormAt b X b' X' v φ := by
+theorem opNormAt_smul
+    (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (b' : Basis κ K W)
+    (X' : InfinitePlace K → Matrix κ κ ℂ) (hX' : ∀ v, IsUnit (X' v).det)
+    (c : InfinitePlace K → ℝ) (hc : ∀ v, 0 < c v)
+    (v : InfinitePlace K) (φ : V →ₗ[K] W)
+    : opNormAt b X b' (fun w => ((c w : ℂ)) • X' w) v φ = (c v)⁻¹ * opNormAt b X b' X' v φ := by
   have hc0 : ((c v : ℂ)) ≠ 0 := by exact_mod_cast (hc v).ne'
   have hi : ((c v : ℂ) • X' v)⁻¹ = ((c v : ℂ))⁻¹ • (X' v)⁻¹ := by
     apply Matrix.inv_eq_left_inv
@@ -91,21 +106,27 @@ theorem opNormAt_smul (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι �
       Matrix.nonsing_inv_mul _ (hX' v)]
   simp only [opNormAt, hi, Matrix.smul_mul, map_smul, norm_smul]
   first
-    | rw [norm_inv, Complex.norm_real, Real.norm_of_nonneg (hc v).le]
-    | simp [norm_inv, abs_of_pos (hc v)]
+  | rw [norm_inv, Complex.norm_real, Real.norm_of_nonneg (hc v).le]
+  | simp [norm_inv, abs_of_pos (hc v)]
 
-theorem opNormAt_pos (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (b' : Basis κ K W)
-    (X' : InfinitePlace K → Matrix κ κ ℂ) (hX : ∀ v, IsUnit (X v).det)
-    (hX' : ∀ v, IsUnit (X' v).det) (v : InfinitePlace K) (φ : V →ₗ[K] W) (hφ : φ ≠ 0) :
-    0 < opNormAt b X b' X' v φ := by
+theorem opNormAt_pos
+    (b : Basis ι K V)
+    (X : InfinitePlace K → Matrix ι ι ℂ)
+    (b' : Basis κ K W)
+    (X' : InfinitePlace K → Matrix κ κ ℂ)
+    (hX : ∀ v, IsUnit (X v).det) (hX' : ∀ v, IsUnit (X' v).det) (v : InfinitePlace K)
+    (φ : V →ₗ[K] W) (hφ : φ ≠ 0)
+    : 0 < opNormAt b X b' X' v φ := by
   rw [opNormAt, norm_pos_iff]
   intro h0
   apply hφ
-  have hA := (Matrix.toEuclideanLin.map_eq_zero_iff).mp
-    ((LinearMap.toContinuousLinearMap.map_eq_zero_iff).mp h0)
+  have hA :=
+    (Matrix.toEuclideanLin.map_eq_zero_iff).mp
+      ((LinearMap.toContinuousLinearMap.map_eq_zero_iff).mp h0)
   have hΦ : (LinearMap.toMatrix b b' φ).map v.embedding = 0 := by
-    have e : (LinearMap.toMatrix b b' φ).map v.embedding =
-        X' v * ((X' v)⁻¹ * (LinearMap.toMatrix b b' φ).map v.embedding * X v) * (X v)⁻¹ := by
+    have e
+        : (LinearMap.toMatrix b b' φ).map v.embedding
+          = X' v * ((X' v)⁻¹ * (LinearMap.toMatrix b b' φ).map v.embedding * X v) * (X v)⁻¹ := by
       simp only [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ (hX v), Matrix.mul_one]
       rw [← Matrix.mul_assoc, Matrix.mul_nonsing_inv _ (hX' v), Matrix.one_mul]
     rw [e, hA, Matrix.mul_zero, Matrix.zero_mul]
@@ -118,8 +139,8 @@ theorem opNormAt_pos (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι �
 end PlaceOperatorNorms
 
 open PlaceOperatorNorms in
-theorem slopeIneqMean_of (h1 : Twist) (h2 : PlLat) (h3 : SlopeIneq.{0, 0, 0, 0, 0}) :
-    SlopeIneqMean := by
+theorem slopeIneqMean_of (h1 : Twist) (h2 : PlLat) (h3 : SlopeIneq.{0, 0, 0, 0, 0})
+    : SlopeIneqMean := by
   intro K V ι W κ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ b X b' X' hX hX' φ A hA hφA
   have hφ : φ ≠ 0 := by
     rintro rfl
@@ -135,8 +156,9 @@ theorem slopeIneqMean_of (h1 : Twist) (h2 : PlLat) (h3 : SlopeIneq.{0, 0, 0, 0, 
       ← Finset.mul_sum]
     push_cast
     ring
-  obtain ⟨c, hc_def⟩ : ∃ c : InfinitePlace K → ℝ,
-      c = fun v => opNormAt b X b' X' v φ * Real.exp (-s) := ⟨_, rfl⟩
+  obtain ⟨c, hc_def⟩
+      : ∃ c : InfinitePlace K → ℝ, c = fun v => opNormAt b X b' X' v φ * Real.exp (-s) :=
+    ⟨_, rfl⟩
   have hc : ∀ v, 0 < c v := fun v => by
     rw [hc_def]
     exact mul_pos (hpos v) (Real.exp_pos _)
@@ -152,37 +174,49 @@ theorem slopeIneqMean_of (h1 : Twist) (h2 : PlLat) (h3 : SlopeIneq.{0, 0, 0, 0, 
       unfold nPl at hf ⊢
       field_simp
     rw [hfs, sub_self]
-  obtain ⟨X'', hX''⟩ : ∃ X'' : InfinitePlace K → Matrix κ κ ℂ,
-      X'' = fun v => ((c v : ℂ)) • X' v := ⟨_, rfl⟩
+  obtain ⟨X'', hX''⟩ : ∃ X'' : InfinitePlace K → Matrix κ κ ℂ, X'' = fun v => ((c v : ℂ)) • X' v :=
+    ⟨_, rfl⟩
   have hdet'' : ∀ v, IsUnit (X'' v).det := fun v => by
     rw [hX'']
     dsimp only
     rw [Matrix.det_smul]
     exact ((Complex.ofReal_ne_zero.mpr (hc v).ne').isUnit.pow _).mul (hX' v)
-  have htw : ∀ N : Submodule (𝓞 K) W, N.FG → N ≠ ⊥ →
-      muMax (Formalism.HermitianLatticesTheory.realize b' X'') N = muMax (Formalism.HermitianLatticesTheory.realize b' X') N ∧
-      muMin (Formalism.HermitianLatticesTheory.realize b' X'') N = muMin (Formalism.HermitianLatticesTheory.realize b' X') N := by
+  have htw
+      : ∀ N : Submodule (𝓞 K) W,
+        N.FG → N ≠ ⊥
+          → muMax (Formalism.HermitianLatticesTheory.realize b' X'') N
+              = muMax (Formalism.HermitianLatticesTheory.realize b' X') N
+            ∧ muMin (Formalism.HermitianLatticesTheory.realize b' X'') N
+              = muMin (Formalism.HermitianLatticesTheory.realize b' X') N := by
     intro N hN hN0
     have := (h1 K W κ b' X' c hX' hc N hN).2.1 hN0
     rw [ht0, add_zero, add_zero] at this
     rw [hX'']
     exact this
   have hC : 0 < Real.exp s := Real.exp_pos s
-  have hbound : ∀ x : V,
-      ‖Formalism.HermitianLatticesTheory.realize b' X'' (φ x)‖ ≤ Real.exp s * ‖Formalism.HermitianLatticesTheory.realize b X x‖ := by
+  have hbound
+      : ∀ x : V,
+        ‖Formalism.HermitianLatticesTheory.realize b' X'' (φ x)‖
+          ≤ Real.exp s * ‖Formalism.HermitianLatticesTheory.realize b X x‖ := by
     intro x
-    have hpl : ∀ v, Formalism.HermitianLatticesTheory.normAt b' X'' v (φ x) ≤ Real.exp s * Formalism.HermitianLatticesTheory.normAt b X v x := by
+    have hpl
+        : ∀ v,
+          Formalism.HermitianLatticesTheory.normAt b' X'' v (φ x)
+            ≤ Real.exp s * Formalism.HermitianLatticesTheory.normAt b X v x := by
       intro v
       have hop : opNormAt b X b' X'' v φ = Real.exp s := by
         rw [hX'', opNormAt_smul b X b' X' hX' c hc v φ, hc_def]
         dsimp only
         rw [mul_inv, Real.exp_neg, inv_inv, mul_comm, ← mul_assoc, mul_inv_cancel₀ (hpos v).ne',
           one_mul]
-      calc Formalism.HermitianLatticesTheory.normAt b' X'' v (φ x)
-          ≤ opNormAt b X b' X'' v φ * Formalism.HermitianLatticesTheory.normAt b X v x := normAt_map_le b X b' X'' hX v φ x
+      calc
+        Formalism.HermitianLatticesTheory.normAt b' X'' v (φ x)
+            ≤ opNormAt b X b' X'' v φ * Formalism.HermitianLatticesTheory.normAt b X v x :=
+          normAt_map_le b X b' X'' hX v φ x
         _ = Real.exp s * Formalism.HermitianLatticesTheory.normAt b X v x := by rw [hop]
-    have hsq : ‖Formalism.HermitianLatticesTheory.realize b' X'' (φ x)‖ ^ 2 ≤
-        (Real.exp s * ‖Formalism.HermitianLatticesTheory.realize b X x‖) ^ 2 := by
+    have hsq
+        : ‖Formalism.HermitianLatticesTheory.realize b' X'' (φ x)‖ ^ 2
+          ≤ (Real.exp s * ‖Formalism.HermitianLatticesTheory.realize b X x‖) ^ 2 := by
       rw [mul_pow, norm_sq_realize, norm_sq_realize, Finset.mul_sum]
       refine Finset.sum_le_sum fun v _ => ?_
       rw [← mul_pow]
@@ -193,20 +227,27 @@ theorem slopeIneqMean_of (h1 : Twist) (h2 : PlLat) (h3 : SlopeIneq.{0, 0, 0, 0, 
     rintro rfl
     apply hφA
     exact Submodule.map_bot _
-  have key : ∀ M : Submodule (𝓞 K) W, M.FG → A.map (φ.restrictScalars (𝓞 K)) ≤ M →
-      (muMin (Formalism.HermitianLatticesTheory.realize b X) A - s ≤
-          muMin (Formalism.HermitianLatticesTheory.realize b' X'') (A.map (φ.restrictScalars (𝓞 K))) ∧
-        muMin (Formalism.HermitianLatticesTheory.realize b X) A ≤ muMax (Formalism.HermitianLatticesTheory.realize b' X'') M + s) ∧
-      (Set.InjOn φ (A : Set V) →
-        muMax (Formalism.HermitianLatticesTheory.realize b X) A ≤ muMax (Formalism.HermitianLatticesTheory.realize b' X'') M + s) := by
+  have key
+      : ∀ M : Submodule (𝓞 K) W,
+        M.FG → A.map (φ.restrictScalars (𝓞 K)) ≤ M
+          → (muMin (Formalism.HermitianLatticesTheory.realize b X) A - s
+                ≤ muMin (Formalism.HermitianLatticesTheory.realize b' X'')
+                  (A.map (φ.restrictScalars (𝓞 K)))
+              ∧ muMin (Formalism.HermitianLatticesTheory.realize b X) A
+                ≤ muMax (Formalism.HermitianLatticesTheory.realize b' X'') M + s)
+            ∧ (Set.InjOn φ (A : Set V)
+              → muMax (Formalism.HermitianLatticesTheory.realize b X) A
+                ≤ muMax (Formalism.HermitianLatticesTheory.realize b' X'') M + s) := by
     intro M hM hAM
     have hMlat := (h2 K W κ b' X'' hdet'' M hM).1
     have hmem : ∀ x : A, (φ.restrictScalars (𝓞 K)).domRestrict A x ∈ M := fun x =>
       hAM (Submodule.mem_map_of_mem x.2)
     let ψ : A →ₗ[𝓞 K] M := LinearMap.codRestrict M ((φ.restrictScalars (𝓞 K)).domRestrict A) hmem
     have hψ : ∀ x : A, ((ψ x : M) : W) = φ x := fun x => rfl
-    have hS := h3 (𝓞 K) V W _ _ (Formalism.HermitianLatticesTheory.realize b X) (Formalism.HermitianLatticesTheory.realize b' X'') A M hAlat hMlat
-      ψ (Real.exp s) hC (fun x => by rw [hψ]; exact hbound x)
+    have hS :=
+      h3 (𝓞 K) V W _ _ (Formalism.HermitianLatticesTheory.realize b X)
+        (Formalism.HermitianLatticesTheory.realize b' X'') A M hAlat hMlat ψ (Real.exp s) hC
+        (fun x => by rw [hψ]; exact hbound x)
     rw [Real.log_exp] at hS
     have hrange : (LinearMap.range ψ).map M.subtype = A.map (φ.restrictScalars (𝓞 K)) := by
       ext y
@@ -251,7 +292,10 @@ theorem slopeIneqMean_of (h1 : Twist) (h2 : PlLat) (h3 : SlopeIneq.{0, 0, 0, 0, 
       linarith
 
 theorem slope_inequality_mean : SlopeIneqMean := by
-  exact slopeIneqMean_of (twist_of rescale_covolume_formula place_lattice_structure
-    (shiftInvariance_of slope_characterization slope_characterization polygon_slopes_characterization)) place_lattice_structure slope_inequality_general
+  exact slopeIneqMean_of
+    (twist_of rescale_covolume_formula place_lattice_structure
+      (shiftInvariance_of slope_characterization slope_characterization
+        polygon_slopes_characterization))
+    place_lattice_structure slope_inequality_general
 
 end Formalism.HN

@@ -12,15 +12,19 @@ namespace GlobalTheory.LocM
 
 open Formalism.BasicNotions Formalism.MainNotions NumberField
 
-inductive SigmaRel {ι : Type} {α β : ι → Type} (R : ∀ i, α i → β i → Prop) : (Σ i, α i) → (Σ i, β i) → Prop
+inductive SigmaRel {ι : Type} {α β : ι → Type} (R : ∀ i, α i → β i → Prop)
+  : (Σ i, α i) → (Σ i, β i) → Prop
   | mk {i : ι} {a : α i} {b : β i} : R i a b → SigmaRel R ⟨i, a⟩ ⟨i, b⟩
 
-theorem sigmaRel_mk {ι : Type} {α β : ι → Type} {R : ∀ i, α i → β i → Prop} {i : ι} {a : α i} {b : β i} :
-    SigmaRel R ⟨i, a⟩ ⟨i, b⟩ ↔ R i a b :=
+theorem sigmaRel_mk
+    {ι : Type} {α β : ι → Type} {R : ∀ i, α i → β i → Prop} {i : ι} {a : α i} {b : β i}
+    : SigmaRel R ⟨i, a⟩ ⟨i, b⟩ ↔ R i a b :=
   ⟨fun h => by cases h; assumption, SigmaRel.mk⟩
 
-theorem SigmaRel.fst_eq {ι : Type} {α β : ι → Type} {R : ∀ i, α i → β i → Prop} {a : Σ i, α i} {b : Σ i, β i}
-    (h : SigmaRel R a b) : a.1 = b.1 := by
+theorem SigmaRel.fst_eq
+    {ι : Type} {α β : ι → Type} {R : ∀ i, α i → β i → Prop} {a : Σ i, α i} {b : Σ i, β i}
+    (h : SigmaRel R a b)
+    : a.1 = b.1 := by
   cases h; rfl
 
 variable {D : D7} {r j p : ℕ} {ι : Type}
@@ -52,7 +56,8 @@ def Loc.pi (L : ι → ModuliIntegralCharts.Loc D r j p) : ModuliIntegralCharts.
   H0 F := AddSubgroup.pi Set.univ fun v => (L v).H0 (F v)
   nrm F f y := (L y.1).nrm (F y.1) (f y.1) y.2
   nrm_nonneg F f y := (L y.1).nrm_nonneg (F y.1) (f y.1) y.2
-  norm_le_one_of_mem_sections F f hf y := (L y.1).norm_le_one_of_mem_sections (F y.1) (f y.1) (hf y.1 (Set.mem_univ _)) y.2
+  norm_le_one_of_mem_sections F f hf y :=
+    (L y.1).norm_le_one_of_mem_sections (F y.1) (f y.1) (hf y.1 (Set.mem_univ _)) y.2
   GIso F₁ F₂ := ∀ v, (L v).GIso (F₁ v) (F₂ v)
   vrat φ y := (L y.1).vrat (φ y.1) y.2
   Lb l v := (L v).Lb l
@@ -158,8 +163,10 @@ def Loc.pi (L : ι → ModuliIntegralCharts.Loc D r j p) : ModuliIntegralCharts.
   degLie c := (L c.1).degLie c.2
   degLdR c := (L c.1).degLdR c.2
 
-def ExtA.pi [Finite ι] [Nonempty ι] {L : ι → ModuliIntegralCharts.Loc D r j p} (G : ∀ v, ModuliIntegralCharts.ExtA D (L v)) :
-    ModuliIntegralCharts.ExtA D (Loc.pi L) where
+def ExtA.pi
+    [Finite ι] [Nonempty ι]
+    {L : ι → ModuliIntegralCharts.Loc D r j p} (G : ∀ v, ModuliIntegralCharts.ExtA D (L v))
+    : ModuliIntegralCharts.ExtA D (Loc.pi L) where
   FlagData Z := ∀ v, (G v).FlagData (Z v)
   flagCl Z s v := (G v).flagCl (Z v) (s v)
   allFlags v := (G v).allFlags
@@ -172,7 +179,8 @@ def ExtA.pi [Finite ι] [Nonempty ι] {L : ι → ModuliIntegralCharts.Loc D r j
   corr_sub Z₁ Z₂ := ⟨fun a b => funext fun v => ((G v).corr_sub (Z₁ v) (Z₂ v)).elim (a v) (b v)⟩
   diagCl Z₁ Z₂ c v := (G v).diagCl (Z₁ v) (Z₂ v) (c v)
   IvD b := ∀ v, (G v).IvD b
-  jIdl b d := match b, d with
+  jIdl b d :=
+    match b, d with
     | none, d => fun v => (G v).jIdl none (d v)
     | some n, d => fun v => (G v).jIdl (some n) (d v)
   ZP Z := Σ v, (G v).ZP (Z v)
@@ -284,20 +292,27 @@ def ExtA.pi [Finite ι] [Nonempty ι] {L : ι → ModuliIntegralCharts.Loc D r j
         obtain ⟨v, ℓ', hℓ', rfl⟩ := Set.mem_iUnion.1 hℓ
         exact h₃ v ℓ' hℓ'
     · rintro ⟨S, h₁, h₂, h₃⟩ v
-      refine ((G v).bdryLoci_def (Z v)).2 ⟨{ℓ | (⟨v, ℓ⟩ : Σ v, (G v).Sum1) ∈ S},
-        h₁.preimage (f := Sigma.mk (β := fun v => (G v).Sum1) v) sigma_mk_injective.injOn, fun x hx => ?_, fun ℓ hℓ => h₃ ⟨v, ℓ⟩ hℓ⟩
+      refine ((G v).bdryLoci_def (Z v)).2 ⟨
+        {ℓ | (⟨v, ℓ⟩ : Σ v, (G v).Sum1) ∈ S},
+        h₁.preimage (f := Sigma.mk (β := fun v => (G v).Sum1) v) sigma_mk_injective.injOn,
+        fun x hx => ?_,
+        fun ℓ hℓ => h₃ ⟨v, ℓ⟩ hℓ
+      ⟩
       obtain ⟨⟨w, ℓ⟩, hℓ, hm⟩ := h₂ ⟨v, x⟩ hx
       obtain rfl : v = w := hm.fst_eq
       exact ⟨ℓ, hℓ, sigmaRel_mk.1 hm⟩
   CrvS Z := Σ v, (G v).CrvS (Z v)
   degGr C := (G C.1).degGr C.2
-  nefHT_def Z l :=
-    ⟨fun H C => ((G C.1).nefHT_def (Z C.1) l).1 (H C.1) C.2,
-      fun H v => ((G v).nefHT_def (Z v) l).2 fun C => H ⟨v, C⟩⟩
+  nefHT_def Z l := ⟨
+    fun H C => ((G C.1).nefHT_def (Z C.1) l).1 (H C.1) C.2,
+    fun H v => ((G v).nefHT_def (Z v) l).2 fun C => H ⟨v, C⟩
+  ⟩
   CrvQ := Σ v, (G v).CrvQ
   degGrQ C := (G C.1).degGrQ C.2
-  nefQ_def l :=
-    ⟨fun H C => ((G C.1).nefQ_def l).1 (H C.1) C.2, fun H v => ((G v).nefQ_def l).2 fun C => H ⟨v, C⟩⟩
+  nefQ_def l := ⟨
+    fun H C => ((G C.1).nefQ_def l).1 (H C.1) C.2,
+    fun H v => ((G v).nefQ_def l).2 fun C => H ⟨v, C⟩
+  ⟩
   degGrD c := (G c.1).degGrD c.2
   degLdR_def c := (G c.1).degLdR_def c.2
   degLie_f c := (G c.1).degLie_f c.2
@@ -306,8 +321,11 @@ def ExtA.pi [Finite ι] [Nonempty ι] {L : ι → ModuliIntegralCharts.Loc D r j
   Pm_head c := (G c.1).Pm_head c.2
   Pm_tail c := (G c.1).Pm_tail c.2
 
-def LocB.pi [Nonempty ι] {L : ι → ModuliIntegralCharts.Loc D r j p} (B : ∀ v, BoundaryLocalData.LocB D (L v)) (α : ℕ → 𝓞 D.host.E)
-    (hα : ∀ v, (B v).alp = α) : BoundaryLocalData.LocB D (Loc.pi L) where
+def LocB.pi
+    [Nonempty ι]
+    {L : ι → ModuliIntegralCharts.Loc D r j p} (B : ∀ v, BoundaryLocalData.LocB D (L v))
+    (α : ℕ → 𝓞 D.host.E) (hα : ∀ v, (B v).alp = α)
+    : BoundaryLocalData.LocB D (Loc.pi L) where
   chX y := (B y.1).chX y.2
   xAdd y := (B y.1).xAdd y.2
   xMod y := (B y.1).xMod y.2
@@ -393,20 +411,22 @@ section Values
 
 variable (L : ι → ModuliIntegralCharts.Loc D r j p)
 
-
 end Values
 
 section Transfer
 
-variable [Finite ι] [Nonempty ι] {L : ι → ModuliIntegralCharts.Loc D r j p} (G : ∀ v, ModuliIntegralCharts.ExtA D (L v))
+variable
+  [Finite ι] [Nonempty ι]
+  {L : ι → ModuliIntegralCharts.Loc D r j p} (G : ∀ v, ModuliIntegralCharts.ExtA D (L v))
 
 end Transfer
 
 section TransferB
 
-variable [Nonempty ι] {L : ι → ModuliIntegralCharts.Loc D r j p} (B : ∀ v, BoundaryLocalData.LocB D (L v)) (α : ℕ → 𝓞 D.host.E)
-  (hα : ∀ v, (B v).alp = α)
-
+variable
+  [Nonempty ι]
+  {L : ι → ModuliIntegralCharts.Loc D r j p} (B : ∀ v, BoundaryLocalData.LocB D (L v))
+  (α : ℕ → 𝓞 D.host.E) (hα : ∀ v, (B v).alp = α)
 
 end TransferB
 

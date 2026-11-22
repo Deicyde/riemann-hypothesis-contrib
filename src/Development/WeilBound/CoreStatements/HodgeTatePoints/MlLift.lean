@@ -15,22 +15,27 @@ open scoped CategoryTheory.Obj
 
 namespace PositivityTheory.HtPt.Ml
 
-theorem spMap_field_pt {R K : Type} [CommRing R] [Field K] (δ : R →+* K) (z : Sp K) :
-    (spMap δ z).asIdeal = RingHom.ker δ := by
+theorem spMap_field_pt {R K : Type} [CommRing R] [Field K] (δ : R →+* K) (z : Sp K)
+    : (spMap δ z).asIdeal = RingHom.ker δ := by
   have hz : z.asIdeal = ⊥ := Ideal.eq_bot_of_prime _ (h := z.2)
   show Ideal.comap δ z.asIdeal = _
-  rw [hz]; rfl
+  rw [hz]
+  rfl
 
-theorem preimm_frac {O F : Type} [CommRing O] [Field F] (β : O →+* F)
-    (h : letI := β.toAlgebra; IsFractionRing O F) : IsPreimmersion (spMap β) := by
+theorem preimm_frac
+    {O F : Type} [CommRing O] [Field F] (β : O →+* F) (h : letI := β.toAlgebra; IsFractionRing O F)
+    : IsPreimmersion (spMap β) := by
   letI := β.toAlgebra
   haveI := h
   exact IsPreimmersion.of_isLocalization (nonZeroDivisors O)
 
-theorem lift_frac {O F : Type} [CommRing O] [Field F] (β : O →+* F)
-    (h : letI := β.toAlgebra; IsFractionRing O F) {X : Scheme.{0}} (s : X ⟶ Sp O) {K : Type} [Field K]
-    (x : Sp K ⟶ X) (hx : Set.range x ⊆ Set.range (pullback.fst s (spMap β))) :
-    ∃ y : Sp K ⟶ pullback s (spMap β), y ≫ pullback.fst _ _ = x := by
+theorem lift_frac
+    {O F : Type} [CommRing O] [Field F]
+    (β : O →+* F) (h : letI := β.toAlgebra; IsFractionRing O F)
+    {X : Scheme.{0}} (s : X ⟶ Sp O)
+    {K : Type} [Field K]
+    (x : Sp K ⟶ X) (hx : Set.range x ⊆ Set.range (pullback.fst s (spMap β)))
+    : ∃ y : Sp K ⟶ pullback s (spMap β), y ≫ pullback.fst _ _ = x := by
   haveI : IsPreimmersion (spMap β) := preimm_frac β h
   obtain ⟨⟨p, a⟩, rfl⟩ := (X.SpecToEquivOfField K).symm.surjective x
   have hp : p ∈ Set.range (pullback.fst s (spMap β)) := by
@@ -49,13 +54,22 @@ theorem lift_frac {O F : Type} [CommRing O] [Field F] (β : O →+* F)
   haveI : IsIso (Scheme.Hom.residueFieldMap (pullback.fst s (spMap β)) q) := by
     rw [ConcreteCategory.isIso_iff_bijective]
     exact ⟨(Scheme.Hom.residueFieldMap (pullback.fst s (spMap β)) q).hom.injective, hsurj⟩
-  refine ⟨Spec.map (inv (Scheme.Hom.residueFieldMap (pullback.fst s (spMap β)) q) ≫ a) ≫
-    (pullback s (spMap β)).fromSpecResidueField q, ?_⟩
+  refine ⟨
+    Spec.map (inv (Scheme.Hom.residueFieldMap (pullback.fst s (spMap β)) q) ≫ a)
+      ≫ (pullback s (spMap β)).fromSpecResidueField q,
+    ?_
+  ⟩
   rw [Category.assoc, ← Scheme.Hom.SpecMap_residueFieldMap_fromSpecResidueField, ← Category.assoc,
     ← Spec.map_comp]
   simp [Scheme.SpecToEquivOfField]
 
-theorem lift_generic_point : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Geo.Tor.Level H) (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β), (letI := β.toAlgebra; IsFractionRing O c.F) → ∀ (K : Type) [Field K] (x : Sp K ⟶ Y.X), Set.range x ⊆ Set.range Y.j → ∃ y : Sp K ⟶ Xo.XF c, y ≫ Y.j = x := by
+theorem lift_generic_point
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H)
+        (l : Geo.Tor.Level H) (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O]
+        (β : O →+* c.F) (Y : Model Xo c β),
+      (letI := β.toAlgebra; IsFractionRing O c.F)
+        → ∀ (K : Type) [Field K] (x : Sp K ⟶ Y.X),
+          Set.range x ⊆ Set.range Y.j → ∃ y : Sp K ⟶ Xo.XF c, y ≫ Y.j = x := by
   intro E _ _ _ H D l Xo c O _ β Y h K _ x hx
   haveI : IsPreimmersion (spMap β) := preimm_frac β h
   haveI := Y.jQ_open
@@ -73,14 +87,18 @@ theorem lift_generic_point : ∀ (E : Type) [Field E] [NumberField E] [IsCMField
   refine ⟨IsOpenImmersion.lift Y.jQ y1 hr, ?_⟩
   simp [Model.j, hy1]
 
-theorem generic_max {X : Type} [TopologicalSpace X] [T0Space X] {v v' : X} (h : v ∈ genericPoints X)
-    (hs : v' ⤳ v) : v' = v := by
+theorem generic_max
+    {X : Type} [TopologicalSpace X] [T0Space X] {v v' : X} (h : v ∈ genericPoints X) (hs : v' ⤳ v)
+    : v' = v := by
   have h1 : closure {v} ⊆ closure {v'} := specializes_iff_closure_subset.1 hs
   have h2 : closure {v'} ⊆ closure {v} := h.2 isIrreducible_singleton.closure h1
   exact (hs.antisymm (specializes_iff_closure_subset.2 h2)).eq
 
-theorem mem_of_dense_of_max {X : Type} [TopologicalSpace X] [TopologicalSpace.NoetherianSpace X] [QuasiSober X]
-    {U : Set X} (ho : IsOpen U) (hd : Dense U) {z : X} (hz : ∀ z', z' ⤳ z → z' = z) : z ∈ U := by
+theorem mem_of_dense_of_max
+    {X : Type} [TopologicalSpace X] [TopologicalSpace.NoetherianSpace X] [QuasiSober X]
+    {U : Set X} (ho : IsOpen U) (hd : Dense U)
+    {z : X} (hz : ∀ z', z' ⤳ z → z' = z)
+    : z ∈ U := by
   have hC := irreducibleComponent_mem_irreducibleComponents z
   obtain ⟨o, hoo, ⟨u, hu⟩, hoC⟩ :=
     TopologicalSpace.NoetherianSpace.exists_isOpen_nonempty_subset_irreducibleComponent _ hC
@@ -91,8 +109,11 @@ theorem mem_of_dense_of_max {X : Type} [TopologicalSpace X] [TopologicalSpace.No
   have hzw : z ⤳ w := hgz ▸ hg.specializes (hoC hwo)
   exact hzw.mem_open ho hwU
 
-private theorem isLocallyNoetherian_of_closedImmersion_pSpace (O F : Type) [CommRing O] [Field F] (β : O →+* F) (X : Scheme.{0}) (s : X ⟶ Sp O)
-    (hp : IsProjOver s) : TopologicalSpace.NoetherianSpace ↥(pullback (C := Scheme.{0}) s (spMap β)) := by
+private theorem isLocallyNoetherian_of_closedImmersion_pSpace
+    (O F : Type) [CommRing O] [Field F]
+    (β : O →+* F)
+    (X : Scheme.{0}) (s : X ⟶ Sp O) (hp : IsProjOver s)
+    : TopologicalSpace.NoetherianSpace ↥(pullback (C := Scheme.{0}) s (spMap β)) := by
   haveI : IsProper s := projProper O X s hp
   haveI : IsLocallyNoetherian (pullback s (spMap β)) :=
     LocallyOfFiniteType.isLocallyNoetherian (pullback.snd s (spMap β))
@@ -101,7 +122,12 @@ private theorem isLocallyNoetherian_of_closedImmersion_pSpace (O F : Type) [Comm
   haveI : IsNoetherian (pullback s (spMap β)) := {}
   infer_instance
 
-theorem generic_points_range : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Geo.Tor.Level H) (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O] (β : O →+* c.F) (Y : Model Xo c β), IsDomain O → (letI := β.toAlgebra; IsFractionRing O c.F) → genericPoints Y.X ⊆ Set.range Y.j := by
+theorem generic_points_range
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H)
+        (l : Geo.Tor.Level H) (Xo : Moduli D l) (c : Coeff l) (O : Type) [CommRing O]
+        (β : O →+* c.F) (Y : Model Xo c β),
+      IsDomain O → (letI := β.toAlgebra; IsFractionRing O c.F)
+        → genericPoints Y.X ⊆ Set.range Y.j := by
   intro E _ _ _ H D l Xo c O _ β Y hO h v hv
   haveI : IsPreimmersion (spMap β) := preimm_frac β h
   haveI := Y.flat

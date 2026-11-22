@@ -7,14 +7,15 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.JacquetShal
 
 noncomputable section
 
-open MeasureTheory Matrix Filter Topology PositivityTheory.JacquetShalikaLocal GroundTheory.Automorphic GroundTheory.Automorphic.GLnLocal
-  GroundTheory.Automorphic.Iwasawa GroundTheory.Automorphic.Spherical
+open MeasureTheory Matrix Filter Topology PositivityTheory.JacquetShalikaLocal
+  GroundTheory.Automorphic GroundTheory.Automorphic.GLnLocal GroundTheory.Automorphic.Iwasawa
+  GroundTheory.Automorphic.Spherical
 open scoped ValuativeRel
 
 namespace GlobalTheory.CompanionTheory.SatakeBound
 
-theorem col_add {F : Type} [Field F] (n k : ℕ) (x y : Fin (k + 1) → F) :
-    col n k (x + y) = col n k x * col n k y := by
+theorem col_add {F : Type} [Field F] (n k : ℕ) (x y : Fin (k + 1) → F)
+    : col n k (x + y) = col n k x * col n k y := by
   apply Units.ext
   show 1 + cM n k (x + y) = (1 + cM n k x) * (1 + cM n k y)
   have h : cM n k (x + y) = cM n k x + cM n k y := by
@@ -24,11 +25,14 @@ theorem col_add {F : Type} [Field F] (n k : ℕ) (x y : Fin (k + 1) → F) :
   rw [h, mul_add, add_mul, add_mul, cM_mul]
   simp [add_assoc]
 
-theorem exists_weak_integral {X V : Type} [TopologicalSpace X] [T2Space X] [MeasurableSpace X] [BorelSpace X]
-    [AddCommGroup V] [Module ℂ V] (ν : Measure X) [IsFiniteMeasureOnCompacts ν]
-    (Λ : Set X) (hc : IsCompact Λ) (hΛ : MeasurableSet Λ) (φ : X → ℂ) (hφ : Continuous φ)
-    (f : X → V) (hf : IsLocallyConstant f) :
-    ∃ w : V, ∀ l : V →ₗ[ℂ] ℂ, l w = ∫ x in Λ, φ x * l (f x) ∂ν := by
+theorem exists_weak_integral
+    {X V : Type} [TopologicalSpace X] [T2Space X] [MeasurableSpace X] [BorelSpace X]
+    [AddCommGroup V] [Module ℂ V]
+    (ν : Measure X) [IsFiniteMeasureOnCompacts ν]
+    (Λ : Set X) (hc : IsCompact Λ) (hΛ : MeasurableSet Λ)
+    (φ : X → ℂ) (hφ : Continuous φ)
+    (f : X → V) (hf : IsLocallyConstant f)
+    : ∃ w : V, ∀ l : V →ₗ[ℂ] ℂ, l w = ∫ x in Λ, φ x * l (f x) ∂ν := by
   classical
   have hS : (f '' Λ).Finite := by
     haveI : CompactSpace Λ := isCompact_iff_compactSpace.mp hc
@@ -52,8 +56,11 @@ theorem exists_weak_integral {X V : Type} [TopologicalSpace X] [T2Space X] [Meas
     (hg.continuousOn.integrableOn_compact hc).mono_set hs
   conv_rhs => rw [hU]
   set_option synthInstance.maxHeartbeats 100000 in
-    rw [integral_biUnion_finset _ (fun v _ => hmeas v) hdisj
-    (fun v _ => hint _ Set.inter_subset_left _ (hcont l)), map_sum]
+    rw [integral_biUnion_finset _
+        (fun v _ => hmeas v)
+        hdisj
+        (fun v _ => hint _ Set.inter_subset_left _ (hcont l)),
+      map_sum]
   refine Finset.sum_congr rfl fun v _ => ?_
   rw [map_smul, smul_eq_mul, ← integral_mul_const]
   refine setIntegral_congr_fun (hmeas v) fun x hx => ?_
@@ -69,8 +76,9 @@ theorem twisted_column_average_exists : L0 → L3 := by
   have hopen0 : IsOpen (lat F (k + 1) 0) := ((hL (k + 1)).1 0).2.1
   have hϖ : (uniformizer F : F) ≠ 0 := uniformizer_ne_zero F
   obtain ⟨c, hc⟩ := hρ u
-  have hfix : ∀ y : Fin (k + 1) → F, (∀ i, ∃ t ∈ 𝒪[F], y i = (uniformizer F : F) ^ (c + 1) * t) →
-      ρ (col n k y) u = u := by
+  have hfix
+      : ∀ y : Fin (k + 1) → F,
+        (∀ i, ∃ t ∈ 𝒪[F], y i = (uniformizer F : F) ^ (c + 1) * t) → ρ (col n k y) u = u := by
     intro y hy
     apply hc
     intro i j
@@ -80,15 +88,17 @@ theorem twisted_column_average_exists : L0 → L3 := by
     split_ifs with h
     · exact hy _
     · exact ⟨0, zero_mem _, by simp⟩
-  have hcol : ∀ x y : Fin (k + 1) → F, ∀ v, ρ (col n k (x + y)) v = ρ (col n k x) (ρ (col n k y) v) := by
+  have hcol
+      : ∀ x y : Fin (k + 1) → F, ∀ v, ρ (col n k (x + y)) v = ρ (col n k x) (ρ (col n k y) v) := by
     intro x y v
     rw [col_add, map_mul]
     rfl
   have hf : IsLocallyConstant fun x : Fin (k + 1) → F => ρ (col n k x) u := by
     rw [IsLocallyConstant.iff_eventually_eq]
     intro x
-    have hcont : Continuous fun y : Fin (k + 1) → F =>
-        ((uniformizer F : F) ^ (c + 1))⁻¹ • (y - x) := by fun_prop
+    have hcont
+        : Continuous fun y : Fin (k + 1) → F => ((uniformizer F : F) ^ (c + 1))⁻¹ • (y - x) := by
+      fun_prop
     have h0mem : ((uniformizer F : F) ^ (c + 1))⁻¹ • (x - x) ∈ lat F (k + 1) 0 := by
       intro i
       simp
@@ -104,8 +114,9 @@ theorem twisted_column_average_exists : L0 → L3 := by
     simp only [dotProduct]
     fun_prop
   have hφ : Continuous fun x : Fin (k + 1) → F => ψ (-(ξ ⬝ᵥ x)) := hψc.comp hdot.neg
-  obtain ⟨w, hw⟩ := exists_weak_integral (Measure.pi fun _ : Fin (k + 1) => μ) (lat F (k + 1) M)
-    hcomp hmeas _ hφ _ hf
+  obtain ⟨w, hw⟩ :=
+    exists_weak_integral (Measure.pi fun _ : Fin (k + 1) => μ) (lat F (k + 1) M) hcomp hmeas _ hφ _
+      hf
   refine ⟨w, hw, fun y hy => ?_⟩
   have hpre : (fun x => y + x) ⁻¹' lat F (k + 1) M = lat F (k + 1) M := by
     ext x
@@ -122,9 +133,11 @@ theorem twisted_column_average_exists : L0 → L3 := by
       simpa [mul_add] using h3
   refine sub_eq_zero.mp ((Module.forall_dual_apply_eq_zero_iff ℂ _).mp fun l => ?_)
   have hl := hw (l ∘ₗ ρ (col n k y))
-  have htr := (measurePreserving_add_left (Measure.pi fun _ : Fin (k + 1) => μ) y).setIntegral_preimage_emb
-    (MeasurableEquiv.addLeft y).measurableEmbedding
-    (fun x => ψ (-(ξ ⬝ᵥ x)) * l (ρ (col n k x) u)) (lat F (k + 1) M)
+  have htr :=
+    (measurePreserving_add_left (Measure.pi fun _ : Fin (k + 1) => μ) y).setIntegral_preimage_emb
+      (MeasurableEquiv.addLeft y).measurableEmbedding
+      (fun x => ψ (-(ξ ⬝ᵥ x)) * l (ρ (col n k x) u))
+      (lat F (k + 1) M)
   rw [hpre] at htr
   have hψy : ∀ x, ψ (-(ξ ⬝ᵥ x)) = ψ (ξ ⬝ᵥ y) * ψ (-(ξ ⬝ᵥ (y + x))) := by
     intro x

@@ -8,8 +8,10 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.OrdUnifo
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Filter Topology
-open GroundTheory.Global GroundTheory.LocalField GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
-open GroundTheory.Automorphic.GodementSection (localChar adeleAt glAt restrictedTensor2 godementSection archSection partialLFunction modPow)
+open GroundTheory.Global GroundTheory.LocalField GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm
+open GroundTheory.Automorphic.GodementSection
+  (localChar adeleAt glAt restrictedTensor2 godementSection archSection partialLFunction modPow)
 open GroundTheory.Automorphic.GL2Classical (realEmb realPart Gamma0Level archLift)
 open GroundTheory.Automorphic.Reduction (finAt infAt maxCompact)
 open GroundTheory.Automorphic.GLnLocal (integralGL)
@@ -22,11 +24,12 @@ section Gen
 
 variable {K : Type*} [Field K] [NumberField K] (v : HeightOneSpectrum (𝓞 K))
 
-theorem coe_eq_algebraMap (z : K) : (z : v.adicCompletion K) = algebraMap K (v.adicCompletion K) z := by
+theorem coe_eq_algebraMap (z : K)
+    : (z : v.adicCompletion K) = algebraMap K (v.adicCompletion K) z := by
   simp [HeightOneSpectrum.algebraMap_adicCompletion]
 
-theorem valued_algebraMap (z : K) :
-    Valued.v (algebraMap K (v.adicCompletion K) z) = v.valuation K z := by
+theorem valued_algebraMap (z : K)
+    : Valued.v (algebraMap K (v.adicCompletion K) z) = v.valuation K z := by
   rw [← coe_eq_algebraMap]
   exact HeightOneSpectrum.valuedAdicCompletion_eq_valuation' v z
 
@@ -36,20 +39,24 @@ theorem pOf_prime (v : Pl) : (pOf v).Prime := by
   have pOf_eq_prime (u : Pl) : pOf u = RationalSymbol.prime u := by
     show Ideal.absNorm u.asIdeal = RationalSymbol.prime u
     rw [DirichletHecke.asIdeal_eq_span, Ideal.absNorm_span_singleton]
-    have h : ((RationalSymbol.prime u : ℕ) : 𝓞 ℚ) =
-        algebraMap ℤ (𝓞 ℚ) ((RationalSymbol.prime u : ℕ) : ℤ) := by simp
+    have h
+        : ((RationalSymbol.prime u : ℕ) : 𝓞 ℚ)
+          = algebraMap ℤ (𝓞 ℚ) ((RationalSymbol.prime u : ℕ) : ℤ) := by
+      simp
     rw [h, Algebra.norm_algebraMap, NumberField.RingOfIntegers.rank, Module.finrank_self]
     simp
   rw [pOf_eq_prime]
   exact Fact.out
 
-theorem coe_uniformizer (v : Pl) :
-    ((DirichletHecke.uniformizer v : (Qv v)ˣ) : Qv v) = ((pOf v : ℕ) : Qv v) := by
+theorem coe_uniformizer (v : Pl)
+    : ((DirichletHecke.uniformizer v : (Qv v)ˣ) : Qv v) = ((pOf v : ℕ) : Qv v) := by
   have pOf_eq_prime (u : Pl) : pOf u = RationalSymbol.prime u := by
     show Ideal.absNorm u.asIdeal = RationalSymbol.prime u
     rw [DirichletHecke.asIdeal_eq_span, Ideal.absNorm_span_singleton]
-    have h : ((RationalSymbol.prime u : ℕ) : 𝓞 ℚ) =
-        algebraMap ℤ (𝓞 ℚ) ((RationalSymbol.prime u : ℕ) : ℤ) := by simp
+    have h
+        : ((RationalSymbol.prime u : ℕ) : 𝓞 ℚ)
+          = algebraMap ℤ (𝓞 ℚ) ((RationalSymbol.prime u : ℕ) : ℤ) := by
+      simp
     rw [h, Algebra.norm_algebraMap, NumberField.RingOfIntegers.rank, Module.finrank_self]
     simp
   rw [pOf_eq_prime, DirichletHecke.uniformizer, IdeleGroup.coe_finiteProj_diagonal,
@@ -60,13 +67,13 @@ theorem ord_pOf (v : Pl) : ord ((pOf v : ℕ) : Qv v) = 1 := by
   rw [← coe_uniformizer]
   have h1 : Valued.v ((DirichletHecke.uniformizer v : (Qv v)ˣ) : Qv v) = WithZero.exp (-1) :=
     DirichletHecke.valued_uniformizer v
-  have h2 := GroundTheory.Global.valued_eq_exp_neg_ord (K := ℚ) (v := v)
-    (x := ((DirichletHecke.uniformizer v : (Qv v)ˣ) : Qv v)) (Units.ne_zero _)
+  have h2 :=
+    GroundTheory.Global.valued_eq_exp_neg_ord (K := ℚ) (v := v)
+      (x := ((DirichletHecke.uniformizer v : (Qv v)ˣ) : Qv v)) (Units.ne_zero _)
   have h3 := WithZero.exp_injective (h2.symm.trans h1)
   omega
 
-theorem residueCard_Qv (v : Pl) : residueCard (Qv v) = pOf v :=
-  residueCard_adicCompletion
+theorem residueCard_Qv (v : Pl) : residueCard (Qv v) = pOf v := residueCard_adicCompletion
 
 theorem differentIdeal_rat : differentIdeal ℤ (𝓞 ℚ) = ⊤ := by
   rw [← Ideal.absNorm_eq_one_iff, NumberField.absNorm_differentIdeal (K := ℚ) (𝒪 := 𝓞 ℚ),
@@ -75,46 +82,58 @@ theorem differentIdeal_rat : differentIdeal ℤ (𝓞 ℚ) = ⊤ := by
 
 theorem isStd_local (v : Pl) : IsStd (localAdelicChar ℚ v) := by
   refine ⟨continuous_localAdelicChar v, localAdelicChar_ne_one v, ?_⟩
-  rw [addCharConductor_localAdelicChar, differentExp, differentIdeal_rat, FractionalIdeal.coeIdeal_top,
-    FractionalIdeal.count_one, neg_zero]
+  rw [addCharConductor_localAdelicChar, differentExp, differentIdeal_rat,
+    FractionalIdeal.coeIdeal_top, FractionalIdeal.count_one, neg_zero]
 
-theorem isUnit1_localChar (c : HeckeCharacter ℚ) (v : Pl) : IsUnit1 (localChar c v) :=
-  ⟨GroundTheory.Automorphic.GodementSection.continuous_localChar c v, fun x => by
-    rw [GroundTheory.Automorphic.GodementSection.coe_localChar]; exact Circle.norm_coe _⟩
+theorem isUnit1_localChar (c : HeckeCharacter ℚ) (v : Pl) : IsUnit1 (localChar c v) := ⟨
+  GroundTheory.Automorphic.GodementSection.continuous_localChar c v,
+  fun x => by rw [GroundTheory.Automorphic.GodementSection.coe_localChar]; exact Circle.norm_coe _
+⟩
 
 theorem pOf_injective : Function.Injective pOf := by
   have pOf_eq_prime (u : Pl) : pOf u = RationalSymbol.prime u := by
     show Ideal.absNorm u.asIdeal = RationalSymbol.prime u
     rw [DirichletHecke.asIdeal_eq_span, Ideal.absNorm_span_singleton]
-    have h : ((RationalSymbol.prime u : ℕ) : 𝓞 ℚ) =
-        algebraMap ℤ (𝓞 ℚ) ((RationalSymbol.prime u : ℕ) : ℤ) := by simp
+    have h
+        : ((RationalSymbol.prime u : ℕ) : 𝓞 ℚ)
+          = algebraMap ℤ (𝓞 ℚ) ((RationalSymbol.prime u : ℕ) : ℤ) := by
+      simp
     rw [h, Algebra.norm_algebraMap, NumberField.RingOfIntegers.rank, Module.finrank_self]
     simp
   intro v w h
   rw [pOf_eq_prime, pOf_eq_prime] at h
-  exact HeightOneSpectrum.ext (by rw [DirichletHecke.asIdeal_eq_span v, DirichletHecke.asIdeal_eq_span w, h])
+  exact HeightOneSpectrum.ext (by
+    rw [DirichletHecke.asIdeal_eq_span v, DirichletHecke.asIdeal_eq_span w, h])
 
-theorem pOf_surjective (p : ℕ) (hp : p.Prime) : ∃ v, pOf v = p :=
-  ⟨RationalSymbol.placeOf ⟨p, hp⟩, by
+theorem pOf_surjective (p : ℕ) (hp : p.Prime) : ∃ v, pOf v = p := ⟨
+  RationalSymbol.placeOf ⟨p, hp⟩,
+  by
     have pOf_eq_prime (u : Pl) : pOf u = RationalSymbol.prime u := by
       show Ideal.absNorm u.asIdeal = RationalSymbol.prime u
       rw [DirichletHecke.asIdeal_eq_span, Ideal.absNorm_span_singleton]
-      have h : ((RationalSymbol.prime u : ℕ) : 𝓞 ℚ) =
-          algebraMap ℤ (𝓞 ℚ) ((RationalSymbol.prime u : ℕ) : ℤ) := by simp
+      have h
+          : ((RationalSymbol.prime u : ℕ) : 𝓞 ℚ)
+            = algebraMap ℤ (𝓞 ℚ) ((RationalSymbol.prime u : ℕ) : ℤ) := by
+        simp
       rw [h, Algebra.norm_algebraMap, NumberField.RingOfIntegers.rank, Module.finrank_self]
       simp
-    rw [pOf_eq_prime]; exact RationalSymbol.prime_placeOf ⟨p, hp⟩⟩
+    rw [pOf_eq_prime]
+    exact RationalSymbol.prime_placeOf ⟨p, hp⟩
+⟩
 
 theorem natCast_mem_asIdeal (v : Pl) (n : ℕ) : (n : 𝓞 ℚ) ∈ v.asIdeal ↔ pOf v ∣ n := by
   have pOf_eq_prime (u : Pl) : pOf u = RationalSymbol.prime u := by
     show Ideal.absNorm u.asIdeal = RationalSymbol.prime u
     rw [DirichletHecke.asIdeal_eq_span, Ideal.absNorm_span_singleton]
-    have h : ((RationalSymbol.prime u : ℕ) : 𝓞 ℚ) =
-        algebraMap ℤ (𝓞 ℚ) ((RationalSymbol.prime u : ℕ) : ℤ) := by simp
+    have h
+        : ((RationalSymbol.prime u : ℕ) : 𝓞 ℚ)
+          = algebraMap ℤ (𝓞 ℚ) ((RationalSymbol.prime u : ℕ) : ℤ) := by
+      simp
     rw [h, Algebra.norm_algebraMap, NumberField.RingOfIntegers.rank, Module.finrank_self]
     simp
   rw [DirichletHecke.asIdeal_eq_span, Ideal.mem_span_singleton, pOf_eq_prime,
-    ← map_dvd_iff (Rat.IsIntegralClosure.intEquiv (𝓞 ℚ)), map_natCast, map_natCast, Int.natCast_dvd_natCast]
+    ← map_dvd_iff (Rat.IsIntegralClosure.intEquiv (𝓞 ℚ)), map_natCast, map_natCast,
+    Int.natCast_dvd_natCast]
 
 theorem ord_natCast_of_not_dvd (v : Pl) {m : ℕ} (h : ¬ pOf v ∣ m) : ord ((m : ℕ) : Qv v) = 0 := by
   have hm : m ≠ 0 := by
@@ -124,13 +143,12 @@ theorem ord_natCast_of_not_dvd (v : Pl) {m : ℕ} (h : ¬ pOf v ∣ m) : ord ((m
     rw [← valued_algebraMap, map_natCast (algebraMap (𝓞 ℚ) ℚ)]
     exact congrArg _ (map_natCast _ m).symm
   have h0 : ((m : ℕ) : Qv v) ≠ 0 := Nat.cast_ne_zero.2 hm
-  rw [← valued_eq_one_iff_ord h0, e,
-    HeightOneSpectrum.valuation_of_algebraMap, HeightOneSpectrum.intValuation_eq_one_iff,
-    natCast_mem_asIdeal]
+  rw [← valued_eq_one_iff_ord h0, e, HeightOneSpectrum.valuation_of_algebraMap,
+    HeightOneSpectrum.intValuation_eq_one_iff, natCast_mem_asIdeal]
   exact h
 
-theorem ord_pow_natCast (v : Pl) (p a : ℕ) (hp : p ≠ 0) :
-    ord (((p : ℕ) : Qv v) ^ a) = a * ord ((p : ℕ) : Qv v) := by
+theorem ord_pow_natCast (v : Pl) (p a : ℕ) (hp : p ≠ 0)
+    : ord (((p : ℕ) : Qv v) ^ a) = a * ord ((p : ℕ) : Qv v) := by
   have h0 : ((p : ℕ) : Qv v) ≠ 0 := Nat.cast_ne_zero.2 hp
   induction a with
   | zero => simp [ord]
@@ -139,8 +157,8 @@ theorem ord_pow_natCast (v : Pl) (p a : ℕ) (hp : p ≠ 0) :
     push_cast
     ring
 
-theorem ord_natCast (v : Pl) (n : ℕ) (hn : n ≠ 0) :
-    ord ((n : ℕ) : Qv v) = n.factorization (pOf v) := by
+theorem ord_natCast (v : Pl) (n : ℕ) (hn : n ≠ 0)
+    : ord ((n : ℕ) : Qv v) = n.factorization (pOf v) := by
   have hp := pOf_prime v
   have hc : ordCompl[pOf v] n ≠ 0 := (Nat.ordCompl_pos _ hn).ne'
   have h0 : ((ordCompl[pOf v] n : ℕ) : Qv v) ≠ 0 := Nat.cast_ne_zero.2 hc
@@ -153,21 +171,31 @@ theorem ord_natCast (v : Pl) (n : ℕ) (hn : n ≠ 0) :
 theorem finite_not_integral (g : G2) : {v : Pl | finAt v g ∉ integralGL (Qv v) 2}.Finite :=
   Filter.eventually_cofinite.1 (AdelicGLn.eventually_mem_integralGL ℚ 2 g)
 
-theorem adelic_GL2_ext_of_local_components (g g' : G2) (h : ∀ v, finAt v g = finAt v g') (h' : ∀ w, infAt w g = infAt w g') : g = g' :=
+theorem adelic_GL2_ext_of_local_components
+    (g g' : G2) (h : ∀ v, finAt v g = finAt v g') (h' : ∀ w, infAt w g = infAt w g')
+    : g = g' :=
   GroundTheory.Automorphic.Reduction.adelicGL_ext h' h
 
 def ofFinSupp (S : Finset Pl) (f : ∀ v : Pl, GL (Fin 2) (Qv v)) (hf : ∀ v ∉ S, f v = 1) : G2 :=
-  (AdelicGLn.restrictedProductEquiv ℚ 2).symm (1, ⟨f, by
-    refine Filter.eventually_cofinite.2 (S.finite_toSet.subset fun v hv => ?_)
-    by_contra hvS
-    exact hv (by rw [hf v hvS]; exact one_mem _)⟩)
+  (AdelicGLn.restrictedProductEquiv ℚ 2).symm (
+    1,
+    ⟨
+      f,
+      by
+        refine Filter.eventually_cofinite.2 (S.finite_toSet.subset fun v hv => ?_)
+        by_contra hvS
+        exact hv (by rw [hf v hvS]; exact one_mem _)
+    ⟩
+  )
 
-theorem finAt_ofFinSupp (S : Finset Pl) (f : ∀ v : Pl, GL (Fin 2) (Qv v)) (hf : ∀ v ∉ S, f v = 1) (v : Pl) :
-    finAt v (ofFinSupp S f hf) = f v := by
+theorem finAt_ofFinSupp
+    (S : Finset Pl) (f : ∀ v : Pl, GL (Fin 2) (Qv v)) (hf : ∀ v ∉ S, f v = 1) (v : Pl)
+    : finAt v (ofFinSupp S f hf) = f v := by
   simp [finAt, ofFinSupp]
 
-theorem infAt_ofFinSupp (S : Finset Pl) (f : ∀ v : Pl, GL (Fin 2) (Qv v)) (hf : ∀ v ∉ S, f v = 1)
-    (w : InfinitePlace ℚ) : infAt w (ofFinSupp S f hf) = 1 := by
+theorem infAt_ofFinSupp
+    (S : Finset Pl) (f : ∀ v : Pl, GL (Fin 2) (Qv v)) (hf : ∀ v ∉ S, f v = 1) (w : InfinitePlace ℚ)
+    : infAt w (ofFinSupp S f hf) = 1 := by
   simp [infAt, ofFinSupp]
 
 theorem exists_isLoc2 (v : Pl) (x : GL (Fin 2) (Qv v)) : ∃ h, IsLoc2 v x h := by
@@ -202,13 +230,15 @@ theorem isLoc2_uni (v : Pl) (x : Qv v) : IsLoc2 v (uni2 x) (uni2 (finitePlaceInc
     fin_cases i <;> fin_cases j <;> simp [uni2, finitePlaceIncl_apply] <;> rfl
   · apply Units.ext
     ext i j
-    fin_cases i <;> fin_cases j <;> simp [uni2, finitePlaceIncl_apply, finiteAdeleSingleAdd_apply_of_ne hu] <;> rfl
+    fin_cases i <;> fin_cases j
+      <;> simp [uni2, finitePlaceIncl_apply, finiteAdeleSingleAdd_apply_of_ne hu] <;> rfl
   · apply Units.ext
     ext i j
     fin_cases i <;> fin_cases j <;> simp [uni2, finitePlaceIncl_apply] <;> rfl
 
-theorem isLoc2_dg (v : Pl) (a d : (Qv v)ˣ) :
-    IsLoc2 v (dg2 a d) (dg2 (IdeleGroup.finiteEmbedding v a) (IdeleGroup.finiteEmbedding v d)) := by
+theorem isLoc2_dg (v : Pl) (a d : (Qv v)ˣ)
+    : IsLoc2 v (dg2 a d)
+      (dg2 (IdeleGroup.finiteEmbedding v a) (IdeleGroup.finiteEmbedding v d)) := by
   refine ⟨?_, fun u hu => ?_, fun w => ?_⟩
   · apply Units.ext
     ext i j
@@ -220,17 +250,40 @@ theorem isLoc2_dg (v : Pl) (a d : (Qv v)ˣ) :
     ext i j
     fin_cases i <;> fin_cases j <;> simp [dg2] <;> rfl
 
-theorem exists_local_data (v : Pl) (x : Qv v) (a d : (Qv v)ˣ) :
-    ∃ (x' : 𝔸[ℚ]) (a' d' : Jd), IsLoc2 v (uni2 x) (uni2 x') ∧ IsLoc2 v (dg2 a d) (dg2 a' d') ∧
-      adelicChar ℚ x' = localAdelicChar ℚ v x ∧ (a = d → a' = d') ∧
-      ∀ c : HeckeCharacter ℚ, (c.toIdele a' : ℂ) = localChar c v a ∧ (c.toIdele d' : ℂ) = localChar c v d :=
-  ⟨finitePlaceIncl v x, IdeleGroup.finiteEmbedding v a, IdeleGroup.finiteEmbedding v d, isLoc2_uni v x,
-    isLoc2_dg v a d, rfl, fun h => by rw [h], fun _ => ⟨rfl, rfl⟩⟩
+theorem exists_local_data (v : Pl) (x : Qv v) (a d : (Qv v)ˣ)
+    : ∃ (x' : 𝔸[ℚ]) (a' d' : Jd),
+      IsLoc2 v (uni2 x) (uni2 x') ∧ IsLoc2 v (dg2 a d) (dg2 a' d')
+        ∧ adelicChar ℚ x' = localAdelicChar ℚ v x ∧ (a = d → a' = d')
+        ∧ ∀ c : HeckeCharacter ℚ,
+          (c.toIdele a' : ℂ) = localChar c v a ∧ (c.toIdele d' : ℂ) = localChar c v d := ⟨
+  finitePlaceIncl v x,
+  IdeleGroup.finiteEmbedding v a,
+  IdeleGroup.finiteEmbedding v d,
+  isLoc2_uni v x,
+  isLoc2_dg v a d,
+  rfl,
+  fun h => by rw [h],
+  fun _ => ⟨rfl, rfl⟩
+⟩
 
-theorem b0 : B0 :=
-  ⟨fun v => ⟨isStd_local v, residueCard_Qv v, pOf_prime v, ord_pOf v, ord_natCast v, exists_isLoc2 v,
-      fun c => isUnit1_localChar c v⟩,
-    pOf_injective, pOf_surjective, adelic_GL2_ext_of_local_components, exists_isUn, exists_isK, finite_not_integral, exists_local_data⟩
+theorem b0 : B0 := ⟨
+  fun v => ⟨
+    isStd_local v,
+    residueCard_Qv v,
+    pOf_prime v,
+    ord_pOf v,
+    ord_natCast v,
+    exists_isLoc2 v,
+    fun c => isUnit1_localChar c v
+  ⟩,
+  pOf_injective,
+  pOf_surjective,
+  adelic_GL2_ext_of_local_components,
+  exists_isUn,
+  exists_isK,
+  finite_not_integral,
+  exists_local_data
+⟩
 
 end GlobalTheory.CompanionTheory.RankinQ
 end

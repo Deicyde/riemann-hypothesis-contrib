@@ -7,7 +7,10 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
+  NumberField IsDedekindDomain Polynomial
 
 noncomputable section
 
@@ -15,21 +18,24 @@ namespace GlobalTheory.TameRes
 
 variable {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
 
-theorem val_int_le_one (A : ValuationSubring Ω) (c : 𝓞 E) : A.valuation (algebraMap E Ω (c : E)) ≤ 1 := by
+theorem val_int_le_one (A : ValuationSubring Ω) (c : 𝓞 E)
+    : A.valuation (algebraMap E Ω (c : E)) ≤ 1 := by
   refine (A.valuation_le_one_iff _).2 ?_
-  have hi : IsIntegral ℤ (algebraMap E Ω (c : E)) := c.isIntegral_coe.map (algebraMap E Ω).toIntAlgHom
+  have hi : IsIntegral ℤ (algebraMap E Ω (c : E)) :=
+    c.isIntegral_coe.map (algebraMap E Ω).toIntAlgHom
   have h1 : IsIntegral A (algebraMap E Ω (c : E)) := hi.tower_top
   obtain ⟨y, hy⟩ := (IsIntegrallyClosed.isIntegral_iff (R := A) (K := Ω)).mp h1
   rw [← hy]
   exact y.2
 
-theorem val_le_of_unif {A : ValuationSubring Ω} {P : HeightOneSpectrum (𝓞 E)} (hA : IsPlaceOver (F := E) A P)
-    {a b : 𝓞 E} (ha : a ∈ P.asIdeal) (hb : b ∈ P.asIdeal) (hb' : b ∉ P.asIdeal ^ 2) :
-    A.valuation (algebraMap E Ω a) ≤ A.valuation (algebraMap E Ω b) := by
+theorem val_le_of_unif
+    {A : ValuationSubring Ω} {P : HeightOneSpectrum (𝓞 E)} (hA : IsPlaceOver (F := E) A P)
+    {a b : 𝓞 E} (ha : a ∈ P.asIdeal) (hb : b ∈ P.asIdeal) (hb' : b ∉ P.asIdeal ^ 2)
+    : A.valuation (algebraMap E Ω a) ≤ A.valuation (algebraMap E Ω b) := by
   obtain ⟨I, hI⟩ : P.asIdeal ∣ Ideal.span {b} :=
     Ideal.dvd_iff_le.2 ((Ideal.span_singleton_le_iff_mem _).2 hb)
-  have h1 : ¬ I ≤ P.asIdeal := fun h => hb' (by
-    rw [← Ideal.span_singleton_le_iff_mem, hI, pow_two]; exact Ideal.mul_mono_right h)
+  have h1 : ¬ I ≤ P.asIdeal := fun h =>
+    hb' (by rw [← Ideal.span_singleton_le_iff_mem, hI, pow_two]; exact Ideal.mul_mono_right h)
   obtain ⟨s, hs, hs'⟩ := Set.not_subset.1 h1
   obtain ⟨t, ht⟩ := Ideal.mem_span_singleton.1 (hI ▸ Ideal.mul_mem_mul ha hs)
   have h2 : A.valuation (algebraMap E Ω s) = 1 :=
@@ -41,9 +47,11 @@ theorem val_le_of_unif {A : ValuationSubring Ω} {P : HeightOneSpectrum (𝓞 E)
   rw [h3]
   exact mul_le_of_le_one_right' hint
 
-theorem redThrough_eq_of_val_sub {A : ValuationSubring Ω} {l : ℕ} [Fact l.Prime]
-    (κ : IsLocalRing.ResidueField A ≃+* Formalism.CyclotomicNorms.Fbar l) {z w : Ω} (hz : z ∈ A) (hw : w ∈ A)
-    (h : A.valuation (z - w) < 1) : redThrough A κ z = redThrough A κ w := by
+theorem redThrough_eq_of_val_sub
+    {A : ValuationSubring Ω} {l : ℕ} [Fact l.Prime]
+    (κ : IsLocalRing.ResidueField A ≃+* Formalism.CyclotomicNorms.Fbar l)
+    {z w : Ω} (hz : z ∈ A) (hw : w ∈ A) (h : A.valuation (z - w) < 1)
+    : redThrough A κ z = redThrough A κ w := by
   unfold redThrough
   rw [dite_eq_left hz, dite_eq_left hw]
   congr 1
@@ -54,9 +62,12 @@ end GlobalTheory.TameRes
 
 namespace GlobalTheory.TameRes
 
-theorem exists_nat_sub_mem {E : Type} [Field E] [NumberField E] (P : HeightOneSpectrum (𝓞 E)) (g : ℕ) [Fact g.Prime]
-    (hN : normV P = g) (hgP : ((g : ℕ) : 𝓞 E) ∈ P.asIdeal) (u : 𝓞 E) :
-    ∃ a : ℕ, a < g ∧ u - (a : 𝓞 E) ∈ P.asIdeal := by
+theorem exists_nat_sub_mem
+    {E : Type} [Field E] [NumberField E]
+    (P : HeightOneSpectrum (𝓞 E))
+    (g : ℕ) [Fact g.Prime]
+    (hN : normV P = g) (hgP : ((g : ℕ) : 𝓞 E) ∈ P.asIdeal) (u : 𝓞 E)
+    : ∃ a : ℕ, a < g ∧ u - (a : 𝓞 E) ∈ P.asIdeal := by
   have hgp : g.Prime := Fact.out
   haveI := P.isMaximal
   letI : Field (𝓞 E ⧸ P.asIdeal) := Ideal.Quotient.field _
@@ -77,9 +88,23 @@ theorem exists_nat_sub_mem {E : Type} [Field E] [NumberField E] (P : HeightOneSp
 
 end GlobalTheory.TameRes
 
-
 open GlobalTheory.TameRes in
-theorem GlobalTheory.tameRep_residue : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω) (P : HeightOneSpectrum (𝓞 E)) (g : ℕ) [Fact g.Prime], IsPlaceOver (F := E) A P → normV P = g → ((g : ℕ) : 𝓞 E) ∈ P.asIdeal → ((g : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2 → ∀ (κ : IsLocalRing.ResidueField A ≃+* Formalism.CyclotomicNorms.Fbar g) (σ : G E Ω) (ζ : ℕ → Formalism.CyclotomicNorms.Fbar g), σ ∈ Ine (F := E) A → IsGenSys ζ → TameCoupled A κ σ ζ → (∀ A' : ValuationSubring Ω, IsPlaceOver (F := E) A' P → σ ∈ Ine (F := E) A' → σ ≠ 1 → A' = A) → ∀ u : 𝓞 E, NX.TameRep P 1 σ u → ∃ a : ℕ, a.Coprime g ∧ u - (a : 𝓞 E) ∈ P.asIdeal ∧ algebraMap (ZMod g) (Formalism.CyclotomicNorms.Fbar g) (a : ZMod g) = ζ 1 := by
+theorem GlobalTheory.tameRep_residue
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A : ValuationSubring Ω) (P : HeightOneSpectrum (𝓞 E)) (g : ℕ) [Fact g.Prime],
+      IsPlaceOver (F := E) A P → normV P = g → ((g : ℕ) : 𝓞 E) ∈ P.asIdeal
+        → ((g : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2
+        → ∀ (κ : IsLocalRing.ResidueField A ≃+* Formalism.CyclotomicNorms.Fbar g) (σ : G E Ω)
+            (ζ : ℕ → Formalism.CyclotomicNorms.Fbar g),
+          σ ∈ Ine (F := E) A → IsGenSys ζ → TameCoupled A κ σ ζ
+            → (∀ A' : ValuationSubring Ω,
+              IsPlaceOver (F := E) A' P → σ ∈ Ine (F := E) A' → σ ≠ 1 → A' = A)
+            → ∀ u : 𝓞 E,
+              NX.TameRep P 1 σ u
+                → ∃ a : ℕ,
+                  a.Coprime g ∧ u - (a : 𝓞 E) ∈ P.asIdeal
+                    ∧ algebraMap (ZMod g) (Formalism.CyclotomicNorms.Fbar g) (a : ZMod g)
+                      = ζ 1 := by
   intro E Ω _ _ _ _ _ A P g _ hAP hN hgP hgP2 κ σ ζ hσ hζ hT huniq u hu
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed E
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap E Ω).injective
@@ -110,7 +135,8 @@ theorem GlobalTheory.tameRep_residue : ∀ (E Ω : Type) [Field E] [NumberField 
   have hTy : redThrough A κ (σ y / y) = ζ 1 := hT 1 one_pos y (by rw [pow_one]; exact hy)
   have hϖ0 : algebraMap E Ω (ϖ : E) ≠ 0 := by
     rw [ne_eq, map_eq_zero, RingOfIntegers.coe_eq_zero_iff]
-    rintro rfl; exact hϖ2 (zero_mem _)
+    rintro rfl
+    exact hϖ2 (zero_mem _)
   have hπ0 : π ≠ 0 := by rintro rfl; rw [zero_pow hg1.ne'] at hπ; exact hϖ0 hπ.symm
   have hϖg : A.valuation (algebraMap E Ω (ϖ : E)) = A.valuation ((g : ℕ) : Ω) := by
     have e : ((g : ℕ) : Ω) = algebraMap E Ω (((g : ℕ) : 𝓞 E) : E) := by simp
@@ -130,7 +156,8 @@ theorem GlobalTheory.tameRep_residue : ∀ (E Ω : Type) [Field E] [NumberField 
   have hq : A.valuation (σ y / y) ≤ 1 := (A.valuation_le_one_iff _).2 (tameQuot_mem A σ hg1 hgΩ hy)
   have h1 : A.valuation (σ π / π - σ y / y) < 1 := by
     rw [key, map_mul, map_div₀ A.valuation (σ (π / y) - π / y), hw1, div_one]
-    calc A.valuation (σ y / y) * A.valuation (σ (π / y) - π / y)
+    calc
+      A.valuation (σ y / y) * A.valuation (σ (π / y) - π / y)
         ≤ 1 * A.valuation (σ (π / y) - π / y) := by gcongr
       _ < 1 := by rw [one_mul]; exact hwσ
 
@@ -139,11 +166,15 @@ theorem GlobalTheory.tameRep_residue : ∀ (E Ω : Type) [Field E] [NumberField 
     have := (hAP (u - (a : 𝓞 E))).2 hua
     simpa using this
   have h3 : A.valuation (σ y / y - (a : Ω)) < 1 := by
-    have e : σ y / y - (a : Ω) = -(σ π / π - σ y / y) + (σ π / π - algebraMap E Ω (u : E)) +
-        (algebraMap E Ω (u : E) - (a : Ω)) := by ring
+    have e
+        : σ y / y - (a : Ω)
+          = -(σ π / π - σ y / y) + (σ π / π - algebraMap E Ω (u : E))
+            + (algebraMap E Ω (u : E) - (a : Ω)) := by
+      ring
     rw [e]
     refine Valuation.map_add_lt _ (Valuation.map_add_lt _ ?_ hv) hua'
-    rw [Valuation.map_neg]; exact h1
+    rw [Valuation.map_neg]
+    exact h1
   have haA : (a : Ω) ∈ A := by exact_mod_cast (natCast_mem A a)
   have hred : redThrough A κ (σ y / y) = (a : Formalism.CyclotomicNorms.Fbar g) := by
     rw [redThrough_eq_of_val_sub κ (tameQuot_mem A σ hg1 hgΩ hy) haA h3]
@@ -155,7 +186,8 @@ theorem GlobalTheory.tameRep_residue : ∀ (E Ω : Type) [Field E] [NumberField 
   refine ⟨a, ?_, hua, by rw [map_natCast, hz]⟩
   rw [Nat.coprime_comm, Nat.Prime.coprime_iff_not_dvd hgp]
   intro hd
-  have h0 : (a : Formalism.CyclotomicNorms.Fbar g) = 0 := (CharP.cast_eq_zero_iff (Formalism.CyclotomicNorms.Fbar g) g a).2 hd
+  have h0 : (a : Formalism.CyclotomicNorms.Fbar g) = 0 :=
+    (CharP.cast_eq_zero_iff (Formalism.CyclotomicNorms.Fbar g) g a).2 hd
   have ho := (hζ 1 one_pos).1
   rw [hz, h0, pow_one] at ho
   have hz0 : orderOf (0 : Formalism.CyclotomicNorms.Fbar g) = 0 := by

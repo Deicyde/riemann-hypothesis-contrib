@@ -29,8 +29,8 @@ open MvPolynomial
 
 theorem VerticalDivisorSupportFibre.fibreVarieties : FibreVarieties.Statement.{0} :=
   FibreVarieties.proof GenericFibProps.proof (GenericDimBound.proof MaximalIdealHeightFG.proof)
-    GenericDimGe.proof SpecialIdealCorresp.proof SpecialIdealMultiHomog.proof SupSpanMultiHomog.proof
-    MinimalPrimeMultiHomog.proof SpecialQuotDim.proof ComponentDim.proof
+    GenericDimGe.proof SpecialIdealCorresp.proof SpecialIdealMultiHomog.proof
+    SupSpanMultiHomog.proof MinimalPrimeMultiHomog.proof SpecialQuotDim.proof ComponentDim.proof
 
 theorem VerticalDivisorSupportFibre.proof : VerticalDivisorSupportFibre.Statement := by
   classical
@@ -42,13 +42,16 @@ theorem VerticalDivisorSupportFibre.proof : VerticalDivisorSupportFibre.Statemen
   have hϖW := hV1.vertical W hW
   rw [BundleExamples.redIdeal_eq]
 
-  have key : ∀ (h : MRing ι O) (bh : K → ℕ), IsMultiHomog h bh → h ∉ P → divCycle P h W ≠ 0 →
-      ReciprocityTheory.ChartRestriction.G.AI.I1.IsProjVarF (specialIdeal W) d := by
+  have key
+      : ∀ (h : MRing ι O) (bh : K → ℕ),
+        IsMultiHomog h bh → h ∉ P → divCycle P h W ≠ 0
+          → ReciprocityTheory.ChartRestriction.G.AI.I1.IsProjVarF (specialIdeal W) d := by
     intro h bh hh hhP hne
     unfold divCycle at hne
     split_ifs at hne with hc
-    · obtain ⟨hmp, hdim⟩ := VerticalComponentFibre.proof VerticalDivisorSupportFibre.fibreVarieties O ϖ hϖ
-        K ι P d hP1 h bh hh hhP W hc.1 hc.2 hϖW
+    · obtain ⟨hmp, hdim⟩ :=
+        VerticalComponentFibre.proof VerticalDivisorSupportFibre.fibreVarieties O ϖ hϖ K ι P d hP1 h
+          bh hh hhP W hc.1 hc.2 hϖW
       obtain ⟨hpr, hho, hre⟩ := hmp
       exact ⟨⟨hpr, (VocabMultiHomogIdeal.proof VocabMultiHomog.proof _ K ι _).2 hho, hre⟩, hdim⟩
     · exact absurd rfl hne

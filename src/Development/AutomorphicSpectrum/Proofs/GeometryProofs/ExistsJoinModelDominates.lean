@@ -17,7 +17,13 @@ open AlgebraicGeometry CategoryTheory GlobalTheory.CompanionTheory.Ar NumberFiel
 
 namespace GlobalTheory.CompanionTheory.Ar
 
-theorem join_exists : ∀ (o : Type) [CommRing o] (Ω : Type) [Field Ω] [Algebra o Ω] (κ : Type) [Finite κ] (x : κ → Ω) (M : PModel o x) (Ω' : Type) [Field Ω'] [Algebra o Ω'] (i : Ω →+* Ω') (κ' : Type) [Finite κ'] (w : κ' → Ω'), (∀ a : o, i (algebraMap o Ω a) = algebraMap o Ω' a) → (∃ l, w l ≠ 0) → Subfield.closure (Set.range i ∪ {a | ∃ l l', a = w l / w l'}) = ⊤ → ∃ (M' : PModel o (joinCo i x w)) (f : M'.X ⟶ M.X), Dominates M'.ξ M.ξ f i := by
+theorem join_exists
+    : ∀ (o : Type) [CommRing o] (Ω : Type) [Field Ω] [Algebra o Ω] (κ : Type) [Finite κ] (x : κ → Ω)
+        (M : PModel o x) (Ω' : Type) [Field Ω'] [Algebra o Ω'] (i : Ω →+* Ω') (κ' : Type)
+        [Finite κ'] (w : κ' → Ω'),
+      (∀ a : o, i (algebraMap o Ω a) = algebraMap o Ω' a) → (∃ l, w l ≠ 0)
+        → Subfield.closure (Set.range i ∪ {a | ∃ l l', a = w l / w l'}) = ⊤
+        → ∃ (M' : PModel o (joinCo i x w)) (f : M'.X ⟶ M.X), Dominates M'.ξ M.ξ f i := by
   intro o _ Ω _ _ κ _ x M Ω' _ _ i κ' _ w hi ⟨l, hl⟩ hcl
   let p : Cpt M.ξ := ⟨genPt M.ξ, specializes_rfl⟩
   obtain ⟨c, hc⟩ := M.tie.cover p
@@ -45,18 +51,21 @@ theorem join_exists : ∀ (o : Type) [CommRing o] (Ω : Type) [Field Ω] [Algebr
     | mul y z _ _ hy hz =>
       rw [map_mul]
       exact mul_mem (hy (by assumption)) (hz (by assumption))
-  have hAF : ∀ a ∈ chRing o (joinCo i x w) (c, l),
-      a ∈ Subfield.closure (chRing o (joinCo i x w) (c, l) : Set Ω') :=
-    fun a ha => Subfield.subset_closure ha
+  have hAF
+      : ∀ a ∈ chRing o (joinCo i x w) (c, l),
+        a ∈ Subfield.closure (chRing o (joinCo i x w) (c, l) : Set Ω') := fun a ha =>
+    Subfield.subset_closure ha
   have hiF : ∀ a : Ω, i a ∈ Subfield.closure (chRing o (joinCo i x w) (c, l) : Set Ω') := by
     intro a
     have h2 := (GlobalTheory.T.regAt_chart_localization o Ω κ x M c p hc).2
-    have key : ∀ b ∈ regAt M.ξ p, i b ∈ Subfield.closure (chRing o (joinCo i x w) (c, l) : Set Ω') := by
+    have key
+        : ∀ b ∈ regAt M.ξ p, i b ∈ Subfield.closure (chRing o (joinCo i x w) (c, l) : Set Ω') := by
       intro b hb
       obtain ⟨s, hs, t, ht, -, rfl⟩ := (h2 b).1 hb
       rw [map_div₀]
       exact div_mem (hAF _ (hmap _ hs)) (hAF _ (hmap _ ht))
-    obtain ⟨u, hu, v, hv, -, rfl⟩ := (GlobalTheory.T.regAt_local_order_fraction M.X Ω M.ξ).2.2 M.tie.gen p a
+    obtain ⟨u, hu, v, hv, -, rfl⟩ :=
+      (GlobalTheory.T.regAt_local_order_fraction M.X Ω M.ξ).2.2 M.tie.gen p a
     rw [map_div₀]
     exact div_mem (key u hu) (key v hv)
   have hw : ∀ l', w l' / w l ∈ chRing o (joinCo i x w) (c, l) := by
@@ -66,28 +75,34 @@ theorem join_exists : ∀ (o : Type) [CommRing o] (Ω : Type) [Field Ω] [Algebr
       rw [mul_div_mul_left _ _ hic]
     rw [this]
     exact hgen _ _
-  have hle : Subfield.closure (Set.range i ∪ {a | ∃ l l', a = w l / w l'}) ≤
-      Subfield.closure (chRing o (joinCo i x w) (c, l) : Set Ω') := by
+  have hle
+      : Subfield.closure (Set.range i ∪ {a | ∃ l l', a = w l / w l'})
+        ≤ Subfield.closure (chRing o (joinCo i x w) (c, l) : Set Ω') := by
     refine Subfield.closure_le.2 (Set.union_subset ?_ ?_)
     · rintro _ ⟨a, rfl⟩
       exact hiF a
     · rintro _ ⟨a, b, rfl⟩
       rw [← div_div_div_cancel_right₀ hl (w a) (w b)]
       exact div_mem (hAF _ (hw a)) (hAF _ (hw b))
-  have hfrac : ∀ a : Ω', ∃ u ∈ chRing o (joinCo i x w) (c, l), ∃ v ∈ chRing o (joinCo i x w) (c, l),
-      a = u / v := by
+  have hfrac
+      : ∀ a : Ω', ∃ u ∈ chRing o (joinCo i x w) (c, l), ∃ v ∈ chRing o (joinCo i x w) (c, l),
+        a = u / v := by
     intro a
     have ha : a ∈ Subfield.closure (chRing o (joinCo i x w) (c, l) : Set Ω') :=
       hle (by rw [hcl]; exact Subfield.mem_top a)
     obtain ⟨y, hy, z, hz, rfl⟩ := Subfield.mem_closure_iff.1 ha
-    have hs : Subring.closure (chRing o (joinCo i x w) (c, l) : Set Ω') =
-        (chRing o (joinCo i x w) (c, l)).toSubring :=
+    have hs
+        : Subring.closure (chRing o (joinCo i x w) (c, l) : Set Ω')
+          = (chRing o (joinCo i x w) (c, l)).toSubring :=
       Subring.closure_eq (chRing o (joinCo i x w) (c, l)).toSubring
     rw [hs] at hy hz
     exact ⟨y, hy, z, hz, rfl⟩
-  obtain ⟨M'⟩ := GlobalTheory.T.projective_model_nonempty o Ω' (κ × κ') (joinCo i x w) ⟨(c, l), hJ, hfrac⟩
-  have hctr : ∀ p', p' ∈ ctrSet o x i M'.ξ := fun p' => (GlobalTheory.T.join_coords_centre_chart o Ω κ κ' x Ω' i w M' hi p').1
-  obtain ⟨f, hf, -⟩ := GlobalTheory.T.existsUnique_dominating_map o Ω κ x M o Ω' (κ × κ') (joinCo i x w) M' i hctr
+  obtain ⟨M'⟩ :=
+    GlobalTheory.T.projective_model_nonempty o Ω' (κ × κ') (joinCo i x w) ⟨(c, l), hJ, hfrac⟩
+  have hctr : ∀ p', p' ∈ ctrSet o x i M'.ξ := fun p' =>
+    (GlobalTheory.T.join_coords_centre_chart o Ω κ κ' x Ω' i w M' hi p').1
+  obtain ⟨f, hf, -⟩ :=
+    GlobalTheory.T.existsUnique_dominating_map o Ω κ x M o Ω' (κ × κ') (joinCo i x w) M' i hctr
   exact ⟨M', f, hf⟩
 
 end GlobalTheory.CompanionTheory.Ar

@@ -24,8 +24,8 @@ theorem segreFlagClosureCut : SegreFlagClosureCut.Statement :=
   SegreFlagClosureCut.proof GlobalTheory.T.cut_effective_divisor
     (PairNumberExpansionIndependence.proof GlobalTheory.T.vertical_divisors_commute)
     NumbersDVR_SegreFlagClosureModel
-    (SegreFlagCutSection.proof NumbersDVR_SegreFlagClosureModel
-      SegreFlagCutForms.proof SegreFlagCutDivisor.closed segre_flag_degree_zero_holds)
+    (SegreFlagCutSection.proof NumbersDVR_SegreFlagClosureModel SegreFlagCutForms.proof
+      SegreFlagCutDivisor.closed segre_flag_degree_zero_holds)
     (SegreFlagCutContraction.proof NumbersDVR_SegreFlagClosureModel
       (SegreFlagCutProjection.proof SegreFlagCutLiesOver.closed NumbersDVR_SegreFlagProjSpecialDim))
 

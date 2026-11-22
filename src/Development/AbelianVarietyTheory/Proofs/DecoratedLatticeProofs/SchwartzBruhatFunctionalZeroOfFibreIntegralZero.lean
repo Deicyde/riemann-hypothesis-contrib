@@ -19,17 +19,28 @@ open scoped Topology
 noncomputable section
 namespace GlobalTheory.SplitWeil.FourierPi
 
-theorem map_eq_zero_of_translation_invariant_of_fibre_integral_eq_zero : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [MeasurableSpace k] [BorelSpace k] (ν : Measure k), ν.IsAddHaarMeasure → ∀ (I₀ I₁ I₂ : Type) [Fintype I₀] [Fintype I₁] [Fintype I₂] (M : Type) [AddCommGroup M] [Module ℂ M] (l : SB ((I₀ → k) × (I₁ → k) × (I₂ → k)) →ₗ[ℂ] M), (∀ (a : I₂ → k) (Φ Φ' : SB ((I₀ → k) × (I₁ → k) × (I₂ → k))), (∀ x, Φ'.1 x = Φ.1 (x + (0, 0, a))) → l Φ' = l Φ) → ∀ Φ : SB ((I₀ → k) × (I₁ → k) × (I₂ → k)), (∀ x₀ x₁, ∫ a, Φ.1 (x₀, x₁, a) ∂(Measure.pi fun _ => ν) = 0) → l Φ = 0 := by
+theorem map_eq_zero_of_translation_invariant_of_fibre_integral_eq_zero
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [MeasurableSpace k] [BorelSpace k] (ν : Measure k),
+      ν.IsAddHaarMeasure
+        → ∀ (I₀ I₁ I₂ : Type) [Fintype I₀] [Fintype I₁] [Fintype I₂] (M : Type) [AddCommGroup M]
+            [Module ℂ M] (l : SB ((I₀ → k) × (I₁ → k) × (I₂ → k)) →ₗ[ℂ] M),
+          (∀ (a : I₂ → k) (Φ Φ' : SB ((I₀ → k) × (I₁ → k) × (I₂ → k))),
+              (∀ x, Φ'.1 x = Φ.1 (x + (0, 0, a))) → l Φ' = l Φ)
+            → ∀ Φ : SB ((I₀ → k) × (I₁ → k) × (I₂ → k)),
+              (∀ x₀ x₁, ∫ a, Φ.1 (x₀, x₁, a) ∂(Measure.pi fun _ => ν) = 0) → l Φ = 0 := by
   intro k _ _ _ _ _ _ ν hν I₀ I₁ I₂ _ _ _ M _ _ l hl Φ hΦ
   haveI := secondCountable k
   haveI := hν
 
-  have hU : {t : I₂ → k | ∀ g : (I₀ → k) × (I₁ → k) × (I₂ → k), Φ.1 (g + (0, 0, t)) = Φ.1 g} ∈
-      𝓝 (0 : I₂ → k) := by
+  have hU
+      : {t : I₂ → k | ∀ g : (I₀ → k) × (I₁ → k) × (I₂ → k), Φ.1 (g + (0, 0, t)) = Φ.1 g}
+        ∈ 𝓝 (0 : I₂ → k) := by
     have ht : Filter.Tendsto
-        (fun t : I₂ → k => ((0, 0, -t) : (I₀ → k) × (I₁ → k) × (I₂ → k))) (𝓝 0) (𝓝 0) := by
-      have hc : Continuous
-          (fun t : I₂ → k => ((0, 0, -t) : (I₀ → k) × (I₁ → k) × (I₂ → k))) := by fun_prop
+        (fun t : I₂ → k => ((0, 0, -t) : (I₀ → k) × (I₁ → k) × (I₂ → k)))
+        (𝓝 0) (𝓝 0) := by
+      have hc : Continuous (fun t : I₂ → k => ((0, 0, -t) : (I₀ → k) × (I₁ → k) × (I₂ → k))) := by
+        fun_prop
       have e : (((0 : I₀ → k), (0 : I₁ → k), -(0 : I₂ → k))) = 0 := by rw [neg_zero]; rfl
       have h := hc.tendsto 0
       rwa [e] at h
@@ -39,7 +50,8 @@ theorem map_eq_zero_of_translation_invariant_of_fibre_integral_eq_zero : ∀ (k 
   obtain ⟨r, hr⟩ := exists_box_subset hU
   have hK : IsCompact ((fun x : (I₀ → k) × (I₁ → k) × (I₂ → k) => x.2.2) '' tsupport Φ.1) :=
     Φ.2.2.isCompact.image (by fun_prop)
-  obtain ⟨R, hrR, hKR⟩ := GlobalTheory.T.exists_integralScaledBoxPi_superset_of_isCompact k I₂ _ hK r
+  obtain ⟨R, hrR, hKR⟩ :=
+    GlobalTheory.T.exists_integralScaledBoxPi_superset_of_isCompact k I₂ _ hK r
   obtain ⟨S, hSR, hS⟩ := GlobalTheory.T.exists_finset_integralScaledBoxPi_coset_reps k I₂ r R hrR
   have h0R : (0 : I₂ → k) ∈ box I₂ R := fun i _ => by simp [cball]
   have h0r : (0 : I₂ → k) ∈ box I₂ r := fun i _ => by simp [cball]
@@ -47,9 +59,11 @@ theorem map_eq_zero_of_translation_invariant_of_fibre_integral_eq_zero : ∀ (k 
     obtain ⟨b, ⟨hb, -⟩, -⟩ := hS 0 h0R
     exact ⟨b, hb⟩
 
-  let T : (I₂ → k) → SB ((I₀ → k) × (I₁ → k) × (I₂ → k)) := fun b =>
-    ⟨fun x => Φ.1 (x + (0, 0, b)), Φ.2.1.comp_continuous (continuous_add_const _),
-      Φ.2.2.comp_homeomorph (Homeomorph.addRight _)⟩
+  let T : (I₂ → k) → SB ((I₀ → k) × (I₁ → k) × (I₂ → k)) := fun b => ⟨
+    fun x => Φ.1 (x + (0, 0, b)),
+    Φ.2.1.comp_continuous (continuous_add_const _),
+    Φ.2.2.comp_homeomorph (Homeomorph.addRight _)
+  ⟩
   have hT : ∀ b, l (T b) = l Φ := fun b => hl b Φ (T b) fun _ => rfl
 
   have hvol : (Measure.pi fun _ : I₂ => ν).real (box I₂ r) ≠ 0 := by
@@ -71,8 +85,13 @@ theorem map_eq_zero_of_translation_invariant_of_fibre_integral_eq_zero : ∀ (k 
       simp [T]
     rw [hval]
     by_cases ha : a ∈ box I₂ R
-    · rw [GlobalTheory.T.sum_integralScaledBoxPi_coset_reps_shift_invariant k I₂ r R S hSR hS (fun y => Φ.1 (x₀, x₁, y)) hF1 a ha]
-      have h := GlobalTheory.T.integral_box_invariant_eq_measureReal_mul_sum_reps k ν hν I₂ r R S hSR hS (fun y => Φ.1 (x₀, x₁, y)) hF1 hF2
+    · rw [GlobalTheory.T.sum_integralScaledBoxPi_coset_reps_shift_invariant k I₂ r R S hSR hS
+        (fun y => Φ.1 (x₀, x₁, y))
+        hF1 a ha]
+      have h :=
+        GlobalTheory.T.integral_box_invariant_eq_measureReal_mul_sum_reps k ν hν I₂ r R S hSR hS
+          (fun y => Φ.1 (x₀, x₁, y))
+          hF1 hF2
       rw [hΦ x₀ x₁] at h
       have h' := (mul_eq_zero.mp h.symm).resolve_left (by exact_mod_cast hvol)
       simpa using h'
@@ -82,7 +101,7 @@ theorem map_eq_zero_of_translation_invariant_of_fibre_integral_eq_zero : ∀ (k 
   have hz : (S.card : ℂ) • l Φ = 0 := by
     have h1 : l (∑ b ∈ S, T b) = (S.card : ℂ) • l Φ := by
       set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, Finset.sum_congr rfl fun b _ => hT b, Finset.sum_const, Nat.cast_smul_eq_nsmul]
+      rw [map_sum, Finset.sum_congr rfl fun b _ => hT b, Finset.sum_const, Nat.cast_smul_eq_nsmul]
     rw [← h1, hsum, map_zero]
   exact (smul_eq_zero.mp hz).resolve_left (by exact_mod_cast hSne.card_ne_zero)
 

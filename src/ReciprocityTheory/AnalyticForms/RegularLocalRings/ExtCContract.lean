@@ -21,8 +21,8 @@ theorem exists_linearForm_one : ∃ ℓ : ℂ →ₗ[ℚ] ℚ, ℓ 1 = 1 := by
 noncomputable def projQ (ℓ : ℂ →ₗ[ℚ] ℚ) (q : MvPolynomial σ ℂ) : MvPolynomial σ ℚ :=
   ∑ m ∈ q.support, monomial m (ℓ (AddMonoidAlgebra.coeff q m))
 
-theorem coeff_projQ (ℓ : ℂ →ₗ[ℚ] ℚ) (q : MvPolynomial σ ℂ) (m : σ →₀ ℕ) :
-    AddMonoidAlgebra.coeff (projQ ℓ q) m = ℓ (AddMonoidAlgebra.coeff q m) := by
+theorem coeff_projQ (ℓ : ℂ →ₗ[ℚ] ℚ) (q : MvPolynomial σ ℂ) (m : σ →₀ ℕ)
+    : AddMonoidAlgebra.coeff (projQ ℓ q) m = ℓ (AddMonoidAlgebra.coeff q m) := by
   classical
   rw [projQ, coeff_sum]
   simp only [coeff_monomial]
@@ -32,8 +32,8 @@ theorem coeff_projQ (ℓ : ℂ →ₗ[ℚ] ℚ) (q : MvPolynomial σ ℂ) (m : �
   · rw [MvPolynomial.mem_support_iff, not_not] at h
     rw [h, map_zero]
 
-theorem projQ_add (ℓ : ℂ →ₗ[ℚ] ℚ) (a b : MvPolynomial σ ℂ) :
-    projQ ℓ (a + b) = projQ ℓ a + projQ ℓ b := by
+theorem projQ_add (ℓ : ℂ →ₗ[ℚ] ℚ) (a b : MvPolynomial σ ℂ)
+    : projQ ℓ (a + b) = projQ ℓ a + projQ ℓ b := by
   ext m
   simp [coeff_projQ]
 
@@ -41,28 +41,29 @@ theorem projQ_zero (ℓ : ℂ →ₗ[ℚ] ℚ) : projQ ℓ (0 : MvPolynomial σ 
   ext m
   simp [coeff_projQ]
 
-theorem projQ_map (ℓ : ℂ →ₗ[ℚ] ℚ) (hℓ : ℓ 1 = 1) (g : MvPolynomial σ ℚ) :
-    projQ ℓ (MvPolynomial.map (algebraMap ℚ ℂ) g) = g := by
+theorem projQ_map (ℓ : ℂ →ₗ[ℚ] ℚ) (hℓ : ℓ 1 = 1) (g : MvPolynomial σ ℚ)
+    : projQ ℓ (MvPolynomial.map (algebraMap ℚ ℂ) g) = g := by
   ext m
   rw [coeff_projQ, coeff_map]
   have : algebraMap ℚ ℂ (AddMonoidAlgebra.coeff g m) = AddMonoidAlgebra.coeff g m • (1 : ℂ) := by
     rw [Algebra.smul_def, mul_one]
   rw [this, map_smul, hℓ, smul_eq_mul, mul_one]
 
-theorem projQ_map_mul (ℓ : ℂ →ₗ[ℚ] ℚ) (g : MvPolynomial σ ℚ) (h : MvPolynomial σ ℂ) :
-    projQ ℓ (MvPolynomial.map (algebraMap ℚ ℂ) g * h) = g * projQ ℓ h := by
+theorem projQ_map_mul (ℓ : ℂ →ₗ[ℚ] ℚ) (g : MvPolynomial σ ℚ) (h : MvPolynomial σ ℂ)
+    : projQ ℓ (MvPolynomial.map (algebraMap ℚ ℂ) g * h) = g * projQ ℓ h := by
   classical
   ext m
   set_option synthInstance.maxHeartbeats 100000 in
     rw [coeff_projQ, coeff_mul, coeff_mul, map_sum]
   refine Finset.sum_congr rfl fun x _ => ?_
   rw [coeff_map, coeff_projQ]
-  have : algebraMap ℚ ℂ (AddMonoidAlgebra.coeff g x.1) * AddMonoidAlgebra.coeff h x.2 = AddMonoidAlgebra.coeff g x.1 • AddMonoidAlgebra.coeff h x.2 := by
+  have : algebraMap ℚ ℂ (AddMonoidAlgebra.coeff g x.1) * AddMonoidAlgebra.coeff h x.2
+      = AddMonoidAlgebra.coeff g x.1 • AddMonoidAlgebra.coeff h x.2 := by
     rw [Algebra.smul_def]
   rw [this, map_smul, smul_eq_mul]
 
-theorem comap_extC (I : Ideal (MvPolynomial σ ℚ)) :
-    (extC I).comap (MvPolynomial.map (algebraMap ℚ ℂ)) = I := by
+theorem comap_extC (I : Ideal (MvPolynomial σ ℚ))
+    : (extC I).comap (MvPolynomial.map (algebraMap ℚ ℂ)) = I := by
   obtain ⟨ℓ, hℓ⟩ := exists_linearForm_one
   refine le_antisymm ?_ Ideal.le_comap_map
   intro f hf

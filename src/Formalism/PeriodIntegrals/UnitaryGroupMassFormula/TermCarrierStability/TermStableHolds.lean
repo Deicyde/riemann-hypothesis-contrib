@@ -12,19 +12,24 @@ open scoped Classical
 
 namespace PI.TCS
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.L2.SG.TermDef
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.L2.SG.TermDef
 
 section D7
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem tr_XS (D : D7) {T' : D.host.E} {γ : (VS D).V ≃ₗ[D.host.E] (VS D).V}
-    {x F₂ : LFlag (D.sp.Y 0) D.R.rS T'} (he : ∀ k, F₂.fl.e k = γ (x.fl.e k)) :
-    Tr γ (XS D F₂.fl) (XS D x.fl) := by
+theorem tr_XS
+    (D : D7)
+    {T' : D.host.E} {γ : (VS D).V ≃ₗ[D.host.E] (VS D).V} {x F₂ : LFlag (D.sp.Y 0) D.R.rS T'}
+    (he : ∀ k, F₂.fl.e k = γ (x.fl.e k))
+    : Tr γ (XS D F₂.fl) (XS D x.fl) := by
   intro v
-  have hmap : XS D F₂.fl = (XS D x.fl).map
-      ((γ.restrictScalars (𝓞 D.host.E) : (VS D).V ≃ₗ[𝓞 D.host.E] (VS D).V) :
-        (VS D).V →ₗ[𝓞 D.host.E] (VS D).V) := by
+  have hmap
+      : XS D F₂.fl
+        = (XS D x.fl).map
+          ((γ.restrictScalars (𝓞 D.host.E) : (VS D).V ≃ₗ[𝓞 D.host.E] (VS D).V)
+            : (VS D).V →ₗ[𝓞 D.host.E] (VS D).V) := by
     unfold XS
     rw [Submodule.map_span]
     congr 1
@@ -38,10 +43,13 @@ theorem tr_XS (D : D7) {T' : D.host.E} {γ : (VS D).V ≃ₗ[D.host.E] (VS D).V}
   rw [hmap, Submodule.mem_map_equiv]
   rfl
 
-theorem frameOK_tr (D : D7) {T' : D.host.E} {γ : (VS D).V ≃ₗ[D.host.E] (VS D).V}
-    {x F₂ : LFlag (D.sp.Y 0) D.R.rS T'} (Λ : Submodule (𝓞 D.host.E) (VS D).V) (hΛ : Tr γ Λ Λ)
+theorem frameOK_tr
+    (D : D7)
+    {T' : D.host.E} {γ : (VS D).V ≃ₗ[D.host.E] (VS D).V} {x F₂ : LFlag (D.sp.Y 0) D.R.rS T'}
+    (Λ : Submodule (𝓞 D.host.E) (VS D).V) (hΛ : Tr γ Λ Λ)
     (he : ∀ k, F₂.fl.e k = γ (x.fl.e k)) (hz : F₂.fl.z = γ x.fl.z)
-    (hiso : ∀ a b, (VS D).hT (γ a) (γ b) = (VS D).hT a b) (hx : FrameOK D Λ x) : FrameOK D Λ F₂ :=
+    (hiso : ∀ a b, (VS D).hT (γ a) (γ b) = (VS D).hT a b) (hx : FrameOK D Λ x)
+    : FrameOK D Λ F₂ :=
   ⟨fixedConv_tr Λ (gS D) hΛ he hz hiso hx.1, Tr.eq (tr_XLam Λ hΛ he) (tr_XS D he) hx.2⟩
 
 theorem termStable_holds (D : D7) (u u' : D.what₂.Word) : TermStable D u u' := by
@@ -66,9 +74,12 @@ theorem termStable_holds (D : D7) (u u' : D.what₂.Word) : TermStable D u u' :=
   have hz : F₂.fl.z = (m.trans n) x.1.fl.z := by
     have := hfr (Fin.last _)
     rwa [frame_last, frame_last] at this
-  exact ⟨isLift_tr Λ hΛγ hz hzt hxl,
-    admissible_stable_under_frame_change Λ (gS D) (lf D F0) x.1 F₂ hFl.1 hFc hxl.1 hxf.1 hxa n hn m hm hfr,
-    frameOK_tr D Λ hΛγ he hz hiso hxf⟩
+  exact ⟨
+    isLift_tr Λ hΛγ hz hzt hxl,
+    admissible_stable_under_frame_change Λ (gS D) (lf D F0) x.1 F₂ hFl.1 hFc hxl.1 hxf.1 hxa n hn m
+      hm hfr,
+    frameOK_tr D Λ hΛγ he hz hiso hxf
+  ⟩
 
 end D7
 

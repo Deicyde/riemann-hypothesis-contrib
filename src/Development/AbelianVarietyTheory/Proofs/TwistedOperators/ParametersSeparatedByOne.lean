@@ -12,7 +12,8 @@ namespace GlobalTheory.WordSep
 
 open GlobalTheory.SignedHC
 
-private theorem v_le {G : GridData} {i j : ℕ} (hi : 2 ≤ i) (hij : i ≤ j) (hj : j ≤ G.k) : G.v j ≤ G.v i := by
+private theorem v_le {G : GridData} {i j : ℕ} (hi : 2 ≤ i) (hij : i ≤ j) (hj : j ≤ G.k)
+    : G.v j ≤ G.v i := by
   rcases hij.eq_or_lt with rfl | h
   · exact le_rfl
   · exact (G.v_anti i j hi h hj).le
@@ -22,11 +23,12 @@ private theorem b_ge {G : GridData} {l : ℕ} (hl : 1 ≤ l) (hlm : l ≤ G.m) :
   · exact le_rfl
   · exact (G.b_mono 1 l le_rfl h hlm).le
 
-theorem sep_rat {G : GridData} (hga : 0 < G.ga)
-    (hgap : ∀ i, 2 ≤ i → i < G.k → G.v (i + 1) + 2 ≤ G.v i) (hb : 2 ≤ G.v G.k + G.b 1)
+theorem sep_rat
+    {G : GridData} (hga : 0 < G.ga) (hgap : ∀ i, 2 ≤ i → i < G.k → G.v (i + 1) + 2 ≤ G.v i)
+    (hb : 2 ≤ G.v G.k + G.b 1)
     {x y : ℚ} (hx : (∃ l, l ≤ G.m ∧ x = G.a l) ∨ ∃ j, 2 ≤ j ∧ j ≤ G.k ∧ x = G.vHalf j)
-    (hy : (∃ j, 2 ≤ j ∧ j ≤ G.k ∧ y = G.v j) ∨ ∃ l, 1 ≤ l ∧ l ≤ G.m ∧ y = -(G.b l : ℚ)) :
-    (y < x → y + 1 < x) ∧ x ≠ y := by
+    (hy : (∃ j, 2 ≤ j ∧ j ≤ G.k ∧ y = G.v j) ∨ ∃ l, 1 ≤ l ∧ l ≤ G.m ∧ y = -(G.b l : ℚ))
+    : (y < x → y + 1 < x) ∧ x ≠ y := by
   have hk := G.two_le_k
   rcases hx with ⟨l, hl, rfl⟩ | ⟨j, hj2, hjk, rfl⟩
   · have hal : (G.v 2 : ℚ) + 3 / 2 ≤ G.a l := by
@@ -39,7 +41,7 @@ theorem sep_rat {G : GridData} (hga : 0 < G.ga)
     obtain ⟨z, hz, hzle⟩ : ∃ z : ℤ, y = z ∧ z ≤ G.v 2 := by
       rcases hy with ⟨j, hj2, hjk, rfl⟩ | ⟨l', hl1, hlm, rfl⟩
       · exact ⟨_, rfl, v_le le_rfl hj2 hjk⟩
-      · refine ⟨-G.b l', by push_cast; ring, ?_⟩
+      · refine ⟨- G.b l', by push_cast; ring, ?_⟩
         have := b_ge (G := G) hl1 hlm
         have := v_le (G := G) le_rfl hk le_rfl
         linarith
@@ -57,7 +59,7 @@ theorem sep_rat {G : GridData} (hga : 0 < G.ga)
           have h1 := v_le (G := G) (by omega : 2 ≤ j + 1) (by omega : j + 1 ≤ j') hjk'
           have h2 := hgap j hj2 (by omega)
           linarith
-      · refine ⟨-G.b l', by push_cast; ring, Or.inr ?_⟩
+      · refine ⟨- G.b l', by push_cast; ring, Or.inr ?_⟩
         have := b_ge (G := G) hl1 hlm
         have := v_le (G := G) hj2 hjk le_rfl
         linarith
@@ -73,10 +75,12 @@ theorem sep_rat {G : GridData} (hga : 0 < G.ga)
       · intro _; linarith
       · intro h'; linarith
 
-theorem word_sep : ∀ {G : GlobalTheory.SignedHC.GridData} {n : ℕ} {lam : Fin (n + 1) → ℝ} {ε : Fin (n + 1) → Bool}
-    {mu : Fin n → ℝ} {ε' : Fin n → Bool}, 0 < G.ga → (∀ i, 2 ≤ i → i < G.k → G.v (i + 1) + 2 ≤ G.v i) →
-    2 ≤ G.v G.k + G.b 1 → IsEnum (G.parPi 0) lam ε → IsEnum G.parD0 mu ε' →
-    (∀ a i, mu i < lam a → mu i + 1 < lam a) ∧ ∀ a i, lam a ≠ mu i := by
+theorem word_sep
+    : ∀ {G : GlobalTheory.SignedHC.GridData} {n : ℕ} {lam : Fin (n + 1) → ℝ}
+        {ε : Fin (n + 1) → Bool} {mu : Fin n → ℝ} {ε' : Fin n → Bool},
+      0 < G.ga → (∀ i, 2 ≤ i → i < G.k → G.v (i + 1) + 2 ≤ G.v i) → 2 ≤ G.v G.k + G.b 1
+        → IsEnum (G.parPi 0) lam ε → IsEnum G.parD0 mu ε'
+        → (∀ a i, mu i < lam a → mu i + 1 < lam a) ∧ ∀ a i, lam a ≠ mu i := by
   rintro G n lam ε mu ε' hga hgap hb ⟨-, q, hq, hS⟩ ⟨-, q', hq', hT⟩
   have key : ∀ a i, (q' i < q a → q' i + 1 < q a) ∧ q a ≠ q' i := by
     intro a i

@@ -11,8 +11,8 @@ open Formalism.MainNotions Formalism.BasicNotions Formalism.MainNotions.G Classi
 
 namespace GlobalTheory.LongRows
 
-theorem not_mem_topPlaces (D : D7) (z : Bool × HH D) (h : ¬ IsTopPl D z) :
-    (D.eTau (tauPl D z) : D.R.GG) ∉ D.host.topPlaces := by
+theorem not_mem_topPlaces (D : D7) (z : Bool × HH D) (h : ¬ IsTopPl D z)
+    : (D.eTau (tauPl D z) : D.R.GG) ∉ D.host.topPlaces := by
   intro hm
   unfold Host.topPlaces at hm
   obtain ⟨t, ht, hte⟩ := Finset.mem_image.1 hm
@@ -30,9 +30,12 @@ theorem not_mem_topPlaces (D : D7) (z : Bool × HH D) (h : ¬ IsTopPl D z) :
     subst this
     exact h ⟨rfl, ht⟩
 
-theorem row_bounds (D : D7) (u : D.what₂.Word) (j : ℕ) (hj : j < D.R.m) (z : Bool × HH D) (r : ℕ) (hr : r < D.R.k) :
-    wPl D (j + 1) z + (((D.hcW u (tauPl D z)).u ⟨r, hr⟩ : ℚ) : ℝ) - D.R.N D.R.m < DV.nuRow D u (j + 1) (tauPl D z) r ∧
-    DV.nuRow D u (j + 1) (tauPl D z) r < wPl D (j + 1) z + (((D.hcW u (tauPl D z)).u ⟨r, hr⟩ : ℚ) : ℝ) := by
+theorem row_bounds
+    (D : D7) (u : D.what₂.Word) (j : ℕ) (hj : j < D.R.m) (z : Bool × HH D) (r : ℕ) (hr : r < D.R.k)
+    : wPl D (j + 1) z + (((D.hcW u (tauPl D z)).u ⟨r, hr⟩ : ℚ) : ℝ) - D.R.N D.R.m
+        < DV.nuRow D u (j + 1) (tauPl D z) r
+      ∧ DV.nuRow D u (j + 1) (tauPl D z) r
+        < wPl D (j + 1) z + (((D.hcW u (tauPl D z)).u ⟨r, hr⟩ : ℚ) : ℝ) := by
   have hw : wPl D (j + 1) z = (((D.hcW u (tauPl D z)).e ⟨j, hj⟩ : ℚ) : ℝ) := by
     unfold wPl wj
     rw [dite_eq_left (by simpa using hj), D.hcW_e]
@@ -51,10 +54,12 @@ theorem row_bounds (D : D7) (u : D.what₂.Word) (j : ℕ) (hj : j < D.R.m) (z :
   push_cast
   constructor <;> linarith
 
-theorem u_bounds_off {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (u : D.what₂.Word) (τ : D.what₂.Tau)
-    (hτ : (D.eTau τ : D.R.GG) ∉ D.host.topPlaces) (r : ℕ) (hr : r < D.R.k) :
-    -(1 / 2 : ℝ) ≤ (((D.hcW u τ).u ⟨r, hr⟩ : ℚ) : ℝ) ∧
-      (((D.hcW u τ).u ⟨r, hr⟩ : ℚ) : ℝ) ≤ if r = 0 then 3 * L.Sc else L.Sc := by
+theorem u_bounds_off
+    {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (u : D.what₂.Word) (τ : D.what₂.Tau)
+    (hτ : (D.eTau τ : D.R.GG) ∉ D.host.topPlaces)
+    (r : ℕ) (hr : r < D.R.k)
+    : -(1 / 2 : ℝ) ≤ (((D.hcW u τ).u ⟨r, hr⟩ : ℚ) : ℝ)
+      ∧ (((D.hcW u τ).u ⟨r, hr⟩ : ℚ) : ℝ) ≤ if r = 0 then 3 * L.Sc else L.Sc := by
   have hk : 5 ≤ D.R.k := by have := D.R.m_add_three_le_k; have := D.R.two_le_m; omega
   by_cases h0 : r = 0
   · subst h0
@@ -75,7 +80,22 @@ theorem u_bounds_off {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (u 
       push_cast
       constructor <;> linarith [h2.1, h2.2]
 
-theorem longRows : ∀ {eps : ℝ} (Fm : FamP eps), ∃ x0 : ℝ, ∀ x ≥ x0, Fm.x1 < x → ∀ i : Fm.Ix x, ∀ (u : (Fm.D x i).what₂.Word), ∀ j < (Fm.D x i).R.m, ∀ (z : Bool × HH (Fm.D x i)), ∀ r < (Fm.D x i).R.k, (¬ IsTopPl (Fm.D x i) z → wPl (Fm.D x i) (j + 1) z - (Fm.D x i).R.N (Fm.D x i).R.m - 1 / 2 < DV.nuRow (Fm.D x i) u (j + 1) (tauPl (Fm.D x i) z) r ∧ DV.nuRow (Fm.D x i) u (j + 1) (tauPl (Fm.D x i) z) r < wPl (Fm.D x i) (j + 1) z + (if r = 0 then 3 * (Fm.L x i).Sc else (Fm.L x i).Sc)) ∧ (IsTopPl (Fm.D x i) z → 1 ≤ r → r + 1 < (Fm.D x i).R.k → wPl (Fm.D x i) (j + 1) z - (Fm.D x i).R.N (Fm.D x i).R.m < DV.nuRow (Fm.D x i) u (j + 1) (tauPl (Fm.D x i) z) r ∧ DV.nuRow (Fm.D x i) u (j + 1) (tauPl (Fm.D x i) z) r < wPl (Fm.D x i) (j + 1) z + (Fm.L x i).Sc) := by
+theorem longRows
+    : ∀ {eps : ℝ} (Fm : FamP eps), ∃ x0 : ℝ, ∀ x ≥ x0,
+      Fm.x1 < x
+        → ∀ i : Fm.Ix x, ∀ (u : (Fm.D x i).what₂.Word), ∀ j < (Fm.D x i).R.m,
+          ∀ (z : Bool × HH (Fm.D x i)), ∀ r < (Fm.D x i).R.k,
+            (¬ IsTopPl (Fm.D x i) z
+                → wPl (Fm.D x i) (j + 1) z - (Fm.D x i).R.N (Fm.D x i).R.m - 1 / 2
+                    < DV.nuRow (Fm.D x i) u (j + 1) (tauPl (Fm.D x i) z) r
+                  ∧ DV.nuRow (Fm.D x i) u (j + 1) (tauPl (Fm.D x i) z) r
+                    < wPl (Fm.D x i) (j + 1) z
+                      + (if r = 0 then 3 * (Fm.L x i).Sc else (Fm.L x i).Sc))
+              ∧ (IsTopPl (Fm.D x i) z → 1 ≤ r → r + 1 < (Fm.D x i).R.k
+                → wPl (Fm.D x i) (j + 1) z - (Fm.D x i).R.N (Fm.D x i).R.m
+                    < DV.nuRow (Fm.D x i) u (j + 1) (tauPl (Fm.D x i) z) r
+                  ∧ DV.nuRow (Fm.D x i) u (j + 1) (tauPl (Fm.D x i) z) r
+                    < wPl (Fm.D x i) (j + 1) z + (Fm.L x i).Sc) := by
   intro eps Fm
   refine ⟨0, fun x _ hx i u j hj z r hr => ?_⟩
   obtain ⟨h1, h2⟩ := row_bounds (Fm.D x i) u j hj z r hr

@@ -8,23 +8,31 @@ namespace ReciprocityTheory.MultiplicativeHeights
 
 open Finset InnerProductSpace
 
-private theorem exists_eq_gramSchmidt_add_sum_Iio {E : Type*} [NormedAddCommGroup E]
-    [InnerProductSpace ℂ E] (n : ℕ) (v : Fin n → E) :
-    ∃ c : Fin n → Fin n → ℂ,
-      ∀ j, v j = gramSchmidt ℂ v j + ∑ i ∈ Iio j, c j i • gramSchmidt ℂ v i :=
+private theorem exists_eq_gramSchmidt_add_sum_Iio
+    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] (n : ℕ) (v : Fin n → E)
+    : ∃ c : Fin n → Fin n → ℂ, ∀ j,
+      v j = gramSchmidt ℂ v j + ∑ i ∈ Iio j, c j i • gramSchmidt ℂ v i :=
   ⟨_, fun j => gramSchmidt_def'' (𝕜 := ℂ) v j⟩
 
-theorem det_gram_eq_prod_gramSchmidt {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
-    (n : ℕ) (v : Fin n → E) :
-    (Matrix.gram ℂ v).det = ∏ k, (((‖gramSchmidt ℂ v k‖ ^ 2 : ℝ)) : ℂ) := by
+theorem det_gram_eq_prod_gramSchmidt
+    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] (n : ℕ) (v : Fin n → E)
+    : (Matrix.gram ℂ v).det = ∏ k, (((‖gramSchmidt ℂ v k‖ ^ 2 : ℝ)) : ℂ) := by
   classical
   obtain ⟨c, hc⟩ := exists_eq_gramSchmidt_add_sum_Iio n v
-  let A : Matrix (Fin n) (Fin n) ℂ := fun i j => if i = j then 1 else if i < j then c j i else 0
+  let A : Matrix (Fin n) (Fin n) ℂ := fun i j =>
+    if i = j then
+      1
+    else if i < j then
+      c j i
+    else
+      0
   have hA : ∀ j, v j = ∑ i, A i j • gramSchmidt ℂ v i := by
     intro j
-    have h1 : ∀ i, A i j • gramSchmidt ℂ v i =
-        (if i = j then gramSchmidt ℂ v i else 0) +
-          (if i < j then c j i • gramSchmidt ℂ v i else 0) := by
+    have h1
+        : ∀ i,
+          A i j • gramSchmidt ℂ v i
+            = (if i = j then gramSchmidt ℂ v i else 0)
+              + (if i < j then c j i • gramSchmidt ℂ v i else 0) := by
       intro i
       by_cases h : i = j
       · subst h; simp [A]
@@ -38,8 +46,10 @@ theorem det_gram_eq_prod_gramSchmidt {E : Type*} [NormedAddCommGroup E] [InnerPr
     refine Finset.sum_congr ?_ (fun _ _ => rfl)
     ext i
     simp
-  have horth : ∀ k l, ⟪gramSchmidt ℂ v k, gramSchmidt ℂ v l⟫_ℂ =
-      if k = l then (((‖gramSchmidt ℂ v k‖ ^ 2 : ℝ)) : ℂ) else 0 := by
+  have horth
+      : ∀ k l,
+        ⟪gramSchmidt ℂ v k, gramSchmidt ℂ v l⟫_ℂ
+          = if k = l then (((‖gramSchmidt ℂ v k‖ ^ 2 : ℝ)) : ℂ) else 0 := by
     intro k l
     by_cases h : k = l
     · subst h
@@ -47,8 +57,10 @@ theorem det_gram_eq_prod_gramSchmidt {E : Type*} [NormedAddCommGroup E] [InnerPr
       push_cast
       rfl
     · rw [if_neg h, gramSchmidt_orthogonal (𝕜 := ℂ) v h]
-  have hG : Matrix.gram ℂ v =
-      Matrix.conjTranspose A * Matrix.diagonal (fun k => (((‖gramSchmidt ℂ v k‖ ^ 2 : ℝ)) : ℂ)) * A := by
+  have hG
+      : Matrix.gram ℂ v
+        = Matrix.conjTranspose A * Matrix.diagonal (fun k => (((‖gramSchmidt ℂ v k‖ ^ 2 : ℝ)) : ℂ))
+          * A := by
     ext i j
     show ⟪v i, v j⟫_ℂ = _
     rw [hA i, hA j]
@@ -67,18 +79,19 @@ theorem det_gram_eq_prod_gramSchmidt {E : Type*} [NormedAddCommGroup E] [InnerPr
   rw [hG, Matrix.det_mul, Matrix.det_mul, Matrix.det_conjTranspose, hdetA, Matrix.det_diagonal]
   simp
 
-theorem prod_le_re_det_gram {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
-    (n : ℕ) (v : Fin n → E) (δ : Fin n → ℝ) (hδ : ∀ k, 0 ≤ δ k)
-    (h : ∀ k, ∀ x ∈ Submodule.span ℂ (v '' Set.Iio k), δ k ≤ ‖v k - x‖ ^ 2) :
-    ∏ k, δ k ≤ (Matrix.gram ℂ v).det.re := by
+theorem prod_le_re_det_gram
+    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E]
+    (n : ℕ) (v : Fin n → E) (δ : Fin n → ℝ)
+    (hδ : ∀ k, 0 ≤ δ k) (h : ∀ k, ∀ x ∈ Submodule.span ℂ (v '' Set.Iio k), δ k ≤ ‖v k - x‖ ^ 2)
+    : ∏ k, δ k ≤ (Matrix.gram ℂ v).det.re := by
   classical
   rw [det_gram_eq_prod_gramSchmidt, ← Complex.ofReal_prod, Complex.ofReal_re]
   refine Finset.prod_le_prod₀ (fun k _ => hδ k) (fun k _ => ?_)
   obtain ⟨c, hc⟩ := exists_eq_gramSchmidt_add_sum_Iio n v
   have hmem : ∑ i ∈ Iio k, c k i • gramSchmidt ℂ v i ∈ Submodule.span ℂ (v '' Set.Iio k) := by
     rw [← span_gramSchmidt_Iio (𝕜 := ℂ) v k]
-    exact Submodule.sum_mem _ fun i hi => Submodule.smul_mem _ _
-      (Submodule.subset_span ⟨i, Finset.mem_Iio.mp hi, rfl⟩)
+    exact Submodule.sum_mem _ fun i hi =>
+      Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, Finset.mem_Iio.mp hi, rfl⟩)
   have h1 := h k _ hmem
   rwa [← eq_sub_of_add_eq (hc k).symm] at h1
 

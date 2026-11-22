@@ -8,13 +8,14 @@ namespace GlobalTheory.CompanionTheory.MatrixRowSpace
 
 variable {K : Type} [Field K]
 
-theorem row_mul {m n r : ℕ} (x : Matrix (Fin m) (Fin r) K) (c : Matrix (Fin r) (Fin n) K)
-    (i : Fin m) : (x * c) i = c.vecMulLinear (x i) := by
+theorem row_mul
+    {m n r : ℕ} (x : Matrix (Fin m) (Fin r) K) (c : Matrix (Fin r) (Fin n) K) (i : Fin m)
+    : (x * c) i = c.vecMulLinear (x i) := by
   ext j
   simp [Matrix.mul_apply, Matrix.vecMul, dotProduct]
 
-theorem range_vecMulLinear_eq {n r : ℕ} (c : Matrix (Fin r) (Fin n) K) :
-    LinearMap.range c.vecMulLinear = Submodule.span K (Set.range c) := by
+theorem range_vecMulLinear_eq {n r : ℕ} (c : Matrix (Fin r) (Fin n) K)
+    : LinearMap.range c.vecMulLinear = Submodule.span K (Set.range c) := by
   apply le_antisymm
   · rintro _ ⟨v, rfl⟩
     rw [Matrix.vecMulLinear_apply, Matrix.vecMul_eq_sum]
@@ -25,9 +26,9 @@ theorem range_vecMulLinear_eq {n r : ℕ} (c : Matrix (Fin r) (Fin n) K) :
     ext j
     simp [Matrix.vecMul, dotProduct, Pi.single_apply]
 
-theorem span_rows_mul {m n r : ℕ} (x : Matrix (Fin m) (Fin r) K) (c : Matrix (Fin r) (Fin n) K) :
-    Submodule.span K (Set.range (x * c)) =
-      (Submodule.span K (Set.range x)).map c.vecMulLinear := by
+theorem span_rows_mul {m n r : ℕ} (x : Matrix (Fin m) (Fin r) K) (c : Matrix (Fin r) (Fin n) K)
+    : Submodule.span K (Set.range (x * c))
+      = (Submodule.span K (Set.range x)).map c.vecMulLinear := by
   apply le_antisymm
   · rw [Submodule.span_le]
     rintro _ ⟨i, rfl⟩
@@ -38,8 +39,8 @@ theorem span_rows_mul {m n r : ℕ} (x : Matrix (Fin m) (Fin r) K) (c : Matrix (
     rw [SetLike.mem_coe, Submodule.mem_comap, ← row_mul]
     exact Submodule.subset_span ⟨i, rfl⟩
 
-theorem span_rows_eq_top_iff {m r : ℕ} (x : Matrix (Fin m) (Fin r) K) :
-    x.rank = r ↔ Submodule.span K (Set.range x) = ⊤ := by
+theorem span_rows_eq_top_iff {m r : ℕ} (x : Matrix (Fin m) (Fin r) K)
+    : x.rank = r ↔ Submodule.span K (Set.range x) = ⊤ := by
   rw [Matrix.rank_eq_finrank_span_row]
   constructor
   · intro h
@@ -49,9 +50,9 @@ theorem span_rows_eq_top_iff {m r : ℕ} (x : Matrix (Fin m) (Fin r) K) :
     rw [h', finrank_top]
     simp
 
-theorem span_rows_mul_of_rank {m n r : ℕ} (x : Matrix (Fin m) (Fin r) K)
-    (c : Matrix (Fin r) (Fin n) K) (hx : x.rank = r) :
-    Submodule.span K (Set.range (x * c)) = Submodule.span K (Set.range c) := by
+theorem span_rows_mul_of_rank
+    {m n r : ℕ} (x : Matrix (Fin m) (Fin r) K) (c : Matrix (Fin r) (Fin n) K) (hx : x.rank = r)
+    : Submodule.span K (Set.range (x * c)) = Submodule.span K (Set.range c) := by
   rw [span_rows_mul, (span_rows_eq_top_iff x).mp hx, Submodule.map_top, range_vecMulLinear_eq]
 
 end GlobalTheory.CompanionTheory.MatrixRowSpace

@@ -71,10 +71,22 @@ private lemma toAddSubgroup_inf {R X : Type} [CommRing R] [AddCommGroup X] [Modu
     (A B : Submodule R X) : (A ⊓ B).toAddSubgroup = A.toAddSubgroup ⊓ B.toAddSubgroup := by
   ext; simp
 
-
 open Classical in
 open scoped BigOperators in
-theorem _root_.GlobalTheory.FinWeil.adjacent_selfDual_simple : ∀ {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M] {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M}, _root_.GlobalTheory.FinWeil.IsHeis σ w γ W → ∀ (A B : Submodule R X), _root_.GlobalTheory.FinWeil.SelfDual γ A → _root_.GlobalTheory.FinWeil.SelfDual γ B → ∀ x ∈ B, ∀ P : Ideal R, P.IsMaximal → Finite (R ⧸ P) → (∀ r : R, r • x ∈ A ↔ r ∈ P) → B ≤ (A ⊓ B) ⊔ Submodule.span R {x} → _root_.GlobalTheory.FinWeil.idx A B = Nat.card (R ⧸ P) ∧ _root_.GlobalTheory.FinWeil.idx B A = Nat.card (R ⧸ P) ∧ (∀ b ∈ B, ∃! q : R ⧸ P, b - (Quotient.out q : R) • x ∈ A) ∧ (∀ T : Submodule R X, A ⊓ B ≤ T → T ≤ B → T ≤ A ∨ T = B) ∧ (∀ T : Submodule R X, A ⊓ B ≤ T → T ≤ A → T ≤ B ∨ T = A) := by
+theorem _root_.GlobalTheory.FinWeil.adjacent_selfDual_simple
+    : ∀ {R X M : Type} [CommRing R] [AddCommGroup X] [Module R X] [AddCommGroup M] [Module ℂ M]
+        {σ : R →+* R} {w : R} {γ : X → X → ℂ} {W : X → M →ₗ[ℂ] M},
+      _root_.GlobalTheory.FinWeil.IsHeis σ w γ W
+        → ∀ (A B : Submodule R X),
+          _root_.GlobalTheory.FinWeil.SelfDual γ A → _root_.GlobalTheory.FinWeil.SelfDual γ B
+            → ∀ x ∈ B, ∀ P : Ideal R,
+              P.IsMaximal → Finite (R ⧸ P) → (∀ r : R, r • x ∈ A ↔ r ∈ P)
+                → B ≤ (A ⊓ B) ⊔ Submodule.span R {x}
+                → _root_.GlobalTheory.FinWeil.idx A B = Nat.card (R ⧸ P)
+                  ∧ _root_.GlobalTheory.FinWeil.idx B A = Nat.card (R ⧸ P)
+                  ∧ (∀ b ∈ B, ∃! q : R ⧸ P, b - (Quotient.out q : R) • x ∈ A)
+                  ∧ (∀ T : Submodule R X, A ⊓ B ≤ T → T ≤ B → T ≤ A ∨ T = B)
+                  ∧ (∀ T : Submodule R X, A ⊓ B ≤ T → T ≤ A → T ≤ B ∨ T = A) := by
   intro R X M _ _ _ _ _ σ w γ W hW A B hA hB x hx P hP hfin hxP hBle
   have hA' : ∀ y, y ∈ A ↔ ∀ a ∈ A, γ y a = 1 := hA
   have hB' : ∀ y, y ∈ B ↔ ∀ b ∈ B, γ y b = 1 := hB
@@ -83,18 +95,23 @@ theorem _root_.GlobalTheory.FinWeil.adjacent_selfDual_simple : ∀ {R X M : Type
   have hAB : _root_.GlobalTheory.FinWeil.idx A B = Nat.card (R ⧸ P) := by
     haveI := Fintype.ofFinite (R ⧸ P)
     rw [Nat.card_eq_fintype_card]
-    exact (_root_.GlobalTheory.FinWeil.sumOp_eq_sum_transversal hW A B hB (0 : M) (fun a _ => map_zero (W a)) (R ⧸ P)
-      (fun q => Quotient.out q • x) (fun q => B.smul_mem _ hx) hrep).2
+    exact (_root_.GlobalTheory.FinWeil.sumOp_eq_sum_transversal hW A B hB (0 : M)
+      (fun a _ => map_zero (W a))
+      (R ⧸ P)
+      (fun q => Quotient.out q • x)
+      (fun q => B.smul_mem _ hx)
+      hrep).2
   have hAB' : A.toAddSubgroup.relIndex B.toAddSubgroup = Nat.card (R ⧸ P) := hAB
   have hBA : B.toAddSubgroup.relIndex A.toAddSubgroup = Nat.card (R ⧸ P) := by
-    have key := (_root_.GlobalTheory.FinWeil.perfect_pairing_quotients hW B.toAddSubgroup A.toAddSubgroup A.toAddSubgroup
-      B.toAddSubgroup (fun a _ => by simpa only [Submodule.mem_toAddSubgroup] using hB' a)
-      (fun t ht => by
-        simp only [Submodule.mem_toAddSubgroup] at ht ⊢
-        rw [hA' t]
-        exact ⟨fun h a ha => hW.swap_eq_one (h a ha),
-          fun h a ha => hW.swap_eq_one (h a ha)⟩)
-      (by rw [hAB']; exact hN)).1
+    have key :=
+      (_root_.GlobalTheory.FinWeil.perfect_pairing_quotients hW B.toAddSubgroup A.toAddSubgroup
+        A.toAddSubgroup B.toAddSubgroup
+        (fun a _ => by simpa only [Submodule.mem_toAddSubgroup] using hB' a)
+        (fun t ht => by
+          simp only [Submodule.mem_toAddSubgroup] at ht ⊢
+          rw [hA' t]
+          exact ⟨fun h a ha => hW.swap_eq_one (h a ha), fun h a ha => hW.swap_eq_one (h a ha)⟩)
+        (by rw [hAB']; exact hN)).1
     rw [key, hAB']
   have hdich := le_or_eq_of_inf_le_of_le_of_isMaximal A B x hx P hP hxP hBle
   refine ⟨hAB, hBA, hrep, hdich, ?_⟩
@@ -102,49 +119,60 @@ theorem _root_.GlobalTheory.FinWeil.adjacent_selfDual_simple : ∀ {R X M : Type
   by_cases hTB : T ≤ B
   · exact Or.inl hTB
   right
-  let T' : Submodule R X :=
-    { carrier := {b | b ∈ B ∧ ∀ t ∈ T, γ t b = 1}
-      add_mem' := fun {b b'} hb hb' => ⟨B.add_mem hb.1 hb'.1, fun t ht => by
-        rw [hW.add_right, hb.2 t ht, hb'.2 t ht, one_mul]⟩
-      zero_mem' := ⟨B.zero_mem, fun t _ => hW.zero_right t⟩
-      smul_mem' := fun r b hb => ⟨B.smul_mem r hb.1, fun t ht => by
+  let T' : Submodule R X := {
+    carrier := {b | b ∈ B ∧ ∀ t ∈ T, γ t b = 1}
+    add_mem' := fun {b b'} hb hb' =>
+      ⟨B.add_mem hb.1 hb'.1, fun t ht => by rw [hW.add_right, hb.2 t ht, hb'.2 t ht, one_mul]⟩
+    zero_mem' := ⟨B.zero_mem, fun t _ => hW.zero_right t⟩
+    smul_mem' := fun r b hb => ⟨
+      B.smul_mem r hb.1,
+      fun t ht => by
         have h3 := hW.adj (σ r) t b
         rw [hW.sg_sg] at h3
         rw [← h3]
-        exact hb.2 _ (T.smul_mem _ ht)⟩ }
+        exact hb.2 _ (T.smul_mem _ ht)
+    ⟩
+  }
   have hmemT' : ∀ b, b ∈ T' ↔ b ∈ B ∧ ∀ t ∈ T, γ t b = 1 := fun b => Iff.rfl
-  have hT'1 : A ⊓ B ≤ T' := fun c hc => (hmemT' c).2
-    ⟨(Submodule.mem_inf.1 hc).2, fun t ht =>
-      hW.iso hA (h2 ht) (Submodule.mem_inf.1 hc).1⟩
+  have hT'1 : A ⊓ B ≤ T' := fun c hc =>
+    (hmemT' c).2
+      ⟨(Submodule.mem_inf.1 hc).2, fun t ht => hW.iso hA (h2 ht) (Submodule.mem_inf.1 hc).1⟩
   have hT'2 : T' ≤ B := fun b hb => ((hmemT' b).1 hb).1
   rcases hdich T' hT'1 hT'2 with hle | heq
   · have hT'eq : T' = A ⊓ B := le_antisymm (le_inf hle hT'2) hT'1
-    have hprod : (A ⊓ B).toAddSubgroup.relIndex T.toAddSubgroup *
-        T.toAddSubgroup.relIndex A.toAddSubgroup = Nat.card (R ⧸ P) := by
-      rw [AddSubgroup.relIndex_mul_relIndex (A ⊓ B).toAddSubgroup T.toAddSubgroup
-        A.toAddSubgroup (fun y hy => h1 hy) (fun y hy => h2 hy),
+    have hprod
+        : (A ⊓ B).toAddSubgroup.relIndex T.toAddSubgroup * T.toAddSubgroup.relIndex A.toAddSubgroup
+          = Nat.card (R ⧸ P) := by
+      rw [AddSubgroup.relIndex_mul_relIndex (A ⊓ B).toAddSubgroup T.toAddSubgroup A.toAddSubgroup
+          (fun y hy => h1 hy)
+          (fun y hy => h2 hy),
         toAddSubgroup_inf, AddSubgroup.inf_relIndex_left, hBA]
     have hne : (A ⊓ B).toAddSubgroup.relIndex T.toAddSubgroup ≠ 0 := by
       intro h0; rw [h0, zero_mul] at hprod; exact hN hprod.symm
-    have key := (_root_.GlobalTheory.FinWeil.perfect_pairing_quotients hW T'.toAddSubgroup B.toAddSubgroup
-      (A ⊓ B).toAddSubgroup T.toAddSubgroup
-      (fun b hb => by
-        simp only [Submodule.mem_toAddSubgroup] at hb ⊢
-        rw [hmemT']
-        exact ⟨fun h t ht => hW.swap_eq_one (h.2 t ht),
-          fun h => ⟨hb, fun t ht => hW.swap_eq_one (h t ht)⟩⟩)
-      (fun t ht => by
-        simp only [Submodule.mem_toAddSubgroup, Submodule.mem_inf] at ht ⊢
-        rw [hB' t]
-        exact ⟨fun h b hb => hW.swap_eq_one (h.2 b hb),
-          fun h => ⟨h2 ht, fun b hb => hW.swap_eq_one (h b hb)⟩⟩)
-      hne).1
-    rw [hT'eq, toAddSubgroup_inf, AddSubgroup.inf_relIndex_right, hAB',
-      ← toAddSubgroup_inf] at key
+    have key :=
+      (_root_.GlobalTheory.FinWeil.perfect_pairing_quotients hW T'.toAddSubgroup B.toAddSubgroup
+        (A ⊓ B).toAddSubgroup T.toAddSubgroup
+        (fun b hb => by
+          simp only [Submodule.mem_toAddSubgroup] at hb ⊢
+          rw [hmemT']
+          exact ⟨
+            fun h t ht => hW.swap_eq_one (h.2 t ht),
+            fun h => ⟨hb, fun t ht => hW.swap_eq_one (h t ht)⟩
+          ⟩)
+        (fun t ht => by
+          simp only [Submodule.mem_toAddSubgroup, Submodule.mem_inf] at ht ⊢
+          rw [hB' t]
+          exact ⟨
+            fun h b hb => hW.swap_eq_one (h.2 b hb),
+            fun h => ⟨h2 ht, fun b hb => hW.swap_eq_one (h b hb)⟩
+          ⟩)
+        hne).1
+    rw [hT'eq, toAddSubgroup_inf, AddSubgroup.inf_relIndex_right, hAB', ← toAddSubgroup_inf] at key
     rw [← key] at hprod
     have hone : T.toAddSubgroup.relIndex A.toAddSubgroup = 1 := by
-      have h5 : Nat.card (R ⧸ P) * T.toAddSubgroup.relIndex A.toAddSubgroup =
-          Nat.card (R ⧸ P) * 1 := by rw [hprod, mul_one]
+      have h5
+          : Nat.card (R ⧸ P) * T.toAddSubgroup.relIndex A.toAddSubgroup = Nat.card (R ⧸ P) * 1 := by
+        rw [hprod, mul_one]
       exact Nat.eq_of_mul_eq_mul_left (Nat.pos_of_ne_zero hN) h5
     have hAT := AddSubgroup.relIndex_eq_one.1 hone
     exact le_antisymm h2 (fun a ha => hAT ha)

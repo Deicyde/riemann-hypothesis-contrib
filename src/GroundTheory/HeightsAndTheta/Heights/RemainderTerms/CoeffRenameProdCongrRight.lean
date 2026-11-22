@@ -26,8 +26,7 @@ def permSign (f N : ℕ) (w : Fin f → Equiv.Perm (Fin N)) : ℤ :=
 def stairExp (f N : ℕ) (w : Fin f → Equiv.Perm (Fin N)) : Fin f × Fin N →₀ ℕ :=
   Finsupp.equivFunOnFinite.symm fun v => N - 1 - ((w v.1).symm v.2 : ℕ)
 
-def rho (f N : ℕ) : Fin f × Fin N →₀ ℕ :=
-  Finsupp.equivFunOnFinite.symm fun v => N - 1 - (v.2 : ℕ)
+def rho (f N : ℕ) : Fin f × Fin N →₀ ℕ := Finsupp.equivFunOnFinite.symm fun v => N - 1 - (v.2 : ℕ)
 
 def stairConst (f N : ℕ) : ℝ := (∏ i : Fin N, ((N - 1 - (i : ℕ)).factorial : ℝ)) ^ f
 
@@ -39,22 +38,24 @@ theorem permSign_one : permSign f N 1 = 1 := by simp [permSign]
 theorem permSign_inv (w : Fin f → Equiv.Perm (Fin N)) : permSign f N w⁻¹ = permSign f N w := by
   simp [permSign, Equiv.Perm.sign_inv]
 
-theorem permSign_mul (u w : Fin f → Equiv.Perm (Fin N)) :
-    permSign f N (u * w) = permSign f N u * permSign f N w := by
+theorem permSign_mul (u w : Fin f → Equiv.Perm (Fin N))
+    : permSign f N (u * w) = permSign f N u * permSign f N w := by
   simp [permSign, Equiv.Perm.sign_mul, prod_mul_distrib]
 
-theorem permSign_mul_self (u : Fin f → Equiv.Perm (Fin N)) :
-    permSign f N u * permSign f N u = 1 := by
+theorem permSign_mul_self (u : Fin f → Equiv.Perm (Fin N))
+    : permSign f N u * permSign f N u = 1 := by
   rw [permSign, ← prod_mul_distrib]
   exact prod_eq_one fun τ _ => by rw [← Units.val_mul, Int.units_mul_self, Units.val_one]
 
 theorem stairConst_pos : 0 < stairConst f N :=
   pow_pos (prod_pos fun i _ => by exact_mod_cast Nat.factorial_pos _) _
 
-theorem coeff_rename_prodCongrRight {R : Type*} [CommSemiring R] (w : Fin f → Equiv.Perm (Fin N))
-    (P : MvPolynomial (Fin f × Fin N) R) (d : Fin f × Fin N →₀ ℕ) :
-    AddMonoidAlgebra.coeff (rename (Equiv.prodCongrRight w) P) d =
-      AddMonoidAlgebra.coeff P (Finsupp.equivFunOnFinite.symm fun v => d (Equiv.prodCongrRight w v)) := by
+theorem coeff_rename_prodCongrRight
+    {R : Type*} [CommSemiring R]
+    (w : Fin f → Equiv.Perm (Fin N)) (P : MvPolynomial (Fin f × Fin N) R) (d : Fin f × Fin N →₀ ℕ)
+    : AddMonoidAlgebra.coeff (rename (Equiv.prodCongrRight w) P) d
+      = AddMonoidAlgebra.coeff P
+        (Finsupp.equivFunOnFinite.symm fun v => d (Equiv.prodCongrRight w v)) := by
   rw [← coeff_rename_mapDomain (Equiv.prodCongrRight w) (Equiv.injective _) P]
   congr 1
   ext v
@@ -62,18 +63,21 @@ theorem coeff_rename_prodCongrRight {R : Type*} [CommSemiring R] (w : Fin f → 
   rw [Finsupp.mapDomain_apply_of_injective (Equiv.injective _)]
   simp
 
-theorem coeff_rho_antisym {R : Type*} [CommRing R] (P : MvPolynomial (Fin f × Fin N) R) :
-    AddMonoidAlgebra.coeff (∑ w : Fin f → Equiv.Perm (Fin N),
-        ((permSign f N w : ℤ) : R) • rename (Equiv.prodCongrRight w) P) (rho f N) =
-      ∑ w, ((permSign f N w : ℤ) : R) * AddMonoidAlgebra.coeff P (stairExp f N w) := by
+theorem coeff_rho_antisym {R : Type*} [CommRing R] (P : MvPolynomial (Fin f × Fin N) R)
+    : AddMonoidAlgebra.coeff
+        (∑ w : Fin f → Equiv.Perm (Fin N),
+          ((permSign f N w : ℤ) : R) • rename (Equiv.prodCongrRight w) P)
+        (rho f N)
+      = ∑ w, ((permSign f N w : ℤ) : R) * AddMonoidAlgebra.coeff P (stairExp f N w) := by
   rw [coeff_sum]
   refine Fintype.sum_equiv (Equiv.inv _) _ _ (fun w => ?_)
   rw [coeff_smul, smul_eq_mul, coeff_rename_prodCongrRight, Equiv.inv_apply, permSign_inv]
   congr 2
 
-theorem blockVandermonde_eq_sum (f N : ℕ) :
-    blockVandermonde f N = ∑ w : Fin f → Equiv.Perm (Fin N),
-      ((permSign f N w : ℤ) : ℚ) • monomial (stairExp f N w) (1 : ℚ) := by
+theorem blockVandermonde_eq_sum (f N : ℕ)
+    : blockVandermonde f N
+      = ∑ w : Fin f → Equiv.Perm (Fin N),
+        ((permSign f N w : ℤ) : ℚ) • monomial (stairExp f N w) (1 : ℚ) := by
   simp only [blockVandermonde, Comb.vandermondeOf_eq_det, Matrix.det_apply', Matrix.of_apply]
   rw [prod_univ_sum, Fintype.piFinset_univ]
   refine sum_congr rfl fun w _ => ?_
@@ -86,14 +90,14 @@ theorem blockVandermonde_eq_sum (f N : ℕ) :
     rw [← Equiv.prod_comp (w τ)]
     simp [stairExp]
 
-theorem coeff_blockVandermonde (α : Fin f × Fin N →₀ ℕ) :
-    AddMonoidAlgebra.coeff (blockVandermonde f N) α =
-      ∑ w, ((permSign f N w : ℤ) : ℚ) * if stairExp f N w = α then 1 else 0 := by
+theorem coeff_blockVandermonde (α : Fin f × Fin N →₀ ℕ)
+    : AddMonoidAlgebra.coeff (blockVandermonde f N) α
+      = ∑ w, ((permSign f N w : ℤ) : ℚ) * if stairExp f N w = α then 1 else 0 := by
   rw [blockVandermonde_eq_sum, coeff_sum]
   simp only [coeff_smul, coeff_monomial, smul_eq_mul]
 
-theorem eq_one_of_stairExp_eq (w : Fin f → Equiv.Perm (Fin N)) (h : stairExp f N w = rho f N) :
-    w = 1 := by
+theorem eq_one_of_stairExp_eq (w : Fin f → Equiv.Perm (Fin N)) (h : stairExp f N w = rho f N)
+    : w = 1 := by
   funext τ
   ext i
   have h1 := DFunLike.congr_fun h (τ, w τ i)
@@ -103,11 +107,13 @@ theorem eq_one_of_stairExp_eq (w : Fin f → Equiv.Perm (Fin N)) (h : stairExp f
   simp only [Pi.one_apply, Equiv.Perm.coe_one, id_eq]
   omega
 
-theorem prod_factorial_stairExp (w : Fin f → Equiv.Perm (Fin N)) :
-    (stairExp f N w).prod (fun _ e => (e.factorial : ℝ)) = stairConst f N := by
+theorem prod_factorial_stairExp (w : Fin f → Equiv.Perm (Fin N))
+    : (stairExp f N w).prod (fun _ e => (e.factorial : ℝ)) = stairConst f N := by
   rw [Finsupp.prod_fintype _ _ (fun _ => by simp), Fintype.prod_prod_type]
-  have h : ∀ τ, ∏ i : Fin N, ((stairExp f N w (τ, i)).factorial : ℝ) =
-      ∏ i : Fin N, ((N - 1 - (i : ℕ)).factorial : ℝ) := by
+  have h
+      : ∀ τ,
+        ∏ i : Fin N, ((stairExp f N w (τ, i)).factorial : ℝ)
+          = ∏ i : Fin N, ((N - 1 - (i : ℕ)).factorial : ℝ) := by
     intro τ
     simp only [stairExp, Finsupp.coe_equivFunOnFinite_symm]
     exact Equiv.prod_comp (w τ).symm (fun i : Fin N => ((N - 1 - (i : ℕ)).factorial : ℝ))

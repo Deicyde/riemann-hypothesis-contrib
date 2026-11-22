@@ -17,8 +17,8 @@ namespace DualCotangentKernel
 
 variable {K : Type} [Field K] [NumberField K] {i : ℕ}
 
-theorem smul_mem (F : HermLattice K i) (μ : 𝓞 K) {φ : Fin i → K} (hφ : φ ∈ dualLattice F) :
-    (algebraMap (𝓞 K) K μ) • φ ∈ dualLattice F := by
+theorem smul_mem (F : HermLattice K i) (μ : 𝓞 K) {φ : Fin i → K} (hφ : φ ∈ dualLattice F)
+    : (algebraMap (𝓞 K) K μ) • φ ∈ dualLattice F := by
   intro x hx
   rw [smul_dotProduct, smul_eq_mul]
   obtain ⟨r, hr⟩ := hφ x hx
@@ -37,10 +37,15 @@ def prodSet (F : HermLattice K i) {k : Type} [Field k] (ρ : 𝓞 K →+* k) : S
   {v | ∃ (μ : 𝓞 K) (φ : dualLattice F), ρ μ = 0 ∧
     (v : Fin i → K) = algebraMap (𝓞 K) K μ • (φ : Fin i → K)}
 
-theorem mulMap_mem (F : HermLattice K i) {k : Type} [Field k] (ρ : 𝓞 K →+* k) (c : 𝓞 K)
-    {χ : dualLattice F} (hχ : χ ∈ Submodule.span ℤ (prodSet F ρ)) :
-    mulMap F c χ ∈ Submodule.span ℤ (prodSet F ρ) := by
-  have hle : Submodule.span ℤ (prodSet F ρ) ≤ (Submodule.span ℤ (prodSet F ρ)).comap (mulMap F c) := by
+theorem mulMap_mem
+    (F : HermLattice K i)
+    {k : Type} [Field k]
+    (ρ : 𝓞 K →+* k)
+    (c : 𝓞 K)
+    {χ : dualLattice F} (hχ : χ ∈ Submodule.span ℤ (prodSet F ρ))
+    : mulMap F c χ ∈ Submodule.span ℤ (prodSet F ρ) := by
+  have hle
+      : Submodule.span ℤ (prodSet F ρ) ≤ (Submodule.span ℤ (prodSet F ρ)).comap (mulMap F c) := by
     rw [Submodule.span_le]
     rintro v ⟨μ, φ, hμ, hv⟩
     refine Submodule.subset_span ⟨c * μ, φ, by rw [map_mul, hμ, mul_zero], ?_⟩
@@ -49,7 +54,6 @@ theorem mulMap_mem (F : HermLattice K i) {k : Type} [Field k] (ρ : 𝓞 K →+*
   exact hle hχ
 
 end DualCotangentKernel
-
 
 open DualCotangentKernel in
 theorem DualCotangentKer.proof : DualCotangentKer.Statement := by
@@ -75,7 +79,9 @@ theorem DualCotangentKer.proof : DualCotangentKer.Statement := by
   have hsum : ∑ x, χ x = 0 := by
     ext1
     rw [Submodule.coe_sum, Submodule.coe_zero]
-    calc ∑ x, ((χ x : dualLattice F) : Fin i → K) = ∑ x, algebraMap (𝓞 K) K (c x) • (w x : Fin i → K) := rfl
+    calc
+      ∑ x, ((χ x : dualLattice F) : Fin i → K)
+        = ∑ x, algebraMap (𝓞 K) K (c x) • (w x : Fin i → K) := rfl
       _ = a • ∑ x, g x • (w x : Fin i → K) := by
         rw [Finset.smul_sum]
         refine Finset.sum_congr rfl fun x _ => ?_
@@ -92,7 +98,8 @@ theorem DualCotangentKer.proof : DualCotangentKer.Statement := by
     have h := congrFun hσsum j
     rw [Fintype.sum_option] at h
     simp only [w, Option.elim_none, Option.elim_some, hψ, smul_zero, zero_add, hφ, Finset.sum_apply,
-      Pi.smul_apply, Pi.single_apply, smul_eq_mul, mul_ite, mul_one, mul_zero, Pi.zero_apply] at h
+        Pi.smul_apply, Pi.single_apply, smul_eq_mul, mul_ite, mul_one, mul_zero, Pi.zero_apply]
+      at h
     rw [Finset.sum_ite_eq] at h
     simpa using h
   have hnone : ρ (c none) ≠ 0 := by
@@ -108,7 +115,7 @@ theorem DualCotangentKer.proof : DualCotangentKer.Statement := by
   have hgen : ∀ j, χ (some j) ∈ Submodule.span ℤ (prodSet F ρ) := fun j =>
     Submodule.subset_span ⟨c (some j), φ j, hsome j, rfl⟩
   have hχ0 : χ none ∈ Submodule.span ℤ (prodSet F ρ) := by
-    have h : χ none = -∑ j, χ (some j) := by
+    have h : χ none = - ∑ j, χ (some j) := by
       rw [Fintype.sum_option] at hsum
       exact eq_neg_of_add_eq_zero_left hsum
     rw [h]

@@ -12,9 +12,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsOpenLevelG
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef
-open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx Formalism.IndefR.Links
+open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+  Formalism.IndefR.Links
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.RawLift
@@ -26,15 +29,17 @@ namespace GlobalTheory.TransSum
 def conjMeet {Γ : Type*} [Group Γ] (K : Subgroup Γ) (γ : Γ) : Subgroup Γ :=
   K ⊓ K.comap (MulAut.conj γ⁻¹).toMonoidHom
 
-theorem mem_conjMeet {Γ : Type*} [Group Γ] {K : Subgroup Γ} {γ x : Γ} :
-    x ∈ conjMeet K γ ↔ x ∈ K ∧ γ⁻¹ * x * γ ∈ K := by
+theorem mem_conjMeet {Γ : Type*} [Group Γ] {K : Subgroup Γ} {γ x : Γ}
+    : x ∈ conjMeet K γ ↔ x ∈ K ∧ γ⁻¹ * x * γ ∈ K := by
   simp [conjMeet, Subgroup.mem_inf, Subgroup.mem_comap, MulAut.conj_apply]
 
-theorem exists_sum_inv {Γ : Type*} [Group Γ] (K : Subgroup Γ) (γ : Γ)
-    [hf : ((conjMeet K γ).subgroupOf K).FiniteIndex] :
-    ∃ C : Finset Γ, C.Nonempty ∧ (∀ δ ∈ C, ∃ k ∈ K, δ = k * γ) ∧
-      ∀ F : Γ → ℂ, (∀ k ∈ K, ∀ g, F (g * k) = F g) → ∀ k ∈ K, ∀ g,
-        ∑ δ ∈ C, F (g * k * δ) = ∑ δ ∈ C, F (g * δ) := by
+theorem exists_sum_inv
+    {Γ : Type*} [Group Γ] (K : Subgroup Γ) (γ : Γ) [hf : ((conjMeet K γ).subgroupOf K).FiniteIndex]
+    : ∃ C : Finset Γ,
+      C.Nonempty ∧ (∀ δ ∈ C, ∃ k ∈ K, δ = k * γ)
+        ∧ ∀ F : Γ → ℂ,
+          (∀ k ∈ K, ∀ g, F (g * k) = F g)
+            → ∀ k ∈ K, ∀ g, ∑ δ ∈ C, F (g * k * δ) = ∑ δ ∈ C, F (g * δ) := by
   classical
   set H := (conjMeet K γ).subgroupOf K
   haveI : Fintype (K ⧸ H) := Fintype.ofFinite _
@@ -54,13 +59,18 @@ theorem exists_sum_inv {Γ : Type*} [Group Γ] (K : Subgroup Γ) (γ : Γ)
 
     have key : ∀ q : K ⧸ H, F (g * k * r q) = F (g * r (kk • q)) := by
       intro q
-      have hq : (QuotientGroup.mk (Quotient.out (kk • q)) : K ⧸ H) = QuotientGroup.mk (kk * Quotient.out q) := by
+      have hq
+          : (QuotientGroup.mk (Quotient.out (kk • q)) : K ⧸ H)
+            = QuotientGroup.mk (kk * Quotient.out q) := by
         rw [QuotientGroup.out_eq']
         conv_lhs => rw [← QuotientGroup.out_eq' q]
         rfl
       have hm := QuotientGroup.eq.1 hq
       rw [Subgroup.mem_subgroupOf, mem_conjMeet] at hm
-      have e : g * k * r q = g * r (kk • q) * (γ⁻¹ * ((((Quotient.out (kk • q))⁻¹ * (kk * Quotient.out q) : K) : Γ)) * γ) := by
+      have e
+          : g * k * r q
+            = g * r (kk • q)
+              * (γ⁻¹ * ((((Quotient.out (kk • q))⁻¹ * (kk * Quotient.out q) : K) : Γ)) * γ) := by
         simp only [r, Subgroup.coe_mul, Subgroup.coe_inv, kk]
         group
       rw [e, hF _ hm.2]
@@ -72,22 +82,37 @@ end GlobalTheory.TransSum
 
 namespace GlobalTheory.TransSum
 
-theorem heckeOn_doubleCoset_mem_wall : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type} {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] {R : RealDat D A Ks} {i : Fin D.R.m}, LevProd R i → ∀ (γ : GA D (Wc D i)), γ ∈ GfC (Wc D i) → ∃ C : Finset (GA D (Wc D i)), C.Nonempty ∧ (∀ δ ∈ C, ∃ k ∈ levW R i, δ = k * γ) ∧ ∀ T ∈ R.Wall i (sg0 D A), heckeOn (R.MW i (sg0 D A)) C T ∈ R.Wall i (sg0 D A) := by
+theorem heckeOn_doubleCoset_mem_wall
+    : ∀ {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T : Type}
+        {A : FamIn D.what₂.LL G Pl0 T D.R.m} {Ks : Type} [Field Ks] [NumberField Ks]
+        [Algebra Ks D.what₂.LL] {R : RealDat D A Ks} {i : Fin D.R.m},
+      LevProd R i
+        → ∀ (γ : GA D (Wc D i)),
+          γ ∈ GfC (Wc D i)
+            → ∃ C : Finset (GA D (Wc D i)),
+              C.Nonempty ∧ (∀ δ ∈ C, ∃ k ∈ levW R i, δ = k * γ)
+                ∧ ∀ T ∈ R.Wall i (sg0 D A),
+                  heckeOn (R.MW i (sg0 D A)) C T ∈ R.Wall i (sg0 D A) := by
   intro D G _ _ Pl0 T A Ks _ _ _ R i hP γ hγ
-  have topgrp := Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.topGroupHA D.sp.cm.sig (Wc D i).gram
+  have topgrp :=
+    Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.topGroupHA D.sp.cm.sig (Wc D i).gram
   haveI : CompactSpace (levW R i) :=
     isCompact_iff_compactSpace.mp (GlobalTheory.ParahoricCompact.isCompact_levG _ _ _)
   have hU := GlobalTheory.LevelOpen.isOpen_levG (Wc D i) (R.βW i) (R.datWp i R.triv)
-  have hopen : IsOpen (((conjMeet (levW R i) γ).subgroupOf (levW R i) : Subgroup (levW R i)) : Set (levW R i)) := by
+  have hopen : IsOpen
+      (((conjMeet (levW R i) γ).subgroupOf (levW R i) : Subgroup (levW R i)) : Set (levW R i)) := by
     let φ : levW R i → GfC (Wc D i) := fun x =>
       ⟨γ⁻¹ * (x : GA D (Wc D i)) * γ, mul_mem (mul_mem (inv_mem hγ) (hP.1 x.2)) hγ⟩
     have hφ : Continuous φ := by
       refine Continuous.subtype_mk ?_ _
       exact (continuous_const.mul continuous_subtype_val).mul continuous_const
-    have e : (((conjMeet (levW R i) γ).subgroupOf (levW R i) : Subgroup (levW R i)) : Set (levW R i)) =
-        φ ⁻¹' {g : GfC (Wc D i) | (g : GA D (Wc D i)) ∈ levG _ (R.βW i) (R.datWp i R.triv)} := by
+    have e
+        : (((conjMeet (levW R i) γ).subgroupOf (levW R i) : Subgroup (levW R i)) : Set (levW R i))
+          = φ
+            ⁻¹' {g : GfC (Wc D i) | (g : GA D (Wc D i)) ∈ levG _ (R.βW i) (R.datWp i R.triv)} := by
       ext x
-      simp only [SetLike.mem_coe, Subgroup.mem_subgroupOf, mem_conjMeet, Set.mem_preimage, Set.mem_setOf_eq, φ]
+      simp only [SetLike.mem_coe, Subgroup.mem_subgroupOf, mem_conjMeet, Set.mem_preimage,
+        Set.mem_setOf_eq, φ]
       exact ⟨fun h => h.2, fun h => ⟨x.2, h⟩⟩
     rw [e]
     exact hU.preimage hφ

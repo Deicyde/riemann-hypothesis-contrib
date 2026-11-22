@@ -9,13 +9,13 @@ open scoped Matrix
 
 namespace GlobalTheory.AugSpan
 
-theorem exists_mem_span_sub_one_eq_id_on :
-    ∀ {K : Type} [Field K] [IsAlgClosed K] {Γ : Type} [Group Γ] {m : ℕ}
-      (S : Γ →* Matrix (Fin m) (Fin m) K) (P : Submodule K (Fin m → K)),
-      (∀ g, ∀ v ∈ P, S g *ᵥ v ∈ P) →
-      (∀ Q : Submodule K (Fin m → K), Q ≤ P → (∀ g, ∀ v ∈ Q, S g *ᵥ v ∈ Q) → Q = ⊥ ∨ Q = P) →
-      (∃ g, ∃ v ∈ P, S g *ᵥ v ≠ v) →
-      ∃ T ∈ Submodule.span K (Set.range fun g => S g - 1), ∀ v ∈ P, T *ᵥ v = v := by
+theorem exists_mem_span_sub_one_eq_id_on
+    : ∀ {K : Type} [Field K] [IsAlgClosed K] {Γ : Type} [Group Γ] {m : ℕ}
+        (S : Γ →* Matrix (Fin m) (Fin m) K) (P : Submodule K (Fin m → K)),
+      (∀ g, ∀ v ∈ P, S g *ᵥ v ∈ P)
+        → (∀ Q : Submodule K (Fin m → K), Q ≤ P → (∀ g, ∀ v ∈ Q, S g *ᵥ v ∈ Q) → Q = ⊥ ∨ Q = P)
+        → (∃ g, ∃ v ∈ P, S g *ᵥ v ≠ v)
+        → ∃ T ∈ Submodule.span K (Set.range fun g => S g - 1), ∀ v ∈ P, T *ᵥ v = v := by
   intro K _ _ Γ _ m S P hst hirrP hnt
   classical
   set J := Submodule.span K (Set.range fun g => S g - 1) with hJ
@@ -25,18 +25,19 @@ theorem exists_mem_span_sub_one_eq_id_on :
     rw [h, Submodule.mem_bot] at hv₀
     apply hne
     rw [hv₀, Matrix.mulVec_zero]
-  have hinv : ∀ g, ∀ v ∈ P, (Matrix.toLin' (S g)) v ∈ P :=
-    fun g v hv => by rw [Matrix.toLin'_apply]; exact hst g v hv
-  let r : Representation K Γ P :=
-    { toFun := fun g => (Matrix.toLin' (S g)).restrict (hinv g)
-      map_one' := by
-        ext v i
-        simp [LinearMap.restrict_apply]
-      map_mul' := fun g g' => by
-        ext v i
-        simp [LinearMap.restrict_apply, Matrix.mulVec_mulVec] }
-  have hr : ∀ g (v : P), ((r g v : P) : Fin m → K) = S g *ᵥ (v : Fin m → K) :=
-    fun g v => by simp [r, LinearMap.restrict_apply]
+  have hinv : ∀ g, ∀ v ∈ P, (Matrix.toLin' (S g)) v ∈ P := fun g v hv => by
+    rw [Matrix.toLin'_apply]; exact hst g v hv
+  let r : Representation K Γ P := {
+    toFun := fun g => (Matrix.toLin' (S g)).restrict (hinv g)
+    map_one' := by
+      ext v i
+      simp [LinearMap.restrict_apply]
+    map_mul' := fun g g' => by
+      ext v i
+      simp [LinearMap.restrict_apply, Matrix.mulVec_mulVec]
+  }
+  have hr : ∀ g (v : P), ((r g v : P) : Fin m → K) = S g *ᵥ (v : Fin m → K) := fun g v => by
+    simp [r, LinearMap.restrict_apply]
   have hirr : r.IsIrreducible := by
     have hnt : Nontrivial (Subrepresentation r) := by
       refine ⟨⊥, ⊤, fun hbt => hP ?_⟩
@@ -48,9 +49,9 @@ theorem exists_mem_span_sub_one_eq_id_on :
       rw [Submodule.mem_bot] at this
       simpa using congrArg Subtype.val this
     refine ⟨fun W => ?_⟩
-    have hle : W.toSubmodule.map P.subtype ≤ P := by
-      rintro _ ⟨v, _, rfl⟩; exact v.2
-    have hinvW : ∀ g, ∀ v ∈ W.toSubmodule.map P.subtype, S g *ᵥ v ∈ W.toSubmodule.map P.subtype := by
+    have hle : W.toSubmodule.map P.subtype ≤ P := by rintro _ ⟨v, _, rfl⟩; exact v.2
+    have hinvW
+        : ∀ g, ∀ v ∈ W.toSubmodule.map P.subtype, S g *ᵥ v ∈ W.toSubmodule.map P.subtype := by
       rintro g _ ⟨v, hv, rfl⟩
       refine ⟨r g v, W.apply_mem_toSubmodule g hv, ?_⟩
       simp [hr]
@@ -60,7 +61,8 @@ theorem exists_mem_span_sub_one_eq_id_on :
       have : (v : Fin m → K) ∈ W.toSubmodule.map P.subtype := ⟨v, hv, rfl⟩
       rw [h1, Submodule.mem_bot] at this
       show v ∈ (⊥ : Submodule K P)
-      rw [Submodule.mem_bot]; exact Subtype.ext this
+      rw [Submodule.mem_bot]
+      exact Subtype.ext this
     · right
       refine Subrepresentation.toSubmodule_injective (eq_top_iff.2 fun v _ => ?_)
       have : (v : Fin m → K) ∈ W.toSubmodule.map P.subtype := by rw [h1]; exact v.2
@@ -91,17 +93,16 @@ theorem exists_mem_span_sub_one_eq_id_on :
     | zero => simp
     | add x y _ _ hx hy => rw [add_mul]; exact Submodule.add_mem _ hx hy
     | smul c x _ hx => rw [Matrix.smul_mul]; exact Submodule.smul_mem _ c hx
-  let J' : Submodule K (Module.End K P) :=
-    { carrier := {f | ∃ T ∈ J, ∀ w : P, T *ᵥ (w : Fin m → K) = f w}
-      add_mem' := by
-        rintro f f' ⟨T, hT, hTf⟩ ⟨T', hT', hTf'⟩
-        exact ⟨T + T', J.add_mem hT hT', fun w => by
-          rw [Matrix.add_mulVec, hTf, hTf']; simp⟩
-      zero_mem' := ⟨0, J.zero_mem, fun w => by simp⟩
-      smul_mem' := by
-        rintro c f ⟨T, hT, hTf⟩
-        exact ⟨c • T, J.smul_mem c hT, fun w => by
-          rw [Matrix.smul_mulVec, hTf]; simp⟩ }
+  let J' : Submodule K (Module.End K P) := {
+    carrier := {f | ∃ T ∈ J, ∀ w : P, T *ᵥ (w : Fin m → K) = f w}
+    add_mem' := by
+      rintro f f' ⟨T, hT, hTf⟩ ⟨T', hT', hTf'⟩
+      exact ⟨T + T', J.add_mem hT hT', fun w => by rw [Matrix.add_mulVec, hTf, hTf']; simp⟩
+    zero_mem' := ⟨0, J.zero_mem, fun w => by simp⟩
+    smul_mem' := by
+      rintro c f ⟨T, hT, hTf⟩
+      exact ⟨c • T, J.smul_mem c hT, fun w => by rw [Matrix.smul_mulVec, hTf]; simp⟩
+  }
   have hmem : ∀ f, f ∈ J' ↔ ∃ T ∈ J, ∀ w : P, T *ᵥ (w : Fin m → K) = f w := fun f => Iff.rfl
   have hl : ∀ a : Module.End K P, ∀ f ∈ J', a * f ∈ J' := by
     intro a f hf
@@ -128,8 +129,15 @@ theorem exists_mem_span_sub_one_eq_id_on :
     | add x y _ _ hx hy => rw [mul_add]; exact J'.add_mem hx hy
     | smul c x _ hx => rw [mul_smul_comm]; exact J'.smul_mem c hx
   set f₀ : Module.End K P := r g₀ - 1 with hf₀def
-  have hf₀ : f₀ ∈ J' := (hmem _).2 ⟨S g₀ - 1, Submodule.subset_span ⟨g₀, rfl⟩, fun w => by
-    rw [Matrix.sub_mulVec, Matrix.one_mulVec, hf₀def, LinearMap.sub_apply, Submodule.coe_sub, hr]; rfl⟩
+  have hf₀ : f₀ ∈ J' :=
+    (hmem _).2 ⟨
+      S g₀ - 1,
+      Submodule.subset_span ⟨g₀, rfl⟩,
+      fun w => by
+        rw [Matrix.sub_mulVec, Matrix.one_mulVec, hf₀def, LinearMap.sub_apply, Submodule.coe_sub,
+          hr]
+        rfl
+    ⟩
   set w₀ : P := ⟨v₀, hv₀⟩ with hw₀
   have hfw : f₀ w₀ ≠ 0 := by
     intro h
@@ -143,8 +151,10 @@ theorem exists_mem_span_sub_one_eq_id_on :
     exact hfw ((Module.forall_dual_apply_eq_zero_iff K _).1 hc)
   let b := Module.finBasis K P
   have hid : (1 : Module.End K P) ∈ J' := by
-    have heq : (1 : Module.End K P) = ∑ i, ((ψ (f₀ w₀))⁻¹ • ψ.smulRight (b i)) * f₀ *
-        ((b.coord i).smulRight w₀) := by
+    have heq
+        : (1 : Module.End K P)
+          = ∑ i, ((ψ (f₀ w₀))⁻¹ • ψ.smulRight (b i)) * f₀ *
+            ((b.coord i).smulRight w₀) := by
       ext1 w
       rw [LinearMap.sum_apply, Module.End.one_apply]
       conv_lhs => rw [← b.sum_repr w]

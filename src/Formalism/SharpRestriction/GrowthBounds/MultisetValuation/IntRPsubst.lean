@@ -16,7 +16,8 @@ section Gen
 
 variable {K : Type} [Field K] {R : Subring K}
 
-theorem IntR_add {ι : Type} {f g : MvPowerSeries ι K} (hf : IntR R f) (hg : IntR R g) : IntR R (f + g) := by
+theorem IntR_add {ι : Type} {f g : MvPowerSeries ι K} (hf : IntR R f) (hg : IntR R g)
+    : IntR R (f + g) := by
   intro n
   rw [map_add (f := _)]
   exact R.add_mem (hf n) (hg n)
@@ -26,8 +27,8 @@ theorem IntR_zero {ι : Type} : IntR R (0 : MvPowerSeries ι K) := by
   rw [map_zero]
   exact R.zero_mem
 
-theorem IntR_sum {ι α : Type} (s : Finset α) (f : α → MvPowerSeries ι K) (h : ∀ a ∈ s, IntR R (f a)) :
-    IntR R (∑ a ∈ s, f a) := by
+theorem IntR_sum {ι α : Type} (s : Finset α) (f : α → MvPowerSeries ι K) (h : ∀ a ∈ s, IntR R (f a))
+    : IntR R (∑ a ∈ s, f a) := by
   intro n
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
@@ -41,8 +42,8 @@ theorem IntR_X {ι : Type} (i : ι) : IntR R (MvPowerSeries.X i : MvPowerSeries 
   · exact R.one_mem
   · exact R.zero_mem
 
-private theorem intR_iff_mem_range_map_subtype {ι : Type} {f : MvPowerSeries ι K} :
-    IntR R f ↔ f ∈ (MvPowerSeries.map R.subtype).range := by
+private theorem intR_iff_mem_range_map_subtype {ι : Type} {f : MvPowerSeries ι K}
+    : IntR R f ↔ f ∈ (MvPowerSeries.map R.subtype).range := by
   constructor
   · intro hf
     unfold IntR at hf
@@ -55,19 +56,23 @@ private theorem intR_iff_mem_range_map_subtype {ι : Type} {f : MvPowerSeries ι
     rw [MvPowerSeries.coeff_map]
     exact (MvPowerSeries.coeff n g).2
 
-theorem IntR_subst {σ τ : Type} [Finite σ] (a : σ → MvPowerSeries τ K)
-    (ha0 : ∀ i, MvPowerSeries.constantCoeff (a i) = 0) (ha : ∀ i, IntR R (a i)) {f : MvPowerSeries σ K}
-    (hf : IntR R f) : IntR R (MvPowerSeries.subst a f) := by
+theorem IntR_subst
+    {σ τ : Type} [Finite σ]
+    (a : σ → MvPowerSeries τ K)
+    (ha0 : ∀ i, MvPowerSeries.constantCoeff (a i) = 0) (ha : ∀ i, IntR R (a i))
+    {f : MvPowerSeries σ K} (hf : IntR R f)
+    : IntR R (MvPowerSeries.subst a f) := by
   classical
   have hs : MvPowerSeries.HasSubst a := MvPowerSeries.hasSubst_of_constantCoeff_zero ha0
   have hprod : ∀ d : σ →₀ ℕ, IntR R (d.prod fun s k => (a s) ^ k) := by
     intro d
     rw [intR_iff_mem_range_map_subtype, Finsupp.prod]
-    exact Subring.prod_mem _ fun s _ => Subring.pow_mem _ (intR_iff_mem_range_map_subtype.1 (ha s)) _
+    exact Subring.prod_mem _ fun s _ =>
+      Subring.pow_mem _ (intR_iff_mem_range_map_subtype.1 (ha s)) _
   intro e
   rw [MvPowerSeries.coeff_subst hs]
   by_cases hfin : (Function.support fun d : σ →₀ ℕ =>
-      MvPowerSeries.coeff d f • MvPowerSeries.coeff e (d.prod fun s k => (a s) ^ k)).Finite
+    MvPowerSeries.coeff d f • MvPowerSeries.coeff e (d.prod fun s k => (a s) ^ k)).Finite
   · rw [finsum_eq_sum _ hfin]
     exact R.sum_mem fun d _ => by
       rw [smul_eq_mul]
@@ -75,15 +80,17 @@ theorem IntR_subst {σ τ : Type} [Finite σ] (a : σ → MvPowerSeries τ K)
   · rw [finsum_of_infinite_support hfin]
     exact R.zero_mem
 
-theorem IntR_of_ps {f : PowerSeries K} (hf : ∀ n, PowerSeries.coeff n f ∈ R) :
-    IntR R (f : MvPowerSeries Unit K) := by
+theorem IntR_of_ps {f : PowerSeries K} (hf : ∀ n, PowerSeries.coeff n f ∈ R)
+    : IntR R (f : MvPowerSeries Unit K) := by
   intro n
   have hn : n = Finsupp.single () (n ()) := Finsupp.unique_single n
   rw [hn]
   exact hf (n ())
 
-theorem IntR_psubst {τ : Type} {L : MvPowerSeries τ K} (hL0 : MvPowerSeries.constantCoeff L = 0) (hL : IntR R L)
-    {f : PowerSeries K} (hf : ∀ n, PowerSeries.coeff n f ∈ R) : IntR R (PowerSeries.subst L f) :=
+theorem IntR_psubst
+    {τ : Type} {L : MvPowerSeries τ K} (hL0 : MvPowerSeries.constantCoeff L = 0) (hL : IntR R L)
+    {f : PowerSeries K} (hf : ∀ n, PowerSeries.coeff n f ∈ R)
+    : IntR R (PowerSeries.subst L f) :=
   IntR_subst (fun _ : Unit => L) (fun _ => hL0) (fun _ => hL) (IntR_of_ps hf)
 
 end Gen
@@ -99,8 +106,8 @@ private theorem mul_add_one_le_succ_pow (b j : ℕ) : b * j + 1 ≤ (b + 1) ^ j 
     rw [pow_succ]
     nlinarith [Nat.mul_le_mul_right (b + 1) ih, Nat.zero_le (b * b * k)]
 
-theorem lamF_mem (vp : K') (hvp : vp ^ (p ^ 2 - 1) = (p : K')) (n : ℕ) :
-    PowerSeries.coeff n (lamF p vp) ∈ Rp p K' vp := by
+theorem lamF_mem (vp : K') (hvp : vp ^ (p ^ 2 - 1) = (p : K')) (n : ℕ)
+    : PowerSeries.coeff n (lamF p vp) ∈ Rp p K' vp := by
   have hvpR : vp ∈ Rp p K' vp := by
     unfold Rp
     exact Subring.subset_closure (Set.mem_union_right _ rfl)
@@ -126,9 +133,10 @@ theorem lamF_mem (vp : K') (hvp : vp ^ (p ^ 2 - 1) = (p : K')) (n : ℕ) :
   · rw [mul_zero]
     exact (Rp p K' vp).zero_mem
 
-theorem exists_mu (vp : K') (hvp : vp ^ (p ^ 2 - 1) = (p : K')) :
-    ∃ μ : PowerSeries K', PowerSeries.constantCoeff μ = 0 ∧ (∀ n, PowerSeries.coeff n μ ∈ Rp p K' vp) ∧
-      (PowerSeries.subst μ (lamF p vp) : PowerSeries K') = PowerSeries.X := by
+theorem exists_mu (vp : K') (hvp : vp ^ (p ^ 2 - 1) = (p : K'))
+    : ∃ μ : PowerSeries K',
+      PowerSeries.constantCoeff μ = 0 ∧ (∀ n, PowerSeries.coeff n μ ∈ Rp p K' vp)
+        ∧ (PowerSeries.subst μ (lamF p vp) : PowerSeries K') = PowerSeries.X := by
   let l0 : PowerSeries (Rp p K' vp) := PowerSeries.mk fun n => ⟨_, lamF_mem p K' vp hvp n⟩
   have hmap : PowerSeries.map (Rp p K' vp).subtype l0 = lamF p vp := by
     ext n
@@ -150,11 +158,15 @@ theorem exists_mu (vp : K') (hvp : vp ^ (p ^ 2 - 1) = (p : K')) :
   have h1 := PowerSeries.subst_substInvOfIsUnit_right l0 hc hu
   refine ⟨PowerSeries.map (Rp p K' vp).subtype (l0.substInvOfIsUnit hu), ?_, fun n => ?_, ?_⟩
   · rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, PowerSeries.coeff_map,
-      PowerSeries.coeff_zero_eq_constantCoeff_apply, PowerSeries.constantCoeff_substInvOfIsUnit, map_zero]
+      PowerSeries.coeff_zero_eq_constantCoeff_apply, PowerSeries.constantCoeff_substInvOfIsUnit,
+      map_zero]
   · rw [PowerSeries.coeff_map]
     exact Subtype.property _
   · have h2 := congrArg (PowerSeries.map (Rp p K' vp).subtype) h1
-    rw [Formalism.InvariantFactorPaths.G7.LogarithmEquivalence.ps_map_subst _ (PowerSeries.HasSubst.substInvOfIsUnit l0 hu), hmap, PowerSeries.map_X] at h2
+    rw [Formalism.InvariantFactorPaths.G7.LogarithmEquivalence.ps_map_subst _
+          (PowerSeries.HasSubst.substInvOfIsUnit l0 hu),
+        hmap, PowerSeries.map_X]
+      at h2
     exact h2
 
 theorem map_logF : PowerSeries.map (algebraMap (K0 p) K') (logF p) = lgF K' p := by

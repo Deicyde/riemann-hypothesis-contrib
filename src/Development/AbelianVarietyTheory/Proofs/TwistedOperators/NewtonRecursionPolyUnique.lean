@@ -33,18 +33,25 @@ lemma shiftDiffPoly_coeff_sub (f : ℂ[X]) (e : ℕ) (he : f.natDegree = e + 1) 
     simp at hi
     simp [Nat.choose_eq_zero_of_lt hi]
 
-theorem newton_recursion_poly_unique : ∀ (m N : ℕ) (p : ℕ → ℂ) (f r : ℂ[X]), m < N → p 0 = (m : ℂ) + 1 → f.natDegree ≤ m → r.natDegree ≤ m → (∀ u : ℂ, (u - m) ^ (N + 1) * (f.eval (u + 1) - f.eval u) - f.eval u * ∑ k ∈ range (N + 1), (-1) ^ k * (u - m) ^ (N - k) * p k = r.eval u) → f = 0 := by
+theorem newton_recursion_poly_unique
+    : ∀ (m N : ℕ) (p : ℕ → ℂ) (f r : ℂ[X]),
+      m < N → p 0 = (m : ℂ) + 1 → f.natDegree ≤ m → r.natDegree ≤ m
+        → (∀ u : ℂ,
+          (u - m) ^ (N + 1) * (f.eval (u + 1) - f.eval u)
+              - f.eval u * ∑ k ∈ range (N + 1), (-1) ^ k * (u - m) ^ (N - k) * p k
+            = r.eval u)
+        → f = 0 := by
   intro m N p f r hmN hp0 hf hr hid
-  have hlead : ∀ k : ℕ, ((X - C (m:ℂ)) ^ k).coeff k = 1 := fun k => by
-    have h := ((monic_X_sub_C (m:ℂ)).pow k).coeff_natDegree
+  have hlead : ∀ k : ℕ, ((X - C (m : ℂ)) ^ k).coeff k = 1 := fun k => by
+    have h := ((monic_X_sub_C (m : ℂ)).pow k).coeff_natDegree
     rwa [natDegree_pow, natDegree_X_sub_C, mul_one] at h
   set Pi : ℂ[X] := ∑ k ∈ range (N + 1), C ((-1) ^ k * p k) * (X - C (m:ℂ)) ^ (N - k) with hPi
   set g : ℂ[X] := f.comp (X + 1) - f with hg
-  have hpoly : (X - C (m:ℂ)) ^ (N + 1) * g - f * Pi = r := by
+  have hpoly : (X - C (m : ℂ)) ^ (N + 1) * g - f * Pi = r := by
     apply Polynomial.funext
     intro u
-    simp only [hg, hPi, eval_sub, eval_mul, eval_pow, eval_X, eval_C, eval_comp, eval_add,
-      eval_one, Polynomial.eval_finsetSum]
+    simp only [hg, hPi, eval_sub, eval_mul, eval_pow, eval_X, eval_C, eval_comp, eval_add, eval_one,
+      Polynomial.eval_finsetSum]
     rw [← hid u]
     congr 2
     apply Finset.sum_congr rfl
@@ -66,12 +73,13 @@ theorem newton_recursion_poly_unique : ∀ (m N : ℕ) (p : ℕ → ℂ) (f r : 
     rw [natDegree_pow, natDegree_X_sub_C]
     omega
   set d := f.natDegree with hd
-  have hcoef : ((X - C (m:ℂ)) ^ (N + 1) * g - f * Pi).coeff (d + N) = r.coeff (d + N) := by rw [hpoly]
+  have hcoef : ((X - C (m : ℂ)) ^ (N + 1) * g - f * Pi).coeff (d + N) = r.coeff (d + N) := by
+    rw [hpoly]
   rw [coeff_sub] at hcoef
   have hr0 : r.coeff (d + N) = 0 := coeff_eq_zero_of_natDegree_lt (by omega)
   have h2 : (f * Pi).coeff (d + N) = f.coeff d * Pi.coeff N :=
     coeff_mul_add_eq_of_natDegree_le le_rfl hPideg
-  have h1 : ((X - C (m:ℂ)) ^ (N + 1) * g).coeff (d + N) = d * f.coeff d := by
+  have h1 : ((X - C (m : ℂ)) ^ (N + 1) * g).coeff (d + N) = d * f.coeff d := by
     rcases Nat.eq_zero_or_pos d with h0 | hpos
     · have hg0 : g = 0 := by
         ext n
@@ -85,7 +93,8 @@ theorem newton_recursion_poly_unique : ∀ (m N : ℕ) (p : ℕ → ℂ) (f r : 
         intro n hn
         exact shiftDiffPoly_coeff_top f n (by omega)
       have hidx : d + N = (N + 1) + e := by omega
-      rw [hidx, coeff_mul_add_eq_of_natDegree_le (by rw [natDegree_pow, natDegree_X_sub_C, mul_one]) hgdeg,
+      rw [hidx,
+        coeff_mul_add_eq_of_natDegree_le (by rw [natDegree_pow, natDegree_X_sub_C, mul_one]) hgdeg,
         hlead, one_mul, shiftDiffPoly_coeff_sub f e he, he]
       push_cast
       ring

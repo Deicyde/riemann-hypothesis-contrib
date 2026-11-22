@@ -16,33 +16,47 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.NotMemOfMulEx
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S Formalism.L2.Theta Matrix
 open Formalism.REAL GlobalTheory.SmoothGlob GlobalTheory.TypeSum
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.TypeSum.CoefClos
 
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.rightDerivativeRelation_of_locallyUniformLimit : ∀ (n : ℕ) (ε : Fin n → Bool) (F : Mx n → ℂ), CSm ε F → ∀ (m : ℕ) (c : Fin m → ℂ) (u : Fin m → List (Ltr ε)),
-    (∀ C : Set (Mx n), IsCompact C → ∀ δ : ℝ, 0 < δ → ∃ f : Mx n → ℂ, CSm ε f ∧
-      (∀ y ∈ C, y ∈ UJset ε → ‖F y - f y‖ < δ) ∧ ∀ y ∈ UJset ε, ∑ i, c i * wordF (u i) f y = 0) →
-    ∀ y ∈ UJset ε, ∑ i, c i * wordF (u i) F y = 0 := by
+theorem _root_.GlobalTheory.T.rightDerivativeRelation_of_locallyUniformLimit
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (F : Mx n → ℂ),
+      CSm ε F
+        → ∀ (m : ℕ) (c : Fin m → ℂ) (u : Fin m → List (Ltr ε)),
+          (∀ C : Set (Mx n),
+              IsCompact C
+                → ∀ δ : ℝ,
+                  0 < δ
+                    → ∃ f : Mx n → ℂ,
+                      CSm ε f ∧ (∀ y ∈ C, y ∈ UJset ε → ‖F y - f y‖ < δ)
+                        ∧ ∀ y ∈ UJset ε, ∑ i, c i * wordF (u i) f y = 0)
+            → ∀ y ∈ UJset ε, ∑ i, c i * wordF (u i) F y = 0 := by
   intro n ε F hF m c u hlim y hy
   have hmem : ∀ g : UJ ε, umat g ∈ UJset ε := fun g => g.2
   have hcont : Continuous fun g : UJ ε => ∑ i, c i * wordF (u i) F (umat g) := by
     refine continuous_finsetSum _ (fun i _ => ?_)
     exact continuous_const.mul (CSm.continuous (CSm.wordF hF (u i)))
-  have key : ∀ φ, IsTest ε φ →
-      ∫ g : UJ ε, φ (umat g) * ∑ i, c i * wordF (u i) F (umat g) ∂(muG ε) = 0 := by
+  have key
+      : ∀ φ,
+        IsTest ε φ → ∫ g : UJ ε, φ (umat g) * ∑ i, c i * wordF (u i) F (umat g) ∂(muG ε) = 0 := by
     intro φ hφ
     choose ψ hψ hadj using fun i => exists_adjoint_word (u i) hφ
 
-    have expand : ∀ G, CSm ε G →
-        ∫ g : UJ ε, φ (umat g) * ∑ i, c i * wordF (u i) G (umat g) ∂(muG ε)
-          = ∑ i, c i * ∫ g : UJ ε, ψ i (umat g) * G (umat g) ∂(muG ε) := by
+    have expand
+        : ∀ G,
+          CSm ε G
+            → ∫ g : UJ ε, φ (umat g) * ∑ i, c i * wordF (u i) G (umat g) ∂(muG ε)
+              = ∑ i, c i * ∫ g : UJ ε, ψ i (umat g) * G (umat g) ∂(muG ε) := by
       intro G hG
-      have hfun : (fun g : UJ ε => φ (umat g) * ∑ i, c i * wordF (u i) G (umat g))
-          = fun g => ∑ i, c i * (φ (umat g) * wordF (u i) G (umat g)) := by
+      have hfun
+          : (fun g : UJ ε => φ (umat g) * ∑ i, c i * wordF (u i) G (umat g))
+            = fun g => ∑ i, c i * (φ (umat g) * wordF (u i) G (umat g)) := by
         funext g
         rw [Finset.mul_sum]
         exact Finset.sum_congr rfl (fun i _ => by ring)
@@ -69,12 +83,15 @@ theorem _root_.GlobalTheory.T.rightDerivativeRelation_of_locallyUniformLimit : �
       obtain ⟨f, hf, hclose, hzero⟩ := hlim _ hC δ hδ
       have e0 : ∑ i, c i * ∫ g : UJ ε, ψ i (umat g) * f (umat g) ∂(muG ε) = 0 := by
         rw [← expand f hf]
-        have hz : (fun g : UJ ε => φ (umat g) * ∑ i, c i * wordF (u i) f (umat g)) = fun _ => 0 := by
+        have hz
+            : (fun g : UJ ε => φ (umat g) * ∑ i, c i * wordF (u i) f (umat g)) = fun _ => 0 := by
           funext g
           rw [hzero _ (hmem g), mul_zero]
         rw [hz, MeasureTheory.integral_zero]
-      have hXf : X = ∑ i, c i * ((∫ g : UJ ε, ψ i (umat g) * F (umat g) ∂(muG ε))
-          - ∫ g : UJ ε, ψ i (umat g) * f (umat g) ∂(muG ε)) := by
+      have hXf
+          : X
+            = ∑ i, c i * ((∫ g : UJ ε, ψ i (umat g) * F (umat g) ∂(muG ε))
+              - ∫ g : UJ ε, ψ i (umat g) * f (umat g) ∂(muG ε)) := by
         rw [hX, expand F hF]
         simp only [mul_sub, Finset.sum_sub_distrib, e0, sub_zero]
       rw [hXf]
@@ -84,7 +101,8 @@ theorem _root_.GlobalTheory.T.rightDerivativeRelation_of_locallyUniformLimit : �
       · rw [norm_mul]
         refine mul_le_mul_of_nonneg_left ?_ (norm_nonneg _)
         show _ ≤ δ * ∫ g : UJ ε, ‖ψ i (umat g)‖ ∂(muG ε)
-        rw [← MeasureTheory.integral_sub (IsTest.integrable (hψ i) hF) (IsTest.integrable (hψ i) hf),
+        rw [← MeasureTheory.integral_sub (IsTest.integrable (hψ i) hF)
+            (IsTest.integrable (hψ i) hf),
           ← MeasureTheory.integral_const_mul]
         refine MeasureTheory.norm_integral_le_of_norm_le ((hint1 i).const_mul δ)
           (Filter.Eventually.of_forall (fun g => ?_))

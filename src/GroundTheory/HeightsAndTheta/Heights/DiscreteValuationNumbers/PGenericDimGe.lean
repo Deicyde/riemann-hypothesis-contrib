@@ -21,25 +21,26 @@ section Noetherian
 
 variable {R : Type*} [CommRing R]
 
-theorem map_mk_lt {p a b : Ideal R} (ha : p ≤ a) (hab : a < b) :
-    a.map (Ideal.Quotient.mk p) < b.map (Ideal.Quotient.mk p) := by
-  have key : ∀ c : Ideal R, p ≤ c →
-      (c.map (Ideal.Quotient.mk p)).comap (Ideal.Quotient.mk p) = c := by
+theorem map_mk_lt {p a b : Ideal R} (ha : p ≤ a) (hab : a < b)
+    : a.map (Ideal.Quotient.mk p) < b.map (Ideal.Quotient.mk p) := by
+  have key
+      : ∀ c : Ideal R, p ≤ c → (c.map (Ideal.Quotient.mk p)).comap (Ideal.Quotient.mk p) = c := by
     intro c hc
-    rw [Ideal.comap_map_of_surjective _ Ideal.Quotient.mk_surjective,
-      ← RingHom.ker_eq_comap_bot, Ideal.mk_ker]
+    rw [Ideal.comap_map_of_surjective _ Ideal.Quotient.mk_surjective, ← RingHom.ker_eq_comap_bot,
+      Ideal.mk_ker]
     exact sup_eq_left.mpr hc
   refine lt_of_le_of_ne (Ideal.map_mono hab.le) fun h => hab.ne ?_
   rw [← key a ha, ← key b (ha.trans hab.le), h]
 
-theorem one_lt_height_map {p a b : Ideal R} [p.IsPrime] [a.IsPrime] [b.IsPrime] (hpa : p < a)
-    (hab : a < b) : 1 < (b.map (Ideal.Quotient.mk p)).height := by
+theorem one_lt_height_map
+    {p a b : Ideal R} [p.IsPrime] [a.IsPrime] [b.IsPrime] (hpa : p < a) (hab : a < b)
+    : 1 < (b.map (Ideal.Quotient.mk p)).height := by
   have hk : ∀ c : Ideal R, p ≤ c → RingHom.ker (Ideal.Quotient.mk p) ≤ c := fun c hc => by
     rw [Ideal.mk_ker]; exact hc
   have := Ideal.map_isPrime_of_surjective (I := p) Ideal.Quotient.mk_surjective (hk p le_rfl)
   have := Ideal.map_isPrime_of_surjective (I := a) Ideal.Quotient.mk_surjective (hk a hpa.le)
-  have := Ideal.map_isPrime_of_surjective (I := b) Ideal.Quotient.mk_surjective
-    (hk b (hpa.trans hab).le)
+  have :=
+    Ideal.map_isPrime_of_surjective (I := b) Ideal.Quotient.mk_surjective (hk b (hpa.trans hab).le)
   have h1 := Ideal.height_add_one_le_of_lt_of_isPrime (map_mk_lt le_rfl hpa)
   have h2 := Ideal.height_add_one_le_of_lt_of_isPrime (map_mk_lt hpa.le hab)
   have h3 : (1 : ℕ∞) ≤ (a.map (Ideal.Quotient.mk p)).height := le_trans le_add_self h1
@@ -47,9 +48,12 @@ theorem one_lt_height_map {p a b : Ideal R} [p.IsPrime] [a.IsPrime] [b.IsPrime] 
     le_trans (add_le_add h3 le_rfl) h2
   exact lt_of_lt_of_le (by norm_num) h4
 
-theorem exists_isPrime_between_not_mem [IsNoetherianRing R] {p q r : Ideal R} [p.IsPrime]
-    [q.IsPrime] [r.IsPrime] (hpq : p < q) (hqr : q < r) {x : R} (hx : x ∉ p) :
-    ∃ q' : Ideal R, q'.IsPrime ∧ p < q' ∧ q' < r ∧ x ∉ q' := by
+theorem exists_isPrime_between_not_mem
+    [IsNoetherianRing R]
+    {p q r : Ideal R} [p.IsPrime] [q.IsPrime] [r.IsPrime]
+    (hpq : p < q) (hqr : q < r)
+    {x : R} (hx : x ∉ p)
+    : ∃ q' : Ideal R, q'.IsPrime ∧ p < q' ∧ q' < r ∧ x ∉ q' := by
   classical
   by_contra H
   push Not at H
@@ -66,18 +70,19 @@ theorem exists_isPrime_between_not_mem [IsNoetherianRing R] {p q r : Ideal R} [p
     rcases Finset.mem_insert.1 ht with rfl | ht
     · exact hpq.trans hqr
     · exact (Finset.mem_filter.1 ht).2
-  have hnot : ¬ ((r : Set R) ⊆ ⋃ t ∈ (↑s : Set (Ideal R)), ((fun t : Ideal R => t) t : Set R)) := by
+  have hnot : ¬((r : Set R) ⊆ ⋃ t ∈ (↑s : Set (Ideal R)), ((fun t : Ideal R => t) t : Set R)) := by
     intro h
     obtain ⟨t, ht, hrt⟩ :=
-      (Ideal.subset_union_prime (f := fun t : Ideal R => t) p p
-        (fun t ht _ _ => hprime t ht)).1 h
+      (Ideal.subset_union_prime (f := fun t : Ideal R => t) p p (fun t ht _ _ => hprime t ht)).1 h
     exact (hlt t ht).not_ge hrt
   obtain ⟨y, hyr, hy⟩ := Set.not_subset.1 hnot
   simp only [Set.mem_iUnion, not_exists] at hy
   have hyp : y ∉ p := fun h => hy p (Finset.mem_coe.2 (Finset.mem_insert_self _ _)) h
   have hyt : ∀ t ∈ (p ⊔ Ideal.span {x}).minimalPrimes, t < r → y ∉ t := fun t ht htr h =>
-    hy t (Finset.mem_coe.2 (Finset.mem_insert_of_mem
-      (Finset.mem_filter.2 ⟨hM.mem_toFinset.2 ht, htr⟩))) h
+    hy t
+      (Finset.mem_coe.2 (Finset.mem_insert_of_mem (Finset.mem_filter.2
+        ⟨hM.mem_toFinset.2 ht, htr⟩)))
+      h
   have hle : p ⊔ Ideal.span {y} ≤ r :=
     sup_le (hpq.trans hqr).le (by rwa [Ideal.span_le, Set.singleton_subset_iff])
   obtain ⟨t0, ht0, ht0r⟩ := Ideal.exists_minimalPrimes_le hle
@@ -106,8 +111,9 @@ theorem exists_isPrime_between_not_mem [IsNoetherianRing R] {p q r : Ideal R} [p
 
 end Noetherian
 
-theorem exists_lt_of_le_height {α : Type*} [Preorder α] {a : α} {n : ℕ}
-    (h : ((n + 1 : ℕ) : ℕ∞) ≤ Order.height a) : ∃ b < a, (n : ℕ∞) ≤ Order.height b := by
+theorem exists_lt_of_le_height
+    {α : Type*} [Preorder α] {a : α} {n : ℕ} (h : ((n + 1 : ℕ) : ℕ∞) ≤ Order.height a)
+    : ∃ b < a, (n : ℕ∞) ≤ Order.height b := by
   obtain ⟨p, hlast, hlen⟩ := Order.exists_series_of_le_height a h
   have hne : p.length ≠ 0 := by omega
   refine ⟨p.eraseLast.last, hlast ▸ p.eraseLast_last_rel_last hne, ?_⟩
@@ -115,9 +121,11 @@ theorem exists_lt_of_le_height {α : Type*} [Preorder α] {a : α} {n : ℕ}
   simp only [RelSeries.eraseLast_length, hlen, Nat.add_sub_cancel] at this
   exact this
 
-theorem comap_C_eq_bot {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+theorem comap_C_eq_bot
+    {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
     {σ : Type*} {ϖ : O} (hϖ : Irreducible ϖ) (Q : Ideal (MvPolynomial σ O)) [Q.IsPrime]
-    (h : (C ϖ : MvPolynomial σ O) ∉ Q) : Q.comap (C : O →+* MvPolynomial σ O) = ⊥ := by
+    (h : (C ϖ : MvPolynomial σ O) ∉ Q)
+    : Q.comap (C : O →+* MvPolynomial σ O) = ⊥ := by
   by_contra hne
   have : (Q.comap (C : O →+* MvPolynomial σ O)).IsMaximal :=
     Ideal.IsPrime.isMaximal inferInstance hne
@@ -138,8 +146,9 @@ theorem proof : Statement.{u} := by
     MvPolynomial.isLocalization (nonZeroDivisors O) (FractionRing O)
   rw [ringKrullDim_quotient, ringKrullDim_quotient]
   let Z := PrimeSpectrum.zeroLocus (R := MRing ι O) (P : Set (MRing ι O))
-  let Z' := PrimeSpectrum.zeroLocus (R := MRing ι (FractionRing O))
-    (genFib P : Set (MRing ι (FractionRing O)))
+  let Z' :=
+    PrimeSpectrum.zeroLocus (R := MRing ι (FractionRing O))
+      (genFib P : Set (MRing ι (FractionRing O)))
   let U := {q : Z // q.1.asIdeal.comap (C : O →+* MRing ι O) = ⊥}
   have ltZ : ∀ a b : Z, a < b ↔ a.1.asIdeal < b.1.asIdeal := fun a b =>
     Subtype.coe_lt_coe.symm.trans (PrimeSpectrum.asIdeal_lt_asIdeal _ _).symm
@@ -150,8 +159,10 @@ theorem proof : Statement.{u} := by
   let P0 : Z := ⟨⟨P, hP⟩, (memZ _).2 le_rfl⟩
   let PU : U := ⟨P0, hPC⟩
 
-  have hstep : ∀ n : ℕ, ∀ r : Z, ((n + 1 : ℕ) : ℕ∞) ≤ Order.height r →
-      ∃ q : U, q.1.1.asIdeal < r.1.asIdeal ∧ (n : ℕ∞) ≤ Order.height q := by
+  have hstep
+      : ∀ n : ℕ, ∀ r : Z,
+        ((n + 1 : ℕ) : ℕ∞) ≤ Order.height r
+          → ∃ q : U, q.1.1.asIdeal < r.1.asIdeal ∧ (n : ℕ∞) ≤ Order.height q := by
     intro n
     induction n with
     | zero =>
@@ -162,17 +173,20 @@ theorem proof : Statement.{u} := by
       intro r hr
       obtain ⟨r', hr'r, hr'⟩ := exists_lt_of_le_height hr
       obtain ⟨q, hqr', hq⟩ := ih r' hr'
-      have hx : (C ϖ : MRing ι O) ∉ q.1.1.asIdeal := fun h => hϖ.ne_zero (by
-        have : ϖ ∈ q.1.1.asIdeal.comap (C : O →+* MRing ι O) := h
-        rw [q.2] at this
-        exact (Submodule.mem_bot _).1 this)
+      have hx : (C ϖ : MRing ι O) ∉ q.1.1.asIdeal := fun h =>
+        hϖ.ne_zero (by
+          have : ϖ ∈ q.1.1.asIdeal.comap (C : O →+* MRing ι O) := h
+          rw [q.2] at this
+          exact (Submodule.mem_bot _).1 this)
       obtain ⟨q', hq'p, hqq', hq'r, hq'x⟩ :=
         exists_isPrime_between_not_mem hqr' ((ltZ _ _).1 hr'r) hx
       let qZ : Z := ⟨⟨q', hq'p⟩, (memZ _).2 (((memZ _).1 q.1.2).trans hqq'.le)⟩
       let qU : U := ⟨qZ, comap_C_eq_bot hϖ q' hq'x⟩
       refine ⟨qU, hq'r, ?_⟩
       have hlt : q < qU := (ltU _ _).2 hqq'
-      calc ((n + 1 : ℕ) : ℕ∞) = (n : ℕ∞) + 1 := by push_cast; rfl
+      calc
+        ((n + 1 : ℕ) : ℕ∞)
+          = (n : ℕ∞) + 1 := by push_cast; rfl
         _ ≤ Order.height q + 1 := add_le_add hq le_rfl
         _ ≤ Order.height qU := Order.height_add_one_le hlt
   have hbound : ∀ r : Z, Order.height r ≤ (⨆ q : U, Order.height q) + 1 := by
@@ -192,30 +206,33 @@ theorem proof : Statement.{u} := by
     have : a ∈ q.1.1.asIdeal.comap (C : O →+* MRing ι O) := hmem
     rw [q.2] at this
     exact nonZeroDivisors.ne_zero ha ((Submodule.mem_bot _).1 this)
-  let Φ : U → Z' := fun q =>
-    ⟨⟨q.1.1.asIdeal.map (algebraMap (MRing ι O) (MRing ι (FractionRing O))),
-      IsLocalization.isPrime_of_isPrime_disjoint M _ _ q.1.1.2 (hdisj q)⟩, by
+  let Φ : U → Z' := fun q => ⟨
+    ⟨
+      q.1.1.asIdeal.map (algebraMap (MRing ι O) (MRing ι (FractionRing O))),
+      IsLocalization.isPrime_of_isPrime_disjoint M _ _ q.1.1.2 (hdisj q)
+    ⟩,
+    by
       rw [PrimeSpectrum.mem_zeroLocus]
-      exact Ideal.map_mono ((memZ _).1 q.1.2)⟩
+      exact Ideal.map_mono ((memZ _).1 q.1.2)
+  ⟩
   have hΦ : StrictMono Φ := by
     intro a b hab
     rw [ltU] at hab
     refine Subtype.coe_lt_coe.1 ((PrimeSpectrum.asIdeal_lt_asIdeal _ _).1 ?_)
     refine lt_of_le_of_ne (Ideal.map_mono hab.le) fun h => hab.ne ?_
-    have ha := IsLocalization.under_map_of_isPrime_disjoint M (MRing ι (FractionRing O))
-      a.1.1.2 (hdisj a)
-    have hb := IsLocalization.under_map_of_isPrime_disjoint M (MRing ι (FractionRing O))
-      b.1.1.2 (hdisj b)
+    have ha :=
+      IsLocalization.under_map_of_isPrime_disjoint M (MRing ι (FractionRing O)) a.1.1.2 (hdisj a)
+    have hb :=
+      IsLocalization.under_map_of_isPrime_disjoint M (MRing ι (FractionRing O)) b.1.1.2 (hdisj b)
     rw [← ha, ← hb]
     exact congrArg (Ideal.comap _) h
   have : Nonempty Z := ⟨P0⟩
   have : Nonempty U := ⟨PU⟩
-  calc Order.krullDim Z = ((⨆ r : Z, Order.height r : ℕ∞) : WithBot ℕ∞) :=
-        Order.krullDim_eq_iSup_height_of_nonempty
-    _ ≤ (((⨆ q : U, Order.height q) + 1 : ℕ∞) : WithBot ℕ∞) :=
-        WithBot.coe_le_coe.2 (iSup_le hbound)
-    _ = Order.krullDim U + 1 := by
-        rw [Order.krullDim_eq_iSup_height_of_nonempty (α := U)]; rfl
+  calc
+    Order.krullDim Z
+      = ((⨆ r : Z, Order.height r : ℕ∞) : WithBot ℕ∞) := Order.krullDim_eq_iSup_height_of_nonempty
+    _ ≤ (((⨆ q : U, Order.height q) + 1 : ℕ∞) : WithBot ℕ∞) := WithBot.coe_le_coe.2 (iSup_le hbound)
+    _ = Order.krullDim U + 1 := by rw [Order.krullDim_eq_iSup_height_of_nonempty (α := U)]; rfl
     _ ≤ Order.krullDim Z' + 1 := add_le_add (Order.krullDim_le_of_strictMono Φ hΦ) le_rfl
 
 end GenericDimGe

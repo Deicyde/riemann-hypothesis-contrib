@@ -12,8 +12,9 @@ namespace PositivityTheory.RgUd.T.Nil.Four.Phi2
 
 open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Nil
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
-  (Z : Subalgebra k (Matrix (Fin n) (Fin n) k))
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  {n : ℕ} (Z : Subalgebra k (Matrix (Fin n) (Fin n) k))
 
 def Dl : Matrix (Fin n) (Fin n) k →ₗ[k] (Fin (d Z) → k) where
   toFun := D Z
@@ -50,7 +51,8 @@ def Hb : Sp k n ≃ₜ TT Z × (Fin (d Z) → k) where
     have hPy : Pr Z (y + E Z ((G Z)⁻¹ *ᵥ w)) = E Z ((G Z)⁻¹ *ᵥ w) := by
       rw [Pr_add, Pr_of_D hZ h hy', Pr_E hZ h, zero_add]
     have hDx : D Z (y + E Z ((G Z)⁻¹ *ᵥ w)) = w := by
-      rw [D_add, hy', zero_add, D_E, mulVec_mulVec, mul_nonsing_inv _ (Ne.isUnit (G_det hZ h)), one_mulVec]
+      rw [D_add, hy', zero_add, D_E, mulVec_mulVec, mul_nonsing_inv _ (Ne.isUnit (G_det hZ h)),
+        one_mulVec]
     refine Prod.ext (Prod.ext (Subtype.ext ?_) rfl) hDx
     show y + E Z ((G Z)⁻¹ *ᵥ w) - Pr Z (y + E Z ((G Z)⁻¹ *ᵥ w)) = y
     rw [hPy, add_sub_cancel_right]
@@ -75,9 +77,11 @@ def Gm : (Fin (d Z) → k) ≃ₜ (Fin (d Z) → k) where
   continuous_toFun := continuous_const.matrix_mulVec continuous_id
   continuous_invFun := continuous_const.matrix_mulVec continuous_id
 
-def F1 : TT Z × (Fin (d Z) → k) ≃ₜ Sp k n := ((Homeomorph.refl (TT Z)).prodCongr (Gm hZ h)).trans (Hb hZ h).symm
+def F1 : TT Z × (Fin (d Z) → k) ≃ₜ Sp k n :=
+  ((Homeomorph.refl (TT Z)).prodCongr (Gm hZ h)).trans (Hb hZ h).symm
 
-theorem real_test_function_apply (q : TT Z × (Fin (d Z) → k)) : F1 hZ h q = (q.1.1.1 + E Z q.2, q.1.2) := by
+theorem real_test_function_apply (q : TT Z × (Fin (d Z) → k))
+    : F1 hZ h q = (q.1.1.1 + E Z q.2, q.1.2) := by
   show (q.1.1.1 + E Z ((G Z)⁻¹ *ᵥ (G Z *ᵥ q.2)), q.1.2) = _
   rw [mulVec_mulVec, nonsing_inv_mul _ (Ne.isUnit (G_det hZ h)), one_mulVec]
 

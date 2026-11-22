@@ -15,35 +15,45 @@ open Formalism.UG GlobalTheory.Hk3.IntWitt
 
 variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
 
-theorem val_lt_exp_of_dvdPow_succ {ϖ x : L}
-    (hϖ : Valued.v ϖ = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)))
-    {N : ℕ} (hx : DvdPow ϖ (N + 1) x) : Valued.v x < WithZero.exp (-(N : ℤ)) := by
+theorem val_lt_exp_of_dvdPow_succ
+    {ϖ x : L}
+    (hϖ : Valued.v ϖ
+      = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)))
+    {N : ℕ} (hx : DvdPow ϖ (N + 1) x)
+    : Valued.v x < WithZero.exp (-(N : ℤ)) := by
   obtain ⟨b, hb, hxb⟩ := hx
   rw [hxb, map_mul, map_pow, hϖ]
-  calc (WithZero.exp (-1 : ℤ)) ^ (N + 1) * Valued.v b ≤ (WithZero.exp (-1 : ℤ)) ^ (N + 1) * 1 :=
-        mul_le_mul' le_rfl hb
+  calc
+    (WithZero.exp (-1 : ℤ)) ^ (N + 1) * Valued.v b
+      ≤ (WithZero.exp (-1 : ℤ)) ^ (N + 1) * 1 := mul_le_mul' le_rfl hb
     _ = WithZero.exp (-((N + 1 : ℕ) : ℤ)) := by
-        rw [mul_one, ← WithZero.exp_nsmul]; congr 1; push_cast; ring
+      rw [mul_one, ← WithZero.exp_nsmul]; congr 1; push_cast; ring
     _ < WithZero.exp (-(N : ℤ)) := WithZero.exp_lt_exp.2 (by push_cast; omega)
 
-theorem isClosed_dvdPow_sub {ϖ : L} (h0 : ϖ ≠ 0) (m : ℕ) (c : L) : IsClosed {x : L | DvdPow ϖ m (x - c)} := by
+theorem isClosed_dvdPow_sub {ϖ : L} (h0 : ϖ ≠ 0) (m : ℕ) (c : L)
+    : IsClosed {x : L | DvdPow ϖ m (x - c)} := by
   have hp : ϖ ^ m ≠ 0 := pow_ne_zero _ h0
-  have he : {x : L | DvdPow ϖ m (x - c)} =
-      (fun x => (ϖ ^ m)⁻¹ * (x - c)) ⁻¹' ((Valued.v (R := L)).integer : Set L) := by
+  have he
+      : {x : L | DvdPow ϖ m (x - c)}
+        = (fun x => (ϖ ^ m)⁻¹ * (x - c)) ⁻¹' ((Valued.v (R := L)).integer : Set L) := by
     ext x
     constructor
     · rintro ⟨b, hb, hxb⟩
       show Valued.v ((ϖ ^ m)⁻¹ * (x - c)) ≤ 1
-      rw [hxb, inv_mul_cancel_left₀ hp]; exact hb
+      rw [hxb, inv_mul_cancel_left₀ hp]
+      exact hb
     · intro hx
       exact ⟨(ϖ ^ m)⁻¹ * (x - c), hx, by rw [mul_inv_cancel_left₀ hp]⟩
   rw [he]
   exact (Valued.isClosed_integer L).preimage (by fun_prop)
 
-theorem exists_limit_dvdPow (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] [CompleteSpace L] (ϖ : L)
-    (hϖ : Valued.v ϖ = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)))
-    (a : ℕ → L) (ha : ∀ k, DvdPow ϖ (k + 1) (a (k + 1) - a k)) :
-    ∃ b : L, ∀ k, DvdPow ϖ (k + 1) (b - a k) := by
+theorem exists_limit_dvdPow
+    (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] [CompleteSpace L]
+    (ϖ : L)
+    (hϖ : Valued.v ϖ
+      = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)))
+    (a : ℕ → L) (ha : ∀ k, DvdPow ϖ (k + 1) (a (k + 1) - a k))
+    : ∃ b : L, ∀ k, DvdPow ϖ (k + 1) (b - a k) := by
   have h0 : ϖ ≠ 0 := by
     rintro rfl
     rw [map_zero] at hϖ

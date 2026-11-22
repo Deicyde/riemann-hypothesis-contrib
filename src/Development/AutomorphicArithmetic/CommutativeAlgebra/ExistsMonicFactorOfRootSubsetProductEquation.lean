@@ -92,13 +92,14 @@ private lemma weights {S ι : Type} [CommRing S] [DecidableEq ι] (Λ : Finset �
   · intro J hJ
     rw [mul_assoc, Finset.prod_erase_mul Λ t hJ, h0, mul_zero]
 
-private def Wt {A : Type} [CommRing A] (N m : ℕ) (α c' : A) (J : Finset (Fin N)) :
-    MvPolynomial (Fin N) A :=
-  MvPolynomial.C c' * ∏ J' ∈ (Finset.powersetCard m (Finset.univ : Finset (Fin N))).erase J,
-    (MvPolynomial.C α - ∏ i ∈ J', MvPolynomial.X i)
+private def Wt {A : Type} [CommRing A] (N m : ℕ) (α c' : A) (J : Finset (Fin N))
+    : MvPolynomial (Fin N) A :=
+  MvPolynomial.C c'
+    * ∏ J' ∈ (Finset.powersetCard m (Finset.univ : Finset (Fin N))).erase J,
+      (MvPolynomial.C α - ∏ i ∈ J', MvPolynomial.X i)
 
-private def Ph {A : Type} [CommRing A] (N m : ℕ) (α c' : A)
-    (f : Finset (Fin N) → Finset (Fin N)) : (MvPolynomial (Fin N) A)[X] :=
+private def Ph {A : Type} [CommRing A] (N m : ℕ) (α c' : A) (f : Finset (Fin N) → Finset (Fin N))
+    : (MvPolynomial (Fin N) A)[X] :=
   ∑ J ∈ Finset.powersetCard m (Finset.univ : Finset (Fin N)),
     C (Wt N m α c' J) * ∏ i ∈ f J, (X - C (MvPolynomial.X i))
 
@@ -196,29 +197,51 @@ private lemma eval_sum {S ι : Type} [CommRing S] {N : ℕ} (Λ : Finset ι) (ε
     linear_combination (-1) ^ d * e
   rw [Finset.sum_congr rfl key, ← Finset.mul_sum, ← Finset.sum_mul, h1, one_mul]
 
-theorem UpperTheory.exists_monic_factor_of_root_subset_product_equation :
-    ∀ (A : Type) [CommRing A] (g : A[X]) (n m N : ℕ), n + m = N → g.Monic → g.natDegree = N → ∀ (α : A) (c : Aˣ),
-      (∀ (S : Type) [CommRing S] [Algebra A S] (x : Fin N → S), g.map (algebraMap A S) = ∏ i, (X - C (x i)) → ∏ J ∈ Finset.powersetCard m (Finset.univ : Finset (Fin N)), (algebraMap A S α - ∏ i ∈ J, x i) = 0 ∧
-        ∑ J ∈ Finset.powersetCard m (Finset.univ : Finset (Fin N)), ∏ J' ∈ (Finset.powersetCard m (Finset.univ : Finset (Fin N))).erase J, (algebraMap A S α - ∏ i ∈ J', x i) = algebraMap A S c) →
-      ∃ P Q : A[X], P.Monic ∧ Q.Monic ∧ g = P * Q ∧ Q.natDegree ≤ m ∧ Q.coeff m = 1 ∧ Q.eval 0 = (-1) ^ m * α := by
+theorem UpperTheory.exists_monic_factor_of_root_subset_product_equation
+    : ∀ (A : Type) [CommRing A] (g : A[X]) (n m N : ℕ),
+      n + m = N → g.Monic → g.natDegree = N
+        → ∀ (α : A) (c : Aˣ),
+          (∀ (S : Type) [CommRing S] [Algebra A S] (x : Fin N → S),
+              g.map (algebraMap A S) = ∏ i, (X - C (x i))
+                → ∏ J ∈ Finset.powersetCard m (Finset.univ : Finset (Fin N)), (algebraMap A S α - ∏ i ∈ J, x i)
+                    = 0
+                  ∧ ∑ J ∈ Finset.powersetCard m (Finset.univ : Finset (Fin N)), ∏ J' ∈ (Finset.powersetCard m (Finset.univ : Finset (Fin N))).erase J, (algebraMap A S α - ∏ i ∈ J', x i)
+                    = algebraMap A S c)
+            → ∃ P Q : A[X],
+              P.Monic ∧ Q.Monic ∧ g = P * Q ∧ Q.natDegree ≤ m ∧ Q.coeff m = 1
+                ∧ Q.eval 0 = (-1) ^ m * α := by
   intro A _ g n m N hnm hg hN α c hyp
   rcases subsingleton_or_nontrivial A with hA | hA
-  · exact ⟨1, 1, monic_one, monic_one, Subsingleton.elim _ _, by simp,
-      Subsingleton.elim _ _, Subsingleton.elim _ _⟩
+  · exact ⟨
+      1,
+      1,
+      monic_one,
+      monic_one,
+      Subsingleton.elim _ _,
+      by simp,
+      Subsingleton.elim _ _,
+      Subsingleton.elim _ _
+    ⟩
   classical
-  obtain ⟨q, hqdeg, hq⟩ := UpperTheory.exists_polynomial_eq_map_eval_roots_of_perm_invariant A N g (Ph N m α (↑c⁻¹ : A) (fun J => J))
-    (Ph_sym N m α _ _ (fun σ J => rfl))
-  obtain ⟨p, -, hp⟩ := UpperTheory.exists_polynomial_eq_map_eval_roots_of_perm_invariant A N g (Ph N m α (↑c⁻¹ : A) (fun J => Jᶜ))
-    (Ph_sym N m α _ _ (fun σ J => by ext i; simp [Finset.mem_map_equiv]))
+  obtain ⟨q, hqdeg, hq⟩ :=
+    UpperTheory.exists_polynomial_eq_map_eval_roots_of_perm_invariant A N g
+      (Ph N m α (↑c⁻¹ : A) (fun J => J)) (Ph_sym N m α _ _ (fun σ J => rfl))
+  obtain ⟨p, -, hp⟩ :=
+    UpperTheory.exists_polynomial_eq_map_eval_roots_of_perm_invariant A N g
+      (Ph N m α (↑c⁻¹ : A) (fun J => Jᶜ))
+      (Ph_sym N m α _ _ (fun σ J => by ext i; simp [Finset.mem_map_equiv]))
   obtain ⟨S, iS, aS, hinj, x, hx⟩ := exists_roots hg hN
   haveI : Nontrivial S := hinj.nontrivial
-  have hinjX : Function.Injective (Polynomial.map (algebraMap A S)) := Polynomial.map_injective _ hinj
+  have hinjX : Function.Injective (Polynomial.map (algebraMap A S)) :=
+    Polynomial.map_injective _ hinj
   obtain ⟨h0, h1⟩ := hyp S x hx
   have hc : algebraMap A S (↑c⁻¹ : A) * algebraMap A S (↑c : A) = 1 := by
     rw [← map_mul]
     simp
-  obtain ⟨w1, w2, w3⟩ := weights (Finset.powersetCard m (Finset.univ : Finset (Fin N)))
-    (fun J => algebraMap A S α - ∏ i ∈ J, x i) _ _ hc h0 h1
+  obtain ⟨w1, w2, w3⟩ :=
+    weights (Finset.powersetCard m (Finset.univ : Finset (Fin N)))
+      (fun J => algebraMap A S α - ∏ i ∈ J, x i)
+      _ _ hc h0 h1
   have hqS := hq S x hx
   rw [Ph_map] at hqS
   have hpS := hp S x hx
@@ -230,12 +253,16 @@ theorem UpperTheory.exists_monic_factor_of_root_subset_product_equation :
     rw [← Polynomial.coeff_map, hqS,
       coeff_sum _ _ (fun J => J) x m (fun J hJ => (Finset.mem_powersetCard.mp hJ).2), w1, map_one]
   have hQm : q.Monic := by
-    have e : q.natDegree = m := natDegree_eq_of_le_of_coeff_ne_zero hQd (by rw [hQc]; exact one_ne_zero)
+    have e : q.natDegree = m :=
+      natDegree_eq_of_le_of_coeff_ne_zero hQd (by rw [hQc]; exact one_ne_zero)
     rw [Monic, leadingCoeff, e, hQc]
   have hg' : g = p * q := by
     apply hinjX
     rw [Polynomial.map_mul, hpS, hqS, hx]
-    exact (idem_mul _ _ (fun J => ∏ i ∈ Jᶜ, (X - C (x i))) (fun J => ∏ i ∈ J, (X - C (x i))) _ w1 w2
+    exact (idem_mul _ _
+      (fun J => ∏ i ∈ Jᶜ, (X - C (x i)))
+      (fun J => ∏ i ∈ J, (X - C (x i)))
+      _ w1 w2
       (fun J _ => Finset.prod_compl_mul_prod J _)).symm
   refine ⟨p, q, Monic.of_mul_monic_right hQm (hg' ▸ hg), hQm, hg', hQd, hQc, ?_⟩
   apply hinj

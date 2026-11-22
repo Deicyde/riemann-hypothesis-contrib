@@ -13,48 +13,55 @@ namespace PI.GalTorsConj.W
 open Formalism.L2.Th1.F
 
 def St (L L' : PeriodPair) (M : IntermediateField ℚ ℂ) (ρ : M →ₐ[ℚ] ℂ) (t t' : ℂ) : Prop :=
-  (t ∈ L.lattice ∧ t' ∈ L'.lattice) ∨
-  (t ∉ L.lattice ∧ t' ∉ L'.lattice ∧ ∃ (hx : L.weierstrassP t ∈ M) (hy : L.derivWeierstrassP t ∈ M),
-    L'.weierstrassP t' = ρ ⟨_, hx⟩ ∧ L'.derivWeierstrassP t' = ρ ⟨_, hy⟩)
+  (t ∈ L.lattice ∧ t' ∈ L'.lattice)
+    ∨ (t ∉ L.lattice ∧ t' ∉ L'.lattice
+      ∧ ∃ (hx : L.weierstrassP t ∈ M) (hy : L.derivWeierstrassP t ∈ M),
+        L'.weierstrassP t' = ρ ⟨_, hx⟩ ∧ L'.derivWeierstrassP t' = ρ ⟨_, hy⟩)
 
 section maps
 
 variable {K K' : Type*} [Field K] [Field K']
 
-theorem addX_map (φ : K →+* K') (x y x₂ y₂ : K) :
-    φ (addX x y x₂ y₂) = addX (φ x) (φ y) (φ x₂) (φ y₂) := by
-  simp only [addX, addY, dblX, dblY, map_div₀, map_sub, map_pow, map_mul, map_add (f := _), map_neg, map_ofNat]
+theorem addX_map (φ : K →+* K') (x y x₂ y₂ : K)
+    : φ (addX x y x₂ y₂) = addX (φ x) (φ y) (φ x₂) (φ y₂) := by
+  simp only [addX, addY, dblX, dblY, map_div₀, map_sub, map_pow, map_mul, map_add (f := _), map_neg,
+    map_ofNat]
 
-theorem addY_map (φ : K →+* K') (x y x₂ y₂ : K) :
-    φ (addY x y x₂ y₂) = addY (φ x) (φ y) (φ x₂) (φ y₂) := by
-  simp only [addX, addY, dblX, dblY, map_div₀, map_sub, map_pow, map_mul, map_add (f := _), map_neg, map_ofNat]
+theorem addY_map (φ : K →+* K') (x y x₂ y₂ : K)
+    : φ (addY x y x₂ y₂) = addY (φ x) (φ y) (φ x₂) (φ y₂) := by
+  simp only [addX, addY, dblX, dblY, map_div₀, map_sub, map_pow, map_mul, map_add (f := _), map_neg,
+    map_ofNat]
 
-theorem dblX_map (φ : K →+* K') (x y g : K) :
-    φ (dblX x y g) = dblX (φ x) (φ y) (φ g) := by
-  simp only [addX, addY, dblX, dblY, map_div₀, map_sub, map_pow, map_mul, map_add (f := _), map_neg, map_ofNat]
+theorem dblX_map (φ : K →+* K') (x y g : K) : φ (dblX x y g) = dblX (φ x) (φ y) (φ g) := by
+  simp only [addX, addY, dblX, dblY, map_div₀, map_sub, map_pow, map_mul, map_add (f := _), map_neg,
+    map_ofNat]
 
-theorem dblY_map (φ : K →+* K') (x y g : K) :
-    φ (dblY x y g) = dblY (φ x) (φ y) (φ g) := by
-  simp only [addX, addY, dblX, dblY, map_div₀, map_sub, map_pow, map_mul, map_add (f := _), map_neg, map_ofNat]
+theorem dblY_map (φ : K →+* K') (x y g : K) : φ (dblY x y g) = dblY (φ x) (φ y) (φ g) := by
+  simp only [addX, addY, dblX, dblY, map_div₀, map_sub, map_pow, map_mul, map_add (f := _), map_neg,
+    map_ofNat]
 
 end maps
 
-theorem wp_add_mem (L : PeriodPair) (z : ℂ) {ω : ℂ} (h : ω ∈ L.lattice) :
-    L.weierstrassP (z + ω) = L.weierstrassP z := PeriodPair.weierstrassP_add_coe L z ⟨ω, h⟩
+theorem wp_add_mem (L : PeriodPair) (z : ℂ) {ω : ℂ} (h : ω ∈ L.lattice)
+    : L.weierstrassP (z + ω) = L.weierstrassP z :=
+  PeriodPair.weierstrassP_add_coe L z ⟨ω, h⟩
 
-theorem dwp_add_mem (L : PeriodPair) (z : ℂ) {ω : ℂ} (h : ω ∈ L.lattice) :
-    L.derivWeierstrassP (z + ω) = L.derivWeierstrassP z := PeriodPair.derivWeierstrassP_add_coe L z ⟨ω, h⟩
+theorem dwp_add_mem (L : PeriodPair) (z : ℂ) {ω : ℂ} (h : ω ∈ L.lattice)
+    : L.derivWeierstrassP (z + ω) = L.derivWeierstrassP z :=
+  PeriodPair.derivWeierstrassP_add_coe L z ⟨ω, h⟩
 
-theorem neg_pair (L : PeriodPair) {s r : ℂ} (h : s + r ∈ L.lattice) :
-    L.weierstrassP r = L.weierstrassP s ∧ L.derivWeierstrassP r = -L.derivWeierstrassP s := by
+theorem neg_pair (L : PeriodPair) {s r : ℂ} (h : s + r ∈ L.lattice)
+    : L.weierstrassP r = L.weierstrassP s ∧ L.derivWeierstrassP r = - L.derivWeierstrassP s := by
   have hr : r = -s + (s + r) := by ring
   rw [hr, wp_add_mem L _ h, dwp_add_mem L _ h, PeriodPair.weierstrassP_neg,
     PeriodPair.derivWeierstrassP_neg]
   exact ⟨rfl, rfl⟩
 
-theorem pInj (L : PeriodPair) {z w : ℂ} (hz : z ∉ L.lattice) (hw : w ∉ L.lattice)
-    (hx : L.weierstrassP z = L.weierstrassP w) (hy : L.derivWeierstrassP z = L.derivWeierstrassP w) :
-    z - w ∈ L.lattice := by
+theorem pInj
+    (L : PeriodPair)
+    {z w : ℂ} (hz : z ∉ L.lattice) (hw : w ∉ L.lattice) (hx : L.weierstrassP z = L.weierstrassP w)
+    (hy : L.derivWeierstrassP z = L.derivWeierstrassP w)
+    : z - w ∈ L.lattice := by
   rcases (pInjective L z w hz hw).1 hx with h | h
   · exact h
   · have h1 := (neg_pair L h).2
@@ -64,12 +71,15 @@ theorem pInj (L : PeriodPair) {z w : ℂ} (hz : z ∉ L.lattice) (hw : w ∉ L.l
     rw [e]
     exact L.lattice.sub_mem h2 h
 
-theorem pNeg (L : PeriodPair) {z w : ℂ} (hz : z ∉ L.lattice) (hw : w ∉ L.lattice)
-    (hx : L.weierstrassP z = L.weierstrassP w) (hy : L.derivWeierstrassP z = -L.derivWeierstrassP w) :
-    z + w ∈ L.lattice := by
+theorem pNeg
+    (L : PeriodPair)
+    {z w : ℂ} (hz : z ∉ L.lattice) (hw : w ∉ L.lattice) (hx : L.weierstrassP z = L.weierstrassP w)
+    (hy : L.derivWeierstrassP z = - L.derivWeierstrassP w)
+    : z + w ∈ L.lattice := by
   have hw' : -w ∉ L.lattice := fun h => hw (by simpa using L.lattice.neg_mem h)
-  have h := pInj L hz hw' (by rw [PeriodPair.weierstrassP_neg, hx])
-    (by rw [PeriodPair.derivWeierstrassP_neg, hy])
+  have h :=
+    pInj L hz hw' (by rw [PeriodPair.weierstrassP_neg, hx])
+      (by rw [PeriodPair.derivWeierstrassP_neg, hy])
   simpa using h
 
 section rel
@@ -85,16 +95,16 @@ theorem st_mem_iff {t t' : ℂ} (h : St L L' M ρ t t') : t ∈ L.lattice ↔ t'
   · exact ⟨fun _ => h2, fun _ => h1⟩
   · exact ⟨fun h => absurd h h1, fun h => absurd h h2⟩
 
-theorem st_add_right {t t' ω : ℂ} (h : St L L' M ρ t t') (hω : ω ∈ L'.lattice) :
-    St L L' M ρ t (t' + ω) := by
+theorem st_add_right {t t' ω : ℂ} (h : St L L' M ρ t t') (hω : ω ∈ L'.lattice)
+    : St L L' M ρ t (t' + ω) := by
   rcases h with ⟨h1, h2⟩ | ⟨h1, h2, hx, hy, e1, e2⟩
   · exact Or.inl ⟨h1, L'.lattice.add_mem h2 hω⟩
   · refine Or.inr ⟨h1, fun hh => h2 (by simpa using L'.lattice.sub_mem hh hω), hx, hy, ?_, ?_⟩
     · rw [wp_add_mem L' t' hω, e1]
     · rw [dwp_add_mem L' t' hω, e2]
 
-theorem st_add_left {t t' ω : ℂ} (h : St L L' M ρ t t') (hω : ω ∈ L.lattice) :
-    St L L' M ρ (t + ω) t' := by
+theorem st_add_left {t t' ω : ℂ} (h : St L L' M ρ t t') (hω : ω ∈ L.lattice)
+    : St L L' M ρ (t + ω) t' := by
   rcases h with ⟨h1, h2⟩ | ⟨h1, h2, hx, hy, e1, e2⟩
   · exact Or.inl ⟨L.lattice.add_mem h1 hω, h2⟩
   · have ex : L.weierstrassP (t + ω) = L.weierstrassP t := wp_add_mem L t hω
@@ -109,8 +119,8 @@ theorem st_add_left {t t' ω : ℂ} (h : St L L' M ρ t t') (hω : ω ∈ L.latt
       congr 1
       exact Subtype.ext ey.symm
 
-theorem st_unique {t t₁ t₂ : ℂ} (h1 : St L L' M ρ t t₁) (h2 : St L L' M ρ t t₂) :
-    t₁ - t₂ ∈ L'.lattice := by
+theorem st_unique {t t₁ t₂ : ℂ} (h1 : St L L' M ρ t t₁) (h2 : St L L' M ρ t t₂)
+    : t₁ - t₂ ∈ L'.lattice := by
   rcases h1 with ⟨a1, b1⟩ | ⟨a1, b1, hx1, hy1, e1, f1⟩
   · rcases h2 with ⟨a2, b2⟩ | ⟨a2, _, _, _, _, _⟩
     · exact L'.lattice.sub_mem b1 b2
@@ -119,8 +129,7 @@ theorem st_unique {t t₁ t₂ : ℂ} (h1 : St L L' M ρ t t₁) (h2 : St L L' M
     · exact absurd a2 a1
     · exact pInj L' b1 b2 (by rw [e1, e2]) (by rw [f1, f2])
 
-theorem st_inj {t u s : ℂ} (h1 : St L L' M ρ t s) (h2 : St L L' M ρ u s) :
-    t - u ∈ L.lattice := by
+theorem st_inj {t u s : ℂ} (h1 : St L L' M ρ t s) (h2 : St L L' M ρ u s) : t - u ∈ L.lattice := by
   rcases h1 with ⟨a1, b1⟩ | ⟨a1, b1, hx1, hy1, e1, f1⟩
   · rcases h2 with ⟨a2, b2⟩ | ⟨a2, b2, _, _, _, _⟩
     · exact L.lattice.sub_mem a1 a2
@@ -131,9 +140,11 @@ theorem st_inj {t u s : ℂ} (h1 : St L L' M ρ t s) (h2 : St L L' M ρ u s) :
       have gy := rho_inj (f1.symm.trans f2)
       exact pInj L a1 a2 (congrArg Subtype.val gx) (congrArg Subtype.val gy)
 
-theorem st_add (hA : AddLaw) (hD : DblLaw) (hg2 : L.g₂ ∈ M) (hg2' : L'.g₂ = ρ ⟨_, hg2⟩)
-    {t t' u u' : ℂ} (ht : St L L' M ρ t t') (hu : St L L' M ρ u u') :
-    St L L' M ρ (t + u) (t' + u') := by
+theorem st_add
+    (hA : AddLaw) (hD : DblLaw)
+    (hg2 : L.g₂ ∈ M) (hg2' : L'.g₂ = ρ ⟨_, hg2⟩)
+    {t t' u u' : ℂ} (ht : St L L' M ρ t t') (hu : St L L' M ρ u u')
+    : St L L' M ρ (t + u) (t' + u') := by
   rcases ht with ⟨a1, b1⟩ | ⟨a1, b1, hx1, hy1, e1, f1⟩
   · have := st_add_right (st_add_left hu a1) b1
     rwa [add_comm u t, add_comm u' t'] at this
@@ -161,13 +172,12 @@ theorem st_add (hA : AddLaw) (hD : DblLaw) (hg2 : L.g₂ ∈ M) (hg2' : L'.g₂ 
     rw [f1, f2, ← map_neg] at p2
     have k1 := congrArg Subtype.val (rho_inj p1)
     have k2 := congrArg Subtype.val (rho_inj p2)
-    have k : L.derivWeierstrassP u = -L.derivWeierstrassP t := k2
+    have k : L.derivWeierstrassP u = - L.derivWeierstrassP t := k2
     exact hs (pNeg L a1 a2 k1.symm (by linear_combination k))
   right
   refine ⟨hs, hs', ?_⟩
   by_cases hd : t - u ∈ L.lattice
-  ·
-    have htu : St L L' M ρ t u' := by
+  · have htu : St L L' M ρ t u' := by
       have := st_add_left hu hd
       rwa [show u + (t - u) = t by ring] at this
     have hd' : t' - u' ∈ L'.lattice := st_unique ht htu
@@ -197,16 +207,17 @@ theorem st_add (hA : AddLaw) (hD : DblLaw) (hg2 : L.g₂ ∈ M) (hg2' : L'.g₂ 
     refine ⟨by rw [v1]; exact SetLike.coe_mem _, by rw [v2]; exact SetLike.coe_mem _, ?_, ?_⟩
     · rw [et', wp_add_mem L' _ n1', d1', e1, f1, hg2']
       have : (⟨_, (by rw [v1]; exact SetLike.coe_mem _ : L.weierstrassP (t + u) ∈ M)⟩ : M)
-          = dblX X1 Y1 G := Subtype.ext v1
+          = dblX X1 Y1 G :=
+        Subtype.ext v1
       rw [this]
       exact (dblX_map (ρ : M →+* ℂ) X1 Y1 G).symm
     · rw [et', dwp_add_mem L' _ n1', d2', e1, f1, hg2']
       have : (⟨_, (by rw [v2]; exact SetLike.coe_mem _ : L.derivWeierstrassP (t + u) ∈ M)⟩ : M)
-          = dblY X1 Y1 G := Subtype.ext v2
+          = dblY X1 Y1 G :=
+        Subtype.ext v2
       rw [this]
       exact (dblY_map (ρ : M →+* ℂ) X1 Y1 G).symm
-  ·
-    have hd' : t' - u' ∉ L'.lattice := by
+  · have hd' : t' - u' ∉ L'.lattice := by
       intro h
       have hut : St L L' M ρ u t' := by
         have := st_add_right hu h
@@ -223,18 +234,23 @@ theorem st_add (hA : AddLaw) (hD : DblLaw) (hg2 : L.g₂ ∈ M) (hg2' : L'.g₂ 
     refine ⟨by rw [v1]; exact SetLike.coe_mem _, by rw [v2]; exact SetLike.coe_mem _, ?_, ?_⟩
     · rw [d1', e1, f1, e2, f2]
       have : (⟨_, (by rw [v1]; exact SetLike.coe_mem _ : L.weierstrassP (t + u) ∈ M)⟩ : M)
-          = addX X1 Y1 X2 Y2 := Subtype.ext v1
+          = addX X1 Y1 X2 Y2 :=
+        Subtype.ext v1
       rw [this]
       exact (addX_map (ρ : M →+* ℂ) X1 Y1 X2 Y2).symm
     · rw [d2', e1, f1, e2, f2]
       have : (⟨_, (by rw [v2]; exact SetLike.coe_mem _ : L.derivWeierstrassP (t + u) ∈ M)⟩ : M)
-          = addY X1 Y1 X2 Y2 := Subtype.ext v2
+          = addY X1 Y1 X2 Y2 :=
+        Subtype.ext v2
       rw [this]
       exact (addY_map (ρ : M →+* ℂ) X1 Y1 X2 Y2).symm
 
-theorem st_nsmul (hA : AddLaw) (hD : DblLaw) (hg2 : L.g₂ ∈ M) (hg2' : L'.g₂ = ρ ⟨_, hg2⟩)
-    {t t' : ℂ} (h : St L L' M ρ t t') (n : ℕ) :
-    St L L' M ρ ((n : ℂ) * t) ((n : ℂ) * t') := by
+theorem st_nsmul
+    (hA : AddLaw) (hD : DblLaw)
+    (hg2 : L.g₂ ∈ M) (hg2' : L'.g₂ = ρ ⟨_, hg2⟩)
+    {t t' : ℂ} (h : St L L' M ρ t t')
+    (n : ℕ)
+    : St L L' M ρ ((n : ℂ) * t) ((n : ℂ) * t') := by
   induction n with
   | zero => simpa using (st_zero : St L L' M ρ 0 0)
   | succ n ih =>
@@ -244,10 +260,11 @@ theorem st_nsmul (hA : AddLaw) (hD : DblLaw) (hg2 : L.g₂ ∈ M) (hg2' : L'.g�
     rw [e1, e2]
     exact h2
 
-theorem st_exists (hO : POnto) (hg2 : L.g₂ ∈ M) (hg3 : L.g₃ ∈ M)
-    (hg2' : L'.g₂ = ρ ⟨_, hg2⟩) (hg3' : L'.g₃ = ρ ⟨_, hg3⟩) (t : ℂ)
-    (ht : t ∈ L.lattice ∨ (L.weierstrassP t ∈ M ∧ L.derivWeierstrassP t ∈ M)) :
-    ∃ t', St L L' M ρ t t' := by
+theorem st_exists
+    (hO : POnto)
+    (hg2 : L.g₂ ∈ M) (hg3 : L.g₃ ∈ M) (hg2' : L'.g₂ = ρ ⟨_, hg2⟩) (hg3' : L'.g₃ = ρ ⟨_, hg3⟩)
+    (t : ℂ) (ht : t ∈ L.lattice ∨ (L.weierstrassP t ∈ M ∧ L.derivWeierstrassP t ∈ M))
+    : ∃ t', St L L' M ρ t t' := by
   by_cases h : t ∈ L.lattice
   · exact ⟨0, Or.inl ⟨h, L'.lattice.zero_mem⟩⟩
   obtain ⟨hx, hy⟩ := ht.resolve_left h

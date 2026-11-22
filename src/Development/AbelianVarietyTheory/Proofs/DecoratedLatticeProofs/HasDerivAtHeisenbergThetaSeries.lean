@@ -12,10 +12,15 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.IsS
 @[expose] public section
 
 open scoped ComplexConjugate Matrix NNReal ENNReal
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.Cusp GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
-open GlobalTheory.IndefiniteRowSideFullHecke.SphericalVolumeLift (FinPl RealMat Lat IsFockVec IsSphOff HidaSetting volQ)
-open GlobalTheory.IndefiniteRowSideFullHecke.SphericalZero (ip delta swSec sZero IsKFinVec ThetaClause SectionClause CoefClause)
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.Cusp GlobalTheory.AdelicU GlobalTheory.Doubling
+  GlobalTheory.Cont GlobalTheory.MixModel
+open GlobalTheory.IndefiniteRowSideFullHecke.SphericalVolumeLift
+  (FinPl RealMat Lat IsFockVec IsSphOff HidaSetting volQ)
+open GlobalTheory.IndefiniteRowSideFullHecke.SphericalZero
+  (ip delta swSec sZero IsKFinVec ThetaClause SectionClause CoefClause)
 open GlobalTheory.Mem.Th (CptF)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Core.Rk.IP GlobalTheory.Core.Rk.SWLaw
@@ -26,10 +31,16 @@ noncomputable section
 
 namespace GlobalTheory.Core.Rk.OntoDer
 
-theorem hasDerivAt_term {G : Type} [AddCommGroup G] (a : ℝ →+ G) (p : G →+ ℂ) (κ : ℂ) (hκ : ∀ t : ℝ, p (a t) = t * κ)
-    (φ φ₁ : G → ℂ) (hφ : ∀ x, HasDerivAt (fun t : ℝ => φ (x + a t)) (φ₁ x) 0) (u : G) (s : ℝ) :
-    HasDerivAt (fun t : ℝ => Complex.exp (t * p (a t) + t * p u + t * p u) * φ (u + a t))
-      (Complex.exp (s * p (a s) + s * p u + s * p u) * ((p + p) (u + a s) * φ (u + a s) + φ₁ (u + a s))) s := by
+theorem hasDerivAt_term
+    {G : Type} [AddCommGroup G]
+    (a : ℝ →+ G) (p : G →+ ℂ) (κ : ℂ) (hκ : ∀ t : ℝ, p (a t) = t * κ)
+    (φ φ₁ : G → ℂ) (hφ : ∀ x, HasDerivAt (fun t : ℝ => φ (x + a t)) (φ₁ x) 0)
+    (u : G) (s : ℝ)
+    : HasDerivAt
+      (fun t : ℝ => Complex.exp (t * p (a t) + t * p u + t * p u) * φ (u + a t))
+      (Complex.exp (s * p (a s) + s * p u + s * p u)
+        * ((p + p) (u + a s) * φ (u + a s) + φ₁ (u + a s)))
+      s := by
   have h1 : HasDerivAt (fun t : ℝ => φ (u + a t)) (φ₁ (u + a s)) s := by
     have h := hφ (u + a s)
     rw [← sub_self s] at h
@@ -47,53 +58,68 @@ theorem hasDerivAt_term {G : Type} [AddCommGroup G] (a : ℝ →+ G) (p : G →+
 
 variable {D : D7}
 
-theorem two_halves (S T : HSp D) (x y : WO S T) : symplO S T x y = symplOH S T x y + symplOH S T x y := by
+theorem two_halves (S T : HSp D) (x y : WO S T)
+    : symplO S T x y = symplOH S T x y + symplOH S T x y := by
   unfold symplOH
   rw [← add_mul, ← map_add (f := _), add_halves, map_one, one_mul]
 
-theorem phase_identity {S S₀ T : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (x y a b ξ : Mx D T.rank ρ) :
-    symplOH S T (d.extX T x + d.extY T y) (d.extX T a + d.extY T b) +
-        (-(symplOH S T (d.extX T (x + a)) (d.extY T (y + b)))) + symplO S T (d.extX T (x + a + ξ)) (d.extY T (y + b)) =
-      -(symplOH S T (d.extX T x) (d.extY T y)) + symplO S T (d.extX T (x + ξ)) (d.extY T y) +
-        (symplOH S T (d.extX T a) (d.extY T b) + symplOH S T (d.extX T (x + ξ)) (d.extY T b) +
-          symplOH S T (d.extX T (x + ξ)) (d.extY T b)) := by
-  simp only [two_halves, map_add (f := _), GlobalTheory.WeilVacMove.symplOH_add_left, GlobalTheory.WeilVacMove.symplOH_add_right,
-    HypDec.symplOH_extX_extX, HypDec.symplOH_extY_extY,
+theorem phase_identity {S S₀ T : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) (x y a b ξ : Mx D T.rank ρ)
+    : symplOH S T (d.extX T x + d.extY T y) (d.extX T a + d.extY T b)
+        + (-(symplOH S T (d.extX T (x + a)) (d.extY T (y + b))))
+        + symplO S T (d.extX T (x + a + ξ)) (d.extY T (y + b))
+      = -(symplOH S T (d.extX T x) (d.extY T y)) + symplO S T (d.extX T (x + ξ)) (d.extY T y)
+        + (symplOH S T (d.extX T a) (d.extY T b) + symplOH S T (d.extX T (x + ξ)) (d.extY T b)
+          + symplOH S T (d.extX T (x + ξ)) (d.extY T b)) := by
+  simp only [two_halves, map_add (f := _), GlobalTheory.WeilVacMove.symplOH_add_left,
+    GlobalTheory.WeilVacMove.symplOH_add_right, HypDec.symplOH_extX_extX, HypDec.symplOH_extY_extY,
     GlobalTheory.WeilVacMove.symplOH_skew S T (d.extX T a) (d.extY T y)]
   ring
 
-theorem eq_ext (A B : HSp D) (w : WO (dblSp A) B) :
-    w = (dblDec A).extX B (HMul.hMul w (dblDec A).jX) + (dblDec A).extY B (HMul.hMul w (dblDec A).jY) := by
+theorem eq_ext (A B : HSp D) (w : WO (dblSp A) B)
+    : w
+      = (dblDec A).extX B (HMul.hMul w (dblDec A).jX)
+        + (dblDec A).extY B (HMul.hMul w (dblDec A).jY) := by
   have h0 : HMul.hMul (dblDec A).j0 (dblDec A).p0 = (0 : Mx D (dblSp A).rank (dblSp A).rank) := by
     ext i j
     rw [Matrix.mul_apply]
     exact Finset.sum_eq_zero fun k _ => Fin.elim0 k
   have h := (dblDec A).sum_eq_one
   rw [h0, add_zero] at h
-  rw [HypDec.extX_apply, HypDec.extY_apply, Matrix.mul_assoc, Matrix.mul_assoc, ← Matrix.mul_add, h, Matrix.mul_one]
+  rw [HypDec.extX_apply, HypDec.extY_apply, Matrix.mul_assoc, Matrix.mul_assoc, ← Matrix.mul_add, h,
+    Matrix.mul_one]
 
 def mulLine {m n k : ℕ} (M : ℝ →+ Mx D m n) (j : Mx D n k) : ℝ →+ Mx D m k where
   toFun t := HMul.hMul (M t) j
   map_zero' := by rw [map_zero, Matrix.zero_mul]
   map_add' s t := by rw [map_add (f := _), Matrix.add_mul]
 
-theorem continuous_mulLine {m n k : ℕ} {M : ℝ →+ Mx D m n} (hM : Continuous M) (j : Mx D n k) :
-    Continuous (mulLine M j) := hM.matrix_mul continuous_const
+theorem continuous_mulLine {m n k : ℕ} {M : ℝ →+ Mx D m n} (hM : Continuous M) (j : Mx D n k)
+    : Continuous (mulLine M j) :=
+  hM.matrix_mul continuous_const
 
-theorem map_mul_zero {m n k : ℕ} {R : Type} [CommRing R] (q : AE D →+* R) {u : Mx D m n} (hu : u.map q = 0)
-    (j : Mx D n k) : (HMul.hMul u j : Mx D m k).map q = 0 := by
+theorem map_mul_zero
+    {m n k : ℕ} {R : Type} [CommRing R]
+    (q : AE D →+* R)
+    {u : Mx D m n} (hu : u.map q = 0)
+    (j : Mx D n k)
+    : (HMul.hMul u j : Mx D m k).map q = 0 := by
   rw [Matrix.map_mul, hu, Matrix.zero_mul]
 
-theorem exists_summable_bound {θ : InfFam D} (hθ : IsInfFam θ) {m n : ℕ} {φ : Mx D m n → ℂ}
-    (hφ : GlobalTheory.IndefiniteRowSideFullHecke.SchwartzBruhatMixedFamilies.IsSchwartzBruhat φ) {Q : Set (Mx D m n)} (hQ : IsCompact Q) :
-    ∃ b : Matrix (Fin m) (Fin n) D.host.E → ℝ, Summable b ∧ ∀ x ∈ Q, ∀ ξ, ‖φ (x + rat ξ)‖ ≤ b ξ := by
-  obtain ⟨N, hN⟩ := GlobalTheory.T.exists_summable_bound_schwartz_majorant_rational_translates D θ hθ m n
-  obtain ⟨-, K, hK, hC⟩ := GlobalTheory.T.schwartzBruhatAdelicMatrix_continuous_le_majorant D θ hθ m n φ hφ
+theorem exists_summable_bound
+    {θ : InfFam D} (hθ : IsInfFam θ)
+    {m n : ℕ} {φ : Mx D m n → ℂ}
+    (hφ : GlobalTheory.IndefiniteRowSideFullHecke.SchwartzBruhatMixedFamilies.IsSchwartzBruhat φ)
+    {Q : Set (Mx D m n)} (hQ : IsCompact Q)
+    : ∃ b : Matrix (Fin m) (Fin n) D.host.E → ℝ,
+      Summable b ∧ ∀ x ∈ Q, ∀ ξ, ‖φ (x + rat ξ)‖ ≤ b ξ := by
+  obtain ⟨N, hN⟩ :=
+    GlobalTheory.T.exists_summable_bound_schwartz_majorant_rational_translates D θ hθ m n
+  obtain ⟨-, K, hK, hC⟩ :=
+    GlobalTheory.T.schwartzBruhatAdelicMatrix_continuous_le_majorant D θ hθ m n φ hφ
   obtain ⟨C, hC⟩ := hC N
   obtain ⟨b, hb, hb'⟩ := hN K Q hK hQ
   refine ⟨fun ξ => |C| * b ξ, hb.mul_left _, fun x hx ξ => (hC _).trans ?_⟩
   exact mul_le_mul (le_abs_self C) (hb' x hx ξ) (GlobalTheory.Unf.maj_nonneg _ _ _ _) (abs_nonneg C)
-
 
 set_option maxHeartbeats 1600000 in
 theorem hasDerivAt_heisO_thetaSeries : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), IsStdChar D ψ (-1) → ∀ (A B : HSp D) (φ : Mx D B.rank A.rank → ℂ), GlobalTheory.IndefiniteRowSideFullHecke.SchwartzBruhatMixedFamilies.IsSchwartzBruhat φ → ∀ f : WO (dblSp A) B → ℂ, (∀ w : WO (dblSp A) B, f w = ψ (-(symplOH (dblSp A) B ((dblDec A).extX B (HMul.hMul w (dblDec A).jX)) ((dblDec A).extY B (HMul.hMul w (dblDec A).jY)))) * ∑' ξ : Matrix (Fin B.rank) (Fin A.rank) D.host.E, ψ (symplO (dblSp A) B ((dblDec A).extX B (HMul.hMul w (dblDec A).jX + rat ξ)) ((dblDec A).extY B (HMul.hMul w (dblDec A).jY))) * φ (HMul.hMul w (dblDec A).jX + rat ξ)) → ∀ M : ℝ →+ WO (dblSp A) B, Continuous M → (∀ t, (M t).map (finPart D) = 0) → ∃ φ' : Mx D B.rank A.rank → ℂ, GlobalTheory.IndefiniteRowSideFullHecke.SchwartzBruhatMixedFamilies.IsSchwartzBruhat φ' ∧ ∀ f' : WO (dblSp A) B → ℂ, (∀ w : WO (dblSp A) B, f' w = ψ (-(symplOH (dblSp A) B ((dblDec A).extX B (HMul.hMul w (dblDec A).jX)) ((dblDec A).extY B (HMul.hMul w (dblDec A).jY)))) * ∑' ξ : Matrix (Fin B.rank) (Fin A.rank) D.host.E, ψ (symplO (dblSp A) B ((dblDec A).extX B (HMul.hMul w (dblDec A).jX + rat ξ)) ((dblDec A).extY B (HMul.hMul w (dblDec A).jY))) * φ' (HMul.hMul w (dblDec A).jX + rat ξ)) → ∀ w, HasDerivAt (fun t : ℝ => heisO ψ (dblSp A) B (M t) f w) (f' w) 0 := by

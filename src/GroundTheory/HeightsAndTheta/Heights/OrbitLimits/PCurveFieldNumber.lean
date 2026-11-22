@@ -15,7 +15,8 @@ open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo GroundTheory.Heights�
 
 noncomputable section
 
-theorem CurveFieldNumber.proof (hR1 : RegularityFunctionFieldNumber.Statement) : CurveFieldNumber.Statement := by
+theorem CurveFieldNumber.proof (hR1 : RegularityFunctionFieldNumber.Statement)
+    : CurveFieldNumber.Statement := by
   intro K _ ι _ Ω _ y hA hB
   set P := mCoordIdeal y with hPdef
   have : P.IsPrime := hA.2.1.1
@@ -23,22 +24,31 @@ theorem CurveFieldNumber.proof (hR1 : RegularityFunctionFieldNumber.Statement) :
   let L := FractionRing (MvPolynomial K Ω)
 
   let j : MRing ι ⧸ P →+* L :=
-    (algebraMap (MvPolynomial K Ω) L).comp (RingHom.kerLift (mConeMap y : MRing ι →+* MvPolynomial K Ω))
+    (algebraMap (MvPolynomial K Ω) L).comp
+      (RingHom.kerLift (mConeMap y : MRing ι →+* MvPolynomial K Ω))
   have hj : Function.Injective j :=
     (IsFractionRing.injective (MvPolynomial K Ω) L).comp (RingHom.kerLift_injective _)
   let Φ : FractionRing (MRing ι ⧸ P) →+* L := IsFractionRing.lift hj
   let c : Ω →+* L := (algebraMap (MvPolynomial K Ω) L).comp MvPolynomial.C
-  have hΦ : ∀ f, Φ (algebraMap _ _ (Ideal.Quotient.mk P f)) = algebraMap _ L (mConeMap y f) := fun f =>
-    (IsFractionRing.lift_algebraMap hj _).trans (congrArg (algebraMap (MvPolynomial K Ω) L)
-      (RingHom.kerLift_mk (mConeMap y : MRing ι →+* MvPolynomial K Ω) f))
+  have hΦ
+      : ∀ f, Φ (algebraMap _ _ (Ideal.Quotient.mk P f)) = algebraMap _ L (mConeMap y f) := fun f =>
+    (IsFractionRing.lift_algebraMap hj _).trans
+      (congrArg (algebraMap (MvPolynomial K Ω) L)
+        (RingHom.kerLift_mk (mConeMap y : MRing ι →+* MvPolynomial K Ω) f))
 
-  have hform : ∀ {g : MRing ι} {a : K → ℕ}, IsMultiHomog g a →
-      Φ (algebraMap _ _ (Ideal.Quotient.mk P g)) = c (aeval y g) * algebraMap _ L (∏ k, (X k : MvPolynomial K Ω) ^ a k) := by
+  have hform
+      : ∀ {g : MRing ι} {a : K → ℕ},
+        IsMultiHomog g a
+          → Φ (algebraMap _ _ (Ideal.Quotient.mk P g))
+            = c (aeval y g) * algebraMap _ L (∏ k, (X k : MvPolynomial K Ω) ^ a k) := by
     intro g a hg
-    rw [hΦ, LowerBoundFree.mConeMap_of_isMultiHomog y hg, map_mul]; rfl
-  have hT : ∀ a : K → ℕ, algebraMap (MvPolynomial K Ω) L (∏ k, (X k : MvPolynomial K Ω) ^ a k) ≠ 0 := fun a =>
-    (map_ne_zero_iff _ (IsFractionRing.injective _ L)).2 (Finset.prod_ne_zero_iff.2 fun k _ =>
-      pow_ne_zero _ (X_ne_zero k))
+    rw [hΦ, LowerBoundFree.mConeMap_of_isMultiHomog y hg, map_mul]
+    rfl
+  have hT
+      : ∀ a : K → ℕ,
+        algebraMap (MvPolynomial K Ω) L (∏ k, (X k : MvPolynomial K Ω) ^ a k) ≠ 0 := fun a =>
+    (map_ne_zero_iff _ (IsFractionRing.injective _ L)).2
+      (Finset.prod_ne_zero_iff.2 fun k _ => pow_ne_zero _ (X_ne_zero k))
 
   have hmem : ∀ {g : MRing ι} {a : K → ℕ}, IsMultiHomog g a → aeval y g = 0 → g ∈ P := by
     intro g a hg h0
@@ -52,7 +62,9 @@ theorem CurveFieldNumber.proof (hR1 : RegularityFunctionFieldNumber.Statement) :
       have hvP : v ∉ P := fun h => nonZeroDivisors.ne_zero hv ((Ideal.Quotient.eq_zero_iff_mem).2 h)
       have hvy : aeval y v ≠ 0 := fun h => hvP (hmem hvf h)
       refine ⟨aeval y u / aeval y v, ?_⟩
-      have h1 := congrArg Φ (IsLocalization.mk'_spec (FractionRing (MRing ι ⧸ P)) (Ideal.Quotient.mk P u) ⟨_, hv⟩)
+      have h1 :=
+        congrArg Φ
+          (IsLocalization.mk'_spec (FractionRing (MRing ι ⧸ P)) (Ideal.Quotient.mk P u) ⟨_, hv⟩)
       rw [map_mul, hform hvf, hform hu] at h1
       have hcv : c (aeval y v) ≠ 0 := (map_ne_zero_iff _ c.injective).2 hvy
       rw [map_div₀, div_eq_iff hcv]
@@ -73,7 +85,8 @@ theorem CurveFieldNumber.proof (hR1 : RegularityFunctionFieldNumber.Statement) :
 
   have hc : Function.Injective c.rangeRestrict := fun a b h => c.injective (congrArg Subtype.val h)
   let e : funField P ≃+* Ω :=
-    ((Subring.equivMapOfInjective (funField P) Φ Φ.injective).trans (RingEquiv.subringCongr heq)).trans
+    ((Subring.equivMapOfInjective (funField P) Φ Φ.injective).trans
+        (RingEquiv.subringCongr heq)).trans
       (RingEquiv.ofBijective c.rangeRestrict ⟨hc, c.rangeRestrict_surjective⟩).symm
   exact @NumberField.of_ringEquiv _ _ hF.toField _ e hN
 

@@ -9,7 +9,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC CrystallineSemistableComparison CrystallineSemistableComparison.Onto UpperTheory.Gal.KunnethLefschetz.G.PX
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC CrystallineSemistableComparison
+  CrystallineSemistableComparison.Onto UpperTheory.Gal.KunnethLefschetz.G.PX
 
 private lemma appTop_appLE {A B C : Scheme.{0}} (f : A ⟶ B) (g : B ⟶ C) (k : A ⟶ C) (h : f ≫ g = k)
     (N : C.Opens) (e₁ : ⊤ ≤ g ⁻¹ᵁ N) (e₂ : ⊤ ≤ k ⁻¹ᵁ N) (s : Γ(C, N)) :
@@ -22,10 +23,15 @@ private lemma appTop_appLE {A B C : Scheme.{0}} (f : A ⟶ B) (g : B ⟶ C) (k :
   rw [← h]
   rfl
 
-theorem UpperTheory.Gal.KunnethLefschetz.G.PX.locMatExists :
-    ∀ {K : Type} [CommRing K] {W Z Y : Scheme.{0}} {q : Z ⟶ Spec (CommRingCat.of K)} {i : W ⟶ Z} {π : Y ⟶ Z} {D : E.LineData Y} {d : ℕ} (B : Blow q i π D d) (α β : B.ι) {V : Scheme.{0}} (p : V ⟶ W), (∀ x : V, (p ≫ i) x ∈ B.V α ⊓ B.V β) → ∃ M : Matrix (Fin d) (Fin d) Γ(V, ⊤), LocMat B α β p M := by
+theorem UpperTheory.Gal.KunnethLefschetz.G.PX.locMatExists
+    : ∀ {K : Type} [CommRing K] {W Z Y : Scheme.{0}} {q : Z ⟶ Spec (CommRingCat.of K)} {i : W ⟶ Z}
+        {π : Y ⟶ Z} {D : E.LineData Y} {d : ℕ} (B : Blow q i π D d) (α β : B.ι) {V : Scheme.{0}}
+        (p : V ⟶ W),
+      (∀ x : V, (p ≫ i) x ∈ B.V α ⊓ B.V β)
+        → ∃ M : Matrix (Fin d) (Fin d) Γ(V, ⊤), LocMat B α β p M := by
   intro K _ W Z Y q i π D d B α β V p hp
-  have hN : ∀ x : V, ∃ N : Z.Opens, IsAffineOpen N ∧ (p ≫ i) x ∈ N ∧ N ≤ B.V α ⊓ B.V β := fun x => by
+  have hN
+      : ∀ x : V, ∃ N : Z.Opens, IsAffineOpen N ∧ (p ≫ i) x ∈ N ∧ N ≤ B.V α ⊓ B.V β := fun x => by
     obtain ⟨N, h1, h2, h3⟩ := exists_isAffineOpen_mem_and_subset (hp x)
     exact ⟨N, h1, h2, h3⟩
   choose N hNa hNx hNle using hN
@@ -53,8 +59,7 @@ theorem UpperTheory.Gal.KunnethLefschetz.G.PX.locMatExists :
     intro x y S f f' hff
     have n1 := locMatNat B α β f ((U x).ι ≫ p) (Mx x) (hL x)
     have n2 := locMatNat B α β f' ((U y).ι ≫ p) (Mx y) (hL y)
-    have e : f ≫ (U x).ι ≫ p = f' ≫ (U y).ι ≫ p := by
-      rw [← Category.assoc, hff, Category.assoc]
+    have e : f ≫ (U x).ι ≫ p = f' ≫ (U y).ι ≫ p := by rw [← Category.assoc, hff, Category.assoc]
     rw [e] at n1
     have := locMatUnique B α β _ _ _ n1 n2
     exact congrFun (congrFun this a) b

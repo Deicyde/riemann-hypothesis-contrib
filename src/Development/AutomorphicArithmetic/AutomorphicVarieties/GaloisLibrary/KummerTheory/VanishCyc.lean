@@ -4,10 +4,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum
 
-private theorem exists_level_pow_dvd_of_not_finOrder (l : ℕ) [hl : Fact l.Prime] (u : ℤ_[l]ˣ) (hu : ¬ IsOfFinOrder u) (a : ℕ) :
-    ∃ j : ℕ, ∀ m : ℤ, PadicInt.toZModPow j ((u ^ m : ℤ_[l]ˣ) : ℤ_[l]) = 1 → (l : ℤ) ^ (a + 1) ∣ m := by
+private theorem exists_level_pow_dvd_of_not_finOrder
+    (l : ℕ) [hl : Fact l.Prime] (u : ℤ_[l]ˣ) (hu : ¬ IsOfFinOrder u) (a : ℕ)
+    : ∃ j : ℕ, ∀ m : ℤ,
+      PadicInt.toZModPow j ((u ^ m : ℤ_[l]ˣ) : ℤ_[l]) = 1 → (l : ℤ) ^ (a + 1) ∣ m := by
   by_contra h
   push_neg at h
   apply hu
@@ -20,8 +24,10 @@ private theorem exists_level_pow_dvd_of_not_finOrder (l : ℕ) [hl : Fact l.Prim
   obtain ⟨m, hm, hnd⟩ := h j
   obtain ⟨w, hwdef⟩ : ∃ w : (ZMod (l ^ j))ˣ, w = Units.map (PadicInt.toZModPow j).toMonoidHom u :=
     ⟨_, rfl⟩
-  have hw : ∀ n : ℤ, ((w ^ n : (ZMod (l ^ j))ˣ) : ZMod (l ^ j)) =
-      PadicInt.toZModPow j ((u ^ n : ℤ_[l]ˣ) : ℤ_[l]) := by
+  have hw
+      : ∀ n : ℤ,
+        ((w ^ n : (ZMod (l ^ j))ˣ) : ZMod (l ^ j))
+          = PadicInt.toZModPow j ((u ^ n : ℤ_[l]ˣ) : ℤ_[l]) := by
     intro n
     rw [hwdef, ← map_zpow]
     rfl
@@ -56,10 +62,13 @@ private theorem exists_level_pow_dvd_of_not_finOrder (l : ℕ) [hl : Fact l.Prim
   rw [zpow_natCast, zpow_natCast, hwK, Units.val_one] at this
   rw [← this, Units.val_one, map_one]
 
-private theorem exists_open_subgroup_cycZ_trivial_mod_pow (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
-    (l : ℕ) [hl : Fact l.Prime] (j : ℕ) :
-    ∃ H : Subgroup (G F Ω), IsOpen (H : Set (G F Ω)) ∧
-      ∀ g ∈ H, PadicInt.toZModPow j ((cycZ F Ω l g : ℤ_[l]ˣ) : ℤ_[l]) = 1 := by
+private theorem exists_open_subgroup_cycZ_trivial_mod_pow
+    (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    (l : ℕ) [hl : Fact l.Prime]
+    (j : ℕ)
+    : ∃ H : Subgroup (G F Ω),
+      IsOpen (H : Set (G F Ω))
+        ∧ ∀ g ∈ H, PadicInt.toZModPow j ((cycZ F Ω l g : ℤ_[l]ˣ) : ℤ_[l]) = 1 := by
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed F
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap F Ω).injective
   haveI : NeZero (l : Ω) := ⟨Nat.cast_ne_zero.mpr hl.out.ne_zero⟩
@@ -67,18 +76,30 @@ private theorem exists_open_subgroup_cycZ_trivial_mod_pow (F Ω : Type) [Field F
   obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot Ω (l ^ j)
   haveI : FiniteDimensional F (IntermediateField.adjoin F ({ζ} : Set Ω)) :=
     IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral ζ)
-  refine ⟨(IntermediateField.adjoin F ({ζ} : Set Ω)).fixingSubgroup,
-    IntermediateField.fixingSubgroup_isOpen _, fun g hg => ?_⟩
+  refine ⟨
+    (IntermediateField.adjoin F ({ζ} : Set Ω)).fixingSubgroup,
+    IntermediateField.fixingSubgroup_isOpen _,
+    fun g hg => ?_
+  ⟩
   have hgζ : g ζ = ζ :=
-    (IntermediateField.mem_fixingSubgroup_iff _ _).mp hg ζ (IntermediateField.mem_adjoin_simple_self F ζ)
-  have hspec := cyclotomicCharacter.spec l (n := j) (MulSemiringAction.toRingAut (G F Ω) Ω g) ζ hζ.pow_eq_one
-  change PadicInt.toZModPow j ((cyclotomicCharacter Ω l (MulSemiringAction.toRingAut (G F Ω) Ω g) : ℤ_[l]ˣ) : ℤ_[l]) = 1
-  generalize PadicInt.toZModPow j ((cyclotomicCharacter Ω l (MulSemiringAction.toRingAut (G F Ω) Ω g) : ℤ_[l]ˣ) : ℤ_[l]) = z at hspec ⊢
+    (IntermediateField.mem_fixingSubgroup_iff _ _).mp hg ζ
+      (IntermediateField.mem_adjoin_simple_self F ζ)
+  have hspec :=
+    cyclotomicCharacter.spec l (n := j) (MulSemiringAction.toRingAut (G F Ω) Ω g) ζ hζ.pow_eq_one
+  change PadicInt.toZModPow j
+      ((cyclotomicCharacter Ω l (MulSemiringAction.toRingAut (G F Ω) Ω g) : ℤ_[l]ˣ) : ℤ_[l])
+    = 1
+  generalize PadicInt.toZModPow j
+        ((cyclotomicCharacter Ω l (MulSemiringAction.toRingAut (G F Ω) Ω g) : ℤ_[l]ˣ) : ℤ_[l])
+      = z
+    at hspec ⊢
   have h1 : ζ ^ 1 = ζ ^ z.val := by
     rw [pow_one, ← hspec]
     exact hgζ.symm
   have hu := hζ.isUnit_unit (NeZero.ne (l ^ j))
-  have h1' : (hζ.isUnit (NeZero.ne (l ^ j))).unit ^ 1 = (hζ.isUnit (NeZero.ne (l ^ j))).unit ^ z.val := by
+  have h1'
+      : (hζ.isUnit (NeZero.ne (l ^ j))).unit ^ 1
+        = (hζ.isUnit (NeZero.ne (l ^ j))).unit ^ z.val := by
     apply Units.ext
     simpa using h1
   rw [pow_eq_pow_iff_modEq, ← hu.eq_orderOf] at h1'
@@ -86,9 +107,12 @@ private theorem exists_open_subgroup_cycZ_trivial_mod_pow (F Ω : Type) [Field F
   rw [ZMod.natCast_val, ZMod.cast_id', id, Nat.cast_one] at h2
   exact h2
 
-theorem UpperTheory.V.Kum.vanishCyc :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (M : Type) [AddCommGroup M] (φ : Uinf F Ω l → M) (γ : G F Ω), IsLocallyConstant φ → (∀ a b, φ (a * b) = φ a + φ b) → (∀ m : M, ∃ k : ℕ, l ^ k • m = 0) → ¬ IsOfFinOrder (cycZ F Ω l γ) →
-    ∀ x : Uinf F Ω l, x.1 ∈ (Subgroup.zpowers γ).topologicalClosure → φ x = 0 := by
+theorem UpperTheory.V.Kum.vanishCyc
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
+        [Fact l.Prime] (M : Type) [AddCommGroup M] (φ : Uinf F Ω l → M) (γ : G F Ω),
+      IsLocallyConstant φ → (∀ a b, φ (a * b) = φ a + φ b) → (∀ m : M, ∃ k : ℕ, l ^ k • m = 0)
+        → ¬ IsOfFinOrder (cycZ F Ω l γ)
+        → ∀ x : Uinf F Ω l, x.1 ∈ (Subgroup.zpowers γ).topologicalClosure → φ x = 0 := by
   intro F Ω _ _ _ _ _ l hl M _ φ γ hφ hmul htor hγ x hx
   have h1 : φ 1 = 0 := by simpa using hmul 1 1
   have hpow : ∀ y : Uinf F Ω l, ∀ n : ℕ, φ (y ^ n) = n • φ y := by
@@ -111,13 +135,17 @@ theorem UpperTheory.V.Kum.vanishCyc :
     rw [hWeq] at this
     exact this
   haveI : Finite (G F Ω ⧸ E.fixingSubgroup) := Subgroup.quotient_finite_of_isOpen _ hN
-  obtain ⟨d, hd0, -, hdN⟩ := Subgroup.exists_pow_mem_of_index_ne_zero (Subgroup.index_ne_zero_of_finite (H := E.fixingSubgroup)) γ
+  obtain ⟨d, hd0, -, hdN⟩ :=
+    Subgroup.exists_pow_mem_of_index_ne_zero
+      (Subgroup.index_ne_zero_of_finite (H := E.fixingSubgroup)) γ
   obtain ⟨a, d', hd'l, hdd⟩ := Nat.exists_eq_pow_mul_and_not_dvd hd0.ne' l hl.out.ne_one
   obtain ⟨j, hj⟩ := exists_level_pow_dvd_of_not_finOrder l (cycZ F Ω l γ) hγ a
   obtain ⟨H, hHo, hH⟩ := exists_open_subgroup_cycZ_trivial_mod_pow F Ω l j
-  have ho : IsOpen ((fun g => x.1⁻¹ * g) ⁻¹' ((E.fixingSubgroup : Set (G F Ω)) ∩ (H : Set (G F Ω)))) :=
+  have ho
+      : IsOpen ((fun g => x.1⁻¹ * g) ⁻¹' ((E.fixingSubgroup : Set (G F Ω)) ∩ (H : Set (G F Ω)))) :=
     (hN.inter hHo).preimage (continuous_const.mul continuous_id)
-  have hxo : x.1 ∈ (fun g => x.1⁻¹ * g) ⁻¹' ((E.fixingSubgroup : Set (G F Ω)) ∩ (H : Set (G F Ω))) := by
+  have hxo
+      : x.1 ∈ (fun g => x.1⁻¹ * g) ⁻¹' ((E.fixingSubgroup : Set (G F Ω)) ∩ (H : Set (G F Ω))) := by
     simp only [Set.mem_preimage, inv_mul_cancel, Set.mem_inter_iff, SetLike.mem_coe]
     exact ⟨one_mem _, one_mem _⟩
   have hx' : x.1 ∈ closure ((Subgroup.zpowers γ : Subgroup (G F Ω)) : Set (G F Ω)) := by
@@ -131,14 +159,16 @@ theorem UpperTheory.V.Kum.vanishCyc :
     have := hH _ hνH
     rwa [map_mul, map_inv, hcx, inv_one, one_mul, map_zpow] at this
   have hma : (l : ℤ) ^ a ∣ m := (pow_dvd_pow _ (Nat.le_succ a)).trans (hj m hcyc)
-  have hcl : closure ((Subgroup.zpowers γ : Subgroup (G F Ω)) : Set (G F Ω)) ⊆ {y | y * γ = γ * y} := by
+  have hcl
+      : closure ((Subgroup.zpowers γ : Subgroup (G F Ω)) : Set (G F Ω)) ⊆ {y | y * γ = γ * y} := by
     apply closure_minimal
     · intro y hy
       obtain ⟨i, rfl⟩ := Subgroup.mem_zpowers_iff.mp hy
       exact (Commute.self_zpow γ i).symm.eq
     · exact isClosed_eq (continuous_id.mul continuous_const) (continuous_const.mul continuous_id)
   have hxγ : Commute x.1 γ := hcl hx'
-  have hxν : Commute x.1 (x.1⁻¹ * γ ^ m) := (Commute.refl x.1).inv_right.mul_right (hxγ.zpow_right m)
+  have hxν : Commute x.1 (x.1⁻¹ * γ ^ m) :=
+    (Commute.refl x.1).inv_right.mul_right (hxγ.zpow_right m)
   have hexp : (γ ^ m) ^ d' = x.1 ^ d' * (x.1⁻¹ * γ ^ m) ^ d' := by
     rw [← hxν.mul_pow, mul_inv_cancel_left]
   have hγN : (γ ^ m) ^ d' ∈ E.fixingSubgroup := by
@@ -164,4 +194,5 @@ theorem UpperTheory.V.Kum.vanishCyc :
   have ho2 : addOrderOf (φ x) ∣ l ^ k := addOrderOf_dvd_of_nsmul_eq_zero hk
   have hcop : Nat.Coprime d' (l ^ k) :=
     Nat.Coprime.pow_right _ (Nat.coprime_comm.mp ((Nat.Prime.coprime_iff_not_dvd hl.out).mpr hd'l))
-  exact AddMonoid.addOrderOf_eq_one_iff.mp (Nat.eq_one_of_dvd_one (by rw [← hcop.gcd_eq_one]; exact Nat.dvd_gcd ho1 ho2))
+  exact AddMonoid.addOrderOf_eq_one_iff.mp (Nat.eq_one_of_dvd_one (by
+    rw [← hcop.gcd_eq_one]; exact Nat.dvd_gcd ho1 ho2))

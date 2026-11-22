@@ -7,10 +7,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open IsLocalRing UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-theorem UpperTheory.V.Ws.P1.coefRes {l : ℕ} [hl : Fact l.Prime] (c : Coef l) :
-    Finite (ResidueField c.O) ∧ CharP (ResidueField c.O) l ∧
-      (∀ (c' : Coef l) (h : c.O ≤ c'.O), IsLocalHom (inc h)) ∧
-      ∀ (m : ℕ) (x : c.O), l.Coprime m → x ^ m = 1 → residue c.O x = 1 → x = 1 := by
+theorem UpperTheory.V.Ws.P1.coefRes {l : ℕ} [hl : Fact l.Prime] (c : Coef l)
+    : Finite (ResidueField c.O) ∧ CharP (ResidueField c.O) l
+      ∧ (∀ (c' : Coef l) (h : c.O ≤ c'.O), IsLocalHom (inc h))
+      ∧ ∀ (m : ℕ) (x : c.O), l.Coprime m → x ^ m = 1 → residue c.O x = 1 → x = 1 := by
   haveI := c.dvr
   haveI := c.fin
   obtain ⟨-, hfin, hlm, -, -, -⟩ := UpperTheory.V.abelian₂.dvr_finite l c.O
@@ -48,8 +48,8 @@ theorem UpperTheory.V.Ws.P1.coefRes {l : ℕ} [hl : Fact l.Prime] (c : Coef l) :
       have h0 := (IsLocalRing.residue_eq_zero_iff _).2 hmem
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum] at h0
-      simp only [map_pow, hres, one_pow, Finset.sum_const, Finset.card_range, nsmul_eq_mul,
-        mul_one] at h0
+      simp only [map_pow, hres, one_pow, Finset.sum_const, Finset.card_range, nsmul_eq_mul, mul_one]
+        at h0
       exact hnd ((CharP.cast_eq_zero_iff (ResidueField c.O) l m).1 h0)
     have hg := geom_sum_mul x m
     rw [hxm, sub_self] at hg

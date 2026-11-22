@@ -7,7 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.PhiTopTar
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC GlobalTheory.Mem.Col2.AdT Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC GlobalTheory.Mem.Col2.AdT
+  Matrix
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 noncomputable section
 
@@ -15,9 +18,11 @@ namespace GlobalTheory.TopRowsQ
 
 open GlobalTheory.TopStep GlobalTheory.Mem.Col2 GlobalTheory.TopLaw
 
-theorem redV_eq_of_cong {E : Type} [Field E] [NumberField E] [StarRing E] {n : ℕ} {P : HeightOneSpectrum (𝓞 E)} {c : ℕ}
-    (hc : 0 < c) {a b : Sp E n} (hb : b ∈ stdAt E n P) (h : (((qOf P : ℕ) : E) ^ c)⁻¹ • (a - b) ∈ stdAt E n P) :
-    a ∈ stdAt E n P ∧ redV P a = redV P b := by
+theorem redV_eq_of_cong
+    {E : Type} [Field E] [NumberField E] [StarRing E]
+    {n : ℕ} {P : HeightOneSpectrum (𝓞 E)} {c : ℕ} (hc : 0 < c)
+    {a b : Sp E n} (hb : b ∈ stdAt E n P) (h : (((qOf P : ℕ) : E) ^ c)⁻¹ • (a - b) ∈ stdAt E n P)
+    : a ∈ stdAt E n P ∧ redV P a = redV P b := by
   have hq := qOf_ne_zero (P := P)
   have h1 : ∀ i, IntAt P ((((qOf P : ℕ) : E) ^ c)⁻¹ * (a i - b i)) := fun i => mem_stdAt.1 h i
   have h2 : ∀ i, IntAt P (a i - b i) := fun i => by
@@ -39,14 +44,20 @@ theorem redV_eq_of_cong {E : Type} [Field E] [NumberField E] [StarRing E] {n : �
   rw [reduction_sub (ha i) (mem_stdAt.1 hb i), sub_eq_zero] at h4
   exact h4
 
-theorem lamQB_mul_levCong : ∀ {X : Fields} {R : Ranks} (ξ : Chr X.F X.E X.K) (Q : Finset (HeightOneSpectrum (𝓞 X.E))) (P : Q) (c M : ℕ), 1 ≤ M →
-    ∀ (k : Formalism.L2.Col.GLint X.E (R.N R.m) P.1) (hk : k ∈ (levCong (N_m_succ R) P.1 c (rowTyQ R ξ Q P)).H)
-    (g : Sp X.E (R.N R.m) ≃ₗ[X.E] Sp X.E (R.N R.m)) (g'' : Sp X.E ((R.N R.m - 1) + 0) ≃ₗ[X.E] Sp X.E ((R.N R.m - 1) + 0)),
-    g'' ∈ LocE.JQ P.1 (qOf P.1) R.r (R.N R.m - 1) 0 →
-    prXpG X.E (R.N R.m) ∘ₗ g.toLinearMap = g''.toLinearMap ∘ₗ prXpG X.E (R.N R.m) →
-    CongE P.1 (2 * M) g (k⁻¹).1 →
-    LocE.lamQB (resChar ξ P.1) R.r (R.N R.m - 1) g''.toLinearMap *
-      (((levCong (N_m_succ R) P.1 c (rowTyQ R ξ Q P)).lam ⟨k, hk⟩ : X.Kˣ) : X.K) = 1 := by
+theorem lamQB_mul_levCong
+    : ∀ {X : Fields} {R : Ranks} (ξ : Chr X.F X.E X.K) (Q : Finset (HeightOneSpectrum (𝓞 X.E)))
+        (P : Q) (c M : ℕ),
+      1 ≤ M
+        → ∀ (k : Formalism.L2.Col.GLint X.E (R.N R.m) P.1)
+            (hk : k ∈ (levCong (N_m_succ R) P.1 c (rowTyQ R ξ Q P)).H)
+            (g : Sp X.E (R.N R.m) ≃ₗ[X.E] Sp X.E (R.N R.m))
+            (g'' : Sp X.E ((R.N R.m - 1) + 0) ≃ₗ[X.E] Sp X.E ((R.N R.m - 1) + 0)),
+          g'' ∈ LocE.JQ P.1 (qOf P.1) R.r (R.N R.m - 1) 0
+            → prXpG X.E (R.N R.m) ∘ₗ g.toLinearMap = g''.toLinearMap ∘ₗ prXpG X.E (R.N R.m)
+            → CongE P.1 (2 * M) g (k⁻¹).1
+            → LocE.lamQB (resChar ξ P.1) R.r (R.N R.m - 1) g''.toLinearMap
+                * (((levCong (N_m_succ R) P.1 c (rowTyQ R ξ Q P)).lam ⟨k, hk⟩ : X.Kˣ) : X.K)
+              = 1 := by
   intro X R ξ Q P c M hM k hk g g'' hJ hpr hC
   have hN := N_m_succ R
   obtain ⟨j, hj, hb⟩ := (mem_levCong (N_m_succ R) c _ k).1 hk
@@ -59,10 +70,11 @@ theorem lamQB_mul_levCong : ∀ {X : Fields} {R : Ranks} (ξ : Chr X.F X.E X.K) 
   have hred : redGL _ P.1 g2 = (redGL _ P.1 j)⁻¹ := by
     refine redGL_eq g2 fun x hx => ?_
     let v : Sp X.E (R.N R.m) := fun l => if h : l.1 < R.N R.m - 1 then x ⟨l.1, h⟩ else 0
-    have hv : v ∈ stdAt X.E (R.N R.m) P.1 := mem_stdAt.2 fun l => by
-      by_cases h : l.1 < R.N R.m - 1
-      · simp only [v, dif_pos h]; exact mem_stdAt.1 hx _
-      · simp only [v, dif_neg h]; simpa using intAt_nat (P := P.1) 0
+    have hv : v ∈ stdAt X.E (R.N R.m) P.1 :=
+      mem_stdAt.2 fun l => by
+        by_cases h : l.1 < R.N R.m - 1
+        · simp only [v, dif_pos h]; exact mem_stdAt.1 hx _
+        · simp only [v, dif_neg h]; simpa using intAt_nat (P := P.1) 0
     have hpv : prXpG X.E (R.N R.m) v = x := by
       funext i
       show v _ = x i
@@ -85,11 +97,13 @@ theorem lamQB_mul_levCong : ∀ {X : Fields} {R : Ranks} (ξ : Chr X.F X.E X.K) 
     funext l
     show redP P.1 (v (Br.iC hN l)) = redP P.1 (x l)
     simp only [v, Br.iC, dif_pos l.2]
-  have hH : redGL _ P.1 g2 ∈ HQ (𝓞 X.E ⧸ P.1.asIdeal) (R.N R.m - 1) R.r (R.m * R.t) := hred ▸ inv_mem hj
+  have hH : redGL _ P.1 g2 ∈ HQ (𝓞 X.E ⧸ P.1.asIdeal) (R.N R.m - 1) R.r (R.m * R.t) :=
+    hred ▸ inv_mem hj
   have hl := lamQB_eq_red (resChar ξ P.1) (rank_X'_eq R) g2 hH
   rw [show (g''.toLinearMap : HomE X.E _ _) = g2.1.toLinearMap from rfl, hl]
-  have e4 : lamQ (resChar ξ P.1) _ R.r (R.m * R.t) ⟨redGL _ P.1 g2, hH⟩ =
-      (lamQ (resChar ξ P.1) _ R.r (R.m * R.t) ⟨redGL _ P.1 j, hj⟩)⁻¹ := by
+  have e4
+      : lamQ (resChar ξ P.1) _ R.r (R.m * R.t) ⟨redGL _ P.1 g2, hH⟩
+        = (lamQ (resChar ξ P.1) _ R.r (R.m * R.t) ⟨redGL _ P.1 j, hj⟩)⁻¹ := by
     rw [← map_inv]
     exact congrArg _ (Subtype.ext hred)
   rw [← Units.val_mul, e4]

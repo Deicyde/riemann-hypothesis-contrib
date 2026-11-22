@@ -10,8 +10,9 @@ open NumberField
 
 namespace Formalism.UG.P
 
-theorem csTrace_trace_pos {F : Type} [Field F] [NumberField F] [IsTotallyReal F] (b : F)
-    (hb : ∀ ι : F →+* ℝ, 0 < ι b) : 0 < Algebra.trace ℚ F b := by
+theorem csTrace_trace_pos
+    {F : Type} [Field F] [NumberField F] [IsTotallyReal F] (b : F) (hb : ∀ ι : F →+* ℝ, 0 < ι b)
+    : 0 < Algebra.trace ℚ F b := by
   have key : algebraMap ℚ ℂ (Algebra.trace ℚ F b) = ∑ σ : F →ₐ[ℚ] ℂ, σ b :=
     trace_eq_sum_embeddings ℂ
   have hre : ∀ σ : F →ₐ[ℚ] ℂ, 0 < (σ b).re := by
@@ -25,14 +26,14 @@ theorem csTrace_trace_pos {F : Type} [Field F] [NumberField F] [IsTotallyReal F]
   have hne : Nonempty (F →ₐ[ℚ] ℂ) := ⟨IsAlgClosed.lift⟩
   have h2 := congrArg Complex.re key
   rw [Complex.re_sum] at h2
-  have h3 : 0 < ∑ σ : F →ₐ[ℚ] ℂ, (σ b).re :=
-    Finset.sum_pos (fun σ _ => hre σ) Finset.univ_nonempty
+  have h3 : 0 < ∑ σ : F →ₐ[ℚ] ℂ, (σ b).re := Finset.sum_pos (fun σ _ => hre σ) Finset.univ_nonempty
   rw [← h2] at h3
   simpa using h3
 
-theorem csTrace_trace_algebraMap_pos {F E : Type} [Field F] [NumberField F] [Field E]
-    [NumberField E] [Algebra F E] [IsTotallyReal F] (b : F) (hb : ∀ ι : F →+* ℝ, 0 < ι b) :
-    0 < Algebra.trace ℚ E (algebraMap F E b) := by
+theorem csTrace_trace_algebraMap_pos
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F]
+    (b : F) (hb : ∀ ι : F →+* ℝ, 0 < ι b)
+    : 0 < Algebra.trace ℚ E (algebraMap F E b) := by
   haveI : Module.Finite F E := Module.Finite.of_restrictScalars_finite ℚ F E
   rw [← Algebra.trace_trace (S := F), Algebra.trace_algebraMap, map_nsmul]
   exact nsmul_pos (csTrace_trace_pos b hb) Module.finrank_pos.ne'
@@ -44,16 +45,21 @@ theorem trace_form_positive : Formalism.UG.CS.TracePos := by
 
   let φ0 : F →+* ℂ := (IsAlgClosed.lift : F →ₐ[ℚ] ℂ).toRingHom
   let ι0 : F →+* ℝ :=
-    (NumberField.InfinitePlace.isReal_mk_iff.mp (IsTotallyReal.isReal (NumberField.InfinitePlace.mk φ0))).embedding
+    (NumberField.InfinitePlace.isReal_mk_iff.mp (IsTotallyReal.isReal (NumberField.InfinitePlace.mk
+      φ0))).embedding
   have hval : ∀ x : n → E, x ≠ 0 → ∃ a : F, algebraMap F E a = hform (σ : E →+* E) J x x := by
     intro x hx
     rcases hdef ι0 with h | h
     · obtain ⟨a, ha, -⟩ := h x hx; exact ⟨a, ha⟩
     · obtain ⟨a, ha, -⟩ := h x hx; exact ⟨a, ha⟩
 
-  have same : ∀ x y : n → E, x ≠ 0 → y ≠ 0 → ∀ a b : F,
-      algebraMap F E a = hform (σ : E →+* E) J x x →
-      algebraMap F E b = hform (σ : E →+* E) J y y → ∀ ι : F →+* ℝ, 0 < ι a * ι b := by
+  have same
+      : ∀ x y : n → E,
+        x ≠ 0 → y ≠ 0
+          → ∀ a b : F,
+            algebraMap F E a = hform (σ : E →+* E) J x x
+              → algebraMap F E b = hform (σ : E →+* E) J y y
+              → ∀ ι : F →+* ℝ, 0 < ι a * ι b := by
     intro x y hx hy a b ha hb ι
     rcases hdef ι with h | h
     · obtain ⟨a', ha', hap⟩ := h x hx
@@ -82,8 +88,7 @@ theorem trace_form_positive : Formalism.UG.CS.TracePos := by
     have hp : algebraMap (𝓞 F) F p = a0 * algebraMap (𝓞 F) F q := by
       rw [← hpq, div_mul_cancel₀ _ hqF]
     have hc : ((p * q : 𝓞 F) : F) = a0 * algebraMap (𝓞 F) F q * algebraMap (𝓞 F) F q := by
-      have : ((p * q : 𝓞 F) : F) = algebraMap (𝓞 F) F p * algebraMap (𝓞 F) F q := by
-        rw [← map_mul]
+      have : ((p * q : 𝓞 F) : F) = algebraMap (𝓞 F) F p * algebraMap (𝓞 F) F q := by rw [← map_mul]
       rw [this, hp]
     refine ⟨p * q, ?_, ?_⟩
     · intro h0

@@ -15,7 +15,7 @@ namespace PositivityTheory.PfSWUS
 open PositivityTheory.SiegelWeilFormula
 
 theorem whitGenLt : PositivityTheory.SiegelWeilFormula.Gen.WhitGenLt :=
-  Gen.whitGenLtOf SwLocFin.locFin2 Gunr.unrWhit (GReal.realWhit_of PositivityTheory.Rg.Sw.WR.wr) GFac.factorX
-    PositivityTheory.PfSWUS.HMass.siegelDensitiesLowA
+  Gen.whitGenLtOf SwLocFin.locFin2 Gunr.unrWhit (GReal.realWhit_of PositivityTheory.Rg.Sw.WR.wr)
+    GFac.factorX PositivityTheory.PfSWUS.HMass.siegelDensitiesLowA
 
 end PositivityTheory.PfSWUS

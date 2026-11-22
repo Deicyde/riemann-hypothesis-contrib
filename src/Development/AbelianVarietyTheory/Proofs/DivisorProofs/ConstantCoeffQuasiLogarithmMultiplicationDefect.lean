@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConstantCoef
 
 @[expose] public section
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat
 
 set_option autoImplicit false
 
@@ -14,7 +16,14 @@ noncomputable section
 
 namespace GlobalTheory.QLogDefect
 
-theorem constantCoeff_defect : ∀ (p : ℕ) [Fact p.Prime] (B O Q : Type) [CommRing B] [CommRing Q] [CommRing O] [Algebra B Q] (θ : B →+* O), IsFrame p Q θ → ∀ (d : ℕ) (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) B), IsLift θ μ → ∀ f : MvPowerSeries (Fin d) Q, QL μ ⊤ f → ∀ n : ℕ, constantCoeff (defect μ n f) = 0 := by
+theorem constantCoeff_defect
+    : ∀ (p : ℕ) [Fact p.Prime] (B O Q : Type) [CommRing B] [CommRing Q] [CommRing O] [Algebra B Q]
+        (θ : B →+* O),
+      IsFrame p Q θ
+        → ∀ (d : ℕ) (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) B),
+          IsLift θ μ
+            → ∀ f : MvPowerSeries (Fin d) Q,
+              QL μ ⊤ f → ∀ n : ℕ, constantCoeff (defect μ n f) = 0 := by
   intro p _ B O Q _ _ _ _ θ _ d μ hμ f hf n
   have hU : ∀ j, constantCoeff (up Q (nmul μ n) j) = 0 := by
     intro j

@@ -19,23 +19,29 @@ theorem XP_AP (w : Fin (n + c) → k) : (XP : (Fin (n + c) → k) →ₗ[k] _) (
   rw [lowProj_apply₂, projA_apply]
   split_ifs <;> rfl
 
-theorem lowProj_basisVec_of_le (q : ℕ) (hq : n ≤ q) : (XP : (Fin (n + c) → k) →ₗ[k] _) (eN k (n + c) q) = 0 := by
+theorem lowProj_basisVec_of_le (q : ℕ) (hq : n ≤ q)
+    : (XP : (Fin (n + c) → k) →ₗ[k] _) (eN k (n + c) q) = 0 := by
   funext l
   rw [lowProj_apply₂, eN_apply]
   split_ifs <;> first | rfl | omega
 
-theorem lowProj_basisVec_of_lt (q : ℕ) (hq : q < n) : (XP : (Fin (n + c) → k) →ₗ[k] _) (eN k (n + c) q) = eN k (n + c) q := by
+theorem lowProj_basisVec_of_lt (q : ℕ) (hq : q < n)
+    : (XP : (Fin (n + c) → k) →ₗ[k] _) (eN k (n + c) q) = eN k (n + c) q := by
   funext l
   rw [lowProj_apply₂, eN_apply]
   split_ifs <;> first | rfl | omega
 
-theorem projA_eq_self_of_projX_eq_zero {w : Fin (n + c) → k} (hw : (XP : (Fin (n + c) → k) →ₗ[k] _) w = 0) : AP w = w := by
+theorem projA_eq_self_of_projX_eq_zero
+    {w : Fin (n + c) → k} (hw : (XP : (Fin (n + c) → k) →ₗ[k] _) w = 0)
+    : AP w = w := by
   have h := lowProj_add_highProj (n := n) (c := c) w
   rwa [hw, zero_add] at h
 
-theorem fix_of_basis (g : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k))
-    (hga : ∀ i < c, g (eN k (n + c) (n + i)) = eN k (n + c) (n + i)) (w : Fin (n + c) → k)
-    (hw : (XP : (Fin (n + c) → k) →ₗ[k] _) w = 0) : g w = w := by
+theorem fix_of_basis
+    (g : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k))
+    (hga : ∀ i < c, g (eN k (n + c) (n + i)) = eN k (n + c) (n + i))
+    (w : Fin (n + c) → k) (hw : (XP : (Fin (n + c) → k) →ₗ[k] _) w = 0)
+    : g w = w := by
   have hsum : w = ∑ l : Fin (n + c), w l • PI.OneCosetSharp.Loc.eN k (n + c) l.1 := by
     funext x
     rw [Finset.sum_apply, Finset.sum_eq_single x]
@@ -59,27 +65,32 @@ theorem fix_of_basis (g : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k))
     have hl' : l.1 = n + (l.1 - n) := by omega
     rw [hl', hga (l.1 - n) (by omega)]
 
-private theorem fIdx_lt_add_of_lt_add {k₀ c n p : ℕ} (hp : p < n + c) : PI.OneCosetSharp.LocE.fIdx k₀ c n p < n + c := by
+private theorem fIdx_lt_add_of_lt_add {k₀ c n p : ℕ} (hp : p < n + c)
+    : PI.OneCosetSharp.LocE.fIdx k₀ c n p < n + c := by
   unfold PI.OneCosetSharp.LocE.fIdx
   split_ifs <;> omega
 
-private theorem fIdx_injOn_of_lt_add {k₀ c n p p' : ℕ} (hk : k₀ ≤ n) (hp : p < n + c) (hp' : p' < n + c)
-    (h : PI.OneCosetSharp.LocE.fIdx k₀ c n p = PI.OneCosetSharp.LocE.fIdx k₀ c n p') : p = p' := by
+private theorem fIdx_injOn_of_lt_add
+    {k₀ c n p p' : ℕ} (hk : k₀ ≤ n) (hp : p < n + c) (hp' : p' < n + c)
+    (h : PI.OneCosetSharp.LocE.fIdx k₀ c n p = PI.OneCosetSharp.LocE.fIdx k₀ c n p')
+    : p = p' := by
   unfold PI.OneCosetSharp.LocE.fIdx at h
   split_ifs at h <;> omega
 
-private theorem mem_block_of_le_fIdx {k₀ c n p : ℕ} (hk : k₀ ≤ n) (hp : p < n + c)
-    (h : n ≤ PI.OneCosetSharp.LocE.fIdx k₀ c n p) : k₀ ≤ p ∧ p < k₀ + c := by
+private theorem mem_block_of_le_fIdx
+    {k₀ c n p : ℕ} (hk : k₀ ≤ n) (hp : p < n + c) (h : n ≤ PI.OneCosetSharp.LocE.fIdx k₀ c n p)
+    : k₀ ≤ p ∧ p < k₀ + c := by
   unfold PI.OneCosetSharp.LocE.fIdx at h
   split_ifs at h <;> omega
 
-private theorem lt_or_le_of_fIdx_lt {k₀ c n p : ℕ} (h : PI.OneCosetSharp.LocE.fIdx k₀ c n p < n) :
-    p < k₀ ∨ k₀ + c ≤ p := by
+private theorem lt_or_le_of_fIdx_lt {k₀ c n p : ℕ} (h : PI.OneCosetSharp.LocE.fIdx k₀ c n p < n)
+    : p < k₀ ∨ k₀ + c ≤ p := by
   unfold PI.OneCosetSharp.LocE.fIdx at h
   split_ifs at h <;> omega
 
-private theorem allow_of_mem_block_of_le_right {k₀ m t N c p p' : ℕ} (hcm : c + 1 < m) (hp : k₀ ≤ p)
-    (hpc : p < k₀ + c) (hp' : k₀ + c ≤ p') : PI.OneCosetSharp.Allow k₀ m t N p p' := by
+private theorem allow_of_mem_block_of_le_right
+    {k₀ m t N c p p' : ℕ} (hcm : c + 1 < m) (hp : k₀ ≤ p) (hpc : p < k₀ + c) (hp' : k₀ + c ≤ p')
+    : PI.OneCosetSharp.Allow k₀ m t N p p' := by
   unfold PI.OneCosetSharp.Allow
   split_ifs
   · omega
@@ -93,19 +104,19 @@ theorem gaStep : GaStep := by
   generalize (j - 1) * t = s' at hn'
   have hkn : k₀ ≤ n := by omega
   have hcm : c + 1 < m := by omega
-  obtain ⟨B, hB⟩ : ∃ B : (Fin (n + c) → k) →ₗ[k] (Fin (n + c) → k),
-      ∀ w, B w = AP (g (XP w)) :=
+  obtain ⟨B, hB⟩ : ∃ B : (Fin (n + c) → k) →ₗ[k] (Fin (n + c) → k), ∀ w, B w = AP (g (XP w)) :=
     ⟨AP ∘ₗ g.toLinearMap ∘ₗ XP, fun w => rfl⟩
-  have hfix : ∀ w, (XP : (Fin (n + c) → k) →ₗ[k] _) w = 0 → g w = w :=
-    fix_of_basis g hga
+  have hfix : ∀ w, (XP : (Fin (n + c) → k) →ₗ[k] _) w = 0 → g w = w := fix_of_basis g hga
   have hB0 : ∀ w, (XP : (Fin (n + c) → k) →ₗ[k] _) w = 0 → B w = 0 := by
     intro w hw
     rw [hB, hw]
     simp
   have hBB : ∀ w, B (B w) = 0 := fun w => hB0 _ (by rw [hB]; exact XP_AP _)
-  obtain ⟨κ, hκ, hκs⟩ : ∃ κ : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k),
-      (∀ w, κ w = w + B w) ∧ ∀ w, κ.symm w = w - B w := by
-    refine ⟨LinearEquiv.ofLinear (LinearMap.id + B) (LinearMap.id - B) ?_ ?_, fun w => rfl, fun w => rfl⟩
+  obtain ⟨κ, hκ, hκs⟩
+      : ∃ κ : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k),
+        (∀ w, κ w = w + B w) ∧ ∀ w, κ.symm w = w - B w := by
+    refine
+      ⟨LinearEquiv.ofLinear (LinearMap.id + B) (LinearMap.id - B) ?_ ?_, fun w => rfl, fun w => rfl⟩
     · refine LinearMap.ext fun w => ?_
       simp only [LinearMap.comp_apply, LinearMap.add_apply, LinearMap.sub_apply, LinearMap.id_apply,
         map_sub, hBB, add_zero]
@@ -139,9 +150,12 @@ theorem gaStep : GaStep := by
       exact hv l hl
     · rw [hγfix _ (lowProj_basisVec_of_le (n + i) (Nat.le_add_right n i)), sub_self]
       exact Submodule.zero_mem _
-  have hentry : ∀ p p' (hp : PI.OneCosetSharp.LocE.fIdx k₀ c n p < n + c),
-      PI.OneCosetSharp.ent k₀ c n c n κ.toLinearMap p p' =
-        (PI.OneCosetSharp.Loc.eN k (n + c) (PI.OneCosetSharp.LocE.fIdx k₀ c n p') + B (PI.OneCosetSharp.Loc.eN k (n + c) (PI.OneCosetSharp.LocE.fIdx k₀ c n p'))) ⟨_, hp⟩ := by
+  have hentry
+      : ∀ p p' (hp : PI.OneCosetSharp.LocE.fIdx k₀ c n p < n + c),
+        PI.OneCosetSharp.ent k₀ c n c n κ.toLinearMap p p'
+          = (PI.OneCosetSharp.Loc.eN k (n + c) (PI.OneCosetSharp.LocE.fIdx k₀ c n p')
+              + B (PI.OneCosetSharp.Loc.eN k (n + c) (PI.OneCosetSharp.LocE.fIdx k₀ c n p')))
+            ⟨_, hp⟩ := by
     intro p p' hp
     simp only [PI.OneCosetSharp.ent, PI.OneCosetSharp.Loc.atN, dif_pos hp, LinearEquiv.coe_coe, hκ]
   have hBq : ∀ q (hq : q < n + c), B (PI.OneCosetSharp.Loc.eN k (n + c) q) ⟨q, hq⟩ = 0 := by
@@ -151,12 +165,14 @@ theorem gaStep : GaStep := by
       exact if_pos h
     · rw [hB0 _ (lowProj_basisVec_of_le q (not_lt.mp h))]
       rfl
-  refine ⟨g * κ⁻¹, mem_flagUnipotent hU, κ, ⟨fun p' hp' => ?_, fun p p' hp hp' hne hent => ?_⟩, by simp⟩
+  refine
+    ⟨g * κ⁻¹, mem_flagUnipotent hU, κ, ⟨fun p' hp' => ?_, fun p p' hp hp' hne hent => ?_⟩, by simp⟩
   · have hq := fIdx_lt_add_of_lt_add (k₀ := k₀) (show p' < n + c by omega)
     rw [hentry p' p' hq, Pi.add_apply, hBq _ hq, add_zero, eN_apply]
     exact if_pos rfl
   · have hq := fIdx_lt_add_of_lt_add (k₀ := k₀) hp
-    have hqq : PI.OneCosetSharp.LocE.fIdx k₀ c n p ≠ PI.OneCosetSharp.LocE.fIdx k₀ c n p' := fun h => hne (fIdx_injOn_of_lt_add hkn hp hp' h)
+    have hqq : PI.OneCosetSharp.LocE.fIdx k₀ c n p ≠ PI.OneCosetSharp.LocE.fIdx k₀ c n p' :=
+      fun h => hne (fIdx_injOn_of_lt_add hkn hp hp' h)
     rw [hentry p p' hq, Pi.add_apply, eN_apply, Fin.val_mk, if_neg hqq, zero_add] at hent
     by_cases hq'n : PI.OneCosetSharp.LocE.fIdx k₀ c n p' < n
     · rw [hB, lowProj_basisVec_of_lt _ hq'n] at hent

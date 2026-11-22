@@ -16,29 +16,34 @@ open IsLocalRing
 
 universe u
 
-theorem mem_nonZeroDivisors_of_notMem_of_minimalPrimes_eq (hCM : CMRegularElement.Statement.{u})
-    {B : Type u} [CommRing B] [IsCohenMacaulayLocalRing B] {P : Ideal B} (hmin : minimalPrimes B = {P})
-    {s : B} (hs : s ∉ P) : s ∈ nonZeroDivisors B := by
+theorem mem_nonZeroDivisors_of_notMem_of_minimalPrimes_eq
+    (hCM : CMRegularElement.Statement.{u})
+    {B : Type u} [CommRing B] [IsCohenMacaulayLocalRing B]
+    {P : Ideal B} (hmin : minimalPrimes B = {P})
+    {s : B} (hs : s ∉ P)
+    : s ∈ nonZeroDivisors B := by
   by_cases hsm : s ∈ maximalIdeal B
   · refine (hCM B s hsm fun p hp => ?_).1
     rw [hmin, Set.mem_singleton_iff] at hp
     rwa [hp]
   · exact ((IsLocalRing.notMem_maximalIdeal.1 hsm)).mem_nonZeroDivisors
 
-theorem length_localization_maximalIdeal (B : Type u) [CommRing B] [IsLocalRing B] :
-    Module.length (Localization.AtPrime (maximalIdeal B)) (Localization.AtPrime (maximalIdeal B)) =
-      Module.length B B := by
+theorem length_localization_maximalIdeal (B : Type u) [CommRing B] [IsLocalRing B]
+    : Module.length (Localization.AtPrime (maximalIdeal B)) (Localization.AtPrime (maximalIdeal B))
+      = Module.length B B := by
   have hU : (maximalIdeal B).primeCompl ≤ IsUnit.submonoid B := fun s hs =>
     IsLocalRing.notMem_maximalIdeal.1 hs
-  let e := IsLocalization.atUnits B (maximalIdeal B).primeCompl
-    (S := Localization.AtPrime (maximalIdeal B)) hU
+  let e :=
+    IsLocalization.atUnits B (maximalIdeal B).primeCompl
+      (S := Localization.AtPrime (maximalIdeal B)) hU
   have hsurj : Function.Surjective (algebraMap B (Localization.AtPrime (maximalIdeal B))) :=
     e.surjective
   rw [← Module.length_eq_of_surjective (S := B) hsurj]
   exact e.toLinearEquiv.length_eq.symm
 
-theorem withBot_natCast_le_of_add_one_le {k : ℕ} {D : WithBot ℕ∞}
-    (h : ((k + 1 : ℕ) : WithBot ℕ∞) ≤ D + 1) : ((k : ℕ) : WithBot ℕ∞) ≤ D := by
+theorem withBot_natCast_le_of_add_one_le
+    {k : ℕ} {D : WithBot ℕ∞} (h : ((k + 1 : ℕ) : WithBot ℕ∞) ≤ D + 1)
+    : ((k : ℕ) : WithBot ℕ∞) ≤ D := by
   induction D using WithBot.recBotCoe with
   | bot => exact absurd h (by simp)
   | coe e =>
@@ -48,16 +53,17 @@ theorem withBot_natCast_le_of_add_one_le {k : ℕ} {D : WithBot ℕ∞}
       have h' : k + 1 ≤ n + 1 := by exact_mod_cast h
       exact_mod_cast (by omega : k ≤ n)
 
-theorem spanFinrank_span_range_le {R : Type*} [CommRing R] {k : ℕ} (z : Fin k → R) :
-    (Ideal.span (Set.range z)).spanFinrank ≤ k := by
+theorem spanFinrank_span_range_le {R : Type*} [CommRing R] {k : ℕ} (z : Fin k → R)
+    : (Ideal.span (Set.range z)).spanFinrank ≤ k := by
   classical
   refine (Submodule.spanFinrank_span_le_ncard_of_finite (Set.finite_range z)).trans ?_
   have hz : Set.range z = ((Finset.univ.image z : Finset R) : Set R) := by simp
   rw [hz, Set.ncard_coe_finset]
   exact Finset.card_image_le.trans (by simp)
 
-theorem span_range_eq_span_range_succ {R : Type*} [CommRing R] {k : ℕ} (z : Fin (k + 1) → R) (h0 : z 0 = 0) :
-    Ideal.span (Set.range z) = Ideal.span (Set.range fun j : Fin k => z j.succ) := by
+theorem span_range_eq_span_range_succ
+    {R : Type*} [CommRing R] {k : ℕ} (z : Fin (k + 1) → R) (h0 : z 0 = 0)
+    : Ideal.span (Set.range z) = Ideal.span (Set.range fun j : Fin k => z j.succ) := by
   refine le_antisymm (Ideal.span_le.2 ?_) (Ideal.span_mono ?_)
   · rintro _ ⟨i, rfl⟩
     cases i using Fin.cases with
@@ -66,23 +72,28 @@ theorem span_range_eq_span_range_succ {R : Type*} [CommRing R] {k : ℕ} (z : Fi
   · rintro _ ⟨j, rfl⟩
     exact ⟨j.succ, rfl⟩
 
-theorem maximalIdeal_quotient_eq_span {B : Type u} [CommRing B] [IsLocalRing B] {I : Ideal B} {k : ℕ}
-    (x : Fin k → B) (hI : Ideal.span (Set.range x) ⊔ I = maximalIdeal B) [IsLocalRing (B ⧸ I)] :
-    maximalIdeal (B ⧸ I) = Ideal.span (Set.range fun i => Ideal.Quotient.mk I (x i)) := by
-  rw [← map_maximalIdeal_of_surjective (Ideal.Quotient.mk I) Ideal.Quotient.mk_surjective, ← hI, Ideal.map_sup,
-    Ideal.map_span, ← Set.range_comp, Ideal.map_quotient_self, sup_bot_eq]
+theorem maximalIdeal_quotient_eq_span
+    {B : Type u} [CommRing B] [IsLocalRing B]
+    {I : Ideal B} {k : ℕ} (x : Fin k → B) (hI : Ideal.span (Set.range x) ⊔ I = maximalIdeal B)
+    [IsLocalRing (B ⧸ I)]
+    : maximalIdeal (B ⧸ I) = Ideal.span (Set.range fun i => Ideal.Quotient.mk I (x i)) := by
+  rw [← map_maximalIdeal_of_surjective (Ideal.Quotient.mk I) Ideal.Quotient.mk_surjective, ← hI,
+    Ideal.map_sup, Ideal.map_span, ← Set.range_comp, Ideal.map_quotient_self, sup_bot_eq]
   rfl
 
-theorem notMem_and_isPrime_sup_span {B : Type u} [CommRing B] [IsLocalRing B] [IsNoetherianRing B]
-    {P : Ideal B} [hP : P.IsPrime] {k : ℕ} (x : Fin (k + 1) → B)
-    (hdim : ringKrullDim (B ⧸ P) = ((k + 1 : ℕ) : WithBot ℕ∞))
-    (hmax : Ideal.span (Set.range x) ⊔ P = maximalIdeal B) :
-    x 0 ∉ P ∧ (P ⊔ Ideal.span {x 0}).IsPrime ∧
-      ringKrullDim (B ⧸ (P ⊔ Ideal.span {x 0})) = ((k : ℕ) : WithBot ℕ∞) := by
+theorem notMem_and_isPrime_sup_span
+    {B : Type u} [CommRing B] [IsLocalRing B] [IsNoetherianRing B]
+    {P : Ideal B} [hP : P.IsPrime]
+    {k : ℕ} (x : Fin (k + 1) → B) (hdim : ringKrullDim (B ⧸ P) = ((k + 1 : ℕ) : WithBot ℕ∞))
+    (hmax : Ideal.span (Set.range x) ⊔ P = maximalIdeal B)
+    : x 0 ∉ P ∧ (P ⊔ Ideal.span {x 0}).IsPrime
+      ∧ ringKrullDim (B ⧸ (P ⊔ Ideal.span {x 0})) = ((k : ℕ) : WithBot ℕ∞) := by
   have hPm : P ≤ maximalIdeal B := hmax ▸ le_sup_right
-  have hxm : ∀ i, x i ∈ maximalIdeal B := fun i => hmax ▸ Ideal.mem_sup_left (Ideal.subset_span ⟨i, rfl⟩)
+  have hxm : ∀ i, x i ∈ maximalIdeal B := fun i =>
+    hmax ▸ Ideal.mem_sup_left (Ideal.subset_span ⟨i, rfl⟩)
   have : Nontrivial (B ⧸ P) := Ideal.Quotient.nontrivial_iff.2 hP.ne_top
-  have : IsLocalRing (B ⧸ P) := IsLocalRing.of_surjective' (Ideal.Quotient.mk P) Ideal.Quotient.mk_surjective
+  have : IsLocalRing (B ⧸ P) :=
+    IsLocalRing.of_surjective' (Ideal.Quotient.mk P) Ideal.Quotient.mk_surjective
   have hA := maximalIdeal_quotient_eq_span x hmax
   have hy : x 0 ∉ P := by
     intro hyP
@@ -90,16 +101,19 @@ theorem notMem_and_isPrime_sup_span {B : Type u} [CommRing B] [IsLocalRing B] [I
     have hle := ringKrullDim_le_spanFinrank_maximalIdeal (B ⧸ P)
     rw [hA, span_range_eq_span_range_succ (fun i => Ideal.Quotient.mk P (x i)) h0, hdim] at hle
     have hk := spanFinrank_span_range_le (fun j : Fin k => Ideal.Quotient.mk P (x j.succ))
-    have h2 : ((k + 1 : ℕ) : WithBot ℕ∞) ≤ ((k : ℕ) : WithBot ℕ∞) := hle.trans (by exact_mod_cast hk)
+    have h2 : ((k + 1 : ℕ) : WithBot ℕ∞) ≤ ((k : ℕ) : WithBot ℕ∞) :=
+      hle.trans (by exact_mod_cast hk)
     have h3 : k + 1 ≤ k := by exact_mod_cast h2
     omega
   set Q₀ := P ⊔ Ideal.span {x 0} with hQ₀
   have hQ₀m : Q₀ ≤ maximalIdeal B := sup_le hPm ((Ideal.span_singleton_le_iff_mem _).2 (hxm 0))
   have hmaxQ : Ideal.span (Set.range x) ⊔ Q₀ = maximalIdeal B :=
     le_antisymm (sup_le (hmax ▸ le_sup_left) hQ₀m) (hmax ▸ sup_le_sup_left le_sup_left _)
-  have : Nontrivial (B ⧸ Q₀) := Ideal.Quotient.nontrivial_iff.2 fun h =>
-    (IsLocalRing.maximalIdeal.isMaximal B).ne_top (top_le_iff.1 (h ▸ hQ₀m))
-  have : IsLocalRing (B ⧸ Q₀) := IsLocalRing.of_surjective' (Ideal.Quotient.mk Q₀) Ideal.Quotient.mk_surjective
+  have : Nontrivial (B ⧸ Q₀) :=
+    Ideal.Quotient.nontrivial_iff.2 fun h =>
+      (IsLocalRing.maximalIdeal.isMaximal B).ne_top (top_le_iff.1 (h ▸ hQ₀m))
+  have : IsLocalRing (B ⧸ Q₀) :=
+    IsLocalRing.of_surjective' (Ideal.Quotient.mk Q₀) Ideal.Quotient.mk_surjective
   have hA' := maximalIdeal_quotient_eq_span x hmaxQ
   have h0' : Ideal.Quotient.mk Q₀ (x 0) = 0 :=
     Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _))
@@ -118,18 +132,23 @@ theorem notMem_and_isPrime_sup_span {B : Type u} [CommRing B] [IsLocalRing B] [I
   have hle : ringKrullDim (B ⧸ Q₀) ≤ ((k : ℕ) : WithBot ℕ∞) :=
     (ringKrullDim_le_spanFinrank_maximalIdeal _).trans (by exact_mod_cast hfin)
   have : IsRegularLocalRing (B ⧸ Q₀) :=
-    IsRegularLocalRing.of_spanFinrank_maximalIdeal_le _ ((by exact_mod_cast hfin :
-      ((maximalIdeal (B ⧸ Q₀)).spanFinrank : WithBot ℕ∞) ≤ ((k : ℕ) : WithBot ℕ∞)).trans hge)
+    IsRegularLocalRing.of_spanFinrank_maximalIdeal_le _
+      ((by exact_mod_cast hfin
+        : ((maximalIdeal (B ⧸ Q₀)).spanFinrank : WithBot ℕ∞) ≤ ((k : ℕ) : WithBot ℕ∞)).trans hge)
   have := GroundTheory.Arith.SchemeCoh.IsRegularLocalRing.isDomain (R := B ⧸ Q₀)
   exact ⟨hy, (Ideal.Quotient.isDomain_iff_prime Q₀).1 inferInstance, le_antisymm hle hge⟩
 
-theorem CMLengthParameters.proof (hCM : CMRegularElement.Statement.{u})
-    (hLen : LengthLocalizedQuotient.Statement.{u}) : CMLengthParameters.Statement.{u} := by
-  suffices h : ∀ d : ℕ, ∀ (B : Type u) [CommRing B] [IsCohenMacaulayLocalRing B] (P : Ideal B) [P.IsPrime]
-      (x : Fin d → B), minimalPrimes B = {P} → ringKrullDim (B ⧸ P) = (d : ℕ) →
-      Ideal.span (Set.range x) ⊔ P = maximalIdeal B →
-        Module.length B (B ⧸ Ideal.span (Set.range x)) =
-          Module.length (Localization.AtPrime P) (Localization.AtPrime P) from
+theorem CMLengthParameters.proof
+    (hCM : CMRegularElement.Statement.{u}) (hLen : LengthLocalizedQuotient.Statement.{u})
+    : CMLengthParameters.Statement.{u} := by
+  suffices h
+      : ∀ d : ℕ,
+        ∀ (B : Type u) [CommRing B] [IsCohenMacaulayLocalRing B] (P : Ideal B) [P.IsPrime]
+            (x : Fin d → B),
+          minimalPrimes B = {P} → ringKrullDim (B ⧸ P) = (d : ℕ)
+            → Ideal.span (Set.range x) ⊔ P = maximalIdeal B
+            → Module.length B (B ⧸ Ideal.span (Set.range x))
+              = Module.length (Localization.AtPrime P) (Localization.AtPrime P) from
     fun B _ _ P _ d x => h d B P x
   intro d
   induction d with
@@ -145,14 +164,16 @@ theorem CMLengthParameters.proof (hCM : CMRegularElement.Statement.{u})
     obtain ⟨hyP, hQ₀, hdimQ⟩ := notMem_and_isPrime_sup_span x hdim hmax
     set y := x 0 with hy
     set Q₀ := P ⊔ Ideal.span {y} with hQ₀def
-    have hxm : ∀ i, x i ∈ maximalIdeal B := fun i => hmax ▸ Ideal.mem_sup_left (Ideal.subset_span ⟨i, rfl⟩)
+    have hxm : ∀ i, x i ∈ maximalIdeal B := fun i =>
+      hmax ▸ Ideal.mem_sup_left (Ideal.subset_span ⟨i, rfl⟩)
     have hnzd : ∀ s ∉ P, s ∈ nonZeroDivisors B := fun s hs =>
       mem_nonZeroDivisors_of_notMem_of_minimalPrimes_eq hCM hmin hs
     have hyQ : Ideal.span {y} ≤ Q₀ := le_sup_right
 
-    have hB'CM : IsCohenMacaulayLocalRing (B ⧸ Ideal.span {y}) := (hCM B y (hxm 0) fun p hp => by
-      rw [hmin, Set.mem_singleton_iff] at hp
-      rwa [hp]).2
+    have hB'CM : IsCohenMacaulayLocalRing (B ⧸ Ideal.span {y}) :=
+      (hCM B y (hxm 0) fun p hp => by
+        rw [hmin, Set.mem_singleton_iff] at hp
+        rwa [hp]).2
     set f := Ideal.Quotient.mk (Ideal.span {y}) with hf
     have hfs : Function.Surjective f := Ideal.Quotient.mk_surjective
     have hker : RingHom.ker f ≤ Q₀ := by rw [hf, Ideal.mk_ker]; exact hyQ
@@ -201,7 +222,8 @@ theorem CMLengthParameters.proof (hCM : CMRegularElement.Statement.{u})
         · rintro _ ⟨i, rfl⟩
           cases i using Fin.cases with
           | zero =>
-            exact Ideal.mem_sup_right (Ideal.mem_map_of_mem f (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _)))
+            exact Ideal.mem_sup_right (Ideal.mem_map_of_mem f
+              (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _)))
           | succ j => exact Ideal.mem_sup_left (Ideal.subset_span ⟨j, rfl⟩)
         · exact Ideal.mem_sup_right (Ideal.mem_map_of_mem f (Ideal.mem_sup_left hp))
     have key := ih (B ⧸ Ideal.span {y}) P' x' hmin' hdim' hmax'
@@ -210,18 +232,24 @@ theorem CMLengthParameters.proof (hCM : CMRegularElement.Statement.{u})
 
     have hyx : Ideal.span {y} ≤ Ideal.span (Set.range x) :=
       (Ideal.span_singleton_le_iff_mem _).2 (Ideal.subset_span ⟨0, rfl⟩)
-    have hJ : (Ideal.span (Set.range x)).map (Ideal.Quotient.mkₐ B (Ideal.span {y})) = Ideal.span (Set.range x') := by
+    have hJ
+        : (Ideal.span (Set.range x)).map (Ideal.Quotient.mkₐ B (Ideal.span {y}))
+          = Ideal.span (Set.range x') := by
       rw [Ideal.map_span, ← Set.range_comp]
       refine span_range_eq_span_range_succ _ ?_
       exact Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_span_singleton_self _)
-    calc Module.length B (B ⧸ Ideal.span (Set.range x))
-        = Module.length B ((B ⧸ Ideal.span {y}) ⧸
+    calc
+      Module.length B (B ⧸ Ideal.span (Set.range x))
+          = Module.length B
+            ((B ⧸ Ideal.span {y}) ⧸
+              (Ideal.span (Set.range x)).map (Ideal.Quotient.mkₐ B (Ideal.span {y}))) :=
+        (DoubleQuot.quotQuotEquivQuotOfLEₐ B hyx).toLinearEquiv.length_eq.symm
+      _ = Module.length (B ⧸ Ideal.span {y})
+          ((B ⧸ Ideal.span {y}) ⧸
             (Ideal.span (Set.range x)).map (Ideal.Quotient.mkₐ B (Ideal.span {y}))) :=
-          (DoubleQuot.quotQuotEquivQuotOfLEₐ B hyx).toLinearEquiv.length_eq.symm
-      _ = Module.length (B ⧸ Ideal.span {y}) ((B ⧸ Ideal.span {y}) ⧸
-            (Ideal.span (Set.range x)).map (Ideal.Quotient.mkₐ B (Ideal.span {y}))) :=
-          Module.length_eq_of_surjective Ideal.Quotient.mk_surjective
-      _ = Module.length (B ⧸ Ideal.span {y}) ((B ⧸ Ideal.span {y}) ⧸ Ideal.span (Set.range x')) := by
-          rw [hJ]
+        Module.length_eq_of_surjective Ideal.Quotient.mk_surjective
+      _ = Module.length (B ⧸ Ideal.span {y})
+          ((B ⧸ Ideal.span {y}) ⧸ Ideal.span (Set.range x')) := by
+        rw [hJ]
 
 end GroundTheory.Heights₂.Heights

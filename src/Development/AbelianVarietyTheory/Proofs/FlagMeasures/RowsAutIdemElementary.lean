@@ -6,13 +6,15 @@ public import Formalism.HarderNarasimhan.ShiftInvariance
 
 @[expose] public section
 
-open GlobalTheory.Count Formalism.MainNotions.S Formalism.HN Formalism.REAL Matrix NumberField MeasureTheory Finset
+open GlobalTheory.Count Formalism.MainNotions.S Formalism.HN Formalism.REAL Matrix NumberField
+  MeasureTheory Finset
 open scoped InnerProductSpace ComplexOrder
 
 namespace GlobalTheory
 
-theorem rowsAut_idem_elementary : ∀ B : RowsAut,
-    (B.e 1).im = 0 ∧ 0 ≤ (B.e 1).re ∧ (∀ y, ‖B.e y‖ ≤ (B.e 1).re) ∧ Continuous B.e := by
+theorem rowsAut_idem_elementary
+    : ∀ B : RowsAut,
+      (B.e 1).im = 0 ∧ 0 ≤ (B.e 1).re ∧ (∀ y, ‖B.e y‖ ≤ (B.e 1).re) ∧ Continuous B.e := by
   intro B
   obtain ⟨hlc, -, hstar, hpos, -⟩ := B.e_adm
 
@@ -38,11 +40,13 @@ theorem rowsAut_idem_elementary : ∀ B : RowsAut,
   have hs : star ((‖b‖ : ℝ) : ℂ) = ((‖b‖ : ℝ) : ℂ) := Complex.conj_ofReal _
 
   have h := hpos 2 ![1, y] ![b, -((‖b‖ : ℝ) : ℂ)]
-  simp only [Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one,
-    inv_one, one_mul, mul_one, inv_mul_cancel, hyi, h1, star_neg, hs] at h
-  have hE : star b * b * (a : ℂ) + star b * -((‖b‖ : ℝ) : ℂ) * b +
-      (-((‖b‖ : ℝ) : ℂ) * b * star b + -((‖b‖ : ℝ) : ℂ) * -((‖b‖ : ℝ) : ℂ) * (a : ℂ)) =
-      ((2 * ‖b‖ ^ 2 * (a - ‖b‖) : ℝ) : ℂ) := by
+  simp only [Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one, inv_one, one_mul, mul_one,
+      inv_mul_cancel, hyi, h1, star_neg, hs]
+    at h
+  have hE
+      : star b * b * (a : ℂ) + star b * -((‖b‖ : ℝ) : ℂ) * b
+          + (-((‖b‖ : ℝ) : ℂ) * b * star b + -((‖b‖ : ℝ) : ℂ) * -((‖b‖ : ℝ) : ℂ) * (a : ℂ))
+        = ((2 * ‖b‖ ^ 2 * (a - ‖b‖) : ℝ) : ℂ) := by
     push_cast at key ⊢
     linear_combination ((a : ℂ) - 2 * ((‖b‖ : ℝ) : ℂ)) * key
   rw [hE, Complex.zero_le_real] at h

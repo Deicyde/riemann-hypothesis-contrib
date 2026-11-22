@@ -38,18 +38,23 @@ theorem exists_unit_of_mem {g : Mat n} (h : g ∈ GLs n) : ∃ y : G n, y.val = 
   obtain ⟨y, hy⟩ := this
   exact ⟨y, hy⟩
 
-theorem isCompact_lift {K : Set (Mat n)} (hK : IsCompact K) (hs : K ⊆ GLs n) :
-    IsCompact (Units.val ⁻¹' K : Set (G n)) := by
-  refine ((GlobalTheory.CompanionTheory.SobGL.HaarDom.isOpenEmbedding_valG n).isInducing.isCompact_preimage_iff ?_).2 hK
+theorem isCompact_lift {K : Set (Mat n)} (hK : IsCompact K) (hs : K ⊆ GLs n)
+    : IsCompact (Units.val ⁻¹' K : Set (G n)) := by
+  refine ((GlobalTheory.CompanionTheory.SobGL.HaarDom.isOpenEmbedding_valG
+    n).isInducing.isCompact_preimage_iff ?_).2 hK
   intro g hg
   obtain ⟨y, hy⟩ := exists_unit_of_mem (hs hg)
   exact ⟨y, hy⟩
 
-theorem exists_compact_support {K B : Set (Mat n)} (hK : IsCompact K) (hKs : K ⊆ GLs n)
-    (hB : IsCompact B) (hBs : B ⊆ GLs n) :
-    ∃ S : Set (G n), IsCompact S ∧ ∀ z ∈ B, ∀ u : G n, z * (u⁻¹ : G n).val ∈ K → u ∈ S := by
-  refine ⟨(fun p : G n × G n => p.1⁻¹ * p.2) ''
-    ((Units.val ⁻¹' K : Set (G n)) ×ˢ (Units.val ⁻¹' B : Set (G n))), ?_, ?_⟩
+theorem exists_compact_support
+    {K B : Set (Mat n)} (hK : IsCompact K) (hKs : K ⊆ GLs n) (hB : IsCompact B) (hBs : B ⊆ GLs n)
+    : ∃ S : Set (G n), IsCompact S ∧ ∀ z ∈ B, ∀ u : G n, z * (u⁻¹ : G n).val ∈ K → u ∈ S := by
+  refine ⟨
+    (fun p : G n × G n => p.1⁻¹ * p.2)
+      '' ((Units.val ⁻¹' K : Set (G n)) ×ˢ (Units.val ⁻¹' B : Set (G n))),
+    ?_,
+    ?_
+  ⟩
   · exact ((isCompact_lift hK hKs).prod (isCompact_lift hB hBs)).image
       ((continuous_fst.inv).mul continuous_snd)
   · intro z hz u hu
@@ -60,10 +65,13 @@ theorem exists_compact_support {K B : Set (Mat n)} (hK : IsCompact K) (hKs : K �
 
 end GlobalTheory.CompanionTheory.PresSobA.MolDiff
 
-
 open GlobalTheory.CompanionTheory.PresSobA.MolDiff in
-theorem GlobalTheory.CompanionTheory.PresSobA.mol_differentiableAt :
-    ∀ (n : ℕ) [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure] (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [CompleteSpace V], Unimod → ∀ φ : Mat n → ℝ, IsTest φ → ∀ x : Lp V 2 μ, ∀ z ∈ GLs n, DifferentiableAt ℝ (Mol μ φ (⇑x)) z := by
+theorem GlobalTheory.CompanionTheory.PresSobA.mol_differentiableAt
+    : ∀ (n : ℕ) [MeasurableSpace (G n)] [BorelSpace (G n)] (μ : Measure (G n)) [μ.IsHaarMeasure]
+        (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [CompleteSpace V],
+      Unimod
+        → ∀ φ : Mat n → ℝ,
+          IsTest φ → ∀ x : Lp V 2 μ, ∀ z ∈ GLs n, DifferentiableAt ℝ (Mol μ φ (⇑x)) z := by
   intro n _ _ μ _ V _ _ _ _ φ hφ x z hz
   obtain ⟨hsm, hcs, hsub⟩ := hφ
   have hc1 : Continuous φ := hsm.continuous
@@ -86,9 +94,10 @@ theorem GlobalTheory.CompanionTheory.PresSobA.mol_differentiableAt :
     haveI : IsFiniteMeasure (μ.restrict S) := ⟨by simpa using hSc.measure_lt_top⟩
     exact ((Lp.memLp x).restrict S).integrable (by norm_num)
   let bound : G n → ℝ := S.indicator fun u => max C C0 * ‖x u‖
-  have hbi : Integrable bound μ := IntegrableOn.integrable_indicator (hxS.norm.const_mul _) hSc.measurableSet
-  have hout : ∀ z' ∈ B, ∀ u : G n, u ∉ S → z' * (u⁻¹ : G n).val ∉ tsupport φ :=
-    fun z' hz' u hu h => hu (hS z' hz' u h)
+  have hbi : Integrable bound μ :=
+    IntegrableOn.integrable_indicator (hxS.norm.const_mul _) hSc.measurableSet
+  have hout : ∀ z' ∈ B, ∀ u : G n, u ∉ S → z' * (u⁻¹ : G n).val ∉ tsupport φ := fun z' hz' u hu h =>
+    hu (hS z' hz' u h)
   let F : Mat n → G n → V := fun z u => φ (z * (u⁻¹ : G n).val) • x u
   let F' : Mat n → G n → CLof (Mat n) V := fun z u => (g z u).smulRight (x u)
   have hFm : ∀ z', AEStronglyMeasurable (F z') μ := fun z' =>
@@ -97,13 +106,11 @@ theorem GlobalTheory.CompanionTheory.PresSobA.mol_differentiableAt :
   have hF'm : AEStronglyMeasurable (F' z) μ := by
     have hgz : Continuous (g z) := hg.comp (Continuous.prodMk_right z)
     let L : CLof (Mat n) ℝ →L[ℝ] V →L[ℝ] CLof (Mat n) V :=
-      LinearMap.mkContinuous₂ (ContinuousLinearMap.smulRightLₗ ℝ (Mat n) V) 1
-        (by
-          intro c v
-          change ‖c.smulRight v‖ ≤ 1 * ‖c‖ * ‖v‖
-          simp [ContinuousLinearMap.norm_smulRight_apply])
-    exact L.aestronglyMeasurable_comp₂
-      hgz.aestronglyMeasurable (Lp.aestronglyMeasurable x)
+      LinearMap.mkContinuous₂ (ContinuousLinearMap.smulRightLₗ ℝ (Mat n) V) 1 (by
+        intro c v
+        change ‖c.smulRight v‖ ≤ 1 * ‖c‖ * ‖v‖
+        simp [ContinuousLinearMap.norm_smulRight_apply])
+    exact L.aestronglyMeasurable_comp₂ hgz.aestronglyMeasurable (Lp.aestronglyMeasurable x)
   have hFb : ∀ u, ‖F z u‖ ≤ bound u := by
     intro u
     by_cases hu : u ∈ S
@@ -126,8 +133,9 @@ theorem GlobalTheory.CompanionTheory.PresSobA.mol_differentiableAt :
       simp
   have hd : ∀ᵐ u ∂μ, ∀ z' ∈ B, HasFDerivAt (F · u) (F' z' u) z' := by
     refine ae_of_all _ fun u z' _ => ?_
-    have h1 : HasFDerivAt (fun w : Mat n => w * (u⁻¹ : G n).val) (MolDiff.rmul (u⁻¹ : G n).val) z' :=
+    have h1
+        : HasFDerivAt (fun w : Mat n => w * (u⁻¹ : G n).val) (MolDiff.rmul (u⁻¹ : G n).val) z' :=
       (MolDiff.rmul (u⁻¹ : G n).val).hasFDerivAt
     exact ((hdφ _).hasFDerivAt.comp z' h1).smul_const (x u)
-  exact (hasFDerivAt_integral_of_dominated_of_fderiv_le hBn
-    (Eventually.of_forall hFm) (hbi.mono' (hFm z) (ae_of_all _ hFb)) hF'm hF'b hbi hd).differentiableAt
+  exact (hasFDerivAt_integral_of_dominated_of_fderiv_le hBn (Eventually.of_forall hFm)
+    (hbi.mono' (hFm z) (ae_of_all _ hFb)) hF'm hF'b hbi hd).differentiableAt

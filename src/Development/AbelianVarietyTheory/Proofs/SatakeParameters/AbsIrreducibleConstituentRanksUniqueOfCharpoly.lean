@@ -9,7 +9,8 @@ noncomputable section
 
 namespace GlobalTheory.SSRank
 
-open Formalism.BasicNotions Formalism.ConjugateSelfDual Formalism.MainNotions Formalism.MainNotions.N Polynomial
+open Formalism.BasicNotions Formalism.ConjugateSelfDual Formalism.MainNotions
+  Formalism.MainNotions.N Polynomial
 
 structure FRep (K Γ : Type) [Field K] [Group Γ] where
   V : Type
@@ -31,29 +32,37 @@ variable {V : Type} [AddCommGroup V] [Module K V] [FiniteDimensional K V]
 def matRep {n : ℕ} (b : Module.Basis (Fin n) K V) (ρ : Representation K Γ V) : Γ →* GL (Fin n) K :=
   (Units.map (LinearMap.toMatrixAlgEquiv b).toMonoidHom).comp ρ.toHomUnits
 
-theorem matRep_coe {n : ℕ} (b : Module.Basis (Fin n) K V) (ρ : Representation K Γ V) (g : Γ) :
-    ((matRep b ρ g : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) = LinearMap.toMatrix b b (ρ g) := by
+theorem matRep_coe {n : ℕ} (b : Module.Basis (Fin n) K V) (ρ : Representation K Γ V) (g : Γ)
+    : ((matRep b ρ g : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)
+      = LinearMap.toMatrix b b (ρ g) := by
   ext i j
   simp [matRep, LinearMap.toMatrixAlgEquiv_apply, LinearMap.toMatrix_apply]
 
-theorem matRep_mulVec {n : ℕ} (b : Module.Basis (Fin n) K V) (ρ : Representation K Γ V) (g : Γ) (v : V) :
-    ((matRep b ρ g : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).mulVec (b.equivFun v) = b.equivFun (ρ g v) := by
+theorem matRep_mulVec
+    {n : ℕ} (b : Module.Basis (Fin n) K V) (ρ : Representation K Γ V) (g : Γ) (v : V)
+    : ((matRep b ρ g : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).mulVec (b.equivFun v)
+      = b.equivFun (ρ g v) := by
   rw [matRep_coe]
   simpa [Module.Basis.equivFun_apply] using LinearMap.toMatrix_mulVec_repr b b (ρ g) v
 
-theorem charpoly_matRep {n : ℕ} (b : Module.Basis (Fin n) K V) (ρ : Representation K Γ V) (g : Γ) :
-    ((matRep b ρ g : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).charpoly = (ρ g).charpoly := by
+theorem charpoly_matRep {n : ℕ} (b : Module.Basis (Fin n) K V) (ρ : Representation K Γ V) (g : Γ)
+    : ((matRep b ρ g : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).charpoly = (ρ g).charpoly := by
   rw [matRep_coe, LinearMap.charpoly_toMatrix]
 
-theorem isSSRep_matRep {n : ℕ} (b : Module.Basis (Fin n) K V) (ρ : Representation K Γ V)
-    (h : ρ.IsSemisimpleRepresentation) : IsSSRep (matRep b ρ) := by
+theorem isSSRep_matRep
+    {n : ℕ} (b : Module.Basis (Fin n) K V)
+    (ρ : Representation K Γ V) (h : ρ.IsSemisimpleRepresentation)
+    : IsSSRep (matRep b ρ) := by
   haveI := h
   intro W hW
   let e := b.equivFun
-  let S : Subrepresentation ρ := ⟨W.comap (e : V →ₗ[K] Fin n → K), fun g v hv => by
-    simp only [Submodule.mem_comap, LinearEquiv.coe_coe] at hv ⊢
-    rw [← matRep_mulVec]
-    exact hW g _ hv⟩
+  let S : Subrepresentation ρ := ⟨
+    W.comap (e : V →ₗ[K] Fin n → K),
+    fun g v hv => by
+      simp only [Submodule.mem_comap, LinearEquiv.coe_coe] at hv ⊢
+      rw [← matRep_mulVec]
+      exact hW g _ hv
+  ⟩
   obtain ⟨C, hC⟩ := exists_isCompl S
   refine ⟨C.toSubmodule.map (e : V →ₗ[K] Fin n → K), ?_, ?_⟩
   · intro g w hw
@@ -61,9 +70,10 @@ theorem isSSRep_matRep {n : ℕ} (b : Module.Basis (Fin n) K V) (ρ : Representa
     refine Submodule.mem_map.2 ⟨ρ g c, C.apply_mem_toSubmodule g hc, ?_⟩
     simp only [LinearEquiv.coe_coe]
     rw [matRep_mulVec]
-  · have h1 : IsCompl S.toSubmodule C.toSubmodule :=
-      ⟨disjoint_iff.2 (congrArg Subrepresentation.toSubmodule hC.inf_eq_bot),
-        codisjoint_iff.2 (congrArg Subrepresentation.toSubmodule hC.sup_eq_top)⟩
+  · have h1 : IsCompl S.toSubmodule C.toSubmodule := ⟨
+      disjoint_iff.2 (congrArg Subrepresentation.toSubmodule hC.inf_eq_bot),
+      codisjoint_iff.2 (congrArg Subrepresentation.toSubmodule hC.sup_eq_top)
+    ⟩
     have h2 := (Submodule.orderIsoMapComap e).isCompl_iff.1 h1
     have h3 : (Submodule.orderIsoMapComap e) S.toSubmodule = W := by
       show Submodule.map (e : V →ₗ[K] Fin n → K) (W.comap (e : V →ₗ[K] Fin n → K)) = W
@@ -71,56 +81,83 @@ theorem isSSRep_matRep {n : ℕ} (b : Module.Basis (Fin n) K V) (ρ : Representa
     rw [h3] at h2
     exact h2
 
-theorem bn_gen {W : Type} [AddCommGroup W] [Module K W] [FiniteDimensional K W]
+theorem bn_gen
+    {W : Type} [AddCommGroup W] [Module K W] [FiniteDimensional K W]
     (ρ : Representation K Γ V) (σ : Representation K Γ W)
     (hρ : IsSemisimpleModule (MonoidAlgebra K Γ) ρ.asModule)
     (hσ : IsSemisimpleModule (MonoidAlgebra K Γ) σ.asModule)
-    (hc : ∀ g, (ρ g).charpoly = (σ g).charpoly) :
-    ∃ e : V ≃ₗ[K] W, ∀ g, (e : V →ₗ[K] W) ∘ₗ ρ g = σ g ∘ₗ (e : V →ₗ[K] W) := by
+    (hc : ∀ g, (ρ g).charpoly = (σ g).charpoly)
+    : ∃ e : V ≃ₗ[K] W, ∀ g, (e : V →ₗ[K] W) ∘ₗ ρ g = σ g ∘ₗ (e : V →ₗ[K] W) := by
   have hn : Module.finrank K V = Module.finrank K W := by
     have := congrArg natDegree (hc 1)
     rwa [LinearMap.charpoly_natDegree, LinearMap.charpoly_natDegree] at this
   let bV : Module.Basis (Fin (Module.finrank K W)) K V := Module.finBasisOfFinrankEq K V hn
   let bW : Module.Basis (Fin (Module.finrank K W)) K W := Module.finBasisOfFinrankEq K W rfl
-  obtain ⟨Pm, hP⟩ := Formalism.MainNotions.SumRepresentations.brauerNesbitt_matrix (matRep bV ρ) (matRep bW σ)
-    (isSSRep_matRep bV ρ ((Representation.isSemisimpleRepresentation_iff_isSemisimpleModule_asModule ρ).2 hρ))
-    (isSSRep_matRep bW σ ((Representation.isSemisimpleRepresentation_iff_isSemisimpleModule_asModule σ).2 hσ))
-    (fun g => by rw [charpoly_matRep, charpoly_matRep, hc])
+  obtain ⟨Pm, hP⟩ :=
+    Formalism.MainNotions.SumRepresentations.brauerNesbitt_matrix (matRep bV ρ) (matRep bW σ)
+      (isSSRep_matRep bV ρ
+        ((Representation.isSemisimpleRepresentation_iff_isSemisimpleModule_asModule ρ).2 hρ))
+      (isSSRep_matRep bW σ
+        ((Representation.isSemisimpleRepresentation_iff_isSemisimpleModule_asModule σ).2 hσ))
+      (fun g => by rw [charpoly_matRep, charpoly_matRep, hc])
   let e0 : (Fin (Module.finrank K W) → K) ≃ₗ[K] (Fin (Module.finrank K W) → K) :=
-    Matrix.toLin'OfInv (M := ((Pm : GL (Fin (Module.finrank K W)) K) : Matrix (Fin (Module.finrank K W)) (Fin (Module.finrank K W)) K)) (M' := ((Pm⁻¹ : GL (Fin (Module.finrank K W)) K) : Matrix (Fin (Module.finrank K W)) (Fin (Module.finrank K W)) K))
+    Matrix.toLin'OfInv
+      (M :=
+        ((Pm : GL (Fin (Module.finrank K W)) K)
+          : Matrix (Fin (Module.finrank K W)) (Fin (Module.finrank K W)) K))
+      (M' :=
+        ((Pm⁻¹ : GL (Fin (Module.finrank K W)) K)
+          : Matrix (Fin (Module.finrank K W)) (Fin (Module.finrank K W)) K))
       Pm.mul_inv Pm.inv_mul
   refine ⟨bV.equivFun ≪≫ₗ e0 ≪≫ₗ bW.equivFun.symm, fun g => LinearMap.ext fun x => ?_⟩
-  have hg : ((Pm⁻¹ : GL (Fin (Module.finrank K W)) K) : Matrix (Fin (Module.finrank K W)) (Fin (Module.finrank K W)) K) * ((matRep bV ρ g : GL (Fin (Module.finrank K W)) K) : Matrix (Fin (Module.finrank K W)) (Fin (Module.finrank K W)) K) =
-      ((matRep bW σ g : GL (Fin (Module.finrank K W)) K) : Matrix (Fin (Module.finrank K W)) (Fin (Module.finrank K W)) K) * ((Pm⁻¹ : GL (Fin (Module.finrank K W)) K) : Matrix (Fin (Module.finrank K W)) (Fin (Module.finrank K W)) K) := by
+  have hg
+      : ((Pm⁻¹ : GL (Fin (Module.finrank K W)) K)
+            : Matrix (Fin (Module.finrank K W)) (Fin (Module.finrank K W)) K)
+          * ((matRep bV ρ g : GL (Fin (Module.finrank K W)) K)
+            : Matrix (Fin (Module.finrank K W)) (Fin (Module.finrank K W)) K)
+        = ((matRep bW σ g : GL (Fin (Module.finrank K W)) K)
+            : Matrix (Fin (Module.finrank K W)) (Fin (Module.finrank K W)) K)
+          * ((Pm⁻¹ : GL (Fin (Module.finrank K W)) K)
+            : Matrix (Fin (Module.finrank K W)) (Fin (Module.finrank K W)) K) := by
     rw [hP g]
     simp only [Units.val_mul, Matrix.mul_assoc, Units.mul_inv, Matrix.mul_one]
-  have key : bW.equivFun (σ g (bW.equivFun.symm (e0 (bV.equivFun x)))) =
-      bW.equivFun (bW.equivFun.symm (e0 (bV.equivFun (ρ g x)))) := by
-    rw [← matRep_mulVec, LinearEquiv.apply_symm_apply, LinearEquiv.apply_symm_apply, ← matRep_mulVec]
-    have he0 : ∀ y, e0 y = ((Pm⁻¹ : GL (Fin (Module.finrank K W)) K) : Matrix (Fin (Module.finrank K W)) (Fin (Module.finrank K W)) K).mulVec y := fun y => Matrix.toLin'_apply _ _
+  have key
+      : bW.equivFun (σ g (bW.equivFun.symm (e0 (bV.equivFun x))))
+        = bW.equivFun (bW.equivFun.symm (e0 (bV.equivFun (ρ g x)))) := by
+    rw [← matRep_mulVec, LinearEquiv.apply_symm_apply, LinearEquiv.apply_symm_apply,
+      ← matRep_mulVec]
+    have he0
+        : ∀ y,
+          e0 y
+            = ((Pm⁻¹ : GL (Fin (Module.finrank K W)) K)
+              : Matrix (Fin (Module.finrank K W)) (Fin (Module.finrank K W)) K).mulVec y := fun y =>
+      Matrix.toLin'_apply _ _
     rw [he0, he0, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hg]
   simpa using (bW.equivFun.injective key).symm
 
 end BN
 
 def sumRep (L : List (Σ m : ℕ, Γ →* GL (Fin m) K)) : FRep K Γ :=
-  L.rec { V := Fin 0 → K, ρ := 1 } fun p _ r => { V := (Fin p.1 → K) × r.V, ρ := (glRep p.2).prod r.ρ }
+  L.rec { V := Fin 0 → K, ρ := 1 } fun p _ r => {
+    V := (Fin p.1 → K) × r.V
+    ρ := (glRep p.2).prod r.ρ
+  }
 
 def cpL (L : List (Σ m : ℕ, Γ →* GL (Fin m) K)) (g : Γ) : K[X] :=
   (L.map fun p => ((p.2 g : GL _ _) : Matrix (Fin p.1) (Fin p.1) K).charpoly).prod
 
 theorem cpL_nil (g : Γ) : cpL ([] : List (Σ m : ℕ, Γ →* GL (Fin m) K)) g = 1 := rfl
 
-theorem cpL_cons (p : Σ m : ℕ, Γ →* GL (Fin m) K) (L : List (Σ m : ℕ, Γ →* GL (Fin m) K)) (g : Γ) :
-    cpL (p :: L) g = ((p.2 g : GL _ _) : Matrix (Fin p.1) (Fin p.1) K).charpoly * cpL L g := by
+theorem cpL_cons (p : Σ m : ℕ, Γ →* GL (Fin m) K) (L : List (Σ m : ℕ, Γ →* GL (Fin m) K)) (g : Γ)
+    : cpL (p :: L) g = ((p.2 g : GL _ _) : Matrix (Fin p.1) (Fin p.1) K).charpoly * cpL L g := by
   simp [cpL]
 
-theorem cpL_perm {L L' : List (Σ m : ℕ, Γ →* GL (Fin m) K)} (h : L.Perm L') (g : Γ) :
-    cpL L g = cpL L' g :=
+theorem cpL_perm {L L' : List (Σ m : ℕ, Γ →* GL (Fin m) K)} (h : L.Perm L') (g : Γ)
+    : cpL L g = cpL L' g :=
   (h.map _).prod_eq
 
-theorem glRep_app {m : ℕ} (ρ : Γ →* GL (Fin m) K) (g : Γ) (v : Fin m → K) :
-    glRep ρ g v = ((ρ g : GL (Fin m) K) : Matrix (Fin m) (Fin m) K).mulVec v := by
+theorem glRep_app {m : ℕ} (ρ : Γ →* GL (Fin m) K) (g : Γ) (v : Fin m → K)
+    : glRep ρ g v = ((ρ g : GL (Fin m) K) : Matrix (Fin m) (Fin m) K).mulVec v := by
   rw [Formalism.MainNotions.SumRepresentations.glRep_apply, Matrix.toLin'_apply]
 
 theorem charpoly_fin_zero (f : Module.End K (Fin 0 → K)) : f.charpoly = 1 := by
@@ -128,8 +165,8 @@ theorem charpoly_fin_zero (f : Module.End K (Fin 0 → K)) : f.charpoly = 1 := b
   exact eq_one_of_monic_natDegree_zero (Matrix.charpoly_monic _)
     (by rw [Matrix.charpoly_natDegree_eq_dim]; simp)
 
-theorem cp_sumRep : ∀ (L : List (Σ m : ℕ, Γ →* GL (Fin m) K)) (g : Γ),
-    ((sumRep L).ρ g).charpoly = cpL L g
+theorem cp_sumRep
+    : ∀ (L : List (Σ m : ℕ, Γ →* GL (Fin m) K)) (g : Γ), ((sumRep L).ρ g).charpoly = cpL L g
   | [], g => charpoly_fin_zero _
   | p :: L, g => by
     rw [cpL_cons, ← cp_sumRep L g]
@@ -138,8 +175,9 @@ theorem cp_sumRep : ∀ (L : List (Σ m : ℕ, Γ →* GL (Fin m) K)) (g : Γ),
     congr 1
     exact Matrix.charpoly_toLin' _
 
-theorem cpL_deg : ∀ (L : List (Σ m : ℕ, Γ →* GL (Fin m) K)) (g : Γ),
-    (cpL L g).Monic ∧ (cpL L g).natDegree = (L.map Sigma.fst).sum
+theorem cpL_deg
+    : ∀ (L : List (Σ m : ℕ, Γ →* GL (Fin m) K)) (g : Γ),
+      (cpL L g).Monic ∧ (cpL L g).natDegree = (L.map Sigma.fst).sum
   | [], g => ⟨monic_one, by simp [cpL]⟩
   | p :: L, g => by
     have ih := cpL_deg L g
@@ -149,9 +187,10 @@ theorem cpL_deg : ∀ (L : List (Σ m : ℕ, Γ →* GL (Fin m) K)) (g : Γ),
       Fintype.card_fin]
     simp
 
-theorem asAlg_prod {V W : Type} [AddCommGroup V] [Module K V] [AddCommGroup W] [Module K W]
-    (ρ : Representation K Γ V) (σ : Representation K Γ W) (r : MonoidAlgebra K Γ) (x : V × W) :
-    (ρ.prod σ).asAlgebraHom r x = (ρ.asAlgebraHom r x.1, σ.asAlgebraHom r x.2) := by
+theorem asAlg_prod
+    {V W : Type} [AddCommGroup V] [Module K V] [AddCommGroup W] [Module K W]
+    (ρ : Representation K Γ V) (σ : Representation K Γ W) (r : MonoidAlgebra K Γ) (x : V × W)
+    : (ρ.prod σ).asAlgebraHom r x = (ρ.asAlgebraHom r x.1, σ.asAlgebraHom r x.2) := by
   induction r using MonoidAlgebra.induction_on with
   | of g =>
     rw [Representation.asAlgebraHom_of, Representation.asAlgebraHom_of,
@@ -160,39 +199,44 @@ theorem asAlg_prod {V W : Type} [AddCommGroup V] [Module K V] [AddCommGroup W] [
   | add a b ha hb => simp only [map_add (f := _), LinearMap.add_apply, ha, hb, Prod.mk_add_mk]
   | smul c a ha => simp only [map_smul, LinearMap.smul_apply, ha, Prod.smul_mk]
 
-def prodEquiv {V W : Type} [AddCommGroup V] [Module K V] [AddCommGroup W] [Module K W]
-    (ρ : Representation K Γ V) (σ : Representation K Γ W) :
-    (ρ.prod σ).asModule ≃ₗ[MonoidAlgebra K Γ] ρ.asModule × σ.asModule where
+def prodEquiv
+    {V W : Type} [AddCommGroup V] [Module K V] [AddCommGroup W] [Module K W]
+    (ρ : Representation K Γ V) (σ : Representation K Γ W)
+    : (ρ.prod σ).asModule ≃ₗ[MonoidAlgebra K Γ] ρ.asModule × σ.asModule where
   toFun x := (show V × W from x)
   invFun x := (show V × W from x)
   map_add' _ _ := rfl
   map_smul' r x := by
-    change (ρ.prod σ).asAlgebraHom r (show V × W from x) =
-      (ρ.asAlgebraHom r (show V × W from x).1, σ.asAlgebraHom r (show V × W from x).2)
+    change (ρ.prod σ).asAlgebraHom r (show V × W from x)
+      = (ρ.asAlgebraHom r (show V × W from x).1, σ.asAlgebraHom r (show V × W from x).2)
     exact asAlg_prod ρ σ r _
   left_inv _ := rfl
   right_inv _ := rfl
 
-theorem ss_prod {R M N : Type} [Ring R] [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
-    [IsSemisimpleModule R M] [IsSemisimpleModule R N] : IsSemisimpleModule R (M × N) := by
-  have h : IsSemisimpleModule R ↥(LinearMap.range (LinearMap.inl R M N) ⊔
-      LinearMap.range (LinearMap.inr R M N)) :=
+theorem ss_prod
+    {R M N : Type} [Ring R] [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
+    [IsSemisimpleModule R M] [IsSemisimpleModule R N]
+    : IsSemisimpleModule R (M × N) := by
+  have h : IsSemisimpleModule R
+      ↥(LinearMap.range (LinearMap.inl R M N) ⊔ LinearMap.range (LinearMap.inr R M N)) :=
     IsSemisimpleModule.sup (IsSemisimpleModule.range _) (IsSemisimpleModule.range _)
   rw [LinearMap.sup_range_inl_inr] at h
   exact IsSemisimpleModule.congr (Submodule.topEquiv (R := R) (M := M × N)).symm
 
-theorem simple_of_irr {m : ℕ} (ρ : Γ →* GL (Fin m) K) (h : IsIrrSub ρ ⊤) :
-    IsSimpleModule (MonoidAlgebra K Γ) (glRep ρ).asModule := by
+theorem simple_of_irr {m : ℕ} (ρ : Γ →* GL (Fin m) K) (h : IsIrrSub ρ ⊤)
+    : IsSimpleModule (MonoidAlgebra K Γ) (glRep ρ).asModule := by
   rw [← Representation.irreducible_iff_isSimpleModule_asModule]
   refine { exists_pair_ne := ⟨⊥, ⊤, fun hbt => h.1 ?_⟩, eq_bot_or_eq_top := fun W => ?_ }
   · exact (congrArg Subrepresentation.toSubmodule hbt).symm
-  · rcases h.2.2 W.toSubmodule le_top (fun g v hv => by
-        rw [← glRep_app]; exact W.apply_mem_toSubmodule g hv) with h0 | h0
+  · rcases h.2.2 W.toSubmodule le_top
+        (fun g v hv => by rw [← glRep_app]; exact W.apply_mem_toSubmodule g hv)
+      with h0 | h0
     · exact Or.inl (Subrepresentation.toSubmodule_injective h0)
     · exact Or.inr (Subrepresentation.toSubmodule_injective h0)
 
-theorem ss_sumRep : ∀ (L : List (Σ m : ℕ, Γ →* GL (Fin m) K)), (∀ p ∈ L, IsIrrSub p.2 ⊤) →
-    IsSemisimpleModule (MonoidAlgebra K Γ) (sumRep L).ρ.asModule
+theorem ss_sumRep
+    : ∀ (L : List (Σ m : ℕ, Γ →* GL (Fin m) K)),
+      (∀ p ∈ L, IsIrrSub p.2 ⊤) → IsSemisimpleModule (MonoidAlgebra K Γ) (sumRep L).ρ.asModule
   | [], _ => by
     have : Subsingleton (sumRep ([] : List (Σ m : ℕ, Γ →* GL (Fin m) K))).ρ.asModule :=
       inferInstanceAs (Subsingleton (Fin 0 → K))
@@ -200,14 +244,15 @@ theorem ss_sumRep : ∀ (L : List (Σ m : ℕ, Γ →* GL (Fin m) K)), (∀ p �
   | p :: L, hL => by
     have := simple_of_irr p.2 (hL p (by simp))
     have := ss_sumRep L (fun r hr => hL r (by simp [hr]))
-    have := ss_prod (R := MonoidAlgebra K Γ) (M := (glRep p.2).asModule) (N := (sumRep L).ρ.asModule)
+    have :=
+      ss_prod (R := MonoidAlgebra K Γ) (M := (glRep p.2).asModule) (N := (sumRep L).ρ.asModule)
     exact IsSemisimpleModule.congr (prodEquiv (glRep p.2) (sumRep L).ρ)
 
-theorem exists_summand (p : Σ m : ℕ, Γ →* GL (Fin m) K) (hp : IsIrrSub p.2 ⊤) :
-    ∀ (L' : List (Σ m : ℕ, Γ →* GL (Fin m) K)) (F : (Fin p.1 → K) →ₗ[K] (sumRep L').V),
-      Function.Injective F → (∀ g v, F (glRep p.2 g v) = (sumRep L').ρ g (F v)) →
-      ∃ q ∈ L', ∃ φ : (Fin p.1 → K) →ₗ[K] (Fin q.1 → K), Function.Injective φ ∧
-        ∀ g v, φ (glRep p.2 g v) = glRep q.2 g (φ v) := by
+theorem exists_summand (p : Σ m : ℕ, Γ →* GL (Fin m) K) (hp : IsIrrSub p.2 ⊤)
+    : ∀ (L' : List (Σ m : ℕ, Γ →* GL (Fin m) K)) (F : (Fin p.1 → K) →ₗ[K] (sumRep L').V),
+      Function.Injective F → (∀ g v, F (glRep p.2 g v) = (sumRep L').ρ g (F v))
+        → ∃ q ∈ L', ∃ φ : (Fin p.1 → K) →ₗ[K] (Fin q.1 → K),
+          Function.Injective φ ∧ ∀ g v, φ (glRep p.2 g v) = glRep q.2 g (φ v) := by
   intro L'
   induction L' with
   | nil =>
@@ -237,11 +282,14 @@ theorem exists_summand (p : Σ m : ℕ, Γ →* GL (Fin m) K) (hp : IsIrrSub p.2
       have hr := ih F2 hF2 h2
       exact hr.elim fun r hr => ⟨r, by simp [hr.1], hr.2⟩
 
-theorem iso_of_inj (p q : Σ m : ℕ, Γ →* GL (Fin m) K) (hp : IsIrrSub p.2 ⊤) (hq : IsIrrSub q.2 ⊤)
-    (φ : (Fin p.1 → K) →ₗ[K] (Fin q.1 → K)) (hφ : Function.Injective φ)
-    (hint : ∀ g v, φ (glRep p.2 g v) = glRep q.2 g (φ v)) :
-    p.1 = q.1 ∧ ∀ g, ((p.2 g : GL _ _) : Matrix (Fin p.1) (Fin p.1) K).charpoly =
-      ((q.2 g : GL _ _) : Matrix (Fin q.1) (Fin q.1) K).charpoly := by
+theorem iso_of_inj
+    (p q : Σ m : ℕ, Γ →* GL (Fin m) K) (hp : IsIrrSub p.2 ⊤) (hq : IsIrrSub q.2 ⊤)
+    (φ : (Fin p.1 → K) →ₗ[K] (Fin q.1 → K))
+    (hφ : Function.Injective φ) (hint : ∀ g v, φ (glRep p.2 g v) = glRep q.2 g (φ v))
+    : p.1 = q.1
+      ∧ ∀ g,
+        ((p.2 g : GL _ _) : Matrix (Fin p.1) (Fin p.1) K).charpoly
+          = ((q.2 g : GL _ _) : Matrix (Fin q.1) (Fin q.1) K).charpoly := by
   have hinv : IsInv q.2 (LinearMap.range φ) := by
     intro g v hv
     rw [← glRep_app]
@@ -273,9 +321,11 @@ theorem iso_of_inj (p q : Σ m : ℕ, Γ →* GL (Fin m) K) (hp : IsIrrSub p.2 �
     rw [← Matrix.charpoly_toLin', ← Matrix.charpoly_toLin']
     exact hcp.symm
 
-theorem main : ∀ (L L' : List (Σ m : ℕ, Γ →* GL (Fin m) K)),
-    (∀ p ∈ L, 1 ≤ p.1 ∧ IsIrrSub p.2 ⊤) → (∀ p ∈ L', 1 ≤ p.1 ∧ IsIrrSub p.2 ⊤) →
-    (∀ g, cpL L g = cpL L' g) → (L.map Sigma.fst).Perm (L'.map Sigma.fst)
+theorem main
+    : ∀ (L L' : List (Σ m : ℕ, Γ →* GL (Fin m) K)),
+      (∀ p ∈ L, 1 ≤ p.1 ∧ IsIrrSub p.2 ⊤) → (∀ p ∈ L', 1 ≤ p.1 ∧ IsIrrSub p.2 ⊤)
+        → (∀ g, cpL L g = cpL L' g)
+        → (L.map Sigma.fst).Perm (L'.map Sigma.fst)
   | [], [], _, _, _ => List.Perm.refl _
   | [], q :: t, _, hL', h => by
     exfalso
@@ -297,8 +347,9 @@ theorem main : ∀ (L L' : List (Σ m : ℕ, Γ →* GL (Fin m) K)),
     have hF : Function.Injective F := e.injective.comp LinearMap.inl_injective
     have hint : ∀ g v, F (glRep p.2 g v) = (sumRep L').ρ g (F v) := by
       intro g v
-      have h0 : (sumRep (p :: L)).ρ g ((v, 0) : (Fin p.1 → K) × (sumRep L).V) =
-          ((glRep p.2 g v, 0) : (Fin p.1 → K) × (sumRep L).V) := by
+      have h0
+          : (sumRep (p :: L)).ρ g ((v, 0) : (Fin p.1 → K) × (sumRep L).V)
+            = ((glRep p.2 g v, 0) : (Fin p.1 → K) × (sumRep L).V) := by
         show ((glRep p.2 g).prodMap ((sumRep L).ρ g)) (v, 0) = _
         rw [LinearMap.prodMap_apply, map_zero]
       have h3 := LinearMap.congr_fun (he g) ((v, 0) : (Fin p.1 → K) × (sumRep L).V)
@@ -317,8 +368,11 @@ theorem main : ∀ (L L' : List (Σ m : ℕ, Γ →* GL (Fin m) K)),
       have h1 := h g
       rw [cpL_cons, cpL_perm hperm, cpL_cons, hI.2 g] at h1
       exact mul_left_cancel₀ (Matrix.charpoly_monic _).ne_zero h1
-    have ih := main L (s ++ t) (fun r hr => hL r (by simp [hr]))
-      (fun r hr => hL' r (by simp only [List.mem_append, List.mem_cons] at hr ⊢; tauto)) hcut
+    have ih :=
+      main L (s ++ t)
+        (fun r hr => hL r (by simp [hr]))
+        (fun r hr => hL' r (by simp only [List.mem_append, List.mem_cons] at hr ⊢; tauto))
+        hcut
     have h4 : ((p :: L).map Sigma.fst).Perm ((q :: (s ++ t)).map Sigma.fst) := by
       simp only [List.map_cons]
       rw [hI.1]
@@ -331,9 +385,11 @@ section Closure
 
 variable {k : Type} [Field k] {Γ : Type} [Group Γ]
 
-theorem span_image_top (m : ℕ) :
-    Submodule.span (AlgebraicClosure k)
-      ((fun v : Fin m → k => (algebraMap k (AlgebraicClosure k)) ∘ v) '' (⊤ : Submodule k (Fin m → k))) = ⊤ := by
+theorem span_image_top (m : ℕ)
+    : Submodule.span (AlgebraicClosure k)
+        ((fun v : Fin m → k => (algebraMap k (AlgebraicClosure k)) ∘ v)
+          '' (⊤ : Submodule k (Fin m → k)))
+      = ⊤ := by
   rw [eq_top_iff, ← (Pi.basisFun (AlgebraicClosure k) (Fin m)).span_eq, Submodule.span_le]
   rintro _ ⟨i, rfl⟩
   apply Submodule.subset_span
@@ -341,11 +397,13 @@ theorem span_image_top (m : ℕ) :
   funext j
   by_cases hj : j = i <;> simp [hj]
 
-def liftL (L : List (Σ m : ℕ, Γ →* GL (Fin m) k)) : List (Σ m : ℕ, Γ →* GL (Fin m) (AlgebraicClosure k)) :=
+def liftL (L : List (Σ m : ℕ, Γ →* GL (Fin m) k))
+    : List (Σ m : ℕ, Γ →* GL (Fin m) (AlgebraicClosure k)) :=
   L.map fun p => ⟨p.1, mapRep (algebraMap k (AlgebraicClosure k)) p.2⟩
 
-theorem cpL_liftL : ∀ (L : List (Σ m : ℕ, Γ →* GL (Fin m) k)) (g : Γ),
-    cpL (liftL L) g = (cpL L g).map (algebraMap k (AlgebraicClosure k))
+theorem cpL_liftL
+    : ∀ (L : List (Σ m : ℕ, Γ →* GL (Fin m) k)) (g : Γ),
+      cpL (liftL L) g = (cpL L g).map (algebraMap k (AlgebraicClosure k))
   | [], g => by simp [liftL, cpL]
   | p :: L, g => by
     have ih := cpL_liftL L g
@@ -353,13 +411,13 @@ theorem cpL_liftL : ∀ (L : List (Σ m : ℕ, Γ →* GL (Fin m) k)) (g : Γ),
     rw [cpL_cons, cpL_cons, ih, Polynomial.map_mul, ← Matrix.charpoly_map]
     rfl
 
-theorem fst_liftL (L : List (Σ m : ℕ, Γ →* GL (Fin m) k)) :
-    (liftL L).map Sigma.fst = L.map Sigma.fst := by
+theorem fst_liftL (L : List (Σ m : ℕ, Γ →* GL (Fin m) k))
+    : (liftL L).map Sigma.fst = L.map Sigma.fst := by
   rw [liftL, List.map_map]
   rfl
 
-theorem irr_liftL (L : List (Σ m : ℕ, Γ →* GL (Fin m) k)) (hL : ∀ p ∈ L, 1 ≤ p.1 ∧ AbsIrrSub p.2 ⊤) :
-    ∀ p ∈ liftL L, 1 ≤ p.1 ∧ IsIrrSub p.2 ⊤ := by
+theorem irr_liftL (L : List (Σ m : ℕ, Γ →* GL (Fin m) k)) (hL : ∀ p ∈ L, 1 ≤ p.1 ∧ AbsIrrSub p.2 ⊤)
+    : ∀ p ∈ liftL L, 1 ≤ p.1 ∧ IsIrrSub p.2 ⊤ := by
   intro p hp
   rw [liftL, List.mem_map] at hp
   refine hp.elim fun a ha => ?_
@@ -374,9 +432,10 @@ end Closure
 
 theorem ssRankUnique_holds : GlobalTheory.StringRepresentationDecomposition.SSRankUnique := by
   intro k _ Γ _ L L' hL hL' h
-  have hP := main (liftL L) (liftL L') (irr_liftL L hL) (irr_liftL L' hL') (fun g => by
-    rw [cpL_liftL, cpL_liftL]
-    exact congrArg _ (h g))
+  have hP :=
+    main (liftL L) (liftL L') (irr_liftL L hL) (irr_liftL L' hL') (fun g => by
+      rw [cpL_liftL, cpL_liftL]
+      exact congrArg _ (h g))
   rw [fst_liftL, fst_liftL] at hP
   exact Multiset.coe_eq_coe.2 hP
 

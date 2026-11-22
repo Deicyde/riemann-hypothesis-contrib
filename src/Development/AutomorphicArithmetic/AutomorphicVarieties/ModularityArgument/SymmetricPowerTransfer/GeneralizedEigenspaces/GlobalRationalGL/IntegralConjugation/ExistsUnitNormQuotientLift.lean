@@ -4,8 +4,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil Formalism.BasicNotions Matrix
-open UpperTheory.V UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict UpperTheory.V.Z.Sym.Dict.Br UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.CuspRep GlobalTheory.PRep
+  GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil Formalism.BasicNotions Matrix
+open UpperTheory.V UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict UpperTheory.V.Z.Sym.Dict.Br
+  UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
 open UpperTheory.V.W (Plc Lp)
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -14,33 +16,38 @@ section H90
 
 variable {O K : Type} [CommRing O] [Field K] [Algebra O K] {Δ : K}
 
-private theorem unit_of_norm (z : Lsq K Δ) (h : QuadraticAlgebra.norm z ≠ 0) :
-    ∃ c : (Lsq K Δ)ˣ, (c : Lsq K Δ) = z ∧
-      ((c⁻¹ : (Lsq K Δ)ˣ) : Lsq K Δ) = algebraMap K (Lsq K Δ) (QuadraticAlgebra.norm z)⁻¹ * star z := by
+private theorem unit_of_norm (z : Lsq K Δ) (h : QuadraticAlgebra.norm z ≠ 0)
+    : ∃ c : (Lsq K Δ)ˣ,
+      (c : Lsq K Δ) = z
+        ∧ ((c⁻¹ : (Lsq K Δ)ˣ) : Lsq K Δ)
+          = algebraMap K (Lsq K Δ) (QuadraticAlgebra.norm z)⁻¹ * star z := by
   have h1 : z * (algebraMap K (Lsq K Δ) (QuadraticAlgebra.norm z)⁻¹ * star z) = 1 := by
-    rw [mul_left_comm, ← QuadraticAlgebra.algebraMap_norm_eq_mul_star, ← map_mul, inv_mul_cancel₀ h, map_one]
+    rw [mul_left_comm, ← QuadraticAlgebra.algebraMap_norm_eq_mul_star, ← map_mul, inv_mul_cancel₀ h,
+      map_one]
   exact ⟨⟨z, _, h1, by rw [mul_comm]; exact h1⟩, rfl, rfl⟩
 
-private def starO : Lsq K Δ →ₐ[O] Lsq K Δ :=
-  { starRingEnd (Lsq K Δ) with
-    commutes' := fun r => by
-      rw [IsScalarTower.algebraMap_apply O K (Lsq K Δ) r]
-      change star (algebraMap K (Lsq K Δ) _) = _
-      ext <;> simp }
+private def starO : Lsq K Δ →ₐ[O] Lsq K Δ := {
+  starRingEnd (Lsq K Δ) with
+  commutes' := fun r => by
+    rw [IsScalarTower.algebraMap_apply O K (Lsq K Δ) r]
+    change star (algebraMap K (Lsq K Δ) _) = _
+    ext <;> simp
+}
 
 private theorem int_star {z : Lsq K Δ} (h : IsIntegral O z) : IsIntegral O (star z) :=
   h.map (starO (O := O) (K := K) (Δ := Δ))
 
-private theorem dich [IsLocalRing O] [IsIntegrallyClosed O] [IsFractionRing O K] (h2 : IsUnit (2 : O))
-    {u : Lsq K Δ} (hu : IsIntegral O u) :
-    (∃ v : Oˣ, algebraMap O K v = 2 + 2 * u.re) ∨ (∃ v : Oˣ, algebraMap O K v = 2 - 2 * u.re) := by
+private theorem dich
+    [IsLocalRing O] [IsIntegrallyClosed O] [IsFractionRing O K]
+    (h2 : IsUnit (2 : O))
+    {u : Lsq K Δ} (hu : IsIntegral O u)
+    : (∃ v : Oˣ, algebraMap O K v = 2 + 2 * u.re)
+      ∨ (∃ v : Oˣ, algebraMap O K v = 2 - 2 * u.re) := by
   have ht : IsIntegral O (algebraMap K (Lsq K Δ) (2 * u.re)) := by
-    have : algebraMap K (Lsq K Δ) (2 * u.re) = u + star u := by
-      ext <;> simp <;> ring
+    have : algebraMap K (Lsq K Δ) (2 * u.re) = u + star u := by ext <;> simp <;> ring
     rw [this]
     exact hu.add (int_star hu)
-  have ht' : IsIntegral O (2 * u.re) :=
-    (isIntegral_algebraMap_iff ).1 ht
+  have ht' : IsIntegral O (2 * u.re) := (isIntegral_algebraMap_iff).1 ht
   haveI : IsDomain O := (IsFractionRing.injective O K).isDomain (algebraMap O K)
   obtain ⟨τ, hτ⟩ := IsIntegrallyClosed.isIntegral_iff.1 ht'
   have h4 : IsUnit ((2 + τ) + (2 - τ) : O) := by
@@ -53,22 +60,24 @@ private theorem dich [IsLocalRing O] [IsIntegrallyClosed O] [IsFractionRing O K]
   · right
     exact ⟨h.unit, by simp [hτ, map_ofNat]⟩
 
-private theorem int_omega {d : O} (hd : algebraMap O K d = Δ) :
-    IsIntegral O (QuadraticAlgebra.omega : Lsq K Δ) := by
+private theorem int_omega {d : O} (hd : algebraMap O K d = Δ)
+    : IsIntegral O (QuadraticAlgebra.omega : Lsq K Δ) := by
   refine ⟨Polynomial.X ^ 2 - Polynomial.C d, Polynomial.monic_X_pow_sub_C d two_ne_zero, ?_⟩
   rw [Polynomial.eval₂_sub, Polynomial.eval₂_X_pow, Polynomial.eval₂_C,
     IsScalarTower.algebraMap_apply O K (Lsq K Δ), hd, pow_two,
     QuadraticAlgebra.omega_mul_omega_eq_mk]
   ext <;> simp
 
-private theorem exists_unit_norm_quotient_lift (z u : Lsq K Δ) (hz : z = u * star z) (hn : QuadraticAlgebra.norm z ≠ 0)
-    (hi : ∀ [IsLocalRing O] [IsIntegrallyClosed O] [IsFractionRing O K], IsUnit (2 : O) →
-      (∃ v : Oˣ, algebraMap O K v = Δ) → IsIntegral O u →
-        IsIntegral O z ∧ ∃ v : Oˣ, algebraMap O K v = QuadraticAlgebra.norm z) :
-    ∃ c : (Lsq K Δ)ˣ, (c : Lsq K Δ) = u * star (c : Lsq K Δ) ∧
-      ∀ [IsLocalRing O] [IsIntegrallyClosed O] [IsFractionRing O K], IsUnit (2 : O) →
-        (∃ v : Oˣ, algebraMap O K v = Δ) → IsIntegral O u →
-          IsIntegral O (c : Lsq K Δ) ∧ IsIntegral O ((c⁻¹ : (Lsq K Δ)ˣ) : Lsq K Δ) := by
+private theorem exists_unit_norm_quotient_lift
+    (z u : Lsq K Δ) (hz : z = u * star z) (hn : QuadraticAlgebra.norm z ≠ 0)
+    (hi : ∀ [IsLocalRing O] [IsIntegrallyClosed O] [IsFractionRing O K],
+      IsUnit (2 : O) → (∃ v : Oˣ, algebraMap O K v = Δ) → IsIntegral O u
+        → IsIntegral O z ∧ ∃ v : Oˣ, algebraMap O K v = QuadraticAlgebra.norm z)
+    : ∃ c : (Lsq K Δ)ˣ,
+      (c : Lsq K Δ) = u * star (c : Lsq K Δ)
+        ∧ ∀ [IsLocalRing O] [IsIntegrallyClosed O] [IsFractionRing O K],
+          IsUnit (2 : O) → (∃ v : Oˣ, algebraMap O K v = Δ) → IsIntegral O u
+            → IsIntegral O (c : Lsq K Δ) ∧ IsIntegral O ((c⁻¹ : (Lsq K Δ)ˣ) : Lsq K Δ) := by
   obtain ⟨c, hc, hci⟩ := unit_of_norm z hn
   refine ⟨c, by rw [hc]; exact hz, ?_⟩
   intro _ _ _ h2 hΔ hu
@@ -77,11 +86,12 @@ private theorem exists_unit_norm_quotient_lift (z u : Lsq K Δ) (hz : z = u * st
   rw [hci, ← hv, ← map_units_inv, ← IsScalarTower.algebraMap_apply]
   exact isIntegral_algebraMap.mul (int_star hzi)
 
-private theorem ex_c (h2 : (2 : K) ≠ 0) (hΔ : Δ ≠ 0) (u : Lsq K Δ) (hu : u * star u = 1) :
-    ∃ c : (Lsq K Δ)ˣ, (c : Lsq K Δ) = u * star (c : Lsq K Δ) ∧
-      ∀ [IsLocalRing O] [IsIntegrallyClosed O] [IsFractionRing O K], IsUnit (2 : O) →
-        (∃ v : Oˣ, algebraMap O K v = Δ) → IsIntegral O u →
-          IsIntegral O (c : Lsq K Δ) ∧ IsIntegral O ((c⁻¹ : (Lsq K Δ)ˣ) : Lsq K Δ) := by
+private theorem ex_c (h2 : (2 : K) ≠ 0) (hΔ : Δ ≠ 0) (u : Lsq K Δ) (hu : u * star u = 1)
+    : ∃ c : (Lsq K Δ)ˣ,
+      (c : Lsq K Δ) = u * star (c : Lsq K Δ)
+        ∧ ∀ [IsLocalRing O] [IsIntegrallyClosed O] [IsFractionRing O K],
+          IsUnit (2 : O) → (∃ v : Oˣ, algebraMap O K v = Δ) → IsIntegral O u
+            → IsIntegral O (c : Lsq K Δ) ∧ IsIntegral O ((c⁻¹ : (Lsq K Δ)ˣ) : Lsq K Δ) := by
   classical
   have r1 : (1 : Lsq K Δ).re = 1 := rfl
   have i1 : (1 : Lsq K Δ).im = 0 := rfl
@@ -94,19 +104,18 @@ private theorem ex_c (h2 : (2 : K) ≠ 0) (hΔ : Δ ≠ 0) (u : Lsq K Δ) (hu : 
   · have hn : QuadraticAlgebra.norm (1 + u) = 2 + 2 * u.re := by
       rw [QuadraticAlgebra.norm_def, QuadraticAlgebra.re_add, QuadraticAlgebra.im_add, r1, i1]
       linear_combination hN
-    apply exists_unit_norm_quotient_lift (1 + u) u (by rw [star_add, star_one, mul_add, hu]; ring) (by rw [hn]; exact hcase.1)
+    apply exists_unit_norm_quotient_lift (1 + u) u (by rw [star_add, star_one, mul_add, hu]; ring)
+      (by rw [hn]; exact hcase.1)
     intro _ _ _ h2' _ hi
     refine ⟨isIntegral_one.add hi, ?_⟩
     rcases dich h2' hi with ⟨v, hv⟩ | h
     · exact ⟨v, by rw [hn, hv]⟩
     · exact absurd h hcase.2
-  · have hsω : star (QuadraticAlgebra.omega : Lsq K Δ) = -QuadraticAlgebra.omega := by
-      ext <;> simp
-    have hn : QuadraticAlgebra.norm ((1 - u) * QuadraticAlgebra.omega)
-        = (2 - 2 * u.re) * (-Δ) := by
-      rw [map_mul, QuadraticAlgebra.norm_def (1 - u), QuadraticAlgebra.norm_def QuadraticAlgebra.omega,
-        QuadraticAlgebra.re_sub, QuadraticAlgebra.im_sub, r1, i1, QuadraticAlgebra.omega_re,
-        QuadraticAlgebra.omega_im]
+  · have hsω : star (QuadraticAlgebra.omega : Lsq K Δ) = -QuadraticAlgebra.omega := by ext <;> simp
+    have hn : QuadraticAlgebra.norm ((1 - u) * QuadraticAlgebra.omega) = (2 - 2 * u.re) * (-Δ) := by
+      rw [map_mul, QuadraticAlgebra.norm_def (1 - u),
+        QuadraticAlgebra.norm_def QuadraticAlgebra.omega, QuadraticAlgebra.re_sub,
+        QuadraticAlgebra.im_sub, r1, i1, QuadraticAlgebra.omega_re, QuadraticAlgebra.omega_im]
       linear_combination (-Δ) * hN
     have hne : 2 - 2 * u.re ≠ 0 := by
       intro h0
@@ -136,10 +145,11 @@ private theorem ex_c (h2 : (2 : K) ≠ 0) (hΔ : Δ ≠ 0) (u : Lsq K Δ) (hu : 
         linear_combination hA
     exact ⟨-(w * d), by rw [hn, ← hw, ← hd]; simp⟩
 
-private theorem mem_range (g : GL (Fin 2) (Lsq K Δ)) (h1 : ∀ i j, IsIntegral O (g.1 i j))
-    (h2 : ∀ i j, IsIntegral O (g.inv i j)) :
-    g ∈ (GeneralLinearGroup.map ((integralClosure O (Lsq K Δ)).val :
-      integralClosure O (Lsq K Δ) →+* Lsq K Δ)).range := by
+private theorem mem_range
+    (g : GL (Fin 2) (Lsq K Δ))
+    (h1 : ∀ i j, IsIntegral O (g.1 i j)) (h2 : ∀ i j, IsIntegral O (g.inv i j))
+    : g ∈ (GeneralLinearGroup.map
+      ((integralClosure O (Lsq K Δ)).val : integralClosure O (Lsq K Δ) →+* Lsq K Δ)).range := by
   let f : integralClosure O (Lsq K Δ) →+* Lsq K Δ := (integralClosure O (Lsq K Δ)).val
   let F := RingHom.mapMatrix (m := Fin 2) f
   let A : Matrix (Fin 2) (Fin 2) (integralClosure O (Lsq K Δ)) :=
@@ -148,23 +158,30 @@ private theorem mem_range (g : GL (Fin 2) (Lsq K Δ)) (h1 : ∀ i j, IsIntegral 
     Matrix.of fun i j => ⟨g.inv i j, h2 i j⟩
   have hA : F A = g.1 := Matrix.ext fun i j => rfl
   have hB : F B = g.inv := Matrix.ext fun i j => rfl
-  have inj : Function.Injective F := fun M N e =>
-    Matrix.map_injective Subtype.val_injective e
+  have inj : Function.Injective F := fun M N e => Matrix.map_injective Subtype.val_injective e
   have hAB : A * B = 1 := inj (by rw [map_mul, hA, hB, g.val_inv, map_one])
   have hBA : B * A = 1 := inj (by rw [map_mul, hA, hB, g.inv_val, map_one])
   refine MonoidHom.mem_range.mpr ⟨⟨A, B, hAB, hBA⟩, ?_⟩
   apply Units.ext
   exact hA
 
-private theorem conj_two {A : Type} [CommRing A] (m : Matrix (Fin 2) (Fin 2) A) :
-    !![0, -1; 1, 0] * m * !![0, 1; -1, 0] = !![m 1 1, -m 1 0; -m 0 1, m 0 0] := by
+private theorem conj_two {A : Type} [CommRing A] (m : Matrix (Fin 2) (Fin 2) A)
+    : !![0, -1; 1, 0] * m * !![0, 1; -1, 0] = !![m 1 1, -m 1 0; -m 0 1, m 0 0] := by
   rw [Matrix.eta_fin_two m]
   simp [Matrix.mul_fin_two]
 
 end H90
 
-theorem UpperTheory.V.Z.Sym.Dict.Br.h90 :
-    ∀ (O K : Type) [CommRing O] [Field K] [Algebra O K] (Δ : K), (2 : K) ≠ 0 → Δ ≠ 0 → ∀ x : Matrix (Fin 2) (Fin 2) (Lsq K Δ), star x * x = 1 → ∃ (y : DX Δ) (c : (Lsq K Δ)ˣ), x = (c : Lsq K Δ) • mt y ∧ (x = 1 → y = 1) ∧ (∀ [IsLocalRing O] [IsIntegrallyClosed O] [IsFractionRing O K], IsUnit (2 : O) → (∃ u : Oˣ, algebraMap O K u = Δ) → (∀ i j, IsIntegral O (x i j)) → y ∈ KD Δ O) := by
+theorem UpperTheory.V.Z.Sym.Dict.Br.h90
+    : ∀ (O K : Type) [CommRing O] [Field K] [Algebra O K] (Δ : K),
+      (2 : K) ≠ 0 → Δ ≠ 0
+        → ∀ x : Matrix (Fin 2) (Fin 2) (Lsq K Δ),
+          star x * x = 1
+            → ∃ (y : DX Δ) (c : (Lsq K Δ)ˣ),
+              x = (c : Lsq K Δ) • mt y ∧ (x = 1 → y = 1)
+                ∧ (∀ [IsLocalRing O] [IsIntegrallyClosed O] [IsFractionRing O K],
+                  IsUnit (2 : O) → (∃ u : Oˣ, algebraMap O K u = Δ) → (∀ i j, IsIntegral O (x i j))
+                    → y ∈ KD Δ O) := by
   intro O K _ _ _ Δ h2 hΔ x hx
   by_cases hx1 : x = 1
   · refine ⟨1, 1, ?_, fun _ => rfl, fun _ _ _ => one_mem _⟩
@@ -174,8 +191,7 @@ theorem UpperTheory.V.Z.Sym.Dict.Br.h90 :
   have hxx : x * star x = 1 := mul_eq_one_comm.mp hx
   have hu : u * star u = 1 := by
     have e := congrArg Matrix.det hx
-    rw [Matrix.det_mul, Matrix.det_one, Matrix.star_eq_conjTranspose,
-      Matrix.det_conjTranspose] at e
+    rw [Matrix.det_mul, Matrix.det_one, Matrix.star_eq_conjTranspose, Matrix.det_conjTranspose] at e
     rw [mul_comm]
     exact e
   obtain ⟨c, hc, hci⟩ := ex_c (O := O) h2 hΔ u hu
@@ -186,7 +202,9 @@ theorem UpperTheory.V.Z.Sym.Dict.Br.h90 :
     have e2 : star s * star (c : Lsq K Δ) = 1 := by rw [← star_mul', hsc, star_one]
     linear_combination (-star s) * hsc + (u * s) * e2 + (star s * s) * hc
   have hM : u • star x = Matrix.adjugate x := by
-    calc u • star x = star x * (u • 1) := by rw [Matrix.mul_smul, Matrix.mul_one]
+    calc
+      u • star x
+        = star x * (u • 1) := by rw [Matrix.mul_smul, Matrix.mul_one]
       _ = star x * (x * Matrix.adjugate x) := by rw [Matrix.mul_adjugate]
       _ = Matrix.adjugate x := by rw [← Matrix.mul_assoc, hx, Matrix.one_mul]
   have r : ∀ i j, u * star (x j i) = Matrix.adjugate x i j := fun i j => by
@@ -197,11 +215,14 @@ theorem UpperTheory.V.Z.Sym.Dict.Br.h90 :
   have r10 := r 1 0
   have r11 := r 1 1
   simp only [Matrix.adjugate_fin_two, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero,
-    Matrix.cons_val_one, Matrix.empty_val', Matrix.cons_val_fin_one] at r00 r01 r10 r11
-  let Y : GL (Fin 2) (Lsq K Δ) :=
-    ⟨s • x, (c : Lsq K Δ) • star x,
-      by rw [Matrix.smul_mul, Matrix.mul_smul, smul_smul, hxx, hsc, one_smul],
-      by rw [Matrix.smul_mul, Matrix.mul_smul, smul_smul, hx, hcs, one_smul]⟩
+      Matrix.cons_val_one, Matrix.empty_val', Matrix.cons_val_fin_one]
+    at r00 r01 r10 r11
+  let Y : GL (Fin 2) (Lsq K Δ) := ⟨
+    s • x,
+    (c : Lsq K Δ) • star x,
+    by rw [Matrix.smul_mul, Matrix.mul_smul, smul_smul, hxx, hsc, one_smul],
+    by rw [Matrix.smul_mul, Matrix.mul_smul, smul_smul, hx, hcs, one_smul]
+  ⟩
   have hY : Y ∈ DX Δ := by
     show GeneralLinearGroup.map (starRingEnd (Lsq K Δ)) Y
       = MulEquiv.toMonoidHom (MulAut.conj (wJ Δ)⁻¹) Y

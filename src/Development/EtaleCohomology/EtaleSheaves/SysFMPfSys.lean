@@ -5,15 +5,18 @@ public import Development.EtaleCohomology.EtaleSheaves.SysFMPfAlg
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry LateralTheory.E.BuildCut LateralTheory.E.SysFMPf LateralTheory.E.SysFMPfAlg
+open CategoryTheory Limits AlgebraicGeometry LateralTheory.E.BuildCut LateralTheory.E.SysFMPf
+  LateralTheory.E.SysFMPfAlg
 
 namespace LateralTheory.E.SysFMPfSys
 
-def IdemSec : Prop := ∀ {P : Scheme.{0}} [CompactSpace P] [QuasiSeparatedSpace P] (W : Type) [CommRing W]
-  (w : Spec (CommRingCat.of W) ⟶ P), Function.Injective (phi w) ∧ ∀ e : W, IsIdempotentElem e → ∃ s, phi w s = e
+def IdemSec : Prop :=
+  ∀ {P : Scheme.{0}} [CompactSpace P] [QuasiSeparatedSpace P] (W : Type) [CommRing W]
+      (w : Spec (CommRingCat.of W) ⟶ P),
+    Function.Injective (phi w) ∧ ∀ e : W, IsIdempotentElem e → ∃ s, phi w s = e
 
-theorem basicOpen_one_sub {X : Scheme.{0}} {s : Γ(X, ⊤)} (hs : IsIdempotentElem s) (x : X) :
-    x ∉ X.basicOpen s ↔ x ∈ X.basicOpen (1 - s) := by
+theorem basicOpen_one_sub {X : Scheme.{0}} {s : Γ(X, ⊤)} (hs : IsIdempotentElem s) (x : X)
+    : x ∉ X.basicOpen s ↔ x ∈ X.basicOpen (1 - s) := by
   simp only [Scheme.mem_basicOpen_top, map_sub, map_one]
   have he : IsIdempotentElem (X.presheaf.germ ⊤ x trivial s) := hs.map _
   constructor
@@ -40,7 +43,8 @@ theorem Sys_of (hI : IdemSec) : Sys := by
     obtain ⟨s, rfl⟩ := hrg e he
     by_cases hy : y ∈ w.normalization.basicOpen s
     · exact Or.inl ⟨he, s, rfl, hy⟩
-    · exact Or.inr ⟨he.one_sub, 1 - s, by rw [map_sub, map_one], (basicOpen_one_sub (hid s he) y).1 hy⟩
+    · exact Or.inr
+        ⟨he.one_sub, 1 - s, by rw [map_sub, map_one], (basicOpen_one_sub (hid s he) y).1 hy⟩
   have hFm : ∀ e ∈ F, ∀ f ∈ F, e * f ∈ F := by
     rintro e ⟨he, s, rfl, hs⟩ f ⟨hf, t, rfl, ht⟩
     exact ⟨he.mul hf, s * t, map_mul _ _ _, by rw [Scheme.basicOpen_mul]; exact ⟨hs, ht⟩⟩
@@ -48,7 +52,11 @@ theorem Sys_of (hI : IdemSec) : Sys := by
   let J : Type := {s : Γ(w.normalization, ⊤) // IsIdempotentElem (phi w s) ∧ phi w s ∉ q.asIdeal}
   letI : Preorder J := Preorder.lift (fun s : J => w.normalization.basicOpen s.1)
   have hmono : Monotone (fun s : J => w.normalization.basicOpen s.1) := fun _ _ h => h
-  have hne : Nonempty J := ⟨⟨1, by rw [map_one]; exact IsIdempotentElem.one, by rw [map_one]; exact (Ideal.ne_top_iff_one _).1 q.2.ne_top⟩⟩
+  have hne : Nonempty J := ⟨⟨
+    1,
+    by rw [map_one]; exact IsIdempotentElem.one,
+    by rw [map_one]; exact (Ideal.ne_top_iff_one _).1 q.2.ne_top
+  ⟩⟩
   haveI : IsCodirectedOrder J := by
     refine ⟨?_⟩
     rintro ⟨s, hs1, hs2⟩ ⟨t, ht1, ht2⟩
@@ -59,13 +67,28 @@ theorem Sys_of (hI : IdemSec) : Sys := by
       rw [Scheme.basicOpen_mul]; exact inf_le_right
   haveI : IsCofiltered J := { nonempty := hne }
   let D : J ⥤ Scheme.{0} := hmono.functor ⋙ w.normalization.restrictFunctor ⋙ Over.forget _
-  have hDι : ∀ {j k : J} (f : j ⟶ k), D.map f ≫ (w.normalization.basicOpen k.1).ι = (w.normalization.basicOpen j.1).ι :=
-    fun f => Over.w (w.normalization.restrictFunctor.map (hmono.functor.map f))
+  have hDι
+      : ∀ {j k : J} (f : j ⟶ k),
+        D.map f ≫ (w.normalization.basicOpen k.1).ι = (w.normalization.basicOpen j.1).ι := fun f =>
+    Over.w (w.normalization.restrictFunctor.map (hmono.functor.map f))
   let ι : ∀ j : J, D.obj j ⟶ w.normalization := fun j => (w.normalization.basicOpen j.1).ι
-  have hr : ∀ j : J, Set.range (ι j) = (w.normalization.basicOpen j.1 : Set w.normalization) := fun j =>
-    Scheme.Opens.range_ι _
-  refine ⟨q, J, inferInstance, inferInstance, D, ι, fun j => ⟨show IsOpenImmersion (w.normalization.basicOpen j.1).ι from
-    inferInstance, isClosedImmersion_basicOpen_idem (hid _ j.2.1), ?_⟩, fun {j k} f => ⟨hDι f, ?_⟩, ?_⟩
+  have hr : ∀ j : J, Set.range (ι j) = (w.normalization.basicOpen j.1 : Set w.normalization) :=
+    fun j => Scheme.Opens.range_ι _
+  refine ⟨
+    q,
+    J,
+    inferInstance,
+    inferInstance,
+    D,
+    ι,
+    fun j => ⟨
+      show IsOpenImmersion (w.normalization.basicOpen j.1).ι from inferInstance,
+      isClosedImmersion_basicOpen_idem (hid _ j.2.1),
+      ?_
+    ⟩,
+    fun {j k} f => ⟨hDι f, ?_⟩,
+    ?_
+  ⟩
   · rw [hr]
     obtain ⟨-, s, hs, hy⟩ := (hq _ j.2.1).1 j.2.2
     rwa [hinj hs] at hy

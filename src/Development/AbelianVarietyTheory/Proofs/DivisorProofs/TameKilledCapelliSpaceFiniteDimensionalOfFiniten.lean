@@ -17,19 +17,42 @@ namespace GlobalTheory.CapKilled
 
 open Polynomial
 
-theorem aeval_restrict_val {M : Type} [AddCommGroup M] [Module ℂ M] (f : Module.End ℂ M) (p : Submodule ℂ M)
-    (h : ∀ x ∈ p, f x ∈ p) (P : ℂ[X]) (v : p) :
-    ((aeval (f.restrict h) P) v : M) = aeval f P (v : M) := by
+theorem aeval_restrict_val
+    {M : Type} [AddCommGroup M] [Module ℂ M]
+    (f : Module.End ℂ M) (p : Submodule ℂ M) (h : ∀ x ∈ p, f x ∈ p)
+    (P : ℂ[X]) (v : p)
+    : ((aeval (f.restrict h) P) v : M) = aeval f P (v : M) := by
   induction P using Polynomial.induction_on' with
   | add P Q hP hQ => simp [map_add (f := _), hP, hQ]
   | monomial n a =>
-    simp only [aeval_monomial, Module.End.mul_apply, Module.algebraMap_end_apply, Submodule.coe_smul]
+    simp only [aeval_monomial, Module.End.mul_apply, Module.algebraMap_end_apply,
+      Submodule.coe_smul]
     congr 1
     induction n generalizing v with
     | zero => simp
     | succ n ih => rw [pow_succ, pow_succ, Module.End.mul_apply, Module.End.mul_apply, ih]; rfl
 
-theorem finiteDimensional_space : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (b : ℕ), (∀ (L : Subgroup (GL (Fin b) (Af E))), IsOpen (L : Set (GL (Fin b) (Af E))) → ∀ W : Submodule ℂ (Kinf E b → ℂ), FiniteDimensional ℂ W → ∀ X : Set (Module.End ℂ (Sm E b) → ℂ), X.Finite → ∀ N : ℕ, FiniteDimensional ℂ (Submodule.span ℂ (GlobalTheory.HCF.formsGL E b L W X N))) → (∀ (τ : E →+* ℂ) (u : ℂ), ∃ w : Fin (b + 1) → ℂ, cap (a := b) τ u = ∑ j : Fin (b + 1), w j • cap (a := b) τ ((j : ℕ) : ℂ)) → ∀ (L : Subgroup (GL (Fin b) (Af E))), IsOpen (L : Set (GL (Fin b) (Af E))) → ∀ W : Submodule ℂ (Kinf E b → ℂ), FiniteDimensional ℂ W → ∀ q : (E →+* ℂ) → ℂ → Polynomial ℂ, (∀ τ u, q τ u ≠ 0) → (∀ z ∈ Zalg E b, ∀ ψ ∈ GlobalTheory.CapKilled.space E b L W q, z ψ ∈ GlobalTheory.CapKilled.space E b L W q) → FiniteDimensional ℂ (GlobalTheory.CapKilled.space E b L W q) := by
+theorem finiteDimensional_space
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (b : ℕ),
+      (∀ (L : Subgroup (GL (Fin b) (Af E))),
+          IsOpen (L : Set (GL (Fin b) (Af E)))
+            → ∀ W : Submodule ℂ (Kinf E b → ℂ),
+              FiniteDimensional ℂ W
+                → ∀ X : Set (Module.End ℂ (Sm E b) → ℂ),
+                  X.Finite
+                    → ∀ N : ℕ,
+                      FiniteDimensional ℂ (Submodule.span ℂ (GlobalTheory.HCF.formsGL E b L W X N)))
+        → (∀ (τ : E →+* ℂ) (u : ℂ), ∃ w : Fin (b + 1) → ℂ,
+          cap (a := b) τ u = ∑ j : Fin (b + 1), w j • cap (a := b) τ ((j : ℕ) : ℂ))
+        → ∀ (L : Subgroup (GL (Fin b) (Af E))),
+          IsOpen (L : Set (GL (Fin b) (Af E)))
+            → ∀ W : Submodule ℂ (Kinf E b → ℂ),
+              FiniteDimensional ℂ W
+                → ∀ q : (E →+* ℂ) → ℂ → Polynomial ℂ,
+                  (∀ τ u, q τ u ≠ 0)
+                    → (∀ z ∈ Zalg E b, ∀ ψ ∈ GlobalTheory.CapKilled.space E b L W q,
+                      z ψ ∈ GlobalTheory.CapKilled.space E b L W q)
+                    → FiniteDimensional ℂ (GlobalTheory.CapKilled.space E b L W q) := by
   intro E _ _ _ b hP hint L hL W hW q hq hstab
   classical
   have hcap : ∀ (τ : E →+* ℂ) (u : ℂ), cap (a := b) τ u ∈ Zalg E b := fun τ u =>
@@ -37,7 +60,8 @@ theorem finiteDimensional_space : ∀ (E : Type) [Field E] [NumberField E] [_roo
   let V := GlobalTheory.CapKilled.space E b L W q
   let R : (E →+* ℂ) × Fin (b + 1) → Module.End ℂ V := fun p =>
     (cap (a := b) p.1 ((p.2 : ℕ) : ℂ)).restrict (fun ψ hψ => hstab _ (hcap _ _) ψ hψ)
-  have hR : ∀ p (v : V), ((R p v : V) : Sm E b) = cap (a := b) p.1 ((p.2 : ℕ) : ℂ) (v : Sm E b) := fun _ _ => rfl
+  have hR : ∀ p (v : V), ((R p v : V) : Sm E b) = cap (a := b) p.1 ((p.2 : ℕ) : ℂ) (v : Sm E b) :=
+    fun _ _ => rfl
   let T : Finset (Module.End ℂ V) := Finset.univ.image R
   have key := GlobalTheory.FinEig.fd_of_finset T ?_ ?_ ⊤ (fun _ _ _ _ => Submodule.mem_top) ?_
   · exact Module.Finite.equiv Submodule.topEquiv
@@ -46,7 +70,8 @@ theorem finiteDimensional_space : ∀ (E : Type) [Field E] [NumberField E] [_roo
     obtain ⟨p', _, rfl⟩ := Finset.mem_image.1 hu'
     refine LinearMap.ext fun v => Subtype.ext ?_
     rw [Module.End.mul_apply, Module.End.mul_apply, hR, hR, hR, hR, ← Module.End.mul_apply,
-      (GlobalTheory.AutGrowth.KilledFin.Zalg_commute (hcap _ _) (hcap _ _)).eq, Module.End.mul_apply]
+      (GlobalTheory.AutGrowth.KilledFin.Zalg_commute (hcap _ _) (hcap _ _)).eq,
+      Module.End.mul_apply]
   · intro u hu
     obtain ⟨p, _, rfl⟩ := Finset.mem_image.1 hu
     refine ⟨q p.1 ((p.2 : ℕ) : ℂ), hq _ _, LinearMap.ext fun v => Subtype.ext ?_⟩
@@ -58,12 +83,18 @@ theorem finiteDimensional_space : ∀ (E : Type) [Field E] [NumberField E] [_roo
       fun τ u => Classical.choose_spec (hint τ u)
     let c' : (E →+* ℂ) → ℂ → ℂ := fun τ u => ∑ j : Fin (b + 1), w τ u j * c (R (τ, j))
     let χ : Module.End ℂ (Sm E b) → ℂ := fun z =>
-      if h : z ∈ Zalg E b then Classical.choose (GlobalTheory.CuspRep.Zalg_acts_by_scalar E b c' z h) else 0
+      if h : z ∈ Zalg E b then
+        Classical.choose (GlobalTheory.CuspRep.Zalg_acts_by_scalar E b c' z h)
+      else
+        0
     let J := (⊤ : Submodule ℂ V) ⊓ ⨅ u ∈ T, LinearMap.ker (u - algebraMap ℂ (Module.End ℂ V) (c u))
-    have hJcap : ∀ v ∈ J, ∀ τ u, cap (a := b) τ u ((v : V) : Sm E b) = c' τ u • ((v : V) : Sm E b) := by
+    have hJcap
+        : ∀ v ∈ J, ∀ τ u, cap (a := b) τ u ((v : V) : Sm E b) = c' τ u • ((v : V) : Sm E b) := by
       intro v hv τ u
-      have hj : ∀ j : Fin (b + 1), cap (a := b) τ ((j : ℕ) : ℂ) ((v : V) : Sm E b) =
-          c (R (τ, j)) • ((v : V) : Sm E b) := by
+      have hj
+          : ∀ j : Fin (b + 1),
+            cap (a := b) τ ((j : ℕ) : ℂ) ((v : V) : Sm E b)
+              = c (R (τ, j)) • ((v : V) : Sm E b) := by
         intro j
         have h1 : v ∈ ⨅ u ∈ T, LinearMap.ker (u - algebraMap ℂ (Module.End ℂ V) (c u)) := hv.2
         rw [Submodule.mem_iInf] at h1
@@ -78,20 +109,24 @@ theorem finiteDimensional_space : ∀ (E : Type) [Field E] [NumberField E] [_roo
     have hJz : ∀ v ∈ J, ∀ z ∈ Zalg E b, z ((v : V) : Sm E b) = χ z • ((v : V) : Sm E b) := by
       intro v hv z hz
       simp only [χ, dif_pos hz]
-      exact Classical.choose_spec (GlobalTheory.CuspRep.Zalg_acts_by_scalar E b c' z hz) _ (hJcap v hv)
+      exact Classical.choose_spec (GlobalTheory.CuspRep.Zalg_acts_by_scalar E b c' z hz) _
+        (hJcap v hv)
     have hmem : ∀ v ∈ J, ((v : V) : Sm E b) ∈ GlobalTheory.HCF.formsGL E b L W {χ} 1 := by
       intro v hv
       obtain ⟨hleft, hfix, hK, _, htame⟩ := GlobalTheory.CapKilled.mem_space.1 (v : V).2
       have hkfin : FiniteDimensional ℂ
           (Submodule.span ℂ (Set.range fun k => cptRep E b k ((v : V) : Sm E b))) := by
         obtain ⟨s, bb, hb⟩ := GlobalTheory.HCFct.exists_interp W hW
-        have e : ∀ k, cptRep E b k ((v : V) : Sm E b) =
-            ∑ i : s, (bb i).1 k • cptRep E b i.1 ((v : V) : Sm E b) := by
+        have e
+            : ∀ k,
+              cptRep E b k ((v : V) : Sm E b)
+                = ∑ i : s, (bb i).1 k • cptRep E b i.1 ((v : V) : Sm E b) := by
           intro k
           apply Subtype.ext
           funext g
           have := hb _ (hK g) k
-          simp only [Submodule.coe_sum, Finset.sum_apply, Submodule.coe_smul, Pi.smul_apply, smul_eq_mul]
+          simp only [Submodule.coe_sum, Finset.sum_apply, Submodule.coe_smul, Pi.smul_apply,
+            smul_eq_mul]
           rw [this]
           exact Finset.sum_congr rfl fun i _ => mul_comm _ _
         haveI : FiniteDimensional ℂ
@@ -119,9 +154,12 @@ theorem finiteDimensional_space : ∀ (E : Type) [Field E] [NumberField E] [_roo
         rw [hJz v hv z (hzs z (List.mem_singleton_self z)), sub_self]
     haveI := hP L hL W hW {χ} (Set.finite_singleton χ) 1
     let Φ : J →ₗ[ℂ] Submodule.span ℂ (GlobalTheory.HCF.formsGL E b L W {χ} 1) :=
-      LinearMap.codRestrict _ (V.subtype.comp J.subtype) fun v => Submodule.subset_span (hmem v.1 v.2)
+      LinearMap.codRestrict _ (V.subtype.comp J.subtype) fun v =>
+        Submodule.subset_span (hmem v.1 v.2)
     have hinj : Function.Injective Φ := fun v v' h =>
-      Subtype.ext (Subtype.ext (congrArg (fun x : Submodule.span ℂ (GlobalTheory.HCF.formsGL E b L W {χ} 1) => (x : Sm E b)) h))
+      Subtype.ext (Subtype.ext (congrArg
+        (fun x : Submodule.span ℂ (GlobalTheory.HCF.formsGL E b L W {χ} 1) => (x : Sm E b))
+        h))
     exact Module.Finite.of_injective Φ hinj
 
 end GlobalTheory.CapKilled

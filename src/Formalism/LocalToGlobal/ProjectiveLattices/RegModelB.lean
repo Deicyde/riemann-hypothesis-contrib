@@ -8,27 +8,31 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.HeightTheory.
 
 namespace Formalism.L2.Pj.RegB
 
-open IsLocalRing ReciprocityTheory.ChartRestriction.G.T0 ReciprocityTheory.ChartRestriction.G.T0.KrullColonIdeal
+open IsLocalRing ReciprocityTheory.ChartRestriction.G.T0
+  ReciprocityTheory.ChartRestriction.G.T0.KrullColonIdeal
 
-theorem mem_loc_of_heightOne {R K : Type*} [CommRing R] [IsDomain R] [IsNoetherianRing R]
-    [IsIntegrallyClosed R] [Field K] [Algebra R K] [IsFractionRing R K] (qq : Ideal R) [hq : qq.IsPrime]
-    (x : K) (hx : ∀ p : Ideal R, p.IsPrime → p.height = 1 → p ≤ qq →
-      ∃ a s : R, s ∉ p ∧ x * algebraMap R K s = algebraMap R K a) :
-    ∃ a s : R, s ∉ qq ∧ x * algebraMap R K s = algebraMap R K a := by
+theorem mem_loc_of_heightOne
+    {R K : Type*} [CommRing R] [IsDomain R] [IsNoetherianRing R] [IsIntegrallyClosed R] [Field K]
+    [Algebra R K] [IsFractionRing R K]
+    (qq : Ideal R) [hq : qq.IsPrime]
+    (x : K)
+    (hx : ∀ p : Ideal R,
+      p.IsPrime → p.height = 1 → p ≤ qq
+        → ∃ a s : R, s ∉ p ∧ x * algebraMap R K s = algebraMap R K a)
+    : ∃ a s : R, s ∉ qq ∧ x * algebraMap R K s = algebraMap R K a := by
   classical
   obtain ⟨⟨a, s⟩, hxs⟩ := IsLocalization.surj (nonZeroDivisors R) x
   simp only at hxs
   have hinj : Function.Injective (algebraMap R K) := IsFractionRing.injective R K
   have hs0 : (s : R) ≠ 0 := nonZeroDivisors.ne_zero s.2
-  have hsK : algebraMap R K (s : R) ≠ 0 := by
-    intro h; apply hs0; exact hinj (by rw [h, map_zero])
+  have hsK : algebraMap R K (s : R) ≠ 0 := by intro h; apply hs0; exact hinj (by rw [h, map_zero])
   by_cases hex : ∃ t : R, t ∉ qq ∧ t * a ∈ Ideal.span {(s : R)}
   · obtain ⟨t, ht, hta⟩ := hex
     obtain ⟨r, hr⟩ := Ideal.mem_span_singleton'.mp hta
     refine ⟨r, t, ht, ?_⟩
     apply mul_right_cancel₀ hsK
-    rw [mul_assoc, mul_comm (algebraMap R K t), ← mul_assoc, hxs, ← map_mul, ← map_mul, mul_comm a t, ← hr,
-      mul_comm]
+    rw [mul_assoc, mul_comm (algebraMap R K t), ← mul_assoc, hxs, ← map_mul, ← map_mul,
+      mul_comm a t, ← hr, mul_comm]
   push Not at hex
   have hab0 : colonI (s : R) a ≤ qq := by
     intro t ht
@@ -135,7 +139,9 @@ theorem mem_loc_of_heightOne {R K : Type*} [CommRing R] [IsDomain R] [IsNoetheri
       obtain ⟨tq, htq⟩ := Ideal.mem_span_singleton'.mp ((mem_colonI).mp hq)
       have key : q * t = u * tq := by
         apply mul_right_cancel₀ hs0
-        calc q * t * s = q * (u * b) := by rw [hut]; ring
+        calc
+          q * t * s
+            = q * (u * b) := by rw [hut]; ring
           _ = u * (q * b) := by ring
           _ = u * tq * s := by rw [← htq]; ring
       have hu' : u ∈ Q := (Ideal.span_singleton_le_iff_mem _).mp huQ

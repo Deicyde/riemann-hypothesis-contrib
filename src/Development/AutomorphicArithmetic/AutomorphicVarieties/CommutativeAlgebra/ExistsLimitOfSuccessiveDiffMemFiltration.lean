@@ -8,16 +8,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
-theorem UpperTheory.exists_limit_of_successive_diff_mem_filtration :
-    ∀ (P : Type) [CommRing P] (m : Ideal P) [IsPrecomplete m P] (J : ℕ → Ideal P), (∀ N, m ^ (N + 1) ≤ J N) → (∀ N, J N ≤ J (N + 1) ⊔ m ^ (N + 1)) → ∀ (N₀ : ℕ) (p : ℕ → P), (∀ N, N₀ ≤ N → p (N + 1) - p N ∈ J N) → ∃ x : P, (∀ N, N₀ ≤ N → x - p N ∈ J N) ∧ x - p N₀ ∈ m ^ (N₀ + 1) := by
+theorem UpperTheory.exists_limit_of_successive_diff_mem_filtration
+    : ∀ (P : Type) [CommRing P] (m : Ideal P) [IsPrecomplete m P] (J : ℕ → Ideal P),
+      (∀ N, m ^ (N + 1) ≤ J N) → (∀ N, J N ≤ J (N + 1) ⊔ m ^ (N + 1))
+        → ∀ (N₀ : ℕ) (p : ℕ → P),
+          (∀ N, N₀ ≤ N → p (N + 1) - p N ∈ J N)
+            → ∃ x : P, (∀ N, N₀ ≤ N → x - p N ∈ J N) ∧ x - p N₀ ∈ m ^ (N₀ + 1) := by
   intro P _ m _ J hmJ hJ N₀ p hp
   classical
   have hsm : ∀ n, (m ^ n • ⊤ : Submodule P P) = m ^ n := by
     intro n
     rw [Ideal.smul_eq_mul, Ideal.mul_top]
-  have step : ∀ (k : ℕ) (y : P), ∃ y' : P,
-      y - p (N₀ + k) ∈ J (N₀ + k) →
-        y' - p (N₀ + k + 1) ∈ J (N₀ + k + 1) ∧ y' - y ∈ m ^ (N₀ + k + 1) := by
+  have step
+      : ∀ (k : ℕ) (y : P), ∃ y' : P,
+        y - p (N₀ + k) ∈ J (N₀ + k)
+          → y' - p (N₀ + k + 1) ∈ J (N₀ + k + 1) ∧ y' - y ∈ m ^ (N₀ + k + 1) := by
     intro k y
     by_cases hy : y - p (N₀ + k) ∈ J (N₀ + k)
     · have h1 : y - p (N₀ + k + 1) ∈ J (N₀ + k) := by
@@ -57,9 +62,10 @@ theorem UpperTheory.exists_limit_of_successive_diff_mem_filtration :
     | succ b hab ih =>
       have h := add_mem (Ideal.pow_le_pow_right (by omega) (hqJ b).2) ih
       rwa [sub_add_sub_cancel] at h
-  obtain ⟨L, hL⟩ := IsPrecomplete.prec' (I := m) q (fun {a b} hab => by
-    rw [hsm, SModEq.sub_mem, ← neg_sub]
-    exact neg_mem (Ideal.pow_le_pow_right (by omega) (hcau a b hab)))
+  obtain ⟨L, hL⟩ :=
+    IsPrecomplete.prec' (I := m) q (fun {a b} hab => by
+      rw [hsm, SModEq.sub_mem, ← neg_sub]
+      exact neg_mem (Ideal.pow_le_pow_right (by omega) (hcau a b hab)))
   have hx : ∀ k, L - q k ∈ m ^ (N₀ + k + 1) := by
     intro k
     have h1 := hL (N₀ + k + 1)

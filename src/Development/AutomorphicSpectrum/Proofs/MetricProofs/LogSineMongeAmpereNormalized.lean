@@ -23,7 +23,9 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.SphereMomentPo
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights
 open scoped ComplexOrder
 open ReciprocityTheory.ChartRestriction.G.AI GroundTheory.Heights₂.Heights.Inter
 
@@ -31,89 +33,128 @@ namespace GlobalTheory.CompanionTheory.Ar.PB.FibN
 
 noncomputable section
 
-theorem densW (d k i : ℕ) (hi : i < k) (hkd : 2 * k ≤ d + 2) (T : Fin 3 → Matrix (Fin d) (Fin d) ℂ)
-    (H : Matrix (Fin d) (Fin d) ℂ) (L : MvPolynomial (Option (Fin 3)) ℝ →ₗ[ℝ] ℂ)
+theorem densW
+    (d k i : ℕ) (hi : i < k) (hkd : 2 * k ≤ d + 2) (T : Fin 3 → Matrix (Fin d) (Fin d) ℂ)
+    (H : Matrix (Fin d) (Fin d) ℂ)
+    (L : MvPolynomial (Option (Fin 3)) ℝ →ₗ[ℝ] ℂ)
     (hL : ∀ (c : Fin d → Fin 3 → ℝ) (v : Fin d → ℝ),
-      (d.factorial : ℂ) * mdisc (fun t => (∑ i, ((c t i : ℝ) : ℂ) • T i) + ((v t : ℝ) : ℂ) • H) =
-        L (∏ t, (lin4 (c t) + C (v t) * X none)))
+      (d.factorial : ℂ) * mdisc (fun t => (∑ i, ((c t i : ℝ) : ℂ) • T i) + ((v t : ℝ) : ℂ) • H)
+        = L (∏ t, (lin4 (c t) + C (v t) * X none)))
     (f : (Fin (d + 1) → ℂ) → ℝ) (α : (Fin d → ℂ) → ℝ) (y : Fin d → ℂ)
     (hfc : ∀ a : ℂ, ContDiffAt ℝ 2 f (Fin.cons a y)) (hα : ContDiffAt ℝ 2 α y)
     (hfh : ∀ a : ℂ, hessC f (Fin.cons a y) = blk (-(wS a : ℂ)) (∑ j, ((nS a j : ℝ) : ℂ) • T j))
-    (hH : H = hessC α y) (φ : Fin (d + 2) → (Fin (d + 2) → ℂ) → ℝ)
-    (hφ : ∀ r z, φ r z =
-      (if (r : ℕ) < 2 * k then DiagonalFibreFubini.wordCoef i r else 0 : Fin 2 → ℝ) 0 *
-          f (Fin.cons (z 0) (Fin.tail (Fin.tail z))) +
-        (if (r : ℕ) < 2 * k then DiagonalFibreFubini.wordCoef i r else 0 : Fin 2 → ℝ) 1 *
-          f (Fin.cons (z 1) (Fin.tail (Fin.tail z))) +
-        (if (r : ℕ) < 2 * k then (0 : ℝ) else 1) * α (Fin.tail (Fin.tail z)))
-    (p₀ p₁ : ℂ) :
-    maDens φ (Fin.cons p₀ (Fin.cons p₁ y)) = (2 / Real.pi) ^ (d + 2) * (wS p₀ * wS p₁ *
-      (L (rename some (aeval ![lin3 (nS p₀), lin3 (nS p₁)]
-        (pderiv 0 (pderiv 1 (wwLinProd k (DiagonalFibreFubini.wordCoef i))))) *
-          X none ^ (d + 2 - 2 * k))).re) := by
+    (hH : H = hessC α y)
+    (φ : Fin (d + 2) → (Fin (d + 2) → ℂ) → ℝ)
+    (hφ : ∀ r z,
+      φ r z
+        = (if (r : ℕ) < 2 * k then DiagonalFibreFubini.wordCoef i r else 0 : Fin 2 → ℝ) 0
+            * f (Fin.cons (z 0) (Fin.tail (Fin.tail z)))
+          + (if (r : ℕ) < 2 * k then DiagonalFibreFubini.wordCoef i r else 0 : Fin 2 → ℝ) 1
+            * f (Fin.cons (z 1) (Fin.tail (Fin.tail z)))
+          + (if (r : ℕ) < 2 * k then (0 : ℝ) else 1) * α (Fin.tail (Fin.tail z)))
+    (p₀ p₁ : ℂ)
+    : maDens φ (Fin.cons p₀ (Fin.cons p₁ y))
+      = (2 / Real.pi) ^ (d + 2)
+        * (wS p₀ * wS p₁
+          * (L
+            (rename some
+                (aeval ![lin3 (nS p₀), lin3 (nS p₁)]
+                  (pderiv 0 (pderiv 1 (wwLinProd k (DiagonalFibreFubini.wordCoef i)))))
+              * X none ^ (d + 2 - 2 * k))).re) := by
   set uu : Fin (d + 2) → Fin 2 → ℝ := fun r => if (r : ℕ) < 2 * k then DiagonalFibreFubini.wordCoef i r else 0
   set vv : Fin (d + 2) → ℝ := fun r => if (r : ℕ) < 2 * k then (0 : ℝ) else 1
-  have hrow : (fun r => hessC (φ r) (Fin.cons p₀ (Fin.cons p₁ y))) = fun r =>
-      blk ((uu r 0 : ℂ) * -(wS p₀ : ℂ)) (blk ((uu r 1 : ℂ) * -(wS p₁ : ℂ))
-        ((∑ j, ((uu r 0 * nS p₀ j + uu r 1 * nS p₁ j : ℝ) : ℂ) • T j) + ((vv r : ℝ) : ℂ) • H)) := by
+  have hrow
+      : (fun r => hessC (φ r) (Fin.cons p₀ (Fin.cons p₁ y)))
+        = fun r =>
+          blk ((uu r 0 : ℂ) * -(wS p₀ : ℂ))
+            (blk ((uu r 1 : ℂ) * -(wS p₁ : ℂ))
+              ((∑ j, ((uu r 0 * nS p₀ j + uu r 1 * nS p₁ j : ℝ) : ℂ) • T j)
+                + ((vv r : ℝ) : ℂ) • H)) := by
     funext r
-    have e : φ r = fun z : Fin (d + 2) → ℂ => uu r 0 * f (Fin.cons (z 0) (Fin.tail (Fin.tail z))) +
-        uu r 1 * f (Fin.cons (z 1) (Fin.tail (Fin.tail z))) + vv r * α (Fin.tail (Fin.tail z)) :=
+    have e
+        : φ r
+          = fun z : Fin (d + 2) → ℂ =>
+            uu r 0 * f (Fin.cons (z 0) (Fin.tail (Fin.tail z)))
+              + uu r 1 * f (Fin.cons (z 1) (Fin.tail (Fin.tail z)))
+              + vv r * α (Fin.tail (Fin.tail z)) :=
       funext (hφ r)
-    rw [e, GlobalTheory.T.complex_hessian_two_point_combination d f α y p₀ p₁ _ _ _ _ (uu r 0) (uu r 1) (vv r) (hfc _) (hfc _) hα (hfh _) (hfh _), ← hH]
+    rw [e,
+      GlobalTheory.T.complex_hessian_two_point_combination d f α y p₀ p₁ _ _ _ _ (uu r 0) (uu r 1)
+        (vv r) (hfc _) (hfc _) hα (hfh _) (hfh _),
+      ← hH]
     congr 3
     simp only [Finset.smul_sum, smul_smul, ← Finset.sum_add_distrib, ← add_smul]
     refine Finset.sum_congr rfl fun j _ => ?_
     push_cast
     rfl
-  have hB := GlobalTheory.T.mixed_discriminant_two_row_expansion d T H L hL uu vv (nS p₀) (nS p₁) (-(wS p₀ : ℂ)) (-(wS p₁ : ℂ))
+  have hB :=
+    GlobalTheory.T.mixed_discriminant_two_row_expansion d T H L hL uu vv (nS p₀) (nS p₁)
+      (-(wS p₀ : ℂ)) (-(wS p₁ : ℂ))
   rw [GlobalTheory.T.word_coefficient_second_derivative d k i hi hkd (nS p₀) (nS p₁)] at hB
   rw [maDens, hrow]
   have hre := congrArg Complex.re hB
   rw [show (((d + 2).factorial : ℕ) : ℂ) = (((d + 2).factorial : ℝ) : ℂ) by push_cast; rfl,
-    Complex.re_ofReal_mul, neg_mul_neg, ← Complex.ofReal_mul, Complex.re_ofReal_mul] at hre
+      Complex.re_ofReal_mul, neg_mul_neg, ← Complex.ofReal_mul, Complex.re_ofReal_mul]
+    at hre
   rw [mul_right_comm, hre]
   ring
 
-theorem densY (d k : ℕ) (hk : 1 ≤ k) (hkd : 2 * k ≤ d + 2) (T : Fin 3 → Matrix (Fin d) (Fin d) ℂ)
-    (H : Matrix (Fin d) (Fin d) ℂ) (L : MvPolynomial (Option (Fin 3)) ℝ →ₗ[ℝ] ℂ)
+theorem densY
+    (d k : ℕ) (hk : 1 ≤ k) (hkd : 2 * k ≤ d + 2) (T : Fin 3 → Matrix (Fin d) (Fin d) ℂ)
+    (H : Matrix (Fin d) (Fin d) ℂ)
+    (L : MvPolynomial (Option (Fin 3)) ℝ →ₗ[ℝ] ℂ)
     (hL : ∀ (c : Fin d → Fin 3 → ℝ) (v : Fin d → ℝ),
-      (d.factorial : ℂ) * mdisc (fun t => (∑ i, ((c t i : ℝ) : ℂ) • T i) + ((v t : ℝ) : ℂ) • H) =
-        L (∏ t, (lin4 (c t) + C (v t) * X none)))
+      (d.factorial : ℂ) * mdisc (fun t => (∑ i, ((c t i : ℝ) : ℂ) • T i) + ((v t : ℝ) : ℂ) • H)
+        = L (∏ t, (lin4 (c t) + C (v t) * X none)))
     (f : (Fin (d + 1) → ℂ) → ℝ) (α : (Fin d → ℂ) → ℝ) (y : Fin d → ℂ)
     (hfc : ∀ a : ℂ, ContDiffAt ℝ 2 f (Fin.cons a y)) (hα : ContDiffAt ℝ 2 α y)
     (hfh : ∀ a : ℂ, hessC f (Fin.cons a y) = blk (-(wS a : ℂ)) (∑ j, ((nS a j : ℝ) : ℂ) • T j))
-    (hH : H = hessC α y) (φ : Fin (d + 1) → (Fin (d + 1) → ℂ) → ℝ)
-    (hφ : ∀ r z, φ r z = (if (r : ℕ) < 2 * k - 1 then (1 : ℝ) else 0) * f z +
-        (if (r : ℕ) < 2 * k - 1 then (0 : ℝ) else 1) * α (Fin.tail z))
-    (a : ℂ) :
-    maDens φ (Fin.cons a y) = (2 / Real.pi) ^ (d + 1) * (-(wS a) * (2 * (k : ℝ) - 1) *
-      (L (rename some (lin3 (nS a) ^ (2 * k - 2)) * X none ^ (d + 2 - 2 * k))).re) := by
+    (hH : H = hessC α y)
+    (φ : Fin (d + 1) → (Fin (d + 1) → ℂ) → ℝ)
+    (hφ : ∀ r z,
+      φ r z
+        = (if (r : ℕ) < 2 * k - 1 then (1 : ℝ) else 0) * f z
+          + (if (r : ℕ) < 2 * k - 1 then (0 : ℝ) else 1) * α (Fin.tail z))
+    (a : ℂ)
+    : maDens φ (Fin.cons a y)
+      = (2 / Real.pi) ^ (d + 1)
+        * (-(wS a) * (2 * (k : ℝ) - 1)
+          * (L (rename some (lin3 (nS a) ^ (2 * k - 2)) * X none ^ (d + 2 - 2 * k))).re) := by
   set cc : Fin (d + 1) → ℝ := fun r => if (r : ℕ) < 2 * k - 1 then (1 : ℝ) else 0
   set vv : Fin (d + 1) → ℝ := fun r => if (r : ℕ) < 2 * k - 1 then (0 : ℝ) else 1
-  have hrow : (fun r => hessC (φ r) (Fin.cons a y)) = fun r =>
-      blk ((cc r : ℂ) * -(wS a : ℂ))
-        ((∑ j, ((cc r * nS a j : ℝ) : ℂ) • T j) + ((vv r : ℝ) : ℂ) • H) := by
+  have hrow
+      : (fun r => hessC (φ r) (Fin.cons a y))
+        = fun r =>
+          blk ((cc r : ℂ) * -(wS a : ℂ))
+            ((∑ j, ((cc r * nS a j : ℝ) : ℂ) • T j) + ((vv r : ℝ) : ℂ) • H) := by
     funext r
     have e : φ r = fun z : Fin (d + 1) → ℂ => cc r * f z + vv r * α (Fin.tail z) := funext (hφ r)
-    rw [e, GlobalTheory.T.complex_hessian_block_combination d f α y a _ _ (cc r) (vv r) (hfc _) hα (hfh _), ← hH]
+    rw [e,
+      GlobalTheory.T.complex_hessian_block_combination d f α y a _ _ (cc r) (vv r) (hfc _) hα
+        (hfh _),
+      ← hH]
     congr 2
     simp only [Finset.smul_sum, smul_smul]
     refine Finset.sum_congr rfl fun j _ => ?_
     push_cast
     rfl
-  have hB := GlobalTheory.T.mixed_discriminant_one_row_expansion d T H L hL cc vv (nS a) (-(wS a : ℂ))
+  have hB :=
+    GlobalTheory.T.mixed_discriminant_one_row_expansion d T H L hL cc vv (nS a) (-(wS a : ℂ))
   rw [GlobalTheory.T.row_product_first_derivative d k hk hkd (nS a)] at hB
   rw [maDens, hrow]
   have hre := congrArg Complex.re hB
-  have hR : (-(wS a : ℂ) * L (C (2 * (k : ℝ) - 1) * rename some (lin3 (nS a) ^ (2 * k - 2)) *
-      X none ^ (d + 2 - 2 * k))).re = -(wS a) * (2 * (k : ℝ) - 1) *
-        (L (rename some (lin3 (nS a) ^ (2 * k - 2)) * X none ^ (d + 2 - 2 * k))).re := by
-    rw [mul_assoc (C _), C_mul', map_smul, Complex.real_smul, ← Complex.ofReal_neg, Complex.re_ofReal_mul,
-      Complex.re_ofReal_mul]
+  have hR
+      : (-(wS a : ℂ) * L
+          (C (2 * (k : ℝ) - 1) * rename some (lin3 (nS a) ^ (2 * k - 2))
+            * X none ^ (d + 2 - 2 * k))).re
+        = -(wS a) * (2 * (k : ℝ) - 1)
+          * (L (rename some (lin3 (nS a) ^ (2 * k - 2)) * X none ^ (d + 2 - 2 * k))).re := by
+    rw [mul_assoc (C _), C_mul', map_smul, Complex.real_smul, ← Complex.ofReal_neg,
+      Complex.re_ofReal_mul, Complex.re_ofReal_mul]
     ring
   rw [show (((d + 1).factorial : ℕ) : ℂ) = (((d + 1).factorial : ℝ) : ℂ) by push_cast; rfl,
-    Complex.re_ofReal_mul, hR] at hre
+      Complex.re_ofReal_mul, hR]
+    at hre
   rw [mul_right_comm, hre]
   ring
 

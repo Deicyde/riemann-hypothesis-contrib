@@ -6,11 +6,17 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.LocallyCo
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.IndefiniteRowSideFullHecke.OpenClosedSequences GlobalTheory.RankStrataProof GlobalTheory.CompanionTheory.ThetaGLLen Matrix Topology
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL
+  GlobalTheory.IndefiniteRowSideFullHecke.OpenClosedSequences GlobalTheory.RankStrataProof
+  GlobalTheory.CompanionTheory.ThetaGLLen Matrix Topology
 noncomputable section
 namespace GlobalTheory.CompanionTheory.ThetaGLLen.FullRank
 
-theorem exists_nhds_smul_invariant : ∀ (H X : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [TopologicalSpace X] [MulAction H X] [ContinuousSMul H X] (f : SB X), ∃ U ∈ 𝓝 (1 : H), ∀ g ∈ U, ∀ x : X, f.1 (g • x) = f.1 x := by
+theorem exists_nhds_smul_invariant
+    : ∀ (H X : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [TopologicalSpace X]
+        [MulAction H X] [ContinuousSMul H X] (f : SB X),
+      ∃ U ∈ 𝓝 (1 : H), ∀ g ∈ U, ∀ x : X,
+        f.1 (g • x) = f.1 x := by
   intro H X _ _ _ _ _ _ f
   have hc : IsCompact (tsupport f.1) := f.2.2
   have hl : IsLocallyConstant fun p : H × X => f.1 (p.1 • p.2) - f.1 p.2 :=
@@ -25,8 +31,12 @@ theorem exists_nhds_smul_invariant : ∀ (H X : Type) [Group H] [TopologicalSpac
     simp [this]
   obtain ⟨U, W, hU, hW, h1, hCW, hUW⟩ := generalized_tube_lemma isCompact_singleton hc hS hsub
   have h1U : (1 : H) ∈ U := h1 rfl
-  refine ⟨U ∩ (fun g : H => g⁻¹) ⁻¹' U, Filter.inter_mem (hU.mem_nhds h1U)
-    (continuous_inv.continuousAt.preimage_mem_nhds (by simpa using hU.mem_nhds h1U)), ?_⟩
+  refine ⟨
+    U ∩ (fun g : H => g⁻¹) ⁻¹' U,
+    Filter.inter_mem (hU.mem_nhds h1U)
+      (continuous_inv.continuousAt.preimage_mem_nhds (by simpa using hU.mem_nhds h1U)),
+    ?_
+  ⟩
   rintro g ⟨hg, hg'⟩ x
   by_cases hx : x ∈ W
   · exact hUW (show (g, x) ∈ U ×ˢ W from ⟨hg, hx⟩)
@@ -37,10 +47,16 @@ theorem exists_nhds_smul_invariant : ∀ (H X : Type) [Group H] [TopologicalSpac
   · rw [image_eq_zero_of_notMem_tsupport fun h => hgx (hCW h),
       image_eq_zero_of_notMem_tsupport fun h => hx (hCW h)]
 
-theorem exists_level_subset : ∀ (H : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [T2Space H] [TotallyDisconnectedSpace H] (K : Subgroup H), IsCompact (K : Set H) → IsOpen (K : Set H) → ∀ U ∈ 𝓝 (1 : H), ∃ N : Subgroup H, IsOpen (N : Set H) ∧ N ≤ K ∧ (N : Set H) ⊆ U ∧ ∀ κ ∈ K, ∀ n ∈ N, κ * n * κ⁻¹ ∈ N := by
+theorem exists_level_subset
+    : ∀ (H : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [T2Space H]
+        [TotallyDisconnectedSpace H] (K : Subgroup H),
+      IsCompact (K : Set H) → IsOpen (K : Set H)
+        → ∀ U ∈ 𝓝 (1 : H), ∃ N : Subgroup H,
+          IsOpen (N : Set H) ∧ N ≤ K ∧ (N : Set H) ⊆ U ∧ ∀ κ ∈ K, ∀ n ∈ N, κ * n * κ⁻¹ ∈ N := by
   intro H _ _ _ _ _ K hKc hKo U hU
   haveI : CompactSpace K := isCompact_iff_compactSpace.1 hKc
-  have hVo : IsOpen ((Subtype.val : K → H) ⁻¹' interior U) := isOpen_interior.preimage continuous_subtype_val
+  have hVo : IsOpen ((Subtype.val : K → H) ⁻¹' interior U) :=
+    isOpen_interior.preimage continuous_subtype_val
   have h1 : (1 : K) ∈ (Subtype.val : K → H) ⁻¹' interior U := mem_interior_iff_mem_nhds.2 hU
   obtain ⟨M, hM⟩ := ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one hVo h1
   refine ⟨M.toSubgroup.map K.subtype, ?_, Subgroup.map_subtype_le _, ?_, ?_⟩
@@ -50,9 +66,13 @@ theorem exists_level_subset : ∀ (H : Type) [Group H] [TopologicalSpace H] [IsT
   · rintro κ hκ _ ⟨m, hm, rfl⟩
     exact ⟨⟨κ, hκ⟩ * m * (⟨κ, hκ⟩ : K)⁻¹, M.isNormal'.conj_mem m hm _, by simp⟩
 
-theorem indicator_mem_SB_of_isClopen {X : Type} [TopologicalSpace X] {Y : Set X} (hY : IsClopen Y) (f : SB X) :
-    Y.indicator f.1 ∈ SB X := by
-  refine ⟨(IsLocallyConstant.iff_eventually_eq _).2 fun x => ?_, HasCompactSupport.mono f.2.2 fun x hx => ?_⟩
+theorem indicator_mem_SB_of_isClopen
+    {X : Type} [TopologicalSpace X] {Y : Set X} (hY : IsClopen Y) (f : SB X)
+    : Y.indicator f.1 ∈ SB X := by
+  refine ⟨
+    (IsLocallyConstant.iff_eventually_eq _).2 fun x => ?_,
+    HasCompactSupport.mono f.2.2 fun x hx => ?_
+  ⟩
   · have hf := (IsLocallyConstant.iff_eventually_eq _).1 f.2.1 x
     by_cases hx : x ∈ Y
     · filter_upwards [hY.isOpen.mem_nhds hx, hf] with y hy e
@@ -64,9 +84,20 @@ theorem indicator_mem_SB_of_isClopen {X : Type} [TopologicalSpace X] {Y : Set X}
       exact hx
     · exact absurd (Set.indicator_of_notMem h _) hx
 
-theorem exists_clopen_cut : ∀ (X : Type) [TopologicalSpace X] (Y : Set X), IsClopen Y → ∀ f : SB X, ∃ f₁ f₂ : SB X, f = f₁ + f₂ ∧ (∀ x, f₁.1 x ≠ 0 → x ∈ Y ∧ f.1 x ≠ 0) ∧ (∀ x, f₂.1 x ≠ 0 → x ∉ Y ∧ f.1 x ≠ 0) := by
+theorem exists_clopen_cut
+    : ∀ (X : Type) [TopologicalSpace X] (Y : Set X),
+      IsClopen Y
+        → ∀ f : SB X, ∃ f₁ f₂ : SB X,
+          f = f₁ + f₂ ∧ (∀ x, f₁.1 x ≠ 0 → x ∈ Y ∧ f.1 x ≠ 0)
+            ∧ (∀ x, f₂.1 x ≠ 0 → x ∉ Y ∧ f.1 x ≠ 0) := by
   intro X _ Y hY f
-  refine ⟨⟨_, indicator_mem_SB_of_isClopen hY f⟩, ⟨_, indicator_mem_SB_of_isClopen hY.compl f⟩, ?_, ?_, ?_⟩
+  refine ⟨
+    ⟨_, indicator_mem_SB_of_isClopen hY f⟩,
+    ⟨_, indicator_mem_SB_of_isClopen hY.compl f⟩,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · refine Subtype.ext (funext fun x => ?_)
     show f.1 x = Y.indicator f.1 x + Yᶜ.indicator f.1 x
     by_cases h : x ∈ Y <;> simp [h]
@@ -83,17 +114,22 @@ theorem exists_clopen_cut : ∀ (X : Type) [TopologicalSpace X] (Y : Set X), IsC
 
 section Matrices
 
-variable {k a c d : Type} [Field k] [Fintype a] [DecidableEq a] [Fintype c] [DecidableEq c] [Fintype d] [DecidableEq d]
+variable
+  {k a c d : Type}
+  [Field k] [Fintype a] [DecidableEq a] [Fintype c] [DecidableEq c] [Fintype d] [DecidableEq d]
 
-theorem exists_gl_mul_eq_base (e : c ⊕ d ≃ a) (x : Matrix c a k) (hx : x.rank = Fintype.card c) :
-    ∃ g : GL a k, ∀ i s, (x * g.val) i (e s) = Sum.elim (fun j => (1 : Matrix c c k) i j) (fun _ => 0) s := by
+theorem exists_gl_mul_eq_base (e : c ⊕ d ≃ a) (x : Matrix c a k) (hx : x.rank = Fintype.card c)
+    : ∃ g : GL a k, ∀ i s,
+      (x * g.val) i (e s) = Sum.elim (fun j => (1 : Matrix c c k) i j) (fun _ => 0) s := by
   obtain ⟨g, hg⟩ := GlobalTheory.T.exists_GL_mul_rightColumns_eq_zero_of_rank k c c d a e x hx
   have hr : (x * g.val).rank = Fintype.card c := by
     rw [rank_mul_eq_left_of_isUnit_det _ _ ((isUnit_iff_isUnit_det _).1 g.isUnit)]
     exact hx
-  have h := GlobalTheory.T.leftColumns_mulVec_injective_of_rank_eq_card k c c d a e (x * g.val) hr hg
+  have h :=
+    GlobalTheory.T.leftColumns_mulVec_injective_of_rank_eq_card k c c d a e (x * g.val) hr hg
   have hu : IsUnit ((x * g.val).submatrix id fun i => e (.inl i)) :=
-    mulVec_injective_iff_isUnit.1 fun v w hvw => sub_eq_zero.1 (h _ (by rw [mulVec_sub, hvw, sub_self]))
+    mulVec_injective_iff_isUnit.1 fun v w hvw =>
+      sub_eq_zero.1 (h _ (by rw [mulVec_sub, hvw, sub_self]))
   set u : Matrix c c k := (x * g.val).submatrix id fun i => e (.inl i) with hudef
   have hud : IsUnit u.det := (isUnit_iff_isUnit_det _).1 hu
   have hD : IsUnit (reindex e e (fromBlocks u⁻¹ 0 0 (1 : Matrix d d k))).det := by
@@ -110,7 +146,10 @@ theorem exists_gl_mul_eq_base (e : c ⊕ d ≃ a) (x : Matrix c a k) (hx : x.ran
 
 end Matrices
 
-theorem exists_gl_eq_mul_of_rank : ∀ (k a c : Type) [Field k] [Fintype a] [DecidableEq a] [Fintype c] [DecidableEq c] (x y : Matrix c a k), x.rank = Fintype.card c → y.rank = Fintype.card c → ∃ g : GL a k, y = x * g.val := by
+theorem exists_gl_eq_mul_of_rank
+    : ∀ (k a c : Type) [Field k] [Fintype a] [DecidableEq a] [Fintype c] [DecidableEq c]
+        (x y : Matrix c a k),
+      x.rank = Fintype.card c → y.rank = Fintype.card c → ∃ g : GL a k, y = x * g.val := by
   intro k a c _ _ _ _ _ x y hx hy
   have hle : Fintype.card c ≤ Fintype.card a := hx ▸ rank_le_card_width x
   have e : c ⊕ Fin (Fintype.card a - Fintype.card c) ≃ a := Fintype.equivOfCardEq (by simp; omega)
@@ -121,28 +160,37 @@ theorem exists_gl_eq_mul_of_rank : ∀ (k a c : Type) [Field k] [Fintype a] [Dec
     obtain ⟨s, rfl⟩ := e.surjective l
     rw [hgx, hgy]
   refine ⟨gx * gy⁻¹, ?_⟩
-  calc y = (y * gy.val) * (gy⁻¹).val := by
-        rw [Matrix.mul_assoc, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.mul_one]
+  calc
+    y = (y * gy.val) * (gy⁻¹).val := by
+      rw [Matrix.mul_assoc, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.mul_one]
     _ = x * (gx * gy⁻¹).val := by rw [← h, Units.val_mul, Matrix.mul_assoc]
 
 section Orbit
 
-variable {H X : Type} [Group H] [TopologicalSpace H] [IsTopologicalGroup H]
-  [TopologicalSpace X] [MulAction H X]
+variable
+  {H X : Type}
+  [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [TopologicalSpace X] [MulAction H X]
 
-theorem translate_mem_span {V : Type} [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ H V) (t : V) (g : H)
-    {w : V} (hw : w ∈ Submodule.span ℂ (Set.range fun h : H => ρ h t)) :
-    ρ g w ∈ Submodule.span ℂ (Set.range fun h : H => ρ h t) := by
-  have h : Submodule.span ℂ (Set.range fun h : H => ρ h t) ≤
-      (Submodule.span ℂ (Set.range fun h : H => ρ h t)).comap (ρ g) := by
+theorem translate_mem_span
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ H V) (t : V)
+    (g : H)
+    {w : V} (hw : w ∈ Submodule.span ℂ (Set.range fun h : H => ρ h t))
+    : ρ g w ∈ Submodule.span ℂ (Set.range fun h : H => ρ h t) := by
+  have h
+      : Submodule.span ℂ (Set.range fun h : H => ρ h t)
+        ≤ (Submodule.span ℂ (Set.range fun h : H => ρ h t)).comap (ρ g) := by
     refine Submodule.span_le.2 ?_
     rintro _ ⟨h, rfl⟩
     exact Submodule.subset_span ⟨g * h, by simp [map_mul]⟩
   exact h hw
 
-theorem span_translates_le {V : Type} [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ H V) {t v : V}
-    (hv : v ∈ Submodule.span ℂ (Set.range fun h : H => ρ h t)) :
-    Submodule.span ℂ (Set.range fun h : H => ρ h v) ≤ Submodule.span ℂ (Set.range fun h : H => ρ h t) := by
+theorem span_translates_le
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ H V)
+    {t v : V} (hv : v ∈ Submodule.span ℂ (Set.range fun h : H => ρ h t))
+    : Submodule.span ℂ (Set.range fun h : H => ρ h v)
+      ≤ Submodule.span ℂ (Set.range fun h : H => ρ h t) := by
   refine Submodule.span_le.2 ?_
   rintro _ ⟨h, rfl⟩
   exact translate_mem_span ρ t h hv
@@ -152,24 +200,34 @@ abbrev orb (N : Subgroup H) (x₀ : X) : Set X := (fun n : H => n • x₀) '' (
 def IsLevel (K N : Subgroup H) : Prop :=
   IsOpen (N : Set H) ∧ N ≤ K ∧ ∀ κ ∈ K, ∀ n ∈ N, κ * n * κ⁻¹ ∈ N
 
-theorem IsLevel.inf {K N N' : Subgroup H} (h : IsLevel K N) (h' : IsLevel K N') : IsLevel K (N ⊓ N') :=
-  ⟨by simpa using h.1.inter h'.1, inf_le_left.trans h.2.1,
-    fun κ hκ n hn => ⟨h.2.2 κ hκ n hn.1, h'.2.2 κ hκ n hn.2⟩⟩
+theorem IsLevel.inf {K N N' : Subgroup H} (h : IsLevel K N) (h' : IsLevel K N')
+    : IsLevel K (N ⊓ N') := ⟨
+  by simpa using h.1.inter h'.1,
+  inf_le_left.trans h.2.1,
+  fun κ hκ n hn => ⟨h.2.2 κ hκ n hn.1, h'.2.2 κ hκ n hn.2⟩
+⟩
 
 def Reached (ρ : Representation ℂ H (SB X)) (K : Subgroup H) (x₀ : X) (f : SB X) : Prop :=
-  ∃ N : Subgroup H, IsLevel K N ∧ ∃ v : SB X, (∀ x, v.1 x = (orb N x₀).indicator (fun _ => (1 : ℂ)) x) ∧
-    f ∈ Submodule.span ℂ (Set.range fun g : H => ρ g v)
+  ∃ N : Subgroup H,
+    IsLevel K N
+      ∧ ∃ v : SB X,
+        (∀ x, v.1 x = (orb N x₀).indicator (fun _ => (1 : ℂ)) x)
+          ∧ f ∈ Submodule.span ℂ (Set.range fun g : H => ρ g v)
 
-theorem exists_indicator_orb [T2Space X] [ContinuousSMul H X] (hopen : ∀ x : X, IsOpenMap fun g : H => g • x)
-    {K N : Subgroup H} (hK : IsCompact (K : Set H)) (hN : IsLevel K N) (x₀ : X) :
-    ∃ v : SB X, ∀ x, v.1 x = (orb N x₀).indicator (fun _ => (1 : ℂ)) x := by
+theorem exists_indicator_orb
+    [T2Space X] [ContinuousSMul H X]
+    (hopen : ∀ x : X, IsOpenMap fun g : H => g • x)
+    {K N : Subgroup H} (hK : IsCompact (K : Set H)) (hN : IsLevel K N)
+    (x₀ : X)
+    : ∃ v : SB X, ∀ x, v.1 x = (orb N x₀).indicator (fun _ => (1 : ℂ)) x := by
   have hc : IsCompact (N : Set H) :=
     hK.of_isClosed_subset (Subgroup.isClosed_of_isOpen N hN.1) hN.2.1
   have hc' : IsCompact (orb N x₀) := hc.image (continuous_id.smul continuous_const)
-  exact ⟨⟨_, GlobalTheory.SBExtend.indicator_mem_SB hc' ⟨hc'.isClosed, hopen x₀ _ hN.1⟩⟩, fun _ => rfl⟩
+  exact
+    ⟨⟨_, GlobalTheory.SBExtend.indicator_mem_SB hc' ⟨hc'.isClosed, hopen x₀ _ hN.1⟩⟩, fun _ => rfl⟩
 
-theorem orb_smul_mem_iff {N : Subgroup H} {x₀ x : X} {n : H} (hn : n ∈ N) :
-    n • x ∈ orb N x₀ ↔ x ∈ orb N x₀ := by
+theorem orb_smul_mem_iff {N : Subgroup H} {x₀ x : X} {n : H} (hn : n ∈ N)
+    : n • x ∈ orb N x₀ ↔ x ∈ orb N x₀ := by
   constructor
   · rintro ⟨m, hm, e⟩
     refine ⟨n⁻¹ * m, N.mul_mem (N.inv_mem hn) hm, ?_⟩
@@ -183,24 +241,42 @@ theorem orb_smul_mem_iff {N : Subgroup H} {x₀ x : X} {n : H} (hn : n ∈ N) :
     show (n * m) • x₀ = n • x
     rw [mul_smul, e']
 
-theorem mem_span_translates_of_level : ∀ (H X : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [TopologicalSpace X] [MulAction H X] (ρ : Representation ℂ H (SB X)), (∀ (g : H) (f : SB X) (x : X), (ρ g f).1 x = f.1 (g⁻¹ • x)) → ∀ (K N : Subgroup H), IsCompact (K : Set H) → IsOpen (N : Set H) → N ≤ K → (∀ κ ∈ K, ∀ n ∈ N, κ * n * κ⁻¹ ∈ N) → ∀ (x₀ : X) (v f : SB X), (∀ x, v.1 x = ((fun n : H => n • x₀) '' (N : Set H)).indicator (fun _ => (1 : ℂ)) x) → (∀ n ∈ N, ∀ x, f.1 (n • x) = f.1 x) → (∀ x, f.1 x ≠ 0 → x ∈ (fun κ : H => κ • x₀) '' (K : Set H)) → f ∈ Submodule.span ℂ (Set.range fun g : H => ρ g v) := by
+theorem mem_span_translates_of_level
+    : ∀ (H X : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [TopologicalSpace X]
+        [MulAction H X] (ρ : Representation ℂ H (SB X)),
+      (∀ (g : H) (f : SB X) (x : X), (ρ g f).1 x = f.1 (g⁻¹ • x))
+        → ∀ (K N : Subgroup H),
+          IsCompact (K : Set H) → IsOpen (N : Set H) → N ≤ K → (∀ κ ∈ K, ∀ n ∈ N, κ * n * κ⁻¹ ∈ N)
+            → ∀ (x₀ : X) (v f : SB X),
+              (∀ x, v.1 x = ((fun n : H => n • x₀) '' (N : Set H)).indicator (fun _ => (1 : ℂ)) x)
+                → (∀ n ∈ N, ∀ x, f.1 (n • x) = f.1 x)
+                → (∀ x, f.1 x ≠ 0 → x ∈ (fun κ : H => κ • x₀) '' (K : Set H))
+                → f ∈ Submodule.span ℂ (Set.range fun g : H => ρ g v) := by
   intro H X _ _ _ _ _ ρ hρ K N hK hN hNK hnorm x₀ v f hv hinv hsupp
   classical
-  obtain ⟨T, hTK, hT⟩ := hK.elim_nhds_subcover (fun κ : H => (fun n : H => κ * n) '' (N : Set H)) (fun κ _ =>
-    ((Homeomorph.mulLeft κ).isOpenMap _ hN).mem_nhds ⟨1, N.one_mem, mul_one κ⟩)
-  have hu : ∀ (τ : H) (x : X), (ρ τ v).1 x = (orb N x₀).indicator (fun _ => (1 : ℂ)) (τ⁻¹ • x) := fun τ x => by
+  obtain ⟨T, hTK, hT⟩ :=
+    hK.elim_nhds_subcover
+      (fun κ : H => (fun n : H => κ * n) '' (N : Set H))
+      (fun κ _ => ((Homeomorph.mulLeft κ).isOpenMap _ hN).mem_nhds ⟨1, N.one_mem, mul_one κ⟩)
+  have hu
+      : ∀ (τ : H) (x : X),
+        (ρ τ v).1 x = (orb N x₀).indicator (fun _ => (1 : ℂ)) (τ⁻¹ • x) := fun τ x => by
     rw [hρ, hv]
-  have key : ∀ (T : Finset H), (∀ τ ∈ T, τ ∈ K) → ∀ f : SB X, (∀ n ∈ N, ∀ x, f.1 (n • x) = f.1 x) →
-      (∀ x, f.1 x ≠ 0 → ∃ τ ∈ T, τ⁻¹ • x ∈ orb N x₀) →
-      f ∈ Submodule.span ℂ (Set.range fun g : H => ρ g v) := by
+  have key
+      : ∀ (T : Finset H),
+        (∀ τ ∈ T, τ ∈ K)
+          → ∀ f : SB X,
+            (∀ n ∈ N, ∀ x, f.1 (n • x) = f.1 x) → (∀ x, f.1 x ≠ 0 → ∃ τ ∈ T, τ⁻¹ • x ∈ orb N x₀)
+              → f ∈ Submodule.span ℂ (Set.range fun g : H => ρ g v) := by
     intro T
     induction T using Finset.induction_on with
     | empty =>
       intro _ f _ hf
-      have : f = 0 := Subtype.ext (funext fun x => by
-        by_contra h
-        obtain ⟨τ, hτ, -⟩ := hf x h
-        simp at hτ)
+      have : f = 0 :=
+        Subtype.ext (funext fun x => by
+          by_contra h
+          obtain ⟨τ, hτ, -⟩ := hf x h
+          simp at hτ)
       rw [this]
       exact Submodule.zero_mem _
     | insert τ T _ ih =>
@@ -209,8 +285,7 @@ theorem mem_span_translates_of_level : ∀ (H X : Type) [Group H] [TopologicalSp
       have hst : ∀ n ∈ N, ∀ x, τ⁻¹ • n • x ∈ orb N x₀ ↔ τ⁻¹ • x ∈ orb N x₀ := fun n hn x => by
         have hm : τ⁻¹ * n * τ⁻¹⁻¹ ∈ N := hnorm _ (K.inv_mem hτ) n hn
         rw [inv_inv] at hm
-        have e : τ⁻¹ • n • x = (τ⁻¹ * n * τ) • τ⁻¹ • x := by
-          simp only [mul_smul, smul_inv_smul]
+        have e : τ⁻¹ • n • x = (τ⁻¹ * n * τ) • τ⁻¹ • x := by simp only [mul_smul, smul_inv_smul]
         rw [e, orb_smul_mem_iff hm]
       have hval : ∀ x, τ⁻¹ • x ∈ orb N x₀ → f.1 x = f.1 (τ • x₀) := by
         rintro x ⟨n, hn, e⟩
@@ -223,23 +298,27 @@ theorem mem_span_translates_of_level : ∀ (H X : Type) [Group H] [TopologicalSp
         rw [hu, Set.indicator_of_mem hx]
       have hu0 : ∀ x, τ⁻¹ • x ∉ orb N x₀ → (ρ τ v).1 x = 0 := fun x hx => by
         rw [hu, Set.indicator_of_notMem hx]
-      have hv' : ∀ x, (f - f.1 (τ • x₀) • ρ τ v).1 x = f.1 x - f.1 (τ • x₀) * (ρ τ v).1 x := fun _ => rfl
-      have hm := ih (fun σ hσ => hTK σ (Finset.mem_insert_of_mem hσ)) (f - f.1 (τ • x₀) • ρ τ v)
-        (fun n hn x => by
-          rw [hv', hv', hfi n hn x]
-          by_cases hx : τ⁻¹ • x ∈ orb N x₀
-          · rw [hu1 _ ((hst n hn x).2 hx), hu1 _ hx]
-          · rw [hu0 _ (fun h => hx ((hst n hn x).1 h)), hu0 _ hx])
-        (fun x hx => by
-          rw [hv'] at hx
-          by_cases hxτ : τ⁻¹ • x ∈ orb N x₀
-          · rw [hu1 _ hxτ, hval x hxτ, mul_one, sub_self] at hx
-            exact absurd rfl hx
-          · rw [hu0 _ hxτ, mul_zero, sub_zero] at hx
-            obtain ⟨σ, hσ, hm⟩ := hf x hx
-            rcases Finset.mem_insert.1 hσ with rfl | hσ
-            · exact absurd hm hxτ
-            · exact ⟨σ, hσ, hm⟩)
+      have hv' : ∀ x, (f - f.1 (τ • x₀) • ρ τ v).1 x = f.1 x - f.1 (τ • x₀) * (ρ τ v).1 x :=
+        fun _ => rfl
+      have hm :=
+        ih
+          (fun σ hσ => hTK σ (Finset.mem_insert_of_mem hσ))
+          (f - f.1 (τ • x₀) • ρ τ v)
+          (fun n hn x => by
+            rw [hv', hv', hfi n hn x]
+            by_cases hx : τ⁻¹ • x ∈ orb N x₀
+            · rw [hu1 _ ((hst n hn x).2 hx), hu1 _ hx]
+            · rw [hu0 _ (fun h => hx ((hst n hn x).1 h)), hu0 _ hx])
+          (fun x hx => by
+            rw [hv'] at hx
+            by_cases hxτ : τ⁻¹ • x ∈ orb N x₀
+            · rw [hu1 _ hxτ, hval x hxτ, mul_one, sub_self] at hx
+              exact absurd rfl hx
+            · rw [hu0 _ hxτ, mul_zero, sub_zero] at hx
+              obtain ⟨σ, hσ, hm⟩ := hf x hx
+              rcases Finset.mem_insert.1 hσ with rfl | hσ
+              · exact absurd hm hxτ
+              · exact ⟨σ, hσ, hm⟩)
       have e : f = (f - f.1 (τ • x₀) • ρ τ v) + f.1 (τ • x₀) • ρ τ v := by abel
       rw [e]
       exact Submodule.add_mem _ hm (Submodule.smul_mem _ _ (Submodule.subset_span ⟨τ, rfl⟩))
@@ -251,14 +330,20 @@ theorem mem_span_translates_of_level : ∀ (H X : Type) [Group H] [TopologicalSp
   show n • x₀ = τ⁻¹ • (τ * n) • x₀
   rw [mul_smul, inv_smul_smul]
 
-theorem span_le_of_level (ρ : Representation ℂ H (SB X))
-    (hρ : ∀ (g : H) (f : SB X) (x : X), (ρ g f).1 x = f.1 (g⁻¹ • x)) {K N N' : Subgroup H}
-    (hK : IsCompact (K : Set H)) (hN : IsLevel K N) (hN' : IsLevel K N') (hle : N' ≤ N) (x₀ : X) {v v' : SB X}
-    (hv : ∀ x, v.1 x = (orb N x₀).indicator (fun _ => (1 : ℂ)) x)
-    (hv' : ∀ x, v'.1 x = (orb N' x₀).indicator (fun _ => (1 : ℂ)) x) :
-    Submodule.span ℂ (Set.range fun g : H => ρ g v) ≤ Submodule.span ℂ (Set.range fun g : H => ρ g v') := by
+theorem span_le_of_level
+    (ρ : Representation ℂ H (SB X)) (hρ : ∀ (g : H) (f : SB X) (x : X), (ρ g f).1 x = f.1 (g⁻¹ • x))
+    {K N N' : Subgroup H}
+    (hK : IsCompact (K : Set H)) (hN : IsLevel K N) (hN' : IsLevel K N') (hle : N' ≤ N)
+    (x₀ : X)
+    {v v' : SB X} (hv : ∀ x, v.1 x = (orb N x₀).indicator (fun _ => (1 : ℂ)) x)
+    (hv' : ∀ x, v'.1 x = (orb N' x₀).indicator (fun _ => (1 : ℂ)) x)
+    : Submodule.span ℂ (Set.range fun g : H => ρ g v)
+      ≤ Submodule.span ℂ (Set.range fun g : H => ρ g v') := by
   classical
-  refine span_translates_le ρ (mem_span_translates_of_level H X ρ hρ K N' hK hN'.1 hN'.2.1 hN'.2.2 x₀ v' v hv' (fun n hn x => ?_) fun x hx => ?_)
+  refine span_translates_le ρ
+    (mem_span_translates_of_level H X ρ hρ K N' hK hN'.1 hN'.2.1 hN'.2.2 x₀ v' v hv'
+      (fun n hn x => ?_)
+      fun x hx => ?_)
   · rw [hv, hv]
     simp only [Set.indicator, orb_smul_mem_iff (hle hn)]
   · rw [hv] at hx
@@ -270,41 +355,65 @@ theorem span_le_of_level (ρ : Representation ℂ H (SB X))
 
 variable [T2Space X] [ContinuousSMul H X]
 
-theorem Reached.add {ρ : Representation ℂ H (SB X)}
-    (hρ : ∀ (g : H) (f : SB X) (x : X), (ρ g f).1 x = f.1 (g⁻¹ • x))
-    (hopen : ∀ x : X, IsOpenMap fun g : H => g • x) {K : Subgroup H} (hK : IsCompact (K : Set H)) {x₀ : X}
-    {f f' : SB X} (h : Reached ρ K x₀ f) (h' : Reached ρ K x₀ f') :
-    ∃ N : Subgroup H, IsLevel K N ∧ ∃ v : SB X, (∀ x, v.1 x = (orb N x₀).indicator (fun _ => (1 : ℂ)) x) ∧
-      f ∈ Submodule.span ℂ (Set.range fun g : H => ρ g v) ∧ f' ∈ Submodule.span ℂ (Set.range fun g : H => ρ g v) := by
+theorem Reached.add
+    {ρ : Representation ℂ H (SB X)} (hρ : ∀ (g : H) (f : SB X) (x : X), (ρ g f).1 x = f.1 (g⁻¹ • x))
+    (hopen : ∀ x : X, IsOpenMap fun g : H => g • x)
+    {K : Subgroup H} (hK : IsCompact (K : Set H))
+    {x₀ : X} {f f' : SB X} (h : Reached ρ K x₀ f) (h' : Reached ρ K x₀ f')
+    : ∃ N : Subgroup H,
+      IsLevel K N
+        ∧ ∃ v : SB X,
+          (∀ x, v.1 x = (orb N x₀).indicator (fun _ => (1 : ℂ)) x)
+            ∧ f ∈ Submodule.span ℂ (Set.range fun g : H => ρ g v)
+            ∧ f' ∈ Submodule.span ℂ (Set.range fun g : H => ρ g v) := by
   obtain ⟨N, hN, v, hv, hf⟩ := h
   obtain ⟨N', hN', v', hv', hf'⟩ := h'
   obtain ⟨u, hu⟩ := exists_indicator_orb hopen hK (hN.inf hN') x₀
-  exact ⟨_, hN.inf hN', u, hu, span_le_of_level ρ hρ hK hN (hN.inf hN') inf_le_left x₀ hv hu hf,
-    span_le_of_level ρ hρ hK hN' (hN.inf hN') inf_le_right x₀ hv' hu hf'⟩
+  exact ⟨
+    _,
+    hN.inf hN',
+    u,
+    hu,
+    span_le_of_level ρ hρ hK hN (hN.inf hN') inf_le_left x₀ hv hu hf,
+    span_le_of_level ρ hρ hK hN' (hN.inf hN') inf_le_right x₀ hv' hu hf'
+  ⟩
 
-theorem reached_of_support [T2Space H] [TotallyDisconnectedSpace H] (ρ : Representation ℂ H (SB X))
-    (hρ : ∀ (g : H) (f : SB X) (x : X), (ρ g f).1 x = f.1 (g⁻¹ • x))
-    (hopen : ∀ x : X, IsOpenMap fun g : H => g • x) {K : Subgroup H} (hK : IsCompact (K : Set H))
-    (hKo : IsOpen (K : Set H)) (x₀ : X) (f : SB X) (hf : ∀ x, f.1 x ≠ 0 → x ∈ orb K x₀) :
-    Reached ρ K x₀ f := by
+theorem reached_of_support
+    [T2Space H] [TotallyDisconnectedSpace H]
+    (ρ : Representation ℂ H (SB X)) (hρ : ∀ (g : H) (f : SB X) (x : X), (ρ g f).1 x = f.1 (g⁻¹ • x))
+    (hopen : ∀ x : X, IsOpenMap fun g : H => g • x)
+    {K : Subgroup H} (hK : IsCompact (K : Set H)) (hKo : IsOpen (K : Set H))
+    (x₀ : X) (f : SB X) (hf : ∀ x, f.1 x ≠ 0 → x ∈ orb K x₀)
+    : Reached ρ K x₀ f := by
   obtain ⟨U, hU, hUf⟩ := exists_nhds_smul_invariant H X f
   obtain ⟨N, hNo, hNK, hNU, hNn⟩ := exists_level_subset H K hK hKo U hU
   have hN : IsLevel K N := ⟨hNo, hNK, hNn⟩
   obtain ⟨v, hv⟩ := exists_indicator_orb hopen hK hN x₀
-  exact ⟨N, hN, v, hv, mem_span_translates_of_level H X ρ hρ K N hK hNo hNK hNn x₀ v f hv (fun n hn x => hUf n (hNU hn) x) hf⟩
+  exact ⟨
+    N,
+    hN,
+    v,
+    hv,
+    mem_span_translates_of_level H X ρ hρ K N hK hNo hNK hNn x₀ v f hv
+      (fun n hn x => hUf n (hNU hn) x)
+      hf
+  ⟩
 
-theorem reached_all [T2Space H] [TotallyDisconnectedSpace H] [MulAction.IsPretransitive H X]
-    (ρ : Representation ℂ H (SB X))
-    (hρ : ∀ (g : H) (f : SB X) (x : X), (ρ g f).1 x = f.1 (g⁻¹ • x))
-    (hopen : ∀ x : X, IsOpenMap fun g : H => g • x) {K : Subgroup H} (hK : IsCompact (K : Set H))
-    (hKo : IsOpen (K : Set H)) (x₀ : X) (f : SB X) : Reached ρ K x₀ f := by
+theorem reached_all
+    [T2Space H] [TotallyDisconnectedSpace H] [MulAction.IsPretransitive H X]
+    (ρ : Representation ℂ H (SB X)) (hρ : ∀ (g : H) (f : SB X) (x : X), (ρ g f).1 x = f.1 (g⁻¹ • x))
+    (hopen : ∀ x : X, IsOpenMap fun g : H => g • x)
+    {K : Subgroup H} (hK : IsCompact (K : Set H)) (hKo : IsOpen (K : Set H))
+    (x₀ : X) (f : SB X)
+    : Reached ρ K x₀ f := by
   classical
   have hYc : IsCompact (orb K x₀) := hK.image (continuous_id.smul continuous_const)
   have hY : IsClopen (orb K x₀) := ⟨hYc.isClosed, hopen x₀ _ hKo⟩
   have hZ : ∀ g : H, IsClopen {x : X | g⁻¹ • x ∈ orb K x₀} := fun g =>
     hY.preimage (continuous_const_smul g⁻¹)
-  have key : ∀ (T : Finset H) (f : SB X), (∀ x, f.1 x ≠ 0 → ∃ g ∈ T, g⁻¹ • x ∈ orb K x₀) →
-      Reached ρ K x₀ f := by
+  have key
+      : ∀ (T : Finset H) (f : SB X),
+        (∀ x, f.1 x ≠ 0 → ∃ g ∈ T, g⁻¹ • x ∈ orb K x₀) → Reached ρ K x₀ f := by
     intro T
     induction T using Finset.induction_on with
     | empty =>
@@ -316,40 +425,52 @@ theorem reached_all [T2Space H] [TotallyDisconnectedSpace H] [MulAction.IsPretra
       intro f hf
       obtain ⟨f₁, f₂, e, h₁, h₂⟩ := exists_clopen_cut X _ (hZ g) f
       have r₁ : Reached ρ K x₀ f₁ := by
-        obtain ⟨N, hN, v, hv, hm⟩ := reached_of_support ρ hρ hopen hK hKo x₀ (ρ g⁻¹ f₁) (fun x hx => by
-          rw [hρ, inv_inv] at hx
-          simpa using (h₁ _ hx).1)
+        obtain ⟨N, hN, v, hv, hm⟩ :=
+          reached_of_support ρ hρ hopen hK hKo x₀ (ρ g⁻¹ f₁) (fun x hx => by
+            rw [hρ, inv_inv] at hx
+            simpa using (h₁ _ hx).1)
         refine ⟨N, hN, v, hv, ?_⟩
         have := translate_mem_span ρ v g hm
-        rwa [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply] at this
-      have r₂ : Reached ρ K x₀ f₂ := ih f₂ fun x hx => by
-        obtain ⟨hx₁, hx₂⟩ := h₂ x hx
-        obtain ⟨g', hg', hm⟩ := hf x hx₂
-        rcases Finset.mem_insert.1 hg' with rfl | hg'
-        · exact absurd hm hx₁
-        · exact ⟨g', hg', hm⟩
+        rwa [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply] at
+          this
+      have r₂ : Reached ρ K x₀ f₂ :=
+        ih f₂ fun x hx => by
+          obtain ⟨hx₁, hx₂⟩ := h₂ x hx
+          obtain ⟨g', hg', hm⟩ := hf x hx₂
+          rcases Finset.mem_insert.1 hg' with rfl | hg'
+          · exact absurd hm hx₁
+          · exact ⟨g', hg', hm⟩
       obtain ⟨N, hN, v, hv, m₁, m₂⟩ := r₁.add hρ hopen hK r₂
       exact ⟨N, hN, v, hv, e ▸ Submodule.add_mem _ m₁ m₂⟩
-  obtain ⟨T, hT⟩ := f.2.2.elim_finite_subcover (fun g : H => {x : X | g⁻¹ • x ∈ orb K x₀})
-    (fun g => (hZ g).isOpen) (fun x _ => by
-      obtain ⟨g, hg⟩ := MulAction.exists_smul_eq H x₀ x
-      exact Set.mem_iUnion.2 ⟨g, 1, K.one_mem, by
-        show (1 : H) • x₀ = g⁻¹ • x
-        rw [one_smul, ← hg, inv_smul_smul]⟩)
-  exact key T f fun x hx => by
-    simpa using hT (subset_tsupport _ hx)
+  obtain ⟨T, hT⟩ :=
+    f.2.2.elim_finite_subcover
+      (fun g : H => {x : X | g⁻¹ • x ∈ orb K x₀})
+      (fun g => (hZ g).isOpen)
+      (fun x _ => by
+        obtain ⟨g, hg⟩ := MulAction.exists_smul_eq H x₀ x
+        exact Set.mem_iUnion.2 ⟨
+          g,
+          1,
+          K.one_mem,
+          by
+            show (1 : H) • x₀ = g⁻¹ • x
+            rw [one_smul, ← hg, inv_smul_smul]
+        ⟩)
+  exact key T f fun x hx => by simpa using hT (subset_tsupport _ hx)
 
-theorem exists_common_generator [T2Space H] [TotallyDisconnectedSpace H] [MulAction.IsPretransitive H X]
-    (ρ : Representation ℂ H (SB X))
-    (hρ : ∀ (g : H) (f : SB X) (x : X), (ρ g f).1 x = f.1 (g⁻¹ • x))
-    (hopen : ∀ x : X, IsOpenMap fun g : H => g • x) {K : Subgroup H} (hK : IsCompact (K : Set H))
-    (hKo : IsOpen (K : Set H)) (w w' : SB X) :
-    ∃ t : SB X, w ∈ Submodule.span ℂ (Set.range fun g : H => ρ g t) ∧
-      w' ∈ Submodule.span ℂ (Set.range fun g : H => ρ g t) := by
+theorem exists_common_generator
+    [T2Space H] [TotallyDisconnectedSpace H] [MulAction.IsPretransitive H X]
+    (ρ : Representation ℂ H (SB X)) (hρ : ∀ (g : H) (f : SB X) (x : X), (ρ g f).1 x = f.1 (g⁻¹ • x))
+    (hopen : ∀ x : X, IsOpenMap fun g : H => g • x)
+    {K : Subgroup H} (hK : IsCompact (K : Set H)) (hKo : IsOpen (K : Set H))
+    (w w' : SB X)
+    : ∃ t : SB X,
+      w ∈ Submodule.span ℂ (Set.range fun g : H => ρ g t)
+        ∧ w' ∈ Submodule.span ℂ (Set.range fun g : H => ρ g t) := by
   by_cases hX : Nonempty X
   · obtain ⟨x₀⟩ := hX
-    obtain ⟨_, _, t, _, h, h'⟩ := (reached_all ρ hρ hopen hK hKo x₀ w).add hρ hopen hK
-      (reached_all ρ hρ hopen hK hKo x₀ w')
+    obtain ⟨_, _, t, _, h, h'⟩ :=
+      (reached_all ρ hρ hopen hK hKo x₀ w).add hρ hopen hK (reached_all ρ hρ hopen hK hKo x₀ w')
     exact ⟨t, h, h'⟩
   · haveI : IsEmpty X := not_nonempty_iff.1 hX
     have h0 : ∀ u : SB X, u = 0 := fun u => Subtype.ext (funext fun x => isEmptyElim x)
@@ -359,10 +480,12 @@ end Orbit
 
 section Stratum
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
   {a c : Type} [Fintype a] [DecidableEq a] [Fintype c] [DecidableEq c]
 
-@[reducible] def rMul (κ : ℕ) : MulAction (GL a k) (RankIn (k := k) (a := a) (b := c) {κ}) where
+@[reducible]
+def rMul (κ : ℕ) : MulAction (GL a k) (RankIn (k := k) (a := a) (b := c) {κ}) where
   smul g x := rAct {κ} x g⁻¹
   one_smul x := by
     show rAct {κ} x 1⁻¹ = x
@@ -371,10 +494,11 @@ variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchim
     show rAct {κ} x (g * h)⁻¹ = rAct {κ} (rAct {κ} x h⁻¹) g⁻¹
     rw [_root_.mul_inv_rev, rAct_mul]
 
-theorem continuous_rAct_inv (κ : ℕ) :
-    Continuous fun p : GL a k × RankIn (k := k) (a := a) (b := c) {κ} => rAct {κ} p.2 p.1⁻¹ := by
+theorem continuous_rAct_inv (κ : ℕ)
+    : Continuous fun p : GL a k × RankIn (k := k) (a := a) (b := c) {κ} => rAct {κ} p.2 p.1⁻¹ := by
   refine Continuous.subtype_mk
-    (f := fun p : GL a k × RankIn (k := k) (a := a) (b := c) {κ} => act p.2.1 (p.1⁻¹, 1)) ?_ _
+    (f := fun p : GL a k × RankIn (k := k) (a := a) (b := c) {κ} => act p.2.1 (p.1⁻¹, 1))
+    ?_ _
   exact (continuous_const.matrix_mul (continuous_subtype_val.comp continuous_snd)).matrix_mul
     (Units.continuous_coe_inv.comp continuous_fst)
 

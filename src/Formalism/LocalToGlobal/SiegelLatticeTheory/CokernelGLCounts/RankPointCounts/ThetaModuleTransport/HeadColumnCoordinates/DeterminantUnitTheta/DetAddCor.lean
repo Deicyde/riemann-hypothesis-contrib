@@ -6,14 +6,18 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 
 noncomputable section
 
-open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA Formalism.L2.SG.LocalCountModules.LocCntCommon
+open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA
+  Formalism.L2.SG.LocalCountModules.LocCntCommon
 
 namespace Formalism.L2.SG.LocalCountModules.ThetaMbe0GWork
 
-theorem det_add_cor {K : Type} [CommRing K] {r : ℕ} (A : Matrix (Fin (r + 1)) (Fin (r + 1)) K) (c : K) :
-    (A + Matrix.of fun a b => cor r a b c).det = A.det + c * (A.submatrix Fin.castSucc Fin.castSucc).det := by
-  have e1 : A + Matrix.of (fun a b => cor r a b c) =
-      A.updateRow (Fin.last r) (A (Fin.last r) + c • Pi.single (Fin.last r) 1) := by
+theorem det_add_cor
+    {K : Type} [CommRing K] {r : ℕ} (A : Matrix (Fin (r + 1)) (Fin (r + 1)) K) (c : K)
+    : (A + Matrix.of fun a b => cor r a b c).det
+      = A.det + c * (A.submatrix Fin.castSucc Fin.castSucc).det := by
+  have e1
+      : A + Matrix.of (fun a b => cor r a b c)
+        = A.updateRow (Fin.last r) (A (Fin.last r) + c • Pi.single (Fin.last r) 1) := by
     ext a b
     by_cases ha : a = Fin.last r
     · subst ha
@@ -25,12 +29,14 @@ theorem det_add_cor {K : Type} [CommRing K] {r : ℕ} (A : Matrix (Fin (r + 1)) 
   rw [e1, Matrix.det_updateRow_add, Matrix.updateRow_eq_self, Matrix.det_updateRow_smul]
   congr 2
   rw [Matrix.det_succ_row _ (Fin.last r), Finset.sum_eq_single (Fin.last r)]
-  · have hsub : (A.updateRow (Fin.last r) (Pi.single (Fin.last r) 1)).submatrix (Fin.last r).succAbove
-        (Fin.last r).succAbove = A.submatrix Fin.castSucc Fin.castSucc := by
+  · have hsub
+        : (A.updateRow (Fin.last r) (Pi.single (Fin.last r) 1)).submatrix (Fin.last r).succAbove
+            (Fin.last r).succAbove
+          = A.submatrix Fin.castSucc Fin.castSucc := by
       ext a b
       simp [Fin.succAbove_last, Matrix.updateRow_ne (Fin.castSucc_lt_last a).ne]
-    rw [hsub, Matrix.updateRow_self, Pi.single_eq_same, mul_one, Fin.val_last, ← two_mul, pow_mul, neg_one_sq,
-      one_pow, one_mul]
+    rw [hsub, Matrix.updateRow_self, Pi.single_eq_same, mul_one, Fin.val_last, ← two_mul, pow_mul,
+      neg_one_sq, one_pow, one_mul]
   · intro j _ hj
     rw [Matrix.updateRow_self, Pi.single_eq_of_ne hj, mul_zero, zero_mul]
   · simp
@@ -49,7 +55,8 @@ theorem detG_holds : DetG := by
     intro h
     exact g.q_irr.ne_zero (Subtype.ext h)
   set Zz := HermSp.ZZplusOf M Zh T T' with hZz
-  have e1 : Zz.map φ₁ = (g.q : F)⁻¹ • Zh.map φ₁ + Matrix.of fun a b => cor r a b (T / (g.q : F)) := by
+  have e1
+      : Zz.map φ₁ = (g.q : F)⁻¹ • Zh.map φ₁ + Matrix.of fun a b => cor r a b (T / (g.q : F)) := by
     ext a b
     rw [hZz]
     unfold HermSp.ZZplusOf
@@ -58,8 +65,10 @@ theorem detG_holds : DetG := by
     · simp [hφ₁, cor, h, div_eq_inv_mul]
       try ring
     · simp [hφ₁, cor, h, div_eq_inv_mul]
-  have e2 : Zz.map φ₂ = (-(g.q : F)⁻¹) • (Zh.map φ₂).transpose +
-      Matrix.of fun a b => cor r a b (-(T' / (g.q : F))) := by
+  have e2
+      : Zz.map φ₂
+        = (-(g.q : F)⁻¹) • (Zh.map φ₂).transpose
+          + Matrix.of fun a b => cor r a b (-(T' / (g.q : F))) := by
     ext a b
     rw [hZz]
     unfold HermSp.ZZplusOf
@@ -78,15 +87,17 @@ theorem detG_holds : DetG := by
   constructor
   · intro h0
     apply u1
-    have hs1 : (((g.q : F)⁻¹ • Zh.map φ₁).submatrix Fin.castSucc Fin.castSucc) =
-        (g.q : F)⁻¹ • ((Zh.submatrix Fin.castSucc Fin.castSucc).map φ₁) := by
+    have hs1
+        : (((g.q : F)⁻¹ • Zh.map φ₁).submatrix Fin.castSucc Fin.castSucc)
+          = (g.q : F)⁻¹ • ((Zh.submatrix Fin.castSucc Fin.castSucc).map φ₁) := by
       ext a b; simp
     rw [Matrix.det_smul, h0, hs1, Matrix.det_smul, hh1]
     ring
   · intro h0
     apply u2
-    have hs2 : ((-(g.q : F)⁻¹) • (Zh.map φ₂).transpose).submatrix Fin.castSucc Fin.castSucc =
-        (-(g.q : F)⁻¹) • ((Zh.submatrix Fin.castSucc Fin.castSucc).map φ₂).transpose := by
+    have hs2
+        : ((-(g.q : F)⁻¹) • (Zh.map φ₂).transpose).submatrix Fin.castSucc Fin.castSucc
+          = (-(g.q : F)⁻¹) • ((Zh.submatrix Fin.castSucc Fin.castSucc).map φ₂).transpose := by
       ext a b; simp
     rw [Matrix.det_smul, Matrix.det_transpose, h0, hs2, Matrix.det_smul, Matrix.det_transpose, hh2]
     ring

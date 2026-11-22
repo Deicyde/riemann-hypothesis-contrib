@@ -8,12 +8,14 @@ open MeasureTheory
 
 namespace GlobalTheory
 
-theorem fundamentalDomain_integral_mul_right {G : Type} [Group G] [MeasurableSpace G]
-    [MeasurableMul G] (μ : Measure G) [μ.IsMulLeftInvariant] [μ.IsMulRightInvariant]
-    (Γ : Subgroup G) [Countable Γ] (𝓕 : Set G) (f : G → ℂ) (a : G)
-    (h : IsFundamentalDomain Γ 𝓕 μ) (hf : ∀ γ ∈ Γ, ∀ g, f (γ * g) = f g) :
-    (IntegrableOn f 𝓕 μ ↔ IntegrableOn (fun g => f (g * a)) 𝓕 μ) ∧
-      ∫ g in 𝓕, f (g * a) ∂μ = ∫ g in 𝓕, f g ∂μ := by
+theorem fundamentalDomain_integral_mul_right
+    {G : Type} [Group G] [MeasurableSpace G] [MeasurableMul G]
+    (μ : Measure G) [μ.IsMulLeftInvariant] [μ.IsMulRightInvariant]
+    (Γ : Subgroup G) [Countable Γ]
+    (𝓕 : Set G) (f : G → ℂ)
+    (a : G) (h : IsFundamentalDomain Γ 𝓕 μ) (hf : ∀ γ ∈ Γ, ∀ g, f (γ * g) = f g)
+    : (IntegrableOn f 𝓕 μ ↔ IntegrableOn (fun g => f (g * a)) 𝓕 μ)
+      ∧ ∫ g in 𝓕, f (g * a) ∂μ = ∫ g in 𝓕, f g ∂μ := by
   have hmp : MeasurePreserving (fun g : G => g * a) μ μ := measurePreserving_mul_right μ a
   have hme : MeasurableEmbedding (fun g : G => g * a) := measurableEmbedding_mulRight a
   have h' : IsFundamentalDomain Γ ((fun g : G => g * a) ⁻¹' 𝓕) μ :=

@@ -12,8 +12,10 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Constant
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs PositivityTheory.Rg.Rs.InducedTensorMap
-open PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation GlobalTheory.CompanionTheory.LimV
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec
+  GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs PositivityTheory.Rg.Rs.InducedTensorMap
+open PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation
+  GlobalTheory.CompanionTheory.LimV
 open scoped ContDiff
 
 noncomputable section
@@ -24,8 +26,10 @@ section SlopeTestRemainingChoices
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {N r s : ℕ}
 
-theorem memInd2_of_mem_indSpan {U₁ : Submodule ℂ (Sm E r)} {U₂ : Submodule ℂ (Sm E s)} {φ : Sm E (r + s)}
-    (h : φ ∈ indSpan U₁ U₂) : MemInd2 U₁ U₂ φ := by
+theorem memInd2_of_mem_indSpan
+    {U₁ : Submodule ℂ (Sm E r)} {U₂ : Submodule ℂ (Sm E s)} {φ : Sm E (r + s)}
+    (h : φ ∈ indSpan U₁ U₂)
+    : MemInd2 U₁ U₂ φ := by
   unfold indSpan at h
   induction h using Submodule.span_induction with
   | mem x hx => exact hx
@@ -39,21 +43,22 @@ theorem memInd2_of_mem_indSpan {U₁ : Submodule ℂ (Sm E r)} {U₂ : Submodule
     change c • x.1 _ = c • x.1 _
     rw [hx.1]
 
-def sliceMap (k : Kinf E (r + s)) (t : GL (Fin (r + s)) (Af E)) :
-    Sm E (r + s) →ₗ[ℂ] (GA E r × GA E s → ℂ) where
+def sliceMap (k : Kinf E (r + s)) (t : GL (Fin (r + s)) (Af E))
+    : Sm E (r + s) →ₗ[ℂ] (GA E r × GA E s → ℂ) where
   toFun φ m := φ.1 (lev (Ad E) r s m * cf (r + s) k t)
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-theorem tensor_le_prodSpan (U₁ : Submodule ℂ (Sm E r)) (U₂ : Submodule ℂ (Sm E s)) :
-    tens2 U₁ U₂ ≤ prodSpan (U₁.map (Sm E r).subtype) (U₂.map (Sm E s).subtype) := by
+theorem tensor_le_prodSpan (U₁ : Submodule ℂ (Sm E r)) (U₂ : Submodule ℂ (Sm E s))
+    : tens2 U₁ U₂ ≤ prodSpan (U₁.map (Sm E r).subtype) (U₂.map (Sm E s).subtype) := by
   refine Submodule.span_le.2 ?_
   rintro F ⟨φ₁, h₁, φ₂, h₂, rfl⟩
   exact Submodule.subset_span ⟨φ₁.1, ⟨φ₁, h₁, rfl⟩, φ₂.1, ⟨φ₂, h₂, rfl⟩, rfl⟩
 
-theorem fd_inf (U : Submodule ℂ (Sm E N)) (K : Subgroup (GL (Fin N) (Af E))) (W : Submodule ℂ (Kinf E N → ℂ))
-    (h : FiniteDimensional ℂ (typed U K W)) :
-    FiniteDimensional ℂ ↥(U.map (Sm E N).subtype ⊓ typeF K W) := by
+theorem fd_inf
+    (U : Submodule ℂ (Sm E N)) (K : Subgroup (GL (Fin N) (Af E))) (W : Submodule ℂ (Kinf E N → ℂ))
+    (h : FiniteDimensional ℂ (typed U K W))
+    : FiniteDimensional ℂ ↥(U.map (Sm E N).subtype ⊓ typeF K W) := by
   have hle : U.map (Sm E N).subtype ⊓ typeF K W ≤ (typed U K W).map (Sm E N).subtype := by
     rintro f ⟨⟨φ, hφ, rfl⟩, hf⟩
     exact ⟨φ, ⟨hφ, hf⟩, rfl⟩
@@ -61,7 +66,18 @@ theorem fd_inf (U : Submodule ℂ (Sm E N)) (K : Subgroup (GL (Fin N) (Af E))) (
 
 end SlopeTestRemainingChoices
 
-theorem finiteDimensional_typed_indSpan : ∀ {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {r s : ℕ} (U₁ : Submodule ℂ (Sm E r)) (U₂ : Submodule ℂ (Sm E s)), (∀ (K : Subgroup (GL (Fin r) (Af E))) (W : Submodule ℂ (Kinf E r → ℂ)), IsOpen (K : Set (GL (Fin r) (Af E))) → FiniteDimensional ℂ W → FiniteDimensional ℂ (typed U₁ K W)) → (∀ (K : Subgroup (GL (Fin s) (Af E))) (W : Submodule ℂ (Kinf E s → ℂ)), IsOpen (K : Set (GL (Fin s) (Af E))) → FiniteDimensional ℂ W → FiniteDimensional ℂ (typed U₂ K W)) → ∀ (K : Subgroup (GL (Fin (r + s)) (Af E))) (W : Submodule ℂ (Kinf E (r + s) → ℂ)), IsOpen (K : Set (GL (Fin (r + s)) (Af E))) → FiniteDimensional ℂ W → FiniteDimensional ℂ (typed (indSpan U₁ U₂) K W) := by
+theorem finiteDimensional_typed_indSpan
+    : ∀ {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {r s : ℕ}
+        (U₁ : Submodule ℂ (Sm E r)) (U₂ : Submodule ℂ (Sm E s)),
+      (∀ (K : Subgroup (GL (Fin r) (Af E))) (W : Submodule ℂ (Kinf E r → ℂ)),
+          IsOpen (K : Set (GL (Fin r) (Af E))) → FiniteDimensional ℂ W
+            → FiniteDimensional ℂ (typed U₁ K W))
+        → (∀ (K : Subgroup (GL (Fin s) (Af E))) (W : Submodule ℂ (Kinf E s → ℂ)),
+          IsOpen (K : Set (GL (Fin s) (Af E))) → FiniteDimensional ℂ W
+            → FiniteDimensional ℂ (typed U₂ K W))
+        → ∀ (K : Subgroup (GL (Fin (r + s)) (Af E))) (W : Submodule ℂ (Kinf E (r + s) → ℂ)),
+          IsOpen (K : Set (GL (Fin (r + s)) (Af E))) → FiniteDimensional ℂ W
+            → FiniteDimensional ℂ (typed (indSpan U₁ U₂) K W) := by
   intro E _ _ _ r s U₁ U₂ h₁ h₂ K W hK hW
   obtain ⟨T, hT⟩ := GlobalTheory.CompanionTheory.CTFin.IwaAd.iwasawa_finite_cosets E r s K hK
   obtain ⟨S, hS⟩ := GlobalTheory.T.exists_finite_determining_set W hW
@@ -78,9 +94,11 @@ theorem finiteDimensional_typed_indSpan : ∀ {E : Type} [Field E] [NumberField 
     intro i φ
     have hmi := memInd2_of_mem_indSpan φ.2.1
     exact GlobalTheory.T.mem_prodSpan_inf _ _ _ _ _ (tensor_le_prodSpan U₁ U₂ (hmi.2 i.1.1 i.2.1))
-      (fun y => sl₁ (i.1.1, i.2.1) _ φ.2.2 y) (fun x => sl₂ (i.1.1, i.2.1) _ φ.2.2 x)
-  let Φ : typed (indSpan U₁ U₂) K W →ₗ[ℂ] ∀ i, P i := LinearMap.pi fun i =>
-    ((sliceMap i.1.1 i.2.1).comp (Submodule.subtype _)).codRestrict (P i) (hmem i)
+      (fun y => sl₁ (i.1.1, i.2.1) _ φ.2.2 y)
+      (fun x => sl₂ (i.1.1, i.2.1) _ φ.2.2 x)
+  let Φ : typed (indSpan U₁ U₂) K W →ₗ[ℂ] ∀ i, P i :=
+    LinearMap.pi fun i =>
+      ((sliceMap i.1.1 i.2.1).comp (Submodule.subtype _)).codRestrict (P i) (hmem i)
   refine FiniteDimensional.of_injective Φ ((injective_iff_map_eq_zero Φ).2 fun φ hφ => ?_)
   have hz : ∀ a ∈ S, ∀ t ∈ T, ∀ m, φ.1.1 (lev (Ad E) r s m * cf (r + s) a t) = 0 := by
     intro a ha t ht m
@@ -90,14 +108,18 @@ theorem finiteDimensional_typed_indSpan : ∀ {E : Type} [Field E] [NumberField 
   have hty : φ.1.1 ∈ typeF K W := φ.2.2
   refine Subtype.ext (Subtype.ext (funext fun g => ?_))
   obtain ⟨x, m, t, k, l, ht, hl, rfl⟩ := hT g
-  have e : unip x * lev (Ad E) r s m * finGL E (r + s) t * infGL E (r + s) (Unitary.toUnits k) * finGL E (r + s) l =
-      unip x * (lev (Ad E) r s m * finGL E (r + s) t * infGL E (r + s) (Unitary.toUnits k)) * finGL E (r + s) l := by
+  have e
+      : unip x * lev (Ad E) r s m * finGL E (r + s) t * infGL E (r + s) (Unitary.toUnits k)
+          * finGL E (r + s) l
+        = unip x * (lev (Ad E) r s m * finGL E (r + s) t * infGL E (r + s) (Unitary.toUnits k))
+          * finGL E (r + s) l := by
     simp only [mul_assoc]
   rw [e, hty.1 l hl, hmi.1]
-  have hw := hS _ (hty.2 (lev (Ad E) r s m * finGL E (r + s) t)) (fun a ha => by
-    have h0 := hz a ha t ht m
-    rw [cf, infGL_comm, ← mul_assoc] at h0
-    exact h0)
+  have hw :=
+    hS _ (hty.2 (lev (Ad E) r s m * finGL E (r + s) t)) (fun a ha => by
+      have h0 := hz a ha t ht m
+      rw [cf, infGL_comm, ← mul_assoc] at h0
+      exact h0)
   exact congrFun hw k
 
 end GlobalTheory.CompanionTheory.LimV.FdNode

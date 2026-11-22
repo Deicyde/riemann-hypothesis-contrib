@@ -6,13 +6,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-theorem UpperTheory.V.Fr.det_mem :
-    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O]
-      [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ n : ℕ},
-      F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ (S : Space O F n) (m : ℕ) (g : Fin m → F.G0)
-        (α : Fin m →₀ ℕ),
-        (∑ a, (MvPolynomial.X a : MvPolynomial (Fin m) S.R) •
-          (S.ρ.r (g a)).map MvPolynomial.C).det.coeff α ∈ S.B := by
+theorem UpperTheory.V.Fr.det_mem
+    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ n : ℕ},
+      F.Ok C₀ → (n = 2 ∨ n = 3)
+        → ∀ (S : Space O F n) (m : ℕ) (g : Fin m → F.G0) (α : Fin m →₀ ℕ),
+          (∑ a, (MvPolynomial.X a : MvPolynomial (Fin m) S.R) •
+            (S.ρ.r (g a)).map MvPolynomial.C).det.coeff α
+            ∈ S.B := by
   intro l _ O _ _ _ _ F C₀ n _ _ S m g α
   classical
   rw [Matrix.det_apply, MvPolynomial.coeff_sum]
@@ -30,8 +31,9 @@ theorem UpperTheory.V.Fr.det_mem :
       rw [Finset.sum_sub_distrib, Equiv.sum_comp, sub_self]
     · rw [List.map_ofFn, List.prod_ofFn]
       rfl
-  · obtain ⟨d, hd⟩ : ∃ d, ∏ i, (MvPolynomial.X (f i) : MvPolynomial (Fin m) S.R) =
-        MvPolynomial.monomial d 1 := by
+  · obtain ⟨d, hd⟩
+        : ∃ d,
+          ∏ i, (MvPolynomial.X (f i) : MvPolynomial (Fin m) S.R) = MvPolynomial.monomial d 1 := by
       refine Finset.prod_induction _ (fun p => ∃ d, p = MvPolynomial.monomial d 1) ?_ ?_ ?_
       · rintro a b ⟨d₁, rfl⟩ ⟨d₂, rfl⟩
         exact ⟨d₁ + d₂, by rw [MvPolynomial.monomial_mul, mul_one]⟩

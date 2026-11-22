@@ -25,7 +25,8 @@ noncomputable section
 
 namespace Formalism.MainNotions
 
-open Formalism.BasicNotions Formalism.MainNotions.Lnk Formalism.MainNotions.GlobalTheoryTheory Formalism.L2.GlobalTheoryTheory Formalism.MainNotions.RT
+open Formalism.BasicNotions Formalism.MainNotions.Lnk Formalism.MainNotions.GlobalTheoryTheory
+  Formalism.L2.GlobalTheoryTheory Formalism.MainNotions.RT
 
 variable {eps : ℝ}
 
@@ -34,10 +35,13 @@ theorem stabF (Fm : FamP eps) : flipTwoThree.admF3 Fm := by
   have h59 : UnusedSlot33.ConclusionOnFamily Fm 100 C₅ := fun x _ i => by
     obtain ⟨p1, p2, p3, p4, p5, p5c, p6, p8⟩ := h59a (Fm.D x i) (Fm.L x i).sc
     exact ⟨p1, p2, p3, p4, p5, p5c, p6, UnusedSlot33.division_rational_lattice _, p8⟩
-  exact flipTwoThree.stabiliser_family_of_column_lemma Fm 100 C₅ h59 (fun _ _ _ => GenusMassVolumes.levels_pro_g _ _)
+  exact flipTwoThree.stabiliser_family_of_column_lemma Fm 100 C₅ h59
+    (fun _ _ _ => GenusMassVolumes.levels_pro_g _ _)
 
-theorem chiFin0_to0S {D : D7} {u : D.what₂.Word} {Ch : ℕ → Type} {chOf : ∀ i, (D.mem u).C.cls i → Ch i}
-    (T : Formalism.L2.Forms.FormsTiedSym D u Ch chOf) (h : ChiFin0 T) : LocalLatticeBases.ChiFin0 T.to0 := by
+theorem chiFin0_to0S
+    {D : D7} {u : D.what₂.Word} {Ch : ℕ → Type} {chOf : ∀ i, (D.mem u).C.cls i → Ch i}
+    (T : Formalism.L2.Forms.FormsTiedSym D u Ch chOf) (h : ChiFin0 T)
+    : LocalLatticeBases.ChiFin0 T.to0 := by
   obtain ⟨n, hn, h⟩ := h
   refine ⟨n, hn, fun i hi h0 x => ?_⟩
   subst h0
@@ -51,21 +55,30 @@ theorem slopeLineT_holds (D : D7) (u : D.what₂.Word) : SlopeLineT D u := by
   rintro hS ⟨⟨Ch, chOf, T, hC⟩, -⟩
   exact LocalLatticeBases.slopeLine_0 hS T.to0 (chiFin0_to0S T hC)
 
-theorem lemmaB_second_branch_of_length_formula (D : D7) (u : D.what₂.Word) (h : product_first_zeroth_parts.HidaSetting D u → ConcreteFormsLevelZero D u → LocalLatticeBases.SeenPlaceLatticeLengthFormula D u) : SecondBranchIntegralityUnderForms D u := by
+theorem lemmaB_second_branch_of_length_formula
+    (D : D7) (u : D.what₂.Word)
+    (h : product_first_zeroth_parts.HidaSetting D u → ConcreteFormsLevelZero D u
+      → LocalLatticeBases.SeenPlaceLatticeLengthFormula D u)
+    : SecondBranchIntegralityUnderForms D u := by
   rintro hS hT
   obtain ⟨⟨Ch, chOf, T, -⟩, -⟩ := id hT
   exact LocalLatticeBases.second_branch_incl_length_level_zero' T.to0 (h hS hT)
 
 def RealPlaceSecondLayerConditions (Fm : FamP eps) : Prop :=
-  ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, Formalism.L2.Theta.RealTied (Fm.D x i) ∧
-    ∃ C : Formalism.L2.Forms.ColsTiedSym (Fm.D x i), ∀ u, ChiFin0 (C.forms u)
+  ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x,
+    Formalism.L2.Theta.RealTied (Fm.D x i)
+      ∧ ∃ C : Formalism.L2.Forms.ColsTiedSym (Fm.D x i), ∀ u, ChiFin0 (C.forms u)
 
-theorem family_conditions_of_layer_two (Fm : FamP eps) (h : RealPlaceSecondLayerConditions Fm) : flipTwoThree.fam0 Fm StandardLattice.VolTie ∧ tCVTies Fm ∧ FamU Fm ConcreteFormsLevelZero := by
+theorem family_conditions_of_layer_two (Fm : FamP eps) (h : RealPlaceSecondLayerConditions Fm)
+    : flipTwoThree.fam0 Fm StandardLattice.VolTie ∧ tCVTies Fm
+      ∧ FamU Fm ConcreteFormsLevelZero := by
   obtain ⟨a, h⟩ := h
   obtain ⟨b, hs⟩ := stabF Fm
-  refine ⟨⟨a, fun x hx _ i => volTie_of_realTied _ (h x hx i).1⟩,
+  refine ⟨
+    ⟨a, fun x hx _ i => volTie_of_realTied _ (h x hx i).1⟩,
     ⟨max (max a b) (Fm.x1 + 1), fun x hx i => ?_⟩,
-    ⟨max a b, fun x hx hx1 i u _ => ?_⟩⟩
+    ⟨max a b, fun x hx hx1 i u _ => ?_⟩
+  ⟩
   · have ea : a ≤ x := le_trans (le_trans (le_max_left _ _) (le_max_left _ _)) hx
     have eb : b ≤ x := le_trans (le_trans (le_max_right _ _) (le_max_left _ _)) hx
     have e1 : Fm.x1 < x := by have := le_trans (le_max_right (max a b) (Fm.x1 + 1)) hx; linarith

@@ -16,7 +16,8 @@ theorem EtLift_of : LateralTheory.E.t_E1Cut.EtLift := by
   letI : Algebra T S := π.toAlgebra
   letI : Algebra T C := ((algebraMap S C).comp π).toAlgebra
   haveI : IsScalarTower T S C := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
-  obtain ⟨ι, σ, _, _, P, hP⟩ := (Algebra.Etale.iff_isStandardSmoothOfRelativeDimension_zero.1 ‹_›).out
+  obtain ⟨ι, σ, _, _, P, hP⟩ :=
+    (Algebra.Etale.iff_isStandardSmoothOfRelativeDimension_zero.1 ‹_›).out
   haveI : P.HasCoeffs T := ⟨fun x _ => hπ x⟩
   let M := P.ModelOfHasCoeffs T
   let P0 := P.toPreSubmersivePresentation.ofHasCoeffs T
@@ -29,8 +30,10 @@ theorem EtLift_of : LateralTheory.E.t_E1Cut.EtLift := by
     simp only [R0, Algebra.PreSubmersivePresentation.comp_jacobian_eq_jacobian_smul_jacobian, Q,
       Algebra.PreSubmersivePresentation.localizationAway_jacobian, Algebra.smul_def]
     rfl
-  let R1 : Algebra.SubmersivePresentation T C' (Unit ⊕ ι) (Unit ⊕ σ) :=
-    { R0 with jacobian_isUnit := by rw [hJ]; exact hJu.mul hJu }
+  let R1 : Algebra.SubmersivePresentation T C' (Unit ⊕ ι) (Unit ⊕ σ) := {
+    R0 with
+    jacobian_isUnit := by rw [hJ]; exact hJu.mul hJu
+  }
   have hdim : R1.dimension = 0 := by
     have := Algebra.PreSubmersivePresentation.dimension_comp_eq_dimension_add_dimension Q P0
     have hQ : Q.dimension = 0 := Algebra.Presentation.localizationAway_dimension_zero J
@@ -40,13 +43,16 @@ theorem EtLift_of : LateralTheory.E.t_E1Cut.EtLift := by
     haveI := R1.isStandardSmoothOfRelativeDimension hdim
     infer_instance
 
-  let φM : M →ₐ[T] C := Ideal.Quotient.liftₐ _ (MvPolynomial.aeval P.val) (by
-    intro a ha
-    have hle : Ideal.span (Set.range (P.relationOfHasCoeffs T)) ≤
-        RingHom.ker (MvPolynomial.aeval (R := T) P.val) := by
-      rw [Ideal.span_le]; rintro _ ⟨r, rfl⟩
-      exact P.toPresentation.aeval_val_relationOfHasCoeffs T r
-    exact hle ha)
+  let φM : M →ₐ[T] C :=
+    Ideal.Quotient.liftₐ _ (MvPolynomial.aeval P.val) (by
+      intro a ha
+      have hle
+          : Ideal.span (Set.range (P.relationOfHasCoeffs T))
+            ≤ RingHom.ker (MvPolynomial.aeval (R := T) P.val) := by
+        rw [Ideal.span_le]
+        rintro _ ⟨r, rfl⟩
+        exact P.toPresentation.aeval_val_relationOfHasCoeffs T r
+      exact hle ha)
   have hφmk : ∀ p : MvPolynomial ι T, φM (Ideal.Quotient.mk _ p) = MvPolynomial.aeval P.val p :=
     fun p => rfl
   have hφJ : φM J = P.jacobian := by
@@ -83,17 +89,20 @@ theorem EtLift_of : LateralTheory.E.t_E1Cut.EtLift := by
       (Ideal.quotientMap K (algebraMap T C') Ideal.le_comap_map).comp e.symm.toRingHom
     have hθ : ∀ t, θ (π t) = Ideal.Quotient.mk K (algebraMap T C' t) := by
       intro t
-      have : e.symm (π t) = Ideal.Quotient.mk _ t := by
-        rw [RingEquiv.symm_apply_eq]; rfl
+      have : e.symm (π t) = Ideal.Quotient.mk _ t := by rw [RingEquiv.symm_apply_eq]; rfl
       show Ideal.quotientMap K (algebraMap T C') Ideal.le_comap_map (e.symm (π t)) = _
       rw [this, Ideal.quotientMap_mk]
-    let xv : ι → C' ⧸ K := fun i => Ideal.Quotient.mk K (algebraMap M C' (Ideal.Quotient.mk _ (X i)))
+    let xv : ι → C' ⧸ K := fun i =>
+      Ideal.Quotient.mk K (algebraMap M C' (Ideal.Quotient.mk _ (X i)))
     let χ : MvPolynomial ι S →+* C' ⧸ K := MvPolynomial.eval₂Hom θ xv
-    have hkey : ∀ q : MvPolynomial ι T, χ (MvPolynomial.map π q) =
-        Ideal.Quotient.mk K (algebraMap M C' (Ideal.Quotient.mk _ q)) := by
+    have hkey
+        : ∀ q : MvPolynomial ι T,
+          χ (MvPolynomial.map π q)
+            = Ideal.Quotient.mk K (algebraMap M C' (Ideal.Quotient.mk _ q)) := by
       intro q
-      have h2 : χ.comp (MvPolynomial.map π) =
-          ((Ideal.Quotient.mk K).comp (algebraMap M C')).comp (Ideal.Quotient.mk _) := by
+      have h2
+          : χ.comp (MvPolynomial.map π)
+            = ((Ideal.Quotient.mk K).comp (algebraMap M C')).comp (Ideal.Quotient.mk _) := by
         apply MvPolynomial.ringHom_ext
         · intro t
           simp only [RingHom.comp_apply, MvPolynomial.map_C, χ, MvPolynomial.coe_eval₂Hom,
@@ -107,10 +116,12 @@ theorem EtLift_of : LateralTheory.E.t_E1Cut.EtLift := by
       intro a ha
       rw [← P.span_range_relation_eq_ker] at ha
       have hle : Ideal.span (Set.range P.relation) ≤ RingHom.ker χ := by
-        rw [Ideal.span_le]; rintro _ ⟨r, rfl⟩
+        rw [Ideal.span_le]
+        rintro _ ⟨r, rfl⟩
         rw [SetLike.mem_coe, RingHom.mem_ker, ← P.toPresentation.map_relationOfHasCoeffs T r]
         change χ (MvPolynomial.map π _) = 0
-        rw [hkey, Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.subset_span (Set.mem_range_self r)), map_zero, map_zero]
+        rw [hkey, Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.subset_span (Set.mem_range_self r)),
+          map_zero, map_zero]
       exact hle ha
     let ψ : C →+* C' ⧸ K := (Ideal.Quotient.lift P.ker χ hker).comp P.quotientEquiv.symm.toRingHom
     have hψP : ∀ p, ψ (algebraMap P.Ring C p) = χ p := by

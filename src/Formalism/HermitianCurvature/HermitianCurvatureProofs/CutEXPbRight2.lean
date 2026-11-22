@@ -7,13 +7,15 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.RadicalUnipo
 
 @[expose] public section
 
-open Matrix MeasureTheory Filter Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+open Matrix MeasureTheory Filter Formalism.REAL Formalism.QuantumDeterminants
+  Formalism.FourierDecayAlt
 
 noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.CutEXPbRight
 
-theorem castM_nset {k a b : ℕ} (e : a = b) {g : B.Mat k a} (hg : g ∈ Nset k a) : D.castM e g ∈ Nset k b := by
+theorem castM_nset {k a b : ℕ} (e : a = b) {g : B.Mat k a} (hg : g ∈ Nset k a)
+    : D.castM e g ∈ Nset k b := by
   subst e
   have : D.castM rfl g = g := by
     ext i j
@@ -27,8 +29,8 @@ namespace Formalism.FourierDecayAlt.P
 
 open CutEX
 
-private theorem castM_mul_eq_mul_castM {k a b : ℕ} (e : a = b) (g h : B.Mat k a) :
-    D.castM e (g * h) = D.castM e g * D.castM e h := by
+private theorem castM_mul_eq_mul_castM {k a b : ℕ} (e : a = b) (g h : B.Mat k a)
+    : D.castM e (g * h) = D.castM e g * D.castM e h := by
   subst e
   ext i j
   simp [D.castM]

@@ -12,14 +12,19 @@ namespace Formalism.L2.G.Model
 
 open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.G.LatticeSystems
 
-theorem edgeLat_of_G {p : ℕ} (G : GAtP p) (v : Fin G.P.nV) (e : Edge (G.P.W v) (G.P.Qq v) (G.P.m + 1))
-    (g : Matrix (Fin (G.P.m + 1)) (Fin (G.P.m + 1)) (G.P.Qq v)) (hgE : IsEdgeBasis p G.P.r e g) :
-    (∀ s, extO G.O (G.P.ι v) (G.P.σ v) s e.src = colSpan G.O (la_tw (G.P.ι v) (G.P.σ v) s g)) ∧
-      (∀ s, LeAt p (G.P.ι v) (G.P.σ v) G.P.w s e =
-        colSpan G.O (la_tw (G.P.ι v) (G.P.σ v) s g * lb_D (G.P.m + 1) G.P.r (algebraMap G.O G.Kf G.P.w))) ∧
-      (∀ s, extO G.O (G.P.ι v) (G.P.σ v) s e.tgt =
-        colSpan G.O (la_tw (G.P.ι v) (G.P.σ v) s g * lb_D (G.P.m + 1) G.P.r (algebraMap G.O G.Kf G.P.w) *
-          lb_D (G.P.m + 1) G.P.r (algebraMap G.O G.Kf G.P.w))) := by
+theorem edgeLat_of_G
+    {p : ℕ} (G : GAtP p) (v : Fin G.P.nV) (e : Edge (G.P.W v) (G.P.Qq v) (G.P.m + 1))
+    (g : Matrix (Fin (G.P.m + 1)) (Fin (G.P.m + 1)) (G.P.Qq v)) (hgE : IsEdgeBasis p G.P.r e g)
+    : (∀ s, extO G.O (G.P.ι v) (G.P.σ v) s e.src = colSpan G.O (la_tw (G.P.ι v) (G.P.σ v) s g))
+      ∧ (∀ s,
+        LeAt p (G.P.ι v) (G.P.σ v) G.P.w s e
+          = colSpan G.O
+            (la_tw (G.P.ι v) (G.P.σ v) s g * lb_D (G.P.m + 1) G.P.r (algebraMap G.O G.Kf G.P.w)))
+      ∧ (∀ s,
+        extO G.O (G.P.ι v) (G.P.σ v) s e.tgt
+          = colSpan G.O
+            (la_tw (G.P.ι v) (G.P.σ v) s g * lb_D (G.P.m + 1) G.P.r (algebraMap G.O G.Kf G.P.w)
+              * lb_D (G.P.m + 1) G.P.r (algebraMap G.O G.Kf G.P.w))) := by
   obtain ⟨hg, hsrc, htgt⟩ := hgE
   unfold lb_D
   set c : G.Kf := algebraMap G.O G.Kf G.P.w with hc
@@ -33,22 +38,30 @@ theorem edgeLat_of_G {p : ℕ} (G : GAtP p) (v : Fin G.P.nV) (e : Edge (G.P.W v)
     simpa using this
   set dK : Fin (G.P.m + 1) → G.Kf := fun a => if a.val < G.P.r then c⁻¹ else 1 with hdK
   set dQ : Fin (G.P.m + 1) → G.P.Qq v := fun a => if a.val < G.P.r then ((p : G.P.Qq v))⁻¹ else 1 with hdQ
-  have hDD : ∀ s, la_tw (G.P.ι v) (G.P.σ v) s (g * Matrix.diagonal dQ) =
-      la_tw (G.P.ι v) (G.P.σ v) s g * Matrix.diagonal dK * Matrix.diagonal dK := by
+  have hDD
+      : ∀ s,
+        la_tw (G.P.ι v) (G.P.σ v) s (g * Matrix.diagonal dQ)
+          = la_tw (G.P.ι v) (G.P.σ v) s g * Matrix.diagonal dK * Matrix.diagonal dK := by
     intro s
     ext i j
-    rw [Matrix.mul_assoc, Matrix.diagonal_mul_diagonal, Matrix.mul_diagonal, lb_tw_apply, lb_tw_apply,
-      Matrix.mul_diagonal, map_mul, map_mul]
+    rw [Matrix.mul_assoc, Matrix.diagonal_mul_diagonal, Matrix.mul_diagonal, lb_tw_apply,
+      lb_tw_apply, Matrix.mul_diagonal, map_mul, map_mul]
     congr 1
     simp only [hdQ, hdK]
     split_ifs
     · rw [map_inv₀, map_inv₀, map_natCast, map_natCast, hpK, pow_two, mul_inv]
     · simp
-  have e1 : ∀ s, extO G.O (G.P.ι v) (G.P.σ v) s e.src = colSpan G.O (la_tw (G.P.ι v) (G.P.σ v) s g) :=
-    fun s => by rw [hsrc]; exact la_extO_G G v s g
-  have e3 : ∀ s, extO G.O (G.P.ι v) (G.P.σ v) s e.tgt =
-      colSpan G.O (la_tw (G.P.ι v) (G.P.σ v) s g * Matrix.diagonal dK * Matrix.diagonal dK) :=
-    fun s => by rw [htgt, la_extO_G, hDD]
+  have e1
+      : ∀ s,
+        extO G.O (G.P.ι v) (G.P.σ v) s e.src
+          = colSpan G.O (la_tw (G.P.ι v) (G.P.σ v) s g) := fun s => by
+    rw [hsrc]; exact la_extO_G G v s g
+  have e3
+      : ∀ s,
+        extO G.O (G.P.ι v) (G.P.σ v) s e.tgt
+          = colSpan G.O
+            (la_tw (G.P.ι v) (G.P.σ v) s g * Matrix.diagonal dK * Matrix.diagonal dK) := fun s => by
+    rw [htgt, la_extO_G, hDD]
   refine ⟨e1, ?_, e3⟩
   intro s
   set gK := la_tw (G.P.ι v) (G.P.σ v) s g with hgK
@@ -57,10 +70,14 @@ theorem edgeLat_of_G {p : ℕ} (G : GAtP p) (v : Fin G.P.nV) (e : Edge (G.P.W v)
     refine sup_le ?_ ?_
     · rw [e1]
       intro x hx
-      have h1 : gK = gK * Matrix.diagonal dK *
-          Matrix.diagonal (fun a : Fin (G.P.m + 1) => if a.val < G.P.r then c else 1) := by
+      have h1
+          : gK
+            = gK * Matrix.diagonal dK
+              * Matrix.diagonal (fun a : Fin (G.P.m + 1) => if a.val < G.P.r then c else 1) := by
         rw [Matrix.mul_assoc, Matrix.diagonal_mul_diagonal]
-        have h2 : (fun a : Fin (G.P.m + 1) => dK a * (if a.val < G.P.r then c else 1)) = fun _ => 1 := by
+        have h2
+            : (fun a : Fin (G.P.m + 1) => dK a * (if a.val < G.P.r then c else 1))
+              = fun _ => 1 := by
           funext a
           simp only [hdK]
           split_ifs
@@ -69,32 +86,37 @@ theorem edgeLat_of_G {p : ℕ} (G : GAtP p) (v : Fin G.P.nV) (e : Edge (G.P.W v)
         rw [h2, Matrix.diagonal_one, Matrix.mul_one]
       have hx' : x ∈ colSpan G.O gK := hx
       rw [h1] at hx'
-      have h3 := lb_col (gK * Matrix.diagonal dK) _
-        (fun a : Fin (G.P.m + 1) => if a.val < G.P.r then G.P.w else 1) 1
-        (by intro j; split_ifs <;> simp [hc]) x hx'
+      have h3 :=
+        lb_col (gK * Matrix.diagonal dK) _
+          (fun a : Fin (G.P.m + 1) => if a.val < G.P.r then G.P.w else 1)
+          1 (by intro j; split_ifs <;> simp [hc]) x hx'
       rw [one_smul] at h3
       exact h3
     · rw [Submodule.span_le]
       rintro _ ⟨x, hx, rfl⟩
-      have h1 : c⁻¹ • twistVec (G.P.ι v) (G.P.σ v) s ((p : G.P.W v) • x) =
-          G.P.w • twistVec (G.P.ι v) (G.P.σ v) s x := by
+      have h1
+          : c⁻¹ • twistVec (G.P.ι v) (G.P.σ v) s ((p : G.P.W v) • x)
+            = G.P.w • twistVec (G.P.ι v) (G.P.σ v) s x := by
         funext i
         rw [Pi.smul_apply, Pi.smul_apply, lb_tw_p, smul_eq_mul, Algebra.smul_def, ← hc, hpK]
         show c⁻¹ * (c ^ 2 * _) = c * (G.P.ι v) ((G.P.σ v ^ s) (x i))
         field_simp
-      have h2 : twistVec (G.P.ι v) (G.P.σ v) s x ∈
-          colSpan G.O (gK * Matrix.diagonal dK * Matrix.diagonal dK) := by
+      have h2
+          : twistVec (G.P.ι v) (G.P.σ v) s x
+            ∈ colSpan G.O (gK * Matrix.diagonal dK * Matrix.diagonal dK) := by
         rw [← e3]; exact Submodule.subset_span ⟨x, hx, rfl⟩
       show c⁻¹ • twistVec (G.P.ι v) (G.P.σ v) s ((p : G.P.W v) • x) ∈ _
       rw [h1]
       exact lb_col (gK * Matrix.diagonal dK) dK
-        (fun a : Fin (G.P.m + 1) => if a.val < G.P.r then 1 else G.P.w) G.P.w
+        (fun a : Fin (G.P.m + 1) => if a.val < G.P.r then 1 else G.P.w)
+        G.P.w
         (by
           intro j
           simp only [hdK]
           split_ifs
           · rw [← hc, mul_inv_cancel₀ hw, map_one]
-          · rw [mul_one]) _ h2
+          · rw [mul_one])
+        _ h2
   · unfold colSpan
     rw [Submodule.span_le]
     rintro _ ⟨j, rfl⟩
@@ -119,20 +141,29 @@ theorem edgeLat_of_G {p : ℕ} (G : GAtP p) (v : Fin G.P.nV) (e : Edge (G.P.W v)
         rfl
 
 section
-variable {p n' : ℕ} {W Qq O Kf : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Qq]
+variable
+  {p n' : ℕ} {W Qq O Kf : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Qq]
   [Algebra W Qq] [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
   {ι : Qq →+* Kf} {σ : Qq ≃+* Qq} {j : W →+* O} {w : O}
 
-theorem edgeLat_of (h : HidaSetting p n' W Qq O Kf ι σ j w) (m r : ℕ) (e : Edge W Qq (m + 1))
-    (g : Matrix (Fin (m + 1)) (Fin (m + 1)) Qq) (hgE : IsEdgeBasis p r e g) :
-    (∀ s, extO O ι σ s e.src = colSpan O (la_tw ι σ s g)) ∧
-      (∀ s, LeAt p ι σ w s e = colSpan O (la_tw ι σ s g * lb_D (m + 1) r (algebraMap O Kf w))) ∧
-      (∀ s, extO O ι σ s e.tgt = colSpan O (la_tw ι σ s g * lb_D (m + 1) r (algebraMap O Kf w) *
-          lb_D (m + 1) r (algebraMap O Kf w))) :=
+theorem edgeLat_of
+    (h : HidaSetting p n' W Qq O Kf ι σ j w)
+    (m r : ℕ) (e : Edge W Qq (m + 1)) (g : Matrix (Fin (m + 1)) (Fin (m + 1)) Qq)
+    (hgE : IsEdgeBasis p r e g)
+    : (∀ s, extO O ι σ s e.src = colSpan O (la_tw ι σ s g))
+      ∧ (∀ s, LeAt p ι σ w s e = colSpan O (la_tw ι σ s g * lb_D (m + 1) r (algebraMap O Kf w)))
+      ∧ (∀ s,
+        extO O ι σ s e.tgt
+          = colSpan O
+            (la_tw ι σ s g * lb_D (m + 1) r (algebraMap O Kf w)
+              * lb_D (m + 1) r (algebraMap O Kf w))) :=
   edgeLat_of_G (mkG h m r (fun _ _ => 0) (fun _ _ _ _ => le_rfl)) (0 : Fin 1) e g hgE
 
-theorem extO_col (h : HidaSetting p n' W Qq O Kf ι σ j w) (m : ℕ) (s : ℕ)
-    (g : Matrix (Fin (m + 1)) (Fin (m + 1)) Qq) : extO O ι σ s (colSpan W g) = colSpan O (la_tw ι σ s g) := by
+theorem extO_col
+    (h : HidaSetting p n' W Qq O Kf ι σ j w)
+    (m : ℕ) (s : ℕ)
+    (g : Matrix (Fin (m + 1)) (Fin (m + 1)) Qq)
+    : extO O ι σ s (colSpan W g) = colSpan O (la_tw ι σ s g) := by
   have hσ : ∀ (n : ℕ) (a : W), ∃ b : W, (σ ^ n) (algebraMap W Qq a) = algebraMap W Qq b := by
     intro n
     induction n with

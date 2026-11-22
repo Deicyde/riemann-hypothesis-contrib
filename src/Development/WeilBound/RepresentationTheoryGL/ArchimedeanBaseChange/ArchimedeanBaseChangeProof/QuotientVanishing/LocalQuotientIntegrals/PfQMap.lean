@@ -11,16 +11,21 @@ noncomputable section
 
 namespace PositivityTheory.Rg.BcB.CV.QuotientMapAlt
 
-def subEquiv {G G' : Type} [Group G] [TopologicalSpace G] [Group G'] [TopologicalSpace G']
-    (e : G ≃ₜ* G') (T : Subgroup G) : T ≃ₜ* T.map e.toMonoidHom where
+def subEquiv
+    {G G' : Type} [Group G] [TopologicalSpace G] [Group G'] [TopologicalSpace G']
+    (e : G ≃ₜ* G') (T : Subgroup G)
+    : T ≃ₜ* T.map e.toMonoidHom where
   toFun t := ⟨e t, Subgroup.mem_map.2 ⟨t, t.2, rfl⟩⟩
-  invFun t := ⟨e.symm t, by
-    obtain ⟨s, hs, hst⟩ := Subgroup.mem_map.1 t.2
-    have h : e.symm (t : G') = s := by
-      rw [← hst]
-      exact e.symm_apply_apply s
-    rw [h]
-    exact hs⟩
+  invFun t := ⟨
+    e.symm t,
+    by
+      obtain ⟨s, hs, hst⟩ := Subgroup.mem_map.1 t.2
+      have h : e.symm (t : G') = s := by
+        rw [← hst]
+        exact e.symm_apply_apply s
+      rw [h]
+      exact hs
+  ⟩
   left_inv t := Subtype.ext (e.symm_apply_apply (t : G))
   right_inv t := Subtype.ext (e.apply_symm_apply (t : G'))
   map_mul' s t := Subtype.ext (map_mul e (s : G) (t : G))
@@ -30,7 +35,8 @@ def subEquiv {G G' : Type} [Group G] [TopologicalSpace G] [Group G'] [Topologica
 end PositivityTheory.Rg.BcB.CV.QuotientMapAlt
 
 open PositivityTheory.Rg.BcB.CV.QuotientMapAlt in
-theorem PositivityTheory.Rg.BcB.CV.pf_QMap : PositivityTheory.Rg.BcB.D4.NormEq → PositivityTheory.Rg.BcB.CV.QMap := by
+theorem PositivityTheory.Rg.BcB.CV.pf_QMap
+    : PositivityTheory.Rg.BcB.D4.NormEq → PositivityTheory.Rg.BcB.CV.QMap := by
   intro hN G _ _ _ _ _ _ _ _ G' _ _ _ _ _ _ _ _ e μ _ μ' _ T T' ν _ _ ν' _ _ F hTc hT hF hFT h0
   subst hT
   have hT'c : IsClosed ((T.map e.toMonoidHom : Subgroup G') : Set G') := by
@@ -58,8 +64,9 @@ theorem PositivityTheory.Rg.BcB.CV.pf_QMap : PositivityTheory.Rg.BcB.D4.NormEq �
     refine ⟨measurable_const.mul (hρ.1.comp e.symm.continuous.measurable), fun x => ?_⟩
     have hk : Measurable fun t : T => ρ ((t : G) * e.symm x) :=
       hρ.1.comp (measurable_subtype_coe.mul_const _)
-    have h1 : ∫⁻ h : T.map e.toMonoidHom, ρ' ((h : G') * x) ∂ν' =
-        (c : ℝ≥0∞)⁻¹ * ∫⁻ t, ρ ((t : G) * e.symm x) ∂(Measure.map φ.symm ν') := by
+    have h1
+        : ∫⁻ h : T.map e.toMonoidHom, ρ' ((h : G') * x) ∂ν'
+          = (c : ℝ≥0∞)⁻¹ * ∫⁻ t, ρ ((t : G) * e.symm x) ∂(Measure.map φ.symm ν') := by
       rw [lintegral_map hk (show Measurable (⇑φ.symm) from φ.symm.continuous.measurable),
         ← lintegral_const_mul' _ _ (ENNReal.inv_ne_top.2 hcne)]
       refine lintegral_congr fun h => ?_
@@ -92,8 +99,9 @@ theorem PositivityTheory.Rg.BcB.CV.pf_QMap : PositivityTheory.Rg.BcB.D4.NormEq �
     simpa [smul_smul, inv_mul_cancel₀ ha0.ne'] using this
   have hcr : ((c : ℝ≥0∞)⁻¹).toReal ≠ 0 :=
     ENNReal.toReal_ne_zero.2 ⟨ENNReal.inv_ne_zero.2 ENNReal.coe_ne_top, ENNReal.inv_ne_top.2 hcne⟩
-  have key3 : ∫ g, F g * ((((c : ℝ≥0∞)⁻¹ * ρ g).toReal : ℝ) : ℂ) ∂μ =
-      (((c : ℝ≥0∞)⁻¹).toReal : ℂ) * ∫ g, F g * (((ρ g).toReal : ℝ) : ℂ) ∂μ := by
+  have key3
+      : ∫ g, F g * ((((c : ℝ≥0∞)⁻¹ * ρ g).toReal : ℝ) : ℂ) ∂μ
+        = (((c : ℝ≥0∞)⁻¹).toReal : ℂ) * ∫ g, F g * (((ρ g).toReal : ℝ) : ℂ) ∂μ := by
     rw [← integral_const_mul]
     refine integral_congr_ae (Filter.Eventually.of_forall fun g => ?_)
     simp only [ENNReal.toReal_mul, Complex.ofReal_mul]

@@ -165,8 +165,9 @@ theorem exists_nondegenerate : PI.NormGramAtOrigin.Statement := by
     exact hJ i j
   obtain ⟨v, hvo, hvd⟩ := Hf_e_e_eq_ite (starRingEnd E) hσ J hJ' hJd r hr
   refine ⟨v, ?_⟩
-  have hg : PI.NormGramAtOrigin.gram (starRingEnd E) J v =
-      Matrix.diagonal (fun a => PI.NormGramAtOrigin.hform (starRingEnd E) J (v a) (v a)) := by
+  have hg
+      : PI.NormGramAtOrigin.gram (starRingEnd E) J v
+        = Matrix.diagonal (fun a => PI.NormGramAtOrigin.hform (starRingEnd E) J (v a) (v a)) := by
     ext a b
     by_cases h : a = b
     · subst h

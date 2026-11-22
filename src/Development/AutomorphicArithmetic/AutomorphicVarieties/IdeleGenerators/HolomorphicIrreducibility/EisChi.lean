@@ -11,15 +11,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.IdeleGenera
 open CongruenceSubgroup UpperHalfPlane UpperTheory.V.Af UpperTheory.V.Sd
 open scoped MatrixGroups ModularForm
 
-private theorem eisChi_gauss_ne {N : ℕ} [NeZero N]
-    {χ : DirichletCharacter ℂ N} {ψ : AddChar (ZMod N) ℂ} (hχ : χ.IsPrimitive)
-    (hψ : ψ.IsPrimitive) : gaussSum χ ψ ≠ 0 := by
-  have h1 : gaussSum χ ψ * gaussSum χ⁻¹ ψ⁻¹
-      = ∑ b : ZMod N, ∑ a : ZMod N, χ a * ψ (b * (a - 1)) := by
+private theorem eisChi_gauss_ne
+    {N : ℕ} [NeZero N]
+    {χ : DirichletCharacter ℂ N} {ψ : AddChar (ZMod N) ℂ} (hχ : χ.IsPrimitive) (hψ : ψ.IsPrimitive)
+    : gaussSum χ ψ ≠ 0 := by
+  have h1
+      : gaussSum χ ψ * gaussSum χ⁻¹ ψ⁻¹ = ∑ b : ZMod N, ∑ a : ZMod N, χ a * ψ (b * (a - 1)) := by
     conv_lhs => rw [gaussSum.eq_1 χ⁻¹, Finset.mul_sum]
     refine Finset.sum_congr rfl fun b _ => ?_
-    rw [← mul_assoc, mul_comm (gaussSum χ ψ), ← gaussSum_mulShift_of_isPrimitive ψ hχ b,
-      gaussSum, Finset.sum_mul]
+    rw [← mul_assoc, mul_comm (gaussSum χ ψ), ← gaussSum_mulShift_of_isPrimitive ψ hχ b, gaussSum,
+      Finset.sum_mul]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [AddChar.mulShift_apply, AddChar.inv_apply, mul_assoc, ← AddChar.map_add_eq_mul]
     congr 2
@@ -36,20 +37,22 @@ private theorem eisChi_gauss_ne {N : ℕ} [NeZero N]
   rw [h0, zero_mul] at h2
   exact (Nat.cast_ne_zero.2 (NeZero.ne N)) h2.symm
 
-private theorem eisChi_coe_sum {N : ℕ} {k : ℤ} {ι : Type} (s : Finset ι) (c : ι → ℂ)
-    (F : ι → ModularForm (Gamma1 N) k) :
-    ((∑ a ∈ s, c a • F a : ModularForm (Gamma1 N) k) : ℍ → ℂ) = ∑ a ∈ s, c a • (F a : ℍ → ℂ) := by
+private theorem eisChi_coe_sum
+    {N : ℕ} {k : ℤ} {ι : Type} (s : Finset ι) (c : ι → ℂ) (F : ι → ModularForm (Gamma1 N) k)
+    : ((∑ a ∈ s, c a • F a : ModularForm (Gamma1 N) k) : ℍ → ℂ) = ∑ a ∈ s, c a • (F a : ℍ → ℂ) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
   | insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, ← ih]; rfl
 
-private theorem eisChi_coef_sum {N : ℕ} [NeZero N] {k : ℤ} {ι : Type} (s : Finset ι) (c : ι → ℂ)
-    (F : ι → ModularForm (Gamma1 N) k) (n : ℕ) :
-    coef ((∑ a ∈ s, c a • F a : ModularForm (Gamma1 N) k) : ℍ → ℂ) n = ∑ a ∈ s, c a * coef (F a) n := by
+private theorem eisChi_coef_sum
+    {N : ℕ} [NeZero N]
+    {k : ℤ} {ι : Type} (s : Finset ι) (c : ι → ℂ) (F : ι → ModularForm (Gamma1 N) k)
+    (n : ℕ)
+    : coef ((∑ a ∈ s, c a • F a : ModularForm (Gamma1 N) k) : ℍ → ℂ) n
+      = ∑ a ∈ s, c a * coef (F a) n := by
   classical
-  have hp : (1 : ℝ) ∈ (Gamma1 N : Subgroup (GL (Fin 2) ℝ)).strictPeriods := by
-    simp
+  have hp : (1 : ℝ) ∈ (Gamma1 N : Subgroup (GL (Fin 2) ℝ)).strictPeriods := by simp
   induction s using Finset.induction_on with
   | empty => simp [coef, qExpansion_zero]
   | insert a s ha ih =>
@@ -59,22 +62,26 @@ private theorem eisChi_coef_sum {N : ℕ} [NeZero N] {k : ℤ} {ι : Type} (s : 
     have h2 := ModularForm.qExpansion_smul one_pos hp (c a) (F a)
     have h3 : ((c a • F a : ModularForm (Gamma1 N) k) : ℍ → ℂ) = c a • (F a : ℍ → ℂ) := rfl
     rw [h3, h2] at h1
-    have h4 : ((c a • F a + ∑ a ∈ s, c a • F a : ModularForm (Gamma1 N) k) : ℍ → ℂ) =
-      c a • (F a : ℍ → ℂ) + ((∑ a ∈ s, c a • F a : ModularForm (Gamma1 N) k) : ℍ → ℂ) := rfl
+    have h4
+        : ((c a • F a + ∑ a ∈ s, c a • F a : ModularForm (Gamma1 N) k) : ℍ → ℂ)
+          = c a • (F a : ℍ → ℂ) + ((∑ a ∈ s, c a • F a : ModularForm (Gamma1 N) k) : ℍ → ℂ) :=
+      rfl
     rw [h4, h1]
     simp
 
-private theorem eisChi_slash_sum {k : ℤ} {ι : Type} (s : Finset ι) (c : ι → ℂ)
-    (F : ι → ℍ → ℂ) (γ : SL(2, ℤ)) :
-    (∑ a ∈ s, c a • F a) ∣[k] γ = ∑ a ∈ s, c a • (F a ∣[k] γ) := by
+private theorem eisChi_slash_sum
+    {k : ℤ} {ι : Type} (s : Finset ι) (c : ι → ℂ) (F : ι → ℍ → ℂ) (γ : SL(2, ℤ))
+    : (∑ a ∈ s, c a • F a) ∣[k] γ = ∑ a ∈ s, c a • (F a ∣[k] γ) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
   | insert a s ha ih =>
-    rw [Finset.sum_insert ha, Finset.sum_insert ha, ← ih, SlashAction.add_slash, ModularForm.SL_smul_slash]
+    rw [Finset.sum_insert ha, Finset.sum_insert ha, ← ih, SlashAction.add_slash,
+      ModularForm.SL_smul_slash]
 
-private theorem eisChi_gs {N : ℕ} [NeZero N] {χ : DirichletCharacter ℂ N} (hχ : χ.IsPrimitive) (e : ZMod N) :
-    ∑ a : ZMod N, χ⁻¹ a * (ZMod.stdAddChar (a * e) : ℂ) = χ e * gaussSum χ⁻¹ ZMod.stdAddChar := by
+private theorem eisChi_gs
+    {N : ℕ} [NeZero N] {χ : DirichletCharacter ℂ N} (hχ : χ.IsPrimitive) (e : ZMod N)
+    : ∑ a : ZMod N, χ⁻¹ a * (ZMod.stdAddChar (a * e) : ℂ) = χ e * gaussSum χ⁻¹ ZMod.stdAddChar := by
   have hi : (χ⁻¹).IsPrimitive := by
     rw [DirichletCharacter.isPrimitive_def, DirichletCharacter.conductor_inv]; exact hχ
   have := gaussSum_mulShift_of_isPrimitive (ZMod.stdAddChar (N := N)) hi e
@@ -83,8 +90,7 @@ private theorem eisChi_gs {N : ℕ} [NeZero N] {χ : DirichletCharacter ℂ N} (
   refine Finset.sum_congr rfl fun a _ => ?_
   rw [AddChar.mulShift_apply, mul_comm e a]
 
-theorem UpperTheory.V.Sd.eisChi :
-    UpperTheory.V.Sd.EisChi := by
+theorem UpperTheory.V.Sd.eisChi : UpperTheory.V.Sd.EisChi := by
   intro N k _ hN hk χ hχ hpar
   choose F hF using UpperTheory.V.Sd.eisMF N k hk
   have hi : (χ⁻¹).IsPrimitive := by
@@ -126,20 +132,24 @@ theorem UpperTheory.V.Sd.eisChi :
       exact Submodule.zero_mem _
   · intro n hn
     rw [eisChi_coef_sum]
-    have h1 : ∀ a : ZMod N, (2 * g)⁻¹ * χ⁻¹ a * coef (F a) n = ∑ e ∈ n.divisors, (2 * g)⁻¹ * (e : ℂ) ^ (k - 1) *
-        (χ⁻¹ a * (ZMod.stdAddChar (a * (e : ZMod N)) : ℂ) +
-          (-1) ^ k * (χ⁻¹ a * (ZMod.stdAddChar (a * (-(e : ZMod N))) : ℂ))) := by
+    have h1
+        : ∀ a : ZMod N,
+          (2 * g)⁻¹ * χ⁻¹ a * coef (F a) n
+            = ∑ e ∈ n.divisors, (2 * g)⁻¹ * (e : ℂ) ^ (k - 1) *
+              (χ⁻¹ a * (ZMod.stdAddChar (a * (e : ZMod N)) : ℂ) +
+                (-1) ^ k * (χ⁻¹ a * (ZMod.stdAddChar (a * (-(e : ZMod N))) : ℂ))) := by
       intro a
       by_cases ha : a = 0
       · simp [ha, h0]
       · rw [hF, (UpperTheory.V.Sd.eisCoef N k hk a ha).2 n hn, Finset.mul_sum]
         refine Finset.sum_congr rfl fun e _ => ?_
-        rw [mul_neg]; ring
+        rw [mul_neg]
+        ring
     simp only [h1]
     rw [Finset.sum_comm, sigChi]
     refine Finset.sum_congr rfl fun e _ => ?_
-    rw [← Finset.mul_sum, Finset.sum_add_distrib, ← Finset.mul_sum, eisChi_gs hχ, eisChi_gs hχ, ← hgdef,
-      ← neg_one_mul (e : ZMod N), map_mul, hpar]
+    rw [← Finset.mul_sum, Finset.sum_add_distrib, ← Finset.mul_sum, eisChi_gs hχ, eisChi_gs hχ,
+      ← hgdef, ← neg_one_mul (e : ZMod N), map_mul, hpar]
     have h2 : ((-1 : ℂ) ^ k) * (-1) ^ k = 1 := by rw [← mul_pow]; simp
     have h3 : (2 * g)⁻¹ * (2 * g) = 1 := inv_mul_cancel₀ (mul_ne_zero two_ne_zero hg)
     linear_combination ((2 * g)⁻¹ * (e : ℂ) ^ (k - 1) * χ (e : ZMod N) * g) * h2 + ((e : ℂ) ^ (k - 1) * χ (e : ZMod N)) * h3

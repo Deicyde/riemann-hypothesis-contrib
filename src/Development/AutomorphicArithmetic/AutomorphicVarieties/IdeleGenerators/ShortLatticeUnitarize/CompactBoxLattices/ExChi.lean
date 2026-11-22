@@ -4,8 +4,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.IdeleGenera
 
 @[expose] public section
 
-theorem UpperTheory.V.Sd.Wc.exChi :
-    UpperTheory.V.Sd.Wc.ExChi := by
+theorem UpperTheory.V.Sd.Wc.exChi : UpperTheory.V.Sd.Wc.ExChi := by
   intro G Z _ _ K ζ ω hc hK
   have hcomm : ∀ (z : Z) (g : G), g * ζ z = ζ z * g := fun z g =>
     Subgroup.mem_center_iff.mp (hc z) g
@@ -22,15 +21,17 @@ theorem UpperTheory.V.Sd.Wc.exChi :
     intro k hk k' hk' z z' h
     have h1 : ζ (z' * z⁻¹) = k'⁻¹ * k := by
       rw [map_mul, map_inv]
-      calc ζ z' * (ζ z)⁻¹ = k'⁻¹ * (k' * ζ z') * (ζ z)⁻¹ := by group
+      calc
+        ζ z' * (ζ z)⁻¹
+          = k'⁻¹ * (k' * ζ z') * (ζ z)⁻¹ := by group
         _ = k'⁻¹ * (k * ζ z) * (ζ z)⁻¹ := by rw [h]
         _ = k'⁻¹ * k := by group
     have h2 : ω (z' * z⁻¹) = 1 := hK _ (by rw [h1]; exact K.mul_mem (K.inv_mem hk') hk)
     rw [map_mul, map_inv] at h2
     exact (mul_inv_eq_one.mp h2).symm
   choose kf hkf zf hzf using fun h : ↥(K ⊔ ζ.range) => hrep h.1 h.2
-  have hval : ∀ (h : ↥(K ⊔ ζ.range)) (k : G), k ∈ K → ∀ z : Z,
-      (h : G) = k * ζ z → ω (zf h) = ω z := by
+  have hval
+      : ∀ (h : ↥(K ⊔ ζ.range)) (k : G), k ∈ K → ∀ z : Z, (h : G) = k * ζ z → ω (zf h) = ω z := by
     intro h k hk z hz
     exact hwd _ (hkf h) _ hk _ _ ((hzf h).symm.trans hz)
   refine ⟨{ toFun := fun h => ω (zf h), map_one' := ?_, map_mul' := ?_ }, ?_⟩

@@ -10,12 +10,20 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsOpenO
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
 open scoped Pointwise
 
 namespace GlobalTheory.InertiaEigenvalues
 
-theorem actQ_pow_isLocallyConstant : ∀ (l : ℕ) [Fact l.Prime] (G : Type) [Group G] [TopologicalSpace G] (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL] (O : Type) [CommRing O] [Algebra O LL], GoodO (Qp := ℚ_[l]) LL O → ∀ (A : GRep G ℚ_[l] LL O) (LA : Lattice (O := O) A.ρ) (r : ℕ) (hI : StableSub LA (Ideal.span {((l : ℕ) : O) ^ r} • ⊤ : Submodule O ↥LA.T)) (x : ↥LA.T ⧸ (Ideal.span {((l : ℕ) : O) ^ r} • ⊤ : Submodule O ↥LA.T)), IsLocallyConstant fun g : G => actQ LA _ hI g x := by
+theorem actQ_pow_isLocallyConstant
+    : ∀ (l : ℕ) [Fact l.Prime] (G : Type) [Group G] [TopologicalSpace G] (LL : Type) [Field LL]
+        [Algebra ℚ_[l] LL] [TopologicalSpace LL] (O : Type) [CommRing O] [Algebra O LL],
+      GoodO (Qp := ℚ_[l]) LL O
+        → ∀ (A : GRep G ℚ_[l] LL O) (LA : Lattice (O := O) A.ρ) (r : ℕ)
+            (hI : StableSub LA (Ideal.span {((l : ℕ) : O) ^ r} • ⊤ : Submodule O ↥LA.T))
+            (x : ↥LA.T ⧸ (Ideal.span {((l : ℕ) : O) ^ r} • ⊤ : Submodule O ↥LA.T)),
+          IsLocallyConstant fun g : G => actQ LA _ hI g x := by
   intro l _ G _ _ LL _ _ _ O _ _ hG A LA r hI x
   obtain ⟨_, _, _, hTR, hO⟩ := hG
   haveI := hTR
@@ -29,8 +37,12 @@ theorem actQ_pow_isLocallyConstant : ∀ (l : ℕ) [Fact l.Prime] (G : Type) [Gr
   obtain ⟨t, rfl⟩ := Submodule.Quotient.mk_surjective _ x
   rw [IsLocallyConstant.iff_exists_open]
   intro g0
-  refine ⟨(fun g => A.ρ g t - A.ρ g0 t) ⁻¹' (c • (LA.T : Set A.V)),
-    hcT.preimage ((A.cont _).sub continuous_const), ?_, ?_⟩
+  refine ⟨
+    (fun g => A.ρ g t - A.ρ g0 t) ⁻¹' (c • (LA.T : Set A.V)),
+    hcT.preimage ((A.cont _).sub continuous_const),
+    ?_,
+    ?_
+  ⟩
   · show A.ρ g0 t - A.ρ g0 t ∈ c • (LA.T : Set A.V)
     rw [sub_self]
     exact ⟨0, LA.T.zero_mem, smul_zero c⟩

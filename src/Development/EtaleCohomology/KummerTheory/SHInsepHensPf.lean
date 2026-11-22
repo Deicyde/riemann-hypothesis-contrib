@@ -11,10 +11,14 @@ open GlobalTheory.EtC IsLocalRing Polynomial
 
 namespace LateralTheory.KummerTheory
 
-theorem hens_root_of_sub {R S : Type*} [CommRing R] [CommRing S] [HenselianLocalRing R] [IsLocalRing S]
-    (φ : R →+* S) (hc : (maximalIdeal S).comap φ = maximalIdeal R) (f : S[X]) (hf : f.Monic) (a₀ : S)
+theorem hens_root_of_sub
+    {R S : Type*} [CommRing R] [CommRing S] [HenselianLocalRing R] [IsLocalRing S]
+    (φ : R →+* S) (hc : (maximalIdeal S).comap φ = maximalIdeal R)
+    (f : S[X]) (hf : f.Monic)
+    (a₀ : S)
     (hlift : ∀ n, f.coeff n ∈ Set.range φ) (ha : a₀ ∈ Set.range φ) (h1 : f.eval a₀ ∈ maximalIdeal S)
-    (h2 : IsUnit (f.derivative.eval a₀)) : ∃ a, f.IsRoot a ∧ a - a₀ ∈ maximalIdeal S := by
+    (h2 : IsUnit (f.derivative.eval a₀))
+    : ∃ a, f.IsRoot a ∧ a - a₀ ∈ maximalIdeal S := by
   obtain ⟨g, hg, -, hgm⟩ := lifts_and_degree_eq_and_monic ((lifts_iff_coeff_lifts f).2 hlift) hf
   obtain ⟨b₀, rfl⟩ := ha
   have hmem : ∀ x, x ∈ maximalIdeal R ↔ φ x ∈ maximalIdeal S := fun x => by rw [← hc]; rfl
@@ -32,34 +36,48 @@ theorem hens_root_of_sub {R S : Type*} [CommRing R] [CommRing S] [HenselianLocal
     rw [← hg, eval_map, eval₂_at_apply, hb, map_zero]
   · rw [← map_sub]; exact (hmem _).1 hbb
 
-abbrev incMap (κ K A : Type) [Field κ] [Field K] [Algebra κ K] [CommRing A] [Algebra κ A]
-    (L : IntermediateField κ K) : A ⊗[κ] L →ₐ[A] A ⊗[κ] K :=
+abbrev incMap
+    (κ K A : Type) [Field κ] [Field K] [Algebra κ K] [CommRing A] [Algebra κ A]
+    (L : IntermediateField κ K)
+    : A ⊗[κ] L →ₐ[A] A ⊗[κ] K :=
   Algebra.TensorProduct.map (AlgHom.id A A) L.val
 
-theorem incMap_mono {κ K A : Type} [Field κ] [Field K] [Algebra κ K] [CommRing A] [Algebra κ A]
-    {L L' : IntermediateField κ K} (h : L ≤ L') {x : A ⊗[κ] K} (hx : x ∈ (incMap κ K A L).range) :
-    x ∈ (incMap κ K A L').range := by
+theorem incMap_mono
+    {κ K A : Type} [Field κ] [Field K] [Algebra κ K] [CommRing A] [Algebra κ A]
+    {L L' : IntermediateField κ K} (h : L ≤ L')
+    {x : A ⊗[κ] K} (hx : x ∈ (incMap κ K A L).range)
+    : x ∈ (incMap κ K A L').range := by
   obtain ⟨y, rfl⟩ := hx
   refine ⟨Algebra.TensorProduct.map (AlgHom.id A A) (IntermediateField.inclusion h) y, ?_⟩
-  have : (incMap κ K A L').comp (Algebra.TensorProduct.map (AlgHom.id A A) (IntermediateField.inclusion h))
-      = incMap κ K A L := Algebra.TensorProduct.ext' (fun a l => by simp)
+  have : (incMap κ K A L').comp
+        (Algebra.TensorProduct.map (AlgHom.id A A) (IntermediateField.inclusion h))
+      = incMap κ K A L :=
+    Algebra.TensorProduct.ext' (fun a l => by simp)
   exact congrArg (fun F : A ⊗[κ] L →ₐ[A] A ⊗[κ] K => F y) this
 
-theorem exists_fd_range {κ K A : Type} [Field κ] [Field K] [Algebra κ K] [Algebra.IsIntegral κ K] [CommRing A]
-    [Algebra κ A] (s : Finset (A ⊗[κ] K)) :
-    ∃ L : IntermediateField κ K, FiniteDimensional κ L ∧ ∀ x ∈ s, x ∈ (incMap κ K A L).range := by
-  have one : ∀ x : A ⊗[κ] K, ∃ L : IntermediateField κ K, FiniteDimensional κ L ∧ x ∈ (incMap κ K A L).range := by
+theorem exists_fd_range
+    {κ K A : Type}
+    [Field κ] [Field K] [Algebra κ K] [Algebra.IsIntegral κ K] [CommRing A] [Algebra κ A]
+    (s : Finset (A ⊗[κ] K))
+    : ∃ L : IntermediateField κ K, FiniteDimensional κ L ∧ ∀ x ∈ s, x ∈ (incMap κ K A L).range := by
+  have one
+      : ∀ x : A ⊗[κ] K, ∃ L : IntermediateField κ K,
+        FiniteDimensional κ L ∧ x ∈ (incMap κ K A L).range := by
     intro x
     induction x using TensorProduct.induction_on with
     | zero => exact ⟨⊥, inferInstance, zero_mem _⟩
     | tmul a k =>
-      refine ⟨IntermediateField.adjoin κ {k},
-        IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral k), ?_⟩
+      refine ⟨
+        IntermediateField.adjoin κ {k},
+        IntermediateField.adjoin.finiteDimensional (Algebra.IsIntegral.isIntegral k),
+        ?_
+      ⟩
       exact ⟨a ⊗ₜ ⟨k, IntermediateField.mem_adjoin_simple_self κ k⟩, by simp⟩
     | add x y hx hy =>
       obtain ⟨L₁, h₁, hx⟩ := hx
       obtain ⟨L₂, h₂, hy⟩ := hy
-      exact ⟨L₁ ⊔ L₂, inferInstance, add_mem (incMap_mono le_sup_left hx) (incMap_mono le_sup_right hy)⟩
+      exact
+        ⟨L₁ ⊔ L₂, inferInstance, add_mem (incMap_mono le_sup_left hx) (incMap_mono le_sup_right hy)⟩
   classical
   induction s using Finset.induction_on with
   | empty => exact ⟨⊥, inferInstance, by simp⟩

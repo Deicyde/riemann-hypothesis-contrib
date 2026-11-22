@@ -6,26 +6,34 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeT
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 open scoped Pointwise
 
-private theorem td_move {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] {A B : ValuationSubring Ω}
-    (g : G F Ω) (hg : ∀ x, g x ∈ A ↔ x ∈ B) {w : HeightOneSpectrum (𝓞 F)} (hw : IsPlaceOver A w) :
-    IsPlaceOver B w := by
+private theorem td_move
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+    {A B : ValuationSubring Ω} (g : G F Ω) (hg : ∀ x, g x ∈ A ↔ x ∈ B)
+    {w : HeightOneSpectrum (𝓞 F)} (hw : IsPlaceOver A w)
+    : IsPlaceOver B w := by
   intro x
   rw [← hw x, valuation_lt_one_iff', valuation_lt_one_iff']
   have hy : g (algebraMap F Ω x) = algebraMap F Ω x := g.commutes _
   have hyi : g (algebraMap F Ω x)⁻¹ = (algebraMap F Ω x)⁻¹ := by rw [map_inv₀, hy]
   rw [← hg (algebraMap F Ω x), hy, ← hg (algebraMap F Ω x)⁻¹, hyi]
 
-private theorem td_count (l : ℕ) [hl : Fact l.Prime] (F : Type) [Field F] [NumberField F] [IsGalois ℚ F] {V : Type}
-    (pl : V → HeightOneSpectrum (𝓞 F)) (hi : Function.Injective pl) (hm : ∀ v, ((l : ℕ) : 𝓞 F) ∈ (pl v).asIdeal)
-    (hs : ∀ w : HeightOneSpectrum (𝓞 F), ((l : ℕ) : 𝓞 F) ∈ w.asIdeal → ∃ v, pl v = w) (v : V) :
-    locDeg (pl v) * Nat.card V = Module.finrank ℚ F := by
+private theorem td_count
+    (l : ℕ) [hl : Fact l.Prime]
+    (F : Type) [Field F] [NumberField F] [IsGalois ℚ F]
+    {V : Type} (pl : V → HeightOneSpectrum (𝓞 F)) (hi : Function.Injective pl)
+    (hm : ∀ v, ((l : ℕ) : 𝓞 F) ∈ (pl v).asIdeal)
+    (hs : ∀ w : HeightOneSpectrum (𝓞 F), ((l : ℕ) : 𝓞 F) ∈ w.asIdeal → ∃ v, pl v = w) (v : V)
+    : locDeg (pl v) * Nat.card V = Module.finrank ℚ F := by
   classical
   let p : Ideal ℤ := Ideal.span {((l : ℕ) : ℤ)}
   have hpp : p.IsPrime :=
-    (Ideal.span_singleton_prime (by exact_mod_cast hl.out.ne_zero)).2 (Nat.prime_iff_prime_int.1 hl.out)
+    (Ideal.span_singleton_prime (by exact_mod_cast hl.out.ne_zero)).2
+      (Nat.prime_iff_prime_int.1 hl.out)
   haveI hpmax : p.IsMaximal :=
     hpp.isMaximal (by rw [Ne, Ideal.span_singleton_eq_bot]; exact_mod_cast hl.out.ne_zero)
   have hlo : ∀ P : Ideal (𝓞 F), P.IsPrime → ((l : ℕ) : 𝓞 F) ∈ P → P.LiesOver p := by
@@ -60,19 +68,24 @@ private theorem td_count (l : ℕ) [hl : Fact l.Prime] (F : Type) [Field F] [Num
   have hG := Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn p (𝓞 F) (F ≃ₐ[ℚ] F)
   haveI := hlo _ (pl v).isPrime (hm v)
   rw [Ideal.ramificationIdxIn_eq_ramificationIdx p (pl v).asIdeal (F ≃ₐ[ℚ] F),
-    Ideal.inertiaDegIn_eq_inertiaDeg p (pl v).asIdeal (F ≃ₐ[ℚ] F), key,
-    IsGalois.card_aut_eq_finrank] at hG
+      Ideal.inertiaDegIn_eq_inertiaDeg p (pl v).asIdeal (F ≃ₐ[ℚ] F), key,
+      IsGalois.card_aut_eq_finrank]
+    at hG
   rw [← hG, mul_comm]
   rfl
 
-theorem UpperTheory.exists_place_over_l_locDeg_mul_card_eq :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c) (T : Tower D) (v : T.ι), ∃ w : HeightOneSpectrum (𝓞 T.F), IsPlaceOver (T.pl v) w ∧ ((l : ℕ) : 𝓞 T.F) ∈ w.asIdeal ∧ locDeg w * Nat.card T.ι = T.d := by
+theorem UpperTheory.exists_place_over_l_locDeg_mul_card_eq
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c) (T : Tower D) (v : T.ι),
+      ∃ w : HeightOneSpectrum (𝓞 T.F),
+        IsPlaceOver (T.pl v) w ∧ ((l : ℕ) : 𝓞 T.F) ∈ w.asIdeal ∧ locDeg w * Nat.card T.ι = T.d := by
   intro Ω _ _ _ l _ c D T v
   haveI := T.nF
   haveI := T.abF
   haveI hac : IsAlgClosure T.F Ω := ⟨IsAlgClosure.isAlgClosed ℚ, Algebra.IsAlgebraic.tower_top (K := ℚ) _⟩
-  have hlt : ∀ (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 T.F)), IsPlaceOver A w →
-      (A.valuation (l : Ω) < 1 ↔ ((l : ℕ) : 𝓞 T.F) ∈ w.asIdeal) := by
+  have hlt
+      : ∀ (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 T.F)),
+        IsPlaceOver A w → (A.valuation (l : Ω) < 1 ↔ ((l : ℕ) : 𝓞 T.F) ∈ w.asIdeal) := by
     intro A w hA
     rw [← hA]
     simp
@@ -83,8 +96,12 @@ theorem UpperTheory.exists_place_over_l_locDeg_mul_card_eq :
     obtain ⟨σ, hσ⟩ := exists_smul_eq_of_isPlaceOver (hP u) (by rw [h]; exact hP u')
     obtain ⟨v0, -, huniq⟩ := T.cover (T.pl u) (T.ovl u)
     have e1 := huniq u ⟨1, fun x => by simp⟩
-    have e2 := huniq u' ⟨σ⁻¹, fun x => by
-      rw [← hσ, ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem, AlgEquiv.smul_def]⟩
+    have e2 :=
+      huniq u' ⟨
+        σ⁻¹,
+        fun x => by
+          rw [← hσ, ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem, AlgEquiv.smul_def]
+      ⟩
     exact e1.trans e2.symm
   · intro w hw
     obtain ⟨A, hA⟩ := exists_isPlaceOver Ω w

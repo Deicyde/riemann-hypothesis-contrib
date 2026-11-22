@@ -11,8 +11,13 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Ade
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.LocMod GlobalTheory.MiS ValuativeRel
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev
+  Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw
+  GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.LocMod
+  GlobalTheory.MiS ValuativeRel
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Fam
@@ -25,24 +30,33 @@ open GlobalTheory.FinPl GlobalTheory.FinPl.KSplit
 
 variable {D : D7}
 
-theorem mem_latV_at_iff_all (S : HSp D) (L : Lat S) (p : Pl D) {z : Fin S.rank → AE D}
-    (hz : ∀ i, z i ∈ idAt D (· = p)) : z ∈ latV S L (· = p) ↔ z ∈ latV S L (fun _ => True) := by
+theorem mem_latV_at_iff_all
+    (S : HSp D) (L : Lat S) (p : Pl D) {z : Fin S.rank → AE D} (hz : ∀ i, z i ∈ idAt D (· = p))
+    : z ∈ latV S L (· = p) ↔ z ∈ latV S L (fun _ => True) := by
   constructor
   · exact fun h => latV_mono S L (fun _ _ => trivial) h
   · intro h
-    have h1 := ((mem_latV_iff_parts S L (fun _ => True) {p}
-      (fun i => idAt_mono (fun _ _ => trivial) (hz i))).1 h).1
-    have e : eQ {p} • z = z := funext fun i =>
-      eQ_mul_of_in (P := fun _ => True) {p}
-        (idAt_mono (fun w hw => ⟨trivial, Finset.mem_singleton.2 hw⟩) (hz i))
+    have h1 :=
+      ((mem_latV_iff_parts S L
+        (fun _ => True)
+        {p}
+        (fun i => idAt_mono (fun _ _ => trivial) (hz i))).1 h).1
+    have e : eQ {p} • z = z :=
+      funext fun i =>
+        eQ_mul_of_in
+          (P := fun _ => True)
+          {p} (idAt_mono (fun w hw => ⟨trivial, Finset.mem_singleton.2 hw⟩) (hz i))
     rw [e] at h1
     exact latV_mono S L (fun w hw => Finset.mem_singleton.1 hw.2) h1
 
-theorem latV_eq_of_moves (S : HSp D) (g : GA D S) (Λ N M : Lat S) (p : Pl D)
-    (hN : Moves S g Λ N (· = p)) (hM : Moves S g Λ M (fun _ => True)) :
-    latV S N (· = p) = latV S M (· = p) := by
-  have key : ∀ z : Fin S.rank → AE D, (∀ i, z i ∈ idAt D (· = p)) →
-      (z ∈ latV S N (· = p) ↔ z ∈ latV S M (· = p)) := by
+theorem latV_eq_of_moves
+    (S : HSp D) (g : GA D S) (Λ N M : Lat S)
+    (p : Pl D) (hN : Moves S g Λ N (· = p))
+    (hM : Moves S g Λ M (fun _ => True))
+    : latV S N (· = p) = latV S M (· = p) := by
+  have key
+      : ∀ z : Fin S.rank → AE D,
+        (∀ i, z i ∈ idAt D (· = p)) → (z ∈ latV S N (· = p) ↔ z ∈ latV S M (· = p)) := by
     intro z hz
     set y := mt S g⁻¹ *ᵥ z with hy
     have hys : ∀ i, y i ∈ idAt D (· = p) := mulVec_mem S _ hz
@@ -59,4 +73,3 @@ theorem latV_eq_of_moves (S : HSp D) (g : GA D S) (Λ N M : Lat S) (p : Pl D)
 end GlobalTheory.Fam.OffLevel
 
 end
-

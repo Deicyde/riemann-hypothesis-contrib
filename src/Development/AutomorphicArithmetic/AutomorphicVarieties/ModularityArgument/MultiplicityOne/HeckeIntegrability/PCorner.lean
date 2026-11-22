@@ -87,28 +87,36 @@ private lemma good_list {I : Type} (s : I → Set R) (e : I → R)
 end UpperTheory.V.Z.Mult.Pi.Cn
 
 open UpperTheory.V.Z.Mult.Pi.Cn in
-theorem UpperTheory.V.Z.Mult.Pi.corner_pf :
-    Corner := by
+theorem UpperTheory.V.Z.Mult.Pi.corner_pf : Corner := by
   intro I _ J Y _ _ _ _ a b e e' haa hab hbb hY he he' f hf
-  have hg := good_list (fun i => Set.range (a i) ∪ Set.range (b i)) (fun i => e i * e' i)
-    (by
-      rintro i k hik x (⟨p, rfl⟩ | ⟨p, rfl⟩) y (⟨q, rfl⟩ | ⟨q, rfl⟩)
-      · exact haa i k hik p q
-      · exact hab i k p q
-      · exact (hab k i q p).symm
-      · exact hbb i k hik p q)
-    (fun i => good_two (by
-      rintro x ⟨p, rfl⟩ y ⟨q, rfl⟩
-      exact hab i i p q) (he i) (he' i))
-    (Finset.univ : Finset I).toList (Finset.nodup_toList _)
+  have hg :=
+    good_list
+      (fun i => Set.range (a i) ∪ Set.range (b i))
+      (fun i => e i * e' i)
+      (by
+        rintro i k hik x (⟨p, rfl⟩ | ⟨p, rfl⟩) y (⟨q, rfl⟩ | ⟨q, rfl⟩)
+        · exact haa i k hik p q
+        · exact hab i k p q
+        · exact (hab k i q p).symm
+        · exact hbb i k hik p q)
+      (fun i =>
+        good_two
+          (by
+            rintro x ⟨p, rfl⟩ y ⟨q, rfl⟩
+            exact hab i i p q)
+          (he i) (he' i))
+      (Finset.univ : Finset I).toList (Finset.nodup_toList _)
   rw [← hf] at hg
   obtain ⟨-, h1, h2⟩ := hg
   refine ⟨h1, fun x => ?_⟩
-  have hsurj := DiscreteGroups.T1.Desc.Swap3.burnside (Algebra.adjoin ℂ
-    {x | ∃ i ∈ (Finset.univ : Finset I).toList, x ∈ Set.range (a i) ∪ Set.range (b i)}).val (by
-    intro W hW
-    refine hY W fun i p x hx => ⟨?_, ?_⟩
-    · exact hW ⟨a i p, Algebra.subset_adjoin ⟨i, by simp, Or.inl ⟨p, rfl⟩⟩⟩ x hx
-    · exact hW ⟨b i p, Algebra.subset_adjoin ⟨i, by simp, Or.inr ⟨p, rfl⟩⟩⟩ x hx)
+  have hsurj :=
+    DiscreteGroups.T1.Desc.Swap3.burnside
+      (Algebra.adjoin ℂ
+        {x | ∃ i ∈ (Finset.univ : Finset I).toList, x ∈ Set.range (a i) ∪ Set.range (b i)}).val
+      (by
+        intro W hW
+        refine hY W fun i p x hx => ⟨?_, ?_⟩
+        · exact hW ⟨a i p, Algebra.subset_adjoin ⟨i, by simp, Or.inl ⟨p, rfl⟩⟩⟩ x hx
+        · exact hW ⟨b i p, Algebra.subset_adjoin ⟨i, by simp, Or.inr ⟨p, rfl⟩⟩⟩ x hx)
   obtain ⟨⟨z, hz⟩, rfl⟩ := hsurj x
   exact h2 z hz

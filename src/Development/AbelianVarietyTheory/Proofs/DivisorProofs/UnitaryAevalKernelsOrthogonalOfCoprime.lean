@@ -5,15 +5,18 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnifAt
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.UnitaryOrth
 
-theorem aeval_mulVec_mem_of_stable {K : Type} [Field K] {n : ℕ} (γ : Matrix (Fin n) (Fin n) K)
-    (W : Submodule K (Fin n → K)) (hW : ∀ z ∈ W, γ *ᵥ z ∈ W) (p : K[X]) :
-    ∀ z ∈ W, aeval γ p *ᵥ z ∈ W := by
+theorem aeval_mulVec_mem_of_stable
+    {K : Type} [Field K]
+    {n : ℕ} (γ : Matrix (Fin n) (Fin n) K) (W : Submodule K (Fin n → K)) (hW : ∀ z ∈ W, γ *ᵥ z ∈ W)
+    (p : K[X])
+    : ∀ z ∈ W, aeval γ p *ᵥ z ∈ W := by
   induction p using Polynomial.induction_on with
   | C c =>
     intro z hz
@@ -28,25 +31,31 @@ theorem aeval_mulVec_mem_of_stable {K : Type} [Field K] {n : ℕ} (γ : Matrix (
     rw [pow_succ, ← mul_assoc, map_mul, aeval_X, ← Matrix.mulVec_mulVec]
     exact h _ (hW z hz)
 
-theorem form_mulVec_mulVec {K : Type} [Field K] (σ : K →+* K) {n : ℕ}
-    (γ : Matrix (Fin n) (Fin n) K) (hγ : (γ.map σ)ᵀ * γ = 1) (x z : Fin n → K) :
-    ∑ k, σ ((γ *ᵥ x) k) * (γ *ᵥ z) k = ∑ k, σ (x k) * z k := by
+theorem form_mulVec_mulVec
+    {K : Type} [Field K]
+    (σ : K →+* K)
+    {n : ℕ} (γ : Matrix (Fin n) (Fin n) K) (hγ : (γ.map σ)ᵀ * γ = 1) (x z : Fin n → K)
+    : ∑ k, σ ((γ *ᵥ x) k) * (γ *ᵥ z) k = ∑ k, σ (x k) * z k := by
   have h1 : (fun k => σ ((γ *ᵥ x) k)) = (γ.map σ) *ᵥ (fun k => σ (x k)) := by
     funext k
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.mulVec, dotProduct, map_sum]
+    simp [Matrix.mulVec, dotProduct, map_sum]
   have h2 : ∑ k, σ ((γ *ᵥ x) k) * (γ *ᵥ z) k = (fun k => σ ((γ *ᵥ x) k)) ⬝ᵥ (γ *ᵥ z) := rfl
   rw [h2, h1, ← Matrix.vecMul_transpose, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, hγ,
     Matrix.one_mulVec]
   rfl
 
-theorem ker_orthogonal_of_coprime :
-    ∀ (K : Type) [Field K] (σ : K →+* K) (n : ℕ) (γ : Matrix (Fin n) (Fin n) K), (γ.map σ)ᵀ * γ = 1 →
-    ∀ (q₁ q₂ a b : K[X]), a * q₁ + b * q₂ = 1 → aeval γ (q₁ * q₂) = 0 →
-    ∀ (V : Submodule K (Fin n → K)), (∀ x, x ∈ V ↔ aeval γ q₁ *ᵥ x = 0) →
-    ∀ {ι : Type} [Fintype ι] [DecidableEq ι] (bs : Module.Basis ι K V),
-    (Matrix.of fun i j => ∑ k, σ ((bs i : Fin n → K) k) * (bs j : Fin n → K) k).det ≠ 0 →
-    ∀ x ∈ V, ∀ y : Fin n → K, aeval γ q₂ *ᵥ y = 0 → ∑ k, σ (x k) * y k = 0 := by
+theorem ker_orthogonal_of_coprime
+    : ∀ (K : Type) [Field K] (σ : K →+* K) (n : ℕ) (γ : Matrix (Fin n) (Fin n) K),
+      (γ.map σ)ᵀ * γ = 1
+        → ∀ (q₁ q₂ a b : K[X]),
+          a * q₁ + b * q₂ = 1 → aeval γ (q₁ * q₂) = 0
+            → ∀ (V : Submodule K (Fin n → K)),
+              (∀ x, x ∈ V ↔ aeval γ q₁ *ᵥ x = 0)
+                → ∀ {ι : Type} [Fintype ι] [DecidableEq ι] (bs : Module.Basis ι K V),
+                  (Matrix.of fun i j => ∑ k, σ ((bs i : Fin n → K) k) * (bs j : Fin n → K) k).det
+                      ≠ 0
+                    → ∀ x ∈ V, ∀ y : Fin n → K, aeval γ q₂ *ᵥ y = 0 → ∑ k, σ (x k) * y k = 0 := by
   intro K _ σ n γ hγ q₁ q₂ a b hab _ V hV ι _ _ bs hG x hx y hy
   have hcomm : ∀ p q : K[X], aeval γ p * aeval γ q = aeval γ q * aeval γ p := by
     intro p q
@@ -68,18 +77,18 @@ theorem ker_orthogonal_of_coprime :
       exact Subtype.ext h2
     obtain ⟨u, hu⟩ := (LinearMap.injective_iff_surjective.mp hf) ⟨z, hz⟩
     exact ⟨u, u.2, congrArg Subtype.val hu⟩
-  let W : Submodule K (Fin n → K) :=
-    { carrier := {z | ∀ x ∈ V, ∑ k, σ (x k) * z k = 0}
-      add_mem' := by
-        intro u v hu hv x hx
-        simp only [Pi.add_apply, mul_add, Finset.sum_add_distrib, hu x hx, hv x hx, add_zero]
-      zero_mem' := by
-        intro x _
-        simp
-      smul_mem' := by
-        intro c u hu x hx
-        simp only [Pi.smul_apply, smul_eq_mul, mul_left_comm _ c, ← Finset.mul_sum, hu x hx,
-          mul_zero] }
+  let W : Submodule K (Fin n → K) := {
+    carrier := {z | ∀ x ∈ V, ∑ k, σ (x k) * z k = 0}
+    add_mem' := by
+      intro u v hu hv x hx
+      simp only [Pi.add_apply, mul_add, Finset.sum_add_distrib, hu x hx, hv x hx, add_zero]
+    zero_mem' := by
+      intro x _
+      simp
+    smul_mem' := by
+      intro c u hu x hx
+      simp only [Pi.smul_apply, smul_eq_mul, mul_left_comm _ c, ← Finset.mul_sum, hu x hx, mul_zero]
+  }
   have hWmem : ∀ z, z ∈ W ↔ ∀ x ∈ V, ∑ k, σ (x k) * z k = 0 := fun z => Iff.rfl
   have hWst : ∀ z ∈ W, γ *ᵥ z ∈ W := by
     intro z hz
@@ -91,8 +100,9 @@ theorem ker_orthogonal_of_coprime :
   set G : Matrix ι ι K :=
     Matrix.of fun i j => ∑ k, σ ((bs i : Fin n → K) k) * (bs j : Fin n → K) k with hGdef
   have hGu : IsUnit G.det := isUnit_iff_ne_zero.mpr hG
-  have hGc : ∀ (c : ι → K) (i : ι), (G *ᵥ c) i =
-      ∑ k, σ ((bs i : Fin n → K) k) * ((∑ j, c j • bs j : V) : Fin n → K) k := by
+  have hGc
+      : ∀ (c : ι → K) (i : ι),
+        (G *ᵥ c) i = ∑ k, σ ((bs i : Fin n → K) k) * ((∑ j, c j • bs j : V) : Fin n → K) k := by
     intro c i
     simp only [hGdef, Matrix.mulVec, dotProduct, Matrix.of_apply, Submodule.coe_sum,
       Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.mul_sum,
@@ -104,12 +114,11 @@ theorem ker_orthogonal_of_coprime :
     intro z hz
     rw [hWmem]
     intro u hu
-    have h1 : u = ((∑ j, bs.repr ⟨u, hu⟩ j • bs j : V) : Fin n → K) := by
-      rw [bs.sum_repr]
+    have h1 : u = ((∑ j, bs.repr ⟨u, hu⟩ j • bs j : V) : Fin n → K) := by rw [bs.sum_repr]
     rw [h1]
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [Submodule.coe_sum, Submodule.coe_smul, Finset.sum_apply, Pi.smul_apply,
-      smul_eq_mul, map_sum, map_mul, Finset.sum_mul]
+        smul_eq_mul, map_sum, map_mul, Finset.sum_mul]
     rw [Finset.sum_comm]
     refine Finset.sum_eq_zero fun j _ => ?_
     simp only [mul_assoc, ← Finset.mul_sum, hz j, mul_zero]

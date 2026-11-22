@@ -12,17 +12,24 @@ open Polynomial IsLocalRing
 
 namespace Formalism.L2.Pj.AvAlg
 
-variable {A B : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] [CommRing B] [IsDomain B]
+variable
+  {A B : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] [CommRing B] [IsDomain B]
   [IsDiscreteValuationRing B] [Algebra A B] [IsLocalHom (algebraMap A B)]
 
-theorem mem_adjoin_mod (α : B) (hres : Algebra.adjoin (ResidueField A) {residue B α} = ⊤) (f : A[X])
-    (hβ : Irreducible (aeval α f)) :
-    ∀ (n : ℕ) (b : B), ∃ s ∈ Algebra.adjoin A {α}, ∃ c : B, b = s + aeval α f ^ n * c := by
+theorem mem_adjoin_mod
+    (α : B) (hres : Algebra.adjoin (ResidueField A) {residue B α} = ⊤)
+    (f : A[X]) (hβ : Irreducible (aeval α f))
+    : ∀ (n : ℕ) (b : B), ∃ s ∈ Algebra.adjoin A {α}, ∃ c : B, b = s + aeval α f ^ n * c := by
   have hra : ∀ G : A[X], residue B (aeval α G) = aeval (residue B α) (G.map (residue A)) := by
     intro G
     rw [Polynomial.aeval_def, Polynomial.aeval_def, Polynomial.eval₂_map, Polynomial.hom_eval₂]
     congr 1
-    all_goals (ext x; simp only [RingHom.comp_apply]; exact (IsLocalRing.ResidueField.algebraMap_residue x).symm)
+    all_goals
+      (
+        ext x
+        simp only [RingHom.comp_apply]
+        exact (IsLocalRing.ResidueField.algebraMap_residue x).symm
+      )
   intro n
   induction n with
   | zero => intro b; exact ⟨0, Subalgebra.zero_mem _, b, by simp⟩
@@ -38,7 +45,8 @@ theorem mem_adjoin_mod (α : B) (hres : Algebra.adjoin (ResidueField A) {residue
       rw [← IsLocalRing.residue_eq_zero_iff, map_sub, hra]
       rw [← hp]
       exact sub_self _
-    rw [(IsDiscreteValuationRing.irreducible_iff_uniformizer _).mp hβ, Ideal.mem_span_singleton'] at hm
+    rw [(IsDiscreteValuationRing.irreducible_iff_uniformizer _).mp hβ, Ideal.mem_span_singleton']
+      at hm
     obtain ⟨c', hc'⟩ := hm
     have hα : aeval α f ∈ Algebra.adjoin A {α} := by
       rw [Algebra.adjoin_singleton_eq_range_aeval]; exact AlgHom.mem_range_self _ f
@@ -54,18 +62,23 @@ end Formalism.L2.Pj.AvAlg
 
 namespace Formalism.L2.Pj.AvAlg
 
-variable {A B : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] [CommRing B] [IsDomain B]
+variable
+  {A B : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] [CommRing B] [IsDomain B]
   [IsDiscreteValuationRing B] [Algebra A B] [IsLocalHom (algebraMap A B)]
 
-theorem adjoin_eq_top_of_gen [Module.Finite A B] (hinj : Function.Injective (algebraMap A B)) (α : B)
-    (hres : Algebra.adjoin (ResidueField A) {residue B α} = ⊤) (f : A[X]) (hβ : Irreducible (aeval α f)) :
-    Algebra.adjoin A {α} = ⊤ := by
+theorem adjoin_eq_top_of_gen
+    [Module.Finite A B]
+    (hinj : Function.Injective (algebraMap A B))
+    (α : B) (hres : Algebra.adjoin (ResidueField A) {residue B α} = ⊤)
+    (f : A[X]) (hβ : Irreducible (aeval α f))
+    : Algebra.adjoin A {α} = ⊤ := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible A
-  have hϖ0 : algebraMap A B ϖ ≠ 0 := by
-    rw [map_ne_zero_iff _ hinj]; exact hϖ.ne_zero
+  have hϖ0 : algebraMap A B ϖ ≠ 0 := by rw [map_ne_zero_iff _ hinj]; exact hϖ.ne_zero
   obtain ⟨e, u, hu⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hϖ0 hβ
   have hϖm : ϖ ∈ maximalIdeal A := (IsLocalRing.mem_maximalIdeal ϖ).mpr hϖ.not_isUnit
-  have key : (⊤ : Submodule A B) ≤ Subalgebra.toSubmodule (Algebra.adjoin A {α}) ⊔ (maximalIdeal A) • ⊤ := by
+  have key
+      : (⊤ : Submodule A B)
+        ≤ Subalgebra.toSubmodule (Algebra.adjoin A {α}) ⊔ (maximalIdeal A) • ⊤ := by
     intro b _
     obtain ⟨s, hs, c, hc⟩ := mem_adjoin_mod α hres f hβ e b
     have e1 : b = s + ϖ • ((↑u⁻¹ : B) * c) := by
@@ -76,8 +89,9 @@ theorem adjoin_eq_top_of_gen [Module.Finite A B] (hinj : Function.Injective (alg
     exact Submodule.add_mem_sup ((Subalgebra.mem_toSubmodule _).mpr hs)
       (Submodule.smul_mem_smul hϖm Submodule.mem_top)
   have hfg : (⊤ : Submodule A B).FG := Module.Finite.fg_top
-  have hle := Submodule.le_of_le_smul_of_le_jacobson_bot hfg
-    (IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top).ge key
+  have hle :=
+    Submodule.le_of_le_smul_of_le_jacobson_bot hfg
+      (IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top).ge key
   rw [eq_top_iff]
   intro x _
   exact (Subalgebra.mem_toSubmodule _).mp (hle Submodule.mem_top)
@@ -86,17 +100,23 @@ end Formalism.L2.Pj.AvAlg
 
 namespace Formalism.L2.Pj.AvAlg
 
-variable {A B : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] [CommRing B] [IsDomain B]
+variable
+  {A B : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] [CommRing B] [IsDomain B]
   [IsDiscreteValuationRing B] [Algebra A B] [IsLocalHom (algebraMap A B)]
 
-theorem residue_aeval (α : B) (G : A[X]) :
-    residue B (aeval α G) = aeval (residue B α) (G.map (residue A)) := by
+theorem residue_aeval (α : B) (G : A[X])
+    : residue B (aeval α G) = aeval (residue B α) (G.map (residue A)) := by
   rw [Polynomial.aeval_def, Polynomial.aeval_def, Polynomial.eval₂_map, Polynomial.hom_eval₂]
   congr 1
-  all_goals (ext x; simp only [RingHom.comp_apply]; exact (IsLocalRing.ResidueField.algebraMap_residue x).symm)
+  all_goals
+    (
+      ext x
+      simp only [RingHom.comp_apply]
+      exact (IsLocalRing.ResidueField.algebraMap_residue x).symm
+    )
 
-theorem adjoin_residue_gen [Finite (ResidueField B)] :
-    ∃ γ : ResidueField B, Algebra.adjoin (ResidueField A) {γ} = ⊤ := by
+theorem adjoin_residue_gen [Finite (ResidueField B)]
+    : ∃ γ : ResidueField B, Algebra.adjoin (ResidueField A) {γ} = ⊤ := by
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := (ResidueField B)ˣ)
   refine ⟨(g : ResidueField B), ?_⟩
   rw [eq_top_iff]
@@ -110,8 +130,9 @@ theorem adjoin_residue_gen [Finite (ResidueField B)] :
     exact Subalgebra.pow_mem (Algebra.adjoin (ResidueField A) {(g : ResidueField B)})
       (Algebra.subset_adjoin (Set.mem_singleton _)) n
 
-theorem exists_adjoin_eq_top [Module.Finite A B] [Finite (ResidueField A)]
-    (hinj : Function.Injective (algebraMap A B)) : ∃ α : B, Algebra.adjoin A {α} = ⊤ := by
+theorem exists_adjoin_eq_top
+    [Module.Finite A B] [Finite (ResidueField A)] (hinj : Function.Injective (algebraMap A B))
+    : ∃ α : B, Algebra.adjoin A {α} = ⊤ := by
   haveI : Finite (ResidueField B) := IsLocalRing.ResidueField.finite_of_finite (R := A) ‹_›
   obtain ⟨γ, hγ⟩ := adjoin_residue_gen (A := A) (B := B)
   obtain ⟨α0, rfl⟩ := IsLocalRing.residue_surjective γ
@@ -121,8 +142,9 @@ theorem exists_adjoin_eq_top [Module.Finite A B] [Finite (ResidueField A)]
   have hq0 : aeval (residue B α0) (minpoly (ResidueField A) (residue B α0)) = 0 := minpoly.aeval _ _
   have hq' : aeval (residue B α0) (derivative (minpoly (ResidueField A) (residue B α0))) ≠ 0 :=
     hsep.aeval_derivative_ne_zero hq0
-  obtain ⟨P, hP⟩ := Polynomial.map_surjective (residue A) IsLocalRing.residue_surjective
-    (minpoly (ResidueField A) (residue B α0))
+  obtain ⟨P, hP⟩ :=
+    Polynomial.map_surjective (residue A) IsLocalRing.residue_surjective
+      (minpoly (ResidueField A) (residue B α0))
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible B
   have hmax := (IsDiscreteValuationRing.irreducible_iff_uniformizer π).mp hπ
   have hm : aeval α0 P ∈ maximalIdeal B := by
@@ -136,7 +158,8 @@ theorem exists_adjoin_eq_top [Module.Finite A B] [Finite (ResidueField A)]
   · refine ⟨α0 + π, adjoin_eq_top_of_gen hinj (α0 + π) ?_ P ?_⟩
     · have hr : residue B π = 0 :=
         (IsLocalRing.residue_eq_zero_iff _).mpr (hmax ▸ Ideal.mem_span_singleton_self π)
-      rw [map_add (f := _), hr, add_zero]; exact hγ
+      rw [map_add (f := _), hr, add_zero]
+      exact hγ
     · obtain ⟨t, ht⟩ := Ideal.mem_span_singleton'.mp h2
       obtain ⟨k, hk⟩ := Polynomial.binomExpansion (P.map (algebraMap A B)) α0 π
       have e : aeval (α0 + π) P = π * (aeval α0 (derivative P) + π * (t + k)) := by
@@ -149,8 +172,7 @@ theorem exists_adjoin_eq_top [Module.Finite A B] [Finite (ResidueField A)]
           (IsLocalRing.mem_maximalIdeal _).mpr hnu
         have h3 : π * (t + k) ∈ maximalIdeal B := by
           rw [hmax]; exact Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self π)
-        have h4 : aeval α0 (derivative P) ∈ maximalIdeal B := by
-          simpa using Ideal.sub_mem _ h1 h3
+        have h4 : aeval α0 (derivative P) ∈ maximalIdeal B := by simpa using Ideal.sub_mem _ h1 h3
         exact (IsLocalRing.mem_maximalIdeal _).mp h4 hd
       rw [e]
       exact (irreducible_mul_isUnit hv).mpr hπ

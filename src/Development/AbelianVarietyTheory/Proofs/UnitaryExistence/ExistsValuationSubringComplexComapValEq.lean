@@ -20,9 +20,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSc
 
 namespace GlobalTheory
 
-theorem exists_valuationSubring_complex_comap_val_eq (F : IntermediateField ℚ ℂ)
-    (U : ValuationSubring F) (p : ℕ) (hp : (p : F) ∈ U.nonunits) :
-    ∃ W : ValuationSubring ℂ, (p : ℂ) ∈ W.nonunits ∧ W.comap F.val.toRingHom = U := by
+theorem exists_valuationSubring_complex_comap_val_eq
+    (F : IntermediateField ℚ ℂ) (U : ValuationSubring F) (p : ℕ) (hp : (p : F) ∈ U.nonunits)
+    : ∃ W : ValuationSubring ℂ, (p : ℂ) ∈ W.nonunits ∧ W.comap F.val.toRingHom = U := by
   obtain ⟨W, hW⟩ : ∃ W : ValuationSubring ℂ, W.comap (algebraMap F ℂ) = U :=
     exists_valuationSubring_comap_eq U _
   refine ⟨W, ?_, hW⟩

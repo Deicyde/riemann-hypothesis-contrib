@@ -10,14 +10,17 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RegularChartDa
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.ChartRestriction.G.Geo GroundTheory.Heights₂.Heights.LowerBoundFree GlobalTheory.CompanionTheory.Ar.Giv.Mix
+open MvPolynomial MeasureTheory Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
+  ReciprocityTheory.ChartRestriction.G.Geo GroundTheory.Heights₂.Heights.LowerBoundFree
+  GlobalTheory.CompanionTheory.Ar.Giv.Mix
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Giv.Mix
 
-theorem continuous_of_atlasSmooth {e : ℕ} {X : Type} [TopologicalSpace X] {A : FinHolAtlas e X}
-    {f : X → ℝ} (hf : A.Smooth f) : Continuous f := by
+theorem continuous_of_atlasSmooth
+    {e : ℕ} {X : Type} [TopologicalSpace X] {A : FinHolAtlas e X} {f : X → ℝ} (hf : A.Smooth f)
+    : Continuous f := by
   rw [continuous_iff_continuousAt]
   intro x
   obtain ⟨j, hj⟩ := A.cover x

@@ -11,37 +11,44 @@ open Set GroundTheory.Automorphic.Whittaker
 
 namespace PositivityTheory.RgUd.T.Nil.BasePf
 
-variable {Y W G : Type*} [TopologicalSpace Y] [T2Space Y] [TopologicalSpace W] [T2Space W]
-  [Group G] [MulAction G W]
+variable
+  {Y W G : Type*}
+  [TopologicalSpace Y] [T2Space Y] [TopologicalSpace W] [T2Space W] [Group G] [MulAction G W]
 
 def rel (K : Subgroup G) : Setoid W where
   r a b := ∃ g ∈ K, g • b = a
-  iseqv :=
-    { refl := fun a => ⟨1, K.one_mem, one_smul _ _⟩
-      symm := fun {a b} ⟨g, hg, h⟩ => ⟨g⁻¹, K.inv_mem hg, by rw [← h, inv_smul_smul]⟩
-      trans := fun {a b c} ⟨g, hg, h⟩ ⟨g', hg', h'⟩ => ⟨g * g', K.mul_mem hg hg', by rw [mul_smul, h', h]⟩ }
+  iseqv := {
+    refl := fun a => ⟨1, K.one_mem, one_smul _ _⟩
+    symm := fun {a b} ⟨g, hg, h⟩ => ⟨g⁻¹, K.inv_mem hg, by rw [← h, inv_smul_smul]⟩
+    trans := fun {a b c} ⟨g, hg, h⟩ ⟨g', hg', h'⟩ =>
+      ⟨g * g', K.mul_mem hg hg', by rw [mul_smul, h', h]⟩
+  }
 
-theorem rel_iff (K : Subgroup G) (a b : W) :
-    Quotient.mk (rel K) a = Quotient.mk (rel K) b ↔ ∃ g ∈ K, g • b = a :=
+theorem rel_iff (K : Subgroup G) (a b : W)
+    : Quotient.mk (rel K) a = Quotient.mk (rel K) b ↔ ∃ g ∈ K, g • b = a :=
   Quotient.eq (r := rel K)
 
 abbrev TF (X : Type*) [TopologicalSpace X] : Submodule ℂ (X → ℂ) :=
   GroundTheory.Automorphic.locallyConstantCompactSupport X ℂ ℂ
 
-theorem comp_mem {F : Y × W → ℂ} (hF : F ∈ TF (Y × W)) (g : G) (hg : Continuous fun w : W => g • w)
-    (hg' : Continuous fun w : W => g⁻¹ • w) : (fun p : Y × W => F (p.1, g • p.2)) ∈ TF (Y × W) := by
+theorem comp_mem
+    {F : Y × W → ℂ} (hF : F ∈ TF (Y × W))
+    (g : G) (hg : Continuous fun w : W => g • w) (hg' : Continuous fun w : W => g⁻¹ • w)
+    : (fun p : Y × W => F (p.1, g • p.2)) ∈ TF (Y × W) := by
   refine ⟨hF.1.comp_continuous (continuous_fst.prodMk (hg.comp continuous_snd)), ?_⟩
-  refine HasCompactSupport.intro ((hF.2.isCompact).image
-    (continuous_fst.prodMk (hg'.comp continuous_snd))) fun x hx => ?_
+  refine HasCompactSupport.intro
+    ((hF.2.isCompact).image (continuous_fst.prodMk (hg'.comp continuous_snd))) fun x hx => ?_
   by_contra h
   refine hx ⟨(x.1, g • x.2), subset_tsupport _ h, ?_⟩
   all_goals simp
 
-theorem tens_mem {a : Y → ℂ} (ha : a ∈ TF Y) {U : Set W} (hUc : IsCompact U) (hUo : IsOpen U) :
-    (fun p : Y × W => a p.1 * U.indicator 1 p.2) ∈ TF (Y × W) := by
+theorem tens_mem {a : Y → ℂ} (ha : a ∈ TF Y) {U : Set W} (hUc : IsCompact U) (hUo : IsOpen U)
+    : (fun p : Y × W => a p.1 * U.indicator 1 p.2) ∈ TF (Y × W) := by
   have h1 : IsLocallyConstant (U.indicator (1 : W → ℂ)) :=
-    (LocallyConstant.indicator (LocallyConstant.const W (1 : ℂ)) ⟨hUc.isClosed, hUo⟩).isLocallyConstant
-  refine ⟨(ha.1.comp_continuous continuous_fst).comp₂ (h1.comp_continuous continuous_snd) (· * ·), ?_⟩
+    (LocallyConstant.indicator (LocallyConstant.const W (1 : ℂ))
+      ⟨hUc.isClosed, hUo⟩).isLocallyConstant
+  refine
+    ⟨(ha.1.comp_continuous continuous_fst).comp₂ (h1.comp_continuous continuous_snd) (· * ·), ?_⟩
   refine HasCompactSupport.intro (ha.2.isCompact.prod hUc) fun p hp => ?_
   simp only [mem_prod, not_and_or] at hp
   rcases hp with h | h
@@ -54,17 +61,18 @@ theorem slice_mem {F : Y × W → ℂ} (hF : F ∈ TF (Y × W)) (w : W) : (fun y
   by_contra h
   exact hy ⟨(y, w), subset_tsupport _ h, rfl⟩
 
-
 open Classical in
-theorem piece_mem (K : Subgroup G) (S : Set W) (hKo : ∀ w ∈ S, IsOpen {w' | ∃ g ∈ K, g • w = w'})
+theorem piece_mem
+    (K : Subgroup G) (S : Set W) (hKo : ∀ w ∈ S, IsOpen {w' | ∃ g ∈ K, g • w = w'})
     {F : Y × W → ℂ} (hF : F ∈ TF (Y × W)) (hFS : ∀ p : Y × W, p.2 ∉ S → F p = 0)
-    (q : Quotient (rel K)) :
-    (fun p : Y × W => F p * if Quotient.mk (rel K) p.2 = q then 1 else 0) ∈ TF (Y × W) := by
+    (q : Quotient (rel K))
+    : (fun p : Y × W => F p * if Quotient.mk (rel K) p.2 = q then 1 else 0) ∈ TF (Y × W) := by
   refine ⟨?_, hF.2.mul_right⟩
   rw [IsLocallyConstant.iff_eventually_eq]
   intro p
   by_cases hp : p.2 ∈ S
-  · have hO : {w' | ∃ g ∈ K, g • p.2 = w'} ∈ nhds p.2 := (hKo p.2 hp).mem_nhds ⟨1, K.one_mem, one_smul _ _⟩
+  · have hO : {w' | ∃ g ∈ K, g • p.2 = w'} ∈ nhds p.2 :=
+      (hKo p.2 hp).mem_nhds ⟨1, K.one_mem, one_smul _ _⟩
     have h1 := ((IsLocallyConstant.iff_eventually_eq _).1 hF.1) p
     have h2 : ∀ᶠ x : Y × W in nhds p, x.2 ∈ {w' | ∃ g ∈ K, g • p.2 = w'} :=
       continuous_snd.continuousAt.preimage_mem_nhds hO
@@ -80,17 +88,17 @@ theorem piece_mem (K : Subgroup G) (S : Set W) (hKo : ∀ w ∈ S, IsOpen {w' | 
 variable {ι : Type*}
 
 open Classical in
-theorem core (hcomm : ∀ a b : G, a * b = b * a) (hcont : ∀ g : G, Continuous fun w : W => g • w)
-    (D : (Y × W → ℂ) →ₗ[ℂ] ℂ)
-    (hD : ∀ g : G, ∀ f ∈ TF (Y × W), D (fun p => f (p.1, g • p.2)) = D f)
+theorem core
+    (hcomm : ∀ a b : G, a * b = b * a) (hcont : ∀ g : G, Continuous fun w : W => g • w)
+    (D : (Y × W → ℂ) →ₗ[ℂ] ℂ) (hD : ∀ g : G, ∀ f ∈ TF (Y × W), D (fun p => f (p.1, g • p.2)) = D f)
     (S : Set W) (w0 : W) (htr : ∀ w ∈ S, ∃ g : G, g • w0 = w)
     (K : ι → Subgroup G) (hKo : ∀ i, ∀ w ∈ S, IsOpen {w' | ∃ g ∈ K i, g • w = w'})
-    (hKf : ∀ f ∈ supportedIn (univ ×ˢ S : Set (Y × W)), ∃ i, ∀ g ∈ K i, ∀ p : Y × W, f (p.1, g • p.2) = f p)
-    (t : G) (L : Set W) (hLc : IsCompact L) (hLo : IsOpen L) (hLK : ∀ i, ∀ g ∈ K i, ∀ w ∈ L, g • w ∈ L)
-    (htL : ∀ w, t⁻¹ • w ∈ L → w ∈ L) (hLS : ∀ w ∈ L, t⁻¹ • w ∉ L → w ∈ S)
-    (hne : ∃ w ∈ L, t⁻¹ • w ∉ L) :
-    ∀ f ∈ supportedIn (univ ×ˢ S : Set (Y × W)), D f = 0 := by
-
+    (hKf : ∀ f ∈ supportedIn (univ ×ˢ S : Set (Y × W)), ∃ i, ∀ g ∈ K i, ∀ p : Y × W,
+      f (p.1, g • p.2) = f p)
+    (t : G) (L : Set W) (hLc : IsCompact L) (hLo : IsOpen L)
+    (hLK : ∀ i, ∀ g ∈ K i, ∀ w ∈ L, g • w ∈ L) (htL : ∀ w, t⁻¹ • w ∈ L → w ∈ L)
+    (hLS : ∀ w ∈ L, t⁻¹ • w ∉ L → w ∈ S) (hne : ∃ w ∈ L, t⁻¹ • w ∉ L)
+    : ∀ f ∈ supportedIn (univ ×ˢ S : Set (Y × W)), D f = 0 := by
   set tL : Set W := {w | t⁻¹ • w ∈ L} with htLdef
   have htLc : IsClopen tL := ⟨hLc.isClosed.preimage (hcont t⁻¹), hLo.preimage (hcont t⁻¹)⟩
   set B : Set W := L ∩ tLᶜ with hBdef
@@ -106,8 +114,11 @@ theorem core (hcomm : ∀ a b : G, a * b = b * a) (hcont : ∀ g : G, Continuous
     show t⁻¹ • w ∈ L
     rwa [e] at h'
 
-  have claimA : ∀ i, ∀ F ∈ TF (Y × W), (∀ g ∈ K i, ∀ p : Y × W, F (p.1, g • p.2) = F p) →
-      (∀ p : Y × W, F p ≠ 0 → ∃ g ∈ K i, g • w0 = p.2) → D F = 0 := by
+  have claimA
+      : ∀ i, ∀ F ∈ TF (Y × W),
+        (∀ g ∈ K i, ∀ p : Y × W, F (p.1, g • p.2) = F p)
+          → (∀ p : Y × W, F p ≠ 0 → ∃ g ∈ K i, g • w0 = p.2)
+          → D F = 0 := by
     intro i F hF hFK hFO
     set a : Y → ℂ := fun y => F (y, w0) with ha
     have haT : a ∈ TF Y := slice_mem hF w0
@@ -136,11 +147,14 @@ theorem core (hcomm : ∀ a b : G, a * b = b * a) (hcont : ∀ g : G, Continuous
               Set.indicator_of_notMem (show p.2 ∉ L ∩ tLᶜ from fun h => h2 h.1)]
       rw [e2, map_sub, ← e1, hD t⁻¹ ΦL hLT, sub_self]
 
-    obtain ⟨b, hbB, hbfin, hbcov⟩ := hBc.elim_finite_subcover_image (b := B)
-      (c := fun r => {w' | ∃ g ∈ K i, g • r = w'}) (fun r hr => hKo i r (hBS hr))
-      (fun w hw => mem_iUnion₂.2 ⟨w, hw, 1, (K i).one_mem, one_smul _ _⟩)
+    obtain ⟨b, hbB, hbfin, hbcov⟩ :=
+      hBc.elim_finite_subcover_image (b := B)
+        (c := fun r => {w' | ∃ g ∈ K i, g • r = w'})
+        (fun r hr => hKo i r (hBS hr))
+        (fun w hw => mem_iUnion₂.2 ⟨w, hw, 1, (K i).one_mem, one_smul _ _⟩)
     set Q : Finset (Quotient (rel (K i))) := hbfin.toFinset.image (Quotient.mk (rel (K i))) with hQ
-    have hΦsum : Φ = ∑ q ∈ Q, fun p : Y × W => Φ p * if Quotient.mk (rel (K i)) p.2 = q then 1 else 0 := by
+    have hΦsum
+        : Φ = ∑ q ∈ Q, fun p : Y × W => Φ p * if Quotient.mk (rel (K i)) p.2 = q then 1 else 0 := by
       funext p
       rw [Finset.sum_apply]
       simp only [← Finset.mul_sum, Finset.sum_ite_eq, Finset.sum_const_zero]
@@ -150,18 +164,23 @@ theorem core (hcomm : ∀ a b : G, a * b = b * a) (hcont : ∀ g : G, Continuous
           Finset.mem_image.2 ⟨r, hbfin.mem_toFinset.2 hr, ((rel_iff _ _ _).2 ⟨g, hg, hgr⟩).symm⟩
         simp [this]
       · simp [Φ, Set.indicator_of_notMem hp]
-    have hpiece : ∀ q ∈ Q, D (fun p : Y × W => Φ p * if Quotient.mk (rel (K i)) p.2 = q then 1 else 0) = D F := by
+    have hpiece
+        : ∀ q ∈ Q,
+          D (fun p : Y × W => Φ p * if Quotient.mk (rel (K i)) p.2 = q then 1 else 0) = D F := by
       intro q hq
       obtain ⟨r, hr, rfl⟩ := Finset.mem_image.1 hq
       have hrB : r ∈ B := hbB (hbfin.mem_toFinset.1 hr)
       obtain ⟨h, hh⟩ := htr r (hBS hrB)
-      have hPT := piece_mem (K i) S (hKo i) hΦT
-        (fun p hp => by simp [Φ, Set.indicator_of_notMem (fun h' => hp (hBS h'))])
-        (Quotient.mk (rel (K i)) r)
+      have hPT :=
+        piece_mem (K i) S (hKo i) hΦT
+          (fun p hp => by simp [Φ, Set.indicator_of_notMem (fun h' => hp (hBS h'))])
+          (Quotient.mk (rel (K i)) r)
       rw [← hD h _ hPT]
       congr 1
       funext p
-      have key : Quotient.mk (rel (K i)) (h • p.2) = Quotient.mk (rel (K i)) r ↔ ∃ g ∈ K i, g • w0 = p.2 := by
+      have key
+          : Quotient.mk (rel (K i)) (h • p.2) = Quotient.mk (rel (K i)) r
+            ↔ ∃ g ∈ K i, g • w0 = p.2 := by
         rw [rel_iff, ← hh]
         constructor
         · rintro ⟨g, hg, hgx⟩
@@ -180,7 +199,8 @@ theorem core (hcomm : ∀ a b : G, a * b = b * a) (hcont : ∀ g : G, Continuous
         have e3 := hFK g hg (p.1, w0)
         simp only [hgx] at e3
         rw [← e3]
-      · have hk : ¬ Quotient.mk (rel (K i)) (h • p.2) = Quotient.mk (rel (K i)) r := fun h' => hp (key.1 h')
+      · have hk : ¬ Quotient.mk (rel (K i)) (h • p.2) = Quotient.mk (rel (K i)) r := fun h' =>
+          hp (key.1 h')
         simp only [hk, if_false, mul_zero]
         by_contra h0
         exact hp (hFO p (Ne.symm h0))
@@ -192,7 +212,7 @@ theorem core (hcomm : ∀ a b : G, a * b = b * a) (hcont : ∀ g : G, Continuous
     have hsum : D Φ = (Q.card : ℂ) * D F := by
       conv_lhs => rw [hΦsum]
       set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, Finset.sum_congr rfl hpiece, Finset.sum_const, nsmul_eq_mul]
+      rw [map_sum, Finset.sum_congr rfl hpiece, Finset.sum_const, nsmul_eq_mul]
     rw [hΦ0] at hsum
     have hc : (Q.card : ℂ) ≠ 0 := Nat.cast_ne_zero.2 (Finset.card_ne_zero.2 hQne)
     exact (mul_eq_zero.1 hsum.symm).resolve_left hc
@@ -208,11 +228,14 @@ theorem core (hcomm : ∀ a b : G, a * b = b * a) (hcont : ∀ g : G, Continuous
   have hCS : C ⊆ S := by
     rintro _ ⟨p, hp, rfl⟩
     exact (hf.2 hp).2
-  obtain ⟨b, hbC, hbfin, hbcov⟩ := hCc.elim_finite_subcover_image (b := C)
-    (c := fun r => {w' | ∃ g ∈ K i, g • r = w'}) (fun r hr => hKo i r (hCS hr))
-    (fun w hw => mem_iUnion₂.2 ⟨w, hw, 1, (K i).one_mem, one_smul _ _⟩)
+  obtain ⟨b, hbC, hbfin, hbcov⟩ :=
+    hCc.elim_finite_subcover_image (b := C)
+      (c := fun r => {w' | ∃ g ∈ K i, g • r = w'})
+      (fun r hr => hKo i r (hCS hr))
+      (fun w hw => mem_iUnion₂.2 ⟨w, hw, 1, (K i).one_mem, one_smul _ _⟩)
   set Q : Finset (Quotient (rel (K i))) := hbfin.toFinset.image (Quotient.mk (rel (K i))) with hQ
-  have hfsum : f = ∑ q ∈ Q, fun p : Y × W => f p * if Quotient.mk (rel (K i)) p.2 = q then 1 else 0 := by
+  have hfsum
+      : f = ∑ q ∈ Q, fun p : Y × W => f p * if Quotient.mk (rel (K i)) p.2 = q then 1 else 0 := by
     funext p
     rw [Finset.sum_apply]
     simp only [← Finset.mul_sum, Finset.sum_ite_eq, Finset.sum_const_zero]

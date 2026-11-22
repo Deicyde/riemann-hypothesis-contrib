@@ -5,8 +5,10 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsHolPeriods
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.PELU
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.PELU
 open scoped Matrix
 
 namespace GlobalTheory
@@ -116,26 +118,39 @@ lemma conjMat_intertwines (f g : (Π i, Matrix (Fin (d i)) (Fin (d i)) ℂ) →�
 
 end HolConj
 
-theorem holFamily_conj_const : ∀ (S : Type) [Ring S] [Algebra ℂ S] [FiniteDimensional ℂ S] [IsSemisimpleRing S] (g m : ℕ) (B : Set (Fin m → ℂ)) (b₀ : Fin m → ℂ) (F : (Fin m → ℂ) → (S →ₐ[ℂ] Matrix (Fin g) (Fin g) ℂ)), IsOpen B → b₀ ∈ B → (∀ a i j, DifferentiableOn ℂ (fun b => F b a i j) B) → ∃ (B' : Set (Fin m → ℂ)) (h : (Fin m → ℂ) → Matrix (Fin g) (Fin g) ℂ), IsOpen B' ∧ b₀ ∈ B' ∧ B' ⊆ B ∧ h b₀ = 1 ∧ (∀ i j, DifferentiableOn ℂ (fun b => h b i j) B') ∧ ∀ b ∈ B', IsUnit (h b) ∧ ∀ a, F b a * h b = h b * F b₀ a := by
+theorem holFamily_conj_const
+    : ∀ (S : Type) [Ring S] [Algebra ℂ S] [FiniteDimensional ℂ S] [IsSemisimpleRing S] (g m : ℕ)
+        (B : Set (Fin m → ℂ)) (b₀ : Fin m → ℂ)
+        (F : (Fin m → ℂ) → (S →ₐ[ℂ] Matrix (Fin g) (Fin g) ℂ)),
+      IsOpen B → b₀ ∈ B → (∀ a i j, DifferentiableOn ℂ (fun b => F b a i j) B)
+        → ∃ (B' : Set (Fin m → ℂ)) (h : (Fin m → ℂ) → Matrix (Fin g) (Fin g) ℂ),
+          IsOpen B' ∧ b₀ ∈ B' ∧ B' ⊆ B ∧ h b₀ = 1
+            ∧ (∀ i j, DifferentiableOn ℂ (fun b => h b i j) B')
+            ∧ ∀ b ∈ B', IsUnit (h b) ∧ ∀ a, F b a * h b = h b * F b₀ a := by
   intro S _ _ _ _ g m B b₀ F hB hb₀ hF
   obtain ⟨n, d, hd, ⟨e⟩⟩ := IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed ℂ S
-  let f : (Fin m → ℂ) →
-      ((Π i, Matrix (Fin (d i)) (Fin (d i)) ℂ) →ₐ[ℂ] Matrix (Fin g) (Fin g) ℂ) :=
+  let f : (Fin m → ℂ) → ((Π i, Matrix (Fin (d i)) (Fin (d i)) ℂ) →ₐ[ℂ] Matrix (Fin g) (Fin g) ℂ) :=
     fun b => (F b).comp e.symm.toAlgHom
   let h : (Fin m → ℂ) → Matrix (Fin g) (Fin g) ℂ := fun b => HolConj.conjMat (f b) (f b₀)
   have hdiff : ∀ i j, DifferentiableOn ℂ (fun b => h b i j) B := by
     intro i j
     simp only [h, f, HolConj.conjMat, Matrix.sum_apply, Matrix.mul_apply, AlgHom.comp_apply]
-    refine DifferentiableOn.fun_sum fun _ _ => DifferentiableOn.fun_sum fun _ _ =>
-      DifferentiableOn.fun_sum fun _ _ => (hF _ _ _).mul_const _
+    refine DifferentiableOn.fun_sum fun _ _ =>
+      DifferentiableOn.fun_sum fun _ _ => DifferentiableOn.fun_sum fun _ _ => (hF _ _ _).mul_const _
   have hc : ContinuousOn h B :=
     continuousOn_pi.2 fun i => continuousOn_pi.2 fun j => (hdiff i j).continuousOn
-  have hdet : ContinuousOn (fun b => (h b).det) B :=
-    (continuous_id.matrix_det).comp_continuousOn hc
+  have hdet : ContinuousOn (fun b => (h b).det) B := (continuous_id.matrix_det).comp_continuousOn hc
   have h₀ : h b₀ = 1 := HolConj.conjMat_self _
-  refine ⟨B ∩ (fun b => (h b).det) ⁻¹' {0}ᶜ, h,
-    hdet.isOpen_inter_preimage hB isOpen_compl_singleton, ⟨hb₀, by simp [h₀]⟩,
-    Set.inter_subset_left, h₀, fun i j => (hdiff i j).mono Set.inter_subset_left, ?_⟩
+  refine ⟨
+    B ∩ (fun b => (h b).det) ⁻¹' {0}ᶜ,
+    h,
+    hdet.isOpen_inter_preimage hB isOpen_compl_singleton,
+    ⟨hb₀, by simp [h₀]⟩,
+    Set.inter_subset_left,
+    h₀,
+    fun i j => (hdiff i j).mono Set.inter_subset_left,
+    ?_
+  ⟩
   rintro b ⟨-, hb⟩
   refine ⟨(Matrix.isUnit_iff_isUnit_det _).2 (isUnit_iff_ne_zero.2 hb), fun a => ?_⟩
   have := HolConj.conjMat_intertwines (f b) (f b₀) (e a)

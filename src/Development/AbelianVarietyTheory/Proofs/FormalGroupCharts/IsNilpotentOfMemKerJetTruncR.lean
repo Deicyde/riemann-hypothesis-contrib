@@ -8,7 +8,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.TaylorDiscrim
 
 noncomputable section
 open CategoryTheory AlgebraicGeometry MvPowerSeries
-open ReciprocityTheory.ChartRestriction.G.Chart ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.TB
+open ReciprocityTheory.ChartRestriction.G.Chart ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+  ReciprocityTheory.ChartRestriction.G.TB
 namespace GlobalTheory.JetSer
 
 section Val
@@ -17,24 +18,29 @@ variable {A : Type} [CommRing A] {X : Scheme.{0}}
 def fnValHom (p : Spec (CommRingCat.of A) ⟶ X) (U : X.Opens) (h : ⊤ ≤ p ⁻¹ᵁ U) : Γ(X, U) →+* A :=
   (p.appLE U ⊤ h ≫ (Scheme.ΓSpecIso (CommRingCat.of A)).hom).hom
 
-theorem fnVal_eq_fnValHom (p : Spec (CommRingCat.of A) ⟶ X) (U : X.Opens) (h : ⊤ ≤ p ⁻¹ᵁ U) (f : Γ(X, U)) :
-    fnVal p U f = fnValHom p U h f := by
+theorem fnVal_eq_fnValHom
+    (p : Spec (CommRingCat.of A) ⟶ X) (U : X.Opens) (h : ⊤ ≤ p ⁻¹ᵁ U) (f : Γ(X, U))
+    : fnVal p U f = fnValHom p U h f := by
   unfold fnVal
   rw [dite_eq_left h]
   rfl
 
-theorem top_le_preimage_comp {T T' : Scheme.{0}} (r : T' ⟶ T) (p : T ⟶ X) (U : X.Opens) (h : ⊤ ≤ p ⁻¹ᵁ U) :
-    ⊤ ≤ (r ≫ p) ⁻¹ᵁ U := fun z _ => by
+theorem top_le_preimage_comp
+    {T T' : Scheme.{0}} (r : T' ⟶ T) (p : T ⟶ X) (U : X.Opens) (h : ⊤ ≤ p ⁻¹ᵁ U)
+    : ⊤ ≤ (r ≫ p) ⁻¹ᵁ U := fun z _ => by
   have : r z ∈ p ⁻¹ᵁ U := h trivial
   simpa using this
 
-theorem fnVal_specMap {B : Type} [CommRing B] (ψ : A →+* B) (p : Spec (CommRingCat.of A) ⟶ X) (U : X.Opens)
-    (h : ⊤ ≤ p ⁻¹ᵁ U) (f : Γ(X, U)) :
-    fnVal (Spec.map (CommRingCat.ofHom ψ) ≫ p) U f = ψ (fnVal p U f) := by
+theorem fnVal_specMap
+    {B : Type} [CommRing B]
+    (ψ : A →+* B)
+    (p : Spec (CommRingCat.of A) ⟶ X) (U : X.Opens) (h : ⊤ ≤ p ⁻¹ᵁ U) (f : Γ(X, U))
+    : fnVal (Spec.map (CommRingCat.ofHom ψ) ≫ p) U f = ψ (fnVal p U f) := by
   have h' := top_le_preimage_comp (Spec.map (CommRingCat.ofHom ψ)) p U h
   rw [fnVal_eq_fnValHom _ _ h', fnVal_eq_fnValHom _ _ h]
-  have e : (Spec.map (CommRingCat.ofHom ψ) ≫ p).appLE U ⊤ h' ≫ (Scheme.ΓSpecIso (CommRingCat.of B)).hom =
-      (p.appLE U ⊤ h ≫ (Scheme.ΓSpecIso (CommRingCat.of A)).hom) ≫ CommRingCat.ofHom ψ := by
+  have e
+      : (Spec.map (CommRingCat.ofHom ψ) ≫ p).appLE U ⊤ h' ≫ (Scheme.ΓSpecIso (CommRingCat.of B)).hom
+        = (p.appLE U ⊤ h ≫ (Scheme.ΓSpecIso (CommRingCat.of A)).hom) ≫ CommRingCat.ofHom ψ := by
     rw [Category.assoc, ← Scheme.ΓSpecIso_naturality, ← Category.assoc,
       ← Scheme.Hom.appLE_comp_appLE (Spec.map (CommRingCat.ofHom ψ)) p U ⊤ ⊤ h le_top]
     congr 2
@@ -42,9 +48,12 @@ theorem fnVal_specMap {B : Type} [CommRing B] (ψ : A →+* B) (p : Spec (CommRi
   rw [e]
   rfl
 
-theorem fnVal_comp {Y : Scheme.{0}} (p : Spec (CommRingCat.of A) ⟶ X) (q : X ⟶ Y) (U : X.Opens) (V : Y.Opens)
-    (hUV : U ≤ q ⁻¹ᵁ V) (h : ⊤ ≤ p ⁻¹ᵁ U) (f : Γ(Y, V)) :
-    ⊤ ≤ (p ≫ q) ⁻¹ᵁ V ∧ fnVal (p ≫ q) V f = fnVal p U ((q.appLE V U hUV).hom f) := by
+theorem fnVal_comp
+    {Y : Scheme.{0}}
+    (p : Spec (CommRingCat.of A) ⟶ X)
+    (q : X ⟶ Y) (U : X.Opens) (V : Y.Opens) (hUV : U ≤ q ⁻¹ᵁ V)
+    (h : ⊤ ≤ p ⁻¹ᵁ U) (f : Γ(Y, V))
+    : ⊤ ≤ (p ≫ q) ⁻¹ᵁ V ∧ fnVal (p ≫ q) V f = fnVal p U ((q.appLE V U hUV).hom f) := by
   have h' : ⊤ ≤ (p ≫ q) ⁻¹ᵁ V := fun z _ => by
     have : p z ∈ q ⁻¹ᵁ V := hUV (h trivial)
     simpa using this
@@ -54,9 +63,9 @@ theorem fnVal_comp {Y : Scheme.{0}} (p : Spec (CommRingCat.of A) ⟶ X) (q : X �
   rw [← Scheme.Hom.appLE_comp_appLE p q V U ⊤ hUV h]
   rfl
 
-theorem fnVal_res (p : Spec (CommRingCat.of A) ⟶ X) (U V : X.Opens) (hUV : U ≤ V) (h : ⊤ ≤ p ⁻¹ᵁ U)
-    (f : Γ(X, V)) :
-    ⊤ ≤ p ⁻¹ᵁ V ∧ fnVal p V f = fnVal p U ((X.presheaf.map (homOfLE hUV).op).hom f) := by
+theorem fnVal_res
+    (p : Spec (CommRingCat.of A) ⟶ X) (U V : X.Opens) (hUV : U ≤ V) (h : ⊤ ≤ p ⁻¹ᵁ U) (f : Γ(X, V))
+    : ⊤ ≤ p ⁻¹ᵁ V ∧ fnVal p V f = fnVal p U ((X.presheaf.map (homOfLE hUV).op).hom f) := by
   have h' : ⊤ ≤ p ⁻¹ᵁ V := fun z _ => hUV (h trivial)
   refine ⟨h', ?_⟩
   rw [fnVal_eq_fnValHom _ _ h', fnVal_eq_fnValHom _ _ h]
@@ -64,9 +73,12 @@ theorem fnVal_res (p : Spec (CommRingCat.of A) ⟶ X) (U V : X.Opens) (hUV : U �
   rw [← Scheme.Hom.map_appLE p h (homOfLE hUV).op]
   rfl
 
-theorem top_le_preimage_of_nil {B : Type} [CommRing B] (q : A →+* B) (hq : Function.Surjective q)
-    (hn : ∀ a ∈ RingHom.ker q, IsNilpotent a) (p : Spec (CommRingCat.of A) ⟶ X) (U : X.Opens)
-    (h : ⊤ ≤ (Spec.map (CommRingCat.ofHom q) ≫ p) ⁻¹ᵁ U) : ⊤ ≤ p ⁻¹ᵁ U := by
+theorem top_le_preimage_of_nil
+    {B : Type} [CommRing B]
+    (q : A →+* B) (hq : Function.Surjective q) (hn : ∀ a ∈ RingHom.ker q, IsNilpotent a)
+    (p : Spec (CommRingCat.of A) ⟶ X) (U : X.Opens)
+    (h : ⊤ ≤ (Spec.map (CommRingCat.ofHom q) ≫ p) ⁻¹ᵁ U)
+    : ⊤ ≤ p ⁻¹ᵁ U := by
   intro z _
   have hker : RingHom.ker q ≤ z.asIdeal := fun a ha => by
     obtain ⟨n, hn⟩ := hn a ha
@@ -92,8 +104,9 @@ theorem jetTruncR_surjective (m : ℕ) : Function.Surjective (jetTruncR R κ m) 
   obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective y
   exact ⟨Ideal.Quotient.mk _ a, rfl⟩
 
-theorem isNilpotent_of_mem_ker_jetTruncR (m : ℕ) (a : JetR R κ (m + 1))
-    (ha : a ∈ RingHom.ker (jetTruncR R κ m).toRingHom) : IsNilpotent a := by
+theorem isNilpotent_of_mem_ker_jetTruncR
+    (m : ℕ) (a : JetR R κ (m + 1)) (ha : a ∈ RingHom.ker (jetTruncR R κ m).toRingHom)
+    : IsNilpotent a := by
   have e : (jetAug R κ m).comp (jetTruncR R κ m) = jetAug R κ (m + 1) :=
     jet_ext fun j => (jetAug_zR m j).trans (jetAug_zR (m + 1) j).symm
   have ha' : jetTruncR R κ m a = 0 := ha
@@ -103,9 +116,11 @@ theorem isNilpotent_of_mem_ker_jetTruncR (m : ℕ) (a : JetR R κ (m + 1))
   have := Ideal.pow_mem_pow h1 (m + 1 + 1)
   rwa [ker_jetAug_pow, Ideal.mem_bot] at this
 
-theorem top_le_preimage_jet {X : Scheme.{0}} (p : ∀ m : ℕ, Spec (CommRingCat.of (JetR R κ m)) ⟶ X)
-    (hp : ∀ m, (spMap (jetTruncR R κ m)).left ≫ p (m + 1) = p m) (U : X.Opens) (h : ⊤ ≤ p 0 ⁻¹ᵁ U) (m : ℕ) :
-    ⊤ ≤ p m ⁻¹ᵁ U := by
+theorem top_le_preimage_jet
+    {X : Scheme.{0}} (p : ∀ m : ℕ, Spec (CommRingCat.of (JetR R κ m)) ⟶ X)
+    (hp : ∀ m, (spMap (jetTruncR R κ m)).left ≫ p (m + 1) = p m) (U : X.Opens) (h : ⊤ ≤ p 0 ⁻¹ᵁ U)
+    (m : ℕ)
+    : ⊤ ≤ p m ⁻¹ᵁ U := by
   induction m with
   | zero => exact h
   | succ m ih =>
@@ -120,7 +135,8 @@ theorem serSt_of_jetAlgSt : JetAlgSt → SerSt := by
   have hU := top_le_preimage_jet p hp U h0
   obtain ⟨hτ, -, hinj, hex, -⟩ := hJ R κ
   refine ⟨?_, ?_, ?_, ?_⟩
-  · have hc : ∀ f : Γ(X, U), ∃ g : MvPowerSeries κ R, ∀ m, toJet m g = fnValHom (p m) U (hU m) f := by
+  · have hc
+        : ∀ f : Γ(X, U), ∃ g : MvPowerSeries κ R, ∀ m, toJet m g = fnValHom (p m) U (hU m) f := by
       intro f
       refine hex (fun m => fnValHom (p m) U (hU m) f) fun m => ?_
       have := fnVal_specMap (jetTruncR R κ m).toRingHom (p (m + 1)) U (hU _) f
@@ -128,13 +144,18 @@ theorem serSt_of_jetAlgSt : JetAlgSt → SerSt := by
       exact this.symm
     choose T hT using hc
     choose τ hτ₁ hτ₂ using hτ
-    refine ⟨{ toFun := T
-              map_one' := hinj _ _ fun m => by rw [hT, ← hτ₁, map_one, map_one]
-              map_mul' := fun a b => hinj _ _ fun m => by
-                rw [hT, ← hτ₁, map_mul, map_mul, hτ₁, hτ₁, hT, hT]
-              map_zero' := hinj _ _ fun m => by rw [hT, ← hτ₁, map_zero, map_zero]
-              map_add' := fun a b => hinj _ _ fun m => by
-                rw [hT, ← hτ₁, map_add (f := _), map_add (f := _), hτ₁, hτ₁, hT, hT] }, fun f g => ⟨fun H => ?_, fun H m => ?_⟩⟩
+    refine ⟨
+      {
+        toFun := T
+        map_one' := hinj _ _ fun m => by rw [hT, ← hτ₁, map_one, map_one]
+        map_mul' := fun a b =>
+          hinj _ _ fun m => by rw [hT, ← hτ₁, map_mul, map_mul, hτ₁, hτ₁, hT, hT]
+        map_zero' := hinj _ _ fun m => by rw [hT, ← hτ₁, map_zero, map_zero]
+        map_add' := fun a b =>
+          hinj _ _ fun m => by rw [hT, ← hτ₁, map_add (f := _), map_add (f := _), hτ₁, hτ₁, hT, hT]
+      },
+      fun f g => ⟨fun H => ?_, fun H m => ?_⟩
+    ⟩
     · exact hinj _ _ fun m => by
         rw [← (H m).2, fnVal_eq_fnValHom _ _ (hU m)]
         exact (hT f m).symm

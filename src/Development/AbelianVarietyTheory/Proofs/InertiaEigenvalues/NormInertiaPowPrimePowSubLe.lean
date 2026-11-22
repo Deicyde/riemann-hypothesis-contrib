@@ -13,8 +13,12 @@ open scoped Formalism.Per
 
 namespace GlobalTheory.InertiaMove
 
-theorem fixed_apply {l : ℕ} [Fact l.Prime] {H : Subgroup (GQ l)} (hH : H.Normal) (σ : GQ l)
-    {x : Om l} (hx : ∀ g ∈ H, g x = x) : ∀ g ∈ H, g (σ x) = σ x := by
+theorem fixed_apply
+    {l : ℕ} [Fact l.Prime]
+    {H : Subgroup (GQ l)} (hH : H.Normal)
+    (σ : GQ l)
+    {x : Om l} (hx : ∀ g ∈ H, g x = x)
+    : ∀ g ∈ H, g (σ x) = σ x := by
   intro g hg
   have h := hx _ (hH.conj_mem' g hg σ)
   have h2 : σ ((σ⁻¹ * g * σ) x) = g (σ x) := by
@@ -32,7 +36,17 @@ def fixedAdd {l : ℕ} [Fact l.Prime] (H : Subgroup (GQ l)) : AddSubgroup (Om l)
 theorem norm_natCast_le_one (l : ℕ) [Fact l.Prime] : ‖((l : ℕ) : Om l)‖ ≤ 1 :=
   IsUltrametricDist.norm_natCast_le_one _ _
 
-theorem norm_pow_sub_le : ∀ (l : ℕ) [Fact l.Prime] (γ : GQ l), γ ∈ (MaximalUnramifiedExtension l).fixingSubgroup → ∀ (H : Subgroup (GQ l)), H.Normal → H.index ≠ 0 → ∀ m n : ℕ, H.index ≤ l ^ m → γ ^ l ^ n ∈ H → ∀ j ≤ m, ∀ x : Om l, (∀ g ∈ H, g x = x) → ‖(γ ^ l ^ j) x - x‖ ≤ ‖((l : ℕ) : Om l)‖ ^ ((1 : ℝ) / (l : ℝ) ^ (m - j)) * ‖x‖ := by
+theorem norm_pow_sub_le
+    : ∀ (l : ℕ) [Fact l.Prime] (γ : GQ l),
+      γ ∈ (MaximalUnramifiedExtension l).fixingSubgroup
+        → ∀ (H : Subgroup (GQ l)),
+          H.Normal → H.index ≠ 0
+            → ∀ m n : ℕ,
+              H.index ≤ l ^ m → γ ^ l ^ n ∈ H
+                → ∀ j ≤ m, ∀ x : Om l,
+                  (∀ g ∈ H, g x = x)
+                    → ‖(γ ^ l ^ j) x - x‖
+                      ≤ ‖((l : ℕ) : Om l)‖ ^ ((1 : ℝ) / (l : ℝ) ^ (m - j)) * ‖x‖ := by
   intro l hl γ hγ H hH hi m n hm hn j
   have hτ0 : 0 ≤ ‖((l : ℕ) : Om l)‖ := norm_nonneg _
   have hτ1 := norm_natCast_le_one l
@@ -58,8 +72,8 @@ theorem norm_pow_sub_le : ∀ (l : ℕ) [Fact l.Prime] (γ : GQ l), γ ∈ (Maxi
     have h1 : ‖z‖ ^ (l ^ m) ≤ ‖((l : ℕ) : Om l)‖ :=
       (pow_le_pow_of_le_one (norm_nonneg _) hz1.le hm).trans hv
     have h2 : ‖z‖ ≤ ‖((l : ℕ) : Om l)‖ ^ ((1 : ℝ) / (l : ℝ) ^ m) := by
-      have h3 := Real.rpow_le_rpow (by positivity) h1
-        (show (0 : ℝ) ≤ ((l ^ m : ℕ) : ℝ)⁻¹ by positivity)
+      have h3 :=
+        Real.rpow_le_rpow (by positivity) h1 (show (0 : ℝ) ≤ ((l ^ m : ℕ) : ℝ)⁻¹ by positivity)
       rw [Real.pow_rpow_inv_natCast (norm_nonneg _) (pow_ne_zero _ hl0)] at h3
       rw [one_div]
       exact_mod_cast h3
@@ -75,8 +89,11 @@ theorem norm_pow_sub_le : ∀ (l : ℕ) [Fact l.Prime] (γ : GQ l), γ ∈ (Maxi
     set s : ℝ := ‖((l : ℕ) : Om l)‖ ^ ((1 : ℝ) / (l : ℝ) ^ (k + 1)) with hs
     have hs0 : 0 ≤ s := Real.rpow_nonneg hτ0 _
     have hs1 : s ≤ 1 := Real.rpow_le_one hτ0 hτ1 (by positivity)
-    have h := (GlobalTheory.MemLoc.norm_geom_sum_galois_le l (γ ^ l ^ j) (fixedAdd H) s hs0 hs1
-      (fun y hy => fixed_apply hH _ hy) (fun y hy => ih' y hy) x hx).2
+    have h :=
+      (GlobalTheory.MemLoc.norm_geom_sum_galois_le l (γ ^ l ^ j) (fixedAdd H) s hs0 hs1
+        (fun y hy => fixed_apply hH _ hy)
+        (fun y hy => ih' y hy)
+        x hx).2
     rw [← pow_mul, ← pow_succ] at h
     have hsl : s ^ l = ‖((l : ℕ) : Om l)‖ ^ ((1 : ℝ) / (l : ℝ) ^ k) := by
       rw [hs, ← Real.rpow_natCast, ← Real.rpow_mul hτ0]

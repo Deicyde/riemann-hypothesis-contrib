@@ -7,22 +7,30 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 noncomputable section
 
 open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC TensorProduct
-open Formalism.BasicNotions.Loc Formalism.MainNotions.N CrystallineSemistableComparison UpperTheory.Gal.Int.Geo
+open Formalism.BasicNotions.Loc Formalism.MainNotions.N CrystallineSemistableComparison
+  UpperTheory.Gal.Int.Geo
 open GlobalTheory.GalV (HTower Htot hop galV galTot pullTot)
 open UpperTheory.Gal.Seam
 
 open TensorProduct in
-private theorem core {Q L : Type*} [Field Q] [Field L] [Algebra Q L] {V : ℤ → Type*} [∀ n, AddCommGroup (V n)] [∀ n, Module Q (V n)]
+private theorem core
+    {Q L : Type*} [Field Q] [Field L] [Algebra Q L]
+    {V : ℤ → Type*} [∀ n, AddCommGroup (V n)] [∀ n, Module Q (V n)]
     (hneg : ∀ n : ℤ, n < 0 → Subsingleton (V n)) (hfin : ∀ n, FiniteDimensional Q (V n))
-    {U G : Type*} [AddCommGroup U] [Module L U] (g : G → ∀ n, V n →ₗ[Q] V n)
-    (φ : (L ⊗[Q] DirectSum ℤ V) →ₗ[L] U) (hφ : Function.Injective φ) (gU : G → U →ₗ[L] U)
-    (hc : ∀ σ, gU σ ∘ₗ φ = φ ∘ₗ (DirectSum.lmap (g σ)).baseChange L)
+    {U G : Type*} [AddCommGroup U] [Module L U]
+    (g : G → ∀ n, V n →ₗ[Q] V n)
+    (φ : (L ⊗[Q] DirectSum ℤ V) →ₗ[L] U) (hφ : Function.Injective φ)
+    (gU : G → U →ₗ[L] U) (hc : ∀ σ, gU σ ∘ₗ φ = φ ∘ₗ (DirectSum.lmap (g σ)).baseChange L)
     {d : ℕ} (v : Fin d → U) (hv : LinearIndependent L v) (hr : ∀ j, v j ∈ LinearMap.range φ)
-    (ρ : G → Matrix (Fin d) (Fin d) L) (hρ : ∀ σ j, gU σ (v j) = ∑ i, ρ σ i j • v i) :
-    ∃ (N : ℕ) (a : Fin N → ℕ) (b : ∀ n : Fin N, Module.Basis (Fin (a n)) Q (V ((n : ℕ) : ℤ)))
-      (M : Matrix (Σ n, Fin (a n)) (Fin d) L), Function.Injective M.mulVec ∧ ∀ σ,
-        (Matrix.blockDiagonal' fun n : Fin N => LinearMap.toMatrix (b n) (b n) (g σ ((n : ℕ) : ℤ))).map (algebraMap Q L) * M =
-          M * ρ σ := by
+    (ρ : G → Matrix (Fin d) (Fin d) L) (hρ : ∀ σ j, gU σ (v j) = ∑ i, ρ σ i j • v i)
+    : ∃ (N : ℕ) (a : Fin N → ℕ) (b : ∀ n : Fin N, Module.Basis (Fin (a n)) Q (V ((n : ℕ) : ℤ)))
+        (M : Matrix (Σ n, Fin (a n)) (Fin d) L),
+      Function.Injective M.mulVec
+        ∧ ∀ σ,
+          (Matrix.blockDiagonal' fun n : Fin N =>
+                LinearMap.toMatrix (b n) (b n) (g σ ((n : ℕ) : ℤ))).map (algebraMap Q L)
+              * M
+            = M * ρ σ := by
   classical
   choose y hy using hr
   let e := TensorProduct.directSumRight Q L L V
@@ -32,13 +40,19 @@ private theorem core {Q L : Type*} [Field Q] [Field L] [Algebra Q L] {V : ℤ �
     apply e.injective
     rw [map_zero]
     exact DFinsupp.ext fun n => h n
-  have hπt : ∀ (n : ℤ) (t : L) (x : DirectSum ℤ V), π n (t ⊗ₜ[Q] x) = t ⊗ₜ[Q] (x n) := fun n t x => by
+  have hπt
+      : ∀ (n : ℤ) (t : L) (x : DirectSum ℤ V), π n (t ⊗ₜ[Q] x) = t ⊗ₜ[Q] (x n) := fun n t x => by
     induction x using DirectSum.induction_on with
     | zero => simp
     | of i z =>
-      have h1 : π n (t ⊗ₜ[Q] (DirectSum.of V i z)) =
-          DirectSum.component L ℤ (fun i => L ⊗[Q] V i) n (DirectSum.lof L ℤ (fun i => L ⊗[Q] V i) i (t ⊗ₜ[Q] z)) := by
-        change DirectSum.component L ℤ (fun i => L ⊗[Q] V i) n (e (t ⊗ₜ[Q] (DirectSum.lof Q ℤ V i z))) = _
+      have h1
+          : π n (t ⊗ₜ[Q] (DirectSum.of V i z))
+            = DirectSum.component L ℤ
+              (fun i => L ⊗[Q] V i)
+              n (DirectSum.lof L ℤ (fun i => L ⊗[Q] V i) i (t ⊗ₜ[Q] z)) := by
+        change
+          DirectSum.component L ℤ (fun i => L ⊗[Q] V i) n (e (t ⊗ₜ[Q] (DirectSum.lof Q ℤ V i z)))
+            = _
         rw [TensorProduct.directSumRight_tmul_lof]
       rw [h1]
       by_cases hi : i = n
@@ -46,11 +60,15 @@ private theorem core {Q L : Type*} [Field Q] [Field L] [Algebra Q L] {V : ℤ �
         rw [DirectSum.component.lof_self]
         simp
       · change (DirectSum.lof L ℤ (fun i => L ⊗[Q] V i) i (t ⊗ₜ[Q] z)) n = _
-        rw [DirectSum.lof_eq_of, DirectSum.of_eq_of_ne _ _ _ (Ne.symm hi), DirectSum.of_eq_of_ne _ _ _ (Ne.symm hi),
-          TensorProduct.tmul_zero]
+        rw [DirectSum.lof_eq_of, DirectSum.of_eq_of_ne _ _ _ (Ne.symm hi),
+          DirectSum.of_eq_of_ne _ _ _ (Ne.symm hi), TensorProduct.tmul_zero]
     | add x₁ x₂ h₁ h₂ =>
-      rw [TensorProduct.tmul_add, map_add (f := _), h₁, h₂, DirectSum.add_apply, TensorProduct.tmul_add]
-  have hnat : ∀ σ n w, π n ((DirectSum.lmap (g σ)).baseChange L w) = (g σ n).baseChange L (π n w) := fun σ n w => by
+      rw [TensorProduct.tmul_add, map_add (f := _), h₁, h₂, DirectSum.add_apply,
+        TensorProduct.tmul_add]
+  have hnat
+      : ∀ σ n w,
+        π n ((DirectSum.lmap (g σ)).baseChange L w)
+          = (g σ n).baseChange L (π n w) := fun σ n w => by
     induction w using TensorProduct.induction_on with
     | zero => simp
     | tmul t x =>
@@ -76,7 +94,8 @@ private theorem core {Q L : Type*} [Field Q] [Field L] [Algebra Q L] {V : ℤ �
     hNf j n (le_trans (by exact_mod_cast Finset.le_sup (f := Nf) (Finset.mem_univ j)) hn)
   let a : Fin N → ℕ := fun n => Module.finrank Q (V ((n : ℕ) : ℤ))
   let b : ∀ n : Fin N, Module.Basis (Fin (a n)) Q (V ((n : ℕ) : ℤ)) := fun n => Module.finBasis Q _
-  let B : ∀ n : Fin N, Module.Basis (Fin (a n)) L (L ⊗[Q] V ((n : ℕ) : ℤ)) := fun n => Algebra.TensorProduct.basis L (b n)
+  let B : ∀ n : Fin N, Module.Basis (Fin (a n)) L (L ⊗[Q] V ((n : ℕ) : ℤ)) := fun n =>
+    Algebra.TensorProduct.basis L (b n)
   let M : Matrix (Σ n, Fin (a n)) (Fin d) L := fun p j => (B p.1).repr (π _ (y j)) p.2
   have hG : ∀ σ j, (DirectSum.lmap (g σ)).baseChange L (y j) = ∑ i, ρ σ i j • y i := fun σ j => by
     apply hφ
@@ -102,26 +121,28 @@ private theorem core {Q L : Type*} [Field Q] [Field L] [Algebra Q L] {V : ℤ �
         have := congrFun hcz ⟨n, i⟩
         simp only [Matrix.mulVec, dotProduct, Pi.zero_apply] at this
         set_option synthInstance.maxHeartbeats 100000 in
-          simp only [map_sum, map_smul, map_zero, Finset.sum_apply', Finsupp.smul_apply, Finsupp.coe_smul,
-          Pi.smul_apply, smul_eq_mul, Finsupp.coe_zero, Pi.zero_apply]
+          simp only [map_sum, map_smul, map_zero, Finset.sum_apply', Finsupp.smul_apply,
+            Finsupp.coe_smul, Pi.smul_apply, smul_eq_mul, Finsupp.coe_zero, Pi.zero_apply]
         rw [← this]
         exact Finset.sum_congr rfl fun j _ => mul_comm _ _
       · simp [hbig _ m hN]
     have h0 : ∑ j, c j • v j = 0 := by
       have := congrArg φ hw
       set_option synthInstance.maxHeartbeats 100000 in
-        simpa [map_sum, hy] using this
+      simpa [map_sum, hy] using this
     funext j
     exact Fintype.linearIndependent_iff.1 hv c h0 j
   refine ⟨N, a, b, M, fun c c' h => ?_, fun σ => ?_⟩
   · have := key (c - c') (by rw [Matrix.mulVec_sub, h, sub_self])
     exact sub_eq_zero.1 this
   · ext ⟨n, i⟩ j
-    have h1 : (B n).repr ((g σ ((n : ℕ) : ℤ)).baseChange L (π _ (y j))) i =
-        ∑ k, algebraMap Q L (LinearMap.toMatrix (b n) (b n) (g σ ((n : ℕ) : ℤ)) i k) * (B n).repr (π _ (y j)) k := by
-      rw [← LinearMap.toMatrix_mulVec_repr (B n) (B n)]
-      simp only [B, LinearMap.toMatrix_baseChange]
-      rfl
+    have h1
+        : (B n).repr ((g σ ((n : ℕ) : ℤ)).baseChange L (π _ (y j))) i
+          = ∑ k, algebraMap Q L (LinearMap.toMatrix (b n) (b n) (g σ ((n : ℕ) : ℤ)) i k) * (B n).repr (π _ (y j)) k :=
+      by
+        rw [← LinearMap.toMatrix_mulVec_repr (B n) (B n)]
+        simp only [B, LinearMap.toMatrix_baseChange]
+        rfl
     have h2 : (g σ ((n : ℕ) : ℤ)).baseChange L (π _ (y j)) = ∑ i', ρ σ i' j • π _ (y i') := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [← hnat, hG, map_sum]
@@ -129,7 +150,8 @@ private theorem core {Q L : Type*} [Field Q] [Field L] [Algebra Q L] {V : ℤ �
     rw [h2] at h1
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [map_sum, map_smul, Finset.sum_apply', Finsupp.smul_apply, Finsupp.coe_smul,
-      Pi.smul_apply, smul_eq_mul] at h1
+          Pi.smul_apply, smul_eq_mul]
+        at h1
     rw [Matrix.mul_apply, Matrix.mul_apply, Fintype.sum_sigma, Finset.sum_eq_single n]
     · simp only [Matrix.map_apply, Matrix.blockDiagonal'_apply_eq]
       rw [← h1]
@@ -139,8 +161,7 @@ private theorem core {Q L : Type*} [Field Q] [Field L] [Algebra Q L] {V : ℤ �
       simp [Matrix.blockDiagonal'_apply_ne _ _ _ hm.symm]
     · simp
 
-theorem UpperTheory.Gal.Seam.matInS :
-    GlobalTheory.GalV.VFin → PieceIn → NegVan → MatIn := by
+theorem UpperTheory.Gal.Seam.matInS : GlobalTheory.GalV.VFin → PieceIn → NegVan → MatIn := by
   intro hV hP hN l _ K H θ hH C hC d ρ₁ hM
   obtain ⟨hinj, hle, heq⟩ := hP l K.1 (Om l) H θ hH C hC
   obtain ⟨b, hb⟩ := hM
@@ -156,22 +177,28 @@ theorem UpperTheory.Gal.Seam.matInS :
   haveI hg : IsProper (pullback.snd (mod C).q (Spec.map (CommRingCat.ofHom (algebraMap ↥K.1 (PadicAlgCl l))))) := inferInstance
   have hunit : IsUnit ((l : ℕ) : PadicAlgCl l) :=
     (Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero).isUnit
-  have hfin := fun n : ℤ => (hV l (PadicAlgCl l) hunit
-    (pullback.snd (mod C).q (Spec.map (CommRingCat.ofHom (algebraMap ↥K.1 (PadicAlgCl l))))) n 0).2
-  obtain ⟨N, a, c, M, hMi, hMe⟩ := core (Q := ℚ_[l]) (L := Om l)
-    (V := fun n : ℤ => HQ l (sch.obj (GlobalTheory.Et.geom (PadicAlgCl l) (mod C).q)) n 0) (G := ↥(GK K))
-    (fun n hn => hN l _ n hn) hfin
-    (fun σ n => galHQ l (PadicAlgCl l) (mod C).q n 0 (IntermediateField.fixingSubgroupEquiv K.1 σ))
-    ((pullTot l (sch.map (toMod C))).baseChange (Om l)) hinj
-    (fun σ => galV l H (PadicAlgCl l) (Om l) (IntermediateField.fixingSubgroupEquiv K.1 σ))
-    (fun σ => by
-      have h := heq (IntermediateField.fixingSubgroupEquiv K.1 σ)
-      have h2 := congrArg (LinearMap.baseChange (Om l)) h
-      rw [LinearMap.baseChange_comp, LinearMap.baseChange_comp] at h2
-      exact h2)
-    (fun j => (b j).1)
-    (b.linearIndependent.map' (Submodule.subtype _) (Submodule.ker_subtype _))
-    (fun j => hle (b j).2)
-    (fun σ => (ρ₁ (IntermediateField.fixingSubgroupEquiv K.1 σ) : Matrix (Fin d) (Fin d) (Om l)))
-    (fun σ j => hb _ j)
+  have hfin := fun n : ℤ =>
+    (hV l (PadicAlgCl l) hunit
+      (pullback.snd (mod C).q (Spec.map (CommRingCat.ofHom (algebraMap ↥K.1 (PadicAlgCl l))))) n
+      0).2
+  obtain ⟨N, a, c, M, hMi, hMe⟩ :=
+    core (Q := ℚ_[l]) (L := Om l)
+      (V := fun n : ℤ => HQ l (sch.obj (GlobalTheory.Et.geom (PadicAlgCl l) (mod C).q)) n 0)
+      (G := ↥(GK K))
+      (fun n hn => hN l _ n hn)
+      hfin
+      (fun σ n =>
+        galHQ l (PadicAlgCl l) (mod C).q n 0 (IntermediateField.fixingSubgroupEquiv K.1 σ))
+      ((pullTot l (sch.map (toMod C))).baseChange (Om l)) hinj
+      (fun σ => galV l H (PadicAlgCl l) (Om l) (IntermediateField.fixingSubgroupEquiv K.1 σ))
+      (fun σ => by
+        have h := heq (IntermediateField.fixingSubgroupEquiv K.1 σ)
+        have h2 := congrArg (LinearMap.baseChange (Om l)) h
+        rw [LinearMap.baseChange_comp, LinearMap.baseChange_comp] at h2
+        exact h2)
+      (fun j => (b j).1)
+      (b.linearIndependent.map' (Submodule.subtype _) (Submodule.ker_subtype _))
+      (fun j => hle (b j).2)
+      (fun σ => (ρ₁ (IntermediateField.fixingSubgroupEquiv K.1 σ) : Matrix (Fin d) (Fin d) (Om l)))
+      (fun σ j => hb _ j)
   exact ⟨N, a, c, M, hMi, fun σ => hMe σ⟩

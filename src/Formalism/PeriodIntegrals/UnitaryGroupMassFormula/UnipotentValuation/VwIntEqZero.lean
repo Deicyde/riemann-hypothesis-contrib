@@ -49,11 +49,13 @@ lemma natCast_mem_iff (w : HeightOneSpectrum (𝓞 K)) (m : ℕ) :
     ((m : 𝓞 K) ∈ w.asIdeal) ↔ plc w ∣ m := by
   rw [← Ideal.Quotient.eq_zero_iff_mem, map_natCast, plc, ringChar.spec]
 
-theorem part1 (w : HeightOneSpectrum (𝓞 K)) (n : ℕ) (hn : n ≠ 0) :
-    vw w ((n : ℕ) : K) = ramw w * (padicValNat (plc w) n : ℤ) := by
+theorem part1 (w : HeightOneSpectrum (𝓞 K)) (n : ℕ) (hn : n ≠ 0)
+    : vw w ((n : ℕ) : K) = ramw w * (padicValNat (plc w) n : ℤ) := by
   have hp := plc_prime w
   haveI : Fact (plc w).Prime := ⟨hp⟩
-  obtain ⟨m, hm⟩ := (fun {p n : ℕ} => _root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat p n)) (p := plc w) (n := n)
+  obtain ⟨m, hm⟩ :=
+    (fun {p n : ℕ} => _root_.Dvd.intro_left _ (_root_.Nat.divMaxPow_mul_pow_padicValNat p n))
+      (p := plc w) (n := n)
   have hm0 : m ≠ 0 := by
     rintro rfl
     exact hn (by simpa using hm)
@@ -84,10 +86,10 @@ lemma pv_prime (l g : ℕ) (hl : l.Prime) (hg : g.Prime) :
     exact Nat.multiplicity_self hg.one_lt
   · exact multiplicity_eq_zero_of_not_dvd fun hd => h ((Nat.prime_dvd_prime_iff_eq hl hg).mp hd)
 
-theorem part2 (w : HeightOneSpectrum (𝓞 K)) (g₁ g₂ a : ℕ) (h1 : g₁.Prime) (h2 : g₂.Prime)
-    (h12 : g₁ ≠ g₂) :
-    (vw w (((g₁ ^ a * g₂ ^ a : ℕ)) : K) : ℝ) =
-      (ramw w : ℝ) * (if plc w = g₁ ∨ plc w = g₂ then (a : ℝ) else 0) := by
+theorem part2
+    (w : HeightOneSpectrum (𝓞 K)) (g₁ g₂ a : ℕ) (h1 : g₁.Prime) (h2 : g₂.Prime) (h12 : g₁ ≠ g₂)
+    : (vw w (((g₁ ^ a * g₂ ^ a : ℕ)) : K) : ℝ)
+      = (ramw w : ℝ) * (if plc w = g₁ ∨ plc w = g₂ then (a : ℝ) else 0) := by
   have hp := plc_prime w
   haveI : Fact (plc w).Prime := ⟨hp⟩
   have ha1 : g₁ ^ a ≠ 0 := pow_ne_zero _ h1.ne_zero

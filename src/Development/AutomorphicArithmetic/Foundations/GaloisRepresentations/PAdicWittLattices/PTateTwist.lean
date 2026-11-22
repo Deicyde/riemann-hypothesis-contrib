@@ -7,13 +7,15 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsGeneri
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
 open scoped TensorProduct
 universe u
 
-theorem UpperTheory.Gal.G3.pTateTwist :
-    GSimOf → TateTwist := by
+theorem UpperTheory.Gal.G3.pTateTwist : GSimOf → TateTwist := by
   unfold GSimOf TateTwist
   intro hG p _ D G L R _ _ gb S s N o k _ t I hI u hu
   have hNpos : 0 < (N : ℕ) := by
@@ -48,8 +50,12 @@ theorem UpperTheory.Gal.G3.pTateTwist :
     obtain ⟨w', hw', hcw⟩ := hcong (inAf D y) (GlobalTheory.HeckeApprox.inAf_mem D y)
     apply LatDiv.eq_nsmul_of_inAf_eq_nsmul p D _ N hNpos hNcop (w' - w) (sub_mem hw' hw)
     have e := hgw.symm.trans hcw
-    rw [show inAf D (g.f N y - y) = inAf D (g.f N y) - inAf D y from GlobalTheory.HeckeApprox.inAf_sub D _ _, smul_sub]
-    calc inAf D (g.f N y) - inAf D y = (inAf D (g.f N y) + (N : ℕ) • w) - (N : ℕ) • w - inAf D y := by abel
+    rw [show inAf D (g.f N y - y) = inAf D (g.f N y) - inAf D y from
+        GlobalTheory.HeckeApprox.inAf_sub D _ _,
+      smul_sub]
+    calc
+      inAf D (g.f N y) - inAf D y
+        = (inAf D (g.f N y) + (N : ℕ) • w) - (N : ℕ) • w - inAf D y := by abel
       _ = (inAf D y + (N : ℕ) • w') - (N : ℕ) • w - inAf D y := by rw [e]
       _ = (N : ℕ) • w' - (N : ℕ) • w := by abel
   · unfold UpperTheory.Gal.G3.Rel
@@ -59,18 +65,21 @@ theorem UpperTheory.Gal.G3.pTateTwist :
     obtain ⟨w, hw, hgw⟩ := hg n hn hnp y
     constructor
     · rintro ⟨z, hz⟩
-      refine ⟨L.actG u (inAf D z - w), intU _ (sub_mem (GlobalTheory.HeckeApprox.inAf_mem D z) hw), ?_⟩
+      refine
+        ⟨L.actG u (inAf D z - w), intU _ (sub_mem (GlobalTheory.HeckeApprox.inAf_mem D z) hw), ?_⟩
       have h1 := GlobalTheory.HeckeApprox.inAf_add D (g.f n y) (n • z)
       have h2 := GlobalTheory.HeckeApprox.inAf_nsmul D n z
       have hx : inAf D x = inAf D (g.f n y) + n • inAf D z :=
-        (congrArg (inAf D) (sub_eq_iff_eq_add'.mp hz)).trans (h1.trans (congrArg (inAf D (g.f n y) + ·) h2))
+        (congrArg (inAf D) (sub_eq_iff_eq_add'.mp hz)).trans
+          (h1.trans (congrArg (inAf D (g.f n y) + ·) h2))
       have e1 : inAf D (g.f n y) = L.actG u⁻¹ (inAf D y) - n • w := by
         rw [hgw]
         abel
       rw [hx, e1, map_add (f := _), map_sub, map_nsmul, map_nsmul, act_inv, map_sub, smul_sub]
       abel
     · rintro ⟨v, hv, hxv⟩
-      apply LatDiv.eq_nsmul_of_inAf_eq_nsmul p D _ n hn hnp (w + L.actG u⁻¹ v) (add_mem hw (intUi _ hv))
+      apply LatDiv.eq_nsmul_of_inAf_eq_nsmul p D _ n hn hnp (w + L.actG u⁻¹ v)
+        (add_mem hw (intUi _ hv))
       have hx : inAf D x = L.actG u⁻¹ (inAf D y) + n • L.actG u⁻¹ v := by
         rw [← map_nsmul, ← map_add (f := _), ← hxv, inv_act]
       refine (GlobalTheory.HeckeApprox.inAf_sub D x (g.f n y)).trans ?_

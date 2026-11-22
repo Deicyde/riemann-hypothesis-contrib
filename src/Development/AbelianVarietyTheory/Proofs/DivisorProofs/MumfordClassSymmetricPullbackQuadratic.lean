@@ -9,13 +9,20 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AbelianVarie
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic GlobalTheory.AV GlobalTheory.AV.AbVar
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic
+  GlobalTheory.AV GlobalTheory.AV.AbVar
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.AV.AbVar
 
-theorem pull_zsmul_of_symm : ∀ (K : Type) [Field K] (B A : AbVar K) (c : Pic A.X.left), CechPic.pull (Hom.hom (-(𝟙 A))).left c = c → ∀ (f : B ⟶ A) (n : ℤ), AbVar.lam c f.hom f.hom = 2 • CechPic.pull f.hom.left c ∧ CechPic.pull (Hom.hom (n • f)).left c = (n ^ 2) • CechPic.pull f.hom.left c := by
+theorem pull_zsmul_of_symm
+    : ∀ (K : Type) [Field K] (B A : AbVar K) (c : Pic A.X.left),
+      CechPic.pull (Hom.hom (-(𝟙 A))).left c = c
+        → ∀ (f : B ⟶ A) (n : ℤ),
+          AbVar.lam c f.hom f.hom = 2 • CechPic.pull f.hom.left c
+            ∧ CechPic.pull (Hom.hom (n • f)).left c = (n ^ 2) • CechPic.pull f.hom.left c := by
   intro K _ B A c hc f n
   have bil := GlobalTheory.T.abelianVarietyMumfordClass_bilinear K A c B.X
 
@@ -27,10 +34,13 @@ theorem pull_zsmul_of_symm : ∀ (K : Type) [Field K] (B A : AbVar K) (c : Pic A
   have hinv : ∀ y : B.X ⟶ A.X, CechPic.pull (y⁻¹).left c = CechPic.pull y.left c := by
     intro y
     have hc' : CechPic.pull ((𝟙 A.X)⁻¹).left c = c := hc
-    rw [show y⁻¹ = y ≫ (𝟙 A.X)⁻¹ by rw [GrpObj.comp_inv, Category.comp_id], Over.comp_left, pull_comp, hc']
+    rw [show y⁻¹ = y ≫ (𝟙 A.X)⁻¹ by rw [GrpObj.comp_inv, Category.comp_id], Over.comp_left,
+      pull_comp, hc']
 
-  have hmul : ∀ y z : B.X ⟶ A.X, CechPic.pull (y * z).left c =
-      AbVar.lam c y z + CechPic.pull y.left c + CechPic.pull z.left c := by
+  have hmul
+      : ∀ y z : B.X ⟶ A.X,
+        CechPic.pull (y * z).left c
+          = AbVar.lam c y z + CechPic.pull y.left c + CechPic.pull z.left c := by
     intro y z
     simp only [AbVar.lam]
     abel
@@ -40,12 +50,16 @@ theorem pull_zsmul_of_symm : ∀ (K : Type) [Field K] (B A : AbVar K) (c : Pic A
     rw [zpow_neg_one] at e
     have e2 := hmul x x⁻¹
     rw [_root_.mul_inv_cancel, h1, hinv, e] at e2
-    have e3 : AbVar.lam c x x - 2 • CechPic.pull x.left c =
-        -((-1 : ℤ) • AbVar.lam c x x + CechPic.pull x.left c + CechPic.pull x.left c) := by module
+    have e3
+        : AbVar.lam c x x - 2 • CechPic.pull x.left c
+          = -((-1 : ℤ) • AbVar.lam c x x + CechPic.pull x.left c + CechPic.pull x.left c) := by
+      module
     rw [← sub_eq_zero, e3, ← e2, neg_zero]
   refine ⟨key, ?_⟩
-  have step : ∀ m : ℤ, CechPic.pull (x ^ (m + 1)).left c =
-      CechPic.pull (x ^ m).left c + (2 * m + 1) • CechPic.pull x.left c := by
+  have step
+      : ∀ m : ℤ,
+        CechPic.pull (x ^ (m + 1)).left c
+          = CechPic.pull (x ^ m).left c + (2 * m + 1) • CechPic.pull x.left c := by
     intro m
     rw [zpow_add_one, hmul, (bil x x 1 m).2.2.2.1, key]
     module

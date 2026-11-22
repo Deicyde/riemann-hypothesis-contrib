@@ -18,11 +18,13 @@ open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS
 
 variable {n : ℕ}
 
-theorem inP_entry_zero {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X) {a b : Fin n}
-    (h : ε a = ε b) : X a b = 0 := by
+theorem inP_entry_zero
+    {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X) {a b : Fin n} (h : ε a = ε b)
+    : X a b = 0 := by
   have h1 := congrFun (congrFun hX.2 a) b
-  simp only [Matrix.mul_apply, Matrix.neg_apply, Jm, Matrix.diagonal_apply, mul_ite, mul_zero, ite_mul, zero_mul,
-    Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, if_true] at h1
+  simp only [Matrix.mul_apply, Matrix.neg_apply, Jm, Matrix.diagonal_apply, mul_ite, mul_zero,
+      ite_mul, zero_mul, Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, if_true]
+    at h1
   rw [h] at h1
   split_ifs at h1 with hb
   · have : (2 : ℂ) * X a b = 0 := by linear_combination h1
@@ -30,8 +32,8 @@ theorem inP_entry_zero {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (h
   · have : (2 : ℂ) * X a b = 0 := by linear_combination -h1
     simpa using this
 
-theorem exists_pmat {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X) :
-    ∃ z : PCoord ε → ℂ, pmat z = X := by
+theorem exists_pmat {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X)
+    : ∃ z : PCoord ε → ℂ, pmat z = X := by
   refine ⟨fun ab => X ab.1.1 ab.1.2, ?_⟩
   have hH := isHermitian_of_mem_noncompactPart' hX
   ext a b
@@ -55,8 +57,9 @@ theorem exists_pmat {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX :
         subst hab
         exact absurd rfl he
 
-theorem one_le_lead_exp {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X) (i : ℕ) (hi : i ≤ n) :
-    1 ≤ (lead i (NormedSpace.exp X)).re := by
+theorem one_le_lead_exp
+    {ε : Fin n → Bool} {X : Matrix (Fin n) (Fin n) ℂ} (hX : inP ε X) (i : ℕ) (hi : i ≤ n)
+    : 1 ≤ (lead i (NormedSpace.exp X)).re := by
   obtain ⟨z, rfl⟩ := exists_pmat hX
   have h0 := fi_nonneg z i
   have hp := (lead_posDef (exp_noncompactPart_posDef hX) i hi).1
@@ -81,16 +84,24 @@ theorem phiLe : PhiLe := by
   rw [← hE]
   set Y := toMK k⁻¹ * X * toMK k with hY
   have hpd := exp_noncompactPart_posDef hP
-  have hr : ∀ i : Fin n, lead ((i : ℕ) + 1) (NormedSpace.exp Y) = ((lead ((i : ℕ) + 1) (NormedSpace.exp Y)).re : ℂ) :=
-    fun i => Complex.ext (by simp) (by simp [(lead_posDef hpd _ i.isLt).2])
-  have hphi : PhiM (Dz n) (NormedSpace.exp Y) =
-      ((∏ i : Fin n, (lead ((i : ℕ) + 1) (NormedSpace.exp Y)).re ^ (-(Dz n i - muNext (Dz n) i)) : ℝ) : ℂ) := by
+  have hr
+      : ∀ i : Fin n,
+        lead ((i : ℕ) + 1) (NormedSpace.exp Y)
+          = ((lead ((i : ℕ) + 1) (NormedSpace.exp Y)).re : ℂ) := fun i =>
+    Complex.ext (by simp) (by simp [(lead_posDef hpd _ i.isLt).2])
+  have hphi
+      : PhiM (Dz n) (NormedSpace.exp Y)
+        = ((∏ i : Fin n, (lead ((i : ℕ) + 1) (NormedSpace.exp Y)).re ^ (-(Dz n i - muNext (Dz n) i))
+            : ℝ)
+          : ℂ) := by
     unfold PhiM
     rw [Complex.ofReal_prod]
     refine Finset.prod_congr rfl fun i _ => ?_
     rw [hr i, Complex.ofReal_zpow, Complex.ofReal_re]
   rw [hphi, Complex.ofReal_re]
-  refine Finset.prod_le_one₀ (fun i _ => zpow_nonneg (zero_le_one.trans (one_le_lead_exp hP _ i.isLt)) _) fun i _ => ?_
+  refine Finset.prod_le_one₀
+    (fun i _ => zpow_nonneg (zero_le_one.trans (one_le_lead_exp hP _ i.isLt)) _)
+    fun i _ => ?_
   exact zpow_le_one_of_nonpos₀ (one_le_lead_exp hP _ i.isLt) (neg_nonpos.2 (dz_sub_muNext_nonneg i))
 
 end CompanionTheory.RgFd

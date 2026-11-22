@@ -46,18 +46,22 @@ private lemma charpoly_sum_smul_eq_of_charpoly_eq {k G : Type} [Field k] [Monoid
 
 open scoped BigOperators in
 open Polynomial in
-theorem _root_.GlobalTheory.charpoly_lift_eq_of_charpoly_eq : ∀ {k G : Type} [Field k] [Monoid G] (n : ℕ)
-    (ρ σ : G →* Matrix (Fin n) (Fin n) k), (∀ g, (ρ g).charpoly = (σ g).charpoly) →
-    ∀ a : MonoidAlgebra k G,
-      (MonoidAlgebra.lift k (Matrix (Fin n) (Fin n) k) G ρ a).charpoly =
-      (MonoidAlgebra.lift k (Matrix (Fin n) (Fin n) k) G σ a).charpoly := by
+theorem _root_.GlobalTheory.charpoly_lift_eq_of_charpoly_eq
+    : ∀ {k G : Type} [Field k] [Monoid G] (n : ℕ) (ρ σ : G →* Matrix (Fin n) (Fin n) k),
+      (∀ g, (ρ g).charpoly = (σ g).charpoly)
+        → ∀ a : MonoidAlgebra k G,
+          (MonoidAlgebra.lift k (Matrix (Fin n) (Fin n) k) G ρ a).charpoly
+            = (MonoidAlgebra.lift k (Matrix (Fin n) (Fin n) k) G σ a).charpoly := by
   intro k G _ _ n ρ σ h a
-  have hsum : ∀ τ : G →* Matrix (Fin n) (Fin n) k,
-      MonoidAlgebra.lift k (Matrix (Fin n) (Fin n) k) G τ a =
-        ∑ i, a.coeff (a.coeff.support.equivFin.symm i) • τ (a.coeff.support.equivFin.symm i) := by
-    intro τ
-    rw [MonoidAlgebra.lift_apply, Finsupp.sum, ← Finset.sum_coe_sort a.coeff.support]
-    exact (Equiv.sum_comp a.coeff.support.equivFin.symm (fun x : a.coeff.support => a.coeff x • τ x)).symm
+  have hsum
+      : ∀ τ : G →* Matrix (Fin n) (Fin n) k,
+        MonoidAlgebra.lift k (Matrix (Fin n) (Fin n) k) G τ a
+          = ∑ i, a.coeff (a.coeff.support.equivFin.symm i) • τ (a.coeff.support.equivFin.symm i) :=
+    by
+      intro τ
+      rw [MonoidAlgebra.lift_apply, Finsupp.sum, ← Finset.sum_coe_sort a.coeff.support]
+      exact (Equiv.sum_comp a.coeff.support.equivFin.symm
+        (fun x : a.coeff.support => a.coeff x • τ x)).symm
   rw [hsum ρ, hsum σ]
   exact charpoly_sum_smul_eq_of_charpoly_eq n ρ σ h _ _ _
 

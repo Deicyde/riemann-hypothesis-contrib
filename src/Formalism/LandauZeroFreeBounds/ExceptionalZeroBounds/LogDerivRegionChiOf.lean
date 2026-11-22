@@ -36,17 +36,18 @@ theorem log_deriv_in_zero_free_region : LogDerivRegionChiOf := by
   have hβlt : ∀ β ∈ B, β < 1 := by
     intro β hβ
     by_contra h
-    exact DirichletCharacter.LFunction_ne_zero_of_one_le_re χ (Or.inl hχ) (by simpa using le_of_not_gt h)
-      (hBmem β hβ).2.2.1
+    exact DirichletCharacter.LFunction_ne_zero_of_one_le_re χ (Or.inl hχ)
+      (by simpa using le_of_not_gt h) (hBmem β hβ).2.2.1
   have hσlow : 1 - c₁ / 2 / L ≤ s.re := hs
   by_cases hσ : 11 / 10 ≤ s.re
-  ·
-    have h1 : ‖negLD χ s‖ ≤ 10 + C₀ := by
+  · have h1 : ‖negLD χ s‖ ≤ 10 + C₀ := by
       have := hR q χ s (by linarith)
       have : 1 / (s.re - 1) ≤ 10 := by rw [div_le_iff₀ (by linarith)]; linarith
       linarith
     have h2 : ‖∑ β ∈ B, 1 / (s - (β : ℂ))‖ ≤ 10 := by
-      calc ‖∑ β ∈ B, 1 / (s - (β : ℂ))‖ ≤ ∑ β ∈ B, ‖1 / (s - (β : ℂ))‖ := norm_sum_le _ _
+      calc
+        ‖∑ β ∈ B, 1 / (s - (β : ℂ))‖
+          ≤ ∑ β ∈ B, ‖1 / (s - (β : ℂ))‖ := norm_sum_le _ _
         _ ≤ ∑ β ∈ B, (10 : ℝ) := by
           apply Finset.sum_le_sum
           intro β hβ
@@ -61,7 +62,8 @@ theorem log_deriv_in_zero_free_region : LogDerivRegionChiOf := by
         _ ≤ 1 * 10 := by gcongr; exact_mod_cast hBcard
         _ = 10 := by ring
     have h3 : 0 ≤ (2880 / 11 * K₁ + 3 * K₁ / (c₁ * Real.log 2) + 480 / 11) * L ^ 2 := by positivity
-    calc ‖negLD χ s + ∑ β ∈ B, 1 / (s - (β : ℂ))‖
+    calc
+      ‖negLD χ s + ∑ β ∈ B, 1 / (s - (β : ℂ))‖
         ≤ ‖negLD χ s‖ + ‖∑ β ∈ B, 1 / (s - (β : ℂ))‖ := norm_add_le _ _
       _ ≤ 20 + C₀ := by linarith
       _ ≤ 4 * (20 + C₀) * L ^ 2 := by nlinarith
@@ -76,7 +78,8 @@ theorem log_deriv_in_zero_free_region : LogDerivRegionChiOf := by
       obtain ⟨β, hβ, hsβ⟩ := hBall s (zero_free_region_mono_half hc₁ q s hs) ⟨Or.inl hχ, h0⟩
       exact hsB β hβ hsβ
     obtain ⟨Z, m, hZ, hm3, hsum, hE⟩ := landau_lemma_lfunction_zeros hLL hC hInv hχ hσ1 hσ' hfs
-    have hmain := log_deriv_sub_exceptional_zeros hc₁ hχ hBcard hBmem hBall hs hσ1 hσ' hZ hm3 hsum hE
+    have hmain :=
+      log_deriv_sub_exceptional_zeros hc₁ hχ hBcard hBmem hBall hs hσ1 hσ' hZ hm3 hsum hE
     have hKL : 0 ≤ K₁ * L := by positivity
     have h4 : 0 ≤ 4 * (20 + C₀) * L ^ 2 := by positivity
     refine le_trans hmain ?_

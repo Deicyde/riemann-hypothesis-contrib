@@ -6,8 +6,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeckeAlgebr
 
 open IsLocalRing Matrix UpperTheory.V.Hi
 
-theorem UpperTheory.V.Hi.ordLevel :
-    ∀ (Γ Ga Gp : Type) [Group Γ] [Group Ga] [Group Gp] (X : Frame Γ Ga Gp) (A : Type) [CommRing A] [IsCNL A] (m : ℕ) (τ : X.Ub →* GL (Fin m) A) (θ : X.I.T →* Aˣ), X.I.ContChar θ → ∀ U V : Subgroup X.Ub, V ≤ U → V.relIndex U ≠ 0 → X.FinLevel U → X.Free τ θ U → X.FinLevel V ∧ X.Free τ θ V ∧ X.Ord τ θ U = X.Ord τ θ V ⊓ fixd (X.ra τ) U := by
+theorem UpperTheory.V.Hi.ordLevel
+    : ∀ (Γ Ga Gp : Type) [Group Γ] [Group Ga] [Group Gp] (X : Frame Γ Ga Gp) (A : Type) [CommRing A]
+        [IsCNL A] (m : ℕ) (τ : X.Ub →* GL (Fin m) A) (θ : X.I.T →* Aˣ),
+      X.I.ContChar θ
+        → ∀ U V : Subgroup X.Ub,
+          V ≤ U → V.relIndex U ≠ 0 → X.FinLevel U → X.Free τ θ U
+            → X.FinLevel V ∧ X.Free τ θ V ∧ X.Ord τ θ U = X.Ord τ θ V ⊓ fixd (X.ra τ) U := by
   intro Γ Ga Gp _ _ _ X A _ _ m τ θ hθ U V hVU hidx hU hF
   refine ⟨?_, ?_, ?_⟩
   · classical
@@ -15,16 +20,28 @@ theorem UpperTheory.V.Hi.ordLevel :
     obtain ⟨s, hs⟩ := hU
     haveI : (V.subgroupOf U).FiniteIndex := ⟨hidx⟩
     haveI : Fintype (U ⧸ V.subgroupOf U) := Fintype.ofFinite _
-    refine ⟨(s ×ˢ (Finset.univ : Finset (U ⧸ V.subgroupOf U))).image
-      (fun p => p.1 * ((((Quotient.out p.2 : U) : X.Ub) : Ga), (1 : Gp))), ?_⟩
+    refine ⟨
+      (s ×ˢ (Finset.univ : Finset (U ⧸ V.subgroupOf U))).image
+        (fun p => p.1 * ((((Quotient.out p.2 : U) : X.Ub) : Ga), (1 : Gp))),
+      ?_
+    ⟩
     intro g
     obtain ⟨γ, x, hx, u, hu, b, hb, rfl⟩ := hs g
     obtain ⟨h, hh⟩ := QuotientGroup.mk_out_eq_mul (V.subgroupOf U) (⟨u, hu⟩ : U)
-    have hmem : (x, (QuotientGroup.mk (⟨u, hu⟩ : U) : U ⧸ V.subgroupOf U)) ∈
-        s ×ˢ (Finset.univ : Finset (U ⧸ V.subgroupOf U)) :=
+    have hmem
+        : (x, (QuotientGroup.mk (⟨u, hu⟩ : U) : U ⧸ V.subgroupOf U))
+          ∈ s ×ˢ (Finset.univ : Finset (U ⧸ V.subgroupOf U)) :=
       Finset.mem_product.mpr ⟨hx, Finset.mem_univ _⟩
-    refine ⟨γ, _, Finset.mem_image_of_mem _ hmem,
-      ((h⁻¹ : V.subgroupOf U) : U), Subgroup.mem_subgroupOf.mp (h⁻¹).2, b, hb, ?_⟩
+    refine ⟨
+      γ,
+      _,
+      Finset.mem_image_of_mem _ hmem,
+      ((h⁻¹ : V.subgroupOf U) : U),
+      Subgroup.mem_subgroupOf.mp (h⁻¹).2,
+      b,
+      hb,
+      ?_
+    ⟩
     simp only at hh ⊢
     rw [hh]
     simp [Prod.ext_iff, mul_assoc]

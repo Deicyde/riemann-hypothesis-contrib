@@ -13,22 +13,34 @@ open NumberField
 
 namespace Formalism.FourierDecayAlt.P.CutMP.En
 
-theorem inCC_fold (hC : CVInCC) {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] (A : ℝ) (s : ℂ)
-    (F : B.Mat k r → E) : ∀ (b : List C.Letter) (m : ℕ),
+theorem inCC_fold
+    (hC : CVInCC)
+    {k r : ℕ} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (A : ℝ) (s : ℂ) (F : B.Mat k r → E)
+    : ∀ (b : List C.Letter) (m : ℕ),
       B.InCC A (m + (2 * r + k + 1) * b.length) F → B.InCC A m (foldCV k r s b F)
   | [], m, h => by rw [foldCV_nil]; simpa using h
   | x :: b, m, h => by
     rw [foldCV_cons]
     refine hC k r E A m _ (x.2 : ℂ) s ?_
     refine inCC_fold hC A s F b (m + (2 * r + k + 1)) ?_
-    have e : m + (2 * r + k + 1) + (2 * r + k + 1) * b.length = m + (2 * r + k + 1) * (x :: b).length := by
+    have e
+        : m + (2 * r + k + 1) + (2 * r + k + 1) * b.length
+          = m + (2 * r + k + 1) * (x :: b).length := by
       simp [List.length_cons]; ring
-    rw [e]; exact h
+    rw [e]
+    exact h
 
-theorem weight_budget_L2_inequality (k r N : ℕ) (A₀ : ℝ) (hk : 2 ≤ k) (j : ℕ) (hj : j ≤ 5)
-    (hA : 100 * ((r : ℝ) + 1) ^ 4 * ((N : ℝ) * (2 * (r : ℝ) + k + 1) ^ 2 + (2 * (r : ℝ) + k + 1) ^ 3) ≤ A₀)
-    (ℓ : ℕ) (hℓ : ℓ ≤ N) :
-    B.AB k r + 2 * ((r : ℝ) + 1) * ((j + (2 * r + k + 1) * ℓ : ℕ) : ℝ) ≤ A₀ := by
+theorem weight_budget_L2_inequality
+    (k r N : ℕ)
+    (A₀ : ℝ)
+    (hk : 2 ≤ k)
+    (j : ℕ) (hj : j ≤ 5)
+    (hA
+      : 100 * ((r : ℝ) + 1) ^ 4 * ((N : ℝ) * (2 * (r : ℝ) + k + 1) ^ 2 + (2 * (r : ℝ) + k + 1) ^ 3)
+        ≤ A₀)
+    (ℓ : ℕ) (hℓ : ℓ ≤ N)
+    : B.AB k r + 2 * ((r : ℝ) + 1) * ((j + (2 * r + k + 1) * ℓ : ℕ) : ℝ) ≤ A₀ := by
   unfold B.AB
   have hR : (0 : ℝ) ≤ r := Nat.cast_nonneg r
   have hK : (2 : ℝ) ≤ k := by exact_mod_cast hk
@@ -54,7 +66,8 @@ theorem weight_budget_L2_inequality (k r N : ℕ) (A₀ : ℝ) (hk : 2 ≤ k) (j
     have hNn : 0 ≤ (N : ℝ) * n ^ 2 := by positivity
     nlinarith
   have hpos : 0 ≤ 100 * ((N : ℝ) * n ^ 2 + n ^ 3) := by positivity
-  calc 2 * ((k : ℝ) + r) * ((r : ℝ) + 1) + 1 + 2 * ((r : ℝ) + 1) * (j + n * ℓ)
+  calc
+    2 * ((k : ℝ) + r) * ((r : ℝ) + 1) + 1 + 2 * ((r : ℝ) + 1) * (j + n * ℓ)
       ≤ ((r : ℝ) + 1) * (2 * ((k : ℝ) + r) + 1 + 2 * (j + n * ℓ)) := by nlinarith
     _ ≤ ((r : ℝ) + 1) * (100 * ((N : ℝ) * n ^ 2 + n ^ 3)) := by gcongr
     _ ≤ ((r : ℝ) + 1) ^ 4 * (100 * ((N : ℝ) * n ^ 2 + n ^ 3)) := by gcongr
@@ -66,17 +79,23 @@ theorem l2BoundAtBuiltPlace_of_cvInCC (hC : CVInCC) : L2BoundAtTowerPlace := by
   obtain ⟨⟨_, _, _, hbuilt, _, _, _, _, _, _, hk2, hA, _⟩, _, _, _⟩ := hB
   obtain ⟨hχ, hv⟩ := hbuilt
   obtain ⟨_, _, _, _, hCC, _⟩ := hv v
-  have hF : ∀ j ≤ 5, B.InCC (B.AB S.G.k S.G.r) (j + (2 * S.G.r + S.G.k + 1) * a.length)
-      (D.cutF (T v).base χ (f v) ε) := fun j hj =>
-    Formalism.FourierDecayAlt.P.PBE.cutF_inCC (T v).base hχ hCC hε _ _ (weight_budget_L2_inequality S.G.k S.G.r S.Ntop A₀ hk2 j hj hA a.length hlen)
+  have hF
+      : ∀ j ≤ 5,
+        B.InCC (B.AB S.G.k S.G.r) (j + (2 * S.G.r + S.G.k + 1) * a.length)
+          (D.cutF (T v).base χ (f v) ε) := fun j hj =>
+    Formalism.FourierDecayAlt.P.PBE.cutF_inCC (T v).base hχ hCC hε _ _
+      (weight_budget_L2_inequality S.G.k S.G.r S.Ntop A₀ hk2 j hj hA a.length hlen)
   have h5 := inCC_fold hC (B.AB S.G.k S.G.r) (M.sgn (D.parOf S v) (S.l + 1)) _ a 5 (hF 5 le_rfl)
-  have h4 := inCC_fold hC (B.AB S.G.k S.G.r) (M.sgn (D.parOf S v) (S.l + 1)) _ a 4 (hF 4 (by norm_num))
-  obtain ⟨_, _, _, hB1, _⟩ := Formalism.FourierDecayAlt.P.b_any_of_xi S.G.k S.G.r (Wp (S.pl v)) (Wq (S.pl v)) (T v).base
-    (B.AB S.G.k S.G.r) le_rfl
+  have h4 :=
+    inCC_fold hC (B.AB S.G.k S.G.r) (M.sgn (D.parOf S v) (S.l + 1)) _ a 4 (hF 4 (by norm_num))
+  obtain ⟨_, _, _, hB1, _⟩ :=
+    Formalism.FourierDecayAlt.P.b_any_of_xi S.G.k S.G.r (Wp (S.pl v)) (Wq (S.pl v)) (T v).base
+      (B.AB S.G.k S.G.r) le_rfl
   obtain ⟨C0, hC0⟩ := hB1
   obtain ⟨c4, hc4⟩ := h4
   exact (hC0 _ _ c4 c4 h5 h5 hc4 hc4).1
 
-theorem L2_bound_at_built_place_holds : L2BoundAtTowerPlace := l2BoundAtBuiltPlace_of_cvInCC coefficient_vector_in_L2_class
+theorem L2_bound_at_built_place_holds : L2BoundAtTowerPlace :=
+  l2BoundAtBuiltPlace_of_cvInCC coefficient_vector_in_L2_class
 
 end Formalism.FourierDecayAlt.P.CutMP.En

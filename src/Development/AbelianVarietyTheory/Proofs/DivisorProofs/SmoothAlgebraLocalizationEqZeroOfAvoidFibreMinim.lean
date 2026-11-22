@@ -10,10 +10,11 @@ open scoped TensorProduct
 
 namespace GlobalTheory.FlatFibreRegular
 
-theorem exists_minimal_generators {A : Type} [CommRing A] (𝔭 : Ideal A) [𝔭.IsPrime] (I : Ideal A)
-    (hI : I.FG) :
-    ∃ S : Finset A, (↑S ⊆ (I : Set A)) ∧ (∀ x ∈ I, ∃ s ∉ 𝔭, s * x ∈ Ideal.span (S : Set A)) ∧
-      ∀ c : S → A, ∑ i, c i * (i : A) = 0 → ∀ i, c i ∈ 𝔭 := by
+theorem exists_minimal_generators
+    {A : Type} [CommRing A] (𝔭 : Ideal A) [𝔭.IsPrime] (I : Ideal A) (hI : I.FG)
+    : ∃ S : Finset A,
+      (↑S ⊆ (I : Set A)) ∧ (∀ x ∈ I, ∃ s ∉ 𝔭, s * x ∈ Ideal.span (S : Set A))
+        ∧ ∀ c : S → A, ∑ i, c i * (i : A) = 0 → ∀ i, c i ∈ 𝔭 := by
   classical
   let P : Finset A → Prop := fun S =>
     (↑S ⊆ (I : Set A)) ∧ ∀ x ∈ I, ∃ s ∉ 𝔭, s * x ∈ Ideal.span (S : Set A)
@@ -32,8 +33,10 @@ theorem exists_minimal_generators {A : Type} [CommRing A] (𝔭 : Ideal A) [𝔭
   refine ⟨S.erase k, rfl, fun x hx => hSI (Finset.mem_of_mem_erase hx), fun x hx => ?_⟩
   obtain ⟨s, hs, hsx⟩ := hSgen x hx
   refine ⟨c k * s, fun h => ((Ideal.IsPrime.mem_or_mem inferInstance h).elim hk hs), ?_⟩
-  have key : Ideal.span (S : Set A) ≤
-      Submodule.comap (LinearMap.mulLeft A (c k)) (Ideal.span ((S.erase k : Finset A) : Set A)) := by
+  have key
+      : Ideal.span (S : Set A)
+        ≤ Submodule.comap (LinearMap.mulLeft A (c k))
+          (Ideal.span ((S.erase k : Finset A) : Set A)) := by
     rw [Ideal.span_le]
     intro a ha
     rw [SetLike.mem_coe, Submodule.mem_comap, LinearMap.mulLeft_apply]
@@ -49,11 +52,14 @@ theorem exists_minimal_generators {A : Type} [CommRing A] (𝔭 : Ideal A) [𝔭
   have := key hsx
   simpa [mul_assoc] using this
 
-theorem mem_map_mul_of_mul_mem {A L : Type} [CommRing A] [CommRing L] [Algebra A L] [Module.Flat A L]
-    (𝔭 : Ideal A) [𝔭.IsPrime] (hu : ∀ s ∉ 𝔭, IsUnit (algebraMap A L s))
+theorem mem_map_mul_of_mul_mem
+    {A L : Type} [CommRing A] [CommRing L] [Algebra A L] [Module.Flat A L]
+    (𝔭 : Ideal A) [𝔭.IsPrime]
+    (hu : ∀ s ∉ 𝔭, IsUnit (algebraMap A L s))
     (g : L) (hg : ∀ y, g * y ∈ 𝔭.map (algebraMap A L) → y ∈ 𝔭.map (algebraMap A L))
-    (I : Ideal A) (hI : I.FG) (y : L) (hy : y ∈ I.map (algebraMap A L))
-    (hgy : g * y ∈ (I * 𝔭).map (algebraMap A L)) : y ∈ (I * 𝔭).map (algebraMap A L) := by
+    (I : Ideal A) (hI : I.FG)
+    (y : L) (hy : y ∈ I.map (algebraMap A L)) (hgy : g * y ∈ (I * 𝔭).map (algebraMap A L))
+    : y ∈ (I * 𝔭).map (algebraMap A L) := by
   classical
   obtain ⟨S, hSI, hSgen, hrel⟩ := exists_minimal_generators 𝔭 I hI
   set J := 𝔭.map (algebraMap A L) with hJdef
@@ -86,14 +92,21 @@ theorem mem_map_mul_of_mul_mem {A L : Type} [CommRing A] [CommRing L] [Algebra A
     have e1 : ∑ i : S, (i : A) • (g * c i) = g * y := by
       rw [← hc, Finset.mul_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
-      simp only [smul_eq_mul, v]; simp only [Algebra.smul_def]; ring
+      simp only [smul_eq_mul, v]
+      simp only [Algebra.smul_def]
+      ring
     have e2 : ∑ i : S, (i : A) • w i = g * y := by
       rw [← hw]
       refine Finset.sum_congr rfl fun i _ => ?_
-      simp only [smul_eq_mul, v]; simp only [Algebra.smul_def]; ring
+      simp only [smul_eq_mul, v]
+      simp only [Algebra.smul_def]
+      ring
     simp only [smul_sub, Finset.sum_sub_distrib, e1, e2, sub_self]
-  obtain ⟨k, a, z, hx, hf⟩ := Module.Flat.isTrivialRelation_of_sum_smul_eq_zero (R := A) (M := L)
-    (f := fun i : S => (i : A)) (x := fun i => g * c i - w i) hrel0
+  obtain ⟨k, a, z, hx, hf⟩ :=
+    Module.Flat.isTrivialRelation_of_sum_smul_eq_zero (R := A) (M := L)
+      (f := fun i : S => (i : A))
+      (x := fun i => g * c i - w i)
+      hrel0
   have ha : ∀ i j, a i j ∈ 𝔭 := fun i j =>
     hrel (fun i => a i j) (by rw [← hf j]; exact Finset.sum_congr rfl fun i _ => mul_comm _ _) i
   have hcJ : ∀ i, c i ∈ J := by
@@ -110,12 +123,14 @@ theorem mem_map_mul_of_mul_mem {A L : Type} [CommRing A] [CommRing L] [Algebra A
   exact Ideal.sum_mem _ fun i _ => by
     rw [smul_eq_mul, mul_comm (c i)]; exact Ideal.mul_mem_mul (hvI i) (hcJ i)
 
-theorem eq_zero_of_mul_eq_zero {A L : Type} [CommRing A] [IsNoetherianRing A] [CommRing L]
-    [IsLocalRing L] [IsNoetherianRing L] [Algebra A L] [Module.Flat A L]
-    (𝔭 : Ideal A) [𝔭.IsPrime] (hu : ∀ s ∉ 𝔭, IsUnit (algebraMap A L s))
-    (hJ : 𝔭.map (algebraMap A L) ≠ ⊤)
+theorem eq_zero_of_mul_eq_zero
+    {A L : Type} [CommRing A] [IsNoetherianRing A] [CommRing L] [IsLocalRing L] [IsNoetherianRing L]
+    [Algebra A L] [Module.Flat A L]
+    (𝔭 : Ideal A) [𝔭.IsPrime]
+    (hu : ∀ s ∉ 𝔭, IsUnit (algebraMap A L s)) (hJ : 𝔭.map (algebraMap A L) ≠ ⊤)
     (g : L) (hg : ∀ y, g * y ∈ 𝔭.map (algebraMap A L) → y ∈ 𝔭.map (algebraMap A L))
-    (y : L) (hgy : g * y = 0) : y = 0 := by
+    (y : L) (hgy : g * y = 0)
+    : y = 0 := by
   have hn : ∀ n : ℕ, y ∈ (𝔭 ^ n).map (algebraMap A L) := by
     intro n
     induction n with
@@ -129,21 +144,27 @@ theorem eq_zero_of_mul_eq_zero {A L : Type} [CommRing A] [IsNoetherianRing A] [C
   rw [← Ideal.map_pow]
   exact hn n
 
-theorem isRadical_map_of_smooth {A B : Type} [CommRing A] [CommRing B] [Algebra A B]
-    [Algebra.Smooth A B] (𝔭 : Ideal A) [𝔭.IsPrime] : (𝔭.map (algebraMap A B)).IsRadical := by
+theorem isRadical_map_of_smooth
+    {A B : Type} [CommRing A] [CommRing B] [Algebra A B] [Algebra.Smooth A B]
+    (𝔭 : Ideal A) [𝔭.IsPrime]
+    : (𝔭.map (algebraMap A B)).IsRadical := by
   haveI : _root_.IsReduced ((A ⧸ 𝔭) ⊗[A] B) :=
     GlobalTheory.isReduced_algebra_of_smooth_of_isReduced (A ⧸ 𝔭) _
-  let e := (Algebra.TensorProduct.quotIdealMapEquivTensorQuot B 𝔭).toRingEquiv.trans
-    (Algebra.TensorProduct.comm A B (A ⧸ 𝔭)).toRingEquiv
+  let e :=
+    (Algebra.TensorProduct.quotIdealMapEquivTensorQuot B 𝔭).toRingEquiv.trans
+      (Algebra.TensorProduct.comm A B (A ⧸ 𝔭)).toRingEquiv
   haveI : _root_.IsReduced (B ⧸ 𝔭.map (algebraMap A B)) :=
     isReduced_of_injective e.toRingHom e.injective
   exact (Ideal.isRadical_iff_quotient_reduced _).2 this
 
-theorem mem_of_mul_mem {B : Type} [CommRing B] (u : Ideal B) [u.IsPrime] (I₀ : Ideal B)
-    (hrad : I₀.IsRadical) (g : B) (hg : ∀ Q ∈ I₀.minimalPrimes, Q ≤ u → g ∉ Q)
+theorem mem_of_mul_mem
+    {B : Type} [CommRing B]
+    (u : Ideal B) [u.IsPrime]
+    (I₀ : Ideal B) (hrad : I₀.IsRadical)
+    (g : B) (hg : ∀ Q ∈ I₀.minimalPrimes, Q ≤ u → g ∉ Q)
     (y : Localization.AtPrime u)
-    (hy : algebraMap B _ g * y ∈ I₀.map (algebraMap B (Localization.AtPrime u))) :
-    y ∈ I₀.map (algebraMap B (Localization.AtPrime u)) := by
+    (hy : algebraMap B _ g * y ∈ I₀.map (algebraMap B (Localization.AtPrime u)))
+    : y ∈ I₀.map (algebraMap B (Localization.AtPrime u)) := by
   set L := Localization.AtPrime u
   set J := I₀.map (algebraMap B L) with hJdef
   have hJrad : J.IsRadical := by
@@ -154,10 +175,15 @@ theorem mem_of_mul_mem {B : Type} [CommRing B] (u : Ideal B) [u.IsPrime] (I₀ :
     have h1 : algebraMap B L (b ^ n) ∈ J := by
       have := Ideal.mul_mem_right (algebraMap B L ((s ^ n : u.primeCompl) : B)) J hn
       rwa [← IsLocalization.mk'_pow, IsLocalization.mk'_spec] at this
-    obtain ⟨t, ht, htb⟩ := (IsLocalization.algebraMap_mem_map_algebraMap_iff u.primeCompl L _ _).1 h1
-    have h2 : t * b ∈ I₀ := hrad ⟨n + 1, by
-      rw [show (t * b) ^ (n + 1) = (t ^ n * b) * (t * b ^ n) by ring]
-      exact Ideal.mul_mem_left _ _ htb⟩
+    obtain ⟨t, ht, htb⟩ :=
+      (IsLocalization.algebraMap_mem_map_algebraMap_iff u.primeCompl L _ _).1 h1
+    have h2 : t * b ∈ I₀ :=
+      hrad ⟨
+        n + 1,
+        by
+          rw [show (t * b) ^ (n + 1) = (t ^ n * b) * (t * b ^ n) by ring]
+          exact Ideal.mul_mem_left _ _ htb
+      ⟩
     have h3 : algebraMap B L b ∈ J := by
       have h4 := Ideal.mem_map_of_mem (algebraMap B L) h2
       rw [map_mul] at h4
@@ -171,13 +197,14 @@ theorem mem_of_mul_mem {B : Type} [CommRing B] (u : Ideal B) [u.IsPrime] (I₀ :
   push_neg at hyJ
   obtain ⟨P, hP, hyP⟩ := hyJ
   haveI : P.IsPrime := hP.1.1
-  have hgP : algebraMap B L g ∈ P := ((Ideal.IsPrime.mem_or_mem inferInstance (hP.1.2 hy)).resolve_right hyP)
+  have hgP : algebraMap B L g ∈ P :=
+    ((Ideal.IsPrime.mem_or_mem inferInstance (hP.1.2 hy)).resolve_right hyP)
   set Q := P.comap (algebraMap B L)
   have hQu : Q ≤ u := by
     intro x hx
     by_contra hxu
-    exact (Ideal.IsPrime.ne_top inferInstance : P ≠ ⊤)
-      (Ideal.eq_top_of_isUnit_mem _ hx (IsLocalization.map_units L (⟨x, hxu⟩ : u.primeCompl)))
+    exact (Ideal.IsPrime.ne_top inferInstance : P ≠ ⊤) (Ideal.eq_top_of_isUnit_mem _ hx
+      (IsLocalization.map_units L (⟨x, hxu⟩ : u.primeCompl)))
   have hQmin : Q ∈ I₀.minimalPrimes := by
     refine ⟨⟨inferInstance, Ideal.map_le_iff_le_comap.1 hP.1.2⟩, fun Q' hQ' hle => ?_⟩
     haveI : Q'.IsPrime := hQ'.1
@@ -192,10 +219,13 @@ theorem mem_of_mul_mem {B : Type} [CommRing B] (u : Ideal B) [u.IsPrime] (I₀ :
     exact hPP hx
   exact hg Q hQmin hQu hgP
 
-theorem localization_eq_zero_of_mul_eq_zero : ∀ (A B : Type) [CommRing A] [IsNoetherianRing A] [CommRing B] [Algebra A B] [Algebra.Smooth A B]
-    (b g : B) (u : PrimeSpectrum B), g * b = 0 →
-    (∀ Q ∈ ((u.asIdeal.comap (algebraMap A B)).map (algebraMap A B)).minimalPrimes, Q ≤ u.asIdeal → g ∉ Q) →
-    algebraMap B (Localization.AtPrime u.asIdeal) b = 0 := by
+theorem localization_eq_zero_of_mul_eq_zero
+    : ∀ (A B : Type) [CommRing A] [IsNoetherianRing A] [CommRing B] [Algebra A B]
+        [Algebra.Smooth A B] (b g : B) (u : PrimeSpectrum B),
+      g * b = 0
+        → (∀ Q ∈ ((u.asIdeal.comap (algebraMap A B)).map (algebraMap A B)).minimalPrimes,
+          Q ≤ u.asIdeal → g ∉ Q)
+        → algebraMap B (Localization.AtPrime u.asIdeal) b = 0 := by
   intro A B _ _ _ _ _ b g u hgb hg
   set 𝔭 := u.asIdeal.comap (algebraMap A B)
   set L := Localization.AtPrime u.asIdeal
@@ -212,8 +242,8 @@ theorem localization_eq_zero_of_mul_eq_zero : ∀ (A B : Type) [CommRing A] [IsN
     refine ne_top_of_le_ne_top (IsLocalRing.maximalIdeal.isMaximal L).ne_top ?_
     rw [← Localization.AtPrime.map_eq_maximalIdeal]
     exact Ideal.map_mono (Ideal.map_le_iff_le_comap.2 le_rfl)
-  have hg' : ∀ y : L, algebraMap B L g * y ∈ 𝔭.map (algebraMap A L) →
-      y ∈ 𝔭.map (algebraMap A L) := by
+  have hg'
+      : ∀ y : L, algebraMap B L g * y ∈ 𝔭.map (algebraMap A L) → y ∈ 𝔭.map (algebraMap A L) := by
     intro y hy
     rw [hmapeq] at hy ⊢
     exact mem_of_mul_mem u.asIdeal _ (isRadical_map_of_smooth 𝔭) g hg y hy

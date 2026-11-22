@@ -14,11 +14,13 @@ open Formalism.L2.Th1.Top.FrP
 section Blocks
 variable {n : Type} [Fintype n] [DecidableEq n]
 
-def mv {R : Type*} [Zero R] [One R] (a : Fin 4) : Matrix (Fin 4 × n) (Fin 4 × n) R :=
-  fun x y => if x.1 = a ∧ y.1 = 0 ∧ x.2 = y.2 then 1 else 0
+def mv {R : Type*} [Zero R] [One R] (a : Fin 4) : Matrix (Fin 4 × n) (Fin 4 × n) R := fun x y =>
+  if x.1 = a ∧ y.1 = 0 ∧ x.2 = y.2 then 1 else 0
 
-theorem mv_mul_apply {R : Type*} [CommRing R] (a : Fin 4) (G : Matrix (Fin 4 × n) (Fin 4 × n) R)
-    (z w : Fin 4 × n) : ((mv a : Matrix (Fin 4 × n) (Fin 4 × n) R) * G) z w = if z.1 = a then G (0, z.2) w else 0 := by
+theorem mv_mul_apply
+    {R : Type*} [CommRing R] (a : Fin 4) (G : Matrix (Fin 4 × n) (Fin 4 × n) R) (z w : Fin 4 × n)
+    : ((mv a : Matrix (Fin 4 × n) (Fin 4 × n) R) * G) z w
+      = if z.1 = a then G (0, z.2) w else 0 := by
   simp only [Matrix.mul_apply, mv]
   by_cases h : z.1 = a
   · rw [Fintype.sum_eq_single (0, z.2)]
@@ -29,8 +31,10 @@ theorem mv_mul_apply {R : Type*} [CommRing R] (a : Fin 4) (G : Matrix (Fin 4 × 
       exact hy (Prod.ext h0 h2.symm)
   · simp [h]
 
-theorem blockShift_mul_apply {R : Type*} [CommRing R] (k : Fin 4) (G : Matrix (Fin 4 × n) (Fin 4 × n) R)
-    (z w : Fin 4 × n) : ((bmv0 k : Matrix (Fin 4 × n) (Fin 4 × n) R) * G) z w = if z.1 = 0 then G (k, z.2) w else 0 := by
+theorem blockShift_mul_apply
+    {R : Type*} [CommRing R] (k : Fin 4) (G : Matrix (Fin 4 × n) (Fin 4 × n) R) (z w : Fin 4 × n)
+    : ((bmv0 k : Matrix (Fin 4 × n) (Fin 4 × n) R) * G) z w
+      = if z.1 = 0 then G (k, z.2) w else 0 := by
   simp only [Matrix.mul_apply, bmv0]
   by_cases h : z.1 = 0
   · rw [Fintype.sum_eq_single (k, z.2)]
@@ -41,8 +45,8 @@ theorem blockShift_mul_apply {R : Type*} [CommRing R] (k : Fin 4) (G : Matrix (F
       exact hy (Prod.ext h0 h2.symm)
   · simp [h]
 
-theorem mv_mulVec (a : Fin 4) (y : Fin 4 × n → ℂ) :
-    (mv a : Matrix _ _ ℂ).mulVec y = fun x => if x.1 = a then y (0, x.2) else 0 := by
+theorem mv_mulVec (a : Fin 4) (y : Fin 4 × n → ℂ)
+    : (mv a : Matrix _ _ ℂ).mulVec y = fun x => if x.1 = a then y (0, x.2) else 0 := by
   funext x
   simp only [Matrix.mulVec, dotProduct, mv]
   by_cases h : x.1 = a
@@ -54,8 +58,8 @@ theorem mv_mulVec (a : Fin 4) (y : Fin 4 × n → ℂ) :
       exact hz (Prod.ext h0 h2.symm)
   · simp [h]
 
-theorem blockShift_mulVec (k : Fin 4) (y : Fin 4 × n → ℂ) :
-    (bmv0 k : Matrix _ _ ℂ).mulVec y = fun x => if x.1 = 0 then y (k, x.2) else 0 := by
+theorem blockShift_mulVec (k : Fin 4) (y : Fin 4 × n → ℂ)
+    : (bmv0 k : Matrix _ _ ℂ).mulVec y = fun x => if x.1 = 0 then y (k, x.2) else 0 := by
   funext x
   simp only [Matrix.mulVec, dotProduct, bmv0]
   by_cases h : x.1 = 0
@@ -67,8 +71,8 @@ theorem blockShift_mulVec (k : Fin 4) (y : Fin 4 × n → ℂ) :
       exact hz (Prod.ext h0 h2.symm)
   · simp [h]
 
-theorem mv_pres (Λ : AddSubgroup (n → ℂ)) (a : Fin 4) :
-    ∀ y ∈ pow4 Λ, Matrix.toLin' (mv a : Matrix _ _ ℂ) y ∈ pow4 Λ := by
+theorem mv_pres (Λ : AddSubgroup (n → ℂ)) (a : Fin 4)
+    : ∀ y ∈ pow4 Λ, Matrix.toLin' (mv a : Matrix _ _ ℂ) y ∈ pow4 Λ := by
   intro y hy
   have hy' : ∀ b, slice b y ∈ Λ := hy
   show ∀ b, slice b _ ∈ Λ
@@ -83,8 +87,8 @@ theorem mv_pres (Λ : AddSubgroup (n → ℂ)) (a : Fin 4) :
     funext i
     simp [slice, h]
 
-theorem blockShift_mapsTo (Λ : AddSubgroup (n → ℂ)) (k : Fin 4) :
-    ∀ y ∈ pow4 Λ, Matrix.toLin' (bmv0 k : Matrix _ _ ℂ) y ∈ pow4 Λ := by
+theorem blockShift_mapsTo (Λ : AddSubgroup (n → ℂ)) (k : Fin 4)
+    : ∀ y ∈ pow4 Λ, Matrix.toLin' (bmv0 k : Matrix _ _ ℂ) y ∈ pow4 Λ := by
   intro y hy
   have hy' : ∀ b, slice b y ∈ Λ := hy
   show ∀ b, slice b _ ∈ Λ
@@ -99,7 +103,8 @@ theorem blockShift_mapsTo (Λ : AddSubgroup (n → ℂ)) (k : Fin 4) :
     funext i
     simp [slice, h]
 
-theorem bd4_transpose {R : Type*} [Zero R] (P : Matrix n n R) : (bd4 P).transpose = bd4 P.transpose := by
+theorem bd4_transpose {R : Type*} [Zero R] (P : Matrix n n R)
+    : (bd4 P).transpose = bd4 P.transpose := by
   ext x y
   by_cases h : x.1 = y.1
   · simp [bd4, Matrix.transpose_apply, h]
@@ -111,11 +116,11 @@ theorem bd4_smul {R : Type*} [CommRing R] (c : R) (P : Matrix n n R) : bd4 (c �
 
 theorem bd4_one {R : Type*} [CommRing R] : bd4 (1 : Matrix n n R) = 1 := by
   ext x y
-  by_cases h1 : x.1 = y.1 <;> by_cases h2 : x.2 = y.2 <;>
-    simp [bd4, Matrix.one_apply, Prod.ext_iff, h1, h2]
+  by_cases h1 : x.1 = y.1 <;> by_cases h2 : x.2 = y.2
+    <;> simp [bd4, Matrix.one_apply, Prod.ext_iff, h1, h2]
 
-theorem blockDiag_mul_blockShift {R : Type*} [CommRing R] (P : Matrix n n R) (k : Fin 4) :
-    bd4 P * bmv0 k = bmv0 k * bd4 P := by
+theorem blockDiag_mul_blockShift {R : Type*} [CommRing R] (P : Matrix n n R) (k : Fin 4)
+    : bd4 P * bmv0 k = bmv0 k * bd4 P := by
   ext x y
   rw [blockShift_mul_apply]
   simp only [Matrix.mul_apply, bd4, bmv0]
@@ -131,8 +136,8 @@ theorem blockDiag_mul_blockShift {R : Type*} [CommRing R] (P : Matrix n n R) (k 
     · exact absurd (Prod.ext hc.1 hc.2.2 : z = (0, y.2)) hz
     · rw [if_neg hc, mul_zero]
 
-theorem exists_cols (G Gi : Matrix (Fin 4 × n) (Fin 4 × n) ℂ) (hG : G * Gi = 1) :
-    ∃ w : n → Fin 4 × n, IsUnit (Matrix.of fun i j => G (0, i) (w j)) := by
+theorem exists_cols (G Gi : Matrix (Fin 4 × n) (Fin 4 × n) ℂ) (hG : G * Gi = 1)
+    : ∃ w : n → Fin 4 × n, IsUnit (Matrix.of fun i j => G (0, i) (w j)) := by
   classical
   set v : Fin 4 × n → (n → ℂ) := fun j i => G (0, i) j with hv
   have hspan : Submodule.span ℂ (Set.range v) = ⊤ := by
@@ -145,11 +150,12 @@ theorem exists_cols (G Gi : Matrix (Fin 4 × n) (Fin 4 × n) ℂ) (hG : G * Gi =
         have := congrFun (congrFun hG (0, i)) (0, k)
         simpa [Matrix.mul_apply, Matrix.one_apply] using this
       symm
-      calc ∑ j, (∑ k, Gi j (0, k) * x k) * G (0, i) j
-          = ∑ k, (∑ j, G (0, i) j * Gi j (0, k)) * x k := by
-            simp_rw [Finset.sum_mul]
-            rw [Finset.sum_comm]
-            exact Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun j _ => by ring
+      calc
+        ∑ j, (∑ k, Gi j (0, k) * x k) * G (0, i) j
+            = ∑ k, (∑ j, G (0, i) j * Gi j (0, k)) * x k := by
+          simp_rw [Finset.sum_mul]
+          rw [Finset.sum_comm]
+          exact Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun j _ => by ring
         _ = x i := by simp [h]
     rw [hx]
     exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
@@ -161,8 +167,7 @@ theorem exists_cols (G Gi : Matrix (Fin 4 × n) (Fin 4 × n) ℂ) (hG : G * Gi =
   choose w hw using hmem
   refine ⟨w, ?_⟩
   rw [← Matrix.linearIndependent_cols_iff_isUnit]
-  have hfun : (Matrix.of fun i j => G (0, i) (w j)).col =
-      (fun x : b => (x : n → ℂ)) ∘ e.symm := by
+  have hfun : (Matrix.of fun i j => G (0, i) (w j)).col = (fun x : b => (x : n → ℂ)) ∘ e.symm := by
     funext j i
     simp [Matrix.col, Matrix.transpose_apply, ← hw j, hv]
   rw [hfun]

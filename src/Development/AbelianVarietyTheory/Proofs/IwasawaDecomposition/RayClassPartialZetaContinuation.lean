@@ -15,7 +15,9 @@ namespace GlobalTheory.Mem.PartialZeta
 
 variable {K : Type} [Field K] [NumberField K]
 
-theorem place_unique [_root_.NumberField.IsTotallyComplex K] (h2 : Module.finrank ℚ K = 2) (v w : InfinitePlace K) : v = w := by
+theorem place_unique
+    [_root_.NumberField.IsTotallyComplex K] (h2 : Module.finrank ℚ K = 2) (v w : InfinitePlace K)
+    : v = w := by
   have hc := InfinitePlace.card_eq_nrRealPlaces_add_nrComplexPlaces (K := K)
   have hr := InfinitePlace.card_add_two_mul_card_eq_rank (K := K)
   rw [IsTotallyComplex.nrRealPlaces_eq_zero, h2] at hr
@@ -23,30 +25,33 @@ theorem place_unique [_root_.NumberField.IsTotallyComplex K] (h2 : Module.finran
   have h1 : Fintype.card (InfinitePlace K) = 1 := by omega
   exact Fintype.card_le_one_iff.1 h1.le v w
 
-theorem normSq_eq [_root_.NumberField.IsTotallyComplex K] (h2 : Module.finrank ℚ K = 2) (φ : K →+* ℂ) (x : 𝓞 K) :
-    ‖φ (x : K)‖ ^ 2 = (Ideal.absNorm (Ideal.span {x}) : ℝ) := by
+theorem normSq_eq
+    [_root_.NumberField.IsTotallyComplex K] (h2 : Module.finrank ℚ K = 2) (φ : K →+* ℂ) (x : 𝓞 K)
+    : ‖φ (x : K)‖ ^ 2 = (Ideal.absNorm (Ideal.span {x}) : ℝ) := by
   haveI : Subsingleton (InfinitePlace K) := ⟨place_unique h2⟩
   have hprod := InfinitePlace.prod_eq_abs_norm (x : K)
-  rw [Fintype.prod_subsingleton _ (InfinitePlace.mk φ), InfinitePlace.apply,
-    InfinitePlace.mult, if_neg (InfinitePlace.not_isReal_iff_isComplex.2
-      (IsTotallyComplex.isComplex _))] at hprod
-  rw [hprod, Ideal.absNorm_span_singleton, Nat.cast_natAbs, Int.cast_abs,
-    ← Algebra.coe_norm_int]
+  rw [Fintype.prod_subsingleton _ (InfinitePlace.mk φ), InfinitePlace.apply, InfinitePlace.mult,
+      if_neg (InfinitePlace.not_isReal_iff_isComplex.2 (IsTotallyComplex.isComplex _))]
+    at hprod
+  rw [hprod, Ideal.absNorm_span_singleton, Nat.cast_natAbs, Int.cast_abs, ← Algebra.coe_norm_int]
   norm_cast
 
-theorem abs_im_eq (φ : K →+* ℂ) (b : Module.Basis (Fin 2) ℤ (𝓞 K)) (J : Ideal (𝓞 K))
-    (e : Module.Basis (Fin 2) ℤ J) :
-    |(starRingEnd ℂ (φ ((e 0 : 𝓞 K) : K)) * φ ((e 1 : 𝓞 K) : K)).im| =
-      Ideal.absNorm J * |(starRingEnd ℂ (φ (b 0 : K)) * φ (b 1 : K)).im| := by
+theorem abs_im_eq
+    (φ : K →+* ℂ) (b : Module.Basis (Fin 2) ℤ (𝓞 K))
+    (J : Ideal (𝓞 K)) (e : Module.Basis (Fin 2) ℤ J)
+    : |(starRingEnd ℂ (φ ((e 0 : 𝓞 K) : K)) * φ ((e 1 : 𝓞 K) : K)).im|
+      = Ideal.absNorm J * |(starRingEnd ℂ (φ (b 0 : K)) * φ (b 1 : K)).im| := by
   classical
   set ψ : 𝓞 K →+* ℂ := φ.comp (algebraMap (𝓞 K) K) with hψdef
   have hψ : ∀ x : 𝓞 K, φ (x : K) = ψ x := fun x => rfl
-  have he : ∀ j, ψ (e j : 𝓞 K) = (b.repr (e j : 𝓞 K) 0 : ℂ) * ψ (b 0) +
-      (b.repr (e j : 𝓞 K) 1 : ℂ) * ψ (b 1) := by
+  have he
+      : ∀ j,
+        ψ (e j : 𝓞 K)
+          = (b.repr (e j : 𝓞 K) 0 : ℂ) * ψ (b 0) + (b.repr (e j : 𝓞 K) 1 : ℂ) * ψ (b 1) := by
     intro j
     conv_lhs => rw [← b.sum_repr (e j : 𝓞 K)]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, Fin.sum_univ_two, zsmul_eq_mul]
+    simp [map_sum, Fin.sum_univ_two, zsmul_eq_mul]
   have hdet := Ideal.natAbs_det_basis_change b J e
   rw [Module.Basis.det_apply, Matrix.det_fin_two] at hdet
   simp only [Module.Basis.toMatrix_apply, Function.comp_apply] at hdet
@@ -58,19 +63,18 @@ theorem abs_im_eq (φ : K →+* ℂ) (b : Module.Basis (Fin 2) ℤ (𝓞 K)) (J 
   push_cast
   ring
 
-theorem cls_iff {M : ℕ} (D : RayData K M) (c : D.G) (B I : Ideal (𝓞 K))
-    (hB : IsCoprime B (Ideal.span {(M : 𝓞 K)})) (hB0 : B ≠ ⊥) (hc : D.cls B = c⁻¹)
-    (hI : IsCoprime I (Ideal.span {(M : 𝓞 K)})) (hI0 : I ≠ ⊥) :
-    D.cls I = c ↔ ∃ x : 𝓞 K, x - 1 ∈ Ideal.span {(M : 𝓞 K)} ∧ Ideal.span {x} = I * B := by
+theorem cls_iff
+    {M : ℕ} (D : RayData K M) (c : D.G)
+    (B I : Ideal (𝓞 K)) (hB : IsCoprime B (Ideal.span {(M : 𝓞 K)})) (hB0 : B ≠ ⊥)
+    (hc : D.cls B = c⁻¹) (hI : IsCoprime I (Ideal.span {(M : 𝓞 K)})) (hI0 : I ≠ ⊥)
+    : D.cls I = c ↔ ∃ x : 𝓞 K, x - 1 ∈ Ideal.span {(M : 𝓞 K)} ∧ Ideal.span {x} = I * B := by
   constructor
   · intro h
-    have hIB : D.cls (I * B) = 1 := by
-      rw [D.cls_mul I B hI hB hI0 hB0, h, hc, mul_inv_cancel]
+    have hIB : D.cls (I * B) = 1 := by rw [D.cls_mul I B hI hB hI0 hB0, h, hc, mul_inv_cancel]
     obtain ⟨a, b', ha, hb, ha1, hb1, hab⟩ :=
       (D.cls_eq_one_iff (hI.mul_left hB) (mul_ne_zero hI0 hB0)).1 hIB
     have hmem : b' ∈ Ideal.span {a} := by
-      have : b' ∈ Ideal.span {a} * (I * B) := by
-        rw [hab]; exact Ideal.mem_span_singleton_self b'
+      have : b' ∈ Ideal.span {a} * (I * B) := by rw [hab]; exact Ideal.mem_span_singleton_self b'
       exact Ideal.mul_le_left this
     obtain ⟨x, hx⟩ := Ideal.mem_span_singleton'.1 hmem
     refine ⟨x, ?_, ?_⟩
@@ -92,42 +96,55 @@ theorem cls_iff {M : ℕ} (D : RayData K M) (c : D.G) (B I : Ideal (𝓞 K))
     rw [D.cls_mul I B hI hB hI0 hB0, hc] at h1
     exact mul_inv_eq_one.1 h1
 
-theorem lattice_bij (N B : Ideal (𝓞 K)) (hB : IsCoprime B N) (e : Module.Basis (Fin 2) ℤ ↥(N * B))
-    (x₀ : 𝓞 K) (h0 : x₀ ∈ B) (h1 : x₀ - 1 ∈ N) :
-    ∃ f : ℤ × ℤ ≃ {x : 𝓞 K // x ∈ B ∧ x - 1 ∈ N},
-      ∀ p, (f p : 𝓞 K) = x₀ + p.1 * (e 0 : 𝓞 K) + p.2 * (e 1 : 𝓞 K) := by
+theorem lattice_bij
+    (N B : Ideal (𝓞 K)) (hB : IsCoprime B N) (e : Module.Basis (Fin 2) ℤ ↥(N * B))
+    (x₀ : 𝓞 K) (h0 : x₀ ∈ B) (h1 : x₀ - 1 ∈ N)
+    : ∃ f : ℤ × ℤ ≃ {x : 𝓞 K // x ∈ B ∧ x - 1 ∈ N}, ∀ p,
+      (f p : 𝓞 K) = x₀ + p.1 * (e 0 : 𝓞 K) + p.2 * (e 1 : 𝓞 K) := by
   have hmemNB : ∀ y : ↥(N * B), (y : 𝓞 K) ∈ B ∧ (y : 𝓞 K) ∈ N := fun y =>
     ⟨Ideal.mul_le_right y.2, Ideal.mul_le_left y.2⟩
-  let g : ↥(N * B) ≃ {x : 𝓞 K // x ∈ B ∧ x - 1 ∈ N} :=
-    { toFun := fun y => ⟨x₀ + y, B.add_mem h0 (hmemNB y).1, by
-        rw [add_sub_right_comm]; exact N.add_mem h1 (hmemNB y).2⟩
-      invFun := fun x => ⟨x.1 - x₀, by
+  let g : ↥(N * B) ≃ {x : 𝓞 K // x ∈ B ∧ x - 1 ∈ N} := {
+    toFun := fun y => ⟨
+      x₀ + y,
+      B.add_mem h0 (hmemNB y).1,
+      by rw [add_sub_right_comm]; exact N.add_mem h1 (hmemNB y).2
+    ⟩
+    invFun := fun x => ⟨
+      x.1 - x₀,
+      by
         rw [Ideal.mul_eq_inf_of_isCoprime hB.symm]
         refine ⟨?_, ?_⟩
         · have : x.1 - x₀ = (x.1 - 1) - (x₀ - 1) := by ring
-          rw [this]; exact N.sub_mem x.2.2 h1
-        · exact B.sub_mem x.2.1 h0⟩
-      left_inv := fun y => by ext; simp
-      right_inv := fun x => by ext; simp }
+          rw [this]
+          exact N.sub_mem x.2.2 h1
+        · exact B.sub_mem x.2.1 h0
+    ⟩
+    left_inv := fun y => by ext; simp
+    right_inv := fun x => by ext; simp
+  }
   refine ⟨(finTwoArrowEquiv ℤ).symm.trans (e.equivFun.symm.toEquiv.trans g), fun p => ?_⟩
   simp [g, Fin.sum_univ_two, zsmul_eq_mul, add_assoc]
 
-theorem ne_bot_of_coprime {M : ℕ} (hM : Ideal.span {(M : 𝓞 K)} ≠ ⊤) {I : Ideal (𝓞 K)}
-    (hI : IsCoprime I (Ideal.span {(M : 𝓞 K)})) : I ≠ ⊥ := by
+theorem ne_bot_of_coprime
+    {M : ℕ} (hM : Ideal.span {(M : 𝓞 K)} ≠ ⊤)
+    {I : Ideal (𝓞 K)} (hI : IsCoprime I (Ideal.span {(M : 𝓞 K)}))
+    : I ≠ ⊥ := by
   rintro rfl
   rw [Ideal.isCoprime_iff_sup_eq, bot_sup_eq] at hI
   exact hM hI
 
-theorem gen_bij {M : ℕ} (hM : Ideal.span {(M : 𝓞 K)} ≠ ⊤) (D : RayData K M) (c : D.G)
-    (B : Ideal (𝓞 K))
-    (hB : IsCoprime B (Ideal.span {(M : 𝓞 K)})) (hB0 : B ≠ ⊥) (hc : D.cls B = c⁻¹) :
-    ∃ f : {I : Ideal (𝓞 K) // IsCoprime I (Ideal.span {(M : 𝓞 K)}) ∧ D.cls I = c} ×
-        {u : (𝓞 K)ˣ // (u : 𝓞 K) - 1 ∈ Ideal.span {(M : 𝓞 K)}} ≃
-        {x : 𝓞 K // x ∈ B ∧ x - 1 ∈ Ideal.span {(M : 𝓞 K)}},
-      ∀ p, Ideal.span {(f p : 𝓞 K)} = p.1 * B := by
+theorem gen_bij
+    {M : ℕ} (hM : Ideal.span {(M : 𝓞 K)} ≠ ⊤) (D : RayData K M) (c : D.G)
+    (B : Ideal (𝓞 K)) (hB : IsCoprime B (Ideal.span {(M : 𝓞 K)})) (hB0 : B ≠ ⊥) (hc : D.cls B = c⁻¹)
+    : ∃ f : {I : Ideal (𝓞 K) // IsCoprime I (Ideal.span {(M : 𝓞 K)}) ∧ D.cls I = c}
+          × {u : (𝓞 K)ˣ // (u : 𝓞 K) - 1 ∈ Ideal.span {(M : 𝓞 K)}}
+        ≃ {x : 𝓞 K // x ∈ B ∧ x - 1 ∈ Ideal.span {(M : 𝓞 K)}},
+      ∀ p,
+        Ideal.span {(f p : 𝓞 K)} = p.1 * B := by
   classical
-  have hgen : ∀ I : {I : Ideal (𝓞 K) // IsCoprime I (Ideal.span {(M : 𝓞 K)}) ∧ D.cls I = c},
-      ∃ x : 𝓞 K, x - 1 ∈ Ideal.span {(M : 𝓞 K)} ∧ Ideal.span {x} = I.1 * B := fun I =>
+  have hgen
+      : ∀ I : {I : Ideal (𝓞 K) // IsCoprime I (Ideal.span {(M : 𝓞 K)}) ∧ D.cls I = c}, ∃ x : 𝓞 K,
+        x - 1 ∈ Ideal.span {(M : 𝓞 K)} ∧ Ideal.span {x} = I.1 * B := fun I =>
     (cls_iff D c B I.1 hB hB0 hc I.2.1 (ne_bot_of_coprime hM I.2.1)).1 I.2.2
   choose g hg1 hg using hgen
   have hgB : ∀ I, g I ∈ B := fun I => by
@@ -138,14 +155,18 @@ theorem gen_bij {M : ℕ} (hM : Ideal.span {(M : 𝓞 K)} ≠ ⊤) (D : RayData 
     have := hg I
     rw [h, Ideal.span_singleton_eq_bot.2 rfl] at this
     exact mul_ne_zero (ne_bot_of_coprime hM I.2.1) hB0 this.symm
-  let F : {I : Ideal (𝓞 K) // IsCoprime I (Ideal.span {(M : 𝓞 K)}) ∧ D.cls I = c} ×
-      {u : (𝓞 K)ˣ // (u : 𝓞 K) - 1 ∈ Ideal.span {(M : 𝓞 K)}} →
-      {x : 𝓞 K // x ∈ B ∧ x - 1 ∈ Ideal.span {(M : 𝓞 K)}} := fun p =>
-    ⟨(p.2.1 : 𝓞 K) * g p.1, Ideal.mul_mem_left _ _ (hgB p.1), by
+  let F
+      : {I : Ideal (𝓞 K) // IsCoprime I (Ideal.span {(M : 𝓞 K)}) ∧ D.cls I = c}
+          × {u : (𝓞 K)ˣ // (u : 𝓞 K) - 1 ∈ Ideal.span {(M : 𝓞 K)}}
+        → {x : 𝓞 K // x ∈ B ∧ x - 1 ∈ Ideal.span {(M : 𝓞 K)}} := fun p => ⟨
+    (p.2.1 : 𝓞 K) * g p.1,
+    Ideal.mul_mem_left _ _ (hgB p.1),
+    by
       have : (p.2.1 : 𝓞 K) * g p.1 - 1 = (p.2.1 : 𝓞 K) * (g p.1 - 1) + ((p.2.1 : 𝓞 K) - 1) := by
         ring
       rw [this]
-      exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ (hg1 p.1)) p.2.2⟩
+      exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ (hg1 p.1)) p.2.2
+  ⟩
   have hspanF : ∀ p, Ideal.span {(F p : 𝓞 K)} = p.1 * B := fun p => by
     show Ideal.span {(p.2.1 : 𝓞 K) * g p.1} = _
     rw [Ideal.span_singleton_mul_left_unit p.2.1.isUnit, hg]
@@ -181,8 +202,7 @@ theorem gen_bij {M : ℕ} (hM : Ideal.span {(M : 𝓞 K)} ≠ ⊤) (D : RayData 
       (cls_iff D c B I hB hB0 hc hIc (ne_bot_of_coprime hM hIc)).2 ⟨x, hx1, hIB⟩
     let I' : {I : Ideal (𝓞 K) // IsCoprime I (Ideal.span {(M : 𝓞 K)}) ∧ D.cls I = c} :=
       ⟨I, hIc, hIcls⟩
-    have hass : Associated (g I') x := by
-      rw [← Ideal.span_singleton_eq_span_singleton, hg I', hIB]
+    have hass : Associated (g I') x := by rw [← Ideal.span_singleton_eq_span_singleton, hg I', hIB]
     obtain ⟨u, hu⟩ := hass
     have hu1 : (u : 𝓞 K) - 1 ∈ Ideal.span {(M : 𝓞 K)} := by
       have hgu : g I' * u - 1 ∈ Ideal.span {(M : 𝓞 K)} := by rw [hu]; exact hx1

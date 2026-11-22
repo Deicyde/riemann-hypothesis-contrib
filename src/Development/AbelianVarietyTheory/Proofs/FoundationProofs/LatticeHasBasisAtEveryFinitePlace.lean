@@ -67,10 +67,10 @@ lemma mem_localization_iff_mem_span (w : HeightOneSpectrum (𝓞 K)) {d : ℕ} (
       rw [he]
       exact M.smul_mem r hsy
 
-theorem basisAtEx :
-    ∀ (K : Type) [Field K] [NumberField K] (n : ℕ)
-      (M : Submodule (𝓞 K) (Fin n → K)), Submodule.IsFullLattice K M →
-      ∀ w : HeightOneSpectrum (𝓞 K), ∃ B : GL (Fin n) K, Formalism.L2.DIV.IsBasisAt w M B := by
+theorem basisAtEx
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (M : Submodule (𝓞 K) (Fin n → K)),
+      Submodule.IsFullLattice K M
+        → ∀ w : HeightOneSpectrum (𝓞 K), ∃ B : GL (Fin n) K, Formalism.L2.DIV.IsBasisAt w M B := by
   intro K _ _ d L hL w
   haveI := w.isPrime
   have : IsDiscreteValuationRing (locRing w) :=
@@ -88,8 +88,7 @@ theorem basisAtEx :
   have hliA : LinearIndependent (locRing w) v := b.linearIndependent.map' N.subtype N.ker_subtype
   have hli : LinearIndependent K v := (LinearIndependent.iff_fractionRing (locRing w) K).mp hliA
   have hspanA : Submodule.span (locRing w) (Set.range v) = N := by
-    have : Set.range v = N.subtype '' Set.range b := by
-      rw [← Set.range_comp]; rfl
+    have : Set.range v = N.subtype '' Set.range b := by rw [← Set.range_comp]; rfl
     rw [this, Submodule.span_image, b.span_eq, Submodule.map_top, Submodule.range_subtype]
   have hspan : ⊤ ≤ Submodule.span K (Set.range v) := by
     rw [← hL.span_eq_top, Submodule.span_le]
@@ -108,7 +107,7 @@ theorem basisAtEx :
   have hcol : Formalism.L2.DIV.colLat hP.unit = Submodule.span (𝓞 K) (Set.range (v ∘ e.symm)) := rfl
   unfold Formalism.L2.DIV.IsBasisAt
   ext x
-  rw [hcol, mem_localization_iff_mem_span, mem_localization_iff_mem_span, Submodule.span_span_of_tower,
-    EquivLike.range_comp, hspanA]
+  rw [hcol, mem_localization_iff_mem_span, mem_localization_iff_mem_span,
+    Submodule.span_span_of_tower, EquivLike.range_comp, hspanA]
 
 end GlobalTheory.LatBasisAt

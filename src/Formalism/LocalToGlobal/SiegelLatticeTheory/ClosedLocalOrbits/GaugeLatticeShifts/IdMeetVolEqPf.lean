@@ -16,13 +16,17 @@ namespace Formalism.L2.SG.Pf.IdMeet
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 open scoped Classical ENNReal
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
-open Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.TermOp Formalism.L2.SG.TermOp.IdBlocks Formalism.L2.SG.Full
-  Formalism.L2.SG.PoincareInHH.Cut
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat
+open Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.TermOp
+  Formalism.L2.SG.TermOp.IdBlocks Formalism.L2.SG.Full Formalism.L2.SG.PoincareInHH.Cut
 
-theorem mem_gcS {D : D7} (X : HidaSetting D) (u : D.what₂.Word) (hK : X.LevelSubgroupCharacter) (c : X.B.I.Gf) (s : X.B.I.Ginf) :
-    s ∈ GcS X u hK c ↔ ∃ γ : X.B.I.GA, γ ∈ X.B.I.GFset ∧ γ.1 = s ∧ γ.1 ∈ X.NinfU u ∧ γ.2 ∈ X.NfinU u ∧
-      c⁻¹ * γ.2 * c ∈ X.K2 := by
+theorem mem_gcS
+    {D : D7} (X : HidaSetting D) (u : D.what₂.Word) (hK : X.LevelSubgroupCharacter) (c : X.B.I.Gf)
+    (s : X.B.I.Ginf)
+    : s ∈ GcS X u hK c
+      ↔ ∃ γ : X.B.I.GA,
+        γ ∈ X.B.I.GFset ∧ γ.1 = s ∧ γ.1 ∈ X.NinfU u ∧ γ.2 ∈ X.NfinU u ∧ c⁻¹ * γ.2 * c ∈ X.K2 := by
   constructor
   · rintro ⟨γ, hγ, rfl⟩
     obtain ⟨hG, hP⟩ := Subgroup.mem_inf.1 hγ
@@ -33,7 +37,8 @@ theorem mem_gcS {D : D7} (X : HidaSetting D) (u : D.what₂.Word) (hK : X.LevelS
     have : γ.2 = c * k * c⁻¹ := by rw [← hke]; rfl
     rw [this]
     have : c⁻¹ * (c * k * c⁻¹) * c = k := by group
-    rw [this]; exact hk
+    rw [this]
+    exact hk
   · rintro ⟨γ, hG, rfl, h1, hN, hk⟩
     refine ⟨γ, Subgroup.mem_inf.2 ⟨hG, Subgroup.mem_prod.2 ⟨h1, Subgroup.mem_inf.2 ⟨hN, ?_⟩⟩⟩, rfl⟩
     refine Subgroup.mem_map.2 ⟨c⁻¹ * γ.2 * c, hk, ?_⟩
@@ -56,15 +61,23 @@ theorem nocolEqC_holds : NOcolEqC := by
   rw [SetLike.mem_coe, mem_gcS]
   constructor
   · rintro ⟨x, n, hx, rfl, hn⟩
-    exact ⟨x, ratLink_mem X hx, rfl, nLamNinf_holds D X u _ x n hx hn, nLamNfin_holds D X u _ x n hx hn,
-      (nilradical_conj_level' D X Y u ρ x n hn hx).1⟩
+    exact ⟨
+      x,
+      ratLink_mem X hx,
+      rfl,
+      nLamNinf_holds D X u _ x n hx hn,
+      nLamNfin_holds D X u _ x n hx hn,
+      (nilradical_conj_level' D X Y u ρ x n hn hx).1
+    ⟩
   · rintro ⟨γ, hG, rfl, hN, hF, hk⟩
-    exact Formalism.L2.SG.Pf.SlabCoverPf.nilradical_rational_lattice D X Y u ρ γ (Formalism.L2.SG.Closed.level_subgroup_properties X) hG hN hF hk
+    exact Formalism.L2.SG.Pf.SlabCoverPf.nilradical_rational_lattice D X Y u ρ γ
+      (Formalism.L2.SG.Closed.level_subgroup_properties X) hG hN hF hk
 
 theorem gcCountC_holds : GcCountC := by
   intro D X u hK c
   have hR : (RcS X u hK c : Set X.B.I.GA).Countable :=
-    (Set.countable_coe_iff.1 (Formalism.MainNotions.LeviCoordinates.rr_GF_countable X.B.I)).mono (fun _ h => (Subgroup.mem_inf.1 h).1)
+    (Set.countable_coe_iff.1 (Formalism.MainNotions.LeviCoordinates.rr_GF_countable X.B.I)).mono
+      (fun _ h => (Subgroup.mem_inf.1 h).1)
   have : (GcS X u hK c : Set X.B.I.Ginf).Countable := by
     unfold GcS
     rw [Subgroup.coe_map]
@@ -85,6 +98,7 @@ theorem conjUC_holds : ConjUC := by
     · group
   · rintro ⟨y, ⟨hN, k, hk, hke⟩, rfl⟩
     refine ⟨(nfinConj_holds X u g y hN).1, k, hk, ?_⟩
-    rw [← hke]; group
+    rw [← hke]
+    group
 
 end Formalism.L2.SG.Pf.IdMeet

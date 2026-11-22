@@ -76,8 +76,13 @@ theorem vector_to_symbol_operator : VOpToSOpOfSteps := by
   intro hF hL hLin d m P O hO hP
   induction P with
   | nil =>
-    exact ⟨zeroOp d m, rfl, fun _ _ => contDiffOn_const, fun u _ x _ => by simp [zeroOp_app, WOp.app],
-      fun x _ ξ => by simp [zeroOp_symb, WOp.symb]⟩
+    exact ⟨
+      zeroOp d m,
+      rfl,
+      fun _ _ => contDiffOn_const,
+      fun u _ x _ => by simp [zeroOp_app, WOp.app],
+      fun x _ ξ => by simp [zeroOp_symb, WOp.symb]
+    ⟩
   | cons t P ih =>
     obtain ⟨T, hTo, hTc, hTa, hTs⟩ := ih (fun s hs => hP s (List.mem_cons_of_mem _ hs))
     obtain ⟨hlen, hsm⟩ := hP t List.mem_cons_self

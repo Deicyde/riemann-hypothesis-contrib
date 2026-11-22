@@ -9,7 +9,17 @@ open Formalism.REAL
 
 namespace GlobalTheory
 
-theorem highestWeight_tensor_standard : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V] (n : ℕ) (E : Fin (n + 1) → Fin (n + 1) → Module.End ℂ V) (Et : Fin (n + 1) → Fin (n + 1) → Module.End ℂ (PiLp 2 (fun _ : Fin (n + 1) => V))) (Om : Module.End ℂ (PiLp 2 (fun _ : Fin (n + 1) => V))) (θ : Fin (n + 1) → ℂ) (lam : ℂ) (y : (PiLp 2 (fun _ : Fin (n + 1) => V))), (∀ a b y c, Et a b y c = E a b (y c) + if c = a then y b else 0) → (∀ y b, Om y b = ∑ c, E c b (y c)) → y ≠ 0 → IsHW Et θ y → Om y = lam • y → ∃ c, y c ≠ 0 ∧ IsHW E (fun a => θ a - if a = c then 1 else 0) (y c) ∧ lam = θ c - 1 - ((c : ℕ) : ℂ) := by
+theorem highestWeight_tensor_standard
+    : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V] (n : ℕ)
+        (E : Fin (n + 1) → Fin (n + 1) → Module.End ℂ V)
+        (Et : Fin (n + 1) → Fin (n + 1) → Module.End ℂ (PiLp 2 (fun _ : Fin (n + 1) => V)))
+        (Om : Module.End ℂ (PiLp 2 (fun _ : Fin (n + 1) => V))) (θ : Fin (n + 1) → ℂ) (lam : ℂ)
+        (y : (PiLp 2 (fun _ : Fin (n + 1) => V))),
+      (∀ a b y c, Et a b y c = E a b (y c) + if c = a then y b else 0)
+        → (∀ y b, Om y b = ∑ c, E c b (y c)) → y ≠ 0 → IsHW Et θ y → Om y = lam • y
+        → ∃ c,
+          y c ≠ 0 ∧ IsHW E (fun a => θ a - if a = c then 1 else 0) (y c)
+            ∧ lam = θ c - 1 - ((c : ℕ) : ℂ) := by
   classical
   intro V _ _ _ n E Et Om θ lam y hEt hOm hy hw hlam
   obtain ⟨h1, h2⟩ := hw
@@ -49,8 +59,8 @@ theorem highestWeight_tensor_standard : ∀ (V : Type) [NormedAddCommGroup V] [I
     · subst hca; simp [hz b hab]
     · simp [hca]
   refine ⟨c, hc0, ⟨hdiag, hraise⟩, ?_⟩
-  have hterm : ∀ d, E d c (y d) =
-      ((if d = c then θ c - 1 else 0) - if d < c then 1 else 0 : ℂ) • y c := by
+  have hterm
+      : ∀ d, E d c (y d) = ((if d = c then θ c - 1 else 0) - if d < c then 1 else 0 : ℂ) • y c := by
     intro d
     rcases lt_trichotomy d c with h | h | h
     · rw [hup d c h d]; simp [h, h.ne]
@@ -60,8 +70,7 @@ theorem highestWeight_tensor_standard : ∀ (V : Type) [NormedAddCommGroup V] [I
     have h := hOm y c
     rw [hlam] at h
     have h' : lam • y c = ∑ d, E d c (y d) := h
-    rw [h', Finset.sum_congr rfl (fun d _ => hterm d), ← Finset.sum_smul,
-      Finset.sum_sub_distrib]
+    rw [h', Finset.sum_congr rfl (fun d _ => hterm d), ← Finset.sum_smul, Finset.sum_sub_distrib]
     congr 2
     · simp
     · rw [Finset.sum_boole]

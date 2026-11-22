@@ -14,8 +14,9 @@ section Coord
 
 variable (o : Type*) {Ω : Type*} [CommRing o] [CommRing Ω] [Algebra o Ω] {ι : Type*}
 
-private theorem coneMap_monomial' (x : ι → Ω) (e : ι →₀ ℕ) (a : o) :
-    coneMap o x (monomial e a) = Polynomial.C (aeval x (monomial e a)) * Polynomial.X ^ e.degree := by
+private theorem coneMap_monomial' (x : ι → Ω) (e : ι →₀ ℕ) (a : o)
+    : coneMap o x (monomial e a)
+      = Polynomial.C (aeval x (monomial e a)) * Polynomial.X ^ e.degree := by
   unfold coneMap
   rw [aeval_monomial, aeval_monomial, Polynomial.algebraMap_apply, map_mul, mul_assoc]
   congr 1
@@ -23,8 +24,9 @@ private theorem coneMap_monomial' (x : ι → Ω) (e : ι →₀ ℕ) (a : o) :
     Finset.prod_pow_eq_pow_sum]
   congr 1
 
-private theorem coeff_coneMap_eq_aeval_homogeneousComponent (x : ι → Ω) (f : MvPolynomial ι o) (d : ℕ) :
-    (coneMap o x f).coeff d = aeval x (homogeneousComponent d f) := by
+private theorem coeff_coneMap_eq_aeval_homogeneousComponent
+    (x : ι → Ω) (f : MvPolynomial ι o) (d : ℕ)
+    : (coneMap o x f).coeff d = aeval x (homogeneousComponent d f) := by
   classical
   set_option synthInstance.maxHeartbeats 100000 in
     conv_lhs => rw [f.as_sum, map_sum]
@@ -37,9 +39,8 @@ private theorem coeff_coneMap_eq_aeval_homogeneousComponent (x : ι → Ω) (f :
   · simp [h]
   · rw [if_neg (Ne.symm h), if_neg h]
 
-theorem coneMap_of_isHomogeneous (x : ι → Ω) {f : MvPolynomial ι o} {n : ℕ}
-    (hf : f.IsHomogeneous n) :
-    coneMap o x f = Polynomial.C (aeval x f) * Polynomial.X ^ n := by
+theorem coneMap_of_isHomogeneous (x : ι → Ω) {f : MvPolynomial ι o} {n : ℕ} (hf : f.IsHomogeneous n)
+    : coneMap o x f = Polynomial.C (aeval x f) * Polynomial.X ^ n := by
   ext d
   rw [coeff_coneMap_eq_aeval_homogeneousComponent, Polynomial.coeff_C_mul_X_pow,
     homogeneousComponent_of_mem ((mem_homogeneousSubmodule _ _).2 hf)]
@@ -47,12 +48,13 @@ theorem coneMap_of_isHomogeneous (x : ι → Ω) {f : MvPolynomial ι o} {n : �
   · simp
   · rw [if_neg h, if_neg h, map_zero]
 
-theorem mem_coordIdeal_of_isHomogeneous (x : ι → Ω) {f : MvPolynomial ι o} {n : ℕ}
-    (hf : f.IsHomogeneous n) (h : aeval x f = 0) : f ∈ coordIdeal o x := by
+theorem mem_coordIdeal_of_isHomogeneous
+    (x : ι → Ω) {f : MvPolynomial ι o} {n : ℕ} (hf : f.IsHomogeneous n) (h : aeval x f = 0)
+    : f ∈ coordIdeal o x := by
   rw [coordIdeal, RingHom.mem_ker, coneMap_of_isHomogeneous o x hf, h, map_zero, zero_mul]
 
-theorem coeff_coneMap (x : ι → Ω) (f : MvPolynomial ι o) (d : ℕ) :
-    (coneMap o x f).coeff d = aeval x (homogeneousComponent d f) := by
+theorem coeff_coneMap (x : ι → Ω) (f : MvPolynomial ι o) (d : ℕ)
+    : (coneMap o x f).coeff d = aeval x (homogeneousComponent d f) := by
   exact coeff_coneMap_eq_aeval_homogeneousComponent o x f d
 
 theorem coordIdeal_isHomogIdeal (x : ι → Ω) : IsHomogIdeal o (coordIdeal o x) := by

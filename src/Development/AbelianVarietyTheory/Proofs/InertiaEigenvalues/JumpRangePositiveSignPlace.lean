@@ -9,8 +9,11 @@ noncomputable section
 
 namespace GlobalTheory.Pass
 
-open Formalism Formalism.MainNotions Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module GlobalTheory.Pass
-open Formalism.MainNotions.PairedCharacterCondition Formalism.MainNotions.PairedCharacterCondition.CongruenceModules
+open Formalism Formalism.MainNotions Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations NumberField IsDedekindDomain
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module GlobalTheory.Pass
+open Formalism.MainNotions.PairedCharacterCondition
+  Formalism.MainNotions.PairedCharacterCondition.CongruenceModules
 
 theorem stepJumpDirect_holds : StepJumpDirect := by
   intro D i r eta s S sg U hs hJ Xs w hw hsg
@@ -29,9 +32,13 @@ theorem stepJumpDirect_holds : StepJumpDirect := by
         · have h1' : (0 : ℚ) ≤ u := by exact_mod_cast h1
           have h2' : (u : ℚ) < D.R.t := by exact_mod_cast h2
           constructor <;> linarith
-        · rw [abs_le] at h; unfold cen at h
+        · rw [abs_le] at h
+          unfold cen at h
           constructor <;> linarith [h.1, h.2]
-        · unfold cloud cen at h; rw [hsg] at h; simp only [if_true] at h; push_cast at h
+        · unfold cloud cen at h
+          rw [hsg] at h
+          simp only [if_true] at h
+          push_cast at h
           constructor <;> linarith [h.1, h.2]
       have k1 : -((eta : ℤ) + D.R.t + 1) - 1 < u := by exact_mod_cast key.1
       have k2 : u ≤ (s : ℤ) + S := by exact_mod_cast key.2

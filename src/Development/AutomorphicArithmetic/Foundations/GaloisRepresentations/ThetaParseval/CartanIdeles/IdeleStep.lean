@@ -8,10 +8,12 @@ public import GroundTheory.GlobalFields.IdeleGroups.LocalConditionIndex
 @[expose] public section
 
 open scoped nonZeroDivisors Matrix
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GroundTheory.Global GroundTheory.Global.IdeleGroup UpperTheory.Gal.TP.Skew
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GroundTheory.Global
+  GroundTheory.Global.IdeleGroup UpperTheory.Gal.TP.Skew
 
-theorem UpperTheory.Gal.TP.Skew.ideleStep :
-    UpperTheory.Gal.TP.Skew.ConjAut → UpperTheory.Gal.TP.Skew.IdeleStep := by
+theorem UpperTheory.Gal.TP.Skew.ideleStep
+    : UpperTheory.Gal.TP.Skew.ConjAut → UpperTheory.Gal.TP.Skew.IdeleStep := by
   intro hconj F E _ _ _ _ _ σ hcm a
   obtain ⟨hgal, s, -, -, hss, hall, -⟩ := hconj F E σ hcm
   haveI := hgal
@@ -32,8 +34,10 @@ theorem UpperTheory.Gal.TP.Skew.ideleStep :
     push_neg at h
     exact hram (MonoidHom.ext h)
   have hc' : infiniteLocalSymbol E v c = s := (hall _).resolve_left hc
-  have key : ∀ a' : IdeleGroup F, ideleSymbol F E a' = 1 →
-      ∃ x b, ∀ w, ord w a' = ord w (diagonal F x) + ord w (ideleNorm F E b) := by
+  have key
+      : ∀ a' : IdeleGroup F,
+        ideleSymbol F E a' = 1
+          → ∃ x b, ∀ w, ord w a' = ord w (diagonal F x) + ord w (ideleNorm F E b) := by
     intro a' ha'
     have hmem : a' ∈ (ideleSymbol F E).ker := ha'
     rw [ker_ideleSymbol, Subgroup.mem_sup] at hmem
@@ -41,8 +45,9 @@ theorem UpperTheory.Gal.TP.Skew.ideleStep :
     exact ⟨x, b, fun w => ord_mul w _ _⟩
   by_cases ha : ideleSymbol F E a = 1
   · exact key a ha
-  · obtain ⟨x, b, hxb⟩ := key (a * infiniteEmbedding v c) (by
-      rw [map_mul, (hall _).resolve_left ha, ideleSymbol_infiniteEmbedding, hc', hss])
+  · obtain ⟨x, b, hxb⟩ :=
+      key (a * infiniteEmbedding v c)
+        (by rw [map_mul, (hall _).resolve_left ha, ideleSymbol_infiniteEmbedding, hc', hss])
     refine ⟨x, b, fun w => ?_⟩
     rw [← hxb w, ord_mul,
       mem_standardOpenSubgroup_iff_ord.mp (infiniteEmbedding_mem_standardOpenSubgroup v c) w,

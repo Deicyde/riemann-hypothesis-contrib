@@ -19,8 +19,10 @@ namespace GlobalTheory.BigTop.Fun.SetFromSize
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L} {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts}
-  {Y : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y cX} {Csz : ℝ}
+variable
+  {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L}
+  {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Y : DivX D}
+  {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y cX} {Csz : ℝ}
 
 theorem finite_tup (p : PtAt ex Csz) : Finite p.P.T := by
   classical
@@ -33,7 +35,6 @@ theorem finite_tup (p : PtAt ex Csz) : Finite p.P.T := by
       · exact Or.inr ⟨w, hw, rfl⟩
       · exact Or.inl (h1 w hw)
   exact Set.finite_univ_iff.1 ((((p.R.twPl).finite_toSet.image _).insert _).subset this)
-
 
 end GlobalTheory.BigTop.Fun.SetFromSize
 

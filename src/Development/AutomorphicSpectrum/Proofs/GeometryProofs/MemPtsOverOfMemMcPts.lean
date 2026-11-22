@@ -65,7 +65,10 @@ public import Formalism.SharpRestriction.Divisibility.GeneratorPowers.SpanResCha
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Filter Topology
-open Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.ChartRestriction.G.AR.Inst Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta
+open Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.ChartRestriction.G.AR.Inst
+  Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta
 open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Rec
 open scoped Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -76,21 +79,37 @@ namespace GlobalTheory.CompanionTheory.Ar.Rec.OS
 
 section Vals
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω] {𝕜 : Type} [Field 𝕜]
+variable
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
+  {Ω : Type} [Field Ω]
+  {𝕜 : Type} [Field 𝕜]
   {y : (Σ k, ι k) → Ω} {z : (Σ k, ι k) → 𝕜}
 
-theorem hasVal_add {a : K → ℤ} {s s' : Ω} {w w' : 𝕜} (h : Small.HasVal y a s z w)
-    (h' : Small.HasVal y a s' z w') : Small.HasVal y a (s + s') z (w + w') := by
+theorem hasVal_add
+    {a : K → ℤ} {s s' : Ω} {w w' : 𝕜} (h : Small.HasVal y a s z w) (h' : Small.HasVal y a s' z w')
+    : Small.HasVal y a (s + s') z (w + w') := by
   obtain ⟨dg, dh, g, f, hg, hf, hd, e, hz0, ez⟩ := h
   obtain ⟨dg', dh', g', f', hg', hf', hd', e', hz0', ez'⟩ := h'
-  have hdeg : dg' + dh = dg + dh' := funext fun k => by
-    have h1 := hd k
-    have h2 := hd' k
-    simp only [Pi.add_apply]
-    omega
-  refine ⟨dg + dh', dh + dh', g * f' + g' * f, f * f',
-    FinRd.ValSub.mh_add (ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.isMultiHomog_mul hg hf') ?_,
-    ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.isMultiHomog_mul hf hf', fun k => ?_, ?_, ?_, ?_⟩
+  have hdeg : dg' + dh = dg + dh' :=
+    funext fun k => by
+      have h1 := hd k
+      have h2 := hd' k
+      simp only [Pi.add_apply]
+      omega
+  refine ⟨
+    dg + dh',
+    dh + dh',
+    g * f' + g' * f,
+    f * f',
+    FinRd.ValSub.mh_add
+      (ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.isMultiHomog_mul hg hf') ?_,
+    ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.isMultiHomog_mul hf hf',
+    fun k => ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [← hdeg]
     exact ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.isMultiHomog_mul hg' hf
   · have h1 := hd k
@@ -104,8 +123,8 @@ theorem hasVal_add {a : K → ℤ} {s s' : Ω} {w w' : 𝕜} (h : Small.HasVal y
   · simp only [map_add (f := _), map_mul, ez, ez']
     ring
 
-theorem hasVal_zsmul {a : K → ℤ} {s : Ω} {w : 𝕜} (n : ℤ) (h : Small.HasVal y a s z w) :
-    Small.HasVal y a (n • s) z (n • w) := by
+theorem hasVal_zsmul {a : K → ℤ} {s : Ω} {w : 𝕜} (n : ℤ) (h : Small.HasVal y a s z w)
+    : Small.HasVal y a (n • s) z (n • w) := by
   obtain ⟨dg, dh, g, f, hg, hf, hd, e, hz0, ez⟩ := h
   refine ⟨dg, dh, MvPolynomial.C n * g, f, ?_, hf, hd, ?_, hz0, ?_⟩
   · intro m hm k
@@ -116,8 +135,8 @@ theorem hasVal_zsmul {a : K → ℤ} {s : Ω} {w : 𝕜} (n : ℤ) (h : Small.Ha
   · rw [map_mul, ez, MvPolynomial.aeval_C, ← mul_assoc]
     simp [zsmul_eq_mul]
 
-theorem hasVal_zero_of {a : K → ℤ} {s : Ω} {w : 𝕜} (h : Small.HasVal y a s z w) :
-    Small.HasVal y a (0 : Ω) z (0 : 𝕜) := by
+theorem hasVal_zero_of {a : K → ℤ} {s : Ω} {w : 𝕜} (h : Small.HasVal y a s z w)
+    : Small.HasVal y a (0 : Ω) z (0 : 𝕜) := by
   obtain ⟨dg, dh, g, f, hg, hf, hd, e, hz0, ez⟩ := h
   exact ⟨dg, dh, 0, f, FinRd.ValSub.mh_zero dg, hf, hd, by simp, hz0, by simp⟩
 
@@ -125,28 +144,35 @@ end Vals
 
 section Coef
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
 
 end Coef
 
 section Fin
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {r : ℕ}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l} {r : ℕ}
 
 end Fin
 
 section Arch
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {r : ℕ}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l} {r : ℕ}
 
 end Arch
 
 section ArchD
 
-variable {D : D7} {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l}
-  {c : Coeff l}
+variable
+  {D : D7} {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {Dw : Datum H}
+  {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
 
 end ArchD
 
@@ -157,6 +183,5 @@ end Emb
 end GlobalTheory.CompanionTheory.Ar.Rec.OS
 
 namespace GlobalTheory.CompanionTheory.Ar.Rec
-
 
 end GlobalTheory.CompanionTheory.Ar.Rec

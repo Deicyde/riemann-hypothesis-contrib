@@ -13,8 +13,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeckeAlgebr
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi UpperTheory.V.AlgebraTools
-open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.So
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools
+open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig
+  UpperTheory.V.Z.Sym.So
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -43,7 +45,9 @@ private theorem diagonal_parameter_mul (t t' : Dat.Par F) : d1 (t * t') = d1 t *
   funext v i
   fin_cases i <;> simp [d1]
 
-private theorem diagonal_parameter_dominant {t : Dat.Par F} (h : ∀ v ∈ A.Sg, valuation (Kv v) (t v : Kv v) ≤ 1) : A.DomS (d1 t) := by
+private theorem diagonal_parameter_dominant
+    {t : Dat.Par F} (h : ∀ v ∈ A.Sg, valuation (Kv v) (t v : Kv v) ≤ 1)
+    : A.DomS (d1 t) := by
   intro v hv i j hij
   fin_cases i <;> fin_cases j
   · exact le_rfl
@@ -51,16 +55,20 @@ private theorem diagonal_parameter_dominant {t : Dat.Par F} (h : ∀ v ∈ A.Sg,
   · exact absurd hij (by decide)
   · exact le_rfl
 
-private theorem cone_le {t : Dat.Par F} (h : A.Cone t) : ∀ v ∈ A.Sg, valuation (Kv v) (t v : Kv v) ≤ 1 := by
+private theorem cone_le {t : Dat.Par F} (h : A.Cone t)
+    : ∀ v ∈ A.Sg, valuation (Kv v) (t v : Kv v) ≤ 1 := by
   intro v hv
   refine (h v hv).le.trans (pow_le_one₀ zero_le' ?_)
   rw [GlAx.unif_spec]
   exact uniformizer_lt_one.le
 
-private theorem cone_mul {x y : Dat.Par F} (hx : ∀ v ∈ A.Sg, valuation (Kv v) (x v : Kv v) ≤ 1) (hy : A.Cone y) :
-    A.Cone (x * y) := by
+private theorem cone_mul
+    {x y : Dat.Par F} (hx : ∀ v ∈ A.Sg, valuation (Kv v) (x v : Kv v) ≤ 1) (hy : A.Cone y)
+    : A.Cone (x * y) := by
   intro v hv
-  have h : valuation (Kv v) ((x * y) v : Kv v) = valuation (Kv v) (x v : Kv v) * valuation (Kv v) (y v : Kv v) := by
+  have h
+      : valuation (Kv v) ((x * y) v : Kv v)
+        = valuation (Kv v) (x v : Kv v) * valuation (Kv v) (y v : Kv v) := by
     rw [Pi.mul_apply, Units.val_mul, map_mul]
   rw [h]
   exact lt_of_le_of_lt (mul_le_of_le_one_left' (hx v hv)) (hy v hv)
@@ -96,8 +104,10 @@ private theorem exS_eq (hA : A.Ok) (a : Chs F) (t : Dat.Par F) : A.exS a t = pp 
   have h := (expoEq (Kv v) (a v)).2.1 (t v)
   rw [SD.dS, h, hχ, absPow_neg, MonoidHom.inv_apply]
 
-private theorem conj_mem (hA : A.Ok) {s u : DA Δ} {z : Dat.Par F} (hs : A.IsElD s fun v => ![z v, z v])
-    (hu : u ∈ A.dat.U2) : s⁻¹ * u * s ∈ A.dat.U2 := by
+private theorem conj_mem
+    (hA : A.Ok)
+    {s u : DA Δ} {z : Dat.Par F} (hs : A.IsElD s fun v => ![z v, z v]) (hu : u ∈ A.dat.U2)
+    : s⁻¹ * u * s ∈ A.dat.U2 := by
   have hU := (datOk F Δ A hA).2.2.2.2
   rw [hU] at hu ⊢
   refine ⟨fun v h => ?_, fun v h => ?_⟩
@@ -111,20 +121,26 @@ private theorem conj_mem (hA : A.Ok) {s u : DA Δ} {z : Dat.Par F} (hs : A.IsElD
 
 variable {V : Type} [AddCommGroup V] [Module ℂ V]
 
-private theorem dc_smul {G : Type} [Group G] (U : Subgroup G) (a : G) (c : ℂ) (φ : G → V) :
-    dcF U a (c • φ) = c • dcF U a φ :=
+private theorem dc_smul {G : Type} [Group G] (U : Subgroup G) (a : G) (c : ℂ) (φ : G → V)
+    : dcF U a (c • φ) = c • dcF U a φ :=
   map_smul (dc (rightReg ℂ G V) U U a) c φ
 
-private theorem mulOp (hA : A.Ok) {g g' : DA Δ} {d d' : ParN F 2} (hg : A.IsElD g d) (hg' : A.IsElD g' d')
-    (hd : A.DomS d) (hd' : A.DomS d') (φ : DA Δ → V) (hφ : ∀ u ∈ A.dat.U2, ∀ x, φ (x * u) = φ x) :
-    dcF A.dat.U2 (g * g') φ = dcF A.dat.U2 g (dcF A.dat.U2 g' φ) := by
+private theorem mulOp
+    (hA : A.Ok)
+    {g g' : DA Δ} {d d' : ParN F 2}
+    (hg : A.IsElD g d) (hg' : A.IsElD g' d') (hd : A.DomS d) (hd' : A.DomS d')
+    (φ : DA Δ → V) (hφ : ∀ u ∈ A.dat.U2, ∀ x, φ (x * u) = φ x)
+    : dcF A.dat.U2 (g * g') φ = dcF A.dat.U2 g (dcF A.dat.U2 g' φ) := by
   have hm := (elEx F Δ A hA).2.2.2.1 g g' d d' hg hg'
-  exact (uFMul _ V _ g g' (dMul F Δ A hA g d hg).1 (dMul F Δ A hA g' d' hg').1 (dMul F Δ A hA _ _ hm).1
-    ((dMul F Δ A hA g d hg).2 g' d' hg' hd hd') φ hφ).symm
+  exact (uFMul _ V _ g g' (dMul F Δ A hA g d hg).1 (dMul F Δ A hA g' d' hg').1
+    (dMul F Δ A hA _ _ hm).1 ((dMul F Δ A hA g d hg).2 g' d' hg' hd hd') φ hφ).symm
 
-private theorem dcScal (hA : A.Ok) {s : DA Δ} {z : Dat.Par F} (hs : A.IsElD s fun v => ![z v, z v])
-    (φ : DA Δ → V) (hφ : ∀ u ∈ A.dat.U2, ∀ x, φ (x * u) = φ x) (x : DA Δ) :
-    dcF A.dat.U2 s φ x = φ (x * s) := by
+private theorem dcScal
+    (hA : A.Ok)
+    {s : DA Δ} {z : Dat.Par F} (hs : A.IsElD s fun v => ![z v, z v])
+    (φ : DA Δ → V) (hφ : ∀ u ∈ A.dat.U2, ∀ x, φ (x * u) = φ x)
+    (x : DA Δ)
+    : dcF A.dat.U2 s φ x = φ (x * s) := by
   have h1 : ∀ y ∈ ({s} : Finset (DA Δ)), y ∈ DC A.dat.U2 s := by
     intro y hy
     rw [Finset.mem_singleton] at hy
@@ -141,8 +157,7 @@ private theorem dcScal (hA : A.Ok) {s : DA Δ} {z : Dat.Par F} (hs : A.IsElD s f
 
 end UpperTheory.V.Z.Sym.So
 
-theorem UpperTheory.V.Z.Sym.So.kSpec :
-    UpperTheory.V.Z.Sym.So.KSpec := by
+theorem UpperTheory.V.Z.Sym.So.kSpec : UpperTheory.V.Z.Sym.So.KSpec := by
   intro F _ _ Δ A hA V _ _ ch B hB
   obtain ⟨hop, hinv, hsc⟩ := kOps F Δ A hA V ch B hB
   have hexD := (elEx F Δ A hA).2.1
@@ -159,7 +174,8 @@ theorem UpperTheory.V.Z.Sym.So.kSpec :
     have e2 := hop t g ht hg ((Base.Tw.one B).R (A.dat.FK t') φ)
     have e3 := hop t' g' ht' hg' φ
     rw [Module.End.mul_apply, e1, e2, e3, dc_smul, smul_smul,
-      mulOp A hA hg hg' (diagonal_parameter_dominant A (cone_le A ht)) (diagonal_parameter_dominant A (cone_le A ht')) φ.1 (hinv φ.1 φ.2)]
+      mulOp A hA hg hg' (diagonal_parameter_dominant A (cone_le A ht))
+        (diagonal_parameter_dominant A (cone_le A ht')) φ.1 (hinv φ.1 φ.2)]
     have := cc_mul A t t'
     simp only [cc] at this
     rw [this]
@@ -175,7 +191,8 @@ theorem UpperTheory.V.Z.Sym.So.kSpec :
       have h0 : valuation (Kv v) (t v : Kv v) ≤ valuation (Kv v) (((t v)⁻¹ : (Kv v)ˣ) : Kv v) := by
         simpa [SD.dS] using hd v hv 0 1 (by decide)
       have h1 := mul_le_mul' h0 (le_refl (valuation (Kv v) (t v : Kv v)))
-      have e : valuation (Kv v) (((t v)⁻¹ : (Kv v)ˣ) : Kv v) * valuation (Kv v) (t v : Kv v) = 1 := by
+      have e
+          : valuation (Kv v) (((t v)⁻¹ : (Kv v)ˣ) : Kv v) * valuation (Kv v) (t v : Kv v) = 1 := by
         rw [← map_mul, Units.inv_mul, map_one]
       rw [e, ← map_mul] at h1
       rw [Pi.mul_apply, Units.val_mul]
@@ -193,8 +210,10 @@ theorem UpperTheory.V.Z.Sym.So.kSpec :
       exact hmulD _ _ _ _ hg1 hg0
     have hg1φ : dcF A.dat.U2 g1 φ.1 = pp A a (t * t) • φ.1 := by
       have e := hT _ _ (cone_mul A ht2 h0) hgg
-      rw [mulOp A hA hg1 hg0 (diagonal_parameter_dominant A ht2) (diagonal_parameter_dominant A (cone_le A h0)) φ.1 hφ, hT _ _ h0 hg0, dc_smul, pp_mul,
-        mul_comm, ← smul_smul] at e
+      rw [mulOp A hA hg1 hg0 (diagonal_parameter_dominant A ht2)
+            (diagonal_parameter_dominant A (cone_le A h0)) φ.1 hφ,
+          hT _ _ h0 hg0, dc_smul, pp_mul, mul_comm, ← smul_smul]
+        at e
       exact smul_right_injective _ (pp_ne A a t0) e
     obtain ⟨s, hs, -⟩ := hexD fun v => ![t⁻¹ v, t⁻¹ v]
     have hm : A.IsElD (g1 * s) (SD.dS t) := by
@@ -213,7 +232,7 @@ theorem UpperTheory.V.Z.Sym.So.kSpec :
       congr 1
       refine Finset.prod_congr rfl fun v _ => ?_
       rw [Pi.inv_apply, map_inv]
-    rw [hgs, mulOp A hA hg1 hs (diagonal_parameter_dominant A ht2) hdom φ.1 hφ, hsφ, dc_smul, hg1φ, smul_smul, exS_eq A hA, pp_sq,
-      mul_comm]
+    rw [hgs, mulOp A hA hg1 hs (diagonal_parameter_dominant A ht2) hdom φ.1 hφ, hsφ, dc_smul, hg1φ,
+      smul_smul, exS_eq A hA, pp_sq, mul_comm]
 
 end

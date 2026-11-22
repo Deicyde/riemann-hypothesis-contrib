@@ -8,13 +8,20 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.UnrAtOfMu
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.MuUnrTie
 
-theorem eq_of_over_two {E : Type} [Field E] [NumberField E] {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
-    (v : HeightOneSpectrum (𝓞 E)) (h1 : ((p : ℕ) : 𝓞 E) ∈ v.asIdeal) (h2 : ((q : ℕ) : 𝓞 E) ∈ v.asIdeal) : p = q := by
+theorem eq_of_over_two
+    {E : Type} [Field E] [NumberField E]
+    {p q : ℕ} (hp : p.Prime) (hq : q.Prime)
+    (v : HeightOneSpectrum (𝓞 E))
+    (h1 : ((p : ℕ) : 𝓞 E) ∈ v.asIdeal) (h2 : ((q : ℕ) : 𝓞 E) ∈ v.asIdeal)
+    : p = q := by
   by_contra hne
   have hc : Nat.Coprime p q := (Nat.coprime_primes hp hq).2 hne
   obtain ⟨a, b, h⟩ := (Nat.isCoprime_iff_coprime.2 hc).map (Int.castRingHom (𝓞 E))
@@ -23,8 +30,9 @@ theorem eq_of_over_two {E : Type} [Field E] [NumberField E] {p q : ℕ} (hp : p.
   rw [Ideal.eq_top_iff_one, ← h]
   exact add_mem (Ideal.mul_mem_left _ _ h1) (Ideal.mul_mem_left _ _ h2)
 
-theorem unrAt_inv {E : Type} [Field E] [NumberField E] {χ : HChar E} {w : HeightOneSpectrum (𝓞 E)}
-    (h : χ.UnrAt w) : (χ⁻¹).UnrAt w := by
+theorem unrAt_inv
+    {E : Type} [Field E] [NumberField E] {χ : HChar E} {w : HeightOneSpectrum (𝓞 E)} (h : χ.UnrAt w)
+    : (χ⁻¹).UnrAt w := by
   exact HChar.UnrAt.inv h
 
 end GlobalTheory.MuUnrTie

@@ -15,7 +15,9 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.Inter
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4
 
 namespace ProjectionFormulaVertical
 
@@ -26,17 +28,20 @@ theorem geoNum_mixed_eq_zero
     (hR4 : ∀ (F : Type) [Field F] (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)],
       ExistsUniqueStatement F ι)
     (hCMF : ContractMixedFieldStatement)
-    {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-    {K' : Type} [Fintype K'] {ι' : K' → Type} [∀ k, Fintype (ι' k)]
-    {κ : K → K'} {v : (Σ k, ι k) → (Σ k', ι' k')} (hv : IsBlockMap κ v) {P' : Ideal (MRing ι')} {d r : ℕ}
-    (hP : IsArithVar (imageZ v P') d) {W : Ideal (MRing ι')} (hPW : P' ≤ W)
-    (hWm : IsMultiProjPrime W) (hpr : (charOf W).Prime)
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {K' : Type} [Fintype K']
+    {ι' : K' → Type} [∀ k, Fintype (ι' k)]
+    {κ : K → K'} {v : (Σ k, ι k) → (Σ k', ι' k')} (hv : IsBlockMap κ v)
+    {P' : Ideal (MRing ι')} {d r : ℕ} (hP : IsArithVar (imageZ v P') d)
+    {W : Ideal (MRing ι')} (hPW : P' ≤ W) (hWm : IsMultiProjPrime W) (hpr : (charOf W).Prime)
     (hWd : ringKrullDim (MRing ι' ⧸ W) = ((d + r + Fintype.card K' : ℕ) : WithBot ℕ∞))
-    (L : Fin d → K → ℤ) (N : Fin r → K' → ℤ) :
-    geoNum (d + r) W (Fin.append (fun j => pullDeg κ (L j)) N) = 0 := by
+    (L : Fin d → K → ℤ) (N : Fin r → K' → ℤ)
+    : geoNum (d + r) W (Fin.append (fun j => pullDeg κ (L j)) N) = 0 := by
   set p := charOf W with hpdef
   have : Fact p.Prime := ⟨hpr⟩
-  have hpW : ((p : ℕ) : MRing ι') ∈ W := ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.natCast_mem_of_charOf W
+  have hpW : ((p : ℕ) : MRing ι') ∈ W :=
+    ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.natCast_mem_of_charOf W
   have hWp : IsProjVarF (W.map (red p)) (d + r) :=
     ⟨isMultiProjPrime_red p hWm hpW, by rw [ringKrullDim_red p hpW, hWd]⟩
   have hImm : IsMultiProjPrime (imageZ v W) := isMultiProjPrime_imageZ hv hWm
@@ -69,22 +74,22 @@ theorem geoNum_mixed_eq_zero
 
 end ProjectionFormulaVertical
 
-
 open ProjectionFormulaVertical in
 theorem PFVert.proof
     (hGeo : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)], GeoNumStatement ι)
     (hR4 : ∀ (F : Type) [Field F] (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)],
       ExistsUniqueStatement F ι)
-    (hCMF : ContractMixedFieldStatement) :
-    PFVert.Statement := by
+    (hCMF : ContractMixedFieldStatement)
+    : PFVert.Statement := by
   intro K _ ι _ K' _ ι' _ κ v P' d r L L' N s a W hv hP' hP hL hs hsP hW hh
   classical
   have hsec : IsSectionOn P' (HermLine.sqMetric (ι := ι') a) s := ⟨a, fun _ => rfl, hs, hsP⟩
   obtain ⟨hWm, hpr, hWd⟩ :=
     (divSuppArith K' ι' P' (d + r) (HermLine.sqMetric (ι := ι') a) s W hP' hsec hW).2 hh
   have hPW : P' ≤ W := le_sup_left.trans hW.1.1.2
-  have e : (fun j => (Fin.append L' N j).a) =
-      Fin.append (fun j => pullDeg κ (L j).a) (fun j => (N j).a) := by
+  have e
+      : (fun j => (Fin.append L' N j).a)
+        = Fin.append (fun j => pullDeg κ (L j).a) (fun j => (N j).a) := by
     funext j
     refine Fin.addCases (fun i => ?_) (fun i => ?_) j
     · simp [(hL i).1]

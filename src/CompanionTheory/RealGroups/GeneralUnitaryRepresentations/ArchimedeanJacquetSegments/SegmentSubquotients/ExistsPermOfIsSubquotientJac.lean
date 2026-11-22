@@ -17,18 +17,19 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Supercu
 
 noncomputable section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.JHMult GlobalTheory.Published GlobalTheory.SegmentRepModel
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.JHMult
+  GlobalTheory.Published GlobalTheory.SegmentRepModel
 
 namespace CompanionTheory.Pf1.SegRepC.Perm
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem entries_zero_or_d {d l : ℕ} (hd : 0 < d) (σ : IrrRep (GL (Fin d) k)) (hσ : IsCuspidal σ.ρ)
+theorem entries_zero_or_d
+    {d l : ℕ} (hd : 0 < d) (σ : IrrRep (GL (Fin d) k)) (hσ : IsCuspidal σ.ρ)
     (b : SizeMatrix (fun _ : Fin l => Fin d) (fun _ : Fin l => Fin d))
-    (f : ∀ i, (Σ j, Fin (b.1 i j)) ≃ Fin d)
-    (s : ∀ i j, IrrRep (GL (Fin (b.1 i j)) k))
-    (hs : ∀ i, IsSubquotient (piTensor fun j => (s i j).ρ) (jac (f i) (segTerm σ.ρ l i))) :
-    ∀ i j, b.1 i j = 0 ∨ b.1 i j = d := by
+    (f : ∀ i, (Σ j, Fin (b.1 i j)) ≃ Fin d) (s : ∀ i j, IrrRep (GL (Fin (b.1 i j)) k))
+    (hs : ∀ i, IsSubquotient (piTensor fun j => (s i j).ρ) (jac (f i) (segTerm σ.ρ l i)))
+    : ∀ i j, b.1 i j = 0 ∨ b.1 i j = d := by
   intro i j₀
   by_contra hc
   push Not at hc
@@ -46,13 +47,11 @@ theorem entries_zero_or_d {d l : ℕ} (hd : 0 < d) (σ : IrrRep (GL (Fin d) k)) 
     · exact ⟨_, _, e0.symm ▸ e1.symm ▸ hlt⟩
   haveI := hcu.2 l (fun j => b.1 i j) (f i) hne
   have hirr : (piTensor fun j => (s i j).ρ).IsIrreducible :=
-    GlobalTheory.ProdFiniteLength.piTensor_isIrreducible_of_schur _ (fun j => (s i j).irr)
-      fun j φ hφ => GlobalTheory.CompanionTheory.SocleFrob.exists_eq_smul_id _ (s i j).smooth (s i j).irr φ hφ
+    GlobalTheory.ProdFiniteLength.piTensor_isIrreducible_of_schur _
+      (fun j => (s i j).irr)
+      fun j φ hφ =>
+        GlobalTheory.CompanionTheory.SocleFrob.exists_eq_smul_id _ (s i j).smooth (s i j).irr φ hφ
   exact jhMult_ne_zero_iff.2 (hs i) (jhMult_of_subsingleton hirr _)
-
-
-
-
 
 end CompanionTheory.Pf1.SegRepC.Perm
 

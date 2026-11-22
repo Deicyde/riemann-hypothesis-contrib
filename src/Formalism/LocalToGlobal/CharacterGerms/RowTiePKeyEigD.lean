@@ -19,8 +19,11 @@ theorem keyEig_of (hT : TeichSt) (hJ : JointEigSt) : KeyEigSt := by
   intro C _ _ V hAlg hc O _ n d hd0 K v
   have hd : d ≠ 0 := NeZero.ne d
   have hq2 : 2 ≤ V.l ^ d := le_trans V.l_prime.two_le (Nat.le_self_pow hd _)
-  obtain ⟨m, w, hsum, hw⟩ := hJ C hAlg n (V.l ^ d) hq2 {τ | τ ∈ Acl K ∧ τ ^ V.l ^ d = τ}
-    (fun _ ht => ht.2) (fun _ hs _ ht => comm_mem K hs.1 ht.1) (Matrix.mulVec K.P v)
+  obtain ⟨m, w, hsum, hw⟩ :=
+    hJ C hAlg n (V.l ^ d) hq2 {τ | τ ∈ Acl K ∧ τ ^ V.l ^ d = τ}
+      (fun _ ht => ht.2)
+      (fun _ hs _ ht => comm_mem K hs.1 ht.1)
+      (Matrix.mulVec K.P v)
   set w' : Fin m → Fin n → C := fun j => Matrix.mulVec K.P (w j) with hw'
   have hPq : K.P ^ V.l ^ d = K.P := by
     obtain ⟨k, hk⟩ := Nat.exists_eq_succ_of_ne_zero (pow_ne_zero d V.l_prime.ne_zero)
@@ -34,7 +37,8 @@ theorem keyEig_of (hT : TeichSt) (hJ : JointEigSt) : KeyEigSt := by
     intro j τ hτ hτq
     obtain ⟨c, hc'⟩ := hw j τ ⟨hτ, hτq⟩
     refine ⟨c, ?_⟩
-    rw [hw', Matrix.mulVec_mulVec, comm_mem K hτ (P_mem K), ← Matrix.mulVec_mulVec, hc', Matrix.mulVec_smul]
+    rw [hw', Matrix.mulVec_mulVec, comm_mem K hτ (P_mem K), ← Matrix.mulVec_mulVec, hc',
+      Matrix.mulVec_smul]
   have hPw' : ∀ j, Matrix.mulVec K.P (w' j) = w' j := fun j => by
     rw [hw', Matrix.mulVec_mulVec, P_idem]
   have hρ : ∀ j x, ∃ σ : C, Matrix.mulVec (K.ρ x) (w' j) = σ • w' j := by
@@ -53,7 +57,8 @@ theorem keyEig_of (hT : TeichSt) (hJ : JointEigSt) : KeyEigSt := by
     · exact uniq _ _ (by rw [← hσ 1, map_one, Matrix.one_mulVec, one_smul])
     · intro x y
       refine uniq _ _ ?_
-      rw [← hσ (x * y), map_mul, ← Matrix.mulVec_mulVec, hσ y, Matrix.mulVec_smul, hσ x, smul_smul, mul_comm]
+      rw [← hσ (x * y), map_mul, ← Matrix.mulVec_mulVec, hσ y, Matrix.mulVec_smul, hσ x, smul_smul,
+        mul_comm]
     · exact uniq _ _ (by rw [← hσ 0, map_zero, Matrix.zero_mulVec, zero_smul])
     · intro x y
       refine uniq _ _ ?_

@@ -5,15 +5,17 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix GlobalTheory.AdLat GlobalTheory.UCls GlobalTheory.SUVol ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+open NumberField IsDedekindDomain MeasureTheory Matrix GlobalTheory.AdLat GlobalTheory.UCls
+  GlobalTheory.SUVol ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
 open scoped ENNReal
 
 namespace GlobalTheory
 
-theorem skew_transpose_mul_add_mul_conj {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
-    (G X : Matrix (Fin r) (Fin r) E)
-    (hX : ∀ u w, herm G (X *ᵥ u) w + herm G u (X *ᵥ w) = 0) :
-    Xᵀ * G + G * X.map (fun x => cc x) = 0 := by
+theorem skew_transpose_mul_add_mul_conj
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {r : ℕ} (G X : Matrix (Fin r) (Fin r) E) (hX : ∀ u w, herm G (X *ᵥ u) w + herm G u (X *ᵥ w) = 0)
+    : Xᵀ * G + G * X.map (fun x => cc x) = 0 := by
   ext i j
   have h := hX (Pi.single i 1) (Pi.single j 1)
   have c0 : cc (0 : E) = 0 := map_zero _
@@ -23,19 +25,25 @@ theorem skew_transpose_mul_add_mul_conj {E : Type} [Field E] [NumberField E] [Is
   simp [herm, Matrix.mulVec_single, Pi.single_apply, c0, c1, hc, Matrix.mul_apply] at h ⊢
   exact h
 
-theorem conj_eq_of_skew {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
-    (G X : Matrix (Fin r) (Fin r) E) (hG : G.det ≠ 0)
-    (hX : ∀ u w, herm G (X *ᵥ u) w + herm G u (X *ᵥ w) = 0) :
-    X.map (fun x => cc x) = -(G⁻¹ * Xᵀ * G) := by
+theorem conj_eq_of_skew
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {r : ℕ} (G X : Matrix (Fin r) (Fin r) E) (hG : G.det ≠ 0)
+    (hX : ∀ u w, herm G (X *ᵥ u) w + herm G u (X *ᵥ w) = 0)
+    : X.map (fun x => cc x) = -(G⁻¹ * Xᵀ * G) := by
   have h := skew_transpose_mul_add_mul_conj G X hX
   have hu : IsUnit G.det := isUnit_iff_ne_zero.mpr hG
   have h2 : G * X.map (fun x => cc x) = -(Xᵀ * G) := eq_neg_of_add_eq_zero_right h
-  calc X.map (fun x => cc x) = G⁻¹ * (G * X.map (fun x => cc x)) := by
-        rw [← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hu, Matrix.one_mul]
+  calc
+    X.map (fun x => cc x) = G⁻¹ * (G * X.map (fun x => cc x)) := by
+      rw [← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hu, Matrix.one_mul]
     _ = -(G⁻¹ * Xᵀ * G) := by rw [h2, Matrix.mul_neg, Matrix.mul_assoc]
 
-theorem trace_mul_skew_mem_maximalRealSubfield :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (G : Matrix (Fin r) (Fin r) E) (X Y : Matrix (Fin r) (Fin r) E), (∀ a b, cc (G a b) = G b a) → G.det ≠ 0 → (∀ u w, herm G (X *ᵥ u) w + herm G u (X *ᵥ w) = 0) → (∀ u w, herm G (Y *ᵥ u) w + herm G u (Y *ᵥ w) = 0) → (X * Y).trace ∈ maximalRealSubfield E := by
+theorem trace_mul_skew_mem_maximalRealSubfield
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (G : Matrix (Fin r) (Fin r) E)
+        (X Y : Matrix (Fin r) (Fin r) E),
+      (∀ a b, cc (G a b) = G b a) → G.det ≠ 0 → (∀ u w, herm G (X *ᵥ u) w + herm G u (X *ᵥ w) = 0)
+        → (∀ u w, herm G (Y *ᵥ u) w + herm G u (Y *ᵥ w) = 0)
+        → (X * Y).trace ∈ maximalRealSubfield E := by
   intro E _ _ _ r G X Y _ hG hX hY
   have hu : IsUnit G.det := isUnit_iff_ne_zero.mpr hG
   have hXc := conj_eq_of_skew G X hG hX

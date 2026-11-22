@@ -6,16 +6,15 @@ public import Mathlib
 
 namespace Bl.general_b_fact_left_bis
 
-theorem goal1 :
-  ∀ {E : Type} [inst : Field.{0} E] [NumberField.{0} E] {N : Nat}
-  (L'' : Submodule.{0, 0} (NumberField.RingOfIntegers.{0} E) (Fin N → E)),
-  Eq.{1} (Submodule.span.{0, 0} E (SetLike.coe.{0, 0} L'')) Top.top.{0} →
-    ∀ (v : Fin N → E),
-      Exists.{1} fun (d : NumberField.RingOfIntegers.{0} E) ↦
-        And (Ne.{1} d 0) (Membership.mem.{0, 0} L'' (HSMul.hSMul.{0, 0, 0} d v)) := by
+theorem goal1
+    : ∀ {E : Type} [inst : Field.{0} E] [NumberField.{0} E] {N : Nat}
+        (L'' : Submodule.{0, 0} (NumberField.RingOfIntegers.{0} E) (Fin N → E)),
+      Eq.{1} (Submodule.span.{0, 0} E (SetLike.coe.{0, 0} L'')) Top.top.{0}
+        → ∀ (v : Fin N → E),
+          Exists.{1} fun (d : NumberField.RingOfIntegers.{0} E) ↦
+            And (Ne.{1} d 0) (Membership.mem.{0, 0} L'' (HSMul.hSMul.{0, 0, 0} d v)) := by
   intro E _ _ N L'' hspan v
-  have hv : v ∈ Submodule.span E (L'' : Set (Fin N → E)) := by
-    rw [hspan]; exact Submodule.mem_top
+  have hv : v ∈ Submodule.span E (L'' : Set (Fin N → E)) := by rw [hspan]; exact Submodule.mem_top
   induction hv using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by rw [one_smul]; exact hx⟩
   | zero => exact ⟨1, one_ne_zero, by rw [smul_zero]; exact L''.zero_mem⟩
@@ -30,7 +29,8 @@ theorem goal1 :
   | smul a x _ ih =>
     obtain ⟨d, hd, h⟩ := ih
     obtain ⟨⟨b, c⟩, hbc⟩ := IsLocalization.surj (nonZeroDivisors (NumberField.RingOfIntegers E)) a
-    refine ⟨(c : NumberField.RingOfIntegers E) * d, mul_ne_zero (nonZeroDivisors.ne_zero c.2) hd, ?_⟩
+    refine
+      ⟨(c : NumberField.RingOfIntegers E) * d, mul_ne_zero (nonZeroDivisors.ne_zero c.2) hd, ?_⟩
     have key : ((c : NumberField.RingOfIntegers E) * d) • (a • x) = b • (d • x) := by
       rw [← algebraMap_smul E ((c : NumberField.RingOfIntegers E) * d), ← algebraMap_smul E b,
         ← algebraMap_smul E d, smul_smul, smul_smul]

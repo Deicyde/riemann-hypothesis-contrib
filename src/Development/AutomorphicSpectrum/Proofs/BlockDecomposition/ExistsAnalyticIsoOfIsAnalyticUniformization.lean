@@ -14,10 +14,10 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.EllipticUniformization
 
-theorem exists_analyticIso_of_isAnalyticUniformization (Λ : Submodule ℤ ℂ)
-    (E : WeierstrassCurve ℂ) (f : ℂ →+ E.toAffine.Point)
-    (hf : GroundTheory.Global.Elliptic.IsAnalyticUniformization Λ f) :
-    ∃ ξ : (ℂ ⧸ Λ.toAddSubgroup) ≃+ E.toAffine.Point,
+theorem exists_analyticIso_of_isAnalyticUniformization
+    (Λ : Submodule ℤ ℂ) (E : WeierstrassCurve ℂ)
+    (f : ℂ →+ E.toAffine.Point) (hf : GroundTheory.Global.Elliptic.IsAnalyticUniformization Λ f)
+    : ∃ ξ : (ℂ ⧸ Λ.toAddSubgroup) ≃+ E.toAffine.Point,
       GlobalTheory.EllipticCM.IsAnalyticIso ξ ∧ ∀ z : ℂ, ξ (QuotientAddGroup.mk z) = f z := by
   let φ : (ℂ ⧸ Λ.toAddSubgroup) →+ E.toAffine.Point :=
     QuotientAddGroup.lift Λ.toAddSubgroup f fun z hz => (hf.map_eq_zero_iff z).2 hz
@@ -30,8 +30,7 @@ theorem exists_analyticIso_of_isAnalyticUniformization (Λ : Submodule ℤ ℂ)
   have hsurj : Function.Surjective φ := fun P => by
     obtain ⟨z, rfl⟩ := hf.surjective P
     exact ⟨QuotientAddGroup.mk z, hφ z⟩
-  let ξ : (ℂ ⧸ Λ.toAddSubgroup) ≃+ E.toAffine.Point :=
-    AddEquiv.ofBijective φ ⟨hinj, hsurj⟩
+  let ξ : (ℂ ⧸ Λ.toAddSubgroup) ≃+ E.toAffine.Point := AddEquiv.ofBijective φ ⟨hinj, hsurj⟩
   have hξ : ∀ z : ℂ, ξ (QuotientAddGroup.mk z) = f z := fun z => rfl
   refine ⟨ξ, fun z hz => ?_, hξ⟩
   have hz0 : f z ≠ 0 := fun h => hz ((hf.map_eq_zero_iff z).1 h)

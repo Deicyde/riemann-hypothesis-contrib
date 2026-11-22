@@ -9,10 +9,11 @@ open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.PolFa
 
 namespace GlobalTheory
 
-theorem latt_free_sub_full_rank {E : Type} [Field E] [NumberField E] (X : Type) [AddCommGroup X]
-    [Module (𝓞 E) X] [Module.Free ℤ X] [Module.Finite ℤ X] :
-    ∃ (f : (Fin (Module.finrank (𝓞 E) X) → 𝓞 E) →ₗ[𝓞 E] X) (m : ℕ), 0 < m ∧
-      Function.Injective f ∧ ∀ x : X, m • x ∈ LinearMap.range f := by
+theorem latt_free_sub_full_rank
+    {E : Type} [Field E] [NumberField E]
+    (X : Type) [AddCommGroup X] [Module (𝓞 E) X] [Module.Free ℤ X] [Module.Finite ℤ X]
+    : ∃ (f : (Fin (Module.finrank (𝓞 E) X) → 𝓞 E) →ₗ[𝓞 E] X) (m : ℕ),
+      0 < m ∧ Function.Injective f ∧ ∀ x : X, m • x ∈ LinearMap.range f := by
   classical
   haveI : Module.Finite (𝓞 E) X := Module.Finite.of_restrictScalars_finite ℤ (𝓞 E) X
   set r := Module.finrank (𝓞 E) X
@@ -48,8 +49,7 @@ theorem latt_free_sub_full_rank {E : Type} [Field E] [NumberField E] (X : Type) 
       simp only [neg_smul, Finset.sum_neg_distrib]
       exact (neg_eq_of_add_eq_zero_left hg)
     have hI : Ideal.span {g 0} ≠ ⊥ := by simpa using ha
-    have hN : Ideal.absNorm (Ideal.span {g 0}) ≠ 0 := by
-      rwa [Ne, Ideal.absNorm_eq_zero_iff]
+    have hN : Ideal.absNorm (Ideal.span {g 0}) ≠ 0 := by rwa [Ne, Ideal.absNorm_eq_zero_iff]
     obtain ⟨b, hb⟩ := Ideal.mem_span_singleton'.mp (Ideal.absNorm_mem (Ideal.span {g 0}))
     refine ⟨Ideal.absNorm (Ideal.span {g 0}), Nat.pos_of_ne_zero hN, ?_⟩
     rw [← Nat.cast_smul_eq_nsmul (𝓞 E), ← hb, mul_smul]

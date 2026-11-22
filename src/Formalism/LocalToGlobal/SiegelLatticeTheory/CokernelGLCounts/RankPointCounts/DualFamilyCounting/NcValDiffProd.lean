@@ -9,8 +9,11 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.NcVal
 
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.HidaSetting Formalism.L2.SG.AdBridge
-  Formalism.L2.SG.LocVol Formalism.L2.SG.MassDataConc Formalism.L2.SG.TypedSets Formalism.L2.SG.Sub Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.AdBridge Formalism.L2.SG.LocVol Formalism.L2.SG.MassDataConc
+  Formalism.L2.SG.TypedSets Formalism.L2.SG.Sub
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open NumberField IsDedekindDomain IsDedekindDomain.HeightOneSpectrum WithZero
 
 section General
@@ -112,14 +115,16 @@ lemma absV_dV (v : HeightOneSpectrum (𝓞 F)) :
   rw [absV_of_valued_eq v _ _ (valued_dV v), IsDedekindDomain.HeightOneSpectrum.maxPowDividing, map_pow,
     zpow_neg, zpow_natCast, Nat.cast_pow]
 
-
 variable (F) in
-theorem hasProd_absV_dV :
-    HasProd (fun v : HeightOneSpectrum (𝓞 F) => absV v (dV v)) (|(discr F : ℝ)|⁻¹) := by
+theorem hasProd_absV_dV
+    : HasProd (fun v : HeightOneSpectrum (𝓞 F) => absV v (dV v)) (|(discr F : ℝ)|⁻¹) := by
   have hD := differentIdeal_ne_zero' F
   have hfin : (Function.mulSupport fun v : HeightOneSpectrum (𝓞 F) =>
-      v.maxPowDividing (differentIdeal ℤ (𝓞 F))).Finite := Ideal.hasFiniteMulSupport hD
-  have hfac : ∏ v ∈ hfin.toFinset, v.maxPowDividing (differentIdeal ℤ (𝓞 F)) = differentIdeal ℤ (𝓞 F) := by
+      v.maxPowDividing (differentIdeal ℤ (𝓞 F))).Finite :=
+    Ideal.hasFiniteMulSupport hD
+  have hfac
+      : ∏ v ∈ hfin.toFinset, v.maxPowDividing (differentIdeal ℤ (𝓞 F))
+        = differentIdeal ℤ (𝓞 F) := by
     rw [← finprod_eq_prod_of_mulSupport_subset _ (fun v hv => hfin.mem_toFinset.mpr hv)]
     exact Ideal.finprod_heightOneSpectrum_factorization hD
   have hone : ∀ v ∉ hfin.toFinset, absV v (dV v) = 1 := by
@@ -131,9 +136,11 @@ theorem hasProd_absV_dV :
     rw [h1, map_one]
     simp
   have hval : ∏ v ∈ hfin.toFinset, absV v (dV v) = |(discr F : ℝ)|⁻¹ := by
-    rw [Finset.prod_congr rfl (fun v _ => absV_dV v), Finset.prod_inv_distrib, ← Nat.cast_prod, ← map_prod, hfac,
-      NumberField.absNorm_differentIdeal F (𝓞 F), Nat.cast_natAbs, Int.cast_abs]
-  have key : HasProd (fun v : HeightOneSpectrum (𝓞 F) => absV v (dV v)) (∏ v ∈ hfin.toFinset, absV v (dV v)) :=
+    rw [Finset.prod_congr rfl (fun v _ => absV_dV v), Finset.prod_inv_distrib, ← Nat.cast_prod,
+      ← map_prod, hfac, NumberField.absNorm_differentIdeal F (𝓞 F), Nat.cast_natAbs, Int.cast_abs]
+  have key : HasProd
+      (fun v : HeightOneSpectrum (𝓞 F) => absV v (dV v))
+      (∏ v ∈ hfin.toFinset, absV v (dV v)) :=
     hasProd_prod_of_ne_finset_one hone
   rw [hval] at key
   exact key
@@ -144,8 +151,7 @@ section Loc
 
 variable {D : D7} (X : HidaSetting D)
 
-theorem diffProd_holds : DiffProd X := by
-  exact hasProd_absV_dV _
+theorem diffProd_holds : DiffProd X := by exact hasProd_absV_dV _
 
 end Loc
 

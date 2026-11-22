@@ -17,7 +17,6 @@ namespace Formalism.L2.Th1.F
 
 namespace TaylorSigmaUniqueness
 
-
 open PowerSeries in
 lemma formal_unique (P U V : PowerSeries ℂ) (hV : X * derivative V = -(X * P))
     (hV0 : constantCoeff V = 0) (hU : X * derivative U = X * (V * U))
@@ -108,7 +107,6 @@ lemma ode_v (L : PeriodPair) :
 
 end TaylorSigmaUniqueness
 
-
 open TaylorSigmaUniqueness in
 theorem taylorSigma_of (hr : TaylorRing) (hd : TaylorDeriv) : TaylorSigma := by
   intro L
@@ -121,42 +119,50 @@ theorem taylorSigma_of (hr : TaylorRing) (hd : TaylorDeriv) : TaylorSigma := by
     have := (hadd (fun z => z) (u L) hid hu).2
     rw [hX] at this
     exact this
-  have eU : PowerSeries.X * PowerSeries.derivative (R := ℂ) (taylor0 (u L))
-      = PowerSeries.X * (taylor0 (AnalyticIdentityTheoremsZetaFacts.zetaExcept L 0) * taylor0 (u L)) := by
-    have hvu : AnalyticAt ℂ (fun z => AnalyticIdentityTheoremsZetaFacts.zetaExcept L 0 z * u L z) 0 := hv.mul hu
+  have eU
+      : PowerSeries.X * PowerSeries.derivative (R := ℂ) (taylor0 (u L))
+        = PowerSeries.X
+          * (taylor0 (AnalyticIdentityTheoremsZetaFacts.zetaExcept L 0) * taylor0 (u L)) := by
+    have hvu
+        : AnalyticAt ℂ (fun z => AnalyticIdentityTheoremsZetaFacts.zetaExcept L 0 z * u L z) 0 :=
+      hv.mul hu
     rw [← hd.1 _ hu, ← hX, ← (hadd _ _ hid hu.deriv).2, ← (hadd _ _ hv hu).2,
       ← (hadd _ _ hid hvu).2]
     exact hgerm _ _ (ode_u L)
-  have eV : PowerSeries.X * PowerSeries.derivative (R := ℂ) (taylor0 (AnalyticIdentityTheoremsZetaFacts.zetaExcept L 0))
-      = -(PowerSeries.X * pSeries L) := by
-    have hneg : taylor0 (fun z => (-1 : ℂ) * (z * L.weierstrassPExcept 0 z))
+  have eV
+      : PowerSeries.X * PowerSeries.derivative (R := ℂ)
+          (taylor0 (AnalyticIdentityTheoremsZetaFacts.zetaExcept L 0))
         = -(PowerSeries.X * pSeries L) := by
+    have hneg
+        : taylor0 (fun z => (-1 : ℂ) * (z * L.weierstrassPExcept 0 z))
+          = -(PowerSeries.X * pSeries L) := by
       have hzp : AnalyticAt ℂ (fun z => z * L.weierstrassPExcept 0 z) 0 := hid.mul hp
-      rw [(hadd (fun _ => (-1 : ℂ)) _ analyticAt_const hzp).2, hC,
-        (hadd _ _ hid hp).2, hX, pSeries]
+      rw [(hadd (fun _ => (-1 : ℂ)) _ analyticAt_const hzp).2, hC, (hadd _ _ hid hp).2, hX, pSeries]
       simp
     rw [← hd.1 _ hv, ← hneg, ← hX, ← (hadd _ _ hid hv.deriv).2]
     refine hgerm _ _ ((ode_v L).mono fun z hz => ?_)
     show z * deriv (AnalyticIdentityTheoremsZetaFacts.zetaExcept L 0) z = -1 * (z * L.weierstrassPExcept 0 z)
-    rw [hz]; ring
+    rw [hz]
+    ring
   rw [e1, B.sigma]
   congr 1
   refine formal_unique (pSeries L) _ _ eV ?_ eU ?_
   · rw [constantCoeff_taylor0, AnalyticIdentityTheoremsZetaFacts.zetaExcept_zero_zero]
   · rw [constantCoeff_taylor0, u_zero]
 
-theorem taylorSgStar_of (h : TaylorSigma) (hr : TaylorRing) (he : TaylorExp) (hent : SigmaEntire) :
-    TaylorSgStar := by
+theorem taylorSgStar_of (h : TaylorSigma) (hr : TaylorRing) (he : TaylorExp) (hent : SigmaEntire)
+    : TaylorSgStar := by
   intro L
   obtain ⟨hadd, hC, hX, -⟩ := hr
   have hid : AnalyticAt ℂ (fun z : ℂ => z) 0 := analyticAt_id
   have hzz : AnalyticAt ℂ (fun z : ℂ => z * z) 0 := hid.mul hid
   have hf : AnalyticAt ℂ (fun z : ℂ => -(s2 L / 2) * (z * z)) 0 := analyticAt_const.mul hzz
   have hef : AnalyticAt ℂ (fun z : ℂ => Complex.exp (-(s2 L / 2) * (z * z))) 0 := hf.cexp
-  have hTf : taylor0 (fun z : ℂ => -(s2 L / 2) * (z * z))
-      = -(PowerSeries.C (s2 L / 2) * PowerSeries.X ^ 2) := by
-    rw [(hadd (fun _ => -(s2 L / 2)) _ analyticAt_const hzz).2, hC,
-      (hadd _ _ hid hid).2, hX, map_neg]
+  have hTf
+      : taylor0 (fun z : ℂ => -(s2 L / 2) * (z * z))
+        = -(PowerSeries.C (s2 L / 2) * PowerSeries.X ^ 2) := by
+    rw [(hadd (fun _ => -(s2 L / 2)) _ analyticAt_const hzz).2, hC, (hadd _ _ hid hid).2, hX,
+      map_neg]
     ring
   have hfun : sgStar L = fun z => wSigma L z * Complex.exp (-(s2 L / 2) * (z * z)) := by
     funext z
@@ -186,7 +192,6 @@ lemma dblInt_eq (e : PowerSeries ℂ) : C.dblInt e = B.prim (B.prim e) := by
 
 end TaylorSigmaUniqueness
 
-
 open TaylorSigmaUniqueness in
 theorem taylorSgStar'_of (h : TaylorSgStar) : TaylorSgStar' := by
   intro L
@@ -196,10 +201,14 @@ theorem taylorSgStar'_of (h : TaylorSgStar) : TaylorSgStar' := by
     have : PowerSeries.constantCoeff (B.sigS (pSeries L)) = 0 := by
       rw [B.sigS, map_neg, B.constantCoeff_prim, neg_zero]
     exact this
-  have h2 : MvPowerSeries.constantCoeff
-      (-(PowerSeries.C (s2 L / 2) * PowerSeries.X ^ 2) : PowerSeries ℂ) = 0 := by
+  have h2
+      : MvPowerSeries.constantCoeff
+          (-(PowerSeries.C (s2 L / 2) * PowerSeries.X ^ 2) : PowerSeries ℂ)
+        = 0 := by
     have : PowerSeries.constantCoeff
-        (-(PowerSeries.C (s2 L / 2) * PowerSeries.X ^ 2) : PowerSeries ℂ) = 0 := by simp
+          (-(PowerSeries.C (s2 L / 2) * PowerSeries.X ^ 2) : PowerSeries ℂ)
+        = 0 := by
+      simp
     exact this
   rw [← B.fExp_add h1 h2, B.sigS, ← neg_add]
   rfl

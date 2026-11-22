@@ -16,8 +16,9 @@ section DerGroups
 variable (k : Type) [Field k]
 
 def colFix (N n : ℕ) : Subgroup (GL (Fin N) k) where
-  carrier := {g | ∀ i : Fin N, (i : ℕ) < n →
-    (g : Matrix (Fin N) (Fin N) k).mulVec (Pi.single i 1) = Pi.single i 1}
+  carrier :=
+    {g | ∀ i : Fin N, (i : ℕ) < n →
+      (g : Matrix (Fin N) (Fin N) k).mulVec (Pi.single i 1) = Pi.single i 1}
   mul_mem' {a b} ha hb := by
     intro i hi
     show ((a * b : GL (Fin N) k) : Matrix (Fin N) (Fin N) k).mulVec _ = _
@@ -58,24 +59,26 @@ section DerChars
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-
 variable (k) in
 def whitCharFrom (ψ : AddChar k Circle) (N n : ℕ) : unipB k (Fin N) →* ℂˣ where
-  toFun u := Circle.toUnits (ψ (∑ p : Fin N × Fin N with (p.2 : ℕ) = p.1 + 1 ∧ n ≤ (p.1 : ℕ),
-    (u : GL (Fin N) k).val p.1 p.2))
+  toFun u :=
+    Circle.toUnits (ψ
+      (∑ p : Fin N × Fin N with (p.2 : ℕ) = p.1 + 1 ∧ n ≤ (p.1 : ℕ),
+        (u : GL (Fin N) k).val p.1 p.2))
   map_one' := by
     rw [Finset.sum_eq_zero, AddChar.map_zero_eq_one, map_one]
     intro p hp
-    exact Matrix.one_apply_ne fun e => by have := (Finset.mem_filter.1 hp).2.1; rw [e] at this; omega
+    exact Matrix.one_apply_ne fun e => by
+      have := (Finset.mem_filter.1 hp).2.1; rw [e] at this; omega
   map_mul' u v := by
     rw [← map_mul, ← AddChar.map_add_eq_mul, ← Finset.sum_add_distrib]
-    exact congrArg _ (congrArg _ (Finset.sum_congr rfl fun p hp => unipB_mul_apply u v (Finset.mem_filter.1 hp).2.1))
-
+    exact congrArg _
+      (congrArg _
+        (Finset.sum_congr rfl fun p hp => unipB_mul_apply u v (Finset.mem_filter.1 hp).2.1))
 
 variable (k) in
 def derChar (ψ : AddChar k Circle) (N n : ℕ) : derUnip k N n →* ℂˣ :=
   (whitCharFrom k ψ N n).comp (Subgroup.inclusion (derUnip_le_unipB k N n))
-
 
 variable (k) in
 def derCharM (ψ : AddChar k Circle) (m n : ℕ) : derUnipM k m n →* ℂˣ :=

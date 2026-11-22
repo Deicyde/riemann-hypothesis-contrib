@@ -10,7 +10,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 
 noncomputable section
 
@@ -18,15 +19,15 @@ namespace SegreArithmetic
 
 variable {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} {Ω : Type} [Field Ω]
 
-
 omit [DecidableEq K] in
-theorem segreCoords_div (y : (Σ k, ι k) → Ω) (f c : (k : K) → ι k) :
-    segreCoords y ⟨(), f⟩ / segreCoords y ⟨(), c⟩ = ∏ k, y ⟨k, f k⟩ / y ⟨k, c k⟩ := by
+theorem segreCoords_div (y : (Σ k, ι k) → Ω) (f c : (k : K) → ι k)
+    : segreCoords y ⟨(), f⟩ / segreCoords y ⟨(), c⟩ = ∏ k, y ⟨k, f k⟩ / y ⟨k, c k⟩ := by
   simp only [segreCoords, Finset.prod_div_distrib]
 
-theorem ratio_eq_segre (y : (Σ k, ι k) → Ω) (c : (k : K) → ι k) (hc : ∀ k, y ⟨k, c k⟩ ≠ 0) (k : K) (i : ι k) :
-    y ⟨k, i⟩ / y ⟨k, c k⟩ =
-      segreCoords y ⟨(), Function.update c k i⟩ / segreCoords y ⟨(), c⟩ := by
+theorem ratio_eq_segre
+    (y : (Σ k, ι k) → Ω) (c : (k : K) → ι k) (hc : ∀ k, y ⟨k, c k⟩ ≠ 0) (k : K) (i : ι k)
+    : y ⟨k, i⟩ / y ⟨k, c k⟩
+      = segreCoords y ⟨(), Function.update c k i⟩ / segreCoords y ⟨(), c⟩ := by
   rw [segreCoords_div, Finset.prod_eq_single k]
   · rw [Function.update_self]
   · intro j _ hj
@@ -35,12 +36,12 @@ theorem ratio_eq_segre (y : (Σ k, ι k) → Ω) (c : (k : K) → ι k) (hc : �
   · intro h
     exact absurd (Finset.mem_univ k) h
 
-
 omit [Fintype K] [DecidableEq K] in
-theorem charZero_of_horizontal (y : (Σ k, ι k) → Ω)
-    (h : IsHorizontal (mCoordIdeal y)) : CharZero Ω := by
+theorem charZero_of_horizontal (y : (Σ k, ι k) → Ω) (h : IsHorizontal (mCoordIdeal y))
+    : CharZero Ω := by
   refine charZero_of_injective_algebraMap (R := ℤ) (A := Ω) ?_
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro n hn
   have hmem : n ∈ (mCoordIdeal y).comap (C : ℤ →+* MRing ι) := by
     rw [Ideal.mem_comap, mCoordIdeal, RingHom.mem_ker, ← algebraMap_eq, AlgHom.commutes,
@@ -50,7 +51,6 @@ theorem charZero_of_horizontal (y : (Σ k, ι k) → Ω)
   exact (Ideal.mem_bot).mp hmem
 
 end SegreArithmetic
-
 
 open SegreArithmetic BlockImageArithmetic in
 theorem SegreArith.proof : SegreArith.Statement := by
@@ -87,8 +87,16 @@ theorem SegreArith.proof : SegreArith.Statement := by
   have hdy := ringKrullDim_eq y c hc
   rw [hdim] at hdy
   rw [coordIdeal_eq_mCoordIdeal]
-  refine ⟨⟨()⟩, ⟨RingHom.ker_isPrime _, CoordinateConeArithVar.isMultiHomogIdeal x,
-    CoordinateConeArithVar.relevant x c' hc'⟩, CoordinateConeArithVar.horizontal x, ?_⟩
+  refine ⟨
+    ⟨()⟩,
+    ⟨
+      RingHom.ker_isPrime _,
+      CoordinateConeArithVar.isMultiHomogIdeal x,
+      CoordinateConeArithVar.relevant x c' hc'
+    ⟩,
+    CoordinateConeArithVar.horizontal x,
+    ?_
+  ⟩
   rw [ringKrullDim_eq x c' hc']
   rw [← hFy, hLeq] at hdy
   generalize (Algebra.trdeg ℤ Fx).toENat = t at hdy ⊢

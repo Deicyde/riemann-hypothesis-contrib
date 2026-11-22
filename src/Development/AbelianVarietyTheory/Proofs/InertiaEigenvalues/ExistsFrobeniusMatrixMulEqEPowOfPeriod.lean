@@ -8,14 +8,17 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.AinfAdi
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 open Matrix
 
 namespace GlobalTheory.BSP.HeightAprime
 
-theorem dvd_of_dvd_prime_pow_mul {R : Type} [CommRing R] [IsDomain R] {p a b : R} (hp : Prime p)
-    (ha : ¬ p ∣ a) : ∀ n : ℕ, a ∣ p ^ n * b → a ∣ b := by
+theorem dvd_of_dvd_prime_pow_mul
+    {R : Type} [CommRing R] [IsDomain R] {p a b : R} (hp : Prime p) (ha : ¬ p ∣ a)
+    : ∀ n : ℕ, a ∣ p ^ n * b → a ∣ b := by
   intro n
   induction n with
   | zero => simp
@@ -27,32 +30,35 @@ theorem dvd_of_dvd_prime_pow_mul {R : Type} [CommRing R] [IsDomain R] {p a b : R
     refine ih ⟨y, mul_left_cancel₀ hp.ne_zero ?_⟩
     linear_combination hx
 
-theorem C_dvd_iff {R : Type} [CommRing R] (p : R) (f : R⟦X⟧) :
-    C p ∣ f ↔ ∀ n, p ∣ coeff n f := by
+theorem C_dvd_iff {R : Type} [CommRing R] (p : R) (f : R⟦X⟧) : C p ∣ f ↔ ∀ n, p ∣ coeff n f := by
   constructor
   · rintro ⟨g, rfl⟩ n
-    rw [coeff_C_mul]; exact dvd_mul_right _ _
+    rw [coeff_C_mul]
+    exact dvd_mul_right _ _
   · intro h
     refine ⟨mk fun n => (h n).choose, ?_⟩
     ext n
     rw [coeff_C_mul, coeff_mk]
     exact (h n).choose_spec
 
-theorem prime_C {R : Type} [CommRing R] [IsDomain R] {p : R} (hp : Prime p) : Prime (C p : R⟦X⟧) := by
+theorem prime_C {R : Type} [CommRing R] [IsDomain R] {p : R} (hp : Prime p)
+    : Prime (C p : R⟦X⟧) := by
   haveI : (Ideal.span {p}).IsPrime := (Ideal.span_singleton_prime hp.ne_zero).2 hp
   let q : R →+* R ⧸ Ideal.span {p} := Ideal.Quotient.mk _
   have key : ∀ f : R⟦X⟧, C p ∣ f ↔ PowerSeries.map q f = 0 := by
     intro f
     rw [C_dvd_iff]
     constructor
-    · intro h; ext n
+    · intro h
+      ext n
       rw [coeff_map, map_zero]
       exact Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_span_singleton.2 (h n))
     · intro h n
       have := congrArg (coeff n) h
       rw [coeff_map, map_zero] at this
       exact Ideal.mem_span_singleton.1 (Ideal.Quotient.eq_zero_iff_mem.1 this)
-  refine ⟨fun h => hp.ne_zero (by simpa using congrArg (constantCoeff) h), fun h => hp.not_unit ?_, ?_⟩
+  refine
+    ⟨fun h => hp.ne_zero (by simpa using congrArg (constantCoeff) h), fun h => hp.not_unit ?_, ?_⟩
   · simpa using h.map (constantCoeff (R := R))
   · intro f g hfg
     rw [key, key]
@@ -70,19 +76,25 @@ namespace GlobalTheory.BSP.HeightAprime
 
 variable {l : ℕ} [hl : Fact l.Prime]
 
-theorem not_l_dvd_det {K : FinExt l} (bk : BK K) {d : ℕ} (Y : Matrix (Fin d) (Fin d) (Ainf l))
-    (A : Matrix (Fin d) (Fin d) bk.S) (hY : IsUnit (Y.map (inclW l)))
-    (hφ : Y.map WittVector.frobenius = Y * A.map bk.ev) : ¬ (l : bk.S) ∣ A.det := by
+theorem not_l_dvd_det
+    {K : FinExt l} (bk : BK K)
+    {d : ℕ} (Y : Matrix (Fin d) (Fin d) (Ainf l)) (A : Matrix (Fin d) (Fin d) bk.S)
+    (hY : IsUnit (Y.map (inclW l))) (hφ : Y.map WittVector.frobenius = Y * A.map bk.ev)
+    : ¬ (l : bk.S) ∣ A.det := by
   rintro ⟨t, ht⟩
   have h2 : WittVector.frobenius Y.det = Y.det * bk.ev A.det := by
     rw [RingHom.map_det, RingHom.map_det, ← det_mul]
     exact congrArg det hφ
   have h0 := congrArg WittVector.constantCoeff h2
-  rw [ht, map_mul, map_mul, map_mul, map_natCast, map_natCast, CharP.cast_eq_zero, zero_mul, mul_zero] at h0
+  rw [ht, map_mul, map_mul, map_mul, map_natCast, map_natCast, CharP.cast_eq_zero, zero_mul,
+      mul_zero]
+    at h0
   have hc : (WittVector.frobenius Y.det).coeff 0 = Y.det.coeff 0 ^ l :=
     WittVector.coeff_frobenius_charP l _ 0
   have hz : Y.det.coeff 0 = 0 := by
-    have : WittVector.constantCoeff (WittVector.frobenius Y.det) = (WittVector.frobenius Y.det).coeff 0 := rfl
+    have : WittVector.constantCoeff (WittVector.frobenius Y.det)
+        = (WittVector.frobenius Y.det).coeff 0 :=
+      rfl
     rw [this, hc] at h0
     exact pow_eq_zero_iff hl.out.ne_zero |>.1 h0
   have hu : IsUnit (inclW l Y.det) := by
@@ -94,15 +106,25 @@ theorem not_l_dvd_det {K : FinExt l} (bk : BK K) {d : ℕ} (Y : Matrix (Fin d) (
 
 end GlobalTheory.BSP.HeightAprime
 
-theorem GlobalTheory.BSP.HeightAprime.main : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (τ : Ainf l), bk.IsPer τ → ∀ (d : ℕ) (Y S' : Matrix (Fin d) (Fin d) (Ainf l)) (A : Matrix (Fin d) (Fin d) (bk.S)) (k M : ℕ), IsUnit (Y.map (inclW l)) → Y * S' = ((l : Ainf l) ^ k * τ ^ M) • (1 : Matrix (Fin d) (Fin d) (Ainf l)) → Y.map WittVector.frobenius = Y * A.map bk.ev → ∃ (b : ℕ) (A' : Matrix (Fin d) (Fin d) (bk.S)), A * A' = bk.E ^ b • (1 : Matrix (Fin d) (Fin d) (bk.S)) := by
+theorem GlobalTheory.BSP.HeightAprime.main
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (τ : Ainf l),
+      bk.IsPer τ
+        → ∀ (d : ℕ) (Y S' : Matrix (Fin d) (Fin d) (Ainf l)) (A : Matrix (Fin d) (Fin d) (bk.S))
+            (k M : ℕ),
+          IsUnit (Y.map (inclW l))
+            → Y * S' = ((l : Ainf l) ^ k * τ ^ M) • (1 : Matrix (Fin d) (Fin d) (Ainf l))
+            → Y.map WittVector.frobenius = Y * A.map bk.ev
+            → ∃ (b : ℕ) (A' : Matrix (Fin d) (Fin d) (bk.S)),
+              A * A' = bk.E ^ b • (1 : Matrix (Fin d) (Fin d) (bk.S)) := by
   intro l _ K bk τ hτ d Y S' A k M hY hYS hφ
   have h1 : Y.det * S'.det = ((l : Ainf l) ^ k * τ ^ M) ^ d := by
     rw [← det_mul, hYS, det_smul, det_one, mul_one, Fintype.card_fin]
   have h2 : WittVector.frobenius Y.det = Y.det * bk.ev A.det := by
     rw [RingHom.map_det, RingHom.map_det, ← det_mul]
     exact congrArg det hφ
-  have h3 : bk.ev A.det * (Y.det * WittVector.frobenius S'.det) =
-      bk.ev ((l : bk.S) ^ (k * d) * bk.E ^ (M * d)) * τ ^ (M * d) := by
+  have h3
+      : bk.ev A.det * (Y.det * WittVector.frobenius S'.det)
+        = bk.ev ((l : bk.S) ^ (k * d) * bk.E ^ (M * d)) * τ ^ (M * d) := by
     have := congrArg WittVector.frobenius h1
     rw [map_mul, h2, map_pow, map_mul, map_pow, map_pow, map_natCast, hτ.1] at this
     rw [map_mul, map_pow, map_pow, map_natCast, pow_mul, pow_mul, pow_mul]
@@ -124,7 +146,9 @@ theorem GlobalTheory.BSP.HeightAprime.main : ∀ (l : ℕ) [Fact l.Prime] (K : F
     have e : c * (l : bk.S) ^ r = (l : bk.S) ^ (k * d + r) * bk.E ^ (M * d) := by
       simp only [c]; ring
     rwa [e] at hdvd
-  obtain ⟨q, hq⟩ := GlobalTheory.BSP.HeightAprime.dvd_of_dvd_prime_pow_mul (GlobalTheory.BSP.HeightAprime.prime_l bk.a)
-    (GlobalTheory.BSP.HeightAprime.not_l_dvd_det bk Y A hY hφ) _ hdvd'
+  obtain ⟨q, hq⟩ :=
+    GlobalTheory.BSP.HeightAprime.dvd_of_dvd_prime_pow_mul
+      (GlobalTheory.BSP.HeightAprime.prime_l bk.a)
+      (GlobalTheory.BSP.HeightAprime.not_l_dvd_det bk Y A hY hφ) _ hdvd'
   refine ⟨M * d, q • A.adjugate, ?_⟩
   rw [Matrix.mul_smul, mul_adjugate, smul_smul, mul_comm q, ← hq]

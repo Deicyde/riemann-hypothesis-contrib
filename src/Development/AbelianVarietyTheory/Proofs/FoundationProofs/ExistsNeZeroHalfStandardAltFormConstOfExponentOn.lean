@@ -14,10 +14,15 @@ section General
 
 variable {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
 
-theorem pow_succ_dvd_bilin_of_const_on_cosets (h2 : IsUnit (2 : R)) (r : R)
-    (B : LinearMap.BilinForm R M) (hB : ∀ x y, B x y = B y x) (T : Set M)
-    (hT : ∀ x, ∃ t ∈ T, ∃ a, x = t + r • a) (c : R) (hc : ∀ t ∈ T, B t t = c) (i : ℕ)
-    (hi : ∀ x y, r ^ i ∣ B x y) (x y : M) : r ^ (i + 1) ∣ B x y := by
+theorem pow_succ_dvd_bilin_of_const_on_cosets
+    (h2 : IsUnit (2 : R))
+    (r : R)
+    (B : LinearMap.BilinForm R M) (hB : ∀ x y, B x y = B y x)
+    (T : Set M) (hT : ∀ x, ∃ t ∈ T, ∃ a, x = t + r • a)
+    (c : R) (hc : ∀ t ∈ T, B t t = c)
+    (i : ℕ) (hi : ∀ x y, r ^ i ∣ B x y)
+    (x y : M)
+    : r ^ (i + 1) ∣ B x y := by
   have h1 : ∀ z, r ^ (i + 1) ∣ B z z - c := by
     intro z
     obtain ⟨t, ht, a, rfl⟩ := hT z
@@ -34,9 +39,13 @@ theorem pow_succ_dvd_bilin_of_const_on_cosets (h2 : IsUnit (2 : R)) (r : R)
     ring
   exact h2.dvd_mul_left.1 (h4 ▸ ((h3 _).sub (h3 _)).sub (h3 _))
 
-theorem bilin_eq_zero_of_const_on_cosets (h2 : IsUnit (2 : R)) {r : R} (hr : IsNilpotent r)
-    (B : LinearMap.BilinForm R M) (hB : ∀ x y, B x y = B y x) (T : Set M)
-    (hT : ∀ x, ∃ t ∈ T, ∃ a, x = t + r • a) (c : R) (hc : ∀ t ∈ T, B t t = c) : B = 0 := by
+theorem bilin_eq_zero_of_const_on_cosets
+    (h2 : IsUnit (2 : R))
+    {r : R} (hr : IsNilpotent r)
+    (B : LinearMap.BilinForm R M) (hB : ∀ x y, B x y = B y x)
+    (T : Set M) (hT : ∀ x, ∃ t ∈ T, ∃ a, x = t + r • a)
+    (c : R) (hc : ∀ t ∈ T, B t t = c)
+    : B = 0 := by
   have h : ∀ (i : ℕ) (x y : M), r ^ i ∣ B x y := by
     intro i
     induction i with
@@ -46,11 +55,15 @@ theorem bilin_eq_zero_of_const_on_cosets (h2 : IsUnit (2 : R)) {r : R} (hr : IsN
   ext x y
   simpa [hk] using h k x y
 
-theorem end_eq_zero_of_quad_const_on_cosets (h2 : IsUnit (2 : R)) {r : R} (hr : IsNilpotent r)
-    (ω : LinearMap.BilinForm R M) (hω : Injective ω) (S : M →ₗ[R] M)
-    (hS : ∀ x y, ω (S x) y = ω (S y) x) (u : Rˣ) (q : M → R)
-    (hq : ∀ x, 2 * q x = u * ω (S x) x) (T : Set M)
-    (hT : ∀ x, ∃ t ∈ T, ∃ a, x = t + r • a) (c : R) (hc : ∀ t ∈ T, q t = c) : S = 0 := by
+theorem end_eq_zero_of_quad_const_on_cosets
+    (h2 : IsUnit (2 : R))
+    {r : R} (hr : IsNilpotent r)
+    (ω : LinearMap.BilinForm R M) (hω : Injective ω)
+    (S : M →ₗ[R] M) (hS : ∀ x y, ω (S x) y = ω (S y) x)
+    (u : Rˣ) (q : M → R) (hq : ∀ x, 2 * q x = u * ω (S x) x)
+    (T : Set M) (hT : ∀ x, ∃ t ∈ T, ∃ a, x = t + r • a)
+    (c : R) (hc : ∀ t ∈ T, q t = c)
+    : S = 0 := by
   have h : (ω ∘ₗ S : LinearMap.BilinForm R M) = 0 := by
     refine bilin_eq_zero_of_const_on_cosets h2 hr (ω ∘ₗ S) hS T hT (↑u⁻¹ * (2 * c)) fun t ht => ?_
     rw [← hc t ht, hq, Units.inv_mul_cancel_left]
@@ -68,16 +81,18 @@ theorem isUnit_two_zmod_pow (hn : Odd n) (k : ℕ) : IsUnit (2 : ZMod (n ^ k)) :
   have h : Nat.Coprime 2 (n ^ k) := (Nat.coprime_two_left.2 hn).pow_right k
   simpa using (ZMod.isUnit_iff_coprime 2 (n ^ k)).2 h
 
-theorem exists_eq_nsmul_of_nsmul_eq_zero_zmod (hn : n ≠ 0) (hk : 2 ≤ k) (x : ZMod (n ^ k))
-    (hx : n • x = 0) : ∃ a, x = n • a := by
+theorem exists_eq_nsmul_of_nsmul_eq_zero_zmod
+    (hn : n ≠ 0) (hk : 2 ≤ k) (x : ZMod (n ^ k)) (hx : n • x = 0)
+    : ∃ a, x = n • a := by
   obtain ⟨z, rfl⟩ := ZMod.intCast_surjective x
   obtain ⟨j, rfl⟩ := Nat.exists_eq_add_of_le' hk
-  have h1 : (((n : ℤ) * z : ℤ) : ZMod (n ^ (j + 2))) = 0 := by
-    rw [← hx]; simp
+  have h1 : (((n : ℤ) * z : ℤ) : ZMod (n ^ (j + 2))) = 0 := by rw [← hx]; simp
   obtain ⟨w, hw⟩ := (ZMod.intCast_zmod_eq_zero_iff_dvd _ _).1 h1
   have h2 : z = n * ((n : ℤ) ^ j * w) := by
     apply mul_left_cancel₀ (Int.natCast_ne_zero.2 hn)
-    rw [hw]; push_cast; ring
+    rw [hw]
+    push_cast
+    ring
   exact ⟨(((n : ℤ) ^ j * w : ℤ) : ZMod (n ^ (j + 2))), by rw [h2]; simp⟩
 
 end ZMod
@@ -86,9 +101,10 @@ section LevelForm
 
 open ReciprocityTheory.ChartRestriction.G.Out
 
-theorem injective_toBilin'_stdSymp {R : Type*} [CommRing R] (g : ℕ) :
-    Injective (Matrix.toBilin' (Matrix.of fun i j => ((stdSymp g i j : ℤ) : R))) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+theorem injective_toBilin'_stdSymp {R : Type*} [CommRing R] (g : ℕ)
+    : Injective (Matrix.toBilin' (Matrix.of fun i j => ((stdSymp g i j : ℤ) : R))) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro x hx
   funext i
   have key : ∀ j, ∑ l, x l * ((stdSymp g l j : ℤ) : R) = 0 := fun j => by

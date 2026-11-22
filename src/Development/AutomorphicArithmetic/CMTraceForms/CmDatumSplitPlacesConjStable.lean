@@ -6,9 +6,11 @@ public import Development.AutomorphicArithmetic.CMTraceForms.Places
 @[expose] public section
 
 open NumberField TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs Formalism.L2.Pj UpperTheory.Depth
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs Formalism.L2.Pj UpperTheory.Depth
 
-private theorem bar_rt' {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E) : H.bar H.rt = -H.rt := by
+private theorem bar_rt' {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E)
+    : H.bar H.rt = -H.rt := by
   have h1 : (H.bar H.rt) ^ 2 = H.rt ^ 2 := by rw [← map_pow, H.rt_sq]; simp
   rcases sq_eq_sq_iff_eq_or_eq_neg.1 h1 with h | h
   · exfalso
@@ -26,16 +28,22 @@ private theorem bar_rt' {E : Type} [Field E] [NumberField E] [IsCMField E] (H : 
     nlinarith [mul_self_nonneg (φ (H.rt : E)).re]
   · exact h
 
-private theorem host_bar_w0_eq_one_sub_w0 {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E) :
-    H.bar H.w0 = 1 - H.w0 := by
+private theorem host_bar_w0_eq_one_sub_w0
+    {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E)
+    : H.bar H.w0 = 1 - H.w0 := by
   have h := congrArg H.bar H.two_weight_eq_one_add_root
   rw [map_mul, map_add (f := _), map_one, bar_rt', map_ofNat] at h
-  have h2 : (2 : 𝓞 E) * H.bar H.w0 = 2 * (1 - H.w0) := by linear_combination h + H.two_weight_eq_one_add_root
+  have h2 : (2 : 𝓞 E) * H.bar H.w0 = 2 * (1 - H.w0) := by
+    linear_combination h + H.two_weight_eq_one_add_root
   exact mul_left_cancel₀ two_ne_zero h2
 
-private theorem exists_beta {p : ℕ} (hp : p.Prime) {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Host E)
-    (hs : SplitAt H.d p) : ¬ p ∣ H.d ∧ ∃ (β γ : 𝓞 E) (n t : ℕ), H.bar β = γ ∧ H.bar γ = β ∧ γ * β = (n : 𝓞 E) ∧
-      β + γ = (t : 𝓞 E) ∧ p ∣ n ∧ ¬ p ∣ t := by
+private theorem exists_beta
+    {p : ℕ} (hp : p.Prime)
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    (H : Host E) (hs : SplitAt H.d p)
+    : ¬ p ∣ H.d
+      ∧ ∃ (β γ : 𝓞 E) (n t : ℕ),
+        H.bar β = γ ∧ H.bar γ = β ∧ γ * β = (n : 𝓞 E) ∧ β + γ = (t : 𝓞 E) ∧ p ∣ n ∧ ¬ p ∣ t := by
   haveI := Fact.mk hp
   have hdm := H.d_mod
   by_cases hp2 : p = 2
@@ -45,8 +53,7 @@ private theorem exists_beta {p : ℕ} (hp : p.Prime) {E : Type} [Field E] [Numbe
     · rw [host_bar_w0_eq_one_sub_w0, map_sub, map_one, host_bar_w0_eq_one_sub_w0]
       ring
     · have hn4 : 4 * ((H.d + 1) / 4) = H.d + 1 := by omega
-      have hn4' : (4 : 𝓞 E) * (((H.d + 1) / 4 : ℕ) : 𝓞 E) = (H.d : 𝓞 E) + 1 := by
-        exact_mod_cast hn4
+      have hn4' : (4 : 𝓞 E) * (((H.d + 1) / 4 : ℕ) : 𝓞 E) = (H.d : 𝓞 E) + 1 := by exact_mod_cast hn4
       rw [host_bar_w0_eq_one_sub_w0]
       apply mul_left_cancel₀ (show (4 : 𝓞 E) ≠ 0 by norm_num)
       linear_combination (-(2 * H.w0 - 1 + H.rt)) * H.two_weight_eq_one_add_root - H.rt_sq - hn4'
@@ -102,11 +109,22 @@ private theorem exists_beta {p : ℕ} (hp : p.Prime) {E : Type} [Field E] [Numbe
     · push_cast
       ring
 
-theorem UpperTheory.cmDatum_splitPlaces_conj_stable :
-    ∀ (p : ℕ), p.Prime → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E), SplitAt H.d p →
-      ∀ (C : Type) [Field C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C], v.Integers O → ¬ IsUnit (p : O) →
-      (∀ σ : 𝓞 E →+* O, IsUnit (σ H.w0 - σ (H.bar H.w0))) ∧ ∀ x : O, x ≠ 0 → ∃ N : ℕ, v (N : C) < v (algebraMap O C x) ∧
-        ∀ σ : 𝓞 E →+* O, ∃ a : 𝓞 E, H.bar a * a = (N : 𝓞 E) ∧ v (algebraMap O C (σ a - 1)) < v (algebraMap O C x) := by
+theorem UpperTheory.cmDatum_splitPlaces_conj_stable
+    : ∀ (p : ℕ),
+      p.Prime
+        → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E),
+          SplitAt H.d p
+            → ∀ (C : Type) [Field C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O]
+                [Algebra O C],
+              v.Integers O → ¬ IsUnit (p : O)
+                → (∀ σ : 𝓞 E →+* O, IsUnit (σ H.w0 - σ (H.bar H.w0)))
+                  ∧ ∀ x : O,
+                    x ≠ 0
+                      → ∃ N : ℕ,
+                        v (N : C) < v (algebraMap O C x)
+                          ∧ ∀ σ : 𝓞 E →+* O, ∃ a : 𝓞 E,
+                            H.bar a * a = (N : 𝓞 E)
+                              ∧ v (algebraMap O C (σ a - 1)) < v (algebraMap O C x) := by
   intro p hp E _ _ _ H hs C _ _ v O _ _ hv hpu
   haveI := Fact.mk hp
   obtain ⟨hpd, β, γ, n, t, hβ, hγ, hn, ht, hpn, hpt⟩ := exists_beta hp H hs
@@ -144,8 +162,10 @@ theorem UpperTheory.cmDatum_splitPlaces_conj_stable :
   have vn : v (n : C) ≤ v (p : C) := by
     have h := hv.le_of_dvd (Nat.cast_dvd_cast hpn : (p : O) ∣ (n : O))
     simpa only [map_natCast] using h
-  have key : ∀ (b g : O), b * g = (n : O) → b + g = (t : O) → v (algebraMap O C b) = 1 →
-      ∀ k : ℕ, (p : O) ^ (k + 1) ∣ b ^ ((p - 1) * p ^ k) - 1 := by
+  have key
+      : ∀ (b g : O),
+        b * g = (n : O) → b + g = (t : O) → v (algebraMap O C b) = 1
+          → ∀ k : ℕ, (p : O) ^ (k + 1) ∣ b ^ ((p - 1) * p ^ k) - 1 := by
     intro b g hbg hbgt hb k
     have hvn : v (algebraMap O C g) = v (n : C) := by
       rw [← map_natCast (algebraMap O C) n, ← hbg, map_mul, map_mul, hb, one_mul]
@@ -159,8 +179,7 @@ theorem UpperTheory.cmDatum_splitPlaces_conj_stable :
         ring
       rw [h]
       exact (dvd_neg).mpr hpg
-    have h1 : (p : O) ∣ b ^ (p - 1) - (t : O) ^ (p - 1) :=
-      dvd_trans hpb (sub_dvd_pow_sub_pow _ _ _)
+    have h1 : (p : O) ∣ b ^ (p - 1) - (t : O) ^ (p - 1) := dvd_trans hpb (sub_dvd_pow_sub_pow _ _ _)
     have h2 := dvd_sub_pow_of_dvd_sub h1 k
     rw [← pow_mul, ← pow_mul] at h2
     have hcop : Nat.Coprime t (p ^ (k + 1)) :=
@@ -170,8 +189,11 @@ theorem UpperTheory.cmDatum_splitPlaces_conj_stable :
     have h4 := map_dvd (Int.castRingHom O) h3.symm.dvd
     push_cast [eq_intCast] at h4
     rw [mul_comm (p ^ k)] at h4
-    have h5 : b ^ ((p - 1) * p ^ k) - 1 = (b ^ ((p - 1) * p ^ k) - (t : O) ^ ((p - 1) * p ^ k)) +
-        ((t : O) ^ ((p - 1) * p ^ k) - 1) := by ring
+    have h5
+        : b ^ ((p - 1) * p ^ k) - 1
+          = (b ^ ((p - 1) * p ^ k) - (t : O) ^ ((p - 1) * p ^ k))
+            + ((t : O) ^ ((p - 1) * p ^ k) - 1) := by
+      ring
     rw [h5]
     exact dvd_add h2 h4
   refine ⟨?_, ?_⟩
@@ -182,8 +204,7 @@ theorem UpperTheory.cmDatum_splitPlaces_conj_stable :
       linear_combination H.two_weight_eq_one_add_root
     rw [hw]
     have hdu : IsUnit (H.d : O) := hv.isUnit_of_one' (by rw [map_natCast]; exact vcop _ hpd)
-    have hsq : σ H.rt ^ 2 = -(H.d : O) := by
-      rw [← map_pow, H.rt_sq, map_neg, map_natCast]
+    have hsq : σ H.rt ^ 2 = -(H.d : O) := by rw [← map_pow, H.rt_sq, map_neg, map_natCast]
     have hu : IsUnit (σ H.rt ^ 2) := by
       rw [hsq]
       exact hdu.neg
@@ -198,20 +219,22 @@ theorem UpperTheory.cmDatum_splitPlaces_conj_stable :
         omega
       nlinarith
     refine ⟨n ^ ((p - 1) * p ^ k), ?_, ?_⟩
-    · calc v (((n ^ ((p - 1) * p ^ k) : ℕ)) : C) = v (n : C) ^ ((p - 1) * p ^ k) := by
-            rw [Nat.cast_pow, map_pow]
+    · calc
+        v (((n ^ ((p - 1) * p ^ k) : ℕ)) : C)
+          = v (n : C) ^ ((p - 1) * p ^ k) := by rw [Nat.cast_pow, map_pow]
         _ ≤ v (p : C) ^ ((p - 1) * p ^ k) := pow_le_pow_left₀ (by positivity) vn _
         _ ≤ v (p : C) ^ k := pow_le_pow_of_le_one (by positivity) vp.le (by omega)
         _ < _ := hk
     · intro σ
-      have hbg : σ β * σ γ = (n : O) := by
-        rw [← map_mul, mul_comm β γ, hn, map_natCast]
-      have hsum : σ β + σ γ = (t : O) := by
-        rw [← map_add (f := _), ht, map_natCast]
-      have close : ∀ b : O, (p : O) ^ (k + 1) ∣ b ^ ((p - 1) * p ^ k) - 1 →
-          v (algebraMap O C (b ^ ((p - 1) * p ^ k) - 1)) < v (algebraMap O C x) := by
+      have hbg : σ β * σ γ = (n : O) := by rw [← map_mul, mul_comm β γ, hn, map_natCast]
+      have hsum : σ β + σ γ = (t : O) := by rw [← map_add (f := _), ht, map_natCast]
+      have close
+          : ∀ b : O,
+            (p : O) ^ (k + 1) ∣ b ^ ((p - 1) * p ^ k) - 1
+              → v (algebraMap O C (b ^ ((p - 1) * p ^ k) - 1)) < v (algebraMap O C x) := by
         intro b hb
-        calc v (algebraMap O C (b ^ ((p - 1) * p ^ k) - 1))
+        calc
+          v (algebraMap O C (b ^ ((p - 1) * p ^ k) - 1))
             ≤ v (algebraMap O C ((p : O) ^ (k + 1))) := hv.le_of_dvd hb
           _ = v (p : C) ^ (k + 1) := by rw [map_pow, map_natCast, map_pow]
           _ ≤ v (p : C) ^ k := pow_le_pow_of_le_one (by positivity) vp.le (by omega)

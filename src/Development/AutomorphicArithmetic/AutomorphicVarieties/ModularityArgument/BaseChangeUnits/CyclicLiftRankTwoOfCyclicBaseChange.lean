@@ -484,8 +484,9 @@ open UpperTheory.V.Af UpperTheory.V.Published UpperTheory.V.HV UpperTheory.V.Lit
 
 theorem cyclicLiftRankTwo_of_cyclic_base_change (h : CycC) : CyclicBaseChangeLiftRankTwo := by
   intro F E _ _ hF _ _ hE _ _ hp π hr
-  rcases (h F E hp hF 2 one_le_two).1 _ _ (Or.inl ⟨hF, π, rfl, rfl⟩)
-    (fun τ => ⟨_, GlobalTheory.CuspRep.ParLaws.hasInfChar_infChar (GlobalTheory.CuspRep.CG.mk π) τ, hr τ⟩) with h1 | ⟨sat', inf', hc, hw, hi⟩
+  rcases (h F E hp hF 2 one_le_two).1 _ _ (Or.inl ⟨hF, π, rfl, rfl⟩) (fun τ =>
+      ⟨_, GlobalTheory.CuspRep.ParLaws.hasInfChar_infChar (GlobalTheory.CuspRep.CG.mk π) τ, hr τ⟩)
+    with h1 | ⟨sat', inf', hc, hw, hi⟩
   · exact Or.inl h1
   · rcases hc with ⟨_, P, rfl, rfl⟩ | ⟨hR, -⟩
     · exact Or.inr ⟨P, hi, hw⟩

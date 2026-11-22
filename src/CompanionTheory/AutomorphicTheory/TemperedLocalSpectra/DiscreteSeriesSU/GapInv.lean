@@ -12,8 +12,10 @@ public import Formalism.SharpRestriction.CuspSpanNormBounds.HCFiniteKMultiplicit
 namespace CompanionTheory.DiscreteSeriesGap.GapInv
 
 theorem dsUnique_dec : GlobalTheory.Dec.DSUnique :=
-  GlobalTheory.Published.discreteSeriesUpqUnique_iff.1 GlobalTheory.CompanionTheory.Front.discreteSeriesUpqUnique
+  GlobalTheory.Published.discreteSeriesUpqUnique_iff.1
+    GlobalTheory.CompanionTheory.Front.discreteSeriesUpqUnique
 
-theorem lowKMultOne_dec : GlobalTheory.Dec.LowKMultOne := CompanionTheory.D.LK.low_K_type_multiplicity_one
+theorem lowKMultOne_dec : GlobalTheory.Dec.LowKMultOne :=
+  CompanionTheory.D.LK.low_K_type_multiplicity_one
 
 end CompanionTheory.DiscreteSeriesGap.GapInv

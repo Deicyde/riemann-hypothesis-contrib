@@ -22,7 +22,9 @@ open Formalism.BasicNotions Formalism.IndefR.Links IsDedekindDomain NumberField 
 open scoped Pointwise nonZeroDivisors
 open Formalism.L2.Host (HChar embTau)
 open GlobalTheory.ChiGrid GlobalTheory.LeafRestExamples
-open Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum GlobalTheory.FunObj GlobalTheory.FunObj.SqNum
+open Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric
+  Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum GlobalTheory.FunObj
+  GlobalTheory.FunObj.SqNum
 
 noncomputable section
 
@@ -32,15 +34,15 @@ variable (D : D7)
 
 theorem star_eq_conj' (x : D.host.E) : (letI := D.host.cmStar; star x) = D.host.conj x := by
   have := D.host.isCMField_hostE
-  exact D.host.φ₀.injective ((NumberField.IsCMField.complexEmbedding_complexConj _ D.host.φ₀ x).trans
-    (D.host.conjE_apply D.host.φ₀ x).symm)
+  exact D.host.φ₀.injective
+    ((NumberField.IsCMField.complexEmbedding_complexConj _ D.host.φ₀ x).trans
+      (D.host.conjE_apply D.host.φ₀ x).symm)
 
 theorem conj_conj' (x : D.host.E) : D.host.conj (D.host.conj x) = x := by
   letI := D.host.cmStar
   rw [← star_eq_conj', ← star_eq_conj', star_star]
 
-theorem conj_mul_conj : D.host.conj * D.host.conj = 1 :=
-  AlgEquiv.ext fun x => conj_conj' D x
+theorem conj_mul_conj : D.host.conj * D.host.conj = 1 := AlgEquiv.ext fun x => conj_conj' D x
 
 theorem conj_smul_conj_smul (I : Ideal (𝓞 D.host.E)) : D.host.conj • D.host.conj • I = I := by
   rw [smul_smul, conj_mul_conj, one_smul]
@@ -54,17 +56,26 @@ theorem smul_ne_bot (g : Gal(D.host.E/ℚ)) {I : Ideal (𝓞 D.host.E)} (h : I �
   rw [e, Ideal.mem_bot, smul_eq_zero_iff_eq] at this
   exact hj0 this
 
-theorem coe_ne_zero {I : Ideal (𝓞 D.host.E)} (h : I ≠ ⊥) : (I : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) ≠ 0 := by
+theorem coe_ne_zero {I : Ideal (𝓞 D.host.E)} (h : I ≠ ⊥)
+    : (I : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) ≠ 0 := by
   rwa [Ne, FractionalIdeal.coeIdeal_eq_zero]
 
-theorem map_mem_div (g : Gal(D.host.E/ℚ)) {I J : Ideal (𝓞 D.host.E)} (hJ : J ≠ ⊥) {x : D.host.E}
-    (hx : x ∈ (I : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) / (J : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E)) : g x ∈ ((g • I : Ideal (𝓞 D.host.E)) : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) / ((g • J : Ideal (𝓞 D.host.E)) : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) := by
+theorem map_mem_div
+    (g : Gal(D.host.E/ℚ))
+    {I J : Ideal (𝓞 D.host.E)} (hJ : J ≠ ⊥)
+    {x : D.host.E}
+    (hx : x
+      ∈ (I : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) / (J : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E))
+    : g x
+      ∈ ((g • I : Ideal (𝓞 D.host.E)) : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E)
+        / ((g • J : Ideal (𝓞 D.host.E)) : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) := by
   rw [FractionalIdeal.mem_div_iff_of_ne_zero (coe_ne_zero hJ)] at hx
   rw [FractionalIdeal.mem_div_iff_of_ne_zero (coe_ne_zero (smul_ne_bot g hJ))]
   intro c hc
   obtain ⟨c', hc', rfl⟩ := (FractionalIdeal.mem_coeIdeal _).1 hc
   have h1 : g⁻¹ • c' ∈ J := Ideal.mem_pointwise_smul_iff_inv_smul_mem.1 hc'
-  obtain ⟨i, hi, e⟩ := (FractionalIdeal.mem_coeIdeal _).1 (hx _ ((FractionalIdeal.mem_coeIdeal _).2 ⟨_, h1, rfl⟩))
+  obtain ⟨i, hi, e⟩ :=
+    (FractionalIdeal.mem_coeIdeal _).1 (hx _ ((FractionalIdeal.mem_coeIdeal _).2 ⟨_, h1, rfl⟩))
   refine (FractionalIdeal.mem_coeIdeal _).2 ⟨g • i, Ideal.smul_mem_pointwise_smul g i I hi, ?_⟩
   have e' : ((i : 𝓞 D.host.E) : D.host.E) = x * ((g⁻¹ • c' : 𝓞 D.host.E) : D.host.E) := e
   show ((g • i : 𝓞 D.host.E) : D.host.E) = g x * (c' : D.host.E)
@@ -78,36 +89,73 @@ namespace GlobalTheory.SkewLatSD
 
 variable {D : D7}
 
-theorem mem_skewLat_iff {𝔪 : Ideal (𝓞 D.host.E)} {N : ℕ} (y : Fin N → D.host.E) :
-    y ∈ GlobalTheory.FunObj.SqNum.skewLat D 𝔪 N ↔ ∀ i, y i ∈ (𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) / ((D.host.conj • 𝔪 : Ideal (𝓞 D.host.E)) : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) := by
+theorem mem_skewLat_iff {𝔪 : Ideal (𝓞 D.host.E)} {N : ℕ} (y : Fin N → D.host.E)
+    : y ∈ GlobalTheory.FunObj.SqNum.skewLat D 𝔪 N
+      ↔ ∀ i,
+        y i
+          ∈ (𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E)
+            / ((D.host.conj • 𝔪 : Ideal (𝓞 D.host.E))
+              : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) := by
   simp only [GlobalTheory.FunObj.SqNum.skewLat, Submodule.mem_pi, Set.mem_univ, true_implies]
   rfl
 
-theorem skewLat_sd : ∀ (D : D7) (𝔪 : Ideal (𝓞 D.host.E)) (N : ℕ), 𝔪 ≠ ⊥ → SD D (GlobalTheory.FunObj.SqNum.skewLat D 𝔪 N) := by
+theorem skewLat_sd
+    : ∀ (D : D7) (𝔪 : Ideal (𝓞 D.host.E)) (N : ℕ),
+      𝔪 ≠ ⊥ → SD D (GlobalTheory.FunObj.SqNum.skewLat D 𝔪 N) := by
   intro D 𝔪 N h𝔪
   letI := D.host.cmStar
   set σ := D.host.conj
   set 𝔫 : Ideal (𝓞 D.host.E) := σ • 𝔪 with h𝔫
   have h𝔫0 : 𝔫 ≠ ⊥ := smul_ne_bot σ h𝔪
-  have hA0 : (𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) / (𝔫 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) ≠ 0 := div_ne_zero (coe_ne_zero h𝔪) (coe_ne_zero h𝔫0)
-  have hB0 : (𝔫 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) / (𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) ≠ 0 := div_ne_zero (coe_ne_zero h𝔫0) (coe_ne_zero h𝔪)
-  have hBA : (𝔫 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) / (𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) * ((𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) / (𝔫 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E)) = 1 := by
-    rw [div_mul_div_comm, mul_comm (𝔫 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E), div_self (mul_ne_zero (coe_ne_zero h𝔪) (coe_ne_zero h𝔫0))]
+  have hA0
+      : (𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) / (𝔫 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E)
+        ≠ 0 :=
+    div_ne_zero (coe_ne_zero h𝔪) (coe_ne_zero h𝔫0)
+  have hB0
+      : (𝔫 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) / (𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E)
+        ≠ 0 :=
+    div_ne_zero (coe_ne_zero h𝔫0) (coe_ne_zero h𝔪)
+  have hBA
+      : (𝔫 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) / (𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E)
+          * ((𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E)
+            / (𝔫 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E))
+        = 1 := by
+    rw [div_mul_div_comm, mul_comm (𝔫 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E),
+      div_self (mul_ne_zero (coe_ne_zero h𝔪) (coe_ne_zero h𝔫0))]
   have hσ𝔫 : σ • 𝔫 = 𝔪 := conj_smul_conj_smul D 𝔪
 
-  have toB : ∀ x ∈ (𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) / (𝔫 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E), σ x ∈ (𝔫 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) / (𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) := fun x hx => by
+  have toB
+      : ∀ x
+          ∈ (𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E)
+            / (𝔫 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E),
+        σ x
+          ∈ (𝔫 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E)
+            / (𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) := fun x hx => by
     simpa only [← h𝔫, hσ𝔫] using (map_mem_div σ h𝔫0 hx)
-  have toA : ∀ x ∈ (𝔫 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) / (𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E), σ x ∈ (𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) / (𝔫 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) := fun x hx => by
+  have toA
+      : ∀ x
+          ∈ (𝔫 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E)
+            / (𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E),
+        σ x
+          ∈ (𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E)
+            / (𝔫 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) := fun x hx => by
     simpa only [← h𝔫, hσ𝔫] using (map_mem_div σ h𝔪 hx)
   have hmem := fun y => mem_skewLat_iff (D := D) (𝔪 := 𝔪) (N := N) y
   refine ⟨?_, ?_, ?_⟩
   · unfold GlobalTheory.FunObj.SqNum.skewLat
     rw [← Submodule.iSup_map_single]
     exact Submodule.fg_iSup _ fun i => (FractionalIdeal.fg_of_isNoetherianRing le_rfl _).map _
-  · obtain ⟨a, ha, ha0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot
-      (show (((𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) / (𝔫 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) : Submodule (𝓞 D.host.E) D.host.E) ≠ ⊥ from fun e =>
+  · obtain ⟨a, ha, ha0⟩ :=
+      Submodule.exists_mem_ne_zero_of_ne_bot (show (((𝔪 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E)
+                / (𝔫 : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E)
+              : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E)
+            : Submodule (𝓞 D.host.E) D.host.E)
+          ≠ ⊥ from fun e =>
         hA0 (FractionalIdeal.coeToSubmodule_injective (e.trans FractionalIdeal.coe_zero.symm)))
-    have hs : ∀ i, (Pi.single i a : Fin N → D.host.E) ∈ GlobalTheory.FunObj.SqNum.skewLat D 𝔪 N := fun i => by
+    have hs
+        : ∀ i,
+          (Pi.single i a : Fin N → D.host.E)
+            ∈ GlobalTheory.FunObj.SqNum.skewLat D 𝔪 N := fun i => by
       rw [hmem]
       intro j
       by_cases hj : j = i
@@ -137,7 +185,8 @@ theorem skewLat_sd : ∀ (D : D7) (𝔪 : Ideal (𝓞 D.host.E)) (N : ℕ), 𝔪
       rw [← one_div_div, FractionalIdeal.mem_div_iff_of_ne_zero hB0]
       intro b hb
       have ha := toA b hb
-      have hx : (Pi.single i (σ b) : Fin N → D.host.E) ∈ GlobalTheory.FunObj.SqNum.skewLat D 𝔪 N := by
+      have hx
+          : (Pi.single i (σ b) : Fin N → D.host.E) ∈ GlobalTheory.FunObj.SqNum.skewLat D 𝔪 N := by
         rw [hmem]
         intro j
         by_cases hj : j = i
@@ -145,8 +194,10 @@ theorem skewLat_sd : ∀ (D : D7) (𝔪 : Ideal (𝓞 D.host.E)) (N : ℕ), 𝔪
         · rw [Pi.single_eq_of_ne hj]; exact FractionalIdeal.zero_mem _
       have := h _ hx
       unfold Formalism.BasicNotions.stdH at this
-      rw [Finset.sum_eq_single i (fun j _ hj => by simp [Pi.single_eq_of_ne hj])
-        (fun hi => absurd (Finset.mem_univ i) hi)] at this
+      rw [Finset.sum_eq_single i
+          (fun j _ hj => by simp [Pi.single_eq_of_ne hj])
+          (fun hi => absurd (Finset.mem_univ i) hi)]
+        at this
       rw [Pi.single_eq_same, star_eq_conj', conj_conj'] at this
       obtain ⟨r, hr⟩ := this
       rw [FractionalIdeal.mem_one_iff]

@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 noncomputable section
 
-open ValuativeRel Matrix GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.Hi.GlAx
+open ValuativeRel Matrix GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.Hi.GlAx
 
 namespace UpperTheory.V.Z.Desc.V0
 
@@ -18,11 +19,15 @@ section Avg
 
 variable {G W : Type} [Group G] [AddCommGroup W] [Module ℂ W]
 
-private theorem avg (ρ : Representation ℂ G W) (A B : Subgroup G) (hfin : B.relIndex A ≠ 0) (χ : G → ℂ)
-    (hm : ∀ a ∈ A, ∀ b ∈ A, χ (a * b) = χ a * χ b) (h0 : ∀ a ∈ A, χ a ≠ 0) (hB : ∀ b ∈ A, b ∈ B → χ b = 1)
-    (w : W) (hw : ∀ b ∈ B, ρ b w = w) (l : W →ₗ[ℂ] ℂ) (hl : ∀ a ∈ A, l (ρ a w) = χ a * l w)
-    (P : Submodule ℂ W) (hP : ∀ a ∈ A, ρ a w ∈ P) :
-    ∃ w' ∈ P, (∀ a ∈ A, ρ a w' = χ a • w') ∧ l w' = (B.relIndex A : ℂ) * l w := by
+private theorem avg
+    (ρ : Representation ℂ G W)
+    (A B : Subgroup G) (hfin : B.relIndex A ≠ 0)
+    (χ : G → ℂ) (hm : ∀ a ∈ A, ∀ b ∈ A, χ (a * b) = χ a * χ b) (h0 : ∀ a ∈ A, χ a ≠ 0)
+    (hB : ∀ b ∈ A, b ∈ B → χ b = 1)
+    (w : W) (hw : ∀ b ∈ B, ρ b w = w)
+    (l : W →ₗ[ℂ] ℂ) (hl : ∀ a ∈ A, l (ρ a w) = χ a * l w)
+    (P : Submodule ℂ W) (hP : ∀ a ∈ A, ρ a w ∈ P)
+    : ∃ w' ∈ P, (∀ a ∈ A, ρ a w' = χ a • w') ∧ l w' = (B.relIndex A : ℂ) * l w := by
   classical
   let C : Subgroup A := B.subgroupOf A
   haveI hfi : C.FiniteIndex := ⟨hfin⟩
@@ -30,7 +35,8 @@ private theorem avg (ρ : Representation ℂ G W) (A B : Subgroup G) (hfin : B.r
   let F : A → W := fun a => (χ a)⁻¹ • ρ a w
   have hF : ∀ x c : A, (c : G) ∈ B → F (x * c) = F x := by
     intro x c hc
-    simp only [F, Subgroup.coe_mul, hm _ x.2 _ c.2, map_mul, Module.End.mul_apply, hw _ hc, hB _ c.2 hc, mul_one]
+    simp only [F, Subgroup.coe_mul, hm _ x.2 _ c.2, map_mul, Module.End.mul_apply, hw _ hc,
+      hB _ c.2 hc, mul_one]
   have hF' : ∀ x y : A, (x : A ⧸ C) = (y : A ⧸ C) → F x = F y := by
     intro x y hxy
     rw [QuotientGroup.eq] at hxy
@@ -40,7 +46,8 @@ private theorem avg (ρ : Representation ℂ G W) (A B : Subgroup G) (hfin : B.r
     intro a ha x
     have h1 := h0 a ha
     have h2 := h0 _ x.2
-    simp only [F, Subgroup.coe_mul, hm _ ha _ x.2, map_mul, Module.End.mul_apply, smul_smul, map_smul]
+    simp only [F, Subgroup.coe_mul, hm _ ha _ x.2, map_mul, Module.End.mul_apply, smul_smul,
+      map_smul]
     congr 1
     field_simp
   refine ⟨∑ q : A ⧸ C, F q.out, ?_, fun a ha => ?_, ?_⟩
@@ -69,11 +76,13 @@ end Avg
 
 section Loc
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.Whittaker GlobalTheory.LocLanglands GlobalTheory.GamMul DiscreteGroups.sglob.LConv in
-private theorem iwasawa (g : GL (Fin n) k) :
-    ∃ u ∈ unipB k (Fin n), ∃ d : Fin n → kˣ, ∃ κ ∈ KO k (Fin n), g = u * diagT k (Fin n) d * κ :=
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.Whittaker GlobalTheory.LocLanglands GlobalTheory.GamMul DiscreteGroups.sglob.LConv in
+private theorem iwasawa (g : GL (Fin n) k)
+    : ∃ u ∈ unipB k (Fin n), ∃ d : Fin n → kˣ, ∃ κ ∈ KO k (Fin n), g = u * diagT k (Fin n) d * κ :=
   exists_unipB_mul_diagT_mul_KO k n g
 
 private theorem val_ord' (x : kˣ) : valuation k (x : k) = uniformizer k ^ ord k x := by
@@ -82,7 +91,8 @@ private theorem val_ord' (x : kˣ) : valuation k (x : k) = uniformizer k ^ ord k
   · exact h
   · exact (zpow_pos unif_pos _).ne'
 
-private theorem Kc_conj' {g x : GL (Fin n) k} (hg : g ∈ KO k (Fin n)) (hx : x ∈ Kc k n 1) : g * x * g⁻¹ ∈ Kc k n 1 := by
+private theorem Kc_conj' {g x : GL (Fin n) k} (hg : g ∈ KO k (Fin n)) (hx : x ∈ Kc k n 1)
+    : g * x * g⁻¹ ∈ Kc k n 1 := by
   obtain ⟨y, rfl⟩ := hg
   obtain ⟨z, hz, rfl⟩ := hx
   exact ⟨y * z * y⁻¹, (MonoidHom.normal_ker _).conj_mem z hz y, by simp⟩
@@ -91,17 +101,23 @@ private theorem locO : IsLocalRing 𝒪[k] := by
   exact inferInstanceAs (IsLocalRing (valuation k).valuationSubring)
 attribute [local instance] locO
 
-private theorem iwahori {g : GL (Fin n) k} (hg : g ∈ Kc k n 1) :
-    ∃ x ∈ unipB k (Fin n), x ∈ Kc k n 1 ∧ ∃ s : Fin n → kˣ, diagT k (Fin n) s ∈ Kc k n 1 ∧
-      ∃ y ∈ (glData k n).Nm 0, g = x * diagT k (Fin n) s * y := by
+private theorem iwahori {g : GL (Fin n) k} (hg : g ∈ Kc k n 1)
+    : ∃ x ∈ unipB k (Fin n),
+      x ∈ Kc k n 1
+        ∧ ∃ s : Fin n → kˣ,
+          diagT k (Fin n) s ∈ Kc k n 1
+            ∧ ∃ y ∈ (glData k n).Nm 0, g = x * diagT k (Fin n) s * y := by
   obtain ⟨g0, hg0, rfl⟩ := hg
   have hI : 𝓂[k] ^ 1 ≤ IsLocalRing.maximalIdeal 𝒪[k] := by simp
   obtain ⟨u, hu, t, lw, hlw, ht1, hl1, hfac⟩ := udl _ hI g0 hg0
-  have hmap : ∀ (h : GL (Fin n) 𝒪[k]) (i j : Fin n),
-      (GeneralLinearGroup.map (algebraMap 𝒪[k] k) h : Matrix (Fin n) (Fin n) k) i j =
-        algebraMap 𝒪[k] k ((h : Matrix (Fin n) (Fin n) 𝒪[k]) i j) := fun h i j => by simp
-  have hdiag : GeneralLinearGroup.map (algebraMap 𝒪[k] k) (diagT 𝒪[k] (Fin n) t) =
-      diagT k (Fin n) (fun i => Units.map (algebraMap 𝒪[k] k).toMonoidHom (t i)) := by
+  have hmap
+      : ∀ (h : GL (Fin n) 𝒪[k]) (i j : Fin n),
+        (GeneralLinearGroup.map (algebraMap 𝒪[k] k) h : Matrix (Fin n) (Fin n) k) i j
+          = algebraMap 𝒪[k] k ((h : Matrix (Fin n) (Fin n) 𝒪[k]) i j) := fun h i j => by
+    simp
+  have hdiag
+      : GeneralLinearGroup.map (algebraMap 𝒪[k] k) (diagT 𝒪[k] (Fin n) t)
+        = diagT k (Fin n) (fun i => Units.map (algebraMap 𝒪[k] k).toMonoidHom (t i)) := by
     ext i j
     simp [val_diagT, Matrix.diagonal_apply]
     split_ifs <;> simp
@@ -112,9 +128,16 @@ private theorem iwahori {g : GL (Fin n) k} (hg : g ∈ Kc k n 1) :
     rw [hu', map_mul, map_mul, map_inv, map_inv, ht1, hl1, hg0]
     simp
   rw [mem_low] at hlw
-  refine ⟨GeneralLinearGroup.map (algebraMap 𝒪[k] k) u, ?_, ⟨u, hu1, rfl⟩,
-    fun i => Units.map (algebraMap 𝒪[k] k).toMonoidHom (t i), ⟨diagT 𝒪[k] (Fin n) t, ht1, hdiag⟩,
-    GeneralLinearGroup.map (algebraMap 𝒪[k] k) lw, ⟨?_, ⟨lw, hl1, rfl⟩⟩, ?_⟩
+  refine ⟨
+    GeneralLinearGroup.map (algebraMap 𝒪[k] k) u,
+    ?_,
+    ⟨u, hu1, rfl⟩,
+    fun i => Units.map (algebraMap 𝒪[k] k).toMonoidHom (t i),
+    ⟨diagT 𝒪[k] (Fin n) t, ht1, hdiag⟩,
+    GeneralLinearGroup.map (algebraMap 𝒪[k] k) lw,
+    ⟨?_, ⟨lw, hl1, rfl⟩⟩,
+    ?_
+  ⟩
   · rw [mem_unipB] at hu ⊢
     refine ⟨fun i j hij => ?_, fun i => ?_⟩
     · rw [hmap, hu.1 i j hij, map_zero]
@@ -124,12 +147,16 @@ private theorem iwahori {g : GL (Fin n) k} (hg : g ∈ Kc k n 1) :
     · rw [hmap, hlw.2 i, map_one]
   · rw [hfac, map_mul, map_mul, hdiag]
 
-private def el (a b : Fin n) (h : a ≠ b) (y : k) : GL (Fin n) k :=
-  ⟨transvection a b y, transvection a b (-y),
-    by rw [transvection_mul_transvection_same _ _ h]; simp, by rw [transvection_mul_transvection_same _ _ h]; simp⟩
+private def el (a b : Fin n) (h : a ≠ b) (y : k) : GL (Fin n) k := ⟨
+  transvection a b y,
+  transvection a b (-y),
+  by rw [transvection_mul_transvection_same _ _ h]; simp,
+  by rw [transvection_mul_transvection_same _ _ h]; simp
+⟩
 
-private theorem el_apply (a b : Fin n) (h : a ≠ b) (y : k) (p q : Fin n) :
-    (el a b h y).val p q = (1 : Matrix (Fin n) (Fin n) k) p q + Matrix.single a b y p q := rfl
+private theorem el_apply (a b : Fin n) (h : a ≠ b) (y : k) (p q : Fin n)
+    : (el a b h y).val p q = (1 : Matrix (Fin n) (Fin n) k) p q + Matrix.single a b y p q :=
+  rfl
 
 private theorem el_unip {a b : Fin n} (h : a < b) (y : k) : el a b h.ne y ∈ unipB k (Fin n) := by
   rw [mem_unipB]
@@ -145,8 +172,9 @@ private theorem el_unip {a b : Fin n} (h : a < b) (y : k) : el a b h.ne y ∈ un
       exact absurd h (lt_irrefl _)
     · simp
 
-private theorem el_bd {a b : Fin n} (h : a ≠ b) {y : k} (hy : valuation k y ≤ uniformizer k ^ ((1 : ℕ) : ℤ)) :
-    Bd ((1 : ℕ) : ℤ) (el a b h y) := by
+private theorem el_bd
+    {a b : Fin n} (h : a ≠ b) {y : k} (hy : valuation k y ≤ uniformizer k ^ ((1 : ℕ) : ℤ))
+    : Bd ((1 : ℕ) : ℤ) (el a b h y) := by
   intro i j
   rw [Matrix.sub_apply, el_apply, add_sub_cancel_left, Matrix.single_apply]
   split_ifs
@@ -154,16 +182,19 @@ private theorem el_bd {a b : Fin n} (h : a ≠ b) {y : k} (hy : valuation k y �
   · rw [map_zero]
     exact zero_le'
 
-private theorem el_Kc {a b : Fin n} (h : a ≠ b) {y : k} (hy : valuation k y ≤ uniformizer k ^ ((1 : ℕ) : ℤ)) :
-    el a b h y ∈ Kc k n 1 := by
+private theorem el_Kc
+    {a b : Fin n} (h : a ≠ b) {y : k} (hy : valuation k y ≤ uniformizer k ^ ((1 : ℕ) : ℤ))
+    : el a b h y ∈ Kc k n 1 := by
   have hinv : (el a b h y)⁻¹ = el a b h (-y) := Units.ext rfl
   refine mem_Kc.2 ⟨el_bd h hy, ?_⟩
   rw [hinv]
   exact el_bd h (by rwa [Valuation.map_neg])
 
-private theorem chr_el {a b : Fin n} (hab : (b : ℕ) = a + 1) (h : a ≠ b) (ψ : AddChar k Circle) (t : Fin n → k)
-    (d : Fin n → kˣ) (y : k) :
-    chr ψ t (diagT k (Fin n) d * el a b h y * (diagT k (Fin n) d)⁻¹) = (ψ (t a * ((d a : k) * y * ((d b)⁻¹ : kˣ))) : ℂ) := by
+private theorem chr_el
+    {a b : Fin n} (hab : (b : ℕ) = a + 1) (h : a ≠ b)
+    (ψ : AddChar k Circle) (t : Fin n → k) (d : Fin n → kˣ) (y : k)
+    : chr ψ t (diagT k (Fin n) d * el a b h y * (diagT k (Fin n) d)⁻¹)
+      = (ψ (t a * ((d a : k) * y * ((d b)⁻¹ : kˣ))) : ℂ) := by
   unfold chr
   congr 2
   rw [Finset.sum_eq_single (a, b)]
@@ -171,22 +202,30 @@ private theorem chr_el {a b : Fin n} (hab : (b : ℕ) = a + 1) (h : a ≠ b) (ψ
   · rintro ⟨p, q⟩ hpq hne
     simp only [Finset.mem_filter] at hpq
     have hpq' : p ≠ q := fun e => by subst e; omega
-    have hn : ¬ (a = p ∧ b = q) := fun ⟨e1, e2⟩ => hne (by rw [e1, e2])
+    have hn : ¬(a = p ∧ b = q) := fun ⟨e1, e2⟩ => hne (by rw [e1, e2])
     rw [conj_apply, el_apply, Matrix.one_apply_ne hpq', Matrix.single_apply, if_neg hn]
     simp
   · intro hab'
     exact absurd (Finset.mem_filter.2 ⟨Finset.mem_univ (a, b), hab⟩) hab'
 
-private theorem chr_one {ψ : AddChar k Circle} {t : Fin n → k} (hψ : ∀ x : k, valuation k x < 1 → ψ x = 1)
-    (ht : ∀ i, valuation k (t i) = 1) {x : GL (Fin n) k} (hx : x ∈ Kc k n 1) : chr ψ t x = 1 := by
+private theorem chr_one
+    {ψ : AddChar k Circle} {t : Fin n → k}
+    (hψ : ∀ x : k, valuation k x < 1 → ψ x = 1) (ht : ∀ i, valuation k (t i) = 1)
+    {x : GL (Fin n) k} (hx : x ∈ Kc k n 1)
+    : chr ψ t x = 1 := by
   unfold chr
   have hb := (mem_Kc.1 hx).1
-  have hlt : valuation k (∑ p ∈ Finset.univ.filter (fun p : Fin n × Fin n => (p.2 : ℕ) = p.1 + 1),
-      t p.1 * (x : Matrix (Fin n) (Fin n) k) p.1 p.2) < 1 := by
+  have hlt
+      : valuation k
+          (∑ p ∈ Finset.univ.filter (fun p : Fin n × Fin n => (p.2 : ℕ) = p.1 + 1),
+            t p.1 * (x : Matrix (Fin n) (Fin n) k) p.1 p.2)
+        < 1 := by
     refine Valuation.map_sum_lt _ one_ne_zero fun p hp => ?_
     simp only [Finset.mem_filter] at hp
     have hne : p.1 ≠ p.2 := fun e => by rw [e] at hp; omega
-    have hxe : (x : Matrix (Fin n) (Fin n) k) p.1 p.2 = ((x : Matrix (Fin n) (Fin n) k) - 1) p.1 p.2 := by
+    have hxe
+        : (x : Matrix (Fin n) (Fin n) k) p.1 p.2
+          = ((x : Matrix (Fin n) (Fin n) k) - 1) p.1 p.2 := by
       rw [Matrix.sub_apply, Matrix.one_apply_ne hne, sub_zero]
     rw [map_mul, ht, one_mul, hxe]
     refine lt_of_le_of_lt (hb p.1 p.2) ?_
@@ -194,11 +233,13 @@ private theorem chr_one {ψ : AddChar k Circle} {t : Fin n → k} (hψ : ∀ x :
   rw [hψ _ hlt]
   simp
 
-private theorem dom {ψ : AddChar k Circle} {t : Fin n → k} (hnt : ∃ x : k, valuation k x ≤ 1 ∧ ψ x ≠ 1)
-    (ht : ∀ i, valuation k (t i) = 1) (d : Fin n → kˣ)
-    (H : ∀ x ∈ unipB k (Fin n), x ∈ Kc k n 1 →
-      chr ψ t (diagT k (Fin n) d * x * (diagT k (Fin n) d)⁻¹) = 1) :
-    Antitone fun i => ord k (d i) := by
+private theorem dom
+    {ψ : AddChar k Circle} {t : Fin n → k}
+    (hnt : ∃ x : k, valuation k x ≤ 1 ∧ ψ x ≠ 1) (ht : ∀ i, valuation k (t i) = 1)
+    (d : Fin n → kˣ)
+    (H : ∀ x ∈ unipB k (Fin n),
+      x ∈ Kc k n 1 → chr ψ t (diagT k (Fin n) d * x * (diagT k (Fin n) d)⁻¹) = 1)
+    : Antitone fun i => ord k (d i) := by
   obtain ⟨x0, hx0, hψx0⟩ := hnt
   rcases n with _ | m
   · intro i
@@ -215,8 +256,10 @@ private theorem dom {ψ : AddChar k Circle} {t : Fin n → k} (hnt : ∃ x : k, 
   set y : k := x0 * (d i.succ : k) / (t i.castSucc * (d i.castSucc : k)) with hydef
   have hy : valuation k y ≤ uniformizer k ^ ((1 : ℕ) : ℤ) := by
     have hu : uniformizer k ≠ 0 := unif_pos.ne'
-    rw [hydef, map_div₀, map_mul, map_mul, ht, one_mul, val_ord', val_ord', mul_div_assoc, ← zpow_sub₀ hu]
-    calc valuation k x0 * uniformizer k ^ (ord k (d i.succ) - ord k (d i.castSucc))
+    rw [hydef, map_div₀, map_mul, map_mul, ht, one_mul, val_ord', val_ord', mul_div_assoc,
+      ← zpow_sub₀ hu]
+    calc
+      valuation k x0 * uniformizer k ^ (ord k (d i.succ) - ord k (d i.castSucc))
         ≤ 1 * uniformizer k ^ (ord k (d i.succ) - ord k (d i.castSucc)) := by gcongr
       _ ≤ _ := by
         rw [one_mul]
@@ -231,14 +274,19 @@ private theorem dom {ψ : AddChar k Circle} {t : Fin n → k} (hnt : ∃ x : k, 
 
 end Loc
 
-private theorem isoNe_lemma {k : Type} [Field k] {n : ℕ} (ψ : AddChar k Circle) (t : Fin n → k)
-    {a b : GL (Fin n) k} (ha : a ∈ unipB k (Fin n)) (hb : b ∈ unipB k (Fin n)) :
-    chr ψ t (a * b) = chr ψ t a * chr ψ t b := by
+private theorem isoNe_lemma
+    {k : Type} [Field k]
+    {n : ℕ}
+    (ψ : AddChar k Circle) (t : Fin n → k)
+    {a b : GL (Fin n) k} (ha : a ∈ unipB k (Fin n)) (hb : b ∈ unipB k (Fin n))
+    : chr ψ t (a * b) = chr ψ t a * chr ψ t b := by
   rw [mem_unipB] at ha hb
   unfold chr
-  have key : ∀ p ∈ Finset.univ.filter (fun p : Fin n × Fin n => (p.2 : ℕ) = p.1 + 1),
-      t p.1 * ((a * b : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) p.1 p.2 =
-        t p.1 * (a : Matrix (Fin n) (Fin n) k) p.1 p.2 + t p.1 * (b : Matrix (Fin n) (Fin n) k) p.1 p.2 := by
+  have key
+      : ∀ p ∈ Finset.univ.filter (fun p : Fin n × Fin n => (p.2 : ℕ) = p.1 + 1),
+        t p.1 * ((a * b : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) p.1 p.2
+          = t p.1 * (a : Matrix (Fin n) (Fin n) k) p.1 p.2
+            + t p.1 * (b : Matrix (Fin n) (Fin n) k) p.1 p.2 := by
     rintro ⟨i, j⟩ hp
     simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hp
     have hij : i ≠ j := fun e => by rw [e] at hp; omega
@@ -255,14 +303,19 @@ private theorem isoNe_lemma {k : Type} [Field k] {n : ℕ} (ψ : AddChar k Circl
         rw [hb.1 m j hjm, mul_zero]
   rw [Finset.sum_congr rfl key, Finset.sum_add_distrib, AddChar.map_add_eq_mul, Circle.coe_mul]
 
-private theorem isoNe_lemma_2 {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    {n : ℕ} (d : Fin n → kˣ) (c : ℕ) (hc : ∀ i j : Fin n, 1 ≤ (c : ℤ) + ord k (d j) - ord k (d i))
-    {h : GL (Fin n) k} (hh : Bd (c : ℤ) h) :
-    Bd ((1 : ℕ) : ℤ) (diagT k (Fin n) d⁻¹ * h * (diagT k (Fin n) d⁻¹)⁻¹) := by
+private theorem isoNe_lemma_2
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {n : ℕ} (d : Fin n → kˣ)
+    (c : ℕ) (hc : ∀ i j : Fin n, 1 ≤ (c : ℤ) + ord k (d j) - ord k (d i))
+    {h : GL (Fin n) k} (hh : Bd (c : ℤ) h)
+    : Bd ((1 : ℕ) : ℤ) (diagT k (Fin n) d⁻¹ * h * (diagT k (Fin n) d⁻¹)⁻¹) := by
   intro i j
   have hu : uniformizer k ≠ 0 := unif_pos.ne'
-  have key : ((diagT k (Fin n) d⁻¹ * h * (diagT k (Fin n) d⁻¹)⁻¹ : GL (Fin n) k) - 1 : Matrix (Fin n) (Fin n) k) i j =
-      ((d i : k))⁻¹ * ((h : Matrix (Fin n) (Fin n) k) - 1) i j * (d j : k) := by
+  have key
+      : ((diagT k (Fin n) d⁻¹ * h * (diagT k (Fin n) d⁻¹)⁻¹ : GL (Fin n) k) - 1
+            : Matrix (Fin n) (Fin n) k)
+          i j
+        = ((d i : k))⁻¹ * ((h : Matrix (Fin n) (Fin n) k) - 1) i j * (d j : k) := by
     rw [Matrix.sub_apply, conj_apply, Matrix.sub_apply]
     simp only [Pi.inv_apply, inv_inv, Units.val_inv_eq_inv_val]
     by_cases hij : i = j
@@ -273,14 +326,17 @@ private theorem isoNe_lemma_2 {k : Type} [Field k] [ValuativeRel k] [Topological
     · rw [Matrix.one_apply_ne hij]
       ring
   rw [key, map_mul, map_mul, map_inv₀, val_ord', val_ord', ← _root_.zpow_neg]
-  calc uniformizer k ^ (-ord k (d i)) * valuation k (((h : Matrix (Fin n) (Fin n) k) - 1) i j) * uniformizer k ^ ord k (d j)
-      ≤ uniformizer k ^ (-ord k (d i)) * uniformizer k ^ (c : ℤ) * uniformizer k ^ ord k (d j) := by
-        gcongr
-        exact hh i j
+  calc
+    uniformizer k ^ (- ord k (d i)) * valuation k (((h : Matrix (Fin n) (Fin n) k) - 1) i j)
+          * uniformizer k ^ ord k (d j)
+        ≤ uniformizer k ^ (- ord k (d i)) * uniformizer k ^ (c : ℤ)
+          * uniformizer k ^ ord k (d j) := by
+      gcongr
+      exact hh i j
     _ = uniformizer k ^ ((c : ℤ) + ord k (d j) - ord k (d i)) := by
-        rw [← zpow_add₀ hu, ← zpow_add₀ hu]
-        congr 1
-        ring
+      rw [← zpow_add₀ hu, ← zpow_add₀ hu]
+      congr 1
+      ring
     _ ≤ _ := zpow_le (by push_cast; linarith [hc i j])
 
 theorem isoNe : IsoNe := by
@@ -322,7 +378,10 @@ theorem isoNe : IsoNe := by
   have hMi : ∀ i, -(M : ℤ) ≤ ord k (d i) ∧ ord k (d i) ≤ M := by
     intro i
     have h1 : (ord k (d i)).natAbs ≤ M :=
-      Finset.single_le_sum (f := fun i => (ord k (d i)).natAbs) (fun _ _ => Nat.zero_le _) (Finset.mem_univ i)
+      Finset.single_le_sum
+        (f := fun i => (ord k (d i)).natAbs)
+        (fun _ _ => Nat.zero_le _)
+        (Finset.mem_univ i)
     have h2 : |ord k (d i)| ≤ (M : ℤ) := by
       rw [Int.abs_eq_natAbs]
       exact_mod_cast h1
@@ -342,8 +401,10 @@ theorem isoNe : IsoNe := by
     obtain ⟨hg1, hg2⟩ := mem_Kc.1 hg
     rw [hDinv]
     refine ⟨isoNe_lemma_2 d _ hc hg1, ?_⟩
-    have e : (diagT k (Fin n) d⁻¹ * g * (diagT k (Fin n) d⁻¹)⁻¹)⁻¹ =
-        diagT k (Fin n) d⁻¹ * g⁻¹ * (diagT k (Fin n) d⁻¹)⁻¹ := by group
+    have e
+        : (diagT k (Fin n) d⁻¹ * g * (diagT k (Fin n) d⁻¹)⁻¹)⁻¹
+          = diagT k (Fin n) d⁻¹ * g⁻¹ * (diagT k (Fin n) d⁻¹)⁻¹ := by
+      group
     rw [e]
     exact isoNe_lemma_2 d _ hc hg2
   have hfin1 : Bg.relIndex (Kc k n 1) ≠ 0 :=
@@ -352,13 +413,14 @@ theorem isoNe : IsoNe := by
     intro b hb
     have hb' : D⁻¹ * b * D⁻¹⁻¹ ∈ Kc k n 1 := (hBmem b).1 hb
     have e : b * D = D * (D⁻¹ * b * D⁻¹⁻¹) := by group
-    rw [← Module.End.mul_apply, ← map_mul, e, map_mul, Module.End.mul_apply, (memfix _ _).1 hw1 _ hb']
+    rw [← Module.End.mul_apply, ← map_mul, e, map_mul, Module.End.mul_apply,
+      (memfix _ _).1 hw1 _ hb']
   have hl1 : ∀ a ∈ Kc k n 1, l (τ a (τ D w1)) = (fun _ => (1 : ℂ)) a * l (τ D w1) := by
     intro a ha
     obtain ⟨x, hxu, hxK, s, hsK, y, hy, rfl⟩ := iwahori ha
     have hyc : D⁻¹ * y * D⁻¹⁻¹ ∈ Kc k n 1 := by
       rw [hDinv]
-      have hN := conj_Nm (t := d⁻¹) (a := fun i => -ord k (d i)) ?_ (c := 0) (c' := 0) ?_ hy
+      have hN := conj_Nm (t := d⁻¹) (a := fun i => - ord k (d i)) ?_ (c := 0) (c' := 0) ?_ hy
       · exact (Subgroup.mem_inf.1 hN).2
       · intro i
         rw [Pi.inv_apply, Units.val_inv_eq_inv_val, map_inv₀, val_ord', _root_.zpow_neg]
@@ -370,21 +432,29 @@ theorem isoNe : IsoNe := by
     have hsD : diagT k (Fin n) s * D = D * diagT k (Fin n) s := by
       rw [← map_mul, ← map_mul, mul_comm]
     have hs' : τ (diagT k (Fin n) s) (τ D w1) = τ D w1 := by
-      rw [← Module.End.mul_apply, ← map_mul, hsD, map_mul, Module.End.mul_apply, (memfix _ _).1 hw1 _ hsK]
+      rw [← Module.End.mul_apply, ← map_mul, hsD, map_mul, Module.End.mul_apply,
+        (memfix _ _).1 hw1 _ hsK]
     rw [map_mul, map_mul, Module.End.mul_apply, Module.End.mul_apply, hy', hs', hequiv x hxu,
       chr_one hψ1 ht hxK]
-  obtain ⟨w3, -, hw3, hlw3⟩ := avg τ (Kc k n 1) Bg hfin1 (fun _ => (1 : ℂ)) (by simp) (by simp) (by simp)
-    (τ D w1) hw2 l hl1 ⊤ (by simp)
-  have hw3fix : w3 ∈ fixd τ (Kc k n 1) := (memfix _ _).2 fun g hg => by
-    rw [hw3 g hg]
-    simp
-  obtain ⟨w', hw'P, hw'eig, hlw'⟩ := avg τ (unipB k (Fin n) ⊓ KO k (Fin n)) (Kc k n 1)
-    (Kc_index 1 inf_le_right) (chr ψ t)
-    (fun a ha b hb => isoNe_lemma ψ t (Subgroup.mem_inf.1 ha).1 (Subgroup.mem_inf.1 hb).1)
-    (fun a _ => by unfold chr; simp)
-    (fun b _ hb => chr_one hψ1 ht hb) w3 (fun b hb => (memfix _ _).1 hw3fix b hb) l
-    (fun a ha => hequiv a (Subgroup.mem_inf.1 ha).1 w3) (fixd τ (Kc k n 1))
-    (fun a ha => hconj a (Subgroup.mem_inf.1 ha).2 w3 hw3fix)
+  obtain ⟨w3, -, hw3, hlw3⟩ :=
+    avg τ (Kc k n 1) Bg hfin1
+      (fun _ => (1 : ℂ))
+      (by simp) (by simp) (by simp) (τ D w1) hw2 l hl1 ⊤ (by simp)
+  have hw3fix : w3 ∈ fixd τ (Kc k n 1) :=
+    (memfix _ _).2 fun g hg => by
+      rw [hw3 g hg]
+      simp
+  obtain ⟨w', hw'P, hw'eig, hlw'⟩ :=
+    avg τ (unipB k (Fin n) ⊓ KO k (Fin n)) (Kc k n 1) (Kc_index 1 inf_le_right) (chr ψ t)
+      (fun a ha b hb => isoNe_lemma ψ t (Subgroup.mem_inf.1 ha).1 (Subgroup.mem_inf.1 hb).1)
+      (fun a _ => by unfold chr; simp)
+      (fun b _ hb => chr_one hψ1 ht hb)
+      w3
+      (fun b hb => (memfix _ _).1 hw3fix b hb)
+      l
+      (fun a ha => hequiv a (Subgroup.mem_inf.1 ha).1 w3)
+      (fixd τ (Kc k n 1))
+      (fun a ha => hconj a (Subgroup.mem_inf.1 ha).2 w3 hw3fix)
   rw [Submodule.ne_bot_iff]
   refine ⟨w', ?_, ?_⟩
   · refine Submodule.mem_inf.2 ⟨hw'P, ?_⟩

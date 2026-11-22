@@ -7,7 +7,8 @@ public import Formalism.RealPlaceAnalysis.StatementB
 
 @[expose] public section
 
-open MeasureTheory Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.FlagMeas GlobalTheory.GKModule GlobalTheory.RealInd GlobalTheory.OpTrace
+open MeasureTheory Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta
+  GlobalTheory.FlagMeas GlobalTheory.GKModule GlobalTheory.RealInd GlobalTheory.OpTrace
 open GlobalTheory.SmoothGlob (lieSet)
 open GlobalTheory.Dec (IsHaarSub HasInfChar UEquiv gelfVal)
 open GlobalTheory.Orb (IsPseudoCoeff ujMat ujRep)
@@ -102,9 +103,15 @@ lemma exp_injOn : Set.InjOn (fun x : ℝ => Complex.exp ((x : ℂ) * Complex.I))
     rw [this]
   · exact absurd hm''.symm ((irrational_pi.intCast_mul h0).ne_int _)
 
-theorem finite_weights : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] (ρ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (S : Submodule ℂ H), FiniteDimensional ℂ S → ∃ F : Finset (Fin n → ℝ), ∀ (μ : Fin n → ℝ) (v : H), v ∈ S → v ≠ 0 → Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) ρ μ v → μ ∈ F := by
+theorem finite_weights
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+        (ρ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (S : Submodule ℂ H),
+      FiniteDimensional ℂ S
+        → ∃ F : Finset (Fin n → ℝ), ∀ (μ : Fin n → ℝ) (v : H),
+          v ∈ S → v ≠ 0 → Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) ρ μ v → μ ∈ F := by
   intro n ε H _ _ ρ S hS
-  let W : Set (Fin n → ℝ) := {μ | ∃ v ∈ S, v ≠ 0 ∧ Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) ρ μ v}
+  let W : Set (Fin n → ℝ) :=
+    {μ | ∃ v ∈ S, v ≠ 0 ∧ Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) ρ μ v}
   suffices hW : W.Finite by
     exact ⟨hW.toFinset, fun μ v hv h0 hw => hW.mem_toFinset.2 ⟨v, hv, h0, hw⟩⟩
 
@@ -117,7 +124,8 @@ theorem finite_weights : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedA
       exact ⟨⟨v, hvS⟩, hv0, hv⟩
     choose xs hxs using hx
     have hli : LinearIndependent ℂ (fun c : C a => ((xs c : S) : H)) :=
-      (T a).eigenvectors_linearIndependent (C a) (fun c => (xs c : H))
+      (T a).eigenvectors_linearIndependent (C a)
+        (fun c => (xs c : H))
         (fun c => ⟨Module.End.mem_eigenspace_iff.2 (hxs c).2, (hxs c).1⟩)
     have hli' : LinearIndependent ℂ xs := LinearIndependent.of_comp S.subtype hli
     have := hli'.finite

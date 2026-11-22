@@ -13,18 +13,22 @@ public import Development.AbelianVarietyTheory.Statements.HyperbolicHypotheses.H
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
-open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Frames GlobalTheory.FrameUnif
+open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
+open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.Frames GlobalTheory.FrameUnif
 open scoped Matrix nonZeroDivisors
 
 namespace GlobalTheory.DiagDifferent
 
-theorem trace_conj {E : Type} [Field E] [NumberField E] [IsCMField E] (a : E) :
-    Algebra.trace ℚ E (cc a) = Algebra.trace ℚ E a :=
+theorem trace_conj {E : Type} [Field E] [NumberField E] [IsCMField E] (a : E)
+    : Algebra.trace ℚ E (cc a) = Algebra.trace ℚ E a :=
   Algebra.trace_eq_of_algEquiv ((IsCMField.complexConj E).restrictScalars ℚ) a
 
-theorem conj_rt {E : Type} [Field E] [NumberField E] [IsCMField E]
-    (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) : cc (H.rt : E) = -(H.rt : E) := by
+theorem conj_rt
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
+    : cc (H.rt : E) = -(H.rt : E) := by
   have hs : (H.rt : E) ^ 2 = -(H.d : E) := by
     have := congrArg (fun x : 𝓞 E => (x : E)) H.rt_sq
     simpa using this
@@ -36,16 +40,17 @@ theorem conj_rt {E : Type} [Field E] [NumberField E] [IsCMField E]
   have h2 := IsCMField.complexEmbedding_complexConj E τ (H.rt : E)
   unfold cc at h1
   rw [h1] at h2
-  have h3 : (τ (H.rt : E)) ^ 2 = -(H.d : ℂ) := by
-    rw [← map_pow, hs, map_neg, map_natCast]
+  have h3 : (τ (H.rt : E)) ^ 2 = -(H.d : ℂ) := by rw [← map_pow, hs, map_neg, map_natCast]
   obtain ⟨r, hr⟩ := Complex.conj_eq_iff_real.1 h2.symm
   rw [hr] at h3
   have h4 : r ^ 2 = -(H.d : ℝ) := by exact_mod_cast h3
   have h5 : (0 : ℝ) < H.d := by exact_mod_cast H.d_prime.pos
   nlinarith [sq_nonneg r]
 
-theorem cmField_host_element_add_conj_eq_one {E : Type} [Field E] [NumberField E] [IsCMField E]
-    (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) : (H.w0 : E) + cc (H.w0 : E) = 1 := by
+theorem cmField_host_element_add_conj_eq_one
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
+    : (H.w0 : E) + cc (H.w0 : E) = 1 := by
   have h1 : 2 * (H.w0 : E) = 1 + (H.rt : E) := by
     have := congrArg (fun x : 𝓞 E => (x : E)) H.two_weight_eq_one_add_root
     simpa [map_ofNat] using this
@@ -57,7 +62,13 @@ theorem cmField_host_element_add_conj_eq_one {E : Type} [Field E] [NumberField E
   have : (2 : E) * ((H.w0 : E) + cc (H.w0 : E)) = 2 * 1 := by linear_combination h1 + h2
   exact mul_left_cancel₀ two_ne_zero this
 
-theorem trace_even_real_iff : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (I : FractionalIdeal (𝓞 E)⁰ E) (x : E), (∀ a ∈ I, cc a ∈ I) → cc x = x → ((∀ s ∈ I, cc s = s → ∃ n : ℤ, Algebra.trace ℚ E (x * s) = 2 * n) ↔ ∀ s ∈ I, ∃ n : ℤ, Algebra.trace ℚ E (x * s) = n) := by
+theorem trace_even_real_iff
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (I : FractionalIdeal (𝓞 E)⁰ E)
+        (x : E),
+      (∀ a ∈ I, cc a ∈ I) → cc x = x
+        → ((∀ s ∈ I, cc s = s → ∃ n : ℤ, Algebra.trace ℚ E (x * s) = 2 * n)
+          ↔ ∀ s ∈ I, ∃ n : ℤ, Algebra.trace ℚ E (x * s) = n) := by
   intro E _ _ _ H I x hI hx
   have hmul : ∀ a b : E, cc (a * b) = cc a * cc b := fun a b => map_mul _ a b
   have hadd : ∀ a b : E, cc (a + b) = cc a + cc b := fun a b => map_add _ a b

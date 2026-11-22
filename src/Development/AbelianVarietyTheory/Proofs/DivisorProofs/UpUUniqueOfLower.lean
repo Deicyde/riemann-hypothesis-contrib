@@ -6,9 +6,12 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.BsLApply
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry MvPolynomial MeasureTheory Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.L2DbarEstimates (V)
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts GlobalTheory.FlagBundle GlobalTheory.HermFrame GlobalTheory.GoodMetric GlobalTheory.CxForm GlobalTheory.LineForm GlobalTheory.ChernCalc GlobalTheory.FlagCell2
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts
+  GlobalTheory.FlagBundle GlobalTheory.HermFrame GlobalTheory.GoodMetric GlobalTheory.CxForm
+  GlobalTheory.LineForm GlobalTheory.ChernCalc GlobalTheory.FlagCell2
 open GlobalTheory.FlagFibre (Low)
 open scoped Matrix ContDiff ComplexOrder ENNReal Classical
 
@@ -16,8 +19,9 @@ set_option autoImplicit false
 
 namespace GlobalTheory.FlagCell2
 
-theorem upU_unique_of_lower : ∀ (K : Type) [Field K] (s : ℕ) (y y' : Low s → K) (b : Matrix (Fin s) (Fin s) K),
-    (∀ i j, i < j → b i j = 0) → upU y = b * upU y' → y = y' := by
+theorem upU_unique_of_lower
+    : ∀ (K : Type) [Field K] (s : ℕ) (y y' : Low s → K) (b : Matrix (Fin s) (Fin s) K),
+      (∀ i j, i < j → b i j = 0) → upU y = b * upU y' → y = y' := by
   intro K _ s y y' b hb h
   have key : ∀ i j : Fin s, (∀ k, k < j → b i k = 0) → upU y i j = b i j := by
     intro i j hk

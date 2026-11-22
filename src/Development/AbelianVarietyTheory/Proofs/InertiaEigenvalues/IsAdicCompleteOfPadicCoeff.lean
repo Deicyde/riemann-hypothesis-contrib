@@ -9,8 +9,10 @@ open ReciprocityTheory.ChartRestriction.T2
 
 namespace GlobalTheory
 
-theorem isPrecomplete_of_compact_isAdic {O : Type} [CommRing O] [TopologicalSpace O] [IsTopologicalRing O]
-    [CompactSpace O] (I : Ideal O) (h : IsAdic I) : IsPrecomplete I O := by
+theorem isPrecomplete_of_compact_isAdic
+    {O : Type} [CommRing O] [TopologicalSpace O] [IsTopologicalRing O] [CompactSpace O]
+    (I : Ideal O) (h : IsAdic I)
+    : IsPrecomplete I O := by
   refine ⟨fun f hf => ?_⟩
   obtain ⟨L, hL⟩ := exists_clusterPt_of_compactSpace (Filter.map f Filter.atTop)
   refine ⟨L, fun n => ?_⟩
@@ -31,8 +33,10 @@ theorem isPrecomplete_of_compact_isAdic {O : Type} [CommRing O] [TopologicalSpac
   rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top]
   exact hLm
 
-theorem isAdicComplete_of_padicCoeff {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [TopologicalSpace O] (h : PadicCoeff p O) : IsAdicComplete (IsLocalRing.maximalIdeal O) O := by
+theorem isAdicComplete_of_padicCoeff
+    {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [TopologicalSpace O]
+    (h : PadicCoeff p O)
+    : IsAdicComplete (IsLocalRing.maximalIdeal O) O := by
   haveI := h.ring
   haveI := h.compact
   haveI := isPrecomplete_of_compact_isAdic _ h.adic

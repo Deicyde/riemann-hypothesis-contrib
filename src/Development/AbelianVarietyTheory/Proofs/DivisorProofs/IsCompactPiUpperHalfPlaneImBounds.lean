@@ -14,9 +14,10 @@ open GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization GlobalTheory.Hec
 
 namespace GlobalTheory
 
-theorem isCompact_pi_upperHalfPlane_im_bounds :
-    ∀ (ι : Type) [Fintype ι] (L : Set (ι → ℂ)), IsCompact L → (∀ z ∈ L, ∀ i, 0 < (z i).im) →
-    ∃ c c' : ℝ, 0 < c ∧ ∀ z ∈ L, ∀ i, c ≤ (z i).im ∧ (z i).im ≤ c' := by
+theorem isCompact_pi_upperHalfPlane_im_bounds
+    : ∀ (ι : Type) [Fintype ι] (L : Set (ι → ℂ)),
+      IsCompact L → (∀ z ∈ L, ∀ i, 0 < (z i).im)
+        → ∃ c c' : ℝ, 0 < c ∧ ∀ z ∈ L, ∀ i, c ≤ (z i).im ∧ (z i).im ≤ c' := by
   intro ι _ L hL hpos
   obtain ⟨C, hC⟩ := hL.isBounded.exists_norm_le
   have hup : ∀ z ∈ L, ∀ i, (z i).im ≤ C := fun z hz i =>

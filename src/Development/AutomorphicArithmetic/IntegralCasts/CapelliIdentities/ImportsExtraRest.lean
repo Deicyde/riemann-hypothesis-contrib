@@ -4,17 +4,17 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Ydb6.main :
-    ∀ {O Ω V : Type} [inst : CommRing O] [inst_1 : Field Ω] [inst_2 : Algebra O Ω] [inst_3 : AddCommGroup V]
-      [inst_4 : _root_.Module Ω V] (R : Subalgebra O Ω) (A B : AddSubgroup V) (c : Ω),
-      (∀ (v : V), v ∈ B ↔ ∃ e ∈ A, v = c • e) →
-        ∀ (v : V),
-          v ∈ AddSubgroup.closure {v : V | ∃ a ∈ R, ∃ e ∈ B, v = a • e} ↔
-            ∃ e ∈ AddSubgroup.closure {v : V | ∃ a ∈ R, ∃ e ∈ A, v = a • e}, v = c • e := by
+theorem UpperTheory.Reformulated.B.Ydb6.main
+    : ∀ {O Ω V : Type} [inst : CommRing O] [inst_1 : Field Ω] [inst_2 : Algebra O Ω]
+        [inst_3 : AddCommGroup V] [inst_4 : _root_.Module Ω V] (R : Subalgebra O Ω)
+        (A B : AddSubgroup V) (c : Ω),
+      (∀ (v : V), v ∈ B ↔ ∃ e ∈ A, v = c • e)
+        → ∀ (v : V),
+          v ∈ AddSubgroup.closure {v : V | ∃ a ∈ R, ∃ e ∈ B, v = a • e}
+            ↔ ∃ e ∈ AddSubgroup.closure {v : V | ∃ a ∈ R, ∃ e ∈ A, v = a • e}, v = c • e := by
   intro O Ω V _ _ _ _ _ R A B c hB v
   let f : V →+ V := DistribSMul.toAddMonoidHom V c
-  have hS : {v : V | ∃ a ∈ R, ∃ e ∈ B, v = a • e} =
-      f '' {v : V | ∃ a ∈ R, ∃ e ∈ A, v = a • e} := by
+  have hS : {v : V | ∃ a ∈ R, ∃ e ∈ B, v = a • e} = f '' {v : V | ∃ a ∈ R, ∃ e ∈ A, v = a • e} := by
     ext w
     simp only [Set.mem_ofPred_eq, Set.mem_image]
     constructor

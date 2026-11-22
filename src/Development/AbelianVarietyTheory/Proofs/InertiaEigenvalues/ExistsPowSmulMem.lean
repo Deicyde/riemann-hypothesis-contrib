@@ -11,8 +11,8 @@ open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
 
 namespace GlobalTheory.IntegralPowerScalar
 
-theorem exists_pow_mul_integral {l : ℕ} [Fact (Nat.Prime l)] (LL : FinExt l) (c : ↥LL.1) :
-    ∃ n : ℕ, (l : ↥LL.1) ^ n * c ∈ OL LL := by
+theorem exists_pow_mul_integral {l : ℕ} [Fact (Nat.Prime l)] (LL : FinExt l) (c : ↥LL.1)
+    : ∃ n : ℕ, (l : ↥LL.1) ^ n * c ∈ OL LL := by
   haveI : FiniteDimensional ℚ_[l] ↥LL.1 := LL.2
   have h1 : IsAlgebraic ℚ_[l] c := IsAlgebraic.of_finite ℚ_[l] c
   have h2 : IsAlgebraic ℤ_[l] c := (IsFractionRing.isAlgebraic_iff ℤ_[l] ℚ_[l] ↥LL.1).2 h1
@@ -26,17 +26,21 @@ theorem exists_pow_mul_integral {l : ℕ} [Fact (Nat.Prime l)] (LL : FinExt l) (
   rw [smul_smul, he, Algebra.smul_def, map_pow, map_natCast] at hm2
   exact hm2
 
-theorem smul_mem_of_mem {l : ℕ} [Fact (Nat.Prime l)] {LL : FinExt l} (T : GlobalTheory.BKGal.QLat LL)
-    {c : ↥LL.1} (hc : c ∈ OL LL) {x : T.V} (hx : x ∈ T.L.T) : c • x ∈ T.L.T := by
+theorem smul_mem_of_mem
+    {l : ℕ} [Fact (Nat.Prime l)]
+    {LL : FinExt l} (T : GlobalTheory.BKGal.QLat LL)
+    {c : ↥LL.1} (hc : c ∈ OL LL)
+    {x : T.V} (hx : x ∈ T.L.T)
+    : c • x ∈ T.L.T := by
   have h := T.L.T.smul_mem (⟨c, hc⟩ : ↥(OL LL)) hx
   rw [← algebraMap_smul ↥LL.1 (⟨c, hc⟩ : ↥(OL LL)) x] at h
   exact h
 
-theorem exists_pow_smul_mem {l : ℕ} [inst : Fact (Nat.Prime l)] {LL : FinExt l}
-    (T : GlobalTheory.BKGal.QLat LL) (v : T.V) : ∃ n : ℕ, (l : ↥LL.1) ^ n • v ∈ T.L.T := by
+theorem exists_pow_smul_mem
+    {l : ℕ} [inst : Fact (Nat.Prime l)] {LL : FinExt l} (T : GlobalTheory.BKGal.QLat LL) (v : T.V)
+    : ∃ n : ℕ, (l : ↥LL.1) ^ n • v ∈ T.L.T := by
   have hl : ∀ k : ℕ, (l : ↥LL.1) ^ k ∈ OL LL := fun k => pow_mem (natCast_mem (OL LL) l) k
-  have hv : v ∈ Submodule.span ↥LL.1 (T.L.T : Set T.V) := by
-    rw [T.L.span]; exact Submodule.mem_top
+  have hv : v ∈ Submodule.span ↥LL.1 (T.L.T : Set T.V) := by rw [T.L.span]; exact Submodule.mem_top
   induction hv using Submodule.span_induction with
   | mem x hx => exact ⟨0, by rw [pow_zero, one_smul]; exact hx⟩
   | zero => exact ⟨0, by rw [smul_zero]; exact T.L.T.zero_mem⟩

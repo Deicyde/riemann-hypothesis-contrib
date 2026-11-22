@@ -10,8 +10,9 @@ open Finset
 
 variable {ι κ : Type*} [DecidableEq ι]
 
-theorem weightedSlopeExcess_decomposition (W : Finset ι) (J : Finset κ) (l : ι → ℝ) (gain F E : κ → ι → ℝ)
-    (tau : ι → ℝ) : ClaimSg W J l gain F E tau := by
+theorem weightedSlopeExcess_decomposition
+    (W : Finset ι) (J : Finset κ) (l : ι → ℝ) (gain F E : κ → ι → ℝ) (tau : ι → ℝ)
+    : ClaimSg W J l gain F E tau := by
   have hF : ∑ j ∈ J, ∑ w ∈ W, l w * F j w = ∑ w ∈ W, ∑ j ∈ J, l w * F j w := Finset.sum_comm
   have hE : ∑ j ∈ J, ∑ w ∈ W, l w * E j w = ∑ w ∈ W, ∑ j ∈ J, l w * E j w := Finset.sum_comm
   unfold ClaimSg Sg sgw Ga Fo Ee
@@ -50,12 +51,13 @@ theorem deficit_bounds (f : ℕ) (T dM du : ℝ) : ClaimDe f T dM du := by
   rw [hdu]
   ring
 
-private theorem le_muN_of_hypLow {W WT : Finset ι} {J : Finset κ} {l : ι → ℝ} {gain F E : κ → ι → ℝ}
-    {tau io len sg' : ι → ℝ} {dM du de muMu muN PT Rd X : ℝ}
-    (hX : X = 2 * ∑ w ∈ W, l w * io w)
-    (H : HypLow W WT J l gain F E tau io len sg' dM du de muMu muN PT Rd) :
-    muMu + Ga W J l gain tau + Fo W J l F - Ee W J l E - Rd - PT - X / (1 - de)
-      - de / (1 - de) * Ta W l tau ≤ muN := by
+private theorem le_muN_of_hypLow
+    {W WT : Finset ι} {J : Finset κ} {l : ι → ℝ} {gain F E : κ → ι → ℝ} {tau io len sg' : ι → ℝ}
+    {dM du de muMu muN PT Rd X : ℝ} (hX : X = 2 * ∑ w ∈ W, l w * io w)
+    (H : HypLow W WT J l gain F E tau io len sg' dM du de muMu muN PT Rd)
+    : muMu + Ga W J l gain tau + Fo W J l F - Ee W J l E - Rd - PT - X / (1 - de)
+        - de / (1 - de) * Ta W l tau
+      ≤ muN := by
   unfold HypLow at H
   obtain ⟨hl, hdM, hde0, hde1, hdu, hWT, htau, hio, hlen, hPT, hRd, hmuN⟩ := H
   have hsg := weightedSlopeExcess_decomposition W J l gain F E tau
@@ -68,23 +70,29 @@ private theorem le_muN_of_hypLow {W WT : Finset ι} {J : Finset κ} {l : ι → 
     unfold Sg
     rw [← Finset.sum_sub_distrib]
     exact le_trans (le_of_eq (Finset.sum_congr rfl (fun w _ => by ring))) hRd
-  have hsplit : ∑ w ∈ W \ WT, 2 * l w * be du len tau w + ∑ w ∈ WT, 2 * l w * be du len tau w
-      = BeSum W l du len tau := Finset.sum_sdiff hWT
+  have hsplit
+      : ∑ w ∈ W \ WT, 2 * l w * be du len tau w + ∑ w ∈ WT, 2 * l w * be du len tau w
+        = BeSum W l du len tau :=
+    Finset.sum_sdiff hWT
   have hT : ∑ w ∈ WT, 2 * l w * be du len tau w = ∑ w ∈ WT, 2 * l w * len w / du := by
     refine Finset.sum_congr rfl (fun w hw => ?_)
     unfold be
     rw [htau w hw]
     ring
-  have hN : ∑ w ∈ W \ WT, 2 * l w * be du len tau w ≤ ∑ w ∈ W \ WT,
-      (1 / (1 - de) * (2 * (l w * io w)) + de / (1 - de) * (2 * (l w * tau w))) := by
+  have hN
+      : ∑ w ∈ W \ WT, 2 * l w * be du len tau w
+        ≤ ∑ w ∈ W \ WT,
+          (1 / (1 - de) * (2 * (l w * io w)) + de / (1 - de) * (2 * (l w * tau w))) := by
     refine Finset.sum_le_sum (fun w hw => ?_)
     have hwW := (Finset.mem_sdiff.1 hw).1
     have h1 := hl w hwW
     have h2 := hlen w hw
     have h3 := hio w hwW
     unfold be
-    have key : 1 / (1 - de) * (2 * (l w * io w)) + de / (1 - de) * (2 * (l w * tau w))
-        - 2 * l w * ((len w - du * tau w) / du) = 2 * l w * (dM * (tau w + io w) - len w) / du := by
+    have key
+        : 1 / (1 - de) * (2 * (l w * io w)) + de / (1 - de) * (2 * (l w * tau w))
+            - 2 * l w * ((len w - du * tau w) / du)
+          = 2 * l w * (dM * (tau w + io w) - len w) / du := by
       rw [hdu]
       field_simp
       ring
@@ -98,9 +106,10 @@ private theorem le_muN_of_hypLow {W WT : Finset ι} {J : Finset κ} {l : ι → 
     Finset.sum_eq_zero (fun w hw => by rw [htau w hw, mul_zero])
   have hTas : ∑ w ∈ W \ WT, l w * tau w + ∑ w ∈ WT, l w * tau w = ∑ w ∈ W, l w * tau w :=
     Finset.sum_sdiff hWT
-  have hN2 : ∑ w ∈ W \ WT,
-      (1 / (1 - de) * (2 * (l w * io w)) + de / (1 - de) * (2 * (l w * tau w)))
-      = 1 / (1 - de) * (2 * ∑ w ∈ W \ WT, l w * io w) + de / (1 - de) * Ta W l tau := by
+  have hN2
+      : ∑ w ∈ W \ WT,
+          (1 / (1 - de) * (2 * (l w * io w)) + de / (1 - de) * (2 * (l w * tau w)))
+        = 1 / (1 - de) * (2 * ∑ w ∈ W \ WT, l w * io w) + de / (1 - de) * Ta W l tau := by
     rw [Finset.sum_add_distrib, ← Finset.mul_sum, ← Finset.mul_sum, ← Finset.mul_sum,
       ← Finset.mul_sum]
     unfold Ta
@@ -114,13 +123,12 @@ private theorem le_muN_of_hypLow {W WT : Finset ι} {J : Finset κ} {l : ι → 
   rw [hmuN]
   linarith
 
-private theorem le_muN_of_hypLow_of_hypLow2 {W WT : Finset ι} {J : Finset κ} {l : ι → ℝ}
-    {gain F E : κ → ι → ℝ} {tau io len sg' : ι → ℝ} {dM du de muMu muN PT Rd : ℝ}
-    {f T b muM Q LT RX : ℝ}
-    (hq : 2 * Q = 2 * ∑ w ∈ W, l w * io w)
+private theorem le_muN_of_hypLow_of_hypLow2
+    {W WT : Finset ι} {J : Finset κ} {l : ι → ℝ} {gain F E : κ → ι → ℝ} {tau io len sg' : ι → ℝ}
+    {dM du de muMu muN PT Rd : ℝ} {f T b muM Q LT RX : ℝ} (hq : 2 * Q = 2 * ∑ w ∈ W, l w * io w)
     (H : HypLow W WT J l gain F E tau io len sg' dM du de muMu muN PT Rd)
-    (H2 : HypLow2 W l tau io f T de b muM muMu Q PT LT Rd RX) :
-    muM + Ga W J l gain tau + Fo W J l F - Ee W J l E - (4 * Q + LT + RX + 1) ≤ muN := by
+    (H2 : HypLow2 W l tau io f T de b muM muMu Q PT LT Rd RX)
+    : muM + Ga W J l gain tau + Fo W J l F - Ee W J l E - (4 * Q + LT + RX + 1) ≤ muN := by
   have hl2 := le_muN_of_hypLow (X := 2 * Q) hq H
   unfold HypLow at H
   unfold HypLow2 at H2
@@ -143,26 +151,37 @@ private theorem le_muN_of_hypLow_of_hypLow2 {W WT : Finset ι} {J : Finset κ} {
     rw [div_le_iff₀ hde']
     nlinarith [mul_nonneg hde0 (by linarith : (0 : ℝ) ≤ 1 - 2 * de)]
   have hchain : de / (1 - de) * Ta W l tau ≤ 4 * f / T * b ^ 2 :=
-    calc de / (1 - de) * Ta W l tau ≤ 2 * de * Ta W l tau := mul_le_mul_of_nonneg_right hk hTa0
+    calc
+      de / (1 - de) * Ta W l tau
+        ≤ 2 * de * Ta W l tau := mul_le_mul_of_nonneg_right hk hTa0
       _ ≤ 2 * (2 * f / T) * Ta W l tau := mul_le_mul_of_nonneg_right (by linarith) hTa0
       _ ≤ 2 * (2 * f / T) * b ^ 2 := mul_le_mul_of_nonneg_left a5 (by linarith)
       _ = 4 * f / T * b ^ 2 := by ring
   linarith
 
-theorem lower_bound_simplified (W WT : Finset ι) (J : Finset κ) (l : ι → ℝ)
-    (gain F E : κ → ι → ℝ) (tau io len sg' : ι → ℝ) (dM du de muMu muN PT Rd : ℝ)
-    (f T b muM IOp LT RX : ℝ) :
-    ClaimLow2 W WT J l gain F E tau io len sg' dM du de muMu muN PT Rd f T b muM IOp LT RX := by
+theorem lower_bound_simplified
+    (W WT : Finset ι) (J : Finset κ) (l : ι → ℝ) (gain F E : κ → ι → ℝ) (tau io len sg' : ι → ℝ)
+    (dM du de muMu muN PT Rd : ℝ) (f T b muM IOp LT RX : ℝ)
+    : ClaimLow2 W WT J l gain F E tau io len sg' dM du de muMu muN PT Rd f T b muM IOp LT RX := by
   unfold ClaimLow2
   intro H H2
   refine le_muN_of_hypLow_of_hypLow2 ?_ H H2
   unfold HypLow2 at H2
   obtain ⟨-, -, -, -, -, -, a7, -, -⟩ := H2
-  exact a7.symm.trans (by first | rfl | (show ∑ w ∈ W, 2 * l w * io w = _; rw [Finset.mul_sum]; exact Finset.sum_congr rfl (fun w _ => mul_assoc _ _ _)) | (show ∑ w ∈ W, 2 * (l w * io w) = _; rw [Finset.mul_sum]))
+  exact a7.symm.trans (by
+    first
+    | rfl
+    | (
+        show ∑ w ∈ W, 2 * l w * io w = _
+        rw [Finset.mul_sum]
+        exact Finset.sum_congr rfl (fun w _ => mul_assoc _ _ _)
+      )
+    | (show ∑ w ∈ W, 2 * (l w * io w) = _; rw [Finset.mul_sum]))
 
-theorem claimHigh_valid (W : Finset ι) (J : Finset κ) (l : ι → ℝ) (gain F E : κ → ι → ℝ)
-    (tau sg' : ι → ℝ) (muMaxM muMaxMu muMaxN : ℝ) :
-    ClaimHigh W J l gain F E tau sg' muMaxM muMaxMu muMaxN := by
+theorem claimHigh_valid
+    (W : Finset ι) (J : Finset κ) (l : ι → ℝ) (gain F E : κ → ι → ℝ) (tau sg' : ι → ℝ)
+    (muMaxM muMaxMu muMaxN : ℝ)
+    : ClaimHigh W J l gain F E tau sg' muMaxM muMaxMu muMaxN := by
   unfold ClaimHigh
   intro H
   unfold HypHigh at H

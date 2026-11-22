@@ -14,14 +14,18 @@ open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNoti
 
 theorem dualInclusionLattices : DualHeightInclusion := by
   intro p n' W Qq O Kf _ _ _ _ _ _ _ _ _ _ ι σ j w h m r lam0 hd e he
-  exact ⟨lb_H_le_Re (mkG h m r lam0 hd) (0 : Fin 1) (lb_edgeLat_of_basis _ _ (restEdgeBasis _ _)) e he,
-    lb_Hdual_le_Re' (mkG h m r lam0 hd) (0 : Fin 1) (lb_edgeLat_of_basis _ _ (restEdgeBasis _ _)) e he⟩
+  exact ⟨
+    lb_H_le_Re (mkG h m r lam0 hd) (0 : Fin 1) (lb_edgeLat_of_basis _ _ (restEdgeBasis _ _)) e he,
+    lb_Hdual_le_Re' (mkG h m r lam0 hd) (0 : Fin 1) (lb_edgeLat_of_basis _ _ (restEdgeBasis _ _)) e
+      he
+  ⟩
 
 theorem hlSpans : HLSpans := by
   intro p n' W Qq O Kf _ _ _ _ _ _ _ _ _ _ ι σ j w h m lam0 hd L hL
   classical
-  have h0 : ∃ (I : Type) (_ : Finite I) (b0 : Module.Basis I Kf (Vsp Kf lam0)),
-      HL (O := O) ι σ lam0 L = Submodule.span O (Set.range b0) :=
+  have h0
+      : ∃ (I : Type) (_ : Finite I) (b0 : Module.Basis I Kf (Vsp Kf lam0)),
+        HL (O := O) ι σ lam0 L = Submodule.span O (Set.range b0) :=
     jm_HL_basis (mkG h m 0 lam0 hd) (0 : Fin 1) L hL
   obtain ⟨I, hI, x, hx⟩ := h0
   cases nonempty_fintype I
@@ -31,10 +35,14 @@ theorem hlSpans : HLSpans := by
   congr 1
   simp
 
-theorem mem_span_of_coord {O Kf V : Type} [CommRing O] [Field Kf] [Algebra O Kf] [AddCommGroup V] [Module Kf V]
-    [Module O V] [IsScalarTower O Kf V] {I : Type} [Finite I] (x : Module.Basis I Kf V) (a : I → Kf)
-    (ha : ∀ i, a i ≠ 0) (F : V) (hF : ∀ i, (a i)⁻¹ * x.coord i F ∈ Set.range (algebraMap O Kf)) :
-    F ∈ Submodule.span O (Set.range fun i => a i • x i) := by
+theorem mem_span_of_coord
+    {O Kf V : Type} [CommRing O] [Field Kf] [Algebra O Kf] [AddCommGroup V] [Module Kf V]
+    [Module O V] [IsScalarTower O Kf V]
+    {I : Type} [Finite I]
+    (x : Module.Basis I Kf V)
+    (a : I → Kf) (ha : ∀ i, a i ≠ 0)
+    (F : V) (hF : ∀ i, (a i)⁻¹ * x.coord i F ∈ Set.range (algebraMap O Kf))
+    : F ∈ Submodule.span O (Set.range fun i => a i • x i) := by
   haveI := Fintype.ofFinite I
   rw [← x.sum_repr F]
   refine Submodule.sum_mem _ fun i _ => ?_
@@ -57,13 +65,17 @@ theorem bePerfect : BePerfect := by
     congr 1
     push_cast
     ring
-  have first : ∀ G, G ∈ Re' p ι σ w r lam0 e ↔
-      ∀ F ∈ Re p ι σ w r lam0 e, be p r lam0 F G ∈ Set.range (algebraMap O Kf) := by
+  have first
+      : ∀ G,
+        G ∈ Re' p ι σ w r lam0 e
+          ↔ ∀ F ∈ Re p ι σ w r lam0 e, be p r lam0 F G ∈ Set.range (algebraMap O Kf) := by
     intro G
     constructor
     · rintro ⟨ψ, hψ, rfl⟩ F ⟨z, hz, rfl⟩
-      have e2 : be p r lam0 ((LinearMap.restrictScalars O ((LinearMap.lsmul Kf _) (c ^ (-A)))) z)
-          ((LinearMap.restrictScalars O ((LinearMap.lsmul Kf _) (c ^ (-A)))) ψ) = ψ z := by
+      have e2
+          : be p r lam0 ((LinearMap.restrictScalars O ((LinearMap.lsmul Kf _) (c ^ (-A)))) z)
+              ((LinearMap.restrictScalars O ((LinearMap.lsmul Kf _) (c ^ (-A)))) ψ)
+            = ψ z := by
         show (c ^ (-A) • ψ) (((p : Kf) ^ A) • (c ^ (-A) • z)) = ψ z
         rw [LinearMap.smul_apply, map_smul, map_smul, smul_smul, smul_smul, mul_assoc, hpA,
           ← zpow_add₀ hw, neg_add_cancel, zpow_zero, one_smul]
@@ -85,10 +97,12 @@ theorem bePerfect : BePerfect := by
   rw [← c5]
   apply mem_span_of_coord x _ (fun i => zpow_ne_zero _ hw)
   intro i
-  have h1 := hF ((c ^ (-order r lam0 (π i)) * (p : Kf) ^ (-π i)) • x.coord i)
-    (by rw [← c6]; exact Submodule.subset_span ⟨i, rfl⟩)
-  have e2 : be p r lam0 F ((c ^ (-order r lam0 (π i)) * (p : Kf) ^ (-π i)) • x.coord i) =
-      (c ^ (-order r lam0 (π i)))⁻¹ * x.coord i F := by
+  have h1 :=
+    hF ((c ^ (- order r lam0 (π i)) * (p : Kf) ^ (- π i)) • x.coord i)
+      (by rw [← c6]; exact Submodule.subset_span ⟨i, rfl⟩)
+  have e2
+      : be p r lam0 F ((c ^ (- order r lam0 (π i)) * (p : Kf) ^ (- π i)) • x.coord i)
+        = (c ^ (- order r lam0 (π i)))⁻¹ * x.coord i F := by
     show ((c ^ (-order r lam0 (π i)) * (p : Kf) ^ (-π i)) • x.coord i) (((p : Kf) ^ A) • F) = _
     rw [LinearMap.smul_apply, map_smul, smul_eq_mul, smul_eq_mul, ← mul_assoc]
     congr 1

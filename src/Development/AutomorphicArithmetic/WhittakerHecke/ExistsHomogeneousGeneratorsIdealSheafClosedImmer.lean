@@ -6,7 +6,8 @@ public import Development.ResolutionOfSingularities.Foundations.Blowup.AffineBlo
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor FunctorialResolution.Blowup
+open CategoryTheory Limits AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  FunctorialResolution.Blowup
 open GroundTheory.Arith.SchemeCoh GroundTheory.Arith.SchemeCoh.ProjSpace MvPolynomial
 
 attribute [local instance] MvPolynomial.gradedAlgebra
@@ -28,8 +29,8 @@ private lemma exists_pow_mul_mem {Z : Scheme.{0}} (I : Z.IdealSheafData) (U : Z.
 
 variable {R : Type} [CommRing R] {N : ℕ} {Z : Scheme.{0}} (i : Z ⟶ PSpace R N)
 
-private noncomputable def phi (a : Fin (N + 1)) :
-    MvPolynomial (Fin (N + 1)) R →+* Γ(Z, i ⁻¹ᵁ Proj.basicOpen (grading R N) (X a)) :=
+private noncomputable def phi (a : Fin (N + 1))
+    : MvPolynomial (Fin (N + 1)) R →+* Γ(Z, i ⁻¹ᵁ Proj.basicOpen (grading R N) (X a)) :=
   (i.appLE _ _ le_rfl).hom.comp (chartHom a)
 
 private lemma phi_X_self (a : Fin (N + 1)) : phi i a (X a) = 1 := by
@@ -148,11 +149,14 @@ private lemma exists_extension [IsClosedImmersion i] (I : Z.IdealSheafData) (a :
 end UpperTheory.HomogeneousExtension
 
 open UpperTheory.HomogeneousExtension in
-theorem UpperTheory.exists_homogeneous_generators_idealSheaf_closedImmersion :
-    ∀ {R : Type} [CommRing R] [IsNoetherianRing R] {N : ℕ} {Z : Scheme.{0}} (i : Z ⟶ PSpace R N) [IsClosedImmersion i] (I : Z.IdealSheafData),
-      ∃ (n M : ℕ) (F : Fin (M + 1) → MvPolynomial (Fin (N + 1)) R), (∀ m, (F m).IsHomogeneous n) ∧
-        ∀ (a : Fin (N + 1)) (hU : IsAffineOpen (i ⁻¹ᵁ Proj.basicOpen (grading R N) (X a))),
-          Ideal.span (Set.range fun m => i.appLE _ _ le_rfl (chartHom a (F m))) = I.ideal ⟨_, hU⟩ := by
+theorem UpperTheory.exists_homogeneous_generators_idealSheaf_closedImmersion
+    : ∀ {R : Type} [CommRing R] [IsNoetherianRing R] {N : ℕ} {Z : Scheme.{0}} (i : Z ⟶ PSpace R N)
+        [IsClosedImmersion i] (I : Z.IdealSheafData),
+      ∃ (n M : ℕ) (F : Fin (M + 1) → MvPolynomial (Fin (N + 1)) R),
+        (∀ m, (F m).IsHomogeneous n)
+          ∧ ∀ (a : Fin (N + 1)) (hU : IsAffineOpen (i ⁻¹ᵁ Proj.basicOpen (grading R N) (X a))),
+            Ideal.span (Set.range fun m => i.appLE _ _ le_rfl (chartHom a (F m)))
+              = I.ideal ⟨_, hU⟩ := by
   intro R _ _ N Z i _ I
   have hfg : ∀ a : Fin (N + 1), (I.ideal ⟨_, isAffineOpen_U i a⟩).FG := by
     intro a
@@ -160,17 +164,24 @@ theorem UpperTheory.exists_homogeneous_generators_idealSheaf_closedImmersion :
       isNoetherianRing_of_surjective _ _ (phi i a) (phi_surjective i a)
     exact IsNoetherian.noetherian _
   choose gens hgens using hfg
-  have hext : ∀ p : (Σ a : Fin (N + 1), (gens a : Set Γ(Z, i ⁻¹ᵁ Proj.basicOpen (grading R N) (X a)))),
-      ∃ d₀ : ℕ, ∀ n, d₀ ≤ n → ∃ G : MvPolynomial (Fin (N + 1)) R, G.IsHomogeneous n ∧
-        phi i p.1 G = p.2.1 ∧ ∀ b, phi i b G ∈ I.ideal ⟨_, isAffineOpen_U i b⟩ := by
+  have hext
+      : ∀ p : (Σ a : Fin (N + 1), (gens a : Set Γ(Z, i ⁻¹ᵁ Proj.basicOpen (grading R N) (X a)))),
+        ∃ d₀ : ℕ, ∀ n,
+          d₀ ≤ n
+            → ∃ G : MvPolynomial (Fin (N + 1)) R,
+              G.IsHomogeneous n ∧ phi i p.1 G = p.2.1
+                ∧ ∀ b, phi i b G ∈ I.ideal ⟨_, isAffineOpen_U i b⟩ := by
     rintro ⟨a, h, hh⟩
     exact exists_extension i I a h (hgens a ▸ Ideal.subset_span hh)
   choose d₀ hd₀ using hext
   let n := Finset.univ.sup d₀
   have hG := fun p => hd₀ p n (Finset.le_sup (Finset.mem_univ p))
   choose G hGh hGa hGb using hG
-  let M := Fintype.card (Σ a : Fin (N + 1), (gens a : Set Γ(Z, i ⁻¹ᵁ Proj.basicOpen (grading R N) (X a))))
-  let e := Fintype.equivFin (Σ a : Fin (N + 1), (gens a : Set Γ(Z, i ⁻¹ᵁ Proj.basicOpen (grading R N) (X a))))
+  let M :=
+    Fintype.card (Σ a : Fin (N + 1), (gens a : Set Γ(Z, i ⁻¹ᵁ Proj.basicOpen (grading R N) (X a))))
+  let e :=
+    Fintype.equivFin
+      (Σ a : Fin (N + 1), (gens a : Set Γ(Z, i ⁻¹ᵁ Proj.basicOpen (grading R N) (X a))))
   let F : Fin (M + 1) → MvPolynomial (Fin (N + 1)) R := fun m =>
     if hm : (m : ℕ) < M then G (e.symm ⟨m, hm⟩) else 0
   refine ⟨n, M, F, ?_, ?_⟩

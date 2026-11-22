@@ -13,10 +13,12 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial ComplexSets
 
-theorem isCohenMacaulayLocalRing_of_minimalPrimes_sup_span {R : Type*} [CommRing R] [IsNoetherianRing R]
-    {J W : Ideal R} {g : R} [J.IsPrime] [W.IsPrime] (hg : g ∉ J)
-    (hW : W ∈ (J ⊔ Ideal.span {g}).minimalPrimes) :
-    IsCohenMacaulayLocalRing (Localization.AtPrime W ⧸ J.map (algebraMap R (Localization.AtPrime W))) := by
+theorem isCohenMacaulayLocalRing_of_minimalPrimes_sup_span
+    {R : Type*} [CommRing R] [IsNoetherianRing R]
+    {J W : Ideal R} {g : R} [J.IsPrime] [W.IsPrime]
+    (hg : g ∉ J) (hW : W ∈ (J ⊔ Ideal.span {g}).minimalPrimes)
+    : IsCohenMacaulayLocalRing
+      (Localization.AtPrime W ⧸ J.map (algebraMap R (Localization.AtPrime W))) := by
   have hJW : J ≤ W := le_sup_left.trans hW.1.2
   have hgW : g ∈ W := hW.1.2 (Ideal.mem_sup_right (Ideal.mem_span_singleton_self g))
   have hker : RingHom.ker (Ideal.Quotient.mk J) ≤ W := by rwa [Ideal.mk_ker]
@@ -37,16 +39,16 @@ theorem isCohenMacaulayLocalRing_of_minimalPrimes_sup_span {R : Type*} [CommRing
       exact hb
     · intro ha
       exact Submonoid.mem_map.mpr ⟨a, fun h => ha ((hmem a).mpr h), rfl⟩
-  have hloc : IsLocalization.AtPrime (Localization.AtPrime W ⧸ J.map (algebraMap R (Localization.AtPrime W)))
-      W' := by
+  have hloc : IsLocalization.AtPrime
+      (Localization.AtPrime W ⧸ J.map (algebraMap R (Localization.AtPrime W))) W' := by
     have h := Vertical.SpecChart.isLocalization_quot W J
     rw [hsub] at h
     exact h
   have : IsLocalRing (Localization.AtPrime W ⧸ J.map (algebraMap R (Localization.AtPrime W))) :=
     IsLocalization.AtPrime.isLocalRing _ W'
   have : IsDomain (Localization.AtPrime W ⧸ J.map (algebraMap R (Localization.AtPrime W))) :=
-    IsLocalization.isDomain_of_le_nonZeroDivisors (Localization.AtPrime W ⧸ J.map (algebraMap R (Localization.AtPrime W)))
-      (M := W'.primeCompl)
+    IsLocalization.isDomain_of_le_nonZeroDivisors
+      (Localization.AtPrime W ⧸ J.map (algebraMap R (Localization.AtPrime W))) (M := W'.primeCompl)
       (Ideal.primeCompl_le_nonZeroDivisors W')
   set x := algebraMap (R ⧸ J) (Localization.AtPrime W ⧸ J.map (algebraMap R (Localization.AtPrime W)))
     (Ideal.Quotient.mk J g) with hx
@@ -54,13 +56,18 @@ theorem isCohenMacaulayLocalRing_of_minimalPrimes_sup_span {R : Type*} [CommRing
   have hx0 : x ≠ 0 := by
     intro h
     apply hg0
-    have h0 : x = algebraMap (R ⧸ J) (Localization.AtPrime W ⧸ J.map (algebraMap R (Localization.AtPrime W))) 0 := by
+    have h0
+        : x
+          = algebraMap (R ⧸ J)
+            (Localization.AtPrime W ⧸ J.map (algebraMap R (Localization.AtPrime W))) 0 := by
       rw [map_zero]
       exact h
-    exact IsLocalization.injective (S := Localization.AtPrime W ⧸ J.map (algebraMap R (Localization.AtPrime W)))
+    exact IsLocalization.injective
+      (S := Localization.AtPrime W ⧸ J.map (algebraMap R (Localization.AtPrime W)))
       (M := W'.primeCompl) (Ideal.primeCompl_le_nonZeroDivisors W') h0
-  have hxm : x ∈ IsLocalRing.maximalIdeal
-      (Localization.AtPrime W ⧸ J.map (algebraMap R (Localization.AtPrime W))) := by
+  have hxm
+      : x ∈ IsLocalRing.maximalIdeal
+        (Localization.AtPrime W ⧸ J.map (algebraMap R (Localization.AtPrime W))) := by
     rw [← IsLocalization.AtPrime.map_eq_maximalIdeal W']
     exact Ideal.mem_map_of_mem _ ((hmem g).mpr hgW)
   have hheight : W'.height = 1 := by
@@ -82,7 +89,8 @@ theorem isCohenMacaulayLocalRing_of_minimalPrimes_sup_span {R : Type*} [CommRing
   · rw [IsLocalization.AtPrime.ringKrullDim_eq_height W', hheight]
     simp
 
-theorem CMHeightOneGeneral.proof (hopen : CMLocusOpen.Statement) : CMHeightOneGeneral.Statement := by
+theorem CMHeightOneGeneral.proof (hopen : CMLocusOpen.Statement)
+    : CMHeightOneGeneral.Statement := by
   intro n J W g hJ hg hW
   have : W.IsPrime := hW.1.1
   have hJW : J ≤ W := le_sup_left.trans hW.1.2

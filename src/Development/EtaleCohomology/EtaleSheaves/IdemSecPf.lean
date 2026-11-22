@@ -10,17 +10,25 @@ open CategoryTheory Limits AlgebraicGeometry LateralTheory.E.SysFMPf
 
 namespace LateralTheory.E.IdemSecPf
 
-theorem phi_injective {P : Scheme.{0}} [CompactSpace P] [QuasiSeparatedSpace P] {W : Type} [CommRing W]
-    (w : Spec (CommRingCat.of W) ⟶ P) : Function.Injective (phi w) := by
+theorem phi_injective
+    {P : Scheme.{0}} [CompactSpace P] [QuasiSeparatedSpace P]
+    {W : Type} [CommRing W]
+    (w : Spec (CommRingCat.of W) ⟶ P)
+    : Function.Injective (phi w) := by
   have h1 : Function.Injective (w.toNormalization.app ⊤) := w.toNormalization.app_injective ⊤
   have h2 : Function.Injective (Scheme.ΓSpecIso (CommRingCat.of W)).hom :=
     ((ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso (CommRingCat.of W)).hom)).1
   intro a b h
   exact h1 (h2 h)
 
-theorem phi_idem {P : Scheme.{0}} [CompactSpace P] [QuasiSeparatedSpace P] {W : Type} [CommRing W]
-    (w : Spec (CommRingCat.of W) ⟶ P) (e : W) (he : IsIdempotentElem e) : ∃ s, phi w s = e := by
-  let t : Γ(Spec (CommRingCat.of W), w.toNormalization ⁻¹ᵁ ⊤) := (Scheme.ΓSpecIso (CommRingCat.of W)).inv e
+theorem phi_idem
+    {P : Scheme.{0}} [CompactSpace P] [QuasiSeparatedSpace P]
+    {W : Type} [CommRing W]
+    (w : Spec (CommRingCat.of W) ⟶ P)
+    (e : W) (he : IsIdempotentElem e)
+    : ∃ s, phi w s = e := by
+  let t : Γ(Spec (CommRingCat.of W), w.toNormalization ⁻¹ᵁ ⊤) :=
+    (Scheme.ΓSpecIso (CommRingCat.of W)).inv e
   have ht : (w.toNormalization.app ⊤).hom.IsIntegralElem t := by
     refine ⟨Polynomial.X ^ 2 - Polynomial.X, ?_, ?_⟩
     · exact Polynomial.monic_X_pow_sub (Polynomial.degree_X_le.trans_lt (by norm_num))

@@ -25,8 +25,9 @@ end PGaussFourierSelf
 theorem GaussFourierSelf.proof : GaussFourierSelf.Statement := by
   intro g w
   have hb : 0 < (π : ℂ).re := by simpa using Real.pi_pos
-  have hfun : (fun x : EuclideanSpace ℝ (Fin g) => ((Real.exp (-π * ‖x‖ ^ 2) : ℝ) : ℂ)) =
-      fun x => Complex.exp (-(π : ℂ) * (‖x‖ : ℂ) ^ 2) := by
+  have hfun
+      : (fun x : EuclideanSpace ℝ (Fin g) => ((Real.exp (-π * ‖x‖ ^ 2) : ℝ) : ℂ))
+        = fun x => Complex.exp (-(π : ℂ) * (‖x‖ : ℂ) ^ 2) := by
     funext x
     exact PGaussFourierSelf.ofReal_gauss x
   rw [hfun, fourier_gaussian_innerProductSpace hb w, PGaussFourierSelf.ofReal_gauss w]

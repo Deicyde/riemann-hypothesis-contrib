@@ -10,10 +10,12 @@ namespace Bl.SecondBlockLemmaM
 
 variable {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C]
 
-theorem goal1 [IsDomain R] [IsFractionRing R C]
+theorem goal1
+    [IsDomain R] [IsFractionRing R C]
     {V : Type} [AddCommGroup V] [Module C V] [Module R V] [IsScalarTower R C V]
-    (S : Submodule R V) {x : V} (hx : x ∈ Submodule.span C (S : Set V)) :
-    ∃ r : R, r ≠ 0 ∧ r • x ∈ S := by
+    (S : Submodule R V)
+    {x : V} (hx : x ∈ Submodule.span C (S : Set V))
+    : ∃ r : R, r ≠ 0 ∧ r • x ∈ S := by
   induction hx using Submodule.span_induction with
   | mem y hy => exact ⟨1, one_ne_zero, by simpa using hy⟩
   | zero => exact ⟨1, one_ne_zero, by simp⟩
@@ -31,7 +33,9 @@ theorem goal1 [IsDomain R] [IsFractionRing R C]
     have hab' : c * algebraMap R C (b : R) = algebraMap R C a := hab
     refine ⟨(b : R) * r, mul_ne_zero (nonZeroDivisors.ne_zero b.2) hr, ?_⟩
     have h : ((b : R) * r) • (c • y) = a • (r • y) := by
-      calc ((b : R) * r) • (c • y) = r • ((b : R) • (c • y)) := by rw [mul_comm, mul_smul]
+      calc
+        ((b : R) * r) • (c • y)
+          = r • ((b : R) • (c • y)) := by rw [mul_comm, mul_smul]
         _ = r • (((b : R) • c) • y) := by rw [smul_assoc]
         _ = r • ((algebraMap R C a) • y) := by rw [Algebra.smul_def, mul_comm, hab']
         _ = r • (a • y) := by rw [algebraMap_smul]

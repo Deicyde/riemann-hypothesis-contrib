@@ -5,7 +5,8 @@ public import Formalism.LatticeTheta.Statement
 
 @[expose] public section
 
-open NumberField nonZeroDivisors MeasureTheory GlobalTheory.LipschitzTR GlobalTheory.IndefiniteRowSideFullHecke.TraceDualDifferent
+open NumberField nonZeroDivisors MeasureTheory GlobalTheory.LipschitzTR
+  GlobalTheory.IndefiniteRowSideFullHecke.TraceDualDifferent
 open scoped FourierTransform RealInnerProductSpace
 
 noncomputable section
@@ -14,8 +15,8 @@ namespace GlobalTheory.LipschitzTR.LhsSum
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem prod_realEmb_eq_norm [IsTotallyReal F] (x : F) :
-    (∏ τ : F →+* ℝ, τ x) = ((Algebra.norm ℚ x : ℚ) : ℝ) := by
+theorem prod_realEmb_eq_norm [IsTotallyReal F] (x : F)
+    : (∏ τ : F →+* ℝ, τ x) = ((Algebra.norm ℚ x : ℚ) : ℝ) := by
   apply Complex.ofReal_injective
   push_cast
   have h := Algebra.norm_eq_prod_embeddings ℚ ℂ x
@@ -24,14 +25,18 @@ theorem prod_realEmb_eq_norm [IsTotallyReal F] (x : F) :
     refine ⟨fun τ τ' h => ?_, fun φ => ?_⟩
     · ext x
       exact Complex.ofReal_injective (RingHom.congr_fun h x)
-    · exact ⟨(IsTotallyReal.complexEmbedding_isReal φ).embedding, RingHom.ext fun x =>
-        (IsTotallyReal.complexEmbedding_isReal φ).coe_embedding_apply x⟩
-  refine Fintype.prod_bijective (fun τ : F →+* ℝ => RingHom.equivRatAlgHom F ℂ (Complex.ofRealHom.comp τ))
-    ((RingHom.equivRatAlgHom F ℂ).bijective.comp hb) _ _ (fun τ => ?_)
+    · exact ⟨
+        (IsTotallyReal.complexEmbedding_isReal φ).embedding,
+        RingHom.ext fun x => (IsTotallyReal.complexEmbedding_isReal φ).coe_embedding_apply x
+      ⟩
+  refine Fintype.prod_bijective
+    (fun τ : F →+* ℝ => RingHom.equivRatAlgHom F ℂ (Complex.ofRealHom.comp τ))
+    ((RingHom.equivRatAlgHom F ℂ).bijective.comp hb) _ _
+    (fun τ => ?_)
   rfl
 
-theorem one_le_abs_prod_int [IsTotallyReal F] (y : 𝓞 F) (hy : y ≠ 0) :
-    1 ≤ |∏ τ : F →+* ℝ, τ (y : F)| := by
+theorem one_le_abs_prod_int [IsTotallyReal F] (y : 𝓞 F) (hy : y ≠ 0)
+    : 1 ≤ |∏ τ : F →+* ℝ, τ (y : F)| := by
   rw [prod_realEmb_eq_norm, ← Algebra.coe_norm_int]
   have h : Algebra.norm ℤ y ≠ 0 := Algebra.norm_ne_zero_iff.2 hy
   have h1 : (1 : ℤ) ≤ |Algebra.norm ℤ y| := Int.one_le_abs h
@@ -39,8 +44,8 @@ theorem one_le_abs_prod_int [IsTotallyReal F] (y : 𝓞 F) (hy : y ≠ 0) :
   rw [h2]
   exact_mod_cast h1
 
-theorem exists_lower_norm [IsTotallyReal F] (M : FractionalIdeal (𝓞 F)⁰ F) :
-    ∃ ν : ℝ, 0 < ν ∧ ∀ a ∈ M, a ≠ 0 → ν ≤ |∏ τ : F →+* ℝ, τ a| := by
+theorem exists_lower_norm [IsTotallyReal F] (M : FractionalIdeal (𝓞 F)⁰ F)
+    : ∃ ν : ℝ, 0 < ν ∧ ∀ a ∈ M, a ≠ 0 → ν ≤ |∏ τ : F →+* ℝ, τ a| := by
   obtain ⟨d, hd, hint⟩ := M.isFractional
   have hd0 : (d : F) ≠ 0 := by
     have := nonZeroDivisors.ne_zero hd
@@ -49,18 +54,16 @@ theorem exists_lower_norm [IsTotallyReal F] (M : FractionalIdeal (𝓞 F)⁰ F) 
     abs_pos.2 (Finset.prod_ne_zero_iff.2 fun τ _ => (map_ne_zero τ).2 hd0)
   refine ⟨1 / |∏ τ : F →+* ℝ, τ (d : F)|, by positivity, fun a ha ha0 => ?_⟩
   obtain ⟨y, hy⟩ := hint a ha
-  have hy' : (y : F) = (d : F) * a := by
-    rw [← Algebra.smul_def]; exact hy
-  have hy0 : y ≠ 0 := by
-    intro h; apply mul_ne_zero hd0 ha0; rw [← hy', h]; simp
+  have hy' : (y : F) = (d : F) * a := by rw [← Algebra.smul_def]; exact hy
+  have hy0 : y ≠ 0 := by intro h; apply mul_ne_zero hd0 ha0; rw [← hy', h]; simp
   have h1 := one_le_abs_prod_int y hy0
   rw [hy'] at h1
   simp only [map_mul, Finset.prod_mul_distrib, abs_mul] at h1
   rw [div_le_iff₀ hP]
   linarith [mul_comm (|∏ τ : F →+* ℝ, τ (d : F)|) (|∏ τ : F →+* ℝ, τ a|)]
 
-theorem exists_lower_one_add (w : ℂ) (hw : w.im ≠ 0) :
-    ∃ c : ℝ, 0 < c ∧ ∀ t : ℝ, c * (1 + |t|) ≤ ‖w + (t : ℂ)‖ := by
+theorem exists_lower_one_add (w : ℂ) (hw : w.im ≠ 0)
+    : ∃ c : ℝ, 0 < c ∧ ∀ t : ℝ, c * (1 + |t|) ≤ ‖w + (t : ℂ)‖ := by
   have him : 0 < |w.im| := abs_pos.2 hw
   refine ⟨|w.im| / (|w.im| + 1 + ‖w‖), by positivity, fun t => ?_⟩
   have h1 : |w.im| ≤ ‖w + (t : ℂ)‖ := by
@@ -74,8 +77,8 @@ theorem exists_lower_one_add (w : ℂ) (hw : w.im ≠ 0) :
   rw [div_mul_eq_mul_div, div_le_iff₀ (by positivity)]
   nlinarith
 
-theorem floor_bound {s : ℝ} (hs0 : 0 < s) (hs1 : s ≤ 1) (x : ℝ) :
-    s / 2 * (1 + |((⌊x / s⌋ : ℤ) : ℝ)|) ≤ 1 + |x| := by
+theorem floor_bound {s : ℝ} (hs0 : 0 < s) (hs1 : s ≤ 1) (x : ℝ)
+    : s / 2 * (1 + |((⌊x / s⌋ : ℤ) : ℝ)|) ≤ 1 + |x| := by
   set n : ℤ := ⌊x / s⌋ with hn
   have h1 : (n : ℝ) ≤ x / s := Int.floor_le _
   have h2 : x / s < (n : ℝ) + 1 := Int.lt_floor_add_one _
@@ -98,8 +101,10 @@ def wt (m : ℤ) : ℝ := ((1 + |(m : ℝ)|) ^ 2)⁻¹
 theorem wt_nonneg (m : ℤ) : 0 ≤ wt m := by unfold wt; positivity
 
 theorem summable_wt : Summable wt := by
-  have hA : Summable (fun m : ℤ => |(m : ℝ)| ^ (-(2 : ℝ))) := Real.summable_abs_int_rpow (by norm_num)
-  have hB : Summable (fun m : ℤ => if m = 0 then (1 : ℝ) else 0) := (hasSum_ite_eq (0 : ℤ) (1 : ℝ)).summable
+  have hA : Summable (fun m : ℤ => |(m : ℝ)| ^ (-(2 : ℝ))) :=
+    Real.summable_abs_int_rpow (by norm_num)
+  have hB : Summable (fun m : ℤ => if m = 0 then (1 : ℝ) else 0) :=
+    (hasSum_ite_eq (0 : ℤ) (1 : ℝ)).summable
   refine Summable.of_nonneg_of_le wt_nonneg (fun m => ?_) (hA.add hB)
   by_cases hm : m = 0
   · subst hm
@@ -113,43 +118,47 @@ theorem summable_wt : Summable wt := by
     apply inv_anti₀ (by positivity)
     nlinarith [abs_nonneg (m : ℝ)]
 
-theorem summable_prod_wt (ι : Type) [Fintype ι] [DecidableEq ι] :
-    Summable (fun n : ι → ℤ => ∏ i, wt (n i)) := by
+theorem summable_prod_wt (ι : Type) [Fintype ι] [DecidableEq ι]
+    : Summable (fun n : ι → ℤ => ∏ i, wt (n i)) := by
   refine summable_of_sum_le (c := ∏ _i : ι, ∑' m, wt m)
-    (fun n => Finset.prod_nonneg fun i _ => wt_nonneg _) (fun u => ?_)
-  calc ∑ n ∈ u, ∏ i, wt (n i)
-      ≤ ∑ n ∈ Fintype.piFinset (fun i => u.image (fun n : ι → ℤ => n i)), ∏ i, wt (n i) := by
-        apply Finset.sum_le_sum_of_subset_of_nonneg
-        · intro n hn
-          rw [Fintype.mem_piFinset]
-          intro i
-          exact Finset.mem_image_of_mem _ hn
-        · intro n _ _
-          exact Finset.prod_nonneg fun i _ => wt_nonneg _
+    (fun n => Finset.prod_nonneg fun i _ => wt_nonneg _)
+    (fun u => ?_)
+  calc
+    ∑ n ∈ u, ∏ i, wt (n i)
+        ≤ ∑ n ∈ Fintype.piFinset (fun i => u.image (fun n : ι → ℤ => n i)), ∏ i, wt (n i) := by
+      apply Finset.sum_le_sum_of_subset_of_nonneg
+      · intro n hn
+        rw [Fintype.mem_piFinset]
+        intro i
+        exact Finset.mem_image_of_mem _ hn
+      · intro n _ _
+        exact Finset.prod_nonneg fun i _ => wt_nonneg _
     _ = ∏ i, ∑ m ∈ u.image (fun n : ι → ℤ => n i), wt m := (Finset.prod_univ_sum _ _).symm
     _ ≤ ∏ _i : ι, ∑' m, wt m := by
-        apply Finset.prod_le_prod₀
-        · intro i _; exact Finset.sum_nonneg fun m _ => wt_nonneg m
-        · intro i _; exact summable_wt.sum_le_tsum _ (fun m _ => wt_nonneg m)
+      apply Finset.prod_le_prod₀
+      · intro i _; exact Finset.sum_nonneg fun m _ => wt_nonneg m
+      · intro i _; exact summable_wt.sum_le_tsum _ (fun m _ => wt_nonneg m)
 
 end GlobalTheory.LipschitzTR.LhsSum
 
-
 open GlobalTheory.LipschitzTR.LhsSum in
-theorem GlobalTheory.LipschitzTR.summable_lhsTerm_ideal :
-    ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (M : FractionalIdeal (𝓞 F)⁰ F), M ≠ 0 →
-      ∀ (k : ℕ), 2 ≤ k → ∀ (z : (F →+* ℝ) → ℂ), (∀ τ, (z τ).im ≠ 0) →
-        Summable (fun a : (M : Set F) => lhsTerm k z a) := by
+theorem GlobalTheory.LipschitzTR.summable_lhsTerm_ideal
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (M : FractionalIdeal (𝓞 F)⁰ F),
+      M ≠ 0
+        → ∀ (k : ℕ),
+          2 ≤ k
+            → ∀ (z : (F →+* ℝ) → ℂ),
+              (∀ τ, (z τ).im ≠ 0) → Summable (fun a : (M : Set F) => lhsTerm k z a) := by
   intro F _ _ _ M _ k hk z hz
   classical
   obtain ⟨ν, hν0, hν⟩ := exists_lower_norm M
-  have hcard : 0 < Fintype.card (F →+* ℝ) := by
-    rw [card_realEmb]; exact Module.finrank_pos
+  have hcard : 0 < Fintype.card (F →+* ℝ) := by rw [card_realEmb]; exact Module.finrank_pos
   set s : ℝ := min 1 (ν / 2) with hs
   have hs0 : 0 < s := lt_min one_pos (by positivity)
   have hs1 : s ≤ 1 := min_le_left _ _
   have hsν : s ^ Fintype.card (F →+* ℝ) < ν :=
-    lt_of_le_of_lt (pow_le_of_le_one hs0.le hs1 hcard.ne') (lt_of_le_of_lt (min_le_right _ _) (by linarith))
+    lt_of_le_of_lt (pow_le_of_le_one hs0.le hs1 hcard.ne')
+      (lt_of_le_of_lt (min_le_right _ _) (by linarith))
   let N : ↥(M : Set F) → ((F →+* ℝ) → ℤ) := fun a τ => ⌊τ (a : F) / s⌋
   have hN : Function.Injective N := by
     intro a b hab
@@ -162,28 +171,35 @@ theorem GlobalTheory.LipschitzTR.summable_lhsTerm_ideal :
       refine Finset.prod_le_prod₀ (fun _ _ => abs_nonneg _) (fun τ _ => ?_)
       have hf := Int.abs_sub_lt_one_of_floor_eq_floor (congrFun hab τ)
       rw [← sub_div, abs_div, abs_of_pos hs0, div_lt_one hs0] at hf
-      rw [map_sub]; exact hf.le
+      rw [map_sub]
+      exact hf.le
     linarith
-  have hc : ∀ τ : F →+* ℝ, ∃ c : ℝ, 0 < c ∧ ∀ t : ℝ, c * (1 + |t|) ≤ ‖z τ + (t : ℂ)‖ :=
-    fun τ => exists_lower_one_add (z τ) (hz τ)
+  have hc : ∀ τ : F →+* ℝ, ∃ c : ℝ, 0 < c ∧ ∀ t : ℝ, c * (1 + |t|) ≤ ‖z τ + (t : ℂ)‖ := fun τ =>
+    exists_lower_one_add (z τ) (hz τ)
   choose c hc0 hc using hc
   set C : ℝ := ∏ τ : F →+* ℝ, ((c τ * (s / 2)) ^ k)⁻¹ with hC
-  refine Summable.of_norm_bounded (g := fun a => C * ∏ τ, wt (N a τ))
-    (((summable_prod_wt (F →+* ℝ)).comp_injective hN).mul_left C) (fun a => ?_)
-  simp only [lhsTerm, zpow_neg, zpow_natCast, ← Finset.prod_pow, ← Finset.prod_inv_distrib, norm_prod, norm_inv, norm_pow]
+  refine Summable.of_norm_bounded
+    (g := fun a => C * ∏ τ, wt (N a τ))
+    (((summable_prod_wt (F →+* ℝ)).comp_injective hN).mul_left C)
+    (fun a => ?_)
+  simp only [lhsTerm, zpow_neg, zpow_natCast, ← Finset.prod_pow, ← Finset.prod_inv_distrib,
+    norm_prod, norm_inv, norm_pow]
   rw [hC, ← Finset.prod_mul_distrib]
   refine Finset.prod_le_prod₀ (fun _ _ => by positivity) (fun τ _ => ?_)
   have hD : 0 < c τ * (s / 2) := by have := hc0 τ; positivity
   have hfl := floor_bound hs0 hs1 (τ (a : F))
   have he : c τ * (s / 2) * (1 + |((N a τ : ℤ) : ℝ)|) ≤ ‖z τ + ((τ (a : F) : ℝ) : ℂ)‖ := by
-    calc c τ * (s / 2) * (1 + |((N a τ : ℤ) : ℝ)|) = c τ * (s / 2 * (1 + |((N a τ : ℤ) : ℝ)|)) := by ring
+    calc
+      c τ * (s / 2) * (1 + |((N a τ : ℤ) : ℝ)|)
+        = c τ * (s / 2 * (1 + |((N a τ : ℤ) : ℝ)|)) := by ring
       _ ≤ c τ * (1 + |τ (a : F)|) := mul_le_mul_of_nonneg_left hfl (hc0 τ).le
       _ ≤ _ := hc τ _
   have hone : (1 : ℝ) ≤ 1 + |((N a τ : ℤ) : ℝ)| := by linarith [abs_nonneg ((N a τ : ℤ) : ℝ)]
   rw [wt, ← mul_inv]
   apply inv_anti₀ (by positivity)
-  calc (c τ * (s / 2)) ^ k * (1 + |((N a τ : ℤ) : ℝ)|) ^ 2
-      ≤ (c τ * (s / 2)) ^ k * (1 + |((N a τ : ℤ) : ℝ)|) ^ k :=
-        mul_le_mul_of_nonneg_left (pow_le_pow_right₀ hone hk) (by positivity)
+  calc
+    (c τ * (s / 2)) ^ k * (1 + |((N a τ : ℤ) : ℝ)|) ^ 2
+        ≤ (c τ * (s / 2)) ^ k * (1 + |((N a τ : ℤ) : ℝ)|) ^ k :=
+      mul_le_mul_of_nonneg_left (pow_le_pow_right₀ hone hk) (by positivity)
     _ = (c τ * (s / 2) * (1 + |((N a τ : ℤ) : ℝ)|)) ^ k := by rw [mul_pow (c τ * (s / 2))]
     _ ≤ _ := pow_le_pow_left₀ (by positivity) he k

@@ -54,12 +54,15 @@ end GlobalTheory.RedBound
 
 namespace GlobalTheory.RedBound
 
-theorem reduced_bound : ∀ (N : ℕ) (C R : ℝ), ∃ C' : ℝ, ∀ (k : Matrix (Fin N) (Fin N) ℝ) (a : Fin N → ℝ)
-    (n : Matrix (Fin N) (Fin N) ℝ), IsSiegel C k a n → ∀ (X : Matrix (Fin N) (Fin N) ℝ)
-    (B B' : Matrix (Fin N) (Fin N) ℤ) (μ : ℝ), μ ≠ 0 → |μ| ≤ R → (∀ i j, |X i j| ≤ R) →
-    B.map (Int.cast : ℤ → ℝ) = (k * diagonal a * n)ᵀ * X * (k * diagonal a * n) →
-    (k * diagonal a * n) * B'.map (Int.cast : ℤ → ℝ) * (k * diagonal a * n)ᵀ = μ • X →
-    ∀ i j, |(B i j : ℝ)| ≤ C' := by
+theorem reduced_bound
+    : ∀ (N : ℕ) (C R : ℝ), ∃ C' : ℝ,
+      ∀ (k : Matrix (Fin N) (Fin N) ℝ) (a : Fin N → ℝ) (n : Matrix (Fin N) (Fin N) ℝ),
+        IsSiegel C k a n
+          → ∀ (X : Matrix (Fin N) (Fin N) ℝ) (B B' : Matrix (Fin N) (Fin N) ℤ) (μ : ℝ),
+            μ ≠ 0 → |μ| ≤ R → (∀ i j, |X i j| ≤ R)
+              → B.map (Int.cast : ℤ → ℝ) = (k * diagonal a * n)ᵀ * X * (k * diagonal a * n)
+              → (k * diagonal a * n) * B'.map (Int.cast : ℤ → ℝ) * (k * diagonal a * n)ᵀ = μ • X
+              → ∀ i j, |(B i j : ℝ)| ≤ C' := by
   intro N C R
   obtain ⟨M, hM⟩ := GlobalTheory.T.unipotent_upper_inv_upperTriangular_bounded N C
   obtain ⟨Cm, hCm1, hCC⟩ : ∃ Cm : ℝ, 1 ≤ Cm ∧ C ≤ Cm := ⟨max C 1, le_max_right _ _, le_max_left _ _⟩
@@ -86,16 +89,17 @@ theorem reduced_bound : ∀ (N : ℕ) (C R : ℝ), ∃ C' : ℝ, ∀ (k : Matrix
     apply entry_bound
     intro r s
     rw [abs_mul, abs_mul, Matrix.transpose_apply]
-    exact mul_le_mul (mul_le_mul (hk r p) ((hX r s).trans hRR) (abs_nonneg _) zero_le_one)
-      (hk s q) (abs_nonneg _) (by positivity)
+    exact mul_le_mul (mul_le_mul (hk r p) ((hX r s).trans hRR) (abs_nonneg _) zero_le_one) (hk s q)
+      (abs_nonneg _) (by positivity)
   obtain ⟨Br', hBr'⟩ : ∃ Br', Br' = B'.map (Int.cast : ℤ → ℝ) := ⟨_, rfl⟩
   obtain ⟨W, hWdef⟩ : ∃ W, W = n * Br' * nᵀ := ⟨_, rfl⟩
   have hWeq : diagonal a * W * diagonal a = μ • X' := by
     have h1 : kᵀ * ((k * diagonal a * n) * Br' * (k * diagonal a * n)ᵀ) * k = μ • X' := by
       rw [hBr', hB', hX'def, Matrix.mul_smul, Matrix.smul_mul]
     rw [← h1, hWdef]
-    have h2 : kᵀ * ((k * diagonal a * n) * Br' * (k * diagonal a * n)ᵀ) * k =
-        (kᵀ * k) * (diagonal a * (n * Br' * nᵀ) * diagonal a) * (kᵀ * k) := by
+    have h2
+        : kᵀ * ((k * diagonal a * n) * Br' * (k * diagonal a * n)ᵀ) * k
+          = (kᵀ * k) * (diagonal a * (n * Br' * nᵀ) * diagonal a) * (kᵀ * k) := by
       simp only [Matrix.transpose_mul, Matrix.diagonal_transpose, Matrix.mul_assoc]
     rw [h2, hS.orth, Matrix.one_mul, Matrix.mul_one]
   have hWent : ∀ p q, a p * W p q * a q = μ * X' p q := by
@@ -104,7 +108,9 @@ theorem reduced_bound : ∀ (N : ℕ) (C R : ℝ), ∃ C' : ℝ, ∀ (k : Matrix
     simpa [Matrix.mul_diagonal, Matrix.diagonal_mul] using this
   have hBm : Br' = m * W * mᵀ := by
     rw [hWdef]
-    calc Br' = (m * n) * Br' * (m * n)ᵀ := by rw [hmn]; simp
+    calc
+      Br'
+        = (m * n) * Br' * (m * n)ᵀ := by rw [hmn]; simp
       _ = m * (n * Br' * nᵀ) * mᵀ := by rw [Matrix.transpose_mul]; simp only [Matrix.mul_assoc]
   have hZ : B.map (Int.cast : ℤ → ℝ) = nᵀ * (diagonal a * X' * diagonal a) * n := by
     rw [hB, hX'def]
@@ -123,19 +129,25 @@ theorem reduced_bound : ∀ (N : ℕ) (C R : ℝ), ∃ C' : ℝ, ∀ (k : Matrix
       · rw [hmlow q s hs]; simp; positivity
       push_neg at hr hs
       have hWb : |W r s| * (a r * a s) ≤ R₀ * R' := by
-        calc |W r s| * (a r * a s) = |a r * W r s * a s| := by
-              rw [abs_mul, abs_mul, abs_of_pos (hS.pos r), abs_of_pos (hS.pos s)]; ring
+        calc
+          |W r s| * (a r * a s) = |a r * W r s * a s| := by
+            rw [abs_mul, abs_mul, abs_of_pos (hS.pos r), abs_of_pos (hS.pos s)]; ring
           _ = |μ| * |X' r s| := by rw [hWent r s, abs_mul]
           _ ≤ R₀ * R' := mul_le_mul hμ₀ (hX' r s) (abs_nonneg _) hR₀
       have hapq := prod_le hS hCm1 hCC hr hs
       rw [abs_mul, abs_mul, hK₁]
-      calc |m p r| * |W r s| * |m q s| * (a p * a q)
-          ≤ |m p r| * |W r s| * |m q s| * (Cm ^ 2 * (a r * a s)) :=
-            mul_le_mul_of_nonneg_left hapq (by positivity)
+      calc
+        |m p r| * |W r s| * |m q s| * (a p * a q)
+            ≤ |m p r| * |W r s| * |m q s| * (Cm ^ 2 * (a r * a s)) :=
+          mul_le_mul_of_nonneg_left hapq (by positivity)
         _ = |m p r| * (Cm ^ 2 * (|W r s| * (a r * a s))) * |m q s| := by ring
         _ ≤ M₀ * (Cm ^ 2 * (R₀ * R')) * M₀ :=
-            mul_le_mul (mul_le_mul (hmb' p r) (mul_le_mul_of_nonneg_left hWb (by positivity))
-              (mul_nonneg (sq_nonneg _) (mul_nonneg (abs_nonneg _) (mul_pos (hS.pos r) (hS.pos s)).le)) hM₀) (hmb' q s) (abs_nonneg _) (by positivity)
+          mul_le_mul
+            (mul_le_mul (hmb' p r) (mul_le_mul_of_nonneg_left hWb (by positivity))
+              (mul_nonneg (sq_nonneg _)
+                (mul_nonneg (abs_nonneg _) (mul_pos (hS.pos r) (hS.pos s)).le))
+              hM₀)
+            (hmb' q s) (abs_nonneg _) (by positivity)
     have hlt : |Br' p q| < 1 := by
       have e : (N : ℝ) * N * (K₁ / (a p * a q)) = (N * N * K₁) / (a p * a q) := by ring
       rw [e] at hb
@@ -170,20 +182,22 @@ theorem reduced_bound : ∀ (N : ℕ) (C R : ℝ), ∃ C' : ℝ, ∀ (k : Matrix
       rw [hBz p q h] at e
       have h0 : μ * X' p q = 0 := by rw [← e]; ring
       have hx : X' p q = 0 := (mul_eq_zero.mp h0).resolve_left hμ
-      rw [hx]; simp; positivity
+      rw [hx]
+      simp
+      positivity
     · push_neg at h
-      calc |a p * X' p q * a q| = (a p * a q) * |X' p q| := by
-            rw [abs_mul, abs_mul, abs_of_pos (hS.pos p), abs_of_pos (hS.pos q)]; ring
+      calc
+        |a p * X' p q * a q| = (a p * a q) * |X' p q| := by
+          rw [abs_mul, abs_mul, abs_of_pos (hS.pos p), abs_of_pos (hS.pos q)]; ring
         _ ≤ (Cm ^ 2 * T) * R' := mul_le_mul h.le (hX' p q) (abs_nonneg _) (by positivity)
-  have hBe : (B i j : ℝ) = (nᵀ * (diagonal a * X' * diagonal a) * n) i j := by
-    rw [← hZ]; simp
+  have hBe : (B i j : ℝ) = (nᵀ * (diagonal a * X' * diagonal a) * n) i j := by rw [← hZ]; simp
   rw [hBe]
   apply entry_bound
   intro r s
   have hZe : (diagonal a * X' * diagonal a) r s = a r * X' r s * a s := by
     simp [Matrix.mul_diagonal, Matrix.diagonal_mul]
   rw [Matrix.transpose_apply, hZe, abs_mul, abs_mul]
-  exact mul_le_mul (mul_le_mul (hnb r i) (hZb r s) (abs_nonneg _) hCm0.le) (hnb s j)
-    (abs_nonneg _) (by positivity)
+  exact mul_le_mul (mul_le_mul (hnb r i) (hZb r s) (abs_nonneg _) hCm0.le) (hnb s j) (abs_nonneg _)
+    (by positivity)
 
 end GlobalTheory.RedBound

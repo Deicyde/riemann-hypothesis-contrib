@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Valuation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction GlobalTheory.IndefiniteRowSideFullHecke.SelmerCrystallineCocycles
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction
+  GlobalTheory.IndefiniteRowSideFullHecke.SelmerCrystallineCocycles
 open Formalism.MainNotions.N
 open scoped Matrix Pointwise
 
@@ -17,21 +19,24 @@ section General
 
 variable {Γ R : Type} [Group Γ] [CommRing R] {r : ℕ}
 
-theorem mem_ker_mapRep_iff (J : Ideal R) (ρ : Γ →* GL (Fin r) R) (g : Γ) :
-    g ∈ (mapRep (Ideal.Quotient.mk J) ρ).ker ↔
-      ∀ a b, (((ρ g : GL (Fin r) R) : Matrix (Fin r) (Fin r) R) - 1) a b ∈ J := by
+theorem mem_ker_mapRep_iff (J : Ideal R) (ρ : Γ →* GL (Fin r) R) (g : Γ)
+    : g ∈ (mapRep (Ideal.Quotient.mk J) ρ).ker
+      ↔ ∀ a b, (((ρ g : GL (Fin r) R) : Matrix (Fin r) (Fin r) R) - 1) a b ∈ J := by
   rw [MonoidHom.mem_ker, Units.ext_iff]
   change (Ideal.Quotient.mk J).mapMatrix ((ρ g : GL (Fin r) R) : Matrix (Fin r) (Fin r) R) = 1 ↔ _
   rw [← sub_eq_zero, ← map_one (Ideal.Quotient.mk J).mapMatrix, ← map_sub, ← Matrix.ext_iff]
   simp only [RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.zero_apply,
     Ideal.Quotient.eq_zero_iff_mem]
 
-theorem isOpen_ker_mapRep [TopologicalSpace Γ] [TopologicalSpace R] [IsTopologicalRing R]
-    (J : Ideal R) (hJ : IsOpen (J : Set R)) (ρ : Γ →* GL (Fin r) R)
-    (hρ : Continuous fun g => ((ρ g : GL (Fin r) R) : Matrix (Fin r) (Fin r) R)) :
-    IsOpen ((mapRep (Ideal.Quotient.mk J) ρ).ker : Set Γ) := by
-  have : ((mapRep (Ideal.Quotient.mk J) ρ).ker : Set Γ) = ⋂ a, ⋂ b,
-      (fun g => (((ρ g : GL (Fin r) R) : Matrix (Fin r) (Fin r) R) - 1) a b) ⁻¹' (J : Set R) := by
+theorem isOpen_ker_mapRep
+    [TopologicalSpace Γ] [TopologicalSpace R] [IsTopologicalRing R]
+    (J : Ideal R) (hJ : IsOpen (J : Set R))
+    (ρ : Γ →* GL (Fin r) R)
+    (hρ : Continuous fun g => ((ρ g : GL (Fin r) R) : Matrix (Fin r) (Fin r) R))
+    : IsOpen ((mapRep (Ideal.Quotient.mk J) ρ).ker : Set Γ) := by
+  have : ((mapRep (Ideal.Quotient.mk J) ρ).ker : Set Γ)
+      = ⋂ a, ⋂ b,
+        (fun g => (((ρ g : GL (Fin r) R) : Matrix (Fin r) (Fin r) R) - 1) a b) ⁻¹' (J : Set R) := by
     ext g
     simp only [SetLike.mem_coe, mem_ker_mapRep_iff, Set.mem_iInter, Set.mem_preimage]
   rw [this]
@@ -40,8 +45,10 @@ theorem isOpen_ker_mapRep [TopologicalSpace Γ] [TopologicalSpace R] [IsTopologi
 
 end General
 
-theorem isWild_of_isWildAt {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
-    (A : ValuationSubring Ω) (σ : G E Ω) (h : IsWildAt A σ) : IsWild A σ := by
+theorem isWild_of_isWildAt
+    {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
+    (A : ValuationSubring Ω) (σ : G E Ω) (h : IsWildAt A σ)
+    : IsWild A σ := by
   have h1 : ∀ x : Ω, x ≠ 0 → A.valuation (σ x - x) < A.valuation x := fun x hx => by
     have e : σ x - x = (σ x / x - 1) * x := by field_simp
     have h0 : 0 < A.valuation x := zero_lt_iff.mpr (by simpa using hx)
@@ -62,8 +69,9 @@ theorem isWild_of_isWildAt {E Ω : Type} [Field E] [NumberField E] [Field Ω] [A
 
 section Wild
 
-variable {E Ω R : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
-  [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [TopologicalSpace R] [IsTopologicalRing R]
+variable
+  {E Ω R : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] [CommRing R]
+  [IsLocalRing R] [IsNoetherianRing R] [TopologicalSpace R] [IsTopologicalRing R]
   {r : ℕ} {A : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 E)}
 
 end Wild

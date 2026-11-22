@@ -12,11 +12,13 @@ namespace PI.UnitaryGroupMassFormula.CntFormula
 open Formalism.MainNotions.S
 open ValuativeRel
 
-theorem fr_ic_free {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E]
-    [Algebra F E] [TopologicalSpace E] (L : Loc.LocE F E) (hl : IsNonarchimedeanLocalField F)
-    (hc : CharZero F) (hE : ∀ x : E, x ≠ 0 → IsUnit x) :
-    Module.Free 𝒪[F] (integralClosure 𝒪[F] E) ∧ Module.Finite 𝒪[F] (integralClosure 𝒪[F] E) ∧
-      Module.finrank 𝒪[F] (integralClosure 𝒪[F] E) = 2 := by
+theorem fr_ic_free
+    {F E : Type}
+    [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E] [Algebra F E] [TopologicalSpace E]
+    (L : Loc.LocE F E) (hl : IsNonarchimedeanLocalField F) (hc : CharZero F)
+    (hE : ∀ x : E, x ≠ 0 → IsUnit x)
+    : Module.Free 𝒪[F] (integralClosure 𝒪[F] E) ∧ Module.Finite 𝒪[F] (integralClosure 𝒪[F] E)
+      ∧ Module.finrank 𝒪[F] (integralClosure 𝒪[F] E) = 2 := by
   haveI := hl
   haveI := hc
   have hnt : Nontrivial E := by
@@ -29,15 +31,21 @@ theorem fr_ic_free {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] 
     ⟨exists_pair_ne E, mul_comm, fun {x} hx => (hE x hx).exists_right_inv⟩).toField
   haveI : FiniteDimensional F E := Module.finite_of_finrank_eq_succ L.rank
   set_option synthInstance.maxHeartbeats 200000 in
-    haveI : Module.IsTorsionFree 𝒪[F] E := FaithfulSMul.to_isTorsionFree _ E
-    refine ⟨IsIntegralClosure.module_free 𝒪[F] F E (integralClosure 𝒪[F] E),
-      IsIntegralClosure.finite 𝒪[F] F E (integralClosure 𝒪[F] E), ?_⟩
-    rw [IsIntegralClosure.rank 𝒪[F] F E (integralClosure 𝒪[F] E), L.rank]
+  haveI : Module.IsTorsionFree 𝒪[F] E := FaithfulSMul.to_isTorsionFree _ E
+  refine ⟨
+    IsIntegralClosure.module_free 𝒪[F] F E (integralClosure 𝒪[F] E),
+    IsIntegralClosure.finite 𝒪[F] F E (integralClosure 𝒪[F] E),
+    ?_
+  ⟩
+  rw [IsIntegralClosure.rank 𝒪[F] F E (integralClosure 𝒪[F] E), L.rank]
 
-theorem fr_card {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E]
-    [Algebra F E] [TopologicalSpace E] (L : Loc.LocE F E) (hl : IsNonarchimedeanLocalField F)
-    (hc : CharZero F) (hE : ∀ x : E, x ≠ 0 → IsUnit x) (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ) :
-    Nat.card (L.O ⧸ Ideal.span {piO L ϖ}) = Nat.card 𝓀[F] ^ 2 := by
+theorem fr_card
+    {F E : Type}
+    [Field F] [ValuativeRel F] [TopologicalSpace F] [CommRing E] [Algebra F E] [TopologicalSpace E]
+    (L : Loc.LocE F E) (hl : IsNonarchimedeanLocalField F) (hc : CharZero F)
+    (hE : ∀ x : E, x ≠ 0 → IsUnit x)
+    (ϖ : 𝒪[F]) (hϖ : Irreducible ϖ)
+    : Nat.card (L.O ⧸ Ideal.span {piO L ϖ}) = Nat.card 𝓀[F] ^ 2 := by
   classical
   haveI := hl
   obtain ⟨hfree, hfin, hrank⟩ := fr_ic_free L hl hc hE
@@ -69,34 +77,36 @@ theorem fr_card {F E : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [Co
     constructor
     · rintro ⟨x, hx, rfl⟩ i
       obtain ⟨y, rfl⟩ := (hmemI x).mp hx
-      exact ⟨b.equivFun y i, by rw [LinearEquiv.coe_coe, map_smul, Pi.smul_apply, smul_eq_mul, mul_comm]⟩
+      exact ⟨
+        b.equivFun y i,
+        by rw [LinearEquiv.coe_coe, map_smul, Pi.smul_apply, smul_eq_mul, mul_comm]
+      ⟩
     · intro h
       choose w hw using h
       refine ⟨ϖ • b.equivFun.symm w, (hmemI _).mpr ⟨_, rfl⟩, ?_⟩
       funext i
-      rw [LinearEquiv.coe_coe, map_smul, LinearEquiv.apply_symm_apply, Pi.smul_apply, smul_eq_mul, ← hw i,
-        mul_comm]
+      rw [LinearEquiv.coe_coe, map_smul, LinearEquiv.apply_symm_apply, Pi.smul_apply, smul_eq_mul,
+        ← hw i, mul_comm]
   have hmax : IsLocalRing.maximalIdeal 𝒪[F] = Ideal.span {ϖ} :=
     (IsDiscreteValuationRing.irreducible_iff_uniformizer ϖ).mp hϖ
-  calc Nat.card (L.O ⧸ Ideal.span {piO L ϖ})
-      = Nat.card (A.toSubring ⧸ Ideal.span {e (piO L ϖ)}) := by
-        apply Nat.card_congr
-        refine (Ideal.quotientEquiv _ _ e ?_).toEquiv
-        rw [Ideal.map_span, Set.image_singleton]
-        rfl
-    _ = Nat.card (A ⧸ (Ideal.span {πA} : Ideal A)) := by
-        rfl
-    _ = Nat.card (A ⧸ I') := Nat.card_congr (Submodule.Quotient.restrictScalarsEquiv 𝒪[F] _).toEquiv.symm
+  calc
+    Nat.card (L.O ⧸ Ideal.span {piO L ϖ}) = Nat.card (A.toSubring ⧸ Ideal.span {e (piO L ϖ)}) := by
+      apply Nat.card_congr
+      refine (Ideal.quotientEquiv _ _ e ?_).toEquiv
+      rw [Ideal.map_span, Set.image_singleton]
+      rfl
+    _ = Nat.card (A ⧸ (Ideal.span {πA} : Ideal A)) := by rfl
+    _ = Nat.card (A ⧸ I') :=
+      Nat.card_congr (Submodule.Quotient.restrictScalarsEquiv 𝒪[F] _).toEquiv.symm
     _ = Nat.card ((Fin 2 → 𝒪[F]) ⧸ P) := by
-        apply Nat.card_congr
-        rw [← hmap]
-        exact (Submodule.Quotient.equiv I' _ b.equivFun rfl).toEquiv
+      apply Nat.card_congr
+      rw [← hmap]
+      exact (Submodule.Quotient.equiv I' _ b.equivFun rfl).toEquiv
     _ = Nat.card (Fin 2 → 𝒪[F] ⧸ Ideal.span {ϖ}) := Nat.card_congr (Submodule.quotientPi _).toEquiv
-    _ = Nat.card (𝒪[F] ⧸ Ideal.span {ϖ}) ^ 2 := by
-        rw [Nat.card_fun, Nat.card_fin]
+    _ = Nat.card (𝒪[F] ⧸ Ideal.span {ϖ}) ^ 2 := by rw [Nat.card_fun, Nat.card_fin]
     _ = Nat.card 𝓀[F] ^ 2 := by
-        congr 1
-        apply Nat.card_congr
-        exact (Ideal.quotEquivOfEq hmax).toEquiv.symm
+      congr 1
+      apply Nat.card_congr
+      exact (Ideal.quotEquivOfEq hmax).toEquiv.symm
 
 end PI.UnitaryGroupMassFormula.CntFormula

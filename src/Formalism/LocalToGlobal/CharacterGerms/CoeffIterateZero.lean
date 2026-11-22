@@ -21,8 +21,10 @@ variable {k : Type*} [Field k] {Z B : Type*}
 
 structure Contr (Ψ : (B → MvPowerSeries Z k) → (B → MvPowerSeries Z k)) : Prop where
   noConst : ∀ t, NoConst (Ψ t)
-  contr : ∀ (t t' : B → MvPowerSeries Z k) (n : ℕ), NoConst t → NoConst t' →
-    (∀ c, OrdGE (n + 1) (t c - t' c)) → ∀ b, OrdGE (n + 2) (Ψ t b - Ψ t' b)
+  contr
+    : ∀ (t t' : B → MvPowerSeries Z k) (n : ℕ),
+      NoConst t → NoConst t' → (∀ c, OrdGE (n + 1) (t c - t' c))
+        → ∀ b, OrdGE (n + 2) (Ψ t b - Ψ t' b)
 
 namespace Contr
 
@@ -30,16 +32,16 @@ variable {Ψ : (B → MvPowerSeries Z k) → (B → MvPowerSeries Z k)} (H : Con
 
 include H
 
-theorem noConst_iterate {t : B → MvPowerSeries Z k} (ht : NoConst t) (n : ℕ) :
-    NoConst (Ψ^[n] t) := by
+theorem noConst_iterate {t : B → MvPowerSeries Z k} (ht : NoConst t) (n : ℕ)
+    : NoConst (Ψ^[n] t) := by
   cases n with
   | zero => simpa using ht
   | succ n =>
     rw [Function.iterate_succ_apply']
     exact H.noConst _
 
-theorem iterate_close {a b : B → MvPowerSeries Z k} (ha : NoConst a) (hb : NoConst b) (n : ℕ) :
-    ∀ c, OrdGE (n + 1) (Ψ^[n] a c - Ψ^[n] b c) := by
+theorem iterate_close {a b : B → MvPowerSeries Z k} (ha : NoConst a) (hb : NoConst b) (n : ℕ)
+    : ∀ c, OrdGE (n + 1) (Ψ^[n] a c - Ψ^[n] b c) := by
   induction n with
   | zero =>
     intro c A hA
@@ -56,12 +58,13 @@ theorem noConst_zero : NoConst (0 : B → MvPowerSeries Z k) := by
 
 def fixPt (_H : Contr Ψ) : B → MvPowerSeries Z k := fun c A => coeff A (Ψ^[A.degree] 0 c)
 
-theorem coeff_iterate_zero (c : B) (A : Z →₀ ℕ) {n : ℕ} (hn : A.degree ≤ n) :
-    coeff A (Ψ^[n] 0 c) = coeff A (H.fixPt c) := by
+theorem coeff_iterate_zero (c : B) (A : Z →₀ ℕ) {n : ℕ} (hn : A.degree ≤ n)
+    : coeff A (Ψ^[n] 0 c) = coeff A (H.fixPt c) := by
   obtain ⟨j, rfl⟩ := Nat.exists_eq_add_of_le hn
   have e : coeff A (H.fixPt c) = coeff A (Ψ^[A.degree] 0 c) := rfl
-  have h1 := H.iterate_close (a := Ψ^[j] 0) (b := 0) (H.noConst_iterate noConst_zero j)
-    noConst_zero A.degree c A (Nat.lt_succ_self _)
+  have h1 :=
+    H.iterate_close (a := Ψ^[j] 0) (b := 0) (H.noConst_iterate noConst_zero j) noConst_zero A.degree
+      c A (Nat.lt_succ_self _)
   rw [map_sub, sub_eq_zero] at h1
   rw [Function.iterate_add_apply, e]
   exact h1
@@ -78,8 +81,10 @@ theorem noConst_fixPt : NoConst H.fixPt := by
 theorem fix_fixPt : Ψ H.fixPt = H.fixPt := by
   funext c
   ext A
-  have h1 := H.contr H.fixPt (Ψ^[A.degree] 0) A.degree H.noConst_fixPt
-    (H.noConst_iterate noConst_zero _) (fun c' => H.fixPt_close A.degree c') c A (by omega)
+  have h1 :=
+    H.contr H.fixPt (Ψ^[A.degree] 0) A.degree H.noConst_fixPt (H.noConst_iterate noConst_zero _)
+      (fun c' => H.fixPt_close A.degree c')
+      c A (by omega)
   rw [map_sub, sub_eq_zero, ← Function.iterate_succ_apply' Ψ A.degree 0] at h1
   rw [h1, H.coeff_iterate_zero c A (Nat.le_succ _)]
 
@@ -94,8 +99,8 @@ theorem exists_unique : ∃! t : B → MvPowerSeries Z k, NoConst t ∧ Ψ t = t
 
 end Contr
 
-theorem noConst_iff (t : B → MvPowerSeries Z k) :
-    NoConst t ↔ ∀ c, MvPowerSeries.constantCoeff (t c) = 0 := by
+theorem noConst_iff (t : B → MvPowerSeries Z k)
+    : NoConst t ↔ ∀ c, MvPowerSeries.constantCoeff (t c) = 0 := by
   constructor
   · intro h c
     have h0 := h c 0 (by simp)
@@ -114,8 +119,8 @@ end Gen
 
 section Main
 
-variable {C : Type} [Field C] {V : VF C} {d : ℕ} {I J : Type} [Fintype I] [Fintype J]
-  {X : Cart V d I J}
+variable
+  {C : Type} [Field C] {V : VF C} {d : ℕ} {I J : Type} [Fintype I] [Fintype J] {X : Cart V d I J}
 
 namespace Sys
 
@@ -145,14 +150,16 @@ def dl (x : I) (μ : I →₀ ℕ) : C := if μ = Finsupp.single x 1 then 1 else
 def Ps (t : I → MvPowerSeries I C) : I → MvPowerSeries I C := fun c μ =>
   Matrix.vecMul (fun x => dl x μ - S.Rr t x μ) S.Mt⁻¹ c
 
-theorem coeff_Ps (t : I → MvPowerSeries I C) (c : I) (μ : I →₀ ℕ) :
-    coeff μ (S.Ps t c) = Matrix.vecMul (fun x => dl x μ - S.Rr t x μ) S.Mt⁻¹ c := rfl
+theorem coeff_Ps (t : I → MvPowerSeries I C) (c : I) (μ : I →₀ ℕ)
+    : coeff μ (S.Ps t c) = Matrix.vecMul (fun x => dl x μ - S.Rr t x μ) S.Mt⁻¹ c :=
+  rfl
 
 theorem two_le_pow (s : ℕ) : 2 ≤ V.l ^ (s + 1) := by
   first
   | exact V.3.two_le.trans (Nat.le_self_pow (Nat.succ_ne_zero s) _)
   | exact le_trans V.3.two_le (Nat.le_self_pow (by omega) _)
-  | calc 2 ≤ V.l := V.3.two_le
+  | calc
+      2 ≤ V.l := V.3.two_le
       _ = V.l ^ 1 := (pow_one _).symm
       _ ≤ V.l ^ (s + 1) := Nat.pow_le_pow_right V.3.pos (by omega)
 
@@ -184,27 +191,33 @@ theorem contr : Contr S.Ps := by
       unfold Rr
       refine Finset.sum_congr rfl fun s _ => Finset.sum_congr rfl fun c _ => ?_
       have hN := two_le_pow (V := V) s
-      have := Formalism.BaseCaseIdentities.OrdGE.pow_sub_pow (ht c) (ht' c) (h c) (N := V.l ^ (s + 1)) (by omega) A
-        (by omega)
+      have :=
+        Formalism.BaseCaseIdentities.OrdGE.pow_sub_pow (ht c) (ht' c) (h c) (N := V.l ^ (s + 1))
+          (by omega) A (by omega)
       rw [map_sub, sub_eq_zero] at this
       rw [this]
     rw [this]
 
-theorem eqn_eq (t : I → MvPowerSeries I C) (x : I) (μ : I →₀ ℕ) :
-    (∑ s ∈ Finset.range (μ.degree + 1), ∑ c : I,
-        S.al c s x * MvPowerSeries.coeff μ (t c ^ (V.l ^ s))) =
-      Matrix.vecMul (fun c => coeff μ (t c)) S.Mt x + S.Rr t x μ := by
+theorem eqn_eq (t : I → MvPowerSeries I C) (x : I) (μ : I →₀ ℕ)
+    : (∑ s ∈ Finset.range (μ.degree + 1), ∑ c : I,
+          S.al c s x * MvPowerSeries.coeff μ (t c ^ (V.l ^ s)))
+      = Matrix.vecMul (fun c => coeff μ (t c)) S.Mt x + S.Rr t x μ := by
   rw [Finset.sum_range_succ', add_comm (Matrix.vecMul _ _ _)]
   congr 1
-  all_goals first
+  all_goals
+    first
     | rfl
-    | (show _ = ∑ c, coeff μ (t c) * S.Mt c x
-       exact Finset.sum_congr rfl fun c _ => by rw [S.al_zero c x, pow_zero, pow_one, mul_comm])
+    | (
+        show _ = ∑ c, coeff μ (t c) * S.Mt c x
+        exact Finset.sum_congr rfl fun c _ => by rw [S.al_zero c x, pow_zero, pow_one, mul_comm]
+      )
 
 theorem isT_iff (t : I → MvPowerSeries I C) : S.IsT t ↔ NoConst t ∧ S.Ps t = t := by
   have hdet : IsUnit S.Mt.det := isUnit_iff_ne_zero.mpr S.det_ne
-  have key : ∀ μ : I →₀ ℕ, ((∀ x, Matrix.vecMul (fun c => coeff μ (t c)) S.Mt x + S.Rr t x μ = dl x μ) ↔
-      (fun c => coeff μ (t c)) = Matrix.vecMul (fun x => dl x μ - S.Rr t x μ) S.Mt⁻¹) := by
+  have key
+      : ∀ μ : I →₀ ℕ,
+        ((∀ x, Matrix.vecMul (fun c => coeff μ (t c)) S.Mt x + S.Rr t x μ = dl x μ)
+          ↔ (fun c => coeff μ (t c)) = Matrix.vecMul (fun x => dl x μ - S.Rr t x μ) S.Mt⁻¹) := by
     intro μ
     constructor
     · intro h

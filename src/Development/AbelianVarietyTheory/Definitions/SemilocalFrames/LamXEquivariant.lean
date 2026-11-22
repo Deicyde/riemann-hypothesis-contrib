@@ -16,8 +16,9 @@ open Formalism.MainNotions.S GlobalTheory.Count
 
 variable (I : AutInst)
 
-theorem mem_lamX (x : I.GA) (y : Fin I.n → I.E) : y ∈ lamX I x ↔
-    I.fmat x.2⁻¹ *ᵥ (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (y i)) ∈ I.Lf := by
+theorem mem_lamX (x : I.GA) (y : Fin I.n → I.E)
+    : y ∈ lamX I x
+      ↔ I.fmat x.2⁻¹ *ᵥ (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (y i)) ∈ I.Lf := by
   constructor
   · intro hy
     unfold lamX at hy
@@ -29,18 +30,20 @@ theorem mem_lamX (x : I.GA) (y : Fin I.n → I.E) : y ∈ lamX I x ↔
       rw [e0, Matrix.mulVec_zero]
       exact zero_mem _
     | add z₁ z₂ _ _ h₁ h₂ =>
-      have e2 : (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) ((z₁ + z₂) i)) =
-          (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (z₁ i)) +
-            (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (z₂ i)) := by
+      have e2
+          : (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) ((z₁ + z₂) i))
+            = (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (z₁ i))
+              + (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (z₂ i)) := by
         ext i; simp
       rw [e2, Matrix.mulVec_add]
       exact add_mem h₁ h₂
     | smul a z _ hz =>
       have hc : Formalism.UG.inclE (F := I.F) (Af I.F) (algebraMap (𝓞 I.E) I.E a) ∈ IntAf I.F I.E :=
         Subring.subset_closure (Or.inl ⟨⟨_, a, rfl⟩, rfl⟩)
-      have e1 : (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) ((a • z) i)) =
-          Formalism.UG.inclE (F := I.F) (Af I.F) (algebraMap (𝓞 I.E) I.E a) •
-            (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (z i)) := by
+      have e1
+          : (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) ((a • z) i))
+            = Formalism.UG.inclE (F := I.F) (Af I.F) (algebraMap (𝓞 I.E) I.E a)
+              • (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (z i)) := by
         ext i; simp [Algebra.smul_def]
       rw [e1, Matrix.mulVec_smul]
       exact I.Lf.smul_mem ⟨_, hc⟩ hz
@@ -61,42 +64,52 @@ theorem one_mem_GF : (1 : I.GA) ∈ I.GFset := by
     simp [uMat, Matrix.nonsing_inv_mul _ hdet]
   · simp [AutInst.fmat]
 
-theorem lamX_equivariant (g x : I.GA) (γ : GL (Fin I.n) I.E)
-    (h : I.fmat g.2 = (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (Formalism.UG.inclE (F := I.F) (Af I.F)))
-    (y : Fin I.n → I.E) :
-    (γ : Matrix (Fin I.n) (Fin I.n) I.E) *ᵥ y ∈ lamX I (g * x) ↔ y ∈ lamX I x := by
-  have hm : ∀ a b : I.Gf, I.fmat (a * b) = I.fmat a * I.fmat b := fun a b => by
-    simp [AutInst.fmat]
+theorem lamX_equivariant
+    (g x : I.GA) (γ : GL (Fin I.n) I.E)
+    (h : I.fmat g.2
+      = (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (Formalism.UG.inclE (F := I.F) (Af I.F)))
+    (y : Fin I.n → I.E)
+    : (γ : Matrix (Fin I.n) (Fin I.n) I.E) *ᵥ y ∈ lamX I (g * x) ↔ y ∈ lamX I x := by
+  have hm : ∀ a b : I.Gf, I.fmat (a * b) = I.fmat a * I.fmat b := fun a b => by simp [AutInst.fmat]
   have h1 : I.fmat 1 = 1 := by simp [AutInst.fmat]
-  have hinc : (fun i => Formalism.UG.inclE (F := I.F) (Af I.F)
-      (((γ : Matrix (Fin I.n) (Fin I.n) I.E) *ᵥ y) i)) =
-      I.fmat g.2 *ᵥ (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (y i)) := by
+  have hinc
+      : (fun i =>
+          Formalism.UG.inclE (F := I.F) (Af I.F) (((γ : Matrix (Fin I.n) (Fin I.n) I.E) *ᵥ y) i))
+        = I.fmat g.2 *ᵥ (fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (y i)) := by
     ext i
     rw [h, RingHom.map_mulVec]
     rfl
-  rw [mem_lamX, mem_lamX, hinc, Prod.snd_mul, _root_.mul_inv_rev, hm, Matrix.mulVec_mulVec, mul_assoc,
-    ← hm g.2⁻¹ g.2, inv_mul_cancel, h1, mul_one]
+  rw [mem_lamX, mem_lamX, hinc, Prod.snd_mul, _root_.mul_inv_rev, hm, Matrix.mulVec_mulVec,
+    mul_assoc, ← hm g.2⁻¹ g.2, inv_mul_cancel, h1, mul_one]
 
-theorem embedding_cases (w : InfinitePlace I.E) :
-    w.embedding = I.φ (w.comap (algebraMap I.F I.E)) ∨
-      w.embedding = ComplexEmbedding.conjugate (I.φ (w.comap (algebraMap I.F I.E))) := by
+theorem embedding_cases (w : InfinitePlace I.E)
+    : w.embedding = I.φ (w.comap (algebraMap I.F I.E))
+      ∨ w.embedding = ComplexEmbedding.conjugate (I.φ (w.comap (algebraMap I.F I.E))) := by
   have hcm := I.cm.cmUnram.2.1
-  have hF : ∀ a : I.F, w.embedding (algebraMap I.F I.E a) =
-      I.φ (w.comap (algebraMap I.F I.E)) (algebraMap I.F I.E a) := by
+  have hF
+      : ∀ a : I.F,
+        w.embedding (algebraMap I.F I.E a)
+          = I.φ (w.comap (algebraMap I.F I.E)) (algebraMap I.F I.E a) := by
     have := I.cm.totReal
-    have hv : w.comap (algebraMap I.F I.E) =
-        InfinitePlace.mk (w.embedding.comp (algebraMap I.F I.E)) := by
+    have hv
+        : w.comap (algebraMap I.F I.E)
+          = InfinitePlace.mk (w.embedding.comp (algebraMap I.F I.E)) := by
       rw [← InfinitePlace.comap_mk, InfinitePlace.mk_embedding]
-    have hψ : (I.φ (w.comap (algebraMap I.F I.E))).comp (algebraMap I.F I.E) =
-        (w.comap (algebraMap I.F I.E)).embedding := RingHom.ext (I.φ_over _)
-    have hreal : ComplexEmbedding.conjugate (w.embedding.comp (algebraMap I.F I.E)) =
-        w.embedding.comp (algebraMap I.F I.E) :=
+    have hψ
+        : (I.φ (w.comap (algebraMap I.F I.E))).comp (algebraMap I.F I.E)
+          = (w.comap (algebraMap I.F I.E)).embedding :=
+      RingHom.ext (I.φ_over _)
+    have hreal
+        : ComplexEmbedding.conjugate (w.embedding.comp (algebraMap I.F I.E))
+          = w.embedding.comp (algebraMap I.F I.E) :=
       ComplexEmbedding.isReal_iff.mp (InfinitePlace.isReal_mk_iff.mp (IsTotallyReal.isReal _))
-    have hmk : InfinitePlace.mk (w.embedding.comp (algebraMap I.F I.E)) =
-        InfinitePlace.mk ((I.φ (w.comap (algebraMap I.F I.E))).comp (algebraMap I.F I.E)) := by
+    have hmk
+        : InfinitePlace.mk (w.embedding.comp (algebraMap I.F I.E))
+          = InfinitePlace.mk ((I.φ (w.comap (algebraMap I.F I.E))).comp (algebraMap I.F I.E)) := by
       rw [hψ, InfinitePlace.mk_embedding, hv]
-    have key : w.embedding.comp (algebraMap I.F I.E) =
-        (I.φ (w.comap (algebraMap I.F I.E))).comp (algebraMap I.F I.E) := by
+    have key
+        : w.embedding.comp (algebraMap I.F I.E)
+          = (I.φ (w.comap (algebraMap I.F I.E))).comp (algebraMap I.F I.E) := by
       rcases InfinitePlace.mk_eq_iff.mp hmk with h | h
       · exact h
       · rwa [hreal] at h
@@ -137,30 +150,38 @@ theorem embedding_cases (w : InfinitePlace I.E) :
     rw [map_add (f := _), map_add (f := _), map_add (f := _)] at h
     linear_combination h - ha'
 
-theorem frm_frame (x : I.GA) (w : InfinitePlace I.E) :
-    (frm I x w)ᴴ * I.J.map w.embedding * frm I x w = Formalism.REAL.Jm (I.ε (w.comap (algebraMap I.F I.E))) := by
-  have hU : (uMat (x.1 (w.comap (algebraMap I.F I.E))))ᴴ * Formalism.REAL.Jm (I.ε (w.comap (algebraMap I.F I.E))) *
-      uMat (x.1 (w.comap (algebraMap I.F I.E))) = Formalism.REAL.Jm (I.ε (w.comap (algebraMap I.F I.E))) :=
+theorem frm_frame (x : I.GA) (w : InfinitePlace I.E)
+    : (frm I x w)ᴴ * I.J.map w.embedding * frm I x w
+      = Formalism.REAL.Jm (I.ε (w.comap (algebraMap I.F I.E))) := by
+  have hU
+      : (uMat (x.1 (w.comap (algebraMap I.F I.E))))ᴴ
+          * Formalism.REAL.Jm (I.ε (w.comap (algebraMap I.F I.E)))
+          * uMat (x.1 (w.comap (algebraMap I.F I.E)))
+        = Formalism.REAL.Jm (I.ε (w.comap (algebraMap I.F I.E))) :=
     (x.1 (w.comap (algebraMap I.F I.E))).2
-  have key : (I.P (w.comap (algebraMap I.F I.E)) * uMat (x.1 (w.comap (algebraMap I.F I.E))))ᴴ *
-      I.J.map (I.φ (w.comap (algebraMap I.F I.E))) *
-      (I.P (w.comap (algebraMap I.F I.E)) * uMat (x.1 (w.comap (algebraMap I.F I.E)))) =
-      Formalism.REAL.Jm (I.ε (w.comap (algebraMap I.F I.E))) := by
+  have key
+      : (I.P (w.comap (algebraMap I.F I.E)) * uMat (x.1 (w.comap (algebraMap I.F I.E))))ᴴ
+          * I.J.map (I.φ (w.comap (algebraMap I.F I.E)))
+          * (I.P (w.comap (algebraMap I.F I.E)) * uMat (x.1 (w.comap (algebraMap I.F I.E))))
+        = Formalism.REAL.Jm (I.ε (w.comap (algebraMap I.F I.E))) := by
     rw [Matrix.conjTranspose_mul]
-    calc _ = (uMat (x.1 (w.comap (algebraMap I.F I.E))))ᴴ *
-          ((I.P (w.comap (algebraMap I.F I.E)))ᴴ * I.J.map (I.φ (w.comap (algebraMap I.F I.E))) *
-            I.P (w.comap (algebraMap I.F I.E))) * uMat (x.1 (w.comap (algebraMap I.F I.E))) := by
-          simp only [Matrix.mul_assoc]
+    calc
+      _ = (uMat (x.1 (w.comap (algebraMap I.F I.E))))ᴴ
+          * ((I.P (w.comap (algebraMap I.F I.E)))ᴴ * I.J.map (I.φ (w.comap (algebraMap I.F I.E)))
+            * I.P (w.comap (algebraMap I.F I.E)))
+          * uMat (x.1 (w.comap (algebraMap I.F I.E))) := by
+        simp only [Matrix.mul_assoc]
       _ = _ := by rw [I.P_spec]; exact hU
-  have hc : ∀ A : Matrix (Fin I.n) (Fin I.n) ℂ,
-      (A.map (starRingEnd ℂ))ᴴ = Aᴴ.map (starRingEnd ℂ) := by
+  have hc
+      : ∀ A : Matrix (Fin I.n) (Fin I.n) ℂ, (A.map (starRingEnd ℂ))ᴴ = Aᴴ.map (starRingEnd ℂ) := by
     intro A; ext i j; simp [Matrix.conjTranspose_apply]
   simp only [frm]
   split_ifs with h
   · rw [h]; exact key
   · rw [(embedding_cases I w).resolve_left h]
-    have hJ : I.J.map (ComplexEmbedding.conjugate (I.φ (w.comap (algebraMap I.F I.E)))) =
-        (I.J.map (I.φ (w.comap (algebraMap I.F I.E)))).map (starRingEnd ℂ) := by
+    have hJ
+        : I.J.map (ComplexEmbedding.conjugate (I.φ (w.comap (algebraMap I.F I.E))))
+          = (I.J.map (I.φ (w.comap (algebraMap I.F I.E)))).map (starRingEnd ℂ) := by
       ext i j; simp [ComplexEmbedding.conjugate_coe_eq]
     rw [hJ, hc, ← Matrix.map_mul, ← Matrix.map_mul, key]
     ext i j

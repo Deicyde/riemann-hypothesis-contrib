@@ -13,17 +13,19 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.BinaryHermiti
 
 @[expose] public section
 
-open NumberField GlobalTheory.Mass Formalism.HermitianLatticesTheory Formalism.HermitianLattices.Ext.L3 Formalism.L2.SG.Pf.Cnt
+open NumberField GlobalTheory.Mass Formalism.HermitianLatticesTheory
+  Formalism.HermitianLattices.Ext.L3 Formalism.L2.SG.Pf.Cnt
 open scoped Classical
 
 namespace GlobalTheory.Mass.MaxFormula
 
-variable {K F V : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
+variable
+  {K F V : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
   [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
 omit [NumberField K] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [FiniteDimensional K V] in
-theorem nondegenerate_of_pos {h : V →ₗ⋆[K] V →ₗ[K] K} [NumberField K] (hd : IsTotPosDef h) :
-    h.Nondegenerate := by
+theorem nondegenerate_of_pos {h : V →ₗ⋆[K] V →ₗ[K] K} [NumberField K] (hd : IsTotPosDef h)
+    : h.Nondegenerate := by
   have han : ∀ x, h x x = 0 → x = 0 := by
     intro x hx
     by_contra h0
@@ -32,11 +34,13 @@ theorem nondegenerate_of_pos {h : V →ₗ⋆[K] V →ₗ[K] K} [NumberField K] 
     simp [hx] at this
   exact ⟨fun x hx => han x (hx x), fun x hx => han x (hx x)⟩
 
-theorem localMassFactor_eq_of_mem_badPrimes (hK : IsCMUnram K) (hF : IsFixF K F) {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm)
-    (hd : IsTotPosDef h) {M : Submodule (𝓞 K) V} (hM : IsMaxLat h M) {P : Ideal (𝓞 K)}
-    (hP : P ∈ badP h M) :
-    lamP h M (P.comap (algebraMap (𝓞 F) (𝓞 K))) =
-      ((qIn P : ℝ) ^ Module.finrank K V - (-1) ^ Module.finrank K V) / ((qIn P : ℝ) + 1) := by
+theorem localMassFactor_eq_of_mem_badPrimes
+    (hK : IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h)
+    {M : Submodule (𝓞 K) V} (hM : IsMaxLat h M)
+    {P : Ideal (𝓞 K)} (hP : P ∈ badP h M)
+    : lamP h M (P.comap (algebraMap (𝓞 F) (𝓞 K)))
+      = ((qIn P : ℝ) ^ Module.finrank K V - (-1) ^ Module.finrank K V) / ((qIn P : ℝ) + 1) := by
   have hnd := nondegenerate_of_pos hd
   obtain ⟨hc, hq2, hq, -⟩ := (GlobalTheory.MaxLatStruct.main K V h hK hs hnd M hM).2.2.2 P hP
   have hPm : P.IsMaximal := hP.1
@@ -45,9 +49,11 @@ theorem localMassFactor_eq_of_mem_badPrimes (hK : IsCMUnram K) (hF : IsFixF K F)
   obtain ⟨hJ1, hJ2⟩ := jordan_splitting_exists K F V hK hF h hs
   have hfull := hM.1.1
   have hlat := hfull.toIsLattice
-  obtain ⟨b, a, hJ⟩ := hJ1 ⊤ M (fun x _ hx => hnd.1 x fun y => hx y trivial)
-    ⟨hlat.fg, hfull.span_eq_top⟩ hM.1.2 𝔭 h𝔭
-  obtain ⟨i, hi, hj⟩ := GlobalTheory.T.jordan_exponents_maximal_hermitian_lattice_bad_prime K F V hK hF h hs hd M hM P hP b a hJ
+  obtain ⟨b, a, hJ⟩ :=
+    hJ1 ⊤ M (fun x _ hx => hnd.1 x fun y => hx y trivial) ⟨hlat.fg, hfull.span_eq_top⟩ hM.1.2 𝔭 h𝔭
+  obtain ⟨i, hi, hj⟩ :=
+    GlobalTheory.T.jordan_exponents_maximal_hermitian_lattice_bad_prime K F V hK hF h hs hd M hM P
+      hP b a hJ
   have hv : vd h M 𝔭 = 1 := by
     rw [hJ2 M hlat 𝔭 h𝔭 b a hJ, vJof, Finset.sum_eq_single i (fun j _ => hj j) (by simp)]
     exact hi
@@ -67,8 +73,10 @@ theorem localMassFactor_eq_of_mem_badPrimes (hK : IsCMUnram K) (hF : IsFixF K F)
   have hη : etaF K F 𝔭 = -1 := by rw [h𝔭def, etaF_comap hK hF hPm, if_pos hc]
   have hdisc : (discAut h ⊤ M 𝔭 : ℝ) = (qIn P : ℝ) + 1 := by
     have hq0 : (qIn P : ℝ) ≠ 0 := by exact_mod_cast (by omega : qIn P ≠ 0)
-    rw [GlobalTheory.T.discriminantModule_isometries_eq_normOne_residues K F V hK hF h hs M hlat 𝔭 h𝔭 b a hJ i hi hj,
-      ThirdPropositionSlot.normRepCount_extP hK hF h𝔭 le_rfl, ThirdPropositionSlot.alphaStd_one, hη, hN]
+    rw [GlobalTheory.T.discriminantModule_isometries_eq_normOne_residues K F V hK hF h hs M hlat 𝔭
+        h𝔭 b a hJ i hi hj,
+      ThirdPropositionSlot.normRepCount_extP hK hF h𝔭 le_rfl, ThirdPropositionSlot.alphaStd_one, hη,
+      hN]
     field_simp
     ring
   have hm : 1 ≤ Module.finrank K V := by
@@ -77,24 +85,29 @@ theorem localMassFactor_eq_of_mem_badPrimes (hK : IsCMUnram K) (hF : IsFixF K F)
   obtain ⟨m, hm'⟩ : ∃ m, Module.finrank K V = m + 1 := ⟨_, (Nat.sub_add_cancel hm).symm⟩
   have hpos := alphaStd_pos hK hF h𝔭 m
   have hq0 : (0 : ℝ) < qIn P := by exact_mod_cast (by omega : 0 < qIn P)
-  rw [lamP, alpha_discriminant_holds K F V hK hF h hs hd M hlat hM.1.2 𝔭 h𝔭 b a hJ, hv, hcJ, hdisc, hm',
-    Nat.add_sub_cancel, mul_one]
-  have hstep : alphaStd K 𝔭 (m + 1) =
-      alphaStd K 𝔭 m * (1 - (-1) ^ (m + 1) * ((qIn P : ℝ) ^ (m + 1))⁻¹) := by
+  rw [lamP, alpha_discriminant_holds K F V hK hF h hs hd M hlat hM.1.2 𝔭 h𝔭 b a hJ, hv, hcJ, hdisc,
+    hm', Nat.add_sub_cancel, mul_one]
+  have hstep
+      : alphaStd K 𝔭 (m + 1)
+        = alphaStd K 𝔭 m * (1 - (-1) ^ (m + 1) * ((qIn P : ℝ) ^ (m + 1))⁻¹) := by
     rw [alphaStd, Finset.prod_Icc_succ_top (by omega), hη, hN, zpow_neg, zpow_natCast, ← hN, ← hη]
     rfl
   rw [hstep, hN]
   field_simp
 
-theorem lamG_eq_lamMax (hK : IsCMUnram K) (hF : IsFixF K F) {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm)
-    (hd : IsTotPosDef h) {M : Submodule (𝓞 K) V} (hM : IsMaxLat h M) :
-    lamG F h M = lamMax h M := by
+theorem lamG_eq_lamMax
+    (hK : IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h)
+    {M : Submodule (𝓞 K) V} (hM : IsMaxLat h M)
+    : lamG F h M = lamMax h M := by
   have hst := GlobalTheory.MaxLatStruct.main K V h hK hs (nondegenerate_of_pos hd) M hM
   have hfin := hst.1
-  let g : {P // P ∈ hfin.toFinset} → {𝔭 : Ideal (𝓞 F) // 𝔭.IsMaximal} := fun P =>
-    ⟨P.1.comap (algebraMap (𝓞 F) (𝓞 K)), by
+  let g : {P // P ∈ hfin.toFinset} → {𝔭 : Ideal (𝓞 F) // 𝔭.IsMaximal} := fun P => ⟨
+    P.1.comap (algebraMap (𝓞 F) (𝓞 K)),
+    by
       have : P.1.IsMaximal := (hfin.mem_toFinset.1 P.2).1
-      exact Ideal.isMaximal_under_of_isIntegral_of_isMaximal (R := 𝓞 F) P.1⟩
+      exact Ideal.isMaximal_under_of_isIntegral_of_isMaximal (R := 𝓞 F) P.1
+  ⟩
   have hg : Function.Injective g := by
     intro P Q hPQ
     have hP := hfin.mem_toFinset.1 P.2
@@ -105,15 +118,16 @@ theorem lamG_eq_lamMax (hK : IsCMUnram K) (hF : IsFixF K F) {h : V →ₗ⋆[K] 
   rw [lamG, lamMax, finprod_mem_eq_finite_toFinset_prod _ hfin,
     tprod_eq_prod (s := hfin.toFinset.attach.image g), Finset.prod_image fun _ _ _ _ e => hg e,
     ← Finset.prod_attach hfin.toFinset]
-  · exact Finset.prod_congr rfl fun P _ => localMassFactor_eq_of_mem_badPrimes hK hF hs hd hM (hfin.mem_toFinset.1 P.2)
+  · exact Finset.prod_congr rfl fun P _ =>
+      localMassFactor_eq_of_mem_badPrimes hK hF hs hd hM (hfin.mem_toFinset.1 P.2)
   · intro 𝔭 h𝔭
     obtain ⟨P, hP, hP𝔭⟩ := exists_maximal_over hK hF 𝔭.2
     have hlat := hM.1.1
     apply localMassFactor_of_valuation_eq_zero hK hF hs hd hlat hM.1.2 𝔭.2
     rw [← hP𝔭]
     refine (isUnimodularAt_iff_vd hK hF hs hd hlat hM.1.2 hP).1 (by_contra fun hb => h𝔭 ?_)
-    exact Finset.mem_image.2 ⟨⟨P, hfin.mem_toFinset.2 ⟨hP, hb⟩⟩, Finset.mem_attach _ _,
-      Subtype.ext hP𝔭⟩
+    exact Finset.mem_image.2
+      ⟨⟨P, hfin.mem_toFinset.2 ⟨hP, hb⟩⟩, Finset.mem_attach _ _, Subtype.ext hP𝔭⟩
 
 theorem main : MaxMass := by
   intro K _ _ _ hK n hn

@@ -8,12 +8,15 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Conti
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Bor
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af
+  UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Bor
 open scoped TensorProduct
 
-private theorem open_fix {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
-    (ρ : Representation ℂ G V) (v : V) {S : Set G} (hS : IsOpen S) (h1 : (1 : G) ∈ S) (h : ∀ g ∈ S, ρ g v = v) :
-    IsOpen {g | ρ g v = v} := by
+private theorem open_fix
+    {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V) (v : V)
+    {S : Set G} (hS : IsOpen S) (h1 : (1 : G) ∈ S) (h : ∀ g ∈ S, ρ g v = v)
+    : IsOpen {g | ρ g v = v} := by
   rw [isOpen_iff_forall_mem_open]
   intro g hg
   refine ⟨(fun x => g⁻¹ * x) ⁻¹' S, fun x hx => ?_, hS.preimage (by fun_prop), by simpa using h1⟩
@@ -22,8 +25,7 @@ private theorem open_fix {G V : Type} [Group G] [TopologicalSpace G] [IsTopologi
   show ρ x v = v
   rw [e, map_mul, Module.End.mul_apply, h _ hx, hg']
 
-theorem UpperTheory.V.Lit.Bor.sqMem :
-    UpperTheory.V.Lit.Bor.SqMem := by
+theorem UpperTheory.V.Lit.Bor.sqMem : UpperTheory.V.Lit.Bor.SqMem := by
   intro E _ _ _ a ha μ _ r χ hχ φ hφ
   change IsOpen {k | finRep E a k (mulChi a χ φ) = mulChi a χ φ} ∧ _
   induction hφ using Submodule.span_induction with
@@ -38,7 +40,12 @@ theorem UpperTheory.V.Lit.Bor.sqMem :
       rw [rt_mulChi, h1', h2']
       simp
     have hs := sqUniq E a ha r χ hχ φ h.one (by simpa using h.sq [])
-    refine ⟨ho, (CuspidalL2GL.memL2_iff_isSqInt (ContAut.continuous_of_isOpen_stab E a _ ho) (fun γ g => ?_) hs.1).2 hs⟩
+    refine ⟨
+      ho,
+      (CuspidalL2GL.memL2_iff_isSqInt (ContAut.continuous_of_isOpen_stab E a _ ho)
+        (fun γ g => ?_)
+        hs.1).2 hs
+    ⟩
     rw [mulChi_apply, mulChi_apply, map_mul, chiDet_ratGL, one_mul, h.left]
   | zero =>
     rw [map_zero]
@@ -48,13 +55,19 @@ theorem UpperTheory.V.Lit.Bor.sqMem :
     simp only [Set.mem_setOf_eq, map_zero, Set.mem_univ]
   | add φ ψ _ _ h h' =>
     rw [map_add (f := _)]
-    refine ⟨open_fix (finRep E a) _ (h.1.inter h'.1) ⟨by simp, by simp⟩ ?_,
-      fun γ hγ g => congrArg₂ (· + ·) (h.2.1 γ hγ g) (h'.2.1 γ hγ g), h.2.2.add h'.2.2⟩
+    refine ⟨
+      open_fix (finRep E a) _ (h.1.inter h'.1) ⟨by simp, by simp⟩ ?_,
+      fun γ hγ g => congrArg₂ (· + ·) (h.2.1 γ hγ g) (h'.2.1 γ hγ g),
+      h.2.2.add h'.2.2
+    ⟩
     rintro k ⟨h1, h2⟩
     exact (map_add _ _ _).trans (congrArg₂ (· + ·) h1 h2)
   | smul c φ _ h =>
     rw [map_smul]
-    refine ⟨open_fix (finRep E a) _ h.1 (by simp) ?_,
-      fun γ hγ g => congrArg (c • ·) (h.2.1 γ hγ g), h.2.2.const_smul c⟩
+    refine ⟨
+      open_fix (finRep E a) _ h.1 (by simp) ?_,
+      fun γ hγ g => congrArg (c • ·) (h.2.1 γ hγ g),
+      h.2.2.const_smul c
+    ⟩
     intro k h1
     exact (map_smul _ _ _).trans (congrArg (c • ·) h1)

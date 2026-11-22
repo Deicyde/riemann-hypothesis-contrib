@@ -10,8 +10,9 @@ noncomputable section
 
 namespace Deduction
 
-theorem landau_growth_contra {c d e C : ℝ} (hc : 0 < c) (hd : 0 < d) (hde : d < e) :
-    ∃ η : ℝ, 0 < η ∧ ∃ U₀ : ℝ, ∀ U ≥ U₀, ∀ k : ℕ, U ≤ k → C * Real.exp (η * U) / e ^ k < c / d ^ k := by
+theorem landau_growth_contra {c d e C : ℝ} (hc : 0 < c) (hd : 0 < d) (hde : d < e)
+    : ∃ η : ℝ,
+      0 < η ∧ ∃ U₀ : ℝ, ∀ U ≥ U₀, ∀ k : ℕ, U ≤ k → C * Real.exp (η * U) / e ^ k < c / d ^ k := by
   have he : 0 < e := hd.trans hde
   have hL : 0 < Real.log (e / d) := Real.log_pos ((one_lt_div hd).mpr hde)
   set L := Real.log (e / d) with hLdef
@@ -27,8 +28,7 @@ theorem landau_growth_contra {c d e C : ℝ} (hc : 0 < c) (hd : 0 < d) (hde : d 
   have hcL : 0 < c * L := mul_pos hc hL
   rw [ge_iff_le, div_le_iff₀ hcL] at hU
   have h1 : L / 2 * U + 1 ≤ X := Real.add_one_le_exp _
-  have hX : |C| < c * X := by
-    nlinarith [mul_le_mul_of_nonneg_left h1 hc.le]
+  have hX : |C| < c * X := by nlinarith [mul_le_mul_of_nonneg_left h1 hc.le]
   have hY : X * X ≤ Real.exp (k * L) := by
     rw [hXdef, ← Real.exp_add]
     apply Real.exp_le_exp.mpr
@@ -39,7 +39,9 @@ theorem landau_growth_contra {c d e C : ℝ} (hc : 0 < c) (hd : 0 < d) (hde : d 
     nlinarith
   have h2 : |C| * X < c * (X * X) := by nlinarith
   have h3 : c * (X * X) ≤ c * Real.exp (k * L) := mul_le_mul_of_nonneg_left hY hc.le
-  calc C * X * d ^ k ≤ |C| * X * d ^ k := hCX
+  calc
+    C * X * d ^ k
+      ≤ |C| * X * d ^ k := hCX
     _ < c * Real.exp (k * L) * d ^ k := mul_lt_mul_of_pos_right (h2.trans_le h3) hdk
     _ = c * (d ^ k * Real.exp (k * L)) := by ring
 

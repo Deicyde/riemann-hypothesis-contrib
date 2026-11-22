@@ -9,7 +9,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 @[expose] public section
 
-open NumberField MeasureTheory Matrix Filter Topology GlobalTheory.SUVol GlobalTheory.RiemConst ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates
+open NumberField MeasureTheory Matrix Filter Topology GlobalTheory.SUVol GlobalTheory.RiemConst
+  ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst
+  ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates
 open scoped ENNReal
 
 namespace GlobalTheory.RiemConst
@@ -29,10 +31,17 @@ lemma exp_I_neg_sum {n : ℕ} (f : Fin n → ℝ) :
   push_cast
   rw [mul_neg, Complex.exp_neg, Finset.mul_sum, Complex.exp_sum]
 
-theorem phaseFrame_small_angles : ∀ (E : Type) [Field E] (Ψ : Finset (E →+* ℂ)) (r : ℕ) (δ : ℝ), 0 < δ → ∃ η : ℝ, 0 < η ∧ ∀ θ : Ψ → Fin (r - 1) → ℝ, (∀ τ (a : Fin r), ‖phaseFrame θ τ a a - 1‖ < η) → ∃ θ' : Ψ → Fin (r - 1) → ℝ, ‖θ'‖ < δ ∧ phaseFrame θ' = phaseFrame θ := by
+theorem phaseFrame_small_angles
+    : ∀ (E : Type) [Field E] (Ψ : Finset (E →+* ℂ)) (r : ℕ) (δ : ℝ),
+      0 < δ
+        → ∃ η : ℝ,
+          0 < η
+            ∧ ∀ θ : Ψ → Fin (r - 1) → ℝ,
+              (∀ τ (a : Fin r), ‖phaseFrame θ τ a a - 1‖ < η)
+                → ∃ θ' : Ψ → Fin (r - 1) → ℝ, ‖θ'‖ < δ ∧ phaseFrame θ' = phaseFrame θ := by
   intro E _ Ψ r δ hδ
-  obtain ⟨η, hη, hcont⟩ := Metric.continuousAt_iff.mp
-    (Complex.continuousAt_arg (Complex.one_mem_slitPlane)) δ hδ
+  obtain ⟨η, hη, hcont⟩ :=
+    Metric.continuousAt_iff.mp (Complex.continuousAt_arg (Complex.one_mem_slitPlane)) δ hδ
   refine ⟨η, hη, fun θ hθ => ?_⟩
   refine ⟨fun τ k => (Complex.exp (Complex.I * (θ τ k : ℂ))).arg, ?_, ?_⟩
   · rw [pi_norm_lt_iff hδ]
@@ -40,8 +49,9 @@ theorem phaseFrame_small_angles : ∀ (E : Type) [Field E] (Ψ : Finset (E →+*
     rw [pi_norm_lt_iff hδ]
     intro k
     have hk := hθ τ (Fin.castLE (Nat.sub_le r 1) k)
-    have hentry : phaseFrame θ τ (Fin.castLE (Nat.sub_le r 1) k) (Fin.castLE (Nat.sub_le r 1) k)
-        = Complex.exp (Complex.I * (θ τ k : ℂ)) := by
+    have hentry
+        : phaseFrame θ τ (Fin.castLE (Nat.sub_le r 1) k) (Fin.castLE (Nat.sub_le r 1) k)
+          = Complex.exp (Complex.I * (θ τ k : ℂ)) := by
       simp only [phaseFrame, Matrix.diagonal_apply_eq, angles, Fin.coe_castLE, k.isLt, dif_pos]
     rw [hentry] at hk
     have := hcont (x := Complex.exp (Complex.I * (θ τ k : ℂ))) (by rwa [dist_eq_norm])

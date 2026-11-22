@@ -16,9 +16,7 @@ def logIdeal {O A : Type} [CommRing O] [NormedField A] (ι : O →+* A) (I : Ide
   Real.log (⨆ a : I, ‖ι (a : O)‖)
 
 structure LogNorms (k : Type) [Field k] where
-
   inf : (k →+* ℂ) → ℝ
-
   fin : ∀ p : Nat.Primes, (k →+* ℂ_[p]) → ℝ
 
 namespace LogNorms

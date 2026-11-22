@@ -6,13 +6,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open UpperTheory.V.FW
 
-private theorem toZModPow_one_eq_zero_iff {l : ℕ} [Fact l.Prime] (x : ℤ_[l]) :
-    PadicInt.toZModPow 1 x = 0 ↔ ‖x‖ < 1 := by
+private theorem toZModPow_one_eq_zero_iff {l : ℕ} [Fact l.Prime] (x : ℤ_[l])
+    : PadicInt.toZModPow 1 x = 0 ↔ ‖x‖ < 1 := by
   rw [PadicInt.norm_lt_one_iff_dvd, ← RingHom.mem_ker, PadicInt.ker_toZModPow,
     Ideal.mem_span_singleton, pow_one]
 
-private theorem exists_root_lift {l : ℕ} [Fact l.Prime] (u : (ZMod (l ^ 1))ˣ) :
-    ∃ ζ ∈ rootsOfUnity (Nat.totient (l ^ 1)) ℤ_[l], redU l 1 ζ = u := by
+private theorem exists_root_lift {l : ℕ} [Fact l.Prime] (u : (ZMod (l ^ 1))ˣ)
+    : ∃ ζ ∈ rootsOfUnity (Nat.totient (l ^ 1)) ℤ_[l], redU l 1 ζ = u := by
   have hl : l.Prime := Fact.out
   haveI : NeZero (l ^ 1) := ⟨pow_ne_zero _ hl.ne_zero⟩
   haveI : Fact (1 < l ^ 1) := ⟨by rw [pow_one]; exact hl.one_lt⟩
@@ -32,8 +32,9 @@ private theorem exists_root_lift {l : ℕ} [Fact l.Prime] (u : (ZMod (l ^ 1))ˣ)
   have hdF : ‖(Polynomial.derivative F).aeval a‖ = 1 := by
     refine le_antisymm (PadicInt.norm_le_one _) (not_lt.mp fun h => ?_)
     rw [← toZModPow_one_eq_zero_iff] at h
-    have hmul : PadicInt.toZModPow 1 ((Polynomial.derivative F).aeval a) =
-        ((l - 1 : ℕ) : ZMod (l ^ 1)) * ((u : ZMod (l ^ 1))) ^ (l - 1 - 1) := by
+    have hmul
+        : PadicInt.toZModPow 1 ((Polynomial.derivative F).aeval a)
+          = ((l - 1 : ℕ) : ZMod (l ^ 1)) * ((u : ZMod (l ^ 1))) ^ (l - 1 - 1) := by
       rw [hF, Polynomial.derivative_sub, Polynomial.derivative_one, sub_zero,
         Polynomial.derivative_X_pow]
       simp [ha]
@@ -43,8 +44,7 @@ private theorem exists_root_lift {l : ℕ} [Fact l.Prime] (u : (ZMod (l ^ 1))ˣ)
     exact Units.ne_zero _ h
   obtain ⟨z, hz, hza, -, -⟩ := hensels_lemma (F := F) (a := a) (by rw [hdF]; simpa using hFa)
   rw [hdF, ← toZModPow_one_eq_zero_iff, map_sub, sub_eq_zero, ha] at hza
-  have hz1 : z ^ (l - 1) = 1 := by
-    simpa [hF, sub_eq_zero] using hz
+  have hz1 : z ^ (l - 1) = 1 := by simpa [hF, sub_eq_zero] using hz
   refine ⟨Units.ofPowEqOne z (l - 1) hz1 hn, ?_, ?_⟩
   · rw [ht, mem_rootsOfUnity]
     exact Units.pow_ofPowEqOne _ _
@@ -54,8 +54,8 @@ private theorem units_four (u : (ZMod (2 ^ 2))ˣ) : u = 1 ∨ u = -1 := by
   revert u
   decide
 
-theorem UpperTheory.V.FW.teich :
-    ∀ (l : ℕ) [Fact l.Prime], Function.Bijective ((redU l (ee l)).comp (WW l).subtype) := by
+theorem UpperTheory.V.FW.teich
+    : ∀ (l : ℕ) [Fact l.Prime], Function.Bijective ((redU l (ee l)).comp (WW l).subtype) := by
   intro l _
   have hl : l.Prime := Fact.out
   have hsurj : Function.Surjective ((redU l (ee l)).comp (WW l).subtype) := by

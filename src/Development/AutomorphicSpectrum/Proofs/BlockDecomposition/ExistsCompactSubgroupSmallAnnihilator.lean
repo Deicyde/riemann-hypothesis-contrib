@@ -10,7 +10,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.TwistedK
 
 @[expose] public section
 
-open Matrix GlobalTheory.PRep GlobalTheory.BZMir GlobalTheory.BZMir.Fun GlobalTheory.SplitWeil ValuativeRel
+open Matrix GlobalTheory.PRep GlobalTheory.BZMir GlobalTheory.BZMir.Fun GlobalTheory.SplitWeil
+  ValuativeRel
 open scoped Topology
 
 namespace GlobalTheory.CompanionTheory.BZOnto.PerpSmall
@@ -26,8 +27,7 @@ def box (m : ℕ) (s : kˣ) : AddSubgroup (Fin m → k) where
 theorem mem_box {m : ℕ} {s : kˣ} {l : Fin m → k} : l ∈ box m s ↔ ∀ j, l j ∈ cball s := by
   exact Iff.rfl
 
-theorem coe_box (m : ℕ) (s : kˣ) :
-    (box m s : Set (Fin m → k)) = Set.univ.pi fun _ => cball s := by
+theorem coe_box (m : ℕ) (s : kˣ) : (box m s : Set (Fin m → k)) = Set.univ.pi fun _ => cball s := by
   ext l
   simp only [SetLike.mem_coe, mem_box, Set.mem_univ_pi]
 
@@ -39,20 +39,24 @@ theorem box_mem_nhds (m : ℕ) (s : kˣ) : (box m s : Set (Fin m → k)) ∈ �
   rw [coe_box]
   exact set_pi_mem_nhds Set.finite_univ fun _ _ => GlobalTheory.SplitWeil.cball_mem_nhds s
 
-theorem exists_box_subset {m : ℕ} {Ω : Set (Fin m → k)} (hΩ : Ω ∈ 𝓝 (0 : Fin m → k)) :
-    ∃ r : kˣ, (box m r : Set (Fin m → k)) ⊆ Ω := by
+theorem exists_box_subset {m : ℕ} {Ω : Set (Fin m → k)} (hΩ : Ω ∈ 𝓝 (0 : Fin m → k))
+    : ∃ r : kˣ, (box m r : Set (Fin m → k)) ⊆ Ω := by
   rw [nhds_pi, Filter.mem_pi'] at hΩ
   obtain ⟨I, t, ht, hsub⟩ := hΩ
   choose s hs using fun i => GlobalTheory.SplitWeil.exists_cball_subset (by simpa using ht i)
   by_cases hm : Nonempty (Fin m)
-  · obtain ⟨i₀, -, hi₀⟩ := Finset.exists_min_image Finset.univ (fun i => ValuativeRel.valuation k (s i : k))
-      Finset.univ_nonempty
+  · obtain ⟨i₀, -, hi₀⟩ :=
+      Finset.exists_min_image Finset.univ
+        (fun i => ValuativeRel.valuation k (s i : k))
+        Finset.univ_nonempty
     refine ⟨s i₀, fun l hl => hsub fun i _ => hs i ?_⟩
-    exact le_trans (show ValuativeRel.valuation k (l i) ≤ _ from (mem_box.1 hl) i) (hi₀ i (Finset.mem_univ _))
+    exact le_trans (show ValuativeRel.valuation k (l i) ≤ _ from (mem_box.1 hl) i)
+      (hi₀ i (Finset.mem_univ _))
   · exact ⟨1, fun l _ => hsub fun i _ => (hm ⟨i⟩).elim⟩
 
-theorem dotProduct_mem_cball {m : ℕ} {r s : kˣ} {b l : Fin m → k} (hb : b ∈ box m (r * s⁻¹))
-    (hl : l ∈ box m s) : b ⬝ᵥ l ∈ cball r := by
+theorem dotProduct_mem_cball
+    {m : ℕ} {r s : kˣ} {b l : Fin m → k} (hb : b ∈ box m (r * s⁻¹)) (hl : l ∈ box m s)
+    : b ⬝ᵥ l ∈ cball r := by
   unfold dotProduct
   refine Finset.sum_induction _ (· ∈ cball r) (fun a b ha hb => add_mem_cball ha hb) ?_ ?_
   · simp only [GlobalTheory.SplitWeil.cball, Set.mem_ofPred_eq]
@@ -64,8 +68,10 @@ theorem dotProduct_mem_cball {m : ℕ} {r s : kˣ} {b l : Fin m → k} (hb : b �
     simp only [GlobalTheory.SplitWeil.cball, Set.mem_ofPred_eq]
     show ValuativeRel.valuation k (b j * l j) ≤ ValuativeRel.valuation k (r : k)
     rw [map_mul]
-    calc ValuativeRel.valuation k (b j) * ValuativeRel.valuation k (l j)
-        ≤ ValuativeRel.valuation k ((r * s⁻¹ : kˣ) : k) * ValuativeRel.valuation k (s : k) := mul_le_mul' h1 h2
+    calc
+      ValuativeRel.valuation k (b j) * ValuativeRel.valuation k (l j)
+          ≤ ValuativeRel.valuation k ((r * s⁻¹ : kˣ) : k) * ValuativeRel.valuation k (s : k) :=
+        mul_le_mul' h1 h2
       _ = ValuativeRel.valuation k (r : k) := by
         rw [← map_mul]
         congr 1

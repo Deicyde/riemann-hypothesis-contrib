@@ -18,19 +18,20 @@ namespace GlobalTheory.LinearPartIteration
 
 variable {R : Type} [CommRing R] {d : ℕ}
 
-def part (F : MvPowerSeries (Fin d) R) (j : Fin d) : MvPowerSeries (Fin d) R :=
-  fun α => if ∀ k < j, α k = 0 then coeff (α + Finsupp.single j 1) F else 0
+def part (F : MvPowerSeries (Fin d) R) (j : Fin d) : MvPowerSeries (Fin d) R := fun α =>
+  if ∀ k < j, α k = 0 then coeff (α + Finsupp.single j 1) F else 0
 
-theorem coeff_part (F : MvPowerSeries (Fin d) R) (j : Fin d) (α : Fin d →₀ ℕ) :
-    coeff α (part F j) = if ∀ k < j, α k = 0 then coeff (α + Finsupp.single j 1) F else 0 := rfl
+theorem coeff_part (F : MvPowerSeries (Fin d) R) (j : Fin d) (α : Fin d →₀ ℕ)
+    : coeff α (part F j) = if ∀ k < j, α k = 0 then coeff (α + Finsupp.single j 1) F else 0 :=
+  rfl
 
-theorem constantCoeff_part (F : MvPowerSeries (Fin d) R) (j : Fin d) :
-    constantCoeff (part F j) = coeff (Finsupp.single j 1) F := by
+theorem constantCoeff_part (F : MvPowerSeries (Fin d) R) (j : Fin d)
+    : constantCoeff (part F j) = coeff (Finsupp.single j 1) F := by
   rw [← coeff_zero_eq_constantCoeff_apply, coeff_part]
   simp
 
-theorem coeff_X_mul_part (F : MvPowerSeries (Fin d) R) (j : Fin d) (β : Fin d →₀ ℕ) :
-    coeff β (X j * part F j) = if β j ≠ 0 ∧ ∀ k < j, β k = 0 then coeff β F else 0 := by
+theorem coeff_X_mul_part (F : MvPowerSeries (Fin d) R) (j : Fin d) (β : Fin d →₀ ℕ)
+    : coeff β (X j * part F j) = if β j ≠ 0 ∧ ∀ k < j, β k = 0 then coeff β F else 0 := by
   classical
   rw [X_def, coeff_monomial_mul, one_mul, coeff_part]
   by_cases h : β j = 0
@@ -39,7 +40,8 @@ theorem coeff_X_mul_part (F : MvPowerSeries (Fin d) R) (j : Fin d) (β : Fin d �
     · rw [Finsupp.single_le_iff]; omega
   · have hle : Finsupp.single j 1 ≤ β := by rw [Finsupp.single_le_iff]; omega
     rw [if_pos hle, tsub_add_cancel_of_le hle]
-    have : (∀ k < j, (β - Finsupp.single j 1 : Fin d →₀ ℕ) k = 0) ↔ (β j ≠ 0 ∧ ∀ k < j, β k = 0) := by
+    have : (∀ k < j, (β - Finsupp.single j 1 : Fin d →₀ ℕ) k = 0)
+        ↔ (β j ≠ 0 ∧ ∀ k < j, β k = 0) := by
       constructor
       · intro H
         refine ⟨h, fun k hk => ?_⟩
@@ -49,8 +51,8 @@ theorem coeff_X_mul_part (F : MvPowerSeries (Fin d) R) (j : Fin d) (β : Fin d �
         rw [Finsupp.tsub_apply, H.2 k hk, Nat.zero_sub]
     simp only [this]
 
-theorem eq_const_add_sum (F : MvPowerSeries (Fin d) R) :
-    F = C (constantCoeff F) + ∑ j, X j * part F j := by
+theorem eq_const_add_sum (F : MvPowerSeries (Fin d) R)
+    : F = C (constantCoeff F) + ∑ j, X j * part F j := by
   classical
   ext β
   set_option synthInstance.maxHeartbeats 100000 in

@@ -9,10 +9,13 @@ open TensorProduct CrystallineSemistableComparison CrystallineSemistableComparis
 
 namespace GlobalTheory.CompanionTheory.TowerLen
 
-theorem isFiniteLength_of_ker_le_range {W : Type} [CommRing W] {A B C : Type 1}
+theorem isFiniteLength_of_ker_le_range
+    {W : Type} [CommRing W]
+    {A B C : Type 1}
     [AddCommGroup A] [Module W A] [AddCommGroup B] [Module W B] [AddCommGroup C] [Module W C]
     (v : A →ₗ[W] B) (f : B →ₗ[W] C) (h : LinearMap.ker f ≤ LinearMap.range v)
-    (hA : IsFiniteLength W A) (hC : IsFiniteLength W C) : IsFiniteLength W B := by
+    (hA : IsFiniteLength W A) (hC : IsFiniteLength W C)
+    : IsFiniteLength W B := by
   rw [isFiniteLength_iff_isNoetherian_isArtinian] at hA hC ⊢
   obtain ⟨_, _⟩ := hA
   obtain ⟨_, _⟩ := hC
@@ -28,16 +31,18 @@ theorem isFiniteLength_of_ker_le_range {W : Type} [CommRing W] {A B C : Type 1}
     rw [Submodule.range_subtype, LinearMap.ker_rangeRestrict]
   exact ⟨isNoetherian_of_range_eq_ker _ _ hr, isArtinian_of_range_eq_ker _ _ hr⟩
 
-theorem isFiniteLength_level : ∀ (W : Type) [CommRing W] (l : ℕ) (S S' : Sys.{1} W) (_ : LSeq l S S'),
-    IsFiniteLength W (S.M 1) → ∀ n, IsFiniteLength W (S.M n) := by
+theorem isFiniteLength_level
+    : ∀ (W : Type) [CommRing W] (l : ℕ) (S S' : Sys.{1} W) (_ : LSeq l S S'),
+      IsFiniteLength W (S.M 1) → ∀ n, IsFiniteLength W (S.M n) := by
   intro W _ l S S' L h1 n
   induction n with
   | zero =>
-    have : Subsingleton (S.M 0) := ⟨fun x y => by
-      have hx := L.kill 0 x
-      have hy := L.kill 0 y
-      simp only [pow_zero, one_smul] at hx hy
-      rw [hx, hy]⟩
+    have : Subsingleton (S.M 0) :=
+      ⟨fun x y => by
+        have hx := L.kill 0 x
+        have hy := L.kill 0 y
+        simp only [pow_zero, one_smul] at hx hy
+        rw [hx, hy]⟩
     exact IsFiniteLength.of_subsingleton
   | succ n ih =>
     refine isFiniteLength_of_ker_le_range (L.ν 1 (n + 1)) (L.ρ (n + 1) n) ?_ h1 ih

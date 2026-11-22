@@ -17,8 +17,8 @@ def diagHom (N : ℕ) : MvPolynomial (Fin N × Fin N) ℚ →ₐ[ℚ] MvPolynomi
 def IsDiag {N : ℕ} (m : Fin N × Fin N →₀ ℕ) : Prop := ∀ v : Fin N × Fin N, v.1 ≠ v.2 → m v = 0
 
 open scoped Classical in
-theorem diagHom_monomial {N : ℕ} (m : Fin N × Fin N →₀ ℕ) (c : ℚ) :
-    diagHom N (monomial m c) = if IsDiag m then monomial m c else 0 := by
+theorem diagHom_monomial {N : ℕ} (m : Fin N × Fin N →₀ ℕ) (c : ℚ)
+    : diagHom N (monomial m c) = if IsDiag m then monomial m c else 0 := by
   classical
   rw [diagHom, aeval_monomial]
   split_ifs with h
@@ -37,8 +37,9 @@ theorem diagHom_monomial {N : ℕ} (m : Fin N × Fin N →₀ ℕ) (c : ℚ) :
     rw [Finsupp.prod, Finset.prod_eq_zero (i := v) (Finsupp.mem_support_iff.2 hmv), mul_zero]
     rw [if_neg hv, zero_pow hmv]
 
-theorem coeff_diagHom {N : ℕ} (f : MvPolynomial (Fin N × Fin N) ℚ) (m : Fin N × Fin N →₀ ℕ)
-    (hm : IsDiag m) : AddMonoidAlgebra.coeff (diagHom N f) m = AddMonoidAlgebra.coeff f m := by
+theorem coeff_diagHom
+    {N : ℕ} (f : MvPolynomial (Fin N × Fin N) ℚ) (m : Fin N × Fin N →₀ ℕ) (hm : IsDiag m)
+    : AddMonoidAlgebra.coeff (diagHom N f) m = AddMonoidAlgebra.coeff f m := by
   classical
   refine MvPolynomial.induction_on' f (fun μ c => ?_) (fun p q hp hq => ?_)
   · rw [diagHom_monomial]
@@ -52,18 +53,21 @@ theorem coeff_diagHom {N : ℕ} (f : MvPolynomial (Fin N × Fin N) ℚ) (m : Fin
 def diagMono {N : ℕ} (s : ℕ) (h : s ≤ N) : Fin N × Fin N →₀ ℕ :=
   ∑ p : Fin s, Finsupp.single (Fin.castLE h p, Fin.castLE h p) 1
 
-theorem diagHom_lpMinor {N : ℕ} (s : ℕ) (hr hn : s ≤ N) :
-    diagHom N (lpMinor ℚ s hr hn) = monomial (diagMono s hr) 1 := by
+theorem diagHom_lpMinor {N : ℕ} (s : ℕ) (hr hn : s ≤ N)
+    : diagHom N (lpMinor ℚ s hr hn) = monomial (diagMono s hr) 1 := by
   classical
   rw [lpMinor, AlgHom.map_det]
-  have hM : (diagHom N).mapMatrix
-      (Matrix.of fun p q : Fin s => (X (Fin.castLE hr p, Fin.castLE hn q) : MvPolynomial (Fin N × Fin N) ℚ)) =
-      Matrix.diagonal fun p : Fin s => (X (Fin.castLE hr p, Fin.castLE hr p) : MvPolynomial (Fin N × Fin N) ℚ) := by
+  have hM
+      : (diagHom N).mapMatrix
+          (Matrix.of fun p q : Fin s =>
+            (X (Fin.castLE hr p, Fin.castLE hn q) : MvPolynomial (Fin N × Fin N) ℚ))
+        = Matrix.diagonal fun p : Fin s =>
+          (X (Fin.castLE hr p, Fin.castLE hr p) : MvPolynomial (Fin N × Fin N) ℚ) := by
     ext p q
     by_cases hpq : p = q
     · subst hpq
       simp [diagHom]
-    · have : ¬ (Fin.castLE hr p = Fin.castLE hn q) := by
+    · have : ¬(Fin.castLE hr p = Fin.castLE hn q) := by
         intro h
         apply hpq
         exact Fin.ext (by simpa [Fin.ext_iff] using h)
@@ -74,8 +78,7 @@ theorem diagHom_lpMinor {N : ℕ} (s : ℕ) (hr hn : s ≤ N) :
 def M0 {N : ℕ} (ν : Fin N → ℕ) : Fin N × Fin N →₀ ℕ :=
   ∑ s : Fin N, (ν s - nuNext ν s) • diagMono (s.val + 1) s.isLt
 
-theorem diagHom_hw {N : ℕ} (ν : Fin N → ℕ) :
-    diagHom N (hw ℚ le_rfl ν) = monomial (M0 ν) 1 := by
+theorem diagHom_hw {N : ℕ} (ν : Fin N → ℕ) : diagHom N (hw ℚ le_rfl ν) = monomial (M0 ν) 1 := by
   classical
   rw [hw, map_prod, M0, monomial_sum_one]
   refine Finset.prod_congr rfl fun s _ => ?_
@@ -93,11 +96,12 @@ theorem isDiag_diagonal_monomial {N : ℕ} (ν : Fin N → ℕ) : IsDiag (M0 ν)
   subst h
   exact hv rfl
 
-theorem coeff_diagonal_monomial_hw {N : ℕ} (ν : Fin N → ℕ) : AddMonoidAlgebra.coeff (hw ℚ le_rfl ν) (M0 ν) = 1 := by
+theorem coeff_diagonal_monomial_hw {N : ℕ} (ν : Fin N → ℕ)
+    : AddMonoidAlgebra.coeff (hw ℚ le_rfl ν) (M0 ν) = 1 := by
   rw [← coeff_diagHom _ _ (isDiag_diagonal_monomial ν), diagHom_hw, coeff_monomial, if_pos rfl]
 
-theorem weight_rowW_apply {N : ℕ} (m : Fin N × Fin N →₀ ℕ) (a : Fin N) :
-    (Finsupp.weight (rowW N N) m) a = ∑ b : Fin N, m (a, b) := by
+theorem weight_rowW_apply {N : ℕ} (m : Fin N × Fin N →₀ ℕ) (a : Fin N)
+    : (Finsupp.weight (rowW N N) m) a = ∑ b : Fin N, m (a, b) := by
   classical
   rw [Finsupp.weight_apply, Finsupp.sum_fintype _ _ (by intro i; simp)]
   rw [Finset.sum_apply, Fintype.sum_prod_type]
@@ -108,9 +112,11 @@ theorem weight_rowW_apply {N : ℕ} (m : Fin N × Fin N →₀ ℕ) (a : Fin N) 
     simp [Ne.symm hb]
   · simp
 
-theorem diagonal_monomial_apply {N : ℕ} (ν : Fin N → ℕ) (hν : Antitone ν) (a : Fin N) : M0 ν (a, a) = ν a := by
+theorem diagonal_monomial_apply {N : ℕ} (ν : Fin N → ℕ) (hν : Antitone ν) (a : Fin N)
+    : M0 ν (a, a) = ν a := by
   classical
-  have hmem : AddMonoidAlgebra.coeff (hw ℚ le_rfl ν) (M0 ν) ≠ 0 := by rw [coeff_diagonal_monomial_hw]; exact one_ne_zero
+  have hmem : AddMonoidAlgebra.coeff (hw ℚ le_rfl ν) (M0 ν) ≠ 0 := by
+    rw [coeff_diagonal_monomial_hw]; exact one_ne_zero
   have hw8 := hwRowWeight ℚ N N le_rfl ν hν hmem
   have h1 := congrFun hw8 a
   rw [weight_rowW_apply, Finset.sum_eq_single a] at h1
@@ -120,11 +126,11 @@ theorem diagonal_monomial_apply {N : ℕ} (ν : Fin N → ℕ) (hν : Antitone �
     exact isDiag_diagonal_monomial ν (a, b) (Ne.symm hb)
   · simp
 
-theorem diagonal_monomial_factorial {N : ℕ} (ν : Fin N → ℕ) (hν : Antitone ν) :
-    (∏ k ∈ (M0 ν).support, ((M0 ν) k).factorial) = ∏ l, (ν l).factorial := by
+theorem diagonal_monomial_factorial {N : ℕ} (ν : Fin N → ℕ) (hν : Antitone ν)
+    : (∏ k ∈ (M0 ν).support, ((M0 ν) k).factorial) = ∏ l, (ν l).factorial := by
   classical
-  rw [Finset.prod_subset (Finset.subset_univ _) (fun k _ hk => by
-    rw [Finsupp.notMem_support_iff.1 hk]; rfl)]
+  rw [Finset.prod_subset (Finset.subset_univ _)
+    (fun k _ hk => by rw [Finsupp.notMem_support_iff.1 hk]; rfl)]
   rw [Fintype.prod_prod_type]
   refine Finset.prod_congr rfl fun a _ => ?_
   rw [Finset.prod_eq_single a]
@@ -134,16 +140,19 @@ theorem diagonal_monomial_factorial {N : ℕ} (ν : Fin N → ℕ) (hν : Antito
     rfl
   · simp
 
-theorem fockQ_hw_ge {N : ℕ} (ν : Fin N → ℕ) (hν : Antitone ν) :
-    (∏ l, ((ν l).factorial : ℚ)) ≤ fockQ (hw ℚ le_rfl ν) (hw ℚ le_rfl ν) := by
+theorem fockQ_hw_ge {N : ℕ} (ν : Fin N → ℕ) (hν : Antitone ν)
+    : (∏ l, ((ν l).factorial : ℚ)) ≤ fockQ (hw ℚ le_rfl ν) (hw ℚ le_rfl ν) := by
   classical
   have hmem : M0 ν ∈ (hw ℚ le_rfl ν).support := by
     rw [mem_support_iff, coeff_diagonal_monomial_hw]; exact one_ne_zero
   unfold fockQ
-  refine le_trans (le_of_eq ?_) (Finset.single_le_sum (f := fun m =>
-      AddMonoidAlgebra.coeff (hw ℚ le_rfl ν) m * AddMonoidAlgebra.coeff (hw ℚ le_rfl ν) m *
-        ((∏ k ∈ m.support, (m k).factorial : ℕ) : ℚ))
-    (fun m _ => mul_nonneg (mul_self_nonneg _) (Nat.cast_nonneg _)) hmem)
+  refine le_trans (le_of_eq ?_)
+    (Finset.single_le_sum
+      (f := fun m =>
+        AddMonoidAlgebra.coeff (hw ℚ le_rfl ν) m * AddMonoidAlgebra.coeff (hw ℚ le_rfl ν) m
+          * ((∏ k ∈ m.support, (m k).factorial : ℕ) : ℚ))
+      (fun m _ => mul_nonneg (mul_self_nonneg _) (Nat.cast_nonneg _))
+      hmem)
   simp only [coeff_diagonal_monomial_hw, one_mul]
   rw [diagonal_monomial_factorial ν hν]
   push_cast

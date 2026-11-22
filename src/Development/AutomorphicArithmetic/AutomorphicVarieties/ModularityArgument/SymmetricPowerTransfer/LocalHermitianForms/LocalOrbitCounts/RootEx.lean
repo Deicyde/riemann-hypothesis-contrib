@@ -10,18 +10,19 @@ theorem UpperTheory.V.Z.Sym.Loc.rootEx : UpperTheory.V.Z.Sym.Loc.RootEx := by
   intro O K _ _ _ _ _ Δ τ hL τ₀ e hτ hm
   subst hτ
   have h2 : IsUnit (2 : O) := hL.two
-  have eZ : ((e : ℤ)) * (e : ℤ) = 1 := by
-    rw [← Units.val_mul, Int.units_mul_self, Units.val_one]
+  have eZ : ((e : ℤ)) * (e : ℤ) = 1 := by rw [← Units.val_mul, Int.units_mul_self, Units.val_one]
   have he : ((e : ℤ) : O) * ((e : ℤ) : O) = 1 := by
     exact_mod_cast congrArg (fun n : ℤ => (n : O)) eZ
   have eK : ((e : ℤ) : K) * ((e : ℤ) : K) = 1 := by
     exact_mod_cast congrArg (fun n : ℤ => (n : K)) eZ
-  obtain ⟨s, hs, hs2⟩ := sqrtO O K Δ hL (((e : ℤ) : O) * (τ₀ + 2 * ((e : ℤ) : O))) 2 h2 (by
-    have hrw : ((e : ℤ) : O) * (τ₀ + 2 * ((e : ℤ) : O)) - 2 ^ 2
-        = ((e : ℤ) : O) * (τ₀ - 2 * ((e : ℤ) : O)) := by
-      linear_combination (4 : O) * he
-    rw [hrw]
-    exact Ideal.mul_mem_left _ _ hm)
+  obtain ⟨s, hs, hs2⟩ :=
+    sqrtO O K Δ hL (((e : ℤ) : O) * (τ₀ + 2 * ((e : ℤ) : O))) 2 h2 (by
+      have hrw
+          : ((e : ℤ) : O) * (τ₀ + 2 * ((e : ℤ) : O)) - 2 ^ 2
+            = ((e : ℤ) : O) * (τ₀ - 2 * ((e : ℤ) : O)) := by
+        linear_combination (4 : O) * he
+      rw [hrw]
+      exact Ideal.mul_mem_left _ _ hm)
   have hsu : IsUnit s := by
     by_contra hn
     have hsm : s ∈ IsLocalRing.maximalIdeal O :=
@@ -35,8 +36,8 @@ theorem UpperTheory.V.Z.Sym.Loc.rootEx : UpperTheory.V.Z.Sym.Loc.RootEx := by
   have key : (τ₀ + 2 * ((e : ℤ) : O)) * y ^ 2 = ((e : ℤ) : O) := by
     linear_combination (-(τ₀ + 2 * ((e : ℤ) : O)) * y ^ 2) * he
       + (-((e : ℤ) : O) * y ^ 2) * hs + ((e : ℤ) : O) * (s * y + 1) * hy
-  have kK : ((algebraMap O K) τ₀ + 2 * ((e : ℤ) : K)) * ((algebraMap O K) y) ^ 2
-      = ((e : ℤ) : K) := by
+  have kK
+      : ((algebraMap O K) τ₀ + 2 * ((e : ℤ) : K)) * ((algebraMap O K) y) ^ 2 = ((e : ℤ) : K) := by
     have := congrArg (algebraMap O K) key
     simpa [map_mul, map_add (f := _), map_pow, map_intCast, map_ofNat] using this
   refine ⟨((e : ℤ) : O) * y, y, Units.isUnit _, ?_, ?_⟩

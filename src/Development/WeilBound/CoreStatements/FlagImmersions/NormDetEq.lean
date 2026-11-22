@@ -13,22 +13,30 @@ open scoped ComplexOrder
 
 namespace MS
 
-theorem jac {α β n : Type} [Fintype α] [Fintype β] [Fintype n] [DecidableEq α] [DecidableEq β] [DecidableEq n]
-    (C : Matrix n n ℂ) (hC : IsUnit C.det) (e : α ⊕ β ≃ n) :
-    C.det * (C⁻¹.submatrix (fun b => e (.inr b)) fun b => e (.inr b)).det =
-      (C.submatrix (fun a => e (.inl a)) fun a => e (.inl a)).det := by
+theorem jac
+    {α β n : Type}
+    [Fintype α] [Fintype β] [Fintype n] [DecidableEq α] [DecidableEq β] [DecidableEq n]
+    (C : Matrix n n ℂ) (hC : IsUnit C.det)
+    (e : α ⊕ β ≃ n)
+    : C.det * (C⁻¹.submatrix (fun b => e (.inr b)) fun b => e (.inr b)).det
+      = (C.submatrix (fun a => e (.inl a)) fun a => e (.inl a)).det := by
   have h1 : C.submatrix e e * C⁻¹.submatrix e e = 1 := by
     rw [submatrix_mul_equiv, mul_nonsing_inv _ hC, submatrix_one_equiv]
   set A := C.submatrix e e with hA
   set B := C⁻¹.submatrix e e with hB
-  have h2 : A * fromBlocks 1 B.toBlocks₁₂ 0 B.toBlocks₂₂ = fromBlocks A.toBlocks₁₁ 0 A.toBlocks₂₁ 1 := by
-    rw [← fromBlocks_toBlocks A, ← fromBlocks_toBlocks B, fromBlocks_multiply, ← fromBlocks_one, fromBlocks_inj] at h1
+  have h2
+      : A * fromBlocks 1 B.toBlocks₁₂ 0 B.toBlocks₂₂
+        = fromBlocks A.toBlocks₁₁ 0 A.toBlocks₂₁ 1 := by
+    rw [← fromBlocks_toBlocks A, ← fromBlocks_toBlocks B, fromBlocks_multiply, ← fromBlocks_one,
+        fromBlocks_inj]
+      at h1
     conv_lhs => rw [← fromBlocks_toBlocks A]
     rw [fromBlocks_multiply, h1.2.1, h1.2.2.2]
     simp
   have h3 := congrArg det h2
   rw [det_mul, det_fromBlocks_zero₂₁, det_fromBlocks_zero₁₂, det_one, det_one, one_mul, mul_one, hA,
-    det_submatrix_equiv_self] at h3
+      det_submatrix_equiv_self]
+    at h3
   exact h3
 
 def headEquiv {N k : ℕ} (h : k ≤ N) : Fin k ≃ {a : Fin N // (a : ℕ) < k} where
@@ -37,28 +45,39 @@ def headEquiv {N k : ℕ} (h : k ≤ N) : Fin k ≃ {a : Fin N // (a : ℕ) < k}
   left_inv _ := rfl
   right_inv _ := rfl
 
-theorem det_head {N k : ℕ} {α : Type} [Fintype α] [DecidableEq α] (hd : Fin N → ℝ) (g : Matrix (Fin N) (Fin N) ℂ)
-    (e : α ≃ {a : Fin N // (a : ℕ) < k}) :
-    (gramHead hd k g).det = ((gramOf hd g).submatrix (fun a => (e a).1) fun a => (e a).1).det := by
+theorem det_head
+    {N k : ℕ} {α : Type} [Fintype α] [DecidableEq α]
+    (hd : Fin N → ℝ) (g : Matrix (Fin N) (Fin N) ℂ) (e : α ≃ {a : Fin N // (a : ℕ) < k})
+    : (gramHead hd k g).det
+      = ((gramOf hd g).submatrix (fun a => (e a).1) fun a => (e a).1).det := by
   rw [← det_submatrix_equiv_self e]
   rfl
 
-theorem gram_sub {N : ℕ} {α β : Type} (hd : Fin N → ℝ) (g : Matrix (Fin N) (Fin N) ℂ) (f : α → Fin N) (f' : β → Fin N) :
-    (gramOf hd g).submatrix f f' = (g.submatrix id f)ᴴ * diagonal (fun i => (hd i : ℂ)) * g.submatrix id f' := by
+theorem gram_sub
+    {N : ℕ} {α β : Type}
+    (hd : Fin N → ℝ) (g : Matrix (Fin N) (Fin N) ℂ) (f : α → Fin N) (f' : β → Fin N)
+    : (gramOf hd g).submatrix f f'
+      = (g.submatrix id f)ᴴ * diagonal (fun i => (hd i : ℂ)) * g.submatrix id f' := by
   ext a b
   simp [gramOf, Matrix.mul_apply, conjTranspose_apply]
 
-theorem norm_det_eq {r s : ℕ} {Γ : Matrix (Fin r) (Fin r) ℂ} (hΓ : Γ.PosDef) (h : s ≤ r) :
-    ‖(Γ.submatrix (Fin.castLE h) (Fin.castLE h)).det‖ = leadMinor Γ s := by
+theorem norm_det_eq {r s : ℕ} {Γ : Matrix (Fin r) (Fin r) ℂ} (hΓ : Γ.PosDef) (h : s ≤ r)
+    : ‖(Γ.submatrix (Fin.castLE h) (Fin.castLE h)).det‖ = leadMinor Γ s := by
   have h1 := (hΓ.submatrix (Fin.castLE_injective h)).det_pos
   unfold leadMinor
   rw [dite_eq_left h]
   exact (Complex.re_eq_norm.2 h1.le).symm
 
-theorem sum_grLog {p q : ℕ} {Γ : Matrix (Fin p) (Fin p) ℂ} {Γ' : Matrix (Fin q) (Fin q) ℂ} (h : Γ.PosDef) (h' : Γ'.PosDef)
-    (n : ℕ) (hn : n ≤ p + q) : ∑ k ∈ Finset.range n, grLog Γ Γ' k =
-      if n ≤ p then Real.log (leadMinor Γ n) / 2
-      else Real.log (leadMinor Γ p) / 2 + (Real.log (leadMinor Γ' (p + q - n)) - Real.log (leadMinor Γ' q)) / 2 := by
+theorem sum_grLog
+    {p q : ℕ} {Γ : Matrix (Fin p) (Fin p) ℂ} {Γ' : Matrix (Fin q) (Fin q) ℂ}
+    (h : Γ.PosDef) (h' : Γ'.PosDef)
+    (n : ℕ) (hn : n ≤ p + q)
+    : ∑ k ∈ Finset.range n, grLog Γ Γ' k
+      = if n ≤ p then
+          Real.log (leadMinor Γ n) / 2
+        else
+          Real.log (leadMinor Γ p) / 2
+            + (Real.log (leadMinor Γ' (p + q - n)) - Real.log (leadMinor Γ' q)) / 2 := by
   induction n with
   | zero => simp [leadMinor_size_zero]
   | succ n ih =>
@@ -66,8 +85,8 @@ theorem sum_grLog {p q : ℕ} {Γ : Matrix (Fin p) (Fin p) ℂ} {Γ' : Matrix (F
     by_cases h1 : n < p
     · have a1 := leadMinor_pos_of_posDef h (s := n + 1) h1
       have a2 := leadMinor_pos_of_posDef h (s := n) h1.le
-      rw [if_pos h1.le, if_pos h1, if_pos (show n + 1 ≤ p from h1), Real.log_sqrt (div_pos a1 a2).le,
-        Real.log_div a1.ne' a2.ne']
+      rw [if_pos h1.le, if_pos h1, if_pos (show n + 1 ≤ p from h1),
+        Real.log_sqrt (div_pos a1 a2).le, Real.log_div a1.ne' a2.ne']
       ring
     · have a1 := leadMinor_pos_of_posDef h' (s := p + q - 1 - n + 1) (by omega)
       have a2 := leadMinor_pos_of_posDef h' (s := p + q - 1 - n) (by omega)
@@ -80,7 +99,8 @@ theorem sum_grLog {p q : ℕ} {Γ : Matrix (Fin p) (Fin p) ℂ} {Γ' : Matrix (F
         ring
       · ring
 
-theorem sum_Iic {N : ℕ} (i : Fin N) (f : ℕ → ℝ) : ∑ k ∈ Finset.Iic i, f k = ∑ k ∈ Finset.range (i + 1), f k := by
+theorem sum_Iic {N : ℕ} (i : Fin N) (f : ℕ → ℝ)
+    : ∑ k ∈ Finset.Iic i, f k = ∑ k ∈ Finset.range (i + 1), f k := by
   refine (Finset.sum_map (Finset.Iic i) Fin.valEmbedding f).symm.trans ?_
   rw [Fin.map_valEmbedding_Iic]
   congr 1
@@ -89,11 +109,14 @@ theorem sum_Iic {N : ℕ} (i : Fin N) (f : ℕ → ℝ) : ∑ k ∈ Finset.Iic i
 
 section
 
-variable {p q : ℕ} {Γ : Matrix (Fin p) (Fin p) ℂ} {C : Matrix (Fin q) (Fin q) ℂ} {M : Matrix (Fin p) (Fin (p + q)) ℂ}
+variable
+  {p q : ℕ}
+  {Γ : Matrix (Fin p) (Fin p) ℂ} {C : Matrix (Fin q) (Fin q) ℂ} {M : Matrix (Fin p) (Fin (p + q)) ℂ}
   {P : Matrix (Fin q) (Fin (p + q)) ℂ} {S : Matrix (Fin (p + q)) (Fin (p + q)) ℂ}
 
-theorem blocks (hC : IsUnit C.det) (hS : S * S = 1) (h : Mᴴ * Γ * M - Pᴴ * C * P = S) :
-    M * S * Pᴴ = 0 ∧ P * S * Pᴴ = -C⁻¹ ∧ ∀ (m : Type) (v : Matrix (Fin (p + q)) m ℂ), P * v = 0 → M * v = 0 → v = 0 := by
+theorem blocks (hC : IsUnit C.det) (hS : S * S = 1) (h : Mᴴ * Γ * M - Pᴴ * C * P = S)
+    : M * S * Pᴴ = 0 ∧ P * S * Pᴴ = -C⁻¹
+      ∧ ∀ (m : Type) (v : Matrix (Fin (p + q)) m ℂ), P * v = 0 → M * v = 0 → v = 0 := by
   have h1 : (S * fromCols (-(Pᴴ * C)) (Mᴴ * Γ)) * fromRows P M = 1 := by
     rw [Matrix.mul_assoc, fromCols_mul_fromRows, ← hS, ← h]
     congr 1
@@ -163,23 +186,25 @@ theorem matStep : MatStep := by
   have FourierUniquenessMirabolic : (gramOf (sigForm (p + q) p) g).submatrix fl fl = -B := by
     rw [gram_sub, gl, ← hSd]
     show ((S * Pᴴ)ᴴ * S * (S * Pᴴ)).submatrix Fin.rev Fin.rev = _
-    rw [conjTranspose_mul, conjTranspose_conjTranspose, hSH,
-      Matrix.mul_assoc P S S, hS, Matrix.mul_one, ← Matrix.mul_assoc, b2]
+    rw [conjTranspose_mul, conjTranspose_conjTranspose, hSH, Matrix.mul_assoc P S S, hS,
+      Matrix.mul_one, ← Matrix.mul_assoc, b2]
     rfl
   have WeakApproximationGL : (gramOf (sigForm (p + q) p) g).submatrix fl fr = X := by
     rw [gram_sub, gl, gr, ← hSd]
     show ((S * Pᴴ)ᴴ * S * L).submatrix Fin.rev id = _
-    rw [conjTranspose_mul, conjTranspose_conjTranspose, hSH, Matrix.mul_assoc P S S, hS, Matrix.mul_one]
+    rw [conjTranspose_mul, conjTranspose_conjTranspose, hSH, Matrix.mul_assoc P S S, hS,
+      Matrix.mul_one]
   have G21 : (gramOf (sigForm (p + q) p) g).submatrix fr fl = Xᴴ := by
-    rw [← WeakApproximationGL, gram_sub, gram_sub, ← hSd, conjTranspose_mul, conjTranspose_mul, conjTranspose_conjTranspose, hSH,
-      Matrix.mul_assoc]
+    rw [← WeakApproximationGL, gram_sub, gram_sub, ← hSd, conjTranspose_mul, conjTranspose_mul,
+      conjTranspose_conjTranspose, hSH, Matrix.mul_assoc]
   have hBi : B⁻¹ = C.submatrix Fin.rev Fin.rev := by
     refine inv_eq_right_inv ?_
     rw [hB, ← submatrix_mul _ _ _ _ _ Fin.rev_bijective, nonsing_inv_mul _ hCu]
     exact submatrix_one _ Fin.rev_injective
   have G22 : (gramOf (sigForm (p + q) p) g).submatrix fr fr = Γ - Xᴴ * B⁻¹ * X := by
-    rw [gram_sub, gr, ← hSd, ← h, hBi, hX, conjTranspose_submatrix, ← submatrix_mul _ _ _ _ _ Fin.rev_bijective,
-      ← submatrix_mul _ _ _ _ _ Fin.rev_bijective, submatrix_id_id, Matrix.mul_sub, Matrix.sub_mul]
+    rw [gram_sub, gr, ← hSd, ← h, hBi, hX, conjTranspose_submatrix,
+      ← submatrix_mul _ _ _ _ _ Fin.rev_bijective, ← submatrix_mul _ _ _ _ _ Fin.rev_bijective,
+      submatrix_id_id, Matrix.mul_sub, Matrix.sub_mul]
     congr 1
     · have : Lᴴ * (Mᴴ * Γ * M) * L = (M * L)ᴴ * Γ * (M * L) := by
         simp only [conjTranspose_mul, Matrix.mul_assoc]
@@ -190,44 +215,63 @@ theorem matStep : MatStep := by
   have lmq : ‖C.det‖ = leadMinor Γ' q := by
     rw [← leadMinor_transpose, ← norm_det_eq hC le_rfl]
     rfl
-  have low : ∀ k (hk : k ≤ q), ‖(B.submatrix (Fin.castLE hk) (Fin.castLE hk)).det‖ =
-      leadMinor Γ' (q - k) / leadMinor Γ' q := by
+  have low
+      : ∀ k (hk : k ≤ q),
+        ‖(B.submatrix (Fin.castLE hk) (Fin.castLE hk)).det‖
+          = leadMinor Γ' (q - k) / leadMinor Γ' q := by
     intro k hk
     have e1 : q - k + k = q := by omega
     have j := congrArg norm (jac C hCu (finSumFinEquiv.trans (finCongr e1)))
-    have e2 : (C⁻¹.submatrix (fun b => (finSumFinEquiv.trans (finCongr e1)) (.inr b))
-        fun b => (finSumFinEquiv.trans (finCongr e1)) (.inr b)).submatrix Fin.revPerm Fin.revPerm =
-        B.submatrix (Fin.castLE hk) (Fin.castLE hk) := by
+    have e2
+        : (C⁻¹.submatrix
+              (fun b => (finSumFinEquiv.trans (finCongr e1)) (.inr b))
+              fun b => (finSumFinEquiv.trans (finCongr e1)) (.inr b)).submatrix Fin.revPerm
+            Fin.revPerm
+          = B.submatrix (Fin.castLE hk) (Fin.castLE hk) := by
       ext a b
       simp only [hB, submatrix_apply]
-      have : ∀ a : Fin k, (finSumFinEquiv.trans (finCongr e1)) (Sum.inr (Fin.revPerm a)) = (Fin.castLE hk a).rev :=
+      have : ∀ a : Fin k,
+          (finSumFinEquiv.trans (finCongr e1)) (Sum.inr (Fin.revPerm a)) = (Fin.castLE hk a).rev :=
         fun a => Fin.ext (by have := a.2; simp [Fin.val_rev]; omega)
       rw [this, this]
-    have e3 : (C.submatrix (fun b => (finSumFinEquiv.trans (finCongr e1)) (.inl b))
-        fun b => (finSumFinEquiv.trans (finCongr e1)) (.inl b)) =
-        C.submatrix (Fin.castLE (Nat.sub_le q k)) (Fin.castLE (Nat.sub_le q k)) := by
+    have e3
+        : (C.submatrix
+            (fun b => (finSumFinEquiv.trans (finCongr e1)) (.inl b))
+            fun b => (finSumFinEquiv.trans (finCongr e1)) (.inl b))
+          = C.submatrix (Fin.castLE (Nat.sub_le q k)) (Fin.castLE (Nat.sub_le q k)) := by
       ext a b
       simp only [submatrix_apply]
       congr 1
-    rw [norm_mul, lmq, e3, norm_det_eq hC, leadMinor_transpose, ← det_submatrix_equiv_self Fin.revPerm, e2] at j
+    rw [norm_mul, lmq, e3, norm_det_eq hC, leadMinor_transpose,
+        ← det_submatrix_equiv_self Fin.revPerm, e2]
+      at j
     rw [← j, mul_div_cancel_left₀ _ (leadMinor_pos_of_posDef hΓ' le_rfl).ne']
-  have dlow : ∀ k, k ≤ q → ‖(gramHead (sigForm (p + q) p) k g).det‖ = leadMinor Γ' (q - k) / leadMinor Γ' q := by
+  have dlow
+      : ∀ k,
+        k ≤ q
+          → ‖(gramHead (sigForm (p + q) p) k g).det‖ = leadMinor Γ' (q - k) / leadMinor Γ' q := by
     intro k hk
     rw [det_head _ _ (headEquiv (hk.trans hqN)), ← low k hk]
-    have : ((gramOf (sigForm (p + q) p) g).submatrix (fun a => (headEquiv (hk.trans hqN) a).1)
-        fun a => (headEquiv (hk.trans hqN) a).1) = -B.submatrix (Fin.castLE hk) (Fin.castLE hk) := by
+    have : ((gramOf (sigForm (p + q) p) g).submatrix
+          (fun a => (headEquiv (hk.trans hqN) a).1)
+          fun a => (headEquiv (hk.trans hqN) a).1)
+        = - B.submatrix (Fin.castLE hk) (Fin.castLE hk) := by
       show _ = (-B).submatrix (Fin.castLE hk) (Fin.castLE hk)
       rw [← FourierUniquenessMirabolic]
       rfl
     rw [this, det_neg, norm_mul]
     simp
-  have dhigh : ∀ m, m ≤ p → ‖(gramHead (sigForm (p + q) p) (q + m) g).det‖ = leadMinor Γ m / leadMinor Γ' q := by
+  have dhigh
+      : ∀ m,
+        m ≤ p
+          → ‖(gramHead (sigForm (p + q) p) (q + m) g).det‖ = leadMinor Γ m / leadMinor Γ' q := by
     intro m hm
     have hle : q + m ≤ p + q := by omega
     rw [det_head _ _ (finSumFinEquiv.trans (headEquiv hle))]
-    have : ((gramOf (sigForm (p + q) p) g).submatrix (fun a => ((finSumFinEquiv.trans (headEquiv hle)) a).1)
-        fun a => ((finSumFinEquiv.trans (headEquiv hle)) a).1) =
-        fromBlocks (-B) (X.submatrix id (Fin.castLE hm)) (Xᴴ.submatrix (Fin.castLE hm) id)
+    have : ((gramOf (sigForm (p + q) p) g).submatrix
+          (fun a => ((finSumFinEquiv.trans (headEquiv hle)) a).1)
+          fun a => ((finSumFinEquiv.trans (headEquiv hle)) a).1)
+        = fromBlocks (-B) (X.submatrix id (Fin.castLE hm)) (Xᴴ.submatrix (Fin.castLE hm) id)
           ((Γ - Xᴴ * B⁻¹ * X).submatrix (Fin.castLE hm) (Fin.castLE hm)) := by
       rw [← FourierUniquenessMirabolic, ← G22, ← G21, ← WeakApproximationGL]
       ext (a | a) (b | b) <;> rfl
@@ -239,9 +283,10 @@ theorem matStep : MatStep := by
       rw [invOf_eq_nonsing_inv]
       refine inv_eq_right_inv ?_
       rw [Matrix.neg_mul, Matrix.mul_neg, neg_neg, mul_nonsing_inv _ hBu]
-    have e4 : (Γ - Xᴴ * B⁻¹ * X).submatrix (Fin.castLE hm) (Fin.castLE hm) -
-        Xᴴ.submatrix (Fin.castLE hm) id * -B⁻¹ * X.submatrix id (Fin.castLE hm) =
-        Γ.submatrix (Fin.castLE hm) (Fin.castLE hm) := by
+    have e4
+        : (Γ - Xᴴ * B⁻¹ * X).submatrix (Fin.castLE hm) (Fin.castLE hm)
+            - Xᴴ.submatrix (Fin.castLE hm) id * -B⁻¹ * X.submatrix id (Fin.castLE hm)
+          = Γ.submatrix (Fin.castLE hm) (Fin.castLE hm) := by
       ext a b
       simp [Matrix.mul_apply]
     have e5 := low q le_rfl
@@ -261,7 +306,8 @@ theorem matStep : MatStep := by
     rw [gramOf, det_mul] at e2
     exact (right_ne_zero_of_mul e2).isUnit
   · rw [hNp]
-    have : -gramHead (sigForm (p + q) p) q g = B.submatrix (headEquiv hqN).symm (headEquiv hqN).symm := by
+    have : - gramHead (sigForm (p + q) p) q g
+        = B.submatrix (headEquiv hqN).symm (headEquiv hqN).symm := by
       rw [← neg_neg B, ← FourierUniquenessMirabolic]
       rfl
     rw [this]
@@ -276,7 +322,8 @@ theorem matStep : MatStep := by
       ring
     · have d1 := dhigh p le_rfl
       rw [add_comm q p] at d1
-      rw [gramLog, gramLog, gramLog, d1, d0, dlow _ (by omega), Real.log_div (leadMinor_pos_of_posDef hΓ le_rfl).ne' lq.ne',
+      rw [gramLog, gramLog, gramLog, d1, d0, dlow _ (by omega),
+        Real.log_div (leadMinor_pos_of_posDef hΓ le_rfl).ne' lq.ne',
         Real.log_div one_ne_zero lq.ne', Real.log_one,
         Real.log_div (leadMinor_pos_of_posDef hΓ' (Nat.sub_le _ _)).ne' lq.ne',
         show q - (i + 1 - p) = p + q - (i + 1) by omega]

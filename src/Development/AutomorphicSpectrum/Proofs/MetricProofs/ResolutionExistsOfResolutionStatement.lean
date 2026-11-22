@@ -14,7 +14,10 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.Multihomogeneo
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 ReciprocityTheory.AnForm.M GlobalTheory.CompanionTheory.Ar.Cmp GlobalTheory.CompanionTheory.Ar.PB Filter Topology
+open MvPolynomial MeasureTheory ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4
+  ReciprocityTheory.AnForm.M GlobalTheory.CompanionTheory.Ar.Cmp GlobalTheory.CompanionTheory.Ar.PB
+  Filter Topology
 open ReciprocityTheory.ChartRestriction.G.AI.I1 (IsBlockMap)
 
 namespace GlobalTheory.CompanionTheory.Ar.Giv
@@ -23,23 +26,25 @@ namespace ResTop
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem homog_mul {f g : MRing ι} {a b : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g b) :
-    IsMultiHomog (f * g) (a + b) := by
+theorem homog_mul {f g : MRing ι} {a b : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g b)
+    : IsMultiHomog (f * g) (a + b) := by
   classical
   intro m hm k
   obtain ⟨m1, hm1, m2, hm2, rfl⟩ := Finset.mem_add.mp (MvPolynomial.support_mul f g hm)
   simp only [Finsupp.add_apply, Finset.sum_add_distrib, Pi.add_apply, hf m1 hm1 k, hg m2 hm2 k]
 
-theorem coord_ne_zero {Ω : Type} [Field Ω] (y : (Σ k, ι k) → Ω) (p : Σ k, ι k)
-    (h : (X p : MRing ι) ∉ mCoordIdeal y) : y p ≠ 0 := by
+theorem coord_ne_zero
+    {Ω : Type} [Field Ω] (y : (Σ k, ι k) → Ω) (p : Σ k, ι k) (h : (X p : MRing ι) ∉ mCoordIdeal y)
+    : y p ≠ 0 := by
   intro h0
   apply h
   unfold mCoordIdeal
   rw [RingHom.mem_ker]
   simp [mConeMap, h0]
 
-theorem charZero_of_horizontal {Ω : Type} [Field Ω] (y : (Σ k, ι k) → Ω) (h : IsHorizontal (mCoordIdeal y)) :
-    CharZero Ω := by
+theorem charZero_of_horizontal
+    {Ω : Type} [Field Ω] (y : (Σ k, ι k) → Ω) (h : IsHorizontal (mCoordIdeal y))
+    : CharZero Ω := by
   refine charZero_of_inj_zero fun n hn => ?_
   have h1 : (n : ℤ) ∈ (mCoordIdeal y).comap (C : ℤ →+* MRing ι) := by
     rw [Ideal.mem_comap, mCoordIdeal, RingHom.mem_ker, map_natCast, map_natCast,
@@ -60,17 +65,21 @@ theorem isBlockMap_joinInl : IsBlockMap (Sum.inl : K → K ⊕ K₂) (joinInl ι
   · rintro ⟨k, i⟩ ⟨k', rfl⟩
     exact ⟨⟨k', i⟩, rfl⟩
 
-theorem evC_rename_inl (z : (Σ k, joinIdx ι ι₂ k) → ℂ) (f : MRing ι) :
-    evC z (rename (joinInl ι ι₂) f) = evC (z ∘ joinInl ι ι₂) f := by
+theorem evC_rename_inl (z : (Σ k, joinIdx ι ι₂ k) → ℂ) (f : MRing ι)
+    : evC z (rename (joinInl ι ι₂) f) = evC (z ∘ joinInl ι ι₂) f := by
   unfold evC
   rw [map_rename, eval_rename]
 
-theorem comp_inl_mem {Ω : Type} [Field Ω] (y : (Σ k, ι k) → Ω) (y₂ : (Σ k, ι₂ k) → Ω)
-    {z : (Σ k, joinIdx ι ι₂ k) → ℂ} (hz : z ∈ mcPts (mCoordIdeal (joinVec y y₂))) :
-    z ∘ joinInl ι ι₂ ∈ mcPts (mCoordIdeal y) := by
+theorem comp_inl_mem
+    {Ω : Type} [Field Ω]
+    (y : (Σ k, ι k) → Ω) (y₂ : (Σ k, ι₂ k) → Ω)
+    {z : (Σ k, joinIdx ι ι₂ k) → ℂ} (hz : z ∈ mcPts (mCoordIdeal (joinVec y y₂)))
+    : z ∘ joinInl ι ι₂ ∈ mcPts (mCoordIdeal y) := by
   refine ⟨fun k => hz.1 (Sum.inl k), fun f hf => ?_⟩
-  have hc : (mConeMap (joinVec y y₂)).comp (rename (joinInl ι ι₂)) =
-      ((rename (Sum.inl : K → K ⊕ K₂) : MvPolynomial K Ω →ₐ[Ω] _).restrictScalars ℤ).comp (mConeMap y) := by
+  have hc
+      : (mConeMap (joinVec y y₂)).comp (rename (joinInl ι ι₂))
+        = ((rename (Sum.inl : K → K ⊕ K₂) : MvPolynomial K Ω →ₐ[Ω] _).restrictScalars ℤ).comp
+          (mConeMap y) := by
     refine MvPolynomial.algHom_ext fun p => ?_
     obtain ⟨k, i⟩ := p
     simp [mConeMap, joinInl, joinVec]
@@ -83,11 +92,12 @@ theorem comp_inl_mem {Ω : Type} [Field Ω] (y : (Σ k, ι k) → Ω) (y₂ : (�
 
 end ResTop
 
-
 open ResTop in
-theorem resExists_of_resK : ReciprocityTheory.ChartRestriction.G.Geo.ResK.ResKStatement → ResExistsStatement := by
+theorem resExists_of_resK
+    : ReciprocityTheory.ChartRestriction.G.Geo.ResK.ResKStatement → ResExistsStatement := by
   intro hRes K _ ι _ P J e hP hJ hJP
-  obtain ⟨Ω, _, y, rfl, -⟩ := GroundTheory.Heights₂.Heights.HilbertSamuel.BirationalModelExists.proof K ι P (e + 1) hP
+  obtain ⟨Ω, _, y, rfl, -⟩ :=
+    GroundTheory.Heights₂.Heights.HilbertSamuel.BirationalModelExists.proof K ι P (e + 1) hP
   haveI : CharZero Ω := charZero_of_horizontal y hP.2.2.1
   have hprime : (mCoordIdeal y).IsPrime := hP.2.1.1
   obtain ⟨β, hβJ, ⟨b, hβ⟩, hβP⟩ : ∃ β ∈ J, (∃ b, IsMultiHomog β b) ∧ β ∉ mCoordIdeal y := by
@@ -112,8 +122,9 @@ theorem resExists_of_resK : ReciprocityTheory.ChartRestriction.G.Geo.ResK.ResKSt
     · rw [hcomp, hfield]
       intro t ht
       exact isAlgebraic_algebraMap (⟨t, ht⟩ : blockFnField y)
-  obtain ⟨R, hR⟩ := GlobalTheory.T.snc_model_embedded_log_resolution (K ⊕ Unit) (joinIdx ι fun _ : Unit => Fin M) Ω (joinVec y y') e J₁
-    harith hJ₁h hJ₁ hsnc
+  obtain ⟨R, hR⟩ :=
+    GlobalTheory.T.snc_model_embedded_log_resolution (K ⊕ Unit) (joinIdx ι fun _ : Unit => Fin M) Ω
+      (joinVec y y') e J₁ harith hJ₁h hJ₁ hsnc
   have hγ := homog_mul hβ hβ'
   have hγP : β * β' ∉ mCoordIdeal y := fun h => (hprime.mem_or_mem h).elim hβP hβ'P
   have hmul : ∀ z : (Σ k, ι k) → ℂ, evC z (β * β') = evC z β * evC z β' := fun z => by
@@ -125,7 +136,8 @@ theorem resExists_of_resK : ReciprocityTheory.ChartRestriction.G.Geo.ResK.ResKSt
     exact ⟨_, hγ⟩
   · rw [Ideal.span_singleton_le_iff_mem]
     exact hγP
-  · refine GlobalTheory.T.multihomogeneous_nonvanishing_on_join K ι Ω y e M y' J₁ R (β * β') (b + b') hR hy' hy hγ hγP ?_ ?_
+  · refine GlobalTheory.T.multihomogeneous_nonvanishing_on_join K ι Ω y e M y' J₁ R (β * β')
+      (b + b') hR hy' hy hγ hγP ?_ ?_
     · intro z hzm h0
       apply hz z hzm
       rw [evC_rename_inl] at h0 ⊢

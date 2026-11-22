@@ -168,9 +168,11 @@ private lemma diagonal_trivial (φ : GL (Fin N) k →* NNReal)
   rw [this, map_list_prod, List.map_map, ← Fin.prod_univ_def]
   exact Finset.prod_eq_one fun m _ => elemDiag_trivial φ hφ m (d m)
 
-theorem gl_hom_nnreal_trivial_of_scalar :
-    ∀ (k : Type) [Field k], (∃ x : k, x ≠ 0 ∧ x ≠ 1) → ∀ (N : ℕ) (φ : GL (Fin N) k →* NNReal),
-      (∀ z : kˣ, φ (Matrix.GeneralLinearGroup.scalar (Fin N) z) = 1) → ∀ g, φ g = 1 := by
+theorem gl_hom_nnreal_trivial_of_scalar
+    : ∀ (k : Type) [Field k],
+      (∃ x : k, x ≠ 0 ∧ x ≠ 1)
+        → ∀ (N : ℕ) (φ : GL (Fin N) k →* NNReal),
+          (∀ z : kˣ, φ (Matrix.GeneralLinearGroup.scalar (Fin N) z) = 1) → ∀ g, φ g = 1 := by
   intro k _ hx N φ hφ g
   have hdet : (g : Matrix (Fin N) (Fin N) k).det ≠ 0 :=
     ((Matrix.isUnit_iff_isUnit_det _).mp g.isUnit).ne_zero
@@ -179,7 +181,8 @@ theorem gl_hom_nnreal_trivial_of_scalar :
     (g : Matrix (Fin N) (Fin N) k) hdet ?_ ?_ ?_ g rfl
   · intro D hD h hh
     rw [det_diagonal] at hD
-    exact diagonal_trivial φ hφ D (fun t => (Finset.prod_ne_zero_iff.mp hD) t (Finset.mem_univ t)) h hh
+    exact
+      diagonal_trivial φ hφ D (fun t => (Finset.prod_ne_zero_iff.mp hD) t (Finset.mem_univ t)) h hh
   · intro t h hh
     exact transvection_trivial φ hx t.i t.j t.hij t.c h hh
   · intro A B hA hB hPA hPB h hh

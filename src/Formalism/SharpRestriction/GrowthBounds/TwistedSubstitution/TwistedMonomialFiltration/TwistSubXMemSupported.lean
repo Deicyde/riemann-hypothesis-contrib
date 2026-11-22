@@ -18,26 +18,34 @@ open Classical
 
 def wDeg (w : Set ι) (μ : ι × Fin n →₀ ℕ) : ℕ := ∑ v ∈ μ.support, if v.1 ∈ w then μ v else 0
 
-def wCoeff (w : Set ι) (M : ι × Fin n →₀ ℕ) (F : MvPolynomial (ι × Fin n) R) : MvPolynomial (ι × Fin n) R :=
+def wCoeff (w : Set ι) (M : ι × Fin n →₀ ℕ) (F : MvPolynomial (ι × Fin n) R)
+    : MvPolynomial (ι × Fin n) R :=
   ∑ μ ∈ F.support with μ.filter (fun v => v.1 ∈ w) = M, monomial (μ.filter (fun v => v.1 ∉ w)) (F.coeff μ)
 
-theorem coeff_wCoeff (w : Set ι) (M ν : ι × Fin n →₀ ℕ) (P : MvPolynomial (ι × Fin n) R) :
-    AddMonoidAlgebra.coeff (wCoeff w M P) ν =
-      if ν.filter (fun v => v.1 ∈ w) = 0 ∧ M.filter (fun v => v.1 ∉ w) = 0 then AddMonoidAlgebra.coeff P (M + ν) else 0 := by
+theorem coeff_wCoeff (w : Set ι) (M ν : ι × Fin n →₀ ℕ) (P : MvPolynomial (ι × Fin n) R)
+    : AddMonoidAlgebra.coeff (wCoeff w M P) ν
+      = if ν.filter (fun v => v.1 ∈ w) = 0 ∧ M.filter (fun v => v.1 ∉ w) = 0 then
+          AddMonoidAlgebra.coeff P (M + ν)
+        else
+          0 := by
   unfold wCoeff
   rw [coeff_sum]
   simp only [coeff_monomial]
-  have key : ∀ μ : ι × Fin n →₀ ℕ, (μ.filter (fun v => v.1 ∈ w) = M ∧ μ.filter (fun v => v.1 ∉ w) = ν) ↔
-      (μ = M + ν ∧ ν.filter (fun v => v.1 ∈ w) = 0 ∧ M.filter (fun v => v.1 ∉ w) = 0) := by
+  have key
+      : ∀ μ : ι × Fin n →₀ ℕ,
+        (μ.filter (fun v => v.1 ∈ w) = M ∧ μ.filter (fun v => v.1 ∉ w) = ν)
+          ↔ (μ = M + ν ∧ ν.filter (fun v => v.1 ∈ w) = 0 ∧ M.filter (fun v => v.1 ∉ w) = 0) := by
     intro μ
     constructor
     · rintro ⟨h1, h2⟩
       refine ⟨?_, ?_, ?_⟩
       · rw [← h1, ← h2, Finsupp.filter_pos_add_filter_neg]
-      · rw [← h2]; ext x
+      · rw [← h2]
+        ext x
         simp only [Finsupp.filter_apply, Finsupp.coe_zero, Pi.zero_apply]
         split_ifs <;> simp_all
-      · rw [← h1]; ext x
+      · rw [← h1]
+        ext x
         simp only [Finsupp.filter_apply, Finsupp.coe_zero, Pi.zero_apply]
         split_ifs <;> simp_all
     · rintro ⟨rfl, h2, h3⟩
@@ -77,23 +85,27 @@ theorem coeff_wCoeff (w : Set ι) (M ν : ι × Fin n →₀ ℕ) (P : MvPolynom
 def WFree {B : Type*} [CommRing B] (w : Set ι) (P : MvPolynomial (ι × Fin n) B) : Prop :=
   ∀ ν ∈ P.support, ν.filter (fun v => v.1 ∈ w) = 0
 
-theorem wCoeff_add (w : Set ι) (M : ι × Fin n →₀ ℕ) (P Q : MvPolynomial (ι × Fin n) R) :
-    wCoeff w M (P + Q) = wCoeff w M P + wCoeff w M Q := by
+theorem wCoeff_add (w : Set ι) (M : ι × Fin n →₀ ℕ) (P Q : MvPolynomial (ι × Fin n) R)
+    : wCoeff w M (P + Q) = wCoeff w M P + wCoeff w M Q := by
   ext ν
   simp only [MvPolynomial.coeff_add, coeff_wCoeff]
   split_ifs <;> simp
 
-theorem wCoeff_mem {Fl : Formalism.MainNotions.TestSideWords.TwistedFiltration.G1.flt_Fil R} (w : Set ι) (M : ι × Fin n →₀ ℕ) {t : ℤ}
-    {P : MvPolynomial (ι × Fin n) R} (hP : P ∈ (Formalism.MainNotions.TestSideWords.TwistedFiltration.G1.flt_lift Fl 0).F t) :
-    wCoeff w M P ∈ (Formalism.MainNotions.TestSideWords.TwistedFiltration.G1.flt_lift Fl 0).F t := by
+theorem wCoeff_mem
+    {Fl : Formalism.MainNotions.TestSideWords.TwistedFiltration.G1.flt_Fil R}
+    (w : Set ι) (M : ι × Fin n →₀ ℕ)
+    {t : ℤ} {P : MvPolynomial (ι × Fin n) R}
+    (hP : P ∈ (Formalism.MainNotions.TestSideWords.TwistedFiltration.G1.flt_lift Fl 0).F t)
+    : wCoeff w M P
+      ∈ (Formalism.MainNotions.TestSideWords.TwistedFiltration.G1.flt_lift Fl 0).F t := by
   intro ν
   rw [coeff_wCoeff]
   split_ifs
   · simpa using hP (M + ν)
   · exact (Fl.F _).zero_mem
 
-theorem wfree_iff_supported {B : Type*} [CommRing B] (w : Set ι) (P : MvPolynomial (ι × Fin n) B) :
-    WFree w P ↔ P ∈ supported B {v : ι × Fin n | v.1 ∉ w} := by
+theorem wfree_iff_supported {B : Type*} [CommRing B] (w : Set ι) (P : MvPolynomial (ι × Fin n) B)
+    : WFree w P ↔ P ∈ supported B {v : ι × Fin n | v.1 ∉ w} := by
   classical
   rw [mem_supported]
   constructor
@@ -116,8 +128,8 @@ theorem wfree_iff_supported {B : Type*} [CommRing B] (w : Set ι) (P : MvPolynom
       exact (h hv) hx
     · rfl
 
-theorem wfree_monomial (w : Set ι) (μ : ι × Fin n →₀ ℕ) (c : R) :
-    WFree w (monomial (μ.filter (fun v => v.1 ∉ w)) c) := by
+theorem wfree_monomial (w : Set ι) (μ : ι × Fin n →₀ ℕ) (c : R)
+    : WFree w (monomial (μ.filter (fun v => v.1 ∉ w)) c) := by
   classical
   intro ν hν
   have := support_monomial_subset hν
@@ -127,9 +139,12 @@ theorem wfree_monomial (w : Set ι) (μ : ι × Fin n →₀ ℕ) (c : R) :
   simp only [Finsupp.filter_apply, Finsupp.coe_zero, Pi.zero_apply]
   split_ifs <;> simp_all
 
-theorem wCoeff_mul_monomial (w : Set ι) (M M' : ι × Fin n →₀ ℕ) (P : MvPolynomial (ι × Fin n) R) (hP : WFree w P)
-    (hM' : M'.filter (fun v => v.1 ∉ w) = 0) :
-    wCoeff w M (P * monomial M' 1) = if M' = M then P else 0 := by
+theorem wCoeff_mul_monomial
+    (w : Set ι)
+    (M M' : ι × Fin n →₀ ℕ)
+    (P : MvPolynomial (ι × Fin n) R) (hP : WFree w P)
+    (hM' : M'.filter (fun v => v.1 ∉ w) = 0)
+    : wCoeff w M (P * monomial M' 1) = if M' = M then P else 0 := by
   classical
   have hM'x : ∀ x, x.1 ∉ w → M' x = 0 := by
     intro x hx
@@ -179,22 +194,28 @@ theorem wCoeff_mul_monomial (w : Set ι) (M M' : ι × Fin n →₀ ℕ) (P : Mv
       exact hν (hP ν (MvPolynomial.mem_support_iff.2 (Ne.symm hne)))
   · rfl
 
-theorem monomial_split (w : Set ι) (μ : ι × Fin n →₀ ℕ) (c : R) :
-    monomial μ c = monomial (μ.filter (fun v => v.1 ∉ w)) c * monomial (μ.filter (fun v => v.1 ∈ w)) 1 := by
+theorem monomial_split (w : Set ι) (μ : ι × Fin n →₀ ℕ) (c : R)
+    : monomial μ c
+      = monomial (μ.filter (fun v => v.1 ∉ w)) c * monomial (μ.filter (fun v => v.1 ∈ w)) 1 := by
   rw [monomial_mul, mul_one, add_comm, Finsupp.filter_pos_add_filter_neg]
 
-theorem filter_neg_filter_pos (w : Set ι) (μ : ι × Fin n →₀ ℕ) :
-    (μ.filter (fun v => v.1 ∈ w)).filter (fun v => v.1 ∉ w) = 0 := by
+theorem filter_neg_filter_pos (w : Set ι) (μ : ι × Fin n →₀ ℕ)
+    : (μ.filter (fun v => v.1 ∈ w)).filter (fun v => v.1 ∉ w) = 0 := by
   ext x
   simp only [Finsupp.filter_apply, Finsupp.coe_zero, Pi.zero_apply]
   split_ifs <;> simp_all
 
-theorem wCoeff_monomial (w : Set ι) (M μ : ι × Fin n →₀ ℕ) (c : R) :
-    wCoeff w M (monomial μ c) = if μ.filter (fun v => v.1 ∈ w) = M then monomial (μ.filter (fun v => v.1 ∉ w)) c else 0 := by
-  rw [monomial_split w μ c, wCoeff_mul_monomial w M _ _ (wfree_monomial w μ c) (filter_neg_filter_pos w μ)]
+theorem wCoeff_monomial (w : Set ι) (M μ : ι × Fin n →₀ ℕ) (c : R)
+    : wCoeff w M (monomial μ c)
+      = if μ.filter (fun v => v.1 ∈ w) = M then
+          monomial (μ.filter (fun v => v.1 ∉ w)) c
+        else
+          0 := by
+  rw [monomial_split w μ c,
+    wCoeff_mul_monomial w M _ _ (wfree_monomial w μ c) (filter_neg_filter_pos w μ)]
 
-theorem X_mem_supported' {B : Type*} [CommRing B] (w : Set ι) (v : ι × Fin n) (hv : v.1 ∉ w) :
-    (X v : MvPolynomial (ι × Fin n) B) ∈ supported B {x : ι × Fin n | x.1 ∉ w} := by
+theorem X_mem_supported' {B : Type*} [CommRing B] (w : Set ι) (v : ι × Fin n) (hv : v.1 ∉ w)
+    : (X v : MvPolynomial (ι × Fin n) B) ∈ supported B {x : ι × Fin n | x.1 ∉ w} := by
   classical
   rw [mem_supported]
   intro x hx
@@ -208,19 +229,19 @@ theorem X_mem_supported' {B : Type*} [CommRing B] (w : Set ι) (v : ι × Fin n)
   subst h2
   exact hv
 
-theorem twistSub_X_mem_supported (w : Set ι) (j : Fin n) (v : ι × Fin n) (hv : v.1 ∉ w) :
-    twistSub (R := R) LL S j (X v) ∈ supported (GLLaurent R n) {x : ι × Fin n | x.1 ∉ w} := by
+theorem twistSub_X_mem_supported (w : Set ι) (j : Fin n) (v : ι × Fin n) (hv : v.1 ∉ w)
+    : twistSub (R := R) LL S j (X v) ∈ supported (GLLaurent R n) {x : ι × Fin n | x.1 ∉ w} := by
   unfold twistSub
   rw [eval₂Hom_X']
   split_ifs
-  · exact Subalgebra.sum_mem _ fun b _ => Subalgebra.mul_mem _ (Subalgebra.algebraMap_mem _ _)
-      (X_mem_supported' w _ hv)
-  · exact Subalgebra.sum_mem _ fun b _ => Subalgebra.mul_mem _ (Subalgebra.algebraMap_mem _ _)
-      (X_mem_supported' w _ hv)
+  · exact Subalgebra.sum_mem _ fun b _ =>
+      Subalgebra.mul_mem _ (Subalgebra.algebraMap_mem _ _) (X_mem_supported' w _ hv)
+  · exact Subalgebra.sum_mem _ fun b _ =>
+      Subalgebra.mul_mem _ (Subalgebra.algebraMap_mem _ _) (X_mem_supported' w _ hv)
   · exact X_mem_supported' w _ hv
 
-theorem twistSub_wfree (w : Set ι) (j : Fin n) (P : MvPolynomial (ι × Fin n) R) (hP : WFree w P) :
-    WFree w (twistSub LL S j P) := by
+theorem twistSub_wfree (w : Set ι) (j : Fin n) (P : MvPolynomial (ι × Fin n) R) (hP : WFree w P)
+    : WFree w (twistSub LL S j P) := by
   rw [wfree_iff_supported]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [P.as_sum, map_sum]
@@ -238,9 +259,11 @@ theorem twistSub_wfree (w : Set ι) (j : Fin n) (P : MvPolynomial (ι × Fin n) 
     rw [Finsupp.filter_apply, if_pos hw] at this
     exact (Finsupp.mem_support_iff.1 hv) this
 
-theorem twistSub_monomial_w (w : Set ι) (hd : Disjoint S w) (j : Fin n) (M' : ι × Fin n →₀ ℕ)
-    (hM' : M'.filter (fun v => v.1 ∉ w) = 0) :
-    twistSub (R := R) LL S j (monomial M' 1) = monomial M' 1 := by
+theorem twistSub_monomial_w
+    (w : Set ι) (hd : Disjoint S w)
+    (j : Fin n)
+    (M' : ι × Fin n →₀ ℕ) (hM' : M'.filter (fun v => v.1 ∉ w) = 0)
+    : twistSub (R := R) LL S j (monomial M' 1) = monomial M' 1 := by
   rw [monomial_eq, map_mul, Finsupp.prod, map_prod, monomial_eq, Finsupp.prod]
   congr 1
   · rw [twistSub, eval₂Hom_C, map_one, map_one]
@@ -252,33 +275,41 @@ theorem twistSub_monomial_w (w : Set ι) (hd : Disjoint S w) (j : Fin n) (M' : �
       have : (M'.filter (fun v => v.1 ∉ w)) v = 0 := by rw [hM']; rfl
       rw [Finsupp.filter_apply, if_pos hw] at this
       exact (Finsupp.mem_support_iff.1 hv) this
-    exact Formalism.MainNotions.TestSideWords.TwistedFiltration.G2.twistSub_X_out LL S j v (Set.disjoint_right.1 hd hw)
+    exact Formalism.MainNotions.TestSideWords.TwistedFiltration.G2.twistSub_X_out LL S j v
+      (Set.disjoint_right.1 hd hw)
 
-theorem twistSub_wCoeff (w : Set ι) (hd : Disjoint S w) (j : Fin n) (M : ι × Fin n →₀ ℕ)
-    (F : MvPolynomial (ι × Fin n) R) : twistSub LL S j (wCoeff w M F) = wCoeff w M (twistSub LL S j F) := by
+theorem twistSub_wCoeff
+    (w : Set ι) (hd : Disjoint S w)
+    (j : Fin n) (M : ι × Fin n →₀ ℕ) (F : MvPolynomial (ι × Fin n) R)
+    : twistSub LL S j (wCoeff w M F) = wCoeff w M (twistSub LL S j F) := by
   induction F using MvPolynomial.induction_on' with
   | add P Q hP hQ => rw [wCoeff_add, map_add (f := _), map_add (f := _), wCoeff_add, hP, hQ]
   | monomial μ c =>
-    rw [wCoeff_monomial, monomial_split w μ c, map_mul, twistSub_monomial_w LL S w hd j _ (filter_neg_filter_pos w μ),
-      wCoeff_mul_monomial w M _ _ (twistSub_wfree LL S w j _ (wfree_monomial w μ c)) (filter_neg_filter_pos w μ)]
+    rw [wCoeff_monomial, monomial_split w μ c, map_mul,
+      twistSub_monomial_w LL S w hd j _ (filter_neg_filter_pos w μ),
+      wCoeff_mul_monomial w M _ _ (twistSub_wfree LL S w j _ (wfree_monomial w μ c))
+        (filter_neg_filter_pos w μ)]
     split_ifs <;> simp
 
-theorem sum_wCoeff (w : Set ι) (F : MvPolynomial (ι × Fin n) R) :
-    F = ∑ M ∈ F.support.image (fun μ => μ.filter (fun v => v.1 ∈ w)), monomial M 1 * wCoeff w M F := by
-  calc F = ∑ μ ∈ F.support, monomial μ (AddMonoidAlgebra.coeff F μ) := F.as_sum
+theorem sum_wCoeff (w : Set ι) (F : MvPolynomial (ι × Fin n) R)
+    : F
+      = ∑ M ∈ F.support.image (fun μ => μ.filter (fun v => v.1 ∈ w)), monomial M 1 * wCoeff w M F := by
+  calc
+    F = ∑ μ ∈ F.support, monomial μ (AddMonoidAlgebra.coeff F μ) := F.as_sum
     _ = ∑ M ∈ F.support.image (fun μ => μ.filter (fun v => v.1 ∈ w)),
           ∑ μ ∈ F.support with μ.filter (fun v => v.1 ∈ w) = M, monomial μ (AddMonoidAlgebra.coeff F μ) :=
-        (Finset.sum_fiberwise_of_maps_to (fun μ hμ => Finset.mem_image_of_mem _ hμ) _).symm
+      (Finset.sum_fiberwise_of_maps_to (fun μ hμ => Finset.mem_image_of_mem _ hμ) _).symm
     _ = _ := by
-        refine Finset.sum_congr rfl fun M _ => ?_
-        unfold wCoeff
-        rw [Finset.mul_sum]
-        refine Finset.sum_congr rfl fun μ hμ => ?_
-        rw [monomial_mul, one_mul]
-        congr 1
-        rw [← (Finset.mem_filter.1 hμ).2, Finsupp.filter_pos_add_filter_neg]
+      refine Finset.sum_congr rfl fun M _ => ?_
+      unfold wCoeff
+      rw [Finset.mul_sum]
+      refine Finset.sum_congr rfl fun μ hμ => ?_
+      rw [monomial_mul, one_mul]
+      congr 1
+      rw [← (Finset.mem_filter.1 hμ).2, Finsupp.filter_pos_add_filter_neg]
 
-def trivFil (B : Type*) [CommRing B] : Formalism.MainNotions.TestSideWords.TwistedFiltration.G1.flt_Fil B where
+def trivFil (B : Type*) [CommRing B]
+    : Formalism.MainNotions.TestSideWords.TwistedFiltration.G1.flt_Fil B where
   F t := if t ≤ 0 then ⊤ else ⊥
   mul_mem := by
     intro t u a b ha hb
@@ -306,28 +337,28 @@ theorem wDegHom_eq (w : Set ι) (μ : ι × Fin n →₀ ℕ) : wDegHom w μ = (
   refine Finset.sum_congr rfl fun v _ => ?_
   split_ifs <;> simp
 
-theorem wDegHom_single (w : Set ι) (v : ι × Fin n) :
-    wDegHom w (Finsupp.single v 1) = if v.1 ∈ w then 1 else 0 := by
+theorem wDegHom_single (w : Set ι) (v : ι × Fin n)
+    : wDegHom w (Finsupp.single v 1) = if v.1 ∈ w then 1 else 0 := by
   unfold wDegHom
   rw [Finsupp.liftAddHom_apply_single]
   split_ifs <;> simp
 
-def untw (w : Set ι) (j : Fin n) :
-    MvPolynomial (ι × Fin n) (GLLaurent R n) →+* MvPolynomial (ι × Fin n) (GLLaurent R n) :=
+def untw (w : Set ι) (j : Fin n)
+    : MvPolynomial (ι × Fin n) (GLLaurent R n) →+* MvPolynomial (ι × Fin n) (GLLaurent R n) :=
   eval₂Hom C fun v =>
     if v.1 ∈ w then ∑ b : Fin n, C (twistMat R n j (-1) b v.2) * X (v.1, b) else X v
 
-theorem untw_C (w : Set ι) (j : Fin n) (a : GLLaurent R n) :
-    untw (R := R) (n := n) w j (C a : MvPolynomial (ι × Fin n) (GLLaurent R n)) = C a := by
+theorem untw_C (w : Set ι) (j : Fin n) (a : GLLaurent R n)
+    : untw (R := R) (n := n) w j (C a : MvPolynomial (ι × Fin n) (GLLaurent R n)) = C a := by
   unfold untw; rw [eval₂Hom_C]
 
-theorem untw_X (w : Set ι) (j : Fin n) (v : ι × Fin n) :
-    untw (R := R) (n := n) w j (X v) =
-      if v.1 ∈ w then ∑ b : Fin n, C (twistMat R n j (-1) b v.2) * X (v.1, b) else X v := by
+theorem untw_X (w : Set ι) (j : Fin n) (v : ι × Fin n)
+    : untw (R := R) (n := n) w j (X v)
+      = if v.1 ∈ w then ∑ b : Fin n, C (twistMat R n j (-1) b v.2) * X (v.1, b) else X v := by
   unfold untw; rw [eval₂Hom_X']
 
-theorem untw_comp (w : Set ι) (hw : ∀ l ∈ w, LL.vec l = true) (hd : Disjoint S w) (j : Fin n) :
-    (untw (R := R) (n := n) w j).comp (twistSub LL (S ∪ w) j) = twistSub LL S j := by
+theorem untw_comp (w : Set ι) (hw : ∀ l ∈ w, LL.vec l = true) (hd : Disjoint S w) (j : Fin n)
+    : (untw (R := R) (n := n) w j).comp (twistSub LL (S ∪ w) j) = twistSub LL S j := by
   apply MvPolynomial.ringHom_ext
   · intro r
     simp only [RingHom.comp_apply, twistSub, eval₂Hom_C]
@@ -357,28 +388,37 @@ theorem untw_comp (w : Set ι) (hw : ∀ l ∈ w, LL.vec l = true) (hd : Disjoin
         rw [Finset.sum_comm]
         set_option synthInstance.maxHeartbeats 100000 in
           simp_rw [← Finset.sum_mul, ← map_sum]
-        have hm : ∀ b' : Fin n, ∑ b : Fin n, twistMat R n j 1 b v.2 * twistMat R n j (-1) b' b =
-            (1 : Matrix (Fin n) (Fin n) (GLLaurent R n)) b' v.2 := by
+        have hm
+            : ∀ b' : Fin n,
+              ∑ b : Fin n, twistMat R n j 1 b v.2 * twistMat R n j (-1) b' b
+                = (1 : Matrix (Fin n) (Fin n) (GLLaurent R n)) b' v.2 := by
           intro b'
-          have h1 := Formalism.MainNotions.TestSideWords.TwistedFiltration.G1.flt_twistMat_mul R n j (-1)
+          have h1 :=
+            Formalism.MainNotions.TestSideWords.TwistedFiltration.G1.flt_twistMat_mul R n j (-1)
           rw [neg_neg] at h1
           rw [← h1, Matrix.mul_apply]
           exact Finset.sum_congr rfl fun b _ => mul_comm _ _
         simp_rw [hm, Matrix.one_apply]
         simp
       · rw [Formalism.MainNotions.TestSideWords.TwistedFiltration.G2.twistSub_X_out LL S j v hS,
-          Formalism.MainNotions.TestSideWords.TwistedFiltration.G2.twistSub_X_out LL (S ∪ w) j v (by simp [hS, hW]), untw_X, if_neg hW]
+          Formalism.MainNotions.TestSideWords.TwistedFiltration.G2.twistSub_X_out LL (S ∪ w) j v
+            (by simp [hS, hW]),
+          untw_X, if_neg hW]
 
-theorem valS_wCoeff_ge (w : Set ι) (hw : ∀ l ∈ w, LL.vec l = true) (hd : Disjoint S w) (F : MvPolynomial (ι × Fin n) R)
-    (dw : ℕ) (hdeg : ∀ μ ∈ F.support, wDeg w μ ≤ dw) (th : ℤ) (hF : (th : WithTop ℤ) ≤ valS LL (S ∪ w) F)
-    (M : ι × Fin n →₀ ℕ) : ((th - dw : ℤ) : WithTop ℤ) ≤ valS LL S (wCoeff w M F) := by
+theorem valS_wCoeff_ge
+    (w : Set ι) (hw : ∀ l ∈ w, LL.vec l = true) (hd : Disjoint S w)
+    (F : MvPolynomial (ι × Fin n) R) (dw : ℕ) (hdeg : ∀ μ ∈ F.support, wDeg w μ ≤ dw)
+    (th : ℤ) (hF : (th : WithTop ℤ) ≤ valS LL (S ∪ w) F)
+    (M : ι × Fin n →₀ ℕ)
+    : ((th - dw : ℤ) : WithTop ℤ) ≤ valS LL S (wCoeff w M F) := by
   open Formalism.MainNotions.TestSideWords.TwistedFiltration.G1 in
   have htriv0 : ∀ (B : Type _) [CommRing B] (b : B), b ∈ (trivFil B).F 0 := by
     intro B _ b; simp [trivFil]
 
-  have hB : twistSub LL (S ∪ w) (lastIdx n) F ∈
-      (flt_lift (trivFil (GLLaurent R n)) (-wDegHom w)).F (-(dw : ℤ)) := by
-    refine flt_hom_mem (trivFil R) _ _ (-wDegHom w) ?_ ?_ ?_
+  have hB
+      : twistSub LL (S ∪ w) (lastIdx n) F
+        ∈ (flt_lift (trivFil (GLLaurent R n)) (- wDegHom w)).F (-(dw : ℤ)) := by
+    refine flt_hom_mem (trivFil R) _ _ (- wDegHom w) ?_ ?_ ?_
     · intro t b hb
       rw [twistSub, eval₂Hom_C]
       apply flt_C_mem
@@ -389,7 +429,9 @@ theorem valS_wCoeff_ge (w : Set ι) (hw : ∀ l ∈ w, LL.vec l = true) (hd : Di
         rw [hb', map_zero]
         exact AddSubgroup.zero_mem _
     · intro v
-      have e1 : ∀ b : Fin n, (-wDegHom w) (Finsupp.single (v.1, b) 1) = (-wDegHom w) (Finsupp.single v 1) := by
+      have e1
+          : ∀ b : Fin n,
+            (- wDegHom w) (Finsupp.single (v.1, b) 1) = (- wDegHom w) (Finsupp.single v 1) := by
         intro b; simp [wDegHom_single]
       unfold twistSub
       rw [eval₂Hom_X']
@@ -410,15 +452,15 @@ theorem valS_wCoeff_ge (w : Set ι) (hw : ∀ l ∈ w, LL.vec l = true) (hd : Di
     · intro m
       by_cases hm : m ∈ F.support
       · have h1 := hdeg m hm
-        have : -(dw : ℤ) - (-wDegHom w) m ≤ 0 := by
-          rw [AddMonoidHom.neg_apply, wDegHom_eq]; omega
+        have : -(dw : ℤ) - (- wDegHom w) m ≤ 0 := by rw [AddMonoidHom.neg_apply, wDegHom_eq]; omega
         rw [trivFil_F, if_pos this]
         exact AddSubgroup.mem_top _
       · rw [MvPolynomial.notMem_support_iff.1 hm]
         exact AddSubgroup.zero_mem _
 
-  have hC : twistSub LL (S ∪ w) (lastIdx n) F ∈
-      (flt_lift (flt_L (GLCoord R n) 1) (-wDegHom w)).F (th - dw) := by
+  have hC
+      : twistSub LL (S ∪ w) (lastIdx n) F
+        ∈ (flt_lift (flt_L (GLCoord R n) 1) (- wDegHom w)).F (th - dw) := by
     intro m
     have h1 := ((flt_le_valS LL (S ∪ w) F th).1 hF) m
     have h2 := hB m
@@ -427,18 +469,21 @@ theorem valS_wCoeff_ge (w : Set ι) (hw : ∀ l ∈ w, LL.vec l = true) (hd : Di
       rw [AddMonoidHom.neg_apply, wDegHom_eq]
       simp only [AddMonoidHom.zero_apply]
       omega
-    · have : ¬ (-(dw : ℤ) - (-wDegHom w) m ≤ 0) := by
-        rw [AddMonoidHom.neg_apply, wDegHom_eq]; omega
-      have h3 : AddMonoidAlgebra.coeff (twistSub LL (S ∪ w) (lastIdx n) F) m ∈ (⊥ : AddSubgroup (GLLaurent R n)) := by
+    · have : ¬(-(dw : ℤ) - (- wDegHom w) m ≤ 0) := by rw [AddMonoidHom.neg_apply, wDegHom_eq]; omega
+      have h3
+          : AddMonoidAlgebra.coeff (twistSub LL (S ∪ w) (lastIdx n) F) m
+            ∈ (⊥ : AddSubgroup (GLLaurent R n)) := by
         rw [trivFil_F, if_neg this] at h2
         exact h2
       rw [AddSubgroup.mem_bot] at h3
       rw [h3]
       exact AddSubgroup.zero_mem _
 
-  have hD : untw w (lastIdx n) (twistSub LL (S ∪ w) (lastIdx n) F) ∈
-      (laurentCoeffFiltration R n (ι × Fin n) 1).F (th - dw) := by
-    refine flt_hom_mem (flt_L (GLCoord R n) 1) (laurentCoeffFiltration R n (ι × Fin n) 1) (untw w (lastIdx n)) (-wDegHom w) ?_ ?_ hC
+  have hD
+      : untw w (lastIdx n) (twistSub LL (S ∪ w) (lastIdx n) F)
+        ∈ (laurentCoeffFiltration R n (ι × Fin n) 1).F (th - dw) := by
+    refine flt_hom_mem (flt_L (GLCoord R n) 1) (laurentCoeffFiltration R n (ι × Fin n) 1)
+      (untw w (lastIdx n)) (- wDegHom w) ?_ ?_ hC
     · intro t b hb
       rw [untw_C]
       exact flt_C_mem hb
@@ -458,13 +503,17 @@ theorem valS_wCoeff_ge (w : Set ι) (hw : ∀ l ∈ w, LL.vec l = true) (hd : Di
   rw [flt_le_valS, twistSub_wCoeff LL S w hd]
   exact wCoeff_mem w M hD
 
-theorem valS_wCoeff_of_disj (w : Set ι) (hd : Disjoint S w) (F : MvPolynomial (ι × Fin n) R) (M : ι × Fin n →₀ ℕ) :
-    valS LL S F ≤ valS LL S (wCoeff w M F) := by
-  have h := Formalism.MainNotions.TestSideWords.TwistedFiltration.G1.flt_withTop_le (a := valS LL S F) (b := valS LL S (wCoeff w M F)) (N := 0) (by
-    intro t ht
-    rw [sub_zero, Formalism.MainNotions.TestSideWords.TwistedFiltration.G1.flt_le_valS] at *
-    rw [twistSub_wCoeff LL S w hd]
-    exact wCoeff_mem w M ht)
+theorem valS_wCoeff_of_disj
+    (w : Set ι) (hd : Disjoint S w) (F : MvPolynomial (ι × Fin n) R) (M : ι × Fin n →₀ ℕ)
+    : valS LL S F ≤ valS LL S (wCoeff w M F) := by
+  have h :=
+    Formalism.MainNotions.TestSideWords.TwistedFiltration.G1.flt_withTop_le (a := valS LL S F)
+      (b := valS LL S (wCoeff w M F)) (N := 0)
+      (by
+        intro t ht
+        rw [sub_zero, Formalism.MainNotions.TestSideWords.TwistedFiltration.G1.flt_le_valS] at *
+        rw [twistSub_wCoeff LL S w hd]
+        exact wCoeff_mem w M ht)
   simpa using h
 
 end Formalism.MainNotions.TestSideWords.TwistedFiltration.G3

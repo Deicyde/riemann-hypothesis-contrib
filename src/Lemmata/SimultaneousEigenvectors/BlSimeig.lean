@@ -68,23 +68,25 @@ private lemma exists_simultaneous_eigenvector {n : ℕ} {X : Type u_1} [NormedAd
     · rw [Function.update_of_ne hca]
       exact hμ c ((Finset.mem_insert.mp hc).resolve_left hca)
 
-theorem goal1 :
-  ∀ {n : Nat} {X : Type u_1} [inst : NormedAddCommGroup.{u_1} X] [inst_1 : InnerProductSpace.{0, u_1} Complex X]
-  {A : Fin n → Fin n → Module.End.{0, u_1} Complex X},
-  ReciprocityTheory.ChartRestriction.DS.IsGlRep.{u_1} A →
-    ∀ (s : Finset.{0} (Fin n)) (T : Submodule.{0, u_1} Complex X),
-      FiniteDimensional.{0, u_1} Complex (Subtype.{u_1 + 1} fun (x : X) ↦ Membership.mem.{u_1, u_1} T x) →
-        (∀ (c : Fin n) (v : X),
-            Membership.mem.{u_1, u_1} T v →
-              Membership.mem.{u_1, u_1} T (DFunLike.coe.{u_1 + 1, u_1 + 1, u_1 + 1} (A c c) v)) →
-          Ne.{u_1 + 1} T Bot.bot.{u_1} →
-            Exists.{u_1 + 1} fun (w : X) ↦
+theorem goal1
+    : ∀ {n : Nat} {X : Type u_1} [inst : NormedAddCommGroup.{u_1} X]
+        [inst_1 : InnerProductSpace.{0, u_1} Complex X]
+        {A : Fin n → Fin n → Module.End.{0, u_1} Complex X},
+      ReciprocityTheory.ChartRestriction.DS.IsGlRep.{u_1} A
+        → ∀ (s : Finset.{0} (Fin n)) (T : Submodule.{0, u_1} Complex X),
+          FiniteDimensional.{0, u_1} Complex
+              (Subtype.{u_1 + 1} fun (x : X) ↦ Membership.mem.{u_1, u_1} T x)
+            → (∀ (c : Fin n) (v : X),
+              Membership.mem.{u_1, u_1} T v
+                → Membership.mem.{u_1, u_1} T (DFunLike.coe.{u_1 + 1, u_1 + 1, u_1 + 1} (A c c) v))
+            → Ne.{u_1 + 1} T Bot.bot.{u_1}
+            → Exists.{u_1 + 1} fun (w : X) ↦
               And (Membership.mem.{u_1, u_1} T w)
                 (And (Ne.{u_1 + 1} w 0)
                   (Exists.{1} fun (μ : Fin n → Complex) ↦
                     ∀ (c : Fin n),
-                      Membership.mem.{0, 0} s c →
-                        Eq.{u_1 + 1} (DFunLike.coe.{u_1 + 1, u_1 + 1, u_1 + 1} (A c c) w)
+                      Membership.mem.{0, 0} s c
+                        → Eq.{u_1 + 1} (DFunLike.coe.{u_1 + 1, u_1 + 1, u_1 + 1} (A c c) w)
                           (HSMul.hSMul.{0, u_1, u_1} (μ c) w))) := by
   intro n X _ _ A hA s T hfd hinv hT
   obtain ⟨w, hw, hw0, μ, hμ⟩ := exists_simultaneous_eigenvector hA s T hfd hinv hT

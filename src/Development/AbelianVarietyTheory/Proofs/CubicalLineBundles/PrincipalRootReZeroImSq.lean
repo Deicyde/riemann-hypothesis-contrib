@@ -9,8 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ReEqZer
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.Serre
 open scoped CategoryTheory.Obj UpperHalfPlane TensorProduct
 
@@ -28,10 +30,11 @@ theorem coe_add' (a b : 𝓞 E) : ((a + b : 𝓞 E) : E) = a + b := rfl
 omit [NumberField E] in
 theorem coe_mul' (a b : 𝓞 E) : ((a * b : 𝓞 E) : E) = a * b := rfl
 
-theorem exists_clear (𝔞 : Submodule (𝓞 E) E) (h : 𝔞.FG) :
-    ∃ N : ℤ, N ≠ 0 ∧ ∃ ψ : 𝔞 →ₗ[𝓞 E] 𝓞 E, ∀ x, (ψ x : E) = N * (x : E) := by
+theorem exists_clear (𝔞 : Submodule (𝓞 E) E) (h : 𝔞.FG)
+    : ∃ N : ℤ, N ≠ 0 ∧ ∃ ψ : 𝔞 →ₗ[𝓞 E] 𝓞 E, ∀ x, (ψ x : E) = N * (x : E) := by
   obtain ⟨a, ⟨N, hN, rfl⟩, ha⟩ :=
-    FractionalIdeal.isFractional_of_fg (S := Algebra.algebraMapSubmonoid (𝓞 E) (nonZeroDivisors ℤ)) h
+    FractionalIdeal.isFractional_of_fg (S := Algebra.algebraMapSubmonoid (𝓞 E) (nonZeroDivisors ℤ))
+      h
   choose f hf using ha
   have hf' : ∀ x : 𝔞, ((f x x.2 : 𝓞 E) : E) = N * (x : E) := fun x => by
     have := hf x x.2
@@ -50,11 +53,6 @@ section Act
 
 variable {M : Type} [AddCommGroup M] [Module (𝓞 E) M]
 
-
-
-
-
-
 end Act
 
 variable [IsCMField E]
@@ -65,7 +63,11 @@ theorem principal_root_re_zero_im_sq (H : Host E) : H.rt0.re = 0 ∧ H.rt0.im ^ 
   | exact _root_.GlobalTheory.SquareEqNegReIm.re_eq_zero_and_im_sq
   | (apply _root_.GlobalTheory.SquareEqNegReIm.re_eq_zero_and_im_sq <;> assumption)
   | (intros; apply _root_.GlobalTheory.SquareEqNegReIm.re_eq_zero_and_im_sq <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.SquareEqNegReIm.re_eq_zero_and_im_sq <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.SquareEqNegReIm.re_eq_zero_and_im_sq
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.SquareEqNegReIm.re_eq_zero_and_im_sq ..)
 
 end GlobalTheory.PrincipalDatum

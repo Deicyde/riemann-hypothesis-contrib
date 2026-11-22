@@ -16,8 +16,11 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar GroundTheory.Heights₂.Heights.LowerBoundFree
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar GroundTheory.Heights₂.Heights.LowerBoundFree
 open MvPolynomial
 
 namespace GlobalTheory.CompanionTheory.Ar.ChartCover
@@ -48,12 +51,13 @@ private lemma torusSmul_mem_mcPts' {K : Type} [Fintype K] {J : K → Type} [∀ 
       exact Ideal.subset_span ⟨f, hf, rfl⟩
     exact ReciprocityTheory.AnForm.R.eval_eq_zero_of_smul hP c z hv _ hmem
 
-theorem mcPts_finite_cover_up_to_torus :
-    ∀ (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)] (P : Ideal (MRing J))
-    (hP : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal (pC P)) (C : Type) (O : C → Set ((Σ k, J k) → ℂ)),
-    (∀ i, IsOpen (O i)) → (∀ z ∈ mcPts P, ∃ i, z ∈ O i) →
-    ∃ (m : ℕ) (e : Fin m → C), ∀ z ∈ mcPts P, ∃ (a : Fin m) (c : K → ℂ), (∀ k, c k ≠ 0) ∧
-      torusSmul c z ∈ O (e a) ∧ torusSmul c z ∈ mcPts P := by
+theorem mcPts_finite_cover_up_to_torus
+    : ∀ (K : Type) [Fintype K] (J : K → Type) [∀ k, Fintype (J k)] (P : Ideal (MRing J))
+        (hP : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal (pC P)) (C : Type)
+        (O : C → Set ((Σ k, J k) → ℂ)),
+      (∀ i, IsOpen (O i)) → (∀ z ∈ mcPts P, ∃ i, z ∈ O i)
+        → ∃ (m : ℕ) (e : Fin m → C), ∀ z ∈ mcPts P, ∃ (a : Fin m) (c : K → ℂ),
+          (∀ k, c k ≠ 0) ∧ torusSmul c z ∈ O (e a) ∧ torusSmul c z ∈ mcPts P := by
   intro K _ J _ P hP C O hO hcov
   classical
   set S : Set ((Σ k, J k) → ℂ) :=
@@ -73,8 +77,9 @@ theorem mcPts_finite_cover_up_to_torus :
     simp only [Set.ofPred_and, Set.ofPred_forall]
     refine IsClosed.inter (isClosed_iInter fun k => ?_)
       (isClosed_iInter fun f => isClosed_iInter fun _ => ?_)
-    · exact isClosed_eq (continuous_finsetSum _ fun i _ =>
-        (continuous_norm.comp (continuous_apply _)).pow 2) continuous_const
+    · exact isClosed_eq
+        (continuous_finsetSum _ fun i _ => (continuous_norm.comp (continuous_apply _)).pow 2)
+        continuous_const
     · exact isClosed_eq (MvPolynomial.continuous_eval _) continuous_const
   have hSb : Bornology.IsBounded S := by
     refine (Metric.isBounded_closedBall (x := (0 : (Σ k, J k) → ℂ)) (r := 1)).subset ?_
@@ -84,12 +89,14 @@ theorem mcPts_finite_cover_up_to_torus :
     rintro ⟨k, i⟩
     have h2 : ‖w ⟨k, i⟩‖ ^ 2 ≤ 1 := by
       rw [← hw.1 k]
-      exact Finset.single_le_sum (f := fun j => ‖w ⟨k, j⟩‖ ^ 2) (fun j _ => sq_nonneg _)
+      exact Finset.single_le_sum
+        (f := fun j => ‖w ⟨k, j⟩‖ ^ 2)
+        (fun j _ => sq_nonneg _)
         (Finset.mem_univ i)
     nlinarith [norm_nonneg (w ⟨k, i⟩)]
   have hScpt : IsCompact S := Metric.isCompact_of_isClosed_isBounded hScl hSb
-  obtain ⟨t, ht⟩ := hScpt.elim_finite_subcover O hO
-    (fun w hw => Set.mem_iUnion.2 (hcov w (hSsub hw)))
+  obtain ⟨t, ht⟩ :=
+    hScpt.elim_finite_subcover O hO (fun w hw => Set.mem_iUnion.2 (hcov w (hSsub hw)))
   refine ⟨t.card, fun a => (t.equivFin.symm a : C), ?_⟩
   intro z hz
   have hz0 := hz
@@ -98,7 +105,9 @@ theorem mcPts_finite_cover_up_to_torus :
     intro k
     obtain ⟨i, hi⟩ := hz0.1 k
     exact lt_of_lt_of_le (pow_pos (norm_pos_iff.2 hi) 2)
-      (Finset.single_le_sum (f := fun j => ‖z ⟨k, j⟩‖ ^ 2) (fun j _ => sq_nonneg _)
+      (Finset.single_le_sum
+        (f := fun j => ‖z ⟨k, j⟩‖ ^ 2)
+        (fun j _ => sq_nonneg _)
         (Finset.mem_univ i))
   set c : K → ℂ := fun k => (((Real.sqrt (∑ i, ‖z ⟨k, i⟩‖ ^ 2))⁻¹ : ℝ) : ℂ) with hcdef
   have hc : ∀ k, c k ≠ 0 := by

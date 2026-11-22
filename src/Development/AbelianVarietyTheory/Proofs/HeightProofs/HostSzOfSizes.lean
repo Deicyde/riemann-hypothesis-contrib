@@ -15,7 +15,8 @@ noncomputable section
 
 namespace GlobalTheory.FieldSize
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj GlobalTheory.Mem GlobalTheory.FinalJoin GlobalTheory.FinalJoin2
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+  GlobalTheory.Mem GlobalTheory.FinalJoin GlobalTheory.FinalJoin2
 open Formalism.MainNotions.Gaps.EtaleWeightGaps.Num
 open scoped IntermediateField
 
@@ -23,13 +24,17 @@ theorem scale_le_rank {D : D7} {L : SizeData₂ D} (S : SizesAt L) : L.sc.x ≤ 
   have hx1 := L.sc.one_lt_alt.le
   have he := L.sc.eps_pos
   have h1 : L.sc.x ≤ L.sc.x ^ (9 / 2 + 10 * L.sc.eps - szTh L) := by
-    calc L.sc.x = L.sc.x ^ (1 : ℝ) := (Real.rpow_one _).symm
+    calc
+      L.sc.x
+        = L.sc.x ^ (1 : ℝ) := (Real.rpow_one _).symm
       _ ≤ _ := Real.rpow_le_rpow_of_exponent_le hx1 (by unfold szTh; linarith)
   exact (h1.trans S.2.2.1.1).trans (Pm.k_le_r D)
 
-theorem hostSz_of_sizes : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterChoice' D L) (_Tp : ParamsT D L Pm), SizesAt L →
-    (∀ i, Real.log (D.host.g i) ≤ 9 * L.sc.L + 1) → (10 : ℝ) ^ 60 ≤ L.sc.x →
-    HostSz D.host L.sc.L ∧ (Sz (FO D) (poR D.R L.sc.L) (poR D.R L.sc.L) → FieldSmall D L) := by
+theorem hostSz_of_sizes
+    : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterChoice' D L) (_Tp : ParamsT D L Pm),
+      SizesAt L → (∀ i, Real.log (D.host.g i) ≤ 9 * L.sc.L + 1) → (10 : ℝ) ^ 60 ≤ L.sc.x
+        → HostSz D.host L.sc.L
+          ∧ (Sz (FO D) (poR D.R L.sc.L) (poR D.R L.sc.L) → FieldSmall D L) := by
   intro D L P _ S hg hx
   have hL := Pm.one_le_L L
   have h6 := Pm.six_le_r D

@@ -7,18 +7,20 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ColumnWittFra
 
 @[expose] public section
 
-open MeasureTheory NumberField IsDedekindDomain Matrix Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.ColDict GlobalTheory.St GlobalTheory.St.G
+open MeasureTheory NumberField IsDedekindDomain Matrix Formalism.BasicNotions
+  Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting
+  Formalism.L2.SG.ColDict GlobalTheory.St GlobalTheory.St.G
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.St
 variable {D : D7}
 
-theorem crd_sum_smul (X : HidaSetting D) {ι : Type} [Fintype ι] (c : ι → X.B.I.E) (v : ι → (VS D).V) :
-    X.crd (∑ k, X.ιE (c k) • v k) = fun i => ∑ k, c k * X.crd (v k) i := by
+theorem crd_sum_smul (X : HidaSetting D) {ι : Type} [Fintype ι] (c : ι → X.B.I.E) (v : ι → (VS D).V)
+    : X.crd (∑ k, X.ιE (c k) • v k) = fun i => ∑ k, c k * X.crd (v k) i := by
   funext i
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [HidaSetting.crd, crdOf, map_sum, Finset.sum_apply, map_mul]
+  simp [HidaSetting.crd, crdOf, map_sum, Finset.sum_apply, map_mul]
 
 theorem crd_injective (X : HidaSetting D) : Function.Injective X.crd := by
   intro v w h
@@ -28,9 +30,13 @@ theorem crd_injective (X : HidaSetting D) : Function.Injective X.crd := by
   simp only [HidaSetting.crd, crdOf] at this
   rw [X.ιE.symm.injective this]
 
-theorem orth_mem_span_qFr : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word) (wt : (VS D).V ≃ₗ[D.host.E] (VS D).V),
-    WittX X u wt → ∀ y : (VS D).V, (∀ a, (VS D).hT (X.eX a) y = 0 ∧ (VS D).hT (X.fY a) y = 0) →
-    (VS D).hT (X.zu u) y = 0 → ∃ d : Fin (D.R.N 0) → D.host.E, Fintype.linearCombination D.host.E (qFr wt) d = y := by
+theorem orth_mem_span_qFr
+    : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word) (wt : (VS D).V ≃ₗ[D.host.E] (VS D).V),
+      WittX X u wt
+        → ∀ y : (VS D).V,
+          (∀ a, (VS D).hT (X.eX a) y = 0 ∧ (VS D).hT (X.fY a) y = 0) → (VS D).hT (X.zu u) y = 0
+            → ∃ d : Fin (D.R.N 0) → D.host.E,
+              Fintype.linearCombination D.host.E (qFr wt) d = y := by
   intro D X u wt hw y hef hz
   classical
   obtain ⟨Q, Qi, G', hQQi, hQiQ, hq, he, hf, hzc, -, -⟩ := qFrame_basis_gram D X u wt hw
@@ -63,13 +69,13 @@ theorem orth_mem_span_qFr : ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word
     have h := (hef b).1
     rw [hy] at h
     set_option synthInstance.maxHeartbeats 100000 in
-      simpa [map_add (f := _), map_sum, hqe, X.ee, X.ef, (X.zu_orth u b).1] using h
+    simpa [map_add (f := _), map_sum, hqe, X.ee, X.ef, (X.zu_orth u b).1] using h
   have c1 : ∀ b, X.ιE (c (Sum.inr (Sum.inl b))) = 0 := by
     intro b
     have h := (hef b).2
     rw [hy] at h
     set_option synthInstance.maxHeartbeats 100000 in
-      simpa [map_add (f := _), map_sum, hqf, X.ff, hT_fe, (X.zu_orth u b).2] using h
+    simpa [map_add (f := _), map_sum, hqf, X.ff, hT_fe, (X.zu_orth u b).2] using h
   have c3 : X.ιE (c (Sum.inr (Sum.inr (Sum.inr ())))) = 0 := by
     have h := hz
     rw [hy] at h

@@ -25,8 +25,8 @@ theorem cstab_one : CStab (1 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) := 
   obtain ⟨o', ho'⟩ := star_int o
   exact (FractionalIdeal.mem_one_iff _).mpr ⟨o', ho'⟩
 
-theorem cstab_mul {I J : FractionalIdeal (nonZeroDivisors (𝓞 E)) E} (hI : CStab I) (hJ : CStab J) :
-    CStab (I * J) := by
+theorem cstab_mul {I J : FractionalIdeal (nonZeroDivisors (𝓞 E)) E} (hI : CStab I) (hJ : CStab J)
+    : CStab (I * J) := by
   intro x hx
   refine FractionalIdeal.mul_induction_on (C := fun y => star y ∈ I * J) hx ?_ ?_
   · intro i hi j hj
@@ -47,16 +47,16 @@ theorem cstab_inv {I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E} (hI : CStab
     have h1 := cstab_one _ (hx (star y) (hI y hy))
     rwa [star_mul', star_star] at h1
 
-theorem cstab_pow {I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E} (hI : CStab I) (n : ℕ) :
-    CStab (I ^ n) := by
+theorem cstab_pow {I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E} (hI : CStab I) (n : ℕ)
+    : CStab (I ^ n) := by
   induction n with
   | zero => simpa using cstab_one
   | succ n ih =>
     rw [pow_succ]
     exact cstab_mul ih hI
 
-theorem cstab_zpow {I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E} (hI : CStab I) (n : ℤ) :
-    CStab (I ^ n) := by
+theorem cstab_zpow {I : FractionalIdeal (nonZeroDivisors (𝓞 E)) E} (hI : CStab I) (n : ℤ)
+    : CStab (I ^ n) := by
   cases n with
   | ofNat n =>
     rw [Int.ofNat_eq_natCast, zpow_natCast]
@@ -89,8 +89,9 @@ theorem ddS_ne (D : D7) : ddS D ≠ 0 := by
   exact differentIdeal_ne_bot
 
 theorem ddS_cstab (D : D7) : CStab (ddS D) := by
-  have hfix : PI.CMT.conj.comp (algebraMap (𝓞 D.host.F) (𝓞 D.host.E)) =
-      algebraMap (𝓞 D.host.F) (𝓞 D.host.E) := by
+  have hfix
+      : PI.CMT.conj.comp (algebraMap (𝓞 D.host.F) (𝓞 D.host.E))
+        = algebraMap (𝓞 D.host.F) (𝓞 D.host.E) := by
     ext a
     rw [RingHom.comp_apply, PI.CMT.coe_conj]
     refine (D.sp.cm.fixed _).2 ⟨(a : D.host.F), ?_⟩

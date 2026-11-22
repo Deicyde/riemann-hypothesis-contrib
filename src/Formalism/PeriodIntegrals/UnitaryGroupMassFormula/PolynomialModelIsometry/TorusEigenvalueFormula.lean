@@ -13,8 +13,9 @@ open scoped InnerProductSpace
 
 theorem lambda_integrality : LamInt := by
   intro N Λ H _ _ σ v hU hv hw a
-  have hfun : (fun b => Complex.exp ((((Pi.single a (2 * Real.pi) : Fin N → ℝ) b : ℝ) : ℂ) * Complex.I))
-      = fun _ => (1 : ℂ) := by
+  have hfun
+      : (fun b => Complex.exp ((((Pi.single a (2 * Real.pi) : Fin N → ℝ) b : ℝ) : ℂ) * Complex.I))
+        = fun _ => (1 : ℂ) := by
     funext b
     by_cases hb : b = a
     · subst hb
@@ -37,8 +38,7 @@ theorem lambda_integrality : LamInt := by
     exact (smul_eq_zero.mp h2).resolve_left (sub_ne_zero.mpr (Ne.symm hne))
   obtain ⟨n, hn⟩ := Complex.exp_eq_one_iff.mp he
   refine ⟨n, ?_⟩
-  have hpi : (2 * (Real.pi : ℂ)) * Complex.I ≠ 0 := by
-    simp [Real.pi_ne_zero, Complex.I_ne_zero]
+  have hpi : (2 * (Real.pi : ℂ)) * Complex.I ≠ 0 := by simp [Real.pi_ne_zero, Complex.I_ne_zero]
   have : (Λ a : ℂ) = (n : ℂ) := by
     apply mul_right_cancel₀ hpi
     push_cast at hn
@@ -47,8 +47,9 @@ theorem lambda_integrality : LamInt := by
 
 theorem torus_eigenvalue_formula : TorusEig := by
   intro N Λ H _ _ σ S K P hU hstab hPσ v0 hw θ x
-  have hwt : σ (torus (-θ)) (v0 : H) =
-      Complex.exp (((∑ a, Λ a * (-θ) a : ℝ) : ℂ) * Complex.I) • (v0 : H) :=
+  have hwt
+      : σ (torus (-θ)) (v0 : H)
+        = Complex.exp (((∑ a, Λ a * (-θ) a : ℝ) : ℂ) * Complex.I) • (v0 : H) :=
     hw (-θ) (lowerInv_torus_mem (-θ))
   have hdet : (torus θ).det = Complex.exp (((∑ a, θ a : ℝ) : ℂ) * Complex.I) := by
     rw [torus, Matrix.det_diagonal]
@@ -60,7 +61,8 @@ theorem torus_eigenvalue_formula : TorusEig := by
   congr 2
   simp only [map_mul, Complex.conj_ofReal, Complex.conj_I]
   push_cast
-  simp only [Pi.neg_apply, Finset.mul_sum, Finset.sum_mul, ← Finset.sum_neg_distrib, ← Finset.sum_add_distrib]
+  simp only [Pi.neg_apply, Finset.mul_sum, Finset.sum_mul, ← Finset.sum_neg_distrib,
+    ← Finset.sum_add_distrib]
   ring_nf
   apply Finset.sum_congr rfl
   intro i _

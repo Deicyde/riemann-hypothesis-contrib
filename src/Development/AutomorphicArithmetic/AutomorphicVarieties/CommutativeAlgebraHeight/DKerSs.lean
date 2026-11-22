@@ -7,14 +7,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open TensorProduct IsLocalRing Polynomial UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.CA
 
-theorem UpperTheory.V.CA.d_ker_ss :
-    ∀ {n : ℕ} {k E ι : Type} [Field k] [IsAlgClosed k] [Ring E] [Algebra k E] [Fintype ι] [DecidableEq ι] (h : Fintype.card ι = n) (r : E →ₐ[k] Matrix ι ι k), IsSemisimpleRing r.range → ∀ x, x ∈ (Det.ofRep h r).ker ↔ r x = 0 := by
+theorem UpperTheory.V.CA.d_ker_ss
+    : ∀ {n : ℕ} {k E ι : Type} [Field k] [IsAlgClosed k] [Ring E] [Algebra k E] [Fintype ι]
+        [DecidableEq ι] (h : Fintype.card ι = n) (r : E →ₐ[k] Matrix ι ι k),
+      IsSemisimpleRing r.range → ∀ x, x ∈ (Det.ofRep h r).ker ↔ r x = 0 := by
   intro n k E ι _ _ _ _ _ _ h r hss x
   rw [Det.mem_ker]
   constructor
   · intro hx
-    obtain ⟨e, he, hI⟩ := IsSemisimpleRing.ideal_eq_span_idempotent
-      (Ideal.span {(⟨r x, x, rfl⟩ : r.range)})
+    obtain ⟨e, he, hI⟩ :=
+      IsSemisimpleRing.ideal_eq_span_idempotent (Ideal.span {(⟨r x, x, rfl⟩ : r.range)})
     have h1 : e ∈ Ideal.span {(⟨r x, x, rfl⟩ : r.range)} := hI ▸ Ideal.subset_span rfl
     have h2 : (⟨r x, x, rfl⟩ : r.range) ∈ Ideal.span {e} := hI ▸ Ideal.subset_span rfl
     obtain ⟨⟨a, u, rfl⟩, ha⟩ := Ideal.mem_span_singleton'.1 h1

@@ -12,15 +12,22 @@ public import GroundTheory.AutomorphicForms.L2LocalComponents.CenterCommute
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
 open scoped TensorProduct InnerProductSpace ComplexConjugate Pointwise
 
-theorem UpperTheory.ConvolutionTheory.Tf.adjInt :
-    ∀ (G H : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (π : UnitaryRep G H) (μ : Measure G) [μ.IsHaarMeasure] [μ.IsInvInvariant]
-      (f g : CompactlySupportedContinuousMap G ℂ), (∀ x, g x = conj (f x⁻¹)) →
-      ContinuousLinearMap.adjoint (π.integrated μ (UnitaryRep.ccToL1 μ f)) = π.integrated μ (UnitaryRep.ccToL1 μ g) ∧
-      ‖π.integrated μ (UnitaryRep.ccToL1 μ f)‖ ≤ ∫ x, ‖f x‖ ∂μ ∧ ∫ x, ‖g x‖ ∂μ = ∫ x, ‖f x‖ ∂μ := by
+theorem UpperTheory.ConvolutionTheory.Tf.adjInt
+    : ∀ (G H : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+        [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+        [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (π : UnitaryRep G H)
+        (μ : Measure G) [μ.IsHaarMeasure] [μ.IsInvInvariant]
+        (f g : CompactlySupportedContinuousMap G ℂ),
+      (∀ x, g x = conj (f x⁻¹))
+        → ContinuousLinearMap.adjoint (π.integrated μ (UnitaryRep.ccToL1 μ f))
+            = π.integrated μ (UnitaryRep.ccToL1 μ g)
+          ∧ ‖π.integrated μ (UnitaryRep.ccToL1 μ f)‖ ≤ ∫ x, ‖f x‖ ∂μ
+          ∧ ∫ x, ‖g x‖ ∂μ = ∫ x, ‖f x‖ ∂μ := by
   intro G H _ _ _ _ _ _ _ _ _ _ _ π μ _ _ f g hg
   have hf1 : ((UnitaryRep.ccToL1 μ f : G →₁[μ] ℂ) : G → ℂ) =ᵐ[μ] f := by
     unfold UnitaryRep.ccToL1

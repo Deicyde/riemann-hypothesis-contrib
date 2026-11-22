@@ -12,7 +12,16 @@ open Formalism.BasicNotions NumberField
 
 namespace GlobalTheory
 
-theorem exists_frames_normAt_eq_norm : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (e : K →+* ℂ) (W : Type) [NormedAddCommGroup W] [InnerProductSpace ℂ W] (n : ℕ) (c : Module.Basis (Fin n) ℂ W) (L : Submodule (𝓞 K) (Fin n → K)), ∃ X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ, (∀ v, IsUnit (X v).det) ∧ ∀ x : Fin n → K, Formalism.HermitianLatticesTheory.normAt (Pi.basisFun K (Fin n)) X (InfinitePlace.mk e) x = ‖∑ i, e (x i) • c i‖ := by
+theorem exists_frames_normAt_eq_norm
+    : ∀ (K : Type) [Field K] [NumberField K] [StarRing K] (e : K →+* ℂ) (W : Type)
+        [NormedAddCommGroup W] [InnerProductSpace ℂ W] (n : ℕ) (c : Module.Basis (Fin n) ℂ W)
+        (L : Submodule (𝓞 K) (Fin n → K)),
+      ∃ X : InfinitePlace K → Matrix (Fin n) (Fin n) ℂ,
+        (∀ v, IsUnit (X v).det)
+          ∧ ∀ x : Fin n → K,
+            Formalism.HermitianLatticesTheory.normAt (Pi.basisFun K (Fin n)) X (InfinitePlace.mk e)
+                x
+              = ‖∑ i, e (x i) • c i‖ := by
   intro K _ _ _ e W _ _ n c _
   have : FiniteDimensional ℂ W := Module.Finite.of_basis c
   have hn : Module.finrank ℂ W = n := by simpa using Module.finrank_eq_card_basis c
@@ -20,7 +29,9 @@ theorem exists_frames_normAt_eq_norm : ∀ (K : Type) [Field K] [NumberField K] 
   set A : Matrix (Fin n) (Fin n) ℂ := o.toBasis.toMatrix c with hA
   have hAu : IsUnit A.det :=
     Matrix.isUnit_det_of_right_inverse (o.toBasis.toMatrix_mul_toMatrix_flip c)
-  have key : ∀ y : Fin n → ℂ, Formalism.HermitianLatticesTheory.cnorm (A.mulVec y) = ‖∑ i, y i • c i‖ := by
+  have key
+      : ∀ y : Fin n → ℂ,
+        Formalism.HermitianLatticesTheory.cnorm (A.mulVec y) = ‖∑ i, y i • c i‖ := by
     intro y
     rw [← o.repr.norm_map, EuclideanSpace.norm_eq]
     unfold Formalism.HermitianLatticesTheory.cnorm
@@ -39,8 +50,11 @@ theorem exists_frames_normAt_eq_norm : ∀ (K : Type) [Field K] [NumberField K] 
   · have hBu : IsUnit (A.map (starRingEnd ℂ)).det := by
       have := hAu.map (starRingEnd ℂ)
       rwa [RingHom.map_det] at this
-    refine ⟨fun _ => (A.map (starRingEnd ℂ))⁻¹, fun _ => Matrix.isUnit_nonsing_inv_det _ hBu,
-      fun x => ?_⟩
+    refine ⟨
+      fun _ => (A.map (starRingEnd ℂ))⁻¹,
+      fun _ => Matrix.isUnit_nonsing_inv_det _ hBu,
+      fun x => ?_
+    ⟩
     rw [← key]
     unfold Formalism.HermitianLatticesTheory.normAt Formalism.HermitianLatticesTheory.fcoord
     rw [Matrix.nonsing_inv_nonsing_inv _ hBu]

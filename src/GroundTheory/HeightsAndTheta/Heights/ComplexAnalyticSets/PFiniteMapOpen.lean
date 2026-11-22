@@ -18,18 +18,20 @@ namespace FiniteMapOpen
 abbrev evalYT {d : ℕ} (F : Polynomial (MvPolynomial (Fin d) ℂ)) (y : Fin d → ℂ) (t : ℂ) : ℂ :=
   (F.map (MvPolynomial.eval y)).eval t
 
-theorem continuous_evalYT {d : ℕ} (F : Polynomial (MvPolynomial (Fin d) ℂ)) (t : ℂ) :
-    Continuous fun y => evalYT F y t := by
-  have : (fun y => evalYT F y t) =
-      fun y => ∑ k ∈ Finset.range (F.natDegree + 1), MvPolynomial.eval y (F.coeff k) * t ^ k := by
+theorem continuous_evalYT {d : ℕ} (F : Polynomial (MvPolynomial (Fin d) ℂ)) (t : ℂ)
+    : Continuous fun y => evalYT F y t := by
+  have : (fun y => evalYT F y t)
+      = fun y => ∑ k ∈ Finset.range (F.natDegree + 1), MvPolynomial.eval y (F.coeff k) * t ^ k := by
     funext y
     rw [evalYT, Polynomial.eval_map, Polynomial.eval₂_eq_sum_range]
   rw [this]
   exact continuous_finsetSum _ fun k _ => (MvPolynomial.continuous_eval _).mul continuous_const
 
-theorem eventually_exists_root {d : ℕ} {F : Polynomial (MvPolynomial (Fin d) ℂ)} (hF : F.Monic)
-    {y₀ : Fin d → ℂ} {t₀ : ℂ} (h₀ : evalYT F y₀ t₀ = 0) {V : Set ℂ} (hV : V ∈ 𝓝 t₀) :
-    ∀ᶠ y in 𝓝 y₀, ∃ t ∈ V, evalYT F y t = 0 := by
+theorem eventually_exists_root
+    {d : ℕ} {F : Polynomial (MvPolynomial (Fin d) ℂ)} (hF : F.Monic)
+    {y₀ : Fin d → ℂ} {t₀ : ℂ} (h₀ : evalYT F y₀ t₀ = 0)
+    {V : Set ℂ} (hV : V ∈ 𝓝 t₀)
+    : ∀ᶠ y in 𝓝 y₀, ∃ t ∈ V, evalYT F y t = 0 := by
   obtain ⟨ε, hε, hball⟩ := Metric.mem_nhds_iff.1 hV
   have hcont := (continuous_evalYT F t₀).tendsto y₀
   rw [h₀] at hcont
@@ -52,15 +54,14 @@ theorem eventually_exists_root {d : ℕ} {F : Polynomial (MvPolynomial (Fin d) �
     rw [hsplit.eval_eq_prod_roots_of_monic hGm]
     exact (G.roots.prod_hom' (NormedField.toMulRingNorm ℂ) (fun r : ℂ => t₀ - r)).symm
   have hge : ε ^ F.natDegree ≤ ‖G.eval t₀‖ := by
-    have := Multiset.prod_map_le_prod_map₀ (fun _ => ε) (fun r => ‖t₀ - r‖)
-      (fun _ _ => hε.le) hle
+    have := Multiset.prod_map_le_prod_map₀ (fun _ => ε) (fun r => ‖t₀ - r‖) (fun _ _ => hε.le) hle
     rw [Multiset.map_const', Multiset.prod_replicate] at this
     rw [hprod, ← hGdeg, hsplit.natDegree_eq_card_roots]
     exact this
   exact absurd hy (not_lt.2 hge)
 
-theorem norm_le_of_monic_root {G : Polynomial ℂ} (hG : G.Monic) {t : ℂ} (ht : G.eval t = 0) :
-    ‖t‖ ≤ ∑ k ∈ Finset.range G.natDegree, ‖G.coeff k‖ + 1 := by
+theorem norm_le_of_monic_root {G : Polynomial ℂ} (hG : G.Monic) {t : ℂ} (ht : G.eval t = 0)
+    : ‖t‖ ≤ ∑ k ∈ Finset.range G.natDegree, ‖G.coeff k‖ + 1 := by
   have h1 := Polynomial.IsRoot.norm_lt_cauchyBound hG.ne_zero ht
   have h2 : Polynomial.cauchyBound G ≤ ∑ k ∈ Finset.range G.natDegree, ‖G.coeff k‖₊ + 1 := by
     rw [Polynomial.cauchyBound, hG.leadingCoeff, nnnorm_one, div_one]
@@ -73,42 +74,54 @@ theorem norm_le_of_monic_root {G : Polynomial ℂ} (hG : G.Monic) {t : ℂ} (ht 
 
 variable {n d : ℕ}
 
-def evalAt (J : Ideal (MvPolynomial (Fin n) ℂ)) {z : Fin n → ℂ} (hz : z ∈ zeroLocus J) :
-    (MvPolynomial (Fin n) ℂ ⧸ J) →ₐ[ℂ] ℂ :=
+def evalAt (J : Ideal (MvPolynomial (Fin n) ℂ)) {z : Fin n → ℂ} (hz : z ∈ zeroLocus J)
+    : (MvPolynomial (Fin n) ℂ ⧸ J) →ₐ[ℂ] ℂ :=
   Ideal.Quotient.liftₐ J (aeval z) fun q hq => by rw [aeval_eq_eval]; exact hz q hq
 
-theorem evalAt_mk (J : Ideal (MvPolynomial (Fin n) ℂ)) {z : Fin n → ℂ} (hz : z ∈ zeroLocus J)
-    (q : MvPolynomial (Fin n) ℂ) : evalAt J hz (Ideal.Quotient.mk J q) = eval z q := by
+theorem evalAt_mk
+    (J : Ideal (MvPolynomial (Fin n) ℂ))
+    {z : Fin n → ℂ} (hz : z ∈ zeroLocus J)
+    (q : MvPolynomial (Fin n) ℂ)
+    : evalAt J hz (Ideal.Quotient.mk J q) = eval z q := by
   simp [evalAt]
 
-theorem evalAt_comp_toRingHom (J : Ideal (MvPolynomial (Fin n) ℂ)) (p : Fin d → MvPolynomial (Fin n) ℂ)
-    {z : Fin n → ℂ} (hz : z ∈ zeroLocus J) :
-    (evalAt J hz : (MvPolynomial (Fin n) ℂ ⧸ J) →+* ℂ).comp
-      ((Ideal.Quotient.mkₐ ℂ J).comp (aeval p)).toRingHom = MvPolynomial.eval fun i => eval z (p i) := by
+theorem evalAt_comp_toRingHom
+    (J : Ideal (MvPolynomial (Fin n) ℂ))
+    (p : Fin d → MvPolynomial (Fin n) ℂ)
+    {z : Fin n → ℂ} (hz : z ∈ zeroLocus J)
+    : (evalAt J hz : (MvPolynomial (Fin n) ℂ ⧸ J) →+* ℂ).comp
+        ((Ideal.Quotient.mkₐ ℂ J).comp (aeval p)).toRingHom
+      = MvPolynomial.eval fun i => eval z (p i) := by
   ext a <;> simp [evalAt]
 
-theorem evalYT_eq_zero (J : Ideal (MvPolynomial (Fin n) ℂ)) (p : Fin d → MvPolynomial (Fin n) ℂ)
+theorem evalYT_eq_zero
+    (J : Ideal (MvPolynomial (Fin n) ℂ))
+    (p : Fin d → MvPolynomial (Fin n) ℂ)
     {F : Polynomial (MvPolynomial (Fin d) ℂ)} {s : MvPolynomial (Fin n) ℂ ⧸ J}
     (hs : Polynomial.eval₂ ((Ideal.Quotient.mkₐ ℂ J).comp (aeval p)).toRingHom s F = 0)
-    {z : Fin n → ℂ} (hz : z ∈ zeroLocus J) :
-    evalYT F (fun i => eval z (p i)) (evalAt J hz s) = 0 := by
+    {z : Fin n → ℂ} (hz : z ∈ zeroLocus J)
+    : evalYT F (fun i => eval z (p i)) (evalAt J hz s) = 0 := by
   have h := congrArg (evalAt J hz : (MvPolynomial (Fin n) ℂ ⧸ J) →+* ℂ) hs
   rw [map_zero, Polynomial.hom_eval₂, evalAt_comp_toRingHom] at h
   rw [evalYT, Polynomial.eval_map]
   exact h
 
-theorem exists_point_of_evalYT_eq_zero (J : Ideal (MvPolynomial (Fin n) ℂ))
-    (p : Fin d → MvPolynomial (Fin n) ℂ) (hfin : ((Ideal.Quotient.mkₐ ℂ J).comp (aeval p)).Finite)
+theorem exists_point_of_evalYT_eq_zero
+    (J : Ideal (MvPolynomial (Fin n) ℂ)) (p : Fin d → MvPolynomial (Fin n) ℂ)
+    (hfin : ((Ideal.Quotient.mkₐ ℂ J).comp (aeval p)).Finite)
     (L : MvPolynomial (Fin n) ℂ) (μ : Polynomial (MvPolynomial (Fin d) ℂ))
-    (hdvd : ∀ F, Polynomial.eval₂ ((Ideal.Quotient.mkₐ ℂ J).comp (aeval p)).toRingHom
-      (Ideal.Quotient.mk J L) F = 0 → μ ∣ F)
-    {y : Fin d → ℂ} {t : ℂ} (hyt : evalYT μ y t = 0) :
-    ∃ z ∈ zeroLocus J, (fun i => eval z (p i)) = y ∧ eval z L = t := by
+    (hdvd : ∀ F,
+      Polynomial.eval₂ ((Ideal.Quotient.mkₐ ℂ J).comp (aeval p)).toRingHom (Ideal.Quotient.mk J L) F
+          = 0
+        → μ ∣ F)
+    {y : Fin d → ℂ} {t : ℂ} (hyt : evalYT μ y t = 0)
+    : ∃ z ∈ zeroLocus J, (fun i => eval z (p i)) = y ∧ eval z L = t := by
   classical
   set f := ((Ideal.Quotient.mkₐ ℂ J).comp (aeval p)).toRingHom with hf
   let g : Polynomial (MvPolynomial (Fin d) ℂ) →+* MvPolynomial (Fin n) ℂ ⧸ J :=
     Polynomial.eval₂RingHom f (Ideal.Quotient.mk J L)
-  let e : Polynomial (MvPolynomial (Fin d) ℂ) →+* ℂ := Polynomial.eval₂RingHom (MvPolynomial.eval y) t
+  let e : Polynomial (MvPolynomial (Fin d) ℂ) →+* ℂ :=
+    Polynomial.eval₂RingHom (MvPolynomial.eval y) t
   have he : Function.Surjective e := fun c => ⟨Polynomial.C (MvPolynomial.C c), by simp [e]⟩
   have hPmax : (RingHom.ker e).IsMaximal := RingHom.ker_isMaximal_of_surjective e he
   have hgC : g.comp Polynomial.C = f := RingHom.ext fun a => by simp [g]
@@ -117,8 +130,9 @@ theorem exists_point_of_evalYT_eq_zero (J : Ideal (MvPolynomial (Fin n) ℂ))
   let _ : Algebra (Polynomial (MvPolynomial (Fin d) ℂ)) (MvPolynomial (Fin n) ℂ ⧸ J) := g.toAlgebra
   have : Algebra.IsIntegral (Polynomial (MvPolynomial (Fin d) ℂ)) (MvPolynomial (Fin n) ℂ ⧸ J) :=
     ⟨hgint⟩
-  have hker : RingHom.ker (algebraMap (Polynomial (MvPolynomial (Fin d) ℂ))
-      (MvPolynomial (Fin n) ℂ ⧸ J)) ≤ RingHom.ker e := by
+  have hker
+      : RingHom.ker (algebraMap (Polynomial (MvPolynomial (Fin d) ℂ)) (MvPolynomial (Fin n) ℂ ⧸ J))
+        ≤ RingHom.ker e := by
     intro F hF
     rw [RingHom.mem_ker] at hF ⊢
     obtain ⟨H, rfl⟩ := hdvd F hF
@@ -161,7 +175,6 @@ theorem exists_point_of_evalYT_eq_zero (J : Ideal (MvPolynomial (Fin n) ℂ))
 
 end FiniteMapOpen
 
-
 set_option synthInstance.maxHeartbeats 400000 in
 open FiniteMapOpen in
 theorem FiniteMapOpen.proof : FiniteMapOpen.Statement := by
@@ -172,8 +185,8 @@ theorem FiniteMapOpen.proof : FiniteMapOpen.Statement := by
   set y₀ := φ x with hy₀
   have := hJ
   let _ : Algebra (MvPolynomial (Fin d) ℂ) (MvPolynomial (Fin n) ℂ ⧸ J) := f.toRingHom.toAlgebra
-  have hint : ∀ s : MvPolynomial (Fin n) ℂ ⧸ J, IsIntegral (MvPolynomial (Fin d) ℂ) s :=
-    fun s => RingHom.IsIntegral.of_finite hfin s
+  have hint : ∀ s : MvPolynomial (Fin n) ℂ ⧸ J, IsIntegral (MvPolynomial (Fin d) ℂ) s := fun s =>
+    RingHom.IsIntegral.of_finite hfin s
 
   choose g hgm hg0 using fun j : Fin n => hint (Ideal.Quotient.mk J (X j))
   have hcoord : ∀ z (hz : z ∈ zeroLocus J) j, evalYT (g j) (φ z) (z j) = 0 := by
@@ -188,26 +201,33 @@ theorem FiniteMapOpen.proof : FiniteMapOpen.Statement := by
       rw [← hwy]
       exact hcoord w hw j
 
-  obtain ⟨c, hc⟩ : ∃ c : ℂ, ∀ w, w ∈ zeroLocus J ∧ φ w = y₀ → w ≠ x →
-      ∑ j : Fin n, c ^ (j : ℕ) * w j ≠ ∑ j : Fin n, c ^ (j : ℕ) * x j := by
-    let P : (Fin n → ℂ) → Polynomial ℂ := fun w => ∑ j : Fin n, Polynomial.monomial (j : ℕ) (w j - x j)
-    have hP : ∀ w c, (P w).eval c = ∑ j : Fin n, c ^ (j : ℕ) * w j - ∑ j : Fin n, c ^ (j : ℕ) * x j := by
+  obtain ⟨c, hc⟩
+      : ∃ c : ℂ, ∀ w,
+        w ∈ zeroLocus J ∧ φ w = y₀ → w ≠ x
+          → ∑ j : Fin n, c ^ (j : ℕ) * w j ≠ ∑ j : Fin n, c ^ (j : ℕ) * x j := by
+    let P : (Fin n → ℂ) → Polynomial ℂ := fun w =>
+      ∑ j : Fin n, Polynomial.monomial (j : ℕ) (w j - x j)
+    have hP
+        : ∀ w c,
+          (P w).eval c = ∑ j : Fin n, c ^ (j : ℕ) * w j - ∑ j : Fin n, c ^ (j : ℕ) * x j := by
       intro w c
       simp [P, Polynomial.eval_finsetSum, Finset.sum_sub_distrib, mul_comm]
     have hP0 : ∀ w, w ≠ x → P w ≠ 0 := by
       intro w hw h0
       obtain ⟨j, hj⟩ := Function.ne_iff.1 hw
       have h1 := congrArg (fun q => _root_.AddMonoidAlgebra.coeff (M := ℕ) q j) h0
-      simp only [P, Polynomial.finsetSum_coeff, Polynomial.coeff_monomial_apply, Polynomial.coeff_zero] at h1
+      simp only [P, Polynomial.finsetSum_coeff, Polynomial.coeff_monomial_apply,
+          Polynomial.coeff_zero]
+        at h1
       rw [Finset.sum_eq_single j (fun k _ hk => if_neg (fun h => hk (Fin.ext h))) (by simp)] at h1
       simp only [if_true] at h1
       exact hj (sub_eq_zero.1 h1)
     have hsub : {w | (w ∈ zeroLocus J ∧ φ w = y₀) ∧ w ≠ x}.Finite :=
       hfib.subset (by intro w hw; exact hw.1)
-    have hbad : (⋃ w ∈ {w | (w ∈ zeroLocus J ∧ φ w = y₀) ∧ w ≠ x},
-        {c : ℂ | (P w).eval c = 0}).Finite :=
-      hsub.biUnion fun w hw =>
-        Polynomial.finite_setOfPred_isRoot (hP0 w hw.2)
+    have hbad
+        : (⋃ w ∈ {w | (w ∈ zeroLocus J ∧ φ w = y₀) ∧ w ≠ x},
+            {c : ℂ | (P w).eval c = 0}).Finite :=
+      hsub.biUnion fun w hw => Polynomial.finite_setOfPred_isRoot (hP0 w hw.2)
     obtain ⟨c, hc⟩ := hbad.infinite_compl.nonempty
     refine ⟨c, fun w hw hwx h => hc ?_⟩
     exact Set.mem_biUnion (x := w) ⟨hw, hwx⟩ (by simp [hP, h])
@@ -243,14 +263,16 @@ theorem FiniteMapOpen.proof : FiniteMapOpen.Statement := by
     hZc.inter ((Metric.isClosed_closedBall.preimage hφc).inter Metric.isOpen_ball.isClosed_compl)
   let B : (Fin d → ℂ) → ℝ := fun y =>
     ∑ j, ∑ k ∈ Finset.range (g j).natDegree, ‖MvPolynomial.eval y ((g j).coeff k)‖
-  have hBc : Continuous B := continuous_finsetSum _ fun j _ =>
-    continuous_finsetSum _ fun k _ => (MvPolynomial.continuous_eval _).norm
+  have hBc : Continuous B :=
+    continuous_finsetSum _ fun j _ =>
+      continuous_finsetSum _ fun k _ => (MvPolynomial.continuous_eval _).norm
   obtain ⟨C0, hC0⟩ := (isCompact_closedBall y₀ 1).exists_bound_of_continuousOn hBc.continuousOn
   have hKb : Bornology.IsBounded K := by
     rw [isBounded_iff_forall_norm_le]
     refine ⟨C0 + 1, fun z hz => ?_⟩
     have hB := hC0 _ hz.2.1
-    have hB0 : 0 ≤ B (φ z) := Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _
+    have hB0 : 0 ≤ B (φ z) :=
+      Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _
     rw [Real.norm_eq_abs, abs_of_nonneg hB0] at hB
     refine (pi_norm_le_iff_of_nonneg (by linarith)).2 fun j => ?_
     have h1 := norm_le_of_monic_root ((hgm j).map (MvPolynomial.eval (φ z))) (hcoord z hz.1 j)
@@ -259,7 +281,8 @@ theorem FiniteMapOpen.proof : FiniteMapOpen.Statement := by
     have h2 : ∑ k ∈ Finset.range (g j).natDegree, ‖eval (φ z) ((g j).coeff k)‖ ≤ B (φ z) :=
       Finset.single_le_sum
         (f := fun j => ∑ k ∈ Finset.range (g j).natDegree, ‖eval (φ z) ((g j).coeff k)‖)
-        (fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _) (Finset.mem_univ j)
+        (fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _)
+        (Finset.mem_univ j)
     linarith
   have hKcpt : IsCompact K := Metric.isCompact_of_isClosed_isBounded hKc hKb
   set Ψ : (Fin n → ℂ) → (Fin d → ℂ) × ℂ := fun z => (φ z, eval z L) with hΨ

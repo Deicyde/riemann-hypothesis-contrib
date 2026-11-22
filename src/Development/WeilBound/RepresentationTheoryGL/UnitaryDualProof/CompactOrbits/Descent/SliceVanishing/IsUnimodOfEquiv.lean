@@ -10,9 +10,12 @@ open MeasureTheory MeasureTheory.Measure
 
 namespace PositivityTheory.RgUd.T.Desc.SLF
 
-theorem isUnimod_of_equiv {G₁ G₂ : Type*} [Group G₁] [TopologicalSpace G₁] [IsTopologicalGroup G₁] [LocallyCompactSpace G₁]
-    [Group G₂] [TopologicalSpace G₂] [IsTopologicalGroup G₂] [LocallyCompactSpace G₂] (φ : G₁ ≃ₜ* G₂)
-    (h : PositivityTheory.PfBern.Frob.IsUnimod G₂) : PositivityTheory.PfBern.Frob.IsUnimod G₁ := by
+theorem isUnimod_of_equiv
+    {G₁ G₂ : Type*}
+    [Group G₁] [TopologicalSpace G₁] [IsTopologicalGroup G₁] [LocallyCompactSpace G₁] [Group G₂]
+    [TopologicalSpace G₂] [IsTopologicalGroup G₂] [LocallyCompactSpace G₂]
+    (φ : G₁ ≃ₜ* G₂) (h : PositivityTheory.PfBern.Frob.IsUnimod G₂)
+    : PositivityTheory.PfBern.Frob.IsUnimod G₁ := by
   intro g
   have hg : modularCharacterFun (φ g) = 1 := h (φ g)
   show modularCharacterFun g = 1

@@ -6,8 +6,8 @@ public import Mathlib
 
 namespace GlobalTheory.NatMulIsIntegralSatakeParameters
 
-theorem exists_nat_mul_isIntegral {E : Type} [Field E] [NumberField E] (a : E) :
-    ∃ m : ℕ, 0 < m ∧ IsIntegral ℤ ((m : E) * a) := by
+theorem exists_nat_mul_isIntegral {E : Type} [Field E] [NumberField E] (a : E)
+    : ∃ m : ℕ, 0 < m ∧ IsIntegral ℤ ((m : E) * a) := by
   obtain ⟨y, hy0, hy'⟩ := exists_integral_multiples ℤ ℚ (L := E) {a}
   have hy := hy' a (Finset.mem_singleton_self a)
   refine ⟨y.natAbs, Int.natAbs_pos.mpr hy0, ?_⟩
@@ -18,10 +18,11 @@ theorem exists_nat_mul_isIntegral {E : Type} [Field E] [NumberField E] (a : E) :
   · rw [h] at hy
     simpa using hy.neg
 
-theorem exists_nsmul_mem {E : Type} [Field E] [NumberField E] {N : ℕ}
-    (Lb : Submodule (NumberField.RingOfIntegers E) (Fin N → E)) {v : Fin N → E}
-    (hv : v ∈ Submodule.span E (↑Lb : Set (Fin N → E))) :
-    ∃ n : ℕ, 0 < n ∧ n • v ∈ Lb := by
+theorem exists_nsmul_mem
+    {E : Type} [Field E] [NumberField E]
+    {N : ℕ} (Lb : Submodule (NumberField.RingOfIntegers E) (Fin N → E))
+    {v : Fin N → E} (hv : v ∈ Submodule.span E (↑Lb : Set (Fin N → E)))
+    : ∃ n : ℕ, 0 < n ∧ n • v ∈ Lb := by
   induction hv using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_pos, by simpa using hx⟩
   | zero => exact ⟨1, one_pos, by simp⟩
@@ -40,8 +41,10 @@ theorem exists_nsmul_mem {E : Type} [Field E] [NumberField E] {N : ℕ}
     obtain ⟨n, hn, h⟩ := hx
     obtain ⟨m, hm, hc⟩ := exists_nat_mul_isIntegral c
     refine ⟨m * n, Nat.mul_pos hm hn, ?_⟩
-    have e : (m * n) • (c • x) =
-        (⟨(m : E) * c, (mem_integralClosure_iff ℤ E).mpr hc⟩ : NumberField.RingOfIntegers E) • (n • x) := by
+    have e
+        : (m * n) • (c • x)
+          = (⟨(m : E) * c, (mem_integralClosure_iff ℤ E).mpr hc⟩ : NumberField.RingOfIntegers E)
+            • (n • x) := by
       ext i
       show (m * n) • (c * x i) = ((m : E) * c) * (n • x i)
       simp only [nsmul_eq_mul, Nat.cast_mul]

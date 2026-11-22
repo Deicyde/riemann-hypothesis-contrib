@@ -13,9 +13,13 @@ open PowerSeries Formalism.G Formalism.LT Formalism.L2.Th1.CM
 
 variable {K : Type} [NormedField K] [IsUltrametricDist K] [CharZero K] {l : ℕ} {σ : K →+* K}
 
-theorem powerSeries_subst_subst_of_constantCoeff_zero {R : Type} [CommRing R] {α β : Type} (φ : PowerSeries R)
-    {u : MvPowerSeries α R} (hu : MvPowerSeries.constantCoeff u = 0) {b : α → MvPowerSeries β R}
-    (hb : MvPowerSeries.HasSubst b) : (φ.subst u).subst b = φ.subst (u.subst b) := by
+theorem powerSeries_subst_subst_of_constantCoeff_zero
+    {R : Type} [CommRing R]
+    {α β : Type}
+    (φ : PowerSeries R)
+    {u : MvPowerSeries α R} (hu : MvPowerSeries.constantCoeff u = 0)
+    {b : α → MvPowerSeries β R} (hb : MvPowerSeries.HasSubst b)
+    : (φ.subst u).subst b = φ.subst (u.subst b) := by
   rw [PowerSeries.subst, PowerSeries.subst]
   first
   | exact MvPowerSeries.subst_comp_subst_apply
@@ -27,8 +31,8 @@ theorem powerSeries_subst_subst_of_constantCoeff_zero {R : Type} [CommRing R] {�
   | exact MvPowerSeries.subst_comp_subst_apply
       ⟨fun _ => by rw [hu]; exact IsNilpotent.zero, by simp⟩ hb φ
 
-theorem mulN_integral {lam : PowerSeries K} {Φ : MvPowerSeries (Fin 2) K} (h : LawD lam Φ) (n : ℕ) :
-    ∃ e : PowerSeries K, constantCoeff e = 0 ∧ IntegralPS e ∧ lam.subst e = C (n : K) * lam := by
+theorem mulN_integral {lam : PowerSeries K} {Φ : MvPowerSeries (Fin 2) K} (h : LawD lam Φ) (n : ℕ)
+    : ∃ e : PowerSeries K, constantCoeff e = 0 ∧ IntegralPS e ∧ lam.subst e = C (n : K) * lam := by
   have hXs : lam.subst (X : PowerSeries K) = lam := by
     have ha1 : PowerSeries.HasSubst (X : PowerSeries K) :=
       PowerSeries.HasSubst.of_constantCoeff_zero' PowerSeries.constantCoeff_X
@@ -75,7 +79,8 @@ theorem mulN_integral {lam : PowerSeries K} {Φ : MvPowerSeries (Fin 2) K} (h : 
             push_neg at hc
             exact hd (Finsupp.ext hc)
           rw [MvPowerSeries.coeff_zero_eq_constantCoeff_apply, Finsupp.prod, map_prod,
-            Finset.prod_eq_zero (Finsupp.mem_support_iff.mpr hs) (by rw [map_pow, hP0 s, zero_pow hs]),
+            Finset.prod_eq_zero (Finsupp.mem_support_iff.mpr hs)
+              (by rw [map_pow, hP0 s, zero_pow hs]),
             smul_zero]
       exact h0
     · exact (integralPS_iff_mv _).mpr (integralMv_subst2 h.Φint hP0 hPint)

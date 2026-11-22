@@ -84,8 +84,9 @@ theorem FrobAIsom_of : RingAFacts → FrobAIsom := by
   have hlpos : (0 : ℝ) < l := by linarith
   have hl0 : (l : ℝ) ≠ 0 := hlpos.ne'
 
-  have hform : ∀ x : ringA l, ∃ y : ringA l,
-      ((σ0 x : ringA l) : ℂ_[l]) = (x : ℂ_[l]) ^ l + (l : ℂ_[l]) * (y : ℂ_[l]) := by
+  have hform
+      : ∀ x : ringA l, ∃ y : ringA l,
+        ((σ0 x : ringA l) : ℂ_[l]) = (x : ℂ_[l]) ^ l + (l : ℂ_[l]) * (y : ℂ_[l]) := by
     intro x
     obtain ⟨y, hy⟩ := hσ x
     refine ⟨y, ?_⟩
@@ -103,9 +104,12 @@ theorem FrobAIsom_of : RingAFacts → FrobAIsom := by
     rw [hy]
     exact norm_pow_add_eq_one hx (hle _ y.2)
 
-  have hrel : ∀ x : ringA l, ‖(x : ℂ_[l])‖ < 1 → ∃ y : ringA l,
-      ‖(x : ℂ_[l])‖ = (l : ℝ)⁻¹ * ‖(y : ℂ_[l])‖ ∧
-      ‖((σ0 x : ringA l) : ℂ_[l])‖ = (l : ℝ)⁻¹ * ‖((σ0 y : ringA l) : ℂ_[l])‖ := by
+  have hrel
+      : ∀ x : ringA l,
+        ‖(x : ℂ_[l])‖ < 1
+          → ∃ y : ringA l,
+            ‖(x : ℂ_[l])‖ = (l : ℝ)⁻¹ * ‖(y : ℂ_[l])‖
+              ∧ ‖((σ0 x : ringA l) : ℂ_[l])‖ = (l : ℝ)⁻¹ * ‖((σ0 y : ringA l) : ℂ_[l])‖ := by
     intro x hx
     obtain ⟨f, hf, y, hy, hxy⟩ := hpow (x : ℂ_[l]) x.2
     have hN : l ^ f - 1 ≠ 0 := by
@@ -124,8 +128,9 @@ theorem FrobAIsom_of : RingAFacts → FrobAIsom := by
       rw [hN1]
       exact e2
 
-  have key : ∀ k : ℕ, ∀ x : ringA l, ((l : ℝ)⁻¹) ^ k < l * ‖(x : ℂ_[l])‖ →
-      ‖((σ0 x : ringA l) : ℂ_[l])‖ = ‖(x : ℂ_[l])‖ := by
+  have key
+      : ∀ k : ℕ, ∀ x : ringA l,
+        ((l : ℝ)⁻¹) ^ k < l * ‖(x : ℂ_[l])‖ → ‖((σ0 x : ringA l) : ℂ_[l])‖ = ‖(x : ℂ_[l])‖ := by
     intro k
     induction k with
     | zero =>
@@ -152,7 +157,9 @@ theorem FrobAIsom_of : RingAFacts → FrobAIsom := by
           rw [hyx]
           rw [pow_succ] at hx
           have h2 := mul_lt_mul_of_pos_left hx hlpos
-          calc ((l : ℝ)⁻¹) ^ k = l * (((l : ℝ)⁻¹) ^ k * (l : ℝ)⁻¹) := by field_simp
+          calc
+            ((l : ℝ)⁻¹) ^ k
+              = l * (((l : ℝ)⁻¹) ^ k * (l : ℝ)⁻¹) := by field_simp
             _ < l * (l * ‖(x : ℂ_[l])‖) := h2
         rw [hy2, ih y hk, hy1]
       · rw [h]
@@ -236,11 +243,11 @@ lemma frobenius_extension_congruence (hA : ∀ x ∈ ringA l, ‖x‖ ≤ 1)
           mul_le_mul_of_nonneg_left (hA _ y.2) (inv_nonneg.mpr (l_pos_real l).le)
       _ = (l : ℝ)⁻¹ := mul_one _
 
-def jBK (hB : ∀ x : ℂ_[l], x ∈ ringB l ↔ x ∈ MaximalUnramifiedExtension l ∧ ‖x‖ ≤ 1) : ringB l →+* MaximalUnramifiedExtension l :=
+def jBK (hB : ∀ x : ℂ_[l], x ∈ ringB l ↔ x ∈ MaximalUnramifiedExtension l ∧ ‖x‖ ≤ 1)
+    : ringB l →+* MaximalUnramifiedExtension l :=
   (ringB l).subtype.codRestrict (MaximalUnramifiedExtension l) (fun x => by
     rw [Subring.subtype_apply]
     exact ((hB x).1 x.2).1)
-
 
 set_option maxHeartbeats 800000 in
 lemma jBK_coe (hB : ∀ x : ℂ_[l], x ∈ ringB l ↔ x ∈ MaximalUnramifiedExtension l ∧ ‖x‖ ≤ 1) (x : ringB l) :

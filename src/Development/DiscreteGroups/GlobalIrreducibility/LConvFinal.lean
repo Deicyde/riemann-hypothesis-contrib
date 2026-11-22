@@ -20,7 +20,7 @@ public import Development.DiscreteGroups.GlobalIrreducibility.LConvBig
 namespace DiscreteGroups.sglob.LConv
 
 theorem localConverseGL : GlobalTheory.Published.LocalConverseGL :=
-  localConverseGL_of_leaves cuspGen kirBump bigCell extremeExists extremeIrred sepOfExtreme commBound unifOfComm
-    altIdentity finiteOfAlt unitOfUnif glue
+  localConverseGL_of_leaves cuspGen kirBump bigCell extremeExists extremeIrred sepOfExtreme
+    commBound unifOfComm altIdentity finiteOfAlt unitOfUnif glue
 
 end DiscreteGroups.sglob.LConv

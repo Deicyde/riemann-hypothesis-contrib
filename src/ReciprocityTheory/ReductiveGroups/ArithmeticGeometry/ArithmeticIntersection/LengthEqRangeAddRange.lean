@@ -8,33 +8,38 @@ namespace ReciprocityTheory.ChartRestriction.G.AI
 
 open Module
 
-theorem length_eq_ker_add_range {A : Type*} [Ring A] {M N : Type*} [AddCommGroup M] [Module A M]
-    [AddCommGroup N] [Module A N] (φ : M →ₗ[A] N) :
-    length A M = length A (LinearMap.ker φ) + length A (LinearMap.range φ) := by
+theorem length_eq_ker_add_range
+    {A : Type*} [Ring A]
+    {M N : Type*} [AddCommGroup M] [Module A M] [AddCommGroup N] [Module A N]
+    (φ : M →ₗ[A] N)
+    : length A M = length A (LinearMap.ker φ) + length A (LinearMap.range φ) := by
   exact Module.length_eq_add_of_exact (LinearMap.ker φ).subtype φ.rangeRestrict
     (Submodule.injective_subtype _) φ.surjective_rangeRestrict
     (by rw [LinearMap.exact_iff, LinearMap.ker_rangeRestrict, Submodule.range_subtype])
 
-theorem length_eq_sub_add_quot {A : Type*} [Ring A] {M : Type*} [AddCommGroup M] [Module A M]
-    (P : Submodule A M) : length A M = length A P + length A (M ⧸ P) :=
-  Module.length_eq_add_of_exact P.subtype P.mkQ (Submodule.injective_subtype _) (Submodule.mkQ_surjective _)
-    (LinearMap.exact_subtype_mkQ P)
+theorem length_eq_sub_add_quot
+    {A : Type*} [Ring A] {M : Type*} [AddCommGroup M] [Module A M] (P : Submodule A M)
+    : length A M = length A P + length A (M ⧸ P) :=
+  Module.length_eq_add_of_exact P.subtype P.mkQ (Submodule.injective_subtype _)
+    (Submodule.mkQ_surjective _) (LinearMap.exact_subtype_mkQ P)
 
-theorem length_eq_range_add_range {A : Type*} [Ring A] {L M N : Type*}
-    [AddCommGroup L] [Module A L] [AddCommGroup M] [Module A M]
-    [AddCommGroup N] [Module A N] {ψ : L →ₗ[A] M} {φ : M →ₗ[A] N} (h : Function.Exact ψ φ) :
-    length A M = length A (LinearMap.range ψ) + length A (LinearMap.range φ) := by
+theorem length_eq_range_add_range
+    {A : Type*} [Ring A]
+    {L M N : Type*}
+    [AddCommGroup L] [Module A L] [AddCommGroup M] [Module A M] [AddCommGroup N] [Module A N]
+    {ψ : L →ₗ[A] M} {φ : M →ₗ[A] N} (h : Function.Exact ψ φ)
+    : length A M = length A (LinearMap.range ψ) + length A (LinearMap.range φ) := by
   rw [length_eq_ker_add_range φ, h.linearMap_ker_eq]
 
-theorem length_six_term {A : Type*} [Ring A] {M₁ M₂ M₃ M₄ M₅ M₆ : Type*}
-    [AddCommGroup M₁] [Module A M₁] [AddCommGroup M₂] [Module A M₂]
-    [AddCommGroup M₃] [Module A M₃] [AddCommGroup M₄] [Module A M₄]
-    [AddCommGroup M₅] [Module A M₅] [AddCommGroup M₆] [Module A M₆]
-    {f₁ : M₁ →ₗ[A] M₂} {f₂ : M₂ →ₗ[A] M₃} {f₃ : M₃ →ₗ[A] M₄} {f₄ : M₄ →ₗ[A] M₅}
-    {f₅ : M₅ →ₗ[A] M₆} (h₁ : Function.Injective f₁) (h₂ : Function.Exact f₁ f₂)
-    (h₃ : Function.Exact f₂ f₃) (h₄ : Function.Exact f₃ f₄) (h₅ : Function.Exact f₄ f₅)
-    (h₆ : Function.Surjective f₅) :
-    length A M₁ + length A M₃ + length A M₅ = length A M₂ + length A M₄ + length A M₆ := by
+theorem length_six_term
+    {A : Type*} [Ring A]
+    {M₁ M₂ M₃ M₄ M₅ M₆ : Type*}
+    [AddCommGroup M₁] [Module A M₁] [AddCommGroup M₂] [Module A M₂] [AddCommGroup M₃] [Module A M₃]
+    [AddCommGroup M₄] [Module A M₄] [AddCommGroup M₅] [Module A M₅] [AddCommGroup M₆] [Module A M₆]
+    {f₁ : M₁ →ₗ[A] M₂} {f₂ : M₂ →ₗ[A] M₃} {f₃ : M₃ →ₗ[A] M₄} {f₄ : M₄ →ₗ[A] M₅} {f₅ : M₅ →ₗ[A] M₆}
+    (h₁ : Function.Injective f₁) (h₂ : Function.Exact f₁ f₂) (h₃ : Function.Exact f₂ f₃)
+    (h₄ : Function.Exact f₃ f₄) (h₅ : Function.Exact f₄ f₅) (h₆ : Function.Surjective f₅)
+    : length A M₁ + length A M₃ + length A M₅ = length A M₂ + length A M₄ + length A M₆ := by
   have e1 : length A M₁ = length A (LinearMap.range f₁) := (LinearEquiv.ofInjective f₁ h₁).length_eq
   have e6 : length A (LinearMap.range f₅) = length A M₆ :=
     (LinearEquiv.ofTop _ (LinearMap.range_eq_top.2 h₆)).length_eq
@@ -42,59 +47,77 @@ theorem length_six_term {A : Type*} [Ring A] {M₁ M₂ M₃ M₄ M₅ M₆ : Ty
     length_eq_range_add_range h₅, ← e6]
   ring
 
-def kerSmulMap {A : Type*} [CommRing A] {M N : Type*} [AddCommGroup M] [Module A M]
-    [AddCommGroup N] [Module A N] (f : M →ₗ[A] N) (x : A) :
-    LinearMap.ker (LinearMap.lsmul A M x) →ₗ[A] LinearMap.ker (LinearMap.lsmul A N x) :=
+def kerSmulMap
+    {A : Type*} [CommRing A]
+    {M N : Type*} [AddCommGroup M] [Module A M] [AddCommGroup N] [Module A N]
+    (f : M →ₗ[A] N) (x : A)
+    : LinearMap.ker (LinearMap.lsmul A M x) →ₗ[A] LinearMap.ker (LinearMap.lsmul A N x) :=
   f.restrict (fun m hm => by
     rw [LinearMap.mem_ker, LinearMap.lsmul_apply] at hm ⊢
     rw [← map_smul, hm, map_zero])
 
-def cokerSmulMap {A : Type*} [CommRing A] {M N : Type*} [AddCommGroup M] [Module A M]
-    [AddCommGroup N] [Module A N] (f : M →ₗ[A] N) (x : A) :
-    (M ⧸ LinearMap.range (LinearMap.lsmul A M x)) →ₗ[A]
-      (N ⧸ LinearMap.range (LinearMap.lsmul A N x)) :=
+def cokerSmulMap
+    {A : Type*} [CommRing A]
+    {M N : Type*} [AddCommGroup M] [Module A M] [AddCommGroup N] [Module A N]
+    (f : M →ₗ[A] N) (x : A)
+    : (M ⧸ LinearMap.range (LinearMap.lsmul A M x)) →ₗ[A]
+        (N ⧸ LinearMap.range (LinearMap.lsmul A N x)) :=
   Submodule.mapQ _ _ f (by
     rintro _ ⟨m, rfl⟩
     exact ⟨f m, by simp⟩)
 
-theorem euler_ses {A : Type*} [CommRing A] {M' M M'' : Type*} [AddCommGroup M'] [Module A M']
-    [AddCommGroup M] [Module A M] [AddCommGroup M''] [Module A M'']
-    (f : M' →ₗ[A] M) (g : M →ₗ[A] M'') (hf : Function.Injective f) (hg : Function.Surjective g)
-    (hex : Function.Exact f g) (x : A) :
-    length A (LinearMap.ker (LinearMap.lsmul A M' x)) + length A (LinearMap.ker (LinearMap.lsmul A M'' x)) +
-        length A (M ⧸ LinearMap.range (LinearMap.lsmul A M x)) =
-      length A (LinearMap.ker (LinearMap.lsmul A M x)) +
-        length A (M' ⧸ LinearMap.range (LinearMap.lsmul A M' x)) +
-        length A (M'' ⧸ LinearMap.range (LinearMap.lsmul A M'' x)) := by
-  have key : ∀ z : LinearMap.ker (LinearMap.lsmul A M'' x), ∃ (m : M) (m' : M'),
-      g m = (z : M'') ∧ f m' = x • m := by
+theorem euler_ses
+    {A : Type*} [CommRing A]
+    {M' M M'' : Type*}
+    [AddCommGroup M'] [Module A M'] [AddCommGroup M] [Module A M] [AddCommGroup M''] [Module A M'']
+    (f : M' →ₗ[A] M) (g : M →ₗ[A] M'')
+    (hf : Function.Injective f) (hg : Function.Surjective g) (hex : Function.Exact f g) (x : A)
+    : length A (LinearMap.ker (LinearMap.lsmul A M' x))
+        + length A (LinearMap.ker (LinearMap.lsmul A M'' x))
+        + length A (M ⧸ LinearMap.range (LinearMap.lsmul A M x))
+      = length A (LinearMap.ker (LinearMap.lsmul A M x))
+        + length A (M' ⧸ LinearMap.range (LinearMap.lsmul A M' x))
+        + length A (M'' ⧸ LinearMap.range (LinearMap.lsmul A M'' x)) := by
+  have key
+      : ∀ z : LinearMap.ker (LinearMap.lsmul A M'' x), ∃ (m : M) (m' : M'),
+        g m = (z : M'') ∧ f m' = x • m := by
     intro z
     obtain ⟨m, hm⟩ := hg z
     have hz : x • (z : M'') = 0 := z.2
     obtain ⟨m', hm'⟩ := (hex (x • m)).1 (by rw [map_smul, hm, hz])
     exact ⟨m, m', hm, hm'⟩
-  have indep : ∀ (m₁ : M) (m₁' : M') (m₂ : M) (m₂' : M'), g m₁ = g m₂ → f m₁' = x • m₁ →
-      f m₂' = x • m₂ →
-      Submodule.mkQ (LinearMap.range (LinearMap.lsmul A M' x)) m₁' =
-        Submodule.mkQ (LinearMap.range (LinearMap.lsmul A M' x)) m₂' := by
+  have indep
+      : ∀ (m₁ : M) (m₁' : M') (m₂ : M) (m₂' : M'),
+        g m₁ = g m₂ → f m₁' = x • m₁ → f m₂' = x • m₂
+          → Submodule.mkQ (LinearMap.range (LinearMap.lsmul A M' x)) m₁'
+            = Submodule.mkQ (LinearMap.range (LinearMap.lsmul A M' x)) m₂' := by
     intro m₁ m₁' m₂ m₂' h h1 h2
     obtain ⟨n, hn⟩ := (hex (m₁ - m₂)).1 (by rw [map_sub, h, sub_self])
     have e : m₁' - m₂' = x • n := hf (by rw [map_sub, map_smul, hn, h1, h2, smul_sub])
     rw [Submodule.mkQ_apply, Submodule.mkQ_apply, Submodule.Quotient.eq, e]
     exact ⟨n, rfl⟩
   choose lift liftP hlift using key
-  obtain ⟨δ, hδ⟩ : ∃ δ : LinearMap.ker (LinearMap.lsmul A M'' x) →ₗ[A]
-      (M' ⧸ LinearMap.range (LinearMap.lsmul A M' x)),
-      ∀ (z : LinearMap.ker (LinearMap.lsmul A M'' x)) (m : M) (m' : M'), g m = (z : M'') → f m' = x • m →
-        δ z = Submodule.mkQ (LinearMap.range (LinearMap.lsmul A M' x)) m' := by
-    refine ⟨{ toFun := fun z => Submodule.mkQ (LinearMap.range (LinearMap.lsmul A M' x)) (liftP z),
-              map_add' := ?_, map_smul' := ?_ }, ?_⟩
+  obtain ⟨δ, hδ⟩
+      : ∃ δ
+          : LinearMap.ker (LinearMap.lsmul A M'' x) →ₗ[A]
+            (M' ⧸ LinearMap.range (LinearMap.lsmul A M' x)),
+        ∀ (z : LinearMap.ker (LinearMap.lsmul A M'' x)) (m : M) (m' : M'),
+          g m = (z : M'') → f m' = x • m
+            → δ z = Submodule.mkQ (LinearMap.range (LinearMap.lsmul A M' x)) m' := by
+    refine ⟨
+      {
+        toFun := fun z => Submodule.mkQ (LinearMap.range (LinearMap.lsmul A M' x)) (liftP z)
+        map_add' := ?_
+        map_smul' := ?_
+      },
+      ?_
+    ⟩
     · intro z₁ z₂
       show Submodule.mkQ _ (liftP (z₁ + z₂)) = Submodule.mkQ _ (liftP z₁) + Submodule.mkQ _ (liftP z₂)
       rw [← map_add (f := _)]
       exact indep _ _ (lift z₁ + lift z₂) _
-        (by rw [(hlift _).1, map_add (f := _), (hlift z₁).1, (hlift z₂).1, Submodule.coe_add]) (hlift _).2
-        (by rw [map_add (f := _), (hlift z₁).2, (hlift z₂).2, smul_add])
+        (by rw [(hlift _).1, map_add (f := _), (hlift z₁).1, (hlift z₂).1, Submodule.coe_add])
+        (hlift _).2 (by rw [map_add (f := _), (hlift z₁).2, (hlift z₂).2, smul_add])
     · intro a z
       show Submodule.mkQ _ (liftP (a • z)) = a • Submodule.mkQ _ (liftP z)
       rw [← map_smul]
@@ -191,10 +214,10 @@ theorem euler_ses {A : Type*} [CommRing A] {M' M M'' : Type*} [AddCommGroup M'] 
     exact ⟨Submodule.mkQ _ m, rfl⟩
   exact length_six_term h₁ h₂ h₃ h₄ h₅ h₆
 
-theorem euler_finLength {A : Type*} [CommRing A] {N : Type*} [AddCommGroup N] [Module A N]
-    (hN : length A N ≠ ⊤) (x : A) :
-    length A (N ⧸ LinearMap.range (LinearMap.lsmul A N x)) =
-      length A (LinearMap.ker (LinearMap.lsmul A N x)) := by
+theorem euler_finLength
+    {A : Type*} [CommRing A] {N : Type*} [AddCommGroup N] [Module A N] (hN : length A N ≠ ⊤) (x : A)
+    : length A (N ⧸ LinearMap.range (LinearMap.lsmul A N x))
+      = length A (LinearMap.ker (LinearMap.lsmul A N x)) := by
   have h1 := length_eq_ker_add_range (LinearMap.lsmul A N x)
   have h2 := length_eq_sub_add_quot (LinearMap.range (LinearMap.lsmul A N x))
   have hle : length A (LinearMap.range (LinearMap.lsmul A N x)) ≤ length A N := by

@@ -7,33 +7,41 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.RangeSubsetOf
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
-private theorem clopen_forall {S : Scheme.{0}} (X F : Over S) [IsFinite F.hom] [Etale F.hom]
-    (W : (X ⊗ F).left.Opens) (hW : IsClosed (W : Set (X ⊗ F).left)) :
-    GlobalTheory.LevCover.ClopenCond X (fun T h => ∀ (T' : Over S) (t : T' ⟶ T) (a : T' ⟶ F),
-      Set.range (lift (t ≫ h) a).left ⊆ W) := by
+private theorem clopen_forall
+    {S : Scheme.{0}} (X F : Over S) [IsFinite F.hom] [Etale F.hom]
+    (W : (X ⊗ F).left.Opens) (hW : IsClosed (W : Set (X ⊗ F).left))
+    : GlobalTheory.LevCover.ClopenCond X (fun T h =>
+      ∀ (T' : Over S) (t : T' ⟶ T) (a : T' ⟶ F), Set.range (lift (t ≫ h) a).left ⊆ W) := by
   have hWo : IsOpen ((W : Set (X ⊗ F).left)ᶜ) := hW.isOpen_compl
   have hWc : IsClosed ((W : Set (X ⊗ F).left)ᶜ) := W.isOpen.isClosed_compl
   have hKc : IsClosed (pullback.fst X.hom F.hom '' (W : Set (X ⊗ F).left)ᶜ) :=
     (pullback.fst X.hom F.hom).isClosedMap _ hWc
   have hKo : IsOpen (pullback.fst X.hom F.hom '' (W : Set (X ⊗ F).left)ᶜ) :=
     (pullback.fst X.hom F.hom).isOpenMap _ hWo
-  refine ⟨⟨(pullback.fst X.hom F.hom '' (W : Set (X ⊗ F).left)ᶜ)ᶜ, hKc.isOpen_compl⟩,
-    hKo.isClosed_compl, ?_⟩
+  refine ⟨
+    ⟨(pullback.fst X.hom F.hom '' (W : Set (X ⊗ F).left)ᶜ)ᶜ, hKc.isOpen_compl⟩,
+    hKo.isClosed_compl,
+    ?_
+  ⟩
   intro T h
   constructor
   · intro H
     rintro _ ⟨x, rfl⟩ ⟨z, hz, hzx⟩
-    obtain ⟨q, hq1, hq2⟩ := Scheme.Pullback.exists_preimage_pullback
-      (f := h.left) (g := pullback.fst X.hom F.hom) x z hzx.symm
+    obtain ⟨q, hq1, hq2⟩ :=
+      Scheme.Pullback.exists_preimage_pullback (f := h.left) (g := pullback.fst X.hom F.hom) x z
+        hzx.symm
     let T' : Over S := Over.mk (pullback.fst h.left (pullback.fst X.hom F.hom) ≫ T.hom)
     let t : T' ⟶ T := Over.homMk (pullback.fst h.left (pullback.fst X.hom F.hom)) rfl
-    have ha : (pullback.snd h.left (pullback.fst X.hom F.hom) ≫ pullback.snd X.hom F.hom) ≫ F.hom
-        = T'.hom := by
+    have ha
+        : (pullback.snd h.left (pullback.fst X.hom F.hom) ≫ pullback.snd X.hom F.hom) ≫ F.hom
+          = T'.hom := by
       simp only [T', Over.mk_hom, Category.assoc]
       rw [← pullback.condition (f := X.hom) (g := F.hom), ← Category.assoc,
-        ← pullback.condition (f := h.left) (g := pullback.fst X.hom F.hom), Category.assoc, Over.w h]
+        ← pullback.condition (f := h.left) (g := pullback.fst X.hom F.hom), Category.assoc,
+        Over.w h]
     let a : T' ⟶ F :=
       Over.homMk (pullback.snd h.left (pullback.fst X.hom F.hom) ≫ pullback.snd X.hom F.hom) ha
     have hl : (lift (t ≫ h) a).left = pullback.snd h.left (pullback.fst X.hom F.hom) := by
@@ -59,15 +67,24 @@ private theorem clopen_forall {S : Scheme.{0}} (X F : Over S) [IsFinite F.hom] [
     refine ⟨(lift (t ≫ h) a).left y, hy, ?_⟩
     rw [← Scheme.Hom.comp_apply, e, Scheme.Hom.comp_apply]
 
-private theorem clopen_pre {S : Scheme.{0}} {X Y : Over S} (e : X ⟶ Y) (U : Y.left.Opens)
-    (hU : IsClosed (U : Set Y.left)) :
-    GlobalTheory.LevCover.ClopenCond X (fun T h => Set.range (h ≫ e).left ⊆ U) := by
+private theorem clopen_pre
+    {S : Scheme.{0}} {X Y : Over S} (e : X ⟶ Y) (U : Y.left.Opens) (hU : IsClosed (U : Set Y.left))
+    : GlobalTheory.LevCover.ClopenCond X (fun T h => Set.range (h ≫ e).left ⊆ U) := by
   refine ⟨e.left ⁻¹ᵁ U, hU.preimage e.left.continuous, ?_⟩
   intro T h
-  simp only [Over.comp_left, Set.range_subset_iff, Scheme.Hom.comp_apply, Scheme.Hom.mem_preimage, SetLike.mem_coe]
+  simp only [Over.comp_left, Set.range_subset_iff, Scheme.Hom.comp_apply, Scheme.Hom.mem_preimage,
+    SetLike.mem_coe]
 
-theorem UpperTheory.clopenCond_of_isClosed_subgroupLocus :
-    ∀ {S : Scheme.{0}} (G X : Over S) [GrpObj G] [IsFinite G.hom] [Etale G.hom] (U : (X ⊗ G).left.Opens), IsClosed (U : Set (X ⊗ G).left) → GlobalTheory.LevCover.ClopenCond X (fun T h => ∀ (T' : Over S) (t : T' ⟶ T), Set.range (lift (t ≫ h) (1 : T' ⟶ G)).left ⊆ U ∧ ∀ a b : T' ⟶ G, Set.range (lift (t ≫ h) a).left ⊆ U → Set.range (lift (t ≫ h) b).left ⊆ U → Set.range (lift (t ≫ h) (a * b⁻¹)).left ⊆ U) := by
+theorem UpperTheory.clopenCond_of_isClosed_subgroupLocus
+    : ∀ {S : Scheme.{0}} (G X : Over S) [GrpObj G] [IsFinite G.hom] [Etale G.hom]
+        (U : (X ⊗ G).left.Opens),
+      IsClosed (U : Set (X ⊗ G).left)
+        → GlobalTheory.LevCover.ClopenCond X (fun T h =>
+          ∀ (T' : Over S) (t : T' ⟶ T),
+            Set.range (lift (t ≫ h) (1 : T' ⟶ G)).left ⊆ U
+              ∧ ∀ a b : T' ⟶ G,
+                Set.range (lift (t ≫ h) a).left ⊆ U → Set.range (lift (t ≫ h) b).left ⊆ U
+                  → Set.range (lift (t ≫ h) (a * b⁻¹)).left ⊆ U) := by
   intro S G X _ _ _ U hU
   haveI := (GlobalTheory.LevCover.finiteEtale_tensor G G).1
   haveI := (GlobalTheory.LevCover.finiteEtale_tensor G G).2
@@ -75,8 +92,7 @@ theorem UpperTheory.clopenCond_of_isClosed_subgroupLocus :
   let m1 : X ⊗ (G ⊗ G) ⟶ X ⊗ G := lift (fst _ _) (snd _ _ ≫ fst G G)
   let m2 : X ⊗ (G ⊗ G) ⟶ X ⊗ G := lift (fst _ _) (snd _ _ ≫ snd G G)
   let m3 : X ⊗ (G ⊗ G) ⟶ X ⊗ G := lift (fst _ _) (snd _ _ ≫ (fst G G * (snd G G)⁻¹))
-  let Ws : Set (X ⊗ (G ⊗ G)).left :=
-    (m1.left ⁻¹' U ∩ m2.left ⁻¹' U)ᶜ ∪ m3.left ⁻¹' U
+  let Ws : Set (X ⊗ (G ⊗ G)).left := (m1.left ⁻¹' U ∩ m2.left ⁻¹' U)ᶜ ∪ m3.left ⁻¹' U
   have hWo : IsOpen Ws :=
     ((hU.preimage m1.left.continuous).inter (hU.preimage m2.left.continuous)).isOpen_compl.union
       (hUo.preimage m3.left.continuous)
@@ -87,24 +103,27 @@ theorem UpperTheory.clopenCond_of_isClosed_subgroupLocus :
   have h2 := clopen_forall X (G ⊗ G) ⟨Ws, hWo⟩ hWc
   refine (h1.and h2).congr ?_
   intro T h
-  have k0 : ∀ (T' : Over S) (t : T' ⟶ T),
-      lift (t ≫ h) (1 : T' ⟶ G) = t ≫ h ≫ lift (𝟙 X) (1 : X ⟶ G) := by
+  have k0
+      : ∀ (T' : Over S) (t : T' ⟶ T),
+        lift (t ≫ h) (1 : T' ⟶ G) = t ≫ h ≫ lift (𝟙 X) (1 : X ⟶ G) := by
     intro T' t
     simp [comp_lift]
-  have k1 : ∀ (T' : Over S) (u : T' ⟶ X) (c : T' ⟶ G ⊗ G),
-      lift u c ≫ m1 = lift u (c ≫ fst G G) := by
+  have k1
+      : ∀ (T' : Over S) (u : T' ⟶ X) (c : T' ⟶ G ⊗ G), lift u c ≫ m1 = lift u (c ≫ fst G G) := by
     intro T' u c
     simp [m1, comp_lift]
-  have k2 : ∀ (T' : Over S) (u : T' ⟶ X) (c : T' ⟶ G ⊗ G),
-      lift u c ≫ m2 = lift u (c ≫ snd G G) := by
+  have k2
+      : ∀ (T' : Over S) (u : T' ⟶ X) (c : T' ⟶ G ⊗ G), lift u c ≫ m2 = lift u (c ≫ snd G G) := by
     intro T' u c
     simp [m2, comp_lift]
-  have k3 : ∀ (T' : Over S) (u : T' ⟶ X) (c : T' ⟶ G ⊗ G),
-      lift u c ≫ m3 = lift u ((c ≫ fst G G) * (c ≫ snd G G)⁻¹) := by
+  have k3
+      : ∀ (T' : Over S) (u : T' ⟶ X) (c : T' ⟶ G ⊗ G),
+        lift u c ≫ m3 = lift u ((c ≫ fst G G) * (c ≫ snd G G)⁻¹) := by
     intro T' u c
     simp [m3, comp_lift, MonObj.comp_mul, GrpObj.comp_inv]
-  have pt : ∀ {A B C : Over S} (f : A ⟶ B) (g : B ⟶ C) (y : A.left),
-      (f ≫ g).left y = g.left (f.left y) := by
+  have pt
+      : ∀ {A B C : Over S} (f : A ⟶ B) (g : B ⟶ C) (y : A.left),
+        (f ≫ g).left y = g.left (f.left y) := by
     intro A B C f g y
     rw [Over.comp_left, Scheme.Hom.comp_apply]
   constructor
@@ -118,8 +137,7 @@ theorem UpperTheory.clopenCond_of_isClosed_subgroupLocus :
       change (lift (t ≫ h) c).left y ∈ Ws
       by_cases hy : (lift (t ≫ h) c).left y ∈ m1.left ⁻¹' U ∩ m2.left ⁻¹' U
       · right
-        let V : T'.left.Opens :=
-          (lift (t ≫ h) c ≫ m1).left ⁻¹ᵁ U ⊓ (lift (t ≫ h) c ≫ m2).left ⁻¹ᵁ U
+        let V : T'.left.Opens := (lift (t ≫ h) c ≫ m1).left ⁻¹ᵁ U ⊓ (lift (t ≫ h) c ≫ m2).left ⁻¹ᵁ U
         have hyV : y ∈ V := by
           refine ⟨?_, ?_⟩
           · change (lift (t ≫ h) c ≫ m1).left y ∈ (U : Set _)
@@ -138,20 +156,22 @@ theorem UpperTheory.clopenCond_of_isClosed_subgroupLocus :
           rw [k1, comp_lift, Category.assoc]
         have eq2 : lift ((j ≫ t) ≫ h) (j ≫ c ≫ snd G G) = j ≫ (lift (t ≫ h) c ≫ m2) := by
           rw [k2, comp_lift, Category.assoc]
-        have eq3 : lift ((j ≫ t) ≫ h) ((j ≫ c ≫ fst G G) * (j ≫ c ≫ snd G G)⁻¹)
-            = j ≫ (lift (t ≫ h) c ≫ m3) := by
+        have eq3
+            : lift ((j ≫ t) ≫ h) ((j ≫ c ≫ fst G G) * (j ≫ c ≫ snd G G)⁻¹)
+              = j ≫ (lift (t ≫ h) c ≫ m3) := by
           rw [k3, comp_lift, MonObj.comp_mul, GrpObj.comp_inv, Category.assoc]
-        have hA := (H T'' (j ≫ t)).2 (j ≫ c ≫ fst G G) (j ≫ c ≫ snd G G)
-          (by
-            rw [eq1]
-            rintro _ ⟨w, rfl⟩
-            rw [pt]
-            exact (hVw w).1)
-          (by
-            rw [eq2]
-            rintro _ ⟨w, rfl⟩
-            rw [pt]
-            exact (hVw w).2)
+        have hA :=
+          (H T'' (j ≫ t)).2 (j ≫ c ≫ fst G G) (j ≫ c ≫ snd G G)
+            (by
+              rw [eq1]
+              rintro _ ⟨w, rfl⟩
+              rw [pt]
+              exact (hVw w).1)
+            (by
+              rw [eq2]
+              rintro _ ⟨w, rfl⟩
+              rw [pt]
+              exact (hVw w).2)
         obtain ⟨y', hy'⟩ : y ∈ Set.range V.ι := by
           rw [Scheme.Opens.range_ι]
           exact hyV

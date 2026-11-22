@@ -9,8 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SmoothOfRelat
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 set_option backward.isDefEq.respectTransparency false
@@ -33,10 +35,12 @@ private lemma smoothOfRelativeDimension_opensRange_ι_comp' {U Z S : Scheme.{0}}
     MorphismProperty.cancel_left_of_respectsIso (@SmoothOfRelativeDimension g)]
   exact h
 
-theorem exists_opens_of_flat {R : CommRingCat.{0}} {Z T : Scheme.{0}} (s : Z ⟶ Spec R)
-    [LocallyOfFinitePresentation s] [Flat s] (t : T ⟶ Spec R) (g : ℕ)
-    (h : SmoothOfRelativeDimension g (pullback.snd s t)) (z : Z) (w : T) (hw : s z = t w) :
-    ∃ W : Z.Opens, z ∈ W ∧ SmoothOfRelativeDimension g (W.ι ≫ s) := by
+theorem exists_opens_of_flat
+    {R : CommRingCat.{0}} {Z T : Scheme.{0}} (s : Z ⟶ Spec R)
+    [LocallyOfFinitePresentation s] [Flat s]
+    (t : T ⟶ Spec R) (g : ℕ) (h : SmoothOfRelativeDimension g (pullback.snd s t))
+    (z : Z) (w : T) (hw : s z = t w)
+    : ∃ W : Z.Opens, z ∈ W ∧ SmoothOfRelativeDimension g (W.ι ≫ s) := by
   have : Smooth (pullback.snd s t) := SmoothOfRelativeDimension.smooth g _
   have hF : Smooth ((pullback.snd s t).fiberToSpecResidueField w) := by
     unfold Scheme.Hom.fiberToSpecResidueField
@@ -52,29 +56,33 @@ theorem exists_opens_of_flat {R : CommRingCat.{0}} {Z T : Scheme.{0}} (s : Z ⟶
   have h' : SmoothOfRelativeDimension g (pullback.snd (s.smoothLocus.ι ≫ s) t) :=
     smoothOfRelativeDimension_pullback_snd_restrict s t _ g h
   obtain ⟨V, hV, hVg⟩ :=
-    exists_opens_smoothOfRelativeDimension (s.smoothLocus.ι ≫ s) t g h' ⟨z, hz⟩ w (by simpa using hw)
+    exists_opens_smoothOfRelativeDimension (s.smoothLocus.ι ≫ s) t g h' ⟨z, hz⟩ w
+      (by simpa using hw)
   refine ⟨(V.ι ≫ s.smoothLocus.ι).opensRange, ⟨⟨⟨z, hz⟩, hV⟩, by simp⟩, ?_⟩
   apply smoothOfRelativeDimension_opensRange_ι_comp'
   simpa using hVg
 
-theorem smoothOfRelativeDimension_pullback_snd {Z S T : Scheme.{0}} (s : Z ⟶ S) (t : T ⟶ S) (g : ℕ)
-    (h : ∀ (z : Z) (w : T), s z = t w →
-      ∃ W : Z.Opens, z ∈ W ∧ SmoothOfRelativeDimension g (W.ι ≫ s)) :
-    SmoothOfRelativeDimension g (pullback.snd s t) := by
+theorem smoothOfRelativeDimension_pullback_snd
+    {Z S T : Scheme.{0}} (s : Z ⟶ S) (t : T ⟶ S)
+    (g : ℕ)
+    (h
+      : ∀ (z : Z) (w : T), s z = t w → ∃ W : Z.Opens, z ∈ W ∧ SmoothOfRelativeDimension g (W.ι ≫ s))
+    : SmoothOfRelativeDimension g (pullback.snd s t) := by
   have hb := smoothOfRelativeDimension_isStableUnderBaseChange (n := g)
-  have key : ∀ p : ↥(pullback s t), ∃ U : (pullback s t).Opens,
-      p ∈ U ∧ SmoothOfRelativeDimension g (U.ι ≫ pullback.snd s t) := by
+  have key
+      : ∀ p : ↥(pullback s t), ∃ U : (pullback s t).Opens,
+        p ∈ U ∧ SmoothOfRelativeDimension g (U.ι ≫ pullback.snd s t) := by
     intro p
     have hc : s (pullback.fst s t p) = t (pullback.snd s t p) := by
       rw [← Scheme.Hom.comp_apply, pullback.condition, Scheme.Hom.comp_apply]
     obtain ⟨W, hzW, hW⟩ := h _ _ hc
     let e := pullbackRightPullbackFstIso s t W.ι
     let j := e.inv ≫ pullback.snd W.ι (pullback.fst s t)
-    have hj : j ≫ pullback.snd s t = pullback.snd (W.ι ≫ s) t := by
-      simp [j, e]
+    have hj : j ≫ pullback.snd s t = pullback.snd (W.ι ≫ s) t := by simp [j, e]
     refine ⟨j.opensRange, ?_, ?_⟩
-    · obtain ⟨q, -, hq2⟩ := Scheme.Pullback.exists_preimage_pullback
-        (f := W.ι) (g := pullback.fst s t) ⟨_, hzW⟩ p (by simp)
+    · obtain ⟨q, -, hq2⟩ :=
+        Scheme.Pullback.exists_preimage_pullback (f := W.ι) (g := pullback.fst s t) ⟨_, hzW⟩ p
+          (by simp)
       refine ⟨e.hom q, ?_⟩
       rw [← Scheme.Hom.comp_apply]
       simpa [j] using hq2
@@ -87,16 +95,21 @@ theorem smoothOfRelativeDimension_pullback_snd {Z S T : Scheme.{0}} (s : Z ⟶ S
   intro p _
   exact TopologicalSpace.Opens.mem_iSup.mpr ⟨p, hU p⟩
 
-theorem exists_smoothOfRelativeDimension_of_isUnit :
-    ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (Z : Scheme.{0}) (s : Z ⟶ Sp R) (g : ℕ) (K : Type) [Field K] (x : R →+* K), IsProper s → Flat s → SmoothOfRelativeDimension g (pullback.snd s (spMap x)) → ∃ f : R, x f ≠ 0 ∧ ∀ (R' : Type) [CommRing R'] (φ : R →+* R'), IsUnit (φ f) → SmoothOfRelativeDimension g (pullback.snd s (spMap φ)) := by
+theorem exists_smoothOfRelativeDimension_of_isUnit
+    : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (Z : Scheme.{0}) (s : Z ⟶ Sp R) (g : ℕ)
+        (K : Type) [Field K] (x : R →+* K),
+      IsProper s → Flat s → SmoothOfRelativeDimension g (pullback.snd s (spMap x))
+        → ∃ f : R,
+          x f ≠ 0
+            ∧ ∀ (R' : Type) [CommRing R'] (φ : R →+* R'),
+              IsUnit (φ f) → SmoothOfRelativeDimension g (pullback.snd s (spMap φ)) := by
   intro R _ _ Z s g K _ x hprop hflat hsm
   have : LocallyOfFinitePresentation s := inferInstance
   let U : Z.Opens := sSup {W : Z.Opens | SmoothOfRelativeDimension g (W.ι ≫ s)}
   have hpt : ∀ w : Sp K, ∀ z : Z, (s z).asIdeal = RingHom.ker x → z ∈ U := by
     intro w z hz
     have hzw : s z = spMap x w := PrimeSpectrum.ext (by rw [hz, spMap_apply_asIdeal])
-    obtain ⟨W, hzW, hW⟩ :=
-      exists_opens_of_flat (R := CommRingCat.of R) s (spMap x) g hsm z w hzw
+    obtain ⟨W, hzW, hW⟩ := exists_opens_of_flat (R := CommRingCat.of R) s (spMap x) g hsm z w hzw
     exact TopologicalSpace.Opens.mem_sSup.mpr ⟨W, hW, hzW⟩
   let w₀ : Sp K := IsLocalRing.closedPoint K
   let C : Set (Sp R) := s '' (U : Set Z)ᶜ

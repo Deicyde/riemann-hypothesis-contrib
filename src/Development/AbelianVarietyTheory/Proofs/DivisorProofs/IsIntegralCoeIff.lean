@@ -9,17 +9,22 @@ public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.Exists
 open NumberField IsDedekindDomain
 open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker
 open GlobalTheory.IndefiniteRowSideFullHecke GlobalTheory.ColumnNormCompare
-open GlobalTheory.IndefiniteRowSideFullHecke.BadPrimesPeriodBound (recFields recPrimes recWts recSeam recGlob Twist)
+open GlobalTheory.IndefiniteRowSideFullHecke.BadPrimesPeriodBound
+  (recFields recPrimes recWts recSeam recGlob Twist)
 
 namespace GlobalTheory.EigenlineBaseChange
 
-theorem isIntegral_coe_iff {M : IntermediateField ℚ ℂ} (x : M) : IsIntegral ℤ (x : ℂ) ↔ IsIntegral ℤ x :=
+theorem isIntegral_coe_iff {M : IntermediateField ℚ ℂ} (x : M)
+    : IsIntegral ℤ (x : ℂ) ↔ IsIntegral ℤ x :=
   isIntegral_algHom_iff (M.val.toRingHom.toIntAlgHom) M.val.injective
 
-theorem span_eq_top {D : D7} {M : IntermediateField ℚ ℂ} [NumberField M]
-    (hM : ∀ τ x, TaylorLogMetric.embT D τ x ∈ M) (τ : D.what₂.Tau) (s : M)
-    (hs : TaylorLogMetric.ellT D M τ = Submodule.span (𝓞 M) {s}) :
-    Ideal.span {a : 𝓞 M | ∃ y ∈ D.host.AA0, ((a : M) : ℂ) = (s : ℂ) * TaylorLogMetric.embT D τ (D.host.conj y)} = ⊤ := by
+theorem span_eq_top
+    {D : D7} {M : IntermediateField ℚ ℂ} [NumberField M]
+    (hM : ∀ τ x, TaylorLogMetric.embT D τ x ∈ M)
+    (τ : D.what₂.Tau) (s : M) (hs : TaylorLogMetric.ellT D M τ = Submodule.span (𝓞 M) {s})
+    : Ideal.span
+        {a : 𝓞 M | ∃ y ∈ D.host.AA0, ((a : M) : ℂ) = (s : ℂ) * TaylorLogMetric.embT D τ (D.host.conj y)}
+      = ⊤ := by
   have hs0 : s ≠ 0 := GlobalTheory.Glob.ne_zero_of_span_eq hM hs.symm
   have hsm : s ∈ TaylorLogMetric.ellT D M τ := hs ▸ Submodule.mem_span_singleton_self s
   rw [GlobalTheory.Glob.mem_ellT_iff hM] at hsm
@@ -42,8 +47,8 @@ theorem span_eq_top {D : D7} {M : IntermediateField ℚ ℂ} [NumberField M]
   have hxs : x * s ∈ TaylorLogMetric.ellT D M τ := by
     rw [GlobalTheory.Glob.mem_ellT_iff hM]
     intro y hy
-    obtain ⟨c, hc⟩ := (FractionalIdeal.mem_one_iff _).1
-      (hx _ (FractionalIdeal.mem_coeIdeal_of_mem _ (hg y hy)))
+    obtain ⟨c, hc⟩ :=
+      (FractionalIdeal.mem_one_iff _).1 (hx _ (FractionalIdeal.mem_coeIdeal_of_mem _ (hg y hy)))
     have h1 : IsIntegral ℤ (((c : M) : ℂ)) := (isIntegral_coe_iff _).2 c.isIntegral_coe
     have h2 : ((c : M) : ℂ) = (x : ℂ) * ((s : ℂ) * TaylorLogMetric.embT D τ (D.host.conj y)) :=
       congrArg (fun a : M => (a : ℂ)) hc
@@ -54,7 +59,12 @@ theorem span_eq_top {D : D7} {M : IntermediateField ℚ ℂ} [NumberField M]
   refine hx1 ((FractionalIdeal.mem_one_iff _).2 ⟨c, ?_⟩)
   exact mul_right_cancel₀ hs0 hc
 
-theorem ellT_eq_span_of_le : ∀ (D : D7) (M M' : IntermediateField ℚ ℂ) [NumberField M] [NumberField M'] (hle : M ≤ M'), (∀ τ x, TaylorLogMetric.embT D τ x ∈ M) → ∀ (τ : D.what₂.Tau) (s : M), TaylorLogMetric.ellT D M τ = Submodule.span (𝓞 M) {s} → TaylorLogMetric.ellT D M' τ = Submodule.span (𝓞 M') {(⟨(s : ℂ), hle s.2⟩ : M')} := by
+theorem ellT_eq_span_of_le
+    : ∀ (D : D7) (M M' : IntermediateField ℚ ℂ) [NumberField M] [NumberField M'] (hle : M ≤ M'),
+      (∀ τ x, TaylorLogMetric.embT D τ x ∈ M)
+        → ∀ (τ : D.what₂.Tau) (s : M),
+          TaylorLogMetric.ellT D M τ = Submodule.span (𝓞 M) {s}
+            → TaylorLogMetric.ellT D M' τ = Submodule.span (𝓞 M') {(⟨(s : ℂ), hle s.2⟩ : M')} := by
   intro D M M' _ _ hle hM τ s hs
   have hM' : ∀ τ x, TaylorLogMetric.embT D τ x ∈ M' := fun τ x => hle (hM τ x)
   have hs0 : s ≠ 0 := GlobalTheory.Glob.ne_zero_of_span_eq hM hs.symm
@@ -62,16 +72,20 @@ theorem ellT_eq_span_of_le : ∀ (D : D7) (M M' : IntermediateField ℚ ℂ) [Nu
   apply le_antisymm
   · intro x hx
     rw [GlobalTheory.Glob.mem_ellT_iff hM'] at hx
-    have key : ∀ a ∈ Ideal.span {a : 𝓞 M | ∃ y ∈ D.host.AA0,
-        ((a : M) : ℂ) = (s : ℂ) * TaylorLogMetric.embT D τ (D.host.conj y)},
-        IsIntegral ℤ ((x : ℂ) * (s : ℂ)⁻¹ * ((a : M) : ℂ)) := by
+    have key
+        : ∀ a
+            ∈ Ideal.span
+              {a : 𝓞 M | ∃ y ∈ D.host.AA0,
+                ((a : M) : ℂ) = (s : ℂ) * TaylorLogMetric.embT D τ (D.host.conj y)},
+          IsIntegral ℤ ((x : ℂ) * (s : ℂ)⁻¹ * ((a : M) : ℂ)) := by
       intro a ha
       induction ha using Submodule.span_induction with
       | mem a ha =>
         obtain ⟨y, hy, e⟩ := ha
         rw [e, mul_assoc, inv_mul_cancel_left₀ hs0']
         exact hx y hy
-      | zero => simpa using isIntegral_zero
+      | zero =>
+        simpa using isIntegral_zero
       | add a b _ _ ha hb =>
         have e : (((a + b : 𝓞 M) : M) : ℂ) = ((a : M) : ℂ) + ((b : M) : ℂ) := rfl
         rw [e, mul_add]

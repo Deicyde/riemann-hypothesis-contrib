@@ -18,10 +18,13 @@ noncomputable section
 
 universe u
 
-theorem sup_span_C_ne_top_of_multiHomog {O : Type*} [CommRing O] {K : Type} [DecidableEq K]
-    (ι : K → Type) {W : Ideal (MRing ι O)} (hW : IsMultiHomogIdeal W)
-    (h0 : W.comap (C : O →+* MRing ι O) = ⊥) {ϖ : O} (hϖ : ¬ IsUnit ϖ) :
-    W ⊔ Ideal.span {(C ϖ : MRing ι O)} ≠ ⊤ := by
+theorem sup_span_C_ne_top_of_multiHomog
+    {O : Type*} [CommRing O]
+    {K : Type} [DecidableEq K]
+    (ι : K → Type)
+    {W : Ideal (MRing ι O)} (hW : IsMultiHomogIdeal W) (h0 : W.comap (C : O →+* MRing ι O) = ⊥)
+    {ϖ : O} (hϖ : ¬ IsUnit ϖ)
+    : W ⊔ Ideal.span {(C ϖ : MRing ι O)} ≠ ⊤ := by
   intro htop
   have h1 : (1 : MRing ι O) ∈ W ⊔ Ideal.span {(C ϖ : MRing ι O)} := htop ▸ Submodule.mem_top
   obtain ⟨w, hw, t, ht, hwt⟩ := Submodule.mem_sup.mp h1
@@ -40,13 +43,16 @@ theorem sup_span_C_ne_top_of_multiHomog {O : Type*} [CommRing O] {K : Type} [Dec
   rw [MvPolynomial.coeff_add, mul_comm s, coeff_C_mul, hc, zero_add, coeff_zero_one] at h2
   exact hϖ (isUnit_iff_exists_inv.mpr ⟨_, h2⟩)
 
-theorem ringKrullDim_quotient_eq_of_minimalPrime_of_sup_ne_top {O : Type*} [CommRing O] [IsDomain O]
-    [IsDiscreteValuationRing O] {ϖ : O} (hϖ : Irreducible ϖ) {K : Type} [Fintype K] {ι : K → Type}
-    [∀ k, Fintype (ι k)] {P W : Ideal (MRing ι O)} [P.IsPrime] {f : MRing ι O} (hfP : f ∉ P)
-    (hWmin : W ∈ (P ⊔ Ideal.span {f}).minimalPrimes)
-    (hWϖ : W ⊔ Ideal.span {(C ϖ : MRing ι O)} ≠ ⊤) (N : ℕ)
-    (hdim : ringKrullDim (MRing ι O ⧸ P) = ((N + 1 : ℕ) : WithBot ℕ∞)) :
-    ringKrullDim (MRing ι O ⧸ W) = (N : WithBot ℕ∞) := by
+theorem ringKrullDim_quotient_eq_of_minimalPrime_of_sup_ne_top
+    {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {P W : Ideal (MRing ι O)} [P.IsPrime]
+    {f : MRing ι O} (hfP : f ∉ P) (hWmin : W ∈ (P ⊔ Ideal.span {f}).minimalPrimes)
+    (hWϖ : W ⊔ Ideal.span {(C ϖ : MRing ι O)} ≠ ⊤)
+    (N : ℕ) (hdim : ringKrullDim (MRing ι O ⧸ P) = ((N + 1 : ℕ) : WithBot ℕ∞))
+    : ringKrullDim (MRing ι O ⧸ W) = (N : WithBot ℕ∞) := by
   have hWp : W.IsPrime := hWmin.1.1
   have hPW : P ≤ W := le_sup_left.trans hWmin.1.2
   have hfW : f ∈ W := hWmin.1.2 (Ideal.mem_sup_right (Ideal.mem_span_singleton_self f))
@@ -66,16 +72,21 @@ theorem ringKrullDim_quotient_eq_of_minimalPrime_of_sup_ne_top {O : Type*} [Comm
   obtain ⟨m, hm, hWm'⟩ := Ideal.exists_le_maximal _ hWϖ
   have hWm : W ≤ m := le_sup_left.trans hWm'
   have : m.IsPrime := hm.isPrime
-  have hmge := le_height_of_isMaximal_of_uniformiser_mem hϖ m hm
-    (hWm' (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _)))
+  have hmge :=
+    le_height_of_isMaximal_of_uniformiser_mem hϖ m hm
+      (hWm' (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _)))
   have hdimS := ringKrullDim_mvPolynomial_dvr (σ := Σ k, ι k) O
   have hfin : FiniteRingKrullDim (MRing ι O) := by
     rw [finiteRingKrullDim_iff_ne_bot_and_top, hdimS]
-    exact ⟨by rw [← WithBot.coe_natCast]; exact WithBot.coe_ne_bot, by
-      rw [← WithBot.coe_natCast]
-      exact ne_of_lt (WithBot.coe_lt_coe.mpr (ENat.natCast_lt_top _))⟩
-  have hmax : ∀ m' : Ideal (MRing ι O), m'.IsMaximal →
-      m'.height ≤ ((Nat.card (Σ k, ι k) + 1 : ℕ) : ℕ∞) := by
+    exact ⟨
+      by rw [← WithBot.coe_natCast]; exact WithBot.coe_ne_bot,
+      by
+        rw [← WithBot.coe_natCast]
+        exact ne_of_lt (WithBot.coe_lt_coe.mpr (ENat.natCast_lt_top _))
+    ⟩
+  have hmax
+      : ∀ m' : Ideal (MRing ι O),
+        m'.IsMaximal → m'.height ≤ ((Nat.card (Σ k, ι k) + 1 : ℕ) : ℕ∞) := by
     intro m' hm'
     have := Ideal.height_le_ringKrullDim_of_ne_top hm'.ne_top
     rw [hdimS] at this
@@ -84,8 +95,9 @@ theorem ringKrullDim_quotient_eq_of_minimalPrime_of_sup_ne_top {O : Type*} [Comm
 
   have hcat1 := DimF.height_eq_height_add_of_isRegularRing P W hPW
   have hcat2 := DimF.height_eq_height_add_of_isRegularRing W m hWm
-  have hsum : P.height + (W.map (Ideal.Quotient.mk P)).height + (m.map (Ideal.Quotient.mk W)).height
-      = ((Nat.card (Σ k, ι k) + 1 : ℕ) : ℕ∞) := by
+  have hsum
+      : P.height + (W.map (Ideal.Quotient.mk P)).height + (m.map (Ideal.Quotient.mk W)).height
+        = ((Nat.card (Σ k, ι k) + 1 : ℕ) : ℕ∞) := by
     rw [← hcat1, ← hcat2, hmeq]
   have hPfin : P.height ≠ ⊤ := fun h => by
     simp only [h, top_add] at hsum; exact ENat.top_ne_natCast _ hsum
@@ -107,8 +119,9 @@ theorem ringKrullDim_quotient_eq_of_minimalPrime_of_sup_ne_top {O : Type*} [Comm
   rw [hdim] at hPdim
   have hPdim' : N + 1 ≤ Nat.card (Σ k, ι k) + 1 - h0 := by exact_mod_cast hPdim
 
-  have hlow := Ideal.height_le_ringKrullDim_of_ne_top
-    (DimF.isPrime_map_mk (A := MRing ι O) (q := W) (M := m) hWm).ne_top
+  have hlow :=
+    Ideal.height_le_ringKrullDim_of_ne_top (DimF.isPrime_map_mk (A := MRing ι O) (q := W) (M := m)
+      hWm).ne_top
   rw [hb0] at hlow
   have hb' : N ≤ b0 := by omega
   have hlow' : ((N : ℕ) : WithBot ℕ∞) ≤ ringKrullDim (MRing ι O ⧸ W) :=
@@ -139,9 +152,10 @@ theorem HorizontalComponentModel.proof : HorizontalComponentModel.Statement := b
       rw [IsLocalRing.eq_maximalIdeal hmx]
       exact (IsLocalRing.mem_maximalIdeal ϖ).mpr hϖ.not_isUnit
     exact hϖW hϖm
-  have hdim := ringKrullDim_quotient_eq_of_minimalPrime_of_sup_ne_top hϖ hxP hWmin
-    (sup_span_C_ne_top_of_multiHomog ι hWh h0 hϖ.not_isUnit) (d + 1 + Fintype.card K)
-    (by rw [hP.dim, show d + 1 + 1 + Fintype.card K = d + 1 + Fintype.card K + 1 by ring])
+  have hdim :=
+    ringKrullDim_quotient_eq_of_minimalPrime_of_sup_ne_top hϖ hxP hWmin
+      (sup_span_C_ne_top_of_multiHomog ι hWh h0 hϖ.not_isUnit) (d + 1 + Fintype.card K)
+      (by rw [hP.dim, show d + 1 + 1 + Fintype.card K = d + 1 + Fintype.card K + 1 by ring])
   exact ⟨⟨hWp, hWh, hrel⟩, h0, hdim⟩
 
 end

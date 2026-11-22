@@ -17,13 +17,13 @@ theorem cosetIntegral_holds : CosetIntegral := by
   set f : G ⧸ K → ℂ := fun x => F x.out with hf
   let A : G ⧸ K → Set G := fun x => QuotientGroup.mk ⁻¹' {x}
   have hA : ∀ x, A x = x.out • (K : Set G) := by
-    intro x; ext g
+    intro x
+    ext g
     simp only [A, Set.mem_preimage, Set.mem_singleton_iff, mem_leftCoset_iff]
     conv_lhs => rw [← QuotientGroup.out_eq' x]
     rw [eq_comm, QuotientGroup.eq]
     rfl
-  have hAm : ∀ x, MeasurableSet (A x) := fun x => by
-    rw [hA]; exact (hK.smul x.out).measurableSet
+  have hAm : ∀ x, MeasurableSet (A x) := fun x => by rw [hA]; exact (hK.smul x.out).measurableSet
   have hAμ : ∀ x, μ (A x) = 1 := fun x => by rw [hA, measure_smul]; exact hμK
   have hconst : ∀ x, ∀ g ∈ A x, F g = f x := by
     intro x g hg
@@ -44,7 +44,11 @@ theorem cosetIntegral_holds : CosetIntegral := by
     simp [Measure.real, hAμ]
   have hBnorm : ∀ i : S, ∫ g in B i, ‖F g‖ ∂μ = ‖f i.1‖ := by
     intro i
-    rw [setIntegral_congr_fun (g := fun _ => ‖f i.1‖) (hAm i.1) (fun g hg => by simp only [hconst i.1 g hg]), setIntegral_const]
+    rw [setIntegral_congr_fun
+        (g := fun _ => ‖f i.1‖)
+        (hAm i.1)
+        (fun g hg => by simp only [hconst i.1 g hg]),
+      setIntegral_const]
     simp [Measure.real, hAμ]
   have hBon : ∀ i : S, IntegrableOn F (B i) μ := by
     intro i
@@ -65,7 +69,11 @@ theorem cosetIntegral_holds : CosetIntegral := by
     simpa [hSdef] using hnot
   have hInt : Integrable F μ := hU.integrable_of_forall_notMem_eq_zero hzero
   refine ⟨hInt, ?_⟩
-  have h1 := hasSum_integral_iUnion (fun i : S => hAm i.1) (fun i j hij => hdisj (fun h => hij (Subtype.ext h))) hU
+  have h1 :=
+    hasSum_integral_iUnion
+      (fun i : S => hAm i.1)
+      (fun i j hij => hdisj (fun h => hij (Subtype.ext h)))
+      hU
   have hfun : (fun i : S => ∫ g in B i, F g ∂μ) = fun i => f i.1 := funext hBint
   rw [hfun] at h1
   have h2 : HasSum (fun i : S => f i.1) Z :=

@@ -13,17 +13,25 @@ public import GroundTheory.GlobalFields.TateThesis.RootNumberLocalPlace
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.CuspRep Formalism.UG GlobalTheory.LFun Matrix MeasureTheory
+open NumberField IsDedekindDomain GlobalTheory.CuspRep Formalism.UG GlobalTheory.LFun Matrix
+  MeasureTheory
 
 namespace GlobalTheory.JSW
 
-theorem psiLoc_addChar_locallyConstant_ne_one :
-    ∀ (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)), ∃ ψ : AddChar (w.adicCompletion E) ℂ,
-      (∀ x, ψ x = (GroundTheory.Global.adelicChar _ (GlobalTheory.CuspRep.sFin _ (GlobalTheory.CuspRep.sLoc _ w x)) : ℂ)) ∧ IsLocallyConstant ψ ∧ ψ ≠ 1 := by
+theorem psiLoc_addChar_locallyConstant_ne_one
+    : ∀ (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)),
+      ∃ ψ : AddChar (w.adicCompletion E) ℂ,
+        (∀ x,
+            ψ x
+              = (GroundTheory.Global.adelicChar _
+                  (GlobalTheory.CuspRep.sFin _ (GlobalTheory.CuspRep.sLoc _ w x))
+                : ℂ))
+          ∧ IsLocallyConstant ψ ∧ ψ ≠ 1 := by
   intro E _ _ w
   refine ⟨psiLocChar w, fun x => rfl, ?_, ?_⟩
   · have hc : Continuous (psiLocChar w) := by
-      have : (psiLocChar w : w.adicCompletion E → ℂ) = fun x => ((GroundTheory.Global.localAdelicChar E w x : Circle) : ℂ) := by
+      have : (psiLocChar w : w.adicCompletion E → ℂ)
+          = fun x => ((GroundTheory.Global.localAdelicChar E w x : Circle) : ℂ) := by
         funext x; exact GlobalTheory.JSW.WhitModel.psiLoc_eq w x
       rw [this]
       exact continuous_subtype_val.comp (GroundTheory.Global.continuous_localAdelicChar w)

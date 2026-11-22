@@ -177,8 +177,7 @@ end Group
 
 open Formalism.FrobeniusOrbits.Group
 
-theorem hostExample : HostExample :=
-  ⟨by norm_num [HostHyp], fun e => layerExists (e + 2) 11 7⟩
+theorem hostExample : HostExample := ⟨by norm_num [HostHyp], fun e => layerExists (e + 2) 11 7⟩
 
 private lemma orderOf_hcl_u5_eq_two_pow (e : ℕ) : orderOf (hcl e (u5 (e + 2))) = 2 ^ e := by
   have hd : orderOf (hcl e (u5 (e + 2))) ∣ 2 ^ e := by
@@ -224,14 +223,9 @@ theorem hostGroup : HostGroup := by
   unfold HostGroup
   intro e
   have hne : (-1 : ℤˣ) ≠ 1 := by
-    first
-      | decide
-      | (intro h; have h' := congrArg Units.val h; norm_num at h')
+    first | decide | (intro h; have h' := congrArg Units.val h; norm_num at h')
   have hU : Nat.card ℤˣ = 2 := by
-    first
-      | (rw [Nat.card_eq_fintype_card]; rfl)
-      | (rw [Nat.card_eq_fintype_card]; decide)
-      | simp
+    first | (rw [Nat.card_eq_fintype_card]; rfl) | (rw [Nat.card_eq_fintype_card]; decide) | simp
   have hfin : Finite (HGrp e) := Nat.finite_of_card_ne_zero (by rw [card_H]; positivity)
   have h5 := orderOf_hcl_u5_eq_two_pow e
   unfold GG Psi cc sg chD G0 c0
@@ -241,8 +235,8 @@ theorem hostGroup : HostGroup := by
   · have hs : Function.Surjective ((MonoidHom.snd ℤˣ ℤˣ).comp (MonoidHom.fst (ℤˣ × ℤˣ) (HGrp e))) :=
       fun b => ⟨((1, b), 1), rfl⟩
     first
-      | (rw [Subgroup.index_ker, Set.range_eq_univ.2 hs, Nat.card_univ, hU])
-      | (rw [Subgroup.index_ker, MonoidHom.range_eq_top.2 hs, Subgroup.card_top, hU])
+    | (rw [Subgroup.index_ker, Set.range_eq_univ.2 hs, Nat.card_univ, hU])
+    | (rw [Subgroup.index_ker, MonoidHom.range_eq_top.2 hs, Subgroup.card_top, hU])
   · intro h
     rw [MonoidHom.mem_ker] at h
     exact hne h
@@ -256,24 +250,20 @@ theorem hostGroup : HostGroup := by
   · have hg : hcl e (u5 (e + 2)) ^ (2 ^ e) = 1 := by
       rw [← h5]
       exact pow_orderOf_eq_one _
-    let f0 : ℤ →+ Additive (HGrp e) := zmultiplesHom (Additive (HGrp e)) (Additive.ofMul (hcl e (u5 (e + 2))))
+    let f0 : ℤ →+ Additive (HGrp e) :=
+      zmultiplesHom (Additive (HGrp e)) (Additive.ofMul (hcl e (u5 (e + 2))))
     have hf0 : f0 ((2 ^ e : ℕ) : ℤ) = 0 := by
       show ((2 ^ e : ℕ) : ℤ) • Additive.ofMul (hcl e (u5 (e + 2))) = 0
       first
-        | (rw [← ofMul_zpow, zpow_natCast, hg, ofMul_one])
-        | (rw [natCast_zsmul, ← ofMul_pow, hg, ofMul_one])
-        | simp [← ofMul_zpow, hg]
+      | (rw [← ofMul_zpow, zpow_natCast, hg, ofMul_one])
+      | (rw [natCast_zsmul, ← ofMul_pow, hg, ofMul_one])
+      | simp [← ofMul_zpow, hg]
     let f1 : ZMod (2 ^ e) →+ Additive (HGrp e) := ZMod.lift (2 ^ e) ⟨f0, hf0⟩
-    let f : Multiplicative (ZMod (2 ^ e)) →* HGrp e :=
-      { toFun := fun x => Additive.toMul (f1 (Multiplicative.toAdd x))
-        map_one' := by
-          first
-            | simp
-            | rfl
-        map_mul' := fun x y => by
-          first
-            | simp
-            | (rw [toAdd_mul, map_add (f := _), toMul_add]) }
+    let f : Multiplicative (ZMod (2 ^ e)) →* HGrp e := {
+      toFun := fun x => Additive.toMul (f1 (Multiplicative.toAdd x))
+      map_one' := by first | simp | rfl
+      map_mul' := fun x y => by first | simp | (rw [toAdd_mul, map_add (f := _), toMul_add])
+    }
     have hf1 : f (Multiplicative.ofAdd 1) = hcl e (u5 (e + 2)) := by
       show Additive.toMul (f1 1) = hcl e (u5 (e + 2))
       have h1 : (1 : ZMod (2 ^ e)) = ((1 : ℤ) : ZMod (2 ^ e)) := by simp
@@ -294,17 +284,15 @@ theorem hostGroup : HostGroup := by
       rw [ZMod.lift_coe]
       show Additive.toMul (k • Additive.ofMul (hcl e (u5 (e + 2)))) = y
       rw [← hk]
-      first
-        | rfl
-        | simp [← ofMul_zpow]
+      first | rfl | simp [← ofMul_zpow]
     have hbij : Function.Bijective f := by
       haveI : NeZero (2 ^ e) := ⟨by positivity⟩
       have hc : Nat.card (Multiplicative (ZMod (2 ^ e))) ≤ Nat.card (HGrp e) := by
         change Nat.card (ZMod (2 ^ e)) ≤ Nat.card (HGrp e)
         rw [Nat.card_zmod, card_H]
       first
-        | exact hsurj.bijective_of_nat_card_le hc
-        | exact (Function.Surjective.bijective_of_nat_card_le hsurj hc)
+      | exact hsurj.bijective_of_nat_card_le hc
+      | exact (Function.Surjective.bijective_of_nat_card_le hsurj hc)
     exact ⟨MulEquiv.ofBijective f hbij, hf1⟩
 
 theorem hostOrders : HostOrders := by
@@ -329,9 +317,7 @@ theorem hostOrders : HostOrders := by
       exact ind l hl M (by omega) j
   · unfold GG cc G0 c0
     have hne : (-1 : ℤˣ) ≠ 1 := by
-      first
-        | decide
-        | (intro h; have h' := congrArg Units.val h; norm_num at h')
+      first | decide | (intro h; have h' := congrArg Units.val h; norm_num at h')
     intro g
     constructor
     · rw [Subgroup.mem_zpowers_iff]
@@ -358,9 +344,7 @@ theorem hostOrders : HostOrders := by
         have hd : (orderOf g.2 : ℤ) ∣ k := orderOf_dvd_iff_zpow_eq_one.2 hk3
         have hd2 : orderOf g.2 ∣ 2 ^ e := by
           have h0 : orderOf g.2 ∣ Nat.card (HGrp e) := by
-            first
-              | exact orderOf_dvd_natCard _
-              | exact orderOf_dvd_card
+            first | exact orderOf_dvd_natCard _ | exact orderOf_dvd_card
           rwa [card_H] at h0
         obtain ⟨i, -, hi⟩ := (Nat.dvd_prime_pow Nat.prime_two).1 hd2
         have hi0 : i = 0 := by

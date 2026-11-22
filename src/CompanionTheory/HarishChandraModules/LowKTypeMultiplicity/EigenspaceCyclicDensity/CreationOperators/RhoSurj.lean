@@ -15,9 +15,11 @@ open CompanionTheory.D.DSIC (KStab)
 
 variable {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
 
-theorem burnside {A : Type} [Ring A] [Algebra ℂ A] [FiniteDimensional ℂ V] (ρ : A →ₐ[ℂ] Module.End ℂ V)
-    (hnt : Nontrivial V) (hirr : ∀ W : Submodule ℂ V, (∀ a : A, ∀ w ∈ W, ρ a w ∈ W) → W = ⊥ ∨ W = ⊤) :
-    Function.Surjective ρ := by
+theorem burnside
+    {A : Type} [Ring A] [Algebra ℂ A] [FiniteDimensional ℂ V]
+    (ρ : A →ₐ[ℂ] Module.End ℂ V)
+    (hnt : Nontrivial V) (hirr : ∀ W : Submodule ℂ V, (∀ a : A, ∀ w ∈ W, ρ a w ∈ W) → W = ⊥ ∨ W = ⊤)
+    : Function.Surjective ρ := by
   classical
   letI : Module A V := Module.compHom V (ρ : A →+* Module.End ℂ V)
   have hsm : ∀ (a : A) (x : V), a • x = ρ a x := fun _ _ => rfl
@@ -30,29 +32,34 @@ theorem burnside {A : Type} [Ring A] [Algebra ℂ A] [FiniteDimensional ℂ V] (
     · right; exact (Submodule.restrictScalars_eq_top_iff ℂ A V).1 h
   have hscal : ∀ φ : Module.End A V, ∃ c : ℂ, ∀ m, φ m = c • m := by
     intro φ
-    obtain ⟨c, hc⟩ := (IsSimpleModule.algebraMap_end_bijective_of_isAlgClosed (A := A) (V := V) ℂ).2 φ
+    obtain ⟨c, hc⟩ :=
+      (IsSimpleModule.algebraMap_end_bijective_of_isAlgClosed (A := A) (V := V) ℂ).2 φ
     exact ⟨c, fun m => by rw [← hc]; rfl⟩
   intro f
-  let F : Module.End (Module.End A V) V :=
-    { toFun := f
-      map_add' := fun x y => by simp
-      map_smul' := fun φ m => by
-        obtain ⟨c, hc⟩ := hscal φ
-        simp only [Module.End.smul_def, RingHom.id_apply, hc, map_smul] }
+  let F : Module.End (Module.End A V) V := {
+    toFun := f
+    map_add' := fun x y => by simp
+    map_smul' := fun φ m => by
+      obtain ⟨c, hc⟩ := hscal φ
+      simp only [Module.End.smul_def, RingHom.id_apply, hc, map_smul]
+  }
   let b := Module.finBasis ℂ V
   obtain ⟨r, hr⟩ := jacobson_density F (Finset.univ.image b)
   refine ⟨r, b.ext fun i => ?_⟩
   exact (hr _ (Finset.mem_image_of_mem _ (Finset.mem_univ i))).symm
 
-def rho (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (L : Submodule ℂ V) (hL : KStab ε E L) :
-    FreeAlgebra ℂ (Fin n × Fin n) →ₐ[ℂ] Module.End ℂ L :=
+def rho
+    (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (L : Submodule ℂ V) (hL : KStab ε E L)
+    : FreeAlgebra ℂ (Fin n × Fin n) →ₐ[ℂ] Module.End ℂ L :=
   FreeAlgebra.lift ℂ fun p => if h : ε p.1 = ε p.2 then (E p.1 p.2).restrict (hL p.1 p.2 h) else 0
 
 def psi (ε : Fin n → Bool) : FreeAlgebra ℂ (Fin n × Fin n) →ₐ[ℂ] FreeAlgebra ℂ (Fin n × Fin n) :=
   FreeAlgebra.lift ℂ fun p => if ε p.1 = ε p.2 then FreeAlgebra.ι ℂ p else 0
 
-theorem ev_psi (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (L : Submodule ℂ V) (hL : KStab ε E L)
-    (r : FreeAlgebra ℂ (Fin n × Fin n)) : ∀ s : L, ev E (psi ε r) s = (rho ε E L hL r s : V) := by
+theorem ev_psi
+    (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (L : Submodule ℂ V) (hL : KStab ε E L)
+    (r : FreeAlgebra ℂ (Fin n × Fin n))
+    : ∀ s : L, ev E (psi ε r) s = (rho ε E L hL r s : V) := by
   induction r using FreeAlgebra.induction with
   | grade0 c => intro s; simp [Module.algebraMap_end_apply]
   | grade1 p =>
@@ -63,9 +70,12 @@ theorem ev_psi (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) 
   | mul a b ha hb => intro s; simp [map_mul, Module.End.mul_apply, ha, hb]
   | add a b ha hb => intro s; simp [map_add (f := _), ha, hb]
 
-theorem rho_surj (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (L : Submodule ℂ V) (hL : KStab ε E L)
-    [FiniteDimensional ℂ L] {v : V} (hv : v ≠ 0) (hvL : v ∈ L)
-    (hirr : ∀ L' ≤ L, KStab ε E L' → L' = ⊥ ∨ L' = L) : Function.Surjective (rho ε E L hL) := by
+theorem rho_surj
+    (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (L : Submodule ℂ V) (hL : KStab ε E L)
+    [FiniteDimensional ℂ L]
+    {v : V} (hv : v ≠ 0) (hvL : v ∈ L)
+    (hirr : ∀ L' ≤ L, KStab ε E L' → L' = ⊥ ∨ L' = L)
+    : Function.Surjective (rho ε E L hL) := by
   refine burnside (rho ε E L hL) ⟨⟨v, hvL⟩, 0, fun h => hv (congrArg Subtype.val h)⟩ ?_
   intro W hW
   have hst : KStab ε E (W.map L.subtype) := by
@@ -86,8 +96,9 @@ theorem dens : CompanionTheory.D.LK.Dens := by
   let b := Module.finBasis ℂ L
   constructor
   · intro x hx
-    obtain ⟨f, hf⟩ := Module.Projective.exists_dual_eq_one ℂ
-      (show (⟨v, hvL⟩ : L) ≠ 0 from fun h => hv (congrArg Subtype.val h))
+    obtain ⟨f, hf⟩ :=
+      Module.Projective.exists_dual_eq_one ℂ
+        (show (⟨v, hvL⟩ : L) ≠ 0 from fun h => hv (congrArg Subtype.val h))
     obtain ⟨r, hr⟩ := hs (f.smulRight (⟨x, hx⟩ : L))
     refine ⟨psi ε r, ?_⟩
     have := ev_psi ε E L hL r ⟨v, hvL⟩
@@ -100,7 +111,8 @@ theorem dens : CompanionTheory.D.LK.Dens := by
     have hu' : ∀ i, ev E (u i) v = φ (b i) := fun i => by simpa using hu i
     conv_rhs => rw [← b.sum_repr s]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, LinearMap.sum_apply, Module.End.mul_apply, ev_psi ε E L hL, hr, map_smul]
+      simp only [map_sum, map_mul, LinearMap.sum_apply, Module.End.mul_apply, ev_psi ε E L hL, hr,
+        map_smul]
     refine Finset.sum_congr rfl fun i _ => ?_
     simp [hu']
 

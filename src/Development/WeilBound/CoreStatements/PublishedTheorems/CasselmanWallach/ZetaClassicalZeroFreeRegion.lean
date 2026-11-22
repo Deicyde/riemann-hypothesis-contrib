@@ -6,30 +6,38 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.CasselmanWa
 
 noncomputable section
 
-open MeasureTheory Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.SmoothGlob GlobalTheory.LowTypeDetermined GlobalTheory.TypeSum
+open MeasureTheory Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta
+  GlobalTheory.SmoothGlob GlobalTheory.LowTypeDetermined GlobalTheory.TypeSum
 
 namespace PositivityTheory.CW
 
-private theorem sobNorm_append' {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (σ : Mx n → H →L[ℂ] H) (S A : List (List (Mx n))) (w : H) :
-    sobNorm σ (S ++ A) w = sobNorm σ S w + sobNorm σ A w := by
+private theorem sobNorm_append'
+    {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (σ : Mx n → H →L[ℂ] H) (S A : List (List (Mx n))) (w : H)
+    : sobNorm σ (S ++ A) w = sobNorm σ S w + sobNorm σ A w := by
   simp [sobNorm, List.map_append, List.sum_append]
 
-private theorem sobNorm_nonneg' {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (σ : Mx n → H →L[ℂ] H) (S : List (List (Mx n))) (w : H) : 0 ≤ sobNorm σ S w := by
+private theorem sobNorm_nonneg'
+    {n : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (σ : Mx n → H →L[ℂ] H) (S : List (List (Mx n))) (w : H)
+    : 0 ≤ sobNorm σ S w := by
   apply List.sum_nonneg
   intro x hx
   obtain ⟨l, -, rfl⟩ := List.mem_map.1 hx
   exact norm_nonneg _
 
-private theorem exists_sobNorm_bound_of_sobBdOn_continuous_seminorm {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] {E : Type} [AddCommGroup E] [Module ℂ E] [TopologicalSpace E]
-    (σ : Mx n → H →L[ℂ] H) (p : ℕ → Seminorm ℂ E) (hp : WithSeminorms p) (T : H →ₗ[ℂ] E)
-    (hT : SobBdOn ε σ (Sm ε σ) p T) (q : Seminorm ℂ E) (hq : Continuous q) :
-    ∃ (S : List (List (Mx n))) (C : ℝ), Words (lieSet ε) S ∧ 0 ≤ C ∧
-      ∀ w, Sm ε σ w → q (T w) ≤ C * sobNorm σ S w := by
-  have key : ∀ s : Finset ℕ, ∃ (S : List (List (Mx n))) (C : ℝ), Words (lieSet ε) S ∧ 0 ≤ C ∧
-      ∀ w, Sm ε σ w → ∑ j ∈ s, p j (T w) ≤ C * sobNorm σ S w := by
+private theorem exists_sobNorm_bound_of_sobBdOn_continuous_seminorm
+    {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    {E : Type} [AddCommGroup E] [Module ℂ E] [TopologicalSpace E]
+    (σ : Mx n → H →L[ℂ] H)
+    (p : ℕ → Seminorm ℂ E) (hp : WithSeminorms p)
+    (T : H →ₗ[ℂ] E) (hT : SobBdOn ε σ (Sm ε σ) p T)
+    (q : Seminorm ℂ E) (hq : Continuous q)
+    : ∃ (S : List (List (Mx n))) (C : ℝ),
+      Words (lieSet ε) S ∧ 0 ≤ C ∧ ∀ w, Sm ε σ w → q (T w) ≤ C * sobNorm σ S w := by
+  have key
+      : ∀ s : Finset ℕ, ∃ (S : List (List (Mx n))) (C : ℝ),
+        Words (lieSet ε) S ∧ 0 ≤ C ∧ ∀ w, Sm ε σ w → ∑ j ∈ s, p j (T w) ≤ C * sobNorm σ S w := by
     intro s
     induction s using Finset.induction_on with
     | empty => exact ⟨[], 0, fun l hl => by simp at hl, le_rfl, fun w _ => by simp⟩
@@ -56,7 +64,9 @@ private theorem exists_sobNorm_bound_of_sobBdOn_continuous_seminorm {n : ℕ} {�
   have hsup : (s.sup p) (T w) ≤ ∑ j ∈ s, p j (T w) :=
     Seminorm.finset_sup_apply_le (Finset.sum_nonneg fun _ _ => apply_nonneg _ _)
       (fun i hi => Finset.single_le_sum (f := fun j => p j (T w)) (fun _ _ => apply_nonneg _ _) hi)
-  calc q (T w) ≤ (C0 • s.sup p) (T w) := Seminorm.le_def.1 hle (T w)
+  calc
+    q (T w)
+      ≤ (C0 • s.sup p) (T w) := Seminorm.le_def.1 hle (T w)
     _ = (C0 : ℝ) * (s.sup p) (T w) := by rw [Seminorm.smul_apply, NNReal.smul_def, smul_eq_mul]
     _ ≤ (C0 : ℝ) * ∑ j ∈ s, p j (T w) := mul_le_mul_of_nonneg_left hsup C0.2
     _ ≤ (C0 : ℝ) * (C * sobNorm σ S w) := mul_le_mul_of_nonneg_left (hb w hw) C0.2
@@ -69,7 +79,8 @@ theorem d3 : D3 := by
     congr 1
     funext a
     split_ifs <;> norm_num
-  have hJu : IsUnit (Formalism.REAL.Jm ε) := ⟨⟨Formalism.REAL.Jm ε, Formalism.REAL.Jm ε, hJJ, hJJ⟩, rfl⟩
+  have hJu : IsUnit (Formalism.REAL.Jm ε) :=
+    ⟨⟨Formalism.REAL.Jm ε, Formalism.REAL.Jm ε, hJJ, hJJ⟩, rfl⟩
   have hU' : IsURepOn (Formalism.QuantumDeterminants.UH (Formalism.REAL.Jm ε)) σ := hU
   have hp := hπ.withSeminorms
   constructor
@@ -84,8 +95,9 @@ theorem d3 : D3 := by
     have hsob : SobBdOn ε σ (Sm ε σ) p T' := by
       intro i
       obtain ⟨S₁, C₁, hS₁, hb₁⟩ := hSob i
-      obtain ⟨S₂, C₂, hS₂, hC₂, hb₂⟩ := exists_sobNorm_bound_of_sobBdOn_continuous_seminorm σ p hp T hSob ((p i).comp (π k).toLinearMap)
-        ((hp.continuous_seminorm i).comp (π k).continuous)
+      obtain ⟨S₂, C₂, hS₂, hC₂, hb₂⟩ :=
+        exists_sobNorm_bound_of_sobBdOn_continuous_seminorm σ p hp T hSob
+          ((p i).comp (π k).toLinearMap) ((hp.continuous_seminorm i).comp (π k).continuous)
       refine ⟨S₁.map (List.map fun X => k⁻¹ * X * k) ++ S₂, max C₁ 0 + C₂, ?_, ?_⟩
       · intro l hl
         rcases List.mem_append.1 hl with h | h
@@ -96,8 +108,7 @@ theorem d3 : D3 := by
         · exact hS₂ l h
       · intro v hv
         have hsv : σ k v ∈ smooth (Formalism.REAL.Jm ε) σ := translate_mem hJu hU' hkU hv
-        have heq : sobNorm σ S₁ (σ k v) =
-            sobNorm σ (S₁.map (List.map fun X => k⁻¹ * X * k)) v := by
+        have heq : sobNorm σ S₁ (σ k v) = sobNorm σ (S₁.map (List.map fun X => k⁻¹ * X * k)) v := by
           unfold sobNorm
           rw [List.map_map]
           congr 1
@@ -116,22 +127,26 @@ theorem d3 : D3 := by
           map_sub_le_add _ _ _
         have h4 : ((p i).comp (π k).toLinearMap) (T v) = p i (π k (T v)) := rfl
         rw [h4] at h2
-        have h5 : C₁ * sobNorm σ (S₁.map (List.map fun X => k⁻¹ * X * k)) v ≤
-            max C₁ 0 * sobNorm σ (S₁.map (List.map fun X => k⁻¹ * X * k)) v :=
+        have h5
+            : C₁ * sobNorm σ (S₁.map (List.map fun X => k⁻¹ * X * k)) v
+              ≤ max C₁ 0 * sobNorm σ (S₁.map (List.map fun X => k⁻¹ * X * k)) v :=
           mul_le_mul_of_nonneg_right (le_max_left _ _) n1
         nlinarith [mul_nonneg (le_max_right C₁ 0) n2, mul_nonneg hC₂ n1]
-    have h0 := hD0 n ε H σ hU hI E p π dπ hπ hDens T' hsob
-      (fun v hv => by rw [hT', hT.1 k hk v hv, sub_self]) w hw
+    have h0 :=
+      hD0 n ε H σ hU hI E p π dπ hπ hDens T' hsob
+        (fun v hv => by rw [hT', hT.1 k hk v hv, sub_self])
+        w hw
     rw [hT'] at h0
     exact sub_eq_zero.1 h0
   · intro X hX
-    obtain ⟨L, hL⟩ := exists_word hJu hU' [X] (fun Y hY => by
-      rw [List.mem_singleton] at hY
-      rw [hY]
-      exact hX)
+    obtain ⟨L, hL⟩ :=
+      exists_word hJu hU' [X] (fun Y hY => by
+        rw [List.mem_singleton] at hY
+        rw [hY]
+        exact hX)
     let f : smooth (Formalism.REAL.Jm ε) σ →ₗ[ℂ] E :=
-      T ∘ₗ (smooth (Formalism.REAL.Jm ε) σ).subtype ∘ₗ L -
-        (dπ X).toLinearMap ∘ₗ T ∘ₗ (smooth (Formalism.REAL.Jm ε) σ).subtype
+      T ∘ₗ (smooth (Formalism.REAL.Jm ε) σ).subtype ∘ₗ L
+        - (dπ X).toLinearMap ∘ₗ T ∘ₗ (smooth (Formalism.REAL.Jm ε) σ).subtype
     obtain ⟨g, hg⟩ := LinearMap.exists_extend f
     have hgw : ∀ v (hv : Sm ε σ v), g v = T (dRep σ X v) - dπ X (T v) := by
       intro v hv
@@ -143,8 +158,9 @@ theorem d3 : D3 := by
     have hsob : SobBdOn ε σ (Sm ε σ) p g := by
       intro i
       obtain ⟨S₁, C₁, hS₁, hb₁⟩ := hSob i
-      obtain ⟨S₂, C₂, hS₂, hC₂, hb₂⟩ := exists_sobNorm_bound_of_sobBdOn_continuous_seminorm σ p hp T hSob ((p i).comp (dπ X).toLinearMap)
-        ((hp.continuous_seminorm i).comp (dπ X).continuous)
+      obtain ⟨S₂, C₂, hS₂, hC₂, hb₂⟩ :=
+        exists_sobNorm_bound_of_sobBdOn_continuous_seminorm σ p hp T hSob
+          ((p i).comp (dπ X).toLinearMap) ((hp.continuous_seminorm i).comp (dπ X).continuous)
       refine ⟨S₁.map (fun l => l ++ [X]) ++ S₂, max C₁ 0 + C₂, ?_, ?_⟩
       · intro l hl
         rcases List.mem_append.1 hl with h | h
@@ -174,12 +190,15 @@ theorem d3 : D3 := by
           map_sub_le_add _ _ _
         have h4 : ((p i).comp (dπ X).toLinearMap) (T v) = p i (dπ X (T v)) := rfl
         rw [h4] at h2
-        have h5 : C₁ * sobNorm σ (S₁.map (fun l => l ++ [X])) v ≤
-            max C₁ 0 * sobNorm σ (S₁.map (fun l => l ++ [X])) v :=
+        have h5
+            : C₁ * sobNorm σ (S₁.map (fun l => l ++ [X])) v
+              ≤ max C₁ 0 * sobNorm σ (S₁.map (fun l => l ++ [X])) v :=
           mul_le_mul_of_nonneg_right (le_max_left _ _) n1
         nlinarith [mul_nonneg (le_max_right C₁ 0) n2, mul_nonneg hC₂ n1]
-    have h0 := hD0 n ε H σ hU hI E p π dπ hπ hDens g hsob
-      (fun v hv => by rw [hgw v (hDens.1 v hv), hT.2 X hX v hv, sub_self]) w hw
+    have h0 :=
+      hD0 n ε H σ hU hI E p π dπ hπ hDens g hsob
+        (fun v hv => by rw [hgw v (hDens.1 v hv), hT.2 X hX v hv, sub_self])
+        w hw
     rw [hgw w hw] at h0
     exact sub_eq_zero.1 h0
 

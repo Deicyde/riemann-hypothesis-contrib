@@ -10,41 +10,46 @@ namespace ReciprocityTheory.GeometryOfNumbersTheory
 open Matrix
 open scoped ComplexOrder
 
-theorem neg_log_det_le {r' r : ℕ} (hr : r' ≤ r) {G' : Matrix (Fin r') (Fin r') ℂ}
-    {G : Matrix (Fin r) (Fin r) ℂ} (hG' : G'.PosDef) (hG : G.PosDef)
+theorem neg_log_det_le
+    {r' r : ℕ} (hr : r' ≤ r)
+    {G' : Matrix (Fin r') (Fin r') ℂ} {G : Matrix (Fin r) (Fin r) ℂ}
+    (hG' : G'.PosDef) (hG : G.PosDef)
     (M : Matrix (Fin r) (Fin r') ℤ) (hM : Function.Injective (M.map (Int.cast : ℤ → ℚ)).mulVec)
-    (N : Matrix (Fin r) (Fin r) ℤ) (hN : N.det ≠ 0) {A lam : ℝ} (hA : 0 < A) (hlam : 0 < lam)
-    (hnorm : (((A : ℂ) ^ 2) • G' -
-      (M.map (Int.cast : ℤ → ℂ))ᴴ * G * M.map (Int.cast : ℤ → ℂ)).PosSemidef)
-    (hsmall : ∀ i, (((N.map (Int.cast : ℤ → ℂ))ᴴ * G * N.map (Int.cast : ℤ → ℂ)) i i).re ≤ lam ^ 2) :
-    -(1 / 2) * Real.log G'.det.re ≤
-      -(1 / 2) * Real.log G.det.re + r' * Real.log A + ((r : ℝ) - r') * Real.log lam := by
+    (N : Matrix (Fin r) (Fin r) ℤ) (hN : N.det ≠ 0)
+    {A lam : ℝ} (hA : 0 < A) (hlam : 0 < lam)
+    (hnorm : (((A : ℂ) ^ 2) • G'
+      - (M.map (Int.cast : ℤ → ℂ))ᴴ * G * M.map (Int.cast : ℤ → ℂ)).PosSemidef)
+    (hsmall : ∀ i, (((N.map (Int.cast : ℤ → ℂ))ᴴ * G * N.map (Int.cast : ℤ → ℂ)) i i).re ≤ lam ^ 2)
+    : -(1 / 2) * Real.log G'.det.re
+      ≤ -(1 / 2) * Real.log G.det.re + r' * Real.log A + ((r : ℝ) - r') * Real.log lam := by
   classical
   have hu0 : LinearIndependent ℚ (M.map (Int.cast : ℤ → ℚ)).col := Matrix.mulVec_injective_iff.mp hM
-  have hNq : (N.map (Int.cast : ℤ → ℚ)).det ≠ 0 := by
-    rw [← Int.cast_det]; exact_mod_cast hN
+  have hNq : (N.map (Int.cast : ℤ → ℚ)).det ≠ 0 := by rw [← Int.cast_det]; exact_mod_cast hN
   have hw : LinearIndependent ℚ (N.map (Int.cast : ℤ → ℚ)).col :=
     Matrix.linearIndependent_cols_iff_isUnit.mpr ((Matrix.isUnit_iff_isUnit_det _).mpr hNq.isUnit)
   obtain ⟨m, f, hmr, hLI⟩ := LinearIndependentExtension.exists_append_li _ hu0 _ hw
   subst hmr
   set U : Matrix (Fin (r' + m)) (Fin (r' + m)) ℤ :=
     Matrix.of fun i j => Fin.append (fun k => M i k) (fun k => N i (f k)) j with hUdef
-  have hUq : (U.map (Int.cast : ℤ → ℚ)).col =
-      Fin.append (M.map (Int.cast : ℤ → ℚ)).col ((N.map (Int.cast : ℤ → ℚ)).col ∘ f) := by
+  have hUq
+      : (U.map (Int.cast : ℤ → ℚ)).col
+        = Fin.append (M.map (Int.cast : ℤ → ℚ)).col ((N.map (Int.cast : ℤ → ℚ)).col ∘ f) := by
     funext j i
     refine Fin.addCases (fun k => ?_) (fun k => ?_) j
     · rw [Fin.append_left]; simp [U, Matrix.col]
     · rw [Fin.append_right]; simp [U, Matrix.col]; rfl
   have hUdet : U.det ≠ 0 := by
     rw [← hUq, Matrix.linearIndependent_cols_iff_isUnit, Matrix.isUnit_iff_isUnit_det,
-      isUnit_iff_ne_zero, ← Int.cast_det] at hLI
+        isUnit_iff_ne_zero, ← Int.cast_det]
+      at hLI
     exact_mod_cast hLI
   set UC := U.map (Int.cast : ℤ → ℂ) with hUC
   set MC := M.map (Int.cast : ℤ → ℂ) with hMC
   set NC := N.map (Int.cast : ℤ → ℂ) with hNC
   have hUCdet : UC.det = ((U.det : ℤ) : ℂ) := by rw [hUC, Int.cast_det]
   have hUCinj : Function.Injective UC.mulVec := by
-    rw [Matrix.mulVec_injective_iff_isUnit, Matrix.isUnit_iff_isUnit_det, hUCdet, isUnit_iff_ne_zero]
+    rw [Matrix.mulVec_injective_iff_isUnit, Matrix.isUnit_iff_isUnit_det, hUCdet,
+      isUnit_iff_ne_zero]
     exact_mod_cast hUdet
   set H := UCᴴ * G * UC with hH
   have hHpd : H.PosDef := hG.conjTranspose_mul_mul_same hUCinj
@@ -72,8 +77,10 @@ theorem neg_log_det_le {r' r : ℕ} (hr : r' ≤ r) {G' : Matrix (Fin r') (Fin r
   rw [hsub] at hstep2
   have hprod : ∏ j : Fin m, (H (Fin.natAdd r' j) (Fin.natAdd r' j)).re ≤ (lam ^ 2) ^ m := by
     rw [← Fin.prod_const]
-    refine Finset.prod_le_prod₀ (fun j _ => (Complex.pos_iff.mp (hHpd.diag_pos)).1.le) (fun j _ => ?_)
-    rw [hdiag]; exact hsmall _
+    refine
+      Finset.prod_le_prod₀ (fun j _ => (Complex.pos_iff.mp (hHpd.diag_pos)).1.le) (fun j _ => ?_)
+    rw [hdiag]
+    exact hsmall _
   have hMM : (MCᴴ * G * MC).det.re ≤ (A ^ 2) ^ r' * G'.det.re := by
     have := det_re_le_of_sub_posSemidef hMMpd hnorm
     rw [det_smul, Fintype.card_fin] at this
@@ -83,13 +90,15 @@ theorem neg_log_det_le {r' r : ℕ} (hr : r' ≤ r) {G' : Matrix (Fin r') (Fin r
   have hfin : G.det.re ≤ (A ^ 2) ^ r' * G'.det.re * (lam ^ 2) ^ m := by
     have hP0 : 0 ≤ ∏ j : Fin m, (H (Fin.natAdd r' j) (Fin.natAdd r' j)).re :=
       Finset.prod_nonneg fun j _ => (Complex.pos_iff.mp (hHpd.diag_pos)).1.le
-    calc G.det.re ≤ H.det.re := hstep1
+    calc
+      G.det.re
+        ≤ H.det.re := hstep1
       _ ≤ _ := hstep2
-      _ ≤ (A ^ 2) ^ r' * G'.det.re * (lam ^ 2) ^ m :=
-        mul_le_mul hMM hprod hP0 (by positivity)
+      _ ≤ (A ^ 2) ^ r' * G'.det.re * (lam ^ 2) ^ m := mul_le_mul hMM hprod hP0 (by positivity)
   have hlog := Real.log_le_log hGpos hfin
   rw [Real.log_mul (by positivity) (by positivity), Real.log_mul (by positivity) (by positivity),
-    Real.log_pow, Real.log_pow, Real.log_pow, Real.log_pow] at hlog
+      Real.log_pow, Real.log_pow, Real.log_pow, Real.log_pow]
+    at hlog
   push_cast at hlog ⊢
   linarith
 

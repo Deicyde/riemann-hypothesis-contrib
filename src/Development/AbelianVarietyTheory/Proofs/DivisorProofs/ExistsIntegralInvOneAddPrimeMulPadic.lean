@@ -8,8 +8,8 @@ open scoped TensorProduct Classical
 
 namespace GlobalTheory
 
-theorem exists_integral_inv_one_add_prime_mul :
-    ∀ (ℓ : ℕ) [Fact ℓ.Prime] (S : Type) [CommRing S] [Algebra ℤ_[ℓ] S] (s : S),
+theorem exists_integral_inv_one_add_prime_mul
+    : ∀ (ℓ : ℕ) [Fact ℓ.Prime] (S : Type) [CommRing S] [Algebra ℤ_[ℓ] S] (s : S),
       IsIntegral ℤ_[ℓ] s → ∃ r : S, (1 + (ℓ : S) * s) * r = 1 ∧ IsIntegral ℤ_[ℓ] r := by
   intro ℓ _ S _ _ s hs
   let B := integralClosure ℤ_[ℓ] S

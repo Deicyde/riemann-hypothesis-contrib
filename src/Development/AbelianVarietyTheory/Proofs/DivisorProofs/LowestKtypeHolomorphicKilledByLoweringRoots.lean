@@ -9,7 +9,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.VoganNormSqH
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
+open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum
+  Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
 open scoped TensorProduct InnerProductSpace ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -149,9 +153,12 @@ lemma vNormSq_lt (p : ℕ) (ε : Fin n → Bool) (hε : ∀ a, ε a = decide ((a
 
 section Rep
 
-variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {ε : Fin n → Bool} {σ : Mt n → (H →L[ℂ] H)}
+variable
+  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {ε : Fin n → Bool} {σ : Mt n → (H →L[ℂ] H)}
 
-noncomputable abbrev tor (θ : Fin n → ℝ) : Mt n := Matrix.diagonal fun a => Complex.exp ((θ a : ℂ) * Complex.I)
+noncomputable abbrev tor (θ : Fin n → ℝ) : Mt n :=
+  Matrix.diagonal fun a => Complex.exp ((θ a : ℂ) * Complex.I)
 
 lemma kset_sub {g : Mt n} (hg : g ∈ Kset ε) : g ∈ UJset ε := by
   obtain ⟨h1, h2⟩ := hg
@@ -341,13 +348,23 @@ lemma conjH_single (a c : Fin n) (ha : ε a = true) (hc : ε c = false) :
 
 end Rep
 
-theorem lowK_killed : ∀ (n p : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] (σ : Mt n → (H →L[ℂ] H)), Formalism.QuantumDeterminants.IsHCParam lam → (∀ a, ε a = decide ((a : ℕ) < p)) → IsDS ε lam σ → ∀ v ∈ lowKSub ε lam σ, SmoothVec (lieH (Formalism.REAL.Jm ε)) σ v → ∀ a c : Fin n, ε a = true → ε c = false → dRepC (Formalism.REAL.Jm ε) σ (Matrix.single c a 1) v = 0 := by
+theorem lowK_killed
+    : ∀ (n p : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ) (H : Type) [NormedAddCommGroup H]
+        [InnerProductSpace ℂ H] (σ : Mt n → (H →L[ℂ] H)),
+      Formalism.QuantumDeterminants.IsHCParam lam → (∀ a, ε a = decide ((a : ℕ) < p)) → IsDS ε lam σ
+        → ∀ v ∈ lowKSub ε lam σ,
+          SmoothVec (lieH (Formalism.REAL.Jm ε)) σ v
+            → ∀ a c : Fin n,
+              ε a = true → ε c = false
+                → dRepC (Formalism.REAL.Jm ε) σ (Matrix.single c a 1) v = 0 := by
   intro n p ε lam H _ _ σ hlam hε hDS v hv hsm a c ha hc
   obtain ⟨hcomp, -, hσ, -, -, ⟨S₀, hS₀⟩, hmin⟩ := hDS
   have hH : (Formalism.REAL.Jm ε).IsHermitian := Jm_conjTranspose ε
-  have hdet : (Formalism.REAL.Jm ε).det ≠ 0 := (Matrix.isUnit_det_of_left_inverse (Jm_mul_self ε)).ne_zero
+  have hdet : (Formalism.REAL.Jm ε).det ≠ 0 :=
+    (Matrix.isUnit_det_of_left_inverse (Jm_mul_self ε)).ne_zero
   have hU : IsURepOn (Formalism.QuantumDeterminants.UH (Formalism.REAL.Jm ε)) σ := hσ
-  obtain ⟨hspan, hsmv⟩ := GlobalTheory.T.smoothVectors_subspace_stable_sobolevForm_deriv n _ H σ hH hdet hU
+  obtain ⟨hspan, hsmv⟩ :=
+    GlobalTheory.T.smoothVectors_subspace_stable_sobolevForm_deriv n _ H σ hH hdet hU
   have hlie := GlobalTheory.T.complexifiedDerivedAction_isLieAction n _ H σ hH hdet hU
   obtain ⟨W, hWf, hWK, hWle, hvW⟩ := exists_fin_stable lam hv
   set J := Formalism.REAL.Jm ε with hJ
@@ -365,17 +382,20 @@ theorem lowK_killed : ∀ (n p : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ
     intro Z
     have := ((hlie 0 0 hs0 hs0).1 1 Z Z).2.1
     simpa using this
-  have hsm1 : ∀ w, SmoothVec (lieH J) σ w → ∀ (t : ℂ) Z, dRepC J σ (t • Z) w = t • dRepC J σ Z w := by
+  have hsm1
+      : ∀ w, SmoothVec (lieH J) σ w → ∀ (t : ℂ) Z, dRepC J σ (t • Z) w = t • dRepC J σ Z w := by
     intro w hw t Z
     have := ((hlie w w hw hw).1 t Z 0).1
     rwa [add_zero, hz1 w hw, add_zero] at this
-  let B : Mt n →ₗ[ℂ] V →ₗ[ℂ] H := LinearMap.mk₂ ℂ (fun Z w => dRepC J σ Z w)
-    (fun Z Z' w => by simpa using ((hlie w w (hVs _ w.2) (hVs _ w.2)).1 1 Z Z').1)
-    (fun t Z w => hsm1 w (hVs _ w.2) t Z)
-    (fun Z w w' => by simpa using ((hlie w w' (hVs _ w.2) (hVs _ w'.2)).1 1 Z Z).2.1)
-    (fun t Z w => by
-      have := ((hlie w 0 (hVs _ w.2) hs0).1 t Z Z).2.1
-      rwa [add_zero, hz2, add_zero] at this)
+  let B : Mt n →ₗ[ℂ] V →ₗ[ℂ] H :=
+    LinearMap.mk₂ ℂ
+      (fun Z w => dRepC J σ Z w)
+      (fun Z Z' w => by simpa using ((hlie w w (hVs _ w.2) (hVs _ w.2)).1 1 Z Z').1)
+      (fun t Z w => hsm1 w (hVs _ w.2) t Z)
+      (fun Z w w' => by simpa using ((hlie w w' (hVs _ w.2) (hVs _ w'.2)).1 1 Z Z).2.1)
+      (fun t Z w => by
+        have := ((hlie w 0 (hVs _ w.2) hs0).1 t Z Z).2.1
+        rwa [add_zero, hz2, add_zero] at this)
   let G : Set H := {x | ∃ Z : Mt n, (Z * J = Z ∧ J * Z = -Z) ∧ ∃ w ∈ V, x = dRepC J σ Z w}
   let S : Submodule ℂ H := Submodule.span ℂ G
   have hSf : FiniteDimensional ℂ S := by
@@ -388,9 +408,15 @@ theorem lowK_killed : ∀ (n p : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ
     have : S ≤ S.comap (σ g : H →ₗ[ℂ] H) := by
       refine Submodule.span_le.2 ?_
       rintro x ⟨Z, ⟨hZ1, hZ2⟩, w, hw, rfl⟩
-      refine Submodule.subset_span ⟨g * Z * g⁻¹, ⟨?_, ?_⟩, σ g w, hVK g hg w hw,
-        (hlie w w (hVs w hw) (hVs w hw)).2.2.1 g (kset_sub hg) Z⟩
-      · rw [kset_inv hg, Matrix.mul_assoc, (kset_star hg).2, ← Matrix.mul_assoc, Matrix.mul_assoc g Z, hZ1]
+      refine Submodule.subset_span ⟨
+        g * Z * g⁻¹,
+        ⟨?_, ?_⟩,
+        σ g w,
+        hVK g hg w hw,
+        (hlie w w (hVs w hw) (hVs w hw)).2.2.1 g (kset_sub hg) Z
+      ⟩
+      · rw [kset_inv hg, Matrix.mul_assoc, (kset_star hg).2, ← Matrix.mul_assoc,
+          Matrix.mul_assoc g Z, hZ1]
       · rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, ← hg.2, Matrix.mul_assoc g _ Z, hZ2]
         simp
     exact fun x hx => this hx
@@ -402,8 +428,9 @@ theorem lowK_killed : ∀ (n p : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ
   by_contra hne
   have hS0 : S ≠ ⊥ := by
     intro h0
-    refine hne ((Submodule.mem_bot ℂ).1 (h0 ▸ Submodule.subset_span
-      ⟨Matrix.single c a 1, ⟨?_, ?_⟩, v, ⟨hvW, Submodule.subset_span hsm⟩, rfl⟩))
+    refine hne ((Submodule.mem_bot ℂ).1
+      (h0 ▸ Submodule.subset_span
+        ⟨Matrix.single c a 1, ⟨?_, ?_⟩, v, ⟨hvW, Submodule.subset_span hsm⟩, rfl⟩))
     · ext i j
       simp only [hJ, Formalism.REAL.Jm, Matrix.mul_diagonal, Matrix.single_apply]
       by_cases h : c = i ∧ a = j
@@ -416,12 +443,14 @@ theorem lowK_killed : ∀ (n p : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ
       · obtain ⟨rfl, rfl⟩ := h
         simp [hc]
       · simp [h]
-  obtain ⟨μ, S', hS'le, hS'⟩ := GlobalTheory.T.exists_compactType_in_compactStable_submodule n ε H σ hσ S hSf hSK hS0
+  obtain ⟨μ, S', hS'le, hS'⟩ :=
+    GlobalTheory.T.exists_compactType_in_compactStable_submodule n ε H σ hσ S hSf hSK hS0
   obtain ⟨u, huS', hu0, hu⟩ := hS'.2.2.2.1
   have huS := hS'le huS'
   have hus := hSs u huS
-  have hex : ∃ a' c' : Fin n, ε a' = true ∧ ε c' = false ∧ ∃ w ∈ V,
-      ⟪dRepC J σ (Matrix.single c' a' 1) w, u⟫_ℂ ≠ 0 := by
+  have hex
+      : ∃ a' c' : Fin n,
+        ε a' = true ∧ ε c' = false ∧ ∃ w ∈ V, ⟪dRepC J σ (Matrix.single c' a' 1) w, u⟫_ℂ ≠ 0 := by
     by_contra hn
     push Not at hn
     have h : S ≤ (ℂ ∙ u)ᗮ := by
@@ -440,7 +469,8 @@ theorem lowK_killed : ∀ (n p : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ
       by_cases hij : Z i j = 0
       · rw [hij, zero_smul]
         exact Submodule.zero_mem _
-      · refine Submodule.smul_mem _ _ (Submodule.mem_orthogonal_singleton_iff_inner_left.2 (hn j i ?_ ?_ w hw))
+      · refine Submodule.smul_mem _ _
+          (Submodule.mem_orthogonal_singleton_iff_inner_left.2 (hn j i ?_ ?_ w hw))
         · have := congrFun (congrFun hZ1 i) j
           simp only [hJ, Formalism.REAL.Jm, Matrix.mul_diagonal] at this
           by_contra hj
@@ -457,16 +487,20 @@ theorem lowK_killed : ∀ (n p : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ
   have hy : IsWtOn (Kset ε) σ (μ + root a' c') (dRepC J σ (Matrix.single a' c' 1) u) := by
     intro θ hθ
     have h1 := (hlie u u hus hus).2.2.1 _ (kset_sub hθ) (Matrix.single a' c' 1)
-    have h2 := ((hlie u 0 hus hs0).1 (Complex.exp (((∑ a, μ a * θ a : ℝ) : ℂ) * Complex.I))
-      (Matrix.single a' c' 1) 0).2.1
+    have h2 :=
+      ((hlie u 0 hus hs0).1 (Complex.exp (((∑ a, μ a * θ a : ℝ) : ℂ) * Complex.I))
+        (Matrix.single a' c' 1) 0).2.1
     rw [add_zero, hz2, add_zero] at h2
-    rw [h1, tor_conj, hsm1 _ ((hsmv u hus).1 _ (kset_sub hθ)), hu θ hθ, h2, smul_smul, ← Complex.exp_add]
+    rw [h1, tor_conj, hsm1 _ ((hsmv u hus).1 _ (kset_sub hθ)), hu θ hθ, h2, smul_smul,
+      ← Complex.exp_add]
     congr 2
     simp only [Pi.add_apply, add_mul, Finset.sum_add_distrib, sum_root_mul]
     push_cast
     ring
   have hd := cdom_of_inner_ne hσ lam hy (hWle hw.1) hwu
-  exact absurd (hmin μ S' hS') (not_le.2 (vNormSq_lt p ε hε _ μ (dominant_of_isKTypeOf hσ hS₀)
-    (dominant_of_isKTypeOf hσ hS') (GlobalTheory.T.voganNormSq_holomorphicLowestKType_sub_root_lt n p ε lam hlam hε) a' c' ha' hc' hd))
+  exact absurd (hmin μ S' hS')
+    (not_le.2 (vNormSq_lt p ε hε _ μ (dominant_of_isKTypeOf hσ hS₀) (dominant_of_isKTypeOf hσ hS')
+      (GlobalTheory.T.voganNormSq_holomorphicLowestKType_sub_root_lt n p ε lam hlam hε) a' c' ha'
+      hc' hd))
 
 end GlobalTheory.HolDict.Lowering

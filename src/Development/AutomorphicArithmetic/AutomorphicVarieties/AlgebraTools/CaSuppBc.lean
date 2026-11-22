@@ -6,10 +6,11 @@ public import Mathlib
 
 open IsLocalRing
 
-theorem UpperTheory.V.AlgebraTools.mem_support_baseChange :
-    ∀ (R B : Type) [CommRing R] [CommRing B] [Algebra R B] (M : Type) [AddCommGroup M] [Module R M] [Module.Finite R M]
-      (Q : PrimeSpectrum B), Q ∈ Module.support B (TensorProduct R B M) ↔
-        PrimeSpectrum.comap (algebraMap R B) Q ∈ Module.support R M := by
+theorem UpperTheory.V.AlgebraTools.mem_support_baseChange
+    : ∀ (R B : Type) [CommRing R] [CommRing B] [Algebra R B] (M : Type) [AddCommGroup M]
+        [Module R M] [Module.Finite R M] (Q : PrimeSpectrum B),
+      Q ∈ Module.support B (TensorProduct R B M)
+        ↔ PrimeSpectrum.comap (algebraMap R B) Q ∈ Module.support R M := by
   intro R B _ _ _ M _ _ _ Q
   let p := PrimeSpectrum.comap (algebraMap R B) Q
   let φ := Ideal.ResidueField.mapₐ p.asIdeal Q.asIdeal (Algebra.ofId R B) rfl

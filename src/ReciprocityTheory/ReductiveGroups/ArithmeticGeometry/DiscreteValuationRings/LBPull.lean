@@ -60,8 +60,13 @@ lemma pullback_generator_isGenerator {X Y Z : Scheme.{0}} (L : LB X) {K : Type} 
   erw [res_res', res_res']
   exact h1
 
-theorem pullGen_isGen {X Y Z : Scheme.{0}} (L : LB X) {K : Type} [Fintype K] (φ : K → (Y ⟶ X)) (ε : K → ℤ)
-    (t : LB.Gen (LB.LinComb L φ ε)) (ht : t.IsGen) (h : Z ⟶ Y) : (LB.pullGen L φ ε t h).IsGen := fun i j => pullback_generator_isGenerator L φ ε t ht h i j
+theorem pullGen_isGen
+    {X Y Z : Scheme.{0}} (L : LB X)
+    {K : Type} [Fintype K]
+    (φ : K → (Y ⟶ X)) (ε : K → ℤ) (t : LB.Gen (LB.LinComb L φ ε)) (ht : t.IsGen)
+    (h : Z ⟶ Y)
+    : (LB.pullGen L φ ε t h).IsGen := fun i j =>
+  pullback_generator_isGenerator L φ ε t ht h i j
 
 lemma inverse_generator_isGenerator {X Y : Scheme.{0}} (L : LB X) {K : Type} [Fintype K] (φ : K → (Y ⟶ X)) (ε : K → ℤ)
     (t : LB.Gen (LB.LinComb L φ ε)) (ht : t.IsGen) (i j : K → L.ι) :
@@ -78,8 +83,12 @@ lemma inverse_generator_isGenerator {X Y : Scheme.{0}} (L : LB X) {K : Type} [Fi
   rw [hg]
   exact h2
 
-theorem invGen_isGen {X Y : Scheme.{0}} (L : LB X) {K : Type} [Fintype K] (φ : K → (Y ⟶ X)) (ε : K → ℤ)
-    (t : LB.Gen (LB.LinComb L φ ε)) (ht : t.IsGen) : (LB.invGen L φ ε t).IsGen := fun i j => inverse_generator_isGenerator L φ ε t ht i j
+theorem invGen_isGen
+    {X Y : Scheme.{0}} (L : LB X)
+    {K : Type} [Fintype K]
+    (φ : K → (Y ⟶ X)) (ε : K → ℤ) (t : LB.Gen (LB.LinComb L φ ε)) (ht : t.IsGen)
+    : (LB.invGen L φ ε t).IsGen := fun i j =>
+  inverse_generator_isGenerator L φ ε t ht i j
 
 set_option maxHeartbeats 1000000 in
 lemma product_generator_isGenerator {X Y : Scheme.{0}} (L : LB X) {K K' : Type} [Fintype K] [Fintype K']
@@ -145,9 +154,13 @@ lemma product_generator_isGenerator {X Y : Scheme.{0}} (L : LB X) {K K' : Type} 
   erw [h1, h2]
   try rfl
 
-theorem mulGen_isGen {X Y : Scheme.{0}} (L : LB X) {K K' : Type} [Fintype K] [Fintype K']
+theorem mulGen_isGen
+    {X Y : Scheme.{0}} (L : LB X)
+    {K K' : Type} [Fintype K] [Fintype K']
     (φ : K → (Y ⟶ X)) (ε : K → ℤ) (φ' : K' → (Y ⟶ X)) (ε' : K' → ℤ)
-    (t : LB.Gen (LB.LinComb L φ ε)) (t' : LB.Gen (LB.LinComb L φ' ε')) (ht : t.IsGen) (ht' : t'.IsGen) :
-    (LB.mulGen L φ ε φ' ε' t t').IsGen := fun i j => product_generator_isGenerator L φ ε φ' ε' t t' ht ht' i j
+    (t : LB.Gen (LB.LinComb L φ ε)) (t' : LB.Gen (LB.LinComb L φ' ε'))
+    (ht : t.IsGen) (ht' : t'.IsGen)
+    : (LB.mulGen L φ ε φ' ε' t t').IsGen := fun i j =>
+  product_generator_isGenerator L φ ε φ' ε' t t' ht ht' i j
 
 end ReciprocityTheory.ChartRestriction.G.DVR

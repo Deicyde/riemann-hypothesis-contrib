@@ -10,19 +10,24 @@ namespace LateralTheory.CohomologicalPurity.GenRingPf
 
 open LateralTheory.CohomologicalPurity
 
-theorem inj_sq {A B : Type} [CommRing A] [CommRing B] (φ : A →+* B) (I : Ideal A) (h : Nbhd φ I) (y : A)
-    (hy : φ y ∈ (I ^ 2).map φ) : y ∈ I ^ 2 := by
+theorem inj_sq
+    {A B : Type} [CommRing A] [CommRing B]
+    (φ : A →+* B) (I : Ideal A) (h : Nbhd φ I)
+    (y : A) (hy : φ y ∈ (I ^ 2).map φ)
+    : y ∈ I ^ 2 := by
   let _ := φ.toAlgebra
   have _ : Algebra.Etale A B := h.1
   let e := RingEquiv.ofBijective _ h.2
-  let f : B →ₐ[A] A ⧸ I :=
-    { toRingHom := e.symm.toRingHom.comp (Ideal.Quotient.mk (I.map φ))
-      commutes' := fun a => by
-        change e.symm (Ideal.Quotient.mk _ (φ a)) = Ideal.Quotient.mk I a
-        rw [e.symm_apply_eq]
-        rfl }
+  let f : B →ₐ[A] A ⧸ I := {
+    toRingHom := e.symm.toRingHom.comp (Ideal.Quotient.mk (I.map φ))
+    commutes' := fun a => by
+      change e.symm (Ideal.Quotient.mk _ (φ a)) = Ideal.Quotient.mk I a
+      rw [e.symm_apply_eq]
+      rfl
+  }
   let g : A ⧸ I ^ 2 →ₐ[A] A ⧸ I := Ideal.Quotient.factorₐ A (Ideal.pow_le_self two_ne_zero)
-  have hg : Function.Surjective g := Ideal.Quotient.factor_surjective (Ideal.pow_le_self two_ne_zero)
+  have hg : Function.Surjective g :=
+    Ideal.Quotient.factor_surjective (Ideal.pow_le_self two_ne_zero)
   have hn : IsNilpotent (RingHom.ker (g : A ⧸ I ^ 2 →+* A ⧸ I)) := by
     refine ⟨2, ?_⟩
     rw [Ideal.zero_eq_bot, ← le_bot_iff]
@@ -43,10 +48,11 @@ theorem inj_sq {A B : Type} [CommRing A] [CommRing B] (φ : A →+* B) (I : Idea
   rw [hσ] at h0
   exact Ideal.Quotient.eq_zero_iff_mem.mp h0
 
-theorem approx {A B : Type} [CommRing A] [CommRing B] (φ : A →+* B) (I : Ideal A)
-    (hs : ∀ b : B, ∃ c : A, b - φ c ∈ I.map φ) (J : Ideal A) (T : Set B)
-    (hT : ∀ t ∈ T, t ∈ I.map φ ∧ ∃ c ∈ J, t - φ c ∈ I.map φ ^ 2) :
-    ∀ z ∈ Ideal.span T, ∃ c ∈ J, z - φ c ∈ I.map φ ^ 2 := by
+theorem approx
+    {A B : Type} [CommRing A] [CommRing B]
+    (φ : A →+* B) (I : Ideal A) (hs : ∀ b : B, ∃ c : A, b - φ c ∈ I.map φ)
+    (J : Ideal A) (T : Set B) (hT : ∀ t ∈ T, t ∈ I.map φ ∧ ∃ c ∈ J, t - φ c ∈ I.map φ ^ 2)
+    : ∀ z ∈ Ideal.span T, ∃ c ∈ J, z - φ c ∈ I.map φ ^ 2 := by
   have hle : Ideal.span T ≤ I.map φ := Ideal.span_le.mpr fun t ht => (hT t ht).1
   intro z hz
   induction hz using Submodule.span_induction with
@@ -57,7 +63,8 @@ theorem approx {A B : Type} [CommRing A] [CommRing B] (φ : A →+* B) (I : Idea
     obtain ⟨c', hc', hyc⟩ := ihy
     refine ⟨c + c', J.add_mem hc hc', ?_⟩
     have : x + y - φ (c + c') = (x - φ c) + (y - φ c') := by rw [map_add (f := _)]; ring
-    rw [this]; exact Ideal.add_mem _ hxc hyc
+    rw [this]
+    exact Ideal.add_mem _ hxc hyc
   | smul b x hx ih =>
     obtain ⟨c, hc, hxc⟩ := ih
     obtain ⟨c', hbc⟩ := hs b
@@ -72,7 +79,8 @@ theorem approx {A B : Type} [CommRing A] [CommRing B] (φ : A →+* B) (I : Idea
 end LateralTheory.CohomologicalPurity.GenRingPf
 
 open LateralTheory.CohomologicalPurity.GenRingPf in
-theorem LateralTheory.CohomologicalPurity.Cl.LeafGenRing_of : LateralTheory.CohomologicalPurity.Cl.LeafGenRing := by
+theorem LateralTheory.CohomologicalPurity.Cl.LeafGenRing_of
+    : LateralTheory.CohomologicalPurity.Cl.LeafGenRing := by
   intro d A _ I hI hC
   obtain ⟨B, _, φ, ψ, hN, _, hspan, _⟩ := hC
   have hs : ∀ b : B, ∃ c : A, b - φ c ∈ I.map φ := by
@@ -92,15 +100,20 @@ theorem LateralTheory.CohomologicalPurity.Cl.LeafGenRing_of : LateralTheory.Coho
   choose a ha hax using hX
   have hle : I ≤ Ideal.span (Set.range a) ⊔ I • I := by
     intro y hy
-    have hy' : φ y ∈ Ideal.span (Set.range fun j => ψ (MvPolynomial.X j)) := hspan ▸ Ideal.mem_map_of_mem _ hy
-    obtain ⟨c, hc, hyc⟩ := approx φ I hs (Ideal.span (Set.range a)) _ (fun t ht => by
-      obtain ⟨j, rfl⟩ := ht
-      exact ⟨hspan ▸ Ideal.subset_span ⟨j, rfl⟩, a j, Ideal.subset_span ⟨j, rfl⟩, hax j⟩) _ hy'
+    have hy' : φ y ∈ Ideal.span (Set.range fun j => ψ (MvPolynomial.X j)) :=
+      hspan ▸ Ideal.mem_map_of_mem _ hy
+    obtain ⟨c, hc, hyc⟩ :=
+      approx φ I hs (Ideal.span (Set.range a)) _
+        (fun t ht => by
+          obtain ⟨j, rfl⟩ := ht
+          exact ⟨hspan ▸ Ideal.subset_span ⟨j, rfl⟩, a j, Ideal.subset_span ⟨j, rfl⟩, hax j⟩)
+        _ hy'
     have h2 : y - c ∈ I ^ 2 := inj_sq φ I hN _ (by rw [map_sub, Ideal.map_pow]; exact hyc)
     have : y = c + (y - c) := by ring
     rw [this]
     refine Submodule.add_mem_sup hc ?_
-    rw [Ideal.smul_eq_mul, ← pow_two]; exact h2
+    rw [Ideal.smul_eq_mul, ← pow_two]
+    exact h2
   obtain ⟨r, hr, hrle⟩ := Submodule.exists_sub_one_mem_and_smul_le_of_fg_of_le_sup hI le_rfl hle
   refine ⟨a, r, hr, ha, fun y hy => ?_⟩
   have := hrle (Submodule.smul_mem_pointwise_smul y r I hy)

@@ -9,9 +9,11 @@ public import Mathlib.LinearAlgebra.Matrix.Permutation
 
 open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.ZK UpperTheory.V.ZK.Ct
 
-private theorem permDet_weight {X : Type} [Fintype X] [DecidableEq X] (π : Equiv.Perm X) (n : ℕ)
-    (h : ∀ (k : ℕ) (x : X), (π ^ k) x = x ↔ n ∣ k) (ζ : ℂ) (hζ : ζ ^ n = 1) (hζ0 : ζ ≠ 0) :
-    ∃ c : X → ℂ, (∀ x, c x ≠ 0) ∧ ∀ x, c (π x) = ζ * c x := by
+private theorem permDet_weight
+    {X : Type} [Fintype X] [DecidableEq X]
+    (π : Equiv.Perm X) (n : ℕ) (h : ∀ (k : ℕ) (x : X), (π ^ k) x = x ↔ n ∣ k)
+    (ζ : ℂ) (hζ : ζ ^ n = 1) (hζ0 : ζ ≠ 0)
+    : ∃ c : X → ℂ, (∀ x, c x ≠ 0) ∧ ∀ x, c (π x) = ζ * c x := by
   classical
   let S := Equiv.Perm.SameCycle.setoid π
   have hk : ∀ x : X, ∃ k : ℕ, (π ^ k) (Quotient.out (Quotient.mk S x)) = x := fun x => by
@@ -40,14 +42,17 @@ private theorem permDet_weight {X : Type} [Fintype X] [DecidableEq X] (π : Equi
   rw [← pow_succ']
   exact hsame _ _ _ (e1.trans e2.symm)
 
-private theorem permDet_twist {X : Type} [Fintype X] [DecidableEq X] (π : Equiv.Perm X)
-    (ζ a : ℂ) (c : X → ℂ) (hc0 : ∀ x, c x ≠ 0) (hc : ∀ x, c (π x) = ζ * c x) :
-    (a • (1 : Matrix X X ℂ) - ζ • π.permMatrix ℂ).det = (a • (1 : Matrix X X ℂ) - π.permMatrix ℂ).det := by
-  have key : Matrix.diagonal c * (a • (1 : Matrix X X ℂ) - ζ • π.permMatrix ℂ) =
-      (a • (1 : Matrix X X ℂ) - π.permMatrix ℂ) * Matrix.diagonal c := by
+private theorem permDet_twist
+    {X : Type} [Fintype X] [DecidableEq X]
+    (π : Equiv.Perm X) (ζ a : ℂ) (c : X → ℂ) (hc0 : ∀ x, c x ≠ 0) (hc : ∀ x, c (π x) = ζ * c x)
+    : (a • (1 : Matrix X X ℂ) - ζ • π.permMatrix ℂ).det
+      = (a • (1 : Matrix X X ℂ) - π.permMatrix ℂ).det := by
+  have key
+      : Matrix.diagonal c * (a • (1 : Matrix X X ℂ) - ζ • π.permMatrix ℂ)
+        = (a • (1 : Matrix X X ℂ) - π.permMatrix ℂ) * Matrix.diagonal c := by
     ext i j
-    simp [Matrix.mul_sub, Matrix.sub_mul, Matrix.diagonal_mul, Matrix.mul_diagonal, Equiv.Perm.permMatrix,
-      PEquiv.toMatrix_apply, Matrix.one_apply]
+    simp [Matrix.mul_sub, Matrix.sub_mul, Matrix.diagonal_mul, Matrix.mul_diagonal,
+      Equiv.Perm.permMatrix, PEquiv.toMatrix_apply, Matrix.one_apply]
     by_cases h2 : π i = j
     · subst h2
       rw [hc]
@@ -68,12 +73,15 @@ private theorem permDet_twist {X : Type} [Fintype X] [DecidableEq X] (π : Equiv
     rw [Matrix.det_diagonal]
     exact Finset.prod_ne_zero_iff.mpr fun x _ => hc0 x
   have := congrArg Matrix.det key
-  rw [Matrix.det_mul, Matrix.det_mul, mul_comm ((a • (1 : Matrix X X ℂ) - π.permMatrix ℂ).det)] at this
+  rw [Matrix.det_mul, Matrix.det_mul, mul_comm ((a • (1 : Matrix X X ℂ) - π.permMatrix ℂ).det)]
+    at this
   exact mul_left_cancel₀ hd this
 
-private theorem permDet_pow {X : Type} [Fintype X] [DecidableEq X] (π : Equiv.Perm X) (n : ℕ)
-    (hn : 0 < n) (h : ∀ (k : ℕ) (x : X), (π ^ k) x = x ↔ n ∣ k) (a : ℂ) :
-    (a • (1 : Matrix X X ℂ) - π.permMatrix ℂ).det ^ n = (a ^ n - 1) ^ Fintype.card X := by
+private theorem permDet_pow
+    {X : Type} [Fintype X] [DecidableEq X]
+    (π : Equiv.Perm X) (n : ℕ) (hn : 0 < n) (h : ∀ (k : ℕ) (x : X), (π ^ k) x = x ↔ n ∣ k)
+    (a : ℂ)
+    : (a • (1 : Matrix X X ℂ) - π.permMatrix ℂ).det ^ n = (a ^ n - 1) ^ Fintype.card X := by
   classical
   have hpow : ∀ k : ℕ, (π.permMatrix ℂ) ^ k = (π ^ k).permMatrix ℂ := by
     intro k
@@ -96,13 +104,15 @@ private theorem permDet_pow {X : Type} [Fintype X] [DecidableEq X] (π : Equiv.P
     · have e := congrArg (Polynomial.eval (a / t)) (Polynomial.X_pow_sub_one_eq_prod hn hprim)
       rw [← hS] at e
       simp only [Polynomial.eval_sub, Polynomial.eval_pow, Polynomial.eval_X, Polynomial.eval_one,
-        Polynomial.eval_prod, Polynomial.eval_C] at e
+          Polynomial.eval_prod, Polynomial.eval_C]
+        at e
       have e2 : ∏ ζ ∈ S, (a - ζ * t) = ∏ ζ ∈ S, (t * (a / t - ζ)) :=
         Finset.prod_congr rfl fun ζ _ => by field_simp
       rw [e2, Finset.prod_mul_distrib, Finset.prod_const, hcard, ← e, div_pow]
       field_simp
-  have hpoly : ∏ ζ ∈ S, (Polynomial.C a - Polynomial.C ζ * Polynomial.X) =
-      Polynomial.C (a ^ n) - Polynomial.X ^ n := by
+  have hpoly
+      : ∏ ζ ∈ S, (Polynomial.C a - Polynomial.C ζ * Polynomial.X)
+        = Polynomial.C (a ^ n) - Polynomial.X ^ n := by
     apply Polynomial.funext
     intro t
     simp only [Polynomial.eval_prod, Polynomial.eval_sub, Polynomial.eval_mul, Polynomial.eval_C,
@@ -113,8 +123,10 @@ private theorem permDet_pow {X : Type} [Fintype X] [DecidableEq X] (π : Equiv.P
   have hf : ∀ q, f q = (Polynomial.aeval (π.permMatrix ℂ) q).det := fun q => rfl
   have hdet := congrArg f hpoly
   rw [map_prod, hf] at hdet
-  have hfac : ∀ ζ ∈ S, f (Polynomial.C a - Polynomial.C ζ * Polynomial.X) =
-      (a • (1 : Matrix X X ℂ) - π.permMatrix ℂ).det := by
+  have hfac
+      : ∀ ζ ∈ S,
+        f (Polynomial.C a - Polynomial.C ζ * Polynomial.X)
+          = (a • (1 : Matrix X X ℂ) - π.permMatrix ℂ).det := by
     intro ζ hζ
     have hz0 : ζ ≠ 0 := by
       rintro rfl
@@ -126,29 +138,36 @@ private theorem permDet_pow {X : Type} [Fintype X] [DecidableEq X] (π : Equiv.P
       Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one, smul_mul_assoc, one_mul]
     exact permDet_twist π ζ a c hc0 hc
   rw [Finset.prod_congr rfl hfac, Finset.prod_const, hcard] at hdet
-  rw [hdet, map_sub, Polynomial.aeval_C, Polynomial.aeval_X_pow, hPn, Algebra.algebraMap_eq_smul_one]
+  rw [hdet, map_sub, Polynomial.aeval_C, Polynomial.aeval_X_pow, hPn,
+    Algebra.algebraMap_eq_smul_one]
   have e3 : (a ^ n • (1 : Matrix X X ℂ) - 1) = (a ^ n - 1) • (1 : Matrix X X ℂ) := by
     rw [sub_smul, one_smul]
   rw [e3, Matrix.det_smul, Matrix.det_one, mul_one]
 
-theorem UpperTheory.V.ZK.Ct.permDet :
-    ∀ (X : Type) [Fintype X] [DecidableEq X] (π : Equiv.Perm X) (n r : ℕ) (a : ℝ), 0 < n → 1 ≤ a → Fintype.card X = n * r → (∀ (k : ℕ) (x : X), (π ^ k) x = x ↔ n ∣ k) → |LinearMap.det (LinearMap.funLeft ℝ ℝ π - a • (LinearMap.id : (X → ℝ) →ₗ[ℝ] (X → ℝ)))| = (a ^ n - 1) ^ r := by
+theorem UpperTheory.V.ZK.Ct.permDet
+    : ∀ (X : Type) [Fintype X] [DecidableEq X] (π : Equiv.Perm X) (n r : ℕ) (a : ℝ),
+      0 < n → 1 ≤ a → Fintype.card X = n * r → (∀ (k : ℕ) (x : X), (π ^ k) x = x ↔ n ∣ k)
+        → |LinearMap.det (LinearMap.funLeft ℝ ℝ π - a • (LinearMap.id : (X → ℝ) →ₗ[ℝ] (X → ℝ)))|
+          = (a ^ n - 1) ^ r := by
   intro X _ _ π n r a hn ha hcard h
   classical
-  have hlin : LinearMap.funLeft ℝ ℝ π - a • (LinearMap.id : (X → ℝ) →ₗ[ℝ] (X → ℝ)) =
-      Matrix.toLin' (π.permMatrix ℝ - a • (1 : Matrix X X ℝ)) := by
+  have hlin
+      : LinearMap.funLeft ℝ ℝ π - a • (LinearMap.id : (X → ℝ) →ₗ[ℝ] (X → ℝ))
+        = Matrix.toLin' (π.permMatrix ℝ - a • (1 : Matrix X X ℝ)) := by
     apply LinearMap.ext
     intro v
     rw [Matrix.toLin'_apply, Matrix.sub_mulVec, Matrix.permMatrix_mulVec, Matrix.smul_mulVec,
       Matrix.one_mulVec]
     rfl
   rw [hlin, LinearMap.det_toLin']
-  have hneg : π.permMatrix ℝ - a • (1 : Matrix X X ℝ) = -(a • (1 : Matrix X X ℝ) - π.permMatrix ℝ) := by
+  have hneg
+      : π.permMatrix ℝ - a • (1 : Matrix X X ℝ) = -(a • (1 : Matrix X X ℝ) - π.permMatrix ℝ) := by
     rw [neg_sub]
   rw [hneg, Matrix.det_neg, abs_mul, abs_pow, abs_neg, abs_one, one_pow, one_mul]
   have hC := permDet_pow π n hn h (a : ℂ)
-  have hmap : ((a • (1 : Matrix X X ℝ) - π.permMatrix ℝ).det : ℂ) =
-      ((a : ℂ) • (1 : Matrix X X ℂ) - π.permMatrix ℂ).det := by
+  have hmap
+      : ((a • (1 : Matrix X X ℝ) - π.permMatrix ℝ).det : ℂ)
+        = ((a : ℂ) • (1 : Matrix X X ℂ) - π.permMatrix ℂ).det := by
     have e := RingHom.map_det Complex.ofRealHom (a • (1 : Matrix X X ℝ) - π.permMatrix ℝ)
     rw [Complex.ofRealHom_eq_coe] at e
     rw [e]

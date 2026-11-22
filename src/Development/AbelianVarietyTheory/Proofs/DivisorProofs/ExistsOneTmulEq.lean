@@ -8,9 +8,11 @@ namespace GlobalTheory.OneTensorExistence
 
 open TensorProduct
 
-theorem exists_one_tmul_eq (A : Type) [CommRing A] [IsLocalRing A] (Λ : Type) [Ring Λ]
-    [Algebra A Λ] (z : TensorProduct A (IsLocalRing.ResidueField A) Λ) :
-    ∃ y : Λ, (1 : IsLocalRing.ResidueField A) ⊗ₜ[A] y = z := by
+theorem exists_one_tmul_eq
+    (A : Type) [CommRing A] [IsLocalRing A]
+    (Λ : Type) [Ring Λ] [Algebra A Λ]
+    (z : TensorProduct A (IsLocalRing.ResidueField A) Λ)
+    : ∃ y : Λ, (1 : IsLocalRing.ResidueField A) ⊗ₜ[A] y = z := by
   induction z using TensorProduct.induction_on with
   | zero => exact ⟨0, TensorProduct.tmul_zero _ _⟩
   | tmul k l =>

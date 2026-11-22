@@ -92,7 +92,7 @@ theorem qPositive : QPositive := by
     rcases hc with hA | hB
     · exact q_core k u u' ρ l Y hl1 hlk h hA
     · have := q_core k u' u ρ l Y hl1 hlk (interlaces_swap h) hB
-      rwa [prod_congr rfl (fun i _ => mul_comm (Y + 1/2 + u' i) (Y + 1/2 + u i))] at this
+      rwa [prod_congr rfl (fun i _ => mul_comm (Y + 1 / 2 + u' i) (Y + 1 / 2 + u i))] at this
   unfold qpoly
   nlinarith
 
@@ -153,6 +153,11 @@ theorem interlaceRatio : InterlaceRatio := by
 
 end Formalism.FourierDecayAlt.P.Interlace
 
-theorem Formalism.FourierDecayAlt.P.interlacing_sign : Formalism.FourierDecayAlt.I.InterlaceSign := Formalism.FourierDecayAlt.P.Interlace.interlaceSign
-theorem Formalism.FourierDecayAlt.P.q_positive_interlacing : Formalism.FourierDecayAlt.I.QPositive := Formalism.FourierDecayAlt.P.Interlace.qPositive
-theorem Formalism.FourierDecayAlt.P.interlacing_ratio : Formalism.FourierDecayAlt.I.InterlaceRatio := Formalism.FourierDecayAlt.P.Interlace.interlaceRatio
+theorem Formalism.FourierDecayAlt.P.interlacing_sign : Formalism.FourierDecayAlt.I.InterlaceSign :=
+  Formalism.FourierDecayAlt.P.Interlace.interlaceSign
+theorem Formalism.FourierDecayAlt.P.q_positive_interlacing
+    : Formalism.FourierDecayAlt.I.QPositive :=
+  Formalism.FourierDecayAlt.P.Interlace.qPositive
+theorem Formalism.FourierDecayAlt.P.interlacing_ratio
+    : Formalism.FourierDecayAlt.I.InterlaceRatio :=
+  Formalism.FourierDecayAlt.P.Interlace.interlaceRatio

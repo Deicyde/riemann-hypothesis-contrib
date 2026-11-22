@@ -21,17 +21,19 @@ def betL (l : (ι → ℂ) →L[ℝ] ℝ) (x : V ι a m) : V ι a m →ₗ[ℝ] 
   map_smul' c y := by simp [Finset.mul_sum]
 
 def bet (l : (ι → ℂ) →L[ℝ] ℝ) : V ι a m →L[ℝ] V ι a m →L[ℝ] ℝ :=
-  LinearMap.toContinuousLinearMap
-    { toFun := fun x => LinearMap.toContinuousLinearMap (betL l x)
-      map_add' := fun x x' => by ext y; simp [betL, add_mul, Finset.sum_add_distrib]
-      map_smul' := fun c x => by ext y; simp [betL, Finset.mul_sum] }
+  LinearMap.toContinuousLinearMap {
+    toFun := fun x => LinearMap.toContinuousLinearMap (betL l x)
+    map_add' := fun x x' => by ext y; simp [betL, add_mul, Finset.sum_add_distrib]
+    map_smul' := fun c x => by ext y; simp [betL, Finset.mul_sum]
+  }
 
-theorem bet_apply (l : (ι → ℂ) →L[ℝ] ℝ) (x y : V ι a m) : bet l x y = l (∑ t, x t * y t) := by
-  rfl
+theorem bet_apply (l : (ι → ℂ) →L[ℝ] ℝ) (x y : V ι a m) : bet l x y = l (∑ t, x t * y t) := by rfl
 
-theorem bet_nondeg (hm : m + 1 < a) {χ : AddChar (ι → ℂ) ℂ} (hχ : ∀ z, (∀ w, χ (z * w) = 1) → z = 0)
-    {l : (ι → ℂ) →L[ℝ] ℝ} (hl : ∀ z, χ z = Complex.exp ((l z : ℝ) * Complex.I)) :
-    ∀ y : V ι a m, (∀ x, bet l x y = 0) → y = 0 := by
+theorem bet_nondeg
+    (hm : m + 1 < a)
+    {χ : AddChar (ι → ℂ) ℂ} (hχ : ∀ z, (∀ w, χ (z * w) = 1) → z = 0)
+    {l : (ι → ℂ) →L[ℝ] ℝ} (hl : ∀ z, χ z = Complex.exp ((l z : ℝ) * Complex.I))
+    : ∀ y : V ι a m, (∀ x, bet l x y = 0) → y = 0 := by
   intro y hy
   funext t
   show y t = 0
@@ -50,25 +52,28 @@ theorem bet_nondeg (hm : m + 1 < a) {χ : AddChar (ι → ℂ) ℂ} (hχ : ∀ z
   simp
 
 def Lb (_hm : m + 1 < a) : V ι a m →L[ℝ] LieI ι a :=
-  LinearMap.toContinuousLinearMap
-    { toFun := fun y => Matrix.of.symm (posM Subtype.val y)
-      map_add' := fun y y' => by rw [posM_add]; rfl
-      map_smul' := fun c y => by
-        ext i j k
-        simp only [posM, Matrix.sum_apply, Matrix.single_apply, Pi.smul_apply, Matrix.of_symm_apply]
-        rw [Finset.sum_apply, Finset.sum_apply, RingHom.id_apply, Finset.smul_sum]
-        refine Finset.sum_congr rfl fun t _ => ?_
-        split_ifs <;> simp }
+  LinearMap.toContinuousLinearMap {
+    toFun := fun y => Matrix.of.symm (posM Subtype.val y)
+    map_add' := fun y y' => by rw [posM_add]; rfl
+    map_smul' := fun c y => by
+      ext i j k
+      simp only [posM, Matrix.sum_apply, Matrix.single_apply, Pi.smul_apply, Matrix.of_symm_apply]
+      rw [Finset.sum_apply, Finset.sum_apply, RingHom.id_apply, Finset.smul_sum]
+      refine Finset.sum_congr rfl fun t _ => ?_
+      split_ifs <;> simp
+  }
 
-theorem blkU_val (hm : m + 1 < a) (y : V ι a m) : (blkU y : GL (Fin a) (ι → ℂ)).val = 1 + Matrix.of (Lb hm y) := by
+theorem blkU_val (hm : m + 1 < a) (y : V ι a m)
+    : (blkU y : GL (Fin a) (ι → ℂ)).val = 1 + Matrix.of (Lb hm y) := by
   rfl
 
-theorem blkU_inv_val (hm : m + 1 < a) (y : V ι a m) :
-    (blkU y : GL (Fin a) (ι → ℂ))⁻¹.val = 1 - Matrix.of (Lb hm y) := by
+theorem blkU_inv_val (hm : m + 1 < a) (y : V ι a m)
+    : (blkU y : GL (Fin a) (ι → ℂ))⁻¹.val = 1 - Matrix.of (Lb hm y) := by
   rfl
 
-theorem lastE_eq {R : Type} [CommRing R] (hm : m + 1 < a) (y : UnipotentBlockColumnIndex a (m + 1) (m + 1) → R) :
-    lastE (m + 1) y = y (t0 hm) := by
+theorem lastE_eq
+    {R : Type} [CommRing R] (hm : m + 1 < a) (y : UnipotentBlockColumnIndex a (m + 1) (m + 1) → R)
+    : lastE (m + 1) y = y (t0 hm) := by
   unfold lastE
   rw [Finset.sum_eq_single (t0 hm)]
   · simp [t0, ix, mm]

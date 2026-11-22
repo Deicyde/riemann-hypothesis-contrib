@@ -18,42 +18,53 @@ noncomputable section
 
 section ChartLength
 
-theorem chartLength_localizedModule_quotient {A : Type*} [CommRing A] (K W : Ideal A) [W.IsPrime] :
-    Module.length (Localization.AtPrime W) (LocalizedModule W.primeCompl (A ⧸ K)) =
-      Module.length (Localization.AtPrime W)
+theorem chartLength_localizedModule_quotient {A : Type*} [CommRing A] (K W : Ideal A) [W.IsPrime]
+    : Module.length (Localization.AtPrime W) (LocalizedModule W.primeCompl (A ⧸ K))
+      = Module.length (Localization.AtPrime W)
         (Localization.AtPrime W ⧸ K.map (algebraMap A (Localization.AtPrime W))) := by
-  let g := Submodule.toLocalizedQuotient' (Localization.AtPrime W) W.primeCompl
-    (Algebra.linearMap A (Localization.AtPrime W)) K
-  let e := (IsLocalizedModule.linearEquiv W.primeCompl g
-    (LocalizedModule.mkLinearMap W.primeCompl (A ⧸ K))).restrictScalars (Localization.AtPrime W)
-  have hK : Submodule.localized' (Localization.AtPrime W) W.primeCompl
-      (Algebra.linearMap A (Localization.AtPrime W)) K = K.map (algebraMap A (Localization.AtPrime W)) := by
+  let g :=
+    Submodule.toLocalizedQuotient' (Localization.AtPrime W) W.primeCompl
+      (Algebra.linearMap A (Localization.AtPrime W)) K
+  let e :=
+    (IsLocalizedModule.linearEquiv W.primeCompl g
+      (LocalizedModule.mkLinearMap W.primeCompl (A ⧸ K))).restrictScalars (Localization.AtPrime W)
+  have hK
+      : Submodule.localized' (Localization.AtPrime W) W.primeCompl
+          (Algebra.linearMap A (Localization.AtPrime W)) K
+        = K.map (algebraMap A (Localization.AtPrime W)) := by
     rw [Submodule.localized'_eq_span]
     rfl
   rw [← e.length_eq]
   exact (Submodule.quotEquivOfEq _ _ hK).length_eq
 
-theorem chartLength_self_eq_of_ringEquiv {Q Q' : Type*} [CommRing Q] [CommRing Q'] (τ : Q ≃+* Q') :
-    Module.length Q Q = Module.length Q' Q' := by
+theorem chartLength_self_eq_of_ringEquiv {Q Q' : Type*} [CommRing Q] [CommRing Q'] (τ : Q ≃+* Q')
+    : Module.length Q Q = Module.length Q' Q' := by
   let _ := RingHomInvPair.of_ringEquiv τ
   let _ := RingHomInvPair.symm (↑τ : Q →+* Q') (τ.symm : Q' →+* Q)
   apply WithBot.coe_injective
   rw [Module.coe_length, Module.coe_length,
     Order.krullDim_eq_of_orderIso (Submodule.orderIsoMapComap τ.toSemilinearEquiv)]
 
-theorem chartLength_quotient_self {A : Type*} [CommRing A] (I : Ideal A) :
-    Module.length A (A ⧸ I) = Module.length (A ⧸ I) (A ⧸ I) :=
+theorem chartLength_quotient_self {A : Type*} [CommRing A] (I : Ideal A)
+    : Module.length A (A ⧸ I) = Module.length (A ⧸ I) (A ⧸ I) :=
   Module.length_eq_of_surjective Ideal.Quotient.mk_surjective
 
 variable {K : Type*} {ι : K → Type} {J : Type} {R : Type*} [CommRing R]
 
-theorem exists_aeval_chartSubst_eq_C_pow_mul (a : J → MRing ι R) (j₀ : J) (h : Polynomial (MRing ι R)) :
-    ∃ (d : ℕ) (H : MRing (extIdx ι J) R),
+theorem exists_aeval_chartSubst_eq_C_pow_mul
+    (a : J → MRing ι R) (j₀ : J) (h : Polynomial (MRing ι R))
+    : ∃ (d : ℕ) (H : MRing (extIdx ι J) R),
       aeval (chartSubst a) H = Polynomial.C (a j₀ ^ d) * h := by
-  refine ⟨h.natDegree, ∑ k ∈ Finset.range (h.natDegree + 1),
-    liftForm (h.coeff k * a j₀ ^ (h.natDegree - k)) * newVar j₀ ^ k, ?_⟩
-  have hs : Polynomial.C (a j₀ ^ h.natDegree) * h = ∑ k ∈ Finset.range (h.natDegree + 1),
-      Polynomial.C (a j₀ ^ h.natDegree) * (Polynomial.C (h.coeff k) * Polynomial.X ^ k) := by
+  refine ⟨
+    h.natDegree,
+    ∑ k ∈ Finset.range (h.natDegree + 1),
+      liftForm (h.coeff k * a j₀ ^ (h.natDegree - k)) * newVar j₀ ^ k,
+    ?_
+  ⟩
+  have hs
+      : Polynomial.C (a j₀ ^ h.natDegree) * h
+        = ∑ k ∈ Finset.range (h.natDegree + 1),
+          Polynomial.C (a j₀ ^ h.natDegree) * (Polynomial.C (h.coeff k) * Polynomial.X ^ k) := by
     rw [← Finset.mul_sum, ← h.as_sum_range_C_mul_X_pow]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [hs, map_sum]
@@ -92,13 +103,18 @@ theorem BlowUpHorizontalChartLength.full : BlowUpHorizontalChartLength.Statement
       rwa [sub_add_cancel] at this
     exact hj ((hPp.mem_or_mem h1).resolve_left fun h' => hv j (hPW₀ h'))
 
-  obtain ⟨u₀, a, hu₀W, hrelP⟩ : ∃ (u₀ : MRing ι O) (a : J → MRing ι O), u₀ ∉ W₀ ∧
-      ∀ j, u₀ * u j - u j₀ * a j ∈ P := by
+  obtain ⟨u₀, a, hu₀W, hrelP⟩
+      : ∃ (u₀ : MRing ι O) (a : J → MRing ι O), u₀ ∉ W₀ ∧ ∀ j, u₀ * u j - u j₀ * a j ∈ P := by
     have := hW₀p
-    refine ⟨∏ j, v j, fun j => w j * ∏ j' ∈ Finset.univ.erase j, v j',
-      fun h => W₀.primeCompl.prod_mem (fun j _ => hv j) h, fun j => ?_⟩
-    have e : (∏ j, v j) * u j - u j₀ * (w j * ∏ j' ∈ Finset.univ.erase j, v j') =
-        (∏ j' ∈ Finset.univ.erase j, v j') * (v j * u j - w j * u j₀) := by
+    refine ⟨
+      ∏ j, v j,
+      fun j => w j * ∏ j' ∈ Finset.univ.erase j, v j',
+      fun h => W₀.primeCompl.prod_mem (fun j _ => hv j) h,
+      fun j => ?_
+    ⟩
+    have e
+        : (∏ j, v j) * u j - u j₀ * (w j * ∏ j' ∈ Finset.univ.erase j, v j')
+          = (∏ j' ∈ Finset.univ.erase j, v j') * (v j * u j - w j * u j₀) := by
       rw [← Finset.mul_prod_erase Finset.univ v (Finset.mem_univ j)]; ring
     rw [e]
     exact P.mul_mem_left _ (hvw j)
@@ -114,8 +130,10 @@ theorem BlowUpHorizontalChartLength.full : BlowUpHorizontalChartLength.Statement
   have hrelB : ∀ j, newVar j * liftForm (a j₀) - newVar j₀ * liftForm (a j) ∈ blowUpOf P u := by
     intro j
     apply mem_blowUpOf_of_sub
-    have e : u₀ * (u j * a j₀ - u j₀ * a j) =
-        a j₀ * (u₀ * u j - u j₀ * a j) - a j * (u₀ * u j₀ - u j₀ * a j₀) := by ring
+    have e
+        : u₀ * (u j * a j₀ - u j₀ * a j)
+          = a j₀ * (u₀ * u j - u j₀ * a j) - a j * (u₀ * u j₀ - u j₀ * a j₀) := by
+      ring
     have h1 : u₀ * (u j * a j₀ - u j₀ * a j) ∈ P := by
       rw [e]; exact P.sub_mem (P.mul_mem_left _ (hrelP j)) (P.mul_mem_left _ (hrelP j₀))
     exact (hPp.mem_or_mem h1).resolve_left hu₀P
@@ -124,12 +142,17 @@ theorem BlowUpHorizontalChartLength.full : BlowUpHorizontalChartLength.Statement
   set 𝔮 := W₀.map (Polynomial.C : MRing ι O →+* Polynomial (MRing ι O)) with h𝔮
   set Jx := (P ⊔ Ideal.span {x}).map (Polynomial.C : MRing ι O →+* Polynomial (MRing ι O)) with hJx
   set I := blowUpOf P u ⊔ Ideal.span {liftForm x} with hI
-  let φ : MRing (extIdx ι J) O →+* Polynomial (MRing ι O) := (aeval (R := O) (chartSubst a)).toRingHom
+  let φ : MRing (extIdx ι J) O →+* Polynomial (MRing ι O) :=
+    (aeval (R := O) (chartSubst a)).toRingHom
   have hφ : ∀ F, φ F = aeval (chartSubst a) F := fun _ => rfl
   have hxW : liftForm x ∈ W := hmin.1.2 (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _))
   have hW𝔮 : W = 𝔮.comap φ := by
     refine le_antisymm ?_ ?_
-    · refine hmin.2 ⟨Ideal.comap_isPrime _ _, sup_le (fun G hG => ?_) ((Ideal.span_singleton_le_iff_mem _).mpr ?_)⟩
+    · refine hmin.2
+        ⟨
+          Ideal.comap_isPrime _ _,
+          sup_le (fun G hG => ?_) ((Ideal.span_singleton_le_iff_mem _).mpr ?_)
+        ⟩
         (fun G hG => ?_)
       · exact Ideal.map_mono hPW₀ (aeval_chartSubst_mem_of_mem_blowUpOf hPp huj₀ hrelP hG)
       · rw [Ideal.mem_comap, hφ, aeval_chartSubst_liftForm]
@@ -146,8 +169,10 @@ theorem BlowUpHorizontalChartLength.full : BlowUpHorizontalChartLength.Statement
     exact ha₀ (hW₀p.mem_of_pow_mem _ h1)
   have hq : 𝔮.IsPrime := inferInstance
 
-  have hlift : ∀ t, t ∉ 𝔮 → ∃ (e : ℕ) (T : MRing (extIdx ι J) O),
-      φ T = Polynomial.C (a j₀ ^ e) * t ∧ T ∉ W := by
+  have hlift
+      : ∀ t,
+        t ∉ 𝔮
+          → ∃ (e : ℕ) (T : MRing (extIdx ι J) O), φ T = Polynomial.C (a j₀ ^ e) * t ∧ T ∉ W := by
     intro t ht
     obtain ⟨e, T, hT⟩ := exists_aeval_chartSubst_eq_C_pow_mul a j₀ t
     refine ⟨e, T, hT, fun hTW => ?_⟩
@@ -167,23 +192,27 @@ theorem BlowUpHorizontalChartLength.full : BlowUpHorizontalChartLength.Statement
     obtain ⟨y, hy, z, hz, hyz⟩ := hG
     obtain ⟨h, rfl⟩ := Ideal.mem_span_singleton'.mp hz
     obtain ⟨d, H, hH⟩ := exists_aeval_chartSubst_eq_C_pow_mul a j₀ h
-    have h1 : aeval (chartSubst a) (liftForm (a j₀ ^ d) * G - H * liftForm x) ∈
-        Ideal.map (Polynomial.C : MRing ι O →+* Polynomial (MRing ι O)) P := by
-      have e : aeval (chartSubst a) (liftForm (a j₀ ^ d) * G - H * liftForm x) =
-          Polynomial.C (a j₀ ^ d) * y := by
-        rw [map_sub, map_mul, map_mul, aeval_chartSubst_liftForm, aeval_chartSubst_liftForm, hH, ← hφ G,
-          ← hyz]
+    have h1
+        : aeval (chartSubst a) (liftForm (a j₀ ^ d) * G - H * liftForm x)
+          ∈ Ideal.map (Polynomial.C : MRing ι O →+* Polynomial (MRing ι O)) P := by
+      have e
+          : aeval (chartSubst a) (liftForm (a j₀ ^ d) * G - H * liftForm x)
+            = Polynomial.C (a j₀ ^ d) * y := by
+        rw [map_sub, map_mul, map_mul, aeval_chartSubst_liftForm, aeval_chartSubst_liftForm, hH,
+          ← hφ G, ← hyz]
         ring
       rw [e]
       exact Ideal.mul_mem_left _ _ hy
     obtain ⟨m, hm⟩ := exists_pow_mul_mem_of_aeval_chartSubst_mem (P := P) (u := u) j₀ hrelB h1
-    have hPB : Ideal.map (liftForm (J := J) : MRing ι O →ₐ[O] MRing (extIdx ι J) O) P ≤ blowUpOf P u :=
+    have hPB
+        : Ideal.map (liftForm (J := J) : MRing ι O →ₐ[O] MRing (extIdx ι J) O) P ≤ blowUpOf P u :=
       Ideal.map_le_iff_le_comap.mpr fun p hp => liftForm_mem_blowUpOf hp
     have hm' := sup_le le_rfl hPB hm
     refine ⟨m + d, ?_⟩
-    have e : liftForm (a j₀ ^ (m + d)) * G =
-        liftForm (a j₀ ^ m) * (liftForm (a j₀ ^ d) * G - H * liftForm x) +
-          (liftForm (a j₀ ^ m) * H) * liftForm x := by
+    have e
+        : liftForm (a j₀ ^ (m + d)) * G
+          = liftForm (a j₀ ^ m) * (liftForm (a j₀ ^ d) * G - H * liftForm x)
+            + (liftForm (a j₀ ^ m) * H) * liftForm x := by
       rw [pow_add, map_mul]; ring
     rw [e]
     exact Ideal.add_mem _ (Ideal.mem_sup_left hm')
@@ -199,12 +228,14 @@ theorem BlowUpHorizontalChartLength.full : BlowUpHorizontalChartLength.Statement
     refine ⟨IsLocalization.mk' _ (H * liftForm (a j₀ ^ e)) ⟨_, hs⟩, ?_⟩
     rw [Localization.localRingHom_mk', IsLocalization.mk'_eq_iff_eq]
     congr 1
-    change (t : Polynomial (MRing ι O)) * φ (H * liftForm (a j₀ ^ e)) = φ (T * liftForm (a j₀ ^ d)) * h
+    change (t : Polynomial (MRing ι O)) * φ (H * liftForm (a j₀ ^ e))
+      = φ (T * liftForm (a j₀ ^ d)) * h
     rw [map_mul, map_mul, hT]
     simp only [hφ, aeval_chartSubst_liftForm, hH]
     ring
-  have hker : I.map (algebraMap _ (Localization.AtPrime W)) =
-      (Jx.map (algebraMap _ (Localization.AtPrime 𝔮))).comap Φ := by
+  have hker
+      : I.map (algebraMap _ (Localization.AtPrime W))
+        = (Jx.map (algebraMap _ (Localization.AtPrime 𝔮))).comap Φ := by
     ext z
     obtain ⟨⟨F, T⟩, rfl⟩ := IsLocalization.mk'_surjective W.primeCompl z
     rw [Ideal.mem_comap, Localization.localRingHom_mk', IsLocalization.mk'_mem_map_algebraMap_iff,
@@ -216,15 +247,19 @@ theorem BlowUpHorizontalChartLength.full : BlowUpHorizontalChartLength.Statement
       exact hIJ hsF
     · rintro ⟨t, ht, htF⟩
       obtain ⟨e, T', hT', hT'W⟩ := hlift t ht
-      obtain ⟨m, hm⟩ := memI (T' * F) (by
-        rw [map_mul, hT', mul_assoc]
-        exact Ideal.mul_mem_left _ _ htF)
-      exact ⟨liftForm (a j₀ ^ m) * T', W.primeCompl.mul_mem (hlfa m) hT'W, by rw [mul_assoc]; exact hm⟩
+      obtain ⟨m, hm⟩ :=
+        memI (T' * F) (by
+          rw [map_mul, hT', mul_assoc]
+          exact Ideal.mul_mem_left _ _ htF)
+      exact
+        ⟨liftForm (a j₀ ^ m) * T', W.primeCompl.mul_mem (hlfa m) hT'W, by rw [mul_assoc]; exact hm⟩
   have hsurj' : Function.Surjective
       ((Ideal.Quotient.mk (Jx.map (algebraMap _ (Localization.AtPrime 𝔮)))).comp Φ) :=
     Ideal.Quotient.mk_surjective.comp hsurj
-  have hker' : I.map (algebraMap _ (Localization.AtPrime W)) =
-      RingHom.ker ((Ideal.Quotient.mk (Jx.map (algebraMap _ (Localization.AtPrime 𝔮)))).comp Φ) := by
+  have hker'
+      : I.map (algebraMap _ (Localization.AtPrime W))
+        = RingHom.ker ((Ideal.Quotient.mk (Jx.map (algebraMap _ (Localization.AtPrime 𝔮)))).comp
+          Φ) := by
     rw [← RingHom.comap_ker, Ideal.mk_ker]
     exact hker
   let τ := (Ideal.quotEquivOfEq hker').trans (RingHom.quotientKerEquivOfSurjective hsurj')

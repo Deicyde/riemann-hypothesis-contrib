@@ -5,7 +5,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaussSumFil
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd GlobalTheory.HilbertThetaSeries
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd
+  GlobalTheory.HilbertThetaSeries
 open scoped Matrix
 
 namespace GlobalTheory.HilbertThetaSeries.LatBasis
@@ -21,7 +23,8 @@ theorem coe_reAt (v : InfinitePlace F) (x : F) : ((reAt v x : ℝ) : ℂ) = v.em
   rw [← rhom_eq]
   exact InfinitePlace.embedding_of_isReal_apply (IsTotallyReal.isReal v) x
 
-theorem emb_bij : Function.Bijective (fun v : InfinitePlace F => RingHom.equivRatAlgHom F ℂ v.embedding) := by
+theorem emb_bij
+    : Function.Bijective (fun v : InfinitePlace F => RingHom.equivRatAlgHom F ℂ v.embedding) := by
   refine (RingHom.equivRatAlgHom F ℂ).bijective.comp
     ⟨fun v w h => InfinitePlace.embedding_injective F h, fun φ => ?_⟩
   refine ⟨InfinitePlace.mk φ, ?_⟩
@@ -51,17 +54,20 @@ theorem card_places : Fintype.card (InfinitePlace F) = Module.finrank ℚ F := b
   rw [← AlgHom.card ℚ F ℂ]
   exact Fintype.card_congr (Equiv.ofBijective _ emb_bij)
 
-theorem exists_basis [DecidableEq (InfinitePlace F)] : ∃ ω : Module.Basis (InfinitePlace F) ℚ F,
-    (∀ x : F, IsIntegral ℤ x ↔ ∃ n : InfinitePlace F → ℤ, x = ∑ w, (n w : F) * ω w) ∧
-    Algebra.discr ℚ ω = (discr F : ℚ) := by
+theorem exists_basis [DecidableEq (InfinitePlace F)]
+    : ∃ ω : Module.Basis (InfinitePlace F) ℚ F,
+      (∀ x : F, IsIntegral ℤ x ↔ ∃ n : InfinitePlace F → ℤ, x = ∑ w, (n w : F) * ω w)
+        ∧ Algebra.discr ℚ ω = (discr F : ℚ) := by
   classical
-  have hc : Fintype.card (Module.Free.ChooseBasisIndex ℤ (𝓞 F)) = Fintype.card (InfinitePlace F) := by
+  have hc
+      : Fintype.card (Module.Free.ChooseBasisIndex ℤ (𝓞 F)) = Fintype.card (InfinitePlace F) := by
     rw [card_places, ← NumberField.RingOfIntegers.rank, Module.finrank_eq_card_chooseBasisIndex]
   let e := Fintype.equivOfCardEq hc
   refine ⟨(NumberField.integralBasis F).reindex e, ?_, ?_⟩
   · intro x
-    have h1 : IsIntegral ℤ x ↔
-        x ∈ Submodule.span ℤ (Set.range ((NumberField.integralBasis F).reindex e)) := by
+    have h1
+        : IsIntegral ℤ x
+          ↔ x ∈ Submodule.span ℤ (Set.range ((NumberField.integralBasis F).reindex e)) := by
       rw [Module.Basis.range_reindex, NumberField.mem_span_integralBasis]
       constructor
       · intro hx
@@ -79,24 +85,35 @@ theorem exists_basis [DecidableEq (InfinitePlace F)] : ∃ ω : Module.Basis (In
 
 end Emb
 
-theorem exists_root {κ : Type} [Fintype κ] [DecidableEq κ] (G : Matrix κ κ ℝ) (h : G.PosDef) :
-    ∃ R : Matrix κ κ ℝ, Rᵀ * R = G := by
+theorem exists_root {κ : Type} [Fintype κ] [DecidableEq κ] (G : Matrix κ κ ℝ) (h : G.PosDef)
+    : ∃ R : Matrix κ κ ℝ, Rᵀ * R = G := by
   classical
   have hH := h.1
-  refine ⟨Matrix.diagonal (fun i => Real.sqrt (hH.eigenvalues i)) * star (hH.eigenvectorUnitary : Matrix κ κ ℝ), ?_⟩
+  refine ⟨
+    Matrix.diagonal (fun i => Real.sqrt (hH.eigenvalues i))
+      * star (hH.eigenvectorUnitary : Matrix κ κ ℝ),
+    ?_
+  ⟩
   conv_rhs => rw [hH.spectral_theorem]
   rw [Unitary.conjStarAlgAut_apply]
-  have hst : (star (hH.eigenvectorUnitary : Matrix κ κ ℝ))ᵀ = (hH.eigenvectorUnitary : Matrix κ κ ℝ) := by
-    rw [Matrix.star_eq_conjTranspose, Matrix.conjTranspose_eq_transpose_of_trivial, Matrix.transpose_transpose]
-  rw [Matrix.transpose_mul, hst, Matrix.diagonal_transpose, Matrix.mul_assoc, ← Matrix.mul_assoc (Matrix.diagonal _) (Matrix.diagonal _), Matrix.diagonal_mul_diagonal, Matrix.mul_assoc]
+  have hst
+      : (star (hH.eigenvectorUnitary : Matrix κ κ ℝ))ᵀ
+        = (hH.eigenvectorUnitary : Matrix κ κ ℝ) := by
+    rw [Matrix.star_eq_conjTranspose, Matrix.conjTranspose_eq_transpose_of_trivial,
+      Matrix.transpose_transpose]
+  rw [Matrix.transpose_mul, hst, Matrix.diagonal_transpose, Matrix.mul_assoc,
+    ← Matrix.mul_assoc (Matrix.diagonal _) (Matrix.diagonal _), Matrix.diagonal_mul_diagonal,
+    Matrix.mul_assoc]
   congr 3
   funext i
   exact Real.mul_self_sqrt (h.posSemidef.eigenvalues_nonneg i)
 
 section Main
-variable {F : Type} [Field F] [NumberField F] [IsTotallyReal F] {κ : Type} [Fintype κ] [DecidableEq κ]
+variable
+  {F : Type} [Field F] [NumberField F] [IsTotallyReal F] {κ : Type} [Fintype κ] [DecidableEq κ]
 
-noncomputable def em (v : InfinitePlace F) : F →+* ℝ := InfinitePlace.embedding_of_isReal (IsTotallyReal.isReal v)
+noncomputable def em (v : InfinitePlace F) : F →+* ℝ :=
+  InfinitePlace.embedding_of_isReal (IsTotallyReal.isReal v)
 
 theorem reAt_eq (v : InfinitePlace F) (x : F) : reAt v x = em v x := (rhom_eq v x).symm
 
@@ -105,20 +122,23 @@ noncomputable def eM (R : Matrix κ κ ℝ) : (κ → F) →+ (InfinitePlace F �
   map_zero' := by ext p; simp
   map_add' x y := by ext p; simp [mul_add, Finset.sum_add_distrib]
 
-theorem eM_pair (G : Matrix κ κ ℤ) (R : Matrix κ κ ℝ) (hR : Rᵀ * R = G.map (Int.cast : ℤ → ℝ)) (x y : κ → F)
-    (v : InfinitePlace F) : ∑ i, eM R x (v, i) * eM R y (v, i) = reAt v (BF G x y) := by
+theorem eM_pair
+    (G : Matrix κ κ ℤ) (R : Matrix κ κ ℝ) (hR : Rᵀ * R = G.map (Int.cast : ℤ → ℝ))
+    (x y : κ → F) (v : InfinitePlace F)
+    : ∑ i, eM R x (v, i) * eM R y (v, i) = reAt v (BF G x y) := by
   rw [reAt_eq]
   have hG : ∀ i j, ((G i j : ℤ) : ℝ) = ∑ l, R l i * R l j := by
     intro i j
     have := congrFun (congrFun hR i) j
     simpa [Matrix.mul_apply] using this.symm
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [eM, AddMonoidHom.coe_mk, ZeroHom.coe_mk, BF, dotProduct, Matrix.mulVec, map_sum, map_mul,
-    Matrix.map_apply, map_intCast, hG, Finset.sum_mul, Finset.mul_sum]
+    simp only [eM, AddMonoidHom.coe_mk, ZeroHom.coe_mk, BF, dotProduct, Matrix.mulVec, map_sum,
+      map_mul, Matrix.map_apply, map_intCast, hG, Finset.sum_mul, Finset.mul_sum]
   conv_lhs => rw [Finset.sum_comm]
   conv_lhs => enter [2, a]; rw [Finset.sum_comm]
   conv_lhs => rw [Finset.sum_comm]
-  refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun r _ => ?_
+  refine Finset.sum_congr rfl fun a _ =>
+    Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun r _ => ?_
   ring
 
 theorem eM_inj (R : Matrix κ κ ℝ) (hR : R.det ≠ 0) (x : κ → F) (h : eM R x = 0) : x = 0 := by
@@ -135,18 +155,21 @@ theorem eM_inj (R : Matrix κ κ ℝ) (hR : R.det ≠ 0) (x : κ → F) (h : eM 
 
 variable [DecidableEq (InfinitePlace F)]
 
-noncomputable def aM (ω : Module.Basis (InfinitePlace F) ℚ F) (a : F) : Matrix (InfinitePlace F) (InfinitePlace F) ℝ :=
+noncomputable def aM (ω : Module.Basis (InfinitePlace F) ℚ F) (a : F)
+    : Matrix (InfinitePlace F) (InfinitePlace F) ℝ :=
   Matrix.of fun v w => em v (a * ω w)
 
-theorem det_aM_one (ω : Module.Basis (InfinitePlace F) ℚ F) : (aM ω 1).det ^ 2 = ((Algebra.discr ℚ ω : ℚ) : ℝ) := by
+theorem det_aM_one (ω : Module.Basis (InfinitePlace F) ℚ F)
+    : (aM ω 1).det ^ 2 = ((Algebra.discr ℚ ω : ℚ) : ℝ) := by
   classical
   let e : InfinitePlace F ≃ (F →ₐ[ℚ] ℂ) := Equiv.ofBijective _ emb_bij
   have h := Algebra.discr_eq_det_embeddingsMatrixReindex_pow_two ℚ ℂ (⇑ω) e
-  have hM : Algebra.embeddingsMatrixReindex ℚ ℂ (⇑ω) e = ((aM ω 1)ᵀ).map (fun r : ℝ => (r : ℂ)) := by
+  have hM
+      : Algebra.embeddingsMatrixReindex ℚ ℂ (⇑ω) e = ((aM ω 1)ᵀ).map (fun r : ℝ => (r : ℂ)) := by
     ext i j
     simp only [Algebra.embeddingsMatrixReindex, Algebra.embeddingsMatrix, Matrix.reindex_apply,
-      Matrix.submatrix_apply, Matrix.of_apply, Equiv.refl_symm, Equiv.coe_refl, id,
-      Equiv.symm_symm, Matrix.map_apply, Matrix.transpose_apply, aM, one_mul]
+      Matrix.submatrix_apply, Matrix.of_apply, Equiv.refl_symm, Equiv.coe_refl, id, Equiv.symm_symm,
+      Matrix.map_apply, Matrix.transpose_apply, aM, one_mul]
     rw [← reAt_eq, coe_reAt]
     rfl
   have hdet : (((aM ω 1)ᵀ).map (fun r : ℝ => (r : ℂ))).det = (((aM ω 1).det : ℝ) : ℂ) := by
@@ -159,8 +182,8 @@ theorem det_aM_one (ω : Module.Basis (InfinitePlace F) ℚ F) : (aM ω 1).det ^
     simp
   exact (Complex.ofReal_injective h2).symm
 
-theorem det_aM (ω : Module.Basis (InfinitePlace F) ℚ F) (a : F) :
-    (aM ω a).det = ((Algebra.norm ℚ a : ℚ) : ℝ) * (aM ω 1).det := by
+theorem det_aM (ω : Module.Basis (InfinitePlace F) ℚ F) (a : F)
+    : (aM ω a).det = ((Algebra.norm ℚ a : ℚ) : ℝ) * (aM ω 1).det := by
   have h : aM ω a = Matrix.diagonal (fun v => em v a) * aM ω 1 := by
     ext v w
     simp [aM, Matrix.diagonal_mul, map_mul]
@@ -169,23 +192,28 @@ theorem det_aM (ω : Module.Basis (InfinitePlace F) ℚ F) (a : F) :
   rw [← prod_reAt]
   exact Finset.prod_congr rfl (fun v _ => (reAt_eq v a).symm)
 
-noncomputable def bM (ω : Module.Basis (InfinitePlace F) ℚ F) (a : F) (R : Matrix κ κ ℝ) :
-    Matrix (InfinitePlace F × κ) (InfinitePlace F × κ) ℝ := Matrix.kroneckerMap (fun x y => x * y) (aM ω a) R
+noncomputable def bM (ω : Module.Basis (InfinitePlace F) ℚ F) (a : F) (R : Matrix κ κ ℝ)
+    : Matrix (InfinitePlace F × κ) (InfinitePlace F × κ) ℝ :=
+  Matrix.kroneckerMap (fun x y => x * y) (aM ω a) R
 
-theorem bM_mulVec (ω : Module.Basis (InfinitePlace F) ℚ F) (a : F) (R : Matrix κ κ ℝ) (m : InfinitePlace F × κ → ℤ) :
-    eM R (a • fun j => ∑ w, (m (w, j) : F) * ω w) = bM ω a R *ᵥ fun i => (m i : ℝ) := by
+theorem bM_mulVec
+    (ω : Module.Basis (InfinitePlace F) ℚ F) (a : F) (R : Matrix κ κ ℝ)
+    (m : InfinitePlace F × κ → ℤ)
+    : eM R (a • fun j => ∑ w, (m (w, j) : F) * ω w) = bM ω a R *ᵥ fun i => (m i : ℝ) := by
   funext p
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [eM, bM, aM, AddMonoidHom.coe_mk, ZeroHom.coe_mk, Matrix.mulVec, dotProduct,
-    Matrix.kroneckerMap_apply, Matrix.of_apply, Pi.smul_apply, smul_eq_mul, map_mul, map_sum,
-    map_intCast, Finset.mul_sum, Fintype.sum_prod_type]
+      Matrix.kroneckerMap_apply, Matrix.of_apply, Pi.smul_apply, smul_eq_mul, map_mul, map_sum,
+      map_intCast, Finset.mul_sum, Fintype.sum_prod_type]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun w _ => ?_
   ring
 
-theorem bM_transpose (G : Matrix κ κ ℤ) (R : Matrix κ κ ℝ) (hR : Rᵀ * R = G.map (Int.cast : ℤ → ℝ))
-    (ω : Module.Basis (InfinitePlace F) ℚ F) (a : F) (y : κ → F) (q : InfinitePlace F × κ) :
-    ((bM ω a R)ᵀ *ᵥ eM R y) q = ((Algebra.trace ℚ F (BF G (a • y) (Pi.single q.2 (ω q.1))) : ℚ) : ℝ) := by
+theorem bM_transpose
+    (G : Matrix κ κ ℤ) (R : Matrix κ κ ℝ) (hR : Rᵀ * R = G.map (Int.cast : ℤ → ℝ))
+    (ω : Module.Basis (InfinitePlace F) ℚ F) (a : F) (y : κ → F) (q : InfinitePlace F × κ)
+    : ((bM ω a R)ᵀ *ᵥ eM R y) q
+      = ((Algebra.trace ℚ F (BF G (a • y) (Pi.single q.2 (ω q.1))) : ℚ) : ℝ) := by
   have hG : ∀ i j, ((G i j : ℤ) : ℝ) = ∑ l, R l i * R l j := by
     intro i j
     have := congrFun (congrFun hR i) j
@@ -195,14 +223,14 @@ theorem bM_transpose (G : Matrix κ κ ℤ) (R : Matrix κ κ ℝ) (hR : Rᵀ * 
     rw [hG, hG]
     exact Finset.sum_congr rfl fun l _ => mul_comm _ _
   have hB : BF G (a • y) (Pi.single q.2 (ω q.1)) = ∑ i, a * y i * ((G i q.2 : ℤ) : F) * ω q.1 := by
-    simp only [BF, dotProduct, Matrix.mulVec, Pi.single_apply, Matrix.map_apply, Pi.smul_apply, smul_eq_mul,
-      mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+    simp only [BF, dotProduct, Matrix.mulVec, Pi.single_apply, Matrix.map_apply, Pi.smul_apply,
+      smul_eq_mul, mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
     exact Finset.sum_congr rfl fun i _ => by ring
   rw [hB, ← sum_reAt]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [reAt_eq, map_sum, map_mul, map_intCast, Matrix.mulVec, dotProduct, Matrix.transpose_apply,
-    bM, aM, eM, Matrix.kroneckerMap_apply, Matrix.of_apply, AddMonoidHom.coe_mk, ZeroHom.coe_mk,
-    Fintype.sum_prod_type]
+    simp only [reAt_eq, map_sum, map_mul, map_intCast, Matrix.mulVec, dotProduct,
+      Matrix.transpose_apply, bM, aM, eM, Matrix.kroneckerMap_apply, Matrix.of_apply,
+      AddMonoidHom.coe_mk, ZeroHom.coe_mk, Fintype.sum_prod_type]
   refine Finset.sum_congr rfl fun v _ => ?_
   simp_rw [hsym _ q.2, hG, Finset.mul_sum, Finset.sum_mul]
   conv_lhs => rw [Finset.sum_comm]
@@ -212,9 +240,12 @@ theorem bM_transpose (G : Matrix κ κ ℤ) (R : Matrix κ κ ℝ) (hR : Rᵀ * 
 theorem mem_LL (x : κ → F) : x ∈ LL F κ ↔ ∀ i, IsIntegral ℤ (x i) := by
   simp [LL, AddSubgroup.mem_pi, mem_integralClosure_iff]
 
-theorem exists_alpha (ω : Module.Basis (InfinitePlace F) ℚ F)
-    (hω : ∀ x : F, IsIntegral ℤ x ↔ ∃ n : InfinitePlace F → ℤ, x = ∑ w, (n w : F) * ω w) (a : F) (ha : a ≠ 0) :
-    ∃ α : (InfinitePlace F × κ → ℤ) ≃ aL κ a, ∀ m, (α m : κ → F) = a • fun j => ∑ w, (m (w, j) : F) * ω w := by
+theorem exists_alpha
+    (ω : Module.Basis (InfinitePlace F) ℚ F)
+    (hω : ∀ x : F, IsIntegral ℤ x ↔ ∃ n : InfinitePlace F → ℤ, x = ∑ w, (n w : F) * ω w)
+    (a : F) (ha : a ≠ 0)
+    : ∃ α : (InfinitePlace F × κ → ℤ) ≃ aL κ a, ∀ m,
+      (α m : κ → F) = a • fun j => ∑ w, (m (w, j) : F) * ω w := by
   classical
   let g : (InfinitePlace F × κ → ℤ) → (κ → F) := fun m => a • fun j => ∑ w, (m (w, j) : F) * ω w
   have hmem : ∀ m, g m ∈ aL κ a := by
@@ -233,8 +264,10 @@ theorem exists_alpha (ω : Module.Basis (InfinitePlace F) ℚ F)
     have hj2 := mul_left_cancel₀ ha hj
     have hli := ω.linearIndependent
     rw [Fintype.linearIndependent_iff] at hli
-    have := hli (fun w => ((m (w, j) : ℚ) - m' (w, j))) (by
-      simp only [Algebra.smul_def, map_sub, map_intCast, sub_mul, Finset.sum_sub_distrib, hj2, sub_self])
+    have :=
+      hli (fun w => ((m (w, j) : ℚ) - m' (w, j))) (by
+        simp only [Algebra.smul_def, map_sub, map_intCast, sub_mul, Finset.sum_sub_distrib, hj2,
+          sub_self])
     exact_mod_cast sub_eq_zero.1 (this w)
   have hsurj : ∀ y : aL κ a, ∃ m, g m = y := by
     rintro ⟨y, hy⟩
@@ -249,9 +282,14 @@ theorem exists_alpha (ω : Module.Basis (InfinitePlace F) ℚ F)
   obtain ⟨m, hm⟩ := hsurj y
   exact ⟨m, Subtype.ext hm⟩
 
-theorem mem_dualL (G : Matrix κ κ ℤ) (ω : Module.Basis (InfinitePlace F) ℚ F)
-    (hω : ∀ x : F, IsIntegral ℤ x ↔ ∃ n : InfinitePlace F → ℤ, x = ∑ w, (n w : F) * ω w) (y : κ → F) :
-    y ∈ dualL F G ↔ ∀ q : InfinitePlace F × κ, ∃ n : ℤ, Algebra.trace ℚ F (BF G y (Pi.single q.2 (ω q.1))) = n := by
+theorem mem_dualL
+    (G : Matrix κ κ ℤ)
+    (ω : Module.Basis (InfinitePlace F) ℚ F)
+    (hω : ∀ x : F, IsIntegral ℤ x ↔ ∃ n : InfinitePlace F → ℤ, x = ∑ w, (n w : F) * ω w)
+    (y : κ → F)
+    : y ∈ dualL F G
+      ↔ ∀ q : InfinitePlace F × κ, ∃ n : ℤ,
+        Algebra.trace ℚ F (BF G y (Pi.single q.2 (ω q.1))) = n := by
   classical
   show (∀ l ∈ LL F κ, ∃ n : ℤ, Algebra.trace ℚ F (BF G y l) = n) ↔ _
   constructor
@@ -297,8 +335,8 @@ theorem mem_dualL (G : Matrix κ κ ℤ) (ω : Module.Basis (InfinitePlace F) �
     refine Finset.sum_congr rfl fun w _ => ?_
     rw [htr, hN (w, k)]
 
-noncomputable def pairL (G : Matrix κ κ ℤ) (ω : Module.Basis (InfinitePlace F) ℚ F) (a : F) :
-    (κ → F) →ₗ[ℚ] (InfinitePlace F × κ → ℚ) where
+noncomputable def pairL (G : Matrix κ κ ℤ) (ω : Module.Basis (InfinitePlace F) ℚ F) (a : F)
+    : (κ → F) →ₗ[ℚ] (InfinitePlace F × κ → ℚ) where
   toFun y q := Algebra.trace ℚ F (BF G (a • y) (Pi.single q.2 (ω q.1)))
   map_add' x y := by
     funext q
@@ -307,12 +345,13 @@ noncomputable def pairL (G : Matrix κ κ ℤ) (ω : Module.Basis (InfinitePlace
     funext q
     simp only [BF, smul_comm a c, smul_dotProduct, map_smul, Pi.smul_apply, RingHom.id_apply]
 
-theorem exists_beta (G : Matrix κ κ ℤ) (R : Matrix κ κ ℝ) (hR : Rᵀ * R = G.map (Int.cast : ℤ → ℝ)) (hd : R.det ≠ 0)
+theorem exists_beta
+    (G : Matrix κ κ ℤ) (R : Matrix κ κ ℝ) (hR : Rᵀ * R = G.map (Int.cast : ℤ → ℝ)) (hd : R.det ≠ 0)
     (ω : Module.Basis (InfinitePlace F) ℚ F)
-    (hω : ∀ x : F, IsIntegral ℤ x ↔ ∃ n : InfinitePlace F → ℤ, x = ∑ w, (n w : F) * ω w) (a : F)
-    (hB : (bM ω a R).det ≠ 0) :
-    ∃ β : (InfinitePlace F × κ → ℤ) ≃ {y : κ → F // a • y ∈ dualL F G},
-      ∀ m, eM R (β m) = (bM ω a R)⁻¹ᵀ *ᵥ fun i => (m i : ℝ) := by
+    (hω : ∀ x : F, IsIntegral ℤ x ↔ ∃ n : InfinitePlace F → ℤ, x = ∑ w, (n w : F) * ω w)
+    (a : F) (hB : (bM ω a R).det ≠ 0)
+    : ∃ β : (InfinitePlace F × κ → ℤ) ≃ {y : κ → F // a • y ∈ dualL F G}, ∀ m,
+      eM R (β m) = (bM ω a R)⁻¹ᵀ *ᵥ fun i => (m i : ℝ) := by
   classical
   set B := bM ω a R with hBdef
   let P := pairL G ω a
@@ -341,15 +380,21 @@ theorem exists_beta (G : Matrix κ κ ℤ) (R : Matrix κ κ ℝ) (hR : Rᵀ * R
   have hPs : ∀ (m : InfinitePlace F × κ → ℤ) q, P (Pe.symm (fun q => (m q : ℚ))) q = m q := by
     intro m q
     rw [← hPe, LinearEquiv.apply_symm_apply]
-  refine ⟨{ toFun := fun m => ⟨Pe.symm (fun q => (m q : ℚ)), (hmem _).2 fun q => ⟨m q, hPs m q⟩⟩
-            invFun := fun y q => Classical.choose ((hmem y.1).1 y.2 q)
-            left_inv := ?_
-            right_inv := ?_ }, ?_⟩
+  refine ⟨
+    {
+      toFun := fun m => ⟨Pe.symm (fun q => (m q : ℚ)), (hmem _).2 fun q => ⟨m q, hPs m q⟩⟩
+      invFun := fun y q => Classical.choose ((hmem y.1).1 y.2 q)
+      left_inv := ?_
+      right_inv := ?_
+    },
+    ?_
+  ⟩
   · intro m
     funext q
     dsimp only
-    have h := Classical.choose_spec ((hmem (Pe.symm (fun q => (m q : ℚ)))).1
-      ((hmem _).2 fun q => ⟨m q, hPs m q⟩) q)
+    have h :=
+      Classical.choose_spec ((hmem (Pe.symm (fun q => (m q : ℚ)))).1
+        ((hmem _).2 fun q => ⟨m q, hPs m q⟩) q)
     have h2 := h.symm.trans (hPs m q)
     exact_mod_cast h2
   · rintro ⟨y, hy⟩
@@ -372,7 +417,26 @@ theorem exists_beta (G : Matrix κ κ ℤ) (R : Matrix κ κ ℝ) (hR : Rᵀ * R
 
 end Main
 
-theorem lattice_matrix : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] [DecidableEq (InfinitePlace F)] (κ : Type) [Fintype κ] [DecidableEq κ] (G : Matrix κ κ ℤ), EvenPos G → ∀ t : ℕ, G.det = (t : ℤ) ^ 2 → ∀ k : ℕ, Fintype.card κ = 2 * k → ∀ a : F, a ≠ 0 → ∃ (e : (κ → F) →+ (InfinitePlace F × κ → ℝ)) (B : Matrix (InfinitePlace F × κ) (InfinitePlace F × κ) ℝ) (α : (InfinitePlace F × κ → ℤ) ≃ aL κ a) (β : (InfinitePlace F × κ → ℤ) ≃ {y : κ → F // a • y ∈ dualL F G}), (∀ x y v, ∑ i, e x (v, i) * e y (v, i) = reAt v (BF G x y)) ∧ (∀ m, e (α m) = B *ᵥ fun i => (m i : ℝ)) ∧ (∀ m, e (β m) = B⁻¹ᵀ *ᵥ fun i => (m i : ℝ)) ∧ B.det ≠ 0 ∧ |B.det| = ((Algebra.norm ℚ a : ℚ) : ℝ) ^ (2 * k) * ((discr F).natAbs : ℝ) ^ k * (t : ℝ) ^ Module.finrank ℚ F := by
+theorem lattice_matrix
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] [DecidableEq (InfinitePlace F)]
+        (κ : Type) [Fintype κ] [DecidableEq κ] (G : Matrix κ κ ℤ),
+      EvenPos G
+        → ∀ t : ℕ,
+          G.det = (t : ℤ) ^ 2
+            → ∀ k : ℕ,
+              Fintype.card κ = 2 * k
+                → ∀ a : F,
+                  a ≠ 0
+                    → ∃ (e : (κ → F) →+ (InfinitePlace F × κ → ℝ))
+                        (B : Matrix (InfinitePlace F × κ) (InfinitePlace F × κ) ℝ)
+                        (α : (InfinitePlace F × κ → ℤ) ≃ aL κ a)
+                        (β : (InfinitePlace F × κ → ℤ) ≃ {y : κ → F // a • y ∈ dualL F G}),
+                      (∀ x y v, ∑ i, e x (v, i) * e y (v, i) = reAt v (BF G x y))
+                        ∧ (∀ m, e (α m) = B *ᵥ fun i => (m i : ℝ))
+                        ∧ (∀ m, e (β m) = B⁻¹ᵀ *ᵥ fun i => (m i : ℝ)) ∧ B.det ≠ 0
+                        ∧ |B.det|
+                          = ((Algebra.norm ℚ a : ℚ) : ℝ) ^ (2 * k) * ((discr F).natAbs : ℝ) ^ k
+                            * (t : ℝ) ^ Module.finrank ℚ F := by
   intro F _ _ _ _ κ _ _ G hG t ht k hk a ha
   obtain ⟨ω, hω, hdisc⟩ := exists_basis (F := F)
   obtain ⟨R, hR⟩ := exists_root (G.map (Int.cast : ℤ → ℝ)) hG.1
@@ -394,8 +458,7 @@ theorem lattice_matrix : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal
     exact lt_irrefl _ hRpos
   have hRabs : |R.det| = (t : ℝ) := by
     rw [(sq_eq_sq_iff_abs_eq_abs _ _).1 hdetR, abs_of_nonneg (Nat.cast_nonneg t)]
-  have hA1 : (aM ω 1).det ^ 2 = ((discr F : ℤ) : ℝ) := by
-    rw [det_aM_one, hdisc, Rat.cast_intCast]
+  have hA1 : (aM ω 1).det ^ 2 = ((discr F : ℤ) : ℝ) := by rw [det_aM_one, hdisc, Rat.cast_intCast]
   have hA1ne : (aM ω 1).det ≠ 0 := by
     intro h
     rw [h] at hA1
@@ -403,8 +466,9 @@ theorem lattice_matrix : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal
     apply h3
     exact_mod_cast (by simpa using hA1.symm : ((discr F : ℤ) : ℝ) = 0)
   have hNa : Algebra.norm ℚ a ≠ 0 := Algebra.norm_ne_zero_iff.2 ha
-  have hdetB : (bM ω a R).det
-      = (aM ω a).det ^ Fintype.card κ * R.det ^ Fintype.card (InfinitePlace F) := by
+  have hdetB
+      : (bM ω a R).det
+        = (aM ω a).det ^ Fintype.card κ * R.det ^ Fintype.card (InfinitePlace F) := by
     unfold bM
     exact Matrix.det_kronecker (aM ω a) R
   have hB : (bM ω a R).det ≠ 0 := by
@@ -419,15 +483,38 @@ theorem lattice_matrix : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal
   · have hdn : (0 : ℝ) ≤ ((discr F : ℤ) : ℝ) := by
       rw [← hA1]
       positivity
-    rw [hdetB, det_aM, abs_mul, abs_pow, abs_pow, hRabs, card_places, hk, abs_mul,
-      mul_pow, pow_mul (|(aM ω 1).det|), sq_abs, hA1, Nat.cast_natAbs, Int.cast_abs,
-      abs_of_nonneg hdn]
+    rw [hdetB, det_aM, abs_mul, abs_pow, abs_pow, hRabs, card_places, hk, abs_mul, mul_pow,
+      pow_mul (|(aM ω 1).det|), sq_abs, hA1, Nat.cast_natAbs, Int.cast_abs, abs_of_nonneg hdn]
     rw [pow_mul, pow_mul, sq_abs]
 
 end GlobalTheory.HilbertThetaSeries.LatBasis
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd GlobalTheory.HilbertThetaSeries
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd
+  GlobalTheory.HilbertThetaSeries
 open scoped Matrix
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.exists_realMatrix_for_lattice_and_dual_with_det : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] [DecidableEq (InfinitePlace F)] (κ : Type) [Fintype κ] [DecidableEq κ] (G : Matrix κ κ ℤ), EvenPos G → ∀ t : ℕ, G.det = (t : ℤ) ^ 2 → ∀ k : ℕ, Fintype.card κ = 2 * k → ∀ a : F, a ≠ 0 → ∃ (e : (κ → F) →+ (InfinitePlace F × κ → ℝ)) (B : Matrix (InfinitePlace F × κ) (InfinitePlace F × κ) ℝ) (α : (InfinitePlace F × κ → ℤ) ≃ aL κ a) (β : (InfinitePlace F × κ → ℤ) ≃ {y : κ → F // a • y ∈ dualL F G}), (∀ x y v, ∑ i, e x (v, i) * e y (v, i) = reAt v (BF G x y)) ∧ (∀ m, e (α m) = B *ᵥ fun i => (m i : ℝ)) ∧ (∀ m, e (β m) = B⁻¹ᵀ *ᵥ fun i => (m i : ℝ)) ∧ B.det ≠ 0 ∧ |B.det| = ((Algebra.norm ℚ a : ℚ) : ℝ) ^ (2 * k) * ((discr F).natAbs : ℝ) ^ k * (t : ℝ) ^ Module.finrank ℚ F := by
-  first | exact @GlobalTheory.HilbertThetaSeries.LatBasis.lattice_matrix | exact GlobalTheory.HilbertThetaSeries.LatBasis.lattice_matrix | (intros; apply GlobalTheory.HilbertThetaSeries.LatBasis.lattice_matrix <;> assumption)
+theorem _root_.GlobalTheory.T.exists_realMatrix_for_lattice_and_dual_with_det
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] [DecidableEq (InfinitePlace F)]
+        (κ : Type) [Fintype κ] [DecidableEq κ] (G : Matrix κ κ ℤ),
+      EvenPos G
+        → ∀ t : ℕ,
+          G.det = (t : ℤ) ^ 2
+            → ∀ k : ℕ,
+              Fintype.card κ = 2 * k
+                → ∀ a : F,
+                  a ≠ 0
+                    → ∃ (e : (κ → F) →+ (InfinitePlace F × κ → ℝ))
+                        (B : Matrix (InfinitePlace F × κ) (InfinitePlace F × κ) ℝ)
+                        (α : (InfinitePlace F × κ → ℤ) ≃ aL κ a)
+                        (β : (InfinitePlace F × κ → ℤ) ≃ {y : κ → F // a • y ∈ dualL F G}),
+                      (∀ x y v, ∑ i, e x (v, i) * e y (v, i) = reAt v (BF G x y))
+                        ∧ (∀ m, e (α m) = B *ᵥ fun i => (m i : ℝ))
+                        ∧ (∀ m, e (β m) = B⁻¹ᵀ *ᵥ fun i => (m i : ℝ)) ∧ B.det ≠ 0
+                        ∧ |B.det|
+                          = ((Algebra.norm ℚ a : ℚ) : ℝ) ^ (2 * k) * ((discr F).natAbs : ℝ) ^ k
+                            * (t : ℝ) ^ Module.finrank ℚ F := by
+  first
+  | exact @GlobalTheory.HilbertThetaSeries.LatBasis.lattice_matrix
+  | exact GlobalTheory.HilbertThetaSeries.LatBasis.lattice_matrix
+  | (intros; apply GlobalTheory.HilbertThetaSeries.LatBasis.lattice_matrix <;> assumption)

@@ -10,24 +10,25 @@ open scoped BigOperators
 
 section JetWedge
 
-variable {A M N : Type*} [CommRing A] [AddCommGroup M] [Module A M] [AddCommGroup N] [Module A N]
-  {D : ℕ}
+variable
+  {A M N : Type*} [CommRing A] [AddCommGroup M] [Module A M] [AddCommGroup N] [Module A N] {D : ℕ}
 
 noncomputable def jetWedge (ω : M [⋀^Fin D]→ₗ[A] N) : (A × M) [⋀^Fin (D + 1)]→ₗ[A] N :=
-  AlternatingMap.alternatizeUncurryFin
-    ((LinearMap.fst A A M).smulRight (ω.compLinearMap (LinearMap.snd A A M)))
+  AlternatingMap.alternatizeUncurryFin ((LinearMap.fst A A M).smulRight
+    (ω.compLinearMap (LinearMap.snd A A M)))
 
-theorem jetWedge_apply (ω : M [⋀^Fin D]→ₗ[A] N) (v : Fin (D + 1) → A × M) :
-    jetWedge ω v =
-      ∑ i : Fin (D + 1), ((-1 : A) ^ (i : ℕ) * (v i).1) • ω (fun k => (v (i.succAbove k)).2) := by
+theorem jetWedge_apply (ω : M [⋀^Fin D]→ₗ[A] N) (v : Fin (D + 1) → A × M)
+    : jetWedge ω v
+      = ∑ i : Fin (D + 1), ((-1 : A) ^ (i : ℕ) * (v i).1) • ω (fun k => (v (i.succAbove k)).2) := by
   rw [jetWedge, AlternatingMap.alternatizeUncurryFin_apply]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [mul_smul, ← Int.cast_smul_eq_zsmul A]
   simp only [Int.cast_pow, Int.cast_neg, Int.cast_one]
   rfl
 
-theorem jetWedge_shear (ω : M [⋀^Fin D]→ₗ[A] N) (h : A) (u : M) (v : Fin (D + 1) → A × M) :
-    jetWedge ω (fun i => (h * (v i).1, h • (v i).2 + (v i).1 • u)) = h ^ (D + 1) • jetWedge ω v := by
+theorem jetWedge_shear (ω : M [⋀^Fin D]→ₗ[A] N) (h : A) (u : M) (v : Fin (D + 1) → A × M)
+    : jetWedge ω (fun i => (h * (v i).1, h • (v i).2 + (v i).1 • u))
+      = h ^ (D + 1) • jetWedge ω v := by
   classical
   let φ : (A × M) →ₗ[A] (A × M) :=
     (h • LinearMap.fst A A M).prod (h • LinearMap.snd A A M + (LinearMap.fst A A M).smulRight u)
@@ -39,8 +40,9 @@ theorem jetWedge_shear (ω : M [⋀^Fin D]→ₗ[A] N) (h : A) (u : M) (v : Fin 
     rw [this]
     exact add_mem (Submodule.smul_mem _ _ (Submodule.subset_span ⟨none, rfl⟩))
       (Submodule.subset_span ⟨some m, rfl⟩)
-  have key : ((jetWedge ω).compLinearMap φ).toMultilinearMap
-      = (h ^ (D + 1) • jetWedge ω).toMultilinearMap := by
+  have key
+      : ((jetWedge ω).compLinearMap φ).toMultilinearMap
+        = (h ^ (D + 1) • jetWedge ω).toMultilinearMap := by
     refine MultilinearMap.ext_of_span_eq_top (g := fun _ => g) (fun _ => hg) fun j => ?_
     change jetWedge ω (fun i => φ (g (j i))) = h ^ (D + 1) • jetWedge ω (fun i => g (j i))
     by_cases hj : ∃ a b, a ≠ b ∧ j a = j b
@@ -69,21 +71,23 @@ theorem jetWedge_shear (ω : M [⋀^Fin D]→ₗ[A] N) (h : A) (u : M) (v : Fin 
         ring
   exact congrArg (fun F => F v) key
 
-theorem alternating_map_sum_smul_eq_det_smul {n : ℕ} (ω : M [⋀^Fin n]→ₗ[A] N)
-    (a : Matrix (Fin n) (Fin n) A) (w : Fin n → M) :
-    ω (fun i => ∑ k, a i k • w k) = a.det • ω w := by
+theorem alternating_map_sum_smul_eq_det_smul
+    {n : ℕ} (ω : M [⋀^Fin n]→ₗ[A] N) (a : Matrix (Fin n) (Fin n) A) (w : Fin n → M)
+    : ω (fun i => ∑ k, a i k • w k) = a.det • ω w := by
   classical
   let φ : (Fin n → A) →ₗ[A] M := Fintype.linearCombination A w
-  have key : ω.compLinearMap φ
-      = ((LinearMap.toSpanSingleton A N (ω w)).compAlternatingMap Matrix.detRowAlternating) := by
+  have key
+      : ω.compLinearMap φ
+        = ((LinearMap.toSpanSingleton A N (ω w)).compAlternatingMap Matrix.detRowAlternating) := by
     refine Module.Basis.ext_alternating (Pi.basisFun A (Fin n)) fun v hv => ?_
     have hb : Function.Bijective v := Finite.injective_iff_bijective.mp hv
     let σ : Equiv.Perm (Fin n) := Equiv.ofBijective v hb
     have e1 : (fun i => (Pi.basisFun A (Fin n)) (v i)) = (Pi.basisFun A (Fin n)) ∘ σ := rfl
     rw [e1, AlternatingMap.map_perm, AlternatingMap.map_perm]
     congr 1
-    have e2 : (Matrix.detRowAlternating : (Fin n → A) [⋀^Fin n]→ₗ[A] A) (Pi.basisFun A (Fin n))
-        = 1 := by
+    have e2
+        : (Matrix.detRowAlternating : (Fin n → A) [⋀^Fin n]→ₗ[A] A) (Pi.basisFun A (Fin n))
+          = 1 := by
       rw [← Matrix.det_one (n := Fin n)]
       change Matrix.det _ = _
       congr 1
@@ -101,9 +105,10 @@ theorem alternating_map_sum_smul_eq_det_smul {n : ℕ} (ω : M [⋀^Fin n]→ₗ
   rw [e3]
   exact this
 
-theorem alternating_sub_mem_smul_top (ω : M [⋀^Fin D]→ₗ[A] N) (I : Ideal A) (v w : Fin D → M)
-    (hvw : ∀ k, v k - w k ∈ I • (⊤ : Submodule A M)) :
-    ω v - ω w ∈ I • (⊤ : Submodule A N) := by
+theorem alternating_sub_mem_smul_top
+    (ω : M [⋀^Fin D]→ₗ[A] N)
+    (I : Ideal A) (v w : Fin D → M) (hvw : ∀ k, v k - w k ∈ I • (⊤ : Submodule A M))
+    : ω v - ω w ∈ I • (⊤ : Submodule A N) := by
   classical
   have key : ∀ s : Finset (Fin D), ω (s.piecewise v w) - ω w ∈ I • (⊤ : Submodule A N) := by
     intro s
@@ -112,16 +117,16 @@ theorem alternating_sub_mem_smul_top (ω : M [⋀^Fin D]→ₗ[A] N) (I : Ideal 
     | insert i s hi ih =>
       have h1 : s.piecewise v w = Function.update (s.piecewise v w) i (w i) := by
         rw [eq_comm, Function.update_eq_self_iff, Finset.piecewise_eq_of_notMem _ _ _ hi]
-      have h2 : ω ((insert i s).piecewise v w) - ω (s.piecewise v w)
-          = ω.toMultilinearMap.toLinearMap (s.piecewise v w) i (v i - w i) := by
+      have h2
+          : ω ((insert i s).piecewise v w) - ω (s.piecewise v w)
+            = ω.toMultilinearMap.toLinearMap (s.piecewise v w) i (v i - w i) := by
         rw [map_sub, Finset.piecewise_insert]
         conv_lhs => rw [h1]
         simp
-      have h3 : ω ((insert i s).piecewise v w) - ω (s.piecewise v w)
-          ∈ I • (⊤ : Submodule A N) := by
+      have h3 : ω ((insert i s).piecewise v w) - ω (s.piecewise v w) ∈ I • (⊤ : Submodule A N) := by
         rw [h2]
-        have := Submodule.mem_map_of_mem
-          (f := ω.toMultilinearMap.toLinearMap (s.piecewise v w) i) (hvw i)
+        have :=
+          Submodule.mem_map_of_mem (f := ω.toMultilinearMap.toLinearMap (s.piecewise v w) i) (hvw i)
         rw [Submodule.map_smul''] at this
         exact Submodule.smul_mono le_rfl le_top this
       simpa using add_mem h3 ih
@@ -131,26 +136,28 @@ end JetWedge
 
 section JacForm
 
-variable {R A M N : Type*} [CommRing R] [CommRing A] [Algebra R A]
-  [AddCommGroup M] [Module A M] [Module R M] [AddCommGroup N] [Module A N] {D : ℕ}
+variable
+  {R A M N : Type*} [CommRing R] [CommRing A] [Algebra R A] [AddCommGroup M] [Module A M]
+  [Module R M] [AddCommGroup N] [Module A N]
+  {D : ℕ}
 
-noncomputable def jacForm (d : Derivation R A M) (ω : M [⋀^Fin D]→ₗ[A] N)
-    (f : Fin (D + 1) → A) : N :=
+noncomputable def jacForm (d : Derivation R A M) (ω : M [⋀^Fin D]→ₗ[A] N) (f : Fin (D + 1) → A)
+    : N :=
   ∑ i : Fin (D + 1), ((-1 : A) ^ (i : ℕ) * f i) • ω (fun k => d (f (i.succAbove k)))
 
 variable (d : Derivation R A M) (ω : M [⋀^Fin D]→ₗ[A] N)
 
-theorem jacForm_eq_jetWedge (f : Fin (D + 1) → A) :
-    jacForm d ω f = jetWedge ω (fun i => (f i, d (f i))) := by
+theorem jacForm_eq_jetWedge (f : Fin (D + 1) → A)
+    : jacForm d ω f = jetWedge ω (fun i => (f i, d (f i))) := by
   rw [jetWedge_apply, jacForm]
 
-theorem jacForm_mul (h : A) (f : Fin (D + 1) → A) :
-    jacForm d ω (fun i => h * f i) = h ^ (D + 1) • jacForm d ω f := by
+theorem jacForm_mul (h : A) (f : Fin (D + 1) → A)
+    : jacForm d ω (fun i => h * f i) = h ^ (D + 1) • jacForm d ω f := by
   rw [jacForm_eq_jetWedge, jacForm_eq_jetWedge, ← jetWedge_shear ω h (d h)]
   simp only [Derivation.leibniz]
 
-theorem form_d_mul_sub_mem (I : Ideal A) (h : A) (g : Fin D → A) (hg : ∀ k, g k ∈ I) :
-    ω (fun k => d (h * g k)) - h ^ D • ω (fun k => d (g k)) ∈ I • (⊤ : Submodule A N) := by
+theorem form_d_mul_sub_mem (I : Ideal A) (h : A) (g : Fin D → A) (hg : ∀ k, g k ∈ I)
+    : ω (fun k => d (h * g k)) - h ^ D • ω (fun k => d (g k)) ∈ I • (⊤ : Submodule A N) := by
   have : h ^ D • ω (fun k => d (g k)) = ω (fun k => h • d (g k)) := by
     rw [ω.map_smul_univ (fun _ => h)]
     simp
@@ -165,9 +172,11 @@ end JacForm
 
 section RestrictScalars
 
-variable (A : Type*) {B M N : Type*} [CommRing A] [CommRing B] [Algebra A B]
-  [AddCommGroup M] [Module A M] [Module B M] [IsScalarTower A B M]
-  [AddCommGroup N] [Module A N] [Module B N] [IsScalarTower A B N] {D : ℕ}
+variable
+  (A : Type*)
+  {B M N : Type*} [CommRing A] [CommRing B] [Algebra A B] [AddCommGroup M] [Module A M] [Module B M]
+  [IsScalarTower A B M] [AddCommGroup N] [Module A N] [Module B N] [IsScalarTower A B N]
+  {D : ℕ}
 
 def altRestrictScalars (ω : M [⋀^Fin D]→ₗ[B] N) : M [⋀^Fin D]→ₗ[A] N where
   toMultilinearMap := ω.toMultilinearMap.restrictScalars A
@@ -180,11 +189,11 @@ noncomputable def exteriorPowerMapOver (φ : L →ₗ[A] M) : (⋀[A]^D L) →�
   exteriorPower.alternatingMapLinearEquiv
     ((altRestrictScalars A (exteriorPower.ιMulti B D (M := M))).compLinearMap φ)
 
-@[simp] theorem exteriorPowerMapOver_ιMulti (φ : L →ₗ[A] M) (v : Fin D → L) :
-    exteriorPowerMapOver B D φ (exteriorPower.ιMulti A D v)
+@[simp]
+theorem exteriorPowerMapOver_ιMulti (φ : L →ₗ[A] M) (v : Fin D → L)
+    : exteriorPowerMapOver B D φ (exteriorPower.ιMulti A D v)
       = exteriorPower.ιMulti B D (fun k => φ (v k)) := by
-  simp only [exteriorPowerMapOver,
-    exteriorPower.alternatingMapLinearEquiv_apply_ιMulti,
+  simp only [exteriorPowerMapOver, exteriorPower.alternatingMapLinearEquiv_apply_ιMulti,
     AlternatingMap.compLinearMap_apply]
   rfl
 
@@ -202,21 +211,20 @@ noncomputable def dWedge (g : Fin D → A) : ⋀[A]^D Ω[A⁄R] :=
 noncomputable def jac (f : Fin (D + 1) → A) : ⋀[A]^D Ω[A⁄R] :=
   ∑ i : Fin (D + 1), ((-1 : A) ^ (i : ℕ) * f i) • dWedge R (fun k => f (i.succAbove k))
 
-theorem jac_mul (h : A) (f : Fin (D + 1) → A) :
-    jac R (fun i => h * f i) = h ^ (D + 1) • jac R f :=
+theorem jac_mul (h : A) (f : Fin (D + 1) → A) : jac R (fun i => h * f i) = h ^ (D + 1) • jac R f :=
   jacForm_mul _ _ h f
 
-theorem dWedge_mul_sub_mem (I : Ideal A) (h : A) (g : Fin D → A) (hg : ∀ k, g k ∈ I) :
-    dWedge R (fun k => h * g k) - h ^ D • dWedge R g ∈ I • (⊤ : Submodule A (⋀[A]^D Ω[A⁄R])) :=
+theorem dWedge_mul_sub_mem (I : Ideal A) (h : A) (g : Fin D → A) (hg : ∀ k, g k ∈ I)
+    : dWedge R (fun k => h * g k) - h ^ D • dWedge R g ∈ I • (⊤ : Submodule A (⋀[A]^D Ω[A⁄R])) :=
   form_d_mul_sub_mem _ _ I h g hg
-
 
 variable {R}
 
-theorem map_jac (S B : Type*) [CommRing S] [CommRing B] [Algebra R S] [Algebra S B] [Algebra R B]
-    [Algebra A B] [IsScalarTower R A B] [IsScalarTower R S B] [SMulCommClass S A B]
-    (f : Fin (D + 1) → A) :
-    exteriorPowerMapOver B D (KaehlerDifferential.map R S A B) (jac R f)
+theorem map_jac
+    (S B : Type*) [CommRing S] [CommRing B] [Algebra R S] [Algebra S B] [Algebra R B] [Algebra A B]
+    [IsScalarTower R A B] [IsScalarTower R S B] [SMulCommClass S A B]
+    (f : Fin (D + 1) → A)
+    : exteriorPowerMapOver B D (KaehlerDifferential.map R S A B) (jac R f)
       = jac S (fun i => algebraMap A B (f i)) := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [jac, jac, map_sum]

@@ -10,15 +10,21 @@ namespace GlobalTheory.UnitarySemisimple
 
 variable {H W : Type} [Group H] [AddCommGroup W] [Module ℂ W]
 
-theorem exists_orth_proj (B : W →ₗ⋆[ℂ] W →ₗ[ℂ] ℂ) (hdef : ∀ v, B v v = 0 → v = 0)
-    (M : Submodule ℂ W) [FiniteDimensional ℂ M] (v : W) :
-    ∃ m ∈ M, ∀ z ∈ M, B z (v - m) = 0 := by
+theorem exists_orth_proj
+    (B : W →ₗ⋆[ℂ] W →ₗ[ℂ] ℂ) (hdef : ∀ v, B v v = 0 → v = 0)
+    (M : Submodule ℂ W) [FiniteDimensional ℂ M]
+    (v : W)
+    : ∃ m ∈ M, ∀ z ∈ M, B z (v - m) = 0 := by
   first
   | exact @_root_.GlobalTheory.OrthogonalProjection.exists_orth_proj
   | exact _root_.GlobalTheory.OrthogonalProjection.exists_orth_proj
   | (apply _root_.GlobalTheory.OrthogonalProjection.exists_orth_proj <;> assumption)
   | (intros; apply _root_.GlobalTheory.OrthogonalProjection.exists_orth_proj <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.OrthogonalProjection.exists_orth_proj <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.OrthogonalProjection.exists_orth_proj
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.OrthogonalProjection.exists_orth_proj ..)
 
 theorem rho_inv_rho (ρ : Representation ℂ H W) (g : H) (u : W) : ρ g⁻¹ (ρ g u) = u := by
@@ -27,20 +33,26 @@ theorem rho_inv_rho (ρ : Representation ℂ H W) (g : H) (u : W) : ρ g⁻¹ (�
 theorem rho_rho_inv (ρ : Representation ℂ H W) (g : H) (u : W) : ρ g (ρ g⁻¹ u) = u := by
   rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply]
 
-theorem orth_stable (ρ : Representation ℂ H W) (B : W →ₗ⋆[ℂ] W →ₗ[ℂ] ℂ)
-    (hinv : ∀ g u v, B (ρ g u) (ρ g v) = B u v) (Z : Subrepresentation ρ) (s : W)
-    (hs : ∀ z ∈ Z.toSubmodule, B z s = 0) (g : H) : ∀ z ∈ Z.toSubmodule, B z (ρ g s) = 0 := by
+theorem orth_stable
+    (ρ : Representation ℂ H W) (B : W →ₗ⋆[ℂ] W →ₗ[ℂ] ℂ) (hinv : ∀ g u v, B (ρ g u) (ρ g v) = B u v)
+    (Z : Subrepresentation ρ) (s : W) (hs : ∀ z ∈ Z.toSubmodule, B z s = 0)
+    (g : H)
+    : ∀ z ∈ Z.toSubmodule, B z (ρ g s) = 0 := by
   intro z hz
-  calc B z (ρ g s) = B (ρ g (ρ g⁻¹ z)) (ρ g s) := by rw [rho_rho_inv]
+  calc
+    B z (ρ g s)
+      = B (ρ g (ρ g⁻¹ z)) (ρ g s) := by rw [rho_rho_inv]
     _ = B (ρ g⁻¹ z) s := hinv _ _ _
     _ = 0 := hs _ (Z.apply_mem_toSubmodule _ hz)
 
-theorem exists_compl_proj (ρ : Representation ℂ H W) (B : W →ₗ⋆[ℂ] W →ₗ[ℂ] ℂ)
+theorem exists_compl_proj
+    (ρ : Representation ℂ H W) (B : W →ₗ⋆[ℂ] W →ₗ[ℂ] ℂ)
     (hdef : ∀ v, B v v = 0 → v = 0) (hinv : ∀ g u v, B (ρ g u) (ρ g v) = B u v)
-    (hadm : ∀ v, ∃ K : Subgroup H, (∀ k ∈ K, ρ k v = v) ∧ FiniteDimensional ℂ (GlobalTheory.PRep.fixed ρ K) ∧
-      ∀ w, (Set.range fun k : K => ρ k w).Finite)
-    (Z : Subrepresentation ρ) (v : W) :
-    ∃ t ∈ Z.toSubmodule, ∀ z ∈ Z.toSubmodule, B z (v - t) = 0 := by
+    (hadm : ∀ v, ∃ K : Subgroup H,
+      (∀ k ∈ K, ρ k v = v) ∧ FiniteDimensional ℂ (GlobalTheory.PRep.fixed ρ K)
+        ∧ ∀ w, (Set.range fun k : K => ρ k w).Finite)
+    (Z : Subrepresentation ρ) (v : W)
+    : ∃ t ∈ Z.toSubmodule, ∀ z ∈ Z.toSubmodule, B z (v - t) = 0 := by
   classical
   obtain ⟨K, hvK, hfd, hfin⟩ := hadm v
   have ofF : ∀ u ∈ GlobalTheory.PRep.fixed ρ K, ∀ k ∈ K, ρ k u = u := by
@@ -83,7 +95,7 @@ theorem exists_compl_proj (ρ : Representation ℂ H W) (B : W →ₗ⋆[ℂ] W 
   have heF : ∑ o ∈ s, o ∈ GlobalTheory.PRep.fixed ρ K := by
     refine memF _ (fun k hk => ?_)
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, hperm k hk]
+    rw [map_sum, hperm k hk]
   have h0 := hm _ ⟨heZ, heF⟩
   have hterm : ∀ o ∈ s, B o (v - m) = B z (v - m) := by
     intro o ho
@@ -100,22 +112,26 @@ theorem exists_compl_proj (ρ : Representation ℂ H W) (B : W →ₗ⋆[ℂ] W 
   · exact absurd (by exact_mod_cast h) hcard
   · exact h
 
-def orbSpan (ρ : Representation ℂ H W) (y : W) : Subrepresentation ρ :=
-  ⟨Submodule.span ℂ (Set.range fun g => ρ g y), by
+def orbSpan (ρ : Representation ℂ H W) (y : W) : Subrepresentation ρ := ⟨
+  Submodule.span ℂ (Set.range fun g => ρ g y),
+  by
     intro g v hv
-    have hle : (Submodule.span ℂ (Set.range fun g => ρ g y)).map (ρ g) ≤
-        Submodule.span ℂ (Set.range fun g => ρ g y) := by
+    have hle
+        : (Submodule.span ℂ (Set.range fun g => ρ g y)).map (ρ g)
+          ≤ Submodule.span ℂ (Set.range fun g => ρ g y) := by
       rw [Submodule.map_span]
       apply Submodule.span_mono
       rintro _ ⟨_, ⟨h, rfl⟩, rfl⟩
       exact ⟨g * h, by simp [map_mul]⟩
-    exact hle (Submodule.mem_map_of_mem hv)⟩
+    exact hle (Submodule.mem_map_of_mem hv)
+⟩
 
 theorem mem_orbSpan (ρ : Representation ℂ H W) (y : W) : y ∈ (orbSpan ρ y).toSubmodule :=
   Submodule.subset_span ⟨1, by simp⟩
 
-theorem orbSpan_le (ρ : Representation ℂ H W) (y : W) (Z : Subrepresentation ρ)
-    (hy : y ∈ Z.toSubmodule) : (orbSpan ρ y).toSubmodule ≤ Z.toSubmodule :=
+theorem orbSpan_le
+    (ρ : Representation ℂ H W) (y : W) (Z : Subrepresentation ρ) (hy : y ∈ Z.toSubmodule)
+    : (orbSpan ρ y).toSubmodule ≤ Z.toSubmodule :=
   Submodule.span_le.2 (by rintro _ ⟨g, rfl⟩; exact Z.apply_mem_toSubmodule g hy)
 
 end GlobalTheory.UnitarySemisimple

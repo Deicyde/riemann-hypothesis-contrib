@@ -9,13 +9,16 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsLat
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 namespace GlobalTheory.NormSum
 
-theorem doubleCoset_surj_of_le {G : Type*} [Group G] (H K J : Subgroup G) :
-    Function.Surjective (fun p : DoubleCoset.Quotient (H : Set G) (K : Set G) × (K ⧸ J.subgroupOf K) =>
+theorem doubleCoset_surj_of_le {G : Type*} [Group G] (H K J : Subgroup G)
+    : Function.Surjective (fun p
+        : DoubleCoset.Quotient (H : Set G) (K : Set G) × (K ⧸ J.subgroupOf K) =>
       DoubleCoset.mk H J (p.1.out * (p.2.out : G))) := by
   intro c
   obtain ⟨h, hh, k, hk, e⟩ := DoubleCoset.mk_out_eq_mul H K c.out
@@ -29,17 +32,27 @@ theorem doubleCoset_surj_of_le {G : Type*} [Group G] (H K J : Subgroup G) :
   refine ⟨h, hh, _, hjJ, ?_⟩
   simp [mul_assoc]
 
-theorem doubleCoset_card_le {G : Type*} [Group G] (H K J : Subgroup G)
-    [Finite (DoubleCoset.Quotient (H : Set G) (K : Set G))] (hJ : J.relIndex K ≠ 0) :
-    Finite (DoubleCoset.Quotient (H : Set G) (J : Set G)) ∧
-      Nat.card (DoubleCoset.Quotient (H : Set G) (J : Set G)) ≤
-        Nat.card (DoubleCoset.Quotient (H : Set G) (K : Set G)) * J.relIndex K := by
+theorem doubleCoset_card_le
+    {G : Type*} [Group G]
+    (H K J : Subgroup G) [Finite (DoubleCoset.Quotient (H : Set G) (K : Set G))]
+    (hJ : J.relIndex K ≠ 0)
+    : Finite (DoubleCoset.Quotient (H : Set G) (J : Set G))
+      ∧ Nat.card (DoubleCoset.Quotient (H : Set G) (J : Set G))
+        ≤ Nat.card (DoubleCoset.Quotient (H : Set G) (K : Set G)) * J.relIndex K := by
   have : Finite (K ⧸ J.subgroupOf K) := Nat.finite_of_card_ne_zero hJ
   refine ⟨Finite.of_surjective _ (doubleCoset_surj_of_le H K J), ?_⟩
   have := Nat.card_le_card_of_surjective _ (doubleCoset_surj_of_le H K J)
   rwa [Nat.card_prod] at this
 
-theorem cls_finite_card_le : ∀ (D : D7) (N : ℕ), Finite (Cls D N (intG D N)) ∧ (Nat.card (Cls D N (intG D N)) : ℝ) ≤ (12 * (fF D : ℝ) ^ 2 * (N : ℝ) ^ 4 * D.host.rdE ^ 2) ^ (6 * fF D * N ^ 2) ∧ ∀ J : Subgroup (GA D N), J ≤ intG D N → J.relIndex (intG D N) ≠ 0 → Finite (Cls D N J) ∧ Nat.card (Cls D N J) ≤ Nat.card (Cls D N (intG D N)) * J.relIndex (intG D N) := by
+theorem cls_finite_card_le
+    : ∀ (D : D7) (N : ℕ),
+      Finite (Cls D N (intG D N))
+        ∧ (Nat.card (Cls D N (intG D N)) : ℝ)
+          ≤ (12 * (fF D : ℝ) ^ 2 * (N : ℝ) ^ 4 * D.host.rdE ^ 2) ^ (6 * fF D * N ^ 2)
+        ∧ ∀ J : Subgroup (GA D N),
+          J ≤ intG D N → J.relIndex (intG D N) ≠ 0
+            → Finite (Cls D N J)
+              ∧ Nat.card (Cls D N J) ≤ Nat.card (Cls D N (intG D N)) * J.relIndex (intG D N) := by
   intro D N
   have hcm : IsCMField D.host.E := D.host.isCMField_hostE
   have hconj : ∀ x : D.host.E, IsCMField.complexConj D.host.E x = D.host.conj x := by
@@ -57,17 +70,18 @@ theorem cls_finite_card_le : ∀ (D : D7) (N : ℕ), Finite (Cls D N (intG D N))
   have key : ∀ g : GA D N, ∃ L₀ ∈ R, ∃ h ∈ ratG D N, Lt (h⁻¹ * g) = L₀ := by
     intro g
     obtain ⟨h1, h2, h3⟩ := (hSD g).2
-    obtain ⟨L₀, hL₀, γ, hγ, hx⟩ := hcov (Lt g) h1 h2 (by
-      intro y
-      rw [h3 y]
-      refine forall_congr' fun x => forall_congr' fun _ => ?_
-      constructor
-      · rintro ⟨z, hz⟩
-        have hz' : (z : D.host.E) = ∑ i, IsCMField.complexConj D.host.E (x i) * y i := hz
-        rw [← hz']
-        exact z.isIntegral_coe
-      · intro hz
-        exact ⟨⟨_, hz⟩, rfl⟩)
+    obtain ⟨L₀, hL₀, γ, hγ, hx⟩ :=
+      hcov (Lt g) h1 h2 (by
+        intro y
+        rw [h3 y]
+        refine forall_congr' fun x => forall_congr' fun _ => ?_
+        constructor
+        · rintro ⟨z, hz⟩
+          have hz' : (z : D.host.E) = ∑ i, IsCMField.complexConj D.host.E (x i) * y i := hz
+          rw [← hz']
+          exact z.isIntegral_coe
+        · intro hz
+          exact ⟨⟨_, hz⟩, rfl⟩)
     have hm : γ.map (IsCMField.complexConj D.host.E) = γ.map D.host.conj := by
       ext i j
       simp only [Matrix.map_apply, hconj]
@@ -83,7 +97,8 @@ theorem cls_finite_card_le : ∀ (D : D7) (N : ℕ), Finite (Cls D N (intG D N))
     have e' : L₀ c.out = L₀ c'.out := congrArg Subtype.val e
     rw [← hL, ← hL, hLt] at e'
     rw [← DoubleCoset.out_eq' c, ← DoubleCoset.out_eq' c', DoubleCoset.eq]
-    refine ⟨h c'.out * (h c.out)⁻¹, Subgroup.mul_mem _ (hh _) (Subgroup.inv_mem _ (hh _)), _, e', ?_⟩
+    refine
+      ⟨h c'.out * (h c.out)⁻¹, Subgroup.mul_mem _ (hh _) (Subgroup.inv_mem _ (hh _)), _, e', ?_⟩
     group
   have hfin : Finite (Cls D N (intG D N)) := Finite.of_injective f hf
   refine ⟨hfin, ?_, fun J _ hJ => doubleCoset_card_le _ _ J hJ⟩
@@ -91,7 +106,8 @@ theorem cls_finite_card_le : ∀ (D : D7) (N : ℕ), Finite (Cls D N (intG D N))
     have := Nat.card_le_card_of_injective f hf
     simpa using this
   refine le_trans (by exact_mod_cast hc) (hR.trans (le_of_eq ?_))
-  have hrd : |(discr D.host.E : ℝ)| ^ ((1 : ℝ) / (Module.finrank ℚ D.host.E : ℝ)) = D.host.rdE := rfl
+  have hrd : |(discr D.host.E : ℝ)| ^ ((1 : ℝ) / (Module.finrank ℚ D.host.E : ℝ)) = D.host.rdE :=
+    rfl
   rw [hrd, hfr]
   have : 3 * (2 * fF D) * N ^ 2 = 6 * fF D * N ^ 2 := by ring
   rw [this]

@@ -16,8 +16,8 @@ variable {n : ℕ}
 
 section Frob
 
-attribute [local instance] Matrix.frobeniusNormedAddCommGroup Matrix.frobeniusNormedRing
-  Matrix.frobeniusNormedAlgebra
+attribute [local instance]
+  Matrix.frobeniusNormedAddCommGroup Matrix.frobeniusNormedRing Matrix.frobeniusNormedAlgebra
 
 lemma coefOp_apply_le_frob (A : Matrix (Fin n) (Fin n) ℂ) (v : EuclideanSpace ℂ (Fin n)) :
     ‖Matrix.toEuclideanCLM (𝕜 := ℂ) A v‖ ≤ ‖A‖ * ‖v‖ := by
@@ -56,36 +56,43 @@ lemma coefOp_unitary_le_one {k : Matrix (Fin n) (Fin n) ℂ} (hk : k ∈ Matrix.
     ContinuousLinearMap.norm_id_le
   nlinarith [norm_nonneg (Matrix.toEuclideanCLM (𝕜 := ℂ) k)]
 
-theorem coefOp_le_sqrt_hs (A : Matrix (Fin n) (Fin n) ℂ) :
-    ‖Matrix.toEuclideanCLM (𝕜 := ℂ) A‖ ≤ Real.sqrt (S7.hs A) := by
+theorem coefOp_le_sqrt_hs (A : Matrix (Fin n) (Fin n) ℂ)
+    : ‖Matrix.toEuclideanCLM (𝕜 := ℂ) A‖ ≤ Real.sqrt (S7.hs A) := by
   refine ContinuousLinearMap.opNorm_le_bound _ (Real.sqrt_nonneg _) fun v => ?_
   have h := coefOp_apply_le_frob A v
   rwa [← S7.sqrt_hs_frobVG A] at h
 
-theorem coefOp_unitary_mul_exp {k : Matrix (Fin n) (Fin n) ℂ} (hk : k ∈ Matrix.unitaryGroup (Fin n) ℂ)
-    (X : Matrix (Fin n) (Fin n) ℂ) :
-    ‖Matrix.toEuclideanCLM (𝕜 := ℂ) (k * NormedSpace.exp X)‖ ≤ Real.exp (Real.sqrt (S7.hs X)) := by
+theorem coefOp_unitary_mul_exp
+    {k : Matrix (Fin n) (Fin n) ℂ} (hk : k ∈ Matrix.unitaryGroup (Fin n) ℂ)
+    (X : Matrix (Fin n) (Fin n) ℂ)
+    : ‖Matrix.toEuclideanCLM (𝕜 := ℂ) (k * NormedSpace.exp X)‖
+      ≤ Real.exp (Real.sqrt (S7.hs X)) := by
   have hc : Continuous (Matrix.toEuclideanCLM (n := Fin n) (𝕜 := ℂ)) :=
-    (Matrix.toEuclideanCLM (n := Fin n) (𝕜 := ℂ)).toAlgEquiv.toLinearEquiv.toLinearMap.continuous_of_finiteDimensional
-  have hexp : Matrix.toEuclideanCLM (𝕜 := ℂ) (NormedSpace.exp X) =
-      NormedSpace.exp (Matrix.toEuclideanCLM (𝕜 := ℂ) X) := by
+    (Matrix.toEuclideanCLM (n := Fin n)
+      (𝕜 := ℂ)).toAlgEquiv.toLinearEquiv.toLinearMap.continuous_of_finiteDimensional
+  have hexp
+      : Matrix.toEuclideanCLM (𝕜 := ℂ) (NormedSpace.exp X)
+        = NormedSpace.exp (Matrix.toEuclideanCLM (𝕜 := ℂ) X) := by
     let _ : NormedRing (Matrix (Fin n) (Fin n) ℂ) := Matrix.frobeniusNormedRing
     let _ : NormedAlgebra ℂ (Matrix (Fin n) (Fin n) ℂ) := Matrix.frobeniusNormedAlgebra
     refine NormedSpace.map_exp_of_mem_ball (𝕂 := ℂ) _ hc X ?_
     rw [NormedSpace.expSeries_radius_eq_top]
     simp
   rw [map_mul, hexp]
-  calc ‖Matrix.toEuclideanCLM (𝕜 := ℂ) k * NormedSpace.exp (Matrix.toEuclideanCLM (𝕜 := ℂ) X)‖
-      ≤ ‖Matrix.toEuclideanCLM (𝕜 := ℂ) k‖ * ‖NormedSpace.exp (Matrix.toEuclideanCLM (𝕜 := ℂ) X)‖ :=
-        norm_mul_le _ _
+  calc
+    ‖Matrix.toEuclideanCLM (𝕜 := ℂ) k * NormedSpace.exp (Matrix.toEuclideanCLM (𝕜 := ℂ) X)‖
+        ≤ ‖Matrix.toEuclideanCLM (𝕜 := ℂ) k‖
+          * ‖NormedSpace.exp (Matrix.toEuclideanCLM (𝕜 := ℂ) X)‖ :=
+      norm_mul_le _ _
     _ ≤ 1 * Real.exp (Real.sqrt (S7.hs X)) :=
-        mul_le_mul (coefOp_unitary_le_one hk)
-          ((coefOp_norm_exp_clm _).trans (Real.exp_le_exp.mpr (coefOp_le_sqrt_hs X)))
-          (norm_nonneg _) zero_le_one
+      mul_le_mul (coefOp_unitary_le_one hk)
+        ((coefOp_norm_exp_clm _).trans (Real.exp_le_exp.mpr (coefOp_le_sqrt_hs X))) (norm_nonneg _)
+        zero_le_one
     _ = Real.exp (Real.sqrt (S7.hs X)) := one_mul _
 
-theorem coefOp_kexp {ε : Fin n → Bool} (k : S7.KG ε) (X : Matrix (Fin n) (Fin n) ℂ) :
-    ‖Matrix.toEuclideanCLM (𝕜 := ℂ) (S7.toMK k * NormedSpace.exp X)‖ ≤ Real.exp (Real.sqrt (S7.hs X)) := by
+theorem coefOp_kexp {ε : Fin n → Bool} (k : S7.KG ε) (X : Matrix (Fin n) (Fin n) ℂ)
+    : ‖Matrix.toEuclideanCLM (𝕜 := ℂ) (S7.toMK k * NormedSpace.exp X)‖
+      ≤ Real.exp (Real.sqrt (S7.hs X)) := by
   have hk : S7.toMK k ∈ Matrix.unitaryGroup (Fin n) ℂ := by
     rw [Matrix.mem_unitaryGroup_iff, Matrix.star_eq_conjTranspose]
     exact (S7.toMK_facts k).2.1

@@ -12,14 +12,17 @@ open Polynomial CategoryTheory
 
 namespace GlobalTheory.SerOSys
 
-theorem repIso_of_zIdem_eq_of_simple {Γ : Type} [Group Γ] [Fintype Γ] (τ τ' : FDRep ℂ Γ)
-    (h : Simple τ) (h' : Simple τ') (he : zIdem τ = zIdem τ') : RepIso τ.ρ τ'.ρ := by
+theorem repIso_of_zIdem_eq_of_simple
+    {Γ : Type} [Group Γ] [Fintype Γ]
+    (τ τ' : FDRep ℂ Γ) (h : Simple τ) (h' : Simple τ') (he : zIdem τ = zIdem τ')
+    : RepIso τ.ρ τ'.ρ := by
   classical
   have hc0 : (Fintype.card Γ : ℂ) ≠ 0 := by exact_mod_cast Fintype.card_ne_zero
   have : Invertible (Nat.card Γ : ℂ) :=
     invertibleOfNonzero (by rw [Nat.card_eq_fintype_card]; exact hc0)
-  have hco : ∀ γ, (Module.finrank ℂ τ : ℂ) * τ.character γ
-      = (Module.finrank ℂ τ' : ℂ) * τ'.character γ := by
+  have hco
+      : ∀ γ,
+        (Module.finrank ℂ τ : ℂ) * τ.character γ = (Module.finrank ℂ τ' : ℂ) * τ'.character γ := by
     intro γ
     have h1 := congrArg (fun z => z.coeff γ⁻¹) he
     simp only [zIdem_coeff, inv_inv] at h1
@@ -29,8 +32,9 @@ theorem repIso_of_zIdem_eq_of_simple {Γ : Type} [Group Γ] [Fintype Γ] (τ τ'
   have hd : Module.finrank ℂ τ = Module.finrank ℂ τ' := by
     have h1 := hco 1
     rw [FDRep.char_one, FDRep.char_one] at h1
-    have h2 : Module.finrank ℂ τ * Module.finrank ℂ τ
-        = Module.finrank ℂ τ' * Module.finrank ℂ τ' := by exact_mod_cast h1
+    have h2
+        : Module.finrank ℂ τ * Module.finrank ℂ τ = Module.finrank ℂ τ' * Module.finrank ℂ τ' := by
+      exact_mod_cast h1
     exact Nat.mul_self_inj.1 h2
   have hs0 := FDRep.char_orthonormal τ τ
   rw [if_pos ⟨Iso.refl _⟩] at hs0

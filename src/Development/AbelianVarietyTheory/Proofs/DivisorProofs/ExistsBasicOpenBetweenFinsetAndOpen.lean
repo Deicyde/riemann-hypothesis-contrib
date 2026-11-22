@@ -7,15 +7,23 @@ public import Development.AbelianVarietyTheory.Definitions.Degenerations.Admissi
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 
 namespace GlobalTheory.Mum
 
-theorem exists_basicOpen_between_finset_and_open : ∀ (X : Scheme.{0}) (W : X.Opens), IsAffineOpen W → ∀ (V : X.Opens), V ≤ W → ∀ s : Finset X, (∀ x ∈ s, x ∈ V) → ∃ f : Γ(X, W), X.basicOpen f ≤ V ∧ ∀ x ∈ s, x ∈ X.basicOpen f := by
+theorem exists_basicOpen_between_finset_and_open
+    : ∀ (X : Scheme.{0}) (W : X.Opens),
+      IsAffineOpen W
+        → ∀ (V : X.Opens),
+          V ≤ W
+            → ∀ s : Finset X,
+              (∀ x ∈ s, x ∈ V) → ∃ f : Γ(X, W), X.basicOpen f ≤ V ∧ ∀ x ∈ s, x ∈ X.basicOpen f := by
   classical
   intro X W hW V hVW s hs
   rcases s.eq_empty_or_nonempty with rfl | ⟨x₀, hx₀⟩
@@ -33,14 +41,15 @@ theorem exists_basicOpen_between_finset_and_open : ∀ (X : Scheme.{0}) (W : X.O
     intro x hx _ _
     rw [hPx x (hVW (hs x hx))]
     exact (hW.primeIdealOf _).isPrime
-  have key : ¬ ((PrimeSpectrum.vanishingIdeal Z : Set Γ(X, W)) ⊆
-      ⋃ i ∈ (↑s : Set X), (P i : Set Γ(X, W))) := by
+  have key : ¬((PrimeSpectrum.vanishingIdeal Z : Set Γ(X, W))
+      ⊆ ⋃ i ∈ (↑s : Set X), (P i : Set Γ(X, W))) := by
     rw [Ideal.subset_union_prime x₀ x₀ hP]
     rintro ⟨x, hx, hle⟩
     have hxW : x ∈ W := hVW (hs x hx)
     rw [hPx x hxW] at hle
-    have hmem : hW.primeIdealOf ⟨x, hxW⟩ ∈
-        PrimeSpectrum.zeroLocus (PrimeSpectrum.vanishingIdeal Z : Set Γ(X, W)) :=
+    have hmem
+        : hW.primeIdealOf ⟨x, hxW⟩
+          ∈ PrimeSpectrum.zeroLocus (PrimeSpectrum.vanishingIdeal Z : Set Γ(X, W)) :=
       (PrimeSpectrum.mem_zeroLocus _ _).2 hle
     rw [PrimeSpectrum.zeroLocus_vanishingIdeal_eq_closure, hZc.closure_eq] at hmem
     apply hmem

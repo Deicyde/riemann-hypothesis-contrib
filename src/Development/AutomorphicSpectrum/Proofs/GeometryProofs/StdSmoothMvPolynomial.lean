@@ -11,10 +11,11 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.LieInh
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  GlobalTheory.CompanionTheory.Ar
 
-theorem stdSmooth_mvPolynomial (R : Type) [CommRing R] (n : ℕ) :
-    Algebra.IsStandardSmoothOfRelativeDimension n R (MvPolynomial (Fin n) R) := by
+theorem stdSmooth_mvPolynomial (R : Type) [CommRing R] (n : ℕ)
+    : Algebra.IsStandardSmoothOfRelativeDimension n R (MvPolynomial (Fin n) R) := by
   have hker : (Algebra.Generators.mvPolynomial R (Fin n)).ker = ⊥ := by
     rw [Algebra.Generators.ker_eq_ker_aeval_val, Algebra.Generators.mvPolynomial_val]
     exact (RingHom.injective_iff_ker_eq_bot _).1 fun a b h => by
@@ -23,11 +24,15 @@ theorem stdSmooth_mvPolynomial (R : Type) [CommRing R] (n : ℕ) :
     ⟨Algebra.Generators.mvPolynomial R (Fin n), Empty.elim, by rw [hker]; simp⟩
   let P' : Algebra.PreSubmersivePresentation R (MvPolynomial (Fin n) R) (Fin n) Empty :=
     ⟨P, Empty.elim, fun a => a.elim⟩
-  let P'' : Algebra.SubmersivePresentation R (MvPolynomial (Fin n) R) (Fin n) Empty :=
-    ⟨P', by
-      rw [Algebra.PreSubmersivePresentation.jacobian_eq_jacobiMatrix_det, Matrix.det_isEmpty, map_one]
-      exact isUnit_one⟩
-  refine Algebra.IsStandardSmoothOfRelativeDimension.mk ⟨Fin n, Empty, inferInstance, inferInstance, P'', ?_⟩
+  let P'' : Algebra.SubmersivePresentation R (MvPolynomial (Fin n) R) (Fin n) Empty := ⟨
+    P',
+    by
+      rw [Algebra.PreSubmersivePresentation.jacobian_eq_jacobiMatrix_det, Matrix.det_isEmpty,
+        map_one]
+      exact isUnit_one
+  ⟩
+  refine Algebra.IsStandardSmoothOfRelativeDimension.mk
+    ⟨Fin n, Empty, inferInstance, inferInstance, P'', ?_⟩
   simp [Algebra.Presentation.dimension]
 
 variable {X : Scheme.{0}}

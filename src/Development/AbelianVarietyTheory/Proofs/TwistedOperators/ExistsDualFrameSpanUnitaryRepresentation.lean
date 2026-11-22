@@ -36,9 +36,12 @@ lemma eq_zero_of_trace_adjoint_comp_self (B : H →ₗ[ℂ] H)
   simpa using this
 
 noncomputable def pairing (W : Submodule ℂ (H →ₗ[ℂ] H)) : LinearMap.BilinForm ℂ W :=
-  LinearMap.mk₂ ℂ (fun X Y : W => LinearMap.trace ℂ H ((X : H →ₗ[ℂ] H) ∘ₗ (Y : H →ₗ[ℂ] H)))
-    (fun x y z => by simp [LinearMap.add_comp]) (fun c x y => by simp [LinearMap.smul_comp])
-    (fun x y z => by simp [LinearMap.comp_add]) (fun c x y => by simp [LinearMap.comp_smul])
+  LinearMap.mk₂ ℂ
+    (fun X Y : W => LinearMap.trace ℂ H ((X : H →ₗ[ℂ] H) ∘ₗ (Y : H →ₗ[ℂ] H)))
+    (fun x y z => by simp [LinearMap.add_comp])
+    (fun c x y => by simp [LinearMap.smul_comp])
+    (fun x y z => by simp [LinearMap.comp_add])
+    (fun c x y => by simp [LinearMap.comp_smul])
 
 lemma pairing_apply (W : Submodule ℂ (H →ₗ[ℂ] H)) (X Y : W) :
     pairing W X Y = LinearMap.trace ℂ H ((X : H →ₗ[ℂ] H) ∘ₗ (Y : H →ₗ[ℂ] H)) := rfl
@@ -84,13 +87,18 @@ lemma comp_mem_span (hmul : ∀ g ∈ K, ∀ h ∈ K, g * h ∈ K)
 
 end span
 
-theorem dual_frame : ∀ {G H : Type} [Mul G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [FiniteDimensional ℂ H]
-    (K : Set G) (ρ : G → (H →ₗ[ℂ] H)) (hmul : ∀ g ∈ K, ∀ h ∈ K, g * h ∈ K)
-    (hρ : ∀ g ∈ K, ∀ h ∈ K, ρ (g * h) = ρ g ∘ₗ ρ h)
-    (hadj : ∀ g ∈ K, ∃ g' ∈ K, LinearMap.adjoint (ρ g) = ρ g'), ∃ (m : ℕ) (k : Fin m → G) (B : Fin m → (H →ₗ[ℂ] H)), (∀ j, k j ∈ K) ∧
-      (∀ A : H →ₗ[ℂ] H, ∀ g ∈ K, LinearMap.trace ℂ H (ρ g ∘ₗ A) =
-        ∑ j, LinearMap.trace ℂ H (ρ (k j) ∘ₗ A) * LinearMap.trace ℂ H (ρ g ∘ₗ B j)) ∧
-      (∀ i, ∀ h ∈ K, B i ∘ₗ ρ h = ∑ j, LinearMap.trace ℂ H (ρ (k j) ∘ₗ (B i ∘ₗ ρ h)) • B j) := by
+theorem dual_frame
+    : ∀ {G H : Type} [Mul G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [FiniteDimensional ℂ H]
+        (K : Set G) (ρ : G → (H →ₗ[ℂ] H)) (hmul : ∀ g ∈ K, ∀ h ∈ K, g * h ∈ K)
+        (hρ : ∀ g ∈ K, ∀ h ∈ K, ρ (g * h) = ρ g ∘ₗ ρ h)
+        (hadj : ∀ g ∈ K, ∃ g' ∈ K, LinearMap.adjoint (ρ g) = ρ g'),
+      ∃ (m : ℕ) (k : Fin m → G) (B : Fin m → (H →ₗ[ℂ] H)),
+        (∀ j, k j ∈ K)
+          ∧ (∀ A : H →ₗ[ℂ] H, ∀ g ∈ K,
+            LinearMap.trace ℂ H (ρ g ∘ₗ A)
+              = ∑ j, LinearMap.trace ℂ H (ρ (k j) ∘ₗ A) * LinearMap.trace ℂ H (ρ g ∘ₗ B j))
+          ∧ (∀ i, ∀ h ∈ K,
+            B i ∘ₗ ρ h = ∑ j, LinearMap.trace ℂ H (ρ (k j) ∘ₗ (B i ∘ₗ ρ h)) • B j) := by
   intro G H _ _ _ _ K ρ hmul hρ hadj
   classical
   obtain ⟨t, hts, hsp, hli⟩ := exists_linearIndependent ℂ (ρ '' K)
@@ -104,8 +112,7 @@ theorem dual_frame : ∀ {G H : Type} [Mul G] [NormedAddCommGroup H] [InnerProdu
   let b : Basis (Fin (Fintype.card t)) ℂ W := b0.reindex e
   have hb : ∀ j, ((b j : W) : H →ₗ[ℂ] H) = ((e.symm j : t) : H →ₗ[ℂ] H) := by
     intro j; simp [b, b0, Basis.span_apply]
-  have hbK : ∀ j, ∃ g ∈ K, ρ g = (b j : H →ₗ[ℂ] H) := fun j => by
-    rw [hb]; exact hts (e.symm j).2
+  have hbK : ∀ j, ∃ g ∈ K, ρ g = (b j : H →ₗ[ℂ] H) := fun j => by rw [hb]; exact hts (e.symm j).2
   choose k hkK hk using hbK
   have hnd := pairing_nondegenerate W (fun X hX => adjoint_mem_span K ρ hadj hX)
   let D := (pairing W).dualBasis hnd b
@@ -118,7 +125,8 @@ theorem dual_frame : ∀ {G H : Type} [Mul G] [NormedAddCommGroup H] [InnerProdu
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [Submodule.coe_smul, LinearMap.BilinForm.dualBasis_repr_apply, pairing_apply, hk,
       LinearMap.trace_comp_comm' (b j : H →ₗ[ℂ] H) X]
-  have hdual : ∀ i j, LinearMap.trace ℂ H (ρ (k i) ∘ₗ (D j : H →ₗ[ℂ] H)) = if i = j then 1 else 0 := by
+  have hdual
+      : ∀ i j, LinearMap.trace ℂ H (ρ (k i) ∘ₗ (D j : H →ₗ[ℂ] H)) = if i = j then 1 else 0 := by
     intro i j
     rw [hk, LinearMap.trace_comp_comm']
     exact LinearMap.BilinForm.apply_dualBasis_left hnd b j i
@@ -128,8 +136,8 @@ theorem dual_frame : ∀ {G H : Type} [Mul G] [NormedAddCommGroup H] [InnerProdu
     have hbi : ∀ i, LinearMap.trace ℂ H (ρ (k i) ∘ₗ A') = LinearMap.trace ℂ H (ρ (k i) ∘ₗ A) := by
       intro i
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [A', comp_sum', LinearMap.comp_smul, map_sum, map_smul, hdual, smul_eq_mul,
-        mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+      simp only [A', comp_sum', LinearMap.comp_smul, map_sum, map_smul, hdual, smul_eq_mul, mul_ite,
+        mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
     have hvan : ∀ C ∈ W, LinearMap.trace ℂ H (C ∘ₗ A') = LinearMap.trace ℂ H (C ∘ₗ A) := by
       intro C hC
       have h1 := congrArg Subtype.val (b.sum_repr ⟨C, hC⟩)
@@ -137,10 +145,10 @@ theorem dual_frame : ∀ {G H : Type} [Mul G] [NormedAddCommGroup H] [InnerProdu
       change _ = C at h1
       rw [← h1]
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Submodule.coe_smul, sum_comp', LinearMap.smul_comp, map_sum, map_smul, ← hk, hbi]
+      simp only [Submodule.coe_smul, sum_comp', LinearMap.smul_comp, map_sum, map_smul, ← hk, hbi]
     rw [← hvan (ρ g) (Submodule.subset_span ⟨g, hg, rfl⟩)]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [A', comp_sum', LinearMap.comp_smul, map_sum, map_smul, smul_eq_mul]
+    simp only [A', comp_sum', LinearMap.comp_smul, map_sum, map_smul, smul_eq_mul]
   · intro i h hh
     exact expand _ (comp_mem_span K ρ hmul hρ hh (D i).2)
 

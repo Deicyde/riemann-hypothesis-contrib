@@ -21,17 +21,17 @@ theorem eq_sum_single (a : MonoidAlgebra ℂ G) : a = ∑ x, MonoidAlgebra.singl
   ext y
   simp [MonoidAlgebra.coeff_sum, Finsupp.single_apply]
 
-theorem coeff_mul_zOf (a : MonoidAlgebra ℂ G) (χ : G → ℂ) :
-    (a * zOf χ).coeff 1 = χ 1 / (Fintype.card G : ℂ) * ∑ x, a.coeff x * χ x := by
+theorem coeff_mul_zOf (a : MonoidAlgebra ℂ G) (χ : G → ℂ)
+    : (a * zOf χ).coeff 1 = χ 1 / (Fintype.card G : ℂ) * ∑ x, a.coeff x * χ x := by
   conv_lhs => rw [eq_sum_single a]
   rw [Finset.sum_mul, MonoidAlgebra.coeff_sum, Finsupp.finsetSum_apply, Finset.mul_sum]
   refine Finset.sum_congr rfl fun x _ => ?_
   rw [MonoidAlgebra.coeff_single_mul_apply, coeff_zOf, mul_one, inv_inv]
   ring
 
-theorem trace_alg (a : MonoidAlgebra ℂ G) (V : FDRep ℂ G) :
-    ∑ x, a.coeff x * V.character x =
-      LinearMap.trace ℂ V (Representation.asAlgebraHom (V.ρ : Representation ℂ G V) a) := by
+theorem trace_alg (a : MonoidAlgebra ℂ G) (V : FDRep ℂ G)
+    : ∑ x, a.coeff x * V.character x
+      = LinearMap.trace ℂ V (Representation.asAlgebraHom (V.ρ : Representation ℂ G V) a) := by
   conv_rhs => rw [eq_sum_single a]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum, map_sum]
@@ -39,16 +39,16 @@ theorem trace_alg (a : MonoidAlgebra ℂ G) (V : FDRep ℂ G) :
   rw [Representation.asAlgebraHom_single, map_smul, smul_eq_mul]
   rfl
 
-theorem trace_nat (a : MonoidAlgebra ℂ G) (ha : a * a = a) (V : FDRep ℂ G) :
-    ∃ m : ℕ, ∑ x, a.coeff x * V.character x = m := by
+theorem trace_nat (a : MonoidAlgebra ℂ G) (ha : a * a = a) (V : FDRep ℂ G)
+    : ∃ m : ℕ, ∑ x, a.coeff x * V.character x = m := by
   have hi : IsIdempotentElem (Representation.asAlgebraHom (V.ρ : Representation ℂ G V) a) := by
     unfold IsIdempotentElem
     rw [← map_mul, ha]
   rw [trace_alg]
   exact ⟨_, (LinearMap.IsIdempotentElem.isProj_range _ hi).trace⟩
 
-theorem re_nonneg (a : MonoidAlgebra ℂ G) (ha : a * a = a) (χ : G → ℂ) (hχ : IsIrr χ) :
-    0 ≤ ((a * zOf χ).coeff 1).re := by
+theorem re_nonneg (a : MonoidAlgebra ℂ G) (ha : a * a = a) (χ : G → ℂ) (hχ : IsIrr χ)
+    : 0 ≤ ((a * zOf χ).coeff 1).re := by
   obtain ⟨V, -, hV⟩ := hχ
   obtain ⟨m, hm⟩ := trace_nat a ha V
   rw [coeff_mul_zOf, ← hV 1, FDRep.char_one]
@@ -59,7 +59,9 @@ theorem re_nonneg (a : MonoidAlgebra ℂ G) (ha : a * a = a) (χ : G → ℂ) (h
 
 end CompanionTheory.Member.TraceCoefficientSum
 
-theorem CompanionTheory.Member.harishChandraSeriesWeight_nonneg_of_idempotent : ∀ (g : ℕ) [Fact g.Prime] (L : LabelDatum g) (n : ℕ) (a : MonoidAlgebra ℂ (Gn g n)), a * a = a → 0 ≤ (a.coeff 1).re → ∀ f, 0 ≤ wtC L a f := by
+theorem CompanionTheory.Member.harishChandraSeriesWeight_nonneg_of_idempotent
+    : ∀ (g : ℕ) [Fact g.Prime] (L : LabelDatum g) (n : ℕ) (a : MonoidAlgebra ℂ (Gn g n)),
+      a * a = a → 0 ≤ (a.coeff 1).re → ∀ f, 0 ≤ wtC L a f := by
   intro g _ L n a ha h1 f
   refine div_nonneg ?_ h1
   unfold eSerC
@@ -75,7 +77,15 @@ end
 section
 open GlobalTheory.GLq Formalism.MainNotions.ArithmeticCylinders Polynomial
 open scoped Classical
-theorem _root_.GlobalTheory.Adopt.harishChandraSeriesWeight_nonneg_of_idempotent_glnPrime : ∀ (g : ℕ) [Fact g.Prime] (L : LabelDatum g) (n : ℕ) (a : MonoidAlgebra ℂ (Gn g n)), a * a = a → 0 ≤ (a.coeff 1).re → ∀ f, 0 ≤ wtC L a f := by
-  first | exact @CompanionTheory.Member.harishChandraSeriesWeight_nonneg_of_idempotent | exact CompanionTheory.Member.harishChandraSeriesWeight_nonneg_of_idempotent | (intros; apply CompanionTheory.Member.harishChandraSeriesWeight_nonneg_of_idempotent <;> assumption)
+theorem _root_.GlobalTheory.Adopt.harishChandraSeriesWeight_nonneg_of_idempotent_glnPrime
+    : ∀ (g : ℕ) [Fact g.Prime] (L : LabelDatum g) (n : ℕ) (a : MonoidAlgebra ℂ (Gn g n)),
+      a * a = a → 0 ≤ (a.coeff 1).re → ∀ f, 0 ≤ wtC L a f := by
+  first
+  | exact @CompanionTheory.Member.harishChandraSeriesWeight_nonneg_of_idempotent
+  | exact CompanionTheory.Member.harishChandraSeriesWeight_nonneg_of_idempotent
+  | (
+      intros
+      apply CompanionTheory.Member.harishChandraSeriesWeight_nonneg_of_idempotent <;> assumption
+    )
 
 end

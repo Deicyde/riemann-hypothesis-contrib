@@ -11,7 +11,14 @@ open scoped WithZero TensorProduct Pointwise
 
 namespace GlobalTheory.CNorm
 
-theorem galois_places_transitive : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsGalois F E], (∀ (τ : E ≃ₐ[F] E) (w : HeightOneSpectrum (𝓞 E)), ∃ w' : HeightOneSpectrum (𝓞 E), w'.under (𝓞 F) = w.under (𝓞 F) ∧ ∀ y : E, w'.valuation E y = w.valuation E (τ y)) ∧ ∀ w w' : HeightOneSpectrum (𝓞 E), w'.under (𝓞 F) = w.under (𝓞 F) → ∃ τ : E ≃ₐ[F] E, ∀ y : E, w'.valuation E y = w.valuation E (τ y) := by
+theorem galois_places_transitive
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        [IsGalois F E],
+      (∀ (τ : E ≃ₐ[F] E) (w : HeightOneSpectrum (𝓞 E)), ∃ w' : HeightOneSpectrum (𝓞 E),
+          w'.under (𝓞 F) = w.under (𝓞 F) ∧ ∀ y : E, w'.valuation E y = w.valuation E (τ y))
+        ∧ ∀ w w' : HeightOneSpectrum (𝓞 E),
+          w'.under (𝓞 F) = w.under (𝓞 F)
+            → ∃ τ : E ≃ₐ[F] E, ∀ y : E, w'.valuation E y = w.valuation E (τ y) := by
   intro F E _ _ _ _ _ _
   refine ⟨fun σ w => ?_, fun w w' hu => ?_⟩
   · set e : 𝓞 E ≃+* 𝓞 E := RingOfIntegers.mapRingEquiv σ.toRingEquiv with he
@@ -32,8 +39,8 @@ theorem galois_places_transitive : ∀ (F E : Type) [Field F] [NumberField F] [F
     haveI := w'.isPrime
     haveI : w.asIdeal.LiesOver (w.under (𝓞 F)).asIdeal := ⟨rfl⟩
     haveI : w'.asIdeal.LiesOver (w.under (𝓞 F)).asIdeal := hu ▸ ⟨rfl⟩
-    obtain ⟨σ, hσ⟩ := Ideal.exists_smul_eq_of_isGaloisGroup (w.under (𝓞 F)).asIdeal
-      w'.asIdeal w.asIdeal (E ≃ₐ[F] E)
+    obtain ⟨σ, hσ⟩ :=
+      Ideal.exists_smul_eq_of_isGaloisGroup (w.under (𝓞 F)).asIdeal w'.asIdeal w.asIdeal (E ≃ₐ[F] E)
     refine ⟨σ, fun y => valuation_of_eq_comap σ.toRingEquiv w w' ?_ y⟩
     ext x
     rw [Ideal.mem_comap, ← hσ]

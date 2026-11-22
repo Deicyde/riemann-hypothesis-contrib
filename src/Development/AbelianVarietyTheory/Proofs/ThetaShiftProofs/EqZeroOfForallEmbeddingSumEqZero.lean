@@ -6,8 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem eq_zero_of_forall_embedding_sum_eq_zero :
-    ∀ (K K₁ : Type) [Field K] [CharZero K] [Field K₁] [Algebra K K₁] [FiniteDimensional K K₁] (σ₀ : K →+* ℂ) (n : ℕ) (e : Fin n → ℂ) (y : Fin n → K₁), (∀ c : Fin n → K, ∑ b, σ₀ (c b) * e b = 0 → c = 0) → (∀ σ₁ : K₁ →+* ℂ, σ₁.comp (algebraMap K K₁) = σ₀ → ∑ b, e b * σ₁ (y b) = 0) → y = 0 := by
+theorem eq_zero_of_forall_embedding_sum_eq_zero
+    : ∀ (K K₁ : Type) [Field K] [CharZero K] [Field K₁] [Algebra K K₁] [FiniteDimensional K K₁]
+        (σ₀ : K →+* ℂ) (n : ℕ) (e : Fin n → ℂ) (y : Fin n → K₁),
+      (∀ c : Fin n → K, ∑ b, σ₀ (c b) * e b = 0 → c = 0)
+        → (∀ σ₁ : K₁ →+* ℂ, σ₁.comp (algebraMap K K₁) = σ₀ → ∑ b, e b * σ₁ (y b) = 0)
+        → y = 0 := by
   intro K K₁ _ _ _ _ _ σ₀ n e y hind hrel
   classical
   letI : Algebra K ℂ := σ₀.toAlgebra
@@ -26,14 +30,15 @@ theorem eq_zero_of_forall_embedding_sum_eq_zero :
   have hu : u = 0 := by
     apply Matrix.eq_zero_of_vecMul_eq_zero hdet
     funext j
-    have h1 := hrel (ε j : K₁ →+* ℂ) (by
-      ext x
-      simp [hσ])
+    have h1 :=
+      hrel (ε j : K₁ →+* ℂ) (by
+        ext x
+        simp [hσ])
     have h2 : ∀ b, (ε j : K₁ →+* ℂ) (y b) = ∑ s, σ₀ (ω.repr (y b) s) * ε j (ω s) := by
       intro b
       conv_lhs => rw [← ω.sum_repr (y b)]
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [RingHom.coe_coe, map_sum, Algebra.smul_def, map_mul, AlgHom.commutes, hσ]
+      simp only [RingHom.coe_coe, map_sum, Algebra.smul_def, map_mul, AlgHom.commutes, hσ]
     simp only [h2, Finset.mul_sum] at h1
     rw [Finset.sum_comm] at h1
     simp only [Matrix.vecMul, dotProduct, u, Finset.sum_mul, Pi.zero_apply]
@@ -41,7 +46,8 @@ theorem eq_zero_of_forall_embedding_sum_eq_zero :
     refine Finset.sum_congr rfl fun s _ => Finset.sum_congr rfl fun b _ => ?_
     have : Algebra.embeddingsMatrixReindex K ℂ ω ε s j = ε j (ω s) := by
       simp [Algebra.embeddingsMatrixReindex, Algebra.embeddingsMatrix]
-    rw [this]; ring
+    rw [this]
+    ring
   funext b
   apply ω.repr.injective
   ext s

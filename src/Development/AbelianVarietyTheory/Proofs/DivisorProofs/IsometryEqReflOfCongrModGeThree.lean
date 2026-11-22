@@ -8,9 +8,13 @@ open IsLocalRing GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan Glo
 
 namespace GlobalTheory.Poinc
 
-theorem eq_refl_of_isometry_congMod : ∀ (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
-    (β : LinearMap.BilinForm ℤ X), (∀ x, x ≠ 0 → 0 < β x x) → ∀ (e : X ≃ₗ[ℤ] X), (∀ x y, β (e x) (e y) = β x y) →
-    ∀ N : ℕ, 3 ≤ N → (∀ x, CongMod N (e x) x) → e = LinearEquiv.refl ℤ X := by
+theorem eq_refl_of_isometry_congMod
+    : ∀ (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
+        (β : LinearMap.BilinForm ℤ X),
+      (∀ x, x ≠ 0 → 0 < β x x)
+        → ∀ (e : X ≃ₗ[ℤ] X),
+          (∀ x y, β (e x) (e y) = β x y)
+            → ∀ N : ℕ, 3 ≤ N → (∀ x, CongMod N (e x) x) → e = LinearEquiv.refl ℤ X := by
   intro X _ _ _ β hpos e he N hN hc
   choose u hu using hc
   have hQ0 : ∀ x, 0 ≤ β x x := fun x => by
@@ -62,8 +66,9 @@ theorem eq_refl_of_isometry_congMod : ∀ (X : Type) [AddCommGroup X] [Module.Fr
   set x := u^[Nat.find hex - 2] y
   have key := he x (u x)
   rw [hu x, hu (u x), huux] at key
-  simp only [smul_zero, add_zero, map_add (f := _), map_nsmul, LinearMap.add_apply, LinearMap.smul_apply,
-    nsmul_eq_mul] at key
+  simp only [smul_zero, add_zero, map_add (f := _), map_nsmul, LinearMap.add_apply,
+      LinearMap.smul_apply, nsmul_eq_mul]
+    at key
   have hp := hpos (u x) hux
   have hN0 : (0 : ℤ) < N := by exact_mod_cast (show 0 < N by omega)
   nlinarith [mul_pos hN0 hp]

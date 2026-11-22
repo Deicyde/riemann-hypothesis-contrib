@@ -5,23 +5,29 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBoun
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Topology
+open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions
+  Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Topology
 
-private theorem fd_pow_root {K : Type*} [Field K] {m n : ℕ} {y : K} (h : y ^ m = 1) :
-    (y ^ n) ^ m = 1 := by
+private theorem fd_pow_root {K : Type*} [Field K] {m n : ℕ} {y : K} (h : y ^ m = 1)
+    : (y ^ n) ^ m = 1 := by
   rw [← pow_mul, mul_comm, pow_mul, h, one_pow]
 
-private theorem fd_level {v : ℕ} [Fact v.Prime] {x : Om v} (hx : x ∈ MaximalUnramifiedExtension v) :
-    ∃ m : ℕ, ¬ v ∣ m ∧ ∀ g h : GQ v, (∀ y : Om v, y ^ m = 1 → g y = h y) → g x = h x := by
+private theorem fd_level {v : ℕ} [Fact v.Prime] {x : Om v} (hx : x ∈ MaximalUnramifiedExtension v)
+    : ∃ m : ℕ, ¬ v ∣ m ∧ ∀ g h : GQ v, (∀ y : Om v, y ^ m = 1 → g y = h y) → g x = h x := by
   have hv : v.Prime := Fact.out
-  have key : ∀ {a b : Om v},
-      (∃ m : ℕ, ¬ v ∣ m ∧ ∀ g h : GQ v, (∀ y : Om v, y ^ m = 1 → g y = h y) → g a = h a) →
-      (∃ m : ℕ, ¬ v ∣ m ∧ ∀ g h : GQ v, (∀ y : Om v, y ^ m = 1 → g y = h y) → g b = h b) →
-      ∃ m : ℕ, ¬ v ∣ m ∧ ∀ g h : GQ v, (∀ y : Om v, y ^ m = 1 → g y = h y) →
-        g a = h a ∧ g b = h b := by
+  have key
+      : ∀ {a b : Om v},
+        (∃ m : ℕ, ¬ v ∣ m ∧ ∀ g h : GQ v, (∀ y : Om v, y ^ m = 1 → g y = h y) → g a = h a)
+          → (∃ m : ℕ, ¬ v ∣ m ∧ ∀ g h : GQ v, (∀ y : Om v, y ^ m = 1 → g y = h y) → g b = h b)
+          → ∃ m : ℕ,
+            ¬ v ∣ m
+              ∧ ∀ g h : GQ v, (∀ y : Om v, y ^ m = 1 → g y = h y) → g a = h a ∧ g b = h b := by
     rintro a b ⟨m, hm, ha⟩ ⟨n, hn, hb⟩
-    refine ⟨m * n, fun h => (hv.dvd_mul.mp h).elim hm hn, fun g h hgh => ⟨ha g h fun y hy => ?_,
-      hb g h fun y hy => ?_⟩⟩
+    refine ⟨
+      m * n,
+      fun h => (hv.dvd_mul.mp h).elim hm hn,
+      fun g h hgh => ⟨ha g h fun y hy => ?_, hb g h fun y hy => ?_⟩
+    ⟩
     · exact hgh y (by rw [pow_mul, hy, one_pow])
     · exact hgh y (by rw [mul_comm, pow_mul, hy, one_pow])
   unfold MaximalUnramifiedExtension at hx
@@ -33,7 +39,11 @@ private theorem fd_level {v : ℕ} [Fact v.Prime] {x : Om v} (hx : x ∈ Maximal
     exact ⟨1, hv.not_dvd_one, fun g h _ => by rw [AlgEquiv.commutes, AlgEquiv.commutes]⟩
   | add x y _ _ hx hy =>
     obtain ⟨m, hm, h⟩ := key hx hy
-    exact ⟨m, hm, fun g k hgk => by rw [map_add (f := _), map_add (f := _), (h g k hgk).1, (h g k hgk).2]⟩
+    exact ⟨
+      m,
+      hm,
+      fun g k hgk => by rw [map_add (f := _), map_add (f := _), (h g k hgk).1, (h g k hgk).2]
+    ⟩
   | inv x _ hx =>
     obtain ⟨m, hm, h⟩ := hx
     exact ⟨m, hm, fun g k hgk => by rw [map_inv₀, map_inv₀, h g k hgk]⟩
@@ -41,9 +51,13 @@ private theorem fd_level {v : ℕ} [Fact v.Prime] {x : Om v} (hx : x ∈ Maximal
     obtain ⟨m, hm, h⟩ := key hx hy
     exact ⟨m, hm, fun g k hgk => by rw [map_mul, map_mul, (h g k hgk).1, (h g k hgk).2]⟩
 
-private theorem fd_frob {v : ℕ} [Fact v.Prime] {σ : GQ v}
-    (hσ : UpperTheory.V.Loc.IsFrob (v := v) σ) {m : ℕ} (hm : ¬ v ∣ m)
-    (j : ℕ) (y : Om v) (hy : y ^ m = 1) : (σ ^ j) y = y ^ v ^ j := by
+private theorem fd_frob
+    {v : ℕ} [Fact v.Prime]
+    {σ : GQ v} (hσ : UpperTheory.V.Loc.IsFrob (v := v) σ)
+    {m : ℕ} (hm : ¬ v ∣ m)
+    (j : ℕ)
+    (y : Om v) (hy : y ^ m = 1)
+    : (σ ^ j) y = y ^ v ^ j := by
   have hm0 : m ≠ 0 := by rintro rfl; exact hm (dvd_zero _)
   have h1 : σ y = y ^ v := by
     have hn : ‖y‖ ^ m = 1 := by rw [← norm_pow, hy, norm_one]
@@ -54,9 +68,9 @@ private theorem fd_frob {v : ℕ} [Fact v.Prime] {σ : GQ v}
   | zero => simp
   | succ j ih => rw [pow_succ', AlgEquiv.mul_apply, ih, map_pow, h1, ← pow_mul, pow_succ']
 
-theorem UpperTheory.V.Loc.frobDense :
-    ∀ {v : ℕ} [Fact v.Prime] (σ : GQ v), UpperTheory.V.Loc.IsFrob (v := v) σ →
-      (Iq v ⊔ Subgroup.zpowers σ).topologicalClosure = ⊤ := by
+theorem UpperTheory.V.Loc.frobDense
+    : ∀ {v : ℕ} [Fact v.Prime] (σ : GQ v),
+      UpperTheory.V.Loc.IsFrob (v := v) σ → (Iq v ⊔ Subgroup.zpowers σ).topologicalClosure = ⊤ := by
   intro v _ σ hσ
   let H : ClosedSubgroup (GQ v) :=
     ⟨(Iq v ⊔ Subgroup.zpowers σ).topologicalClosure, Subgroup.isClosed_topologicalClosure _⟩
@@ -68,7 +82,8 @@ theorem UpperTheory.V.Loc.frobDense :
   intro x hx
   rw [IntermediateField.mem_fixedField_iff] at hx
   have hxK : x ∈ MaximalUnramifiedExtension v := by
-    rw [← InfiniteGalois.fixedField_fixingSubgroup (MaximalUnramifiedExtension v), IntermediateField.mem_fixedField_iff]
+    rw [← InfiniteGalois.fixedField_fixingSubgroup (MaximalUnramifiedExtension v),
+      IntermediateField.mem_fixedField_iff]
     exact fun f hf => hx f (hle (Subgroup.mem_sup_left hf))
   obtain ⟨m, hm, h⟩ := fd_level hxK
   obtain ⟨j, hj⟩ := KStar.IdealValuations.exists_pow_of_aut g hm

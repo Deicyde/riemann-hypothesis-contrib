@@ -44,7 +44,8 @@ theorem rectangleShiftOfResidue : RectShiftOf := by
     intro z hz0 hz1 hzz
     have hzm : z - 1 ≠ 0 := sub_ne_zero.2 hz1
     exact ((rso_Fy_diff y hy hz0 hz1 hzz).sub
-      ((differentiableAt_const a).div ((differentiableAt_id.sub_const 1).pow 2) (pow_ne_zero 2 hzm))).sub
+        ((differentiableAt_const a).div ((differentiableAt_id.sub_const 1).pow 2)
+          (pow_ne_zero 2 hzm))).sub
       ((differentiableAt_const b).div (differentiableAt_id.sub_const 1) hzm)
   have hG : ∀ z : ℂ, z ≠ 0 → z ≠ 1 → riemannZeta z ≠ 0 → DifferentiableAt ℂ G z := by
     intro z hz0 hz1 hzz
@@ -70,8 +71,7 @@ theorem rectangleShiftOfResidue : RectShiftOf := by
     intro w hw
     rw [Complex.mem_reProdIm, Set.uIcc_of_le (by linarith), Set.uIcc_of_le (by linarith)] at hw
     obtain ⟨⟨hr1, hr2⟩, hi1, hi2⟩ := hw
-    have hw0 : w ≠ 0 := by
-      intro h; rw [h] at hr1; simp at hr1; linarith
+    have hw0 : w ≠ 0 := by intro h; rw [h] at hr1; simp at hr1; linarith
     by_cases hw1 : w = 1
     · subst hw1
       show ∀ᶠ z in 𝓝 (1 : ℂ), DifferentiableAt ℂ G z

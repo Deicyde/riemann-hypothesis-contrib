@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.LevelOfSp
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 namespace GlobalTheory.LevelAllPrimes
@@ -20,22 +22,24 @@ open GlobalTheory.HostModel
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.LevelAllPrimes.add_rt_mul_sub_rt (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (c : ℕ) :
-    ((c : 𝓞 E) + H.rt) * (c - H.rt) = ((c ^ 2 + H.d : ℕ) : 𝓞 E) := by
+theorem _root_.GlobalTheory.LevelAllPrimes.add_rt_mul_sub_rt
+    (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (c : ℕ)
+    : ((c : 𝓞 E) + H.rt) * (c - H.rt) = ((c ^ 2 + H.d : ℕ) : 𝓞 E) := by
   push_cast
   linear_combination (-1 : 𝓞 E) * H.rt_sq
 
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.LevelAllPrimes.isCoprime_add_rt_sub_rt (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) {c : ℕ} (hc : Nat.Coprime c H.d)
-    (ho : Odd (c ^ 2 + H.d)) :
-    IsCoprime ((c : 𝓞 E) + H.rt) (c - H.rt) := by
+theorem _root_.GlobalTheory.LevelAllPrimes.isCoprime_add_rt_sub_rt
+    (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
+    {c : ℕ} (hc : Nat.Coprime c H.d) (ho : Odd (c ^ 2 + H.d))
+    : IsCoprime ((c : 𝓞 E) + H.rt) (c - H.rt) := by
   have h2 : Nat.Coprime 2 (c ^ 2 + H.d) := (Nat.coprime_two_left).2 ho
   have hc' : Nat.Coprime c (c ^ 2 + H.d) := by
     rw [sq, add_comm]
@@ -52,12 +56,14 @@ end GlobalTheory.LevelAllPrimes
 
 namespace GlobalTheory
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-private theorem host_bar_rt' (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) : H.bar H.rt = -H.rt := by
+private theorem host_bar_rt' (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
+    : H.bar H.rt = -H.rt := by
   obtain ⟨φ⟩ : Nonempty (E →+* ℂ) := inferInstance
-  have hconj : starRingEnd ℂ (φ (H.rt : E)) = -φ (H.rt : E) := by
+  have hconj : starRingEnd ℂ (φ (H.rt : E)) = - φ (H.rt : E) := by
     set z := φ (H.rt : E)
     have hz : z ^ 2 = -(H.d : ℂ) := by
       have := congrArg (fun x : 𝓞 E => φ (x : E)) H.rt_sq
@@ -66,7 +72,8 @@ private theorem host_bar_rt' (H : _root_.ReciprocityTheory.ChartRestriction.G.Ge
     have hre := congrArg Complex.re hz
     have him := congrArg Complex.im hz
     simp only [sq, Complex.mul_re, Complex.mul_im, Complex.neg_re, Complex.neg_im,
-      Complex.natCast_re, Complex.natCast_im, neg_zero] at hre him
+        Complex.natCast_re, Complex.natCast_im, neg_zero]
+      at hre him
     have hx : z.re = 0 := by
       rcases mul_eq_zero.1 (by linarith : z.re * z.im = 0) with h | h
       · exact h
@@ -78,23 +85,29 @@ private theorem host_bar_rt' (H : _root_.ReciprocityTheory.ChartRestriction.G.Ge
     simpa [IsCMField.complexEmbedding_complexConj] using hconj
   exact RingOfIntegers.coe_injective key
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-private theorem natCast_add_rt_mem_adjoin_w0 (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (c : ℕ) :
-    (c : 𝓞 E) + H.rt ∈ Algebra.adjoin ℤ {H.w0} := by
-  rw [show (c : 𝓞 E) + H.rt = ((c : 𝓞 E) - 1) + 2 * H.w0 by linear_combination -H.two_weight_eq_one_add_root]
+private theorem natCast_add_rt_mem_adjoin_w0
+    (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (c : ℕ)
+    : (c : 𝓞 E) + H.rt ∈ Algebra.adjoin ℤ {H.w0} := by
+  rw [show (c : 𝓞 E) + H.rt = ((c : 𝓞 E) - 1) + 2 * H.w0 by
+    linear_combination -H.two_weight_eq_one_add_root]
   have hw : H.w0 ∈ Algebra.adjoin ℤ {H.w0} := Algebra.self_mem_adjoin_singleton ℤ H.w0
   have h2 : (2 : 𝓞 E) ∈ Algebra.adjoin ℤ {H.w0} := by
     simpa using natCast_mem (Algebra.adjoin ℤ {H.w0}) 2
   exact add_mem (sub_mem (natCast_mem _ c) (one_mem _)) (mul_mem h2 hw)
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct in
-private theorem three_le_mul_div_prime_pow_factorization {a b : ℕ} (p : ℕ) (hab : Nat.Coprime a b)
-    (ha : 3 ≤ a) (hb : 3 ≤ b) : 3 ≤ a * b / p ^ (a * b).factorization p := by
-  have key : ∀ {x y : ℕ}, 3 ≤ x → 0 < y → x.factorization p = 0 →
-      3 ≤ x * y / p ^ (x * y).factorization p := by
+private theorem three_le_mul_div_prime_pow_factorization
+    {a b : ℕ} (p : ℕ) (hab : Nat.Coprime a b) (ha : 3 ≤ a) (hb : 3 ≤ b)
+    : 3 ≤ a * b / p ^ (a * b).factorization p := by
+  have key
+      : ∀ {x y : ℕ},
+        3 ≤ x → 0 < y → x.factorization p = 0 → 3 ≤ x * y / p ^ (x * y).factorization p := by
     intro x y hx hy hxp
     rw [Nat.factorization_mul (by omega) hy.ne', Finsupp.add_apply, hxp, zero_add,
       Nat.mul_div_assoc x (Nat.ordProj_dvd y p)]
@@ -114,13 +127,18 @@ private theorem three_le_mul_div_prime_pow_factorization {a b : ℕ} (p : ℕ) (
     rw [mul_comm]
     exact key hb (by omega) hbp
 
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField in
 open scoped CategoryTheory.Obj TensorProduct in
-theorem _root_.GlobalTheory.exists_level_goodAt_all_primes_and_idx :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (A : ℕ), 0 < A →
-      ∃ l : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H, l.A = A ∧ (∀ p : ℕ, p.Prime → l.GoodAt p) ∧
-        ∀ p : ℕ, p.Prime → ∃ i : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Idx H p, i.l = l := by
+theorem _root_.GlobalTheory.exists_level_goodAt_all_primes_and_idx
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (A : ℕ),
+      0 < A
+        → ∃ l : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H,
+          l.A = A ∧ (∀ p : ℕ, p.Prime → l.GoodAt p)
+            ∧ ∀ p : ℕ,
+              p.Prime
+                → ∃ i : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Idx H p, i.l = l := by
   intro E _ _ _ H A hA
   obtain ⟨k, hk⟩ : Odd H.d := Nat.odd_iff.2 (by have := H.d_mod; omega)
   have h2d : Nat.Coprime 2 H.d := (Nat.coprime_two_left).2 ⟨k, hk⟩
@@ -152,8 +170,10 @@ theorem _root_.GlobalTheory.exists_level_goodAt_all_primes_and_idx :
   have hmem : al ∈ Algebra.adjoin ℤ {H.w0} :=
     mul_mem (natCast_add_rt_mem_adjoin_w0 H 2) (natCast_add_rt_mem_adjoin_w0 H c)
   have hprod : al * H.bar al = ((M₁ * M₂ : ℕ) : 𝓞 E) := by
-    rw [hbar, hal, show ((2 : ℕ) + H.rt) * ((c : 𝓞 E) + H.rt) * (((2 : ℕ) - H.rt) * ((c : 𝓞 E) - H.rt))
-      = (((2 : ℕ) + H.rt) * ((2 : ℕ) - H.rt)) * (((c : 𝓞 E) + H.rt) * ((c : 𝓞 E) - H.rt)) by ring,
+    rw [hbar, hal,
+      show ((2 : ℕ) + H.rt) * ((c : 𝓞 E) + H.rt) * (((2 : ℕ) - H.rt) * ((c : 𝓞 E) - H.rt))
+          = (((2 : ℕ) + H.rt) * ((2 : ℕ) - H.rt)) * (((c : 𝓞 E) + H.rt) * ((c : 𝓞 E) - H.rt)) by
+        ring,
       e1, e2]
     exact (Nat.cast_mul _ _).symm
   have hcop : IsCoprime al (H.bar al) := by
@@ -167,9 +187,9 @@ theorem _root_.GlobalTheory.exists_level_goodAt_all_primes_and_idx :
     · exact _root_.GlobalTheory.LevelAllPrimes.isCoprime_add_rt_sub_rt H hc2 ho2
   have h3₁ : 3 ≤ M₁ := by omega
   have h3₂ : 3 ≤ M₂ := by have := Nat.zero_le (c ^ 2); have := H.d_prime.two_le; omega
-  obtain ⟨l, hlM, hlA, -⟩ := (_root_.GlobalTheory.level_of_split_and_level_coeff_exist).1 E H al (M₁ * M₂) A
-    hmem hprod hcop (le_trans h3₁ (Nat.le_mul_of_pos_right _ (by omega)))
-    (Nat.odd_mul.2 ⟨ho1, ho2⟩) hA
+  obtain ⟨l, hlM, hlA, -⟩ :=
+    (_root_.GlobalTheory.level_of_split_and_level_coeff_exist).1 E H al (M₁ * M₂) A hmem hprod hcop
+      (le_trans h3₁ (Nat.le_mul_of_pos_right _ (by omega))) (Nat.odd_mul.2 ⟨ho1, ho2⟩) hA
   have hgood : ∀ p : ℕ, p.Prime → l.GoodAt p := by
     intro p _
     unfold _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level.GoodAt

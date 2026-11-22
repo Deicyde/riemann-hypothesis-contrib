@@ -30,9 +30,10 @@ private theorem dnR_finGL (u : GL (Fin 2) (Af ℚ)) : dnR (finGL ℚ 2 u) = 1 :=
 private theorem pFin_upR (h : GL (Fin 2) ℝ) : Matrix.GeneralLinearGroup.map (pFin ℚ) (upR h) = 1 :=
   TR.pFin_infGL _
 
-private theorem comp_eq {γ γ' : GL (Fin 2) ℚ} {h h' : GL (Fin 2) ℝ} {u u' : GL (Fin 2) (Af ℚ)}
-    (e : ratGL ℚ 2 γ * (upR h * finGL ℚ 2 u) = ratGL ℚ 2 γ' * (upR h' * finGL ℚ 2 u')) :
-    h' = toR (γ'⁻¹ * γ) * h ∧ toF (γ'⁻¹ * γ) = u' * u⁻¹ := by
+private theorem comp_eq
+    {γ γ' : GL (Fin 2) ℚ} {h h' : GL (Fin 2) ℝ} {u u' : GL (Fin 2) (Af ℚ)}
+    (e : ratGL ℚ 2 γ * (upR h * finGL ℚ 2 u) = ratGL ℚ 2 γ' * (upR h' * finGL ℚ 2 u'))
+    : h' = toR (γ'⁻¹ * γ) * h ∧ toF (γ'⁻¹ * γ) = u' * u⁻¹ := by
   rw [ratGL_eq, ratGL_eq] at e
   have e1 := congrArg dnR e
   have e2 := congrArg (Matrix.GeneralLinearGroup.map (pFin ℚ)) e
@@ -44,8 +45,7 @@ private theorem comp_eq {γ γ' : GL (Fin 2) ℚ} {h h' : GL (Fin 2) ℝ} {u u' 
 
 end UpperTheory.V.Af.Nf
 
-theorem UpperTheory.V.Af.Nf.liftEx :
-    UpperTheory.V.Af.Nf.LiftEx := by
+theorem UpperTheory.V.Af.Nf.liftEx : UpperTheory.V.Af.Nf.LiftEx := by
   intro k M hM f hf
   choose γ h u hu e using decomp M hM
   refine ⟨fun g => nsl k f (h g) UpperHalfPlane.I, fun γ' h' u' hu' => ?_⟩

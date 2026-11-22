@@ -12,17 +12,18 @@ namespace GenericFreeness
 
 section Basic
 
-variable {R : Type*} [CommRing R] {M : Type*} [AddCommGroup M] [Module R M]
+variable
+  {R : Type*} [CommRing R]
+  {M : Type*} [AddCommGroup M] [Module R M]
   {X : Type*} [AddCommGroup X] [Module R X]
 
 def IsBasisAway (a : R) (P Q : Submodule R M) (s : Set M) : Prop :=
   s ⊆ Q ∧ LinearIndepOn R P.mkQ s ∧ ∀ m ∈ Q, ∃ n : ℕ, a ^ n • m ∈ P ⊔ span R s
 
-def HasBasisAway (a : R) (P Q : Submodule R M) : Prop :=
-  ∃ s : Set M, IsBasisAway a P Q s
+def HasBasisAway (a : R) (P Q : Submodule R M) : Prop := ∃ s : Set M, IsBasisAway a P Q s
 
-theorem HasBasisAway.of_dvd {a b : R} {P Q : Submodule R M} (h : HasBasisAway a P Q)
-    (hab : a ∣ b) : HasBasisAway b P Q := by
+theorem HasBasisAway.of_dvd {a b : R} {P Q : Submodule R M} (h : HasBasisAway a P Q) (hab : a ∣ b)
+    : HasBasisAway b P Q := by
   obtain ⟨s, h1, h2, h3⟩ := h
   obtain ⟨c, rfl⟩ := hab
   refine ⟨s, h1, h2, fun m hm => ?_⟩
@@ -32,12 +33,12 @@ theorem HasBasisAway.of_dvd {a b : R} {P Q : Submodule R M} (h : HasBasisAway a 
   exact smul_mem _ _ hn
 
 theorem isBasisAway_empty (a : R) (P : Submodule R M) : IsBasisAway a P P ∅ :=
-  ⟨Set.empty_subset _, linearIndepOn_empty _ _, fun m hm =>
-    ⟨0, by simpa using hm⟩⟩
+  ⟨Set.empty_subset _, linearIndepOn_empty _ _, fun m hm => ⟨0, by simpa using hm⟩⟩
 
-theorem IsBasisAway.union {a : R} {P Q U : Submodule R M} {s t : Set M} (hPQ : P ≤ Q)
-    (hQU : Q ≤ U) (hs : IsBasisAway a P Q s) (ht : IsBasisAway a Q U t) :
-    IsBasisAway a P U (s ∪ t) := by
+theorem IsBasisAway.union
+    {a : R} {P Q U : Submodule R M} {s t : Set M}
+    (hPQ : P ≤ Q) (hQU : Q ≤ U) (hs : IsBasisAway a P Q s) (ht : IsBasisAway a Q U t)
+    : IsBasisAway a P U (s ∪ t) := by
   obtain ⟨s1, s2, s3⟩ := hs
   obtain ⟨t1, t2, t3⟩ := ht
   have t2' : LinearIndepOn R (factor hPQ ∘ P.mkQ) t := t2
@@ -57,15 +58,17 @@ theorem IsBasisAway.union {a : R} {P Q U : Submodule R M} {s t : Set M} (hPQ : P
     rw [pow_add, mul_smul, ← e, smul_add, span_union, ← sup_assoc]
     exact add_mem_sup hk (smul_mem _ _ hx)
 
-theorem HasBasisAway.trans {a : R} {P Q U : Submodule R M} (hPQ : P ≤ Q)
-    (hQU : Q ≤ U) (hs : HasBasisAway a P Q) (ht : HasBasisAway a Q U) :
-    HasBasisAway a P U := by
+theorem HasBasisAway.trans
+    {a : R} {P Q U : Submodule R M}
+    (hPQ : P ≤ Q) (hQU : Q ≤ U) (hs : HasBasisAway a P Q) (ht : HasBasisAway a Q U)
+    : HasBasisAway a P U := by
   obtain ⟨s, hs⟩ := hs
   obtain ⟨t, ht⟩ := ht
   exact ⟨_, hs.union hPQ hQU ht⟩
 
-theorem HasBasisAway.iSup {a : R} (F : ℕ → Submodule R M) (hF : Monotone F)
-    (h : ∀ d, HasBasisAway a (F d) (F (d + 1))) : HasBasisAway a (F 0) (⨆ d, F d) := by
+theorem HasBasisAway.iSup
+    {a : R} (F : ℕ → Submodule R M) (hF : Monotone F) (h : ∀ d, HasBasisAway a (F d) (F (d + 1)))
+    : HasBasisAway a (F 0) (⨆ d, F d) := by
   choose s hs using h
   let t : ℕ → Set M := fun d => Nat.rec ∅ (fun d t => t ∪ s d) d
   have ht : ∀ d, IsBasisAway a (F 0) (F d) (t d) := by
@@ -80,8 +83,9 @@ theorem HasBasisAway.iSup {a : R} (F : ℕ → Submodule R M) (hF : Monotone F)
     obtain ⟨n, hn⟩ := (ht d).2.2 m hd
     exact ⟨n, (sup_le_sup_left (span_mono (Set.subset_iUnion t d)) (F 0) :) hn⟩
 
-theorem HasBasisAway.map {a : R} (φ : X →ₗ[R] M) (P : Submodule R M)
-    (h : HasBasisAway a (P.comap φ) ⊤) : HasBasisAway a P (P ⊔ LinearMap.range φ) := by
+theorem HasBasisAway.map
+    {a : R} (φ : X →ₗ[R] M) (P : Submodule R M) (h : HasBasisAway a (P.comap φ) ⊤)
+    : HasBasisAway a P (P ⊔ LinearMap.range φ) := by
   obtain ⟨s, -, h2, h3⟩ := h
   refine ⟨φ '' s, ?_, ?_, fun m hm => ?_⟩
   · rintro _ ⟨x, -, rfl⟩
@@ -100,15 +104,16 @@ theorem HasBasisAway.map {a : R} (φ : X →ₗ[R] M) (P : Submodule R M)
     rw [← map_span]
     exact mem_map_of_mem hy
 
-theorem HasBasisAway.comap {a : R} (π : X →ₗ[R] M) (hπ : Function.Surjective π)
-    (h : HasBasisAway a (⊥ : Submodule R M) ⊤) : HasBasisAway a (LinearMap.ker π) ⊤ := by
+theorem HasBasisAway.comap
+    {a : R} (π : X →ₗ[R] M) (hπ : Function.Surjective π) (h : HasBasisAway a (⊥ : Submodule R M) ⊤)
+    : HasBasisAway a (LinearMap.ker π) ⊤ := by
   obtain ⟨s, -, h2, h3⟩ := h
   obtain ⟨σ, hσ⟩ := hπ.hasRightInverse
   refine ⟨σ '' s, Set.subset_univ _, ?_, fun m _ => ?_⟩
   · apply LinearIndepOn.image_of_comp
     apply LinearIndepOn.of_comp (mapQ (LinearMap.ker π) ⊥ π le_rfl)
-    have : (mapQ (LinearMap.ker π) ⊥ π le_rfl) ∘ (LinearMap.ker π).mkQ ∘ σ =
-        (⊥ : Submodule R M).mkQ := by
+    have : (mapQ (LinearMap.ker π) ⊥ π le_rfl) ∘ (LinearMap.ker π).mkQ ∘ σ
+        = (⊥ : Submodule R M).mkQ := by
       ext x
       change (⊥ : Submodule R M).mkQ (π (σ x)) = _
       rw [hσ x]
@@ -122,32 +127,34 @@ theorem HasBasisAway.comap {a : R} (π : X →ₗ[R] M) (hπ : Function.Surjecti
     rw [sup_comm, ← comap_map_eq]
     exact hn
 
-theorem HasBasisAway.quotient {a : R} {P : Submodule R M} (h : HasBasisAway a P ⊤) :
-    HasBasisAway a (⊥ : Submodule R (M ⧸ P)) ⊤ := by
+theorem HasBasisAway.quotient {a : R} {P : Submodule R M} (h : HasBasisAway a P ⊤)
+    : HasBasisAway a (⊥ : Submodule R (M ⧸ P)) ⊤ := by
   have := HasBasisAway.map (a := a) P.mkQ ⊥ (by simpa using h)
   simpa using this
 
-theorem IsBasisAway.linearIndepOn {a : R} {s : Set M}
-    (h : IsBasisAway a (⊥ : Submodule R M) ⊤ s) : LinearIndepOn R id s :=
+theorem IsBasisAway.linearIndepOn {a : R} {s : Set M} (h : IsBasisAway a (⊥ : Submodule R M) ⊤ s)
+    : LinearIndepOn R id s :=
   LinearIndepOn.of_comp (⊥ : Submodule R M).mkQ h.2.1
 
-theorem hasBasisAway_of_free [Module.Free R M] (a : R) :
-    HasBasisAway a (⊥ : Submodule R M) ⊤ := by
+theorem hasBasisAway_of_free [Module.Free R M] (a : R) : HasBasisAway a (⊥ : Submodule R M) ⊤ := by
   let b := Module.Free.chooseBasis R M
   refine ⟨Set.range b, Set.subset_univ _, ?_, fun m _ => ⟨0, by simp⟩⟩
   exact LinearIndependent.map' b.linearIndependent.linearIndepOn_id (⊥ : Submodule R M).mkQ
     (ker_mkQ _)
 
-theorem IsBasisAway.exists_basis {a : R} {s : Set M}
-    (h : IsBasisAway a (⊥ : Submodule R M) ⊤ s) (S : Submonoid R) (ha : a ∈ S)
+theorem IsBasisAway.exists_basis
+    {a : R} {s : Set M} (h : IsBasisAway a (⊥ : Submodule R M) ⊤ s)
+    (S : Submonoid R) (ha : a ∈ S)
     (Rₛ : Type*) [CommRing Rₛ] [Algebra R Rₛ] [IsLocalization S Rₛ]
     {Mₛ : Type*} [AddCommGroup Mₛ] [Module R Mₛ] [Module Rₛ Mₛ] [IsScalarTower R Rₛ Mₛ]
-    (f : M →ₗ[R] Mₛ) [IsLocalizedModule S f] :
-    Nonempty (Module.Basis s Rₛ Mₛ) := by
+    (f : M →ₗ[R] Mₛ) [IsLocalizedModule S f]
+    : Nonempty (Module.Basis s Rₛ Mₛ) := by
   refine ⟨Module.Basis.mk (v := f ∘ fun x : s => (x : M))
     (LinearIndependent.of_isLocalizedModule Rₛ S f h.linearIndepOn) ?_⟩
-  have key : ∀ (c : S) (y : Mₛ), (c : R) • y ∈ span Rₛ (Set.range (f ∘ fun x : s => (x : M))) →
-      y ∈ span Rₛ (Set.range (f ∘ fun x : s => (x : M))) := by
+  have key
+      : ∀ (c : S) (y : Mₛ),
+        (c : R) • y ∈ span Rₛ (Set.range (f ∘ fun x : s => (x : M)))
+          → y ∈ span Rₛ (Set.range (f ∘ fun x : s => (x : M))) := by
     intro c y hy
     obtain ⟨u, hu⟩ := IsLocalization.map_units Rₛ c
     rw [← algebraMap_smul Rₛ, ← hu] at hy
@@ -165,30 +172,31 @@ theorem IsBasisAway.exists_basis {a : R} {s : Set M}
   have h2 := span_subset_span R Rₛ _ this
   rwa [Set.range_comp, Subtype.range_coe]
 
-theorem HasBasisAway.free_of_isLocalizedModule {a : R}
-    (h : HasBasisAway a (⊥ : Submodule R M) ⊤) (S : Submonoid R) (ha : a ∈ S)
+theorem HasBasisAway.free_of_isLocalizedModule
+    {a : R} (h : HasBasisAway a (⊥ : Submodule R M) ⊤)
+    (S : Submonoid R) (ha : a ∈ S)
     (Rₛ : Type*) [CommRing Rₛ] [Algebra R Rₛ] [IsLocalization S Rₛ]
     {Mₛ : Type*} [AddCommGroup Mₛ] [Module R Mₛ] [Module Rₛ Mₛ] [IsScalarTower R Rₛ Mₛ]
-    (f : M →ₗ[R] Mₛ) [IsLocalizedModule S f] : Module.Free Rₛ Mₛ := by
+    (f : M →ₗ[R] Mₛ) [IsLocalizedModule S f]
+    : Module.Free Rₛ Mₛ := by
   obtain ⟨s, hs⟩ := h
   obtain ⟨b⟩ := hs.exists_basis S ha Rₛ f
   exact .of_basis b
 
-theorem HasBasisAway.free_away {a : R} (h : HasBasisAway a (⊥ : Submodule R M) ⊤) :
-    Module.Free (Localization.Away a) (LocalizedModule.Away a M) :=
+theorem HasBasisAway.free_away {a : R} (h : HasBasisAway a (⊥ : Submodule R M) ⊤)
+    : Module.Free (Localization.Away a) (LocalizedModule.Away a M) :=
   h.free_of_isLocalizedModule (.powers a) (Submonoid.mem_powers a) _
     (LocalizedModule.mkLinearMap _ M)
 
-theorem HasBasisAway.free (h : HasBasisAway (1 : R) (⊥ : Submodule R M) ⊤) :
-    Module.Free R M := by
+theorem HasBasisAway.free (h : HasBasisAway (1 : R) (⊥ : Submodule R M) ⊤) : Module.Free R M := by
   obtain ⟨s, hs⟩ := h
   refine .of_basis (Module.Basis.mk hs.linearIndepOn ?_)
   intro m _
   obtain ⟨n, hn⟩ := hs.2.2 m trivial
   simpa using hn
 
-theorem exists_hasBasisAway_of_finite [IsDomain R] [Module.Finite R M] :
-    ∃ a : R, a ≠ 0 ∧ HasBasisAway a (⊥ : Submodule R M) ⊤ := by
+theorem exists_hasBasisAway_of_finite [IsDomain R] [Module.Finite R M]
+    : ∃ a : R, a ≠ 0 ∧ HasBasisAway a (⊥ : Submodule R M) ⊤ := by
   obtain ⟨s, hs, hs'⟩ := exists_maximal_linearIndepOn R (id : M → M)
   have ht : Module.IsTorsion R (M ⧸ span R s) := by
     intro x
@@ -201,8 +209,14 @@ theorem exists_hasBasisAway_of_finite [IsDomain R] [Module.Finite R M] :
       rw [← map_smul, mkQ_apply, Quotient.mk_eq_zero]
       simpa using hcx
   obtain ⟨a, ha, ha0⟩ := annihilator_top_inter_nonZeroDivisors ht
-  refine ⟨a, nonZeroDivisors.ne_zero ha0, s, Set.subset_univ _,
-    LinearIndependent.map' hs (⊥ : Submodule R M).mkQ (ker_mkQ _), fun m _ => ⟨1, ?_⟩⟩
+  refine ⟨
+    a,
+    nonZeroDivisors.ne_zero ha0,
+    s,
+    Set.subset_univ _,
+    LinearIndependent.map' hs (⊥ : Submodule R M).mkQ (ker_mkQ _),
+    fun m _ => ⟨1, ?_⟩
+  ⟩
   have := mem_annihilator.1 ha ((span R s).mkQ m) trivial
   rw [← map_smul, mkQ_apply, Quotient.mk_eq_zero] at this
   simpa using this
@@ -211,7 +225,9 @@ end Basic
 
 section Step
 
-variable {R : Type*} [CommRing R] {T : Type*} [CommRing T] [Algebra R T]
+variable
+  {R : Type*} [CommRing R]
+  {T : Type*} [CommRing T] [Algebra R T]
   {M : Type*} [AddCommGroup M] [Module R M] [Module T M] [IsScalarTower R T M]
 
 noncomputable def powerChain (t : Module.End T M) (N : Submodule T M) : ℕ → Submodule T M
@@ -221,8 +237,8 @@ noncomputable def powerChain (t : Module.End T M) (N : Submodule T M) : ℕ → 
 theorem powerChain_mono (t : Module.End T M) (N : Submodule T M) : Monotone (powerChain t N) :=
   monotone_nat_of_le_succ fun _ => le_sup_left
 
-theorem map_powerChain_le (t : Module.End T M) (N : Submodule T M) (d : ℕ) :
-    (powerChain t N d).map t ≤ powerChain t N (d + 1) := by
+theorem map_powerChain_le (t : Module.End T M) (N : Submodule T M) (d : ℕ)
+    : (powerChain t N d).map t ≤ powerChain t N (d + 1) := by
   induction d with
   | zero => simp [powerChain]
   | succ d ih =>
@@ -230,37 +246,43 @@ theorem map_powerChain_le (t : Module.End T M) (N : Submodule T M) (d : ℕ) :
       ← pow_succ']
     exact sup_le_sup_right ih _
 
-theorem exists_hasBasisAway_powerChain [IsDomain R] (t : Module.End T M) (N : Submodule T M)
-    [IsNoetherian T N]
-    (H : ∀ K : Submodule T N, ∃ a : R, a ≠ 0 ∧ HasBasisAway a (⊥ : Submodule R (N ⧸ K)) ⊤) :
-    ∃ a : R, a ≠ 0 ∧
-      HasBasisAway a (N.restrictScalars R) (⨆ d, (powerChain t N d).restrictScalars R) := by
+theorem exists_hasBasisAway_powerChain
+    [IsDomain R]
+    (t : Module.End T M)
+    (N : Submodule T M) [IsNoetherian T N]
+    (H : ∀ K : Submodule T N, ∃ a : R, a ≠ 0 ∧ HasBasisAway a (⊥ : Submodule R (N ⧸ K)) ⊤)
+    : ∃ a : R,
+      a ≠ 0 ∧ HasBasisAway a (N.restrictScalars R) (⨆ d, (powerChain t N d).restrictScalars R) := by
   let K : ℕ → Submodule T N := fun d => (powerChain t N d).comap ((t ^ (d + 1)) ∘ₗ N.subtype)
-  have hK : Monotone K := monotone_nat_of_le_succ fun d x hx => by
-    have := map_powerChain_le t N d (mem_map_of_mem hx)
-    simpa [K, pow_succ' t (d + 1)] using this
+  have hK : Monotone K :=
+    monotone_nat_of_le_succ fun d x hx => by
+      have := map_powerChain_le t N d (mem_map_of_mem hx)
+      simpa [K, pow_succ' t (d + 1)] using this
   obtain ⟨n, hn⟩ := monotone_stabilizes_iff_noetherian.2 inferInstance ⟨K, hK⟩
   choose a ha0 ha using H
   refine ⟨∏ i ∈ Finset.range (n + 1), a (K i), Finset.prod_ne_zero_iff.2 fun i _ => ha0 _, ?_⟩
-  refine HasBasisAway.iSup (fun d => (powerChain t N d).restrictScalars R)
-    (fun i j hij => powerChain_mono t N hij) fun d => ?_
+  refine HasBasisAway.iSup
+    (fun d => (powerChain t N d).restrictScalars R)
+    (fun i j hij => powerChain_mono t N hij)
+    fun d => ?_
   have hdvd : a (K d) ∣ ∏ i ∈ Finset.range (n + 1), a (K i) := by
     rcases le_total d n with h | h
     · exact Finset.dvd_prod_of_mem _ (Finset.mem_range.2 (Nat.lt_succ_of_le h))
     · have : K n = K d := hn d h
       rw [← this]
       exact Finset.dvd_prod_of_mem _ (Finset.mem_range.2 (Nat.lt_succ_self n))
-  have h1 := ((ha (K d)).of_dvd hdvd).comap ((K d).mkQ.restrictScalars R)
-    (K d).mkQ_surjective
-  have e1 : LinearMap.ker ((K d).mkQ.restrictScalars R) =
-      ((powerChain t N d).restrictScalars R).comap
-        (((t ^ (d + 1)) ∘ₗ N.subtype).restrictScalars R) := by
+  have h1 := ((ha (K d)).of_dvd hdvd).comap ((K d).mkQ.restrictScalars R) (K d).mkQ_surjective
+  have e1
+      : LinearMap.ker ((K d).mkQ.restrictScalars R)
+        = ((powerChain t N d).restrictScalars R).comap
+          (((t ^ (d + 1)) ∘ₗ N.subtype).restrictScalars R) := by
     ext x
     exact Quotient.mk_eq_zero (K d)
   rw [e1] at h1
   have h2 := HasBasisAway.map _ _ h1
-  have e2 : LinearMap.range (((t ^ (d + 1)) ∘ₗ N.subtype).restrictScalars R) =
-      (N.map (t ^ (d + 1))).restrictScalars R := by
+  have e2
+      : LinearMap.range (((t ^ (d + 1)) ∘ₗ N.subtype).restrictScalars R)
+        = (N.map (t ^ (d + 1))).restrictScalars R := by
     ext x
     exact ⟨by rintro ⟨y, rfl⟩; exact ⟨y, y.2, rfl⟩, by rintro ⟨y, hy, rfl⟩; exact ⟨⟨y, hy⟩, rfl⟩⟩
   rw [e2, ← restrictScalars_sup] at h2
@@ -276,15 +298,17 @@ variable (R : Type*) [CommRing R] [IsDomain R] (A : Type*) [CommRing A] [Algebra
 
 def QuotientsFreeAway (T : Type u) [CommRing T] [Algebra A T] : Prop :=
   ∀ (M : Type v) [AddCommGroup M] [Module R M] [Module A M] [Module T M] [IsScalarTower R A M]
-    [IsScalarTower A T M] [Module.Finite T M] (N : Submodule A M), N.FG →
-    ∃ a : R, a ≠ 0 ∧ HasBasisAway a (N.restrictScalars R) ⊤
+      [IsScalarTower A T M] [Module.Finite T M] (N : Submodule A M),
+    N.FG → ∃ a : R, a ≠ 0 ∧ HasBasisAway a (N.restrictScalars R) ⊤
 
 variable {R A}
 
-theorem QuotientsFreeAway.step {B : Type*} {T : Type*} [CommRing B] [CommRing T] [Algebra A B]
-    [Algebra A T] [Algebra B T] [IsScalarTower A B T] [IsNoetherianRing B] (t : T)
-    (ht : Algebra.adjoin B {t} = ⊤) (H : QuotientsFreeAway.{_, v} R A B) :
-    QuotientsFreeAway.{_, v} R A T := by
+theorem QuotientsFreeAway.step
+    {B : Type*} {T : Type*} [CommRing B] [CommRing T] [Algebra A B] [Algebra A T] [Algebra B T]
+    [IsScalarTower A B T] [IsNoetherianRing B]
+    (t : T) (ht : Algebra.adjoin B {t} = ⊤)
+    (H : QuotientsFreeAway.{_, v} R A B)
+    : QuotientsFreeAway.{_, v} R A T := by
   intro M _ _ _ _ _ _ _ N hN
   letI : Algebra R B := ((algebraMap A B).comp (algebraMap R A)).toAlgebra
   haveI : IsScalarTower R A B := .of_algebraMap_eq' rfl
@@ -301,8 +325,8 @@ theorem QuotientsFreeAway.step {B : Type*} {T : Type*} [CommRing B] [CommRing T]
   haveI : Module.Finite B M₀ :=
     Module.Finite.span_of_finite B (s.finite_toSet.union s'.finite_toSet)
   let τ : Module.End B M := (LinearMap.lsmul T M t).restrictScalars B
-  obtain ⟨a, ha0, ha⟩ := exists_hasBasisAway_powerChain (R := R) τ M₀ fun K => by
-    simpa using H (M₀ ⧸ K) ⊥ fg_bot
+  obtain ⟨a, ha0, ha⟩ :=
+    exists_hasBasisAway_powerChain (R := R) τ M₀ fun K => by simpa using H (M₀ ⧸ K) ⊥ fg_bot
   have htop : (⨆ d, (powerChain τ M₀ d).restrictScalars R) = ⊤ := by
     have hdir := (powerChain_mono τ M₀).directed_le
     have key : ∀ (c : T), ∀ x ∈ ⨆ d, powerChain τ M₀ d, c • x ∈ ⨆ d, powerChain τ M₀ d := by
@@ -331,28 +355,38 @@ theorem QuotientsFreeAway.step {B : Type*} {T : Type*} [CommRing B] [CommRing T]
   rw [htop] at ha
   have hle : span A (s' : Set M) ≤ M₀.restrictScalars A :=
     span_le.2 fun x hx => subset_span (Or.inr hx)
-  obtain ⟨b, hb0, hb⟩ := H M₀ ((span A (s' : Set M)).comap (M₀.subtype.restrictScalars A)) (by
-    apply fg_of_fg_map_injective (M₀.subtype.restrictScalars A) Subtype.val_injective
-    rw [map_comap_eq_of_le]
-    · exact ⟨s', rfl⟩
-    · intro x hx
-      exact ⟨⟨x, hle hx⟩, rfl⟩)
-  have hb' := HasBasisAway.map (M₀.subtype.restrictScalars R)
-    ((span A (s' : Set M)).restrictScalars R) hb
-  have he : (span A (s' : Set M)).restrictScalars R ⊔
-      LinearMap.range (M₀.subtype.restrictScalars R) = M₀.restrictScalars R := by
+  obtain ⟨b, hb0, hb⟩ :=
+    H M₀ ((span A (s' : Set M)).comap (M₀.subtype.restrictScalars A)) (by
+      apply fg_of_fg_map_injective (M₀.subtype.restrictScalars A) Subtype.val_injective
+      rw [map_comap_eq_of_le]
+      · exact ⟨s', rfl⟩
+      · intro x hx
+        exact ⟨⟨x, hle hx⟩, rfl⟩)
+  have hb' :=
+    HasBasisAway.map (M₀.subtype.restrictScalars R) ((span A (s' : Set M)).restrictScalars R) hb
+  have he
+      : (span A (s' : Set M)).restrictScalars R ⊔ LinearMap.range (M₀.subtype.restrictScalars R)
+        = M₀.restrictScalars R := by
     apply le_antisymm
     · exact sup_le (fun x hx => hle hx) (by rintro _ ⟨x, rfl⟩; exact x.2)
     · exact fun x hx => mem_sup_right ⟨⟨x, hx⟩, rfl⟩
   rw [he] at hb'
-  exact ⟨a * b, mul_ne_zero ha0 hb0, (hb'.of_dvd (dvd_mul_left b a)).trans (fun x hx => hle hx)
-    le_top (ha.of_dvd (dvd_mul_right a b))⟩
+  exact ⟨
+    a * b,
+    mul_ne_zero ha0 hb0,
+    (hb'.of_dvd (dvd_mul_left b a)).trans
+      (fun x hx => hle hx)
+      le_top (ha.of_dvd (dvd_mul_right a b))
+  ⟩
 
-theorem quotientsFreeAway_of_finiteType [IsNoetherianRing A]
+theorem quotientsFreeAway_of_finiteType
+    [IsNoetherianRing A]
     (H : ∀ (M : Type v) [AddCommGroup M] [Module R M] [Module A M] [IsScalarTower R A M]
-      [Module.Finite A M], ∃ a : R, a ≠ 0 ∧ HasBasisAway a (⊥ : Submodule R M) ⊤)
-    (T : Type u) [CommRing T] [Algebra A T] [hT : Algebra.FiniteType A T] :
-    QuotientsFreeAway.{_, v} R A T := by
+        [Module.Finite A M],
+      ∃ a : R,
+        a ≠ 0 ∧ HasBasisAway a (⊥ : Submodule R M) ⊤)
+    (T : Type u) [CommRing T] [Algebra A T] [hT : Algebra.FiniteType A T]
+    : QuotientsFreeAway.{_, v} R A T := by
   obtain ⟨n, f, hf⟩ : ∃ (n : ℕ) (f : Fin n → T), Algebra.adjoin A (Set.range f) = ⊤ := by
     obtain ⟨s, hs⟩ := hT.out
     refine ⟨s.card, fun i => s.equivFin.symm i, ?_⟩
@@ -360,8 +394,7 @@ theorem quotientsFreeAway_of_finiteType [IsNoetherianRing A]
     congr 1
     ext x
     simp only [Set.mem_range, SetLike.mem_coe]
-    exact ⟨by rintro ⟨i, rfl⟩; exact (s.equivFin.symm i).2,
-      fun hx => ⟨s.equivFin ⟨x, hx⟩, by simp⟩⟩
+    exact ⟨by rintro ⟨i, rfl⟩; exact (s.equivFin.symm i).2, fun hx => ⟨s.equivFin ⟨x, hx⟩, by simp⟩⟩
   clear hT
   induction n generalizing T with
   | zero =>
@@ -394,17 +427,22 @@ theorem quotientsFreeAway_of_finiteType [IsNoetherianRing A]
     rw [← Algebra.adjoin_union_eq_adjoin_adjoin, Subalgebra.restrictScalars_top, ← hf,
       Fin.range_fin_succ, Set.union_singleton]
 
-theorem exists_hasBasisAway_of_finite_algebra [Module.Finite R A]
-    (M : Type v) [AddCommGroup M] [Module R M] [Module A M] [IsScalarTower R A M]
-    [Module.Finite A M] : ∃ a : R, a ≠ 0 ∧ HasBasisAway a (⊥ : Submodule R M) ⊤ :=
+theorem exists_hasBasisAway_of_finite_algebra
+    [Module.Finite R A]
+    (M : Type v)
+    [AddCommGroup M] [Module R M] [Module A M] [IsScalarTower R A M] [Module.Finite A M]
+    : ∃ a : R, a ≠ 0 ∧ HasBasisAway a (⊥ : Submodule R M) ⊤ :=
   haveI : Module.Finite R M := Module.Finite.trans A M
   exists_hasBasisAway_of_finite
 
-theorem exists_hasBasisAway_of_finiteType [IsNoetherianRing R] [Algebra.FiniteType R A]
-    (M : Type v) [AddCommGroup M] [Module R M] [Module A M] [IsScalarTower R A M]
-    [Module.Finite A M] : ∃ a : R, a ≠ 0 ∧ HasBasisAway a (⊥ : Submodule R M) ⊤ := by
-  simpa using quotientsFreeAway_of_finiteType (R := R) (A := R)
-    exists_hasBasisAway_of_finite_algebra A M ⊥ fg_bot
+theorem exists_hasBasisAway_of_finiteType
+    [IsNoetherianRing R] [Algebra.FiniteType R A]
+    (M : Type v)
+    [AddCommGroup M] [Module R M] [Module A M] [IsScalarTower R A M] [Module.Finite A M]
+    : ∃ a : R, a ≠ 0 ∧ HasBasisAway a (⊥ : Submodule R M) ⊤ := by
+  simpa using
+    quotientsFreeAway_of_finiteType (R := R) (A := R) exists_hasBasisAway_of_finite_algebra A M ⊥
+      fg_bot
 
 end Main
 
@@ -412,30 +450,39 @@ section BaseChange
 
 variable {R : Type*} [CommRing R] {M : Type*} [AddCommGroup M] [Module R M]
 
-theorem IsBasisAway.exists_basis_tensor {a : R} {s : Set M}
-    (h : IsBasisAway a (⊥ : Submodule R M) ⊤ s) (R' : Type*) [CommRing R'] [Algebra R R']
-    (ha : IsUnit (algebraMap R R' a)) : Nonempty (Module.Basis s R' (R' ⊗[R] M)) := by
-  obtain ⟨b⟩ := h.exists_basis (.powers a) (Submonoid.mem_powers a) (Localization.Away a)
-    (TensorProduct.mk R (Localization.Away a) M 1)
+theorem IsBasisAway.exists_basis_tensor
+    {a : R} {s : Set M} (h : IsBasisAway a (⊥ : Submodule R M) ⊤ s)
+    (R' : Type*) [CommRing R'] [Algebra R R']
+    (ha : IsUnit (algebraMap R R' a))
+    : Nonempty (Module.Basis s R' (R' ⊗[R] M)) := by
+  obtain ⟨b⟩ :=
+    h.exists_basis (.powers a) (Submonoid.mem_powers a) (Localization.Away a)
+      (TensorProduct.mk R (Localization.Away a) M 1)
   letI : Algebra (Localization.Away a) R' := (IsLocalization.Away.lift a ha).toAlgebra
   haveI : IsScalarTower R (Localization.Away a) R' :=
     .of_algebraMap_eq fun r => (IsLocalization.Away.lift_eq a ha r).symm
   exact ⟨(b.baseChange R').map (AlgebraTensorModule.cancelBaseChange R _ R' R' M)⟩
 
-theorem HasBasisAway.free_tensor {a : R} (h : HasBasisAway a (⊥ : Submodule R M) ⊤)
-    (R' : Type*) [CommRing R'] [Algebra R R'] (ha : IsUnit (algebraMap R R' a)) :
-    Module.Free R' (R' ⊗[R] M) := by
+theorem HasBasisAway.free_tensor
+    {a : R} (h : HasBasisAway a (⊥ : Submodule R M) ⊤)
+    (R' : Type*) [CommRing R'] [Algebra R R']
+    (ha : IsUnit (algebraMap R R' a))
+    : Module.Free R' (R' ⊗[R] M) := by
   obtain ⟨s, hs⟩ := h
   obtain ⟨b⟩ := hs.exists_basis_tensor R' ha
   exact .of_basis b
 
-theorem HasBasisAway.exists_pow_smul_eq_zero {a : R} (h : HasBasisAway a (⊥ : Submodule R M) ⊤)
-    (R' : Type*) [CommRing R'] [Nontrivial R'] [Algebra R R'] (ha : IsUnit (algebraMap R R' a))
-    [Subsingleton (R' ⊗[R] M)] (m : M) : ∃ n : ℕ, a ^ n • m = 0 := by
+theorem HasBasisAway.exists_pow_smul_eq_zero
+    {a : R} (h : HasBasisAway a (⊥ : Submodule R M) ⊤)
+    (R' : Type*) [CommRing R'] [Nontrivial R'] [Algebra R R']
+    (ha : IsUnit (algebraMap R R' a))
+    [Subsingleton (R' ⊗[R] M)]
+    (m : M)
+    : ∃ n : ℕ, a ^ n • m = 0 := by
   obtain ⟨s, hs⟩ := h
   obtain ⟨b⟩ := hs.exists_basis_tensor R' ha
-  obtain rfl : s = ∅ := Set.eq_empty_of_forall_notMem fun x hx =>
-    b.ne_zero ⟨x, hx⟩ (Subsingleton.elim _ _)
+  obtain rfl : s = ∅ :=
+    Set.eq_empty_of_forall_notMem fun x hx => b.ne_zero ⟨x, hx⟩ (Subsingleton.elim _ _)
   simpa using hs.2.2 m trivial
 
 end BaseChange
@@ -446,26 +493,28 @@ universe v
 
 variable (R : Type*) [CommRing R] [IsDomain R] [IsNoetherianRing R]
 
-theorem exists_hasBasisAway_quotient (A₀ : Type*) [CommRing A₀] [Algebra R A₀]
-    [Algebra.FiniteType R A₀] (A : Type*) [CommRing A] [Algebra A₀ A] [Algebra.FiniteType A₀ A]
+theorem exists_hasBasisAway_quotient
+    (A₀ : Type*) [CommRing A₀] [Algebra R A₀] [Algebra.FiniteType R A₀]
+    (A : Type*) [CommRing A] [Algebra A₀ A] [Algebra.FiniteType A₀ A]
     {M : Type v} [AddCommGroup M] [Module R M] [Module A₀ M] [Module A M] [IsScalarTower R A₀ M]
-    [IsScalarTower A₀ A M] [Module.Finite A M] (N : Submodule A₀ M) (hN : N.FG) :
-    ∃ a : R, a ≠ 0 ∧ HasBasisAway a (N.restrictScalars R) ⊤ :=
+    [IsScalarTower A₀ A M] [Module.Finite A M]
+    (N : Submodule A₀ M) (hN : N.FG)
+    : ∃ a : R, a ≠ 0 ∧ HasBasisAway a (N.restrictScalars R) ⊤ :=
   haveI : IsNoetherianRing A₀ := Algebra.FiniteType.isNoetherianRing R A₀
   quotientsFreeAway_of_finiteType (R := R) (A := A₀) exists_hasBasisAway_of_finiteType A M N hN
 
 variable {R}
 
-theorem exists_hasBasisAway_coker {A₀ : Type*} [CommRing A₀] [Algebra R A₀]
-    [Algebra.FiniteType R A₀] {A : Type*} [CommRing A] [Algebra R A] [Algebra.FiniteType R A]
-    (φ : A₀ →ₐ[R] A) :
-    ∃ a : R, a ≠ 0 ∧
-      HasBasisAway a (⊥ : Submodule R (A ⧸ LinearMap.range φ.toLinearMap)) ⊤ := by
+theorem exists_hasBasisAway_coker
+    {A₀ : Type*} [CommRing A₀] [Algebra R A₀] [Algebra.FiniteType R A₀]
+    {A : Type*} [CommRing A] [Algebra R A] [Algebra.FiniteType R A]
+    (φ : A₀ →ₐ[R] A)
+    : ∃ a : R, a ≠ 0 ∧ HasBasisAway a (⊥ : Submodule R (A ⧸ LinearMap.range φ.toLinearMap)) ⊤ := by
   letI : Algebra A₀ A := φ.toRingHom.toAlgebra
   haveI : IsScalarTower R A₀ A := .of_algebraMap_eq fun r => (φ.commutes r).symm
   haveI : Algebra.FiniteType A₀ A := .of_restrictScalars_finiteType R A₀ A
-  obtain ⟨a, ha0, ha⟩ := exists_hasBasisAway_quotient R A₀ A (span A₀ {(1 : A)})
-    (fg_span_singleton _)
+  obtain ⟨a, ha0, ha⟩ :=
+    exists_hasBasisAway_quotient R A₀ A (span A₀ {(1 : A)}) (fg_span_singleton _)
   have e : (span A₀ {(1 : A)}).restrictScalars R = LinearMap.range φ.toLinearMap := by
     ext x
     simp only [restrictScalars_mem, mem_span_singleton, Algebra.smul_def, mul_one]
@@ -483,28 +532,32 @@ section Chain
 
 variable {R : Type*} [CommRing R] {M : Type*} [AddCommGroup M] [Module R M]
 
-theorem free_quotient_of_chain (F : ℕ → Submodule R M) (hF : Monotone F) (htop : ⨆ d, F d = ⊤)
-    (h : ∀ d, Module.Free R (F (d + 1) ⧸ (F d).submoduleOf (F (d + 1)))) :
-    Module.Free R (M ⧸ F 0) := by
-  have := HasBasisAway.iSup (a := 1) F hF fun d => by
-    have h1 := (hasBasisAway_of_free (M := F (d + 1) ⧸ (F d).submoduleOf (F (d + 1))) 1).comap
-      ((F d).submoduleOf (F (d + 1))).mkQ (mkQ_surjective _)
-    rw [ker_mkQ] at h1
-    have h2 := HasBasisAway.map (F (d + 1)).subtype (F d) h1
-    rwa [range_subtype, sup_eq_right.2 (hF (Nat.le_succ d))] at h2
+theorem free_quotient_of_chain
+    (F : ℕ → Submodule R M) (hF : Monotone F) (htop : ⨆ d, F d = ⊤)
+    (h : ∀ d, Module.Free R (F (d + 1) ⧸ (F d).submoduleOf (F (d + 1))))
+    : Module.Free R (M ⧸ F 0) := by
+  have :=
+    HasBasisAway.iSup (a := 1) F hF fun d => by
+      have h1 :=
+        (hasBasisAway_of_free (M := F (d + 1) ⧸ (F d).submoduleOf (F (d + 1))) 1).comap
+          ((F d).submoduleOf (F (d + 1))).mkQ (mkQ_surjective _)
+      rw [ker_mkQ] at h1
+      have h2 := HasBasisAway.map (F (d + 1)).subtype (F d) h1
+      rwa [range_subtype, sup_eq_right.2 (hF (Nat.le_succ d))] at h2
   rw [htop] at this
   exact this.quotient.free
 
-theorem free_of_chain (F : ℕ → Submodule R M) (hF : Monotone F) (htop : ⨆ d, F d = ⊤)
-    (h0 : Module.Free R (F 0))
-    (h : ∀ d, Module.Free R (F (d + 1) ⧸ (F d).submoduleOf (F (d + 1)))) :
-    Module.Free R M := by
+theorem free_of_chain
+    (F : ℕ → Submodule R M) (hF : Monotone F) (htop : ⨆ d, F d = ⊤) (h0 : Module.Free R (F 0))
+    (h : ∀ d, Module.Free R (F (d + 1) ⧸ (F d).submoduleOf (F (d + 1))))
+    : Module.Free R M := by
   haveI := free_quotient_of_chain F hF htop h
   have h1 := (hasBasisAway_of_free (M := M ⧸ F 0) (1 : R)).comap (F 0).mkQ (mkQ_surjective _)
   rw [ker_mkQ] at h1
-  have h2 := HasBasisAway.map (a := 1) (F 0).subtype ⊥ (by
-    rw [comap_bot, ker_subtype]
-    exact hasBasisAway_of_free 1)
+  have h2 :=
+    HasBasisAway.map (a := 1) (F 0).subtype ⊥ (by
+      rw [comap_bot, ker_subtype]
+      exact hasBasisAway_of_free 1)
   rw [range_subtype, bot_sup_eq] at h2
   exact (h2.trans bot_le le_top h1).free
 
@@ -514,43 +567,50 @@ section Statements
 
 variable (R : Type*) [CommRing R] [IsDomain R] [IsNoetherianRing R]
 
-theorem exists_forall_dvd_free_away (S : Type*) [CommRing S] [Algebra R S]
-    [Algebra.FiniteType R S] (M : Type*) [AddCommGroup M] [Module R M] [Module S M]
-    [IsScalarTower R S M] [Module.Finite S M] :
-    ∃ a : R, a ≠ 0 ∧
-      ∀ b, a ∣ b → Module.Free (Localization.Away b) (LocalizedModule.Away b M) := by
+theorem exists_forall_dvd_free_away
+    (S : Type*) [CommRing S] [Algebra R S] [Algebra.FiniteType R S]
+    (M : Type*) [AddCommGroup M] [Module R M] [Module S M] [IsScalarTower R S M] [Module.Finite S M]
+    : ∃ a : R,
+      a ≠ 0 ∧ ∀ b, a ∣ b → Module.Free (Localization.Away b) (LocalizedModule.Away b M) := by
   obtain ⟨a, ha0, ha⟩ := exists_hasBasisAway_of_finiteType (R := R) (A := S) M
   exact ⟨a, ha0, fun b hb => (ha.of_dvd hb).free_away⟩
 
-theorem exists_free_away (S : Type*) [CommRing S] [Algebra R S]
-    [Algebra.FiniteType R S] (M : Type*) [AddCommGroup M] [Module R M] [Module S M]
-    [IsScalarTower R S M] [Module.Finite S M] :
-    ∃ a : R, a ≠ 0 ∧ Module.Free (Localization.Away a) (LocalizedModule.Away a M) := by
+theorem exists_free_away
+    (S : Type*) [CommRing S] [Algebra R S] [Algebra.FiniteType R S]
+    (M : Type*) [AddCommGroup M] [Module R M] [Module S M] [IsScalarTower R S M] [Module.Finite S M]
+    : ∃ a : R, a ≠ 0 ∧ Module.Free (Localization.Away a) (LocalizedModule.Away a M) := by
   obtain ⟨a, ha0, ha⟩ := exists_forall_dvd_free_away R S M
   exact ⟨a, ha0, ha a dvd_rfl⟩
 
-theorem exists_free_tensor_of_isUnit.{w} (S : Type*) [CommRing S] [Algebra R S]
-    [Algebra.FiniteType R S] (M : Type*) [AddCommGroup M] [Module R M] [Module S M]
-    [IsScalarTower R S M] [Module.Finite S M] :
-    ∃ a : R, a ≠ 0 ∧ ∀ (R' : Type w) [CommRing R'] [Algebra R R'],
-      IsUnit (algebraMap R R' a) → Module.Free R' (R' ⊗[R] M) := by
+theorem exists_free_tensor_of_isUnit.{w}
+    (S : Type*) [CommRing S] [Algebra R S] [Algebra.FiniteType R S]
+    (M : Type*) [AddCommGroup M] [Module R M] [Module S M] [IsScalarTower R S M] [Module.Finite S M]
+    : ∃ a : R,
+      a ≠ 0
+        ∧ ∀ (R' : Type w) [CommRing R'] [Algebra R R'],
+          IsUnit (algebraMap R R' a) → Module.Free R' (R' ⊗[R] M) := by
   obtain ⟨a, ha0, ha⟩ := exists_hasBasisAway_of_finiteType (R := R) (A := S) M
   exact ⟨a, ha0, fun R' _ _ h => ha.free_tensor R' h⟩
 
-variable {R} {A₀ : Type*} [CommRing A₀] [Algebra R A₀] [Algebra.FiniteType R A₀]
-  {A : Type*} [CommRing A] [Algebra R A] [Algebra.FiniteType R A] (φ : A₀ →ₐ[R] A)
+variable
+  {R} {A₀ : Type*} [CommRing A₀] [Algebra R A₀] [Algebra.FiniteType R A₀]
+  {A : Type*} [CommRing A] [Algebra R A] [Algebra.FiniteType R A]
+  (φ : A₀ →ₐ[R] A)
 
-theorem exists_free_away_coker :
-    ∃ a : R, a ≠ 0 ∧ Module.Free (Localization.Away a)
-      (LocalizedModule.Away a (A ⧸ LinearMap.range φ.toLinearMap)) := by
+theorem exists_free_away_coker
+    : ∃ a : R,
+      a ≠ 0 ∧ Module.Free (Localization.Away a)
+        (LocalizedModule.Away a (A ⧸ LinearMap.range φ.toLinearMap)) := by
   obtain ⟨a, ha0, ha⟩ := exists_hasBasisAway_coker φ
   exact ⟨a, ha0, ha.free_away⟩
 
 theorem exists_pow_smul_mem_range_of_surjective_baseChange.{w}
-    (h : ∀ a : R, a ≠ 0 → ∃ (K : Type w) (_ : CommRing K) (_ : Nontrivial K) (_ : Algebra R K),
-      IsUnit (algebraMap R K a) ∧
-        Function.Surjective (Algebra.TensorProduct.map (AlgHom.id K K) φ)) :
-    ∃ a : R, a ≠ 0 ∧ ∀ y : A, ∃ (n : ℕ) (x : A₀), φ x = a ^ n • y := by
+    (h : ∀ a : R,
+      a ≠ 0
+        → ∃ (K : Type w) (_ : CommRing K) (_ : Nontrivial K) (_ : Algebra R K),
+          IsUnit (algebraMap R K a)
+            ∧ Function.Surjective (Algebra.TensorProduct.map (AlgHom.id K K) φ))
+    : ∃ a : R, a ≠ 0 ∧ ∀ y : A, ∃ (n : ℕ) (x : A₀), φ x = a ^ n • y := by
   obtain ⟨a, ha0, ha⟩ := exists_hasBasisAway_coker φ
   obtain ⟨K, _, _, _, hK, hsurj⟩ := h a ha0
   refine ⟨a, ha0, fun y => ?_⟩
@@ -569,33 +629,42 @@ theorem exists_pow_smul_mem_range_of_surjective_baseChange.{w}
   rw [← map_smul, mkQ_apply, Submodule.Quotient.mk_eq_zero] at hn
   exact ⟨n, hn⟩
 
-theorem exists_pow_smul_mem_range_of_dense {D : Set (PrimeSpectrum R)} (hD : Dense D)
-    (h : ∀ x ∈ D, Function.Surjective (Algebra.TensorProduct.map
-      (AlgHom.id x.asIdeal.ResidueField x.asIdeal.ResidueField) φ)) :
-    ∃ a : R, a ≠ 0 ∧ ∀ y : A, ∃ (n : ℕ) (x : A₀), φ x = a ^ n • y := by
+theorem exists_pow_smul_mem_range_of_dense
+    {D : Set (PrimeSpectrum R)} (hD : Dense D)
+    (h : ∀ x ∈ D,
+      Function.Surjective (Algebra.TensorProduct.map
+        (AlgHom.id x.asIdeal.ResidueField x.asIdeal.ResidueField) φ))
+    : ∃ a : R, a ≠ 0 ∧ ∀ y : A, ∃ (n : ℕ) (x : A₀), φ x = a ^ n • y := by
   refine exists_pow_smul_mem_range_of_surjective_baseChange φ fun a ha => ?_
-  obtain ⟨x, hxD, hxa⟩ := hD.exists_mem_open (PrimeSpectrum.basicOpen a).isOpen
-    ⟨⟨⊥, Ideal.isPrime_bot⟩, by simpa using ha⟩
+  obtain ⟨x, hxD, hxa⟩ :=
+    hD.exists_mem_open (PrimeSpectrum.basicOpen a).isOpen
+      ⟨⟨⊥, Ideal.isPrime_bot⟩, by simpa using ha⟩
   refine ⟨x.asIdeal.ResidueField, inferInstance, inferInstance, inferInstance, ?_, h x hxD⟩
   rw [isUnit_iff_ne_zero, Ne, Ideal.algebraMap_residueField_eq_zero]
   exact hxa
 
-theorem exists_awayMap_surjective_of_dense {D : Set (PrimeSpectrum R)} (hD : Dense D)
-    (h : ∀ x ∈ D, Function.Surjective (Algebra.TensorProduct.map
-      (AlgHom.id x.asIdeal.ResidueField x.asIdeal.ResidueField) φ)) :
-    ∃ a : R, a ≠ 0 ∧
-      Function.Surjective (Localization.awayMap (φ : A₀ →+* A) (algebraMap R A₀ a)) := by
+theorem exists_awayMap_surjective_of_dense
+    {D : Set (PrimeSpectrum R)} (hD : Dense D)
+    (h : ∀ x ∈ D,
+      Function.Surjective (Algebra.TensorProduct.map
+        (AlgHom.id x.asIdeal.ResidueField x.asIdeal.ResidueField) φ))
+    : ∃ a : R,
+      a ≠ 0 ∧ Function.Surjective (Localization.awayMap (φ : A₀ →+* A) (algebraMap R A₀ a)) := by
   obtain ⟨a, ha0, ha⟩ := exists_pow_smul_mem_range_of_dense φ hD h
   refine ⟨a, ha0, Localization.awayMap_surjective_iff.2 fun y => ?_⟩
   obtain ⟨n, x, hx⟩ := ha y
   exact ⟨x, n, by simp [hx, Algebra.smul_def]⟩
 
-theorem exists_baseChange_surjective_of_dense.{w} {D : Set (PrimeSpectrum R)} (hD : Dense D)
-    (h : ∀ x ∈ D, Function.Surjective (Algebra.TensorProduct.map
-      (AlgHom.id x.asIdeal.ResidueField x.asIdeal.ResidueField) φ)) :
-    ∃ a : R, a ≠ 0 ∧ ∀ (R' : Type w) [CommRing R'] [Algebra R R'],
-      IsUnit (algebraMap R R' a) →
-        Function.Surjective (Algebra.TensorProduct.map (AlgHom.id R' R') φ) := by
+theorem exists_baseChange_surjective_of_dense.{w}
+    {D : Set (PrimeSpectrum R)} (hD : Dense D)
+    (h : ∀ x ∈ D,
+      Function.Surjective (Algebra.TensorProduct.map
+        (AlgHom.id x.asIdeal.ResidueField x.asIdeal.ResidueField) φ))
+    : ∃ a : R,
+      a ≠ 0
+        ∧ ∀ (R' : Type w) [CommRing R'] [Algebra R R'],
+          IsUnit (algebraMap R R' a)
+            → Function.Surjective (Algebra.TensorProduct.map (AlgHom.id R' R') φ) := by
   obtain ⟨a, ha0, ha⟩ := exists_pow_smul_mem_range_of_dense φ hD h
   refine ⟨a, ha0, fun R' _ _ hu z => ?_⟩
   change z ∈ (Algebra.TensorProduct.map (AlgHom.id R' R') φ).range
@@ -605,31 +674,38 @@ theorem exists_baseChange_surjective_of_dense.{w} {D : Set (PrimeSpectrum R)} (h
     obtain ⟨u, hu⟩ := (hu.pow n).exists_left_inv
     refine ⟨(c * u) ⊗ₜ x, ?_⟩
     change Algebra.TensorProduct.map (AlgHom.id R' R') φ _ = _
-    rw [Algebra.TensorProduct.map_tmul, hx, ← smul_tmul, Algebra.smul_def, map_pow,
-      AlgHom.id_apply, mul_comm, mul_assoc, hu, mul_one]
+    rw [Algebra.TensorProduct.map_tmul, hx, ← smul_tmul, Algebra.smul_def, map_pow, AlgHom.id_apply,
+      mul_comm, mul_assoc, hu, mul_one]
   | add z w hz hw => exact add_mem hz hw
 
 end Statements
 
-theorem generic_freeness.{u, v} (R : Type u) [CommRing R] [IsDomain R] [IsNoetherianRing R] :
-    (∀ (M : Type v) [AddCommGroup M] [Module R M] (F : ℕ → Submodule R M), Monotone F →
-      ⨆ d, F d = ⊤ → Module.Free R (F 0) →
-      (∀ d, Module.Free R (F (d + 1) ⧸ (F d).submoduleOf (F (d + 1)))) → Module.Free R M) ∧
-    (∀ (S : Type v) [CommRing S] [Algebra R S] [Algebra.FiniteType R S] (M : Type v)
-      [AddCommGroup M] [Module R M] [Module S M] [IsScalarTower R S M] [Module.Finite S M],
-      ∃ a : R, a ≠ 0 ∧ Module.Free (Localization.Away a) (LocalizedModule.Away a M)) ∧
-    (∀ (A₀ A : Type v) [CommRing A₀] [Algebra R A₀] [Algebra.FiniteType R A₀]
-      [CommRing A] [Algebra R A] [Algebra.FiniteType R A] (φ : A₀ →ₐ[R] A),
-      (∃ a : R, a ≠ 0 ∧ Module.Free (Localization.Away a)
-        (LocalizedModule.Away a (A ⧸ LinearMap.range φ.toLinearMap))) ∧
-      ∀ D : Set (PrimeSpectrum R), Dense D →
-        (∀ x ∈ D, Function.Surjective (Algebra.TensorProduct.map
-          (AlgHom.id x.asIdeal.ResidueField x.asIdeal.ResidueField) φ)) →
-        ∃ a : R, a ≠ 0 ∧
-          Function.Surjective (Localization.awayMap (φ : A₀ →+* A) (algebraMap R A₀ a))) :=
-  ⟨fun _ _ _ F hF htop h0 h => free_of_chain F hF htop h0 h,
-    fun S _ _ _ M _ _ _ _ _ => exists_free_away R S M,
-    fun _ _ _ _ _ _ _ _ φ => ⟨exists_free_away_coker φ,
-      fun _ hD h => exists_awayMap_surjective_of_dense φ hD h⟩⟩
+theorem generic_freeness.{u, v} (R : Type u) [CommRing R] [IsDomain R] [IsNoetherianRing R]
+    : (∀ (M : Type v) [AddCommGroup M] [Module R M] (F : ℕ → Submodule R M),
+        Monotone F → ⨆ d, F d = ⊤ → Module.Free R (F 0)
+          → (∀ d, Module.Free R (F (d + 1) ⧸ (F d).submoduleOf (F (d + 1))))
+          → Module.Free R M)
+      ∧ (∀ (S : Type v) [CommRing S] [Algebra R S] [Algebra.FiniteType R S] (M : Type v)
+          [AddCommGroup M] [Module R M] [Module S M] [IsScalarTower R S M] [Module.Finite S M],
+        ∃ a : R,
+          a ≠ 0 ∧ Module.Free (Localization.Away a) (LocalizedModule.Away a M))
+      ∧ (∀ (A₀ A : Type v) [CommRing A₀] [Algebra R A₀] [Algebra.FiniteType R A₀] [CommRing A]
+          [Algebra R A] [Algebra.FiniteType R A] (φ : A₀ →ₐ[R] A),
+        (∃ a : R,
+            a ≠ 0 ∧ Module.Free (Localization.Away a)
+              (LocalizedModule.Away a (A ⧸ LinearMap.range φ.toLinearMap)))
+          ∧ ∀ D : Set (PrimeSpectrum R),
+            Dense D
+              → (∀ x ∈ D,
+                Function.Surjective (Algebra.TensorProduct.map
+                  (AlgHom.id x.asIdeal.ResidueField x.asIdeal.ResidueField) φ))
+              → ∃ a : R,
+                a ≠ 0 ∧ Function.Surjective (Localization.awayMap (φ : A₀ →+* A)
+                  (algebraMap R A₀ a))) := ⟨
+  fun _ _ _ F hF htop h0 h => free_of_chain F hF htop h0 h,
+  fun S _ _ _ M _ _ _ _ _ => exists_free_away R S M,
+  fun _ _ _ _ _ _ _ _ φ =>
+    ⟨exists_free_away_coker φ, fun _ hD h => exists_awayMap_surjective_of_dense φ hD h⟩
+⟩
 
 end GlobalTheory

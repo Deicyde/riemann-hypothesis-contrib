@@ -23,8 +23,7 @@ def unipVec (H : Matrix ι ι ℂ) (X W₀ u e : ι → ℂ) : ι → ℂ :=
 def unipMat (H : Matrix ι ι ℂ) (X W₀ u : ι → ℂ) : Matrix ι ι ℂ :=
   Matrix.of fun i j => unipVec H X W₀ u (Pi.single j 1) i
 
-theorem continuous_unipMat (H : Matrix ι ι ℂ) (X W₀ : ι → ℂ) :
-    Continuous (unipMat H X W₀) := by
+theorem continuous_unipMat (H : Matrix ι ι ℂ) (X W₀ : ι → ℂ) : Continuous (unipMat H X W₀) := by
   refine continuous_pi fun i => continuous_pi fun j => ?_
   have hc : Continuous fun u => unipVec H X W₀ u (Pi.single j 1) := by
     unfold unipVec
@@ -33,10 +32,11 @@ theorem continuous_unipMat (H : Matrix ι ι ℂ) (X W₀ : ι → ℂ) :
     · exact (continuous_star.dotProduct continuous_const).smul continuous_const
   exact (continuous_apply i).comp hc
 
-theorem eq_unipMat {H G : Matrix ι ι ℂ} {X W₀ : ι → ℂ} (hU : Gᴴ * H * G = H)
-    (hX : G *ᵥ X = X) (hz : ∀ z, star X ⬝ᵥ (H *ᵥ z) = 0 → ∃ c : ℂ, G *ᵥ z = z + c • X)
-    (hXW : star X ⬝ᵥ (H *ᵥ W₀) = 1) (hWX : star W₀ ⬝ᵥ (H *ᵥ X) = 1) :
-    G = unipMat H X W₀ (G *ᵥ W₀ - W₀) := by
+theorem eq_unipMat
+    {H G : Matrix ι ι ℂ} {X W₀ : ι → ℂ} (hU : Gᴴ * H * G = H) (hX : G *ᵥ X = X)
+    (hz : ∀ z, star X ⬝ᵥ (H *ᵥ z) = 0 → ∃ c : ℂ, G *ᵥ z = z + c • X) (hXW : star X ⬝ᵥ (H *ᵥ W₀) = 1)
+    (hWX : star W₀ ⬝ᵥ (H *ᵥ X) = 1)
+    : G = unipMat H X W₀ (G *ᵥ W₀ - W₀) := by
   have ip : ∀ a b, star (G *ᵥ a) ⬝ᵥ (H *ᵥ (G *ᵥ b)) = star a ⬝ᵥ (H *ᵥ b) := by
     intro a b
     rw [star_mulVec, ← dotProduct_mulVec, mulVec_mulVec, mulVec_mulVec, hU]
@@ -58,11 +58,11 @@ theorem eq_unipMat {H G : Matrix ι ι ℂ} {X W₀ : ι → ℂ} (hU : Gᴴ * H
       have := ip W₀ z
       rw [hc, hGW] at this
       simp only [star_add, add_dotProduct, mulVec_add, mulVec_smul, dotProduct_add, dotProduct_smul,
-        hWX, huX, smul_eq_mul] at this
+          hWX, huX, smul_eq_mul]
+        at this
       linear_combination this
     have he : e = z + b • W₀ := by rw [hzdef]; abel
-    have : G *ᵥ e = z + c • X + b • (W₀ + u) := by
-      rw [he, mulVec_add, mulVec_smul, hc, hGW]
+    have : G *ᵥ e = z + c • X + b • (W₀ + u) := by rw [he, mulVec_add, mulVec_smul, hc, hGW]
     rw [this, hc']
     simp only [unipVec, ← hb, ← hzdef]
     rw [he]
@@ -75,19 +75,19 @@ end UnipotentCoordProper
 
 open UnipotentCoordProper
 
-variable {F E : Type*} [Field F] [Field E] [NumberField F] [NumberField E] [Algebra F E]
+variable
+  {F E : Type*} [Field F] [Field E] [NumberField F] [NumberField E] [Algebra F E]
   [Algebra.IsQuadraticExtension F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E]
 variable {W : Type*} [AddCommGroup W] [Module E W] {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-theorem UnipotentCoordProper.proof (h : HermitianForm F E W) (v : Basis ι E W) :
-    UnipotentCoordProper.Statement h v := by
+theorem UnipotentCoordProper.proof (h : HermitianForm F E W) (v : Basis ι E W)
+    : UnipotentCoordProper.Statement h v := by
   intro x₀ w₀ hp K hK
   have hherm := HermAtPlace.proof h v
   set H := gramAt h v
   set X := vecAt v x₀
   set W0 := vecAt v w₀
-  have hXW : ∀ w, star (X w) ⬝ᵥ (H w *ᵥ W0 w) = 1 := fun w => by
-    rw [← hherm, hp.2.2, map_one]
+  have hXW : ∀ w, star (X w) ⬝ᵥ (H w *ᵥ W0 w) = 1 := fun w => by rw [← hherm, hp.2.2, map_one]
   have hWX : ∀ w, star (W0 w) ⬝ᵥ (H w *ᵥ X w) = 1 := fun w => by
     rw [← hherm, ← h.conj_toSesq, hp.2.2, map_one, map_one]
   have hHdet : ∀ w, IsUnit (H w).det := fun w => by
@@ -100,11 +100,12 @@ theorem UnipotentCoordProper.proof (h : HermitianForm F E W) (v : Basis ι E W) 
   have hΦc : ∀ w, Continuous (Φ w) := fun w => continuous_unipMat _ _ _
   have hΨc : ∀ w, Continuous (Ψ w) := fun w =>
     (continuous_const.matrix_mul (hΦc w).matrix_conjTranspose).matrix_mul continuous_const
-  have key : ∀ (n : unipRadical h v x₀) (w : InfinitePlace E),
-      (((n : archUnitary h v) : InfinitePlace E → GL ι ℂ) w : Matrix ι ι ℂ) =
-        Φ w (unipCoord h v x₀ w₀ n w) ∧
-      (((((n : archUnitary h v) : InfinitePlace E → GL ι ℂ) w)⁻¹ : GL ι ℂ) : Matrix ι ι ℂ) =
-        Ψ w (unipCoord h v x₀ w₀ n w) := by
+  have key
+      : ∀ (n : unipRadical h v x₀) (w : InfinitePlace E),
+        (((n : archUnitary h v) : InfinitePlace E → GL ι ℂ) w : Matrix ι ι ℂ)
+            = Φ w (unipCoord h v x₀ w₀ n w)
+          ∧ (((((n : archUnitary h v) : InfinitePlace E → GL ι ℂ) w)⁻¹ : GL ι ℂ) : Matrix ι ι ℂ)
+            = Ψ w (unipCoord h v x₀ w₀ n w) := by
     intro n w
     set G : Matrix ι ι ℂ := (((n : archUnitary h v) : InfinitePlace E → GL ι ℂ) w : Matrix ι ι ℂ)
     have hU : Gᴴ * H w * G = H w := (mem_archUnitary.mp (n : archUnitary h v).2) w
@@ -116,8 +117,9 @@ theorem UnipotentCoordProper.proof (h : HermitianForm F E W) (v : Basis ι E W) 
     have hGGi : G * Gi = 1 := Units.mul_inv _
     show Gi = (H w)⁻¹ * (Φ w (unipCoord h v x₀ w₀ n w))ᴴ * H w
     rw [← hG]
-    calc Gi = (H w)⁻¹ * (Gᴴ * H w * G) * Gi := by
-          rw [hU, Matrix.nonsing_inv_mul _ (hHdet w), Matrix.one_mul]
+    calc
+      Gi = (H w)⁻¹ * (Gᴴ * H w * G) * Gi := by
+        rw [hU, Matrix.nonsing_inv_mul _ (hHdet w), Matrix.one_mul]
       _ = (H w)⁻¹ * Gᴴ * H w * (G * Gi) := by simp only [Matrix.mul_assoc]
       _ = (H w)⁻¹ * Gᴴ * H w := by rw [hGGi, Matrix.mul_one]
   set Kw : InfinitePlace E → Set (ι → ℂ) := fun w => (fun y => y w) '' K
@@ -125,9 +127,8 @@ theorem UnipotentCoordProper.proof (h : HermitianForm F E W) (v : Basis ι E W) 
   set C : InfinitePlace E → Set (GL ι ℂ) := fun w => Units.embedProduct (Matrix ι ι ℂ) ⁻¹'
     ((Φ w '' Kw w) ×ˢ (MulOpposite.unop ⁻¹' (Ψ w '' Kw w)))
   have hC : ∀ w, IsCompact (C w) := fun w =>
-    Units.isClosedEmbedding_embedProduct.isCompact_preimage
-      (((hKw w).image (hΦc w)).prod
-        (MulOpposite.opHomeomorph.isCompact_preimage.mp ((hKw w).image (hΨc w))))
+    Units.isClosedEmbedding_embedProduct.isCompact_preimage (((hKw w).image (hΦc w)).prod
+      (MulOpposite.opHomeomorph.isCompact_preimage.mp ((hKw w).image (hΨc w))))
   have hS : IsClosed {n : unipRadical h v x₀ | unipCoord h v x₀ w₀ n ∈ K} :=
     hK.isClosed.preimage (continuous_unipCoord h v x₀ w₀)
   rw [Subtype.isCompact_iff, Subtype.isCompact_iff, Set.image_image]

@@ -8,12 +8,15 @@ open IsDedekindDomain
 
 namespace GlobalTheory
 
-theorem valuation_uniformizer_integralClosure (R K L : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
-    [Field K] [Algebra R K] [IsFractionRing R K] [Field L] [Algebra K L] [FiniteDimensional K L]
-    [Algebra R L] [IsScalarTower R K L] [IsDedekindDomain (integralClosure R L)]
-    [IsFractionRing (integralClosure R L) L] (P : IsDedekindDomain.HeightOneSpectrum (integralClosure R L))
-    (π : R) (hπ : Irreducible π) :
-    P.valuation L (algebraMap K L (algebraMap R K π)) = WithZero.exp (-(P.asIdeal.ramificationIdx R : ℤ)) := by
+theorem valuation_uniformizer_integralClosure
+    (R K L : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K]
+    [IsFractionRing R K] [Field L] [Algebra K L] [FiniteDimensional K L] [Algebra R L]
+    [IsScalarTower R K L] [IsDedekindDomain (integralClosure R L)]
+    [IsFractionRing (integralClosure R L) L]
+    (P : IsDedekindDomain.HeightOneSpectrum (integralClosure R L))
+    (π : R) (hπ : Irreducible π)
+    : P.valuation L (algebraMap K L (algebraMap R K π))
+      = WithZero.exp (-(P.asIdeal.ramificationIdx R : ℤ)) := by
   let v : HeightOneSpectrum R := IsDiscreteValuationRing.maximalIdeal R
   have hinj : Function.Injective (algebraMap R (integralClosure R L)) := by
     have h : Function.Injective (algebraMap R L) := by

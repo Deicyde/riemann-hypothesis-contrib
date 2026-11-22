@@ -14,12 +14,15 @@ noncomputable section
 namespace ReciprocityTheory.ChartRestriction.G.PullbackSections
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory NumberField
-  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.L2.Pj
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.L2.Theta Formalism.L2.Pj
 
 namespace ThetaHol
 
-theorem isHolTo_const {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] {Y : Scheme.{0}} (y : Sp ℂ ⟶ Y) :
-    IsHolTo (Set.univ : Set V) (fun _ => y) := by
+theorem isHolTo_const
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] {Y : Scheme.{0}} (y : Sp ℂ ⟶ Y)
+    : IsHolTo (Set.univ : Set V) (fun _ => y) := by
   intro Uo f
   by_cases h : ⊤ ≤ y ⁻¹ᵁ Uo
   · simp only [Set.mem_univ, true_and, h, Set.ofPred_true]
@@ -31,8 +34,9 @@ end ThetaHol
 
 section Main
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
-  {Xo : Moduli Dw l} {c : Coeff l} {σ : c.F →+* ℂ} {r : ℕ}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {σ : c.F →+* ℂ} {r : ℕ}
 
 end Main
 

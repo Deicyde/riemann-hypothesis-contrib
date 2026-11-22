@@ -14,8 +14,8 @@ namespace GroundTheory.Automorphic
 
 variable (K : Type*) [Field K] [NumberField K]
 
-instance secondCountableTopology_adicCompletion (v : HeightOneSpectrum (𝓞 K)) :
-    SecondCountableTopology (v.adicCompletion K) := by
+instance secondCountableTopology_adicCompletion (v : HeightOneSpectrum (𝓞 K))
+    : SecondCountableTopology (v.adicCompletion K) := by
   have : Countable K := (Module.finBasis ℚ K).equivFun.injective.countable
   let O : Set (v.adicCompletion K) := v.adicCompletionIntegers K
   let U : K → Set (v.adicCompletion K) := fun a => {x | x - algebraMap K _ a ∈ O}
@@ -33,27 +33,29 @@ instance secondCountableTopology_adicCompletion (v : HeightOneSpectrum (𝓞 K))
   refine Set.eq_univ_of_forall fun x => Set.mem_iUnion.2 ?_
   have hV : IsOpen {y : v.adicCompletion K | x - y ∈ O} :=
     hO.preimage (continuous_const.sub continuous_id)
-  obtain ⟨a, ha⟩ := (HeightOneSpectrum.denseRange_algebraMap K v).exists_mem_open hV
-    ⟨x, by simp [O, (v.adicCompletionIntegers K).zero_mem]⟩
+  obtain ⟨a, ha⟩ :=
+    (HeightOneSpectrum.denseRange_algebraMap K v).exists_mem_open hV
+      ⟨x, by simp [O, (v.adicCompletionIntegers K).zero_mem]⟩
   exact ⟨a, ha⟩
 
-instance secondCountableTopology_finiteAdeleRing :
-    SecondCountableTopology (FiniteAdeleRing (𝓞 K) K) := by
+instance secondCountableTopology_finiteAdeleRing
+    : SecondCountableTopology (FiniteAdeleRing (𝓞 K) K) := by
   let R := fun v : HeightOneSpectrum (𝓞 K) => v.adicCompletion K
   let A := fun v : HeightOneSpectrum (𝓞 K) =>
     (v.adicCompletionIntegers K : Set (v.adicCompletion K))
   have hAo : ∀ v, IsOpen (A v) := fun v => GroundTheory.Global.isOpen_adicCompletionIntegers v
-  have hS : ∀ S : Finset (HeightOneSpectrum (𝓞 K)),
-      cofinite ≤ 𝓟 ((S : Set (HeightOneSpectrum (𝓞 K)))ᶜ) := fun S => by
+  have hS
+      : ∀ S : Finset (HeightOneSpectrum (𝓞 K)),
+        cofinite ≤ 𝓟 ((S : Set (HeightOneSpectrum (𝓞 K)))ᶜ) := fun S => by
     rw [le_principal_iff]
     exact S.finite_toSet.compl_mem_cofinite
-  let U : Finset (HeightOneSpectrum (𝓞 K)) → Set (Πʳ v, [R v, A v]) :=
-    fun S => Set.range (RestrictedProduct.inclusion R A (hS S))
+  let U : Finset (HeightOneSpectrum (𝓞 K)) → Set (Πʳ v, [R v, A v]) := fun S =>
+    Set.range (RestrictedProduct.inclusion R A (hS S))
   have hUo : ∀ S, IsOpen (U S) := fun S =>
     (RestrictedProduct.isOpenEmbedding_inclusion_principal hAo (hS S)).isOpen_range
   have hSC : ∀ S, SecondCountableTopology (U S) := fun S => by
-    have h1 :
-        SecondCountableTopology (Πʳ v, [R v, A v]_[𝓟 ((S : Set (HeightOneSpectrum (𝓞 K)))ᶜ)]) :=
+    have h1
+        : SecondCountableTopology (Πʳ v, [R v, A v]_[𝓟 ((S : Set (HeightOneSpectrum (𝓞 K)))ᶜ)]) :=
       RestrictedProduct.isEmbedding_coe_of_principal.secondCountableTopology
     exact (RestrictedProduct.isOpenEmbedding_inclusion_principal hAo
       (hS S)).isEmbedding.toHomeomorph.symm.isEmbedding.secondCountableTopology

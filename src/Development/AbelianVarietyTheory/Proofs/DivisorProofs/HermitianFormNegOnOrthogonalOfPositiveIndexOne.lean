@@ -5,14 +5,16 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsRootSe
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount
 open scoped TensorProduct Classical
 
 namespace GlobalTheory.SignatureOneForms
 
-theorem form_re_eq_sum {n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.IsHermitian) (v : Fin n → ℂ) :
-    (star v ⬝ᵥ A *ᵥ v).re = ∑ i, hA.eigenvalues i *
-      Complex.normSq ((star (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) *ᵥ v) i) := by
+theorem form_re_eq_sum {n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.IsHermitian) (v : Fin n → ℂ)
+    : (star v ⬝ᵥ A *ᵥ v).re
+      = ∑ i, hA.eigenvalues i *
+        Complex.normSq ((star (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) *ᵥ v) i) := by
   set U : Matrix (Fin n) (Fin n) ℂ := (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) with hU
   set d : Fin n → ℂ := RCLike.ofReal ∘ hA.eigenvalues with hd
   set c := star U *ᵥ v with hc
@@ -30,10 +32,11 @@ theorem form_re_eq_sum {n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.IsHerm
   simp [Complex.mul_re, Complex.mul_im]
   ring
 
-theorem form_re_neg {n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.IsHermitian) (hdet : A.det ≠ 0)
-    (i₀ : Fin n) (hpos : ∀ i, 0 < hA.eigenvalues i → i = i₀) (v : Fin n → ℂ) (hv : v ≠ 0)
-    (hv0 : (star (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) *ᵥ v) i₀ = 0) :
-    (star v ⬝ᵥ A *ᵥ v).re < 0 := by
+theorem form_re_neg
+    {n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.IsHermitian) (hdet : A.det ≠ 0) (i₀ : Fin n)
+    (hpos : ∀ i, 0 < hA.eigenvalues i → i = i₀) (v : Fin n → ℂ) (hv : v ≠ 0)
+    (hv0 : (star (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) *ᵥ v) i₀ = 0)
+    : (star v ⬝ᵥ A *ᵥ v).re < 0 := by
   set U : Matrix (Fin n) (Fin n) ℂ := (hA.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) with hU
   set c := star U *ᵥ v with hc
   have hne : ∀ i, hA.eigenvalues i ≠ 0 := by
@@ -51,8 +54,7 @@ theorem form_re_neg {n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (hA : A.IsHermiti
   have hji : j ≠ i₀ := by
     rintro rfl
     exact hj hv0
-  have hjneg : hA.eigenvalues j < 0 :=
-    lt_of_le_of_ne (not_lt.mp fun h => hji (hpos j h)) (hne j)
+  have hjneg : hA.eigenvalues j < 0 := lt_of_le_of_ne (not_lt.mp fun h => hji (hpos j h)) (hne j)
   rw [form_re_eq_sum hA v]
   have key : ∑ i, hA.eigenvalues i * Complex.normSq (c i) < ∑ _i : Fin n, (0 : ℝ) := by
     apply Finset.sum_lt_sum
@@ -70,7 +72,11 @@ end GlobalTheory.SignatureOneForms
 
 namespace GlobalTheory
 
-theorem re_form_neg_of_orth_of_sigPosH_eq_one : ∀ {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (hA : A.IsHermitian), A.det ≠ 0 → sigPosH hA = 1 → ∀ x y : Fin n → ℂ, 0 < (star x ⬝ᵥ A *ᵥ x).re → star x ⬝ᵥ A *ᵥ y = 0 → y ≠ 0 → (star y ⬝ᵥ A *ᵥ y).re < 0 := by
+theorem re_form_neg_of_orth_of_sigPosH_eq_one
+    : ∀ {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (hA : A.IsHermitian),
+      A.det ≠ 0 → sigPosH hA = 1
+        → ∀ x y : Fin n → ℂ,
+          0 < (star x ⬝ᵥ A *ᵥ x).re → star x ⬝ᵥ A *ᵥ y = 0 → y ≠ 0 → (star y ⬝ᵥ A *ᵥ y).re < 0 := by
   intro n A hA hdet hsig x y hx hxy hy
   unfold sigPosH at hsig
   obtain ⟨⟨i₀, hi₀⟩, huniq⟩ := Fintype.card_eq_one_iff.mp hsig
@@ -88,13 +94,16 @@ theorem re_form_neg_of_orth_of_sigPosH_eq_one : ∀ {n : ℕ} (A : Matrix (Fin n
     rintro rfl
     simp at hx
   by_cases ha : a₀ = 0
-  · exact absurd (GlobalTheory.SignatureOneForms.form_re_neg hA hdet i₀ hpos x hx0 ha) (not_lt.mpr hx.le)
+  · exact absurd (GlobalTheory.SignatureOneForms.form_re_neg hA hdet i₀ hpos x hx0 ha)
+      (not_lt.mpr hx.le)
   set w := b₀ • x - a₀ • y with hw
   have hw0 : (star U *ᵥ w) i₀ = 0 := by
     simp only [hw, mulVec_sub, mulVec_smul, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, ← ha₀, ← hb₀]
     ring
-  have hQw : star w ⬝ᵥ A *ᵥ w = (Complex.normSq b₀ : ℂ) * (star x ⬝ᵥ A *ᵥ x)
-      + (Complex.normSq a₀ : ℂ) * (star y ⬝ᵥ A *ᵥ y) := by
+  have hQw
+      : star w ⬝ᵥ A *ᵥ w
+        = (Complex.normSq b₀ : ℂ) * (star x ⬝ᵥ A *ᵥ x)
+          + (Complex.normSq a₀ : ℂ) * (star y ⬝ᵥ A *ᵥ y) := by
     simp only [hw, star_sub, star_smul, mulVec_sub, mulVec_smul, sub_dotProduct, dotProduct_sub,
       smul_dotProduct, dotProduct_smul, hxy, hyx, smul_eq_mul, Complex.normSq_eq_conj_mul_self]
     simp only [RCLike.star_def]

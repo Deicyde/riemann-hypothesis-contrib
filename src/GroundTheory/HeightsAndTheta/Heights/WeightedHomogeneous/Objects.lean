@@ -18,7 +18,6 @@ noncomputable section
 
 variable {ι : Type} [Fintype ι] [DecidableEq ι] {n : ι → ℕ}
 
-
 namespace ArithVariety
 
 variable (P : ArithVariety n)
@@ -29,27 +28,26 @@ def IsLive (c : (k : ι) → Fin (n k + 1)) : Prop :=
 def chartRing (c : (k : ι) → Fin (n k + 1)) : Subring P.FunField :=
   Subring.closure (Set.range (P.chartCoord c))
 
-def chartPow (c : (k : ι) → Fin (n k + 1)) (a : ι → ℤ) : P.FunField :=
-  ∏ k, P.mkF (X ⟨k, c k⟩) ^ a k
+def chartPow (c : (k : ι) → Fin (n k + 1)) (a : ι → ℤ) : P.FunField := ∏ k, P.mkF (X ⟨k, c k⟩) ^ a k
 
 def IsOfDegree (a : ι → ℤ) (x : P.FunField) : Prop :=
-  ∃ (f g : MvPolynomial (Coord n) ℤ) (δf δg : ι → ℕ), IsWeightedHomogeneous (coordDeg n) f δf ∧
-    IsWeightedHomogeneous (coordDeg n) g δg ∧ (∀ k, (δf k : ℤ) - δg k = a k) ∧ g ∉ P.ideal ∧
-    x = P.mkF f / P.mkF g
+  ∃ (f g : MvPolynomial (Coord n) ℤ) (δf δg : ι → ℕ),
+    IsWeightedHomogeneous (coordDeg n) f δf ∧ IsWeightedHomogeneous (coordDeg n) g δg
+      ∧ (∀ k, (δf k : ℤ) - δg k = a k) ∧ g ∉ P.ideal ∧ x = P.mkF f / P.mkF g
 
 end ArithVariety
 
 structure AddBlockData (P : ArithVariety n) where
-
   deg : ι → ℤ
-
   size : ℕ
-
   elt : Fin (size + 1) → P.FunField
   elt_deg : ∀ j, P.IsOfDegree deg (elt j)
   chart_mem : ∀ c, P.IsLive c → ∀ j, elt j / P.chartPow c deg ∈ P.chartRing c
-  generating : ∀ c, P.IsLive c → ∃ u : Fin (size + 1) → P.FunField,
-    (∀ j, u j ∈ P.chartRing c) ∧ ∑ j, u j * (elt j / P.chartPow c deg) = 1
+  generating
+    : ∀ c,
+      P.IsLive c
+        → ∃ u : Fin (size + 1) → P.FunField,
+          (∀ j, u j ∈ P.chartRing c) ∧ ∑ j, u j * (elt j / P.chartPow c deg) = 1
 
 namespace AddBlockData
 
@@ -57,10 +55,13 @@ variable {P : ArithVariety n} (D : AddBlockData P)
 
 def extSizes : Option ι → ℕ := fun o ↦ o.elim D.size n
 
-def den (d : ι → ℕ) (g : ((k : ι) → Fin (n k + 1)) → Fin (D.size + 1) → MvPolynomial (Coord n) ℤ)
-    {r : ℕ} (G : Fin r → MvPolynomial (Coord n) ℤ) (δ : Fin r → ι → ℕ) (z : Cone n ℂ) : ℝ :=
-  (∑ c, ∑ j, ‖evalCone z (g c j)‖ ^ 2) +
-    ∑ i, ‖evalCone z (G i)‖ ^ 2 * ∏ k, l2Norm (z k) ^ (2 * ((d k : ℤ) + D.deg k - δ i k))
+def den
+    (d : ι → ℕ) (g : ((k : ι) → Fin (n k + 1)) → Fin (D.size + 1) → MvPolynomial (Coord n) ℤ)
+    {r : ℕ} (G : Fin r → MvPolynomial (Coord n) ℤ) (δ : Fin r → ι → ℕ)
+    (z : Cone n ℂ)
+    : ℝ :=
+  (∑ c, ∑ j, ‖evalCone z (g c j)‖ ^ 2)
+    + ∑ i, ‖evalCone z (G i)‖ ^ 2 * ∏ k, l2Norm (z k) ^ (2 * ((d k : ℤ) + D.deg k - δ i k))
 
 end AddBlockData
 
@@ -91,15 +92,14 @@ def inv (A : HermLine n) : HermLine n where
 end HermLine
 
 omit [DecidableEq ι] in
-theorem chartMonomial_add (c : (k : ι) → Fin (n k + 1)) (d d' : ι → ℕ) :
-    chartMonomial c (d + d') = chartMonomial c d * chartMonomial c d' := by
+theorem chartMonomial_add (c : (k : ι) → Fin (n k + 1)) (d d' : ι → ℕ)
+    : chartMonomial c (d + d') = chartMonomial c d * chartMonomial c d' := by
   simp only [chartMonomial, Pi.add_apply, pow_add, Finset.prod_mul_distrib]
 
 omit [DecidableEq ι] in
-theorem chartMonomial_nsmul (c : (k : ι) → Fin (n k + 1)) (m : ℕ) (d : ι → ℕ) :
-    chartMonomial c (m • d) = chartMonomial c d ^ m := by
+theorem chartMonomial_nsmul (c : (k : ι) → Fin (n k + 1)) (m : ℕ) (d : ι → ℕ)
+    : chartMonomial c (m • d) = chartMonomial c d ^ m := by
   simp only [chartMonomial, Pi.smul_apply, smul_eq_mul, ← Finset.prod_pow, ← pow_mul, mul_comm]
-
 
 namespace IntegralSection
 
@@ -132,7 +132,6 @@ end IntegralSection
 def blockIncl (k₀ : ι) : Coord (fun _ : Unit ↦ n k₀) → Coord n := fun v ↦ ⟨k₀, v.2⟩
 
 variable {K : Type*} [Field K] [NumberField K] {e r : ℕ}
-
 
 end
 

@@ -207,80 +207,95 @@ lemma slopes_const {p h s m : ℕ} (hp : 2 ≤ p) (hs : s < h) (hm : 1 ≤ m) (a
   · exact hle r t hr h' ht1
   · exact (hle t r ht h' hr1).symm
 
-theorem p_homogeneous_difference_linear : ∀ (p h s m : ℕ), 2 ≤ p → s < h → 1 ≤ m → ∀ A B : ℝ → ℝ, ConcaveOn ℝ (Set.Ioc 0 1) A → ConcaveOn ℝ (Set.Ioc 0 1) B → ContinuousOn A (Set.Ioc 0 1) → ContinuousOn B (Set.Ioc 0 1) → (∀ r ∈ Set.Ioo (0 : ℝ) 1, ∃ (k : ℤ) (δ : ℝ), 0 < δ ∧ r + δ ≤ 1 ∧ ∀ t ∈ Set.Icc r (r + δ), A t = A r + k * (t - r)) → (∀ r ∈ Set.Ioo (0 : ℝ) 1, ∃ (k : ℤ) (δ : ℝ), 0 < δ ∧ r + δ ≤ 1 ∧ ∀ t ∈ Set.Icc r (r + δ), B t = B r + k * (t - r)) → (∀ r ∈ Set.Ioc (0 : ℝ) 1, (p : ℝ) ^ h * B (r / (p : ℝ) ^ h) = B r + s * r) → (∀ r ∈ Set.Ioc (0 : ℝ) (1 / p), A (p * r) - m * B (p * r) = p * (A r - m * B r)) → ∃ n : ℤ, ∀ r ∈ Set.Ioc (0 : ℝ) 1, A r - m * B r = n * r := by
+theorem p_homogeneous_difference_linear
+    : ∀ (p h s m : ℕ),
+      2 ≤ p → s < h → 1 ≤ m
+        → ∀ A B : ℝ → ℝ,
+          ConcaveOn ℝ (Set.Ioc 0 1) A → ConcaveOn ℝ (Set.Ioc 0 1) B → ContinuousOn A (Set.Ioc 0 1)
+            → ContinuousOn B (Set.Ioc 0 1)
+            → (∀ r ∈ Set.Ioo (0 : ℝ) 1, ∃ (k : ℤ) (δ : ℝ),
+              0 < δ ∧ r + δ ≤ 1 ∧ ∀ t ∈ Set.Icc r (r + δ), A t = A r + k * (t - r))
+            → (∀ r ∈ Set.Ioo (0 : ℝ) 1, ∃ (k : ℤ) (δ : ℝ),
+              0 < δ ∧ r + δ ≤ 1 ∧ ∀ t ∈ Set.Icc r (r + δ), B t = B r + k * (t - r))
+            → (∀ r ∈ Set.Ioc (0 : ℝ) 1, (p : ℝ) ^ h * B (r / (p : ℝ) ^ h) = B r + s * r)
+            → (∀ r ∈ Set.Ioc (0 : ℝ) (1 / p), A (p * r) - m * B (p * r) = p * (A r - m * B r))
+            → ∃ n : ℤ, ∀ r ∈ Set.Ioc (0 : ℝ) 1, A r - m * B r = n * r := by
   intro p h s m hp hs hm A B hAc hBc hAcont hBcont hA hB hBq hG
-  have hp0 : (0:ℝ) < p := by exact_mod_cast (by omega : 0 < p)
-  have hp1 : (1:ℝ) < p := by exact_mod_cast (by omega : 1 < p)
-  have hq0 : (0:ℝ) < (p:ℝ) ^ h := by positivity
-  have hq1 : (1:ℝ) ≤ (p:ℝ) ^ h := one_le_pow₀ hp1.le
+  have hp0 : (0 : ℝ) < p := by exact_mod_cast (by omega : 0 < p)
+  have hp1 : (1 : ℝ) < p := by exact_mod_cast (by omega : 1 < p)
+  have hq0 : (0 : ℝ) < (p : ℝ) ^ h := by positivity
+  have hq1 : (1 : ℝ) ≤ (p : ℝ) ^ h := one_le_pow₀ hp1.le
   choose! kA δA hδA hδA1 hA' using hA
   choose! kB δB hδB hδB1 hB' using hB
-  have raA : ∀ r ∈ Set.Ioo (0:ℝ) 1, RightAffine A r (kA r) :=
-    fun r hr => ⟨δA r, hδA r hr, hA' r hr⟩
-  have raB : ∀ r ∈ Set.Ioo (0:ℝ) 1, RightAffine B r (kB r) :=
-    fun r hr => ⟨δB r, hδB r hr, hB' r hr⟩
+  have raA : ∀ r ∈ Set.Ioo (0 : ℝ) 1, RightAffine A r (kA r) := fun r hr =>
+    ⟨δA r, hδA r hr, hA' r hr⟩
+  have raB : ∀ r ∈ Set.Ioo (0 : ℝ) 1, RightAffine B r (kB r) := fun r hr =>
+    ⟨δB r, hδB r hr, hB' r hr⟩
   have antiA : ∀ r t : ℝ, 0 < r → r < t → t < 1 → kA t ≤ kA r := fun r t hr hrt ht => by
     exact_mod_cast RightAffine.anti_of_concave hAc hr hrt ht (raA r ⟨hr, by linarith⟩)
       (raA t ⟨by linarith, ht⟩)
   have antiB : ∀ r t : ℝ, 0 < r → r < t → t < 1 → kB t ≤ kB r := fun r t hr hrt ht => by
     exact_mod_cast RightAffine.anti_of_concave hBc hr hrt ht (raB r ⟨hr, by linarith⟩)
       (raB t ⟨by linarith, ht⟩)
-  have hbq : ∀ r : ℝ, 0 < r → r < 1 → kB (r / (p:ℝ) ^ h) = kB r + s := by
+  have hbq : ∀ r : ℝ, 0 < r → r < 1 → kB (r / (p : ℝ) ^ h) = kB r + s := by
     intro r hr hr1
-    have hrq : r / (p:ℝ) ^ h ∈ Set.Ioo (0:ℝ) 1 :=
+    have hrq : r / (p : ℝ) ^ h ∈ Set.Ioo (0 : ℝ) 1 :=
       ⟨by positivity, lt_of_le_of_lt (div_le_self hr.le hq1) hr1⟩
-    have h1 := ((raB _ hrq).comp_mul (c := 1 / (p:ℝ) ^ h) (r := r) (by positivity)
-      (by ring)).const_mul ((p:ℝ) ^ h)
-    have h2 := (raB r ⟨hr, hr1⟩).add_linear (s:ℝ)
-    have h3 : RightAffine (fun t => B t + s * t) r
-        ((p:ℝ) ^ h * (1 / (p:ℝ) ^ h * kB (r / (p:ℝ) ^ h))) := by
+    have h1 :=
+      ((raB _ hrq).comp_mul (c := 1 / (p : ℝ) ^ h) (r := r) (by positivity) (by ring)).const_mul
+        ((p : ℝ) ^ h)
+    have h2 := (raB r ⟨hr, hr1⟩).add_linear (s : ℝ)
+    have h3 : RightAffine
+        (fun t => B t + s * t)
+        r ((p : ℝ) ^ h * (1 / (p : ℝ) ^ h * kB (r / (p : ℝ) ^ h))) := by
       refine h1.congr (ε := 1 - r) (by linarith) (fun t ht => ?_)
       have := hBq t ⟨by linarith [ht.1], by linarith [ht.2]⟩
-      rw [show 1 / (p:ℝ) ^ h * t = t / (p:ℝ) ^ h by ring]; exact this
+      rw [show 1 / (p : ℝ) ^ h * t = t / (p : ℝ) ^ h by ring]
+      exact this
     have := h3.unique h2
     rw [← mul_assoc, mul_one_div_cancel hq0.ne', one_mul] at this
     exact_mod_cast this
-  have hgp : ∀ r : ℝ, 0 < r → r < 1 / (p:ℝ) →
-      kA (p * r) - m * kB (p * r) = kA r - m * kB r := by
+  have hgp : ∀ r : ℝ, 0 < r → r < 1 / (p : ℝ) → kA (p * r) - m * kB (p * r) = kA r - m * kB r := by
     intro r hr hrp
-    have hpr1 : (p:ℝ) * r < 1 := by rwa [lt_div_iff₀ hp0, mul_comm] at hrp
-    have hp1' : 1 / (p:ℝ) < 1 := by rw [div_lt_one hp0]; exact hp1
+    have hpr1 : (p : ℝ) * r < 1 := by rwa [lt_div_iff₀ hp0, mul_comm] at hrp
+    have hp1' : 1 / (p : ℝ) < 1 := by rw [div_lt_one hp0]; exact hp1
     have hr1 : r < 1 := by linarith
-    have hpr : (p:ℝ) * r ∈ Set.Ioo (0:ℝ) 1 := ⟨by positivity, hpr1⟩
-    have h1 := ((raA _ hpr).sub_mul (m:ℝ) (raB _ hpr)).comp_mul (r := r) hp0 rfl
-    have h2 := ((raA r ⟨hr, hr1⟩).sub_mul (m:ℝ) (raB r ⟨hr, hr1⟩)).const_mul (p:ℝ)
-    have h3 := h1.congr (ε := 1 / (p:ℝ) - r) (by linarith) (fun t ht => by
-      exact hG t ⟨by linarith [ht.1], by linarith [ht.2]⟩)
+    have hpr : (p : ℝ) * r ∈ Set.Ioo (0 : ℝ) 1 := ⟨by positivity, hpr1⟩
+    have h1 := ((raA _ hpr).sub_mul (m : ℝ) (raB _ hpr)).comp_mul (r := r) hp0 rfl
+    have h2 := ((raA r ⟨hr, hr1⟩).sub_mul (m : ℝ) (raB r ⟨hr, hr1⟩)).const_mul (p : ℝ)
+    have h3 :=
+      h1.congr (ε := 1 / (p : ℝ) - r) (by linarith)
+        (fun t ht => by exact hG t ⟨by linarith [ht.1], by linarith [ht.2]⟩)
     have := h3.unique h2
     have := mul_left_cancel₀ hp0.ne' this
     exact_mod_cast this
   have hconst := slopes_const hp hs hm kA kB antiA antiB hbq hgp
-  obtain ⟨n, hn⟩ : ∃ n : ℤ, n = kA (1/2) - m * kB (1/2) := ⟨_, rfl⟩
-  have raG : ∀ r ∈ Set.Ioo (0:ℝ) 1, RightAffine (fun t => A t - m * B t) r n := by
+  obtain ⟨n, hn⟩ : ∃ n : ℤ, n = kA (1 / 2) - m * kB (1 / 2) := ⟨_, rfl⟩
+  have raG : ∀ r ∈ Set.Ioo (0 : ℝ) 1, RightAffine (fun t => A t - m * B t) r n := by
     intro r hr
-    have := (raA r hr).sub_mul (m:ℝ) (raB r hr)
-    have e := hconst (1/2) r (by norm_num) (by norm_num) hr.1 hr.2
-    have e' : ((kA r : ℝ) - m * kB r) = (n:ℝ) := by rw [hn]; exact_mod_cast e
+    have := (raA r hr).sub_mul (m : ℝ) (raB r hr)
+    have e := hconst (1 / 2) r (by norm_num) (by norm_num) hr.1 hr.2
+    have e' : ((kA r : ℝ) - m * kB r) = (n : ℝ) := by rw [hn]; exact_mod_cast e
     rwa [e'] at this
-  have raH : ∀ r ∈ Set.Ioo (0:ℝ) 1,
-      RightAffine (fun t => (fun t => A t - m * B t) t + (-(n:ℝ)) * t) r 0 := by
+  have raH
+      : ∀ r ∈ Set.Ioo (0 : ℝ) 1,
+        RightAffine (fun t => (fun t => A t - m * B t) t + (-(n : ℝ)) * t) r 0 := by
     intro r hr
-    have := (raG r hr).add_linear (-(n:ℝ))
+    have := (raG r hr).add_linear (-(n : ℝ))
     rwa [add_neg_cancel] at this
-  have hcont : ContinuousOn (fun t => (fun t => A t - m * B t) t + (-(n:ℝ)) * t)
-      (Set.Ioc 0 1) :=
+  have hcont : ContinuousOn (fun t => (fun t => A t - m * B t) t + (-(n : ℝ)) * t) (Set.Ioc 0 1) :=
     (hAcont.sub (continuousOn_const.mul hBcont)).add (continuousOn_const.mul continuousOn_id)
   have hH := const_of_rightAffine_zero hcont raH
-  have hpinv : (p:ℝ) * (1 / p) = 1 := mul_one_div_cancel hp0.ne'
-  have hpm : (1:ℝ) / p ∈ Set.Ioc (0:ℝ) (1 / p) := ⟨by positivity, le_rfl⟩
+  have hpinv : (p : ℝ) * (1 / p) = 1 := mul_one_div_cancel hp0.ne'
+  have hpm : (1 : ℝ) / p ∈ Set.Ioc (0 : ℝ) (1 / p) := ⟨by positivity, le_rfl⟩
   have hGp := hG (1 / p) hpm
   rw [hpinv] at hGp
   have hHp := hH (1 / p) ⟨by positivity, by rw [div_le_one hp0]; exact hp1.le⟩
   simp only at hHp
-  have key : ((p:ℝ) - 1) * ((A 1 - m * B 1) - n) = 0 := by
+  have key : ((p : ℝ) - 1) * ((A 1 - m * B 1) - n) = 0 := by
     linear_combination (-1) * hGp + (-(p:ℝ)) * hHp + (-(n:ℝ)) * hpinv
   have hG1 : A 1 - m * B 1 = n := by
-    have hne : (p:ℝ) - 1 ≠ 0 := by linarith
+    have hne : (p : ℝ) - 1 ≠ 0 := by linarith
     have := (mul_eq_zero.mp key).resolve_left hne
     linarith
   refine ⟨n, fun r hr => ?_⟩

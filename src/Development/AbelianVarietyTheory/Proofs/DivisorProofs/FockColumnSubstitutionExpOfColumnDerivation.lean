@@ -17,10 +17,9 @@ open GlobalTheory.MinorFrame
 
 variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
-
 omit [DecidableEq ι] in
-theorem totalDegree_colSub_le {d a : ℕ} (g : ι → Matrix (Fin a) (Fin a) ℂ) (P : Pol ι d a) :
-    (colSub g P).totalDegree ≤ P.totalDegree := by
+theorem totalDegree_colSub_le {d a : ℕ} (g : ι → Matrix (Fin a) (Fin a) ℂ) (P : Pol ι d a)
+    : (colSub g P).totalDegree ≤ P.totalDegree := by
   have hX : ∀ y : Var ι d a, (colSub g (X y : Pol ι d a)).totalDegree ≤ 1 := by
     intro y
     rw [colSub, aeval_X]
@@ -40,12 +39,18 @@ theorem totalDegree_colSub_le {d a : ℕ} (g : ι → Matrix (Fin a) (Fin a) ℂ
   refine (totalDegree_pow _ _).trans ?_
   simpa using Nat.mul_le_mul_left (m y) (hX y)
 
-theorem hasDerivAt_dual_of_coeff {σ : Type} [Finite σ] (l : MvPolynomial σ ℂ →ₗ[ℂ] ℂ) (N : ℕ)
-    (u : ℝ → MvPolynomial σ ℂ) (u' : MvPolynomial σ ℂ) (t : ℝ) (hu : ∀ s, (u s).totalDegree ≤ N)
-    (hd : ∀ m, HasDerivAt (fun s => AddMonoidAlgebra.coeff (u s) m) (AddMonoidAlgebra.coeff u' m) t) : HasDerivAt (fun s => l (u s)) (l u') t := by
+theorem hasDerivAt_dual_of_coeff
+    {σ : Type} [Finite σ]
+    (l : MvPolynomial σ ℂ →ₗ[ℂ] ℂ)
+    (N : ℕ) (u : ℝ → MvPolynomial σ ℂ) (u' : MvPolynomial σ ℂ) (t : ℝ)
+    (hu : ∀ s, (u s).totalDegree ≤ N)
+    (hd : ∀ m, HasDerivAt (fun s => AddMonoidAlgebra.coeff (u s) m) (AddMonoidAlgebra.coeff u' m) t)
+    : HasDerivAt (fun s => l (u s)) (l u') t := by
   classical
   let A : Finset (σ →₀ ℕ) := (Finsupp.finite_of_degree_le (σ := σ) N).toFinset ∪ u'.support
-  have key : ∀ P : MvPolynomial σ ℂ, P.support ⊆ A → l P = ∑ m ∈ A, AddMonoidAlgebra.coeff P m * l (monomial m 1) := by
+  have key
+      : ∀ P : MvPolynomial σ ℂ,
+        P.support ⊆ A → l P = ∑ m ∈ A, AddMonoidAlgebra.coeff P m * l (monomial m 1) := by
     intro P hP
     conv_lhs => rw [as_sum P]
     set_option synthInstance.maxHeartbeats 100000 in
@@ -62,8 +67,8 @@ theorem hasDerivAt_dual_of_coeff {σ : Type} [Finite σ] (l : MvPolynomial σ �
   exact HasDerivAt.fun_sum fun m _ => (hd m).mul_const _
 
 omit [Fintype ι] in
-theorem atPl_mul {a : ℕ} (τ : ι) (A B : Matrix (Fin a) (Fin a) ℂ) :
-    atPl τ (A * B) = fun σ => atPl τ A σ * atPl τ B σ := by
+theorem atPl_mul {a : ℕ} (τ : ι) (A B : Matrix (Fin a) (Fin a) ℂ)
+    : atPl τ (A * B) = fun σ => atPl τ A σ * atPl τ B σ := by
   funext σ
   by_cases h : σ = τ
   · subst h; simp [atPl]
@@ -84,14 +89,26 @@ theorem colSub_atPl_one {d a : ℕ} (τ : ι) (P : Pol ι d a) : colSub (atPl τ
     · simp
   rw [this, AlgHom.id_apply]
 
-theorem colSub_exp_of_colDer : ∀ {ι : Type} [Fintype ι] [DecidableEq ι] (d a : ℕ) (τ : ι) (c : ℕ) (Q : Type) [AddCommGroup Q] [Module ℂ Q]
-    (q : GlobalTheory.MinorFrame.Pol ι d a →ₗ[ℂ] Q),
-    (∀ (S : Matrix (Fin a) (Fin a) ℂ) (R : GlobalTheory.MinorFrame.Pol ι d a) (m : GlobalTheory.MinorFrame.Var ι d a →₀ ℕ),
-      HasDerivAt (fun h : ℝ => AddMonoidAlgebra.coeff (GlobalTheory.MinorFrame.colSub (GlobalTheory.ColLie.atPl τ (NormedSpace.exp ((h : ℂ) • S))) R) m)
-        (AddMonoidAlgebra.coeff (GlobalTheory.ColLie.colDer τ S R) m) 0) →
-    (∀ S : Matrix (Fin a) (Fin a) ℂ, S.conjTranspose = -S → ∀ P, q (GlobalTheory.ColLie.colDer τ S P) = ((c : ℂ) * S.trace) • q P) →
-    ∀ S : Matrix (Fin a) (Fin a) ℂ, S.conjTranspose = -S → ∀ P,
-      q (GlobalTheory.MinorFrame.colSub (GlobalTheory.ColLie.atPl τ (NormedSpace.exp S)) P) = ((NormedSpace.exp S).det ^ c) • q P := by
+theorem colSub_exp_of_colDer
+    : ∀ {ι : Type} [Fintype ι] [DecidableEq ι] (d a : ℕ) (τ : ι) (c : ℕ) (Q : Type) [AddCommGroup Q]
+        [Module ℂ Q] (q : GlobalTheory.MinorFrame.Pol ι d a →ₗ[ℂ] Q),
+      (∀ (S : Matrix (Fin a) (Fin a) ℂ) (R : GlobalTheory.MinorFrame.Pol ι d a)
+            (m : GlobalTheory.MinorFrame.Var ι d a →₀ ℕ),
+          HasDerivAt
+            (fun h : ℝ =>
+              AddMonoidAlgebra.coeff
+                (GlobalTheory.MinorFrame.colSub
+                  (GlobalTheory.ColLie.atPl τ (NormedSpace.exp ((h : ℂ) • S))) R)
+                m)
+            (AddMonoidAlgebra.coeff (GlobalTheory.ColLie.colDer τ S R) m) 0)
+        → (∀ S : Matrix (Fin a) (Fin a) ℂ,
+          S.conjTranspose = -S
+            → ∀ P, q (GlobalTheory.ColLie.colDer τ S P) = ((c : ℂ) * S.trace) • q P)
+        → ∀ S : Matrix (Fin a) (Fin a) ℂ,
+          S.conjTranspose = -S
+            → ∀ P,
+              q (GlobalTheory.MinorFrame.colSub (GlobalTheory.ColLie.atPl τ (NormedSpace.exp S)) P)
+                = ((NormedSpace.exp S).det ^ c) • q P := by
   intro ι _ _ d a τ c Q _ _ q hco hq S hS P
   rw [← sub_eq_zero, ← Module.forall_dual_apply_eq_zero_iff ℂ]
   intro l
@@ -106,9 +123,12 @@ theorem colSub_exp_of_colDer : ∀ {ι : Type} [Fintype ι] [DecidableEq ι] (d 
       Matrix.exp_add_of_commute _ _ (((Commute.refl S).smul_left _).smul_right _)]
   have hd : ∀ t, HasDerivAt f (f t * k) t := by
     intro t
-    have h0 := hasDerivAt_dual_of_coeff (l ∘ₗ q) (R t).totalDegree
-      (fun h : ℝ => colSub (atPl τ (NormedSpace.exp ((h : ℂ) • S))) (R t)) (colDer τ S (R t)) 0
-      (fun s => totalDegree_colSub_le _ _) (hco S (R t))
+    have h0 :=
+      hasDerivAt_dual_of_coeff (l ∘ₗ q) (R t).totalDegree
+        (fun h : ℝ => colSub (atPl τ (NormedSpace.exp ((h : ℂ) • S))) (R t))
+        (colDer τ S (R t)) 0
+        (fun s => totalDegree_colSub_le _ _)
+        (hco S (R t))
     simp only [hadd, LinearMap.comp_apply, hq S hS, map_smul, smul_eq_mul] at h0
     rw [← sub_self t] at h0
     have h1 := h0.comp_sub_const t t
@@ -120,11 +140,13 @@ theorem colSub_exp_of_colDer : ∀ {ι : Type} [Fintype ι] [DecidableEq ι] (d 
     have h1 : HasDerivAt (fun s : ℝ => -((s : ℂ) * k)) (-k) t := by
       simpa using ((Complex.ofRealCLM.hasDerivAt (x := t)).mul_const k).fun_neg
     exact ((hd t).fun_mul h1.cexp).congr_deriv (by ring)
-  have hc := is_const_of_deriv_eq_zero (fun t => (hg t).differentiableAt) (fun t => (hg t).deriv) 1 0
-  simp only [f, R, Complex.ofReal_one, Complex.ofReal_zero, one_smul, zero_smul, NormedSpace.exp_zero, colSub_atPl_one,
-    one_mul, zero_mul, neg_zero, Complex.exp_zero, mul_one] at hc
-  rw [← hc, GlobalTheory.SUVol.det_exp, ← Complex.exp_nat_mul, ← hk, mul_comm, mul_assoc, ← Complex.exp_add, neg_add_cancel,
-    Complex.exp_zero, mul_one]
+  have hc :=
+    is_const_of_deriv_eq_zero (fun t => (hg t).differentiableAt) (fun t => (hg t).deriv) 1 0
+  simp only [f, R, Complex.ofReal_one, Complex.ofReal_zero, one_smul, zero_smul,
+      NormedSpace.exp_zero, colSub_atPl_one, one_mul, zero_mul, neg_zero, Complex.exp_zero, mul_one]
+    at hc
+  rw [← hc, GlobalTheory.SUVol.det_exp, ← Complex.exp_nat_mul, ← hk, mul_comm, mul_assoc,
+    ← Complex.exp_add, neg_add_cancel, Complex.exp_zero, mul_one]
 
 end GlobalTheory.ColLie
 

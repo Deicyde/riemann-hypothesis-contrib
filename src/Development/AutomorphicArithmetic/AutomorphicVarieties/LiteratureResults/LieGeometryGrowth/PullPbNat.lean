@@ -8,12 +8,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 open UpperTheory.V.Lit.Geo
 open scoped ContDiff
 
-private theorem pbNat_flow {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] {Y : Set V} (hY : IsOpen Y)
-    (ρ : V →L[ℝ] V) {W W' : V → V} (hW : IsField Y W) (hW' : IsField Y W') (hρ : ∀ p ∈ Y, ρ p ∈ Y)
-    (he : ∀ p ∈ Y, W' (ρ p) = ρ (W p)) (t : ℝ) {p : V} (hp : p ∈ Y) :
-    flow W' t (ρ p) = ρ (flow W t p) ∧ ∀ v, fderiv ℝ (flow W' t) (ρ p) (ρ v) = ρ (fderiv ℝ (flow W t) p v) := by
-  have hd : ∀ (U : V → V) (x : V), DifferentiableAt ℝ U x → ∀ v : V,
-      fderiv ℝ (flow U t) x v = v + t • fderiv ℝ U x v := by
+private theorem pbNat_flow
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
+    {Y : Set V} (hY : IsOpen Y)
+    (ρ : V →L[ℝ] V)
+    {W W' : V → V} (hW : IsField Y W) (hW' : IsField Y W')
+    (hρ : ∀ p ∈ Y, ρ p ∈ Y) (he : ∀ p ∈ Y, W' (ρ p) = ρ (W p)) (t : ℝ)
+    {p : V} (hp : p ∈ Y)
+    : flow W' t (ρ p) = ρ (flow W t p)
+      ∧ ∀ v, fderiv ℝ (flow W' t) (ρ p) (ρ v) = ρ (fderiv ℝ (flow W t) p v) := by
+  have hd
+      : ∀ (U : V → V) (x : V),
+        DifferentiableAt ℝ U x → ∀ v : V, fderiv ℝ (flow U t) x v = v + t • fderiv ℝ U x v := by
     intro U x hU v
     have h := (hasFDerivAt_id x).add (hU.hasFDerivAt.const_smul t)
     have hfl : flow U t = id + t • U := by
@@ -43,8 +49,7 @@ private theorem pbNat_flow {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V]
     rw [hd W' (ρ p) hW'd, hd W p hWd, hder]
     simp [map_add (f := _), map_smul]
 
-theorem UpperTheory.V.Lit.Geo.pbNat :
-    PbNat := by
+theorem UpperTheory.V.Lit.Geo.pbNat : PbNat := by
   unfold PbNat
   intro V F _ _ _ _ _ _ Y hY ρ A W W' hW hW' hρ he q
   constructor
@@ -54,8 +59,9 @@ theorem UpperTheory.V.Lit.Geo.pbNat :
     simp only [h2]
     exact hww _ (hW.2 p hp t ht) _
   · intro w w' hww
-    have hb1 : ∀ t ∈ Set.Icc (0 : ℝ) 1, ∀ p ∈ Y, ∀ v : Fin q → V,
-        (hk W' t w' (ρ p)) (fun i => ρ (v i)) = A ((hk W t w p) v) := by
+    have hb1
+        : ∀ t ∈ Set.Icc (0 : ℝ) 1, ∀ p ∈ Y, ∀ v : Fin q → V,
+          (hk W' t w' (ρ p)) (fun i => ρ (v i)) = A ((hk W t w p) v) := by
       intro t ht p hp v
       obtain ⟨h1, h2⟩ := pbNat_flow hY ρ hW hW' hρ he t hp
       rw [hk_apply, hk_apply, h1, he p hp]
@@ -79,8 +85,9 @@ theorem UpperTheory.V.Lit.Geo.pbNat :
       apply ContinuousOn.intervalIntegrable
       rw [Set.uIcc_of_le zero_le_one]
       exact (ContinuousAlternatingMap.apply ℝ V F v).continuous.comp_continuousOn hk1
-    have e1 : (∫ t in (0 : ℝ)..1, hk W' t w' (ρ p)) (fun i => ρ (v i)) =
-        ∫ t in (0 : ℝ)..1, (hk W' t w' (ρ p)) (fun i => ρ (v i)) :=
+    have e1
+        : (∫ t in (0 : ℝ)..1, hk W' t w' (ρ p)) (fun i => ρ (v i))
+          = ∫ t in (0 : ℝ)..1, (hk W' t w' (ρ p)) (fun i => ρ (v i)) :=
       ((ContinuousAlternatingMap.apply ℝ V F (fun i => ρ (v i))).intervalIntegral_comp_comm i2).symm
     have e2 : (∫ t in (0 : ℝ)..1, hk W t w p) v = ∫ t in (0 : ℝ)..1, (hk W t w p) v :=
       ((ContinuousAlternatingMap.apply ℝ V F v).intervalIntegral_comp_comm i1).symm

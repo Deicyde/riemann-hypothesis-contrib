@@ -18,7 +18,8 @@ variable (a : ℕ) (b c : ℤ) (d : ℕ) (ha : 0 < a) (hd : 0 < d) (lam : ℂ) (
 
 def pt (u v : ℝ) : ℂ := lam * ((u : ℂ) * (a : ℂ) + (v : ℂ) * Formalism.L2.Th1.F.cmTheta b d)
 
-theorem mem_cmL (z : ℂ) : z ∈ (cmL a b d ha hd lam hlam).lattice ↔ ∃ r s : ℤ, z = pt a b d lam r s := by
+theorem mem_cmL (z : ℂ)
+    : z ∈ (cmL a b d ha hd lam hlam).lattice ↔ ∃ r s : ℤ, z = pt a b d lam r s := by
   rw [PeriodPair.mem_lattice]
   have e1 : (cmL a b d ha hd lam hlam).ω₁ = lam * (a : ℂ) := rfl
   have e2 : (cmL a b d ha hd lam hlam).ω₂ = lam * Formalism.L2.Th1.F.cmTheta b d := rfl
@@ -31,20 +32,24 @@ theorem mem_cmL (z : ℂ) : z ∈ (cmL a b d ha hd lam hlam).lattice ↔ ∃ r s
 
 include ha hd hlam in
 theorem pt_inj {u v u' v' : ℝ} (h : pt a b d lam u v = pt a b d lam u' v') : u = u' ∧ v = v' := by
-  have h' : (u : ℂ) * a + (v : ℂ) * Formalism.L2.Th1.F.cmTheta b d
-      = (u' : ℂ) * a + (v' : ℂ) * Formalism.L2.Th1.F.cmTheta b d := by
+  have h'
+      : (u : ℂ) * a + (v : ℂ) * Formalism.L2.Th1.F.cmTheta b d
+        = (u' : ℂ) * a + (v' : ℂ) * Formalism.L2.Th1.F.cmTheta b d := by
     unfold pt at h
     exact mul_left_cancel₀ hlam h
   have hind := (Formalism.L2.Th1.F.cmPair a b d ha hd).indep
   rw [LinearIndependent.pair_iff] at hind
-  obtain ⟨h1, h2⟩ := hind (u - u') (v - v') (by
-    show (u - u') • (a : ℂ) + (v - v') • Formalism.L2.Th1.F.cmTheta b d = 0
-    rw [Complex.real_smul, Complex.real_smul]
-    push_cast
-    linear_combination h')
+  obtain ⟨h1, h2⟩ :=
+    hind (u - u') (v - v') (by
+      show (u - u') • (a : ℂ) + (v - v') • Formalism.L2.Th1.F.cmTheta b d = 0
+      rw [Complex.real_smul, Complex.real_smul]
+      push_cast
+      linear_combination h')
   exact ⟨by linarith, by linarith⟩
 
-theorem pt_mem_iff (u v : ℝ) : pt a b d lam u v ∈ (cmL a b d ha hd lam hlam).lattice ↔ (∃ r : ℤ, u = r) ∧ ∃ s : ℤ, v = s := by
+theorem pt_mem_iff (u v : ℝ)
+    : pt a b d lam u v ∈ (cmL a b d ha hd lam hlam).lattice
+      ↔ (∃ r : ℤ, u = r) ∧ ∃ s : ℤ, v = s := by
   rw [mem_cmL]
   constructor
   · rintro ⟨r, s, h⟩
@@ -53,13 +58,15 @@ theorem pt_mem_iff (u v : ℝ) : pt a b d lam u v ∈ (cmL a b d ha hd lam hlam)
   · rintro ⟨⟨r, rfl⟩, ⟨s, rfl⟩⟩
     exact ⟨r, s, rfl⟩
 
-theorem pt_sub (u v u' v' : ℝ) : pt a b d lam u v - pt a b d lam u' v' = pt a b d lam (u - u') (v - v') := by
+theorem pt_sub (u v u' v' : ℝ)
+    : pt a b d lam u v - pt a b d lam u' v' = pt a b d lam (u - u') (v - v') := by
   simp only [pt]
   push_cast
   ring
 
-theorem theta_sq (h : 4 * (a : ℤ) * c = b ^ 2 + d) :
-    Formalism.L2.Th1.F.cmTheta b d * Formalism.L2.Th1.F.cmTheta b d = (b : ℂ) * Formalism.L2.Th1.F.cmTheta b d - (a : ℂ) * (c : ℂ) := by
+theorem theta_sq (h : 4 * (a : ℤ) * c = b ^ 2 + d)
+    : Formalism.L2.Th1.F.cmTheta b d * Formalism.L2.Th1.F.cmTheta b d
+      = (b : ℂ) * Formalism.L2.Th1.F.cmTheta b d - (a : ℂ) * (c : ℂ) := by
   have h' : 4 * (a : ℂ) * (c : ℂ) = (b : ℂ) ^ 2 + (d : ℂ) := by exact_mod_cast h
   have hS : ((Real.sqrt d : ℝ) : ℂ) ^ 2 = (d : ℂ) := by
     rw [← Complex.ofReal_pow, Real.sq_sqrt (Nat.cast_nonneg _), Complex.ofReal_natCast]
@@ -67,14 +74,16 @@ theorem theta_sq (h : 4 * (a : ℤ) * c = b ^ 2 + d) :
   linear_combination (1 / 4 : ℂ) * h' + (1 / 4 : ℂ) * ((Real.sqrt d : ℝ) : ℂ) ^ 2 * Complex.I_sq
     - (1 / 4 : ℂ) * hS
 
-theorem theta_one (k : ℤ) (hb : b = 2 * k + 1) : Formalism.L2.Th1.F.cmTheta 1 d = Formalism.L2.Th1.F.cmTheta b d - (k : ℂ) := by
+theorem theta_one (k : ℤ) (hb : b = 2 * k + 1)
+    : Formalism.L2.Th1.F.cmTheta 1 d = Formalism.L2.Th1.F.cmTheta b d - (k : ℂ) := by
   subst hb
   unfold Formalism.L2.Th1.F.cmTheta
   push_cast
   ring
 
-theorem theta_pt (h : 4 * (a : ℤ) * c = b ^ 2 + d) (k : ℤ) (hb : b = 2 * k + 1) (u v : ℝ) :
-    Formalism.L2.Th1.F.cmTheta 1 d * pt a b d lam u v = pt a b d lam (-v * c - k * u) (u * a + v * (k + 1)) := by
+theorem theta_pt (h : 4 * (a : ℤ) * c = b ^ 2 + d) (k : ℤ) (hb : b = 2 * k + 1) (u v : ℝ)
+    : Formalism.L2.Th1.F.cmTheta 1 d * pt a b d lam u v
+      = pt a b d lam (-v * c - k * u) (u * a + v * (k + 1)) := by
   have hsq := theta_sq a b c d h
   have hbC : (b : ℂ) = 2 * (k : ℂ) + 1 := by exact_mod_cast hb
   rw [theta_one b d k hb]
@@ -95,8 +104,7 @@ theorem even_c (hcm : CmOK a b c d) : Even c ∧ Odd b := by
   obtain ⟨h, ⟨a', ha'⟩, hd8, -⟩ := hcm
   rcases Int.even_or_odd b with ⟨t, ht⟩ | ⟨t, ht⟩
   · exfalso
-    have e : 4 * ((a : ℤ) * c) = 4 * (t * t) + (d : ℤ) := by
-      linear_combination h + (b + t + t) * ht
+    have e : 4 * ((a : ℤ) * c) = 4 * (t * t) + (d : ℤ) := by linear_combination h + (b + t + t) * ht
     generalize (a : ℤ) * c = P at e
     generalize t * t = Q at e
     omega
@@ -116,15 +124,17 @@ theorem even_c (hcm : CmOK a b c d) : Even c ∧ Odd b := by
       omega
     · exact ⟨hce, ⟨t, ht⟩⟩
 
-theorem half_period_standard_CM (hcm : CmOK a b c d) :
-    2 * (lam * a / 2) ∈ (cmL a b d ha hd lam hlam).lattice ∧
-    Formalism.L2.Th1.F.cmTheta 1 d * (lam * a / 2) ∉ (cmL a b d ha hd lam hlam).lattice ∧
-    (1 - Formalism.L2.Th1.F.cmTheta 1 d) * (lam * a / 2) ∉ (cmL a b d ha hd lam hlam).lattice := by
+theorem half_period_standard_CM (hcm : CmOK a b c d)
+    : 2 * (lam * a / 2) ∈ (cmL a b d ha hd lam hlam).lattice
+      ∧ Formalism.L2.Th1.F.cmTheta 1 d * (lam * a / 2) ∉ (cmL a b d ha hd lam hlam).lattice
+      ∧ (1 - Formalism.L2.Th1.F.cmTheta 1 d) * (lam * a / 2)
+        ∉ (cmL a b d ha hd lam hlam).lattice := by
   obtain ⟨hc2, k, hk⟩ := even_c a b c d hcm
   obtain ⟨a', ha2⟩ := hcm.2.1
-  have hpt : lam * (a : ℂ) / 2 = pt a b d lam (1 / 2) 0 := by
-    simp only [pt]; push_cast; ring
-  have hθ : Formalism.L2.Th1.F.cmTheta 1 d * (lam * (a : ℂ) / 2) = pt a b d lam (-(k : ℝ) / 2) ((a : ℝ) / 2) := by
+  have hpt : lam * (a : ℂ) / 2 = pt a b d lam (1 / 2) 0 := by simp only [pt]; push_cast; ring
+  have hθ
+      : Formalism.L2.Th1.F.cmTheta 1 d * (lam * (a : ℂ) / 2)
+        = pt a b d lam (-(k : ℝ) / 2) ((a : ℝ) / 2) := by
     rw [theta_one b d k hk]
     simp only [pt]
     push_cast
@@ -144,16 +154,21 @@ theorem half_period_standard_CM (hcm : CmOK a b c d) :
     omega
 
 omit a b c d lam in
-theorem parity_key (r s k a c : ℤ) (hc : Even c) (ha : ¬ Even a) (h3 : ¬ (Even (-s * c - k * r) ∧ Even (r * a + s * (k + 1))))
-    (h4 : ¬ (Even (r - (-s * c - k * r)) ∧ Even (s - (r * a + s * (k + 1))))) : Even (r - 1) ∧ Even s := by
+theorem parity_key
+    (r s k a c : ℤ)
+    (hc : Even c) (ha : ¬ Even a) (h3 : ¬(Even (-s * c - k * r) ∧ Even (r * a + s * (k + 1))))
+    (h4 : ¬(Even (r - (-s * c - k * r)) ∧ Even (s - (r * a + s * (k + 1)))))
+    : Even (r - 1) ∧ Even s := by
   simp [Int.even_sub, Int.even_add, Int.even_mul, Int.even_add_one, hc, ha] at h3 h4 ⊢
   simp only [← Int.not_even_iff_odd] at h3 h4 ⊢
   tauto
 
-theorem half_period_unique_CM (hcm : CmOK a b c d) (t : ℂ) (h2 : 2 * t ∈ (cmL a b d ha hd lam hlam).lattice)
+theorem half_period_unique_CM
+    (hcm : CmOK a b c d)
+    (t : ℂ) (h2 : 2 * t ∈ (cmL a b d ha hd lam hlam).lattice)
     (h3 : Formalism.L2.Th1.F.cmTheta 1 d * t ∉ (cmL a b d ha hd lam hlam).lattice)
-    (h4 : (1 - Formalism.L2.Th1.F.cmTheta 1 d) * t ∉ (cmL a b d ha hd lam hlam).lattice) :
-    t - lam * a / 2 ∈ (cmL a b d ha hd lam hlam).lattice := by
+    (h4 : (1 - Formalism.L2.Th1.F.cmTheta 1 d) * t ∉ (cmL a b d ha hd lam hlam).lattice)
+    : t - lam * a / 2 ∈ (cmL a b d ha hd lam hlam).lattice := by
   obtain ⟨hc2, k, hk⟩ := even_c a b c d hcm
   have hform := hcm.1
   have hao : ¬ Even (a : ℤ) := by
@@ -166,14 +181,17 @@ theorem half_period_unique_CM (hcm : CmOK a b c d) (t : ℂ) (h2 : 2 * t ∈ (cm
     simp only [pt] at hrs ⊢
     push_cast at hrs ⊢
     linear_combination hrs / 2
-  have e3 : Formalism.L2.Th1.F.cmTheta 1 d * t
-      = pt a b d lam (((-s * c - k * r : ℤ) : ℝ) / 2) (((r * (a : ℤ) + s * (k + 1) : ℤ) : ℝ) / 2) := by
+  have e3
+      : Formalism.L2.Th1.F.cmTheta 1 d * t
+        = pt a b d lam (((-s * c - k * r : ℤ) : ℝ) / 2)
+          (((r * (a : ℤ) + s * (k + 1) : ℤ) : ℝ) / 2) := by
     rw [ht, theta_pt a b c d lam hform k hk]
     simp only [pt]
     push_cast
     ring
-  have e4 : (1 - Formalism.L2.Th1.F.cmTheta 1 d) * t
-      = pt a b d lam (((r - (-s * c - k * r) : ℤ) : ℝ) / 2)
+  have e4
+      : (1 - Formalism.L2.Th1.F.cmTheta 1 d) * t
+        = pt a b d lam (((r - (-s * c - k * r) : ℤ) : ℝ) / 2)
           (((s - (r * (a : ℤ) + s * (k + 1)) : ℤ) : ℝ) / 2) := by
     rw [sub_mul, one_mul, e3, ht]
     simp only [pt]
@@ -182,25 +200,30 @@ theorem half_period_unique_CM (hcm : CmOK a b c d) (t : ℂ) (h2 : 2 * t ∈ (cm
   rw [e3, pt_mem_iff, half_int, half_int] at h3
   rw [e4, pt_mem_iff, half_int, half_int] at h4
   obtain ⟨⟨m, hm⟩, ⟨n, hn⟩⟩ := parity_key r s k (a : ℤ) c hc2 hao h3 h4
-  have hpt : lam * (a : ℂ) / 2 = pt a b d lam (1 / 2) 0 := by
-    simp only [pt]; push_cast; ring
+  have hpt : lam * (a : ℂ) / 2 = pt a b d lam (1 / 2) 0 := by simp only [pt]; push_cast; ring
   rw [ht, hpt, pt_sub, pt_mem_iff]
   have em : ((r - 1 : ℤ) : ℝ) = ((m + m : ℤ) : ℝ) := by exact_mod_cast hm
   have en : ((s : ℤ) : ℝ) = ((n + n : ℤ) : ℝ) := by exact_mod_cast hn
   push_cast at em en
   exact ⟨⟨m, by linarith⟩, ⟨n, by linarith⟩⟩
 
-theorem lattice_ext {L L' : PeriodPair} (h : ∀ z, z ∈ L.lattice ↔ z ∈ L'.lattice) : L.lattice = L'.lattice := Submodule.ext h
+theorem lattice_ext {L L' : PeriodPair} (h : ∀ z, z ∈ L.lattice ↔ z ∈ L'.lattice)
+    : L.lattice = L'.lattice :=
+  Submodule.ext h
 
-theorem cmL_swap (hc : 0 < c) (h : 4 * (a : ℤ) * c = b ^ 2 + d) :
-    ∃ (lam' : ℂ) (hlam' : lam' ≠ 0), (cmL c.toNat (-b) d (by omega) hd lam' hlam').lattice = (cmL a b d ha hd lam hlam).lattice := by
+theorem cmL_swap (hc : 0 < c) (h : 4 * (a : ℤ) * c = b ^ 2 + d)
+    : ∃ (lam' : ℂ) (hlam' : lam' ≠ 0),
+      (cmL c.toNat (-b) d (by omega) hd lam' hlam').lattice
+        = (cmL a b d ha hd lam hlam).lattice := by
   have hind := (Formalism.L2.Th1.F.cmPair a b d ha hd).indep
   rw [LinearIndependent.pair_iff] at hind
   have hθ : Formalism.L2.Th1.F.cmTheta b d ≠ 0 := by
     intro h0
-    have := (hind 0 1 (by
-      show (0 : ℝ) • (a : ℂ) + (1 : ℝ) • Formalism.L2.Th1.F.cmTheta b d = 0
-      rw [h0]; simp)).2
+    have :=
+      (hind 0 1 (by
+        show (0 : ℝ) • (a : ℂ) + (1 : ℝ) • Formalism.L2.Th1.F.cmTheta b d = 0
+        rw [h0]
+        simp)).2
     norm_num at this
   have hc' : (c : ℂ) ≠ 0 := by exact_mod_cast hc.ne'
   have hcc : (c : ℂ) * (c : ℂ)⁻¹ = 1 := mul_inv_cancel₀ hc'
@@ -210,7 +233,9 @@ theorem cmL_swap (hc : 0 < c) (h : 4 * (a : ℤ) * c = b ^ 2 + d) :
   have h' : 4 * (a : ℂ) * (c : ℂ) = (b : ℂ) ^ 2 + (d : ℂ) := by exact_mod_cast h
   have hS : ((Real.sqrt d : ℝ) : ℂ) ^ 2 = (d : ℂ) := by
     rw [← Complex.ofReal_pow, Real.sq_sqrt (Nat.cast_nonneg _), Complex.ofReal_natCast]
-  have hprod : Formalism.L2.Th1.F.cmTheta b d * Formalism.L2.Th1.F.cmTheta (-b) d = -((a : ℂ) * (c : ℂ)) := by
+  have hprod
+      : Formalism.L2.Th1.F.cmTheta b d * Formalism.L2.Th1.F.cmTheta (-b) d
+        = -((a : ℂ) * (c : ℂ)) := by
     unfold Formalism.L2.Th1.F.cmTheta
     push_cast
     linear_combination (1 / 4 : ℂ) * h' + (1 / 4 : ℂ) * ((Real.sqrt d : ℝ) : ℂ) ^ 2 * Complex.I_sq
@@ -235,34 +260,42 @@ theorem cmL_swap (hc : 0 < c) (h : 4 * (a : ℤ) * c = b ^ 2 + d) :
     linear_combination (-(lam * (s : ℂ) * Formalism.L2.Th1.F.cmTheta b d) - lam * (r : ℂ) * (a : ℂ)) * hcc
       + (lam * (r : ℂ) * (c : ℂ)⁻¹) * hprod
 
-theorem cmL_shift (hs : 0 < (a : ℤ) + b + c) (h : 4 * (a : ℤ) * c = b ^ 2 + d) :
-    ∃ (lam' : ℂ) (hlam' : lam' ≠ 0),
-      (cmL ((a : ℤ) + b + c).toNat (b + 2 * c) d (by omega) hd lam' hlam').lattice = (cmL a b d ha hd lam hlam).lattice := by
+theorem cmL_shift (hs : 0 < (a : ℤ) + b + c) (h : 4 * (a : ℤ) * c = b ^ 2 + d)
+    : ∃ (lam' : ℂ) (hlam' : lam' ≠ 0),
+      (cmL ((a : ℤ) + b + c).toNat (b + 2 * c) d (by omega) hd lam' hlam').lattice
+        = (cmL a b d ha hd lam hlam).lattice := by
   have hind := (Formalism.L2.Th1.F.cmPair a b d ha hd).indep
   rw [LinearIndependent.pair_iff] at hind
   have hne : (a : ℂ) + Formalism.L2.Th1.F.cmTheta b d ≠ 0 := by
     intro h0
-    have := (hind 1 1 (by
-      show (1 : ℝ) • (a : ℂ) + (1 : ℝ) • Formalism.L2.Th1.F.cmTheta b d = 0
-      rw [one_smul, one_smul]; exact h0)).1
+    have :=
+      (hind 1 1 (by
+        show (1 : ℝ) • (a : ℂ) + (1 : ℝ) • Formalism.L2.Th1.F.cmTheta b d = 0
+        rw [one_smul, one_smul]
+        exact h0)).1
     norm_num at this
   have hA : (a : ℂ) + (b : ℂ) + (c : ℂ) ≠ 0 := by
     have e : (((a : ℤ) + b + c : ℤ) : ℂ) ≠ 0 := by exact_mod_cast hs.ne'
     push_cast at e
     exact e
-  have hAA : ((a : ℂ) + (b : ℂ) + (c : ℂ)) * ((a : ℂ) + (b : ℂ) + (c : ℂ))⁻¹ = 1 := mul_inv_cancel₀ hA
+  have hAA : ((a : ℂ) + (b : ℂ) + (c : ℂ)) * ((a : ℂ) + (b : ℂ) + (c : ℂ))⁻¹ = 1 :=
+    mul_inv_cancel₀ hA
   have hAt : ((((a : ℤ) + b + c).toNat : ℕ) : ℂ) = (a : ℂ) + (b : ℂ) + (c : ℂ) := by
     have e : ((((a : ℤ) + b + c).toNat : ℕ) : ℤ) = (a : ℤ) + b + c := Int.toNat_of_nonneg hs.le
     have e' : (((((a : ℤ) + b + c).toNat : ℕ) : ℤ) : ℂ) = (((a : ℤ) + b + c : ℤ) : ℂ) := by rw [e]
     push_cast at e'
     exact e'
-  have hθ' : Formalism.L2.Th1.F.cmTheta (b + 2 * c) d = Formalism.L2.Th1.F.cmTheta b d + (c : ℂ) := by
+  have hθ'
+      : Formalism.L2.Th1.F.cmTheta (b + 2 * c) d = Formalism.L2.Th1.F.cmTheta b d + (c : ℂ) := by
     unfold Formalism.L2.Th1.F.cmTheta
     push_cast
     ring
   have hsq := theta_sq a b c d h
-  refine ⟨lam * ((a : ℂ) + Formalism.L2.Th1.F.cmTheta b d) / ((a : ℂ) + (b : ℂ) + (c : ℂ)),
-    div_ne_zero (mul_ne_zero hlam hne) hA, ?_⟩
+  refine ⟨
+    lam * ((a : ℂ) + Formalism.L2.Th1.F.cmTheta b d) / ((a : ℂ) + (b : ℂ) + (c : ℂ)),
+    div_ne_zero (mul_ne_zero hlam hne) hA,
+    ?_
+  ⟩
   apply lattice_ext
   intro z
   rw [mem_cmL, mem_cmL]
@@ -286,34 +319,43 @@ theorem cmL_shift (hs : 0 < (a : ℤ) + b + c) (h : 4 * (a : ℤ) * c = b ^ 2 + 
 
 end Pt
 
-theorem form_core (d : ℕ) (hd : 0 < d) (w1 w2 : ℂ) (hw1 : w1 ≠ 0) (p q r s : ℤ) (hq : 0 < q)
-    (h1 : (p : ℂ) * w1 + (q : ℂ) * w2 = Formalism.L2.Th1.F.cmTheta 1 d * w1)
-    (h2 : (r : ℂ) * w1 + (s : ℂ) * w2 = Formalism.L2.Th1.F.cmTheta 1 d * w2) :
-    4 * q * (-r) = (1 - 2 * p) ^ 2 + d ∧ w1 / q ≠ 0 ∧ w1 = w1 / q * q ∧ w2 = w1 / q * Formalism.L2.Th1.F.cmTheta (1 - 2 * p) d := by
+theorem form_core
+    (d : ℕ) (hd : 0 < d)
+    (w1 w2 : ℂ) (hw1 : w1 ≠ 0)
+    (p q r s : ℤ)
+    (hq : 0 < q) (h1 : (p : ℂ) * w1 + (q : ℂ) * w2 = Formalism.L2.Th1.F.cmTheta 1 d * w1)
+    (h2 : (r : ℂ) * w1 + (s : ℂ) * w2 = Formalism.L2.Th1.F.cmTheta 1 d * w2)
+    : 4 * q * (-r) = (1 - 2 * p) ^ 2 + d ∧ w1 / q ≠ 0 ∧ w1 = w1 / q * q
+      ∧ w2 = w1 / q * Formalism.L2.Th1.F.cmTheta (1 - 2 * p) d := by
   have hS : ((Real.sqrt d : ℝ) : ℂ) ^ 2 = (d : ℂ) := by
     rw [← Complex.ofReal_pow, Real.sq_sqrt (Nat.cast_nonneg _), Complex.ofReal_natCast]
-  have hθsq : Formalism.L2.Th1.F.cmTheta 1 d * Formalism.L2.Th1.F.cmTheta 1 d
-      = Formalism.L2.Th1.F.cmTheta 1 d - (1 + (d : ℂ)) / 4 := by
+  have hθsq
+      : Formalism.L2.Th1.F.cmTheta 1 d * Formalism.L2.Th1.F.cmTheta 1 d
+        = Formalism.L2.Th1.F.cmTheta 1 d - (1 + (d : ℂ)) / 4 := by
     unfold Formalism.L2.Th1.F.cmTheta
     push_cast
     linear_combination (1 / 4 : ℂ) * ((Real.sqrt d : ℝ) : ℂ) ^ 2 * Complex.I_sq - (1 / 4 : ℂ) * hS
-  have hkey : ((Formalism.L2.Th1.F.cmTheta 1 d - s) * (Formalism.L2.Th1.F.cmTheta 1 d - p) - r * q) * w1 = 0 := by
+  have hkey
+      : ((Formalism.L2.Th1.F.cmTheta 1 d - s) * (Formalism.L2.Th1.F.cmTheta 1 d - p) - r * q) * w1
+        = 0 := by
     linear_combination (-(Formalism.L2.Th1.F.cmTheta 1 d - s)) * h1 - (q : ℂ) * h2
   have hE := (mul_eq_zero.mp hkey).resolve_right hw1
   have hind := (Formalism.L2.Th1.F.cmPair 1 1 d one_pos hd).indep
   rw [LinearIndependent.pair_iff] at hind
-  obtain ⟨e1, e2⟩ := hind (((4 * (p * s - r * q) - (1 + d) : ℤ) : ℝ)) (((4 * (1 - p - s) : ℤ) : ℝ)) (by
-    show (((4 * (p * s - r * q) - (1 + d) : ℤ) : ℝ)) • (((1 : ℕ) : ℂ))
-      + (((4 * (1 - p - s) : ℤ) : ℝ)) • Formalism.L2.Th1.F.cmTheta 1 d = 0
-    rw [Complex.real_smul, Complex.real_smul]
-    push_cast
-    linear_combination 4 * hE - 4 * hθsq)
+  obtain ⟨e1, e2⟩ :=
+    hind (((4 * (p * s - r * q) - (1 + d) : ℤ) : ℝ)) (((4 * (1 - p - s) : ℤ) : ℝ)) (by
+      show (((4 * (p * s - r * q) - (1 + d) : ℤ) : ℝ)) • (((1 : ℕ) : ℂ))
+        + (((4 * (1 - p - s) : ℤ) : ℝ)) • Formalism.L2.Th1.F.cmTheta 1 d = 0
+      rw [Complex.real_smul, Complex.real_smul]
+      push_cast
+      linear_combination 4 * hE - 4 * hθsq)
   have e1' : 4 * (p * s - r * q) - (1 + (d : ℤ)) = 0 := by exact_mod_cast e1
   have e2' : 4 * (1 - p - s) = 0 := by exact_mod_cast e2
   have hs : s = 1 - p := by omega
   have hq' : (q : ℂ) ≠ 0 := by exact_mod_cast hq.ne'
   have hqq : (q : ℂ) * (q : ℂ)⁻¹ = 1 := mul_inv_cancel₀ hq'
-  have hθp : Formalism.L2.Th1.F.cmTheta (1 - 2 * p) d = Formalism.L2.Th1.F.cmTheta 1 d - (p : ℂ) := by
+  have hθp
+      : Formalism.L2.Th1.F.cmTheta (1 - 2 * p) d = Formalism.L2.Th1.F.cmTheta 1 d - (p : ℂ) := by
     unfold Formalism.L2.Th1.F.cmTheta
     push_cast
     ring
@@ -323,13 +365,15 @@ theorem form_core (d : ℕ) (hd : 0 < d) (w1 w2 : ℂ) (hw1 : w1 ≠ 0) (p q r s
   · rw [hθp]
     linear_combination (q : ℂ)⁻¹ * h1 - w2 * hqq
 
-private theorem exists_cmL_lattice_eq_of_cm_action (d : ℕ) (hd : 0 < d) (L : PeriodPair) (w1 w2 : ℂ) (hw1 : w1 ≠ 0)
-    (hL : ∀ z, z ∈ L.lattice ↔ ∃ m n : ℤ, (m : ℂ) * w1 + (n : ℂ) * w2 = z)
-    (p q r s : ℤ) (hq : 0 < q)
-    (h1 : (p : ℂ) * w1 + (q : ℂ) * w2 = Formalism.L2.Th1.F.cmTheta 1 d * w1)
-    (h2 : (r : ℂ) * w1 + (s : ℂ) * w2 = Formalism.L2.Th1.F.cmTheta 1 d * w2) :
-    ∃ (a : ℕ) (b c : ℤ) (ha : 0 < a) (lam : ℂ) (hlam : lam ≠ 0), 4 * (a : ℤ) * c = b ^ 2 + d ∧
-      (cmL a b d ha hd lam hlam).lattice = L.lattice := by
+private theorem exists_cmL_lattice_eq_of_cm_action
+    (d : ℕ) (hd : 0 < d)
+    (L : PeriodPair) (w1 w2 : ℂ)
+    (hw1 : w1 ≠ 0) (hL : ∀ z, z ∈ L.lattice ↔ ∃ m n : ℤ, (m : ℂ) * w1 + (n : ℂ) * w2 = z)
+    (p q r s : ℤ)
+    (hq : 0 < q) (h1 : (p : ℂ) * w1 + (q : ℂ) * w2 = Formalism.L2.Th1.F.cmTheta 1 d * w1)
+    (h2 : (r : ℂ) * w1 + (s : ℂ) * w2 = Formalism.L2.Th1.F.cmTheta 1 d * w2)
+    : ∃ (a : ℕ) (b c : ℤ) (ha : 0 < a) (lam : ℂ) (hlam : lam ≠ 0),
+      4 * (a : ℤ) * c = b ^ 2 + d ∧ (cmL a b d ha hd lam hlam).lattice = L.lattice := by
   obtain ⟨hf, hne, he1, he2⟩ := form_core d hd w1 w2 hw1 p q r s hq h1 h2
   have hqz : ((q.toNat : ℕ) : ℤ) = q := Int.toNat_of_nonneg hq.le
   have hqt : ((q.toNat : ℕ) : ℂ) = (q : ℂ) := by
@@ -349,9 +393,11 @@ private theorem exists_cmL_lattice_eq_of_cm_action (d : ℕ) (hd : 0 < d) (L : P
     have e2 : (cmL q.toNat (1 - 2 * p) d (by omega) hd (w1 / q) hne).ω₂ = w2 := he2.symm
     rw [e1, e2]
 
-theorem exists_form (d : ℕ) (hd : 0 < d) (L : PeriodPair) (hst : ∀ x ∈ L.lattice, Formalism.L2.Th1.F.cmTheta 1 d * x ∈ L.lattice) :
-    ∃ (a : ℕ) (b c : ℤ) (ha : 0 < a) (lam : ℂ) (hlam : lam ≠ 0), 4 * (a : ℤ) * c = b ^ 2 + d ∧
-      (cmL a b d ha hd lam hlam).lattice = L.lattice := by
+theorem exists_form
+    (d : ℕ) (hd : 0 < d)
+    (L : PeriodPair) (hst : ∀ x ∈ L.lattice, Formalism.L2.Th1.F.cmTheta 1 d * x ∈ L.lattice)
+    : ∃ (a : ℕ) (b c : ℤ) (ha : 0 < a) (lam : ℂ) (hlam : lam ≠ 0),
+      4 * (a : ℤ) * c = b ^ 2 + d ∧ (cmL a b d ha hd lam hlam).lattice = L.lattice := by
   have hw1 : L.ω₁ ≠ 0 := by
     intro h0
     have hind := L.indep
@@ -370,26 +416,33 @@ theorem exists_form (d : ℕ) (hd : 0 < d) (L : PeriodPair) (hst : ∀ x ∈ L.l
       linear_combination e'
     have hind := (Formalism.L2.Th1.F.cmPair 1 1 d one_pos hd).indep
     rw [LinearIndependent.pair_iff] at hind
-    have := (hind (p : ℝ) (-1) (by
-      show (p : ℝ) • (((1 : ℕ) : ℂ)) + (-1 : ℝ) • Formalism.L2.Th1.F.cmTheta 1 d = 0
-      rw [hθ, Complex.real_smul, Complex.real_smul]
-      push_cast
-      ring)).2
+    have :=
+      (hind (p : ℝ) (-1) (by
+        show (p : ℝ) • (((1 : ℕ) : ℂ)) + (-1 : ℝ) • Formalism.L2.Th1.F.cmTheta 1 d = 0
+        rw [hθ, Complex.real_smul, Complex.real_smul]
+        push_cast
+        ring)).2
     norm_num at this
   rcases lt_or_gt_of_ne hq0 with hneg | hpos
-  · refine exists_cmL_lattice_eq_of_cm_action d hd L L.ω₁ (-L.ω₂) hw1 (fun z => ?_) p (-q) (-r) s (by omega)
-      (by push_cast; linear_combination hpq) (by push_cast; linear_combination -hrs)
+  · refine exists_cmL_lattice_eq_of_cm_action d hd L L.ω₁ (-L.ω₂) hw1
+      (fun z => ?_)
+      p (-q) (-r) s (by omega) (by push_cast; linear_combination hpq)
+      (by push_cast; linear_combination -hrs)
     rw [PeriodPair.mem_lattice]
     constructor
     · rintro ⟨m, n, h⟩
       exact ⟨m, -n, by push_cast; rw [← h]; ring⟩
     · rintro ⟨m, n, h⟩
       exact ⟨m, -n, by push_cast; rw [← h]; ring⟩
-  · exact exists_cmL_lattice_eq_of_cm_action d hd L L.ω₁ L.ω₂ hw1 (fun z => PeriodPair.mem_lattice) p q r s hpos hpq hrs
+  · exact exists_cmL_lattice_eq_of_cm_action d hd L L.ω₁ L.ω₂ hw1
+      (fun z => PeriodPair.mem_lattice)
+      p q r s hpos hpq hrs
 
-theorem exists_cmOK (d : ℕ) (hd : 0 < d) (hd8 : d % 8 = 7) (hp : d.Prime) (L : PeriodPair)
-    (hst : ∀ x ∈ L.lattice, Formalism.L2.Th1.F.cmTheta 1 d * x ∈ L.lattice) :
-    ∃ (a : ℕ) (b c : ℤ) (ha : 0 < a) (lam : ℂ) (hlam : lam ≠ 0), CmOK a b c d ∧ (cmL a b d ha hd lam hlam).lattice = L.lattice := by
+theorem exists_cmOK
+    (d : ℕ) (hd : 0 < d) (hd8 : d % 8 = 7) (hp : d.Prime)
+    (L : PeriodPair) (hst : ∀ x ∈ L.lattice, Formalism.L2.Th1.F.cmTheta 1 d * x ∈ L.lattice)
+    : ∃ (a : ℕ) (b c : ℤ) (ha : 0 < a) (lam : ℂ) (hlam : lam ≠ 0),
+      CmOK a b c d ∧ (cmL a b d ha hd lam hlam).lattice = L.lattice := by
   obtain ⟨a, b, c, ha, lam, hlam, h, hL⟩ := exists_form d hd L hst
   have hd' : (0 : ℤ) < d := by exact_mod_cast hd
   have ha' : (0 : ℤ) < a := by exact_mod_cast ha
@@ -419,7 +472,16 @@ theorem exists_cmOK (d : ℕ) (hd : 0 < d) (hd8 : d % 8 = 7) (hp : d.Prime) (L :
       obtain ⟨lam', hlam', hL'⟩ := cmL_shift a b c d ha hd lam hlam hs h
       obtain ⟨m, hm⟩ := hae
       obtain ⟨n, hn⟩ := hce
-      refine ⟨((a : ℤ) + b + c).toNat, b + 2 * c, c, by omega, lam', hlam', ⟨?_, ?_, hd8, hp⟩, hL'.trans hL⟩
+      refine ⟨
+        ((a : ℤ) + b + c).toNat,
+        b + 2 * c,
+        c,
+        by omega,
+        lam',
+        hlam',
+        ⟨?_, ?_, hd8, hp⟩,
+        hL'.trans hL
+      ⟩
       · rw [Int.toNat_of_nonneg hs.le]
         linear_combination h
       · exact ⟨((a : ℤ) + b + c).toNat / 2, by omega⟩

@@ -6,10 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory.SmulMemOfMemSpanExists
 
-theorem exists_smul_mem_of_mem_span {Oe K'' T : Type} [CommRing Oe] [IsDomain Oe] [Field K'']
-    [Algebra Oe K''] [IsFractionRing Oe K''] [AddCommGroup T] [Module K'' T] [Module Oe T]
-    [IsScalarTower Oe K'' T] (M : Submodule Oe T) {x : T}
-    (hx : x ∈ Submodule.span K'' (↑M : Set T)) : ∃ c : Oe, c ≠ (0 : Oe) ∧ c • x ∈ M := by
+theorem exists_smul_mem_of_mem_span
+    {Oe K'' T : Type} [CommRing Oe] [IsDomain Oe] [Field K''] [Algebra Oe K'']
+    [IsFractionRing Oe K''] [AddCommGroup T] [Module K'' T] [Module Oe T] [IsScalarTower Oe K'' T]
+    (M : Submodule Oe T)
+    {x : T} (hx : x ∈ Submodule.span K'' (↑M : Set T))
+    : ∃ c : Oe, c ≠ (0 : Oe) ∧ c • x ∈ M := by
   induction hx using Submodule.span_induction with
   | mem y hy => exact ⟨1, one_ne_zero, by simpa using hy⟩
   | zero => exact ⟨1, one_ne_zero, by simp⟩

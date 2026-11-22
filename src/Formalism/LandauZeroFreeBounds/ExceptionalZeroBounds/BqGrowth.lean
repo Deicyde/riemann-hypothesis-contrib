@@ -55,14 +55,17 @@ theorem product_lfunction_growth_bound : BqGrowth := by
   intro q₁ q₂ _ _ _ χ₁ χ₂ ψ h1 h2 h3 s hs
   obtain ⟨hre, hn, -⟩ := circle_about_two_geometry hs
   have hz := zeta_norm_le_on_circle hs
-  have L : ∀ (q : ℕ) [NeZero q] (χ : DirichletCharacter ℂ q), χ ≠ 1 →
-      ‖DirichletCharacter.LFunction χ s‖ ≤ 9 / 2 * |C| * q := by
+  have L
+      : ∀ (q : ℕ) [NeZero q] (χ : DirichletCharacter ℂ q),
+        χ ≠ 1 → ‖DirichletCharacter.LFunction χ s‖ ≤ 9 / 2 * |C| * q := by
     intro q _ χ hχ
     have h := hC q χ hχ s hre
     have hq : (0 : ℝ) ≤ q := Nat.cast_nonneg _
     have hCq : C * q ≤ |C| * q := mul_le_mul_of_nonneg_right (le_abs_self C) hq
     have hp : 0 ≤ |C| * q := by positivity
-    calc ‖DirichletCharacter.LFunction χ s‖ ≤ C * q * (1 + ‖s‖) := h
+    calc
+      ‖DirichletCharacter.LFunction χ s‖
+        ≤ C * q * (1 + ‖s‖) := h
       _ ≤ |C| * q * (1 + ‖s‖) := mul_le_mul_of_nonneg_right hCq (by positivity)
       _ ≤ |C| * q * (9 / 2) := mul_le_mul_of_nonneg_left (by linarith) hp
       _ = 9 / 2 * |C| * q := by ring
@@ -77,12 +80,14 @@ theorem product_lfunction_growth_bound : BqGrowth := by
   rw [show (3 : ℝ) = ((3 : ℕ) : ℝ) by norm_num, Real.rpow_natCast]
   unfold Fbq
   rw [norm_mul, norm_mul, norm_mul]
-  calc ‖riemannZeta s‖ * ‖DirichletCharacter.LFunction χ₁ s‖ * ‖DirichletCharacter.LFunction χ₂ s‖ *
-        ‖DirichletCharacter.LFunction ψ s‖
-      ≤ 14 * (9 / 2 * |C| * q₁) * (9 / 2 * |C| * q₂) * (9 / 2 * |C| * ((q₁ * q₂ : ℕ) : ℝ)) := by
-        gcongr
-    _ ≤ 14 * (9 / 2 * |C| * ((q₁ * q₂ : ℕ) : ℝ)) * (9 / 2 * |C| * ((q₁ * q₂ : ℕ) : ℝ)) *
-          (9 / 2 * |C| * ((q₁ * q₂ : ℕ) : ℝ)) := by gcongr
+  calc
+    ‖riemannZeta s‖ * ‖DirichletCharacter.LFunction χ₁ s‖ * ‖DirichletCharacter.LFunction χ₂ s‖
+          * ‖DirichletCharacter.LFunction ψ s‖
+        ≤ 14 * (9 / 2 * |C| * q₁) * (9 / 2 * |C| * q₂) * (9 / 2 * |C| * ((q₁ * q₂ : ℕ) : ℝ)) := by
+      gcongr
+    _ ≤ 14 * (9 / 2 * |C| * ((q₁ * q₂ : ℕ) : ℝ)) * (9 / 2 * |C| * ((q₁ * q₂ : ℕ) : ℝ))
+        * (9 / 2 * |C| * ((q₁ * q₂ : ℕ) : ℝ)) := by
+      gcongr
     _ = 14 * (9 / 2 * |C|) ^ 3 * ((q₁ * q₂ : ℕ) : ℝ) ^ 3 := by ring
 
 end Formalism.ZeroFreeDirichlet

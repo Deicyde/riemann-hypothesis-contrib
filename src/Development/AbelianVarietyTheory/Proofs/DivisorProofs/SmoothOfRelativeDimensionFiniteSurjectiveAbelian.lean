@@ -9,8 +9,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GoodOfFinite
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual GlobalTheory.DualCon
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual GlobalTheory.DualCon
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -18,10 +21,12 @@ set_option autoImplicit false
 
 namespace GlobalTheory.FiniteSurjDimField
 
-theorem smoothOfRelativeDimension_of_finite_surjective : ∀ (K : Type) [Field K] [IsAlgClosed K]
-    (A A' : Over (Sp K)) [GrpObj A] [GrpObj A'] (g : ℕ) (q : A ⟶ A'), IsAbelianScheme A → IsAbelianScheme A' →
-    IsFinite q.left → Surjective q.left → SmoothOfRelativeDimension g A.hom →
-    SmoothOfRelativeDimension g A'.hom := by
+theorem smoothOfRelativeDimension_of_finite_surjective
+    : ∀ (K : Type) [Field K] [IsAlgClosed K] (A A' : Over (Sp K)) [GrpObj A] [GrpObj A'] (g : ℕ)
+        (q : A ⟶ A'),
+      IsAbelianScheme A → IsAbelianScheme A' → IsFinite q.left → Surjective q.left
+        → SmoothOfRelativeDimension g A.hom
+        → SmoothOfRelativeDimension g A'.hom := by
   intro K _ _ A A' _ _ g q hA hA' hfin hsurj hg
   have := hA.geomConnected
   have := hA'.geomConnected

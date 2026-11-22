@@ -7,28 +7,42 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCompac
 
 @[expose] public section
 
-open NumberField MeasureTheory Matrix GlobalTheory.AutomorphicL2Unitary GlobalTheory.OpTrace GlobalTheory.UnitaryBC GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.CuspQuot GlobalTheory.GLFin
+open NumberField MeasureTheory Matrix GlobalTheory.AutomorphicL2Unitary GlobalTheory.OpTrace
+  GlobalTheory.UnitaryBC GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL
+  GlobalTheory.CuspQuot GlobalTheory.GLFin
 
 namespace GlobalTheory.GLFinSmall
 
 open Set Filter Pointwise Topology
 
-theorem exists_nhds_mul_subset {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    {W : Set G} (hWc : IsCompact W) (hWo : IsOpen W) : ∃ T ∈ 𝓝 (1 : G), W * T ⊆ W := by
-  apply hWc.induction_on (p := fun S ↦ ∃ T ∈ 𝓝 (1 : G), S * T ⊆ W)
+theorem exists_nhds_mul_subset
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    {W : Set G} (hWc : IsCompact W) (hWo : IsOpen W)
+    : ∃ T ∈ 𝓝 (1 : G), W * T ⊆ W := by
+  apply hWc.induction_on
+    (p := fun S ↦ ∃ T ∈ 𝓝 (1 : G), S * T ⊆ W)
     ⟨Set.univ, by simp only [univ_mem, Set.empty_mul, empty_subset, and_self]⟩
     (fun _ _ huv ⟨T, hT, mem⟩ ↦ ⟨T, hT, (mul_subset_mul_right huv).trans mem⟩)
-    fun U V ⟨T₁, hT₁, mem1⟩ ⟨T₂, hT₂, mem2⟩ ↦ ⟨T₁ ∩ T₂, inter_mem hT₁ hT₂, by
-      rw [union_mul]
-      exact union_subset (mul_subset_mul_left inter_subset_left |>.trans mem1)
-        (mul_subset_mul_left inter_subset_right |>.trans mem2)⟩
+    fun U V ⟨T₁, hT₁, mem1⟩ ⟨T₂, hT₂, mem2⟩ ↦ ⟨
+      T₁ ∩ T₂,
+      inter_mem hT₁ hT₂,
+      by
+        rw [union_mul]
+        exact union_subset (mul_subset_mul_left inter_subset_left |>.trans mem1)
+          (mul_subset_mul_left inter_subset_right |>.trans mem2)
+    ⟩
   intro x memW
   have : (x, 1) ∈ (fun p : G × G ↦ p.1 * p.2) ⁻¹' W := by simp [memW]
   rcases isOpen_prod_iff.mp (continuous_mul.isOpen_preimage W hWo) x 1 this with
     ⟨U, V, Uopen, Vopen, xmemU, onememV, prodsub⟩
   have h6 : U * V ⊆ W := mul_subset_iff.mpr (fun _ hx _ hy ↦ prodsub (mk_mem_prod hx hy))
-  exact ⟨U ∩ W, ⟨U, Uopen.mem_nhds xmemU, W, fun _ a ↦ a, rfl⟩,
-    V, IsOpen.mem_nhds Vopen onememV, fun _ a ↦ h6 ((mul_subset_mul_right inter_subset_left) a)⟩
+  exact ⟨
+    U ∩ W,
+    ⟨U, Uopen.mem_nhds xmemU, W, fun _ a ↦ a, rfl⟩,
+    V,
+    IsOpen.mem_nhds Vopen onememV,
+    fun _ a ↦ h6 ((mul_subset_mul_right inter_subset_left) a)
+  ⟩
 
 def rightStab {G : Type} [Group G] (W : Set G) : Subgroup G where
   carrier := {g | ∀ w, w ∈ W ↔ w * g ∈ W}
@@ -40,9 +54,10 @@ def rightStab {G : Type} [Group G] (W : Set G) : Subgroup G where
     intro g hg w
     rw [hg (w * g⁻¹), inv_mul_cancel_right]
 
-theorem exists_compact_open_subgroup_subset {G : Type} [Group G] [TopologicalSpace G]
-    [IsTopologicalGroup G] {W : Set G} (hWc : IsCompact W) (hWo : IsOpen W) (h1 : (1 : G) ∈ W) :
-    ∃ U : Subgroup G, IsOpen (U : Set G) ∧ IsCompact (U : Set G) ∧ (U : Set G) ⊆ W := by
+theorem exists_compact_open_subgroup_subset
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    {W : Set G} (hWc : IsCompact W) (hWo : IsOpen W) (h1 : (1 : G) ∈ W)
+    : ∃ U : Subgroup G, IsOpen (U : Set G) ∧ IsCompact (U : Set G) ∧ (U : Set G) ⊆ W := by
   obtain ⟨T, hT, hTW⟩ := exists_nhds_mul_subset hWc hWo
   have hsub : T ∩ T⁻¹ ⊆ (rightStab W : Set G) := by
     intro v hv w
@@ -63,12 +78,15 @@ theorem exists_compact_open_subgroup_subset {G : Type} [Group G] [TopologicalSpa
 
 end GlobalTheory.GLFinSmall
 
-theorem GlobalTheory.GLFin.exists_compact_open_subgroup_subset_nhds_one :
-    ∀ (E : Type) [Field E] [NumberField E] (a : ℕ) (B : Set (GL (Fin a) (Af E))),
-      B ∈ nhds (1 : GL (Fin a) (Af E)) → ∃ U : Subgroup (GL (Fin a) (Af E)),
-        IsOpen (U : Set (GL (Fin a) (Af E))) ∧ IsCompact (U : Set (GL (Fin a) (Af E))) ∧
-          (U : Set (GL (Fin a) (Af E))) ⊆ B := by
+theorem GlobalTheory.GLFin.exists_compact_open_subgroup_subset_nhds_one
+    : ∀ (E : Type) [Field E] [NumberField E] (a : ℕ) (B : Set (GL (Fin a) (Af E))),
+      B ∈ nhds (1 : GL (Fin a) (Af E))
+        → ∃ U : Subgroup (GL (Fin a) (Af E)),
+          IsOpen (U : Set (GL (Fin a) (Af E))) ∧ IsCompact (U : Set (GL (Fin a) (Af E)))
+            ∧ (U : Set (GL (Fin a) (Af E))) ⊆ B := by
   intro E _ _ a B hB
-  obtain ⟨W, hWo, hWc, -, h1, hWB⟩ := GlobalTheory.T.exists_compact_clopen_nhds_one_GL_finiteAdeles E a B hB
-  obtain ⟨U, hUo, hUc, hUW⟩ := GlobalTheory.GLFinSmall.exists_compact_open_subgroup_subset hWc hWo h1
+  obtain ⟨W, hWo, hWc, -, h1, hWB⟩ :=
+    GlobalTheory.T.exists_compact_clopen_nhds_one_GL_finiteAdeles E a B hB
+  obtain ⟨U, hUo, hUc, hUW⟩ :=
+    GlobalTheory.GLFinSmall.exists_compact_open_subgroup_subset hWc hWo h1
   exact ⟨U, hUo, hUc, hUW.trans hWB⟩

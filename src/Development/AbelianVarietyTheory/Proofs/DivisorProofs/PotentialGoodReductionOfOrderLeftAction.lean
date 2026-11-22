@@ -12,20 +12,24 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.AbLaw GlobalTheory.UU GlobalTheory.LN GlobalTheory.Raynaud IsLocalRing
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.AbLaw GlobalTheory.UU GlobalTheory.LN GlobalTheory.Raynaud
+  IsLocalRing
 open scoped CategoryTheory.Obj
 
 open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem DivOrder.mul_comm_of_eq_int {O : Type} [Ring O] {x y : O} {c : ℤ}
-    (htf : ∀ n : ℤ, n ≠ 0 → Function.Injective (fun a : O => n • a))
-    (hxy : x * y = (c : O))
-    (hy : ∀ y : O, y ≠ 0 → ∃ w : O, ∃ c' : ℤ, c' ≠ 0 ∧ y * w = (c' : O)) :
-    y * x = (c : O) := by
+theorem DivOrder.mul_comm_of_eq_int
+    {O : Type} [Ring O]
+    {x y : O} {c : ℤ}
+    (htf : ∀ n : ℤ, n ≠ 0 → Function.Injective (fun a : O => n • a)) (hxy : x * y = (c : O))
+    (hy : ∀ y : O, y ≠ 0 → ∃ w : O, ∃ c' : ℤ, c' ≠ 0 ∧ y * w = (c' : O))
+    : y * x = (c : O) := by
   by_cases hy0 : y = 0
   · subst hy0
     rw [mul_zero] at hxy
@@ -36,16 +40,17 @@ theorem DivOrder.mul_comm_of_eq_int {O : Type} [Ring O] {x y : O} {c : ℤ}
     rw [hyw, hxy, ← Int.cast_comm] at this
     exact this.symm
   have h2 : (c' : O) * (y * x) = (c' : O) * (c : O) := by
-    calc (c' : O) * (y * x) = y * ((c' : O) * x) := (Int.cast_commute c' y).left_comm x
+    calc
+      (c' : O) * (y * x)
+        = y * ((c' : O) * x) := (Int.cast_commute c' y).left_comm x
       _ = y * ((c : O) * w) := by rw [h1]
       _ = (c : O) * (y * w) := ((Int.cast_commute c y).left_comm w).symm
       _ = (c' : O) * (c : O) := by rw [hyw, Int.cast_comm]
-  have h3 : c' • (y * x) = c' • (c : O) := by
-    simpa [zsmul_eq_mul] using h2
+  have h3 : c' • (y * x) = c' • (c : O) := by simpa [zsmul_eq_mul] using h2
   exact htf c' hc' h3
 
-theorem DivOrder.exists_zsmul_eq_tmul (O : Type) [Ring O] (z : ℚ ⊗[ℤ] O) :
-    ∃ n : ℤ, n ≠ 0 ∧ ∃ x : O, n • z = (1 : ℚ) ⊗ₜ[ℤ] x := by
+theorem DivOrder.exists_zsmul_eq_tmul (O : Type) [Ring O] (z : ℚ ⊗[ℤ] O)
+    : ∃ n : ℤ, n ≠ 0 ∧ ∃ x : O, n • z = (1 : ℚ) ⊗ₜ[ℤ] x := by
   induction z using TensorProduct.induction_on with
   | zero => exact ⟨1, one_ne_zero, 0, by simp⟩
   | tmul q o =>
@@ -62,9 +67,11 @@ theorem DivOrder.exists_zsmul_eq_tmul (O : Type) [Ring O] (z : ℚ ⊗[ℤ] O) :
     rw [smul_add, mul_comm, mul_smul, e₁, mul_comm, mul_smul, e₂, TensorProduct.tmul_add,
       TensorProduct.tmul_smul, TensorProduct.tmul_smul]
 
-theorem DivOrder.isUnit_of_ne_zero (O : Type) [Ring O] [Module.Free ℤ O]
+theorem DivOrder.isUnit_of_ne_zero
+    (O : Type) [Ring O] [Module.Free ℤ O]
     (hdiv : ∀ x : O, x ≠ 0 → ∃ y : O, ∃ c : ℤ, c ≠ 0 ∧ x * y = (c : O))
-    (z : ℚ ⊗[ℤ] O) (hz : z ≠ 0) : IsUnit z := by
+    (z : ℚ ⊗[ℤ] O) (hz : z ≠ 0)
+    : IsUnit z := by
   have hinj : Function.Injective (Algebra.TensorProduct.includeRight (R := ℤ) (A := ℚ) (B := O)) :=
     Algebra.TensorProduct.includeRight_injective (algebraMap ℤ ℚ).injective_int
   have htf : ∀ n : ℤ, n ≠ 0 → Function.Injective (fun a : O => n • a) := by
@@ -97,12 +104,23 @@ theorem DivOrder.isUnit_of_ne_zero (O : Type) [Ring O] [Module.Free ℤ O]
   rw [hz']
   exact ((isUnit_iff_ne_zero.mpr (inv_ne_zero (by exact_mod_cast hn))).map _).mul hjx
 
-theorem potModel_of_intDivOrder_leftAction : ∀ (V K : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [IsAdicComplete (maximalIdeal V) V] [Field K] [CharZero K] [Algebra V K] [IsFractionRing V K] (A : Over (Sp K)) [GrpObj A] (g : ℕ), IsAbelianScheme A → SmoothOfRelativeDimension g A.hom → ∀ (O : Type) [Ring O] [Module.Free ℤ O] [Module.Finite ℤ O] (act : O → (A ⟶ A)), (∀ a, IsMonHom (act a)) → act 1 = 𝟙 A → (∀ a b, act (a * b) = act b ≫ act a) → (∀ a b, act (a + b) = act a * act b) → (∀ x : O, x ≠ 0 → ∃ y : O, ∃ c : ℤ, c ≠ 0 ∧ x * y = (c : O)) → g < Module.finrank ℤ O → GlobalTheory.SS.PotModel V K A (fun _ _ _ G _ => IsAbelianScheme G) := by
+theorem potModel_of_intDivOrder_leftAction
+    : ∀ (V K : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+        [IsAdicComplete (maximalIdeal V) V] [Field K] [CharZero K] [Algebra V K]
+        [IsFractionRing V K] (A : Over (Sp K)) [GrpObj A] (g : ℕ),
+      IsAbelianScheme A → SmoothOfRelativeDimension g A.hom
+        → ∀ (O : Type) [Ring O] [Module.Free ℤ O] [Module.Finite ℤ O] (act : O → (A ⟶ A)),
+          (∀ a, IsMonHom (act a)) → act 1 = 𝟙 A → (∀ a b, act (a * b) = act b ≫ act a)
+            → (∀ a b, act (a + b) = act a * act b)
+            → (∀ x : O, x ≠ 0 → ∃ y : O, ∃ c : ℤ, c ≠ 0 ∧ x * y = (c : O)) → g < Module.finrank ℤ O
+            → GlobalTheory.SS.PotModel V K A (fun _ _ _ G _ => IsAbelianScheme G) := by
   intro V K _ _ _ _ _ _ _ _ A _ g hA hsm O _ _ _ act hmon h1 hmul hadd hdiv hg
   have hinj : Function.Injective (Algebra.TensorProduct.includeRight (R := ℤ) (A := ℚ) (B := O)) :=
     Algebra.TensorProduct.includeRight_injective (algebraMap ℤ ℚ).injective_int
-  have hspan : Submodule.span ℚ (Set.range
-      (Algebra.TensorProduct.includeRight (R := ℤ) (A := ℚ) (B := O)).toRingHom) = ⊤ := by
+  have hspan
+      : Submodule.span ℚ
+          (Set.range (Algebra.TensorProduct.includeRight (R := ℤ) (A := ℚ) (B := O)).toRingHom)
+        = ⊤ := by
     rw [eq_top_iff]
     intro z _
     obtain ⟨n, hn, x, e⟩ := DivOrder.exists_zsmul_eq_tmul O z
@@ -112,7 +130,8 @@ theorem potModel_of_intDivOrder_leftAction : ∀ (V K : Type) [CommRing V] [IsDo
     rw [hz]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨x, rfl⟩)
   have hrank : Module.finrank ℚ (ℚ ⊗[ℤ] O) = Module.finrank ℤ O := Module.finrank_baseChange
-  exact GlobalTheory.T.potentialGoodReduction_of_divisionAlgebra_leftAction V K A g hA hsm O act hmon h1 hmul hadd (ℚ ⊗[ℤ] O)
+  exact GlobalTheory.T.potentialGoodReduction_of_divisionAlgebra_leftAction V K A g hA hsm O act
+    hmon h1 hmul hadd (ℚ ⊗[ℤ] O)
     (Algebra.TensorProduct.includeRight (R := ℤ) (A := ℚ) (B := O)).toRingHom
     (DivOrder.isUnit_of_ne_zero O hdiv) hinj hspan (hrank ▸ hg)
 

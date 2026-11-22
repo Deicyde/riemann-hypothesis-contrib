@@ -5,10 +5,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi UpperTheory.Zero.ConvolutionTheory.EB PositivityTheory.Rg.BcB.Desc
+open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi
+  UpperTheory.Zero.ConvolutionTheory.EB PositivityTheory.Rg.BcB.Desc
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.twUniq_pf :
-    TwUniq := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.twUniq_pf : TwUniq := by
   intro E _ _ _ n μ π φ t t' h₁ h₂
   obtain ⟨L₁, e₁, -, rfl⟩ := h₁
   obtain ⟨L₂, e₂, -, rfl⟩ := h₂

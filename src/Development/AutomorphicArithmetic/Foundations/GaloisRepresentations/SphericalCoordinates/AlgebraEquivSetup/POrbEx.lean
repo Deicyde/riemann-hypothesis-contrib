@@ -5,20 +5,26 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
+open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip
+  GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
 open scoped TensorProduct
 
-theorem UpperTheory.Gal.W2.Seed.pOrbEx :
-    OrbEx := by
+theorem UpperTheory.Gal.W2.Seed.pOrbEx : OrbEx := by
   intro E _ _ p _ Kq u τ₁ h₁
   classical
   let S := {τ : E →+* PadicAlgCl p // LiesOver Kq u τ}
-  let R : Setoid S :=
-    { r := fun a b => ∃ σ : Gal(PadicAlgCl p/ℚ_[p]),
-        b.1 = ((σ.toRingEquiv : PadicAlgCl p ≃+* PadicAlgCl p) : PadicAlgCl p →+* PadicAlgCl p).comp a.1
-      iseqv := ⟨fun a => ⟨1, by ext x; simp⟩,
-        fun {a b} ⟨σ, hσ⟩ => ⟨σ⁻¹, by rw [hσ]; ext x; simp⟩,
-        fun {a b c} ⟨σ, hσ⟩ ⟨ρ, hρ⟩ => ⟨ρ * σ, by rw [hρ, hσ]; ext x; simp⟩⟩ }
+  let R : Setoid S := {
+    r := fun a b =>
+      ∃ σ : Gal(PadicAlgCl p/ℚ_[p]),
+        b.1
+          = ((σ.toRingEquiv : PadicAlgCl p ≃+* PadicAlgCl p) : PadicAlgCl p →+* PadicAlgCl p).comp
+            a.1
+    iseqv := ⟨
+      fun a => ⟨1, by ext x; simp⟩,
+      fun {a b} ⟨σ, hσ⟩ => ⟨σ⁻¹, by rw [hσ]; ext x; simp⟩,
+      fun {a b c} ⟨σ, hσ⟩ ⟨ρ, hρ⟩ => ⟨ρ * σ, by rw [hρ, hσ]; ext x; simp⟩
+    ⟩
+  }
   haveI : Finite (E →+* PadicAlgCl p) := inferInstance
   haveI : Finite S := Subtype.finite
   haveI : Finite (Quotient R) := Quotient.finite _
@@ -32,7 +38,8 @@ theorem UpperTheory.Gal.W2.Seed.pOrbEx :
     · simp only [rep, if_neg hq]
       exact Quotient.out_eq q
   let eq := Finite.equivFin (Quotient R)
-  refine ⟨Nat.card (Quotient R), fun i => (rep (eq.symm i)).1, eq (Quotient.mk R s₁), ?_, ?_, ?_, ?_⟩
+  refine
+    ⟨Nat.card (Quotient R), fun i => (rep (eq.symm i)).1, eq (Quotient.mk R s₁), ?_, ?_, ?_, ?_⟩
   · simp [rep, s₁]
   · intro i
     exact (rep _).2

@@ -11,7 +11,9 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.AdmissibleLieWords
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity PI.UnitaryCorollaryDerivatives.CRH
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity
+  PI.UnitaryCorollaryDerivatives.CRH
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 

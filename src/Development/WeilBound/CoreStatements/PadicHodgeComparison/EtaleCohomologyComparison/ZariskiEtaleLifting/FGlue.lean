@@ -12,7 +12,8 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory Polynomial CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.B
+open CategoryTheory Polynomial CrystallineSemistableComparison CrystallineSemistableComparison.CH
+  CrystallineSemistableComparison.B
 universe w w' v u v' u' v'' u''
 
 namespace CrystallineSemistableComparison.B
@@ -45,7 +46,17 @@ lemma gl_desc_id {R : Type} [CommRing R] {C : Type u} [Category.{v} C] (F : C �
 
 end CrystallineSemistableComparison.B
 
-theorem CrystallineSemistableComparison.B.P.glue : ∀ d n : ℕ, ∃ N : ℕ, ∀ {R : Type} [CommRing R] {C : Type u} [Category.{v} C] {E : Type u'} [Category.{v'} E] {E₀ : Type u''} [Category.{v''} E₀] (F : C ⥤ ModuleCat.{w} R) (G : E ⥤ C) (j : E₀ ⥤ E) [j.Full] [j.Faithful] (U : UF C) (D : C) (A : Act (𝟭 C) U d D) (L : Line (𝟭 C) U) (U' : UF E) (D' : E) (A' : Act j U' d D') (L' : Line j U') (θ : D ⟶ G.obj D') (h : ∀ a, (A.γ a).asHom ≫ θ = θ ≫ G.map (A'.γ a).asHom) (s : R), (∀ T, Acyc1 s (F.map (L.i.app T)).hom (F.map (L.γ.app T)).hom) → Desc s (G ⋙ F) j → (∀ T, Acyc1 s ((G ⋙ F).map (L'.i.app T)).hom ((G ⋙ F).map (L'.γ.app T)).hom) → NI s (Functor.whiskerRight (⟨fun _ => θ, fun _ _ a => h a⟩ : A.ι ⟶ A'.ι ⋙ G) F) → RI (s ^ N) n F (j ⋙ G) := by
+theorem CrystallineSemistableComparison.B.P.glue
+    : ∀ d n : ℕ, ∃ N : ℕ,
+      ∀ {R : Type} [CommRing R] {C : Type u} [Category.{v} C] {E : Type u'} [Category.{v'} E]
+          {E₀ : Type u''} [Category.{v''} E₀] (F : C ⥤ ModuleCat.{w} R) (G : E ⥤ C) (j : E₀ ⥤ E)
+          [j.Full] [j.Faithful] (U : UF C) (D : C) (A : Act (𝟭 C) U d D) (L : Line (𝟭 C) U)
+          (U' : UF E) (D' : E) (A' : Act j U' d D') (L' : Line j U') (θ : D ⟶ G.obj D')
+          (h : ∀ a, (A.γ a).asHom ≫ θ = θ ≫ G.map (A'.γ a).asHom) (s : R),
+        (∀ T, Acyc1 s (F.map (L.i.app T)).hom (F.map (L.γ.app T)).hom) → Desc s (G ⋙ F) j
+          → (∀ T, Acyc1 s ((G ⋙ F).map (L'.i.app T)).hom ((G ⋙ F).map (L'.γ.app T)).hom)
+          → NI s (Functor.whiskerRight (⟨fun _ => θ, fun _ _ a => h a⟩ : A.ι ⟶ A'.ι ⋙ G) F)
+          → RI (s ^ N) n F (j ⋙ G) := by
   intro d n
   obtain ⟨N₁, h₁⟩ := CrystallineSemistableComparison.B.P.tors.{w, v, u, v, u} d n
   obtain ⟨N₂, h₂⟩ := CrystallineSemistableComparison.B.P.tors.{w, v', u', v'', u''} d n
@@ -56,16 +67,24 @@ theorem CrystallineSemistableComparison.B.P.glue : ∀ d n : ℕ, ∃ N : ℕ, �
   have t2 : RI (s ^ N₂) n (G ⋙ F) A'.ι := h₂ (G ⋙ F) j U' D' A' L' s hD hL'
   have t3 : RI (s ^ N₁ * s ^ 2) n F (A'.ι ⋙ G) := by
     intro i hi
-    have hp : (Mor.restrict F (A'.ι ⋙ G)).pull i =
-        ((Mor.ofNatTrans (Functor.whiskerRight θn F)).pull i).comp ((Mor.restrict F A.ι).pull i) := by
+    have hp
+        : (Mor.restrict F (A'.ι ⋙ G)).pull i
+          = ((Mor.ofNatTrans (Functor.whiskerRight θn F)).pull i).comp
+            ((Mor.restrict F A.ι).pull i) := by
       rw [← rc_pull_comp]
-      exact (LinearMap.ext fun x => CrystallineSemistableComparison.P.prism ((Mor.restrict F A.ι).comp (Mor.ofNatTrans (Functor.whiskerRight θn F)))
-        (Mor.restrict F (A'.ι ⋙ G)) θn (fun T x => rfl) i x).symm
+      exact (LinearMap.ext fun x =>
+        CrystallineSemistableComparison.P.prism
+          ((Mor.restrict F A.ι).comp (Mor.ofNatTrans (Functor.whiskerRight θn F)))
+          (Mor.restrict F (A'.ι ⋙ G)) θn
+          (fun T x => rfl)
+          i x).symm
     rw [hp]
-    exact (CrystallineSemistableComparison.P.upTo_alg _ _ _ _).1 (t1 i hi) (P.ni_coh s (Functor.whiskerRight θn F) hN n i hi)
+    exact (CrystallineSemistableComparison.P.upTo_alg _ _ _ _).1 (t1 i hi)
+      (P.ni_coh s (Functor.whiskerRight θn F) hN n i hi)
   have t4 : RI (s ^ N₂ * (s ^ N₁ * s ^ 2)) n F G := (P.ri_calc F G A'.ι _ _ n).2.2.1 t2 t3
   have t5 : RI (s ^ (2 * n + 3)) n (G ⋙ F) j := P.fib (Mor.restrict (G ⋙ F) j) s hD n
   have t6 := (P.ri_calc F G j _ _ n).1 t4 t5
-  have he : s ^ (N₂ + (N₁ + 2) + (2 * n + 3)) = s ^ N₂ * (s ^ N₁ * s ^ 2) * s ^ (2 * n + 3) := by ring
+  have he : s ^ (N₂ + (N₁ + 2) + (2 * n + 3)) = s ^ N₂ * (s ^ N₁ * s ^ 2) * s ^ (2 * n + 3) := by
+    ring
   rw [he]
   exact t6

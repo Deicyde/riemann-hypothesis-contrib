@@ -14,8 +14,10 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter Topology MeasureTheory Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Points GlobalTheory.CxPts GlobalTheory.VB GlobalTheory.HermFrame GlobalTheory.ArInt GlobalTheory.MixDens GlobalTheory.CovTest
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Points GlobalTheory.CxPts GlobalTheory.VB GlobalTheory.HermFrame
+  GlobalTheory.ArInt GlobalTheory.MixDens GlobalTheory.CovTest
 open GlobalTheory.FlagFibre (Low uni dens)
 open ReciprocityTheory.L2DbarEstimates (V cHess)
 open scoped ContDiff ComplexOrder Classical
@@ -24,8 +26,8 @@ namespace GlobalTheory.MixDens
 
 variable {k : Type} [CommRing k] {X : Scheme.{0}} {p : X ⟶ Sp k} {σ : k →+* ℂ} {D : ℕ}
 
-theorem chernMat_tens (L M : HermLB p) (c : AlgChart p σ D) {y : CxPts p σ} (hy : y ∈ c.e.source) :
-    chernMat ((L.tens M).φ σ) c y = chernMat (L.φ σ) c y + chernMat (M.φ σ) c y := by
+theorem chernMat_tens (L M : HermLB p) (c : AlgChart p σ D) {y : CxPts p σ} (hy : y ∈ c.e.source)
+    : chernMat ((L.tens M).φ σ) c y = chernMat (L.φ σ) c y + chernMat (M.φ σ) c y := by
   have ha := mem_pick (L.φ σ).isLB y
   have hb := mem_pick (M.φ σ).isLB y
   unfold chernMat
@@ -34,18 +36,23 @@ theorem chernMat_tens (L M : HermLB p) (c : AlgChart p σ D) {y : CxPts p σ} (h
   change c.hess ((L.φ σ).tens (M.φ σ)) _ y = _
   exact FlatMass.hess_tens (L.cInf σ) (M.cInf σ) hy ha hb
 
-def chernHom (c : AlgChart p σ D) {y : CxPts p σ} (hy : y ∈ c.e.source) :
-    HermLB.IsomClass p →+ Matrix (Fin D) (Fin D) ℂ :=
+def chernHom (c : AlgChart p σ D) {y : CxPts p σ} (hy : y ∈ c.e.source)
+    : HermLB.IsomClass p →+ Matrix (Fin D) (Fin D) ℂ :=
   AddMonoidHom.mk' (M := HermLB.IsomClass p)
-    (Quotient.lift (s := HermLB.isometrySetoid p) (fun L => chernMat (L.φ σ) c y)
-    fun _ _ h => chernMat_congr h c hy) (by rintro ⟨L⟩ ⟨M⟩; exact chernMat_tens L M c hy)
+    (Quotient.lift (s := HermLB.isometrySetoid p)
+      (fun L => chernMat (L.φ σ) c y)
+      fun _ _ h => chernMat_congr h c hy)
+    (by rintro ⟨L⟩ ⟨M⟩; exact chernMat_tens L M c hy)
 
-theorem chernHom_icls (c : AlgChart p σ D) {y : CxPts p σ} (hy : y ∈ c.e.source) (L : HermLB p) :
-    chernHom c hy L.icls = chernMat (L.φ σ) c y := rfl
+theorem chernHom_icls (c : AlgChart p σ D) {y : CxPts p σ} (hy : y ∈ c.e.source) (L : HermLB p)
+    : chernHom c hy L.icls = chernMat (L.φ σ) c y :=
+  rfl
 
-theorem chernMat_comb : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) (p : X ⟶ Sp k) (σ : k →+* ℂ) (D : ℕ) (κ : Type)
-    [Fintype κ] (L : κ → HermLB p) (n : κ → ℤ) (c : AlgChart p σ D), ∀ y ∈ c.e.source,
-    chernMat ((ArInt.comb L n).φ σ) c y = ∑ j, (n j : ℂ) • chernMat ((L j).φ σ) c y := by
+theorem chernMat_comb
+    : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) (p : X ⟶ Sp k) (σ : k →+* ℂ) (D : ℕ) (κ : Type)
+        [Fintype κ] (L : κ → HermLB p) (n : κ → ℤ) (c : AlgChart p σ D),
+      ∀ y ∈ c.e.source,
+        chernMat ((ArInt.comb L n).φ σ) c y = ∑ j, (n j : ℂ) • chernMat ((L j).φ σ) c y := by
   intro k _ X p σ D κ _ L n c y hy
   set_option synthInstance.maxHeartbeats 100000 in
     rw [← chernHom_icls c hy, icls_comb, map_sum]

@@ -16,13 +16,36 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.AllRowsAtReco
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.MainNotions.ArithmeticCylinders Formalism.L2.GlobalTheoryTheory.ConcN Formalism.L2.GlobalTheoryTheory.AllJoin Formalism.L2.SG.HidaSetting Formalism.L2.SG.RowDict Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.PackageTie2
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.MainNotions.ArithmeticCylinders Formalism.L2.GlobalTheoryTheory.ConcN
+  Formalism.L2.GlobalTheoryTheory.AllJoin Formalism.L2.SG.HidaSetting Formalism.L2.SG.RowDict
+  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.PackageTie2
 
 namespace GlobalTheory.IrrRowConcrete
 
-theorem irr_row_closed : HeckeCharacterZeroLocus.SiegelWeilU.SiegelWeilUnitaryConvergent → Formalism.L2.SG.RowsDef.RowsFinDim → ∃ cIc : ℝ, 0 < cIc ∧ ∀ 𝒞 : FamClass, (∀ {eps : ℝ} (Fm : FamP eps), 𝒞 Fm → TuSize Fm) → (Closed 𝒞 fun Fm _ => 𝒞 Fm → ∃ x0 : ℝ, ∀ x, Fm.x1 < x → x0 ≤ x → ∀ i : Fm.Ix x, ∃ (X : HidaSetting (Fm.D x i)) (G : GoodOp X) (ι : (Fm.D x i).s.HH ≃ₗᵢ[ℂ] HHX X), AutTie (Fm.D x i) X.B X.pl ∧ RowDictTie X G ι ∧ GlobalTheory.LabPin.LabTie X ι) → Closed 𝒞 fun Fm _ => ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ∃ A : AllRows (Fm.D x i), LabelCountGoodInjective A ∧ AllJoinA A ∧ CountAllRows A (epsC cIc (Fm.D x i).R.r (Fm.D x i).R.f) := by
+theorem irr_row_closed
+    : HeckeCharacterZeroLocus.SiegelWeilU.SiegelWeilUnitaryConvergent
+      → Formalism.L2.SG.RowsDef.RowsFinDim
+      → ∃ cIc : ℝ,
+        0 < cIc
+          ∧ ∀ 𝒞 : FamClass,
+            (∀ {eps : ℝ} (Fm : FamP eps), 𝒞 Fm → TuSize Fm)
+              → (Closed 𝒞 fun Fm _ =>
+                𝒞 Fm
+                  → ∃ x0 : ℝ, ∀ x,
+                    Fm.x1 < x → x0 ≤ x
+                      → ∀ i : Fm.Ix x,
+                        ∃ (X : HidaSetting (Fm.D x i)) (G : GoodOp X)
+                            (ι : (Fm.D x i).s.HH ≃ₗᵢ[ℂ] HHX X),
+                          AutTie (Fm.D x i) X.B X.pl ∧ RowDictTie X G ι
+                            ∧ GlobalTheory.LabPin.LabTie X ι)
+              → Closed 𝒞 fun Fm _ =>
+                ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ∃ A : AllRows (Fm.D x i),
+                  LabelCountGoodInjective A ∧ AllJoinA A
+                    ∧ CountAllRows A (epsC cIc (Fm.D x i).R.r (Fm.D x i).R.f) := by
   intro hSW hRF
-  obtain ⟨c30, cIc, hc30, hcI, hcle, hP⟩ := GlobalTheory.CountConstants.count_constants_of_siegelWeil hSW
+  obtain ⟨c30, cIc, hc30, hcI, hcle, hP⟩ :=
+    GlobalTheory.CountConstants.count_constants_of_siegelWeil hSW
   refine ⟨cIc, hcI, fun 𝒞 hT hX => ?_⟩
   have hcb : ∀ {eps : ℝ} (Fm : FamP eps), 0 < (c30 Fm.cOut).cb := fun Fm =>
     (hP (fun _ _ _ _ => True) Fm).2.1
@@ -41,7 +64,10 @@ theorem irr_row_closed : HeckeCharacterZeroLocus.SiegelWeilU.SiegelWeilUnitaryCo
   have hxlt : Fm.x1 < x := (lt_add_of_pos_right _ zero_lt_one).trans_le b4
   obtain ⟨X, G, ι, hA, hR, hLab⟩ := hx1 x hxlt b1 i
   obtain ⟨hpar, h4⟩ := hx2 x b2 i
-  exact GlobalTheory.AllRowsAtRecord.allRows_at_record hRF (Fm.D x i) (Fm.L x i) X G ι (c30 Fm.cOut).n0 (c30 Fm.cOut).A (c30 Fm.cOut).C
-    (c30 Fm.cOut).c (c30 Fm.cOut).cb cIc hcI (hcle Fm) (hy x b3 i) hA hR hLab (fun P => (hP P Fm).2.2 x i) hpar h4
+  exact GlobalTheory.AllRowsAtRecord.allRows_at_record hRF (Fm.D x i) (Fm.L x i) X G ι
+    (c30 Fm.cOut).n0 (c30 Fm.cOut).A (c30 Fm.cOut).C (c30 Fm.cOut).c (c30 Fm.cOut).cb cIc hcI
+    (hcle Fm) (hy x b3 i) hA hR hLab
+    (fun P => (hP P Fm).2.2 x i)
+    hpar h4
 
 end GlobalTheory.IrrRowConcrete

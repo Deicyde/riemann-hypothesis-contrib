@@ -8,12 +8,15 @@ public import Development.AutomorphicSpectrum.Proofs.MembershipProofs.Schrodinge
 
 noncomputable section
 
-open GlobalTheory.CompanionTheory.VacLoc GlobalTheory.CompanionTheory.FinHeis GlobalTheory.WeilM MeasureTheory Matrix Topology
+open GlobalTheory.CompanionTheory.VacLoc GlobalTheory.CompanionTheory.FinHeis GlobalTheory.WeilM
+  MeasureTheory Matrix Topology
 
 namespace GlobalTheory.CompanionTheory.StdLattice
 
-theorem exists_nhds_invariant {G : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G] {f : G → ℂ}
-    (hf : f ∈ SB G) : ∀ᶠ u in 𝓝 (0 : G), ∀ y ∈ tsupport f, f (y + u) = f y := by
+theorem exists_nhds_invariant
+    {G : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
+    {f : G → ℂ} (hf : f ∈ SB G)
+    : ∀ᶠ u in 𝓝 (0 : G), ∀ y ∈ tsupport f, f (y + u) = f y := by
   have hf' : IsLocallyConstant f ∧ HasCompactSupport f := hf
   obtain ⟨hlc, hcs⟩ := hf'
   have hg : IsLocallyConstant (fun z : G × G => f (z.2 + z.1)) :=
@@ -23,16 +26,20 @@ theorem exists_nhds_invariant {G : Type} [AddCommGroup G] [TopologicalSpace G] [
   filter_upwards [hg.eventually_eq (0, y), hg2.eventually_eq (0, y)] with z hz1 hz2
   exact hz1.trans ((congrArg f (add_zero y)).trans hz2.symm)
 
-theorem mem_span_cosets {G : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G] {f : G → ℂ}
-    (hf : HasCompactSupport f) (H : AddSubgroup G) (hH : IsOpen (H : Set G))
-    (hinv : ∀ y ∈ tsupport f, ∀ u ∈ H, f (y + u) = f y) :
-    f ∈ Submodule.span ℂ (Set.range fun a : G => fun x : G => (H : Set G).indicator (fun _ => (1 : ℂ)) (x + a)) := by
+theorem mem_span_cosets
+    {G : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
+    {f : G → ℂ} (hf : HasCompactSupport f)
+    (H : AddSubgroup G)
+    (hH : IsOpen (H : Set G)) (hinv : ∀ y ∈ tsupport f, ∀ u ∈ H, f (y + u) = f y)
+    : f ∈ Submodule.span ℂ
+      (Set.range fun a : G => fun x : G => (H : Set G).indicator (fun _ => (1 : ℂ)) (x + a)) := by
   classical
   haveI : DiscreteTopology (G ⧸ H) := QuotientAddGroup.discreteTopology hH
   have hfin : ((QuotientAddGroup.mk : G → G ⧸ H) '' tsupport f).Finite :=
     (hf.isCompact.image QuotientAddGroup.continuous_mk).finite_of_discrete
-  have key : ∀ c ∈ hfin.toFinset, ∀ x : G, (QuotientAddGroup.mk x : G ⧸ H) = c →
-      f x = f (Quotient.out c) := by
+  have key
+      : ∀ c ∈ hfin.toFinset, ∀ x : G,
+        (QuotientAddGroup.mk x : G ⧸ H) = c → f x = f (Quotient.out c) := by
     intro c hc x hx
     rw [Set.Finite.mem_toFinset] at hc
     obtain ⟨k, hk, rfl⟩ := hc
@@ -42,15 +49,19 @@ theorem mem_span_cosets {G : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopo
       have h2 := hinv k hk (-k + z) hm
       rwa [add_neg_cancel_left] at h2
     rw [h1 x hx, h1 _ (QuotientAddGroup.out_eq' _)]
-  have hfeq : f = ∑ c ∈ hfin.toFinset, f (Quotient.out c) •
-      (fun x : G => (H : Set G).indicator (fun _ => (1 : ℂ)) (x + -Quotient.out c)) := by
+  have hfeq
+      : f
+        = ∑ c ∈ hfin.toFinset, f (Quotient.out c) •
+          (fun x : G => (H : Set G).indicator (fun _ => (1 : ℂ)) (x + -Quotient.out c)) := by
     funext x
     rw [Finset.sum_apply]
     simp only [Pi.smul_apply, smul_eq_mul]
-    have hind : ∀ c : G ⧸ H, (H : Set G).indicator (fun _ => (1 : ℂ)) (x + -Quotient.out c) =
-        if c = (QuotientAddGroup.mk x : G ⧸ H) then 1 else 0 := by
+    have hind
+        : ∀ c : G ⧸ H,
+          (H : Set G).indicator (fun _ => (1 : ℂ)) (x + - Quotient.out c)
+            = if c = (QuotientAddGroup.mk x : G ⧸ H) then 1 else 0 := by
       intro c
-      have hiff : x + -Quotient.out c ∈ H ↔ c = (QuotientAddGroup.mk x : G ⧸ H) := by
+      have hiff : x + - Quotient.out c ∈ H ↔ c = (QuotientAddGroup.mk x : G ⧸ H) := by
         rw [add_comm, ← QuotientAddGroup.eq, QuotientAddGroup.out_eq']
       simp only [Set.indicator_apply, SetLike.mem_coe, hiff]
     simp only [hind, mul_ite, mul_one, mul_zero]
@@ -64,7 +75,7 @@ theorem mem_span_cosets {G : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopo
       exact ⟨x, hxK, rfl⟩
   rw [hfeq]
   exact Submodule.sum_mem _ fun c _ =>
-    Submodule.smul_mem _ _ (Submodule.subset_span ⟨-Quotient.out c, rfl⟩)
+    Submodule.smul_mem _ _ (Submodule.subset_span ⟨- Quotient.out c, rfl⟩)
 
 variable {R : Type} [CommRing R] {κ : Type} [Fintype κ]
 
@@ -74,12 +85,14 @@ def box (O : Subring R) (v : Rˣ) (κ : Type) : AddSubgroup (κ → R) where
   add_mem' := fun hx hy i => by simpa [mul_add] using O.add_mem (hx i) (hy i)
   neg_mem' := fun hx i => by simpa using O.neg_mem (hx i)
 
-def ind (O : Subring R) (κ : Type) : (κ → R) → ℂ := Set.indicator {x : κ → R | ∀ i, x i ∈ O} fun _ => (1 : ℂ)
+def ind (O : Subring R) (κ : Type) : (κ → R) → ℂ :=
+  Set.indicator {x : κ → R | ∀ i, x i ∈ O} fun _ => (1 : ℂ)
 
 variable [TopologicalSpace R]
 
-theorem ind_mem_SB [T2Space R] {O : Subring R} (hc : IsCompact (O : Set R)) (ho : IsOpen (O : Set R)) :
-    ind O κ ∈ SB (κ → R) := by
+theorem ind_mem_SB
+    [T2Space R] {O : Subring R} (hc : IsCompact (O : Set R)) (ho : IsOpen (O : Set R))
+    : ind O κ ∈ SB (κ → R) := by
   have hO : IsClosed (O : Set R) := hc.isClosed
   have hset : {x : κ → R | ∀ i, x i ∈ O} = Set.univ.pi (fun _ => (O : Set R)) := by
     ext x
@@ -99,32 +112,40 @@ theorem ind_mem_SB [T2Space R] {O : Subring R} (hc : IsCompact (O : Set R)) (ho 
   · exact HasCompactSupport.of_support_subset_isCompact
       (by rw [hset]; exact isCompact_univ_pi fun _ => hc) Set.support_indicator_subset
 
-theorem psi_dot {ψ : AddChar R ℂ} {O : Subring R} {u : Rˣ} (h : GoodChar ψ O u) {x y : κ → R} (hx : ∀ i, x i ∈ O)
-    (hy : y ∈ box O u κ) : ψ (x ⬝ᵥ y) = 1 := by
+theorem psi_dot
+    {ψ : AddChar R ℂ} {O : Subring R} {u : Rˣ} (h : GoodChar ψ O u)
+    {x y : κ → R} (hx : ∀ i, x i ∈ O) (hy : y ∈ box O u κ)
+    : ψ (x ⬝ᵥ y) = 1 := by
   have hy' : ∀ i, ((u⁻¹ : Rˣ) : R) * y i ∈ O := hy
   have hxy : ∀ i, ψ (x i * y i) = 1 := fun i => by
     rw [mul_comm]
     exact (h.ann (y i)).2 (hy' i) (x i) (hx i)
   show ψ (∑ i, x i * y i) = 1
-  exact Finset.sum_induction _ (fun z => ψ z = 1)
+  exact Finset.sum_induction _
+    (fun z => ψ z = 1)
     (fun a b ha hb => by rw [AddChar.map_add_eq_mul, ha, hb, one_mul])
-    (AddChar.map_zero_eq_one ψ) (fun i _ => hxy i)
+    (AddChar.map_zero_eq_one ψ)
+    (fun i _ => hxy i)
 
 variable [IsTopologicalRing R] [Invertible (2 : R)]
 
-theorem mem_span_schr [LocallyCompactSpace R] [T2Space R] {ψ : AddChar R ℂ} {O : Subring R} {u : Rˣ}
-    (h : GoodChar ψ O u) {f : (κ → R) → ℂ} (hf : f ∈ SB (κ → R)) :
-    f ∈ Submodule.span ℂ (Set.range fun w => schr ψ w (ind O κ)) := by
+theorem mem_span_schr
+    [LocallyCompactSpace R] [T2Space R]
+    {ψ : AddChar R ℂ} {O : Subring R} {u : Rˣ} (h : GoodChar ψ O u)
+    {f : (κ → R) → ℂ} (hf : f ∈ SB (κ → R))
+    : f ∈ Submodule.span ℂ (Set.range fun w => schr ψ w (ind O κ)) := by
   classical
   set V := Submodule.span ℂ (Set.range fun w => schr ψ w (ind O κ)) with hV
-  have htr : ∀ g ∈ Submodule.span ℂ {g : (κ → R) → ℂ | ∃ y, g = schr ψ (0, y) (ind O κ)},
-      ∀ a : κ → R, (fun x => g (x + a)) ∈ V := by
+  have htr
+      : ∀ g ∈ Submodule.span ℂ {g : (κ → R) → ℂ | ∃ y, g = schr ψ (0, y) (ind O κ)}, ∀ a : κ → R,
+        (fun x => g (x + a)) ∈ V := by
     intro g hg a
     induction hg using Submodule.span_induction with
     | mem g hg =>
       obtain ⟨y, rfl⟩ := hg
-      have heq : (fun x => schr ψ (0, y) (ind O κ) (x + a)) =
-          ψ (a ⬝ᵥ y - ⅟2 * (a ⬝ᵥ y)) • schr ψ (a, y) (ind O κ) := by
+      have heq
+          : (fun x => schr ψ (0, y) (ind O κ) (x + a))
+            = ψ (a ⬝ᵥ y - ⅟2 * (a ⬝ᵥ y)) • schr ψ (a, y) (ind O κ) := by
         funext x
         simp only [schr, Pi.smul_apply, smul_eq_mul, add_zero, zero_dotProduct, mul_zero]
         rw [← mul_assoc, ← AddChar.map_add_eq_mul, add_dotProduct,
@@ -161,7 +182,14 @@ theorem mem_span_schr [LocallyCompactSpace R] [T2Space R] {ψ : AddChar R ℂ} {
   rintro _ ⟨a, rfl⟩
   exact htr _ (GlobalTheory.T.indicator_in_schrodinger_span ψ O u v h hvO) a
 
-theorem exists_std : ∀ {R : Type} [CommRing R] [TopologicalSpace R] [IsTopologicalRing R] [LocallyCompactSpace R] [T2Space R] [Invertible (2 : R)] (ψ : AddChar R ℂ) (O : Subring R) (u : Rˣ) {W : Type} [AddCommGroup W] [Module R W] {B : W → W → R} {κ : Type} [Fintype κ] (d : Darboux B κ) (μ : @Measure (κ → R) (borel _)) (S : Sys W (SB (κ → R))), GoodChar ψ O u → IsModel ψ d μ S → ∃ (Γ : AddSubgroup W) (al : W → ℂ) (φ : SB (κ → R)), SelfDual S Γ ∧ IsSemi S al Γ ∧ Law S al Γ φ ∧ Cyclic S φ ∧ φ ≠ 0 := by
+theorem exists_std
+    : ∀ {R : Type} [CommRing R] [TopologicalSpace R] [IsTopologicalRing R] [LocallyCompactSpace R]
+        [T2Space R] [Invertible (2 : R)] (ψ : AddChar R ℂ) (O : Subring R) (u : Rˣ) {W : Type}
+        [AddCommGroup W] [Module R W] {B : W → W → R} {κ : Type} [Fintype κ] (d : Darboux B κ)
+        (μ : @Measure (κ → R) (borel _)) (S : Sys W (SB (κ → R))),
+      GoodChar ψ O u → IsModel ψ d μ S
+        → ∃ (Γ : AddSubgroup W) (al : W → ℂ) (φ : SB (κ → R)),
+          SelfDual S Γ ∧ IsSemi S al Γ ∧ Law S al Γ φ ∧ Cyclic S φ ∧ φ ≠ 0 := by
   intro R _ _ _ _ _ _ ψ O u W _ _ B κ _ d μ S h hM
   classical
   obtain ⟨hrho, -, hc⟩ := hM
@@ -173,12 +201,21 @@ theorem exists_std : ∀ {R : Type} [CommRing R] [TopologicalSpace R] [IsTopolog
     simp only [inv_one, Units.val_one, one_mul]
   have hsq : ∀ z : R, ψ (⅟2 * z) ^ 2 = ψ z := by
     intro z
-    rw [← AddChar.map_nsmul_eq_pow, nsmul_eq_mul, Nat.cast_ofNat, ← mul_assoc, mul_invOf_self, one_mul]
+    rw [← AddChar.map_nsmul_eq_pow, nsmul_eq_mul, Nat.cast_ofNat, ← mul_assoc, mul_invOf_self,
+      one_mul]
   have hB1 : ∀ γ x, S.c γ x ^ 2 = ψ ((d.e γ).1 ⬝ᵥ (d.e x).2 - (d.e x).1 ⬝ᵥ (d.e γ).2) := by
     intro γ x
     rw [hc, hsq, d.form]
-  refine ⟨Γ, fun x => ψ (-(⅟2 * ((d.e x).1 ⬝ᵥ (d.e x).2))),
-    ⟨ind O κ, ind_mem_SB h.compact h.isOpen⟩, ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    Γ,
+    fun x => ψ (-(⅟2 * ((d.e x).1 ⬝ᵥ (d.e x).2))),
+    ⟨ind O κ, ind_mem_SB h.compact h.isOpen⟩,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro x
     constructor
     · intro hx γ hγ
@@ -217,7 +254,8 @@ theorem exists_std : ∀ {R : Type} [CommRing R] [TopologicalSpace R] [IsTopolog
         exact h3
   · refine ⟨fun x hx => ?_, fun x hx y hy => ?_⟩
     · obtain ⟨hxa, hxb⟩ := (hΓ x).1 hx
-      have h2 : ψ (-(⅟2 * ((d.e x).1 ⬝ᵥ (d.e x).2))) * ψ (-(⅟2 * ((d.e x).1 ⬝ᵥ (d.e x).2))) = 1 := by
+      have h2
+          : ψ (-(⅟2 * ((d.e x).1 ⬝ᵥ (d.e x).2))) * ψ (-(⅟2 * ((d.e x).1 ⬝ᵥ (d.e x).2))) = 1 := by
         rw [← pow_two, ← mul_neg, hsq, AddChar.map_neg_eq_inv, psi_dot h hxa hxb, inv_one]
       exact mul_self_eq_one_iff.1 h2
     · obtain ⟨hxa, hxb⟩ := (hΓ x).1 hx
@@ -226,34 +264,37 @@ theorem exists_std : ∀ {R : Type} [CommRing R] [TopologicalSpace R] [IsTopolog
         ψ (-(⅟2 * ((d.e x).1 ⬝ᵥ (d.e x).2))) * ψ (-(⅟2 * ((d.e y).1 ⬝ᵥ (d.e y).2))) * S.c x y
       have h0 : ψ (-(2 * ⅟2 * ((d.e x).1 ⬝ᵥ (d.e y).2))) = 1 := by
         rw [mul_invOf_self, one_mul, AddChar.map_neg_eq_inv, psi_dot h hxa hyb, inv_one]
-      have hX : -(⅟2 * ((d.e x + d.e y).1 ⬝ᵥ (d.e x + d.e y).2)) =
-          (-(⅟2 * ((d.e x).1 ⬝ᵥ (d.e x).2)) + -(⅟2 * ((d.e y).1 ⬝ᵥ (d.e y).2)) +
-            ⅟2 * ((d.e x).1 ⬝ᵥ (d.e y).2 - (d.e y).1 ⬝ᵥ (d.e x).2)) +
-          -(2 * ⅟2 * ((d.e x).1 ⬝ᵥ (d.e y).2)) := by
+      have hX
+          : -(⅟2 * ((d.e x + d.e y).1 ⬝ᵥ (d.e x + d.e y).2))
+            = (-(⅟2 * ((d.e x).1 ⬝ᵥ (d.e x).2)) + -(⅟2 * ((d.e y).1 ⬝ᵥ (d.e y).2))
+                + ⅟2 * ((d.e x).1 ⬝ᵥ (d.e y).2 - (d.e y).1 ⬝ᵥ (d.e x).2))
+              + -(2 * ⅟2 * ((d.e x).1 ⬝ᵥ (d.e y).2)) := by
         simp only [Prod.fst_add, Prod.snd_add, add_dotProduct, dotProduct_add]
         ring
-      rw [hc, d.form, map_add (f := _), hX, AddChar.map_add_eq_mul, h0, mul_one, AddChar.map_add_eq_mul,
-        AddChar.map_add_eq_mul]
+      rw [hc, d.form, map_add (f := _), hX, AddChar.map_add_eq_mul, h0, mul_one,
+        AddChar.map_add_eq_mul, AddChar.map_add_eq_mul]
   · intro γ hγ
     obtain ⟨ha, hb⟩ := (hΓ γ).1 hγ
     apply Subtype.ext
     rw [hrho, Submodule.coe_smul]
     funext x
-    simp only [GlobalTheory.WeilM.Darboux.rho, schr, Pi.smul_apply, smul_eq_mul, ind, Set.indicator_apply,
-      Set.mem_setOf_eq, AddChar.map_neg_eq_inv, inv_inv]
+    simp only [GlobalTheory.WeilM.Darboux.rho, schr, Pi.smul_apply, smul_eq_mul, ind,
+      Set.indicator_apply, Set.mem_setOf_eq, AddChar.map_neg_eq_inv, inv_inv]
     by_cases hx : ∀ i, x i ∈ O
     · have hxa : ∀ i, (x + (d.e γ).1) i ∈ O := fun i => O.add_mem (hx i) (ha i)
       rw [if_pos hxa, if_pos hx, AddChar.map_add_eq_mul, psi_dot h hx hb, one_mul]
-    · have hxa : ¬ ∀ i, (x + (d.e γ).1) i ∈ O := fun h' => hx fun i => by
-        simpa using O.sub_mem (h' i) (ha i)
+    · have hxa : ¬ ∀ i, (x + (d.e γ).1) i ∈ O := fun h' =>
+        hx fun i => by simpa using O.sub_mem (h' i) (ha i)
       rw [if_neg hxa, if_neg hx, mul_zero, mul_zero]
   · show Submodule.span ℂ (Set.range fun x => S.rho x ⟨ind O κ, ind_mem_SB h.compact h.isOpen⟩) = ⊤
     rw [eq_top_iff]
     rintro g -
     have hg := mem_span_schr h g.2
-    have hmap : Submodule.span ℂ (Set.range fun w => schr ψ w (ind O κ)) =
-        (Submodule.span ℂ (Set.range fun x => S.rho x ⟨ind O κ, ind_mem_SB h.compact h.isOpen⟩)).map
-          (GlobalTheory.WeilM.SB (κ → R)).subtype := by
+    have hmap
+        : Submodule.span ℂ (Set.range fun w => schr ψ w (ind O κ))
+          = (Submodule.span ℂ
+              (Set.range fun x => S.rho x ⟨ind O κ, ind_mem_SB h.compact h.isOpen⟩)).map
+            (GlobalTheory.WeilM.SB (κ → R)).subtype := by
       rw [Submodule.map_span, ← Set.range_comp]
       congr 1
       ext f

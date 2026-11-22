@@ -26,25 +26,33 @@ theorem blk_eq_two_iff {l : Fin (N + 2)} : blk N l = 2 ↔ l = Fin.last (N + 1) 
   · simp [mid_ne_last]
   · simp
 
-theorem levi_mul_apply_zero {x : GU σ (N + 2)} (hx : x ∈ leviU σ (blk N)) (M : Matrix (Fin (N + 2)) (Fin (N + 2)) L)
-    (j : Fin (N + 2)) : (mat x * M) 0 j = mat x 0 0 * M 0 j := by
+theorem levi_mul_apply_zero
+    {x : GU σ (N + 2)} (hx : x ∈ leviU σ (blk N))
+    (M : Matrix (Fin (N + 2)) (Fin (N + 2)) L) (j : Fin (N + 2))
+    : (mat x * M) 0 j = mat x 0 0 * M 0 j := by
   rw [Matrix.mul_apply, Finset.sum_eq_single 0]
   · intro l _ hl
     rw [hx 0 l (by rw [blk_zero]; exact fun h => hl (blk_eq_zero_iff.1 h.symm)), zero_mul]
   · simp
 
-theorem levi_mul_apply_last {x : GU σ (N + 2)} (hx : x ∈ leviU σ (blk N)) (M : Matrix (Fin (N + 2)) (Fin (N + 2)) L)
-    (j : Fin (N + 2)) : (mat x * M) (Fin.last (N + 1)) j = mat x (Fin.last (N + 1)) (Fin.last (N + 1)) * M (Fin.last (N + 1)) j := by
+theorem levi_mul_apply_last
+    {x : GU σ (N + 2)} (hx : x ∈ leviU σ (blk N))
+    (M : Matrix (Fin (N + 2)) (Fin (N + 2)) L) (j : Fin (N + 2))
+    : (mat x * M) (Fin.last (N + 1)) j
+      = mat x (Fin.last (N + 1)) (Fin.last (N + 1)) * M (Fin.last (N + 1)) j := by
   rw [Matrix.mul_apply, Finset.sum_eq_single (Fin.last (N + 1))]
   · intro l _ hl
     rw [hx _ l (by rw [blk_last]; exact fun h => hl (blk_eq_two_iff.1 h.symm)), zero_mul]
   · simp
 
-theorem levi_mul_apply_mid {x : GU σ (N + 2)} (hx : x ∈ leviU σ (blk N)) (M : Matrix (Fin (N + 2)) (Fin (N + 2)) L)
-    (i j : Fin (N + 2)) (k : Fin N) (hi : i = mid k) :
-    (mat x * M) i j = ∑ l, mat x i (mid l) * M (mid l) j := by
+theorem levi_mul_apply_mid
+    {x : GU σ (N + 2)} (hx : x ∈ leviU σ (blk N))
+    (M : Matrix (Fin (N + 2)) (Fin (N + 2)) L)
+    (i j : Fin (N + 2)) (k : Fin N) (hi : i = mid k)
+    : (mat x * M) i j = ∑ l, mat x i (mid l) * M (mid l) j := by
   subst hi
-  rw [Matrix.mul_apply, sum_idx (fun l => mat x (mid k) l * M l j), hx (mid k) 0 (by simp), hx (mid k) _ (by simp)]
+  rw [Matrix.mul_apply, sum_idx (fun l => mat x (mid k) l * M l j), hx (mid k) 0 (by simp),
+    hx (mid k) _ (by simp)]
   simp
 
 end
@@ -60,8 +68,7 @@ theorem cosetInj : CosetInj := by
   have hnL : n ∈ leviU σ (blk N) := mul_mem (inv_mem hm.1) hm'.1
   have hconj : n⁻¹ * u⁻¹ * n⁻¹⁻¹ ∈ radQ σ N :=
     (leviRad L σ (N + 2) (blk N) hσ n⁻¹ (inv_mem hnL) u⁻¹ (inv_mem hu)).1
-  have he : (m * u)⁻¹ * (m' * u') = n * ((n⁻¹ * u⁻¹ * n⁻¹⁻¹) * u') := by
-    rw [hn_def]; group
+  have he : (m * u)⁻¹ * (m' * u') = n * ((n⁻¹ * u⁻¹ * n⁻¹⁻¹) * u') := by rw [hn_def]; group
   have hnK : n ∈ KU σ (N + 2) :=
     (leviRad L σ (N + 2) (blk N) hσ n hnL _ (mul_mem hconj hu')).2 (he ▸ hK)
   have hint : ∀ i j, mat n i j ∈ intL L := (mem_KU_iff hσ n).1 hnK
@@ -72,8 +79,7 @@ theorem cosetInj : CosetInj := by
     rw [← hm.2.2.1, ← hm'.2.2.1, ← hmn, levi_mul_apply_last hm.1]
   have hv0 := hint 0 0
   have hvl := hint (Fin.last (N + 1)) (Fin.last (N + 1))
-  have e0 : mat n 0 0 = ϖ ^ (a' - a) := by
-    rw [zpow_sub₀ hϖ0, ← h0]; field_simp
+  have e0 : mat n 0 0 = ϖ ^ (a' - a) := by rw [zpow_sub₀ hϖ0, ← h0]; field_simp
   have el : mat n (Fin.last (N + 1)) (Fin.last (N + 1)) = ϖ ^ (a - a') := by
     rw [show a - a' = -a' - -a by ring, zpow_sub₀ hϖ0, ← hl]; field_simp
   change Valued.v (mat n 0 0) ≤ 1 at hv0

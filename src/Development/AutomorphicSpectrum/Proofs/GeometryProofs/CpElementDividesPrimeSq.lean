@@ -7,13 +7,17 @@ public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.Bir
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry NumberField MvPolynomial GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.HT ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.NumbersDVR.Bundles
+open CategoryTheory AlgebraicGeometry NumberField MvPolynomial GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.HT ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.NumbersDVR.Bundles
 
 namespace GlobalTheory.CompanionTheory.Ar.HT.KappaDvd
 
-theorem kappa_dvd_sq : ∀ (A Ω : Type) [CommRing A] [IsDomain A] [Field Ω] [Algebra A Ω] [IsFractionRing A Ω]
-    [IsIntegrallyClosed A] [CharZero Ω] (p : ℕ) [Fact p.Prime] (κ : A),
-    IsCp p (algebraMap A Ω κ) → κ ∣ (p : A) ^ 2 := by
+theorem kappa_dvd_sq
+    : ∀ (A Ω : Type) [CommRing A] [IsDomain A] [Field Ω] [Algebra A Ω] [IsFractionRing A Ω]
+        [IsIntegrallyClosed A] [CharZero Ω] (p : ℕ) [Fact p.Prime] (κ : A),
+      IsCp p (algebraMap A Ω κ) → κ ∣ (p : A) ^ 2 := by
   intro A Ω _ _ _ _ _ _ _ p hp κ h
   have hinj : Function.Injective (algebraMap A Ω) := IsFractionRing.injective A Ω
   unfold IsCp at h

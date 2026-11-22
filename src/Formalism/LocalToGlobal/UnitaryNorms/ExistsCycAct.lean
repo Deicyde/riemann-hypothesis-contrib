@@ -14,35 +14,43 @@ namespace Formalism.L2.Host
 
 open Formalism.BasicNotions Formalism.FrobeniusOrbits
 
-theorem range_cyc (M : ℕ) [NeZero M] (κ : CyclotomicField M ℚ →ₐ[ℚ] Qb) : κ.fieldRange = cycQ M := by
-  have hz : IsPrimitiveRoot (κ (Cond.z M)) M := (Cond.z_spec M).map_of_injective κ.toRingHom.injective
+theorem range_cyc (M : ℕ) [NeZero M] (κ : CyclotomicField M ℚ →ₐ[ℚ] Qb)
+    : κ.fieldRange = cycQ M := by
+  have hz : IsPrimitiveRoot (κ (Cond.z M)) M :=
+    (Cond.z_spec M).map_of_injective κ.toRingHom.injective
   rw [AlgHom.fieldRange_eq_map, ← Cond.top_adjoin M, adjoin_map, Set.image_singleton, cycQ_eq hz]
 
-theorem exists_cyc_act (N : ℕ) [NeZero N] (u : (ZMod N)ˣ) :
-    ∃ s : Qb ≃ₐ[ℚ] Qb, ∀ z ∈ mus N, s z = z ^ (u : ZMod N).val := by
+theorem exists_cyc_act (N : ℕ) [NeZero N] (u : (ZMod N)ˣ)
+    : ∃ s : Qb ≃ₐ[ℚ] Qb, ∀ z ∈ mus N, s z = z ^ (u : ZMod N).val := by
   have hco : (u : ZMod N).val.Coprime N := ZMod.val_coe_unit_coprime u
   obtain ⟨σ, hσ⟩ := Cond.aut N (u : ZMod N).val hco
   let κ : CyclotomicField N ℚ →ₐ[ℚ] Qb := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   let _ : Algebra (CyclotomicField N ℚ) Qb := κ.toRingHom.toAlgebra
-  have : IsScalarTower ℚ (CyclotomicField N ℚ) Qb := IsScalarTower.of_algebraMap_eq fun x => (κ.commutes x).symm
-  have : IsGalois ℚ (CyclotomicField N ℚ) := IsCyclotomicExtension.isGalois {N} ℚ (CyclotomicField N ℚ)
+  have : IsScalarTower ℚ (CyclotomicField N ℚ) Qb :=
+    IsScalarTower.of_algebraMap_eq fun x => (κ.commutes x).symm
+  have : IsGalois ℚ (CyclotomicField N ℚ) :=
+    IsCyclotomicExtension.isGalois {N} ℚ (CyclotomicField N ℚ)
   have : IsAlgClosure ℚ Qb := ⟨inferInstance, AlgebraicClosure.isAlgebraic ℚ⟩
   have : Normal ℚ Qb := IsAlgClosure.normal ℚ Qb
   refine ⟨σ.liftNormal Qb, fun z hz => ?_⟩
   have hzr : z ∈ κ.fieldRange := by rw [range_cyc N κ]; exact subset_adjoin ℚ _ hz
   obtain ⟨w, rfl⟩ := hzr
-  have hw : w ^ N = 1 := κ.toRingHom.injective (by
-    show κ (w ^ N) = κ 1
-    rw [map_pow, map_one]; exact hz)
+  have hw : w ^ N = 1 :=
+    κ.toRingHom.injective (by
+      show κ (w ^ N) = κ 1
+      rw [map_pow, map_one]
+      exact hz)
   have h := AlgEquiv.liftNormal_commutes σ Qb w
-  calc σ.liftNormal Qb (κ w) = κ (σ w) := h
+  calc
+    σ.liftNormal Qb (κ w)
+      = κ (σ w) := h
     _ = κ w ^ (u : ZMod N).val := by rw [hσ w hw, map_pow]
 
-theorem condEQ_of {φ : Formalism.HC.Frame} (H : Formalism.HC.HostAx φ) (hP : H.PsQ) (hE : H.Exact) : H.CondEQ := by
+theorem condEQ_of {φ : Formalism.HC.Frame} (H : Formalism.HC.HostAx φ) (hP : H.PsQ) (hE : H.Exact)
+    : H.CondEQ := by
   refine ⟨H.EQ_le_cycQ, fun M hM hle => ?_⟩
   by_contra hnd
   have hN := H.condN_ne_zero
@@ -67,12 +75,14 @@ theorem condEQ_of {φ : Formalism.HC.Frame} (H : Formalism.HC.HostAx φ) (hP : H
       (hw.of_dvd (dvd_mul_right _ _)).trans hk1, ← pow_eq_pow_mod _ (show z ^ H.condN = 1 from hz)]
   have hs2 : ∀ z ∈ mus M, s z = z := fun z hz => by
     rw [hs z (mus_mono (dvd_mul_left _ _) hz), pow_eq_pow_mod _ (show z ^ M = 1 from hz),
-      (hw.of_dvd (dvd_mul_left _ _)).trans hk2, ← pow_eq_pow_mod _ (show z ^ M = 1 from hz), pow_one]
+      (hw.of_dvd (dvd_mul_left _ _)).trans hk2, ← pow_eq_pow_mod _ (show z ^ M = 1 from hz),
+      pow_one]
   have hs3 : cycQ M ≤ fixedField (Subgroup.zpowers s) := by
     rw [cycQ, adjoin_le_iff]
     intro z hz
     refine (mem_fixedField_iff _ _).2 fun t ht => ?_
-    exact (Subgroup.zpowers_le.2 (show s ∈ MulAction.stabilizer (Qb ≃ₐ[ℚ] Qb) z from hs2 z hz) ht : _)
+    exact (Subgroup.zpowers_le.2 (show s ∈ MulAction.stabilizer (Qb ≃ₐ[ℚ] Qb) z from hs2 z hz) ht
+      : _)
   obtain ⟨j⟩ := H.nonempty_emb
   apply hne
   rw [← H.gal.symm.map_eq_one_iff]

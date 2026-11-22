@@ -12,25 +12,29 @@ noncomputable section
 open Matrix Finset
 open scoped InnerProductSpace
 
-open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD GlobalTheory.CompanionTheory.RealCount GlobalTheory.CompanionTheory.RealCountG GlobalTheory.CompanionTheory.RealCount.InjHw
+open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD
+  GlobalTheory.CompanionTheory.RealCount GlobalTheory.CompanionTheory.RealCountG
+  GlobalTheory.CompanionTheory.RealCount.InjHw
 
 namespace GlobalTheory.CompanionTheory.RealCountG.WtInt
 
 variable {n : ℕ}
 
-theorem expU_add (X : Matrix (Fin n) (Fin n) ℂ) (hX : Xᴴ = -X) (s t : ℝ) :
-    expU X hX (s + t) = expU X hX s * expU X hX t := by
+theorem expU_add (X : Matrix (Fin n) (Fin n) ℂ) (hX : Xᴴ = -X) (s t : ℝ)
+    : expU X hX (s + t) = expU X hX s * expU X hX t := by
   apply Subtype.ext
   show NormedSpace.exp (((s + t : ℝ) : ℂ) • X) = NormedSpace.exp ((s : ℂ) • X) * NormedSpace.exp ((t : ℂ) • X)
   rw [Complex.ofReal_add, add_smul, Matrix.exp_add_of_commute]
   exact ((Commute.refl X).smul_left _).smul_right _
 
-theorem expU_two_pi (a : Fin n) (hX : (Matrix.single a a Complex.I)ᴴ = -(Matrix.single a a Complex.I)) :
-    expU (Matrix.single a a Complex.I) hX (2 * Real.pi) = 1 := by
+theorem expU_two_pi
+    (a : Fin n) (hX : (Matrix.single a a Complex.I)ᴴ = -(Matrix.single a a Complex.I))
+    : expU (Matrix.single a a Complex.I) hX (2 * Real.pi) = 1 := by
   apply Subtype.ext
   show NormedSpace.exp (((2 * Real.pi : ℝ) : ℂ) • (Matrix.single a a Complex.I : Matrix (Fin n) (Fin n) ℂ)) = 1
-  have e : (((2 * Real.pi : ℝ) : ℂ)) • (Matrix.single a a Complex.I : Matrix (Fin n) (Fin n) ℂ) =
-      diagonal (fun c => if c = a then ((2 * Real.pi : ℝ) : ℂ) * Complex.I else 0) := by
+  have e
+      : (((2 * Real.pi : ℝ) : ℂ)) • (Matrix.single a a Complex.I : Matrix (Fin n) (Fin n) ℂ)
+        = diagonal (fun c => if c = a then ((2 * Real.pi : ℝ) : ℂ) * Complex.I else 0) := by
     ext i j
     by_cases hij : i = j
     · subst hij
@@ -43,8 +47,9 @@ theorem expU_two_pi (a : Fin n) (hX : (Matrix.single a a Complex.I)ᴴ = -(Matri
   rw [e, Matrix.exp_diagonal, ← Matrix.diagonal_one]
   congr 1
   funext c
-  have hh : NormedSpace.exp (fun c => if c = a then ((2 * Real.pi : ℝ) : ℂ) * Complex.I else 0) c =
-      if c = a then Complex.exp (((2 * Real.pi : ℝ) : ℂ) * Complex.I) else 1 := by
+  have hh
+      : NormedSpace.exp (fun c => if c = a then ((2 * Real.pi : ℝ) : ℂ) * Complex.I else 0) c
+        = if c = a then Complex.exp (((2 * Real.pi : ℝ) : ℂ) * Complex.I) else 1 := by
     split_ifs with hc <;> simp [hc, Complex.exp_eq_exp_ℂ]
   rw [hh]
   have h2 : Complex.exp (((2 * Real.pi : ℝ) : ℂ) * Complex.I) = 1 := by
@@ -53,12 +58,15 @@ theorem expU_two_pi (a : Fin n) (hX : (Matrix.single a a Complex.I)ᴴ = -(Matri
   rw [h2]
   simp
 
-theorem eigen_int (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+theorem eigen_int
+    (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
     (ρ : Matrix.unitaryGroup (Fin n) ℂ →* (H →L[ℂ] H)) (G : Fin n → Fin n → Module.End ℂ H)
-    (hd : ∀ (X : Matrix (Fin n) (Fin n) ℂ) (γ : ℝ → Matrix.unitaryGroup (Fin n) ℂ), Xᴴ = -X →
-      (∀ t : ℝ, (γ t).1 = NormedSpace.exp ((t : ℂ) • X)) → ∀ w : H,
-      HasDerivAt (fun t : ℝ => ρ (γ t) w) (∑ a, ∑ b, X a b • G a b w) 0)
-    (a : Fin n) (r : ℝ) {v : H} (hv : v ≠ 0) (hr : G a a v = (r : ℂ) • v) : ∃ m : ℤ, r = m := by
+    (hd : ∀ (X : Matrix (Fin n) (Fin n) ℂ) (γ : ℝ → Matrix.unitaryGroup (Fin n) ℂ),
+      Xᴴ = -X → (∀ t : ℝ, (γ t).1 = NormedSpace.exp ((t : ℂ) • X))
+        → ∀ w : H, HasDerivAt (fun t : ℝ => ρ (γ t) w) (∑ a, ∑ b, X a b • G a b w) 0)
+    (a : Fin n) (r : ℝ)
+    {v : H} (hv : v ≠ 0) (hr : G a a v = (r : ℂ) • v)
+    : ∃ m : ℤ, r = m := by
   have hX : (Matrix.single a a Complex.I)ᴴ = -(Matrix.single a a Complex.I) := by
     rw [single_conjT, Complex.star_def, Complex.conj_I, single_negI]
   set X : Matrix (Fin n) (Fin n) ℂ := Matrix.single a a Complex.I with hXdef
@@ -75,8 +83,7 @@ theorem eigen_int (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
     have hL : ∀ y, L y = ρ (expU X hX s) y := fun _ => rfl
     have h1 : HasDerivAt (fun t => L (φ t)) (L ((Complex.I * r) • v)) 0 :=
       L.hasFDerivAt.comp_hasDerivAt 0 hd0
-    have h2 : HasDerivAt (fun t => L (φ t)) (L ((Complex.I * r) • v)) (s - s) := by
-      rwa [sub_self]
+    have h2 : HasDerivAt (fun t => L (φ t)) (L ((Complex.I * r) • v)) (s - s) := by rwa [sub_self]
     have h3 := h2.comp_sub_const s s
     have e : (fun t => L (φ (t - s))) = φ := by
       funext t
@@ -86,8 +93,7 @@ theorem eigen_int (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
         ring
       simp only [hL, hφ, this, map_mul, ContinuousLinearMap.mul_apply]
     rw [e] at h3
-    have e2 : L ((Complex.I * r) • v) = (Complex.I * r) • φ s := by
-      rw [hL, map_smul]
+    have e2 : L ((Complex.I * r) • v) = (Complex.I * r) • φ s := by rw [hL, map_smul]
     rwa [e2] at h3
   set ψ : ℝ → H := fun s => Complex.exp ((s : ℂ) * (-(Complex.I * r))) • φ s with hψ
   have hψd : ∀ s, HasDerivAt ψ 0 s := by
@@ -96,8 +102,9 @@ theorem eigen_int (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
       simpa using (Complex.ofRealCLM.hasDerivAt (x := s)).mul_const (-(Complex.I * (r : ℂ)))
     have h2 := h1.cexp
     have h3 := h2.smul (hstep s)
-    have : Complex.exp ((s : ℂ) * (-(Complex.I * r))) • (Complex.I * r) • φ s +
-        (Complex.exp ((s : ℂ) * (-(Complex.I * r))) * -(Complex.I * r)) • φ s = 0 := by
+    have : Complex.exp ((s : ℂ) * (-(Complex.I * r))) • (Complex.I * r) • φ s
+          + (Complex.exp ((s : ℂ) * (-(Complex.I * r))) * -(Complex.I * r)) • φ s
+        = 0 := by
       rw [smul_smul, ← add_smul]
       simp
     rw [this] at h3
@@ -131,15 +138,20 @@ theorem eigen_int (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   have hpi : (Real.pi : ℂ) ≠ 0 := by exact_mod_cast Real.pi_ne_zero
   have h5 : (r : ℂ) = ((-m : ℤ) : ℂ) := by
     push_cast at hm ⊢
-    have h6 : (2 * (Real.pi : ℂ) * Complex.I) * ((r : ℂ) + m) = 0 := by
-      linear_combination -hm
-    have h7 : (2 * (Real.pi : ℂ) * Complex.I) ≠ 0 := by
-      simp [hpi, Complex.I_ne_zero]
+    have h6 : (2 * (Real.pi : ℂ) * Complex.I) * ((r : ℂ) + m) = 0 := by linear_combination -hm
+    have h7 : (2 * (Real.pi : ℂ) * Complex.I) ≠ 0 := by simp [hpi, Complex.I_ne_zero]
     have := (mul_eq_zero.1 h6).resolve_left h7
     linear_combination this
   exact_mod_cast h5
 
-theorem weight_integral : ∀ {n : ℕ} (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [FiniteDimensional ℂ H] (ρ : Matrix.unitaryGroup (Fin n) ℂ →* (H →L[ℂ] H)) (G : Fin n → Fin n → Module.End ℂ H), (∀ (X : Matrix (Fin n) (Fin n) ℂ) (γ : ℝ → Matrix.unitaryGroup (Fin n) ℂ), Xᴴ = -X → (∀ t : ℝ, (γ t).1 = NormedSpace.exp ((t : ℂ) • X)) → ∀ w : H, HasDerivAt (fun t : ℝ => ρ (γ t) w) (∑ a, ∑ b, X a b • G a b w) 0) → ∀ (μ : Fin n → ℝ) (v : H), v ≠ 0 → Formalism.REAL.IsWeight G μ v → ∃ ν : Fin n → ℤ, μ = wtR ν := by
+theorem weight_integral
+    : ∀ {n : ℕ} (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [FiniteDimensional ℂ H]
+        (ρ : Matrix.unitaryGroup (Fin n) ℂ →* (H →L[ℂ] H)) (G : Fin n → Fin n → Module.End ℂ H),
+      (∀ (X : Matrix (Fin n) (Fin n) ℂ) (γ : ℝ → Matrix.unitaryGroup (Fin n) ℂ),
+          Xᴴ = -X → (∀ t : ℝ, (γ t).1 = NormedSpace.exp ((t : ℂ) • X))
+            → ∀ w : H, HasDerivAt (fun t : ℝ => ρ (γ t) w) (∑ a, ∑ b, X a b • G a b w) 0)
+        → ∀ (μ : Fin n → ℝ) (v : H),
+          v ≠ 0 → Formalism.REAL.IsWeight G μ v → ∃ ν : Fin n → ℤ, μ = wtR ν := by
   intro n H _ _ _ ρ G hd μ v hv hw
   choose ν hν using fun a => eigen_int H ρ G hd a (μ a) hv (hw a)
   exact ⟨ν, funext hν⟩

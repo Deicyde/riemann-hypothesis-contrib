@@ -12,7 +12,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
 open scoped ENNReal
 
 noncomputable section
@@ -21,31 +22,33 @@ namespace SeparatedSmallCount
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω]
 
-
 omit [Fintype K] in
-theorem isMultiHomog_sub {f g : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g a) :
-    IsMultiHomog (f - g) a := by
+theorem isMultiHomog_sub {f g : MRing ι} {a : K → ℕ} (hf : IsMultiHomog f a) (hg : IsMultiHomog g a)
+    : IsMultiHomog (f - g) a := by
   classical
   intro m hm k
   rcases Finset.mem_union.mp (MvPolynomial.support_sub _ f g hm) with h | h
   · exact hf m h k
   · exact hg m h k
 
-theorem eval_cross {y : (Σ k, ι k) → Ω} {a : K → ℤ} {τ : ℕ} {s : Ω} {dg dh dg' dh' : K → ℕ}
-    {g h g' h' : MRing ι} (hg : IsMultiHomog g dg) (hh : IsMultiHomog h dh)
-    (hg' : IsMultiHomog g' dg') (hh' : IsMultiHomog h' dh')
-    (hd : ∀ k, (dg k : ℤ) = dh k + τ * a k) (hd' : ∀ k, (dg' k : ℤ) = dh' k + τ * a k)
-    (he : aeval y g = s * aeval y h) (he' : aeval y g' = s * aeval y h')
-    {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts (mCoordIdeal y)) :
-    eval z (map (Int.castRingHom ℂ) g) * eval z (map (Int.castRingHom ℂ) h') =
-      eval z (map (Int.castRingHom ℂ) g') * eval z (map (Int.castRingHom ℂ) h) := by
-  have hdeg : dg' + dh = dg + dh' := funext fun k => by
-    have e1 := hd k
-    have e2 := hd' k
-    have : ((dg' k + dh k : ℕ) : ℤ) = ((dg k + dh' k : ℕ) : ℤ) := by push_cast; linarith
-    simpa only [Pi.add_apply] using (Nat.cast_inj.mp this)
+theorem eval_cross
+    {y : (Σ k, ι k) → Ω} {a : K → ℤ} {τ : ℕ} {s : Ω} {dg dh dg' dh' : K → ℕ} {g h g' h' : MRing ι}
+    (hg : IsMultiHomog g dg) (hh : IsMultiHomog h dh) (hg' : IsMultiHomog g' dg')
+    (hh' : IsMultiHomog h' dh') (hd : ∀ k, (dg k : ℤ) = dh k + τ * a k)
+    (hd' : ∀ k, (dg' k : ℤ) = dh' k + τ * a k) (he : aeval y g = s * aeval y h)
+    (he' : aeval y g' = s * aeval y h')
+    {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts (mCoordIdeal y))
+    : eval z (map (Int.castRingHom ℂ) g) * eval z (map (Int.castRingHom ℂ) h')
+      = eval z (map (Int.castRingHom ℂ) g') * eval z (map (Int.castRingHom ℂ) h) := by
+  have hdeg : dg' + dh = dg + dh' :=
+    funext fun k => by
+      have e1 := hd k
+      have e2 := hd' k
+      have : ((dg' k + dh k : ℕ) : ℤ) = ((dg k + dh' k : ℕ) : ℤ) := by push_cast; linarith
+      simpa only [Pi.add_apply] using (Nat.cast_inj.mp this)
   have hm : IsMultiHomog (g * h' - g' * h) (dg + dh') :=
-    isMultiHomog_sub (LocalRep.isMultiHomog_mul hg hh') (by rw [← hdeg]; exact LocalRep.isMultiHomog_mul hg' hh)
+    isMultiHomog_sub (LocalRep.isMultiHomog_mul hg hh')
+      (by rw [← hdeg]; exact LocalRep.isMultiHomog_mul hg' hh)
   have h0 : aeval y (g * h' - g' * h) = 0 := by
     rw [map_sub, map_mul, map_mul, he, he']
     ring
@@ -56,53 +59,69 @@ theorem eval_cross {y : (Σ k, ι k) → Ω} {a : K → ℤ} {τ : ℕ} {s : Ω}
   rw [map_sub, map_sub, map_mul, map_mul, map_mul, map_mul, sub_eq_zero] at this
   exact this
 
-def IsSectionValue (y : (Σ k, ι k) → Ω) (a : K → ℤ) (τ : ℕ) (s : Ω) (z : (Σ k, ι k) → ℂ) (v : ℂ) : Prop :=
-  ∃ (dg dh : K → ℕ) (g h : MRing ι), IsMultiHomog g dg ∧ IsMultiHomog h dh ∧
-    (∀ k, (dg k : ℤ) = dh k + τ * a k) ∧ aeval y g = s * aeval y h ∧
-    eval z (map (Int.castRingHom ℂ) h) ≠ 0 ∧
-    v = eval z (map (Int.castRingHom ℂ) g) / eval z (map (Int.castRingHom ℂ) h)
-
+def IsSectionValue (y : (Σ k, ι k) → Ω) (a : K → ℤ) (τ : ℕ) (s : Ω) (z : (Σ k, ι k) → ℂ) (v : ℂ)
+    : Prop :=
+  ∃ (dg dh : K → ℕ) (g h : MRing ι),
+    IsMultiHomog g dg ∧ IsMultiHomog h dh ∧ (∀ k, (dg k : ℤ) = dh k + τ * a k)
+      ∧ aeval y g = s * aeval y h ∧ eval z (map (Int.castRingHom ℂ) h) ≠ 0
+      ∧ v = eval z (map (Int.castRingHom ℂ) g) / eval z (map (Int.castRingHom ℂ) h)
 
 open Classical in
 def sectionValue (y : (Σ k, ι k) → Ω) (a : K → ℤ) (τ : ℕ) (s : Ω) (z : (Σ k, ι k) → ℂ) : ℂ :=
   if h : ∃ v, IsSectionValue y a τ s z v then h.choose else 0
 
-theorem isSectionValue_unique {y : (Σ k, ι k) → Ω} {a : K → ℤ} {τ : ℕ} {s : Ω} {z : (Σ k, ι k) → ℂ} {v w : ℂ}
-    (hz : z ∈ mcPts (mCoordIdeal y)) (hv : IsSectionValue y a τ s z v) (hw : IsSectionValue y a τ s z w) :
-    v = w := by
+theorem isSectionValue_unique
+    {y : (Σ k, ι k) → Ω} {a : K → ℤ} {τ : ℕ} {s : Ω} {z : (Σ k, ι k) → ℂ} {v w : ℂ}
+    (hz : z ∈ mcPts (mCoordIdeal y)) (hv : IsSectionValue y a τ s z v)
+    (hw : IsSectionValue y a τ s z w)
+    : v = w := by
   obtain ⟨dg, dh, g, h, hg, hh, hd, he, hz0, rfl⟩ := hv
   obtain ⟨dg', dh', g', h', hg', hh', hd', he', hz0', rfl⟩ := hw
   rw [div_eq_div_iff hz0 hz0']
   exact eval_cross hg hh hg' hh' hd hd' he he' hz
 
-theorem sectionValue_eq {y : (Σ k, ι k) → Ω} {a : K → ℤ} {τ : ℕ} {s : Ω} {z : (Σ k, ι k) → ℂ} {v : ℂ}
-    (hz : z ∈ mcPts (mCoordIdeal y)) (hv : IsSectionValue y a τ s z v) : sectionValue y a τ s z = v := by
+theorem sectionValue_eq
+    {y : (Σ k, ι k) → Ω} {a : K → ℤ} {τ : ℕ} {s : Ω} {z : (Σ k, ι k) → ℂ} {v : ℂ}
+    (hz : z ∈ mcPts (mCoordIdeal y)) (hv : IsSectionValue y a τ s z v)
+    : sectionValue y a τ s z = v := by
   have hex : ∃ v, IsSectionValue y a τ s z v := ⟨v, hv⟩
   unfold sectionValue
   rw [dif_pos hex]
   exact isSectionValue_unique hz hex.choose_spec hv
 
-theorem exists_isSectionValue {y : (Σ k, ι k) → Ω} {a : K → ℤ} {τ : ℕ} {s : Ω} {z : (Σ k, ι k) → ℂ}
-    (hs : s ∈ chartLat y a τ) (hz : z ∈ mcPts (mCoordIdeal y)) : ∃ v, IsSectionValue y a τ s z v := by
+theorem exists_isSectionValue
+    {y : (Σ k, ι k) → Ω} {a : K → ℤ} {τ : ℕ} {s : Ω} {z : (Σ k, ι k) → ℂ}
+    (hs : s ∈ chartLat y a τ) (hz : z ∈ mcPts (mCoordIdeal y))
+    : ∃ v, IsSectionValue y a τ s z v := by
   obtain ⟨dg, dh, g, h, hg, hh, hd, he, hz0⟩ := LocalRep.proof K ι Ω y a τ s z hs hz
   exact ⟨_, dg, dh, g, h, hg, hh, hd, he, hz0, rfl⟩
 
-
 omit [Fintype K] in
-theorem isSectionValue_add {y : (Σ k, ι k) → Ω} {a : K → ℤ} {τ : ℕ} {s t : Ω} {z : (Σ k, ι k) → ℂ} {v w : ℂ}
-    (hv : IsSectionValue y a τ s z v) (hw : IsSectionValue y a τ t z w) :
-    IsSectionValue y a τ (s + t) z (v + w) := by
+theorem isSectionValue_add
+    {y : (Σ k, ι k) → Ω} {a : K → ℤ} {τ : ℕ} {s t : Ω} {z : (Σ k, ι k) → ℂ} {v w : ℂ}
+    (hv : IsSectionValue y a τ s z v) (hw : IsSectionValue y a τ t z w)
+    : IsSectionValue y a τ (s + t) z (v + w) := by
   obtain ⟨dg, dh, g, h, hg, hh, hd, he, hz0, rfl⟩ := hv
   obtain ⟨dg', dh', g', h', hg', hh', hd', he', hz0', rfl⟩ := hw
-  have hdeg : dg' + dh = dg + dh' := funext fun k => by
-    have e1 := hd k
-    have e2 := hd' k
-    have : ((dg' k + dh k : ℕ) : ℤ) = ((dg k + dh' k : ℕ) : ℤ) := by push_cast; linarith
-    simpa only [Pi.add_apply] using (Nat.cast_inj.mp this)
-  refine ⟨dg + dh', dh + dh', g * h' + g' * h, h * h',
+  have hdeg : dg' + dh = dg + dh' :=
+    funext fun k => by
+      have e1 := hd k
+      have e2 := hd' k
+      have : ((dg' k + dh k : ℕ) : ℤ) = ((dg k + dh' k : ℕ) : ℤ) := by push_cast; linarith
+      simpa only [Pi.add_apply] using (Nat.cast_inj.mp this)
+  refine ⟨
+    dg + dh',
+    dh + dh',
+    g * h' + g' * h,
+    h * h',
     LocalRep.isMultiHomog_add (LocalRep.isMultiHomog_mul hg hh')
       (by rw [← hdeg]; exact LocalRep.isMultiHomog_mul hg' hh),
-    LocalRep.isMultiHomog_mul hh hh', fun k => ?_, ?_, ?_, ?_⟩
+    LocalRep.isMultiHomog_mul hh hh',
+    fun k => ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · simp only [Pi.add_apply, Nat.cast_add]
     linarith [hd k]
   · rw [map_add (f := _), map_mul, map_mul, map_mul, he, he']
@@ -113,16 +132,19 @@ theorem isSectionValue_add {y : (Σ k, ι k) → Ω} {a : K → ℤ} {τ : ℕ} 
     rw [div_add_div _ _ hz0 hz0']
     ring
 
-theorem sectionValue_add {y : (Σ k, ι k) → Ω} {a : K → ℤ} {τ : ℕ} {s t : Ω} {z : (Σ k, ι k) → ℂ}
-    (hs : s ∈ chartLat y a τ) (ht : t ∈ chartLat y a τ) (hz : z ∈ mcPts (mCoordIdeal y)) :
-    sectionValue y a τ (s + t) z = sectionValue y a τ s z + sectionValue y a τ t z := by
+theorem sectionValue_add
+    {y : (Σ k, ι k) → Ω} {a : K → ℤ} {τ : ℕ} {s t : Ω} {z : (Σ k, ι k) → ℂ}
+    (hs : s ∈ chartLat y a τ) (ht : t ∈ chartLat y a τ) (hz : z ∈ mcPts (mCoordIdeal y))
+    : sectionValue y a τ (s + t) z = sectionValue y a τ s z + sectionValue y a τ t z := by
   obtain ⟨v, hv⟩ := exists_isSectionValue hs hz
   obtain ⟨w, hw⟩ := exists_isSectionValue ht hz
   rw [sectionValue_eq hz hv, sectionValue_eq hz hw, sectionValue_eq hz (isSectionValue_add hv hw)]
 
-theorem norm_sectionValue_le_of_isSmallH {y : (Σ k, ι k) → Ω} {A : HermLine ι} {τ : ℕ} {s : Ω}
-    {z : (Σ k, ι k) → ℂ} (hs : s ∈ chartLat y A.a τ) (hz : z ∈ mcPts (mCoordIdeal y))
-    (hsm : IsSmallH (mCoordIdeal y) y A τ s) : ‖sectionValue y A.a τ s z‖ ≤ A.h z ^ τ := by
+theorem norm_sectionValue_le_of_isSmallH
+    {y : (Σ k, ι k) → Ω} {A : HermLine ι} {τ : ℕ} {s : Ω} {z : (Σ k, ι k) → ℂ}
+    (hs : s ∈ chartLat y A.a τ) (hz : z ∈ mcPts (mCoordIdeal y))
+    (hsm : IsSmallH (mCoordIdeal y) y A τ s)
+    : ‖sectionValue y A.a τ s z‖ ≤ A.h z ^ τ := by
   obtain ⟨v, hv⟩ := exists_isSectionValue hs hz
   rw [sectionValue_eq hz hv]
   obtain ⟨dg, dh, g, h, hg, hh, hd, he, hz0, rfl⟩ := hv
@@ -130,10 +152,10 @@ theorem norm_sectionValue_le_of_isSmallH {y : (Σ k, ι k) → Ω} {A : HermLine
   rw [norm_div, div_le_iff₀ (norm_pos_iff.2 hz0)]
   exact hle.trans_eq (mul_comm _ _)
 
-theorem isBoundedH_of_sectionValue {y : (Σ k, ι k) → Ω} {A : HermLine ι} {τ : ℕ} {s : Ω} {c : ℝ}
-    (hs : s ∈ chartLat y A.a τ)
-    (hc : ∀ z ∈ mcPts (mCoordIdeal y), ‖sectionValue y A.a τ s z‖ ≤ c * A.h z ^ τ) :
-    IsBoundedH (mCoordIdeal y) y A τ c s := by
+theorem isBoundedH_of_sectionValue
+    {y : (Σ k, ι k) → Ω} {A : HermLine ι} {τ : ℕ} {s : Ω} {c : ℝ} (hs : s ∈ chartLat y A.a τ)
+    (hc : ∀ z ∈ mcPts (mCoordIdeal y), ‖sectionValue y A.a τ s z‖ ≤ c * A.h z ^ τ)
+    : IsBoundedH (mCoordIdeal y) y A τ c s := by
   intro dg dh g h z hg hh hd he hz
   by_cases hz0 : eval z (map (Int.castRingHom ℂ) h) = 0
   · obtain ⟨v, dg1, dh1, g1, h1, hg1, hh1, hd1, he1, hz1, -⟩ := exists_isSectionValue hs hz
@@ -149,9 +171,9 @@ theorem isBoundedH_of_sectionValue {y : (Σ k, ι k) → Ω} {A : HermLine ι} {
 
 end SeparatedSmallCount
 
-
 open SeparatedSmallCount in
-theorem SeparatedSmallCount.proof (hfin : SectionLatticeFinite.Statement) : SeparatedSmallCount.Statement := by
+theorem SeparatedSmallCount.proof (hfin : SectionLatticeFinite.Statement)
+    : SeparatedSmallCount.Statement := by
   classical
   intro K _ ι _ Ω _ y D A τ b hV _hB hb hsep
   have hy : ∀ k, ∃ i, y ⟨k, i⟩ ≠ 0 := by
@@ -181,31 +203,36 @@ theorem SeparatedSmallCount.proof (hfin : SectionLatticeFinite.Statement) : Sepa
       rw [sectionValue_add s.2 t.2 z.2, add_div])
   have hψ : ∀ s z, ‖ψ s z‖ = ‖sectionValue y A.a τ (s : Ω) z‖ / A.h z ^ τ := fun s z => by
     simp [ψ, norm_pow, abs_of_pos (hpos z)]
-  have hsmallψ : ∀ s : chartLat y A.a τ, IsSmallH (mCoordIdeal y) y A τ (s : Ω) → ∀ z, ‖ψ s z‖ ≤ 1 := by
+  have hsmallψ
+      : ∀ s : chartLat y A.a τ, IsSmallH (mCoordIdeal y) y A τ (s : Ω) → ∀ z, ‖ψ s z‖ ≤ 1 := by
     intro s hs z
     rw [hψ, div_le_one (pow_pos (hpos z) τ)]
     exact norm_sectionValue_le_of_isSmallH s.2 z.2 hs
 
-  let W : AddSubgroup (chartLat y A.a τ) :=
-    { carrier := {s | Memℓp (ψ s) ∞}
-      zero_mem' := by
-        show Memℓp (ψ 0) ∞
-        rw [map_zero]
-        exact zero_memℓp
-      add_mem' := fun {s t} hs ht => by
-        show Memℓp (ψ (s + t)) ∞
-        rw [map_add (f := _)]
-        exact Memℓp.add hs ht
-      neg_mem' := fun {s} hs => by
-        show Memℓp (ψ (-s)) ∞
-        rw [map_neg]
-        exact Memℓp.neg hs }
+  let W : AddSubgroup (chartLat y A.a τ) := {
+    carrier := {s | Memℓp (ψ s) ∞}
+    zero_mem' := by
+      show Memℓp (ψ 0) ∞
+      rw [map_zero]
+      exact zero_memℓp
+    add_mem' := fun {s t} hs ht => by
+      show Memℓp (ψ (s + t)) ∞
+      rw [map_add (f := _)]
+      exact Memℓp.add hs ht
+    neg_mem' := fun {s} hs => by
+      show Memℓp (ψ (-s)) ∞
+      rw [map_neg]
+      exact Memℓp.neg hs
+  }
   have hmemW : ∀ s : chartLat y A.a τ, IsSmallH (mCoordIdeal y) y A τ (s : Ω) → s ∈ W := fun s hs =>
     memℓp_infty_iff.2 ⟨1, by rintro _ ⟨z, rfl⟩; exact hsmallψ s hs z⟩
   let φ : W →+ lp (fun _ : mcPts (mCoordIdeal y) => ℂ) ∞ :=
-    AddMonoidHom.mk' (fun w => ⟨ψ w, w.2⟩) (fun v w => lp.ext (by
-      show ψ ((v + w : W) : chartLat y A.a τ) = ψ v + ψ w
-      rw [AddSubgroup.coe_add, map_add (f := _)]))
+    AddMonoidHom.mk'
+      (fun w => ⟨ψ w, w.2⟩)
+      (fun v w =>
+        lp.ext (by
+          show ψ ((v + w : W) : chartLat y A.a τ) = ψ v + ψ w
+          rw [AddSubgroup.coe_add, map_add (f := _)]))
   let F : chartLat y A.a τ → lp (fun _ : mcPts (mCoordIdeal y) => ℂ) ∞ := fun s =>
     if h : s ∈ W then φ ⟨s, h⟩ else 0
   have hF : ∀ s (h : s ∈ W), F s = φ ⟨s, h⟩ := fun s h => dif_pos h
@@ -215,14 +242,16 @@ theorem SeparatedSmallCount.proof (hfin : SectionLatticeFinite.Statement) : Sepa
     refine lp.norm_le_of_forall_le zero_le_one fun z => ?_
     rw [hFz s (hmemW s hs)]
     exact hsmallψ s hs z
-  have hdist : ∀ s t : chartLat y A.a τ, IsSmallH (mCoordIdeal y) y A τ (s : Ω) →
-      IsSmallH (mCoordIdeal y) y A τ (t : Ω) → s ≠ t → Real.exp (-b) ≤ ‖F s - F t‖ := by
+  have hdist
+      : ∀ s t : chartLat y A.a τ,
+        IsSmallH (mCoordIdeal y) y A τ (s : Ω) → IsSmallH (mCoordIdeal y) y A τ (t : Ω) → s ≠ t
+          → Real.exp (-b) ≤ ‖F s - F t‖ := by
     intro s t hs ht hst
     by_contra hlt
     rw [not_le] at hlt
     refine hsep ((s - t : chartLat y A.a τ) : Ω) (s - t).2
-      (fun h0 => hst (sub_eq_zero.1 (Subtype.ext h0))) _ hlt
-      (isBoundedH_of_sectionValue (s - t).2 fun z hz => ?_)
+      (fun h0 => hst (sub_eq_zero.1 (Subtype.ext h0)))
+      _ hlt (isBoundedH_of_sectionValue (s - t).2 fun z hz => ?_)
     have h1 : ‖ψ (s - t) ⟨z, hz⟩‖ ≤ ‖F s - F t‖ := by
       have := lp.norm_apply_le_norm (by simp) (F s - F t) ⟨z, hz⟩
       rw [lp.coeFn_sub, Pi.sub_apply, hFz s (hmemW s hs), hFz t (hmemW t ht)] at this
@@ -243,30 +272,34 @@ theorem SeparatedSmallCount.proof (hfin : SectionLatticeFinite.Statement) : Sepa
       have := (Submodule.fg_iff_addSubgroup_fg _).1 h1
       simpa using this
     exact Module.Finite.iff_addGroup_fg.2 ((AddGroup.fg_iff_addSubgroup_fg W).2 h2)
-  have hP := Packing.proof (lp (fun _ : mcPts (mCoordIdeal y) => ℂ) ∞) (LinearMap.range φ.toIntLinearMap)
-    (hS.toFinset.image F) b hb
-    (by
-      intro v hv
-      obtain ⟨s, hs, rfl⟩ := Finset.mem_image.1 hv
-      exact LinearMap.mem_range.2 ⟨⟨s, hmemW s (hS.mem_toFinset.1 hs)⟩, (hF s _).symm⟩)
-    (by
-      intro v hv
-      obtain ⟨s, hs, rfl⟩ := Finset.mem_image.1 hv
-      exact hnormF s (hS.mem_toFinset.1 hs))
-    (by
-      intro v hv w hw hvw
-      obtain ⟨s, hs, rfl⟩ := Finset.mem_image.1 hv
-      obtain ⟨t, ht, rfl⟩ := Finset.mem_image.1 hw
-      exact hdist s t (hS.mem_toFinset.1 hs) (hS.mem_toFinset.1 ht) fun h => hvw (by rw [h]))
+  have hP :=
+    Packing.proof (lp (fun _ : mcPts (mCoordIdeal y) => ℂ) ∞) (LinearMap.range φ.toIntLinearMap)
+      (hS.toFinset.image F) b hb
+      (by
+        intro v hv
+        obtain ⟨s, hs, rfl⟩ := Finset.mem_image.1 hv
+        exact LinearMap.mem_range.2 ⟨⟨s, hmemW s (hS.mem_toFinset.1 hs)⟩, (hF s _).symm⟩)
+      (by
+        intro v hv
+        obtain ⟨s, hs, rfl⟩ := Finset.mem_image.1 hv
+        exact hnormF s (hS.mem_toFinset.1 hs))
+      (by
+        intro v hv w hw hvw
+        obtain ⟨s, hs, rfl⟩ := Finset.mem_image.1 hv
+        obtain ⟨t, ht, rfl⟩ := Finset.mem_image.1 hw
+        exact hdist s t (hS.mem_toFinset.1 hs) (hS.mem_toFinset.1 ht) fun h => hvw (by rw [h]))
   rw [Finset.card_image_of_injOn hinj] at hP
-  have hrank : (Module.finrank ℤ (LinearMap.range φ.toIntLinearMap) : ℝ) ≤
-      Module.finrank ℤ (chartLat y A.a τ) := by
+  have hrank
+      : (Module.finrank ℤ (LinearMap.range φ.toIntLinearMap) : ℝ)
+        ≤ Module.finrank ℤ (chartLat y A.a τ) := by
     have h1 := LinearMap.finrank_range_le φ.toIntLinearMap
     have h2 : Module.finrank ℤ W ≤ Module.finrank ℤ (chartLat y A.a τ) :=
-      LinearMap.finrank_le_finrank_of_injective (f := W.subtype.toIntLinearMap) fun a b h => Subtype.ext h
+      LinearMap.finrank_le_finrank_of_injective (f := W.subtype.toIntLinearMap) fun a b h =>
+        Subtype.ext h
     exact_mod_cast h1.trans h2
   unfold smallSectionCount
-  rw [show Nat.card {s : chartLat y A.a τ // IsSmallH (mCoordIdeal y) y A τ (s : Ω)} = hS.toFinset.card from
+  rw [show Nat.card {s : chartLat y A.a τ // IsSmallH (mCoordIdeal y) y A τ (s : Ω)}
+      = hS.toFinset.card from
     Nat.card_eq_card_finite_toFinset hS]
   exact hP.trans (mul_le_mul_of_nonneg_right hrank hl3)
 

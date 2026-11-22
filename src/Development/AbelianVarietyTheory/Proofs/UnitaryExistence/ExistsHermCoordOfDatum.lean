@@ -17,9 +17,9 @@ variable {E : Type} [Field E] [NumberField E]
 open NumberField Matrix in
 open scoped nonZeroDivisors TensorProduct in
 variable {E : Type} [Field E] [NumberField E] in
-theorem _root_.GlobalTheory.DatumCoord.eq_of_trace_int {c d : E}
-    (h : ∀ a : 𝓞 E, Algebra.trace ℚ E ((a : E) * c) = Algebra.trace ℚ E ((a : E) * d)) :
-    c = d := by
+theorem _root_.GlobalTheory.DatumCoord.eq_of_trace_int
+    {c d : E} (h : ∀ a : 𝓞 E, Algebra.trace ℚ E ((a : E) * c) = Algebra.trace ℚ E ((a : E) * d))
+    : c = d := by
   by_contra hcd
   have hne : c - d ≠ 0 := sub_ne_zero.2 hcd
   have halg : IsAlgebraic ℤ (c - d)⁻¹ :=
@@ -29,7 +29,8 @@ theorem _root_.GlobalTheory.DatumCoord.eq_of_trace_int {c d : E}
   rw [← sub_eq_zero, ← map_sub, ← mul_sub] at key
   change Algebra.trace ℚ E (y • (c - d)⁻¹ * (c - d)) = 0 at key
   rw [zsmul_eq_mul, mul_assoc, inv_mul_cancel₀ hne, mul_one,
-    show (y : E) = algebraMap ℚ E y by simp, Algebra.trace_algebraMap] at key
+      show (y : E) = algebraMap ℚ E y by simp, Algebra.trace_algebraMap]
+    at key
   simp [hy, Module.finrank_pos.ne'] at key
 
 variable [IsCMField E]
@@ -59,28 +60,40 @@ private lemma exists_trace_mul_eq_of_addMonoidHom (f : 𝓞 E →+ ℤ) :
   rw [h1]
   exact congrArg (fun w : 𝓞 E →ₗ[ℤ] ℚ => w a) huv
 
-
 open NumberField Matrix in
 open scoped nonZeroDivisors TensorProduct in
-theorem _root_.GlobalTheory.exists_herm_coord_of_datum :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (D : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H) (ξ : E),
-      _root_.ReciprocityTheory.ChartRestriction.G.FD.cc ξ = -ξ → ξ ≠ 0 → ∀ r : ℕ, r = D.p + D.q →
-      ∃ (Gm : Matrix (Fin r) (Fin r) E) (φ : D.La →ₗ[𝓞 E] (Fin r → E)),
-        (Function.Injective φ ∧ Submodule.span E (Set.range φ) = ⊤ ∧
-          (∀ a b, _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (Gm a b) = Gm b a) ∧ Gm.det ≠ 0 ∧
-          ∀ x y, ((D.EF x y : ℤ) : ℚ) = Algebra.trace ℚ E (ξ * _root_.ReciprocityTheory.ChartRestriction.G.FD.herm Gm (φ x) (φ y))) := by
+theorem _root_.GlobalTheory.exists_herm_coord_of_datum
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E)
+        (D : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H) (ξ : E),
+      _root_.ReciprocityTheory.ChartRestriction.G.FD.cc ξ = -ξ → ξ ≠ 0
+        → ∀ r : ℕ,
+          r = D.p + D.q
+            → ∃ (Gm : Matrix (Fin r) (Fin r) E) (φ : D.La →ₗ[𝓞 E] (Fin r → E)),
+              (Function.Injective φ ∧ Submodule.span E (Set.range φ) = ⊤
+                ∧ (∀ a b, _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (Gm a b) = Gm b a)
+                ∧ Gm.det ≠ 0
+                ∧ ∀ x y,
+                  ((D.EF x y : ℤ) : ℚ)
+                    = Algebra.trace ℚ E
+                      (ξ
+                        * _root_.ReciprocityTheory.ChartRestriction.G.FD.herm Gm (φ x) (φ y))) := by
   intro E _ _ _ H D ξ hξ hξ0 r hr
-  have hz : ∀ x y : D.La, ∃ z : E, ∀ a : 𝓞 E,
-      Algebra.trace ℚ E ((a : E) * z) = (D.EF (a • x) y : ℚ) := fun x y =>
-    exists_trace_mul_eq_of_addMonoidHom (AddMonoidHom.mk' (fun a => D.EF (a • x) y) fun a b => by simp [add_smul])
+  have hz
+      : ∀ x y : D.La, ∃ z : E, ∀ a : 𝓞 E,
+        Algebra.trace ℚ E ((a : E) * z) = (D.EF (a • x) y : ℚ) := fun x y =>
+    exists_trace_mul_eq_of_addMonoidHom
+      (AddMonoidHom.mk' (fun a => D.EF (a • x) y) fun a b => by simp [add_smul])
   choose h0 hh0 using hz
-  have huniq := fun c d h => _root_.GlobalTheory.DatumCoord.eq_of_trace_int (E := E) (c := c) (d := d) h
-  have hsmul : ∀ (b : 𝓞 E) x y, h0 (b • x) y = b * h0 x y := fun b x y => huniq _ _ fun a => by
-    rw [hh0, ← mul_assoc, ← map_mul, hh0, smul_smul]
-  have hadd : ∀ x x' y, h0 (x + x') y = h0 x y + h0 x' y := fun x x' y => huniq _ _ fun a => by
-    rw [hh0, mul_add, map_add (f := _), hh0, hh0]; simp [smul_add]
-  have hadd' : ∀ x y y', h0 x (y + y') = h0 x y + h0 x y' := fun x y y' => huniq _ _ fun a => by
-    rw [mul_add, map_add (f := _), hh0, hh0, hh0, map_add (f := _), Int.cast_add]
+  have huniq := fun c d h =>
+    _root_.GlobalTheory.DatumCoord.eq_of_trace_int (E := E) (c := c) (d := d) h
+  have hsmul : ∀ (b : 𝓞 E) x y, h0 (b • x) y = b * h0 x y := fun b x y =>
+    huniq _ _ fun a => by rw [hh0, ← mul_assoc, ← map_mul, hh0, smul_smul]
+  have hadd : ∀ x x' y, h0 (x + x') y = h0 x y + h0 x' y := fun x x' y =>
+    huniq _ _ fun a => by rw [hh0, mul_add, map_add (f := _), hh0, hh0]; simp [smul_add]
+  have hadd' : ∀ x y y', h0 x (y + y') = h0 x y + h0 x y' := fun x y y' =>
+    huniq _ _ fun a => by
+      rw [mul_add, map_add (f := _), hh0, hh0, hh0, map_add (f := _), Int.cast_add]
   let σ : E ≃ₐ[ℚ] E := (IsCMField.complexConj E).restrictScalars ℚ
   have hσ : ∀ e, σ e = _root_.ReciprocityTheory.ChartRestriction.G.FD.cc e := fun e => rfl
   have hσσ : ∀ e, σ (σ e) = e := fun e => by simp [σ]
@@ -92,14 +105,16 @@ theorem _root_.GlobalTheory.exists_herm_coord_of_datum :
     have h := D.alt (u + v)
     simp only [map_add (f := _), LinearMap.add_apply, D.alt u, D.alt v] at h
     omega
-  have hsmul' : ∀ (b : 𝓞 E) x y, h0 x (b • y) = σ b * h0 x y := fun b x y => huniq _ _ fun a => by
-    rw [hh0, ← hbb b, ← D.adj, smul_smul, ← hh0, hbb]
-    congr 1
-    push_cast [hbar]
-    ring
-  have hherm : ∀ x y, h0 y x = - σ (h0 x y) := fun x y => huniq _ _ fun a => by
-    rw [hh0, hanti, ← hbb a, ← D.adj, Int.cast_neg, ← hh0, hbb, hbar, ← htr (σ a * h0 x y),
-      map_mul, hσσ, mul_neg, map_neg]
+  have hsmul' : ∀ (b : 𝓞 E) x y, h0 x (b • y) = σ b * h0 x y := fun b x y =>
+    huniq _ _ fun a => by
+      rw [hh0, ← hbb b, ← D.adj, smul_smul, ← hh0, hbb]
+      congr 1
+      push_cast [hbar]
+      ring
+  have hherm : ∀ x y, h0 y x = - σ (h0 x y) := fun x y =>
+    huniq _ _ fun a => by
+      rw [hh0, hanti, ← hbb a, ← D.adj, Int.cast_neg, ← hh0, hbb, hbar, ← htr (σ a * h0 x y),
+        map_mul, hσσ, mul_neg, map_neg]
   haveI := D.fin
   have hrk : Module.finrank (𝓞 E) D.La = r := hr ▸ D.rank
   obtain ⟨l, hl⟩ := exists_linearIndependent_of_le_finrank (R := 𝓞 E) (M := D.La) hrk.ge
@@ -111,7 +126,7 @@ theorem _root_.GlobalTheory.exists_herm_coord_of_datum :
     obtain ⟨g, hg, i, hi⟩ := Fintype.not_linearIndependent_iff.1 hnot
     rw [Fin.sum_univ_castSucc] at hg
     simp only [Fin.snoc_castSucc, Fin.snoc_last] at hg
-    refine ⟨g (Fin.last r), fun hg0 => hi ?_, fun j => -g j.castSucc, ?_⟩
+    refine ⟨g (Fin.last r), fun hg0 => hi ?_, fun j => - g j.castSucc, ?_⟩
     · rw [hg0, zero_smul, add_zero] at hg
       have := Fintype.linearIndependent_iff.1 hl _ hg
       rcases Fin.eq_castSucc_or_eq_last i with ⟨j, rfl⟩ | rfl
@@ -132,22 +147,26 @@ theorem _root_.GlobalTheory.exists_herm_coord_of_datum :
     | empty => simp [hz0']
     | insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, hadd', hsmul', ih]
   have hσ0 : ∀ s : 𝓞 E, s ≠ 0 → σ s ≠ 0 := fun s hs => by simpa using hs
-  have hnd : ∀ x, (∀ y, h0 x y = 0) → x = 0 := fun x hx => D.unimod.1 (LinearMap.ext fun y => by
-    have := hh0 x y 1
-    rw [hx, mul_zero, map_zero, one_smul] at this
-    simp only [map_zero, LinearMap.zero_apply]
-    exact_mod_cast this.symm)
-  let ψ : D.La →ₗ[𝓞 E] (Fin r → E) :=
-    { toFun := fun x j => h0 x (l j)
-      map_add' := fun x y => funext fun j => hadd _ _ _
-      map_smul' := fun b x => funext fun j => by simp [hsmul, Algebra.smul_def] }
+  have hnd : ∀ x, (∀ y, h0 x y = 0) → x = 0 := fun x hx =>
+    D.unimod.1 (LinearMap.ext fun y => by
+      have := hh0 x y 1
+      rw [hx, mul_zero, map_zero, one_smul] at this
+      simp only [map_zero, LinearMap.zero_apply]
+      exact_mod_cast this.symm)
+  let ψ : D.La →ₗ[𝓞 E] (Fin r → E) := {
+    toFun := fun x j => h0 x (l j)
+    map_add' := fun x y => funext fun j => hadd _ _ _
+    map_smul' := fun b x => funext fun j => by simp [hsmul, Algebra.smul_def]
+  }
   have hψ : ∀ x j, ψ x j = h0 x (l j) := fun x j => rfl
-  have hinj : Function.Injective ψ := (injective_iff_map_eq_zero ψ).2 fun x hx => hnd x fun y => by
-    obtain ⟨s, hs, d, hd⟩ := hmax y
-    have h1 : σ s * h0 x y = 0 := by
-      rw [← hsmul', ← hd, hsumR]
-      exact Finset.sum_eq_zero fun j _ => by rw [← hψ, hx]; simp
-    exact (mul_eq_zero.1 h1).resolve_left (hσ0 s hs)
+  have hinj : Function.Injective ψ :=
+    (injective_iff_map_eq_zero ψ).2 fun x hx =>
+      hnd x fun y => by
+        obtain ⟨s, hs, d, hd⟩ := hmax y
+        have h1 : σ s * h0 x y = 0 := by
+          rw [← hsmul', ← hd, hsumR]
+          exact Finset.sum_eq_zero fun j _ => by rw [← hψ, hx]; simp
+        exact (mul_eq_zero.1 h1).resolve_left (hσ0 s hs)
   let gram : Matrix (Fin r) (Fin r) E := Matrix.of fun i j => h0 (l i) (l j)
   have hgramσ : ∀ i j, σ (gram i j) = - gram j i := fun i j => by
     simp [gram, hherm (l i) (l j), hσσ]
@@ -156,12 +175,13 @@ theorem _root_.GlobalTheory.exists_herm_coord_of_datum :
     obtain ⟨v, hv0, hv⟩ := Matrix.exists_vecMul_eq_zero_iff.2 h
     obtain ⟨⟨m, hm⟩, hmv⟩ := IsLocalization.exist_integer_multiples (𝓞 E)⁰ Finset.univ v
     choose c hc using fun i => hmv i (Finset.mem_univ i)
-    have hx : ∑ i, c i • l i = 0 := hinj <| funext fun j => by
-      rw [map_zero, Pi.zero_apply, hψ, hsumL]
-      have := congrFun hv j
-      simp only [Matrix.vecMul, dotProduct, Pi.zero_apply, gram, Matrix.of_apply] at this
-      simp only [hc, Submonoid.smul_def, Algebra.smul_def, mul_assoc, ← Finset.mul_sum, this,
-        mul_zero]
+    have hx : ∑ i, c i • l i = 0 :=
+      hinj <| funext fun j => by
+        rw [map_zero, Pi.zero_apply, hψ, hsumL]
+        have := congrFun hv j
+        simp only [Matrix.vecMul, dotProduct, Pi.zero_apply, gram, Matrix.of_apply] at this
+        simp only [hc, Submonoid.smul_def, Algebra.smul_def, mul_assoc, ← Finset.mul_sum, this,
+          mul_zero]
     have hc0 := Fintype.linearIndependent_iff.1 hl c hx
     apply hv0
     funext i
@@ -180,16 +200,17 @@ theorem _root_.GlobalTheory.exists_herm_coord_of_datum :
     rw [hw]
     exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨l i, rfl⟩)
   · have hu : IsUnit gram.det := isUnit_iff_ne_zero.2 hdet
-    have h1 : gram.map σ = -gramᵀ := by
+    have h1 : gram.map σ = - gramᵀ := by
       ext i j
       simp [hgramσ]
     have e1 : (gram⁻¹).map σ * gram.map σ = 1 := by
       have h3 : (gram⁻¹ * gram).map (σ : E →+* E) = (gram⁻¹).map σ * gram.map σ := Matrix.map_mul
       rw [← h3, Matrix.nonsing_inv_mul _ hu]
       exact Matrix.map_one _ (map_zero _) (map_one _)
-    have e2 : -(gram⁻¹)ᵀ * gram.map σ = 1 := by
-      rw [h1, neg_mul_neg, ← Matrix.transpose_mul, Matrix.mul_nonsing_inv _ hu, Matrix.transpose_one]
-    have hinvσ : (gram⁻¹).map σ = -(gram⁻¹)ᵀ :=
+    have e2 : - (gram⁻¹)ᵀ * gram.map σ = 1 := by
+      rw [h1, neg_mul_neg, ← Matrix.transpose_mul, Matrix.mul_nonsing_inv _ hu,
+        Matrix.transpose_one]
+    have hinvσ : (gram⁻¹).map σ = - (gram⁻¹)ᵀ :=
       (Matrix.inv_eq_left_inv e1).symm.trans (Matrix.inv_eq_left_inv e2)
     intro a b
     have h2 := congrFun (congrFun hinvσ a) b
@@ -207,17 +228,21 @@ theorem _root_.GlobalTheory.exists_herm_coord_of_datum :
     have ht' : (t : E) ≠ 0 := by simpa using ht
     let cv : Fin r → E := fun i => c i
     let dv : Fin r → E := fun j => σ (d j)
-    have hA : (fun j => (t : E) * ψ x j) = cv ᵥ* gram := funext fun j => by
-      rw [hψ, ← hsmul, ← hc, hsumL]
-      simp [Matrix.vecMul, dotProduct, cv, gram]
-    have hB : (fun b => -(σ (s : E) * σ (ψ y b))) = gram *ᵥ dv := funext fun b => by
-      rw [hψ, hherm (l b) y, map_neg, hσσ, mul_neg, neg_neg, ← hsmul', ← hd, hsumR]
-      simp [Matrix.mulVec, dotProduct, dv, gram, mul_comm]
+    have hA : (fun j => (t : E) * ψ x j) = cv ᵥ* gram :=
+      funext fun j => by
+        rw [hψ, ← hsmul, ← hc, hsumL]
+        simp [Matrix.vecMul, dotProduct, cv, gram]
+    have hB : (fun b => -(σ (s : E) * σ (ψ y b))) = gram *ᵥ dv :=
+      funext fun b => by
+        rw [hψ, hherm (l b) y, map_neg, hσσ, mul_neg, neg_neg, ← hsmul', ← hd, hsumR]
+        simp [Matrix.mulVec, dotProduct, dv, gram, mul_comm]
     have hC : (t : E) * σ s * h0 x y = cv ⬝ᵥ (gram *ᵥ dv) := by
       rw [mul_assoc, ← hsmul', ← hsmul, ← hc, ← hd, hsumL]
       simp only [hsumR, Matrix.mulVec, dotProduct, Finset.mul_sum, cv, dv, gram, Matrix.of_apply]
       exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
-    have key : ξ * _root_.ReciprocityTheory.ChartRestriction.G.FD.herm (-ξ⁻¹ • gram⁻¹) (ψ x) (ψ y) = h0 x y := by
+    have key
+        : ξ * _root_.ReciprocityTheory.ChartRestriction.G.FD.herm (-ξ⁻¹ • gram⁻¹) (ψ x) (ψ y)
+          = h0 x y := by
       apply mul_left_cancel₀ (mul_ne_zero ht' (hσ0 s hs))
       rw [hC, ← vecMul_one cv, ← Matrix.mul_nonsing_inv _ hu, ← vecMul_vecMul, ← dotProduct_mulVec,
         ← hA, ← hB]

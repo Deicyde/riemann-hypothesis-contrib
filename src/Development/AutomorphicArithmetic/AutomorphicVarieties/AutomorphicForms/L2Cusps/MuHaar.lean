@@ -5,8 +5,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField MeasureTheory GlobalTheory.AutomorphicL2Unitary GlobalTheory.DiscreteSum GlobalTheory.UnitaryBC GlobalTheory.DiscSpec GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.V.KernelIndexFullLattice
+open NumberField MeasureTheory GlobalTheory.AutomorphicL2Unitary GlobalTheory.DiscreteSum
+  GlobalTheory.UnitaryBC GlobalTheory.DiscSpec GlobalTheory.CuspRep
+  GlobalTheory.CuspRep.CuspidalL2GL
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.V.KernelIndexFullLattice
 
 section
 
@@ -21,8 +24,8 @@ private theorem one_lt_top (ha : 0 < a) : 1 < detModule E a (splitCentre E a 1) 
 
 private theorem band_zero : band E 0 = Set.univ := Set.eq_univ_of_forall fun _ => Or.inl rfl
 
-private theorem band_pos (ha : 0 < a) :
-    band E a = detModule E a ⁻¹' Set.Ico 1 (detModule E a (splitCentre E a 1)) := by
+private theorem band_pos (ha : 0 < a)
+    : band E a = detModule E a ⁻¹' Set.Ico 1 (detModule E a (splitCentre E a 1)) := by
   ext g
   simp only [band, Set.mem_setOf_eq, ha.ne', false_or, Set.mem_preimage, Set.mem_Ico]
 
@@ -32,22 +35,25 @@ private theorem measurableSet_band : MeasurableSet (band E a) := by
   · rw [band_pos ha]
     have hc : Continuous fun g : GA E a => (detModule E a g : ℝ) :=
       continuous_subtype_val.comp continuous_detModule
-    exact hc.measurable (measurableSet_Ico (a := (1 : ℝ)) (b := (detModule E a (splitCentre E a 1) : ℝ)))
+    exact hc.measurable (measurableSet_Ico (a := (1 : ℝ))
+      (b := (detModule E a (splitCentre E a 1) : ℝ)))
 
-private theorem meas_retract : Measurable (retractOne : GA E a → G1 E a) := continuous_retractOne.measurable
+private theorem meas_retract : Measurable (retractOne : GA E a → G1 E a) :=
+  continuous_retractOne.measurable
 
-private theorem muOne_apply (μ : Measure (GA E a)) {A : Set (G1 E a)} (hA : MeasurableSet A) :
-    muOne μ A = μ (retractOne ⁻¹' A ∩ band E a) := by
+private theorem muOne_apply (μ : Measure (GA E a)) {A : Set (G1 E a)} (hA : MeasurableSet A)
+    : muOne μ A = μ (retractOne ⁻¹' A ∩ band E a) := by
   rw [muOne, Measure.map_apply meas_retract hA, Measure.restrict_apply (meas_retract hA)]
 
 omit [_root_.NumberField.IsTotallyComplex E] in
-private theorem retract_mul_left (x : G1 E a) (g : GA E a) :
-    retractOne ((x : GA E a) * g) = x * retractOne g := by
+private theorem retract_mul_left (x : G1 E a) (g : GA E a)
+    : retractOne ((x : GA E a) * g) = x * retractOne g := by
   ext1
-  rw [coe_retractOne, Subgroup.coe_mul, coe_retractOne, map_mul, (mem_normOneGL_iff_detModule).1 x.2, one_mul,
-    mul_assoc]
+  rw [coe_retractOne, Subgroup.coe_mul, coe_retractOne, map_mul,
+    (mem_normOneGL_iff_detModule).1 x.2, one_mul, mul_assoc]
 
-private theorem band_mul_left (x : G1 E a) (g : GA E a) : (x : GA E a) * g ∈ band E a ↔ g ∈ band E a := by
+private theorem band_mul_left (x : G1 E a) (g : GA E a)
+    : (x : GA E a) * g ∈ band E a ↔ g ∈ band E a := by
   simp only [band, Set.mem_setOf_eq, map_mul, (mem_normOneGL_iff_detModule).1 x.2, one_mul]
 
 private theorem isCompact_posIcc (s t : {r : ℝ // 0 < r}) : IsCompact (Set.Icc s t) := by
@@ -62,8 +68,8 @@ private theorem isCompact_posIcc (s t : {r : ℝ // 0 < r}) : IsCompact (Set.Icc
 
 end
 
-theorem UpperTheory.V.KernelIndexFullLattice.muHaar_holds :
-    UpperTheory.V.KernelIndexFullLattice.MuHaar := by
+theorem UpperTheory.V.KernelIndexFullLattice.muHaar_holds
+    : UpperTheory.V.KernelIndexFullLattice.MuHaar := by
   intro E _ _ _ a μ _
   have h1 : (muOne μ).IsMulLeftInvariant := by
     refine ⟨fun x => ?_⟩
@@ -80,8 +86,10 @@ theorem UpperTheory.V.KernelIndexFullLattice.muHaar_holds :
     rcases Nat.eq_zero_or_pos a with rfl | ha
     · have : Subsingleton (GA E 0) := ⟨fun x y => Units.ext (Subsingleton.elim _ _)⟩
       exact (Set.toFinite _).isCompact.measure_lt_top
-    · have hc : Continuous fun p : G1 E a × {r : ℝ // 0 < r} => (p.1 : GA E a) * centralSection E a p.2 :=
-        (continuous_subtype_val.comp continuous_fst).mul (continuous_centralSection.comp continuous_snd)
+    · have hc : Continuous fun p : G1 E a × {r : ℝ // 0 < r} =>
+          (p.1 : GA E a) * centralSection E a p.2 :=
+        (continuous_subtype_val.comp continuous_fst).mul
+          (continuous_centralSection.comp continuous_snd)
       refine lt_of_le_of_lt (measure_mono ?_)
         ((hC.prod (isCompact_posIcc 1 (detModule E a (splitCentre E a 1)))).image hc).measure_lt_top
       rintro g ⟨hg, hb⟩
@@ -100,20 +108,27 @@ theorem UpperTheory.V.KernelIndexFullLattice.muHaar_holds :
       refine hO.measure_ne_zero μ ⟨1, ?_⟩
       change retractOne _ ∈ U
       rwa [Subsingleton.elim (retractOne _) x]
-    · obtain ⟨s, hs1, hs2⟩ : ∃ s : {r : ℝ // 0 < r}, 1 < s ∧ s < detModule E a (splitCentre E a 1) := by
-        obtain ⟨s, h1, h2⟩ := exists_between (show (1 : ℝ) < (detModule E a (splitCentre E a 1) : ℝ) from one_lt_top ha)
+    · obtain ⟨s, hs1, hs2⟩
+          : ∃ s : {r : ℝ // 0 < r}, 1 < s ∧ s < detModule E a (splitCentre E a 1) := by
+        obtain ⟨s, h1, h2⟩ :=
+          exists_between (show (1 : ℝ) < (detModule E a (splitCentre E a 1) : ℝ) from one_lt_top ha)
         exact ⟨⟨s, one_pos.trans h1⟩, h1, h2⟩
       have hc : Continuous fun g : GA E a => (detModule E a g : ℝ) :=
         continuous_subtype_val.comp continuous_detModule
-      have hI : IsOpen (detModule E a ⁻¹' Set.Ioo 1 (detModule E a (splitCentre E a 1)) : Set (GA E a)) :=
+      have hI : IsOpen
+          (detModule E a ⁻¹' Set.Ioo 1 (detModule E a (splitCentre E a 1)) : Set (GA E a)) :=
         (isOpen_Ioo (a := (1 : ℝ)) (b := (detModule E a (splitCentre E a 1) : ℝ))).preimage hc
       have hd : detModule E a ((x : GA E a) * centralSection E a s) = s := by
         rw [map_mul, (mem_normOneGL_iff_detModule).1 x.2, detModule_centralSection ha, one_mul]
       have hr : retractOne ((x : GA E a) * centralSection E a s) = x := by
         ext1
         rw [coe_retractOne, hd, mul_inv_cancel_right]
-      have hp := (hO.inter hI).measure_ne_zero μ ⟨(x : GA E a) * centralSection E a s, by
-        rw [Set.mem_preimage, hr]; exact hx, by rw [Set.mem_preimage, hd]; exact ⟨hs1, hs2⟩⟩
+      have hp :=
+        (hO.inter hI).measure_ne_zero μ ⟨
+          (x : GA E a) * centralSection E a s,
+          by rw [Set.mem_preimage, hr]; exact hx,
+          by rw [Set.mem_preimage, hd]; exact ⟨hs1, hs2⟩
+        ⟩
       intro h0
       refine hp (measure_mono_null ?_ h0)
       rw [band_pos ha]

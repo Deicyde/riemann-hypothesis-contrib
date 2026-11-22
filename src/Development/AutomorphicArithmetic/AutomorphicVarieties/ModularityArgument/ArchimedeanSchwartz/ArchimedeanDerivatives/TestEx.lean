@@ -10,20 +10,26 @@ open scoped ContDiff
 
 namespace UpperTheory.V.Z.Inf
 
-private theorem testEx_gen {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
-    [MeasurableSpace E] [BorelSpace E] (μ : Measure E) [IsFiniteMeasureOnCompacts μ] [μ.IsOpenPosMeasure]
-    {U : Set E} (hU : IsOpen U) {f : E → ℂ} (hf : ContinuousOn f U) {A : E → ℝ} (hA : Continuous A)
-    (hA0 : ∀ x ∈ U, 0 < A x) {x₀ : E} (hx₀ : x₀ ∈ U) (h0 : f x₀ ≠ 0) :
-    ∃ Φ : E → ℂ, (ContDiff ℝ ∞ Φ ∧ HasCompactSupport Φ ∧ tsupport Φ ⊆ U) ∧
-      (Differentiable ℂ fun s : ℂ => ∫ x, Φ x * f x * ((A x : ℝ) : ℂ) ^ s ∂μ) ∧
-      ∃ s : ℂ, ∫ x, Φ x * f x * ((A x : ℝ) : ℂ) ^ s ∂μ ≠ 0 := by
+private theorem testEx_gen
+    {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+    [BorelSpace E]
+    (μ : Measure E) [IsFiniteMeasureOnCompacts μ] [μ.IsOpenPosMeasure]
+    {U : Set E} (hU : IsOpen U)
+    {f : E → ℂ} (hf : ContinuousOn f U)
+    {A : E → ℝ} (hA : Continuous A) (hA0 : ∀ x ∈ U, 0 < A x)
+    {x₀ : E} (hx₀ : x₀ ∈ U) (h0 : f x₀ ≠ 0)
+    : ∃ Φ : E → ℂ,
+      (ContDiff ℝ ∞ Φ ∧ HasCompactSupport Φ ∧ tsupport Φ ⊆ U)
+        ∧ (Differentiable ℂ fun s : ℂ => ∫ x, Φ x * f x * ((A x : ℝ) : ℂ) ^ s ∂μ)
+        ∧ ∃ s : ℂ, ∫ x, Φ x * f x * ((A x : ℝ) : ℂ) ^ s ∂μ ≠ 0 := by
   haveI : ProperSpace E := FiniteDimensional.proper ℝ E
   set c : ℂ := starRingEnd ℂ (f x₀) with hc
   have hre : 0 < (c * f x₀).re := by
     rw [hc, mul_comm, Complex.mul_conj, Complex.ofReal_re]
     exact Complex.normSq_pos.2 h0
   have hca : ContinuousAt (fun x => (c * f x).re) x₀ :=
-    Complex.continuous_re.continuousAt.comp (continuousAt_const.mul (hf.continuousAt (hU.mem_nhds hx₀)))
+    Complex.continuous_re.continuousAt.comp (continuousAt_const.mul (hf.continuousAt (hU.mem_nhds
+      hx₀)))
   have hW : U ∩ {x | 0 < (c * f x).re} ∈ 𝓝 x₀ :=
     inter_mem (hU.mem_nhds hx₀) (hca.eventually (lt_mem_nhds hre))
   obtain ⟨ε, hε, hball⟩ := Metric.nhds_basis_closedBall.mem_iff.1 hW
@@ -38,8 +44,8 @@ private theorem testEx_gen {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
   let F : ℂ → E → ℂ := fun s x => (ψ x : ℂ) * f x * ((A x : ℝ) : ℂ) ^ s
   have hFz : ∀ s x, x ∉ closedBall x₀ ε → F s x = 0 := fun s x hx => by
     simp only [F, hψz x hx, Complex.ofReal_zero, zero_mul]
-  have hts : ∀ {G : E → ℂ}, (∀ x, x ∉ closedBall x₀ ε → G x = 0) → tsupport G ⊆ closedBall x₀ ε := fun h =>
-    closure_minimal (fun x hx => by by_contra h'; exact hx (h x h')) isClosed_closedBall
+  have hts : ∀ {G : E → ℂ}, (∀ x, x ∉ closedBall x₀ ε → G x = 0) → tsupport G ⊆ closedBall x₀ ε :=
+    fun h => closure_minimal (fun x hx => by by_contra h'; exact hx (h x h')) isClosed_closedBall
   have hJ : ContinuousOn (fun p : ℂ × E => F p.1 p.2) (univ ×ˢ U) := by
     refine ContinuousOn.mul (ContinuousOn.mul ?_ ?_) ?_
     · exact (Complex.continuous_ofReal.comp (ψ.continuous.comp continuous_snd)).continuousOn
@@ -57,16 +63,23 @@ private theorem testEx_gen {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
   refine ⟨fun x => (ψ x : ℂ), ⟨?_, HasCompactSupport.intro hKc hΦz, (hts hΦz).trans hKU⟩, ?_, 0, ?_⟩
   · exact Complex.ofRealCLM.contDiff.comp ψ.contDiff
   · rw [← differentiableOn_univ]
-    refine GroundTheory.Automorphic.PseudoEisenstein.differentiableOn_integral_of_bound (F := F) isOpen_univ
-      (fun x => ?_) (fun s _ => (hFc s).aestronglyMeasurable) fun s₀ _ => ?_
+    refine GroundTheory.Automorphic.PseudoEisenstein.differentiableOn_integral_of_bound (F := F)
+      isOpen_univ
+      (fun x => ?_)
+      (fun s _ => (hFc s).aestronglyMeasurable)
+      fun s₀ _ => ?_
     · by_cases hx : x ∈ closedBall x₀ ε
       · refine Differentiable.differentiableOn ?_
-        exact (differentiable_id.const_cpow (Or.inl (by exact_mod_cast (hA0 x (hKU hx)).ne'))).const_mul _
+        exact
+          (differentiable_id.const_cpow (Or.inl (by exact_mod_cast (hA0 x (hKU hx)).ne'))).const_mul
+            _
       · simp only [hFz _ x hx]
         exact differentiableOn_const _
-    · obtain ⟨C, hC⟩ := ((isCompact_closedBall s₀ 1).prod hKc).exists_bound_of_continuousOn
-        (hJ.mono (prod_mono (subset_univ _) hKU))
-      refine ⟨1, one_pos, subset_univ _, (closedBall x₀ ε).indicator fun _ => C, ?_, fun s hs x => ?_⟩
+    · obtain ⟨C, hC⟩ :=
+        ((isCompact_closedBall s₀ 1).prod hKc).exists_bound_of_continuousOn
+          (hJ.mono (prod_mono (subset_univ _) hKU))
+      refine
+        ⟨1, one_pos, subset_univ _, (closedBall x₀ ε).indicator fun _ => C, ?_, fun s hs x => ?_⟩
       · rw [integrable_indicator_iff isClosed_closedBall.measurableSet]
         exact integrableOn_const hKc.measure_lt_top.ne
       · by_cases hx : x ∈ closedBall x₀ ε
@@ -100,12 +113,12 @@ private theorem testEx_gen {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
 
 end UpperTheory.V.Z.Inf
 
-theorem UpperTheory.V.Z.Inf.testEx :
-    UpperTheory.V.Z.Inf.TestEx := by
+theorem UpperTheory.V.Z.Inf.testEx : UpperTheory.V.Z.Inf.TestEx := by
   intro K _ _ _ n f hf ⟨x₀, hx₀, h0⟩
   haveI : Measure.IsAddHaarMeasure (volume : Measure (Fin n → GlobalTheory.CuspRep.Cinf K)) := Measure.pi.isAddHaarMeasure _
   haveI : Measure.IsAddHaarMeasure (volume : Measure (GlobalTheory.CuspRep.Lie K n)) := Measure.pi.isAddHaarMeasure _
-  refine UpperTheory.V.Z.Inf.testEx_gen volume GlobalTheory.CuspRep.isOpen_invSet hf (A := UpperTheory.V.Z.Inf.nrm) ?_ ?_ hx₀ h0
+  refine UpperTheory.V.Z.Inf.testEx_gen volume GlobalTheory.CuspRep.isOpen_invSet hf
+    (A := UpperTheory.V.Z.Inf.nrm) ?_ ?_ hx₀ h0
   · unfold UpperTheory.V.Z.Inf.nrm
     refine continuous_finsetProd _ fun w _ => Continuous.pow (Continuous.norm ?_) 2
     exact (continuous_apply w).comp (Continuous.matrix_det continuous_id)

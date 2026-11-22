@@ -13,9 +13,11 @@ noncomputable section
 
 namespace PI.UnitaryGroupMassFormula.CntFormula
 
-theorem orbit_count_first_stage : Stage1 := stage1_of_unipotentIntegralIsGroup unipotent_integral_isGroup
+theorem orbit_count_first_stage : Stage1 :=
+  stage1_of_unipotentIntegralIsGroup unipotent_integral_isGroup
 
 theorem orbitReps_of_stage2 (h2 : Stage2) : OrbitReps :=
-  orbitReps_of unipotent_integral_isGroup rank_gram good_places_integral orbit_count_first_stage h2 finite_level_index
+  orbitReps_of unipotent_integral_isGroup rank_gram good_places_integral orbit_count_first_stage h2
+    finite_level_index
 
 end PI.UnitaryGroupMassFormula.CntFormula

@@ -13,10 +13,12 @@ namespace Formalism.HermitianLattices.Ext.PrimitiveCharacterCasts.ZD
 attribute [local irreducible] q0 pY pJ pN in
 theorem numeric_constants : Num := by
   intro C hC
-  have h3 := (isLittleO_log_rpow_rpow_atTop (3 : ℝ) (by norm_num : (0 : ℝ) < 7 / 100)).bound
-    (by norm_num : (0 : ℝ) < 1 / 32768)
-  have h2 := (isLittleO_log_rpow_rpow_atTop (2 : ℝ) (by norm_num : (0 : ℝ) < 47 / 50)).bound
-    (by positivity : (0 : ℝ) < 1 / (65536 * (C + 1)))
+  have h3 :=
+    (isLittleO_log_rpow_rpow_atTop (3 : ℝ) (by norm_num : (0 : ℝ) < 7 / 100)).bound
+      (by norm_num : (0 : ℝ) < 1 / 32768)
+  have h2 :=
+    (isLittleO_log_rpow_rpow_atTop (2 : ℝ) (by norm_num : (0 : ℝ) < 47 / 50)).bound
+      (by positivity : (0 : ℝ) < 1 / (65536 * (C + 1)))
   obtain ⟨Q1, hQ1⟩ := Filter.eventually_atTop.1 (h3.and h2)
   refine ⟨max 20 Q1, 1 + 8 * C * (1048576 : ℝ) ^ (3 / 200 : ℝ), le_max_left _ _, fun Q hQ => ?_⟩
   have hQ20 : 20 ≤ Q := (le_max_left _ _).trans hQ
@@ -28,13 +30,16 @@ theorem numeric_constants : Num := by
     linarith
   have hlog0 : 0 ≤ Real.log Q := by linarith
   rw [Real.norm_eq_abs, Real.norm_eq_abs, abs_of_nonneg (Real.rpow_nonneg hlog0 _),
-    abs_of_nonneg (Real.rpow_nonneg hQ0.le _)] at hl3 hl2
+      abs_of_nonneg (Real.rpow_nonneg hQ0.le _)]
+    at hl3 hl2
   have hl3' : Real.log Q ^ 3 ≤ 1 / 32768 * Q ^ (7 / 100 : ℝ) := by
-    have e : Real.log Q ^ (3 : ℝ) = Real.log Q ^ 3 := by simpa using Real.rpow_natCast (Real.log Q) 3
+    have e : Real.log Q ^ (3 : ℝ) = Real.log Q ^ 3 := by
+      simpa using Real.rpow_natCast (Real.log Q) 3
     rw [← e]
     exact hl3
   have hl2' : Real.log Q ^ 2 ≤ 1 / (65536 * (C + 1)) * Q ^ (47 / 50 : ℝ) := by
-    have e : Real.log Q ^ (2 : ℝ) = Real.log Q ^ 2 := by simpa using Real.rpow_natCast (Real.log Q) 2
+    have e : Real.log Q ^ (2 : ℝ) = Real.log Q ^ 2 := by
+      simpa using Real.rpow_natCast (Real.log Q) 2
     rw [← e]
     exact hl2
   have hq1 : Q ≤ (q0 Q : ℝ) := by rw [q0]; exact Nat.le_ceil Q
@@ -70,14 +75,17 @@ theorem numeric_constants : Num := by
       rw [hYdef]
       push_cast
       have h1 : (1 : ℝ) ≤ 2 ^ j := one_le_pow₀ (by norm_num)
-      calc Q ^ 4 ≤ (q0 Q : ℝ) ^ 4 := by gcongr
+      calc
+        Q ^ 4
+          ≤ (q0 Q : ℝ) ^ 4 := by gcongr
         _ ≤ (q0 Q : ℝ) ^ 4 * 2 ^ j := le_mul_of_one_le_right (by positivity) h1
     have hpow : ((pY Q * 2 ^ j : ℕ) : ℝ) ^ (-(197 / 200 : ℝ)) ≤ Q ^ (-(197 / 50 : ℝ)) := by
-      calc ((pY Q * 2 ^ j : ℕ) : ℝ) ^ (-(197 / 200 : ℝ)) ≤ (Q ^ 4) ^ (-(197 / 200 : ℝ)) :=
-            Real.rpow_le_rpow_of_nonpos (by positivity) hY (by norm_num)
+      calc
+        ((pY Q * 2 ^ j : ℕ) : ℝ) ^ (-(197 / 200 : ℝ)) ≤ (Q ^ 4) ^ (-(197 / 200 : ℝ)) :=
+          Real.rpow_le_rpow_of_nonpos (by positivity) hY (by norm_num)
         _ = Q ^ (-(197 / 50 : ℝ)) := by
-            rw [← Real.rpow_natCast, ← Real.rpow_mul hQ0.le]
-            norm_num
+          rw [← Real.rpow_natCast, ← Real.rpow_mul hQ0.le]
+          norm_num
     have hQ3 : Q ^ 3 * Q ^ (-(197 / 50 : ℝ)) = Q ^ (-(47 / 50 : ℝ)) := by
       rw [← Real.rpow_natCast, ← Real.rpow_add hQ0]
       norm_num
@@ -87,20 +95,25 @@ theorem numeric_constants : Num := by
     have hkey : 64 * C * (pJ Q : ℝ) ^ 2 ≤ Q ^ (47 / 50 : ℝ) := by
       have hJ2 : (pJ Q : ℝ) ^ 2 ≤ 1024 * Real.log Q ^ 2 := by nlinarith
       have hC1 : C / (C + 1) ≤ 1 := by rw [div_le_one (by linarith)]; linarith
-      calc 64 * C * (pJ Q : ℝ) ^ 2 ≤ 64 * C * (1024 * Real.log Q ^ 2) := by gcongr
+      calc
+        64 * C * (pJ Q : ℝ) ^ 2
+          ≤ 64 * C * (1024 * Real.log Q ^ 2) := by gcongr
         _ ≤ 64 * C * (1024 * (1 / (65536 * (C + 1)) * Q ^ (47 / 50 : ℝ))) := by gcongr
         _ = C / (C + 1) * Q ^ (47 / 50 : ℝ) := by field_simp; ring
         _ ≤ 1 * Q ^ (47 / 50 : ℝ) := by gcongr
         _ = Q ^ (47 / 50 : ℝ) := one_mul _
     rw [le_div_iff₀ (by positivity)]
-    calc 8 * Q ^ 3 * C * ((pY Q * 2 ^ j : ℕ) : ℝ) ^ (-(197 / 200 : ℝ)) * (8 * (pJ Q : ℝ) ^ 2)
+    calc
+      8 * Q ^ 3 * C * ((pY Q * 2 ^ j : ℕ) : ℝ) ^ (-(197 / 200 : ℝ)) * (8 * (pJ Q : ℝ) ^ 2)
         ≤ 8 * Q ^ 3 * C * Q ^ (-(197 / 50 : ℝ)) * (8 * (pJ Q : ℝ) ^ 2) := by gcongr
       _ = (64 * C * (pJ Q : ℝ) ^ 2) * (Q ^ 3 * Q ^ (-(197 / 50 : ℝ))) := by ring
       _ ≤ Q ^ (47 / 50 : ℝ) * Q ^ (-(47 / 50 : ℝ)) := by rw [hQ3]; gcongr
       _ = 1 := hQ47
   · have hJ2 : (2 : ℕ) ^ pJ Q ≤ 256 * q0 Q ^ 8 := by
       rw [hJdef, pow_mul', pow_succ]
-      calc (2 ^ Nat.log 2 (q0 Q) * 2) ^ 8 = 256 * (2 ^ Nat.log 2 (q0 Q)) ^ 8 := by ring
+      calc
+        (2 ^ Nat.log 2 (q0 Q) * 2) ^ 8
+          = 256 * (2 ^ Nat.log 2 (q0 Q)) ^ 8 := by ring
         _ ≤ 256 * q0 Q ^ 8 := by gcongr
     have hYJ : ((pY Q * 2 ^ pJ Q : ℕ) : ℝ) ≤ 1048576 * Q ^ 12 := by
       have h1 : pY Q * 2 ^ pJ Q ≤ q0 Q ^ 4 * (256 * q0 Q ^ 8) := by
@@ -108,19 +121,25 @@ theorem numeric_constants : Num := by
         exact Nat.mul_le_mul_left _ hJ2
       have h4 : ((pY Q * 2 ^ pJ Q : ℕ) : ℝ) ≤ (q0 Q : ℝ) ^ 4 * (256 * (q0 Q : ℝ) ^ 8) := by
         exact_mod_cast h1
-      calc ((pY Q * 2 ^ pJ Q : ℕ) : ℝ) ≤ (q0 Q : ℝ) ^ 4 * (256 * (q0 Q : ℝ) ^ 8) := h4
+      calc
+        ((pY Q * 2 ^ pJ Q : ℕ) : ℝ)
+          ≤ (q0 Q : ℝ) ^ 4 * (256 * (q0 Q : ℝ) ^ 8) := h4
         _ ≤ (2 * Q) ^ 4 * (256 * (2 * Q) ^ 8) := by gcongr
         _ = 1048576 * Q ^ 12 := by ring
-    have hpow : ((pY Q * 2 ^ pJ Q : ℕ) : ℝ) ^ (3 / 200 : ℝ) ≤
-        (1048576 : ℝ) ^ (3 / 200 : ℝ) * Q ^ (9 / 50 : ℝ) := by
-      calc ((pY Q * 2 ^ pJ Q : ℕ) : ℝ) ^ (3 / 200 : ℝ) ≤ (1048576 * Q ^ 12) ^ (3 / 200 : ℝ) :=
-            Real.rpow_le_rpow (by positivity) hYJ (by norm_num)
+    have hpow
+        : ((pY Q * 2 ^ pJ Q : ℕ) : ℝ) ^ (3 / 200 : ℝ)
+          ≤ (1048576 : ℝ) ^ (3 / 200 : ℝ) * Q ^ (9 / 50 : ℝ) := by
+      calc
+        ((pY Q * 2 ^ pJ Q : ℕ) : ℝ) ^ (3 / 200 : ℝ) ≤ (1048576 * Q ^ 12) ^ (3 / 200 : ℝ) :=
+          Real.rpow_le_rpow (by positivity) hYJ (by norm_num)
         _ = (1048576 : ℝ) ^ (3 / 200 : ℝ) * Q ^ (9 / 50 : ℝ) := by
-            rw [Real.mul_rpow (by norm_num) (by positivity), ← Real.rpow_natCast Q 12,
-              ← Real.rpow_mul hQ0.le]
-            norm_num
+          rw [Real.mul_rpow (by norm_num) (by positivity), ← Real.rpow_natCast Q 12,
+            ← Real.rpow_mul hQ0.le]
+          norm_num
     have hJ3 : (pJ Q : ℝ) ^ 3 ≤ Q ^ (7 / 100 : ℝ) := by
-      calc (pJ Q : ℝ) ^ 3 ≤ (32 * Real.log Q) ^ 3 := by gcongr
+      calc
+        (pJ Q : ℝ) ^ 3
+          ≤ (32 * Real.log Q) ^ 3 := by gcongr
         _ = 32768 * Real.log Q ^ 3 := by ring
         _ ≤ 32768 * (1 / 32768 * Q ^ (7 / 100 : ℝ)) := by gcongr
         _ = Q ^ (7 / 100 : ℝ) := by ring
@@ -128,11 +147,13 @@ theorem numeric_constants : Num := by
     have hsplit : Q ^ (7 / 100 : ℝ) * Q ^ (9 / 50 : ℝ) = Q ^ (1 / 4 : ℝ) := by
       rw [← Real.rpow_add hQ0]
       norm_num
-    calc 1 + (pJ Q : ℝ) * (8 * (pJ Q : ℝ) ^ 2 * C * ((pY Q * 2 ^ pJ Q : ℕ) : ℝ) ^ (3 / 200 : ℝ))
+    calc
+      1 + (pJ Q : ℝ) * (8 * (pJ Q : ℝ) ^ 2 * C * ((pY Q * 2 ^ pJ Q : ℕ) : ℝ) ^ (3 / 200 : ℝ))
         = 1 + 8 * C * ((pJ Q : ℝ) ^ 3 * ((pY Q * 2 ^ pJ Q : ℕ) : ℝ) ^ (3 / 200 : ℝ)) := by ring
       _ ≤ 1 + 8 * C * (Q ^ (7 / 100 : ℝ) * ((1048576 : ℝ) ^ (3 / 200 : ℝ) * Q ^ (9 / 50 : ℝ))) := by
-          gcongr
-      _ = 1 + 8 * C * (1048576 : ℝ) ^ (3 / 200 : ℝ) * (Q ^ (7 / 100 : ℝ) * Q ^ (9 / 50 : ℝ)) := by ring
+        gcongr
+      _ = 1 + 8 * C * (1048576 : ℝ) ^ (3 / 200 : ℝ) * (Q ^ (7 / 100 : ℝ) * Q ^ (9 / 50 : ℝ)) := by
+        ring
       _ = 1 + 8 * C * (1048576 : ℝ) ^ (3 / 200 : ℝ) * Q ^ (1 / 4 : ℝ) := by rw [hsplit]
       _ ≤ Q ^ (1 / 4 : ℝ) + 8 * C * (1048576 : ℝ) ^ (3 / 200 : ℝ) * Q ^ (1 / 4 : ℝ) := by gcongr
       _ = (1 + 8 * C * (1048576 : ℝ) ^ (3 / 200 : ℝ)) * Q ^ (1 / 4 : ℝ) := by ring

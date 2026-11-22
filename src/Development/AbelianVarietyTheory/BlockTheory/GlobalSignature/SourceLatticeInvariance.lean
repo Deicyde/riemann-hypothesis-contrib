@@ -17,17 +17,18 @@ section Defs
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem intAt_zero (P : HeightOneSpectrum (𝓞 E)) : IntAt P (0 : E) :=
-  ⟨0, 1, one_notMem P, by simp⟩
+theorem intAt_zero (P : HeightOneSpectrum (𝓞 E)) : IntAt P (0 : E) := ⟨0, 1, one_notMem P, by simp⟩
 
-theorem intAt_add {P : HeightOneSpectrum (𝓞 E)} {a b : E} (ha : IntAt P a) (hb : IntAt P b) : IntAt P (a + b) := by
+theorem intAt_add {P : HeightOneSpectrum (𝓞 E)} {a b : E} (ha : IntAt P a) (hb : IntAt P b)
+    : IntAt P (a + b) := by
   obtain ⟨r, s, hs, h⟩ := ha
   obtain ⟨r', s', hs', h'⟩ := hb
   refine ⟨s' * r + s * r', s * s', fun hm => (P.isPrime.mem_or_mem hm).elim hs hs', ?_⟩
   rw [map_add (f := _), map_mul, map_mul, map_mul, ← h, ← h']
   ring
 
-theorem intAt_mul {P : HeightOneSpectrum (𝓞 E)} {a b : E} (ha : IntAt P a) (hb : IntAt P b) : IntAt P (a * b) := by
+theorem intAt_mul {P : HeightOneSpectrum (𝓞 E)} {a b : E} (ha : IntAt P a) (hb : IntAt P b)
+    : IntAt P (a * b) := by
   obtain ⟨r, s, hs, h⟩ := ha
   obtain ⟨r', s', hs', h'⟩ := hb
   refine ⟨r * r', s * s', fun hm => (P.isPrime.mem_or_mem hm).elim hs hs', ?_⟩
@@ -45,9 +46,10 @@ def DegOneUnram (P : HeightOneSpectrum (𝓞 E)) : Prop :=
   (qOf P).Prime ∧ ((qOf P : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2
 
 def IsLatAt (P : HeightOneSpectrum (𝓞 E)) {N : ℕ} (abelian₂ : Submodule (𝓞 E) (Fin N → E)) : Prop :=
-  (∀ u : E, IntAt P u → ∀ v ∈ abelian₂, u • v ∈ abelian₂) ∧
-    ∃ m : ℕ, (∀ v : Fin N → E, (∀ l, IntAt P (v l)) → ((qOf P : E) ^ m) • v ∈ abelian₂) ∧
-      ∀ v ∈ abelian₂, ∀ l, IntAt P ((qOf P : E) ^ m * v l)
+  (∀ u : E, IntAt P u → ∀ v ∈ abelian₂, u • v ∈ abelian₂)
+    ∧ ∃ m : ℕ,
+      (∀ v : Fin N → E, (∀ l, IntAt P (v l)) → ((qOf P : E) ^ m) • v ∈ abelian₂)
+        ∧ ∀ v ∈ abelian₂, ∀ l, IntAt P ((qOf P : E) ^ m * v l)
 
 def depthSub (P : HeightOneSpectrum (𝓞 E)) (D : ℕ) : AddSubgroup E where
   carrier := {a | IntAt P ((qOf P : E) ^ D * a)}
@@ -64,8 +66,11 @@ def depthSub (P : HeightOneSpectrum (𝓞 E)) (D : ℕ) : AddSubgroup E where
     rw [mul_neg]
     exact intAt_neg ha
 
-def unfoldAB {K : Type} [Field K] (P : HeightOneSpectrum (𝓞 E)) (psi : E → K) (A B : ℕ) {n' c' n c : ℕ}
-    (Psi : Loc.SF E K (n' + c') (n + c)) : Loc.SF E K n' n :=
+def unfoldAB
+    {K : Type} [Field K]
+    (P : HeightOneSpectrum (𝓞 E)) (psi : E → K) (A B : ℕ)
+    {n' c' n c : ℕ} (Psi : Loc.SF E K (n' + c') (n + c))
+    : Loc.SF E K n' n :=
   Loc.E1 psi (LocE.valsQ E (qOf P) A B) (((qOf P : K) ^ B)⁻¹) Psi
 
 end Defs

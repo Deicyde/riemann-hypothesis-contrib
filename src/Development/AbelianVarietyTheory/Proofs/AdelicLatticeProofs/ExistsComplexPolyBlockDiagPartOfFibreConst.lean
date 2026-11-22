@@ -57,7 +57,6 @@ lemma evC_map (p : MvPolynomial (ι × ι) ℚ) (y : Matrix ι ι ℂ) :
     evC (MvPolynomial.map (algebraMap ℚ ℂ) p) y = ev p y := by
   rw [evC, ev, MvPolynomial.eval_map, MvPolynomial.aeval_def]
 
-
 omit [DecidableEq ι] in
 lemma exists_fg_rtr (f : MvPolynomial (ι × ι) ℂ) :
     ∃ V : Submodule ℂ (MvPolynomial (ι × ι) ℂ), V.FG ∧ ∀ g, rtr g f ∈ V := by
@@ -81,7 +80,6 @@ lemma exists_fg_rtr (f : MvPolynomial (ι × ι) ℂ) :
     rw [rtr, MvPolynomial.aeval_X]
     exact Submodule.sum_mem _ fun k _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, rfl⟩)
 
-
 omit [DecidableEq ι] in
 lemma exists_finset_rtr (Γ : Set (Matrix ι ι ℂ)) (f : MvPolynomial (ι × ι) ℂ) :
     ∃ s : Finset (MvPolynomial (ι × ι) ℂ), (∀ p ∈ s, ∃ g ∈ Γ, p = rtr g f) ∧
@@ -101,10 +99,12 @@ lemma exists_finset_rtr (Γ : Set (Matrix ι ι ℂ)) (f : MvPolynomial (ι × �
   · rw [← hspan]
     exact Submodule.subset_span ⟨g, hg, rfl⟩
 
-def multIdeal (Γ : Set (Matrix ι ι ℂ)) (π : Matrix ι ι ℂ → Matrix ι ι ℂ) (f : MvPolynomial (ι × ι) ℂ) :
-    Ideal (MvPolynomial (ι × ι) ℂ) where
-  carrier := {b | ∀ g ∈ Γ, ∃ b' : MvPolynomial (ι × ι) ℂ, ∀ x ∈ Γ,
-    evC b (π x) * evC f (x * g) = evC b' (π x)}
+def multIdeal
+    (Γ : Set (Matrix ι ι ℂ)) (π : Matrix ι ι ℂ → Matrix ι ι ℂ) (f : MvPolynomial (ι × ι) ℂ)
+    : Ideal (MvPolynomial (ι × ι) ℂ) where
+  carrier :=
+    {b | ∀ g ∈ Γ, ∃ b' : MvPolynomial (ι × ι) ℂ, ∀ x ∈ Γ,
+      evC b (π x) * evC f (x * g) = evC b' (π x)}
   zero_mem' := fun g _ => ⟨0, fun x _ => by simp [evC]⟩
   add_mem' := by
     intro a b ha hb g hg
@@ -127,25 +127,35 @@ lemma exists_common_zero (D : Ideal (MvPolynomial (ι × ι) ℂ)) (hD : D ≠ �
 
 end GlobalTheory.ClassFin.FibreDescent
 
-
 open GlobalTheory.ClassFin.FibreDescent in
-theorem GlobalTheory.ClassFin.exists_evC_blk_of_fibre_const : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (Γ : Set (Matrix ι ι ℂ)) (e : Matrix ι ι ℚ), IsQGroup Γ → e * e = e → (∀ g ∈ Γ, (1 - e.map (algebraMap ℚ ℂ)) * g * e.map (algebraMap ℚ ℂ) = 0) → ∀ f : MvPolynomial (ι × ι) ℂ, (∀ x ∈ Γ, ∀ x' ∈ Γ, blk e x = blk e x' → evC f x = evC f x') → ∃ b : MvPolynomial (ι × ι) ℂ, ∀ x ∈ Γ, evC f x = evC b (blk e x) := by
+theorem GlobalTheory.ClassFin.exists_evC_blk_of_fibre_const
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (Γ : Set (Matrix ι ι ℂ)) (e : Matrix ι ι ℚ),
+      IsQGroup Γ → e * e = e
+        → (∀ g ∈ Γ, (1 - e.map (algebraMap ℚ ℂ)) * g * e.map (algebraMap ℚ ℂ) = 0)
+        → ∀ f : MvPolynomial (ι × ι) ℂ,
+          (∀ x ∈ Γ, ∀ x' ∈ Γ, blk e x = blk e x' → evC f x = evC f x')
+            → ∃ b : MvPolynomial (ι × ι) ℂ, ∀ x ∈ Γ, evC f x = evC b (blk e x) := by
   intro ι _ _ Γ e hΓ he htri f hf
   have hmul : ∀ x ∈ Γ, ∀ y ∈ Γ, blk e (x * y) = blk e x * blk e y := fun x hx y hy =>
     ((GlobalTheory.ClassFin.blk_mul_of_triangular ι e ℂ he).2.1 x y (htri x hx) (htri y hy)).1
   have hpre : IsPre (blk e '' Γ) := GlobalTheory.ClassFin.isPre_blk_image ι Γ e hΓ.toIsPre he htri
   obtain ⟨-, hm, hadj, hdet⟩ := GlobalTheory.T.ratZariskiClosurePoints_isGroup ι _ hpre ℂ
   obtain ⟨s, hs, hspan⟩ := exists_finset_rtr Γ f
-  obtain ⟨b₀, ⟨x₀, hx₀, hb₀⟩, hb⟩ := GlobalTheory.T.exists_multiplier_descend_blockDiagPartOfRatIdempotent ι Γ e hΓ.closed ⟨1, hΓ.one_mem⟩ s (by
-    intro p hp x hx x' hx' hxx
-    obtain ⟨g, hg, rfl⟩ := hs p hp
-    rw [evC_rtr, evC_rtr]
-    exact hf _ (hΓ.mul_mem _ hx _ hg) _ (hΓ.mul_mem _ hx' _ hg)
-      (by rw [hmul _ hx _ hg, hmul _ hx' _ hg, hxx]))
+  obtain ⟨b₀, ⟨x₀, hx₀, hb₀⟩, hb⟩ :=
+    GlobalTheory.T.exists_multiplier_descend_blockDiagPartOfRatIdempotent ι Γ e hΓ.closed
+      ⟨1, hΓ.one_mem⟩ s
+      (by
+        intro p hp x hx x' hx' hxx
+        obtain ⟨g, hg, rfl⟩ := hs p hp
+        rw [evC_rtr, evC_rtr]
+        exact hf _ (hΓ.mul_mem _ hx _ hg) _ (hΓ.mul_mem _ hx' _ hg)
+          (by rw [hmul _ hx _ hg, hmul _ hx' _ hg, hxx]))
   have hb₀D : b₀ ∈ multIdeal Γ (blk e) f := by
     intro g hg
-    have key : ∀ p ∈ Submodule.span ℂ (s : Set (MvPolynomial (ι × ι) ℂ)),
-        ∃ b' : MvPolynomial (ι × ι) ℂ, ∀ x ∈ Γ, evC b₀ (blk e x) * evC p x = evC b' (blk e x) := by
+    have key
+        : ∀ p ∈ Submodule.span ℂ (s : Set (MvPolynomial (ι × ι) ℂ)), ∃ b' : MvPolynomial (ι × ι) ℂ,
+          ∀ x ∈ Γ,
+            evC b₀ (blk e x) * evC p x = evC b' (blk e x) := by
       intro p hp
       induction hp using Submodule.span_induction with
       | mem p hp => exact hb p hp
@@ -175,11 +185,15 @@ theorem GlobalTheory.ClassFin.exists_evC_blk_of_fibre_const : ∀ (ι : Type) [F
       rw [evC_map, hp _ ⟨x, hx, rfl⟩]
       simp [evC]
     have hx₀p : blk e x₀ ∈ pts (blk e '' Γ) ℂ := fun p hp => hp _ ⟨x₀, hx₀, rfl⟩
-    have := GlobalTheory.T.evalComplexPoly_eq_zero_on_ratZariskiClosure ι _ hpre.aut_mem (ltr z b₀) (by
-      rintro _ ⟨h, hh, rfl⟩
-      rw [evC_ltr, ← evC_rtr]
-      exact hz _ (hstab h hh)) _ (hm _ (hadj z hzp) _ hx₀p)
-    rw [evC_ltr, ← Matrix.mul_assoc, Matrix.mul_adjugate, hdet z hzp, one_smul, Matrix.one_mul] at this
+    have :=
+      GlobalTheory.T.evalComplexPoly_eq_zero_on_ratZariskiClosure ι _ hpre.aut_mem (ltr z b₀)
+        (by
+          rintro _ ⟨h, hh, rfl⟩
+          rw [evC_ltr, ← evC_rtr]
+          exact hz _ (hstab h hh))
+        _ (hm _ (hadj z hzp) _ hx₀p)
+    rw [evC_ltr, ← Matrix.mul_assoc, Matrix.mul_adjugate, hdet z hzp, one_smul, Matrix.one_mul]
+      at this
     exact hb₀ this
   have h1 : (1 : MvPolynomial (ι × ι) ℂ) ∈ multIdeal Γ (blk e) f := htop ▸ Submodule.mem_top
   obtain ⟨b, hb⟩ := h1 1 hΓ.one_mem

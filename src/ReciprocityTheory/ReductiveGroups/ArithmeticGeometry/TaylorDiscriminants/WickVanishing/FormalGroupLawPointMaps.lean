@@ -9,7 +9,9 @@ set_option autoImplicit false
 
 noncomputable section
 
-open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.TB.LogPf ReciprocityTheory.ChartRestriction.G.TB.WickVanishing
+open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+  ReciprocityTheory.ChartRestriction.G.TB.LogPf
+  ReciprocityTheory.ChartRestriction.G.TB.WickVanishing
 
 namespace ReciprocityTheory.ChartRestriction.G.TB.PointMapComposition
 
@@ -22,8 +24,8 @@ theorem mapPt_pt {n : ℕ} (j : Fin n) : mapPt k (pt R d j) = pt k d j := by
   funext i
   simp [mapPt, pt, MvPowerSeries.map_X]
 
-theorem mapPt_comp1 {n : ℕ} (φ : Pt R 1 d) (a : Pt R n d) (ha : ∀ i, constantCoeff (a i) = 0) :
-    mapPt k (comp1 φ a) = comp1 (mapPt k φ) (mapPt k a) := by
+theorem mapPt_comp1 {n : ℕ} (φ : Pt R 1 d) (a : Pt R n d) (ha : ∀ i, constantCoeff (a i) = 0)
+    : mapPt k (comp1 φ a) = comp1 (mapPt k φ) (mapPt k a) := by
   funext i
   have hs : MvPowerSeries.HasSubst (fun p : Fin 1 × Fin d => ![a] p.1 p.2) :=
     MvPowerSeries.hasSubst_of_constantCoeff_zero (fun p => by
@@ -36,13 +38,17 @@ theorem mapPt_comp1 {n : ℕ} (φ : Pt R 1 d) (a : Pt R n d) (ha : ∀ i, consta
   fin_cases j
   rfl
 
-theorem mapPt_addOf {n : ℕ} (F : Fin d → PS R 2 d) (u v : Pt R n d) (hu : ∀ i, constantCoeff (u i) = 0)
-    (hv : ∀ i, constantCoeff (v i) = 0) :
-    mapPt k (addOf F u v) = addOf (fun i => MvPowerSeries.map (algebraMap R k) (F i)) (mapPt k u) (mapPt k v) := by
+theorem mapPt_addOf
+    {n : ℕ}
+    (F : Fin d → PS R 2 d)
+    (u v : Pt R n d) (hu : ∀ i, constantCoeff (u i) = 0) (hv : ∀ i, constantCoeff (v i) = 0)
+    : mapPt k (addOf F u v)
+      = addOf (fun i => MvPowerSeries.map (algebraMap R k) (F i)) (mapPt k u) (mapPt k v) := by
   funext i
   have hs : MvPowerSeries.HasSubst (fun p : Fin 2 × Fin d => ![u, v] p.1 p.2) :=
     MvPowerSeries.hasSubst_of_constantCoeff_zero (fun p => by
-      rcases p with ⟨j, l⟩; fin_cases j
+      rcases p with ⟨j, l⟩
+      fin_cases j
       · exact hu l
       · exact hv l)
   simp only [mapPt, addOf, ev]
@@ -59,12 +65,13 @@ def actKO (B : FB R d O) : OAct O (Nab.lawK k B) where
     have h := congrArg (mapPt k) (B.A.hom a)
     have hp0 : ∀ i, constantCoeff (pt R (n := 2) d 0 i) = 0 := LogPf.cc_pt 0
     have hp1 : ∀ i, constantCoeff (pt R (n := 2) d 1 i) = 0 := LogPf.cc_pt 1
-    have hadd : ∀ i, constantCoeff (B.G.add (pt R (n := 2) d 0) (pt R (n := 2) d 1) i) = 0 := fun i =>
-      constantCoeff_ev (CZ.cons hp0 (CZ.cons hp1 CZ.nil)) (B.G.const i)
-    have hc : ∀ (j : Fin 2) i, constantCoeff (comp1 (B.A.act a) (pt R (n := 2) d j) i) = 0 := fun j i =>
-      constantCoeff_ev (CZ.cons (LogPf.cc_pt j) CZ.nil) (B.A.const a i)
+    have hadd : ∀ i, constantCoeff (B.G.add (pt R (n := 2) d 0) (pt R (n := 2) d 1) i) = 0 :=
+      fun i => constantCoeff_ev (CZ.cons hp0 (CZ.cons hp1 CZ.nil)) (B.G.const i)
+    have hc : ∀ (j : Fin 2) i, constantCoeff (comp1 (B.A.act a) (pt R (n := 2) d j) i) = 0 :=
+      fun j i => constantCoeff_ev (CZ.cons (LogPf.cc_pt j) CZ.nil) (B.A.const a i)
     rw [mapPt_comp1 k _ _ hadd, mapPt_addOf k _ _ _ hp0 hp1, mapPt_addOf k _ _ _ (hc 0) (hc 1),
-      mapPt_comp1 k _ _ hp0, mapPt_comp1 k _ _ hp1, mapPt_pt, mapPt_pt] at h
+        mapPt_comp1 k _ _ hp0, mapPt_comp1 k _ _ hp1, mapPt_pt, mapPt_pt]
+      at h
     exact h
   add_act a b := by
     have h := congrArg (mapPt k) (B.A.add_act a b)

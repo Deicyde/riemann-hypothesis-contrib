@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsF
 
 noncomputable section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc
 
 namespace GlobalTheory.Cyc.Graded
 
@@ -32,8 +33,8 @@ theorem norm_lpow (m : ℕ) : ‖(l : PadicComplex l) ^ m‖ = (l : ℝ) ^ (-(m 
   rw [map_pow, map_natCast] at h
   rw [h, Padic.norm_p_pow]
 
-theorem eq_zero_of_norm_le (y : PadicComplex l) (h : ∀ m : ℕ, ‖y‖ ≤ 2 * (l : ℝ) ^ (-(m : ℤ))) :
-    y = 0 := by
+theorem eq_zero_of_norm_le (y : PadicComplex l) (h : ∀ m : ℕ, ‖y‖ ≤ 2 * (l : ℝ) ^ (-(m : ℤ)))
+    : y = 0 := by
   by_contra hy
   have hpos : 0 < ‖y‖ / 2 := by positivity
   have hl : (1 : ℝ) < l := by exact_mod_cast (Fact.out : l.Prime).one_lt
@@ -42,16 +43,17 @@ theorem eq_zero_of_norm_le (y : PadicComplex l) (h : ∀ m : ℕ, ‖y‖ ≤ 2 
   rw [zpow_neg, zpow_natCast, ← inv_pow] at this
   linarith
 
-theorem theta_alg (θ : Ainf l →+* OC l) (z : ℤ_[l]) :
-    ((θ (algebraMap ℤ_[l] (Ainf l) z) : OC l) : PadicComplex l) = zC z := by
+theorem theta_alg (θ : Ainf l →+* OC l) (z : ℤ_[l])
+    : ((θ (algebraMap ℤ_[l] (Ainf l) z) : OC l) : PadicComplex l) = zC z := by
   rw [← sub_eq_zero]
   apply eq_zero_of_norm_le
   intro m
   obtain ⟨w, hw⟩ := Ideal.mem_span_singleton'.1 (PadicInt.appr_spec m z)
   have hz : z = (z.appr m : ℤ_[l]) + w * (l : ℤ_[l]) ^ m := by rw [hw]; ring
-  have h1 : ((θ (algebraMap ℤ_[l] (Ainf l) z) : OC l) : PadicComplex l) - zC z =
-      ((θ (algebraMap ℤ_[l] (Ainf l) w) : OC l) : PadicComplex l) * (l : PadicComplex l) ^ m -
-        zC w * (l : PadicComplex l) ^ m := by
+  have h1
+      : ((θ (algebraMap ℤ_[l] (Ainf l) z) : OC l) : PadicComplex l) - zC z
+        = ((θ (algebraMap ℤ_[l] (Ainf l) w) : OC l) : PadicComplex l) * (l : PadicComplex l) ^ m
+          - zC w * (l : PadicComplex l) ^ m := by
     generalize z.appr m = n at hz
     subst hz
     simp [zC]
@@ -86,12 +88,13 @@ theorem ζQ_pow (m : ℕ) : P.ζQ m ^ (l ^ m) = 1 := by
   | zero => simp [P.ζQ_zero]
   | succ k ih => rw [pow_succ', pow_mul, P.ζQ_succ, ih]
 
-theorem theta_lambda (θ : Ainf l →+* OC l) (hθ : IsTheta AI θ) (g : GQ l)
-    (hg : g (P.ζQ 1) = P.ζQ 1) (lam : Ainf l) (hlam : AI.actW g AI.ξ = lam * AI.ξ) :
-    ((θ lam : OC l) : PadicComplex l) = algebraMap ℚ_[l] (PadicComplex l) (P.χQ g : ℚ_[l]) := by
+theorem theta_lambda
+    (θ : Ainf l →+* OC l) (hθ : IsTheta AI θ)
+    (g : GQ l) (hg : g (P.ζQ 1) = P.ζQ 1)
+    (lam : Ainf l) (hlam : AI.actW g AI.ξ = lam * AI.ξ)
+    : ((θ lam : OC l) : PadicComplex l) = algebraMap ℚ_[l] (PadicComplex l) (P.χQ g : ℚ_[l]) := by
   obtain ⟨-, -, hact, hker, hζ⟩ := hθ
-  have hπ : θ AI.π₁ = AI.ζ 1 - 1 := by
-    rw [LocAinf.π₁, map_sub, map_one, ← hζ 1]; rfl
+  have hπ : θ AI.π₁ = AI.ζ 1 - 1 := by rw [LocAinf.π₁, map_sub, map_one, ← hζ 1]; rfl
   have hne : ((AI.ζ 1 - 1 : OC l) : PadicComplex l) ≠ 0 := by
     intro h
     exact AI.ζ_one (sub_eq_zero.1 (Subtype.ext h))
@@ -109,8 +112,7 @@ theorem theta_lambda (θ : Ainf l →+* OC l) (hθ : IsTheta AI θ) (g : GQ l)
   intro m
   obtain ⟨a, ha, hga⟩ := P.χQ_cyc g m (P.ζQ m) (ζQ_pow m)
   set z : Ainf l := WittVector.teichmuller l (AI.εroot m) with hz
-  have hzl : z ^ (l ^ m) = 1 + AI.μ := by
-    rw [hz, ← map_pow, εroot_pow, LocAinf.μ]; ring
+  have hzl : z ^ (l ^ m) = 1 + AI.μ := by rw [hz, ← map_pow, εroot_pow, LocAinf.μ]; ring
   have h0 : θ (AI.actW g z - z ^ a) = 0 := by
     apply Subtype.ext
     rw [map_sub, map_pow]
@@ -124,8 +126,10 @@ theorem theta_lambda (θ : Ainf l →+* OC l) (hθ : IsTheta AI θ) (g : GQ l)
   have h1 : 1 + AI.actW g AI.μ = (z ^ a + AI.ξ * b) ^ (l ^ m) := by
     rw [← hb', ← map_pow, hzl, map_add (f := _), map_one]
   rw [hk, ← pow_mul, mul_comm a, pow_mul, hzl, hk', AI.μ_eq, map_mul, hlam] at h1
-  have h2 : AI.actW g AI.π₁ * lam = (a : Ainf l) * AI.π₁ +
-      (l : Ainf l) ^ m * ((z ^ a) ^ (l ^ m - 1) * b) + AI.ξ * (k' * AI.π₁ ^ 2 + k * b ^ 2) := by
+  have h2
+      : AI.actW g AI.π₁ * lam
+        = (a : Ainf l) * AI.π₁ + (l : Ainf l) ^ m * ((z ^ a) ^ (l ^ m - 1) * b)
+          + AI.ξ * (k' * AI.π₁ ^ 2 + k * b ^ 2) := by
     apply xi_cancel AI
     rw [Nat.cast_pow, one_pow, one_pow] at h1
     linear_combination h1
@@ -133,10 +137,12 @@ theorem theta_lambda (θ : Ainf l →+* OC l) (hθ : IsTheta AI θ) (g : GQ l)
   have h3 := congrArg (fun t => ((θ t : OC l) : PadicComplex l)) h2
   simp only [map_add (f := _), map_mul, hξ, hgπ, hπ, map_pow, map_natCast, zero_mul, add_zero] at h3
   set u : OC l := (θ z ^ a) ^ (l ^ m - 1) * θ b with hu
-  have h4 : ((AI.ζ 1 - 1 : OC l) : PadicComplex l) * (((θ lam : OC l) : PadicComplex l) -
-      algebraMap ℚ_[l] (PadicComplex l) (P.χQ g : ℚ_[l])) = (l : PadicComplex l) ^ m * (u : PadicComplex l) -
-      ((AI.ζ 1 - 1 : OC l) : PadicComplex l) *
-        algebraMap ℚ_[l] (PadicComplex l) ((P.χQ g : ℚ_[l]) - a) := by
+  have h4
+      : ((AI.ζ 1 - 1 : OC l) : PadicComplex l)
+          * (((θ lam : OC l) : PadicComplex l) - algebraMap ℚ_[l] (PadicComplex l) (P.χQ g : ℚ_[l]))
+        = (l : PadicComplex l) ^ m * (u : PadicComplex l)
+          - ((AI.ζ 1 - 1 : OC l) : PadicComplex l)
+            * algebraMap ℚ_[l] (PadicComplex l) ((P.χQ g : ℚ_[l]) - a) := by
     rw [map_sub, map_natCast]
     generalize (AI.ζ 1 - 1 : OC l) = t at h3 ⊢
     push_cast at h3
@@ -155,8 +161,9 @@ def toM (i : ℤ) : Ainf l →+ Mxi (AinfSub l) (xiU AI) i where
   map_zero' := Subtype.ext (by simp)
   map_add' a b := Subtype.ext (by simp [mul_add])
 
-theorem toM_val (i : ℤ) (a : Ainf l) :
-    (toM AI i a : WCb l) = ((xiU AI ^ i : (WCb l)ˣ) : WCb l) * inclW l a := rfl
+theorem toM_val (i : ℤ) (a : Ainf l)
+    : (toM AI i a : WCb l) = ((xiU AI ^ i : (WCb l)ˣ) : WCb l) * inclW l a :=
+  rfl
 
 theorem toM_bij (i : ℤ) : Function.Bijective (toM AI i) := by
   constructor
@@ -167,33 +174,42 @@ theorem toM_bij (i : ℤ) : Function.Bijective (toM AI i) := by
   · rintro ⟨x, y, ⟨a, rfl⟩, rfl⟩
     exact ⟨a, rfl⟩
 
-theorem toM_mem (i : ℤ) (a : Ainf l) :
-    toM AI i a ∈ (Mxi (AinfSub l) (xiU AI) (i + 1)).comap (Mxi (AinfSub l) (xiU AI) i).subtype ↔
-      AI.ξ ∣ a := by
-  have key : ∀ b : Ainf l, ((xiU AI ^ (i + 1) : (WCb l)ˣ) : WCb l) * inclW l b =
-      ((xiU AI ^ i : (WCb l)ˣ) : WCb l) * inclW l (AI.ξ * b) := by
+theorem toM_mem (i : ℤ) (a : Ainf l)
+    : toM AI i a ∈ (Mxi (AinfSub l) (xiU AI) (i + 1)).comap (Mxi (AinfSub l) (xiU AI) i).subtype
+      ↔ AI.ξ ∣ a := by
+  have key
+      : ∀ b : Ainf l,
+        ((xiU AI ^ (i + 1) : (WCb l)ˣ) : WCb l) * inclW l b
+          = ((xiU AI ^ i : (WCb l)ˣ) : WCb l) * inclW l (AI.ξ * b) := by
     intro b
-    rw [zpow_add_one, Units.val_mul, map_mul, mul_assoc]; rfl
+    rw [zpow_add_one, Units.val_mul, map_mul, mul_assoc]
+    rfl
   constructor
   · rintro ⟨y, ⟨b, rfl⟩, h⟩
     refine ⟨b, ?_⟩
-    have h' : ((xiU AI ^ (i + 1) : (WCb l)ˣ) : WCb l) * inclW l b =
-      ((xiU AI ^ i : (WCb l)ˣ) : WCb l) * inclW l a := h
+    have h'
+        : ((xiU AI ^ (i + 1) : (WCb l)ˣ) : WCb l) * inclW l b
+          = ((xiU AI ^ i : (WCb l)ˣ) : WCb l) * inclW l a :=
+      h
     rw [key] at h'
     exact (inclW_inj ((Units.mul_right_inj _).1 h')).symm
   · rintro ⟨b, rfl⟩
     exact ⟨inclW l b, ⟨b, rfl⟩, key b⟩
 
-theorem toM_smul (i : ℤ) (z : ℤ_[l]) (a : Ainf l) :
-    z • toM AI i a = toM AI i (algebraMap ℤ_[l] (Ainf l) z * a) := by
+theorem toM_smul (i : ℤ) (z : ℤ_[l]) (a : Ainf l)
+    : z • toM AI i a = toM AI i (algebraMap ℤ_[l] (Ainf l) z * a) := by
   apply Subtype.ext
   rw [Submodule.coe_smul, toM_val, toM_val, map_mul, Algebra.smul_def]
   have : inclW l (algebraMap ℤ_[l] (Ainf l) z) = algebraMap ℤ_[l] (WCb l) z := (inclWA l).commutes z
-  rw [this]; ring
+  rw [this]
+  ring
 
-theorem toM_act (i : ℤ) (g : GQ l) : ∃ lam : (Ainf l)ˣ, AI.actW g AI.ξ = lam * AI.ξ ∧
-    ∀ a : Ainf l, actM (xiOK AI) i g (toM AI i a) =
-      toM AI i (((lam ^ i : (Ainf l)ˣ) : Ainf l) * AI.actW g a) := by
+theorem toM_act (i : ℤ) (g : GQ l)
+    : ∃ lam : (Ainf l)ˣ,
+      AI.actW g AI.ξ = lam * AI.ξ
+        ∧ ∀ a : Ainf l,
+          actM (xiOK AI) i g (toM AI i a)
+            = toM AI i (((lam ^ i : (Ainf l)ˣ) : Ainf l) * AI.actW g a) := by
   obtain ⟨u, ⟨b, hb⟩, ⟨b', hb'⟩, hu⟩ := (xiOK AI).2.2 g
   have hb1 : inclW l b = u := hb
   have hb2 : inclW l b' = ((u⁻¹ : (WCb l)ˣ) : WCb l) := hb'
@@ -211,18 +227,20 @@ theorem toM_act (i : ℤ) (g : GQ l) : ∃ lam : (Ainf l)ˣ, AI.actW g AI.ξ = l
     rw [← h1, h2, hb1]
   · apply Subtype.ext
     change AI.actWCbHom g (((xiU AI ^ i : (WCb l)ˣ) : WCb l) * inclW l a) = _
-    rw [toM_val, map_mul, act_zpow (act := AI.actWCbHom) g i u hu, inclW_act, map_mul, mul_zpow, Units.val_mul]
+    rw [toM_val, map_mul, act_zpow (act := AI.actWCbHom) g i u hu, inclW_act, map_mul, mul_zpow,
+      Units.val_mul]
     have h3 : inclW l ((lam ^ i : (Ainf l)ˣ) : Ainf l) = ((u ^ i : (WCb l)ˣ) : WCb l) := by
       rw [← hmap, ← map_zpow]; rfl
     rw [h3]
     change _ = _ * (_ * inclW l (AI.actWHom g a))
     ring
 
-theorem graded_of_theta (θ : Ainf l →+* OC l) (hθ : IsTheta AI θ) (i : ℤ) :
-    ∃ Φ : Qab (AinfSub l) (xiU AI) i (i + 1) →+ PadicComplex l, Function.Injective Φ ∧
-      Set.range Φ = {y | ‖y‖ ≤ 1} ∧ (∀ (z : ℤ_[l]) x, Φ (z • x) = zC z * Φ x) ∧
-      ∀ g : GQ l, g (P.ζQ 1) = P.ζQ 1 → ∀ x,
-        Φ (actQab (xiOK AI) i (i + 1) g x) = chiC P.χQ i g * AI.actC g (Φ x) := by
+theorem graded_of_theta (θ : Ainf l →+* OC l) (hθ : IsTheta AI θ) (i : ℤ)
+    : ∃ Φ : Qab (AinfSub l) (xiU AI) i (i + 1) →+ PadicComplex l,
+      Function.Injective Φ ∧ Set.range Φ = {y | ‖y‖ ≤ 1} ∧ (∀ (z : ℤ_[l]) x, Φ (z • x) = zC z * Φ x)
+        ∧ ∀ g : GQ l,
+          g (P.ζQ 1) = P.ζQ 1
+            → ∀ x, Φ (actQab (xiOK AI) i (i + 1) g x) = chiC P.χQ i g * AI.actC g (Φ x) := by
   let θ' : Ainf l →+* PadicComplex l := (PadicComplexInt l).subtype.comp θ
   have hθ' : ∀ a, θ' a = ((θ a : OC l) : PadicComplex l) := fun _ => rfl
   have hker : ∀ a, θ' a = 0 ↔ AI.ξ ∣ a := by
@@ -235,14 +253,16 @@ theorem graded_of_theta (θ : Ainf l →+* OC l) (hθ : IsTheta AI θ) (i : ℤ)
   have hf : ∀ a, f (toM AI i a) = θ' a := fun a => congrArg θ' (e.symm_apply_apply a)
   let Φ : Qab (AinfSub l) (xiU AI) i (i + 1) →+ PadicComplex l :=
     QuotientAddGroup.lift
-      ((Mxi (AinfSub l) (xiU AI) (i + 1)).comap (Mxi (AinfSub l) (xiU AI) i).subtype).toAddSubgroup f
+      ((Mxi (AinfSub l) (xiU AI) (i + 1)).comap (Mxi (AinfSub l) (xiU AI) i).subtype).toAddSubgroup
+      f
       (by
         intro x hx
         obtain ⟨a, rfl⟩ := (toM_bij AI i).2 x
         rw [AddMonoidHom.mem_ker, hf, hker]
         exact (toM_mem AI i a).1 hx)
   have hΦ : ∀ a, Φ (Submodule.Quotient.mk (toM AI i a)) = θ' a := fun a => hf a
-  have hsurj : ∀ x : Qab (AinfSub l) (xiU AI) i (i + 1), ∃ a, x = Submodule.Quotient.mk (toM AI i a) := by
+  have hsurj
+      : ∀ x : Qab (AinfSub l) (xiU AI) i (i + 1), ∃ a, x = Submodule.Quotient.mk (toM AI i a) := by
     intro x
     obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ x
     obtain ⟨a, rfl⟩ := (toM_bij AI i).2 y
@@ -269,22 +289,30 @@ theorem graded_of_theta (θ : Ainf l →+* OC l) (hθ : IsTheta AI θ) (i : ℤ)
     obtain ⟨a, rfl⟩ := hsurj x
     obtain ⟨lam, h1, h2⟩ := toM_act AI i g
     have h3 := theta_lambda AI θ hθ g hg lam h1
-    have h4 : actQab (xiOK AI) i (i + 1) g (Submodule.Quotient.mk (toM AI i a)) =
-        Submodule.Quotient.mk (actM (xiOK AI) i g (toM AI i a)) := rfl
+    have h4
+        : actQab (xiOK AI) i (i + 1) g (Submodule.Quotient.mk (toM AI i a))
+          = Submodule.Quotient.mk (actM (xiOK AI) i g (toM AI i a)) :=
+      rfl
     rw [h4, h2, hΦ, hΦ, map_mul, hθ' (AI.actW g a), hθ.2.2.1, hθ' a]
     congr 1
-    have h5 : Units.map θ'.toMonoidHom lam =
-        Units.map (algebraMap ℚ_[l] (PadicComplex l)).toMonoidHom (P.χQ g) := Units.ext h3
-    have h6 := congrArg (fun u : (PadicComplex l)ˣ => ((u ^ i : (PadicComplex l)ˣ) : PadicComplex l)) h5
+    have h5
+        : Units.map θ'.toMonoidHom lam
+          = Units.map (algebraMap ℚ_[l] (PadicComplex l)).toMonoidHom (P.χQ g) :=
+      Units.ext h3
+    have h6 :=
+      congrArg (fun u : (PadicComplex l)ˣ => ((u ^ i : (PadicComplex l)ˣ) : PadicComplex l)) h5
     beta_reduce at h6
     rw [← map_zpow, ← map_zpow] at h6
     exact h6
 
-theorem graded_iso : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (i : ℤ),
-    ∃ Φ : Qab (AinfSub l) (xiU AI) i (i + 1) →+ PadicComplex l, Function.Injective Φ ∧
-      Set.range Φ = {y | ‖y‖ ≤ 1} ∧ (∀ (z : ℤ_[l]) x, Φ (z • x) = zC z * Φ x) ∧
-      ∀ g : GQ l, g (P.ζQ 1) = P.ζQ 1 → ∀ x,
-        Φ (actQab (xiOK AI) i (i + 1) g x) = chiC P.χQ i g * AI.actC g (Φ x) := by
+theorem graded_iso
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (i : ℤ),
+      ∃ Φ : Qab (AinfSub l) (xiU AI) i (i + 1) →+ PadicComplex l,
+        Function.Injective Φ ∧ Set.range Φ = {y | ‖y‖ ≤ 1}
+          ∧ (∀ (z : ℤ_[l]) x, Φ (z • x) = zC z * Φ x)
+          ∧ ∀ g : GQ l,
+            g (P.ζQ 1) = P.ζQ 1
+              → ∀ x, Φ (actQab (xiOK AI) i (i + 1) g x) = chiC P.χQ i g * AI.actC g (Φ x) := by
   intro l _ P AI i
   obtain ⟨θ, hθ⟩ := GlobalTheory.T.exists_fontaineTheta_on_Ainf l P AI
   exact graded_of_theta AI θ hθ i

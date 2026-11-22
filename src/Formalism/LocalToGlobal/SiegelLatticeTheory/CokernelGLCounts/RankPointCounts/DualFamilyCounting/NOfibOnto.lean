@@ -14,7 +14,8 @@ open NumberField Formalism.BasicNotions Matrix
 
 namespace Formalism.L2.SG.Pf.NcReal.JX.NOf
 
-open Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj Formalism.MainNotions.S Formalism.L2.SG.Pf.NcReal.JX
+open Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj Formalism.MainNotions.S
+  Formalism.L2.SG.Pf.NcReal.JX
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -22,8 +23,10 @@ namespace Onto
 
 variable {D : D7} (X : HidaSetting D) (u : D.what₂.Word)
 
-theorem hc_congr (x y : BV X) (hX : ∀ p, x (Sum.inl (Sum.inl p)) = y (Sum.inl (Sum.inl p)))
-    (hR : ∀ b, x (Sum.inl (Sum.inr b)) = y (Sum.inl (Sum.inr b))) : Hc X u x = Hc X u y := by
+theorem hc_congr
+    (x y : BV X) (hX : ∀ p, x (Sum.inl (Sum.inl p)) = y (Sum.inl (Sum.inl p)))
+    (hR : ∀ b, x (Sum.inl (Sum.inr b)) = y (Sum.inl (Sum.inr b)))
+    : Hc X u x = Hc X u y := by
   funext v
   have h1 : Xc X x v = Xc X y v := by
     ext b a
@@ -51,13 +54,16 @@ theorem aaLb_inW {b : Fin D.R.rS} {y : (VS D).V} (hy : y ∈ aaLb X b) : InW X y
     intro a
     simp only [LinearMap.map_smul_of_tower, (hz a).1, (hz a).2, smul_zero, and_self]
 
-theorem mem_cl_row (b : Fin D.R.rS) (z : InfinitePlace X.B.I.F → Fin (D.R.k + 1) → ℂ) :
-    z ∈ AddSubgroup.closure (rowV X u '' aaLb X b) ↔ ∃ y ∈ aaLb X b, rowV X u y = z := by
+theorem mem_cl_row (b : Fin D.R.rS) (z : InfinitePlace X.B.I.F → Fin (D.R.k + 1) → ℂ)
+    : z ∈ AddSubgroup.closure (rowV X u '' aaLb X b) ↔ ∃ y ∈ aaLb X b, rowV X u y = z := by
   exact mem_closure_image (rowHom X u)
-    (Submodule.span (𝓞 D.host.E) {y | ∃ c ∈ (aaD D b : Set D.host.E), ∃ l ∈ X.Lb, y = c • l}).toAddSubgroup z
+    (Submodule.span (𝓞 D.host.E)
+      {y | ∃ c ∈ (aaD D b : Set D.host.E), ∃ l ∈ X.Lb, y = c • l}).toAddSubgroup
+    z
 
 def imH (a : Fin D.R.rS) : AddSubgroup D.host.E where
-  carrier := {t | t ∈ ((aaD D a * aaD D a : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) :
+  carrier :=
+    {t | t ∈ ((aaD D a * aaD D a : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) :
       Set D.host.E) ∧ D.host.conj t = -t}
   zero_mem' := ⟨Submodule.zero_mem _, by simp⟩
   add_mem' := by
@@ -72,18 +78,18 @@ def imHom : D.host.E →+ (InfinitePlace X.B.I.F → ℝ) where
   map_zero' := by funext v; simp
   map_add' s t := by funext v; simp
 
-theorem mem_cl_im (a : Fin D.R.rS) (z : InfinitePlace X.B.I.F → ℝ) :
-    z ∈ cLat X u (Sum.inr (Sum.inr a)) ↔ ∃ t ∈ imH a, imHom X t = z := by
+theorem mem_cl_im (a : Fin D.R.rS) (z : InfinitePlace X.B.I.F → ℝ)
+    : z ∈ cLat X u (Sum.inr (Sum.inr a)) ↔ ∃ t ∈ imH a, imHom X t = z := by
   exact mem_closure_image (imHom X) (imH a) z
 
 end Onto
 
-
 open Onto in
 theorem fibOnto_holds : FibOnto := by
   intro D X u x hx
-  have hA : ∀ p : LsNc5.LtPair D.R.rS, ∃ t ∈ aaD D p.1.1 * (aaD D p.1.2)⁻¹,
-      embV X t = x (Sum.inl (Sum.inl p)) := by
+  have hA
+      : ∀ p : LsNc5.LtPair D.R.rS, ∃ t ∈ aaD D p.1.1 * (aaD D p.1.2)⁻¹,
+        embV X t = x (Sum.inl (Sum.inl p)) := by
     intro p
     have h := hx (Sum.inl (Sum.inl p))
     simp only [tauQ, sub_zero] at h
@@ -93,18 +99,31 @@ theorem fibOnto_holds : FibOnto := by
     have h := hx (Sum.inl (Sum.inr b))
     simp only [tauQ, sub_zero] at h
     exact (mem_cl_row X u b _).1 h
-  have hC : ∀ p : LsNc5.LtPair D.R.rS, ∃ s ∈ aaD D p.1.1 * aaD D p.1.2,
-      embV X s = fun v => x (Sum.inr (Sum.inl p)) v - Hc X u x v p.1.1 p.1.2 / 2 :=
-    fun p => (mem_cl_emb X _ _).1 (hx (Sum.inr (Sum.inl p)))
-  have hD : ∀ a : Fin D.R.rS, ∃ t ∈ imH a, imHom X t =
-      fun v => x (Sum.inr (Sum.inr a)) v - -((Hc X u x v a a).re * (embS D (X.pl v) (theta D)).im) :=
+  have hC
+      : ∀ p : LsNc5.LtPair D.R.rS, ∃ s ∈ aaD D p.1.1 * aaD D p.1.2,
+        embV X s = fun v => x (Sum.inr (Sum.inl p)) v - Hc X u x v p.1.1 p.1.2 / 2 := fun p =>
+    (mem_cl_emb X _ _).1 (hx (Sum.inr (Sum.inl p)))
+  have hD
+      : ∀ a : Fin D.R.rS, ∃ t ∈ imH a,
+        imHom X t
+          = fun v =>
+            x (Sum.inr (Sum.inr a)) v - -((Hc X u x v a a).re * (embS D (X.pl v) (theta D)).im) :=
     fun a => (mem_cl_im X u a _).1 (hx (Sum.inr (Sum.inr a)))
   choose tA htA htA' using hA
   choose xs hxs hxs' using hB
   choose sC hsC hsC' using hC
   choose tD htD htD' using hD
-  obtain ⟨X0, hX0⟩ : ∃ X0 : Matrix (Fin D.R.rS) (Fin D.R.rS) D.host.E,
-      X0 = fun b a => if h : b < a then tA ⟨(b, a), h⟩ else if b = a then 1 else 0 := ⟨_, rfl⟩
+  obtain ⟨X0, hX0⟩
+      : ∃ X0 : Matrix (Fin D.R.rS) (Fin D.R.rS) D.host.E,
+        X0
+          = fun b a =>
+            if h : b < a then
+              tA ⟨(b, a), h⟩
+            else if b = a then
+              1
+            else
+              0 :=
+    ⟨_, rfl⟩
   have hup : ∀ b a : Fin D.R.rS, a < b → X0 b a = 0 := by
     intro b a h
     simp [hX0, not_lt_of_gt h, ne_of_gt h]
@@ -119,15 +138,21 @@ theorem fibOnto_holds : FibOnto := by
     intro i j
     have := congrFun (congrFun (Gp_herm X0 xs) i) j
     rwa [Matrix.conjTranspose_apply] at this
-  obtain ⟨M, hM⟩ : ∃ M : Matrix (Fin D.R.rS) (Fin D.R.rS) D.host.E,
-      M = fun b a => if h : b < a then sC ⟨(b, a), h⟩
-        else if h' : a < b then -Gp D X0 xs b a - star (sC ⟨(a, b), h'⟩)
-        else tD a - Gp D X0 xs a a * theta D := ⟨_, rfl⟩
+  obtain ⟨M, hM⟩
+      : ∃ M : Matrix (Fin D.R.rS) (Fin D.R.rS) D.host.E,
+        M = fun b a =>
+          if h : b < a then
+            sC ⟨(b, a), h⟩
+          else if h' : a < b then
+            - Gp D X0 xs b a - star (sC ⟨(a, b), h'⟩)
+          else
+            tD a - Gp D X0 xs a a * theta D :=
+    ⟨_, rfl⟩
   have hMlt : ∀ p : LsNc5.LtPair D.R.rS, M p.1.1 p.1.2 = sC p := by
     intro p
     simp [hM, p.2]
-  have hMgt : ∀ p : LsNc5.LtPair D.R.rS,
-      M p.1.2 p.1.1 = -Gp D X0 xs p.1.2 p.1.1 - star (sC p) := by
+  have hMgt
+      : ∀ p : LsNc5.LtPair D.R.rS, M p.1.2 p.1.1 = - Gp D X0 xs p.1.2 p.1.1 - star (sC p) := by
     intro p
     simp [hM, p.2, not_lt_of_gt p.2]
   have hMd : ∀ a, M a a = tD a - Gp D X0 xs a a * theta D := by
@@ -169,8 +194,9 @@ theorem fibOnto_holds : FibOnto := by
     show (embS D (X.pl v) (M p.1.1 p.1.2) - star (embS D (X.pl v) (M p.1.2 p.1.1))) / 2 = _
     have hs := congrFun (hsC' p) v
     simp only [embV, hHc v, Matrix.map_apply] at hs
-    have e1 : star (embS D (X.pl v) (M p.1.2 p.1.1)) =
-        -embS D (X.pl v) (Gp D X0 xs p.1.1 p.1.2) - embS D (X.pl v) (sC p) := by
+    have e1
+        : star (embS D (X.pl v) (M p.1.2 p.1.1))
+          = - embS D (X.pl v) (Gp D X0 xs p.1.1 p.1.2) - embS D (X.pl v) (sC p) := by
       rw [hMgt, ← emb_star X, star_sub, star_neg, star_star, hGh, map_sub, map_neg]
     rw [e1, hMlt]
     linear_combination hs

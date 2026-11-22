@@ -9,8 +9,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open TensorProduct IsLocalRing Polynomial UpperTheory.V.W UpperTheory.V.Alg UpperTheory.V.CA
 
-theorem UpperTheory.V.CA.d_unit :
-    ∀ {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E] (D : Det n A E), D.IsCH → (∀ x, IsUnit x ↔ IsUnit (D.val x)) ∧ Algebra.IsIntegral A E := by
+theorem UpperTheory.V.CA.d_unit
+    : ∀ {n : ℕ} {A E : Type} [CommRing A] [Ring E] [Algebra A E] (D : Det n A E),
+      D.IsCH → (∀ x, IsUnit x ↔ IsUnit (D.val x)) ∧ Algebra.IsIntegral A E := by
   intro n A E _ _ _ D hD
   have h0 : ∀ x : E, Polynomial.aeval x (D.chi x) = 0 := ((d_chS D A).2.2 hD).2
   refine ⟨fun x => ⟨fun h => h.map D.val, fun h => ?_⟩, ⟨fun x => ?_⟩⟩
@@ -19,7 +20,8 @@ theorem UpperTheory.V.CA.d_unit :
     have hc : IsUnit ((D.chi x).coeff 0) := isUnit_of_mul_isUnit_right h
     have h2 := h0 x
     rw [← Polynomial.X_mul_divX_add (D.chi x), map_add (f := _), map_mul, Polynomial.aeval_X,
-      Polynomial.aeval_C] at h2
+        Polynomial.aeval_C]
+      at h2
     have h3 : IsUnit (x * Polynomial.aeval x (D.chi x).divX) := by
       rw [eq_neg_of_add_eq_zero_left h2]
       exact (hc.map (algebraMap A E)).neg

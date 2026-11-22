@@ -13,9 +13,8 @@ namespace GlobalTheory.CompanionTheory.ShuffleWords
 
 variable {T : Type u}
 
-theorem interleave_exchange {u v w : List T} (h : Interleave u v w) :
-    ∀ {u' x : List T}, Interleave u' x v →
-      ∃ v', Interleave u' v' w ∧ Interleave u x v' := by
+theorem interleave_exchange {u v w : List T} (h : Interleave u v w)
+    : ∀ {u' x : List T}, Interleave u' x v → ∃ v', Interleave u' v' w ∧ Interleave u x v' := by
   induction h with
   | nil =>
     intro u' x h'
@@ -35,8 +34,8 @@ theorem interleave_exchange {u v w : List T} (h : Interleave u v w) :
       obtain ⟨v', h₁, h₂⟩ := ih h'
       exact ⟨a :: v', Interleave.right h₁, Interleave.right h₂⟩
 
-theorem shuffle_swap {a b : List T} {us : List (List T)} {w : List T}
-    (h : Shuffle (a :: b :: us) w) : Shuffle (b :: a :: us) w := by
+theorem shuffle_swap {a b : List T} {us : List (List T)} {w : List T} (h : Shuffle (a :: b :: us) w)
+    : Shuffle (b :: a :: us) w := by
   cases h with
   | cons hv hw =>
     cases hv with
@@ -44,8 +43,9 @@ theorem shuffle_swap {a b : List T} {us : List (List T)} {w : List T}
       obtain ⟨v', h₁, h₂⟩ := interleave_exchange hw hv
       exact Shuffle.cons (Shuffle.cons hx h₂) h₁
 
-theorem shuffle_perm {T : Type u} (us us' : List (List T)) (w : List T)
-    (h : Shuffle us w) (hp : us.Perm us') : Shuffle us' w := by
+theorem shuffle_perm
+    {T : Type u} (us us' : List (List T)) (w : List T) (h : Shuffle us w) (hp : us.Perm us')
+    : Shuffle us' w := by
   induction hp generalizing w with
   | nil => exact h
   | cons a _ ih =>

@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.Definitions.QuasicoherentCohomolo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -20,7 +22,8 @@ namespace GlobalTheory.Mum
 def stalkOf {W : Type} [CommRing W] (z : Sp W) : W →+* (Sp W).presheaf.stalk z :=
   ((Sp W).presheaf.germ ⊤ z trivial).hom.comp (Scheme.ΓSpecIso (CommRingCat.of W)).inv.hom
 
-theorem stalkOf_injective {W : Type} [CommRing W] [IsDomain W] (z : Sp W) : Function.Injective (stalkOf z) :=
+theorem stalkOf_injective {W : Type} [CommRing W] [IsDomain W] (z : Sp W)
+    : Function.Injective (stalkOf z) :=
   (germ_injective_of_isIntegral (Sp W) (U := ⊤) z trivial).comp
     (ConcreteCategory.bijective_of_isIso (Scheme.ΓSpecIso (CommRingCat.of W)).inv).1
 

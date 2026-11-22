@@ -6,14 +6,18 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Bijecti
 
 @[expose] public section
 
-open ReciprocityTheory.Gal Formalism.RepresentationBoundsCohomology.LOC ReciprocityTheory.ChartRestriction.T2 GlobalTheory.FunctorialityH2
+open ReciprocityTheory.Gal Formalism.RepresentationBoundsCohomology.LOC
+  ReciprocityTheory.ChartRestriction.T2 GlobalTheory.FunctorialityH2
 
 namespace GlobalTheory.NatQuot
 
-theorem quot_pow_maximalIdeal_discrete_finite :
-    ∀ {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [TopologicalSpace O]
-      [IsTopologicalRing O], PadicCoeff p O → ∀ k : ℕ,
-      DiscreteTopology (O ⧸ IsLocalRing.maximalIdeal O ^ k) ∧ Finite (O ⧸ IsLocalRing.maximalIdeal O ^ k) := by
+theorem quot_pow_maximalIdeal_discrete_finite
+    : ∀ {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [TopologicalSpace O] [IsTopologicalRing O],
+      PadicCoeff p O
+        → ∀ k : ℕ,
+          DiscreteTopology (O ⧸ IsLocalRing.maximalIdeal O ^ k)
+            ∧ Finite (O ⧸ IsLocalRing.maximalIdeal O ^ k) := by
   intro p O _ _ _ _ _ hO k
   haveI : CompactSpace O := hO.compact
   set I : Ideal O := IsLocalRing.maximalIdeal O ^ k with hI

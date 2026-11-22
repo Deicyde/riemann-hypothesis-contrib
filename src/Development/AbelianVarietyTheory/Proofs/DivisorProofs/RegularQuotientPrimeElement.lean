@@ -7,9 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Regul
 
 namespace GlobalTheory
 
-theorem prime_algebraMap_localization_of_isRegularRing_quotient :
-    ∀ (A : Type) [CommRing A] [IsDomain A] (P : Ideal A) [P.IsPrime] (x : A), x ≠ 0 → x ∈ P →
-      IsRegularRing (A ⧸ Ideal.span {x}) → Prime (algebraMap A (Localization.AtPrime P) x) := by
+theorem prime_algebraMap_localization_of_isRegularRing_quotient
+    : ∀ (A : Type) [CommRing A] [IsDomain A] (P : Ideal A) [P.IsPrime] (x : A),
+      x ≠ 0 → x ∈ P → IsRegularRing (A ⧸ Ideal.span {x})
+        → Prime (algebraMap A (Localization.AtPrime P) x) := by
   intro A _ _ P _ x hx hxP hreg
   set R := Localization.AtPrime P
   set J : Ideal A := Ideal.span {x} with hJdef
@@ -17,9 +18,10 @@ theorem prime_algebraMap_localization_of_isRegularRing_quotient :
     rw [Ideal.mk_ker, hJdef, Ideal.span_le, Set.singleton_subset_iff]; exact hxP
   have hle : J ≤ (J.map (algebraMap A R)).comap (algebraMap A R) := Ideal.le_comap_map
   letI : Algebra (A ⧸ J) (R ⧸ J.map (algebraMap A R)) := (Ideal.quotientMap _ _ hle).toAlgebra
-  have hl := IsLocalization.of_surjective P.primeCompl R (S' := R ⧸ J.map (algebraMap A R))
-    (Ideal.Quotient.mk J) Ideal.Quotient.mk_surjective (Ideal.Quotient.mk _) Ideal.Quotient.mk_surjective rfl
-    (by rw [Ideal.mk_ker, Ideal.mk_ker])
+  have hl :=
+    IsLocalization.of_surjective P.primeCompl R (S' := R ⧸ J.map (algebraMap A R))
+      (Ideal.Quotient.mk J) Ideal.Quotient.mk_surjective (Ideal.Quotient.mk _)
+      Ideal.Quotient.mk_surjective rfl (by rw [Ideal.mk_ker, Ideal.mk_ker])
   have hm : (P.map (Ideal.Quotient.mk J)).IsPrime :=
     Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective hJP
   have e : P.primeCompl.map (Ideal.Quotient.mk J) = (P.map (Ideal.Quotient.mk J)).primeCompl := by
@@ -41,7 +43,8 @@ theorem prime_algebraMap_localization_of_isRegularRing_quotient :
   have hmap : J.map (algebraMap A R) = Ideal.span {algebraMap A R x} := by
     rw [hJdef, Ideal.map_span, Set.image_singleton]
   rw [hmap] at hdom
-  have hprime : (Ideal.span {algebraMap A R x}).IsPrime := (Ideal.Quotient.isDomain_iff_prime _).1 hdom
+  have hprime : (Ideal.span {algebraMap A R x}).IsPrime :=
+    (Ideal.Quotient.isDomain_iff_prime _).1 hdom
   have hne : algebraMap A R x ≠ 0 := by
     intro h0
     apply hx

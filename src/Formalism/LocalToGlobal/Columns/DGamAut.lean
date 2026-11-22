@@ -9,7 +9,8 @@ public import Formalism.LocalRingCardinality.MinkMEqMinkowskiNumber
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.DIV Formalism.HermitianLatticesTheory
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.DIV
+  Formalism.HermitianLatticesTheory
 
 noncomputable section
 
@@ -23,15 +24,18 @@ def autLcm : ℕ := sInf {D : ℕ | 0 < D ∧ ∀ N : UniLat E n, Nat.card (autU
 
 variable {E n}
 
-theorem autLcm_mem {D : ℕ} (hD : 0 < D) (h : ∀ N : UniLat E n, Nat.card (autU E n N) ∣ D) :
-    0 < autLcm E n ∧ ∀ N : UniLat E n, Nat.card (autU E n N) ∣ autLcm E n := by
-  have hne : ({D : ℕ | 0 < D ∧ ∀ N : UniLat E n, Nat.card (autU E n N) ∣ D} : Set ℕ).Nonempty := ⟨D, hD, h⟩
+theorem autLcm_mem {D : ℕ} (hD : 0 < D) (h : ∀ N : UniLat E n, Nat.card (autU E n N) ∣ D)
+    : 0 < autLcm E n ∧ ∀ N : UniLat E n, Nat.card (autU E n N) ∣ autLcm E n := by
+  have hne : ({D : ℕ | 0 < D ∧ ∀ N : UniLat E n, Nat.card (autU E n N) ∣ D} : Set ℕ).Nonempty :=
+    ⟨D, hD, h⟩
   exact Nat.sInf_mem hne
 
-theorem autLcm_dvd {D : ℕ} (hD : 0 < D) (h : ∀ N : UniLat E n, Nat.card (autU E n N) ∣ D) : autLcm E n ∣ D := by
+theorem autLcm_dvd {D : ℕ} (hD : 0 < D) (h : ∀ N : UniLat E n, Nat.card (autU E n N) ∣ D)
+    : autLcm E n ∣ D := by
   obtain ⟨hpos, hdvd⟩ := autLcm_mem hD h
   have hg : 0 < Nat.gcd (autLcm E n) D := Nat.gcd_pos_of_pos_left _ hpos
-  have hmem : Nat.gcd (autLcm E n) D ∈ {D : ℕ | 0 < D ∧ ∀ N : UniLat E n, Nat.card (autU E n N) ∣ D} :=
+  have hmem
+      : Nat.gcd (autLcm E n) D ∈ {D : ℕ | 0 < D ∧ ∀ N : UniLat E n, Nat.card (autU E n N) ∣ D} :=
     ⟨hg, fun N => Nat.dvd_gcd (hdvd N) (h N)⟩
   have hle : autLcm E n ≤ Nat.gcd (autLcm E n) D := Nat.sInf_le hmem
   have hge : Nat.gcd (autLcm E n) D ≤ autLcm E n := Nat.le_of_dvd hpos (Nat.gcd_dvd_left _ _)
@@ -39,8 +43,8 @@ theorem autLcm_dvd {D : ℕ} (hD : 0 < D) (h : ∀ N : UniLat E n, Nat.card (aut
   rw [← heq]
   exact Nat.gcd_dvd_right _ _
 
-theorem card_autU_dvd_minkM (hE : PosStar E) (N : UniLat E n) :
-    Nat.card (autU E n N) ∣ minkM (Module.finrank ℚ E * n) := by
+theorem card_autU_dvd_minkM (hE : PosStar E) (N : UniLat E n)
+    : Nat.card (autU E n N) ∣ minkM (Module.finrank ℚ E * n) := by
   let φ : autU E n N →* GL (Fin n) E := (ufGL E n).comp (autU E n N).subtype
   have hφ : Function.Injective φ := fun a b hab =>
     Subtype.ext (Subtype.ext ((toGLm E n).injective hab))
@@ -60,15 +64,21 @@ theorem card_autU_dvd_minkM (hE : PosStar E) (N : UniLat E n) :
       obtain ⟨y, hy, e⟩ := hx
       have : y = x := (a.1 : UF E n).1.injective e
       rwa [← this]
-  have h1 := mk_card_dvd minkowskiBound_holds N.1 (hcnt_isFullLattice_of_unimodular N.2.1 N.2.2) φ.range hfin' hst
+  have h1 :=
+    mk_card_dvd minkowskiBound_holds N.1 (hcnt_isFullLattice_of_unimodular N.2.1 N.2.2) φ.range
+      hfin' hst
   rw [← Nat.card_congr (MonoidHom.ofInjective hφ).toEquiv] at h1
   exact h1
 
-theorem autLcm_pos (hE : PosStar E) : 0 < autLcm E n := (autLcm_mem (minkM_pos _) (card_autU_dvd_minkM hE)).1
+theorem autLcm_pos (hE : PosStar E) : 0 < autLcm E n :=
+  (autLcm_mem (minkM_pos _) (card_autU_dvd_minkM hE)).1
 
-theorem card_autU_dvd_autLcm (hE : PosStar E) (N : UniLat E n) : Nat.card (autU E n N) ∣ autLcm E n := (autLcm_mem (minkM_pos _) (card_autU_dvd_minkM hE)).2 N
+theorem card_autU_dvd_autLcm (hE : PosStar E) (N : UniLat E n)
+    : Nat.card (autU E n N) ∣ autLcm E n :=
+  (autLcm_mem (minkM_pos _) (card_autU_dvd_minkM hE)).2 N
 
-def UniLat.til (N : UniLat E n) : UniLat E (n + 1) := ⟨tilN N.1, tilN_lattice N.2.1, tilN_unimodular N.2.2⟩
+def UniLat.til (N : UniLat E n) : UniLat E (n + 1) :=
+  ⟨tilN N.1, tilN_lattice N.2.1, tilN_unimodular N.2.2⟩
 
 def autU_til (N : UniLat E n) : autU E n N →* autU E (n + 1) N.til :=
   (extU.comp (autU E n N).subtype).codRestrict _ fun a => by
@@ -88,16 +98,21 @@ theorem autU_til_injective (N : UniLat E n) : Function.Injective (autU_til N) :=
   intro x
   obtain ⟨y, hy⟩ : ∃ y : Sp E (n + 1), initL E n y = x := by
     refine ⟨Fin.snoc (α := fun _ => E) x 0, ?_⟩
-    change (fun i : Fin n => (Fin.snoc (α := fun _ => E) x 0 : Fin (n + 1) → E) (Fin.castSucc i)) = x
+    change (fun i : Fin n => (Fin.snoc (α := fun _ => E) x 0 : Fin (n + 1) → E) (Fin.castSucc i))
+      = x
     funext i
     simp
   subst hy
-  calc (a.1 : UF E n).1 (initL E n y) = initL E n (extE (a.1 : UF E n).1 y) := (initL_extE _ _).symm
+  calc
+    (a.1 : UF E n).1 (initL E n y)
+      = initL E n (extE (a.1 : UF E n).1 y) := (initL_extE _ _).symm
     _ = initL E n (extE (b.1 : UF E n).1 y) := by rw [h1]
     _ = (b.1 : UF E n).1 (initL E n y) := initL_extE _ _
 
-theorem autLcm_dvd_succ (hE : PosStar E) : autLcm E n ∣ autLcm E (n + 1) := autLcm_dvd (autLcm_pos (E := E) (n := n + 1) hE) fun N =>
-    (Subgroup.card_dvd_of_injective (autU_til N) (autU_til_injective N)).trans (card_autU_dvd_autLcm hE N.til)
+theorem autLcm_dvd_succ (hE : PosStar E) : autLcm E n ∣ autLcm E (n + 1) :=
+  autLcm_dvd (autLcm_pos (E := E) (n := n + 1) hE) fun N =>
+    (Subgroup.card_dvd_of_injective (autU_til N) (autU_til_injective N)).trans
+      (card_autU_dvd_autLcm hE N.til)
 
 theorem autLcm_mono (hE : PosStar E) {n n' : ℕ} (h : n ≤ n') : autLcm E n ∣ autLcm E n' := by
   induction h with
@@ -134,7 +149,8 @@ theorem dGamRanks_le (R : Ranks) {n : ℕ} (hn : n ∈ dGamRanks R) : n ≤ R.N 
     omega
   unfold dGamRanks at hn
   simp only [Finset.mem_union, Finset.mem_image, Finset.mem_Icc, Finset.mem_insert,
-    Finset.mem_singleton] at hn
+      Finset.mem_singleton]
+    at hn
   rcases hn with ⟨j, ⟨_, hj⟩, rfl⟩ | rfl | rfl | rfl
   · exact dga_N_mono R hj
   · exact hX
@@ -161,8 +177,9 @@ theorem autLcm_dvd_dGamAut (hX : X.Ok) {n : ℕ} (hn : n ≤ R.N R.m) : autLcm X
   rw [dGamAut_eq hX]
   exact autLcm_mono (posStar_of_ok hX) hn
 
-theorem card_autU_dvd_dGamAut (hX : X.Ok) {n : ℕ} (hn : n ≤ R.N R.m) (N : UniLat X.E n) :
-    Nat.card (autU X.E n N) ∣ dGamAut X R := (card_autU_dvd_autLcm (posStar_of_ok hX) N).trans (autLcm_dvd_dGamAut hX hn)
+theorem card_autU_dvd_dGamAut (hX : X.Ok) {n : ℕ} (hn : n ≤ R.N R.m) (N : UniLat X.E n)
+    : Nat.card (autU X.E n N) ∣ dGamAut X R :=
+  (card_autU_dvd_autLcm (posStar_of_ok hX) N).trans (autLcm_dvd_dGamAut hX hn)
 
 end DGam
 
@@ -170,24 +187,39 @@ section Stab
 
 variable {X : Fields} {R : Ranks} {n : ℕ} {ST SG Q : Finset (HeightOneSpectrum (𝓞 X.E))}
 
-theorem formGSD_stab_dvd_autU (C : CoefPk X n (DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG))) (Λ : LevFam X.E X.K n SG) (d : DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG)) :
-    Nat.card (MulAction.stabilizer (formGSD C Λ).G d) ∣ Nat.card (autU X.E n d.lat) := by
+theorem formGSD_stab_dvd_autU
+    (C : CoefPk X n (DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG))) (Λ : LevFam X.E X.K n SG)
+    (d : DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG))
+    : Nat.card (MulAction.stabilizer (formGSD C Λ).G d) ∣ Nat.card (autU X.E n d.lat) := by
   let φ : MulAction.stabilizer (formGSD C Λ).G d →* autU X.E n d.lat :=
-    ((MonoidHom.fst (UF X.E n) ↥Λ.grp).comp (MulAction.stabilizer (formGSD C Λ).G d).subtype).codRestrict _ fun a => by
+    ((MonoidHom.fst (UF X.E n) ↥Λ.grp).comp
+        (MulAction.stabilizer (formGSD C Λ).G d).subtype).codRestrict _ fun a => by
       rw [MulAction.mem_stabilizer_iff]
       exact congrArg DecoSet.lat a.2
   refine Subgroup.card_dvd_of_injective φ fun a b hab => ?_
   have h1 : (a.1.1 : UF X.E n) = b.1.1 := congrArg Subtype.val hab
   exact Subtype.ext (formGSD_stab_inj C Λ d a.2 b.2 h1)
 
-theorem formGSD_stab_dvd_dGamAut (hX : X.Ok) (hn : n ≤ R.N R.m) (C : CoefPk X n (DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG))) (Λ : LevFam X.E X.K n SG)
-    (d : DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG)) : Nat.card (MulAction.stabilizer (formGSD C Λ).G d) ∣ dGamAut X R := (formGSD_stab_dvd_autU C Λ d).trans (card_autU_dvd_dGamAut hX hn _)
+theorem formGSD_stab_dvd_dGamAut
+    (hX : X.Ok) (hn : n ≤ R.N R.m)
+    (C : CoefPk X n (DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG))) (Λ : LevFam X.E X.K n SG)
+    (d : DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG))
+    : Nat.card (MulAction.stabilizer (formGSD C Λ).G d) ∣ dGamAut X R :=
+  (formGSD_stab_dvd_autU C Λ d).trans (card_autU_dvd_dGamAut hX hn _)
 
-theorem dga_frm_stab_inj (Λ : LevFam X.E X.K n SG) (Θ : LevQFam X.E X.K n Q) (p : DecoF X.E n ST SG Q) {a b : FrmG Λ Θ}
-    (ha : a • p = p) (hb : b • p = p) (hab : a.1 = b.1) : a = b := by
-  have hda : ((a.1, (a.2.1 : GLG (E := X.E) (n := n) (SG := SG))) • p.deco : DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG)) = p.deco :=
+theorem dga_frm_stab_inj
+    (Λ : LevFam X.E X.K n SG) (Θ : LevQFam X.E X.K n Q) (p : DecoF X.E n ST SG Q)
+    {a b : FrmG Λ Θ} (ha : a • p = p) (hb : b • p = p) (hab : a.1 = b.1)
+    : a = b := by
+  have hda
+      : ((a.1, (a.2.1 : GLG (E := X.E) (n := n) (SG := SG))) • p.deco
+          : DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG))
+        = p.deco :=
     congrArg (fun q : DecoF X.E n ST SG Q => q.1.1) ha
-  have hdb : ((b.1, (b.2.1 : GLG (E := X.E) (n := n) (SG := SG))) • p.deco : DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG)) = p.deco :=
+  have hdb
+      : ((b.1, (b.2.1 : GLG (E := X.E) (n := n) (SG := SG))) • p.deco
+          : DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG))
+        = p.deco :=
     congrArg (fun q : DecoF X.E n ST SG Q => q.1.1) hb
   have h1 := DecoSet.stab_fst_injective p.deco hda hdb hab
   have h2 : (a.2.1 : GLG (E := X.E) (n := n) (SG := SG)) = b.2.1 := congrArg Prod.snd h1

@@ -13,15 +13,17 @@ namespace ReciprocityTheory.ChartRestriction.G.AR.Up
 
 namespace BigB
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
-theorem S_pos (X : Data E r) (Xa : ArchInM X) {x : Frame X.Ψ r} (hx : x ∈ X.dom) :
-    0 < ∑ k, X.pnorm Xa.L (Xa.w k) x ^ 2 := by
+theorem S_pos (X : Data E r) (Xa : ArchInM X) {x : Frame X.Ψ r} (hx : x ∈ X.dom)
+    : 0 < ∑ k, X.pnorm Xa.L (Xa.w k) x ^ 2 := by
   obtain ⟨k, hk⟩ := Xa.w_nz x hx
-  have hd' : ∀ τ : X.Ψ, (mat x τ).det ≠ 0 ∧
-      ∀ i : Fin (r + 1), 0 < psgn X.p0 i * (dmin X.Gm x τ i).re := hx
+  have hd'
+      : ∀ τ : X.Ψ, (mat x τ).det ≠ 0 ∧ ∀ i : Fin (r + 1), 0 < psgn X.p0 i * (dmin X.Gm x τ i).re :=
+    hx
   have hne : ∀ (τ : X.Ψ) (i : Fin (r + 1)), dmin X.Gm x τ i ≠ 0 := by
     intro τ i h0
     have h1 := (hd' τ).2 i
@@ -36,13 +38,17 @@ theorem S_pos (X : Data E r) (Xa : ArchInM X) {x : Frame X.Ψ r} (hx : x ∈ X.d
     intro i _
     apply Real.rpow_pos_of_pos
     exact norm_pos_iff.mpr (div_ne_zero (hne τ i.succ) (hne τ i.castSucc))
-  calc (0 : ℝ) < X.pnorm Xa.L (Xa.w k) x ^ 2 := by positivity
+  calc
+    (0 : ℝ)
+      < X.pnorm Xa.L (Xa.w k) x ^ 2 := by positivity
     _ ≤ ∑ k, X.pnorm Xa.L (Xa.w k) x ^ 2 :=
-      Finset.single_le_sum (f := fun k => X.pnorm Xa.L (Xa.w k) x ^ 2) (fun j _ => sq_nonneg _)
+      Finset.single_le_sum
+        (f := fun k => X.pnorm Xa.L (Xa.w k) x ^ 2)
+        (fun j _ => sq_nonneg _)
         (Finset.mem_univ k)
 
-theorem pnorm_contOn (X : Data E r) (la : Wt X.Ψ r) {P : Frame X.Ψ r → ℂ} (hP : X.IsSec la P) :
-    ContinuousOn (X.pnorm la P) X.dom := by
+theorem pnorm_contOn (X : Data E r) (la : Wt X.Ψ r) {P : Frame X.Ψ r → ℂ} (hP : X.IsSec la P)
+    : ContinuousOn (X.pnorm la P) X.dom := by
   have hd : ∀ (τ : X.Ψ) (i : Fin (r + 1)), Continuous fun x : Frame X.Ψ r => dmin X.Gm x τ i := by
     intro τ i
     unfold dmin lminor
@@ -55,8 +61,10 @@ theorem pnorm_contOn (X : Data E r) (la : Wt X.Ψ r) {P : Frame X.Ψ r → ℂ} 
     fun_prop
   have hne : ∀ x ∈ X.dom, ∀ (τ : X.Ψ) (i : Fin (r + 1)), dmin X.Gm x τ i ≠ 0 := by
     intro x hx τ i h0
-    have hd' : ∀ τ : X.Ψ, (mat x τ).det ≠ 0 ∧
-        ∀ i : Fin (r + 1), 0 < psgn X.p0 i * (dmin X.Gm x τ i).re := hx
+    have hd'
+        : ∀ τ : X.Ψ,
+          (mat x τ).det ≠ 0 ∧ ∀ i : Fin (r + 1), 0 < psgn X.p0 i * (dmin X.Gm x τ i).re :=
+      hx
     have h1 := (hd' τ).2 i
     rw [h0] at h1
     simp at h1

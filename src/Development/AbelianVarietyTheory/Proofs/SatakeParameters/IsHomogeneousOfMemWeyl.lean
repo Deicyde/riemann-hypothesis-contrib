@@ -14,7 +14,9 @@ noncomputable section
 
 namespace GlobalTheory.LiftTypePrime
 
-open NumberField MvPolynomial Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.GL3Theta GlobalTheory.IndefiniteRowSideFullHecke.IntegralityWeylConditions
+open NumberField MvPolynomial Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.GL3Theta
+  GlobalTheory.IndefiniteRowSideFullHecke.IntegralityWeylConditions
 
 section Generic
 
@@ -22,23 +24,29 @@ open Formalism.GradedWeylDivisibility
 
 variable {a b : ℕ} (hab : a ≤ b)
 
-def subGen : MvPolynomial (Fin a × Fin a) ℤ →ₐ[ℤ] MvPolynomial (Fin b × Fin a) (MvPolynomial (Fin b × Fin b) ℤ) :=
+def subGen
+    : MvPolynomial (Fin a × Fin a) ℤ →ₐ[ℤ] MvPolynomial (Fin b × Fin a) (MvPolynomial (Fin b × Fin b) ℤ) :=
   aeval fun v => ∑ β : Fin b, C (X (β, Fin.castLE hab v.2)) * X (β, v.1)
 
-theorem aeval_subGen {A : Type} [CommRing A] (d : Fin b × Fin a → A) (y : Fin b × Fin b → A)
-    (f : MvPolynomial (Fin a × Fin a) ℤ) :
-    aeval (fun v : Fin a × Fin a => ∑ β : Fin b, y (β, Fin.castLE hab v.2) * d (β, v.1)) f =
-      ∑ α ∈ (subGen hab f).support, aeval y ((subGen hab f).coeff α) * ∏ v ∈ α.support, d v ^ α v := by
-  have h := eval₂_eq (aeval (R := ℤ) y).toRingHom d (subGen hab f)
-  refine Eq.trans ?_ h
-  have : (aeval (R := ℤ) (fun v : Fin a × Fin a => ∑ β : Fin b, y (β, Fin.castLE hab v.2) * d (β, v.1))).toRingHom =
-      (eval₂Hom (aeval (R := ℤ) y).toRingHom d).comp (subGen hab).toRingHom := by
-    refine MvPolynomial.ringHom_ext' (RingHom.ext_int _ _) fun v => ?_
-    simp [subGen]
-  exact RingHom.congr_fun this f
+theorem aeval_subGen
+    {A : Type} [CommRing A]
+    (d : Fin b × Fin a → A) (y : Fin b × Fin b → A) (f : MvPolynomial (Fin a × Fin a) ℤ)
+    : aeval (fun v : Fin a × Fin a => ∑ β : Fin b, y (β, Fin.castLE hab v.2) * d (β, v.1)) f
+      = ∑ α ∈ (subGen hab f).support, aeval y ((subGen hab f).coeff α) * ∏ v ∈ α.support, d v ^ α v :=
+  by
+    have h := eval₂_eq (aeval (R := ℤ) y).toRingHom d (subGen hab f)
+    refine Eq.trans ?_ h
+    have : (aeval (R := ℤ)
+          (fun v : Fin a × Fin a => ∑ β : Fin b, y (β, Fin.castLE hab v.2) * d (β, v.1))).toRingHom
+        = (eval₂Hom (aeval (R := ℤ) y).toRingHom d).comp (subGen hab).toRingHom := by
+      refine MvPolynomial.ringHom_ext' (RingHom.ext_int _ _) fun v => ?_
+      simp [subGen]
+    exact RingHom.congr_fun this f
 
-theorem isHomogeneous_of_mem_weyl {ν : Fin a → ℕ} (hν : Antitone ν) {f : MvPolynomial (Fin a × Fin a) ℤ}
-    (hf : f ∈ weyl ℤ a a le_rfl ν) : f.IsHomogeneous (∑ r, ν r) := by
+theorem isHomogeneous_of_mem_weyl
+    {ν : Fin a → ℕ} (hν : Antitone ν)
+    {f : MvPolynomial (Fin a × Fin a) ℤ} (hf : f ∈ weyl ℤ a a le_rfl ν)
+    : f.IsHomogeneous (∑ r, ν r) := by
   have h : IsWeightedHomogeneous (colW a a) f ν := (weylLeDual ℤ a a le_rfl ν hν hf).1
   intro m hm
   rw [← h hm]
@@ -47,17 +55,24 @@ theorem isHomogeneous_of_mem_weyl {ν : Fin a → ℕ} (hν : Antitone ν) {f : 
   refine Finset.sum_congr rfl fun v _ => ?_
   simp [Pi.single_apply]
 
-theorem subGen_isHomogeneous {n : ℕ} {f : MvPolynomial (Fin a × Fin a) ℤ} (hf : f.IsHomogeneous n) :
-    (subGen hab f).IsHomogeneous n := by
-  have := hf.aeval (fun v : Fin a × Fin a => ∑ β : Fin b,
-    (C (X (β, Fin.castLE hab v.2)) * X (β, v.1) : MvPolynomial (Fin b × Fin a) (MvPolynomial (Fin b × Fin b) ℤ)))
-    (n := 1) (fun v => IsHomogeneous.sum _ _ _ fun β _ => isHomogeneous_C_mul_X _ _)
+theorem subGen_isHomogeneous {n : ℕ} {f : MvPolynomial (Fin a × Fin a) ℤ} (hf : f.IsHomogeneous n)
+    : (subGen hab f).IsHomogeneous n := by
+  have :=
+    hf.aeval
+      (fun v : Fin a × Fin a =>
+        ∑ β : Fin b,
+          (C (X (β, Fin.castLE hab v.2)) * X (β, v.1) : MvPolynomial (Fin b × Fin a) (MvPolynomial (Fin b × Fin b) ℤ)))
+      (n := 1)
+      (fun v => IsHomogeneous.sum _ _ _ fun β _ => isHomogeneous_C_mul_X _ _)
   rw [one_mul] at this
   exact this
 
-theorem coeff_subGen_mem {ν : Fin a → ℕ} {ν' : Fin b → ℕ} (hν : Antitone ν')
-    (h : ∀ j : Fin b, ν' j = if h : (j : ℕ) < a then ν ⟨j, h⟩ else 0) {f : MvPolynomial (Fin a × Fin a) ℤ}
-    (hf : f ∈ weyl ℤ a a le_rfl ν) (α : Fin b × Fin a →₀ ℕ) : (subGen hab f).coeff α ∈ weyl ℤ b b le_rfl ν' := by
+theorem coeff_subGen_mem
+    {ν : Fin a → ℕ} {ν' : Fin b → ℕ}
+    (hν : Antitone ν') (h : ∀ j : Fin b, ν' j = if h : (j : ℕ) < a then ν ⟨j, h⟩ else 0)
+    {f : MvPolynomial (Fin a × Fin a) ℤ} (hf : f ∈ weyl ℤ a a le_rfl ν)
+    (α : Fin b × Fin a →₀ ℕ)
+    : (subGen hab f).coeff α ∈ weyl ℤ b b le_rfl ν' := by
   let S := MvPolynomial (Fin b × Fin a) ℤ
   let M : Matrix (Fin b) (Fin b) S := fun i β => if h : (i : ℕ) < a then X (β, ⟨i, h⟩) else 0
   have h1 := GlobalTheory.T.rename_upperLeftCorner_mem_weylLattice ℤ a b hab ν ν' h f hf
@@ -66,23 +81,36 @@ theorem coeff_subGen_mem {ν : Fin a → ℕ} {ν' : Fin b → ℕ} (hν : Antit
     induction hg using Submodule.span_induction with
     | mem x hx =>
       obtain ⟨w, rfl⟩ := hx
-      exact Submodule.subset_span ⟨w, by
-        beta_reduce
-        rw [← lclosedeq_hw_map (algebraMap ℤ S), lclosedeq_applyWord_map]⟩
+      exact Submodule.subset_span ⟨
+        w,
+        by
+          beta_reduce
+          rw [← lclosedeq_hw_map (algebraMap ℤ S), lclosedeq_applyWord_map]
+      ⟩
     | zero => rw [map_zero]; exact zero_mem _
     | add x y _ _ hx hy => rw [map_add (f := map (algebraMap ℤ S))]; exact add_mem hx hy
     | smul c x _ hx => rw [map_zsmul]; exact zsmul_mem hx c
   have h2 := GlobalTheory.T.weylRowAction_mem_weylLattice_square S b ν' hν M _ (hmap _ h1)
-  let ψ : MvPolynomial (Fin b × Fin b) S →+* MvPolynomial (Fin b × Fin a) (MvPolynomial (Fin b × Fin b) ℤ) :=
+  let ψ
+      : MvPolynomial (Fin b × Fin b) S
+        →+* MvPolynomial (Fin b × Fin a) (MvPolynomial (Fin b × Fin b) ℤ) :=
     eval₂Hom (map (algebraMap ℤ _)) fun v => C (X v)
   have hψ : ∀ g : MvPolynomial (Fin b × Fin b) ℤ, ψ (map (algebraMap ℤ S) g) = C g := fun g => by
     have : ψ.comp (map (algebraMap ℤ S)) = C :=
       MvPolynomial.ringHom_ext' (RingHom.ext_int _ _) fun v => by simp [ψ]
     exact RingHom.congr_fun this g
-  have e : subGen hab f = ψ (rowAct S M (map (algebraMap ℤ S) (rename (fun v : Fin a × Fin a =>
-      ((Fin.castLE hab v.1, Fin.castLE hab v.2) : Fin b × Fin b)) f))) := by
-    have : (subGen hab).toRingHom = ψ.comp ((rowAct S M).toRingHom.comp ((map (algebraMap ℤ S)).comp
-        (rename (fun v : Fin a × Fin a => ((Fin.castLE hab v.1, Fin.castLE hab v.2) : Fin b × Fin b))).toRingHom)) := by
+  have e
+      : subGen hab f
+        = ψ (rowAct S M
+          (map (algebraMap ℤ S)
+            (rename
+              (fun v : Fin a × Fin a => ((Fin.castLE hab v.1, Fin.castLE hab v.2) : Fin b × Fin b))
+              f))) := by
+    have : (subGen hab).toRingHom
+        = ψ.comp ((rowAct S M).toRingHom.comp
+          ((map (algebraMap ℤ S)).comp
+            (rename (fun v : Fin a × Fin a =>
+              ((Fin.castLE hab v.1, Fin.castLE hab v.2) : Fin b × Fin b))).toRingHom)) := by
       refine MvPolynomial.ringHom_ext' (RingHom.ext_int _ _) fun v => ?_
       simp [subGen, rowAct, ψ, M, mul_comm]
       exact Finset.sum_congr rfl fun x _ => congrArg (· * _) (map_X _ _).symm
@@ -92,14 +120,17 @@ theorem coeff_subGen_mem {ν : Fin a → ℕ} {ν' : Fin b → ℕ} (hν : Antit
   induction h2 using Submodule.span_induction generalizing α with
   | mem x hx =>
     obtain ⟨w, rfl⟩ := hx
-    have : applyWord S w (hw S le_rfl ν') = map (algebraMap ℤ S) (applyWord ℤ w (hw ℤ le_rfl ν')) := by
+    have : applyWord S w (hw S le_rfl ν')
+        = map (algebraMap ℤ S) (applyWord ℤ w (hw ℤ le_rfl ν')) := by
       rw [← lclosedeq_hw_map (algebraMap ℤ S), lclosedeq_applyWord_map]
     simp only [this, hψ, coeff_C]
     split_ifs
     · exact Submodule.subset_span ⟨w, rfl⟩
     · exact zero_mem _
-  | zero => simp
-  | add x y _ _ hx hy => rw [map_add (f := _), AddMonoidAlgebra.coeff_add]; exact add_mem (hx α) (hy α)
+  | zero =>
+    simp
+  | add x y _ _ hx hy =>
+    rw [map_add (f := _), AddMonoidAlgebra.coeff_add]; exact add_mem (hx α) (hy α)
   | smul c x _ hx =>
     classical
     rw [smul_eq_C_mul, map_mul, coeff_mul]

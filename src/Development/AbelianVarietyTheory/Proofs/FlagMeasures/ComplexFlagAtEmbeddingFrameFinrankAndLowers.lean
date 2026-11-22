@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LowersMulZero
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.RadCov
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.RadCov
 
 namespace GlobalTheory.RadCov
 
@@ -70,9 +71,8 @@ private lemma map_mem_span_image_of_mem_span {E : Type} [Field E] {n : ℕ} (φ 
     rw [h1]
     exact Submodule.smul_mem _ _ hy
 
-theorem finrank_span_image_ringHom {E : Type} [Field E] {n : ℕ} (φ : E →+* ℂ)
-    (s : Set (Fin n → E)) :
-    Module.finrank ℂ (Submodule.span ℂ ((fun (y : Fin n → E) l => φ (y l)) '' s))
+theorem finrank_span_image_ringHom {E : Type} [Field E] {n : ℕ} (φ : E →+* ℂ) (s : Set (Fin n → E))
+    : Module.finrank ℂ (Submodule.span ℂ ((fun (y : Fin n → E) l => φ (y l)) '' s))
       = Module.finrank E (Submodule.span E s) := by
   classical
   let V := Submodule.span E s
@@ -81,16 +81,15 @@ theorem finrank_span_image_ringHom {E : Type} [Field E] {n : ℕ} (φ : E →+* 
   have hv : LinearIndependent E v := b.linearIndependent.map' V.subtype V.ker_subtype
   have hvV : ∀ i, v i ∈ V := fun i => (b i).2
   have hspan : Submodule.span E (Set.range v) = V := by
-    have hr : Set.range v = V.subtype '' Set.range b := by
-      rw [← Set.range_comp]; rfl
+    have hr : Set.range v = V.subtype '' Set.range b := by rw [← Set.range_comp]; rfl
     rw [hr, Submodule.span_image, b.span_eq, Submodule.map_subtype_top]
-  have heq : Submodule.span ℂ ((fun (y : Fin n → E) l => φ (y l)) '' s)
-      = Submodule.span ℂ (Set.range fun i l => φ (v i l)) := by
+  have heq
+      : Submodule.span ℂ ((fun (y : Fin n → E) l => φ (y l)) '' s)
+        = Submodule.span ℂ (Set.range fun i l => φ (v i l)) := by
     apply le_antisymm
     · rw [Submodule.span_le]
       rintro _ ⟨x, hx, rfl⟩
-      have hx' : x ∈ Submodule.span E (Set.range v) := by
-        rw [hspan]; exact Submodule.subset_span hx
+      have hx' : x ∈ Submodule.span E (Set.range v) := by rw [hspan]; exact Submodule.subset_span hx
       have h := map_mem_span_image_of_mem_span φ _ hx'
       rw [← Set.range_comp] at h
       exact h
@@ -99,10 +98,14 @@ theorem finrank_span_image_ringHom {E : Type} [Field E] {n : ℕ} (φ : E →+* 
       exact map_mem_span_image_of_mem_span φ s (hvV i)
   rw [heq, finrank_span_eq_card (linearIndependent_map_ringHom_complex φ hv), Fintype.card_fin]
 
-theorem finrank_locFlag_and_lowers (E : Type) [Field E] [NumberField E] (n : ℕ) (φ : E →+* ℂ)
-    (P : Matrix (Fin n) (Fin n) ℂ) (F : ℕ → Submodule (𝓞 E) (Fin n → E)) (hP : IsUnit P) :
-    (∀ b, Module.finrank ℂ (locFlag φ P F b) = Formalism.HN.rkK (F b)) ∧
-      ∀ c, ∀ T ∈ lowers F c, P⁻¹ * T.map φ * P ∈ lowers (locFlag φ P F) c := by
+theorem finrank_locFlag_and_lowers
+    (E : Type) [Field E] [NumberField E]
+    (n : ℕ)
+    (φ : E →+* ℂ)
+    (P : Matrix (Fin n) (Fin n) ℂ)
+    (F : ℕ → Submodule (𝓞 E) (Fin n → E)) (hP : IsUnit P)
+    : (∀ b, Module.finrank ℂ (locFlag φ P F b) = Formalism.HN.rkK (F b))
+      ∧ ∀ c, ∀ T ∈ lowers F c, P⁻¹ * T.map φ * P ∈ lowers (locFlag φ P F) c := by
   have hdet : IsUnit P.det := (Matrix.isUnit_iff_isUnit_det P).mp hP
   have hPP : P * P⁻¹ = 1 := Matrix.mul_nonsing_inv P hdet
   refine ⟨fun b => ?_, fun c T hT => ?_⟩
@@ -110,16 +113,19 @@ theorem finrank_locFlag_and_lowers (E : Type) [Field E] [NumberField E] (n : ℕ
       intro x y hxy
       have h := congrArg (fun z => P *ᵥ z) hxy
       simpa [Matrix.mulVec_mulVec, hPP] using h
-    have himg : locFlag φ P F b = Submodule.map (Matrix.mulVecLin P⁻¹)
-        (Submodule.span ℂ ((fun (y : Fin n → E) l => φ (y l)) '' (F b : Set (Fin n → E)))) := by
+    have himg
+        : locFlag φ P F b
+          = Submodule.map (Matrix.mulVecLin P⁻¹)
+            (Submodule.span ℂ ((fun (y : Fin n → E) l => φ (y l)) '' (F b : Set (Fin n → E)))) := by
       rw [Submodule.map_span, ← Set.image_comp]
       rfl
     rw [himg, ← (Submodule.equivMapOfInjective _ hinj _).finrank_eq, finrank_span_image_ringHom]
     rfl
   · rw [GlobalTheory.RadCov.mem_lowers] at hT ⊢
     intro b y hy
-    have key : locFlag φ P F (b + c + 1)
-        ≤ Submodule.comap (Matrix.mulVecLin (P⁻¹ * T.map φ * P)) (locFlag φ P F b) := by
+    have key
+        : locFlag φ P F (b + c + 1)
+          ≤ Submodule.comap (Matrix.mulVecLin (P⁻¹ * T.map φ * P)) (locFlag φ P F b) := by
       rw [locFlag, Submodule.span_le]
       rintro _ ⟨x, hx, rfl⟩
       rw [SetLike.mem_coe, Submodule.mem_comap, Matrix.mulVecLin_apply]

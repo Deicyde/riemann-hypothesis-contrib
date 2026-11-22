@@ -8,9 +8,10 @@ namespace GlobalTheory.FinsetKernelTrivial
 
 open scoped BigOperators
 
-noncomputable def restr {X : Type} (V : Submodule ℂ (X → ℂ)) (W : Submodule ℂ V) (P : Finset X) :
-    W →ₗ[ℂ] (P → ℂ) :=
-  LinearMap.pi (fun x : P => (LinearMap.proj (R := ℂ) (φ := fun _ : X => ℂ) x.1).comp (V.subtype.comp W.subtype))
+noncomputable def restr {X : Type} (V : Submodule ℂ (X → ℂ)) (W : Submodule ℂ V) (P : Finset X)
+    : W →ₗ[ℂ] (P → ℂ) :=
+  LinearMap.pi (fun x : P =>
+    (LinearMap.proj (R := ℂ) (φ := fun _ : X => ℂ) x.1).comp (V.subtype.comp W.subtype))
 
 lemma restr_apply {X : Type} (V : Submodule ℂ (X → ℂ)) (W : Submodule ℂ V) (P : Finset X)
     (w : W) (x : P) : restr V W P w x = ((w : V) : X → ℂ) x := rfl
@@ -47,8 +48,10 @@ lemma exists_finset_ker_eq_bot {X : Type} (V : Submodule ℂ (X → ℂ)) (W : S
   have hmin := Nat.find_min hex (hP ▸ hlt)
   exact hmin ⟨insert x P, rfl⟩
 
-theorem main : ∀ {X : Type} (V : Submodule ℂ (X → ℂ)) (W : Submodule ℂ ↥V) [FiniteDimensional ℂ ↥W],
-    ∃ (P : Finset X) (e : X → ↥V), ∀ w ∈ W, w = ∑ x ∈ P, (↑w : X → ℂ) x • e x := by
+theorem main
+    : ∀ {X : Type} (V : Submodule ℂ (X → ℂ)) (W : Submodule ℂ ↥V) [FiniteDimensional ℂ ↥W],
+      ∃ (P : Finset X) (e : X → ↥V), ∀ w ∈ W,
+        w = ∑ x ∈ P, (↑w : X → ℂ) x • e x := by
   intro X V W _
   classical
   obtain ⟨P, hP⟩ := exists_finset_ker_eq_bot V W

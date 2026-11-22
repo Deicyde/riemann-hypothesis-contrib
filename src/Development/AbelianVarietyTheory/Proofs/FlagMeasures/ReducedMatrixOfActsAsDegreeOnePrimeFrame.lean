@@ -10,7 +10,13 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.MainNotions.ArithmeticCylinders Formalism.L2.Theta Formalism.IndefR.Mult Formalism.IndefR.Links Formalism.IndefR.AutomorphicEvaluation Formalism.IndefR.principalLevelFrame Formalism.L2.DIV Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting MeasureTheory NumberField ReciprocityTheory.Aut Formalism.AUTREP GlobalTheory.Mem.SRe GlobalTheory.LabPin
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S
+  Formalism.MainNotions.ArithmeticCylinders Formalism.L2.Theta Formalism.IndefR.Mult
+  Formalism.IndefR.Links Formalism.IndefR.AutomorphicEvaluation Formalism.IndefR.principalLevelFrame
+  Formalism.L2.DIV Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned
+  Formalism.L2.SG.RowLevelMatch Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.PoincareInHH.PoincareSetting MeasureTheory NumberField ReciprocityTheory.Aut
+  Formalism.AUTREP GlobalTheory.Mem.SRe GlobalTheory.LabPin
 attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LabPin.instCM
 open scoped TensorProduct Matrix
 
@@ -18,7 +24,12 @@ namespace GlobalTheory.RowLev
 
 open Formalism.L2.SG.Pf.RowDictPf Formalism.L2.SG.Pf.RedBasicsPf PIW.AdelClassFin IsDedekindDomain
 
-theorem redMat0_of_actsAs : ∀ (I : AutInst) (N p : ℕ) (w : IsDedekindDomain.HeightOneSpectrum (𝓞 I.E)) (fr : GlobalTheory.RowLev.PlFrame I N p w) (x : I.Gf), x ∈ I.Kset → ∀ M : Matrix (Fin N) (Fin N) (ZMod p), fr.ActsAs x M → Formalism.L2.SG.Pf.RowDictPf.RedMat0 I w p x M := by
+theorem redMat0_of_actsAs
+    : ∀ (I : AutInst) (N p : ℕ) (w : IsDedekindDomain.HeightOneSpectrum (𝓞 I.E))
+        (fr : GlobalTheory.RowLev.PlFrame I N p w) (x : I.Gf),
+      x ∈ I.Kset
+        → ∀ M : Matrix (Fin N) (Fin N) (ZMod p),
+          fr.ActsAs x M → Formalism.L2.SG.Pf.RowDictPf.RedMat0 I w p x M := by
   intro I N p w fr x hx M hM
   have hp : p.Prime := fr.prime
   haveI : NeZero p := ⟨hp.ne_zero⟩
@@ -27,22 +38,26 @@ theorem redMat0_of_actsAs : ∀ (I : AutInst) (N p : ℕ) (w : IsDedekindDomain.
   have h1 : ∀ u ∈ lamAf (F := I.F) (wLat0 I w), u ∈ extId I w.asIdeal • I.Lf := by
     refine fun u hu => lamAf_w_le I w _ (fun a ha y hy => ?_) hu
     rw [DictLat.iv_smulE]
-    exact Submodule.smul_mem_smul (r := Inhab.psi I.F I.E a) (Ideal.subset_span ⟨a, ha, rfl⟩) (DictLat.iv_mem I hy)
+    exact Submodule.smul_mem_smul (r := Inhab.psi I.F I.E a) (Ideal.subset_span ⟨a, ha, rfl⟩)
+      (DictLat.iv_mem I hy)
   have h2 : ∀ u ∈ extId I w.asIdeal • I.Lf, u ∈ lamAf (F := I.F) (wLat0 I w) := by
     intro u hu
     refine Submodule.smul_induction_on hu (fun a ha v hv => ?_) (fun _ _ h h' => add_mem h h')
-    refine Submodule.span_induction (p := fun a _ => a • v ∈ lamAf (F := I.F) (wLat0 I w)) ?_ ?_ ?_ ?_ ha
+    refine
+      Submodule.span_induction (p := fun a _ => a • v ∈ lamAf (F := I.F) (wLat0 I w)) ?_ ?_ ?_ ?_ ha
     · rintro z ⟨b, hb, e⟩
       show (z : I.E ⊗[I.F] Af I.F) • v ∈ _
       rw [e]
       exact smul_mem I w hb hv
     · simp
     · intro a b _ _ ha hb
-      rw [add_smul]; exact add_mem ha hb
+      rw [add_smul]
+      exact add_mem ha hb
     · intro s a _ ha
       rw [smul_eq_mul, mul_smul]
       exact Submodule.smul_mem _ s ha
-  have hz : ∀ u : I.Lf, fr.c u = 0 ↔ (u : Fin I.n → I.E ⊗[I.F] Af I.F) ∈ lamAf (F := I.F) (wLat0 I w) :=
+  have hz
+      : ∀ u : I.Lf, fr.c u = 0 ↔ (u : Fin I.n → I.E ⊗[I.F] Af I.F) ∈ lamAf (F := I.F) (wLat0 I w) :=
     fun u => (fr.c_ker u).trans ⟨h2 _, h1 _⟩
   choose y hy using fun i : Fin N => fr.c_surj (Pi.single i 1)
   choose b hbL hb using fun i => dense I w hp hcard (y i).2

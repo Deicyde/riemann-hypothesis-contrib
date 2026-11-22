@@ -6,13 +6,26 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Representation Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.Published GlobalTheory.Published.PoitouTate
+open NumberField IsDedekindDomain Representation Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.Published GlobalTheory.Published.PoitouTate
 
 namespace GlobalTheory.CompanionTheory.TameAction
 
-
 open GlobalTheory.TameQuot GlobalTheory.WeilDeligne in
-theorem eq_zero_of_fixes_primitiveRoot : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 F)), IsPlaceOver A v → ∀ φ : Dec (F := F) A, IsFrob (F := F) A (normV v) (φ : G F Ω) → ∀ N : ℕ, 0 < N → ∀ ξ : Ω, IsPrimitiveRoot ξ (normV v ^ N - 1) → ∀ (a : ℕ) (t i : Dec (F := F) A), a < N → (i : G F Ω) ∈ Ine (F := F) A → ((φ ^ a * t ^ N * i : Dec (F := F) A) : G F Ω) ξ = ξ → a = 0 := by
+theorem eq_zero_of_fixes_primitiveRoot
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+        (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 F)),
+      IsPlaceOver A v
+        → ∀ φ : Dec (F := F) A,
+          IsFrob (F := F) A (normV v) (φ : G F Ω)
+            → ∀ N : ℕ,
+              0 < N
+                → ∀ ξ : Ω,
+                  IsPrimitiveRoot ξ (normV v ^ N - 1)
+                    → ∀ (a : ℕ) (t i : Dec (F := F) A),
+                      a < N → (i : G F Ω) ∈ Ine (F := F) A
+                        → ((φ ^ a * t ^ N * i : Dec (F := F) A) : G F Ω) ξ = ξ
+                        → a = 0 := by
   intro F Ω _ _ _ _ _ A v hA φ hφ N hN ξ hξ' a t i haN hi hfix
   have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed F
   have : CharZero Ω := charZero_of_injective_algebraMap (algebraMap F Ω).injective
@@ -49,8 +62,10 @@ theorem eq_zero_of_fixes_primitiveRoot : ∀ (F Ω : Type) [Field F] [NumberFiel
     conv_lhs => rw [hu.eq_orderOf, ← pow_eq_pow_iff_modEq, Units.ext_iff]
     simp
   have hθ' : ∀ (g : Dec (F := F) A) (k : ℕ), A.valuation (g.1 ξ - ξ ^ k) < 1 → (θ g : ZMod n) = k :=
-    fun g k h => (hθ g k).2 (eq_of_pow_eq_one A hnv (by rw [← map_pow, hξ.pow_eq_one, map_one])
-      (by rw [← pow_mul, mul_comm, pow_mul, hξ.pow_eq_one, one_pow]) h)
+    fun g k h =>
+      (hθ g k).2
+        (eq_of_pow_eq_one A hnv (by rw [← map_pow, hξ.pow_eq_one, map_one])
+          (by rw [← pow_mul, mul_comm, pow_mul, hξ.pow_eq_one, one_pow]) h)
   have hI : ∀ σ : Dec (F := F) A, σ.1 ∈ Ine (F := F) A → θ σ = 1 := fun σ hσ =>
     Units.ext (by simpa using hθ' σ 1 (by simpa using hσ.2 ξ hξ1))
   have hF : (θ φ : ZMod n) = (normV v : ℕ) := hθ' φ _ (hφ.2 ξ hξ1)
@@ -62,14 +77,14 @@ theorem eq_zero_of_fixes_primitiveRoot : ∀ (F Ω : Type) [Field F] [NumberFiel
       exact Units.ext_iff.trans this
     rw [e]
     exact (isOpen_setOf_apply (F := F) ξ (fun t => t = ξ)).preimage continuous_subtype_val
-  have h3 : θ φ ^ N = 1 := Units.ext (by
-    rw [Units.val_pow_eq_pow_val, hF, ← Nat.cast_pow, hn]; simp)
+  have h3 : θ φ ^ N = 1 :=
+    Units.ext (by rw [Units.val_pow_eq_pow_val, hF, ← Nat.cast_pow, hn]; simp)
   have hr : ∀ g, θ g ∈ Subgroup.zpowers (θ φ) := by
     have h4 : ⊤ ≤ (Subgroup.zpowers (θ φ)).comap θ := by
       rw [← closure_frob_sup_Ine F Ω A v hA φ hφ]
-      refine Subgroup.topologicalClosure_minimal _ (sup_le (Subgroup.zpowers_le.2
-        (Subgroup.mem_zpowers _)) fun σ hσ => ?_) (Subgroup.isClosed_of_isOpen _
-          (Subgroup.isOpen_mono (fun σ hσ => ?_) ho))
+      refine Subgroup.topologicalClosure_minimal _
+        (sup_le (Subgroup.zpowers_le.2 (Subgroup.mem_zpowers _)) fun σ hσ => ?_)
+        (Subgroup.isClosed_of_isOpen _ (Subgroup.isOpen_mono (fun σ hσ => ?_) ho))
       · rw [Subgroup.mem_comap, hI σ hσ]
         exact one_mem _
       · rw [Subgroup.mem_comap, MonoidHom.mem_ker.1 hσ]
@@ -87,9 +102,10 @@ theorem eq_zero_of_fixes_primitiveRoot : ∀ (F Ω : Type) [Field F] [NumberFiel
   rw [Units.val_pow_eq_pow_val, hF, ← Nat.cast_pow, ZMod.natCast_eq_natCast_iff] at h1
   have h2 := (Nat.modEq_iff_dvd' (Nat.one_le_pow _ _ (by omega))).1 h1.symm
   have h4 := pow_lt_pow_right₀ hq haN
-  have h7 := Nat.eq_zero_of_dvd_of_lt h2 (by
-    have := Nat.one_le_pow a (normV v) (by omega)
-    omega)
+  have h7 :=
+    Nat.eq_zero_of_dvd_of_lt h2 (by
+      have := Nat.one_le_pow a (normV v) (by omega)
+      omega)
   by_contra h
   have := one_lt_pow₀ hq h
   omega

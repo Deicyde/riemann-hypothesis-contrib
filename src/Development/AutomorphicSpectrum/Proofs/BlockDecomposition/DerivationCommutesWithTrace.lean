@@ -9,12 +9,13 @@ open MvPolynomial
 
 namespace GlobalTheory.CompanionTheory.TraceDerivation
 
-theorem trace_map_derivation : ∀ (K F L : Type) [Field K] [CharZero K] [Field F] [Field L]
-    [Algebra K F] [Algebra K L] [Algebra F L] [IsScalarTower K F L] [FiniteDimensional F L]
-    (D : Derivation K L L) (D0 : Derivation K F F),
-    (∀ x : F, D (algebraMap F L x) = algebraMap F L (D0 x)) →
-    ∀ y : L, algebraMap F L (D0 (Algebra.trace F L y)) =
-      algebraMap F L (Algebra.trace F L (D y)) := by
+theorem trace_map_derivation
+    : ∀ (K F L : Type) [Field K] [CharZero K] [Field F] [Field L] [Algebra K F] [Algebra K L]
+        [Algebra F L] [IsScalarTower K F L] [FiniteDimensional F L] (D : Derivation K L L)
+        (D0 : Derivation K F F),
+      (∀ x : F, D (algebraMap F L x) = algebraMap F L (D0 x))
+        → ∀ y : L,
+          algebraMap F L (D0 (Algebra.trace F L y)) = algebraMap F L (Algebra.trace F L (D y)) := by
   intro K F L _ _ _ _ _ _ _ _ _ D D0 h y
   classical
   let b := Module.finBasis F L
@@ -60,7 +61,8 @@ theorem trace_map_derivation : ∀ (K F L : Type) [Field K] [CharZero K] [Field 
     rw [add_comm (D y * b j), mul_comm (D y), e]
   have hmat : N + M * C = M.map D0 + C * M := by
     ext i j
-    have : b.repr (∑ i, (N + M * C) i j • b i) i = b.repr (∑ i, (M.map D0 + C * M) i j • b i) i := by
+    have : b.repr (∑ i, (N + M * C) i j • b i) i
+        = b.repr (∑ i, (M.map D0 + C * M) i j • b i) i := by
       rw [key j]
     rw [b.repr_sum_self, b.repr_sum_self] at this
     exact this
@@ -70,7 +72,7 @@ theorem trace_map_derivation : ∀ (K F L : Type) [Field K] [CharZero K] [Field 
     have h3 := add_right_cancel this
     rw [h3]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.trace, map_sum]
+    simp [Matrix.trace, map_sum]
   congr 1
   rw [Algebra.trace_eq_matrix_trace b y, Algebra.trace_eq_matrix_trace b (D y)]
   exact htr.symm

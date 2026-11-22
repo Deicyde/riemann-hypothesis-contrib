@@ -10,33 +10,45 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TateTwistCup
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Pbf UpperTheory.Blow
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Pbf UpperTheory.Blow
 
-private theorem cast_zero' {q : ℕ} {E : Spc} {n i n' i' : ℤ} (hn : n = n') (hi : i = i') :
-    Ht.cast hn hi (0 : Ht q E n i) = 0 := by
+private theorem cast_zero' {q : ℕ} {E : Spc} {n i n' i' : ℤ} (hn : n = n') (hi : i = i')
+    : Ht.cast hn hi (0 : Ht q E n i) = 0 := by
   subst hn hi
   rfl
 
-private theorem eq_zero_of_cast {q : ℕ} {E : Spc} {n i n' i' : ℤ} (hn : n = n') (hi : i = i') (x : Ht q E n i)
-    (h : Ht.cast hn hi x = 0) : x = 0 := by
+private theorem eq_zero_of_cast
+    {q : ℕ} {E : Spc} {n i n' i' : ℤ}
+    (hn : n = n') (hi : i = i') (x : Ht q E n i) (h : Ht.cast hn hi x = 0)
+    : x = 0 := by
   subst hn hi
   exact h
 
-private theorem pull_cast' {q : ℕ} {X Y : Spc} (f : X ⟶ Y) {n i n' i' : ℤ} (hn : n = n') (hi : i = i') (x : Ht q Y n i) :
-    pull _ f _ _ (x.cast hn hi) = Ht.cast hn hi (pull _ f _ _ x : Ht q X n i) := by
+private theorem pull_cast'
+    {q : ℕ} {X Y : Spc} (f : X ⟶ Y) {n i n' i' : ℤ} (hn : n = n') (hi : i = i') (x : Ht q Y n i)
+    : pull _ f _ _ (x.cast hn hi) = Ht.cast hn hi (pull _ f _ _ x : Ht q X n i) := by
   subst hn hi
   rfl
 
-private theorem inj_of_LH {q : ℕ} {N : ℕ} (hN : 1 ≤ N) {E X : Spc} (πX : X ⟶ E) (ξX : Ht q X 2 1)
-    (hLH : LH q πX (fun j : Fin N => 2 * (((j : ℕ) : ℤ))) (fun j : Fin N => ((j : ℕ) : ℤ)) (fun j => cpow q ξX j))
-    {n i : ℤ} (a : Ht q E n i) (ha : pull _ πX _ _ a = 0) : a = 0 := by
+private theorem inj_of_LH
+    {q : ℕ} {N : ℕ} (hN : 1 ≤ N)
+    {E X : Spc} (πX : X ⟶ E) (ξX : Ht q X 2 1)
+    (hLH : LH q πX
+      (fun j : Fin N => 2 * (((j : ℕ) : ℤ)))
+      (fun j : Fin N => ((j : ℕ) : ℤ))
+      (fun j => cpow q ξX j))
+    {n i : ℤ} (a : Ht q E n i) (ha : pull _ πX _ _ a = 0)
+    : a = 0 := by
   classical
   obtain ⟨hinj, -⟩ := hLH n i
   obtain ⟨j0, hj0⟩ : ∃ j0 : Fin N, (j0 : ℕ) = 0 := ⟨⟨0, hN⟩, rfl⟩
   have e1 : n = n - 2 * (((j0 : ℕ) : ℤ)) := by simp [hj0]
   have e2 : i = i - ((j0 : ℕ) : ℤ) := by simp [hj0]
   let a' : (j : Fin N) → Ht q E (n - 2 * ((j : ℕ) : ℤ)) (i - ((j : ℕ) : ℤ)) :=
-    Pi.single (M := fun j : Fin N => Ht q E (n - 2 * ((j : ℕ) : ℤ)) (i - ((j : ℕ) : ℤ))) j0 (a.cast e1 e2)
+    Pi.single
+      (M := fun j : Fin N => Ht q E (n - 2 * ((j : ℕ) : ℤ)) (i - ((j : ℕ) : ℤ)))
+      j0 (a.cast e1 e2)
   have hp : ∀ j, pull _ πX _ _ (a' j) = 0 := by
     intro j
     by_cases hj : j = j0
@@ -49,21 +61,33 @@ private theorem inj_of_LH {q : ℕ} {N : ℕ} (hN : 1 ≤ N) {E X : Spc} (πX : 
   simp only [a', Pi.single_eq_same, Pi.zero_apply] at h1
   exact eq_zero_of_cast e1 e2 a h1
 
-theorem UpperTheory.leray_hirsch_of_two_element_cover :
-    ∀ (q : ℕ) [NeZero q] (N : ℕ), 1 ≤ N → ∀ {E X Y B W₁ W₂ B₁ B₂ : Spc} (πX : X ⟶ E) (πY : Y ⟶ E) (p : B ⟶ X) (β : B ⟶ Y)
+theorem UpperTheory.leray_hirsch_of_two_element_cover
+    : ∀ (q : ℕ) [NeZero q] (N : ℕ),
+      1 ≤ N
+        → ∀ {E X Y B W₁ W₂ B₁ B₂ : Spc} (πX : X ⟶ E) (πY : Y ⟶ E) (p : B ⟶ X) (β : B ⟶ Y)
             (f₁ : W₁ ⟶ Y) (f₂ : W₂ ⟶ Y) (g₁ : B₁ ⟶ B) (g₂ : B₂ ⟶ B) (b₁ : B₁ ⟶ W₁) (b₂ : B₂ ⟶ W₂)
             (h₁ : g₁ ≫ β = b₁ ≫ f₁) (h₂ : g₂ ≫ β = b₂ ≫ f₂) (_ : p ≫ πX = β ≫ πY) (ξX : Ht q X 2 1),
-            Inv q X → Cover2 (ZMod q) f₁ f₂ → Cover2 (ZMod q) g₁ g₂ →
-            LH q πX (fun j : Fin N => 2 * (((j : ℕ) : ℤ))) (fun j : Fin N => ((j : ℕ) : ℤ)) (fun j => cpow q ξX j) →
-            (∀ i, Eqv _ (f₁ ≫ πY) (tw q i)) → (∀ i, Eqv _ (g₁ ≫ p) (tw q i)) → (∀ i, Eqv _ b₂ (tw q i)) →
-            (∀ i, Eqv _ (pullback.map g₁ g₂ f₁ f₂ b₁ b₂ β h₁ h₂) (tw q i)) →
-            ∀ (n i : ℤ) (x : Ht q Y n i), pull _ β _ _ x = 0 → x = 0 := by
-  intro q _ N hN E X Y B W₁ W₂ B₁ B₂ πX πY p β f₁ f₂ g₁ g₂ b₁ b₂ h₁ h₂ hsq ξX hX hcW hcB hLH hW₁ hB₁ hb₂
-    hmap n i x hx
+          Inv q X → Cover2 (ZMod q) f₁ f₂ → Cover2 (ZMod q) g₁ g₂
+            → LH q πX
+              (fun j : Fin N => 2 * (((j : ℕ) : ℤ)))
+              (fun j : Fin N => ((j : ℕ) : ℤ))
+              (fun j => cpow q ξX j)
+            → (∀ i, Eqv _ (f₁ ≫ πY) (tw q i)) → (∀ i, Eqv _ (g₁ ≫ p) (tw q i))
+            → (∀ i, Eqv _ b₂ (tw q i))
+            → (∀ i, Eqv _ (pullback.map g₁ g₂ f₁ f₂ b₁ b₂ β h₁ h₂) (tw q i))
+            → ∀ (n i : ℤ) (x : Ht q Y n i), pull _ β _ _ x = 0 → x = 0 := by
+  intro q _ N hN E X Y B W₁ W₂ B₁ B₂ πX πY p β f₁ f₂ g₁ g₂ b₁ b₂ h₁ h₂ hsq ξX hX hcW hcB hLH hW₁ hB₁
+    hb₂ hmap n i x hx
   obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 := ⟨n - 1, by ring⟩
-  have MW := (UpperTheory.mayerVietorisConnecting_exists_unique_additive_exact (ZMod q) (tw q i) m).1 f₁ f₂ hcW
-  have MB := (UpperTheory.mayerVietorisConnecting_exists_unique_additive_exact (ZMod q) (tw q i) m).1 g₁ g₂ hcB
-  have nat := (UpperTheory.mayerVietorisConnecting_exists_unique_additive_exact (ZMod q) (tw q i) m).2 g₁ g₂ f₁ f₂ β b₁ b₂ h₁ h₂ hcB hcW
+  have MW :=
+    (UpperTheory.mayerVietorisConnecting_exists_unique_additive_exact (ZMod q) (tw q i) m).1 f₁ f₂
+      hcW
+  have MB :=
+    (UpperTheory.mayerVietorisConnecting_exists_unique_additive_exact (ZMod q) (tw q i) m).1 g₁ g₂
+      hcB
+  have nat :=
+    (UpperTheory.mayerVietorisConnecting_exists_unique_additive_exact (ZMod q) (tw q i) m).2 g₁ g₂
+      f₁ f₂ β b₁ b₂ h₁ h₂ hcB hcW
   have hA : pull _ f₁ _ _ x = 0 := by
     obtain ⟨e, he⟩ := (hW₁ i (m + 1)).2 (pull _ f₁ _ _ x)
     have key : (g₁ ≫ p) ≫ πX = b₁ ≫ (f₁ ≫ πY) := by
@@ -81,8 +105,9 @@ theorem UpperTheory.leray_hirsch_of_two_element_cover :
   rw [hx] at hc'
   obtain ⟨a, b, hab⟩ := (MB.2.2.2.1 _ _ hc').1 rfl
   obtain ⟨a₀, ha₀⟩ := (hB₁ i m).2 a
-  have hfst : pull _ (pullback.fst g₁ g₂) _ _ a =
-      pull _ (pullback.snd g₁ g₂) _ _ (pull _ g₂ _ _ (pull _ p _ _ a₀)) := by
+  have hfst
+      : pull _ (pullback.fst g₁ g₂) _ _ a
+        = pull _ (pullback.snd g₁ g₂) _ _ (pull _ g₂ _ _ (pull _ p _ _ a₀)) := by
     rw [← ha₀]
     simp only [← pull_comp]
     rw [← Category.assoc, pullback.condition, Category.assoc]

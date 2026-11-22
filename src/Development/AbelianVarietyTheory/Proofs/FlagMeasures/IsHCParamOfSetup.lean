@@ -25,8 +25,8 @@ variable {k r : ℕ}
 abbrev flagSpan (k r : ℕ) (a : Fin (r + 1)) : Submodule ℂ (Fin (2 * r + k + 1) → ℂ) :=
   Submodule.span ℂ (Set.range fun b : {b : Fin r // b.val < a.val} => bvec (eI k r b.1))
 
-theorem mem_flagSpan {a : Fin (r + 1)} {y : Fin (2 * r + k + 1) → ℂ} :
-    y ∈ flagSpan k r a ↔ ∀ i : Fin (2 * r + k + 1), a.val ≤ i.val → y i = 0 := by
+theorem mem_flagSpan {a : Fin (r + 1)} {y : Fin (2 * r + k + 1) → ℂ}
+    : y ∈ flagSpan k r a ↔ ∀ i : Fin (2 * r + k + 1), a.val ≤ i.val → y i = 0 := by
   constructor
   · intro hy i hi
     induction hy using Submodule.span_induction with
@@ -43,14 +43,19 @@ theorem mem_flagSpan {a : Fin (r + 1)} {y : Fin (2 * r + k + 1) → ℂ} :
     by_cases hi : a.val ≤ i.val
     · rw [hy i hi, Pi.single_zero]; exact Submodule.zero_mem _
     · have ha := a.isLt
-      have : (Pi.single i (y i) : Fin (2 * r + k + 1) → ℂ) = y i • bvec (eI k r ⟨i.val, by omega⟩) := by
+      have : (Pi.single i (y i) : Fin (2 * r + k + 1) → ℂ)
+          = y i • bvec (eI k r ⟨i.val, by omega⟩) := by
         rw [bvec, ← Pi.single_smul, smul_eq_mul, mul_one]; rfl
       rw [this]
-      exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨⟨⟨i.val, by omega⟩, by simpa using hi⟩, rfl⟩)
+      exact Submodule.smul_mem _ _
+        (Submodule.subset_span ⟨⟨⟨i.val, by omega⟩, by simpa using hi⟩, rfl⟩)
 
-theorem mulVec_sub {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) {s : Mat k r} (hs : s ∈ Sset k r z)
-    (a : Fin (r + 1)) {y : Fin (2 * r + k + 1) → ℂ} (hy : y ∈ flagSpan k r a) :
-    ∃ y' ∈ flagSpan k r a, s *ᵥ (fvec k r z a - y) = fvec k r z a - y' := by
+theorem mulVec_sub
+    {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z)
+    {s : Mat k r} (hs : s ∈ Sset k r z)
+    (a : Fin (r + 1))
+    {y : Fin (2 * r + k + 1) → ℂ} (hy : y ∈ flagSpan k r a)
+    : ∃ y' ∈ flagSpan k r a, s *ᵥ (fvec k r z a - y) = fvec k r z a - y' := by
   obtain ⟨h, hh, m, hm, rfl⟩ := hs
   have hc := ((WeylGroupFacts.nset_iff m).1 hm).2
   have ha := a.isLt
@@ -68,7 +73,8 @@ theorem mulVec_sub {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) {s : Mat 
           · exact Pi.single_eq_of_ne (fun e => by rw [e] at hj; simp only [eI] at hj; omega) _
           · exact hz j (by omega)
         simp [e1, e2]
-    rw [Pi.sub_apply, this, Matrix.one_mulVec, Pi.sub_apply, mem_flagSpan.1 hy i hi]; ring
+    rw [Pi.sub_apply, this, Matrix.one_mulVec, Pi.sub_apply, mem_flagSpan.1 hy i hi]
+    ring
   have h2 : ∀ x ∈ flagSpan k r a, h *ᵥ x = x := by
     intro x hx
     induction hx using Submodule.span_induction with
@@ -88,8 +94,11 @@ theorem mulVec_sub {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) {s : Mat 
   rw [sub_sub_cancel]
   exact sub_right_injective this
 
-theorem lA_left {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) {s : Mat k r} (hs : s ∈ Sset k r z) (g : Mat k r)
-    (a : Fin (r + 1)) : lA k r z (s * g) a = lA k r z g a := by
+theorem lA_left
+    {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z)
+    {s : Mat k r} (hs : s ∈ Sset k r z)
+    (g : Mat k r) (a : Fin (r + 1))
+    : lA k r z (s * g) a = lA k r z g a := by
   have hH : IsUnit (Hpk k r).det := Matrix.isUnit_det_of_left_inverse (hpkFacts k r).2.1
   have hu : IsUnit s.det := by
     obtain ⟨h, hh, m, hm, rfl⟩ := hs
@@ -105,21 +114,26 @@ theorem lA_left {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) {s : Mat k r
   · rintro ⟨y, hy, rfl⟩
     obtain ⟨y', hy', e⟩ := mulVec_sub hz hs a hy
     refine ⟨y', hy', ?_⟩
-    rw [← e, Matrix.mulVec_mulVec, Matrix.mul_inv_rev, Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hu, Matrix.mul_one]
+    rw [← e, Matrix.mulVec_mulVec, Matrix.mul_inv_rev, Matrix.mul_assoc,
+      Matrix.nonsing_inv_mul _ hu, Matrix.mul_one]
 
-theorem eucl_unitary {N : ℕ} {t : Matrix (Fin N) (Fin N) ℂ} (ht : t ∈ Matrix.unitaryGroup (Fin N) ℂ)
-    (v : Fin N → ℂ) : eucl (t *ᵥ v) = eucl v := by
+theorem eucl_unitary
+    {N : ℕ} {t : Matrix (Fin N) (Fin N) ℂ} (ht : t ∈ Matrix.unitaryGroup (Fin N) ℂ) (v : Fin N → ℂ)
+    : eucl (t *ᵥ v) = eucl v := by
   have e : ∀ v : Fin N → ℂ, ((∑ i, Complex.normSq (v i) : ℝ) : ℂ) = star v ⬝ᵥ v := fun v => by
     simp [dotProduct, Complex.normSq_eq_conj_mul_self]
   have h1 : tᴴ * t = 1 := Matrix.mem_unitaryGroup_iff'.1 ht
   unfold eucl
   congr 1
   apply Complex.ofReal_injective
-  rw [e, e, Matrix.star_mulVec, Matrix.dotProduct_mulVec, Matrix.vecMul_vecMul, h1, Matrix.vecMul_one]
+  rw [e, e, Matrix.star_mulVec, Matrix.dotProduct_mulVec, Matrix.vecMul_vecMul, h1,
+    Matrix.vecMul_one]
 
-theorem lA_right (z : Fin (2 * r + k + 1) → ℂ) (g : Mat k r) {t : Mat k r}
-    (ht : t ∈ Matrix.unitaryGroup (Fin (2 * r + k + 1)) ℂ) (a : Fin (r + 1)) :
-    lA k r z (g * t) a = lA k r z g a := by
+theorem lA_right
+    (z : Fin (2 * r + k + 1) → ℂ) (g : Mat k r)
+    {t : Mat k r} (ht : t ∈ Matrix.unitaryGroup (Fin (2 * r + k + 1)) ℂ)
+    (a : Fin (r + 1))
+    : lA k r z (g * t) a = lA k r z g a := by
   have h1 : t⁻¹ ∈ Matrix.unitaryGroup (Fin (2 * r + k + 1)) ℂ := by
     rw [Matrix.inv_eq_left_inv (Matrix.mem_unitaryGroup_iff'.1 ht)]
     exact Unitary.star_mem ht

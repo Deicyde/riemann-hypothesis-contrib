@@ -14,8 +14,11 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.QRelExists
 @[expose] public section
 
 set_option autoImplicit false
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry TensorProduct Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  TensorProduct Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -23,11 +26,13 @@ open scoped CategoryTheory.Obj
 
 namespace GlobalTheory.ChF
 
-private theorem lift_of_smooth_affine {G B : Scheme.{0}} (q : G ⟶ B) [Smooth q] [IsAffineHom q]
-    {S S' : Type} [CommRing S] [CommRing S'] (π : S →+* S') (hπ : Function.Surjective π)
-    (hk : IsNilpotent (RingHom.ker π)) (y : Spec (CommRingCat.of S) ⟶ B) (x : Spec (CommRingCat.of S') ⟶ G)
-    (h : x ≫ q = Spec.map (CommRingCat.ofHom π) ≫ y) :
-    ∃ w : Spec (CommRingCat.of S) ⟶ G, w ≫ q = y ∧ Spec.map (CommRingCat.ofHom π) ≫ w = x := by
+private theorem lift_of_smooth_affine
+    {G B : Scheme.{0}} (q : G ⟶ B) [Smooth q] [IsAffineHom q]
+    {S S' : Type} [CommRing S] [CommRing S']
+    (π : S →+* S') (hπ : Function.Surjective π) (hk : IsNilpotent (RingHom.ker π))
+    (y : Spec (CommRingCat.of S) ⟶ B) (x : Spec (CommRingCat.of S') ⟶ G)
+    (h : x ≫ q = Spec.map (CommRingCat.ofHom π) ≫ y)
+    : ∃ w : Spec (CommRingCat.of S) ⟶ G, w ≫ q = y ∧ Spec.map (CommRingCat.ofHom π) ≫ w = x := by
   have : IsAffine (pullback q y) := isAffine_of_isAffineHom (pullback.snd q y)
   let e := (pullback q y).isoSpec
   obtain ⟨φ, hφ⟩ := Spec.map_surjective (pullback.lift x _ h ≫ e.hom)
@@ -53,11 +58,20 @@ private theorem lift_of_smooth_affine {G B : Scheme.{0}} (q : G ⟶ B) [Smooth q
     ext a
     exact congr($hψ a)
   refine ⟨Spec.map ψ' ≫ e.inv ≫ pullback.fst q y, ?_, ?_⟩
-  · rw [Category.assoc, Category.assoc, pullback.condition, ← Category.assoc e.inv, ← hα, ← Category.assoc,
-      ← Spec.map_comp, h₁, Spec.map_id, Category.id_comp]
-  · rw [← Category.assoc, ← Spec.map_comp, h₂, hφ, Category.assoc, Iso.hom_inv_id_assoc, pullback.lift_fst]
+  · rw [Category.assoc, Category.assoc, pullback.condition, ← Category.assoc e.inv, ← hα,
+      ← Category.assoc, ← Spec.map_comp, h₁, Spec.map_id, Category.id_comp]
+  · rw [← Category.assoc, ← Spec.map_comp, h₂, hφ, Category.assoc, Iso.hom_inv_id_assoc,
+      pullback.lift_fst]
 
-theorem qRel_lift : ∀ (R : Type) [CommRing R] [IsDomain R] (I : Ideal R) (D : Out.DegPre R) (k : ℕ) (G : Over (Spec (CommRingCat.of R))) [GrpObj G] [IsCommMonObj G] (c : Out.GtCoord I D k G) (S : Type) [CommRing S] [Algebra R S], Kills I k S → ∀ (S' : Type) [CommRing S'] [Algebra R S'] (ρ : S →ₐ[R] S') (σ : S' →ₐ[R] S), ρ.comp σ = AlgHom.id R S' → RingHom.ker ρ ^ 2 = ⊥ → ∀ y : sp (R₀ := R) S ⟶ D.P.A, spMap ρ ≫ y = 1 → ∃ z : sp (R₀ := R) S ⟶ G, spMap ρ ≫ z = 1 ∧ QRel c S z y := by
+theorem qRel_lift
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (I : Ideal R) (D : Out.DegPre R) (k : ℕ)
+        (G : Over (Spec (CommRingCat.of R))) [GrpObj G] [IsCommMonObj G] (c : Out.GtCoord I D k G)
+        (S : Type) [CommRing S] [Algebra R S],
+      Kills I k S
+        → ∀ (S' : Type) [CommRing S'] [Algebra R S'] (ρ : S →ₐ[R] S') (σ : S' →ₐ[R] S),
+          ρ.comp σ = AlgHom.id R S' → RingHom.ker ρ ^ 2 = ⊥
+            → ∀ y : sp (R₀ := R) S ⟶ D.P.A,
+              spMap ρ ≫ y = 1 → ∃ z : sp (R₀ := R) S ⟶ G, spMap ρ ≫ z = 1 ∧ QRel c S z y := by
   intro R _ _ I D k G _ _ c S _ _ hS S' _ _ ρ σ hρσ hk y hy
   have hS' : Kills I k S' := fun t ht => by rw [← ρ.commutes, hS t ht, map_zero]
   obtain ⟨hex, hmul⟩ := (qRel_existsUnique_mul_nat R I D k G c).1 S' hS'
@@ -79,7 +93,8 @@ theorem qRel_lift : ∀ (R : Type) [CommRing R] [IsDomain R] (I : Ideal R) (D : 
       ((H1.torsor_pullback c.i c.q c.isKernel).map (Over.forget _)).flip
       ⟨⟨‹_›, ‹_›⟩, inferInstanceAs (QuasiCompact c.q.left)⟩ ?_
     exact smooth_isStableUnderBaseChange.of_isPullback (IsPullback.of_hasPullback _ _) this
-  have : IsClosedImmersion (Out.thick R I k) := IsClosedImmersion.spec_of_surjective _ Ideal.Quotient.mk_surjective
+  have : IsClosedImmersion (Out.thick R I k) :=
+    IsClosedImmersion.spec_of_surjective _ Ideal.Quotient.mk_surjective
   have hf : Mono (pullback.fst D.P.A.hom (Out.thick R I k)) := inferInstance
   let t : Spec (CommRingCat.of S) ⟶ Spec (CommRingCat.of (R ⧸ I ^ (k + 1))) :=
     Spec.map (CommRingCat.ofHom (Ideal.Quotient.lift (I ^ (k + 1)) (algebraMap R S) hS))
@@ -89,18 +104,23 @@ theorem qRel_lift : ∀ (R : Type) [CommRing R] [IsDomain R] (I : Ideal R) (D : 
   let y' : Spec (CommRingCat.of S) ⟶ (Out.thickObj R I k D.P.A).left :=
     pullback.lift y.left t ((Over.w y).trans ht.symm)
   have hy' : y' ≫ pullback.fst D.P.A.hom (Out.thick R I k) = y.left := pullback.lift_fst _ _ _
-  have hyl : Spec.map (CommRingCat.ofHom ρ.toRingHom) ≫ y.left = (1 : sp (R₀ := R) S' ⟶ D.P.A).left :=
+  have hyl
+      : Spec.map (CommRingCat.ofHom ρ.toRingHom) ≫ y.left = (1 : sp (R₀ := R) S' ⟶ D.P.A).left :=
     congrArg (·.left) hy
-  obtain ⟨w, hw₁, hw₂⟩ := lift_of_smooth_affine c.q.left ρ.toRingHom
-    (fun a => ⟨σ a, congr($hρσ a)⟩) ⟨2, hk⟩ y' x (by
+  obtain ⟨w, hw₁, hw₂⟩ :=
+    lift_of_smooth_affine c.q.left ρ.toRingHom (fun a => ⟨σ a, congr($hρσ a)⟩) ⟨2, hk⟩ y' x (by
       refine (cancel_mono (pullback.fst D.P.A.hom (Out.thick R I k))).1 ?_
       exact ((Category.assoc _ _ _).trans hx₂).trans
         (hyl.symm.trans ((congrArg (_ ≫ ·) hy'.symm).trans (Category.assoc _ _ _).symm)))
-  have hq : w ≫ c.pG.left = y.left := (Category.assoc _ _ _).symm.trans ((congrArg (· ≫ _) hw₁).trans hy')
-  have hz : (w ≫ (Out.fstG I k G).left) ≫ G.hom = Spec.map (CommRingCat.ofHom (algebraMap R S)) := by
-    have a : (Out.fstG I k G).left ≫ G.hom = c.pG.left ≫ D.P.A.hom := (Over.w _).trans (Over.w _).symm
-    exact (Category.assoc _ _ _).trans ((congrArg (w ≫ ·) a).trans
-      ((Category.assoc _ _ _).symm.trans ((congrArg (· ≫ D.P.A.hom) hq).trans (Over.w y))))
+  have hq : w ≫ c.pG.left = y.left :=
+    (Category.assoc _ _ _).symm.trans ((congrArg (· ≫ _) hw₁).trans hy')
+  have hz
+      : (w ≫ (Out.fstG I k G).left) ≫ G.hom = Spec.map (CommRingCat.ofHom (algebraMap R S)) := by
+    have a : (Out.fstG I k G).left ≫ G.hom = c.pG.left ≫ D.P.A.hom :=
+      (Over.w _).trans (Over.w _).symm
+    exact (Category.assoc _ _ _).trans
+      ((congrArg (w ≫ ·) a).trans
+        ((Category.assoc _ _ _).symm.trans ((congrArg (· ≫ D.P.A.hom) hq).trans (Over.w y))))
   refine ⟨Over.homMk (w ≫ (Out.fstG I k G).left) hz, ?_, w, rfl, hq⟩
   apply Over.OverMorphism.ext
   exact (Category.assoc _ _ _).symm.trans ((congrArg (· ≫ (Out.fstG I k G).left) hw₂).trans hx₁)

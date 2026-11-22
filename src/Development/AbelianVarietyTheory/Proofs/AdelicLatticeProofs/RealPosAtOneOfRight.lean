@@ -15,9 +15,10 @@ open Filter Topology
 
 namespace GlobalTheory
 
-theorem real_pos_at_one_of_right (L : ℂ → ℂ) (hc : ContinuousAt L 1) (h1 : L 1 ≠ 0)
-    (h : ∀ s : ℂ, 1 < s.re → s.im = 0 → (L s).im = 0 ∧ 0 < (L s).re) :
-    (L 1).im = 0 ∧ 0 < (L 1).re := by
+theorem real_pos_at_one_of_right
+    (L : ℂ → ℂ) (hc : ContinuousAt L 1) (h1 : L 1 ≠ 0)
+    (h : ∀ s : ℂ, 1 < s.re → s.im = 0 → (L s).im = 0 ∧ 0 < (L s).re)
+    : (L 1).im = 0 ∧ 0 < (L 1).re := by
   have ht : Tendsto (fun t : ℝ => L (t : ℂ)) (𝓝[>] (1 : ℝ)) (𝓝 (L 1)) := by
     have h0 : Tendsto (fun t : ℝ => (t : ℂ)) (𝓝 (1 : ℝ)) (𝓝 (1 : ℂ)) := by
       simpa using Complex.continuous_ofReal.tendsto 1

@@ -12,8 +12,7 @@ open Finset InnerProductSpace Submodule
 
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] {d : ℕ}
 
-def pot (b : Fin d → E) : ℝ :=
-  ∏ k, ∏ j ∈ univ.filter (fun j : Fin d => j ≤ k), ‖gs b j‖ ^ 2
+def pot (b : Fin d → E) : ℝ := ∏ k, ∏ j ∈ univ.filter (fun j : Fin d => j ≤ k), ‖gs b j‖ ^ 2
 
 lemma swap_lt (j j1 : Fin d) (hj : j1.val = j.val + 1) (k : Fin d) (hk : k ≠ j1) (l : Fin d)
     (hl : l < k) : Equiv.swap j j1 l < k := by

@@ -16,28 +16,32 @@ section Core2
 
 variable {n : ℕ} {U : Type*} [AddCommGroup U] [Module ℂ U]
 
-theorem vc_cone_core (T : Fin n → Fin n → Module.End ℂ U) (hT : IsGlRep T) (A : Module.End ℂ U)
-    (hA : ∀ a b, Commute A (T a b)) (F : ℕ → Submodule ℂ U) (θ : ℕ → ℂ)
-    (hF : ∀ k a b, ∀ x ∈ F k, T a b x ∈ F k)
-    (hstep : ∀ k, ∀ x ∈ F k, A x - θ k • x ∈ F (k + 1))
-    (m j : ℕ) (h0 : F 0 = ⊤) (hm : F m = ⊥) (hj : j < m) (hθ : ∀ k < m, k ≠ j → θ k ≠ θ j)
+theorem vc_cone_core
+    (T : Fin n → Fin n → Module.End ℂ U) (hT : IsGlRep T)
+    (A : Module.End ℂ U) (hA : ∀ a b, Commute A (T a b))
+    (F : ℕ → Submodule ℂ U)
+    (θ : ℕ → ℂ)
+    (hF : ∀ k a b, ∀ x ∈ F k, T a b x ∈ F k) (hstep : ∀ k, ∀ x ∈ F k, A x - θ k • x ∈ F (k + 1))
+    (m j : ℕ)
+    (h0 : F 0 = ⊤) (hm : F m = ⊥) (hj : j < m) (hθ : ∀ k < m, k ≠ j → θ k ≠ θ j)
     (v : U) (base : Fin n → ℝ) (hFj : F j ≤ genSub T (Submodule.span ℂ {v}) ⊔ F (j + 1))
-    (hlow : ∀ a b, b < a → T a b v ∈ F (j + 1)) (hdiag : ∀ a, T a a v = ((base a : ℝ) : ℂ) • v) :
-    (∀ (μ : Fin n → ℝ) (x : U), A x = θ j • x → x ≠ 0 → (∀ a, T a a x = ((μ a : ℝ) : ℂ) • x) →
-        InRootCone (μ - base)) ∧
-    ∀ x₁ x₂ : U, A x₁ = θ j • x₁ → A x₂ = θ j • x₂ →
-      (∀ a, T a a x₁ = ((base a : ℝ) : ℂ) • x₁) → (∀ a, T a a x₂ = ((base a : ℝ) : ℂ) • x₂) →
-      ∃ c₁ c₂ : ℂ, (c₁ ≠ 0 ∨ c₂ ≠ 0) ∧ c₁ • x₁ + c₂ • x₂ = 0 := by
+    (hlow : ∀ a b, b < a → T a b v ∈ F (j + 1)) (hdiag : ∀ a, T a a v = ((base a : ℝ) : ℂ) • v)
+    : (∀ (μ : Fin n → ℝ) (x : U),
+        A x = θ j • x → x ≠ 0 → (∀ a, T a a x = ((μ a : ℝ) : ℂ) • x) → InRootCone (μ - base))
+      ∧ ∀ x₁ x₂ : U,
+        A x₁ = θ j • x₁ → A x₂ = θ j • x₂ → (∀ a, T a a x₁ = ((base a : ℝ) : ℂ) • x₁)
+          → (∀ a, T a a x₂ = ((base a : ℝ) : ℂ) • x₂)
+          → ∃ c₁ c₂ : ℂ, (c₁ ≠ 0 ∨ c₂ ≠ 0) ∧ c₁ • x₁ + c₂ • x₂ = 0 := by
   have hiter_maps : ∀ k₀ i x, x ∈ F k₀ → vcIter A θ k₀ i x ∈ F (k₀ + i) := by
     intro k₀ i
     induction i with
     | zero =>
-        intro x hx
-        simpa [vcIter] using hx
+      intro x hx
+      simpa [vcIter] using hx
     | succ i ih =>
-        intro x hx
-        have h := hstep (k₀ + i) _ (ih x hx)
-        simpa [vcIter, Module.End.mul_apply, LinearMap.sub_apply, add_assoc] using h
+      intro x hx
+      have h := hstep (k₀ + i) _ (ih x hx)
+      simpa [vcIter, Module.End.mul_apply, LinearMap.sub_apply, add_assoc] using h
   set post := vcIter A θ (j + 1) (m - j - 1) with hpost
   set c' : ℂ := ∏ i ∈ range (m - j - 1), (θ j - θ (j + 1 + i)) with hc'
   have hc'0 : c' ≠ 0 := by
@@ -73,8 +77,9 @@ theorem vc_cone_core (T : Fin n → Fin n → Module.End ℂ U) (hT : IsGlRep T)
     intro P w ⟨ν, hP, hν⟩
     refine ⟨ν, hP, fun a => ?_⟩
     rw [← Module.End.mul_apply, ← (hpostT a a).eq, Module.End.mul_apply, hν a, map_smul]
-  have hspanGood : ∀ (P : (Fin n → ℝ) → Prop) (G : Set U), G ⊆ vcGood T P →
-      ∀ y ∈ Submodule.span ℂ G, post y ∈ Submodule.span ℂ (vcGood T P) := by
+  have hspanGood
+      : ∀ (P : (Fin n → ℝ) → Prop) (G : Set U),
+        G ⊆ vcGood T P → ∀ y ∈ Submodule.span ℂ G, post y ∈ Submodule.span ℂ (vcGood T P) := by
     intro P G hG y hy
     have : Submodule.span ℂ G ≤ (Submodule.span ℂ (vcGood T P)).comap post :=
       Submodule.span_le.mpr (fun w hw => Submodule.subset_span (hpostGood P w (hG hw)))
@@ -90,18 +95,25 @@ theorem vc_cone_core (T : Fin n → Fin n → Module.End ℂ U) (hT : IsGlRep T)
       exact ⟨ν, hc, hν⟩
     have hs := hspanGood _ _ hmon y hy
     rw [hyx] at hs
-    have hz := vc_eq_zero_of_mem_span T (fun ν => InRootCone (ν - base)) hcone
-      (x := c' • x) (fun a => by rw [map_smul, hμ a, smul_comm]) hs
+    have hz :=
+      vc_eq_zero_of_mem_span T
+        (fun ν => InRootCone (ν - base))
+        hcone (x := c' • x)
+        (fun a => by rw [map_smul, hμ a, smul_comm])
+        hs
     exact hx0 ((smul_eq_zero.mp hz).resolve_left hc'0)
   · have hpv : ∀ a, T a a (post v) = ((base a : ℝ) : ℂ) • post v := by
       intro a
       rw [← Module.End.mul_apply, ← (hpostT a a).eq, Module.End.mul_apply, hdiag a, map_smul]
-    have hvert : ∀ x, A x = θ j • x → (∀ a, T a a x = ((base a : ℝ) : ℂ) • x) →
-        ∃ β : ℂ, x = β • post v := by
+    have hvert
+        : ∀ x,
+          A x = θ j • x → (∀ a, T a a x = ((base a : ℝ) : ℂ) • x) → ∃ β : ℂ, x = β • post v := by
       intro x hx hxw
       obtain ⟨y, hy, hyx⟩ := hred x hx
-      have hmon : vcMonAll T v ⊆
-          (Submodule.span ℂ {v} ⊔ Submodule.span ℂ (vcGood T (fun ν => ν ≠ base)) : Submodule ℂ U) := by
+      have hmon
+          : vcMonAll T v
+            ⊆ (Submodule.span ℂ {v} ⊔ Submodule.span ℂ (vcGood T (fun ν => ν ≠ base))
+              : Submodule ℂ U) := by
         intro w hw
         obtain ⟨k, hk⟩ := Set.mem_iUnion.mp hw
         rcases k with _ | k
@@ -124,8 +136,9 @@ theorem vc_cone_core (T : Fin n → Fin n → Module.End ℂ U) (hT : IsGlRep T)
       have hdw : ∀ a, T a a (c' • x - α • post v) = ((base a : ℝ) : ℂ) • (c' • x - α • post v) := by
         intro a
         rw [map_sub, map_smul, map_smul, hxw a, hpv a, smul_sub, smul_comm c', smul_comm α]
-      have hd0 := vc_eq_zero_of_mem_span T (fun ν => ν ≠ base) (μ := base) (by simp) hdw
-        (by rw [hd]; exact hpr)
+      have hd0 :=
+        vc_eq_zero_of_mem_span T (fun ν => ν ≠ base) (μ := base) (by simp) hdw (by
+          rw [hd]; exact hpr)
       refine ⟨c'⁻¹ * α, ?_⟩
       rw [sub_eq_zero] at hd0
       rw [mul_smul, ← hd0, smul_smul, inv_mul_cancel₀ hc'0, one_smul]
@@ -137,7 +150,8 @@ theorem vc_cone_core (T : Fin n → Fin n → Module.End ℂ U) (hT : IsGlRep T)
     · refine ⟨β₂, -β₁, Or.inr (neg_ne_zero.mpr hb), ?_⟩
       rw [smul_smul, smul_smul, mul_comm β₂ β₁, neg_mul, neg_smul, add_neg_cancel]
 
-def vcFlag (T : Fin n → Fin n → Module.End ℂ U) (g : Fin n → U) (r : Fin n → ℕ) (k : ℕ) : Submodule ℂ U :=
+def vcFlag (T : Fin n → Fin n → Module.End ℂ U) (g : Fin n → U) (r : Fin n → ℕ) (k : ℕ)
+    : Submodule ℂ U :=
   genSub T (Submodule.span ℂ (g '' {t | k ≤ r t}))
 
 variable (T : Fin n → Fin n → Module.End ℂ U) (g : Fin n → U) (r : Fin n → ℕ)
@@ -149,20 +163,23 @@ theorem vcFlag_gen {t : Fin n} {k : ℕ} (h : k ≤ r t) : g t ∈ vcFlag T g r 
   vc_le_genSub T _ (Submodule.subset_span ⟨t, h, rfl⟩)
 
 theorem vcFlag_anti {k l : ℕ} (h : k ≤ l) : vcFlag T g r l ≤ vcFlag T g r k :=
-  vc_genSub_le T _ _ (Submodule.span_le.mpr (by
-    rintro _ ⟨t, ht, rfl⟩
-    exact vcFlag_gen T g r (le_trans h ht))) (vcFlag_stable T g r k)
+  vc_genSub_le T _ _
+    (Submodule.span_le.mpr (by
+      rintro _ ⟨t, ht, rfl⟩
+      exact vcFlag_gen T g r (le_trans h ht)))
+    (vcFlag_stable T g r k)
 
 theorem vcFlag_eq_bot {m : ℕ} (hm : ∀ t, r t < m) : vcFlag T g r m = ⊥ := by
-  refine le_bot_iff.mp (vc_genSub_le T _ ⊥ ?_ (fun a b v hv => by
-    rw [(Submodule.mem_bot ℂ).mp hv, map_zero]; exact Submodule.zero_mem _))
+  refine le_bot_iff.mp (vc_genSub_le T _ ⊥ ?_
+    (fun a b v hv => by rw [(Submodule.mem_bot ℂ).mp hv, map_zero]; exact Submodule.zero_mem _))
   rw [Submodule.span_le]
   rintro _ ⟨t, ht, rfl⟩
   exact absurd ht (not_le.mpr (hm t))
 
-theorem vcFlag_step (A : Module.End ℂ U) (hA : ∀ a b, Commute A (T a b)) (θ : ℕ → ℂ)
-    (hgen : ∀ t, A (g t) - θ (r t) • g t ∈ vcFlag T g r (r t + 1)) :
-    ∀ k, ∀ x ∈ vcFlag T g r k, A x - θ k • x ∈ vcFlag T g r (k + 1) := by
+theorem vcFlag_step
+    (A : Module.End ℂ U) (hA : ∀ a b, Commute A (T a b))
+    (θ : ℕ → ℂ) (hgen : ∀ t, A (g t) - θ (r t) • g t ∈ vcFlag T g r (r t + 1))
+    : ∀ k, ∀ x ∈ vcFlag T g r k, A x - θ k • x ∈ vcFlag T g r (k + 1) := by
   have hAst : ∀ k, ∀ x ∈ vcFlag T g r k, A x ∈ vcFlag T g r k := by
     intro k
     let S : Submodule ℂ U := vcFlag T g r k ⊓ (vcFlag T g r k).comap A
@@ -198,15 +215,16 @@ theorem vcFlag_step (A : Module.End ℂ U) (hA : ∀ a b, Commute A (T a b)) (θ
     · intro a b x hx
       refine ⟨vcFlag_stable T g r k a b x hx.1, ?_⟩
       show (A - θ k • 1) (T a b x) ∈ vcFlag T g r (k + 1)
-      have hc : Commute (A - θ k • 1) (T a b) := (hA a b).sub_left ((Commute.one_left _).smul_left _)
+      have hc : Commute (A - θ k • 1) (T a b) :=
+        (hA a b).sub_left ((Commute.one_left _).smul_left _)
       rw [← Module.End.mul_apply, hc.eq, Module.End.mul_apply]
       exact vcFlag_stable T g r (k + 1) a b _ hx.2
   intro x hx
   have := (hle hx).2
   simpa using this
 
-theorem vcFlag_top_le {j : ℕ} {s : Fin n} (hr : Function.Injective r) (hj : r s = j) :
-    vcFlag T g r j ≤ genSub T (Submodule.span ℂ {g s}) ⊔ vcFlag T g r (j + 1) := by
+theorem vcFlag_top_le {j : ℕ} {s : Fin n} (hr : Function.Injective r) (hj : r s = j)
+    : vcFlag T g r j ≤ genSub T (Submodule.span ℂ {g s}) ⊔ vcFlag T g r (j + 1) := by
   refine vc_genSub_le T _ _ ?_ ?_
   · rw [Submodule.span_le]
     rintro _ ⟨t, ht, rfl⟩

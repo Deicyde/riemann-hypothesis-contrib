@@ -12,8 +12,9 @@ namespace GlobalTheory.FieldSize
 open NumberField IsDedekindDomain GlobalTheory.FieldSize
 open scoped IntermediateField nonZeroDivisors
 
-theorem sz_adjoin_rootOfUnity :
-    ∀ n : ℕ, 0 < n → Sz ℚ⟮Complex.exp (2 * Real.pi * Complex.I / n)⟯ (Real.log n) (Real.log n) := by
+theorem sz_adjoin_rootOfUnity
+    : ∀ n : ℕ,
+      0 < n → Sz ℚ⟮Complex.exp (2 * Real.pi * Complex.I / n)⟯ (Real.log n) (Real.log n) := by
   intro n hn
   haveI : NeZero n := ⟨hn.ne'⟩
   have hζ := Complex.isPrimitiveRoot_exp n hn.ne'

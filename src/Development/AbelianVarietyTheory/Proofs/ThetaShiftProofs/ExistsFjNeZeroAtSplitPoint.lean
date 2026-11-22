@@ -201,52 +201,101 @@ private lemma exists_mem_D1set_sSup_hatN_lt_two_mul {r : ℕ} (X : _root_.Recipr
   obtain ⟨t, ⟨z0, hz0, rfl⟩, ht⟩ := exists_lt_of_lt_csSup ⟨_, hyS⟩ (half_lt_self hM)
   exact ⟨z0, hz0, by linarith⟩
 
-
 open NumberField Complex in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.FJDetect.exists_fj_ne_zero_at_split_point' {r : ℕ} (X : _root_.ReciprocityTheory.ChartRestriction.G.FD.DataX E r)
-    (la : _root_.ReciprocityTheory.ChartRestriction.G.FD.Wt X.Ψ r) (P : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame X.Ψ r → ℂ) (c1 w : ℝ)
+theorem _root_.GlobalTheory.FJDetect.exists_fj_ne_zero_at_split_point'
+    {r : ℕ} (X : _root_.ReciprocityTheory.ChartRestriction.G.FD.DataX E r)
+    (la : _root_.ReciprocityTheory.ChartRestriction.G.FD.Wt X.Ψ r)
+    (P : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame X.Ψ r → ℂ)
+    (c1 w : ℝ)
     (hdom : X.IsDominant la) (hc1 : 0 < c1) (hw : 1 ≤ w) (hspr : (∑ τ, X.spread la τ) ≤ w)
     (hr : (r : ℝ) ≤ w)
-    (hχ : ∀ γ ∈ X.Γ, (∀ v ∈ X.Λ, ∃ y ∈ X.Λ,
-      Matrix.mulVec (γ : Matrix (Fin r) (Fin r) E) v - v = (X.g : E) • y) → X.χ la γ = 1)
-    (hP : P ∈ X.SS la) (hP' : P ∉ X.SSgt la c1) :
-    ∃ (ξ : Fin r → E) (ν : X.Ψ → ℝ), X.IsIso ξ ∧ ∑ τ, ν τ ≤ c1 ∧ (∀ τ, 0 ≤ ν τ) ∧
-      (∃ z0, _root_.ReciprocityTheory.ChartRestriction.G.FD.ShortVectorHypotheses X la P ξ ν c1 w z0) ∧
-      let ep0 := _root_.ReciprocityTheory.ChartRestriction.G.FD.flowEpsilonBound X.g (_root_.ReciprocityTheory.ChartRestriction.G.FD.dE E) (_root_.ReciprocityTheory.ChartRestriction.G.FD.fdeg E) X.NA X.NC c1 w
-      let rh := _root_.ReciprocityTheory.ChartRestriction.G.FD.d6rh c1 w
-      let La := _root_.ReciprocityTheory.ChartRestriction.G.FD.d6La r X.p0 (_root_.ReciprocityTheory.ChartRestriction.G.FD.fdeg E) (_root_.ReciprocityTheory.ChartRestriction.G.FD.dE E) ep0 rh
-      let ms := _root_.ReciprocityTheory.ChartRestriction.G.FD.frameIndexBound r (_root_.ReciprocityTheory.ChartRestriction.G.FD.fdeg E) (_root_.ReciprocityTheory.ChartRestriction.G.FD.dE E) (_root_.ReciprocityTheory.ChartRestriction.G.FD.rdE E) X.NA X.NC ep0
-      ∀ n' : ℕ, 1000 * ms / rh ≤ n' →
-      ∃ x ∈ X.dom, ∃ lam : Fin (r - 2) → Fin r → E,
-        (∀ j, lam j ∈ X.L' ∧ _root_.ReciprocityTheory.ChartRestriction.G.FD.herm X.Gm (lam j) ξ = 0) ∧
-        LinearIndependent E (Fin.cons ξ lam : Fin (r - 2 + 1) → Fin r → E) ∧
-        (∀ j k : Fin (r - 2), (j : ℕ) < X.p0 - 1 → X.p0 - 1 ≤ (k : ℕ) →
-          _root_.ReciprocityTheory.ChartRestriction.G.FD.herm X.Gm (lam j) (lam k) = 0) ∧
-        (∀ j : Fin (r - 2), (j : ℕ) < X.p0 - 1 →
-          (∀ τ : X.Ψ, 0 < (τ.1 (_root_.ReciprocityTheory.ChartRestriction.G.FD.herm X.Gm (lam j) (lam j))).re) ∧
-          X.Jz x (X.ucomp x ξ (X.embV (lam j))) = I • X.ucomp x ξ (X.embV (lam j))) ∧
-        (∀ j : Fin (r - 2), X.p0 - 1 ≤ (j : ℕ) →
-          (∀ τ : X.Ψ, (τ.1 (_root_.ReciprocityTheory.ChartRestriction.G.FD.herm X.Gm (lam j) (lam j))).re < 0) ∧
-          X.Jz x (X.ucomp x ξ (X.embV (lam j))) = -(I • X.ucomp x ξ (X.embV (lam j)))) ∧
-        (∀ j (τ : X.Ψ), ‖τ.1 (_root_.ReciprocityTheory.ChartRestriction.G.FD.herm X.Gm (lam j) (lam j))‖ ≤ La ^ 2) ∧
-        (∀ μ ∈ X.Λp ξ, ∃ e : E, e • ξ ∈ X.Λ ∧
-          (n' : ℂ) • X.aproj x ξ (X.embV μ) = X.embV (e • ξ)) ∧
-        X.fj la ξ ν P x ≠ 0 := by
-  have hnot : ∃ ξ, X.IsIso ξ ∧ ∃ ν : X.Ψ → ℝ, ∑ τ, ν τ ≤ c1 ∧
-      ∃ x ∈ X.dom, X.fj la ξ ν P x ≠ 0 := by
+    (hχ : ∀ γ ∈ X.Γ,
+      (∀ v ∈ X.Λ, ∃ y ∈ X.Λ, Matrix.mulVec (γ : Matrix (Fin r) (Fin r) E) v - v = (X.g : E) • y)
+        → X.χ la γ = 1)
+    (hP : P ∈ X.SS la) (hP' : P ∉ X.SSgt la c1)
+    : ∃ (ξ : Fin r → E) (ν : X.Ψ → ℝ),
+      X.IsIso ξ ∧ ∑ τ, ν τ ≤ c1 ∧ (∀ τ, 0 ≤ ν τ)
+        ∧ (∃ z0,
+          _root_.ReciprocityTheory.ChartRestriction.G.FD.ShortVectorHypotheses X la P ξ ν c1 w z0)
+        ∧ let ep0 :=
+            _root_.ReciprocityTheory.ChartRestriction.G.FD.flowEpsilonBound X.g
+              (_root_.ReciprocityTheory.ChartRestriction.G.FD.dE E)
+              (_root_.ReciprocityTheory.ChartRestriction.G.FD.fdeg E) X.NA X.NC c1 w
+          let rh := _root_.ReciprocityTheory.ChartRestriction.G.FD.d6rh c1 w
+          let La :=
+            _root_.ReciprocityTheory.ChartRestriction.G.FD.d6La r X.p0
+              (_root_.ReciprocityTheory.ChartRestriction.G.FD.fdeg E)
+              (_root_.ReciprocityTheory.ChartRestriction.G.FD.dE E) ep0 rh
+          let ms :=
+            _root_.ReciprocityTheory.ChartRestriction.G.FD.frameIndexBound r
+              (_root_.ReciprocityTheory.ChartRestriction.G.FD.fdeg E)
+              (_root_.ReciprocityTheory.ChartRestriction.G.FD.dE E)
+              (_root_.ReciprocityTheory.ChartRestriction.G.FD.rdE E) X.NA X.NC ep0
+          ∀ n' : ℕ,
+            1000 * ms / rh ≤ n'
+              → ∃ x ∈ X.dom, ∃ lam : Fin (r - 2) → Fin r → E,
+                (∀ j,
+                    lam j ∈ X.L'
+                      ∧ _root_.ReciprocityTheory.ChartRestriction.G.FD.herm X.Gm (lam j) ξ = 0)
+                  ∧ LinearIndependent E (Fin.cons ξ lam : Fin (r - 2 + 1) → Fin r → E)
+                  ∧ (∀ j k : Fin (r - 2),
+                    (j : ℕ) < X.p0 - 1 → X.p0 - 1 ≤ (k : ℕ)
+                      → _root_.ReciprocityTheory.ChartRestriction.G.FD.herm X.Gm (lam j) (lam k)
+                        = 0)
+                  ∧ (∀ j : Fin (r - 2),
+                    (j : ℕ) < X.p0 - 1
+                      → (∀ τ : X.Ψ,
+                          0 < (τ.1 (_root_.ReciprocityTheory.ChartRestriction.G.FD.herm X.Gm (lam j)
+                            (lam j))).re)
+                        ∧ X.Jz x (X.ucomp x ξ (X.embV (lam j))) = I • X.ucomp x ξ (X.embV (lam j)))
+                  ∧ (∀ j : Fin (r - 2),
+                    X.p0 - 1 ≤ (j : ℕ)
+                      → (∀ τ : X.Ψ,
+                          (τ.1 (_root_.ReciprocityTheory.ChartRestriction.G.FD.herm X.Gm (lam j)
+                              (lam j))).re
+                            < 0)
+                        ∧ X.Jz x (X.ucomp x ξ (X.embV (lam j)))
+                          = -(I • X.ucomp x ξ (X.embV (lam j))))
+                  ∧ (∀ j (τ : X.Ψ),
+                    ‖τ.1 (_root_.ReciprocityTheory.ChartRestriction.G.FD.herm X.Gm (lam j) (lam j))‖
+                      ≤ La ^ 2)
+                  ∧ (∀ μ ∈ X.Λp ξ, ∃ e : E,
+                    e • ξ ∈ X.Λ ∧ (n' : ℂ) • X.aproj x ξ (X.embV μ) = X.embV (e • ξ))
+                  ∧ X.fj la ξ ν P x ≠ 0 := by
+  have hnot : ∃ ξ, X.IsIso ξ ∧ ∃ ν : X.Ψ → ℝ, ∑ τ, ν τ ≤ c1 ∧ ∃ x ∈ X.dom, X.fj la ξ ν P x ≠ 0 := by
     by_contra h
     push_neg at h
     exact hP' ⟨hP, fun ξ hξ ν hν x hx => h ξ hξ ν hν x hx⟩
   obtain ⟨ξ, hξ, ν, hν, x, hx, hfx⟩ := hnot
   have hbdd := hP.1
-  have hνpos : ∀ τ, 0 ≤ ν τ := _root_.ReciprocityTheory.ChartRestriction.G.FD.BoundedSectionAlgebra.sign_of_bdd _ _root_.ReciprocityTheory.ChartRestriction.G.FD.moderateCoefficientPositivity_holds hbdd hξ ν hx hfx
+  have hνpos : ∀ τ, 0 ≤ ν τ :=
+    _root_.ReciprocityTheory.ChartRestriction.G.FD.BoundedSectionAlgebra.sign_of_bdd _
+      _root_.ReciprocityTheory.ChartRestriction.G.FD.moderateCoefficientPositivity_holds hbdd hξ ν
+      hx hfx
   obtain ⟨z0, hz0, hsup⟩ := exists_mem_D1set_sSup_hatN_lt_two_mul _ la P hbdd hξ ν hx hfx
-  have hD4 : _root_.ReciprocityTheory.ChartRestriction.G.FD.ShortVectorHypotheses X la P ξ ν c1 w z0 :=
+  have hD4
+      : _root_.ReciprocityTheory.ChartRestriction.G.FD.ShortVectorHypotheses X la P ξ ν c1 w z0 :=
     ⟨hdom, hP, hξ, hc1, hν, ⟨x, hx, hfx⟩, hw, hspr, hχ, hz0, hsup⟩
   refine ⟨ξ, ν, hξ, hν, hνpos, ⟨z0, hD4⟩, ?_⟩
-  exact (_root_.fd_point_assembly _root_.ReciprocityTheory.ChartRestriction.G.FD.shortVectorBound _root_.ReciprocityTheory.ChartRestriction.G.FD.orthonormalFlagTranslate_holds _root_.ReciprocityTheory.ChartRestriction.G.FD.orthonormalChartNormControl_holds (_root_.fd_fj_near_sup _root_.ReciprocityTheory.ChartRestriction.G.FD.holomorphic_periodicity_extension _root_.ReciprocityTheory.ChartRestriction.G.FD.m3bNorm_holds _root_.ReciprocityTheory.ChartRestriction.G.FD.moderateCoefficientPositivity_holds) _root_.ReciprocityTheory.ChartRestriction.G.FD.schwarzLemmaBall_holds
-    (_root_.ReciprocityTheory.ChartRestriction.G.FD.orthonormalShortVectorBound_of _root_.ReciprocityTheory.ChartRestriction.G.FD.shortVectorBound _root_.GlobalTheory.CMTransference.cmApproximation_transference) _root_.ReciprocityTheory.ChartRestriction.G.FD.isotropicCoefficientSplitting_holds _root_.ReciprocityTheory.ChartRestriction.G.FD.noShortVectorLowerBound_holds
-    (_root_.fd_unip_move _root_.ReciprocityTheory.ChartRestriction.G.FD.shortVectorBound _root_.ReciprocityTheory.ChartRestriction.G.FD.unitaryComplementMove _root_.ReciprocityTheory.ChartRestriction.G.FD.unipotent_majorant_bound _root_.ReciprocityTheory.ChartRestriction.G.FD.isotropicCoefficientSplitting_holds _root_.ReciprocityTheory.ChartRestriction.G.FD.noShortVectorLowerBound_holds)) r X la P ξ ν c1 w z0 hD4 hr
+  exact (_root_.fd_point_assembly _root_.ReciprocityTheory.ChartRestriction.G.FD.shortVectorBound
+      _root_.ReciprocityTheory.ChartRestriction.G.FD.orthonormalFlagTranslate_holds
+      _root_.ReciprocityTheory.ChartRestriction.G.FD.orthonormalChartNormControl_holds
+      (_root_.fd_fj_near_sup
+        _root_.ReciprocityTheory.ChartRestriction.G.FD.holomorphic_periodicity_extension
+        _root_.ReciprocityTheory.ChartRestriction.G.FD.m3bNorm_holds
+        _root_.ReciprocityTheory.ChartRestriction.G.FD.moderateCoefficientPositivity_holds)
+      _root_.ReciprocityTheory.ChartRestriction.G.FD.schwarzLemmaBall_holds
+      (_root_.ReciprocityTheory.ChartRestriction.G.FD.orthonormalShortVectorBound_of
+        _root_.ReciprocityTheory.ChartRestriction.G.FD.shortVectorBound
+        _root_.GlobalTheory.CMTransference.cmApproximation_transference)
+      _root_.ReciprocityTheory.ChartRestriction.G.FD.isotropicCoefficientSplitting_holds
+      _root_.ReciprocityTheory.ChartRestriction.G.FD.noShortVectorLowerBound_holds
+      (_root_.fd_unip_move _root_.ReciprocityTheory.ChartRestriction.G.FD.shortVectorBound
+        _root_.ReciprocityTheory.ChartRestriction.G.FD.unitaryComplementMove
+        _root_.ReciprocityTheory.ChartRestriction.G.FD.unipotent_majorant_bound
+        _root_.ReciprocityTheory.ChartRestriction.G.FD.isotropicCoefficientSplitting_holds
+        _root_.ReciprocityTheory.ChartRestriction.G.FD.noShortVectorLowerBound_holds))
+    r X la P ξ ν c1 w z0 hD4 hr
 
 end GlobalTheory.FJDetect

@@ -8,11 +8,12 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem exists_systemOfParameters_insert (S : Type) [CommRing S] [IsDomain S] [IsLocalRing S]
-    [IsNoetherianRing S] (a : S) (ha0 : a ≠ 0) (ha : a ∈ maximalIdeal S) :
-    ∃ (n : ℕ) (x : Fin n → S), (∀ i, x i ∈ maximalIdeal S) ∧
-      ringKrullDim S = (n : WithBot ℕ∞) + 1 ∧
-      ∃ N : ℕ, maximalIdeal S ^ N ≤ Ideal.span (insert a (Set.range x)) := by
+theorem exists_systemOfParameters_insert
+    (S : Type) [CommRing S] [IsDomain S] [IsLocalRing S] [IsNoetherianRing S]
+    (a : S) (ha0 : a ≠ 0) (ha : a ∈ maximalIdeal S)
+    : ∃ (n : ℕ) (x : Fin n → S),
+      (∀ i, x i ∈ maximalIdeal S) ∧ ringKrullDim S = (n : WithBot ℕ∞) + 1
+        ∧ ∃ N : ℕ, maximalIdeal S ^ N ≤ Ideal.span (insert a (Set.range x)) := by
   classical
   have hIle : Ideal.span {a} ≤ maximalIdeal S := (Ideal.span_singleton_le_iff_mem _).mpr ha
   have hIne : Ideal.span {a} ≠ ⊤ := fun h =>
@@ -28,20 +29,21 @@ theorem exists_systemOfParameters_insert (S : Type) [CommRing S] [IsDomain S] [I
   have hht := IsLocalRing.maximalIdeal_height_eq_ringKrullDim (R := S ⧸ Ideal.span {a})
   have hsle : Ideal.span (s : Set (S ⧸ Ideal.span {a})) ≤ maximalIdeal (S ⧸ Ideal.span {a}) :=
     hsmin.1.2
-  have hcomap : (maximalIdeal (S ⧸ Ideal.span {a})).comap (Ideal.Quotient.mk (Ideal.span {a})) =
-      maximalIdeal S :=
-    IsLocalRing.eq_maximalIdeal
-      (Ideal.comap_isMaximal_of_surjective _ Ideal.Quotient.mk_surjective)
-  have hmapeq : Ideal.map (Ideal.Quotient.mk (Ideal.span {a})) (maximalIdeal S) =
-      maximalIdeal (S ⧸ Ideal.span {a}) := by
+  have hcomap
+      : (maximalIdeal (S ⧸ Ideal.span {a})).comap (Ideal.Quotient.mk (Ideal.span {a}))
+        = maximalIdeal S :=
+    IsLocalRing.eq_maximalIdeal (Ideal.comap_isMaximal_of_surjective _ Ideal.Quotient.mk_surjective)
+  have hmapeq
+      : Ideal.map (Ideal.Quotient.mk (Ideal.span {a})) (maximalIdeal S)
+        = maximalIdeal (S ⧸ Ideal.span {a}) := by
     rw [← hcomap, Ideal.map_comap_of_surjective _ Ideal.Quotient.mk_surjective]
   let e := s.equivFin
   let x : Fin s.card → S := fun i =>
     (Ideal.Quotient.mk_surjective ((e.symm i : S ⧸ Ideal.span {a}))).choose
   have hx : ∀ i, Ideal.Quotient.mk (Ideal.span {a}) (x i) = e.symm i := fun i =>
     (Ideal.Quotient.mk_surjective _).choose_spec
-  have hrange : Ideal.Quotient.mk (Ideal.span {a}) '' Set.range x =
-      (s : Set (S ⧸ Ideal.span {a})) := by
+  have hrange
+      : Ideal.Quotient.mk (Ideal.span {a}) '' Set.range x = (s : Set (S ⧸ Ideal.span {a})) := by
     rw [← Set.range_comp]
     ext q
     constructor
@@ -55,8 +57,9 @@ theorem exists_systemOfParameters_insert (S : Type) [CommRing S] [IsDomain S] [I
     exact hsle (Ideal.subset_span (e.symm i).2)
   · rw [← hdim, ← hht, ← hcard]
     norm_cast
-  · have hrad : maximalIdeal (S ⧸ Ideal.span {a}) ≤
-        (Ideal.span (s : Set (S ⧸ Ideal.span {a}))).radical := by
+  · have hrad
+        : maximalIdeal (S ⧸ Ideal.span {a})
+          ≤ (Ideal.span (s : Set (S ⧸ Ideal.span {a}))).radical := by
       rw [Ideal.radical_eq_sInf]
       refine le_sInf ?_
       rintro p ⟨hsp, hp⟩
@@ -67,8 +70,7 @@ theorem exists_systemOfParameters_insert (S : Type) [CommRing S] [IsDomain S] [I
     rw [Ideal.map_pow, hmapeq] at h1
     have h2 := hN h1
     rw [← hrange, ← Ideal.map_span] at h2
-    obtain ⟨z, hz, hzy⟩ :=
-      (Ideal.mem_map_iff_of_surjective _ Ideal.Quotient.mk_surjective).mp h2
+    obtain ⟨z, hz, hzy⟩ := (Ideal.mem_map_iff_of_surjective _ Ideal.Quotient.mk_surjective).mp h2
     obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.mp (Ideal.Quotient.eq.mp hzy)
     exact Ideal.mem_span_insert.mpr ⟨-c, z, hz, by linear_combination hc⟩
 

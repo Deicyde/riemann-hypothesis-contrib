@@ -31,14 +31,16 @@ lemma subst_coeff_coeff (D : ℕ) (P : Polynomial (Polynomial κ)) (i k : ℕ) :
   · intro j _ hj; simp [Ne.symm hj]
   · intro hi; simp [notMem_support_iff.mp hi]
 
-theorem monic_factor_coeff_natDegree_le : ∀ {κ : Type} [Field κ] (Φ A B : Polynomial (Polynomial κ))
-    (D : ℕ), Φ.Monic → A.Monic → B.Monic → Φ = A * B → (∀ i, (Φ.coeff i).natDegree ≤ D) →
-    ∀ i, (A.coeff i).natDegree ≤ Φ.natDegree * D := by
+theorem monic_factor_coeff_natDegree_le
+    : ∀ {κ : Type} [Field κ] (Φ A B : Polynomial (Polynomial κ)) (D : ℕ),
+      Φ.Monic → A.Monic → B.Monic → Φ = A * B → (∀ i, (Φ.coeff i).natDegree ≤ D)
+        → ∀ i, (A.coeff i).natDegree ≤ Φ.natDegree * D := by
   intro κ _ Φ A B D hΦ _ hB hAB hD i
   by_cases hi : A.coeff i = 0
   · simp [hi]
-  have key : ∀ P : Polynomial (Polynomial κ), ∀ j, P.coeff j ≠ 0 →
-      (P.coeff j).natDegree + D * j ≤ (subst D P).natDegree ∧ subst D P ≠ 0 := by
+  have key
+      : ∀ P : Polynomial (Polynomial κ), ∀ j,
+        P.coeff j ≠ 0 → (P.coeff j).natDegree + D * j ≤ (subst D P).natDegree ∧ subst D P ≠ 0 := by
     intro P j hj
     have h := subst_coeff_coeff D P j (P.coeff j).natDegree
     have hne : (subst D P).coeff ((P.coeff j).natDegree + D * j) ≠ 0 := by
@@ -55,14 +57,18 @@ theorem monic_factor_coeff_natDegree_le : ∀ {κ : Type} [Field κ] (Φ A B : P
     apply natDegree_sum_le_of_forall_le
     intro j hj
     have hjd : j ≤ Φ.natDegree := le_natDegree_of_mem_supp j hj
-    have h1 : (mapRingHom (C : κ →+* Polynomial κ) (Φ.coeff j)).natDegree ≤ (Φ.coeff j).natDegree := by
+    have h1
+        : (mapRingHom (C : κ →+* Polynomial κ) (Φ.coeff j)).natDegree ≤ (Φ.coeff j).natDegree := by
       rw [coe_mapRingHom]; exact natDegree_map_le
     have h2 : ((C X * X ^ D : Polynomial (Polynomial κ)) ^ j).natDegree ≤ j * D := by
-      calc _ ≤ j * (C X * X ^ D : Polynomial (Polynomial κ)).natDegree := natDegree_pow_le
+      calc
+        _ ≤ j * (C X * X ^ D : Polynomial (Polynomial κ)).natDegree := natDegree_pow_le
         _ ≤ j * D := by
           apply Nat.mul_le_mul_left
-          calc _ ≤ (C X : Polynomial (Polynomial κ)).natDegree + (X ^ D : Polynomial (Polynomial κ)).natDegree :=
-                natDegree_mul_le
+          calc
+            _ ≤ (C X : Polynomial (Polynomial κ)).natDegree
+                + (X ^ D : Polynomial (Polynomial κ)).natDegree :=
+              natDegree_mul_le
             _ = D := by simp
     have h3 : (Φ.coeff j).natDegree + j * D ≤ Φ.natDegree * D := by
       rcases hjd.lt_or_eq with h | h

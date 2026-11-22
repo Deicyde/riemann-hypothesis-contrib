@@ -19,8 +19,10 @@ theorem npDescF_of_valRatF {eps : ℝ} (Fm : FamP eps) (h : ValRatF Fm) : NPDesc
   refine npDesc_of_valRat _ (Fm.gatT x i) (Fm.Gx x i) (Fm.Gy x i) Fm.GK ?_ (hx0 x hx i hx1)
   exact (Fm.ex x hx1 i).lat.vram
 
-theorem CmpTied.valRat {D : D7} {X : Formalism.L2.Herm.Herm0 D} {T : ∀ u : D.what₂.Word, Forms0 D u} {Gt : GatTies D}
-    {c : LatCmp D} (K : CmpTied D X T Gt c) : ValRat c := by
+theorem CmpTied.valRat
+    {D : D7} {X : Formalism.L2.Herm.Herm0 D} {T : ∀ u : D.what₂.Word, Forms0 D u} {Gt : GatTies D}
+    {c : LatCmp D} (K : CmpTied D X T Gt c)
+    : ValRat c := by
   intro u w hg x i L hL
   exact ⟨_, ((K.tie u w hg).val_cmp x i L hL).symm⟩
 

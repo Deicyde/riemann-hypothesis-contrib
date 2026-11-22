@@ -9,18 +9,20 @@ public import Development.DiscreteGroups.PiInvariants.CompactSupportTwists.PiSee
 @[expose] public section
 
 open UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi DiscreteGroups.T1.G
-open MeasureTheory GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.Desc PositivityTheory.Rg.BcB.E1
+open MeasureTheory GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.BcB
+  PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.Desc
+  PositivityTheory.Rg.BcB.E1
 
 attribute [local instance] PositivityTheory.Rg.BcB.E.borelH
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.supp_pf :
-    Basic → Zero → KInv → PSupp → Ker → Supp := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.supp_pf
+    : Basic → Zero → KInv → PSupp → Ker → Supp := by
   intro hB hZ hK hP hKer E _ _ _ n ι _ s m R hR x y hxy
   obtain ⟨hac, hmul, -, -, hone, -, hldth, hthth, hthmul, hrat, -, hthc⟩ := hB E n s.pos
   have hl1 : ldet (1 : H E n 0) = 0 := by
     have h := hac 0
     rwa [hone] at h
-  have hlinv : ∀ z : H E n 0, ldet z⁻¹ = -ldet z := by
+  have hlinv : ∀ z : H E n 0, ldet z⁻¹ = - ldet z := by
     intro z
     have h := hmul z z⁻¹
     rw [mul_inv_cancel, hl1] at h
@@ -39,15 +41,19 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.supp_pf :
     rw [show s.k₂ (th (γ : H E n 0) * th w) = s.k₂ (th w) from h]
   obtain ⟨δ, hδ⟩ : ∃ δ, δ = (|ldet x + ldet y| - R) / 2 := ⟨_, rfl⟩
   have hδ0 : 0 < δ := by rw [hδ]; linarith
-  have key := hZ E n s.D (fun w => m.G x (th w)) (Set.Ioo (-ldet y - δ) (-ldet y + δ)) hf hinv isOpen_Ioo ?_ (th y) ?_
+  have key :=
+    hZ E n s.D
+      (fun w => m.G x (th w))
+      (Set.Ioo (- ldet y - δ) (- ldet y + δ)) hf hinv isOpen_Ioo ?_ (th y) ?_
   · simpa only [hthth] using key
   · intro v hv
     refine ((hKer E n ι s m v x).2).trans ?_
-    have hPv := hP E n s.D s.π (-ldet y - δ) (-ldet y + δ) v
-      (hv.mono fun w h h' => h fun hI => h' (Set.Ioo_subset_Icc_self hI))
+    have hPv :=
+      hP E n s.D s.π (- ldet y - δ) (- ldet y + δ) v
+        (hv.mono fun w h h' => h fun hI => h' (Set.Ioo_subset_Icc_self hI))
     apply integral_eq_zero_of_ae
     filter_upwards [hPv] with w hw
-    by_cases hI : ldet w ∈ Set.Icc (-ldet y - δ) (-ldet y + δ)
+    by_cases hI : ldet w ∈ Set.Icc (- ldet y - δ) (- ldet y + δ)
     · have hk : kerH m.φ x w = 0 := by
         unfold kerH
         refine finsum_eq_zero_of_forall_eq_zero fun γ => ?_

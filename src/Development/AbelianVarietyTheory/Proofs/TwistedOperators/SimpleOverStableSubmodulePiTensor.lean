@@ -13,11 +13,13 @@ namespace GlobalTheory.PiSimple
 
 open GlobalTheory.TensHead
 
-theorem simpleOver_of_equiv {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W]
-    [Module ℂ W] (e : V ≃ₗ[ℂ] W) (G : Set (Module.End ℂ V)) (G' : Set (Module.End ℂ W))
+theorem simpleOver_of_equiv
+    {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    (e : V ≃ₗ[ℂ] W)
+    (G : Set (Module.End ℂ V)) (G' : Set (Module.End ℂ W))
     (K : Submodule ℂ V) (K' : Submodule ℂ W) (hK : K.map (e : V →ₗ[ℂ] W) = K')
-    (hG : ∀ g' ∈ G', ∃ g ∈ G, ∀ x, g' (e x) = e (g x)) (h : SimpleOver G' K') :
-    SimpleOver G K := by
+    (hG : ∀ g' ∈ G', ∃ g ∈ G, ∀ x, g' (e x) = e (g x)) (h : SimpleOver G' K')
+    : SimpleOver G K := by
   intro N hN hKN
   have hs : Stab G' (N.map (e : V →ₗ[ℂ] W)) := by
     rintro g' hg' _ ⟨x, hx, rfl⟩
@@ -36,14 +38,15 @@ theorem simpleOver_of_equiv {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCom
 
 def PP (σ : Type) : Prop :=
   ∀ [DecidableEq σ] (M : σ → Type) [∀ i, AddCommGroup (M i)] [∀ i, Module ℂ (M i)]
-    (Op : ∀ i, Set (Module.End ℂ (M i))) (K : ∀ i, Submodule ℂ (M i)),
-    (∀ i, Module.rank ℂ (M i) ≤ Cardinal.aleph0) → (∀ i, Stab (Op i) (K i)) →
-    (∀ i, SimpleOver (Op i) (K i)) → SimpleOver (piOps Op) (piKer K)
+      (Op : ∀ i, Set (Module.End ℂ (M i))) (K : ∀ i, Submodule ℂ (M i)),
+    (∀ i, Module.rank ℂ (M i) ≤ Cardinal.aleph0) → (∀ i, Stab (Op i) (K i))
+      → (∀ i, SimpleOver (Op i) (K i))
+      → SimpleOver (piOps Op) (piKer K)
 
 theorem pp_empty : PP PEmpty := by
   intro _ M _ _ Op K _ _ _
-  refine simpleOver_of_equiv (PiTensorProduct.isEmptyEquiv PEmpty) _ (∅ : Set (Module.End ℂ ℂ))
-    _ ⊥ ?_ (by simp) ?_
+  refine simpleOver_of_equiv (PiTensorProduct.isEmptyEquiv PEmpty) _ (∅ : Set (Module.End ℂ ℂ)) _ ⊥
+    ?_ (by simp) ?_
   · have : piKer K = ⊥ := by
       rw [piKer, Submodule.span_eq_bot]
       rintro _ ⟨y, ⟨i, _⟩, _⟩
@@ -77,8 +80,14 @@ theorem pp_unit : PP PUnit := by
 theorem pp_of_equiv {σ ι : Type} (f : σ ≃ ι) (hσ : PP σ) : PP ι := by
   intro _ M _ _ Op K hr hs hso
   classical
-  have H := hσ (fun s => M (f s)) (fun s => Op (f s)) (fun s => K (f s)) (fun s => hr _)
-    (fun s => hs _) (fun s => hso _)
+  have H :=
+    hσ
+      (fun s => M (f s))
+      (fun s => Op (f s))
+      (fun s => K (f s))
+      (fun s => hr _)
+      (fun s => hs _)
+      (fun s => hso _)
   refine simpleOver_of_equiv (PiTensorProduct.reindex ℂ M f.symm) _ _ _ _ ?_ ?_ H
   · apply le_antisymm
     · rw [piKer, Submodule.map_span, Submodule.span_le]
@@ -87,71 +96,105 @@ theorem pp_of_equiv {σ ι : Type} (f : σ ≃ ι) (hσ : PP σ) : PP ι := by
       exact Submodule.subset_span ⟨fun s => y (f s), ⟨s, hi⟩, by simp⟩
     · rw [piKer, Submodule.span_le]
       rintro _ ⟨z, ⟨s, hz⟩, rfl⟩
-      refine ⟨PiTensorProduct.tprod ℂ (Equiv.piCongrLeft M f z),
-        Submodule.subset_span ⟨_, ⟨f s, by simpa using hz⟩, rfl⟩, ?_⟩
+      refine ⟨
+        PiTensorProduct.tprod ℂ (Equiv.piCongrLeft M f z),
+        Submodule.subset_span ⟨_, ⟨f s, by simpa using hz⟩, rfl⟩,
+        ?_
+      ⟩
       simp
   · rintro _ ⟨s, g, hg, rfl⟩
     refine ⟨piOp (f s) g, ⟨f s, g, hg, rfl⟩, fun x => ?_⟩
-    have hu : (Function.update (fun j => (LinearMap.id : M (f j) →ₗ[ℂ] M (f j))) s g) =
-        fun j => Function.update (fun i => (LinearMap.id : M i →ₗ[ℂ] M i)) (f s) g (f.symm.symm j) := by
+    have hu
+        : (Function.update (fun j => (LinearMap.id : M (f j) →ₗ[ℂ] M (f j))) s g)
+          = fun j =>
+            Function.update (fun i => (LinearMap.id : M i →ₗ[ℂ] M i)) (f s) g (f.symm.symm j) := by
       funext j
       by_cases h : j = s
       · subst h; simp
       · rw [Function.update_of_ne h]
-        exact (Function.update_of_ne (β := fun i => M i →ₗ[ℂ] M i) (a := f j) (a' := f s)
-          (fun h' => h (f.injective h')) g (fun i => LinearMap.id)).symm
+        exact (Function.update_of_ne
+          (β := fun i => M i →ₗ[ℂ] M i)
+          (a := f j) (a' := f s)
+          (fun h' => h (f.injective h'))
+          g
+          (fun i => LinearMap.id)).symm
     simp only [piOp, LinearEquiv.coe_coe]
     rw [hu, PiTensorProduct.map_reindex]
 
-theorem simpleOver_sum {α β : Type} (hα : PP α) (hβ : PP β) [DecidableEq (α ⊕ β)]
+theorem simpleOver_sum
+    {α β : Type} (hα : PP α) (hβ : PP β) [DecidableEq (α ⊕ β)]
     (N : α ⊕ β → Type) [∀ i, AddCommGroup (N i)] [∀ i, Module ℂ (N i)]
     (Op : ∀ i, Set (Module.End ℂ (N i))) (K : ∀ i, Submodule ℂ (N i))
     (hr : ∀ i, Module.rank ℂ (N i) ≤ Cardinal.aleph0)
-    (hrl : Module.rank ℂ (⨂[ℂ] a, N (.inl a)) ≤ Cardinal.aleph0)
-    (hs : ∀ i, Stab (Op i) (K i)) (hso : ∀ i, SimpleOver (Op i) (K i)) :
-    SimpleOver (piOps Op) (piKer K) := by
+    (hrl : Module.rank ℂ (⨂[ℂ] a, N (.inl a)) ≤ Cardinal.aleph0) (hs : ∀ i, Stab (Op i) (K i))
+    (hso : ∀ i, SimpleOver (Op i) (K i))
+    : SimpleOver (piOps Op) (piKer K) := by
   classical
-  have hA := hα (fun a => N (.inl a)) (fun a => Op (.inl a)) (fun a => K (.inl a))
-    (fun a => hr _) (fun a => hs _) (fun a => hso _)
-  have hB := hβ (fun b => N (.inr b)) (fun b => Op (.inr b)) (fun b => K (.inr b))
-    (fun b => hr _) (fun b => hs _) (fun b => hso _)
-  have hT := GlobalTheory.T.simpleOverStableSubmodule_tensorPureKernelSpan (piOps (fun a => Op (.inl a))) (piOps (fun b => Op (.inr b)))
-    (piKer (fun a => K (.inl a))) (piKer (fun b => K (.inr b))) hrl
-    (GlobalTheory.T.operatorStable_piTensorPureKernelSpan _ _ (fun a => hs _)) (GlobalTheory.T.operatorStable_piTensorPureKernelSpan _ _ (fun b => hs _)) hA hB
+  have hA :=
+    hα
+      (fun a => N (.inl a))
+      (fun a => Op (.inl a))
+      (fun a => K (.inl a))
+      (fun a => hr _)
+      (fun a => hs _)
+      (fun a => hso _)
+  have hB :=
+    hβ
+      (fun b => N (.inr b))
+      (fun b => Op (.inr b))
+      (fun b => K (.inr b))
+      (fun b => hr _)
+      (fun b => hs _)
+      (fun b => hso _)
+  have hT :=
+    GlobalTheory.T.simpleOverStableSubmodule_tensorPureKernelSpan (piOps (fun a => Op (.inl a)))
+      (piOps (fun b => Op (.inr b))) (piKer (fun a => K (.inl a))) (piKer (fun b => K (.inr b))) hrl
+      (GlobalTheory.T.operatorStable_piTensorPureKernelSpan _ _ (fun a => hs _))
+      (GlobalTheory.T.operatorStable_piTensorPureKernelSpan _ _ (fun b => hs _)) hA hB
   let e := (PiTensorProduct.tmulEquivDep ℂ N).symm
   refine simpleOver_of_equiv e _ _ _ _ ?_ ?_ hT
   · apply le_antisymm
     · rw [piKer, Submodule.map_span, Submodule.span_le]
       rintro _ ⟨_, ⟨y, ⟨i, hi⟩, rfl⟩, rfl⟩
-      refine Submodule.subset_span ⟨PiTensorProduct.tprod ℂ (fun a => y (.inl a)),
-        PiTensorProduct.tprod ℂ (fun b => y (.inr b)), ?_, by simp [e]⟩
+      refine Submodule.subset_span ⟨
+        PiTensorProduct.tprod ℂ (fun a => y (.inl a)),
+        PiTensorProduct.tprod ℂ (fun b => y (.inr b)),
+        ?_,
+        by simp [e]
+      ⟩
       cases i with
       | inl a => exact Or.inl (Submodule.subset_span ⟨_, ⟨a, hi⟩, rfl⟩)
       | inr b => exact Or.inr (Submodule.subset_span ⟨_, ⟨b, hi⟩, rfl⟩)
     · set Q := (piKer K).map e.toLinearMap with hQ
-      have pure : ∀ (y₁ : ∀ a, N (.inl a)) (y₂ : ∀ b, N (.inr b)),
-          ((∃ a, y₁ a ∈ K (.inl a)) ∨ (∃ b, y₂ b ∈ K (.inr b))) →
-          PiTensorProduct.tprod ℂ y₁ ⊗ₜ[ℂ] PiTensorProduct.tprod ℂ y₂ ∈ Q := by
+      have pure
+          : ∀ (y₁ : ∀ a, N (.inl a)) (y₂ : ∀ b, N (.inr b)),
+            ((∃ a, y₁ a ∈ K (.inl a)) ∨ (∃ b, y₂ b ∈ K (.inr b)))
+              → PiTensorProduct.tprod ℂ y₁ ⊗ₜ[ℂ] PiTensorProduct.tprod ℂ y₂ ∈ Q := by
         intro y₁ y₂ h
-        refine ⟨PiTensorProduct.tprod ℂ (fun i => Sum.rec y₁ y₂ i),
-          Submodule.subset_span ⟨_, ?_, rfl⟩, by simp [e]⟩
+        refine ⟨
+          PiTensorProduct.tprod ℂ (fun i => Sum.rec y₁ y₂ i),
+          Submodule.subset_span ⟨_, ?_, rfl⟩,
+          by simp [e]
+        ⟩
         rcases h with ⟨a, ha⟩ | ⟨b, hb⟩
         · exact ⟨.inl a, ha⟩
         · exact ⟨.inr b, hb⟩
-      have left : ∀ (y₁ : ∀ a, N (.inl a)), (∃ a, y₁ a ∈ K (.inl a)) →
-          ∀ z, PiTensorProduct.tprod ℂ y₁ ⊗ₜ[ℂ] z ∈ Q := by
+      have left
+          : ∀ (y₁ : ∀ a, N (.inl a)),
+            (∃ a, y₁ a ∈ K (.inl a)) → ∀ z, PiTensorProduct.tprod ℂ y₁ ⊗ₜ[ℂ] z ∈ Q := by
         intro y₁ h z
-        have : (⊤ : Submodule ℂ (⨂[ℂ] b, N (.inr b))) ≤
-            Q.comap (TensorProduct.mk ℂ _ _ (PiTensorProduct.tprod ℂ y₁)) := by
+        have : (⊤ : Submodule ℂ (⨂[ℂ] b, N (.inr b)))
+            ≤ Q.comap (TensorProduct.mk ℂ _ _ (PiTensorProduct.tprod ℂ y₁)) := by
           rw [← PiTensorProduct.span_tprod_eq_top, Submodule.span_le]
           rintro _ ⟨y₂, rfl⟩
           exact pure y₁ y₂ (Or.inl h)
         exact this Submodule.mem_top
-      have right : ∀ (y₂ : ∀ b, N (.inr b)), (∃ b, y₂ b ∈ K (.inr b)) →
-          ∀ x, x ⊗ₜ[ℂ] PiTensorProduct.tprod ℂ y₂ ∈ Q := by
+      have right
+          : ∀ (y₂ : ∀ b, N (.inr b)),
+            (∃ b, y₂ b ∈ K (.inr b)) → ∀ x, x ⊗ₜ[ℂ] PiTensorProduct.tprod ℂ y₂ ∈ Q := by
         intro y₂ h x
-        have : (⊤ : Submodule ℂ (⨂[ℂ] a, N (.inl a))) ≤
-            Q.comap ((TensorProduct.mk ℂ _ _).flip (PiTensorProduct.tprod ℂ y₂)) := by
+        have : (⊤ : Submodule ℂ (⨂[ℂ] a, N (.inl a)))
+            ≤ Q.comap ((TensorProduct.mk ℂ _ _).flip (PiTensorProduct.tprod ℂ y₂)) := by
           rw [← PiTensorProduct.span_tprod_eq_top, Submodule.span_le]
           rintro _ ⟨y₁, rfl⟩
           exact pure y₁ y₂ (Or.inr h)
@@ -171,8 +214,9 @@ theorem simpleOver_sum {α β : Type} (hα : PP α) (hβ : PP β) [DecidableEq (
         exact this hz
   · rintro _ (⟨_, ⟨a, g, hg, rfl⟩, rfl⟩ | ⟨_, ⟨b, g, hg, rfl⟩, rfl⟩)
     · refine ⟨piOp (Sum.inl a) g, ⟨_, g, hg, rfl⟩, fun x => ?_⟩
-      have H : (TensorProduct.map (piOp a g) LinearMap.id) ∘ₗ e.toLinearMap =
-          e.toLinearMap ∘ₗ piOp (Sum.inl a) g := by
+      have H
+          : (TensorProduct.map (piOp a g) LinearMap.id) ∘ₗ e.toLinearMap
+            = e.toLinearMap ∘ₗ piOp (Sum.inl a) g := by
         apply PiTensorProduct.ext
         apply MultilinearMap.ext
         intro y
@@ -189,8 +233,9 @@ theorem simpleOver_sum {α β : Type} (hα : PP α) (hβ : PP β) [DecidableEq (
           rfl
       exact LinearMap.congr_fun H x
     · refine ⟨piOp (Sum.inr b) g, ⟨_, g, hg, rfl⟩, fun x => ?_⟩
-      have H : (TensorProduct.map LinearMap.id (piOp b g)) ∘ₗ e.toLinearMap =
-          e.toLinearMap ∘ₗ piOp (Sum.inr b) g := by
+      have H
+          : (TensorProduct.map LinearMap.id (piOp b g)) ∘ₗ e.toLinearMap
+            = e.toLinearMap ∘ₗ piOp (Sum.inr b) g := by
         apply PiTensorProduct.ext
         apply MultilinearMap.ext
         intro y
@@ -210,7 +255,8 @@ theorem simpleOver_sum {α β : Type} (hα : PP α) (hβ : PP β) [DecidableEq (
 theorem pp_unit_sum {α : Type} (hα : PP α) : PP (PUnit ⊕ α) := by
   intro _ N _ _ Op K hr hs hso
   refine simpleOver_sum pp_unit hα N Op K hr ?_ hs hso
-  rw [(PiTensorProduct.subsingletonEquiv (R := ℂ) (s := fun u : PUnit => N (Sum.inl u))
+  rw [(PiTensorProduct.subsingletonEquiv (R := ℂ)
+    (s := fun u : PUnit => N (Sum.inl u))
     PUnit.unit).rank_eq]
   exact hr _
 
@@ -218,15 +264,19 @@ theorem pp_option {α : Type} (hα : PP α) : PP (Option α) :=
   pp_of_equiv ((Equiv.optionEquivSumPUnit α).trans (Equiv.sumComm _ _)).symm (pp_unit_sum hα)
 
 theorem pp_finite (σ : Type) [Finite σ] : PP σ :=
-  Finite.induction_empty_option (P := PP) (fun f h => pp_of_equiv f h) pp_empty
-    (fun h => pp_option h) σ
+  Finite.induction_empty_option (P := PP)
+    (fun f h => pp_of_equiv f h)
+    pp_empty
+    (fun h => pp_option h)
+    σ
 
-theorem simpleOver_piKer : ∀ {ι : Type} [Fintype ι] [DecidableEq ι] {M : ι → Type}
-    [∀ i, AddCommGroup (M i)] [∀ i, Module ℂ (M i)] (Op : ∀ i, Set (Module.End ℂ (M i)))
-    (K : ∀ i, Submodule ℂ (M i)),
-    (∀ i, Module.rank ℂ (M i) ≤ Cardinal.aleph0) → (∀ i, GlobalTheory.TensHead.Stab (Op i) (K i)) →
-    (∀ i, GlobalTheory.TensHead.SimpleOver (Op i) (K i)) →
-    GlobalTheory.TensHead.SimpleOver (GlobalTheory.TensHead.piOps Op) (GlobalTheory.TensHead.piKer K) := by
+theorem simpleOver_piKer
+    : ∀ {ι : Type} [Fintype ι] [DecidableEq ι] {M : ι → Type} [∀ i, AddCommGroup (M i)]
+        [∀ i, Module ℂ (M i)] (Op : ∀ i, Set (Module.End ℂ (M i))) (K : ∀ i, Submodule ℂ (M i)),
+      (∀ i, Module.rank ℂ (M i) ≤ Cardinal.aleph0) → (∀ i, GlobalTheory.TensHead.Stab (Op i) (K i))
+        → (∀ i, GlobalTheory.TensHead.SimpleOver (Op i) (K i))
+        → GlobalTheory.TensHead.SimpleOver (GlobalTheory.TensHead.piOps Op)
+          (GlobalTheory.TensHead.piKer K) := by
   intro ι _ _ M _ _ Op K hr hs hso
   exact pp_finite ι M Op K hr hs hso
 

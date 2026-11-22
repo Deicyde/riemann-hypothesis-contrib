@@ -6,12 +6,21 @@ public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.HeckeActMem
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKGeo GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC Formalism.UG UpperTheory.Gal.W2.Seed
+open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKGeo
+  GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC Formalism.UG
+  UpperTheory.Gal.W2.Seed
 open UpperTheory.Gal.CertificateRingHomMap (GUf Gam0 AfQ Plc sim mat comp rat lev ZU)
 open scoped TensorProduct Classical
 
-theorem UpperTheory.Gal.W2.Seed.pMemAct :
-    MemSum → SumDoset → TfAct → (∀ (X M' : Type) [Group X] [Group M'] (L' : Loc X M') (K : Subgroup X) (Kw : Subgroup M'), L'.Fact K Kw → ∀ (t : M') (V : Type) [AddCommGroup V] [Module ℂ V] (Ψ : X → V), (∀ k ∈ K, ∀ g, Ψ (g * k) = Ψ g) → ∑ᶠ y : X ⧸ K, dosetInd ℂ K (L'.loc t) y.out • Ψ y.out = ∑ᶠ x : M' ⧸ Kw, dosetInd ℂ Kw t x.out • Ψ (L'.loc x.out)) → MemAct := by
+theorem UpperTheory.Gal.W2.Seed.pMemAct
+    : MemSum → SumDoset → TfAct
+      → (∀ (X M' : Type) [Group X] [Group M'] (L' : Loc X M') (K : Subgroup X) (Kw : Subgroup M'),
+        L'.Fact K Kw
+          → ∀ (t : M') (V : Type) [AddCommGroup V] [Module ℂ V] (Ψ : X → V),
+            (∀ k ∈ K, ∀ g, Ψ (g * k) = Ψ g)
+              → ∑ᶠ y : X ⧸ K, dosetInd ℂ K (L'.loc t) y.out • Ψ y.out
+                = ∑ᶠ x : M' ⧸ Kw, dosetInd ℂ Kw t x.out • Ψ (L'.loc x.out))
+      → MemAct := by
   intro hMS hSD hTF hS X M M' _ _ _ T L' Kw hfT hap K KM htr hfK hK0 hKM hidx hnor t z h hz hh hc
   have hKMK : KM ≤ K := hKM.trans hK0
   have hcK : ∀ u ∈ KM, h * u * h⁻¹ ∈ K := fun u hu => hK0 (by simpa using hc 1 K.one_mem u hu)
@@ -39,15 +48,18 @@ theorem UpperTheory.Gal.W2.Seed.pMemAct :
       obtain ⟨k, hk⟩ := QuotientGroup.mk_out_eq_mul K (z * q.out)
       have e1 : Φ (g * (z * q.out * k)) = Φ (g * z * q.out) := by
         rw [← mul_assoc, hΦK _ k.2, ← mul_assoc]
-      have hmem2 : z * q.out * k ∈ DoubleCoset.doubleCoset (L'.loc t * z) (K : Set X) K ↔
-          q.out ∈ DoubleCoset.doubleCoset (L'.loc t) (K : Set X) K := by
+      have hmem2
+          : z * q.out * k ∈ DoubleCoset.doubleCoset (L'.loc t * z) (K : Set X) K
+            ↔ q.out ∈ DoubleCoset.doubleCoset (L'.loc t) (K : Set X) K := by
         simp only [DoubleCoset.mem_doubleCoset, SetLike.mem_coe]
         constructor
         · rintro ⟨a, ha, b, hb, e⟩
           refine ⟨a, ha, b * (k : X)⁻¹, K.mul_mem hb (K.inv_mem k.2), ?_⟩
           have hw : a * (L'.loc t * z) * b = z * (a * L'.loc t * b) := by
             rw [← mul_assoc a, ← hz.1, mul_assoc z]
-          calc q.out = z⁻¹ * (z * q.out * k) * (k : X)⁻¹ := by group
+          calc
+            q.out
+              = z⁻¹ * (z * q.out * k) * (k : X)⁻¹ := by group
             _ = z⁻¹ * (z * (a * L'.loc t * b)) * (k : X)⁻¹ := by rw [e, hw]
             _ = a * L'.loc t * (b * (k : X)⁻¹) := by group
         · rintro ⟨a, ha, b, hb, e⟩

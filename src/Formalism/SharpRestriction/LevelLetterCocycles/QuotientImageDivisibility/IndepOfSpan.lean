@@ -19,33 +19,34 @@ variable {LL : Type} [Field LL] {E : Type} [AddCommGroup E] [Module LL E]
 def sumAt {r : ℕ} (e : Fin r → ℤ → E) (j : ℤ) : (Fin r → LL) →ₗ[LL] E :=
   ∑ m, (LinearMap.proj m : (Fin r → LL) →ₗ[LL] LL).smulRight (e m j)
 
-theorem sumAt_apply {r : ℕ} (e : Fin r → ℤ → E) (j : ℤ) (c : Fin r → LL) :
-    sumAt e j c = ∑ m, c m • e m j := by
+theorem sumAt_apply {r : ℕ} (e : Fin r → ℤ → E) (j : ℤ) (c : Fin r → LL)
+    : sumAt e j c = ∑ m, c m • e m j := by
   simp [sumAt, LinearMap.sum_apply]
 
-def Ub {r : ℕ} (Fil : ℤ → Submodule LL E) (e : Fin r → ℤ → E) (j : ℤ) :
-    Submodule LL (Fin r → LL) :=
+def Ub {r : ℕ} (Fil : ℤ → Submodule LL E) (e : Fin r → ℤ → E) (j : ℤ) : Submodule LL (Fin r → LL) :=
   ⨅ (i : ℤ) (_ : i < j), (Fil (-i + 1)).comap (sumAt e i)
 
-theorem mem_Ub {r : ℕ} (Fil : ℤ → Submodule LL E) (e : Fin r → ℤ → E) (j : ℤ) (c : Fin r → LL) :
-    c ∈ Ub Fil e j ↔ ∀ i < j, ∑ m, c m • e m i ∈ Fil (-i + 1) := by
+theorem mem_Ub {r : ℕ} (Fil : ℤ → Submodule LL E) (e : Fin r → ℤ → E) (j : ℤ) (c : Fin r → LL)
+    : c ∈ Ub Fil e j ↔ ∀ i < j, ∑ m, c m • e m i ∈ Fil (-i + 1) := by
   simp only [Ub, Submodule.mem_iInf, Submodule.mem_comap, sumAt_apply]
 
-theorem Ub_anti {r : ℕ} (Fil : ℤ → Submodule LL E) (e : Fin r → ℤ → E) {j j' : ℤ} (h : j ≤ j') :
-    Ub Fil e j' ≤ Ub Fil e j := fun c hc =>
+theorem Ub_anti {r : ℕ} (Fil : ℤ → Submodule LL E) (e : Fin r → ℤ → E) {j j' : ℤ} (h : j ≤ j')
+    : Ub Fil e j' ≤ Ub Fil e j := fun c hc =>
   (mem_Ub Fil e j c).2 fun i hi => (mem_Ub Fil e j' c).1 hc i (by omega)
 
-variable {r : ℕ} {Fil : ℤ → Submodule LL E} (hFa : Antitone Fil) (D : Submodule LL E)
-  [FiniteDimensional LL D] {e : Fin r → ℤ → E}
-
+variable
+  {r : ℕ} {Fil : ℤ → Submodule LL E} (hFa : Antitone Fil)
+  (D : Submodule LL E) [FiniteDimensional LL D]
+  {e : Fin r → ℤ → E}
 
 include hFa in
-theorem count_step (he : ∀ m k, e m k ∈ D ⊓ Fil (-k))
+theorem count_step
+    (he : ∀ m k, e m k ∈ D ⊓ Fil (-k))
     (hS : ∀ k : ℤ, ∀ w ∈ D ⊓ Fil (-k), ∃ c : Fin r → LL,
       (∀ j < k, ∑ m, c m • e m j ∈ Fil (-j + 1)) ∧ ∑ m, c m • e m k - w ∈ Fil (-k + 1))
-    (j : ℤ) :
-    finrank LL ↥(Ub Fil e (j + 1)) + finrank LL ↥(D ⊓ Fil (-j)) =
-      finrank LL ↥(Ub Fil e j) + finrank LL ↥(D ⊓ Fil (-j + 1)) := by
+    (j : ℤ)
+    : finrank LL ↥(Ub Fil e (j + 1)) + finrank LL ↥(D ⊓ Fil (-j))
+      = finrank LL ↥(Ub Fil e j) + finrank LL ↥(D ⊓ Fil (-j + 1)) := by
   let ψ : ↥(Ub Fil e j) →ₗ[LL] E ⧸ Fil (-j + 1) :=
     (Fil (-j + 1)).mkQ ∘ₗ sumAt e j ∘ₗ (Ub Fil e j).subtype
   have hle : Ub Fil e (j + 1) ≤ Ub Fil e j := Ub_anti Fil e (by omega)
@@ -89,14 +90,15 @@ theorem count_step (he : ∀ m k, e m k ∈ D ⊓ Fil (-k))
   rw [hφr, hφk, (Submodule.comapSubtypeEquivOfLe hle').finrank_eq] at h2
   omega
 
-
 include hFa in
-theorem indep_of_span (a₀ a₁ : ℤ) (h₀ : D ≤ Fil a₀) (h₁ : D ⊓ Fil a₁ = ⊥)
+theorem indep_of_span
+    (a₀ a₁ : ℤ) (h₀ : D ≤ Fil a₀) (h₁ : D ⊓ Fil a₁ = ⊥)
     (he : ∀ m k, e m k ∈ D ⊓ Fil (-k))
     (hS : ∀ k : ℤ, ∀ w ∈ D ⊓ Fil (-k), ∃ c : Fin r → LL,
       (∀ j < k, ∑ m, c m • e m j ∈ Fil (-j + 1)) ∧ ∑ m, c m • e m k - w ∈ Fil (-k + 1))
-    (hr : r ≤ finrank LL ↥D) (c : Fin r → LL) (hc : ∀ j, ∑ m, c m • e m j ∈ Fil (-j + 1)) :
-    c = 0 := by
+    (hr : r ≤ finrank LL ↥D)
+    (c : Fin r → LL) (hc : ∀ j, ∑ m, c m • e m j ∈ Fil (-j + 1))
+    : c = 0 := by
   let H : ℤ → ℕ := fun j => finrank LL ↥(Ub Fil e j) + finrank LL ↥(D ⊓ Fil (-j + 1))
   have hstep : ∀ j, H (j + 1) = H j := by
     intro j
@@ -108,12 +110,12 @@ theorem indep_of_span (a₀ a₁ : ℤ) (h₀ : D ≤ Fil a₀) (h₁ : D ⊓ Fi
     intro j N
     induction N with
     | zero => simp
-    | succ N ih =>
-      rw [show j + ((N + 1 : ℕ) : ℤ) = (j + N) + 1 by push_cast; ring, hstep, ih]
+    | succ N ih => rw [show j + ((N + 1 : ℕ) : ℤ) = (j + N) + 1 by push_cast; ring, hstep, ih]
   have hzero : ∀ m i, i < 1 - a₁ → e m i = 0 := by
     intro m i hi
     have h := he m i
-    have h' : e m i ∈ D ⊓ Fil a₁ := ⟨(Submodule.mem_inf.1 h).1, hFa (by omega) (Submodule.mem_inf.1 h).2⟩
+    have h' : e m i ∈ D ⊓ Fil a₁ :=
+      ⟨(Submodule.mem_inf.1 h).1, hFa (by omega) (Submodule.mem_inf.1 h).2⟩
     rw [h₁] at h'
     exact (Submodule.mem_bot LL).1 h'
   have htop : Ub Fil e (1 - a₁) = ⊤ := by
@@ -140,11 +142,10 @@ theorem indep_of_span (a₀ a₁ : ℤ) (h₀ : D ≤ Fil a₀) (h₁ : D ⊓ Fi
   rw [hU] at hcU
   exact (Submodule.mem_bot LL).1 hcU
 
-
 include hFa in
-theorem smulS_sub_cc {M : ℤ} {f : ℤ → E} (hf : LB M f) (hfF : ∀ k, f k ∈ Fil (-k))
-    (g : PowerSeries LL) (j : ℤ) :
-    smulS g f j - PowerSeries.constantCoeff g • f j ∈ Fil (-j + 1) := by
+theorem smulS_sub_cc
+    {M : ℤ} {f : ℤ → E} (hf : LB M f) (hfF : ∀ k, f k ∈ Fil (-k)) (g : PowerSeries LL) (j : ℤ)
+    : smulS g f j - PowerSeries.constantCoeff g • f j ∈ Fil (-j + 1) := by
   obtain ⟨N, hN⟩ : ∃ N : ℕ, j - M < (N + 1 : ℕ) :=
     ⟨(j - M).toNat, by have := Int.self_le_toNat (j - M); push_cast; omega⟩
   rw [smulS_eq_sum hf g j (N + 1) hN, Finset.sum_range_succ']
@@ -153,16 +154,18 @@ theorem smulS_sub_cc {M : ℤ} {f : ℤ → E} (hf : LB M f) (hfF : ∀ k, f k �
   refine Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ ?_
   exact hFa (show -j + 1 ≤ -(j - ((i + 1 : ℕ) : ℤ)) by push_cast; omega) (hfF _)
 
-
 include hFa in
-theorem dvd_of_dg (a₁ : ℤ) (h₁ : D ⊓ Fil a₁ = ⊥) (he : ∀ m k, e m k ∈ D ⊓ Fil (-k))
-    (hind : ∀ c : Fin r → LL, (∀ j, ∑ m, c m • e m j ∈ Fil (-j + 1)) → c = 0) :
-    ∀ (k : ℕ) (g : Fin r → PowerSeries LL),
+theorem dvd_of_dg
+    (a₁ : ℤ) (h₁ : D ⊓ Fil a₁ = ⊥)
+    (he : ∀ m k, e m k ∈ D ⊓ Fil (-k))
+    (hind : ∀ c : Fin r → LL, (∀ j, ∑ m, c m • e m j ∈ Fil (-j + 1)) → c = 0)
+    : ∀ (k : ℕ) (g : Fin r → PowerSeries LL),
       (∀ j : ℤ, ∑ m, smulS (g m) (e m) j ∈ Fil ((k : ℤ) - j)) → ∀ m, PowerSeries.X ^ k ∣ g m := by
   have hLB : ∀ m, LB (1 - a₁) (e m) := by
     intro m i hi
     have h := he m i
-    have h' : e m i ∈ D ⊓ Fil a₁ := ⟨(Submodule.mem_inf.1 h).1, hFa (by omega) (Submodule.mem_inf.1 h).2⟩
+    have h' : e m i ∈ D ⊓ Fil a₁ :=
+      ⟨(Submodule.mem_inf.1 h).1, hFa (by omega) (Submodule.mem_inf.1 h).2⟩
     rw [h₁] at h'
     exact (Submodule.mem_bot LL).1 h'
   have hF : ∀ m k, e m k ∈ Fil (-k) := fun m k => (Submodule.mem_inf.1 (he m k)).2
@@ -176,22 +179,24 @@ theorem dvd_of_dg (a₁ : ℤ) (h₁ : D ⊓ Fil a₁ = ⊥) (he : ∀ m k, e m 
       intro j
       have h1 : ∑ m, smulS (g m) (e m) j ∈ Fil (-j + 1) :=
         hFa (show -j + 1 ≤ ((k + 1 : ℕ) : ℤ) - j by push_cast; omega) (hg j)
-      have h2 : ∑ m, (smulS (g m) (e m) j - PowerSeries.constantCoeff (g m) • e m j) ∈ Fil (-j + 1) :=
+      have h2
+          : ∑ m, (smulS (g m) (e m) j - PowerSeries.constantCoeff (g m) • e m j) ∈ Fil (-j + 1) :=
         Submodule.sum_mem _ fun m _ => smulS_sub_cc hFa (hLB m) (hF m) (g m) j
       have := Submodule.sub_mem _ h1 h2
       rwa [← Finset.sum_sub_distrib, Finset.sum_congr rfl fun m _ => sub_sub_cancel _ _] at this
-    have hX : ∀ m, PowerSeries.X ∣ g m := fun m =>
-      (PowerSeries.X_dvd_iff).2 (congrFun hcc m)
+    have hX : ∀ m, PowerSeries.X ∣ g m := fun m => (PowerSeries.X_dvd_iff).2 (congrFun hcc m)
     choose g' hg' using hX
     have hshift : ∀ m (j : ℤ), smulS (g m) (e m) (j + 1) = smulS (g' m) (e m) j := by
       intro m j
-      rw [hg' m, smulS_mul (hLB m), show (PowerSeries.X : PowerSeries LL) = PowerSeries.X ^ 1 by
-        rw [pow_one], smulS_X_pow (LB_smulS (hLB m) (g' m)) 1]
+      rw [hg' m, smulS_mul (hLB m),
+        show (PowerSeries.X : PowerSeries LL) = PowerSeries.X ^ 1 by rw [pow_one],
+        smulS_X_pow (LB_smulS (hLB m) (g' m)) 1]
       simp
-    have hg'd := ih g' fun j => by
-      have := hg (j + 1)
-      rw [Finset.sum_congr rfl fun m _ => hshift m j] at this
-      rwa [show ((k + 1 : ℕ) : ℤ) - (j + 1) = (k : ℤ) - j by push_cast; ring] at this
+    have hg'd :=
+      ih g' fun j => by
+        have := hg (j + 1)
+        rw [Finset.sum_congr rfl fun m _ => hshift m j] at this
+        rwa [show ((k + 1 : ℕ) : ℤ) - (j + 1) = (k : ℤ) - j by push_cast; ring] at this
     intro m
     rw [hg' m, pow_succ']
     exact mul_dvd_mul_left _ (hg'd m)

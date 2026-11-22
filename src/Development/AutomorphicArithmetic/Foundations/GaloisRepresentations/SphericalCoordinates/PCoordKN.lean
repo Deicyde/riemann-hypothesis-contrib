@@ -6,8 +6,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCommon
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 open UpperTheory.Gal.W2
@@ -18,8 +21,8 @@ section SlopeTestRemainingChoices
 
 variable {p : ℕ} [Fact p.Prime] {D : Datum p} {G : HTGroup p} (L : Link D G)
 
-private theorem smul_mem_laHat {c : AfP p} (hc : IsIntAf c) {v : AfP p ⊗[ℚ] VQ D} (hv : v ∈ LaHat D) :
-    c • v ∈ LaHat D := by
+private theorem smul_mem_laHat {c : AfP p} (hc : IsIntAf c) {v : AfP p ⊗[ℚ] VQ D} (hv : v ∈ LaHat D)
+    : c • v ∈ LaHat D := by
   classical
   haveI := D.freeLa
   haveI := D.finLa
@@ -34,16 +37,19 @@ private theorem inAf_mem_laHat (a : D.La) : inAf D a ∈ LaHat D := by
   unfold inAf LaHat
   exact AddSubgroup.subset_closure ⟨1, a, (KNLevel.isIntAf_iff 1).mpr (one_mem _), rfl⟩
 
-private theorem exists_den_act (g : G.GAf) :
-    ∃ m : ℕ, 0 < m ∧ ∀ z ∈ LaHat D, m • L.actG g z ∈ LaHat D := by
+private theorem exists_den_act (g : G.GAf)
+    : ∃ m : ℕ, 0 < m ∧ ∀ z ∈ LaHat D, m • L.actG g z ∈ LaHat D := by
   classical
   haveI := D.freeLa
   haveI := D.finLa
   let b := Module.Free.chooseBasis ℤ D.La
   let B := KNLevel.bA b
-  obtain ⟨m, hm, hden⟩ := AfPCpctDen.exists_den p
-    (Set.range fun ki : Module.Free.ChooseBasisIndex ℤ D.La × Module.Free.ChooseBasisIndex ℤ D.La =>
-      B.repr (L.actG g (B ki.1)) ki.2) (Set.finite_range _).isCompact
+  obtain ⟨m, hm, hden⟩ :=
+    AfPCpctDen.exists_den p
+      (Set.range
+        fun ki : Module.Free.ChooseBasisIndex ℤ D.La × Module.Free.ChooseBasisIndex ℤ D.La =>
+          B.repr (L.actG g (B ki.1)) ki.2)
+      (Set.finite_range _).isCompact
   refine ⟨m, hm, fun z hz => ?_⟩
   have hy : ∀ k, m • L.actG g (B k) ∈ LaHat D := by
     intro k
@@ -57,14 +63,17 @@ private theorem exists_den_act (g : G.GAf) :
   rw [LinearMap.map_smul, smul_comm m]
   exact smul_mem_laHat (KNLevel.repr_isIntAf b z hz k) (hy k)
 
-private theorem rd_move (x : (AfP p ⊗[ℚ] G.C)ˣ) (h₁ h₂ : G.GAf) (w : VQ D) :
-    rd L x h₂ w = L.actG (h₂⁻¹ * h₁) (rd L x h₁ w) := by
+private theorem rd_move (x : (AfP p ⊗[ℚ] G.C)ˣ) (h₁ h₂ : G.GAf) (w : VQ D)
+    : rd L x h₂ w = L.actG (h₂⁻¹ * h₁) (rd L x h₁ w) := by
   simp only [rd]
   rw [← Module.End.mul_apply (L.actG (h₂⁻¹ * h₁)), ← map_mul, mul_inv_cancel_right]
 
-private theorem stable (hd : RdDense) (x : (AfP p ⊗[ℚ] G.C)ˣ) (h₁ h₂ : G.GAf) (P : VQ D → Prop)
+private theorem stable
+    (hd : RdDense)
+    (x : (AfP p ⊗[ℚ] G.C)ˣ) (h₁ h₂ : G.GAf) (P : VQ D → Prop)
     (A₁ : ∀ w, P w ↔ rd L x h₁ w ∈ LaHat D) (A₂ : ∀ w, P w ↔ rd L x h₂ w ∈ LaHat D)
-    (z : AfP p ⊗[ℚ] VQ D) (hz : z ∈ LaHat D) : L.actG (h₂⁻¹ * h₁) z ∈ LaHat D := by
+    (z : AfP p ⊗[ℚ] VQ D) (hz : z ∈ LaHat D)
+    : L.actG (h₂⁻¹ * h₁) z ∈ LaHat D := by
   obtain ⟨m, hm, hden⟩ := exists_den_act L (h₂⁻¹ * h₁)
   obtain ⟨w, e, he, rfl⟩ := hd p D G L x h₁ m hm z
   have h1 : rd L x h₁ w ∈ LaHat D := by
@@ -74,8 +83,9 @@ private theorem stable (hd : RdDense) (x : (AfP p ⊗[ℚ] G.C)ˣ) (h₁ h₂ : 
   rw [map_add (f := _), map_nsmul, ← rd_move L x h₁ h₂ w]
   exact add_mem h2 (hden e he)
 
-private theorem congOne_of_gen {N : ℕ} {g : G.GAf}
-    (gen : ∀ a : D.La, ∃ u ∈ LaHat D, L.actG g (inAf D a) = inAf D a + N • u) : L.CongOne N g := by
+private theorem congOne_of_gen
+    {N : ℕ} {g : G.GAf} (gen : ∀ a : D.La, ∃ u ∈ LaHat D, L.actG g (inAf D a) = inAf D a + N • u)
+    : L.CongOne N g := by
   unfold Link.CongOne
   intro v hv
   unfold LaHat at hv
@@ -87,7 +97,8 @@ private theorem congOne_of_gen {N : ℕ} {g : G.GAf}
       rw [inAf, TensorProduct.smul_tmul', smul_eq_mul, _root_.mul_one]
     refine ⟨c • u, smul_mem_laHat hc hu, ?_⟩
     rw [hcy, LinearMap.map_smul, hgu, smul_add, smul_comm c N u]
-  | zero => exact ⟨0, zero_mem _, by simp⟩
+  | zero =>
+    exact ⟨0, zero_mem _, by simp⟩
   | add y z _ _ hy hz =>
     obtain ⟨w₁, hw₁, e₁⟩ := hy
     obtain ⟨w₂, hw₂, e₂⟩ := hz
@@ -105,8 +116,9 @@ theorem coordKN_of : RdDense → CoordKN := by
     obtain ⟨w, hw, e⟩ := hC v hv
     rw [e]
     exact add_mem hv (nsmul_mem hw N)
-  have cong : ∀ k₁ k₂ : G.GAf, IsCoordA L x N D' t j k₁ → IsCoordA L x N D' t j k₂ →
-      L.CongOne N (k₂⁻¹ * k₁) := by
+  have cong
+      : ∀ k₁ k₂ : G.GAf,
+        IsCoordA L x N D' t j k₁ → IsCoordA L x N D' t j k₂ → L.CongOne N (k₂⁻¹ * k₁) := by
     intro k₁ k₂ hk₁ hk₂
     have hst : ∀ z ∈ LaHat D, L.actG (k₂⁻¹ * k₁) z ∈ LaHat D :=
       stable L hd x k₁ k₂ (fun w => ∃ r u, p ^ r • w = j u) hk₁.1 hk₂.1

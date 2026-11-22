@@ -31,8 +31,8 @@ private lemma ins_res {β : I → Type} (i₀ : I) (g : ∀ i, β i) :
   · subst h; exact ins_self _ _ _
   · exact ins_ne i₀ _ _ ⟨i, h⟩
 
-private def insHom (Gi : I → Type) [∀ i, Group (Gi i)] (i₀ : I) :
-    (Gi i₀ × ∀ j : {i // i ≠ i₀}, Gi j.1) →* ∀ i, Gi i where
+private def insHom (Gi : I → Type) [∀ i, Group (Gi i)] (i₀ : I)
+    : (Gi i₀ × ∀ j : {i // i ≠ i₀}, Gi j.1) →* ∀ i, Gi i where
   toFun p := ins i₀ p.1 p.2
   map_one' := by
     funext i
@@ -95,26 +95,28 @@ private lemma res_update_self {β : I → Type} (i₀ : I) (m : ∀ i, β i) (x 
     (fun j : {i // i ≠ i₀} => Function.update m i₀ x j.1) = fun j : {i // i ≠ i₀} => m j.1 :=
   funext fun j : {i // i ≠ i₀} => Function.update_of_ne j.2 _ _
 
-private def split (Wi : I → Type) [∀ i, AddCommGroup (Wi i)] [∀ i, Module ℂ (Wi i)] (i₀ : I) :
-    (⨂[ℂ] i, Wi i) →ₗ[ℂ] Wi i₀ ⊗[ℂ] (⨂[ℂ] j : {i // i ≠ i₀}, Wi j.1) :=
-  PiTensorProduct.lift
-    { toFun := fun m => m i₀ ⊗ₜ[ℂ] PiTensorProduct.tprod ℂ (fun j : {i // i ≠ i₀} => m j.1)
-      map_update_add' := by
-        intro _ m i x y
-        by_cases h : i = i₀
-        · subst h
-          simp only [Function.update_self, res_update_self, TensorProduct.add_tmul]
-        · classical
-          simp only [Function.update_of_ne (Ne.symm h), res_update i₀ i h,
-            MultilinearMap.map_update_add, TensorProduct.tmul_add]
-      map_update_smul' := by
-        intro _ m i c x
-        by_cases h : i = i₀
-        · subst h
-          simp only [Function.update_self, res_update_self, TensorProduct.smul_tmul', RingHom.id_apply]
-        · classical
-          simp only [Function.update_of_ne (Ne.symm h), res_update i₀ i h,
-            MultilinearMap.map_update_smul, TensorProduct.tmul_smul] }
+private def split (Wi : I → Type) [∀ i, AddCommGroup (Wi i)] [∀ i, Module ℂ (Wi i)] (i₀ : I)
+    : (⨂[ℂ] i, Wi i) →ₗ[ℂ] Wi i₀ ⊗[ℂ] (⨂[ℂ] j : {i // i ≠ i₀}, Wi j.1) :=
+  PiTensorProduct.lift {
+    toFun := fun m => m i₀ ⊗ₜ[ℂ] PiTensorProduct.tprod ℂ (fun j : {i // i ≠ i₀} => m j.1)
+    map_update_add' := by
+      intro _ m i x y
+      by_cases h : i = i₀
+      · subst h
+        simp only [Function.update_self, res_update_self, TensorProduct.add_tmul]
+      · classical
+        simp only [Function.update_of_ne (Ne.symm h), res_update i₀ i h,
+          MultilinearMap.map_update_add, TensorProduct.tmul_add]
+    map_update_smul' := by
+      intro _ m i c x
+      by_cases h : i = i₀
+      · subst h
+        simp only [Function.update_self, res_update_self, TensorProduct.smul_tmul',
+          RingHom.id_apply]
+      · classical
+        simp only [Function.update_of_ne (Ne.symm h), res_update i₀ i h,
+          MultilinearMap.map_update_smul, TensorProduct.tmul_smul]
+  }
 
 private lemma split_tprod (Wi : I → Type) [∀ i, AddCommGroup (Wi i)] [∀ i, Module ℂ (Wi i)] (i₀ : I)
     (m : ∀ i, Wi i) :
@@ -224,8 +226,7 @@ private lemma piIsot_card (hB : BoxIsot) (hP : PiIrr) (n : ℕ) :
     refine le_iSup_of_le ⟨_, hf⟩ ?_
     rw [LinearMap.range_comp_of_range_eq_top _ (split_range Wi i₀)]
 
-theorem piIsot :
-    BoxIsot → PiIrr → PiIsot := by
+theorem piIsot : BoxIsot → PiIrr → PiIsot := by
   intro hB hP I _ _ Gi Wi _ _ _ τ hτ X _ _ κ hκ
   exact piIsot_card hB hP _ I rfl Gi Wi τ hτ X κ hκ
 

@@ -5,11 +5,22 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsSie
 
 @[expose] public section
 
-open Matrix GlobalTheory.RedTh NumberField GlobalTheory.PolFan ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open Matrix GlobalTheory.RedTh NumberField GlobalTheory.PolFan
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory.RedTh
 
-theorem adjoint_weighted_sq_trace : ∀ (n : ℕ) (A A' : Matrix (Fin n) (Fin n) ℤ) (d : Fin n → ℝ) (u v : Matrix (Fin n) (Fin n) ℝ), (∀ i, 0 < d i) → v * u = 1 → u * v = 1 → (A.map (Int.cast : ℤ → ℝ))ᵀ * gram d u = gram d u * A'.map (Int.cast : ℤ → ℝ) → (∀ p q, d p * (u * A.map (Int.cast : ℤ → ℝ) * v) p q = d q * (u * A'.map (Int.cast : ℤ → ℝ) * v) q p) ∧ (∑ p, ∑ q, d p / d q * (u * A.map (Int.cast : ℤ → ℝ) * v) p q ^ 2 = (((A' * A).trace : ℤ) : ℝ)) ∧ ∑ p, ∑ q, d p / d q * (u * A'.map (Int.cast : ℤ → ℝ) * v) p q ^ 2 = (((A' * A).trace : ℤ) : ℝ) := by
+theorem adjoint_weighted_sq_trace
+    : ∀ (n : ℕ) (A A' : Matrix (Fin n) (Fin n) ℤ) (d : Fin n → ℝ) (u v : Matrix (Fin n) (Fin n) ℝ),
+      (∀ i, 0 < d i) → v * u = 1 → u * v = 1
+        → (A.map (Int.cast : ℤ → ℝ))ᵀ * gram d u = gram d u * A'.map (Int.cast : ℤ → ℝ)
+        → (∀ p q,
+            d p * (u * A.map (Int.cast : ℤ → ℝ) * v) p q
+              = d q * (u * A'.map (Int.cast : ℤ → ℝ) * v) q p)
+          ∧ (∑ p, ∑ q, d p / d q * (u * A.map (Int.cast : ℤ → ℝ) * v) p q ^ 2
+            = (((A' * A).trace : ℤ) : ℝ))
+          ∧ ∑ p, ∑ q, d p / d q * (u * A'.map (Int.cast : ℤ → ℝ) * v) p q ^ 2
+            = (((A' * A).trace : ℤ) : ℝ) := by
   intro n A A' d u v hd hvu huv h
   set a := A.map (Int.cast : ℤ → ℝ) with ha
   set a' := A'.map (Int.cast : ℤ → ℝ) with ha'
@@ -32,20 +43,25 @@ theorem adjoint_weighted_sq_trace : ∀ (n : ℕ) (A A' : Matrix (Fin n) (Fin n)
       rw [Finset.sum_comm]; simp [Matrix.trace, Matrix.mul_apply]
     rw [e]
     have : (u * a' * v) * (u * a * v) = u * (a' * a) * v := by
-      rw [show (u * a' * v) * (u * a * v) = u * a' * (v * u) * a * v by simp only [Matrix.mul_assoc], hvu]
+      rw [show (u * a' * v) * (u * a * v) = u * a' * (v * u) * a * v by
+          simp only [Matrix.mul_assoc],
+        hvu]
       simp only [Matrix.mul_one, Matrix.mul_assoc]
     rw [this, Matrix.trace_mul_comm, ← Matrix.mul_assoc, hvu, Matrix.one_mul]
     rw [ha, ha']
     simp only [Matrix.trace, Matrix.diag, Matrix.mul_apply, Matrix.map_apply]
-    push_cast; rfl
+    push_cast
+    rfl
   refine ⟨c1, ?_, ?_⟩
   · rw [← htr]
     refine Finset.sum_congr rfl fun p _ => Finset.sum_congr rfl fun q _ => ?_
     have hq := (hd q).ne'
-    rw [div_mul_eq_mul_div, div_eq_iff hq, sq, ← mul_assoc, c1 p q]; ring
+    rw [div_mul_eq_mul_div, div_eq_iff hq, sq, ← mul_assoc, c1 p q]
+    ring
   · rw [← htr, Finset.sum_comm]
     refine Finset.sum_congr rfl fun p _ => Finset.sum_congr rfl fun q _ => ?_
     have hp := (hd p).ne'
-    rw [div_mul_eq_mul_div, div_eq_iff hp, sq, ← mul_assoc, ← c1 p q]; ring
+    rw [div_mul_eq_mul_div, div_eq_iff hp, sq, ← mul_assoc, ← c1 p q]
+    ring
 
 end GlobalTheory.RedTh

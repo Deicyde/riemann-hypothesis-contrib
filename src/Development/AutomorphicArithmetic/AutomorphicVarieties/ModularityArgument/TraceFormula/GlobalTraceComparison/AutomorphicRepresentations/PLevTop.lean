@@ -6,24 +6,29 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.FiniteRe
 
 @[expose] public section
 
-open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi UpperTheory.Zero.ConvolutionTheory.EB PositivityTheory.Rg.BcB.Desc
+open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi
+  UpperTheory.Zero.ConvolutionTheory.EB PositivityTheory.Rg.BcB.Desc
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.levTop_pf :
-    SlotBasic → LevTop := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.levTop_pf : SlotBasic → LevTop := by
   intro hS E _ _ _ n S Z N hSec hZ hG
   obtain ⟨hinv, -, hloc, -, -, hinert, hK⟩ := hS E n S hSec
-  have mem : ∀ (M : ∀ w : GlobalTheory.BCT.Pl E, Subgroup (GlobalTheory.BCT.GLw n w)) (x : GF E n),
-      x ∈ Lev S M ↔ ∀ i : GlobalTheory.BCT.Pl E × Bool, Sl S i → qw n i.1 i.2 x ∈ M i.1 := by
+  have mem
+      : ∀ (M : ∀ w : GlobalTheory.BCT.Pl E, Subgroup (GlobalTheory.BCT.GLw n w)) (x : GF E n),
+        x ∈ Lev S M ↔ ∀ i : GlobalTheory.BCT.Pl E × Bool, Sl S i → qw n i.1 i.2 x ∈ M i.1 := by
     intro M x
     simp only [Lev, Subgroup.mem_iInf, Subgroup.mem_comap, Subtype.forall]
-  have hKq : ∀ k ∈ PositivityTheory.Rg.BcB.G8.Kf E n, ∀ i : GlobalTheory.BCT.Pl E × Bool, Sl S i →
-      qw n i.1 i.2 k ∈ GlobalTheory.LFun.KGL i.1 (n := n) := fun k hk => (mem _ k).1 ((hK k).2 hk)
+  have hKq
+      : ∀ k ∈ PositivityTheory.Rg.BcB.G8.Kf E n, ∀ i : GlobalTheory.BCT.Pl E × Bool,
+        Sl S i → qw n i.1 i.2 k ∈ GlobalTheory.LFun.KGL i.1 (n := n) := fun k hk =>
+    (mem _ k).1 ((hK k).2 hk)
   have hsub : (Lev S N : Set (GF E n)) ⊆ (PositivityTheory.Rg.BcB.G8.Kf E n : Set (GF E n)) := by
     intro x hx
     exact (hK x).1 ((mem _ x).2 fun i hi => (hG i.1).2.1 ((mem N x).1 hx i hi))
-  have hset : (Lev S N : Set (GF E n)) = (PositivityTheory.Rg.BcB.G8.Kf E n : Set (GF E n)) ∩
-      ⋂ i ∈ {i : GlobalTheory.BCT.Pl E × Bool | i.1 ∈ Z ∧ Sl S i},
-        (qw n i.1 i.2) ⁻¹' (N i.1 : Set (GlobalTheory.BCT.GLw n i.1)) := by
+  have hset
+      : (Lev S N : Set (GF E n))
+        = (PositivityTheory.Rg.BcB.G8.Kf E n : Set (GF E n))
+          ∩ ⋂ i ∈ {i : GlobalTheory.BCT.Pl E × Bool | i.1 ∈ Z ∧ Sl S i},
+              (qw n i.1 i.2) ⁻¹' (N i.1 : Set (GlobalTheory.BCT.GLw n i.1)) := by
     ext x
     constructor
     · intro hx
@@ -55,8 +60,7 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.levTop_pf :
     refine (mem N _).2 ?_
     rintro ⟨w, b⟩ ⟨hw, hb⟩
     cases b with
-    | true =>
-      exact (hq1 w).symm ▸ (mem N k).1 hk (w, false) ⟨hw, by simp⟩
+    | true => exact (hq1 w).symm ▸ (mem N k).1 hk (w, false) ⟨hw, by simp⟩
     | false =>
       change qw n w false (GlobalTheory.BCT.thF E n k) ∈ N w
       rw [hq0]

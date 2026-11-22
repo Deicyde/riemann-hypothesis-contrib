@@ -10,12 +10,19 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.AbelianScheme
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.CechPic GlobalTheory.QCoh
 
 namespace GlobalTheory.FieldDescentSm
 
-theorem smoothOfRelativeDimension_and_geometricallyConnected_descend : ∀ (k E : Type) [Field k] [Field E] [Algebra k E] (Y X : Scheme.{0}) (p : Y ⟶ Sp k) (q : X ⟶ Sp E) (π : X ⟶ Y), IsPullback π q p (spMap (algebraMap k E)) → ∀ D : ℕ, Nonempty X → SmoothOfRelativeDimension D q → GeometricallyConnected q → SmoothOfRelativeDimension D p ∧ GeometricallyConnected p := by
+theorem smoothOfRelativeDimension_and_geometricallyConnected_descend
+    : ∀ (k E : Type) [Field k] [Field E] [Algebra k E] (Y X : Scheme.{0}) (p : Y ⟶ Sp k)
+        (q : X ⟶ Sp E) (π : X ⟶ Y),
+      IsPullback π q p (spMap (algebraMap k E))
+        → ∀ D : ℕ,
+          Nonempty X → SmoothOfRelativeDimension D q → GeometricallyConnected q
+            → SmoothOfRelativeDimension D p ∧ GeometricallyConnected p := by
   intro k E _ _ _ Y X p q π H D hX hD hq
   have hf := GlobalTheory.FieldDescentAb.fpqc_spMap (algebraMap k E)
   have hsq : Smooth q := SmoothOfRelativeDimension.smooth D q
@@ -27,7 +34,8 @@ theorem smoothOfRelativeDimension_and_geometricallyConnected_descend : ∀ (k E 
   have hc : ConnectedSpace Y :=
     hp.geometrically_connectedSpace (𝟙 _) (𝟙 Y) p (IsPullback.of_horiz_isIso ⟨by simp⟩)
   obtain ⟨x⟩ := hX
-  obtain ⟨D', hD'⟩ := ReciprocityTheory.ChartRestriction.G.Geo.Tor.exists_dim_of_preconnected p (π x)
+  obtain ⟨D', hD'⟩ :=
+    ReciprocityTheory.ChartRestriction.G.Geo.Tor.exists_dim_of_preconnected p (π x)
   have h' : SmoothOfRelativeDimension D' q :=
     (smoothOfRelativeDimension_isStableUnderBaseChange D').of_isPullback H hD'
   rw [ReciprocityTheory.ChartRestriction.G.H1.dim_unique q hD h' x]

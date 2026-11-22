@@ -7,7 +7,9 @@ public import GroundTheory.GlobalFields.SemilocalAlgebras.LocalDegree
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.G (FS2 Rw nE row)
@@ -15,27 +17,30 @@ open UpperTheory.V.Af.Smo (EigAt)
 open scoped ComplexOrder
 
 namespace UpperTheory.AdeleBaseChangeSplitting
-open UpperTheory.ConvolutionTheory.R2.H GroundTheory.Global.SemiLocal GroundTheory.Global.AdeleBaseChange
+open UpperTheory.ConvolutionTheory.R2.H GroundTheory.Global.SemiLocal
+  GroundTheory.Global.AdeleBaseChange
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-private theorem split_iota (v : P F) (w : P E) [hl : w.asIdeal.LiesOver v.asIdeal] (h : SplitAt v w) :
-    ∃ i : Kv v ≃+* Kv w, (∀ x, completionMap v w x = i x) ∧
-      (∀ x : F, i (algebraMap F _ x) = algebraMap E _ (algebraMap F E x)) ∧
-      ∀ x, Valued.v (i x) = Valued.v x := by
+private theorem split_iota (v : P F) (w : P E) [hl : w.asIdeal.LiesOver v.asIdeal] (h : SplitAt v w)
+    : ∃ i : Kv v ≃+* Kv w,
+      (∀ x, completionMap v w x = i x)
+        ∧ (∀ x : F, i (algebraMap F _ x) = algebraMap E _ (algebraMap F E x))
+        ∧ ∀ x, Valued.v (i x) = Valued.v x := by
   obtain ⟨-, i, hc, ha, hv⟩ := h
   refine ⟨i, ?_, ha, hv⟩
-  have := (HeightOneSpectrum.denseRange_algebraMap (K := F) v).equalizer
-    (continuous_completionMap v w) hc (by
-      funext x
-      change completionMap v w (algebraMap F (Kv v) x) = i (algebraMap F (Kv v) x)
-      rw [ha, completionMap_algebraMap, IsScalarTower.algebraMap_apply F E (Kv w)])
+  have :=
+    (HeightOneSpectrum.denseRange_algebraMap (K := F) v).equalizer (continuous_completionMap v w) hc
+      (by
+        funext x
+        change completionMap v w (algebraMap F (Kv v) x) = i (algebraMap F (Kv v) x)
+        rw [ha, completionMap_algebraMap, IsScalarTower.algebraMap_apply F E (Kv w)])
   exact fun x => congrFun this x
 
-private theorem adeleMap_split_two_places (v : P F) (w w' : P E) [hl : w.asIdeal.LiesOver v.asIdeal]
-    [hl' : w'.asIdeal.LiesOver v.asIdeal] (hne : w ≠ w')
-    (hu : ∀ u : P E, u.asIdeal.LiesOver v.asIdeal → u = w ∨ u = w') (x : Kv v) :
-    adeleMap F E (sg v x) = sg w (completionMap v w x) + sg w' (completionMap v w' x) := by
+private theorem adeleMap_split_two_places
+    (v : P F) (w w' : P E) [hl : w.asIdeal.LiesOver v.asIdeal] [hl' : w'.asIdeal.LiesOver v.asIdeal]
+    (hne : w ≠ w') (hu : ∀ u : P E, u.asIdeal.LiesOver v.asIdeal → u = w ∨ u = w') (x : Kv v)
+    : adeleMap F E (sg v x) = sg w (completionMap v w x) + sg w' (completionMap v w' x) := by
   obtain ⟨-, -, hc, -, -, -, -, hs, -, -⟩ := sgLaws F v
   obtain ⟨-, -, hc', -, -, -, -, hs', -, -⟩ := sgLaws E w
   obtain ⟨-, -, hc'', -, -, -, -, hs'', -, -⟩ := sgLaws E w'
@@ -58,10 +63,12 @@ private theorem adeleMap_split_two_places (v : P F) (w w' : P E) [hl : w.asIdeal
       · have hb : below F u ≠ v := fun hb => (hu u ((below_eq_iff _ _).1 hb)).elim h h'
         rw [(hs x).2 _ hb, map_zero, (hs' _).2 _ h, (hs'' _).2 _ h', add_zero]
 
-private theorem main (D : Dat F E) (v : P F) (w w' : P E) [hl : w.asIdeal.LiesOver v.asIdeal]
-    [hl' : w'.asIdeal.LiesOver v.asIdeal] (hne : w ≠ w') (h1 : SplitAt v w) (h2 : SplitAt v w')
-    (hu : ∀ u : P E, u.asIdeal.LiesOver v.asIdeal → u = w ∨ u = w') (hG : Gd D.δ v) :
-    ∃ χ : Kv w → ℂ, Good χ ∧ ∀ x, ∃ u t, sg w x = D.mkE u t ∧ ψ (-t) = χ x := by
+private theorem main
+    (D : Dat F E)
+    (v : P F) (w w' : P E) [hl : w.asIdeal.LiesOver v.asIdeal] [hl' : w'.asIdeal.LiesOver v.asIdeal]
+    (hne : w ≠ w') (h1 : SplitAt v w) (h2 : SplitAt v w')
+    (hu : ∀ u : P E, u.asIdeal.LiesOver v.asIdeal → u = w ∨ u = w') (hG : Gd D.δ v)
+    : ∃ χ : Kv w → ℂ, Good χ ∧ ∀ x, ∃ u t, sg w x = D.mkE u t ∧ ψ (-t) = χ x := by
   obtain ⟨i, hi, hia, hiv⟩ := split_iota v w h1
   obtain ⟨j, hj, hja, hjv⟩ := split_iota v w' h2
   obtain ⟨τ, hτ⟩ := i.surjective (algebraMap E (Kv w) D.θ)
@@ -74,7 +81,7 @@ private theorem main (D : Dat F E) (v : P F) (w w' : P E) [hl : w.asIdeal.LiesOv
     exact (pow_eq_one_iff_of_nonneg zero_le' two_ne_zero).1 h
   have hτ0 : τ ≠ 0 := fun h => by simp [h] at hτv
   have h20 : (2 : Kv v) ≠ 0 := fun h => by simpa [h] using hG.two
-  have hτ' : j τ = -algebraMap E (Kv w') D.θ := by
+  have hτ' : j τ = - algebraMap E (Kv w') D.θ := by
     have hsq : (j τ) ^ 2 = (algebraMap E (Kv w') D.θ) ^ 2 := by
       rw [← map_pow, hτ2, hja, ← map_pow, D.sq]
     refine (sq_eq_sq_iff_eq_or_eq_neg.1 hsq).resolve_left fun he => hne ?_
@@ -91,7 +98,8 @@ private theorem main (D : Dat F E) (v : P F) (w w' : P E) [hl : w.asIdeal.LiesOv
         rw [map_add (f := _), map_mul, he, hja, hja, ← map_mul, ← map_add (f := _), ← hy]
       rw [← valued_algebraMap_field, ← valued_algebraMap_field, e1, e2, hiv, hjv]
     refine HeightOneSpectrum.ext (Ideal.ext fun a => ?_)
-    rw [← HeightOneSpectrum.valuation_lt_one_iff_mem (K := E), ← HeightOneSpectrum.valuation_lt_one_iff_mem (K := E), hval]
+    rw [← HeightOneSpectrum.valuation_lt_one_iff_mem (K := E),
+      ← HeightOneSpectrum.valuation_lt_one_iff_mem (K := E), hval]
   have hcv : Valued.v (2 * τ) = 1 := by rw [map_mul, hG.two, hτv, mul_one]
   obtain ⟨g1, g2, g3⟩ := hG.psi
   obtain ⟨hadd, hmul, -⟩ := sgLaws F v
@@ -100,21 +108,25 @@ private theorem main (D : Dat F E) (v : P F) (w w' : P E) [hl : w.asIdeal.LiesOv
   have hsv : ∀ x : Kv w, Valued.v (-(i.symm x / (2 * τ))) = Valued.v x := by
     intro x
     rw [Valuation.map_neg, map_div₀, hcv, div_one, ← hiv, RingEquiv.apply_symm_apply]
-  refine ⟨fun x => ψ (sg v (-(i.symm x / (2 * τ)))), ⟨fun x y => ?_, fun x hx => ?_, fun x hx => ?_⟩,
-    fun x => ⟨sg v (i.symm x / 2), sg v (i.symm x / (2 * τ)), ?_, ?_⟩⟩
+  refine ⟨
+    fun x => ψ (sg v (-(i.symm x / (2 * τ)))),
+    ⟨fun x y => ?_, fun x hx => ?_, fun x hx => ?_⟩,
+    fun x => ⟨sg v (i.symm x / 2), sg v (i.symm x / (2 * τ)), ?_, ?_⟩
+  ⟩
   · have e : -(i.symm (x + y) / (2 * τ)) = -(i.symm x / (2 * τ)) + -(i.symm y / (2 * τ)) := by
       rw [map_add (f := _)]; ring
     show ψ (sg v (-(i.symm (x + y) / (2 * τ)))) = _
     rw [e]
     exact g1 _ _
   · exact g2 _ (by unfold IsInt at *; rw [hsv]; exact hx)
-  · have := g3 (-(i.symm x / (2 * τ))) fun c hc => by
-      have h := hx (i c) (by unfold IsInt at *; rw [hiv]; exact hc)
-      have e : -(i.symm (i c * x) / (2 * τ)) = c * -(i.symm x / (2 * τ)) := by
-        rw [map_mul, RingEquiv.symm_apply_apply]; ring
-      change ψ (sg v (-(i.symm (i c * x) / (2 * τ)))) = 1 at h
-      rw [e] at h
-      exact h
+  · have :=
+      g3 (-(i.symm x / (2 * τ))) fun c hc => by
+        have h := hx (i c) (by unfold IsInt at *; rw [hiv]; exact hc)
+        have e : -(i.symm (i c * x) / (2 * τ)) = c * -(i.symm x / (2 * τ)) := by
+          rw [map_mul, RingEquiv.symm_apply_apply]; ring
+        change ψ (sg v (-(i.symm (i c * x) / (2 * τ)))) = 1 at h
+        rw [e] at h
+        exact h
     unfold IsInt at *
     rwa [hsv] at this
   · have hmk : ∀ u t : A F, D.mkE u t = adeleMap F E u + adeleMap F E t * rt D.θ := fun _ _ => rfl
@@ -124,9 +136,10 @@ private theorem main (D : Dat F E) (v : P F) (w w' : P E) [hl : w.asIdeal.LiesOv
       simpa using this.symm
     have c1 : cp w (rt D.θ) = i τ := hτ.symm
     have c2 : cp w' (rt D.θ) = - j τ := by rw [hτ', neg_neg]; rfl
-    rw [RingEquiv.symm_apply_apply, hmk, adeleMap_split_two_places v w w' hne hu, adeleMap_split_two_places v w w' hne hu,
-      add_mul, mul_comm (sg w _), mul_comm (sg w' _), hmul1, hmul2, add_add_add_comm, ← hadd1, ← hadd2,
-      c1, c2, hi, hi, hj, hj, ← map_neg, ← map_mul, ← map_mul, ← map_add, ← map_add,
+    rw [RingEquiv.symm_apply_apply, hmk, adeleMap_split_two_places v w w' hne hu,
+      adeleMap_split_two_places v w w' hne hu, add_mul, mul_comm (sg w _), mul_comm (sg w' _),
+      hmul1, hmul2, add_add_add_comm, ← hadd1, ← hadd2, c1, c2, hi, hi, hj, hj, ← map_neg,
+      ← map_mul, ← map_mul, ← map_add, ← map_add,
       show y / 2 + τ * (y / (2 * τ)) = y by field_simp; ring,
       show y / 2 + -τ * (y / (2 * τ)) = 0 by field_simp; ring, map_zero, z2, add_zero]
   · have := hmul (-1) (i.symm x / (2 * τ))
@@ -135,12 +148,14 @@ private theorem main (D : Dat F E) (v : P F) (w w' : P E) [hl : w.asIdeal.LiesOv
 
 end UpperTheory.AdeleBaseChangeSplitting
 
-theorem UpperTheory.exists_localCharacter_of_split_pair_rat :
-    ∀ (E : Type) [Field E] [NumberField E] (D : Dat ℚ E) (v : H.P ℚ) (w w' : H.P E), w ≠ w' → w.under (𝓞 ℚ) = v → w'.under (𝓞 ℚ) = v → H.SplitAt v w → H.SplitAt v w' →
-          (∀ w'' : H.P E, w''.under (𝓞 ℚ) = v → w'' = w ∨ w'' = w') → H.Gd D.δ v →
-          ∃ χ : H.Kv w → ℂ, H.Good χ ∧ ∀ x, ∃ u t, H.sg w x = D.mkE u t ∧ ψ (-t) = χ x := by
+theorem UpperTheory.exists_localCharacter_of_split_pair_rat
+    : ∀ (E : Type) [Field E] [NumberField E] (D : Dat ℚ E) (v : H.P ℚ) (w w' : H.P E),
+      w ≠ w' → w.under (𝓞 ℚ) = v → w'.under (𝓞 ℚ) = v → H.SplitAt v w → H.SplitAt v w'
+        → (∀ w'' : H.P E, w''.under (𝓞 ℚ) = v → w'' = w ∨ w'' = w') → H.Gd D.δ v
+        → ∃ χ : H.Kv w → ℂ, H.Good χ ∧ ∀ x, ∃ u t, H.sg w x = D.mkE u t ∧ ψ (-t) = χ x := by
   intro E _ _ D v w w' hne hw hw' h1 h2 hu hG
   haveI hl : w.asIdeal.LiesOver v.asIdeal := ⟨by rw [← hw]; rfl⟩
   haveI hl' : w'.asIdeal.LiesOver v.asIdeal := ⟨by rw [← hw']; rfl⟩
   exact UpperTheory.AdeleBaseChangeSplitting.main D v w w' hne h1 h2
-    (fun u h => hu u (HeightOneSpectrum.ext h.1.symm)) hG
+    (fun u h => hu u (HeightOneSpectrum.ext h.1.symm))
+    hG

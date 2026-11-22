@@ -11,14 +11,15 @@ open IsLocalRing TensorProduct
 
 namespace GlobalTheory
 
-theorem formalFibre_isRegularRing_of_essFiniteType :
-    ∀ (Λ : Type) [CommRing Λ] [IsDomain Λ] [IsRegularRing Λ] [PerfectField (FractionRing Λ)]
-      (R K : Type) [CommRing R] [IsLocalRing R] [Algebra Λ R] [Algebra.EssFiniteType Λ R]
-      [Field K] [Algebra R K] [Algebra.EssFiniteType R K],
-      (∀ a : Λ, algebraMap R K (algebraMap Λ R a) = 0 → a = 0) →
-      IsRegularRing (AdicCompletion (maximalIdeal R) R ⊗[R] K) := by
+theorem formalFibre_isRegularRing_of_essFiniteType
+    : ∀ (Λ : Type) [CommRing Λ] [IsDomain Λ] [IsRegularRing Λ] [PerfectField (FractionRing Λ)]
+        (R K : Type) [CommRing R] [IsLocalRing R] [Algebra Λ R] [Algebra.EssFiniteType Λ R]
+        [Field K] [Algebra R K] [Algebra.EssFiniteType R K],
+      (∀ a : Λ, algebraMap R K (algebraMap Λ R a) = 0 → a = 0)
+        → IsRegularRing (AdicCompletion (maximalIdeal R) R ⊗[R] K) := by
   intro Λ _ _ _ _ R K _ _ _ _ _ _ _ hK
-  obtain ⟨n, P, hP, φ, hφ⟩ := GlobalTheory.T.exists_surj_localization_mvPolynomial_of_essFiniteType_local Λ R
+  obtain ⟨n, P, hP, φ, hφ⟩ :=
+    GlobalTheory.T.exists_surj_localization_mvPolynomial_of_essFiniteType_local Λ R
   let R₀ := Localization.AtPrime P
   letI : Algebra R₀ R := φ.toRingHom.toAlgebra
   letI : Algebra R₀ K := ((algebraMap R K).comp φ.toRingHom).toAlgebra

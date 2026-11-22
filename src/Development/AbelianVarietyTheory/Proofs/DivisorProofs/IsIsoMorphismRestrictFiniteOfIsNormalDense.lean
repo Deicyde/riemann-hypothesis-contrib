@@ -11,7 +11,12 @@ open AlgebraicGeometry CategoryTheory Limits
 
 namespace GlobalTheory.FiniteBirationalNear
 
-theorem isIso_morphismRestrict_of_isNormal : ∀ {S T : Scheme.{0}} [IsLocallyNoetherian T] (ν : S ⟶ T) [IsFinite ν] (U V : T.Opens), ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme S → ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme (V : Scheme.{0}) → Dense (U : Set T) → Dense (ν ⁻¹' (U : Set T)) → IsIso (ν ∣_ U) → IsIso (ν ∣_ V) := by
+theorem isIso_morphismRestrict_of_isNormal
+    : ∀ {S T : Scheme.{0}} [IsLocallyNoetherian T] (ν : S ⟶ T) [IsFinite ν] (U V : T.Opens),
+      ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme S
+        → ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme (V : Scheme.{0})
+        → Dense (U : Set T) → Dense (ν ⁻¹' (U : Set T)) → IsIso (ν ∣_ U)
+        → IsIso (ν ∣_ V) := by
   intro S T _ ν _ U V hS hV hU hνU hiso
   have : IsReduced S := by
     haveI : ∀ x : S, _root_.IsReduced (S.presheaf.stalk x) := fun x => by
@@ -37,13 +42,14 @@ theorem isIso_morphismRestrict_of_isNormal : ∀ {S T : Scheme.{0}} [IsLocallyNo
   refine IsZariskiLocalAtTarget.of_iSup_eq_top (P := MorphismProperty.isomorphisms Scheme) W' hcov
     fun x => ?_
   have h1 : IsIso (ν ∣_ W x ∣_ ((W x).ι ⁻¹ᵁ V)) := inferInstance
-  have h2 := ((MorphismProperty.isomorphisms Scheme).arrow_mk_iso_iff
-    (morphismRestrictRestrict ν (W x) ((W x).ι ⁻¹ᵁ V))).1 h1
+  have h2 :=
+    ((MorphismProperty.isomorphisms Scheme).arrow_mk_iso_iff
+      (morphismRestrictRestrict ν (W x) ((W x).ι ⁻¹ᵁ V))).1 h1
   have e : (W x).ι ''ᵁ ((W x).ι ⁻¹ᵁ V) = V.ι ''ᵁ W' x := by
     rw [Scheme.Hom.image_preimage_eq_opensRange_inf, Scheme.Hom.image_preimage_eq_opensRange_inf,
       Scheme.Opens.opensRange_ι, Scheme.Opens.opensRange_ι, inf_comm]
   exact ((MorphismProperty.isomorphisms Scheme).arrow_mk_iso_iff
-    (morphismRestrictRestrict ν V (W' x))).2
+      (morphismRestrictRestrict ν V (W' x))).2
     (((MorphismProperty.isomorphisms Scheme).arrow_mk_iso_iff (morphismRestrictEq ν e)).1 h2)
 
 end GlobalTheory.FiniteBirationalNear

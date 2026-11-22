@@ -16,7 +16,12 @@ set_option synthInstance.maxHeartbeats 200000
 section
 noncomputable section
 namespace PositivityTheory.SiegelWeilFormula.Ald
-theorem modelExists_of_siegelSmall (hG : _root_.PositivityTheory.SiegelWeilFormula.Ald.SiegelSmall_k) : _root_.PositivityTheory.SiegelWeilFormula.Ald.ModelEx_k := _root_.PositivityTheory.SiegelWeilFormula.Ald.modelExists_of_smallness hG (_root_.PositivityTheory.SiegelWeilFormula.Ald.smallS_of'_k _root_.PositivityTheory.SiegelWeilFormula.Ald.chartFacts_k sliceFacts)
+theorem modelExists_of_siegelSmall
+    (hG : _root_.PositivityTheory.SiegelWeilFormula.Ald.SiegelSmall_k)
+    : _root_.PositivityTheory.SiegelWeilFormula.Ald.ModelEx_k :=
+  _root_.PositivityTheory.SiegelWeilFormula.Ald.modelExists_of_smallness hG
+    (_root_.PositivityTheory.SiegelWeilFormula.Ald.smallS_of'_k
+      _root_.PositivityTheory.SiegelWeilFormula.Ald.chartFacts_k sliceFacts)
 end PositivityTheory.SiegelWeilFormula.Ald
 end
 end

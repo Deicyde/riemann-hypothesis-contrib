@@ -13,27 +13,29 @@ public import Formalism.LandauZeroFreeBounds.SiegelWalfiszAPOfSiegelLower
 
 @[expose] public section
 
-open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2 Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
+open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2
+  Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
 
 namespace QH
 
-private theorem stage_log {ε : ℝ} (hε : 0 < ε) :
-    ∀ᶠ Y : ℝ in Filter.atTop, 3 / 2 * (Y ^ (ε / 5) * Real.log Y ^ 2) ≤ Y ^ (ε / 4) := by
-  have h := (isLittleO_log_rpow_rpow_atTop (2 : ℝ) (show 0 < ε / 20 by positivity)).bound
-    (show (0 : ℝ) < 2 / 3 by norm_num)
+private theorem stage_log {ε : ℝ} (hε : 0 < ε)
+    : ∀ᶠ Y : ℝ in Filter.atTop, 3 / 2 * (Y ^ (ε / 5) * Real.log Y ^ 2) ≤ Y ^ (ε / 4) := by
+  have h :=
+    (isLittleO_log_rpow_rpow_atTop (2 : ℝ) (show 0 < ε / 20 by positivity)).bound
+      (show (0 : ℝ) < 2 / 3 by norm_num)
   filter_upwards [h, Filter.eventually_gt_atTop (0 : ℝ)] with Y hY hY0
   rw [Real.rpow_two, Real.norm_of_nonneg (sq_nonneg _),
-    Real.norm_of_nonneg (Real.rpow_nonneg hY0.le _)] at hY
-  have e : Y ^ (ε / 4) = Y ^ (ε / 5) * Y ^ (ε / 20) := by
-    rw [← Real.rpow_add hY0]; congr 1; ring
+      Real.norm_of_nonneg (Real.rpow_nonneg hY0.le _)]
+    at hY
+  have e : Y ^ (ε / 4) = Y ^ (ε / 5) * Y ^ (ε / 20) := by rw [← Real.rpow_add hY0]; congr 1; ring
   have h5 : 0 < Y ^ (ε / 5) := Real.rpow_pos_of_pos hY0 _
   rw [e]
   nlinarith
 
-private theorem stage_pow (C : ℝ) {η : ℝ} (hη : 0 < η) :
-    ∀ᶠ U : ℝ in Filter.atTop, |C| * U ^ (3 / 8 : ℝ) ≤ η / 2 * U ^ (9 / 10 : ℝ) := by
-  have h := (tendsto_rpow_atTop (show (0 : ℝ) < 21 / 40 by norm_num)).eventually_ge_atTop
-    (2 * |C| / η)
+private theorem stage_pow (C : ℝ) {η : ℝ} (hη : 0 < η)
+    : ∀ᶠ U : ℝ in Filter.atTop, |C| * U ^ (3 / 8 : ℝ) ≤ η / 2 * U ^ (9 / 10 : ℝ) := by
+  have h :=
+    (tendsto_rpow_atTop (show (0 : ℝ) < 21 / 40 by norm_num)).eventually_ge_atTop (2 * |C| / η)
   filter_upwards [h, Filter.eventually_gt_atTop (0 : ℝ)] with U hU hU0
   have e : U ^ (9 / 10 : ℝ) = U ^ (21 / 40 : ℝ) * U ^ (3 / 8 : ℝ) := by
     rw [← Real.rpow_add hU0]; norm_num
@@ -42,13 +44,22 @@ private theorem stage_pow (C : ℝ) {η : ℝ} (hη : 0 < η) :
   rw [e]
   nlinarith
 
-theorem stage :
-    ∃ C : ℝ, 0 < C ∧ ∀ (ε τ K η : ℝ) (R : ℕ), 0 < ε → ε ≤ 1 / 4 → 0 < τ → 1 ≤ K → 0 < η → ∃ Y₀ : ℝ, ∀ Y ≥ Y₀,
-      ∀ (U F : ℝ) (m₀ a₀ : ℕ) (Ξ : Finset (Σ N : ℕ, DirichletCharacter ℂ (N + 1))), admitted ε Y U m₀ a₀ → (∀ p : ℕ, p.Prime → p ∣ m₀ → (p : ℝ) ≤ Y ^ (ε / 5) ∨ (Y ^ K) ^ 400 < (p : ℝ)) →
-      1 ≤ F → F ≤ U ^ (1 / 2 : ℝ) → Ξ.card ≤ R → (∀ ξ ∈ Ξ, ξ.2.IsPrimitive ∧ ((ξ.1 + 1 : ℕ) : ℝ) ≤ F) →
-      (PPset m₀ a₀ U).Nonempty ∧ ∀ B ⊆ PPset m₀ a₀ U,
-        (∀ q ∈ B, ∃ ξ ∈ Ξ, ∃ M : ℕ, M ≠ 0 ∧ ¬ BoxAll (F * U) C τ Y (Y ^ K) (fun n => ξ.2 n * J q n) M) →
-        (B.card : ℝ) ≤ η * (PPset m₀ a₀ U).card := by
+theorem stage
+    : ∃ C : ℝ,
+      0 < C
+        ∧ ∀ (ε τ K η : ℝ) (R : ℕ),
+          0 < ε → ε ≤ 1 / 4 → 0 < τ → 1 ≤ K → 0 < η
+            → ∃ Y₀ : ℝ, ∀ Y ≥ Y₀,
+              ∀ (U F : ℝ) (m₀ a₀ : ℕ) (Ξ : Finset (Σ N : ℕ, DirichletCharacter ℂ (N + 1))),
+                admitted ε Y U m₀ a₀
+                  → (∀ p : ℕ, p.Prime → p ∣ m₀ → (p : ℝ) ≤ Y ^ (ε / 5) ∨ (Y ^ K) ^ 400 < (p : ℝ))
+                  → 1 ≤ F → F ≤ U ^ (1 / 2 : ℝ) → Ξ.card ≤ R
+                  → (∀ ξ ∈ Ξ, ξ.2.IsPrimitive ∧ ((ξ.1 + 1 : ℕ) : ℝ) ≤ F)
+                  → (PPset m₀ a₀ U).Nonempty
+                    ∧ ∀ B ⊆ PPset m₀ a₀ U,
+                      (∀ q ∈ B, ∃ ξ ∈ Ξ, ∃ M : ℕ,
+                          M ≠ 0 ∧ ¬ BoxAll (F * U) C τ Y (Y ^ K) (fun n => ξ.2 n * J q n) M)
+                        → (B.card : ℝ) ≤ η * (PPset m₀ a₀ U).card := by
   classical
   obtain ⟨C, hC, hbox⟩ := box_of_S
   obtain ⟨Cm, hCm, hms⟩ := meanSqK
@@ -57,11 +68,15 @@ theorem stage :
   obtain ⟨Y₁, hY₁⟩ := hbox ε τ K hε hε4 hτ hK
   obtain ⟨Y₂, hY₂⟩ := hms ε K hε (by linarith) hK
   obtain ⟨Y₃, hY₃⟩ := bad_share Cm τ (η / (2 * (R + 1))) hCm.le hτ (by positivity)
-  obtain ⟨Y₄, hY₄⟩ := count_a Formalism.HermitianLattices.Ext.PrimesInProgressions.pnt_progressions_relative_weak_holds Formalism.ZeroFreeDirichlet.excBound ε hε
-  obtain ⟨U₀, hU₀⟩ := Filter.eventually_atTop.1
-    ((stage_pow Cb hη).and (Filter.eventually_ge_atTop (4 : ℝ)))
-  obtain ⟨Y₅, hY₅⟩ := Filter.eventually_atTop.1 ((stage_log hε).and
-    ((tendsto_rpow_atTop (show 0 < ε / 6 by positivity)).eventually_ge_atTop U₀))
+  obtain ⟨Y₄, hY₄⟩ :=
+    count_a
+      Formalism.HermitianLattices.Ext.PrimesInProgressions.pnt_progressions_relative_weak_holds
+      Formalism.ZeroFreeDirichlet.excBound ε hε
+  obtain ⟨U₀, hU₀⟩ :=
+    Filter.eventually_atTop.1 ((stage_pow Cb hη).and (Filter.eventually_ge_atTop (4 : ℝ)))
+  obtain ⟨Y₅, hY₅⟩ :=
+    Filter.eventually_atTop.1 ((stage_log hε).and
+      ((tendsto_rpow_atTop (show 0 < ε / 6 by positivity)).eventually_ge_atTop U₀))
   refine ⟨max (max (max Y₁ Y₂) (max Y₃ Y₄)) Y₅, ?_⟩
   intro Y hY U F m₀ a₀ Ξ hA hp hF1 hFU hR hΞ
   simp only [ge_iff_le, max_le_iff] at hY
@@ -73,12 +88,14 @@ theorem stage :
     rcases hneg.eq_or_lt with h | h
     · rw [h, Real.zero_rpow (by norm_num)] at hFU; linarith
     · rw [Real.rpow_def_of_neg h, show (1 / 2 : ℝ) * Real.pi = Real.pi / 2 by ring,
-        Real.cos_pi_div_two, mul_zero] at hFU
+          Real.cos_pi_div_two, mul_zero]
+        at hFU
       linarith
-  obtain ⟨hpow, hU4⟩ := hU₀ U (by
-    have := Real.log_le_sub_one_of_pos hU0
-    have := hA.lo
-    linarith)
+  obtain ⟨hpow, hU4⟩ :=
+    hU₀ U (by
+      have := Real.log_le_sub_one_of_pos hU0
+      have := hA.lo
+      linarith)
   have hcount := hY₄ Y U m₀ a₀ h4 hA.pos hA.eight hA.coprime hA.log_m hA.lo hA.hi
   have hM := hY₂ Y h2 U m₀ a₀ hA hp
   have hsq2 : (2 : ℝ) ≤ U ^ (1 / 2 : ℝ) := by
@@ -129,8 +146,9 @@ theorem stage :
     have hz : ZeroFreeBox (F * U) ψ := by
       by_contra hz
       exact hc1 (Finset.mem_filter.2 ⟨hq, ξ.1 + 1, hne, ψ, hξF, hlev, hψp, hz⟩)
-    have hS : ∀ y ∈ Set.Icc Y (Y ^ K),
-        ‖S ((Y ^ K) ^ 400) y q (fun n => ξ.2 n)‖ ≤ y ^ (1 / 2 + τ) / 2 := by
+    have hS
+        : ∀ y ∈ Set.Icc Y (Y ^ K),
+          ‖S ((Y ^ K) ^ 400) y q (fun n => ξ.2 n)‖ ≤ y ^ (1 / 2 + τ) / 2 := by
       intro y hy
       by_contra hy'
       exact hc2 (Finset.mem_biUnion.2 ⟨ξ, hξ, Finset.mem_filter.2 ⟨hq, y, hy, not_le.1 hy'⟩⟩)
@@ -143,31 +161,37 @@ theorem stage :
     exact hB
   have hP0 : (0 : ℝ) ≤ (PPset m₀ a₀ U).card := Nat.cast_nonneg _
   have hb1 : (B₁.card : ℝ) ≤ η / 2 * (PPset m₀ a₀ U).card := by
-    have h := hcb (F * U) F B₁ (by nlinarith) (fun q hq => by
-      obtain ⟨hq1, hq2⟩ := Finset.mem_filter.1 hq
-      exact ⟨(hPP q hq1).1, lt_of_le_of_lt hFU (hPP q hq1).2.1, hq2⟩)
+    have h :=
+      hcb (F * U) F B₁ (by nlinarith) (fun q hq => by
+        obtain ⟨hq1, hq2⟩ := Finset.mem_filter.1 hq
+        exact ⟨(hPP q hq1).1, lt_of_le_of_lt hFU (hPP q hq1).2.1, hq2⟩)
     have e : (U ^ (1 / 2 : ℝ) * U) ^ (1 / 4 : ℝ) = U ^ (3 / 8 : ℝ) := by
       rw [← Real.rpow_add_one hU0.ne', ← Real.rpow_mul hU0.le]; norm_num
     have h' : (F * U) ^ (1 / 4 : ℝ) ≤ U ^ (3 / 8 : ℝ) := by
       rw [← e]
       exact Real.rpow_le_rpow (by positivity) (mul_le_mul_of_nonneg_right hFU hU0.le) (by norm_num)
-    calc (B₁.card : ℝ) ≤ Cb * (F * U) ^ (1 / 4 : ℝ) := h
-      _ ≤ |Cb| * U ^ (3 / 8 : ℝ) :=
-          mul_le_mul (le_abs_self _) h' (by positivity) (abs_nonneg _)
+    calc
+      (B₁.card : ℝ)
+        ≤ Cb * (F * U) ^ (1 / 4 : ℝ) := h
+      _ ≤ |Cb| * U ^ (3 / 8 : ℝ) := mul_le_mul (le_abs_self _) h' (by positivity) (abs_nonneg _)
       _ ≤ η / 2 * U ^ (9 / 10 : ℝ) := hpow
       _ ≤ _ := mul_le_mul_of_nonneg_left hcount (by positivity)
   have hb2 : ∀ ξ ∈ Ξ, ((B₂ ξ).card : ℝ) ≤ η / (2 * (R + 1)) * (PPset m₀ a₀ U).card := by
     intro ξ _
-    exact hY₃ Y h3 (Y ^ K) _ _ (B₂ ξ) (fun n => ξ.2 n) (fun n => ξ.2.norm_le_one _) hM
-      ((Finset.filter_subset _ _).trans hB) (fun q hq => (Finset.mem_filter.1 hq).2)
+    exact hY₃ Y h3 (Y ^ K) _ _ (B₂ ξ)
+      (fun n => ξ.2 n)
+      (fun n => ξ.2.norm_le_one _)
+      hM ((Finset.filter_subset _ _).trans hB)
+      (fun q hq => (Finset.mem_filter.1 hq).2)
   have hb3 : ((Ξ.biUnion B₂).card : ℝ) ≤ η / 2 * (PPset m₀ a₀ U).card := by
     have hR' : (Ξ.card : ℝ) ≤ R + 1 := by exact_mod_cast hR.trans (Nat.le_succ R)
-    calc ((Ξ.biUnion B₂).card : ℝ) ≤ ∑ ξ ∈ Ξ, ((B₂ ξ).card : ℝ) := by
-          exact_mod_cast Finset.card_biUnion_le
+    calc
+      ((Ξ.biUnion B₂).card : ℝ)
+        ≤ ∑ ξ ∈ Ξ, ((B₂ ξ).card : ℝ) := by exact_mod_cast Finset.card_biUnion_le
       _ ≤ Ξ.card • (η / (2 * (R + 1)) * (PPset m₀ a₀ U).card) := Finset.sum_le_card_nsmul _ _ _ hb2
       _ ≤ (R + 1) * (η / (2 * (R + 1)) * (PPset m₀ a₀ U).card) := by
-          rw [nsmul_eq_mul]
-          exact mul_le_mul_of_nonneg_right hR' (by positivity)
+        rw [nsmul_eq_mul]
+        exact mul_le_mul_of_nonneg_right hR' (by positivity)
       _ = _ := by field_simp
   have hc : (B.card : ℝ) ≤ B₁.card + (Ξ.biUnion B₂).card := by
     exact_mod_cast (Finset.card_le_card hsub).trans (Finset.card_union_le _ _)

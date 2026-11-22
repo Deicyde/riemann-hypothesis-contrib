@@ -7,23 +7,26 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Cub
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory AlgebraicGeometry DirectSum TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory
+  AlgebraicGeometry DirectSum TensorProduct
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory GlobalTheory.AbLaw
 
 namespace GlobalTheory.AbLaw
 
-theorem secCube_exactAt_zero_and_one (R : Type) [CommRing R] (Y : Scheme.{0})
-    (f : Y ⟶ Spec (CommRingCat.of R)) (M : LB Y) (κ : Type) [LinearOrder κ] [Fintype κ]
-    (D : κ → Y.Opens) (hD : ⨆ i, D i = ⊤) :
-    (cubeComplex (secCube f M D)).ExactAt 0 ∧ (cubeComplex (secCube f M D)).ExactAt 1 := by
+theorem secCube_exactAt_zero_and_one
+    (R : Type) [CommRing R]
+    (Y : Scheme.{0}) (f : Y ⟶ Spec (CommRingCat.of R)) (M : LB Y)
+    (κ : Type) [LinearOrder κ] [Fintype κ]
+    (D : κ → Y.Opens) (hD : ⨆ i, D i = ⊤)
+    : (cubeComplex (secCube f M D)).ExactAt 0 ∧ (cubeComplex (secCube f M D)).ExactAt 1 := by
   let O : κ → Y.Opens := fun a => ⨅ i ∈ ({a} : Finset κ), D i
   have hOD (a : κ) : O a = D a := by simp [O]
   have hO (a : κ) : O a ≤ ⨅ i ∈ (∅ : Finset κ), D i :=
     iInf_le_iInf_of_subset D (Finset.empty_subset _)
-  have hc : (⨅ i ∈ (∅ : Finset κ), D i) ≤ ⨆ a, O a := by
-    simp only [hOD, hD, le_top]
+  have hc : (⨅ i ∈ (∅ : Finset κ), D i) ≤ ⨆ a, O a := by simp only [hOD, hD, le_top]
   constructor
   · rw [cubeComplex_exactAt_zero_iff]
     intro s t h
@@ -32,9 +35,9 @@ theorem secCube_exactAt_zero_and_one (R : Type) [CommRing R] (Y : Scheme.{0})
     intro x
     constructor
     · intro hx
-      have key (a b : κ) (hab : a < b) {W : Y.Opens} (ha : W ≤ O a) (hb : W ≤ O b) :
-          SecOnR.restrict f M ha (x ⟨{a}, Finset.card_singleton a⟩) =
-            SecOnR.restrict f M hb (x ⟨{b}, Finset.card_singleton b⟩) := by
+      have key (a b : κ) (hab : a < b) {W : Y.Opens} (ha : W ≤ O a) (hb : W ≤ O b)
+          : SecOnR.restrict f M ha (x ⟨{a}, Finset.card_singleton a⟩)
+            = SecOnR.restrict f M hb (x ⟨{b}, Finset.card_singleton b⟩) := by
         have e := Cube.d_one_apply_pair (secCube f M D) x hab
         rw [hx] at e
         have e' := (sub_eq_zero.1 e.symm).symm
@@ -45,12 +48,14 @@ theorem secCube_exactAt_zero_and_one (R : Type) [CommRing R] (Y : Scheme.{0})
         have e'' := congrArg (SecOnR.restrict f M hW) e'
         exact (SecOnR.restrict_restrict f _ _ _).symm.trans
           (e''.trans (SecOnR.restrict_restrict f _ _ _))
-      obtain ⟨t, ht, -⟩ := SecOnR.existsUnique_glue f O hO hc
-        (fun a => x ⟨{a}, Finset.card_singleton a⟩) fun a b => by
-          rcases lt_trichotomy a b with h | rfl | h
-          · exact key a b h _ _
-          · rfl
-          · exact (key b a h _ _).symm
+      obtain ⟨t, ht, -⟩ :=
+        SecOnR.existsUnique_glue f O hO hc
+          (fun a => x ⟨{a}, Finset.card_singleton a⟩)
+          fun a b => by
+            rcases lt_trichotomy a b with h | rfl | h
+            · exact key a b h _ _
+            · rfl
+            · exact (key b a h _ _).symm
       refine ⟨t, funext ?_⟩
       rintro ⟨s, hs⟩
       obtain ⟨a, rfl⟩ := Finset.card_eq_one.1 hs

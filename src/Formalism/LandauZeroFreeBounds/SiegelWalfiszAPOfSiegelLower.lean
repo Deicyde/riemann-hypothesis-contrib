@@ -19,13 +19,14 @@ public import Formalism.ZeroFreeRegion.LogDerivRegion
 namespace Formalism.ZeroFreeDirichlet
 
 theorem logDerivRegionChi : LogDerivRegionChi :=
-  log_deriv_in_zero_free_region landau_local3 lfunction_polynomial_growth inverseBound l_log_deriv_right
+  log_deriv_in_zero_free_region landau_local3 lfunction_polynomial_growth inverseBound
+    l_log_deriv_right
 
 theorem smoothChi : SmoothChi :=
-  smoothed_character_sum_of perron_formula_character rectangle_contour_shift_character logDerivRegionChi l_log_deriv_right
+  smoothed_character_sum_of perron_formula_character rectangle_contour_shift_character
+    logDerivRegionChi l_log_deriv_right
 
-theorem psiChiBound : PsiChiBound :=
-  chebyshev_character_bound_of smoothChi Formalism.ZF.gzPNT
+theorem psiChiBound : PsiChiBound := chebyshev_character_bound_of smoothChi Formalism.ZF.gzPNT
 
 theorem excBound_of_siegelLower (hS : SiegelLower) : ExcBound :=
   exceptional_zero_bound_of hS lfunction_deriv_near_one

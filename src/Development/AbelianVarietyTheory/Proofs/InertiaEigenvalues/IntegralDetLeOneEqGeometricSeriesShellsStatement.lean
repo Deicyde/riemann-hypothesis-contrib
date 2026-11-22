@@ -14,7 +14,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CuspFor
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CuspRep GlobalTheory.UnitaryBC GroundTheory.Global.IdeleGroup Formalism.L2.Host
+open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  GroundTheory.Global.IdeleGroup Formalism.L2.Host
 open scoped nonZeroDivisors ComplexConjugate
 
 set_option maxHeartbeats 1000000 in

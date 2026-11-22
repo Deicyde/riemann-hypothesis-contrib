@@ -26,8 +26,9 @@ theorem RegularQuotientIndependent.proof : RegularQuotientIndependent.Statement 
       intro hc
       have h1 := hind (Pi.single 0 1) (by simpa [Pi.single_apply] using hc) 0
       simp at h1
-    have hne : span {x 0} ≠ ⊤ := ne_top_of_le_ne_top (maximalIdeal.isMaximal S).ne_top
-      ((span_singleton_le_iff_mem _).mpr (hxm 0))
+    have hne : span {x 0} ≠ ⊤ :=
+      ne_top_of_le_ne_top (maximalIdeal.isMaximal S).ne_top
+        ((span_singleton_le_iff_mem _).mpr (hxm 0))
     have : Nontrivial (S ⧸ span {x 0}) := Ideal.Quotient.nontrivial_iff.mpr hne
     have : IsLocalRing (S ⧸ span {x 0}) :=
       IsLocalRing.of_surjective' (Ideal.Quotient.mk _) Ideal.Quotient.mk_surjective
@@ -38,8 +39,10 @@ theorem RegularQuotientIndependent.proof : RegularQuotientIndependent.Statement 
     let y : Fin h → S ⧸ span {x 0} := fun i ↦ f (x i.succ)
     have hy : ∀ i, y i ∈ maximalIdeal (S ⧸ span {x 0}) := fun i ↦
       hmax ▸ Ideal.mem_map_of_mem f (hxm i.succ)
-    have hyind : ∀ b : Fin h → S ⧸ span {x 0}, ∑ i, b i * y i ∈ maximalIdeal (S ⧸ span {x 0}) ^ 2 →
-        ∀ i, b i ∈ maximalIdeal (S ⧸ span {x 0}) := by
+    have hyind
+        : ∀ b : Fin h → S ⧸ span {x 0},
+          ∑ i, b i * y i ∈ maximalIdeal (S ⧸ span {x 0}) ^ 2
+            → ∀ i, b i ∈ maximalIdeal (S ⧸ span {x 0}) := by
       intro b hb i
       choose a ha using fun i ↦ Ideal.Quotient.mk_surjective (I := span {x 0}) (b i)
       have hsum : ∑ i, b i * y i = f (∑ i, a i * x i.succ) := by
@@ -49,11 +52,15 @@ theorem RegularQuotientIndependent.proof : RegularQuotientIndependent.Statement 
       rw [hsum, ← hmax, ← Ideal.map_pow, hf, Ideal.mem_quotient_iff_mem_sup] at hb
       obtain ⟨z, hz, w, hw, hzw⟩ := Submodule.mem_sup.mp hb
       obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.mp hw
-      have h2 := hind (Fin.cons (-c) a) (by
-        rw [Fin.sum_univ_succ]
-        simp only [Fin.cons_zero, Fin.cons_succ]
-        have : -c * x 0 + ∑ i, a i * x i.succ = z := by rw [← hzw]; ring
-        rw [this]; exact hz) i.succ
+      have h2 :=
+        hind (Fin.cons (-c) a)
+          (by
+            rw [Fin.sum_univ_succ]
+            simp only [Fin.cons_zero, Fin.cons_succ]
+            have : -c * x 0 + ∑ i, a i * x i.succ = z := by rw [← hzw]; ring
+            rw [this]
+            exact hz)
+          i.succ
       simp only [Fin.cons_succ] at h2
       rw [← ha i, ← hmax]
       exact Ideal.mem_map_of_mem _ h2
@@ -67,7 +74,8 @@ theorem RegularQuotientIndependent.proof : RegularQuotientIndependent.Statement 
       congr 1
       ext s
       simp [Fin.exists_fin_succ, eq_comm]
-    exact IsRegularLocalRing.of_ringEquiv (((Ideal.quotEquivOfEq hspan).trans
-      (DoubleQuot.quotQuotEquivQuotSup (span {x 0}) J)).trans (Ideal.quotEquivOfEq hsup))
+    exact IsRegularLocalRing.of_ringEquiv
+      (((Ideal.quotEquivOfEq hspan).trans (DoubleQuot.quotQuotEquivQuotSup (span {x 0}) J)).trans
+        (Ideal.quotEquivOfEq hsup))
 
 end GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets

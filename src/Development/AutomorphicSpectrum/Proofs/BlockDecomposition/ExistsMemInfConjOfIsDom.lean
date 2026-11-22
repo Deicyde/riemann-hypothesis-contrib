@@ -9,9 +9,13 @@ open GlobalTheory.PRep PositivityTheory.SphericalProduct
 
 namespace GlobalTheory.CompanionTheory.Casselman
 
-theorem exists_mem_inf_conj_of_isDom : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    (D : PositivityTheory.SphericalProduct.CassData G), ∀ t : D.T, D.IsDom t → ∀ y ∈ D.J,
-      ∃ a ∈ D.J ⊓ D.N, a⁻¹ * y ∈ D.J ⊓ D.J.map (MulAut.conj (t : G)).toMonoidHom := by
+theorem exists_mem_inf_conj_of_isDom
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+        (D : PositivityTheory.SphericalProduct.CassData G),
+      ∀ t : D.T,
+        D.IsDom t
+          → ∀ y ∈ D.J, ∃ a ∈ D.J ⊓ D.N,
+            a⁻¹ * y ∈ D.J ⊓ D.J.map (MulAut.conj (t : G)).toMonoidHom := by
   intro G _ _ _ D t ht y hy
   obtain ⟨c, hc, b, hb, a, ha, rfl⟩ := D.fact_up y hy
   have hb' : b ∈ D.J := (Subgroup.mem_inf.1 hb).1

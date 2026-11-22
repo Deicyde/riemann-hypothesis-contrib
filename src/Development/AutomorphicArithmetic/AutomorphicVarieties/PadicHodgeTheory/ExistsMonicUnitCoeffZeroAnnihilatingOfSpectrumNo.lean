@@ -4,16 +4,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeT
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Topology Polynomial
+open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions
+  Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Topology
+  Polynomial
 
-private theorem exists_monic_integral_unit_root {l : ℕ} [Fact l.Prime] (a : Om l) (ha : ‖a‖ = 1) :
-    ∃ Q : ℤ_[l][X], Q.Monic ∧ IsUnit (Q.coeff 0) ∧
-      (X - C a) ∣ Q.map ((algebraMap ℚ_[l] (Om l)).comp (algebraMap ℤ_[l] ℚ_[l])) := by
+private theorem exists_monic_integral_unit_root {l : ℕ} [Fact l.Prime] (a : Om l) (ha : ‖a‖ = 1)
+    : ∃ Q : ℤ_[l][X],
+      Q.Monic ∧ IsUnit (Q.coeff 0)
+        ∧ (X - C a) ∣ Q.map ((algebraMap ℚ_[l] (Om l)).comp (algebraMap ℤ_[l] ℚ_[l])) := by
   have hint : IsIntegral ℚ_[l] a := Algebra.IsIntegral.isIntegral a
   have hm : (minpoly ℚ_[l] a).Monic := minpoly.monic hint
   have hs : spectralNorm ℚ_[l] (Om l) a = 1 := ha
-  have hc : ∀ n, ‖(minpoly ℚ_[l] a).coeff n‖ ≤ 1 :=
-    (spectralValue_le_one_iff hm).1 (le_of_eq hs)
+  have hc : ∀ n, ‖(minpoly ℚ_[l] a).coeff n‖ ≤ 1 := (spectralValue_le_one_iff hm).1 (le_of_eq hs)
   have h0 : ‖(minpoly ℚ_[l] a).coeff 0‖ = 1 := by
     have h := spectralNorm.spectralNorm_eq_norm_coeff_zero_rpow ℚ_[l] (Om l) a
     rw [hs] at h
@@ -35,10 +37,11 @@ private theorem exists_monic_integral_unit_root {l : ℕ} [Fact l.Prime] (a : Om
   · rw [← Polynomial.map_map, hQ, dvd_iff_isRoot, IsRoot.def, eval_map_algebraMap]
     exact minpoly.aeval _ _
 
-private theorem aux_mul {l : ℕ} [Fact l.Prime] (s : Multiset (Om l)) (hs : ∀ a ∈ s, ‖a‖ = 1) :
-    ∃ Q : ℤ_[l][X], Q.Monic ∧ IsUnit (Q.coeff 0) ∧
-      (s.map (fun a => X - C a)).prod ∣
-        Q.map ((algebraMap ℚ_[l] (Om l)).comp (algebraMap ℤ_[l] ℚ_[l])) := by
+private theorem aux_mul {l : ℕ} [Fact l.Prime] (s : Multiset (Om l)) (hs : ∀ a ∈ s, ‖a‖ = 1)
+    : ∃ Q : ℤ_[l][X],
+      Q.Monic ∧ IsUnit (Q.coeff 0)
+        ∧ (s.map (fun a => X - C a)).prod
+          ∣ Q.map ((algebraMap ℚ_[l] (Om l)).comp (algebraMap ℤ_[l] ℚ_[l])) := by
   induction s using Multiset.induction_on with
   | empty => exact ⟨1, monic_one, by simp, by simp⟩
   | cons a s ih =>
@@ -49,16 +52,23 @@ private theorem aux_mul {l : ℕ} [Fact l.Prime] (s : Multiset (Om l)) (hs : ∀
     · rw [Multiset.map_cons, Multiset.prod_cons, Polynomial.map_mul]
       exact mul_dvd_mul g3 h3
 
-theorem UpperTheory.exists_monic_unit_coeff_zero_annihilating_of_spectrum_norm_one :
-    ∀ {l : ℕ} [Fact l.Prime] (L : IntermediateField ℚ_[l] (Om l)) {d : ℕ} (F : Matrix (Fin d) (Fin d) ↥L), (∀ a ∈ spectrum (Om l) (F.map (algebraMap ↥L (Om l))), ‖a‖ = 1) → ∃ P : ℤ_[l][X], P.Monic ∧ IsUnit (P.coeff 0) ∧ aeval F (P.map ((algebraMap ℚ_[l] ↥L).comp (algebraMap ℤ_[l] ℚ_[l]))) = 0 := by
+theorem UpperTheory.exists_monic_unit_coeff_zero_annihilating_of_spectrum_norm_one
+    : ∀ {l : ℕ} [Fact l.Prime] (L : IntermediateField ℚ_[l] (Om l)) {d : ℕ}
+        (F : Matrix (Fin d) (Fin d) ↥L),
+      (∀ a ∈ spectrum (Om l) (F.map (algebraMap ↥L (Om l))), ‖a‖ = 1)
+        → ∃ P : ℤ_[l][X],
+          P.Monic ∧ IsUnit (P.coeff 0)
+            ∧ aeval F (P.map ((algebraMap ℚ_[l] ↥L).comp (algebraMap ℤ_[l] ℚ_[l]))) = 0 := by
   intro l _ L d F hF
   set χ := (F.map (algebraMap ↥L (Om l))).charpoly with hχ
   have hχm : χ.Monic := Matrix.charpoly_monic _
-  obtain ⟨Q, h1, h2, h3⟩ := aux_mul χ.roots (fun a ha =>
-    hF a (Matrix.mem_spectrum_iff_isRoot_charpoly.2 ((mem_roots hχm.ne_zero).1 ha)))
+  obtain ⟨Q, h1, h2, h3⟩ :=
+    aux_mul χ.roots
+      (fun a ha => hF a (Matrix.mem_spectrum_iff_isRoot_charpoly.2 ((mem_roots hχm.ne_zero).1 ha)))
   refine ⟨Q, h1, h2, ?_⟩
   rw [← (IsAlgClosed.splits χ).eq_prod_roots_of_monic hχm, hχ, Matrix.charpoly_map,
-    IsScalarTower.algebraMap_eq ℚ_[l] L (Om l), RingHom.comp_assoc, ← Polynomial.map_map,
-    map_dvd_map'] at h3
+      IsScalarTower.algebraMap_eq ℚ_[l] L (Om l), RingHom.comp_assoc, ← Polynomial.map_map,
+      map_dvd_map']
+    at h3
   obtain ⟨R, hR⟩ := h3
   rw [hR, map_mul, Matrix.aeval_self_charpoly, zero_mul]

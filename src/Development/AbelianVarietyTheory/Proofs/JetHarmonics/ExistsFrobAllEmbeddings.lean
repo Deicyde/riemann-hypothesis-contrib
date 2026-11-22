@@ -12,12 +12,16 @@ set_option autoImplicit false
 noncomputable section
 
 open scoped BigOperators TensorProduct
-open Classical NumberField IsDedekindDomain Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds Formalism.L2.Pj Formalism.L2.DIV Formalism.BasicNotions GlobalTheory.RowLaw GlobalTheory.RowAt GlobalTheory.GoodDepth
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+open Classical NumberField IsDedekindDomain Formalism.L2.FormalSeriesBounds Formalism.IncomingBounds
+  Formalism.L2.Pj Formalism.L2.DIV Formalism.BasicNotions GlobalTheory.RowLaw GlobalTheory.RowAt
+  GlobalTheory.GoodDepth
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 
 namespace GlobalTheory.RowAt
 
-def frobKer {R C : Type} [CommRing R] [Field C] (V : VF C) (f : R →+* C) (hf : ∀ x, V.Ge 0 (f x)) : Ideal R where
+def frobKer {R C : Type} [CommRing R] [Field C] (V : VF C) (f : R →+* C) (hf : ∀ x, V.Ge 0 (f x))
+    : Ideal R where
   carrier := {x | V.MM (f x)}
   add_mem' := fun {a b} ha hb => by
     show 0 < V.v (f (a + b))
@@ -32,8 +36,9 @@ def frobKer {R C : Type} [CommRing R] [Field C] (V : VF C) (f : R →+* C) (hf :
     rw [map_mul, V.v.map_mul]
     exact lt_of_lt_of_le hb (le_add_of_nonneg_left (hf a))
 
-theorem frobKer_isPrime {R C : Type} [CommRing R] [Field C] (V : VF C) (f : R →+* C) (hf : ∀ x, V.Ge 0 (f x)) :
-    (frobKer V f hf).IsPrime := by
+theorem frobKer_isPrime
+    {R C : Type} [CommRing R] [Field C] (V : VF C) (f : R →+* C) (hf : ∀ x, V.Ge 0 (f x))
+    : (frobKer V f hf).IsPrime := by
   constructor
   · rw [Ideal.ne_top_iff_one]
     show ¬ 0 < V.v (f 1)
@@ -46,9 +51,10 @@ theorem frobKer_isPrime {R C : Type} [CommRing R] [Field C] (V : VF C) (f : R �
     by_contra! hn
     exact (not_le_of_gt h') (add_nonpos hn.1 hn.2)
 
-theorem exists_frob_of_hom {E C : Type} [Field E] [NumberField E] [IsGalois ℚ E] [Field C] (V : VF C)
-    (f : 𝓞 E →+* C) (hf : ∀ x, V.Ge 0 (f x)) :
-    ∃ φ : E ≃ₐ[ℚ] E, ∀ x : 𝓞 E, V.MM (f (φ • x) - f x ^ V.l) := by
+theorem exists_frob_of_hom
+    {E C : Type} [Field E] [NumberField E] [IsGalois ℚ E] [Field C]
+    (V : VF C) (f : 𝓞 E →+* C) (hf : ∀ x, V.Ge 0 (f x))
+    : ∃ φ : E ≃ₐ[ℚ] E, ∀ x : 𝓞 E, V.MM (f (φ • x) - f x ^ V.l) := by
   set P := frobKer V f hf with hP
   haveI : P.IsPrime := frobKer_isPrime V f hf
   have hl : ((V.l : ℕ) : 𝓞 E) ∈ P := by
@@ -63,8 +69,8 @@ theorem exists_frob_of_hom {E C : Type} [Field E] [NumberField E] [IsGalois ℚ 
   have hu : P.under ℤ = Ideal.span {(V.l : ℤ)} := by
     have hmax : (Ideal.span {(V.l : ℤ)}).IsMaximal :=
       ((Ideal.span_singleton_prime (by exact_mod_cast V.l_prime.ne_zero)).2
-        (Nat.prime_iff_prime_int.1 V.l_prime)).isMaximal (by
-          rw [Ne, Ideal.span_singleton_eq_bot]; exact_mod_cast V.l_prime.ne_zero)
+          (Nat.prime_iff_prime_int.1 V.l_prime)).isMaximal
+        (by rw [Ne, Ideal.span_singleton_eq_bot]; exact_mod_cast V.l_prime.ne_zero)
     refine (hmax.eq_of_le (Ideal.IsPrime.ne_top inferInstance) ?_).symm
     rw [Ideal.span_singleton_le_iff_mem, Ideal.mem_comap, map_natCast]
     exact hl
@@ -75,18 +81,30 @@ theorem exists_frob_of_hom {E C : Type} [Field E] [NumberField E] [IsGalois ℚ 
   have h' : V.MM (f (φ • x - x ^ V.l)) := h
   rwa [map_sub, map_pow] at h'
 
-theorem exists_aut_comp_eq {E : Type} [Field E] [NumberField E] [IsGalois ℚ E] (τ₀ τ : E →+* ℂ) :
-    ∃ σ : E ≃ₐ[ℚ] E, τ = τ₀.comp (σ : E →+* E) := by
-  obtain ⟨σ, hσ⟩ := NumberField.ComplexEmbedding.exists_comp_symm_eq_of_comp_eq (k := ℚ) τ₀ τ (Subsingleton.elim _ _)
+theorem exists_aut_comp_eq {E : Type} [Field E] [NumberField E] [IsGalois ℚ E] (τ₀ τ : E →+* ℂ)
+    : ∃ σ : E ≃ₐ[ℚ] E, τ = τ₀.comp (σ : E →+* E) := by
+  obtain ⟨σ, hσ⟩ :=
+    NumberField.ComplexEmbedding.exists_comp_symm_eq_of_comp_eq (k := ℚ) τ₀ τ
+      (Subsingleton.elim _ _)
   exact ⟨σ.symm, hσ.symm⟩
 
-theorem exists_frob_all_embeddings : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (lv : Level H) (c : Coeff lv) (T : CDVR) (io : c.F →+* T.Fr) (C : Type) [Field C] [CharZero C] (V : VF C) (ι : T.Fr →+* C), EmbOK T V ι → IsGalois ℚ E → (∀ σ σ' : E ≃ₐ[ℚ] E, σ * σ' = σ' * σ) → ∃ φ : E ≃ₐ[ℚ] E, ∀ (τ : E →+* ℂ) (x : 𝓞 E), V.MM (emA3 io ι (τ.comp (φ : E →+* E)) x - emA3 io ι τ x ^ V.l) := by
+theorem exists_frob_all_embeddings
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (lv : Level H) (c : Coeff lv)
+        (T : CDVR) (io : c.F →+* T.Fr) (C : Type) [Field C] [CharZero C] (V : VF C)
+        (ι : T.Fr →+* C),
+      EmbOK T V ι → IsGalois ℚ E → (∀ σ σ' : E ≃ₐ[ℚ] E, σ * σ' = σ' * σ)
+        → ∃ φ : E ≃ₐ[ℚ] E, ∀ (τ : E →+* ℂ) (x : 𝓞 E),
+          V.MM (emA3 io ι (τ.comp (φ : E →+* E)) x - emA3 io ι τ x ^ V.l) := by
   intro E _ _ _ H lv c T io C _ _ V ι hι hG hab
   obtain ⟨τ₀⟩ : Nonempty (E →+* ℂ) := inferInstance
-  have key : ∀ (τ : E →+* ℂ) (s : E ≃ₐ[ℚ] E) (x : 𝓞 E),
-      emA3 io ι (τ.comp (s : E →+* E)) x = emA3 io ι τ (s • x) := fun τ s x => rfl
-  obtain ⟨φ, hφ⟩ := exists_frob_of_hom V (emA3 io ι τ₀)
-    (fun x => GlobalTheory.RowChartCounterexample.em_int_holds τ₀ x hι)
+  have key
+      : ∀ (τ : E →+* ℂ) (s : E ≃ₐ[ℚ] E) (x : 𝓞 E),
+        emA3 io ι (τ.comp (s : E →+* E)) x = emA3 io ι τ (s • x) := fun τ s x =>
+    rfl
+  obtain ⟨φ, hφ⟩ :=
+    exists_frob_of_hom V (emA3 io ι τ₀)
+      (fun x => GlobalTheory.RowChartCounterexample.em_int_holds τ₀ x hι)
   refine ⟨φ, fun τ x => ?_⟩
   obtain ⟨σ, rfl⟩ := exists_aut_comp_eq τ₀ τ
   rw [key, key, key, ← mul_smul, hab, mul_smul]

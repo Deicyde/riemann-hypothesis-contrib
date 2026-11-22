@@ -16,11 +16,14 @@ noncomputable section
 
 namespace GlobalTheory.TameLabels
 
-open NumberField IsDedekindDomain Polynomial Formalism.BasicNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+open NumberField IsDedekindDomain Polynomial Formalism.BasicNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal
 
-theorem normV_eq_of_split {E : Type} [Field E] [NumberField E] {p : ℕ} (hp : p.Prime)
-    (h : (placesOver E p).ncard = Module.finrank ℚ E) {w : HeightOneSpectrum (𝓞 E)} (hw : w ∈ placesOver E p) :
-    normV w = p := by
+theorem normV_eq_of_split
+    {E : Type} [Field E] [NumberField E]
+    {p : ℕ} (hp : p.Prime) (h : (placesOver E p).ncard = Module.finrank ℚ E)
+    {w : HeightOneSpectrum (𝓞 E)} (hw : w ∈ placesOver E p)
+    : normV w = p := by
   classical
   obtain ⟨hc, -⟩ := Formalism.MainNotions.ModuliIntegralCharts.H1.GSplit.split_of_ncard hp h
   set I : Ideal (𝓞 E) := Ideal.span {((p : ℕ) : 𝓞 E)} with hI
@@ -42,21 +45,23 @@ theorem normV_eq_of_split {E : Type} [Field E] [NumberField E] {p : ℕ} (hp : p
     have h1 : Ideal.absNorm P ≠ 1 := by rw [Ne, Ideal.absNorm_eq_one_iff]; exact hPp.ne_top
     rw [hj] at h1 ⊢
     exact Nat.le_self_pow (by rintro rfl; simp at h1) p
-  have hwM : w.asIdeal ∈ M := (Ideal.mem_normalizedFactors_iff hI0).2
-    ⟨w.isPrime, by rw [hI, Ideal.span_singleton_le_iff_mem]; exact hw⟩
+  have hwM : w.asIdeal ∈ M :=
+    (Ideal.mem_normalizedFactors_iff hI0).2
+      ⟨w.isPrime, by rw [hI, Ideal.span_singleton_le_iff_mem]; exact hw⟩
   have e : normV w = Ideal.absNorm w.asIdeal := by
     simp [normV, Ideal.absNorm_apply, Submodule.cardQuot_apply]
   rw [e]
   refine le_antisymm ?_ (hge _ hwM)
   obtain ⟨M', hM'⟩ := Multiset.exists_cons_of_mem hwM
   have h2 : p ^ M'.card ≤ (M'.map Ideal.absNorm).prod := by
-    have := Multiset.pow_card_le_prod (s := M'.map Ideal.absNorm) (a := p) (fun x hx => by
-      obtain ⟨P, hP, rfl⟩ := Multiset.mem_map.1 hx
-      exact hge P (hM' ▸ Multiset.mem_cons_of_mem hP))
+    have :=
+      Multiset.pow_card_le_prod (s := M'.map Ideal.absNorm) (a := p) (fun x hx => by
+        obtain ⟨P, hP, rfl⟩ := Multiset.mem_map.1 hx
+        exact hge P (hM' ▸ Multiset.mem_cons_of_mem hP))
     simpa using this
   have h3 : Ideal.absNorm w.asIdeal * (M'.map Ideal.absNorm).prod = p * p ^ M'.card := by
-    rw [← pow_succ', ← Multiset.card_cons w.asIdeal, ← hM', hc, ← hN, ← hprod, hM', Multiset.prod_cons, map_mul,
-      map_multiset_prod]
+    rw [← pow_succ', ← Multiset.card_cons w.asIdeal, ← hM', hc, ← hN, ← hprod, hM',
+      Multiset.prod_cons, map_mul, map_multiset_prod]
   by_contra hlt
   push_neg at hlt
   have hpos : 0 < p ^ M'.card := pow_pos hp.pos _
@@ -66,11 +71,12 @@ section Tame
 
 variable {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] {A : ValuationSubring Ω}
 
-theorem valuation_apply_of_mem_Dec [IsAlgClosure E Ω] {σ : G E Ω} (hσ : σ ∈ Dec (F := E) A) (y : Ω) :
-    A.valuation (σ y) = A.valuation y := by
+theorem valuation_apply_of_mem_Dec [IsAlgClosure E Ω] {σ : G E Ω} (hσ : σ ∈ Dec (F := E) A) (y : Ω)
+    : A.valuation (σ y) = A.valuation y := by
   rcases eq_or_ne y 0 with rfl | hy
   · simp
-  have key : ∀ τ : G E Ω, τ ∈ Dec (F := E) A → ∀ z : Ω, z ≠ 0 → ¬ A.valuation (τ z) < A.valuation z := by
+  have key
+      : ∀ τ : G E Ω, τ ∈ Dec (F := E) A → ∀ z : Ω, z ≠ 0 → ¬ A.valuation (τ z) < A.valuation z := by
     intro τ hτ z hz hlt
     have hz0 : ∀ i : ℕ, (τ ^ i) z ≠ 0 := fun i => (map_ne_zero (τ ^ i)).2 hz
     have hv0 : ∀ x : Ω, x ≠ 0 → 0 < A.valuation x := fun x hx => zero_lt_iff.mpr (by simpa using hx)
@@ -87,7 +93,10 @@ theorem valuation_apply_of_mem_Dec [IsAlgClosure E Ω] {σ : G E Ω} (hσ : σ �
       rw [mem_rootSet]
       refine ⟨minpoly.ne_zero hint, ?_⟩
       rw [Polynomial.aeval_algHom_apply, minpoly.aeval, map_zero]
-    refine Set.infinite_range_of_injective (f := fun i : ℕ => (τ ^ i) z) (fun i j hij => hs.injective ?_) hfin
+    refine Set.infinite_range_of_injective
+      (f := fun i : ℕ => (τ ^ i) z)
+      (fun i j hij => hs.injective ?_)
+      hfin
     simp only at hij ⊢
     rw [hij]
   rcases lt_trichotomy (A.valuation (σ y)) (A.valuation y) with h | h | h
@@ -99,29 +108,33 @@ theorem valuation_apply_of_mem_Dec [IsAlgClosure E Ω] {σ : G E Ω} (hσ : σ �
       simp
     rwa [this]
 
-theorem cong_mul {a b c d : Ω} (hab : A.valuation (a - b) < 1) (hcd : A.valuation (c - d) < 1)
-    (hb : A.valuation b ≤ 1) (hc : A.valuation c ≤ 1) : A.valuation (a * c - b * d) < 1 := by
+theorem cong_mul
+    {a b c d : Ω} (hab : A.valuation (a - b) < 1) (hcd : A.valuation (c - d) < 1)
+    (hb : A.valuation b ≤ 1) (hc : A.valuation c ≤ 1)
+    : A.valuation (a * c - b * d) < 1 := by
   have e : a * c - b * d = (a - b) * c + b * (c - d) := by ring
   rw [e]
   refine Valuation.map_add_lt _ ?_ ?_
   · rw [map_mul]; exact lt_of_le_of_lt (mul_le_of_le_one_right' hc) hab
   · rw [map_mul]; exact lt_of_le_of_lt (mul_le_of_le_one_left' hb) hcd
 
-theorem cong_of_valuation_eq [IsAlgClosure E Ω] {t : G E Ω} (ht : t ∈ Ine (F := E) A) {y z : Ω} (hy : y ≠ 0)
-    (h : A.valuation z = A.valuation y) : A.valuation (t z / z - t y / y) < 1 := by
+theorem cong_of_valuation_eq
+    [IsAlgClosure E Ω]
+    {t : G E Ω} (ht : t ∈ Ine (F := E) A)
+    {y z : Ω} (hy : y ≠ 0) (h : A.valuation z = A.valuation y)
+    : A.valuation (t z / z - t y / y) < 1 := by
   have hy0 : A.valuation y ≠ 0 := by simpa using hy
-  have hz : z ≠ 0 := by
-    intro hz; rw [hz, map_zero] at h; exact hy0 h.symm
+  have hz : z ≠ 0 := by intro hz; rw [hz, map_zero] at h; exact hy0 h.symm
   have hu : A.valuation (z / y) = 1 := by rw [map_div₀, h, div_self hy0]
   have h1 := ht.2 _ hu.le
   have hty : t y ≠ 0 := (map_ne_zero t).2 hy
-  have e : t z / z - t y / y = (t (z / y) - z / y) * (t y / z) := by
-    rw [map_div₀]; field_simp
+  have e : t z / z - t y / y = (t (z / y) - z / y) * (t y / z) := by rw [map_div₀]; field_simp
   rw [e, map_mul, map_div₀ A.valuation, valuation_apply_of_mem_Dec ht.1, h, div_self hy0, mul_one]
   exact h1
 
-theorem cong_pow [IsAlgClosure E Ω] {t : G E Ω} (ht : t ∈ Ine (F := E) A) {y : Ω} (hy : y ≠ 0) (n : ℕ) :
-    A.valuation ((t ^ n) y / y - (t y / y) ^ n) < 1 := by
+theorem cong_pow
+    [IsAlgClosure E Ω] {t : G E Ω} (ht : t ∈ Ine (F := E) A) {y : Ω} (hy : y ≠ 0) (n : ℕ)
+    : A.valuation ((t ^ n) y / y - (t y / y) ^ n) < 1 := by
   have hy0 : A.valuation y ≠ 0 := by simpa using hy
   induction n with
   | zero => simp [div_self hy]
@@ -136,13 +149,17 @@ theorem cong_pow [IsAlgClosure E Ω] {t : G E Ω} (ht : t ∈ Ine (F := E) A) {y
     · rw [map_div₀, valuation_apply_of_mem_Dec ht.1, div_self hy0]
     · rw [map_div₀, hv, div_self hy0]
 
-theorem wild_of_frob [IsAlgClosure E Ω] {t φ : G E Ω} {q : ℕ} (ht : t ∈ Ine (F := E) A) (hφ : IsFrob A q φ)
-    (y : Ω) (hy : y ≠ 0) : A.valuation (((t ^ q)⁻¹ * (φ * t * φ⁻¹)) y / y - 1) < 1 := by
+theorem wild_of_frob
+    [IsAlgClosure E Ω]
+    {t φ : G E Ω} {q : ℕ} (ht : t ∈ Ine (F := E) A) (hφ : IsFrob A q φ)
+    (y : Ω) (hy : y ≠ 0)
+    : A.valuation (((t ^ q)⁻¹ * (φ * t * φ⁻¹)) y / y - 1) < 1 := by
   have hy0 : A.valuation y ≠ 0 := by simpa using hy
   have hφD : φ ∈ Dec (F := E) A := hφ.1
   have htq : t ^ q ∈ Dec (F := E) A := (Dec (F := E) A).pow_mem ht.1 q
   set z := (φ⁻¹ : G E Ω) y with hz
-  have hzv : A.valuation z = A.valuation y := valuation_apply_of_mem_Dec ((Dec (F := E) A).inv_mem hφD) y
+  have hzv : A.valuation z = A.valuation y :=
+    valuation_apply_of_mem_Dec ((Dec (F := E) A).inv_mem hφD) y
   have hφz : φ z = y := mul_inv_apply y
   have hu : A.valuation (t z / z) = 1 := by
     rw [map_div₀, valuation_apply_of_mem_Dec ht.1, hzv, div_self hy0]
@@ -159,14 +176,18 @@ theorem wild_of_frob [IsAlgClosure E Ω] {t φ : G E Ω} {q : ℕ} (ht : t ∈ I
       rw [pow_succ, pow_succ]
       exact cong_mul ih (cong_of_valuation_eq ht hy hzv) (by rw [map_pow, hu', one_pow]) hu.le
   have h3 : A.valuation (φ (t z) / y - (t ^ q) y / y) < 1 := by
-    have e : φ (t z) / y - (t ^ q) y / y = (φ (t z) / y - (t z / z) ^ q) +
-        (((t z / z) ^ q - (t y / y) ^ q) - ((t ^ q) y / y - (t y / y) ^ q)) := by ring
+    have e
+        : φ (t z) / y - (t ^ q) y / y
+          = (φ (t z) / y - (t z / z) ^ q)
+            + (((t z / z) ^ q - (t y / y) ^ q) - ((t ^ q) y / y - (t y / y) ^ q)) := by
+      ring
     rw [e]
     exact Valuation.map_add_lt _ h1 (Valuation.map_sub_lt _ (h2 q) (cong_pow ht hy q))
   rw [← valuation_apply_lt_one_iff htq]
   have hty : (t ^ q) y ≠ 0 := (_root_.map_ne_zero _).2 hy
-  have e : (t ^ q) (((t ^ q)⁻¹ * (φ * t * φ⁻¹)) y / y - 1) =
-      (φ (t z) / y - (t ^ q) y / y) * (y / (t ^ q) y) := by
+  have e
+      : (t ^ q) (((t ^ q)⁻¹ * (φ * t * φ⁻¹)) y / y - 1)
+        = (φ (t z) / y - (t ^ q) y / y) * (y / (t ^ q) y) := by
     rw [map_sub, map_div₀, map_one, AlgEquiv.mul_apply, mul_inv_apply]
     show φ (t z) / _ - 1 = _
     field_simp
@@ -179,44 +200,58 @@ section Roots
 
 variable {g : ℕ} [Fact g.Prime]
 
-theorem card_rootsBar (f : (ZMod g)[X]) : Multiset.card (Formalism.CyclotomicNorms.rootsBar f) = f.natDegree := by
+theorem card_rootsBar (f : (ZMod g)[X])
+    : Multiset.card (Formalism.CyclotomicNorms.rootsBar f) = f.natDegree := by
   rw [Formalism.CyclotomicNorms.rootsBar, IsAlgClosed.card_roots_eq_natDegree, natDegree_map]
 
-theorem rootsBar_frob (f : (ZMod g)[X]) :
-    (Formalism.CyclotomicNorms.rootsBar f).map (fun x => x ^ g) = Formalism.CyclotomicNorms.rootsBar f := by
-  have hcard := IsAlgClosed.card_roots_eq_natDegree (p := f.map (algebraMap (ZMod g) (Formalism.CyclotomicNorms.Fbar g)))
-  have := roots_map_of_injective_of_card_eq_natDegree
-    (f := frobenius (Formalism.CyclotomicNorms.Fbar g) g) (RingHom.injective _) hcard
-  rw [Polynomial.map_map, RingHom.ext_zmod ((frobenius _ _).comp _)
-    (algebraMap (ZMod g) (Formalism.CyclotomicNorms.Fbar g))] at this
+theorem rootsBar_frob (f : (ZMod g)[X])
+    : (Formalism.CyclotomicNorms.rootsBar f).map (fun x => x ^ g)
+      = Formalism.CyclotomicNorms.rootsBar f := by
+  have hcard :=
+    IsAlgClosed.card_roots_eq_natDegree
+      (p := f.map (algebraMap (ZMod g) (Formalism.CyclotomicNorms.Fbar g)))
+  have :=
+    roots_map_of_injective_of_card_eq_natDegree
+      (f := frobenius (Formalism.CyclotomicNorms.Fbar g) g) (RingHom.injective _) hcard
+  rw [Polynomial.map_map,
+      RingHom.ext_zmod ((frobenius _ _).comp _)
+        (algebraMap (ZMod g) (Formalism.CyclotomicNorms.Fbar g))]
+    at this
   exact this
 
-theorem rootsBar_mul {f f' : (ZMod g)[X]} (h : f * f' ≠ 0) :
-    Formalism.CyclotomicNorms.rootsBar (f * f') = Formalism.CyclotomicNorms.rootsBar f + Formalism.CyclotomicNorms.rootsBar f' := by
+theorem rootsBar_mul {f f' : (ZMod g)[X]} (h : f * f' ≠ 0)
+    : Formalism.CyclotomicNorms.rootsBar (f * f')
+      = Formalism.CyclotomicNorms.rootsBar f + Formalism.CyclotomicNorms.rootsBar f' := by
   unfold Formalism.CyclotomicNorms.rootsBar
   rw [Polynomial.map_mul, roots_mul]
   rw [← Polynomial.map_mul]
   exact Polynomial.map_ne_zero h
 
-theorem isOfFinOrder_of_ne_zero {x : Formalism.CyclotomicNorms.Fbar g} (hx : x ≠ 0) : IsOfFinOrder x := by
+theorem isOfFinOrder_of_ne_zero {x : Formalism.CyclotomicNorms.Fbar g} (hx : x ≠ 0)
+    : IsOfFinOrder x := by
   have hint : IsIntegral (ZMod g) x := Algebra.IsIntegral.isIntegral x
   haveI := IntermediateField.adjoin.finiteDimensional hint
   haveI : Finite (IntermediateField.adjoin (ZMod g) {x}) := Module.finite_of_finite (ZMod g)
   let y : IntermediateField.adjoin (ZMod g) {x} := IntermediateField.AdjoinSimple.gen (ZMod g) x
   have hy : y ≠ 0 := fun h => hx (congrArg Subtype.val h)
   have h1 : IsOfFinOrder (Units.mk0 y hy) := isOfFinOrder_of_finite _
-  exact ((IntermediateField.adjoin (ZMod g) {x}).val.toMonoidHom.comp (Units.coeHom _)).isOfFinOrder h1
+  exact ((IntermediateField.adjoin (ZMod g) {x}).val.toMonoidHom.comp (Units.coeHom _)).isOfFinOrder
+    h1
 
-theorem teich_zero (t : Formalism.CyclotomicNorms.Fbar g →* ℂ) (ht : ∀ x y, x ≠ 0 → y ≠ 0 → t x = t y → x = y) : t 0 = 0 := by
+theorem teich_zero
+    (t : Formalism.CyclotomicNorms.Fbar g →* ℂ) (ht : ∀ x y, x ≠ 0 → y ≠ 0 → t x = t y → x = y)
+    : t 0 = 0 := by
   classical
-  obtain ⟨x, hx⟩ := Infinite.exists_notMem_finset ({0, 1} : Finset (Formalism.CyclotomicNorms.Fbar g))
+  obtain ⟨x, hx⟩ :=
+    Infinite.exists_notMem_finset ({0, 1} : Finset (Formalism.CyclotomicNorms.Fbar g))
   simp only [Finset.mem_insert, Finset.mem_singleton, not_or] at hx
   by_contra h0
   have h1 : t 0 * t x = t 0 * t 1 := by rw [← map_mul, ← map_mul, zero_mul, zero_mul]
   exact hx.2 (ht x 1 hx.1 one_ne_zero (mul_left_cancel₀ h0 h1))
 
-theorem teich_injective (t : Formalism.CyclotomicNorms.Fbar g →* ℂ) (ht : ∀ x y, x ≠ 0 → y ≠ 0 → t x = t y → x = y) :
-    Function.Injective t := by
+theorem teich_injective
+    (t : Formalism.CyclotomicNorms.Fbar g →* ℂ) (ht : ∀ x y, x ≠ 0 → y ≠ 0 → t x = t y → x = y)
+    : Function.Injective t := by
   have h0 := teich_zero t ht
   have hne : ∀ x, x ≠ 0 → t x ≠ 0 := fun x hx => ((IsUnit.mk0 x hx).map t).ne_zero
   intro x y h
@@ -229,23 +264,32 @@ theorem teich_injective (t : Formalism.CyclotomicNorms.Fbar g →* ℂ) (ht : �
 
 end Roots
 
-theorem map_primeToPart {M k : Type} [Monoid M] [Field k] {l : ℕ} [Fact l.Prime] [CharP k l] (ι : M →* k)
-    {x : M} (hx : IsOfFinOrder x) : ι (Formalism.CyclotomicNorms.primeToPart l x) = ι x := by
+theorem map_primeToPart
+    {M k : Type} [Monoid M] [Field k]
+    {l : ℕ} [Fact l.Prime] [CharP k l]
+    (ι : M →* k)
+    {x : M} (hx : IsOfFinOrder x)
+    : ι (Formalism.CyclotomicNorms.primeToPart l x) = ι x := by
   obtain ⟨a, -, -, -, -, h⟩ := GlobalTheory.TameRed.part_spec (Fact.out : l.Prime) hx
   have h1 : (ι (Formalism.CyclotomicNorms.primeToPart l x) - ι x) ^ (l ^ a) = 0 := by
     rw [sub_pow_char_pow, ← map_pow, ← map_pow, h, sub_self]
   exact sub_eq_zero.1 (pow_eq_zero_iff (pow_ne_zero _ (Fact.out : l.Prime).ne_zero) |>.1 h1)
 
-theorem pow_eq_one_of_charpoly {k : Type} [Field k] {l N : ℕ} [Fact l.Prime] [CharP k l]
-    (M : Matrix (Fin N) (Fin N) k) (hc : M.charpoly = (X - 1) ^ N) : M ^ (l ^ N) = 1 := by
+theorem pow_eq_one_of_charpoly
+    {k : Type} [Field k]
+    {l N : ℕ} [Fact l.Prime] [CharP k l]
+    (M : Matrix (Fin N) (Fin N) k) (hc : M.charpoly = (X - 1) ^ N)
+    : M ^ (l ^ N) = 1 := by
   have h1 : aeval M ((X - 1 : k[X]) ^ N) = 0 := hc ▸ Matrix.aeval_self_charpoly M
-  obtain ⟨c, hcN⟩ := Nat.exists_eq_add_of_le (Nat.lt_pow_self (Fact.out : l.Prime).one_lt (n := N)).le
+  obtain ⟨c, hcN⟩ :=
+    Nat.exists_eq_add_of_le (Nat.lt_pow_self (Fact.out : l.Prime).one_lt (n := N)).le
   have h2 : aeval M ((X - 1 : k[X]) ^ (l ^ N)) = 0 := by rw [hcN, pow_add, map_mul, h1, zero_mul]
   rw [sub_pow_char_pow] at h2
   simpa [sub_eq_zero] using h2
 
-open GlobalTheory.IndefiniteRowSideFullHecke.RayClassPrimeCounting (OnW OccursOnLevelZero IsBaseChange IsGaloisRepOf IsReduction Zbar GaloisReps TransferRows GalE
-  LabelLaws BaseChangeRows ResidualTie)
+open GlobalTheory.IndefiniteRowSideFullHecke.RayClassPrimeCounting
+  (OnW OccursOnLevelZero IsBaseChange IsGaloisRepOf IsReduction Zbar GaloisReps TransferRows GalE
+    LabelLaws BaseChangeRows ResidualTie)
 
 variable (D : D7)
 
@@ -256,9 +300,12 @@ variable {D} {k : Fin 2} {v : D.nd.PlG k}
 def rts (L : D.naut.LP (D.naut.plGw k v)) : Multiset (Fb (D.host.g k) (D.host.g_prime k)) :=
   @Formalism.CyclotomicNorms.rootsBar _ ⟨D.host.g_prime k⟩ (D.naut.items₂ k _ L)
 
-theorem spehLoc_eq (p : Part D.naut.CG) (w : PlE D.host) :
-    spehLoc D.nd D.naut p w = (List.range p.d).foldr (fun (j : ℕ) acc =>
-      D.naut.lpSum (D.naut.lpTw (D.naut.locG p.π w) (((p.d : ℝ) - 1) / 2 - j)) acc) (D.naut.lpZero w) := by
+theorem spehLoc_eq (p : Part D.naut.CG) (w : PlE D.host)
+    : spehLoc D.nd D.naut p w
+      = (List.range p.d).foldr
+        (fun (j : ℕ) acc =>
+          D.naut.lpSum (D.naut.lpTw (D.naut.locG p.π w) (((p.d : ℝ) - 1) / 2 - j)) acc)
+        (D.naut.lpZero w) := by
   simp only [spehLoc, bind_pure_comp, List.map_eq_map, List.foldr_map]
 
 end Blocks
@@ -267,12 +314,12 @@ section TameClause
 
 variable {D} {k : Fin 2} {v : D.nd.PlG k}
 
-theorem isoLoc_single {a : ℕ} (π : D.naut.CG a) (w : PlE D.host) :
-    isoLoc D.nd D.naut [⟨a, π, 1⟩] w = D.naut.locG π w := by
+theorem isoLoc_single {a : ℕ} (π : D.naut.CG a) (w : PlE D.host)
+    : isoLoc D.nd D.naut [⟨a, π, 1⟩] w = D.naut.locG π w := by
   simp [isoLoc, spehLoc_eq, D.naut.lpSum_zero, D.naut.lpTw_zero]
 
-theorem not_mem_of_ne {l : ℕ} (hl : l.Prime) (hne : l ≠ D.host.g k) :
-    D.naut.plGw k v ∉ placesOver D.host.E l := by
+theorem not_mem_of_ne {l : ℕ} (hl : l.Prime) (hne : l ≠ D.host.g k)
+    : D.naut.plGw k v ∉ placesOver D.host.E l := by
   intro h
   have h1 : ((l : ℕ) : 𝓞 D.host.E) ∈ (D.naut.plGw k v).asIdeal := h
   have h2 : ((D.host.g k : ℕ) : 𝓞 D.host.E) ∈ (D.naut.plGw k v).asIdeal := D.naut.plGw_over k v

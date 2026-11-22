@@ -7,29 +7,40 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LevelLe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual Formalism.BasicNotions Formalism.MainNotions Formalism.FrobeniusOrbits Formalism.L2.Host GlobalTheory.CMVal GlobalTheory.ToricDenom GlobalTheory.LamTie
+open NumberField IsDedekindDomain ReciprocityTheory.Gal Formalism.ConjugateSelfDual
+  Formalism.BasicNotions Formalism.MainNotions Formalism.FrobeniusOrbits Formalism.L2.Host
+  GlobalTheory.CMVal GlobalTheory.ToricDenom GlobalTheory.LamTie
 
 namespace GlobalTheory.LamTie
 
-theorem mu0_del_tame {D : D7} (C : CharFrame D) (l : ℕ) (j : Fin D.R.m) (w : HeightOneSpectrum (𝓞 D.host.E)) :
-    (C.mu0 j * C.delAt l).LevelLe w 1 := by
+theorem mu0_del_tame
+    {D : D7} (C : CharFrame D) (l : ℕ) (j : Fin D.R.m) (w : HeightOneSpectrum (𝓞 D.host.E))
+    : (C.mu0 j * C.delAt l).LevelLe w 1 := by
   have hd : (C.delAt l).TameAt w := by
-    unfold CharFrame.delAt; split_ifs
+    unfold CharFrame.delAt
+    split_ifs
     · exact C.isDel'.tame w
     · exact C.isDel.tame w
   exact HChar.LevelLe.mul ((C.isMu0 j).tame w) hd
 
-theorem mu0_del_unr {D : D7} (C : CharFrame D) (l : ℕ) (j : Fin D.R.m) (w : HeightOneSpectrum (𝓞 D.host.E))
-    (hw : ¬ Over4 D.host w) : (C.mu0 j * C.delAt l).UnrAt w := by
+theorem mu0_del_unr
+    {D : D7} (C : CharFrame D)
+    (l : ℕ) (j : Fin D.R.m)
+    (w : HeightOneSpectrum (𝓞 D.host.E)) (hw : ¬ Over4 D.host w)
+    : (C.mu0 j * C.delAt l).UnrAt w := by
   have h1 : ∀ k, ¬ OverP D.host (D.host.g k) w := fun k hk => hw (Or.inl ⟨k, hk⟩)
   have hd : (C.delAt l).UnrAt w := by
-    unfold CharFrame.delAt; split_ifs
+    unfold CharFrame.delAt
+    split_ifs
     · exact C.isDel'.unr w (fun h => hw (Or.inr (Or.inr h)))
     · exact C.isDel.unr w (fun h => hw (Or.inr (Or.inl h)))
   exact HChar.UnrAt.mul ((C.isMu0 j).unr w h1) hd
 
-theorem lam0_expAt : ∀ (D : D7) (Z : LamDat D), Z.Ok → ∀ (l : ℕ) (j a : Fin D.R.m) (w : HeightOneSpectrum (𝓞 D.host.E)),
-    ExpAt (Z.lam0 l j a) w (expIn (cond0 D.host Z.w0) (below w)) := by
+theorem lam0_expAt
+    : ∀ (D : D7) (Z : LamDat D),
+      Z.Ok
+        → ∀ (l : ℕ) (j a : Fin D.R.m) (w : HeightOneSpectrum (𝓞 D.host.E)),
+          ExpAt (Z.lam0 l j a) w (expIn (cond0 D.host Z.w0) (below w)) := by
   intro D Z hZ l j a w
   obtain ⟨h4, h0, hO⟩ := expIn_cond0 D.R D.host Z.q0 Z.w0 hZ.places w
   have hA := hZ.aux a

@@ -8,6 +8,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 namespace UpperTheory.Gal.FixZ
 
-theorem FixK_holds : LocalSmoothExtension.FixK := tower_fixed_points_of_isogeny_data G3.sysOf_holds G3.relComp_holds G3.witUniq_holds G3.isogFEt_holds G3.powSm_holds
+theorem FixK_holds : LocalSmoothExtension.FixK :=
+  tower_fixed_points_of_isogeny_data G3.sysOf_holds G3.relComp_holds G3.witUniq_holds
+    G3.isogFEt_holds G3.powSm_holds
 
 end UpperTheory.Gal.FixZ

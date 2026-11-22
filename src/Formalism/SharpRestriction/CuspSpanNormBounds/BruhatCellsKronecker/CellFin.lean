@@ -12,25 +12,28 @@ public import Formalism.SharpRestriction.CuspSpanNormBounds.BruhatCellsKronecker
 
 noncomputable section
 namespace Formalism.MainNotions.BridgeLemma
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.LatticeGluingRadicals NumberField Module
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.LatticeGluingRadicals NumberField Module
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem tie_trace {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
-    (hc : CMData F E) (x : E) : algebraMap F E (Algebra.trace F E x) = x + star x := by
+theorem tie_trace
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+    (hc : CMData F E) (x : E)
+    : algebraMap F E (Algebra.trace F E x) = x + star x := by
   classical
-
-  have hfix : ∀ c : F, star (algebraMap F E c) = algebraMap F E c :=
-    fun c => (hc.fixed _).2 ⟨c, rfl⟩
+  have hfix : ∀ c : F, star (algebraMap F E c) = algebraMap F E c := fun c =>
+    (hc.fixed _).2 ⟨c, rfl⟩
   haveI : FiniteDimensional F E := Module.finite_of_finrank_pos (by rw [hc.deg2]; norm_num)
-  let s : E ≃ₐ[F] E :=
-    { toFun := star
-      invFun := star
-      left_inv := star_star
-      right_inv := star_star
-      map_mul' := fun a b => by rw [star_mul, mul_comm]
-      map_add' := star_add
-      commutes' := hfix }
+  let s : E ≃ₐ[F] E := {
+    toFun := star
+    invFun := star
+    left_inv := star_star
+    right_inv := star_star
+    map_mul' := fun a b => by rw [star_mul, mul_comm]
+    map_add' := star_add
+    commutes' := hfix
+  }
   have hs1 : s ≠ 1 := by
     intro h
     have hbot : (⊥ : Subalgebra F E) = ⊤ := by
@@ -43,8 +46,8 @@ theorem tie_trace {F E : Type} [Field F] [NumberField F] [Field E] [NumberField 
     exact absurd h1 (by norm_num)
   have hle : Fintype.card (E ≃ₐ[F] E) ≤ Module.finrank F E := by
     first
-      | exact AlgEquiv.card_le
-      | exact (Fintype.card_congr (algEquivEquivAlgHom F E)).le.trans AlgHom.card_le
+    | exact AlgEquiv.card_le
+    | exact (Fintype.card_congr (algEquivEquivAlgHom F E)).le.trans AlgHom.card_le
   have hpair : ({1, s} : Finset (E ≃ₐ[F] E)).card = 2 := Finset.card_pair (Ne.symm hs1)
   have hcard : Fintype.card (E ≃ₐ[F] E) = 2 := by
     have hge : ({1, s} : Finset (E ≃ₐ[F] E)).card ≤ Fintype.card (E ≃ₐ[F] E) :=
@@ -59,14 +62,14 @@ theorem tie_trace {F E : Type} [Field F] [NumberField F] [Field E] [NumberField 
     symm
     apply Finset.eq_of_subset_of_card_le (Finset.subset_univ _)
     rw [Finset.card_univ, hcard, hpair]
-  first
-    | rw [trace_eq_sum_automorphisms]
-    | rw [Algebra.trace_eq_sum_automorphisms]
+  first | rw [trace_eq_sum_automorphisms] | rw [Algebra.trace_eq_sum_automorphisms]
   rw [huniv, Finset.sum_pair (Ne.symm hs1)]
   try rfl
 
-theorem tie_aniso (D : D7) (T : ℕ) (hT : 0 < T) (F : LFlag (D.sp.Y 0) D.R.rS (T : D.host.E)) (y : (hS D).V)
-    (h1 : ∀ a, (hS D).hT (F.fl.fvec a) y = 0) (h2 : (hS D).hT y y = 0) : y ∈ F.fl.X := by
+theorem tie_aniso
+    (D : D7) (T : ℕ) (hT : 0 < T) (F : LFlag (D.sp.Y 0) D.R.rS (T : D.host.E))
+    (y : (hS D).V) (h1 : ∀ a, (hS D).hT (F.fl.fvec a) y = 0) (h2 : (hS D).hT y y = 0)
+    : y ∈ F.fl.X := by
   by_contra hy
   obtain ⟨τ⟩ : Nonempty (D.host.E →+* ℂ) := inferInstance
   have hmem : y ∈ orth (hS D) (Xplus F) := by

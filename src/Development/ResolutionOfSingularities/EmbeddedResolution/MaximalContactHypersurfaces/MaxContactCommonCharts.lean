@@ -34,30 +34,36 @@ namespace FunctorialResolution.EmbeddedResolution
 
 section
 
-variable {k : Type u} [Field k] [CharZero k] {X : Scheme.{u}}
-  {p : X ⟶ Spec (CommRingCat.of k)} [LocallyOfFiniteType p] [AlgebraicGeometry.Smooth p]
+variable
+  {k : Type u} [Field k] [CharZero k]
+  {X : Scheme.{u}} {p : X ⟶ Spec (CommRingCat.of k)}
+  [LocallyOfFiniteType p] [AlgebraicGeometry.Smooth p]
 
-private theorem presheaf_map_mem_ideal_of_mem (k : Type u) [Field k] {X : Scheme.{u}}
-    (p : X ⟶ Spec (CommRingCat.of k)) [LocallyOfFiniteType p] (D : X.IdealSheafData)
+private theorem presheaf_map_mem_ideal_of_mem
+    (k : Type u) [Field k]
+    {X : Scheme.{u}} (p : X ⟶ Spec (CommRingCat.of k)) [LocallyOfFiniteType p]
+    (D : X.IdealSheafData)
     {U V : X.Opens} (hU : IsAffineOpen U) (hV : IsAffineOpen V) (h : V ≤ U)
-    {y : Γ(X, U)} (hy : y ∈ D.ideal ⟨U, hU⟩) :
-    (X.presheaf.map (homOfLE h).op).hom y ∈ D.ideal ⟨V, hV⟩ := by
-  have hcomap : D.ideal ⟨U, hU⟩
-      ≤ (D.ideal ⟨V, hV⟩).comap (X.presheaf.map (homOfLE h).op).hom :=
+    {y : Γ(X, U)} (hy : y ∈ D.ideal ⟨U, hU⟩)
+    : (X.presheaf.map (homOfLE h).op).hom y ∈ D.ideal ⟨V, hV⟩ := by
+  have hcomap : D.ideal ⟨U, hU⟩ ≤ (D.ideal ⟨V, hV⟩).comap (X.presheaf.map (homOfLE h).op).hom :=
     D.ideal_le_comap_ideal h
   exact hcomap hy
 
-private theorem ideal_le_of_ideal_le_of_le (k : Type u) [Field k] {X : Scheme.{u}}
-    (p : X ⟶ Spec (CommRingCat.of k)) [LocallyOfFiniteType p] (D E : X.IdealSheafData)
+private theorem ideal_le_of_ideal_le_of_le
+    (k : Type u) [Field k]
+    {X : Scheme.{u}} (p : X ⟶ Spec (CommRingCat.of k)) [LocallyOfFiniteType p]
+    (D E : X.IdealSheafData)
     {U V : X.Opens} (hU : IsAffineOpen U) (hV : IsAffineOpen V) (h : V ≤ U)
-    (hDleE : D.ideal ⟨U, hU⟩ ≤ E.ideal ⟨U, hU⟩) : D.ideal ⟨V, hV⟩ ≤ E.ideal ⟨V, hV⟩ := by
+    (hDleE : D.ideal ⟨U, hU⟩ ≤ E.ideal ⟨U, hU⟩)
+    : D.ideal ⟨V, hV⟩ ≤ E.ideal ⟨V, hV⟩ := by
   let _ : Algebra k Γ(X, U) := sectionsAlgebra k p U
   have : IsNoetherianRing Γ(X, U) :=
     isNoetherianRing_sections k p ⟨U, hU⟩ (algebraMap_sectionsAlgebra k p U)
   obtain ⟨s, hs⟩ : (D.ideal ⟨U, hU⟩).FG := IsNoetherian.noetherian _
   have hs' : Ideal.span (↑s : Set Γ(X, U)) = D.ideal ⟨U, hU⟩ := hs
-  have hspan : D.ideal ⟨V, hV⟩
-      = Ideal.span ((X.presheaf.map (homOfLE h).op).hom '' (↑s : Set Γ(X, U))) :=
+  have hspan
+      : D.ideal ⟨V, hV⟩ = Ideal.span ((X.presheaf.map (homOfLE h).op).hom '' (↑s : Set Γ(X, U))) :=
     ideal_eq_span_image_map_of_le D hU hV h (↑s : Set Γ(X, U)) hs'.symm
   rw [hspan, Ideal.span_le]
   rintro _ ⟨y, hy, rfl⟩
@@ -66,66 +72,68 @@ private theorem ideal_le_of_ideal_le_of_le (k : Type u) [Field k] {X : Scheme.{u
     exact Ideal.subset_span hy
   exact presheaf_map_mem_ideal_of_mem k p E hU hV h (hDleE hyD)
 
-private theorem restrictIdeal_eq_coordIdeal_of_coord_eq {X : Scheme.{u}} {k : Type u} [Field k]
-    {p : X ⟶ Spec (CommRingCat.of k)} {V : X.Opens} (hV : IsAffineOpen V) {n : ℕ}
-    (c c' : EtaleChart p V n) (j : Fin n) (hcoord : c'.coord j = c.coord j)
-    (D : X.IdealSheafData) (hD : restrictIdeal D V = c.coordIdeal {j}) :
-    restrictIdeal D V = c'.coordIdeal {j} := by
-  have h1 : D.ideal ⟨V, hV⟩
-      = Ideal.span (c.coord '' ((({j} : Finset (Fin n))) : Set (Fin n))) :=
+private theorem restrictIdeal_eq_coordIdeal_of_coord_eq
+    {X : Scheme.{u}} {k : Type u} [Field k]
+    {p : X ⟶ Spec (CommRingCat.of k)} {V : X.Opens} (hV : IsAffineOpen V)
+    {n : ℕ} (c c' : EtaleChart p V n) (j : Fin n) (hcoord : c'.coord j = c.coord j)
+    (D : X.IdealSheafData) (hD : restrictIdeal D V = c.coordIdeal {j})
+    : restrictIdeal D V = c'.coordIdeal {j} := by
+  have h1 : D.ideal ⟨V, hV⟩ = Ideal.span (c.coord '' ((({j} : Finset (Fin n))) : Set (Fin n))) :=
     c.ideal_eq_span_coord hV D {j} hD
   refine restrictIdeal_eq_coordIdeal_of_ideal_eq_span hV c' D {j} ?_
   rw [h1, Finset.coe_singleton, Set.image_singleton, Set.image_singleton, hcoord]
 
-theorem exists_common_charts_of_isMaxContactHypersurface (A : X.IdealSheafData) {μ : ℕ}
-    (hμ : 1 ≤ μ) (N : List X.IdealSheafData) (H₁ H₂ : X.IdealSheafData)
-    (hsnc₁ : InStrictNormalCrossingPosition p (H₁ :: N)) (hsnc₂ : InStrictNormalCrossingPosition p (H₂ :: N))
-    (hadm₁ : IsMaxContactHypersurface k p A μ H₁)
-    (hadm₂ : IsMaxContactHypersurface k p A μ H₂)
-    (x : X) (hx : x ∈ orderAtLeastLocus A μ) :
-    ∃ (V : X.Opens) (_ : IsAffineOpen V) (hxV : x ∈ V) (n : ℕ) (c₁ : EtaleChart p V n)
-      (c₂ : EtaleChart p V n) (γ : ℕ → Option (Fin n)) (j₀ : Fin n),
-      restrictIdeal H₁ V = c₁.coordIdeal {j₀} ∧
-      restrictIdeal H₂ V = c₂.coordIdeal {j₀} ∧
-      IsMaxContactCoord k p A μ c₁ j₀ ∧
-      IsMaxContactCoord k p A μ c₂ j₀ ∧
-      (X.presheaf.germ V x hxV).hom (c₁.coord j₀) ∈
-        IsLocalRing.maximalIdeal ↑(X.presheaf.stalk x) ∧
-      (X.presheaf.germ V x hxV).hom (c₂.coord j₀) ∈
-        IsLocalRing.maximalIdeal ↑(X.presheaf.stalk x) ∧
-      (∀ j : Fin n, j ≠ j₀ → c₂.coord j = c₁.coord j) ∧
-      (∀ i : ℕ, ∀ hi : i < N.length,
-        (γ i = none → restrictIdeal (N[i]'hi) V = ⊤) ∧
-          ∀ j : Fin n, γ i = some j → restrictIdeal (N[i]'hi) V = c₁.coordIdeal {j}) ∧
-      (∀ i i' : ℕ, i < N.length → i' < N.length → ∀ j : Fin n,
-        γ i = some j → γ i' = some j → i = i') ∧
-      (∀ i : ℕ, γ i ≠ some j₀) := by
+theorem exists_common_charts_of_isMaxContactHypersurface
+    (A : X.IdealSheafData)
+    {μ : ℕ} (hμ : 1 ≤ μ)
+    (N : List X.IdealSheafData) (H₁ H₂ : X.IdealSheafData)
+    (hsnc₁ : InStrictNormalCrossingPosition p (H₁ :: N))
+    (hsnc₂ : InStrictNormalCrossingPosition p (H₂ :: N))
+    (hadm₁ : IsMaxContactHypersurface k p A μ H₁) (hadm₂ : IsMaxContactHypersurface k p A μ H₂)
+    (x : X) (hx : x ∈ orderAtLeastLocus A μ)
+    : ∃ (V : X.Opens) (_ : IsAffineOpen V) (hxV : x ∈ V) (n : ℕ) (c₁ : EtaleChart p V n)
+        (c₂ : EtaleChart p V n) (γ : ℕ → Option (Fin n)) (j₀ : Fin n),
+      restrictIdeal H₁ V = c₁.coordIdeal {j₀} ∧ restrictIdeal H₂ V = c₂.coordIdeal {j₀}
+        ∧ IsMaxContactCoord k p A μ c₁ j₀ ∧ IsMaxContactCoord k p A μ c₂ j₀
+        ∧ (X.presheaf.germ V x hxV).hom (c₁.coord j₀)
+          ∈ IsLocalRing.maximalIdeal ↑(X.presheaf.stalk x)
+        ∧ (X.presheaf.germ V x hxV).hom (c₂.coord j₀)
+          ∈ IsLocalRing.maximalIdeal ↑(X.presheaf.stalk x)
+        ∧ (∀ j : Fin n, j ≠ j₀ → c₂.coord j = c₁.coord j)
+        ∧ (∀ i : ℕ, ∀ hi : i < N.length,
+          (γ i = none → restrictIdeal (N[i]'hi) V = ⊤)
+            ∧ ∀ j : Fin n, γ i = some j → restrictIdeal (N[i]'hi) V = c₁.coordIdeal {j})
+        ∧ (∀ i i' : ℕ,
+          i < N.length → i' < N.length → ∀ j : Fin n, γ i = some j → γ i' = some j → i = i')
+        ∧ (∀ i : ℕ, γ i ≠ some j₀) := by
   classical
   have hxH₁ : x ∈ H₁.support := hadm₁.orderAtLeastLocus_subset_support hμ hx
   have hxH₂ : x ∈ H₂.support := hadm₂.orderAtLeastLocus_subset_support hμ hx
   obtain ⟨U₁, hU₁, hxU₁, hcase₁⟩ := (isMaxContactHypersurface_iff k p A μ H₁).mp hadm₁ x
-  obtain ⟨n₁, d₁, i₁, hH₁U₁, hmc₁⟩ :
-      ∃ (n : ℕ) (c : EtaleChart p U₁ n) (j : Fin n),
+  obtain ⟨n₁, d₁, i₁, hH₁U₁, hmc₁⟩
+      : ∃ (n : ℕ) (c : EtaleChart p U₁ n) (j : Fin n),
         restrictIdeal H₁ U₁ = c.coordIdeal {j} ∧ IsMaxContactCoord k p A μ c j := by
     rcases hcase₁ with ⟨hdisj, -⟩ | hc
     · exact absurd hxU₁ (Set.disjoint_left.mp hdisj hx)
     · exact hc
   obtain ⟨U₂, hU₂, hxU₂, hcase₂⟩ := (isMaxContactHypersurface_iff k p A μ H₂).mp hadm₂ x
-  obtain ⟨n₂, d₂, i₂, hH₂U₂, hmc₂⟩ :
-      ∃ (n : ℕ) (c : EtaleChart p U₂ n) (j : Fin n),
+  obtain ⟨n₂, d₂, i₂, hH₂U₂, hmc₂⟩
+      : ∃ (n : ℕ) (c : EtaleChart p U₂ n) (j : Fin n),
         restrictIdeal H₂ U₂ = c.coordIdeal {j} ∧ IsMaxContactCoord k p A μ c j := by
     rcases hcase₂ with ⟨hdisj, -⟩ | hc
     · exact absurd hxU₂ (Set.disjoint_left.mp hdisj hx)
     · exact hc
   have hM₁ : H₁.ideal ⟨U₁, hU₁⟩ ≤ (maxContactIdeal k p A μ).ideal ⟨U₁, hU₁⟩ := by
-    have h1 : H₁.ideal ⟨U₁, hU₁⟩
-        = Ideal.span (d₁.coord '' ((({i₁} : Finset (Fin n₁))) : Set (Fin n₁))) :=
+    have h1
+        : H₁.ideal ⟨U₁, hU₁⟩
+          = Ideal.span (d₁.coord '' ((({i₁} : Finset (Fin n₁))) : Set (Fin n₁))) :=
       d₁.ideal_eq_span_coord hU₁ H₁ {i₁} hH₁U₁
     rw [h1, Finset.coe_singleton, Set.image_singleton, Ideal.span_le, Set.singleton_subset_iff]
     exact (isMaxContactCoord_iff_coord_mem k p A μ hU₁ d₁ i₁).mp hmc₁
   have hM₂ : H₂.ideal ⟨U₂, hU₂⟩ ≤ (maxContactIdeal k p A μ).ideal ⟨U₂, hU₂⟩ := by
-    have h1 : H₂.ideal ⟨U₂, hU₂⟩
-        = Ideal.span (d₂.coord '' ((({i₂} : Finset (Fin n₂))) : Set (Fin n₂))) :=
+    have h1
+        : H₂.ideal ⟨U₂, hU₂⟩
+          = Ideal.span (d₂.coord '' ((({i₂} : Finset (Fin n₂))) : Set (Fin n₂))) :=
       d₂.ideal_eq_span_coord hU₂ H₂ {i₂} hH₂U₂
     rw [h1, Finset.coe_singleton, Set.image_singleton, Ideal.span_le, Set.singleton_subset_iff]
     exact (isMaxContactCoord_iff_coord_mem k p A μ hU₂ d₂ i₂).mp hmc₂
@@ -138,20 +146,25 @@ theorem exists_common_charts_of_isMaxContactHypersurface (A : X.IdealSheafData) 
   obtain ⟨V₀, hV₀b, hxV₀, hV₀W⟩ :=
     TopologicalSpace.Opens.isBasis_iff_nbhd.mp X.isBasis_affineOpens hxW
   have hV₀ : IsAffineOpen V₀ := hV₀b
-  have hdesc0 : ∀ i : ℕ, ∀ hi : i < (H₁ :: N).length,
-      (a i = none → restrictIdeal ((H₁ :: N)[i]'hi) V₀ = ⊤) ∧
-        ∀ j : Fin m₀, a i = some j →
-          restrictIdeal ((H₁ :: N)[i]'hi) V₀ = (c₀.restrict hV₀W).coordIdeal {j} := by
+  have hdesc0
+      : ∀ i : ℕ, ∀ hi : i < (H₁ :: N).length,
+        (a i = none → restrictIdeal ((H₁ :: N)[i]'hi) V₀ = ⊤)
+          ∧ ∀ j : Fin m₀,
+            a i = some j
+              → restrictIdeal ((H₁ :: N)[i]'hi) V₀ = (c₀.restrict hV₀W).coordIdeal {j} := by
     intro i hi
     refine ⟨fun hn => restrictIdeal_eq_top_of_le _ hV₀W (hanone i hi hn), ?_⟩
     intro j hj
     exact restrictIdeal_eq_restrict_coordIdeal_of_le hV₀W c₀ _ {j} (hasome i hi j hj)
-  have hinj0 : ∀ i i' : ℕ, i < (H₁ :: N).length → i' < (H₁ :: N).length →
-      ∀ j : Fin m₀, a i = some j → a i' = some j → i = i' := by
+  have hinj0
+      : ∀ i i' : ℕ,
+        i < (H₁ :: N).length → i' < (H₁ :: N).length
+          → ∀ j : Fin m₀, a i = some j → a i' = some j → i = i' := by
     intro i i' hi hi' j h1 h2
     exact hainj i hi i' hi' j h1 h2
   obtain ⟨U', hU', hxU', n', c', a', hdesc', hinj', hprime'⟩ :=
-    exists_etaleChart_coord_mem_primeIdealOf (H₁ :: N) x V₀ hV₀ hxV₀ (c₀.restrict hV₀W) a hdesc0 hinj0
+    exists_etaleChart_coord_mem_primeIdealOf (H₁ :: N) x V₀ hV₀ hxV₀ (c₀.restrict hV₀W) a hdesc0
+      hinj0
   have hlt0 : 0 < (H₁ :: N).length := by simp
   obtain ⟨j₀, hj₀⟩ : ∃ t : Fin n', a' 0 = some t := by
     cases h0 : a' 0 with
@@ -164,12 +177,13 @@ theorem exists_common_charts_of_isMaxContactHypersurface (A : X.IdealSheafData) 
   have hH₁U' : restrictIdeal H₁ U' = c'.coordIdeal {j₀} := by
     have h1 := (hdesc' 0 hlt0).2 j₀ hj₀
     simpa only [List.getElem_cons_zero] using h1
-  obtain ⟨γ, hγval, hγnone⟩ :
-      ∃ γ : ℕ → Option (Fin n'),
-        (∀ i : ℕ, i < N.length → γ i = a' (i + 1)) ∧
-        (∀ i : ℕ, ¬ i < N.length → γ i = none) :=
-    ⟨fun i => if i < N.length then a' (i + 1) else none, fun i hi => if_pos hi,
-      fun i hi => if_neg hi⟩
+  obtain ⟨γ, hγval, hγnone⟩
+      : ∃ γ : ℕ → Option (Fin n'),
+        (∀ i : ℕ, i < N.length → γ i = a' (i + 1)) ∧ (∀ i : ℕ, ¬ i < N.length → γ i = none) := ⟨
+    fun i => if i < N.length then a' (i + 1) else none,
+    fun i hi => if_pos hi,
+    fun i hi => if_neg hi
+  ⟩
   have hγinj : LabelingInjective γ N.length := by
     intro i i' hi hi' j hj hj'
     rw [hγval i hi] at hj
@@ -214,8 +228,7 @@ theorem exists_common_charts_of_isMaxContactHypersurface (A : X.IdealSheafData) 
       have h2 := (hdesc' (i + 1) hiE).2 j ha'
       rw [hget] at h2
       exact h2
-  have hxN : ∀ i : ℕ, ∀ hi : i < N.length, ∀ j : Fin n',
-      γ i = some j → x ∈ (N[i]'hi).support := by
+  have hxN : ∀ i : ℕ, ∀ hi : i < N.length, ∀ j : Fin n', γ i = some j → x ∈ (N[i]'hi).support := by
     intro i hi j hj
     have hiE : i + 1 < (H₁ :: N).length := by
       simp only [List.length_cons]
@@ -251,21 +264,21 @@ theorem exists_common_charts_of_isMaxContactHypersurface (A : X.IdealSheafData) 
     refine ⟨(X.presheaf.map (homOfLE hVW₂).op).hom f₂, ?_⟩
     have h2 := ideal_eq_span_image_map_of_le H₂ hW₂ hV hVW₂ ({f₂} : Set Γ(X, W₂)) hf₂span
     rwa [Set.image_singleton] at h2
-  obtain ⟨jd, hjdlab, hjdpd⟩ : ∃ j : Fin n',
-      (∀ i : ℕ, i < N.length → γ i ≠ some j) ∧
-      chartPartialDeriv hV (c'.restrict hVU') j g ∉
-        (hV.primeIdealOf ⟨x, hxV⟩).asIdeal :=
-    exists_unlabeled_index_partialDeriv_notMem_primeIdealOf hV (c'.restrict hVU') hxV N γ
-      H₂ g hlab hγinj (hsnc₂'.2 x) hg hxH₂ hxN
-  have hjdpd' :
-      chartPartialDeriv hV (c'.restrict hVU') jd g ∉ (hV.primeIdealOf ⟨x, hxV⟩).asIdeal := hjdpd
-  obtain ⟨c'', hcj₀, hclab, hpd⟩ : ∃ c'' : EtaleChart p V n',
-      c''.coord j₀ = (c'.restrict hVU').coord j₀ ∧
-      (∀ j : Fin n', (∃ i : ℕ, i < N.length ∧ γ i = some j) →
-        c''.coord j = (c'.restrict hVU').coord j) ∧
-      chartPartialDeriv hV c'' j₀ g ∉ (hV.primeIdealOf ⟨x, hxV⟩).asIdeal := by
-    by_cases h0 : chartPartialDeriv hV (c'.restrict hVU') j₀ g ∈
-        (hV.primeIdealOf ⟨x, hxV⟩).asIdeal
+  obtain ⟨jd, hjdlab, hjdpd⟩
+      : ∃ j : Fin n',
+        (∀ i : ℕ, i < N.length → γ i ≠ some j)
+          ∧ chartPartialDeriv hV (c'.restrict hVU') j g ∉ (hV.primeIdealOf ⟨x, hxV⟩).asIdeal :=
+    exists_unlabeled_index_partialDeriv_notMem_primeIdealOf hV (c'.restrict hVU') hxV N γ H₂ g hlab
+      hγinj (hsnc₂'.2 x) hg hxH₂ hxN
+  have hjdpd' : chartPartialDeriv hV (c'.restrict hVU') jd g ∉ (hV.primeIdealOf ⟨x, hxV⟩).asIdeal :=
+    hjdpd
+  obtain ⟨c'', hcj₀, hclab, hpd⟩
+      : ∃ c'' : EtaleChart p V n',
+        c''.coord j₀ = (c'.restrict hVU').coord j₀
+          ∧ (∀ j : Fin n',
+            (∃ i : ℕ, i < N.length ∧ γ i = some j) → c''.coord j = (c'.restrict hVU').coord j)
+          ∧ chartPartialDeriv hV c'' j₀ g ∉ (hV.primeIdealOf ⟨x, hxV⟩).asIdeal := by
+    by_cases h0 : chartPartialDeriv hV (c'.restrict hVU') j₀ g ∈ (hV.primeIdealOf ⟨x, hxV⟩).asIdeal
     · have hne : j₀ ≠ jd := by
         intro hh
         rw [hh] at h0
@@ -280,10 +293,12 @@ theorem exists_common_charts_of_isMaxContactHypersurface (A : X.IdealSheafData) 
       · rw [hderiv g, map_one, one_mul]
         intro hmem
         apply hjdpd'
-        have heq : chartPartialDeriv hV (c'.restrict hVU') jd g
-            = chartPartialDeriv hV (c'.restrict hVU') j₀ g
-              - (chartPartialDeriv hV (c'.restrict hVU') j₀ g
-                 - chartPartialDeriv hV (c'.restrict hVU') jd g) := by ring
+        have heq
+            : chartPartialDeriv hV (c'.restrict hVU') jd g
+              = chartPartialDeriv hV (c'.restrict hVU') j₀ g
+                - (chartPartialDeriv hV (c'.restrict hVU') j₀ g
+                  - chartPartialDeriv hV (c'.restrict hVU') jd g) := by
+          ring
         rw [heq]
         exact Submodule.sub_mem _ h0 hmem
     · exact ⟨c'.restrict hVU', rfl, fun j _ => rfl, h0⟩
@@ -293,8 +308,8 @@ theorem exists_common_charts_of_isMaxContactHypersurface (A : X.IdealSheafData) 
     intro i hi
     refine ⟨(hlab i hi).1, ?_⟩
     intro j hj
-    exact restrictIdeal_eq_coordIdeal_of_coord_eq hV (c'.restrict hVU') c'' j
-      (hclab j ⟨i, hi, hj⟩) (N[i]'hi) ((hlab i hi).2 j hj)
+    exact restrictIdeal_eq_coordIdeal_of_coord_eq hV (c'.restrict hVU') c'' j (hclab j ⟨i, hi, hj⟩)
+      (N[i]'hi) ((hlab i hi).2 j hj)
   obtain ⟨V', hV', hV'V, hxV', c₂, hc₂j₀, hc₂other⟩ :=
     exists_etaleChart_update_coord_of_partialDeriv_notMem hV c'' hxV j₀ g hpd
   have hH₁V' : restrictIdeal H₁ V' = (c''.restrict hV'V).coordIdeal {j₀} :=
@@ -312,28 +327,28 @@ theorem exists_common_charts_of_isMaxContactHypersurface (A : X.IdealSheafData) 
   have hmcc₁ : IsMaxContactCoord k p A μ (c''.restrict hV'V) j₀ := by
     rw [isMaxContactCoord_iff_coord_mem k p A μ hV' (c''.restrict hV'V) j₀]
     have h1 : H₁.ideal ⟨V', hV'⟩ ≤ (maxContactIdeal k p A μ).ideal ⟨V', hV'⟩ :=
-      ideal_le_of_ideal_le_of_le k p H₁ (maxContactIdeal k p A μ) hU₁ hV'
-        (le_trans hV'V hVU₁) hM₁
+      ideal_le_of_ideal_le_of_le k p H₁ (maxContactIdeal k p A μ) hU₁ hV' (le_trans hV'V hVU₁) hM₁
     refine h1 ?_
     rw [hH₁id]
     exact Ideal.mem_span_singleton_self _
   have hmcc₂ : IsMaxContactCoord k p A μ c₂ j₀ := by
     rw [isMaxContactCoord_iff_coord_mem k p A μ hV' c₂ j₀]
     have h1 : H₂.ideal ⟨V', hV'⟩ ≤ (maxContactIdeal k p A μ).ideal ⟨V', hV'⟩ :=
-      ideal_le_of_ideal_le_of_le k p H₂ (maxContactIdeal k p A μ) hU₂ hV'
-        (le_trans hV'V hVU₂) hM₂
+      ideal_le_of_ideal_le_of_le k p H₂ (maxContactIdeal k p A μ) hU₂ hV' (le_trans hV'V hVU₂) hM₂
     refine h1 ?_
     rw [hgV']
     exact Ideal.mem_span_singleton_self _
-  have hgerm₁ : (X.presheaf.germ V' x hxV').hom ((c''.restrict hV'V).coord j₀)
-      ∈ IsLocalRing.maximalIdeal ↑(X.presheaf.stalk x) := by
+  have hgerm₁
+      : (X.presheaf.germ V' x hxV').hom ((c''.restrict hV'V).coord j₀)
+        ∈ IsLocalRing.maximalIdeal ↑(X.presheaf.stalk x) := by
     have hmem : (c''.restrict hV'V).coord j₀ ∈ H₁.ideal ⟨V', hV'⟩ := by
       rw [hH₁id]
       exact Ideal.mem_span_singleton_self _
     have h2 := germ_mem_stalkIdeal H₁ x ⟨V', hV'⟩ hxV' hmem
     exact (mem_support_iff_stalkIdeal_le_maximalIdeal H₁ x).mp hxH₁ h2
-  have hgerm₂ : (X.presheaf.germ V' x hxV').hom (c₂.coord j₀)
-      ∈ IsLocalRing.maximalIdeal ↑(X.presheaf.stalk x) := by
+  have hgerm₂
+      : (X.presheaf.germ V' x hxV').hom (c₂.coord j₀)
+        ∈ IsLocalRing.maximalIdeal ↑(X.presheaf.stalk x) := by
     have hmem : c₂.coord j₀ ∈ H₂.ideal ⟨V', hV'⟩ := by
       rw [hgV']
       exact Ideal.mem_span_singleton_self _
@@ -342,19 +357,37 @@ theorem exists_common_charts_of_isMaxContactHypersurface (A : X.IdealSheafData) 
   have hcoords : ∀ j : Fin n', j ≠ j₀ → c₂.coord j = (c''.restrict hV'V).coord j := by
     intro j hj
     rw [hc₂other j hj]
-    change (X.presheaf.map (homOfLE hV'V).op).hom (c''.coord j) =
-      (c''.restrictCompat hV'V).coord j
+    change (X.presheaf.map (homOfLE hV'V).op).hom (c''.coord j) = (c''.restrictCompat hV'V).coord j
     exact (EtaleChart.coord_restrict c'' hV'V j).symm
-  have hlabV' : ∀ i : ℕ, ∀ hi : i < N.length,
-      (γ i = none → restrictIdeal (N[i]'hi) V' = ⊤) ∧
-        ∀ j : Fin n', γ i = some j →
-          restrictIdeal (N[i]'hi) V' = (c''.restrict hV'V).coordIdeal {j} := by
+  have hlabV'
+      : ∀ i : ℕ, ∀ hi : i < N.length,
+        (γ i = none → restrictIdeal (N[i]'hi) V' = ⊤)
+          ∧ ∀ j : Fin n',
+            γ i = some j → restrictIdeal (N[i]'hi) V' = (c''.restrict hV'V).coordIdeal {j} := by
     intro i hi
     refine ⟨fun hn => restrictIdeal_eq_top_of_le (N[i]'hi) hV'V ((hlab'' i hi).1 hn), ?_⟩
     intro j hj
     exact restrictIdeal_eq_restrict_coordIdeal_of_le hV'V c'' (N[i]'hi) {j} ((hlab'' i hi).2 j hj)
-  exact ⟨V', hV', hxV', n', c''.restrict hV'V, c₂, γ, j₀, hH₁V', hH₂V', hmcc₁, hmcc₂,
-    hgerm₁, hgerm₂, hcoords, hlabV', hγinj, hγj₀⟩
+  exact ⟨
+    V',
+    hV',
+    hxV',
+    n',
+    c''.restrict hV'V,
+    c₂,
+    γ,
+    j₀,
+    hH₁V',
+    hH₂V',
+    hmcc₁,
+    hmcc₂,
+    hgerm₁,
+    hgerm₂,
+    hcoords,
+    hlabV',
+    hγinj,
+    hγj₀
+  ⟩
 
 end
 

@@ -99,15 +99,19 @@ lemma coeff_prod_geom (k : ℕ) :
   simp only [PowerSeries.coeff_mk]
   rw [MvPolynomial.monomial_eq, MvPolynomial.C_1, one_mul, Finsupp.prod_fintype _ _ (fun _ => pow_zero _)]
 
-theorem esymm_hsymm_rel (k : ℕ) (hk : 1 ≤ k) :
-    ∑ i ∈ range (k + 1), (-1) ^ i * MvPolynomial.esymm σ R i * MvPolynomial.hsymm σ R (k - i) = 0 := by
-  have hAB : (∏ j : σ, (1 - PowerSeries.C (MvPolynomial.X j : MvPolynomial σ R) * PowerSeries.X)) *
-      (∏ j : σ, PowerSeries.mk (fun m => (MvPolynomial.X j : MvPolynomial σ R) ^ m)) = 1 := by
+theorem esymm_hsymm_rel (k : ℕ) (hk : 1 ≤ k)
+    : ∑ i ∈ range (k + 1), (-1) ^ i * MvPolynomial.esymm σ R i * MvPolynomial.hsymm σ R (k - i)
+      = 0 := by
+  have hAB
+      : (∏ j : σ, (1 - PowerSeries.C (MvPolynomial.X j : MvPolynomial σ R) * PowerSeries.X))
+          * (∏ j : σ, PowerSeries.mk (fun m => (MvPolynomial.X j : MvPolynomial σ R) ^ m))
+        = 1 := by
     rw [← Finset.prod_mul_distrib]
     exact Finset.prod_eq_one fun j _ => geom_mul _
   have h := congrArg (PowerSeries.coeff k) hAB
-  rw [PowerSeries.coeff_mul, Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk, PowerSeries.coeff_one,
-    if_neg (by omega)] at h
+  rw [PowerSeries.coeff_mul, Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk,
+      PowerSeries.coeff_one, if_neg (by omega)]
+    at h
   simp only [coeff_prod_one_sub, coeff_prod_geom] at h
   exact h
 
@@ -128,7 +132,6 @@ end Formalism.FT.SymmetricSeries
 namespace Formalism.FT.SymmetricSeries
 
 variable {R : Type*} [CommRing R] {n : ℕ}
-
 
 end Formalism.FT.SymmetricSeries
 

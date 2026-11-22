@@ -13,11 +13,16 @@ noncomputable section
 
 namespace GlobalTheory.KZ.ES
 
-
 open GlobalTheory.KroneckerCongruence in
-theorem kron_frob_diag : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε),
-    ∀ (q : ℕ), q.Prime → ∀ (V : ValuationSubring Ω) (s : Ω ≃ₐ[ℚ] Ω), FrobV V q s → ∀ a : X.K, IntC X V a →
-    SmallC X V (X.sl (toGQ !![(q : ℤ), 0; 0, 1]) a - (X.gal s.symm a) ^ q) := by
+theorem kron_frob_diag
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε),
+      ∀ (q : ℕ),
+        q.Prime
+          → ∀ (V : ValuationSubring Ω) (s : Ω ≃ₐ[ℚ] Ω),
+            FrobV V q s
+              → ∀ a : X.K,
+                IntC X V a
+                  → SmallC X V (X.sl (toGQ !![(q : ℤ), 0; 0, 1]) a - (X.gal s.symm a) ^ q) := by
   intro Ω _ _ _ ε X q hq V s hs a ha r
   classical
   haveI : Fact q.Prime := ⟨hq⟩
@@ -44,12 +49,15 @@ theorem kron_frob_diag : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosu
   set B := X.exp (X.gal s.symm a) with hB
   have hBc : ∀ t, B.coeff t = s.symm (c.coeff t) := fun t => by rw [hB, X.gal_exp]
   have hBV : ∀ t, B.coeff t ∈ V := fun t => by rw [hBc]; exact (hs.2 _ (ha t)).2.1
-  have hBq : X.exp ((X.gal s.symm a) ^ q) = hahnSeriesCoeffRingHomMap V.subtype (liftV V B hBV ^ q) := by
+  have hBq
+      : X.exp ((X.gal s.symm a) ^ q) = hahnSeriesCoeffRingHomMap V.subtype (liftV V B hBV ^ q) := by
     rw [map_pow, map_pow, map_liftV]
   set y : V := (liftV V B hBV ^ q).coeff r with hy_def
-  have hy : (X.exp ((X.gal s.symm a) ^ q)).coeff r = (y : Ω) := by rw [hBq, hahnSeriesCoeffRingHomMap_coeff]; rfl
+  have hy : (X.exp ((X.gal s.symm a) ^ q)).coeff r = (y : Ω) := by
+    rw [hBq, hahnSeriesCoeffRingHomMap_coeff]; rfl
   have hρy : ρ y = ρ ⟨c.coeff (r / q), ha _⟩ := by
-    have h1 : ρ y = (hahnSeriesCoeffRingHomMap ρ (liftV V B hBV ^ q)).coeff r := by rw [hahnSeriesCoeffRingHomMap_coeff]
+    have h1 : ρ y = (hahnSeriesCoeffRingHomMap ρ (liftV V B hBV ^ q)).coeff r := by
+      rw [hahnSeriesCoeffRingHomMap_coeff]
     rw [h1, map_pow, coeff_pow_char q, hahnSeriesCoeffRingHomMap_coeff]
     have h2 : (liftV V B hBV).coeff (r / q) = ⟨s.symm (c.coeff (r / q)), (hs.2 _ (ha _)).2.1⟩ :=
       Subtype.ext (hBc _)

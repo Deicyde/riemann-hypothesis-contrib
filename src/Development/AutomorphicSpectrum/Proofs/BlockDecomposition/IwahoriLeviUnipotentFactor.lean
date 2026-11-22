@@ -6,16 +6,19 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsJ
 
 @[expose] public section
 
-open PositivityTheory.LowerBoundConstant GlobalTheory GlobalTheory.Published GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.SplitRead Topology
+open PositivityTheory.LowerBoundConstant GlobalTheory GlobalTheory.Published GlobalTheory.PRep
+  GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.SplitRead Topology
 
 namespace GlobalTheory.CompanionTheory.KOneFactor
 
 open GlobalTheory.LocGL GlobalTheory.LocGL.IwahoriFactor
 
-theorem sub_one_apply_eq_zero {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] {n s : ℕ} {d : Fin s → ℕ} (e : (Σ a, Fin (d a)) ≃ Fin n)
-    {c : GL (Fin n) k} (hc : c ∈ unipRadLower k e) (i j : Fin n)
-    (hij : ¬ (e.symm j).1 < (e.symm i).1) : ((c : Matrix (Fin n) (Fin n) k) - 1) i j = 0 := by
+theorem sub_one_apply_eq_zero
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {n s : ℕ} {d : Fin s → ℕ} (e : (Σ a, Fin (d a)) ≃ Fin n)
+    {c : GL (Fin n) k} (hc : c ∈ unipRadLower k e)
+    (i j : Fin n) (hij : ¬ (e.symm j).1 < (e.symm i).1)
+    : ((c : Matrix (Fin n) (Fin n) k) - 1) i j = 0 := by
   obtain ⟨hP, hD⟩ := (GlobalTheory.SmGL.mem_unipRadLower k).1 hc
   have hB := (GlobalTheory.SmGL.mem_parabLower_iff k).1 hP
   obtain ⟨⟨a, p⟩, rfl⟩ := e.surjective i
@@ -26,9 +29,12 @@ theorem sub_one_apply_eq_zero {k : Type} [Field k] [ValuativeRel k] [Topological
   · rw [hB a b p q hab, GlobalTheory.LocGL.IwahoriFactor.one_ne e hab.ne p q]
   · rw [hD a p q, GlobalTheory.LocGL.IwahoriFactor.one_same e a p q]
 
-theorem kone_factor : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n s : ℕ) (d : Fin s → ℕ) (e : (Σ a, Fin (d a)) ≃ Fin n), ∀ g ∈ KOne k (Fin n),
-    ∃ m : Levi k (fun a => Fin (d a)), leviEmb k e m ∈ KOne k (Fin n) ∧
-      ∃ x ∈ unipRad k e ⊓ KOne k (Fin n), ∃ c ∈ lowC k e, g = leviEmb k e m * x * c := by
+theorem kone_factor
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n s : ℕ) (d : Fin s → ℕ) (e : (Σ a, Fin (d a)) ≃ Fin n),
+      ∀ g ∈ KOne k (Fin n), ∃ m : Levi k (fun a => Fin (d a)),
+        leviEmb k e m ∈ KOne k (Fin n)
+          ∧ ∃ x ∈ unipRad k e ⊓ KOne k (Fin n), ∃ c ∈ lowC k e, g = leviEmb k e m * x * c := by
   intro k _ _ _ _ n s d e g hg
   obtain ⟨c, hc, hgc⟩ := GlobalTheory.LocGL.IwahoriFactor.exists_mul_mem_parab e hg
   have hcP : c ∈ GlobalTheory.SplitWeil.KOne k (Fin n) := by
@@ -57,7 +63,8 @@ theorem kone_factor : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpac
       have h := StepData.mem_KOne.1 (mul_mem hg hcP) (e ⟨a, i⟩) (e ⟨a, j⟩)
       rw [Matrix.sub_apply, one_same] at h
       simpa [Matrix.sub_apply, one_same, m] using h
-    · rw [Matrix.sub_apply, GlobalTheory.SmGL.leviEmb_apply_ne k e m hab, one_ne e hab, sub_zero, map_zero]
+    · rw [Matrix.sub_apply, GlobalTheory.SmGL.leviEmb_apply_ne k e m hab, one_ne e hab, sub_zero,
+        map_zero]
       exact zero_lt_one
   refine ⟨m, hpP, u, ?_, c⁻¹, ?_, eq_mul_inv_of_mul_eq hpu⟩
   · have hug : (GlobalTheory.SmGL.leviEmb k e m)⁻¹ * (g * c) = u := inv_mul_eq_iff_eq_mul.2 hpu
@@ -73,6 +80,9 @@ theorem kone_factor : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpac
       | exact (Subgroup.mem_inf.1 hu).2
     exact Subgroup.mem_inf.2 ⟨hur, huP⟩
   · show _ ∧ _
-    exact ⟨inv_mem hcP, fun i j hij => GlobalTheory.CompanionTheory.KOneFactor.sub_one_apply_eq_zero e hcl i j hij⟩
+    exact ⟨
+      inv_mem hcP,
+      fun i j hij => GlobalTheory.CompanionTheory.KOneFactor.sub_one_apply_eq_zero e hcl i j hij
+    ⟩
 
 end GlobalTheory.CompanionTheory.KOneFactor

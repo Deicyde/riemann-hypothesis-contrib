@@ -19,47 +19,56 @@ variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : �
 def pairVec (F : FlagG S r T) (F' : FlagG S r T') : Fin (r + 1) ⊕ Fin (r + 1) → S.V :=
   Sum.elim F.fvec F'.fvec
 
-def gramFF (F : FlagG S r T) (F' : FlagG S r T') :
-    Matrix (Fin (r + 1) ⊕ Fin (r + 1)) (Fin (r + 1) ⊕ Fin (r + 1)) E :=
-  fun i j => brS S (pairVec F F' j) (pairVec F F' i)
+def gramFF (F : FlagG S r T) (F' : FlagG S r T')
+    : Matrix (Fin (r + 1) ⊕ Fin (r + 1)) (Fin (r + 1) ⊕ Fin (r + 1)) E := fun i j =>
+  brS S (pairVec F F' j) (pairVec F F' i)
 
 end Defs
 
 def TF {E : Type} [CommRing E] (r : ℕ) (T : E) : Matrix (Fin (r + 1)) (Fin (r + 1)) E :=
   Matrix.diagonal fun i => if i = Fin.last r then -T else 0
 
-def Gmat {E : Type} [Field E] [StarRing E] {r : ℕ} (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : E) : E :=
-  leadMinorE Z (r + 1) * star (leadMinorE Z (r + 1)) - T * T' * (leadMinorE Z r * star (leadMinorE Z r))
+def Gmat
+    {E : Type} [Field E] [StarRing E] {r : ℕ} (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : E)
+    : E :=
+  leadMinorE Z (r + 1) * star (leadMinorE Z (r + 1))
+    - T * T' * (leadMinorE Z r * star (leadMinorE Z r))
 
-theorem gflag_eq_gmat {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ} {T T' : E}
-    (F : FlagG S r T) (F' : FlagG S r T') : Gflag F F' = Gmat (Zhat F F') T T' := rfl
+theorem gflag_eq_gmat
+    {E : Type} [Field E] [NumberField E] [StarRing E]
+    {S : HSpace E} {r : ℕ} {T T' : E} (F : FlagG S r T) (F' : FlagG S r T')
+    : Gflag F F' = Gmat (Zhat F F') T T' :=
+  rfl
 
 def GramBlocks : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (S : HSpace E) (r : ℕ) (T T' : E)
-    (F : FlagG S r T) (F' : FlagG S r T'),
+      (F : FlagG S r T) (F' : FlagG S r T'),
     gramFF F F' = Matrix.fromBlocks (TF r T) (Zhat F F') (Zhat F F')ᴴ (TF r T')
 
 def GramDetFlag : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (S : HSpace E) (r : ℕ) (T T' : E)
-    (F : FlagG S r T) (F' : FlagG S r T'),
+      (F : FlagG S r T) (F' : FlagG S r T'),
     (gramFF F F').det = (-1) ^ (r + 1) * Gflag F F'
 
 def GramIndep : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (S : HSpace E) (r : ℕ) (T T' : E)
-    (F : FlagG S r T) (F' : FlagG S r T'), Gflag F F' ≠ 0 →
-    LinearIndependent E (pairVec F F') ∧ F.Xplus ⊓ F'.Xplus = ⊥
+      (F : FlagG S r T) (F' : FlagG S r T'),
+    Gflag F F' ≠ 0 → LinearIndependent E (pairVec F F') ∧ F.Xplus ⊓ F'.Xplus = ⊥
 
 def GNonnegAt : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (S : HSpace E) (τ : E →+* ℂ),
-    (∀ a, τ (star a) = starRingEnd ℂ (τ a)) → S.SigOK →
-    ∀ (r T T' : ℕ), (S.sig τ).2 = r + 1 → 0 < T → 0 < T' →
-    ∀ (F : FlagG S r (T : E)) (F' : FlagG S r (T' : E)), ∃ c : ℝ, 0 ≤ c ∧ τ (Gflag F F') = c
+    (∀ a, τ (star a) = starRingEnd ℂ (τ a)) → S.SigOK
+      → ∀ (r T T' : ℕ),
+        (S.sig τ).2 = r + 1 → 0 < T → 0 < T'
+          → ∀ (F : FlagG S r (T : E)) (F' : FlagG S r (T' : E)), ∃ c : ℝ, 0 ≤ c ∧ τ (Gflag F F') = c
 
 def DNeZeroAt : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (S : HSpace E) (τ : E →+* ℂ),
-    (∀ a, τ (star a) = starRingEnd ℂ (τ a)) → S.SigOK →
-    ∀ (r T T' : ℕ), (S.sig τ).2 = r + 1 → 0 < T → 0 < T' →
-    ∀ (F : FlagG S r (T : E)) (F' : FlagG S r (T' : E)), Gflag F F' ≠ 0 → Dl F F' (r + 1) ≠ 0
+    (∀ a, τ (star a) = starRingEnd ℂ (τ a)) → S.SigOK
+      → ∀ (r T T' : ℕ),
+        (S.sig τ).2 = r + 1 → 0 < T → 0 < T'
+          → ∀ (F : FlagG S r (T : E)) (F' : FlagG S r (T' : E)),
+            Gflag F F' ≠ 0 → Dl F F' (r + 1) ≠ 0
 
 section Record
 
@@ -73,20 +82,21 @@ section Lemmas
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ} {T T' : E}
 
-theorem leadMinorE_self {K : Type} [Field K] [StarRing K] {N : ℕ}
-    (Z : Matrix (Fin N) (Fin N) K) : leadMinorE Z N = Z.det := by
+theorem leadMinorE_self {K : Type} [Field K] [StarRing K] {N : ℕ} (Z : Matrix (Fin N) (Fin N) K)
+    : leadMinorE Z N = Z.det := by
   unfold leadMinorE
   rw [dite_eq_left le_rfl]
   exact congrArg Matrix.det (Matrix.ext fun i j => rfl)
 
-theorem leadMinorE_castSucc {K : Type} [Field K] [StarRing K] {N : ℕ}
-    (Z : Matrix (Fin (N + 1)) (Fin (N + 1)) K) :
-    leadMinorE Z N = (Z.submatrix Fin.castSucc Fin.castSucc).det := by
+theorem leadMinorE_castSucc
+    {K : Type} [Field K] [StarRing K] {N : ℕ} (Z : Matrix (Fin (N + 1)) (Fin (N + 1)) K)
+    : leadMinorE Z N = (Z.submatrix Fin.castSucc Fin.castSucc).det := by
   unfold leadMinorE
   rw [dite_eq_left (Nat.le_succ N)]
   exact congrArg Matrix.det (Matrix.ext fun i j => rfl)
 
-theorem hT_fvec (F : FlagG S r T) (i j : Fin (r + 1)) : S.hT (F.fvec i) (F.fvec j) = TF r T i j := by
+theorem hT_fvec (F : FlagG S r T) (i j : Fin (r + 1))
+    : S.hT (F.fvec i) (F.fvec j) = TF r T i j := by
   have hne : ∀ k : Fin r, Fin.castSucc k ≠ Fin.last r := fun k => (Fin.castSucc_lt_last k).ne
   have hne' : ∀ k : Fin r, Fin.last r ≠ Fin.castSucc k := fun k => (hne k).symm
   induction i using Fin.lastCases with
@@ -96,8 +106,8 @@ theorem hT_fvec (F : FlagG S r T) (i j : Fin (r + 1)) : S.hT (F.fvec i) (F.fvec 
     | cast j =>
       have h1 : S.hT F.z (F.e j) = 0 := by
         first
-          | rw [← S.herm (F.e j) F.z, F.z_orth j, map_zero]
-          | rw [← S.herm.eq (F.e j) F.z, F.z_orth j, map_zero]
+        | rw [← S.herm (F.e j) F.z, F.z_orth j, map_zero]
+        | rw [← S.herm.eq (F.e j) F.z, F.z_orth j, map_zero]
       simp [FlagG.fvec, TF, h1, Matrix.diagonal_apply_ne _ (hne j).symm]
   | cast i =>
     induction j using Fin.lastCases with
@@ -128,17 +138,17 @@ theorem gramBlocks : GramBlocks := by
   rcases i with a | a <;> rcases j with b | b
   · simp [gramFF, pairVec, brS, hT_fvec]
   · simp [gramFF, pairVec, brS, Zhat]
-  · simp only [gramFF, pairVec, brS, Zhat, Matrix.fromBlocks_apply₂₁, Matrix.conjTranspose_apply, Sum.elim_inl,
-      Sum.elim_inr]
-    first
-      | exact (S.herm _ _).symm
-      | exact (S.herm.eq _ _).symm
+  · simp only [gramFF, pairVec, brS, Zhat, Matrix.fromBlocks_apply₂₁, Matrix.conjTranspose_apply,
+      Sum.elim_inl, Sum.elim_inr]
+    first | exact (S.herm _ _).symm | exact (S.herm.eq _ _).symm
   · simp [gramFF, pairVec, brS, hT_fvec]
 
 theorem gramDetFlag : GramDetFlag := by
   intro E _ _ _ S r T T' F F'
   rw [gramBlocks E S r T T' F F']
-  have h := Formalism.HermitianLatticeCounting.Final.LocalIntegralStructure.gramDetGen E r (Zhat F F')ᴴ (Zhat F F') T T'
+  have h :=
+    Formalism.HermitianLatticeCounting.Final.LocalIntegralStructure.gramDetGen E r (Zhat F F')ᴴ
+      (Zhat F F') T T'
   unfold TF
   rw [h, Matrix.det_conjTranspose, ← Matrix.conjTranspose_submatrix, Matrix.det_conjTranspose,
     gflag_eq_gmat]
@@ -156,8 +166,9 @@ theorem gramIndep : GramIndep := by
       ext i j; rfl
     rw [this, Matrix.det_transpose]
     exact hdet
-  have h := Formalism.HermitianLatticeCounting.Final.LocalIntegralStructure.gramNondeg E S.V (Fin (r + 1) ⊕ Fin (r + 1)) (starRingEnd E) S.hT.flip
-    (pairVec F F') hB
+  have h :=
+    Formalism.HermitianLatticeCounting.Final.LocalIntegralStructure.gramNondeg E S.V
+      (Fin (r + 1) ⊕ Fin (r + 1)) (starRingEnd E) S.hT.flip (pairVec F F') hB
   refine ⟨h.1, ?_⟩
   have hl : LinearIndependent E (Sum.elim F.fvec F'.fvec) := h.1
   rw [linearIndependent_sum] at hl
@@ -171,8 +182,9 @@ theorem dNeZeroAt_of (h : GNonnegAt) : DNeZeroAt := by
     unfold Gflag
     rw [hD]
     simp
-  have hval : τ (-((T : E) * (T' : E) * (Dl F F' r * star (Dl F F' r)))) =
-      -(((T : ℝ) * (T' : ℝ) * Complex.normSq (τ (Dl F F' r)) : ℝ) : ℂ) := by
+  have hval
+      : τ (-((T : E) * (T' : E) * (Dl F F' r * star (Dl F F' r))))
+        = -(((T : ℝ) * (T' : ℝ) * Complex.normSq (τ (Dl F F' r)) : ℝ) : ℂ) := by
     rw [map_neg, map_mul, map_mul, map_mul, hτ, map_natCast, map_natCast, Complex.mul_conj]
     simp
   rw [hG', hval] at hτG

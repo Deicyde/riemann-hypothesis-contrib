@@ -29,8 +29,11 @@ theorem SchHookResidues.proof : SchHookResidues.Statement := by
       intro m hm
       rw [Finset.mem_Icc] at hm
       rw [Finset.mem_map]
-      refine ⟨⟨m, by omega⟩, down _ j (show m ≠ 0 by omega)
-        (by rw [Fin.le_iff_val_le_val]; show m ≤ (j : ℕ); omega) hj, rfl⟩
+      refine ⟨
+        ⟨m, by omega⟩,
+        down _ j (show m ≠ 0 by omega) (by rw [Fin.le_iff_val_le_val]; show m ≤ (j : ℕ); omega) hj,
+        rfl
+      ⟩
     have := Finset.card_le_card hsub
     simp at this
     omega
@@ -70,8 +73,8 @@ theorem SchHookResidues.proof : SchHookResidues.Statement := by
     have := card_le_card hsub
     simpa [card_erase_of_mem] using this
   have hnu0 : nu 0 + t = n + 1 := by
-    have hpt : ∀ i, nu i = (if i = 0 then nu 0 else 0) +
-        (if (i : ℕ) ≠ 0 ∧ nu i = 1 then 1 else 0) := by
+    have hpt
+        : ∀ i, nu i = (if i = 0 then nu 0 else 0) + (if (i : ℕ) ≠ 0 ∧ nu i = 1 then 1 else 0) := by
       intro i
       by_cases h0 : i = 0
       · subst h0; simp

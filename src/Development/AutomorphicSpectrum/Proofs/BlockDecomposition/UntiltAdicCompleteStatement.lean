@@ -8,7 +8,12 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory GroundTheory.PAdicHodge CrystallineSemistableComparison CrystallineSemistableComparison.PAlg
+open CategoryTheory GroundTheory.PAdicHodge CrystallineSemistableComparison
+  CrystallineSemistableComparison.PAlg
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.untilt_adic_complete : ∀ {l : ℕ} [Fact l.Prime] (A : PAlg l), IsAdicComplete (Ideal.span {(l : A.U)}) A.U := by
-  first | exact @GlobalTheory.CompanionTheory.Untilt.isAdicComplete_U | exact GlobalTheory.CompanionTheory.Untilt.isAdicComplete_U | (intros; apply GlobalTheory.CompanionTheory.Untilt.isAdicComplete_U <;> assumption)
+theorem _root_.GlobalTheory.T.untilt_adic_complete
+    : ∀ {l : ℕ} [Fact l.Prime] (A : PAlg l), IsAdicComplete (Ideal.span {(l : A.U)}) A.U := by
+  first
+  | exact @GlobalTheory.CompanionTheory.Untilt.isAdicComplete_U
+  | exact GlobalTheory.CompanionTheory.Untilt.isAdicComplete_U
+  | (intros; apply GlobalTheory.CompanionTheory.Untilt.isAdicComplete_U <;> assumption)

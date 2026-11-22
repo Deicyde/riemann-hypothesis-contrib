@@ -5,20 +5,26 @@ public import Development.EtaleCohomology.CohomologicalPurity.LeafDictPf
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC LateralTheory.KummerTheory.FlasquePf
+open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC
+  LateralTheory.KummerTheory.FlasquePf
 
 namespace LateralTheory.CohomologicalPurity.DictPf
 
 section
 variable {R : Type} [CommRing R] {G : Shv R} {X : Scheme.{0}}
 
-theorem ev_res' (m : (free R).obj (yoneda.obj X) ⟶ G) {V : Scheme.{0}} (h : V ⟶ X) :
-    (m.hom.app (op V)).hom (freeGen R (yoneda.obj X) V h) = Sec.res h (ev m) := by
-  calc (m.hom.app (op V)).hom (freeGen R (yoneda.obj X) V h)
-      = (m.hom.app (op V)).hom (freeGen R (yoneda.obj X) V ((yoneda.obj X).map h.op (𝟙 X))) := by simp
+theorem ev_res' (m : (free R).obj (yoneda.obj X) ⟶ G) {V : Scheme.{0}} (h : V ⟶ X)
+    : (m.hom.app (op V)).hom (freeGen R (yoneda.obj X) V h) = Sec.res h (ev m) := by
+  calc
+    (m.hom.app (op V)).hom (freeGen R (yoneda.obj X) V h)
+        = (m.hom.app (op V)).hom (freeGen R (yoneda.obj X) V ((yoneda.obj X).map h.op (𝟙 X))) := by
+      simp
     _ = (m.hom.app (op V)).hom (Sec.res h (freeGen R (yoneda.obj X) X (𝟙 X))) := by rw [freeGen_res]
     _ = Sec.res h (ev m) := by
-      have := congrArg (fun φ => ModuleCat.Hom.hom φ (freeGen R (yoneda.obj X) X (𝟙 X))) (m.hom.naturality h.op)
+      have :=
+        congrArg
+          (fun φ => ModuleCat.Hom.hom φ (freeGen R (yoneda.obj X) X (𝟙 X)))
+          (m.hom.naturality h.op)
       exact this
 
 theorem eq_ofSec (m : (free R).obj (yoneda.obj X) ⟶ G) : m = ofSec G (ev m) := by
@@ -47,8 +53,9 @@ theorem LeafEv_of : LeafEv := by
   · intro m m'
     rfl
   · intro Y f m
-    change (m.hom.app (op Y)).hom ((((free R).map (yoneda.map f)).hom.app (op Y)).hom
-      (freeGen R (yoneda.obj Y) Y (𝟙 Y))) = _
+    change (m.hom.app (op Y)).hom
+        ((((free R).map (yoneda.map f)).hom.app (op Y)).hom (freeGen R (yoneda.obj Y) Y (𝟙 Y)))
+      = _
     rw [freeGen_map]
     simp only [yoneda_map_app]
     exact ev_res' m f

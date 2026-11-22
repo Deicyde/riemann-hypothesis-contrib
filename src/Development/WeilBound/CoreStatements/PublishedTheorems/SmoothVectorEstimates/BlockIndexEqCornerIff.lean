@@ -13,9 +13,10 @@ namespace PositivityTheory.jumpWindows.CornerBlockIndex
 
 variable {ι : Type} {a m : ℕ}
 
-theorem mul_upd {n R : Type} [Fintype n] [DecidableEq n] [CommRing R] (A : Matrix n n R) (p : n)
-    (r : n → R) (i j : n) :
-    (A * (1 : Matrix n n R).updateRow p r) i j = A i p * r j + if j = p then 0 else A i j := by
+theorem mul_upd
+    {n R : Type} [Fintype n] [DecidableEq n] [CommRing R]
+    (A : Matrix n n R) (p : n) (r : n → R) (i j : n)
+    : (A * (1 : Matrix n n R).updateRow p r) i j = A i p * r j + if j = p then 0 else A i j := by
   rw [Matrix.mul_apply, ← Finset.add_sum_erase _ _ (Finset.mem_univ p)]
   simp only [Matrix.updateRow_self]
   congr 1
@@ -30,11 +31,13 @@ theorem mul_upd {n R : Type} [Fintype n] [DecidableEq n] [CommRing R] (A : Matri
       rw [Matrix.updateRow_ne (Finset.ne_of_mem_erase hl), Matrix.one_apply_ne hlj, mul_zero]
     · intro hj'; exact absurd (Finset.mem_erase.2 ⟨hj, Finset.mem_univ _⟩) hj'
 
-theorem of_sM (hm : m + 1 < a) (x : V ι a m) :
-    Matrix.of (sM hm x) = (1 : Matrix (Fin a) (Fin a) (ι → ℂ)).updateRow (mm hm) (rowS hm x) := rfl
+theorem of_sM (hm : m + 1 < a) (x : V ι a m)
+    : Matrix.of (sM hm x) = (1 : Matrix (Fin a) (Fin a) (ι → ℂ)).updateRow (mm hm) (rowS hm x) :=
+  rfl
 
-theorem of_sI (hm : m + 1 < a) (x : V ι a m) :
-    Matrix.of (sI hm x) = (1 : Matrix (Fin a) (Fin a) (ι → ℂ)).updateRow (mm hm) (rowT hm x) := rfl
+theorem of_sI (hm : m + 1 < a) (x : V ι a m)
+    : Matrix.of (sI hm x) = (1 : Matrix (Fin a) (Fin a) (ι → ℂ)).updateRow (mm hm) (rowT hm x) :=
+  rfl
 
 theorem rowS_mm (hm : m + 1 < a) (x : V ι a m) : rowS hm x (mm hm) = x (t0 hm) := by
   unfold rowS
@@ -45,19 +48,20 @@ theorem rowT_mm (hm : m + 1 < a) (x : V ι a m) : rowT hm x (mm hm) = (x (t0 hm)
   unfold rowT
   rw [dite_eq_left (by simp [mm]), if_pos (by simp [mm])]
 
-theorem rowT_ne (hm : m + 1 < a) (x : V ι a m) {j : Fin a} (hj : j ≠ mm hm) :
-    rowT hm x j = -(rowS hm x j * (x (t0 hm))⁻¹) := by
+theorem rowT_ne (hm : m + 1 < a) (x : V ι a m) {j : Fin a} (hj : j ≠ mm hm)
+    : rowT hm x j = -(rowS hm x j * (x (t0 hm))⁻¹) := by
   have hj' : (j : ℕ) ≠ m := fun h => hj (Fin.ext h)
   unfold rowT rowS
   split_ifs <;> first | (exfalso; omega) | rfl | simp
 
-theorem mul_inv_cancel_at_t0_of_mem_O (hm : m + 1 < a) {x : V ι a m} (hx : x ∈ O ι hm) :
-    x (t0 hm) * (x (t0 hm))⁻¹ = 1 := by
+theorem mul_inv_cancel_at_t0_of_mem_O (hm : m + 1 < a) {x : V ι a m} (hx : x ∈ O ι hm)
+    : x (t0 hm) * (x (t0 hm))⁻¹ = 1 := by
   funext i
   simp only [Pi.mul_apply, Pi.inv_apply, Pi.one_apply]
   exact mul_inv_cancel₀ (hx i)
 
-theorem block_index_eq_corner_iff (hm : m + 1 < a) (t : UnipotentBlockColumnIndex a (m + 1) (m + 1)) : t = t0 hm ↔ t.1.1 = mm hm := by
+theorem block_index_eq_corner_iff (hm : m + 1 < a) (t : UnipotentBlockColumnIndex a (m + 1) (m + 1))
+    : t = t0 hm ↔ t.1.1 = mm hm := by
   constructor
   · rintro rfl; rfl
   · intro h
@@ -68,16 +72,19 @@ theorem block_index_eq_corner_iff (hm : m + 1 < a) (t : UnipotentBlockColumnInde
     show (t.1.2 : ℕ) = m + 1
     omega
 
-theorem rowS_xi (hm : m + 1 < a) {h : GL (Fin a) (ι → ℂ)} (hh : GlobalTheory (m + 1) h) (k : Fin a) :
-    rowS hm (xi hm h) k = h.val (mm hm) k := by
+theorem rowS_xi (hm : m + 1 < a) {h : GL (Fin a) (ι → ℂ)} (hh : GlobalTheory (m + 1) h) (k : Fin a)
+    : rowS hm (xi hm h) k = h.val (mm hm) k := by
   unfold rowS
   split_ifs with hk
   · rfl
   · rw [hh _ _ (Or.inr (by omega)), Matrix.one_apply_ne]
-    intro e; apply hk; rw [← e]; simp [mm]
+    intro e
+    apply hk
+    rw [← e]
+    simp [mm]
 
-theorem sI_mul_sM (hm : m + 1 < a) {x : V ι a m} (hx : x ∈ O ι hm) :
-    Matrix.of (sI hm x) * Matrix.of (sM hm x) = 1 := by
+theorem sI_mul_sM (hm : m + 1 < a) {x : V ι a m} (hx : x ∈ O ι hm)
+    : Matrix.of (sI hm x) * Matrix.of (sM hm x) = 1 := by
   have hi1 := mul_inv_cancel_at_t0_of_mem_O hm hx
   refine Matrix.ext fun i j => ?_
   rw [of_sI, of_sM, mul_upd]
@@ -94,8 +101,8 @@ theorem sI_mul_sM (hm : m + 1 < a) {x : V ι a m} (hx : x ∈ O ι hm) :
     · subst hj; rw [Matrix.one_apply_ne hi]
     · rfl
 
-theorem sM_mul_sI (hm : m + 1 < a) {x : V ι a m} (hx : x ∈ O ι hm) :
-    Matrix.of (sM hm x) * Matrix.of (sI hm x) = 1 := by
+theorem sM_mul_sI (hm : m + 1 < a) {x : V ι a m} (hx : x ∈ O ι hm)
+    : Matrix.of (sM hm x) * Matrix.of (sI hm x) = 1 := by
   have hi1 := mul_inv_cancel_at_t0_of_mem_O hm hx
   refine Matrix.ext fun i j => ?_
   rw [of_sI, of_sM, mul_upd]
@@ -112,24 +119,27 @@ theorem sM_mul_sI (hm : m + 1 < a) {x : V ι a m} (hx : x ∈ O ι hm) :
     · subst hj; rw [Matrix.one_apply_ne hi]
     · rfl
 
-
 open Classical in
 def uM (hm : m + 1 < a) (x : V ι a m) : GL (Fin a) (ι → ℂ) :=
-  if hx : x ∈ O ι hm then ⟨Matrix.of (sM hm x), Matrix.of (sI hm x), sM_mul_sI hm hx, sI_mul_sM hm hx⟩ else 1
+  if hx : x ∈ O ι hm then
+    ⟨Matrix.of (sM hm x), Matrix.of (sI hm x), sM_mul_sI hm hx, sI_mul_sM hm hx⟩
+  else
+    1
 
-theorem uM_val (hm : m + 1 < a) {x : V ι a m} (hx : x ∈ O ι hm) : (uM hm x).val = Matrix.of (sM hm x) := by
+theorem uM_val (hm : m + 1 < a) {x : V ι a m} (hx : x ∈ O ι hm)
+    : (uM hm x).val = Matrix.of (sM hm x) := by
   simp [uM, hx]
 
-theorem uM_inv_val (hm : m + 1 < a) {x : V ι a m} (hx : x ∈ O ι hm) :
-    (uM hm x)⁻¹.val = Matrix.of (sI hm x) := by
+theorem uM_inv_val (hm : m + 1 < a) {x : V ι a m} (hx : x ∈ O ι hm)
+    : (uM hm x)⁻¹.val = Matrix.of (sI hm x) := by
   simp [uM, hx]
 
 theorem e_mem (hm : m + 1 < a) : e ι hm ∈ O ι hm := by
   intro i
   simp [e]
 
-theorem rowS_e (hm : m + 1 < a) :
-    rowS hm (e ι hm) = (1 : Matrix (Fin a) (Fin a) (ι → ℂ)) (mm hm) := by
+theorem rowS_e (hm : m + 1 < a)
+    : rowS hm (e ι hm) = (1 : Matrix (Fin a) (Fin a) (ι → ℂ)) (mm hm) := by
   funext j
   by_cases hj : j = mm hm
   · subst hj; rw [rowS_mm]; simp [e]
@@ -139,7 +149,8 @@ theorem rowS_e (hm : m + 1 < a) :
     split_ifs with h
     · simp only [e]
       rw [Pi.single_eq_of_ne]
-      intro h'; exact hj ((block_index_eq_corner_iff hm _).1 h')
+      intro h'
+      exact hj ((block_index_eq_corner_iff hm _).1 h')
     · rfl
 
 theorem uM_e (hm : m + 1 < a) : uM hm (e ι hm) = 1 := by
@@ -167,8 +178,9 @@ theorem blk_uM (hm : m + 1 < a) (x : V ι a m) : GlobalTheory (m + 1) (uM hm x) 
     · rw [Matrix.updateRow_ne hi]
   · simp [uM, hx]
 
-theorem mir_mul (hm : m + 1 < a) {h : GL (Fin a) (ι → ℂ)} (hh : GlobalTheory (m + 1) h) (hx : xi hm h ∈ O ι hm) :
-    Mir m (h * (uM hm (xi hm h))⁻¹) := by
+theorem mir_mul
+    (hm : m + 1 < a) {h : GL (Fin a) (ι → ℂ)} (hh : GlobalTheory (m + 1) h) (hx : xi hm h ∈ O ι hm)
+    : Mir m (h * (uM hm (xi hm h))⁻¹) := by
   have hi1 := mul_inv_cancel_at_t0_of_mem_O hm hx
   have e0 : xi hm h (t0 hm) = h.val (mm hm) (mm hm) := rfl
   rw [e0] at hi1
@@ -200,11 +212,16 @@ theorem mir_mul (hm : m + 1 < a) {h : GL (Fin a) (ι → ℂ)} (hh : GlobalTheor
         rw [hh (mm hm) k (Or.inr h2), hh i k (Or.inr h2), Matrix.one_apply_ne (Ne.symm hk)]
         ring
 
-theorem orb_sI [Fintype ι] {X : Type} [NormedAddCommGroup X] [NormedSpace ℂ X] (hm : m + 1 < a)
-    (ρ : GL (Fin a) (ι → ℂ) →* (X →L[ℂ] X)) (v : X) {x : V ι a m} (hx : x ∈ O ι hm) :
-    orb ρ v (sI hm x) = ρ (uM hm x)⁻¹ v := by
+theorem orb_sI
+    [Fintype ι]
+    {X : Type} [NormedAddCommGroup X] [NormedSpace ℂ X]
+    (hm : m + 1 < a)
+    (ρ : GL (Fin a) (ι → ℂ) →* (X →L[ℂ] X)) (v : X)
+    {x : V ι a m} (hx : x ∈ O ι hm)
+    : orb ρ v (sI hm x) = ρ (uM hm x)⁻¹ v := by
   have hu : IsUnit (Matrix.of (sI hm x)) := ⟨(uM hm x)⁻¹, uM_inv_val hm hx⟩
-  rw [orb, dite_eq_left hu, show hu.unit = (uM hm x)⁻¹ from Units.ext (by rw [IsUnit.unit_spec, uM_inv_val hm hx])]
+  rw [orb, dite_eq_left hu,
+    show hu.unit = (uM hm x)⁻¹ from Units.ext (by rw [IsUnit.unit_spec, uM_inv_val hm hx])]
 
 end PositivityTheory.jumpWindows.CornerBlockIndex
 

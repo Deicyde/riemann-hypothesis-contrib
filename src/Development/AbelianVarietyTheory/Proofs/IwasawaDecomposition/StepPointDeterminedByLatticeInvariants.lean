@@ -8,18 +8,25 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Colum
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC GlobalTheory.Mem.Col2.MemChart Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC GlobalTheory.Mem.Col2.MemChart
+  Matrix
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Mem.Col2.ChEx
 
-
 open Classical in
-theorem ptDet_cqOf : ∀ {X : Fields} {Pr : Primes X} {R : Ranks} {sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)} {S : Set ℕ}
-    {mu : Tup X.F X.E X.K S} {cst : LocCst X (rowSG Pr sel mu)} {u : Pr.Word} {j : ℕ},
-    (∀ P ∈ QE sel (mu : Chr X.F X.E X.K), P ∉ Pr.vGs) → (∀ w ∈ Pr.vGs, ((Formalism.L2.Col.qOf w : ℕ) : 𝓞 X.E) ∉ w.asIdeal ^ 2) →
-    GlobalTheory.Mem.Col2.ChEx.PtDet (GlobalTheory.Mem.Col2.ChEx.cqOf (R := R) (cst := cst) (u := u) (j := j) : PtAt R sel mu cst u j → _) := by
+theorem ptDet_cqOf
+    : ∀ {X : Fields} {Pr : Primes X} {R : Ranks}
+        {sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)} {S : Set ℕ}
+        {mu : Tup X.F X.E X.K S} {cst : LocCst X (rowSG Pr sel mu)} {u : Pr.Word} {j : ℕ},
+      (∀ P ∈ QE sel (mu : Chr X.F X.E X.K), P ∉ Pr.vGs)
+        → (∀ w ∈ Pr.vGs, ((Formalism.L2.Col.qOf w : ℕ) : 𝓞 X.E) ∉ w.asIdeal ^ 2)
+        → GlobalTheory.Mem.Col2.ChEx.PtDet
+          (GlobalTheory.Mem.Col2.ChEx.cqOf (R := R) (cst := cst) (u := u) (j := j)
+            : PtAt R sel mu cst u j → _) := by
   intro X Pr R sel S mu cst u j hQ hq r r' hfr hb hc
   suffices h2 : r.1.2 = r'.1.2 from Subtype.ext (Prod.ext hfr h2)
   have hd : r.1.1.deco = r'.1.1.deco := congrArg DecoF.deco hfr
@@ -34,7 +41,10 @@ theorem ptDet_cqOf : ∀ {X : Fields} {Pr : Primes X} {R : Ranks} {sel : HeightO
     refine (mem_locLat _ _ _ _).2 fun P => ?_
     by_cases hG : P.1 ∈ Pr.vGs
     · rw [if_pos hG, zpow_zero, inv_one, one_smul]
-      have hm : r.1.1.deco.1.be ⟨P.1, hG⟩ (((Formalism.L2.Col.qOf P.1 : ℕ) : X.E) • y) ∈ bar r ⟨P.1, hG⟩ := ⟨y, hyin, rfl⟩
+      have hm
+          : r.1.1.deco.1.be ⟨P.1, hG⟩ (((Formalism.L2.Col.qOf P.1 : ℕ) : X.E) • y)
+            ∈ bar r ⟨P.1, hG⟩ :=
+        ⟨y, hyin, rfl⟩
       rw [hb] at hm
       obtain ⟨z, hz, ez⟩ := hm
       rw [← hd] at ez
@@ -50,13 +60,20 @@ theorem ptDet_cqOf : ∀ {X : Fields} {Pr : Primes X} {R : Ranks} {sel : HeightO
       have hfrP : frsF sel mu r.1.1 P = r.1.1.fr ⟨P.1, hPQ⟩ := by
         unfold frsF
         rw [dite_eq_right hG]
-      have hc1 : (r.1.1.fr ⟨P.1, hPQ⟩).symm y ∈ cqOf r ⟨P.1, hPQ⟩ := ⟨y, hyin, by
-        show ((qOf P.1 : X.E) ^ (if P.1 ∈ Pr.vGs then 0 else cst.M))⁻¹ • (_ - (frsF sel mu r.1.1 P).symm y) ∈ _
-        rw [hfrP, sub_self, smul_zero]
-        exact zero_mem _⟩
+      have hc1 : (r.1.1.fr ⟨P.1, hPQ⟩).symm y ∈ cqOf r ⟨P.1, hPQ⟩ := ⟨
+        y,
+        hyin,
+        by
+          show ((qOf P.1 : X.E) ^ (if P.1 ∈ Pr.vGs then 0 else cst.M))⁻¹ • (_ - (frsF sel mu r.1.1 P).symm y) ∈ _
+          rw [hfrP, sub_self, smul_zero]
+          exact zero_mem _
+      ⟩
       rw [hc] at hc1
       obtain ⟨y0, hy0, hmem⟩ := hc1
-      change ((qOf P.1 : X.E) ^ (if P.1 ∈ Pr.vGs then 0 else cst.M))⁻¹ • (_ - (frsF sel mu r'.1.1 P).symm y0) ∈ _ at hmem
+      change ((qOf P.1 : X.E) ^ (if P.1 ∈ Pr.vGs then 0 else cst.M))⁻¹
+            • (_ - (frsF sel mu r'.1.1 P).symm y0)
+          ∈ _
+        at hmem
       rw [if_neg hG, ← hfr, hfrP] at hmem
       have hA := (r.1.1.2 ⟨P.1, hPQ⟩ _).2 hmem
       change r.1.1.fr ⟨P.1, hPQ⟩ _ ∈ _ at hA

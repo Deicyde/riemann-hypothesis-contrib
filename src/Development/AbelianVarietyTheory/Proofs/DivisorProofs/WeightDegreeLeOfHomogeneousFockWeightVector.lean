@@ -9,17 +9,19 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.PderivEqZ
 
 noncomputable section
 
-open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.FockAlg MvPolynomial
+open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.FockAlg
+  MvPolynomial
 
 namespace GlobalTheory.FockAlg
 
-
 open GlobalTheory.JointHarm in
-theorem degW_le_of_isSide {σ : Type} {p q r s : ℕ} {e : Ln p q r s → σ}
+theorem degW_le_of_isSide
+    {σ : Type} {p q r s : ℕ} {e : Ln p q r s → σ}
     {act : Mat p q →ₗ[ℂ] Module.End ℂ (MvPolynomial σ ℂ)} [Fintype σ]
-    (he : Function.Bijective e) (h : IsSide e act) {d : ℕ}
-    {μ : Ix p q → ℚ} {P : MvPolynomial σ ℂ} (hd : P ∈ homog σ d) (hP0 : P ≠ 0)
-    (hP : P ∈ wtSub act μ) : degW (cPair r s) μ ≤ d := by
+    (he : Function.Bijective e) (h : IsSide e act)
+    {d : ℕ} {μ : Ix p q → ℚ} {P : MvPolynomial σ ℂ}
+    (hd : P ∈ homog σ d) (hP0 : P ≠ 0) (hP : P ∈ wtSub act μ)
+    : degW (cPair r s) μ ≤ d := by
   obtain ⟨m, hm⟩ := support_nonempty.2 hP0
   obtain ⟨h1, h2⟩ := (h.mem_wtSub μ P).1 hP
   have e1 : m.degree = d := by
@@ -33,14 +35,18 @@ theorem degW_le_of_isSide {σ : Type} {p q r s : ℕ} {e : Ln p q r s → σ}
   · rw [mixed_weight _ _ (h2 t) hm, Nat.cast_add]
     exact (abs_sub _ _).trans (by simp only [Nat.abs_cast, le_refl])
 
-theorem degW_le_of_homog_wtSub : ∀ (p q r s : ℕ),
-    (∀ (d : ℕ) (μ : Ix p q → ℚ) (P : Pol p q r s), P ∈ homog (Ix p q × Ix r s) d → P ≠ 0 →
-      P ∈ wtSub (fockAct1 p q r s) μ → degW (cPair r s) μ ≤ d) ∧
-    (∀ (d : ℕ) (μ : Ix r s → ℚ) (P : Pol p q r s), P ∈ homog (Ix p q × Ix r s) d → P ≠ 0 →
-      P ∈ wtSub (fockAct2 p q r s) μ → degW (cPair p q) μ ≤ d) := fun _ _ _ _ =>
-  ⟨fun _ _ _ hd h0 hP =>
-      degW_le_of_isSide Function.bijective_id GlobalTheory.JointHarm.isSide_one hd h0 hP,
-    fun _ _ _ hd h0 hP =>
-      degW_le_of_isSide Prod.swap_bijective GlobalTheory.JointHarm.isSide_two hd h0 hP⟩
+theorem degW_le_of_homog_wtSub
+    : ∀ (p q r s : ℕ),
+      (∀ (d : ℕ) (μ : Ix p q → ℚ) (P : Pol p q r s),
+          P ∈ homog (Ix p q × Ix r s) d → P ≠ 0 → P ∈ wtSub (fockAct1 p q r s) μ
+            → degW (cPair r s) μ ≤ d)
+        ∧ (∀ (d : ℕ) (μ : Ix r s → ℚ) (P : Pol p q r s),
+          P ∈ homog (Ix p q × Ix r s) d → P ≠ 0 → P ∈ wtSub (fockAct2 p q r s) μ
+            → degW (cPair p q) μ ≤ d) := fun _ _ _ _ => ⟨
+  fun _ _ _ hd h0 hP =>
+    degW_le_of_isSide Function.bijective_id GlobalTheory.JointHarm.isSide_one hd h0 hP,
+  fun _ _ _ hd h0 hP =>
+    degW_le_of_isSide Prod.swap_bijective GlobalTheory.JointHarm.isSide_two hd h0 hP
+⟩
 
 end GlobalTheory.FockAlg

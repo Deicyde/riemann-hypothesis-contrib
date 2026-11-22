@@ -10,19 +10,22 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem pow_dvd_pow_mul_pow_of_homogeneous_relation {R : Type*} [CommRing R] (v x : R)
-    (q : ℕ → R) (n N : ℕ) (h0 : IsUnit (q 0))
-    (h : x ^ N * ∑ i ∈ Finset.range (n + 1), q i * v ^ i * x ^ (n - i) = 0) (j : ℕ) :
-    v ^ j ∣ v ^ (N + n) * x ^ j := by
+theorem pow_dvd_pow_mul_pow_of_homogeneous_relation
+    {R : Type*} [CommRing R]
+    (v x : R) (q : ℕ → R) (n N : ℕ)
+    (h0 : IsUnit (q 0)) (h : x ^ N * ∑ i ∈ Finset.range (n + 1), q i * v ^ i * x ^ (n - i) = 0)
+    (j : ℕ)
+    : v ^ j ∣ v ^ (N + n) * x ^ j := by
   induction j using Nat.strong_induction_on with
   | _ j ih =>
     by_cases hj : j ≤ N + n
     · exact Dvd.dvd.mul_right (pow_dvd_pow v hj) _
     · obtain ⟨d, rfl⟩ : ∃ d, j = N + n + d := ⟨j - (N + n), by omega⟩
       rw [Finset.sum_range_succ'] at h
-      have key : q 0 * (v ^ (N + n) * x ^ (N + n + d)) =
-          - ∑ i ∈ Finset.range n,
-            v ^ (N + n) * x ^ d * x ^ N * (q (i + 1) * v ^ (i + 1) * x ^ (n - (i + 1))) := by
+      have key
+          : q 0 * (v ^ (N + n) * x ^ (N + n + d))
+            = - ∑ i ∈ Finset.range n,
+                v ^ (N + n) * x ^ d * x ^ N * (q (i + 1) * v ^ (i + 1) * x ^ (n - (i + 1))) := by
         rw [← Finset.mul_sum]
         simp only [pow_zero, mul_one, Nat.sub_zero] at h
         linear_combination (v ^ (N + n) * x ^ d) * h
@@ -35,12 +38,12 @@ theorem pow_dvd_pow_mul_pow_of_homogeneous_relation {R : Type*} [CommRing R] (v 
       rw [Nat.add_sub_cancel_left]
       linear_combination (q (i + 1) * v ^ (i + 1)) * hw
 
-theorem bounded_powers_or_exists_valuationSubring_dvd :
-    ∀ (R : Type) [CommRing R] (u x : R) (M : ℕ), u ∈ nonZeroDivisors R →
-      (∀ r, IsUnit (1 - u * r)) →
-      (∃ c : ℕ, ∀ n : ℕ, u ^ (M * n) ∣ u ^ c * x ^ n) ∨
-        ∃ (L : Type) (_ : Field L) (_ : IsAlgClosed L) (V : ValuationSubring L)
-          (f : R →+* ↥V), f u ≠ 0 ∧ ¬ IsUnit (f u) ∧ f x ∣ f u ^ M := by
+theorem bounded_powers_or_exists_valuationSubring_dvd
+    : ∀ (R : Type) [CommRing R] (u x : R) (M : ℕ),
+      u ∈ nonZeroDivisors R → (∀ r, IsUnit (1 - u * r))
+        → (∃ c : ℕ, ∀ n : ℕ, u ^ (M * n) ∣ u ^ c * x ^ n)
+          ∨ ∃ (L : Type) (_ : Field L) (_ : IsAlgClosed L) (V : ValuationSubring L) (f : R →+* ↥V),
+            f u ≠ 0 ∧ ¬ IsUnit (f u) ∧ f x ∣ f u ^ M := by
   intro R _ u x M hu hJ
   let T := Localization.Away (u * x)
   have hux : IsUnit (algebraMap R T (u * x)) := IsLocalization.Away.algebraMap_isUnit (u * x)
@@ -62,13 +65,13 @@ theorem bounded_powers_or_exists_valuationSubring_dvd :
     obtain ⟨p, hp⟩ := hz'
     have hp' : aeval t p = z := hp
     set q : R[X] := 1 - C u * p with hq
-    have hq0 : aeval t q = 0 := by
-      simp [hq, hp', hz2]
-    have hc : IsUnit (q.coeff 0) := by
-      simpa [hq] using hJ (p.coeff 0)
-    have hsum : algebraMap R T
-        (∑ i ∈ Finset.range (q.natDegree + 1),
-          q.coeff i * (u ^ M) ^ i * x ^ (q.natDegree - i)) = 0 := by
+    have hq0 : aeval t q = 0 := by simp [hq, hp', hz2]
+    have hc : IsUnit (q.coeff 0) := by simpa [hq] using hJ (p.coeff 0)
+    have hsum
+        : algebraMap R T
+            (∑ i ∈ Finset.range (q.natDegree + 1),
+              q.coeff i * (u ^ M) ^ i * x ^ (q.natDegree - i))
+          = 0 := by
       have h1 : algebraMap R T x ^ q.natDegree * aeval t q = 0 := by rw [hq0, mul_zero]
       rw [aeval_eq_sum_range, Finset.mul_sum] at h1
       set_option synthInstance.maxHeartbeats 100000 in
@@ -89,7 +92,8 @@ theorem bounded_powers_or_exists_valuationSubring_dvd :
     refine pow_dvd_pow_mul_pow_of_homogeneous_relation (u ^ M) x q.coeff _ N hc ?_ j
     simpa only [mul_assoc] using hN'
   · right
-    obtain ⟨L, _, _, V, f, hf1, hf2⟩ := GlobalTheory.T.exists_valuationSubring_algClosed_not_isUnit S _ hS
+    obtain ⟨L, _, _, V, f, hf1, hf2⟩ :=
+      GlobalTheory.T.exists_valuationSubring_algClosed_not_isUnit S _ hS
     refine ⟨L, inferInstance, inferInstance, V, f.comp (algebraMap R S), ?_, hf1, ?_⟩
     · refine hf2 _ (mem_nonZeroDivisors_iff_right.2 fun s hs => ?_)
       have h1 : (s : T) * algebraMap R T u = 0 := congrArg Subtype.val hs

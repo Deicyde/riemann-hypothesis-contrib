@@ -12,13 +12,28 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.Core.Rk GlobalTheory.Core.Mi
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory IsDedekindDomain
+  NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum
+  Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.RowDict
+  Formalism.L2.SG.RowsJoinPinned GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf
+  GlobalTheory.Core.Rk GlobalTheory.Core.Mi
 open scoped TensorProduct InnerProductSpace Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Core.Mi.Fold
 
-theorem exists_cutoff_srat : ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u : D.what₂.Word) (Fs : Set X.B.I.GA), IsFundamentalDomain (Srat X u) Fs (X.B.I.muA X.B.μf) → ∃ β : X.B.I.GA → ENNReal, Measurable β ∧ (∀ x, ∑' σ : Srat X u, β ((σ : X.B.I.GA) * x) = 1) ∧ ∀ F : X.B.I.GA → ENNReal, Measurable F → (∀ γ ∈ Srat X u, ∀ x, F (γ * x) = F x) → ∫⁻ x in Fs, F x ∂(X.B.I.muA X.B.μf) = ∫⁻ x, β x * F x ∂(X.B.I.muA X.B.μf) := by
+theorem exists_cutoff_srat
+    : ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u : D.what₂.Word)
+        (Fs : Set X.B.I.GA),
+      IsFundamentalDomain (Srat X u) Fs (X.B.I.muA X.B.μf)
+        → ∃ β : X.B.I.GA → ENNReal,
+          Measurable β ∧ (∀ x, ∑' σ : Srat X u, β ((σ : X.B.I.GA) * x) = 1)
+            ∧ ∀ F : X.B.I.GA → ENNReal,
+              Measurable F → (∀ γ ∈ Srat X u, ∀ x, F (γ * x) = F x)
+                → ∫⁻ x in Fs, F x ∂(X.B.I.muA X.B.μf) = ∫⁻ x, β x * F x ∂(X.B.I.muA X.B.μf) := by
   intro D X u Fs hFs
   have hR := Formalism.L2.SG.Pf.foldReady_holds X.B.I
   haveI : BorelSpace X.B.I.GA := hR.2.2.2.1
@@ -38,12 +53,14 @@ theorem exists_cutoff_srat : ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaS
       have hne : ((t : X.B.I.GA) * x) ∉ F' := by
         intro htx
         apply ht
-        have := h2 _ hsx ((t : X.B.I.GA) * s⁻¹) ((Srat X u).mul_mem t.2 ((Srat X u).inv_mem hs))
-          (by simpa [mul_assoc] using htx)
+        have :=
+          h2 _ hsx ((t : X.B.I.GA) * s⁻¹) ((Srat X u).mul_mem t.2 ((Srat X u).inv_mem hs))
+            (by simpa [mul_assoc] using htx)
         exact Subtype.ext (by simpa [mul_inv_eq_one] using this)
       simp [Set.indicator_of_notMem hne]
   · intro F hFm hFinv
-    rw [hFs.setLIntegral_eq hF' F (fun g x => by simpa [Subgroup.smul_def, smul_eq_mul] using hFinv g g.2 x)]
+    rw [hFs.setLIntegral_eq hF' F
+      (fun g x => by simpa [Subgroup.smul_def, smul_eq_mul] using hFinv g g.2 x)]
     rw [← lintegral_indicator hF'm]
     refine lintegral_congr fun x => ?_
     by_cases hx : x ∈ F' <;> simp [Set.indicator, hx]

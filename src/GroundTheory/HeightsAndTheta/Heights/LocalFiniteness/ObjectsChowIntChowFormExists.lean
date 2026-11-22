@@ -80,8 +80,16 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 set_option maxSynthPendingDepth 1
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.Targets_ChartSectionLength : GroundTheory.Heights₂.Heights.Targets.ChartSectionLength.Statement :=
-  @GroundTheory.Heights₂.Heights.Targets.ChartSectionLength.proof GroundTheory.Heights₂.Heights.Targets.ChartConeComponent.proof GroundTheory.Heights₂.Heights.AutoClose.Targets_ChartConeLength
+theorem GroundTheory.Heights₂.Heights.AutoClose.Targets_ChartSectionLength
+    : GroundTheory.Heights₂.Heights.Targets.ChartSectionLength.Statement :=
+  @GroundTheory.Heights₂.Heights.Targets.ChartSectionLength.proof
+    GroundTheory.Heights₂.Heights.Targets.ChartConeComponent.proof
+    GroundTheory.Heights₂.Heights.AutoClose.Targets_ChartConeLength
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.FsLogAverage : GroundTheory.Heights₂.Heights.FsLogAverage.Statement :=
-  @GroundTheory.Heights₂.Heights.FsLogAverage.proof GroundTheory.Heights₂.Heights.BallAverageLinear.proof GroundTheory.Heights₂.Heights.FsLogPointOf.proof GroundTheory.Heights₂.Heights.AutoClose.SphereMeanLinearBall GroundTheory.Heights₂.Heights.BallVolume.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.FsLogAverage
+    : GroundTheory.Heights₂.Heights.FsLogAverage.Statement :=
+  @GroundTheory.Heights₂.Heights.FsLogAverage.proof
+    GroundTheory.Heights₂.Heights.BallAverageLinear.proof
+    GroundTheory.Heights₂.Heights.FsLogPointOf.proof
+    GroundTheory.Heights₂.Heights.AutoClose.SphereMeanLinearBall
+    GroundTheory.Heights₂.Heights.BallVolume.proof

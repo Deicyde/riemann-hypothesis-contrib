@@ -12,11 +12,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa UpperTheory.V.Pa.Core
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa UpperTheory.V.Pa.Core
 open scoped TensorProduct
 
-private theorem lam_comap {n : ℕ} {A G H : Type} [CommRing A] [Group G] [Group H] (D : GDet n A G) (φ : H →* G)
-    (i : ℕ) (g : H) : (D.comap φ).lam i (MonoidAlgebra.single g 1) = D.lam i (MonoidAlgebra.single (φ g) 1) := by
+private theorem lam_comap
+    {n : ℕ} {A G H : Type} [CommRing A] [Group G] [Group H]
+    (D : GDet n A G) (φ : H →* G) (i : ℕ) (g : H)
+    : (D.comap φ).lam i (MonoidAlgebra.single g 1) = D.lam i (MonoidAlgebra.single (φ g) 1) := by
   have : (D.comap φ).chi (MonoidAlgebra.single g 1) = D.chi (MonoidAlgebra.single (φ g) 1) := by
     change D.D _ (MonoidAlgebra.mapDomainRingHom _ φ _) = D.D _ _
     congr 1
@@ -24,33 +27,44 @@ private theorem lam_comap {n : ℕ} {A G H : Type} [CommRing A] [Group G] [Group
     simp
   rw [GDet.lam, GDet.lam, this]
 
-private theorem lam_map {n : ℕ} {A A' G : Type} [CommRing A] [CommRing A'] [Group G] (D : GDet n A G) (f : A →+* A')
-    (i : ℕ) (g : G) : (D.map f).lam i (MonoidAlgebra.single g 1) = f (D.lam i (MonoidAlgebra.single g 1)) := by
+private theorem lam_map
+    {n : ℕ} {A A' G : Type} [CommRing A] [CommRing A'] [Group G]
+    (D : GDet n A G) (f : A →+* A') (i : ℕ) (g : G)
+    : (D.map f).lam i (MonoidAlgebra.single g 1) = f (D.lam i (MonoidAlgebra.single g 1)) := by
   have := ((UpperTheory.V.CA.d_gmap D).2.2.1 f (MonoidAlgebra.single g 1)).2 i
   rwa [MonoidAlgebra.mapRingHom_single, map_one] at this
 
-private theorem coeff_cong {n : ℕ} {A G : Type} [CommRing A] [Group G] (D : GDet n A G) (I : Ideal A)
-    (x y : MonoidAlgebra A G) (h : ∀ i, D.lam i x - D.lam i y ∈ I) (k : ℕ) :
-    (D.chi x).coeff k - (D.chi y).coeff k ∈ I := by
+private theorem coeff_cong
+    {n : ℕ} {A G : Type} [CommRing A] [Group G]
+    (D : GDet n A G) (I : Ideal A) (x y : MonoidAlgebra A G) (h : ∀ i, D.lam i x - D.lam i y ∈ I)
+    (k : ℕ)
+    : (D.chi x).coeff k - (D.chi y).coeff k ∈ I := by
   by_cases hk : k ≤ n
   · have h1 := I.mul_mem_left ((-1) ^ (n - k)) (h (n - k))
     rw [GDet.lam, GDet.lam, Nat.sub_sub_self hk, ← mul_sub, ← mul_assoc, ← mul_pow] at h1
     simpa using h1
   · have hd : ∀ z, (D.chi z).coeff k = 0 := fun z => by
       rw [← (UpperTheory.V.CA.d_toDet D z).1]
-      exact Polynomial.coeff_eq_zero_of_natDegree_lt
-        (lt_of_le_of_lt (UpperTheory.V.CA.d_chi D.toDet z).2.2.2.2.2.1 (not_le.1 hk))
+      exact Polynomial.coeff_eq_zero_of_natDegree_lt (lt_of_le_of_lt
+        (UpperTheory.V.CA.d_chi D.toDet z).2.2.2.2.2.1 (not_le.1 hk))
     rw [hd, hd, sub_self]
     exact I.zero_mem
 
-private theorem sees_glob {l : ℕ} [Fact l.Prime] {L : Loc} (G0 : Glob l L) {n : ℕ} {R : Type} [CommRing R]
-    (D : GDet n R G0.G₀) (I : Ideal R) (hD : D.IsCont I) (e : ℕ) :
-    ∃ V : OpenNormalSubgroup G0.Γ, ∀ g g' : G0.G₀, (g : G0.Γ) * (g' : G0.Γ)⁻¹ ∈ V → ∀ i,
-      D.lam i (MonoidAlgebra.single g' 1) - D.lam i (MonoidAlgebra.single g 1) ∈ I ^ e := by
+private theorem sees_glob
+    {l : ℕ} [Fact l.Prime]
+    {L : Loc} (G0 : Glob l L)
+    {n : ℕ} {R : Type} [CommRing R]
+    (D : GDet n R G0.G₀) (I : Ideal R) (hD : D.IsCont I)
+    (e : ℕ)
+    : ∃ V : OpenNormalSubgroup G0.Γ, ∀ g g' : G0.G₀,
+      (g : G0.Γ) * (g' : G0.Γ)⁻¹ ∈ V
+        → ∀ i,
+          D.lam i (MonoidAlgebra.single g' 1) - D.lam i (MonoidAlgebra.single g 1) ∈ I ^ e := by
   obtain ⟨V0, hV0⟩ := UpperTheory.V.Pa.Core.dSees n R G0.G₀ D I hD e
   have hop : IsOpen (Subtype.val '' (V0 : Set G0.G₀) : Set G0.Γ) :=
     G0.η_open.isOpenMap_subtype_val _ V0.isOpen
-  obtain ⟨V, hV⟩ := ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one hop ⟨1, one_mem V0, rfl⟩
+  obtain ⟨V, hV⟩ :=
+    ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one hop ⟨1, one_mem V0, rfl⟩
   refine ⟨V, fun g g' hg i => hV0 i _ _ ?_⟩
   obtain ⟨a, ha, e⟩ := hV hg
   have e' : a = g * g'⁻¹ := Subtype.ext e
@@ -60,21 +74,29 @@ private theorem sees_glob {l : ℕ} [Fact l.Prime] {L : Loc} (G0 : Glob l L) {n 
     exact this.symm
   simp only [MonoidAlgebra.mapDomainRingHom_apply, MonoidAlgebra.mapDomain_single, h2]
 
-private theorem sp_le {R : Type} [CommRing R] (I : Ideal R) {q n : ℕ} (P P' : Fin q → Polynomial R)
-    (ut : Fin q → Fin n → R) (h : ∀ j k, (P j).coeff k - (P' j).coeff k ∈ I) :
-    spIdeal P' ut ≤ spIdeal P ut ⊔ I.map (MvPowerSeries.C : R →+* MvPowerSeries (Fin q × Fin n) R) := by
+private theorem sp_le
+    {R : Type} [CommRing R]
+    (I : Ideal R)
+    {q n : ℕ} (P P' : Fin q → Polynomial R) (ut : Fin q → Fin n → R)
+    (h : ∀ j k, (P j).coeff k - (P' j).coeff k ∈ I)
+    : spIdeal P' ut
+      ≤ spIdeal P ut ⊔ I.map (MvPowerSeries.C : R →+* MvPowerSeries (Fin q × Fin n) R) := by
   unfold spIdeal
   rw [Ideal.span_le]
   rintro _ ⟨j, k, rfl⟩
-  refine Submodule.mem_sup.2 ⟨_, Ideal.subset_span ⟨j, k, rfl⟩, _, Ideal.mem_map_of_mem _ (h j k), ?_⟩
+  refine Submodule.mem_sup.2
+    ⟨_, Ideal.subset_span ⟨j, k, rfl⟩, _, Ideal.mem_map_of_mem _ (h j k), ?_⟩
   simp only [Polynomial.coeff_sub, Polynomial.coeff_map, map_sub]
   ring
 
-private theorem sp_lift (O : Type) [CommRing O] {R : Type} [CommRing R] [Algebra O R] {q n : ℕ}
-    (P : Fin q → Polynomial R) (ut : Fin q → Fin n → R) (K : Ideal (MvPowerSeries (Fin q × Fin n) R))
-    (h : spIdeal P ut ≤ K) :
-    ∃ f : Sp P ut →ₐ[O] (MvPowerSeries (Fin q × Fin n) R ⧸ K), (∀ z, f (Sp.mk P ut z) = Ideal.Quotient.mk K z) ∧
-      ∀ b, f (algebraMap R _ b) = Ideal.Quotient.mk K (MvPowerSeries.C b) :=
+private theorem sp_lift
+    (O : Type) [CommRing O]
+    {R : Type} [CommRing R] [Algebra O R]
+    {q n : ℕ} (P : Fin q → Polynomial R) (ut : Fin q → Fin n → R)
+    (K : Ideal (MvPowerSeries (Fin q × Fin n) R)) (h : spIdeal P ut ≤ K)
+    : ∃ f : Sp P ut →ₐ[O] (MvPowerSeries (Fin q × Fin n) R ⧸ K),
+      (∀ z, f (Sp.mk P ut z) = Ideal.Quotient.mk K z)
+        ∧ ∀ b, f (algebraMap R _ b) = Ideal.Quotient.mk K (MvPowerSeries.C b) :=
   ⟨Ideal.Quotient.factorₐ O h, fun _ => rfl, fun _ => rfl⟩
 
 theorem UpperTheory.V.Pa.Core.piCong :

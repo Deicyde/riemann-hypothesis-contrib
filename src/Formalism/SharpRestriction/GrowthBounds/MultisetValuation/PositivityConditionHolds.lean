@@ -12,7 +12,8 @@ namespace Formalism.MainNotions.FormalGroupSystem.Pf
 
 open Formalism.MainNotions.G Formalism.BasicNotions Finset
 open Formalism.DworkPowerSeriesWeights (Integral mvExp)
-open Formalism.InvariantFactorPaths.G7 (WModel.nf WModel.norm_def WModel.abv_le_one_iff WModel.abv_le_pow_iff)
+open Formalism.InvariantFactorPaths.G7
+  (WModel.nf WModel.norm_def WModel.abv_le_one_iff WModel.abv_le_pow_iff)
 
 attribute [local instance] Formalism.InvariantFactorPaths.G7.WModel.nf
 
@@ -26,8 +27,8 @@ theorem sx_norm_le_one_iff (x : K0 p) : ‖x‖ ≤ 1 ↔ ∃ w : WW p, algebraM
   rw [Formalism.InvariantFactorPaths.G7.WModel.norm_def]
   exact Formalism.InvariantFactorPaths.G7.WModel.abv_le_one_iff p x
 
-theorem sx_norm_le_inv_iff (x : K0 p) :
-    ‖x‖ ≤ (p : ℝ)⁻¹ ↔ ∃ w : WW p, x = (p : K0 p) * algebraMap (WW p) (K0 p) w := by
+theorem sx_norm_le_inv_iff (x : K0 p)
+    : ‖x‖ ≤ (p : ℝ)⁻¹ ↔ ∃ w : WW p, x = (p : K0 p) * algebraMap (WW p) (K0 p) w := by
   have h := Formalism.InvariantFactorPaths.G7.WModel.abv_le_pow_iff p 1 x
   rw [pow_one, pow_one] at h
   rw [Formalism.InvariantFactorPaths.G7.WModel.norm_def]
@@ -37,9 +38,12 @@ theorem sx_norm_p : ‖(p : K0 p)‖ = (p : ℝ)⁻¹ := by
   rw [Formalism.InvariantFactorPaths.G7.WModel.norm_def]
   exact Formalism.InvariantFactorPaths.G7.WModel.abv_p p
 
-theorem sx_ultra : IsUltrametricDist (K0 p) := IsUltrametricDist.isUltrametricDist_of_forall_norm_add_le_max_norm fun x y => by
-  rw [Formalism.InvariantFactorPaths.G7.WModel.norm_def, Formalism.InvariantFactorPaths.G7.WModel.norm_def, Formalism.InvariantFactorPaths.G7.WModel.norm_def]
-  exact Formalism.InvariantFactorPaths.G7.WModel.abv_nonarch p x y
+theorem sx_ultra : IsUltrametricDist (K0 p) :=
+  IsUltrametricDist.isUltrametricDist_of_forall_norm_add_le_max_norm fun x y => by
+    rw [Formalism.InvariantFactorPaths.G7.WModel.norm_def,
+      Formalism.InvariantFactorPaths.G7.WModel.norm_def,
+      Formalism.InvariantFactorPaths.G7.WModel.norm_def]
+    exact Formalism.InvariantFactorPaths.G7.WModel.abv_nonarch p x y
 
 theorem sx_sigK_eq : (sigK p).toRingHom = Formalism.InvariantFactorPaths.G7.WModel.sig p := by
   apply IsLocalization.ringHom_ext (nonZeroDivisors (WW p))
@@ -61,8 +65,8 @@ theorem sx_integral_iff {ι : Type} (f : MvPowerSeries ι (K0 p)) : Integral f �
   · rintro ⟨g, rfl⟩ n
     exact (sx_norm_le_one_iff p _).mpr ⟨_, rfl⟩
 
-theorem sx_expS_eq {ι : Type} {f : MvPowerSeries ι (K0 p)} (hf : MvPowerSeries.constantCoeff f = 0) :
-    expS p f = mvExp f := by
+theorem sx_expS_eq {ι : Type} {f : MvPowerSeries ι (K0 p)} (hf : MvPowerSeries.constantCoeff f = 0)
+    : expS p f = mvExp f := by
   ext n
   unfold mvExp
   rw [PowerSeries.coeff_subst (PowerSeries.HasSubst.of_constantCoeff_zero hf)]
@@ -77,7 +81,9 @@ theorem sx_expS_eq {ι : Type} {f : MvPowerSeries ι (K0 p)} (hf : MvPowerSeries
   have hz : ∀ d : ℕ, Finsupp.degree n < d → MvPowerSeries.coeff n (f ^ d) = 0 := by
     intro d hd
     apply MvPowerSeries.coeff_of_lt_order
-    calc ((Finsupp.degree n : ℕ) : ℕ∞) < d := by exact_mod_cast hd
+    calc
+      ((Finsupp.degree n : ℕ) : ℕ∞)
+        < d := by exact_mod_cast hd
       _ = d • (1 : ℕ∞) := by simp
       _ ≤ d • f.order := nsmul_le_nsmul_right hord d
       _ ≤ (f ^ d).order := MvPowerSeries.le_order_pow d
@@ -94,9 +100,10 @@ theorem sx_expS_eq {ι : Type} {f : MvPowerSeries ι (K0 p)} (hf : MvPowerSeries
     apply hd
     rw [hz d (by omega), smul_zero]
 
-theorem sx_div_p_iff {ι : Type} (f : MvPowerSeries ι (K0 p)) :
-    (∀ n, ‖MvPowerSeries.coeff n f‖ ≤ (p : ℝ)⁻¹) ↔
-      ∃ Q : MvPowerSeries ι (WW p), f = (p : K0 p) • MvPowerSeries.map (algebraMap (WW p) (K0 p)) Q := by
+theorem sx_div_p_iff {ι : Type} (f : MvPowerSeries ι (K0 p))
+    : (∀ n, ‖MvPowerSeries.coeff n f‖ ≤ (p : ℝ)⁻¹)
+      ↔ ∃ Q : MvPowerSeries ι (WW p),
+        f = (p : K0 p) • MvPowerSeries.map (algebraMap (WW p) (K0 p)) Q := by
   constructor
   · intro h
     choose g hg using fun n => (sx_norm_le_inv_iff p (MvPowerSeries.coeff n f)).mp (h n)
@@ -111,11 +118,15 @@ theorem sx_div_p_iff {ι : Type} (f : MvPowerSeries ι (K0 p)) :
 theorem sx_dwork : DworkLemma p := by
   intro _ n Ps h0
   have := sx_ultra p
-  have h := Formalism.InvariantFactorPaths.G7.dwork_multivariable (K0 p) (Fin n) p (sigK p).toRingHom hp.out (sx_norm_p p) (sx_sig_frob p) Ps h0
+  have h :=
+    Formalism.InvariantFactorPaths.G7.dwork_multivariable (K0 p) (Fin n) p (sigK p).toRingHom hp.out
+      (sx_norm_p p) (sx_sig_frob p) Ps h0
   rw [sx_expS_eq p h0, ← sx_integral_iff, h, sx_div_p_iff]
   unfold Formalism.InvariantFactorPaths.G7.frobVar
   rw [MvPowerSeries.smul_eq_C_mul]
 
-theorem positivity_condition_holds (D : Formalism.BasicNotions.D7) : Formalism.MainNotions.FormalGroupSystem.adm1 D := fun p _ => sx_dwork p
+theorem positivity_condition_holds (D : Formalism.BasicNotions.D7)
+    : Formalism.MainNotions.FormalGroupSystem.adm1 D := fun p _ =>
+  sx_dwork p
 
 end Formalism.MainNotions.FormalGroupSystem.Pf

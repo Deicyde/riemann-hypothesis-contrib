@@ -12,7 +12,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SecondDer
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 Filter Topology PeriodPair
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 Filter Topology
+  PeriodPair
 
 namespace GlobalTheory.JetConj
 
@@ -184,7 +186,9 @@ lemma exists_periodPair_lamConj (h : ∀ z, z ∈ Λ ↔ z ∈ L.lattice) {M : I
 
 theorem galois_translate_sgStar : ∀ D : D7, gal1 D := by
   intro D cc δ hc M ρ hK h2 h3 x x' m hm hmx hA hM n
-  have hlat := (GlobalTheory.CurveLattice.lattice_of_curve D (GlobalTheory.InducedType.induced_type D).1 cc δ hc).1
+  have hlat :=
+    (GlobalTheory.CurveLattice.lattice_of_curve D (GlobalTheory.InducedType.induced_type D).1 cc δ
+      hc).1
   have hsg := GlobalTheory.T.galois_taylorSeries_canonicalOddTheta_all D cc δ hc M ρ hK h2 h3
   have hst := (GlobalTheory.ConjPoint.galStar_holds D cc δ hc M ρ hK h2 h3).2.2.2.2.2.1
   generalize lamOf D cc δ = Λ at *
@@ -223,36 +227,49 @@ theorem galois_translate_sgStar : ∀ D : D7, gal1 D := by
   have hS := isFieldGraph_graph M ρ
   have hS0 := isFieldGraph_graph M M.val
   have huL : u ∉ L.lattice := mt (hL u).2 hu
-  have ψ := jetRel_divQuot hS H H' huL (mt (hL' u').2 hu') hg
-    (mem_graph_iff_cj.2 ⟨p1, p3.symm⟩) (mem_graph_iff_cj.2 ⟨p2, p4.symm⟩)
-  have ψ0 := jetRel_divQuot hS0 H H huL huL (mem_graph_val.2 (mem_graph_iff_cj.1 hg).1)
-    (mem_graph_val.2 p1) (mem_graph_val.2 p2)
+  have ψ :=
+    jetRel_divQuot hS H H' huL (mt (hL' u').2 hu') hg (mem_graph_iff_cj.2 ⟨p1, p3.symm⟩)
+      (mem_graph_iff_cj.2 ⟨p2, p4.symm⟩)
+  have ψ0 :=
+    jetRel_divQuot hS0 H H huL huL (mem_graph_val.2 (mem_graph_iff_cj.1 hg).1) (mem_graph_val.2 p1)
+      (mem_graph_val.2 p2)
   obtain ⟨k, hk⟩ : ∃ k, m ^ 2 = k + 1 := Nat.exists_eq_succ_of_ne_zero (by positivity)
   obtain ⟨K, a1, a2, a3, a4, a5⟩ := translate_facts hL hu hk hN
   obtain ⟨K', b1, -, b3, b4, b5⟩ := translate_facts hL' hu' hk hN'
   have dG := differentiable_U1 (Λ := Λ) H.diff ((2 * m : ℕ) * u)
   have dG' := differentiable_U1 (Λ := lamConj M ρ Λ) H'.diff ((2 * m : ℕ) * u')
 
-  have G0 : JetRel (graph M M.val) (U1 Λ ((2 * m : ℕ) * u) (sgStar Λ)) (U1 Λ ((2 * m : ℕ) * u) (sgStar Λ)) :=
-    ⟨dG.analyticAt 0, dG.analyticAt 0, fun n => mem_graph_val.2 (taylorCoeff_mem_iff_iteratedDeriv_mem.1 (hM n))⟩
+  have G0 : JetRel (graph M M.val) (U1 Λ ((2 * m : ℕ) * u) (sgStar Λ))
+      (U1 Λ ((2 * m : ℕ) * u) (sgStar Λ)) := ⟨
+    dG.analyticAt 0,
+    dG.analyticAt 0,
+    fun n => mem_graph_val.2 (taylorCoeff_mem_iff_iteratedDeriv_mem.1 (hM n))
+  ⟩
   have K0 : JetRel (graph M M.val) K K :=
     JetRel.of_mul hS0 a1 a1 (ψ0 (2 * m)) (H.divQuot_ne huL (by omega))
       ((G0.comp_mul dG dG (pair_natCast _ _)).congr a3 a3)
   have s0 : JetRel (graph M M.val) (sgStar Λ) (sgStar Λ) :=
     JetRel.of_comp_mul hS0 H.diff H.diff hm3 (pair_natCast _ _)
       (((K0.pow _).mul (ψ0 _)).congr a4.symm a4.symm)
-  have sM : ∀ n, coef1 (sgStar Λ) n ∈ M := fun n => taylorCoeff_mem_iff_iteratedDeriv_mem.2 (mem_graph_val.1 (s0.2.2 n))
-  have s1 : JetRel (graph M ρ) (sgStar Λ) (sgStar (lamConj M ρ Λ)) :=
-    ⟨H.diff.analyticAt 0, H'.diff.analyticAt 0, fun n =>
-      (pair_iteratedDeriv_iff hS).2 (mem_graph_iff_cj.2 ⟨sM n, hsg sM n⟩)⟩
+  have sM : ∀ n, coef1 (sgStar Λ) n ∈ M := fun n =>
+    taylorCoeff_mem_iff_iteratedDeriv_mem.2 (mem_graph_val.1 (s0.2.2 n))
+  have s1 : JetRel (graph M ρ) (sgStar Λ) (sgStar (lamConj M ρ Λ)) := ⟨
+    H.diff.analyticAt 0,
+    H'.diff.analyticAt 0,
+    fun n => (pair_iteratedDeriv_iff hS).2 (mem_graph_iff_cj.2 ⟨sM n, hsg sM n⟩)
+  ⟩
   have K2 : JetRel (graph M ρ) (fun z => K z ^ (m ^ 2)) (fun z => K' z ^ (m ^ 2)) :=
-    JetRel.of_mul hS (a1.fun_pow _) (b1.fun_pow _) (ψ (2 * m ^ 2)) (H.divQuot_ne huL (by positivity))
+    JetRel.of_mul hS (a1.fun_pow _) (b1.fun_pow _) (ψ (2 * m ^ 2))
+      (H.divQuot_ne huL (by positivity))
       ((s1.comp_mul H.diff H'.diff (pair_natCast _ _)).congr a4 b4)
   have K1 : JetRel (graph M ρ) K K' :=
-    JetRel.of_pow hS a1 b1 (by positivity) K2 (by
-      rw [a5, b5]
-      exact pair_mul (pair_sub (Subring.zero_mem _) (ψ k).zero) (hS.2 _ _ (ψ (k + 2)).zero)) a2
-  have G1 := JetRel.of_comp_mul hS dG dG' hm2 (pair_natCast _ _) ((K1.mul (ψ _)).congr a3.symm b3.symm)
+    JetRel.of_pow hS a1 b1 (by positivity) K2
+      (by
+        rw [a5, b5]
+        exact pair_mul (pair_sub (Subring.zero_mem _) (ψ k).zero) (hS.2 _ _ (ψ (k + 2)).zero))
+      a2
+  have G1 :=
+    JetRel.of_comp_mul hS dG dG' hm2 (pair_natCast _ _) ((K1.mul (ψ _)).congr a3.symm b3.symm)
   exact (mem_graph_iff_cj.1 ((pair_iteratedDeriv_iff hS).1 (G1.2.2 n))).2
 
 end GlobalTheory.JetConj

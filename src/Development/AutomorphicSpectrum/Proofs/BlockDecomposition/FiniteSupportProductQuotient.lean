@@ -8,14 +8,15 @@ public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.
 
 namespace GlobalTheory.CompanionTheory.ProdQuotient
 
-theorem support_mul_out_finite (G₁ G₂ : Type) [Group G₁] [Group G₂] (K₁ : Subgroup G₁)
-    (K₂ : Subgroup G₂) (f₁ : G₁ → ℂ) (f₂ : G₂ → ℂ)
+theorem support_mul_out_finite
+    (G₁ G₂ : Type) [Group G₁] [Group G₂]
+    (K₁ : Subgroup G₁) (K₂ : Subgroup G₂) (f₁ : G₁ → ℂ) (f₂ : G₂ → ℂ)
     (h₁ : (Function.support fun q : G₁ ⧸ K₁ => f₁ q.out).Finite)
     (h₂ : (Function.support fun q : G₂ ⧸ K₂ => f₂ q.out).Finite)
-    (i₁ : ∀ k ∈ K₁, ∀ g, f₁ (g * k) = f₁ g) (i₂ : ∀ k ∈ K₂, ∀ g, f₂ (g * k) = f₂ g) :
-    (Function.support fun q : (G₁ × G₂) ⧸ K₁.prod K₂ => f₁ q.out.1 * f₂ q.out.2).Finite := by
-  let φ : (G₁ × G₂) ⧸ K₁.prod K₂ → (G₁ ⧸ K₁) × (G₂ ⧸ K₂) :=
-    fun q => ((q.out.1 : G₁ ⧸ K₁), (q.out.2 : G₂ ⧸ K₂))
+    (i₁ : ∀ k ∈ K₁, ∀ g, f₁ (g * k) = f₁ g) (i₂ : ∀ k ∈ K₂, ∀ g, f₂ (g * k) = f₂ g)
+    : (Function.support fun q : (G₁ × G₂) ⧸ K₁.prod K₂ => f₁ q.out.1 * f₂ q.out.2).Finite := by
+  let φ : (G₁ × G₂) ⧸ K₁.prod K₂ → (G₁ ⧸ K₁) × (G₂ ⧸ K₂) := fun q =>
+    ((q.out.1 : G₁ ⧸ K₁), (q.out.2 : G₂ ⧸ K₂))
   have hinj : Function.Injective φ := by
     intro a b hab
     have e₁ : ((a.out.1 : G₁ ⧸ K₁)) = (b.out.1 : G₁ ⧸ K₁) := congrArg Prod.fst hab

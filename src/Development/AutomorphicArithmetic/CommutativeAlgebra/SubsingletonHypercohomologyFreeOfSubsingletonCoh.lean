@@ -7,10 +7,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsNatura
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Bc
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Bc
 
-theorem UpperTheory.subsingleton_hypercohomology_free_of_subsingleton_cohomology :
-    ∀ (F : Shv ℤ) (P : PSh) (n : ℤ), Subsingleton (H ℤ (disc.obj P) F n) → Subsingleton (HK ℤ (sgl ((free ℤ).obj P)) F n) := by
+theorem UpperTheory.subsingleton_hypercohomology_free_of_subsingleton_cohomology
+    : ∀ (F : Shv ℤ) (P : PSh) (n : ℤ),
+      Subsingleton (H ℤ (disc.obj P) F n) → Subsingleton (HK ℤ (sgl ((free ℤ).obj P)) F n) := by
   intro F P n hs
   obtain ⟨e, -, -⟩ := GlobalTheory.T.exists_natural_homotopyEquiv_chains_constant_presheaf ℤ
   haveI : (res ℤ F).IsKInjective := (GlobalTheory.T.chosenInjectiveResolution_etaleSheaf_properties ℤ F).1

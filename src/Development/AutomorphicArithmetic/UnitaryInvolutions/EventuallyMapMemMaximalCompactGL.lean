@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.SimpleTwiste
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix Polynomial Filter
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC GlobalTheory.BCT
 open scoped Classical TensorProduct
 
 private lemma val_le_one_ae (E : Type) [Field E] [NumberField E] (e : E) :
@@ -41,19 +42,23 @@ private lemma mem_GLint {n : ℕ} {L : Type} [Field L] (O : Subring L) (g : GL (
   refine Units.ext (Matrix.ext fun i j => ?_)
   rfl
 
-theorem UpperTheory.eventually_map_mem_maximalCompactGL :
-    ∀ (E : Type) [Field E] [NumberField E] (n : ℕ) (δ : GL (Fin n) E), ∀ᶠ w : Pl E in cofinite,
-        GeneralLinearGroup.map (algebraMap E (w.adicCompletion E)) δ ∈ GlobalTheory.LFun.KGL w (n := n) := by
-  intro E _ _ n δ
-  have h₁ : ∀ᶠ w : Pl E in cofinite, ∀ i j,
-      Valued.v (algebraMap E (w.adicCompletion E) ((δ : Matrix (Fin n) (Fin n) E) i j)) ≤ 1 :=
-    eventually_all.2 fun i => eventually_all.2 fun j => val_le_one_ae E _
-  have h₂ : ∀ᶠ w : Pl E in cofinite, ∀ i j,
-      Valued.v (algebraMap E (w.adicCompletion E)
-        (((δ⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) i j)) ≤ 1 :=
-    eventually_all.2 fun i => eventually_all.2 fun j => val_le_one_ae E _
-  filter_upwards [h₁, h₂] with w hw₁ hw₂
-  refine mem_GLint (Ov E w) _ (fun i j => ?_) (fun i j => ?_)
-  · exact hw₁ i j
-  · rw [← map_inv]
-    exact hw₂ i j
+theorem UpperTheory.eventually_map_mem_maximalCompactGL
+    : ∀ (E : Type) [Field E] [NumberField E] (n : ℕ) (δ : GL (Fin n) E),
+      ∀ᶠ w : Pl E in cofinite,
+        GeneralLinearGroup.map (algebraMap E (w.adicCompletion E)) δ ∈ GlobalTheory.LFun.KGL w (n := n) :=
+  by
+    intro E _ _ n δ
+    have h₁
+        : ∀ᶠ w : Pl E in cofinite, ∀ i j,
+          Valued.v (algebraMap E (w.adicCompletion E) ((δ : Matrix (Fin n) (Fin n) E) i j)) ≤ 1 :=
+      eventually_all.2 fun i => eventually_all.2 fun j => val_le_one_ae E _
+    have h₂
+        : ∀ᶠ w : Pl E in cofinite, ∀ i j,
+          Valued.v (algebraMap E (w.adicCompletion E)
+            (((δ⁻¹ : GL (Fin n) E) : Matrix (Fin n) (Fin n) E) i j)) ≤ 1 :=
+      eventually_all.2 fun i => eventually_all.2 fun j => val_le_one_ae E _
+    filter_upwards [h₁, h₂] with w hw₁ hw₂
+    refine mem_GLint (Ov E w) _ (fun i j => ?_) (fun i j => ?_)
+    · exact hw₁ i j
+    · rw [← map_inv]
+      exact hw₂ i j

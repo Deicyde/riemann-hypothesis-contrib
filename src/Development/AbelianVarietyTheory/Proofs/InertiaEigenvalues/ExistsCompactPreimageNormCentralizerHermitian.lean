@@ -12,11 +12,29 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
 namespace GlobalTheory.NormSec
 
-theorem normsec : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (r : ℕ) (A₀ : Matrix (Fin r) (Fin r) E), A₀.IsHermitian → A₀.charpoly.Separable → ∀ M : Set (GL (Fin r) E), IsCompact M → ∃ S : Set (GL (Fin r) E), IsCompact S ∧ ∀ t : GL (Fin r) E, (t : Matrix (Fin r) (Fin r) E) * A₀ = A₀ * (t : Matrix (Fin r) (Fin r) E) → (∃ m ∈ M, (t : Matrix (Fin r) (Fin r) E) * star (t : Matrix (Fin r) (Fin r) E) = (m : Matrix (Fin r) (Fin r) E)) → ∃ s ∈ S, (s : Matrix (Fin r) (Fin r) E) * A₀ = A₀ * (s : Matrix (Fin r) (Fin r) E) ∧ (s : Matrix (Fin r) (Fin r) E) * star (s : Matrix (Fin r) (Fin r) E) = (t : Matrix (Fin r) (Fin r) E) * star (t : Matrix (Fin r) (Fin r) E) := by
+theorem normsec
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (r : ℕ) (A₀ : Matrix (Fin r) (Fin r) E),
+      A₀.IsHermitian → A₀.charpoly.Separable
+        → ∀ M : Set (GL (Fin r) E),
+          IsCompact M
+            → ∃ S : Set (GL (Fin r) E),
+              IsCompact S
+                ∧ ∀ t : GL (Fin r) E,
+                  (t : Matrix (Fin r) (Fin r) E) * A₀ = A₀ * (t : Matrix (Fin r) (Fin r) E)
+                    → (∃ m ∈ M,
+                      (t : Matrix (Fin r) (Fin r) E) * star (t : Matrix (Fin r) (Fin r) E)
+                        = (m : Matrix (Fin r) (Fin r) E))
+                    → ∃ s ∈ S,
+                      (s : Matrix (Fin r) (Fin r) E) * A₀ = A₀ * (s : Matrix (Fin r) (Fin r) E)
+                        ∧ (s : Matrix (Fin r) (Fin r) E) * star (s : Matrix (Fin r) (Fin r) E)
+                          = (t : Matrix (Fin r) (Fin r) E)
+                            * star (t : Matrix (Fin r) (Fin r) E) := by
   intro F E _ _ _ _ hU r A₀ hA hsep M hM
   classical
   have hA' : star A₀ = A₀ := by rw [Matrix.star_eq_conjTranspose]; exact hA
-  obtain ⟨f, hfA, hff, hffs, haniso⟩ := GlobalTheory.T.exists_isotropic_idempotent_centralizer_hermitian E r A₀ hA hsep
+  obtain ⟨f, hfA, hff, hffs, haniso⟩ :=
+    GlobalTheory.T.exists_isotropic_idempotent_centralizer_hermitian E r A₀ hA hsep
   have hcomm := GlobalTheory.T.matrix_commute_of_commute_separable_charpoly E r A₀ hsep
   have hstarC : ∀ m : Matrix (Fin r) (Fin r) E, m * A₀ = A₀ * m → star m * A₀ = A₀ * star m := by
     intro m hm
@@ -38,15 +56,16 @@ theorem normsec : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNorm
     exact ((Subring.mem_centralizer_iff.1 hm) A₀ rfl).symm
   letI : CommRing R := { (inferInstance : Ring R) with
     mul_comm := fun a b => Subtype.ext (hcomm a.1 b.1 (memR' _ a.2) (memR' _ b.2)) }
-  let V : Submodule E (Matrix (Fin r) (Fin r) E) :=
-    { carrier := {z | z * A₀ = A₀ * z ∧ z * e = z}
-      add_mem' := by
-        rintro a b ⟨ha1, ha2⟩ ⟨hb1, hb2⟩
-        exact ⟨by rw [add_mul, mul_add, ha1, hb1], by rw [add_mul, ha2, hb2]⟩
-      zero_mem' := ⟨by simp, by simp⟩
-      smul_mem' := by
-        rintro c a ⟨ha1, ha2⟩
-        exact ⟨by rw [Matrix.smul_mul, Matrix.mul_smul, ha1], by rw [Matrix.smul_mul, ha2]⟩ }
+  let V : Submodule E (Matrix (Fin r) (Fin r) E) := {
+    carrier := {z | z * A₀ = A₀ * z ∧ z * e = z}
+    add_mem' := by
+      rintro a b ⟨ha1, ha2⟩ ⟨hb1, hb2⟩
+      exact ⟨by rw [add_mul, mul_add, ha1, hb1], by rw [add_mul, ha2, hb2]⟩
+    zero_mem' := ⟨by simp, by simp⟩
+    smul_mem' := by
+      rintro c a ⟨ha1, ha2⟩
+      exact ⟨by rw [Matrix.smul_mul, Matrix.mul_smul, ha1], by rw [Matrix.smul_mul, ha2]⟩
+  }
   have hV : ∀ z ∈ V, z * star z = 0 → z = 0 := by
     rintro z ⟨hz1, hz2⟩ h0
     have h := haniso z hz1
@@ -62,15 +81,22 @@ theorem normsec : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNorm
   have hB₂ : IsCompact B₂ := hM₂.image (continuous_mul_const e)
   have hT₁ := GlobalTheory.T.isCompact_preimage_mul_star_anisotropic_submodule F E r V hV B₁ hB₁
   have hT₂ := GlobalTheory.T.isCompact_preimage_mul_star_anisotropic_submodule F E r V hV B₂ hB₂
-  let P₁ := (fun p : Matrix (Fin r) (Fin r) E × Matrix (Fin r) (Fin r) E => p.1 + p.2 * f + g) ''
-    ({z | z ∈ V ∧ z * star z ∈ B₁} ×ˢ M₁)
-  let P₂ := (fun p : Matrix (Fin r) (Fin r) E × Matrix (Fin r) (Fin r) E => p.1 + p.2 * f + g) ''
-    ({z | z ∈ V ∧ z * star z ∈ B₂} ×ˢ M₂)
+  let P₁ :=
+    (fun p : Matrix (Fin r) (Fin r) E × Matrix (Fin r) (Fin r) E => p.1 + p.2 * f + g)
+      '' ({z | z ∈ V ∧ z * star z ∈ B₁} ×ˢ M₁)
+  let P₂ :=
+    (fun p : Matrix (Fin r) (Fin r) E × Matrix (Fin r) (Fin r) E => p.1 + p.2 * f + g)
+      '' ({z | z ∈ V ∧ z * star z ∈ B₂} ×ˢ M₂)
   have hP₁ : IsCompact P₁ := (hT₁.prod hM₁).image (by fun_prop)
   have hP₂ : IsCompact P₂ := (hT₂.prod hM₂).image (by fun_prop)
-  refine ⟨{s | (s : Matrix (Fin r) (Fin r) E) ∈ P₁ ∧ ((s⁻¹ : GL (Fin r) E) : Matrix (Fin r) (Fin r) E) ∈ P₂}, ?_, ?_⟩
-  · have := Units.isClosedEmbedding_embedProduct.isCompact_preimage
-      (hP₁.prod (hP₂.image MulOpposite.continuous_op))
+  refine ⟨
+    {s | (s : Matrix (Fin r) (Fin r) E) ∈ P₁ ∧ ((s⁻¹ : GL (Fin r) E) : Matrix (Fin r) (Fin r) E) ∈ P₂},
+    ?_,
+    ?_
+  ⟩
+  · have :=
+      Units.isClosedEmbedding_embedProduct.isCompact_preimage (hP₁.prod (hP₂.image
+        MulOpposite.continuous_op))
     convert this using 1
     ext s
     simp only [Set.mem_setOf_eq, Set.mem_preimage, Units.embedProduct_apply, Set.mem_prod]
@@ -81,8 +107,7 @@ theorem normsec : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNorm
   set mm : Matrix (Fin r) (Fin r) E := (m : Matrix (Fin r) (Fin r) E) with hmm
   set mi : Matrix (Fin r) (Fin r) E := ((m⁻¹ : GL (Fin r) E) : Matrix (Fin r) (Fin r) E) with hmi
   have cTi : Ti * A₀ = A₀ * Ti := Commute.units_inv_left (u := t) ht
-  have cm : mm * A₀ = A₀ * mm := by
-    rw [← hm, mul_assoc, hstarC _ ht, ← mul_assoc, ht, mul_assoc]
+  have cm : mm * A₀ = A₀ * mm := by rw [← hm, mul_assoc, hstarC _ ht, ← mul_assoc, ht, mul_assoc]
   have cmi : mi * A₀ = A₀ * mi := Commute.units_inv_left (u := m) cm
   let xT : R := ⟨T, memR _ ht⟩
   let xTp : R := ⟨star T, memR _ (hstarC _ ht)⟩
@@ -95,13 +120,16 @@ theorem normsec : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNorm
   have hgR : xg * xg = xg := Subtype.ext (by show star f * star f = star f; rw [← star_mul, hff])
   have hfgR : xf * xg = 0 := Subtype.ext hffs
   have hTiR : xT * xTi = 1 := Subtype.ext (Units.mul_inv t)
-  have hTpiR : xTp * xTip = 1 := Subtype.ext (by
-    show star T * star Ti = 1
-    rw [← star_mul, hT, hTi, Units.inv_mul, star_one])
-  have hmiR : xmi * (xT * xTp) = 1 := Subtype.ext (by
-    show mi * (T * star T) = 1
-    rw [hm, hmi, hmm, Units.inv_mul])
-  have heR : (1 - xf - xg) * (1 - xf - xg) = 1 - xf - xg := by linear_combination hfR + hgR + 2 * hfgR
+  have hTpiR : xTp * xTip = 1 :=
+    Subtype.ext (by
+      show star T * star Ti = 1
+      rw [← star_mul, hT, hTi, Units.inv_mul, star_one])
+  have hmiR : xmi * (xT * xTp) = 1 :=
+    Subtype.ext (by
+      show mi * (T * star T) = 1
+      rw [hm, hmi, hmm, Units.inv_mul])
+  have heR : (1 - xf - xg) * (1 - xf - xg) = 1 - xf - xg := by
+    linear_combination hfR + hgR + 2 * hfgR
   have hefR : (1 - xf - xg) * xf = 0 := by linear_combination -hfR - hfgR
   have hegR : (1 - xf - xg) * xg = 0 := by linear_combination -hgR - hfgR
   let X₀ : R := xT * (1 - xf - xg) + xT * xTp * xf + xg
@@ -118,7 +146,8 @@ theorem normsec : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNorm
   refine ⟨s, ⟨?_, ?_⟩, ?_, ?_⟩
   · refine ⟨(T * e, mm), ⟨⟨⟨?_, ?_⟩, ?_⟩, ⟨m, hmM, rfl⟩⟩, hX₀.symm⟩
     · exact memR' _ (xT * (1 - xf - xg)).2
-    · have : xT * (1 - xf - xg) * (1 - xf - xg) = xT * (1 - xf - xg) := by linear_combination xT * heR
+    · have : xT * (1 - xf - xg) * (1 - xf - xg) = xT * (1 - xf - xg) := by
+        linear_combination xT * heR
       exact congrArg Subtype.val this
     · refine ⟨mm, ⟨m, hmM, rfl⟩, ?_⟩
       have : xT * xTp * (1 - xf - xg) = xT * (1 - xf - xg) * ((1 - xg - xf) * xTp) := by
@@ -129,7 +158,8 @@ theorem normsec : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNorm
       exact h2
   · refine ⟨(Ti * e, mi), ⟨⟨⟨?_, ?_⟩, ?_⟩, ⟨m, hmM, rfl⟩⟩, hX₁.symm⟩
     · exact memR' _ (xTi * (1 - xf - xg)).2
-    · have : xTi * (1 - xf - xg) * (1 - xf - xg) = xTi * (1 - xf - xg) := by linear_combination xTi * heR
+    · have : xTi * (1 - xf - xg) * (1 - xf - xg) = xTi * (1 - xf - xg) := by
+        linear_combination xTi * heR
       exact congrArg Subtype.val this
     · refine ⟨mi, ⟨m, hmM, rfl⟩, ?_⟩
       have hTT : xTi * xTip = xmi := by

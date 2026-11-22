@@ -15,13 +15,16 @@ open MvPolynomial IsDedekindDomain
 
 section Residue
 
-variable {O : Type} [CommRing O] [IsDedekindDomain O] {n : ℕ} (v : HeightOneSpectrum O)
-  (W : Ideal (MvPolynomial (Fin n) O))
+variable
+  {O : Type} [CommRing O] [IsDedekindDomain O]
+  {n : ℕ}
+  (v : HeightOneSpectrum O) (W : Ideal (MvPolynomial (Fin n) O))
 
-noncomputable def quotientResidueEquiv (hW : Ideal.map (C : O →+* MvPolynomial (Fin n) O) v.asIdeal ≤ W) :
-    (MvPolynomial (Fin n) O ⧸ W) ≃+*
-      (MvPolynomial (Fin n) v.asIdeal.ResidueField ⧸
-        W.map (MvPolynomial.map (algebraMap O v.asIdeal.ResidueField))) :=
+noncomputable def quotientResidueEquiv
+    (hW : Ideal.map (C : O →+* MvPolynomial (Fin n) O) v.asIdeal ≤ W)
+    : (MvPolynomial (Fin n) O ⧸ W)
+      ≃+* (MvPolynomial (Fin n) v.asIdeal.ResidueField ⧸
+            W.map (MvPolynomial.map (algebraMap O v.asIdeal.ResidueField))) :=
   let φ : MvPolynomial (Fin n) O →+* MvPolynomial (Fin n) v.asIdeal.ResidueField :=
     MvPolynomial.map (algebraMap O v.asIdeal.ResidueField)
   have hφ : Function.Surjective φ :=
@@ -35,9 +38,9 @@ noncomputable def quotientResidueEquiv (hW : Ideal.map (C : O →+* MvPolynomial
       ← RingHom.ker_eq_comap_bot, this, sup_eq_left.mpr hW]
   (Ideal.quotEquivOfEq hker.symm).trans (RingHom.quotientKerEquivOfSurjective hψ)
 
-theorem exists_ringKrullDim_quotient_eq_nat (hWp : W.IsPrime)
-    (hW : Ideal.map (C : O →+* MvPolynomial (Fin n) O) v.asIdeal ≤ W) :
-    ∃ m : ℕ, ringKrullDim (MvPolynomial (Fin n) O ⧸ W) = m := by
+theorem exists_ringKrullDim_quotient_eq_nat
+    (hWp : W.IsPrime) (hW : Ideal.map (C : O →+* MvPolynomial (Fin n) O) v.asIdeal ≤ W)
+    : ∃ m : ℕ, ringKrullDim (MvPolynomial (Fin n) O ⧸ W) = m := by
   let φ : MvPolynomial (Fin n) O →+* MvPolynomial (Fin n) v.asIdeal.ResidueField :=
     MvPolynomial.map (algebraMap O v.asIdeal.ResidueField)
   have hφ : Function.Surjective φ :=
@@ -46,38 +49,43 @@ theorem exists_ringKrullDim_quotient_eq_nat (hWp : W.IsPrime)
     rw [MvPolynomial.ker_map, Ideal.ker_algebraMap_residueField]
     exact hW
   have : (W.map φ).IsPrime := Ideal.map_isPrime_of_surjective hφ hkerW
-  obtain ⟨m, hm, -⟩ := GroundTheory.Arith.Abelian.Jacobian.exists_ringKrullDim_eq_trdeg
-    (k := v.asIdeal.ResidueField) (A := MvPolynomial (Fin n) v.asIdeal.ResidueField ⧸ W.map φ)
+  obtain ⟨m, hm, -⟩ :=
+    GroundTheory.Arith.Abelian.Jacobian.exists_ringKrullDim_eq_trdeg (k := v.asIdeal.ResidueField)
+      (A := MvPolynomial (Fin n) v.asIdeal.ResidueField ⧸ W.map φ)
   exact ⟨m, (ringKrullDim_eq_of_ringEquiv (quotientResidueEquiv v W hW)).trans hm⟩
 
 end Residue
 
-theorem FibreCompDim.proof (hBase : FibreClosedComponent.Statement) (hCut : FibreCut.Statement)
-    (hDrop : GenericFibreDrop.Statement) : FibreCompDim.Statement := by
+theorem FibreCompDim.proof
+    (hBase : FibreClosedComponent.Statement) (hCut : FibreCut.Statement)
+    (hDrop : GenericFibreDrop.Statement)
+    : FibreCompDim.Statement := by
   intro O _ _ F _ _ _ n P W v hP hPC hW
-  have key : ∀ (m : ℕ) (P W : Ideal (MvPolynomial (Fin n) O)), P.IsPrime →
-      P.comap (C : O →+* MvPolynomial (Fin n) O) = ⊥ →
-      W ∈ (P ⊔ Ideal.map (C : O →+* MvPolynomial (Fin n) O) v.asIdeal).minimalPrimes →
-      ringKrullDim (MvPolynomial (Fin n) O ⧸ W) = m →
-      ringKrullDim (MvPolynomial (Fin n) O ⧸ W) =
-        ringKrullDim (MvPolynomial (Fin n) F ⧸ P.map (MvPolynomial.map (algebraMap O F))) := by
+  have key
+      : ∀ (m : ℕ) (P W : Ideal (MvPolynomial (Fin n) O)),
+        P.IsPrime → P.comap (C : O →+* MvPolynomial (Fin n) O) = ⊥
+          → W ∈ (P ⊔ Ideal.map (C : O →+* MvPolynomial (Fin n) O) v.asIdeal).minimalPrimes
+          → ringKrullDim (MvPolynomial (Fin n) O ⧸ W) = m
+          → ringKrullDim (MvPolynomial (Fin n) O ⧸ W)
+            = ringKrullDim
+              (MvPolynomial (Fin n) F ⧸ P.map (MvPolynomial.map (algebraMap O F))) := by
     intro m
     induction m using Nat.strong_induction_on with
     | _ m ih =>
-    intro P W hP hPC hW hm
-    by_cases hmax : W.IsMaximal
-    · rw [hBase O F n P W v hP hPC hW hmax]
-      let _ := Ideal.Quotient.field W
-      exact ringKrullDim_eq_zero_of_field _
-    · obtain ⟨P', W', f, hfP, hP', hP'C, hW', hdim⟩ := hCut O n P W v hP hPC hW hmax
-      have : W'.IsPrime := hW'.1.1
-      have : P'.IsPrime := hP'.1.1
-      obtain ⟨m', hm'⟩ := exists_ringKrullDim_quotient_eq_nat v W' hW'.1.1
-        (le_sup_right.trans hW'.1.2)
-      have hmm : m' + 1 = m := by
-        rw [hm', hm] at hdim
-        exact_mod_cast hdim
-      rw [hDrop O F n P P' f hP hP'C hfP hP', ← ih m' (by omega) P' W' hP'.1.1 hP'C hW' hm', hdim]
+      intro P W hP hPC hW hm
+      by_cases hmax : W.IsMaximal
+      · rw [hBase O F n P W v hP hPC hW hmax]
+        let _ := Ideal.Quotient.field W
+        exact ringKrullDim_eq_zero_of_field _
+      · obtain ⟨P', W', f, hfP, hP', hP'C, hW', hdim⟩ := hCut O n P W v hP hPC hW hmax
+        have : W'.IsPrime := hW'.1.1
+        have : P'.IsPrime := hP'.1.1
+        obtain ⟨m', hm'⟩ :=
+          exists_ringKrullDim_quotient_eq_nat v W' hW'.1.1 (le_sup_right.trans hW'.1.2)
+        have hmm : m' + 1 = m := by
+          rw [hm', hm] at hdim
+          exact_mod_cast hdim
+        rw [hDrop O F n P P' f hP hP'C hfP hP', ← ih m' (by omega) P' W' hP'.1.1 hP'C hW' hm', hdim]
   have : W.IsPrime := hW.1.1
   obtain ⟨m, hm⟩ := exists_ringKrullDim_quotient_eq_nat v W hW.1.1 (le_sup_right.trans hW.1.2)
   rw [← ringKrullDim_eq_of_ringEquiv (quotientResidueEquiv v W (le_sup_right.trans hW.1.2))]

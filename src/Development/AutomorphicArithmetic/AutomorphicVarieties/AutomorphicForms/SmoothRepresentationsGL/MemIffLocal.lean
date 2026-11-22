@@ -5,15 +5,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
+open NumberField IsDedekindDomain MeasureTheory Matrix GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm
 open GroundTheory.Automorphic.FourierWhittaker (whittaker)
 open GlobalTheory.CuspRep (GA Af Ad ratGL finGL locGL pFin pLoc sFin sLoc)
 open UpperTheory.V UpperTheory.V.Af.Smo
 open UpperTheory.V.TR (Rinf Lie chart infGL pInf sInf toL lmul oneL invSet CuspSub)
 open scoped SchwartzMap FourierTransform RealInnerProductSpace ContDiff Topology
 
-private theorem lamS_perm {n : ℕ} (S T : Finset (Fin n)) (h : S.card = T.card) :
-    ∃ σ : Equiv.Perm (Fin n), Spherical.lamS T ∘ σ = Spherical.lamS S := by
+private theorem lamS_perm {n : ℕ} (S T : Finset (Fin n)) (h : S.card = T.card)
+    : ∃ σ : Equiv.Perm (Fin n), Spherical.lamS T ∘ σ = Spherical.lamS S := by
   classical
   let e : {x // x ∈ S} ≃ {x // x ∈ T} := Finset.equivOfCardEq h
   refine ⟨e.extendSubtype, funext fun i => ?_⟩
@@ -23,17 +24,20 @@ private theorem lamS_perm {n : ℕ} (S T : Finset (Fin n)) (h : S.card = T.card)
   · have := Equiv.extendSubtype_not_mem e i hi
     simp [Spherical.lamS, hi, this]
 
-private theorem mem_iff_local {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
-    [IsNonarchimedeanLocalField F] {n r : ℕ} (hr : r ≤ n) (g : GL (Fin n) F) :
-    g ∈ Spherical.minusculeSet F n r ↔ ∃ a ∈ GLnLocal.integralGL F n, ∃ b ∈ GLnLocal.integralGL F n,
-      (g : Matrix (Fin n) (Fin n) F) = (a : Matrix (Fin n) (Fin n) F) *
-        Formalism.UG.diagJ n (GLnLocal.uniformizer F : F) r * (b : Matrix (Fin n) (Fin n) F) := by
+private theorem mem_iff_local
+    {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+    {n r : ℕ} (hr : r ≤ n) (g : GL (Fin n) F)
+    : g ∈ Spherical.minusculeSet F n r
+      ↔ ∃ a ∈ GLnLocal.integralGL F n, ∃ b ∈ GLnLocal.integralGL F n,
+        (g : Matrix (Fin n) (Fin n) F)
+          = (a : Matrix (Fin n) (Fin n) F) * Formalism.UG.diagJ n (GLnLocal.uniformizer F : F) r
+            * (b : Matrix (Fin n) (Fin n) F) := by
   classical
   let T : Finset (Fin n) := Finset.univ.filter fun i => i.val < r
-  have hT : T.card = r := by
-    simp [T, Fin.card_filter_val_lt, hr]
-  have hD : ((Iwasawa.torusPow F n (Spherical.lamS T) : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) =
-      Formalism.UG.diagJ n (GLnLocal.uniformizer F : F) r := by
+  have hT : T.card = r := by simp [T, Fin.card_filter_val_lt, hr]
+  have hD
+      : ((Iwasawa.torusPow F n (Spherical.lamS T) : GL (Fin n) F) : Matrix (Fin n) (Fin n) F)
+        = Formalism.UG.diagJ n (GLnLocal.uniformizer F : F) r := by
     rw [Iwasawa.coe_torusPow, Formalism.UG.diagJ]
     congr 1
     funext i
@@ -68,10 +72,11 @@ private theorem mem_iff_local {F : Type} [Field F] [ValuativeRel F] [Topological
     rw [Spherical.gMat]
     group
 
-theorem UpperTheory.V.Af.Smo.tjSet :
-    UpperTheory.V.Af.Smo.SphDict → UpperTheory.V.Af.Smo.TjSet := by
+theorem UpperTheory.V.Af.Smo.tjSet : UpperTheory.V.Af.Smo.SphDict → UpperTheory.V.Af.Smo.TjSet := by
   intro hd E _ _ n w r hr
-  have hK : GLnLocal.integralGL (w.adicCompletion E) n = Formalism.UG.GLint (Fin n) (Formalism.UG.Ov E w) :=
+  have hK
+      : GLnLocal.integralGL (w.adicCompletion E) n
+        = Formalism.UG.GLint (Fin n) (Formalism.UG.Ov E w) :=
     (hd E n w).1
   unfold Formalism.UG.Tj
   rw [← hK]

@@ -6,7 +6,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.DualKernelLe
 
 namespace Formalism.FourierDecayAlt.P.RealWeightedForms
 
-open Finset Formalism.FourierDecayAlt.FormPairingAction Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.P.GramProductIdentities Formalism.FourierDecayAlt.P.DualKernelLemmas
+open Finset Formalism.FourierDecayAlt.FormPairingAction Formalism.FourierDecayAlt.Wd
+  Formalism.FourierDecayAlt.P.GramProductIdentities Formalism.FourierDecayAlt.P.DualKernelLemmas
 open scoped Matrix
 
 theorem qwOfReal : QwOfReal := by
@@ -30,11 +31,14 @@ end admitted
 
 section Rep
 
-variable {A S V : Type} [Ring A] [StarRing A] [Algebra ℂ A] [Fintype S] [DecidableEq S]
-  [AddCommGroup V] [Module ℂ V] [Module A V] [IsScalarTower ℂ A V]
+variable
+  {A S V : Type} [Ring A] [StarRing A] [Algebra ℂ A] [Fintype S] [DecidableEq S] [AddCommGroup V]
+  [Module ℂ V] [Module A V] [IsScalarTower ℂ A V]
 
 end Rep
 
 end Formalism.FourierDecayAlt.P.RealWeightedForms
 
-theorem Formalism.FourierDecayAlt.P.weighted_quadratic_of_real : Formalism.FourierDecayAlt.FormPairingAction.QwOfReal := Formalism.FourierDecayAlt.P.RealWeightedForms.qwOfReal
+theorem Formalism.FourierDecayAlt.P.weighted_quadratic_of_real
+    : Formalism.FourierDecayAlt.FormPairingAction.QwOfReal :=
+  Formalism.FourierDecayAlt.P.RealWeightedForms.qwOfReal

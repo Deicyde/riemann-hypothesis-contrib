@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.NormP
 
 @[expose] public section
 
-open Formalism.BasicNotions GlobalTheory.Mem GlobalTheory.MemN NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
+open Formalism.BasicNotions GlobalTheory.Mem GlobalTheory.MemN NumberField IsDedekindDomain
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
 
 noncomputable section
 
@@ -18,8 +19,12 @@ section General
 
 variable {C : Type} [NormedField C] [IsUltrametricDist C]
 
-theorem norm_le_one_of_root {R : Type} [CommRing R] (f : R →+* C) (hf : ∀ r, ‖f r‖ ≤ 1) {q : R[X]}
-    (hq : q.Monic) {x : C} (hx : q.eval₂ f x = 0) : ‖x‖ ≤ 1 := by
+theorem norm_le_one_of_root
+    {R : Type} [CommRing R]
+    (f : R →+* C) (hf : ∀ r, ‖f r‖ ≤ 1)
+    {q : R[X]} (hq : q.Monic)
+    {x : C} (hx : q.eval₂ f x = 0)
+    : ‖x‖ ≤ 1 := by
   let v := NormedField.valuation (K := C)
   let g : R →+* v.integer := f.codRestrict v.integer fun r => hf r
   have hint : IsIntegral v.integer x := by
@@ -45,7 +50,8 @@ theorem dvd_iff {x y : ints F} : y ∣ x ↔ ‖(x : C)‖ ≤ ‖(y : C)‖ := 
   · intro h
     by_cases hy : (y : C) = 0
     · have : x = 0 := Subtype.ext (by simpa [hy] using h)
-      rw [this]; exact dvd_zero _
+      rw [this]
+      exact dvd_zero _
     · refine ⟨⟨x / y, div_mem_ints (mem_ints.1 x.2).1 (mem_ints.1 y.2).1 h⟩, Subtype.ext ?_⟩
       simp only [Subring.coe_mul]
       field_simp
@@ -53,8 +59,8 @@ theorem dvd_iff {x y : ints F} : y ∣ x ↔ ‖(x : C)‖ ≤ ‖(y : C)‖ := 
 theorem not_isUnit_iff {x : ints F} : ¬ IsUnit x ↔ ‖(x : C)‖ < 1 := by
   rw [isUnit_iff_dvd_one, dvd_iff]; simp
 
-variable {π : ints F} (h0 : (π : C) ≠ 0) (h1 : ‖(π : C)‖ < 1)
-  (hπ : ∀ y ∈ F, ‖y‖ < 1 → ‖y‖ ≤ ‖(π : C)‖)
+variable
+  {π : ints F} (h0 : (π : C) ≠ 0) (h1 : ‖(π : C)‖ < 1) (hπ : ∀ y ∈ F, ‖y‖ < 1 → ‖y‖ ≤ ‖(π : C)‖)
 
 include h0 h1 hπ
 
@@ -88,14 +94,16 @@ theorem isDVR : IsDiscreteValuationRing (ints F) := by
         exact ⟨n + 1, by rw [pow_succ']; exact hn.mul_left π⟩
   exact key N x hN
 
-theorem mem_pow_iff [IsDiscreteValuationRing (ints F)] (n : ℕ) (x : ints F) :
-    x ∈ IsLocalRing.maximalIdeal (ints F) ^ n ↔ ‖(x : C)‖ ≤ ‖(π : C)‖ ^ n := by
+theorem mem_pow_iff [IsDiscreteValuationRing (ints F)] (n : ℕ) (x : ints F)
+    : x ∈ IsLocalRing.maximalIdeal (ints F) ^ n ↔ ‖(x : C)‖ ≤ ‖(π : C)‖ ^ n := by
   rw [(irreducible_unif h0 h1 hπ).maximalIdeal_eq, Ideal.span_singleton_pow,
     Ideal.mem_span_singleton, dvd_iff, SubmonoidClass.coe_pow, norm_pow]
 
 theorem isAdic [IsDiscreteValuationRing (ints F)] : IsAdic (IsLocalRing.maximalIdeal (ints F)) := by
-  have hs : ∀ n : ℕ, ((IsLocalRing.maximalIdeal (ints F) ^ n : Ideal (ints F)) : Set (ints F)) =
-      Metric.closedBall 0 (‖(π : C)‖ ^ n) := fun n => by
+  have hs
+      : ∀ n : ℕ,
+        ((IsLocalRing.maximalIdeal (ints F) ^ n : Ideal (ints F)) : Set (ints F))
+          = Metric.closedBall 0 (‖(π : C)‖ ^ n) := fun n => by
     ext x
     rw [SetLike.mem_coe, mem_pow_iff h0 h1 hπ, mem_closedBall_zero_iff]
     rfl
@@ -109,24 +117,30 @@ theorem isAdic [IsDiscreteValuationRing (ints F)] : IsAdic (IsLocalRing.maximalI
 
 omit h0 h1 hπ
 
-theorem isAlgClosed_res [IsAlgClosed C] [IsLocalRing (ints F)]
-    (hF : ∀ x : C, ‖x‖ ≤ 1 → ∃ y ∈ F, ‖x - y‖ < 1) :
-    IsAlgClosed (IsLocalRing.ResidueField (ints F)) := by
+theorem isAlgClosed_res
+    [IsAlgClosed C] [IsLocalRing (ints F)] (hF : ∀ x : C, ‖x‖ ≤ 1 → ∃ y ∈ F, ‖x - y‖ < 1)
+    : IsAlgClosed (IsLocalRing.ResidueField (ints F)) := by
   first
-  | (rename_i h_1 h_2 h_4 h_5; revert C h_1 h_2 F h_4 h_5 hF; exact @_root_.GlobalTheory.NormEvalSubBound.main_theorem)
+  | (
+      rename_i h_1 h_2 h_4 h_5
+      revert C h_1 h_2 F h_4 h_5 hF
+      exact @_root_.GlobalTheory.NormEvalSubBound.main_theorem
+    )
   | exact @_root_.GlobalTheory.NormEvalSubBound.main_theorem
   | exact _root_.GlobalTheory.NormEvalSubBound.main_theorem
   | (apply _root_.GlobalTheory.NormEvalSubBound.main_theorem <;> assumption)
   | (intros; apply _root_.GlobalTheory.NormEvalSubBound.main_theorem <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.NormEvalSubBound.main_theorem <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.NormEvalSubBound.main_theorem
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.NormEvalSubBound.main_theorem ..)
 
-theorem coe_ints_closure :
-    (ints F.topologicalClosure : Set C) = closure {x | x ∈ F ∧ ‖x‖ ≤ 1} := by
+theorem coe_ints_closure : (ints F.topologicalClosure : Set C) = closure {x | x ∈ F ∧ ‖x‖ ≤ 1} := by
   have hc : IsClopen (Metric.closedBall (0 : C) 1) :=
     IsUltrametricDist.isClopen_closedBall _ one_ne_zero
-  have e : {x | x ∈ F ∧ ‖x‖ ≤ 1} = (F : Set C) ∩ Metric.closedBall (0 : C) 1 := by
-    ext x; simp
+  have e : {x | x ∈ F ∧ ‖x‖ ≤ 1} = (F : Set C) ∩ Metric.closedBall (0 : C) 1 := by ext x; simp
   rw [e]
   apply Set.Subset.antisymm
   · intro x hx
@@ -142,8 +156,10 @@ variable {l : ℕ} [Fact l.Prime]
 
 open Loc
 
-theorem exists_pow_norm (LL : FinExt l) :
-    ∃ d : ℕ, 0 < d ∧ ∀ y ∈ LL.1 ⊔ MaximalUnramifiedExtension l, y ≠ 0 → ∃ n : ℤ, ‖y‖ ^ d = (l : ℝ) ^ n := by
+theorem exists_pow_norm (LL : FinExt l)
+    : ∃ d : ℕ,
+      0 < d
+        ∧ ∀ y ∈ LL.1 ⊔ MaximalUnramifiedExtension l, y ≠ 0 → ∃ n : ℤ, ‖y‖ ^ d = (l : ℝ) ^ n := by
   haveI := LL.2
   obtain ⟨α, hα⟩ := Field.exists_primitive_element ℚ_[l] ↥LL.1
   have hLL : IntermediateField.adjoin ℚ_[l] {(α : Om l)} = LL.1 := by
@@ -152,7 +168,8 @@ theorem exists_pow_norm (LL : FinExt l) :
     rw [show (α : Om l) = LL.1.val α from rfl, this]
     ext x
     simp
-  let E : IntermediateField ↥(MaximalUnramifiedExtension l) (Om l) := IntermediateField.adjoin ↥(MaximalUnramifiedExtension l) {(α : Om l)}
+  let E : IntermediateField ↥(MaximalUnramifiedExtension l) (Om l) :=
+    IntermediateField.adjoin ↥(MaximalUnramifiedExtension l) {(α : Om l)}
   have hE : E.restrictScalars ℚ_[l] = LL.1 ⊔ MaximalUnramifiedExtension l := by
     rw [IntermediateField.restrictScalars_adjoin_eq_sup, hLL, sup_comm]
   haveI : FiniteDimensional ↥(MaximalUnramifiedExtension l) ↥E :=
@@ -169,30 +186,44 @@ theorem exists_pow_norm (LL : FinExt l) :
     exact congrArg spectralValue (h1.trans h2.symm)
   have h3 := congrArg norm h
   rw [norm_prod, Finset.prod_congr rfl fun σ _ => hn σ, Finset.prod_const, Finset.card_univ,
-    AlgHom.card] at h3
+      AlgHom.card]
+    at h3
   rw [← h3]
-  refine GlobalTheory.UnramValue.norm_of_mem_Kur (Algebra.norm ↥(MaximalUnramifiedExtension l) y').2 ?_
+  refine GlobalTheory.UnramValue.norm_of_mem_Kur (Algebra.norm ↥(MaximalUnramifiedExtension l) y').2
+    ?_
   rw [← norm_ne_zero_iff]
-  change ‖algebraMap ↥(MaximalUnramifiedExtension l) (Om l) (Algebra.norm ↥(MaximalUnramifiedExtension l) y')‖ ≠ 0
+  change
+    ‖algebraMap ↥(MaximalUnramifiedExtension l) (Om l) (Algebra.norm ↥(MaximalUnramifiedExtension l) y')‖
+      ≠ 0
   rw [h3]
   exact pow_ne_zero _ (norm_ne_zero_iff.2 hy0)
 
-theorem exists_unif (LL : FinExt l) :
-    ∃ π ∈ LL.1 ⊔ MaximalUnramifiedExtension l, π ≠ 0 ∧ ‖π‖ < 1 ∧ ∀ y ∈ LL.1 ⊔ MaximalUnramifiedExtension l, ‖y‖ < 1 → ‖y‖ ≤ ‖π‖ := by
+theorem exists_unif (LL : FinExt l)
+    : ∃ π ∈ LL.1 ⊔ MaximalUnramifiedExtension l,
+      π ≠ 0 ∧ ‖π‖ < 1 ∧ ∀ y ∈ LL.1 ⊔ MaximalUnramifiedExtension l, ‖y‖ < 1 → ‖y‖ ≤ ‖π‖ := by
   classical
   have hp : l.Prime := Fact.out
   have hl1 : (1 : ℝ) < l := by exact_mod_cast hp.one_lt
   obtain ⟨d, hd, H⟩ := exists_pow_norm LL
-  have key : ∀ y ∈ LL.1 ⊔ MaximalUnramifiedExtension l, y ≠ 0 → ‖y‖ < 1 → ∃ k : ℕ, ‖y‖ ^ d = ((l : ℝ)⁻¹) ^ k := by
+  have key
+      : ∀ y ∈ LL.1 ⊔ MaximalUnramifiedExtension l,
+        y ≠ 0 → ‖y‖ < 1 → ∃ k : ℕ, ‖y‖ ^ d = ((l : ℝ)⁻¹) ^ k := by
     intro y hy h0 h1
     obtain ⟨n, hn⟩ := H y hy h0
     have h2 : (l : ℝ) ^ n < 1 := by rw [← hn]; exact pow_lt_one₀ (norm_nonneg _) h1 hd.ne'
     rw [zpow_lt_one_iff_right₀ hl1] at h2
     obtain ⟨k, rfl⟩ := Int.exists_eq_neg_ofNat h2.le
     exact ⟨k, by rw [hn, zpow_neg, zpow_natCast, inv_pow]⟩
-  have hex : ∃ k : ℕ, ∃ y ∈ LL.1 ⊔ MaximalUnramifiedExtension l, y ≠ 0 ∧ ‖y‖ < 1 ∧ ‖y‖ ^ d = ((l : ℝ)⁻¹) ^ k :=
-    ⟨d, l, natCast_mem _ _, Nat.cast_ne_zero.2 hp.ne_zero, by
-      rw [GlobalTheory.UnramValue.norm_l]; exact inv_lt_one_of_one_lt₀ hl1, by rw [GlobalTheory.UnramValue.norm_l]⟩
+  have hex
+      : ∃ k : ℕ, ∃ y ∈ LL.1 ⊔ MaximalUnramifiedExtension l,
+        y ≠ 0 ∧ ‖y‖ < 1 ∧ ‖y‖ ^ d = ((l : ℝ)⁻¹) ^ k := ⟨
+    d,
+    l,
+    natCast_mem _ _,
+    Nat.cast_ne_zero.2 hp.ne_zero,
+    by rw [GlobalTheory.UnramValue.norm_l]; exact inv_lt_one_of_one_lt₀ hl1,
+    by rw [GlobalTheory.UnramValue.norm_l]
+  ⟩
   obtain ⟨π, hπ, h0, h1, e⟩ := Nat.find_spec hex
   refine ⟨π, hπ, h0, h1, fun y hy hy1 => ?_⟩
   by_cases hy0 : y = 0
@@ -206,10 +237,20 @@ theorem exists_unif (LL : FinExt l) :
 def img (LL : FinExt l) : Subfield ℂ_[l] :=
   (LL.1 ⊔ MaximalUnramifiedExtension l).toSubfield.map (algebraMap (Om l) ℂ_[l])
 
-theorem mem_img {LL : FinExt l} {x : ℂ_[l]} :
-    x ∈ img LL ↔ ∃ y ∈ LL.1 ⊔ MaximalUnramifiedExtension l, (y : ℂ_[l]) = x := Iff.rfl
+theorem mem_img {LL : FinExt l} {x : ℂ_[l]}
+    : x ∈ img LL ↔ ∃ y ∈ LL.1 ⊔ MaximalUnramifiedExtension l, (y : ℂ_[l]) = x :=
+  Iff.rfl
 
-theorem exists_integers_completion : ∀ (l : ℕ) [Fact l.Prime] (LL : Loc.FinExt l), ∃ (O : Subring ℂ_[l]) (_ : IsDiscreteValuationRing ↥O), (∀ x : ↥(Loc.OL LL), (((x : ↥LL.1) : Loc.Om l) : ℂ_[l]) ∈ O) ∧ (∀ x ∈ O, ‖x‖ ≤ 1) ∧ (∀ x ∈ O, ∀ y ∈ O, ‖x‖ ≤ ‖y‖ → x / y ∈ O) ∧ IsAlgClosed (IsLocalRing.ResidueField ↥O) ∧ IsAdicComplete (IsLocalRing.maximalIdeal ↥O) ↥O ∧ IsAdic (IsLocalRing.maximalIdeal ↥O) ∧ (O : Set ℂ_[l]) = closure ((fun y : Loc.Om l => (y : ℂ_[l])) '' {y | y ∈ LL.1 ⊔ Loc.MaximalUnramifiedExtension l ∧ ‖y‖ ≤ 1}) := by
+theorem exists_integers_completion
+    : ∀ (l : ℕ) [Fact l.Prime] (LL : Loc.FinExt l),
+      ∃ (O : Subring ℂ_[l]) (_ : IsDiscreteValuationRing ↥O),
+        (∀ x : ↥(Loc.OL LL), (((x : ↥LL.1) : Loc.Om l) : ℂ_[l]) ∈ O) ∧ (∀ x ∈ O, ‖x‖ ≤ 1)
+          ∧ (∀ x ∈ O, ∀ y ∈ O, ‖x‖ ≤ ‖y‖ → x / y ∈ O) ∧ IsAlgClosed (IsLocalRing.ResidueField ↥O)
+          ∧ IsAdicComplete (IsLocalRing.maximalIdeal ↥O) ↥O ∧ IsAdic (IsLocalRing.maximalIdeal ↥O)
+          ∧ (O : Set ℂ_[l])
+            = closure
+              ((fun y : Loc.Om l => (y : ℂ_[l]))
+                '' {y | y ∈ LL.1 ⊔ Loc.MaximalUnramifiedExtension l ∧ ‖y‖ ≤ 1}) := by
   intro l _ LL
   let F : Subfield ℂ_[l] := (img LL).topologicalClosure
   have hle : ∀ y ∈ LL.1 ⊔ MaximalUnramifiedExtension l, (y : ℂ_[l]) ∈ F := fun y hy =>
@@ -226,26 +267,37 @@ theorem exists_integers_completion : ∀ (l : ℕ) [Fact l.Prime] (LL : Loc.FinE
     have hc : IsClosed {y : ℂ_[l] | ‖y‖ ≤ ‖(π : ℂ_[l])‖ ∨ 1 ≤ ‖y‖} :=
       (isClosed_le continuous_norm continuous_const).union
         (isClosed_le continuous_const continuous_norm)
-    have := closure_minimal (s := (img LL : Set ℂ_[l])) (by
-      rintro _ ⟨z, hz, rfl⟩
-      change ‖(z : ℂ_[l])‖ ≤ ‖(π : ℂ_[l])‖ ∨ 1 ≤ ‖(z : ℂ_[l])‖
-      simp only [PadicComplex.norm_extends]
-      rcases lt_or_ge ‖z‖ 1 with h | h
-      · exact Or.inl (hmax z hz h)
-      · exact Or.inr h) hc hy
+    have :=
+      closure_minimal (s := (img LL : Set ℂ_[l]))
+        (by
+          rintro _ ⟨z, hz, rfl⟩
+          change ‖(z : ℂ_[l])‖ ≤ ‖(π : ℂ_[l])‖ ∨ 1 ≤ ‖(z : ℂ_[l])‖
+          simp only [PadicComplex.norm_extends]
+          rcases lt_or_ge ‖z‖ 1 with h | h
+          · exact Or.inl (hmax z hz h)
+          · exact Or.inr h)
+        hc hy
     exact this.resolve_right (not_le.2 hy1)
   haveI hdvr : IsDiscreteValuationRing (ints F) := isDVR (π := π') h0' h1' hmax'
   have had := isAdic (π := π') h0' h1' hmax'
-  refine ⟨ints F, hdvr, fun x => mem_ints.2 ⟨hle _ (le_sup_left (a := LL.1) x.1.2), ?_⟩,
+  refine ⟨
+    ints F,
+    hdvr,
+    fun x => mem_ints.2 ⟨hle _ (le_sup_left (a := LL.1) x.1.2), ?_⟩,
     fun x hx => (mem_ints.1 hx).2,
     fun x hx y hy h => div_mem_ints (mem_ints.1 hx).1 (mem_ints.1 hy).1 h,
-    isAlgClosed_res fun x hx => ?_, ?_, had, ?_⟩
+    isAlgClosed_res fun x hx => ?_,
+    ?_,
+    had,
+    ?_
+  ⟩
   · rw [PadicComplex.norm_extends]
     have hint : IsIntegral ℤ_[l] ((x : ↥LL.1) : Om l) :=
       (show IsIntegral ℤ_[l] (x : ↥LL.1) from x.2).map (LL.1.val.restrictScalars ℤ_[l])
     obtain ⟨q, hq, hx⟩ := hint
-    exact norm_le_one_of_root _ (fun r => by
-      rw [GlobalTheory.UnramValue.norm_algebraMap_int]; exact r.norm_le_one) hq hx
+    exact norm_le_one_of_root _
+      (fun r => by rw [GlobalTheory.UnramValue.norm_algebraMap_int]; exact r.norm_le_one)
+      hq hx
   · rcases hx.lt_or_eq with h | h
     · exact ⟨0, zero_mem _, by simpa using h⟩
     obtain ⟨y, hy⟩ := (UniformSpace.Completion.denseRange_coe (α := Om l)).exists_dist_lt x one_pos
@@ -256,7 +308,8 @@ theorem exists_integers_completion : ∀ (l : ℕ) [Fact l.Prime] (LL : Loc.FinE
         IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (by rw [norm_neg, h]; exact hy.ne'),
         norm_neg, h, max_eq_left hy.le]
     obtain ⟨ζ, m, hm, hlm, hζ, hn⟩ := GlobalTheory.MemLoc.FrobLaws.exists_root y hy1
-    have hK : ζ ∈ MaximalUnramifiedExtension l := IntermediateField.subset_adjoin _ _ ⟨m, hm, hlm, hζ⟩
+    have hK : ζ ∈ MaximalUnramifiedExtension l :=
+      IntermediateField.subset_adjoin _ _ ⟨m, hm, hlm, hζ⟩
     refine ⟨ζ, hle ζ (le_sup_right (a := LL.1) hK), ?_⟩
     have e : x - (ζ : ℂ_[l]) = (x - y) + ((y - ζ : Om l) : ℂ_[l]) := by
       rw [UniformSpace.Completion.coe_sub]; ring

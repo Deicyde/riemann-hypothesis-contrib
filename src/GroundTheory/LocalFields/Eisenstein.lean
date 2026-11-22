@@ -18,14 +18,16 @@ section DVR
 
 variable {R : Type*} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
 
-theorem eq_zero_of_addVal_lt_of_sum_eq_zero {ι : Type*} [DecidableEq ι] {s : Finset ι} {t : ι → R}
-    (hs : ∑ i ∈ s, t i = 0) {j : ι} (hj : j ∈ s)
-    (hlt : ∀ i ∈ s, i ≠ j → addVal R (t j) < addVal R (t i)) : t j = 0 := by
+theorem eq_zero_of_addVal_lt_of_sum_eq_zero
+    {ι : Type*} [DecidableEq ι]
+    {s : Finset ι} {t : ι → R} (hs : ∑ i ∈ s, t i = 0)
+    {j : ι} (hj : j ∈ s) (hlt : ∀ i ∈ s, i ≠ j → addVal R (t j) < addVal R (t i))
+    : t j = 0 := by
   by_contra h0
   have htop : addVal R (t j) ≠ ⊤ := fun h => h0 (addVal_eq_top_iff.mp h)
   have hrest : addVal R (t j) < addVal R (∑ i ∈ s.erase j, t i) :=
-    (addVal R).map_lt_sum htop fun i hi => hlt i (Finset.mem_of_mem_erase hi)
-      (Finset.ne_of_mem_erase hi)
+    (addVal R).map_lt_sum htop fun i hi =>
+      hlt i (Finset.mem_of_mem_erase hi) (Finset.ne_of_mem_erase hi)
   have := (addVal R).map_add_eq_of_lt_left hrest
   rw [Finset.add_sum_erase s t hj, hs, AddValuation.map_zero] at this
   exact htop this.symm
@@ -39,18 +41,30 @@ end DVR
 
 section Local
 
-variable (K L : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L]
-  [Algebra K L] [ValuativeExtension K L] [FiniteDimensional K L]
+variable
+  (K L : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra K L]
+  [ValuativeExtension K L] [FiniteDimensional K L]
 
-theorem addVal_algebraMap_integer (x : 𝒪[K]) :
-    addVal 𝒪[L] (algebraMap 𝒪[K] 𝒪[L] x) = (_root_.Ideal.ramificationIdx (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation L))) (_root_.Valuation.integer (_root_.ValuativeRel.valuation K))) * addVal 𝒪[K] x := by
+theorem addVal_algebraMap_integer (x : 𝒪[K])
+    : addVal 𝒪[L] (algebraMap 𝒪[K] 𝒪[L] x)
+      = (_root_.Ideal.ramificationIdx
+          (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation
+            L)))
+          (_root_.Valuation.integer (_root_.ValuativeRel.valuation K)))
+        * addVal 𝒪[K] x := by
   obtain ⟨ϖ, hϖ⟩ := exists_irreducible 𝒪[K]
   obtain ⟨ϖL, hϖL⟩ := exists_irreducible 𝒪[L]
-  have key : addVal 𝒪[L] (algebraMap 𝒪[K] 𝒪[L] ϖ) = (_root_.Ideal.ramificationIdx (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation L))) (_root_.Valuation.integer (_root_.ValuativeRel.valuation K))) := by
+  have key
+      : addVal 𝒪[L] (algebraMap 𝒪[K] 𝒪[L] ϖ)
+        = (_root_.Ideal.ramificationIdx
+          (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation
+            L)))
+          (_root_.Valuation.integer (_root_.ValuativeRel.valuation K))) := by
     have h := map_maximalIdeal K L
     rw [hϖ.maximalIdeal_eq, hϖL.maximalIdeal_eq, Ideal.map_span, Set.image_singleton,
-      Ideal.span_singleton_pow, Ideal.span_singleton_eq_span_singleton] at h
+        Ideal.span_singleton_pow, Ideal.span_singleton_eq_span_singleton]
+      at h
     rw [(addVal_eq_iff_associated _ _).mpr h, hϖL.addVal_pow]
   rcases eq_or_ne x 0 with rfl | hx
   · rw [map_zero, addVal_zero, addVal_zero, ENat.mul_top]
@@ -66,14 +80,15 @@ section DVR2
 
 variable {R : Type*} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
 
-theorem mem_maximalIdeal_pow_iff_le_addVal (k : ℕ) (x : R) :
-    x ∈ IsLocalRing.maximalIdeal R ^ k ↔ (k : ℕ∞) ≤ addVal R x := by
+theorem mem_maximalIdeal_pow_iff_le_addVal (k : ℕ) (x : R)
+    : x ∈ IsLocalRing.maximalIdeal R ^ k ↔ (k : ℕ∞) ≤ addVal R x := by
   obtain ⟨ϖ, hϖ⟩ := exists_irreducible R
-  rw [hϖ.maximalIdeal_eq, Ideal.span_singleton_pow, Ideal.mem_span_singleton,
-    ← addVal_le_iff_dvd, hϖ.addVal_pow]
+  rw [hϖ.maximalIdeal_eq, Ideal.span_singleton_pow, Ideal.mem_span_singleton, ← addVal_le_iff_dvd,
+    hϖ.addVal_pow]
 
-theorem addVal_eq_one_of_mem_of_notMem_sq {x : R} (h1 : x ∈ IsLocalRing.maximalIdeal R)
-    (h2 : x ∉ IsLocalRing.maximalIdeal R ^ 2) : addVal R x = 1 := by
+theorem addVal_eq_one_of_mem_of_notMem_sq
+    {x : R} (h1 : x ∈ IsLocalRing.maximalIdeal R) (h2 : x ∉ IsLocalRing.maximalIdeal R ^ 2)
+    : addVal R x = 1 := by
   rw [← pow_one (IsLocalRing.maximalIdeal R), mem_maximalIdeal_pow_iff_le_addVal] at h1
   rw [mem_maximalIdeal_pow_iff_le_addVal, not_le] at h2
   have h0 : x ≠ 0 := by
@@ -88,10 +103,10 @@ end DVR2
 
 section Forward
 
-variable {K L : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K]
-  [IsNonarchimedeanLocalField K]
-  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L]
-  [Algebra K L] [ValuativeExtension K L] [FiniteDimensional K L]
+variable
+  {K L : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra K L]
+  [ValuativeExtension K L] [FiniteDimensional K L]
 
 theorem natDegree_mul_addVal_eq_ramificationIndex {f : 𝒪[K][X]}
     (hf : f.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K])) (hn : 0 < f.natDegree)
@@ -184,13 +199,18 @@ end Forward
 
 section TotallyRamified
 
-variable (K L : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K]
-  [IsNonarchimedeanLocalField K]
-  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L]
-  [Algebra K L] [ValuativeExtension K L] [FiniteDimensional K L]
+variable
+  (K L : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra K L]
+  [ValuativeExtension K L] [FiniteDimensional K L]
 
 theorem residueDegree_eq_one_of_ramificationIndex_eq_finrank
-    (h : (_root_.Ideal.ramificationIdx (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation L))) (_root_.Valuation.integer (_root_.ValuativeRel.valuation K))) = Module.finrank K L) : ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K])) = 1 := by
+    (h : (_root_.Ideal.ramificationIdx
+        (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation
+          L)))
+        (_root_.Valuation.integer (_root_.ValuativeRel.valuation K)))
+      = Module.finrank K L)
+    : ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K])) = 1 := by
   have h1 := ramificationIndex_mul_residueDegree K L
   have h2 := ramificationIndex_pos K L
   dsimp only [ramificationIndex] at h1 h2
@@ -201,43 +221,47 @@ end TotallyRamified
 
 section Eisenstein
 
-variable {K L : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K]
-  [IsNonarchimedeanLocalField K]
+variable
+  {K L : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
 
-theorem isUnit_leadingCoeff_of_isEisensteinAt {f : 𝒪[K][X]}
-    (hf : f.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K])) : IsUnit f.leadingCoeff :=
+theorem isUnit_leadingCoeff_of_isEisensteinAt
+    {f : 𝒪[K][X]} (hf : f.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K]))
+    : IsUnit f.leadingCoeff :=
   IsLocalRing.notMem_maximalIdeal.mp hf.leading
 
-theorem isPrimitive_of_isEisensteinAt {f : 𝒪[K][X]}
-    (hf : f.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K])) : f.IsPrimitive := by
+theorem isPrimitive_of_isEisensteinAt
+    {f : 𝒪[K][X]} (hf : f.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K]))
+    : f.IsPrimitive := by
   intro r hr
   rw [C_dvd_iff_dvd_coeff] at hr
   exact isUnit_of_dvd_unit (hr _) (isUnit_leadingCoeff_of_isEisensteinAt hf)
 
-theorem irreducible_of_isEisensteinAt {f : 𝒪[K][X]}
-    (hf : f.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K])) (hn : 0 < f.natDegree) :
-    Irreducible f :=
+theorem irreducible_of_isEisensteinAt
+    {f : 𝒪[K][X]} (hf : f.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K])) (hn : 0 < f.natDegree)
+    : Irreducible f :=
   hf.irreducible (IsLocalRing.maximalIdeal.isMaximal 𝒪[K]).isPrime
     (isPrimitive_of_isEisensteinAt hf) hn
 
-theorem irreducible_map_of_isEisensteinAt {f : 𝒪[K][X]}
-    (hf : f.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K])) (hn : 0 < f.natDegree) :
-    Irreducible (f.map (algebraMap 𝒪[K] K)) :=
+theorem irreducible_map_of_isEisensteinAt
+    {f : 𝒪[K][X]} (hf : f.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K])) (hn : 0 < f.natDegree)
+    : Irreducible (f.map (algebraMap 𝒪[K] K)) :=
   (isPrimitive_of_isEisensteinAt hf).irreducible_iff_irreducible_map_fraction_map.mp
     (irreducible_of_isEisensteinAt hf hn)
 
 variable [Field L] [Algebra K L]
 
-theorem isIntegral_of_isEisensteinAt {f : 𝒪[K][X]}
-    (hf : f.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K])) {α : L} (hα : aeval α f = 0) :
-    IsIntegral 𝒪[K] α := by
+theorem isIntegral_of_isEisensteinAt
+    {f : 𝒪[K][X]} (hf : f.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K]))
+    {α : L} (hα : aeval α f = 0)
+    : IsIntegral 𝒪[K] α := by
   obtain ⟨u, hu⟩ := isUnit_leadingCoeff_of_isEisensteinAt hf
   refine ⟨C (↑u⁻¹ : 𝒪[K]) * f, monic_C_mul_of_mul_leadingCoeff_eq_one (by rw [← hu]; simp), ?_⟩
   rw [← aeval_def, map_mul, hα, mul_zero]
 
-theorem finrank_adjoin_le_of_isEisensteinAt {f : 𝒪[K][X]}
-    (hf : f.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K])) {α : L} (hα : aeval α f = 0) :
-    Module.finrank K K⟮α⟯ ≤ f.natDegree := by
+theorem finrank_adjoin_le_of_isEisensteinAt
+    {f : 𝒪[K][X]} (hf : f.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K]))
+    {α : L} (hα : aeval α f = 0)
+    : Module.finrank K K⟮α⟯ ≤ f.natDegree := by
   have hint : IsIntegral K α := (isIntegral_of_isEisensteinAt hf hα).tower_top
   have hinj : Function.Injective (algebraMap 𝒪[K] K) := IsFractionRing.injective 𝒪[K] K
   have hne : f.map (algebraMap 𝒪[K] K) ≠ 0 := by
@@ -251,28 +275,35 @@ end Eisenstein
 
 section Root
 
-variable {K L : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K]
-  [IsNonarchimedeanLocalField K]
-  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L]
-  [Algebra K L] [ValuativeExtension K L] [FiniteDimensional K L]
+variable
+  {K L : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra K L]
+  [ValuativeExtension K L] [FiniteDimensional K L]
   {f : 𝒪[K][X]}
 
-theorem mem_integer_of_isEisensteinAt (hf : f.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K]))
-    {α : L} (hα : aeval α f = 0) : α ∈ 𝒪[L] :=
+theorem mem_integer_of_isEisensteinAt
+    (hf : f.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K])) {α : L} (hα : aeval α f = 0)
+    : α ∈ 𝒪[L] :=
   (isIntegral_iff K L α).mp (isIntegral_of_isEisensteinAt hf hα)
 
-theorem aeval_integer_eq_zero {α : L} (h : α ∈ 𝒪[L]) (hα : aeval α f = 0) :
-    aeval (⟨α, h⟩ : 𝒪[L]) f = 0 := by
+theorem aeval_integer_eq_zero {α : L} (h : α ∈ 𝒪[L]) (hα : aeval α f = 0)
+    : aeval (⟨α, h⟩ : 𝒪[L]) f = 0 := by
   refine Subtype.val_injective ?_
   have h2 : (IsScalarTower.toAlgHom 𝒪[K] 𝒪[L] L) (aeval (⟨α, h⟩ : 𝒪[L]) f) = aeval α f :=
     (aeval_algHom_apply _ _ _).symm
   rw [hα] at h2
   simpa using h2
 
-theorem isEisensteinAt_root_of_finrank_le (hf : f.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K]))
-    (hn : 0 < f.natDegree) {α : 𝒪[L]} (hα : aeval α f = 0)
-    (hdeg : Module.finrank K L ≤ f.natDegree) :
-    (_root_.Ideal.ramificationIdx (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation L))) (_root_.Valuation.integer (_root_.ValuativeRel.valuation K))) = f.natDegree ∧ Module.finrank K L = f.natDegree ∧ Irreducible α := by
+theorem isEisensteinAt_root_of_finrank_le
+    (hf : f.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K])) (hn : 0 < f.natDegree)
+    {α : 𝒪[L]} (hα : aeval α f = 0)
+    (hdeg : Module.finrank K L ≤ f.natDegree)
+    : (_root_.Ideal.ramificationIdx
+          (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation
+            L)))
+          (_root_.Valuation.integer (_root_.ValuativeRel.valuation K)))
+        = f.natDegree
+      ∧ Module.finrank K L = f.natDegree ∧ Irreducible α := by
   have key := natDegree_mul_addVal_eq_ramificationIndex hf hn hα
   have hα0 : α ≠ 0 := by
     rintro rfl
@@ -280,12 +311,23 @@ theorem isEisensteinAt_root_of_finrank_le (hf : f.IsEisensteinAt (IsLocalRing.ma
     exact ENat.top_ne_natCast _ key
   obtain ⟨m, hm⟩ := exists_addVal_eq_coe hα0
   rw [hm] at key
-  have key' : f.natDegree * m = (_root_.Ideal.ramificationIdx (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation L))) (_root_.Valuation.integer (_root_.ValuativeRel.valuation K))) := by exact_mod_cast key
+  have key'
+      : f.natDegree * m
+        = (_root_.Ideal.ramificationIdx
+          (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation
+            L)))
+          (_root_.Valuation.integer (_root_.ValuativeRel.valuation K))) := by
+    exact_mod_cast key
   have hef := ramificationIndex_mul_residueDegree K L
   have hf1 := residueDegree_pos K L
   have he := ramificationIndex_pos K L
   dsimp only [ramificationIndex] at hef he
-  have hle : (_root_.Ideal.ramificationIdx (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation L))) (_root_.Valuation.integer (_root_.ValuativeRel.valuation K))) ≤ Module.finrank K L := by
+  have hle
+      : (_root_.Ideal.ramificationIdx
+          (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation
+            L)))
+          (_root_.Valuation.integer (_root_.ValuativeRel.valuation K)))
+        ≤ Module.finrank K L := by
     rw [← hef]
     exact Nat.le_mul_of_pos_right _ hf1
   have hm1 : m = 1 := by
@@ -304,7 +346,8 @@ theorem isEisensteinAt_root_of_finrank_le (hf : f.IsEisensteinAt (IsLocalRing.ma
     rw [← addVal_eq_iff_associated, addVal_uniformizer hϖ, hm, Nat.cast_one]
   exact this.irreducible hϖ
 
-variable (hf : f.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K])) (hn : 0 < f.natDegree)
+variable
+  (hf : f.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K])) (hn : 0 < f.natDegree)
   {α : L} (hα : aeval α f = 0)
 include hf hn hα
 
@@ -313,24 +356,31 @@ section Generated
 variable (hgen : K⟮α⟯ = ⊤)
 include hgen
 
-
 omit hn in
 theorem finrank_le_of_isEisensteinAt : Module.finrank K L ≤ f.natDegree := by
   rw [← IntermediateField.finrank_top', ← hgen]
   exact finrank_adjoin_le_of_isEisensteinAt hf hα
 
 theorem finrank_eq_natDegree_of_isEisensteinAt : Module.finrank K L = f.natDegree :=
-  (isEisensteinAt_root_of_finrank_le hf hn (aeval_integer_eq_zero
-    (mem_integer_of_isEisensteinAt hf hα) hα) (finrank_le_of_isEisensteinAt hf hα hgen)).2.1
+  (isEisensteinAt_root_of_finrank_le hf hn
+    (aeval_integer_eq_zero (mem_integer_of_isEisensteinAt hf hα) hα)
+    (finrank_le_of_isEisensteinAt hf hα hgen)).2.1
 
-theorem ramificationIndex_eq_natDegree_of_isEisensteinAt : (_root_.Ideal.ramificationIdx (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation L))) (_root_.Valuation.integer (_root_.ValuativeRel.valuation K))) = f.natDegree :=
-  (isEisensteinAt_root_of_finrank_le hf hn (aeval_integer_eq_zero
-    (mem_integer_of_isEisensteinAt hf hα) hα) (finrank_le_of_isEisensteinAt hf hα hgen)).1
+theorem ramificationIndex_eq_natDegree_of_isEisensteinAt
+    : (_root_.Ideal.ramificationIdx
+        (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation
+          L)))
+        (_root_.Valuation.integer (_root_.ValuativeRel.valuation K)))
+      = f.natDegree :=
+  (isEisensteinAt_root_of_finrank_le hf hn
+    (aeval_integer_eq_zero (mem_integer_of_isEisensteinAt hf hα) hα)
+    (finrank_le_of_isEisensteinAt hf hα hgen)).1
 
-theorem irreducible_of_isEisensteinAt_root :
-    Irreducible (⟨α, mem_integer_of_isEisensteinAt hf hα⟩ : 𝒪[L]) :=
-  (isEisensteinAt_root_of_finrank_le hf hn (aeval_integer_eq_zero
-    (mem_integer_of_isEisensteinAt hf hα) hα) (finrank_le_of_isEisensteinAt hf hα hgen)).2.2
+theorem irreducible_of_isEisensteinAt_root
+    : Irreducible (⟨α, mem_integer_of_isEisensteinAt hf hα⟩ : 𝒪[L]) :=
+  (isEisensteinAt_root_of_finrank_le hf hn
+    (aeval_integer_eq_zero (mem_integer_of_isEisensteinAt hf hα) hα)
+    (finrank_le_of_isEisensteinAt hf hα hgen)).2.2
 
 end Generated
 
@@ -338,10 +388,10 @@ end Root
 
 section AdjoinRoot
 
-variable {K L : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K]
-  [IsNonarchimedeanLocalField K]
-  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L]
-  [Algebra K L] [ValuativeExtension K L] [FiniteDimensional K L]
+variable
+  {K L : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra K L]
+  [ValuativeExtension K L] [FiniteDimensional K L]
   {f : 𝒪[K][X]} (hf : f.IsEisensteinAt (IsLocalRing.maximalIdeal 𝒪[K])) (hn : 0 < f.natDegree)
   {α : L} (hα : aeval α f = 0)
 
@@ -353,11 +403,15 @@ end AdjoinRoot
 
 section Converse
 
-variable {K L : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K]
-  [IsNonarchimedeanLocalField K]
-  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L]
-  [Algebra K L] [ValuativeExtension K L] [FiniteDimensional K L]
-  (h : (_root_.Ideal.ramificationIdx (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation L))) (_root_.Valuation.integer (_root_.ValuativeRel.valuation K))) = Module.finrank K L) {ϖ : 𝒪[L]} (hϖ : Irreducible ϖ)
+variable
+  {K L : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra K L]
+  [ValuativeExtension K L] [FiniteDimensional K L]
+  (h : (_root_.Ideal.ramificationIdx
+      (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation L)))
+      (_root_.Valuation.integer (_root_.ValuativeRel.valuation K)))
+    = Module.finrank K L)
+  {ϖ : 𝒪[L]} (hϖ : Irreducible ϖ)
 include h hϖ
 
 end Converse

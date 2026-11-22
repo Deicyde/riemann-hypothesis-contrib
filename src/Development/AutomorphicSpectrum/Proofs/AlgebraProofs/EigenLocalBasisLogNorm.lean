@@ -10,8 +10,10 @@ public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.DualBasisTrac
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Matrix GlobalTheory GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl
 open scoped ComplexOrder
 
@@ -23,8 +25,8 @@ section Proj
 
 variable {E K U : Type} [Field E] [NumberField E] [Field K] [AddCommGroup U] [Module K U]
 
-theorem eigProj_rho (ρ : 𝓞 E →+* Module.End K U) (σ : E →+* K) (a : 𝓞 E) (u : U) :
-    HT.eigProj ρ σ (ρ a u) = σ (a : E) • HT.eigProj ρ σ u := by
+theorem eigProj_rho (ρ : 𝓞 E →+* Module.End K U) (σ : E →+* K) (a : 𝓞 E) (u : U)
+    : HT.eigProj ρ σ (ρ a u) = σ (a : E) • HT.eigProj ρ σ u := by
   have h1 : HT.eigProj ρ σ (ρ a u) = ρ a (HT.eigProj ρ σ u) := by
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [HT.eigProj, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul]
@@ -33,19 +35,27 @@ theorem eigProj_rho (ρ : 𝓞 E →+* Module.End K U) (σ : E →+* K) (a : �
   rw [h1]
   exact HT.LatBasic.mem_eigSp.1 (HT.LatBasic.eigProj_mem ρ σ u) a
 
-theorem eigProj_eq_zero (ρ : 𝓞 E →+* Module.End K U) (σ : E →+* K) (r : 𝓞 E) (s : K)
-    (hs : s ≠ σ (r : E)) {u : U} (hu : ρ r u = s • u) : HT.eigProj ρ σ u = 0 := by
+theorem eigProj_eq_zero
+    (ρ : 𝓞 E →+* Module.End K U)
+    (σ : E →+* K) (r : 𝓞 E) (s : K) (hs : s ≠ σ (r : E))
+    {u : U} (hu : ρ r u = s • u)
+    : HT.eigProj ρ σ u = 0 := by
   have h1 := eigProj_rho ρ σ r u
   rw [hu, map_smul] at h1
   have h2 : (s - σ (r : E)) • HT.eigProj ρ σ u = 0 := by rw [sub_smul, h1, sub_self]
   exact (smul_eq_zero.1 h2).resolve_left (sub_ne_zero.2 hs)
 
-theorem eigProj_eq_sum [CharZero K] (hcard : Nat.card (E →+* K) = Module.finrank ℚ E)
-    (ρ : 𝓞 E →+* Module.End K U) (σ : E →+* K) (r : 𝓞 E) {f : ℕ} (b : Fin f → 𝓞 E) (b' : Fin f → E)
-    (hb : ∀ σ' : E →+* K, σ (r : E) = σ' (r : E) →
-      (σ = σ' → ∑ k, σ (b' k) * σ' (b k : E) = 1) ∧ (σ ≠ σ' → ∑ k, σ (b' k) * σ' (b k : E) = 0))
-    {u : U} (hu : ρ r u = σ (r : E) • u) :
-    HT.eigProj ρ σ u = ∑ k, σ (b' k) • ρ (b k) u := by
+theorem eigProj_eq_sum
+    [CharZero K]
+    (hcard : Nat.card (E →+* K) = Module.finrank ℚ E)
+    (ρ : 𝓞 E →+* Module.End K U)
+    (σ : E →+* K) (r : 𝓞 E)
+    {f : ℕ} (b : Fin f → 𝓞 E) (b' : Fin f → E)
+    (hb : ∀ σ' : E →+* K,
+      σ (r : E) = σ' (r : E)
+        → (σ = σ' → ∑ k, σ (b' k) * σ' (b k : E) = 1) ∧ (σ ≠ σ' → ∑ k, σ (b' k) * σ' (b k : E) = 0))
+    {u : U} (hu : ρ r u = σ (r : E) • u)
+    : HT.eigProj ρ σ u = ∑ k, σ (b' k) • ρ (b k) u := by
   classical
   haveI : Finite (E →+* K) := Nat.finite_of_card_ne_zero (by
     rw [hcard]; exact Module.finrank_pos.ne')
@@ -55,8 +65,9 @@ theorem eigProj_eq_sum [CharZero K] (hcard : Nat.card (E →+* K) = Module.finra
   have hexp : u = ∑ τ : E →+* K, HT.eigProj ρ τ u := by
     have := congrArg (fun T : Module.End K U => T u) hsum
     simpa [LinearMap.sum_apply] using this.symm
-  have hterm : ∀ τ : E →+* K,
-      ∑ k, σ (b' k) • ρ (b k) (HT.eigProj ρ τ u) = if τ = σ then HT.eigProj ρ σ u else 0 := by
+  have hterm
+      : ∀ τ : E →+* K,
+        ∑ k, σ (b' k) • ρ (b k) (HT.eigProj ρ τ u) = if τ = σ then HT.eigProj ρ σ u else 0 := by
     intro τ
     have hact : ∀ k, ρ (b k) (HT.eigProj ρ τ u) = τ (b k : E) • HT.eigProj ρ τ u := fun k =>
       HT.LatBasic.mem_eigSp.1 (HT.LatBasic.eigProj_mem ρ τ u) (b k)
@@ -82,36 +93,46 @@ end LieEigenProjections
 
 section Core
 
-variable {E K U : Type} [Field E] [NumberField E] [Field K] [CharZero K] [AddCommGroup U] [Module K U]
+variable
+  {E K U : Type} [Field E] [NumberField E] [Field K] [CharZero K] [AddCommGroup U] [Module K U]
 
-theorem core (V : Subring K) (ρ : 𝓞 E →+* Module.End K U) (σ : E →+* K) (r : 𝓞 E)
-    (hr : σ (r : E) ≠ 0) {I J : Type} [Fintype I] [Fintype J] (u : I → U) (u' : J → U) {f : ℕ}
-    (b : Fin f → 𝓞 E) (m : Fin f → K) (δ : K) (k₀ : Fin f)
+theorem core
+    (V : Subring K) (ρ : 𝓞 E →+* Module.End K U)
+    (σ : E →+* K) (r : 𝓞 E) (hr : σ (r : E) ≠ 0)
+    {I J : Type} [Fintype I] [Fintype J]
+    (u : I → U) (u' : J → U)
+    {f : ℕ} (b : Fin f → 𝓞 E) (m : Fin f → K)
+    (δ : K) (k₀ : Fin f)
     (hm : ∀ a, HT.eigProj ρ σ (u a) = ∑ k, m k • ρ (b k) (u a))
-    (hu' : ∀ a, ρ r (u' a) = -σ (r : E) • u' a)
-    (hlin : LinearIndependent K (Sum.elim (fun q : I × Fin f => ρ (b q.2) (u q.1))
-      (fun q : J × Fin f => ρ (b q.2) (u' q.1))))
+    (hu' : ∀ a, ρ r (u' a) = - σ (r : E) • u' a)
+    (hlin : LinearIndependent K
+      (Sum.elim (fun q : I × Fin f => ρ (b q.2) (u q.1)) (fun q : J × Fin f => ρ (b q.2) (u' q.1))))
     (hδ0 : δ ≠ 0) (hk₀ : m k₀ ≠ 0) (hVm : ∀ k, δ * m k ∈ V)
-    (hVx : ∀ x : K, x * m k₀ ∈ V → x * δ⁻¹ ∈ V) :
-    LinearIndependent K (fun a => δ • HT.eigProj ρ σ (u a)) ∧
-      Submodule.span V (Set.range (Sum.elim (fun q : I × Fin f => ρ (b q.2) (u q.1))
-        (fun q : J × Fin f => ρ (b q.2) (u' q.1)))) ⊓ (HT.eigSp ρ σ).restrictScalars V =
-      Submodule.span V (Set.range fun a => δ • HT.eigProj ρ σ (u a)) := by
+    (hVx : ∀ x : K, x * m k₀ ∈ V → x * δ⁻¹ ∈ V)
+    : LinearIndependent K (fun a => δ • HT.eigProj ρ σ (u a))
+      ∧ Submodule.span V
+            (Set.range (Sum.elim
+              (fun q : I × Fin f => ρ (b q.2) (u q.1))
+              (fun q : J × Fin f => ρ (b q.2) (u' q.1))))
+          ⊓ (HT.eigSp ρ σ).restrictScalars V
+        = Submodule.span V (Set.range fun a => δ • HT.eigProj ρ σ (u a)) := by
   classical
-  have hneg : -σ (r : E) ≠ σ (r : E) := by
+  have hneg : - σ (r : E) ≠ σ (r : E) := by
     intro h
     have h2 : (2 : K) * σ (r : E) = 0 := by linear_combination -h
     exact hr ((mul_eq_zero.1 h2).resolve_left two_ne_zero)
   have hker : ∀ a k, HT.eigProj ρ σ (ρ (b k) (u' a)) = 0 := by
     intro a k
-    refine LieEigenProjections.eigProj_eq_zero ρ σ r (-σ (r : E)) hneg ?_
+    refine LieEigenProjections.eigProj_eq_zero ρ σ r (- σ (r : E)) hneg ?_
     rw [← Module.End.mul_apply, ← map_mul, mul_comm, map_mul, Module.End.mul_apply, hu', map_smul]
   refine ⟨?_, le_antisymm ?_ ?_⟩
   · rw [Fintype.linearIndependent_iff]
     intro g hg a
-    have hs : ∑ q : I × Fin f, (g q.1 * δ * m q.2) •
-        (Sum.elim (fun q : I × Fin f => ρ (b q.2) (u q.1))
-          (fun q : J × Fin f => ρ (b q.2) (u' q.1)) ∘ Sum.inl) q = 0 := by
+    have hs
+        : ∑ q : I × Fin f, (g q.1 * δ * m q.2) •
+            (Sum.elim (fun q : I × Fin f => ρ (b q.2) (u q.1))
+              (fun q : J × Fin f => ρ (b q.2) (u' q.1)) ∘ Sum.inl) q
+          = 0 := by
       rw [Fintype.sum_prod_type, ← hg]
       refine Finset.sum_congr rfl fun a _ => ?_
       rw [hm, Finset.smul_sum, Finset.smul_sum]
@@ -137,9 +158,11 @@ theorem core (V : Subring K) (ρ : 𝓞 E →+* Module.End K U) (σ : E →+* K)
       refine Finset.sum_congr rfl fun a _ => ?_
       simp only [hx, Finset.sum_smul, map_smul, LieEigenProjections.eigProj_rho, smul_smul]
     have hcoef : ∀ a k, (c (Sum.inl (a, k)) : K) = x a * m k := by
-      have hz0 : ∑ i, ((c i : K) - Sum.elim (fun q : I × Fin f => x q.1 * m q.2)
-          (fun _ : J × Fin f => (0 : K)) i) • (Sum.elim (fun q : I × Fin f => ρ (b q.2) (u q.1))
-            (fun q : J × Fin f => ρ (b q.2) (u' q.1))) i = 0 := by
+      have hz0
+          : ∑ i, ((c i : K) - Sum.elim (fun q : I × Fin f => x q.1 * m q.2)
+              (fun _ : J × Fin f => (0 : K)) i) • (Sum.elim (fun q : I × Fin f => ρ (b q.2) (u q.1))
+                (fun q : J × Fin f => ρ (b q.2) (u' q.1))) i
+            = 0 := by
         rw [Fintype.sum_sum_type]
         simp only [Sum.elim_inl, Sum.elim_inr, sub_zero, sub_smul, Finset.sum_sub_distrib]
         have h1 : ∑ q : I × Fin f, (x q.1 * m q.2) • ρ (b q.2) (u q.1) = z := by
@@ -151,12 +174,12 @@ theorem core (V : Subring K) (ρ : 𝓞 E →+* Module.End K U) (σ : E →+* K)
       intro a k
       have := Fintype.linearIndependent_iff.1 hlin _ hz0 (Sum.inl (a, k))
       simpa [sub_eq_zero] using this
-    have hy : ∀ a, x a * δ⁻¹ ∈ V := fun a => hVx _ (by
-      rw [← hcoef a k₀]; exact (c (Sum.inl (a, k₀))).2)
+    have hy : ∀ a, x a * δ⁻¹ ∈ V := fun a =>
+      hVx _ (by rw [← hcoef a k₀]; exact (c (Sum.inl (a, k₀))).2)
     rw [hez]
     refine Submodule.sum_mem _ fun a _ => ?_
-    have h1 : x a • HT.eigProj ρ σ (u a) =
-        (⟨x a * δ⁻¹, hy a⟩ : V) • (δ • HT.eigProj ρ σ (u a)) := by
+    have h1
+        : x a • HT.eigProj ρ σ (u a) = (⟨x a * δ⁻¹, hy a⟩ : V) • (δ • HT.eigProj ρ σ (u a)) := by
       rw [Subring.smul_def, smul_smul]
       simp [hδ0]
     rw [h1]
@@ -167,9 +190,12 @@ theorem core (V : Subring K) (ρ : 𝓞 E →+* Module.End K U) (σ : E →+* K)
     · change δ • HT.eigProj ρ σ (u a) ∈ Submodule.span V _
       rw [hm, Finset.smul_sum]
       refine Submodule.sum_mem _ fun k _ => ?_
-      have h1 : δ • m k • ρ (b k) (u a) = (⟨δ * m k, hVm k⟩ : V) •
-          (Sum.elim (fun q : I × Fin f => ρ (b q.2) (u q.1))
-            (fun q : J × Fin f => ρ (b q.2) (u' q.1))) (Sum.inl (a, k)) := by
+      have h1
+          : δ • m k • ρ (b k) (u a)
+            = (⟨δ * m k, hVm k⟩ : V) • (Sum.elim
+                (fun q : I × Fin f => ρ (b q.2) (u q.1))
+                (fun q : J × Fin f => ρ (b q.2) (u' q.1)))
+              (Sum.inl (a, k)) := by
         rw [Subring.smul_def, smul_smul]
         rfl
       rw [h1]
@@ -178,7 +204,29 @@ theorem core (V : Subring K) (ρ : 𝓞 E →+* Module.End K U) (σ : E →+* K)
 
 end Core
 
-theorem eigSub_span : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (ℓ : Nat.Primes) (K : Type) [Field K] [CharZero K] (j : K →+* ℂ_[ℓ]) (V : Subring K) (U : Type) [AddCommGroup U] [Module K U] (ρ : 𝓞 E →+* Module.End K U) (σ : E →+* K) (I J : Type) [Fintype I] [Fintype J] (u : I → U) (u' : J → U) (f : ℕ) (b : Fin f → 𝓞 E) (δ : K), (∀ a : K, ‖j a‖ ≤ 1 ↔ a ∈ V) → Nat.card (E →+* K) = Module.finrank ℚ E → IsLocBasis (Algebra.adjoin ℤ {H.w0}) ℓ b → (∀ a, ρ H.rt (u a) = σ (H.rt : E) • u a) → (∀ a, ρ H.rt (u' a) = -σ (H.rt : E) • u' a) → LinearIndependent K (Sum.elim (fun q : I × Fin f => ρ (b q.2) (u q.1)) (fun q : J × Fin f => ρ (b q.2) (u' q.1))) → δ ≠ 0 → Real.log ‖j δ‖ = logIdeal ((j.comp σ).comp (algebraMap (𝓞 E) E)) (differentIdeal ℤ (𝓞 E)) - Real.log ‖j (σ (H.rt : E))‖ → LinearIndependent K (fun a => δ • HT.eigProj ρ σ (u a)) ∧ Submodule.span V (Set.range (Sum.elim (fun q : I × Fin f => ρ (b q.2) (u q.1)) (fun q : J × Fin f => ρ (b q.2) (u' q.1)))) ⊓ (HT.eigSp ρ σ).restrictScalars V = Submodule.span V (Set.range fun a => δ • HT.eigProj ρ σ (u a)) := by
+theorem eigSub_span
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (ℓ : Nat.Primes) (K : Type)
+        [Field K] [CharZero K] (j : K →+* ℂ_[ℓ]) (V : Subring K) (U : Type) [AddCommGroup U]
+        [Module K U] (ρ : 𝓞 E →+* Module.End K U) (σ : E →+* K) (I J : Type) [Fintype I] [Fintype J]
+        (u : I → U) (u' : J → U) (f : ℕ) (b : Fin f → 𝓞 E) (δ : K),
+      (∀ a : K, ‖j a‖ ≤ 1 ↔ a ∈ V) → Nat.card (E →+* K) = Module.finrank ℚ E
+        → IsLocBasis (Algebra.adjoin ℤ {H.w0}) ℓ b → (∀ a, ρ H.rt (u a) = σ (H.rt : E) • u a)
+        → (∀ a, ρ H.rt (u' a) = - σ (H.rt : E) • u' a)
+        → LinearIndependent K
+          (Sum.elim
+            (fun q : I × Fin f => ρ (b q.2) (u q.1))
+            (fun q : J × Fin f => ρ (b q.2) (u' q.1)))
+        → δ ≠ 0
+        → Real.log ‖j δ‖
+          = logIdeal ((j.comp σ).comp (algebraMap (𝓞 E) E)) (differentIdeal ℤ (𝓞 E))
+            - Real.log ‖j (σ (H.rt : E))‖
+        → LinearIndependent K (fun a => δ • HT.eigProj ρ σ (u a))
+          ∧ Submodule.span V
+                (Set.range (Sum.elim
+                  (fun q : I × Fin f => ρ (b q.2) (u q.1))
+                  (fun q : J × Fin f => ρ (b q.2) (u' q.1))))
+              ⊓ (HT.eigSp ρ σ).restrictScalars V
+            = Submodule.span V (Set.range fun a => δ • HT.eigProj ρ σ (u a)) := by
   intro E _ _ _ H ℓ K _ _ j V U _ _ ρ σ I J _ _ u u' f b δ hV hcard hloc hu hu' hlin hδ0 hδ
   obtain ⟨b', hb', hj⟩ := GlobalTheory.T.dual_basis_trace_log_norm E H ℓ f b hloc
   obtain ⟨hpos, hlog⟩ := hj (j.comp σ)
@@ -207,7 +255,8 @@ theorem eigSub_span : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H 
       simpa using this
     exact H.d_prime.ne_zero (by exact_mod_cast h3)
   refine core V ρ σ H.rt hr u u' b (fun k => σ (b' k)) δ k₀ ?_ hu' hlin hδ0 ?_ ?_ ?_
-  · exact fun a => LieEigenProjections.eigProj_eq_sum hcard ρ σ H.rt b b' (fun σ' h => hb' K σ σ' h) (hu a)
+  · exact fun a =>
+      LieEigenProjections.eigProj_eq_sum hcard ρ σ H.rt b b' (fun σ' h => hb' K σ σ' h) (hu a)
   · intro h0
     have h0' : σ (b' k₀) = 0 := h0
     have : ‖j (σ (b' k₀))‖ = 0 := by rw [h0', map_zero, norm_zero]
@@ -216,8 +265,9 @@ theorem eigSub_span : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H 
   · intro k
     refine (hV _).1 ?_
     rw [map_mul, norm_mul, mul_comm]
-    calc ‖j (σ (b' k))‖ * ‖j δ‖ ≤ (⨆ k, ‖j (σ (b' k))‖) * ‖j δ‖ :=
-          mul_le_mul_of_nonneg_right (hle k) hδp.le
+    calc
+      ‖j (σ (b' k))‖ * ‖j δ‖
+        ≤ (⨆ k, ‖j (σ (b' k))‖) * ‖j δ‖ := mul_le_mul_of_nonneg_right (hle k) hδp.le
       _ = 1 := hprod
   · intro x hx
     have h1 := (hV _).2 hx

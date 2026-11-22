@@ -6,12 +6,13 @@ public import Mathlib
 
 namespace GlobalTheory.AdTh
 
-theorem scalar_of_intertwines_up_to_scalar (Γ M : Type) [Group Γ] [AddCommGroup M] [Module ℂ M]
-    [FiniteDimensional ℂ M] [Nontrivial M] (ρ : Γ →* Module.End ℂ M) (S : Set Γ)
+theorem scalar_of_intertwines_up_to_scalar
+    (Γ M : Type) [Group Γ] [AddCommGroup M] [Module ℂ M] [FiniteDimensional ℂ M] [Nontrivial M]
+    (ρ : Γ →* Module.End ℂ M) (S : Set Γ)
     (hS : Subgroup.closure S = ⊤) (htr : ∀ γ ∈ S, LinearMap.trace ℂ M (ρ γ) ≠ 0)
     (hirr : ∀ U : Submodule ℂ M, (∀ γ, U.map (ρ γ) ≤ U) → U = ⊥ ∨ U = ⊤)
-    (T : M →ₗ[ℂ] M) (χ : Γ → ℂ) (hT : Function.Injective T)
-    (h : ∀ γ x, T (ρ γ x) = χ γ • ρ γ (T x)) : ∃ a : ℂ, ∀ x, T x = a • x := by
+    (T : M →ₗ[ℂ] M) (χ : Γ → ℂ) (hT : Function.Injective T) (h : ∀ γ x, T (ρ γ x) = χ γ • ρ γ (T x))
+    : ∃ a : ℂ, ∀ x, T x = a • x := by
   have hu : IsUnit (T : Module.End ℂ M) :=
     (Module.End.isUnit_iff _).2 ⟨hT, LinearMap.injective_iff_surjective.1 hT⟩
   obtain ⟨u, hu⟩ := hu
@@ -38,8 +39,10 @@ theorem scalar_of_intertwines_up_to_scalar (Γ M : Type) [Group Γ] [AddCommGrou
       have := h1 x
       rw [hχ x hx, one_smul] at this
       exact this
-    | one => rw [map_one]; exact Commute.one_right _
-    | mul x y _ _ hx hy => rw [map_mul]; exact hx.mul_right hy
+    | one =>
+      rw [map_one]; exact Commute.one_right _
+    | mul x y _ _ hx hy =>
+      rw [map_mul]; exact hx.mul_right hy
     | inv x _ hx =>
       have e1 : ρ x * ρ x⁻¹ = 1 := by rw [← map_mul, mul_inv_cancel, map_one]
       have e2 : ρ x⁻¹ * ρ x = 1 := by rw [← map_mul, inv_mul_cancel, map_one]
@@ -52,7 +55,8 @@ theorem scalar_of_intertwines_up_to_scalar (Γ M : Type) [Group Γ] [AddCommGrou
       rw [Module.End.mem_eigenspace_iff]
       have := congrArg (fun f : Module.End ℂ M => f y) (hc γ).eq
       simp only [hu, Module.End.mul_apply] at this
-      rw [this, hy', map_smul]) with h0 | h0
+      rw [this, hy', map_smul])
+    with h0 | h0
   · exact absurd h0 (Module.End.hasEigenvalue_iff.1 ha)
   · exact Module.End.mem_eigenspace_iff.1 (h0 ▸ Submodule.mem_top)
 

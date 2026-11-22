@@ -11,23 +11,27 @@ noncomputable section
 
 namespace PI.OmFibreUniq.W.SdAbs
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory Topology Filter NumberField IsDedekindDomain
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory Topology Filter
+  NumberField IsDedekindDomain
 open PI.VolStabSW.SdUniqW PI.OmFibreUniq.W.SdCore PI.OmFibreUniq.W.SdChar
 open scoped ENNReal
 
 section Abs
 
-variable {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
-  {V : Type} [AddCommGroup V] [Module (Fv F v) V] [TopologicalSpace V]
-  [IsTopologicalAddGroup V] [ContinuousSMul (Fv F v) V] [T2Space V] [LocallyCompactSpace V]
-  [SecondCountableTopology V] [MeasurableSpace V] [BorelSpace V] (B : V → V → Fv F v)
+variable
+  {F : Type} [Field F] [NumberField F]
+  (v : HeightOneSpectrum (𝓞 F))
+  {V : Type} [AddCommGroup V] [Module (Fv F v) V] [TopologicalSpace V] [IsTopologicalAddGroup V]
+  [ContinuousSMul (Fv F v) V] [T2Space V] [LocallyCompactSpace V] [SecondCountableTopology V]
+  [MeasurableSpace V] [BorelSpace V]
+  (B : V → V → Fv F v)
 
 theorem B_zero_left (hBs : ∀ (c : Fv F v) x y, B (c • x) y = c * B x y) (y : V) : B 0 y = 0 := by
   have := hBs 0 0 y
   rwa [zero_smul, zero_mul] at this
 
-theorem haar_smul_preimage (μ0 : Measure V) [μ0.IsAddHaarMeasure] (a : Fv F v) (ha : a ≠ 0) :
-    ∃ c : ℝ≥0∞, ∀ S, MeasurableSet S → μ0 ((fun y : V => a • y) ⁻¹' S) = c * μ0 S := by
+theorem haar_smul_preimage (μ0 : Measure V) [μ0.IsAddHaarMeasure] (a : Fv F v) (ha : a ≠ 0)
+    : ∃ c : ℝ≥0∞, ∀ S, MeasurableSet S → μ0 ((fun y : V => a • y) ⁻¹' S) = c * μ0 S := by
   let e : V ≃+ V := (LinearEquiv.smulOfNeZero (Fv F v) V a ha).toAddEquiv
   have he : Continuous e := by
     show Continuous fun y : V => a • y
@@ -45,30 +49,29 @@ theorem haar_smul_preimage (μ0 : Measure V) [μ0.IsAddHaarMeasure] (a : Fv F v)
   rw [← h]
   rfl
 
-theorem exists_selfDual_measure (ψ0 : Fv F v → ℂ) (hψc : Continuous ψ0) (hψa : ∀ r s, ψ0 (r + s) = ψ0 r * ψ0 s)
+theorem exists_selfDual_measure
+    (ψ0 : Fv F v → ℂ) (hψc : Continuous ψ0) (hψa : ∀ r s, ψ0 (r + s) = ψ0 r * ψ0 s)
     (hψn : ∀ r, ‖ψ0 r‖ = 1) (hnt : ∃ y, ψ0 y ≠ 1)
     (hBa : ∀ x x' y, B (x + x') y = B x y + B x' y)
     (hBs : ∀ (c : Fv F v) x y, B (c • x) y = c * B x y) (hBsym : ∀ x y, B x y = B y x)
-    (hBjc : Continuous (fun p : V × V => B p.1 p.2)) (hD : DualAt v B) :
-    ∃ μ : Measure V, SelfDual μ (fun x y => ψ0 (B x y)) := by
+    (hBjc : Continuous (fun p : V × V => B p.1 p.2)) (hD : DualAt v B)
+    : ∃ μ : Measure V, SelfDual μ (fun x y => ψ0 (B x y)) := by
   obtain ⟨π, hπ0, hπt, -⟩ := PI.VolStabSW.exists_unif_Fv v
   set χ : V → V → ℂ := fun x y => ψ0 (B x y) with hχdef
-  have hχc : Continuous (fun p : V × V => χ p.1 p.2) :=
-    hψc.comp hBjc
-  have hχ : ∀ x t y, χ (t + x) y = χ t y * χ x y := fun x t y => by
-    simp only [hχdef]; rw [hBa, hψa]
+  have hχc : Continuous (fun p : V × V => χ p.1 p.2) := hψc.comp hBjc
+  have hχ : ∀ x t y, χ (t + x) y = χ t y * χ x y := fun x t y => by simp only [hχdef]; rw [hBa, hψa]
   have hsym : ∀ x y, χ x y = χ y x := fun x y => by simp only [hχdef]; rw [hBsym]
   have hn : ∀ x y, ‖χ x y‖ = 1 := fun x y => hψn _
   obtain ⟨L, hLc, hLo, hsL, hK⟩ := hD
   have hBzr : ∀ x, B x 0 = 0 := fun x => by rw [hBsym]; exact B_zero_left v B hBs x
   have hQ : ∀ᶠ q in 𝓝 (0 : V), ∀ x ∈ (L : Set V), B x q ∈ Aset v ψ0 := by
-    have hP : ∀ x ∈ (L : Set V), ∀ᶠ z : V × V in 𝓝 ((0 : V), x), B z.2 z.1 ∈ Aset v ψ0 :=
-      fun x _ => by
-        have hc : Continuous fun z : V × V => B z.2 z.1 :=
-          hBjc.comp (continuous_snd.prodMk continuous_fst)
-        exact (hc.tendsto ((0 : V), x)).eventually_mem
-          (by rw [show B ((0 : V), x).2 ((0 : V), x).1 = 0 from hBzr x]
-              exact Aset_mem_nhds v ψ0 hψc hψa hψn)
+    have hP
+        : ∀ x ∈ (L : Set V), ∀ᶠ z : V × V in 𝓝 ((0 : V), x), B z.2 z.1 ∈ Aset v ψ0 := fun x _ => by
+      have hc : Continuous fun z : V × V => B z.2 z.1 :=
+        hBjc.comp (continuous_snd.prodMk continuous_fst)
+      exact (hc.tendsto ((0 : V), x)).eventually_mem (by
+        rw [show B ((0 : V), x).2 ((0 : V), x).1 = 0 from hBzr x]
+        exact Aset_mem_nhds v ψ0 hψc hψa hψn)
     exact hLc.eventually_forall_of_forall_eventually (P := fun q x => B x q ∈ Aset v ψ0) hP
   have hNo0 : IsOpen (ann χ (L : Set V)) := by
     rw [isOpen_iff_mem_nhds]
@@ -134,8 +137,9 @@ theorem exists_selfDual_measure (ψ0 : Fv F v → ℂ) (hψc : Continuous ψ0) (
   have hsh : ∀ U ∈ 𝓝 (0 : V), ∀ᶠ k in atTop, ann χ (M k : Set V) ⊆ U := by
     intro U hU
     have hP : ∀ w ∈ ann χ (L : Set V), ∀ᶠ z : Fv F v × V in 𝓝 ((0 : Fv F v), w), z.1 • z.2 ∈ U :=
-      fun w _ => (continuous_smul.tendsto ((0 : Fv F v), w)).eventually_mem
-        (by rw [show ((0 : Fv F v), w).1 • ((0 : Fv F v), w).2 = (0 : V) by simp]; exact hU)
+      fun w _ =>
+        (continuous_smul.tendsto ((0 : Fv F v), w)).eventually_mem
+          (by rw [show ((0 : Fv F v), w).1 • ((0 : Fv F v), w).2 = (0 : V) by simp]; exact hU)
     have hev := hNc0.eventually_forall_of_forall_eventually (P := fun c w => c • w ∈ U) hP
     filter_upwards [hπt.eventually hev] with k hk y hy
     rw [hann] at hy
@@ -147,13 +151,15 @@ theorem exists_selfDual_measure (ψ0 : Fv F v → ℂ) (hψc : Continuous ψ0) (
   have hNm : MeasurableSet (ann χ (L : Set V)) := hNcl.measurableSet
   have hL0 : μ0 (L : Set V) ≠ 0 := (hLo.measure_pos μ0 ⟨0, L.zero_mem⟩).ne'
   have hLt : μ0 (L : Set V) ≠ ⊤ := hLc.measure_lt_top.ne
-  have hgen : ∀ k, μ0 (M k : Set V) * μ0 (ann χ (M k : Set V)) =
-      μ0 (L : Set V) * μ0 (ann χ (L : Set V)) := by
+  have hgen
+      : ∀ k,
+        μ0 (M k : Set V) * μ0 (ann χ (M k : Set V)) = μ0 (L : Set V) * μ0 (ann χ (L : Set V)) := by
     intro k
     obtain ⟨c1, hc1⟩ := haar_smul_preimage v μ0 (π ^ k) (hπk k)
     obtain ⟨c2, hc2⟩ := haar_smul_preimage v μ0 ((π ^ k)⁻¹) (inv_ne_zero (hπk k))
-    have hid : (fun y : V => (π ^ k)⁻¹ • y) ⁻¹' ((fun y : V => π ^ k • y) ⁻¹' (L : Set V)) =
-        (L : Set V) := by
+    have hid
+        : (fun y : V => (π ^ k)⁻¹ • y) ⁻¹' ((fun y : V => π ^ k • y) ⁻¹' (L : Set V))
+          = (L : Set V) := by
       ext y; simp [smul_smul, mul_inv_cancel₀ (hπk k)]
     have hm1 : MeasurableSet ((fun y : V => π ^ k • y) ⁻¹' (L : Set V)) :=
       hLm.preimage (continuous_const_smul _).measurable
@@ -161,11 +167,13 @@ theorem exists_selfDual_measure (ψ0 : Fv F v → ℂ) (hψc : Continuous ψ0) (
       have := hc2 _ hm1
       rw [hid, hc1 _ hLm, ← mul_assoc] at this
       have h3 : μ0 (L : Set V) * (μ0 (L : Set V))⁻¹ = 1 := ENNReal.mul_inv_cancel hL0 hLt
-      calc c2 * c1 = c2 * c1 * μ0 (L : Set V) * (μ0 (L : Set V))⁻¹ := by
-            rw [mul_assoc (c2 * c1), h3, mul_one]
+      calc
+        c2 * c1 = c2 * c1 * μ0 (L : Set V) * (μ0 (L : Set V))⁻¹ := by
+          rw [mul_assoc (c2 * c1), h3, mul_one]
         _ = 1 := by rw [← this, h3]
     rw [hann, hMset, hc1 _ hLm, hc2 _ hNm]
-    calc c1 * μ0 (L : Set V) * (c2 * μ0 (ann χ (L : Set V)))
+    calc
+      c1 * μ0 (L : Set V) * (c2 * μ0 (ann χ (L : Set V)))
         = (c2 * c1) * (μ0 (L : Set V) * μ0 (ann χ (L : Set V))) := by ring
       _ = _ := by rw [h12, one_mul]
   exact selfDual_of_pairs χ hχc hχ hsym hn M hMc hMo hNc hNo hex hsh μ0

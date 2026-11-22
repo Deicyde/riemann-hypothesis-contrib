@@ -23,9 +23,10 @@ def aaLbS (b : Fin D.R.rS) : Submodule (𝓞 D.host.E) (VS D).V :=
 
 def TrDetUnimod : Prop :=
   ∀ {D : D7} (X : HidaSetting D) (b : Fin D.R.rS) {N : ℕ}
-    (m : Module.Basis (Fin N) ℤ ((aaLbS X b).restrictScalars ℤ)),
-    N = Module.finrank ℚ D.host.E * (D.R.k + 1) →
-    |(Matrix.of fun i j => Algebra.trace ℚ D.host.E ((VS D).hT (m i : (VS D).V) (m j : (VS D).V))).det| =
-      |(discr D.host.E : ℚ)| ^ (D.R.k + 1) * (FractionalIdeal.absNorm (aaD D b) : ℚ) ^ (2 * (D.R.k + 1))
+      (m : Module.Basis (Fin N) ℤ ((aaLbS X b).restrictScalars ℤ)),
+    N = Module.finrank ℚ D.host.E * (D.R.k + 1)
+      → |(Matrix.of fun i j => Algebra.trace ℚ D.host.E ((VS D).hT (m i : (VS D).V) (m j : (VS D).V))).det|
+        = |(discr D.host.E : ℚ)| ^ (D.R.k + 1)
+          * (FractionalIdeal.absNorm (aaD D b) : ℚ) ^ (2 * (D.R.k + 1))
 
 end Formalism.L2.SG.Pf.NcReal.JX.CovB

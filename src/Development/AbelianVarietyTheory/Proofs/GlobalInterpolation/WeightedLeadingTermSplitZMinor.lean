@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.SplitL
 
 @[expose] public section
 
-open MvPolynomial NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.DIV Formalism.L2.Col GlobalTheory.IndefiniteRowSideFullHecke.InterlacingEquivariance GlobalTheory.BranchFormula
+open MvPolynomial NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.DIV
+  Formalism.L2.Col GlobalTheory.IndefiniteRowSideFullHecke.InterlacingEquivariance
+  GlobalTheory.BranchFormula
 
 noncomputable section
 
@@ -28,8 +30,10 @@ theorem TopTerm.C (c : A) : TopTerm w (C c : MvPolynomial σ A) 0 c := by
   rw [mem_support_iff, coeff_C, if_neg (Ne.symm h)] at hm
   exact hm rfl
 
-theorem TopTerm.mul {f g : MvPolynomial σ A} {d e : σ →₀ ℕ} {c c' : A} (hf : TopTerm w f d c) (hg : TopTerm w g e c') :
-    TopTerm w (f * g) (d + e) (c * c') := by
+theorem TopTerm.mul
+    {f g : MvPolynomial σ A} {d e : σ →₀ ℕ} {c c' : A}
+    (hf : TopTerm w f d c) (hg : TopTerm w g e c')
+    : TopTerm w (f * g) (d + e) (c * c') := by
   classical
   constructor
   · rw [coeff_mul, Finset.sum_eq_single (d, e), hf.1, hg.1]
@@ -52,24 +56,32 @@ theorem TopTerm.mul {f g : MvPolynomial σ A} {d e : σ →₀ ℕ} {c c' : A} (
     · exact Or.inl rfl
     all_goals right; omega
 
-theorem TopTerm.pow {f : MvPolynomial σ A} {d : σ →₀ ℕ} {c : A} (hf : TopTerm w f d c) (k : ℕ) :
-    TopTerm w (f ^ k) (k • d) (c ^ k) := by
+theorem TopTerm.pow {f : MvPolynomial σ A} {d : σ →₀ ℕ} {c : A} (hf : TopTerm w f d c) (k : ℕ)
+    : TopTerm w (f ^ k) (k • d) (c ^ k) := by
   induction k with
   | zero => simpa using TopTerm.C (w := w) (1 : A)
   | succ k ih => rw [pow_succ, pow_succ, succ_nsmul]; exact ih.mul hf
 
-theorem TopTerm.prod {ι : Type} (s : Finset ι) {f : ι → MvPolynomial σ A} {d : ι → σ →₀ ℕ} {c : ι → A}
-    (h : ∀ i, TopTerm w (f i) (d i) (c i)) : TopTerm w (∏ i ∈ s, f i) (∑ i ∈ s, d i) (∏ i ∈ s, c i) := by
+theorem TopTerm.prod
+    {ι : Type} (s : Finset ι)
+    {f : ι → MvPolynomial σ A} {d : ι → σ →₀ ℕ} {c : ι → A} (h : ∀ i, TopTerm w (f i) (d i) (c i))
+    : TopTerm w (∏ i ∈ s, f i) (∑ i ∈ s, d i) (∏ i ∈ s, c i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using TopTerm.C (w := w) (1 : A)
-  | insert a s ha ih => rw [Finset.prod_insert ha, Finset.sum_insert ha, Finset.prod_insert ha]; exact (h a).mul ih
+  | insert a s ha ih =>
+    rw [Finset.prod_insert ha, Finset.sum_insert ha, Finset.prod_insert ha]; exact (h a).mul ih
 
-theorem TopTerm.linear {k : ℕ} (v : Fin (k + 1) → σ) (c : Fin (k + 1) → A)
-    (hv : ∀ q : Fin k, w (v q.castSucc) < w (v (Fin.last k))) :
-    TopTerm w (∑ q, X (v q) * MvPolynomial.C (c q)) (Finsupp.single (v (Fin.last k)) 1) (c (Fin.last k)) := by
+theorem TopTerm.linear
+    {k : ℕ} (v : Fin (k + 1) → σ) (c : Fin (k + 1) → A)
+    (hv : ∀ q : Fin k, w (v q.castSucc) < w (v (Fin.last k)))
+    : TopTerm w (∑ q, X (v q) * MvPolynomial.C (c q)) (Finsupp.single (v (Fin.last k)) 1)
+      (c (Fin.last k)) := by
   classical
-  have e : ∀ q, (X (v q) * MvPolynomial.C (c q) : MvPolynomial σ A) = monomial (Finsupp.single (v q) 1) (c q) := by
+  have e
+      : ∀ q,
+        (X (v q) * MvPolynomial.C (c q) : MvPolynomial σ A)
+          = monomial (Finsupp.single (v q) 1) (c q) := by
     intro q
     rw [mul_comm, C_mul_X_eq_monomial]
   simp only [e]
@@ -95,55 +107,76 @@ end Top
 variable (K : Type) [Field K] {N n : ℕ} (hN : N = n + 1)
 
 def lp (n k : ℕ) : Pol K Unit n :=
-  if h : k ≤ n then rename (fun v : Fin n × Fin n => (((), v) : Unit × Fin n × Fin n)) (Formalism.GradedWeylDivisibility.lpMinor K k h h) else 1
+  if h : k ≤ n then
+    rename
+      (fun v : Fin n × Fin n => (((), v) : Unit × Fin n × Fin n))
+      (Formalism.GradedWeylDivisibility.lpMinor K k h h)
+  else
+    1
 
-theorem lp_eq {k : ℕ} (h : k ≤ n) :
-    lp K n k = (Matrix.of fun p q : Fin k => (X ((), Fin.castLE h p, Fin.castLE h q) : Pol K Unit n)).det := by
+theorem lp_eq {k : ℕ} (h : k ≤ n)
+    : lp K n k
+      = (Matrix.of fun p q : Fin k =>
+        (X ((), Fin.castLE h p, Fin.castLE h q) : Pol K Unit n)).det := by
   rw [lp, dif_pos h, Formalism.GradedWeylDivisibility.lpMinor, AlgHom.map_det]
   congr 1
   ext p q
   simp
 
-theorem lp_zero : lp K n 0 = 1 := by
-  rw [lp_eq K (Nat.zero_le n), Matrix.det_isEmpty]
+theorem lp_zero : lp K n 0 = 1 := by rw [lp_eq K (Nat.zero_le n), Matrix.det_isEmpty]
 
-theorem split_lp {k : ℕ} (h : k ≤ n) (h' h'' : k ≤ N) :
-    splitLast K Unit hN (rename (fun v : Fin N × Fin N => (((), v) : Unit × Fin N × Fin N)) (Formalism.GradedWeylDivisibility.lpMinor K k h' h'')) =
-      C (lp K n k) := by
-  rw [lp_eq K h, Formalism.GradedWeylDivisibility.lpMinor, AlgHom.map_det, AlgHom.map_det, RingHom.map_det]
+theorem split_lp {k : ℕ} (h : k ≤ n) (h' h'' : k ≤ N)
+    : splitLast K Unit hN
+        (rename
+          (fun v : Fin N × Fin N => (((), v) : Unit × Fin N × Fin N))
+          (Formalism.GradedWeylDivisibility.lpMinor K k h' h''))
+      = C (lp K n k) := by
+  rw [lp_eq K h, Formalism.GradedWeylDivisibility.lpMinor, AlgHom.map_det, AlgHom.map_det,
+    RingHom.map_det]
   congr 1
   ext1 p q
-  simp only [AlgHom.mapMatrix_apply, RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply, rename_X]
+  simp only [AlgHom.mapMatrix_apply, RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply,
+    rename_X]
   exact splitLast_X_up K Unit hN () (Fin.castLE h p) (Fin.castLE h q)
 
-theorem weightedLeadingTerm_split_zMinor (i : Fin n) :
-    TopTerm (fun p : Unit × Fin n => p.2.val)
-      (splitLast K Unit hN (rename (fun v : Fin N × Fin N => (((), v) : Unit × Fin N × Fin N)) (Br.zMinor K hN i)))
+theorem weightedLeadingTerm_split_zMinor (i : Fin n)
+    : TopTerm
+      (fun p : Unit × Fin n => p.2.val)
+      (splitLast K Unit hN
+        (rename (fun v : Fin N × Fin N => (((), v) : Unit × Fin N × Fin N)) (Br.zMinor K hN i)))
       (Finsupp.single ((), i) 1) (lp K n i) := by
   have hi : i.val + 1 ≤ n := i.2
   have hi' : i.val ≤ n := i.2.le
-  have key := TopTerm.linear (w := fun p : Unit × Fin n => p.2.val) (k := i.val) (fun q => ((), Fin.castLE hi q))
-    (fun q => (-1) ^ (i.val + q.val) * (Matrix.of fun p r : Fin i.val =>
-      (X ((), Fin.castLE hi' p, Fin.castLE hi (q.succAbove r)) : Pol K Unit n)).det) (fun q => by simp)
+  have key :=
+    TopTerm.linear
+      (w := fun p : Unit × Fin n => p.2.val)
+      (k := i.val)
+      (fun q => ((), Fin.castLE hi q))
+      (fun q =>
+        (-1) ^ (i.val + q.val) * (Matrix.of fun p r : Fin i.val =>
+          (X ((), Fin.castLE hi' p, Fin.castLE hi (q.succAbove r)) : Pol K Unit n)).det)
+      (fun q => by simp)
   convert key using 1
-  · rw [Br.zMinor, Formalism.GradedWeylDivisibility.initMinor, AlgHom.map_det, AlgHom.map_det, Matrix.det_succ_row _ (Fin.last i.val)]
+  · rw [Br.zMinor, Formalism.GradedWeylDivisibility.initMinor, AlgHom.map_det, AlgHom.map_det,
+      Matrix.det_succ_row _ (Fin.last i.val)]
     refine Finset.sum_congr rfl fun q _ => ?_
     rw [map_mul, RingHom.map_det, map_pow, map_neg, map_one, mul_left_comm, ← mul_assoc]
     congr 2
-    · simp only [AlgHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply, rename_X, Fin.val_last, lt_irrefl, dif_neg,
-        not_false_eq_true]
+    · simp only [AlgHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply, rename_X, Fin.val_last,
+        lt_irrefl, dif_neg, not_false_eq_true]
       exact splitLast_X_lastRow K Unit hN () (Fin.castLE hi q)
     · ext1 p r
-      simp only [AlgHom.mapMatrix_apply, RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply, rename_X,
-        Matrix.submatrix_apply, Fin.succAbove_last, Fin.val_castSucc, p.2, dif_pos]
+      simp only [AlgHom.mapMatrix_apply, RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply,
+        rename_X, Matrix.submatrix_apply, Fin.succAbove_last, Fin.val_castSucc, p.2, dif_pos]
       exact splitLast_X_up K Unit hN () (Fin.castLE hi' p) (Fin.castLE hi (q.succAbove r))
   · rfl
   · rw [lp_eq K hi', Fin.val_last, ← two_mul, pow_mul]
     simp only [Fin.succAbove_last, even_two, Even.neg_pow, one_pow, one_mul]
     rfl
 
-theorem prod_shift {M : Type} [CommMonoid M] (P : ℕ → M) (h0 : P 0 = 1) (b : Fin n → ℕ) :
-    ∏ i : Fin n, P i ^ b i = ∏ i : Fin n, P (i + 1) ^ Formalism.GradedWeylDivisibility.nuNext b i := by
+theorem prod_shift {M : Type} [CommMonoid M] (P : ℕ → M) (h0 : P 0 = 1) (b : Fin n → ℕ)
+    : ∏ i : Fin n, P i ^ b i
+      = ∏ i : Fin n, P (i + 1) ^ Formalism.GradedWeylDivisibility.nuNext b i := by
   cases n with
   | zero => simp
   | succ m =>
@@ -151,9 +184,12 @@ theorem prod_shift {M : Type} [CommMonoid M] (P : ℕ → M) (h0 : P 0 = 1) (b :
     simp [h0, Formalism.GradedWeylDivisibility.nuNext]
     rfl
 
-theorem exp_eq (lam : DomWeight N) (sg : DomWeight n) (hI : Br.Interlace hN lam sg) (hS : Br.SameShift lam sg) (i : Fin n) :
-    (Br.aBr hN lam sg i).toNat + Formalism.GradedWeylDivisibility.nuNext (fun s => (Br.bBr hN lam sg s).toNat) i =
-      sg.natW i - Formalism.GradedWeylDivisibility.nuNext sg.natW i := by
+theorem exp_eq
+    (lam : DomWeight N) (sg : DomWeight n) (hI : Br.Interlace hN lam sg) (hS : Br.SameShift lam sg)
+    (i : Fin n)
+    : (Br.aBr hN lam sg i).toNat
+        + Formalism.GradedWeylDivisibility.nuNext (fun s => (Br.bBr hN lam sg s).toNat) i
+      = sg.natW i - Formalism.GradedWeylDivisibility.nuNext sg.natW i := by
   subst hN
   have hn : 0 < n := i.pos
   have h1 := (hI i).1
@@ -163,7 +199,8 @@ theorem exp_eq (lam : DomWeight N) (sg : DomWeight n) (hI : Br.Interlace hN lam 
   unfold Formalism.GradedWeylDivisibility.nuNext
   split_ifs with h
   · have h2 := (hI ⟨i.val + 1, h⟩).2
-    have h3 : sg.w ⟨n - 1, by omega⟩ ≤ sg.w ⟨i.val + 1, h⟩ := sg.anti (by simp only [Fin.le_def]; omega)
+    have h3 : sg.w ⟨n - 1, by omega⟩ ≤ sg.w ⟨i.val + 1, h⟩ :=
+      sg.anti (by simp only [Fin.le_def]; omega)
     simp only [Br.aBr, Br.bBr, Br.iS, Br.iC, DomWeight.natW] at *
     omega
   · have hi : i = ⟨n - 1, by omega⟩ := Fin.ext (by have := i.2; simp only; omega)
@@ -174,11 +211,24 @@ theorem exp_eq (lam : DomWeight N) (sg : DomWeight n) (hI : Br.Interlace hN lam 
     simp only [Br.aBr, DomWeight.natW] at *
     omega
 
-theorem coefLast_xi : ∀ (K : Type) [Field K] (N n : ℕ) (hN : N = n + 1) (lam : DomWeight N) (sg : DomWeight n), Br.Interlace hN lam sg → Br.SameShift lam sg → Br.coefLast (K := K) hN (Br.bExp hN (fun _ : Unit => lam) (fun _ : Unit => sg)) (rename (fun v : Fin N × Fin N => (((), v) : Unit × Fin N × Fin N)) (Br.xiBr K hN lam sg)) = rename (fun v : Fin n × Fin n => (((), v) : Unit × Fin n × Fin n)) (extremal K n sg) := by
+theorem coefLast_xi
+    : ∀ (K : Type) [Field K] (N n : ℕ) (hN : N = n + 1) (lam : DomWeight N) (sg : DomWeight n),
+      Br.Interlace hN lam sg → Br.SameShift lam sg
+        → Br.coefLast (K := K) hN (Br.bExp hN (fun _ : Unit => lam) (fun _ : Unit => sg))
+            (rename
+              (fun v : Fin N × Fin N => (((), v) : Unit × Fin N × Fin N))
+              (Br.xiBr K hN lam sg))
+          = rename
+            (fun v : Fin n × Fin n => (((), v) : Unit × Fin n × Fin n))
+            (extremal K n sg) := by
   intro K _ N n hN lam sg hI hS
-  have key := (TopTerm.prod (w := fun p : Unit × Fin n => p.2.val) Finset.univ fun i : Fin n =>
-    ((TopTerm.C (lp K n (i.val + 1))).pow (Br.aBr hN lam sg i).toNat).mul
-      ((weightedLeadingTerm_split_zMinor K hN i).pow (Br.bBr hN lam sg i).toNat)).1
+  have key :=
+    (TopTerm.prod
+      (w := fun p : Unit × Fin n => p.2.val)
+      Finset.univ
+      fun i : Fin n =>
+        ((TopTerm.C (lp K n (i.val + 1))).pow (Br.aBr hN lam sg i).toNat).mul
+          ((weightedLeadingTerm_split_zMinor K hN i).pow (Br.bBr hN lam sg i).toNat)).1
   rw [coefLast_eq_coeff, Br.xiBr, map_prod, map_prod]
   simp only [map_mul, map_pow]
   have hsp : ∀ i : Fin n, _ := fun i : Fin n =>
@@ -187,7 +237,8 @@ theorem coefLast_xi : ∀ (K : Type) [Field K] (N n : ℕ) (hN : N = n + 1) (lam
   refine Eq.trans (congrArg (fun e => AddMonoidAlgebra.coeff _ e) ?_) (key.trans ?_)
   · ext ⟨u, s⟩
     simp [Br.bExp, Finsupp.finsetSum_apply, Finsupp.single_apply]
-  · rw [Finset.prod_mul_distrib, prod_shift (lp K n) (lp_zero K) fun s => (Br.bBr hN lam sg s).toNat,
+  · rw [Finset.prod_mul_distrib,
+      prod_shift (lp K n) (lp_zero K) fun s => (Br.bBr hN lam sg s).toNat,
       ← Finset.prod_mul_distrib, extremal, Formalism.GradedWeylDivisibility.hw, map_prod]
     refine Finset.prod_congr rfl fun i _ => ?_
     rw [← pow_add, exp_eq hN lam sg hI hS, map_pow, lp, dif_pos (show i.val + 1 ≤ n from i.2)]

@@ -16,8 +16,7 @@ noncomputable section
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem IR_bot {dim : (E →+* ℂ) → ℕ} : IR (⊥ : Submodule ℤ (Vsp dim)) = ⊥ := by
-  simp [IR]
+theorem IR_bot {dim : (E →+* ℂ) → ℕ} : IR (⊥ : Submodule ℤ (Vsp dim)) = ⊥ := by simp [IR]
 
 theorem split_bot (X : PT E) {DF : ℕ} (P : Par X DF) (h : ¬ X.la1 < P.th) : IsSplit P ⊥ := by
   have hIR : IR (⊥ : Submodule ℤ (Vsp X.dim)) = ⊥ := IR_bot
@@ -27,18 +26,19 @@ theorem split_bot (X : PT E) {DF : ℕ} (P : Par X DF) (h : ¬ X.la1 < P.th) : I
   have hph : P.ph = 0 := by
     unfold Par.ph PT.ph
     rw [if_neg h']
-  refine
-    { le := bot_le
-      sat := ?_
-      stable := ?_
-      iso := ?_
-      eps := ?_
-      rank := ⟨0, Nat.zero_le _, by rw [h0, mul_zero]⟩
-      ne_bot := iff_of_false (fun h'' => h'' rfl) h
-      thick := ?_
-      sep := ?_
-      u1 := ?_
-      u2 := ?_ }
+  refine {
+    le := bot_le
+    sat := ?_
+    stable := ?_
+    iso := ?_
+    eps := ?_
+    rank := ⟨0, Nat.zero_le _, by rw [h0, mul_zero]⟩
+    ne_bot := iff_of_false (fun h'' => h'' rfl) h
+    thick := ?_
+    sep := ?_
+    u1 := ?_
+    u2 := ?_
+  }
   · intro x _ k hk hx
     rw [Submodule.mem_bot] at hx ⊢
     rw [← Int.cast_smul_eq_zsmul ℂ] at hx
@@ -77,32 +77,42 @@ theorem split_bot (X : PT E) {DF : ℕ} (P : Par X DF) (h : ¬ X.la1 < P.th) : I
     exact hu1
   · haveI : IsEmpty (Fin (Module.finrank ℝ (IR (⊥ : Submodule ℤ (Vsp X.dim))))) := by
       rw [h0]; infer_instance
-    exact ⟨fun _ => 0, fun _ => 0, fun j => isEmptyElim j, linearIndependent_empty_type,
-      fun j => isEmptyElim j⟩
+    exact ⟨
+      fun _ => 0,
+      fun _ => 0,
+      fun j => isEmptyElim j,
+      linearIndependent_empty_type,
+      fun j => isEmptyElim j
+    ⟩
   · intro k x u _ _
     rw [hph]
     exact Finset.sum_nonneg fun j _ => by positivity
 
-theorem le_of_forall_pos_div_sq {a c S : ℝ} (ha : 0 < a) (hc : 0 < c) (h : ∀ ε > 0, c / (a + ε) ^ 2 ≤ S) :
-    c / a ^ 2 ≤ S := by
+theorem le_of_forall_pos_div_sq
+    {a c S : ℝ} (ha : 0 < a) (hc : 0 < c) (h : ∀ ε > 0, c / (a + ε) ^ 2 ≤ S)
+    : c / a ^ 2 ≤ S := by
   have hcont : ContinuousAt (fun ε : ℝ => c / (a + ε) ^ 2) 0 := by
     apply ContinuousAt.div continuousAt_const
     · exact ((continuous_const.add continuous_id).pow 2).continuousAt
     · simpa using ha.ne'
-  have ht : Filter.Tendsto (fun ε : ℝ => c / (a + ε) ^ 2) (nhdsWithin 0 (Set.Ioi 0))
-      (nhds (c / a ^ 2)) := by
-    have := hcont.tendsto.mono_left (nhdsWithin_le_nhds (s := Set.Ioi (0:ℝ)))
+  have ht : Filter.Tendsto
+      (fun ε : ℝ => c / (a + ε) ^ 2)
+      (nhdsWithin 0 (Set.Ioi 0)) (nhds (c / a ^ 2)) := by
+    have := hcont.tendsto.mono_left (nhdsWithin_le_nhds (s := Set.Ioi (0 : ℝ)))
     simpa using this
   apply le_of_tendsto ht
   filter_upwards [self_mem_nhdsWithin] with ε hε using h ε hε
 
-theorem sq_le_pow_four_div_sq {d N la u : ℝ} (hd : 2 ≤ d) (hN : N ≤ d) (hla : 0 < la) (hu0 : 0 ≤ u)
-    (hu : u ≤ N / la + 1 / la) : u ^ 2 ≤ d ^ 4 / la ^ 2 := by
+theorem sq_le_pow_four_div_sq
+    {d N la u : ℝ} (hd : 2 ≤ d) (hN : N ≤ d) (hla : 0 < la) (hu0 : 0 ≤ u) (hu : u ≤ N / la + 1 / la)
+    : u ^ 2 ≤ d ^ 4 / la ^ 2 := by
   have key : u * la ≤ N + 1 := by
     have e : N / la + 1 / la = (N + 1) / la := by ring
     rw [e] at hu
     have e2 : (N + 1) / la * la = N + 1 := by field_simp
-    calc u * la ≤ (N + 1) / la * la := mul_le_mul_of_nonneg_right hu hla.le
+    calc
+      u * la
+        ≤ (N + 1) / la * la := mul_le_mul_of_nonneg_right hu hla.le
       _ = N + 1 := e2
   have hla2 : 0 < la ^ 2 := by positivity
   rw [le_div_iff₀ hla2]
@@ -126,10 +136,8 @@ theorem split_pos (X : PT E) {DF : ℕ} (P : Par X DF) (h : X.la1 < P.th) : ∃ 
     norm_num
   have hth2 : P.th ^ 2 = PT.f E * P.R0 ^ 2 * RR (E := E) ^ 3 / P.q := by
     rw [Par.th, th, Real.sq_sqrt]; positivity
-  have hth : 0 < P.th := by
-    rw [Par.th, th]; apply Real.sqrt_pos.2; positivity
-  have hd2n : 2 ≤ dstar (E := E) P.m := by
-    rw [dstar]; have := P.hm1; nlinarith
+  have hth : 0 < P.th := by rw [Par.th, th]; apply Real.sqrt_pos.2; positivity
+  have hd2n : 2 ≤ dstar (E := E) P.m := by rw [dstar]; have := P.hm1; nlinarith
   have hd2 : (2 : ℝ) ≤ dstar (E := E) P.m := by exact_mod_cast hd2n
   have hC1 : (dstar (E := E) P.m : ℝ) ^ 2 * Ω * P.th ^ 2 < 1 := P.C1
   have hΩth : Ω * P.th ^ 2 ≤ 1 := by nlinarith [sq_nonneg P.th, hΩ]
@@ -152,8 +160,20 @@ theorem split_pos (X : PT E) {DF : ℕ} (P : Par X DF) (h : X.la1 < P.th) : ∃ 
     have h2 : Metric.infDist x (IR I) ≤ ‖x‖ := by
       rw [← dist_zero_right]; exact Metric.infDist_le_dist_of_mem (IR I).zero_mem
     linarith
-  refine ⟨I, hI.le, sat_of_IR hI.sat, hI.stable, hI.iso, ?_, ⟨ρ, le_trans (hρ τ) hτ, hfr⟩, ?_,
-    ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    I,
+    hI.le,
+    sat_of_IR hI.sat,
+    hI.stable,
+    hI.iso,
+    ?_,
+    ⟨ρ, le_trans (hρ τ) hτ, hfr⟩,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro x hx
     exact X.eps_iso x (hI.le hx) (fun α => hI.iso _ (hI.stable α x hx) x hx)
   · refine ⟨fun _ => h, fun _ hbot => ?_⟩
@@ -165,26 +185,33 @@ theorem split_pos (X : PT E) {DF : ℕ} (P : Par X DF) (h : X.la1 < P.th) : ∃ 
     exact hmax x hx hxI
   · intro x hx u hu hne
     have h1 := hI.sep x hx u hu hne
-    have key : b0 (E := E) P.q P.R0 * (Ω ^ 2 * P.th ^ 2) = 4 * (PT.f E : ℝ) ^ 4 * PT.rd E ^ 2 / RR (E := E) := by
+    have key
+        : b0 (E := E) P.q P.R0 * (Ω ^ 2 * P.th ^ 2)
+          = 4 * (PT.f E : ℝ) ^ 4 * PT.rd E ^ 2 / RR (E := E) := by
       have hR0ne : P.R0 ≠ 0 := fun h0 => by rw [h0] at hR0; simp at hR0
-      rw [hΩ2, hth2, b0]; field_simp
+      rw [hΩ2, hth2, b0]
+      field_simp
     have hf4 : (PT.f E : ℝ) ^ 4 ≤ PT.rd E ^ 2 := by
       have := P.hf2
-      calc (PT.f E : ℝ) ^ 4 = ((PT.f E : ℝ) ^ 2) ^ 2 := by ring
+      calc
+        (PT.f E : ℝ) ^ 4
+          = ((PT.f E : ℝ) ^ 2) ^ 2 := by ring
         _ ≤ PT.rd E ^ 2 := pow_le_pow_left₀ (by positivity) this 2
     have hb : b0 (E := E) P.q P.R0 * (Ω ^ 2 * P.th ^ 2) ≤ 1 := by
       rw [key, div_le_one hRR, RR]
       have : 4 * PT.rd E ^ 4 ≤ PT.rd E ^ 7 := by
         have h3 : (4 : ℝ) ≤ PT.rd E ^ 3 := by nlinarith
-        calc 4 * PT.rd E ^ 4 ≤ PT.rd E ^ 3 * PT.rd E ^ 4 :=
-              mul_le_mul_of_nonneg_right h3 (by positivity)
+        calc
+          4 * PT.rd E ^ 4
+            ≤ PT.rd E ^ 3 * PT.rd E ^ 4 := mul_le_mul_of_nonneg_right h3 (by positivity)
           _ = PT.rd E ^ 7 := by ring
       nlinarith [pow_pos (show (0:ℝ) < PT.rd E by linarith) 2]
     have hb' : b0 (E := E) P.q P.R0 ≤ (1 / (Ω * P.th)) ^ 2 := by
       rw [div_pow, one_pow, mul_pow, le_div_iff₀ (by positivity)]
       exact hb
     exact hb'.trans (pow_le_pow_left₀ (by positivity) h1.le 2)
-  · obtain ⟨x, u, hxu, hli, hb⟩ := exists_short_vectors_realSpan X I hI.le hI.sat hla (ε := 1 / X.la1) (by positivity)
+  · obtain ⟨x, u, hxu, hli, hb⟩ :=
+      exists_short_vectors_realSpan X I hI.le hI.sat hla (ε := 1 / X.la1) (by positivity)
     refine ⟨x, u, hxu, hli, fun j => ?_⟩
     have hN : (Module.finrank ℝ (IR I) : ℝ) ≤ dstar (E := E) P.m := by
       have : Module.finrank ℝ (IR I) ≤ dstar (E := E) P.m := by
@@ -209,9 +236,12 @@ theorem split_pos (X : PT E) {DF : ℕ} (P : Par X DF) (h : X.la1 < P.th) : ∃ 
         apply div_le_div_of_nonneg_left hcpos.le (by positivity)
         exact pow_le_pow_left₀ (norm_nonneg _) (le_of_lt (lt_of_lt_of_le hξs (min_le_right _ _))) 2
       refine h2.trans (le_of_eq_of_le ?_ h1)
-      rw [hc]; field_simp
+      rw [hc]
+      field_simp
     have hl := le_of_forall_pos_div_sq hla hcpos hbound
-    calc 2 * PT.f E / (PT.rd E ^ 2 * X.la1 ^ 2) = c / X.la1 ^ 2 := by rw [hc]; field_simp
+    calc
+      2 * PT.f E / (PT.rd E ^ 2 * X.la1 ^ 2)
+        = c / X.la1 ^ 2 := by rw [hc]; field_simp
       _ ≤ S := hl
 
 end

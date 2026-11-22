@@ -18,17 +18,16 @@ theorem LeafSurjGeo_of : LeafSurjGeo := by
     · by_cases hx : t.base x ∈ (U : Set X)
       · refine ⟨true, ?_⟩
         show x ∈ Set.range (t ⁻¹ᵁ U).ι.base
-        rw [Scheme.Opens.range_ι]; exact hx
+        rw [Scheme.Opens.range_ι]
+        exact hx
       · rw [hU, Set.notMem_compl_iff] at hx
         obtain ⟨z, hz⟩ := hx
-        have hw : f.base (ι'.base z) = ι.base z := by
-          rw [← Scheme.Hom.comp_apply, hp.w]; simp
-        obtain ⟨p, hp1, -⟩ := Scheme.Pullback.exists_preimage_pullback (f := t) (g := f) x (ι'.base z)
-          (by rw [hw, hz])
+        have hw : f.base (ι'.base z) = ι.base z := by rw [← Scheme.Hom.comp_apply, hp.w]; simp
+        obtain ⟨p, hp1, -⟩ :=
+          Scheme.Pullback.exists_preimage_pullback (f := t) (g := f) x (ι'.base z) (by rw [hw, hz])
         exact ⟨false, p, hp1⟩
     · cases b <;> dsimp [m] <;> infer_instance
-  refine ⟨Sieve.generate (Presieve.ofArrows F m),
-    Precoverage.generate_mem_toGrothendieck hR, ?_⟩
+  refine ⟨Sieve.generate (Presieve.ofArrows F m), Precoverage.generate_mem_toGrothendieck hR, ?_⟩
   intro V g hg
   obtain ⟨W, h, k, hk, rfl⟩ := hg
   obtain ⟨b⟩ := hk

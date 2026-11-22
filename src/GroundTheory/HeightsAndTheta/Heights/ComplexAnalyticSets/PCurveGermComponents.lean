@@ -18,8 +18,8 @@ namespace CurveGermComponents
 
 variable {n : ℕ}
 
-theorem mem_zeroSet_iff_le_ker (J : Ideal (MvPolynomial (Fin n) ℂ)) (x : Fin n → ℂ) :
-    x ∈ zeroSet J ↔ J ≤ RingHom.ker (eval x : MvPolynomial (Fin n) ℂ →+* ℂ) := by
+theorem mem_zeroSet_iff_le_ker (J : Ideal (MvPolynomial (Fin n) ℂ)) (x : Fin n → ℂ)
+    : x ∈ zeroSet J ↔ J ≤ RingHom.ker (eval x : MvPolynomial (Fin n) ℂ →+* ℂ) := by
   simp only [zeroSet, Set.mem_ofPred_eq, SetLike.le_def, RingHom.mem_ker]
 
 theorem isClosed_zeroSet (J : Ideal (MvPolynomial (Fin n) ℂ)) : IsClosed (zeroSet J) := by
@@ -29,15 +29,17 @@ theorem isClosed_zeroSet (J : Ideal (MvPolynomial (Fin n) ℂ)) : IsClosed (zero
   rw [h]
   exact isClosed_biInter fun f _ => isClosed_eq (MvPolynomial.continuous_eval f) continuous_const
 
-theorem exists_minimalPrime_mem_zeroSet {I : Ideal (MvPolynomial (Fin n) ℂ)} {x : Fin n → ℂ}
-    (hx : x ∈ zeroSet I) : ∃ W ∈ I.minimalPrimes, x ∈ zeroSet W := by
+theorem exists_minimalPrime_mem_zeroSet
+    {I : Ideal (MvPolynomial (Fin n) ℂ)} {x : Fin n → ℂ} (hx : x ∈ zeroSet I)
+    : ∃ W ∈ I.minimalPrimes, x ∈ zeroSet W := by
   rw [mem_zeroSet_iff_le_ker] at hx
   obtain ⟨W, hW, hle⟩ := Ideal.exists_minimalPrimes_le hx
   exact ⟨W, hW, (mem_zeroSet_iff_le_ker W x).2 hle⟩
 
-theorem ringKrullDim_curveLocalRing_le_zero {I : Ideal (MvPolynomial (Fin n) ℂ)} {q : Fin n → ℂ}
-    (hm : RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ) ∈ I.minimalPrimes) :
-    ringKrullDim (curveLocalRing I q) ≤ 0 := by
+theorem ringKrullDim_curveLocalRing_le_zero
+    {I : Ideal (MvPolynomial (Fin n) ℂ)} {q : Fin n → ℂ}
+    (hm : RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ) ∈ I.minimalPrimes)
+    : ringKrullDim (curveLocalRing I q) ≤ 0 := by
   set m := RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ) with hmdef
   let L := Localization.AtPrime m
   let J : Ideal L := I.map (algebraMap (MvPolynomial (Fin n) ℂ) L)
@@ -57,25 +59,32 @@ theorem ringKrullDim_curveLocalRing_le_zero {I : Ideal (MvPolynomial (Fin n) ℂ
       exact (Ideal.comap_mono (IsLocalRing.le_maximalIdeal hQ.ne_top)).trans
         (Localization.AtPrime.under_maximalIdeal (I := m)).le
     have hPeq : Q.under (MvPolynomial (Fin n) ℂ) = m := le_antisymm hPm (hm.2 ⟨hP, hIP⟩ hPm)
-    have hQmax : Q = IsLocalRing.maximalIdeal L := Localization.AtPrime.eq_maximalIdeal_iff_under_eq.1 hPeq
+    have hQmax : Q = IsLocalRing.maximalIdeal L :=
+      Localization.AtPrime.eq_maximalIdeal_iff_under_eq.1 hPeq
     have hQm : Q.IsMaximal := hQmax ▸ IsLocalRing.maximalIdeal.isMaximal L
-    have h := Ideal.map_eq_top_or_isMaximal_of_surjective (Ideal.Quotient.mk J) Ideal.Quotient.mk_surjective hQm
+    have h :=
+      Ideal.map_eq_top_or_isMaximal_of_surjective (Ideal.Quotient.mk J) Ideal.Quotient.mk_surjective
+        hQm
     rw [hQdef, Ideal.map_comap_of_surjective _ Ideal.Quotient.mk_surjective] at h
     exact h.resolve_left hp.ne_top
   exact_mod_cast Ring.krullDimLE_iff.1 hK
 
-theorem ringKrullDim_localRingAt_eq_one {I W : Ideal (MvPolynomial (Fin n) ℂ)} {q : Fin n → ℂ}
-    (hW : W ∈ I.minimalPrimes) (hq : q ∈ zeroSet W) (hdim : ringKrullDim (curveLocalRing I q) = 1) :
-    ringKrullDim (localRingAt W q) = 1 := by
+theorem ringKrullDim_localRingAt_eq_one
+    {I W : Ideal (MvPolynomial (Fin n) ℂ)} {q : Fin n → ℂ}
+    (hW : W ∈ I.minimalPrimes) (hq : q ∈ zeroSet W) (hdim : ringKrullDim (curveLocalRing I q) = 1)
+    : ringKrullDim (localRingAt W q) = 1 := by
   set m := RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ) with hmdef
   have hWm : W ≤ m := (mem_zeroSet_iff_le_ker W q).1 hq
   have hWp : W.IsPrime := hW.1.1
   let L := Localization.AtPrime m
-  have hle : I.map (algebraMap (MvPolynomial (Fin n) ℂ) L) ≤ W.map (algebraMap (MvPolynomial (Fin n) ℂ) L) :=
+  have hle
+      : I.map (algebraMap (MvPolynomial (Fin n) ℂ) L)
+        ≤ W.map (algebraMap (MvPolynomial (Fin n) ℂ) L) :=
     Ideal.map_mono hW.1.2
   have hup : ringKrullDim (localRingAt W q) ≤ 1 := by
     rw [← hdim]
-    exact ringKrullDim_le_of_surjective (Ideal.Quotient.factor hle) (Ideal.Quotient.factor_surjective hle)
+    exact ringKrullDim_le_of_surjective (Ideal.Quotient.factor hle)
+      (Ideal.Quotient.factor_surjective hle)
   have disj : Disjoint (m.primeCompl : Set (MvPolynomial (Fin n) ℂ)) W := by
     rw [Set.disjoint_left]
     intro a ha haW
@@ -86,7 +95,8 @@ theorem ringKrullDim_localRingAt_eq_one {I W : Ideal (MvPolynomial (Fin n) ℂ)}
     intro h0
     have : Ring.KrullDimLE 0 (localRingAt W q) := Ring.krullDimLE_iff.2 (by exact_mod_cast h0)
     have : IsDomain (localRingAt W q) := Ideal.Quotient.isDomain _
-    have hf : IsField (localRingAt W q) := Ring.KrullDimLE.isField_of_isDomain (R := localRingAt W q)
+    have hf : IsField (localRingAt W q) :=
+      Ring.KrullDimLE.isField_of_isDomain (R := localRingAt W q)
     have hmax : (W.map (algebraMap (MvPolynomial (Fin n) ℂ) L)).IsMaximal :=
       Ideal.Quotient.maximal_of_isField _ hf
     have hWeq : W = m := by
@@ -99,8 +109,8 @@ theorem ringKrullDim_localRingAt_eq_one {I W : Ideal (MvPolynomial (Fin n) ℂ)}
     exact absurd h2 (by decide)
   exact le_antisymm hup (Order.succ_le_of_lt (lt_of_not_ge hne))
 
-theorem exists_ringKrullDim_quotient_eq_nat (W : Ideal (MvPolynomial (Fin n) ℂ)) [W.IsPrime] :
-    ∃ e : ℕ, ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ W) = (e : ℕ) := by
+theorem exists_ringKrullDim_quotient_eq_nat (W : Ideal (MvPolynomial (Fin n) ℂ)) [W.IsPrime]
+    : ∃ e : ℕ, ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ W) = (e : ℕ) := by
   have h0 := ringKrullDim_nonneg_of_nontrivial (R := MvPolynomial (Fin n) ℂ ⧸ W)
   have h1 : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ W) ≤ (n : ℕ) :=
     (ringKrullDim_quotient_le W).trans (by simp)

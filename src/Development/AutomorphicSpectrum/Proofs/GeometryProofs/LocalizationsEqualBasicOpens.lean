@@ -16,26 +16,33 @@ open Mdl
 
 variable {Ω : Type} [Field Ω] [Algebra ℚ Ω]
 
-theorem mem_of_isLocAt {A : Subalgebra ℚ Ω} {q : Ideal A} {R : Subring Ω} (hq : q.IsPrime)
-    (hR : IsLocAt A q R) {a : Ω} (ha : a ∈ A) : a ∈ R :=
+theorem mem_of_isLocAt
+    {A : Subalgebra ℚ Ω} {q : Ideal A} {R : Subring Ω} (hq : q.IsPrime) (hR : IsLocAt A q R)
+    {a : Ω} (ha : a ∈ A)
+    : a ∈ R :=
   (hR a).2 ⟨1, (Ideal.ne_top_iff_one q).1 hq.ne_top, by simpa using ha⟩
 
-theorem unit_of_not_mem {A : Subalgebra ℚ Ω} {q : Ideal A} {R : Subring Ω}
-    (hR : IsLocAt A q R) {a : A} (ha : a ∉ q) : (a : Ω) ≠ 0 ∧ (a : Ω)⁻¹ ∈ R := by
-  have h0 : (a : Ω) ≠ 0 := fun h => ha (by
-    have e : a = 0 := Subtype.ext h
-    rw [e]
-    exact q.zero_mem)
+theorem unit_of_not_mem
+    {A : Subalgebra ℚ Ω} {q : Ideal A} {R : Subring Ω} (hR : IsLocAt A q R) {a : A} (ha : a ∉ q)
+    : (a : Ω) ≠ 0 ∧ (a : Ω)⁻¹ ∈ R := by
+  have h0 : (a : Ω) ≠ 0 := fun h =>
+    ha (by
+      have e : a = 0 := Subtype.ext h
+      rw [e]
+      exact q.zero_mem)
   exact ⟨h0, (hR _).2 ⟨a, ha, by rw [mul_inv_cancel₀ h0]; exact A.one_mem⟩⟩
 
-theorem not_mem_of_unit {A : Subalgebra ℚ Ω} {q : Ideal A} {R : Subring Ω}
-    (hR : IsLocAt A q R) {b : A} (h0 : (b : Ω) ≠ 0) (hi : (b : Ω)⁻¹ ∈ R) : b ∉ q := by
+theorem not_mem_of_unit
+    {A : Subalgebra ℚ Ω} {q : Ideal A} {R : Subring Ω} (hR : IsLocAt A q R)
+    {b : A} (h0 : (b : Ω) ≠ 0) (hi : (b : Ω)⁻¹ ∈ R)
+    : b ∉ q := by
   obtain ⟨s, hs, hsb⟩ := (hR _).1 hi
   intro hb
   apply hs
-  have e : s = ⟨_, hsb⟩ * b := Subtype.ext (by
-    rw [Subalgebra.coe_mul]
-    exact (inv_mul_cancel_right₀ h0 _).symm)
+  have e : s = ⟨_, hsb⟩ * b :=
+    Subtype.ext (by
+      rw [Subalgebra.coe_mul]
+      exact (inv_mul_cancel_right₀ h0 _).symm)
   rw [e]
   exact q.mul_mem_left _ hb
 
@@ -45,8 +52,8 @@ theorem invAdj_le_of {A C : Subalgebra ℚ Ω} {h : Ω} (hA : A ≤ C) (hh : h�
     · exact hh
     · exact hA hx)
 
-theorem invAdj_le_mul {A : Subalgebra ℚ Ω} {g s : Ω} (hs : s ∈ A) (h0 : g * s ≠ 0) :
-    invAdj A g ≤ invAdj A (g * s) := by
+theorem invAdj_le_mul {A : Subalgebra ℚ Ω} {g s : Ω} (hs : s ∈ A) (h0 : g * s ≠ 0)
+    : invAdj A g ≤ invAdj A (g * s) := by
   refine invAdj_le_of (le_invAdj _ _) ?_
   have hs0 : s ≠ 0 := right_ne_zero_of_mul h0
   have hg0 : g ≠ 0 := left_ne_zero_of_mul h0
@@ -54,8 +61,10 @@ theorem invAdj_le_mul {A : Subalgebra ℚ Ω} {g s : Ω} (hs : s ∈ A) (h0 : g 
   rw [e]
   exact Subalgebra.mul_mem _ (le_invAdj _ _ hs) (inv_mem_invAdj _ _)
 
-theorem exists_den {A B : Subalgebra ℚ Ω} {q : Ideal A} {R : Subring Ω} (hq : q.IsPrime)
-    (hR : IsLocAt A q R) (hB : B.FG) (hBR : ∀ b ∈ B, b ∈ R) : ∃ g : A, g ∉ q ∧ B ≤ invAdj A g := by
+theorem exists_den
+    {A B : Subalgebra ℚ Ω} {q : Ideal A} {R : Subring Ω}
+    (hq : q.IsPrime) (hR : IsLocAt A q R) (hB : B.FG) (hBR : ∀ b ∈ B, b ∈ R)
+    : ∃ g : A, g ∉ q ∧ B ≤ invAdj A g := by
   classical
   have key : ∀ T : Finset Ω, (∀ b ∈ T, b ∈ R) → ∃ g : A, g ∉ q ∧ ∀ b ∈ T, b ∈ invAdj A g := by
     intro T
@@ -75,16 +84,18 @@ theorem exists_den {A B : Subalgebra ℚ Ω} {q : Ideal A} {R : Subring Ω} (hq 
       rcases Finset.mem_insert.1 hx with rfl | hx
       · have e : x = ((s : Ω) * x) * g₁ * ((g₁ : Ω) * s)⁻¹ := by field_simp
         rw [e]
-        exact Subalgebra.mul_mem _
-          (Subalgebra.mul_mem _ (le_invAdj _ _ hsb) (le_invAdj _ _ g₁.2)) (inv_mem_invAdj _ _)
+        exact Subalgebra.mul_mem _ (Subalgebra.mul_mem _ (le_invAdj _ _ hsb) (le_invAdj _ _ g₁.2))
+          (inv_mem_invAdj _ _)
       · exact invAdj_le_mul s.2 h0 (hg₁T x hx)
   obtain ⟨S, rfl⟩ := hB
   obtain ⟨g, hg, hgS⟩ := key S fun b hb => hBR b (Algebra.subset_adjoin hb)
   exact ⟨g, hg, Algebra.adjoin_le fun b hb => hgS b hb⟩
 
-theorem exists_clear {A B : Subalgebra ℚ Ω} {q : Ideal A} {q' : Ideal B} {R : Subring Ω}
-    (hR : IsLocAt A q R) (hR' : IsLocAt B q' R) {g : A} {h : B} (hg : g ∉ q) (hh : h ∉ q')
-    (hgh : (g : Ω) ∈ invAdj B h) : ∃ (a : B) (m : ℕ), a ∉ q' ∧ (a : Ω) = g * (h : Ω) ^ m := by
+theorem exists_clear
+    {A B : Subalgebra ℚ Ω} {q : Ideal A} {q' : Ideal B} {R : Subring Ω}
+    (hR : IsLocAt A q R) (hR' : IsLocAt B q' R)
+    {g : A} {h : B} (hg : g ∉ q) (hh : h ∉ q') (hgh : (g : Ω) ∈ invAdj B h)
+    : ∃ (a : B) (m : ℕ), a ∉ q' ∧ (a : Ω) = g * (h : Ω) ^ m := by
   obtain ⟨gn, gi⟩ := unit_of_not_mem hR hg
   obtain ⟨hn, hi⟩ := unit_of_not_mem hR' hh
   obtain ⟨m, hm⟩ := exists_mul_pow_mem h.2 hn hgh
@@ -93,9 +104,11 @@ theorem exists_clear {A B : Subalgebra ℚ Ω} {q : Ideal A} {q' : Ideal B} {R :
   rw [mul_inv, ← inv_pow]
   exact R.mul_mem gi (R.pow_mem hi _)
 
-theorem exists_common_loc : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] (A B : Subalgebra ℚ Ω) (q : Ideal A) (q' : Ideal B)
-    (R : Subring Ω), A.FG → B.FG → q.IsPrime → q'.IsPrime → IsLocAt A q R → IsLocAt B q' R →
-    ∃ (g : A) (h : B), g ∉ q ∧ h ∉ q' ∧ Mdl.invAdj A g = Mdl.invAdj B h := by
+theorem exists_common_loc
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] (A B : Subalgebra ℚ Ω) (q : Ideal A) (q' : Ideal B)
+        (R : Subring Ω),
+      A.FG → B.FG → q.IsPrime → q'.IsPrime → IsLocAt A q R → IsLocAt B q' R
+        → ∃ (g : A) (h : B), g ∉ q ∧ h ∉ q' ∧ Mdl.invAdj A g = Mdl.invAdj B h := by
   intro Ω _ _ A B q q' R hA hB hq hq' hR hR'
   obtain ⟨g₀, hg₀, hBg⟩ := exists_den hq hR hB fun b hb => mem_of_isLocAt hq' hR' hb
   obtain ⟨h₀, hh₀, hAh⟩ := exists_den hq' hR' hA fun b hb => mem_of_isLocAt hq hR hb
@@ -125,7 +138,8 @@ theorem exists_common_loc : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] (A B : S
       field_simp
     rw [e]
     exact Subalgebra.mul_mem _
-      (Subalgebra.mul_mem _ (le_invAdj _ _ (B.pow_mem h₀.2 _)) (le_invAdj _ _ h₀.2)) (inv_mem_invAdj _ _)
+      (Subalgebra.mul_mem _ (le_invAdj _ _ (B.pow_mem h₀.2 _)) (le_invAdj _ _ h₀.2))
+      (inv_mem_invAdj _ _)
   have C1 : invAdj A (g₀ : Ω) ≤ invAdj B h := invAdj_le_of (hAh.trans hAh') g0inv
   have hinv : (h : Ω)⁻¹ ∈ invAdj A g := by
     have e : (h : Ω)⁻¹ = (g₀ : Ω) ^ l * g₀ * (g : Ω)⁻¹ := by
@@ -133,7 +147,8 @@ theorem exists_common_loc : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] (A B : S
       field_simp
     rw [e]
     exact Subalgebra.mul_mem _
-      (Subalgebra.mul_mem _ (le_invAdj _ _ (A.pow_mem g₀.2 _)) (le_invAdj _ _ g₀.2)) (inv_mem_invAdj _ _)
+      (Subalgebra.mul_mem _ (le_invAdj _ _ (A.pow_mem g₀.2 _)) (le_invAdj _ _ g₀.2))
+      (inv_mem_invAdj _ _)
   have ginv : (g : Ω)⁻¹ ∈ invAdj B h := by
     have e : (g : Ω)⁻¹ = (g₀ : Ω)⁻¹ * ((h : Ω)⁻¹ * ((g₀ : Ω)⁻¹) ^ l) := by
       rw [eg, ea', mul_inv, mul_inv, inv_pow]

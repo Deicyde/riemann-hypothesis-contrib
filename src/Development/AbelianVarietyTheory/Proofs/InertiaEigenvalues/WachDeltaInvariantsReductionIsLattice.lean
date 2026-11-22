@@ -10,25 +10,29 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.GammaAc
 noncomputable section
 namespace GlobalTheory.Present.RedLat
 open scoped LaurentSeries PowerSeries
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions GlobalTheory.PhiGam GlobalTheory.AdmLoc GlobalTheory.Models
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions GlobalTheory.PhiGam
+  GlobalTheory.AdmLoc GlobalTheory.Models
 
 section General
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL]
-    [CommRing O] [Algebra O LL] [TopologicalSpace LL] {v : AddValuation LL (WithTop ℚ)} {n₀ : ℕ}
-    (W : LocWach PD LL O v n₀) {k : Type} [Field k] [Algebra O k]
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+  {v : AddValuation LL (WithTop ℚ)} {n₀ : ℕ} (W : LocWach PD LL O v n₀)
+  {k : Type} [Field k] [Algebra O k]
 
 theorem mem_del (g : W.Gam) : g ∈ W.DelF ↔ IsOfFinOrder g := by
   rw [W.DelF_def, isOfFinOrder_iff_pow_eq_one]
 
 theorem one_mem_del : (1 : W.Gam) ∈ W.DelF := (mem_del W 1).2 IsOfFinOrder.one
 
-theorem prod_del {M : Type} [CommMonoid M] (f : W.Gam → M) {d : W.Gam} (hd : d ∈ W.DelF) :
-    ∏ δ ∈ W.DelF, f (d * δ) = ∏ δ ∈ W.DelF, f δ := by
+theorem prod_del {M : Type} [CommMonoid M] (f : W.Gam → M) {d : W.Gam} (hd : d ∈ W.DelF)
+    : ∏ δ ∈ W.DelF, f (d * δ) = ∏ δ ∈ W.DelF, f δ := by
   rw [mem_del] at hd
   refine Finset.prod_nbij' (fun δ => d * δ) (fun δ => d⁻¹ * δ) ?_ ?_ ?_ ?_ ?_
   · intro a ha
@@ -44,12 +48,12 @@ theorem prod_del {M : Type} [CommMonoid M] (f : W.Gam → M) {d : W.Gam} (hd : d
   · intro a _
     rfl
 
-theorem sum_del {M : Type} [AddCommMonoid M] (f : W.Gam → M) {d : W.Gam} (hd : d ∈ W.DelF) :
-    ∑ δ ∈ W.DelF, f (d * δ) = ∑ δ ∈ W.DelF, f δ :=
+theorem sum_del {M : Type} [AddCommMonoid M] (f : W.Gam → M) {d : W.Gam} (hd : d ∈ W.DelF)
+    : ∑ δ ∈ W.DelF, f (d * δ) = ∑ δ ∈ W.DelF, f δ :=
   prod_del W (M := Multiplicative M) f hd
 
-theorem γD_smulA (T : LocLat G Qp LL O) (g : W.Gam) (a : LetA O n₀) (x : W.DD T) :
-    W.γD T g (a • x) = W.γA g a • W.γD T g x := by
+theorem γD_smulA (T : LocLat G Qp LL O) (g : W.Gam) (a : LetA O n₀) (x : W.DD T)
+    : W.γD T g (a • x) = W.γA g a • W.γD T g x := by
   have := W.γD_smul T g (algebraMap (LetA O n₀) W.EE a) x
   rw [algebraMap_smul, W.γE_ext, algebraMap_smul] at this
   exact this
@@ -61,16 +65,19 @@ theorem trace_mem (T : LocLat G Qp LL O) (x : W.DD T) : ∑ δ ∈ W.DelF, W.γD
   simp_rw [← W.γD_mul]
   exact sum_del W (fun δ => W.γD T δ x) hd
 
-theorem smul_mem_DΔ (T : LocLat G Qp LL O) {a : LetA O n₀} (ha : ∀ i, ∀ δ ∈ W.DelF, W.γ₀ δ (a i) = a i)
-    {x : W.DD T} (hx : x ∈ DΔ W T) : a • x ∈ DΔ W T := by
+theorem smul_mem_DΔ
+    (T : LocLat G Qp LL O)
+    {a : LetA O n₀} (ha : ∀ i, ∀ δ ∈ W.DelF, W.γ₀ δ (a i) = a i)
+    {x : W.DD T} (hx : x ∈ DΔ W T)
+    : a • x ∈ DΔ W T := by
   intro d hd
   rw [γD_smulA, hx d hd]
   congr 1
   funext i
   exact ha i d hd
 
-theorem approx (T : LocLat G Qp LL O) (hT : IsCrys PD T.ρ) (x : W.DD T) :
-    ∃ (m : ℕ) (y z : W.DD T), y ∈ W.N T ∧ ((letπ : LetA O n₀) ^ m) • x = y + PD.p • z := by
+theorem approx (T : LocLat G Qp LL O) (hT : IsCrys PD T.ρ) (x : W.DD T)
+    : ∃ (m : ℕ) (y z : W.DD T), y ∈ W.N T ∧ ((letπ : LetA O n₀) ^ m) • x = y + PD.p • z := by
   refine (W.N_base T hT).inductionOn x ?_ ?_ ?_
   · intro y
     exact ⟨0, y, 0, y.2, by simp⟩
@@ -78,33 +85,48 @@ theorem approx (T : LocLat G Qp LL O) (hT : IsCrys PD T.ρ) (x : W.DD T) :
     obtain ⟨a, m', ha⟩ := W.EE_dense e 1
     rw [pow_one, Ideal.mem_span_singleton'] at ha
     obtain ⟨e', he'⟩ := ha
-    refine ⟨m' + m, a • y, e' • y + (e * algebraMap (LetA O n₀) W.EE (letπ ^ m')) • z,
-      (W.N T).smul_mem _ hy, ?_⟩
-    have h1 : ((letπ : LetA O n₀) ^ (m' + m)) • e • x =
-        (e * algebraMap (LetA O n₀) W.EE (letπ ^ m')) • ((letπ : LetA O n₀) ^ m) • x := by
-      rw [← algebraMap_smul W.EE (letπ ^ (m' + m) : LetA O n₀), ← algebraMap_smul W.EE (letπ ^ m : LetA O n₀),
-        smul_smul, smul_smul, pow_add, map_mul]
+    refine ⟨
+      m' + m,
+      a • y,
+      e' • y + (e * algebraMap (LetA O n₀) W.EE (letπ ^ m')) • z,
+      (W.N T).smul_mem _ hy,
+      ?_
+    ⟩
+    have h1
+        : ((letπ : LetA O n₀) ^ (m' + m)) • e • x
+          = (e * algebraMap (LetA O n₀) W.EE (letπ ^ m')) • ((letπ : LetA O n₀) ^ m) • x := by
+      rw [← algebraMap_smul W.EE (letπ ^ (m' + m) : LetA O n₀),
+        ← algebraMap_smul W.EE (letπ ^ m : LetA O n₀), smul_smul, smul_smul, pow_add, map_mul]
       congr 1
       ring
-    have h2 : e * algebraMap (LetA O n₀) W.EE (letπ ^ m') =
-        algebraMap (LetA O n₀) W.EE a + e' * (PD.p : W.EE) := by rw [he']; ring
+    have h2
+        : e * algebraMap (LetA O n₀) W.EE (letπ ^ m')
+          = algebraMap (LetA O n₀) W.EE a + e' * (PD.p : W.EE) := by
+      rw [he']; ring
     rw [h1, h, smul_add, smul_add, smul_comm _ PD.p z, ← add_assoc]
     congr 1
     rw [h2, add_smul, algebraMap_smul, mul_comm, mul_smul, Nat.cast_smul_eq_nsmul]
   · rintro x x' ⟨m, y, z, hy, h⟩ ⟨m', y', z', hy', h'⟩
-    refine ⟨m + m', ((letπ : LetA O n₀) ^ m') • y + ((letπ : LetA O n₀) ^ m) • y',
+    refine ⟨
+      m + m',
+      ((letπ : LetA O n₀) ^ m') • y + ((letπ : LetA O n₀) ^ m) • y',
       ((letπ : LetA O n₀) ^ m') • z + ((letπ : LetA O n₀) ^ m) • z',
-      add_mem ((W.N T).smul_mem _ hy) ((W.N T).smul_mem _ hy'), ?_⟩
+      add_mem ((W.N T).smul_mem _ hy) ((W.N T).smul_mem _ hy'),
+      ?_
+    ⟩
     rw [smul_add]
     nth_rewrite 1 [add_comm m m']
     rw [pow_add, pow_add, mul_smul, mul_smul, h, h']
     simp only [smul_add, smul_comm _ PD.p]
     abel
 
-theorem exists_norm : ∃ u u' : O⟦X⟧, (∀ δ ∈ W.DelF, W.γ₀ δ u = u) ∧ u = u' * PowerSeries.X ∧
-    PowerSeries.map (algebraMap O k) u ≠ 0 := by
+theorem exists_norm
+    : ∃ u u' : O⟦X⟧,
+      (∀ δ ∈ W.DelF, W.γ₀ δ u = u) ∧ u = u' * PowerSeries.X
+        ∧ PowerSeries.map (algebraMap O k) u ≠ 0 := by
   classical
-  refine ⟨∏ δ ∈ W.DelF, W.γ₀ δ PowerSeries.X, ∏ δ ∈ W.DelF.erase 1, W.γ₀ δ PowerSeries.X, ?_, ?_, ?_⟩
+  refine
+    ⟨∏ δ ∈ W.DelF, W.γ₀ δ PowerSeries.X, ∏ δ ∈ W.DelF.erase 1, W.γ₀ δ PowerSeries.X, ?_, ?_, ?_⟩
   · intro d hd
     rw [map_prod, ← prod_del W (fun δ => W.γ₀ δ PowerSeries.X) hd]
     refine Finset.prod_congr rfl fun δ _ => ?_
@@ -118,28 +140,34 @@ theorem exists_norm : ∃ u u' : O⟦X⟧, (∀ δ ∈ W.DelF, W.γ₀ δ u = u)
     rw [PowerSeries.coeff_map, (W.γ₀_X δ).2, map_zero] at this
     exact ((W.χΓ δ).isUnit.map (algebraMap O k)).ne_zero this
 
-theorem exists_lat {l n : ℕ} {R : RingPG k l} {F : DFun R n G} {ι : k⸨X⸩ →ₐ[k] k⸨X⸩} {τ : ZMod n → ZMod n₀}
+theorem exists_lat
+    {l n : ℕ} {R : RingPG k l} {F : DFun R n G} {ι : k⸨X⸩ →ₐ[k] k⸨X⸩} {τ : ZMod n → ZMod n₀}
     {γ : W.Gam} (p : Pres W F ι τ γ)
-    (hred : ∀ a : O⟦X⟧, (∀ δ ∈ W.DelF, W.γ₀ δ a = a) →
-      ∃ c : k⟦X⟧, ι (c : k⸨X⸩) = ((PowerSeries.map (algebraMap O k) a : k⟦X⟧) : k⸨X⸩))
-    (hlift : ∀ c : k⟦X⟧, ∃ a : O⟦X⟧, (∀ δ ∈ W.DelF, W.γ₀ δ a = a) ∧
-      ι (c : k⸨X⸩) = ((PowerSeries.map (algebraMap O k) a : k⟦X⟧) : k⸨X⸩))
-    (hcard : ((W.DelF.card : ℕ) : k) ≠ 0) (hp : ((PD.p : ℕ) : k) = 0) (hb : GlobalTheory.WachUse.InvBasis W)
+    (hred : ∀ a : O⟦X⟧,
+      (∀ δ ∈ W.DelF, W.γ₀ δ a = a)
+        → ∃ c : k⟦X⟧, ι (c : k⸨X⸩) = ((PowerSeries.map (algebraMap O k) a : k⟦X⟧) : k⸨X⸩))
+    (hlift : ∀ c : k⟦X⟧, ∃ a : O⟦X⟧,
+      (∀ δ ∈ W.DelF, W.γ₀ δ a = a)
+        ∧ ι (c : k⸨X⸩) = ((PowerSeries.map (algebraMap O k) a : k⟦X⟧) : k⸨X⸩))
+    (hcard : ((W.DelF.card : ℕ) : k) ≠ 0) (hp : ((PD.p : ℕ) : k) = 0)
+    (hb : GlobalTheory.WachUse.InvBasis W)
     (T : LocLat G Qp LL O) (A : Ob k G) (q : ↥T.L.T →ₗ[O] (Fin A.m → k)) (hq : Onto T A q)
-    (hT : IsCrys PD T.ρ) (i : ZMod n) :
-    ∃ N : Submodule k⟦X⟧ (Vc k A.m),
+    (hT : IsCrys PD T.ρ) (i : ZMod n)
+    : ∃ N : Submodule k⟦X⟧ (Vc k A.m),
       (∀ y, y ∈ N ↔ ∃ x : ↥(DΔ W T), (x : W.DD T) ∈ W.N T ∧ p.j T A q i x = y) ∧ IsLat N := by
   obtain ⟨b, hbΔ, hli, hsp⟩ := hb T hT
   let b' : Fin (Module.finrank O ↥T.L.T) → ↥(DΔ W T) := fun j => ⟨b j, (hbΔ j).2⟩
-  have hmem : ∀ y, y ∈ Submodule.span k⟦X⟧ (Set.range fun j => p.j T A q i (b' j)) ↔
-      ∃ x : ↥(DΔ W T), (x : W.DD T) ∈ W.N T ∧ p.j T A q i x = y := by
+  have hmem
+      : ∀ y,
+        y ∈ Submodule.span k⟦X⟧ (Set.range fun j => p.j T A q i (b' j))
+          ↔ ∃ x : ↥(DΔ W T), (x : W.DD T) ∈ W.N T ∧ p.j T A q i x = y := by
     intro y
     rw [Submodule.mem_span_range_iff_exists_fun]
     constructor
     · rintro ⟨c, rfl⟩
       choose a ha hι using fun j => hlift (c j)
-      let x : _ → ↥(DΔ W T) := fun j => ⟨((fun _ => a j) : LetA O n₀) • b j,
-        smul_mem_DΔ W T (fun _ => ha j) (hbΔ j).2⟩
+      let x : _ → ↥(DΔ W T) := fun j =>
+        ⟨((fun _ => a j) : LetA O n₀) • b j, smul_mem_DΔ W T (fun _ => ha j) (hbΔ j).2⟩
       refine ⟨∑ j, x j, ?_, ?_⟩
       · change (DΔ W T).subtype (∑ j, x j) ∈ W.N T
         rw [map_sum]
@@ -193,13 +221,15 @@ theorem exists_lat {l n : ℕ} {R : RingPG k l} {F : DFun R n G} {ι : k⸨X⸩ 
     rw [haa, mul_smul, h, smul_add, smul_comm a' PD.p]
   have key : W.DelF.card • x₁ = y₁ + PD.p • z₁ := by
     apply Subtype.ext
-    change W.DelF.card • (x₁ : W.DD T) = ∑ δ ∈ W.DelF, W.γD T δ (a' • y) + PD.p • ∑ δ ∈ W.DelF, W.γD T δ (a' • z)
+    change W.DelF.card • (x₁ : W.DD T)
+      = ∑ δ ∈ W.DelF, W.γD T δ (a' • y) + PD.p • ∑ δ ∈ W.DelF, W.γD T δ (a' • z)
     rw [Finset.smul_sum, ← Finset.sum_add_distrib, ← Finset.sum_const]
     refine Finset.sum_congr rfl fun δ hδ => ?_
     rw [← map_nsmul, ← map_add (f := _), ← hx₁, x₁.2 δ hδ]
   have hj := congrArg (p.j T A q i) key
   rw [map_nsmul, map_add (f := _), map_nsmul, p.j_smul T A q hq i a c x x₁ hc rfl,
-    ← Nat.cast_smul_eq_nsmul k PD.p, hp, zero_smul, add_zero] at hj
+      ← Nat.cast_smul_eq_nsmul k PD.p, hp, zero_smul, add_zero]
+    at hj
   have hy₁ : p.j T A q i y₁ ∈ Submodule.span k⟦X⟧ (Set.range fun j => p.j T A q i (b' j)) :=
     (hmem _).2 ⟨y₁, sum_mem fun δ _ => W.N_Γ T δ _ ((W.N T).smul_mem _ hy), rfl⟩
   have hc0 : (c : k⸨X⸩) ≠ 0 := by
@@ -219,15 +249,19 @@ theorem exists_lat {l n : ℕ} {R : RingPG k l} {F : DFun R n G} {ι : k⸨X⸩ 
   rw [hj']
   exact Submodule.smul_mem _ _ (Submodule.subset_span hy₁)
 
-theorem card_ne_zero {l : ℕ} [Fact l.Prime] [CharP k l]
-    (e : {δ // δ ∈ W.DelF} ≃ {z : ℤ_[l] // z ^ (l - 1) = 1}) : ((W.DelF.card : ℕ) : k) ≠ 0 := by
+theorem card_ne_zero
+    {l : ℕ} [Fact l.Prime] [CharP k l] (e : {δ // δ ∈ W.DelF} ≃ {z : ℤ_[l] // z ^ (l - 1) = 1})
+    : ((W.DelF.card : ℕ) : k) ≠ 0 := by
   classical
   have hl : 2 ≤ l := (Fact.out : l.Prime).two_le
   have hpos : 0 < W.DelF.card := Finset.card_pos.2 ⟨1, one_mem_del W⟩
   have hle : W.DelF.card ≤ l - 1 := by
     rw [← Finset.card_attach]
-    refine le_trans (Finset.card_le_card_of_injOn (t := (Polynomial.nthRoots (l - 1) (1 : ℤ_[l])).toFinset)
-      (fun δ => (e δ).1) ?_ ?_) ((Multiset.toFinset_card_le _).trans (Polynomial.card_nthRoots _ _))
+    refine le_trans
+      (Finset.card_le_card_of_injOn (t := (Polynomial.nthRoots (l - 1) (1 : ℤ_[l])).toFinset)
+        (fun δ => (e δ).1)
+        ?_ ?_)
+      ((Multiset.toFinset_card_le _).trans (Polynomial.card_nthRoots _ _))
     · intro δ _
       simp only [Finset.mem_coe, Multiset.mem_toFinset]
       rw [Polynomial.mem_nthRoots (by omega)]
@@ -239,15 +273,22 @@ theorem card_ne_zero {l : ℕ} [Fact l.Prime] [CharP k l]
   have := Nat.le_of_dvd hpos h
   omega
 
-theorem red_lift {l : ℕ} [Fact l.Prime] [CharP k l] {R : RingPG k l} {ι : k⸨X⸩ →ₐ[k] k⸨X⸩}
-    (hι : GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacters.IsCyclotomic R ι) (hs : Function.Surjective (algebraMap O k))
+theorem red_lift
+    {l : ℕ} [Fact l.Prime] [CharP k l]
+    {R : RingPG k l} {ι : k⸨X⸩ →ₐ[k] k⸨X⸩}
+    (hι : GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacters.IsCyclotomic R ι)
+    (hs : Function.Surjective (algebraMap O k))
     (e : {δ // δ ∈ W.DelF} ≃ {z : ℤ_[l] // z ^ (l - 1) = 1})
-    (he : ∀ δ a, PowerSeries.map (algebraMap O k) (W.γ₀ δ.1 a) =
-      GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacters.deltaPi k l (e δ).1 (PowerSeries.map (algebraMap O k) a)) :
-    (∀ a : O⟦X⟧, (∀ δ ∈ W.DelF, W.γ₀ δ a = a) →
-      ∃ c : k⟦X⟧, ι (c : k⸨X⸩) = ((PowerSeries.map (algebraMap O k) a : k⟦X⟧) : k⸨X⸩)) ∧
-    (∀ c : k⟦X⟧, ∃ a : O⟦X⟧, (∀ δ ∈ W.DelF, W.γ₀ δ a = a) ∧
-      ι (c : k⸨X⸩) = ((PowerSeries.map (algebraMap O k) a : k⟦X⟧) : k⸨X⸩)) := by
+    (he : ∀ δ a,
+      PowerSeries.map (algebraMap O k) (W.γ₀ δ.1 a)
+        = GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacters.deltaPi k l (e δ).1
+          (PowerSeries.map (algebraMap O k) a))
+    : (∀ a : O⟦X⟧,
+        (∀ δ ∈ W.DelF, W.γ₀ δ a = a)
+          → ∃ c : k⟦X⟧, ι (c : k⸨X⸩) = ((PowerSeries.map (algebraMap O k) a : k⟦X⟧) : k⸨X⸩))
+      ∧ (∀ c : k⟦X⟧, ∃ a : O⟦X⟧,
+        (∀ δ ∈ W.DelF, W.γ₀ δ a = a)
+          ∧ ι (c : k⸨X⸩) = ((PowerSeries.map (algebraMap O k) a : k⟦X⟧) : k⸨X⸩)) := by
   constructor
   · intro a ha
     refine (hι.2.2.1 _).1 fun z hz => ?_
@@ -269,8 +310,10 @@ theorem red_lift {l : ℕ} [Fact l.Prime] [CharP k l] {R : RingPG k l} {ι : k�
     · set_option synthInstance.maxHeartbeats 100000 in
         rw [hb, map_sum]
       congr 1
-      have h1 : ∀ δ ∈ W.DelF, PowerSeries.map (algebraMap O k) (W.γ₀ δ (d • b₀)) =
-          ((W.DelF.card : ℕ) : k)⁻¹ • PowerSeries.map (algebraMap O k) b₀ := by
+      have h1
+          : ∀ δ ∈ W.DelF,
+            PowerSeries.map (algebraMap O k) (W.γ₀ δ (d • b₀))
+              = ((W.DelF.card : ℕ) : k)⁻¹ • PowerSeries.map (algebraMap O k) b₀ := by
         intro δ hδ
         rw [map_smul, PowerSeries.smul_eq_C_mul, map_mul, PowerSeries.map_C, hd, he ⟨δ, hδ⟩,
           hinv _ (e ⟨δ, hδ⟩).2, PowerSeries.smul_eq_C_mul]
@@ -281,12 +324,30 @@ end General
 
 end GlobalTheory.Present.RedLat
 
-open GlobalTheory.PhiGam GlobalTheory.AdmLoc GlobalTheory.Models GlobalTheory.TopSteps GlobalTheory.Present Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+open GlobalTheory.PhiGam GlobalTheory.AdmLoc GlobalTheory.Models GlobalTheory.TopSteps
+  GlobalTheory.Present Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions
+  Formalism.BasicNotions.Loc
 open scoped LaurentSeries PowerSeries
 
-
 set_option maxHeartbeats 2000000 in
-theorem GlobalTheory.Present.RedLat.red_isLat : ∀ {l : ℕ} [Fact l.Prime] {P : LocPrime l} (H : LocHW l P) (S : TopSit P) (k : Type) [Field k] [Algebra S.O k] [CharP k l], S.IsRes k → ∀ {R : RingPG k l} (ι : k⸨X⸩ →ₐ[k] k⸨X⸩) (F : DFun R S.n S.G) (τ : ZMod S.n → ZMod (Module.finrank ℚ_[l] ↥(K0 S.K))) (γ : (S.W H).Gam) (p : Pres (S.W H) F ι τ γ), GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacters.IsCyclotomic R ι → (∀ i, (S.W H).emb (τ i) = S.emb i) → ((S.W H).χΓ γ : S.O) = 1 + (l : S.O) → GlobalTheory.WachUse.QN (S.W H) → ∀ (T : LocLat S.G ℚ_[l] ↥S.LL.1 S.O) (A : Ob k S.G) q (U : ZMod S.n → Multiset ℤ), Onto T A q → KerIs S.Γ.lam q → CrysWith (P.PD S.K) S.emb T.ρ U → ∃ N : Lats k S.n A.m, (∀ i y, y ∈ N i ↔ ∃ x : ↥(DΔ (S.W H) T), (x : (S.W H).DD T) ∈ (S.W H).N T ∧ p.j T A q i x = y) ∧ ∀ i, IsLat (N i) := by
+theorem GlobalTheory.Present.RedLat.red_isLat
+    : ∀ {l : ℕ} [Fact l.Prime] {P : LocPrime l} (H : LocHW l P) (S : TopSit P) (k : Type) [Field k]
+        [Algebra S.O k] [CharP k l],
+      S.IsRes k
+        → ∀ {R : RingPG k l} (ι : k⸨X⸩ →ₐ[k] k⸨X⸩) (F : DFun R S.n S.G)
+            (τ : ZMod S.n → ZMod (Module.finrank ℚ_[l] ↥(K0 S.K))) (γ : (S.W H).Gam)
+            (p : Pres (S.W H) F ι τ γ),
+          GlobalTheory.IndefiniteRowSideFullHecke.OnePlusPowerCharacters.IsCyclotomic R ι
+            → (∀ i, (S.W H).emb (τ i) = S.emb i) → ((S.W H).χΓ γ : S.O) = 1 + (l : S.O)
+            → GlobalTheory.WachUse.QN (S.W H)
+            → ∀ (T : LocLat S.G ℚ_[l] ↥S.LL.1 S.O) (A : Ob k S.G) q (U : ZMod S.n → Multiset ℤ),
+              Onto T A q → KerIs S.Γ.lam q → CrysWith (P.PD S.K) S.emb T.ρ U
+                → ∃ N : Lats k S.n A.m,
+                  (∀ i y,
+                      y ∈ N i
+                        ↔ ∃ x : ↥(DΔ (S.W H) T),
+                          (x : (S.W H).DD T) ∈ (S.W H).N T ∧ p.j T A q i x = y)
+                    ∧ ∀ i, IsLat (N i) := by
   intro l _ P H S k _ _ _ hres R ι F τ γ p hι _ _ hQ T A q U hq _ hT
   obtain ⟨-, e, he⟩ := GlobalTheory.T.map_gamma_eq_deltaPi_teichmuller H S k
   obtain ⟨h1, h2⟩ := GlobalTheory.Present.RedLat.red_lift (S.W H) hι hres.1 e he

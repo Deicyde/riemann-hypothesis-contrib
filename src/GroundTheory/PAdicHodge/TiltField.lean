@@ -23,39 +23,37 @@ local notation "𝒪♭" => PreTilt 𝒪 p
 local notation "K♭" => FractionRing 𝒪♭
 local notation "♮" x:arg => ((PreTilt.untilt x : 𝒪) : K)
 
-instance isDomain_preTilt_of_isPerfectoidField : IsDomain 𝒪♭ :=
-  IsPerfectoidField.isDomain_preTilt p
+instance isDomain_preTilt_of_isPerfectoidField : IsDomain 𝒪♭ := IsPerfectoidField.isDomain_preTilt p
 
-instance algebraPreTiltTilt : Algebra 𝒪♭ K♭ :=
-  inferInstanceAs (Algebra 𝒪♭ (FractionRing 𝒪♭))
+instance algebraPreTiltTilt : Algebra 𝒪♭ K♭ := inferInstanceAs (Algebra 𝒪♭ (FractionRing 𝒪♭))
 
 instance isFractionRing_preTilt_tilt : IsFractionRing 𝒪♭ K♭ :=
   inferInstanceAs (IsFractionRing 𝒪♭ (FractionRing 𝒪♭))
 
 section Sharp
 
-theorem untiltK_mul (a b : 𝒪♭) : ♮(a * b) = ♮a * ♮b := by
-  rw [map_mul, Subring.coe_mul]
+theorem untiltK_mul (a b : 𝒪♭) : ♮(a * b) = ♮a * ♮b := by rw [map_mul, Subring.coe_mul]
 
-theorem untiltK_one : ♮(1 : 𝒪♭) = 1 := by
-  rw [map_one, OneMemClass.coe_one]
+theorem untiltK_one : ♮(1 : 𝒪♭) = 1 := by rw [map_one, OneMemClass.coe_one]
 
-theorem untiltK_ne_zero {a : 𝒪♭} (ha : a ≠ 0) : ♮a ≠ 0 :=
-  fun h => ha (untilt_eq_zero_iff.1 h)
+theorem untiltK_ne_zero {a : 𝒪♭} (ha : a ≠ 0) : ♮a ≠ 0 := fun h => ha (untilt_eq_zero_iff.1 h)
 
-theorem exists_mul_algebraMap_eq (x : K♭) :
-    ∃ a b : 𝒪♭, b ≠ 0 ∧ x * algebraMap 𝒪♭ K♭ b = algebraMap 𝒪♭ K♭ a :=
-  ⟨_, _, nonZeroDivisors.ne_zero (IsLocalization.sec (nonZeroDivisors 𝒪♭) x).2.2,
-    IsLocalization.sec_spec (nonZeroDivisors 𝒪♭) x⟩
-
+theorem exists_mul_algebraMap_eq (x : K♭)
+    : ∃ a b : 𝒪♭, b ≠ 0 ∧ x * algebraMap 𝒪♭ K♭ b = algebraMap 𝒪♭ K♭ a := ⟨
+  _,
+  _,
+  nonZeroDivisors.ne_zero (IsLocalization.sec (nonZeroDivisors 𝒪♭) x).2.2,
+  IsLocalization.sec_spec (nonZeroDivisors 𝒪♭) x
+⟩
 
 variable (K p) in
 def tiltSharpFun (x : K♭) : K :=
-  ♮(IsLocalization.sec (nonZeroDivisors 𝒪♭) x).1 /
-    ♮((IsLocalization.sec (nonZeroDivisors 𝒪♭) x).2 : 𝒪♭)
+  ♮(IsLocalization.sec (nonZeroDivisors 𝒪♭) x).1
+    / ♮((IsLocalization.sec (nonZeroDivisors 𝒪♭) x).2 : 𝒪♭)
 
-theorem tiltSharpFun_eq {x : K♭} {a b : 𝒪♭} (hb : b ≠ 0)
-    (h : x * algebraMap 𝒪♭ K♭ b = algebraMap 𝒪♭ K♭ a) : tiltSharpFun (K := K) (p := p) x = ♮a / ♮b := by
+theorem tiltSharpFun_eq
+    {x : K♭} {a b : 𝒪♭} (hb : b ≠ 0) (h : x * algebraMap 𝒪♭ K♭ b = algebraMap 𝒪♭ K♭ a)
+    : tiltSharpFun (K := K) (p := p) x = ♮a / ♮b := by
   have hs := IsLocalization.sec_spec (nonZeroDivisors 𝒪♭) x
   set a' := (IsLocalization.sec (nonZeroDivisors 𝒪♭) x).1
   set b' : 𝒪♭ := ((IsLocalization.sec (nonZeroDivisors 𝒪♭) x).2 : 𝒪♭) with hb'def
@@ -64,11 +62,9 @@ theorem tiltSharpFun_eq {x : K♭} {a b : 𝒪♭} (hb : b ≠ 0)
     apply IsFractionRing.injective 𝒪♭ K♭
     rw [map_mul, map_mul, ← hs, ← h]
     ring
-  have key' : ♮a' * ♮b = ♮a * ♮b' := by
-    rw [← untiltK_mul, ← untiltK_mul, key]
+  have key' : ♮a' * ♮b = ♮a * ♮b' := by rw [← untiltK_mul, ← untiltK_mul, key]
   change ♮a' / ♮b' = _
   rw [div_eq_div_iff (untiltK_ne_zero hb') (untiltK_ne_zero hb), key']
-
 
 variable (K p) in
 def tiltSharp : K♭ →*₀ K where
@@ -87,8 +83,9 @@ def tiltSharp : K♭ →*₀ K where
         (by rw [map_mul, map_mul, ← h, ← h']; ring),
       untiltK_mul, untiltK_mul, div_mul_div_comm]
 
-theorem tiltSharp_eq {x : K♭} {a b : 𝒪♭} (hb : b ≠ 0)
-    (h : x * algebraMap 𝒪♭ K♭ b = algebraMap 𝒪♭ K♭ a) : tiltSharp (K := K) (p := p) x = ♮a / ♮b :=
+theorem tiltSharp_eq
+    {x : K♭} {a b : 𝒪♭} (hb : b ≠ 0) (h : x * algebraMap 𝒪♭ K♭ b = algebraMap 𝒪♭ K♭ a)
+    : tiltSharp (K := K) (p := p) x = ♮a / ♮b :=
   tiltSharpFun_eq hb h
 
 @[simp]
@@ -101,23 +98,21 @@ theorem tiltSharp_eq_zero_iff {x : K♭} : tiltSharp (K := K) (p := p) x = 0 ↔
   constructor
   · intro ha
     have ha' : a = 0 := untilt_eq_zero_iff.1 ha
-    have hb' : algebraMap 𝒪♭ K♭ b ≠ 0 :=
-      (map_ne_zero_iff _ (IsFractionRing.injective 𝒪♭ K♭)).2 hb
+    have hb' : algebraMap 𝒪♭ K♭ b ≠ 0 := (map_ne_zero_iff _ (IsFractionRing.injective 𝒪♭ K♭)).2 hb
     rw [ha', map_zero] at h
     exact (mul_eq_zero.1 h).resolve_right hb'
   · rintro rfl
     rw [zero_mul, eq_comm, map_eq_zero_iff _ (IsFractionRing.injective 𝒪♭ K♭)] at h
     rw [h, untilt_zero, ZeroMemClass.coe_zero]
 
-theorem norm_tiltSharp_add_le (x y : K♭) :
-    ‖tiltSharp (K := K) (p := p) (x + y)‖ ≤ max ‖tiltSharp (K := K) (p := p) x‖ ‖tiltSharp (K := K) (p := p) y‖ := by
+theorem norm_tiltSharp_add_le (x y : K♭)
+    : ‖tiltSharp (K := K) (p := p) (x + y)‖
+      ≤ max ‖tiltSharp (K := K) (p := p) x‖ ‖tiltSharp (K := K) (p := p) y‖ := by
   obtain ⟨a, b, hb, h⟩ := exists_mul_algebraMap_eq x
   obtain ⟨c, d, hd, h'⟩ := exists_mul_algebraMap_eq y
   have hbd : b * d ≠ 0 := mul_ne_zero hb hd
-  rw [tiltSharp_eq (x := x) (a := a * d) (b := b * d) hbd
-      (by rw [map_mul, map_mul, ← h]; ring),
-    tiltSharp_eq (x := y) (a := c * b) (b := b * d) hbd
-      (by rw [map_mul, map_mul, ← h']; ring),
+  rw [tiltSharp_eq (x := x) (a := a * d) (b := b * d) hbd (by rw [map_mul, map_mul, ← h]; ring),
+    tiltSharp_eq (x := y) (a := c * b) (b := b * d) hbd (by rw [map_mul, map_mul, ← h']; ring),
     tiltSharp_eq (x := x + y) (a := a * d + c * b) (b := b * d) hbd
       (by rw [map_add (f := _), map_mul, map_mul, map_mul, ← h, ← h']; ring),
     norm_div, norm_div, norm_div, max_div_div_right (norm_nonneg _)]
@@ -127,15 +122,14 @@ end Sharp
 
 section Norm
 
-
 variable (K p) in
 def tiltAbv : AbsoluteValue K♭ ℝ where
   toFun x := ‖tiltSharp (K := K) (p := p) x‖
   map_mul' x y := by simp only [map_mul, norm_mul]
   nonneg' x := norm_nonneg _
   eq_zero' x := by rw [norm_eq_zero, tiltSharp_eq_zero_iff]
-  add_le' x y := (norm_tiltSharp_add_le x y).trans
-    (max_le_add_of_nonneg (norm_nonneg _) (norm_nonneg _))
+  add_le' x y :=
+    (norm_tiltSharp_add_le x y).trans (max_le_add_of_nonneg (norm_nonneg _) (norm_nonneg _))
 
 instance normedFieldTilt : NormedField K♭ := (tiltAbv (K := K) (p := p)).toNormedField
 
@@ -145,15 +139,15 @@ theorem norm_tiltSharp (x : K♭) : ‖tiltSharp (K := K) (p := p) x‖ = ‖x�
 theorem norm_algebraMap_preTilt (a : 𝒪♭) : ‖algebraMap 𝒪♭ K♭ a‖ = ‖a‖ := by
   rw [← norm_tiltSharp, tiltSharp_algebraMap, preTilt_norm_def]
 
-theorem dist_algebraMap_preTilt (a b : 𝒪♭) :
-    dist (algebraMap 𝒪♭ K♭ a) (algebraMap 𝒪♭ K♭ b) = dist a b := by
+theorem dist_algebraMap_preTilt (a b : 𝒪♭)
+    : dist (algebraMap 𝒪♭ K♭ a) (algebraMap 𝒪♭ K♭ b) = dist a b := by
   rw [dist_eq_norm, dist_eq_norm, ← map_sub, norm_algebraMap_preTilt]
 
 instance isUltrametricDist_tilt : IsUltrametricDist K♭ :=
   IsUltrametricDist.isUltrametricDist_of_forall_norm_add_le_max_norm norm_tiltSharp_add_le
 
-theorem norm_le_one_iff_exists_algebraMap {x : K♭} :
-    ‖x‖ ≤ 1 ↔ ∃ a : 𝒪♭, algebraMap 𝒪♭ K♭ a = x := by
+theorem norm_le_one_iff_exists_algebraMap {x : K♭}
+    : ‖x‖ ≤ 1 ↔ ∃ a : 𝒪♭, algebraMap 𝒪♭ K♭ a = x := by
   constructor
   · intro hx
     obtain ⟨a, b, hb, h⟩ := exists_mul_algebraMap_eq x
@@ -161,8 +155,7 @@ theorem norm_le_one_iff_exists_algebraMap {x : K♭} :
       rw [← norm_algebraMap_preTilt (K := K) a, ← h, norm_mul, norm_algebraMap_preTilt]
       exact mul_le_of_le_one_left (norm_nonneg _) hx
     obtain ⟨c, rfl⟩ := preTilt_dvd_iff_norm_le.2 hle
-    have hb' : algebraMap 𝒪♭ K♭ b ≠ 0 :=
-      (map_ne_zero_iff _ (IsFractionRing.injective 𝒪♭ K♭)).2 hb
+    have hb' : algebraMap 𝒪♭ K♭ b ≠ 0 := (map_ne_zero_iff _ (IsFractionRing.injective 𝒪♭ K♭)).2 hb
     refine ⟨c, ?_⟩
     rw [map_mul, mul_comm x] at h
     exact (mul_left_cancel₀ hb' h).symm
@@ -170,12 +163,12 @@ theorem norm_le_one_iff_exists_algebraMap {x : K♭} :
     rw [norm_algebraMap_preTilt]
     exact preTilt_norm_le_one a
 
-
 theorem exists_tilt_norm_mem_Ioo (r : ℝ) (hr : r < 1) : ∃ x : K♭, r < ‖x‖ ∧ ‖x‖ < 1 := by
-  obtain ⟨ϖ, h1, h2⟩ := IsPerfectoidField.exists_norm_mem_Ioo (K := K) (p := p) (max r ‖(p : K)‖)
-    (max_lt hr IsPerfectoidField.norm_natCast_lt_one)
-  obtain ⟨a, ha⟩ := exists_norm_untilt_eq (p := p) ⟨ϖ, mem_normInteger.2 h2.le⟩
-    ((le_max_right _ _).trans_lt h1)
+  obtain ⟨ϖ, h1, h2⟩ :=
+    IsPerfectoidField.exists_norm_mem_Ioo (K := K) (p := p) (max r ‖(p : K)‖)
+      (max_lt hr IsPerfectoidField.norm_natCast_lt_one)
+  obtain ⟨a, ha⟩ :=
+    exists_norm_untilt_eq (p := p) ⟨ϖ, mem_normInteger.2 h2.le⟩ ((le_max_right _ _).trans_lt h1)
   refine ⟨algebraMap 𝒪♭ K♭ a, ?_, ?_⟩ <;> rw [norm_algebraMap_preTilt, preTilt_norm_def, ha]
   · exact (le_max_left _ _).trans_lt h1
   · exact h2
@@ -214,8 +207,7 @@ instance completeSpace_tilt : CompleteSpace K♭ := by
     abel
   exact (tendsto_add_atTop_iff_nat N).1 h1
 
-instance charP_tilt : CharP K♭ p :=
-  charP_of_injective_algebraMap (IsFractionRing.injective 𝒪♭ K♭) p
+instance charP_tilt : CharP K♭ p := charP_of_injective_algebraMap (IsFractionRing.injective 𝒪♭ K♭) p
 
 instance perfectRing_tilt : PerfectRing K♭ p := by
   refine PerfectRing.ofSurjective K♭ p fun x => ?_
@@ -224,24 +216,27 @@ instance perfectRing_tilt : PerfectRing K♭ p := by
     rw [← frobenius_def, frobenius_apply_frobeniusEquiv_symm]
   have hb : ((frobeniusEquiv 𝒪♭ p).symm b) ^ p = b := by
     rw [← frobenius_def, frobenius_apply_frobeniusEquiv_symm]
-  refine ⟨algebraMap 𝒪♭ K♭ ((frobeniusEquiv 𝒪♭ p).symm a) /
-    algebraMap 𝒪♭ K♭ ((frobeniusEquiv 𝒪♭ p).symm b), ?_⟩
+  refine ⟨
+    algebraMap 𝒪♭ K♭ ((frobeniusEquiv 𝒪♭ p).symm a)
+      / algebraMap 𝒪♭ K♭ ((frobeniusEquiv 𝒪♭ p).symm b),
+    ?_
+  ⟩
   rw [frobenius_def, div_pow, ← map_pow (algebraMap 𝒪♭ K♭), ← map_pow (algebraMap 𝒪♭ K♭), ha, hb]
 
 end Norm
 
 section ValueGroup
 
-theorem exists_norm_untilt_eq_norm {y : K} (hy0 : y ≠ 0) (hy1 : ‖y‖ ≤ 1) :
-    ∃ a : 𝒪♭, ‖♮a‖ = ‖y‖ :=
+theorem exists_norm_untilt_eq_norm {y : K} (hy0 : y ≠ 0) (hy1 : ‖y‖ ≤ 1) : ∃ a : 𝒪♭, ‖♮a‖ = ‖y‖ :=
   _root_.GroundTheory.Variant₂.N1.exists_norm_untilt_eq_norm_of_norm_le_one hy0 hy1
 
 theorem exists_tilt_norm_eq {y : K} (hy : y ≠ 0) : ∃ x : K♭, ‖x‖ = ‖y‖ := by
   rcases le_or_gt ‖y‖ 1 with h | h
   · obtain ⟨a, ha⟩ := exists_norm_untilt_eq_norm (p := p) hy h
     exact ⟨algebraMap 𝒪♭ K♭ a, by rw [norm_algebraMap_preTilt, preTilt_norm_def, ha]⟩
-  · obtain ⟨a, ha⟩ := exists_norm_untilt_eq_norm (p := p) (inv_ne_zero hy)
-      (by rw [norm_inv]; exact inv_le_one_of_one_le₀ h.le)
+  · obtain ⟨a, ha⟩ :=
+      exists_norm_untilt_eq_norm (p := p) (inv_ne_zero hy)
+        (by rw [norm_inv]; exact inv_le_one_of_one_le₀ h.le)
     refine ⟨(algebraMap 𝒪♭ K♭ a)⁻¹, ?_⟩
     rw [norm_inv, norm_algebraMap_preTilt, preTilt_norm_def, ha, norm_inv, inv_inv]
 

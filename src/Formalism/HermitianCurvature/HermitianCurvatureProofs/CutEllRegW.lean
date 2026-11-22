@@ -7,6 +7,7 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutEllRegBri
 
 namespace Formalism.FourierDecayAlt.P.CutMP.SmoothTransferRegularity
 
-theorem elliptic_regularity_weighted : EllRegW := elliptic_regularity_transfer_holds ZetaZeros.D.EllReg.elliptic_regularity_of_parts
+theorem elliptic_regularity_weighted : EllRegW :=
+  elliptic_regularity_transfer_holds ZetaZeros.D.EllReg.elliptic_regularity_of_parts
 
 end Formalism.FourierDecayAlt.P.CutMP.SmoothTransferRegularity

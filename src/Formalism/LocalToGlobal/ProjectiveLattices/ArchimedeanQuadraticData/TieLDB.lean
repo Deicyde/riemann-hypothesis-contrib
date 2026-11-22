@@ -8,16 +8,18 @@ namespace Formalism.L2.Pj.QAt.TieLDB
 
 open Module
 
-variable {A : Type*} [CommRing A] (p : Ideal A) [p.IsPrime]
+variable
+  {A : Type*} [CommRing A]
+  (p : Ideal A) [p.IsPrime]
   {V : Type*} [AddCommGroup V] [Module A V] [Module (Localization.AtPrime p) V]
   [IsScalarTower A (Localization.AtPrime p) V]
 
 theorem smul_comm' (s : A) (o : Localization.AtPrime p) (v : V) : s • (o • v) = o • (s • v) := by
   rw [← smul_assoc, Algebra.smul_def, mul_comm, mul_smul, algebraMap_smul]
 
-theorem exists_smul_mem (G : Submodule A V) {x : V}
-    (hx : x ∈ Submodule.span (Localization.AtPrime p) (G : Set V)) :
-    ∃ s ∈ p.primeCompl, s • x ∈ G := by
+theorem exists_smul_mem
+    (G : Submodule A V) {x : V} (hx : x ∈ Submodule.span (Localization.AtPrime p) (G : Set V))
+    : ∃ s ∈ p.primeCompl, s • x ∈ G := by
   induction hx using Submodule.span_induction with
   | mem y hy => exact ⟨1, p.primeCompl.one_mem, by rw [one_smul]; exact hy⟩
   | zero => exact ⟨1, p.primeCompl.one_mem, by rw [smul_zero]; exact G.zero_mem⟩
@@ -38,9 +40,9 @@ theorem exists_smul_mem (G : Submodule A V) {x : V}
     rw [mul_smul, smul_comm' p s o x, ← smul_assoc, h1, algebraMap_smul]
     exact G.smul_mem a hsx
 
-theorem span_inf_eq (M : Submodule A V) (W : Submodule (Localization.AtPrime p) V) :
-    Submodule.span (Localization.AtPrime p) ((M ⊓ W.restrictScalars A : Submodule A V) : Set V) =
-      Submodule.span (Localization.AtPrime p) (M : Set V) ⊓ W := by
+theorem span_inf_eq (M : Submodule A V) (W : Submodule (Localization.AtPrime p) V)
+    : Submodule.span (Localization.AtPrime p) ((M ⊓ W.restrictScalars A : Submodule A V) : Set V)
+      = Submodule.span (Localization.AtPrime p) (M : Set V) ⊓ W := by
   apply le_antisymm
   · rw [Submodule.span_le]
     intro x hx
@@ -48,8 +50,9 @@ theorem span_inf_eq (M : Submodule A V) (W : Submodule (Localization.AtPrime p) 
   · rintro x ⟨hxM, hxW⟩
     obtain ⟨s, hs, hsx⟩ := exists_smul_mem p M hxM
     have hu := IsLocalization.map_units (Localization.AtPrime p) (⟨s, hs⟩ : p.primeCompl)
-    have hmem : s • x ∈ Submodule.span (Localization.AtPrime p)
-        ((M ⊓ W.restrictScalars A : Submodule A V) : Set V) :=
+    have hmem
+        : s • x ∈ Submodule.span (Localization.AtPrime p)
+          ((M ⊓ W.restrictScalars A : Submodule A V) : Set V) :=
       Submodule.subset_span ⟨hsx, W.smul_of_tower_mem s hxW⟩
     have hx : x = hu.unit⁻¹ • (s • x) := by
       rw [← algebraMap_smul (Localization.AtPrime p) s x]
@@ -65,21 +68,23 @@ def inc : H →ₗ[A] Submodule.span (Localization.AtPrime p) (H : Set V) where
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-noncomputable def locMap :
-    H ⧸ G.comap H.subtype →ₗ[A] ↥(Submodule.span (Localization.AtPrime p) (H : Set V)) ⧸
-      (Submodule.span (Localization.AtPrime p) (G : Set V)).comap
-        (Submodule.span (Localization.AtPrime p) (H : Set V)).subtype :=
+noncomputable def locMap
+    : H ⧸ G.comap H.subtype →ₗ[A] ↥(Submodule.span (Localization.AtPrime p) (H : Set V)) ⧸
+        (Submodule.span (Localization.AtPrime p) (G : Set V)).comap
+          (Submodule.span (Localization.AtPrime p) (H : Set V)).subtype :=
   (G.comap H.subtype).liftQ
     (((((Submodule.span (Localization.AtPrime p) (G : Set V)).comap
-      (Submodule.span (Localization.AtPrime p) (H : Set V)).subtype).mkQ).restrictScalars A) ∘ₗ
-        inc p H) (by
+        (Submodule.span (Localization.AtPrime p) (H : Set V)).subtype).mkQ).restrictScalars A)
+      ∘ₗ inc p H)
+    (by
       intro h hh
       rw [LinearMap.mem_ker, LinearMap.comp_apply, LinearMap.restrictScalars_apply,
         Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
       exact Submodule.subset_span hh)
 
-theorem locMap_mk (h : H) :
-    locMap p H G (Submodule.Quotient.mk h) = Submodule.Quotient.mk (inc p H h) := rfl
+theorem locMap_mk (h : H)
+    : locMap p H G (Submodule.Quotient.mk h) = Submodule.Quotient.mk (inc p H h) :=
+  rfl
 
 theorem isLocalizedModule : IsLocalizedModule p.primeCompl (locMap p H G) := by
   constructor
@@ -89,8 +94,9 @@ theorem isLocalizedModule : IsLocalizedModule p.primeCompl (locMap p H G) := by
     constructor
     · intro z1 z2 h
       rw [Module.algebraMap_end_apply, Module.algebraMap_end_apply,
-        ← algebraMap_smul (Localization.AtPrime p) (s : A) z1,
-        ← algebraMap_smul (Localization.AtPrime p) (s : A) z2] at h
+          ← algebraMap_smul (Localization.AtPrime p) (s : A) z1,
+          ← algebraMap_smul (Localization.AtPrime p) (s : A) z2]
+        at h
       exact hu.smul_left_cancel.1 h
     · intro z
       refine ⟨hu.unit⁻¹ • z, ?_⟩
@@ -115,16 +121,17 @@ theorem isLocalizedModule : IsLocalizedModule p.primeCompl (locMap p H G) := by
     rw [← smul_sub]
     exact hsx
 
-theorem length_localized_eq {P : Type*} [AddCommGroup P] [Module A P]
-    (e : P ≃ₗ[A] H ⧸ G.comap H.subtype) :
-    Module.length (Localization.AtPrime p) (LocalizedModule p.primeCompl P) =
-      Module.length (Localization.AtPrime p)
+theorem length_localized_eq
+    {P : Type*} [AddCommGroup P] [Module A P] (e : P ≃ₗ[A] H ⧸ G.comap H.subtype)
+    : Module.length (Localization.AtPrime p) (LocalizedModule p.primeCompl P)
+      = Module.length (Localization.AtPrime p)
         (↥(Submodule.span (Localization.AtPrime p) (H : Set V)) ⧸
           (Submodule.span (Localization.AtPrime p) (G : Set V)).comap
             (Submodule.span (Localization.AtPrime p) (H : Set V)).subtype) := by
   have := isLocalizedModule p H G
   have : IsLocalizedModule p.primeCompl (locMap p H G ∘ₗ e.toLinearMap) := inferInstance
-  exact ((IsLocalizedModule.iso p.primeCompl (locMap p H G ∘ₗ e.toLinearMap)).extendScalarsOfIsLocalization
-    p.primeCompl (Localization.AtPrime p)).length_eq
+  exact ((IsLocalizedModule.iso p.primeCompl
+      (locMap p H G ∘ₗ e.toLinearMap)).extendScalarsOfIsLocalization p.primeCompl
+    (Localization.AtPrime p)).length_eq
 
 end Formalism.L2.Pj.QAt.TieLDB

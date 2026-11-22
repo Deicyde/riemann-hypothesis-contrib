@@ -18,13 +18,18 @@ section Helpers
 
 variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 
-theorem kfin_mapsTo_orth (U : H →L[ℂ] H) (hU : ∀ x, ‖U x‖ = ‖x‖) (S : Submodule ℂ H)
-    [FiniteDimensional ℂ S] (hS : ∀ x ∈ S, U x ∈ S) {v : H} (hv : v ∈ Sᗮ) : U v ∈ Sᗮ := by
+theorem kfin_mapsTo_orth
+    (U : H →L[ℂ] H) (hU : ∀ x, ‖U x‖ = ‖x‖)
+    (S : Submodule ℂ H) [FiniteDimensional ℂ S]
+    (hS : ∀ x ∈ S, U x ∈ S)
+    {v : H} (hv : v ∈ Sᗮ)
+    : U v ∈ Sᗮ := by
   let L : H →ₗᵢ[ℂ] H := ⟨U.toLinearMap, hU⟩
-  let f : S →ₗ[ℂ] S :=
-    { toFun := fun x => ⟨U x, hS x x.2⟩
-      map_add' := by intro x y; ext; simp
-      map_smul' := by intro c x; ext; simp }
+  let f : S →ₗ[ℂ] S := {
+    toFun := fun x => ⟨U x, hS x x.2⟩
+    map_add' := by intro x y; ext; simp
+    map_smul' := by intro c x; ext; simp
+  }
   have hinj : Function.Injective f := by
     intro a b hab
     apply Subtype.ext
@@ -40,9 +45,11 @@ theorem kfin_mapsTo_orth (U : H →L[ℂ] H) (hU : ∀ x, ‖U x‖ = ‖x‖) (
   rw [key]
   exact hv _ s.2
 
-theorem kfin_starProj_comm (U : H →L[ℂ] H) (hU : ∀ x, ‖U x‖ = ‖x‖) (S : Submodule ℂ H)
-    [FiniteDimensional ℂ S] [S.HasOrthogonalProjection] (hS : ∀ x ∈ S, U x ∈ S) (w : H) :
-    S.starProjection (U w) = U (S.starProjection w) := by
+theorem kfin_starProj_comm
+    (U : H →L[ℂ] H) (hU : ∀ x, ‖U x‖ = ‖x‖)
+    (S : Submodule ℂ H) [FiniteDimensional ℂ S] [S.HasOrthogonalProjection]
+    (hS : ∀ x ∈ S, U x ∈ S) (w : H)
+    : S.starProjection (U w) = U (S.starProjection w) := by
   apply Submodule.eq_starProjection_of_mem_of_inner_eq_zero
   · exact hS _ (Submodule.starProjection_apply_mem S w)
   · intro x hx
@@ -53,8 +60,8 @@ theorem kfin_starProj_comm (U : H →L[ℂ] H) (hU : ∀ x, ‖U x‖ = ‖x‖)
 
 end Helpers
 
-theorem kfin_diag_mem_Kset (ε : Fin n → Bool) (θ : Fin n → ℝ) :
-    Matrix.diagonal (fun a => Complex.exp ((θ a : ℂ) * Complex.I)) ∈ Kset ε := by
+theorem kfin_diag_mem_Kset (ε : Fin n → Bool) (θ : Fin n → ℝ)
+    : Matrix.diagonal (fun a => Complex.exp ((θ a : ℂ) * Complex.I)) ∈ Kset ε := by
   unfold Kset
   rw [Set.mem_setOf_eq]
   refine ⟨?_, ?_⟩
@@ -73,12 +80,15 @@ theorem kfin_diag_mem_Kset (ε : Fin n → Bool) (θ : Fin n → ℝ) :
 
 section Wt
 
-variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {ε : Fin n → Bool}
-  {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
+variable
+  {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
 
-theorem kfin_wt_orth (hσ : IsURepOn (UJset ε) σ) {μ ν : Fin n → ℝ} {v w : H}
-    (hv : Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ μ v) (hw : Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ ν w)
-    (hne : μ ≠ ν) : inner ℂ v w = 0 := by
+theorem kfin_wt_orth
+    (hσ : IsURepOn (UJset ε) σ)
+    {μ ν : Fin n → ℝ} {v w : H} (hv : Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ μ v)
+    (hw : Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ ν w) (hne : μ ≠ ν)
+    : inner ℂ v w = 0 := by
   classical
   obtain ⟨a, ha⟩ : ∃ a, μ a ≠ ν a := by
     by_contra h
@@ -92,7 +102,8 @@ theorem kfin_wt_orth (hσ : IsURepOn (UJset ε) σ) {μ ν : Fin n → ℝ} {v w
     intro f
     simp only [θ, mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
   obtain ⟨h1, h2⟩ := kfin_diag_mem_Kset (n := n) ε θ
-  have hK : Matrix.diagonal (fun b => Complex.exp ((θ b : ℂ) * Complex.I)) ∈ Formalism.REAL.Kset ε :=
+  have hK
+      : Matrix.diagonal (fun b => Complex.exp ((θ b : ℂ) * Complex.I)) ∈ Formalism.REAL.Kset ε :=
     kfin_diag_mem_Kset ε θ
   have hU : Matrix.diagonal (fun b => Complex.exp ((θ b : ℂ) * Complex.I)) ∈ UJset ε := by
     show _ * Jm ε * _ = Jm ε
@@ -101,49 +112,65 @@ theorem kfin_wt_orth (hσ : IsURepOn (UJset ε) σ) {μ ν : Fin n → ℝ} {v w
   obtain ⟨-, hiso, -⟩ := hσ
   let L : H →ₗᵢ[ℂ] H :=
     ⟨(σ (Matrix.diagonal (fun b => Complex.exp ((θ b : ℂ) * Complex.I)))).toLinearMap, hiso _ hU⟩
-  have hinner : inner ℂ (σ (Matrix.diagonal (fun b => Complex.exp ((θ b : ℂ) * Complex.I))) v)
-      (σ (Matrix.diagonal (fun b => Complex.exp ((θ b : ℂ) * Complex.I))) w) = inner ℂ v w :=
+  have hinner
+      : inner ℂ (σ (Matrix.diagonal (fun b => Complex.exp ((θ b : ℂ) * Complex.I))) v)
+          (σ (Matrix.diagonal (fun b => Complex.exp ((θ b : ℂ) * Complex.I))) w)
+        = inner ℂ v w :=
     L.inner_map_map v w
   rw [hv θ hK, hw θ hK, inner_smul_left, inner_smul_right, hs μ, hs ν, ← Complex.exp_conj, map_mul,
-    Complex.conj_ofReal, Complex.conj_I, ← mul_assoc, ← Complex.exp_add] at hinner
-  have hexp : ((μ a * c : ℝ) : ℂ) * -Complex.I + ((ν a * c : ℝ) : ℂ) * Complex.I =
-      (Real.pi : ℂ) * Complex.I := by
+      Complex.conj_ofReal, Complex.conj_I, ← mul_assoc, ← Complex.exp_add]
+    at hinner
+  have hexp
+      : ((μ a * c : ℝ) : ℂ) * -Complex.I + ((ν a * c : ℝ) : ℂ) * Complex.I
+        = (Real.pi : ℂ) * Complex.I := by
     rw [← hπ]; push_cast; ring
   rw [hexp, Complex.exp_pi_mul_I] at hinner
   linear_combination (-1 / 2 : ℂ) * hinner
 
-theorem kfin_wts_finite (hσ : IsURepOn (UJset ε) σ) (S : Submodule ℂ H) [FiniteDimensional ℂ S] :
-    {μ : Fin n → ℝ | ∃ s ∈ S, s ≠ 0 ∧ Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ μ s}.Finite := by
-  classical
-  have hc : ∀ μ : {μ : Fin n → ℝ | ∃ s ∈ S, s ≠ 0 ∧ Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ μ s},
-      ∃ s ∈ S, s ≠ 0 ∧ Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ (μ : Fin n → ℝ) s := fun μ => μ.2
-  choose f hfS hf0 hfw using hc
-  let g : {μ : Fin n → ℝ | ∃ s ∈ S, s ≠ 0 ∧ Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ μ s} → S :=
-    fun μ => ⟨f μ, hfS μ⟩
-  have hli : LinearIndependent ℂ (S.subtype ∘ g) := by
-    apply linearIndependent_of_ne_zero_of_inner_eq_zero
-    · intro i
-      exact hf0 i
-    · intro i j hij
-      exact kfin_wt_orth hσ (hfw i) (hfw j) (fun h => hij (Subtype.ext h))
-  have hfin := (LinearIndependent.of_comp S.subtype hli).finite
-  exact Set.finite_coe_iff.mp hfin
+theorem kfin_wts_finite (hσ : IsURepOn (UJset ε) σ) (S : Submodule ℂ H) [FiniteDimensional ℂ S]
+    : {μ : Fin n → ℝ | ∃ s ∈ S, s ≠ 0 ∧ Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ μ s}.Finite :=
+  by
+    classical
+    have hc
+        : ∀ μ
+            : {μ : Fin n → ℝ | ∃ s ∈ S, s ≠ 0 ∧ Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ μ s},
+          ∃ s ∈ S,
+            s ≠ 0 ∧ Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ (μ : Fin n → ℝ) s :=
+      fun μ => μ.2
+    choose f hfS hf0 hfw using hc
+    let g
+        : {μ : Fin n → ℝ | ∃ s ∈ S, s ≠ 0 ∧ Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ μ s}
+          → S := fun μ =>
+      ⟨f μ, hfS μ⟩
+    have hli : LinearIndependent ℂ (S.subtype ∘ g) := by
+      apply linearIndependent_of_ne_zero_of_inner_eq_zero
+      · intro i
+        exact hf0 i
+      · intro i j hij
+        exact kfin_wt_orth hσ (hfw i) (hfw j) (fun h => hij (Subtype.ext h))
+    have hfin := (LinearIndependent.of_comp S.subtype hli).finite
+    exact Set.finite_coe_iff.mp hfin
 
 end Wt
 
 section Key
 
-variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] {ε : Fin n → Bool}
-  {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {D : Submodule ℂ H}
+variable
+  {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {D : Submodule ℂ H}
   {E : Fin n → Fin n → Module.End ℂ D} {V : Submodule ℂ D}
 
-theorem kfin_key (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
-    (hVf : FiniteDimensional ℂ V) (hVk : IsKStableSub ε E V)
+theorem kfin_key
+    (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E) (hVf : FiniteDimensional ℂ V)
+    (hVk : IsKStableSub ε E V)
     (S : Submodule ℂ H) (hS : S ≤ closGen E V) [FiniteDimensional ℂ S]
-    (hSK : ∀ k ∈ Kset ε, ∀ x ∈ S, σ k x ∈ S) (m : ℕ)
-    (hm : ∀ (μ : Fin n → ℝ) (w : D), w ∈ genSub E V → IsKHWVec ε E μ w →
-      (∃ s ∈ S, s ≠ 0 ∧ Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ μ s) → w ∈ layer ε E V m) :
-    S ≤ (layer ε E V m).map D.subtype := by
+    (hSK : ∀ k ∈ Kset ε, ∀ x ∈ S, σ k x ∈ S)
+    (m : ℕ)
+    (hm : ∀ (μ : Fin n → ℝ) (w : D),
+      w ∈ genSub E V → IsKHWVec ε E μ w
+        → (∃ s ∈ S, s ≠ 0 ∧ Formalism.MainNotions.S.IsWtOn (Formalism.REAL.Kset ε) σ μ s)
+        → w ∈ layer ε E V m)
+    : S ≤ (layer ε E V m).map D.subtype := by
   classical
   have hE := hD.glRep
   have hU : IsInfUnitary ε E := isInfUnitary_of_isDerivedOn hσ hD
@@ -186,9 +213,11 @@ theorem kfin_key (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
   obtain ⟨z', hz'⟩ : ∃ z' : D, z' = z0 - Lm.starProjection z0 := ⟨_, rfl⟩
   have hz'GD : z' ∈ GD := by
     rw [hGD, hz']
-    exact ⟨Submodule.sub_mem _ (layer_mono (le_max_left l0 m) hl0)
-      (layer_mono (le_max_right l0 m) (Lm.starProjection_apply_mem z0)),
-      Lm.sub_starProjection_mem_orthogonal z0⟩
+    exact ⟨
+      Submodule.sub_mem _ (layer_mono (le_max_left l0 m) hl0)
+        (layer_mono (le_max_right l0 m) (Lm.starProjection_apply_mem z0)),
+      Lm.sub_starProjection_mem_orthogonal z0
+    ⟩
   have hz'Lm : z' ∈ Lmᗮ := by
     rw [hGD] at hz'GD
     exact hz'GD.2
@@ -200,7 +229,8 @@ theorem kfin_key (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
       rw [Submodule.coe_inner] at this
       exact this
     have e2 : inner ℂ ((Lm.starProjection z0 : D) : H) y = 0 :=
-      (Submodule.mem_orthogonal _ _).1 hyF _ (Submodule.mem_map_of_mem (Lm.starProjection_apply_mem z0))
+      (Submodule.mem_orthogonal _ _).1 hyF _
+        (Submodule.mem_map_of_mem (Lm.starProjection_apply_mem z0))
     have e3 : inner ℂ (z' : H) x = inner ℂ (z' : H) y + inner ℂ (z' : H) (Fm.starProjection x) := by
       rw [← inner_add_right, hy, sub_add_cancel]
     have e4 : inner ℂ (z' : H) y = inner ℂ (z0 : H) y := by
@@ -255,8 +285,10 @@ theorem kfin_key (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
     intro hbot
     have hbb1 : z' - G0.starProjection z' ∈ G1 := by
       rw [hG1]
-      exact ⟨Submodule.sub_mem _ hz'GD (hG0GD (G0.starProjection_apply_mem z')),
-        G0.sub_starProjection_mem_orthogonal z'⟩
+      exact ⟨
+        Submodule.sub_mem _ hz'GD (hG0GD (G0.starProjection_apply_mem z')),
+        G0.sub_starProjection_mem_orthogonal z'
+      ⟩
     rw [hbot] at hbb1
     have hbb0 : z' - G0.starProjection z' = 0 := (Submodule.mem_bot ℂ).1 hbb1
     have hz'G0 : z' ∈ G0 := by
@@ -293,14 +325,18 @@ end Key
 
 section Data
 
-variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] {ε : Fin n → Bool}
-  {lam : Fin n → ℝ} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {D : Submodule ℂ H}
-  {E : Fin n → Fin n → Module.End ℂ D} {V : Submodule ℂ D}
+variable
+  {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+  {ε : Fin n → Bool} {lam : Fin n → ℝ} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
+  {D : Submodule ℂ H} {E : Fin n → Fin n → Module.End ℂ D} {V : Submodule ℂ D}
 
-theorem data_kfin_le (hgap : StdGap ε lam) (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
+theorem data_kfin_le
+    (hgap : StdGap ε lam) (hσ : IsURepOn (UJset ε) σ) (hD : IsDerivedOn ε σ D E)
     (hV : IsKIrrHW ε E (lowK ε lam) V) (hc : ∀ v ∈ V, casimir E v = (casVal lam : ℂ) • v)
-    (hVK : ∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v) (S : Submodule ℂ H) (hS : S ≤ closGen E V) (hSf : FiniteDimensional ℂ S)
-    (hSK : ∀ k ∈ Kset ε, ∀ x ∈ S, σ k x ∈ S) : S ≤ (genSub E V).map D.subtype := by
+    (hVK : ∀ k ∈ Kset ε, ∀ v ∈ V, ∃ w ∈ V, (w : H) = σ k v)
+    (S : Submodule ℂ H)
+    (hS : S ≤ closGen E V) (hSf : FiniteDimensional ℂ S) (hSK : ∀ k ∈ Kset ε, ∀ x ∈ S, σ k x ∈ S)
+    : S ≤ (genSub E V).map D.subtype := by
   classical
   have hE := hD.glRep
   have hU : IsInfUnitary ε E := isInfUnitary_of_isDerivedOn hσ hD

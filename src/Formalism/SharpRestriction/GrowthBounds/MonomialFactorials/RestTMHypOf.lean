@@ -8,7 +8,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.G.SymmetricFormBlocks
 
-open MvPolynomial Finset Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.MainNotions.G.CountingStatementReduction
+open MvPolynomial Finset Formalism.MainNotions.G Formalism.MainNotions.flipOneThree
+  Formalism.MainNotions.G.CountingStatementReduction
 
 section Hyp
 
@@ -16,15 +17,21 @@ variable (C0 CE1 CE2 : ℝ) (X : flipOneThree.Inst)
 
 def RestTMSize : Prop :=
   ∀ dl ∈ clSet C0 CE1 CE2 X, ∀ a ∈ cbox C0 CE1 CE2 X dl, ∀ x ∈ idx C0 CE1 CE2 X dl a,
-    (∀ i, (XMof C0 CE1 CE2 X dl a x.1 x.2).T.S ((XMof C0 CE1 CE2 X dl a x.1 x.2).LL.setTies
-        (XMof C0 CE1 CE2 X dl a x.1 x.2).T (XMof C0 CE1 CE2 X dl a x.1 x.2).top) i ≤
-      (XMof C0 CE1 CE2 X dl a x.1 x.2).n₀ i) ∧
-    (∀ y, ((XMof C0 CE1 CE2 X dl a x.1 x.2).LL.setTies (XMof C0 CE1 CE2 X dl a x.1 x.2).T
-        (XMof C0 CE1 CE2 X dl a x.1 x.2).top).deg y ≤ 2 * X.L.a) ∧
-    (∀ i, (XMof C0 CE1 CE2 X dl a x.1 x.2).T.z i ≤ 2 * X.L.a) ∧
-    (∑ y, ((XMof C0 CE1 CE2 X dl a x.1 x.2).LL.setTies (XMof C0 CE1 CE2 X dl a x.1 x.2).T
-        (XMof C0 CE1 CE2 X dl a x.1 x.2).top).deg y) ≤ 8 * X.L.a ∧
-    1 ≤ X.L.a
+    (∀ i,
+        (XMof C0 CE1 CE2 X dl a x.1 x.2).T.S
+            ((XMof C0 CE1 CE2 X dl a x.1 x.2).LL.setTies (XMof C0 CE1 CE2 X dl a x.1 x.2).T
+              (XMof C0 CE1 CE2 X dl a x.1 x.2).top)
+            i
+          ≤ (XMof C0 CE1 CE2 X dl a x.1 x.2).n₀ i)
+      ∧ (∀ y,
+        ((XMof C0 CE1 CE2 X dl a x.1 x.2).LL.setTies (XMof C0 CE1 CE2 X dl a x.1 x.2).T
+            (XMof C0 CE1 CE2 X dl a x.1 x.2).top).deg y
+          ≤ 2 * X.L.a)
+      ∧ (∀ i, (XMof C0 CE1 CE2 X dl a x.1 x.2).T.z i ≤ 2 * X.L.a)
+      ∧ (∑ y, ((XMof C0 CE1 CE2 X dl a x.1 x.2).LL.setTies (XMof C0 CE1 CE2 X dl a x.1 x.2).T
+            (XMof C0 CE1 CE2 X dl a x.1 x.2).top).deg y)
+        ≤ 8 * X.L.a
+      ∧ 1 ≤ X.L.a
 
 variable {C0 CE1 CE2 X}
 
@@ -37,37 +44,42 @@ theorem lgA_ge_one (p a r : ℕ) (hp : 1 < p) (hr : 1 ≤ r) : 1 ≤ lgA p a r :
     linarith
   linarith
 
-theorem r_ge_two {CYb Cde Ck CD Cb Cc : ℝ} (hH : flipOneThree.HI C0 CYb Cde Ck CD Cb Cc X) : 2 ≤ X.r := by
+theorem r_ge_two {CYb Cde Ck CD Cb Cc : ℝ} (hH : flipOneThree.HI C0 CYb Cde Ck CD Cb Cc X)
+    : 2 ≤ X.r := by
   have h := hH.1.2.2.2.2.2.2.1
   have h1 := hH.1.2.2.2.2.2.1
   show 2 ≤ X.L.m
   omega
 
-theorem p_ne_two {CYb Cde Ck CD Cb Cc : ℝ} (hH : flipOneThree.HI C0 CYb Cde Ck CD Cb Cc X) : X.p ≠ 2 := by
+theorem p_ne_two {CYb Cde Ck CD Cb Cc : ℝ} (hH : flipOneThree.HI C0 CYb Cde Ck CD Cb Cc X)
+    : X.p ≠ 2 := by
   have h5 := X.std.1.five_le
   show X.L.p ≠ 2
   omega
 
-private theorem setTies_deg_succ_pos_eq_of_strictMono {N : ℕ} (LL : GM.M.Letters N) (T : GM.M.TieData) (n : Fin T.t → ℕ)
-    (hT : StrictMono T.pos) (i : Fin T.t) (h : T.pos i + 1 < N) :
-    (LL.setTies T n).deg ⟨T.pos i + 1, h⟩ = n i := by
+private theorem setTies_deg_succ_pos_eq_of_strictMono
+    {N : ℕ} (LL : GM.M.Letters N)
+    (T : GM.M.TieData) (n : Fin T.t → ℕ) (hT : StrictMono T.pos) (i : Fin T.t) (h : T.pos i + 1 < N)
+    : (LL.setTies T n).deg ⟨T.pos i + 1, h⟩ = n i := by
   have hex : ∃ j : Fin T.t, T.pos j + 1 = T.pos i + 1 := ⟨i, rfl⟩
   have hc : Classical.choose hex = i := hT.injective (by have := Classical.choose_spec hex; omega)
   show (if h' : ∃ j : Fin T.t, T.pos j + 1 = T.pos i + 1 then n (Classical.choose h')
     else LL.deg ⟨T.pos i + 1, h⟩) = n i
   rw [dite_eq_left hex, hc]
 
-
 set_option maxHeartbeats 400000 in
-theorem restTMHyp_of {CYb Cde Ck CD Cb Cc : ℝ} (hH : flipOneThree.HI C0 CYb Cde Ck CD Cb Cc X)
-    (hS : RestTMSize C0 CE1 CE2 X) : RestTMHyp C0 CE1 CE2 X := by
+theorem restTMHyp_of
+    {CYb Cde Ck CD Cb Cc : ℝ} (hH : flipOneThree.HI C0 CYb Cde Ck CD Cb Cc X)
+    (hS : RestTMSize C0 CE1 CE2 X)
+    : RestTMHyp C0 CE1 CE2 X := by
   intro dl hdl a ha x hx
   obtain ⟨hS1, hS2, hS3, hS4, hS5⟩ := hS dl hdl a ha x hx
   have hY : 1 ≤ X.L.Y := by
     obtain ⟨⟨hY, -⟩, -⟩ := hH
     exact hY
   set M := XMof C0 CE1 CE2 X dl a x.fst x.snd with hM
-  have hpos : ∀ l : Fin M.T.t, M.T.pos l = 2 * ((uTop (X.S C0 CE1 CE2) l : Fin X.s) : ℕ) := fun l => rfl
+  have hpos : ∀ l : Fin M.T.t, M.T.pos l = 2 * ((uTop (X.S C0 CE1 CE2) l : Fin X.s) : ℕ) := fun l =>
+    rfl
   have hlt : ∀ l : Fin M.T.t, M.T.pos l + 1 < 2 * M.s + 1 := by
     intro l
     rw [hpos l]
@@ -86,8 +98,10 @@ theorem restTMHyp_of {CYb Cde Ck CD Cb Cc : ℝ} (hH : flipOneThree.HI C0 CYb Cd
     have := hS2 ⟨M.T.pos i + 1, hlt i⟩
     rwa [setTies_deg_succ_pos_eq_of_strictMono _ _ _ hmono i (hlt i)] at this
   have hdd : ∀ i, M.dd i = 1 := fun i => rfl
-  have hYl : ∀ i, M.Yl i = (Nl C0 CE1 CE2 X dl x.snd i).sup id
-      - sInf ↑(Nl C0 CE1 CE2 X dl x.snd i) + 1 := fun i => rfl
+  have hYl
+      : ∀ i,
+        M.Yl i = (Nl C0 CE1 CE2 X dl x.snd i).sup id - sInf ↑(Nl C0 CE1 CE2 X dl x.snd i) + 1 :=
+    fun i => rfl
   have hYl1 : ∀ i, 1 ≤ M.Yl i := fun i => by rw [hYl i]; omega
   have htop' : ∀ i, M.top i = M.n₀ i + (M.Yl i - 1) := fun i => by
     show M.n₀ i + M.dd i * (M.Yl i - 1) = _

@@ -9,24 +9,28 @@ noncomputable section
 
 namespace PI.VolSemiDirect.W.Cj
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub MeasureTheory Measure
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub MeasureTheory
+  Measure
 open scoped TensorProduct Matrix
 
 section Bases
 
-variable (F E : Type) [Field F] [Field E] [Algebra F E] [FiniteDimensional F E] (M : ℕ)
+variable
+  (F E : Type) [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
+  (M : ℕ)
   (A : Type) [CommRing A] [Algebra F A]
 
 def bV : Module.Basis (Fin (Fintype.card (Σ _ : Fin M, Fin (Module.finrank F E)))) F (Fin M → E) :=
   (Pi.basis fun _ : Fin M => Module.finBasis F E).reindex (Fintype.equivFin _)
 
-def bVR : Module.Basis (Fin (Fintype.card (Σ _ : Fin M, Fin (Module.finrank F E)))) A
-    (Fin M → A ⊗[F] E) :=
+def bVR
+    : Module.Basis (Fin (Fintype.card (Σ _ : Fin M, Fin (Module.finrank F E)))) A
+      (Fin M → A ⊗[F] E) :=
   (Pi.basis fun _ : Fin M => Algebra.TensorProduct.basis A (Module.finBasis F E)).reindex
     (Fintype.equivFin _)
 
-theorem bVR_apply (i : Fin (Fintype.card (Σ _ : Fin M, Fin (Module.finrank F E)))) :
-    bVR F E M A i = ratV (F := F) A (bV F E M i) := by
+theorem bVR_apply (i : Fin (Fintype.card (Σ _ : Fin M, Fin (Module.finrank F E))))
+    : bVR F E M A i = ratV (F := F) A (bV F E M i) := by
   rw [bVR, bV, Module.Basis.reindex_apply, Module.Basis.reindex_apply]
   generalize (Fintype.equivFin (Σ _ : Fin M, Fin (Module.finrank F E))).symm i = p
   obtain ⟨a, c⟩ := p
@@ -55,12 +59,12 @@ theorem vMod_of (hO : OrthInv) (hB : TraceBase) (hN : TraceGramND) : VMod := by
   set bR := bVR F E M (AF F)
   set e : (Fin M → AF F ⊗[F] E) ≃ₗ[AF F] (Fin k → AF F) := bR.equivFun
   have c1 : Continuous e.toLinearMap := IsModuleTopology.continuous_of_linearMap (R := AF F) _
-  have c2 : Continuous e.symm.toLinearMap :=
-    IsModuleTopology.continuous_of_linearMap (R := AF F) _
-  let ec : (Fin M → AF F ⊗[F] E) ≃ₜ+ (Fin k → AF F) :=
-    { e.toAddEquiv with
-      continuous_toFun := by simpa using c1
-      continuous_invFun := by simpa using c2 }
+  have c2 : Continuous e.symm.toLinearMap := IsModuleTopology.continuous_of_linearMap (R := AF F) _
+  let ec : (Fin M → AF F ⊗[F] E) ≃ₜ+ (Fin k → AF F) := {
+    e.toAddEquiv with
+    continuous_toFun := by simpa using c1
+    continuous_invFun := by simpa using c2
+  }
   have hec : ∀ u, ec u = e u := fun _ => rfl
   have hecs : ∀ x, ec.symm x = e.symm x := fun _ => rfl
   set μ' := μ.map ec
@@ -96,8 +100,9 @@ theorem vMod_of (hO : OrthInv) (hB : TraceBase) (hN : TraceGramND) : VMod := by
     ext i j
     simpa using e1 (Pi.single i 1) (Pi.single j 1)
   have hinv := hO F k G X hGu hXG μ' hμ'
-  have hlin : (lin (AF F) σ J g : (Fin M → AF F ⊗[F] E) → (Fin M → AF F ⊗[F] E)) =
-      ec.symm ∘ X.mulVec ∘ ec := by
+  have hlin
+      : (lin (AF F) σ J g : (Fin M → AF F ⊗[F] E) → (Fin M → AF F ⊗[F] E))
+        = ec.symm ∘ X.mulVec ∘ ec := by
     funext u
     simp only [Function.comp_apply, hec, hecs, hX, LinearEquiv.symm_apply_apply]
   have mec : Measurable ec := ec.continuous.measurable

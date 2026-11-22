@@ -8,14 +8,17 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.RankPosO
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec
+  GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs
 open PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation
 
 namespace GlobalTheory.CompanionTheory.EGlue.SliceTypePf
 
-theorem restrict_left {A B : Type} [One B] (W₁ : Submodule ℂ (A → ℂ)) (W₂ : Submodule ℂ (B → ℂ)) (f : A × B → ℂ)
-    (hf : f ∈ Submodule.span ℂ {f : A × B → ℂ | ∃ w₁ ∈ W₁, ∃ w₂ ∈ W₂, f = fun k => w₁ k.1 * w₂ k.2}) :
-    (fun k : A => f (k, 1)) ∈ W₁ := by
+theorem restrict_left
+    {A B : Type} [One B]
+    (W₁ : Submodule ℂ (A → ℂ)) (W₂ : Submodule ℂ (B → ℂ)) (f : A × B → ℂ)
+    (hf : f ∈ Submodule.span ℂ {f : A × B → ℂ | ∃ w₁ ∈ W₁, ∃ w₂ ∈ W₂, f = fun k => w₁ k.1 * w₂ k.2})
+    : (fun k : A => f (k, 1)) ∈ W₁ := by
   induction hf using Submodule.span_induction with
   | mem f h =>
     obtain ⟨w₁, h₁, w₂, -, rfl⟩ := h
@@ -27,9 +30,11 @@ theorem restrict_left {A B : Type} [One B] (W₁ : Submodule ℂ (A → ℂ)) (W
   | add f g _ _ hf hg => exact W₁.add_mem hf hg
   | smul c f _ hf => exact W₁.smul_mem c hf
 
-theorem restrict_right {A B : Type} [One A] (W₁ : Submodule ℂ (A → ℂ)) (W₂ : Submodule ℂ (B → ℂ)) (f : A × B → ℂ)
-    (hf : f ∈ Submodule.span ℂ {f : A × B → ℂ | ∃ w₁ ∈ W₁, ∃ w₂ ∈ W₂, f = fun k => w₁ k.1 * w₂ k.2}) :
-    (fun k : B => f (1, k)) ∈ W₂ := by
+theorem restrict_right
+    {A B : Type} [One A]
+    (W₁ : Submodule ℂ (A → ℂ)) (W₂ : Submodule ℂ (B → ℂ)) (f : A × B → ℂ)
+    (hf : f ∈ Submodule.span ℂ {f : A × B → ℂ | ∃ w₁ ∈ W₁, ∃ w₂ ∈ W₂, f = fun k => w₁ k.1 * w₂ k.2})
+    : (fun k : B => f (1, k)) ∈ W₂ := by
   induction hf using Submodule.span_induction with
   | mem f h =>
     obtain ⟨w₁, -, w₂, h₂, rfl⟩ := h

@@ -17,13 +17,15 @@ universe u v w
 theorem CechPartition.proof : CechPartition.Statement.{u, v, w} := by
   intro S _ Ω _ E _ _ _ n U M m a b j hjU hab ha hb hloc p s hs hds
 
-  let T : Subring Ω :=
-    { carrier := {c | ∀ I, ∀ z ∈ M I, c • z ∈ M I}
-      mul_mem' := fun {x y} hx hy I z hz => by rw [mul_smul]; exact hx I _ (hy I z hz)
-      one_mem' := fun I z hz => by rwa [one_smul]
-      add_mem' := fun {x y} hx hy I z hz => by rw [add_smul]; exact (M I).add_mem (hx I z hz) (hy I z hz)
-      zero_mem' := fun I z _ => by rw [zero_smul]; exact (M I).zero_mem
-      neg_mem' := fun {x} hx I z hz => by rw [neg_smul]; exact (M I).neg_mem (hx I z hz) }
+  let T : Subring Ω := {
+    carrier := {c | ∀ I, ∀ z ∈ M I, c • z ∈ M I}
+    mul_mem' := fun {x y} hx hy I z hz => by rw [mul_smul]; exact hx I _ (hy I z hz)
+    one_mem' := fun I z hz => by rwa [one_smul]
+    add_mem' := fun {x y} hx hy I z hz => by
+      rw [add_smul]; exact (M I).add_mem (hx I z hz) (hy I z hz)
+    zero_mem' := fun I z _ => by rw [zero_smul]; exact (M I).zero_mem
+    neg_mem' := fun {x} hx I z hz => by rw [neg_smul]; exact (M I).neg_mem (hx I z hz)
+  }
   have hT : ∀ c ∈ T, ∀ I, ∀ z ∈ M I, c • z ∈ M I := fun c hc => hc
   let b' : Fin m → T := fun k => ⟨b k, hb k⟩
 
@@ -33,17 +35,20 @@ theorem CechPartition.proof : CechPartition.Statement.{u, v, w} := by
     rw [← h1]
     exact Ideal.sum_mem _ fun k _ => Ideal.mul_mem_left _ _ (Ideal.subset_span ⟨k, rfl⟩)
 
-  have hex : ∀ (k : Fin m) (K : Cech.Idx U p), ∃ e0 : ℕ, j k ∉ K.1.1 →
-      b k ^ e0 • Cech.Partition.onSet s (insert (j k) K.1.1) ∈ M K.1 := by
+  have hex
+      : ∀ (k : Fin m) (K : Cech.Idx U p), ∃ e0 : ℕ,
+        j k ∉ K.1.1 → b k ^ e0 • Cech.Partition.onSet s (insert (j k) K.1.1) ∈ M K.1 := by
     intro k K
     by_cases hk : j k ∈ K.1.1
     · exact ⟨0, fun h => absurd hk h⟩
-    · let I' : Cell U := ⟨insert (j k) K.1.1, Finset.insert_nonempty _ _, Finset.insert_subset (hjU k) K.1.2.2⟩
+    · let I' : Cell U :=
+        ⟨insert (j k) K.1.1, Finset.insert_nonempty _ _, Finset.insert_subset (hjU k) K.1.2.2⟩
       have hI' : I'.1.card = p + 1 + 1 := by
         change (insert (j k) K.1.1).card = p + 1 + 1
         rw [Finset.card_insert_of_notMem hk, K.2]
       have hz : Cech.Partition.onSet s (insert (j k) K.1.1) ∈ M I' := by
-        rw [show insert (j k) K.1.1 = (⟨I', hI'⟩ : Cech.Idx U (p + 1)).1.1 from rfl, Cech.Partition.onSet_idx]
+        rw [show insert (j k) K.1.1 = (⟨I', hI'⟩ : Cech.Idx U (p + 1)).1.1 from rfl,
+          Cech.Partition.onSet_idx]
         exact (Submodule.mem_pi.mp hs) ⟨I', hI'⟩ (Set.mem_univ _)
       obtain ⟨e0, he0⟩ := hloc k K.1 I' rfl _ hz
       exact ⟨e0, fun _ => he0⟩

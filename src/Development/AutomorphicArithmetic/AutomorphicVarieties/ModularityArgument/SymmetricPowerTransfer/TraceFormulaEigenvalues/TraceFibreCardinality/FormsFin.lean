@@ -4,8 +4,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-theorem UpperTheory.V.Z.Sym.Tf.formsFin :
-    UpperTheory.V.Z.Sym.Tf.FormsFin := by
+theorem UpperTheory.V.Z.Sym.Tf.formsFin : UpperTheory.V.Z.Sym.Tf.FormsFin := by
   intro Γ G V _ _ _ _ _ B hB
   obtain ⟨S, hS⟩ := hB.cls
   let L : B.Forms →ₗ[ℂ] (S → V) :=

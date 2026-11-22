@@ -7,17 +7,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 open scoped Pointwise
 
-private theorem val_lt_iff {Ω : Type} [Field Ω] {A B : ValuationSubring Ω} (g : Ω ≃+* Ω)
-    (h : ∀ x, g x ∈ A ↔ x ∈ B) (y : Ω) : A.valuation (g y) < 1 ↔ B.valuation y < 1 := by
+private theorem val_lt_iff
+    {Ω : Type} [Field Ω] {A B : ValuationSubring Ω} (g : Ω ≃+* Ω) (h : ∀ x, g x ∈ A ↔ x ∈ B) (y : Ω)
+    : A.valuation (g y) < 1 ↔ B.valuation y < 1 := by
   rw [valuation_lt_one_iff', valuation_lt_one_iff', h, ← map_inv₀, h, map_eq_zero_iff g g.injective]
 
-private theorem card_eq {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
-    (l : ℕ) [hl : Fact l.Prime] {ι : Type} (pl : ι → ValuationSubring Ω) (ovl : ∀ v, (pl v).valuation (l : Ω) < 1)
-    (cover : ∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 → ∃! v, ∃ g : G F Ω, ∀ x, g x ∈ A ↔ x ∈ pl v) :
-    Nat.card ι = ((Ideal.span {(l : ℤ)}).primesOver (𝓞 F)).ncard := by
+private theorem card_eq
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    (l : ℕ) [hl : Fact l.Prime]
+    {ι : Type} (pl : ι → ValuationSubring Ω) (ovl : ∀ v, (pl v).valuation (l : Ω) < 1)
+    (cover : ∀ A : ValuationSubring Ω,
+      A.valuation (l : Ω) < 1 → ∃! v, ∃ g : G F Ω, ∀ x, g x ∈ A ↔ x ∈ pl v)
+    : Nat.card ι = ((Ideal.span {(l : ℤ)}).primesOver (𝓞 F)).ncard := by
   classical
   have hlp : l.Prime := hl.out
   have hplace : ∀ v, ∃ w : HeightOneSpectrum (𝓞 F), IsPlaceOver (pl v) w := fun v => by
@@ -25,14 +31,17 @@ private theorem card_eq {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Alge
     · exact absurd (ovl v) ((places F Ω l (pl v)).2.1 htop).2
     · exact (places F Ω l (pl v)).1 htop
   choose w hw using hplace
-  have huniq : ∀ {A : ValuationSubring Ω} {w₁ w₂ : HeightOneSpectrum (𝓞 F)},
-      IsPlaceOver A w₁ → IsPlaceOver A w₂ → w₁ = w₂ := by
+  have huniq
+      : ∀ {A : ValuationSubring Ω} {w₁ w₂ : HeightOneSpectrum (𝓞 F)},
+        IsPlaceOver A w₁ → IsPlaceOver A w₂ → w₁ = w₂ := by
     intro A w₁ w₂ h₁ h₂
     apply HeightOneSpectrum.ext
     ext x
     rw [← h₁ x, ← h₂ x]
-  have htrans : ∀ {A B : ValuationSubring Ω} (g : G F Ω), (∀ x, g x ∈ A ↔ x ∈ B) →
-      ∀ u : HeightOneSpectrum (𝓞 F), IsPlaceOver A u → IsPlaceOver B u := by
+  have htrans
+      : ∀ {A B : ValuationSubring Ω} (g : G F Ω),
+        (∀ x, g x ∈ A ↔ x ∈ B)
+          → ∀ u : HeightOneSpectrum (𝓞 F), IsPlaceOver A u → IsPlaceOver B u := by
     intro A B g hg u hA x
     rw [← hA x, ← val_lt_iff g.toRingEquiv hg]
     simp only [AlgEquiv.coe_ringEquiv, AlgEquiv.commutes]
@@ -44,12 +53,13 @@ private theorem card_eq {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Alge
     have e1 := hv v₁ ⟨σ, fun x => by rw [← hσ]; exact ValuationSubring.smul_mem_pointwise_smul_iff⟩
     have e2 := hv v₂ ⟨1, fun x => by simp⟩
     rw [e1, e2]
-  have hinj' : Function.Injective (fun v => (w v).asIdeal) :=
-    fun a b h => hinj (HeightOneSpectrum.ext h)
+  have hinj' : Function.Injective (fun v => (w v).asIdeal) := fun a b h =>
+    hinj (HeightOneSpectrum.ext h)
   have hmax : (Ideal.span {(l : ℤ)}).IsMaximal :=
     PrincipalIdealRing.isMaximal_of_irreducible (Nat.prime_iff_prime_int.mp hlp).irreducible
-  have habove : ∀ (A : ValuationSubring Ω) (u : HeightOneSpectrum (𝓞 F)), IsPlaceOver A u →
-      (A.valuation (l : Ω) < 1 ↔ (l : 𝓞 F) ∈ u.asIdeal) := by
+  have habove
+      : ∀ (A : ValuationSubring Ω) (u : HeightOneSpectrum (𝓞 F)),
+        IsPlaceOver A u → (A.valuation (l : Ω) < 1 ↔ (l : 𝓞 F) ∈ u.asIdeal) := by
     intro A u hu
     simpa only [map_natCast] using (hu (l : 𝓞 F))
   rw [← Nat.card_range_of_injective hinj', _root_.Nat.card_coe_set_eq]
@@ -78,14 +88,19 @@ private theorem card_eq {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Alge
     obtain ⟨v, ⟨g, hg⟩, -⟩ := cover A hAl
     exact ⟨v, congrArg HeightOneSpectrum.asIdeal (huniq (hw v) (htrans g hg u hA))⟩
 
-theorem UpperTheory.V.Ws.chDv :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c) (T : Tower D), ∃ dv : ℕ, dv * Nat.card T.ι = T.d := by
+theorem UpperTheory.V.Ws.chDv
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c) (T : Tower D),
+      ∃ dv : ℕ,
+        dv * Nat.card T.ι = T.d := by
   intro Ω _ _ _ l hl c D T
   haveI : IsAlgClosure T.F Ω :=
     { isAlgClosed := IsAlgClosure.isAlgClosed ℚ
       isAlgebraic := haveI : Algebra.IsAlgebraic ℚ Ω := IsAlgClosure.isAlgebraic
         Algebra.IsAlgebraic.tower_top (K := ℚ) T.F }
   haveI hmax : (Ideal.span {(l : ℤ)}).IsMaximal := Int.ideal_span_isMaximal_of_prime l
-  have h := Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn (Ideal.span {(l : ℤ)}) (𝓞 T.F) (T.F ≃ₐ[ℚ] T.F)
+  have h :=
+    Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn (Ideal.span {(l : ℤ)}) (𝓞 T.F)
+      (T.F ≃ₐ[ℚ] T.F)
   rw [IsGalois.card_aut_eq_finrank, ← card_eq l T.pl T.ovl T.cover] at h
   exact ⟨_, (mul_comm _ _).trans h⟩

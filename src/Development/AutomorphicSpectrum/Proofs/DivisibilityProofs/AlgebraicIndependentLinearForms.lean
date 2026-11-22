@@ -9,16 +9,21 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Top.FlDeg.LinKer
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
-open GroundTheory.Heights₂.Heights.LowerBoundFree GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top GlobalTheory.CompanionTheory.Ar.Top.FlDeg
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+open GroundTheory.Heights₂.Heights.LowerBoundFree GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Top GlobalTheory.CompanionTheory.Ar.Top.FlDeg
 
-theorem algebraicIndependent_linearForms {F E : Type} [Field F] [Field E] [Algebra F E]
-    {D κ : Type} [Fintype D] [Fintype κ] (u : D → E) (hu : AlgebraicIndependent F u)
-    (v : κ → D → F) (hv : LinearIndependent F v) :
-    AlgebraicIndependent F fun i => ∑ c, algebraMap F E (v i c) * u c := by
+theorem algebraicIndependent_linearForms
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    {D κ : Type} [Fintype D] [Fintype κ]
+    (u : D → E) (hu : AlgebraicIndependent F u)
+    (v : κ → D → F) (hv : LinearIndependent F v)
+    : AlgebraicIndependent F fun i => ∑ c, algebraMap F E (v i c) * u c := by
   classical
-  obtain ⟨T, hT⟩ := LinearMap.exists_leftInverse_of_injective (Fintype.linearCombination F v)
-    (LinearMap.ker_eq_bot.2 hv.fintypeLinearCombination_injective)
+  obtain ⟨T, hT⟩ :=
+    LinearMap.exists_leftInverse_of_injective (Fintype.linearCombination F v)
+      (LinearMap.ker_eq_bot.2 hv.fintypeLinearCombination_injective)
   have hTv : ∀ i, T (v i) = Pi.single i 1 := by
     intro i
     have := LinearMap.congr_fun hT (Pi.single i 1)
@@ -31,7 +36,7 @@ theorem algebraicIndependent_linearForms {F E : Type} [Field F] [Field E] [Algeb
     rw [← hTv i]
     conv_rhs => rw [hvi]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, Finset.sum_apply]
+    simp [map_sum, Finset.sum_apply]
   let A : MvPolynomial κ F →ₐ[F] MvPolynomial D F :=
     aeval fun i => ∑ c, MvPolynomial.C (v i c) * MvPolynomial.X c
   let B : MvPolynomial D F →ₐ[F] MvPolynomial κ F :=
@@ -41,7 +46,7 @@ theorem algebraicIndependent_linearForms {F E : Type} [Field F] [Field E] [Algeb
     intro i
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [A, B, AlgHom.comp_apply, aeval_X, map_sum, map_mul, algHom_C, AlgHom.id_apply,
-      algebraMap_eq, Finset.mul_sum]
+        algebraMap_eq, Finset.mul_sum]
     rw [Finset.sum_comm]
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [← mul_assoc, ← MvPolynomial.C_mul, ← Finset.sum_mul, ← map_sum, hdual]
@@ -49,27 +54,30 @@ theorem algebraicIndependent_linearForms {F E : Type} [Field F] [Field E] [Algeb
   have hA : Function.Injective A := by
     intro f g h
     have := congrArg B h
-    have e : ∀ f, B (A f) = f := fun f => by
-      simpa using DFunLike.congr_fun hBA f
+    have e : ∀ f, B (A f) = f := fun f => by simpa using DFunLike.congr_fun hBA f
     rwa [e, e] at this
-  have hcomp : (aeval fun i => ∑ c, algebraMap F E (v i c) * u c : MvPolynomial κ F →ₐ[F] E) =
-      (aeval u).comp A := by
+  have hcomp
+      : (aeval fun i => ∑ c, algebraMap F E (v i c) * u c : MvPolynomial κ F →ₐ[F] E)
+        = (aeval u).comp A := by
     apply MvPolynomial.algHom_ext
     intro i
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [A, map_sum, aeval_X, algHom_C]
-  have : Function.Injective (aeval fun i => ∑ c, algebraMap F E (v i c) * u c :
-      MvPolynomial κ F →ₐ[F] E) := by
+    simp [A, map_sum, aeval_X, algHom_C]
+  have : Function.Injective
+      (aeval fun i => ∑ c, algebraMap F E (v i c) * u c : MvPolynomial κ F →ₐ[F] E) := by
     rw [hcomp]
     exact Function.Injective.comp (f := A) hu hA
   exact this
 
-theorem ker_eq_span_homogeneous {F E : Type} [Field F] [Field E] [Algebra F E]
-    {P D : Type} [Fintype P] [Fintype D] (u : D → E) (hu : AlgebraicIndependent F u)
-    (l : P → D → F) :
-    RingHom.ker (aeval (fun p => ∑ c, algebraMap F E (l p c) * u c) : MvPolynomial P F →ₐ[F] E) =
-      Ideal.span {f : MvPolynomial P F | f.IsHomogeneous 1 ∧
-        aeval (fun p => ∑ c, algebraMap F E (l p c) * u c) f = 0} := by
+theorem ker_eq_span_homogeneous
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    {P D : Type} [Fintype P] [Fintype D]
+    (u : D → E) (hu : AlgebraicIndependent F u)
+    (l : P → D → F)
+    : RingHom.ker (aeval (fun p => ∑ c, algebraMap F E (l p c) * u c) : MvPolynomial P F →ₐ[F] E)
+      = Ideal.span
+        {f : MvPolynomial P F | f.IsHomogeneous 1 ∧
+          aeval (fun p => ∑ c, algebraMap F E (l p c) * u c) f = 0} := by
   classical
   set x : P → E := fun p => ∑ c, algebraMap F E (l p c) * u c with hx
   set S : Set (MvPolynomial P F) := {f | f.IsHomogeneous 1 ∧ aeval x f = 0} with hS
@@ -89,7 +97,7 @@ theorem ker_eq_span_homogeneous {F E : Type} [Field F] [Field E] [Algebra F E]
   have hρX : ∀ p, ρ (MvPolynomial.X p) = ∑ i, MvPolynomial.C (c p i) * MvPolynomial.X (a i) := by
     intro p
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [ρ, ρ', map_sum, aeval_X, rename_C, rename_X]
+    simp [ρ, ρ', map_sum, aeval_X, rename_C, rename_X]
   have hxp : ∀ p, x p = ∑ i, algebraMap F E (c p i) * x (a i) := by
     intro p
     simp only [hx, Finset.mul_sum]
@@ -134,8 +142,7 @@ theorem ker_eq_span_homogeneous {F E : Type} [Field F] [Field E] [Algebra F E]
     have h2 : aeval x (f - ρ f) = 0 := this
     rw [map_sub, hf0, zero_sub, neg_eq_zero] at h2
     exact h2
-  have hind : AlgebraicIndependent F (x ∘ a) :=
-    algebraicIndependent_linearForms u hu (l ∘ a) hli
+  have hind : AlgebraicIndependent F (x ∘ a) := algebraicIndependent_linearForms u hu (l ∘ a) hli
   have h2 : ρ' f = 0 := by
     apply hind
     rw [map_zero, ← h1]
@@ -143,12 +150,17 @@ theorem ker_eq_span_homogeneous {F E : Type} [Field F] [Field E] [Algebra F E]
   have h3 : ρ f = 0 := by simp [ρ, h2]
   simpa [h3] using hdiff f
 
-theorem ker_linearForms_span : ∀ (F E : Type) [Field F] [Field E] [Algebra F E] (K : Type) [Fintype K]
-    (ι : K → Type) [∀ k, Fintype (ι k)] (k₀ : K), (∀ a : K, a = k₀) → ∀ (C : Type) [Fintype C]
-    (u : C → E) (l : (Σ k, ι k) → C → F), AlgebraicIndependent F u →
-    ∃ S : Set (MRingOver F ι), (∀ f ∈ S, IsMultiHomog f fun _ => 1) ∧
-      RingHom.ker (aeval (fun p => ∑ c, algebraMap F E (l p c) * u c) : MRingOver F ι →ₐ[F] E) =
-        Ideal.span S := by
+theorem ker_linearForms_span
+    : ∀ (F E : Type) [Field F] [Field E] [Algebra F E] (K : Type) [Fintype K] (ι : K → Type)
+        [∀ k, Fintype (ι k)] (k₀ : K),
+      (∀ a : K, a = k₀)
+        → ∀ (C : Type) [Fintype C] (u : C → E) (l : (Σ k, ι k) → C → F),
+          AlgebraicIndependent F u
+            → ∃ S : Set (MRingOver F ι),
+              (∀ f ∈ S, IsMultiHomog f fun _ => 1)
+                ∧ RingHom.ker
+                    (aeval (fun p => ∑ c, algebraMap F E (l p c) * u c) : MRingOver F ι →ₐ[F] E)
+                  = Ideal.span S := by
   intro F E _ _ _ K _ ι _ k₀ hk C _ u l hu
   refine ⟨_, ?_, ker_eq_span_homogeneous u hu l⟩
   rintro f ⟨hf, -⟩ m hm k
@@ -157,8 +169,7 @@ theorem ker_linearForms_span : ∀ (F E : Type) [Field F] [Field E] [Algebra F E
       rw [Finsupp.degree_eq_weight_one]
       exact hf (mem_support_iff.1 hm)
     rw [← h, Finsupp.degree_apply]
-    exact (Finset.sum_subset (Finset.subset_univ _)
-      fun p _ hp => by simpa using hp).symm
+    exact (Finset.sum_subset (Finset.subset_univ _) fun p _ hp => by simpa using hp).symm
   rw [Fintype.sum_sigma] at hd
   have hk' : ∀ j : K, j = k := fun j => (hk j).trans (hk k).symm
   rw [Fintype.sum_eq_single k (fun j hj => absurd (hk' j) hj)] at hd

@@ -15,13 +15,13 @@ open scoped BigOperators
 namespace GlobalTheory.Ex.Nest
 variable {O : Type} [CommRing O] (N : NumD O)
 
-theorem wQ_nest {n k l : ℕ} (hk : Odd k) (hl : Odd l) (e : l = n * (k * n)) (p'' : N.QT l) (p : N.QT k)
-    (hy : p''.1.1 = p.1.1 ^ n) (hg : p.1.2 = p''.1.2 ^ n) :
-    N.wQ p * mulq N.θ N.σ n p''.1.2.b ^ k = N.wQ p'' := by
+theorem wQ_nest
+    {n k l : ℕ} (hk : Odd k) (hl : Odd l) (e : l = n * (k * n)) (p'' : N.QT l) (p : N.QT k)
+    (hy : p''.1.1 = p.1.1 ^ n) (hg : p.1.2 = p''.1.2 ^ n)
+    : N.wQ p * mulq N.θ N.σ n p''.1.2.b ^ k = N.wQ p'' := by
   subst e
   have hb : p.1.2.b = p''.1.2.b ^ n := by rw [hg, NumD.Gt.pow_b]
-  have hc : N.c p.1.1.toAdd = p''.1.2.b ^ (k * n) := by
-    rw [← N.QT_pow_b p, hb, ← pow_mul']
+  have hc : N.c p.1.1.toAdd = p''.1.2.b ^ (k * n) := by rw [← N.QT_pow_b p, hb, ← pow_mul']
   have hy' : p''.1.1.toAdd = n • p.1.1.toAdd := by rw [hy, toAdd_pow]
   obtain ⟨hA, hB⟩ := (SymLift.wQ_iff N hk p (N.wQ p)).mp rfl
   refine (SymLift.wQ_iff N hl p'' _).mpr ⟨?_, ?_⟩
@@ -61,7 +61,11 @@ theorem wQ_nest {n k l : ℕ} (hk : Odd k) (hl : Odd l) (e : l = n * (k * n)) (p
     linear_combination (norm := module)
       ((n : ℤ) ^ 2) • hB - hψ - hm1 - ((n : ℤ) ^ 2) • hm2
 
-theorem txT_nest : ∀ (O : Type) [CommRing O] (N : NumD O), ∀ (n m : ℕ), Odd n → Odd m → ∀ (p'' : N.QT ((n * m) ^ 2)) (p : N.QT (m ^ 2)), p''.1.1 = p.1.1 ^ n → p.1.2 = p''.1.2 ^ n → ∀ χ, N.txT (n * m) p'' χ = N.txT m p χ := by
+theorem txT_nest
+    : ∀ (O : Type) [CommRing O] (N : NumD O), ∀ (n m : ℕ),
+      Odd n → Odd m
+        → ∀ (p'' : N.QT ((n * m) ^ 2)) (p : N.QT (m ^ 2)),
+          p''.1.1 = p.1.1 ^ n → p.1.2 = p''.1.2 ^ n → ∀ χ, N.txT (n * m) p'' χ = N.txT m p χ := by
   intro O _ N n m hn hm p'' p hy hg χ
   have hw := wQ_nest N hm.pow (hn.mul hm).pow (by ring) p'' p hy hg
   have hq := (GlobalTheory.T.mulq_dbl_cubN_relations O N.toNumB m n p''.1.2.b p''.1.2.b).1

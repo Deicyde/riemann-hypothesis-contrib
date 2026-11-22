@@ -86,9 +86,10 @@ lemma approxGraph_two {r p : ℕ} {μ ρ : ℝ} (X : Fin r → Fin r → ℂ) (h
     hs.trans (by nlinarith)
   nlinarith [mul_le_mul hs' hs' hA (by linarith : (0 : ℝ) ≤ ‖euc (negPart p y)‖ / 3)]
 
-private theorem exists_coeffs_of_mem_span_lemma {r p : ℕ} (X : Fin r → Fin r → ℂ) {u : Fin r → ℂ}
-    (hu : u ∈ Submodule.span ℂ (X '' {j | (j : ℕ) < p})) :
-    ∃ w : Fin r → ℂ, (∀ j : Fin r, p ≤ (j : ℕ) → w j = 0) ∧ u = ∑ j, w j • X j := by
+private theorem exists_coeffs_of_mem_span_lemma
+    {r p : ℕ} (X : Fin r → Fin r → ℂ)
+    {u : Fin r → ℂ} (hu : u ∈ Submodule.span ℂ (X '' {j | (j : ℕ) < p}))
+    : ∃ w : Fin r → ℂ, (∀ j : Fin r, p ≤ (j : ℕ) → w j = 0) ∧ u = ∑ j, w j • X j := by
   induction hu using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨j, hj, rfl⟩ := hx
@@ -97,7 +98,8 @@ private theorem exists_coeffs_of_mem_span_lemma {r p : ℕ} (X : Fin r → Fin r
       simp [hkj]
     · rw [Finset.sum_eq_single j (fun k _ hk => by simp [hk]) (by simp)]
       simp
-  | zero => exact ⟨0, fun _ _ => rfl, by simp⟩
+  | zero =>
+    exact ⟨0, fun _ _ => rfl, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨a, ha, rfl⟩ := hx
     obtain ⟨b, hb, rfl⟩ := hy

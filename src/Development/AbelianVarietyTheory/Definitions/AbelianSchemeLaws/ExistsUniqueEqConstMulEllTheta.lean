@@ -24,7 +24,8 @@ set_option autoImplicit false
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.WeierstrassCurve GlobalTheory.AddLaw
 
 namespace GlobalTheory.WeierstrassCurve
@@ -33,10 +34,11 @@ variable {R : Type} [CommRing R] (W : _root_.WeierstrassCurve R)
 
 variable [W.IsElliptic]
 
-theorem appLE_originSec_eq_zero_iff_eSec (T : Scheme.{0}) (t : T ⟶ (schemeOver W).left)
-    (i : (originLB W).ι) (h : ⊤ ≤ t ⁻¹ᵁ (originLB W).U i) :
-    (t.appLE ((originLB W).U i) ⊤ h).hom ((originSec W).f i) = 0 ↔
-      t = t ≫ (schemeOver W).hom ≫ eSec (schemeOver W) := by
+theorem appLE_originSec_eq_zero_iff_eSec
+    (T : Scheme.{0}) (t : T ⟶ (schemeOver W).left)
+    (i : (originLB W).ι) (h : ⊤ ≤ t ⁻¹ᵁ (originLB W).U i)
+    : (t.appLE ((originLB W).U i) ⊤ h).hom ((originSec W).f i) = 0
+      ↔ t = t ≫ (schemeOver W).hom ≫ eSec (schemeOver W) := by
   rw [show eSec (schemeOver W) = zero W from one_left W]
   exact appLE_originSec_eq_zero_iff W t i h
 
@@ -54,7 +56,8 @@ theorem sym_originLB : Out.Sym (schemeOver W) (originLB W) := by
   refine SameZeroScheme.exists_isGen_linComb (schemeOver W).left _ (originLB W) (originSec W) _ _
     (originLB_isLB W)
     (fun i V h => SymOfZeroDivisor.appLE_mem_nonZeroDivisors _ _ _ (hreg i) V h)
-    (fun i V h => SymOfZeroDivisor.appLE_mem_nonZeroDivisors _ _ _ (hreg i) V h) ?_
+    (fun i V h => SymOfZeroDivisor.appLE_mem_nonZeroDivisors _ _ _ (hreg i) V h)
+    ?_
   intro T t i j h h'
   rw [appLE_originSec_eq_zero_iff_eSec, appLE_originSec_eq_zero_iff_eSec, ← Category.assoc t]
   exact SymOfZeroDivisor.inv_eq_zero_iff (schemeOver W) _
@@ -79,25 +82,29 @@ def ellPolAV : Out.PolAV (Spec (CommRingCat.of R)) where
   ample := relAmple_originLB W
   ktriv := kTriv_originLB W
 
-@[simp] theorem ellPolAV_g : (ellPolAV W).g = 1 := rfl
+@[simp]
+theorem ellPolAV_g : (ellPolAV W).g = 1 := rfl
 
 theorem eSec_ellPolAV : eSec (ellPolAV W).A = zero W := one_left W
 
 def ellTheta : (ellPolAV W).L.Sec := originSec W
 
-theorem exists_isLieBasis_ellPolAV : ∃ v : epsR R ⟶ (ellPolAV W).A,
-    (∃ h : IsUnimodularSol (W.map (algebraMap R (DualNumber R))) ![DualNumber.eps, -1, 0],
-      v.left = ptHom W (algebraMap R (DualNumber R)) ![DualNumber.eps, -1, 0] h) ∧
-    IsLieBasis ![v] :=
+theorem exists_isLieBasis_ellPolAV
+    : ∃ v : epsR R ⟶ (ellPolAV W).A,
+      (∃ h : IsUnimodularSol (W.map (algebraMap R (DualNumber R))) ![DualNumber.eps, -1, 0],
+          v.left = ptHom W (algebraMap R (DualNumber R)) ![DualNumber.eps, -1, 0] h)
+        ∧ IsLieBasis ![v] :=
   WeierstrassLie.isLieBasis_eps R W (one_left W)
 
 section BaseChange
 
-variable {R' : Type} [CommRing R'] {W' : _root_.WeierstrassCurve R'} [W'.IsElliptic]
+variable
+  {R' : Type} [CommRing R']
+  {W' : _root_.WeierstrassCurve R'} [W'.IsElliptic]
   (f : R →+* R') (h : W.map f = W')
 
-theorem isGrpPullback_ellPolAV :
-    IsGrpPullback (ellPolAV W').A (ellPolAV W).A (spMap f) (mapHom W f h) :=
+theorem isGrpPullback_ellPolAV
+    : IsGrpPullback (ellPolAV W').A (ellPolAV W).A (spMap f) (mapHom W f h) :=
   isGrpPullback_mapHom W f h
 
 theorem lbIso_ellPolAV : LBIso (ellPolAV W').L ((ellPolAV W).L.pull (mapHom W f h)) :=
@@ -105,10 +112,11 @@ theorem lbIso_ellPolAV : LBIso (ellPolAV W').L ((ellPolAV W).L.pull (mapHom W f 
 
 end BaseChange
 
-theorem not_isGen_ellPolAV [Nontrivial R] (t : (ellPolAV W).L.Gen) : ¬ t.IsGen :=
+theorem not_isGen_ellPolAV [Nontrivial R] (t : (ellPolAV W).L.Gen) : ¬t.IsGen :=
   not_isGen_originLB W t
 
-theorem weierstrass_0_0_1_neg_one_0_isElliptic : (⟨0, 0, 1, -1, 0⟩ : _root_.WeierstrassCurve ℚ).IsElliptic :=
+theorem weierstrass_0_0_1_neg_one_0_isElliptic
+    : (⟨0, 0, 1, -1, 0⟩ : _root_.WeierstrassCurve ℚ).IsElliptic :=
   ⟨by
     have : (⟨0, 0, 1, -1, 0⟩ : _root_.WeierstrassCurve ℚ).Δ = 37 := by
       norm_num [WeierstrassCurve.Δ, WeierstrassCurve.b₂, WeierstrassCurve.b₄, WeierstrassCurve.b₆,

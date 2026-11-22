@@ -29,20 +29,23 @@ private lemma deg_one {σ : Type} [DecidableEq σ] (d : σ →₀ ℕ) (h : d.de
 end DegreeOneCoeffSubstitution
 
 open MvPowerSeries Finsupp in
-theorem UpperTheory.Reformulated.B.LinearTermOfSubstitution.main :
-    ∀ {S : Type}
-    [inst : CommRing S] {σ τ : Type} [inst_1 : Fintype σ] [DecidableEq σ] [DecidableEq τ] (a : σ → MvPowerSeries τ S),
-    (∀ (s : σ), (MvPowerSeries.constantCoeff : MvPowerSeries τ S → S) (a s) = (0 : S)) →
-      ∀ (f : MvPowerSeries σ S) (t : τ),
-        (MvPowerSeries.coeff fun₀ | t => (1 : ℕ) : MvPowerSeries τ S → S) (MvPowerSeries.subst a f) =
-          ∑ s : σ,
-            (MvPowerSeries.coeff fun₀ | s => (1 : ℕ) : MvPowerSeries σ S → S) f *
-              (MvPowerSeries.coeff fun₀ | t => (1 : ℕ) : MvPowerSeries τ S → S) (a s) := by
+theorem UpperTheory.Reformulated.B.LinearTermOfSubstitution.main
+    : ∀ {S : Type} [inst : CommRing S] {σ τ : Type} [inst_1 : Fintype σ] [DecidableEq σ]
+        [DecidableEq τ] (a : σ → MvPowerSeries τ S),
+      (∀ (s : σ), (MvPowerSeries.constantCoeff : MvPowerSeries τ S → S) (a s) = (0 : S))
+        → ∀ (f : MvPowerSeries σ S) (t : τ),
+          (MvPowerSeries.coeff fun₀ | t => (1 : ℕ) : MvPowerSeries τ S → S) (MvPowerSeries.subst a
+              f)
+            = ∑ s : σ,
+                (MvPowerSeries.coeff fun₀ | s => (1 : ℕ) : MvPowerSeries σ S → S) f *
+                  (MvPowerSeries.coeff fun₀ | t => (1 : ℕ) : MvPowerSeries τ S → S) (a s) := by
   intro S _ σ τ _ _ _ a ha f t
   have hS : HasSubst a := hasSubst_of_constantCoeff_zero ha
   rw [coeff_subst hS]
-  have key : ∀ d : σ →₀ ℕ, d ∉ Finset.univ.image (fun s => Finsupp.single s 1) →
-      coeff (Finsupp.single t 1) (d.prod fun s e => a s ^ e) = 0 := by
+  have key
+      : ∀ d : σ →₀ ℕ,
+        d ∉ Finset.univ.image (fun s => Finsupp.single s 1)
+          → coeff (Finsupp.single t 1) (d.prod fun s e => a s ^ e) = 0 := by
     intro d hd
     by_cases h0 : d = 0
     · subst h0
@@ -58,11 +61,13 @@ theorem UpperTheory.Reformulated.B.LinearTermOfSubstitution.main :
     apply coeff_of_lt_order
     rw [Finsupp.degree_single]
     refine lt_of_lt_of_le ?_ (le_order_prod _ _)
-    calc ((1 : ℕ) : ℕ∞) < 2 := by norm_num
+    calc
+      ((1 : ℕ) : ℕ∞)
+        < 2 := by norm_num
       _ ≤ ((d.degree : ℕ) : ℕ∞) := by exact_mod_cast h2
       _ = ∑ i ∈ d.support, ((d i : ℕ) : ℕ∞) := by rw [degree_apply]; push_cast; rfl
       _ ≤ ∑ i ∈ d.support, (a i ^ d i).order :=
-          Finset.sum_le_sum fun i _ => le_order_pow_of_constantCoeff_eq_zero _ (ha i)
+        Finset.sum_le_sum fun i _ => le_order_pow_of_constantCoeff_eq_zero _ (ha i)
   rw [finsum_eq_sum_of_support_subset _ (s := Finset.univ.image (fun s => Finsupp.single s 1)) ?_]
   · rw [Finset.sum_image (fun x _ y _ h => Finsupp.single_left_injective one_ne_zero h)]
     apply Finset.sum_congr rfl

@@ -17,18 +17,24 @@ namespace GlobalTheory.CompanionTheory.SiegLoc.UnimodSeries
 
 variable {R : Type} [CommRing R]
 
-theorem densAt_succ {σ : R →+* R} {ϖ : R} {q : ℕ} {ε : ℤ} (hU : IsUnrQuad R σ ϖ q ε) {m n : ℕ}
-    (S : Matrix (Fin m) (Fin m) R) (T : Matrix (Fin n) (Fin n) R) (hS : IsUnimod σ S) (hT : IsUnimod σ T) (b : ℕ) :
-    densAt σ ϖ S T (0 + b + 1) = densAt σ ϖ S T (0 + b + 1 + 1) := by
+theorem densAt_succ
+    {σ : R →+* R} {ϖ : R} {q : ℕ} {ε : ℤ} (hU : IsUnrQuad R σ ϖ q ε)
+    {m n : ℕ} (S : Matrix (Fin m) (Fin m) R) (T : Matrix (Fin n) (Fin n) R) (hS : IsUnimod σ S)
+    (hT : IsUnimod σ T)
+    (b : ℕ)
+    : densAt σ ϖ S T (0 + b + 1) = densAt σ ϖ S T (0 + b + 1 + 1) := by
   obtain ⟨hTc, hdet⟩ := hT
   obtain ⟨c, hc⟩ : ∃ c, c * T.det = ϖ ^ 0 := by
     obtain ⟨w, hw⟩ := hdet.exists_left_inv
     exact ⟨w, by simpa using hw⟩
   have hσ := hU.fix_ϖ
-  have hfin : ∀ k, Finite (R ⧸ lev ϖ k) := fun k => finite_lev (by
-    refine Nat.finite_of_card_ne_zero ?_
-    rw [hU.card]
-    exact pow_ne_zero _ (by have := hU.one_lt; omega)) k
+  have hfin : ∀ k, Finite (R ⧸ lev ϖ k) := fun k =>
+    finite_lev
+      (by
+        refine Nat.finite_of_card_ne_zero ?_
+        rw [hU.card]
+        exact pow_ne_zero _ (by have := hU.one_lt; omega))
+      k
   have h1 : T * (c • T.adjugate) = ϖ ^ 0 • (1 : Matrix (Fin n) (Fin n) R) := by
     rw [Matrix.mul_smul, Matrix.mul_adjugate, smul_smul, hc]
   have h2 : cT σ (c • T.adjugate) * T = ϖ ^ 0 • (1 : Matrix (Fin n) (Fin n) R) := by
@@ -53,7 +59,8 @@ theorem densAt_succ {σ : R →+* R} {ϖ : R} {q : ℕ} {ε : ℤ} (hU : IsUnrQu
     ext i j
     have := hC i j
     simp only [Matrix.add_apply, Matrix.smul_apply, Matrix.of_apply, smul_eq_mul]
-    rw [← this]; ring
+    rw [← this]
+    ring
   have hCh : cT σ (Matrix.of C) = Matrix.of C := by
     ext i j
     have e1 := congrFun (congrFun (hh) i) j
@@ -61,27 +68,35 @@ theorem densAt_succ {σ : R →+* R} {ϖ : R} {q : ℕ} {ε : ℤ} (hU : IsUnrQu
     have e3 := congrFun (congrFun hTc i) j
     simp only [cT, Matrix.transpose_apply, Matrix.map_apply] at e1 e3
     simp only [map_sub, map_mul, map_pow, hσ, e1, e3] at e2
-    have := (hU.reg.pow (0 + b + 1)) (a₁ := σ (C j i)) (a₂ := C i j) (by
-      simp only [smul_eq_mul]
-      rw [← e2, hC i j])
+    have :=
+      (hU.reg.pow (0 + b + 1)) (a₁ := σ (C j i)) (a₂ := C i j) (by
+        simp only [smul_eq_mul]
+        rw [← e2, hC i j])
     simpa [cT] using this
   obtain ⟨g, h', hgh, hhg, hg⟩ := twist hσ ht hCh 0 b h1 h2
   rw [← hhT] at hg
   rw [solCount_eq, ← sol_congr σ ϖ S _ hg, ← solCount_eq]
   exact solCount_congr hσ S T g h' _ hgh hhg
 
-theorem densAt_eq_densAt_one_of_isUnimod {σ : R →+* R} {ϖ : R} {q : ℕ} {ε : ℤ} (hU : IsUnrQuad R σ ϖ q ε) {m n : ℕ}
-    (S : Matrix (Fin m) (Fin m) R) (T : Matrix (Fin n) (Fin n) R) (hS : IsUnimod σ S) (hT : IsUnimod σ T)
-    (k : ℕ) (hk : 1 ≤ k) : densAt σ ϖ S T k = densAt σ ϖ S T 1 := by
+theorem densAt_eq_densAt_one_of_isUnimod
+    {σ : R →+* R} {ϖ : R} {q : ℕ} {ε : ℤ} (hU : IsUnrQuad R σ ϖ q ε)
+    {m n : ℕ} (S : Matrix (Fin m) (Fin m) R) (T : Matrix (Fin n) (Fin n) R) (hS : IsUnimod σ S)
+    (hT : IsUnimod σ T)
+    (k : ℕ) (hk : 1 ≤ k)
+    : densAt σ ϖ S T k = densAt σ ϖ S T 1 := by
   induction k, hk using Nat.le_induction with
   | base => rfl
   | succ k hk ih =>
     obtain ⟨b, rfl⟩ : ∃ b, k = 0 + b + 1 := ⟨k - 1, by omega⟩
     rw [← densAt_succ hU S T hS hT b, ih]
 
-theorem densAt_eq_of_isDens {σ : R →+* R} {ϖ : R} {q : ℕ} {ε : ℤ} (hU : IsUnrQuad R σ ϖ q ε) {m n : ℕ}
-    (S : Matrix (Fin m) (Fin m) R) (T : Matrix (Fin n) (Fin n) R) (hS : IsUnimod σ S) (hT : IsUnimod σ T)
-    {α : ℝ} (hα : IsDens σ ϖ S T α) (k : ℕ) (hk : 1 ≤ k) : densAt σ ϖ S T k = α := by
+theorem densAt_eq_of_isDens
+    {σ : R →+* R} {ϖ : R} {q : ℕ} {ε : ℤ} (hU : IsUnrQuad R σ ϖ q ε)
+    {m n : ℕ} (S : Matrix (Fin m) (Fin m) R) (T : Matrix (Fin n) (Fin n) R) (hS : IsUnimod σ S)
+    (hT : IsUnimod σ T)
+    {α : ℝ} (hα : IsDens σ ϖ S T α)
+    (k : ℕ) (hk : 1 ≤ k)
+    : densAt σ ϖ S T k = α := by
   have h1 : Tendsto (densAt σ ϖ S T) atTop (𝓝 (densAt σ ϖ S T 1)) := by
     refine tendsto_const_nhds.congr' ?_
     filter_upwards [eventually_ge_atTop 1] with j hj
@@ -92,13 +107,17 @@ theorem densAt_eq_of_isDens {σ : R →+* R} {ϖ : R} {q : ℕ} {ε : ℤ} (hU :
 theorem isUnimod_one (σ : R →+* R) (m : ℕ) : IsUnimod σ (1 : Matrix (Fin m) (Fin m) R) :=
   ⟨cT_one σ, by simp⟩
 
-theorem unrPoly : PositivityTheory.PfSWUS.Loc.UnrFormula → PositivityTheory.SiegelWeilFormula.Gen.UnrPoly := by
+theorem unrPoly
+    : PositivityTheory.PfSWUS.Loc.UnrFormula → PositivityTheory.SiegelWeilFormula.Gen.UnrPoly := by
   intro hF R _ σ ϖ q ε hR ψ hψ n T hT k hk t
   classical
-  have hfin : ∀ k, Finite (R ⧸ lev ϖ k) := fun k => finite_lev (by
-    refine Nat.finite_of_card_ne_zero ?_
-    rw [hR.card]
-    exact pow_ne_zero _ (by have := hR.one_lt; omega)) k
+  have hfin : ∀ k, Finite (R ⧸ lev ϖ k) := fun k =>
+    finite_lev
+      (by
+        refine Nat.finite_of_card_ne_zero ?_
+        rw [hR.card]
+        exact pow_ne_zero _ (by have := hR.one_lt; omega))
+      k
   letI : ∀ k, Fintype (R ⧸ lev ϖ k) := fun k => Fintype.ofFinite _
   haveI : Finite (Matrix (Fin n) (Fin n) (R ⧸ lev ϖ k)) :=
     inferInstanceAs (Finite (Fin n → Fin n → R ⧸ lev ϖ k))
@@ -106,15 +125,17 @@ theorem unrPoly : PositivityTheory.PfSWUS.Loc.UnrFormula → PositivityTheory.Si
   letI : Fintype (hermMod σ ϖ n k) := Fintype.ofFinite _
   have hq1 : 1 < q := hR.one_lt
   have hqC : (q : ℂ) ≠ 0 := by exact_mod_cast (by omega : q ≠ 0)
-  have hε : (ε : ℂ) ^ 2 = 1 := by
-    rcases hR.eps with ⟨rfl, -⟩ | ⟨rfl, -⟩ <;> simp
-  have hnε : ‖(ε : ℂ)‖ = 1 := by
-    rcases hR.eps with ⟨rfl, -⟩ | ⟨rfl, -⟩ <;> simp
-  let P : ℂ[X] := ∑ B : hermMod σ ϖ n k,
-    C (ψ k (Matrix.trace (red ϖ k T * B.1))) * X ^ Nat.log (q ^ 2) (nuAt ϖ B.1)
+  have hε : (ε : ℂ) ^ 2 = 1 := by rcases hR.eps with ⟨rfl, -⟩ | ⟨rfl, -⟩ <;> simp
+  have hnε : ‖(ε : ℂ)‖ = 1 := by rcases hR.eps with ⟨rfl, -⟩ | ⟨rfl, -⟩ <;> simp
+  let P : ℂ[X] :=
+    ∑ B : hermMod σ ϖ n k,
+      C (ψ k (Matrix.trace (red ϖ k T * B.1))) * X ^ Nat.log (q ^ 2) (nuAt ϖ B.1)
   let Q : ℂ[X] := ∏ i : Fin n, (1 - X * C (((ε : ℂ) * q) ^ (i : ℕ)))
-  have hP : ∀ x : ℂ, P.eval x = ∑' B : hermMod σ ϖ n k,
-      ψ k (Matrix.trace (red ϖ k T * B.1)) * x ^ Nat.log (q ^ 2) (nuAt ϖ B.1) := by
+  have hP
+      : ∀ x : ℂ,
+        P.eval x
+          = ∑' B : hermMod σ ϖ n k,
+            ψ k (Matrix.trace (red ϖ k T * B.1)) * x ^ Nat.log (q ^ 2) (nuAt ϖ B.1) := by
     intro x
     rw [tsum_fintype]
     simp [P, Polynomial.eval_finsetSum]
@@ -161,8 +182,9 @@ theorem unrPoly : PositivityTheory.PfSWUS.Loc.UnrFormula → PositivityTheory.Si
       exact (inv_lt_one_of_one_lt₀ this).ne
     have := pow_right_injective₀ hq0 hq2 h1
     omega
-  have hPQ : P = Q := Polynomial.eq_of_infinite_eval_eq P Q
-    (Set.infinite_of_injective_forall_mem hinj fun j => hval (n + j) (by omega))
+  have hPQ : P = Q :=
+    Polynomial.eq_of_infinite_eval_eq P Q
+      (Set.infinite_of_injective_forall_mem hinj fun j => hval (n + j) (by omega))
   have := congrArg (Polynomial.eval t) hPQ
   rw [hP, hQ] at this
   exact this

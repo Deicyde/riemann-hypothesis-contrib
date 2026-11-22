@@ -6,7 +6,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.G
 open scoped Classical ENNReal nonZeroDivisors
 
@@ -25,22 +27,26 @@ private def eQ : Fin 3 ⊕ Unit ≃ Fin 4 where
     intro i
     fin_cases i <;> rfl
 
-private theorem reindex_mem {φ : V4 F → ℂ} (hφ : φ ∈ schwartzBruhatPi (K := F) (ι := Fin 4)) :
-    (fun z : Fin 3 ⊕ Unit → A F => φ fun i => z (eQ.symm i)) ∈ schwartzBruhatPi (K := F) (ι := Fin 3 ⊕ Unit) := by
+private theorem reindex_mem {φ : V4 F → ℂ} (hφ : φ ∈ schwartzBruhatPi (K := F) (ι := Fin 4))
+    : (fun z : Fin 3 ⊕ Unit → A F => φ fun i => z (eQ.symm i))
+      ∈ schwartzBruhatPi (K := F) (ι := Fin 3 ⊕ Unit) := by
   let M : Matrix (Fin 4) (Fin 3 ⊕ Unit) F := (1 : Matrix (Fin 4) (Fin 4) F).submatrix id eQ
   let N : Matrix (Fin 3 ⊕ Unit) (Fin 4) F := (1 : Matrix (Fin 4) (Fin 4) F).submatrix eQ id
   have hNM : N * M = 1 := by
-    have h := Matrix.submatrix_mul (1 : Matrix (Fin 4) (Fin 4) F) (1 : Matrix (Fin 4) (Fin 4) F)
-      eQ id eQ Function.bijective_id
+    have h :=
+      Matrix.submatrix_mul (1 : Matrix (Fin 4) (Fin 4) F) (1 : Matrix (Fin 4) (Fin 4) F) eQ id eQ
+        Function.bijective_id
     rw [Matrix.mul_one, Matrix.submatrix_one_equiv] at h
     exact h.symm
   have hMN : M * N = 1 := by
-    have h := Matrix.submatrix_mul (1 : Matrix (Fin 4) (Fin 4) F) (1 : Matrix (Fin 4) (Fin 4) F)
-      id eQ id eQ.bijective
+    have h :=
+      Matrix.submatrix_mul (1 : Matrix (Fin 4) (Fin 4) F) (1 : Matrix (Fin 4) (Fin 4) F) id eQ id
+        eQ.bijective
     rw [Matrix.mul_one, Matrix.submatrix_id_id] at h
     exact h.symm
   have h := GroundTheory.Heights₂.Theta.comp_mulVec_mem_schwartzBruhatPi M N hNM hMN hφ
-  have hx : ∀ x : Fin 3 ⊕ Unit → A F, (M.map (algebraMap F (A F)) *ᵥ x) = fun i => x (eQ.symm i) := by
+  have hx
+      : ∀ x : Fin 3 ⊕ Unit → A F, (M.map (algebraMap F (A F)) *ᵥ x) = fun i => x (eQ.symm i) := by
     intro x
     funext i
     have hM : ∀ j k, M j k = if j = eQ k then (1 : F) else 0 := fun j k => by
@@ -55,22 +61,25 @@ private theorem reindex_mem {φ : V4 F → ℂ} (hφ : φ ∈ schwartzBruhatPi (
     · simp
   simpa only [hx] using h
 
-private theorem integrable_slice (φ : S4 F) (v : V4 F) :
-    Integrable (fun s : A F => φ.1 (Function.update v 1 s)) (adeleMeasure F) := by
-  have h := GroundTheory.Heights₂.Theta.integrable_partialFourierPi_slice (reindex_mem φ.2)
-    (fun i : Fin 3 => v (eQ (.inl i)))
+private theorem integrable_slice (φ : S4 F) (v : V4 F)
+    : Integrable (fun s : A F => φ.1 (Function.update v 1 s)) (adeleMeasure F) := by
+  have h :=
+    GroundTheory.Heights₂.Theta.integrable_partialFourierPi_slice (reindex_mem φ.2)
+      (fun i : Fin 3 => v (eQ (.inl i)))
   have hmp := measurePreserving_funUnique (adeleMeasure F) Unit
   refine (hmp.integrable_comp_emb (MeasurableEquiv.measurableEmbedding _)).1 ?_
   refine h.congr (Eventually.of_forall fun y => ?_)
-  have : (fun i => (Sum.elim (fun i : Fin 3 => v (eQ (.inl i))) y : Fin 3 ⊕ Unit → A F) (eQ.symm i)) =
-      Function.update v 1 (MeasurableEquiv.funUnique Unit (A F) y) := by
+  have : (fun i => (Sum.elim (fun i : Fin 3 => v (eQ (.inl i))) y : Fin 3 ⊕ Unit → A F) (eQ.symm i))
+      = Function.update v 1 (MeasurableEquiv.funUnique Unit (A F) y) := by
     funext i
     fin_cases i <;> simp [eQ]
   simp only [Function.comp]
   rw [this]
 
-private theorem integrable_term (φ : S4 F) (v : V4 F) :
-    Integrable (fun s : A F => φ.1 (Function.update v 1 s) * ψ (-(s * v 1))) (adeleMeasure F) := by
+private theorem integrable_term (φ : S4 F) (v : V4 F)
+    : Integrable
+      (fun s : A F => φ.1 (Function.update v 1 s) * ψ (-(s * v 1)))
+      (adeleMeasure F) := by
   have hs := integrable_slice φ v
   have hc : Continuous fun s : A F => ψ (-(s * v 1)) :=
     continuous_subtype_val.comp ((continuous_adelicChar (K := F)).comp
@@ -80,8 +89,8 @@ private theorem integrable_term (φ : S4 F) (v : V4 F) :
 
 end UpperTheory.ConvolutionTheory.R2.G
 
-theorem UpperTheory.ConvolutionTheory.R2.G.hatLin :
-    ∀ (F : Type) [Field F] [NumberField F], ∃ H : S4 F →ₗ[ℂ] S4 F, ∀ φ, (H φ).1 = hat φ.1 := by
+theorem UpperTheory.ConvolutionTheory.R2.G.hatLin
+    : ∀ (F : Type) [Field F] [NumberField F], ∃ H : S4 F →ₗ[ℂ] S4 F, ∀ φ, (H φ).1 = hat φ.1 := by
   intro F _ _
   have hadd : ∀ φ χ : S4 F, hat (φ + χ).1 = hat φ.1 + hat χ.1 := by
     intro φ χ
@@ -93,6 +102,11 @@ theorem UpperTheory.ConvolutionTheory.R2.G.hatLin :
     funext v
     simp only [hat, Submodule.coe_smul, Pi.smul_apply, smul_eq_mul, mul_assoc]
     exact integral_const_mul c _
-  refine ⟨{ toFun := fun φ => ⟨hat φ.1, (UpperTheory.ConvolutionTheory.R2.D.hatMem F φ).1⟩
-            map_add' := fun φ χ => Subtype.ext (hadd φ χ)
-            map_smul' := fun c φ => Subtype.ext (hsmul c φ) }, fun φ => rfl⟩
+  refine ⟨
+    {
+      toFun := fun φ => ⟨hat φ.1, (UpperTheory.ConvolutionTheory.R2.D.hatMem F φ).1⟩
+      map_add' := fun φ χ => Subtype.ext (hadd φ χ)
+      map_smul' := fun c φ => Subtype.ext (hsmul c φ)
+    },
+    fun φ => rfl
+  ⟩

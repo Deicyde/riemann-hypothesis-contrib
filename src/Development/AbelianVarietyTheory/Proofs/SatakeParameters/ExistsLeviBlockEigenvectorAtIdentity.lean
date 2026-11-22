@@ -10,7 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsLocally
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
 open Matrix ValuativeRel
@@ -19,16 +22,28 @@ noncomputable section
 
 namespace GlobalTheory.SphBlock
 
-theorem exists_eigen_at_one : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (α : Type) [Fintype α] [LinearOrder α] (m : α → Type) [∀ a, Fintype (m a)] [∀ a, DecidableEq (m a)] (n : Type) [Fintype n] [DecidableEq n] (e : (Σ a, m a) ≃ n) (X : α → Type) [∀ a, AddCommGroup (X a)] [∀ a, Module ℂ (X a)] (σ : ∀ a, Representation ℂ (GL (m a) k) (X a)) (χ : kˣ →* ℂˣ) (x : IndSp e (piTensor σ)), x ≠ 0 → (∀ g ∈ KO k n, multiProd e σ g x = (χ (Matrix.GeneralLinearGroup.det g) : ℂ) • x) → ∃ w : PiTensorProduct ℂ X, w ≠ 0 ∧ ∀ a, ∀ h ∈ KO k (m a), piTensor σ (Pi.mulSingle a h) w = (χ (Matrix.GeneralLinearGroup.det h) : ℂ) • w := by
+theorem exists_eigen_at_one
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (α : Type) [Fintype α] [LinearOrder α] (m : α → Type) [∀ a, Fintype (m a)]
+        [∀ a, DecidableEq (m a)] (n : Type) [Fintype n] [DecidableEq n] (e : (Σ a, m a) ≃ n)
+        (X : α → Type) [∀ a, AddCommGroup (X a)] [∀ a, Module ℂ (X a)]
+        (σ : ∀ a, Representation ℂ (GL (m a) k) (X a)) (χ : kˣ →* ℂˣ) (x : IndSp e (piTensor σ)),
+      x ≠ 0 → (∀ g ∈ KO k n, multiProd e σ g x = (χ (Matrix.GeneralLinearGroup.det g) : ℂ) • x)
+        → ∃ w : PiTensorProduct ℂ X,
+          w ≠ 0
+            ∧ ∀ a, ∀ h ∈ KO k (m a),
+              piTensor σ (Pi.mulSingle a h) w = (χ (Matrix.GeneralLinearGroup.det h) : ℂ) • w := by
   intro k _ _ _ _ α _ _ m _ _ n _ _ e X _ _ σ χ x hx hK
   classical
   set f := x.1.1 with hf
-  have hval : ∀ {d : Type} [Fintype d] [DecidableEq d] {g : GL d k}, g ∈ KO k d →
-      valuation k (GeneralLinearGroup.det g : k) = 1 := by
+  have hval
+      : ∀ {d : Type} [Fintype d] [DecidableEq d] {g : GL d k},
+        g ∈ KO k d → valuation k (GeneralLinearGroup.det g : k) = 1 := by
     intro d _ _ g hg
     obtain ⟨g, rfl⟩ := hg
-    have h1 : ((GeneralLinearGroup.det (GeneralLinearGroup.map (algebraMap 𝒪[k] k) g) : kˣ) : k) =
-        algebraMap 𝒪[k] k (GeneralLinearGroup.det g : 𝒪[k]ˣ) :=
+    have h1
+        : ((GeneralLinearGroup.det (GeneralLinearGroup.map (algebraMap 𝒪[k] k) g) : kˣ) : k)
+          = algebraMap 𝒪[k] k (GeneralLinearGroup.det g : 𝒪[k]ˣ) :=
       ((algebraMap 𝒪[k] k).map_det _).symm
     rw [h1]
     exact (Valuation.integer.integers (valuation k)).one_of_isUnit (Units.isUnit _)
@@ -44,12 +59,14 @@ theorem exists_eigen_at_one : ∀ (k : Type) [Field k] [ValuativeRel k] [Topolog
     have hall : ∀ g, f g = 0 := by
       intro g
       obtain ⟨u, l, κ, hκ, rfl⟩ := UnitInd.exists_iwasawa e g
-      let p : parab k e := ⟨(u : GL n k) * leviEmb k e l,
-        mul_mem (unipRad_le_parab k e u.2) (leviEmb_mem_parab k e l)⟩
+      let p : parab k e :=
+        ⟨(u : GL n k) * leviEmb k e l, mul_mem (unipRad_le_parab k e u.2) (leviEmb_mem_parab k e l)⟩
       have := parInd_law e (piTensor σ) x p κ
       change f ((u : GL n k) * leviEmb k e l * κ) = _ at this
       rw [this, show x.1.1 κ = f κ from rfl, hfK κ hκ, h0, smul_zero, map_zero, smul_zero]
-    apply Subtype.ext; apply Subtype.ext; funext g
+    apply Subtype.ext
+    apply Subtype.ext
+    funext g
     exact hall g
   · intro a h hh
     set l : Levi k m := Pi.mulSingle a h with hl

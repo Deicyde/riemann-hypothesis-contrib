@@ -26,8 +26,10 @@ theorem SecDegreeLe.proof : SecDegreeLe.Statement := by
   set N := Vertical.normForm (R := E) A (Vertical.secCoord QE y)
   set G := Vertical.specRest (algebraMap k E) g y
 
-  have hirr : Irreducible N := Vertical.NormFormIrreducible.full E A n (Vertical.secCoord QE y)
-    (fun j => y (.inr j)) (Vertical.secCoord_adjoin _ _) (Vertical.secCoord_chart _ _)
+  have hirr : Irreducible N :=
+    Vertical.NormFormIrreducible.full E A n (Vertical.secCoord QE y)
+      (fun j => y (.inr j))
+      (Vertical.secCoord_adjoin _ _) (Vertical.secCoord_chart _ _)
   obtain ⟨m, -, hm⟩ := Vertical.ChowSecDvd.full k E n e Q g y hQ hg
   have hd := Vertical.NormFormDvd.full E A n (Vertical.secCoord QE y) (G ^ m) (by rwa [map_pow])
   rw [← pow_mul] at hd

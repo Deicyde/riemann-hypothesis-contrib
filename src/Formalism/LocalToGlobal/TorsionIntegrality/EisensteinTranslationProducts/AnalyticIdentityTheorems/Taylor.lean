@@ -13,18 +13,18 @@ namespace Taylor
 
 open PowerSeries
 
-theorem coeff_taylor0 (f : ℂ → ℂ) (n : ℕ) :
-    coeff n (taylor0 f) = iteratedDeriv n f 0 / (n.factorial : ℂ) := by
+theorem coeff_taylor0 (f : ℂ → ℂ) (n : ℕ)
+    : coeff n (taylor0 f) = iteratedDeriv n f 0 / (n.factorial : ℂ) := by
   simp [taylor0]
 
-theorem taylor0_add {f g : ℂ → ℂ} (hf : AnalyticAt ℂ f 0) (hg : AnalyticAt ℂ g 0) :
-    taylor0 (fun z => f z + g z) = taylor0 f + taylor0 g := by
+theorem taylor0_add {f g : ℂ → ℂ} (hf : AnalyticAt ℂ f 0) (hg : AnalyticAt ℂ g 0)
+    : taylor0 (fun z => f z + g z) = taylor0 f + taylor0 g := by
   ext n
   rw [map_add (f := _), coeff_taylor0, coeff_taylor0, coeff_taylor0,
     iteratedDeriv_fun_add hf.contDiffAt hg.contDiffAt, add_div]
 
-theorem taylor0_mul {f g : ℂ → ℂ} (hf : AnalyticAt ℂ f 0) (hg : AnalyticAt ℂ g 0) :
-    taylor0 (fun z => f z * g z) = taylor0 f * taylor0 g := by
+theorem taylor0_mul {f g : ℂ → ℂ} (hf : AnalyticAt ℂ f 0) (hg : AnalyticAt ℂ g 0)
+    : taylor0 (fun z => f z * g z) = taylor0 f * taylor0 g := by
   ext n
   rw [coeff_mul, coeff_taylor0, iteratedDeriv_fun_mul hf.contDiffAt hg.contDiffAt,
     Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk, Finset.sum_div]
@@ -65,8 +65,9 @@ theorem taylor0_deriv (f : ℂ → ℂ) : taylor0 (deriv f) = derivative (taylor
   push_cast
   field_simp
 
-theorem iteratedDeriv_comp_mul (a : ℂ) (n : ℕ) : ∀ f : ℂ → ℂ, AnalyticAt ℂ f 0 →
-    iteratedDeriv n (fun z => f (a * z)) 0 = a ^ n * iteratedDeriv n f 0 := by
+theorem iteratedDeriv_comp_mul (a : ℂ) (n : ℕ)
+    : ∀ f : ℂ → ℂ,
+      AnalyticAt ℂ f 0 → iteratedDeriv n (fun z => f (a * z)) 0 = a ^ n * iteratedDeriv n f 0 := by
   induction n with
   | zero => intro f _; simp
   | succ n ih =>
@@ -77,8 +78,7 @@ theorem iteratedDeriv_comp_mul (a : ℂ) (n : ℕ) : ∀ f : ℂ → ℂ, Analyt
     have he : deriv (fun z => f (a * z)) =ᶠ[nhds 0] fun z => a * deriv f (a * z) := by
       filter_upwards [hc.eventually hf.eventually_analyticAt] with z hz
       have h1 : HasDerivAt f (deriv f (a * z)) (a * z) := hz.differentiableAt.hasDerivAt
-      have h2 : HasDerivAt (fun z : ℂ => a * z) a z := by
-        simpa using (hasDerivAt_id z).const_mul a
+      have h2 : HasDerivAt (fun z : ℂ => a * z) a z := by simpa using (hasDerivAt_id z).const_mul a
       have := (h1.comp z h2).deriv
       rw [mul_comm] at this
       exact this
@@ -86,13 +86,14 @@ theorem iteratedDeriv_comp_mul (a : ℂ) (n : ℕ) : ∀ f : ℂ → ℂ, Analyt
       iteratedDeriv_succ', pow_succ]
     ring
 
-theorem taylor0_rescale {f : ℂ → ℂ} (a : ℂ) (hf : AnalyticAt ℂ f 0) :
-    taylor0 (fun z => f (a * z)) = rescale a (taylor0 f) := by
+theorem taylor0_rescale {f : ℂ → ℂ} (a : ℂ) (hf : AnalyticAt ℂ f 0)
+    : taylor0 (fun z => f (a * z)) = rescale a (taylor0 f) := by
   ext n
   rw [coeff_rescale, coeff_taylor0, coeff_taylor0, iteratedDeriv_comp_mul a n f hf, mul_div_assoc]
 
-theorem taylor0_inj {f g : ℂ → ℂ} (hf : AnalyticAt ℂ f 0) (hg : AnalyticAt ℂ g 0)
-    (h : taylor0 f = taylor0 g) : f =ᶠ[nhds 0] g := by
+theorem taylor0_inj
+    {f g : ℂ → ℂ} (hf : AnalyticAt ℂ f 0) (hg : AnalyticAt ℂ g 0) (h : taylor0 f = taylor0 g)
+    : f =ᶠ[nhds 0] g := by
   have hd : AnalyticAt ℂ (fun z => f z - g z) 0 := hf.fun_sub hg
   have h0 : ∀ n, iteratedDeriv n (fun z => f z - g z) 0 = 0 := by
     intro n
@@ -111,8 +112,8 @@ theorem taylor0_inj {f g : ℂ → ℂ} (hf : AnalyticAt ℂ f 0) (hg : Analytic
   filter_upwards [ht] with z hz
   exact sub_eq_zero.mp hz
 
-theorem ode_zero {a Y : PowerSeries ℂ} (h : derivative Y = a * Y) (h0 : constantCoeff Y = 0) :
-    Y = 0 := by
+theorem ode_zero {a Y : PowerSeries ℂ} (h : derivative Y = a * Y) (h0 : constantCoeff Y = 0)
+    : Y = 0 := by
   have key : ∀ n, coeff n Y = 0 := by
     intro n
     induction n using Nat.strong_induction_on with
@@ -134,23 +135,26 @@ theorem ode_zero {a Y : PowerSeries ℂ} (h : derivative Y = a * Y) (h0 : consta
   ext n
   simpa using key n
 
-theorem taylor0_exp {f : ℂ → ℂ} (hf : AnalyticAt ℂ f 0) (h0 : f 0 = 0) :
-    taylor0 (fun z => Complex.exp (f z)) = Formalism.L2.Th1.B.fExp (taylor0 f) := by
+theorem taylor0_exp {f : ℂ → ℂ} (hf : AnalyticAt ℂ f 0) (h0 : f 0 = 0)
+    : taylor0 (fun z => Complex.exp (f z)) = Formalism.L2.Th1.B.fExp (taylor0 f) := by
   have hE : AnalyticAt ℂ (fun z => Complex.exp (f z)) 0 := hf.cexp
   have hc : constantCoeff (taylor0 f) = 0 := by
     rw [← coeff_zero_eq_constantCoeff_apply, coeff_taylor0]
     simp [h0]
   have hS : HasSubst (taylor0 f) := HasSubst.of_constantCoeff_zero' hc
-  have he : deriv (fun z => Complex.exp (f z)) =ᶠ[nhds 0] fun z => deriv f z * Complex.exp (f z) := by
+  have he
+      : deriv (fun z => Complex.exp (f z)) =ᶠ[nhds 0] fun z => deriv f z * Complex.exp (f z) := by
     filter_upwards [hf.eventually_analyticAt] with z hz
     have := (hz.differentiableAt.hasDerivAt.cexp).deriv
     rw [mul_comm] at this
     exact this
-  have h1 : derivative (taylor0 fun z => Complex.exp (f z))
-      = derivative (taylor0 f) * taylor0 fun z => Complex.exp (f z) := by
+  have h1
+      : derivative (taylor0 fun z => Complex.exp (f z))
+        = derivative (taylor0 f) * taylor0 fun z => Complex.exp (f z) := by
     rw [← taylor0_deriv, taylor0_congr he, taylor0_mul hf.deriv hE, taylor0_deriv]
-  have h2 : derivative (Formalism.L2.Th1.B.fExp (taylor0 f))
-      = derivative (taylor0 f) * Formalism.L2.Th1.B.fExp (taylor0 f) := by
+  have h2
+      : derivative (Formalism.L2.Th1.B.fExp (taylor0 f))
+        = derivative (taylor0 f) * Formalism.L2.Th1.B.fExp (taylor0 f) := by
     unfold Formalism.L2.Th1.B.fExp
     rw [derivative_subst hS, derivative_exp, mul_comm]
   have h3 : constantCoeff (taylor0 fun z => Complex.exp (f z)) = 1 := by
@@ -170,13 +174,18 @@ theorem taylor0_exp {f : ℂ → ℂ} (hf : AnalyticAt ℂ f 0) (h0 : f 0 = 0) :
 
 end Taylor
 
-theorem taylor_ring : TaylorRing :=
-  ⟨fun _ _ hf hg => ⟨Taylor.taylor0_add hf hg, Taylor.taylor0_mul hf hg⟩, Taylor.taylor0_const,
-    Taylor.taylor0_id, fun _ _ h => Taylor.taylor0_congr h⟩
+theorem taylor_ring : TaylorRing := ⟨
+  fun _ _ hf hg => ⟨Taylor.taylor0_add hf hg, Taylor.taylor0_mul hf hg⟩,
+  Taylor.taylor0_const,
+  Taylor.taylor0_id,
+  fun _ _ h => Taylor.taylor0_congr h
+⟩
 
-theorem taylor_deriv : TaylorDeriv :=
-  ⟨fun f _ => Taylor.taylor0_deriv f, fun _ a hf => Taylor.taylor0_rescale a hf,
-    fun _ _ hf hg h => Taylor.taylor0_inj hf hg h⟩
+theorem taylor_deriv : TaylorDeriv := ⟨
+  fun f _ => Taylor.taylor0_deriv f,
+  fun _ a hf => Taylor.taylor0_rescale a hf,
+  fun _ _ hf hg h => Taylor.taylor0_inj hf hg h
+⟩
 
 theorem taylor_exp : TaylorExp := fun _ hf h0 => Taylor.taylor0_exp hf h0
 

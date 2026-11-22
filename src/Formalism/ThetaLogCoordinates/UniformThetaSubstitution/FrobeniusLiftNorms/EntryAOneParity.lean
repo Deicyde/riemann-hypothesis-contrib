@@ -176,24 +176,28 @@ lemma level_le {ν r0 r1 E : ℕ} [NeZero ν] (p : ℕ) (e : TpV ν r1 → ℕ) 
 
 end ValuationParity
 
-
 open ValuationParity in
-theorem entryExcessBound_of (hS : EntryStar) (hC : HitsCapPos) (hA : ExcessGainBound) (hL : ChargeLemma) : EntryExcessBound := by
+theorem entryExcessBound_of
+    (hS : EntryStar) (hC : HitsCapPos) (hA : ExcessGainBound) (hL : ChargeLemma)
+    : EntryExcessBound := by
   intro K _ _ p ν r0 r1 C _ u F TT ξ e l sf T I hyp
-  rcases hS K p ν r0 r1 C u F TT ξ e l sf T I hyp with h0 | ⟨E, α, β, hαTT, hβTT, hτ, hhasse, hbound⟩
+  rcases hS K p ν r0 r1 C u F TT ξ e l sf T I hyp with
+    h0 | ⟨E, α, β, hαTT, hβTT, hτ, hhasse, hbound⟩
   · rw [h0, norm_zero]
     exact Real.rpow_nonneg (Nat.cast_nonneg _) _
   classical
   have hp : 2 < p := hyp.2.1
   have hp1 : (1 : ℝ) < p := by exact_mod_cast (by omega : 1 < p)
-  have hcharge : ∀ φ : PhiI ν r0 r1 E, ∃ s s' : ZMod (2 * ν),
-      ((s = pairFirst φ ∧ s' = pairSecond φ) ∨ (s = pairSecond φ ∧ s' = pairFirst φ)) ∧
-      (s' - s).val % 2 = 1 ∧ s'.val % 2 ≠ s.val % 2 ∧
-      p ^ (s' - s).val ≤ dAof p φ (s, φ.2.2.2.2) :=
-    fun φ => ValuationParity.charge_exists hL p (by omega) φ
+  have hcharge
+      : ∀ φ : PhiI ν r0 r1 E, ∃ s s' : ZMod (2 * ν),
+        ((s = pairFirst φ ∧ s' = pairSecond φ) ∨ (s = pairSecond φ ∧ s' = pairFirst φ))
+          ∧ (s' - s).val % 2 = 1 ∧ s'.val % 2 ≠ s.val % 2
+          ∧ p ^ (s' - s).val ≤ dAof p φ (s, φ.2.2.2.2) := fun φ =>
+    ValuationParity.charge_exists hL p (by omega) φ
   choose sφ s'φ hor hodd hpar hle using hcharge
-  obtain ⟨c, hcdef⟩ : ∃ c : PhiI ν r0 r1 E → ZMod (2 * ν) × ℕ,
-      ∀ φ, c φ = (sφ φ, ((s'φ φ - sφ φ).val - 1) / 2) := ⟨_, fun _ => rfl⟩
+  obtain ⟨c, hcdef⟩
+      : ∃ c : PhiI ν r0 r1 E → ZMod (2 * ν) × ℕ, ∀ φ, c φ = (sφ φ, ((s'φ φ - sφ φ).val - 1) / 2) :=
+    ⟨_, fun _ => rfl⟩
   have hc2 : ∀ φ, 2 * (c φ).2 + 1 = (s'φ φ - sφ φ).val := by
     intro φ
     have := hodd φ
@@ -209,12 +213,18 @@ theorem entryExcessBound_of (hS : EntryStar) (hC : HitsCapPos) (hA : ExcessGainB
     rcases hor φ with ⟨hs1, hs2⟩ | ⟨hs1, hs2⟩
     · exact ⟨hs1 ▸ h1, hs2 ▸ h2⟩
     · exact ⟨hs1 ▸ h2, hs2 ▸ h1⟩
-  obtain ⟨Ee, hEe⟩ : ∃ Ee : Finset ℕ, Ee = (Finset.univ.image fun φ => (c φ).2) ∪
-      (Finset.univ.image fun k : KapI ν r1 E => k.2.1.val) := ⟨_, rfl⟩
-  obtain ⟨chN, hchN⟩ : ∃ chN : ZMod (2 * ν) → ℕ → ℕ,
-      ∀ s e', chN s e' = ∑ φ, if c φ = (s, e') then α φ else 0 := ⟨_, fun _ _ => rfl⟩
-  obtain ⟨iN, hiN⟩ : ∃ iN : ZMod (2 * ν) → ℕ → ℕ,
-      ∀ s e', iN s e' = ∑ k : KapI ν r1 E, if (k.1, k.2.1.val) = (s, e') then β k else 0 :=
+  obtain ⟨Ee, hEe⟩
+      : ∃ Ee : Finset ℕ,
+        Ee
+          = (Finset.univ.image fun φ => (c φ).2)
+            ∪ (Finset.univ.image fun k : KapI ν r1 E => k.2.1.val) :=
+    ⟨_, rfl⟩
+  obtain ⟨chN, hchN⟩
+      : ∃ chN : ZMod (2 * ν) → ℕ → ℕ, ∀ s e', chN s e' = ∑ φ, if c φ = (s, e') then α φ else 0 :=
+    ⟨_, fun _ _ => rfl⟩
+  obtain ⟨iN, hiN⟩
+      : ∃ iN : ZMod (2 * ν) → ℕ → ℕ, ∀ s e',
+        iN s e' = ∑ k : KapI ν r1 E, if (k.1, k.2.1.val) = (s, e') then β k else 0 :=
     ⟨_, fun _ _ => rfl⟩
   have hlev : ∀ s e', p ^ (2 * e' + 1) * (chN s e' + iN s e') ≤ alN e s := fun s e' => by
     rw [hchN, hiN]
@@ -226,7 +236,8 @@ theorem entryExcessBound_of (hS : EntryStar) (hC : HitsCapPos) (hA : ExcessGainB
     apply hhasse
     refine hC K (ZMod (2 * ν)) (KapI ν r1 E) r0 r1 C l sf T I
       (fun k => k.1 + ((2 * k.2.1.val + 1 : ℕ) : ZMod (2 * ν)))
-      (fun k a => ξ k.1 a ^ (p ^ (2 * k.2.1.val + 1))) (fun k => k.2.2)
+      (fun k a => ξ k.1 a ^ (p ^ (2 * k.2.1.val + 1)))
+      (fun k => k.2.2)
       (Finset.univ.filter fun k : KapI ν r1 E => (k.1, k.2.1.val) = (s, e'))
       (s + ((2 * e' + 1 : ℕ) : ZMod (2 * ν))) ?_ ?_ β ?_
     · intro k hk
@@ -238,13 +249,21 @@ theorem entryExcessBound_of (hS : EntryStar) (hC : HitsCapPos) (hA : ExcessGainB
       rw [hk.1, hk.2, hk'.1, hk'.2]
     · rw [hiN, ← Finset.sum_filter] at hlt
       exact hlt
-  have hcoreA := hA (2 * ν) (p : ℝ) TT (dSet TT) (fun s => (alN e s : ℝ)) (fun s => (capN sf s : ℝ))
-    (deLoss p r0 r1 TT (alN e) (lsN l sf))
-    (gamP p * ∑ s ∈ TT, (alN e s : ℝ) - (∑ φ, (α φ : ℝ)) - (∑ k, (β k : ℝ)) -
-      deLoss p r0 r1 TT (alN e) (lsN l sf))
-    (fun s e' => (iN s e' : ℝ)) (fun s e' => (chN s e' : ℝ)) Ee hp1
-    (fun _ => Nat.cast_nonneg _) (fun _ => Nat.cast_nonneg _) (fun _ _ => Nat.cast_nonneg _)
-    (fun _ _ => Nat.cast_nonneg _) ?hE ?hD ?hmain ?h6 ?h7
+  have hcoreA :=
+    hA (2 * ν) (p : ℝ) TT (dSet TT)
+      (fun s => (alN e s : ℝ))
+      (fun s => (capN sf s : ℝ))
+      (deLoss p r0 r1 TT (alN e) (lsN l sf))
+      (gamP p * ∑ s ∈ TT, (alN e s : ℝ) - (∑ φ, (α φ : ℝ)) - (∑ k, (β k : ℝ))
+        - deLoss p r0 r1 TT (alN e) (lsN l sf))
+      (fun s e' => (iN s e' : ℝ))
+      (fun s e' => (chN s e' : ℝ))
+      Ee hp1
+      (fun _ => Nat.cast_nonneg _)
+      (fun _ => Nat.cast_nonneg _)
+      (fun _ _ => Nat.cast_nonneg _)
+      (fun _ _ => Nat.cast_nonneg _)
+      ?hE ?hD ?hmain ?h6 ?h7
   case hE =>
     intro s e' he'
     constructor
@@ -285,14 +304,28 @@ theorem entryExcessBound_of (hS : EntryStar) (hC : HitsCapPos) (hA : ExcessGainB
     · rfl
   case hmain =>
     have hsumch : ∑ s ∈ TT, ∑ e' ∈ Ee, (chN s e' : ℝ) = ∑ φ, (α φ : ℝ) := by
-      have h := ValuationParity.sum_charge TT Ee c (fun φ => α φ) (fun φ hα => ⟨by rw [hc1]; exact (hsTT φ hα).1,
-        by rw [hEe]; exact Finset.mem_union_left _ (Finset.mem_image_of_mem _ (Finset.mem_univ _))⟩)
+      have h :=
+        ValuationParity.sum_charge TT Ee c
+          (fun φ => α φ)
+          (fun φ hα => ⟨
+            by rw [hc1]; exact (hsTT φ hα).1,
+            by
+              rw [hEe]
+              exact Finset.mem_union_left _ (Finset.mem_image_of_mem _ (Finset.mem_univ _))
+          ⟩)
       simp only [← hchN] at h
       exact_mod_cast h
     have hsumi : ∑ s ∈ TT, ∑ e' ∈ Ee, (iN s e' : ℝ) = ∑ k, (β k : ℝ) := by
-      have h := ValuationParity.sum_charge TT Ee (fun k : KapI ν r1 E => (k.1, k.2.1.val)) (fun k => β k)
-        (fun k hk => ⟨hβTT k hk, by
-          rw [hEe]; exact Finset.mem_union_right _ (Finset.mem_image_of_mem _ (Finset.mem_univ _))⟩)
+      have h :=
+        ValuationParity.sum_charge TT Ee
+          (fun k : KapI ν r1 E => (k.1, k.2.1.val))
+          (fun k => β k)
+          (fun k hk => ⟨
+            hβTT k hk,
+            by
+              rw [hEe]
+              exact Finset.mem_union_right _ (Finset.mem_image_of_mem _ (Finset.mem_univ _))
+          ⟩)
       simp only [← hiN] at h
       exact_mod_cast h
     show gamP (p : ℝ) * ∑ s ∈ TT, (alN e s : ℝ) - ∑ s ∈ TT, ∑ e' ∈ Ee, (chN s e' : ℝ) -

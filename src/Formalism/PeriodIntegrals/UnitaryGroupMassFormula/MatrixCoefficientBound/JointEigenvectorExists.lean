@@ -17,15 +17,17 @@ open Formalism.L2.SG.GGMirabolic
 
 variable {ι : Type} [Fintype ι] {Fq : ι → Type} [∀ v, Field (Fq v)] [∀ v, Fintype (Fq v)] {k : ℕ}
 
-theorem gamProd_conj (ψ : ∀ v, AddChar (Fq v) ℂ) (g x : ∀ v, GL (Fin k) (Fq v)) :
-    gamProd ψ (g * x * g⁻¹) = gamProd ψ x := by
+theorem gamProd_conj (ψ : ∀ v, AddChar (Fq v) ℂ) (g x : ∀ v, GL (Fin k) (Fq v))
+    : gamProd ψ (g * x * g⁻¹) = gamProd ψ x := by
   unfold gamProd
   refine Finset.prod_congr rfl fun v _ => ?_
   exact PI.GGConvScalarW.gam_conj (ψ v) (g v) (x v)
 
-theorem totOp_comm (ψ : ∀ v, AddChar (Fq v) ℂ) {V : Type} [AddCommGroup V] [Module ℂ V]
-    (π : Representation ℂ (∀ v, GL (Fin k) (Fq v)) V) (g : ∀ v, GL (Fin k) (Fq v)) :
-    π g ∘ₗ totOp ψ π = totOp ψ π ∘ₗ π g := by
+theorem totOp_comm
+    (ψ : ∀ v, AddChar (Fq v) ℂ)
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (π : Representation ℂ (∀ v, GL (Fin k) (Fq v)) V) (g : ∀ v, GL (Fin k) (Fq v))
+    : π g ∘ₗ totOp ψ π = totOp ψ π ∘ₗ π g := by
   unfold totOp
   show π g * (∑ x, gamProd ψ x • π x) = (∑ x, gamProd ψ x • π x) * π g
   rw [Finset.mul_sum, Finset.sum_mul]
@@ -38,16 +40,19 @@ theorem totOp_comm (ψ : ∀ v, AddChar (Fq v) ℂ) {V : Type} [AddCommGroup V] 
   congr 1
   group
 
-theorem mulSingle_conj (v : ι) (g : ∀ v, GL (Fin k) (Fq v)) (y : GL (Fin k) (Fq v)) :
-    g * Pi.mulSingle v y * g⁻¹ = Pi.mulSingle v (g v * y * (g v)⁻¹) := by
+theorem mulSingle_conj (v : ι) (g : ∀ v, GL (Fin k) (Fq v)) (y : GL (Fin k) (Fq v))
+    : g * Pi.mulSingle v y * g⁻¹ = Pi.mulSingle v (g v * y * (g v)⁻¹) := by
   funext w
   by_cases h : w = v
   · subst h; simp
   · simp [Pi.mulSingle_eq_of_ne h]
 
-theorem placeOp_comm (ψ : ∀ v, AddChar (Fq v) ℂ) {V : Type} [AddCommGroup V] [Module ℂ V]
-    (π : Representation ℂ (∀ v, GL (Fin k) (Fq v)) V) (v : ι) (g : ∀ v, GL (Fin k) (Fq v)) :
-    π g ∘ₗ placeOp ψ π v = placeOp ψ π v ∘ₗ π g := by
+theorem placeOp_comm
+    (ψ : ∀ v, AddChar (Fq v) ℂ)
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (π : Representation ℂ (∀ v, GL (Fin k) (Fq v)) V)
+    (v : ι) (g : ∀ v, GL (Fin k) (Fq v))
+    : π g ∘ₗ placeOp ψ π v = placeOp ψ π v ∘ₗ π g := by
   unfold placeOp
   show π g * (∑ y, gam (ψ v) y • π (Pi.mulSingle v y)) = (∑ y, gam (ψ v) y • π (Pi.mulSingle v y)) * π g
   rw [Finset.mul_sum, Finset.sum_mul]
@@ -60,9 +65,14 @@ theorem placeOp_comm (ψ : ∀ v, AddChar (Fq v) ℂ) {V : Type} [AddCommGroup V
   congr 1
   group
 
-theorem placeOp_mem (ψ : ∀ v, AddChar (Fq v) ℂ) {V : Type} [AddCommGroup V] [Module ℂ V]
-    (π : Representation ℂ (∀ v, GL (Fin k) (Fq v)) V) (v : ι) (W : Submodule ℂ V)
-    (hW : ∀ g, ∀ x ∈ W, π g x ∈ W) (x : V) (hx : x ∈ W) : placeOp ψ π v x ∈ W := by
+theorem placeOp_mem
+    (ψ : ∀ v, AddChar (Fq v) ℂ)
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (π : Representation ℂ (∀ v, GL (Fin k) (Fq v)) V)
+    (v : ι)
+    (W : Submodule ℂ V) (hW : ∀ g, ∀ x ∈ W, π g x ∈ W)
+    (x : V) (hx : x ∈ W)
+    : placeOp ψ π v x ∈ W := by
   unfold placeOp
   rw [LinearMap.sum_apply]
   exact Submodule.sum_mem _ fun y _ => Submodule.smul_mem _ _ (hW _ x hx)
@@ -81,8 +91,9 @@ theorem joint_eigenvector_exists : JointEig := by
     have h1 := congrArg (fun e : V →ₗ[ℂ] V => e x) (totOp_comm ψ π g)
     simp only [LinearMap.comp_apply] at h1
     rw [← h1, hx, map_smul]
-  have hex : ∃ n, ∃ W : Submodule ℂ V, W ≠ ⊥ ∧ W ≤ E ∧ (∀ g, ∀ x ∈ W, π g x ∈ W) ∧
-      Module.finrank ℂ W = n := by
+  have hex
+      : ∃ n, ∃ W : Submodule ℂ V,
+        W ≠ ⊥ ∧ W ≤ E ∧ (∀ g, ∀ x ∈ W, π g x ∈ W) ∧ Module.finrank ℂ W = n := by
     refine ⟨_, E, ?_, le_rfl, Einv, rfl⟩
     intro h
     apply hw

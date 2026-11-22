@@ -20,13 +20,14 @@ private lemma coeff_lin_form {A ι : Type} [CommRing A] [Fintype ι] (a : ι →
     exact hk (Finsupp.single_left_injective one_ne_zero h)
   · simp
 
-theorem UpperTheory.Gal.crystallineComparison.matchStep_of :
-    GaussLin → SameNormBasic → LinFactor → MatchStep := by
+theorem UpperTheory.Gal.crystallineComparison.matchStep_of
+    : GaussLin → SameNormBasic → LinFactor → MatchStep := by
   intro hG hS hL B _ ϖ hϖ hnu ι _ N m hm u u' hcard hsame x hx hchain hdich
   by_contra hcon
   push_neg at hcon
-  have hex : ∀ y : ι → B, ∃ c : B, ∃ e : ι → B,
-      y ∈ u' → c ∣ ϖ ^ m ∧ (∃ k₀, e k₀ = 1) ∧ ∀ k, x k - y k = c * e k := by
+  have hex
+      : ∀ y : ι → B, ∃ c : B, ∃ e : ι → B,
+        y ∈ u' → c ∣ ϖ ^ m ∧ (∃ k₀, e k₀ = 1) ∧ ∀ k, x k - y k = c * e k := by
     intro y
     by_cases hy : y ∈ u'
     · obtain ⟨k, hk⟩ := hcon y hy
@@ -36,11 +37,15 @@ theorem UpperTheory.Gal.crystallineComparison.matchStep_of :
     · exact ⟨0, 0, fun h => absurd h hy⟩
   choose c e hce using hex
   set M := ϖ ^ (m * (N + 1)) with hM
-  have h4 := (hS (B ⧸ Ideal.span {M}) ι).2.2.2 (fun k => Ideal.Quotient.mk (Ideal.span {M}) (x k))
-    (redMod M u) (redMod M u') hsame (Multiset.mem_map_of_mem _ hx)
-  let L : (ι → B) → MvPolynomial ι (B ⧸ Ideal.span {M}) :=
-    fun y => ∑ k, MvPolynomial.C (Ideal.Quotient.mk (Ideal.span {M}) (e y k)) * MvPolynomial.X k
-  have h4' : (u'.map (fun y => MvPolynomial.C (Ideal.Quotient.mk (Ideal.span {M}) (c y)) * L y)).prod = 0 := by
+  have h4 :=
+    (hS (B ⧸ Ideal.span {M}) ι).2.2.2
+      (fun k => Ideal.Quotient.mk (Ideal.span {M}) (x k))
+      (redMod M u) (redMod M u') hsame (Multiset.mem_map_of_mem _ hx)
+  let L : (ι → B) → MvPolynomial ι (B ⧸ Ideal.span {M}) := fun y =>
+    ∑ k, MvPolynomial.C (Ideal.Quotient.mk (Ideal.span {M}) (e y k)) * MvPolynomial.X k
+  have h4'
+      : (u'.map (fun y => MvPolynomial.C (Ideal.Quotient.mk (Ideal.span {M}) (c y)) * L y)).prod
+        = 0 := by
     rw [← h4]
     congr 1
     unfold redMod
@@ -50,10 +55,12 @@ theorem UpperTheory.Gal.crystallineComparison.matchStep_of :
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [← map_sub, (hce y hy).2.2 k, map_mul, map_mul, mul_assoc]
   rw [Multiset.prod_map_mul] at h4'
-  have hC : (u'.map fun y => (MvPolynomial.C (Ideal.Quotient.mk (Ideal.span {M}) (c y)) :
-        MvPolynomial ι (B ⧸ Ideal.span {M}))).prod =
-      (MvPolynomial.C (Ideal.Quotient.mk (Ideal.span {M}) (u'.map c).prod) :
-        MvPolynomial ι (B ⧸ Ideal.span {M})) := by
+  have hC
+      : (u'.map fun y =>
+          (MvPolynomial.C (Ideal.Quotient.mk (Ideal.span {M}) (c y))
+            : MvPolynomial ι (B ⧸ Ideal.span {M}))).prod
+        = (MvPolynomial.C (Ideal.Quotient.mk (Ideal.span {M}) (u'.map c).prod)
+          : MvPolynomial ι (B ⧸ Ideal.span {M})) := by
     rw [map_multiset_prod, map_multiset_prod, Multiset.map_map, Multiset.map_map]
     rfl
   rw [hC] at h4'

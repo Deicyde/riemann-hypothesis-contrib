@@ -4,14 +4,16 @@ public import Mathlib
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj TopologicalSpace TensorProduct
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  TopologicalSpace TensorProduct
 open scoped CategoryTheory.Obj
 
 noncomputable section
 namespace GlobalTheory.FibreHyp
 
 section defs
-variable {A : Type} [CommRing A] {σ : Type} (f g : MvPolynomial σ A) (k : Type) [Field k] [Algebra A k]
+variable
+  {A : Type} [CommRing A] {σ : Type} (f g : MvPolynomial σ A) (k : Type) [Field k] [Algebra A k]
 
 abbrev Ik : Ideal (MvPolynomial σ k) := Ideal.span {MvPolynomial.map (algebraMap A k) f}
 
@@ -20,7 +22,8 @@ abbrev Lk := Localization.Away (Ideal.Quotient.mk (Ik f k) (MvPolynomial.map (al
 abbrev LA := Localization.Away (Ideal.Quotient.mk (Ideal.span {f}) g)
 
 def rhoK : MvPolynomial σ k →ₐ[k] Lk f g k :=
-  (IsScalarTower.toAlgHom k (MvPolynomial σ k ⧸ Ik f k) (Lk f g k)).comp (Ideal.Quotient.mkₐ k (Ik f k))
+  (IsScalarTower.toAlgHom k (MvPolynomial σ k ⧸ Ik f k) (Lk f g k)).comp
+    (Ideal.Quotient.mkₐ k (Ik f k))
 
 def rhoA : MvPolynomial σ A →ₐ[A] LA f g :=
   (IsScalarTower.toAlgHom A (MvPolynomial σ A ⧸ Ideal.span {f}) (LA f g)).comp
@@ -55,10 +58,12 @@ lemma fibreHypersurfaceForwardQuotient_mk (p : MvPolynomial σ A) :
   rw [← fibreHypersurfaceForwardPolynomial_apply]; rfl
 
 def fwd2 : LA f g →ₐ[A] Lk f g k :=
-  IsLocalization.Away.liftAlgHom (S := LA f g) (Ideal.Quotient.mk (Ideal.span {f}) g) (f := fwd1 f g k) (by
-    rw [fibreHypersurfaceForwardQuotient_mk, rhoK_apply]
-    exact IsLocalization.Away.algebraMap_isUnit (S := Lk f g k)
-      (Ideal.Quotient.mk (Ik f k) (MvPolynomial.map (algebraMap A k) g)))
+  IsLocalization.Away.liftAlgHom (S := LA f g) (Ideal.Quotient.mk (Ideal.span {f}) g)
+    (f := fwd1 f g k)
+    (by
+      rw [fibreHypersurfaceForwardQuotient_mk, rhoK_apply]
+      exact IsLocalization.Away.algebraMap_isUnit (S := Lk f g k)
+        (Ideal.Quotient.mk (Ik f k) (MvPolynomial.map (algebraMap A k) g)))
 
 def fwd : k ⊗[A] LA f g →ₐ[k] Lk f g k :=
   Algebra.TensorProduct.lift (Algebra.ofId k _) (fwd2 f g k) (fun _ _ => Commute.all _ _)
@@ -87,10 +92,13 @@ def bwd1 : (MvPolynomial σ k ⧸ Ik f k) →ₐ[k] k ⊗[A] LA f g :=
 lemma fibreHypersurfaceBackwardQuotient_mk (p : MvPolynomial σ k) : bwd1 f g k (Ideal.Quotient.mk _ p) = bwd0 f g k p := rfl
 
 def bwd2 : Lk f g k →ₐ[k] k ⊗[A] LA f g :=
-  IsLocalization.Away.liftAlgHom (S := Lk f g k) (Ideal.Quotient.mk (Ik f k) (MvPolynomial.map (algebraMap A k) g)) (f := bwd1 f g k) (by
-    rw [fibreHypersurfaceBackwardQuotient_mk, fibreHypersurfaceBackwardPolynomial_map, rhoA_apply]
-    exact (IsLocalization.Away.algebraMap_isUnit (S := LA f g)
-      (Ideal.Quotient.mk (Ideal.span {f}) g)).map (Algebra.TensorProduct.includeRight (R := A) (A := k)))
+  IsLocalization.Away.liftAlgHom (S := Lk f g k)
+    (Ideal.Quotient.mk (Ik f k) (MvPolynomial.map (algebraMap A k) g)) (f := bwd1 f g k)
+    (by
+      rw [fibreHypersurfaceBackwardQuotient_mk, fibreHypersurfaceBackwardPolynomial_map, rhoA_apply]
+      exact (IsLocalization.Away.algebraMap_isUnit (S := LA f g)
+          (Ideal.Quotient.mk (Ideal.span {f}) g)).map
+        (Algebra.TensorProduct.includeRight (R := A) (A := k)))
 
 lemma fwd_bwd : (fwd f g k).comp (bwd2 f g k) = AlgHom.id k _ := by
   apply IsLocalization.algHom_ext (Submonoid.powers (Ideal.Quotient.mk (Ik f k) (MvPolynomial.map (algebraMap A k) g)))
@@ -126,15 +134,18 @@ lemma bwd_fwd : (bwd2 f g k).comp (fwd f g k) = AlgHom.id k _ := by
 lemma rhoK_comp : (rhoK f g k).toRingHom =
     (algebraMap (MvPolynomial σ k ⧸ Ik f k) (Lk f g k)).comp (Ideal.Quotient.mk (Ik f k)) := rfl
 
-theorem isEmbedding_comap_rhoK : Topology.IsEmbedding (PrimeSpectrum.comap (rhoK f g k).toRingHom) := by
+theorem isEmbedding_comap_rhoK
+    : Topology.IsEmbedding (PrimeSpectrum.comap (rhoK f g k).toRingHom) := by
   rw [rhoK_comp, PrimeSpectrum.comap_comp]
-  exact (PrimeSpectrum.isClosedEmbedding_comap_of_surjective _ _ Ideal.Quotient.mk_surjective).isEmbedding.comp
+  exact (PrimeSpectrum.isClosedEmbedding_comap_of_surjective _ _
+      Ideal.Quotient.mk_surjective).isEmbedding.comp
     (PrimeSpectrum.localization_away_isOpenEmbedding (Lk f g k)
       (Ideal.Quotient.mk (Ik f k) (MvPolynomial.map (algebraMap A k) g))).isEmbedding
 
-theorem range_comap_rhoK : Set.range (PrimeSpectrum.comap (rhoK f g k).toRingHom) =
-    PrimeSpectrum.zeroLocus {MvPolynomial.map (algebraMap A k) f} \
-      PrimeSpectrum.zeroLocus {MvPolynomial.map (algebraMap A k) g} := by
+theorem range_comap_rhoK
+    : Set.range (PrimeSpectrum.comap (rhoK f g k).toRingHom)
+      = PrimeSpectrum.zeroLocus {MvPolynomial.map (algebraMap A k) f}
+        \ PrimeSpectrum.zeroLocus {MvPolynomial.map (algebraMap A k) g} := by
   ext p
   constructor
   · rintro ⟨q, rfl⟩
@@ -143,7 +154,8 @@ theorem range_comap_rhoK : Set.range (PrimeSpectrum.comap (rhoK f g k).toRingHom
         PrimeSpectrum.comap_asIdeal, Ideal.mem_comap]
       have : (rhoK f g k).toRingHom (MvPolynomial.map (algebraMap A k) f) = 0 := by
         simp [rhoK_apply, Ideal.Quotient.eq_zero_iff_mem, Ideal.mem_span_singleton_self]
-      rw [this]; exact q.asIdeal.zero_mem
+      rw [this]
+      exact q.asIdeal.zero_mem
     · rw [PrimeSpectrum.mem_zeroLocus, Set.singleton_subset_iff, SetLike.mem_coe,
         PrimeSpectrum.comap_asIdeal, Ideal.mem_comap]
       intro h
@@ -157,7 +169,9 @@ theorem range_comap_rhoK : Set.range (PrimeSpectrum.comap (rhoK f g k).toRingHom
         PrimeSpectrum.zeroLocus_span]
       exact hf
     obtain ⟨q0, rfl⟩ := h1
-    have h2 : q0 ∈ Set.range (PrimeSpectrum.comap (algebraMap (MvPolynomial σ k ⧸ Ik f k) (Lk f g k))) := by
+    have h2
+        : q0 ∈ Set.range (PrimeSpectrum.comap (algebraMap (MvPolynomial σ k ⧸ Ik f k)
+          (Lk f g k))) := by
       rw [PrimeSpectrum.localization_away_comap_range (Lk f g k)
         (Ideal.Quotient.mk (Ik f k) (MvPolynomial.map (algebraMap A k) g))]
       intro h
@@ -170,25 +184,29 @@ theorem range_comap_rhoK : Set.range (PrimeSpectrum.comap (rhoK f g k).toRingHom
 
 end defs
 
-theorem preirreducibleSpace_congr {X Y : Type} [TopologicalSpace X] [TopologicalSpace Y] (e : X ≃ₜ Y) :
-    PreirreducibleSpace X ↔ PreirreducibleSpace Y := by
-  have key : ∀ {X Y : Type} [TopologicalSpace X] [TopologicalSpace Y] (e : X ≃ₜ Y),
-      PreirreducibleSpace X → PreirreducibleSpace Y := by
+theorem preirreducibleSpace_congr
+    {X Y : Type} [TopologicalSpace X] [TopologicalSpace Y] (e : X ≃ₜ Y)
+    : PreirreducibleSpace X ↔ PreirreducibleSpace Y := by
+  have key
+      : ∀ {X Y : Type} [TopologicalSpace X] [TopologicalSpace Y] (e : X ≃ₜ Y),
+        PreirreducibleSpace X → PreirreducibleSpace Y := by
     intro X Y _ _ e h
     refine ⟨?_⟩
     have := (PreirreducibleSpace.isPreirreducible_univ (X := X)).image e e.continuous.continuousOn
     rwa [Set.image_univ_of_surjective e.surjective] at this
   exact ⟨key e, key e.symm⟩
 
-theorem spectrum_fibre_preirreducible_iff (A : Type) [CommRing A] (σ : Type) (f g : MvPolynomial σ A)
-    (k : Type) [Field k] [Algebra A k] :
-    PreirreducibleSpace (PrimeSpectrum (k ⊗[A] Localization.Away (Ideal.Quotient.mk (Ideal.span {f}) g))) ↔
-      IsPreirreducible (PrimeSpectrum.zeroLocus {MvPolynomial.map (algebraMap A k) f} \
-        PrimeSpectrum.zeroLocus {MvPolynomial.map (algebraMap A k) g}) := by
+theorem spectrum_fibre_preirreducible_iff
+    (A : Type) [CommRing A] (σ : Type) (f g : MvPolynomial σ A) (k : Type) [Field k] [Algebra A k]
+    : PreirreducibleSpace (PrimeSpectrum
+        (k ⊗[A] Localization.Away (Ideal.Quotient.mk (Ideal.span {f}) g)))
+      ↔ IsPreirreducible
+        (PrimeSpectrum.zeroLocus {MvPolynomial.map (algebraMap A k) f}
+          \ PrimeSpectrum.zeroLocus {MvPolynomial.map (algebraMap A k) g}) := by
   let e : (k ⊗[A] LA f g) ≃ₐ[k] Lk f g k :=
     AlgEquiv.ofAlgHom (fwd f g k) (bwd2 f g k) (fwd_bwd f g k) (bwd_fwd f g k)
-  rw [preirreducibleSpace_congr (PrimeSpectrum.homeomorphOfRingEquiv e.toRingEquiv), ← range_comap_rhoK,
-    isPreirreducible_iff_preirreducibleSpace]
+  rw [preirreducibleSpace_congr (PrimeSpectrum.homeomorphOfRingEquiv e.toRingEquiv),
+    ← range_comap_rhoK, isPreirreducible_iff_preirreducibleSpace]
   exact preirreducibleSpace_congr (isEmbedding_comap_rhoK f g k).toHomeomorph
 
 end GlobalTheory.FibreHyp

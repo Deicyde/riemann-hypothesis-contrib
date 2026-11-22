@@ -17,23 +17,27 @@ open scoped Pointwise
 
 namespace IntermediateRingQuotLength
 
-theorem smul_top_eq_span {A : Type*} [CommRing A] (a : A) :
-    (a • ⊤ : Submodule A A) = Ideal.span {a} := by
+theorem smul_top_eq_span {A : Type*} [CommRing A] (a : A)
+    : (a • ⊤ : Submodule A A) = Ideal.span {a} := by
   rw [← Submodule.ideal_span_singleton_smul, smul_eq_mul, Ideal.mul_top]
 
-theorem length_quot_smul_le {A : Type*} [CommRing A] [IsDomain A] [IsNoetherianRing A]
-    [Ring.KrullDimLE 1 A] {M : Type*} [AddCommGroup M] [Module A M] (φ : A →ₗ[A] M)
+theorem length_quot_smul_le
+    {A : Type*} [CommRing A] [IsDomain A] [IsNoetherianRing A] [Ring.KrullDimLE 1 A]
+    {M : Type*} [AddCommGroup M] [Module A M]
+    (φ : A →ₗ[A] M)
     (hφ : Function.Injective φ) (htor : ∀ x : M, ∃ c : A, c ≠ 0 ∧ c • x ∈ LinearMap.range φ)
-    {a : A} (ha : a ≠ 0) (hreg : Function.Injective fun x : M => a • x) :
-    Module.length A (M ⧸ (a • ⊤ : Submodule A M)) ≤ Module.length A (A ⧸ Ideal.span {a}) := by
+    {a : A} (ha : a ≠ 0) (hreg : Function.Injective fun x : M => a • x)
+    : Module.length A (M ⧸ (a • ⊤ : Submodule A M)) ≤ Module.length A (A ⧸ Ideal.span {a}) := by
   rw [← smul_top_eq_span]
   have hLtop : Module.length A (A ⧸ (a • ⊤ : Submodule A A)) ≠ ⊤ := by
     rw [smul_top_eq_span]
-    exact Module.length_ne_top_iff.mpr
-      (isFiniteLength_quotient_span_singleton A (mem_nonZeroDivisors_of_ne_zero ha))
+    exact Module.length_ne_top_iff.mpr (isFiniteLength_quotient_span_singleton A
+      (mem_nonZeroDivisors_of_ne_zero ha))
   let T : Submodule A M := a • ⊤
-  have hfg : ∀ N : Submodule A M, N.FG → LinearMap.range φ ≤ N →
-      Module.length A (N.map T.mkQ) ≤ Module.length A (A ⧸ (a • ⊤ : Submodule A A)) := by
+  have hfg
+      : ∀ N : Submodule A M,
+        N.FG → LinearMap.range φ ≤ N
+          → Module.length A (N.map T.mkQ) ≤ Module.length A (A ⧸ (a • ⊤ : Submodule A A)) := by
     intro N hN hφN
     have : Module.Finite A N := Module.Finite.iff_fg.mpr hN
     let φN : A →ₗ[A] N := φ.codRestrict N fun y => hφN (LinearMap.mem_range_self φ y)
@@ -41,8 +45,8 @@ theorem length_quot_smul_le {A : Type*} [CommRing A] [IsDomain A] [IsNoetherianR
     have hregN : Function.Injective fun x : N => a • x := fun x y h =>
       Subtype.ext (hreg (congrArg Subtype.val h))
     have hfin : IsFiniteLength A (N ⧸ LinearMap.range φN) := by
-      refine GroundTheory.Heights₂.Heights.Model.TorsionFreeQuotientLength.isFiniteLength_of_torsion _
-        fun q => ?_
+      refine GroundTheory.Heights₂.Heights.Model.TorsionFreeQuotientLength.isFiniteLength_of_torsion
+        _ fun q => ?_
       obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ q
       obtain ⟨c, hc, y, hy⟩ := htor x
       refine ⟨c, hc, ?_⟩
@@ -55,16 +59,21 @@ theorem length_quot_smul_le {A : Type*} [CommRing A] [IsDomain A] [IsNoetherianR
       exact smul_mem_pointwise_smul _ a ⊤ mem_top
     have hmap : N.map T.mkQ = LinearMap.range ((a • ⊤ : Submodule A N).liftQ _ hle) := by
       rw [range_liftQ, LinearMap.range_comp, range_subtype]
-    rw [hmap, ← GroundTheory.Heights₂.Heights.Model.TorsionFreeQuotientLength.length_quot_smul_eq φN hφN'
-      hregN hfin]
+    rw [hmap,
+      ← GroundTheory.Heights₂.Heights.Model.TorsionFreeQuotientLength.length_quot_smul_eq φN hφN'
+        hregN hfin]
     exact Module.length_le_of_surjective _ (LinearMap.surjective_rangeRestrict _)
-  let S : Set ℕ := {n | ∃ N : Submodule A M, N.FG ∧ LinearMap.range φ ≤ N ∧
-    Module.length A (N.map T.mkQ) = n}
-  have hSb : BddAbove S := ⟨(Module.length A (A ⧸ (a • ⊤ : Submodule A A))).toNat, by
-    rintro n ⟨N, hN, hφN, hn⟩
-    have := hfg N hN hφN
-    rw [hn] at this
-    simpa using ENat.toNat_le_toNat this hLtop⟩
+  let S : Set ℕ :=
+    {n | ∃ N : Submodule A M, N.FG ∧ LinearMap.range φ ≤ N ∧
+      Module.length A (N.map T.mkQ) = n}
+  have hSb : BddAbove S := ⟨
+    (Module.length A (A ⧸ (a • ⊤ : Submodule A A))).toNat,
+    by
+      rintro n ⟨N, hN, hφN, hn⟩
+      have := hfg N hN hφN
+      rw [hn] at this
+      simpa using ENat.toNat_le_toNat this hLtop
+  ⟩
   have hφfg : (LinearMap.range φ).FG := by
     rw [LinearMap.range_eq_map]
     exact Module.Finite.fg_top.map φ
@@ -91,8 +100,9 @@ theorem length_quot_smul_le {A : Type*} [CommRing A] [IsDomain A] [IsNoetherianR
       exact ENat.natCast_lt_top _
     rw [hm, ← ENat.natCast_toNat hne] at h2
     exact absurd (ENat.natCast_lt_natCast.mp h2) (not_lt.mpr h1)
-  calc Module.length A (M ⧸ T) = Module.length A (N₀.map T.mkQ) := by
-        rw [htop, Module.length_top]
+  calc
+    Module.length A (M ⧸ T)
+      = Module.length A (N₀.map T.mkQ) := by rw [htop, Module.length_top]
     _ ≤ Module.length A (A ⧸ (a • ⊤ : Submodule A A)) := hfg N₀ hN₀ hφN₀
 
 end IntermediateRingQuotLength

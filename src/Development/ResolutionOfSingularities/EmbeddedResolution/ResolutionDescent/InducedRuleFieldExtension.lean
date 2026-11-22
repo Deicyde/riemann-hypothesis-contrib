@@ -24,16 +24,16 @@ noncomputable section
 
 namespace FunctorialResolution.EmbeddedResolution
 
-private theorem notMem_support_comap_top {A C : Scheme.{u}} (h : A ⟶ C) (x : ↥A) :
-    x ∉ ((⊤ : C.IdealSheafData).comap h).support := by
+private theorem notMem_support_comap_top {A C : Scheme.{u}} (h : A ⟶ C) (x : ↥A)
+    : x ∉ ((⊤ : C.IdealSheafData).comap h).support := by
   rw [Scheme.IdealSheafData.comap_top, Scheme.IdealSheafData.support_top]
   intro hx
   have hx' : x ∈ ((⊥ : TopologicalSpace.Closeds ↥A) : Set ↥A) := hx
   simp at hx'
 
-theorem center_ne_top_of_isPullbackSequenceOfBlowups_id {X : Scheme.{u}} (s : SequenceOfBlowups X)
-    (h : IsPullbackBlowupSequence (𝟙 X) s s) :
-    ∀ i : ℕ, i < s.length → s.center i ≠ ⊤ := by
+theorem center_ne_top_of_isPullbackSequenceOfBlowups_id
+    {X : Scheme.{u}} (s : SequenceOfBlowups X) (h : IsPullbackBlowupSequence (𝟙 X) s s)
+    : ∀ i : ℕ, i < s.length → s.center i ≠ ⊤ := by
   obtain ⟨r, _e, _hlt, hmono, htop, hsupp, -⟩ := h
   have hgeid : ∀ i : ℕ, i ≤ s.length → i ≤ r i := by
     intro i
@@ -69,18 +69,39 @@ theorem center_ne_top_of_isPullbackSequenceOfBlowups_id {X : Scheme.{u}} (s : Se
   rw [hc] at hx
   exact notMem_support_comap_top _ x hx
 
-theorem AffineResolutionRule.center_ne_top (B : AffineResolutionRule.{u}) (hB : IsCompatibleWithOpenImmersions B)
-    (k : Type u) [Field k] [CharZero k] (Y : Scheme.{u})
-    (p : Y ⟶ Spec (CommRingCat.of k)) [AlgebraicGeometry.LocallyOfFiniteType p]
-    [AlgebraicGeometry.QuasiCompact p] [AlgebraicGeometry.IsReduced Y]
-    [AlgebraicGeometry.IsAffine Y] :
-    ∀ i : ℕ, i < (B k Y p).length → (B k Y p).center i ≠ ⊤ :=
-  center_ne_top_of_isPullbackSequenceOfBlowups_id (B k Y p) (hB k Y Y p p (𝟙 Y) (Category.id_comp p))
+theorem AffineResolutionRule.center_ne_top
+    (B : AffineResolutionRule.{u}) (hB : IsCompatibleWithOpenImmersions B)
+    (k : Type u) [Field k] [CharZero k]
+    (Y : Scheme.{u}) (p : Y ⟶ Spec (CommRingCat.of k))
+    [AlgebraicGeometry.LocallyOfFiniteType p] [AlgebraicGeometry.QuasiCompact p]
+    [AlgebraicGeometry.IsReduced Y] [AlgebraicGeometry.IsAffine Y]
+    : ∀ i : ℕ, i < (B k Y p).length → (B k Y p).center i ≠ ⊤ :=
+  center_ne_top_of_isPullbackSequenceOfBlowups_id (B k Y p)
+    (hB k Y Y p p (𝟙 Y) (Category.id_comp p))
 
-theorem inducedRuleCompatibleWithFieldExtension (B : AffineResolutionRule.{u}) : InducedRuleCompatibleWithFieldExtension B := by
+theorem inducedRuleCompatibleWithFieldExtension (B : AffineResolutionRule.{u})
+    : InducedRuleCompatibleWithFieldExtension B := by
   intro hoi hfe F hF k _ _ X f _ _ _ K _ _ _ _
-  obtain ⟨W, c, g, hWaff, hWred, hqlft, hqqc, hcet, hcsur, hYaff, hYred, hglft, hgqc, hget,
-    hgsur, hgstruct, hgproj⟩ := exists_etale_surjective_affine_cover_baseChange X f K
+  obtain ⟨
+      W,
+      c,
+      g,
+      hWaff,
+      hWred,
+      hqlft,
+      hqqc,
+      hcet,
+      hcsur,
+      hYaff,
+      hYred,
+      hglft,
+      hgqc,
+      hget,
+      hgsur,
+      hgstruct,
+      hgproj
+    ⟩ :=
+    exists_etale_surjective_affine_cover_baseChange X f K
   have := hWaff
   have := hWred
   have := hqlft
@@ -96,9 +117,9 @@ theorem inducedRuleCompatibleWithFieldExtension (B : AffineResolutionRule.{u}) :
   have h0 : IsStrictPullbackBlowupSeq (baseChangeProjection f K)
       ((F k X f).baseChange (baseChangeProjection f K)) (F k X f) :=
     isStrictPullbackSequenceOfBlowups_baseChange _ _
-  have hw : IsStrictPullbackBlowupSeq g
-      (((F k X f).baseChange (baseChangeProjection f K)).baseChange g)
-      ((F k X f).baseChange (baseChangeProjection f K)) :=
+  have hw
+      : IsStrictPullbackBlowupSeq g (((F k X f).baseChange (baseChangeProjection f K)).baseChange g)
+        ((F k X f).baseChange (baseChangeProjection f K)) :=
     isStrictPullbackSequenceOfBlowups_baseChange _ _
   have hcomp := hw.comp h0
   rw [hgproj] at hcomp
@@ -108,13 +129,15 @@ theorem inducedRuleCompatibleWithFieldExtension (B : AffineResolutionRule.{u}) :
       (B K (baseChange (c ≫ f) K) (baseChangeToSpec (c ≫ f) K)) (B k W (c ≫ f)) :=
     hfe k W (c ≫ f) K
   have hEqw := hcomp.isomorphic (htK.comp htW)
-  have hntop := AffineResolutionRule.center_ne_top B hoi K (baseChange (c ≫ f) K)
-      (baseChangeToSpec (c ≫ f) K)
-  have hEq := (SequenceOfBlowups.Isomorphic.withoutIsoBlowups hEqw).trans (SequenceOfBlowups.withoutIsoBlowups_isomorphic_self _ hntop)
+  have hntop :=
+    AffineResolutionRule.center_ne_top B hoi K (baseChange (c ≫ f) K) (baseChangeToSpec (c ≫ f) K)
+  have hEq :=
+    (SequenceOfBlowups.Isomorphic.withoutIsoBlowups hEqw).trans
+      (SequenceOfBlowups.withoutIsoBlowups_isomorphic_self _ hntop)
   have h₂ : IsStrictPullbackBlowupSeq g (B K (baseChange (c ≫ f) K) (baseChangeToSpec (c ≫ f) K))
       (F K (baseChange f K) (baseChangeToSpec f K)) :=
-    hF K (baseChange f K) (baseChangeToSpec f K) (baseChange (c ≫ f) K)
-      (baseChangeToSpec (c ≫ f) K) g hgstruct AlgebraicGeometry.Surjective.surj
+    hF K (baseChange f K) (baseChangeToSpec f K) (baseChange (c ≫ f) K) (baseChangeToSpec (c ≫ f) K)
+      g hgstruct AlgebraicGeometry.Surjective.surj
   have hdesc := IsStrictPullbackBlowupSeq.isomorphic_of_isomorphic hw.withoutIsoBlowups h₂ hEq
   exact h0.isPullbackSequenceOfBlowups_withoutIsoBlowups.of_isomorphic hdesc
 

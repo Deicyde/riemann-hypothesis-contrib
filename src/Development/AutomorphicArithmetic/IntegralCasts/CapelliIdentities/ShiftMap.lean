@@ -4,8 +4,8 @@ public import Mathlib
 
 @[expose] public section
 
-private def UpperTheory.Reformulated.B.ShiftMap.shift {G H : Type} [Group G] [Group H] (p : G →* H) :
-    G →* ((H → ℂ) →ₗ[ℂ] (H → ℂ)) where
+private def UpperTheory.Reformulated.B.ShiftMap.shift {G H : Type} [Group G] [Group H] (p : G →* H)
+    : G →* ((H → ℂ) →ₗ[ℂ] (H → ℂ)) where
   toFun g := LinearMap.funLeft ℂ ℂ (fun z => (p g)⁻¹ * z)
   map_one' := by
     ext φ z
@@ -17,19 +17,21 @@ private def UpperTheory.Reformulated.B.ShiftMap.shift {G H : Type} [Group G] [Gr
 private lemma UpperTheory.Reformulated.B.ShiftMap.shift_apply {G H : Type} [Group G] [Group H] (p : G →* H)
     (g : G) (φ : H → ℂ) (z : H) : UpperTheory.Reformulated.B.ShiftMap.shift p g φ z = φ ((p g)⁻¹ * z) := rfl
 
-theorem UpperTheory.Reformulated.B.ShiftMap.finite_translates_matrix_coefficient :
-    ∀ (G H : Type) [inst : Group G] [inst_1 : TopologicalSpace G] [IsTopologicalGroup G]
-    [inst_3 : Group H] [inst_4 : TopologicalSpace H] [IsTopologicalGroup H] (p : G →* H),
-    Continuous (⇑p : G → H) →
-      ∀ (f : H → ℂ),
-        Continuous f →
-          FiniteDimensional ℂ ↥(Submodule.span ℂ (Set.range fun (k : G) (z : H) ↦ f (((p : G → H) k)⁻¹ * z))) →
-            ∃ (d : ℕ) (ρ : G →* Matrix (Fin d) (Fin d) ℂ),
-              Continuous (⇑ρ : G → Matrix (Fin d) (Fin d) ℂ) ∧
-                ∀ (x : G →₀ ℂ),
-                  (x.sum fun (k : G) (c : ℂ) ↦ c • (ρ : G → Matrix (Fin d) (Fin d) ℂ) k) =
-                      (0 : Matrix (Fin d) (Fin d) ℂ) →
-                    ∀ (z : H), (x.sum fun (k : G) (c : ℂ) ↦ c * f (((p : G → H) k)⁻¹ * z)) = (0 : ℂ) := by
+theorem UpperTheory.Reformulated.B.ShiftMap.finite_translates_matrix_coefficient
+    : ∀ (G H : Type) [inst : Group G] [inst_1 : TopologicalSpace G] [IsTopologicalGroup G]
+        [inst_3 : Group H] [inst_4 : TopologicalSpace H] [IsTopologicalGroup H] (p : G →* H),
+      Continuous (⇑p : G → H)
+        → ∀ (f : H → ℂ),
+          Continuous f
+            → FiniteDimensional ℂ
+              ↥(Submodule.span ℂ (Set.range fun (k : G) (z : H) ↦ f (((p : G → H) k)⁻¹ * z)))
+            → ∃ (d : ℕ) (ρ : G →* Matrix (Fin d) (Fin d) ℂ),
+              Continuous (⇑ρ : G → Matrix (Fin d) (Fin d) ℂ)
+                ∧ ∀ (x : G →₀ ℂ),
+                  (x.sum fun (k : G) (c : ℂ) ↦ c • (ρ : G → Matrix (Fin d) (Fin d) ℂ) k)
+                      = (0 : Matrix (Fin d) (Fin d) ℂ)
+                    → ∀ (z : H),
+                      (x.sum fun (k : G) (c : ℂ) ↦ c * f (((p : G → H) k)⁻¹ * z)) = (0 : ℂ) := by
   intro G H _ _ _ _ _ _ p hp f hf hfd
   set V : Submodule ℂ (H → ℂ) :=
     Submodule.span ℂ (Set.range fun (k : G) (z : H) ↦ f ((p k)⁻¹ * z)) with hV
@@ -52,17 +54,18 @@ theorem UpperTheory.Reformulated.B.ShiftMap.finite_translates_matrix_coefficient
     | add a b _ _ ha hb => exact ha.add hb
     | smul c a _ ha => exact ha.const_smul c
   have hfV : f ∈ V := Submodule.subset_span ⟨1, by funext z; simp⟩
-  let σ : G →* (V →ₗ[ℂ] V) :=
-    { toFun := fun g => (UpperTheory.Reformulated.B.ShiftMap.shift p g).restrict (hinv g)
-      map_one' := by
-        ext φ z
-        simp [UpperTheory.Reformulated.B.ShiftMap.shift_apply]
-      map_mul' := by
-        intro g h
-        ext φ z
-        simp [UpperTheory.Reformulated.B.ShiftMap.shift_apply, mul_assoc] }
-  have hσ : ∀ (g : G) (φ : V) (z : H), (σ g φ : H → ℂ) z = (φ : H → ℂ) ((p g)⁻¹ * z) :=
-    fun _ _ _ => rfl
+  let σ : G →* (V →ₗ[ℂ] V) := {
+    toFun := fun g => (UpperTheory.Reformulated.B.ShiftMap.shift p g).restrict (hinv g)
+    map_one' := by
+      ext φ z
+      simp [UpperTheory.Reformulated.B.ShiftMap.shift_apply]
+    map_mul' := by
+      intro g h
+      ext φ z
+      simp [UpperTheory.Reformulated.B.ShiftMap.shift_apply, mul_assoc]
+  }
+  have hσ : ∀ (g : G) (φ : V) (z : H), (σ g φ : H → ℂ) z = (φ : H → ℂ) ((p g)⁻¹ * z) := fun _ _ _ =>
+    rfl
   let b := Module.finBasis ℂ V
   let e := LinearMap.toMatrixAlgEquiv b
   refine ⟨Module.finrank ℂ V, (e.toAlgHom.toRingHom.toMonoidHom).comp σ, ?_, ?_⟩

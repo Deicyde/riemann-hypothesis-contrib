@@ -14,7 +14,8 @@ open Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV F
 
 noncomputable section
 namespace GlobalTheory.MatchCompare
-open GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.SymChain GlobalTheory.SymBridge
+open GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.SymChain
+  GlobalTheory.SymBridge
 open GlobalTheory.IndefiniteRowSideFullHecke.LocalOrderMatrix
 
 theorem isOrd_ordX (R : Ranks) (j : ℕ) : IsOrd xPos (ordX R j) := by
@@ -24,11 +25,16 @@ theorem isOrd_ordX (R : Ranks) (j : ℕ) : IsOrd xPos (ordX R j) := by
   · rw [ordX_d]; simp only [xPos]; ring
 
 section Concl
-variable {X : Fields} {Pr : Primes X} {R : Ranks} (Ch : Chars X Pr R.m)
-  (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) {S₀ : Set ℕ}
-  (mu : Tup X.F X.E X.K S₀) (cst : LocCst X (rowSG Pr sel mu)) (σ₀ : X.K →+* ℂ) (P : rowSG Pr sel mu)
+variable
+  {X : Fields} {Pr : Primes X} {R : Ranks}
+  (Ch : Chars X Pr R.m) (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E))
+  {S₀ : Set ℕ} (mu : Tup X.F X.E X.K S₀) (cst : LocCst X (rowSG Pr sel mu))
+  (σ₀ : X.K →+* ℂ) (P : rowSG Pr sel mu)
   {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-  (ι : X.E →+* k) {s : ℕ} (S : SymData k s R.k) [MeasurableSpace k] [BorelSpace k] (ν : Measure k)
+  (ι : X.E →+* k)
+  {s : ℕ} (S : SymData k s R.k)
+  [MeasurableSpace k] [BorelSpace k]
+  (ν : Measure k)
 
 end Concl
 
@@ -40,11 +46,14 @@ variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchim
 end Arith
 
 section Hyp
-variable {X : Fields} {Pr : Primes X} {R : Ranks} (Ch : Chars X Pr R.m)
-  (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) {S₀ : Set ℕ}
-  (mu : Tup X.F X.E X.K S₀) (cst : LocCst X (rowSG Pr sel mu)) (σ₀ : X.K →+* ℂ) (P : rowSG Pr sel mu)
+variable
+  {X : Fields} {Pr : Primes X} {R : Ranks}
+  (Ch : Chars X Pr R.m) (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E))
+  {S₀ : Set ℕ} (mu : Tup X.F X.E X.K S₀) (cst : LocCst X (rowSG Pr sel mu))
+  (σ₀ : X.K →+* ℂ) (P : rowSG Pr sel mu)
   {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-  (ι : X.E →+* k) {s : ℕ} (S : SymData k s R.k)
+  (ι : X.E →+* k)
+  {s : ℕ} (S : SymData k s R.k)
 
 end Hyp
 
@@ -58,7 +67,9 @@ variable [MeasurableSpace k] [BorelSpace k] (ν : Measure k)
 end Trunc
 
 section Ext
-variable {E K K' : Type} [Field E] [NumberField E] [StarRing E] [Field K] [Field K'] (φ : K →+* K')
+variable
+  {E K K' : Type} [Field E] [NumberField E] [StarRing E] [Field K] [Field K']
+  (φ : K →+* K')
   {P : HeightOneSpectrum (𝓞 E)}
 
 end Ext
@@ -86,10 +97,14 @@ variable {X K'} {Pr : Primes X} {R : Ranks} (Ch : Chars X Pr R.m) (φ : X.K →+
 
 variable {π} {P : HeightOneSpectrum (𝓞 X.E)}
 
-variable (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)) {S₀ : Set ℕ} (mu : Tup X.F X.E X.K S₀)
-  (cst : LocCst X (rowSG Pr sel mu)) (P : rowSG Pr sel mu) (z : K')
+variable
+  (sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E))
+  {S₀ : Set ℕ} (mu : Tup X.F X.E X.K S₀) (cst : LocCst X (rowSG Pr sel mu)) (P : rowSG Pr sel mu)
+  (z : K')
 
-variable {P} (hP : P.1 ∈ Pr.vGs) (hs : cst.sharp = true) (hq : (qOf P.1 : X.E) ≠ 0) (hP' : P.1 ∈ (onePrimes X K' π).vGs)
+variable
+  {P} (hP : P.1 ∈ Pr.vGs)
+  (hs : cst.sharp = true) (hq : (qOf P.1 : X.E) ≠ 0) (hP' : P.1 ∈ (onePrimes X K' π).vGs)
 
 end Reparam
 

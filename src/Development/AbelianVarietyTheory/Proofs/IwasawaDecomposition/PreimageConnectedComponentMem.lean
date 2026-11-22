@@ -13,33 +13,48 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.CompSplitPfB
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain Topology
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.L2.Geo GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ShFam.Pad
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.MainNotions
+  Formalism.L2.Pj Formalism.L2.Geo GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ShFam.Pad
 open Formalism.MainNotions.DIV.Cons (intO)
 
 namespace GlobalTheory.ShFam.PtComp
 
-theorem disjoint_of_smooth {K : Type} [Field K] {X : Scheme.{0}} (f : X ⟶ Spec (CommRingCat.of K)) (hsm : Smooth f)
-    (Z Z' : Set X) (hZ : Z ∈ irreducibleComponents X) (hZ' : Z' ∈ irreducibleComponents X) (hne : Z ≠ Z') :
-    Disjoint Z Z' := by
+theorem disjoint_of_smooth
+    {K : Type} [Field K]
+    {X : Scheme.{0}} (f : X ⟶ Spec (CommRingCat.of K)) (hsm : Smooth f) (Z Z' : Set X)
+    (hZ : Z ∈ irreducibleComponents X) (hZ' : Z' ∈ irreducibleComponents X) (hne : Z ≠ Z')
+    : Disjoint Z Z' := by
   refine CompSplitPfD.cspD_disj (fun x => ?_) Z Z' hZ hZ' hne
   obtain ⟨_, ⟨V, hV, rfl⟩, hxV, -⟩ :=
     X.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ x) isOpen_univ
   have hV' : IsAffineOpen V := hV
-  have h1 := HasRingHomProperty.appLE (P := @Smooth) f hsm
-    ⟨⊤, isAffineOpen_top _⟩ ⟨V, hV⟩ (fun p _ => by simp)
+  have h1 :=
+    HasRingHomProperty.appLE (P := @Smooth) f hsm ⟨⊤, isAffineOpen_top _⟩ ⟨V, hV⟩
+      (fun p _ => by simp)
   let ψ : K →+* Γ(X, V) :=
     (f.appLE ⊤ V (fun p _ => by simp)).hom.comp (Scheme.ΓSpecIso (CommRingCat.of K)).inv.hom
-  have hψ : ψ.Smooth := RingHom.Smooth.comp
-    (RingHom.Smooth.of_bijective (Scheme.ΓSpecIso (CommRingCat.of K)).symm.commRingCatIsoToRingEquiv.bijective) h1
+  have hψ : ψ.Smooth :=
+    RingHom.Smooth.comp
+      (RingHom.Smooth.of_bijective (Scheme.ΓSpecIso (CommRingCat.of
+        K)).symm.commRingCatIsoToRingEquiv.bijective)
+      h1
   let _ : Algebra K Γ(X, V) := ψ.toAlgebra
   have : Algebra.Smooth K Γ(X, V) := hψ
-  obtain ⟨r, hr, n, _, _, _⟩ := Algebra.IsSmoothAt.exists_isStandardEtale_mvPolynomial (R := K)
-    (p := (hV'.primeIdealOf ⟨x, hxV⟩).asIdeal)
-  refine ⟨PrimeSpectrum (Localization.Away r), inferInstance,
-    hV'.fromSpec ∘ PrimeSpectrum.comap (algebraMap Γ(X, V) (Localization.Away r)), ?_, ?_, ?_⟩
+  obtain ⟨r, hr, n, _, _, _⟩ :=
+    Algebra.IsSmoothAt.exists_isStandardEtale_mvPolynomial (R := K)
+      (p := (hV'.primeIdealOf ⟨x, hxV⟩).asIdeal)
+  refine ⟨
+    PrimeSpectrum (Localization.Away r),
+    inferInstance,
+    hV'.fromSpec ∘ PrimeSpectrum.comap (algebraMap Γ(X, V) (Localization.Away r)),
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · exact (hV'.fromSpec.isOpenEmbedding).comp (PrimeSpectrum.localization_away_isOpenEmbedding _ r)
-  · obtain ⟨z, hz⟩ : hV'.primeIdealOf ⟨x, hxV⟩ ∈
-        Set.range (PrimeSpectrum.comap (algebraMap Γ(X, V) (Localization.Away r))) := by
+  · obtain ⟨z, hz⟩
+        : hV'.primeIdealOf ⟨x, hxV⟩
+          ∈ Set.range (PrimeSpectrum.comap (algebraMap Γ(X, V) (Localization.Away r))) := by
       rw [PrimeSpectrum.localization_away_comap_range (Localization.Away r) r]
       exact hr
     refine ⟨z, ?_⟩
@@ -47,22 +62,29 @@ theorem disjoint_of_smooth {K : Type} [Field K] {X : Scheme.{0}} (f : X ⟶ Spec
     rw [hz]
     exact hV'.fromSpec_primeIdealOf ⟨x, hxV⟩
   · intro a b y ha hb hay hby
-    have : IsIntegrallyClosed (MvPolynomial (Fin n) K) := UniqueFactorizationMonoid.instIsIntegrallyClosed
-    have hmin : ∀ a : PrimeSpectrum (Localization.Away r), (∀ a', a' ⤳ a → a' = a) →
-        a.asIdeal ∈ minimalPrimes (Localization.Away r) := by
+    have : IsIntegrallyClosed (MvPolynomial (Fin n) K) :=
+      UniqueFactorizationMonoid.instIsIntegrallyClosed
+    have hmin
+        : ∀ a : PrimeSpectrum (Localization.Away r),
+          (∀ a', a' ⤳ a → a' = a) → a.asIdeal ∈ minimalPrimes (Localization.Away r) := by
       intro a ha
       refine ⟨⟨a.isPrime, bot_le⟩, fun J hJ hJa => ?_⟩
       have := ha ⟨J, hJ.1⟩ ((PrimeSpectrum.le_iff_specializes _ _).1 hJa)
       exact (congrArg PrimeSpectrum.asIdeal this).ge
-    exact PrimeSpectrum.ext (CompSplitPfC.cspC_minimal_unique (MvPolynomial (Fin n) K) (q := y.asIdeal)
-      (hmin a ha) (hmin b hb) ((PrimeSpectrum.le_iff_specializes _ _).2 hay)
+    exact PrimeSpectrum.ext (CompSplitPfC.cspC_minimal_unique (MvPolynomial (Fin n) K)
+      (q := y.asIdeal) (hmin a ha) (hmin b hb) ((PrimeSpectrum.le_iff_specializes _ _).2 hay)
       ((PrimeSpectrum.le_iff_specializes _ _).2 hby))
 
-theorem connectedComponent_mem {X : Type} [TopologicalSpace X] (hfin : (irreducibleComponents X).Finite)
-    (hd : ∀ Z ∈ irreducibleComponents X, ∀ Z' ∈ irreducibleComponents X, Z ≠ Z' → Disjoint Z Z') (z : X) :
-    connectedComponent z ∈ irreducibleComponents X ∧ IsOpen (connectedComponent z) := by
+theorem connectedComponent_mem
+    {X : Type} [TopologicalSpace X]
+    (hfin : (irreducibleComponents X).Finite)
+    (hd : ∀ Z ∈ irreducibleComponents X, ∀ Z' ∈ irreducibleComponents X, Z ≠ Z' → Disjoint Z Z')
+    (z : X)
+    : connectedComponent z ∈ irreducibleComponents X ∧ IsOpen (connectedComponent z) := by
   have hV := irreducibleComponent_mem_irreducibleComponents z
-  have hU : irreducibleComponent z = (⋃ W ∈ irreducibleComponents X \ {irreducibleComponent z}, W)ᶜ := by
+  have hU
+      : irreducibleComponent z
+        = (⋃ W ∈ irreducibleComponents X \ {irreducibleComponent z}, W)ᶜ := by
     ext p
     simp only [Set.mem_compl_iff, Set.mem_iUnion, not_exists]
     constructor
@@ -70,31 +92,40 @@ theorem connectedComponent_mem {X : Type} [TopologicalSpace X] (hfin : (irreduci
       exact Set.disjoint_left.1 (hd _ hW.1 _ hV hW.2) hpW hp
     · intro hp
       by_contra hpZ
-      exact hp _ ⟨irreducibleComponent_mem_irreducibleComponents p,
-        fun h => hpZ ((show irreducibleComponent p = _ from h) ▸ mem_irreducibleComponent)⟩ mem_irreducibleComponent
+      exact hp _
+        ⟨
+          irreducibleComponent_mem_irreducibleComponents p,
+          fun h => hpZ ((show irreducibleComponent p = _ from h) ▸ mem_irreducibleComponent)
+        ⟩
+        mem_irreducibleComponent
   have ho : IsOpen (irreducibleComponent z) := by
     rw [hU]
     exact ((hfin.subset Set.diff_subset).isClosed_biUnion fun W hW =>
       isClosed_of_mem_irreducibleComponents _ hW.1).isOpen_compl
   have e : connectedComponent z = irreducibleComponent z :=
-    ((IsClopen.connectedComponent_subset ⟨isClosed_irreducibleComponent, ho⟩ mem_irreducibleComponent)).antisymm
-      irreducibleComponent_subset_connectedComponent
+    ((IsClopen.connectedComponent_subset ⟨isClosed_irreducibleComponent, ho⟩
+      mem_irreducibleComponent)).antisymm irreducibleComponent_subset_connectedComponent
   rw [e]
   exact ⟨hV, ho⟩
 
 section Free
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {O : Type} [CommRing O] {β : O →+* c.F}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l} {O : Type} [CommRing O]
+  {β : O →+* c.F}
 
-theorem preimage_connectedComponent_mem (Z : Model Xo c β) (hsm : Smooth (genStr Z)) (z : gen Z) :
-    Z.jQ ⁻¹' connectedComponent z ∈ irreducibleComponents (Xo.XF c) := by
+theorem preimage_connectedComponent_mem (Z : Model Xo c β) (hsm : Smooth (genStr Z)) (z : gen Z)
+    : Z.jQ ⁻¹' connectedComponent z ∈ irreducibleComponents (Xo.XF c) := by
   have := isProper_genStr Z
   have : IsLocallyNoetherian (gen Z) := LocallyOfFiniteType.isLocallyNoetherian (genStr Z)
   have : CompactSpace (gen Z) := QuasiCompact.compactSpace_of_compactSpace (genStr Z)
   have : IsNoetherian (gen Z) := {}
-  obtain ⟨h1, h2⟩ := connectedComponent_mem TopologicalSpace.NoetherianSpace.finite_irreducibleComponents
-    (fun W hW W' hW' => disjoint_of_smooth (genStr Z) hsm W W' hW hW') z
+  obtain ⟨h1, h2⟩ :=
+    connectedComponent_mem TopologicalSpace.NoetherianSpace.finite_irreducibleComponents
+      (fun W hW W' hW' => disjoint_of_smooth (genStr Z) hsm W W' hW hW')
+      z
   have := Z.jQ_open
   exact preimage_mem_irreducibleComponents h1 Z.jQ.isOpenEmbedding
     (Z.jQ_dense.inter_open_nonempty _ h2 ⟨z, mem_connectedComponent⟩)
@@ -103,18 +134,25 @@ end Free
 
 variable {D : D7} {A : Amb D} {N j : ℕ} {S : Sig A N j} {κ : Lv A} (s : FinalTheorems S κ)
 
-theorem exists_equiv : ∃ q : s.Comp ≃ Comp (S.Xo κ.l) κ.c, ∀ k z,
-    OnComp s k z ↔ (q k).1 = s.T.Z.jQ ⁻¹' connectedComponent z := by
+theorem exists_equiv
+    : ∃ q : s.Comp ≃ Comp (S.Xo κ.l) κ.c, ∀ k z,
+      OnComp s k z ↔ (q k).1 = s.T.Z.jQ ⁻¹' connectedComponent z := by
   have hσ : Formalism.L2.PjFree.GoodEmb κ.c κ.σ₀ := rfl
-  have hne : ∀ k, ((s.U κ.σ₀).X k).dom.Nonempty := fun k => GlobalTheory.OrbitScalar.exists_mem_dom _
-  obtain ⟨q, hq⟩ := GlobalTheory.UnifComp.exists_equiv_comp _ _ _ _ _ _ κ.σ₀ N (s.U κ.σ₀) hσ (s.unf _ hσ).1 hne s.geo
-  have hsm : Smooth (genStr s.T.Z) := haveI := s.T.smooth; SmoothOfRelativeDimension.smooth S.Dw.dim _
+  have hne : ∀ k, ((s.U κ.σ₀).X k).dom.Nonempty := fun k =>
+    GlobalTheory.OrbitScalar.exists_mem_dom _
+  obtain ⟨q, hq⟩ :=
+    GlobalTheory.UnifComp.exists_equiv_comp _ _ _ _ _ _ κ.σ₀ N (s.U κ.σ₀) hσ (s.unf _ hσ).1 hne
+      s.geo
+  have hsm : Smooth (genStr s.T.Z) :=
+    haveI := s.T.smooth; SmoothOfRelativeDimension.smooth S.Dw.dim _
   refine ⟨q, fun k z => ⟨?_, fun h => ?_⟩⟩
   · rintro ⟨x, hx⟩
     by_contra hn
     let pt : Sp (CAt κ.σ₀) := (⟨⊥, Ideal.isPrime_bot⟩ : PrimeSpectrum ℂ)
-    exact Set.disjoint_left.1 (CompSplitPfD.cspD_comp_disj _ _ (q k)
-      ⟨_, preimage_connectedComponent_mem s.T.Z hsm z⟩ fun e => hn (congrArg Subtype.val e)) (hq k x pt) (hx pt)
+    exact Set.disjoint_left.1
+      (CompSplitPfD.cspD_comp_disj _ _ (q k) ⟨_, preimage_connectedComponent_mem s.T.Z hsm z⟩
+        fun e => hn (congrArg Subtype.val e))
+      (hq k x pt) (hx pt)
   · obtain ⟨x, hx⟩ := hne k
     refine ⟨⟨x, hx⟩, fun pt => ?_⟩
     have := hq k ⟨x, hx⟩ pt
@@ -123,9 +161,13 @@ theorem exists_equiv : ∃ q : s.Comp ≃ Comp (S.Xo κ.l) κ.c, ∀ k z,
 
 theorem existsUnique_onComp (z : gen s.T.Z) : ∃! k, OnComp s k z := by
   obtain ⟨q, hq⟩ := exists_equiv s
-  have hsm : Smooth (genStr s.T.Z) := haveI := s.T.smooth; SmoothOfRelativeDimension.smooth S.Dw.dim _
-  refine ⟨q.symm ⟨_, preimage_connectedComponent_mem s.T.Z hsm z⟩, (hq _ _).2 (by rw [Equiv.apply_symm_apply]),
-    fun k hk => ?_⟩
+  have hsm : Smooth (genStr s.T.Z) :=
+    haveI := s.T.smooth; SmoothOfRelativeDimension.smooth S.Dw.dim _
+  refine ⟨
+    q.symm ⟨_, preimage_connectedComponent_mem s.T.Z hsm z⟩,
+    (hq _ _).2 (by rw [Equiv.apply_symm_apply]),
+    fun k hk => ?_
+  ⟩
   rw [Equiv.eq_symm_apply]
   exact Subtype.ext ((hq _ _).1 hk)
 

@@ -16,15 +16,20 @@ namespace PositivityTheory.RgFd
 
 open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS.S7
 
-theorem sigLam_coe_of (hS : HlamStable) {n : ℕ} {ε : Fin n → Bool} {lam : Fin n → ℝ} {T : KType ε (lowK ε lam)}
-    {Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)} (hP : IsPsiFor ε lam T Ψ) {g : Matrix (Fin n) (Fin n) ℂ}
-    (hg : g ∈ UJset ε) (x : Hlam ε Ψ T.w) : ((sigLam ε Ψ T.w g x : Hlam ε Ψ T.w) : L2 ε) = rreg ε g x := by
+theorem sigLam_coe_of
+    (hS : HlamStable)
+    {n : ℕ} {ε : Fin n → Bool} {lam : Fin n → ℝ} {T : KType ε (lowK ε lam)}
+    {Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)} (hP : IsPsiFor ε lam T Ψ)
+    {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ UJset ε)
+    (x : Hlam ε Ψ T.w)
+    : ((sigLam ε Ψ T.w g x : Hlam ε Ψ T.w) : L2 ε) = rreg ε g x := by
   have hx : rreg ε g x ∈ Hlam ε Ψ T.w := hS n ε lam T Ψ hP g hg x x.2
   show (((Hlam ε Ψ T.w).orthogonalProjectionOnto (rreg ε g (x : L2 ε)) : Hlam ε Ψ T.w) : L2 ε) = _
   exact congrArg Subtype.val
     (Submodule.orthogonalProjectionOnto_mem_subspace_eq_self (⟨_, hx⟩ : Hlam ε Ψ T.w))
 
-theorem fdModel_of (hD : DegPsi) (hS : HlamStable) (hF : FormF) (hN : PsiNorm) (hM : ModelDS) : FdModel := by
+theorem fdModel_of (hD : DegPsi) (hS : HlamStable) (hF : FormF) (hN : PsiNorm) (hM : ModelDS)
+    : FdModel := by
   intro n ε lam T μ hl hμ
   obtain ⟨hP, hDS⟩ := hM n ε lam T μ hl hμ
   have : CompleteSpace (Hlam ε (PsiM T μ) T.w) := hDS.1
@@ -32,13 +37,19 @@ theorem fdModel_of (hD : DegPsi) (hS : HlamStable) (hF : FormF) (hN : PsiNorm) (
   have hw : T.w ≠ 0 := G2.fdc_w_ne T
   have hj0 : uniformisationL2 ε (PsiM T μ) T.w T.w ≠ 0 := by
     intro h
-    have h0 : uniformisationL2 ε (PsiM T μ) T.w (0 : T.V) = 0 := by simpa using datumEmbedding_smul hP T.w 0 (0 : T.V)
+    have h0 : uniformisationL2 ε (PsiM T μ) T.w (0 : T.V) = 0 := by
+      simpa using datumEmbedding_smul hP T.w 0 (0 : T.V)
     exact hw (uniformisationL2_injective hP hw (h.trans h0.symm))
   set C : ℝ := ‖uniformisationL2 ε (PsiM T μ) T.w T.w‖ ^ 2 with hC
   have hC0 : 0 < C := by positivity
   have h1 : (1 : Matrix (Fin n) (Fin n) ℂ) ∈ UJset ε := umat_mem_UJset ε 1
-  have hdeg := hD n ε T.V (PsiM T μ) (Hlam ε (PsiM T μ) T.w) (sigLam ε (PsiM T μ) T.w)
-    (fun v => ⟨uniformisationL2 ε (PsiM T μ) T.w v, datumEmbedding_mem_Hlam hP v⟩) C d (muCD ε) hC0 (fun v v' => ?_) (fun g v v' => ?_) hd
+  have hdeg :=
+    hD n ε T.V (PsiM T μ) (Hlam ε (PsiM T μ) T.w) (sigLam ε (PsiM T μ) T.w)
+      (fun v => ⟨uniformisationL2 ε (PsiM T μ) T.w v, datumEmbedding_mem_Hlam hP v⟩)
+      C d (muCD ε) hC0
+      (fun v v' => ?_)
+      (fun g v v' => ?_)
+      hd
   · have hn := hN n ε lam hl T μ hμ
     rw [hdeg] at hn
     have hr : 0 < (Module.finrank ℂ T.V : ℝ) := by

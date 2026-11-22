@@ -13,8 +13,12 @@ set_option synthInstance.maxHeartbeats 200000
 
 section
 noncomputable section
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial ValuativeRel IsLocalRing Filter
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.UnitaryBC
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial ValuativeRel
+  IsLocalRing Filter
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.SmGL GlobalTheory.SplitWeil
+  GlobalTheory.UnitaryBC
 open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj)
 open UpperTheory.V.HV (Coef)
 open UpperTheory.V.Hi UpperTheory.V.Hi.CaseU
@@ -23,16 +27,22 @@ open scoped Matrix TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 set_option synthInstance.maxHeartbeats 200000
 namespace UpperTheory.V.Z.J.D
-private def resEquiv {G V V' : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup V'] [Module ℂ V']
-    {ρ : Representation ℂ G V} {ρ' : Representation ℂ G V'} (K : Subgroup G) (e : ρ.Equiv ρ') :
-    Representation.Equiv (ρ.comp K.subtype) (ρ'.comp K.subtype) :=
-  Representation.Equiv.mk e.toLinearEquiv fun g => LinearMap.ext fun v =>
-    Representation.IntertwiningMap.isIntertwining _ _ e.toIntertwiningMap (g : G) v
-theorem resEq2_alt : _root_.UpperTheory.V.Z.J.D.TypePS2Alt → PsRes → _root_.UpperTheory.V.Z.J.D.ResidualEqualityRankTwo := by
+private def resEquiv
+    {G V V' : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup V'] [Module ℂ V']
+    {ρ : Representation ℂ G V} {ρ' : Representation ℂ G V'}
+    (K : Subgroup G) (e : ρ.Equiv ρ')
+    : Representation.Equiv (ρ.comp K.subtype) (ρ'.comp K.subtype) :=
+  Representation.Equiv.mk e.toLinearEquiv fun g =>
+    LinearMap.ext fun v =>
+      Representation.IntertwiningMap.isIntertwining _ _ e.toIntertwiningMap (g : G) v
+theorem resEq2_alt
+    : _root_.UpperTheory.V.Z.J.D.TypePS2Alt → PsRes
+      → _root_.UpperTheory.V.Z.J.D.ResidualEqualityRankTwo := by
   intro hT hP hN L Ω _ _ _ _ _ _ n hn π π' w A h τ τ' hτ hτ' χ hx hc hc'
   obtain ⟨ω, hs, ⟨e⟩, hω⟩ := hT hN L Ω n hn π w A h τ hτ χ hx hc
   obtain ⟨ω', hs', ⟨e'⟩, hω'⟩ := hT hN L Ω n hn π' w A h τ' hτ' χ hx hc'
-  have ha : IsLocalArtin h (artOf h) := Classical.epsilon_spec (_root_.UpperTheory.V.Z.Win.T2.laArtinLit' hN h)
+  have ha : IsLocalArtin h (artOf h) :=
+    Classical.epsilon_spec (_root_.UpperTheory.V.Z.Win.T2.laArtinLit' hN h)
   have hu : ∀ i (y : Uo (w.adicCompletion L)), ω i y = ω' i y := by
     intro i y
     obtain ⟨σ, hσ⟩ := ha.surj y

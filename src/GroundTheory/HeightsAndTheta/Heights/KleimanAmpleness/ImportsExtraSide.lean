@@ -15,10 +15,10 @@ open ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH (cechHc quotPart m
 
 def MultiSerre.Statement : Prop :=
   ∀ (F : Type) [Field F] (K : Type) [Fintype K] [LinearOrder K] (ι : K → Type) [∀ k, Fintype (ι k)]
-    [∀ k, LinearOrder (ι k)] (V : Ideal (MvPolynomial (Σ k, ι k) F)),
-    NumbersDVR.IsMultiHomogIdeal V →
-      ∀ᶠ m : K → ℤ in Filter.atTop,
-        (∀ i : ℕ, 1 ≤ i → Subsingleton (cechHc ι (quotPart F V) m i)) ∧
-        (Module.finrank F (cechHc ι (quotPart F V) m 0) : ℤ) = NumbersDVR.hilbFn V m
+      [∀ k, LinearOrder (ι k)] (V : Ideal (MvPolynomial (Σ k, ι k) F)),
+    NumbersDVR.IsMultiHomogIdeal V
+      → ∀ᶠ m : K → ℤ in Filter.atTop,
+          (∀ i : ℕ, 1 ≤ i → Subsingleton (cechHc ι (quotPart F V) m i)) ∧
+          (Module.finrank F (cechHc ι (quotPart F V) m 0) : ℤ) = NumbersDVR.hilbFn V m
 
 end GroundTheory.Heights₂.Heights.Kleiman.SectionsOverLocalization

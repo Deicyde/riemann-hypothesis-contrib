@@ -7,13 +7,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsPowCha
 
 @[expose] public section
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup
 
 namespace GlobalTheory
 
-theorem exists_perfectPart_algHom : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p]
-    [PerfectRing k p] (A : Type) [CommRing A] [Algebra k A] [Module.Finite k A],
-    ∃ π : A →ₐ[k] A, ((∀ a : A, IsNilpotent (a - π a)) ∧ ∀ a : A, ∃ b : A, π a = π b ^ p) := by
+theorem exists_perfectPart_algHom
+    : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p] (A : Type)
+        [CommRing A] [Algebra k A] [Module.Finite k A],
+      ∃ π : A →ₐ[k] A,
+        ((∀ a : A, IsNilpotent (a - π a)) ∧ ∀ a : A, ∃ b : A, π a = π b ^ p) := by
   intro p _ k _ _ _ A _ _ _
   rcases subsingleton_or_nontrivial A with hA | hA
   · exact ⟨AlgHom.id k A, fun a => ⟨1, Subsingleton.elim _ _⟩, fun a => ⟨a, Subsingleton.elim _ _⟩⟩
@@ -62,34 +65,35 @@ theorem exists_perfectPart_algHom : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Fie
     exact h3
   choose β hβ using hlift
   have hf : ∀ a c : A, a - c ^ q ∈ N → β a ^ q = c ^ q := fun a c hc => hu a _ _ (hβ a) hc
-  let π : A →ₐ[k] A :=
-    { toFun := fun a => β a ^ q
-      map_one' := by
-        rw [hf 1 1 (by simp), one_pow]
-      map_mul' := fun x y => by
-        rw [hf (x * y) (β x * β y) ?_, mul_pow]
-        have : x * y - (β x * β y) ^ q = x * (y - β y ^ q) + (x - β x ^ q) * β y ^ q := by ring
-        rw [this]
-        exact N.add_mem (N.mul_mem_left _ (hβ y)) (N.mul_mem_right _ (hβ x))
-      map_zero' := by
-        rw [hf 0 0 (by rw [zero_pow (by positivity), sub_zero]; exact N.zero_mem), zero_pow (by positivity)]
-      map_add' := fun x y => by
-        rw [hf (x + y) (β x + β y) ?_, hqdef, add_pow_char_pow]
-        rw [hqdef, add_pow_char_pow]
-        have : x + y - (β x ^ p ^ (n + 1) + β y ^ p ^ (n + 1)) =
-            (x - β x ^ q) + (y - β y ^ q) := by rw [hqdef]; ring
-        rw [this]
-        exact N.add_mem (hβ x) (hβ y)
-      commutes' := fun c => by
-        set d := (iterateFrobeniusEquiv k p (n + 1)).symm c with hd
-        have hdc : d ^ q = c := by
-          have h0 := RingEquiv.apply_symm_apply (iterateFrobeniusEquiv k p (n + 1)) c
-          rw [iterateFrobeniusEquiv_apply, iterateFrobenius_def] at h0
-          rw [hqdef, hd]
-          exact h0
-        rw [hf _ (algebraMap k A d) ?_, ← map_pow, hdc]
-        rw [← map_pow, hdc, sub_self]
-        exact N.zero_mem }
+  let π : A →ₐ[k] A := {
+    toFun := fun a => β a ^ q
+    map_one' := by rw [hf 1 1 (by simp), one_pow]
+    map_mul' := fun x y => by
+      rw [hf (x * y) (β x * β y) ?_, mul_pow]
+      have : x * y - (β x * β y) ^ q = x * (y - β y ^ q) + (x - β x ^ q) * β y ^ q := by ring
+      rw [this]
+      exact N.add_mem (N.mul_mem_left _ (hβ y)) (N.mul_mem_right _ (hβ x))
+    map_zero' := by
+      rw [hf 0 0 (by rw [zero_pow (by positivity), sub_zero]; exact N.zero_mem),
+        zero_pow (by positivity)]
+    map_add' := fun x y => by
+      rw [hf (x + y) (β x + β y) ?_, hqdef, add_pow_char_pow]
+      rw [hqdef, add_pow_char_pow]
+      have : x + y - (β x ^ p ^ (n + 1) + β y ^ p ^ (n + 1)) = (x - β x ^ q) + (y - β y ^ q) := by
+        rw [hqdef]; ring
+      rw [this]
+      exact N.add_mem (hβ x) (hβ y)
+    commutes' := fun c => by
+      set d := (iterateFrobeniusEquiv k p (n + 1)).symm c with hd
+      have hdc : d ^ q = c := by
+        have h0 := RingEquiv.apply_symm_apply (iterateFrobeniusEquiv k p (n + 1)) c
+        rw [iterateFrobeniusEquiv_apply, iterateFrobenius_def] at h0
+        rw [hqdef, hd]
+        exact h0
+      rw [hf _ (algebraMap k A d) ?_, ← map_pow, hdc]
+      rw [← map_pow, hdc, sub_self]
+      exact N.zero_mem
+  }
   have hπ : ∀ a, π a = β a ^ q := fun a => rfl
   refine ⟨π, fun a => ?_, fun a => ⟨β a ^ p ^ n, ?_⟩⟩
   · rw [hπ]

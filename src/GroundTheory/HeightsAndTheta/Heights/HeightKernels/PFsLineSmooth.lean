@@ -13,13 +13,17 @@ open ReciprocityTheory.ChartRestriction.G.Geo
 
 namespace FubiniStudySmooth
 
-theorem contDiffAt_blockNorm {K : Type} [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (k : K)
-    (z : (Σ k, ι k) → ℂ) (hz : ∃ i, z ⟨k, i⟩ ≠ 0) :
-    ContDiffAt ℝ ((⊤ : ℕ∞) : WithTop ℕ∞)
-      (fun w : (Σ k, ι k) → ℂ => ‖WithLp.toLp 2 (fun i => w ⟨k, i⟩)‖) z := by
+theorem contDiffAt_blockNorm
+    {K : Type} [Fintype K]
+    (ι : K → Type) [∀ k, Fintype (ι k)]
+    (k : K) (z : (Σ k, ι k) → ℂ) (hz : ∃ i, z ⟨k, i⟩ ≠ 0)
+    : ContDiffAt ℝ ((⊤ : ℕ∞) : WithTop ℕ∞)
+      (fun w : (Σ k, ι k) → ℂ => ‖WithLp.toLp 2 (fun i => w ⟨k, i⟩)‖)
+      z := by
   have hL : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞)
       (fun w : (Σ k, ι k) → ℂ => WithLp.toLp 2 (fun i => w ⟨k, i⟩)) :=
-    PiLp.contDiff_toLp.comp (contDiff_pi.2 fun i => contDiff_apply ℝ (fun _ => ℂ) (⟨k, i⟩ : Σ k, ι k))
+    PiLp.contDiff_toLp.comp (contDiff_pi.2 fun i =>
+      contDiff_apply ℝ (fun _ => ℂ) (⟨k, i⟩ : Σ k, ι k))
   have hne : WithLp.toLp 2 (fun i => z ⟨k, i⟩) ≠ 0 := by
     obtain ⟨i, hi⟩ := hz
     intro h0

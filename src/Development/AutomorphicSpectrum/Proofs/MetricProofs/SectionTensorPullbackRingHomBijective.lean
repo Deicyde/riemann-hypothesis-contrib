@@ -9,7 +9,13 @@ open Set Filter Topology
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat
 
-theorem exists_const_of_section_mem_range : ∀ (n g : ℕ) (Λ : Type) [AddCommGroup Λ] [Countable Λ] (B : Set (Fin n → ℂ)), IsOpen B → IsPreconnected B → B.Nonempty → ∀ (P : (Fin n → ℂ) → (Λ →+ (Fin g → ℂ))) (s : (Fin n → ℂ) → (Fin g → ℂ)), (∀ x, DifferentiableOn ℂ (fun b => P b x) B) → DifferentiableOn ℂ s B → (∀ b ∈ B, s b ∈ (P b).range) → ∃ x : Λ, ∀ b ∈ B, s b = P b x := by
+theorem exists_const_of_section_mem_range
+    : ∀ (n g : ℕ) (Λ : Type) [AddCommGroup Λ] [Countable Λ] (B : Set (Fin n → ℂ)),
+      IsOpen B → IsPreconnected B → B.Nonempty
+        → ∀ (P : (Fin n → ℂ) → (Λ →+ (Fin g → ℂ))) (s : (Fin n → ℂ) → (Fin g → ℂ)),
+          (∀ x, DifferentiableOn ℂ (fun b => P b x) B) → DifferentiableOn ℂ s B
+            → (∀ b ∈ B, s b ∈ (P b).range)
+            → ∃ x : Λ, ∀ b ∈ B, s b = P b x := by
   intro n g Λ _ _ B hB hpc hne P s hP hs hrange
   haveI : Nonempty B := hne.to_subtype
   haveI : LocallyCompactSpace B := hB.locallyCompactSpace

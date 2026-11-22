@@ -18,10 +18,12 @@ namespace ExtCoeff
 
 variable {O E : Type} [CommRing O] [CommRing E] {d : ℕ}
 
-theorem hasSubst_XL : HasSubst (fun i : Fin d => (X (Sum.inl i) : MvPowerSeries (Fin d ⊕ Fin d) O)) :=
+theorem hasSubst_XL
+    : HasSubst (fun i : Fin d => (X (Sum.inl i) : MvPowerSeries (Fin d ⊕ Fin d) O)) :=
   hasSubst_of_constantCoeff_zero fun _ => constantCoeff_X _
 
-theorem hasSubst_XR : HasSubst (fun i : Fin d => (X (Sum.inr i) : MvPowerSeries (Fin d ⊕ Fin d) O)) :=
+theorem hasSubst_XR
+    : HasSubst (fun i : Fin d => (X (Sum.inr i) : MvPowerSeries (Fin d ⊕ Fin d) O)) :=
   hasSubst_of_constantCoeff_zero fun _ => constantCoeff_X _
 
 theorem map_inL (h : O →+* E) (f : MvPowerSeries (Fin d) O) : map h (inL f) = inL (map h f) := by
@@ -38,9 +40,11 @@ theorem map_inR (h : O →+* E) (f : MvPowerSeries (Fin d) O) : map h (inR f) = 
   funext i
   exact map_X h _
 
-theorem map_formalGroupLawCoboundaryOne_eq (h : O →+* E) (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) O)
-    (s : MvPowerSeries (Fin d) O) (hμ : ∀ i, constantCoeff (μ i) = 0) :
-    cob1 (fun i => map h (μ i)) (map h s) = map h (cob1 μ s) := by
+theorem map_formalGroupLawCoboundaryOne_eq
+    (h : O →+* E)
+    (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) O)
+    (s : MvPowerSeries (Fin d) O) (hμ : ∀ i, constantCoeff (μ i) = 0)
+    : cob1 (fun i => map h (μ i)) (map h s) = map h (cob1 μ s) := by
   unfold cob1
   rw [map_sub, map_sub, map_subst (hasSubst_of_constantCoeff_zero hμ), map_inL, map_inR]
 

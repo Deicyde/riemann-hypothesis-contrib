@@ -11,11 +11,12 @@ open ValuativeRel IsDedekindDomain NumberField Formalism.MainNotions.S.Loc Polyn
 
 namespace PI.LocLatEq.W
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {sig : E →ₐ[F] E} {p : HeightOneSpectrum (𝓞 F)}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {sig : E →ₐ[F] E} {p : HeightOneSpectrum (𝓞 F)}
 
-theorem int_of_val (A : LocAt F E sig p) (x : F) (hx : A.ιF x ∈ 𝒪[A.Fp]) :
-    ∃ d : 𝓞 F, d ∉ p.asIdeal ∧ ∃ n : 𝓞 F, (d : F) * x = n := by
+theorem int_of_val (A : LocAt F E sig p) (x : F) (hx : A.ιF x ∈ 𝒪[A.Fp])
+    : ∃ d : 𝓞 F, d ∉ p.asIdeal ∧ ∃ n : 𝓞 F, (d : F) * x = n := by
   rw [Valuation.mem_integer_iff] at hx
   have h1 : A.ιF x ≤ᵥ A.ιF 1 := by
     rw [map_one, Valuation.Compatible.vle_iff_le (v := ValuativeRel.valuation A.Fp), map_one]
@@ -32,9 +33,12 @@ theorem ep_nontrivial (A : LocAt F E sig p) : Nontrivial A.Ep := by
   have := A.free
   exact Module.nontrivial_of_finrank_pos (R := A.Fp) (by rw [A.rank]; norm_num)
 
-theorem coeff_mem (h2 : Module.finrank F E = 2) (A : LocAt F E sig p) (a : E)
-    (ha : IsIntegral 𝒪[A.Fp] (A.ιE a)) (hnot : a ∉ (algebraMap F E).range) (i : ℕ) :
-    A.ιF ((minpoly F a).coeff i) ∈ 𝒪[A.Fp] := by
+theorem coeff_mem
+    (h2 : Module.finrank F E = 2)
+    (A : LocAt F E sig p) (a : E)
+    (ha : IsIntegral 𝒪[A.Fp] (A.ιE a)) (hnot : a ∉ (algebraMap F E).range)
+    (i : ℕ)
+    : A.ιF ((minpoly F a).coeff i) ∈ 𝒪[A.Fp] := by
   classical
   haveI := ep_nontrivial A
   haveI := A.free
@@ -70,7 +74,8 @@ theorem coeff_mem (h2 : Module.finrank F E = 2) (A : LocAt F E sig p) (a : E)
   have hintP : IsIntegral A.Fp (A.ιE a) := Algebra.IsIntegral.isIntegral _
   have hdegP : 2 ≤ (minpoly A.Fp (A.ιE a)).natDegree := by
     have h0 := minpoly.natDegree_pos hintP
-    have h1 : (minpoly A.Fp (A.ιE a)).natDegree ≠ 1 := fun h => hnotP (minpoly.natDegree_eq_one_iff.mp h)
+    have h1 : (minpoly A.Fp (A.ιE a)).natDegree ≠ 1 := fun h =>
+      hnotP (minpoly.natDegree_eq_one_iff.mp h)
     omega
   have hintF : IsIntegral F a := Algebra.IsIntegral.isIntegral _
   have hdegF : (minpoly F a).natDegree ≤ 2 := h2 ▸ minpoly.natDegree_le a
@@ -88,7 +93,8 @@ theorem coeff_mem (h2 : Module.finrank F E = 2) (A : LocAt F E sig p) (a : E)
   have hdvd : minpoly A.Fp (A.ιE a) ∣ g := minpoly.dvd A.Fp _ hgα
   have hgeq : g = minpoly A.Fp (A.ιE a) :=
     eq_of_monic_of_dvd_of_natDegree_le (minpoly.monic hintP) hgmon hdvd (by omega)
-  have hdvd2 : minpoly A.Fp (A.ιE a) ∣ (minpoly 𝒪[A.Fp] (A.ιE a)).map (algebraMap 𝒪[A.Fp] A.Fp) := by
+  have hdvd2
+      : minpoly A.Fp (A.ιE a) ∣ (minpoly 𝒪[A.Fp] (A.ιE a)).map (algebraMap 𝒪[A.Fp] A.Fp) := by
     apply minpoly.dvd
     rw [aeval_map_algebraMap, minpoly.aeval]
   obtain ⟨g', hg'⟩ := IsIntegrallyClosed.eq_map_mul_C_of_dvd A.Fp (minpoly.monic ha) hdvd2
@@ -106,8 +112,7 @@ theorem intP : IntP := by
   · obtain ⟨f, rfl⟩ := hr
     have hf : A.ιF f ∈ 𝒪[A.Fp] := by
       rw [A.compat] at ha
-      have hi : IsIntegral 𝒪[A.Fp] (A.ιF f) :=
-        (isIntegral_algebraMap_iff ).mp ha
+      have hi : IsIntegral 𝒪[A.Fp] (A.ιF f) := (isIntegral_algebraMap_iff).mp ha
       exact (Valuation.integer.integers _).mem_of_integral hi
     obtain ⟨d, hd, n, hn⟩ := int_of_val A f hf
     refine ⟨d, hd, algebraMap (𝓞 F) (𝓞 E) n, ?_⟩
@@ -127,12 +132,15 @@ theorem intP : IntP := by
     have hlead : (minpoly F a).coeff 2 = 1 := by
       have := (minpoly.monic hintF).leadingCoeff
       rwa [leadingCoeff, hdeg] at this
-    have hrel : algebraMap F E ((minpoly F a).coeff 0) + algebraMap F E ((minpoly F a).coeff 1) * a
-        + a ^ 2 = 0 := by
+    have hrel
+        : algebraMap F E ((minpoly F a).coeff 0) + algebraMap F E ((minpoly F a).coeff 1) * a
+            + a ^ 2
+          = 0 := by
       have := minpoly.aeval F a
       rw [aeval_eq_sum_range' (n := 3) (by omega)] at this
-      simp only [Finset.sum_range_succ, Finset.sum_range_zero, hlead, Algebra.smul_def,
-        map_one, pow_zero, pow_one, one_mul, mul_one, zero_add] at this
+      simp only [Finset.sum_range_succ, Finset.sum_range_zero, hlead, Algebra.smul_def, map_one,
+          pow_zero, pow_one, one_mul, mul_one, zero_add]
+        at this
       linear_combination this
     have hd : d0 * d1 ∉ p.asIdeal := fun h => (p.isPrime.mem_or_mem h).elim hd0 hd1
     have hint : IsIntegral (𝓞 F) (algebraMap F E ((d0 * d1 : 𝓞 F) : F) * a) := by

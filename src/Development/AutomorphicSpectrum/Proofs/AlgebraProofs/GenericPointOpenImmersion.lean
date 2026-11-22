@@ -16,7 +16,8 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaLawProofs.RigidifiedS
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 open GlobalTheory.CechPic GlobalTheory.AbDual
 open GlobalTheory.IndefiniteRowSideFullHecke.ZeroSectionBase (IsPrincipalPol sqToBase)
@@ -24,9 +25,9 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.CompanionTheory.ValGeneric
 
-theorem exists_pow_mem_of_ne_zero (R : Type) [CommRing R] [IsDomain R] [ValuationRing R]
-    [Ring.DimensionLEOne R] :
-    ∃ π : R, π ≠ 0 ∧ ∀ b : R, b ≠ 0 → ∃ (n : ℕ) (c : R), π ^ n = b * c := by
+theorem exists_pow_mem_of_ne_zero
+    (R : Type) [CommRing R] [IsDomain R] [ValuationRing R] [Ring.DimensionLEOne R]
+    : ∃ π : R, π ≠ 0 ∧ ∀ b : R, b ≠ 0 → ∃ (n : ℕ) (c : R), π ^ n = b * c := by
   by_cases hm : IsLocalRing.maximalIdeal R = ⊥
   · refine ⟨1, one_ne_zero, fun b hb => ?_⟩
     have hu : IsUnit b := by
@@ -54,9 +55,10 @@ theorem exists_pow_mem_of_ne_zero (R : Type) [CommRing R] [IsDomain R] [Valuatio
     obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.1 hn
     exact ⟨n, c, by rw [← hc, mul_comm]⟩
 
-theorem isOpenImmersion_spMap_fraction :
-    ∀ (C : Type) [Field C] (R : Type) [CommRing R] [IsDomain R] [ValuationRing R] [Ring.DimensionLEOne R]
-    [Algebra R C] [IsFractionRing R C], IsOpenImmersion (spMap (algebraMap R C)) := by
+theorem isOpenImmersion_spMap_fraction
+    : ∀ (C : Type) [Field C] (R : Type) [CommRing R] [IsDomain R] [ValuationRing R]
+        [Ring.DimensionLEOne R] [Algebra R C] [IsFractionRing R C],
+      IsOpenImmersion (spMap (algebraMap R C)) := by
   intro C _ R _ _ _ _ _ _
   obtain ⟨π, hπ0, h⟩ := exists_pow_mem_of_ne_zero R
   have inj := IsFractionRing.injective R C

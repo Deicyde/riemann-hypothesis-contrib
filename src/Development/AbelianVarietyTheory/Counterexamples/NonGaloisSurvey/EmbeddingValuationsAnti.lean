@@ -9,7 +9,8 @@ noncomputable section
 
 namespace GlobalTheory.Survey.EmbeddingValuationsAnti
 
-open Formalism.BasicNotions Formalism.MainNotions.N Formalism.L2.Host NumberField IsDedekindDomain GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings GlobalTheory.HeightCounting
+open Formalism.BasicNotions Formalism.MainNotions.N Formalism.L2.Host NumberField IsDedekindDomain
+  GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings GlobalTheory.HeightCounting
 
 theorem v_strictAnti {R : Ranks} (P : HCParam R) : StrictAnti P.v := by
   have hk := R.m_add_three_le_k
@@ -46,7 +47,8 @@ theorem b_strictMono {R : Ranks} (P : HCParam R) : StrictMono P.b := by
   obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_lt this
   exact key d a hb
 
-theorem neg_b_lt_v {R : Ranks} (P : HCParam R) (i : Fin (R.k - 1)) (j : Fin R.m) : -P.b j < P.v i := by
+theorem neg_b_lt_v {R : Ranks} (P : HCParam R) (i : Fin (R.k - 1)) (j : Fin R.m)
+    : - P.b j < P.v i := by
   have hk := R.m_add_three_le_k
   have hm := R.two_le_m
   have h1 := P.u_last_gt (by omega) (by omega)
@@ -54,8 +56,8 @@ theorem neg_b_lt_v {R : Ranks} (P : HCParam R) (i : Fin (R.k - 1)) (j : Fin R.m)
     have := P.v_gt_u ⟨R.k - 2, by omega⟩
     have e : (⟨R.k - 2 + 1, by omega⟩ : Fin R.k) = ⟨R.k - 1, by omega⟩ := Fin.ext (by simp; omega)
     simpa [e] using this
-  have h3 : P.v ⟨R.k - 2, by omega⟩ ≤ P.v i := (v_strictAnti P).antitone (by
-    have := i.2; show i.1 ≤ R.k - 2; omega)
+  have h3 : P.v ⟨R.k - 2, by omega⟩ ≤ P.v i :=
+    (v_strictAnti P).antitone (by have := i.2; show i.1 ≤ R.k - 2; omega)
   have h4 : P.b ⟨0, by omega⟩ ≤ P.b j := (b_strictMono P).monotone (by show 0 ≤ j.1; omega)
   linarith
 
@@ -72,7 +74,7 @@ theorem nodup_hcSigma {R : Ranks} (P : HCParam R) : (hcSigma P).Nodup := by
     intro z h1 h2
     obtain ⟨i, -, rfl⟩ := Multiset.mem_map.1 h1
     obtain ⟨j, -, hj⟩ := Multiset.mem_map.1 h2
-    have : -P.b j = P.v i := by exact_mod_cast hj
+    have : - P.b j = P.v i := by exact_mod_cast hj
     exact (neg_b_lt_v P i j).ne this
 
 theorem emb_injective (D : D7) : Function.Injective D.host.emb := by
@@ -81,14 +83,18 @@ theorem emb_injective (D : D7) : Function.Injective D.host.emb := by
     AlgEquiv.ext fun x => D.host.φ₀.injective (RingHom.congr_fun h x)
   exact (D.host.gal).symm.injective h1
 
-theorem embTau_injective (D : D7) : Function.Injective (GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.embTau D) := fun _ _ h =>
-  D.eTau.injective (Subtype.ext (emb_injective D h))
+theorem embTau_injective (D : D7)
+    : Function.Injective (GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.embTau D) :=
+  fun _ _ h => D.eTau.injective (Subtype.ext (emb_injective D h))
 
-theorem embTau_ne_bar (D : D7) (τ τ' : D.what₂.Tau) : embTauBar D τ ≠ GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.embTau D τ' := by
+theorem embTau_ne_bar (D : D7) (τ τ' : D.what₂.Tau)
+    : embTauBar D τ ≠ GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.embTau D τ' := by
   intro h
   have hc : embTauBar D τ = D.host.emb (D.R.cc * (D.eTau τ : D.R.GG)) := by
     refine RingHom.ext fun x => ?_
-    simp only [embTauBar, GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.embTau, embPsi, Formalism.BasicNotions.Host.emb, Formalism.BasicNotions.Host.sigmaOf, RingHom.comp_apply, map_mul]
+    simp only [embTauBar, GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.embTau, embPsi,
+      Formalism.BasicNotions.Host.emb, Formalism.BasicNotions.Host.sigmaOf, RingHom.comp_apply,
+      map_mul]
     rw [← D.host.conjE_apply D.host.φ₀]
     rfl
   rw [hc] at h
@@ -97,13 +103,10 @@ theorem embTau_ne_bar (D : D7) (τ τ' : D.what₂.Tau) : embTauBar D τ ≠ Glo
     rw [Formalism.HC.Frame.mem_Psi_iff]
     simp [Formalism.HC.Frame.cc, Formalism.FrobeniusOrbits.c0]
   apply hn
-  have h2 : D.R.cc =
-      ((D.eTau τ' : D.R.Psi) : D.R.GG) *
-        ((D.eTau τ : D.R.Psi) : D.R.GG)⁻¹ := by
+  have h2 : D.R.cc = ((D.eTau τ' : D.R.Psi) : D.R.GG) * ((D.eTau τ : D.R.Psi) : D.R.GG)⁻¹ := by
     rw [← h1]; group
   rw [h2]
   exact (D.R.Psi).mul_mem (D.eTau τ').2 ((D.R.Psi).inv_mem (D.eTau τ).2)
-
 
 end GlobalTheory.Survey.EmbeddingValuationsAnti
 

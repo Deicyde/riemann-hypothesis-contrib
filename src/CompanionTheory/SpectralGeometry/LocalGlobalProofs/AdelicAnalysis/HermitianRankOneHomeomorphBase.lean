@@ -9,13 +9,14 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.SW.BB.HermOne
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW GlobalTheory.CompanionTheory.SW.BB NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW
+  GlobalTheory.CompanionTheory.SW.BB NumberField IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 section Field
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 theorem sig_sig (hcm : IsCMExt F E σ) (x : E) : σ (σ x) = x := by
   obtain ⟨-, -, -, h⟩ := hcm
@@ -37,8 +38,8 @@ theorem exists_sig_ne (hcm : IsCMExt F E σ) : ∃ x : E, σ x ≠ x := by
   rw [hall x] at this
   simpa using this.symm
 
-theorem trace_sig (hcm : IsCMExt F E σ) (y : E) :
-    Algebra.trace F E (σ y) = Algebra.trace F E y := by
+theorem trace_sig (hcm : IsCMExt F E σ) (y : E)
+    : Algebra.trace F E (σ y) = Algebra.trace F E y := by
   haveI : FiniteDimensional F E := Module.Finite.of_restrictScalars_finite ℚ F E
   let e : E ≃ₐ[F] E := AlgEquiv.ofAlgHom σ σ (AlgHom.ext (sig_sig hcm)) (AlgHom.ext (sig_sig hcm))
   have h : (e.toLinearEquiv).conj (Algebra.lmul F E y) = Algebra.lmul F E (σ y) := by
@@ -52,8 +53,8 @@ theorem trace_sig (hcm : IsCMExt F E σ) (y : E) :
   show LinearMap.trace F E (Algebra.lmul F E (σ y)) = LinearMap.trace F E (Algebra.lmul F E y)
   rw [← h, LinearMap.trace_conj']
 
-theorem add_sig_eq_trace (hcm : IsCMExt F E σ) (y : E) :
-    y + σ y = algebraMap F E (Algebra.trace F E y) := by
+theorem add_sig_eq_trace (hcm : IsCMExt F E σ) (y : E)
+    : y + σ y = algebraMap F E (Algebra.trace F E y) := by
   haveI : FiniteDimensional F E := Module.Finite.of_restrictScalars_finite ℚ F E
   have hfr : Module.finrank F E = 2 := hcm.2.2.1
   obtain ⟨x, hx⟩ := exists_sig_ne hcm
@@ -79,12 +80,11 @@ theorem add_sig_eq_trace (hcm : IsCMExt F E σ) (y : E) :
     have ht : t = 0 := by simpa [hθ0] using h3
     refine ⟨?_, ht⟩
     simpa [ht] using hst
-  let bb : Module.Basis (Fin 2) F E :=
-    basisOfLinearIndependentOfCardEqFinrank hli (by simp [hfr])
-  have hbb : ∀ i, bb i = ![(1 : E), θ] i := fun i => by
-    simp [bb]
-  have hmaps : (LinearMap.id + σ.toLinearMap : E →ₗ[F] E) =
-      (Algebra.linearMap F E) ∘ₗ Algebra.trace F E := by
+  let bb : Module.Basis (Fin 2) F E := basisOfLinearIndependentOfCardEqFinrank hli (by simp [hfr])
+  have hbb : ∀ i, bb i = ![(1 : E), θ] i := fun i => by simp [bb]
+  have hmaps
+      : (LinearMap.id + σ.toLinearMap : E →ₗ[F] E)
+        = (Algebra.linearMap F E) ∘ₗ Algebra.trace F E := by
     refine bb.ext fun i => ?_
     fin_cases i
     · have h1 : Algebra.trace F E (1 : E) = 2 := by
@@ -100,11 +100,13 @@ end Field
 
 section Ring
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {σ : E →ₐ[F] E} (R : Type) [CommRing R] [Algebra F R]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {σ : E →ₐ[F] E}
+  (R : Type) [CommRing R] [Algebra F R]
 
-theorem trace_tmul (r : R) (e : E) :
-    Algebra.trace R (R ⊗[F] E) (r ⊗ₜ[F] e) = r * algebraMap F R (Algebra.trace F E e) := by
+theorem trace_tmul (r : R) (e : E)
+    : Algebra.trace R (R ⊗[F] E) (r ⊗ₜ[F] e) = r * algebraMap F R (Algebra.trace F E e) := by
   haveI : FiniteDimensional F E := Module.Finite.of_restrictScalars_finite ℚ F E
   have h1 : r ⊗ₜ[F] e = r • ((1 : R) ⊗ₜ[F] e) := by simp [TensorProduct.smul_tmul']
   have h2 : Algebra.lmul R (R ⊗[F] E) ((1 : R) ⊗ₜ[F] e) = (Algebra.lmul F E e).baseChange R := by
@@ -114,8 +116,8 @@ theorem trace_tmul (r : R) (e : E) :
   show r * LinearMap.trace R _ (Algebra.lmul R (R ⊗[F] E) ((1 : R) ⊗ₜ[F] e)) = _
   rw [h2, LinearMap.trace_baseChange]
 
-theorem add_sigR_eq_trace (hcm : IsCMExt F E σ) (z : R ⊗[F] E) :
-    z + sigR R σ z = (Algebra.trace R (R ⊗[F] E) z) ⊗ₜ[F] (1 : E) := by
+theorem add_sigR_eq_trace (hcm : IsCMExt F E σ) (z : R ⊗[F] E)
+    : z + sigR R σ z = (Algebra.trace R (R ⊗[F] E) z) ⊗ₜ[F] (1 : E) := by
   induction z using TensorProduct.induction_on with
   | zero => simp
   | tmul r e =>
@@ -131,8 +133,10 @@ end Ring
 
 section Main
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {σ : E →ₐ[F] E} (R : Type) [CommRing R] [Algebra F R]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {σ : E →ₐ[F] E}
+  (R : Type) [CommRing R] [Algebra F R]
 
 def tH (σ : E →ₐ[F] E) (S : HermR R σ 1) : R :=
   algebraMap F R (1 / 2) * Algebra.trace R (R ⊗[F] E) ((S : Matrix (Fin 1) (Fin 1) (R ⊗[F] E)) 0 0)
@@ -167,28 +171,36 @@ def hermHomeo (hcm : IsCMExt F E σ) : HermR R σ 1 ≃ₜ R :=
   haveI : IsModuleTopology R (R ⊗[F] E) := ⟨rfl⟩
   haveI : FiniteDimensional F E := Module.Finite.of_restrictScalars_finite ℚ F E
   haveI : ContinuousAdd (R ⊗[F] E) := IsModuleTopology.toContinuousAdd R _
-  { toFun := tH R σ
+  {
+    toFun := tH R σ
     invFun := hermScal R σ
     left_inv := hermScal_tH R hcm
     right_inv := tH_hermScal R hcm
-    continuous_toFun := continuous_const.mul
-      ((IsModuleTopology.continuous_of_linearMap (R := R) (Algebra.trace R (R ⊗[F] E))).comp
-        ((continuous_apply 0).comp ((continuous_apply 0).comp continuous_subtype_val)))
-    continuous_invFun := Continuous.subtype_mk (continuous_pi fun _ => continuous_pi fun _ =>
-      IsModuleTopology.continuous_of_linearMap (R := R) (Algebra.linearMap R (R ⊗[F] E))) _ }
+    continuous_toFun :=
+      continuous_const.mul
+        ((IsModuleTopology.continuous_of_linearMap (R := R) (Algebra.trace R (R ⊗[F] E))).comp
+          ((continuous_apply 0).comp ((continuous_apply 0).comp continuous_subtype_val)))
+    continuous_invFun :=
+      Continuous.subtype_mk
+        (continuous_pi fun _ =>
+          continuous_pi fun _ =>
+            IsModuleTopology.continuous_of_linearMap (R := R) (Algebra.linearMap R (R ⊗[F] E)))
+        _
+  }
 
 variable [MeasurableSpace R] [BorelSpace R]
 
-theorem map_coordHerm (hcm : IsCMExt F E σ) {d : ℕ} (b : Module.Basis (Fin d) F E) (lam : Measure R)
-    [SigmaFinite lam] : (coordHerm R σ b lam 1).map (hermHomeo R hcm) = lam := by
+theorem map_coordHerm
+    (hcm : IsCMExt F E σ) {d : ℕ} (b : Module.Basis (Fin d) F E) (lam : Measure R) [SigmaFinite lam]
+    : (coordHerm R σ b lam 1).map (hermHomeo R hcm) = lam := by
   haveI : BorelSpace (HermR R σ 1) := ⟨rfl⟩
   haveI hT : IsEmpty {p : Fin 1 × Fin 1 // p.1 < p.2} :=
     ⟨fun p => by
       have h := p.2
       rw [Subsingleton.elim p.1.1 p.1.2] at h
       exact lt_irrefl _ h⟩
-  let ψ : R → (Fin 1 → R) × ({p : Fin 1 × Fin 1 // p.1 < p.2} → R ⊗[F] E) :=
-    fun r => (fun _ => r, fun p => hT.elim p)
+  let ψ : R → (Fin 1 → R) × ({p : Fin 1 × Fin 1 // p.1 < p.2} → R ⊗[F] E) := fun r =>
+    (fun _ => r, fun p => hT.elim p)
   have hψ : MeasurableEmbedding ψ := by
     refine MeasurableEmbedding.of_measurable_inverse (g := fun q => q.1 0) ?_ ?_ ?_ ?_
     · refine Measurable.prodMk (Measurable.of_eval fun _ => measurable_id) ?_
@@ -206,11 +218,15 @@ theorem map_coordHerm (hcm : IsCMExt F E σ) {d : ℕ} (b : Module.Basis (Fin d)
     · intro r
       rfl
   ext s hs
-  have hfun : (fun S : HermR R σ 1 =>
-      ((fun i : Fin 1 => algebraMap F R (1 / 2) *
-          Algebra.trace R (R ⊗[F] E) ((S : Matrix (Fin 1) (Fin 1) (R ⊗[F] E)) i i)),
-        (fun p : {p : Fin 1 × Fin 1 // p.1 < p.2} =>
-          (S : Matrix (Fin 1) (Fin 1) (R ⊗[F] E)) p.1.1 p.1.2))) = ψ ∘ hermHomeo R hcm := by
+  have hfun
+      : (fun S : HermR R σ 1 => (
+          (fun i : Fin 1 =>
+            algebraMap F R (1 / 2)
+              * Algebra.trace R (R ⊗[F] E) ((S : Matrix (Fin 1) (Fin 1) (R ⊗[F] E)) i i)),
+          (fun p : {p : Fin 1 × Fin 1 // p.1 < p.2} =>
+            (S : Matrix (Fin 1) (Fin 1) (R ⊗[F] E)) p.1.1 p.1.2)
+        ))
+        = ψ ∘ hermHomeo R hcm := by
     funext S
     refine Prod.ext ?_ (Subsingleton.elim _ _)
     funext i
@@ -218,10 +234,13 @@ theorem map_coordHerm (hcm : IsCMExt F E σ) {d : ℕ} (b : Module.Basis (Fin d)
     rfl
   have hemb : MeasurableEmbedding (ψ ∘ hermHomeo R hcm) :=
     hψ.comp (hermHomeo R hcm).measurableEmbedding
-  have hpi : Measure.pi (fun _ : {p : Fin 1 × Fin 1 // p.1 < p.2} => coordK R b lam) =
-      Measure.dirac (fun p => hT.elim p) := Measure.pi_of_empty _ _
-  have himg : (ψ ∘ hermHomeo R hcm) '' (hermHomeo R hcm ⁻¹' s) =
-      ((fun a : Fin 1 → R => a 0) ⁻¹' s) ×ˢ Set.univ := by
+  have hpi
+      : Measure.pi (fun _ : {p : Fin 1 × Fin 1 // p.1 < p.2} => coordK R b lam)
+        = Measure.dirac (fun p => hT.elim p) :=
+    Measure.pi_of_empty _ _
+  have himg
+      : (ψ ∘ hermHomeo R hcm) '' (hermHomeo R hcm ⁻¹' s)
+        = ((fun a : Fin 1 → R => a 0) ⁻¹' s) ×ˢ Set.univ := by
     ext q
     constructor
     · rintro ⟨S, hS, rfl⟩
@@ -233,8 +252,8 @@ theorem map_coordHerm (hcm : IsCMExt F E σ) {d : ℕ} (b : Module.Basis (Fin d)
         funext i
         obtain rfl : i = 0 := Subsingleton.elim _ _
         simp [ψ]
-  rw [Measure.map_apply (hermHomeo R hcm).measurable hs, coordHerm, hfun, hemb.comap_apply, hpi, himg,
-    Measure.prod_prod, measure_univ, mul_one]
+  rw [Measure.map_apply (hermHomeo R hcm).measurable hs, coordHerm, hfun, hemb.comap_apply, hpi,
+    himg, Measure.prod_prod, measure_univ, mul_one]
   exact (measurePreserving_funUnique lam (Fin 1)).measure_preimage hs.nullMeasurableSet
 
 end Main

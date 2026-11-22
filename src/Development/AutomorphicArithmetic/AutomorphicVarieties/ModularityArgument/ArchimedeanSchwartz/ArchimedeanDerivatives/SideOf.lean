@@ -7,19 +7,24 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CuspidalLett
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Polynomial Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.HenQ UpperTheory.V
+open NumberField IsDedekindDomain Polynomial Formalism.L2.Host GlobalTheory.CuspRep
+  GlobalTheory.HenQ UpperTheory.V
 
 namespace UpperTheory.V.Z.Inf
 
 variable {K : Type} [Field K] [NumberField K]
 
-private theorem norm_ne (w : HeightOneSpectrum (𝓞 K)) : ((Ideal.absNorm w.asIdeal : ℕ) : ℂ) ≠ 0 := by
-  have h0 : (Ideal.absNorm w.asIdeal : ℕ) ≠ 0 := by
-    simpa [Ideal.absNorm_eq_zero_iff] using w.ne_bot
+private theorem norm_ne (w : HeightOneSpectrum (𝓞 K))
+    : ((Ideal.absNorm w.asIdeal : ℕ) : ℂ) ≠ 0 := by
+  have h0 : (Ideal.absNorm w.asIdeal : ℕ) ≠ 0 := by simpa [Ideal.absNorm_eq_zero_iff] using w.ne_bot
   exact_mod_cast h0
 
-private theorem euler_shift (B : HeightOneSpectrum (𝓞 K) → Multiset ℂ) (S : Set (HeightOneSpectrum (𝓞 K))) (z s : ℂ) :
-    eulerL K (fun w => (B w).map fun b => b * ((Ideal.absNorm w.asIdeal : ℕ) : ℂ) ^ (-z)) S (s - z) = eulerL K B S s := by
+private theorem euler_shift
+    (B : HeightOneSpectrum (𝓞 K) → Multiset ℂ) (S : Set (HeightOneSpectrum (𝓞 K))) (z s : ℂ)
+    : eulerL K
+        (fun w => (B w).map fun b => b * ((Ideal.absNorm w.asIdeal : ℕ) : ℂ) ^ (-z))
+        S (s - z)
+      = eulerL K B S s := by
   unfold eulerL
   refine tprod_congr fun w => ?_
   rw [Multiset.map_map]
@@ -29,8 +34,12 @@ private theorem euler_shift (B : HeightOneSpectrum (𝓞 K) → Multiset ℂ) (S
   congr 4
   ring
 
-private theorem eulerd_shift (B : HeightOneSpectrum (𝓞 K) → Multiset ℂ) (S : Set (HeightOneSpectrum (𝓞 K))) (z s : ℂ) :
-    eulerLd K (fun w => (B w).map fun b => b * ((Ideal.absNorm w.asIdeal : ℕ) : ℂ) ^ (-z)) S (s - z) = eulerLd K B S s := by
+private theorem eulerd_shift
+    (B : HeightOneSpectrum (𝓞 K) → Multiset ℂ) (S : Set (HeightOneSpectrum (𝓞 K))) (z s : ℂ)
+    : eulerLd K
+        (fun w => (B w).map fun b => b * ((Ideal.absNorm w.asIdeal : ℕ) : ℂ) ^ (-z))
+        S (s - z)
+      = eulerLd K B S s := by
   unfold eulerLd eulerL
   refine tprod_congr fun w => ?_
   rw [Multiset.map_map, Multiset.map_map, Multiset.map_map]
@@ -41,4 +50,3 @@ private theorem eulerd_shift (B : HeightOneSpectrum (𝓞 K) → Multiset ℂ) (
   ring
 
 end UpperTheory.V.Z.Inf
-

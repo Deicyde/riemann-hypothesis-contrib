@@ -35,7 +35,8 @@ def ring (hN : GradedFam c₀ N) : Subring F[X] where
     have := hN.smul k (-1) _ (hp k)
     simpa using this
 
-theorem monomial_mem (hN : GradedFam c₀ N) {k : ℕ} {b : F} (hb : b ∈ N k) : monomial k b ∈ ring hN := by
+theorem monomial_mem (hN : GradedFam c₀ N) {k : ℕ} {b : F} (hb : b ∈ N k)
+    : monomial k b ∈ ring hN := by
   intro j
   rw [coeff_monomial_apply]
   split_ifs with h
@@ -44,13 +45,12 @@ theorem monomial_mem (hN : GradedFam c₀ N) {k : ℕ} {b : F} (hb : b ∈ N k) 
 
 def piece (hN : GradedFam c₀ N) (k : ℕ) : AddSubgroup (ring hN) where
   carrier := {p | ∀ j, j ≠ k → (p : F[X]).coeff j = 0}
-  add_mem' {p q} hp hq j hj := by
-    rw [Subring.coe_add, coeff_add, hp j hj, hq j hj, add_zero]
+  add_mem' {p q} hp hq j hj := by rw [Subring.coe_add, coeff_add, hp j hj, hq j hj, add_zero]
   zero_mem' j _ := by rw [Subring.coe_zero, coeff_zero]
   neg_mem' {p} hp j hj := by rw [Subring.coe_neg, coeff_neg, hp j hj, neg_zero]
 
-theorem mem_piece_iff (hN : GradedFam c₀ N) {k : ℕ} {p : ring hN} :
-    p ∈ piece hN k ↔ (p : F[X]) = monomial k ((p : F[X]).coeff k) := by
+theorem mem_piece_iff (hN : GradedFam c₀ N) {k : ℕ} {p : ring hN}
+    : p ∈ piece hN k ↔ (p : F[X]) = monomial k ((p : F[X]).coeff k) := by
   constructor
   · intro hp
     ext j
@@ -61,37 +61,46 @@ theorem mem_piece_iff (hN : GradedFam c₀ N) {k : ℕ} {p : ring hN} :
   · intro hp j hj
     rw [hp, coeff_monomial_of_ne _ hj]
 
-def hel (hN : GradedFam c₀ N) (k : ℕ) (b : F) (hb : b ∈ N k) : ring hN := ⟨monomial k b, monomial_mem hN hb⟩
+def hel (hN : GradedFam c₀ N) (k : ℕ) (b : F) (hb : b ∈ N k) : ring hN :=
+  ⟨monomial k b, monomial_mem hN hb⟩
 
-@[simp] theorem coe_hel (hN : GradedFam c₀ N) (k : ℕ) (b : F) (hb : b ∈ N k) :
-    (hel hN k b hb : F[X]) = monomial k b := rfl
+@[simp]
+theorem coe_hel (hN : GradedFam c₀ N) (k : ℕ) (b : F) (hb : b ∈ N k)
+    : (hel hN k b hb : F[X]) = monomial k b :=
+  rfl
 
-theorem hel_mem (hN : GradedFam c₀ N) (k : ℕ) (b : F) (hb : b ∈ N k) : hel hN k b hb ∈ piece hN k := by
+theorem hel_mem (hN : GradedFam c₀ N) (k : ℕ) (b : F) (hb : b ∈ N k)
+    : hel hN k b hb ∈ piece hN k := by
   rw [mem_piece_iff, coe_hel, coeff_monomial_same]
 
-theorem hel_ne_zero (hN : GradedFam c₀ N) {k : ℕ} {b : F} (hb : b ∈ N k) (h : b ≠ 0) : hel hN k b hb ≠ 0 := by
+theorem hel_ne_zero (hN : GradedFam c₀ N) {k : ℕ} {b : F} (hb : b ∈ N k) (h : b ≠ 0)
+    : hel hN k b hb ≠ 0 := by
   intro e
   have := congrArg (fun p : ring hN => (p : F[X]).coeff k) e
   simp at this
   exact h this
 
 def comp (hN : GradedFam c₀ N) (k : ℕ) : ring hN →+ piece hN k where
-  toFun p := ⟨⟨monomial k ((p : F[X]).coeff k), monomial_mem hN (p.2 k)⟩, by
-    intro j hj; exact coeff_monomial_of_ne _ hj⟩
+  toFun p := ⟨
+    ⟨monomial k ((p : F[X]).coeff k), monomial_mem hN (p.2 k)⟩,
+    by intro j hj; exact coeff_monomial_of_ne _ hj
+  ⟩
   map_zero' := by ext; simp
   map_add' p q := by ext; simp
 
-theorem comp_eq_zero (hN : GradedFam c₀ N) {k : ℕ} {p : ring hN} (h : (p : F[X]).coeff k = 0) : comp hN k p = 0 := by
+theorem comp_eq_zero (hN : GradedFam c₀ N) {k : ℕ} {p : ring hN} (h : (p : F[X]).coeff k = 0)
+    : comp hN k p = 0 := by
   ext; simp [comp, h]
 
-theorem comp_of_mem (hN : GradedFam c₀ N) {k : ℕ} {p : ring hN} (h : p ∈ piece hN k) : (comp hN k p : ring hN) = p := by
+theorem comp_of_mem (hN : GradedFam c₀ N) {k : ℕ} {p : ring hN} (h : p ∈ piece hN k)
+    : (comp hN k p : ring hN) = p := by
   ext1; exact ((mem_piece_iff hN).1 h).symm
 
 def dec (hN : GradedFam c₀ N) (p : ring hN) : DirectSum ℕ (fun k => piece hN k) :=
   ∑ k ∈ (p : F[X]).support, DirectSum.of (fun k => piece hN k) k (comp hN k p)
 
-theorem dec_eq (hN : GradedFam c₀ N) (p : ring hN) (S : Finset ℕ) (hS : (p : F[X]).support ⊆ S) :
-    dec hN p = ∑ k ∈ S, DirectSum.of (fun k => piece hN k) k (comp hN k p) := by
+theorem dec_eq (hN : GradedFam c₀ N) (p : ring hN) (S : Finset ℕ) (hS : (p : F[X]).support ⊆ S)
+    : dec hN p = ∑ k ∈ S, DirectSum.of (fun k => piece hN k) k (comp hN k p) := by
   refine Finset.sum_subset hS fun k _ hk => ?_
   rw [comp_eq_zero hN (notMem_support_iff.1 hk), map_zero]
 
@@ -103,7 +112,8 @@ def decHom (hN : GradedFam c₀ N) : ring hN →+ DirectSum ℕ (fun k => piece 
     set S := (p : F[X]).support ∪ (q : F[X]).support ∪ ((p + q : ring hN) : F[X]).support
     rw [dec_eq hN _ S (fun x hx => Finset.mem_union_right _ hx),
       dec_eq hN p S (fun x hx => Finset.mem_union_left _ (Finset.mem_union_left _ hx)),
-      dec_eq hN q S (fun x hx => Finset.mem_union_left _ (Finset.mem_union_right _ hx)), ← Finset.sum_add_distrib]
+      dec_eq hN q S (fun x hx => Finset.mem_union_left _ (Finset.mem_union_right _ hx)),
+      ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_add (f := _), map_add (f := _)]
 
@@ -116,9 +126,10 @@ instance gradedMonoid (hN : GradedFam c₀ N) : SetLike.GradedMonoid (piece hN) 
     intro l hl
     rw [Subring.coe_mul, ha, hb, monomial_mul_monomial, coeff_monomial_of_ne _ hl]
 
-instance gradedRing (hN : GradedFam c₀ N) : GradedRing (piece hN) :=
-  { gradedMonoid hN with
-    toDecomposition := DirectSum.Decomposition.ofAddHom (piece hN) (decHom hN)
+instance gradedRing (hN : GradedFam c₀ N) : GradedRing (piece hN) := {
+  gradedMonoid hN with
+  toDecomposition :=
+    DirectSum.Decomposition.ofAddHom (piece hN) (decHom hN)
       (by
         refine AddMonoidHom.ext fun p => Subtype.ext ?_
         change (((DirectSum.coeAddMonoidHom (piece hN)) (dec hN p) : ring hN) : F[X]) = p
@@ -136,10 +147,10 @@ instance gradedRing (hN : GradedFam c₀ N) : GradedRing (piece hN) :=
           exact (mem_support_iff.1 hj) (y.2 j (by simpa using h')))]
         rw [Finset.sum_singleton]
         congr 1
-        exact Subtype.ext (comp_of_mem hN y.2)) }
+        exact Subtype.ext (comp_of_mem hN y.2))
+}
 
 section Frac
-
 
 variable (F) in
 def cL : F →+* FractionRing F[X] := (algebraMap F[X] (FractionRing F[X])).comp C
@@ -162,23 +173,24 @@ def liftAt : Localization.AtPrime P →+* FractionRing F[X] :=
 def valL : AtPrime (piece hN) P →+* FractionRing F[X] :=
   (liftAt hN P).comp (algebraMap (AtPrime (piece hN) P) (Localization.AtPrime P))
 
-theorem valL_mk (g : NumDenSameDeg (piece hN) P.primeCompl) :
-    valL hN P (mk g) = cL F (((g.num : ring hN) : F[X]).coeff g.deg / ((g.den : ring hN) : F[X]).coeff g.deg) := by
+theorem valL_mk (g : NumDenSameDeg (piece hN) P.primeCompl)
+    : valL hN P (mk g)
+      = cL F (((g.num : ring hN) : F[X]).coeff g.deg / ((g.den : ring hN) : F[X]).coeff g.deg) := by
   have hnum := (mem_piece_iff hN).1 g.num.2
   have hden := (mem_piece_iff hN).1 g.den.2
   have hs : ((g.den : ring hN) : F[X]).coeff g.deg ≠ 0 := by
     intro h0
     apply g.den_mem
     have : (g.den : ring hN) = 0 := Subtype.ext (by rw [hden, h0, map_zero]; rfl)
-    rw [this]; exact P.zero_mem
+    rw [this]
+    exact P.zero_mem
   change liftAt hN P (mk g).val = _
   rw [val_mk, Localization.mk_eq_mk', liftAt, IsLocalization.lift_mk'_spec]
-  change algebraMap F[X] _ ((g.num : ring hN) : F[X]) =
-    algebraMap F[X] _ ((g.den : ring hN) : F[X]) * algebraMap F[X] _ (C _)
+  change algebraMap F[X] _ ((g.num : ring hN) : F[X])
+    = algebraMap F[X] _ ((g.den : ring hN) : F[X]) * algebraMap F[X] _ (C _)
   rw [← map_mul]
   congr 1
   rw [hnum, hden, coeff_monomial_same, coeff_monomial_same, monomial_mul_C, mul_div_cancel₀ _ hs]
-
 
 variable (F) in
 def eqR : F ≃+* (cL F).range :=
@@ -195,8 +207,9 @@ def psiAt : AtPrime (piece hN) P →+* F := (eqR F).symm.toRingHom.comp (valR hN
 theorem cL_psiAt (y : AtPrime (piece hN) P) : cL F (psiAt hN P y) = valL hN P y :=
   congrArg Subtype.val ((eqR F).apply_symm_apply (valR hN P y))
 
-theorem psiAt_mk (g : NumDenSameDeg (piece hN) P.primeCompl) :
-    psiAt hN P (mk g) = ((g.num : ring hN) : F[X]).coeff g.deg / ((g.den : ring hN) : F[X]).coeff g.deg :=
+theorem psiAt_mk (g : NumDenSameDeg (piece hN) P.primeCompl)
+    : psiAt hN P (mk g)
+      = ((g.num : ring hN) : F[X]).coeff g.deg / ((g.den : ring hN) : F[X]).coeff g.deg :=
   cL_injective (by rw [cL_psiAt, valL_mk])
 
 end Frac
@@ -208,21 +221,28 @@ variable (hN : GradedFam c₀ N)
 instance isPrime_point (x : Proj (piece hN)) : x.asHomogeneousIdeal.toIdeal.IsPrime :=
   ProjectiveSpectrum.isPrime x
 
-def gen {k : ℕ} (hk : 1 ≤ k) {b : F} (hb : b ∈ N k) (h0 : b ≠ 0) : Proj (piece hN) :=
-  ⟨⊥, Ideal.isPrime_bot, fun h => hel_ne_zero hN hb h0 (by
-    have : hel hN k b hb ∈ HomogeneousIdeal.irrelevant (piece hN) := by
-      rw [HomogeneousIdeal.mem_irrelevant_iff, GradedRing.proj_apply,
-        DirectSum.decompose_of_mem_ne (piece hN) (hel_mem hN k b hb) (by omega)]
-    exact h this)⟩
+def gen {k : ℕ} (hk : 1 ≤ k) {b : F} (hb : b ∈ N k) (h0 : b ≠ 0) : Proj (piece hN) := ⟨
+  ⊥,
+  Ideal.isPrime_bot,
+  fun h =>
+    hel_ne_zero hN hb h0 (by
+      have : hel hN k b hb ∈ HomogeneousIdeal.irrelevant (piece hN) := by
+        rw [HomogeneousIdeal.mem_irrelevant_iff, GradedRing.proj_apply,
+          DirectSum.decompose_of_mem_ne (piece hN) (hel_mem hN k b hb) (by omega)]
+      exact h this)
+⟩
 
-theorem isIntegral {k : ℕ} (hk : 1 ≤ k) {b : F} (hb : b ∈ N k) (h0 : b ≠ 0) : IsIntegral (Proj (piece hN)) := by
+theorem isIntegral {k : ℕ} (hk : 1 ≤ k) {b : F} (hb : b ∈ N k) (h0 : b ≠ 0)
+    : IsIntegral (Proj (piece hN)) := by
   have hred : IsReduced (Proj (piece hN)) := by
     have (x : Proj (piece hN)) : _root_.IsReduced ((Proj (piece hN)).presheaf.stalk x) := by
       let x' : ProjectiveSpectrum (piece hN) := x
-      have h1 : _root_.IsReduced (HomogeneousLocalization.AtPrime (piece hN) x'.asHomogeneousIdeal.toIdeal) :=
+      have h1 : _root_.IsReduced (HomogeneousLocalization.AtPrime (piece hN)
+          x'.asHomogeneousIdeal.toIdeal) :=
         isReduced_of_injective (algebraMap _ (Localization.AtPrime x'.asHomogeneousIdeal.toIdeal))
           (HomogeneousLocalization.val_injective _)
-      exact isReduced_of_injective (Proj.stalkIso' (piece hN) x') (Proj.stalkIso' (piece hN) x').injective
+      exact isReduced_of_injective (Proj.stalkIso' (piece hN) x')
+        (Proj.stalkIso' (piece hN) x').injective
     exact isReduced_of_isReduced_stalk _
   have hcl : closure ({gen hN hk hb h0} : Set (ProjectiveSpectrum (piece hN))) = Set.univ := by
     refine Set.eq_univ_of_forall fun y => ?_
@@ -237,41 +257,55 @@ theorem isIntegral {k : ℕ} (hk : 1 ≤ k) {b : F} (hb : b ∈ N k) (h0 : b ≠
   exact isIntegral_of_irreducibleSpace_of_isReduced _
 
 def toZero : R →+* piece hN 0 where
-  toFun r := ⟨⟨C (c₀ r), by
-      have : c₀ r * 1 ∈ N 0 := hN.smul 0 r 1 hN.one
-      rw [mul_one] at this
-      exact monomial_mem hN (k := 0) this⟩, by
-    intro j hj; simp [coeff_C, hj]⟩
+  toFun r := ⟨
+    ⟨
+      C (c₀ r),
+      by
+        have : c₀ r * 1 ∈ N 0 := hN.smul 0 r 1 hN.one
+        rw [mul_one] at this
+        exact monomial_mem hN (k := 0) this
+    ⟩,
+    by intro j hj; simp [coeff_C, hj]
+  ⟩
   map_one' := by ext1; ext1; simp
   map_mul' a b := by ext1; ext1; simp
   map_zero' := by ext1; ext1; simp
   map_add' a b := by ext1; ext1; simp
 
 def Dp (k : ℕ) (b : F) : (Proj (piece hN)).Opens := by
-  classical exact if hb : b ∈ N k then Proj.basicOpen (piece hN) (hel hN k b hb) else ⊥
+  classical
+  exact if hb : b ∈ N k then Proj.basicOpen (piece hN) (hel hN k b hb) else ⊥
 
-theorem Dp_of_mem {k : ℕ} {b : F} (hb : b ∈ N k) : Dp hN k b = Proj.basicOpen (piece hN) (hel hN k b hb) := by
+theorem Dp_of_mem {k : ℕ} {b : F} (hb : b ∈ N k)
+    : Dp hN k b = Proj.basicOpen (piece hN) (hel hN k b hb) := by
   rw [Dp, dite_eq_left hb]
 
 def psi [IsIntegral (Proj (piece hN))] : (Proj (piece hN)).functionField →+* F :=
   (psiAt hN _).comp (Proj.stalkIso' (piece hN) (genericPoint (Proj (piece hN)))).toRingHom
 
-theorem psi_algebraMap [IsIntegral (Proj (piece hN))] (x : Proj (piece hN)) (w : (Proj (piece hN)).presheaf.stalk x) :
-    psi hN (algebraMap _ _ w) = psiAt hN _ (Proj.stalkIso' (piece hN) x w) := by
+theorem psi_algebraMap
+    [IsIntegral (Proj (piece hN))] (x : Proj (piece hN)) (w : (Proj (piece hN)).presheaf.stalk x)
+    : psi hN (algebraMap _ _ w) = psiAt hN _ (Proj.stalkIso' (piece hN) x w) := by
   obtain ⟨g, hg⟩ := mk_surjective (Proj.stalkIso' (piece hN) x w)
   have hw : w = (Proj.stalkIso' (piece hN) x).symm (mk g) :=
     ((Proj.stalkIso' (piece hN) x).symm_apply_apply w).symm.trans (congrArg _ hg.symm)
   subst hw
   have hsp : genericPoint (Proj (piece hN)) ⤳ x := genericPoint_specializes x
-  have hle : (genericPoint (Proj (piece hN))).asHomogeneousIdeal.toIdeal ≤ x.asHomogeneousIdeal.toIdeal :=
+  have hle
+      : (genericPoint (Proj (piece hN))).asHomogeneousIdeal.toIdeal
+        ≤ x.asHomogeneousIdeal.toIdeal :=
     (ProjectiveSpectrum.le_iff_mem_closure (piece hN) _ _).2 (specializes_iff_mem_closure.1 hsp)
-  have key : Proj.stalkIso' (piece hN) (genericPoint (Proj (piece hN)))
-      ((Proj (piece hN)).presheaf.stalkSpecializes hsp ((Proj.stalkIso' (piece hN) x).symm (mk g))) =
-      mk (⟨g.deg, g.num, g.den, fun hy => g.den_mem (hle hy)⟩ :
-        NumDenSameDeg (piece hN) (genericPoint (Proj (piece hN))).asHomogeneousIdeal.toIdeal.primeCompl) := by
+  have key
+      : Proj.stalkIso' (piece hN) (genericPoint (Proj (piece hN)))
+          ((Proj (piece hN)).presheaf.stalkSpecializes hsp
+            ((Proj.stalkIso' (piece hN) x).symm (mk g)))
+        = mk
+          (⟨g.deg, g.num, g.den, fun hy => g.den_mem (hle hy)⟩ : NumDenSameDeg (piece hN)
+            (genericPoint (Proj (piece hN))).asHomogeneousIdeal.toIdeal.primeCompl) := by
     erw [Proj.stalkIso'_symm_mk, TopCat.Presheaf.germ_stalkSpecializes_apply, Proj.stalkIso'_germ]
     rfl
-  change psiAt hN _ (Proj.stalkIso' (piece hN) _ ((Proj (piece hN)).presheaf.stalkSpecializes hsp _)) = _
+  change
+    psiAt hN _ (Proj.stalkIso' (piece hN) _ ((Proj (piece hN)).presheaf.stalkSpecializes hsp _)) = _
   rw [key, RingEquiv.apply_symm_apply, psiAt_mk, psiAt_mk]
 
 end Scheme

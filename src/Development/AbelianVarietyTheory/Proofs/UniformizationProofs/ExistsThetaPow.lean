@@ -13,17 +13,23 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.ThetaPow
 
-theorem prod_fam_zero {R : Type} [CommRing R] [IsDomain R] (D : DegPre R) (F : Type) [Field F]
-    [Algebra (FractionRing R) F] (k : ℕ) {U : Type} [CommGroup U]
-    (h : ((DegPre.BF D F).left ⟶ D.P.A.left) → U) :
-    ∏ i, h (DegPre.famφ D F 0 i) ^ DegPre.famε k i = h (DegPre.prB D F).left ^ k := by
+theorem prod_fam_zero
+    {R : Type} [CommRing R] [IsDomain R]
+    (D : DegPre R)
+    (F : Type) [Field F] [Algebra (FractionRing R) F]
+    (k : ℕ)
+    {U : Type} [CommGroup U]
+    (h : ((DegPre.BF D F).left ⟶ D.P.A.left) → U)
+    : ∏ i, h (DegPre.famφ D F 0 i) ^ DegPre.famε k i = h (DegPre.prB D F).left ^ k := by
   have hmul : ∀ {T : Over (Spec (CommRingCat.of R))} (a b : T ⟶ D.P.A), padd D.P.A a b = a * b := by
     intro T a b
     unfold padd
@@ -38,8 +44,10 @@ theorem prod_fam_zero {R : Type} [CommRing R] [IsDomain R] (D : DegPre R) (F : T
   have h3 : padd D.P.A (DegPre.prB D F) (toUnit (DegPre.BF D F) ≫ η[D.P.A]) = DegPre.prB D F := by
     rw [hmul]
     exact mul_one _
-  have hφ : DegPre.famφ D F 0 = ![(DegPre.prB D F).left, (DegPre.prB D F).left,
-      (toUnit (DegPre.BF D F) ≫ η[D.P.A]).left, (toUnit (DegPre.BF D F) ≫ η[D.P.A]).left] := by
+  have hφ
+      : DegPre.famφ D F 0
+        = ![(DegPre.prB D F).left, (DegPre.prB D F).left,
+          (toUnit (DegPre.BF D F) ≫ η[D.P.A]).left, (toUnit (DegPre.BF D F) ≫ η[D.P.A]).left] := by
     unfold DegPre.famφ
     rw [h1, h3]
   have hε : DegPre.famε k = ![(k : ℤ) - 1, 1, -1, 1] := rfl
@@ -50,11 +58,28 @@ theorem prod_fam_zero {R : Type} [CommRing R] [IsDomain R] (D : DegPre R) (F : T
   simp only [zpow_neg, zpow_one]
   rw [_root_.inv_mul_cancel_right, ← zpow_add_one, sub_add_cancel, zpow_natCast]
 
-theorem exists_theta_pow : SecTwistSt → ∀ (R : Type) [CommRing R] [IsDomain R] (D : DegPre R) (F : Type) [Field F] [Algebra (FractionRing R) F] (n : ℕ), 1 ≤ n → ∃ (θ : LB.Sec (D.P.L.pull (DegPre.prB D F).left)) (σ : LB.Sec (LB.LinComb D.P.L (DegPre.famφ D F 0) (DegPre.famε n))), (∃ j, θ.f j ≠ 0) ∧ ∀ (Z : Scheme.{0}) (r : Z ⟶ (DegPre.BF D F).left) (z : Z) (J : (Z ⟶ D.P.A.left) → D.P.L.ι), Good D.P.L z J → sval σ r z J = sval (L := D.P.L) (φ := fun _ : PUnit => (DegPre.prB D F).left) (ε := fun _ => 1) θ r z J ^ n := by
+theorem exists_theta_pow
+    : SecTwistSt
+      → ∀ (R : Type) [CommRing R] [IsDomain R] (D : DegPre R) (F : Type) [Field F]
+          [Algebra (FractionRing R) F] (n : ℕ),
+        1 ≤ n
+          → ∃ (θ : LB.Sec (D.P.L.pull (DegPre.prB D F).left))
+              (σ : LB.Sec (LB.LinComb D.P.L (DegPre.famφ D F 0) (DegPre.famε n))),
+            (∃ j, θ.f j ≠ 0)
+              ∧ ∀ (Z : Scheme.{0}) (r : Z ⟶ (DegPre.BF D F).left) (z : Z)
+                  (J : (Z ⟶ D.P.A.left) → D.P.L.ι),
+                Good D.P.L z J
+                  → sval σ r z J
+                    = sval (L := D.P.L)
+                        (φ := fun _ : PUnit => (DegPre.prB D F).left)
+                        (ε := fun _ => 1)
+                        θ r z J
+                      ^ n := by
   intro hT R _ _ D F _ _ n _
   obtain ⟨s₀, hs₀⟩ := GlobalTheory.FamFree.exists_sec_ne_zero (D := D) (F := F) hT (k := 1) le_rfl 0
   have hF₁ : FormEq (DegPre.famφ D F 0) (DegPre.famε 1)
-      (fun _ : PUnit => (DegPre.prB D F).left) (fun _ => (1 : ℤ)) := by
+      (fun _ : PUnit => (DegPre.prB D F).left)
+      (fun _ => (1 : ℤ)) := by
     intro U _ h
     rw [prod_fam_zero D F 1 h]
     simp
@@ -68,12 +93,18 @@ theorem exists_theta_pow : SecTwistSt → ∀ (R : Type) [CommRing R] [IsDomain 
       split <;> simp
     apply hs₀
     intro j
-    refine (sec_ext_val D.P.isLB (s' := H1.SectionArithmetic.secZero _) (fun y J hJ => ?_) j).trans rfl
+    refine (sec_ext_val D.P.isLB (s' := H1.SectionArithmetic.secZero _) (fun y J hJ => ?_) j).trans
+      rfl
     rw [← hθ _ (𝟙 _) y J hJ]
     exact ((congrArg (gs _ y _) (hc _)).trans (g0 _ _ _)).trans (g0 _ _ _).symm
-  let P := H1.SectionArithmetic.powSec (L := D.P.L) (φ := fun _ : PUnit => (DegPre.prB D F).left)
-    (ε := fun _ => (1 : ℤ)) (fun _ : Fin n => θ)
-  have hFn : FormEq (fun p : Fin n × PUnit => (DegPre.prB D F).left) (fun _ => (1 : ℤ))
+  let P :=
+    H1.SectionArithmetic.powSec (L := D.P.L)
+      (φ := fun _ : PUnit => (DegPre.prB D F).left)
+      (ε := fun _ => (1 : ℤ))
+      (fun _ : Fin n => θ)
+  have hFn : FormEq
+      (fun p : Fin n × PUnit => (DegPre.prB D F).left)
+      (fun _ => (1 : ℤ))
       (DegPre.famφ D F 0) (DegPre.famε n) := by
     intro U _ h
     rw [prod_fam_zero D F n h]

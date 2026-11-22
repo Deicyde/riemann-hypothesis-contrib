@@ -74,8 +74,7 @@ theorem PrimeBranchDimOne.proof : PrimeBranchDimOne.Statement := by
     rw [abs_of_pos (half_pos c.radius_pos)]
     exact half_lt_self c.radius_pos
   have h0 : (0 : Fin 1 → ℂ) ∈ Metric.ball (0 : Fin 1 → ℂ) r := Metric.mem_ball_self c.radius_pos
-  have heq : c.toFun v = c.toFun 0 := by
-    rw [hZ _ (c.mapsTo hv), hZ _ (c.mapsTo h0)]
+  have heq : c.toFun v = c.toFun 0 := by rw [hZ _ (c.mapsTo hv), hZ _ (c.mapsTo h0)]
   have := congrFun (c.injOn hv h0 heq) 0
   simp only [v, Pi.zero_apply, Complex.ofReal_eq_zero] at this
   exact (half_pos c.radius_pos).ne' this

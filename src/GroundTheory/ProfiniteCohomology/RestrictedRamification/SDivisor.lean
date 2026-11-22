@@ -20,26 +20,27 @@ universe u
 section Tower
 
 variable {F : Type u} [Field F] [NumberField F] (S : Set (HeightOneSpectrum (𝓞 F)))
-variable {K L : Type u} [Field K] [Field L] [NumberField K] [NumberField L] [Algebra F K]
-  [Algebra F L] [Algebra K L] [IsScalarTower F K L]
-
+variable
+  {K L : Type u} [Field K] [Field L] [NumberField K] [NumberField L] [Algebra F K] [Algebra F L]
+  [Algebra K L] [IsScalarTower F K L]
 
 omit [NumberField F] [NumberField L] in
-theorem exists_underPlace_eq (v : HeightOneSpectrum (𝓞 F)) :
-    ∃ w : HeightOneSpectrum (𝓞 L), underPlace (F := F) w = v := by
+theorem exists_underPlace_eq (v : HeightOneSpectrum (𝓞 F))
+    : ∃ w : HeightOneSpectrum (𝓞 L), underPlace (F := F) w = v := by
   obtain ⟨⟨Q, hQ, hQv⟩⟩ := (inferInstance : Nonempty (v.asIdeal.primesOver (𝓞 L)))
-  exact ⟨⟨Q, hQ, Ideal.ne_bot_of_liesOver_of_ne_bot v.ne_bot Q⟩,
-    (liesOver_iff_eq_underPlace.1 hQv).symm⟩
-
+  exact ⟨
+    ⟨Q, hQ, Ideal.ne_bot_of_liesOver_of_ne_bot v.ne_bot Q⟩,
+    (liesOver_iff_eq_underPlace.1 hQv).symm
+  ⟩
 
 omit [NumberField F] [NumberField K] [NumberField L] in
-theorem underPlace_underPlace (W : HeightOneSpectrum (𝓞 L)) :
-    underPlace (F := F) (underPlace (F := K) W) = underPlace (F := F) W :=
+theorem underPlace_underPlace (W : HeightOneSpectrum (𝓞 L))
+    : underPlace (F := F) (underPlace (F := K) W) = underPlace (F := F) W :=
   HeightOneSpectrum.ext (Ideal.under_under (A := 𝓞 F) (B := 𝓞 K) W.asIdeal)
 
-theorem valuation_algebraMap_underPlace (W : HeightOneSpectrum (𝓞 L))
-    (hW : Algebra.IsUnramifiedAt (𝓞 F) W.asIdeal) (y : K) :
-    W.valuation L (algebraMap K L y) = (underPlace (F := K) W).valuation K y := by
+theorem valuation_algebraMap_underPlace
+    (W : HeightOneSpectrum (𝓞 L)) (hW : Algebra.IsUnramifiedAt (𝓞 F) W.asIdeal) (y : K)
+    : W.valuation L (algebraMap K L y) = (underPlace (F := K) W).valuation K y := by
   have hu := ((isUnramifiedAt_tower_iff (F := F) (L := K) W.asIdeal).1 hW).2
   exact valuation_algebraMap_of_isUnramifiedAt (underPlace (F := K) W) W y
 
@@ -55,17 +56,16 @@ def IsSInvariant (x : (maxUnramifiedOutside F Ω S)ˣ) : Prop :=
 
 def IsOrdAbove (v : HeightOneSpectrum (𝓞 F)) (x : (maxUnramifiedOutside F Ω S)ˣ) (m : ℤ) : Prop :=
   ∃ (E : IntermediateField F Ω) (_ : FiniteDimensional F E) (_ : E ≤ maxUnramifiedOutside F Ω S)
-    (hx : ((x : maxUnramifiedOutside F Ω S) : Ω) ∈ E),
+      (hx : ((x : maxUnramifiedOutside F Ω S) : Ω) ∈ E),
     letI := NumberField.of_module_finite F E
-    ∃ w : HeightOneSpectrum (𝓞 E), underPlace (F := F) w = v ∧
-      w.valuation E ⟨_, hx⟩ = WithZero.exp (-m)
+    ∃ w : HeightOneSpectrum (𝓞 E),
+      underPlace (F := F) w = v ∧ w.valuation E ⟨_, hx⟩ = WithZero.exp (-m)
 
 variable [IsGalois F Ω]
 
-theorem exists_isOrdAbove (v : HeightOneSpectrum (𝓞 F)) (x : (maxUnramifiedOutside F Ω S)ˣ) :
-    ∃ m, IsOrdAbove S v x m := by
-  obtain ⟨E, hf, hu, hx⟩ :=
-    (mem_maxUnramifiedOutside_iff S).1 (x : maxUnramifiedOutside F Ω S).2
+theorem exists_isOrdAbove (v : HeightOneSpectrum (𝓞 F)) (x : (maxUnramifiedOutside F Ω S)ˣ)
+    : ∃ m, IsOrdAbove S v x m := by
+  obtain ⟨E, hf, hu, hx⟩ := (mem_maxUnramifiedOutside_iff S).1 (x : maxUnramifiedOutside F Ω S).2
   have := NumberField.of_module_finite F E
   obtain ⟨w, hw⟩ := exists_underPlace_eq (L := E) v
   have h0 : w.valuation E ⟨_, hx⟩ ≠ 0 := by
@@ -75,7 +75,8 @@ theorem exists_isOrdAbove (v : HeightOneSpectrum (𝓞 F)) (x : (maxUnramifiedOu
     apply Subtype.ext
     have := congrArg Subtype.val h
     simp at this
-  refine ⟨-WithZero.log (w.valuation E ⟨_, hx⟩), E, hf, le_maxUnramifiedOutside S hu, hx, w, hw, ?_⟩
+  refine
+    ⟨- WithZero.log (w.valuation E ⟨_, hx⟩), E, hf, le_maxUnramifiedOutside S hu, hx, w, hw, ?_⟩
   rw [neg_neg, WithZero.exp_log h0]
 
 end Field
@@ -85,29 +86,31 @@ section Galois
 variable {F Ω : Type u} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsGalois F Ω]
 variable (S : Set (HeightOneSpectrum (𝓞 F)))
 
-theorem exists_galUnramifiedOutside_restrict {M : IntermediateField F Ω} [Normal F M]
-    (hMle : M ≤ maxUnramifiedOutside F Ω S) (τ : Gal(M/F)) :
-    ∃ ρ : galUnramifiedOutside F Ω S, ∀ y : M,
+theorem exists_galUnramifiedOutside_restrict
+    {M : IntermediateField F Ω} [Normal F M] (hMle : M ≤ maxUnramifiedOutside F Ω S) (τ : Gal(M/F))
+    : ∃ ρ : galUnramifiedOutside F Ω S, ∀ y : M,
       ((ρ ⟨y, hMle y.2⟩ : maxUnramifiedOutside F Ω S) : Ω) = ((τ y : M) : Ω) := by
   refine ⟨(τ.liftNormal Ω).restrictNormal (maxUnramifiedOutside F Ω S), fun y => ?_⟩
-  have h1 := AlgEquiv.restrictNormal_commutes (τ.liftNormal Ω) (maxUnramifiedOutside F Ω S)
-    ⟨y, hMle y.2⟩
+  have h1 :=
+    AlgEquiv.restrictNormal_commutes (τ.liftNormal Ω) (maxUnramifiedOutside F Ω S) ⟨y, hMle y.2⟩
   have h2 := AlgEquiv.liftNormal_commutes τ Ω y
   exact h1.trans h2
 
-theorem valuation_eq_of_isSInvariant {M : IntermediateField F Ω} [FiniteDimensional F M]
-    [IsGalois F M] [NumberField M] (hMle : M ≤ maxUnramifiedOutside F Ω S)
-    {x : (maxUnramifiedOutside F Ω S)ˣ} (hx : IsSInvariant S x)
-    (hxM : ((x : maxUnramifiedOutside F Ω S) : Ω) ∈ M) (W W' : HeightOneSpectrum (𝓞 M))
-    (hWW' : underPlace (F := F) W = underPlace (F := F) W')
-    (hWS : underPlace (F := F) W ∉ S) :
-    W.valuation M ⟨_, hxM⟩ = W'.valuation M ⟨_, hxM⟩ := by
+theorem valuation_eq_of_isSInvariant
+    {M : IntermediateField F Ω} [FiniteDimensional F M] [IsGalois F M] [NumberField M]
+    (hMle : M ≤ maxUnramifiedOutside F Ω S)
+    {x : (maxUnramifiedOutside F Ω S)ˣ}
+    (hx : IsSInvariant S x) (hxM : ((x : maxUnramifiedOutside F Ω S) : Ω) ∈ M)
+    (W W' : HeightOneSpectrum (𝓞 M))
+    (hWW' : underPlace (F := F) W = underPlace (F := F) W') (hWS : underPlace (F := F) W ∉ S)
+    : W.valuation M ⟨_, hxM⟩ = W'.valuation M ⟨_, hxM⟩ := by
   have : IsGaloisGroup Gal(M/F) (𝓞 F) (𝓞 M) := IsGaloisGroup.of_isFractionRing _ _ _ F M
   have : W'.asIdeal.LiesOver (underPlace (F := F) W).asIdeal := by
     rw [hWW']
     infer_instance
-  obtain ⟨σ, hσ⟩ := Ideal.exists_smul_eq_of_isGaloisGroup (underPlace (F := F) W).asIdeal
-    W.asIdeal W'.asIdeal Gal(M/F)
+  obtain ⟨σ, hσ⟩ :=
+    Ideal.exists_smul_eq_of_isGaloisGroup (underPlace (F := F) W).asIdeal W.asIdeal W'.asIdeal
+      Gal(M/F)
   have hW' : W' = smulPlace σ W := HeightOneSpectrum.ext hσ.symm
   rw [hW', valuation_smulPlace_apply]
   set y : M := ⟨_, hxM⟩ with hy
@@ -120,8 +123,9 @@ theorem valuation_eq_of_isSInvariant {M : IntermediateField F Ω} [FiniteDimensi
   obtain ⟨ρ, hρ⟩ := exists_galUnramifiedOutside_restrict S hMle σ⁻¹
   have hyu : (σ⁻¹ y / y : M) ≠ 0 := div_ne_zero ((map_ne_zero _).2 hy0) hy0
   let u : Mˣ := Units.mk0 _ hyu
-  have hmap : Units.map (IntermediateField.inclusion hMle : M →* maxUnramifiedOutside F Ω S) u =
-      galUnitsHom F _ ρ x * x⁻¹ := by
+  have hmap
+      : Units.map (IntermediateField.inclusion hMle : M →* maxUnramifiedOutside F Ω S) u
+        = galUnitsHom F _ ρ x * x⁻¹ := by
     apply Units.ext
     apply Subtype.ext
     have h1 := hρ y
@@ -152,23 +156,23 @@ variable {F Ω : Type u} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [Is
 variable (S : Set (HeightOneSpectrum (𝓞 F)))
 
 omit [IsGalois F Ω] in
-theorem finiteDimensional_of_numberField (E : IntermediateField F Ω) [NumberField E] :
-    FiniteDimensional F E :=
+theorem finiteDimensional_of_numberField (E : IntermediateField F Ω) [NumberField E]
+    : FiniteDimensional F E :=
   Module.Finite.of_restrictScalars_finite ℚ F E
 
-theorem exists_place_valuation_eq_of_le {E M : IntermediateField F Ω} [NumberField E]
-    [NumberField M] (hEM : E ≤ M) (hMle : M ≤ maxUnramifiedOutside F Ω S)
-    (w : HeightOneSpectrum (𝓞 E)) (hwS : underPlace (F := F) w ∉ S) :
-    ∃ W : HeightOneSpectrum (𝓞 M), underPlace (F := F) W = underPlace (F := F) w ∧
-      ∀ y : E, W.valuation M ⟨y, hEM y.2⟩ = w.valuation E y := by
+theorem exists_place_valuation_eq_of_le
+    {E M : IntermediateField F Ω} [NumberField E] [NumberField M]
+    (hEM : E ≤ M) (hMle : M ≤ maxUnramifiedOutside F Ω S)
+    (w : HeightOneSpectrum (𝓞 E)) (hwS : underPlace (F := F) w ∉ S)
+    : ∃ W : HeightOneSpectrum (𝓞 M),
+      underPlace (F := F) W = underPlace (F := F) w
+        ∧ ∀ y : E, W.valuation M ⟨y, hEM y.2⟩ = w.valuation E y := by
   have := finiteDimensional_of_numberField M
   let _ : Algebra E M := (IntermediateField.inclusion hEM).toAlgebra
   have : IsScalarTower F E M := IsScalarTower.of_algebraMap_eq fun _ => rfl
-  have hMu : IsUnramifiedOutside S M :=
-    (isUnramifiedOutside_iff_le_maxUnramifiedOutside S).2 hMle
+  have hMu : IsUnramifiedOutside S M := (isUnramifiedOutside_iff_le_maxUnramifiedOutside S).2 hMle
   obtain ⟨W, hW⟩ := exists_underPlace_eq (F := E) (L := M) w
-  have hWF : underPlace (F := F) W = underPlace (F := F) w := by
-    rw [← hW, underPlace_underPlace]
+  have hWF : underPlace (F := F) W = underPlace (F := F) w := by rw [← hW, underPlace_underPlace]
   refine ⟨W, hWF, fun y => ?_⟩
   have hun : Algebra.IsUnramifiedAt (𝓞 F) W.asIdeal :=
     hMu (underPlace (F := F) W) (hWF ▸ hwS) W.asIdeal inferInstance inferInstance
@@ -176,9 +180,11 @@ theorem exists_place_valuation_eq_of_le {E M : IntermediateField F Ω} [NumberFi
   rw [hW] at this
   exact this
 
-theorem IsOrdAbove.unique {v : HeightOneSpectrum (𝓞 F)} (hv : v ∉ S)
-    {x : (maxUnramifiedOutside F Ω S)ˣ} (hx : IsSInvariant S x) {m m' : ℤ}
-    (h : IsOrdAbove S v x m) (h' : IsOrdAbove S v x m') : m = m' := by
+theorem IsOrdAbove.unique
+    {v : HeightOneSpectrum (𝓞 F)} (hv : v ∉ S)
+    {x : (maxUnramifiedOutside F Ω S)ˣ} (hx : IsSInvariant S x)
+    {m m' : ℤ} (h : IsOrdAbove S v x m) (h' : IsOrdAbove S v x m')
+    : m = m' := by
   obtain ⟨E, hEf, hEle, hxE, hh⟩ := h
   obtain ⟨E', hE'f, hE'le, hxE', hh'⟩ := h'
   have := NumberField.of_module_finite F E
@@ -187,7 +193,8 @@ theorem IsOrdAbove.unique {v : HeightOneSpectrum (𝓞 F)} (hv : v ∉ S)
   obtain ⟨w', hw', hw'x⟩ := hh'
   let M : IntermediateField F Ω := IntermediateField.normalClosure F ↥(E ⊔ E') Ω
   have hMle : M ≤ maxUnramifiedOutside F Ω S :=
-    (IntermediateField.normalClosure_le_iff_of_normal (K₂ := maxUnramifiedOutside F Ω S)).2 (sup_le hEle hE'le)
+    (IntermediateField.normalClosure_le_iff_of_normal (K₂ := maxUnramifiedOutside F Ω S)).2
+      (sup_le hEle hE'le)
   have hEM : E ≤ M := le_sup_left.trans (IntermediateField.le_normalClosure _)
   have hE'M : E' ≤ M := le_sup_right.trans (IntermediateField.le_normalClosure _)
   have : FiniteDimensional F M := inferInstance
@@ -197,8 +204,9 @@ theorem IsOrdAbove.unique {v : HeightOneSpectrum (𝓞 F)} (hv : v ∉ S)
   obtain ⟨W', hW', hW'x⟩ := exists_place_valuation_eq_of_le S hE'M hMle w' (hw' ▸ hv)
   have e1 := hWx ⟨_, hxE⟩
   have e2 := hW'x ⟨_, hxE'⟩
-  have e3 := valuation_eq_of_isSInvariant S hMle hx (hEM hxE) W W' (by rw [hW, hW', hw, hw'])
-    (by rw [hW, hw]; exact hv)
+  have e3 :=
+    valuation_eq_of_isSInvariant S hMle hx (hEM hxE) W W' (by rw [hW, hW', hw, hw'])
+      (by rw [hW, hw]; exact hv)
   have : WithZero.exp (-m) = WithZero.exp (-m') := by
     rw [← hwx, ← hw'x, ← e1, ← e2]
     exact e3
@@ -207,20 +215,23 @@ theorem IsOrdAbove.unique {v : HeightOneSpectrum (𝓞 F)} (hv : v ∉ S)
 noncomputable def ordAbove (v : HeightOneSpectrum (𝓞 F)) (x : (maxUnramifiedOutside F Ω S)ˣ) : ℤ :=
   (exists_isOrdAbove S v x).choose
 
-theorem isOrdAbove_ordAbove (v : HeightOneSpectrum (𝓞 F)) (x : (maxUnramifiedOutside F Ω S)ˣ) :
-    IsOrdAbove S v x (ordAbove S v x) :=
+theorem isOrdAbove_ordAbove (v : HeightOneSpectrum (𝓞 F)) (x : (maxUnramifiedOutside F Ω S)ˣ)
+    : IsOrdAbove S v x (ordAbove S v x) :=
   (exists_isOrdAbove S v x).choose_spec
 
-theorem ordAbove_eq_of_isOrdAbove {v : HeightOneSpectrum (𝓞 F)} (hv : v ∉ S)
-    {x : (maxUnramifiedOutside F Ω S)ˣ} (hx : IsSInvariant S x) {m : ℤ}
-    (h : IsOrdAbove S v x m) : ordAbove S v x = m :=
+theorem ordAbove_eq_of_isOrdAbove
+    {v : HeightOneSpectrum (𝓞 F)} (hv : v ∉ S)
+    {x : (maxUnramifiedOutside F Ω S)ˣ} (hx : IsSInvariant S x)
+    {m : ℤ} (h : IsOrdAbove S v x m)
+    : ordAbove S v x = m :=
   IsOrdAbove.unique S hv hx (isOrdAbove_ordAbove S v x) h
 
-theorem valuation_eq_exp_ordAbove {x : (maxUnramifiedOutside F Ω S)ˣ} (hx : IsSInvariant S x)
-    {E : IntermediateField F Ω} [NumberField E] (hEle : E ≤ maxUnramifiedOutside F Ω S)
-    (hxE : ((x : maxUnramifiedOutside F Ω S) : Ω) ∈ E) (w : HeightOneSpectrum (𝓞 E))
-    (hwS : underPlace (F := F) w ∉ S) :
-    w.valuation E ⟨_, hxE⟩ = WithZero.exp (-ordAbove S (underPlace (F := F) w) x) := by
+theorem valuation_eq_exp_ordAbove
+    {x : (maxUnramifiedOutside F Ω S)ˣ} (hx : IsSInvariant S x)
+    {E : IntermediateField F Ω} [NumberField E]
+    (hEle : E ≤ maxUnramifiedOutside F Ω S) (hxE : ((x : maxUnramifiedOutside F Ω S) : Ω) ∈ E)
+    (w : HeightOneSpectrum (𝓞 E)) (hwS : underPlace (F := F) w ∉ S)
+    : w.valuation E ⟨_, hxE⟩ = WithZero.exp (- ordAbove S (underPlace (F := F) w) x) := by
   have h0 : w.valuation E ⟨_, hxE⟩ ≠ 0 := by
     rw [Ne, map_eq_zero]
     intro h
@@ -229,7 +240,7 @@ theorem valuation_eq_exp_ordAbove {x : (maxUnramifiedOutside F Ω S)ˣ} (hx : Is
     have := congrArg Subtype.val h
     simp at this
   have hE := finiteDimensional_of_numberField E
-  have hw : IsOrdAbove S (underPlace (F := F) w) x (-WithZero.log (w.valuation E ⟨_, hxE⟩)) :=
+  have hw : IsOrdAbove S (underPlace (F := F) w) x (- WithZero.log (w.valuation E ⟨_, hxE⟩)) :=
     ⟨E, hE, hEle, hxE, w, rfl, by rw [neg_neg, WithZero.exp_log h0]⟩
   rw [ordAbove_eq_of_isOrdAbove S hwS hx hw, neg_neg, WithZero.exp_log h0]
 
@@ -241,11 +252,12 @@ variable {F Ω : Type u} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [Is
 variable (S : Set (HeightOneSpectrum (𝓞 F)))
 
 omit [NumberField F] [IsGalois F Ω] in
-theorem galUnitsHom_mul_inv_eq (σ : galUnramifiedOutside F Ω S) (x y : (maxUnramifiedOutside F Ω S)ˣ) :
-    galUnitsHom F _ σ (x * y) * (x * y)⁻¹ = (galUnitsHom F _ σ x * x⁻¹) * (galUnitsHom F _ σ y * y⁻¹) := by
+theorem galUnitsHom_mul_inv_eq
+    (σ : galUnramifiedOutside F Ω S) (x y : (maxUnramifiedOutside F Ω S)ˣ)
+    : galUnitsHom F _ σ (x * y) * (x * y)⁻¹
+      = (galUnitsHom F _ σ x * x⁻¹) * (galUnitsHom F _ σ y * y⁻¹) := by
   rw [map_mul, mul_inv]
   ac_rfl
-
 
 variable (Ω) in
 def sInvariantSubgroup : Subgroup (maxUnramifiedOutside F Ω S)ˣ where
@@ -263,30 +275,30 @@ def sInvariantSubgroup : Subgroup (maxUnramifiedOutside F Ω S)ˣ where
     exact inv_mem (hx σ)
 
 omit [IsGalois F Ω] in
-theorem mem_sInvariantSubgroup {x : (maxUnramifiedOutside F Ω S)ˣ} :
-    x ∈ sInvariantSubgroup Ω S ↔ IsSInvariant S x :=
+theorem mem_sInvariantSubgroup {x : (maxUnramifiedOutside F Ω S)ˣ}
+    : x ∈ sInvariantSubgroup Ω S ↔ IsSInvariant S x :=
   Iff.rfl
 
-
 omit [IsGalois F Ω] in
-theorem map_algebraMap_mem_sInvariantSubgroup (a : Fˣ) :
-    Units.map (algebraMap F (maxUnramifiedOutside F Ω S) : F →* _) a ∈ sInvariantSubgroup Ω S := by
+theorem map_algebraMap_mem_sInvariantSubgroup (a : Fˣ)
+    : Units.map (algebraMap F (maxUnramifiedOutside F Ω S) : F →* _) a
+      ∈ sInvariantSubgroup Ω S := by
   intro σ
-  have : galUnitsHom F _ σ (Units.map (algebraMap F (maxUnramifiedOutside F Ω S) : F →* _) a) =
-      Units.map (algebraMap F (maxUnramifiedOutside F Ω S) : F →* _) a :=
+  have : galUnitsHom F _ σ (Units.map (algebraMap F (maxUnramifiedOutside F Ω S) : F →* _) a)
+      = Units.map (algebraMap F (maxUnramifiedOutside F Ω S) : F →* _) a :=
     Units.ext (σ.commutes _)
   rw [this, mul_inv_cancel]
   exact one_mem _
 
-theorem exists_numberField_mem (x : (maxUnramifiedOutside F Ω S)ˣ) :
-    ∃ E : IntermediateField F Ω, NumberField E ∧ E ≤ maxUnramifiedOutside F Ω S ∧
-      ((x : maxUnramifiedOutside F Ω S) : Ω) ∈ E := by
-  obtain ⟨E, hf, hu, hx⟩ :=
-    (mem_maxUnramifiedOutside_iff S).1 (x : maxUnramifiedOutside F Ω S).2
+theorem exists_numberField_mem (x : (maxUnramifiedOutside F Ω S)ˣ)
+    : ∃ E : IntermediateField F Ω,
+      NumberField E ∧ E ≤ maxUnramifiedOutside F Ω S
+        ∧ ((x : maxUnramifiedOutside F Ω S) : Ω) ∈ E := by
+  obtain ⟨E, hf, hu, hx⟩ := (mem_maxUnramifiedOutside_iff S).1 (x : maxUnramifiedOutside F Ω S).2
   exact ⟨E, NumberField.of_module_finite F E, le_maxUnramifiedOutside S hu, hx⟩
 
-theorem finite_ordAbove_ne_zero {x : (maxUnramifiedOutside F Ω S)ˣ} (hx : IsSInvariant S x) :
-    {v : HeightOneSpectrum (𝓞 F) | v ∉ S ∧ ordAbove S v x ≠ 0}.Finite := by
+theorem finite_ordAbove_ne_zero {x : (maxUnramifiedOutside F Ω S)ˣ} (hx : IsSInvariant S x)
+    : {v : HeightOneSpectrum (𝓞 F) | v ∉ S ∧ ordAbove S v x ≠ 0}.Finite := by
   obtain ⟨E, hE, hEle, hxE⟩ := exists_numberField_mem S x
   have hx0 : (⟨_, hxE⟩ : E) ≠ 0 := by
     intro h
@@ -307,8 +319,8 @@ theorem finite_ordAbove_ne_zero {x : (maxUnramifiedOutside F Ω S)ˣ} (hx : IsSI
   have := congrArg WithZero.log h1
   simpa using this.symm
 
-theorem ordAbove_one {v : HeightOneSpectrum (𝓞 F)} (hv : v ∉ S) :
-    ordAbove S v (1 : (maxUnramifiedOutside F Ω S)ˣ) = 0 := by
+theorem ordAbove_one {v : HeightOneSpectrum (𝓞 F)} (hv : v ∉ S)
+    : ordAbove S v (1 : (maxUnramifiedOutside F Ω S)ˣ) = 0 := by
   refine ordAbove_eq_of_isOrdAbove S hv (one_mem (sInvariantSubgroup Ω S)) ?_
   obtain ⟨E, hE, hEle, hxE⟩ := exists_numberField_mem S (1 : (maxUnramifiedOutside F Ω S)ˣ)
   obtain ⟨w, hw⟩ := exists_underPlace_eq (L := E) v
@@ -316,9 +328,10 @@ theorem ordAbove_one {v : HeightOneSpectrum (𝓞 F)} (hv : v ∉ S) :
   have : (⟨_, hxE⟩ : E) = 1 := Subtype.ext (by simp)
   rw [this, map_one, neg_zero, WithZero.exp_zero]
 
-theorem ordAbove_mul {v : HeightOneSpectrum (𝓞 F)} (hv : v ∉ S)
-    {x y : (maxUnramifiedOutside F Ω S)ˣ} (hx : IsSInvariant S x) (hy : IsSInvariant S y) :
-    ordAbove S v (x * y) = ordAbove S v x + ordAbove S v y := by
+theorem ordAbove_mul
+    {v : HeightOneSpectrum (𝓞 F)} (hv : v ∉ S)
+    {x y : (maxUnramifiedOutside F Ω S)ˣ} (hx : IsSInvariant S x) (hy : IsSInvariant S y)
+    : ordAbove S v (x * y) = ordAbove S v x + ordAbove S v y := by
   obtain ⟨E, hE, hEle, hxE⟩ := exists_numberField_mem S x
   obtain ⟨E', hE', hE'le, hyE'⟩ := exists_numberField_mem S y
   have : FiniteDimensional F E := finiteDimensional_of_numberField E
@@ -329,8 +342,8 @@ theorem ordAbove_mul {v : HeightOneSpectrum (𝓞 F)} (hv : v ∉ S)
     le_sup_left (α := IntermediateField F Ω) hxE
   have hyE'' : ((y : maxUnramifiedOutside F Ω S) : Ω) ∈ E ⊔ E' :=
     le_sup_right (α := IntermediateField F Ω) hyE'
-  have hxy : (((x * y : (maxUnramifiedOutside F Ω S)ˣ) : maxUnramifiedOutside F Ω S) : Ω) ∈
-      E ⊔ E' := by
+  have hxy
+      : (((x * y : (maxUnramifiedOutside F Ω S)ˣ) : maxUnramifiedOutside F Ω S) : Ω) ∈ E ⊔ E' := by
     simp only [Units.val_mul, IntermediateField.coe_mul]
     exact mul_mem hxE'' hyE''
   obtain ⟨w, hw⟩ := exists_underPlace_eq (L := ↥(E ⊔ E')) v
@@ -345,10 +358,13 @@ theorem ordAbove_mul {v : HeightOneSpectrum (𝓞 F)} (hv : v ∉ S)
   omega
 
 noncomputable def divAbove : Additive (sInvariantSubgroup Ω S) →+ sDivisor S where
-  toFun x := Finsupp.ofSupportFinite
-    (fun v => ordAbove S v.1 ((Additive.toMul x : sInvariantSubgroup Ω S) : (maxUnramifiedOutside F Ω S)ˣ))
-    (((finite_ordAbove_ne_zero S (Additive.toMul x).2).preimage Subtype.val_injective.injOn).subset
-      fun v hv => ⟨v.2, Function.mem_support.1 hv⟩)
+  toFun x :=
+    Finsupp.ofSupportFinite
+      (fun v =>
+        ordAbove S v.1
+          ((Additive.toMul x : sInvariantSubgroup Ω S) : (maxUnramifiedOutside F Ω S)ˣ))
+      (((finite_ordAbove_ne_zero S (Additive.toMul x).2).preimage
+        Subtype.val_injective.injOn).subset fun v hv => ⟨v.2, Function.mem_support.1 hv⟩)
   map_zero' := by
     ext v
     exact ordAbove_one S v.2
@@ -356,9 +372,10 @@ noncomputable def divAbove : Additive (sInvariantSubgroup Ω S) →+ sDivisor S 
     ext v
     exact ordAbove_mul S v.2 (Additive.toMul x).2 (Additive.toMul y).2
 
-theorem divAbove_apply (x : Additive (sInvariantSubgroup Ω S)) (v : {v // v ∉ S}) :
-    divAbove S x v =
-      ordAbove S v.1 ((Additive.toMul x : sInvariantSubgroup Ω S) : (maxUnramifiedOutside F Ω S)ˣ) :=
+theorem divAbove_apply (x : Additive (sInvariantSubgroup Ω S)) (v : {v // v ∉ S})
+    : divAbove S x v
+      = ordAbove S v.1
+        ((Additive.toMul x : sInvariantSubgroup Ω S) : (maxUnramifiedOutside F Ω S)ˣ) :=
   rfl
 
 end Div
@@ -368,9 +385,9 @@ section Descent
 variable {F Ω : Type u} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsGalois F Ω]
 variable (S : Set (HeightOneSpectrum (𝓞 F)))
 
-theorem mem_sUnitsMax_of_divAbove_eq_zero {x : sInvariantSubgroup Ω S}
-    (h : divAbove S (Additive.ofMul x) = 0) :
-    (x : (maxUnramifiedOutside F Ω S)ˣ) ∈ sUnitsMax F Ω S := by
+theorem mem_sUnitsMax_of_divAbove_eq_zero
+    {x : sInvariantSubgroup Ω S} (h : divAbove S (Additive.ofMul x) = 0)
+    : (x : (maxUnramifiedOutside F Ω S)ˣ) ∈ sUnitsMax F Ω S := by
   obtain ⟨E, hE, hEle, hxE⟩ := exists_numberField_mem S (x : (maxUnramifiedOutside F Ω S)ˣ)
   have hx0 : (⟨_, hxE⟩ : E) ≠ 0 := by
     intro h
@@ -387,26 +404,31 @@ theorem mem_sUnitsMax_of_divAbove_eq_zero {x : sInvariantSubgroup Ω S}
       have := congrArg (fun D : sDivisor S => D ⟨_, hwS⟩) h
       simpa [divAbove_apply] using this
     rw [Units.val_mk0, h1, h2, neg_zero, WithZero.exp_zero]
-  have hmap : Units.map (IntermediateField.inclusion hEle : E →* maxUnramifiedOutside F Ω S)
-      (Units.mk0 _ hx0) = x := Units.ext rfl
+  have hmap
+      : Units.map (IntermediateField.inclusion hEle : E →* maxUnramifiedOutside F Ω S)
+          (Units.mk0 _ hx0)
+        = x :=
+    Units.ext rfl
   rw [← hmap]
   let f := (IntermediateField.inclusion hEle).restrictScalars (S.integer F)
   have hf : Function.Injective f := (IntermediateField.inclusion hEle).injective
-  have hmem' : Units.map (IntermediateField.inclusion hEle : E →* _) (Units.mk0 _ hx0) ∈
-      sUnitsMax F Ω S := by
+  have hmem'
+      : Units.map (IntermediateField.inclusion hEle : E →* _) (Units.mk0 _ hx0)
+        ∈ sUnitsMax F Ω S := by
     refine ⟨(isIntegral_algHom_iff f hf).2 hmem.1, ?_⟩
     rw [← map_inv]
     exact (isIntegral_algHom_iff f hf).2 hmem.2
   exact hmem'
 
-theorem divAbove_algebraMap (a : Fˣ) :
-    divAbove S (Additive.ofMul ⟨_, map_algebraMap_mem_sInvariantSubgroup (Ω := Ω) S a⟩) =
-      divS S (Additive.ofMul a) := by
+theorem divAbove_algebraMap (a : Fˣ)
+    : divAbove S (Additive.ofMul ⟨_, map_algebraMap_mem_sInvariantSubgroup (Ω := Ω) S a⟩)
+      = divS S (Additive.ofMul a) := by
   ext v
   rw [divAbove_apply, divS_apply]
   refine ordAbove_eq_of_isOrdAbove S v.2 (map_algebraMap_mem_sInvariantSubgroup (Ω := Ω) S a) ?_
-  obtain ⟨E, hE, hEle, hxE⟩ := exists_numberField_mem (Ω := Ω) S
-    (Units.map (algebraMap F (maxUnramifiedOutside F Ω S) : F →* _) a)
+  obtain ⟨E, hE, hEle, hxE⟩ :=
+    exists_numberField_mem (Ω := Ω) S
+      (Units.map (algebraMap F (maxUnramifiedOutside F Ω S) : F →* _) a)
   obtain ⟨w, hw⟩ := exists_underPlace_eq (L := E) v.1
   have hEf := finiteDimensional_of_numberField E
   refine ⟨E, hEf, hEle, hxE, w, hw, ?_⟩
@@ -421,18 +443,21 @@ end Descent
 
 section Capitulation
 
-variable {F Ω : Type u} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsGalois F Ω]
-  [IsSepClosed Ω]
+variable
+  {F Ω : Type u} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsGalois F Ω] [IsSepClosed Ω]
 variable (S : Set (HeightOneSpectrum (𝓞 F)))
 
-theorem exists_divAbove_eq {N : ℕ} (hN : N ≠ 0) (hNS : ∀ v ∉ S, ((N : ℕ) : 𝓞 F) ∉ v.asIdeal)
-    (D : sDivisor S) (a : Fˣ) (ha : divS S (Additive.ofMul a) = N • D) :
-    ∃ x : sInvariantSubgroup Ω S, divAbove S (Additive.ofMul x) = D := by
-  have : NeZero ((N : ℕ) : Ω) := ⟨by
-    rw [← map_natCast (algebraMap F Ω)]
-    exact (map_ne_zero _).2 (Nat.cast_ne_zero.2 hN)⟩
+theorem exists_divAbove_eq
+    {N : ℕ} (hN : N ≠ 0) (hNS : ∀ v ∉ S, ((N : ℕ) : 𝓞 F) ∉ v.asIdeal)
+    (D : sDivisor S) (a : Fˣ) (ha : divS S (Additive.ofMul a) = N • D)
+    : ∃ x : sInvariantSubgroup Ω S, divAbove S (Additive.ofMul x) = D := by
+  have : NeZero ((N : ℕ) : Ω) :=
+    ⟨by
+      rw [← map_natCast (algebraMap F Ω)]
+      exact (map_ne_zero _).2 (Nat.cast_ne_zero.2 hN)⟩
   obtain ⟨α, hα⟩ := IsSepClosed.exists_pow_nat_eq (algebraMap F Ω (a : F)) N
-  have hαint : IsIntegral F α := IsIntegral.of_pow (Nat.pos_of_ne_zero hN) (hα ▸ isIntegral_algebraMap)
+  have hαint : IsIntegral F α :=
+    IsIntegral.of_pow (Nat.pos_of_ne_zero hN) (hα ▸ isIntegral_algebraMap)
   let E : IntermediateField F Ω := IntermediateField.adjoin F {α}
   have : FiniteDimensional F E := IntermediateField.adjoin.finiteDimensional hαint
   have : NumberField E := NumberField.of_module_finite F E
@@ -445,7 +470,7 @@ theorem exists_divAbove_eq {N : ℕ} (hN : N ≠ 0) (hNS : ∀ v ∉ S, ((N : �
     have := congrArg (fun D' : sDivisor S => D' ⟨v, hv⟩) ha
     simp only [divS_apply, toMul_ofMul, Finsupp.smul_apply, nsmul_eq_mul] at this
     rw [valuation_eq_exp_neg_ordAt, WithZero.log_exp, this]
-    exact ⟨-D ⟨v, hv⟩, by ring⟩
+    exact ⟨- D ⟨v, hv⟩, by ring⟩
   have hEu : IsUnramifiedOutside S E := fun v hv =>
     Global.Kummer.isUnramifiedIn_of_pow_eq a hβ (adjoin_gen_eq_top F α) v (hNS v hv) (hdiv v hv)
   have hEle : E ≤ maxUnramifiedOutside F Ω S := le_maxUnramifiedOutside S hEu
@@ -464,15 +489,16 @@ theorem exists_divAbove_eq {N : ℕ} (hN : N ≠ 0) (hNS : ∀ v ∉ S, ((N : �
     intro σ
     apply mem_sUnitsOf_of_mem_rootsOfUnity hN
     rw [mem_rootsOfUnity, mul_pow, ← map_pow, hxN, inv_pow, hxN]
-    have : galUnitsHom F _ σ (Units.map (algebraMap F (maxUnramifiedOutside F Ω S) : F →* _) a) =
-        Units.map (algebraMap F (maxUnramifiedOutside F Ω S) : F →* _) a :=
+    have : galUnitsHom F _ σ (Units.map (algebraMap F (maxUnramifiedOutside F Ω S) : F →* _) a)
+        = Units.map (algebraMap F (maxUnramifiedOutside F Ω S) : F →* _) a :=
       Units.ext (σ.commutes _)
     rw [this, mul_inv_cancel]
   refine ⟨⟨x, hx⟩, ?_⟩
   ext v
   rw [divAbove_apply]
   obtain ⟨w, hw⟩ := exists_underPlace_eq (L := E) v.1
-  have hαE : ((x : maxUnramifiedOutside F Ω S) : Ω) ∈ E := IntermediateField.mem_adjoin_simple_self F α
+  have hαE : ((x : maxUnramifiedOutside F Ω S) : Ω) ∈ E :=
+    IntermediateField.mem_adjoin_simple_self F α
   have h1 := valuation_eq_exp_ordAbove S hx hEle hαE w (hw ▸ v.2)
   have : w.asIdeal.LiesOver v.1.asIdeal := liesOver_iff_eq_underPlace.2 hw.symm
   have : Algebra.IsUnramifiedAt (𝓞 F) w.asIdeal := hEu v.1 v.2 w.asIdeal inferInstance this

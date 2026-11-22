@@ -4,52 +4,58 @@ public import Development.WeilBound.CoreStatements.TemperedRepresentationTheory.
 
 @[expose] public section
 
-open MeasureTheory GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.ThetaGL ValuativeRel PositivityTheory.Tls2.Ming3
+open MeasureTheory GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.ThetaGL
+  ValuativeRel PositivityTheory.Tls2.Ming3
 
 namespace PositivityTheory.Rg.Ming.StepX
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
   {n r : ℕ}
 
 theorem isUnit_det_val {m : ℕ} (h : GL (Fin m) k) : IsUnit h.val.det := by
   exact (Matrix.isUnit_iff_isUnit_det h.val).mp h.isUnit
 
-theorem rank_conj (h : GL (Fin n) k) (g : GL (Fin r) k) (x : Matrix (Fin n) (Fin r) k) :
-    (h.val * x * g.val).rank = x.rank := by
+theorem rank_conj (h : GL (Fin n) k) (g : GL (Fin r) k) (x : Matrix (Fin n) (Fin r) k)
+    : (h.val * x * g.val).rank = x.rank := by
   rw [Matrix.rank_mul_eq_left_of_isUnit_det _ _ (isUnit_det_val g),
     Matrix.rank_mul_eq_right_of_isUnit_det _ _ (isUnit_det_val h)]
 
-theorem conj_cancel (h : GL (Fin n) k) (g : GL (Fin r) k) (x : Matrix (Fin n) (Fin r) k) :
-    (h⁻¹ : GL (Fin n) k).val * (h.val * x * g.val) * (g⁻¹ : GL (Fin r) k).val = x := by
+theorem conj_cancel (h : GL (Fin n) k) (g : GL (Fin r) k) (x : Matrix (Fin n) (Fin r) k)
+    : (h⁻¹ : GL (Fin n) k).val * (h.val * x * g.val) * (g⁻¹ : GL (Fin r) k).val = x := by
   simp [← Matrix.mul_assoc]
 
-theorem conj_cancel' (h : GL (Fin n) k) (g : GL (Fin r) k) (x : Matrix (Fin n) (Fin r) k) :
-    h.val * ((h⁻¹ : GL (Fin n) k).val * x * (g⁻¹ : GL (Fin r) k).val) * g.val = x := by
+theorem conj_cancel' (h : GL (Fin n) k) (g : GL (Fin r) k) (x : Matrix (Fin n) (Fin r) k)
+    : h.val * ((h⁻¹ : GL (Fin n) k).val * x * (g⁻¹ : GL (Fin r) k).val) * g.val = x := by
   simp [← Matrix.mul_assoc]
 
 theorem mem_ballM_self (c : kˣ) (x : Matrix (Fin n) (Fin r) k) : x ∈ ballM c x := by
   intro i l
   simp
 
-theorem tr_mem (h : GL (Fin n) k) (g : GL (Fin r) k) (Ψ : SB (Matrix (Fin n) (Fin r) k)) :
-    (fun y => Ψ.1 (h.val * y * g.val)) ∈ SB (Matrix (Fin n) (Fin r) k) := by
-  let e : Matrix (Fin n) (Fin r) k ≃ₜ Matrix (Fin n) (Fin r) k :=
-    { toFun := fun y => h.val * y * g.val
-      invFun := fun y => (h⁻¹ : GL (Fin n) k).val * y * (g⁻¹ : GL (Fin r) k).val
-      left_inv := fun y => conj_cancel h g y
-      right_inv := fun y => conj_cancel' h g y
-      continuous_toFun := (continuous_const.matrix_mul continuous_id).matrix_mul continuous_const
-      continuous_invFun := (continuous_const.matrix_mul continuous_id).matrix_mul continuous_const }
+theorem tr_mem (h : GL (Fin n) k) (g : GL (Fin r) k) (Ψ : SB (Matrix (Fin n) (Fin r) k))
+    : (fun y => Ψ.1 (h.val * y * g.val)) ∈ SB (Matrix (Fin n) (Fin r) k) := by
+  let e : Matrix (Fin n) (Fin r) k ≃ₜ Matrix (Fin n) (Fin r) k := {
+    toFun := fun y => h.val * y * g.val
+    invFun := fun y => (h⁻¹ : GL (Fin n) k).val * y * (g⁻¹ : GL (Fin r) k).val
+    left_inv := fun y => conj_cancel h g y
+    right_inv := fun y => conj_cancel' h g y
+    continuous_toFun := (continuous_const.matrix_mul continuous_id).matrix_mul continuous_const
+    continuous_invFun := (continuous_const.matrix_mul continuous_id).matrix_mul continuous_const
+  }
   obtain ⟨h1, h2⟩ := Ψ.2
   exact ⟨h1.comp_continuous e.continuous, h2.comp_homeomorph e⟩
 
-variable {μ : kˣ →* ℂˣ} {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+variable
+  {μ : kˣ →* ℂˣ} {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
   {σ : Representation ℂ (GL (Fin r) k) V} {π : Representation ℂ (GL (Fin n) k) W}
   {B : SB (Matrix (Fin n) (Fin r) k) →ₗ[ℂ] W →ₗ[ℂ] V}
 
-theorem kill (hE : Equi μ σ π B) (h : GL (Fin n) k) (g : GL (Fin r) k)
-    (Φ Ψ : SB (Matrix (Fin n) (Fin r) k)) (hΨ : ∀ y, Ψ.1 y = Φ.1 (h.val * y * g.val))
-    (hΦ : B Φ = 0) : B Ψ = 0 := by
+theorem kill
+    (hE : Equi μ σ π B)
+    (h : GL (Fin n) k) (g : GL (Fin r) k) (Φ Ψ : SB (Matrix (Fin n) (Fin r) k))
+    (hΨ : ∀ y, Ψ.1 y = Φ.1 (h.val * y * g.val)) (hΦ : B Φ = 0)
+    : B Ψ = 0 := by
   apply LinearMap.ext
   intro F
   rw [LinearMap.zero_apply]
@@ -64,24 +70,30 @@ theorem kill (hE : Equi μ σ π B) (h : GL (Fin n) k) (g : GL (Fin r) k)
   have h1 := hE g⁻¹ h Ψ Φ' rfl F
   rw [hΦ', map_smul, hΦ, smul_zero, LinearMap.zero_apply] at h1
   have h3 := congrArg (σ g) h1
-  rw [map_zero, ← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply] at h3
+  rw [map_zero, ← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply]
+    at h3
   exact h3.symm
 
-theorem key (hball : BallSt) (hnf : NfSt) (hcore : CoreSt) {j : ℕ} (hj : j < r) (hjn : 2 * j < n)
+theorem key
+    (hball : BallSt) (hnf : NfSt) (hcore : CoreSt)
+    {j : ℕ} (hj : j < r) (hjn : 2 * j < n)
     (hμ : IsUnitaryChar μ) (hσ : IsUnitarisable σ) (hE : Equi μ σ π B) (hV : VanRk B (j + 1))
-    (c : kˣ) (hc : valuation k (c : k) < 1) (Ψ : SB (Matrix (Fin n) (Fin r) k))
-    (hsupp : ∀ y, Ψ.1 y ≠ 0 → y ∈ ballM c (idem k r n j))
-    (hvan : ∀ y : Matrix (Fin n) (Fin r) k, y.rank < j → Ψ.1 y = 0) : B Ψ = 0 := by
+    (c : kˣ) (hc : valuation k (c : k) < 1)
+    (Ψ : SB (Matrix (Fin n) (Fin r) k)) (hsupp : ∀ y, Ψ.1 y ≠ 0 → y ∈ ballM c (idem k r n j))
+    (hvan : ∀ y : Matrix (Fin n) (Fin r) k, y.rank < j → Ψ.1 y = 0)
+    : B Ψ = 0 := by
   obtain ⟨hB1, -, hB3⟩ := hball k n r
   obtain ⟨c₀, hc₀⟩ := hB3 Ψ
-  obtain ⟨c', hc'1, hc'0⟩ : ∃ c' : kˣ, valuation k (c' : k) < 1 ∧ valuation k (c' : k) ≤ valuation k (c₀ : k) := by
+  obtain ⟨c', hc'1, hc'0⟩
+      : ∃ c' : kˣ, valuation k (c' : k) < 1 ∧ valuation k (c' : k) ≤ valuation k (c₀ : k) := by
     by_cases h0 : valuation k (c₀ : k) < 1
     · exact ⟨c₀, h0, le_rfl⟩
     · exact ⟨c, hc, le_of_lt (lt_of_lt_of_le hc (not_lt.mp h0))⟩
   obtain ⟨S, hS, hsum⟩ := hc₀ c' hc'0
-  have hind : ∀ x₀ : Matrix (Fin n) (Fin r) k,
-      ((ballM c' x₀).indicator fun _ => (1 : ℂ)) ∈ SB (Matrix (Fin n) (Fin r) k) :=
-    fun x₀ => (hB1 c' x₀).2.2.1
+  have hind
+      : ∀ x₀ : Matrix (Fin n) (Fin r) k,
+        ((ballM c' x₀).indicator fun _ => (1 : ℂ)) ∈ SB (Matrix (Fin n) (Fin r) k) := fun x₀ =>
+    (hB1 c' x₀).2.2.1
   have hpiece : ∀ x ∈ S, B ⟨_, hind x⟩ = 0 := by
     intro x hx
     by_cases hr : ∃ y ∈ ballM c' x, y.rank = j
@@ -97,8 +109,9 @@ theorem key (hball : BallSt) (hnf : NfSt) (hcore : CoreSt) {j : ℕ} (hj : j < r
       refine kill hE h⁻¹ g⁻¹ ⟨_, hind (idem k r n j)⟩ ⟨_, hind x⟩ (fun z => ?_) hcore'
       show (ballM c' x).indicator (fun _ => (1 : ℂ)) z = (ballM c' (idem k r n j)).indicator (fun _ => (1 : ℂ))
         ((h⁻¹ : GL (Fin n) k).val * z * (g⁻¹ : GL (Fin r) k).val)
-      have hiff : (h⁻¹ : GL (Fin n) k).val * z * (g⁻¹ : GL (Fin r) k).val ∈ ballM c' (idem k r n j) ↔
-          z ∈ ballM c' x := by
+      have hiff
+          : (h⁻¹ : GL (Fin n) k).val * z * (g⁻¹ : GL (Fin r) k).val ∈ ballM c' (idem k r n j)
+            ↔ z ∈ ballM c' x := by
         have h4 := (hB1 c' y).2.2.2.2 h⁻¹ (inv_mem hh) g⁻¹ (inv_mem hg) z
         rw [hball_eq, hye, conj_cancel] at h4
         exact h4
@@ -156,9 +169,14 @@ theorem step : BallSt → LocSt → NfSt → RkSt → CoreSt → StepSt := by
       simpa using Matrix.rank_le_width x
     obtain ⟨⟨h, g, hxe⟩, -⟩ := hNf k n r m x hm
     obtain ⟨c, hc, -⟩ := (hBall k n r).2.1 (0 : Matrix (Fin n) (Fin r) k) Set.univ Filter.univ_mem
-    refine ⟨{y | (h⁻¹ : GL (Fin n) k).val * y * (g⁻¹ : GL (Fin r) k).val ∈ ballM c (idem k r n m)}, ?_, ?_, ?_⟩
-    · exact ((hBall k n r).1 c _).1.preimage
-        ((continuous_const.matrix_mul continuous_id).matrix_mul continuous_const)
+    refine ⟨
+      {y | (h⁻¹ : GL (Fin n) k).val * y * (g⁻¹ : GL (Fin r) k).val ∈ ballM c (idem k r n m)},
+      ?_,
+      ?_,
+      ?_
+    ⟩
+    · exact ((hBall k n r).1 c _).1.preimage ((continuous_const.matrix_mul continuous_id).matrix_mul
+        continuous_const)
     · have e1 : (h⁻¹ : GL (Fin n) k).val * x * (g⁻¹ : GL (Fin r) k).val = idem k r n m := by
         rw [hxe]
         exact conj_cancel h g _

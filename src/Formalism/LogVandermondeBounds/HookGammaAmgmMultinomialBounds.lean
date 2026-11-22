@@ -19,6 +19,7 @@ public import Formalism.LogVandermondeBounds.UpperPlace
 
 namespace Formalism.LogVandermondeBounds
 
-theorem vandermonde_place_lower_bound : StandardLattice.LogRatioLowerBound := StandardLattice.logRatioLowerBound_of_logVandermondeGap StandardLattice.VandPlace_holds
+theorem vandermonde_place_lower_bound : StandardLattice.LogRatioLowerBound :=
+  StandardLattice.logRatioLowerBound_of_logVandermondeGap StandardLattice.VandPlace_holds
 
 end Formalism.LogVandermondeBounds

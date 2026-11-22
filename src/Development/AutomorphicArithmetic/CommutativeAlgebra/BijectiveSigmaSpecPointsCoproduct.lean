@@ -6,8 +6,10 @@ public import Mathlib
 
 open AlgebraicGeometry CategoryTheory Limits
 
-theorem UpperTheory.bijective_sigma_spec_points_coproduct :
-    ∀ {I : Type} (Z : I → Scheme.{0}) (K : Type) [Field K], Function.Bijective (fun p : (Σ c, (Spec (CommRingCat.of K) ⟶ Z c)) => p.2 ≫ Sigma.ι Z p.1) := by
+theorem UpperTheory.bijective_sigma_spec_points_coproduct
+    : ∀ {I : Type} (Z : I → Scheme.{0}) (K : Type) [Field K],
+      Function.Bijective (fun p : (Σ c, (Spec (CommRingCat.of K) ⟶ Z c)) =>
+        p.2 ≫ Sigma.ι Z p.1) := by
   intro I Z K _
   obtain ⟨z⟩ : Nonempty (Spec (CommRingCat.of K)) := inferInstance
   constructor

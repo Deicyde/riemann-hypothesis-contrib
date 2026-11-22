@@ -16,8 +16,7 @@ section disjointProducts
 
 variable {R B σ τ : Type*} [CommRing R] [Fintype B]
 
-def dGlue (em : B → σ → τ) (p : B → σ →₀ ℕ) : τ →₀ ℕ :=
-  ∑ b, (p b).mapDomain (em b)
+def dGlue (em : B → σ → τ) (p : B → σ →₀ ℕ) : τ →₀ ℕ := ∑ b, (p b).mapDomain (em b)
 
 lemma dGlue_apply (em : B → σ → τ) (hem : Function.Injective fun x : B × σ => em x.1 x.2)
     (p : B → σ →₀ ℕ) (b : B) (s : σ) : dGlue em p (em b s) = p b s := by

@@ -13,8 +13,9 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial Topology
 
-theorem UniformiserLocallyInjective.proof (hgrad : UniformiserGradientIndependent.Statement)
-    (hchart : PolynomialChartInjective.Statement) : UniformiserLocallyInjective.Statement := by
+theorem UniformiserLocallyInjective.proof
+    (hgrad : UniformiserGradientIndependent.Statement) (hchart : PolynomialChartInjective.Statement)
+    : UniformiserLocallyInjective.Statement := by
   intro σ _ I w t hI hic hdim hw ht
   obtain ⟨k, f, hk, hfI, hli⟩ := hgrad σ I w t hI hic hdim hw ht
   obtain ⟨U, hU, hinj⟩ := hchart σ k t f w hk hli

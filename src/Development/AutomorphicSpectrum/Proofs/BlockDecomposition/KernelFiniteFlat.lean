@@ -12,7 +12,8 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 open GlobalTheory.CompanionTheory.Ar.GR
@@ -23,8 +24,9 @@ namespace GlobalTheory.CompanionTheory.Ar.KerFF
 
 variable {R : Type} [CommRing R]
 
-theorem exists_sp_iso (X : Over (Sp R)) [IsFinite X.hom] [Flat X.hom] [LocallyOfFinitePresentation X.hom] :
-    ∃ (F : Type) (_ : CommRing F) (_ : Algebra R F) (_ : Nonempty (sp (R₀ := R) F ≅ X)),
+theorem exists_sp_iso
+    (X : Over (Sp R)) [IsFinite X.hom] [Flat X.hom] [LocallyOfFinitePresentation X.hom]
+    : ∃ (F : Type) (_ : CommRing F) (_ : Algebra R F) (_ : Nonempty (sp (R₀ := R) F ≅ X)),
       Module.Finite R F ∧ Module.Projective R F := by
   haveI : IsAffine X.left := isAffine_of_isAffineHom X.hom
   obtain ⟨φ, hφ⟩ := Spec.map_surjective (X.left.isoSpec.inv ≫ X.hom)
@@ -39,16 +41,23 @@ theorem exists_sp_iso (X : Over (Sp R)) [IsFinite X.hom] [Flat X.hom] [LocallyOf
   haveI : Module.Flat R Γ(X.left, ⊤) := RingHom.flat_algebraMap_iff.1 f₂
   haveI : Algebra.FinitePresentation R Γ(X.left, ⊤) := RingHom.finitePresentation_algebraMap.1 f₃
   haveI : Module.FinitePresentation R Γ(X.left, ⊤) := Module.FinitePresentation.of_finite_of_finitePresentation _ _
-  refine ⟨Γ(X.left, ⊤), inferInstance, inferInstance,
-    ⟨Over.isoMk X.left.isoSpec.symm ?_⟩, inferInstance, Module.Flat.projective_of_finitePresentation⟩
+  refine ⟨
+    Γ(X.left, ⊤),
+    inferInstance,
+    inferInstance,
+    ⟨Over.isoMk X.left.isoSpec.symm ?_⟩,
+    inferInstance,
+    Module.Flat.projective_of_finitePresentation
+  ⟩
   exact hφ.symm
 
-theorem mul_comp_hom {A B T : Over (Sp R)} [GrpObj A] [GrpObj B] (u v : T ⟶ A) (l : A ⟶ B) [IsMonHom l] :
-    (u * v) ≫ l = (u ≫ l) * (v ≫ l) := by
+theorem mul_comp_hom
+    {A B T : Over (Sp R)} [GrpObj A] [GrpObj B] (u v : T ⟶ A) (l : A ⟶ B) [IsMonHom l]
+    : (u * v) ≫ l = (u ≫ l) * (v ≫ l) := by
   rw [Hom.mul_def, Hom.mul_def, Category.assoc, IsMonHom.mul_hom, ← Category.assoc, lift_map]
 
-theorem one_comp_hom {A B T : Over (Sp R)} [GrpObj A] [GrpObj B] (l : A ⟶ B) [IsMonHom l] :
-    (1 : T ⟶ A) ≫ l = 1 := by
+theorem one_comp_hom {A B T : Over (Sp R)} [GrpObj A] [GrpObj B] (l : A ⟶ B) [IsMonHom l]
+    : (1 : T ⟶ A) ≫ l = 1 := by
   rw [Hom.one_def, Hom.one_def, Category.assoc, IsMonHom.one_hom]
 
 theorem kernelFinFlat : PositivityTheory.Tls2.Zar3.Ch1.KernelFinFlat := by
@@ -80,8 +89,7 @@ theorem kernelFinFlat : PositivityTheory.Tls2.Zar3.Ch1.KernelFinFlat := by
       rw [Hom.one_def, Over.comp_left, Over.toUnit_left]
     constructor
     · intro h
-      have h' : z.left ≫ l.left = T.hom ≫ e := by
-        rw [← one_left, ← h, Over.comp_left]
+      have h' : z.left ≫ l.left = T.hom ≫ e := by rw [← one_left, ← h, Over.comp_left]
       refine ⟨Over.homMk (pullback.lift z.left T.hom h') (pullback.lift_snd _ _ _), ?_⟩
       exact Over.OverMorphism.ext (pullback.lift_fst _ _ _)
     · rintro ⟨t, rfl⟩
@@ -95,8 +103,9 @@ theorem kernelFinFlat : PositivityTheory.Tls2.Zar3.Ch1.KernelFinFlat := by
     rw [← cancel_mono (pullback.fst l.left e)]
     exact congrArg (fun u => u.left) h
   obtain ⟨F, iF, aF, ⟨ee⟩, hfinF, hproj⟩ := exists_sp_iso X
-  have ker : ∀ (S : Type) [CommRing S] [Algebra R S] (z : sp (R₀ := R) S ⟶ A),
-      z ≫ l = 1 ↔ ∃ φ : F →ₐ[R] S, spMap φ ≫ (ee.hom ≫ f) = z := by
+  have ker
+      : ∀ (S : Type) [CommRing S] [Algebra R S] (z : sp (R₀ := R) S ⟶ A),
+        z ≫ l = 1 ↔ ∃ φ : F →ₐ[R] S, spMap φ ≫ (ee.hom ≫ f) = z := by
     intro S _ _ z
     rw [key]
     constructor
@@ -113,8 +122,8 @@ theorem kernelFinFlat : PositivityTheory.Tls2.Zar3.Ch1.KernelFinFlat := by
   · intro S _ _
     exact (ker S 1).1 (one_comp_hom l)
   · intro S _ _ φ φ'
-    exact (ker S _).1 (by
-      rw [mul_comp_hom, (ker S _).2 ⟨φ, rfl⟩, (ker S _).2 ⟨φ', rfl⟩, _root_.mul_one])
+    exact (ker S _).1
+      (by rw [mul_comp_hom, (ker S _).2 ⟨φ, rfl⟩, (ker S _).2 ⟨φ', rfl⟩, _root_.mul_one])
   · intro S _ _ φ
     have hz := (ker S _).2 ⟨φ, rfl⟩
     have h₂ : (spMap φ ≫ ee.hom ≫ f)⁻¹ ≫ l = 1 := by

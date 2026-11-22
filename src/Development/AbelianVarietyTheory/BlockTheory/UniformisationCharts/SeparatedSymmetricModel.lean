@@ -25,8 +25,7 @@ section BaseChange
 
 variable {S S' : Scheme.{0}} (p : S' ⟶ S)
 
-def dn {G : Over S} {T : Over S'} (y : T ⟶ (Over.pullback p).obj G) :
-    Over.mk (T.hom ≫ p) ⟶ G :=
+def dn {G : Over S} {T : Over S'} (y : T ⟶ (Over.pullback p).obj G) : Over.mk (T.hom ≫ p) ⟶ G :=
   Over.homMk (y.left ≫ pullback.fst G.hom p) (by
     have h := Over.w y
     dsimp at h ⊢
@@ -43,8 +42,7 @@ lemma dn_map {G G' : Over S} {T : Over S'} (y : T ⟶ (Over.pullback p).obj G) (
 
 variable {G : Over S} [GrpObj G] [IsCommMonObj G]
 
-instance isComm_baseChange : IsCommMonObj ((Over.pullback p).obj G) :=
-  Functor.isCommMonObj_obj
+instance isComm_baseChange : IsCommMonObj ((Over.pullback p).obj G) := Functor.isCommMonObj_obj
 
 lemma dn_padd {T : Over S'} (a b : T ⟶ (Over.pullback p).obj G) :
     dn p (padd _ a b) = padd G (dn p a) (dn p b) := by
@@ -82,8 +80,7 @@ def bcMap (f : H ⟶ (Over.pullback p).obj G) [IsMonHom f] : CubeMap H G where
   F3 := (dn3 p f).left
   e := p
   e_comm := by
-    have h1 : eSec H ≫ (dn p f).left = (dn p (η[H] ≫ f)).left :=
-      (Category.assoc _ _ _).symm
+    have h1 : eSec H ≫ (dn p f).left = (dn p (η[H] ≫ f)).left := (Category.assoc _ _ _).symm
     have h2 : η[H] ≫ f = pzero _ (𝟙_ (Over S')) := by
       rw [IsMonHom.one_hom, pzero, toUnit_unit, Category.id_comp]
     rw [h1, h2, dn_pzero, pzero, Over.comp_left, eSec]
@@ -97,7 +94,6 @@ def bcMap (f : H ⟶ (Over.pullback p).obj G) [IsMonHom f] : CubeMap H G where
     simp only [psum]
     rw [foldr_padd_comp, dn_foldr, ← foldr_padd_pre]
     simp only [downThree_comp_proj]
-
 
 end BaseChange
 
@@ -123,19 +119,17 @@ end Generic
 
 section Levels
 
-variable {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {D : DegPre R}
-  {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {I : Ideal R} {D : DegPre R} {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
 
-abbrev toG (I : Ideal R) (e : ℕ) (G : Over (Spec (CommRingCat.of R))) [GrpObj G]
-    [IsCommMonObj G] : CubeMap (thickObj R I e G) G :=
+abbrev toG (I : Ideal R) (e : ℕ) (G : Over (Spec (CommRingCat.of R))) [GrpObj G] [IsCommMonObj G]
+    : CubeMap (thickObj R I e G) G :=
   bcMap (thick R I e) (𝟙 (thickObj R I e G))
 
 def toB {e : ℕ} (j : CanonicalRigidImages.GtIso D I e G) : CubeMap (thickObj R I e G) D.P.A :=
   haveI := j.q_hom
   bcMap (thick R I e) j.q
-
-
-
 
 end Levels
 

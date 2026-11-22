@@ -9,14 +9,19 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.Formally
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 namespace GlobalTheory
 
-theorem abelianScheme_id_pow_finite_etale_surjective :
-    ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] (m : ℕ), IsAbelianScheme A → IsUnit (m : Γ(S, ⊤)) → IsMonHom ((𝟙 A) ^ m) ∧ IsFinite ((𝟙 A) ^ m).left ∧ Etale ((𝟙 A) ^ m).left ∧ Surjective ((𝟙 A) ^ m).left := by
+theorem abelianScheme_id_pow_finite_etale_surjective
+    : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] (m : ℕ),
+      IsAbelianScheme A → IsUnit (m : Γ(S, ⊤))
+        → IsMonHom ((𝟙 A) ^ m) ∧ IsFinite ((𝟙 A) ^ m).left ∧ Etale ((𝟙 A) ^ m).left
+          ∧ Surjective ((𝟙 A) ^ m).left := by
   intro S A _ m hA hm
   obtain ⟨⟩ := hA
   have hmon : ∀ n : ℕ, IsMonHom ((𝟙 A) ^ n) := by
@@ -29,11 +34,9 @@ theorem abelianScheme_id_pow_finite_etale_surjective :
   refine ⟨hmon m, hfin, het, ⟨fun x => ?_⟩⟩
   set f := ((𝟙 A) ^ m).left with hf
 
-  have hcl : IsClopen (Set.range f) :=
-    ⟨f.isClosedMap.isClosed_range, f.isOpenMap.isOpen_range⟩
+  have hcl : IsClopen (Set.range f) := ⟨f.isClosedMap.isClosed_range, f.isOpenMap.isOpen_range⟩
 
-  have hw : A.hom (f x) = A.hom x := by
-    rw [← Scheme.Hom.comp_apply, hf, Over.w]
+  have hw : A.hom (f x) = A.hom x := by rw [← Scheme.Hom.comp_apply, hf, Over.w]
 
   have hsub : A.hom ⁻¹' {A.hom x} ⊆ Set.range f :=
     (A.hom.isConnected_preimage_singleton (A.hom x)).isPreconnected.subset_isClopen hcl

@@ -15,15 +15,24 @@ section Generic
 
 variable {G : Type} [Group G]
 
-theorem fix_of_mem {V : Type} [AddCommGroup V] [Module ℂ V] {ρ : Representation ℂ G V} {K : Subgroup G}
-    {v : V} (hv : v ∈ fixed ρ K) {c : G} (hc : c ∈ K) : ρ c v = v := by
+theorem fix_of_mem
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    {ρ : Representation ℂ G V} {K : Subgroup G} {v : V} (hv : v ∈ fixed ρ K)
+    {c : G} (hc : c ∈ K)
+    : ρ c v = v := by
   have := hv ⟨c, hc⟩
   simpa using this
 
-theorem eq_top_of_inv {V : Type} [AddCommGroup V] [Module ℂ V] {ρ : Representation ℂ G V}
-    (hρ : ρ.IsIrreducible) (N : Submodule ℂ V) (hN : ∀ g, ∀ v ∈ N, ρ g v ∈ N) {w : V} (hw : w ∈ N)
-    (h0 : w ≠ 0) : N = ⊤ := by
-  let S : Subrepresentation ρ := { toSubmodule := N, apply_mem_toSubmodule := fun g v hv => hN g v hv }
+theorem eq_top_of_inv
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    {ρ : Representation ℂ G V} (hρ : ρ.IsIrreducible)
+    (N : Submodule ℂ V) (hN : ∀ g, ∀ v ∈ N, ρ g v ∈ N)
+    {w : V} (hw : w ∈ N) (h0 : w ≠ 0)
+    : N = ⊤ := by
+  let S : Subrepresentation ρ := {
+    toSubmodule := N
+    apply_mem_toSubmodule := fun g v hv => hN g v hv
+  }
   rcases hρ.eq_bot_or_eq_top S with h | h
   · exfalso
     have h1 : w ∈ S.toSubmodule := hw
@@ -31,30 +40,40 @@ theorem eq_top_of_inv {V : Type} [AddCommGroup V] [Module ℂ V] {ρ : Represent
     exact h0 h1
   · exact congrArg Subrepresentation.toSubmodule h
 
-def act {V M : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup M] [Module ℂ M]
-    (ρ : Representation ℂ G V) (A : M →ₗ[ℂ] V) : (G →₀ M) →ₗ[ℂ] V :=
+def act
+    {V M : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup M] [Module ℂ M]
+    (ρ : Representation ℂ G V) (A : M →ₗ[ℂ] V)
+    : (G →₀ M) →ₗ[ℂ] V :=
   Finsupp.lsum ℂ fun g => ρ g ∘ₗ A
 
-theorem act_single {V M : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup M] [Module ℂ M]
-    (ρ : Representation ℂ G V) (A : M →ₗ[ℂ] V) (g : G) (m : M) :
-    act ρ A (Finsupp.single g m) = ρ g (A m) := by
+theorem act_single
+    {V M : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup M] [Module ℂ M]
+    (ρ : Representation ℂ G V) (A : M →ₗ[ℂ] V) (g : G) (m : M)
+    : act ρ A (Finsupp.single g m) = ρ g (A m) := by
   simp [act]
 
-theorem act_translate {V M : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup M] [Module ℂ M]
-    (ρ : Representation ℂ G V) (A : M →ₗ[ℂ] V) (h : G) (x : G →₀ M) :
-    act ρ A (Finsupp.lmapDomain M ℂ (fun g => h * g) x) = ρ h (act ρ A x) := by
+theorem act_translate
+    {V M : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup M] [Module ℂ M]
+    (ρ : Representation ℂ G V) (A : M →ₗ[ℂ] V) (h : G) (x : G →₀ M)
+    : act ρ A (Finsupp.lmapDomain M ℂ (fun g => h * g) x) = ρ h (act ρ A x) := by
   have : act ρ A ∘ₗ Finsupp.lmapDomain M ℂ (fun g => h * g) = ρ h ∘ₗ act ρ A := by
     refine Finsupp.lhom_ext fun a b => ?_
     simp [act_single, Finsupp.mapDomain_single]
   exact LinearMap.congr_fun this x
 
-def avg {V : Type} [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V) (K L : Subgroup G)
-    [Fintype (K ⧸ L.subgroupOf K)] : V →ₗ[ℂ] V :=
+def avg
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V)
+    (K L : Subgroup G) [Fintype (K ⧸ L.subgroupOf K)]
+    : V →ₗ[ℂ] V :=
   ∑ q : K ⧸ L.subgroupOf K, ρ ((q.out : K) : G)
 
-theorem avg_of_fixed {V : Type} [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V) (K L : Subgroup G)
-    [Fintype (K ⧸ L.subgroupOf K)] {v : V} (hv : v ∈ fixed ρ K) :
-    avg ρ K L v = (Fintype.card (K ⧸ L.subgroupOf K) : ℂ) • v := by
+theorem avg_of_fixed
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V)
+    (K L : Subgroup G) [Fintype (K ⧸ L.subgroupOf K)]
+    {v : V} (hv : v ∈ fixed ρ K)
+    : avg ρ K L v = (Fintype.card (K ⧸ L.subgroupOf K) : ℂ) • v := by
   simp only [avg, LinearMap.sum_apply]
   rw [Finset.sum_congr rfl fun q _ => fix_of_mem hv (q.out : K).2]
   simp [Nat.cast_smul_eq_nsmul]
@@ -64,31 +83,40 @@ def cosetFn (K L : Subgroup G) [Fintype (K ⧸ L.subgroupOf K)] (g x : G) : ℂ 
   ∑ q : K ⧸ L.subgroupOf K,
     if (QuotientGroup.mk x : G ⧸ K) = QuotientGroup.mk (((q.out : K) : G) * g) then 1 else 0
 
-theorem cosetFn_right (K L : Subgroup G) [Fintype (K ⧸ L.subgroupOf K)] (g x : G) {k : G} (hk : k ∈ K) :
-    cosetFn K L g (x * k) = cosetFn K L g x := by
+theorem cosetFn_right
+    (K L : Subgroup G) [Fintype (K ⧸ L.subgroupOf K)] (g x : G) {k : G} (hk : k ∈ K)
+    : cosetFn K L g (x * k) = cosetFn K L g x := by
   unfold cosetFn
   rw [QuotientGroup.mk_mul_of_mem x hk]
 
-theorem cosetFn_left (K L : Subgroup G) [Fintype (K ⧸ L.subgroupOf K)] (g : G)
-    (hL : ∀ l ∈ L, g⁻¹ * l * g ∈ K) (x : G) {k : G} (hk : k ∈ K) :
-    cosetFn K L g (k * x) = cosetFn K L g x := by
+theorem cosetFn_left
+    (K L : Subgroup G) [Fintype (K ⧸ L.subgroupOf K)]
+    (g : G) (hL : ∀ l ∈ L, g⁻¹ * l * g ∈ K)
+    (x : G)
+    {k : G} (hk : k ∈ K)
+    : cosetFn K L g (k * x) = cosetFn K L g x := by
   classical
   unfold cosetFn
   let kk : K := ⟨k, hk⟩
   refine Fintype.sum_equiv (MulAction.toPerm kk⁻¹ : Equiv.Perm (K ⧸ L.subgroupOf K)) _ _ fun q => ?_
-  have hq : (MulAction.toPerm kk⁻¹ : Equiv.Perm (K ⧸ L.subgroupOf K)) q =
-      (QuotientGroup.mk (kk⁻¹ * q.out) : K ⧸ L.subgroupOf K) := by
+  have hq
+      : (MulAction.toPerm kk⁻¹ : Equiv.Perm (K ⧸ L.subgroupOf K)) q
+        = (QuotientGroup.mk (kk⁻¹ * q.out) : K ⧸ L.subgroupOf K) := by
     conv_lhs => rw [← QuotientGroup.out_eq' q]
     rfl
   obtain ⟨c, hc⟩ := QuotientGroup.mk_out_eq_mul (L.subgroupOf K) (kk⁻¹ * q.out)
   have hcL : ((c : K) : G) ∈ L := Subgroup.mem_subgroupOf.1 c.2
-  have hmk : (QuotientGroup.mk (((((MulAction.toPerm kk⁻¹ : Equiv.Perm (K ⧸ L.subgroupOf K)) q).out : K) : G) * g) : G ⧸ K)
-      = QuotientGroup.mk (k⁻¹ * (((q.out : K) : G) * g)) := by
+  have hmk
+      : (QuotientGroup.mk
+            (((((MulAction.toPerm kk⁻¹ : Equiv.Perm (K ⧸ L.subgroupOf K)) q).out : K) : G) * g)
+          : G ⧸ K)
+        = QuotientGroup.mk (k⁻¹ * (((q.out : K) : G) * g)) := by
     rw [hq, hc, QuotientGroup.eq]
     have := hL _ (L.inv_mem hcL)
     simpa [kk, mul_assoc] using this
-  have hiff : ((QuotientGroup.mk (k * x) : G ⧸ K) = QuotientGroup.mk (((q.out : K) : G) * g)) ↔
-      ((QuotientGroup.mk x : G ⧸ K) = QuotientGroup.mk (k⁻¹ * (((q.out : K) : G) * g))) := by
+  have hiff
+      : ((QuotientGroup.mk (k * x) : G ⧸ K) = QuotientGroup.mk (((q.out : K) : G) * g))
+        ↔ ((QuotientGroup.mk x : G ⧸ K) = QuotientGroup.mk (k⁻¹ * (((q.out : K) : G) * g))) := by
     rw [QuotientGroup.eq, QuotientGroup.eq]
     simp [mul_assoc]
   rw [hmk]
@@ -98,19 +126,25 @@ end Generic
 
 section Hecke
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
   {ι : Type} [Fintype ι] [DecidableEq ι]
 
-theorem isHk_cosetFn {K L : Subgroup (GL ι F)} [Fintype (K ⧸ L.subgroupOf K)]
-    (hKo : IsOpen (K : Set (GL ι F))) (hKc : IsCompact (K : Set (GL ι F))) (g : GL ι F)
-    (hL : ∀ l ∈ L, g⁻¹ * l * g ∈ K) : IsHk K (cosetFn K L g) := by
+theorem isHk_cosetFn
+    {K L : Subgroup (GL ι F)} [Fintype (K ⧸ L.subgroupOf K)]
+    (hKo : IsOpen (K : Set (GL ι F))) (hKc : IsCompact (K : Set (GL ι F)))
+    (g : GL ι F) (hL : ∀ l ∈ L, g⁻¹ * l * g ∈ K)
+    : IsHk K (cosetFn K L g) := by
   classical
   refine ⟨hKo, hKc, ?_, fun k₁ h₁ k₂ h₂ x => ?_⟩
-  · let C : Set (GL ι F) := ⋃ q : K ⧸ L.subgroupOf K, (fun y => (((q.out : K) : GL ι F) * g) * y) '' (K : Set (GL ι F))
-    have hC : IsCompact C := isCompact_iUnion fun q => hKc.image (continuous_const.mul continuous_id)
+  · let C : Set (GL ι F) :=
+      ⋃ q : K ⧸ L.subgroupOf K, (fun y => (((q.out : K) : GL ι F) * g) * y) '' (K : Set (GL ι F))
+    have hC : IsCompact C :=
+      isCompact_iUnion fun q => hKc.image (continuous_const.mul continuous_id)
     refine HasCompactSupport.of_support_subset_isCompact hC fun x hx => ?_
-    obtain ⟨q, hq⟩ : ∃ q : K ⧸ L.subgroupOf K,
-        (QuotientGroup.mk x : GL ι F ⧸ K) = QuotientGroup.mk (((q.out : K) : GL ι F) * g) := by
+    obtain ⟨q, hq⟩
+        : ∃ q : K ⧸ L.subgroupOf K,
+          (QuotientGroup.mk x : GL ι F ⧸ K) = QuotientGroup.mk (((q.out : K) : GL ι F) * g) := by
       by_contra h
       push_neg at h
       refine (Function.mem_support.1 hx) ?_
@@ -120,13 +154,19 @@ theorem isHk_cosetFn {K L : Subgroup (GL ι F)} [Fintype (K ⧸ L.subgroupOf K)]
     group
   · rw [cosetFn_right K L g _ h₂, cosetFn_left K L g hL _ h₁]
 
-theorem hk_cosetFn {K L : Subgroup (GL ι F)} [Fintype (K ⧸ L.subgroupOf K)] (g : GL ι F)
-    {V : Type} [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ (GL ι F) V) {v : V} (hv : v ∈ fixed ρ K) :
-    hk ρ K (cosetFn K L g) v = avg ρ K L (ρ g v) := by
+theorem hk_cosetFn
+    {K L : Subgroup (GL ι F)} [Fintype (K ⧸ L.subgroupOf K)]
+    (g : GL ι F)
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ (GL ι F) V)
+    {v : V} (hv : v ∈ fixed ρ K)
+    : hk ρ K (cosetFn K L g) v = avg ρ K L (ρ g v) := by
   classical
-  have step : ∀ p : GL ι F ⧸ K, cosetFn K L g p.out • ρ p.out v =
-      ∑ q : K ⧸ L.subgroupOf K, if p = QuotientGroup.mk (((q.out : K) : GL ι F) * g)
-        then ρ (((q.out : K) : GL ι F) * g) v else 0 := by
+  have step
+      : ∀ p : GL ι F ⧸ K,
+        cosetFn K L g p.out • ρ p.out v
+          = ∑ q : K ⧸ L.subgroupOf K, if p = QuotientGroup.mk (((q.out : K) : GL ι F) * g)
+              then ρ (((q.out : K) : GL ι F) * g) v else 0 := by
     intro p
     unfold cosetFn
     rw [Finset.sum_smul]
@@ -145,13 +185,16 @@ theorem hk_cosetFn {K L : Subgroup (GL ι F)} [Fintype (K ⧸ L.subgroupOf K)] (
     · intro p hp
       exact if_neg hp
   · intro q _
-    refine (Set.finite_singleton (QuotientGroup.mk (((q.out : K) : GL ι F) * g) : GL ι F ⧸ K)).subset ?_
+    refine
+      (Set.finite_singleton (QuotientGroup.mk (((q.out : K) : GL ι F) * g) : GL ι F ⧸ K)).subset ?_
     intro p hp
     by_contra h
     exact (Function.mem_support.1 hp) (if_neg h)
 
-theorem exists_open_sub {K : Subgroup (GL ι F)} (hKo : IsOpen (K : Set (GL ι F))) (s : Finset (GL ι F)) :
-    ∃ L : Subgroup (GL ι F), IsOpen (L : Set (GL ι F)) ∧ L ≤ K ∧ ∀ g ∈ s, ∀ l ∈ L, g⁻¹ * l * g ∈ K := by
+theorem exists_open_sub
+    {K : Subgroup (GL ι F)} (hKo : IsOpen (K : Set (GL ι F))) (s : Finset (GL ι F))
+    : ∃ L : Subgroup (GL ι F),
+      IsOpen (L : Set (GL ι F)) ∧ L ≤ K ∧ ∀ g ∈ s, ∀ l ∈ L, g⁻¹ * l * g ∈ K := by
   classical
   induction s using Finset.induction_on with
   | empty => exact ⟨K, hKo, le_rfl, by simp⟩
@@ -168,26 +211,30 @@ theorem exists_open_sub {K : Subgroup (GL ι F)} (hKo : IsOpen (K : Set (GL ι F
       simpa [C, Subgroup.mem_comap] using this
     · exact hL g hg l hl.1
 
-theorem finite_quot {K L : Subgroup (GL ι F)} (hKc : IsCompact (K : Set (GL ι F)))
-    (hLo : IsOpen (L : Set (GL ι F))) : Finite (K ⧸ L.subgroupOf K) := by
+theorem finite_quot
+    {K L : Subgroup (GL ι F)} (hKc : IsCompact (K : Set (GL ι F))) (hLo : IsOpen (L : Set (GL ι F)))
+    : Finite (K ⧸ L.subgroupOf K) := by
   haveI : CompactSpace K := isCompact_iff_compactSpace.1 hKc
   exact Subgroup.quotient_finite_of_isOpen _ (hLo.preimage continuous_subtype_val)
 
-theorem eq_zero_of_rel {K : Subgroup (GL ι F)} (hKo : IsOpen (K : Set (GL ι F))) (hKc : IsCompact (K : Set (GL ι F)))
+theorem eq_zero_of_rel
+    {K : Subgroup (GL ι F)} (hKo : IsOpen (K : Set (GL ι F))) (hKc : IsCompact (K : Set (GL ι F)))
     {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
     (π : Representation ℂ (GL ι F) V) (τ : Representation ℂ (GL ι F) W) (T : V →ₗ[ℂ] W)
     (hfix : ∀ v ∈ fixed π K, T v ∈ fixed τ K)
     (hT : ∀ e, IsHk K e → ∀ v ∈ fixed π K, T (hk π K e v) = hk τ K e (T v))
-    (x : GL ι F →₀ fixed π K) (ha : act π (fixed π K).subtype x = 0)
-    (hb : act τ (T ∘ₗ (fixed π K).subtype) x ∈ fixed τ K) :
-    act τ (T ∘ₗ (fixed π K).subtype) x = 0 := by
+    (x : GL ι F →₀ fixed π K)
+    (ha : act π (fixed π K).subtype x = 0) (hb : act τ (T ∘ₗ (fixed π K).subtype) x ∈ fixed τ K)
+    : act τ (T ∘ₗ (fixed π K).subtype) x = 0 := by
   classical
   obtain ⟨L, hLo, -, hL⟩ := exists_open_sub hKo x.support
   haveI := finite_quot hKc hLo
   letI : Fintype (K ⧸ L.subgroupOf K) := Fintype.ofFinite _
   have hcard : (Fintype.card (K ⧸ L.subgroupOf K) : ℂ) ≠ 0 :=
     Nat.cast_ne_zero.2 Fintype.card_ne_zero
-  have key : avg τ K L (act τ (T ∘ₗ (fixed π K).subtype) x) = T (avg π K L (act π (fixed π K).subtype x)) := by
+  have key
+      : avg τ K L (act τ (T ∘ₗ (fixed π K).subtype) x)
+        = T (avg π K L (act π (fixed π K).subtype x)) := by
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [act, Finsupp.coe_lsum, Finsupp.sum, map_sum]
     refine Finset.sum_congr rfl fun g hg => ?_
@@ -197,13 +244,25 @@ theorem eq_zero_of_rel {K : Subgroup (GL ι F)} (hKo : IsOpen (K : Set (GL ι F)
   rw [ha, map_zero, map_zero, avg_of_fixed τ K L hb] at key
   exact (smul_eq_zero.1 key).resolve_left hcard
 
-theorem hecke_determines : ∀ (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] (ι : Type) [Fintype ι] [DecidableEq ι] (K : Subgroup (GL ι F)), IsOpen (K : Set (GL ι F)) → IsCompact (K : Set (GL ι F)) → ∀ (V W : Type) [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W] (π : Representation ℂ (GL ι F) V) (τ : Representation ℂ (GL ι F) W), GlobalTheory.PRep.IsSmooth π → π.IsIrreducible → GlobalTheory.PRep.IsSmooth τ → τ.IsIrreducible → (∃ v ∈ fixed π K, v ≠ 0) → ∀ T : V →ₗ[ℂ] W, (∀ v ∈ fixed π K, T v ∈ fixed τ K) → (∀ w ∈ fixed τ K, ∃ v ∈ fixed π K, T v = w) → (∀ v ∈ fixed π K, T v = 0 → v = 0) → (∀ e, IsHk K e → ∀ v ∈ fixed π K, T (hk π K e v) = hk τ K e (T v)) → Nonempty (π.Equiv τ) := by
+theorem hecke_determines
+    : ∀ (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        (ι : Type) [Fintype ι] [DecidableEq ι] (K : Subgroup (GL ι F)),
+      IsOpen (K : Set (GL ι F)) → IsCompact (K : Set (GL ι F))
+        → ∀ (V W : Type) [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+            (π : Representation ℂ (GL ι F) V) (τ : Representation ℂ (GL ι F) W),
+          GlobalTheory.PRep.IsSmooth π → π.IsIrreducible → GlobalTheory.PRep.IsSmooth τ
+            → τ.IsIrreducible → (∃ v ∈ fixed π K, v ≠ 0)
+            → ∀ T : V →ₗ[ℂ] W,
+              (∀ v ∈ fixed π K, T v ∈ fixed τ K) → (∀ w ∈ fixed τ K, ∃ v ∈ fixed π K, T v = w)
+                → (∀ v ∈ fixed π K, T v = 0 → v = 0)
+                → (∀ e, IsHk K e → ∀ v ∈ fixed π K, T (hk π K e v) = hk τ K e (T v))
+                → Nonempty (π.Equiv τ) := by
   intro F _ _ _ _ ι _ _ K hKo hKc V W _ _ _ _ π τ _ hπ _ hτ ⟨v₀, hv₀, hv₀0⟩ T hfix _ hinj hT
   classical
   set a := act π (fixed π K).subtype with ha_def
   set b := act τ (T ∘ₗ (fixed π K).subtype) with hb_def
-  let tr : GL ι F → (GL ι F →₀ fixed π K) →ₗ[ℂ] (GL ι F →₀ fixed π K) :=
-    fun h => Finsupp.lmapDomain (fixed π K) ℂ (fun g => h * g)
+  let tr : GL ι F → (GL ι F →₀ fixed π K) →ₗ[ℂ] (GL ι F →₀ fixed π K) := fun h =>
+    Finsupp.lmapDomain (fixed π K) ℂ (fun g => h * g)
   have hatr : ∀ h x, a (tr h x) = π h (a x) := fun h x => act_translate π _ h x
   have hbtr : ∀ h x, b (tr h x) = τ h (b x) := fun h x => act_translate τ _ h x
   let x₀ : GL ι F →₀ fixed π K := Finsupp.single 1 ⟨v₀, hv₀⟩
@@ -227,9 +286,11 @@ theorem hecke_determines : ∀ (F : Type) [Field F] [ValuativeRel F] [Topologica
     have hmem : T v₀ ∈ (LinearMap.ker a).map b := htop ▸ Submodule.mem_top
     obtain ⟨x, hx, hxe⟩ := hmem
     have hxe' : b x = T v₀ := hxe
-    have := eq_zero_of_rel hKo hKc π τ T hfix hT x hx (by
-      show b x ∈ fixed τ K
-      rw [hxe']; exact hfix v₀ hv₀)
+    have :=
+      eq_zero_of_rel hKo hKc π τ T hfix hT x hx (by
+        show b x ∈ fixed τ K
+        rw [hxe']
+        exact hfix v₀ hv₀)
     exact hw₀ (hxe'.symm.trans this)
   obtain ⟨s, hs⟩ := LinearMap.exists_rightInverse_of_surjective a (LinearMap.range_eq_top.2 hsurj)
   have has : ∀ u, a (s u) = u := fun u => LinearMap.congr_fun hs u
@@ -243,8 +304,10 @@ theorem hecke_determines : ∀ (F : Type) [Field F] [ValuativeRel F] [Topologica
     intro g u
     obtain ⟨x, rfl⟩ := hsurj u
     rw [← hatr, hS, hS, hbtr]
-  let Φ : Representation.IntertwiningMap π τ :=
-    { S with isIntertwining' := fun g => by ext u; exact hint g u }
+  let Φ : Representation.IntertwiningMap π τ := {
+    S with
+    isIntertwining' := fun g => by ext u; exact hint g u
+  }
   haveI := hπ
   haveI := hτ
   have hΦ : Φ ≠ 0 := by

@@ -8,8 +8,10 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.NotDominates
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -18,10 +20,11 @@ noncomputable section
 
 namespace GlobalTheory.FieldPair
 
-theorem isAlgebraic_range_eval₂Hom_of_isEtTower : ∀ {K L : Type} [Field K] [Field L] (cK : ℂ →+* K) (cL : ℂ →+* L) (r : ℕ) (R : Subring K) (T : Subring L)
-    (ι : R →+* T) (ψ : T →+* R) (τ : Fin r → T),
-  IsEtTower cK R cL T ι ψ τ → Function.Injective (MvPolynomial.eval₂Hom ι τ) →
-  ∀ z : L, IsAlgebraic (T.subtype.comp (MvPolynomial.eval₂Hom ι τ)).range z := by
+theorem isAlgebraic_range_eval₂Hom_of_isEtTower
+    : ∀ {K L : Type} [Field K] [Field L] (cK : ℂ →+* K) (cL : ℂ →+* L) (r : ℕ) (R : Subring K)
+        (T : Subring L) (ι : R →+* T) (ψ : T →+* R) (τ : Fin r → T),
+      IsEtTower cK R cL T ι ψ τ → Function.Injective (MvPolynomial.eval₂Hom ι τ)
+        → ∀ z : L, IsAlgebraic (T.subtype.comp (MvPolynomial.eval₂Hom ι τ)).range z := by
   intro K L _ _ cK cL r R T ι ψ τ h hinj z
   classical
   let A := MvPolynomial (Fin r) R
@@ -69,8 +72,11 @@ theorem isAlgebraic_range_eval₂Hom_of_isEtTower : ∀ {K L : Type} [Field K] [
     (IsFractionRing.isAlgebraic_iff A F L).2 (Algebra.IsAlgebraic.isAlgebraic z)
 
   obtain ⟨p, hp, hpz⟩ := hA
-  refine ⟨p.map φL.rangeRestrict, (Polynomial.map_ne_zero_iff
-    (RingHom.injective_codRestrict.2 hφL)).2 hp, ?_⟩
+  refine ⟨
+    p.map φL.rangeRestrict,
+    (Polynomial.map_ne_zero_iff (RingHom.injective_codRestrict.2 hφL)).2 hp,
+    ?_
+  ⟩
   rw [Polynomial.aeval_def, Polynomial.eval₂_map]
   exact hpz
 

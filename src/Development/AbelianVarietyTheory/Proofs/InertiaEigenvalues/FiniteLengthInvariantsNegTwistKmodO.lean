@@ -6,15 +6,19 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CycZBri
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.WeaklyAdmissibleFiltrations
+open Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N NumberField
+  IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.WeaklyAdmissibleFiltrations
 
 noncomputable section
 
 namespace GlobalTheory.FinInvKO
 
-theorem isFiniteLength_of_killed {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    {M : Type} [AddCommGroup M] [Module O M] [Module.Finite O M] {c : O}
-    (hc : c ≠ 0) (h : ∀ x : M, c • x = 0) : IsFiniteLength O M := by
+theorem isFiniteLength_of_killed
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {M : Type} [AddCommGroup M] [Module O M] [Module.Finite O M]
+    {c : O} (hc : c ≠ 0) (h : ∀ x : M, c • x = 0)
+    : IsFiniteLength O M := by
   have hfl := isFiniteLength_quotient_span_singleton O (mem_nonZeroDivisors_of_ne_zero hc)
   rw [isFiniteLength_iff_isNoetherian_isArtinian] at hfl ⊢
   refine ⟨inferInstance, ?_⟩
@@ -26,9 +30,11 @@ theorem isFiniteLength_of_killed {O : Type} [CommRing O] [IsDomain O] [IsDiscret
   haveI : Module.Finite (O ⧸ Ideal.span {c}) M := Module.Finite.of_restrictScalars_finite O _ _
   exact isArtinian_of_surjective_algebraMap (R := O ⧸ Ideal.span {c}) Ideal.Quotient.mk_surjective
 
-theorem length_lt_top_of_killed {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    (S : Submodule O (KmodO O)) {c : O} (hc : c ≠ 0) (h : ∀ x ∈ S, c • x = 0) :
-    Module.length O S < ⊤ := by
+theorem length_lt_top_of_killed
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    (S : Submodule O (KmodO O))
+    {c : O} (hc : c ≠ 0) (h : ∀ x ∈ S, c • x = 0)
+    : Module.length O S < ⊤ := by
   have hc' : algebraMap O (FractionRing O) c ≠ 0 := by
     simpa using (IsFractionRing.injective O (FractionRing O)).ne hc
   let x₀ : KmodO O := Submodule.Quotient.mk ((algebraMap O (FractionRing O) c)⁻¹)
@@ -49,18 +55,24 @@ theorem length_lt_top_of_killed {O : Type} [CommRing O] [IsDomain O] [IsDiscrete
   have hk : ∀ z : LinearMap.range ψ, c • z = 0 := by
     rintro ⟨_, a, rfl⟩
     ext1
-    simp only [SetLike.val_smul, ψ, LinearMap.toSpanSingleton_apply, x₀, ← Submodule.Quotient.mk_smul,
-      smul_smul, Submodule.coe_zero]
+    simp only [SetLike.val_smul, ψ, LinearMap.toSpanSingleton_apply, x₀,
+      ← Submodule.Quotient.mk_smul, smul_smul, Submodule.coe_zero]
     rw [Submodule.Quotient.mk_eq_zero]
     refine ⟨a, ?_⟩
-    rw [Algebra.linearMap_apply, Algebra.smul_def, map_mul, mul_comm (algebraMap O (FractionRing O) c), mul_assoc, mul_inv_cancel₀ hc', mul_one]
+    rw [Algebra.linearMap_apply, Algebra.smul_def, map_mul,
+      mul_comm (algebraMap O (FractionRing O) c), mul_assoc, mul_inv_cancel₀ hc', mul_one]
   have hfl := isFiniteLength_of_killed hc hk
-  exact lt_of_le_of_lt (Module.length_le_of_injective (Submodule.inclusion hS) (Submodule.inclusion_injective hS))
+  exact lt_of_le_of_lt
+    (Module.length_le_of_injective (Submodule.inclusion hS) (Submodule.inclusion_injective hS))
     (lt_top_iff_ne_top.2 (Module.length_ne_top_iff.2 hfl))
 
-theorem finiteLength_invariants_negTwist_KmodO : ∀ (D : D7) (i : D.nd.Loc), ∀ w ∈ placesOver D.host.E (D.nd.l i), ∀ e : ℕ, 0 < e →
-    Module.length (D.nd.O i) ↥(Representation.invariants
-      ((Formalism.MainNotions.N.Glob.KOtw D.nd i (e : ℤ)).comp (decS D.nd w))) < ⊤ := by
+theorem finiteLength_invariants_negTwist_KmodO
+    : ∀ (D : D7) (i : D.nd.Loc), ∀ w ∈ placesOver D.host.E (D.nd.l i), ∀ e : ℕ,
+      0 < e
+        → Module.length (D.nd.O i)
+            ↥(Representation.invariants ((Formalism.MainNotions.N.Glob.KOtw D.nd i (e : ℤ)).comp
+              (decS D.nd w)))
+          < ⊤ := by
   intro D i w hw e he
   obtain ⟨g, hgI, hg⟩ := GlobalTheory.EpsInertia.epsAll D i w hw 1
   have hgD : g ∈ Dec (F := D.host.E) (D.nd.plOm.1 w) := hgI.1
@@ -76,12 +88,14 @@ theorem finiteLength_invariants_negTwist_KmodO : ∀ (D : D7) (i : D.nd.Loc), �
   refine length_lt_top_of_killed _ hc fun v hv => ?_
   have h1 := hv ⟨g, hgD⟩
   change ((((Glob.epsO D.nd i) ^ (-(e : ℤ))) g : (D.nd.O i)ˣ) : D.nd.O i) • v = v at h1
-  have hu : ((Glob.epsO D.nd i g : (D.nd.O i)ˣ) : D.nd.O i) = 1 + (D.nd.l i : D.nd.O i) ^ D.nd.s0 i := by
+  have hu
+      : ((Glob.epsO D.nd i g : (D.nd.O i)ˣ) : D.nd.O i)
+        = 1 + (D.nd.l i : D.nd.O i) ^ D.nd.s0 i := by
     simp [Glob.epsO, hg]
   have h2 : (((Glob.epsO D.nd i g) ^ e : (D.nd.O i)ˣ) : D.nd.O i) • v = v := by
     conv_lhs => rw [← h1]
-    rw [smul_smul, ← Units.val_mul, MonoidHom.zpow_apply, ← zpow_natCast, ← zpow_add, add_neg_cancel,
-      zpow_zero, Units.val_one, one_smul]
+    rw [smul_smul, ← Units.val_mul, MonoidHom.zpow_apply, ← zpow_natCast, ← zpow_add,
+      add_neg_cancel, zpow_zero, Units.val_one, one_smul]
   rw [Nat.cast_sub hle, Nat.cast_one, sub_smul, one_smul, Nat.cast_pow, Nat.cast_add, Nat.cast_one,
     Nat.cast_pow, ← hu, ← Units.val_pow_eq_pow_val, h2, sub_self]
 

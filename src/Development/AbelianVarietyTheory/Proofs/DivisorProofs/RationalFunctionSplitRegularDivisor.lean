@@ -9,24 +9,30 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsRation
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 open ReciprocityTheory.ChartRestriction.G.DVR.FlatBC (algX)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.PairStep
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.PairStep
 
 namespace GlobalTheory
 
-theorem genericPoint_mem_of_mem_opens (Y : Scheme.{0}) [IsIntegral Y] (W : Y.Opens) {y : Y}
-    (hy : y ∈ W) : genericPoint Y ∈ W :=
+theorem genericPoint_mem_of_mem_opens
+    (Y : Scheme.{0}) [IsIntegral Y] (W : Y.Opens) {y : Y} (hy : y ∈ W)
+    : genericPoint Y ∈ W :=
   ((genericPoint_spec Y).mem_open_set_iff W.isOpen).mpr ⟨y, trivial, hy⟩
 
-theorem ratsec_split_of_H1 : ∀ (Y : Scheme.{0}) [IsIntegral Y] (D : CartierDiv Y) (W₁ W₂ : Y.Opens),
-    Subsingleton (cohOn (twist (GlobalTheory.structureModule Y) (toLB D)) (W₁ ⊔ W₂) 1) →
-    ∀ f : Y.functionField, (∀ y ∈ W₁ ⊓ W₂, D.RegularAt y f) →
-    ∃ h₁ h₂ : Y.functionField, f = h₂ - h₁ ∧ (∀ y ∈ W₁, D.RegularAt y h₁) ∧
-      ∀ y ∈ W₂, D.RegularAt y h₂ := by
+theorem ratsec_split_of_H1
+    : ∀ (Y : Scheme.{0}) [IsIntegral Y] (D : CartierDiv Y) (W₁ W₂ : Y.Opens),
+      Subsingleton (cohOn (twist (GlobalTheory.structureModule Y) (toLB D)) (W₁ ⊔ W₂) 1)
+        → ∀ f : Y.functionField,
+          (∀ y ∈ W₁ ⊓ W₂, D.RegularAt y f)
+            → ∃ h₁ h₂ : Y.functionField,
+              f = h₂ - h₁ ∧ (∀ y ∈ W₁, D.RegularAt y h₁) ∧ ∀ y ∈ W₂, D.RegularAt y h₂ := by
   intro Y _ D W₁ W₂ hH f hf
-  obtain ⟨ρ, hreg, hsurj, hres⟩ := GlobalTheory.T.exists_rationalFunction_maps_of_cartierTwistSections Y D
+  obtain ⟨ρ, hreg, hsurj, hres⟩ :=
+    GlobalTheory.T.exists_rationalFunction_maps_of_cartierTwistSections Y D
   by_cases g1 : genericPoint Y ∈ W₁
   · by_cases g2 : genericPoint Y ∈ W₂
     · have g12 : genericPoint Y ∈ W₁ ⊓ W₂ := ⟨g1, g2⟩

@@ -14,7 +14,8 @@ open ContinuousLinearMap
 
 section Schur
 
-variable {G H : Type} [Group G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+variable
+  {G H : Type} [Group G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
   (π : G →* (H →L[ℂ] H))
 
 lemma adjoint_rep (hπ : ∀ g v, ‖π g v‖ = ‖v‖) (g : G) : adjoint (π g) = π g⁻¹ := by
@@ -130,16 +131,16 @@ end Schur
 theorem stSchur : StSchur := by
   intro G H iG iH iI iC π hπ hirr T hT
   have hc : ∀ g, Commute T (π g) := fun g => by
-    first
-    | exact hT g
-    | simpa [Commute, SemiconjBy, ContinuousLinearMap.mul_def] using hT g
+    first | exact hT g | simpa [Commute, SemiconjBy, ContinuousLinearMap.mul_def] using hT g
   have hcs : ∀ g, Commute (star T) (π g) := fun g => commute_star π hπ T hc g
-  obtain ⟨r1, h1⟩ := sa_scalar π hirr (ℜ T : H →L[ℂ] H) (ℜ T).2 (fun g => by
-    rw [realPart_apply_coe]
-    exact ((hc g).add_left (hcs g)).smul_left _)
-  obtain ⟨r2, h2⟩ := sa_scalar π hirr (ℑ T : H →L[ℂ] H) (ℑ T).2 (fun g => by
-    rw [imaginaryPart_apply_coe]
-    exact (((hc g).sub_left (hcs g)).smul_left _).smul_left _)
+  obtain ⟨r1, h1⟩ :=
+    sa_scalar π hirr (ℜ T : H →L[ℂ] H) (ℜ T).2 (fun g => by
+      rw [realPart_apply_coe]
+      exact ((hc g).add_left (hcs g)).smul_left _)
+  obtain ⟨r2, h2⟩ :=
+    sa_scalar π hirr (ℑ T : H →L[ℂ] H) (ℑ T).2 (fun g => by
+      rw [imaginaryPart_apply_coe]
+      exact (((hc g).sub_left (hcs g)).smul_left _).smul_left _)
   refine ⟨(r1 : ℂ) + Complex.I * r2, ?_⟩
   conv_lhs => rw [← realPart_add_I_smul_imaginaryPart T]
   rw [h1, h2]

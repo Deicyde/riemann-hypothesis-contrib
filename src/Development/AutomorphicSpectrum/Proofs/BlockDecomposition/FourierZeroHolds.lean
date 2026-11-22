@@ -17,10 +17,14 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EqZer
 
 noncomputable section
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.StdUnn GlobalTheory.StdUnn.Model PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
+open GlobalTheory.StdUnn GlobalTheory.StdUnn.Model PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS
 
 namespace GlobalTheory.CompanionTheory.FourierN
 
@@ -46,17 +50,16 @@ def pr (a : Matrix (Fin n) (Fin n) D.host.E) (x : Mx D n n) : AF D.host.F :=
 theorem halfTr_add (z w : AE D) : halfTr (z + w) = halfTr z + halfTr w := by
   simp only [halfTr, map_add (f := _), mul_add]
 
-theorem halfTr_zero : halfTr (0 : AE D) = 0 := by
-  simp only [halfTr, map_zero, mul_zero]
+theorem halfTr_zero : halfTr (0 : AE D) = 0 := by simp only [halfTr, map_zero, mul_zero]
 
-theorem pr_add_right (a : Matrix (Fin n) (Fin n) D.host.E) (x y : Mx D n n) :
-    pr a (x + y) = pr a x + pr a y := by
+theorem pr_add_right (a : Matrix (Fin n) (Fin n) D.host.E) (x y : Mx D n n)
+    : pr a (x + y) = pr a x + pr a y := by
   simp only [pr, ← halfTr_add, ← Matrix.trace_add]
   congr 2
   exact Matrix.mul_add _ _ _
 
-theorem pr_add_left (a b : Matrix (Fin n) (Fin n) D.host.E) (x : Mx D n n) :
-    pr (a + b) x = pr a x + pr b x := by
+theorem pr_add_left (a b : Matrix (Fin n) (Fin n) D.host.E) (x : Mx D n n)
+    : pr (a + b) x = pr a x + pr b x := by
   simp only [pr, ← halfTr_add, ← Matrix.trace_add]
   congr 2
   rw [Matrix.map_add _ (map_add _)]
@@ -72,14 +75,17 @@ theorem continuous_halfTr : Continuous (halfTr : AE D → AF D.host.F) := by
     simpa using GlobalTheory.Core.Rk.SplitPsi.continuous_trace_mul D 1
   exact continuous_const.mul h
 
-theorem continuous_pr (a : Matrix (Fin n) (Fin n) D.host.E) : Continuous (pr a : Mx D n n → AF D.host.F) :=
+theorem continuous_pr (a : Matrix (Fin n) (Fin n) D.host.E)
+    : Continuous (pr a : Mx D n n → AF D.host.F) :=
   continuous_halfTr.comp (Continuous.matrix_trace (continuous_const.matrix_mul continuous_id))
 
 theorem trA_cA (z : AE D) : trA (cA D z) = trA z := by
   haveI : Module.Finite D.host.F D.host.E := Module.finite_of_finrank_pos (by rw [D.sp.cm.deg2]; norm_num)
   have hb : Function.Bijective (D.sp.cm.sig : D.host.E →ₐ[D.host.F] D.host.E) :=
     Algebra.IsAlgebraic.algHom_bijective _
-  have ht : ∀ e : D.host.E, Algebra.trace D.host.F D.host.E (D.sp.cm.sig e) = Algebra.trace D.host.F D.host.E e :=
+  have ht
+      : ∀ e : D.host.E,
+        Algebra.trace D.host.F D.host.E (D.sp.cm.sig e) = Algebra.trace D.host.F D.host.E e :=
     fun e => Algebra.trace_eq_of_algEquiv (AlgEquiv.ofBijective _ hb) e
   induction z using TensorProduct.induction_on with
   | zero => simp
@@ -97,37 +103,51 @@ theorem trace_adj (M : Mx D n n) : Matrix.trace (adj M) = cA D (Matrix.trace M) 
   rw [adj, Matrix.trace_transpose]
   exact (AddMonoidHom.map_trace (cA D).toAddMonoidHom M).symm
 
-theorem pr_sym (γ : Matrix (Fin n) (Fin n) D.host.E) {x : Mx D n n} (hx : adj x = x) :
-    pr (γ + γᴴ) x = trA (Matrix.trace (HMul.hMul (rat γ) x : Mx D n n)) := by
-  have e1 : Matrix.trace (HMul.hMul (adj (rat γ)) x : Mx D n n) =
-      cA D (Matrix.trace (HMul.hMul (rat γ) x : Mx D n n)) := by
-    rw [← trace_adj, show adj (rat γ * x) = adj x * adj (rat γ) by
-      simp [adj, Matrix.map_mul, Matrix.transpose_mul], hx]
+theorem pr_sym (γ : Matrix (Fin n) (Fin n) D.host.E) {x : Mx D n n} (hx : adj x = x)
+    : pr (γ + γᴴ) x = trA (Matrix.trace (HMul.hMul (rat γ) x : Mx D n n)) := by
+  have e1
+      : Matrix.trace (HMul.hMul (adj (rat γ)) x : Mx D n n)
+        = cA D (Matrix.trace (HMul.hMul (rat γ) x : Mx D n n)) := by
+    rw [← trace_adj,
+      show adj (rat γ * x) = adj x * adj (rat γ) by
+        simp [adj, Matrix.map_mul, Matrix.transpose_mul],
+      hx]
     exact Matrix.trace_mul_comm _ _
   have e2 : (γ + γᴴ).map (incA D) = rat γ + adj (rat γ) := by
     rw [Matrix.map_add _ (map_add _)]
     exact congrArg (rat γ + ·) (rat_conjTranspose γ)
-  rw [pr, e2, show HMul.hMul (rat γ + adj (rat γ)) x = (HMul.hMul (rat γ) x + HMul.hMul (adj (rat γ)) x : Mx D n n) from Matrix.add_mul _ _ _,
+  rw [pr, e2,
+    show HMul.hMul (rat γ + adj (rat γ)) x
+        = (HMul.hMul (rat γ) x + HMul.hMul (adj (rat γ)) x : Mx D n n) from
+      Matrix.add_mul _ _ _,
     Matrix.trace_add, e1, halfTr_add_cA]
 
 theorem mem_hermSub_sym (γ : Matrix (Fin n) (Fin n) D.host.E) : γ + γᴴ ∈ hermSub D n := by
   show ((γ + γᴴ).map (D.sp.cm.sig : D.host.E → D.host.E)).transpose = γ + γᴴ
   ext i j
-  simp only [Matrix.transpose_apply, Matrix.map_apply, Matrix.add_apply, Matrix.conjTranspose_apply, map_add (f := _)]
+  simp only [Matrix.transpose_apply, Matrix.map_apply, Matrix.add_apply, Matrix.conjTranspose_apply,
+    map_add (f := _)]
   have hs : ∀ e : D.host.E, D.sp.cm.sig e = star e := fun e => rfl
   simp only [hs, star_add, star_star]
   rw [add_comm]
 
-theorem rat_ker {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ) (x : hermA D n)
-    (h : ∀ a ∈ hermSub D n, ψ (-pr a x.1) = 1) : x ∈ ratHerm D n := by
+theorem rat_ker
+    {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ)
+    (x : hermA D n) (h : ∀ a ∈ hermSub D n, ψ (- pr a x.1) = 1)
+    : x ∈ ratHerm D n := by
   haveI : Module.Finite D.host.F D.host.E := Module.finite_of_finrank_pos (by rw [D.sp.cm.deg2]; norm_num)
   have hx : adj x.1 = x.1 := x.2
-  have key : ∀ i j (e : D.host.E), ψ (Algebra.trace (AF D.host.F) (AE D) (incA D e * x.1 i j)) = 1 := by
+  have key
+      : ∀ i j (e : D.host.E), ψ (Algebra.trace (AF D.host.F) (AE D) (incA D e * x.1 i j)) = 1 := by
     intro i j e
     have h1 := h _ (mem_hermSub_sym (Matrix.single j i e))
     rw [pr_sym _ hx, GlobalTheory.GramAnnih.rat_single] at h1
-    have h2 : Matrix.trace (HMul.hMul (Matrix.single j i (incA D e)) x.1 : Mx D n n) = incA D e * x.1 i j := by
-      rw [show (HMul.hMul (Matrix.single j i (incA D e)) x.1 : Mx D n n) = Matrix.single j i (incA D e) * x.1 from rfl,
+    have h2
+        : Matrix.trace (HMul.hMul (Matrix.single j i (incA D e)) x.1 : Mx D n n)
+          = incA D e * x.1 i j := by
+      rw [show (HMul.hMul (Matrix.single j i (incA D e)) x.1 : Mx D n n)
+            = Matrix.single j i (incA D e) * x.1 from
+          rfl,
         Matrix.trace_single_mul, smul_eq_mul]
     rw [h2] at h1
     have h3 := AddChar.map_neg_eq_inv ψ (trA (incA D e * x.1 i j))
@@ -136,21 +156,29 @@ theorem rat_ker {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ) (x
   have hent : ∀ i j, ∃ e : D.host.E, x.1 i j = (1 : AF D.host.F) ⊗ₜ[D.host.F] e := fun i j =>
     GlobalTheory.RatAnnih.tensor_rat (x.1 i j) fun e =>
       (GlobalTheory.SWQ.Annihilator.self_annihilator D.host.F inferInstance ψ hψ).2 _ fun c =>
-        (congrArg ψ (GlobalTheory.RatAnnih.trace_mul_algebraMap (x.1 i j) e c)).trans (key i j (c • e))
+        (congrArg ψ (GlobalTheory.RatAnnih.trace_mul_algebraMap (x.1 i j) e c)).trans
+          (key i j (c • e))
   choose M hM using hent
   exact ⟨Matrix.of M, Matrix.ext fun i j => (hM i j).symm⟩
 
-theorem ker_of_rat {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ) (x : hermA D n)
-    (hx : x ∈ ratHerm D n) (a : Matrix (Fin n) (Fin n) D.host.E) : ψ (-pr a x.1) = 1 := by
+theorem ker_of_rat
+    {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ)
+    (x : hermA D n) (hx : x ∈ ratHerm D n)
+    (a : Matrix (Fin n) (Fin n) D.host.E)
+    : ψ (- pr a x.1) = 1 := by
   haveI : Module.Finite D.host.F D.host.E := Module.finite_of_finrank_pos (by rw [D.sp.cm.deg2]; norm_num)
   obtain ⟨η, hη⟩ := hx
   have hη' : x.1 = rat η := hη.symm
-  have e : Matrix.trace (rat (D := D) (a * η)) = (1 : AF D.host.F) ⊗ₜ[D.host.F] Matrix.trace (a * η) :=
+  have e
+      : Matrix.trace (rat (D := D) (a * η)) = (1 : AF D.host.F) ⊗ₜ[D.host.F] Matrix.trace (a * η) :=
     (AddMonoidHom.map_trace (incA D) _).symm
-  have e2 : -pr a x.1 = algebraMap D.host.F (AF D.host.F)
-      (-((1 / 2) * Algebra.trace D.host.F D.host.E (Matrix.trace (a * η)))) := by
-    rw [pr, hη', show (HMul.hMul (a.map (incA D)) (rat η) : Mx D n n) = rat (a * η) from Matrix.map_mul.symm, e,
-      halfTr, trA, GlobalTheory.LatVac.trace_tmul, one_mul, map_neg, map_mul]
+  have e2
+      : - pr a x.1
+        = algebraMap D.host.F (AF D.host.F)
+          (-((1 / 2) * Algebra.trace D.host.F D.host.E (Matrix.trace (a * η)))) := by
+    rw [pr, hη',
+      show (HMul.hMul (a.map (incA D)) (rat η) : Mx D n n) = rat (a * η) from Matrix.map_mul.symm,
+      e, halfTr, trA, GlobalTheory.LatVac.trace_tmul, one_mul, map_neg, map_mul]
   rw [e2]
   exact hψ.2.2.1 _
 
@@ -196,10 +224,15 @@ theorem continuous_sym : Continuous (sym : Mx D n n → Mx D n n) := by
   exact (continuous_const : Continuous fun _ : Mx D n n => (incA D 2⁻¹ : AE D)).smul
     (continuous_id.add (continuous_adj' (D := D) (n := n)))
 
-theorem exists_compact_cover : ∃ K : Set (hermA D n), IsCompact K ∧ ∀ x, ∃ γ ∈ ratHerm D n, γ + x ∈ K := by
+theorem exists_compact_cover
+    : ∃ K : Set (hermA D n), IsCompact K ∧ ∀ x, ∃ γ ∈ ratHerm D n, γ + x ∈ K := by
   obtain ⟨-, -, -, -, -, K₀, hK₀, hcov⟩ := GlobalTheory.TowerResNonzero.lattice_ratMx D n n
-  refine ⟨Subtype.val ⁻¹' (sym '' K₀),
-    (isClosed_hermA (D := D) (n := n)).isClosedEmbedding_subtypeVal.isCompact_preimage (hK₀.image continuous_sym), fun x => ?_⟩
+  refine ⟨
+    Subtype.val ⁻¹' (sym '' K₀),
+    (isClosed_hermA (D := D) (n := n)).isClosedEmbedding_subtypeVal.isCompact_preimage
+      (hK₀.image continuous_sym),
+    fun x => ?_
+  ⟩
   obtain ⟨γ, ⟨η, hη⟩, hk⟩ := hcov x.1
   have hη' : γ = rat η := hη.symm
   refine ⟨⟨sym γ, adj_sym γ⟩, ?_, γ + x.1, hk, ?_⟩
@@ -211,17 +244,21 @@ theorem exists_compact_cover : ∃ K : Set (hermA D n), IsCompact K ∧ ∀ x, �
 
 theorem discrete_ratHerm : DiscreteTopology (ratHerm D n) := by
   obtain ⟨-, -, -, -, i5, -⟩ := GlobalTheory.TowerResNonzero.lattice_ratMx D n n
-  let φ : ratHerm D n → GlobalTheory.IndefiniteRowSideFullHecke.AdjointIsotropicDecomposition.ratMx D n n := fun a => ⟨a.1.1, a.2⟩
+  let φ
+      : ratHerm D n
+        → GlobalTheory.IndefiniteRowSideFullHecke.AdjointIsotropicDecomposition.ratMx D n n :=
+    fun a => ⟨a.1.1, a.2⟩
   have hc : Continuous φ := (continuous_subtype_val.comp continuous_subtype_val).subtype_mk _
   have hi : Function.Injective φ := fun a b h => by
     have e : a.1.1 = b.1.1 := Subtype.mk.inj h
     exact Subtype.ext (Subtype.ext e)
   exact DiscreteTopology.of_continuous_injective hc hi
 
-theorem mat_injective : Function.Injective (mat : G D n → Mx D (n + n) (n + n)) :=
-  fun _ _ h => matHom_injective _ _ _ (Units.ext h)
+theorem mat_injective : Function.Injective (mat : G D n → Mx D (n + n) (n + n)) := fun _ _ h =>
+  matHom_injective _ _ _ (Units.ext h)
 
-theorem nb_add {nb : hermA D n → G D n} (h : IsNMap nb) (a b : hermA D n) : nb (a + b) = nb a * nb b := by
+theorem nb_add {nb : hermA D n → G D n} (h : IsNMap nb) (a b : hermA D n)
+    : nb (a + b) = nb a * nb b := by
   apply mat_injective
   show mat (nb (a + b)) = mat (nb a) * mat (nb b)
   rw [h, h, h, submatrix_fromBlocks_mul]
@@ -233,49 +270,63 @@ theorem nb_zero {nb : hermA D n → G D n} (h : IsNMap nb) : nb 0 = 1 := by
   rw [h]
   exact block_matrix_one
 
-theorem continuous_block_matrix : Continuous fun b : hermA D n => (blk4 1 b.1 0 1 : Mx D (n + n) (n + n)) :=
-  (Continuous.matrix_fromBlocks continuous_const continuous_subtype_val continuous_const continuous_const).matrix_submatrix _ _
+theorem continuous_block_matrix
+    : Continuous fun b : hermA D n => (blk4 1 b.1 0 1 : Mx D (n + n) (n + n)) :=
+  (Continuous.matrix_fromBlocks continuous_const continuous_subtype_val continuous_const
+    continuous_const).matrix_submatrix _ _
 
 theorem continuous_nb {nb : hermA D n → G D n} (h : IsNMap nb) : Continuous nb := by
   rw [(isEmbedding_matHom (AF D.host.F) D.sp.cm.sig (Jst D n)).continuous_iff, Units.continuous_iff]
   refine ⟨?_, ?_⟩
-  · have e : (Units.val ∘ (matHom (AF D.host.F) D.sp.cm.sig (Jst D n)) ∘ nb) = fun b : hermA D n => (blk4 1 b.1 0 1 : Mx D (n + n) (n + n)) :=
+  · have e
+        : (Units.val ∘ (matHom (AF D.host.F) D.sp.cm.sig (Jst D n)) ∘ nb)
+          = fun b : hermA D n => (blk4 1 b.1 0 1 : Mx D (n + n) (n + n)) :=
       funext fun b => h b
     rw [e]
     exact continuous_block_matrix
   · have hinv : ∀ b, (nb b)⁻¹ = nb (-b) := fun b => by
       rw [inv_eq_iff_mul_eq_one, ← nb_add h, add_neg_cancel, nb_zero h]
-    have e : (fun b : hermA D n => (((matHom (AF D.host.F) D.sp.cm.sig (Jst D n) ∘ nb) b)⁻¹ : GL _ _).1) =
-        fun b : hermA D n => (blk4 1 (-b.1) 0 1 : Mx D (n + n) (n + n)) := funext fun b => by
-      rw [Function.comp_apply, ← map_inv, hinv]
-      exact h (-b)
+    have e
+        : (fun b : hermA D n =>
+            (((matHom (AF D.host.F) D.sp.cm.sig (Jst D n) ∘ nb) b)⁻¹ : GL _ _).1)
+          = fun b : hermA D n => (blk4 1 (-b.1) 0 1 : Mx D (n + n) (n + n)) :=
+      funext fun b => by
+        rw [Function.comp_apply, ← map_inv, hinv]
+        exact h (-b)
     rw [e]
     exact (Continuous.matrix_fromBlocks continuous_const continuous_subtype_val.neg continuous_const
       continuous_const).matrix_submatrix _ _
 
-theorem blk4_map_alt {R S : Type} (f : R → S) (a b c d : Matrix (Fin n) (Fin n) R) :
-    (blk4 a b c d).map f = blk4 (a.map f) (b.map f) (c.map f) (d.map f) := by
+theorem blk4_map_alt {R S : Type} (f : R → S) (a b c d : Matrix (Fin n) (Fin n) R)
+    : (blk4 a b c d).map f = blk4 (a.map f) (b.map f) (c.map f) (d.map f) := by
   ext i j
   simp only [blk4, Matrix.map_apply, Matrix.submatrix_apply]
   rcases finSumFinEquiv.symm i with i | i <;> rcases finSumFinEquiv.symm j with j | j <;> rfl
 
-theorem nb_rat {nb : hermA D n → G D n} (h : IsNMap nb) (γ : hermA D n) (hγ : γ ∈ ratHerm D n) : nb γ ∈ GF D n := by
+theorem nb_rat {nb : hermA D n → G D n} (h : IsNMap nb) (γ : hermA D n) (hγ : γ ∈ ratHerm D n)
+    : nb γ ∈ GF D n := by
   obtain ⟨η, hη⟩ := hγ
   have hη' : rat η = γ.1 := hη
-  let x : GL (Fin (n + n)) D.host.E := ⟨blk4 1 η 0 1, blk4 1 (-η) 0 1,
-    by simp [submatrix_fromBlocks_mul, block_matrix_one], by simp [submatrix_fromBlocks_mul, block_matrix_one]⟩
+  let x : GL (Fin (n + n)) D.host.E := ⟨
+    blk4 1 η 0 1,
+    blk4 1 (-η) 0 1,
+    by simp [submatrix_fromBlocks_mul, block_matrix_one],
+    by simp [submatrix_fromBlocks_mul, block_matrix_one]
+  ⟩
   have hm : x.1.map (incA D) = blk4 1 γ.1 0 1 := by
     simp only [x, blk4_map_alt]
     rw [Matrix.map_one _ (map_zero _) (map_one _), Matrix.map_zero _ (map_zero _)]
     congr 1
   refine ⟨x, ?_, Units.ext (hm.trans (h γ).symm)⟩
   apply rat_injective (D := D)
-  have h2 : adj (mat (nb γ)) * JR (AF D.host.F) (Jst D n) * mat (nb γ) = JR (AF D.host.F) (Jst D n) := (nb γ).2
+  have h2
+      : adj (mat (nb γ)) * JR (AF D.host.F) (Jst D n) * mat (nb γ) = JR (AF D.host.F) (Jst D n) :=
+    (nb γ).2
   rw [h γ, ← hm] at h2
-  change ((Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) x.1 * Jst D n * x.1).map (incA D)) = _
+  change ((Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) x.1 * Jst D n * x.1).map (incA D))
+    = _
   rw [Matrix.map_mul, Matrix.map_mul]
   exact h2
-
 
 set_option synthInstance.maxHeartbeats 400000 in
 theorem fourierZero : PositivityTheory.PfSWUS.FourierZero := by
@@ -289,27 +340,30 @@ theorem fourierZero : PositivityTheory.PfSWUS.FourierZero := by
   haveI : DiscreteTopology (ratHerm D n) := discrete_ratHerm
   obtain ⟨K, hK, hcov⟩ := exists_compact_cover (D := D) (n := n)
   funext g
-  have key := GlobalTheory.SeparatingCharacters.eq_zero_of_coefficients_eq_zero (hermA D n) (ratHerm D n) K hK hcov
-    (hermSub D n) (fun a x => ψ (-pr a.1 x.1))
-    (fun a => hψ.1.comp ((continuous_pr a.1).neg.comp continuous_subtype_val))
-    (fun a x y => by
-      show ψ (-pr a.1 (x.1 + y.1)) = _
-      rw [pr_add_right, neg_add, AddChar.map_add_eq_mul])
-    (fun a b x => by
-      show ψ (-pr (a.1 + b.1) x.1) = _
-      rw [pr_add_left, neg_add, AddChar.map_add_eq_mul])
-    (fun x => by
-      show ψ (-pr 0 x.1) = 1
-      rw [pr_zero_left, neg_zero, AddChar.map_zero_eq_one])
-    (fun a x => hψ.2.1 _)
-    (fun x => ⟨fun h => rat_ker hψ x (fun a ha => h ⟨a, ha⟩), fun hx a => ker_of_rat hψ x hx a.1⟩)
-    lam 𝓖 hlam hFD (fun b => f (nb b * g))
-    (hf.comp ((continuous_nb hnb).mul continuous_const))
-    (fun γ hγ x => by
-      show f (nb (γ + x) * g) = f (nb x * g)
-      rw [nb_add hnb, mul_assoc]
-      exact hinv _ (nb_rat hnb γ hγ) _)
-    (fun a => (integral_congr_ae (.of_forall fun x => mul_comm _ _)).trans (hco ⟨a.1, a.2⟩ g))
+  have key :=
+    GlobalTheory.SeparatingCharacters.eq_zero_of_coefficients_eq_zero (hermA D n) (ratHerm D n) K hK
+      hcov (hermSub D n)
+      (fun a x => ψ (- pr a.1 x.1))
+      (fun a => hψ.1.comp ((continuous_pr a.1).neg.comp continuous_subtype_val))
+      (fun a x y => by
+        show ψ (-pr a.1 (x.1 + y.1)) = _
+        rw [pr_add_right, neg_add, AddChar.map_add_eq_mul])
+      (fun a b x => by
+        show ψ (-pr (a.1 + b.1) x.1) = _
+        rw [pr_add_left, neg_add, AddChar.map_add_eq_mul])
+      (fun x => by
+        show ψ (-pr 0 x.1) = 1
+        rw [pr_zero_left, neg_zero, AddChar.map_zero_eq_one])
+      (fun a x => hψ.2.1 _)
+      (fun x => ⟨fun h => rat_ker hψ x (fun a ha => h ⟨a, ha⟩), fun hx a => ker_of_rat hψ x hx a.1⟩)
+      lam 𝓖 hlam hFD
+      (fun b => f (nb b * g))
+      (hf.comp ((continuous_nb hnb).mul continuous_const))
+      (fun γ hγ x => by
+        show f (nb (γ + x) * g) = f (nb x * g)
+        rw [nb_add hnb, mul_assoc]
+        exact hinv _ (nb_rat hnb γ hγ) _)
+      (fun a => (integral_congr_ae (.of_forall fun x => mul_comm _ _)).trans (hco ⟨a.1, a.2⟩ g))
   have h0 := congrFun key 0
   simpa [nb_zero hnb] using h0
 

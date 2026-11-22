@@ -8,9 +8,10 @@ open GlobalTheory.JR Matrix MeasureTheory Filter Topology
 
 namespace GlobalTheory.JR.LinDesc
 
-theorem charpoly_companion_separable : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E]
-    [NormedAlgebra F E] [StarRing E] [Unram F E] (A : Et F E) (r : ℕ) (τ : A.K) (p : Fin r → F),
-    A.IsGen τ p → (companion p).charpoly.Separable := by
+theorem charpoly_companion_separable
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (A : Et F E) (r : ℕ) (τ : A.K) (p : Fin r → F),
+      A.IsGen τ p → (companion p).charpoly.Separable := by
   intro F E _ _ _ _ hU A r τ p hG
   haveI : CharZero F := hU.charZero
   set P := (companion p).charpoly with hP
@@ -37,7 +38,8 @@ theorem charpoly_companion_separable : ∀ (F E : Type) [NontriviallyNormedField
   have hq0 : q ≠ 0 := by rintro rfl; simp at hs; exact hP0 hs
   have hs0 : s ≠ 0 := by rintro rfl; simp at hs; exact hP0 hs
   have hqdeg : 0 < q.natDegree :=
-    Polynomial.natDegree_pos_iff_degree_pos.mpr (Polynomial.degree_pos_of_ne_zero_of_nonunit hq0 hqu)
+    Polynomial.natDegree_pos_iff_degree_pos.mpr (Polynomial.degree_pos_of_ne_zero_of_nonunit hq0
+      hqu)
   have hQ0 : q * s ≠ 0 := mul_ne_zero hq0 hs0
   have hdegQ : (q * s).natDegree < r := by
     have : P.natDegree = q.natDegree + (q * s).natDegree := by
@@ -45,10 +47,13 @@ theorem charpoly_companion_separable : ∀ (F E : Type) [NontriviallyNormedField
     omega
   apply hQ0
   apply hsmall _ hdegQ
-  have hnil : IsNilpotent (Polynomial.aeval τ (q * s)) := ⟨2, by
-    rw [pow_two, ← map_mul]
-    have : q * s * (q * s) = P * s := by rw [hs]; ring
-    rw [this, map_mul, hroot, zero_mul]⟩
+  have hnil : IsNilpotent (Polynomial.aeval τ (q * s)) := ⟨
+    2,
+    by
+      rw [pow_two, ← map_mul]
+      have : q * s * (q * s) = P * s := by rw [hs]; ring
+      rw [this, map_mul, hroot, zero_mul]
+  ⟩
   exact hnil.eq_zero
 
 end GlobalTheory.JR.LinDesc

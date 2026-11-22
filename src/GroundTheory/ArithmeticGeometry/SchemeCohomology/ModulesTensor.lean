@@ -14,15 +14,16 @@ variable {C : Type u₁} [Category.{v₁} C] (J : GrothendieckTopology C) {R : C
 namespace GroundTheory.Arith.SchemeCoh
 namespace ModulesTensor
 
-def zeroSieve {M : PresheafOfModules.{u} (R ⋙ forget₂ _ _)} {U : Cᵒᵖ} (x : M.obj U) :
-    Sieve U.unop where
+def zeroSieve {M : PresheafOfModules.{u} (R ⋙ forget₂ _ _)} {U : Cᵒᵖ} (x : M.obj U)
+    : Sieve U.unop where
   arrows _ g := M.map g.op x = 0
   downward_closed {_ _} g hg h := by
     rw [op_comp, PresheafOfModules.map_comp_apply]
-    erw [hg]; exact map_zero _
+    erw [hg]
+    exact map_zero _
 
-def imSieve {M N : PresheafOfModules.{u} (R ⋙ forget₂ _ _)} (φ : M ⟶ N) {U : Cᵒᵖ}
-    (y : N.obj U) : Sieve U.unop where
+def imSieve {M N : PresheafOfModules.{u} (R ⋙ forget₂ _ _)} (φ : M ⟶ N) {U : Cᵒᵖ} (y : N.obj U)
+    : Sieve U.unop where
   arrows V g := ∃ x : M.obj (op V), φ.app (op V) x = N.map g.op y
   downward_closed {_ _} g := by
     rintro ⟨x, hx⟩ h
@@ -232,10 +233,9 @@ lemma W_toPresheaf_iff (φ : M ⟶ N) :
 
 end
 
-
 variable (J R) in
-abbrev W (J : GrothendieckTopology C) (R : Cᵒᵖ ⥤ CommRingCat.{u}) :
-    MorphismProperty (PresheafOfModules.{u} (R ⋙ forget₂ CommRingCat RingCat)) :=
+abbrev W (J : GrothendieckTopology C) (R : Cᵒᵖ ⥤ CommRingCat.{u})
+    : MorphismProperty (PresheafOfModules.{u} (R ⋙ forget₂ CommRingCat RingCat)) :=
   J.W.inverseImage (PresheafOfModules.toPresheaf _)
 
 variable [J.WEqualsLocallyBijective AddCommGrpCat.{u}]
@@ -259,29 +259,35 @@ abbrev ringSheaf : Sheaf K RingCat.{u} := (sheafCompose K (forget₂ CommRingCat
 
 abbrev ringSheafId : S.obj ⋙ forget₂ CommRingCat RingCat ⟶ (ringSheaf K S).obj := 𝟙 _
 
-instance : IsIso (ringSheafId K S) := inferInstanceAs (IsIso (𝟙 (S.obj ⋙ forget₂ CommRingCat RingCat)))
+instance : IsIso (ringSheafId K S) :=
+  inferInstanceAs (IsIso (𝟙 (S.obj ⋙ forget₂ CommRingCat RingCat)))
 
 variable [HasWeakSheafify K AddCommGrpCat.{u}] [K.WEqualsLocallyBijective AddCommGrpCat.{u}]
 
-noncomputable abbrev modulesSheafification :
-    PresheafOfModules.{u} (S.obj ⋙ forget₂ CommRingCat RingCat) ⥤ SheafOfModules.{u} (ringSheaf K S) :=
+noncomputable abbrev modulesSheafification
+    : PresheafOfModules.{u} (S.obj ⋙ forget₂ CommRingCat RingCat)
+      ⥤ SheafOfModules.{u} (ringSheaf K S) :=
   PresheafOfModules.sheafification (J := K) (R₀ := S.obj ⋙ forget₂ CommRingCat RingCat)
     (R := ringSheaf K S) (ringSheafId K S)
 
 instance : (modulesSheafification K S).IsLocalization (ModulesTensor.W K S.obj) :=
-  inferInstanceAs ((PresheafOfModules.sheafification (J := K) (R₀ := S.obj ⋙ forget₂ CommRingCat RingCat)
-    (R := ringSheaf K S) (ringSheafId K S)).IsLocalization
+  inferInstanceAs
+    ((PresheafOfModules.sheafification (J := K) (R₀ := S.obj ⋙ forget₂ CommRingCat RingCat)
+        (R := ringSheaf K S) (ringSheafId K S)).IsLocalization
       (K.W.inverseImage (PresheafOfModules.toPresheaf (S.obj ⋙ forget₂ CommRingCat RingCat))))
 
-instance : IsIso (PresheafOfModules.sheafificationAdjunction (J := K)
-    (R₀ := S.obj ⋙ forget₂ CommRingCat RingCat) (R := ringSheaf K S) (ringSheafId K S)).counit :=
-  inferInstanceAs (IsIso (PresheafOfModules.sheafificationAdjunction (J := K)
-    (R := ringSheaf K S) (𝟙 (ringSheaf K S).obj)).counit)
+instance
+    : IsIso (PresheafOfModules.sheafificationAdjunction (J := K)
+      (R₀ := S.obj ⋙ forget₂ CommRingCat RingCat) (R := ringSheaf K S) (ringSheafId K S)).counit :=
+  inferInstanceAs (IsIso (PresheafOfModules.sheafificationAdjunction (J := K) (R := ringSheaf K S)
+    (𝟙 (ringSheaf K S).obj)).counit)
 
-noncomputable def sheafificationUnitIso :
-    (modulesSheafification K S).obj (𝟙_ _) ≅ SheafOfModules.unit (ringSheaf K S) :=
-  @asIso _ _ _ _ _ (NatIso.isIso_app_of_isIso (PresheafOfModules.sheafificationAdjunction (J := K)
-    (R₀ := S.obj ⋙ forget₂ CommRingCat RingCat) (R := ringSheaf K S) (ringSheafId K S)).counit
+noncomputable def sheafificationUnitIso
+    : (modulesSheafification K S).obj (𝟙_ _) ≅ SheafOfModules.unit (ringSheaf K S) :=
+  @asIso _ _ _ _ _
+    (NatIso.isIso_app_of_isIso
+      (PresheafOfModules.sheafificationAdjunction (J := K)
+        (R₀ := S.obj ⋙ forget₂ CommRingCat RingCat) (R := ringSheaf K S) (ringSheafId K S)).counit
       (SheafOfModules.unit (ringSheaf K S)))
 
 end

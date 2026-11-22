@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Idele
 
 open scoped Pointwise
 open Formalism.BasicNotions Formalism.IndefR.Links IsDedekindDomain NumberField
-open Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+open Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric
+  Formalism.MainNotions.StandardLatticesGL3
 open Formalism.L2.Host (HChar)
 open GlobalTheory.ChiGrid GlobalTheory.LeafRestExamples GlobalTheory.FunObj.SqNum
 open GlobalTheory.Mem.Col2.SplitChar (finIdl)
@@ -21,15 +22,17 @@ open GlobalTheory.Mem.Col2.SplitChar
 
 namespace GlobalTheory.UnrKill
 
-theorem exists_prime_mem {K : Type} [Field K] [NumberField K] (P : HeightOneSpectrum (𝓞 K)) :
-    ∃ q : ℕ, q.Prime ∧ ((q : ℕ) : 𝓞 K) ∈ P.asIdeal := by
+theorem exists_prime_mem {K : Type} [Field K] [NumberField K] (P : HeightOneSpectrum (𝓞 K))
+    : ∃ q : ℕ, q.Prime ∧ ((q : ℕ) : 𝓞 K) ∈ P.asIdeal := by
   haveI := P.isPrime
   haveI : Finite (𝓞 K ⧸ P.asIdeal) := Ideal.finiteQuotientOfFreeOfNeBot _ P.ne_bot
   refine ⟨ringChar (𝓞 K ⧸ P.asIdeal), CharP.char_is_prime (𝓞 K ⧸ P.asIdeal) _, ?_⟩
   rw [← Ideal.Quotient.eq_zero_iff_mem, map_natCast, ringChar.spec]
 
-theorem vl_nat_eq_one {D : D7} {q m : ℕ} (hm : Nat.Coprime m q) {v : HeightOneSpectrum (𝓞 D.host.E)}
-    (hv : GlobalTheory.Mem.Chr.OverP D.host q v) : vl D v (m : AE D) = 1 := by
+theorem vl_nat_eq_one
+    {D : D7} {q m : ℕ} (hm : Nat.Coprime m q)
+    {v : HeightOneSpectrum (𝓞 D.host.E)} (hv : GlobalTheory.Mem.Chr.OverP D.host q v)
+    : vl D v (m : AE D) = 1 := by
   refine le_antisymm (vl_le (natCast_mem _ _) v) (not_lt.1 fun hlt => ?_)
   obtain ⟨a, b, hab⟩ := Nat.isCoprime_iff_coprime.2 hm
   have hab' := congrArg (Int.cast : ℤ → AE D) hab
@@ -44,8 +47,10 @@ theorem vl_nat_eq_one {D : D7} {q m : ℕ} (hm : Nat.Coprime m q) {v : HeightOne
   rw [hab', map_one] at h4
   exact lt_irrefl _ h4
 
-theorem vl_eq_zero_of_zeroAt {D : D7} {q : ℕ} {x : AE D} (h : ZeroAt D q x) {v : HeightOneSpectrum (𝓞 D.host.E)}
-    (hv : GlobalTheory.Mem.Chr.OverP D.host q v) : vl D v x = 0 := by
+theorem vl_eq_zero_of_zeroAt
+    {D : D7} {q : ℕ} {x : AE D} (h : ZeroAt D q x)
+    {v : HeightOneSpectrum (𝓞 D.host.E)} (hv : GlobalTheory.Mem.Chr.OverP D.host q v)
+    : vl D v x = 0 := by
   have hk : ∀ k : ℕ, vl D v x ≤ vl D v (q : AE D) ^ k := fun k => by
     obtain ⟨m, -, hm, s, hs, e⟩ := h k
     have h1 := vl_nat_eq_one hm hv
@@ -55,10 +60,17 @@ theorem vl_eq_zero_of_zeroAt {D : D7} {q : ℕ} {x : AE D} (h : ZeroAt D q x) {v
   obtain ⟨k, hk'⟩ := exists_pow_lt₀ (val_nat_lt hv) (Units.mk0 _ h0)
   exact lt_irrefl _ ((hk k).trans_lt hk')
 
-theorem unr_kill : ∀ (D : D7) (χ : Formalism.L2.Host.HChar D.host.E), (∀ P : HeightOneSpectrum (𝓞 D.host.E), (∃ q : ℕ, q.Prime ∧ InertQ D q ∧ ((q : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal) → χ.UnrAt P) → ∀ u : (AE D)ˣ, IntU D u → (∀ q : ℕ, q.Prime → ¬ InertQ D q → ZeroAt D q ((u : AE D) - 1)) → χ.1 (GlobalTheory.Mem.Col2.SplitChar.finIdl D u) = 1 := by
+theorem unr_kill
+    : ∀ (D : D7) (χ : Formalism.L2.Host.HChar D.host.E),
+      (∀ P : HeightOneSpectrum (𝓞 D.host.E),
+          (∃ q : ℕ, q.Prime ∧ InertQ D q ∧ ((q : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal) → χ.UnrAt P)
+        → ∀ u : (AE D)ˣ,
+          IntU D u → (∀ q : ℕ, q.Prime → ¬ InertQ D q → ZeroAt D q ((u : AE D) - 1))
+            → χ.1 (GlobalTheory.Mem.Col2.SplitChar.finIdl D u) = 1 := by
   intro D χ hχ u hu hz
   refine GlobalTheory.Mem.LocTriv.eq_one_of_local D.host.E χ.1 χ.2.1 (finIdl D u) (finIdl_unit hu)
-    (fun w => by rw [finIdl_fst]; rfl) ?_
+    (fun w => by rw [finIdl_fst]; rfl)
+    ?_
   intro P x hx
   obtain ⟨q, hq, hqP⟩ := exists_prime_mem P
   by_cases hI : InertQ D q

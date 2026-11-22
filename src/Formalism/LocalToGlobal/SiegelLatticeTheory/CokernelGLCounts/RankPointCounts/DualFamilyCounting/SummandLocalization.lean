@@ -12,7 +12,8 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.G6
 
-open Formalism.HermitianLattices.Ext.L3 Formalism.L2.SG.Pf.Cnt Formalism.HermitianLattices.Ext.L3.LocalSpans
+open Formalism.HermitianLattices.Ext.L3 Formalism.L2.SG.Pf.Cnt
+  Formalism.HermitianLattices.Ext.L3.LocalSpans
 
 theorem summand_localization : SummandLoc := by
   rintro K F V _ _ _ _ _ _ _ _ _ _ X 𝔭 h𝔭 Λ ⟨L, hL, rfl⟩
@@ -25,8 +26,7 @@ theorem summand_localization : SummandLoc := by
     rw [Submodule.range_subtype]
     exact fun _ hx => Submodule.subset_span hx
   have hfull : Submodule.IsFullLattice K L' := by
-    have hfg : L'.FG := Submodule.fg_of_fg_map_injective i Subtype.val_injective
-      (hmap.symm ▸ hL.fg)
+    have hfg : L'.FG := Submodule.fg_of_fg_map_injective i Subtype.val_injective (hmap.symm ▸ hL.fg)
     letI : Submodule.IsLattice K L' := Submodule.IsLattice.of_fg K hfg
     refine ⟨?_⟩
     apply Submodule.map_injective_of_injective (f := W.subtype) Subtype.val_injective
@@ -37,8 +37,8 @@ theorem summand_localization : SummandLoc := by
   let X' := X.comap W.subtype
   let Lloc := UpperTheory.Reformulated.B.SummandLocalization.locF 𝔭 L'
   obtain ⟨p, hpX, hpId, hpL⟩ :=
-    UpperTheory.Reformulated.B.SummandLocalization.summand_localization
-      K F W X' 𝔭 h𝔭 Lloc ⟨L', hfull, rfl⟩
+    UpperTheory.Reformulated.B.SummandLocalization.summand_localization K F W X' 𝔭 h𝔭 Lloc
+      ⟨L', hfull, rfl⟩
   let N := (LinearMap.ker p).map W.subtype
   have hNX : Disjoint N X := by
     rw [Submodule.disjoint_def]
@@ -49,17 +49,25 @@ theorem summand_localization : SummandLoc := by
   obtain ⟨Y, hNY, hYX⟩ := hNX.exists_isCompl
   let π := X.projection Y hYX.symm
   have hπ (w : W) : π w = (p w : V) := by
-    have hdiff : (w : V) - (p w : V) ∈ Y := hNY ⟨w - p w, by
-      change p (w - p w) = 0
-      rw [map_sub, hpId _ (hpX w), sub_self], rfl⟩
+    have hdiff : (w : V) - (p w : V) ∈ Y :=
+      hNY ⟨
+        w - p w,
+        by
+          change p (w - p w) = 0
+          rw [map_sub, hpId _ (hpX w), sub_self],
+        rfl
+      ⟩
     have he := Submodule.projection_apply_of_mem_right hYX.symm hdiff
     change π ((w : V) - (p w : V)) = 0 at he
     have hp : (p w : V) ∈ X := hpX w
-    have hproj : π (p w : V) = (p w : V) :=
-      Submodule.projection_apply_of_mem_left hYX.symm hp
+    have hproj : π (p w : V) = (p w : V) := Submodule.projection_apply_of_mem_left hYX.symm hp
     rwa [map_sub, hproj, sub_eq_zero] at he
-  refine ⟨π, Submodule.projection_apply_mem hYX.symm,
-    fun _ hx => Submodule.projection_apply_of_mem_left hYX.symm hx, ?_⟩
+  refine ⟨
+    π,
+    Submodule.projection_apply_mem hYX.symm,
+    fun _ hx => Submodule.projection_apply_of_mem_left hYX.symm hx,
+    ?_
+  ⟩
   letI := h𝔭.isPrime
   intro y hy
   obtain ⟨t, ht, hty⟩ := (LocalSpans.mem_locF 𝔭 L y).1 hy

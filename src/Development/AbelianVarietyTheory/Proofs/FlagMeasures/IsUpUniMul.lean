@@ -11,8 +11,11 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.Place
 
 namespace GlobalTheory.UpperUnipotentMulFlagMeasures
 
-theorem isUpUni_mul {N : ℕ} {K : Type} [inst : Field K] {A B : Matrix (Fin N) (Fin N) K}
-    (hA : Formalism.MainNotions.S.IsUpUni A) (hB : Formalism.MainNotions.S.IsUpUni B) : Formalism.MainNotions.S.IsUpUni (A * B) := by
+theorem isUpUni_mul
+    {N : ℕ} {K : Type} [inst : Field K]
+    {A B : Matrix (Fin N) (Fin N) K}
+    (hA : Formalism.MainNotions.S.IsUpUni A) (hB : Formalism.MainNotions.S.IsUpUni B)
+    : Formalism.MainNotions.S.IsUpUni (A * B) := by
   intro i j
   refine ⟨fun hji => ?_, fun hij => ?_⟩
   · rw [Matrix.mul_apply]

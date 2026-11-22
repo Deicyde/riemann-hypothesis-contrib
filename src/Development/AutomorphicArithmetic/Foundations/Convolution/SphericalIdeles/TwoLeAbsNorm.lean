@@ -19,14 +19,20 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.CentreSp
 
 open MeasureTheory NumberField IsDedekindDomain Filter
 open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
-open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.T GlobalTheory.CuspRep Formalism.L2.Host Formalism.ConjugateSelfDual
+open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo UpperTheory.ConvolutionTheory
+  UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.T GlobalTheory.CuspRep
+  Formalism.L2.Host Formalism.ConjugateSelfDual
 open UpperTheory.V.Published UpperTheory.CBC PositivityTheory.RgJS
 
-private theorem same_sat {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    [_root_.NumberField.IsTotallyComplex F] [IsGalois F E] {n : ℕ} (hp : (Module.finrank F E).Prime) (π : CuspSub F n)
+private theorem same_sat
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    [_root_.NumberField.IsTotallyComplex F] [IsGalois F E]
+    {n : ℕ}
+    (hp : (Module.finrank F E).Prime)
+    (π : CuspSub F n)
     {sat sat' : Pl E → Multiset ℂˣ → Prop}
-    (H : WeakBC (CG.mk π).HasSat sat) (H' : WeakBC (CG.mk π).HasSat sat') :
-    ∀ᶠ w : Pl E in cofinite, ∃ B, sat w B ∧ sat' w B := by
+    (H : WeakBC (CG.mk π).HasSat sat) (H' : WeakBC (CG.mk π).HasSat sat')
+    : ∀ᶠ w : Pl E in cofinite, ∃ B, sat w B ∧ sat' w B := by
   have hN := (places F E hp).2.2.2.2.1
   filter_upwards [H, H'] with w a b
   have hn : normV w = normV (w.under (𝓞 F)) ^ resDeg F w := by
@@ -36,13 +42,13 @@ private theorem same_sat {F E : Type} [Field F] [NumberField F] [Field E] [Numbe
   obtain rfl := hB.unique hC
   exact ⟨_, hB', hC'⟩
 
-private theorem two_le_absNorm {K : Type} [Field K] [NumberField K] (v : Pl K) : 2 ≤ Ideal.absNorm v.asIdeal := by
+private theorem two_le_absNorm {K : Type} [Field K] [NumberField K] (v : Pl K)
+    : 2 ≤ Ideal.absNorm v.asIdeal := by
   have a := Ideal.absNorm_eq_zero_iff.not.2 v.ne_bot
   have b := Ideal.absNorm_eq_one_iff.not.2 v.isPrime.ne_top
   omega
 
-theorem UpperTheory.ConvolutionTheory.Sph.up :
-    UpperTheory.ConvolutionTheory.Sph.Up := by
+theorem UpperTheory.ConvolutionTheory.Sph.up : UpperTheory.ConvolutionTheory.Sph.Up := by
   classical
   intro F E _ _ _ _ _ _ _ _ σ hσ hp n hn π P hW v hv B hB w hw f hf
   let μE : Measure (normOneGL (K := E) (n := n)) := Measure.haar
@@ -59,7 +65,8 @@ theorem UpperTheory.ConvolutionTheory.Sph.up :
   have hSv : SSat μF V v ((B.map (· * χ.val v)).map fun b : ℂˣ => (b : ℂ)) :=
     (Dp.sSatIff F n μF (π.twist χ) V hV v _).2 ⟨_, rfl, hBv⟩
 
-  let t₁ : Pl F → Multiset ℂ := Function.update t v ((B.map (· * χ.val v)).map fun b : ℂˣ => (b : ℂ))
+  let t₁ : Pl F → Multiset ℂ :=
+    Function.update t v ((B.map (· * χ.val v)).map fun b : ℂˣ => (b : ℂ))
   have hAt₁ : At μF (S \ {v}) V Λ t₁ := by
     refine ⟨hAt.1, fun u hu => ?_⟩
     by_cases e : u = v
@@ -69,8 +76,9 @@ theorem UpperTheory.ConvolutionTheory.Sph.up :
       simpa [t₁, Function.update_of_ne e] using hAt.2 u hu'
   have hfin : (S \ {v}).Finite := hS.diff
   have hAE₁ : AtAE μF V Λ t₁ := ⟨_, hfin, hAt₁⟩
-  obtain ⟨V'', hV'', hAE'', hup⟩ := Sph.liftAt ci Sph.gm F E σ hσ hp n hn μE μF θ hθ V Λ t₁ (S \ {v})
-    hV.summand hfin hAt₁ (hOff Λ t₁ hAE₁) v (by simp) hv
+  obtain ⟨V'', hV'', hAE'', hup⟩ :=
+    Sph.liftAt ci Sph.gm F E σ hσ hp n hn μE μF θ hθ V Λ t₁ (S \ {v}) hV.summand hfin hAt₁
+      (hOff Λ t₁ hAE₁) v (by simp) hv
 
   obtain ⟨P', hP', -⟩ := Dp.exCusp E n μE V'' hV''
   have hl := c3 _ P' V V'' Λ t₁ _ _ hV hP' hAE₁ hAE'' rfl (Filter.Eventually.of_forall fun _ => rfl)
@@ -93,9 +101,10 @@ theorem UpperTheory.ConvolutionTheory.Sph.up :
   have htt := (h3 n hn).2.1 P
   have hval : χ'.val w = χ.val v ^ f := by
     apply Units.ext
-    rw [Units.val_pow_eq_pow_val, (Sph.powSat F χ s hχ _).2, (Sph.powSat E χ' s hχ' w).2, hf', Nat.cast_pow,
-      ← Complex.cpow_nat_mul, Complex.natCast_cpow_natCast_mul]
-  have hfin' := satake_twist_holds E n (CG.mk (P.twist χ')) χ'⁻¹ w _ (Sph.powSat E χ'⁻¹ (-s) hinv w).1 hB'
+    rw [Units.val_pow_eq_pow_val, (Sph.powSat F χ s hχ _).2, (Sph.powSat E χ' s hχ' w).2, hf',
+      Nat.cast_pow, ← Complex.cpow_nat_mul, Complex.natCast_cpow_natCast_mul]
+  have hfin' :=
+    satake_twist_holds E n (CG.mk (P.twist χ')) χ'⁻¹ w _ (Sph.powSat E χ'⁻¹ (-s) hinv w).1 hB'
   rw [CG.twist_mk, htt] at hfin'
   change (CG.mk P).HasSat w _
   convert hfin' using 1

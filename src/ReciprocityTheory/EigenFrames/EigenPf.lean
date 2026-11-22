@@ -11,8 +11,11 @@ open NumberField
 
 namespace ReciprocityTheory.EigenFramesTheory
 
-theorem norm_le_one_of_monic {p : ℕ} [Fact p.Prime] {f : Polynomial ℤ} (hf : f.Monic) {y : ℂ_[p]}
-    (h : Polynomial.eval₂ (Int.castRingHom ℂ_[p]) y f = 0) : ‖y‖ ≤ 1 := by
+theorem norm_le_one_of_monic
+    {p : ℕ} [Fact p.Prime]
+    {f : Polynomial ℤ} (hf : f.Monic)
+    {y : ℂ_[p]} (h : Polynomial.eval₂ (Int.castRingHom ℂ_[p]) y f = 0)
+    : ‖y‖ ≤ 1 := by
   by_contra hy
   rw [not_le] at hy
   set n := f.natDegree
@@ -21,7 +24,8 @@ theorem norm_le_one_of_monic {p : ℕ} [Fact p.Prime] {f : Polynomial ℤ} (hf :
     have hf1 : f = 1 := Polynomial.eq_one_of_monic_natDegree_zero hf h0
     rw [hf1, Polynomial.eval₂_one] at h
     exact one_ne_zero h
-  rw [Polynomial.eval₂_eq_sum_range, Finset.sum_range_succ, hf.coeff_natDegree, map_one, one_mul] at h
+  rw [Polynomial.eval₂_eq_sum_range, Finset.sum_range_succ, hf.coeff_natDegree, map_one, one_mul]
+    at h
   set S := ∑ i ∈ Finset.range n, Int.castRingHom ℂ_[p] (f.coeff i) * y ^ i
   have hS : ‖S‖ ≤ ‖y‖ ^ (n - 1) := by
     refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (by positivity) fun i hi => ?_
@@ -35,17 +39,23 @@ theorem norm_le_one_of_monic {p : ℕ} [Fact p.Prime] {f : Polynomial ℤ} (hf :
   have h3 : ‖y‖ ^ (n - 1) < ‖y‖ ^ n := pow_lt_pow_right₀ hy (by omega)
   linarith
 
-theorem eig_norm_det_le_one {p : ℕ} [Fact p.Prime] {κ : Type*} [Fintype κ] [DecidableEq κ]
-    (M : Matrix κ κ ℂ_[p]) (hM : ∀ i j, ‖M i j‖ ≤ 1) : ‖M.det‖ ≤ 1 := by
+theorem eig_norm_det_le_one
+    {p : ℕ} [Fact p.Prime]
+    {κ : Type*} [Fintype κ] [DecidableEq κ]
+    (M : Matrix κ κ ℂ_[p]) (hM : ∀ i j, ‖M i j‖ ≤ 1)
+    : ‖M.det‖ ≤ 1 := by
   rw [Matrix.det_apply']
   refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg zero_le_one fun σ _ => ?_
   rw [norm_mul, norm_prod]
   exact mul_le_one₀ (IsUltrametricDist.norm_intCast_le_one _ _)
-    (Finset.prod_nonneg fun _ _ => norm_nonneg _) (Finset.prod_le_one₀ (fun _ _ => norm_nonneg _) fun _ _ => hM _ _)
+    (Finset.prod_nonneg fun _ _ => norm_nonneg _)
+    (Finset.prod_le_one₀ (fun _ _ => norm_nonneg _) fun _ _ => hM _ _)
 
-theorem eig_norm_intCast {p : ℕ} [Fact p.Prime] {z : ℤ} (h : ¬ (p : ℤ) ∣ z) : ‖(z : ℂ_[p])‖ = 1 := by
+theorem eig_norm_intCast {p : ℕ} [Fact p.Prime] {z : ℤ} (h : ¬ (p : ℤ) ∣ z)
+    : ‖(z : ℂ_[p])‖ = 1 := by
   rw [← map_intCast (algebraMap ℚ_[p] ℂ_[p]) z, norm_algebraMap']
-  exact le_antisymm (Padic.norm_int_le_one z) (not_lt.mp fun h' => h (Padic.norm_intCast_lt_one_iff.mp h'))
+  exact le_antisymm (Padic.norm_int_le_one z)
+    (not_lt.mp fun h' => h (Padic.norm_intCast_lt_one_iff.mp h'))
 
 universe u v
 
@@ -61,7 +71,8 @@ theorem eigenFrameDual : EigenFrameDual.{u, v} := by
   let N : Matrix κ κ ℂ := Algebra.embeddingsMatrixReindex ℚ ℂ bQ e
   have hN : N.det ^ 2 = ((NumberField.discr E : ℤ) : ℂ) := by
     rw [← Algebra.discr_eq_det_embeddingsMatrixReindex_pow_two ℚ ℂ bQ e,
-      Algebra.discr_localizationLocalization ℤ (nonZeroDivisors ℤ) E b, NumberField.discr_eq_discr E b]
+      Algebra.discr_localizationLocalization ℤ (nonZeroDivisors ℤ) E b,
+      NumberField.discr_eq_discr E b]
     simp
   let M : Matrix κ κ ℂ_[p] := (ι : ℂ →+* ℂ_[p]).mapMatrix N
   have hMa : ∀ i j, M i j = ι (e j ((b i : 𝓞 E) : E)) := by
@@ -80,7 +91,8 @@ theorem eigenFrameDual : EigenFrameDual.{u, v} := by
     exact zero_ne_one hM1
   have hint : ∀ i j, ‖M i j‖ ≤ 1 := by
     intro i j
-    obtain ⟨f, hmon, hf⟩ := (NumberField.RingOfIntegers.isIntegral_coe (b i) : IsIntegral ℤ ((b i : 𝓞 E) : E))
+    obtain ⟨f, hmon, hf⟩ :=
+      (NumberField.RingOfIntegers.isIntegral_coe (b i) : IsIntegral ℤ ((b i : 𝓞 E) : E))
     refine norm_le_one_of_monic hmon ?_
     let g : E →+* ℂ_[p] := (ι : ℂ →+* ℂ_[p]).comp (e j : E →+* ℂ)
     have h := congrArg g hf

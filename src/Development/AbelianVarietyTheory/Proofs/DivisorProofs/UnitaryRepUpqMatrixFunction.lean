@@ -19,20 +19,26 @@ abbrev mat (g : Formalism.REAL.UJ ε) : Matrix (Fin n) (Fin n) ℂ :=
 theorem mat_injective : Function.Injective (mat ε) := fun _ _ h => Subtype.ext (Units.ext h)
 
 def rep (π : Formalism.REAL.UJ ε →* (X →L[ℂ] X)) (x : Matrix (Fin n) (Fin n) ℂ) : X →L[ℂ] X := by
-  classical exact if h : ∃ g, mat ε g = x then π h.choose else 1
+  classical
+  exact if h : ∃ g, mat ε g = x then π h.choose else 1
 
-theorem rep_mat (π : Formalism.REAL.UJ ε →* (X →L[ℂ] X)) (g : Formalism.REAL.UJ ε) : rep ε π (mat ε g) = π g := by
+theorem rep_mat (π : Formalism.REAL.UJ ε →* (X →L[ℂ] X)) (g : Formalism.REAL.UJ ε)
+    : rep ε π (mat ε g) = π g := by
   have h : ∃ g', mat ε g' = mat ε g := ⟨g, rfl⟩
   rw [rep, dite_eq_left h, mat_injective ε h.choose_spec]
 
-theorem range_mat : Set.range (mat ε) = Formalism.MainNotions.S.UJset ε := (Formalism.REAL.isClosedEmbeddingMatrix n ε).2
+theorem range_mat : Set.range (mat ε) = Formalism.MainNotions.S.UJset ε :=
+  (Formalism.REAL.isClosedEmbeddingMatrix n ε).2
 
-theorem mat_mem (g : Formalism.REAL.UJ ε) : mat ε g ∈ Formalism.MainNotions.S.UJset ε := range_mat ε ▸ ⟨g, rfl⟩
+theorem mat_mem (g : Formalism.REAL.UJ ε) : mat ε g ∈ Formalism.MainNotions.S.UJset ε :=
+  range_mat ε ▸ ⟨g, rfl⟩
 
-theorem exists_mat {x : Matrix (Fin n) (Fin n) ℂ} (hx : x ∈ Formalism.MainNotions.S.UJset ε) : ∃ g, mat ε g = x := by
+theorem exists_mat {x : Matrix (Fin n) (Fin n) ℂ} (hx : x ∈ Formalism.MainNotions.S.UJset ε)
+    : ∃ g, mat ε g = x := by
   rw [← range_mat ε] at hx; exact hx
 
-theorem isEmbedding_mat : Topology.IsEmbedding (mat ε) := (Formalism.REAL.isClosedEmbeddingMatrix n ε).1.isEmbedding
+theorem isEmbedding_mat : Topology.IsEmbedding (mat ε) :=
+  (Formalism.REAL.isClosedEmbeddingMatrix n ε).1.isEmbedding
 
 end GlobalTheory.PsCo.PcEF.MatrixRepresentation
 
@@ -42,7 +48,12 @@ open GlobalTheory.PsCo.PcEF.MatrixRepresentation
 
 theorem unitaryRep_upq_matrixFunction : MatRep := by
   intro n ε U _ _ π hπ hi
-  refine ⟨rep ε π, ⟨⟨?_, fun a ha b hb => ?_⟩, fun a ha v => ?_, fun v => ?_⟩, fun S hS hinv => ?_, fun g => rep_mat ε π g⟩
+  refine ⟨
+    rep ε π,
+    ⟨⟨?_, fun a ha b hb => ?_⟩, fun a ha v => ?_, fun v => ?_⟩,
+    fun S hS hinv => ?_,
+    fun g => rep_mat ε π g
+  ⟩
   · have h1 : mat ε 1 = 1 := rfl
     rw [← h1, rep_mat, map_one]
   · obtain ⟨g, rfl⟩ := exists_mat ε ha

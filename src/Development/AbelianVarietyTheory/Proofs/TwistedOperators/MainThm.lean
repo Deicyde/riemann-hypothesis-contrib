@@ -8,7 +8,38 @@ open MeasureTheory DoubleCoset
 
 namespace GlobalTheory.TwistedOperatorMainTheorem
 
-theorem main_thm : ∀ (G : Type) [inst : Group G] [inst_1 : TopologicalSpace G] [IsTopologicalGroup G] [inst_3 : MeasurableSpace G] [BorelSpace G] (m : MeasureTheory.Measure G) [MeasureTheory.Measure.IsHaarMeasure m] (J : Subgroup G), IsOpen (↑J : Set G) → IsCompact (↑J : Set G) → ∀ (ι : Type) [Countable ι] (x : ι → G), Pairwise (Function.onFun Disjoint fun (i : ι) ↦ DoubleCoset.doubleCoset (x i) (↑J : Set G) (↑J : Set G)) → ∀ (F : G → ℂ), (∀ (g j : G), j ∈ J → ∀ j' ∈ J, F (j * g * j') = F g) → (∀ (g : G), F g ≠ (0 : ℂ) → ∃ (i : ι), g ∈ DoubleCoset.doubleCoset (x i) (↑J : Set G) (↑J : Set G)) → (Summable fun (i : ι) ↦ MeasureTheory.Measure.real m (DoubleCoset.doubleCoset (x i) (↑J : Set G) (↑J : Set G)) * ‖F (x i)‖) → MeasureTheory.Integrable F m ∧ HasSum (fun (i : ι) ↦ (↑(MeasureTheory.Measure.real m (DoubleCoset.doubleCoset (x i) (↑J : Set G) (↑J : Set G))) : ℂ) * F (x i)) (∫ (g : G), F g ∂m) ∧ HasSum (fun (c : DoubleCoset.Quotient (↑J : Set G) (↑J : Set G)) ↦ (↑(MeasureTheory.Measure.real m (DoubleCoset.doubleCoset (Quotient.out c) (↑J : Set G) (↑J : Set G))) : ℂ) * F (Quotient.out c)) (∫ (g : G), F g ∂m) := by
+theorem main_thm
+    : ∀ (G : Type) [inst : Group G] [inst_1 : TopologicalSpace G] [IsTopologicalGroup G]
+        [inst_3 : MeasurableSpace G] [BorelSpace G] (m : MeasureTheory.Measure G)
+        [MeasureTheory.Measure.IsHaarMeasure m] (J : Subgroup G),
+      IsOpen (↑J : Set G) → IsCompact (↑J : Set G)
+        → ∀ (ι : Type) [Countable ι] (x : ι → G),
+          Pairwise (Function.onFun Disjoint fun (i : ι) ↦
+              DoubleCoset.doubleCoset (x i) (↑J : Set G) (↑J : Set G))
+            → ∀ (F : G → ℂ),
+              (∀ (g j : G), j ∈ J → ∀ j' ∈ J, F (j * g * j') = F g)
+                → (∀ (g : G),
+                  F g ≠ (0 : ℂ)
+                    → ∃ (i : ι), g ∈ DoubleCoset.doubleCoset (x i) (↑J : Set G) (↑J : Set G))
+                → (Summable fun (i : ι) ↦
+                  MeasureTheory.Measure.real m
+                      (DoubleCoset.doubleCoset (x i) (↑J : Set G) (↑J : Set G))
+                    * ‖F (x i)‖)
+                → MeasureTheory.Integrable F m
+                  ∧ HasSum
+                    (fun (i : ι) ↦
+                      (↑(MeasureTheory.Measure.real m
+                            (DoubleCoset.doubleCoset (x i) (↑J : Set G) (↑J : Set G)))
+                          : ℂ)
+                        * F (x i))
+                    (∫ (g : G), F g ∂m)
+                  ∧ HasSum
+                    (fun (c : DoubleCoset.Quotient (↑J : Set G) (↑J : Set G)) ↦
+                      (↑(MeasureTheory.Measure.real m
+                            (DoubleCoset.doubleCoset (Quotient.out c) (↑J : Set G) (↑J : Set G)))
+                          : ℂ)
+                        * F (Quotient.out c))
+                    (∫ (g : G), F g ∂m) := by
   intro G _ _ _ _ _ m _ J hJo hJc ι _ x hdisj F hF hsupp hsum
 
   have hmeas : ∀ a : G, MeasurableSet (doubleCoset a (J : Set G) J) := fun a =>
@@ -20,14 +51,20 @@ theorem main_thm : ∀ (G : Type) [inst : Group G] [inst_1 : TopologicalSpace G]
     intro a g hg
     obtain ⟨u, hu, w, hw, rfl⟩ := mem_doubleCoset.1 hg
     exact hF a u hu w hw
-  have hint : ∀ i, ∫ g in doubleCoset (x i) (J : Set G) J, F g ∂m =
-      (m.real (doubleCoset (x i) (J : Set G) J) : ℂ) * F (x i) := by
+  have hint
+      : ∀ i,
+        ∫ g in doubleCoset (x i) (J : Set G) J, F g ∂m
+          = (m.real (doubleCoset (x i) (J : Set G) J) : ℂ) * F (x i) := by
     intro i
-    rw [setIntegral_congr_fun (hmeas _) (fun g hg => hconst (x i) g hg), setIntegral_const, Complex.real_smul]
-  have hnorm : ∀ i, ∫ g in doubleCoset (x i) (J : Set G) J, ‖F g‖ ∂m =
-      m.real (doubleCoset (x i) (J : Set G) J) * ‖F (x i)‖ := by
+    rw [setIntegral_congr_fun (hmeas _) (fun g hg => hconst (x i) g hg), setIntegral_const,
+      Complex.real_smul]
+  have hnorm
+      : ∀ i,
+        ∫ g in doubleCoset (x i) (J : Set G) J, ‖F g‖ ∂m
+          = m.real (doubleCoset (x i) (J : Set G) J) * ‖F (x i)‖ := by
     intro i
-    rw [setIntegral_congr_fun (hmeas _) (fun g hg => by rw [hconst (x i) g hg]), setIntegral_const, smul_eq_mul]
+    rw [setIntegral_congr_fun (hmeas _) (fun g hg => by rw [hconst (x i) g hg]), setIntegral_const,
+      smul_eq_mul]
   have hon : ∀ i, IntegrableOn F (doubleCoset (x i) (J : Set G) J) m := fun i =>
     (integrableOn_const (hfin (x i)).ne).congr_fun (fun g hg => (hconst (x i) g hg).symm) (hmeas _)
 
@@ -38,7 +75,9 @@ theorem main_thm : ∀ (G : Type) [inst : Group G] [inst_1 : TopologicalSpace G]
     by_contra h
     obtain ⟨i, hi⟩ := hsupp g h
     exact hg (Set.mem_iUnion.2 ⟨i, hi⟩)
-  have hsumI : HasSum (fun i => (m.real (doubleCoset (x i) (J : Set G) J) : ℂ) * F (x i)) (∫ g, F g ∂m) := by
+  have hsumI : HasSum
+      (fun i => (m.real (doubleCoset (x i) (J : Set G) J) : ℂ) * F (x i))
+      (∫ g, F g ∂m) := by
     have h := hasSum_integral_iUnion (fun i => hmeas (x i)) hdisj hU
     rw [setIntegral_eq_integral_of_forall_compl_eq_zero hout] at h
     simp only [hint] at h
@@ -56,8 +95,9 @@ theorem main_thm : ∀ (G : Type) [inst : Group G] [inst_1 : TopologicalSpace G]
     intro i
     obtain ⟨u, hu, w, hw, e⟩ := DoubleCoset.mk_out_eq_mul J J (x i)
     exact mem_doubleCoset.2 ⟨u, hu, w, hw, e⟩
-  have hzero : ∀ c ∉ Set.range (fun i => DoubleCoset.mk J J (x i)),
-      (m.real (doubleCoset (Quotient.out c) (J : Set G) J) : ℂ) * F (Quotient.out c) = 0 := by
+  have hzero
+      : ∀ c ∉ Set.range (fun i => DoubleCoset.mk J J (x i)),
+        (m.real (doubleCoset (Quotient.out c) (J : Set G) J) : ℂ) * F (Quotient.out c) = 0 := by
     intro c hc
     by_contra h
     obtain ⟨i, hi⟩ := hsupp _ (right_ne_zero_of_mul h)

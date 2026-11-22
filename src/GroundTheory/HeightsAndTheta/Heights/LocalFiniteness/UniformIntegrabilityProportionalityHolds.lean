@@ -311,23 +311,39 @@ public import GroundTheory.HeightsAndTheta.Heights.OrbitLimits.PVarIntGraph
 
 set_option maxSynthPendingDepth 1
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.Targets_ChartDivisorComponents : GroundTheory.Heights₂.Heights.Targets.ChartDivisorComponents.Statement :=
-  @GroundTheory.Heights₂.Heights.Targets.ChartDivisorComponents.proof GroundTheory.Heights₂.Heights.Targets.ChartSectionNotMem.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.Targets_ChartDivisorComponents
+    : GroundTheory.Heights₂.Heights.Targets.ChartDivisorComponents.Statement :=
+  @GroundTheory.Heights₂.Heights.Targets.ChartDivisorComponents.proof
+    GroundTheory.Heights₂.Heights.Targets.ChartSectionNotMem.proof
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.Targets_LelongWeightDiff : GroundTheory.Heights₂.Heights.Targets.LelongWeightDiff.Statement :=
-  @GroundTheory.Heights₂.Heights.Targets.LelongWeightDiff.proof GroundTheory.Heights₂.Heights.HilbertSamuel.Closed.ChartMassCompact
+theorem GroundTheory.Heights₂.Heights.AutoClose.Targets_LelongWeightDiff
+    : GroundTheory.Heights₂.Heights.Targets.LelongWeightDiff.Statement :=
+  @GroundTheory.Heights₂.Heights.Targets.LelongWeightDiff.proof
+    GroundTheory.Heights₂.Heights.HilbertSamuel.Closed.ChartMassCompact
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.Targets_ChartConeLength : GroundTheory.Heights₂.Heights.Targets.ChartConeLength.Statement :=
-  @GroundTheory.Heights₂.Heights.Targets.ChartConeLength.proof GroundTheory.Heights₂.Heights.Targets.ConeRingLaurent.proof GroundTheory.Heights₂.Heights.Targets.ChartDehomIdeal.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.Targets_ChartConeLength
+    : GroundTheory.Heights₂.Heights.Targets.ChartConeLength.Statement :=
+  @GroundTheory.Heights₂.Heights.Targets.ChartConeLength.proof
+    GroundTheory.Heights₂.Heights.Targets.ConeRingLaurent.proof
+    GroundTheory.Heights₂.Heights.Targets.ChartDehomIdeal.proof
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.MahlerAverageSplit : GroundTheory.Heights₂.Heights.MahlerAverageSplit.Statement :=
-  @GroundTheory.Heights₂.Heights.MahlerAverageSplit.proof GroundTheory.Heights₂.Heights.MahlerIntegrand.proof GroundTheory.Heights₂.Heights.SphereMeanFubini.proof GroundTheory.Heights₂.Heights.EvalSpecFirst.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.MahlerAverageSplit
+    : GroundTheory.Heights₂.Heights.MahlerAverageSplit.Statement :=
+  @GroundTheory.Heights₂.Heights.MahlerAverageSplit.proof
+    GroundTheory.Heights₂.Heights.MahlerIntegrand.proof
+    GroundTheory.Heights₂.Heights.SphereMeanFubini.proof
+    GroundTheory.Heights₂.Heights.EvalSpecFirst.proof
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.ConeFubini : GroundTheory.Heights₂.Heights.ConeFubini.Statement :=
+theorem GroundTheory.Heights₂.Heights.AutoClose.ConeFubini
+    : GroundTheory.Heights₂.Heights.ConeFubini.Statement :=
   @GroundTheory.Heights₂.Heights.ConeFubini.proof GroundTheory.Heights₂.Heights.BallVolume.proof
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.SphereMeanLinearBall : GroundTheory.Heights₂.Heights.SphereMeanLinearBall.Statement :=
-  @GroundTheory.Heights₂.Heights.SphereMeanLinearBall.proof GroundTheory.Heights₂.Heights.SphereMeanLinear.full
+theorem GroundTheory.Heights₂.Heights.AutoClose.SphereMeanLinearBall
+    : GroundTheory.Heights₂.Heights.SphereMeanLinearBall.Statement :=
+  @GroundTheory.Heights₂.Heights.SphereMeanLinearBall.proof
+    GroundTheory.Heights₂.Heights.SphereMeanLinear.full
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.AdmissibleAENrm : GroundTheory.Heights₂.Heights.AdmissibleAENrm.Statement :=
-  @GroundTheory.Heights₂.Heights.AdmissibleAENrm.proof GroundTheory.Heights₂.Heights.AdmissibleAE.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.AdmissibleAENrm
+    : GroundTheory.Heights₂.Heights.AdmissibleAENrm.Statement :=
+  @GroundTheory.Heights₂.Heights.AdmissibleAENrm.proof
+    GroundTheory.Heights₂.Heights.AdmissibleAE.proof

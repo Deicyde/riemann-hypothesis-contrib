@@ -5,26 +5,31 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix Polynomial Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
 open PositivityTheory.Rg.BcB.G8
 open UpperTheory.V.Af.Bc (cPl)
-open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Cusp UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm UpperTheory.V.Z.Tf.GaloisFromTraceFormula
+open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Cusp
+  UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm UpperTheory.V.Z.Tf.GaloisFromTraceFormula
 
 namespace UpperTheory.V.Z.Tf.GaloisFromTraceFormula
 
-private noncomputable def listProd {ι : Type} {a b : ℕ} (d : ι → Ex (Fin (a + 1) × Fin (b + 1))) :
-    List ι → Ex (Fin (a + 1) × Fin (b + 1))
+private noncomputable def listProd {ι : Type} {a b : ℕ} (d : ι → Ex (Fin (a + 1) × Fin (b + 1)))
+    : List ι → Ex (Fin (a + 1) × Fin (b + 1))
   | [] => .one
   | i :: l => .mul (d i) (listProd d l)
 
-private theorem list_prod_unitary_test {ι : Type} {a b : ℕ} {d : ι → Ex (Fin (a + 1) × Fin (b + 1))}
-    (h : ∀ i, U1 (d i)) : ∀ l : List ι, U1 (listProd d l)
+private theorem list_prod_unitary_test
+    {ι : Type} {a b : ℕ} {d : ι → Ex (Fin (a + 1) × Fin (b + 1))} (h : ∀ i, U1 (d i))
+    : ∀ l : List ι, U1 (listProd d l)
   | [] => .one
   | i :: l => .mul (h i) (list_prod_unitary_test h l)
 
-private theorem listProd_ev_zero {ι : Type} {a b : ℕ} {d : ι → Ex (Fin (a + 1) × Fin (b + 1))}
-    (x : Fin (a + 1) × Fin (b + 1) → ℂ) {i : ι} (h0 : (d i).ev x = 0) :
-    ∀ l : List ι, i ∈ l → (listProd d l).ev x = 0
+private theorem listProd_ev_zero
+    {ι : Type} {a b : ℕ} {d : ι → Ex (Fin (a + 1) × Fin (b + 1))}
+    (x : Fin (a + 1) × Fin (b + 1) → ℂ)
+    {i : ι} (h0 : (d i).ev x = 0)
+    : ∀ l : List ι, i ∈ l → (listProd d l).ev x = 0
   | [], h => by simp at h
   | j :: l, h => by
     rcases List.mem_cons.1 h with rfl | h
@@ -34,8 +39,8 @@ private theorem listProd_ev_zero {ι : Type} {a b : ℕ} {d : ι → Ex (Fin (a 
 end UpperTheory.V.Z.Tf.GaloisFromTraceFormula
 
 open scoped Classical in
-theorem UpperTheory.V.Z.Tf.GaloisFromTraceFormula.enlarge :
-    StUnit → EvaluationAtUnitaryOne → SeparatesUnitaryOne → Places → Enlarge := by
+theorem UpperTheory.V.Z.Tf.GaloisFromTraceFormula.enlarge
+    : StUnit → EvaluationAtUnitaryOne → SeparatesUnitaryOne → Places → Enlarge := by
   intro hSt hEv hSep hPl E _ _ _ hunr a b S hS Z T hZ hT hTZ e₁ e₂ I _ u C₁ C₂ hC
   obtain ⟨-, hcp, -, hsec⟩ := hPl E
   have hd : ∀ i, ∃ e, U1 e ∧ ev2 a b (u i) e (C₁ i (u i)) (C₂ i (u i)) = 0 := fun i =>
@@ -54,7 +59,8 @@ theorem UpperTheory.V.Z.Tf.GaloisFromTraceFormula.enlarge :
   have hZns : ∀ w ∈ Z, IsSplitAt w := fun w hw => (hZ w hw).2
   let L : Pl E → List I := fun w => (Finset.univ.filter fun i => u i = w).toList
   let T' : Finset (Pl E) := T ∪ Finset.univ.image u
-  let f₁ : Pl E → Ex (Fin (a + 1) × Fin (b + 1)) := fun w => if w ∈ T then e₁ w else listProd d (L w)
+  let f₁ : Pl E → Ex (Fin (a + 1) × Fin (b + 1)) := fun w =>
+    if w ∈ T then e₁ w else listProd d (L w)
   let f₂ : Pl E → Ex (Fin (a + 1) × Fin (b + 1)) := fun w => if w ∈ T then e₂ w else .one
   have hfU : ∀ w, w ∉ T → U1 (f₁ w) := by
     intro w hw
@@ -82,7 +88,8 @@ theorem UpperTheory.V.Z.Tf.GaloisFromTraceFormula.enlarge :
     have hwT : w ∉ T := fun h => hns (hTns w h)
     exact hf₂ w hwT
   · intro i
-    refine Finset.prod_eq_zero (i := u i) (Finset.mem_union_right _ (Finset.mem_image_of_mem _ (Finset.mem_univ i))) ?_
+    refine Finset.prod_eq_zero (i := u i)
+      (Finset.mem_union_right _ (Finset.mem_image_of_mem _ (Finset.mem_univ i))) ?_
     have : ev2 a b (u i) (f₁ (u i)) (C₁ i (u i)) (C₂ i (u i)) = 0 := by
       simp only [f₁, if_neg (huT i)]
       refine listProd_ev_zero _ (hd0 i) _ ?_
@@ -99,11 +106,15 @@ theorem UpperTheory.V.Z.Tf.GaloisFromTraceFormula.enlarge :
       rcases Finset.mem_union.1 hw with h | h
       · exact absurd h hwT
       obtain ⟨i, -, rfl⟩ := Finset.mem_image.1 h
-      rw [hf₂ _ hwT, hEv E (u i) a b _ (hfU _ hwT) _ _ (hB i).1 (hB i).2.1 (hB i).2.2.1 (hB i).2.2.2]
+      rw [hf₂ _ hwT,
+        hEv E (u i) a b _ (hfU _ hwT) _ _ (hB i).1 (hB i).2.1 (hB i).2.2.1 (hB i).2.2.2]
       simp [ev2, Ex.ev]
   · intro l₁ l₂ φ k
-    have hloc : ∀ (w : Pl E) (Q₁ Q₂ : (w.adicCompletion E)[X]), Q₁.Separable → Q₂.Separable →
-        stTw2 a b w Q₁ Q₂ (fam Z T' φ f₁ f₂ k w) = stTw2 a b w Q₁ Q₂ (fam Z T φ e₁ e₂ k w) := by
+    have hloc
+        : ∀ (w : Pl E) (Q₁ Q₂ : (w.adicCompletion E)[X]),
+          Q₁.Separable → Q₂.Separable
+            → stTw2 a b w Q₁ Q₂ (fam Z T' φ f₁ f₂ k w)
+              = stTw2 a b w Q₁ Q₂ (fam Z T φ e₁ e₂ k w) := by
       intro w Q₁ Q₂ h₁ h₂
       unfold fam
       by_cases hwZ : w ∈ Z
@@ -115,8 +126,8 @@ theorem UpperTheory.V.Z.Tf.GaloisFromTraceFormula.enlarge :
       by_cases hw' : w ∈ T'
       · simp only [if_neg hwT, if_pos hw']
         rw [hf₂ w hwT]
-        exact hSt E hunr w (hT'ns w hw' hwT) a b _
-          (.mul ((hfU w hwT).pow k) ((U1.one).pow k)) Q₁ Q₂ h₁ h₂
+        exact hSt E hunr w (hT'ns w hw' hwT) a b _ (.mul ((hfU w hwT).pow k) ((U1.one).pow k)) Q₁ Q₂
+          h₁ h₂
       · simp only [if_neg hwT, if_neg hw']
     unfold PositivityTheory.Rg.BcB.G8.geomSt2
     refine finsum_mem_congr rfl fun p hp => ?_

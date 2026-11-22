@@ -103,11 +103,11 @@ theorem etaSplit_of (h : Legendre) : EtaSplit := by
   have hA : (area L : ℂ) ≠ 0 := by exact_mod_cast (area_pos L).ne'
   have hD := disc_ne_zero L
   have hDe := disc_eq L
-  have hdet : (det L : ℂ) = ((sgn L : ℤ) : ℂ) * (area L : ℂ) := by
-    exact_mod_cast det_eq_sgn_mul L
+  have hdet : (det L : ℂ) = ((sgn L : ℤ) : ℂ) * (area L : ℂ) := by exact_mod_cast det_eq_sgn_mul L
   set D := L.ω₁ * conj L.ω₂ - L.ω₂ * conj L.ω₁ with hDdef
-  have hpi : ((Real.pi : ℂ) / (area L : ℂ)) * D
-      = -(((sgn L : ℤ) : ℂ) * (2 * (Real.pi : ℂ) * Complex.I)) := by
+  have hpi
+      : ((Real.pi : ℂ) / (area L : ℂ)) * D
+        = -(((sgn L : ℤ) : ℂ) * (2 * (Real.pi : ℂ) * Complex.I)) := by
     rw [hDe, hdet]; field_simp
   have hs2 : s2 L * D = wEta L L.ω₁ * conj L.ω₂ - wEta L L.ω₂ * conj L.ω₁ := by
     rw [s2, ← hDdef]; field_simp
@@ -190,13 +190,13 @@ theorem semi_character_mul : SemiCharMul := by
   intro L x y hx hy
   obtain ⟨m, n, rfl⟩ := PeriodPair.mem_lattice.mp hx
   obtain ⟨m', n', rfl⟩ := PeriodPair.mem_lattice.mp hy
-  have hadd : (m : ℂ) * L.ω₁ + (n : ℂ) * L.ω₂ + ((m' : ℂ) * L.ω₁ + (n' : ℂ) * L.ω₂)
-      = ((m + m' : ℤ) : ℂ) * L.ω₁ + ((n + n' : ℤ) : ℂ) * L.ω₂ := by
+  have hadd
+      : (m : ℂ) * L.ω₁ + (n : ℂ) * L.ω₂ + ((m' : ℂ) * L.ω₁ + (n' : ℂ) * L.ω₂)
+        = ((m + m' : ℤ) : ℂ) * L.ω₁ + ((n + n' : ℤ) : ℂ) * L.ω₂ := by
     push_cast; ring
   rw [hadd, semiChar_coord, semiChar_coord, semiChar_coord, altE_coord, exp_pi_int]
   have hsg := sgn_odd L
-  by_cases h1 : Even m <;> by_cases h2 : Even n <;> by_cases h3 : Even m' <;>
-    by_cases h4 : Even n' <;>
-    simp [Int.even_add, Int.even_sub, Int.even_mul, h1, h2, h3, h4, hsg]
+  by_cases h1 : Even m <;> by_cases h2 : Even n <;> by_cases h3 : Even m' <;> by_cases h4 : Even n'
+    <;> simp [Int.even_add, Int.even_sub, Int.even_mul, h1, h2, h3, h4, hsg]
 
 end Formalism.L2.Th1.F

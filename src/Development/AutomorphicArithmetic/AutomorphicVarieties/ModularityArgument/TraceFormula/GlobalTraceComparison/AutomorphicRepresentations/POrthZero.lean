@@ -6,7 +6,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi UpperTheory.Zero.ConvolutionTheory.EB
-open NumberField MeasureTheory GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.Desc
+open NumberField MeasureTheory GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.BcB
+  PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.Desc
 
 attribute [local instance] PositivityTheory.Rg.BcB.E.borelH
 
@@ -34,8 +35,8 @@ private theorem bump_one {s : ℝ} (h : s ∈ Set.Ioo (-1 : ℝ) 1) : bump s = 1
 end UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.OZ
 
 open UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.OZ in
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.orthZero_pf :
-    Basic → AeEq → WtInd → OrthZero := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.orthZero_pf
+    : Basic → AeEq → WtInd → OrthZero := by
   intro hB hA _ E _ _ _ n hn D π _ f hf hS ho
   obtain ⟨hl, hmul, -⟩ := hB E n hn
   obtain ⟨hfc, hfr, hfs, -⟩ := hf
@@ -46,9 +47,11 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.orthZero_pf :
     induction hg using Submodule.span_induction with
     | mem g hg =>
       obtain ⟨ψ, hψ, u, hu, hus, he⟩ := hg ()
-      have hz := ho ψ hψ (fun s => starRingEnd ℂ (u s) * bump s)
-        ((Complex.continuous_conj.comp hu).mul bump_cont)
-        ((hus.comp_left (g := starRingEnd ℂ) (map_zero _)).mul_right)
+      have hz :=
+        ho ψ hψ
+          (fun s => starRingEnd ℂ (u s) * bump s)
+          ((Complex.continuous_conj.comp hu).mul bump_cont)
+          ((hus.comp_left (g := starRingEnd ℂ) (map_zero _)).mul_right)
       rw [PiLp.inner_apply]
       simp only [Finset.univ_unique, Finset.sum_singleton]
       rw [L2.inner_def]
@@ -62,11 +65,14 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.orthZero_pf :
     | zero => simp
     | add x y _ _ hx hy => rw [inner_add_left, hx, hy, add_zero]
     | smul r x _ hx => rw [inner_smul_left, hx, mul_zero]
-  have hv0 : v = 0 := inner_self_eq_zero.1
-    ((Submodule.mem_orthogonal _ _).1 horth v hv)
+  have hv0 : v = 0 := inner_self_eq_zero.1 ((Submodule.mem_orthogonal _ _).1 horth v hv)
   have hlat : ∀ x : H E n 0, ldet x ∈ Set.Ioo (-1 : ℝ) 1 → f x.1 = 0 := by
-    refine hA E n D (fun x => f x.1) (fun _ => 0) (Set.Ioo (-1 : ℝ) 1) (hfc.comp continuous_fst)
-      continuous_const ?_ (fun _ _ => rfl) isOpen_Ioo ?_
+    refine hA E n D
+      (fun x => f x.1)
+      (fun _ => 0)
+      (Set.Ioo (-1 : ℝ) 1) (hfc.comp continuous_fst) continuous_const ?_
+      (fun _ _ => rfl)
+      isOpen_Ioo ?_
     · intro γ x
       obtain ⟨⟨a, b⟩, hab⟩ := γ.2
       have h1 : (γ : H E n 0).1 = ratGL E n a := by rw [← hab]; rfl
@@ -79,9 +85,9 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.orthZero_pf :
       rw [h2] at h1
       simpa [bump_one h3] using h1.symm
   funext g
-  have hx := hlat (ac E n (-ldet ((g, 1) : H E n 0)) * (g, 1)) (by
-    rw [hmul, hl]; simp)
-  have : (ac E n (-ldet ((g, 1) : H E n 0)) * (g, 1) : H E n 0).1 =
-      splitCentre E n (-ldet ((g, 1) : H E n 0) / (n * Module.finrank ℚ E)) * g := rfl
+  have hx := hlat (ac E n (- ldet ((g, 1) : H E n 0)) * (g, 1)) (by rw [hmul, hl]; simp)
+  have : (ac E n (- ldet ((g, 1) : H E n 0)) * (g, 1) : H E n 0).1
+      = splitCentre E n (- ldet ((g, 1) : H E n 0) / (n * Module.finrank ℚ E)) * g :=
+    rfl
   rw [this, hfs] at hx
   exact hx

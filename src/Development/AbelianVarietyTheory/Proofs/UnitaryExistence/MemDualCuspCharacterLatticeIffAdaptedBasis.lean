@@ -13,16 +13,19 @@ public import Development.AbelianVarietyTheory.Statements.HyperbolicHypotheses.H
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
-open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.Frames GlobalTheory.FrameUnif
+open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
+open AlgebraicGeometry CategoryTheory Limits ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.Frames GlobalTheory.FrameUnif
 open scoped Matrix nonZeroDivisors
 
 namespace GlobalTheory
 
-theorem mem_crdI_one_iff_of_adapted {E : Type} [Field E] [NumberField E] [IsCMField E] {r ρ : ℕ}
-    {X : Data E r} (cu : FJ.CuspFD X ρ) (cc' : Fin ρ → FractionalIdeal (𝓞 E)⁰ E)
-    (h : ∀ a : Fin ρ → E, (∑ b, a b • cu.e b) ∈ X.Λ ↔ ∀ b, a b ∈ cc' b) (v : Fin ρ → E) :
-    v ∈ FJ.crdI 1 cu ↔ ∀ b, v b ∈ cc' b := by
+theorem mem_crdI_one_iff_of_adapted
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {r ρ : ℕ} {X : Data E r} (cu : FJ.CuspFD X ρ) (cc' : Fin ρ → FractionalIdeal (𝓞 E)⁰ E)
+    (h : ∀ a : Fin ρ → E, (∑ b, a b • cu.e b) ∈ X.Λ ↔ ∀ b, a b ∈ cc' b) (v : Fin ρ → E)
+    : v ∈ FJ.crdI 1 cu ↔ ∀ b, v b ∈ cc' b := by
   constructor
   · intro hv
     unfold FJ.crdI at hv
@@ -33,20 +36,35 @@ theorem mem_crdI_one_iff_of_adapted {E : Type} [Field E] [NumberField E] [IsCMFi
       obtain ⟨o, rfl⟩ := (FractionalIdeal.mem_one_iff (𝓞 E)⁰).1 (FractionalIdeal.mem_coe.1 ha)
       rw [algebraMap_smul]
       exact X.Λ.smul_mem o hx.1
-    | zero => exact fun b => (cc' b).zero_mem
+    | zero =>
+      exact fun b => (cc' b).zero_mem
     | add x y _ _ hx hy =>
-      exact fun b => FractionalIdeal.mem_coe.1
-        (Submodule.add_mem _ (FractionalIdeal.mem_coe.2 (hx b)) (FractionalIdeal.mem_coe.2 (hy b)))
+      exact fun b =>
+        FractionalIdeal.mem_coe.1 (Submodule.add_mem _ (FractionalIdeal.mem_coe.2 (hx b))
+          (FractionalIdeal.mem_coe.2 (hy b)))
     | smul c x _ hx =>
-      exact fun b => FractionalIdeal.mem_coe.1
-        (Submodule.smul_mem _ c (FractionalIdeal.mem_coe.2 (hx b)))
+      exact fun b =>
+        FractionalIdeal.mem_coe.1 (Submodule.smul_mem _ c (FractionalIdeal.mem_coe.2 (hx b)))
   · intro hv
-    refine Submodule.subset_span ⟨1, FractionalIdeal.mem_coe.2 (FractionalIdeal.one_mem_one _),
-      ∑ i, v i • cu.e i, ⟨(h v).2 hv, ?_⟩, one_smul _ _⟩
+    refine Submodule.subset_span ⟨
+      1,
+      FractionalIdeal.mem_coe.2 (FractionalIdeal.one_mem_one _),
+      ∑ i, v i • cu.e i,
+      ⟨(h v).2 hv, ?_⟩,
+      one_smul _ _
+    ⟩
     exact (show ∑ i, v i • cu.e i ∈ Submodule.span E (Set.range cu.e) from
       sum_mem fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩))
 
-theorem mem_dualOE_xcFD_one_iff_of_adapted : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r ρ : ℕ) (X : Data E r) (cu : FJ.CuspFD X ρ) (cc' : Fin ρ → FractionalIdeal (𝓞 E)⁰ E), (∀ a : Fin ρ → E, (∑ b, a b • cu.e b) ∈ X.Λ ↔ ∀ b, a b ∈ cc' b) → ∀ u : Fin ρ → E, u ∈ FJ.dualOE (FJ.XcFD 1 cu) ↔ ∀ a (y : E), (∀ a' ∈ cc' a, ∃ n : ℤ, Algebra.trace ℚ E (y * a') = n) → u a * y ∈ Set.range (algebraMap (𝓞 E) E) := by
+theorem mem_dualOE_xcFD_one_iff_of_adapted
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r ρ : ℕ) (X : Data E r)
+        (cu : FJ.CuspFD X ρ) (cc' : Fin ρ → FractionalIdeal (𝓞 E)⁰ E),
+      (∀ a : Fin ρ → E, (∑ b, a b • cu.e b) ∈ X.Λ ↔ ∀ b, a b ∈ cc' b)
+        → ∀ u : Fin ρ → E,
+          u ∈ FJ.dualOE (FJ.XcFD 1 cu)
+            ↔ ∀ a (y : E),
+              (∀ a' ∈ cc' a, ∃ n : ℤ, Algebra.trace ℚ E (y * a') = n)
+                → u a * y ∈ Set.range (algebraMap (𝓞 E) E) := by
   intro E _ _ _ r ρ X cu cc' h u
   have hc := mem_crdI_one_iff_of_adapted cu cc' h
   constructor
@@ -77,7 +95,8 @@ theorem mem_dualOE_xcFD_one_iff_of_adapted : ∀ (E : Type) [Field E] [NumberFie
       rw [hn]
       congr 1
       simp [Pi.single_apply]
-    | zero => simp
+    | zero =>
+      simp
     | add x y _ _ hx hy =>
       simp only [Pi.add_apply, mul_add, Finset.sum_add_distrib]
       exact add_mem hx hy
@@ -85,7 +104,8 @@ theorem mem_dualOE_xcFD_one_iff_of_adapted : ∀ (E : Type) [Field E] [NumberFie
       have e : ∑ i, u i * (c • x) i = algebraMap (𝓞 E) E c * ∑ i, u i * x i := by
         rw [Finset.mul_sum]
         refine Finset.sum_congr rfl fun i _ => ?_
-        rw [Pi.smul_apply, Algebra.smul_def]; ring
+        rw [Pi.smul_apply, Algebra.smul_def]
+        ring
       rw [e]
       exact mul_mem ⟨c, rfl⟩ hx
 

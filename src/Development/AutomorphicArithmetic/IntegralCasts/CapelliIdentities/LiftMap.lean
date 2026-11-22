@@ -4,9 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qk56.lift_map :
-    ∀ {α β : Type} (f : α → β) (B : Multiset α)
-    (t : Multiset β), (∀ x ∈ t, x ∈ Multiset.map f B) → ∃ (t' : Multiset α), Multiset.map f t' = t ∧ ∀ x ∈ t', x ∈ B := by
+theorem UpperTheory.Reformulated.B.Qk56.lift_map
+    : ∀ {α β : Type} (f : α → β) (B : Multiset α) (t : Multiset β),
+      (∀ x ∈ t, x ∈ Multiset.map f B)
+        → ∃ (t' : Multiset α), Multiset.map f t' = t ∧ ∀ x ∈ t', x ∈ B := by
   intro α β f B t
   induction t using Multiset.induction_on with
   | empty => exact fun _ => ⟨0, Multiset.map_zero f, fun x hx => absurd hx (Multiset.notMem_zero x)⟩

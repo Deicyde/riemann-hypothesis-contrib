@@ -10,19 +10,24 @@ open scoped ENNReal NNReal
 
 namespace GlobalTheory.CompanionTheory.QuotVan
 
-def HaarNM : Prop := ∀ {Q : Type} [Group Q] [TopologicalSpace Q] [IsTopologicalGroup Q]
-  [LocallyCompactSpace Q] [SecondCountableTopology Q] [T2Space Q] [MeasurableSpace Q] [BorelSpace Q]
-  (νQ : Measure Q) [νQ.IsHaarMeasure] (N M : Subgroup Q) [N.Normal]
-  (_ : IsClosed (N : Set Q)) (_ : IsClosed (M : Set Q))
-  (_ : ∀ q : Q, ∃ u ∈ N, ∃ m ∈ M, q = u * m) (_ : N ⊓ M = ⊥)
-  (νN : Measure N) [νN.IsHaarMeasure] (νM : Measure M) [νM.IsHaarMeasure],
-  ∃ δ : M → ℝ≥0∞, Measurable δ ∧ (∀ m, δ m ≠ ∞) ∧
-    νQ = ((νN.prod νM).withDensity fun p => δ p.2).map (fun p : N × M => (p.1 : Q) * (p.2 : Q))
+def HaarNM : Prop :=
+  ∀ {Q : Type} [Group Q] [TopologicalSpace Q] [IsTopologicalGroup Q] [LocallyCompactSpace Q]
+      [SecondCountableTopology Q] [T2Space Q] [MeasurableSpace Q] [BorelSpace Q] (νQ : Measure Q)
+      [νQ.IsHaarMeasure] (N M : Subgroup Q) [N.Normal] (_ : IsClosed (N : Set Q))
+      (_ : IsClosed (M : Set Q)) (_ : ∀ q : Q, ∃ u ∈ N, ∃ m ∈ M, q = u * m) (_ : N ⊓ M = ⊥)
+      (νN : Measure N) [νN.IsHaarMeasure] (νM : Measure M) [νM.IsHaarMeasure],
+    ∃ δ : M → ℝ≥0∞,
+      Measurable δ ∧ (∀ m, δ m ≠ ∞)
+        ∧ νQ
+          = ((νN.prod νM).withDensity fun p => δ p.2).map (fun p : N × M => (p.1 : Q) * (p.2 : Q))
 
-theorem map_withDensity_eq_of_scale {X : Type*} [MeasurableSpace X] (ρ : Measure X) (S : X → X)
-    (hS : Measurable S) (f : X → ℝ≥0∞) (hf : Measurable f) (a : ℝ≥0∞) (ha0 : a ≠ 0) (hat : a ≠ ∞)
-    (hρ : ρ.map S = a • ρ) (hfS : ∀ x, f (S x) = a * f x) :
-    (ρ.withDensity f).map S = ρ.withDensity f := by
+theorem map_withDensity_eq_of_scale
+    {X : Type*} [MeasurableSpace X]
+    (ρ : Measure X)
+    (S : X → X) (hS : Measurable S)
+    (f : X → ℝ≥0∞) (hf : Measurable f)
+    (a : ℝ≥0∞) (ha0 : a ≠ 0) (hat : a ≠ ∞) (hρ : ρ.map S = a • ρ) (hfS : ∀ x, f (S x) = a * f x)
+    : (ρ.withDensity f).map S = ρ.withDensity f := by
   ext A hA
   rw [map_apply hS hA, withDensity_apply _ (hS hA), withDensity_apply _ hA]
   have key : ∫⁻ x, (A.indicator f) x ∂(ρ.map S) = a * ∫⁻ x, A.indicator f x ∂ρ := by
@@ -36,7 +41,8 @@ theorem map_withDensity_eq_of_scale {X : Type*} [MeasurableSpace X] (ρ : Measur
     · have hx' : x ∉ S ⁻¹' A := hx
       rw [Set.indicator_of_notMem hx, Set.indicator_of_notMem hx', mul_zero]
   rw [h2, lintegral_const_mul _ (hf.indicator (hS hA)), lintegral_indicator (hS hA),
-    lintegral_indicator hA] at key
+      lintegral_indicator hA]
+    at key
   exact (ENNReal.mul_right_inj ha0 hat).1 key
 
 section
@@ -53,27 +59,27 @@ noncomputable def conjCE (N : Subgroup Q) [N.Normal] (g : Q) : N ≃ₜ* N where
     have : Continuous fun u : N => g⁻¹ * (u : Q) * g⁻¹⁻¹ := by fun_prop
     exact this
 
-theorem conjCE_coe (N : Subgroup Q) [N.Normal] (g : Q) (u : N) :
-    ((conjCE N g u : N) : Q) = g * u * g⁻¹ := rfl
+theorem conjCE_coe (N : Subgroup Q) [N.Normal] (g : Q) (u : N)
+    : ((conjCE N g u : N) : Q) = g * u * g⁻¹ :=
+  rfl
 
-theorem conjCE_mul (N : Subgroup Q) [N.Normal] (g h : Q) :
-    conjCE N (g * h) = (conjCE N h).trans (conjCE N g) := by
+theorem conjCE_mul (N : Subgroup Q) [N.Normal] (g h : Q)
+    : conjCE N (g * h) = (conjCE N h).trans (conjCE N g) := by
   ext u
   simp [conjCE_coe, mul_assoc]
 
 variable [MeasurableSpace Q] [BorelSpace Q] [SecondCountableTopology Q] [T2Space Q]
-variable (N M : Subgroup Q) [N.Normal] [LocallyCompactSpace N] [SecondCountableTopology N]
-  [SecondCountableTopology M]
+variable
+  (N M : Subgroup Q)
+  [N.Normal] [LocallyCompactSpace N] [SecondCountableTopology N] [SecondCountableTopology M]
 
-noncomputable def modInv (m : M) : ℝ≥0∞ :=
-  ((mulEquivHaarChar (conjCE N (m : Q)) : ℝ≥0) : ℝ≥0∞)⁻¹
+noncomputable def modInv (m : M) : ℝ≥0∞ := ((mulEquivHaarChar (conjCE N (m : Q)) : ℝ≥0) : ℝ≥0∞)⁻¹
 
 theorem modInv_ne_top (m : M) : modInv N M m ≠ ∞ := by
   have h := (mulEquivHaarChar_pos (conjCE N (m : Q))).ne'
   simp [modInv, h]
 
-theorem modInv_ne_zero (m : M) : modInv N M m ≠ 0 := by
-  simp [modInv]
+theorem modInv_ne_zero (m : M) : modInv N M m ≠ 0 := by simp [modInv]
 
 theorem modInv_mul (m m' : M) : modInv N M (m * m') = modInv N M m * modInv N M m' := by
   have h1 := (mulEquivHaarChar_pos (conjCE N (m : Q))).ne'
@@ -81,8 +87,8 @@ theorem modInv_mul (m m' : M) : modInv N M (m * m') = modInv N M m * modInv N M 
   simp only [modInv, Subgroup.coe_mul, conjCE_mul, mulEquivHaarChar_trans, ENNReal.coe_mul]
   rw [ENNReal.mul_inv (Or.inr ENNReal.coe_ne_top) (Or.inl ENNReal.coe_ne_top), mul_comm]
 
-theorem map_conj (ν : Measure N) [ν.IsHaarMeasure] (m : M) :
-    ν.map (conjCE N (m : Q)) = modInv N M m • ν := by
+theorem map_conj (ν : Measure N) [ν.IsHaarMeasure] (m : M)
+    : ν.map (conjCE N (m : Q)) = modInv N M m • ν := by
   obtain ⟨K, hK, hK1⟩ := exists_compact_mem_nhds (1 : N)
   haveI : ν.Regular := regular_of_isMulLeftInvariant hK ⟨1, mem_interior_iff_mem_nhds.2 hK1⟩
     hK.measure_lt_top.ne
@@ -98,8 +104,7 @@ theorem measurable_modInv : Measurable (modInv N M) := by
   obtain ⟨K, hK, hK1⟩ := exists_compact_mem_nhds (1 : N)
   have hs : IsOpen (interior K) := isOpen_interior
   have hs0 : ν (interior K) ≠ 0 := (hs.measure_pos ν ⟨1, mem_interior_iff_mem_nhds.2 hK1⟩).ne'
-  have hst : ν (interior K) ≠ ∞ :=
-    ((measure_mono interior_subset).trans_lt hK.measure_lt_top).ne
+  have hst : ν (interior K) ≠ ∞ := ((measure_mono interior_subset).trans_lt hK.measure_lt_top).ne
   let F : M × N → N := fun p => conjCE N (p.1 : Q) p.2
   have hF : Continuous F := by
     refine continuous_induced_rng.2 ?_
@@ -117,11 +122,13 @@ theorem measurable_modInv : Measurable (modInv N M) := by
   rw [he]
   exact hm.div_const _
 
-theorem map_translate (νN : Measure N) [νN.IsHaarMeasure] (νM : Measure M) [νM.IsHaarMeasure]
-    [LocallyCompactSpace M] (u : N) (m : M) :
-    ((νN.prod νM).withDensity fun p => modInv N M p.2).map
-        (fun p : N × M => (u * conjCE N (m : Q) p.1, m * p.2)) =
-      (νN.prod νM).withDensity fun p => modInv N M p.2 := by
+theorem map_translate
+    (νN : Measure N) [νN.IsHaarMeasure]
+    (νM : Measure M) [νM.IsHaarMeasure] [LocallyCompactSpace M]
+    (u : N) (m : M)
+    : ((νN.prod νM).withDensity fun p => modInv N M p.2).map
+        (fun p : N × M => (u * conjCE N (m : Q) p.1, m * p.2))
+      = (νN.prod νM).withDensity fun p => modInv N M p.2 := by
   have hS1 : Measurable fun x : N => u * conjCE N (m : Q) x :=
     (continuous_const.mul (map_continuous _)).measurable
   have hS2 : Measurable fun x : M => m * x := (continuous_const.mul continuous_id).measurable
@@ -143,8 +150,8 @@ theorem map_translate (νN : Measure N) [νN.IsHaarMeasure] (νM : Measure M) [�
 
 end
 
-theorem mulMap_injective {Q : Type} [Group Q] (N M : Subgroup Q) (hinf : N ⊓ M = ⊥) :
-    Function.Injective (fun p : N × M => (p.1 : Q) * (p.2 : Q)) := by
+theorem mulMap_injective {Q : Type} [Group Q] (N M : Subgroup Q) (hinf : N ⊓ M = ⊥)
+    : Function.Injective (fun p : N × M => (p.1 : Q) * (p.2 : Q)) := by
   rintro ⟨u, m⟩ ⟨u', m'⟩ h
   have h' : (u : Q) * m = u' * m' := h
   have h1 : (u' : Q)⁻¹ * u = m' * (m : Q)⁻¹ := by
@@ -196,8 +203,9 @@ theorem haarNM : HaarNM := by
   have hν0 : ν' Set.univ ≠ 0 := by
     intro h0
     rw [φemb.map_apply, Set.preimage_univ] at h0
-    have hac : (νN.prod νM) ≪ ρ := withDensity_absolutelyContinuous' hf.aemeasurable
-      (Filter.Eventually.of_forall fun p => modInv_ne_zero N M p.2)
+    have hac : (νN.prod νM) ≪ ρ :=
+      withDensity_absolutelyContinuous' hf.aemeasurable
+        (Filter.Eventually.of_forall fun p => modInv_ne_zero N M p.2)
     exact (isOpen_univ.measure_pos (νN.prod νM) Set.univ_nonempty).ne' (hac h0)
   obtain ⟨n, hn⟩ : ∃ n, ν' (spanningSets (ν' + νQ) n) ≠ 0 := by
     by_contra! h
@@ -209,8 +217,12 @@ theorem haarNM : HaarNM := by
   have hc : νQ (spanningSets (ν' + νQ) n) / ν' (spanningSets (ν' + νQ) n) ≠ ∞ :=
     ENNReal.div_ne_top h2.ne hn
   generalize νQ (spanningSets (ν' + νQ) n) / ν' (spanningSets (ν' + νQ) n) = c at key hc
-  refine ⟨fun m => c * modInv N M m, (measurable_modInv N M).const_mul c,
-    fun m => ENNReal.mul_ne_top hc (modInv_ne_top N M m), key.trans ?_⟩
+  refine ⟨
+    fun m => c * modInv N M m,
+    (measurable_modInv N M).const_mul c,
+    fun m => ENNReal.mul_ne_top hc (modInv_ne_top N M m),
+    key.trans ?_
+  ⟩
   have h3 : (fun p : N × M => c * modInv N M p.2) = c • f := rfl
   rw [h3, withDensity_smul c hf, Measure.map_smul]
   exact φc.measurable.aemeasurable

@@ -6,7 +6,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 private lemma pk_mem {d : ℕ} {I : Finset (Fin (d + 1))} (h : I.Nonempty) : pk I ∈ I := by
@@ -34,8 +35,11 @@ private lemma prod_split {F : Type} [Field F] {d : ℕ} (x : Fin (d + 1) → Fˣ
   exact Finset.prod_congr rfl fun m _ => (div_mul_cancel₀ _ (x i).ne_zero).symm
 
 section
-variable {F : Type} (K : Type) [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K] [IsScalarTower ℂ F K]
-  {d : ℕ} (x : Fin (d + 1) → Fˣ) (a : ℕ)
+variable
+  {F : Type} (K : Type)
+  [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K] [IsScalarTower ℂ F K]
+  {d : ℕ} (x : Fin (d + 1) → Fˣ)
+  (a : ℕ)
 
 private lemma act_tmul (f g : F) (k : K) (w : DR ℂ K) :
     (sysP K x a).act (f ⊗ₜ k) (g ⊗ₜ w) = (f * g) ⊗ₜ (k • w) := by
@@ -51,24 +55,34 @@ private lemma Y_val (i : Fin (d + 1)) : (((sysP K x a).Y i : (F ⊗[ℂ] K)ˣ) :
 
 end
 
-theorem UpperTheory.Gal.productCup_of_system.pTheta_of :
-    MJ → ThMu → ThMuLat → KapInd → LatA → ActsLin → GoodZ → SysBasic → SysOk → PTheta := by
+theorem UpperTheory.Gal.productCup_of_system.pTheta_of
+    : MJ → ThMu → ThMuLat → KapInd → LatA → ActsLin → GoodZ → SysBasic → SysOk → PTheta := by
   intro hMJ hTh hLat hKap hLA hAL hG hSB _ F K _ _ _ _ _ _ d x hc a p β hβ
   have hU := wdUni_of
-  have hl : ∀ {A B : Type} [LinearOrder A] [LinearOrder B] (b : Finset A) (L : Finset B), lft (uni b L) = b :=
-    fun {A B} _ _ b L => (hU A B ℂ (fun _ => 0) (fun _ => 0) b L).2.1
-  have hr : ∀ {A B : Type} [LinearOrder A] [LinearOrder B] (b : Finset A) (L : Finset B), rgt (uni b L) = L :=
-    fun {A B} _ _ b L => (hU A B ℂ (fun _ => 0) (fun _ => 0) b L).2.2.1
-  have hcard : ∀ {A B : Type} [LinearOrder A] [LinearOrder B] (b : Finset A) (L : Finset B),
-      (uni b L).card = b.card + L.card :=
-    fun {A B} _ _ b L => (hU A B ℂ (fun _ => 0) (fun _ => 0) b L).2.2.2.1
-  have hlr : ∀ {A B : Type} [LinearOrder A] [LinearOrder B] (s : Finset (A ⊕ₗ B)), uni (lft s) (rgt s) = s :=
-    fun {A B} _ _ s => (hU A B ℂ (fun _ => 0) (fun _ => 0) ∅ ∅).2.2.2.2 s
+  have hl
+      : ∀ {A B : Type} [LinearOrder A] [LinearOrder B] (b : Finset A) (L : Finset B),
+        lft (uni b L) = b := fun {A B} _ _ b L =>
+    (hU A B ℂ (fun _ => 0) (fun _ => 0) b L).2.1
+  have hr
+      : ∀ {A B : Type} [LinearOrder A] [LinearOrder B] (b : Finset A) (L : Finset B),
+        rgt (uni b L) = L := fun {A B} _ _ b L =>
+    (hU A B ℂ (fun _ => 0) (fun _ => 0) b L).2.2.1
+  have hcard
+      : ∀ {A B : Type} [LinearOrder A] [LinearOrder B] (b : Finset A) (L : Finset B),
+        (uni b L).card = b.card + L.card := fun {A B} _ _ b L =>
+    (hU A B ℂ (fun _ => 0) (fun _ => 0) b L).2.2.2.1
+  have hlr
+      : ∀ {A B : Type} [LinearOrder A] [LinearOrder B] (s : Finset (A ⊕ₗ B)),
+        uni (lft s) (rgt s) = s := fun {A B} _ _ s =>
+    (hU A B ℂ (fun _ => 0) (fun _ => 0) ∅ ∅).2.2.2.2 s
   have hGood : (sysP K x a).Good := (hG F K d x hc a).2.1
-  have hβC : ∀ J, β J ∈ (if J.Nonempty ∧ (J.card : ℤ) = (p : ℤ) + 1 then omB ℂ K (rB ℂ K (xv x) J) a else ⊥) :=
+  have hβC
+      : ∀ J,
+        β J
+          ∈ (if J.Nonempty ∧ (J.card : ℤ) = (p : ℤ) + 1 then omB ℂ K (rB ℂ K (xv x) J) a else ⊥) :=
     fun J => hβ.1 J (Set.mem_univ J)
   set b : Finset (Fin (d + 1)) → F ⊗[ℂ] DR ℂ K := fun J => (1 : F) ⊗ₜ[ℂ] β J with hbdef
-  have hb0 : ∀ J, ¬ (J.Nonempty ∧ J.card = p + 1) → b J = 0 := by
+  have hb0 : ∀ J, ¬(J.Nonempty ∧ J.card = p + 1) → b J = 0 := by
     intro J hJ
     have h := hβC J
     rw [if_neg (by rintro ⟨h1, h2⟩; exact hJ ⟨h1, by exact_mod_cast h2⟩)] at h
@@ -82,23 +96,28 @@ theorem UpperTheory.Gal.productCup_of_system.pTheta_of :
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, map_zero] at h2
     rw [← h2]
-    exact Finset.sum_congr rfl fun i _ => by simp only [hbdef, Units.smul_def, map_zsmul, TensorProduct.mk_apply]
+    exact Finset.sum_congr rfl fun i _ => by
+      simp only [hbdef, Units.smul_def, map_zsmul, TensorProduct.mk_apply]
   have hb2 : ∀ J, J.card ≠ p + 1 → b J = 0 := fun J hJ => hb0 J fun h => hJ h.2
-  have hθ0 : ∀ (I : Finset (Fin (d + 1))) (L : Finset (Mi d)), I.card + L.card ≠ d + 1 →
-      detC (sysP K x a).rowMu (uni I L) = 0 := by
+  have hθ0
+      : ∀ (I : Finset (Fin (d + 1))) (L : Finset (Mi d)),
+        I.card + L.card ≠ d + 1 → detC (sysP K x a).rowMu (uni I L) = 0 := by
     intro I L h
     unfold detC
     rw [dite_eq_right (by rw [hcard]; exact h)]
   have hθe : ∀ L : Finset (Mi d), detC (sysP K x a).rowMu (uni ∅ L) = 0 :=
     (hTh d _ _ (sysP K x a)).2.1
-  have hval : ∀ (I J : Finset (Fin (d + 1))) (L : Finset (Mi d)),
-      (sysP K x a).mj p (detC (sysP K x a).rowMu) b (uni (uni I J) L) =
-        ((-1 : ℤ) ^ ((p + 1) * L.card)) • (sysP K x a).act (detC (sysP K x a).rowMu (uni I L)) (b J) := by
+  have hval
+      : ∀ (I J : Finset (Fin (d + 1))) (L : Finset (Mi d)),
+        (sysP K x a).mj p (detC (sysP K x a).rowMu) b (uni (uni I J) L)
+          = ((-1 : ℤ) ^ ((p + 1) * L.card))
+            • (sysP K x a).act (detC (sysP K x a).rowMu (uni I L)) (b J) := by
     intro I J L
     simp only [Sys.mj, hl, hr]
-  have hzero : ∀ (I J : Finset (Fin (d + 1))) (L : Finset (Mi d)),
-      (I = ∅ ∨ ¬ (J.Nonempty ∧ J.card = p + 1) ∨ I.card + L.card ≠ d + 1) →
-      (sysP K x a).mj p (detC (sysP K x a).rowMu) b (uni (uni I J) L) = 0 := by
+  have hzero
+      : ∀ (I J : Finset (Fin (d + 1))) (L : Finset (Mi d)),
+        (I = ∅ ∨ ¬(J.Nonempty ∧ J.card = p + 1) ∨ I.card + L.card ≠ d + 1)
+          → (sysP K x a).mj p (detC (sysP K x a).rowMu) b (uni (uni I J) L) = 0 := by
     intro I J L h
     rw [hval]
     rcases h with rfl | h | h
@@ -124,22 +143,26 @@ theorem UpperTheory.Gal.productCup_of_system.pTheta_of :
             have hbJ : β J ∈ omB ℂ K (rB ℂ K (xv x) J) a := by
               have h := hβC J
               rwa [if_pos ⟨hJ, by exact_mod_cast hJc⟩] at h
-            have hcompl : Iᶜ.card = L.card := by
-              rw [Finset.card_compl, Fintype.card_fin]; omega
+            have hcompl : Iᶜ.card = L.card := by rw [Finset.card_compl, Fintype.card_fin]; omega
             have hfm := lat_mem hLA x hc.pd I (pk I) hi
             have hsplit := prod_split x I (pk I)
             generalize (∏ m ∈ Iᶜ, ((x m : F) / x (pk I))) = f at hfm hsplit
             have hm : f ⊗ₜ[ℂ] β J ∈ (sysP K x a).M I J := Submodule.apply_mem_map₂ _ hfm hbJ
             have hm' := hGood.stab I J hI hJ s hs _ hm
-            have hXprod : ∏ m ∈ Iᶜ, (((sysP K x a).X m : (F ⊗[ℂ] K)ˣ) : F ⊗[ℂ] K) =
-                (f ⊗ₜ (1 : K)) * (((sysP K x a).X (pk I) : (F ⊗[ℂ] K)ˣ) : F ⊗[ℂ] K) ^ L.card := by
+            have hXprod
+                : ∏ m ∈ Iᶜ, (((sysP K x a).X m : (F ⊗[ℂ] K)ˣ) : F ⊗[ℂ] K)
+                  = (f ⊗ₜ (1 : K))
+                    * (((sysP K x a).X (pk I) : (F ⊗[ℂ] K)ˣ) : F ⊗[ℂ] K) ^ L.card := by
               have e := congrArg (Algebra.TensorProduct.includeLeftRingHom : F →+* F ⊗[ℂ] K) hsplit
               rw [map_prod, map_mul, map_pow, hcompl] at e
               exact e
-            have hU' : (((∏ l ∈ L, (sysP K x a).u n11 (pk I) (pk J) l : (F ⊗[ℂ] K)ˣ)) : F ⊗[ℂ] K) =
-                (((sysP K x a).X (pk I) : (F ⊗[ℂ] K)ˣ) : F ⊗[ℂ] K) ^ L.card *
-                  (((sysP K x a).Y (pk J) : (F ⊗[ℂ] K)ˣ) : F ⊗[ℂ] K) ^ L.card := by
-              have : ∀ l : Mi d, (sysP K x a).u n11 (pk I) (pk J) l = (sysP K x a).X (pk I) * (sysP K x a).Y (pk J) := by
+            have hU'
+                : (((∏ l ∈ L, (sysP K x a).u n11 (pk I) (pk J) l : (F ⊗[ℂ] K)ˣ)) : F ⊗[ℂ] K)
+                  = (((sysP K x a).X (pk I) : (F ⊗[ℂ] K)ˣ) : F ⊗[ℂ] K) ^ L.card
+                    * (((sysP K x a).Y (pk J) : (F ⊗[ℂ] K)ˣ) : F ⊗[ℂ] K) ^ L.card := by
+              have : ∀ l : Mi d,
+                  (sysP K x a).u n11 (pk I) (pk J) l
+                    = (sysP K x a).X (pk I) * (sysP K x a).Y (pk J) := by
                 intro l; simp [Sys.u, n11]
               simp only [this, Finset.prod_const, mul_pow, Units.val_mul, Units.val_pow_eq_pow_val]
             have hact : (sysP K x a).act (f ⊗ₜ (1 : K)) (b J) = f ⊗ₜ[ℂ] β J := by
@@ -147,7 +170,8 @@ theorem UpperTheory.Gal.productCup_of_system.pTheta_of :
             rw [hval]
             apply zsmul_mem
             refine ⟨(sysP K x a).act s (f ⊗ₜ[ℂ] β J), hm', ?_⟩
-            rw [hdet, hXprod, hU', ← hact, ← Module.End.mul_apply, ← map_mul, ← Module.End.mul_apply, ← map_mul]
+            rw [hdet, hXprod, hU', ← hact, ← Module.End.mul_apply, ← map_mul,
+              ← Module.End.mul_apply, ← map_mul]
             congr 2
             ring
           · rw [hzero I J L (Or.inr (Or.inl fun h => hJc h.2))]
@@ -156,7 +180,8 @@ theorem UpperTheory.Gal.productCup_of_system.pTheta_of :
             refine hzero I J L ?_
             by_cases hJc : J.card = p + 1
             · refine Or.inr (Or.inr fun h => hL ?_)
-              push_cast [hJc]; omega
+              push_cast [hJc]
+              omega
             · exact Or.inr (Or.inl fun h => hJc h.2)
           rw [this]
           exact Submodule.zero_mem _
@@ -182,9 +207,12 @@ theorem UpperTheory.Gal.productCup_of_system.pTheta_of :
       obtain ⟨i, rfl⟩ := Finset.card_eq_one.1 hI
       obtain ⟨τ, hτ⟩ := hc.exists_isTop
       have h5 := (hAL F K d x hc τ hτ a).2.2.2.2.1
-      have hk := hKap F K d x hc _ _ (sysP K x a)
-        (Algebra.TensorProduct.productMap (IsScalarTower.toAlgHom ℂ F K) (AlgHom.id ℂ K))
-        (fun m => by rw [X_val]; simp) (fun m => by rw [Y_val]; simp) i L hL
+      have hk :=
+        hKap F K d x hc _ _ (sysP K x a)
+          (Algebra.TensorProduct.productMap (IsScalarTower.toAlgHom ℂ F K) (AlgHom.id ℂ K))
+          (fun m => by rw [X_val]; simp)
+          (fun m => by rw [Y_val]; simp)
+          i L hL
       rw [hval, hL, map_zsmul, h5, hk, hbdef]
       simp only [mulP_one]
       rw [smul_comm]

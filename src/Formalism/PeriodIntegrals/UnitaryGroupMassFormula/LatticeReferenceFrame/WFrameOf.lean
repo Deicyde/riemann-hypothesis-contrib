@@ -19,14 +19,15 @@ section Frame
 
 variable {r k : ℕ} {e f : Fin r → Fin I.n → I.E} {w : Fin (k + 1) → Fin I.n → I.E}
 
-def fam (e f : Fin r → Fin I.n → I.E) (w : Fin (k + 1) → Fin I.n → I.E) :
-    Fin r ⊕ (Fin r ⊕ Fin (k + 1)) → Fin I.n → I.E :=
+def fam (e f : Fin r → Fin I.n → I.E) (w : Fin (k + 1) → Fin I.n → I.E)
+    : Fin r ⊕ (Fin r ⊕ Fin (k + 1)) → Fin I.n → I.E :=
   Sum.elim e (Sum.elim f w)
 
-theorem fam_li (he : ∀ a b, hG I (e a) (e b) = 0) (hf : ∀ a b, hG I (f a) (f b) = 0)
+theorem fam_li
+    (he : ∀ a b, hG I (e a) (e b) = 0) (hf : ∀ a b, hG I (f a) (f b) = 0)
     (hef : ∀ a b, hG I (e a) (f b) = if a = b then 1 else 0)
-    (hw : ∀ i a, hG I (e a) (w i) = 0 ∧ hG I (f a) (w i) = 0) (hli : LinearIndependent I.E w) :
-    LinearIndependent I.E (fam e f w) := by
+    (hw : ∀ i a, hG I (e a) (w i) = 0 ∧ hG I (f a) (w i) = 0) (hli : LinearIndependent I.E w)
+    : LinearIndependent I.E (fam e f w) := by
   rw [Fintype.linearIndependent_iff]
   intro g hg
   simp only [fam, Fintype.sum_sum_type, Sum.elim_inl, Sum.elim_inr] at hg
@@ -54,12 +55,13 @@ theorem fam_li (he : ∀ a b, hG I (e a) (e b) = 0) (hf : ∀ a b, hG I (f a) (f
   · exact hb a
   · exact hc i
 
-theorem fam_sp (hp : p.Prime) (he : ∀ a b, hG I (e a) (e b) = 0) (hf : ∀ a b, hG I (f a) (f b) = 0)
-    (hef : ∀ a b, hG I (e a) (f b) = if a = b then 1 else 0)
-    (heA : ∀ a, e a ∈ LA I p) (hfA : ∀ a, f a ∈ LA I p)
-    (hW : ∀ x ∈ LA I p, (∀ a, hG I (e a) x = 0 ∧ hG I (f a) x = 0) →
-        x ∈ Submodule.span (Ap I p) (Set.range w)) :
-    ⊤ ≤ Submodule.span I.E (Set.range (fam e f w)) := by
+theorem fam_sp
+    (hp : p.Prime) (he : ∀ a b, hG I (e a) (e b) = 0) (hf : ∀ a b, hG I (f a) (f b) = 0)
+    (hef : ∀ a b, hG I (e a) (f b) = if a = b then 1 else 0) (heA : ∀ a, e a ∈ LA I p)
+    (hfA : ∀ a, f a ∈ LA I p)
+    (hW : ∀ x ∈ LA I p,
+      (∀ a, hG I (e a) x = 0 ∧ hG I (f a) x = 0) → x ∈ Submodule.span (Ap I p) (Set.range w))
+    : ⊤ ≤ Submodule.span I.E (Set.range (fam e f w)) := by
   rw [← I.L_span, Submodule.span_le]
   intro y hy
   have hyA : y ∈ LA I p := L_le_LA hy
@@ -68,8 +70,9 @@ theorem fam_sp (hp : p.Prime) (he : ∀ a b, hG I (e a) (e b) = 0) (hf : ∀ a b
     intro a
     rw [hG_sub_right, hG_sub_right, hG_e_proj he hef, hG_f_proj hf hef, sub_self, sub_self]
     exact ⟨rfl, rfl⟩
-  have key : ∀ z ∈ Submodule.span (Ap I p) (Set.range w),
-      z ∈ Submodule.span I.E (Set.range (fam e f w)) := by
+  have key
+      : ∀ z ∈ Submodule.span (Ap I p) (Set.range w),
+        z ∈ Submodule.span I.E (Set.range (fam e f w)) := by
     intro z hz
     induction hz using Submodule.span_induction with
     | mem x hx =>
@@ -109,33 +112,35 @@ theorem wFrame_of (hPID : ApPID) (hWB : WBasis) : WFrame := by
     | zero => exact hG_zero_left I u
     | add x y _ _ hx hy => rw [hG_add_left, hx, hy, add_zero]
     | smul c x _ hx => rw [hG_smul_left, hx, mul_zero]
-  let T : (Fin I.n → I.E) →ₗ[I.E] (Fin r ⊕ (Fin r ⊕ Fin (k + 1)) → I.E) :=
-    { toFun := fun d j => hG I (fam e f w j) d
-      map_add' := fun x y => by
-        ext j
-        simp [hG_add_right]
-      map_smul' := fun c x => by
-        ext j
-        simp [hG_smul_right] }
+  let T : (Fin I.n → I.E) →ₗ[I.E] (Fin r ⊕ (Fin r ⊕ Fin (k + 1)) → I.E) := {
+    toFun := fun d j => hG I (fam e f w j) d
+    map_add' := fun x y => by
+      ext j
+      simp [hG_add_right]
+    map_smul' := fun c x => by
+      ext j
+      simp [hG_smul_right]
+  }
   have hTi : Function.Injective T := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro u hu
     exact hT0 u (fun j => congrFun hu j)
-  have hdim : Module.finrank I.E (Fin I.n → I.E) =
-      Module.finrank I.E (Fin r ⊕ (Fin r ⊕ Fin (k + 1)) → I.E) := by
+  have hdim
+      : Module.finrank I.E (Fin I.n → I.E)
+        = Module.finrank I.E (Fin r ⊕ (Fin r ⊕ Fin (k + 1)) → I.E) := by
     rw [Module.finrank_fin_fun, Module.finrank_fintype_fun_eq_card, Fintype.card_sum,
       Fintype.card_sum, Fintype.card_fin, Fintype.card_fin, hn]
     ring
   have hTs : Function.Surjective T :=
     (LinearMap.injective_iff_surjective_of_finrank_eq_finrank hdim).1 hTi
-  have hex : ∀ i : Fin (k + 1), ∃ d : Fin I.n → I.E, ∀ j,
-      hG I (fam e f w j) d = if j = Sum.inr (Sum.inr i) then 1 else 0 := by
+  have hex
+      : ∀ i : Fin (k + 1), ∃ d : Fin I.n → I.E, ∀ j,
+        hG I (fam e f w j) d = if j = Sum.inr (Sum.inr i) then 1 else 0 := by
     intro i
     obtain ⟨d, hd⟩ := hTs (fun j => if j = Sum.inr (Sum.inr i) then 1 else 0)
     exact ⟨d, fun j => congrFun hd j⟩
   choose wd hwd using hex
-  have hewd : ∀ a i, hG I (e a) (wd i) = 0 := fun a i => by
-    simpa [fam] using hwd i (Sum.inl a)
+  have hewd : ∀ a i, hG I (e a) (wd i) = 0 := fun a i => by simpa [fam] using hwd i (Sum.inl a)
   have hfwd : ∀ a i, hG I (f a) (wd i) = 0 := fun a i => by
     simpa [fam] using hwd i (Sum.inr (Sum.inl a))
   have hwwd : ∀ j i, hG I (w j) (wd i) = if j = i then 1 else 0 := fun j i => by
@@ -146,8 +151,7 @@ theorem wFrame_of (hPID : ApPID) (hWB : WBasis) : WFrame := by
     by_cases h : i = j
     · subst h; simp
     · simp [h, Ne.symm h]
-  have hyS : ∀ y ∈ I.L,
-      y ∈ Submodule.span (Ap I p) (Set.range e ∪ Set.range f ∪ Set.range w) := by
+  have hyS : ∀ y ∈ I.L, y ∈ Submodule.span (Ap I p) (Set.range e ∪ Set.range f ∪ Set.range w) := by
     intro y hy
     have hyA : y ∈ LA I p := L_le_LA hy
     have hz : y - proj e f y ∈ Submodule.span (Ap I p) (Set.range w) := by
@@ -155,15 +159,15 @@ theorem wFrame_of (hPID : ApPID) (hWB : WBasis) : WFrame := by
       intro a
       rw [hG_sub_right, hG_sub_right, hG_e_proj he hef, hG_f_proj hf hef, sub_self, sub_self]
       exact ⟨rfl, rfl⟩
-    have h1 := proj_span e f hp heA hfA hyA (Set.range e ∪ Set.range f ∪ Set.range w)
-      Set.subset_union_left
-    have h2 : y - proj e f y ∈
-        Submodule.span (Ap I p) (Set.range e ∪ Set.range f ∪ Set.range w) :=
+    have h1 :=
+      proj_span e f hp heA hfA hyA (Set.range e ∪ Set.range f ∪ Set.range w) Set.subset_union_left
+    have h2 : y - proj e f y ∈ Submodule.span (Ap I p) (Set.range e ∪ Set.range f ∪ Set.range w) :=
       Submodule.span_mono Set.subset_union_right hz
     have := add_mem h1 h2
     simpa using this
-  have hwdAp : ∀ i, ∀ y ∈ Submodule.span (Ap I p) (Set.range e ∪ Set.range f ∪ Set.range w),
-      hG I (wd i) y ∈ Ap I p := by
+  have hwdAp
+      : ∀ i, ∀ y ∈ Submodule.span (Ap I p) (Set.range e ∪ Set.range f ∪ Set.range w),
+        hG I (wd i) y ∈ Ap I p := by
     intro i y hy
     induction hy using Submodule.span_induction with
     | mem x hx =>
@@ -176,17 +180,20 @@ theorem wFrame_of (hPID : ApPID) (hWB : WBasis) : WFrame := by
         split_ifs
         · exact one_mem _
         · exact zero_mem _
-    | zero => rw [hG_zero_right]; exact zero_mem _
-    | add x y _ _ hx hy => rw [hG_add_right]; exact add_mem hx hy
+    | zero =>
+      rw [hG_zero_right]; exact zero_mem _
+    | add x y _ _ hx hy =>
+      rw [hG_add_right]; exact add_mem hx hy
     | smul c x _ hx =>
       show hG I (wd i) ((c : I.E) • x) ∈ Ap I p
       rw [hG_smul_right]
       exact mul_mem c.2 hx
-  have hwdA : ∀ i, wd i ∈ LA I p := fun i => dual_LA hp fun y hy => by
-    rw [hG_symm I (wd i) y]
-    exact star_mem_Ap (hwdAp i y (hyS y hy))
-  have hyS' : ∀ y ∈ I.L,
-      y ∈ Submodule.span (Ap I p) (Set.range e ∪ Set.range f ∪ Set.range wd) := by
+  have hwdA : ∀ i, wd i ∈ LA I p := fun i =>
+    dual_LA hp fun y hy => by
+      rw [hG_symm I (wd i) y]
+      exact star_mem_Ap (hwdAp i y (hyS y hy))
+  have hyS'
+      : ∀ y ∈ I.L, y ∈ Submodule.span (Ap I p) (Set.range e ∪ Set.range f ∪ Set.range wd) := by
     intro y hy
     have hyA : y ∈ LA I p := L_le_LA hy
     have hzA : y - proj e f y ∈ LA I p := sub_mem hyA (proj_mem hp heA hfA hyA)
@@ -209,15 +216,19 @@ theorem wFrame_of (hPID : ApPID) (hWB : WBasis) : WFrame := by
       refine Submodule.sum_mem _ fun i _ => ?_
       exact Submodule.smul_mem _ (⟨_, hG_LA hp (hwA i) hzA⟩ : Ap I p)
         (Submodule.subset_span ⟨i, rfl⟩)
-    have h1 := proj_span e f hp heA hfA hyA (Set.range e ∪ Set.range f ∪ Set.range wd)
-      Set.subset_union_left
-    have h2 : y - proj e f y ∈
-        Submodule.span (Ap I p) (Set.range e ∪ Set.range f ∪ Set.range wd) :=
+    have h1 :=
+      proj_span e f hp heA hfA hyA (Set.range e ∪ Set.range f ∪ Set.range wd) Set.subset_union_left
+    have h2 : y - proj e f y ∈ Submodule.span (Ap I p) (Set.range e ∪ Set.range f ∪ Set.range wd) :=
       Submodule.span_mono Set.subset_union_right hz'
     have := add_mem h1 h2
     simpa using this
-  exact ⟨w, wd, fun i => ⟨hwA i, hwdA i⟩,
-    fun a i => ⟨(hwo i a).1, (hwo i a).2, hewd a i, hfwd a i⟩, hdual,
-    fun y hy => ⟨hyS y hy, hyS' y hy⟩⟩
+  exact ⟨
+    w,
+    wd,
+    fun i => ⟨hwA i, hwdA i⟩,
+    fun a i => ⟨(hwo i a).1, (hwo i a).2, hewd a i, hfwd a i⟩,
+    hdual,
+    fun y hy => ⟨hyS y hy, hyS' y hy⟩
+  ⟩
 
 end PI.ScRefExists.WF

@@ -5,17 +5,22 @@ public import Mathlib.Topology.Algebra.ClopenNhdofOne
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa
 
-theorem UpperTheory.V.Pa.eventually_locallyConstant_comp_tower_eq :
-    ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (T : TWGrp G0) (Λ : Lim T) (Z : Type) (ρ : G0.G₀ → Z), IsLocallyConstant ρ → ∀ᶠ N in (Λ.U : Filter ℕ), ∀ g, ρ ((T.h N).p₀ (Λ.π0 N g)) = ρ (Λ.h.p₀ (Λ.πo0 g)) := by
+theorem UpperTheory.V.Pa.eventually_locallyConstant_comp_tower_eq
+    : ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (T : TWGrp G0) (Λ : Lim T) (Z : Type)
+        (ρ : G0.G₀ → Z),
+      IsLocallyConstant ρ
+        → ∀ᶠ N in (Λ.U : Filter ℕ), ∀ g, ρ ((T.h N).p₀ (Λ.π0 N g)) = ρ (Λ.h.p₀ (Λ.πo0 g)) := by
   intro l _ L G0 T Λ Z ρ hρ
   have hKo : IsOpen ((G0.η.ker : Subgroup G0.Γ) : Set G0.Γ) := G0.η_open
   have hKc : IsClosed ((G0.η.ker : Subgroup G0.Γ) : Set G0.Γ) := Subgroup.isClosed_of_isOpen _ hKo
   haveI : CompactSpace G0.G₀ := isCompact_iff_compactSpace.mp hKc.isCompact
   have hfin : (Set.range ρ).Finite := hρ.range_finite
-  have hS : ∀ z, ∃ V ∈ nhds (1 : G0.Γ), ∀ v ∈ V, ∀ x ∈ (Subtype.val '' (ρ ⁻¹' {z}) : Set G0.Γ),
-      v * x ∈ (Subtype.val '' (ρ ⁻¹' {z}) : Set G0.Γ) := by
+  have hS
+      : ∀ z, ∃ V ∈ nhds (1 : G0.Γ), ∀ v ∈ V, ∀ x ∈ (Subtype.val '' (ρ ⁻¹' {z}) : Set G0.Γ),
+        v * x ∈ (Subtype.val '' (ρ ⁻¹' {z}) : Set G0.Γ) := by
     intro z
     have hc : IsCompact (Subtype.val '' (ρ ⁻¹' {z}) : Set G0.Γ) :=
       (hρ.isClosed_fiber z).isCompact.image continuous_subtype_val
@@ -26,7 +31,8 @@ theorem UpperTheory.V.Pa.eventually_locallyConstant_comp_tower_eq :
     open scoped Pointwise in
     exact ⟨V, hV, fun v hv x hx => hVS (Set.mul_mem_mul hv hx)⟩
   choose V hV hVS using hS
-  have hW : (⋂ z ∈ Set.range ρ, V z) ∈ nhds (1 : G0.Γ) := (Filter.biInter_mem hfin).2 fun z _ => hV z
+  have hW : (⋂ z ∈ Set.range ρ, V z) ∈ nhds (1 : G0.Γ) :=
+    (Filter.biInter_mem hfin).2 fun z _ => hV z
   obtain ⟨O, hOW, hOo, h1O⟩ := mem_nhds_iff.1 hW
   obtain ⟨H, hH⟩ := ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one hOo h1O
   refine (Λ.p_lim H).mono ?_

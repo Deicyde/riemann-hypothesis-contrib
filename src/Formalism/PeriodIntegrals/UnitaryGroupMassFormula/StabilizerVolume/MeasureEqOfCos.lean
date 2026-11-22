@@ -13,29 +13,32 @@ open MeasureTheory Topology Set Filter
 
 section CosMeas
 
-variable {X : Type} [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X]
-  [MeasurableSpace X] [OpensMeasurableSpace X]
-
+variable
+  {X : Type} [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X] [MeasurableSpace X]
+  [OpensMeasurableSpace X]
 
 omit [MeasurableSpace X] [OpensMeasurableSpace X] in
 def thick (S : Set X) (Λ : AddSubgroup X) : Set X := {x | ∃ s ∈ S, x - s ∈ Λ}
 
 omit [MeasurableSpace X] [OpensMeasurableSpace X] in
-theorem isOpen_thick (S : Set X) (Λ : AddSubgroup X) (hΛ : IsOpen (Λ : Set X)) :
-    IsOpen (thick S Λ) := by
+theorem isOpen_thick (S : Set X) (Λ : AddSubgroup X) (hΛ : IsOpen (Λ : Set X))
+    : IsOpen (thick S Λ) := by
   have e : thick S Λ = ⋃ s ∈ S, (fun x => x - s) ⁻¹' (Λ : Set X) := by
     ext x
     simp [thick]
   rw [e]
   exact isOpen_biUnion fun s _ => hΛ.preimage (continuous_id.sub continuous_const)
 
-theorem measure_thick_eq (m1 m2 : Measure X) (Λ : AddSubgroup X) (hΛ : IsOpen (Λ : Set X))
-    (h : ∀ y, m1 {z | z - y ∈ Λ} = m2 {z | z - y ∈ Λ}) (S : Set X) (hS : IsCompact S) :
-    m1 (thick S Λ) = m2 (thick S Λ) := by
+theorem measure_thick_eq
+    (m1 m2 : Measure X) (Λ : AddSubgroup X)
+    (hΛ : IsOpen (Λ : Set X)) (h : ∀ y, m1 {z | z - y ∈ Λ} = m2 {z | z - y ∈ Λ})
+    (S : Set X) (hS : IsCompact S)
+    : m1 (thick S Λ) = m2 (thick S Λ) := by
   classical
-
-  have hfib : ∀ c : X ⧸ Λ, m1 (((↑) : X → X ⧸ Λ) ⁻¹' {c}) = m2 (((↑) : X → X ⧸ Λ) ⁻¹' {c}) ∧
-      MeasurableSet (((↑) : X → X ⧸ Λ) ⁻¹' {c}) := by
+  have hfib
+      : ∀ c : X ⧸ Λ,
+        m1 (((↑) : X → X ⧸ Λ) ⁻¹' {c}) = m2 (((↑) : X → X ⧸ Λ) ⁻¹' {c})
+          ∧ MeasurableSet (((↑) : X → X ⧸ Λ) ⁻¹' {c}) := by
     intro c
     obtain ⟨y, rfl⟩ := QuotientAddGroup.mk_surjective c
     have e : ((↑) : X → X ⧸ Λ) ⁻¹' {(y : X ⧸ Λ)} = {z | z - y ∈ Λ} := by
@@ -43,14 +46,18 @@ theorem measure_thick_eq (m1 m2 : Measure X) (Λ : AddSubgroup X) (hΛ : IsOpen 
       simp [QuotientAddGroup.eq_iff_sub_mem]
     rw [e]
     exact ⟨h y, (hΛ.preimage (continuous_id.sub continuous_const)).measurableSet⟩
-  obtain ⟨t, ht⟩ := hS.elim_finite_subcover (fun s : S => {z : X | z - (s : X) ∈ Λ})
-    (fun s => hΛ.preimage (continuous_id.sub continuous_const))
-    (fun x hx => mem_iUnion.mpr ⟨⟨x, hx⟩, by simp⟩)
-  have hT : thick S Λ = ⋃ c ∈ t.image (fun s : S => ((s : X) : X ⧸ Λ)),
-      ((↑) : X → X ⧸ Λ) ⁻¹' {c} := by
+  obtain ⟨t, ht⟩ :=
+    hS.elim_finite_subcover
+      (fun s : S => {z : X | z - (s : X) ∈ Λ})
+      (fun s => hΛ.preimage (continuous_id.sub continuous_const))
+      (fun x hx => mem_iUnion.mpr ⟨⟨x, hx⟩, by simp⟩)
+  have hT
+      : thick S Λ
+        = ⋃ c ∈ t.image (fun s : S => ((s : X) : X ⧸ Λ)),
+          ((↑) : X → X ⧸ Λ) ⁻¹' {c} := by
     ext x
-    simp only [thick, mem_ofPred_eq, mem_iUnion, mem_preimage, mem_singleton_iff,
-      Finset.mem_image, exists_prop]
+    simp only [thick, mem_ofPred_eq, mem_iUnion, mem_preimage, mem_singleton_iff, Finset.mem_image,
+      exists_prop]
     constructor
     · rintro ⟨s, hs, hxs⟩
       obtain ⟨s', hs't, hss'⟩ := mem_iUnion₂.mp (ht hs)
@@ -63,14 +70,16 @@ theorem measure_thick_eq (m1 m2 : Measure X) (Λ : AddSubgroup X) (hΛ : IsOpen 
       exact ⟨s', s'.2, (QuotientAddGroup.eq_iff_sub_mem).mp hx⟩
   rw [hT, measure_biUnion_finset, measure_biUnion_finset]
   · exact Finset.sum_congr rfl fun c _ => (hfib c).1
-  all_goals first
+  all_goals
+    first
     | exact fun c _ c' _ hne => (Set.disjoint_singleton.mpr hne).preimage _
     | exact fun c _ => (hfib c).2
 
-
 omit [MeasurableSpace X] [OpensMeasurableSpace X] in
-theorem iInter_thick (S : Set X) (hSc : IsClosed S) (Λ : ℕ → AddSubgroup X)
-    (hb : ∀ N ∈ 𝓝 (0 : X), ∃ n, (Λ n : Set X) ⊆ N) : ⋂ n, thick S (Λ n) = S := by
+theorem iInter_thick
+    (S : Set X) (hSc : IsClosed S)
+    (Λ : ℕ → AddSubgroup X) (hb : ∀ N ∈ 𝓝 (0 : X), ∃ n, (Λ n : Set X) ⊆ N)
+    : ⋂ n, thick S (Λ n) = S := by
   ext x
   simp only [mem_iInter]
   constructor
@@ -87,11 +96,13 @@ theorem iInter_thick (S : Set X) (hSc : IsClosed S) (Λ : ℕ → AddSubgroup X)
   · intro hx n
     exact ⟨x, hx, by simp⟩
 
-theorem measure_eq_of_cos (m1 m2 : Measure X) [IsFiniteMeasure m1]
+theorem measure_eq_of_cos
+    (m1 m2 : Measure X) [IsFiniteMeasure m1]
     (Λ : ℕ → AddSubgroup X) (hΛo : ∀ n, IsOpen (Λ n : Set X)) (hanti : Antitone Λ)
     (hb : ∀ N ∈ 𝓝 (0 : X), ∃ n, (Λ n : Set X) ⊆ N)
     (h : ∀ n y, m1 {z | z - y ∈ Λ n} = m2 {z | z - y ∈ Λ n})
-    (S : Set X) (hS : IsCompact S) (hSc : IsClosed S) : m1 S = m2 S := by
+    (S : Set X) (hS : IsCompact S) (hSc : IsClosed S)
+    : m1 S = m2 S := by
   have hmono : Antitone fun n => thick S (Λ n) := by
     intro a c hac x hx
     obtain ⟨s, hs, hxs⟩ := hx
@@ -110,7 +121,8 @@ theorem cosDens_holds : CosDens := by
   unfold CosDens
   intro X _ _ _ _ _ _ ν m _ _ H hHo _ hanti hb c0 κ hm0 hcos S hS
   have hle : ∀ n, H n ≤ H 0 := fun n => hanti (Nat.zero_le n)
-  have hcos' : ∀ n y, m {z | z - y ∈ H n} = ((κ • ν).restrict {z | z - c0 ∈ H 0}) {z | z - y ∈ H n} := by
+  have hcos'
+      : ∀ n y, m {z | z - y ∈ H n} = ((κ • ν).restrict {z | z - c0 ∈ H 0}) {z | z - y ∈ H n} := by
     intro n y
     have hmeas : MeasurableSet {z : X | z - y ∈ H n} :=
       ((hHo n).preimage (continuous_id.sub continuous_const)).measurableSet
@@ -125,8 +137,7 @@ theorem cosDens_holds : CosDens := by
         exact (H 0).add_mem (hle n hz) hy
       rw [hsub]
       exact hcos n y hy
-    ·
-      have hout : ∀ z, z - y ∈ H n → z - c0 ∉ H 0 := by
+    · have hout : ∀ z, z - y ∈ H n → z - c0 ∉ H 0 := by
         intro z hz hz0
         apply hy
         have e : y - c0 = (z - c0) - (z - y) := by abel

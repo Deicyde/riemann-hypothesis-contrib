@@ -16,9 +16,10 @@ namespace Formalism.FourierDecayAlt.P.CutMP.Gauge.GC
 open Formalism.REAL
 
 def QTopAlg : Prop :=
-  ∀ (A : Type) [Ring A] [Algebra ℂ A] (n : ℕ) (E : Fin n → Fin n → A) (h : ℂ),
-    ∃ d : ℕ → A, (∀ Y : ℂ, qminor E id id (Y + h) = ∑ j ∈ Finset.range (n + 1), Y ^ j • d j) ∧
-      (1 ≤ n → d (n - 1) = ∑ a, E a a + algebraMap ℂ A ((n : ℂ) * h - (n : ℂ) * ((n : ℂ) - 1) / 2))
+  ∀ (A : Type) [Ring A] [Algebra ℂ A] (n : ℕ) (E : Fin n → Fin n → A) (h : ℂ), ∃ d : ℕ → A,
+    (∀ Y : ℂ, qminor E id id (Y + h) = ∑ j ∈ Finset.range (n + 1), Y ^ j • d j)
+      ∧ (1 ≤ n
+        → d (n - 1) = ∑ a, E a a + algebraMap ℂ A ((n : ℂ) * h - (n : ℂ) * ((n : ℂ) - 1) / 2))
 
 namespace TopAlg
 
@@ -26,8 +27,8 @@ variable {A : Type*} [Ring A] [Algebra ℂ A]
 
 def fac (lin : Prop) [Decidable lin] (B : A) : A[X] := (if lin then X else 0) + C B
 
-theorem natDegree_fac (lin : Prop) [Decidable lin] (B : A) :
-    (fac lin B).natDegree ≤ if lin then 1 else 0 := by
+theorem natDegree_fac (lin : Prop) [Decidable lin] (B : A)
+    : (fac lin B).natDegree ≤ if lin then 1 else 0 := by
   unfold fac
   split_ifs
   · exact (natDegree_add_le _ _).trans (by simp [natDegree_X_le])
@@ -36,8 +37,9 @@ theorem natDegree_fac (lin : Prop) [Decidable lin] (B : A) :
 def prodP {m : ℕ} (lin : Fin m → Prop) [DecidablePred lin] (B : Fin m → A) : A[X] :=
   (List.ofFn fun l => fac (lin l) (B l)).prod
 
-theorem natDegree_prodP : ∀ {m : ℕ} (lin : Fin m → Prop) [DecidablePred lin] (B : Fin m → A),
-    (prodP lin B).natDegree ≤ ∑ l, (if lin l then 1 else 0)
+theorem natDegree_prodP
+    : ∀ {m : ℕ} (lin : Fin m → Prop) [DecidablePred lin] (B : Fin m → A),
+      (prodP lin B).natDegree ≤ ∑ l, (if lin l then 1 else 0)
   | 0, lin, _, B => by simp [prodP]
   | m + 1, lin, _, B => by
     unfold prodP
@@ -45,9 +47,9 @@ theorem natDegree_prodP : ∀ {m : ℕ} (lin : Fin m → Prop) [DecidablePred li
     refine (natDegree_mul_le).trans (add_le_add (natDegree_fac _ _) ?_)
     exact natDegree_prodP (fun l => lin l.succ) (fun l => B l.succ)
 
-theorem eval_prodP {m : ℕ} (lin : Fin m → Prop) [DecidablePred lin] (B : Fin m → A) (Y : ℂ) :
-    eval₂ (RingHom.id A) (algebraMap ℂ A Y) (prodP lin B) =
-      (List.ofFn fun l => (if lin l then algebraMap ℂ A Y else 0) + B l).prod := by
+theorem eval_prodP {m : ℕ} (lin : Fin m → Prop) [DecidablePred lin] (B : Fin m → A) (Y : ℂ)
+    : eval₂ (RingHom.id A) (algebraMap ℂ A Y) (prodP lin B)
+      = (List.ofFn fun l => (if lin l then algebraMap ℂ A Y else 0) + B l).prod := by
   unfold prodP
   rw [eval₂_list_prod_noncomm]
   · rw [List.map_ofFn]
@@ -57,9 +59,10 @@ theorem eval_prodP {m : ℕ} (lin : Fin m → Prop) [DecidablePred lin] (B : Fin
   · intro p _ k
     exact (Algebra.commutes Y _).symm
 
-theorem coeff_all : ∀ {m : ℕ} (B : Fin m → A),
-    (List.ofFn fun l => (X + C (B l) : A[X])).prod.coeff m = 1 ∧
-      (1 ≤ m → (List.ofFn fun l => (X + C (B l) : A[X])).prod.coeff (m - 1) = ∑ l, B l) := by
+theorem coeff_all
+    : ∀ {m : ℕ} (B : Fin m → A),
+      (List.ofFn fun l => (X + C (B l) : A[X])).prod.coeff m = 1
+        ∧ (1 ≤ m → (List.ofFn fun l => (X + C (B l) : A[X])).prod.coeff (m - 1) = ∑ l, B l) := by
   intro m
   induction m with
   | zero => simp
@@ -68,7 +71,9 @@ theorem coeff_all : ∀ {m : ℕ} (B : Fin m → A),
     specialize ih (fun l => B l.succ)
     have hdeg : (List.ofFn fun l : Fin m => (X + C (B l.succ) : A[X])).prod.natDegree ≤ m := by
       have := natDegree_prodP (fun _ : Fin m => True) (fun l => B l.succ)
-      simp only [if_true, Finset.sum_const, Finset.card_univ, Fintype.card_fin, smul_eq_mul, mul_one] at this
+      simp only [if_true, Finset.sum_const, Finset.card_univ, Fintype.card_fin, smul_eq_mul,
+          mul_one]
+        at this
       simpa [prodP, fac] using this
     rw [List.ofFn_succ, List.prod_cons]
     set Q := (List.ofFn fun l : Fin m => (X + C (B l.succ) : A[X])).prod with hQ
@@ -91,19 +96,23 @@ open TopAlg in
 theorem quadratic_top_algebra_holds : QTopAlg := by
   intro A _ _ n E h
   classical
-
   let lin : Equiv.Perm (Fin n) → Fin n → Prop := fun σ l => σ l = l
   let B : Equiv.Perm (Fin n) → Fin n → A := fun σ l =>
     (if σ l = l then algebraMap ℂ A (h - ((l : ℕ) : ℂ)) else 0) + E (σ l) l
   let Pσ : Equiv.Perm (Fin n) → A[X] := fun σ => prodP (lin σ) (B σ)
-  refine ⟨fun j => ∑ σ : Equiv.Perm (Fin n), ((Equiv.Perm.sign σ : ℤ) : A) * (Pσ σ).coeff j, fun Y => ?_, fun hn => ?_⟩
-  ·
-    have hfac : ∀ σ : Equiv.Perm (Fin n),
-        (List.ofFn fun k : Fin n => Tm E (Y + h - (k : ℂ)) (id (σ k)) (id k)).prod =
-          ∑ j ∈ Finset.range (n + 1), Y ^ j • (Pσ σ).coeff j := by
+  refine ⟨
+    fun j => ∑ σ : Equiv.Perm (Fin n), ((Equiv.Perm.sign σ : ℤ) : A) * (Pσ σ).coeff j,
+    fun Y => ?_,
+    fun hn => ?_
+  ⟩
+  · have hfac
+        : ∀ σ : Equiv.Perm (Fin n),
+          (List.ofFn fun k : Fin n => Tm E (Y + h - (k : ℂ)) (id (σ k)) (id k)).prod
+            = ∑ j ∈ Finset.range (n + 1), Y ^ j • (Pσ σ).coeff j := by
       intro σ
-      have e1 : (List.ofFn fun k : Fin n => Tm E (Y + h - (k : ℂ)) (id (σ k)) (id k)) =
-          List.ofFn fun l => (if lin σ l then algebraMap ℂ A Y else 0) + B σ l := by
+      have e1
+          : (List.ofFn fun k : Fin n => Tm E (Y + h - (k : ℂ)) (id (σ k)) (id k))
+            = List.ofFn fun l => (if lin σ l then algebraMap ℂ A Y else 0) + B σ l := by
         refine congrArg List.ofFn (funext fun l => ?_)
         simp only [Tm, id_eq, lin, B]
         split_ifs
@@ -113,8 +122,9 @@ theorem quadratic_top_algebra_holds : QTopAlg := by
       have hdeg : (Pσ σ).natDegree < n + 1 := by
         have := natDegree_prodP (lin σ) (B σ)
         have h2 : ∑ l : Fin n, (if lin σ l then 1 else 0) ≤ n := by
-          calc ∑ l : Fin n, (if lin σ l then 1 else 0) ≤ ∑ _l : Fin n, 1 :=
-                Finset.sum_le_sum fun l _ => by split_ifs <;> simp
+          calc
+            ∑ l : Fin n, (if lin σ l then 1 else 0)
+              ≤ ∑ _l : Fin n, 1 := Finset.sum_le_sum fun l _ => by split_ifs <;> simp
             _ = n := by simp
         show (prodP (lin σ) (B σ)).natDegree < n + 1
         omega
@@ -126,8 +136,7 @@ theorem quadratic_top_algebra_holds : QTopAlg := by
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [Finset.smul_sum]
-  ·
-    dsimp only
+  · dsimp only
     rw [Finset.sum_eq_single (1 : Equiv.Perm (Fin n))]
     · simp only [Equiv.Perm.sign_one, Units.val_one, Int.cast_one, one_mul]
       have e1 : Pσ 1 = (List.ofFn fun l => (X + C (B 1 l) : A[X])).prod := by
@@ -143,7 +152,8 @@ theorem quadratic_top_algebra_holds : QTopAlg := by
         rw [Finset.sum_add_distrib, add_comm, ← map_sum]
       congr 1
       congr 1
-      rw [Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+      rw [Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
+        nsmul_eq_mul]
       have hs : ∑ l : Fin n, ((l : ℕ) : ℂ) = (n : ℂ) * ((n : ℂ) - 1) / 2 := by
         rw [Fin.sum_univ_eq_sum_range (fun l => ((l : ℕ) : ℂ)) n]
         have := Finset.sum_range_id_mul_two n
@@ -164,8 +174,9 @@ theorem quadratic_top_algebra_holds : QTopAlg := by
           rw [Finset.sum_boole, Nat.cast_id]
           rfl
         rw [hsupp, ← Finset.sum_add_distrib]
-        calc ∑ l : Fin n, ((if lin σ l then 1 else 0) + (if ¬lin σ l then 1 else 0)) = ∑ _l : Fin n, 1 :=
-              Finset.sum_congr rfl fun l _ => by split_ifs <;> simp_all
+        calc
+          ∑ l : Fin n, ((if lin σ l then 1 else 0) + (if ¬lin σ l then 1 else 0))
+            = ∑ _l : Fin n, 1 := Finset.sum_congr rfl fun l _ => by split_ifs <;> simp_all
           _ = n := by simp
       have : (Pσ σ).coeff (n - 1) = 0 :=
         coeff_eq_zero_of_natDegree_lt (by show (prodP (lin σ) (B σ)).natDegree < n - 1; omega)

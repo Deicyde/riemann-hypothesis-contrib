@@ -18,72 +18,86 @@ section Adic
 
 variable {A : Type u} [CommRing A]
 
-def adicMk (I : Ideal A) (x : ∀ n : ℕ, A ⧸ I ^ n)
-    (h : ∀ (m n : ℕ) (hle : m ≤ n), Ideal.Quotient.factorPow I hle (x n) = x m) :
-    AdicCompletion I A :=
+def adicMk
+    (I : Ideal A) (x : ∀ n : ℕ, A ⧸ I ^ n)
+    (h : ∀ (m n : ℕ) (hle : m ≤ n), Ideal.Quotient.factorPow I hle (x n) = x m)
+    : AdicCompletion I A :=
   AdicCompletion.liftRingHom I
     (fun n => Polynomial.eval₂RingHom (Int.castRingHom (A ⧸ I ^ n)) (x n))
     (fun {m n} hle => by
       apply Polynomial.ringHom_ext'
       · exact Subsingleton.elim _ _
-      · simpa using h m n hle) Polynomial.X
+      · simpa using h m n hle)
+    Polynomial.X
 
-@[simp] theorem evalₐ_adicMk (I : Ideal A) (x : ∀ n : ℕ, A ⧸ I ^ n)
-    (h : ∀ (m n : ℕ) (hle : m ≤ n), Ideal.Quotient.factorPow I hle (x n) = x m) (n : ℕ) :
-    AdicCompletion.evalₐ I n (adicMk I x h) = x n := by
+@[simp]
+theorem evalₐ_adicMk
+    (I : Ideal A) (x : ∀ n : ℕ, A ⧸ I ^ n)
+    (h : ∀ (m n : ℕ) (hle : m ≤ n), Ideal.Quotient.factorPow I hle (x n) = x m)
+    (n : ℕ)
+    : AdicCompletion.evalₐ I n (adicMk I x h) = x n := by
   unfold adicMk
   rw [AdicCompletion.evalₐ_liftRingHom]
   simp
 
-theorem factorPow_evalₐ (I : Ideal A) {m n : ℕ} (hle : m ≤ n) (x : AdicCompletion I A) :
-    Ideal.Quotient.factorPow I hle (AdicCompletion.evalₐ I n x) = AdicCompletion.evalₐ I m x := by
+theorem factorPow_evalₐ (I : Ideal A) {m n : ℕ} (hle : m ≤ n) (x : AdicCompletion I A)
+    : Ideal.Quotient.factorPow I hle (AdicCompletion.evalₐ I n x) = AdicCompletion.evalₐ I m x := by
   induction x using AdicCompletion.induction_on with
   | h x =>
     simp only [AdicCompletion.evalₐ_mk, Ideal.Quotient.factorPow, Ideal.Quotient.factor_mk]
     exact AdicCompletion.Ideal.mk_eq_mk I hle x
 
-theorem evalₐ_pow_eq_zero (I : Ideal A) {x : AdicCompletion I A}
-    (hx : AdicCompletion.evalOneₐ I x = 0) (n : ℕ) : AdicCompletion.evalₐ I n x ^ n = 0 := by
+theorem evalₐ_pow_eq_zero
+    (I : Ideal A) {x : AdicCompletion I A} (hx : AdicCompletion.evalOneₐ I x = 0) (n : ℕ)
+    : AdicCompletion.evalₐ I n x ^ n = 0 := by
   rcases n with _ | n
   · exact Subsingleton.elim (h := Ideal.Quotient.subsingleton_iff.2 (by simp)) _ _
   obtain ⟨a, ha⟩ := Ideal.Quotient.mk_surjective (AdicCompletion.evalₐ I (n + 1) x)
   have h1 := factorPow_evalₐ I (show 1 ≤ n + 1 by omega) x
   rw [← AdicCompletion.factorₐ_evalₐ_one, ← h1, ← ha] at hx
-  simp only [Ideal.Quotient.factorPow, Ideal.Quotient.factor_mk,
-    Ideal.Quotient.eq_zero_iff_mem] at hx
+  simp only [Ideal.Quotient.factorPow, Ideal.Quotient.factor_mk, Ideal.Quotient.eq_zero_iff_mem]
+    at hx
   rw [← ha, ← map_pow, Ideal.Quotient.eq_zero_iff_mem]
   exact Ideal.pow_mem_pow hx _
 
 def truncLog {B : Type*} [CommRing B] [Algebra ℚ B] (N : ℕ) (x : B) : B :=
   ∑ k ∈ Finset.range N, ((-1 : ℚ) ^ k / (k + 1)) • x ^ (k + 1)
 
-theorem map_truncLog {B B' : Type*} [CommRing B] [Algebra ℚ B] [CommRing B'] [Algebra ℚ B']
-    (f : B →+* B') (N : ℕ) (x : B) : f (truncLog N x) = truncLog N (f x) := by
+theorem map_truncLog
+    {B B' : Type*} [CommRing B] [Algebra ℚ B] [CommRing B'] [Algebra ℚ B']
+    (f : B →+* B') (N : ℕ) (x : B)
+    : f (truncLog N x) = truncLog N (f x) := by
   simp [truncLog, map_rat_smul]
 
-theorem truncLog_eq_of_pow_eq_zero {B : Type*} [CommRing B] [Algebra ℚ B] {x : B} {m n : ℕ}
-    (h : x ^ m = 0) (hle : m ≤ n) : truncLog n x = truncLog m x := by
+theorem truncLog_eq_of_pow_eq_zero
+    {B : Type*} [CommRing B] [Algebra ℚ B] {x : B} {m n : ℕ} (h : x ^ m = 0) (hle : m ≤ n)
+    : truncLog n x = truncLog m x := by
   induction n, hle using Nat.le_induction with
   | base => rfl
   | succ n hle ih =>
     rw [← ih, truncLog, Finset.sum_range_succ, pow_eq_zero_of_le (by omega) h, smul_zero, add_zero]
     rfl
 
-def adicLog [Algebra ℚ A] (I : Ideal A) (u : AdicCompletion I A)
-    (hu : AdicCompletion.evalOneₐ I u = 1) : AdicCompletion I A :=
-  adicMk I (fun n => truncLog n (AdicCompletion.evalₐ I n (u - 1))) (fun m n hle => by
-    rw [map_truncLog, factorPow_evalₐ]
-    exact truncLog_eq_of_pow_eq_zero (evalₐ_pow_eq_zero I (by simp [hu]) m) hle)
+def adicLog
+    [Algebra ℚ A] (I : Ideal A) (u : AdicCompletion I A) (hu : AdicCompletion.evalOneₐ I u = 1)
+    : AdicCompletion I A :=
+  adicMk I
+    (fun n => truncLog n (AdicCompletion.evalₐ I n (u - 1)))
+    (fun m n hle => by
+      rw [map_truncLog, factorPow_evalₐ]
+      exact truncLog_eq_of_pow_eq_zero (evalₐ_pow_eq_zero I (by simp [hu]) m) hle)
 
-theorem evalₐ_adicLog [Algebra ℚ A] (I : Ideal A) (u : AdicCompletion I A)
-    (hu : AdicCompletion.evalOneₐ I u = 1) (n : ℕ) :
-    AdicCompletion.evalₐ I n (adicLog I u hu) = truncLog n (AdicCompletion.evalₐ I n (u - 1)) :=
+theorem evalₐ_adicLog
+    [Algebra ℚ A]
+    (I : Ideal A) (u : AdicCompletion I A) (hu : AdicCompletion.evalOneₐ I u = 1)
+    (n : ℕ)
+    : AdicCompletion.evalₐ I n (adicLog I u hu) = truncLog n (AdicCompletion.evalₐ I n (u - 1)) :=
   evalₐ_adicMk _ _ _ _
 
 end Adic
 
 variable (p : ℕ) [Fact p.Prime]
-variable (R : Type u) [CommRing R] [Fact ¬IsUnit (p : R)] [IsAdicComplete (span {(p : R)}) R]
+variable (R : Type u) [CommRing R] [Fact ¬ IsUnit (p : R)] [IsAdicComplete (span {(p : R)}) R]
 
 abbrev AinfInv.kerTheta : Ideal (AinfInv p R) := RingHom.ker (AinfInv.theta p R)
 
@@ -120,26 +134,28 @@ variable {p R}
 theorem ext_eval {x y : BdRPlus p R} (h : ∀ n, eval p R n x = eval p R n y) : x = y :=
   AdicCompletion.ext_evalₐ h
 
-@[simp] theorem eval_algebraMap (n : ℕ) (x : AinfInv p R) :
-    eval p R n (algebraMap _ _ x) = Ideal.Quotient.mk _ x :=
+@[simp]
+theorem eval_algebraMap (n : ℕ) (x : AinfInv p R)
+    : eval p R n (algebraMap _ _ x) = Ideal.Quotient.mk _ x :=
   AdicCompletion.evalₐ_of _ n x
 
-@[simp] theorem theta_algebraMap (x : AinfInv p R) :
-    theta p R (algebraMap _ _ x) = AinfInv.theta p R x := rfl
+@[simp]
+theorem theta_algebraMap (x : AinfInv p R) : theta p R (algebraMap _ _ x) = AinfInv.theta p R x :=
+  rfl
 
-theorem theta_eq_zero_iff (x : BdRPlus p R) :
-    theta p R x = 0 ↔ AdicCompletion.evalOneₐ (AinfInv.kerTheta p R) x = 0 :=
+theorem theta_eq_zero_iff (x : BdRPlus p R)
+    : theta p R x = 0 ↔ AdicCompletion.evalOneₐ (AinfInv.kerTheta p R) x = 0 :=
   map_eq_zero_iff _ (RingHom.kerLift_injective _)
 
-theorem theta_eq_one_iff (x : BdRPlus p R) :
-    theta p R x = 1 ↔ AdicCompletion.evalOneₐ (AinfInv.kerTheta p R) x = 1 :=
+theorem theta_eq_one_iff (x : BdRPlus p R)
+    : theta p R x = 1 ↔ AdicCompletion.evalOneₐ (AinfInv.kerTheta p R) x = 1 :=
   map_eq_one_iff _ (RingHom.kerLift_injective _)
 
 def log (u : BdRPlus p R) (hu : theta p R u = 1) : BdRPlus p R :=
   adicLog (AinfInv.kerTheta p R) u ((theta_eq_one_iff u).1 hu)
 
-theorem eval_log (u : BdRPlus p R) (hu : theta p R u = 1) (n : ℕ) :
-    eval p R n (log u hu) = truncLog n (eval p R n (u - 1)) :=
+theorem eval_log (u : BdRPlus p R) (hu : theta p R u = 1) (n : ℕ)
+    : eval p R n (log u hu) = truncLog n (eval p R n (u - 1)) :=
   evalₐ_adicLog _ _ _ n
 
 end BdRPlus
@@ -161,8 +177,7 @@ instance : IsScalarTower ℚ_[p] (BdRPlus p R) (BdR p R) :=
 def filNat (n : ℕ) : Submodule (BdRPlus p R) (BdR p R) :=
   Submodule.map (Algebra.linearMap (BdRPlus p R) (BdR p R)) (BdRPlus.fil p R n)
 
-def fil (i : ℤ) : Submodule (BdRPlus p R) (BdR p R) :=
-  filNat p R i.toNat / filNat p R (-i).toNat
+def fil (i : ℤ) : Submodule (BdRPlus p R) (BdR p R) := filNat p R i.toNat / filNat p R (-i).toNat
 
 end BdR
 
@@ -186,16 +201,15 @@ namespace Acris
 instance : CommRing (Acris p R) :=
   inferInstanceAs (CommRing (AdicCompletion (span {(p : AcrisZero p R)}) (AcrisZero p R)))
 instance : Algebra (AcrisZero p R) (Acris p R) :=
-  inferInstanceAs (Algebra (AcrisZero p R)
-    (AdicCompletion (span {(p : AcrisZero p R)}) (AcrisZero p R)))
+  inferInstanceAs
+    (Algebra (AcrisZero p R) (AdicCompletion (span {(p : AcrisZero p R)}) (AcrisZero p R)))
 instance : Algebra (Ainf p R) (Acris p R) :=
   ((algebraMap (AcrisZero p R) (Acris p R)).comp (algebraMap _ _)).toAlgebra
 instance : Algebra ℤ_[p] (Acris p R) :=
   ((algebraMap (Ainf p R) (Acris p R)).comp (algebraMap _ _)).toAlgebra
 instance : IsScalarTower (Ainf p R) (AcrisZero p R) (Acris p R) :=
   IsScalarTower.of_algebraMap_eq fun _ => rfl
-instance : IsScalarTower ℤ_[p] (Ainf p R) (Acris p R) :=
-  IsScalarTower.of_algebraMap_eq fun _ => rfl
+instance : IsScalarTower ℤ_[p] (Ainf p R) (Acris p R) := IsScalarTower.of_algebraMap_eq fun _ => rfl
 
 def eval (n : ℕ) : Acris p R →+* AcrisZero p R ⧸ span {(p : AcrisZero p R)} ^ n :=
   (AdicCompletion.evalₐ (span {(p : AcrisZero p R)}) n).toRingHom
@@ -205,17 +219,18 @@ variable {p R}
 theorem ext_eval {x y : Acris p R} (h : ∀ n, eval p R n x = eval p R n y) : x = y :=
   AdicCompletion.ext_evalₐ h
 
-@[simp] theorem eval_algebraMap (n : ℕ) (x : AcrisZero p R) :
-    eval p R n (algebraMap _ _ x) = Ideal.Quotient.mk _ x :=
+@[simp]
+theorem eval_algebraMap (n : ℕ) (x : AcrisZero p R)
+    : eval p R n (algebraMap _ _ x) = Ideal.Quotient.mk _ x :=
   AdicCompletion.evalₐ_of _ n x
 
 def logPartial (N : ℕ) (u : Ainf p R) (hu : Ainf.theta p R u = 1) : AcrisZero p R :=
   ∑ k ∈ Finset.range N,
     ((-1) ^ k * (k ! : AcrisZero p R)) * AcrisZero.gamma (k + 1) (u - 1) (by simp [hu])
 
-theorem logPartial_sub_mem (u : Ainf p R) (hu : Ainf.theta p R u = 1) {n M N : ℕ}
-    (hM : p ^ n ≤ M) (hN : M ≤ N) :
-    logPartial N u hu - logPartial M u hu ∈ span {(p : AcrisZero p R)} ^ n := by
+theorem logPartial_sub_mem
+    (u : Ainf p R) (hu : Ainf.theta p R u = 1) {n M N : ℕ} (hM : p ^ n ≤ M) (hN : M ≤ N)
+    : logPartial N u hu - logPartial M u hu ∈ span {(p : AcrisZero p R)} ^ n := by
   induction N, hN using Nat.le_induction with
   | base => simp
   | succ N hN ih =>
@@ -226,13 +241,15 @@ theorem logPartial_sub_mem (u : Ainf p R) (hu : Ainf.theta p R u = 1) {n M N : �
     exact Ideal.mul_mem_right _ _ (Ideal.pow_mem_pow (mem_span_singleton_self _) _)
 
 def log (u : Ainf p R) (hu : Ainf.theta p R u = 1) : Acris p R :=
-  adicMk _ (fun n => Ideal.Quotient.mk _ (logPartial (p ^ n) u hu)) (fun m n hle => by
-    simp only [Ideal.Quotient.factorPow, Ideal.Quotient.factor_mk]
-    exact Ideal.Quotient.eq.2 (logPartial_sub_mem u hu le_rfl
-      (Nat.pow_le_pow_right (Fact.out : p.Prime).pos hle)))
+  adicMk _
+    (fun n => Ideal.Quotient.mk _ (logPartial (p ^ n) u hu))
+    (fun m n hle => by
+      simp only [Ideal.Quotient.factorPow, Ideal.Quotient.factor_mk]
+      exact Ideal.Quotient.eq.2 (logPartial_sub_mem u hu le_rfl
+        (Nat.pow_le_pow_right (Fact.out : p.Prime).pos hle)))
 
-theorem eval_log (u : Ainf p R) (hu : Ainf.theta p R u = 1) {n N : ℕ} (hN : p ^ n ≤ N) :
-    eval p R n (log u hu) = Ideal.Quotient.mk _ (logPartial N u hu) :=
+theorem eval_log (u : Ainf p R) (hu : Ainf.theta p R u = 1) {n N : ℕ} (hN : p ^ n ≤ N)
+    : eval p R n (log u hu) = Ideal.Quotient.mk _ (logPartial N u hu) :=
   (evalₐ_adicMk _ _ _ n).trans (Ideal.Quotient.eq.2 (logPartial_sub_mem u hu le_rfl hN)).symm
 
 end Acris
@@ -266,8 +283,9 @@ instance : Algebra ℚ_[p] (BcrisPlus p R) :=
     (isUnit_p p R)).toAlgebra
 
 def periods : Submonoid (BcrisPlus p R) :=
-  Submonoid.closure {x | ∃ ε : tateModule p R, IsPrimitive ε ∧
-    x = algebraMap (Acris p R) _ (Acris.logTeich ε)}
+  Submonoid.closure
+    {x | ∃ ε : tateModule p R, IsPrimitive ε ∧
+      x = algebraMap (Acris p R) _ (Acris.logTeich ε)}
 
 end BcrisPlus
 
@@ -301,8 +319,9 @@ def PFlat.twist (η : tateModule p R) (ϖ : PFlat p R) : PFlat p R :=
   ⟨η.1 * ϖ.1, by rw [map_mul, ϖ.2, show PreTilt.untilt η.1 = 1 from η.2, one_mul]⟩
 
 def Bst.relations : Ideal (MvPolynomial (PFlat p R) (Bcris p R)) :=
-  span {f | ∃ (η : tateModule p R) (ϖ : PFlat p R), f = MvPolynomial.X (ϖ.twist η) -
-    (MvPolynomial.C (Bcris.logTeich η) + MvPolynomial.X ϖ)}
+  span
+    {f | ∃ (η : tateModule p R) (ϖ : PFlat p R), f = MvPolynomial.X (ϖ.twist η) -
+      (MvPolynomial.C (Bcris.logTeich η) + MvPolynomial.X ϖ)}
 
 def Bst : Type u := MvPolynomial (PFlat p R) (Bcris p R) ⧸ Bst.relations p R
 
@@ -314,26 +333,30 @@ instance : Algebra (Bcris p R) (Bst p R) :=
   inferInstanceAs (Algebra (Bcris p R) (MvPolynomial (PFlat p R) (Bcris p R) ⧸ Bst.relations p R))
 instance : Algebra ℚ_[p] (Bst p R) :=
   ((algebraMap (Bcris p R) (Bst p R)).comp (algebraMap _ _)).toAlgebra
-instance : IsScalarTower ℚ_[p] (Bcris p R) (Bst p R) :=
-  IsScalarTower.of_algebraMap_eq fun _ => rfl
+instance : IsScalarTower ℚ_[p] (Bcris p R) (Bst p R) := IsScalarTower.of_algebraMap_eq fun _ => rfl
 
 def mk : MvPolynomial (PFlat p R) (Bcris p R) →ₐ[Bcris p R] Bst p R :=
   Ideal.Quotient.mkₐ (Bcris p R) (Bst.relations p R)
 
 variable {p R}
 
-theorem mk_eq_zero_iff (f : MvPolynomial (PFlat p R) (Bcris p R)) :
-    mk p R f = 0 ↔ f ∈ Bst.relations p R := Ideal.Quotient.eq_zero_iff_mem
+theorem mk_eq_zero_iff (f : MvPolynomial (PFlat p R) (Bcris p R))
+    : mk p R f = 0 ↔ f ∈ Bst.relations p R :=
+  Ideal.Quotient.eq_zero_iff_mem
 
 def logFlat (ϖ : PFlat p R) : Bst p R := mk p R (MvPolynomial.X ϖ)
 
-theorem logFlat_twist (η : tateModule p R) (ϖ : PFlat p R) :
-    logFlat (ϖ.twist η) = algebraMap _ _ (Bcris.logTeich η) + logFlat ϖ := by
-  rw [← sub_eq_zero, logFlat, logFlat, ← (mk p R).commutes, ← map_add (f := _), ← map_sub, mk_eq_zero_iff]
+theorem logFlat_twist (η : tateModule p R) (ϖ : PFlat p R)
+    : logFlat (ϖ.twist η) = algebraMap _ _ (Bcris.logTeich η) + logFlat ϖ := by
+  rw [← sub_eq_zero, logFlat, logFlat, ← (mk p R).commutes, ← map_add (f := _), ← map_sub,
+    mk_eq_zero_iff]
   exact subset_span ⟨η, ϖ, rfl⟩
 
-def lift {B : Type*} [CommRing B] (f : Bcris p R →+* B) (l : PFlat p R → B)
-    (h : ∀ η ϖ, l (PFlat.twist η ϖ) = f (Bcris.logTeich η) + l ϖ) : Bst p R →+* B :=
+def lift
+    {B : Type*} [CommRing B]
+    (f : Bcris p R →+* B) (l : PFlat p R → B)
+    (h : ∀ η ϖ, l (PFlat.twist η ϖ) = f (Bcris.logTeich η) + l ϖ)
+    : Bst p R →+* B :=
   Ideal.Quotient.lift (Bst.relations p R) (MvPolynomial.eval₂Hom f l) (by
     intro a ha
     refine (show Bst.relations p R ≤ RingHom.ker (MvPolynomial.eval₂Hom f l) from ?_) ha
@@ -341,18 +364,21 @@ def lift {B : Type*} [CommRing B] (f : Bcris p R →+* B) (l : PFlat p R → B)
     rintro _ ⟨η, ϖ, rfl⟩
     simp [RingHom.mem_ker, h])
 
-@[simp] theorem lift_algebraMap {B : Type*} [CommRing B] (f : Bcris p R →+* B) (l : PFlat p R → B)
-    (h : ∀ η ϖ, l (PFlat.twist η ϖ) = f (Bcris.logTeich η) + l ϖ) (x : Bcris p R) :
-    lift f l h (algebraMap _ _ x) = f x :=
+@[simp]
+theorem lift_algebraMap
+    {B : Type*} [CommRing B]
+    (f : Bcris p R →+* B) (l : PFlat p R → B)
+    (h : ∀ η ϖ, l (PFlat.twist η ϖ) = f (Bcris.logTeich η) + l ϖ)
+    (x : Bcris p R)
+    : lift f l h (algebraMap _ _ x) = f x :=
   (Ideal.Quotient.lift_mk _ _ _).trans (MvPolynomial.eval₂Hom_C f l x)
 
-theorem hom_ext {B : Type*} [CommRing B] {f g : Bst p R →+* B}
-    (h₁ : ∀ x : Bcris p R, f (algebraMap _ _ x) = g (algebraMap _ _ x))
-    (h₂ : ∀ ϖ, f (logFlat ϖ) = g (logFlat ϖ)) : f = g :=
+theorem hom_ext
+    {B : Type*} [CommRing B]
+    {f g : Bst p R →+* B} (h₁ : ∀ x : Bcris p R, f (algebraMap _ _ x) = g (algebraMap _ _ x))
+    (h₂ : ∀ ϖ, f (logFlat ϖ) = g (logFlat ϖ))
+    : f = g :=
   Ideal.Quotient.ringHom_ext (MvPolynomial.ringHom_ext h₁ h₂)
-
-
-
 
 end Bst
 

@@ -9,7 +9,9 @@ public import Development.AutomorphicArithmetic.WeightCongruences.ProdNegOneZpow
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta MeasureTheory IsDedekindDomain NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta MeasureTheory IsDedekindDomain NumberField
 open scoped TensorProduct
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.UnitaryVolumePairs
@@ -20,15 +22,23 @@ section Volume
 
 variable {D : D7}
 
-def volBox (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)) (V : HSp D) {P Q : ℕ}
-    (A : D.what₂.Tau → Matrix (Fin P ⊕ Fin Q) (Fin V.rank) ℂ) (B : D.what₂.Tau → Set (UpqT P Q)) : Set (GA D V) :=
+def volBox
+    (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ))
+    (V : HSp D)
+    {P Q : ℕ}
+    (A : D.what₂.Tau → Matrix (Fin P ⊕ Fin Q) (Fin V.rank) ℂ) (B : D.what₂.Tau → Set (UpqT P Q))
+    : Set (GA D V) :=
   {h | ∃ k ∈ KsphC V ∅, ∃ g ∈ GinfC V, h = k * g ∧
     ∀ ρ, ∃ b ∈ B ρ, UpqT.mat b * A ρ = A ρ * infMat D.sp.cm.sig V.gram (θ ρ) g}
 
-def IsProductForm (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ)) (V : HSp D) {P Q : ℕ}
-    (A : D.what₂.Tau → Matrix (Fin P ⊕ Fin Q) (Fin V.rank) ℂ) (μ : Measure (GA D V)) : Prop :=
-  ∀ B : D.what₂.Tau → Set (UpqT P Q), (∀ ρ, MeasurableSet (B ρ)) →
-    μ (volBox θ V A B) = ∏ ρ, D.cd.cd P Q (B ρ)
+def IsProductForm
+    (θ : D.what₂.Tau → (Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ))
+    (V : HSp D)
+    {P Q : ℕ} (A : D.what₂.Tau → Matrix (Fin P ⊕ Fin Q) (Fin V.rank) ℂ)
+    (μ : Measure (GA D V))
+    : Prop :=
+  ∀ B : D.what₂.Tau → Set (UpqT P Q),
+    (∀ ρ, MeasurableSet (B ρ)) → μ (volBox θ V A B) = ∏ ρ, D.cd.cd P Q (B ρ)
 
 variable (D)
 
@@ -45,8 +55,9 @@ abbrev IdE : Type := (AE D)ˣ
 abbrev IdF : Type := (AF D.host.F)ˣ
 
 def resF : IdF D →* IdE D :=
-  Units.map (Algebra.TensorProduct.includeLeftRingHom :
-    AF D.host.F →+* AF D.host.F ⊗[D.host.F] D.host.E).toMonoidHom
+  Units.map
+    (Algebra.TensorProduct.includeLeftRingHom
+      : AF D.host.F →+* AF D.host.F ⊗[D.host.F] D.host.E).toMonoidHom
 
 def ratF : D.host.Fˣ →* IdF D := Units.map (algebraMap D.host.F (AF D.host.F)).toMonoidHom
 
@@ -62,9 +73,7 @@ variable (D : D7)
 
 def normGroup : Subgroup (IdF D) := (ratF D).range ⊔ (normId D).range.comap (resF D)
 
-
 variable {D}
-
 
 variable (D)
 

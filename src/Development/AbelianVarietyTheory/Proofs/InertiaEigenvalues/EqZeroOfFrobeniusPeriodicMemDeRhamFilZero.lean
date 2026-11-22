@@ -8,13 +8,17 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Fontain
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pst GlobalTheory.PMon TensorProduct
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  GlobalTheory.Pst GlobalTheory.PMon TensorProduct
 open scoped Formalism.Per
 
 namespace GlobalTheory.PMon
 
-theorem fil_add_nat_le {l : ℕ} [Fact l.Prime] (P : LocPrime l) (a : ℤ) (k : ℕ) {x : P.R.BdR}
-    (hx : x ∈ (P.PD (botExt l)).Fil (a + k)) : x ∈ (P.PD (botExt l)).Fil a := by
+theorem fil_add_nat_le
+    {l : ℕ} [Fact l.Prime]
+    (P : LocPrime l) (a : ℤ) (k : ℕ)
+    {x : P.R.BdR} (hx : x ∈ (P.PD (botExt l)).Fil (a + k))
+    : x ∈ (P.PD (botExt l)).Fil a := by
   induction k generalizing a with
   | zero => simpa using hx
   | succ k ih =>
@@ -24,12 +28,15 @@ theorem fil_add_nat_le {l : ℕ} [Fact l.Prime] (P : LocPrime l) (a : ℤ) (k : 
     have : a + ((k + 1 : ℕ) : ℤ) = a + k + 1 := by push_cast; ring
     rwa [← this]
 
-theorem no_fil_zero_neg_slope : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (T : LocTied l P AI)
-    (h d : ℕ), 0 < h → 0 < d → ∀ c : P.R.B, (l : P.R.B) ^ d * P.φB^[h] c = c →
-    (∀ j < h, ev P j c ∈ Fil P 0) → c = 0 := by
+theorem no_fil_zero_neg_slope
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (T : LocTied l P AI) (h d : ℕ),
+      0 < h → 0 < d
+        → ∀ c : P.R.B,
+          (l : P.R.B) ^ d * P.φB^[h] c = c → (∀ j < h, ev P j c ∈ Fil P 0) → c = 0 := by
   intro l _ P AI T h d hh hd c hc hfil
   have hF : IsField P.R.BdR := GlobalTheory.RegularRing.isField_of_tied T
-  have hι : Function.Injective P.ιB := fun a b hab => (P.PD (botExt l)).ι_inj (by rw [P.PD_ι, P.PD_ι, hab])
+  have hι : Function.Injective P.ιB := fun a b hab =>
+    (P.PD (botExt l)).ι_inj (by rw [P.PD_ι, P.PD_ι, hab])
   set PD := P.PD (botExt l) with hPD
   have hdom : ∀ a b : P.R.B, a * b = 0 → a = 0 ∨ b = 0 := by
     intro a b hab
@@ -40,7 +47,9 @@ theorem no_fil_zero_neg_slope : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (A
       obtain ⟨y, hy⟩ := hF.mul_inv_cancel ha
       apply hι
       rw [map_zero]
-      calc P.ιB b = (y * P.ιB a) * P.ιB b := by rw [mul_comm y, hy, one_mul]
+      calc
+        P.ιB b
+          = (y * P.ιB a) * P.ιB b := by rw [mul_comm y, hy, one_mul]
         _ = 0 := by rw [mul_assoc, h0, mul_zero]
   haveI : NoZeroDivisors P.R.B := ⟨fun {a b} hab => hdom a b hab⟩
   haveI : Nontrivial P.R.B := nontrivial_B P
@@ -58,7 +67,9 @@ theorem no_fil_zero_neg_slope : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (A
     rw [mul_comm c, ← e2, e3]
   have hlN : (l : P.R.B) ^ d * P.φB N = N := by
     have : c * ((l : P.R.B) ^ d * P.φB N - N) = 0 := by
-      calc c * ((l : P.R.B) ^ d * P.φB N - N) = (l : P.R.B) ^ d * (c * P.φB N) - N * c := by ring
+      calc
+        c * ((l : P.R.B) ^ d * P.φB N - N)
+          = (l : P.R.B) ^ d * (c * P.φB N) - N * c := by ring
         _ = N * ((l : P.R.B) ^ d * P.φB^[h] c) - N * c := by rw [hφN]; ring
         _ = 0 := by rw [hc, sub_self]
     rcases hdom _ _ this with h1 | h1
@@ -66,14 +77,18 @@ theorem no_fil_zero_neg_slope : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (A
     · exact sub_eq_zero.mp h1
   set x : P.R.B := N * P.tB ^ d with hx
   have hφx : PD.φ x = x := by
-    rw [P.PD_φ, hx, map_mul, map_pow, localPrime_frobenius_periodT, Algebra.smul_def, map_natCast, mul_pow]
+    rw [P.PD_φ, hx, map_mul, map_pow, localPrime_frobenius_periodT, Algebra.smul_def, map_natCast,
+      mul_pow]
     linear_combination (P.tB ^ d) * hlN
   have hmul : ∀ (a b : ℤ) (u v : P.R.BdR), u ∈ PD.Fil a → v ∈ PD.Fil b → u * v ∈ PD.Fil (a + b) :=
     fun a b u v hu hv => PD.Fil_mul a b u v hu hv
   have hιN : P.ιB N ∈ PD.Fil 0 := by
     rw [hN, map_prod]
-    refine Finset.prod_induction _ (fun u => u ∈ PD.Fil 0) (fun u v hu hv => by simpa using hmul 0 0 u v hu hv)
-      (by simpa using PD.one_mem) fun j hj => ?_
+    refine Finset.prod_induction _
+      (fun u => u ∈ PD.Fil 0)
+      (fun u v hu hv => by simpa using hmul 0 0 u v hu hv)
+      (by simpa using PD.one_mem)
+      fun j hj => ?_
     exact hfil j (Finset.mem_range.mp hj)
   have hιt : P.ιB P.tB ∈ PD.Fil 1 := by
     have := PD.mem_filtration_one

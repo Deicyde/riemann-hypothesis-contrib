@@ -12,27 +12,36 @@ open Module
 
 variable {k : Type} [Field k]
 
-theorem dex_global {R : Type} [CommRing R] [Algebra k R] [FiniteDimensional k R] [IsReduced R]
-    {V : Type} [AddCommGroup V] [Module R V] [Module k V] [IsScalarTower k R V] [FiniteDimensional k V] :
-    ∃ (M : Type) (_ : Fintype M) (L : M → Type) (_ : ∀ m, Fintype (L m)) (_ : ∀ m, Nonempty (L m))
-      (Rc : R → (m : M) → L m → L m → k) (o : (m : M) → L m → k),
-      ∀ N : V →ₗ[R] V, IsNilpotent N → ∀ v : V,
-        ∃ (ι : M → Type) (_ : ∀ m, Fintype (ι m)) (l s : (m : M) → ι m → ℕ)
-          (β : Basis (Σ m, L m × (Σ a : ι m, Fin (l m a))) k V),
-          (∀ m a, 0 < l m a) ∧ (∀ m a, s m a ≤ l m a) ∧
-          (∀ (z : R) m (p : L m) (j : Σ a : ι m, Fin (l m a)),
-            z • β ⟨m, (p, j)⟩ = ∑ q, Rc z m p q • β ⟨m, (q, j)⟩) ∧
-          (∀ m (p : L m) (a : ι m) (i : Fin (l m a)), N (β ⟨m, (p, ⟨a, i⟩)⟩) =
-            if h : (i : ℕ) + 1 < l m a then β ⟨m, (p, ⟨a, ⟨i + 1, h⟩⟩)⟩ else 0) ∧
-          v = ∑ m, ∑ p, ∑ a, (if h : s m a < l m a then o m p • β ⟨m, (p, ⟨a, ⟨s m a, h⟩⟩)⟩ else 0) ∧
-          ∀ A : V →ₗ[R] V, A ∘ₗ N = N ∘ₗ A → ∀ m (p : L m) (a : ι m) (i : Fin (l m a)), (i : ℕ) < s m a →
-            β.repr (A v) ⟨m, (p, ⟨a, i⟩)⟩ = 0 := by
+theorem dex_global
+    {R : Type} [CommRing R] [Algebra k R] [FiniteDimensional k R] [IsReduced R]
+    {V : Type}
+    [AddCommGroup V] [Module R V] [Module k V] [IsScalarTower k R V] [FiniteDimensional k V]
+    : ∃ (M : Type) (_ : Fintype M) (L : M → Type) (_ : ∀ m, Fintype (L m)) (_ : ∀ m, Nonempty (L m))
+        (Rc : R → (m : M) → L m → L m → k) (o : (m : M) → L m → k),
+      ∀ N : V →ₗ[R] V,
+        IsNilpotent N
+          → ∀ v : V,
+            ∃ (ι : M → Type) (_ : ∀ m, Fintype (ι m)) (l s : (m : M) → ι m → ℕ)
+                (β : Basis (Σ m, L m × (Σ a : ι m, Fin (l m a))) k V),
+              (∀ m a, 0 < l m a) ∧ (∀ m a, s m a ≤ l m a)
+                ∧ (∀ (z : R) m (p : L m) (j : Σ a : ι m, Fin (l m a)),
+                  z • β ⟨m, (p, j)⟩ = ∑ q, Rc z m p q • β ⟨m, (q, j)⟩)
+                ∧ (∀ m (p : L m) (a : ι m) (i : Fin (l m a)),
+                  N (β ⟨m, (p, ⟨a, i⟩)⟩)
+                    = if h : (i : ℕ) + 1 < l m a then β ⟨m, (p, ⟨a, ⟨i + 1, h⟩⟩)⟩ else 0)
+                ∧ v
+                  = ∑ m, ∑ p, ∑ a, (if h : s m a < l m a then o m p • β ⟨m, (p, ⟨a, ⟨s m a, h⟩⟩)⟩ else 0)
+                ∧ ∀ A : V →ₗ[R] V,
+                  A ∘ₗ N = N ∘ₗ A
+                    → ∀ m (p : L m) (a : ι m) (i : Fin (l m a)),
+                      (i : ℕ) < s m a → β.repr (A v) ⟨m, (p, ⟨a, i⟩)⟩ = 0 := by
   haveI : IsArtinianRing R := IsArtinianRing.of_finite k R
   classical
   let M := MaximalSpectrum R
   letI : Fintype M := Fintype.ofFinite M
   have hfin : ∀ m : M, Module.Finite k (R ⧸ m.asIdeal) := fun m =>
-    Module.Finite.of_surjective (Ideal.Quotient.mkₐ k m.asIdeal).toLinearMap Ideal.Quotient.mk_surjective
+    Module.Finite.of_surjective (Ideal.Quotient.mkₐ k m.asIdeal).toLinearMap
+      Ideal.Quotient.mk_surjective
   let L : M → Type := fun m => Fin (finrank k (R ⧸ m.asIdeal))
   let b : ∀ m : M, Basis (L m) k (R ⧸ m.asIdeal) := fun m => by
     haveI := hfin m
@@ -41,12 +50,21 @@ theorem dex_global {R : Type} [CommRing R] [Algebra k R] [FiniteDimensional k R]
     haveI := hfin m
     haveI : Nontrivial (R ⧸ m.asIdeal) := Ideal.Quotient.nontrivial_iff.mpr m.isMaximal.ne_top
     exact ⟨⟨0, Module.finrank_pos⟩⟩
-  refine ⟨M, inferInstance, L, fun m => inferInstance, hne,
-    fun z m p q => (b m).repr (Ideal.Quotient.mk _ z * b m p) q, fun m p => (b m).repr 1 p, ?_⟩
+  refine ⟨
+    M,
+    inferInstance,
+    L,
+    fun m => inferInstance,
+    hne,
+    fun z m p q => (b m).repr (Ideal.Quotient.mk _ z * b m p) q,
+    fun m p => (b m).repr 1 p,
+    ?_
+  ⟩
   intro N hN v
 
   let e : M → R := fun m => (IsArtinianRing.equivPi R).symm (Pi.single m 1)
-  have he : ∀ m, IsArtinianRing.equivPi R (e m) = Pi.single m 1 := fun m => AlgEquiv.apply_symm_apply _ _
+  have he : ∀ m, IsArtinianRing.equivPi R (e m) = Pi.single m 1 := fun m =>
+    AlgEquiv.apply_symm_apply _ _
   have hE1 : ∀ m, ∀ z ∈ m.asIdeal, z * e m = 0 := by
     intro m z hz
     apply (IsArtinianRing.equivPi R).injective
@@ -119,8 +137,9 @@ theorem dex_global {R : Type} [CommRing R] [Algebra k R] [FiniteDimensional k R]
     refine ⟨r, LinearMap.ext fun y => Subtype.ext ?_⟩
     rw [hpow, hr]
     rfl
-  have hblk (m : M) := dex_block_frame m.asIdeal (b m) (W := Vm m) (htor m) (N.restrict (hNm m)) (hNnil m)
-    ⟨e m • v, hself m v⟩
+  have hblk (m : M) :=
+    dex_block_frame m.asIdeal (b m) (W := Vm m) (htor m) (N.restrict (hNm m)) (hNnil m)
+      ⟨e m • v, hself m v⟩
   choose ι fι l s βm hl hs hZ hN' hv hA using hblk
 
   have hInt : DirectSum.IsInternal (fun m => (Vm m).restrictScalars k) := by
@@ -142,13 +161,14 @@ theorem dex_global {R : Type} [CommRing R] [Algebra k R] [FiniteDimensional k R]
       have hy : y = ∑ m, e m • y := by rw [← Finset.sum_smul, hE2, one_smul]
       rw [hy]
       exact Submodule.sum_mem _ fun m _ => Submodule.mem_iSup_of_mem m (hself m y)
-  let eqv : ∀ m, (Vm m) ≃ₗ[k] ((Vm m).restrictScalars k) := fun m =>
-    { toFun := fun x => ⟨x.1, x.2⟩
-      invFun := fun x => ⟨x.1, x.2⟩
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl
-      left_inv := fun _ => rfl
-      right_inv := fun _ => rfl }
+  let eqv : ∀ m, (Vm m) ≃ₗ[k] ((Vm m).restrictScalars k) := fun m => {
+    toFun := fun x => ⟨x.1, x.2⟩
+    invFun := fun x => ⟨x.1, x.2⟩
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+    left_inv := fun _ => rfl
+    right_inv := fun _ => rfl
+  }
   let β := hInt.collectedBasis (fun m => (βm m).map (eqv m))
   have hβ : ∀ m j, β ⟨m, j⟩ = ((βm m j : Vm m) : V) := by
     intro m j
@@ -162,7 +182,9 @@ theorem dex_global {R : Type} [CommRing R] [Algebra k R] [FiniteDimensional k R]
     rfl
   · intro m p a i
     rw [hβ]
-    have : N ((βm m (p, ⟨a, i⟩) : Vm m) : V) = ((N.restrict (hNm m) (βm m (p, ⟨a, i⟩)) : Vm m) : V) := rfl
+    have : N ((βm m (p, ⟨a, i⟩) : Vm m) : V)
+        = ((N.restrict (hNm m) (βm m (p, ⟨a, i⟩)) : Vm m) : V) :=
+      rfl
     rw [this, hN' m p a i]
     split_ifs with h
     · rw [hβ]
@@ -195,11 +217,16 @@ theorem dex_global {R : Type} [CommRing R] [Algebra k R] [FiniteDimensional k R]
     refine Finset.sum_eq_zero fun m' _ => ?_
     by_cases hmm : m' = m
     · subst hmm
-      have hc : A.restrict (hAm m') ∘ₗ N.restrict (hNm m') = N.restrict (hNm m') ∘ₗ A.restrict (hAm m') := by
+      have hc
+          : A.restrict (hAm m') ∘ₗ N.restrict (hNm m')
+            = N.restrict (hNm m') ∘ₗ A.restrict (hAm m') := by
         refine LinearMap.ext fun y => Subtype.ext ?_
         exact LinearMap.congr_fun hAN y.1
-      have key := DirectSum.IsInternal.collectedBasis_repr_of_mem hInt (fun m => (βm m).map (eqv m))
-        (x := ((A.restrict (hAm m') ⟨e m' • v, hself m' v⟩ : Vm m') : V)) (a := (p, ⟨a, i⟩)) (Subtype.mem _)
+      have key :=
+        DirectSum.IsInternal.collectedBasis_repr_of_mem hInt
+          (fun m => (βm m).map (eqv m))
+          (x := ((A.restrict (hAm m') ⟨e m' • v, hself m' v⟩ : Vm m') : V)) (a := (p, ⟨a, i⟩))
+          (Subtype.mem _)
       refine key.trans ?_
       rw [Basis.map_repr]
       exact hA m' (A.restrict (hAm m')) hc p a i hi

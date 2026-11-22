@@ -6,10 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem log_factorial_pow_mul_factorial_pow_le :
-    ∀ (n R₀ : ℕ) (R : ℝ), 1 ≤ R → (R₀ : ℝ) ≤ R →
-      Real.log (((n.factorial) ^ (2 * R₀) * (R₀.factorial) ^ n : ℕ) : ℝ)
-        ≤ 4 * (n : ℝ) * R * Real.log (n * R) := by
+theorem log_factorial_pow_mul_factorial_pow_le
+    : ∀ (n R₀ : ℕ) (R : ℝ),
+      1 ≤ R → (R₀ : ℝ) ≤ R
+        → Real.log (((n.factorial) ^ (2 * R₀) * (R₀.factorial) ^ n : ℕ) : ℝ)
+          ≤ 4 * (n : ℝ) * R * Real.log (n * R) := by
   intro n R₀ R hR hR₀
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · simp
@@ -25,13 +26,16 @@ theorem log_factorial_pow_mul_factorial_pow_le :
     exact_mod_cast n.factorial_le_pow
   have h2 : Real.log (R₀.factorial : ℝ) ≤ R * Real.log R := by
     have h3 : (R₀.factorial : ℝ) ≤ R ^ R₀ := by
-      calc (R₀.factorial : ℝ) ≤ (R₀ : ℝ) ^ R₀ := by exact_mod_cast R₀.factorial_le_pow
+      calc
+        (R₀.factorial : ℝ)
+          ≤ (R₀ : ℝ) ^ R₀ := by exact_mod_cast R₀.factorial_le_pow
         _ ≤ R ^ R₀ := pow_le_pow_left₀ h0 hR₀ _
-    calc Real.log (R₀.factorial : ℝ) ≤ Real.log (R ^ R₀) := Real.log_le_log hf2 h3
+    calc
+      Real.log (R₀.factorial : ℝ)
+        ≤ Real.log (R ^ R₀) := Real.log_le_log hf2 h3
       _ = R₀ * Real.log R := Real.log_pow _ _
       _ ≤ R * Real.log R := mul_le_mul_of_nonneg_right hR₀ hlR
-  have hlf : 0 ≤ Real.log (n.factorial : ℝ) :=
-    Real.log_nonneg (by exact_mod_cast n.factorial_pos)
+  have hlf : 0 ≤ Real.log (n.factorial : ℝ) := Real.log_nonneg (by exact_mod_cast n.factorial_pos)
   push_cast
   rw [Real.log_mul (pow_pos hf1 _).ne' (pow_pos hf2 _).ne', Real.log_pow, Real.log_pow,
     Real.log_mul (by linarith) (by linarith)]

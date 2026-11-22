@@ -18,21 +18,24 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Exists
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.GlobalTheoryTheory GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem NumberField
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab
+  Formalism.L2.GlobalTheoryTheory GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem NumberField
 
 namespace GlobalTheory.EX.OB.Bridge
 
-theorem exists_T_of_over {D : D7} {P : PreCh} {Lv : LevCh P} (h : Over D P Lv) (u : D.what₂.Word) :
-    ∃ u', (D.mem u).A.T = Lv.T u' := by
+theorem exists_T_of_over {D : D7} {P : PreCh} {Lv : LevCh P} (h : Over D P Lv) (u : D.what₂.Word)
+    : ∃ u', (D.mem u).A.T = Lv.T u' := by
   obtain ⟨sp, hT, hY, hA, hV, hz, X, h1, rfl⟩ := h
-  have key : ∀ B : Pre, B = Pre.ofCh P Lv sp hT hY hA hV hz → ∀ v : B.Word, ∃ u', B.T v = Lv.T u' := by
+  have key
+      : ∀ B : Pre, B = Pre.ofCh P Lv sp hT hY hA hV hz → ∀ v : B.Word, ∃ u', B.T v = Lv.T u' := by
     rintro B rfl v
     exact ⟨v, rfl⟩
   obtain ⟨u', hu⟩ := key X.B.toPre h1 u
   exact ⟨u', (X.C.A_T u).trans hu⟩
 
-theorem scale_X'_le_of_log (eps cs : ℝ) (he : 0 < eps) (hc : 0 < cs) : ∃ x0 : ℝ, ∀ (s : Scale) (R : Ranks) (T : ℝ),
-    s.eps = eps → x0 ≤ s.x → RankVal s R → 0 < T → cs * R.m * s.L ≤ Real.log T → s.X' ≤ T := by
+theorem scale_X'_le_of_log (eps cs : ℝ) (he : 0 < eps) (hc : 0 < cs)
+    : ∃ x0 : ℝ, ∀ (s : Scale) (R : Ranks) (T : ℝ),
+      s.eps = eps → x0 ≤ s.x → RankVal s R → 0 < T → cs * R.m * s.L ≤ Real.log T → s.X' ≤ T := by
   refine ⟨cs⁻¹ ^ ((2 * eps / 3)⁻¹), fun s R T hs hx hR hT h => ?_⟩
   have hx1 := s.one_lt_alt
   have hx0 : 0 < s.x := by linarith
@@ -57,8 +60,9 @@ theorem scale_X'_le_of_log (eps cs : ℝ) (he : 0 < eps) (hc : 0 < cs) : ∃ x0 
   rw [Scale.X', ← Real.le_log_iff_exp_le hT]
   exact h5.trans h
 
-theorem scale_one_le_w'' (eps : ℝ) (he : 0 < eps) : ∃ x0 : ℝ, ∀ (s : Scale) (R : Ranks),
-    s.eps = eps → x0 ≤ s.x → RankVal s R → 1 ≤ s.w'' R.n := by
+theorem scale_one_le_w'' (eps : ℝ) (he : 0 < eps)
+    : ∃ x0 : ℝ, ∀ (s : Scale) (R : Ranks),
+      s.eps = eps → x0 ≤ s.x → RankVal s R → 1 ≤ s.w'' R.n := by
   obtain ⟨x0, h⟩ := GlobalTheory.scale_poly_comparison eps 0 1 he one_pos
   refine ⟨max x0 4, fun s R hs hx hR => ?_⟩
   have hx4 : 4 ≤ s.x := (le_max_right _ _).trans hx

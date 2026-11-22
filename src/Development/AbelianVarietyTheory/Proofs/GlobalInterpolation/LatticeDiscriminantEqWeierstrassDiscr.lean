@@ -11,10 +11,13 @@ noncomputable section
 
 namespace GlobalTheory.LatticePeriodEtaProof
 
-open Formalism.MainNotions.TaylorLogMetric GlobalTheory.IndefiniteRowSideFullHecke.PeriodLatticeAgreement
+open Formalism.MainNotions.TaylorLogMetric
+  GlobalTheory.IndefiniteRowSideFullHecke.PeriodLatticeAgreement
 open scoped UpperHalfPlane
 
-theorem lattice_discriminant_eq_weierstrass_discr (Λ : AddSubgroup ℂ) : discr Λ = Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.B5.discr Λ := rfl
+theorem lattice_discriminant_eq_weierstrass_discr (Λ : AddSubgroup ℂ)
+    : discr Λ = Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.B5.discr Λ :=
+  rfl
 
 theorem latt_eq_closure (ω₁ τ : ℂ) : latt ω₁ τ = AddSubgroup.closure {ω₁, ω₁ * τ} := by
   ext w
@@ -30,9 +33,9 @@ theorem discrEta : DiscrEta := by
   rw [lattice_discriminant_eq_weierstrass_discr, latt_eq_closure]
   exact Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.B5.jac_discr ω₁ τ h τ.2
 
-theorem im_conj_mul (ω τ : ℂ) (m n m' n' : ℤ) :
-    ((starRingEnd ℂ) (ω * ((m : ℂ) + (n : ℂ) * τ)) * (ω * ((m' : ℂ) + (n' : ℂ) * τ))).im =
-      ‖ω‖ ^ 2 * τ.im * ((m * n' - n * m' : ℤ) : ℝ) := by
+theorem im_conj_mul (ω τ : ℂ) (m n m' n' : ℤ)
+    : ((starRingEnd ℂ) (ω * ((m : ℂ) + (n : ℂ) * τ)) * (ω * ((m' : ℂ) + (n' : ℂ) * τ))).im
+      = ‖ω‖ ^ 2 * τ.im * ((m * n' - n * m' : ℤ) : ℝ) := by
   rw [Complex.sq_norm, Complex.normSq_apply]
   simp [Complex.mul_im, Complex.mul_re]
   ring
@@ -44,8 +47,17 @@ theorem areaEq : AreaEq := by
   have hc : 0 < ‖ω₁‖ ^ 2 * τ.im := by positivity
   unfold area
   apply IsLeast.csInf_eq
-  refine ⟨⟨hc, ω₁ * ((1 : ℤ) + ((0 : ℤ) : ℂ) * (τ : ℂ)), ⟨1, 0, rfl⟩,
-    ω₁ * (((0 : ℤ) : ℂ) + ((1 : ℤ) : ℂ) * (τ : ℂ)), ⟨0, 1, rfl⟩, ?_⟩, ?_⟩
+  refine ⟨
+    ⟨
+      hc,
+      ω₁ * ((1 : ℤ) + ((0 : ℤ) : ℂ) * (τ : ℂ)),
+      ⟨1, 0, rfl⟩,
+      ω₁ * (((0 : ℤ) : ℂ) + ((1 : ℤ) : ℂ) * (τ : ℂ)),
+      ⟨0, 1, rfl⟩,
+      ?_
+    ⟩,
+    ?_
+  ⟩
   · rw [im_conj_mul]
     norm_num [UpperHalfPlane.coe_im, abs_of_pos hy]
   · rintro a ⟨ha, w₁, ⟨m, n, rfl⟩, w₂, ⟨m', n', rfl⟩, rfl⟩
@@ -67,14 +79,16 @@ theorem periodEta : PeriodEta := by
   have hπ : 0 < Real.pi := Real.pi_pos
   unfold period
   rw [discrEta ω₁ τ h, areaEq ω₁ τ h]
-  have e : ‖(2 * (Real.pi : ℂ) / ω₁) ^ 12 * ModularForm.eta (τ : ℂ) ^ 24‖ =
-      ((2 * Real.pi / ‖ω₁‖) ^ 2 * ‖ModularForm.eta (τ : ℂ)‖ ^ 4) ^ 6 := by
+  have e
+      : ‖(2 * (Real.pi : ℂ) / ω₁) ^ 12 * ModularForm.eta (τ : ℂ) ^ 24‖
+        = ((2 * Real.pi / ‖ω₁‖) ^ 2 * ‖ModularForm.eta (τ : ℂ)‖ ^ 4) ^ 6 := by
     rw [norm_mul, norm_pow, norm_pow, norm_div, norm_mul, Complex.norm_real,
       Real.norm_of_nonneg hπ.le]
     norm_num
     ring
   have hx : 0 ≤ (2 * Real.pi / ‖ω₁‖) ^ 2 * ‖ModularForm.eta (τ : ℂ)‖ ^ 4 := by positivity
-  rw [e, show ((1 : ℝ) / 6) = ((6 : ℕ) : ℝ)⁻¹ by norm_num, Real.pow_rpow_inv_natCast hx (by norm_num)]
+  rw [e, show ((1 : ℝ) / 6) = ((6 : ℕ) : ℝ)⁻¹ by norm_num,
+    Real.pow_rpow_inv_natCast hx (by norm_num)]
   field_simp
   ring
 
@@ -84,16 +98,19 @@ theorem discrScale : DiscrScale := by
   rw [zpow_neg, show (12 : ℤ) = ((12 : ℕ) : ℤ) from rfl, zpow_natCast]
   field_simp
 
-theorem hasSum_G (L : PeriodPair) {n : ℕ} (hn : 2 < n) :
-    HasSum (fun w : {w : ℂ // w ∈ L.lattice.toAddSubgroup ∧ w ≠ 0} => 1 / (w : ℂ) ^ n) (L.G n) := by
+theorem hasSum_G (L : PeriodPair) {n : ℕ} (hn : 2 < n)
+    : HasSum
+      (fun w : {w : ℂ // w ∈ L.lattice.toAddSubgroup ∧ w ≠ 0} => 1 / (w : ℂ) ^ n)
+      (L.G n) := by
   have h := L.hasSum_sumInvPow 0 hn
   simp only [sub_zero, PeriodPair.sumInvPow_zero] at h
   have h1 : HasSum (((L.lattice : Set ℂ)).indicator (fun w : ℂ => 1 / w ^ n)) (L.G n) := by
     rw [← hasSum_subtype_iff_indicator]
     simp only [one_div]
     exact h
-  have h2 : ((L.lattice : Set ℂ)).indicator (fun w : ℂ => 1 / w ^ n) =
-      ({w : ℂ | w ∈ L.lattice.toAddSubgroup ∧ w ≠ 0}).indicator (fun w : ℂ => 1 / w ^ n) := by
+  have h2
+      : ((L.lattice : Set ℂ)).indicator (fun w : ℂ => 1 / w ^ n)
+        = ({w : ℂ | w ∈ L.lattice.toAddSubgroup ∧ w ≠ 0}).indicator (fun w : ℂ => 1 / w ^ n) := by
     ext w
     by_cases hw : w = 0
     · subst hw
@@ -108,9 +125,12 @@ theorem hasSum_G (L : PeriodPair) {n : ℕ} (hn : 2 < n) :
 
 theorem agreePeriodPair : AgreePeriodPair := by
   intro L
-  have hk : ∀ k : ℕ, 2 ≤ k →
-      (Summable (fun w : {w : ℂ // w ∈ L.lattice.toAddSubgroup ∧ w ≠ 0} => 1 / (w : ℂ) ^ (2 * k)) ∧
-      eisG L.lattice.toAddSubgroup k = L.G (2 * k)) := by
+  have hk
+      : ∀ k : ℕ,
+        2 ≤ k
+          → (Summable (fun w : {w : ℂ // w ∈ L.lattice.toAddSubgroup ∧ w ≠ 0} =>
+              1 / (w : ℂ) ^ (2 * k))
+            ∧ eisG L.lattice.toAddSubgroup k = L.G (2 * k)) := by
     intro k hk
     have h := hasSum_G L (n := 2 * k) (by omega)
     exact ⟨h.summable, h.tsum_eq⟩

@@ -13,13 +13,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.IdeleGenera
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd GlobalTheory.HilbertThetaSeries
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd
+  GlobalTheory.HilbertThetaSeries
 open scoped Matrix
 
 namespace GlobalTheory.HilbertThetaSeries.CuspOne
 
-theorem pow_sub_one_small (p : ℕ) [Fact p.Prime] (r : ℚ) (hr : ‖(r : ℚ_[p])‖ = 1) (k : ℕ) (hk : p - 1 ∣ k) :
-    ‖((r : ℚ_[p]) ^ k - 1)‖ ≤ (p : ℝ)⁻¹ := by
+theorem pow_sub_one_small
+    (p : ℕ) [Fact p.Prime] (r : ℚ) (hr : ‖(r : ℚ_[p])‖ = 1) (k : ℕ) (hk : p - 1 ∣ k)
+    : ‖((r : ℚ_[p]) ^ k - 1)‖ ≤ (p : ℝ)⁻¹ := by
   set x : ℤ_[p] := ⟨(r : ℚ_[p]), hr.le⟩ with hx
   have hxu : ‖x‖ = 1 := hr
   have h1 : PadicInt.toZMod x ≠ 0 := by
@@ -30,7 +33,8 @@ theorem pow_sub_one_small (p : ℕ) [Fact p.Prime] (r : ℚ) (hr : ‖(r : ℚ_[
   obtain ⟨m, rfl⟩ := hk
   have h2 : PadicInt.toZMod (x ^ ((p - 1) * m) - 1) = 0 := by
     rw [map_sub, map_pow, map_one, pow_mul, ZMod.pow_card_sub_one_eq_one h1, one_pow, sub_self]
-  have h3 : x ^ ((p - 1) * m) - 1 ∈ IsLocalRing.maximalIdeal ℤ_[p] := by rw [← PadicInt.ker_toZMod]; exact h2
+  have h3 : x ^ ((p - 1) * m) - 1 ∈ IsLocalRing.maximalIdeal ℤ_[p] := by
+    rw [← PadicInt.ker_toZMod]; exact h2
   rw [IsLocalRing.mem_maximalIdeal, PadicInt.mem_nonunits] at h3
   have h4 : ‖x ^ ((p - 1) * m) - 1‖ ≤ (p : ℝ) ^ (-1 : ℤ) :=
     (PadicInt.norm_le_pow_iff_norm_lt_pow_add_one _ (-1)).2 (by simpa using h3)
@@ -44,8 +48,8 @@ theorem norm_qbar_rat (p : ℕ) [Fact p.Prime] (q : ℚ) : ‖((q : ℚ) : Qbar 
   rw [this]
   exact PadicAlgCl.norm_extends p _
 
-theorem toFin_aff {F : Type} [Field F] [NumberField F] (ξ : Fˣ) :
-    toFin (aff ξ 0) = aff (Units.map (algebraMap F (Af F)).toMonoidHom ξ) 0 := by
+theorem toFin_aff {F : Type} [Field F] [NumberField F] (ξ : Fˣ)
+    : toFin (aff ξ 0) = aff (Units.map (algebraMap F (Af F)).toMonoidHom ξ) 0 := by
   ext i j; fin_cases i <;> fin_cases j <;> simp [toFin, aff]
 
 theorem aff_mul {R : Type} [CommRing R] (a b : Rˣ) : aff (a * b) 0 = aff a 0 * aff b 0 := by
@@ -54,12 +58,31 @@ theorem aff_mul {R : Type} [CommRing R] (a b : Rˣ) : aff (a * b) 0 = aff a 0 * 
 theorem det_aff {R : Type} [CommRing R] (a : Rˣ) : (aff a 0).val.det = a := by
   simp [aff, Matrix.det_fin_two]
 
-theorem weightSlash_hilbertAffine_apply {F : Type} [Field F] [NumberField F] [IsTotallyReal F] (k : ℕ) (ξ : Fˣ) (g : Hn F → ℂ) :
-    sl0 k (toInf (aff ξ 0)) g = fun z => g (act (toInf (aff ξ 0)) z) := by
+theorem weightSlash_hilbertAffine_apply
+    {F : Type} [Field F] [NumberField F] [IsTotallyReal F] (k : ℕ) (ξ : Fˣ) (g : Hn F → ℂ)
+    : sl0 k (toInf (aff ξ 0)) g = fun z => g (act (toInf (aff ξ 0)) z) := by
   funext z
   simp [sl0, toInf, cmp, aff, UpperHalfPlane.denom]
 
-theorem cusp_inf_one : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (p : ℕ) [Fact p.Prime] (ι : Qbar p ≃+* ℂ), p ≠ 2 → ∀ δ : F, IsDel p δ → ∀ (k : ℕ), p - 1 ∣ k → ∀ (Ψ : GL (Fin 2) (Af F) → Hn F → ℂ), Sys k Ψ → ∀ (y y' z : (Af F)ˣ) (f : Hn F → ℂ), AtP p δ y' → (∀ γ, InG p δ γ → Small ι (p : ℝ)⁻¹ (sl0 k (toInf γ) f - 1)) → ∀ (γ : GL (Fin 2) F) (u : GL (Fin 2) (Af F)), TP γ.val.det → u ∈ KLev F 2 1 → toFin γ * aff y 0 = Matrix.GeneralLinearGroup.scalar (Fin 2) z * aff y' 0 * u → Ψ (aff y 0) = sl k (toInf γ) (((absF y' ^ ((k : ℝ) / 2) : ℝ) : ℂ) • f) → Small ι (p : ℝ)⁻¹ ((((absF y ^ ((k : ℝ) / 2) : ℝ) : ℂ))⁻¹ • Ψ (aff y 0) - 1) := by
+theorem cusp_inf_one
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (p : ℕ) [Fact p.Prime]
+        (ι : Qbar p ≃+* ℂ),
+      p ≠ 2
+        → ∀ δ : F,
+          IsDel p δ
+            → ∀ (k : ℕ),
+              p - 1 ∣ k
+                → ∀ (Ψ : GL (Fin 2) (Af F) → Hn F → ℂ),
+                  Sys k Ψ
+                    → ∀ (y y' z : (Af F)ˣ) (f : Hn F → ℂ),
+                      AtP p δ y' → (∀ γ, InG p δ γ → Small ι (p : ℝ)⁻¹ (sl0 k (toInf γ) f - 1))
+                        → ∀ (γ : GL (Fin 2) F) (u : GL (Fin 2) (Af F)),
+                          TP γ.val.det → u ∈ KLev F 2 1
+                            → toFin γ * aff y 0
+                              = Matrix.GeneralLinearGroup.scalar (Fin 2) z * aff y' 0 * u
+                            → Ψ (aff y 0) = sl k (toInf γ) (((absF y' ^ ((k : ℝ) / 2) : ℝ) : ℂ) • f)
+                            → Small ι (p : ℝ)⁻¹
+                              ((((absF y ^ ((k : ℝ) / 2) : ℝ) : ℂ))⁻¹ • Ψ (aff y 0) - 1) := by
   intro F _ _ _ p _ ι hp2 δ hδ k hk Ψ _ y y' z f hy' hf γ u hγ hu hmat hΨ
   have hpp : p.Prime := Fact.out
   have hkev : Even k := by
@@ -73,12 +96,14 @@ theorem cusp_inf_one : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F
   set ξa : (Af F)ˣ := Units.map (algebraMap F (Af F)).toMonoidHom ξ with hξa
   set γ₁ : GL (Fin 2) F := γ * (aff ξ 0)⁻¹ with hγ₁
   have hγeq : γ = γ₁ * aff ξ 0 := by simp [γ₁]
-  have hmat₁ : toFin γ₁ * aff (ξa * y) 0 = Matrix.GeneralLinearGroup.scalar (Fin 2) z * aff y' 0 * u := by
+  have hmat₁
+      : toFin γ₁ * aff (ξa * y) 0 = Matrix.GeneralLinearGroup.scalar (Fin 2) z * aff y' 0 * u := by
     rw [← hmat, aff_mul, hγ₁, map_mul, map_inv, toFin_aff]
     simp only [← hξa, mul_assoc, inv_mul_cancel_left]
   have hdet₁ : γ₁.val.det = γ.val.det / ξ := by
-    rw [← Matrix.GeneralLinearGroup.val_det_apply, hγ₁, map_mul, map_inv, Units.val_mul, Units.val_inv_eq_inv_val,
-      Matrix.GeneralLinearGroup.val_det_apply, Matrix.GeneralLinearGroup.val_det_apply, det_aff, div_eq_mul_inv]
+    rw [← Matrix.GeneralLinearGroup.val_det_apply, hγ₁, map_mul, map_inv, Units.val_mul,
+      Units.val_inv_eq_inv_val, Matrix.GeneralLinearGroup.val_det_apply,
+      Matrix.GeneralLinearGroup.val_det_apply, det_aff, div_eq_mul_inv]
   have hTP₁ : TP γ₁.val.det := fun v => by
     have h1 : γ.val.det = γ₁.val.det * ξ := by rw [hdet₁, div_mul_cancel₀ _ ξ.ne_zero]
     have h2 := hγ v
@@ -102,35 +127,48 @@ theorem cusp_inf_one : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F
     rw [← (R f).2.2.2.1 η, ← map_mul] at h
     exact h.symm
   have e3 : sl k (toInf γ₂) (c' • f) = ((Nd ^ ((k : ℝ) / 2) : ℝ) : ℂ) • (c' • G) := by
-    rw [((R (c' • f)).2.1 γ₂).2, (GlobalTheory.HilbertThetaSeries.slash_add_smul_pow F k 1 (toInf γ₂) f f c').2.1]
-  have e4 : sl k (toInf (aff ξ 0)) (((Nd ^ ((k : ℝ) / 2) : ℝ) : ℂ) • (c' • G)) =
-      (((Nd ^ ((k : ℝ) / 2) : ℝ) : ℂ) * c' * ((Nξ ^ ((k : ℝ) / 2) : ℝ) : ℂ)) • sl0 k (toInf (aff ξ 0)) G := by
-    rw [smul_smul, (GlobalTheory.HilbertThetaSeries.slash_add_smul_pow F k 1 (toInf (aff ξ 0)) G G _).2.2.2.2.1, ((R G).2.1 (aff ξ 0)).2, smul_smul]
+    rw [((R (c' • f)).2.1 γ₂).2,
+      (GlobalTheory.HilbertThetaSeries.slash_add_smul_pow F k 1 (toInf γ₂) f f c').2.1]
+  have e4
+      : sl k (toInf (aff ξ 0)) (((Nd ^ ((k : ℝ) / 2) : ℝ) : ℂ) • (c' • G))
+        = (((Nd ^ ((k : ℝ) / 2) : ℝ) : ℂ) * c' * ((Nξ ^ ((k : ℝ) / 2) : ℝ) : ℂ))
+          • sl0 k (toInf (aff ξ 0)) G := by
+    rw [smul_smul,
+      (GlobalTheory.HilbertThetaSeries.slash_add_smul_pow F k 1 (toInf (aff ξ 0)) G G _).2.2.2.2.1,
+      ((R G).2.1 (aff ξ 0)).2, smul_smul]
 
   obtain ⟨hA0, hAmul, -, hAprod⟩ := UpperTheory.V.Sd.Hm.absf F
   have hNξ' : Nξ * absF ξa = 1 := by
     rw [hNξ, det_aff, ← ((R f).2.2.2.2 (ξ : F)).1, Finset.abs_prod]
     exact hAprod ξ
-  have hreal : Nd ^ ((k : ℝ) / 2) * absF y' ^ ((k : ℝ) / 2) * Nξ ^ ((k : ℝ) / 2) =
-      ((r : ℝ) ^ k) * absF y ^ ((k : ℝ) / 2) := by
+  have hreal
+      : Nd ^ ((k : ℝ) / 2) * absF y' ^ ((k : ℝ) / 2) * Nξ ^ ((k : ℝ) / 2)
+        = ((r : ℝ) ^ k) * absF y ^ ((k : ℝ) / 2) := by
     have h0 : Nd * absF y' * Nξ = (r : ℝ) ^ 2 * absF y := by
       rw [hNd, hnorm, hAmul]
-      calc (r : ℝ) ^ 2 * (absF ξa * absF y) * Nξ = (r : ℝ) ^ 2 * absF y * (Nξ * absF ξa) := by ring
+      calc
+        (r : ℝ) ^ 2 * (absF ξa * absF y) * Nξ
+          = (r : ℝ) ^ 2 * absF y * (Nξ * absF ξa) := by ring
         _ = _ := by rw [hNξ', mul_one]
     have hNd0 : 0 ≤ Nd := abs_nonneg _
     have hNξ0 : 0 ≤ Nξ := abs_nonneg _
     have hy'0 : 0 ≤ absF y' := (hA0 y').le
     rw [← Real.mul_rpow hNd0 hy'0, ← Real.mul_rpow (mul_nonneg hNd0 hy'0) hNξ0, h0,
-      Real.mul_rpow (sq_nonneg _) (hA0 y).le, ← Real.rpow_natCast ((r : ℝ)) 2, ← Real.rpow_mul (by exact_mod_cast hr0.le)]
+      Real.mul_rpow (sq_nonneg _) (hA0 y).le, ← Real.rpow_natCast ((r : ℝ)) 2,
+      ← Real.rpow_mul (by exact_mod_cast hr0.le)]
     congr 1
     rw [← Real.rpow_natCast]
     congr 1
-    push_cast; ring
+    push_cast
+    ring
   have hy0 : ((absF y ^ ((k : ℝ) / 2) : ℝ) : ℂ) ≠ 0 := by
     exact_mod_cast (Real.rpow_pos_of_pos (hA0 y) _).ne'
   set H : Hn F → ℂ := sl0 k (toInf (aff ξ 0)) G with hHdef
   set c : ℂ := ((r : ℚ) : ℂ) ^ k with hcdef
-  have key : (((absF y ^ ((k : ℝ) / 2) : ℝ) : ℂ))⁻¹ * (((Nd ^ ((k : ℝ) / 2) : ℝ) : ℂ) * c' * ((Nξ ^ ((k : ℝ) / 2) : ℝ) : ℂ)) = c := by
+  have key
+      : (((absF y ^ ((k : ℝ) / 2) : ℝ) : ℂ))⁻¹
+          * (((Nd ^ ((k : ℝ) / 2) : ℝ) : ℂ) * c' * ((Nξ ^ ((k : ℝ) / 2) : ℝ) : ℂ))
+        = c := by
     rw [hc', inv_mul_eq_iff_eq_mul₀ hy0]
     have := congrArg (fun x : ℝ => (x : ℂ)) hreal
     push_cast at this ⊢
@@ -161,15 +199,37 @@ theorem cusp_inf_one : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F
   have hS2 := (Q _ _ (H - 1) (H - 1) c S1 S1).2.2.1
   have hS3 := (Q _ _ (H - 1) (H - 1) (c - 1) S1 S1).2.2.2.2.2
   have hsum := (Q _ _ _ _ 0 hS2 hS3).1
-  have heq : c • H - 1 = c • (H - 1) + fun _ => c - 1 := by
-    funext w; simp; ring
+  have heq : c • H - 1 = c • (H - 1) + fun _ => c - 1 := by funext w; simp; ring
   rw [heq]
   exact (Q _ _ _ _ 0 hsum S1).2.2.2.1 (by rw [hc, one_mul]; exact max_le le_rfl hc1)
 
 end GlobalTheory.HilbertThetaSeries.CuspOne
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd GlobalTheory.HilbertThetaSeries
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd
+  GlobalTheory.HilbertThetaSeries
 open scoped Matrix
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.system_cusp_infinity_component_congr_one : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (p : ℕ) [Fact p.Prime] (ι : Qbar p ≃+* ℂ), p ≠ 2 → ∀ δ : F, IsDel p δ → ∀ (k : ℕ), p - 1 ∣ k → ∀ (Ψ : GL (Fin 2) (Af F) → Hn F → ℂ), Sys k Ψ → ∀ (y y' z : (Af F)ˣ) (f : Hn F → ℂ), AtP p δ y' → (∀ γ, InG p δ γ → Small ι (p : ℝ)⁻¹ (sl0 k (toInf γ) f - 1)) → ∀ (γ : GL (Fin 2) F) (u : GL (Fin 2) (Af F)), TP γ.val.det → u ∈ KLev F 2 1 → toFin γ * aff y 0 = Matrix.GeneralLinearGroup.scalar (Fin 2) z * aff y' 0 * u → Ψ (aff y 0) = sl k (toInf γ) (((absF y' ^ ((k : ℝ) / 2) : ℝ) : ℂ) • f) → Small ι (p : ℝ)⁻¹ ((((absF y ^ ((k : ℝ) / 2) : ℝ) : ℂ))⁻¹ • Ψ (aff y 0) - 1) := by
-  first | exact @GlobalTheory.HilbertThetaSeries.CuspOne.cusp_inf_one | exact GlobalTheory.HilbertThetaSeries.CuspOne.cusp_inf_one | (intros; apply GlobalTheory.HilbertThetaSeries.CuspOne.cusp_inf_one <;> assumption)
+theorem _root_.GlobalTheory.T.system_cusp_infinity_component_congr_one
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (p : ℕ) [Fact p.Prime]
+        (ι : Qbar p ≃+* ℂ),
+      p ≠ 2
+        → ∀ δ : F,
+          IsDel p δ
+            → ∀ (k : ℕ),
+              p - 1 ∣ k
+                → ∀ (Ψ : GL (Fin 2) (Af F) → Hn F → ℂ),
+                  Sys k Ψ
+                    → ∀ (y y' z : (Af F)ˣ) (f : Hn F → ℂ),
+                      AtP p δ y' → (∀ γ, InG p δ γ → Small ι (p : ℝ)⁻¹ (sl0 k (toInf γ) f - 1))
+                        → ∀ (γ : GL (Fin 2) F) (u : GL (Fin 2) (Af F)),
+                          TP γ.val.det → u ∈ KLev F 2 1
+                            → toFin γ * aff y 0
+                              = Matrix.GeneralLinearGroup.scalar (Fin 2) z * aff y' 0 * u
+                            → Ψ (aff y 0) = sl k (toInf γ) (((absF y' ^ ((k : ℝ) / 2) : ℝ) : ℂ) • f)
+                            → Small ι (p : ℝ)⁻¹
+                              ((((absF y ^ ((k : ℝ) / 2) : ℝ) : ℂ))⁻¹ • Ψ (aff y 0) - 1) := by
+  first
+  | exact @GlobalTheory.HilbertThetaSeries.CuspOne.cusp_inf_one
+  | exact GlobalTheory.HilbertThetaSeries.CuspOne.cusp_inf_one
+  | (intros; apply GlobalTheory.HilbertThetaSeries.CuspOne.cusp_inf_one <;> assumption)

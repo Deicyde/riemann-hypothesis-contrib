@@ -11,11 +11,16 @@ public import ReciprocityTheory.Hypotheses.GalCoh
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host NumberField IsDedekindDomain ReciprocityTheory.Gal GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up GlobalTheory.NPin GlobalTheory.NFacts
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
+  Formalism.L2.Host NumberField IsDedekindDomain ReciprocityTheory.Gal GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.Up GlobalTheory.NPin GlobalTheory.NFacts
 
 namespace GlobalTheory.EtaInfType
 
-theorem main : ∀ (D : D7) (cf : CharFrame D) (C : NChoice D) (tp : TupTied D cf C), NCharTied D cf C tp → ∀ t, D.naut.infG D.naut.etaT (Formalism.L2.embT D t) = {(1 / 2 : ℂ)} := by
+theorem main
+    : ∀ (D : D7) (cf : CharFrame D) (C : NChoice D) (tp : TupTied D cf C),
+      NCharTied D cf C tp
+        → ∀ t, D.naut.infG D.naut.etaT (Formalism.L2.embT D t) = {(1 / 2 : ℂ)} := by
   intro D cf C tp N t
   have hI : (N.e1 D.naut.etaT).1.HasInfQ (embPsi D.host) (fun _ => (1 / 2 : ℚ)) := by
     rw [N.etaT]

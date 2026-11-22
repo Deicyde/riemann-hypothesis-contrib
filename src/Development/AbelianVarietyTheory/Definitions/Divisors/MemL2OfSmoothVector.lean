@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LieDerivativ
 noncomputable section
 
 open NumberField MeasureTheory Matrix
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.UnitaryBC GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.UnitaryBC GlobalTheory.CuspRep
+  GlobalTheory.CuspRep.CuspidalL2GL
 
 namespace GlobalTheory.GLFin
 
@@ -26,12 +27,6 @@ def word (l : List (Lie E a)) : Module.End ℂ (Sm E a) := (l.map (lie E a)).pro
 variable (μ : Measure (GA E a)) [μ.IsMulLeftInvariant]
 
 variable {μ} {H : Submodule ℂ (L2 (latticeGL E a) μ)}
-
-
-
-
-
-
 
 end GlobalTheory.GLFin
 

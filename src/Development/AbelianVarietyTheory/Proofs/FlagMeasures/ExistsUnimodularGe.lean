@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Latti
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.Mass Formalism.HermitianLatticesTheory Formalism.BasicNotions Formalism.MainNotions.S
+open NumberField Matrix GlobalTheory.Mass Formalism.HermitianLatticesTheory Formalism.BasicNotions
+  Formalism.MainNotions.S
 open scoped ENNReal Classical nonZeroDivisors
 
 namespace GlobalTheory.Mass.RowEx
@@ -21,17 +22,20 @@ open GlobalTheory.Mass.RowPerp
 
 section General
 
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
   [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-private theorem full_of_unimodular {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm)
-    (hn : h.Nondegenerate) {N : Submodule (𝓞 K) V} (hN : Submodule.IsLattice K N)
-    (hU : IsUnimodular h N) : Submodule.IsFullLattice K N := by
+private theorem full_of_unimodular
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hn : h.Nondegenerate)
+    {N : Submodule (𝓞 K) V} (hN : Submodule.IsLattice K N) (hU : IsUnimodular h N)
+    : Submodule.IsFullLattice K N := by
   refine { toIsLattice := hN, span_eq_top := ?_ }
   classical
   by_contra hspan
   obtain ⟨φ, hφ₀, hφ⟩ := Submodule.exists_le_ker_of_lt_top _ (lt_top_iff_ne_top.mpr hspan)
-  obtain ⟨bs, hbs⟩ := Formalism.HermitianLatticesTheory.dualLattice_dualBasis h hn (Module.finBasis K V)
+  obtain ⟨bs, hbs⟩ :=
+    Formalism.HermitianLatticesTheory.dualLattice_dualBasis h hn (Module.finBasis K V)
   let μ := ∑ j, star (φ ((Module.finBasis K V) j)) • bs j
   have hμ : ∀ v, h μ v = φ v := by
     have key : h μ = φ := by
@@ -40,8 +44,10 @@ private theorem full_of_unimodular {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.Is
       dsimp only [μ]
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum, LinearMap.sum_apply]
-      have hs : ∀ j, h (star (φ ((Module.finBasis K V) j)) • bs j) ((Module.finBasis K V) i) =
-          φ ((Module.finBasis K V) j) * (if i = j then 1 else 0) := by
+      have hs
+          : ∀ j,
+            h (star (φ ((Module.finBasis K V) j)) • bs j) ((Module.finBasis K V) i)
+              = φ ((Module.finBasis K V) j) * (if i = j then 1 else 0) := by
         intro j
         rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, starRingEnd_apply, star_star]
         congr 1
@@ -58,26 +64,28 @@ private theorem full_of_unimodular {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.Is
   have hline (a : K) : a • μ ∈ N := by
     rw [← hU]
     change a • μ ∈ Formalism.E.hdual h N
-    simp only [Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap, LinearMap.restrictScalars_apply]
+    simp only [Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap,
+      LinearMap.restrictScalars_apply]
     intro y hy
     have hy₀ := LinearMap.mem_ker.mp (hφ (Submodule.subset_span hy))
     simp [← hs.eq (a • μ) y, LinearMap.map_smulₛₗ, hμ, hy₀]
-  obtain ⟨ψ, hψ, -⟩ := Submodule.exists_le_ker_of_notMem
-    (show μ ∉ (⊥ : Submodule K V) by simpa using hμ₀)
+  obtain ⟨ψ, hψ, -⟩ :=
+    Submodule.exists_le_ker_of_notMem (show μ ∉ (⊥ : Submodule K V) by simpa using hμ₀)
   let f := ψ.restrictScalars (𝓞 K)
   have hmap (x : K) : x ∈ N.map f := by
     refine ⟨(x / ψ μ) • μ, hline _, ?_⟩
     change ψ ((x / ψ μ) • μ) = x
     rw [map_smul, smul_eq_mul, div_mul_cancel₀ _ hψ]
-  obtain ⟨d, hd₀, hd⟩ := FractionalIdeal.isFractional_of_fg
-    (S := nonZeroDivisors (𝓞 K)) (hN.fg.map f)
+  obtain ⟨d, hd₀, hd⟩ :=
+    FractionalIdeal.isFractional_of_fg (S := nonZeroDivisors (𝓞 K)) (hN.fg.map f)
   have hinj := IsFractionRing.injective (𝓞 K) K
-  have hne {a : 𝓞 K} (ha : a ≠ 0) : algebraMap (𝓞 K) K a ≠ 0 :=
-    fun h => ha (hinj (h.trans (map_zero _).symm))
+  have hne {a : 𝓞 K} (ha : a ≠ 0) : algebraMap (𝓞 K) K a ≠ 0 := fun h =>
+    ha (hinj (h.trans (map_zero _).symm))
   have hinteger (x : K) : IsLocalization.IsInteger (𝓞 K) x := by
     have hx := hd _ (hmap ((algebraMap (𝓞 K) K d)⁻¹ * x))
     rwa [Algebra.smul_def, ← mul_assoc, mul_inv_cancel₀ (hne (nonZeroDivisors.ne_zero hd₀)),
-      one_mul] at hx
+        one_mul]
+      at hx
   apply RingOfIntegers.not_isField K
   refine ⟨⟨0, 1, zero_ne_one⟩, mul_comm, ?_⟩
   intro a ha
@@ -85,27 +93,35 @@ private theorem full_of_unimodular {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.Is
   refine ⟨b, hinj ?_⟩
   rw [map_mul, hb, map_one, mul_inv_cancel₀ (hne ha)]
 
-
-theorem exists_unimodular_ge {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hn : h.Nondegenerate)
+theorem exists_unimodular_ge
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hn : h.Nondegenerate)
     {M : Submodule (𝓞 K) V} (hM : Submodule.IsFullLattice K M) (hu : IsUnimodular h M)
-    {G : Submodule (𝓞 K) V} (hG : G.FG) (hi : G ≤ dual h G) :
-    ∃ Λ : Submodule (𝓞 K) V, Submodule.IsFullLattice K Λ ∧ IsUnimodular h Λ ∧ G ≤ Λ := by
+    {G : Submodule (𝓞 K) V} (hG : G.FG) (hi : G ≤ dual h G)
+    : ∃ Λ : Submodule (𝓞 K) V, Submodule.IsFullLattice K Λ ∧ IsUnimodular h Λ ∧ G ≤ Λ := by
   have hsup := (dualBasic (𝓞 K) K V h hs star_algebraMap_ringOfIntegers_mem_range).2.2.1
-  have lat : ∀ A : Submodule (𝓞 K) V, Submodule.IsFullLattice K A → Submodule.IsFullLattice K (A ⊔ G : Submodule (𝓞 K) V) :=
-    fun A hA => by
-      letI := hA
-      exact { toIsLattice := Submodule.IsLattice.of_fg K (hA.fg.sup hG)
-              span_eq_top := top_le_iff.1 ((Submodule.IsFullLattice.span_eq_top (A := K) (M := A)).ge.trans
-                (Submodule.span_mono (le_sup_left (a := A) (b := G)))) }
-  obtain ⟨h1, h2, -⟩ := dualLattice (𝓞 K) K V h hs hn star_algebraMap_ringOfIntegers_mem_range _ (lat M hM)
+  have lat
+      : ∀ A : Submodule (𝓞 K) V,
+        Submodule.IsFullLattice K A
+          → Submodule.IsFullLattice K (A ⊔ G : Submodule (𝓞 K) V) := fun A hA => by
+    letI := hA
+    exact {
+      toIsLattice := Submodule.IsLattice.of_fg K (hA.fg.sup hG)
+      span_eq_top :=
+        top_le_iff.1 ((Submodule.IsFullLattice.span_eq_top (A := K) (M := A)).ge.trans
+          (Submodule.span_mono (le_sup_left (a := A) (b := G))))
+    }
+  obtain ⟨h1, h2, -⟩ :=
+    dualLattice (𝓞 K) K V h hs hn star_algebraMap_ringOfIntegers_mem_range _ (lat M hM)
   refine ⟨dual h (M ⊔ G) ⊔ G, lat _ h1, ?_, le_sup_right⟩
   unfold IsUnimodular at hu ⊢
   rw [hsup, h2, hsup, hu, sup_comm M G, sup_comm _ G, sup_inf_assoc_of_le _ hi]
 
-
-theorem exists_pair {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hn : h.Nondegenerate) [Nontrivial V]
-    {M : Submodule (𝓞 K) V} (hM : Submodule.IsFullLattice K M) (hu : IsUnimodular h M) (T : 𝓞 K) (hT : T ≠ 0) :
-    ∃ x ∈ M, ∃ y ∈ M, ∃ o : 𝓞 K, h x y = 1 + o * T := by
+theorem exists_pair
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hn : h.Nondegenerate)
+    [Nontrivial V]
+    {M : Submodule (𝓞 K) V} (hM : Submodule.IsFullLattice K M) (hu : IsUnimodular h M)
+    (T : 𝓞 K) (hT : T ≠ 0)
+    : ∃ x ∈ M, ∃ y ∈ M, ∃ o : 𝓞 K, h x y = 1 + o * T := by
   have hint : ∀ x ∈ M, ∀ y ∈ M, h x y ∈ (1 : Submodule (𝓞 K) K) := fun x hx y hy => by
     rw [← hu, dualBasic_mem_dual] at hy
     exact hy x hx
@@ -118,20 +134,24 @@ theorem exists_pair {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hn : h.N
     obtain ⟨w, hw⟩ := exists_ne (0 : V)
     refine hw (hn.1 w fun y => ?_)
     have h1 : ∀ v ∈ M, h w v = 0 := fun v hv => swap_zero hs (by rw [ne _ (H v hv)]; rfl)
-    rw [ne _ h1]; rfl
+    rw [ne _ h1]
+    rfl
   let J : Ideal (𝓞 K) := (M.map ((h v).restrictScalars (𝓞 K))).comap (Algebra.linearMap (𝓞 K) K)
   have hJ : ∀ y ∈ M, h v y ∈ (J : FractionalIdeal (𝓞 K)⁰ K) := fun y hy => by
     obtain ⟨r, hr⟩ := Submodule.mem_one.1 (hint v hv y hy)
     exact (FractionalIdeal.mem_coeIdeal _).2 ⟨r, ⟨y, hy, hr.symm⟩, hr⟩
-  obtain ⟨c, hc⟩ := IsDedekindDomain.exists_add_spanSingleton_mul_eq (K := K)
-    (a := ((Ideal.span {T} : Ideal (𝓞 K)) : FractionalIdeal (𝓞 K)⁰ K)) (b := (J : FractionalIdeal (𝓞 K)⁰ K))
-    (c := 1) FractionalIdeal.coeIdeal_le_one
-    (FractionalIdeal.coeIdeal_ne_zero.2 (by simpa using hT))
-    (fun e => hvy (by simpa [e] using hJ y hy))
+  obtain ⟨c, hc⟩ :=
+    IsDedekindDomain.exists_add_spanSingleton_mul_eq (K := K)
+      (a := ((Ideal.span {T} : Ideal (𝓞 K)) : FractionalIdeal (𝓞 K)⁰ K))
+      (b := (J : FractionalIdeal (𝓞 K)⁰ K)) (c := 1) FractionalIdeal.coeIdeal_le_one
+      (FractionalIdeal.coeIdeal_ne_zero.2 (by simpa using hT))
+      (fun e => hvy (by simpa [e] using hJ y hy))
   have e : ∀ y, h (star c • v) y = c * h v y := fun y => by
     rw [LinearMap.map_smulₛₗ, starRingEnd_apply, star_star]; rfl
-  have h1 : (1 : K) ∈ ((Ideal.span {T} : Ideal (𝓞 K)) : FractionalIdeal (𝓞 K)⁰ K) +
-      FractionalIdeal.spanSingleton (𝓞 K)⁰ c * (J : FractionalIdeal (𝓞 K)⁰ K) := by
+  have h1
+      : (1 : K)
+        ∈ ((Ideal.span {T} : Ideal (𝓞 K)) : FractionalIdeal (𝓞 K)⁰ K)
+          + FractionalIdeal.spanSingleton (𝓞 K)⁰ c * (J : FractionalIdeal (𝓞 K)⁰ K) := by
     rw [hc]; exact FractionalIdeal.one_mem_one _
   obtain ⟨a, ha, b, hb, hab⟩ := (FractionalIdeal.mem_add _ _ _).1 h1
   obtain ⟨t, ht, rfl⟩ := (FractionalIdeal.mem_coeIdeal _).1 ha
@@ -145,21 +165,28 @@ theorem exists_pair {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hn : h.N
     rw [e]
     have : c * h v w ∈ (1 : FractionalIdeal (𝓞 K)⁰ K) := by
       rw [← hc]
-      exact (FractionalIdeal.mem_add _ _ _).2 ⟨0, FractionalIdeal.zero_mem _, _,
-        FractionalIdeal.mem_singleton_mul.2 ⟨_, hJ w hw, rfl⟩, zero_add _⟩
+      exact (FractionalIdeal.mem_add _ _ _).2 ⟨
+        0,
+        FractionalIdeal.zero_mem _,
+        _,
+        FractionalIdeal.mem_singleton_mul.2 ⟨_, hJ w hw, rfl⟩,
+        zero_add _
+      ⟩
     exact Submodule.mem_one.2 ((FractionalIdeal.mem_one_iff _).1 this)
   · rw [e]
     have e2 : h v y' = algebraMap (𝓞 K) K r := e'
     rw [e2, ← hab]
     simp
 
-theorem exists_idem (P : Ideal (𝓞 K)) (T : 𝓞 K) (hc : IsCoprime P (conjIdeal (K := K) P))
-    (hP : P * conjIdeal (K := K) P = Ideal.span {T}) :
-    ∃ ε m n : 𝓞 K, (ε : K) + star (ε : K) = 1 + m * T ∧ (ε : K) * star (ε : K) = n * T ^ 2 := by
+theorem exists_idem
+    (P : Ideal (𝓞 K)) (T : 𝓞 K)
+    (hc : IsCoprime P (conjIdeal (K := K) P)) (hP : P * conjIdeal (K := K) P = Ideal.span {T})
+    : ∃ ε m n : 𝓞 K, (ε : K) + star (ε : K) = 1 + m * T ∧ (ε : K) * star (ε : K) = n * T ^ 2 := by
   obtain ⟨a, ha, b, hb, hab⟩ := Ideal.isCoprime_iff_exists.1 hc
   obtain ⟨a', ha'⟩ := star_algebraMap_ringOfIntegers_mem_range a
   obtain ⟨b', hb', eb⟩ : ∃ b' ∈ P, algebraMap (𝓞 K) K b' = star (algebraMap (𝓞 K) K b) := by
-    refine Submodule.span_induction (p := fun b _ => ∃ b' ∈ P, algebraMap (𝓞 K) K b' = star (algebraMap (𝓞 K) K b))
+    refine Submodule.span_induction
+      (p := fun b _ => ∃ b' ∈ P, algebraMap (𝓞 K) K b' = star (algebraMap (𝓞 K) K b))
       ?_ ⟨0, P.zero_mem, by simp⟩ ?_ ?_ hb
     · rintro r ⟨s, hs, e⟩
       exact ⟨s, hs, by rw [e, star_star]⟩
@@ -172,11 +199,11 @@ theorem exists_idem (P : Ideal (𝓞 K)) (T : 𝓞 K) (hc : IsCoprime P (conjIde
   have h2 : b' * b ∈ Ideal.span {T} := hP ▸ Ideal.mul_mem_mul hb' hb
   obtain ⟨p, hp⟩ := Ideal.mem_span_singleton'.1 h1
   obtain ⟨q, hq⟩ := Ideal.mem_span_singleton'.1 h2
-  have hab' : a' + b' = 1 := IsFractionRing.injective (𝓞 K) K (by
-    rw [map_add (f := _), ha', eb, ← star_add, ← map_add (f := _), hab, map_one, star_one])
+  have hab' : a' + b' = 1 :=
+    IsFractionRing.injective (𝓞 K) K
+      (by rw [map_add (f := _), ha', eb, ← star_add, ← map_add (f := _), hab, map_one, star_one])
   have e1 : a ^ 2 + a' ^ 2 = 1 + (2 * (p - q) + (p - q) ^ 2 * T - 2 * p) * T := by
-    have : a + a' = 1 + (p - q) * T := by
-      linear_combination -hp + hq + b' * hab + (1 - a) * hab'
+    have : a + a' = 1 + (p - q) * T := by linear_combination -hp + hq + b' * hab + (1 - a) * hab'
     linear_combination (a + a' + 1 + (p - q) * T) * this + 2 * hp
   have e2 : a ^ 2 * a' ^ 2 = p ^ 2 * T ^ 2 := by rw [← mul_pow, ← hp, mul_pow]
   have e3 : star ((a ^ 2 : 𝓞 K) : K) = ((a' ^ 2 : 𝓞 K) : K) := by
@@ -186,12 +213,14 @@ theorem exists_idem (P : Ideal (𝓞 K)) (T : 𝓞 K) (hc : IsCoprime P (conjIde
   · rw [e3]; exact_mod_cast congrArg (fun x : 𝓞 K => (x : K)) e1
   · rw [e3]; exact_mod_cast congrArg (fun x : 𝓞 K => (x : K)) e2
 
-
-theorem exists_norm {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hn : h.Nondegenerate) [Nontrivial V]
-    {M : Submodule (𝓞 K) V} (hM : Submodule.IsFullLattice K M) (hu : IsUnimodular h M) (T : ℕ) (hT : T ≠ 0)
+theorem exists_norm
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hn : h.Nondegenerate)
+    [Nontrivial V]
+    {M : Submodule (𝓞 K) V} (hM : Submodule.IsFullLattice K M) (hu : IsUnimodular h M)
+    (T : ℕ) (hT : T ≠ 0)
     (P : Ideal (𝓞 K)) (hc : IsCoprime P (conjIdeal (K := K) P))
-    (hP : P * conjIdeal (K := K) P = Ideal.span {(T : 𝓞 K)}) :
-    ∃ w, h w w - (T : K)⁻¹ ∈ (1 : Submodule (𝓞 K) K) := by
+    (hP : P * conjIdeal (K := K) P = Ideal.span {(T : 𝓞 K)})
+    : ∃ w, h w w - (T : K)⁻¹ ∈ (1 : Submodule (𝓞 K) K) := by
   have hint : ∀ x ∈ M, ∀ y ∈ M, h x y ∈ (1 : Submodule (𝓞 K) K) := fun x hx y hy => by
     rw [← hu, dualBasic_mem_dual] at hy
     exact hy x hx
@@ -207,33 +236,43 @@ theorem exists_norm {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hn : h.N
   have hyx : h y x = 1 + o' * T := by
     rw [← hs.eq x y, ho]
     change _ = 1 + algebraMap (𝓞 K) K o' * T
-    rw [ho']; simp [starRingEnd_apply]
+    rw [ho']
+    simp [starRingEnd_apply]
   have hε : star (ε : K) = ε' := hε'.symm
   rw [hε] at h1 h2
   refine ⟨y + ((ε : K) / T) • x, Submodule.mem_one.2 ⟨b + m + ε * o' + ε' * o + n * a, ?_⟩⟩
-  simp only [map_add (f := _), map_mul, LinearMap.map_smulₛₗ, LinearMap.add_apply, LinearMap.smul_apply, smul_eq_mul,
-    ho, hyx, ← ha, ← hb, starRingEnd_apply, star_div₀, star_natCast, hε, RingHom.id_apply]
+  simp only [map_add (f := _), map_mul, LinearMap.map_smulₛₗ, LinearMap.add_apply,
+    LinearMap.smul_apply, smul_eq_mul, ho, hyx, ← ha, ← hb, starRingEnd_apply, star_div₀,
+    star_natCast, hε, RingHom.id_apply]
   change (b : K) + m + ε * o' + ε' * o + n * a = b + ε' / T * (1 + o * T) + _ - _
   field_simp
   linear_combination (-(T : K)) * h1 - (a : K) * h2
 
-theorem exists_adapted {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hn : h.Nondegenerate)
-    {M : Submodule (𝓞 K) V} (hM : Submodule.IsFullLattice K M) (hu : IsUnimodular h M) {r : ℕ} (e f : Fin r → V)
-    (I : Fin r → FractionalIdeal (𝓞 K)⁰ K) (hI : ∀ a, (1 : K) ∈ I a) (hee : ∀ a b, h (e a) (e b) = 0)
-    (hff : ∀ a b, h (f a) (f b) = 0) (hef : ∀ a b, h (e a) (f b) = if a = b then 1 else 0) (z g : V)
-    (hez : ∀ a, h (e a) z = 0) (hfz : ∀ a, h (f a) z = 0) (heg : ∀ a, h (e a) g = 0) (hfg : ∀ a, h (f a) g = 0)
-    (hzz : h z z ∈ (1 : Submodule (𝓞 K) K)) (hgg : h g g ∈ (1 : Submodule (𝓞 K) K)) (hgz : h g z = 1) :
-    ∃ Λ : Submodule (𝓞 K) V, Submodule.IsFullLattice K Λ ∧ IsUnimodular h Λ ∧ z ∈ Λ ∧ g ∈ Λ ∧
-      Λ ⊓ (Submodule.span K (Set.range e)).restrictScalars (𝓞 K) =
-        Submodule.span (𝓞 K) {y | ∃ (a : Fin r) (x : K), x ∈ I a ∧ y = x • e a} := by
+theorem exists_adapted
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hn : h.Nondegenerate)
+    {M : Submodule (𝓞 K) V} (hM : Submodule.IsFullLattice K M) (hu : IsUnimodular h M)
+    {r : ℕ} (e f : Fin r → V) (I : Fin r → FractionalIdeal (𝓞 K)⁰ K) (hI : ∀ a, (1 : K) ∈ I a)
+    (hee : ∀ a b, h (e a) (e b) = 0) (hff : ∀ a b, h (f a) (f b) = 0)
+    (hef : ∀ a b, h (e a) (f b) = if a = b then 1 else 0)
+    (z g : V) (hez : ∀ a, h (e a) z = 0) (hfz : ∀ a, h (f a) z = 0) (heg : ∀ a, h (e a) g = 0)
+    (hfg : ∀ a, h (f a) g = 0) (hzz : h z z ∈ (1 : Submodule (𝓞 K) K))
+    (hgg : h g g ∈ (1 : Submodule (𝓞 K) K)) (hgz : h g z = 1)
+    : ∃ Λ : Submodule (𝓞 K) V,
+      Submodule.IsFullLattice K Λ ∧ IsUnimodular h Λ ∧ z ∈ Λ ∧ g ∈ Λ
+        ∧ Λ ⊓ (Submodule.span K (Set.range e)).restrictScalars (𝓞 K)
+          = Submodule.span (𝓞 K) {y | ∃ (a : Fin r) (x : K), x ∈ I a ∧ y = x • e a} := by
   have hI0 : ∀ a, I a ≠ 0 := fun a k => by simpa [k] using hI a
   have int : ∀ a, ∀ x ∈ I a, ∀ b ∈ (I a)⁻¹, b * x ∈ (1 : Submodule (𝓞 K) K) := fun a x hx b hb =>
-    Submodule.mem_one.2 ((FractionalIdeal.mem_one_iff _).1 ((FractionalIdeal.mem_inv_iff (hI0 a)).1 hb x hx))
+    Submodule.mem_one.2 ((FractionalIdeal.mem_one_iff _).1
+      ((FractionalIdeal.mem_inv_iff (hI0 a)).1 hb x hx))
   have hfe : ∀ a b, h (f b) (e a) = if a = b then 1 else 0 := fun a b => by
     rw [← hs.eq, hef]; split_ifs <;> simp
   have sm : ∀ (c d : K) (x y : V), h (c • x) (d • y) = star c * d * h x y := fun c d x y => by
-    rw [map_smul, LinearMap.map_smulₛₗ, starRingEnd_apply, LinearMap.smul_apply, smul_eq_mul, smul_eq_mul]; ring
-  have sl : ∀ (c : K) (x y : V), h x y = 0 → h (c • x) y ∈ (1 : Submodule (𝓞 K) K) := fun c x y k => by
+    rw [map_smul, LinearMap.map_smulₛₗ, starRingEnd_apply, LinearMap.smul_apply, smul_eq_mul,
+      smul_eq_mul]
+    ring
+  have sl
+      : ∀ (c : K) (x y : V), h x y = 0 → h (c • x) y ∈ (1 : Submodule (𝓞 K) K) := fun c x y k => by
     rw [← one_smul K y, sm, k, mul_zero]; exact Submodule.zero_mem _
   have one : (1 : K) ∈ (1 : Submodule (𝓞 K) K) := Submodule.mem_one.2 ⟨1, map_one _⟩
   let S₁ : Set V := {y | ∃ (a : Fin r) (x : K), x ∈ I a ∧ y = x • e a}
@@ -248,7 +287,8 @@ theorem exists_adapted {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hn : 
     rintro x ((hx | hx) | rfl | rfl) y ((hy | hy) | rfl | rfl)
     · obtain ⟨a, x, -, rfl⟩ := hx
       obtain ⟨b, y, -, rfl⟩ := hy
-      rw [sm, hee, mul_zero]; exact Submodule.zero_mem _
+      rw [sm, hee, mul_zero]
+      exact Submodule.zero_mem _
     · exact h12 x hx y hy
     · obtain ⟨a, x, -, rfl⟩ := hx
       exact swap_mem hs (sl _ _ _ (hez a))
@@ -257,7 +297,8 @@ theorem exists_adapted {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hn : 
     · exact swap_mem hs (h12 y hy x hx)
     · obtain ⟨a, x, -, rfl⟩ := hx
       obtain ⟨b, y, -, rfl⟩ := hy
-      rw [sm, hff, mul_zero]; exact Submodule.zero_mem _
+      rw [sm, hff, mul_zero]
+      exact Submodule.zero_mem _
     · obtain ⟨a, x, -, rfl⟩ := hx
       exact swap_mem hs (sl _ _ _ (hfz a))
     · obtain ⟨a, x, -, rfl⟩ := hx
@@ -275,8 +316,10 @@ theorem exists_adapted {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hn : 
     · exact swap_mem hs (by rw [hgz]; exact one)
     · exact hgg
   let G : Submodule (𝓞 K) V := Submodule.span (𝓞 K) (S₁ ∪ S₂ ∪ {z, g})
-  have hd : ∀ (S : Set V) (x : V), (∀ y ∈ S, h y x ∈ (1 : Submodule (𝓞 K) K)) →
-      x ∈ dual h (Submodule.span (𝓞 K) S) := fun S x H => by
+  have hd
+      : ∀ (S : Set V) (x : V),
+        (∀ y ∈ S, h y x ∈ (1 : Submodule (𝓞 K) K))
+          → x ∈ dual h (Submodule.span (𝓞 K) S) := fun S x H => by
     rw [dualBasic_mem_dual]
     intro y hy
     refine swap_mem hs ?_
@@ -287,9 +330,12 @@ theorem exists_adapted {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hn : 
   have hG : G.FG := by
     simp only [G, Submodule.span_union]
     refine (Submodule.FG.sup ?_ ?_).sup (Submodule.fg_span (Set.toFinite _))
-    · refine (Submodule.fg_iSup (fun a => (I a : Submodule (𝓞 K) K).map
-        ((LinearMap.toSpanSingleton K V (e a)).restrictScalars (𝓞 K))) fun a =>
-          (FractionalIdeal.fg_of_isNoetherianRing le_rfl (I a)).map _).of_le (Submodule.span_le.2 ?_)
+    · refine (Submodule.fg_iSup
+          (fun a =>
+            (I a : Submodule (𝓞 K) K).map
+              ((LinearMap.toSpanSingleton K V (e a)).restrictScalars (𝓞 K)))
+          fun a => (FractionalIdeal.fg_of_isNoetherianRing le_rfl (I a)).map _).of_le
+        (Submodule.span_le.2 ?_)
       rintro _ ⟨a, x, hx, rfl⟩
       exact Submodule.mem_iSup_of_mem a ⟨x, hx, rfl⟩
     · refine (Submodule.fg_span (R := 𝓞 K) (Set.finite_range f)).of_le (Submodule.span_le.2 ?_)
@@ -300,29 +346,45 @@ theorem exists_adapted {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hn : 
       rw [← ht, algebraMap_smul]
       exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, rfl⟩)
   obtain ⟨Λ, h1, h2, h3⟩ := exists_unimodular_ge hs hn hM hu hG hi
-  refine ⟨Λ, h1, h2, h3 (Submodule.subset_span (by simp)), h3 (Submodule.subset_span (by simp)),
-    le_antisymm ?_ (Submodule.span_le.2 ?_)⟩
+  refine ⟨
+    Λ,
+    h1,
+    h2,
+    h3 (Submodule.subset_span (by simp)),
+    h3 (Submodule.subset_span (by simp)),
+    le_antisymm ?_ (Submodule.span_le.2 ?_)
+  ⟩
   · rintro x ⟨hx, hX⟩
     obtain ⟨k, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun K).1 hX
     refine Submodule.sum_mem _ fun a _ => Submodule.subset_span ⟨a, k a, ?_, rfl⟩
     rw [← inv_inv (I a), FractionalIdeal.mem_inv_iff (inv_ne_zero (hI0 a))]
     intro b hb
     have hx' : ∑ a, k a • e a ∈ dual h Λ := h2.ge hx
-    have := (dualBasic_mem_dual h Λ _).1 hx' (star b • f a)
-      (h3 (Submodule.subset_span (Or.inl (Or.inr ⟨a, b, hb, rfl⟩))))
+    have :=
+      (dualBasic_mem_dual h Λ _).1 hx' (star b • f a)
+        (h3 (Submodule.subset_span (Or.inl (Or.inr ⟨a, b, hb, rfl⟩))))
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, sm, star_star, hfe, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ,
-      if_true] at this
+      simp only [map_sum, sm, star_star, hfe, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq',
+          Finset.mem_univ, if_true]
+        at this
     rw [mul_comm]
     exact (FractionalIdeal.mem_one_iff _).2 (Submodule.mem_one.1 this)
   · rintro _ ⟨a, x, hx, rfl⟩
     have k : x • e a ∈ S₁ := ⟨a, x, hx, rfl⟩
-    exact ⟨h3 (Submodule.subset_span (Or.inl (Or.inl k))),
-      (Submodule.span K (Set.range e)).smul_mem x (Submodule.subset_span ⟨a, rfl⟩)⟩
+    exact ⟨
+      h3 (Submodule.subset_span (Or.inl (Or.inl k))),
+      (Submodule.span K (Set.range e)).smul_mem x (Submodule.subset_span ⟨a, rfl⟩)
+    ⟩
 
 end General
 
-theorem main : ∀ (D : D7) (u : D.what₂.Word), letI := D.host.cmStar; ∀ F0 : FlagG (VS D) D.R.rS ((Lat.Tu D u : ℕ) : D.host.E), F0.e = D.sp.hypE → F0.z = D.zmOf u → (Lat.Tu D u).Prime → Lat.SplitsCompletely (E := D.host.E) (Lat.Tu D u) → ∃ Λ : Cnt.LatV D, IsRowLat D F0 Λ := by
+theorem main
+    : ∀ (D : D7) (u : D.what₂.Word),
+      letI := D.host.cmStar
+      ∀ F0 : FlagG (VS D) D.R.rS ((Lat.Tu D u : ℕ) : D.host.E),
+        F0.e = D.sp.hypE → F0.z = D.zmOf u → (Lat.Tu D u).Prime
+          → Lat.SplitsCompletely (E := D.host.E) (Lat.Tu D u)
+          → ∃ Λ : Cnt.LatV D, IsRowLat D F0 Λ := by
   intro D u
   letI := D.host.cmStar
   intro F0 he hz hp hsp
@@ -330,54 +392,87 @@ theorem main : ∀ (D : D7) (u : D.what₂.Word), letI := D.host.cmStar; ∀ F0 
   have hcm : IsCMUnram D.host.E := D.sp.cm.cmUnram
   have hs := (D.sp.Y 0).herm
   have hT' : ((Lat.Tu D u : ℕ) : D.host.E) ≠ 0 := Nat.cast_ne_zero.2 hp.ne_zero
-  have : Nontrivial (D.sp.X 0).V := Module.nontrivial_of_finrank_pos (R := D.host.E) (by
-    rw [(RowPerp.main D u F0 he hz).1.2]
-    have := D.R.m_add_three_le_k
-    omega)
-  obtain ⟨s, -, -, hc, hP⟩ := (CyclicGenus.main D.host.E (D.sp.X 0).V (D.sp.X 0).hT hcm (D.sp.X 0).herm
-    (D.sp.X 0).nondeg _ hp hsp).1
-  obtain ⟨w, hw⟩ := exists_norm (D.sp.X 0).herm (D.sp.X 0).nondeg (full_of_unimodular (D.sp.X 0).herm (D.sp.X 0).nondeg (D.sp.X 0).standardTuple_isLattice (D.sp.X 0).baseLattice_isUnimodular) (D.sp.X 0).baseLattice_isUnimodular
-    _ hp.ne_zero _ hc hP
+  have : Nontrivial (D.sp.X 0).V :=
+    Module.nontrivial_of_finrank_pos (R := D.host.E) (by
+      rw [(RowPerp.main D u F0 he hz).1.2]
+      have := D.R.m_add_three_le_k
+      omega)
+  obtain ⟨s, -, -, hc, hP⟩ :=
+    (CyclicGenus.main D.host.E (D.sp.X 0).V (D.sp.X 0).hT hcm (D.sp.X 0).herm (D.sp.X 0).nondeg _ hp
+      hsp).1
+  obtain ⟨w, hw⟩ :=
+    exists_norm (D.sp.X 0).herm (D.sp.X 0).nondeg
+      (full_of_unimodular (D.sp.X 0).herm (D.sp.X 0).nondeg (D.sp.X 0).standardTuple_isLattice
+        (D.sp.X 0).baseLattice_isUnimodular)
+      (D.sp.X 0).baseLattice_isUnimodular _ hp.ne_zero _ hc hP
   have hfz : ∀ a, (D.sp.Y 0).hT (D.sp.hypF a) F0.z = 0 := fun a => by
-    rw [hz]; unfold D7.zmOf
+    rw [hz]
+    unfold D7.zmOf
     rw [map_smul, swap_zero hs (D.sp.hyp_orthz a).2, smul_zero]
   have hιz : (D.sp.Y 0).hT (D.sp.iXY 0 w) F0.z = 0 := by
-    rw [hz]; unfold D7.zmOf
+    rw [hz]
+    unfold D7.zmOf
     rw [map_smul, D.sp.zm_orth, smul_zero]
   let g := D.sp.iXY 0 w - ((Lat.Tu D u : ℕ) : D.host.E)⁻¹ • F0.z
   have hgz : (D.sp.Y 0).hT g F0.z = 1 := by
-    simp only [g, map_sub, LinearMap.map_smulₛₗ, LinearMap.sub_apply, LinearMap.smul_apply, hιz, F0.z_norm,
-      map_inv₀, map_natCast, smul_eq_mul]
+    simp only [g, map_sub, LinearMap.map_smulₛₗ, LinearMap.sub_apply, LinearMap.smul_apply, hιz,
+      F0.z_norm, map_inv₀, map_natCast, smul_eq_mul]
     field_simp
     ring
   have heg : ∀ a, (D.sp.Y 0).hT (F0.e a) g = 0 := fun a => by
     rw [map_sub, map_smul, F0.z_orth, he, swap_zero hs (D.sp.hyp_orthX a w).1, smul_zero, sub_zero]
-  obtain ⟨Λ, h1, h2, h3, h4, h5⟩ := exists_adapted hs (D.sp.Y 0).nondeg (full_of_unimodular hs (D.sp.Y 0).nondeg (D.sp.Y 0).standardTuple_isLattice (D.sp.Y 0).baseLattice_isUnimodular) (D.sp.Y 0).baseLattice_isUnimodular
-    F0.e D.sp.hypF (fun a => GlobalTheory.SgGlob.dInv D.host.E (D.R.rS - a)) (fun a => GlobalTheory.SgGlob.Iota.one_mem_dInv _)
-    F0.e_iso D.sp.hyp_ff (by rw [he]; exact D.sp.hyp_ef) F0.z g F0.z_orth hfz heg
-    (fun a => by rw [map_sub, map_smul, hfz, swap_zero hs (D.sp.hyp_orthX a w).2, smul_zero, sub_zero])
-    (Submodule.mem_one.2 ⟨-(Lat.Tu D u : ℕ), by rw [F0.z_norm]; simp⟩)
-    (by
-      have e : (D.sp.Y 0).hT g (D.sp.iXY 0 w) = (D.sp.X 0).hT w w := by
-        rw [map_sub, LinearMap.sub_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, swap_zero hs hιz, smul_zero,
-          sub_zero, D.sp.iXY_isom 0 hm]
-      have e2 : (D.sp.Y 0).hT g g = (D.sp.Y 0).hT g (D.sp.iXY 0 w) -
-          ((Lat.Tu D u : ℕ) : D.host.E)⁻¹ • (D.sp.Y 0).hT g F0.z := by rw [← map_smul, ← map_sub]
-      rw [e2, e, hgz, smul_eq_mul, mul_one]
-      exact hw) hgz
+  obtain ⟨Λ, h1, h2, h3, h4, h5⟩ :=
+    exists_adapted hs (D.sp.Y 0).nondeg
+      (full_of_unimodular hs (D.sp.Y 0).nondeg (D.sp.Y 0).standardTuple_isLattice
+        (D.sp.Y 0).baseLattice_isUnimodular)
+      (D.sp.Y 0).baseLattice_isUnimodular F0.e D.sp.hypF
+      (fun a => GlobalTheory.SgGlob.dInv D.host.E (D.R.rS - a))
+      (fun a => GlobalTheory.SgGlob.Iota.one_mem_dInv _)
+      F0.e_iso D.sp.hyp_ff (by rw [he]; exact D.sp.hyp_ef) F0.z g F0.z_orth hfz heg
+      (fun a => by
+        rw [map_sub, map_smul, hfz, swap_zero hs (D.sp.hyp_orthX a w).2, smul_zero, sub_zero])
+      (Submodule.mem_one.2 ⟨-(Lat.Tu D u : ℕ), by rw [F0.z_norm]; simp⟩)
+      (by
+        have e : (D.sp.Y 0).hT g (D.sp.iXY 0 w) = (D.sp.X 0).hT w w := by
+          rw [map_sub, LinearMap.sub_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply,
+            swap_zero hs hιz, smul_zero, sub_zero, D.sp.iXY_isom 0 hm]
+        have e2
+            : (D.sp.Y 0).hT g g
+              = (D.sp.Y 0).hT g (D.sp.iXY 0 w)
+                - ((Lat.Tu D u : ℕ) : D.host.E)⁻¹ • (D.sp.Y 0).hT g F0.z := by
+          rw [← map_smul, ← map_sub]
+        rw [e2, e, hgz, smul_eq_mul, mul_one]
+        exact hw)
+      hgz
   change Lat.XLam Λ (lf D F0) = _ at h5
   have loc := fun (L : Submodule (𝓞 D.host.E) (D.sp.Y 0).V) (hL : L.FG) =>
-    (locDual (𝓞 D.host.E) D.host.E (D.sp.Y 0).V (D.sp.Y 0).hT hs star_algebraMap_ringOfIntegers_mem_range L hL).2.1
-  refine ⟨Λ, ⟨h1, fun P hP => UnimodLoc.exists_isom_of_isUnimodularAt D.host.E _ _ hcm hs (D.sp.Y 0).nondeg _ _
-    (full_of_unimodular hs (D.sp.Y 0).nondeg (D.sp.Y 0).standardTuple_isLattice (D.sp.Y 0).baseLattice_isUnimodular) h1 P hP (loc _ (D.sp.Y 0).standardTuple_isLattice.fg (D.sp.Y 0).baseLattice_isUnimodular P hP) (loc _ h1.fg h2 P hP)⟩,
-    ⟨h1.toIsLattice, h2, ⟨h3, rfl⟩, fun P => ?_, fun c hc => ?_⟩, ?_⟩
+    (locDual (𝓞 D.host.E) D.host.E (D.sp.Y 0).V (D.sp.Y 0).hT hs
+      star_algebraMap_ringOfIntegers_mem_range L hL).2.1
+  refine ⟨
+    Λ,
+    ⟨
+      h1,
+      fun P hP =>
+        UnimodLoc.exists_isom_of_isUnimodularAt D.host.E _ _ hcm hs (D.sp.Y 0).nondeg _ _
+          (full_of_unimodular hs (D.sp.Y 0).nondeg (D.sp.Y 0).standardTuple_isLattice
+            (D.sp.Y 0).baseLattice_isUnimodular)
+          h1 P hP
+          (loc _ (D.sp.Y 0).standardTuple_isLattice.fg (D.sp.Y 0).baseLattice_isUnimodular P hP)
+          (loc _ h1.fg h2 P hP)
+    ⟩,
+    ⟨h1.toIsLattice, h2, ⟨h3, rfl⟩, fun P => ?_, fun c hc => ?_⟩,
+    ?_
+  ⟩
   · have := P.isPrime
     choose c k1 k2 k3 k4 using fun a : Fin D.R.rS =>
       GlobalTheory.IntTerm.Conv.exists_gen_dInv (E := D.host.E) (D.R.rS - a) P.asIdeal
-    refine ⟨c, k1, fun k a => k3 a (GlobalTheory.IntTerm.Conv.level_not_dvd D P k), le_antisymm ?_ ?_⟩
+    refine
+      ⟨c, k1, fun k a => k3 a (GlobalTheory.IntTerm.Conv.level_not_dvd D P k), le_antisymm ?_ ?_⟩
     · rintro x ⟨s, hs, hx⟩
-      have k : Lat.XLam Λ (lf D F0) ≤
-          Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (Submodule.span (𝓞 D.host.E) (Set.range fun a => c a • F0.e a)) := by
+      have k
+          : Lat.XLam Λ (lf D F0)
+            ≤ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal
+              (Submodule.span (𝓞 D.host.E) (Set.range fun a => c a • F0.e a)) := by
         rw [h5, Submodule.span_le]
         rintro _ ⟨a, y, hy, rfl⟩
         obtain ⟨t, ht, o, e⟩ := k4 a y hy
@@ -395,15 +490,17 @@ theorem main : ∀ (D : D7) (u : D.what₂.Word), letI := D.host.cmStar; ∀ F0 
       rintro _ ⟨a, rfl⟩
       exact Submodule.subset_span ⟨a, _, k2 a, rfl⟩
   · obtain ⟨l, hl, x, hx, e⟩ := Submodule.mem_sup.1 hc.1
-    have e1 : (D.sp.Y 0).hT g x = 0 := swap_zero hs (Formalism.MainNotions.hT_zero_of_mem_X F0 heg x hx)
+    have e1 : (D.sp.Y 0).hT g x = 0 :=
+      swap_zero hs (Formalism.MainNotions.hT_zero_of_mem_X F0 heg x hx)
     have e2 := congrArg ((D.sp.Y 0).hT g) e
     rw [map_add (f := _), e1, add_zero, map_smul, hgz, smul_eq_mul, mul_one] at e2
     have hl' : l ∈ dual (D.sp.Y 0).hT Λ := h2.ge hl.1
     rw [← e2]
     exact Submodule.mem_one.1 ((dualBasic_mem_dual _ Λ _).1 hl' g h4)
-  · have e (a : Fin D.R.rS) : ddS D ^ (-((D.R.rS : ℤ) - (a : ℕ))) = GlobalTheory.SgGlob.dInv D.host.E (D.R.rS - a) := by
-      rw [GlobalTheory.IntTerm.Conv.ddS_eq, GlobalTheory.SgGlob.dInv, ← Nat.cast_sub a.2.le, _root_.zpow_neg, _root_.zpow_natCast,
-        inv_pow]
+  · have e (a : Fin D.R.rS)
+        : ddS D ^ (-((D.R.rS : ℤ) - (a : ℕ))) = GlobalTheory.SgGlob.dInv D.host.E (D.R.rS - a) := by
+      rw [GlobalTheory.IntTerm.Conv.ddS_eq, GlobalTheory.SgGlob.dInv, ← Nat.cast_sub a.2.le,
+        _root_.zpow_neg, _root_.zpow_natCast, inv_pow]
     rw [h5, XS]
     simp only [e]
 

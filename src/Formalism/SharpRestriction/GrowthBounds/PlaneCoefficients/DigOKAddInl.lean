@@ -10,23 +10,29 @@ open MvPolynomial Finset Classical
 
 namespace Formalism.MainNotions.PairMembershipBlocks
 
-open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords Formalism.MainNotions.G.GLWeightTheory
+open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning
+  Formalism.MainNotions.Pf14 Formalism.MainNotions.PlaneGramData
+  Formalism.MainNotions.TestSideCounting Formalism.MainNotions.TestSideWords
+  Formalism.MainNotions.G.GLWeightTheory
 
-variable {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {r J : ℕ} (Dt : SignedChainData p O r J)
+variable
+  {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {r J : ℕ} (Dt : SignedChainData p O r J)
 
 def Pof : TL J Dt.nL r × Fin r → ℕ
   | (⟨_, Sum.inl _⟩, _) => 1
   | (⟨j, Sum.inr m⟩, _) => Dt.P j m
 
-theorem liftExp_eq (mo : TL J Dt.nL r × Fin r →₀ ℕ) (v : TL J Dt.nL r × Fin r) :
-    Dt.liftExp mo v = mo v / Pof Dt v := by
+theorem liftExp_eq (mo : TL J Dt.nL r × Fin r →₀ ℕ) (v : TL J Dt.nL r × Fin r)
+    : Dt.liftExp mo v = mo v / Pof Dt v := by
   rcases v with ⟨⟨j, l | m⟩, a⟩
   · exact (Nat.div_one _).symm
   · rfl
 
 theorem liftVar_inj : Function.Injective Dt.liftVar := by
-  rintro ⟨⟨j, l | m⟩, a⟩ ⟨⟨j', l' | m'⟩, a'⟩ h <;>
-    simp only [SignedChainData.liftVar, Prod.mk.injEq, reduceCtorEq, ML.ll.injEq, ML.wc.injEq, false_and] at h
+  rintro ⟨⟨j, l | m⟩, a⟩ ⟨⟨j', l' | m'⟩, a'⟩ h <;> simp only [SignedChainData.liftVar,
+      Prod.mk.injEq, reduceCtorEq, ML.ll.injEq, ML.wc.injEq, false_and]
+    at h
   · obtain ⟨⟨rfl, h1⟩, rfl⟩ := h
     cases h1
     rfl
@@ -41,15 +47,16 @@ def liftE (mo : TL J Dt.nL r × Fin r →₀ ℕ) : TL J Dt.nL r × Fin r →₀
     apply hv
     simp [h0])
 
-theorem liftE_apply (mo : TL J Dt.nL r × Fin r →₀ ℕ) (v : TL J Dt.nL r × Fin r) :
-    liftE Dt mo v = mo v / Pof Dt v := rfl
+theorem liftE_apply (mo : TL J Dt.nL r × Fin r →₀ ℕ) (v : TL J Dt.nL r × Fin r)
+    : liftE Dt mo v = mo v / Pof Dt v :=
+  rfl
 
 def liftMon (mo : TL J Dt.nL r × Fin r →₀ ℕ) : ML J Dt.nL r × Fin r →₀ ℕ :=
   Finsupp.mapDomain Dt.liftVar (liftE Dt mo)
 
-theorem prod_lift (mo : TL J Dt.nL r × Fin r →₀ ℕ) :
-    ∏ v ∈ mo.support, (X (Dt.liftVar v) : MvPolynomial (ML J Dt.nL r × Fin r) (KK O)) ^ Dt.liftExp mo v =
-      monomial (liftMon Dt mo) 1 := by
+theorem prod_lift (mo : TL J Dt.nL r × Fin r →₀ ℕ)
+    : ∏ v ∈ mo.support, (X (Dt.liftVar v) : MvPolynomial (ML J Dt.nL r × Fin r) (KK O)) ^ Dt.liftExp mo v
+      = monomial (liftMon Dt mo) 1 := by
   have hsub : (liftE Dt mo).support ⊆ mo.support := by
     intro v hv
     rw [Finsupp.mem_support_iff] at hv ⊢
@@ -63,8 +70,8 @@ theorem prod_lift (mo : TL J Dt.nL r × Fin r →₀ ℕ) :
   refine Finset.prod_congr rfl (fun v _ => ?_)
   rw [liftE_apply, liftExp_eq]
 
-theorem Fdig_mono (rho : (ZMod J × Fin r) × Fin r → ℕ) (mo : TL J Dt.nL r × Fin r →₀ ℕ) (c : KK O) :
-    Dt.Fdig rho (monomial mo c) = if Dt.digOK rho mo then monomial (liftMon Dt mo) c else 0 := by
+theorem Fdig_mono (rho : (ZMod J × Fin r) × Fin r → ℕ) (mo : TL J Dt.nL r × Fin r →₀ ℕ) (c : KK O)
+    : Dt.Fdig rho (monomial mo c) = if Dt.digOK rho mo then monomial (liftMon Dt mo) c else 0 := by
   unfold SignedChainData.Fdig
   by_cases hc : c = 0
   · subst hc
@@ -74,8 +81,8 @@ theorem Fdig_mono (rho : (ZMod J × Fin r) × Fin r → ℕ) (mo : TL J Dt.nL r 
     · rw [Finset.sum_singleton, coeff_monomial, if_pos rfl, prod_lift, C_mul_monomial, mul_one]
     · simp
 
-theorem liftMon_w (mo : TL J Dt.nL r × Fin r →₀ ℕ) (v : TL J Dt.nL r × Fin r) :
-    liftMon Dt mo (Dt.liftVar v) = mo v / Pof Dt v := by
+theorem liftMon_w (mo : TL J Dt.nL r × Fin r →₀ ℕ) (v : TL J Dt.nL r × Fin r)
+    : liftMon Dt mo (Dt.liftVar v) = mo v / Pof Dt v := by
   rw [liftMon, Finsupp.mapDomain_apply_of_injective (liftVar_inj Dt)]
   rfl
 

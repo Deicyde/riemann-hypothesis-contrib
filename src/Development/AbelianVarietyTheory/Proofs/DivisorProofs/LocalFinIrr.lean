@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsCompactUni
 
 @[expose] public section
 
-open Matrix NumberField IsDedekindDomain GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.OrbFinAf
+open Matrix NumberField IsDedekindDomain GlobalTheory.LKTrip GlobalTheory.LKMid
+  GlobalTheory.OrbFinAf
 open scoped TensorProduct Classical
 
 noncomputable section
@@ -22,8 +23,8 @@ def conjMA (H : Type*) [Group H] : MulAction H H where
   one_smul y := by show 1 * y * 1⁻¹ = y; group
   mul_smul a b y := by show a * b * y * (a * b)⁻¹ = a * (b * y * b⁻¹) * a⁻¹; group
 
-theorem conjMA_cont (H : Type*) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] :
-    @ContinuousSMul H H (conjMA H).toSMul _ _ :=
+theorem conjMA_cont (H : Type*) [Group H] [TopologicalSpace H] [IsTopologicalGroup H]
+    : @ContinuousSMul H H (conjMA H).toSMul _ _ :=
   @ContinuousSMul.mk H H (conjMA H).toSMul _ _ (by
     show Continuous fun q : H × H => q.1 * q.2 * q.1⁻¹
     fun_prop)

@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BigCellFacto
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped TensorProduct Matrix
 
 noncomputable section
@@ -19,21 +21,24 @@ open Matrix GlobalTheory.DblVac
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-@[reducible] def invTwoE : Invertible (2 : AE F E) :=
+@[reducible]
+def invTwoE : Invertible (2 : AE F E) :=
   (Invertible.map (algebraMap (AF F) (AE F E)) (2 : AF F)).copy 2 (map_ofNat _ 2).symm
 
-theorem invOf_two_eq [Invertible (2 : AE F E)] :
-    (⅟(2 : AE F E)) = algebraMap (AF F) (AE F E) (⅟(2 : AF F)) :=
-  invOf_eq_right_inv (by rw [← map_ofNat (algebraMap (AF F) (AE F E)) 2, ← map_mul, mul_invOf_self, map_one])
+theorem invOf_two_eq [Invertible (2 : AE F E)]
+    : (⅟(2 : AE F E)) = algebraMap (AF F) (AE F E) (⅟(2 : AF F)) :=
+  invOf_eq_right_inv (by
+    rw [← map_ofNat (algebraMap (AF F) (AE F E)) 2, ← map_mul, mul_invOf_self, map_one])
 
 theorem valued_two {v : Pl (F := F)} (h2 : (2 : 𝓞 F) ∉ v.asIdeal) : Valued.v (2 : Fv F v) = 1 := by
   have := HeightOneSpectrum.valuedAdicCompletion_eq_valuation (K := F) v (2 : 𝓞 F)
-  rw [HeightOneSpectrum.valuation_of_algebraMap, HeightOneSpectrum.intValuation_eq_one_iff.2 h2] at this
+  rw [HeightOneSpectrum.valuation_of_algebraMap, HeightOneSpectrum.intValuation_eq_one_iff.2 h2]
+    at this
   convert this using 2
   exact (map_ofNat _ 2).symm
 
-theorem evFin_half_mem {v : Pl (F := F)} (h2 : (2 : 𝓞 F) ∉ v.asIdeal) :
-    evFin F v (⅟(2 : AF F)) ∈ v.adicCompletionIntegers F := by
+theorem evFin_half_mem {v : Pl (F := F)} (h2 : (2 : 𝓞 F) ∉ v.asIdeal)
+    : evFin F v (⅟(2 : AF F)) ∈ v.adicCompletionIntegers F := by
   have e : evFin F v (⅟(2 : AF F)) * 2 = 1 := by
     rw [← map_ofNat (evFin F v) 2, ← map_mul, invOf_mul_self, map_one]
   rw [HeightOneSpectrum.mem_adicCompletionIntegers]
@@ -41,10 +46,14 @@ theorem evFin_half_mem {v : Pl (F := F)} (h2 : (2 : 𝓞 F) ∉ v.asIdeal) :
   rw [map_mul, valued_two h2, mul_one, map_one] at h
   rw [h]
 
-theorem half_smul_mem {d : ℕ} {W : Spc F E d} {v : Pl (F := F)} (h2 : (2 : 𝓞 F) ∉ v.asIdeal) {y : Fin d → AE F E}
-    (hy : y ∈ GlobalTheory.InertSph.latAt W v) : (⅟(2 : AF F)) • y ∈ GlobalTheory.InertSph.latAt W v := by
-  have hle : GlobalTheory.InertSph.latAt W v ≤ (GlobalTheory.InertSph.latAt W v).comap
-      (DistribSMul.toAddMonoidHom (Fin d → AE F E) (⅟(2 : AF F))) := by
+theorem half_smul_mem
+    {d : ℕ} {W : Spc F E d} {v : Pl (F := F)} (h2 : (2 : 𝓞 F) ∉ v.asIdeal)
+    {y : Fin d → AE F E} (hy : y ∈ GlobalTheory.InertSph.latAt W v)
+    : (⅟(2 : AF F)) • y ∈ GlobalTheory.InertSph.latAt W v := by
+  have hle
+      : GlobalTheory.InertSph.latAt W v
+        ≤ (GlobalTheory.InertSph.latAt W v).comap
+          (DistribSMul.toAddMonoidHom (Fin d → AE F E) (⅟(2 : AF F))) := by
     show AddSubgroup.closure _ ≤ _
     rw [AddSubgroup.closure_le]
     rintro z ⟨a, ha, hint, y, hy, rfl⟩
@@ -58,34 +67,41 @@ section Lat
 
 variable {d : ℕ} {W : Spc F E d} {v : Pl (F := F)}
 
-theorem latD_add {z w : Fin d ⊕ Fin d → AE F E} (hz : z ∈ latD W v) (hw : w ∈ latD W v) : z + w ∈ latD W v :=
+theorem latD_add {z w : Fin d ⊕ Fin d → AE F E} (hz : z ∈ latD W v) (hw : w ∈ latD W v)
+    : z + w ∈ latD W v :=
   ⟨add_mem hz.1 hw.1, add_mem hz.2 hw.2⟩
 
-theorem latD_sub {z w : Fin d ⊕ Fin d → AE F E} (hz : z ∈ latD W v) (hw : w ∈ latD W v) : z - w ∈ latD W v :=
+theorem latD_sub {z w : Fin d ⊕ Fin d → AE F E} (hz : z ∈ latD W v) (hw : w ∈ latD W v)
+    : z - w ∈ latD W v :=
   ⟨sub_mem hz.1 hw.1, sub_mem hz.2 hw.2⟩
 
-theorem latD_half [Invertible (2 : AE F E)] (h2 : (2 : 𝓞 F) ∉ v.asIdeal) {z : Fin d ⊕ Fin d → AE F E}
-    (hz : z ∈ latD W v) : (⅟(2 : AE F E)) • z ∈ latD W v := by
+theorem latD_half
+    [Invertible (2 : AE F E)]
+    (h2 : (2 : 𝓞 F) ∉ v.asIdeal)
+    {z : Fin d ⊕ Fin d → AE F E} (hz : z ∈ latD W v)
+    : (⅟(2 : AE F E)) • z ∈ latD W v := by
   rw [invOf_two_eq, algebraMap_smul]
   exact ⟨half_smul_mem h2 hz.1, half_smul_mem h2 hz.2⟩
 
-theorem latD_diag {y : Fin d → AE F E} (hy : y ∈ GlobalTheory.InertSph.latAt W v) :
-    (fromRows (1 : Matrix (Fin d) (Fin d) (AE F E)) 1) *ᵥ y ∈ latD W v := by
+theorem latD_diag {y : Fin d → AE F E} (hy : y ∈ GlobalTheory.InertSph.latAt W v)
+    : (fromRows (1 : Matrix (Fin d) (Fin d) (AE F E)) 1) *ᵥ y ∈ latD W v := by
   rw [fromRows_mulVec, one_mulVec]
   exact ⟨hy, hy⟩
 
-theorem latD_anti {y : Fin d → AE F E} (hy : y ∈ GlobalTheory.InertSph.latAt W v) :
-    (fromRows (1 : Matrix (Fin d) (Fin d) (AE F E)) (-1)) *ᵥ y ∈ latD W v := by
+theorem latD_anti {y : Fin d → AE F E} (hy : y ∈ GlobalTheory.InertSph.latAt W v)
+    : (fromRows (1 : Matrix (Fin d) (Fin d) (AE F E)) (-1)) *ᵥ y ∈ latD W v := by
   rw [fromRows_mulVec, one_mulVec, neg_mulVec, one_mulVec]
   exact ⟨hy, neg_mem hy⟩
 
-theorem lat_diagT {z : Fin d ⊕ Fin d → AE F E} (hz : z ∈ latD W v) :
-    (fromCols (1 : Matrix (Fin d) (Fin d) (AE F E)) 1) *ᵥ z ∈ GlobalTheory.InertSph.latAt W v := by
+theorem lat_diagT {z : Fin d ⊕ Fin d → AE F E} (hz : z ∈ latD W v)
+    : (fromCols (1 : Matrix (Fin d) (Fin d) (AE F E)) 1) *ᵥ z
+      ∈ GlobalTheory.InertSph.latAt W v := by
   rw [fromCols_mulVec, one_mulVec, one_mulVec]
   exact add_mem hz.1 hz.2
 
-theorem lat_antiT {z : Fin d ⊕ Fin d → AE F E} (hz : z ∈ latD W v) :
-    (fromCols (1 : Matrix (Fin d) (Fin d) (AE F E)) (-1)) *ᵥ z ∈ GlobalTheory.InertSph.latAt W v := by
+theorem lat_antiT {z : Fin d ⊕ Fin d → AE F E} (hz : z ∈ latD W v)
+    : (fromCols (1 : Matrix (Fin d) (Fin d) (AE F E)) (-1)) *ᵥ z
+      ∈ GlobalTheory.InertSph.latAt W v := by
   rw [fromCols_mulVec, one_mulVec, neg_mulVec, one_mulVec]
   exact add_mem hz.1 (neg_mem hz.2)
 
@@ -99,9 +115,10 @@ theorem KD_mul {a b : UD σ W} (ha : a ∈ KD σ W v) (hb : b ∈ KD σ W v) : a
   have hm : matD (a * b) = matD a * matD b := rfl
   have hi : matD (a * b)⁻¹ = matD b⁻¹ * matD a⁻¹ := by rw [_root_.mul_inv_rev]; rfl
   refine ⟨fun u hu => ?_, fun z hz => ?_⟩
-  · rw [hm, show matD a * matD b - 1 = (matD a - 1) * matD b + (matD b - 1) by
-      rw [Matrix.sub_mul, Matrix.one_mul]; abel, smul_add, ← Matrix.smul_mul, ha.1 u hu, hb.1 u hu,
-      Matrix.zero_mul, add_zero]
+  · rw [hm,
+      show matD a * matD b - 1 = (matD a - 1) * matD b + (matD b - 1) by
+        rw [Matrix.sub_mul, Matrix.one_mul]; abel,
+      smul_add, ← Matrix.smul_mul, ha.1 u hu, hb.1 u hu, Matrix.zero_mul, add_zero]
   · rw [hm, hi, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec]
     exact ⟨(ha.2 _ (hb.2 z hz).1).1, (hb.2 _ (ha.2 z hz).2).2⟩
 
@@ -109,7 +126,8 @@ theorem KD_inv {a : UD σ W} (ha : a ∈ KD σ W v) : a⁻¹ ∈ KD σ W v := by
   have h1 : matD a⁻¹ * matD a = 1 := by
     rw [show matD a⁻¹ * matD a = matD (a⁻¹ * a) from rfl, inv_mul_cancel]; rfl
   refine ⟨fun u hu => ?_, fun z hz => ?_⟩
-  · rw [show matD a⁻¹ - 1 = -(matD a⁻¹ * (matD a - 1)) by rw [Matrix.mul_sub, h1, Matrix.mul_one]; abel,
+  · rw [show matD a⁻¹ - 1 = -(matD a⁻¹ * (matD a - 1)) by
+        rw [Matrix.mul_sub, h1, Matrix.mul_one]; abel,
       smul_neg, ← Matrix.mul_smul, ha.1 u hu, Matrix.mul_zero, neg_zero]
   · rw [inv_inv]; exact ⟨(ha.2 z hz).2, (ha.2 z hz).1⟩
 

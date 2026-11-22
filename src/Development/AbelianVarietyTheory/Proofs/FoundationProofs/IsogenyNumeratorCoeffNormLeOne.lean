@@ -8,17 +8,24 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem exists_gauss_size_polynomial (K : Type) [NormedField K] [IsUltrametricDist K] :
-    ∃ G : K[X] → ℝ, (∀ p, 0 ≤ G p) ∧ (∀ p i, ‖p.coeff i‖ ≤ G p) ∧
-      (∀ p r, (∀ i, ‖p.coeff i‖ ≤ r) → G p ≤ r) ∧
-      (∀ p q, G (p * q) = G p * G q) ∧ (∀ p q, G (p + q) ≤ max (G p) (G q)) ∧
-      (∀ a, G (C a) = ‖a‖) ∧ G X = 1 := by
+theorem exists_gauss_size_polynomial (K : Type) [NormedField K] [IsUltrametricDist K]
+    : ∃ G : K[X] → ℝ,
+      (∀ p, 0 ≤ G p) ∧ (∀ p i, ‖p.coeff i‖ ≤ G p) ∧ (∀ p r, (∀ i, ‖p.coeff i‖ ≤ r) → G p ≤ r)
+        ∧ (∀ p q, G (p * q) = G p * G q) ∧ (∀ p q, G (p + q) ≤ max (G p) (G q))
+        ∧ (∀ a, G (C a) = ‖a‖) ∧ G X = 1 := by
   let v : AbsoluteValue K ℝ := NormedField.toAbsoluteValue K
   have hv : ∀ a, v a = ‖a‖ := fun _ => rfl
   have hna : IsNonarchimedean v := fun a b => IsUltrametricDist.norm_add_le_max a b
-  refine ⟨gaussNorm v 1, fun p => gaussNorm_nonneg v p zero_le_one, fun p i => ?_,
-    fun p r hr => ?_, fun p q => gaussNorm_mul hna one_pos p q,
-    fun p q => isNonarchimedean_gaussNorm v hna zero_le_one p q, fun a => ?_, ?_⟩
+  refine ⟨
+    gaussNorm v 1,
+    fun p => gaussNorm_nonneg v p zero_le_one,
+    fun p i => ?_,
+    fun p r hr => ?_,
+    fun p q => gaussNorm_mul hna one_pos p q,
+    fun p q => isNonarchimedean_gaussNorm v hna zero_le_one p q,
+    fun a => ?_,
+    ?_
+  ⟩
   · simpa [hv] using le_gaussNorm v p zero_le_one i
   · obtain ⟨i, hi⟩ := exists_eq_gaussNorm v 1 p
     rw [hi, hv, one_pow, mul_one]
@@ -27,11 +34,12 @@ theorem exists_gauss_size_polynomial (K : Type) [NormedField K] [IsUltrametricDi
   · rw [← monomial_one_one_eq_X, gaussNorm_monomial, hv]
     simp
 
-theorem isogeny_numerator_coeff_norm_le_one :
-    ∀ (K : Type) [NormedField K] [IsUltrametricDist K] (A B A' B' : K) (n h : K[X]),
-      ‖A‖ ≤ 1 → ‖B‖ ≤ 1 → ‖A'‖ ≤ 1 → ‖B'‖ ≤ 1 → (∀ i, ‖h.coeff i‖ ≤ 1) →
-      (X ^ 3 + C A * X + C B) * (derivative n * h - 2 * n * derivative h) ^ 2
-        = n ^ 3 + C A' * n * h ^ 4 + C B' * h ^ 6 → ∀ i, ‖n.coeff i‖ ≤ 1 := by
+theorem isogeny_numerator_coeff_norm_le_one
+    : ∀ (K : Type) [NormedField K] [IsUltrametricDist K] (A B A' B' : K) (n h : K[X]),
+      ‖A‖ ≤ 1 → ‖B‖ ≤ 1 → ‖A'‖ ≤ 1 → ‖B'‖ ≤ 1 → (∀ i, ‖h.coeff i‖ ≤ 1)
+        → (X ^ 3 + C A * X + C B) * (derivative n * h - 2 * n * derivative h) ^ 2
+          = n ^ 3 + C A' * n * h ^ 4 + C B' * h ^ 6
+        → ∀ i, ‖n.coeff i‖ ≤ 1 := by
   intro K _ _ A B A' B' n h hA hB hA' hB' hh heq
   obtain ⟨G, h0, hle, hub, hmul, hadd, hC, hX⟩ := exists_gauss_size_polynomial K
   have hone : G 1 = 1 := by simpa using hC 1
@@ -58,8 +66,9 @@ theorem isogeny_numerator_coeff_norm_le_one :
       rw [coeff_derivative, norm_mul]
       have h1 : ‖((i : K) + 1)‖ ≤ 1 := by
         exact_mod_cast IsUltrametricDist.norm_natCast_le_one K (i + 1)
-      calc ‖p.coeff (i + 1)‖ * ‖((i : K) + 1)‖ ≤ G p * 1 :=
-            mul_le_mul (hle p _) h1 (norm_nonneg _) (h0 p)
+      calc
+        ‖p.coeff (i + 1)‖ * ‖((i : K) + 1)‖
+          ≤ G p * 1 := mul_le_mul (hle p _) h1 (norm_nonneg _) (h0 p)
         _ = G p := mul_one _
   have hh1 : G h ≤ 1 := hub _ _ hh
   suffices hn : G n ≤ 1 from fun i => (hle n i).trans hn
@@ -79,20 +88,23 @@ theorem isogeny_numerator_coeff_norm_le_one :
     refine hsub _ _ _ ?_ ?_
     · simpa using hmul' _ _ g 1 (hder n) hh1
     · simpa using hmul' _ _ g 1 h2n ((hder h).trans hh1)
-  have hL : G ((X ^ 3 + C A * X + C B) * (derivative n * h - 2 * n * derivative h) ^ 2)
-      ≤ g ^ 2 := by
+  have hL
+      : G ((X ^ 3 + C A * X + C B) * (derivative n * h - 2 * n * derivative h) ^ 2) ≤ g ^ 2 := by
     simpa using hmul' _ _ 1 (g ^ 2) hcub (hpow' _ g 2 hW)
   have hgg : g ≤ g ^ 2 := by nlinarith
   have h1g : 1 ≤ g ^ 2 := hg.le.trans hgg
   have hA2 : G (C A' * n * h ^ 4) ≤ g ^ 2 := by
     refine le_trans ?_ hgg
-    simpa using hmul' _ _ (1 * g) (1 ^ 4)
-      (hmul' (C A') n 1 g (by rw [hC]; exact hA') le_rfl) (hpow' h 1 4 hh1)
+    simpa using
+      hmul' _ _ (1 * g) (1 ^ 4) (hmul' (C A') n 1 g (by rw [hC]; exact hA') le_rfl)
+        (hpow' h 1 4 hh1)
   have hB2 : G (C B' * h ^ 6) ≤ g ^ 2 := by
     refine le_trans ?_ h1g
     simpa using hmul' (C B') _ 1 (1 ^ 6) (by rw [hC]; exact hB') (hpow' h 1 6 hh1)
-  have hn3 : n ^ 3 = (X ^ 3 + C A * X + C B) * (derivative n * h - 2 * n * derivative h) ^ 2
-      - C A' * n * h ^ 4 - C B' * h ^ 6 := by
+  have hn3
+      : n ^ 3
+        = (X ^ 3 + C A * X + C B) * (derivative n * h - 2 * n * derivative h) ^ 2 - C A' * n * h ^ 4
+          - C B' * h ^ 6 := by
     rw [heq]; ring
   have h3 : G (n ^ 3) ≤ g ^ 2 := by
     rw [hn3]

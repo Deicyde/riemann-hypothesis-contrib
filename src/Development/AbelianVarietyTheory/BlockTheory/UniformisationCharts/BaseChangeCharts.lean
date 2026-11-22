@@ -17,7 +17,8 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.BaseChangeCharts
 
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out
 open scoped CategoryTheory.Obj
 
 section FamBaseChange
@@ -25,8 +26,9 @@ section FamBaseChange
 variable {R : Type} [CommRing R] [IsDomain R] (D : DegPre R)
 variable (F : Type) [Field F] [Algebra (FractionRing R) F]
 
-def overHom {S X Y : Scheme.{0}} (a : X ⟶ S) (b : Y ⟶ S) (h : X ⟶ Y) (w : h ≫ b = a) :
-    Over.mk a ⟶ Over.mk b := Over.homMk h w
+def overHom {S X Y : Scheme.{0}} (a : X ⟶ S) (b : Y ⟶ S) (h : X ⟶ Y) (w : h ≫ b = a)
+    : Over.mk a ⟶ Over.mk b :=
+  Over.homMk h w
 
 omit [IsDomain R] in
 lemma specMap_algebraMap_self (K : Type) [CommRing K] :
@@ -36,7 +38,8 @@ lemma specMap_algebraMap_self (K : Type) [CommRing K] :
 def specFK : TF (R := R) F ⟶ TF (R := R) (FractionRing R) :=
   overHom (X := Spec (CommRingCat.of F)) (Y := Spec (CommRingCat.of (FractionRing R))) _ _
     (Spec.map (CommRingCat.ofHom (algebraMap (FractionRing R) F)))
-    (congrArg (fun z => Spec.map (CommRingCat.ofHom (algebraMap (FractionRing R) F)) ≫ z)
+    (congrArg
+      (fun z => Spec.map (CommRingCat.ofHom (algebraMap (FractionRing R) F)) ≫ z)
       ((congrArg (fun z => z ≫ jK R) (specMap_algebraMap_self (FractionRing R))).trans
         (Category.id_comp _)))
 
@@ -70,21 +73,22 @@ lemma chart_le_bcB (α : D.X) (j : Fin 4 → D.P.L.ι) :
   rw [← bcB_famφ D F α i] at h1
   exact h1
 
-def FamComb (k : ℕ) {n : ℕ} (c : Fin n → F) (f : Fin n → Fam D (FractionRing R) k)
-    (s : Fam D F k) : Prop :=
+def FamComb (k : ℕ) {n : ℕ} (c : Fin n → F) (f : Fin n → Fam D (FractionRing R) k) (s : Fam D F k)
+    : Prop :=
   ∀ (α : D.X) (j : Fin 4 → D.P.L.ι),
-    @id Γ((DegPre.BF D F).left, LB.wchart D.P.L (DegPre.famφ D F α) j) ((s.s α).f j) =
-      ∑ i, DegPre.constBF D F (c i) (LB.wchart D.P.L (DegPre.famφ D F α) j) *
-        ((DegPre.BF D F).left.presheaf.map (homOfLE (chart_le_bcB D F α j)).op).hom
-          (((bcB D F).left.app (LB.wchart D.P.L (DegPre.famφ D (FractionRing R) α) j)).hom
-            (((f i).s α).f j))
+    @id Γ((DegPre.BF D F).left, LB.wchart D.P.L (DegPre.famφ D F α) j) ((s.s α).f j)
+      = ∑ i, DegPre.constBF D F (c i) (LB.wchart D.P.L (DegPre.famφ D F α) j) *
+          ((DegPre.BF D F).left.presheaf.map (homOfLE (chart_le_bcB D F α j)).op).hom
+            (((bcB D F).left.app (LB.wchart D.P.L (DegPre.famφ D (FractionRing R) α) j)).hom
+              (((f i).s α).f j))
 
 end FamBaseChange
 
 section Expansion
 
-variable {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {D : DegData R I}
-  {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {I : Ideal R} {D : DegData R I} {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
   {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
 
 def Ident (U : UnifPre I D A G) : Type :=
@@ -108,8 +112,9 @@ lemma toGK_gen (U : UnifPre I D A G) :
   exact congrArg (·.left) this
 
 abbrev cmpW (U : UnifPre I D A G) (a : U.LG.L.ι) (b : A.L.ι) : (AF F A).Opens :=
-  toGK F U ⁻¹ᵁ ((U.LG.L.pull (pullback.fst G.hom (jK R))).U (fun _ => a) ⊓
-    (A.L.pull U.gen.hom.left).U (fun _ => b))
+  toGK F U
+    ⁻¹ᵁ ((U.LG.L.pull (pullback.fst G.hom (jK R))).U (fun _ => a)
+      ⊓ (A.L.pull U.gen.hom.left).U (fun _ => b))
 
 lemma cmpW_le_L (U : UnifPre I D A G) (k : ℕ) (a : U.LG.L.ι) (b : A.L.ι) :
     cmpW F U a b ≤ (LPow A.A A.L (k : ℤ) (TFK (R := R) F)).U (fun _ => b) := by
@@ -125,20 +130,23 @@ lemma cmpW_le_LG (U : UnifPre I D A G) (a : U.LG.L.ι) (b : A.L.ι) :
   intro y hy
   exact Set.mem_iInter.2 fun _ => Set.mem_iInter.1 hy.1 PUnit.unit
 
-def SecComb (U : UnifPre I D A G) (w : Ident U) (k : ℕ) {n : ℕ} (c : Fin n → F)
-    (σ : Fin n → U.SecK k) (t : SecF F A k) : Prop :=
+def SecComb
+    (U : UnifPre I D A G) (w : Ident U)
+    (k : ℕ)
+    {n : ℕ} (c : Fin n → F) (σ : Fin n → U.SecK k)
+    (t : SecF F A k)
+    : Prop :=
   ∀ (a : U.LG.L.ι) (b : A.L.ι),
-    @id Γ(AF F A, cmpW F U a b) (pullU (toGK F U) _ (w.1.s (fun _ => a, fun _ => b))).val ^ k *
-      ((AF F A).presheaf.map (homOfLE (cmpW_le_L F U k a b)).op).hom (t.f (fun _ => b)) =
-    ∑ i, @id Γ(AF F A, cmpW F U a b) (liftFun A.A (T := TFK (R := R) F) (cmpW F U a b)
-        ((Scheme.ΓSpecIso (CommRingCat.of F)).inv.hom (c i))) *
-      ((AF F A).presheaf.map (homOfLE (cmpW_le_LG F U a b)).op).hom
-        (((toGK F U).app _).hom ((σ i).f (fun _ => a)))
+    @id Γ(AF F A, cmpW F U a b) (pullU (toGK F U) _ (w.1.s (fun _ => a, fun _ => b))).val ^ k
+        * ((AF F A).presheaf.map (homOfLE (cmpW_le_L F U k a b)).op).hom (t.f (fun _ => b))
+      = ∑ i, @id Γ(AF F A, cmpW F U a b) (liftFun A.A (T := TFK (R := R) F) (cmpW F U a b)
+            ((Scheme.ΓSpecIso (CommRingCat.of F)).inv.hom (c i))) *
+          ((AF F A).presheaf.map (homOfLE (cmpW_le_LG F U a b)).op).hom
+            (((toGK F U).app _).hom ((σ i).f (fun _ => a)))
 
-def ExpandsF (U : UnifPre I D A G) (w : Ident U) (k : ℕ) (t : SecF F A k)
-    (s : Fam D.toPre F k) : Prop :=
-  ∃ (n : ℕ) (c : Fin n → F) (σ : Fin n → U.SecK k)
-    (f : Fin n → Fam D.toPre (FractionRing R) k),
+def ExpandsF (U : UnifPre I D A G) (w : Ident U) (k : ℕ) (t : SecF F A k) (s : Fam D.toPre F k)
+    : Prop :=
+  ∃ (n : ℕ) (c : Fin n → F) (σ : Fin n → U.SecK k) (f : Fin n → Fam D.toPre (FractionRing R) k),
     (∀ i, U.Expands k (σ i) (f i)) ∧ SecComb F U w k c σ t ∧ FamComb D.toPre F k c f s
 
 end Expansion

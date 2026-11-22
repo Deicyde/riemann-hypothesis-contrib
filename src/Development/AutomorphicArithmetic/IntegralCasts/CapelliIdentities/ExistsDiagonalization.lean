@@ -4,12 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.ExistsDiagonalization.exists_diag :
-    ∀ {K : Type} [inst : Field K] {n : ℕ}
-    (P : Matrix (Fin n) (Fin n) K) (α : Fin n → K),
-    Function.Injective α →
-      P.charpoly = ∏ i : Fin n, (Polynomial.X - (Polynomial.C : K → Polynomial K) (α i)) →
-        ∃ (V : Matrix (Fin n) (Fin n) K), IsUnit V ∧ P * V = V * Matrix.diagonal α := by
+theorem UpperTheory.Reformulated.B.ExistsDiagonalization.exists_diag
+    : ∀ {K : Type} [inst : Field K] {n : ℕ} (P : Matrix (Fin n) (Fin n) K) (α : Fin n → K),
+      Function.Injective α
+        → P.charpoly = ∏ i : Fin n, (Polynomial.X - (Polynomial.C : K → Polynomial K) (α i))
+        → ∃ (V : Matrix (Fin n) (Fin n) K), IsUnit V ∧ P * V = V * Matrix.diagonal α := by
   intro K _ n P α hα hP
   have h1 : ∀ i, ∃ v : Fin n → K, v ≠ 0 ∧ P.mulVec v = α i • v := by
     intro i

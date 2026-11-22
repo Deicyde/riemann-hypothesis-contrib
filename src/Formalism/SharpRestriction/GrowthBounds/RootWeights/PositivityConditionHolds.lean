@@ -27,27 +27,24 @@ theorem pie_pr_ne {n : ℕ} {j : Fin n} (h : 0 < j.val) : pie_pr j ≠ j := by
 
 theorem pie_sw_self {n : ℕ} (mu : Fin n → ℕ) (j : Fin n) : pie_sw mu j j = mu (pie_pr j) + 1 := by
   unfold pie_sw
-  first
-  | rw [Function.update_self]
-  | rw [Function.update_same]
-  | simp
+  first | rw [Function.update_self] | rw [Function.update_same] | simp
 
-theorem pie_sw_pr {n : ℕ} (mu : Fin n → ℕ) {j : Fin n} (h : 0 < j.val) :
-    pie_sw mu j (pie_pr j) = mu j - 1 := by
+theorem pie_sw_pr {n : ℕ} (mu : Fin n → ℕ) {j : Fin n} (h : 0 < j.val)
+    : pie_sw mu j (pie_pr j) = mu j - 1 := by
   unfold pie_sw
   first
   | rw [Function.update_of_ne (pie_pr_ne h), Function.update_self]
   | rw [Function.update_noteq (pie_pr_ne h), Function.update_same]
 
-theorem pie_sw_other {n : ℕ} (mu : Fin n → ℕ) {j k : Fin n} (hk : k ≠ j) (hk' : k ≠ pie_pr j) :
-    pie_sw mu j k = mu k := by
+theorem pie_sw_other {n : ℕ} (mu : Fin n → ℕ) {j k : Fin n} (hk : k ≠ j) (hk' : k ≠ pie_pr j)
+    : pie_sw mu j k = mu k := by
   unfold pie_sw
   first
   | rw [Function.update_of_ne hk, Function.update_of_ne hk']
   | rw [Function.update_noteq hk, Function.update_noteq hk']
 
-theorem pie_sw_rho {n : ℕ} (mu : Fin n → ℕ) {j : Fin n} (h : 0 < j.val) (h1 : 1 ≤ mu j) :
-    pie_sw mu j + rhoN n = (mu + rhoN n) ∘ Equiv.swap (pie_pr j) j := by
+theorem pie_sw_rho {n : ℕ} (mu : Fin n → ℕ) {j : Fin n} (h : 0 < j.val) (h1 : 1 ≤ mu j)
+    : pie_sw mu j + rhoN n = (mu + rhoN n) ∘ Equiv.swap (pie_pr j) j := by
   funext k
   simp only [Pi.add_apply, Function.comp_apply, rhoN]
   have hj := j.isLt
@@ -62,29 +59,30 @@ theorem pie_sw_rho {n : ℕ} (mu : Fin n → ℕ) {j : Fin n} (h : 0 < j.val) (h
       omega
     · rw [Equiv.swap_apply_of_ne_of_ne hkp hkj, pie_sw_other mu hkj hkp]
 
-theorem pie_alt_swap (n : ℕ) (ga : Fin n → ℕ) {i j : Fin n} (hij : i ≠ j) :
-    alt n (ga ∘ Equiv.swap i j) = - alt n ga := by
+theorem pie_alt_swap (n : ℕ) (ga : Fin n → ℕ) {i j : Fin n} (hij : i ≠ j)
+    : alt n (ga ∘ Equiv.swap i j) = - alt n ga := by
   unfold alt
-  have e : (Matrix.of fun a b : Fin n => (X a : MvPolynomial (Fin n) ℤ) ^ (ga ∘ Equiv.swap i j) b) =
-      (Matrix.of fun a b : Fin n => (X a : MvPolynomial (Fin n) ℤ) ^ ga b).submatrix id (Equiv.swap i j) := by
+  have e
+      : (Matrix.of fun a b : Fin n => (X a : MvPolynomial (Fin n) ℤ) ^ (ga ∘ Equiv.swap i j) b)
+        = (Matrix.of fun a b : Fin n => (X a : MvPolynomial (Fin n) ℤ) ^ ga b).submatrix id
+          (Equiv.swap i j) := by
     ext a b
     rfl
   rw [e, Matrix.det_permute', Equiv.Perm.sign_swap hij]
   simp
 
-theorem pie_alt_zero (n : ℕ) (ga : Fin n → ℕ) {i j : Fin n} (hij : i ≠ j) (h : ga i = ga j) :
-    alt n ga = 0 := by
+theorem pie_alt_zero (n : ℕ) (ga : Fin n → ℕ) {i j : Fin n} (hij : i ≠ j) (h : ga i = ga j)
+    : alt n ga = 0 := by
   unfold alt
   exact Matrix.det_zero_of_column_eq hij fun k => by simp [h]
 
-
 open Classical in
 def pie_S {n : ℕ} (lam : Fin n → ℕ) (b : ℕ) : Finset (Fin n → ℕ) :=
-  (Fintype.piFinset fun _ : Fin n => Finset.range (∑ j, lam j + b + 1)).filter
-    fun mu => (∀ j, lam j ≤ mu j) ∧ ∑ j, mu j = ∑ j, lam j + b
+  (Fintype.piFinset fun _ : Fin n => Finset.range (∑ j, lam j + b + 1)).filter fun mu =>
+    (∀ j, lam j ≤ mu j) ∧ ∑ j, mu j = ∑ j, lam j + b
 
-theorem pie_mem_S {n : ℕ} {lam : Fin n → ℕ} {b : ℕ} {mu : Fin n → ℕ} :
-    mu ∈ pie_S lam b ↔ (∀ j, lam j ≤ mu j) ∧ ∑ j, mu j = ∑ j, lam j + b := by
+theorem pie_mem_S {n : ℕ} {lam : Fin n → ℕ} {b : ℕ} {mu : Fin n → ℕ}
+    : mu ∈ pie_S lam b ↔ (∀ j, lam j ≤ mu j) ∧ ∑ j, mu j = ∑ j, lam j + b := by
   unfold pie_S
   rw [Finset.mem_filter, Fintype.mem_piFinset]
   constructor
@@ -114,8 +112,9 @@ private lemma pie_cnt_injective {n b : ℕ} {s1 s2 : Sym (Fin n) b} (h : pie_cnt
   | exact Multiset.ext' fun a => congrFun h a
   | exact Multiset.ext.2 fun a => congrFun h a
 
-theorem pie_step2 (n b : ℕ) (lam : Fin n → ℕ) :
-    ∑ s : Sym (Fin n) b, alt n (lam + rhoN n + pie_cnt s) = ∑ mu ∈ pie_S lam b, alt n (mu + rhoN n) := by
+theorem pie_step2 (n b : ℕ) (lam : Fin n → ℕ)
+    : ∑ s : Sym (Fin n) b, alt n (lam + rhoN n + pie_cnt s)
+      = ∑ mu ∈ pie_S lam b, alt n (mu + rhoN n) := by
   classical
   refine Finset.sum_bij (fun s _ => lam + pie_cnt s) ?_ ?_ ?_ ?_
   · intro s _
@@ -153,16 +152,16 @@ theorem pie_step2 (n b : ℕ) (lam : Fin n → ℕ) :
     show alt n (lam + rhoN n + pie_cnt s) = alt n (lam + pie_cnt s + rhoN n)
     rw [add_right_comm]
 
-theorem pie_sw_sum {n : ℕ} (mu : Fin n → ℕ) {j : Fin n} (h : 0 < j.val) (h1 : 1 ≤ mu j) :
-    ∑ k, pie_sw mu j k = ∑ k, mu k := by
+theorem pie_sw_sum {n : ℕ} (mu : Fin n → ℕ) {j : Fin n} (h : 0 < j.val) (h1 : 1 ≤ mu j)
+    : ∑ k, pie_sw mu j k = ∑ k, mu k := by
   have e : ∑ k, (pie_sw mu j + rhoN n) k = ∑ k, (mu + rhoN n) k := by
     rw [pie_sw_rho mu h h1]
     exact Equiv.sum_comp (Equiv.swap (pie_pr j) j) (mu + rhoN n)
   simp only [Pi.add_apply, Finset.sum_add_distrib] at e
   omega
 
-theorem pie_sw_sw {n : ℕ} (mu : Fin n → ℕ) {j : Fin n} (h : 0 < j.val) (h1 : 1 ≤ mu j) :
-    pie_sw (pie_sw mu j) j = mu := by
+theorem pie_sw_sw {n : ℕ} (mu : Fin n → ℕ) {j : Fin n} (h : 0 < j.val) (h1 : 1 ≤ mu j)
+    : pie_sw (pie_sw mu j) j = mu := by
   funext k
   by_cases hkj : k = j
   · subst hkj
@@ -174,14 +173,15 @@ theorem pie_sw_sw {n : ℕ} (mu : Fin n → ℕ) {j : Fin n} (h : 0 < j.val) (h1
       omega
     · rw [pie_sw_other _ hkj hkp, pie_sw_other _ hkj hkp]
 
-theorem pie_mem_B {n : ℕ} {lam mu : Fin n → ℕ} {j : Fin n} :
-    j ∈ pie_B lam mu ↔ 0 < j.val ∧ lam (pie_pr j) < mu j := by
+theorem pie_mem_B {n : ℕ} {lam mu : Fin n → ℕ} {j : Fin n}
+    : j ∈ pie_B lam mu ↔ 0 < j.val ∧ lam (pie_pr j) < mu j := by
   unfold pie_B
   simp only [Finset.mem_filter, Finset.mem_univ, true_and]
 
-theorem pie_B_sw {n : ℕ} {lam mu : Fin n → ℕ} {j : Fin n} (hj : j ∈ pie_B lam mu)
-    (hmax : ∀ k ∈ pie_B lam mu, k ≤ j) (hle : lam (pie_pr j) ≤ mu (pie_pr j)) :
-    ∃ h' : (pie_B lam (pie_sw mu j)).Nonempty, (pie_B lam (pie_sw mu j)).max' h' = j := by
+theorem pie_B_sw
+    {n : ℕ} {lam mu : Fin n → ℕ} {j : Fin n} (hj : j ∈ pie_B lam mu)
+    (hmax : ∀ k ∈ pie_B lam mu, k ≤ j) (hle : lam (pie_pr j) ≤ mu (pie_pr j))
+    : ∃ h' : (pie_B lam (pie_sw mu j)).Nonempty, (pie_B lam (pie_sw mu j)).max' h' = j := by
   have hj' := pie_mem_B.1 hj
   have hjB : j ∈ pie_B lam (pie_sw mu j) := by
     rw [pie_mem_B, pie_sw_self]
@@ -208,11 +208,15 @@ def pie_g {n : ℕ} (lam mu : Fin n → ℕ) : Fin n → ℕ :=
   if h : (pie_B lam mu).Nonempty then pie_sw mu ((pie_B lam mu).max' h) else mu
 
 open Classical in
-theorem pie_bad_zero (n b : ℕ) (lam : Fin n → ℕ) (hlam : Antitone lam) :
-    ∑ mu ∈ (pie_S lam b).filter (fun mu => (pie_B lam mu).Nonempty), alt n (mu + rhoN n) = 0 := by
-  have key : ∀ mu : Fin n → ℕ, (∀ j, lam j ≤ mu j) → (pie_B lam mu).Nonempty →
-      ∃ j : Fin n, 0 < j.val ∧ 1 ≤ mu j ∧ pie_g lam mu = pie_sw mu j ∧ (∀ k, lam k ≤ pie_sw mu j k) ∧
-        ∃ h' : (pie_B lam (pie_sw mu j)).Nonempty, (pie_B lam (pie_sw mu j)).max' h' = j := by
+theorem pie_bad_zero (n b : ℕ) (lam : Fin n → ℕ) (hlam : Antitone lam)
+    : ∑ mu ∈ (pie_S lam b).filter (fun mu => (pie_B lam mu).Nonempty), alt n (mu + rhoN n) = 0 := by
+  have key
+      : ∀ mu : Fin n → ℕ,
+        (∀ j, lam j ≤ mu j) → (pie_B lam mu).Nonempty
+          → ∃ j : Fin n,
+            0 < j.val ∧ 1 ≤ mu j ∧ pie_g lam mu = pie_sw mu j ∧ (∀ k, lam k ≤ pie_sw mu j k)
+              ∧ ∃ h' : (pie_B lam (pie_sw mu j)).Nonempty,
+                (pie_B lam (pie_sw mu j)).max' h' = j := by
     intro mu hle hB
     obtain ⟨j, hjdef⟩ : ∃ j, (pie_B lam mu).max' hB = j := ⟨_, rfl⟩
     have hjB : j ∈ pie_B lam mu := by
@@ -249,10 +253,7 @@ theorem pie_bad_zero (n b : ℕ) (lam : Fin n → ℕ) (hlam : Antitone lam) :
     obtain ⟨j, hj0, hj1, hg, -, -⟩ := key mu hle hB
     show alt n (mu + rhoN n) + alt n (pie_g lam mu + rhoN n) = 0
     rw [hg, pie_sw_rho mu hj0 hj1, pie_alt_swap n _ (pie_pr_ne hj0)]
-    first
-    | exact add_neg_cancel _
-    | exact add_right_neg _
-    | simp
+    first | exact add_neg_cancel _ | exact add_right_neg _ | simp
   · intro mu hmu hne
     have hmu' := hmu
     rw [Finset.mem_filter, pie_mem_S] at hmu'
@@ -285,8 +286,8 @@ theorem pie_bad_zero (n b : ℕ) (lam : Fin n → ℕ) (hlam : Antitone lam) :
     unfold pie_g
     rw [dite_eq_left hne', hmax', pie_sw_sw mu hj0 hj1]
 
-theorem pie_good_iff {n : ℕ} (lam mu : Fin n → ℕ) :
-    ¬ (pie_B lam mu).Nonempty ↔ ∀ i j : Fin n, i.val + 1 = j.val → mu j ≤ lam i := by
+theorem pie_good_iff {n : ℕ} (lam mu : Fin n → ℕ)
+    : ¬(pie_B lam mu).Nonempty ↔ ∀ i j : Fin n, i.val + 1 = j.val → mu j ≤ lam i := by
   constructor
   · intro hn i j hij
     by_contra hc
@@ -303,9 +304,10 @@ theorem positivity_condition_holds (D : Formalism.BasicNotions.D7) : adm1 D := b
   classical
   unfold adm1
   intro n lam hlam b
-  have hset : (pie_S lam b).filter (fun mu => ¬ (pie_B lam mu).Nonempty) =
-      (Fintype.piFinset fun _ : Fin n => Finset.range (∑ j, lam j + b + 1)).filter
-        (fun mu => Interlace lam mu ∧ ∑ j, mu j = ∑ j, lam j + b) := by
+  have hset
+      : (pie_S lam b).filter (fun mu => ¬(pie_B lam mu).Nonempty)
+        = (Fintype.piFinset fun _ : Fin n => Finset.range (∑ j, lam j + b + 1)).filter
+          (fun mu => Interlace lam mu ∧ ∑ j, mu j = ∑ j, lam j + b) := by
     ext mu
     rw [Finset.mem_filter, Finset.mem_filter, pie_mem_S, pie_good_iff]
     unfold Interlace

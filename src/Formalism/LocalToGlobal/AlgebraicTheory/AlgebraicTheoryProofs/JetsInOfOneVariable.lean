@@ -18,10 +18,10 @@ open Formalism.InvariantFactorPaths.G7 (at1)
 
 namespace LinearSubstitutionJets
 
-private theorem sum_C_scl_mul_X {K : Type} [Field K] {p : Type} [Fintype p] [DecidableEq p] (c : K)
-    (x : p) :
-    (∑ y, MvPowerSeries.C (scl p c x y) * MvPowerSeries.X y : MvPowerSeries p K) =
-      MvPowerSeries.C c * MvPowerSeries.X x := by
+private theorem sum_C_scl_mul_X
+    {K : Type} [Field K] {p : Type} [Fintype p] [DecidableEq p] (c : K) (x : p)
+    : (∑ y, MvPowerSeries.C (scl p c x y) * MvPowerSeries.X y : MvPowerSeries p K)
+      = MvPowerSeries.C c * MvPowerSeries.X x := by
   rw [Finset.sum_eq_single x]
   · simp [scl]
   · intro y _ hy
@@ -29,9 +29,9 @@ private theorem sum_C_scl_mul_X {K : Type} [Field K] {p : Type} [Fintype p] [Dec
   · intro h
     exact absurd (Finset.mem_univ x) h
 
-theorem linSub_scl {K : Type} [Field K] {n : Type} [Fintype n] [DecidableEq n] (c : K)
-    (f : MvPowerSeries n K) :
-    linSub (scl n c) f = MvPowerSeries.rescale (fun _ => c) f := by
+theorem linSub_scl
+    {K : Type} [Field K] {n : Type} [Fintype n] [DecidableEq n] (c : K) (f : MvPowerSeries n K)
+    : linSub (scl n c) f = MvPowerSeries.rescale (fun _ => c) f := by
   unfold linSub
   rw [MvPowerSeries.rescale_eq_subst]
   congr 1
@@ -51,8 +51,10 @@ theorem product_scaling_jets : ProdScaleJets := by
   rw [linSub_scl]
   obtain ⟨hC, -, hadd, -, hmul⟩ := Formalism.L2.Th1.G.jetsRing K (Formalism.G.unitBall K) n
 
-  have hfac : ∀ k i, JetsIn (Formalism.G.unitBall K)
-      (MvPowerSeries.rescale (fun _ => c) (at1 i (H k i) : MvPowerSeries n K)) := by
+  have hfac
+      : ∀ k i,
+        JetsIn (Formalism.G.unitBall K)
+          (MvPowerSeries.rescale (fun _ => c) (at1 i (H k i) : MvPowerSeries n K)) := by
     intro k i κ'
     rw [MvPowerSeries.coeff_rescale]
     unfold at1
@@ -65,17 +67,21 @@ theorem product_scaling_jets : ProdScaleJets := by
         conv_lhs => rw [h]
         rw [Finsupp.prod_single_index (by simp)]
       rw [hm, hp]
-      calc ‖((κ' i).factorial : K) * (c ^ κ' i * PowerSeries.coeff (κ' i) (H k i))‖
-          = ‖((κ' i).factorial : K) * PowerSeries.coeff (κ' i) (H k i)‖ * ‖c‖ ^ κ' i := by
-            rw [norm_mul, norm_mul, norm_mul, norm_pow]
-            ring
+      calc
+        ‖((κ' i).factorial : K) * (c ^ κ' i * PowerSeries.coeff (κ' i) (H k i))‖
+            = ‖((κ' i).factorial : K) * PowerSeries.coeff (κ' i) (H k i)‖ * ‖c‖ ^ κ' i := by
+          rw [norm_mul, norm_mul, norm_mul, norm_pow]
+          ring
         _ ≤ 1 := hH k i (κ' i)
     · simp
-  have hCr : ∀ k, JetsIn (Formalism.G.unitBall K)
-      (MvPowerSeries.rescale (fun _ => c) (MvPowerSeries.C (r k) : MvPowerSeries n K)) := by
+  have hCr
+      : ∀ k,
+        JetsIn (Formalism.G.unitBall K)
+          (MvPowerSeries.rescale (fun _ => c) (MvPowerSeries.C (r k) : MvPowerSeries n K)) := by
     intro k
-    have hres : MvPowerSeries.rescale (fun _ => c) (MvPowerSeries.C (r k) : MvPowerSeries n K) =
-        MvPowerSeries.C (r k) := by
+    have hres
+        : MvPowerSeries.rescale (fun _ => c) (MvPowerSeries.C (r k) : MvPowerSeries n K)
+          = MvPowerSeries.C (r k) := by
       ext κ'
       rw [MvPowerSeries.coeff_rescale, MvPowerSeries.coeff_C]
       split_ifs with h
@@ -87,18 +93,21 @@ theorem product_scaling_jets : ProdScaleJets := by
   unfold Formalism.L2.Th1.E.thetaProd
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
-  refine Finset.sum_induction _ (JetsIn (Formalism.G.unitBall K)) (fun f g hf hg => hadd f g hf hg) ?_ ?_
+  refine
+    Finset.sum_induction _ (JetsIn (Formalism.G.unitBall K)) (fun f g hf hg => hadd f g hf hg) ?_ ?_
   · simpa using hC 0 (Formalism.G.unitBall K).zero_mem
   · intro k _
     rw [map_mul, map_prod]
     exact hmul _ _ (hCr k)
-      (Formalism.L2.Th1.G.HurwitzJetIntegrality.jetsIn_prod Formalism.L2.Th1.G.jetsRing _ _ _ fun i _ => hfac k i)
+      (Formalism.L2.Th1.G.HurwitzJetIntegrality.jetsIn_prod Formalism.L2.Th1.G.jetsRing _ _ _
+        fun i _ => hfac k i)
 
 theorem linear_scaling_jets : LinScale := by
   intro K _ n m _ _ _ _ c A f
-  have hS : ∀ {p q : Type} [Fintype p] [Fintype q] (B : p → q → K),
-      MvPowerSeries.HasSubst
-        (fun i => (∑ x, MvPowerSeries.C (B i x) * MvPowerSeries.X x : MvPowerSeries q K)) := by
+  have hS
+      : ∀ {p q : Type} [Fintype p] [Fintype q] (B : p → q → K),
+        MvPowerSeries.HasSubst (fun i =>
+          (∑ x, MvPowerSeries.C (B i x) * MvPowerSeries.X x : MvPowerSeries q K)) := by
     intro p q _ _ B
     exact Formalism.L2.Th1.G.hasSubst_lin B
   constructor
@@ -120,7 +129,8 @@ theorem linear_scaling_jets : LinScale := by
     rw [sum_C_scl_mul_X]
     show linSub A (MvPowerSeries.C c * MvPowerSeries.X i) = _
     rw [← Formalism.L2.Th1.G.linSubHom_apply, map_mul, Formalism.L2.Th1.G.linSubHom_apply,
-      Formalism.L2.Th1.G.linSubHom_apply, Formalism.L2.Th1.G.linSub_C, Formalism.L2.Th1.G.linSub_X, Finset.mul_sum]
+      Formalism.L2.Th1.G.linSubHom_apply, Formalism.L2.Th1.G.linSub_C, Formalism.L2.Th1.G.linSub_X,
+      Finset.mul_sum]
     refine Finset.sum_congr rfl (fun x _ => ?_)
     rw [map_mul]
     ring

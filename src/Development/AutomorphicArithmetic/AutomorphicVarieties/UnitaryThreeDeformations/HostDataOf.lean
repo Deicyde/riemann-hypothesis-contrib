@@ -8,10 +8,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVa
 
 @[expose] public section
 
-open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Alg UpperTheory.V.UnitaryThreeInertia
+open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Alg
+  UpperTheory.V.UnitaryThreeInertia
 
-theorem UpperTheory.V.UnitaryThreeInertia.hostData_of_host :
-    ∀ (h : Host) {l : ℕ} [Fact l.Prime] (c : Coef l) (e : ℕ), l ≠ 2 → 1 ≤ e → ∀ ψ ∈ h.X c e, h.R1 l ψ ≤ 2 ^ c2 ψ → HostData l e ψ h.o ∧ XData l ψ h.q := by
+theorem UpperTheory.V.UnitaryThreeInertia.hostData_of_host
+    : ∀ (h : Host) {l : ℕ} [Fact l.Prime] (c : Coef l) (e : ℕ),
+      l ≠ 2 → 1 ≤ e → ∀ ψ ∈ h.X c e, h.R1 l ψ ≤ 2 ^ c2 ψ → HostData l e ψ h.o ∧ XData l ψ h.q := by
   intro h l _ c e hl2 he ψ hψ hR
   have hl : l.Prime := Fact.out
   obtain ⟨hchar, hpar⟩ := (Host.mem_X h).mp hψ
@@ -32,6 +34,8 @@ theorem UpperTheory.V.UnitaryThreeInertia.hostData_of_host :
     have hX : l * h.q ≤ (l * h.q) ^ 2 := Nat.le_self_pow two_ne_zero _
     have hoX : 1 * (l * h.q) ^ 2 ≤ h.o * (l * h.q) ^ 2 := Nat.mul_le_mul_right _ ho
     have hmain : 2 * (l * h.q) ≤ 16 * h.o * (l * h.q) ^ 2 := by nlinarith
-    calc 2 * (l * h.q) * 4 ^ n0 l ψ ≤ 16 * h.o * (l * h.q) ^ 2 * 4 ^ n0 l ψ := Nat.mul_le_mul_right _ hmain
+    calc
+      2 * (l * h.q) * 4 ^ n0 l ψ
+        ≤ 16 * h.o * (l * h.q) ^ 2 * 4 ^ n0 l ψ := Nat.mul_le_mul_right _ hmain
       _ = h.R1 l ψ := hR1.symm
       _ ≤ 2 ^ c2 ψ := hR

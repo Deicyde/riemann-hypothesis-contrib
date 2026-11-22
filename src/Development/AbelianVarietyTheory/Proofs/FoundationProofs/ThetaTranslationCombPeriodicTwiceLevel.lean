@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Different
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum GlobalTheory.GalTheta
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum GlobalTheory.GalTheta
 open scoped BigOperators
 
 noncomputable section
@@ -19,28 +21,32 @@ variable (D : D7) (T : Tor D) {N N' : ℕ}
 theorem Hf_two_mul (m : ℕ) (y l : VC D N N') : Hf D T y ((2 * m) • l) = 2 * Hf D T (m • y) l := by
   rw [Hf_nsmul_right, Hf_nsmul_left]; push_cast; ring
 
-theorem qH_add (a b : VC D N N') :
-    qH D T (a + b) = qH D T a + qH D T b + Real.sqrt D.host.d * (Hf D T a b).re := by
+theorem qH_add (a b : VC D N N')
+    : qH D T (a + b) = qH D T a + qH D T b + Real.sqrt D.host.d * (Hf D T a b).re := by
   simp only [qH, Hf_add_left, Hf_add_right, Complex.add_re, Hf_re_swap D T a b]
   ring
 
 theorem qH_nsmul (n : ℕ) (a : VC D N N') : qH D T (n • a) = (n : ℝ) ^ 2 * qH D T a := by
   simp only [qH, Hf_nsmul_left, Hf_nsmul_right]
-  have : ((n : ℂ) * ((n : ℂ) * Hf D T a a)).re = (n : ℝ) ^ 2 * (Hf D T a a).re := by
-    simp; ring
-  rw [this]; ring
+  have : ((n : ℂ) * ((n : ℂ) * Hf D T a a)).re = (n : ℝ) ^ 2 * (Hf D T a a).re := by simp; ring
+  rw [this]
+  ring
 
-theorem exp_even (r : ℝ) (m : ℤ) (h : r = 2 * m) :
-    Complex.exp (-(Real.pi : ℂ) * Complex.I * (r : ℂ)) = 1 := by
+theorem exp_even (r : ℝ) (m : ℤ) (h : r = 2 * m)
+    : Complex.exp (-(Real.pi : ℂ) * Complex.I * (r : ℂ)) = 1 := by
   rw [h, Complex.exp_eq_one_iff]
   exact ⟨-m, by push_cast; ring⟩
 
-theorem period (D : D7) (T : Tor D) (N N' : ℕ) (A : AddSubgroup (VC D N N'))
+theorem period
+    (D : D7) (T : Tor D)
+    (N N' : ℕ) (A : AddSubgroup (VC D N N'))
     (hIm : ∀ x ∈ A, ∀ y ∈ A, ∃ m : ℤ, (Hf D T x y).im = m) (hq : ∀ x ∈ A, ∃ m : ℤ, qH D T x = m)
-    (k : ℕ) (c : Fin k → ℂ) (t : Fin k → VC D N N') (e₀ : VC D N N' → ℂ) (x : VC D N N') (m₀ : ℕ)
-    (he : e₀ ∈ ThSp D T A) (hx : m₀ • x ∈ A) (ht : ∀ i, m₀ • t i ∈ A) (l : VC D N N') (hl : l ∈ A) :
-    U D T (x + (2 * m₀) • l) (comb D T c t e₀) = U D T x (comb D T c t e₀) ∧
-      wdPh D T (x + (2 * m₀) • l) = wdPh D T x := by
+    (k : ℕ) (c : Fin k → ℂ) (t : Fin k → VC D N N')
+    (e₀ : VC D N N' → ℂ) (x : VC D N N') (m₀ : ℕ)
+    (he : e₀ ∈ ThSp D T A) (hx : m₀ • x ∈ A) (ht : ∀ i, m₀ • t i ∈ A)
+    (l : VC D N N') (hl : l ∈ A)
+    : U D T (x + (2 * m₀) • l) (comb D T c t e₀) = U D T x (comb D T c t e₀)
+      ∧ wdPh D T (x + (2 * m₀) • l) = wdPh D T x := by
   obtain ⟨ql, hql⟩ := hq l hl
   have hqμ : qH D T ((2 * m₀) • l) = ((2 * (2 * (m₀ : ℤ) ^ 2 * ql) : ℤ) : ℝ) := by
     rw [qH_nsmul, hql]; push_cast; ring
@@ -57,8 +63,9 @@ theorem period (D : D7) (T : Tor D) (N N' : ℕ) (A : AddSubgroup (VC D N N'))
     obtain ⟨m, hm⟩ := hIm _ hy _ hl
     exact ⟨m, by rw [Hf_two_mul, ← hm]; simp⟩
   refine ⟨?_, ?_⟩
-  · have key : ∀ (s : VC D N N'), m₀ • s ∈ A → ∀ z,
-        U D T (x + (2 * m₀) • l) (U D T s e₀) z = U D T x (U D T s e₀) z := by
+  · have key
+        : ∀ (s : VC D N N'),
+          m₀ • s ∈ A → ∀ z, U D T (x + (2 * m₀) • l) (U D T s e₀) z = U D T x (U D T s e₀) z := by
       intro s hs z
       have h1 : U D T (x + s) e₀ z = U D T (x + (2 * m₀) • l + s) e₀ z := by
         obtain ⟨m, hm⟩ := hev (x + s) (by rw [smul_add]; exact A.add_mem hx hs)
@@ -81,10 +88,10 @@ theorem period (D : D7) (T : Tor D) (N N' : ℕ) (A : AddSubgroup (VC D N N'))
     obtain ⟨b, hb⟩ := hq _ (A.add_mem hx hl)
     have h1 := qH_add D T (m₀ • x) l
     have h2 := qH_add D T x ((2 * m₀) • l)
-    have h3 : (Hf D T x ((2 * m₀) • l)).re = 2 * (Hf D T (m₀ • x) l).re := by
-      rw [Hf_two_mul]; simp
-    have h4 : qH D T (x + (2 * m₀) • l) / 2 =
-        qH D T x / 2 + ((2 * (m₀ : ℤ) ^ 2 * ql + (b - a - ql) : ℤ) : ℝ) := by
+    have h3 : (Hf D T x ((2 * m₀) • l)).re = 2 * (Hf D T (m₀ • x) l).re := by rw [Hf_two_mul]; simp
+    have h4
+        : qH D T (x + (2 * m₀) • l) / 2
+          = qH D T x / 2 + ((2 * (m₀ : ℤ) ^ 2 * ql + (b - a - ql) : ℤ) : ℝ) := by
       rw [h2, hqμ, h3]
       rw [ha, hb, hql] at h1
       push_cast

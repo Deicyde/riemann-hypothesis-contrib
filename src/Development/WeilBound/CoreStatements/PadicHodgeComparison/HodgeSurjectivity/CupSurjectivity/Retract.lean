@@ -18,18 +18,21 @@ namespace CrystallineSemistableComparison.Onto
 
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (PSpace Sp spMap IsProjOver)
 
-def retractPt (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)) :
-    Spec (CommRingCat.of (OK l K)) ⟶ PSpace (OK l K) 2 :=
-  GlobalTheory.ProjSpace.pt (RingHom.id (OK l K)) (fun _ => 1)
+def retractPt (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l))
+    : Spec (CommRingCat.of (OK l K)) ⟶ PSpace (OK l K) 2 :=
+  GlobalTheory.ProjSpace.pt (RingHom.id (OK l K))
+    (fun _ => 1)
     (Ideal.eq_top_of_isUnit_mem _ (Ideal.subset_span ⟨0, rfl⟩) isUnit_one)
 
-theorem retractPt_str (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l)) :
-    retractPt l K ≫ PSpace.str (OK l K) 2 = 𝟙 _ := by
-  have hstr : ∀ (v : Fin (2 + 1) → OK l K) (hv : Ideal.span (Set.range v) = ⊤),
-      GlobalTheory.ProjSpace.pt (RingHom.id (OK l K)) v hv ≫ PSpace.str (OK l K) 2 =
-        spMap (RingHom.id (OK l K)) := by
+theorem retractPt_str (l : ℕ) [Fact l.Prime] (K : IntermediateField ℚ_[l] (PadicAlgCl l))
+    : retractPt l K ≫ PSpace.str (OK l K) 2 = 𝟙 _ := by
+  have hstr
+      : ∀ (v : Fin (2 + 1) → OK l K) (hv : Ideal.span (Set.range v) = ⊤),
+        GlobalTheory.ProjSpace.pt (RingHom.id (OK l K)) v hv ≫ PSpace.str (OK l K) 2
+          = spMap (RingHom.id (OK l K)) := by
     intro v hv
-    rw [GlobalTheory.ProjSpace.pt, PSpace.str, GlobalTheory.ProjPoint.ofHom_toSpecZero_assoc, ← Spec.map_comp]
+    rw [GlobalTheory.ProjSpace.pt, PSpace.str, GlobalTheory.ProjPoint.ofHom_toSpecZero_assoc,
+      ← Spec.map_comp]
     congr 1
     ext1
     exact RingHom.ext fun r => MvPolynomial.eval₂Hom_C _ v r
@@ -52,12 +55,21 @@ theorem retract_pf : Retract := by
     exact this
   have hsm : Smooth N.p := SmoothOfRelativeDimension.smooth (d + 1 + 1) N.p
   obtain ⟨⟨hproj, ϖ, hϖ, -⟩, -⟩ := hM
-  refine ⟨N, pullback.fst _ _, pullback.lift (𝟙 _) (M.p ≫ retractPt l K) ?_, rfl, pullback.lift_fst _ _ _,
-    ⟨⟨?_, ϖ, hϖ, ?_⟩, hsm⟩, hN⟩
+  refine ⟨
+    N,
+    pullback.fst _ _,
+    pullback.lift (𝟙 _) (M.p ≫ retractPt l K) ?_,
+    rfl,
+    pullback.lift_fst _ _ _,
+    ⟨⟨?_, ϖ, hϖ, ?_⟩, hsm⟩,
+    hN
+  ⟩
   · rw [Category.assoc, retractPt_str, Category.comp_id, Category.id_comp]
-  · exact GlobalTheory.ProjSpace.isProjOver_pullback hproj (GlobalTheory.ProjSpace.isProjOver_pspace_str _ 2)
+  · exact GlobalTheory.ProjSpace.isProjOver_pullback hproj
+      (GlobalTheory.ProjSpace.isProjOver_pspace_str _ 2)
   · intro x
-    exact GlobalTheory.T.hasStrictlySemistableChartAt_of_smooth _ ϖ N.X N.p ⊤ x trivial inferInstance
+    exact GlobalTheory.T.hasStrictlySemistableChartAt_of_smooth _ ϖ N.X N.p ⊤ x trivial
+      inferInstance
 
 end CrystallineSemistableComparison.Onto
 

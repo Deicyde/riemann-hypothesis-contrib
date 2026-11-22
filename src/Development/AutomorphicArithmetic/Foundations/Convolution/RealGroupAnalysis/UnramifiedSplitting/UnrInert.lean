@@ -18,17 +18,22 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Cuspidal
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.V.Af.Smo (Eig EigAt)
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.H
 open scoped Classical
 
-private theorem below_ev {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    {p : P F → Prop} (h : ∀ᶠ v in cofinite, p v) : ∀ᶠ w : P E in cofinite, ∀ v, Below v w → p v := by
+private theorem below_ev
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {p : P F → Prop} (h : ∀ᶠ v in cofinite, p v)
+    : ∀ᶠ w : P E in cofinite, ∀ v, Below v w → p v := by
   have hfin : ∀ v : P F, {w : P E | Below v w}.Finite := fun v => by
     haveI := v.isMaximal
     refine Set.Finite.of_finite_image (f := HeightOneSpectrum.asIdeal)
-      ((IsDedekindDomain.primesOver_finite v.asIdeal (𝓞 E)).subset ?_) (fun _ _ _ _ h => HeightOneSpectrum.ext h)
+      ((IsDedekindDomain.primesOver_finite v.asIdeal (𝓞 E)).subset ?_)
+      (fun _ _ _ _ h => HeightOneSpectrum.ext h)
     rintro _ ⟨w, hw, rfl⟩
     exact ⟨w.isPrime, ⟨hw⟩⟩
   have hS : {v | ¬ p v}.Finite := h
@@ -37,20 +42,34 @@ private theorem below_ev {F E : Type} [Field F] [NumberField F] [Field E] [Numbe
   by_contra hc
   exact hw (Set.mem_iUnion.mpr ⟨v, Set.mem_iUnion.mpr ⟨hc, hv⟩⟩)
 
-private def LRel {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E]
-    {D : Dat F E} (W : Weil D) (π : TR.CuspSub F 2) (h₀ : GL (Fin 2) (A E)) (Φ : GL (Fin 2) (A E) → ℂ) (v : P F) : Prop :=
-  W.η.UnrAt v → W.η.val v = -1 → ∀ α β : ℂˣ, π.HasSat v {α, β} → ∀ (ϖ : (Kv v)ˣ) (z : (A E)ˣ), IsU ϖ →
-    (z : A E) = D.mkE (idl v ϖ : (A F)ˣ) 0 → ideleNorm F E z = idl v ϖ ^ 2 →
-    WE D Φ (aE z * h₀) = (q v)⁻¹ * ((α : ℂ) ^ 2 + (β : ℂ) ^ 2) * WE D Φ h₀ ∧
-      ∀ h, Φ (Matrix.GeneralLinearGroup.scalar (Fin 2) z * h) = ((α : ℂ) * β) ^ 2 * Φ h
+private def LRel
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F]
+    [_root_.NumberField.IsTotallyComplex E]
+    {D : Dat F E} (W : Weil D)
+    (π : TR.CuspSub F 2) (h₀ : GL (Fin 2) (A E)) (Φ : GL (Fin 2) (A E) → ℂ) (v : P F)
+    : Prop :=
+  W.η.UnrAt v → W.η.val v = -1
+    → ∀ α β : ℂˣ,
+      π.HasSat v {α, β}
+        → ∀ (ϖ : (Kv v)ˣ) (z : (A E)ˣ),
+          IsU ϖ → (z : A E) = D.mkE (idl v ϖ : (A F)ˣ) 0 → ideleNorm F E z = idl v ϖ ^ 2
+            → WE D Φ (aE z * h₀) = (q v)⁻¹ * ((α : ℂ) ^ 2 + (β : ℂ) ^ 2) * WE D Φ h₀
+              ∧ ∀ h, Φ (Matrix.GeneralLinearGroup.scalar (Fin 2) z * h) = ((α : ℂ) * β) ^ 2 * Φ h
 
-private theorem we_zero {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (D : Dat F E)
-    (h : GL (Fin 2) (A E)) : WE D (0 : GL (Fin 2) (A E) → ℂ) h = 0 := by
+private theorem we_zero
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (D : Dat F E) (h : GL (Fin 2) (A E))
+    : WE D (0 : GL (Fin 2) (A E) → ℂ) h = 0 := by
   simp [WE]
 
-private theorem span_rel {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E]
-    (D : Dat F E) (W : Weil D) (M : Meas F) (π : TR.CuspSub F 2) (h₀ : GL (Fin 2) (A E)) (Φ : Sm E 2) (hΦ : Φ ∈ span W M π) :
-    ∀ᶠ v : P F in cofinite, LRel W π h₀ Φ.1 v := by
+private theorem span_rel
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F]
+    [_root_.NumberField.IsTotallyComplex E]
+    (D : Dat F E) (W : Weil D)
+    (M : Meas F) (π : TR.CuspSub F 2)
+    (h₀ : GL (Fin 2) (A E))
+    (Φ : Sm E 2) (hΦ : Φ ∈ span W M π)
+    : ∀ᶠ v : P F in cofinite, LRel W π h₀ Φ.1 v := by
   have hc : ∀ Ψ ∈ span W M π, Continuous Ψ.1 := fun Ψ h => (spanCont F E D W M π Ψ h).1
   induction hΦ using Submodule.span_induction with
   | mem x hx =>
@@ -73,7 +92,8 @@ private theorem span_rel {F E : Type} [Field F] [NumberField F] [Field E] [Numbe
     refine ⟨?_, fun h => ?_⟩
     · rw [e, e, a1, b1]; ring
     · show x.1 _ + y.1 _ = _ * (x.1 _ + y.1 _)
-      rw [a2, b2]; ring
+      rw [a2, b2]
+      ring
   | smul c x hx ihx =>
     filter_upwards [ihx] with v h1 hu hv α β hB ϖ z hϖ hz hn
     obtain ⟨a1, a2⟩ := h1 hu hv α β hB ϖ z hϖ hz hn
@@ -83,9 +103,11 @@ private theorem span_rel {F E : Type} [Field F] [NumberField F] [Field E] [Numbe
     refine ⟨?_, fun h => ?_⟩
     · rw [e, e, a1]; ring
     · show c * x.1 _ = _ * (c * x.1 _)
-      rw [a2]; ring
+      rw [a2]
+      ring
 
-private theorem pairs {a b c d : ℂ} (hs : c + d = a + b) (hp : c * d = a * b) : (c = a ∧ d = b) ∨ (c = b ∧ d = a) := by
+private theorem pairs {a b c d : ℂ} (hs : c + d = a + b) (hp : c * d = a * b)
+    : (c = a ∧ d = b) ∨ (c = b ∧ d = a) := by
   have h : (c - a) * (c - b) = 0 := by linear_combination c * hs - hp
   rcases mul_eq_zero.1 h with h | h
   · have e : c = a := sub_eq_zero.1 h
@@ -93,9 +115,14 @@ private theorem pairs {a b c d : ℂ} (hs : c + d = a + b) (hp : c * d = a * b) 
   · have e : c = b := sub_eq_zero.1 h
     exact Or.inr ⟨e, by rw [e, add_comm a] at hs; exact add_left_cancel hs⟩
 
-theorem UpperTheory.ConvolutionTheory.R2.H.unrInert :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (D : Dat F E) (W : Weil D) (M : Meas F) (π : TR.CuspSub F 2), ThetaLiftTrivialOrbitTermsVanish W M π → ∀ Q : CuspSub E 2, Q.V ≤ span W M π →
-      ∀ᶠ w : P E in cofinite, ∀ v : P F, Below v w → Inert D v w → ∀ B, π.HasSat v B → (CG.mk Q).HasSat w (B.map (· ^ 2)) := by
+theorem UpperTheory.ConvolutionTheory.R2.H.unrInert
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (D : Dat F E) (W : Weil D)
+        (M : Meas F) (π : TR.CuspSub F 2),
+      ThetaLiftTrivialOrbitTermsVanish W M π
+        → ∀ Q : CuspSub E 2,
+          Q.V ≤ span W M π
+            → ∀ᶠ w : P E in cofinite, ∀ v : P F, Below v w → Inert D v w → ∀ B, π.HasSat v B → (CG.mk Q).HasSat w (B.map (· ^ 2)) := by
   intro F E _ _ _ _ _ _ _ D W M π hN Q hQ
   obtain ⟨y, hy, h0⟩ := (Submodule.ne_bot_iff _).1 Q.ne_bot
   have hsp := hQ hy
@@ -130,7 +157,9 @@ theorem UpperTheory.ConvolutionTheory.R2.H.unrInert :
   have hp0 : p ≠ 0 := fun h0 => by simp [Formalism.UG.IsUnifV, h0] at hp
   obtain ⟨ϖ', hϖ', hz, hnz⟩ := hin.unif (Units.mk0 p hp0) hp
   obtain ⟨r1, r2⟩ := hrel v hv hu hval α β hB (Units.mk0 p hp0) (idl w ϖ') hp hz hnz
-  have hfix' : ∀ g, ∀ k ∈ GlobalTheory.LFun.KGL w (n := 2), y.1 (g * finGL E 2 (locGL E 2 w k)) = y.1 g := fun g k hk =>
+  have hfix'
+      : ∀ g, ∀ k ∈ GlobalTheory.LFun.KGL w (n := 2),
+        y.1 (g * finGL E 2 (locGL E 2 w k)) = y.1 g := fun g k hk =>
     congrFun (congrArg (fun x : Q.V => x.1.1) (GlobalTheory.LGrp.mem_fixed.1 hfix k hk)) g
   have hEig : EigAt w {α', β'} y.1 := by
     intro g
@@ -139,14 +168,19 @@ theorem UpperTheory.ConvolutionTheory.R2.H.unrInert :
     · by_cases h0 : y = 0
       · subst y
         simp
-      have he := (hB'.2 (⟨y, hy⟩ : Q.V)
-        (GlobalTheory.LGrp.mem_fixed.2 fun k hk => Subtype.ext (Subtype.ext (funext fun x => hfix' x k hk))) fun h => h0 (congrArg Subtype.val h)).2.2.2 ϖ hϖ j hj
-      let ev : Q.V →+ ℂ :=
-        { toFun := fun ψ => ψ.1.1 (g * finGL E 2 (locGL E 2 w x))
-          map_zero' := rfl
-          map_add' := fun _ _ => rfl }
-      have hs := ev.map_finsum (GlobalTheory.LFun.finite_heckeVec (Formalism.UG.Final.GLintComm E w 2)
-        (GlobalTheory.LFun.Tj_mem_hecke hϖ j) (Q.locRep w) ⟨y, hy⟩)
+      have he :=
+        (hB'.2 (⟨y, hy⟩ : Q.V)
+          (GlobalTheory.LGrp.mem_fixed.2 fun k hk =>
+            Subtype.ext (Subtype.ext (funext fun x => hfix' x k hk)))
+          fun h => h0 (congrArg Subtype.val h)).2.2.2 ϖ hϖ j hj
+      let ev : Q.V →+ ℂ := {
+        toFun := fun ψ => ψ.1.1 (g * finGL E 2 (locGL E 2 w x))
+        map_zero' := rfl
+        map_add' := fun _ _ => rfl
+      }
+      have hs :=
+        ev.map_finsum (GlobalTheory.LFun.finite_heckeVec (Formalism.UG.Final.GLintComm E w 2)
+          (GlobalTheory.LFun.Tj_mem_hecke hϖ j) (Q.locRep w) ⟨y, hy⟩)
       refine Eq.trans (finsum_congr fun c => ?_) (hs.symm.trans (congrArg ev he))
       rw [map_mul, map_mul, ← mul_assoc]
       rfl
@@ -161,7 +195,9 @@ theorem UpperTheory.ConvolutionTheory.R2.H.unrInert :
   obtain ⟨t1, -⟩ := whTorus E w ϖ' hϖ' χ hχ α' β' _ hE1 hnl
   obtain ⟨R, -, -, hR⟩ := heckeExpl E w ϖ' hϖ'
   have hc := (hR α' β' _ (hEig h₁) 1).2
-  have hc' : y.1 (h₁ * Matrix.GeneralLinearGroup.scalar (Fin 2) (idl w ϖ')) = (α' : ℂ) * β' * y.1 h₁ := by
+  have hc'
+      : y.1 (h₁ * Matrix.GeneralLinearGroup.scalar (Fin 2) (idl w ϖ'))
+        = (α' : ℂ) * β' * y.1 h₁ := by
     simp only [one_mul, map_one, mul_one] at hc
     rw [← (lcLaws E w).2.2.2.2.1]
     exact hc
@@ -171,7 +207,8 @@ theorem UpperTheory.ConvolutionTheory.R2.H.unrInert :
     have h3 := mul_right_cancel₀ hh₁ h2
     rw [h3]
     ring
-  have e1 : WE D y.1 (lc w (dL ϖ' 1) * h₀) = WE D y.1 (aE (idl w ϖ') * h₀) := by rw [(lcLaws E w).2.2.2.1]
+  have e1 : WE D y.1 (lc w (dL ϖ' 1) * h₀) = WE D y.1 (aE (idl w ϖ') * h₀) := by
+    rw [(lcLaws E w).2.2.2.1]
   have e2 : WE D y.1 (lc w 1 * h₀) = WE D y.1 h₀ := by simp
   beta_reduce at t1
   rw [e1, e2, r1] at t1
@@ -187,13 +224,14 @@ theorem UpperTheory.ConvolutionTheory.R2.H.unrInert :
   have hsq : q w ^ (1 / 2 : ℂ) = q v := by
     rw [hqw, hcard]
     have e : ((normV v : ℂ) ^ 2) = ((((normV v : ℝ) ^ 2 : ℝ)) : ℂ) := by push_cast; rfl
-    rw [e, show (1 / 2 : ℂ) = ((1 / 2 : ℝ) : ℂ) by push_cast; rfl, ← Complex.ofReal_cpow (by positivity),
-      ← Real.sqrt_eq_rpow, Real.sqrt_sq (by positivity)]
+    rw [e, show (1 / 2 : ℂ) = ((1 / 2 : ℝ) : ℂ) by push_cast; rfl,
+      ← Complex.ofReal_cpow (by positivity), ← Real.sqrt_eq_rpow, Real.sqrt_sq (by positivity)]
     simp
   have hs : (α' : ℂ) + β' = (α : ℂ) ^ 2 + (β : ℂ) ^ 2 := by
     rw [hsq, hqw] at t1
-    have h3 : q v ^ 2 * ((q v)⁻¹ * ((α : ℂ) ^ 2 + (β : ℂ) ^ 2) * WE D y.1 h₀) =
-        q v * ((α : ℂ) ^ 2 + (β : ℂ) ^ 2) * WE D y.1 h₀ := by
+    have h3
+        : q v ^ 2 * ((q v)⁻¹ * ((α : ℂ) ^ 2 + (β : ℂ) ^ 2) * WE D y.1 h₀)
+          = q v * ((α : ℂ) ^ 2 + (β : ℂ) ^ 2) * WE D y.1 h₀ := by
       field_simp
     rw [h3] at t1
     exact (mul_left_cancel₀ hqv (mul_right_cancel₀ hh₀ t1)).symm

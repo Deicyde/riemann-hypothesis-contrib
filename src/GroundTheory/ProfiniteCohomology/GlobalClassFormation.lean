@@ -11,21 +11,23 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.ProfCoh
 
-open CategoryTheory NumberField IntermediateField GroundTheory.Global FiniteSubfield IsDedekindDomain
+open CategoryTheory NumberField IntermediateField GroundTheory.Global FiniteSubfield
+  IsDedekindDomain
 
 noncomputable section
 
-theorem sumInvRestriction : SumInvRestriction :=
-  fun _ _ _ ιK ιF y => idelesSumInv_idelesResField ιK ιF y
+theorem sumInvRestriction : SumInvRestriction := fun _ _ _ ιK ιF y =>
+  idelesSumInv_idelesResField ιK ιF y
 
-theorem idelesToClasses_surjective (K : FiniteSubfield) : Function.Surjective (idelesToClasses K 2).hom :=
+theorem idelesToClasses_surjective (K : FiniteSubfield)
+    : Function.Surjective (idelesToClasses K 2).hom :=
   idelesToClasses_surjective_of sumInvRestriction K (Classical.choice (nonempty_localEmbeddings K))
 
 def globalClassFormation (K : FiniteSubfield) : ClassFormation (classLimitRep K) :=
   globalClassFormationOf sumInvRestriction K
 
-theorem subsingleton_cohomology_three_unitsLimitRep (K : FiniteSubfield) :
-    Subsingleton (cohomology (unitsLimitRep K) 3) := by
+theorem subsingleton_cohomology_three_unitsLimitRep (K : FiniteSubfield)
+    : Subsingleton (cohomology (unitsLimitRep K) 3) := by
   have h3 := subsingleton_cohomology_three_limitRep (K := K)
   refine ⟨fun x x' => ?_⟩
   have hz : ∀ x : cohomology (unitsLimitRep K) 3, x = 0 := by

@@ -28,10 +28,10 @@ lemma det_rev_vandermonde {n : ℕ} (v : Fin n → ℂ) :
     simp [Matrix.vandermonde_apply, Fin.val_rev, this]
   rw [h, Matrix.det_permute', Matrix.det_vandermonde, prod_prs_eq_iter]
 
-theorem det_vandermonde_sq {n : ℕ} (z : Fin n → ℂ) :
-    (Matrix.of fun i j : Fin n => (z i ^ 2) ^ (n - 1 - (j : ℕ))).det =
-      (Matrix.of fun i j : Fin n => z i ^ (n - 1 - (j : ℕ))).det *
-        ∏ p ∈ prs n, (z p.1 + z p.2) := by
+theorem det_vandermonde_sq {n : ℕ} (z : Fin n → ℂ)
+    : (Matrix.of fun i j : Fin n => (z i ^ 2) ^ (n - 1 - (j : ℕ))).det
+      = (Matrix.of fun i j : Fin n => z i ^ (n - 1 - (j : ℕ))).det
+        * ∏ p ∈ prs n, (z p.1 + z p.2) := by
   rw [det_rev_vandermonde (fun i => z i ^ 2), det_rev_vandermonde z, mul_assoc,
     ← Finset.prod_mul_distrib]
   congr 1

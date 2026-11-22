@@ -10,10 +10,13 @@ open IsDedekindDomain NumberField
 
 namespace PI.ProdFormulaE.Tr
 
-theorem exists_eq_ell_mul {F : Type} [Field F] [NumberField F] (ℓ : ℕ) [Fact ℓ.Prime] (X : 𝓞 F)
-    (h : ∀ v : IsDedekindDomain.HeightOneSpectrum (𝓞 F), (ℓ : 𝓞 F) ∈ v.asIdeal →
-      v.valuation F (X : F) ≤ v.valuation F (ℓ : F)) :
-    ∃ Z : 𝓞 F, X = ℓ * Z := by
+theorem exists_eq_ell_mul
+    {F : Type} [Field F] [NumberField F]
+    (ℓ : ℕ) [Fact ℓ.Prime]
+    (X : 𝓞 F)
+    (h : ∀ v : IsDedekindDomain.HeightOneSpectrum (𝓞 F),
+      (ℓ : 𝓞 F) ∈ v.asIdeal → v.valuation F (X : F) ≤ v.valuation F (ℓ : F))
+    : ∃ Z : 𝓞 F, X = ℓ * Z := by
   have hℓ : (ℓ : F) ≠ 0 := Nat.cast_ne_zero.2 (Fact.out : ℓ.Prime).ne_zero
   have hval : ∀ v : IsDedekindDomain.HeightOneSpectrum (𝓞 F), v.valuation F ((X : F) / ℓ) ≤ 1 := by
     intro v
@@ -26,8 +29,9 @@ theorem exists_eq_ell_mul {F : Type} [Field F] [NumberField F] (ℓ : ℕ) [Fact
       exact (div_le_one₀ (zero_lt_iff.2 hpos)).2 (h v hv)
     · rw [hℓv, IsDedekindDomain.HeightOneSpectrum.intValuation_eq_one_iff.2 hv, div_one]
       exact IsDedekindDomain.HeightOneSpectrum.valuation_le_one v X
-  obtain ⟨Z, hZ⟩ := IsDedekindDomain.HeightOneSpectrum.mem_integers_of_valuation_le_one (R := 𝓞 F) F
-    ((X : F) / ℓ) hval
+  obtain ⟨Z, hZ⟩ :=
+    IsDedekindDomain.HeightOneSpectrum.mem_integers_of_valuation_le_one (R := 𝓞 F) F ((X : F) / ℓ)
+      hval
   refine ⟨Z, ?_⟩
   apply IsFractionRing.injective (𝓞 F) F
   have hZ' : algebraMap (𝓞 F) F Z = (X : F) / ℓ := hZ
@@ -35,8 +39,8 @@ theorem exists_eq_ell_mul {F : Type} [Field F] [NumberField F] (ℓ : ℕ) [Fact
   rw [map_mul, hZ', map_natCast, hc]
   try rfl
 
-theorem exists_int_approx (ℓ : ℕ) [Fact ℓ.Prime] (c : ℚ_[ℓ]) (hc : ‖c‖ ≤ 1) :
-    ∃ m : ℤ, ‖(c - m) / ℓ‖ ≤ 1 := by
+theorem exists_int_approx (ℓ : ℕ) [Fact ℓ.Prime] (c : ℚ_[ℓ]) (hc : ‖c‖ ≤ 1)
+    : ∃ m : ℤ, ‖(c - m) / ℓ‖ ≤ 1 := by
   obtain ⟨n, -, hn⟩ := PadicInt.exists_mem_range (⟨c, hc⟩ : ℤ_[ℓ])
   rw [IsLocalRing.mem_maximalIdeal, PadicInt.mem_nonunits, PadicInt.norm_lt_one_iff_dvd] at hn
   obtain ⟨y, hy⟩ := hn

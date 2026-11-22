@@ -8,21 +8,27 @@ open Polynomial IntermediateField
 
 namespace GlobalTheory
 
-theorem isSeparable_and_natDegree_le_of_fixed {F E : Type} [Field F] [Field E] [Algebra F E]
-    (G : Type) [Group G] (act : G →* (E ≃ₐ[F] E)) (N : Subgroup G) [N.FiniteIndex]
+theorem isSeparable_and_natDegree_le_of_fixed
+    {F E : Type} [Field F] [Field E] [Algebra F E]
+    (G : Type) [Group G]
+    (act : G →* (E ≃ₐ[F] E))
+    (N : Subgroup G) [N.FiniteIndex]
     (hG : ∀ x : E, (∀ g, act g x = x) → x ∈ (⊥ : IntermediateField F E))
-    (x : E) (hx : ∀ n ∈ N, act n x = x) :
-    IsIntegral F x ∧ IsSeparable F x ∧ (minpoly F x).natDegree ≤ N.index := by
+    (x : E) (hx : ∀ n ∈ N, act n x = x)
+    : IsIntegral F x ∧ IsSeparable F x ∧ (minpoly F x).natDegree ≤ N.index := by
   classical
   haveI : Finite (G ⧸ N) := Subgroup.finite_quotient_of_finiteIndex
   haveI : Fintype (G ⧸ N) := Fintype.ofFinite _
-  let f : G ⧸ N → E := fun q => Quotient.liftOn' q (fun g => act g x) (by
-    intro a b hab
-    rw [QuotientGroup.leftRel_apply] at hab
-    have := hx _ hab
-    show act a x = act b x
-    calc act a x = act a (act (a⁻¹ * b) x) := by rw [this]
-      _ = act b x := by rw [← AlgEquiv.mul_apply, ← map_mul, mul_inv_cancel_left])
+  let f : G ⧸ N → E := fun q =>
+    Quotient.liftOn' q (fun g => act g x) (by
+      intro a b hab
+      rw [QuotientGroup.leftRel_apply] at hab
+      have := hx _ hab
+      show act a x = act b x
+      calc
+        act a x
+          = act a (act (a⁻¹ * b) x) := by rw [this]
+        _ = act b x := by rw [← AlgEquiv.mul_apply, ← map_mul, mul_inv_cancel_left])
   have hf : ∀ g : G, f (QuotientGroup.mk g) = act g x := fun g => rfl
   let S : Finset E := Finset.univ.image f
   have hS : ∀ y, y ∈ S ↔ ∃ g : G, act g x = y := by
@@ -50,8 +56,11 @@ theorem isSeparable_and_natDegree_le_of_fixed {F E : Type} [Field F] [Field E] [
       · rintro ⟨z, ⟨h, rfl⟩, rfl⟩
         exact ⟨g * h, by rw [map_mul, AlgEquiv.mul_apply]⟩
       · rintro ⟨h, rfl⟩
-        exact ⟨act (g⁻¹ * h) x, ⟨g⁻¹ * h, rfl⟩, by
-          rw [← AlgEquiv.mul_apply, ← map_mul, mul_inv_cancel_left]⟩
+        exact ⟨
+          act (g⁻¹ * h) x,
+          ⟨g⁻¹ * h, rfl⟩,
+          by rw [← AlgEquiv.mul_apply, ← map_mul, mul_inv_cancel_left]
+        ⟩
     conv_rhs => rw [← himg]
     rw [Finset.prod_image (fun a _ b _ h => (act g).injective h)]
     rfl
@@ -74,14 +83,17 @@ theorem isSeparable_and_natDegree_le_of_fixed {F E : Type} [Field F] [Field E] [
   have hdvd : minpoly F x ∣ q := minpoly.dvd F x hqx
   have hqsep : q.Separable := (separable_map (algebraMap F E)).1 (hqmap ▸ hpsep)
   refine ⟨hint, hqsep.of_dvd hdvd, ?_⟩
-  calc (minpoly F x).natDegree ≤ q.natDegree := natDegree_le_of_dvd hdvd hqmon.ne_zero
+  calc
+    (minpoly F x).natDegree
+      ≤ q.natDegree := natDegree_le_of_dvd hdvd hqmon.ne_zero
     _ = S.card := by rw [hqdeg, hpdeg]
     _ ≤ N.index := hcard
 
-theorem finiteDimensional_fixedField_map_of_finiteIndex : ∀ {F E : Type} [Field F] [Field E]
-    [Algebra F E] (G : Type) [Group G] (act : G →* (E ≃ₐ[F] E)) (N : Subgroup G), N.FiniteIndex →
-    (∀ x : E, (∀ g, act g x = x) → x ∈ (⊥ : IntermediateField F E)) →
-    FiniteDimensional F (IntermediateField.fixedField (N.map act)) := by
+theorem finiteDimensional_fixedField_map_of_finiteIndex
+    : ∀ {F E : Type} [Field F] [Field E] [Algebra F E] (G : Type) [Group G] (act : G →* (E ≃ₐ[F] E))
+        (N : Subgroup G),
+      N.FiniteIndex → (∀ x : E, (∀ g, act g x = x) → x ∈ (⊥ : IntermediateField F E))
+        → FiniteDimensional F (IntermediateField.fixedField (N.map act)) := by
   intro F E _ _ _ G _ act N hN hG
   set L := IntermediateField.fixedField (N.map act) with hLdef
   have key : ∀ y ∈ L, IsIntegral F y ∧ IsSeparable F y ∧ (minpoly F y).natDegree ≤ N.index := by

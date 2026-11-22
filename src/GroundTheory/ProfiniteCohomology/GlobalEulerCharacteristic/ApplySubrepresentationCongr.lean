@@ -16,12 +16,13 @@ universe u w
 
 variable {k G : Type u} [CommRing k] [Group G] [TopologicalSpace G] {R : Type w} [CommMonoid R]
 
-
 omit [CommMonoid R] in
-theorem apply_subrepresentation_congr (χ : (A : Rep.{u} k G) → [IsDiscreteRep A] → R)
-    {A : Rep.{u} k G} [IsDiscreteRep A] {W W' : Submodule k A} (h : W = W')
-    (hW : ∀ g, W ≤ W.comap (A.ρ g)) (hW' : ∀ g, W' ≤ W'.comap (A.ρ g)) :
-    χ (Rep.subrepresentation A W hW) = χ (Rep.subrepresentation A W' hW') := by
+theorem apply_subrepresentation_congr
+    (χ : (A : Rep.{u} k G) → [IsDiscreteRep A] → R)
+    {A : Rep.{u} k G} [IsDiscreteRep A]
+    {W W' : Submodule k A}
+    (h : W = W') (hW : ∀ g, W ≤ W.comap (A.ρ g)) (hW' : ∀ g, W' ≤ W'.comap (A.ρ g))
+    : χ (Rep.subrepresentation A W hW) = χ (Rep.subrepresentation A W' hW') := by
   subst h
   rfl
 
@@ -29,27 +30,31 @@ namespace IsMultiplicativeOn
 
 variable {P : ℕ → Prop} {χ : (A : Rep.{u} k G) → [IsDiscreteRep A] → R}
 
-theorem rangeStep (hχ : IsMultiplicativeOn P χ) (hPdvd : ∀ m n, m ∣ n → P n → P m)
-    {A : Rep.{u} k G} [IsDiscreteRep A] [Finite A] (T : Module.End k A)
-    (hT : ∀ g : G, Commute T (A.ρ g)) (D : Submodule k A) (hD : ∀ g : G, D ≤ D.comap (A.ρ g))
-    (hA : P (Nat.card A)) :
-    χ (Rep.subrepresentation A D hD) =
-      χ (Rep.subrepresentation A _ (inf_ker_le_comap T hT D hD)) *
-        χ (Rep.subrepresentation A _ (map_le_comap T hT D hD)) := by
-  have hdvd : Nat.card D ∣ Nat.card A :=
-    AddSubgroup.card_addSubgroup_dvd_card D.toAddSubgroup
-  exact hχ.shortExact (S := rangeStepComplex T hT D hD)
-    (rangeStepComplex_shortExact T hT D hD) (hPdvd _ _ hdvd hA)
+theorem rangeStep
+    (hχ : IsMultiplicativeOn P χ) (hPdvd : ∀ m n, m ∣ n → P n → P m)
+    {A : Rep.{u} k G} [IsDiscreteRep A] [Finite A]
+    (T : Module.End k A) (hT : ∀ g : G, Commute T (A.ρ g))
+    (D : Submodule k A) (hD : ∀ g : G, D ≤ D.comap (A.ρ g))
+    (hA : P (Nat.card A))
+    : χ (Rep.subrepresentation A D hD)
+      = χ (Rep.subrepresentation A _ (inf_ker_le_comap T hT D hD))
+        * χ (Rep.subrepresentation A _ (map_le_comap T hT D hD)) := by
+  have hdvd : Nat.card D ∣ Nat.card A := AddSubgroup.card_addSubgroup_dvd_card D.toAddSubgroup
+  exact hχ.shortExact (S := rangeStepComplex T hT D hD) (rangeStepComplex_shortExact T hT D hD)
+    (hPdvd _ _ hdvd hA)
 
 variable [IsTopologicalGroup G] [CompactSpace G]
 
-theorem coind_res_eq_pow (hχ : IsMultiplicativeOn P χ) (hPdvd : ∀ m n, m ∣ n → P n → P m)
-    (hPmul : ∀ m n, P m → P n → P (m * n)) (H : OpenSubgroup G)
-    [hN : (H : Subgroup G).Normal] [IsCyclic (G ⧸ (H : Subgroup G))] {p a : ℕ} [hp : Fact p.Prime]
-    (hcard : Nat.card (G ⧸ (H : Subgroup G)) = p ^ a) (M : Rep.{u} k G) [IsDiscreteRep M]
-    [Finite M] (hM : P (Nat.card M)) (hpM : ∀ m : M, p • m = 0) :
-    χ (Rep.coind (H : Subgroup G).subtype (Rep.res (H : Subgroup G).subtype M)) =
-      χ M ^ (p ^ a) := by
+theorem coind_res_eq_pow
+    (hχ : IsMultiplicativeOn P χ) (hPdvd : ∀ m n, m ∣ n → P n → P m)
+    (hPmul : ∀ m n, P m → P n → P (m * n))
+    (H : OpenSubgroup G) [hN : (H : Subgroup G).Normal] [IsCyclic (G ⧸ (H : Subgroup G))]
+    {p a : ℕ} [hp : Fact p.Prime]
+    (hcard : Nat.card (G ⧸ (H : Subgroup G)) = p ^ a)
+    (M : Rep.{u} k G) [IsDiscreteRep M] [Finite M]
+    (hM : P (Nat.card M)) (hpM : ∀ m : M, p • m = 0)
+    : χ (Rep.coind (H : Subgroup G).subtype (Rep.res (H : Subgroup G).subtype M))
+      = χ M ^ (p ^ a) := by
   have hQ : Finite (G ⧸ (H : Subgroup G)) :=
     Nat.finite_of_card_ne_zero (by rw [hcard]; exact pow_ne_zero _ hp.out.ne_zero)
   obtain ⟨q, hq⟩ := IsCyclic.exists_generator (α := G ⧸ (H : Subgroup G))
@@ -83,15 +88,16 @@ theorem coind_res_eq_pow (hχ : IsMultiplicativeOn P χ) (hPdvd : ∀ m n, m ∣
 
   set T : Module.End k (coindRes H M) := coindT (H := H) (M := M) s with hT_def
   have hT : ∀ g : G, Commute T ((coindRes H M).ρ g) := commute_coindShift_sub_one hs
-  have hCp : ∀ f : coindRes H M, p • f = 0 := fun f =>
-    Subtype.ext (funext fun x => hpM (f.1 x))
+  have hCp : ∀ f : coindRes H M, p • f = 0 := fun f => Subtype.ext (funext fun x => hpM (f.1 x))
   have hTN : T ^ (p ^ a) = 0 :=
     sub_one_pow_prime_pow_eq_zero hCp (coindShift (H := H) (M := M) s) a (coindShift_pow_eq_one hsN)
   let D : ℕ → Submodule k (coindRes H M) := fun j => LinearMap.range (T ^ j)
   have hD : ∀ j (g : G), D j ≤ (D j).comap ((coindRes H M).ρ g) := by
     rintro j g _ ⟨y, rfl⟩
-    exact ⟨(coindRes H M).ρ g y, by
-      rw [← Module.End.mul_apply, ((hT g).pow_left j).eq, Module.End.mul_apply]⟩
+    exact ⟨
+      (coindRes H M).ρ g y,
+      by rw [← Module.End.mul_apply, ((hT g).pow_left j).eq, Module.End.mul_apply]
+    ⟩
   have hDsucc : ∀ j, (D j).map T = D (j + 1) := fun j => by
     simp only [D]
     rw [pow_succ', Module.End.mul_eq_comp, LinearMap.range_comp]
@@ -108,8 +114,9 @@ theorem coind_res_eq_pow (hχ : IsMultiplicativeOn P χ) (hPdvd : ∀ m n, m ∣
   have : IsDiscreteRep (coindRes H M) := isDiscreteRep_coind_res H M
   set c := Nat.card (LinearMap.ker T) with hc
   have hcM : c = Nat.card M := Nat.card_congr (kerShiftEquiv (H := H) (M := M) hgen).toEquiv.symm
-  have hstep : ∀ j, Nat.card (D j) =
-      Nat.card ↥(D j ⊓ LinearMap.ker T) * Nat.card (D (j + 1)) := fun j => by
+  have hstep
+      : ∀ j,
+        Nat.card (D j) = Nat.card ↥(D j ⊓ LinearMap.ker T) * Nat.card (D (j + 1)) := fun j => by
     rw [card_rangeStep T (D j), hDsucc]
   have hle : ∀ j, Nat.card ↥(D j ⊓ LinearMap.ker T) ≤ c := fun j =>
     Nat.card_le_card_of_injective _
@@ -161,7 +168,8 @@ theorem coind_res_eq_pow (hχ : IsMultiplicativeOn P χ) (hPdvd : ∀ m n, m ∣
       Nat.eq_of_mul_eq_mul_right (pow_pos hcpos _) h1
     apply Submodule.toAddSubgroup_injective
     refine AddSubgroup.eq_of_le_of_card_ge
-      ((Submodule.toAddSubgroup_le _ _).2 (inf_le_right : D j ⊓ LinearMap.ker T ≤ LinearMap.ker T)) ?_
+      ((Submodule.toAddSubgroup_le _ _).2 (inf_le_right : D j ⊓ LinearMap.ker T ≤ LinearMap.ker T))
+      ?_
     change Nat.card (LinearMap.ker T) ≤ Nat.card ↥(D j ⊓ LinearMap.ker T)
     rw [hcard']
 
@@ -181,9 +189,11 @@ theorem coind_res_eq_pow (hχ : IsMultiplicativeOn P χ) (hPdvd : ∀ m n, m ∣
         rw [pow_succ]
         exact hPmul _ _ ih hM
     exact hPdvd _ _ (card_coind_dvd H (Rep.res (H : Subgroup G).subtype M)) (hpow _)
-  have hchain : ∀ j ≤ p ^ a - 1, χ (Rep.subrepresentation _ (D 0) (hD 0)) =
-      χ (Rep.subrepresentation _ (LinearMap.ker T) hK) ^ j *
-        χ (Rep.subrepresentation _ (D j) (hD j)) := by
+  have hchain
+      : ∀ j ≤ p ^ a - 1,
+        χ (Rep.subrepresentation _ (D 0) (hD 0))
+          = χ (Rep.subrepresentation _ (LinearMap.ker T) hK) ^ j
+            * χ (Rep.subrepresentation _ (D j) (hD j)) := by
     intro j
     induction j with
     | zero =>
@@ -196,18 +206,16 @@ theorem coind_res_eq_pow (hχ : IsMultiplicativeOn P χ) (hPdvd : ∀ m n, m ∣
         apply_subrepresentation_congr χ (hDsucc j) _ (hD (j + 1)), pow_succ, mul_assoc]
   have : IsDiscreteRep (Rep.subrepresentation (coindRes H M) ⊤ (fun _ => le_top)) :=
     isDiscreteRep_subrepresentation (coindRes H M) ⊤ (fun _ => le_top)
-  have htop : χ (coindRes H M) =
-      χ (Rep.subrepresentation (coindRes H M) ⊤ (fun _ => le_top)) :=
+  have htop : χ (coindRes H M) = χ (Rep.subrepresentation (coindRes H M) ⊤ (fun _ => le_top)) :=
     hχ.iso hP (subrepresentationTopIso (coindRes H M) (fun _ => le_top)).symm
-  calc χ (coindRes H M)
+  calc
+    χ (coindRes H M)
       = χ (Rep.subrepresentation (coindRes H M) ⊤ (fun _ => le_top)) := htop
-    _ = χ (Rep.subrepresentation _ (D 0) (hD 0)) :=
-        apply_subrepresentation_congr χ hD0.symm _ _
+    _ = χ (Rep.subrepresentation _ (D 0) (hD 0)) := apply_subrepresentation_congr χ hD0.symm _ _
     _ = χ (Rep.subrepresentation _ (LinearMap.ker T) hK) ^ (p ^ a) := by
-        rw [hchain (p ^ a - 1) le_rfl, apply_subrepresentation_congr χ hlast _ hK, ← pow_succ,
-          show p ^ a - 1 + 1 = p ^ a by omega]
-    _ = χ M ^ (p ^ a) := by
-        rw [hχ.iso hM (kerShiftIso (H := H) (M := M) hs hgen)]
+      rw [hchain (p ^ a - 1) le_rfl, apply_subrepresentation_congr χ hlast _ hK, ← pow_succ,
+        show p ^ a - 1 + 1 = p ^ a by omega]
+    _ = χ M ^ (p ^ a) := by rw [hχ.iso hM (kerShiftIso (H := H) (M := M) hs hgen)]
 
 end IsMultiplicativeOn
 

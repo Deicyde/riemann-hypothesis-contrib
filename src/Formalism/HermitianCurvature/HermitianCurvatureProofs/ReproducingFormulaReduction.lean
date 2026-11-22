@@ -21,11 +21,12 @@ section Basic
 
 variable {k r : ℕ}
 
-theorem psi_norm (z : Fin (2 * r + k + 1) → ℂ) (c : ℂ) (g : Mx k r) : ‖Formalism.QuantumDeterminants.psi k r z c g‖ = 1 := by
+theorem psi_norm (z : Fin (2 * r + k + 1) → ℂ) (c : ℂ) (g : Mx k r)
+    : ‖Formalism.QuantumDeterminants.psi k r z c g‖ = 1 := by
   simp [Formalism.QuantumDeterminants.psi, Complex.norm_exp]
 
-theorem psi_cont (z : Fin (2 * r + k + 1) → ℂ) (c : ℂ) :
-    Continuous (fun g : Mx k r => Formalism.QuantumDeterminants.psi k r z c g) := by
+theorem psi_cont (z : Fin (2 * r + k + 1) → ℂ) (c : ℂ)
+    : Continuous (fun g : Mx k r => Formalism.QuantumDeterminants.psi k r z c g) := by
   unfold Formalism.QuantumDeterminants.psi Formalism.QuantumDeterminants.ell
   refine Complex.continuous_exp.comp (continuous_const.mul (Complex.continuous_ofReal.comp
     (Complex.continuous_re.comp (continuous_const.mul ?_))))
@@ -36,16 +37,24 @@ theorem psi_cont (z : Fin (2 * r + k + 1) → ℂ) (c : ℂ) :
   · simp only [dif_neg h, Matrix.mulVec, dotProduct]
     fun_prop
 
-theorem isClosed_UH : IsClosed (Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r) : Set (Mx k r)) := by
+theorem isClosed_UH
+    : IsClosed
+      (Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r)
+        : Set (Mx k r)) := by
   show IsClosed {g : Mx k r | gᴴ * Formalism.QuantumDeterminants.Hpk k r * g = Formalism.QuantumDeterminants.Hpk k r}
-  exact isClosed_eq ((continuous_id.matrix_conjTranspose.matrix_mul continuous_const).matrix_mul continuous_id)
+  exact isClosed_eq
+    ((continuous_id.matrix_conjTranspose.matrix_mul continuous_const).matrix_mul continuous_id)
     continuous_const
 
-theorem isClosed_UW (z : Fin (2 * r + k + 1) → ℂ) : IsClosed (Formalism.QuantumDeterminants.UWset k r z : Set (Mx k r)) := by
-  have h1 : IsClosed {g : Mx k r | g ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r)} := isClosed_UH
-  have h2 : IsClosed {g : Mx k r | ∀ a : Fin r, g *ᵥ Formalism.QuantumDeterminants.bvec (Formalism.QuantumDeterminants.eI k r a) =
-      Formalism.QuantumDeterminants.bvec (Formalism.QuantumDeterminants.eI k r a) ∧ g *ᵥ Formalism.QuantumDeterminants.bvec (Formalism.QuantumDeterminants.esI k r a) =
-      Formalism.QuantumDeterminants.bvec (Formalism.QuantumDeterminants.esI k r a)} := by
+theorem isClosed_UW (z : Fin (2 * r + k + 1) → ℂ)
+    : IsClosed (Formalism.QuantumDeterminants.UWset k r z : Set (Mx k r)) := by
+  have h1 : IsClosed
+      {g : Mx k r | g ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r)} :=
+    isClosed_UH
+  have h2 : IsClosed
+      {g : Mx k r | ∀ a : Fin r, g *ᵥ Formalism.QuantumDeterminants.bvec (Formalism.QuantumDeterminants.eI k r a) =
+        Formalism.QuantumDeterminants.bvec (Formalism.QuantumDeterminants.eI k r a) ∧ g *ᵥ Formalism.QuantumDeterminants.bvec (Formalism.QuantumDeterminants.esI k r a) =
+        Formalism.QuantumDeterminants.bvec (Formalism.QuantumDeterminants.esI k r a)} := by
     simp only [Set.setOf_forall, Set.setOf_and]
     exact isClosed_iInter fun a =>
       (isClosed_eq (continuous_id.matrix_mulVec continuous_const) continuous_const).inter
@@ -54,15 +63,19 @@ theorem isClosed_UW (z : Fin (2 * r + k + 1) → ℂ) : IsClosed (Formalism.Quan
     isClosed_eq (continuous_id.matrix_mulVec continuous_const) continuous_const
   exact h1.inter (h2.inter h3)
 
-theorem aesm_of_contOn {α E : Type*} [TopologicalSpace α] [MeasurableSpace α] [OpensMeasurableSpace α]
+theorem aesm_of_contOn
+    {α E : Type*} [TopologicalSpace α] [MeasurableSpace α] [OpensMeasurableSpace α]
     [SecondCountableTopology α] [NormedAddCommGroup E] [SecondCountableTopology E]
-    {μ : Measure α} {f : α → E} {s : Set α} (hf : ContinuousOn f s) (hs : MeasurableSet s)
-    (hμ : ∀ᵐ x ∂μ, x ∈ s) : AEStronglyMeasurable f μ := by
+    {μ : Measure α} {f : α → E} {s : Set α}
+    (hf : ContinuousOn f s) (hs : MeasurableSet s) (hμ : ∀ᵐ x ∂μ, x ∈ s)
+    : AEStronglyMeasurable f μ := by
   have h := hf.aestronglyMeasurable hs (μ := μ)
   rwa [Measure.restrict_eq_self_of_ae_mem hμ] at h
 
-theorem key_bound {A S X Y a : ℝ} (hA : 1 ≤ A) (hX : 1 ≤ X) (hY : 1 ≤ Y) (hS0 : 0 < S) (ha : 0 < a)
-    (hS : S ≤ A * X * Y) : Y ^ (-a) * A ^ (-a) ≤ X ^ (a / 2) * (Y ^ (-(a / 2)) * S ^ (-(a / 2))) := by
+theorem key_bound
+    {A S X Y a : ℝ}
+    (hA : 1 ≤ A) (hX : 1 ≤ X) (hY : 1 ≤ Y) (hS0 : 0 < S) (ha : 0 < a) (hS : S ≤ A * X * Y)
+    : Y ^ (-a) * A ^ (-a) ≤ X ^ (a / 2) * (Y ^ (-(a / 2)) * S ^ (-(a / 2))) := by
   have hA0 : 0 < A := by linarith
   have hX0 : 0 < X := by linarith
   have hY0 : 0 < Y := by linarith

@@ -13,10 +13,11 @@ namespace Formalism.CohomologicalDescent
 
 open Classical
 
-theorem comb_roots_prod {K : Type} [Field K] {N : ℕ} (f : Fin N → K) :
-    (∏ a, (X + C (f a))).roots = Multiset.map (fun a => -f a) Finset.univ.val := by
-  have h : (∏ a, (X + C (f a))) =
-      ((Multiset.map (fun a => -f a) Finset.univ.val).map fun x => X - C x).prod := by
+theorem comb_roots_prod {K : Type} [Field K] {N : ℕ} (f : Fin N → K)
+    : (∏ a, (X + C (f a))).roots = Multiset.map (fun a => - f a) Finset.univ.val := by
+  have h
+      : (∏ a, (X + C (f a)))
+        = ((Multiset.map (fun a => - f a) Finset.univ.val).map fun x => X - C x).prod := by
     rw [Multiset.map_map, Finset.prod_eq_multiset_prod]
     congr 1
     apply Multiset.map_congr rfl
@@ -33,8 +34,11 @@ theorem contentLinkage_holds : Linkage := by
   rw [hU, hU'] at hr
   let ψ : ZMod l →+* K := ZMod.castHom (dvd_refl l) K
   have hψ : Function.Injective ψ := ψ.injective
-  have key : ∀ V : Fin N → ℤ, Multiset.map (fun a => -(((V a + c : ℤ)) : K)) Finset.univ.val =
-      Multiset.map ψ (Multiset.map (fun a => -(((V a + c : ℤ)) : ZMod l)) Finset.univ.val) := by
+  have key
+      : ∀ V : Fin N → ℤ,
+        Multiset.map (fun a => -(((V a + c : ℤ)) : K)) Finset.univ.val
+          = Multiset.map ψ
+            (Multiset.map (fun a => -(((V a + c : ℤ)) : ZMod l)) Finset.univ.val) := by
     intro V
     rw [Multiset.map_map]
     apply Multiset.map_congr rfl

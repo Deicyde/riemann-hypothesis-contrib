@@ -8,8 +8,10 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory.PlaceTransport
 
-theorem eq_of_forall_le_exp_neg {a b : WithZero (Multiplicative ℤ)} (ha : a ≠ 0) (hb : b ≠ 0) (ha1 : a ≤ 1)
-    (hb1 : b ≤ 1) (h : ∀ n : ℕ, a ≤ WithZero.exp (-(n : ℤ)) ↔ b ≤ WithZero.exp (-(n : ℤ))) : a = b := by
+theorem eq_of_forall_le_exp_neg
+    {a b : WithZero (Multiplicative ℤ)} (ha : a ≠ 0) (hb : b ≠ 0) (ha1 : a ≤ 1) (hb1 : b ≤ 1)
+    (h : ∀ n : ℕ, a ≤ WithZero.exp (-(n : ℤ)) ↔ b ≤ WithZero.exp (-(n : ℤ)))
+    : a = b := by
   obtain ⟨m, rfl⟩ : ∃ m : ℤ, WithZero.exp m = a := ⟨_, WithZero.exp_log ha⟩
   obtain ⟨k, rfl⟩ : ∃ k : ℤ, WithZero.exp k = b := ⟨_, WithZero.exp_log hb⟩
   rw [← WithZero.exp_zero, WithZero.exp_le_exp] at ha1 hb1
@@ -23,9 +25,11 @@ theorem eq_of_forall_le_exp_neg {a b : WithZero (Multiplicative ℤ)} (ha : a �
     omega
   rw [le_antisymm hmk hkm]
 
-theorem intValuation_comap_equiv {R S : Type} [CommRing R] [IsDedekindDomain R] [CommRing S] [IsDedekindDomain S]
-    (f : R ≃+* S) (w : HeightOneSpectrum S) (x : R) :
-    (HeightOneSpectrum.comap (f : R →+* S) f.surjective w).intValuation x = w.intValuation (f x) := by
+theorem intValuation_comap_equiv
+    {R S : Type} [CommRing R] [IsDedekindDomain R] [CommRing S] [IsDedekindDomain S]
+    (f : R ≃+* S) (w : HeightOneSpectrum S) (x : R)
+    : (HeightOneSpectrum.comap (f : R →+* S) f.surjective w).intValuation x
+      = w.intValuation (f x) := by
   by_cases hx : x = 0
   · simp [hx]
   have hfx : f x ≠ 0 := by simpa using hx
@@ -39,10 +43,11 @@ theorem intValuation_comap_equiv {R S : Type} [CommRing R] [IsDedekindDomain R] 
   rw [hJ, ← Ideal.map_pow, ← hJ, Ideal.mem_comap]
   rfl
 
-theorem exists_place_valuation_comp_equiv :
-    ∀ (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] (e : K ≃+* L)
-      (la : HeightOneSpectrum (𝓞 L)), ∃ la' : HeightOneSpectrum (𝓞 K),
-        ∀ y : K, la'.valuation K y = la.valuation L (e y) := by
+theorem exists_place_valuation_comp_equiv
+    : ∀ (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] (e : K ≃+* L)
+        (la : HeightOneSpectrum (𝓞 L)),
+      ∃ la' : HeightOneSpectrum (𝓞 K), ∀ y : K,
+        la'.valuation K y = la.valuation L (e y) := by
   intro K L _ _ _ _ e la
   set g : 𝓞 K ≃+* 𝓞 L := RingOfIntegers.mapRingEquiv e
   refine ⟨HeightOneSpectrum.comap (g : 𝓞 K →+* 𝓞 L) g.surjective la, fun y => ?_⟩

@@ -8,10 +8,12 @@ namespace GlobalTheory.IntMulMem
 
 open NumberField
 
-theorem exists_int_mul_mem {E : Type} [Field E] [NumberField E] {V : Type} [AddCommGroup V]
-    [Module E V] [Module (RingOfIntegers E) V] [IsScalarTower (RingOfIntegers E) E V]
-    (Λ : Submodule (RingOfIntegers E) V) :
-    ∀ v ∈ Submodule.span E (↑Λ : Set V), ∃ (N : ℤ), N ≠ (0 : ℤ) ∧ (↑N : E) • v ∈ Λ := by
+theorem exists_int_mul_mem
+    {E : Type} [Field E] [NumberField E]
+    {V : Type} [AddCommGroup V] [Module E V] [Module (RingOfIntegers E) V]
+    [IsScalarTower (RingOfIntegers E) E V]
+    (Λ : Submodule (RingOfIntegers E) V)
+    : ∀ v ∈ Submodule.span E (↑Λ : Set V), ∃ (N : ℤ), N ≠ (0 : ℤ) ∧ (↑N : E) • v ∈ Λ := by
   intro v hv
   induction hv using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by simpa using hx⟩
@@ -40,7 +42,9 @@ theorem exists_int_mul_mem {E : Type} [Field E] [NumberField E] {V : Type} [AddC
       rw [← algebraMap_smul E a, smul_smul, smul_smul]
       congr 1
       show _ = (y • c) * (N : E)
-      rw [zsmul_eq_mul]; push_cast; ring
+      rw [zsmul_eq_mul]
+      push_cast
+      ring
     rw [h]
     exact Λ.smul_mem _ hNx
 

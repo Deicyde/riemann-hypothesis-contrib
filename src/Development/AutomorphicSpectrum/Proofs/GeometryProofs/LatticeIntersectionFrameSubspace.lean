@@ -13,15 +13,26 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.RegAtFractio
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat Filter Topology Metric
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat Filter Topology Metric
 
 namespace GlobalTheory.CompanionTheory.Ar.LocalFrames
 
-theorem span_eq_of_saturated : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (E : Type) [AddCommGroup E] [Module Ω E] (L : Lat ξ E) (V' : Submodule Ω E) (p : Cpt ξ) (g : ℕ) (b : Fin g → E) (S : Finset (Fin g)), IsCptGen ξ → Submodule.span Ω (Set.range b) = ⊤ → L p = Submodule.span (regAt ξ p) (Set.range b) → (L.inter V') p = Submodule.span (regAt ξ p) (b '' S) → V' = Submodule.span Ω (b '' S) := by
+theorem span_eq_of_saturated
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (E : Type) [AddCommGroup E]
+        [Module Ω E] (L : Lat ξ E) (V' : Submodule Ω E) (p : Cpt ξ) (g : ℕ) (b : Fin g → E)
+        (S : Finset (Fin g)),
+      IsCptGen ξ → Submodule.span Ω (Set.range b) = ⊤
+        → L p = Submodule.span (regAt ξ p) (Set.range b)
+        → (L.inter V') p = Submodule.span (regAt ξ p) (b '' S)
+        → V' = Submodule.span Ω (b '' S) := by
   intro X Ω _ ξ E _ _ L V' p g b S h hspan hL hI
   haveI hfr : IsFractionRing (regAt ξ p) Ω := (RegAtRing.regAt_ring X Ω ξ h p).1
-  have sm : ∀ (c : regAt ξ p) {m : E}, m ∈ L p → (c : Ω) • m ∈ L p := fun c _ hm => (L p).smul_mem c hm
+  have sm : ∀ (c : regAt ξ p) {m : E}, m ∈ L p → (c : Ω) • m ∈ L p := fun c _ hm =>
+    (L p).smul_mem c hm
   have key : ∀ x : E, ∃ d : regAt ξ p, (d : Ω) ≠ 0 ∧ (d : Ω) • x ∈ L p := by
     intro x
     have hx : x ∈ Submodule.span Ω (Set.range b) := hspan ▸ Submodule.mem_top
@@ -30,12 +41,14 @@ theorem span_eq_of_saturated : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ :
       refine ⟨1, by simp, ?_⟩
       rw [hL]
       simpa using Submodule.subset_span hy
-    | zero => exact ⟨1, by simp, by simp⟩
+    | zero =>
+      exact ⟨1, by simp, by simp⟩
     | add y z _ _ hy hz =>
       obtain ⟨d, hd, hdy⟩ := hy
       obtain ⟨e, he, hez⟩ := hz
       refine ⟨d * e, by rw [Subring.coe_mul]; exact mul_ne_zero hd he, ?_⟩
-      have : ((d * e : regAt ξ p) : Ω) • (y + z) = (e : Ω) • ((d : Ω) • y) + (d : Ω) • ((e : Ω) • z) := by
+      have : ((d * e : regAt ξ p) : Ω) • (y + z)
+          = (e : Ω) • ((d : Ω) • y) + (d : Ω) • ((e : Ω) • z) := by
         simp only [Subring.coe_mul, smul_add, smul_smul, mul_comm]
       rw [this]
       exact (L p).add_mem (sm e hdy) (sm d hez)
@@ -46,8 +59,9 @@ theorem span_eq_of_saturated : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ :
         have := IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors (K := Ω) hv
         simpa using this
       refine ⟨v * d, by rw [Subring.coe_mul]; exact mul_ne_zero hv0 hd, ?_⟩
-      have : ((v * d : regAt ξ p) : Ω) • ((algebraMap (regAt ξ p) Ω u / algebraMap (regAt ξ p) Ω v) • y) =
-          (u : Ω) • ((d : Ω) • y) := by
+      have : ((v * d : regAt ξ p) : Ω)
+            • ((algebraMap (regAt ξ p) Ω u / algebraMap (regAt ξ p) Ω v) • y)
+          = (u : Ω) • ((d : Ω) • y) := by
         have hu : algebraMap (regAt ξ p) Ω u = (u : Ω) := rfl
         have hv' : algebraMap (regAt ξ p) Ω v = (v : Ω) := rfl
         rw [hu, hv', smul_smul, smul_smul, Subring.coe_mul]

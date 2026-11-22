@@ -13,10 +13,13 @@ open GlobalTheory.WeilM Matrix
 
 namespace GlobalTheory.RankChart
 
-theorem exists_eq_stack (k : Type) [Field k] (R T D : Type) [Fintype R] [DecidableEq R] [Fintype T]
-    [DecidableEq T] [Fintype D] [DecidableEq D] (τ : R → D) (Y : Matrix (R ⊕ T) D k)
-    (hrank : Y.rank ≤ Fintype.card R) (hdet : (Y.submatrix Sum.inl τ).det ≠ 0) :
-    ∃ C : Matrix T R k, Y = GlobalTheory.RankChart.stack Y.toRows₁ C := by
+theorem exists_eq_stack
+    (k : Type) [Field k]
+    (R T D : Type)
+    [Fintype R] [DecidableEq R] [Fintype T] [DecidableEq T] [Fintype D] [DecidableEq D]
+    (τ : R → D) (Y : Matrix (R ⊕ T) D k)
+    (hrank : Y.rank ≤ Fintype.card R) (hdet : (Y.submatrix Sum.inl τ).det ≠ 0)
+    : ∃ C : Matrix T R k, Y = GlobalTheory.RankChart.stack Y.toRows₁ C := by
   classical
   set Y₁ := Y.toRows₁ with hY₁
 
@@ -28,11 +31,13 @@ theorem exists_eq_stack (k : Type) [Field k] (R T D : Type) [Fintype R] [Decidab
     exact hA
   have hfin₁ : Module.finrank k (Submodule.span k (Set.range fun i : R => Y₁ i)) = Fintype.card R :=
     finrank_span_eq_card hli
-  have hle : Submodule.span k (Set.range fun i : R => Y₁ i) ≤ Submodule.span k (Set.range Y.row) := by
+  have hle
+      : Submodule.span k (Set.range fun i : R => Y₁ i) ≤ Submodule.span k (Set.range Y.row) := by
     apply Submodule.span_mono
     rintro _ ⟨i, rfl⟩
     exact ⟨Sum.inl i, rfl⟩
-  have heq : Submodule.span k (Set.range fun i : R => Y₁ i) = Submodule.span k (Set.range Y.row) := by
+  have heq
+      : Submodule.span k (Set.range fun i : R => Y₁ i) = Submodule.span k (Set.range Y.row) := by
     apply Submodule.eq_of_le_of_finrank_le hle
     rw [hfin₁, ← Matrix.rank_eq_finrank_span_row]
     exact hrank

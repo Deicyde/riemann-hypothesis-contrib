@@ -12,14 +12,14 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.JStable
 
-
 open Module in
-theorem exists_adapted_onb {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (W : Submodule ℂ (EuclideanSpace ℂ ι)) :
-    ∃ (b : OrthonormalBasis ι ℂ (EuclideanSpace ℂ ι)) (T : Set ι),
+theorem exists_adapted_onb
+    {ι : Type*} [Fintype ι] [DecidableEq ι] (W : Submodule ℂ (EuclideanSpace ℂ ι))
+    : ∃ (b : OrthonormalBasis ι ℂ (EuclideanSpace ℂ ι)) (T : Set ι),
       W = Submodule.span ℂ (b '' T) := by
   classical
-  let v : Set (EuclideanSpace ℂ ι) := Set.range (fun i => ((stdOrthonormalBasis ℂ W i : W) : EuclideanSpace ℂ ι))
+  let v : Set (EuclideanSpace ℂ ι) :=
+    Set.range (fun i => ((stdOrthonormalBasis ℂ W i : W) : EuclideanSpace ℂ ι))
   have hon : Orthonormal ℂ (fun i => ((stdOrthonormalBasis ℂ W i : W) : EuclideanSpace ℂ ι)) :=
     (stdOrthonormalBasis ℂ W).orthonormal.comp_linearIsometry W.subtypeₗᵢ
   have hv : Orthonormal ℂ ((↑) : v → EuclideanSpace ℂ ι) :=
@@ -92,10 +92,11 @@ lemma sum_extendByZero_fin_eq_sum_of_eq (s : Bool) (x y : EuclideanSpace ℂ {i 
   rw [hx x, hx y]
   simp [mul_comm]
 
-theorem exists_KG_coordinate (W : Submodule ℂ (Fin n → ℂ))
-    (hW : ∀ v ∈ W, Formalism.REAL.Jm ε *ᵥ v ∈ W) :
-    ∃ (k : Formalism.REAL.KG ε) (S : Set (Fin n)),
-      W = (Submodule.span ℂ (Set.range fun j : S => (Pi.single (j : Fin n) (1 : ℂ) : Fin n → ℂ))).map
+theorem exists_KG_coordinate
+    (W : Submodule ℂ (Fin n → ℂ)) (hW : ∀ v ∈ W, Formalism.REAL.Jm ε *ᵥ v ∈ W)
+    : ∃ (k : Formalism.REAL.KG ε) (S : Set (Fin n)),
+      W = (Submodule.span ℂ
+          (Set.range fun j : S => (Pi.single (j : Fin n) (1 : ℂ) : Fin n → ℂ))).map
         (Formalism.REAL.toMK k).mulVecLin := by
   classical
   choose b T hT using fun s : Bool => exists_adapted_onb (W.comap (ext0 ε s))
@@ -103,18 +104,21 @@ theorem exists_KG_coordinate (W : Submodule ℂ (Fin n → ℂ))
     intro s v hv
     rw [Submodule.mem_comap, extendByZero_restrict_eigen_projection]
     exact W.smul_mem _ (W.add_mem hv (W.smul_mem _ (hW v hv)))
-  have hdecomp : W = (W.comap (ext0 ε true)).map (ext0 ε true) ⊔
-      (W.comap (ext0 ε false)).map (ext0 ε false) := by
-    refine le_antisymm (fun v hv => ?_) (sup_le (Submodule.map_le_iff_le_comap.2 le_rfl)
-      (Submodule.map_le_iff_le_comap.2 le_rfl))
+  have hdecomp
+      : W
+        = (W.comap (ext0 ε true)).map (ext0 ε true)
+          ⊔ (W.comap (ext0 ε false)).map (ext0 ε false) := by
+    refine le_antisymm
+      (fun v hv => ?_)
+      (sup_le (Submodule.map_le_iff_le_comap.2 le_rfl) (Submodule.map_le_iff_le_comap.2 le_rfl))
     rw [eq_extendByZero_restrict_sum ε v]
     exact Submodule.add_mem_sup (Submodule.mem_map_of_mem (hres true v hv))
       (Submodule.mem_map_of_mem (hres false v hv))
-  obtain ⟨M, hM⟩ : ∃ M : Matrix (Fin n) (Fin n) ℂ,
-      ∀ i j, M i j = ext0 ε (ε j) (b (ε j) ⟨j, rfl⟩) i :=
+  obtain ⟨M, hM⟩
+      : ∃ M : Matrix (Fin n) (Fin n) ℂ, ∀ i j, M i j = ext0 ε (ε j) (b (ε j) ⟨j, rfl⟩) i :=
     ⟨Matrix.of fun i j => ext0 ε (ε j) (b (ε j) ⟨j, rfl⟩) i, fun _ _ => rfl⟩
-  have hcol : ∀ (s : Bool) (i' : {i : Fin n // ε i = s}) (a : Fin n),
-      M a i'.1 = ext0 ε s (b s i') a := by
+  have hcol
+      : ∀ (s : Bool) (i' : {i : Fin n // ε i = s}) (a : Fin n), M a i'.1 = ext0 ε s (b s i') a := by
     rintro s ⟨j, rfl⟩ a
     exact hM a j
   have hMM : Mᴴ * M = 1 := by
@@ -122,8 +126,8 @@ theorem exists_KG_coordinate (W : Submodule ℂ (Fin n → ℂ))
     simp only [Matrix.mul_apply, Matrix.conjTranspose_apply, Matrix.one_apply]
     by_cases hjl : ε j = ε l
     · have h1 : ∀ a, M a j = ext0 ε (ε j) (b (ε j) ⟨j, rfl⟩) a := fun a => hcol (ε j) ⟨j, rfl⟩ a
-      have h2 : ∀ a, M a l = ext0 ε (ε j) (b (ε j) ⟨l, hjl.symm⟩) a :=
-        fun a => hcol (ε j) ⟨l, hjl.symm⟩ a
+      have h2 : ∀ a, M a l = ext0 ε (ε j) (b (ε j) ⟨l, hjl.symm⟩) a := fun a =>
+        hcol (ε j) ⟨l, hjl.symm⟩ a
       simp only [h1, h2]
       rw [sum_extendByZero_fin_eq_sum_of_eq, orthonormal_iff_ite.1 (b (ε j)).orthonormal]
       simp only [Subtype.mk.injEq]
@@ -155,18 +159,20 @@ theorem exists_KG_coordinate (W : Submodule ℂ (Fin n → ℂ))
   let k : Formalism.REAL.KG ε := ⟨gu, (Formalism.REAL.mem_KG ε gu).2 hK⟩
   let S : Set (Fin n) := {j | (⟨j, rfl⟩ : {i : Fin n // ε i = ε j}) ∈ T (ε j)}
   refine ⟨k, S, ?_⟩
-  change W = (Submodule.span ℂ (Set.range fun j : S => (Pi.single (j : Fin n) (1 : ℂ) : Fin n → ℂ))).map
-    M.mulVecLin
-  have hMcol : ∀ (s : Bool) (i' : {i : Fin n // ε i = s}),
-      M *ᵥ Pi.single i'.1 1 = ext0 ε s (b s i') := by
+  change W
+    = (Submodule.span ℂ (Set.range fun j : S => (Pi.single (j : Fin n) (1 : ℂ) : Fin n → ℂ))).map
+      M.mulVecLin
+  have hMcol
+      : ∀ (s : Bool) (i' : {i : Fin n // ε i = s}), M *ᵥ Pi.single i'.1 1 = ext0 ε s (b s i') := by
     intro s i'
     funext a
     rw [Matrix.mulVec_single_one, Matrix.col_apply, hcol s i' a]
   have hmemS : ∀ (s : Bool) (i' : {i : Fin n // ε i = s}), i' ∈ T s → i'.1 ∈ S := by
     rintro s ⟨j, rfl⟩ hi'
     exact hi'
-  have hset : ⇑(ext0 ε true) '' (⇑(b true) '' T true) ∪ ⇑(ext0 ε false) '' (⇑(b false) '' T false) =
-      Set.range (⇑M.mulVecLin ∘ fun j : S => (Pi.single (j : Fin n) (1 : ℂ) : Fin n → ℂ)) := by
+  have hset
+      : ⇑(ext0 ε true) '' (⇑(b true) '' T true) ∪ ⇑(ext0 ε false) '' (⇑(b false) '' T false)
+        = Set.range (⇑M.mulVecLin ∘ fun j : S => (Pi.single (j : Fin n) (1 : ℂ) : Fin n → ℂ)) := by
     ext x
     simp only [Set.mem_union, Set.mem_image, Set.mem_range, Function.comp_apply,
       Matrix.mulVecLin_apply]
@@ -178,8 +184,9 @@ theorem exists_KG_coordinate (W : Submodule ℂ (Fin n → ℂ))
       have htr : ∀ (s : Bool) (h : ε j = s), (⟨j, h⟩ : {i : Fin n // ε i = s}) ∈ T s := by
         rintro s rfl
         exact hj
-      have hback : ∀ (s : Bool) (i' : {i : Fin n // ε i = s}), i' ∈ T s →
-          ∃ y, (∃ a ∈ T s, b s a = y) ∧ ext0 ε s y = M *ᵥ Pi.single i'.1 1 :=
+      have hback
+          : ∀ (s : Bool) (i' : {i : Fin n // ε i = s}),
+            i' ∈ T s → ∃ y, (∃ a ∈ T s, b s a = y) ∧ ext0 ε s y = M *ᵥ Pi.single i'.1 1 :=
         fun s i' hi' => ⟨b s i', ⟨i', hi', rfl⟩, (hMcol s i').symm⟩
       rcases Bool.eq_false_or_eq_true (ε j) with h | h
       · exact Or.inl (hback _ ⟨j, h⟩ (htr _ h))

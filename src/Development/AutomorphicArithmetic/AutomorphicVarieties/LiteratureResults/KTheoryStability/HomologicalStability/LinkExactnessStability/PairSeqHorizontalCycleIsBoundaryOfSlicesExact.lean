@@ -15,20 +15,20 @@ namespace DblRow
 
 variable {V W : Type}
 
-theorem pair_injective (w : List W) : Function.Injective (fun l : List V => (l, w)) :=
-  fun _ _ h => (Prod.mk.inj h).1
+theorem pair_injective (w : List W) : Function.Injective (fun l : List V => (l, w)) := fun _ _ h =>
+  (Prod.mk.inj h).1
 
 def proj (w : List W) (x : List V × List W →₀ ℤ) : List V →₀ ℤ :=
   Finsupp.comapDomain (fun l : List V => (l, w)) x (pair_injective w).injOn
 
-theorem proj_apply (w : List W) (x : List V × List W →₀ ℤ) (l : List V) :
-    proj w x l = x (l, w) := rfl
+theorem proj_apply (w : List W) (x : List V × List W →₀ ℤ) (l : List V) : proj w x l = x (l, w) :=
+  rfl
 
 def incl (w : List W) : (List V →₀ ℤ) →ₗ[ℤ] (List V × List W →₀ ℤ) :=
   Finsupp.lmapDomain ℤ ℤ (fun l : List V => (l, w))
 
-theorem incl_apply (w w' : List W) (z : List V →₀ ℤ) (l : List V) :
-    incl w z (l, w') = if w = w' then z l else 0 := by
+theorem incl_apply (w w' : List W) (z : List V →₀ ℤ) (l : List V)
+    : incl w z (l, w') = if w = w' then z l else 0 := by
   by_cases h : w = w'
   · subst h
     rw [if_pos rfl]
@@ -43,15 +43,15 @@ theorem hbd_incl (w : List W) (z : List V →₀ ℤ) : hbd V W (incl w z) = inc
     apply Finsupp.lhom_ext
     intro l c
     simp only [LinearMap.comp_apply]
-    rw [show Finsupp.single l c = c • Finsupp.single l (1 : ℤ) by simp, map_smul, map_smul, map_smul,
-      map_smul]
+    rw [show Finsupp.single l c = c • Finsupp.single l (1 : ℤ) by simp, map_smul, map_smul,
+      map_smul, map_smul]
     congr 1
     simp only [incl, Finsupp.lmapDomain_apply, Finsupp.mapDomain_single, hbd,
       Finsupp.linearCombination_single, one_smul]
   exact LinearMap.congr_fun this z
 
-theorem decomp (x : List V × List W →₀ ℤ) :
-    x = ∑ w ∈ x.support.image Prod.snd, incl w (proj w x) := by
+theorem decomp (x : List V × List W →₀ ℤ)
+    : x = ∑ w ∈ x.support.image Prod.snd, incl w (proj w x) := by
   ext ⟨l, w'⟩
   rw [Finsupp.finsetSum_apply]
   simp only [incl_apply, proj_apply]
@@ -66,9 +66,10 @@ end DblRow
 
 open DblRow
 
-theorem dblRow_exact : ∀ (V W : Type) (D : Set (List V × List W)) (a b : ℕ),
-    (∀ w : List W, w.length = b → (∃ l, (l, w) ∈ D) → ExactAt {l | (l, w) ∈ D} a) →
-    ∀ x ∈ chains2 D a b, hbd V W x = 0 → ∃ y ∈ chains2 D (a + 1) b, hbd V W y = x := by
+theorem dblRow_exact
+    : ∀ (V W : Type) (D : Set (List V × List W)) (a b : ℕ),
+      (∀ w : List W, w.length = b → (∃ l, (l, w) ∈ D) → ExactAt {l | (l, w) ∈ D} a)
+        → ∀ x ∈ chains2 D a b, hbd V W x = 0 → ∃ y ∈ chains2 D (a + 1) b, hbd V W y = x := by
   intro V W D a b hex x hx h0
   have hsupp : ∀ z ∈ x.support, z ∈ D ∧ z.1.length = a ∧ z.2.length = b := fun z hz => hx hz
   set T := x.support.image Prod.snd with hT
@@ -119,7 +120,10 @@ end
 
 section
 open GlobalTheory.SeqCx
-theorem _root_.GlobalTheory.T.pairSeqHorizontalCycle_is_boundary_of_slices_exact : ∀ (V W : Type) (D : Set (List V × List W)) (a b : ℕ), (∀ w : List W, w.length = b → (∃ l, (l, w) ∈ D) → ExactAt {l | (l, w) ∈ D} a) → ∀ x ∈ chains2 D a b, hbd V W x = 0 → ∃ y ∈ chains2 D (a + 1) b, hbd V W y = x := by
+theorem _root_.GlobalTheory.T.pairSeqHorizontalCycle_is_boundary_of_slices_exact
+    : ∀ (V W : Type) (D : Set (List V × List W)) (a b : ℕ),
+      (∀ w : List W, w.length = b → (∃ l, (l, w) ∈ D) → ExactAt {l | (l, w) ∈ D} a)
+        → ∀ x ∈ chains2 D a b, hbd V W x = 0 → ∃ y ∈ chains2 D (a + 1) b, hbd V W y = x := by
   first
   | exact @GlobalTheory.SeqCx.dblRow_exact
   | exact @GlobalTheory.SeqCx.DblRow.decomp

@@ -13,7 +13,9 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.MongeAmpereDen
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.FiniteCovolume
+open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.FiniteCovolume
 open scoped ENNReal InnerProductSpace
 
 noncomputable section
@@ -25,11 +27,15 @@ open Measure
 
 section Abstract
 
-variable {G X : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+variable
+  {G X : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
   [SecondCountableTopology G] [TopologicalSpace X] [T2Space X] [LocallyCompactSpace X]
 
-def translHomeo {π : G → X} (hs : Function.Surjective π) {T : G → X → X} (hT : ∀ a, Continuous (T a))
-    (hπ : ∀ a b, π (a * b) = T a (π b)) (a : G) : X ≃ₜ X where
+def translHomeo
+    {π : G → X} (hs : Function.Surjective π)
+    {T : G → X → X} (hT : ∀ a, Continuous (T a)) (hπ : ∀ a b, π (a * b) = T a (π b))
+    (a : G)
+    : X ≃ₜ X where
   toFun := T a
   invFun := T a⁻¹
   left_inv x := by
@@ -41,8 +47,10 @@ def translHomeo {π : G → X} (hs : Function.Surjective π) {T : G → X → X}
   continuous_toFun := hT a
   continuous_invFun := hT a⁻¹
 
-theorem isOpenMap_orbit {π : G → X} (hc : Continuous π) (hs : Function.Surjective π) {T : G → X → X}
-    (hT : ∀ a, Continuous (T a)) (hπ : ∀ a b, π (a * b) = T a (π b)) : IsOpenMap π := by
+theorem isOpenMap_orbit
+    {π : G → X} (hc : Continuous π) (hs : Function.Surjective π)
+    {T : G → X → X} (hT : ∀ a, Continuous (T a)) (hπ : ∀ a b, π (a * b) = T a (π b))
+    : IsOpenMap π := by
   have key : ∀ W ∈ 𝓝 (1 : G), π '' W ∈ 𝓝 (π 1) := by
     intro W hW
     obtain ⟨W', hW', hWW⟩ : ∃ V ∈ 𝓝 (1 : G), ∀ v ∈ V, ∀ w ∈ V, v⁻¹ * w ∈ W := by
@@ -104,22 +112,28 @@ theorem isOpenMap_orbit {π : G → X} (hc : Continuous π) (hs : Function.Surje
   show π u = T b (π (b⁻¹ * u))
   rw [← hπ, mul_inv_cancel_left]
 
-theorem continuous_action {π : G → X} (hc : Continuous π) (hs : Function.Surjective π) {T : G → X → X}
-    (hT : ∀ a, Continuous (T a)) (hπ : ∀ a b, π (a * b) = T a (π b)) :
-    Continuous fun p : G × X => T p.1 p.2 := by
-  have hop : IsOpenMap (Prod.map (id : G → G) π) := IsOpenMap.id.prodMap (isOpenMap_orbit hc hs hT hπ)
+theorem continuous_action
+    {π : G → X} (hc : Continuous π) (hs : Function.Surjective π)
+    {T : G → X → X} (hT : ∀ a, Continuous (T a)) (hπ : ∀ a b, π (a * b) = T a (π b))
+    : Continuous fun p : G × X => T p.1 p.2 := by
+  have hop : IsOpenMap (Prod.map (id : G → G) π) :=
+    IsOpenMap.id.prodMap (isOpenMap_orbit hc hs hT hπ)
   have hq : Topology.IsQuotientMap (Prod.map (id : G → G) π) :=
     hop.isQuotientMap (continuous_id.prodMap hc) (Function.surjective_id.prodMap hs)
   rw [hq.continuous_iff]
-  have : ((fun p : G × X => T p.1 p.2) ∘ Prod.map (id : G → G) π) = fun p : G × G => π (p.1 * p.2) := by
+  have : ((fun p : G × X => T p.1 p.2) ∘ Prod.map (id : G → G) π)
+      = fun p : G × G => π (p.1 * p.2) := by
     funext p
     simp [hπ]
   rw [this]
   exact hc.comp (continuous_fst.mul continuous_snd)
 
-theorem isCompact_preimage_orbit {π : G → X} (hc : Continuous π) (hs : Function.Surjective π) {T : G → X → X}
-    (hT : ∀ a, Continuous (T a)) (hπ : ∀ a b, π (a * b) = T a (π b)) {K : Set G} (hK : IsCompact K)
-    (hf : ∀ a b, π a = π b → a⁻¹ * b ∈ K) {C : Set X} (hC : IsCompact C) : IsCompact (π ⁻¹' C) := by
+theorem isCompact_preimage_orbit
+    {π : G → X} (hc : Continuous π) (hs : Function.Surjective π)
+    {T : G → X → X} (hT : ∀ a, Continuous (T a)) (hπ : ∀ a b, π (a * b) = T a (π b))
+    {K : Set G} (hK : IsCompact K) (hf : ∀ a b, π a = π b → a⁻¹ * b ∈ K)
+    {C : Set X} (hC : IsCompact C)
+    : IsCompact (π ⁻¹' C) := by
   have hop := isOpenMap_orbit hc hs hT hπ
   obtain ⟨V, hVc, hV⟩ := exists_compact_mem_nhds (1 : G)
   have hnb : ∀ c ∈ C, ∃ g : G, π '' ((fun y => g * y) '' V) ∈ 𝓝 c := by
@@ -146,16 +160,19 @@ end Abstract
 
 section Measure
 
-variable {G X : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
-  [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
-  [TopologicalSpace X] [T2Space X] [LocallyCompactSpace X] [SecondCountableTopology X]
-  [MeasurableSpace X] [BorelSpace X]
+variable
+  {G X : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+  [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] [TopologicalSpace X] [T2Space X]
+  [LocallyCompactSpace X] [SecondCountableTopology X] [MeasurableSpace X] [BorelSpace X]
 
-theorem map_haar_eq_smul {π : G → X} (hc : Continuous π) (hs : Function.Surjective π) {T : G → X → X}
-    (hT : ∀ a, Continuous (T a)) (hπ : ∀ a b, π (a * b) = T a (π b)) {K : Set G} (hK : IsCompact K)
-    (hf : ∀ a b, π a = π b → a⁻¹ * b ∈ K) (μ : Measure G) [μ.IsHaarMeasure] (ν : Measure X)
-    [IsFiniteMeasureOnCompacts ν] (hν : ∀ a, ν.map (T a) = ν) (h0 : ν ≠ 0) :
-    ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ μ.map π = c • ν := by
+theorem map_haar_eq_smul
+    {π : G → X} (hc : Continuous π) (hs : Function.Surjective π)
+    {T : G → X → X} (hT : ∀ a, Continuous (T a)) (hπ : ∀ a b, π (a * b) = T a (π b))
+    {K : Set G} (hK : IsCompact K) (hf : ∀ a b, π a = π b → a⁻¹ * b ∈ K)
+    (μ : Measure G) [μ.IsHaarMeasure]
+    (ν : Measure X) [IsFiniteMeasureOnCompacts ν]
+    (hν : ∀ a, ν.map (T a) = ν) (h0 : ν ≠ 0)
+    : ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ μ.map π = c • ν := by
   have hm : Measurable π := hc.measurable
   have hTm : ∀ a, Measurable (T a) := fun a => (hT a).measurable
   set ν' : Measure X := μ.map π with hν'def
@@ -189,8 +206,9 @@ theorem map_haar_eq_smul {π : G → X} (hc : Continuous π) (hs : Function.Surj
       have h2 : ∀ x, μ ((fun a => (a, x)) ⁻¹' ((fun p : G × X => T p.1 p.2) ⁻¹' N)) = 0 := by
         intro x
         obtain ⟨b, rfl⟩ := hs x
-        have h3 : ((fun a => (a, π b)) ⁻¹' ((fun p : G × X => T p.1 p.2) ⁻¹' N)) =
-            (fun a => a * b) ⁻¹' (π ⁻¹' N) := by
+        have h3
+            : ((fun a => (a, π b)) ⁻¹' ((fun p : G × X => T p.1 p.2) ⁻¹' N))
+              = (fun a => a * b) ⁻¹' (π ⁻¹' N) := by
           ext a
           simp [hπ]
         rw [h3]
@@ -214,7 +232,9 @@ theorem map_haar_eq_smul {π : G → X} (hc : Continuous π) (hs : Function.Surj
         simp [← hπ]
       have h2 := (hpres b).setLIntegral_comp_preimage hS' hfm
       rw [e] at h2
-      calc ∫⁻ a in S, (f ∘ T b) a ∂ν' = ∫⁻ y in T b⁻¹ ⁻¹' S, f y ∂ν' := h2
+      calc
+        ∫⁻ a in S, (f ∘ T b) a ∂ν'
+          = ∫⁻ y in T b⁻¹ ⁻¹' S, f y ∂ν' := h2
         _ = ν'.withDensity f (T b⁻¹ ⁻¹' S) := (withDensity_apply _ hS').symm
         _ = ν (T b⁻¹ ⁻¹' S) := by rw [hwd]
         _ = ν S := by rw [← Measure.map_apply (hTm _) hS, hν]
@@ -264,11 +284,15 @@ variable {Ψ : Type} [Fintype Ψ] {j j' n : ℕ} (q : Ψ × Fin j × Fin j' ≃ 
 
 open scoped ComplexOrder
 
-theorem contDiff_ballDet (τ : Ψ) :
-    ContDiff ℝ 2 fun t : Fin n → ℂ => (1 - (ballMat q t τ)ᴴ * ballMat q t τ).det.re := by
-  have he : ∀ i k, ContDiff ℝ 2 fun t : Fin n → ℂ => ((1 : Matrix (Fin j') (Fin j') ℂ) - (ballMat q t τ)ᴴ * ballMat q t τ) i k := by
+theorem contDiff_ballDet (τ : Ψ)
+    : ContDiff ℝ 2 fun t : Fin n → ℂ => (1 - (ballMat q t τ)ᴴ * ballMat q t τ).det.re := by
+  have he
+      : ∀ i k,
+        ContDiff ℝ 2 fun t : Fin n → ℂ =>
+          ((1 : Matrix (Fin j') (Fin j') ℂ) - (ballMat q t τ)ᴴ * ballMat q t τ) i k := by
     intro i k
-    simp only [Matrix.sub_apply, Matrix.mul_apply, Matrix.conjTranspose_apply, ballMat, Matrix.of_apply]
+    simp only [Matrix.sub_apply, Matrix.mul_apply, Matrix.conjTranspose_apply, ballMat,
+      Matrix.of_apply]
     refine contDiff_const.sub (ContDiff.sum fun l _ => ContDiff.mul ?_ ?_)
     · exact Complex.conjCLE.contDiff.comp (contDiff_apply ℝ (fun _ => ℂ) _)
     · exact contDiff_apply ℝ (fun _ => ℂ) _
@@ -277,8 +301,8 @@ theorem contDiff_ballDet (τ : Ψ) :
     refine ContDiff.sum fun σ _ => ContDiff.const_smul _ (contDiff_prod fun i _ => he _ _)
   exact Complex.reCLM.contDiff.comp hd
 
-theorem ballDet_pos {t : Fin n → ℂ} (ht : t ∈ ballDom q) (τ : Ψ) :
-    0 < (1 - (ballMat q t τ)ᴴ * ballMat q t τ).det.re :=
+theorem ballDet_pos {t : Fin n → ℂ} (ht : t ∈ ballDom q) (τ : Ψ)
+    : 0 < (1 - (ballMat q t τ)ᴴ * ballMat q t τ).det.re :=
   (Complex.lt_def.mp (ht τ).det_pos).1
 
 theorem contDiffAt_ballPot {t : Fin n → ℂ} (ht : t ∈ ballDom q) : ContDiffAt ℝ 2 (ballPot q) t := by
@@ -288,7 +312,8 @@ theorem contDiffAt_ballPot {t : Fin n → ℂ} (ht : t ∈ ballDom q) : ContDiff
 
 theorem measurable_ballDens : Measurable (ballDens q) := by
   unfold ballDens ballPot
-  refine Real.measurable_exp.comp (measurable_const.mul (Measurable.neg (Finset.measurable_sum _ fun τ _ => ?_)))
+  refine Real.measurable_exp.comp (measurable_const.mul (Measurable.neg (Finset.measurable_sum _
+    fun τ _ => ?_)))
   exact Real.measurable_log.comp (contDiff_ballDet q τ).continuous.measurable
 
 theorem continuousOn_ballDens : ContinuousOn (ballDens q) (ballDom q) := by
@@ -302,17 +327,20 @@ theorem continuousOn_ballDens : ContinuousOn (ballDens q) (ballDom q) := by
 def ballMeas : Measure (Fin n → ℂ) :=
   (volume.restrict (ballDom q)).withDensity fun t => ENNReal.ofReal (ballDens q t)
 
-theorem ballMeas_apply {S : Set (Fin n → ℂ)} (hS : MeasurableSet S) (hSD : S ⊆ ballDom q) :
-    ballMeas q S = ∫⁻ t in S, ENNReal.ofReal (ballDens q t) := by
+theorem ballMeas_apply {S : Set (Fin n → ℂ)} (hS : MeasurableSet S) (hSD : S ⊆ ballDom q)
+    : ballMeas q S = ∫⁻ t in S, ENNReal.ofReal (ballDens q t) := by
   rw [ballMeas, withDensity_apply _ hS, Measure.restrict_restrict hS, Set.inter_eq_left.mpr hSD]
 
-theorem ballMeas_image {A : (Fin n → ℂ) → Fin n → ℂ} (hA : DifferentiableOn ℂ A (ballDom q))
+theorem ballMeas_image
+    {A : (Fin n → ℂ) → Fin n → ℂ} (hA : DifferentiableOn ℂ A (ballDom q))
     (hAD : ∀ t ∈ ballDom q, A t ∈ ballDom q) (hinj : Set.InjOn A (ballDom q))
-    (hd : ∀ t ∈ ballDom q, ballDens q t =
-      ‖LinearMap.det ((fderiv ℂ A t : (Fin n → ℂ) →L[ℂ] (Fin n → ℂ)) : (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ))‖ ^ 2 *
-        ballDens q (A t))
-    {S : Set (Fin n → ℂ)} (hS : MeasurableSet S) (hSD : S ⊆ ballDom q) :
-    ballMeas q (A '' S) = ballMeas q S := by
+    (hd : ∀ t ∈ ballDom q,
+      ballDens q t
+        = ‖LinearMap.det ((fderiv ℂ A t : (Fin n → ℂ) →L[ℂ] (Fin n → ℂ)) : (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ))‖
+            ^ 2
+          * ballDens q (A t))
+    {S : Set (Fin n → ℂ)} (hS : MeasurableSet S) (hSD : S ⊆ ballDom q)
+    : ballMeas q (A '' S) = ballMeas q S := by
   have hD : IsOpen (ballDom q) := BallInverse.isOpen_ballDom q
   have hder : ∀ t ∈ S, HasFDerivWithinAt A ((fderiv ℂ A t).restrictScalars ℝ) S t := fun t ht =>
     (((hA.differentiableAt (hD.mem_nhds (hSD ht))).hasFDerivAt).restrictScalars ℝ).hasFDerivWithinAt
@@ -324,24 +352,30 @@ theorem ballMeas_image {A : (Fin n → ℂ) → Fin n → ℂ} (hA : Differentia
   rw [ballMeas_apply q hmeas himg, ballMeas_apply q hS hSD,
     lintegral_image_eq_lintegral_abs_det_fderiv_mul volume hS hder hinjS]
   refine setLIntegral_congr_fun hS fun t ht => ?_
-  have hdet : |((fderiv ℂ A t).restrictScalars ℝ : (Fin n → ℂ) →L[ℝ] (Fin n → ℂ)).det| =
-      ‖LinearMap.det ((fderiv ℂ A t : (Fin n → ℂ) →L[ℂ] (Fin n → ℂ)) : (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ))‖ ^ 2 := by
-    have h1 : ((fderiv ℂ A t).restrictScalars ℝ : (Fin n → ℂ) →L[ℝ] (Fin n → ℂ)).det =
-        Algebra.norm ℝ (LinearMap.det ((fderiv ℂ A t : (Fin n → ℂ) →L[ℂ] (Fin n → ℂ)) :
-          (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ))) :=
-      LinearMap.det_restrictScalars (f := ((fderiv ℂ A t : (Fin n → ℂ) →L[ℂ] (Fin n → ℂ)) :
-          (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ)))
+  have hdet
+      : |((fderiv ℂ A t).restrictScalars ℝ : (Fin n → ℂ) →L[ℝ] (Fin n → ℂ)).det|
+        = ‖LinearMap.det ((fderiv ℂ A t : (Fin n → ℂ) →L[ℂ] (Fin n → ℂ)) : (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ))‖
+          ^ 2 := by
+    have h1
+        : ((fderiv ℂ A t).restrictScalars ℝ : (Fin n → ℂ) →L[ℝ] (Fin n → ℂ)).det
+          = Algebra.norm ℝ
+            (LinearMap.det
+              ((fderiv ℂ A t : (Fin n → ℂ) →L[ℂ] (Fin n → ℂ)) : (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ))) :=
+      LinearMap.det_restrictScalars
+        (f := ((fderiv ℂ A t : (Fin n → ℂ) →L[ℂ] (Fin n → ℂ)) : (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ)))
     rw [h1, Algebra.norm_complex_apply, Complex.normSq_eq_norm_sq, abs_of_nonneg (by positivity)]
   show ENNReal.ofReal _ * ENNReal.ofReal _ = ENNReal.ofReal _
   rw [hdet, ← ENNReal.ofReal_mul (by positivity), ← hd t (hSD ht)]
 
-theorem ballDens_transform {A : (Fin n → ℂ) → Fin n → ℂ} {Gf : (Fin n → ℂ) → ℂ}
-    (hA : DifferentiableOn ℂ A (ballDom q)) (hG : DifferentiableOn ℂ Gf (ballDom q))
-    (hAD : ∀ t ∈ ballDom q, A t ∈ ballDom q)
-    (hp : ∀ t ∈ ballDom q, ballPot q (A t) = ballPot q t + (Gf t).re) {t : Fin n → ℂ} (ht : t ∈ ballDom q) :
-    ballDens q t =
-      ‖LinearMap.det ((fderiv ℂ A t : (Fin n → ℂ) →L[ℂ] (Fin n → ℂ)) : (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ))‖ ^ 2 *
-        ballDens q (A t) := by
+theorem ballDens_transform
+    {A : (Fin n → ℂ) → Fin n → ℂ} {Gf : (Fin n → ℂ) → ℂ} (hA : DifferentiableOn ℂ A (ballDom q))
+    (hG : DifferentiableOn ℂ Gf (ballDom q)) (hAD : ∀ t ∈ ballDom q, A t ∈ ballDom q)
+    (hp : ∀ t ∈ ballDom q, ballPot q (A t) = ballPot q t + (Gf t).re)
+    {t : Fin n → ℂ} (ht : t ∈ ballDom q)
+    : ballDens q t
+      = ‖LinearMap.det ((fderiv ℂ A t : (Fin n → ℂ) →L[ℂ] (Fin n → ℂ)) : (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ))‖
+          ^ 2
+        * ballDens q (A t) := by
   have hD : IsOpen (ballDom q) := BallInverse.isOpen_ballDom q
   obtain ⟨c, hc, hdens⟩ := GlobalTheory.T.monge_ampere_density_of_ball_potential Ψ j j' n q
   have hAan : AnalyticAt ℂ A t :=
@@ -355,21 +389,27 @@ theorem ballDens_transform {A : (Fin n → ℂ) → Fin n → ℂ} {Gf : (Fin n 
     ring
   have hφ : ContDiffAt ℝ 2 (fun t' => ballPot q t' / 2) (A t) :=
     (contDiffAt_ballPot q (hAD t ht)).div_const 2
-  have h := GlobalTheory.T.monge_ampere_density_change_of_variables n (fun t' => ballPot q t' / 2) (fun t' => ballPot q t' / 2) A
-    (fun t' => -(Gf t') / 2) t hAan hGan hφ hev
+  have h :=
+    GlobalTheory.T.monge_ampere_density_change_of_variables n
+      (fun t' => ballPot q t' / 2)
+      (fun t' => ballPot q t' / 2)
+      A
+      (fun t' => -(Gf t') / 2)
+      t hAan hGan hφ hev
   rw [hdens t ht, hdens _ (hAD t ht)] at h
   have hc' : c ≠ 0 := hc.ne'
   apply mul_left_cancel₀ hc'
   rw [h]
   ring
 
-theorem ballMeas_compact_lt_top {C : Set (Fin n → ℂ)} (hC : IsCompact C) (hCD : C ⊆ ballDom q) :
-    ballMeas q C < ⊤ := by
+theorem ballMeas_compact_lt_top {C : Set (Fin n → ℂ)} (hC : IsCompact C) (hCD : C ⊆ ballDom q)
+    : ballMeas q C < ⊤ := by
   obtain ⟨M, hM⟩ := hC.exists_bound_of_continuousOn ((continuousOn_ballDens q).mono hCD)
   rw [ballMeas_apply q hC.measurableSet hCD]
-  calc ∫⁻ t in C, ENNReal.ofReal (ballDens q t) ≤ ∫⁻ _ in C, ENNReal.ofReal M :=
-        setLIntegral_mono measurable_const fun t ht =>
-          ENNReal.ofReal_le_ofReal ((le_abs_self _).trans (hM t ht))
+  calc
+    ∫⁻ t in C, ENNReal.ofReal (ballDens q t) ≤ ∫⁻ _ in C, ENNReal.ofReal M :=
+      setLIntegral_mono measurable_const fun t ht =>
+        ENNReal.ofReal_le_ofReal ((le_abs_self _).trans (hM t ht))
     _ = ENNReal.ofReal M * volume C := by simp
     _ < ⊤ := ENNReal.mul_lt_top ENNReal.ofReal_lt_top hC.measure_lt_top
 
@@ -378,8 +418,8 @@ theorem ballMeas_ne_zero (hne : (ballDom q).Nonempty) : ballMeas q (ballDom q) �
   rw [ballMeas_apply q hD.measurableSet subset_rfl]
   intro h'
   have h := (lintegral_eq_zero_iff (ENNReal.measurable_ofReal.comp (measurable_ballDens q))).mp h'
-  have hF : ∀ᵐ _ ∂(volume.restrict (ballDom q)), False := h.mono fun t ht =>
-    (ENNReal.ofReal_pos.mpr (Real.exp_pos _)).ne' ht
+  have hF : ∀ᵐ _ ∂(volume.restrict (ballDom q)), False :=
+    h.mono fun t ht => (ENNReal.ofReal_pos.mpr (Real.exp_pos _)).ne' ht
   have h0 : volume.restrict (ballDom q) = 0 := by
     rw [← ae_eq_bot]
     exact Filter.eventually_false_iff_eq_bot.mp hF
@@ -393,13 +433,19 @@ end Ball
 
 section Main
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {Ψ : Type} [Fintype Ψ] {j j' n g : ℕ} {Λ : Type}
-  [AddCommGroup Λ] [Module (𝓞 E) Λ]
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {Ψ : Type} [Fintype Ψ]
+  {j j' n g : ℕ} {Λ : Type} [AddCommGroup Λ] [Module (𝓞 E) Λ]
 
-theorem map_haar_eq (F : UnivFam E Ψ j j' n g Λ) (Δ : GroupDict F)
-    (μ : Measure (archUnitary Δ.h (Pi.basisFun E (Fin (j + j'))))) [μ.IsHaarMeasure] :
-    ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ μ.map Δ.π =
-      c • (volume.restrict (ballDom F.q)).withDensity fun t => ENNReal.ofReal (ballDens F.q t) := by
+theorem map_haar_eq
+    (F : UnivFam E Ψ j j' n g Λ) (Δ : GroupDict F)
+    (μ : Measure (archUnitary Δ.h (Pi.basisFun E (Fin (j + j'))))) [μ.IsHaarMeasure]
+    : ∃ c : ℝ≥0∞,
+      c ≠ 0 ∧ c ≠ ⊤
+        ∧ μ.map Δ.π
+          = c • (volume.restrict (ballDom F.q)).withDensity fun t =>
+            ENNReal.ofReal (ballDens F.q t) := by
   have hD : IsOpen (ballDom F.q) := BallInverse.isOpen_ballDom F.q
   haveI : LocallyCompactSpace (ballDom F.q) := hD.locallyCompactSpace
   have hmem : ∀ a, Δ.π a ∈ ballDom F.q := fun a => Δ.π_range ▸ Set.mem_range_self a
@@ -411,8 +457,8 @@ theorem map_haar_eq (F : UnivFam E Ψ j j' n g Λ) (Δ : GroupDict F)
     rw [← hπA]
     exact hmem _
   let π' : archUnitary Δ.h (Pi.basisFun E (Fin (j + j'))) → ballDom F.q := fun a => ⟨Δ.π a, hmem a⟩
-  let T : archUnitary Δ.h (Pi.basisFun E (Fin (j + j'))) → ballDom F.q → ballDom F.q :=
-    fun a x => ⟨A a x, hAD a x x.2⟩
+  let T : archUnitary Δ.h (Pi.basisFun E (Fin (j + j'))) → ballDom F.q → ballDom F.q := fun a x =>
+    ⟨A a x, hAD a x x.2⟩
   have hc : Continuous π' := Δ.π_cont.subtype_mk _
   have hs : Function.Surjective π' := by
     rintro ⟨t, ht⟩
@@ -424,7 +470,9 @@ theorem map_haar_eq (F : UnivFam E Ψ j j' n g Λ) (Δ : GroupDict F)
   have hπ : ∀ a b, π' (a * b) = T a (π' b) := fun a b => Subtype.ext (hπA a b)
   have hK : IsCompact (Δ.M.stab : Set (archUnitary Δ.h (Pi.basisFun E (Fin (j + j'))))) :=
     MajorantStabCompact.proof Δ.h _ Δ.M
-  have hf : ∀ a b, π' a = π' b → a⁻¹ * b ∈ (Δ.M.stab : Set (archUnitary Δ.h (Pi.basisFun E (Fin (j + j'))))) :=
+  have hf
+      : ∀ a b,
+        π' a = π' b → a⁻¹ * b ∈ (Δ.M.stab : Set (archUnitary Δ.h (Pi.basisFun E (Fin (j + j'))))) :=
     fun a b h => (Δ.π_fibre a b).mp (congrArg Subtype.val h)
   have hemb : MeasurableEmbedding (Subtype.val : ballDom F.q → Fin n → ℂ) :=
     MeasurableEmbedding.subtype_coe hD.measurableSet
@@ -445,16 +493,21 @@ theorem map_haar_eq (F : UnivFam E Ψ j j' n g Λ) (Δ : GroupDict F)
       · rintro ⟨_, ⟨x, hx, rfl⟩, rfl⟩
         exact ⟨T a x, hx, rfl⟩
       · rintro ⟨x, hx, rfl⟩
-        have e : T a ((translHomeo hs hT hπ a).symm x) = x := (translHomeo hs hT hπ a).apply_symm_apply x
-        exact ⟨_, ⟨(translHomeo hs hT hπ a).symm x, by rw [Set.mem_preimage, e]; exact hx, rfl⟩,
-          congrArg Subtype.val e⟩
+        have e : T a ((translHomeo hs hT hπ a).symm x) = x :=
+          (translHomeo hs hT hπ a).apply_symm_apply x
+        exact ⟨
+          _,
+          ⟨(translHomeo hs hT hπ a).symm x, by rw [Set.mem_preimage, e]; exact hx, rfl⟩,
+          congrArg Subtype.val e
+        ⟩
     have hinj : Set.InjOn (A a) (ballDom F.q) := by
       intro t ht t' ht' e
       have h1 : T a ⟨t, ht⟩ = T a ⟨t', ht'⟩ := Subtype.ext e
       exact congrArg Subtype.val ((translHomeo hs hT hπ a).injective h1)
-    rw [← himg, ballMeas_image F.q (hA a) (hAD a) hinj
-      (fun t ht => ballDens_transform F.q (hA a) (hG a) (hAD a) (hpot a) ht) hS0
-      (Subtype.coe_image_subset _ _)]
+    rw [← himg,
+      ballMeas_image F.q (hA a) (hAD a) hinj
+        (fun t ht => ballDens_transform F.q (hA a) (hG a) (hAD a) (hpot a) ht)
+        hS0 (Subtype.coe_image_subset _ _)]
   have h0 : νX ≠ 0 := by
     intro h
     have h1 := hνX Set.univ
@@ -473,5 +526,13 @@ end Main
 
 end GlobalTheory.CompanionTheory.Ar.Cusp.DictMeas
 
-theorem GlobalTheory.CompanionTheory.Ar.Cusp.DictMeas.haar_projects : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Ψ : Type) [Fintype Ψ] (j j' n g : ℕ) (Λ : Type) [AddCommGroup Λ] [Module (𝓞 E) Λ] (F : UnivFam E Ψ j j' n g Λ) (Δ : GroupDict F) (μ : Measure (archUnitary Δ.h (Pi.basisFun E (Fin (j + j'))))) [μ.IsHaarMeasure], ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ μ.map Δ.π = c • (volume.restrict (ballDom F.q)).withDensity fun t => ENNReal.ofReal (ballDens F.q t) :=
-  fun _ _ _ _ _ _ _ _ _ _ _ _ _ F Δ μ _ => GlobalTheory.CompanionTheory.Ar.Cusp.DictMeas.map_haar_eq F Δ μ
+theorem GlobalTheory.CompanionTheory.Ar.Cusp.DictMeas.haar_projects
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Ψ : Type) [Fintype Ψ] (j j' n g : ℕ)
+        (Λ : Type) [AddCommGroup Λ] [Module (𝓞 E) Λ] (F : UnivFam E Ψ j j' n g Λ) (Δ : GroupDict F)
+        (μ : Measure (archUnitary Δ.h (Pi.basisFun E (Fin (j + j'))))) [μ.IsHaarMeasure],
+      ∃ c : ℝ≥0∞,
+        c ≠ 0 ∧ c ≠ ⊤
+          ∧ μ.map Δ.π
+            = c • (volume.restrict (ballDom F.q)).withDensity fun t =>
+              ENNReal.ofReal (ballDens F.q t) := fun _ _ _ _ _ _ _ _ _ _ _ _ _ F Δ μ _ =>
+  GlobalTheory.CompanionTheory.Ar.Cusp.DictMeas.map_haar_eq F Δ μ

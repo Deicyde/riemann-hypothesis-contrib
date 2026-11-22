@@ -10,8 +10,8 @@ open Finset Matrix
 
 variable {K R : Type} [CommRing K] [CommRing R] [Algebra K R]
 
-theorem derivation_prod {ι : Type} [DecidableEq ι] (D : Derivation K R R) (f : ι → R) (s : Finset ι) :
-    D (∏ i ∈ s, f i) = ∑ k ∈ s, ∏ i ∈ s, Function.update f k (D (f k)) i := by
+theorem derivation_prod {ι : Type} [DecidableEq ι] (D : Derivation K R R) (f : ι → R) (s : Finset ι)
+    : D (∏ i ∈ s, f i) = ∑ k ∈ s, ∏ i ∈ s, Function.update f k (D (f k)) i := by
   induction s using Finset.induction_on with
   | empty => simp
   | insert a s ha ih =>
@@ -23,25 +23,27 @@ theorem derivation_prod {ι : Type} [DecidableEq ι] (D : Derivation K R R) (f :
     refine sum_congr rfl fun k hk => ?_
     rw [prod_insert ha, Function.update_of_ne (ne_of_mem_of_not_mem hk ha).symm]
 
-theorem derivation_det {ι : Type} [Fintype ι] [DecidableEq ι] (D : Derivation K R R)
-    (A : Matrix ι ι R) :
-    D A.det = ∑ k, (A.updateRow k fun l => D (A k l)).det := by
+theorem derivation_det
+    {ι : Type} [Fintype ι] [DecidableEq ι] (D : Derivation K R R) (A : Matrix ι ι R)
+    : D A.det = ∑ k, (A.updateRow k fun l => D (A k l)).det := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [det_apply, map_sum]
   rw [sum_comm]
   refine sum_congr rfl fun σ _ => ?_
-  rcases Int.units_eq_one_or (Equiv.Perm.sign σ) with h | h <;>
-  · simp only [h, one_smul, Units.neg_smul, map_neg, sum_neg_distrib, neg_inj]
-    rw [derivation_prod]
-    conv_rhs => rw [← Equiv.sum_comp σ]
-    refine sum_congr rfl fun k _ => prod_congr rfl fun i _ => ?_
-    by_cases hik : i = k
-    · subst hik; simp [updateRow_apply]
-    · rw [Function.update_of_ne hik, updateRow_apply, if_neg (σ.injective.ne hik)]
+  rcases Int.units_eq_one_or (Equiv.Perm.sign σ) with h | h
+    <;> · simp only [h, one_smul, Units.neg_smul, map_neg, sum_neg_distrib, neg_inj]
+          rw [derivation_prod]
+          conv_rhs => rw [← Equiv.sum_comp σ]
+          refine sum_congr rfl fun k _ => prod_congr rfl fun i _ => ?_
+          by_cases hik : i = k
+          · subst hik; simp [updateRow_apply]
+          · rw [Function.update_of_ne hik, updateRow_apply, if_neg (σ.injective.ne hik)]
 
-theorem piola {ι : Type} [Fintype ι] [DecidableEq ι] (δ : ι → Derivation K R R)
-    (M : Matrix ι ι R) (hM : ∀ h i j, δ h (M i j) = δ i (M h j)) (j : ι) :
-    ∑ i, δ i (M.adjugate j i) = 0 := by
+theorem piola
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (δ : ι → Derivation K R R) (M : Matrix ι ι R) (hM : ∀ h i j, δ h (M i j) = δ i (M h j))
+    (j : ι)
+    : ∑ i, δ i (M.adjugate j i) = 0 := by
   set f : ι × ι → R := fun p =>
     ((M.updateRow p.1 (Pi.single j 1)).updateRow p.2
       fun l => δ p.1 ((M.updateRow p.1 (Pi.single j 1)) p.2 l)).det with hf
@@ -64,8 +66,10 @@ theorem piola {ι : Type} [Fintype ι] [DecidableEq ι] (δ : ι → Derivation 
       congr 2
       funext l
       rw [updateRow_ne (Ne.symm hik)]
-    have h2 : f (k, i) = (((M.updateRow i (Pi.single j 1)).updateRow k D).submatrix
-        (Equiv.swap i k) id).det := by
+    have h2
+        : f (k, i)
+          = (((M.updateRow i (Pi.single j 1)).updateRow k D).submatrix (Equiv.swap i k)
+            id).det := by
       simp only [hf]
       congr 1
       ext a b
@@ -90,9 +94,10 @@ theorem piola {ι : Type} [Fintype ι] [DecidableEq ι] (δ : ι → Derivation 
   · intro p _; simp
   · intro p _; simp
 
-theorem piola_identity : ∀ {K R : Type} [CommRing K] [CommRing R] [Algebra K R] {ι : Type} [Fintype ι]
-    [DecidableEq ι] (δ : ι → Derivation K R R) (M : Matrix ι ι R),
-    (∀ h i j, δ h (M i j) = δ i (M h j)) → ∀ j, ∑ i, δ i (M.adjugate j i) = 0 :=
-  fun δ M hM j => piola δ M hM j
+theorem piola_identity
+    : ∀ {K R : Type} [CommRing K] [CommRing R] [Algebra K R] {ι : Type} [Fintype ι] [DecidableEq ι]
+        (δ : ι → Derivation K R R) (M : Matrix ι ι R),
+      (∀ h i j, δ h (M i j) = δ i (M h j)) → ∀ j, ∑ i, δ i (M.adjugate j i) = 0 := fun δ M hM j =>
+  piola δ M hM j
 
 end GlobalTheory.PiolaAlg

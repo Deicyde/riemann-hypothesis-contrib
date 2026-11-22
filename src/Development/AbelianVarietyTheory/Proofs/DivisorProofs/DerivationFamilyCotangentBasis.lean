@@ -8,15 +8,33 @@ open IsLocalRing
 
 namespace GlobalTheory.CoordsAlg
 
-noncomputable def cotFun {R A : Type} [CommRing R] [CommRing A] [Algebra R A] (I : Ideal A)
-    (f : I →ₗ[R] R) (hf : ∀ x : I, (x : A) ∈ I ^ 2 → f x = 0) : Module.Dual R I.Cotangent :=
+noncomputable def cotFun
+    {R A : Type} [CommRing R] [CommRing A] [Algebra R A]
+    (I : Ideal A) (f : I →ₗ[R] R) (hf : ∀ x : I, (x : A) ∈ I ^ 2 → f x = 0)
+    : Module.Dual R I.Cotangent :=
   ((I • ⊤ : Submodule A I).restrictScalars R).liftQ f (fun x hx => by
       refine LinearMap.mem_ker.mpr (hf x ?_)
       rw [← Ideal.toCotangent_eq_zero]
-      exact (Submodule.Quotient.mk_eq_zero _).mpr hx) ∘ₗ
-    (Submodule.Quotient.restrictScalarsEquiv R (I • ⊤ : Submodule A I)).symm.toLinearMap
+      exact (Submodule.Quotient.mk_eq_zero _).mpr hx)
+    ∘ₗ (Submodule.Quotient.restrictScalarsEquiv R (I • ⊤ : Submodule A I)).symm.toLinearMap
 
-theorem coords_of_derivation_basis : ∀ (R A : Type) [CommRing R] [IsLocalRing R] [CommRing A] [IsLocalRing A] [IsNoetherianRing A] [Algebra R A] (e : A →+* R), (∀ r, e (algebraMap R A r) = r) → Module.Free R (RingHom.ker e).Cotangent → Module.Finite R (RingHom.ker e).Cotangent → ∀ (n : ℕ) (dv : Fin n → A → R), (∀ a x y, dv a (x + y) = dv a x + dv a y) → (∀ a x y, dv a (x * y) = e x * dv a y + e y * dv a x) → (∀ a r, dv a (algebraMap R A r) = 0) → (∀ D : A → R, (∀ x y, D (x + y) = D x + D y) → (∀ x y, D (x * y) = e x * D y + e y * D x) → (∀ r, D (algebraMap R A r) = 0) → ∃! c : Fin n → R, ∀ x, D x = ∑ a, c a * dv a x) → ∃ z : Fin n → A, (∀ i, e (z i) = 0) ∧ (∀ a i, dv a (z i) = if a = i then 1 else 0) ∧ maximalIdeal A = (maximalIdeal R).map (algebraMap R A) ⊔ Ideal.span (Set.range z) := by
+theorem coords_of_derivation_basis
+    : ∀ (R A : Type) [CommRing R] [IsLocalRing R] [CommRing A] [IsLocalRing A] [IsNoetherianRing A]
+        [Algebra R A] (e : A →+* R),
+      (∀ r, e (algebraMap R A r) = r) → Module.Free R (RingHom.ker e).Cotangent
+        → Module.Finite R (RingHom.ker e).Cotangent
+        → ∀ (n : ℕ) (dv : Fin n → A → R),
+          (∀ a x y, dv a (x + y) = dv a x + dv a y)
+            → (∀ a x y, dv a (x * y) = e x * dv a y + e y * dv a x)
+            → (∀ a r, dv a (algebraMap R A r) = 0)
+            → (∀ D : A → R,
+              (∀ x y, D (x + y) = D x + D y) → (∀ x y, D (x * y) = e x * D y + e y * D x)
+                → (∀ r, D (algebraMap R A r) = 0)
+                → ∃! c : Fin n → R, ∀ x, D x = ∑ a, c a * dv a x)
+            → ∃ z : Fin n → A,
+              (∀ i, e (z i) = 0) ∧ (∀ a i, dv a (z i) = if a = i then 1 else 0)
+                ∧ maximalIdeal A
+                  = (maximalIdeal R).map (algebraMap R A) ⊔ Ideal.span (Set.range z) := by
   intro R A _ _ _ _ _ _ e he hfree hfin n dv hadd hmul halg huniq
   set I := RingHom.ker e with hIdef
   let dH : Fin n → A →+ R := fun a => AddMonoidHom.mk' (dv a) (hadd a)
@@ -28,16 +46,17 @@ theorem coords_of_derivation_basis : ∀ (R A : Type) [CommRing R] [IsLocalRing 
     rw [pow_two] at hx
     refine Submodule.mul_induction_on hx ?_ ?_
     · intro u hu v hv
-      rw [hmul, (RingHom.mem_ker).1 hu, (RingHom.mem_ker).1 hv]; ring
+      rw [hmul, (RingHom.mem_ker).1 hu, (RingHom.mem_ker).1 hv]
+      ring
     · intro u v hu hv; rw [hadd, hu, hv, add_zero]
-  have hdec : ∀ x : A, x - algebraMap R A (e x) ∈ I := fun x => by
-    simp [I, RingHom.mem_ker, he]
-  let fa : Fin n → (I →ₗ[R] R) := fun a =>
-    { toFun := fun x => dv a x
-      map_add' := fun x y => hadd a x y
-      map_smul' := fun r x => by
-        simp only [Submodule.coe_smul_of_tower, Algebra.smul_def, RingHom.id_apply, smul_eq_mul]
-        exact hsmul a r x }
+  have hdec : ∀ x : A, x - algebraMap R A (e x) ∈ I := fun x => by simp [I, RingHom.mem_ker, he]
+  let fa : Fin n → (I →ₗ[R] R) := fun a => {
+    toFun := fun x => dv a x
+    map_add' := fun x y => hadd a x y
+    map_smul' := fun r x => by
+      simp only [Submodule.coe_smul_of_tower, Algebra.smul_def, RingHom.id_apply, smul_eq_mul]
+      exact hsmul a r x
+  }
   let ℓ : Fin n → Module.Dual R I.Cotangent := fun a => cotFun I (fa a) (fun x hx => hI2 a x hx)
   have hℓ : ∀ a (x : I), ℓ a (I.toCotangent x) = dv a x := fun _ _ => rfl
   let Ψ : (Fin n → R) →ₗ[R] Module.Dual R I.Cotangent :=
@@ -57,8 +76,8 @@ theorem coords_of_derivation_basis : ∀ (R A : Type) [CommRing R] [IsLocalRing 
         intro a; rw [hdH, map_sub, ← hdH, ← hdH, halg, sub_zero]
       simp only [this] at hx
       exact hx.symm
-    obtain ⟨c0, -, hc0⟩ := huniq (fun _ => 0) (fun _ _ => by simp) (fun _ _ => by simp)
-      (fun _ => rfl)
+    obtain ⟨c0, -, hc0⟩ :=
+      huniq (fun _ => 0) (fun _ _ => by simp) (fun _ _ => by simp) (fun _ => rfl)
     have h1 : c = c0 := hc0 c (fun x => (h0 x).symm)
     have h2 : (0 : Fin n → R) = c0 := hc0 0 (fun x => by simp)
     rw [h1, ← h2]
@@ -69,7 +88,9 @@ theorem coords_of_derivation_basis : ∀ (R A : Type) [CommRing R] [IsLocalRing 
       intro x y
       simp only [D, ← map_add (f := _)]
       congr 2
-      ext; simp; ring
+      ext
+      simp
+      ring
     have Dalg : ∀ r, D (algebraMap R A r) = 0 := by
       intro r
       simp only [D]
@@ -79,17 +100,24 @@ theorem coords_of_derivation_basis : ∀ (R A : Type) [CommRing R] [IsLocalRing 
       intro x y
       have hsq : (x - algebraMap R A (e x)) * (y - algebraMap R A (e y)) ∈ I ^ 2 := by
         rw [pow_two]; exact Ideal.mul_mem_mul (hdec x) (hdec y)
-      have key : (⟨_, hdec (x * y)⟩ : I) = e x • (⟨_, hdec y⟩ : I) + e y • (⟨_, hdec x⟩ : I) +
-          ⟨_, Ideal.pow_le_self two_ne_zero hsq⟩ := by
+      have key
+          : (⟨_, hdec (x * y)⟩ : I)
+            = e x • (⟨_, hdec y⟩ : I) + e y • (⟨_, hdec x⟩ : I)
+              + ⟨_, Ideal.pow_le_self two_ne_zero hsq⟩ := by
         ext
         simp only [Submodule.coe_add, Submodule.coe_smul_of_tower, Algebra.smul_def, map_mul]
         ring
-      have hw0 : I.toCotangent ⟨(x - algebraMap R A (e x)) * (y - algebraMap R A (e y)),
-          Ideal.pow_le_self two_ne_zero hsq⟩ = 0 := (I.toCotangent_eq_zero _).2 hsq
+      have hw0
+          : I.toCotangent ⟨
+              (x - algebraMap R A (e x)) * (y - algebraMap R A (e y)),
+              Ideal.pow_le_self two_ne_zero hsq
+            ⟩
+            = 0 :=
+        (I.toCotangent_eq_zero _).2 hsq
       simp only [D]
       rw [key]
-      simp only [map_add (f := _), LinearMap.map_smul_of_tower, hw0,
-        map_zero, add_zero, map_smul, smul_eq_mul]
+      simp only [map_add (f := _), LinearMap.map_smul_of_tower, hw0, map_zero, add_zero, map_smul,
+        smul_eq_mul]
     obtain ⟨c, hc, -⟩ := huniq D Dadd Dmul Dalg
     refine ⟨c, ?_⟩
     ext w
@@ -99,8 +127,7 @@ theorem coords_of_derivation_basis : ∀ (R A : Type) [CommRing R] [IsLocalRing 
     congr 2
     ext
     simp [(RingHom.mem_ker).1 x.2]
-  let Ψe : (Fin n → R) ≃ₗ[R] Module.Dual R I.Cotangent :=
-    LinearEquiv.ofBijective Ψ ⟨hΨinj, hΨsurj⟩
+  let Ψe : (Fin n → R) ≃ₗ[R] Module.Dual R I.Cotangent := LinearEquiv.ofBijective Ψ ⟨hΨinj, hΨsurj⟩
   have hΨsingle : ∀ a, Ψ (Pi.single a 1) = ℓ a := by
     intro a
     ext w
@@ -122,8 +149,7 @@ theorem coords_of_derivation_basis : ∀ (R A : Type) [CommRing R] [IsLocalRing 
     · simp [h, Pi.single_apply, Ne.symm h]
   choose y hy using fun i => I.toCotangent_surjective (w i)
   have hzI : ∀ i, (y i : A) ∈ I := fun i => (y i).2
-  have hdz : ∀ a i, dv a (y i : A) = if a = i then 1 else 0 := by
-    intro a i; rw [← hℓ, hy, hw]
+  have hdz : ∀ a i, dv a (y i : A) = if a = i then 1 else 0 := by intro a i; rw [← hℓ, hy, hw]
   have hImax : I ≤ maximalIdeal A := by
     intro x hx
     rw [mem_maximalIdeal, mem_nonunits_iff]
@@ -150,7 +176,8 @@ theorem coords_of_derivation_basis : ∀ (R A : Type) [CommRing R] [IsLocalRing 
       have hcot : I.toCotangent ⟨x - s, hr⟩ = 0 := by
         refine (Module.forall_dual_apply_eq_zero_iff R _).1 fun φ => ?_
         obtain ⟨c, rfl⟩ := hΨsurj φ
-        rw [hΨ]; simp [hdr]
+        rw [hΨ]
+        simp [hdr]
       have hsq : x - s ∈ I ^ 2 := (I.toCotangent_eq_zero _).1 hcot
       have hxs : x = s + (x - s) := by ring
       rw [hxs]

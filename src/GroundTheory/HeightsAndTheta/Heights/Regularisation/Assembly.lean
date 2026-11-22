@@ -26,25 +26,26 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.Regular
 
-theorem GlueRegularised.full : GlueRegularised.Statement :=
-  GlueRegularised.proof
+theorem GlueRegularised.full : GlueRegularised.Statement := GlueRegularised.proof
 
-theorem KernelPositive.full : KernelPositive.Statement :=
-  kernelPositive_statement
+theorem KernelPositive.full : KernelPositive.Statement := kernelPositive_statement
 
-theorem Tau0Holomorphic.cond (hE : RiemannExtensionSlices.Statement)
-    (hO : PuncturedExpOrder.Statement) (hD : LogCoverDescent.Statement) :
-    Tau0Holomorphic.Statement :=
+theorem Tau0Holomorphic.cond
+    (hE : RiemannExtensionSlices.Statement) (hO : PuncturedExpOrder.Statement)
+    (hD : LogCoverDescent.Statement)
+    : Tau0Holomorphic.Statement :=
   Tau0Holomorphic.proof (ExpQuadMonomial.proof hE hO hD)
 
-theorem ImTauBounds.cond (hE : RiemannExtensionSlices.Statement)
-    (hO : PuncturedExpOrder.Statement) (hD : LogCoverDescent.Statement) :
-    ImTauBounds.Statement :=
+theorem ImTauBounds.cond
+    (hE : RiemannExtensionSlices.Statement) (hO : PuncturedExpOrder.Statement)
+    (hD : LogCoverDescent.Statement)
+    : ImTauBounds.Statement :=
   ImTauBounds.proof (Tau0Holomorphic.cond hE hO hD) KernelPositive.full
 
-theorem HodgeDerivative.cond (hE : RiemannExtensionSlices.Statement)
-    (hO : PuncturedExpOrder.Statement) (hD : LogCoverDescent.Statement) :
-    HodgeDerivative.Statement :=
+theorem HodgeDerivative.cond
+    (hE : RiemannExtensionSlices.Statement) (hO : PuncturedExpOrder.Statement)
+    (hD : LogCoverDescent.Statement)
+    : HodgeDerivative.Statement :=
   have hInv : InvEntryDeriv.Statement := InvEntryDeriv.proof InvEntryBound.proof
   HodgeDerivative.proof (ImTauBounds.cond hE hO hD) (Tau0Holomorphic.cond hE hO hD)
     AnalyticDerivBound.proof hInv

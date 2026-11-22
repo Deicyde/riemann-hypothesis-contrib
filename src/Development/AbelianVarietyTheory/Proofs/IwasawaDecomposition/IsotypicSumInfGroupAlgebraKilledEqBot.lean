@@ -15,10 +15,15 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConjugateMod
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum Formalism.IndefR.Cx
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open Formalism.IndefR.RecTie Formalism.IndefR.Lev Formalism.L2.Rows GlobalTheory.Mem GlobalTheory.Mem.R3
+open Formalism.IndefR.RecTie Formalism.IndefR.Lev Formalism.L2.Rows GlobalTheory.Mem
+  GlobalTheory.Mem.R3
 attribute [local instance] Formalism.IndefR.principalLevelFrame.instCMHostI
 open GlobalTheory.CuspMult
 
@@ -26,7 +31,12 @@ noncomputable section
 
 namespace GlobalTheory.RepCount
 
-theorem iSup_range_homInto_inf_killed_eq_bot : ∀ (H S0 X : Type) [Group H] [AddCommGroup S0] [Module ℂ S0] [AddCommGroup X] [Module ℂ X] (σ0 : Representation ℂ H S0) (ρ : Representation ℂ H X) (C : Submodule ℂ X) (I : Set (MonoidAlgebra ℂ H)), σ0.IsIrreducible → killed σ0 I = ⊥ → ((⨆ f ∈ homInto σ0 ρ C, LinearMap.range f) ⊓ killed ρ I : Submodule ℂ X) = ⊥ := by
+theorem iSup_range_homInto_inf_killed_eq_bot
+    : ∀ (H S0 X : Type) [Group H] [AddCommGroup S0] [Module ℂ S0] [AddCommGroup X] [Module ℂ X]
+        (σ0 : Representation ℂ H S0) (ρ : Representation ℂ H X) (C : Submodule ℂ X)
+        (I : Set (MonoidAlgebra ℂ H)),
+      σ0.IsIrreducible → killed σ0 I = ⊥
+        → ((⨆ f ∈ homInto σ0 ρ C, LinearMap.range f) ⊓ killed ρ I : Submodule ℂ X) = ⊥ := by
   intro H S0 X _ _ _ _ _ σ0 ρ C I hirr hk
   haveI hS : IsSimpleModule (MonoidAlgebra ℂ H) σ0.asModule :=
     (Representation.irreducible_iff_isSimpleModule_asModule σ0).1 hirr
@@ -47,21 +57,25 @@ theorem iSup_range_homInto_inf_killed_eq_bot : ∀ (H S0 X : Type) [Group H] [Ad
   rw [Submodule.mem_bot]
   by_contra hv0
   have hvN : ρ.asModuleEquiv.symm v ∈ N := by
-    have hle : (⨆ f ∈ homInto σ0 ρ C, LinearMap.range f : Submodule ℂ X) ≤
-        (N.restrictScalars ℂ).comap ρ.asModuleEquiv.symm.toLinearMap := by
+    have hle
+        : (⨆ f ∈ homInto σ0 ρ C, LinearMap.range f : Submodule ℂ X)
+          ≤ (N.restrictScalars ℂ).comap ρ.asModuleEquiv.symm.toLinearMap := by
       refine iSup₂_le fun f hf => ?_
       rintro _ ⟨s, rfl⟩
       have hfs : ρ.asModuleEquiv.symm (f s) = modMap f hf.2 (σ0.asModuleEquiv.symm s) := by
         rw [LinearEquiv.symm_apply_eq, modMap_apply, LinearEquiv.apply_symm_apply]
       show ρ.asModuleEquiv.symm (f s) ∈ N
       rw [hfs]
-      exact (le_iSup₂ (f := fun (f : S0 →ₗ[ℂ] X) (hf : f ∈ homInto σ0 ρ C) =>
-        LinearMap.range (modMap f hf.2)) f hf) ⟨_, rfl⟩
+      exact (le_iSup₂
+          (f := fun (f : S0 →ₗ[ℂ] X) (hf : f ∈ homInto σ0 ρ C) => LinearMap.range (modMap f hf.2))
+          f hf)
+        ⟨_, rfl⟩
     exact hle hv1
   let w : N := ⟨_, hvN⟩
-  have hw : w ≠ 0 := fun h => hv0 (by
-    have := congrArg (fun x : N => ρ.asModuleEquiv x.1) h
-    simpa [w] using this)
+  have hw : w ≠ 0 := fun h =>
+    hv0 (by
+      have := congrArg (fun x : N => ρ.asModuleEquiv x.1) h
+      simpa [w] using this)
   have hew : e w ≠ 0 := fun h => hw (e.map_eq_zero_iff.1 h)
   obtain ⟨i, hi⟩ : ∃ i, e w i ≠ 0 := by
     by_contra h

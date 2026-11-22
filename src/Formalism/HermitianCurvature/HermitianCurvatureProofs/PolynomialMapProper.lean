@@ -5,5 +5,6 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.PolynomialProper
 
 @[expose] public section
 
-theorem Formalism.FourierDecayAlt.P.polynomial_map_proper : Formalism.FourierDecayAlt.C2.PolyProper :=
+theorem Formalism.FourierDecayAlt.P.polynomial_map_proper
+    : Formalism.FourierDecayAlt.C2.PolyProper :=
   PI.PolynomialProperness.polyProper_of_mx PI.PolynomialProperness.mxFacts

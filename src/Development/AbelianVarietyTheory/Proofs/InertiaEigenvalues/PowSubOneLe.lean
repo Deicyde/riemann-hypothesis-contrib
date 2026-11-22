@@ -21,14 +21,20 @@ lemma pow_sub_one_le (w : ℚ_[l]) (hw : ‖w‖ ≤ 1) (k : ℕ) : ‖w ^ k - 1
     calc ‖w‖ * ‖w ^ k - 1‖ ≤ 1 * ‖w ^ k - 1‖ := by gcongr
       _ ≤ ‖w - 1‖ := by rw [one_mul]; exact ih
 
-theorem main : ∀ {l : ℕ} [inst : Fact (Nat.Prime l)] (w : ℚ_[l]), ‖w‖ ≤ (1 : ℝ) → ∀ (k : ℕ),
-    ‖w ^ k - (1 : ℚ_[l]) - (↑k : ℚ_[l]) * (w - (1 : ℚ_[l]))‖ ≤ ‖w - (1 : ℚ_[l])‖ ^ (2 : ℕ) := by
+theorem main
+    : ∀ {l : ℕ} [inst : Fact (Nat.Prime l)] (w : ℚ_[l]),
+      ‖w‖ ≤ (1 : ℝ)
+        → ∀ (k : ℕ),
+          ‖w ^ k - (1 : ℚ_[l]) - (↑k : ℚ_[l]) * (w - (1 : ℚ_[l]))‖
+            ≤ ‖w - (1 : ℚ_[l])‖ ^ (2 : ℕ) := by
   intro l _ w hw k
   induction k with
   | zero => simp
   | succ k ih =>
-    have e : w ^ (k + 1) - 1 - ((k + 1 : ℕ) : ℚ_[l]) * (w - 1)
-        = (w ^ k - 1 - (k : ℚ_[l]) * (w - 1)) + (w - 1) * (w ^ k - 1) := by push_cast; ring
+    have e
+        : w ^ (k + 1) - 1 - ((k + 1 : ℕ) : ℚ_[l]) * (w - 1)
+          = (w ^ k - 1 - (k : ℚ_[l]) * (w - 1)) + (w - 1) * (w ^ k - 1) := by
+      push_cast; ring
     rw [e]
     refine (ultra _ _).trans (max_le ih ?_)
     rw [norm_mul, sq]

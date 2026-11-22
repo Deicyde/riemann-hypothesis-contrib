@@ -14,28 +14,37 @@ namespace UpperTheory.TNZ.P_spLat
 
 variable {Γ V : Type} [Group Γ] [AddCommGroup V] [Module ℂ V] {I : Representation ℂ Γ V}
 
-theorem eqvInt {A B : Type} [AddCommGroup A] [Module ℂ A] [AddCommGroup B] [Module ℂ B]
-    {α : Representation ℂ Γ A} {β : Representation ℂ Γ B} (e : α.Equiv β) (g : Γ) (v : A) :
-    e (α g v) = β g (e v) :=
+theorem eqvInt
+    {A B : Type} [AddCommGroup A] [Module ℂ A] [AddCommGroup B] [Module ℂ B]
+    {α : Representation ℂ Γ A} {β : Representation ℂ Γ B} (e : α.Equiv β)
+    (g : Γ) (v : A)
+    : e (α g v) = β g (e v) :=
   Representation.IntertwiningMap.isIntertwining _ _ e.toIntertwiningMap g v
 
-def eqvTrans {A B C : Type} [AddCommGroup A] [Module ℂ A] [AddCommGroup B] [Module ℂ B]
-    [AddCommGroup C] [Module ℂ C] {α : Representation ℂ Γ A} {β : Representation ℂ Γ B}
-    {γ : Representation ℂ Γ C} (e : α.Equiv β) (f : β.Equiv γ) : α.Equiv γ :=
+def eqvTrans
+    {A B C : Type}
+    [AddCommGroup A] [Module ℂ A] [AddCommGroup B] [Module ℂ B] [AddCommGroup C] [Module ℂ C]
+    {α : Representation ℂ Γ A} {β : Representation ℂ Γ B} {γ : Representation ℂ Γ C}
+    (e : α.Equiv β) (f : β.Equiv γ)
+    : α.Equiv γ :=
   Representation.Equiv.mk (e.toLinearEquiv.trans f.toLinearEquiv) (fun g => by
     ext v
     show f (e (α g v)) = γ g (f (e v))
     rw [eqvInt e, eqvInt f])
 
-theorem dich {A : Type} [AddCommGroup A] [Module ℂ A] {α : Representation ℂ Γ A} (hα : α.IsIrreducible)
-    (X Y S : Subrepresentation I) (e : (subQuot Y X).Equiv α) :
-    Y ⊓ S ≤ X ∨ Y ≤ S ⊔ X := by
-  let T : Subrepresentation α :=
-    ⟨((S.toSubmodule.comap Y.toSubmodule.subtype).map
-        (X.toSubmodule.comap Y.toSubmodule.subtype).mkQ).map e.toLinearMap, by
+theorem dich
+    {A : Type} [AddCommGroup A] [Module ℂ A]
+    {α : Representation ℂ Γ A} (hα : α.IsIrreducible)
+    (X Y S : Subrepresentation I) (e : (subQuot Y X).Equiv α)
+    : Y ⊓ S ≤ X ∨ Y ≤ S ⊔ X := by
+  let T : Subrepresentation α := ⟨
+    ((S.toSubmodule.comap Y.toSubmodule.subtype).map
+      (X.toSubmodule.comap Y.toSubmodule.subtype).mkQ).map e.toLinearMap,
+    by
       rintro g _ ⟨_, ⟨v, hv, rfl⟩, rfl⟩
       refine ⟨_, ⟨Y.toRepresentation g v, S.apply_mem_toSubmodule g hv, rfl⟩, ?_⟩
-      exact eqvInt e g (Submodule.Quotient.mk v)⟩
+      exact eqvInt e g (Submodule.Quotient.mk v)
+  ⟩
   rcases hα.eq_bot_or_eq_top T with hT | hT
   · left
     intro v hv
@@ -58,8 +67,8 @@ theorem dich {A : Type} [AddCommGroup A] [Module ℂ A] {α : Representation ℂ
     refine Submodule.mem_sup.2 ⟨w, hwS, v - w, ?_, by abel⟩
     simpa using X.toSubmodule.neg_mem hx
 
-def eqv (Z W Y X : Subrepresentation I) (hZY : Z ≤ Y) (hY : Y ≤ Z ⊔ X)
-    (hW : Z ⊓ W = Z ⊓ X) : (subQuot Z W).Equiv (subQuot Y X) := by
+def eqv (Z W Y X : Subrepresentation I) (hZY : Z ≤ Y) (hY : Y ≤ Z ⊔ X) (hW : Z ⊓ W = Z ⊓ X)
+    : (subQuot Z W).Equiv (subQuot Y X) := by
   let f : Z.toSubmodule →ₗ[ℂ] (Y.toSubmodule ⧸ X.toSubmodule.comap Y.toSubmodule.subtype) :=
     (X.toSubmodule.comap Y.toSubmodule.subtype).mkQ ∘ₗ Submodule.inclusion hZY
   have hf : Function.Surjective f := by
@@ -86,8 +95,8 @@ def eqv (Z W Y X : Subrepresentation I) (hZY : Z ≤ Y) (hY : Y ≤ Z ⊔ X)
       have : v ∈ Z.toSubmodule ⊓ X.toSubmodule := ⟨hv, hx⟩
       rw [← h] at this
       exact this.2
-  refine Representation.Equiv.mk ((Submodule.quotEquivOfEq _ _ hker).trans
-    (f.quotKerEquivOfSurjective hf)) (fun g => ?_)
+  refine Representation.Equiv.mk
+    ((Submodule.quotEquivOfEq _ _ hker).trans (f.quotKerEquivOfSurjective hf)) (fun g => ?_)
   refine Submodule.linearMap_qext _ (LinearMap.ext fun v => ?_)
   simp only [LinearMap.coe_comp, Function.comp_apply, Submodule.mkQ_apply, LinearEquiv.coe_coe,
     LinearEquiv.trans_apply]
@@ -114,16 +123,20 @@ theorem step_spLat : SpecialLatticeProp := by
     omega
   set Z := Y₁ ⊓ Y₂ with hZdef
   set N := X₁ ⊔ X₂ with hNdef
-  have side : ∀ (C : Type) [AddCommGroup C] [Module ℂ C] (γ : Representation ℂ Γ C), γ.IsIrreducible →
-      ∀ X Y : Subrepresentation I, X ≤ Y → X ≤ N → Z ≤ Y → d X = 0 → (subQuot Y X).Equiv γ →
-      Y ≤ Z ⊔ X ∧ Z ⊓ N = Z ⊓ X := by
+  have side
+      : ∀ (C : Type) [AddCommGroup C] [Module ℂ C] (γ : Representation ℂ Γ C),
+        γ.IsIrreducible
+          → ∀ X Y : Subrepresentation I,
+            X ≤ Y → X ≤ N → Z ≤ Y → d X = 0 → (subQuot Y X).Equiv γ
+              → Y ≤ Z ⊔ X ∧ Z ⊓ N = Z ⊓ X := by
     intro C _ _ γ hγ X Y hXY hXN hZY hX e
     refine ⟨?_, ?_⟩
     · rcases dich hγ X Y Z e with h | h
       · exfalso
         have h' : Z ≤ X := by
           have : Y ⊓ Z = Z := inf_eq_right.2 hZY
-          rw [← this]; exact h
+          rw [← this]
+          exact h
         have := hmono h'
         omega
       · exact h

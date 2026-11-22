@@ -14,12 +14,20 @@ noncomputable section
 open Matrix Finset
 open scoped InnerProductSpace ComplexConjugate
 open PositivityTheory.RgTw (Mat)
-open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD UpperTheory.RealTr
+open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD
+  UpperTheory.RealTr
 open Formalism.REAL (GlRel IsWeight KHighest Cas)
 
-theorem UpperTheory.RealTr.irrCh :
-    ∀ (n : ℕ) (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (F : Fin n → Fin n → Module.End ℂ V), UF F → LocF F → ∀ ν : Wt n, hw F ν ≠ ⊥ → Dom ν ∧ ∃ (S : Submodule ℂ V) (c : FR n) (d : ℂ), FiniteDimensional ℂ S ∧ Stb F S ∧ IsCh F S 1 c ∧ d ≠ 0 ∧
-      alt (rhoV n) * c = d • alt (ν + rhoV n) := by
+theorem UpperTheory.RealTr.irrCh
+    : ∀ (n : ℕ) (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+        (F : Fin n → Fin n → Module.End ℂ V),
+      UF F → LocF F
+        → ∀ ν : Wt n,
+          hw F ν ≠ ⊥
+            → Dom ν
+              ∧ ∃ (S : Submodule ℂ V) (c : FR n) (d : ℂ),
+                FiniteDimensional ℂ S ∧ Stb F S ∧ IsCh F S 1 c ∧ d ≠ 0
+                  ∧ alt (rhoV n) * c = d • alt (ν + rhoV n) := by
   intro n V _ _ F hU hL ν hν
   obtain ⟨x, hxh, hx0⟩ := (Submodule.ne_bot_iff _).1 hν
   obtain ⟨S0, hS0f, hxS0, hS0⟩ := hL x
@@ -48,7 +56,9 @@ theorem UpperTheory.RealTr.irrCh :
   have key := wcfIso n V F hU S hSf hSs 1 c ν hCm hc hoth
   have hIf : FiniteDimensional ℂ (hw F ν ⊓ S : Submodule ℂ V) :=
     Submodule.finiteDimensional_of_le (inf_le_right : hw F ν ⊓ S ≤ S)
-  have htr : trOn (hw F ν ⊓ S) (1 : Module.End ℂ V) = (Module.finrank ℂ (hw F ν ⊓ S : Submodule ℂ V) : ℂ) :=
+  have htr
+      : trOn (hw F ν ⊓ S) (1 : Module.End ℂ V)
+        = (Module.finrank ℂ (hw F ν ⊓ S : Submodule ℂ V) : ℂ) :=
     (trAdd V (1 : Module.End ℂ V)).2.2.2 _ hIf
   refine ⟨hD, S, c, trOn (hw F ν ⊓ S) 1, hSf, hSs, hc, ?_, key⟩
   rw [htr, Nat.cast_ne_zero]

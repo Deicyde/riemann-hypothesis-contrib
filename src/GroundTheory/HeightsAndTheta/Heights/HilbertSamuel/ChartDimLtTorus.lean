@@ -17,22 +17,27 @@ namespace ChartDimLt
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem exists_dim_add_card_le {J : Ideal (MvPolynomial (Σ k, ι k) ℂ)}
-    (hJ : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal J) (p : (k : K) → ι k)
-    (𝔮 : Ideal (MvPolynomial (Σ k, ι k) ℂ)) [𝔮.IsPrime] (h𝔮 : ReciprocityTheory.AnForm.R.chartIdeal J p ≤ 𝔮) :
-    ∃ s : ℕ, ringKrullDim (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) = s ∧
-      ((s + Fintype.card K : ℕ) : WithBot ℕ∞) ≤ ringKrullDim (MvPolynomial (Σ k, ι k) ℂ ⧸ J) := by
+theorem exists_dim_add_card_le
+    {J : Ideal (MvPolynomial (Σ k, ι k) ℂ)} (hJ : ReciprocityTheory.AnForm.R.IsMultiHomogIdeal J)
+    (p : (k : K) → ι k)
+    (𝔮 : Ideal (MvPolynomial (Σ k, ι k) ℂ)) [𝔮.IsPrime]
+    (h𝔮 : ReciprocityTheory.AnForm.R.chartIdeal J p ≤ 𝔮)
+    : ∃ s : ℕ,
+      ringKrullDim (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) = s
+        ∧ ((s + Fintype.card K : ℕ) : WithBot ℕ∞)
+          ≤ ringKrullDim (MvPolynomial (Σ k, ι k) ℂ ⧸ J) := by
   classical
   let : CommRing (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) := Ideal.Quotient.commRing 𝔮
   have : IsDomain (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) := Ideal.Quotient.isDomain 𝔮
-  let y : (Σ k, ι k) → MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) :=
-    fun q => C (Ideal.Quotient.mk 𝔮 (X q))
+  let y : (Σ k, ι k) → MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) := fun q =>
+    C (Ideal.Quotient.mk 𝔮 (X q))
   let θ : (MvPolynomial (Σ k, ι k) ℂ) →ₐ[ℂ] MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) :=
     aeval (fun q => (X q.1 : MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) * y q)
   have hy : ∀ f : (MvPolynomial (Σ k, ι k) ℂ), aeval y f = C (Ideal.Quotient.mk 𝔮 f) := by
     intro f
-    have : (aeval y : (MvPolynomial (Σ k, ι k) ℂ) →ₐ[ℂ] MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) =
-        (IsScalarTower.toAlgHom ℂ (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)
+    have : (aeval y
+          : (MvPolynomial (Σ k, ι k) ℂ) →ₐ[ℂ] MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))
+        = (IsScalarTower.toAlgHom ℂ (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)
           (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))).comp (Ideal.Quotient.mkₐ ℂ 𝔮) := by
       apply MvPolynomial.algHom_ext
       intro q
@@ -50,8 +55,8 @@ theorem exists_dim_add_card_le {J : Ideal (MvPolynomial (Σ k, ι k) ℂ)}
       show θ f = 0
       simp only [θ]
       rw [ReciprocityTheory.AnForm.R.aeval_smul_of_isMultiHomog ha
-          (X : K → MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) y, hy,
-        Ideal.Quotient.eq_zero_iff_mem.mpr hf𝔮, map_zero, mul_zero]
+          (X : K → MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) y,
+        hy, Ideal.Quotient.eq_zero_iff_mem.mpr hf𝔮, map_zero, mul_zero]
     rw [hJS]
     exact hle
   have hdimR : ringKrullDim θ.range ≤ ringKrullDim (MvPolynomial (Σ k, ι k) ℂ ⧸ J) := by
@@ -72,18 +77,20 @@ theorem exists_dim_add_card_le {J : Ideal (MvPolynomial (Σ k, ι k) ℂ)}
   have : FaithfulSMul ℂ (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) :=
     (faithfulSMul_iff_algebraMap_injective ℂ (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)).mpr
       (algebraMap ℂ (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)).injective
-  have : FaithfulSMul (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) :=
+  have : FaithfulSMul (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)
+      (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) :=
     (faithfulSMul_iff_algebraMap_injective (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)
-      (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))).mpr
+        (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))).mpr
       (MvPolynomial.C_injective K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))
   have : FaithfulSMul ℂ θ.range :=
     (faithfulSMul_iff_algebraMap_injective ℂ θ.range).mpr (algebraMap ℂ θ.range).injective
   have : FaithfulSMul θ.range (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) :=
     (faithfulSMul_iff_algebraMap_injective θ.range
       (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))).mpr Subtype.val_injective
-  have hT1 : trdeg ℂ (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) +
-      trdeg (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) =
-      trdeg ℂ (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) :=
+  have hT1
+      : trdeg ℂ (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)
+          + trdeg (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))
+        = trdeg ℂ (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) :=
     trdeg_add_eq ℂ (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)
 
   have h1 : ∀ k, Ideal.Quotient.mk 𝔮 (X ⟨k, p k⟩ : (MvPolynomial (Σ k, ι k) ℂ)) = 1 := by
@@ -94,16 +101,16 @@ theorem exists_dim_add_card_le {J : Ideal (MvPolynomial (Σ k, ι k) ℂ)}
     intro k
     refine (θ.mem_range).mpr ⟨X ⟨k, p k⟩, ?_⟩
     simp only [θ, y, aeval_X, h1, map_one, mul_one]
-  have hXq : ∀ q, (X q.1 : MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) * y q ∈ θ.range := fun q =>
-    (θ.mem_range).mpr ⟨X q, by simp only [θ, aeval_X]⟩
+  have hXq : ∀ q, (X q.1 : MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) * y q ∈ θ.range :=
+    fun q => (θ.mem_range).mpr ⟨X q, by simp only [θ, aeval_X]⟩
   let AC := Subalgebra.algebraicClosure θ.range (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))
   have hRAC : ∀ t ∈ θ.range, t ∈ AC := fun t ht =>
     (Subalgebra.mem_algebraicClosure _ _).mpr (isAlgebraic_algebraMap (⟨t, ht⟩ : θ.range))
   have hyAC : ∀ q, y q ∈ AC := fun q =>
-    (Subalgebra.mem_algebraicClosure _ _).mpr (IsAlgebraic.of_mul
-      (mem_nonZeroDivisors_of_ne_zero (X_ne_zero q.1))
-      ((Subalgebra.mem_algebraicClosure _ _).mp (hRAC _ (hXk q.1)))
-      ((Subalgebra.mem_algebraicClosure _ _).mp (hRAC _ (hXq q))))
+    (Subalgebra.mem_algebraicClosure _ _).mpr
+      (IsAlgebraic.of_mul (mem_nonZeroDivisors_of_ne_zero (X_ne_zero q.1))
+        ((Subalgebra.mem_algebraicClosure _ _).mp (hRAC _ (hXk q.1)))
+        ((Subalgebra.mem_algebraicClosure _ _).mp (hRAC _ (hXq q))))
   have hCAC : ∀ f : (MvPolynomial (Σ k, ι k) ℂ), C (Ideal.Quotient.mk 𝔮 f) ∈ AC := by
     intro f
     refine MvPolynomial.induction_on (motive := fun f => C (Ideal.Quotient.mk 𝔮 f) ∈ AC) f ?_ ?_ ?_
@@ -130,13 +137,15 @@ theorem exists_dim_add_card_le {J : Ideal (MvPolynomial (Σ k, ι k) ℂ)}
       exact AC.mul_mem hf (hRAC _ (hXk k))
   have : Algebra.IsAlgebraic θ.range (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) :=
     ⟨fun t => (Subalgebra.mem_algebraicClosure _ _).mp (hall t)⟩
-  have hT2 : trdeg ℂ θ.range + trdeg θ.range (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) =
-      trdeg ℂ (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) :=
+  have hT2
+      : trdeg ℂ θ.range + trdeg θ.range (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))
+        = trdeg ℂ (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) :=
     trdeg_add_eq ℂ θ.range
   have h0 : trdeg θ.range (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) = 0 := trdeg_eq_zero
   rw [h0, add_zero] at hT2
-  have hK : trdeg (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮)) =
-      (Fintype.card K : Cardinal) := by
+  have hK
+      : trdeg (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮) (MvPolynomial K (MvPolynomial (Σ k, ι k) ℂ ⧸ 𝔮))
+        = (Fintype.card K : Cardinal) := by
     rw [MvPolynomial.trdeg_of_isDomain, Cardinal.lift_id, Cardinal.mk_fintype]
   rw [hK, hAtr, ← hT2, hRtr] at hT1
   have hnat : sA + Fintype.card K = sR := by exact_mod_cast hT1

@@ -16,8 +16,10 @@ section Abstract
 
 variable {p : ℕ} [hp : Fact p.Prime] {L : Type*} [Field L] (v : Valuation L ℝ≥0)
 
-theorem eq_of_zpow_mul {c a b : ℝ≥0} (h0 : 0 < c) (h1 : c < 1) (ha : c < a) (ha1 : a ≤ 1) (hb : c < b) (hb1 : b ≤ 1)
-    {k l : ℤ} (h : c ^ k * a = c ^ l * b) : a = b := by
+theorem eq_of_zpow_mul
+    {c a b : ℝ≥0} (h0 : 0 < c) (h1 : c < 1) (ha : c < a) (ha1 : a ≤ 1) (hb : c < b) (hb1 : b ≤ 1)
+    {k l : ℤ} (h : c ^ k * a = c ^ l * b)
+    : a = b := by
   have key : ∀ {a b : ℝ≥0} {k l : ℤ}, c < a → b ≤ 1 → c ^ k * a = c ^ l * b → ¬ k < l := by
     intro a b k l ha hb1 h hkl
     have h2 : c ^ l ≤ c ^ (k + 1) := zpow_le_zpow_right_of_le_one₀ h0 h1.le (by omega)
@@ -30,23 +32,29 @@ theorem eq_of_zpow_mul {c a b : ℝ≥0} (h0 : 0 < c) (h1 : c < 1) (ha : c < a) 
   subst hkl
   exact mul_left_cancel₀ (zpow_pos h0 k).ne' h
 
-theorem val_int (φ : ℤ_[p] →+* L) (hφ : ∀ z, v (φ z) ≤ 1) {z : ℤ_[p]} (hz : z ≠ 0) :
-    ∃ n : ℕ, v (φ z) = v (p : L) ^ n := by
+theorem val_int (φ : ℤ_[p] →+* L) (hφ : ∀ z, v (φ z) ≤ 1) {z : ℤ_[p]} (hz : z ≠ 0)
+    : ∃ n : ℕ, v (φ z) = v (p : L) ^ n := by
   refine ⟨z.valuation, ?_⟩
   set u := PadicInt.unitCoeff hz
   have hu : v (φ u) = 1 := by
     refine le_antisymm (hφ _) ?_
     have h1 : v (φ u) * v (φ (u⁻¹ : ℤ_[p]ˣ)) = 1 := by
       rw [← map_mul, ← map_mul, Units.mul_inv, map_one, map_one]
-    calc (1 : ℝ≥0) = v (φ u) * v (φ (u⁻¹ : ℤ_[p]ˣ)) := h1.symm
+    calc
+      (1 : ℝ≥0)
+        = v (φ u) * v (φ (u⁻¹ : ℤ_[p]ˣ)) := h1.symm
       _ ≤ v (φ u) := mul_le_of_le_one_right' (hφ _)
   conv_lhs => rw [PadicInt.unitCoeff_spec hz]
   rw [map_mul, map_mul, hu, one_mul, map_pow, map_pow, map_natCast]
 
-theorem exists_eq_sum (φ : ℤ_[p] →+* L) (hφ : ∀ z, v (φ z) ≤ 1) (h1 : v (p : L) < 1) {ι : Type} [Fintype ι]
+theorem exists_eq_sum
+    (φ : ℤ_[p] →+* L) (hφ : ∀ z, v (φ z) ≤ 1)
+    (h1 : v (p : L) < 1)
+    {ι : Type} [Fintype ι]
     (b : ι → L) (hb : ∀ i, v (b i) ≤ 1)
     (h : ∀ x, v x ≤ 1 → ∃ (l : ι → ℤ_[p]) (y : L), v y ≤ 1 ∧ x = ∑ i, b i * φ (l i) + p * y)
-    (x : L) (hx : v x ≤ 1) : ∃ l : ι → ℤ_[p], x = ∑ i, b i * φ (l i) := by
+    (x : L) (hx : v x ≤ 1)
+    : ∃ l : ι → ℤ_[p], x = ∑ i, b i * φ (l i) := by
   have hk : ∀ k : ℕ, ∃ (l : ι → ℤ_[p]) (y : L), v y ≤ 1 ∧ x = ∑ i, b i * φ (l i) + p ^ k * y := by
     intro k
     induction k with
@@ -55,7 +63,8 @@ theorem exists_eq_sum (φ : ℤ_[p] →+* L) (hφ : ∀ z, v (φ z) ≤ 1) (h1 :
       obtain ⟨l, y, hy, rfl⟩ := ih
       obtain ⟨l', y', hy', rfl⟩ := h y hy
       refine ⟨fun i => l i + p ^ k * l' i, y', hy', ?_⟩
-      simp only [map_add (f := _), map_mul, map_pow, map_natCast, mul_add, Finset.sum_add_distrib, Finset.mul_sum]
+      simp only [map_add (f := _), map_mul, map_pow, map_natCast, mul_add, Finset.sum_add_distrib,
+        Finset.mul_sum]
       rw [add_assoc, pow_succ, mul_assoc]
       congr 2
       exact Finset.sum_congr rfl fun i _ => by ring
@@ -73,7 +82,8 @@ theorem exists_eq_sum (φ : ℤ_[p] →+* L) (hφ : ∀ z, v (φ z) ≤ 1) (h1 :
       have h2 : ‖l n i - a i‖ ≤ (p : ℝ) ^ (-(k : ℤ)) := by
         rw [← dist_eq_norm]
         exact (dist_le_pi_dist (l n) a i).trans hn.le
-      obtain ⟨w, hw⟩ := Ideal.mem_span_singleton'.1 ((PadicInt.norm_le_pow_iff_mem_span_pow _ k).1 h2)
+      obtain ⟨w, hw⟩ :=
+        Ideal.mem_span_singleton'.1 ((PadicInt.norm_le_pow_iff_mem_span_pow _ k).1 h2)
       exact ⟨w, hw.symm⟩
     choose w hw using hd
     have he : x - ∑ i, b i * φ (a i) = (∑ i, b i * φ (w i) + p ^ (n - k) * y n) * p ^ k := by
@@ -90,24 +100,28 @@ theorem exists_eq_sum (φ : ℤ_[p] →+* L) (hφ : ∀ z, v (φ z) ≤ 1) (h1 :
   have h0 := ge_of_tendsto' (NNReal.tendsto_pow_atTop_nhds_zero_of_lt_one h1) hle
   exact sub_eq_zero.1 ((Valuation.zero_iff v).1 (le_antisymm h0 zero_le))
 
-theorem exists_expansion (φ : ℤ_[p] →+* L) {F : ℕ} (κ : Fin F → L) {π : L} (hπ0 : 0 < v π)
-    (hπ : ∀ x, v x < 1 → v x ≤ v π)
-    (hκ : ∀ x, v x ≤ 1 → ∃ μ : Fin F → ℤ_[p], v (x - ∑ j, κ j * φ (μ j)) < 1) (m : ℕ) :
-    ∀ x, v x ≤ 1 → ∃ (l : Fin F → Fin m → ℤ_[p]) (y : L), v y ≤ 1 ∧
-      x = ∑ j, ∑ s : Fin m, κ j * π ^ (s : ℕ) * φ (l j s) + π ^ m * y := by
+theorem exists_expansion
+    (φ : ℤ_[p] →+* L)
+    {F : ℕ} (κ : Fin F → L)
+    {π : L} (hπ0 : 0 < v π) (hπ : ∀ x, v x < 1 → v x ≤ v π)
+    (hκ : ∀ x, v x ≤ 1 → ∃ μ : Fin F → ℤ_[p], v (x - ∑ j, κ j * φ (μ j)) < 1) (m : ℕ)
+    : ∀ x,
+      v x ≤ 1
+        → ∃ (l : Fin F → Fin m → ℤ_[p]) (y : L),
+          v y ≤ 1 ∧ x = ∑ j, ∑ s : Fin m, κ j * π ^ (s : ℕ) * φ (l j s) + π ^ m * y := by
   have hπne : π ≠ 0 := (Valuation.pos_iff v).1 hπ0
   induction m with
   | zero => exact fun x hx => ⟨fun _ => Fin.elim0, x, hx, by simp⟩
   | succ m ih =>
     intro x hx
     obtain ⟨μ, hμ⟩ := hκ x hx
-    obtain ⟨l, y, hy, he⟩ := ih ((x - ∑ j, κ j * φ (μ j)) / π) (by
-      rw [map_div₀]; exact (div_le_one hπ0).2 (hπ _ hμ))
+    obtain ⟨l, y, hy, he⟩ :=
+      ih ((x - ∑ j, κ j * φ (μ j)) / π) (by rw [map_div₀]; exact (div_le_one hπ0).2 (hπ _ hμ))
     refine ⟨fun j => Fin.cons (μ j) (l j), y, hy, ?_⟩
     rw [div_eq_iff hπne, sub_eq_iff_eq_add'] at he
     rw [he]
-    simp only [Fin.sum_univ_succ, Fin.cons_zero, Fin.cons_succ, Fin.val_zero, Fin.val_succ, pow_zero, mul_one,
-      Finset.sum_add_distrib, add_mul, Finset.sum_mul, pow_succ]
+    simp only [Fin.sum_univ_succ, Fin.cons_zero, Fin.cons_succ, Fin.val_zero, Fin.val_succ,
+      pow_zero, mul_one, Finset.sum_add_distrib, add_mul, Finset.sum_mul, pow_succ]
     rw [add_assoc]
     congr 2
     · exact Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun s _ => by ring
@@ -115,14 +129,13 @@ theorem exists_expansion (φ : ℤ_[p] →+* L) {F : ℕ} (κ : Fin F → L) {π
 
 variable [Algebra ℚ_[p] L]
 
-
 variable (p L) in
 noncomputable def fromInt : ℤ_[p] →+* L := (algebraMap ℚ_[p] L).comp PadicInt.Coe.ringHom
 
 theorem fromInt_apply (z : ℤ_[p]) : fromInt p L z = algebraMap ℚ_[p] L z := rfl
 
-theorem val_rat (hφ : ∀ z, v (fromInt p L z) ≤ 1) {a : ℚ_[p]} (ha : a ≠ 0) :
-    ∃ k : ℤ, v (algebraMap ℚ_[p] L a) = v (p : L) ^ k := by
+theorem val_rat (hφ : ∀ z, v (fromInt p L z) ≤ 1) {a : ℚ_[p]} (ha : a ≠ 0)
+    : ∃ k : ℤ, v (algebraMap ℚ_[p] L a) = v (p : L) ^ k := by
   obtain ⟨x, y, hy, rfl⟩ := IsFractionRing.div_surjective (A := ℤ_[p]) a
   have hy0 : y ≠ 0 := nonZeroDivisors.ne_zero hy
   have hx0 : x ≠ 0 := by rintro rfl; simp at ha
@@ -137,8 +150,8 @@ theorem val_rat (hφ : ∀ z, v (fromInt p L z) ≤ 1) {a : ℚ_[p]} (ha : a ≠
 
 variable [FiniteDimensional ℚ_[p] L]
 
-theorem finite_values (hφ : ∀ z, v (fromInt p L z) ≤ 1) (h0 : 0 < v (p : L)) (h1 : v (p : L) < 1) :
-    {γ : ℝ≥0 | (∃ x, v x = γ) ∧ v (p : L) < γ ∧ γ ≤ 1}.Finite := by
+theorem finite_values (hφ : ∀ z, v (fromInt p L z) ≤ 1) (h0 : 0 < v (p : L)) (h1 : v (p : L) < 1)
+    : {γ : ℝ≥0 | (∃ x, v x = γ) ∧ v (p : L) < γ ∧ γ ≤ 1}.Finite := by
   classical
   set S := {γ : ℝ≥0 | (∃ x, v x = γ) ∧ v (p : L) < γ ∧ γ ≤ 1}
   choose x hx using fun γ : S => γ.2.1
@@ -165,15 +178,18 @@ theorem finite_values (hφ : ∀ z, v (fromInt p L z) ≤ 1) (h0 : 0 < v (p : L)
     exact hj0.ne hsum
   exact Set.finite_coe_iff.1 hli.finite
 
-theorem exists_uniformiser (hφ : ∀ z, v (fromInt p L z) ≤ 1) (h0 : 0 < v (p : L)) (h1 : v (p : L) < 1) :
-    ∃ (π : L) (E : ℕ), 0 < v π ∧ v π < 1 ∧ (∀ x, v x < 1 → v x ≤ v π) ∧ 1 ≤ E ∧ v π ^ E = v (p : L) := by
+theorem exists_uniformiser
+    (hφ : ∀ z, v (fromInt p L z) ≤ 1) (h0 : 0 < v (p : L)) (h1 : v (p : L) < 1)
+    : ∃ (π : L) (E : ℕ),
+      0 < v π ∧ v π < 1 ∧ (∀ x, v x < 1 → v x ≤ v π) ∧ 1 ≤ E ∧ v π ^ E = v (p : L) := by
   have hfin : {γ : ℝ≥0 | (∃ x, v x = γ) ∧ v (p : L) ≤ γ ∧ γ < 1}.Finite := by
     refine ((finite_values v hφ h0 h1).insert (v (p : L))).subset ?_
     rintro γ ⟨h2, h3, h4⟩
     rcases h3.eq_or_lt with h | h
     · exact Or.inl h.symm
     · exact Or.inr ⟨h2, h, h4.le⟩
-  obtain ⟨γ, ⟨⟨π, rfl⟩, h3, h4⟩, hmax⟩ := Set.exists_max_image _ id hfin ⟨v (p : L), ⟨p, rfl⟩, le_rfl, h1⟩
+  obtain ⟨γ, ⟨⟨π, rfl⟩, h3, h4⟩, hmax⟩ :=
+    Set.exists_max_image _ id hfin ⟨v (p : L), ⟨p, rfl⟩, le_rfl, h1⟩
   have hπ0 : 0 < v π := h0.trans_le h3
   have hπ : ∀ x, v x < 1 → v x ≤ v π := fun x hx => by
     rcases le_total (v (p : L)) (v x) with h | h
@@ -192,14 +208,18 @@ theorem exists_uniformiser (hφ : ∀ z, v (fromInt p L z) ≤ 1) (h0 : 0 < v (p
   · rw [pow_zero] at hE; exact absurd hE h1.ne'
   · exact h
 
-theorem exists_residue_basis (hφ : ∀ z, v (fromInt p L z) ≤ 1) (h1 : v (p : L) < 1) :
-    ∃ (F : ℕ) (κ : Fin F → L), (∀ j, v (κ j) ≤ 1) ∧
-      (∀ μ : Fin F → ℤ_[p], (∃ j, ¬ (p : ℤ_[p]) ∣ μ j) → v (∑ j, κ j * fromInt p L (μ j)) = 1) ∧
-      ∀ x, v x ≤ 1 → ∃ μ : Fin F → ℤ_[p], v (x - ∑ j, κ j * fromInt p L (μ j)) < 1 := by
+theorem exists_residue_basis (hφ : ∀ z, v (fromInt p L z) ≤ 1) (h1 : v (p : L) < 1)
+    : ∃ (F : ℕ) (κ : Fin F → L),
+      (∀ j, v (κ j) ≤ 1)
+        ∧ (∀ μ : Fin F → ℤ_[p], (∃ j, ¬ (p : ℤ_[p]) ∣ μ j) → v (∑ j, κ j * fromInt p L (μ j)) = 1)
+        ∧ ∀ x, v x ≤ 1 → ∃ μ : Fin F → ℤ_[p], v (x - ∑ j, κ j * fromInt p L (μ j)) < 1 := by
   by_contra hcon
   push_neg at hcon
-  have hall : ∀ F : ℕ, ∃ κ : Fin F → L, (∀ j, v (κ j) ≤ 1) ∧
-      (∀ μ : Fin F → ℤ_[p], (∃ j, ¬ (p : ℤ_[p]) ∣ μ j) → v (∑ j, κ j * fromInt p L (μ j)) = 1) := by
+  have hall
+      : ∀ F : ℕ, ∃ κ : Fin F → L,
+        (∀ j, v (κ j) ≤ 1)
+          ∧ (∀ μ : Fin F → ℤ_[p],
+            (∃ j, ¬ (p : ℤ_[p]) ∣ μ j) → v (∑ j, κ j * fromInt p L (μ j)) = 1) := by
     intro F
     induction F with
     | zero => exact ⟨Fin.elim0, fun j => j.elim0, fun μ ⟨j, _⟩ => j.elim0⟩
@@ -211,8 +231,9 @@ theorem exists_residue_basis (hφ : ∀ z, v (fromInt p L z) ≤ 1) (h1 : v (p :
       simp only [Fin.cons_zero, Fin.cons_succ]
       by_cases h : (p : ℤ_[p]) ∣ μ 0
       · obtain ⟨j, hj⟩ := hμ
-        have hs := hu (fun j => μ j.succ) (by
-          refine Fin.cases (fun hj => absurd h hj) (fun j hj => ⟨j, hj⟩) j hj)
+        have hs :=
+          hu (fun j => μ j.succ) (by
+            refine Fin.cases (fun hj => absurd h hj) (fun j hj => ⟨j, hj⟩) j hj)
         obtain ⟨w, hw⟩ := h
         have hlt : v (x * fromInt p L (μ 0)) < 1 := by
           rw [hw, map_mul, map_mul, map_mul, map_natCast]
@@ -226,10 +247,12 @@ theorem exists_residue_basis (hφ : ∀ z, v (fromInt p L z) ≤ 1) (h1 : v (p :
         · rw [map_mul]; exact mul_le_one' hx (hφ _)
         · rw [map_mul]; exact mul_le_one' (hκ _) (hφ _)
         · have h2 := hfar fun j => -(w * μ j.succ)
-          have h3 : x - ∑ j, κ j * fromInt p L (-(w * μ j.succ)) =
-              fromInt p L w * (x * fromInt p L (μ 0) + ∑ j, κ j * fromInt p L (μ (Fin.succ j))) := by
-            rw [mul_add, mul_left_comm, ← map_mul, hw, map_one, mul_one, Finset.mul_sum, sub_eq_add_neg,
-              ← Finset.sum_neg_distrib]
+          have h3
+              : x - ∑ j, κ j * fromInt p L (-(w * μ j.succ))
+                = fromInt p L w
+                  * (x * fromInt p L (μ 0) + ∑ j, κ j * fromInt p L (μ (Fin.succ j))) := by
+            rw [mul_add, mul_left_comm, ← map_mul, hw, map_one, mul_one, Finset.mul_sum,
+              sub_eq_add_neg, ← Finset.sum_neg_distrib]
             congr 1
             exact Finset.sum_congr rfl fun j _ => by rw [map_neg, map_mul]; ring
           rw [h3, map_mul] at h2
@@ -242,13 +265,20 @@ theorem exists_residue_basis (hφ : ∀ z, v (fromInt p L z) ≤ 1) (h1 : v (p :
     obtain ⟨j, -, hmax⟩ := Finset.univ.exists_max_image (fun i => ‖g i‖) ⟨i, Finset.mem_univ i⟩
     have hj0 : 0 < ‖g j‖ := (norm_pos_iff.2 hgi).trans_le (hmax i (Finset.mem_univ i))
     have hgj : g j ≠ 0 := norm_pos_iff.1 hj0
-    let μ : Fin _ → ℤ_[p] := fun k => ⟨g k / g j, by
-      rw [PadicInt.mem_subring_iff, norm_div]
-      exact (div_le_one hj0).2 (hmax k (Finset.mem_univ k))⟩
-    have h2 := hu μ ⟨j, by
-      have : μ j = 1 := Subtype.ext (div_self hgj)
-      rw [this, ← isUnit_iff_dvd_one]
-      exact PadicInt.irreducible_p.not_isUnit⟩
+    let μ : Fin _ → ℤ_[p] := fun k => ⟨
+      g k / g j,
+      by
+        rw [PadicInt.mem_subring_iff, norm_div]
+        exact (div_le_one hj0).2 (hmax k (Finset.mem_univ k))
+    ⟩
+    have h2 :=
+      hu μ ⟨
+        j,
+        by
+          have : μ j = 1 := Subtype.ext (div_self hgj)
+          rw [this, ← isUnit_iff_dvd_one]
+          exact PadicInt.irreducible_p.not_isUnit
+      ⟩
     have h3 : ∑ k, κ k * fromInt p L (μ k) = (g j)⁻¹ • ∑ k, g k • κ k := by
       rw [Finset.smul_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
@@ -258,33 +288,51 @@ theorem exists_residue_basis (hφ : ∀ z, v (fromInt p L z) ≤ 1) (h1 : v (p :
   have := hli.fintype_card_le_finrank
   simp at this
 
-theorem exists_basis (hφ : ∀ z, v (fromInt p L z) ≤ 1) (h0 : 0 < v (p : L)) (h1 : v (p : L) < 1) :
-    ∃ (E F : ℕ) (π : L) (κ : Fin F → L), 1 ≤ E ∧ v π ^ E = v (p : L) ∧ (∀ j, v (κ j) ≤ 1) ∧
-      (∀ μ : Fin F → ℤ_[p], (∃ j, ¬ (p : ℤ_[p]) ∣ μ j) → v (∑ j, κ j * fromInt p L (μ j)) = 1) ∧
-      ∀ x, v x ≤ 1 → ∃ l : Fin F → Fin E → ℤ_[p],
-        x = ∑ j, ∑ s : Fin E, κ j * π ^ (s : ℕ) * fromInt p L (l j s) := by
+theorem exists_basis (hφ : ∀ z, v (fromInt p L z) ≤ 1) (h0 : 0 < v (p : L)) (h1 : v (p : L) < 1)
+    : ∃ (E F : ℕ) (π : L) (κ : Fin F → L),
+      1 ≤ E ∧ v π ^ E = v (p : L) ∧ (∀ j, v (κ j) ≤ 1)
+        ∧ (∀ μ : Fin F → ℤ_[p], (∃ j, ¬ (p : ℤ_[p]) ∣ μ j) → v (∑ j, κ j * fromInt p L (μ j)) = 1)
+        ∧ ∀ x,
+          v x ≤ 1
+            → ∃ l : Fin F → Fin E → ℤ_[p],
+              x = ∑ j, ∑ s : Fin E, κ j * π ^ (s : ℕ) * fromInt p L (l j s) := by
   obtain ⟨π, E, hπ0, hπ1, hπ, hE, hπE⟩ := exists_uniformiser v hφ h0 h1
   obtain ⟨F, κ, hκ, hu, hsp⟩ := exists_residue_basis v hφ h1
   refine ⟨E, F, π, κ, hE, hπE, hκ, hu, fun x hx => ?_⟩
   have hp0 : (p : L) ≠ 0 := (Valuation.pos_iff v).1 h0
-  obtain ⟨l, hl⟩ := exists_eq_sum v (fromInt p L) hφ h1 (fun i : Fin F × Fin E => κ i.1 * π ^ (i.2 : ℕ))
-    (fun i => by rw [map_mul, map_pow]; exact mul_le_one' (hκ _) (pow_le_one' hπ1.le _))
-    (fun x hx => by
-      obtain ⟨l, y, hy, he⟩ := exists_expansion v (fromInt p L) κ hπ0 hπ hsp E x hx
-      refine ⟨fun i => l i.1 i.2, π ^ E / p * y, ?_, ?_⟩
-      · rw [map_mul, map_div₀, map_pow, hπE, div_self h0.ne', one_mul]; exact hy
-      · rw [Fintype.sum_prod_type, ← mul_assoc, mul_div_cancel₀ _ hp0]; exact he) x hx
+  obtain ⟨l, hl⟩ :=
+    exists_eq_sum v (fromInt p L) hφ h1
+      (fun i : Fin F × Fin E => κ i.1 * π ^ (i.2 : ℕ))
+      (fun i => by rw [map_mul, map_pow]; exact mul_le_one' (hκ _) (pow_le_one' hπ1.le _))
+      (fun x hx => by
+        obtain ⟨l, y, hy, he⟩ := exists_expansion v (fromInt p L) κ hπ0 hπ hsp E x hx
+        refine ⟨fun i => l i.1 i.2, π ^ E / p * y, ?_, ?_⟩
+        · rw [map_mul, map_div₀, map_pow, hπE, div_self h0.ne', one_mul]; exact hy
+        · rw [Fintype.sum_prod_type, ← mul_assoc, mul_div_cancel₀ _ hp0]; exact he)
+      x hx
   exact ⟨fun j s => l (j, s), by rw [hl, Fintype.sum_prod_type]⟩
 
 end Abstract
 
-theorem okbasis : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω], IsClo p Ω → ∀ (v : Valuation Ω ℝ≥0), (∀ x : Ω, v x ≤ 1 ↔ IsInt (p := p) x) → 0 < v (p : Ω) → v (p : Ω) < 1 → ∀ (d : ℕ) (e : Fin d → Ω), (∀ t, IsInt (p := p) (e t) ∧ IsAlgZp p (e t)) → ∃ (E F : ℕ) (π : Ω) (κ : Fin F → Ω) (lam : Fin d → Fin F → Fin E → ℤ_[p]), 1 ≤ E ∧ IsAlgZp p π ∧ v π ^ E = v (p : Ω) ∧ (∀ j, IsInt (p := p) (κ j) ∧ IsAlgZp p (κ j)) ∧ (∀ μ : Fin F → ℤ_[p], (∃ j, ¬ (p : ℤ_[p]) ∣ μ j) → v (∑ j, κ j * zp Ω (μ j)) = 1) ∧ ∀ t, e t = ∑ j, ∑ s : Fin E, κ j * π ^ (s : ℕ) * zp Ω (lam t j s) := by
+theorem okbasis
+    : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
+      IsClo p Ω
+        → ∀ (v : Valuation Ω ℝ≥0),
+          (∀ x : Ω, v x ≤ 1 ↔ IsInt (p := p) x) → 0 < v (p : Ω) → v (p : Ω) < 1
+            → ∀ (d : ℕ) (e : Fin d → Ω),
+              (∀ t, IsInt (p := p) (e t) ∧ IsAlgZp p (e t))
+                → ∃ (E F : ℕ) (π : Ω) (κ : Fin F → Ω) (lam : Fin d → Fin F → Fin E → ℤ_[p]),
+                  1 ≤ E ∧ IsAlgZp p π ∧ v π ^ E = v (p : Ω)
+                    ∧ (∀ j, IsInt (p := p) (κ j) ∧ IsAlgZp p (κ j))
+                    ∧ (∀ μ : Fin F → ℤ_[p],
+                      (∃ j, ¬ (p : ℤ_[p]) ∣ μ j) → v (∑ j, κ j * zp Ω (μ j)) = 1)
+                    ∧ ∀ t, e t = ∑ j, ∑ s : Fin E, κ j * π ^ (s : ℕ) * zp Ω (lam t j s) := by
   intro p hp Ω _ _ hc v hv h0 h1 d e he
   letI : Algebra ℤ_[p] Ω := ((algebraMap (O0 p) Ω).comp (algebraMap ℤ_[p] (O0 p))).toAlgebra
   haveI : IsScalarTower ℤ_[p] (O0 p) Ω := IsScalarTower.of_algebraMap_eq fun _ => rfl
   have hzp : ∀ z, zp Ω z = algebraMap ℤ_[p] Ω z := fun z => by
     have h : (HahnSeries.single 0 z : Lau p) = algebraMap ℤ_[p] (Lau p) z := by
-      rw [HahnSeries.algebraMap_apply' ]; simp
+      rw [HahnSeries.algebraMap_apply']; simp
     rw [zp, h]
     rfl
   have halg : ∀ x : Ω, IsAlgZp p x ↔ IsAlgebraic ℤ_[p] x := fun x => by
@@ -293,7 +341,8 @@ theorem okbasis : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (
   have hle : ∀ z, v (algebraMap ℤ_[p] Ω z) ≤ 1 := fun z =>
     (hv _).2 (isIntegral_algebraMap (x := algebraMap ℤ_[p] (O0 p) z))
   have hinj : Function.Injective (algebraMap ℤ_[p] Ω) := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro z hz
     by_contra hz0
     obtain ⟨n, hn⟩ := val_int v _ hle hz0
@@ -315,11 +364,22 @@ theorem okbasis : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (
   let w : Valuation L ℝ≥0 := v.comap (algebraMap L Ω)
   have hw : ∀ x : L, w x = v (x : Ω) := fun x => rfl
   have hwp : w (p : L) = v (p : Ω) := by rw [hw]; simp
-  obtain ⟨E, F, π, κ, hE, hπ, hκ, hu, hsp⟩ := exists_basis (p := p) w
-    (fun z => by rw [hw, hf, hzp]; exact hle z) (hwp ▸ h0) (hwp ▸ h1)
+  obtain ⟨E, F, π, κ, hE, hπ, hκ, hu, hsp⟩ :=
+    exists_basis (p := p) w (fun z => by rw [hw, hf, hzp]; exact hle z) (hwp ▸ h0) (hwp ▸ h1)
   choose lam hlam using fun t => hsp ⟨e t, IntermediateField.subset_adjoin _ _ ⟨t, rfl⟩⟩ ((hv _).2 (he t).1)
-  refine ⟨E, F, π, fun j => κ j, lam, hE, hL π, by rw [← hwp, ← hπ, hw],
-    fun j => ⟨(hv _).1 (hκ j), hL _⟩, fun μ hμ => ?_, fun t => ?_⟩
+  refine ⟨
+    E,
+    F,
+    π,
+    fun j => κ j,
+    lam,
+    hE,
+    hL π,
+    by rw [← hwp, ← hπ, hw],
+    fun j => ⟨(hv _).1 (hκ j), hL _⟩,
+    fun μ hμ => ?_,
+    fun t => ?_
+  ⟩
   · have := hu μ hμ
     rw [hw] at this
     push_cast at this

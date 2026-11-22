@@ -13,7 +13,9 @@ noncomputable section
 
 namespace GlobalTheory.ColNorms.LastDatum
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker GlobalTheory.IndefiniteRowSideFullHecke.PlaceLogThetaBounds GlobalTheory.ColNorms
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV
+  Formalism.L2.Col Formalism.L2.Ker GlobalTheory.IndefiniteRowSideFullHecke.PlaceLogThetaBounds
+  GlobalTheory.ColNorms
 open scoped ComplexOrder
 open GlobalTheory.TopStep
 
@@ -21,11 +23,17 @@ section
 
 variable {X : Fields}
 
-theorem norm_psi {SB : Finset (HeightOneSpectrum (𝓞 X.E))} {cst : LocCst X SB} (hc : cst.Ok) (P : SB) {a : X.E}
-    (ha : IntAt P.1 ((Formalism.L2.Col.qOf P.1 : X.E) * a)) (σ : X.K →+* ℂ) : ‖σ (cst.psi P a)‖ = 1 := by
-  have hD : ∀ k : ℕ, IntAt P.1 ((Formalism.L2.Col.qOf P.1 : X.E) ^ cst.D P * ((k : X.E) * a)) := fun k => by
+theorem norm_psi
+    {SB : Finset (HeightOneSpectrum (𝓞 X.E))} {cst : LocCst X SB} (hc : cst.Ok) (P : SB)
+    {a : X.E} (ha : IntAt P.1 ((Formalism.L2.Col.qOf P.1 : X.E) * a))
+    (σ : X.K →+* ℂ)
+    : ‖σ (cst.psi P a)‖ = 1 := by
+  have hD
+      : ∀ k : ℕ,
+        IntAt P.1 ((Formalism.L2.Col.qOf P.1 : X.E) ^ cst.D P * ((k : X.E) * a)) := fun k => by
     obtain ⟨D, hD⟩ : ∃ D, cst.D P = D + 1 := ⟨cst.D P - 1, by have := hc.D_pos P; omega⟩
-    have := ((intAt_pow (intAt_nat (P := P.1) (Formalism.L2.Col.qOf P.1)) D).mul (intAt_nat k)).mul ha
+    have :=
+      ((intAt_pow (intAt_nat (P := P.1) (Formalism.L2.Col.qOf P.1)) D).mul (intAt_nat k)).mul ha
     convert this using 1
     rw [hD]
     ring
@@ -39,19 +47,26 @@ theorem norm_psi {SB : Finset (HeightOneSpectrum (𝓞 X.E))} {cst : LocCst X SB
   have h1 := hk (Formalism.L2.Col.qOf P.1)
   rw [hc.psi_int P _ ha] at h1
   have hq : Formalism.L2.Col.qOf P.1 ≠ 0 := fun h0 => P.1.ne_bot (Ideal.absNorm_eq_zero_iff.1 h0)
-  have h2 : ‖σ (cst.psi P a)‖ ^ Formalism.L2.Col.qOf P.1 = 1 := by rw [← norm_pow, ← map_pow, ← h1, map_one, norm_one]
+  have h2 : ‖σ (cst.psi P a)‖ ^ Formalism.L2.Col.qOf P.1 = 1 := by
+    rw [← norm_pow, ← map_pow, ← h1, map_one, norm_one]
   exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) hq).1 h2
 
-variable {Pr : Primes X} {R : Ranks} {Ch : Chars X Pr R.m}
-  {sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)} {S : Set ℕ}
-  {mu : Tup X.F X.E X.K S} {cst : LocCst X (rowSG Pr sel mu)} {m2 : ℕ}
+variable
+  {Pr : Primes X} {R : Ranks} {Ch : Chars X Pr R.m}
+  {sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)} {S : Set ℕ} {mu : Tup X.F X.E X.K S}
+  {cst : LocCst X (rowSG Pr sel mu)} {m2 : ℕ}
 
-theorem locSmall_locTop (hm : R.m = m2 + 2) (hc : cst.Ok) (hs : cst.sharp = true) {P : rowSG Pr sel mu} (hP : P.1 ∈ Pr.vGs)
-    {y' : Sp X.E (R.N (m2 + 1))} (hy' : ∀ i, IntAt P.1 ((Formalism.L2.Col.qOf P.1 : X.E) * y' i)) :
-    LocSmall (Formalism.L2.Col.qOf P.1) (stdAt X.E (R.N (m2 + 1)) P.1) (stdAt X.E (R.N R.m) P.1)
-      (fun y => locTop Ch sel mu cst m2 P y y') 1 := by
+theorem locSmall_locTop
+    (hm : R.m = m2 + 2) (hc : cst.Ok) (hs : cst.sharp = true)
+    {P : rowSG Pr sel mu} (hP : P.1 ∈ Pr.vGs)
+    {y' : Sp X.E (R.N (m2 + 1))} (hy' : ∀ i, IntAt P.1 ((Formalism.L2.Col.qOf P.1 : X.E) * y' i))
+    : LocSmall (Formalism.L2.Col.qOf P.1) (stdAt X.E (R.N (m2 + 1)) P.1) (stdAt X.E (R.N R.m) P.1)
+      (fun y => locTop Ch sel mu cst m2 P y y')
+      1 := by
   have hq := qOf_ne_zero (P := P.1)
-  have hsingle : ∀ s : Fin (R.N (m2 + 1)), (Pi.single s 1 : Sp X.E (R.N (m2 + 1))) ∈ stdAt X.E (R.N (m2 + 1)) P.1 := fun s =>
+  have hsingle
+      : ∀ s : Fin (R.N (m2 + 1)),
+        (Pi.single s 1 : Sp X.E (R.N (m2 + 1))) ∈ stdAt X.E (R.N (m2 + 1)) P.1 := fun s =>
     mem_stdAt.2 fun i => by
       rw [Pi.single_apply]
       split_ifs
@@ -61,10 +76,16 @@ theorem locSmall_locTop (hm : R.m = m2 + 2) (hc : cst.Ok) (hs : cst.sharp = true
   · rw [apply_eq_sum]
     exact intAt_sum _ fun j _ => (mem_stdAt.1 hy j).mul (mem_stdAt.1 (locTop_supp hm hP hx j) l)
   · have hz' : ∀ s l, IntAt P.1 (z (Pi.single s 1) l) := fun s l => mem_stdAt.1 (hz _ (hsingle s)) l
-    have e : ∀ s l, (x + (Formalism.L2.Col.qOf P.1 : X.E) • z) (Pi.single s 1) l =
-        x (Pi.single s 1) l + (Formalism.L2.Col.qOf P.1 : X.E) * z (Pi.single s 1) l := fun s l => rfl
-    have hi : ∀ s l, IntAt P.1 ((x + (Formalism.L2.Col.qOf P.1 : X.E) • z) (Pi.single s 1) l) ↔ IntAt P.1 (x (Pi.single s 1) l) :=
-      fun s l => by rw [e, GlobalTheory.SymLevelDatum.intAt_add_iff P.1 ((intAt_nat _).mul (hz' s l))]
+    have e
+        : ∀ s l,
+          (x + (Formalism.L2.Col.qOf P.1 : X.E) • z) (Pi.single s 1) l
+            = x (Pi.single s 1) l + (Formalism.L2.Col.qOf P.1 : X.E) * z (Pi.single s 1) l :=
+      fun s l => rfl
+    have hi
+        : ∀ s l,
+          IntAt P.1 ((x + (Formalism.L2.Col.qOf P.1 : X.E) • z) (Pi.single s 1) l)
+            ↔ IntAt P.1 (x (Pi.single s 1) l) := fun s l => by
+      rw [e, GlobalTheory.SymLevelDatum.intAt_add_iff P.1 ((intAt_nat _).mul (hz' s l))]
     by_cases hx : ∀ s l, IntAt P.1 (x (Pi.single s 1) l)
     · refine locTop_congr hm hc hP hy' fun s l => ⟨(hi s l).2 (hx s l), hx s l, ?_⟩
       rw [e, add_sub_cancel_left, mul_div_cancel_left₀ _ hq]
@@ -82,11 +103,12 @@ theorem locSmall_locTop (hm : R.m = m2 + 2) (hc : cst.Ok) (hs : cst.sharp = true
     refine mul_le_one₀ ?_ (norm_nonneg _) ?_
     · unfold PhiTop
       rw [if_pos hP, hs, if_pos rfl]
-      have hq0 : Formalism.L2.Col.qOf P.1 ≠ 0 := fun h0 => P.1.ne_bot (Ideal.absNorm_eq_zero_iff.1 h0)
+      have hq0 : Formalism.L2.Col.qOf P.1 ≠ 0 := fun h0 =>
+        P.1.ne_bot (Ideal.absNorm_eq_zero_iff.1 h0)
       have hN : ∀ j, R.N j = R.k + j * R.t + j := fun j => by unfold Ranks.N; ring
       have h0 : Formalism.L2.Col.cOf R (m2 + 1) = 0 := by unfold Formalism.L2.Col.cOf; omega
-      refine (GlobalTheory.SymLevelDatum.locSmall_phiGS X.E X.K P.1 _ _ _ _ _ _ _ R.m _ _ 0 _ hq0 (Ideal.absNorm_mem _)
-        ?_ ?_ ?_ ?_ ?_).2.2 σ _
+      refine (GlobalTheory.SymLevelDatum.locSmall_phiGS X.E X.K P.1 _ _ _ _ _ _ _ R.m _ _ 0 _ hq0
+        (Ideal.absNorm_mem _) ?_ ?_ ?_ ?_ ?_).2.2 σ _
       · simp only [h0, rank_add_mul_eq_penultimate_rank hm, add_zero]
       · rw [h0, hN, hN, hm, show m2 + 2 = m2 + 1 + 1 from rfl, add_mul (m2 + 1) 1]; omega
       · rw [hN]; omega
@@ -102,7 +124,8 @@ theorem locSmall_locTop (hm : R.m = m2 + 2) (hc : cst.Ok) (hs : cst.sharp = true
           rwa [LinearMap.comp_apply, atNL_last] at this
         have := he.mul (intAt_sum Finset.univ fun j _ => (hy' j).mul (h' j))
         convert this using 1
-        rw [LinearMap.comp_apply, atNL_last, apply_eq_sum, Finset.mul_sum, Finset.mul_sum, Finset.mul_sum]
+        rw [LinearMap.comp_apply, atNL_last, apply_eq_sum, Finset.mul_sum, Finset.mul_sum,
+          Finset.mul_sum]
         exact Finset.sum_congr rfl fun j _ => by ring
       · simp
 

@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.MatGroupHaarU
 
 @[expose] public section
 
-open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix MeasureTheory Finset
+open BranchingSupport Formalism.FourierDecayAlt Formalism.FourierDecayAlt.ThreeDimData Matrix
+  MeasureTheory Finset
 open scoped InnerProductSpace ENNReal
 
 noncomputable section
@@ -154,31 +155,40 @@ lemma exists_precutoff {m : ℕ} {G S : Set (Matrix (Fin m) (Fin m) ℂ)} {μ : 
 
 end QuotCutoff
 
-
 open QuotCutoff in
-theorem exists_normalised_cutoff : ∀ (m : ℕ) (G S : Set (Matrix (Fin m) (Fin m) ℂ)) (μS : Measure (PI.MtM m)), PI.IsMatGroup G → PI.IsMatGroup S → S ⊆ G → PI.IsHaarOnM S μS → PI.IsRightInvM S μS → ∃ φ : PI.MtM m → ℝ≥0∞, Measurable φ ∧ ∀ x : PI.MtM m, Matrix.of x ∈ G → ∫⁻ s, φ (fun i j => (Matrix.of s * Matrix.of x) i j) ∂μS = 1 := by
+theorem exists_normalised_cutoff
+    : ∀ (m : ℕ) (G S : Set (Matrix (Fin m) (Fin m) ℂ)) (μS : Measure (PI.MtM m)),
+      PI.IsMatGroup G → PI.IsMatGroup S → S ⊆ G → PI.IsHaarOnM S μS → PI.IsRightInvM S μS
+        → ∃ φ : PI.MtM m → ℝ≥0∞,
+          Measurable φ
+            ∧ ∀ x : PI.MtM m,
+              Matrix.of x ∈ G → ∫⁻ s, φ (fun i j => (Matrix.of s * Matrix.of x) i j) ∂μS = 1 := by
   intro m G S μ hG hS hSG hμ hR
   obtain ⟨φ, hφ, hI⟩ := exists_precutoff hG hS hSG hμ hR
   haveI := hμ.1
   set I : PI.MtM m → ℝ≥0∞ := fun x => ∫⁻ s, φ (mulM s x) ∂μ with hIdef
   have hIm : Measurable I :=
-    Measurable.lintegral_prod_left' (f := fun p : PI.MtM m × PI.MtM m => φ (mulM p.1 p.2))
+    Measurable.lintegral_prod_left'
+      (f := fun p : PI.MtM m × PI.MtM m => φ (mulM p.1 p.2))
       (hφ.comp continuous_mulM.measurable)
   have hinv : ∀ s₀ x : PI.MtM m, Matrix.of s₀ ∈ S → I (mulM s₀ x) = I x := by
     intro s₀ x hs₀
     have h1 : μ.map (fun s => mulM s s₀) = μ := hR _ hs₀
-    have h2 := lintegral_map (μ := μ) (f := fun s => φ (mulM s x))
-      (hφ.comp (continuous_mulM_left x).measurable) (continuous_mulM_left s₀).measurable
+    have h2 :=
+      lintegral_map (μ := μ)
+        (f := fun s => φ (mulM s x))
+        (hφ.comp (continuous_mulM_left x).measurable) (continuous_mulM_left s₀).measurable
     rw [h1] at h2
     simp only [hIdef]
     rw [h2]
     simp only [mulM_assoc]
   refine ⟨fun y => φ y * (I y)⁻¹, hφ.mul hIm.inv, fun x hx => ?_⟩
   have hae : ∀ᵐ s ∂μ, Matrix.of s ∈ S := hμ.2.2.1
-  calc ∫⁻ s, φ (mulM s x) * (I (mulM s x))⁻¹ ∂μ = ∫⁻ s, φ (mulM s x) * (I x)⁻¹ ∂μ := by
-        refine lintegral_congr_ae ?_
-        filter_upwards [hae] with s hs
-        rw [hinv s x hs]
+  calc
+    ∫⁻ s, φ (mulM s x) * (I (mulM s x))⁻¹ ∂μ = ∫⁻ s, φ (mulM s x) * (I x)⁻¹ ∂μ := by
+      refine lintegral_congr_ae ?_
+      filter_upwards [hae] with s hs
+      rw [hinv s x hs]
     _ = I x * (I x)⁻¹ := lintegral_mul_const _ (hφ.comp (continuous_mulM_left x).measurable)
     _ = 1 := ENNReal.mul_inv_cancel (hI x hx).1 (hI x hx).2
 

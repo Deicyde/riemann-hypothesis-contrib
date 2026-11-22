@@ -7,7 +7,9 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 open MeasureTheory NumberField IsDedekindDomain Filter ValuativeRel
 open GroundTheory.Global GroundTheory.Global.SemiLocal
-open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.Loc GlobalTheory.PRep GlobalTheory.CuspRep GlobalTheory.SmGL GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
+open UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.Loc
+  GlobalTheory.PRep GlobalTheory.CuspRep GlobalTheory.SmGL
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
 open UpperTheory.Gal.LocD UpperTheory.Gal.InertialTypesAlt.G UpperTheory.Gal.Join
 open scoped Classical
 
@@ -17,8 +19,7 @@ private lemma exists_common_eigenvector {ι M : Type} [AddCommGroup M] [Module �
     ∃ y ∈ W, y ≠ 0 ∧ ∀ i, ∃ c : ℂ, f i y = c • y :=
   _root_.UpperTheory.Reformulated.B.CommonEigenvectorInInvariantComplexSubspace.exists_common_eigenvector f hc W hW hst
 
-theorem UpperTheory.Gal.Join.twExp :
-    UpperTheory.Gal.Join.TwExp := by
+theorem UpperTheory.Gal.Join.twExp : UpperTheory.Gal.Join.TwExp := by
   intro T X _ _ _ ρ P _ s A hρ hA hAρ t₁ htr
   let r : T → Module.End ℂ P := fun t => (ρ t).restrict (hρ t)
   let A' : Module.End ℂ P := A.restrict hA
@@ -41,7 +42,8 @@ theorem UpperTheory.Gal.Join.twExp :
   have hind : iSupIndep N := Module.End.independent_iInf_maxGenEigenspace_of_forall_mapsTo r hmaps
   have htop : ⨆ χ, N χ = ⊤ :=
     Module.End.iSup_iInf_maxGenEigenspace_eq_top_of_iSup_maxGenEigenspace_eq_top_of_commute r
-      (fun a b _ => hcomm a b) (fun t => Module.End.iSup_maxGenEigenspace_eq_top (r t))
+      (fun a b _ => hcomm a b)
+      (fun t => Module.End.iSup_maxGenEigenspace_eq_top (r t))
   let f : Module.End ℂ P := r t₁ * A'
   have hAN : ∀ χ, Set.MapsTo f (N χ) (N (χ ∘ s.symm)) := by
     intro χ y hy
@@ -83,12 +85,15 @@ theorem UpperTheory.Gal.Join.twExp :
       funext t
       have := congrFun e (s t)
       simpa using this.symm
-    let σ : J → J := fun j => ⟨j.1 ∘ s.symm, by
-      intro e
-      apply hne j.1 j.2
-      funext t
-      have := congrFun e t
-      simpa [Function.comp] using this.symm⟩
+    let σ : J → J := fun j => ⟨
+      j.1 ∘ s.symm,
+      by
+        intro e
+        apply hne j.1 j.2
+        funext t
+        have := congrFun e t
+        simpa [Function.comp] using this.symm
+    ⟩
     have hσ : ∀ j, σ j ≠ j := fun j e => hne j.1 j.2 (congrArg Subtype.val e)
     have hzero : LinearMap.trace ℂ P f = 0 :=
       LinearMap.trace_eq_zero_of_mapsTo_ne hint σ hσ (fun j => hAN j.1)
@@ -126,15 +131,13 @@ theorem UpperTheory.Gal.Join.twExp :
       simp [r_apply]
     have h2 := hc 1
     rw [h1, Module.End.one_apply] at h2
-    have h3 : (c 1 - 1) • y = 0 := by
-      rw [sub_smul, one_smul, ← h2, sub_self]
+    have h3 : (c 1 - 1) • y = 0 := by rw [sub_smul, one_smul, ← h2, sub_self]
     exact sub_eq_zero.mp ((smul_eq_zero.mp h3).resolve_right hy0)
   have hcmul : ∀ a b, c (a * b) = c a * c b := by
     intro a b
     have h2 := hc (a * b)
     rw [r_mul, Module.End.mul_apply, hc b, map_smul, hc a, smul_smul] at h2
-    have h3 : (c (a * b) - c b * c a) • y = 0 := by
-      rw [sub_smul, ← h2, sub_self]
+    have h3 : (c (a * b) - c b * c a) • y = 0 := by rw [sub_smul, ← h2, sub_self]
     rw [sub_eq_zero.mp ((smul_eq_zero.mp h3).resolve_right hy0), mul_comm]
   let m : T →* ℂ := { toFun := c, map_one' := hc1, map_mul' := hcmul }
   refine ⟨m.toHomUnits, fun t => ?_, (y : X), y.2, fun h => hy0 (Subtype.ext h), fun t => ?_⟩

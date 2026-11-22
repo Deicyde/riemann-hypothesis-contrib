@@ -8,22 +8,21 @@ namespace GlobalTheory.ValuedPrincipal
 
 variable {F : Type} [Field F] (v : AddValuation F (WithTop ℚ))
 
-theorem exists_val_eq {x : F} (hx : x ≠ 0) :
-    ∃ r : ℚ, v x = (r : WithTop ℚ) ∧ v x⁻¹ = ((-r : ℚ) : WithTop ℚ) := by
+theorem exists_val_eq {x : F} (hx : x ≠ 0)
+    : ∃ r : ℚ, v x = (r : WithTop ℚ) ∧ v x⁻¹ = ((-r : ℚ) : WithTop ℚ) := by
   have hit : v x⁻¹ ≠ ⊤ := (v.ne_top_iff).2 (inv_ne_zero hx)
   obtain ⟨r, hr⟩ := WithTop.ne_top_iff_exists.1 ((v.ne_top_iff).2 hx)
   obtain ⟨s, hs⟩ := WithTop.ne_top_iff_exists.1 hit
   refine ⟨r, hr.symm, ?_⟩
-  have hsum : v x + v x⁻¹ = 0 := by
-    rw [← v.map_mul, mul_inv_cancel₀ hx, v.map_one]
+  have hsum : v x + v x⁻¹ = 0 := by rw [← v.map_mul, mul_inv_cancel₀ hx, v.map_one]
   rw [← hr, ← hs, ← WithTop.coe_add] at hsum
   have h0 : r + s = 0 := by exact_mod_cast hsum
   rw [← hs]
   congr 1
   linarith
 
-theorem exists_val_eq_int {π : F} (hπ : v π = ((1 : ℚ) : WithTop ℚ)) (n : ℤ) :
-    ∃ y : F, y ≠ 0 ∧ v y = ((n : ℚ) : WithTop ℚ) := by
+theorem exists_val_eq_int {π : F} (hπ : v π = ((1 : ℚ) : WithTop ℚ)) (n : ℤ)
+    : ∃ y : F, y ≠ 0 ∧ v y = ((n : ℚ) : WithTop ℚ) := by
   have hπ0 : π ≠ 0 := (v.ne_top_iff).1 (by rw [hπ]; exact WithTop.coe_ne_top)
   obtain ⟨r, hr, hri⟩ := exists_val_eq v hπ0
   have hr1 : r = 1 := by
@@ -47,8 +46,8 @@ theorem exists_val_eq_int {π : F} (hπ : v π = ((1 : ℚ) : WithTop ℚ)) (n :
     push_cast
     ring
 
-theorem val_pow_eq {t : F} {r : ℚ} (h : v t = (r : WithTop ℚ)) (k : ℕ) :
-    v (t ^ k) = (((k : ℚ) * r : ℚ) : WithTop ℚ) := by
+theorem val_pow_eq {t : F} {r : ℚ} (h : v t = (r : WithTop ℚ)) (k : ℕ)
+    : v (t ^ k) = (((k : ℚ) * r : ℚ) : WithTop ℚ) := by
   induction k with
   | zero => simp
   | succ k ih =>
@@ -57,8 +56,8 @@ theorem val_pow_eq {t : F} {r : ℚ} (h : v t = (r : WithTop ℚ)) (k : ℕ) :
     push_cast
     ring
 
-theorem exists_val_eq_rat [IsAlgClosed F] {π : F} (hπ : v π = ((1 : ℚ) : WithTop ℚ)) (q : ℚ) :
-    ∃ t : F, t ≠ 0 ∧ v t = (q : WithTop ℚ) := by
+theorem exists_val_eq_rat [IsAlgClosed F] {π : F} (hπ : v π = ((1 : ℚ) : WithTop ℚ)) (q : ℚ)
+    : ∃ t : F, t ≠ 0 ∧ v t = (q : WithTop ℚ) := by
   obtain ⟨y, hy, hyv⟩ := exists_val_eq_int v hπ q.num
   obtain ⟨t, ht⟩ := IsAlgClosed.exists_pow_nat_eq y q.den_pos
   have ht0 : t ≠ 0 := by
@@ -76,9 +75,11 @@ theorem exists_val_eq_rat [IsAlgClosed F] {π : F} (hπ : v π = ((1 : ℚ) : Wi
   rw [← Rat.num_div_den q, eq_div_iff hd, hq]
   ring
 
-theorem exists_least_of_discrete {π : F} (hπ : v π = ((1 : ℚ) : WithTop ℚ)) {d : ℕ} (hd : 1 ≤ d)
-    (h : ∀ x : F, x ≠ 0 → ∃ n : ℤ, v x = (((n : ℚ) / d : ℚ) : WithTop ℚ)) (q : ℚ) :
-    ∃ t : F, t ≠ 0 ∧ (q : WithTop ℚ) ≤ v t ∧ ∀ a : F, (q : WithTop ℚ) ≤ v a → v t ≤ v a := by
+theorem exists_least_of_discrete
+    {π : F} (hπ : v π = ((1 : ℚ) : WithTop ℚ))
+    {d : ℕ} (hd : 1 ≤ d) (h : ∀ x : F, x ≠ 0 → ∃ n : ℤ, v x = (((n : ℚ) / d : ℚ) : WithTop ℚ))
+    (q : ℚ)
+    : ∃ t : F, t ≠ 0 ∧ (q : WithTop ℚ) ≤ v t ∧ ∀ a : F, (q : WithTop ℚ) ≤ v a → v t ≤ v a := by
   classical
   have hdq : (0 : ℚ) < d := by exact_mod_cast hd
   have hne : ∃ n : ℤ, ∃ x : F, x ≠ 0 ∧ v x = (((n : ℚ) / d : ℚ) : WithTop ℚ) ∧ q ≤ (n : ℚ) / d := by
@@ -90,8 +91,9 @@ theorem exists_least_of_discrete {π : F} (hπ : v π = ((1 : ℚ) : WithTop ℚ
     · rw [hyv, hc]
     · rw [hc]
       exact Int.le_ceil q
-  have hbdd : ∃ b : ℤ, ∀ n : ℤ, (∃ x : F, x ≠ 0 ∧ v x = (((n : ℚ) / d : ℚ) : WithTop ℚ) ∧
-      q ≤ (n : ℚ) / d) → b ≤ n := by
+  have hbdd
+      : ∃ b : ℤ, ∀ n : ℤ,
+        (∃ x : F, x ≠ 0 ∧ v x = (((n : ℚ) / d : ℚ) : WithTop ℚ) ∧ q ≤ (n : ℚ) / d) → b ≤ n := by
     refine ⟨⌊q * d⌋, ?_⟩
     rintro n ⟨x, -, -, hqn⟩
     rw [le_div_iff₀ hdq] at hqn
@@ -114,8 +116,8 @@ theorem exists_least_of_discrete {π : F} (hπ : v π = ((1 : ℚ) : WithTop ℚ
       rw [htv, hm]
       exact_mod_cast hdiv
 
-theorem exists_eq_mul_of_le {t a : F} (ht : t ≠ 0) (h : v t ≤ v a) :
-    ∃ c : F, (0 : WithTop ℚ) ≤ v c ∧ a = c * t := by
+theorem exists_eq_mul_of_le {t a : F} (ht : t ≠ 0) (h : v t ≤ v a)
+    : ∃ c : F, (0 : WithTop ℚ) ≤ v c ∧ a = c * t := by
   refine ⟨a * t⁻¹, ?_, (inv_mul_cancel_right₀ ht a).symm⟩
   by_cases ha : a = 0
   · rw [ha, zero_mul, v.map_zero]
@@ -127,10 +129,18 @@ theorem exists_eq_mul_of_le {t a : F} (ht : t ≠ 0) (h : v t ≤ v a) :
     rw [v.map_mul, hs, hri, ← WithTop.coe_add]
     exact_mod_cast (by linarith : (0 : ℚ) ≤ s + -r)
 
-theorem main : ∀ (F : Type) [Field F] (v : AddValuation F (WithTop ℚ)) (π : F), v π = ((1 : ℚ) : WithTop ℚ) → (IsAlgClosed F ∨ ∃ d : ℕ, 1 ≤ d ∧ ∀ x : F, x ≠ 0 → ∃ n : ℤ, v x = (((n : ℚ) / d : ℚ) : WithTop ℚ)) → ∀ q : ℚ, ∃ t : F, t ≠ 0 ∧ ((q : ℚ) : WithTop ℚ) ≤ v t ∧ ∀ a : F, ((q : ℚ) : WithTop ℚ) ≤ v a → ∃ c : F, (0 : WithTop ℚ) ≤ v c ∧ a = c * t := by
+theorem main
+    : ∀ (F : Type) [Field F] (v : AddValuation F (WithTop ℚ)) (π : F),
+      v π = ((1 : ℚ) : WithTop ℚ)
+        → (IsAlgClosed F
+          ∨ ∃ d : ℕ, 1 ≤ d ∧ ∀ x : F, x ≠ 0 → ∃ n : ℤ, v x = (((n : ℚ) / d : ℚ) : WithTop ℚ))
+        → ∀ q : ℚ, ∃ t : F,
+          t ≠ 0 ∧ ((q : ℚ) : WithTop ℚ) ≤ v t
+            ∧ ∀ a : F,
+              ((q : ℚ) : WithTop ℚ) ≤ v a → ∃ c : F, (0 : WithTop ℚ) ≤ v c ∧ a = c * t := by
   intro F _ v π hπ hcase q
-  have key : ∃ t : F, t ≠ 0 ∧ (q : WithTop ℚ) ≤ v t ∧
-      ∀ a : F, (q : WithTop ℚ) ≤ v a → v t ≤ v a := by
+  have key
+      : ∃ t : F, t ≠ 0 ∧ (q : WithTop ℚ) ≤ v t ∧ ∀ a : F, (q : WithTop ℚ) ≤ v a → v t ≤ v a := by
     rcases hcase with hac | ⟨d, hd, hdisc⟩
     · haveI := hac
       obtain ⟨t, ht, htv⟩ := exists_val_eq_rat v hπ q

@@ -10,12 +10,11 @@ open scoped RealInnerProductSpace ContDiff Real ComplexOrder
 
 namespace GlobalTheory
 
-
 open MeasureTheory Complex Matrix in
 open scoped RealInnerProductSpace ContDiff Real ComplexOrder in
-theorem _root_.GlobalTheory.hermitian_congr_involution (ι : Type) [Fintype ι] [DecidableEq ι]
-    (H : Matrix ι ι ℂ) (hH : Hᴴ = H) (hd : H.det ≠ 0) :
-    ∃ R s : Matrix ι ι ℂ, R.det ≠ 0 ∧ sᴴ = s ∧ s * s = 1 ∧ Rᴴ * s * R = H := by
+theorem _root_.GlobalTheory.hermitian_congr_involution
+    (ι : Type) [Fintype ι] [DecidableEq ι] (H : Matrix ι ι ℂ) (hH : Hᴴ = H) (hd : H.det ≠ 0)
+    : ∃ R s : Matrix ι ι ℂ, R.det ≠ 0 ∧ sᴴ = s ∧ s * s = 1 ∧ Rᴴ * s * R = H := by
   have hA : H.IsHermitian := hH
   set U : Matrix ι ι ℂ := (hA.eigenvectorUnitary : Matrix ι ι ℂ) with hU
   set d := hA.eigenvalues with hdd
@@ -36,9 +35,10 @@ theorem _root_.GlobalTheory.hermitian_congr_involution (ι : Type) [Fintype ι] 
     split_ifs with h
     · rw [mul_one, hsq, abs_of_pos h]; rfl
     · rw [mul_neg_one, neg_mul, hsq, abs_of_neg (lt_of_le_of_ne (not_lt.1 h) (hd0 i))]
-      push_cast; ring_nf; rfl
-  have hDH : Dᴴ = D := by
-    rw [hD, diagonal_conjTranspose]; congr 1; funext i; simp
+      push_cast
+      ring_nf
+      rfl
+  have hDH : Dᴴ = D := by rw [hD, diagonal_conjTranspose]; congr 1; funext i; simp
   have hsH : sᴴ = s := by
     rw [hs, diagonal_conjTranspose]; congr 1; funext i; by_cases h : 0 < d i <;> simp [h]
   have hss : s * s = 1 := by

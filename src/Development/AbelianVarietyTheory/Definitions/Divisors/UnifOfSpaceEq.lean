@@ -17,68 +17,90 @@ noncomputable section
 
 namespace GlobalTheory.LevGeo
 
-open NumberField Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.L2.Theta Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+open NumberField Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.L2.Theta Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-structure Laws (D : D7) (j : ℕ) {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {Dw : Datum H} {l : Level H} (Xo : Moduli Dw l)
-    (c : Coeff l) (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ D.R.r)
-    (dict : ∀ σ : c.F →+* ℂ, GA D (D.sp.W j) → Σ k, Frame ((U σ).X k).Ψ D.R.r) : Prop where
-
+structure Laws
+    (D : D7) (j : ℕ)
+    {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {Dw : Datum H} {l : Level H}
+    (Xo : Moduli Dw l) (c : Coeff l) (U : ∀ σ : c.F →+* ℂ, Unf Xo c σ D.R.r)
+    (dict : ∀ σ : c.F →+* ℂ, GA D (D.sp.W j) → Σ k, Frame ((U σ).X k).Ψ D.R.r)
+    : Prop where
   inR : InR D j
-
-  host : H.d = D.host.d ∧ (H.rt : D.host.E) = D.host.sqrtMinusD ∧ H.rt0 = D.host.φ₀ D.host.sqrtMinusD ∧
-    ∀ t : D.what₂.Tau, DV.tauEmb D t (H.rt : D.host.E) = H.rt0
-
+  host
+    : H.d = D.host.d ∧ (H.rt : D.host.E) = D.host.sqrtMinusD ∧ H.rt0 = D.host.φ₀ D.host.sqrtMinusD
+      ∧ ∀ t : D.what₂.Tau, DV.tauEmb D t (H.rt : D.host.E) = H.rt0
   dat : IsDatW D j Dw
-
   levA : l.A = 1
-
   unf : ∀ σ, GoodEmb c σ → IsUnf (U σ)
-
-  chiTriv : ∀ σ, GoodEmb c σ → ∀ a n, Dom a n → ∀ k, ∀ γ ∈ ((U σ).X k).Γ, ((U σ).X k).χ (laU (U σ) a n k) γ = 1
-
-  dictU : ∀ σ, GoodEmb c σ → ∃ Kf th hr, IsLevelK (D.sp.W j) l.M Kf ∧ (∀ k τ, Formalism.MainNotions.StandardLattice.IsInfEmb τ.1 (th k τ)) ∧
-    DictIsUnif (D.sp.W j) (dict σ) Kf th hr ∧
-    ∀ g τ k, ‖dmin ((U σ).X (dict σ g).1).Gm (dict σ g).2 τ k‖ = 1
-
+  chiTriv
+    : ∀ σ,
+      GoodEmb c σ → ∀ a n, Dom a n → ∀ k, ∀ γ ∈ ((U σ).X k).Γ, ((U σ).X k).χ (laU (U σ) a n k) γ = 1
+  dictU
+    : ∀ σ,
+      GoodEmb c σ
+        → ∃ Kf th hr,
+          IsLevelK (D.sp.W j) l.M Kf
+            ∧ (∀ k τ, Formalism.MainNotions.StandardLattice.IsInfEmb τ.1 (th k τ))
+            ∧ DictIsUnif (D.sp.W j) (dict σ) Kf th hr
+            ∧ ∀ g τ k, ‖dmin ((U σ).X (dict σ g).1).Gm (dict σ g).2 τ k‖ = 1
   modelW : ∀ σ, GoodEmb c σ → ∃ hr : (D.sp.W j).rank = D.R.r, ∀ k, ModelW (D.sp.W j) hr ((U σ).X k)
 
 section Derived
 
-variable {D : D7} {j : ℕ} {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l}
-  {c : Coeff l} {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ D.R.r}
+variable
+  {D : D7} {j : ℕ} {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E} {Dw : Datum H}
+  {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {U : ∀ σ : c.F →+* ℂ, Unf Xo c σ D.R.r}
   {dict : ∀ σ : c.F →+* ℂ, GA D (D.sp.W j) → Σ k, Frame ((U σ).X k).Ψ D.R.r}
 
-theorem Laws.unTest (_ : Laws D j Xo c U dict) : ∀ σ, GoodEmb c σ → ∀ k x,
-    FromTest (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) ((U σ).un k x) := fun σ _ k x =>
+theorem Laws.unTest (_ : Laws D j Xo c U dict)
+    : ∀ σ,
+      GoodEmb c σ
+        → ∀ k x,
+          FromTest (K := c.F)
+            (fun S _ _ => FrPt Xo c S)
+            (fun φ y z => FrMap φ y z)
+            ((U σ).un k x) := fun σ _ k x =>
   haveI : IsReduced (CAt σ) := inferInstanceAs (IsReduced ℂ)
   GlobalTheory.TransferCompare.allTest_framed Xo c (CAt σ) ((U σ).un k x)
 
-theorem Laws.xiAbs (h : Laws D j Xo c U dict) : ∀ σ, GoodEmb c σ → ∀ k (τ : D.host.E →+* ℂ), ‖τ ((U σ).X k).ξ0‖ = xiR D := by
+theorem Laws.xiAbs (h : Laws D j Xo c U dict)
+    : ∀ σ, GoodEmb c σ → ∀ k (τ : D.host.E →+* ℂ), ‖τ ((U σ).X k).ξ0‖ = xiR D := by
   intro σ hσ k τ
   obtain ⟨hr, hm⟩ := h.modelW σ hσ
   rw [(hm k).2, map_neg, norm_neg]
-  exact ReciprocityTheory.ChartRestriction.G.PullbackSections.PfModelLatB.norm_embedding_hostFormConstant_eq D τ
+  exact
+    ReciprocityTheory.ChartRestriction.G.PullbackSections.PfModelLatB.norm_embedding_hostFormConstant_eq
+      D τ
 
 end Derived
 
-def coreDict {D : D7} (T : Core D) (j : ℕ) (σ : T.Q.c.F →+* ℂ) (g : GA D (D.sp.W j)) : Σ k, Frame ((T.U j σ).X k).Ψ D.R.r :=
-  open Classical in if h : T.V j σ = D.sp.W j then T.dict j σ (h ▸ g) else T.dict j σ 1
+def coreDict {D : D7} (T : Core D) (j : ℕ) (σ : T.Q.c.F →+* ℂ) (g : GA D (D.sp.W j))
+    : Σ k, Frame ((T.U j σ).X k).Ψ D.R.r :=
+  open Classical in
+  if h : T.V j σ = D.sp.W j then T.dict j σ (h ▸ g) else T.dict j σ 1
 
-theorem unif_of_space_eq {D : D7} {r : ℕ} {C : Type} {X : C → Data D.host.E r} (V W : HSp D) (h : V = W)
-    (dict : GA D V → Σ k, Frame (X k).Ψ r) (M : ℕ) (Kf : Subgroup (GA D V)) (hK : IsLevelK V M Kf)
-    (hd : ∃ th hr, (∀ k τ, Formalism.MainNotions.StandardLattice.IsInfEmb τ.1 (th k τ)) ∧ DictIsUnif V dict Kf th hr)
-    (hu : ∀ g τ k, ‖dmin (X (dict g).1).Gm (dict g).2 τ k‖ = 1) :
-    ∃ Kf th hr, IsLevelK W M Kf ∧ (∀ k τ, Formalism.MainNotions.StandardLattice.IsInfEmb τ.1 (th k τ)) ∧
-      DictIsUnif W (fun g => dict (h ▸ g)) Kf th hr ∧
-      ∀ (g : GA D W) τ k, ‖dmin (X (dict (h ▸ g)).1).Gm (dict (h ▸ g)).2 τ k‖ = 1 := by
+theorem unif_of_space_eq
+    {D : D7} {r : ℕ} {C : Type} {X : C → Data D.host.E r}
+    (V W : HSp D) (h : V = W) (dict : GA D V → Σ k, Frame (X k).Ψ r)
+    (M : ℕ) (Kf : Subgroup (GA D V)) (hK : IsLevelK V M Kf)
+    (hd : ∃ th hr,
+      (∀ k τ, Formalism.MainNotions.StandardLattice.IsInfEmb τ.1 (th k τ))
+        ∧ DictIsUnif V dict Kf th hr)
+    (hu : ∀ g τ k, ‖dmin (X (dict g).1).Gm (dict g).2 τ k‖ = 1)
+    : ∃ Kf th hr,
+      IsLevelK W M Kf ∧ (∀ k τ, Formalism.MainNotions.StandardLattice.IsInfEmb τ.1 (th k τ))
+        ∧ DictIsUnif W (fun g => dict (h ▸ g)) Kf th hr
+        ∧ ∀ (g : GA D W) τ k, ‖dmin (X (dict (h ▸ g)).1).Gm (dict (h ▸ g)).2 τ k‖ = 1 := by
   subst h
   obtain ⟨th, hr, h1, h2⟩ := hd
   exact ⟨Kf, th, hr, hK, h1, h2, hu⟩
 
-theorem laws_core (D : D7) (T : CoreJ D) (j : ℕ) (h : LawsJ T) (hj : InR D j) :
-    Laws D j (T.Q.Xo j) T.Q.c (T.U j) (coreDict T.toCore j) := by
+theorem laws_core (D : D7) (T : CoreJ D) (j : ℕ) (h : LawsJ T) (hj : InR D j)
+    : Laws D j (T.Q.Xo j) T.Q.c (T.U j) (coreDict T.toCore j) := by
   refine ⟨hj, h.pins.1, h.pins.2.2.2 j hj, h.pins.2.1.2, h.unf j hj, h.chiTriv j hj, ?_, ?_⟩
   · intro σ hσ
     have hV := h.spaceW j hj σ hσ
@@ -116,10 +138,11 @@ def cmLen (q d M : ℕ) (w : ℝ) : ℝ :=
   frameBasisRadius r q (fdeg E) (dE E) (Real.sqrt (epsLev E d M w)) (3 * frameRadius w r / 5)
 
 def lamSup (q d M : ℕ) (Om s t : ℝ) : ℝ :=
-  (Formalism.L2.LamCM.pDeg Om + 1 / 2 * Real.log (cmLen E r q d M (s + t + 1))) * (s + t) +
-    s * Real.log (r * cmLen E r q d M (s + t + 1))
+  (Formalism.L2.LamCM.pDeg Om + 1 / 2 * Real.log (cmLen E r q d M (s + t + 1))) * (s + t)
+    + s * Real.log (r * cmLen E r q d M (s + t + 1))
 
-def lamPet (q d M : ℕ) (Om s t : ℝ) : ℝ := lamSup E r q d M Om s t + 1 / 2 * Real.log (supConst E r d M (s + t + 1))
+def lamPet (q d M : ℕ) (Om s t : ℝ) : ℝ :=
+  lamSup E r q d M Om s t + 1 / 2 * Real.log (supConst E r d M (s + t + 1))
 
 theorem one_le_multBd {ε : ℝ} (hε : 0 < ε) : 1 ≤ multBd E r ε := by
   unfold multBd
@@ -129,7 +152,11 @@ theorem one_le_multBd {ε : ℝ} (hε : 0 < ε) : 1 ≤ multBd E r ε := by
 
 end Consts
 
-def absA {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} (Dw : Datum H)
-    (a : (E →+* ℂ) × ℕ → ℕ) : ℕ := ∑ b : E →+* ℂ, ∑ i : Fin (Dw.mult b), a (b, i)
+def absA
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} (Dw : Datum H)
+    (a : (E →+* ℂ) × ℕ → ℕ)
+    : ℕ :=
+  ∑ b : E →+* ℂ, ∑ i : Fin (Dw.mult b), a (b, i)
 
 end GlobalTheory.LevGeo

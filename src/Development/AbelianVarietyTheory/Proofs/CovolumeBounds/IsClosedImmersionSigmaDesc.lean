@@ -30,24 +30,28 @@ private lemma isClosedEmbedding_sigma_desc_of_pairwise_disjoint_range {ι : Type
     rw [hC']
     exact isClosed_iUnion_of_finite fun i => (hg i).isClosedMap _ (hC.preimage continuous_sigmaMk)
 
-
 open AlgebraicGeometry CategoryTheory CategoryTheory.Limits TopologicalSpace MvPolynomial in
-theorem _root_.GlobalTheory.ProjSpace.isClosedImmersion_sigmaDesc {ι : Type} [Finite ι]
-    {X : ι → Scheme.{0}} {Y : Scheme.{0}}
-    (f : ∀ i, X i ⟶ Y) (hf : ∀ i, IsClosedImmersion (f i))
-    (h : Pairwise fun i j => Disjoint (Set.range (f i)) (Set.range (f j))) :
-    IsClosedImmersion (Sigma.desc f) := by
+theorem _root_.GlobalTheory.ProjSpace.isClosedImmersion_sigmaDesc
+    {ι : Type} [Finite ι]
+    {X : ι → Scheme.{0}} {Y : Scheme.{0}} (f : ∀ i, X i ⟶ Y) (hf : ∀ i, IsClosedImmersion (f i))
+    (h : Pairwise fun i j => Disjoint (Set.range (f i)) (Set.range (f j)))
+    : IsClosedImmersion (Sigma.desc f) := by
   have hsurj : SurjectiveOnStalks (Sigma.desc f) :=
     IsZariskiLocalAtSource.sigmaDesc (P := @SurjectiveOnStalks) fun i => (hf i).toSurjectiveOnStalks
   have key : ⇑(Sigma.desc f) ∘ AlgebraicGeometry.sigmaMk X = fun p => f p.1 p.2 := by
     funext ⟨i, x⟩
     rw [Function.comp_apply, AlgebraicGeometry.sigmaMk_mk, ← Scheme.Hom.comp_apply, Sigma.ι_desc]
   have hce : Topology.IsClosedEmbedding (Sigma.desc f) := by
-    have e := isClosedEmbedding_sigma_desc_of_pairwise_disjoint_range (fun i => ⇑(f i))
-      (fun i => (hf i).isClosedEmbedding) h
+    have e :=
+      isClosedEmbedding_sigma_desc_of_pairwise_disjoint_range
+        (fun i => ⇑(f i))
+        (fun i => (hf i).isClosedEmbedding)
+        h
     rw [← key] at e
-    have hsplit : ⇑(Sigma.desc f) =
-        (⇑(Sigma.desc f) ∘ AlgebraicGeometry.sigmaMk X) ∘ (AlgebraicGeometry.sigmaMk X).symm := by
+    have hsplit
+        : ⇑(Sigma.desc f)
+          = (⇑(Sigma.desc f) ∘ AlgebraicGeometry.sigmaMk X)
+            ∘ (AlgebraicGeometry.sigmaMk X).symm := by
       funext y
       simp
     rw [hsplit]

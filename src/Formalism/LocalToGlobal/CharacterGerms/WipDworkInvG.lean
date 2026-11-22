@@ -13,17 +13,19 @@ namespace Formalism.L2.FormalSeriesBounds.AltInv
 
 variable {C : Type*} [Field C] {v : AddValuation C (WithTop ℝ)}
 
-theorem intS_invG {σ : Type*} [Fintype σ] (Φ t G : σ → MvPowerSeries σ C) (hΦ0 : ∀ x, constantCoeff (Φ x) = 0)
-    (hΦ : ∀ x, IntS v (Φ x))
+theorem intS_invG
+    {σ : Type*} [Fintype σ]
+    (Φ t G : σ → MvPowerSeries σ C) (hΦ0 : ∀ x, constantCoeff (Φ x) = 0) (hΦ : ∀ x, IntS v (Φ x))
     (hL : v (Matrix.of fun x y : σ => coeff (Finsupp.single y 1) (Φ x)).det = 0)
-    (ht0 : ∀ y, constantCoeff (t y) = 0) (hG : ∀ x, IntS v (G x)) (heq : ∀ x, subst t (Φ x) = G x) :
-    ∀ y, IntS v (t y) := by
+    (ht0 : ∀ y, constantCoeff (t y) = 0) (hG : ∀ x, IntS v (G x)) (heq : ∀ x, subst t (Φ x) = G x)
+    : ∀ y, IntS v (t y) := by
   set L : Matrix σ σ C := Matrix.of fun x y : σ => coeff (Finsupp.single y 1) (Φ x) with hLdef
   have hdet0 : L.det ≠ 0 := by
     intro h0; rw [h0, AddValuation.map_zero] at hL; exact WithTop.top_ne_coe hL
   have hord : ∀ s, OrdV 1 (t s) := fun s μ hμ => by
     have : μ = 0 := (Finsupp.degree_eq_zero_iff μ).1 (by omega)
-    subst this; simpa using ht0 s
+    subst this
+    simpa using ht0 s
   have hs : HasSubst t := hasSubst_of_constantCoeff_zero ht0
   suffices key : ∀ E : ℕ, ∀ y, LowLt (v := v) E (t y) by
     intro y μ; exact key (μ.degree + 1) y μ (Nat.lt_succ_self _)
@@ -38,9 +40,9 @@ theorem intS_invG {σ : Type*} [Fintype σ] (Φ t G : σ → MvPowerSeries σ C)
     cases E with
     | zero =>
       have : μ = 0 := (Finsupp.degree_eq_zero_iff μ).1 heqd
-      subst this; simp [ht0 y, intC_zero]
+      subst this
+      simp [ht0 y, intC_zero]
     | succ E' =>
-
       have hlow : ∀ s, LowLt (v := v) (E' + 1) (t s) := ih
       have hbig : ∀ d : σ →₀ ℕ, 2 ≤ d.degree → IntC v (coeff μ (d.prod fun s n => t s ^ n)) := by
         intro d hd
@@ -50,27 +52,40 @@ theorem intS_invG {σ : Type*} [Fintype σ] (Φ t G : σ → MvPowerSeries σ C)
         have hdeg : d.degree = ∑ s ∈ d.support, d s := rfl
         exact hp.2 μ (by omega)
 
-      have heqx : ∀ x, ∑ y', L x y' * coeff μ (t y') = coeff μ (G x) -
-          ∑ᶠ d : σ →₀ ℕ, (if d.degree = 1 then 0 else
-            coeff d (Φ x) • coeff μ (d.prod fun s n => t s ^ n)) := by
+      have heqx
+          : ∀ x,
+            ∑ y', L x y' * coeff μ (t y')
+              = coeff μ (G x)
+                - ∑ᶠ d : σ →₀ ℕ, (if d.degree = 1 then 0 else
+                    coeff d (Φ x) • coeff μ (d.prod fun s n => t s ^ n)) := by
         intro x
         have h1 := congrArg (coeff μ) (heq x)
         rw [coeff_subst hs] at h1
         have hfin := coeff_subst_finite hs (Φ x) μ
         set T : (σ →₀ ℕ) → C := fun d => coeff d (Φ x) • coeff μ (d.prod fun s n => t s ^ n) with hT
-        have hsplit : ∀ d, T d = (if d.degree = 1 then T d else 0) + (if d.degree = 1 then 0 else T d) := by
+        have hsplit
+            : ∀ d, T d = (if d.degree = 1 then T d else 0) + (if d.degree = 1 then 0 else T d) := by
           intro d; split_ifs <;> simp
         have hfg : (Function.support fun d => if d.degree = 1 then T d else 0).Finite :=
           hfin.subset (fun d hd => by
-            simp only [Function.mem_support] at hd ⊢; split_ifs at hd; exact hd; exact absurd rfl hd)
+            simp only [Function.mem_support] at hd ⊢
+            split_ifs at hd
+            exact hd
+            exact absurd rfl hd)
         have hfh : (Function.support fun d => if d.degree = 1 then 0 else T d).Finite :=
           hfin.subset (fun d hd => by
-            simp only [Function.mem_support] at hd ⊢; split_ifs at hd; exact absurd rfl hd; exact hd)
-        have h2 : ∑ᶠ d, T d = (∑ᶠ d, if d.degree = 1 then T d else 0) +
-            ∑ᶠ d, (if d.degree = 1 then 0 else T d) := by
+            simp only [Function.mem_support] at hd ⊢
+            split_ifs at hd
+            exact absurd rfl hd
+            exact hd)
+        have h2
+            : ∑ᶠ d, T d
+              = (∑ᶠ d, if d.degree = 1 then T d else 0)
+                + ∑ᶠ d, (if d.degree = 1 then 0 else T d) := by
           rw [← finsum_add_distrib hfg hfh]; exact finsum_congr hsplit
         have h3 : (∑ᶠ d, if d.degree = 1 then T d else 0) = ∑ y', L x y' * coeff μ (t y') := by
-          rw [finsum_eq_sum_of_support_subset _ (s := Finset.univ.image fun y' => Finsupp.single y' 1)
+          rw [finsum_eq_sum_of_support_subset _
+            (s := Finset.univ.image fun y' => Finsupp.single y' 1)
             (fun d hd => by
               simp only [Function.mem_support] at hd
               split_ifs at hd with hd1
@@ -86,9 +101,12 @@ theorem intS_invG {σ : Type*} [Fintype σ] (Φ t G : σ → MvPowerSeries σ C)
         rw [h2, h3] at h1
         exact eq_sub_of_add_eq h1
 
-      have hc : ∀ x, IntC v (coeff μ (G x) -
-          ∑ᶠ d : σ →₀ ℕ, (if d.degree = 1 then 0 else
-            coeff d (Φ x) • coeff μ (d.prod fun s n => t s ^ n))) := by
+      have hc
+          : ∀ x,
+            IntC v
+              (coeff μ (G x)
+                - ∑ᶠ d : σ →₀ ℕ, (if d.degree = 1 then 0 else
+                    coeff d (Φ x) • coeff μ (d.prod fun s n => t s ^ n))) := by
         intro x
         refine intC_sub ?_ (intC_finsum fun d => ?_)
         · exact hG x μ
@@ -99,14 +117,14 @@ theorem intS_invG {σ : Type*} [Fintype σ] (Φ t G : σ → MvPowerSeries σ C)
             · have : 2 ≤ d.degree := by
                 have : d.degree ≠ 0 := fun h0 => hd0 ((Finsupp.degree_eq_zero_iff d).1 h0)
                 omega
-              rw [smul_eq_mul]; exact intC_mul (hΦ x d) (hbig d this)
+              rw [smul_eq_mul]
+              exact intC_mul (hΦ x d) (hbig d this)
 
       set w : σ → C := fun y' => coeff μ (t y') with hw
       set c : σ → C := fun x => coeff μ (G x) -
           ∑ᶠ d : σ →₀ ℕ, (if d.degree = 1 then 0 else
             coeff d (Φ x) • coeff μ (d.prod fun s n => t s ^ n)) with hcdef
-      have hLw : L.mulVec w = c := by
-        funext x; simp only [Matrix.mulVec, dotProduct]; exact heqx x
+      have hLw : L.mulVec w = c := by funext x; simp only [Matrix.mulVec, dotProduct]; exact heqx x
       have hunit : IsUnit L.det := isUnit_iff_ne_zero.mpr hdet0
       have hwsol : w = L⁻¹.mulVec c := by
         rw [← hLw, Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul L hunit, Matrix.one_mulVec]

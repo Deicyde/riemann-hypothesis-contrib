@@ -11,16 +11,21 @@ namespace LateralTheory.KummerTheory.ValAICPf
 
 variable {K : Type} [Field K] [IsAlgClosed K] (T : ValuationSubring K)
 
-theorem mem_of_root (p : T[X]) (hp : p.Monic) (r : K) (hr : (p.map (algebraMap T K)).eval r = 0) : r ∈ T := by
+theorem mem_of_root (p : T[X]) (hp : p.Monic) (r : K) (hr : (p.map (algebraMap T K)).eval r = 0)
+    : r ∈ T := by
   have hi : IsIntegral T r := ⟨p, hp, by rwa [eval_map] at hr⟩
   obtain ⟨y, hy⟩ := (IsIntegrallyClosed.isIntegral_iff (R := T) (K := K)).mp hi
-  rw [← hy]; exact y.2
+  rw [← hy]
+  exact y.2
 
 theorem aic : AIC T := by
   intro p hp hd
   have hd' : (p.map (algebraMap T K)).degree ≠ 0 := by
     rw [degree_map_eq_of_injective (IsFractionRing.injective T K)]
-    intro h; rw [degree_eq_natDegree hp.ne_zero] at h; norm_cast at h; omega
+    intro h
+    rw [degree_eq_natDegree hp.ne_zero] at h
+    norm_cast at h
+    omega
   obtain ⟨r, hr⟩ := IsAlgClosed.exists_root _ hd'
   have hrT := mem_of_root T p hp r hr
   refine ⟨⟨r, hrT⟩, ?_⟩
@@ -28,8 +33,8 @@ theorem aic : AIC T := by
   rw [map_zero, ← eval₂_hom, ← eval_map]
   exact hr
 
-theorem prod_lt (s : Multiset K) (hs : ∀ r ∈ s, T.valuation r ≤ 1) (h : T.valuation s.prod < 1) :
-    ∃ r ∈ s, T.valuation r < 1 := by
+theorem prod_lt (s : Multiset K) (hs : ∀ r ∈ s, T.valuation r ≤ 1) (h : T.valuation s.prod < 1)
+    : ∃ r ∈ s, T.valuation r < 1 := by
   by_contra hc
   push_neg at hc
   have : T.valuation s.prod = 1 := by
@@ -38,7 +43,8 @@ theorem prod_lt (s : Multiset K) (hs : ∀ r ∈ s, T.valuation r ≤ 1) (h : T.
     intro x hx
     obtain ⟨r, hr, rfl⟩ := Multiset.mem_map.mp hx
     exact le_antisymm (hs r hr) (hc r hr)
-  rw [this] at h; exact lt_irrefl _ h
+  rw [this] at h
+  exact lt_irrefl _ h
 
 theorem hens : HenselianLocalRing T where
   is_henselian := by
@@ -51,10 +57,13 @@ theorem hens : HenselianLocalRing T where
       mem_of_root T f hf r ((mem_roots (hf.map _).ne_zero).mp hr)
     have hlt : T.valuation (q.roots.map (fun r => (a₀ : K) - r)).prod < 1 := by
       rw [← he]; exact (T.valuation_lt_one_iff _).mp h₁
-    obtain ⟨x, hx, hxv⟩ := prod_lt T _ (by
-      intro x hx
-      obtain ⟨r, hr, rfl⟩ := Multiset.mem_map.mp hx
-      exact (T.valuation_le_one_iff _).mpr (T.sub_mem a₀.2 (hmem r hr))) hlt
+    obtain ⟨x, hx, hxv⟩ :=
+      prod_lt T _
+        (by
+          intro x hx
+          obtain ⟨r, hr, rfl⟩ := Multiset.mem_map.mp hx
+          exact (T.valuation_le_one_iff _).mpr (T.sub_mem a₀.2 (hmem r hr)))
+        hlt
     obtain ⟨r, hr, rfl⟩ := Multiset.mem_map.mp hx
     refine ⟨⟨r, hmem r hr⟩, ?_, ?_⟩
     · have h0 := (mem_roots (hf.map _).ne_zero).mp hr
@@ -68,7 +77,9 @@ theorem hens : HenselianLocalRing T where
 
 end LateralTheory.KummerTheory.ValAICPf
 
-theorem LateralTheory.KummerTheory.ValAIC_of : LateralTheory.KummerTheory.ValAIC := fun K _ _ T => ⟨LateralTheory.KummerTheory.ValAICPf.aic T, LateralTheory.KummerTheory.ValAICPf.hens T⟩
+theorem LateralTheory.KummerTheory.ValAIC_of : LateralTheory.KummerTheory.ValAIC := fun K _ _ T =>
+  ⟨LateralTheory.KummerTheory.ValAICPf.aic T, LateralTheory.KummerTheory.ValAICPf.hens T⟩
 
-theorem LateralTheory.KummerTheory.Place_of_ex (h : LateralTheory.KummerTheory.PlaceEx) : LateralTheory.KummerTheory.Place :=
+theorem LateralTheory.KummerTheory.Place_of_ex (h : LateralTheory.KummerTheory.PlaceEx)
+    : LateralTheory.KummerTheory.Place :=
   LateralTheory.KummerTheory.Place_of h LateralTheory.KummerTheory.ValAIC_of

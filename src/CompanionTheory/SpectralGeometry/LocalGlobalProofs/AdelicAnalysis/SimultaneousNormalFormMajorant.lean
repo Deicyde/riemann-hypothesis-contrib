@@ -9,19 +9,20 @@ open scoped ENNReal NNReal MatrixGroups
 
 namespace GlobalTheory.CompanionTheory.SW.Diag
 
-
 open scoped MatrixOrder in
-theorem exists_eq_transpose_mul_self {ι : Type} [Fintype ι] [DecidableEq ι]
-    {T : Matrix ι ι ℝ} (hT : T.PosSemidef) : ∃ B : Matrix ι ι ℝ, T = Bᵀ * B := by
+theorem exists_eq_transpose_mul_self
+    {ι : Type} [Fintype ι] [DecidableEq ι] {T : Matrix ι ι ℝ} (hT : T.PosSemidef)
+    : ∃ B : Matrix ι ι ℝ, T = Bᵀ * B := by
   have hH := hT.isHermitian
   set U : Matrix ι ι ℝ := (hH.eigenvectorUnitary : Matrix ι ι ℝ) with hUdef
   have hspec : T = U * diagonal (RCLike.ofReal ∘ hH.eigenvalues) * star U := hH.spectral_theorem
   have hstar : star U = Uᵀ := by
     rw [Matrix.star_eq_conjTranspose, conjTranspose_eq_transpose_of_trivial]
   rw [hstar] at hspec
-  have hd : diagonal (RCLike.ofReal ∘ hH.eigenvalues) =
-      diagonal (fun i => Real.sqrt (hH.eigenvalues i)) *
-        diagonal (fun i => Real.sqrt (hH.eigenvalues i)) := by
+  have hd
+      : diagonal (RCLike.ofReal ∘ hH.eigenvalues)
+        = diagonal (fun i => Real.sqrt (hH.eigenvalues i))
+          * diagonal (fun i => Real.sqrt (hH.eigenvalues i)) := by
     rw [diagonal_mul_diagonal]
     congr 1
     funext i
@@ -31,11 +32,12 @@ theorem exists_eq_transpose_mul_self {ι : Type} [Fintype ι] [DecidableEq ι]
   conv_lhs => rw [hspec, hd]
   simp only [Matrix.mul_assoc]
 
-theorem simultaneous_normal_form_majorant :
-    ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (S P : Matrix ι ι ℝ), S.IsSymm → S.det ≠ 0 →
-      P.PosDef → P * S⁻¹ * P = S →
-      ∃ (g : Matrix ι ι ℝ) (e : ι → ℝ), g.det ≠ 0 ∧ (∀ i, e i = 1 ∨ e i = -1) ∧
-        gᵀ * P * g = 1 ∧ gᵀ * S * g = Matrix.diagonal e := by
+theorem simultaneous_normal_form_majorant
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (S P : Matrix ι ι ℝ),
+      S.IsSymm → S.det ≠ 0 → P.PosDef → P * S⁻¹ * P = S
+        → ∃ (g : Matrix ι ι ℝ) (e : ι → ℝ),
+          g.det ≠ 0 ∧ (∀ i, e i = 1 ∨ e i = -1) ∧ gᵀ * P * g = 1
+            ∧ gᵀ * S * g = Matrix.diagonal e := by
   intro ι _ _ S P hS hSdet hP hPS
   obtain ⟨B, hB⟩ := exists_eq_transpose_mul_self hP.posSemidef
   have hPdet : P.det ≠ 0 := hP.det_pos.ne'
@@ -51,22 +53,27 @@ theorem simultaneous_normal_form_majorant :
   have hCB : C * B = 1 := nonsing_inv_mul B hBu
   have hCPC : Cᵀ * P * C = 1 := by
     rw [hB]
-    calc Cᵀ * (Bᵀ * B) * C = (B * C)ᵀ * (B * C) := by
-          rw [transpose_mul]
-          simp only [Matrix.mul_assoc]
+    calc
+      Cᵀ * (Bᵀ * B) * C = (B * C)ᵀ * (B * C) := by
+        rw [transpose_mul]
+        simp only [Matrix.mul_assoc]
       _ = 1 := by rw [hBC, transpose_one, Matrix.one_mul]
   have hPCC : P * (C * Cᵀ) = 1 := by
     rw [hB]
-    calc Bᵀ * B * (C * Cᵀ) = Bᵀ * ((B * C) * Cᵀ) := by simp only [Matrix.mul_assoc]
+    calc
+      Bᵀ * B * (C * Cᵀ)
+        = Bᵀ * ((B * C) * Cᵀ) := by simp only [Matrix.mul_assoc]
       _ = (C * B)ᵀ := by rw [hBC, Matrix.one_mul, transpose_mul]
       _ = 1 := by rw [hCB, transpose_one]
   have hCC : C * Cᵀ = P⁻¹ := (inv_eq_right_inv hPCC).symm
   have hSPS : S * P⁻¹ * S = P := by
-    calc S * P⁻¹ * S = P * S⁻¹ * P * P⁻¹ * S := by rw [hPS]
+    calc
+      S * P⁻¹ * S
+        = P * S⁻¹ * P * P⁻¹ * S := by rw [hPS]
       _ = P * S⁻¹ * (P * P⁻¹) * S := by simp only [Matrix.mul_assoc]
       _ = P := by
-          rw [mul_nonsing_inv P hPu, Matrix.mul_one, Matrix.mul_assoc, nonsing_inv_mul S hSu,
-            Matrix.mul_one]
+        rw [mul_nonsing_inv P hPu, Matrix.mul_one, Matrix.mul_assoc, nonsing_inv_mul S hSu,
+          Matrix.mul_one]
   set A := Cᵀ * S * C with hAdef
   have hAT : Aᵀ = A := by
     simp only [hAdef, transpose_mul, transpose_transpose, hS.eq, Matrix.mul_assoc]
@@ -75,7 +82,9 @@ theorem simultaneous_normal_form_majorant :
     rw [conjTranspose_eq_transpose_of_trivial]
     exact hAT
   have hA2 : A * A = 1 := by
-    calc A * A = Cᵀ * (S * (C * Cᵀ) * S) * C := by simp only [hAdef, Matrix.mul_assoc]
+    calc
+      A * A
+        = Cᵀ * (S * (C * Cᵀ) * S) * C := by simp only [hAdef, Matrix.mul_assoc]
       _ = 1 := by rw [hCC, hSPS, hCPC]
   set U : Matrix ι ι ℝ := (hA.eigenvectorUnitary : Matrix ι ι ℝ) with hUdef
   set e : ι → ℝ := RCLike.ofReal ∘ hA.eigenvalues with hedef
@@ -87,12 +96,15 @@ theorem simultaneous_normal_form_majorant :
   rw [hstar] at hspec hU1 hU2
   have hD : Uᵀ * A * U = diagonal e := by
     rw [hspec]
-    calc Uᵀ * (U * diagonal e * Uᵀ) * U = (Uᵀ * U) * diagonal e * (Uᵀ * U) := by
-          simp only [Matrix.mul_assoc]
+    calc
+      Uᵀ * (U * diagonal e * Uᵀ) * U
+        = (Uᵀ * U) * diagonal e * (Uᵀ * U) := by simp only [Matrix.mul_assoc]
       _ = diagonal e := by rw [hU1, Matrix.one_mul, Matrix.mul_one]
   have hDD : diagonal e * diagonal e = 1 := by
     rw [← hD]
-    calc Uᵀ * A * U * (Uᵀ * A * U) = Uᵀ * (A * (U * Uᵀ) * A) * U := by simp only [Matrix.mul_assoc]
+    calc
+      Uᵀ * A * U * (Uᵀ * A * U)
+        = Uᵀ * (A * (U * Uᵀ) * A) * U := by simp only [Matrix.mul_assoc]
       _ = 1 := by rw [hU2, Matrix.mul_one, hA2, Matrix.mul_one, hU1]
   have he : ∀ i, e i = 1 ∨ e i = -1 := by
     intro i
@@ -110,13 +122,15 @@ theorem simultaneous_normal_form_majorant :
       have h' := congrArg det hU1
       rw [det_mul, h, mul_zero, det_one] at h'
       exact zero_ne_one h'
-  · calc (C * U)ᵀ * P * (C * U) = Uᵀ * (Cᵀ * P * C) * U := by
-          rw [transpose_mul]
-          simp only [Matrix.mul_assoc]
+  · calc
+      (C * U)ᵀ * P * (C * U) = Uᵀ * (Cᵀ * P * C) * U := by
+        rw [transpose_mul]
+        simp only [Matrix.mul_assoc]
       _ = 1 := by rw [hCPC, Matrix.mul_one, hU1]
-  · calc (C * U)ᵀ * S * (C * U) = Uᵀ * A * U := by
-          rw [transpose_mul]
-          simp only [hAdef, Matrix.mul_assoc]
+  · calc
+      (C * U)ᵀ * S * (C * U) = Uᵀ * A * U := by
+        rw [transpose_mul]
+        simp only [hAdef, Matrix.mul_assoc]
       _ = diagonal e := hD
 
 end GlobalTheory.CompanionTheory.SW.Diag

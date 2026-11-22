@@ -10,9 +10,11 @@ public import Formalism.GaloisCohomology.LocalTateDualityK
 
 namespace GlobalTheory.FixedFinsetInvariants
 
-theorem exists_finset_fixed_mem_invariants {G LL V : Type} [Group G] [Field LL] [AddCommGroup V]
-    [Module LL V] [FiniteDimensional LL V] (ρ : Representation LL G V) :
-    ∃ s : Finset G, ∀ v : V, (∀ g ∈ s, ρ g v = v) → v ∈ Formalism.WeaklyAdmissibleFiltrations.H0V ρ := by
+theorem exists_finset_fixed_mem_invariants
+    {G LL V : Type} [Group G] [Field LL] [AddCommGroup V] [Module LL V] [FiniteDimensional LL V]
+    (ρ : Representation LL G V)
+    : ∃ s : Finset G, ∀ v : V,
+      (∀ g ∈ s, ρ g v = v) → v ∈ Formalism.WeaklyAdmissibleFiltrations.H0V ρ := by
   classical
   let F : Finset G → Submodule LL V := fun s => ⨅ g ∈ s, LinearMap.ker (ρ g - LinearMap.id)
   have hF : ∀ (s : Finset G) (v : V), v ∈ F s ↔ ∀ g ∈ s, ρ g v = v := by

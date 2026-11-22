@@ -10,11 +10,13 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.PullbackSections
 
-open AlgebraicGeometry CategoryTheory Limits Opposite Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.TB.ValAt
+open AlgebraicGeometry CategoryTheory Limits Opposite Formalism.L2.Pj
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.TB.ValAt
 
-theorem vtf_closure_eq_top {A B C P : CommRingCat.{0}} {f : A ⟶ B} {g : A ⟶ C} {inl : B ⟶ P}
-    {inr : C ⟶ P} (h : IsPushout f g inl inr) :
-    Subring.closure (Set.range inl.hom ∪ Set.range inr.hom) = ⊤ := by
+theorem vtf_closure_eq_top
+    {A B C P : CommRingCat.{0}} {f : A ⟶ B} {g : A ⟶ C} {inl : B ⟶ P} {inr : C ⟶ P}
+    (h : IsPushout f g inl inr)
+    : Subring.closure (Set.range inl.hom ∪ Set.range inr.hom) = ⊤ := by
   set R := Subring.closure (Set.range inl.hom ∪ Set.range inr.hom) with hR
   let l : B ⟶ CommRingCat.of R :=
     CommRingCat.ofHom (inl.hom.codRestrict R fun b => Subring.subset_closure (Or.inl ⟨b, rfl⟩))
@@ -45,8 +47,8 @@ theorem vtf_pt_eq (q : Sp ℂ) : q = cpt := by
 theorem vtf_mem {Z : Scheme.{0}} {x : Sp ℂ ⟶ Z} {U : Z.Opens} (h : ⊤ ≤ x ⁻¹ᵁ U) : x cpt ∈ U :=
   h trivial
 
-theorem vtf_range {Z : Scheme.{0}} (x : Sp ℂ ⟶ Z) (U : Z.Opens) (h : ⊤ ≤ x ⁻¹ᵁ U) :
-    Set.range x ⊆ Set.range U.ι := by
+theorem vtf_range {Z : Scheme.{0}} (x : Sp ℂ ⟶ Z) (U : Z.Opens) (h : ⊤ ≤ x ⁻¹ᵁ U)
+    : Set.range x ⊆ Set.range U.ι := by
   rintro _ ⟨q, rfl⟩
   rw [Scheme.Opens.range_ι, vtf_pt_eq q]
   exact vtf_mem h
@@ -55,17 +57,21 @@ theorem vtf_top {Z : Scheme.{0}} (x : Sp ℂ ⟶ Z) : ⊤ ≤ x ⁻¹ᵁ (⊤ : 
 
 section Fibre
 
-variable {g : ℕ} {X Y : Scheme.{0}} (f : Y ⟶ X) (u : Sp ℂ ⟶ X) (e : (Fin g → ℂ) → (Sp ℂ ⟶ Y))
-  (he : ∀ z, e z ≫ f = u)
+variable
+  {g : ℕ} {X Y : Scheme.{0}}
+  (f : Y ⟶ X) (u : Sp ℂ ⟶ X) (e : (Fin g → ℂ) → (Sp ℂ ⟶ Y)) (he : ∀ z, e z ≫ f = u)
 
 def vtfLift (z : Fin g → ℂ) : Sp ℂ ⟶ pullback f u :=
   pullback.lift (e z) (𝟙 _) (by rw [he z, Category.id_comp])
 
 set_option maxHeartbeats 800000 in
-theorem vtf_local (hol : IsHolFam e) (V : (pullback f u).Opens) (φ : Γ(pullback f u, V))
-    (z0 : Fin g → ℂ) (hz0 : ⊤ ≤ vtfLift f u e he z0 ⁻¹ᵁ V) :
-    ∃ N : Set (Fin g → ℂ), IsOpen N ∧ z0 ∈ N ∧ (∀ z ∈ N, ⊤ ≤ vtfLift f u e he z ⁻¹ᵁ V) ∧
-      DifferentiableOn ℂ (fun z => valAt' (vtfLift f u e he z) V φ) N := by
+theorem vtf_local
+    (hol : IsHolFam e)
+    (V : (pullback f u).Opens) (φ : Γ(pullback f u, V))
+    (z0 : Fin g → ℂ) (hz0 : ⊤ ≤ vtfLift f u e he z0 ⁻¹ᵁ V)
+    : ∃ N : Set (Fin g → ℂ),
+      IsOpen N ∧ z0 ∈ N ∧ (∀ z ∈ N, ⊤ ≤ vtfLift f u e he z ⁻¹ᵁ V)
+        ∧ DifferentiableOn ℂ (fun z => valAt' (vtfLift f u e he z) V φ) N := by
   classical
   obtain ⟨W, hW, huW, -⟩ := exists_isAffineOpen_mem_and_subset (x := u cpt) (U := ⊤) trivial
   have hfy : e z0 cpt ∈ f ⁻¹ᵁ W := by
@@ -84,8 +90,10 @@ theorem vtf_local (hol : IsHolFam e) (V : (pullback f u).Opens) (φ : Γ(pullbac
   have hSU : IsOpen {z | ⊤ ≤ e z ⁻¹ᵁ U} := (hol U 0).1
   have h0U : ⊤ ≤ e z0 ⁻¹ᵁ U := top_le_of_mem hyU
   let eU : (Fin g → ℂ) → (Sp ℂ ⟶ U.toScheme) := fun z =>
-    if h : ⊤ ≤ e z ⁻¹ᵁ U then IsOpenImmersion.lift U.ι (e z) (vtf_range (e z) U h)
-    else IsOpenImmersion.lift U.ι (e z0) (vtf_range (e z0) U h0U)
+    if h : ⊤ ≤ e z ⁻¹ᵁ U then
+      IsOpenImmersion.lift U.ι (e z) (vtf_range (e z) U h)
+    else
+      IsOpenImmersion.lift U.ι (e z0) (vtf_range (e z0) U h0U)
   have heU : ∀ z, ⊤ ≤ e z ⁻¹ᵁ U → eU z ≫ U.ι = e z := fun z h => by
     simp only [eU, dif_pos h, IsOpenImmersion.lift_fac]
   have heU' : ∀ z, eU z ≫ fU = uW := fun z => by
@@ -94,57 +102,76 @@ theorem vtf_local (hol : IsHolFam e) (V : (pullback f u).Opens) (φ : Γ(pullbac
     by_cases h : ⊤ ≤ e z ⁻¹ᵁ U
     · rw [← Category.assoc, heU z h, he]
     · simp only [eU, dif_neg h, IsOpenImmersion.lift_fac_assoc, he]
-  have hpb : IsPullback (pullback.fst fU uW) (pullback.snd fU uW) fU uW := IsPullback.of_hasPullback fU uW
+  have hpb : IsPullback (pullback.fst fU uW) (pullback.snd fU uW) fU uW :=
+    IsPullback.of_hasPullback fU uW
   have hgen := vtf_closure_eq_top (isPushout_appTop_of_isPullback hpb)
   have hw' : (pullback.fst fU uW ≫ U.ι) ≫ f = pullback.snd fU uW ≫ u := by
-    rw [Category.assoc, ← IsOpenImmersion.lift_fac W.ι (U.ι ≫ f) hUr, ← Category.assoc, pullback.condition,
-      Category.assoc, IsOpenImmersion.lift_fac]
-  let ι' : pullback fU uW ⟶ pullback f u := pullback.lift (pullback.fst fU uW ≫ U.ι) (pullback.snd fU uW) hw'
+    rw [Category.assoc, ← IsOpenImmersion.lift_fac W.ι (U.ι ≫ f) hUr, ← Category.assoc,
+      pullback.condition, Category.assoc, IsOpenImmersion.lift_fac]
+  let ι' : pullback fU uW ⟶ pullback f u :=
+    pullback.lift (pullback.fst fU uW ≫ U.ι) (pullback.snd fU uW) hw'
   let pP : (Fin g → ℂ) → (Sp ℂ ⟶ pullback fU uW) := fun z =>
     pullback.lift (eU z) (𝟙 _) (by rw [heU' z, Category.id_comp])
   have hpP : ∀ z, ⊤ ≤ e z ⁻¹ᵁ U → pP z ≫ ι' = vtfLift f u e he z := fun z h => by
     apply pullback.hom_ext
-    · change pullback.lift (eU z) (𝟙 _) _ ≫ pullback.lift (pullback.fst fU uW ≫ U.ι) (pullback.snd fU uW) hw' ≫
-        pullback.fst f u = pullback.lift (e z) (𝟙 _) _ ≫ pullback.fst f u
+    · change pullback.lift (eU z) (𝟙 _) _
+          ≫ pullback.lift (pullback.fst fU uW ≫ U.ι) (pullback.snd fU uW) hw' ≫ pullback.fst f u
+        = pullback.lift (e z) (𝟙 _) _ ≫ pullback.fst f u
       rw [pullback.lift_fst, pullback.lift_fst, pullback.lift_fst_assoc, heU z h]
-    · change pullback.lift (eU z) (𝟙 _) _ ≫ pullback.lift (pullback.fst fU uW ≫ U.ι) (pullback.snd fU uW) hw' ≫
-        pullback.snd f u = pullback.lift (e z) (𝟙 _) _ ≫ pullback.snd f u
+    · change pullback.lift (eU z) (𝟙 _) _
+          ≫ pullback.lift (pullback.fst fU uW ≫ U.ι) (pullback.snd fU uW) hw' ≫ pullback.snd f u
+        = pullback.lift (e z) (𝟙 _) _ ≫ pullback.snd f u
       rw [pullback.lift_snd, pullback.lift_snd, pullback.lift_snd]
   have hUimg : U ≤ U.ι ''ᵁ ⊤ := by
     rw [Scheme.Hom.image_top_eq_opensRange, Scheme.Opens.opensRange_ι]
-  have hfst : ∀ b : Γ(U.toScheme, ⊤), DifferentiableOn ℂ
-      (fun z => valAt' (pP z) ⊤ ((pullback.fst fU uW).appTop.hom b)) {z | ⊤ ≤ e z ⁻¹ᵁ U} := by
+  have hfst
+      : ∀ b : Γ(U.toScheme, ⊤),
+        DifferentiableOn ℂ
+          (fun z => valAt' (pP z) ⊤ ((pullback.fst fU uW).appTop.hom b))
+          {z | ⊤ ≤ e z ⁻¹ᵁ U} := by
     intro b
     obtain ⟨b', rfl⟩ : ∃ b', (U.ι.appIso ⊤).hom.hom b' = b :=
       ⟨(U.ι.appIso ⊤).inv.hom b, by exact congrArg (fun q => q.hom b) (U.ι.appIso ⊤).inv_hom_id⟩
-    have key : ∀ z, ⊤ ≤ e z ⁻¹ᵁ U →
-        valAt' (pP z) ⊤ ((pullback.fst fU uW).appTop.hom ((U.ι.appIso ⊤).hom.hom b')) =
-          valAt' (e z) (U.ι ''ᵁ ⊤) b' := by
+    have key
+        : ∀ z,
+          ⊤ ≤ e z ⁻¹ᵁ U
+            → valAt' (pP z) ⊤ ((pullback.fst fU uW).appTop.hom ((U.ι.appIso ⊤).hom.hom b'))
+              = valAt' (e z) (U.ι ''ᵁ ⊤) b' := by
       intro z hz
-      have e1 : valAt' (pP z) ⊤ ((pullback.fst fU uW).appTop.hom ((U.ι.appIso ⊤).hom.hom b')) =
-          valAt' (pP z ≫ pullback.fst fU uW) ⊤ ((U.ι.appIso ⊤).hom.hom b') := by
+      have e1
+          : valAt' (pP z) ⊤ ((pullback.fst fU uW).appTop.hom ((U.ι.appIso ⊤).hom.hom b'))
+            = valAt' (pP z ≫ pullback.fst fU uW) ⊤ ((U.ι.appIso ⊤).hom.hom b') := by
         exact valAt'_comp (pP z) (pullback.fst fU uW) ⊤ _
       have e2 : pP z ≫ pullback.fst fU uW = eU z := pullback.lift_fst _ _ _
       rw [e1, e2, Scheme.Hom.appIso_hom', Scheme.Hom.appLE, CommRingCat.comp_apply,
         valAt'_res _ _ (vtf_top _), valAt'_comp, heU z hz]
     refine ((hol _ b').2.mono fun z hz => ?_).congr fun z hz => key z hz
     exact top_le_of_mem (hUimg (vtf_mem hz))
-  have hsnd : ∀ c : Γ(Sp ℂ, ⊤), DifferentiableOn ℂ
-      (fun z => valAt' (pP z) ⊤ ((pullback.snd fU uW).appTop.hom c)) {z | ⊤ ≤ e z ⁻¹ᵁ U} := by
+  have hsnd
+      : ∀ c : Γ(Sp ℂ, ⊤),
+        DifferentiableOn ℂ
+          (fun z => valAt' (pP z) ⊤ ((pullback.snd fU uW).appTop.hom c))
+          {z | ⊤ ≤ e z ⁻¹ᵁ U} := by
     intro c
     refine (differentiableOn_const (valAt' (𝟙 (Sp ℂ)) ⊤ c)).congr fun z _ => ?_
-    have e1 : valAt' (pP z) ⊤ ((pullback.snd fU uW).appTop.hom c) =
-        valAt' (pP z ≫ pullback.snd fU uW) ⊤ c := by
+    have e1
+        : valAt' (pP z) ⊤ ((pullback.snd fU uW).appTop.hom c)
+          = valAt' (pP z ≫ pullback.snd fU uW) ⊤ c := by
       exact valAt'_comp (pP z) (pullback.snd fU uW) ⊤ _
     have e2 : pP z ≫ pullback.snd fU uW = 𝟙 _ := pullback.lift_snd _ _ _
     rw [e1, e2]
-  have hv : ∀ (x : Sp ℂ ⟶ pullback fU uW) (a : Γ(pullback fU uW, ⊤)),
-      valHom x ⊤ (vtf_top x) a = valAt' x ⊤ a := fun _ _ => rfl
-  have hall : ∀ a : Γ(pullback fU uW, ⊤), DifferentiableOn ℂ (fun z => valAt' (pP z) ⊤ a)
-      {z | ⊤ ≤ e z ⁻¹ᵁ U} := by
+  have hv
+      : ∀ (x : Sp ℂ ⟶ pullback fU uW) (a : Γ(pullback fU uW, ⊤)),
+        valHom x ⊤ (vtf_top x) a = valAt' x ⊤ a := fun _ _ =>
+    rfl
+  have hall
+      : ∀ a : Γ(pullback fU uW, ⊤),
+        DifferentiableOn ℂ (fun z => valAt' (pP z) ⊤ a) {z | ⊤ ≤ e z ⁻¹ᵁ U} := by
     intro a
-    have ha : a ∈ Subring.closure (Set.range (pullback.fst fU uW).appTop.hom ∪
-        Set.range (pullback.snd fU uW).appTop.hom) := by
+    have ha
+        : a ∈ Subring.closure
+          (Set.range (pullback.fst fU uW).appTop.hom
+            ∪ Set.range (pullback.snd fU uW).appTop.hom) := by
       rw [hgen]; exact Subring.mem_top a
     induction ha using Subring.closure_induction with
     | mem x hx =>
@@ -153,16 +180,15 @@ theorem vtf_local (hol : IsHolFam e) (V : (pullback f u).Opens) (φ : Γ(pullbac
       · exact hsnd c
     | zero => exact (differentiableOn_const 0).congr fun z _ => (hv _ _).symm.trans (map_zero _)
     | one => exact (differentiableOn_const 1).congr fun z _ => (hv _ _).symm.trans (map_one _)
-    | add x y _ _ hx hy =>
-      exact (hx.add hy).congr fun z _ => (hv _ _).symm.trans (map_add _ _ _)
+    | add x y _ _ hx hy => exact (hx.add hy).congr fun z _ => (hv _ _).symm.trans (map_add _ _ _)
     | neg x _ hx => exact hx.neg.congr fun z _ => (hv _ _).symm.trans (map_neg _ _)
-    | mul x y _ _ hx hy =>
-      exact (hx.mul hy).congr fun z _ => (hv _ _).symm.trans (map_mul _ _ _)
+    | mul x y _ _ hx hy => exact (hx.mul hy).congr fun z _ => (hv _ _).symm.trans (map_mul _ _ _)
   have hz0' : pP z0 cpt ∈ ι' ⁻¹ᵁ V := by
     show ι' (pP z0 cpt) ∈ V
     rw [← Scheme.Hom.comp_apply, hpP z0 h0U]
     exact vtf_mem hz0
-  obtain ⟨h, hle, hmem⟩ := (isAffineOpen_top (pullback fU uW)).exists_basicOpen_le ⟨pP z0 cpt, hz0'⟩ trivial
+  obtain ⟨h, hle, hmem⟩ :=
+    (isAffineOpen_top (pullback fU uW)).exists_basicOpen_le ⟨pP z0 cpt, hz0'⟩ trivial
   haveI := (isAffineOpen_top (pullback fU uW)).isLocalization_basicOpen h
   let ψ : Γ(pullback fU uW, (pullback fU uW).basicOpen h) :=
     ((pullback fU uW).presheaf.map (homOfLE hle).op).hom ((ι'.app V).hom φ)
@@ -171,9 +197,11 @@ theorem vtf_local (hol : IsHolFam e) (V : (pullback f u).Opens) (φ : Γ(pullbac
   obtain ⟨n, hn⟩ := s.2
   have hpow : ∀ z, valAt' (pP z) ⊤ (h ^ n) = valAt' (pP z) ⊤ h ^ n := fun z =>
     (hv _ _).symm.trans ((map_pow _ _ _).trans (congrArg (· ^ n) (hv _ _)))
-  have hal : ∀ q : Γ(pullback fU uW, ⊤), algebraMap Γ(pullback fU uW, ⊤)
-      Γ(pullback fU uW, (pullback fU uW).basicOpen h) q =
-      ((pullback fU uW).presheaf.map (homOfLE ((pullback fU uW).basicOpen_le h)).op).hom q := fun _ => rfl
+  have hal
+      : ∀ q : Γ(pullback fU uW, ⊤),
+        algebraMap Γ(pullback fU uW, ⊤) Γ(pullback fU uW, (pullback fU uW).basicOpen h) q
+          = ((pullback fU uW).presheaf.map (homOfLE ((pullback fU uW).basicOpen_le h)).op).hom q :=
+    fun _ => rfl
   let N : Set (Fin g → ℂ) := {z | ⊤ ≤ e z ⁻¹ᵁ U} ∩ (fun z => valAt' (pP z) ⊤ h) ⁻¹' {0}ᶜ
   have hN : IsOpen N := (hall h).continuousOn.isOpen_inter_preimage hSU isOpen_compl_singleton
   have hD : ∀ z ∈ N, ⊤ ≤ pP z ⁻¹ᵁ (pullback fU uW).basicOpen h := fun z hz =>
@@ -182,8 +210,9 @@ theorem vtf_local (hol : IsHolFam e) (V : (pullback f u).Opens) (φ : Γ(pullbac
     apply top_le_of_mem
     rw [← hpP z hz.1, Scheme.Hom.comp_apply]
     exact hle (vtf_mem (hD z hz))
-  have hval : ∀ z ∈ N, valAt' (vtfLift f u e he z) V φ =
-      valAt' (pP z) ⊤ a * (valAt' (pP z) ⊤ (h ^ n))⁻¹ := by
+  have hval
+      : ∀ z ∈ N,
+        valAt' (vtfLift f u e he z) V φ = valAt' (pP z) ⊤ a * (valAt' (pP z) ⊤ (h ^ n))⁻¹ := by
     intro z hz
     have hne : valAt' (pP z) ⊤ h ≠ 0 := hz.2
     have e1 : valAt' (vtfLift f u e he z) V φ = valAt' (pP z) _ ψ := by
@@ -192,10 +221,13 @@ theorem vtf_local (hol : IsHolFam e) (V : (pullback f u).Opens) (φ : Γ(pullbac
     have e3 : valAt' (pP z) _ ψ * valAt' (pP z) ⊤ (h ^ n) = valAt' (pP z) ⊤ a := by
       have e2 := congrArg (valHom (pP z) _ (hD z hz)) hs
       rw [map_mul] at e2
-      have ra : valHom (pP z) _ (hD z hz) (algebraMap Γ(pullback fU uW, ⊤) _ a) = valAt' (pP z) ⊤ a := by
+      have ra
+          : valHom (pP z) _ (hD z hz) (algebraMap Γ(pullback fU uW, ⊤) _ a)
+            = valAt' (pP z) ⊤ a := by
         exact valAt'_res (pP z) ((pullback fU uW).basicOpen_le h) (hD z hz) a
-      have rs : valHom (pP z) _ (hD z hz) (algebraMap Γ(pullback fU uW, ⊤) _ (s : Γ(pullback fU uW, ⊤))) =
-          valAt' (pP z) ⊤ (h ^ n) := by
+      have rs
+          : valHom (pP z) _ (hD z hz) (algebraMap Γ(pullback fU uW, ⊤) _ (s : Γ(pullback fU uW, ⊤)))
+            = valAt' (pP z) ⊤ (h ^ n) := by
         rw [← hn]
         exact valAt'_res (pP z) ((pullback fU uW).basicOpen_le h) (hD z hz) _
       rw [ra, rs] at e2
@@ -203,8 +235,8 @@ theorem vtf_local (hol : IsHolFam e) (V : (pullback f u).Opens) (φ : Γ(pullbac
     rw [e1, eq_mul_inv_iff_mul_eq₀ (by rw [hpow]; exact pow_ne_zero _ hne), e3]
   refine ⟨N, hN, ⟨h0U, ?_⟩, hVz, ?_⟩
   · exact (valAt'_ne_zero_iff (pP z0) ⊤ (vtf_top _) h cpt).2 hmem
-  · refine (((hall a).mono Set.inter_subset_left).mul (((hall (h ^ n)).mono Set.inter_subset_left).inv
-      fun z hz => ?_)).congr fun z hz => hval z hz
+  · refine (((hall a).mono Set.inter_subset_left).mul
+      (((hall (h ^ n)).mono Set.inter_subset_left).inv fun z hz => ?_)).congr fun z hz => hval z hz
     rw [hpow]
     exact pow_ne_zero _ hz.2
 

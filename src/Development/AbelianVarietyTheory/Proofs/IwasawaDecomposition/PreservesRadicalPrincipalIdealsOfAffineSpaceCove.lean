@@ -7,12 +7,17 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ValRS
 
 set_option autoImplicit false
 
-open AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH GlobalTheory.Cartier GlobalTheory.FlagBundle
+open AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH GlobalTheory.Cartier
+  GlobalTheory.FlagBundle
 
 namespace GlobalTheory.FlagBundle.AffRad
 
-theorem C_dvd_of_C_dvd_pow {A σ : Type} [CommRing A] {g : A} (hg : ∀ (x : A) (n : ℕ), g ∣ x ^ n → g ∣ x)
-    {P : MvPolynomial σ A} {n : ℕ} (h : MvPolynomial.C g ∣ P ^ n) : MvPolynomial.C g ∣ P := by
+theorem C_dvd_of_C_dvd_pow
+    {A σ : Type} [CommRing A]
+    {g : A} (hg : ∀ (x : A) (n : ℕ), g ∣ x ^ n → g ∣ x)
+    {P : MvPolynomial σ A} {n : ℕ} (h : MvPolynomial.C g ∣ P ^ n)
+    : MvPolynomial.C g ∣ P := by
   have hq : ∀ a : A, Ideal.Quotient.mk (Ideal.span {g}) a = 0 ↔ g ∣ a := fun a => by
     rw [Ideal.Quotient.eq_zero_iff_mem, Ideal.mem_span_singleton]
   rw [MvPolynomial.C_dvd_iff_map_hom_eq_zero _ g hq] at h ⊢
@@ -26,9 +31,12 @@ theorem C_dvd_of_C_dvd_pow {A σ : Type} [CommRing A] {g : A} (hg : ∀ (x : A) 
   change Ideal.Quotient.mk (Ideal.span {g}) (P.coeff i) = 0
   exact (hq _).2 (hg _ _ hk)
 
-theorem exists_div_of_mem_O {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] {M : RatModel o Ω}
-    {V : M.Z.Opens} (hV : IsAffineOpen V) {z : M.Z} (hz : z ∈ V) {x : Ω} (hx : x ∈ M.O z) :
-    ∃ a b : Ω, a ∈ M.ringOn V ∧ b ∈ M.ringOn V ∧ b ≠ 0 ∧ b⁻¹ ∈ M.O z ∧ x * b = a := by
+theorem exists_div_of_mem_O
+    {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω]
+    {M : RatModel o Ω} {V : M.Z.Opens} (hV : IsAffineOpen V)
+    {z : M.Z} (hz : z ∈ V)
+    {x : Ω} (hx : x ∈ M.O z)
+    : ∃ a b : Ω, a ∈ M.ringOn V ∧ b ∈ M.ringOn V ∧ b ≠ 0 ∧ b⁻¹ ∈ M.O z ∧ x * b = a := by
   obtain ⟨U, f, hU, rfl⟩ := hx
   have hne : (V : Set M.Z).Nonempty := ⟨z, hz⟩
   obtain ⟨g, hgU, hwg⟩ := hV.exists_basicOpen_le (V := U) ⟨z, hU⟩ hz
@@ -36,19 +44,31 @@ theorem exists_div_of_mem_O {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω]
   have := hV.isLocalization_basicOpen g
   obtain ⟨n, a, ha⟩ := IsLocalization.Away.surj g (resG M.Z hgU f)
   have h1 := congrArg (M.res _ hg) ha
-  have h2 : ∀ t : Γ(M.Z, V), M.res _ hg (algebraMap Γ(M.Z, V) Γ(M.Z, M.Z.basicOpen g) t) = M.res V hne t :=
-    fun t => M.res_resG (M.Z.basicOpen_le g) hg t
+  have h2
+      : ∀ t : Γ(M.Z, V),
+        M.res _ hg (algebraMap Γ(M.Z, V) Γ(M.Z, M.Z.basicOpen g) t) = M.res V hne t := fun t =>
+    M.res_resG (M.Z.basicOpen_le g) hg t
   rw [map_mul, map_pow, h2, h2, RatModel.res_resG, RatModel.res_apply, RatModel.res_apply,
-    RatModel.res_apply] at h1
+      RatModel.res_apply]
+    at h1
   have hu := (RatModel.isUnit_O_iff _).1 ((RatModel.isUnit_valF_iff hz g).2 hwg)
-  refine ⟨_, _, (RatModel.mem_ringOn_iff_exists hne).2 ⟨a, rfl⟩,
-    pow_mem ((RatModel.mem_ringOn_iff_exists hne).2 ⟨g, rfl⟩) n, pow_ne_zero _ hu.1, ?_, h1⟩
+  refine ⟨
+    _,
+    _,
+    (RatModel.mem_ringOn_iff_exists hne).2 ⟨a, rfl⟩,
+    pow_mem ((RatModel.mem_ringOn_iff_exists hne).2 ⟨g, rfl⟩) n,
+    pow_ne_zero _ hu.1,
+    ?_,
+    h1
+  ⟩
   rw [← inv_pow]
   exact pow_mem hu.2 n
 
-theorem keepsRad_of_affCover (F Ω Ω' : Type) [Field F] [Field Ω] [Algebra F Ω] [Field Ω'] [Algebra F Ω']
-    (M : RatModel F Ω) (M' : RatModel F Ω') (φ : Ω →ₐ[F] Ω') (f : M'.Z ⟶ M.Z) (r : ℕ)
-    (h : AffCover M M' φ f r) : KeepsRad M M' φ f := by
+theorem keepsRad_of_affCover
+    (F Ω Ω' : Type) [Field F] [Field Ω] [Algebra F Ω] [Field Ω'] [Algebra F Ω']
+    (M : RatModel F Ω) (M' : RatModel F Ω') (φ : Ω →ₐ[F] Ω')
+    (f : M'.Z ⟶ M.Z) (r : ℕ) (h : AffCover M M' φ f r)
+    : KeepsRad M M' φ f := by
   rintro z' g ⟨hg0, hgO, hg⟩
   obtain ⟨hf, hc⟩ := h
   obtain ⟨U, W, t, hU, -, hz, hW, hinj, hR⟩ := hc z'
@@ -57,7 +77,8 @@ theorem keepsRad_of_affCover (F Ω Ω' : Type) [Field F] [Field Ω] [Algebra F �
   let A := (M.O (f z')).toSubring
   let ψ : MvPolynomial (Fin r) A →+* Ω' := MvPolynomial.eval₂Hom ((φ : Ω →+* Ω').comp A.subtype) t
   have hψ : Function.Injective ψ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro P hP
     have := hinj (MvPolynomial.map A.subtype P) (by rw [MvPolynomial.eval₂_map]; exact hP)
     exact (map_eq_zero_iff _ (MvPolynomial.map_injective _ A.subtype_injective)).1 this
@@ -74,13 +95,18 @@ theorem keepsRad_of_affCover (F Ω Ω' : Type) [Field F] [Field Ω] [Algebra F �
     induction hy using Algebra.adjoin_induction with
     | mem y hy =>
       rcases hy with ⟨w, hw, rfl⟩ | ⟨i, rfl⟩
-      · exact ⟨MvPolynomial.C ⟨w, RatModel.ringOn_le_O (hW z' hz) hw⟩, MvPolynomial.eval₂Hom_C _ _ _⟩
+      · exact
+          ⟨MvPolynomial.C ⟨w, RatModel.ringOn_le_O (hW z' hz) hw⟩, MvPolynomial.eval₂Hom_C _ _ _⟩
       · exact ⟨MvPolynomial.X i, MvPolynomial.eval₂Hom_X' _ _ _⟩
     | algebraMap c =>
-      exact ⟨MvPolynomial.C ⟨algebraMap F Ω c, (M.O (f z')).algebraMap_mem c⟩,
-        (MvPolynomial.eval₂Hom_C _ _ _).trans (φ.commutes c)⟩
-    | add a b _ _ ha hb => obtain ⟨P, rfl⟩ := ha; obtain ⟨Q, rfl⟩ := hb; exact ⟨P + Q, map_add _ _ _⟩
-    | mul a b _ _ ha hb => obtain ⟨P, rfl⟩ := ha; obtain ⟨Q, rfl⟩ := hb; exact ⟨P * Q, map_mul _ _ _⟩
+      exact ⟨
+        MvPolynomial.C ⟨algebraMap F Ω c, (M.O (f z')).algebraMap_mem c⟩,
+        (MvPolynomial.eval₂Hom_C _ _ _).trans (φ.commutes c)
+      ⟩
+    | add a b _ _ ha hb =>
+      obtain ⟨P, rfl⟩ := ha; obtain ⟨Q, rfl⟩ := hb; exact ⟨P + Q, map_add _ _ _⟩
+    | mul a b _ _ ha hb =>
+      obtain ⟨P, rfl⟩ := ha; obtain ⟨Q, rfl⟩ := hb; exact ⟨P * Q, map_mul _ _ _⟩
   have hrad : ∀ (y : A) (k : ℕ), (⟨g, hgO⟩ : A) ∣ y ^ k → (⟨g, hgO⟩ : A) ∣ y := by
     rintro y k ⟨c, hc⟩
     have e : (y : Ω) ^ k = g * c := congrArg Subtype.val hc

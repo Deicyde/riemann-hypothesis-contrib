@@ -30,7 +30,7 @@ theorem continuous_levi (n : ℕ) : Continuous (levi k n) := by
   have h : Continuous (glEmb k n) := Continuous.units_map _ (continuous_glEmbHom k n)
   exact h.subtype_mk _
 
-theorem smPsiMinus : SmPsiMinus k :=
-  by apply _root_.UpperTheory.Reformulated.B.DYhc8.main <;> assumption
+theorem smPsiMinus : SmPsiMinus k := by
+  apply _root_.UpperTheory.Reformulated.B.DYhc8.main <;> assumption
 
 end GlobalTheory.CompanionTheory.BZMirFun

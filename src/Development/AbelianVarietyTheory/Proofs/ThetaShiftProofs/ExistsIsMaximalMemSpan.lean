@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.IntegerRi
 
 namespace GlobalTheory.MaxCusp
 
-open NumberField Complex MeasureTheory Module ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.TorusFourier
+open NumberField Complex MeasureTheory Module ReciprocityTheory.ChartRestriction.G.FD
+  GlobalTheory.TorusFourier
 open scoped ComplexConjugate
 
 noncomputable section
@@ -21,8 +22,9 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r d : ℕ}
 def IsIsotropicSub (G : Matrix (Fin r) (Fin r) E) (V : Submodule E (Fin r → E)) : Prop :=
   ∀ v ∈ V, ∀ w ∈ V, herm G v w = 0
 
-theorem isIsotropicSub_span {G : Matrix (Fin r) (Fin r) E} {s : Set (Fin r → E)}
-    (h : ∀ v ∈ s, ∀ w ∈ s, herm G v w = 0) : IsIsotropicSub G (Submodule.span E s) := by
+theorem isIsotropicSub_span
+    {G : Matrix (Fin r) (Fin r) E} {s : Set (Fin r → E)} (h : ∀ v ∈ s, ∀ w ∈ s, herm G v w = 0)
+    : IsIsotropicSub G (Submodule.span E s) := by
   intro v hv w hw
   induction hv using Submodule.span_induction with
   | mem x hx =>
@@ -38,7 +40,8 @@ theorem isIsotropicSub_span {G : Matrix (Fin r) (Fin r) E} {s : Set (Fin r → E
         simp only [herm, cc, Pi.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
         exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
       rw [this, hy, mul_zero]
-  | zero => simp [herm]
+  | zero =>
+    simp [herm]
   | add x y _ _ hx hy =>
     have : herm G (x + y) w = herm G x w + herm G y w := by
       simp [herm, add_mul, Finset.sum_add_distrib]
@@ -51,7 +54,10 @@ theorem exists_smul_mem (X : Data E r) (v : Fin r → E) : ∃ n : ℤ, n ≠ 0 
   | exact _root_.GlobalTheory.SubmoduleScalarClosure.main
   | (apply _root_.GlobalTheory.SubmoduleScalarClosure.main <;> assumption)
   | (intros; apply _root_.GlobalTheory.SubmoduleScalarClosure.main <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.SubmoduleScalarClosure.main <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.SubmoduleScalarClosure.main <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.SubmoduleScalarClosure.main ..)
 
 section Torus
@@ -62,9 +68,11 @@ end Torus
 
 section Main
 
-variable (X : DataX E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) (hP : X.IsSec la P)
-  (hχ : ∀ γ ∈ X.Γ, (∀ v ∈ X.Λ, ∃ y ∈ X.Λ,
-    Matrix.mulVec (γ : Matrix (Fin r) (Fin r) E) v - v = (X.g : E) • y) → X.χ la γ = 1)
+variable
+  (X : DataX E r) (la : Wt X.Ψ r) (P : Frame X.Ψ r → ℂ) (hP : X.IsSec la P)
+  (hχ : ∀ γ ∈ X.Γ,
+    (∀ v ∈ X.Λ, ∃ y ∈ X.Λ, Matrix.mulVec (γ : Matrix (Fin r) (Fin r) E) v - v = (X.g : E) • y)
+      → X.χ la γ = 1)
 
 include hP hχ
 

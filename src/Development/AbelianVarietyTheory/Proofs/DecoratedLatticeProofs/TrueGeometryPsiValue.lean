@@ -33,8 +33,13 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Colum
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw GlobalTheory.StepData GlobalTheory.SymChain GlobalTheory.LocMod GlobalTheory.MiS GlobalTheory.MiTop GlobalTheory.Fam GlobalTheory.Mem.Col2 ValuativeRel IsLocalRing
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev
+  Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw
+  GlobalTheory.StepData GlobalTheory.SymChain GlobalTheory.LocMod GlobalTheory.MiS
+  GlobalTheory.MiTop GlobalTheory.Fam GlobalTheory.Mem.Col2 ValuativeRel IsLocalRing
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 set_option maxHeartbeats 2000000
@@ -43,11 +48,15 @@ noncomputable section
 
 namespace GlobalTheory.FamTraceChiColChar
 
-open GlobalTheory.LocMod.PinEx GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum GlobalTheory.SplitWeil
+open GlobalTheory.LocMod.PinEx GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum
+  GlobalTheory.SplitWeil
 
-theorem chr_unif_congr {k : Type} [Field k] [ValuativeRel k] {ψ : AddChar k Circle} (hψ : HasConductor ψ 1) {t : kˣ} (ht : IsUnif t)
-    {p y : k} (hp : valuation k ((t : k) - p) < valuation k (t : k)) (hy : valuation k y ≤ 1) :
-    ψ (((t⁻¹ : kˣ) : k) * y) = ψ (p⁻¹ * y) := by
+theorem chr_unif_congr
+    {k : Type} [Field k] [ValuativeRel k]
+    {ψ : AddChar k Circle} (hψ : HasConductor ψ 1)
+    {t : kˣ} (ht : IsUnif t)
+    {p y : k} (hp : valuation k ((t : k) - p) < valuation k (t : k)) (hy : valuation k y ≤ 1)
+    : ψ (((t⁻¹ : kˣ) : k) * y) = ψ (p⁻¹ * y) := by
   have tp : 0 < valuation k (t : k) := zero_lt_iff.2 ((map_ne_zero _).2 t.ne_zero)
   have hpv : valuation k p = valuation k (t : k) := by
     refine Valuation.map_eq_of_sub_lt _ ?_
@@ -55,14 +64,16 @@ theorem chr_unif_congr {k : Type} [Field k] [ValuativeRel k] {ψ : AddChar k Cir
   have p0 : p ≠ 0 := fun e => by
     rw [e, map_zero] at hpv
     exact tp.ne hpv
-  have h1 : valuation k (((t : k) - p) * (t : k)⁻¹) ≤ valuation k (t : k) := (ht _).1 (by
-    rw [map_mul, map_inv₀, mul_inv_lt_iff₀ tp, one_mul]
-    exact hp)
-  have triv : ψ (((t : k) - p) * (t : k)⁻¹ * p⁻¹ * y) = 1 := (hψ 1).2 (by simp) _ (by
-    rw [map_one, map_mul, map_mul _ _ p⁻¹, map_inv₀, hpv]
-    refine mul_le_one' ?_ hy
-    rw [mul_inv_le_iff₀ tp, one_mul]
-    exact h1)
+  have h1 : valuation k (((t : k) - p) * (t : k)⁻¹) ≤ valuation k (t : k) :=
+    (ht _).1 (by
+      rw [map_mul, map_inv₀, mul_inv_lt_iff₀ tp, one_mul]
+      exact hp)
+  have triv : ψ (((t : k) - p) * (t : k)⁻¹ * p⁻¹ * y) = 1 :=
+    (hψ 1).2 (by simp) _ (by
+      rw [map_one, map_mul, map_mul _ _ p⁻¹, map_inv₀, hpv]
+      refine mul_le_one' ?_ hy
+      rw [mul_inv_le_iff₀ tp, one_mul]
+      exact h1)
   have e : p⁻¹ * y = ((t⁻¹ : kˣ) : k) * y + ((t : k) - p) * (t : k)⁻¹ * p⁻¹ * y := by
     have := t.ne_zero
     rw [Units.val_inv_eq_inv_val]
@@ -70,21 +81,32 @@ theorem chr_unif_congr {k : Type} [Field k] [ValuativeRel k] {ψ : AddChar k Cir
     ring
   rw [e, AddChar.map_add_eq_mul, triv, mul_one]
 
-theorem weil_unif_eq_exp {D : D7} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (q : GlobalTheory.FinPl.SplitPt D k) {PP : Formalism.L2.DIV.Pl D.host.E} (h : Formalism.L2.NTheta.IsIdemAt q.e PP) {ψ : AddChar k Circle}
-    (hψ : HasConductor ψ 1) {Ψ : AddChar (AF D.host.F) ℂ} (hΨ : IsStdChar D Ψ (-1)) (hc : (ofSplit q).IsChar Ψ ψ)
-    {p : ℕ} (hp : p.Prime) (hN : Ideal.absNorm PP.asIdeal = p) (hsq : ((p : ℕ) : 𝓞 D.host.E) ∉ PP.asIdeal ^ 2)
+theorem weil_unif_eq_exp
+    {D : D7} {k : Type}
+    [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (q : GlobalTheory.FinPl.SplitPt D k)
+    {PP : Formalism.L2.DIV.Pl D.host.E} (h : Formalism.L2.NTheta.IsIdemAt q.e PP)
+    {ψ : AddChar k Circle} (hψ : HasConductor ψ 1)
+    {Ψ : AddChar (AF D.host.F) ℂ} (hΨ : IsStdChar D Ψ (-1)) (hc : (ofSplit q).IsChar Ψ ψ)
+    {p : ℕ} (hp : p.Prime) (hN : Ideal.absNorm PP.asIdeal = p)
+    (hsq : ((p : ℕ) : 𝓞 D.host.E) ∉ PP.asIdeal ^ 2)
     {t : kˣ} (ht : IsUnif t) (htp : valuation k ((t : k) - (p : k)) < valuation k (t : k))
-    {s : 𝓞 D.host.E} (hs : D.host.xi0 * (s : D.host.E) = 1) {z : 𝓞 D.host.E} {b : ℤ} (hz : z - s * b ∈ PP.asIdeal) :
-    (ψ (((t⁻¹ : kˣ) : k) * (ofSplit q).pr (z : D.host.E)) : ℂ) = Complex.exp (2 * Real.pi * Complex.I * b / (p : ℂ)) := by
+    {s : 𝓞 D.host.E} (hs : D.host.xi0 * (s : D.host.E) = 1)
+    {z : 𝓞 D.host.E} {b : ℤ} (hz : z - s * b ∈ PP.asIdeal)
+    : (ψ (((t⁻¹ : kˣ) : k) * (ofSplit q).pr (z : D.host.E)) : ℂ)
+      = Complex.exp (2 * Real.pi * Complex.I * b / (p : ℂ)) := by
   obtain ⟨hv, hi, -⟩ := place_facts q h
   have h1 : valuation k (prO q z - prO q (s * b)) < 1 := by
     rw [← map_sub, ← prO_lt q h]
     exact hz
-  rw [← prO_apply, GlobalTheory.LevelUnif.chr_near hψ ht h1, chr_unif_congr hψ ht htp (prO_le q h _), hc,
-    ← GlobalTheory.SplitDegOneChar.psiE_sec_pr_eq_exp D k q PP p hp hN hsq hv hi Ψ hΨ ((b : D.host.E) / (p : D.host.E)) b
+  rw [← prO_apply, GlobalTheory.LevelUnif.chr_near hψ ht h1,
+    chr_unif_congr hψ ht htp (prO_le q h _), hc,
+    ← GlobalTheory.SplitDegOneChar.psiE_sec_pr_eq_exp D k q PP p hp hN hsq hv hi Ψ hΨ
+      ((b : D.host.E) / (p : D.host.E)) b
       (by rw [sub_self]; exact ⟨0, 1, (Ideal.ne_top_iff_one _).1 PP.isPrime.ne_top, by simp⟩)]
-  have e1 : ((p : k))⁻¹ * prO q (s * b) = q.pr (incA D ((s : D.host.E) * ((b : D.host.E) / (p : D.host.E)))) := by
+  have e1
+      : ((p : k))⁻¹ * prO q (s * b)
+        = q.pr (incA D ((s : D.host.E) * ((b : D.host.E) / (p : D.host.E)))) := by
     change _ = (q.pr.comp (incA D)) _
     rw [map_mul, map_mul, map_div₀, map_intCast, map_intCast, map_natCast]
     change _ = prO q s * _
@@ -93,18 +115,26 @@ theorem weil_unif_eq_exp {D : D7} {k : Type} [Field k] [ValuativeRel k] [Topolog
   change psiE Ψ (incA D D.host.xi0 * q.sec (q.pr _)) = psiE Ψ (q.sec (q.pr (incA D _)))
   rw [q.sec_pr, q.sec_pr, mul_left_comm, ← map_mul, ← mul_assoc D.host.xi0, hs, one_mul]
 
-theorem columnCharacter_reduction_eq_exp {B : GlobalTheory.Mem.Base} {X : GlobalTheory.Mem.PreX B.toPre} (I : TC B X) (hI : I.Ok)
+theorem columnCharacter_reduction_eq_exp
+    {B : GlobalTheory.Mem.Base} {X : GlobalTheory.Mem.PreX B.toPre} (I : TC B X) (hI : I.Ok)
     (G : Formalism.L2.Forms.GLoc B.host.F B.host.E B.sp.cm.sig B.host.g) (hG : G.piG = X.piG)
-    (hpsi : ∀ j v h (w : {w // w ∈ (B.primes X).vGs}), w.1.under (𝓞 B.host.F) = v → ∀ n : ℕ,
-      G.psi0 j v h (n : Formalism.L2.Forms.kv B.host.F v) = B.embLL (I.Ch.psi0 w (n : 𝓞 B.fields.E ⧸ w.1.asIdeal)))
-    (P : HeightOneSpectrum (𝓞 B.host.E)) (hPP : P ∈ (B.primes X).vGs) (j : Fin 2)
-    (h : (B.host.g j : 𝓞 B.host.F) ∈ (P.under (𝓞 B.host.F)).asIdeal) (z : 𝓞 B.host.E)
-    (w : (P.under (𝓞 B.host.F)).adicCompletionIntegers B.host.F)
-    (hw : (w : (P.under (𝓞 B.host.F)).adicCompletion B.host.F) =
-      G.phi j _ h ((z : B.host.E) ⊗ₜ[B.host.F] (1 : (P.under (𝓞 B.host.F)).adicCompletion B.host.F)))
-    {s : 𝓞 B.host.E} (hs : B.host.xi0 * (s : B.host.E) = 1) (hsP : s ∉ P.asIdeal) :
-    (Formalism.L2.Col.qOf P).Prime ∧ ∃ b : ℤ, z - s * b ∈ P.asIdeal ∧ G.psi0 j _ h (IsLocalRing.residue _ w) =
-      Complex.exp (2 * Real.pi * Complex.I * b / ((Formalism.L2.Col.qOf P : ℕ) : ℂ)) := by
+    (hpsi : ∀ j v h (w : {w // w ∈ (B.primes X).vGs}),
+      w.1.under (𝓞 B.host.F) = v
+        → ∀ n : ℕ,
+          G.psi0 j v h (n : Formalism.L2.Forms.kv B.host.F v)
+            = B.embLL (I.Ch.psi0 w (n : 𝓞 B.fields.E ⧸ w.1.asIdeal)))
+    (P : HeightOneSpectrum (𝓞 B.host.E)) (hPP : P ∈ (B.primes X).vGs)
+    (j : Fin 2) (h : (B.host.g j : 𝓞 B.host.F) ∈ (P.under (𝓞 B.host.F)).asIdeal)
+    (z : 𝓞 B.host.E) (w : (P.under (𝓞 B.host.F)).adicCompletionIntegers B.host.F)
+    (hw : (w : (P.under (𝓞 B.host.F)).adicCompletion B.host.F)
+      = G.phi j _ h
+        ((z : B.host.E) ⊗ₜ[B.host.F] (1 : (P.under (𝓞 B.host.F)).adicCompletion B.host.F)))
+    {s : 𝓞 B.host.E} (hs : B.host.xi0 * (s : B.host.E) = 1) (hsP : s ∉ P.asIdeal)
+    : (Formalism.L2.Col.qOf P).Prime
+      ∧ ∃ b : ℤ,
+        z - s * b ∈ P.asIdeal
+          ∧ G.psi0 j _ h (IsLocalRing.residue _ w)
+            = Complex.exp (2 * Real.pi * Complex.I * b / ((Formalism.L2.Col.qOf P : ℕ) : ℂ)) := by
   have hPr := (GlobalTheory.BasePrimes.primes_ok B X).1
   obtain ⟨P', hP, ρ, hPu, hres⟩ := TC.GLev0.exists_w (X := X) G hG j _ h
   have hwP : P' = P := TC.GLev0.vGs_inj (X := X) hPP (TC.GLev0.mem_vGs.2 ⟨j, hP⟩) hPu
@@ -113,11 +143,15 @@ theorem columnCharacter_reduction_eq_exp {B : GlobalTheory.Mem.Base} {X : Global
   refine ⟨by rw [hq]; exact hPr.g_prime j, ?_⟩
   obtain ⟨n, hn⟩ := TC.GLev0.exists_natCast (X := X) hPP (Ideal.Quotient.mk _ z)
   obtain ⟨b, hb⟩ := TC.GLev0.exists_natCast (X := X) hPP (Formalism.L2.Col.redP P' B.host.xi0 * n)
-  have hred := Formalism.L2.Col.reduction_spec P' (a := B.host.xi0) (r := 1) hsP (by rw [map_one, mul_comm]; exact hs)
+  have hred :=
+    Formalism.L2.Col.reduction_spec P' (a := B.host.xi0) (r := 1) hsP
+      (by rw [map_one, mul_comm]; exact hs)
   refine ⟨b, ?_, ?_⟩
-  · rw [← Ideal.Quotient.eq, map_mul, Int.cast_natCast, map_natCast, hb, ← mul_assoc, hred, map_one, one_mul, hn]
-  obtain ⟨hh, e⟩ := hres (Formalism.UG.inclE (F := B.host.F) (FiniteAdeleRing (𝓞 B.host.F) B.host.F) (z : B.host.E)) (Ideal.Quotient.mk _ z)
-    (by rw [adAt_inclE]; exact hasRes_coe _ z)
+  · rw [← Ideal.Quotient.eq, map_mul, Int.cast_natCast, map_natCast, hb, ← mul_assoc, hred, map_one,
+      one_mul, hn]
+  obtain ⟨hh, e⟩ :=
+    hres (Formalism.UG.inclE (F := B.host.F) (FiniteAdeleRing (𝓞 B.host.F) B.host.F) (z : B.host.E))
+      (Ideal.Quotient.mk _ z) (by rw [adAt_inclE]; exact hasRes_coe _ z)
   have ew : w = ⟨_, hh⟩ := Subtype.ext hw
   have e2 : IsLocalRing.residue _ w = (n : Formalism.L2.Forms.kv B.host.F _) := by
     rw [ew]

@@ -19,9 +19,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PrimeDivisor
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.PairStep
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.PairStep
 open GlobalTheory.Discrepancy GlobalTheory.EtaleKlt
 
 set_option autoImplicit false
@@ -30,7 +32,20 @@ noncomputable section
 
 namespace GlobalTheory.PairStep
 
-theorem finite_test_divisors : GlobalTheory.Published.Principalisation → ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] (p : X ⟶ Sp ℂ) (n : ℕ), IsProjOver p → topologicalKrullDim X = n → ∀ (η : RatForms p n) (m : ℕ) (G D₀ : CartierDiv X), η ≠ 0 → 0 < m → ∃ S : Set (DivOver p), S.Finite ∧ ∀ (x : X) (g f : X.functionFieldˣ) (c : ℚ), G.IsEqn x g → D₀.IsEqn x f → ((∀ E ∈ S, E.Through x → -1 < discrep E η m g - c * E.ord f) → ∀ E : DivOver p, E.Through x → -1 < discrep E η m g - c * E.ord f) ∧ ((∀ E ∈ S, E.Through x → -1 ≤ discrep E η m g - c * E.ord f) → ∀ E : DivOver p, E.Through x → -1 ≤ discrep E η m g - c * E.ord f) := by
+theorem finite_test_divisors
+    : GlobalTheory.Published.Principalisation
+      → ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] (p : X ⟶ Sp ℂ) (n : ℕ),
+        IsProjOver p → topologicalKrullDim X = n
+          → ∀ (η : RatForms p n) (m : ℕ) (G D₀ : CartierDiv X),
+            η ≠ 0 → 0 < m
+              → ∃ S : Set (DivOver p),
+                S.Finite
+                  ∧ ∀ (x : X) (g f : X.functionFieldˣ) (c : ℚ),
+                    G.IsEqn x g → D₀.IsEqn x f
+                      → ((∀ E ∈ S, E.Through x → -1 < discrep E η m g - c * E.ord f)
+                          → ∀ E : DivOver p, E.Through x → -1 < discrep E η m g - c * E.ord f)
+                        ∧ ((∀ E ∈ S, E.Through x → -1 ≤ discrep E η m g - c * E.ord f)
+                          → ∀ E : DivOver p, E.Through x → -1 ≤ discrep E η m g - c * E.ord f) := by
   intro hP X _ _ p n hproj hn η m G D₀ hη hm
   haveI : LocallyOfFiniteType p := by
     obtain ⟨h1, -⟩ := (isProjOver_iff_isProper_and_exists_isAmpleLB p).1 hproj
@@ -39,30 +54,37 @@ theorem finite_test_divisors : GlobalTheory.Published.Principalisation → ∀ (
     GlobalTheory.T.exists_resolution_divisors_topForm_normalCrossings hP X p n hproj hn η G D₀ hη
   haveI := SmoothOfRelativeDimension.smooth n (s ≫ p)
   haveI : GlobalTheory.IsNormalScheme Y := isNormalScheme_of_smooth (s ≫ p)
-  have hnY : topologicalKrullDim Y = n := GlobalTheory.NadelApp.topologicalKrullDim_eq_of_smooth Y (s ≫ p) n
+  have hnY : topologicalKrullDim Y = n :=
+    GlobalTheory.NadelApp.topologicalKrullDim_eq_of_smooth Y (s ≫ p) n
   set S : Set (DivOver p) := ⋃ v ∈ {v : Y | v ∈ B ∧ Order.coheight v = 1},
     {E : DivOver p | ∀ f, f ∈ E.ring ↔ RegAt v (functionFieldMap s f)} with hSdef
   refine ⟨S, hfin.biUnion fun v _ => Set.Subsingleton.finite fun E hE E₂ hE₂ => ?_, ?_⟩
   · have hr : E.ring = E₂.ring := SetLike.ext fun f => (hE f).trans (hE₂ f).symm
-    cases E; cases E₂
+    cases E
+    cases E₂
     cases hr
     rfl
   intro x g f c hg hf
   have hmq : (0 : ℚ) < m := by exact_mod_cast hm
 
-  have core : ∀ E : DivOver p, E.Through x → ∃ (ι : Type) (_ : Fintype ι) (Es : ι → DivOver p) (t : ι → ℤ),
-      (∀ j, Es j ∈ S ∧ (Es j).Through x ∧ 0 ≤ t j) ∧
-      ((∀ j, t j = 0) → (1 : ℚ) ≤ 1 + (discrep E η m g - c * E.ord f)) ∧
-      ((∃ j, t j ≠ 0) → ∑ j, (1 + (discrep (Es j) η m g - c * (Es j).ord f)) * (t j : ℚ) ≤
-        1 + (discrep E η m g - c * E.ord f)) := by
+  have core
+      : ∀ E : DivOver p,
+        E.Through x
+          → ∃ (ι : Type) (_ : Fintype ι) (Es : ι → DivOver p) (t : ι → ℤ),
+            (∀ j, Es j ∈ S ∧ (Es j).Through x ∧ 0 ≤ t j)
+              ∧ ((∀ j, t j = 0) → (1 : ℚ) ≤ 1 + (discrep E η m g - c * E.ord f))
+              ∧ ((∃ j, t j ≠ 0)
+                → ∑ j, (1 + (discrep (Es j) η m g - c * (Es j).ord f)) * (t j : ℚ)
+                  ≤ 1 + (discrep E η m g - c * E.ord f)) := by
     intro E hE
     obtain ⟨E', hE'⟩ := GlobalTheory.T.exists_primeDivisor_over_source_of_birational p s hbij E
-    obtain ⟨y, hyx, hy⟩ := GlobalTheory.T.exists_centre_of_valuationSubring_proper_dominant s E'.ring x fun a ha => (hE' a).1 (hE a ha)
+    obtain ⟨y, hyx, hy⟩ :=
+      GlobalTheory.T.exists_centre_of_valuationSubring_proper_dominant s E'.ring x fun a ha =>
+        (hE' a).1 (hE a ha)
     obtain ⟨U, hyU, z, J, w, u, hc⟩ := hchart y
     have hgen := isFreeGen_formOf (gen_mem hyU) hc.frame
     set ω0 := formOf U (gen_mem hyU) (dOn (s ≫ p) z) with hω0
-    have h0 : ω0 ≠ 0 := fun h =>
-      one_ne_zero (hgen.1 (a₁ := 1) (a₂ := 0) (by simp [h]))
+    have h0 : ω0 ≠ 0 := fun h => one_ne_zero (hgen.1 (a₁ := 1) (a₂ := 0) (by simp [h]))
     obtain ⟨h, hh⟩ := hgen.2 (ratPull p s n η)
     have hh0 : h ≠ 0 := fun e => hη' (by simp [← hh, e])
     set H : Y.functionFieldˣ := Units.mk0 h hh0 with hH
@@ -79,18 +101,29 @@ theorem finite_test_divisors : GlobalTheory.Published.Principalisation → ∀ (
       intro v hv h1 hne hvB
       obtain ⟨j, hj, rfl⟩ := (hc.mem v hv h1).1 hvB
       exact hne ⟨j, hj⟩ rfl
-    have hHv : ∀ v, v ⤳ y → Order.coheight v = 1 → (∀ j : J, v ≠ w j) →
-        Scheme.ord (H : Y.functionField) v = 0 := by
+    have hHv
+        : ∀ v,
+          v ⤳ y → Order.coheight v = 1 → (∀ j : J, v ≠ w j)
+            → Scheme.ord (H : Y.functionField) v = 0 := by
       intro v hv h1 hne
       obtain ⟨F, hF⟩ := DivOver.exists_isAt_of_coheight_eq_one (p := s ≫ p) h1
       have e1 := hK v F h1 (hoff v hv h1 hne) hF
       change F.formOrd (ratPull p s n η) = 0 at e1
-      rw [hHη, F.formOrd_smul hnY h0, DivOver.formOrd_formOf_eq_zero (hv.mem_open U.isOpen hyU) hF hc.frame,
-        add_zero, hF.ord_eq] at e1
+      rw [hHη, F.formOrd_smul hnY h0,
+          DivOver.formOrd_formOf_eq_zero (hv.mem_open U.isOpen hyU) hF hc.frame, add_zero,
+          hF.ord_eq]
+        at e1
       exact e1
-    have hM := fun φ hφ => GlobalTheory.T.primeDivisorOver_ord_eq_sum_adaptedMonomial E' y hy (ι := J) (fun j => w j) (fun j => u j)
-      (fun a b e => Subtype.ext (hc.inj a.2 b.2 e)) (fun j => hc.spec j j.2) (fun j => hc.coheight j j.2)
-      (fun j => hc.ord_self j j.2) (fun j v hv _ hne => hc.ord_other j j.2 v hv hne) φ hφ
+    have hM := fun φ hφ =>
+      GlobalTheory.T.primeDivisorOver_ord_eq_sum_adaptedMonomial E' y hy (ι := J)
+        (fun j => w j)
+        (fun j => u j)
+        (fun a b e => Subtype.ext (hc.inj a.2 b.2 e))
+        (fun j => hc.spec j j.2)
+        (fun j => hc.coheight j j.2)
+        (fun j => hc.ord_self j j.2)
+        (fun j v hv _ hne => hc.ord_other j j.2 v hv hne)
+        φ hφ
     have hMH := hM H hHv
     have hMg := hM (fnPull s g) fun v hv h1 hne => hG y v g hv h1 (hoff v hv h1 hne) hgy
     have hMf := hM (fnPull s f) fun v hv h1 hne => hD y v f hv h1 (hoff v hv h1 hne) hfy
@@ -98,10 +131,14 @@ theorem finite_test_divisors : GlobalTheory.Published.Principalisation → ∀ (
     have hFj : ∀ j : J, ∃ F : DivOver (s ≫ p), F.IsAt (w j) := fun j =>
       DivOver.exists_isAt_of_coheight_eq_one (hc.coheight j j.2)
     choose F hF using hFj
-    have hEj : ∀ j : J, ∃ Ej : DivOver p, DivOver.Over s (F j) Ej := fun j => GlobalTheory.T.exists_primeDivisor_over_target_of_birational p s hbij (F j)
+    have hEj : ∀ j : J, ∃ Ej : DivOver p, DivOver.Over s (F j) Ej := fun j =>
+      GlobalTheory.T.exists_primeDivisor_over_target_of_birational p s hbij (F j)
     choose Es hEs using hEj
-    have hA := GlobalTheory.T.birational_primeDivisor_orders_functions_topForms p n hn s hbij E E' hE'
-    have hAj := fun j => GlobalTheory.T.birational_primeDivisor_orders_functions_topForms p n hn s hbij (Es j) (F j) (hEs j)
+    have hA :=
+      GlobalTheory.T.birational_primeDivisor_orders_functions_topForms p n hn s hbij E E' hE'
+    have hAj := fun j =>
+      GlobalTheory.T.birational_primeDivisor_orders_functions_topForms p n hn s hbij (Es j) (F j)
+        (hEs j)
 
     set t : J → ℤ := fun j => E'.ord (u j) with ht
     have htn : ∀ j, 0 ≤ t j := fun j => by
@@ -110,7 +147,9 @@ theorem finite_test_divisors : GlobalTheory.Published.Principalisation → ∀ (
       exact regAt_fnOf hyU _ _
     set Fo := E'.formOrd ω0 with hFo
     have hlog : ∑ j : J, t j - 1 ≤ Fo :=
-      GlobalTheory.T.sum_ord_sub_one_le_ord_wedgeDifferentials hnY E' hyU hy z h0 (J := J) Subtype.val Subtype.val_injective (fun j => u j)
+      GlobalTheory.T.sum_ord_sub_one_le_ord_wedgeDifferentials hnY E' hyU hy z h0 (J := J)
+        Subtype.val Subtype.val_injective
+        (fun j => u j)
         fun j => hc.val j j.2
     have hnn : 0 ≤ Fo := DivOver.formOrd_formOf_nonneg hnY hyU hy (dOn (s ≫ p) z) h0
     have eFE : E.formOrd η = ∑ j : J, Scheme.ord (H : Y.functionField) (w j) * t j + Fo := by
@@ -123,29 +162,34 @@ theorem finite_test_divisors : GlobalTheory.Published.Principalisation → ∀ (
     have eFj : ∀ j, (Es j).formOrd η = Scheme.ord (H : Y.functionField) (w j) := fun j => by
       have hAform : (F j).formOrd (ratPull p s n η) = (Es j).formOrd η := (hAj j).2 η hη
       rw [← hAform, hHη, (F j).formOrd_smul hnY h0,
-        DivOver.formOrd_formOf_eq_zero ((hc.spec j j.2).mem_open U.isOpen hyU) (hF j) hc.frame, add_zero,
-        (hF j).ord_eq]
+        DivOver.formOrd_formOf_eq_zero ((hc.spec j j.2).mem_open U.isOpen hyU) (hF j) hc.frame,
+        add_zero, (hF j).ord_eq]
     have egj : ∀ j, (Es j).ord g = Scheme.ord (fnPull s g : Y.functionField) (w j) := fun j => by
       rw [← (hAj j).1 g, (hF j).ord_eq]
     have efj : ∀ j, (Es j).ord f = Scheme.ord (fnPull s f : Y.functionField) (w j) := fun j => by
       rw [← (hAj j).1 f, (hF j).ord_eq]
-    have key : ∑ j : J, (1 + (discrep (Es j) η m g - c * (Es j).ord f)) * (t j : ℚ) =
-        1 + (discrep E η m g - c * E.ord f) - (1 + Fo - ∑ j : J, (t j : ℚ)) := by
+    have key
+        : ∑ j : J, (1 + (discrep (Es j) η m g - c * (Es j).ord f)) * (t j : ℚ)
+          = 1 + (discrep E η m g - c * E.ord f) - (1 + Fo - ∑ j : J, (t j : ℚ)) := by
       simp only [discrep, eFE, egE, efE, eFj, egj, efj]
       push_cast
       rw [Finset.sum_div, Finset.mul_sum]
-      have : ∀ j : J, (1 + ((Scheme.ord (H : Y.functionField) (w j) : ℚ) -
-          (Scheme.ord (fnPull s g : Y.functionField) (w j) : ℚ) / m -
-          c * (Scheme.ord (fnPull s f : Y.functionField) (w j) : ℚ))) * (t j : ℚ) =
-          (t j : ℚ) + (Scheme.ord (H : Y.functionField) (w j) : ℚ) * t j -
-          (Scheme.ord (fnPull s g : Y.functionField) (w j) : ℚ) * t j / m -
-          c * ((Scheme.ord (fnPull s f : Y.functionField) (w j) : ℚ) * t j) := fun j => by ring
+      have : ∀ j : J,
+          (1 + ((Scheme.ord (H : Y.functionField) (w j) : ℚ)
+                - (Scheme.ord (fnPull s g : Y.functionField) (w j) : ℚ) / m
+                - c * (Scheme.ord (fnPull s f : Y.functionField) (w j) : ℚ)))
+              * (t j : ℚ)
+            = (t j : ℚ) + (Scheme.ord (H : Y.functionField) (w j) : ℚ) * t j
+              - (Scheme.ord (fnPull s g : Y.functionField) (w j) : ℚ) * t j / m
+              - c * ((Scheme.ord (fnPull s f : Y.functionField) (w j) : ℚ) * t j) := fun j => by
+        ring
       rw [Finset.sum_congr rfl fun j _ => this j, Finset.sum_sub_distrib, Finset.sum_sub_distrib,
         Finset.sum_add_distrib]
       ring
     refine ⟨J, inferInstance, Es, t, fun j => ⟨?_, ?_, htn j⟩, fun h0' => ?_, fun ⟨j0, hj0⟩ => ?_⟩
-    · refine Set.mem_biUnion (x := w j) ⟨(hc.mem _ (hc.spec j j.2) (hc.coheight j j.2)).2 ⟨j, j.2, rfl⟩,
-        hc.coheight j j.2⟩ fun a => (hEs j a).trans (hF j _)
+    · refine Set.mem_biUnion (x := w j)
+        ⟨(hc.mem _ (hc.spec j j.2) (hc.coheight j j.2)).2 ⟨j, j.2, rfl⟩, hc.coheight j j.2⟩
+        fun a => (hEs j a).trans (hF j _)
     · intro a ha
       refine (hEs j a).2 ((hF j _).2 (regAt_of_specializes (hc.spec j j.2) ?_))
       exact GlobalTheory.Cartier.PullDominant.regAt_map s (regAt_of_specializes hyx ha)

@@ -9,9 +9,10 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem one_mem_of_mulClosed_of_det_ne_zero : ∀ {F K : Type} [Field F] [Field K] [Algebra F K]
-    [Algebra.IsIntegral F K] {m : ℕ} (S : Submodule F (Matrix (Fin m) (Fin m) K)),
-    (∀ x ∈ S, ∀ y ∈ S, x * y ∈ S) → ∀ T ∈ S, T.det ≠ 0 → (1 : Matrix (Fin m) (Fin m) K) ∈ S := by
+theorem one_mem_of_mulClosed_of_det_ne_zero
+    : ∀ {F K : Type} [Field F] [Field K] [Algebra F K] [Algebra.IsIntegral F K] {m : ℕ}
+        (S : Submodule F (Matrix (Fin m) (Fin m) K)),
+      (∀ x ∈ S, ∀ y ∈ S, x * y ∈ S) → ∀ T ∈ S, T.det ≠ 0 → (1 : Matrix (Fin m) (Fin m) K) ∈ S := by
   intro F K _ _ _ _ m S hS T hT hdet
   classical
   have hTu : IsUnit T := (Matrix.isUnit_iff_isUnit_det T).2 (isUnit_iff_ne_zero.2 hdet)
@@ -40,8 +41,7 @@ theorem one_mem_of_mulClosed_of_det_ne_zero : ∀ {F K : Type} [Field F] [Field 
   have hc : p.coeff 0 ≠ 0 := by
     intro hc
     rw [hc, map_zero, add_zero] at hkey
-    have hq : aeval T p.divX = 0 := by
-      exact hTu.mul_right_eq_zero.1 hkey
+    have hq : aeval T p.divX = 0 := by exact hTu.mul_right_eq_zero.1 hkey
     have hne : p.divX ≠ 0 := by
       intro h
       rw [divX_eq_zero_iff, hc, map_zero] at h
@@ -49,8 +49,8 @@ theorem one_mem_of_mulClosed_of_det_ne_zero : ∀ {F K : Type} [Field F] [Field 
     have hle := minpoly.degree_le_of_ne_zero F T hne hq
     exact absurd (degree_divX_lt hp0) (not_lt.2 hle)
   have hone : (1 : Matrix (Fin m) (Fin m) K) = (-(p.coeff 0)⁻¹) • (T * aeval T p.divX) := by
-    rw [eq_neg_of_add_eq_zero_left hkey, smul_neg, neg_smul, neg_neg, Algebra.smul_def,
-      ← map_mul, inv_mul_cancel₀ hc, map_one]
+    rw [eq_neg_of_add_eq_zero_left hkey, smul_neg, neg_smul, neg_neg, Algebra.smul_def, ← map_mul,
+      inv_mul_cancel₀ hc, map_one]
   rw [hone]
   exact S.smul_mem _ (hmul _)
 

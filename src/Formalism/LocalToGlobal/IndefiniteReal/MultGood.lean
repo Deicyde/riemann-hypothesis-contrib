@@ -13,11 +13,22 @@ namespace Formalism.IndefR.Mult
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem goodPar_dualPar {n p q : ℕ} {S : SPar} (h : GoodPar n p q S) : GoodPar n p q (dualPar S) := by
+theorem goodPar_dualPar {n p q : ℕ} {S : SPar} (h : GoodPar n p q S)
+    : GoodPar n p q (dualPar S) := by
   obtain ⟨lam, ε, ⟨hanti, Q, hQ, rfl⟩, ⟨_, hint⟩, hp, hq⟩ := h
-  refine ⟨fun a => -lam (Fin.rev a), fun a => ε (Fin.rev a),
-    ⟨fun a b hab => neg_lt_neg (hanti (Fin.rev_lt_rev.mpr hab)), fun a => -Q (Fin.rev a), fun a => by simp [hQ], ?_⟩,
-    ⟨fun a b hab => neg_lt_neg (hanti (Fin.rev_lt_rev.mpr hab)), fun a => ?_⟩, ?_, ?_⟩
+  refine ⟨
+    fun a => - lam (Fin.rev a),
+    fun a => ε (Fin.rev a),
+    ⟨
+      fun a b hab => neg_lt_neg (hanti (Fin.rev_lt_rev.mpr hab)),
+      fun a => - Q (Fin.rev a),
+      fun a => by simp [hQ],
+      ?_
+    ⟩,
+    ⟨fun a b hab => neg_lt_neg (hanti (Fin.rev_lt_rev.mpr hab)), fun a => ?_⟩,
+    ?_,
+    ?_
+  ⟩
   · unfold dualPar
     rw [Finset.image_image]
     ext ⟨x, s⟩
@@ -49,11 +60,13 @@ theorem lamAt_strictAnti {R : Ranks} (h : HCParam R) : StrictAnti fun a : Fin R.
 
 def sgA (R : Ranks) (a : ℕ) : Bool := decide (a < R.k - 1 ∨ Even (a - (R.k - 1)))
 
-theorem holPar_kapW_eq {R : Ranks} (h : HCParam R) (p q : ℕ) (hpq : p + q = R.r) :
-    holPar p q (kapW h p q) = Finset.univ.image fun a : Fin R.r => (lamAt h a, decide ((a : ℕ) < p)) := by
+theorem holPar_kapW_eq {R : Ranks} (h : HCParam R) (p q : ℕ) (hpq : p + q = R.r)
+    : holPar p q (kapW h p q)
+      = Finset.univ.image fun a : Fin R.r => (lamAt h a, decide ((a : ℕ) < p)) := by
   have ho : Odd (p + q) := hpq ▸ odd_r R
   ext ⟨x, s⟩
-  simp only [holPar, Finset.mem_image, Finset.mem_univ, true_and, Prod.mk.injEq, holEnt_kapW h p q ho]
+  simp only [holPar, Finset.mem_image, Finset.mem_univ, true_and, Prod.mk.injEq,
+    holEnt_kapW h p q ho]
   constructor
   · rintro ⟨a, rfl, rfl⟩
     cases a with

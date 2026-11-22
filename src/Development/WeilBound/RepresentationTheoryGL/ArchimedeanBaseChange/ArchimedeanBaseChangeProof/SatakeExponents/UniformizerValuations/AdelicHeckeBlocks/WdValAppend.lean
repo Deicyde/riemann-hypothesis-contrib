@@ -8,7 +8,8 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC PositivityTheory.Rg.BcB.CG
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.BcB.E PositivityTheory.RgBcC
+  PositivityTheory.Rg.BcB.CG
 open PositivityTheory.RgTw (Mat G)
 open PositivityTheory.Rg.BcB.SpectralAccumulation (Hf)
 open scoped Classical
@@ -19,12 +20,12 @@ attribute [local instance] borelG borelF borelH
 
 namespace Word
 
-theorem wdVal_append {A Γ : Type} [Monoid A] [Star A] (gen : Γ → A) (u v : List (Γ × Bool)) :
-    wdVal gen (u ++ v) = wdVal gen u * wdVal gen v := by
+theorem wdVal_append {A Γ : Type} [Monoid A] [Star A] (gen : Γ → A) (u v : List (Γ × Bool))
+    : wdVal gen (u ++ v) = wdVal gen u * wdVal gen v := by
   simp [wdVal, List.map_append, List.prod_append]
 
-theorem wdVal_star {A Γ : Type} [Monoid A] [StarMul A] (gen : Γ → A) (w : List (Γ × Bool)) :
-    star (wdVal gen w) = wdVal gen (w.map fun p => (p.1, !p.2)).reverse := by
+theorem wdVal_star {A Γ : Type} [Monoid A] [StarMul A] (gen : Γ → A) (w : List (Γ × Bool))
+    : star (wdVal gen w) = wdVal gen (w.map fun p => (p.1, !p.2)).reverse := by
   induction w with
   | nil => simp [wdVal]
   | cons p w ih =>
@@ -35,14 +36,16 @@ theorem wdVal_star {A Γ : Type} [Monoid A] [StarMul A] (gen : Γ → A) (w : Li
     obtain ⟨x, b⟩ := p
     cases b <;> simp [wdVal]
 
-theorem pow_eq {A Γ J : Type} [Ring A] [StarRing A] [Algebra ℂ A] [Fintype J] (gen : Γ → A) (c : J → ℂ)
-    (w : J → List (Γ × Bool)) (k : ℕ) :
-    (∑ j, c j • wdVal gen (w j)) ^ k =
-      ∑ f : Fin k → J, (∏ i, c (f i)) • wdVal gen (List.ofFn fun i => w (f i)).flatten := by
+theorem pow_eq
+    {A Γ J : Type} [Ring A] [StarRing A] [Algebra ℂ A] [Fintype J]
+    (gen : Γ → A) (c : J → ℂ) (w : J → List (Γ × Bool)) (k : ℕ)
+    : (∑ j, c j • wdVal gen (w j)) ^ k
+      = ∑ f : Fin k → J, (∏ i, c (f i)) • wdVal gen (List.ofFn fun i => w (f i)).flatten := by
   induction k with
   | zero => simp [wdVal]
   | succ k ih =>
-    rw [pow_succ', ih, Finset.sum_mul_sum, ← (Fin.consEquiv fun _ => J).sum_comp, Fintype.sum_prod_type]
+    rw [pow_succ', ih, Finset.sum_mul_sum, ← (Fin.consEquiv fun _ => J).sum_comp,
+      Fintype.sum_prod_type]
     refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun f _ => ?_
     simp only [Fin.consEquiv, Equiv.coe_fn_mk, Fin.prod_univ_succ, Fin.cons_zero, Fin.cons_succ,
       List.ofFn_succ, List.flatten_cons, wdVal_append, smul_mul_smul_comm]
@@ -51,17 +54,26 @@ end Word
 
 theorem adjWords : AdjWords := by
   intro A Γ _ _ _ _ gen a ha
-  suffices h : ∃ (J : Type) (_ : Fintype J) (c : J → ℂ) (w : J → List (Γ × Bool)) (L : ℕ),
-      (∀ j, (w j).length ≤ L) ∧ a = ∑ j, c j • wdVal gen (w j) by
+  suffices h
+      : ∃ (J : Type) (_ : Fintype J) (c : J → ℂ) (w : J → List (Γ × Bool)) (L : ℕ),
+        (∀ j, (w j).length ≤ L) ∧ a = ∑ j, c j • wdVal gen (w j) by
     obtain ⟨J, _, c, w, L, hL, rfl⟩ := h
     exact ⟨J, inferInstance, c, w, L, hL, rfl, Word.pow_eq gen c w⟩
   induction ha using StarAlgebra.adjoin_induction with
   | mem x hx =>
     obtain ⟨i, rfl⟩ := hx
-    exact ⟨Unit, inferInstance, fun _ => 1, fun _ => [(i, false)], 1, fun _ => le_rfl, by simp [wdVal]⟩
+    exact
+      ⟨Unit, inferInstance, fun _ => 1, fun _ => [(i, false)], 1, fun _ => le_rfl, by simp [wdVal]⟩
   | algebraMap r =>
-    exact ⟨Unit, inferInstance, fun _ => r, fun _ => [], 0, fun _ => le_rfl, by
-      simp [wdVal, Algebra.algebraMap_eq_smul_one]⟩
+    exact ⟨
+      Unit,
+      inferInstance,
+      fun _ => r,
+      fun _ => [],
+      0,
+      fun _ => le_rfl,
+      by simp [wdVal, Algebra.algebraMap_eq_smul_one]
+    ⟩
   | add x y _ _ hx hy =>
     obtain ⟨J, _, c, w, L, hL, rfl⟩ := hx
     obtain ⟨J', _, c', w', L', hL', rfl⟩ := hy
@@ -73,7 +85,8 @@ theorem adjWords : AdjWords := by
   | mul x y _ _ hx hy =>
     obtain ⟨J, _, c, w, L, hL, rfl⟩ := hx
     obtain ⟨J', _, c', w', L', hL', rfl⟩ := hy
-    refine ⟨J × J', inferInstance, fun p => c p.1 * c' p.2, fun p => w p.1 ++ w' p.2, L + L', ?_, ?_⟩
+    refine
+      ⟨J × J', inferInstance, fun p => c p.1 * c' p.2, fun p => w p.1 ++ w' p.2, L + L', ?_, ?_⟩
     · rintro ⟨j, j'⟩
       simpa using Nat.add_le_add (hL j) (hL' j')
     · rw [Finset.sum_mul_sum, Fintype.sum_prod_type]
@@ -82,7 +95,15 @@ theorem adjWords : AdjWords := by
       rw [smul_mul_smul_comm, Word.wdVal_append]
   | star x _ hx =>
     obtain ⟨J, _, c, w, L, hL, rfl⟩ := hx
-    refine ⟨J, inferInstance, fun j => star (c j), fun j => ((w j).map fun p => (p.1, !p.2)).reverse, L, ?_, ?_⟩
+    refine ⟨
+      J,
+      inferInstance,
+      fun j => star (c j),
+      fun j => ((w j).map fun p => (p.1, !p.2)).reverse,
+      L,
+      ?_,
+      ?_
+    ⟩
     · intro j
       simpa using hL j
     · simp [star_sum, star_smul, Word.wdVal_star]
@@ -109,17 +130,21 @@ theorem blkWord (h : BlockOperatorsProductAdjoint) : BlockWordOperators := by
       congr 1
       exact ContinuousLinearMap.adjoint_id.symm
     · exact ⟨(h E B s s hg hg).2.2.2.2.1, (h E B s s hg hg).2.2.2.2.2.1⟩
-  suffices main : (BGen.wd w t₀).Ok ∧ (w.map BGen.op).prod * t₀.op = BGen.sc w • (BGen.wd w t₀).op ∧
-      (BGen.wd w t₀).T ≤ t₀.T + w.length * R ∧ (BGen.wd w t₀).r ≤ t₀.r + w.length * R ∧
-      ∀ χa χb, (BGen.wd w t₀).val χa χb =
-        (w.map (Sum.elim (fun _ => 1) fun s => s.val χa χb)).prod * t₀.val χa χb by
+  suffices main
+      : (BGen.wd w t₀).Ok ∧ (w.map BGen.op).prod * t₀.op = BGen.sc w • (BGen.wd w t₀).op
+        ∧ (BGen.wd w t₀).T ≤ t₀.T + w.length * R ∧ (BGen.wd w t₀).r ≤ t₀.r + w.length * R
+        ∧ ∀ χa χb,
+          (BGen.wd w t₀).val χa χb
+            = (w.map (Sum.elim (fun _ => 1) fun s => s.val χa χb)).prod * t₀.val χa χb by
     obtain ⟨m1, m2, m3, m4, m5⟩ := main
     exact ⟨m1, m2, m3, m4, hadj, m5⟩
   induction w with
   | nil => simp [BGen.wd, BGen.sc, ht₀]
   | cons g w ih =>
-    obtain ⟨h1, h2, h3, h4, h5⟩ := ih (fun g hg => hw g (List.mem_cons_of_mem _ hg))
-      (fun s hs' => hs s (List.mem_cons_of_mem _ hs'))
+    obtain ⟨h1, h2, h3, h4, h5⟩ :=
+      ih
+        (fun g hg => hw g (List.mem_cons_of_mem _ hg))
+        (fun s hs' => hs s (List.mem_cons_of_mem _ hs'))
     have hg := hw g List.mem_cons_self
     rcases g with c | s
     · have ew : BGen.wd (Sum.inl c :: w) t₀ = BGen.wd w t₀ := rfl
@@ -141,9 +166,13 @@ theorem blkWord (h : BlockOperatorsProductAdjoint) : BlockWordOperators := by
         show s.op * _ = _
         rw [mul_smul_comm]
       · show s.T + (BGen.wd w t₀).T ≤ _
-        simp only [List.length_cons]; push_cast; linarith [hsR.1]
+        simp only [List.length_cons]
+        push_cast
+        linarith [hsR.1]
       · show s.r + (BGen.wd w t₀).r + B.c ≤ _
-        simp only [List.length_cons]; push_cast; linarith [hsR.2]
+        simp only [List.length_cons]
+        push_cast
+        linarith [hsR.2]
       · intro χa χb
         rw [hop.2.2.2.2.2.2.1, h5]
         simp [mul_assoc]

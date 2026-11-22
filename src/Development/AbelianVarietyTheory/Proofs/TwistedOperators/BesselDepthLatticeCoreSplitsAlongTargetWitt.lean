@@ -11,11 +11,16 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.IsP
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows GlobalTheory.Asc
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory
+  IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
+  GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows GlobalTheory.Asc
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.FinPl (Lat idAt idOff intAt grpAt grpOff MxAt latV latA InK MonoAt OrthAt PrimAt ColsAt)
+open GlobalTheory.FinPl
+  (Lat idAt idOff intAt grpAt grpOff MxAt latV latA InK MonoAt OrthAt PrimAt ColsAt)
 open scoped nonZeroDivisors ContDiff
 open GlobalTheory.AscFin
 set_option synthInstance.maxHeartbeats 400000
@@ -28,48 +33,62 @@ variable {D : D7}
 theorem one_mem_intAf : (1 : Af D.host.F) ∈ intAf D.host.F := fun v => by
   rw [map_one]; exact one_mem _
 
-theorem finPart_pure (α : Af D.host.F) (e : D.host.E) :
-    finPart D ((pairA D.host.F 0 α) ⊗ₜ[D.host.F] e) = α ⊗ₜ[D.host.F] e := by
+theorem finPart_pure (α : Af D.host.F) (e : D.host.E)
+    : finPart D ((pairA D.host.F 0 α) ⊗ₜ[D.host.F] e) = α ⊗ₜ[D.host.F] e := by
   unfold finPart
   rw [AlgHom.toRingHom_eq_coe, RingHom.coe_coe, Algebra.TensorProduct.map_tmul]
   rfl
 
-theorem toEAf_pure (e : D.host.E) :
-    toEAf D ((pairA D.host.F 0 1) ⊗ₜ[D.host.F] e) =
-      Formalism.UG.inclE (F := D.host.F) (FiniteAdeleRing (𝓞 D.host.F) D.host.F) e := by
+theorem toEAf_pure (e : D.host.E)
+    : toEAf D ((pairA D.host.F 0 1) ⊗ₜ[D.host.F] e)
+      = Formalism.UG.inclE (F := D.host.F) (FiniteAdeleRing (𝓞 D.host.F) D.host.F) e := by
   unfold toEAf
   rw [RingHom.comp_apply, finPart_pure]
   rfl
 
-theorem rat_mulVec_pure {m n : ℕ} (M : Matrix (Fin m) (Fin n) D.host.E) (α : Af D.host.F) (t : Fin n → D.host.E) :
-    rat M *ᵥ (fun i => (pairA D.host.F 0 α) ⊗ₜ[D.host.F] t i) =
-      fun i => (pairA D.host.F 0 α) ⊗ₜ[D.host.F] (M *ᵥ t) i := by
+theorem rat_mulVec_pure
+    {m n : ℕ} (M : Matrix (Fin m) (Fin n) D.host.E) (α : Af D.host.F) (t : Fin n → D.host.E)
+    : rat M *ᵥ (fun i => (pairA D.host.F 0 α) ⊗ₜ[D.host.F] t i)
+      = fun i => (pairA D.host.F 0 α) ⊗ₜ[D.host.F] (M *ᵥ t) i := by
   funext i
   simp only [Matrix.mulVec, dotProduct, rat, Matrix.map_apply, TensorProduct.tmul_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   show ((1 : AF D.host.F) ⊗ₜ[D.host.F] M i k) * _ = _
   rw [Algebra.TensorProduct.tmul_mul_tmul, one_mul]
 
-theorem proj_mem {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ) {L : Lat S} {L₀ : Lat S₀}
-    (hL : Submodule.IsLattice D.host.E L) (hL₀ : Submodule.IsLattice D.host.E L₀) (hm : ∀ v, MonoAt d L L₀ v)
-    {t : Fin S.rank → D.host.E} (ht : t ∈ L) : (d.i₀ * d.q0) *ᵥ t ∈ L := by
+theorem proj_mem
+    {S S₀ : HSp D} {ρ : ℕ} (d : HypDec S S₀ ρ)
+    {L : Lat S} {L₀ : Lat S₀} (hL : Submodule.IsLattice D.host.E L)
+    (hL₀ : Submodule.IsLattice D.host.E L₀) (hm : ∀ v, MonoAt d L L₀ v)
+    {t : Fin S.rank → D.host.E} (ht : t ∈ L)
+    : (d.i₀ * d.q0) *ᵥ t ∈ L := by
   have hy : (fun i => (pairA D.host.F 0 1) ⊗ₜ[D.host.F] t i) ∈ latV S L (fun _ => True) :=
-    AddSubgroup.subset_closure ⟨1, one_mem_intAf, fun v hv => (hv trivial).elim, 1, rfl, t, ht, by
-      funext i; rw [one_mul]⟩
-  have h2 := GlobalTheory.FinPl.ExtZeroAt.wittCoreInclusion_mem_latticeCompletionAtPlace d hL (fun v _ => hm v)
-    (GlobalTheory.FinPl.ExtZeroAt.wittProjectionZero_mem_latticeCompletion_of_splits d hL₀ (fun v _ => hm v) hy)
-  have e : d.j0 *ᵥ (d.p0 *ᵥ (fun i => (pairA D.host.F 0 1) ⊗ₜ[D.host.F] t i)) =
-      fun i => (pairA D.host.F 0 1) ⊗ₜ[D.host.F] ((d.i₀ * d.q0) *ᵥ t) i := by
+    AddSubgroup.subset_closure
+      ⟨1, one_mem_intAf, fun v hv => (hv trivial).elim, 1, rfl, t, ht, by funext i; rw [one_mul]⟩
+  have h2 :=
+    GlobalTheory.FinPl.ExtZeroAt.wittCoreInclusion_mem_latticeCompletionAtPlace d hL
+      (fun v _ => hm v)
+      (GlobalTheory.FinPl.ExtZeroAt.wittProjectionZero_mem_latticeCompletion_of_splits d hL₀
+        (fun v _ => hm v)
+        hy)
+  have e
+      : d.j0 *ᵥ (d.p0 *ᵥ (fun i => (pairA D.host.F 0 1) ⊗ₜ[D.host.F] t i))
+        = fun i => (pairA D.host.F 0 1) ⊗ₜ[D.host.F] ((d.i₀ * d.q0) *ᵥ t) i := by
     rw [Matrix.mulVec_mulVec, show d.j0 * d.p0 = rat (d.i₀ * d.q0) by rw [rat_mul]; rfl]
     exact rat_mulVec_pure _ _ _
   rw [e] at h2
-  have h3 := (GlobalTheory.Core.Mi.LatMatch.TraceX.latV_iff_hatL S L _ _ (GlobalTheory.FinPlLoc.latV_idAt h2)).1 h2
+  have h3 :=
+    (GlobalTheory.Core.Mi.LatMatch.TraceX.latV_iff_hatL S L _ _
+      (GlobalTheory.FinPlLoc.latV_idAt h2)).1 h2
   simp only [toEAf_pure] at h3
   exact (GlobalTheory.Mem.Col2.PtUniq.mem_iff_hatL (F := D.host.F) hL _).2 h3
 
-theorem mul_mem_latO {S T : HSp D} {LS : Set (Fin S.rank → D.host.E)} {LT : Lat T} {P : GlobalTheory.FinPl.Pl D → Prop}
-    (M : Matrix (Fin T.rank) (Fin T.rank) D.host.E) (hM : ∀ t ∈ LT, M *ᵥ t ∈ LT) {u : WO S T}
-    (hu : u ∈ latO S T LS (LT : Set _) P) : rat M * u ∈ latO S T LS (LT : Set _) P := by
+theorem mul_mem_latO
+    {S T : HSp D} {LS : Set (Fin S.rank → D.host.E)} {LT : Lat T}
+    {P : GlobalTheory.FinPl.Pl D → Prop}
+    (M : Matrix (Fin T.rank) (Fin T.rank) D.host.E) (hM : ∀ t ∈ LT, M *ᵥ t ∈ LT)
+    {u : WO S T} (hu : u ∈ latO S T LS (LT : Set _) P)
+    : rat M * u ∈ latO S T LS (LT : Set _) P := by
   induction hu using AddSubgroup.closure_induction with
   | mem z hz =>
     obtain ⟨α, hα, hαP, a, ha, s, hs, t, ht, rfl⟩ := hz
@@ -87,10 +106,13 @@ theorem mul_mem_latO {S T : HSp D} {LS : Set (Fin S.rank → D.host.E)} {LT : La
   | add x y _ _ hx hy => rw [Matrix.mul_add]; exact add_mem hx hy
   | neg x _ hx => rw [Matrix.mul_neg]; exact neg_mem hx
 
-theorem mul_mem_smul_homLat {m n : ℕ} (I : Ideal (𝓞 D.host.E)) {Λ : Submodule (𝓞 D.host.E) (Fin n → D.host.E)}
-    {Λ' : Submodule (𝓞 D.host.E) (Fin m → D.host.E)} (M : Matrix (Fin m) (Fin m) D.host.E)
-    (hM : ∀ t ∈ Λ', M *ᵥ t ∈ Λ') {x : Matrix (Fin m) (Fin n) D.host.E} (hx : x ∈ I • homLat Λ Λ') :
-    M * x ∈ I • homLat Λ Λ' := by
+theorem mul_mem_smul_homLat
+    {m n : ℕ}
+    (I : Ideal (𝓞 D.host.E))
+    {Λ : Submodule (𝓞 D.host.E) (Fin n → D.host.E)} {Λ' : Submodule (𝓞 D.host.E) (Fin m → D.host.E)}
+    (M : Matrix (Fin m) (Fin m) D.host.E) (hM : ∀ t ∈ Λ', M *ᵥ t ∈ Λ')
+    {x : Matrix (Fin m) (Fin n) D.host.E} (hx : x ∈ I • homLat Λ Λ')
+    : M * x ∈ I • homLat Λ Λ' := by
   refine Submodule.smul_induction_on hx (fun r hr y hy => ?_) (fun a b ha hb => ?_)
   · rw [Matrix.mul_smul]
     refine Submodule.smul_mem_smul hr fun z hz => ?_
@@ -98,9 +120,11 @@ theorem mul_mem_smul_homLat {m n : ℕ} (I : Ideal (𝓞 D.host.E)) {Λ : Submod
     exact hM _ (hy z hz)
   · rw [Matrix.mul_add]; exact add_mem ha hb
 
-theorem mul_mem_hatMx {m n : ℕ} (N : Submodule (𝓞 D.host.E) (Matrix (Fin m) (Fin n) D.host.E))
-    (M : Matrix (Fin m) (Fin m) D.host.E) (hM : ∀ x ∈ N, M * x ∈ N) {u : Mx D m n} (hu : u ∈ hatMx N) :
-    rat M * u ∈ hatMx N := by
+theorem mul_mem_hatMx
+    {m n : ℕ} (N : Submodule (𝓞 D.host.E) (Matrix (Fin m) (Fin n) D.host.E))
+    (M : Matrix (Fin m) (Fin m) D.host.E) (hM : ∀ x ∈ N, M * x ∈ N)
+    {u : Mx D m n} (hu : u ∈ hatMx N)
+    : rat M * u ∈ hatMx N := by
   induction hu using AddSubgroup.closure_induction with
   | mem z hz =>
     obtain ⟨α, hα, x, hx, rfl⟩ := hz
@@ -115,7 +139,6 @@ theorem mul_mem_hatMx {m n : ℕ} (N : Submodule (𝓞 D.host.E) (Matrix (Fin m)
   | neg x _ hx => rw [Matrix.mul_neg]; exact neg_mem hx
 
 end GlobalTheory.TgtCoreSplit
-
 
 open GlobalTheory.TgtCoreSplit in
 theorem GlobalTheory.AscFin.latRow_bessel_core_split : OnStd fun {D} _ _ {sc} {G} W F => ∀ ρ (h : 2 * ρ + 2 ≤ D.R.m), ∀ w : WO (F.V₀ ρ) (G.V (.grid (2 * ρ + 1) 0)), (F.dB ρ h).ext0 (G.V (.grid (2 * ρ + 1) 0)) w ∈ latRow G (2 * ρ + 1) → (F.dB ρ h).ext0 (G.V (.grid (2 * ρ + 1) 0)) ((F.dJ ρ h).inc0 (F.V₀ ρ) ((F.dJ ρ h).p0 ⬝ w)) ∈ latRow G (2 * ρ + 1) := by

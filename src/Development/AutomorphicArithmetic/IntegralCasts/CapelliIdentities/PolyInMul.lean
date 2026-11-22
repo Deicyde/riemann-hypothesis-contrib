@@ -4,20 +4,24 @@ public import Mathlib
 
 @[expose] public section
 
-noncomputable def UpperTheory.Reformulated.B.Qk18.PolyIn :
-    {R : Type} → [inst : Ring R] → [Algebra ℂ R] → (ℂ → R) → ℕ → Prop :=
-    fun {R : Type} [Ring R] [Algebra ℂ R] (f : ℂ → R) (d : ℕ) ↦
-      ∃ (a : ℕ → R), ∀ (s : ℂ), f s = ∑ k ∈ Finset.range (d + (1 : ℕ)), s ^ k • a k
+noncomputable def UpperTheory.Reformulated.B.Qk18.PolyIn
+    : {R : Type} → [inst : Ring R] → [Algebra ℂ R] → (ℂ → R) → ℕ
+      → Prop := fun {R : Type} [Ring R] [Algebra ℂ R] (f : ℂ → R) (d : ℕ) ↦
+  ∃ (a : ℕ → R), ∀ (s : ℂ), f s = ∑ k ∈ Finset.range (d + (1 : ℕ)), s ^ k • a k
 
-theorem UpperTheory.Reformulated.B.Qk18.polyIn_mul :
-    ∀ {R : Type} [inst : Ring R] [inst_1 : Algebra ℂ R] {f g : ℂ → R} {d₁ d₂ : ℕ},
-      UpperTheory.Reformulated.B.Qk18.PolyIn f d₁ →
-        UpperTheory.Reformulated.B.Qk18.PolyIn g d₂ → UpperTheory.Reformulated.B.Qk18.PolyIn (fun (t : ℂ) ↦ f t * g t) (d₁ + d₂) := by
+theorem UpperTheory.Reformulated.B.Qk18.polyIn_mul
+    : ∀ {R : Type} [inst : Ring R] [inst_1 : Algebra ℂ R] {f g : ℂ → R} {d₁ d₂ : ℕ},
+      UpperTheory.Reformulated.B.Qk18.PolyIn f d₁ → UpperTheory.Reformulated.B.Qk18.PolyIn g d₂
+        → UpperTheory.Reformulated.B.Qk18.PolyIn (fun (t : ℂ) ↦ f t * g t) (d₁ + d₂) := by
   intro R _ _ f g d₁ d₂ hf hg
   obtain ⟨a, ha⟩ := hf
   obtain ⟨b, hb⟩ := hg
-  refine ⟨fun n => ∑ i ∈ Finset.range (d₁ + 1), ∑ j ∈ Finset.range (d₂ + 1),
-    if i + j = n then a i * b j else 0, fun s => ?_⟩
+  refine ⟨
+    fun n =>
+      ∑ i ∈ Finset.range (d₁ + 1), ∑ j ∈ Finset.range (d₂ + 1),
+        if i + j = n then a i * b j else 0,
+    fun s => ?_
+  ⟩
   show f s * g s = _
   rw [ha s, hb s, Finset.sum_mul_sum]
   simp only [Finset.smul_sum]

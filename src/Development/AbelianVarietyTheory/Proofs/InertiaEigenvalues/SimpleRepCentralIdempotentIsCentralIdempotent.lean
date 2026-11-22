@@ -13,13 +13,14 @@ open Polynomial CategoryTheory
 
 namespace GlobalTheory.SerOSys
 
-theorem zIdem_eq_charIdem {Γ : Type} [Group Γ] [Fintype Γ] (τ : FDRep ℂ Γ) :
-    zIdem τ = PI.CharIdem.charIdem τ := by
+theorem zIdem_eq_charIdem {Γ : Type} [Group Γ] [Fintype Γ] (τ : FDRep ℂ Γ)
+    : zIdem τ = PI.CharIdem.charIdem τ := by
   unfold zIdem PI.CharIdem.charIdem
   rfl
 
-theorem zIdem_centralIdempotent : ∀ {Γ : Type} [Group Γ] [Fintype Γ] (τ : FDRep ℂ Γ), Simple τ →
-    zIdem τ * zIdem τ = zIdem τ ∧ ∀ a, zIdem τ * a = a * zIdem τ := by
+theorem zIdem_centralIdempotent
+    : ∀ {Γ : Type} [Group Γ] [Fintype Γ] (τ : FDRep ℂ Γ),
+      Simple τ → zIdem τ * zIdem τ = zIdem τ ∧ ∀ a, zIdem τ * a = a * zIdem τ := by
   intro Γ _ _ τ hτ
   have h := orthogonalCentral Γ τ τ hτ hτ
   rw [zIdem_eq_charIdem]

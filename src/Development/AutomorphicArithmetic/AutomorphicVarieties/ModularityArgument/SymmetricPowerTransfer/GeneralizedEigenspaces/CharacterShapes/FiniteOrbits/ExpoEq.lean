@@ -6,30 +6,35 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi UpperTheory.V.AlgebraTools
-open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.So
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools
+open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig
+  UpperTheory.V.Z.Sym.So
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem det_lt {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    {n : ℕ} (t : Fin n → kˣ) (i : Fin n) :
-    Matrix.GeneralLinearGroup.det (leviTorus k (Fin n) t i) = t i := congrFun ((leviTorus k (Fin n)).symm_apply_apply t) i
+private theorem det_lt
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {n : ℕ} (t : Fin n → kˣ) (i : Fin n)
+    : Matrix.GeneralLinearGroup.det (leviTorus k (Fin n) t i) = t i :=
+  congrFun ((leviTorus k (Fin n)).symm_apply_apply t) i
 
-private theorem abs_one_eq {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] :
-    absPow k 1 = (absPow k (-1))⁻¹ := by
+private theorem abs_one_eq
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : absPow k 1 = (absPow k (-1))⁻¹ := by
   have h0 : absPow k 0 = 1 := by
     ext x
     simp [val_absPow]
   apply eq_inv_of_mul_eq_one_left
   rw [← absPow_add, show (1 : ℂ) + -1 = 0 by ring, h0]
 
-private theorem abs_zero_eq {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] :
-    absPow k 0 = 1 := by
+private theorem abs_zero_eq
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : absPow k 0 = 1 := by
   ext x
   simp [val_absPow]
 
-theorem UpperTheory.V.Z.Sym.So.expoEq :
-    UpperTheory.V.Z.Sym.So.ExpoEq := by
+theorem UpperTheory.V.Z.Sym.So.expoEq : UpperTheory.V.Z.Sym.So.ExpoEq := by
   intro k _ _ _ _ a
   have hA : ∀ x : kˣ, absPow k 1 x = (absPow k (-1) x)⁻¹ := by
     intro x
@@ -47,7 +52,8 @@ theorem UpperTheory.V.Z.Sym.So.expoEq :
     unfold Dict.expo
     rw [← Units.val_mul]
     congr 1
-    rw [torusChar_apply, MonoidHom.comp_apply, deltaHalf_apply, Fin.prod_univ_three, Fin.prod_univ_three]
+    rw [torusChar_apply, MonoidHom.comp_apply, deltaHalf_apply, Fin.prod_univ_three,
+      Fin.prod_univ_three]
     simp only [MulEquiv.coe_toMonoidHom, det_lt, m0, m1, m2]
     have e0 : ((2 : ℤ) : ℂ) / 2 = 1 := by norm_num
     have e1 : ((0 : ℤ) : ℂ) / 2 = 0 := by norm_num
@@ -65,7 +71,8 @@ theorem UpperTheory.V.Z.Sym.So.expoEq :
     unfold Dict.expo
     rw [← Units.val_mul]
     congr 1
-    rw [torusChar_apply, MonoidHom.comp_apply, deltaHalf_apply, Fin.prod_univ_two, Fin.prod_univ_two]
+    rw [torusChar_apply, MonoidHom.comp_apply, deltaHalf_apply, Fin.prod_univ_two,
+      Fin.prod_univ_two]
     simp only [MulEquiv.coe_toMonoidHom, det_lt, m0, m1]
     have hh : absPow k ((1 : ℤ) / 2) = absPow k 1 * absPow k ((-1 : ℤ) / 2) := by
       rw [← absPow_add]
@@ -73,8 +80,8 @@ theorem UpperTheory.V.Z.Sym.So.expoEq :
       push_cast
       ring
     rw [hh]
-    simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
-      MonoidHom.one_apply, MonoidHom.mul_apply, hA, map_inv]
+    simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, MonoidHom.one_apply,
+      MonoidHom.mul_apply, hA, map_inv]
     ext
     simp only [Units.val_mul, Units.val_inv_eq_inv_val, Units.val_one]
     field_simp

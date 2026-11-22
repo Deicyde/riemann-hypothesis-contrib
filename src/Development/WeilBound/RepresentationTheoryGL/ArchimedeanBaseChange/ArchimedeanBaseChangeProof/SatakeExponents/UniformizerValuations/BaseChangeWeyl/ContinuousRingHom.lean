@@ -16,24 +16,34 @@ namespace ConjugationUpperEntries
 
 variable {E : Type} [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E))
 
-instance compat : (Valued.v : Valuation (w.adicCompletion E) (WithZero (Multiplicative ℤ))).Compatible :=
+instance compat
+    : (Valued.v : Valuation (w.adicCompletion E) (WithZero (Multiplicative ℤ))).Compatible :=
   Valuation.Compatible.ofValuation _
 
 theorem isEquiv : (ValuativeRel.valuation (w.adicCompletion E)).IsEquiv Valued.v :=
   ValuativeRel.isEquiv _ _
 
 theorem exists_nat_lt_one : ∃ d : ℕ, 0 < d ∧ Valued.v ((d : w.adicCompletion E)) < 1 := by
-  refine ⟨Ideal.absNorm w.asIdeal, Nat.pos_of_ne_zero fun h => w.ne_bot (Ideal.absNorm_eq_zero_iff.mp h), ?_⟩
-  have h1 := (HeightOneSpectrum.valuation_lt_one_iff_mem (K := E) w
-    ((Ideal.absNorm w.asIdeal : ℕ) : 𝓞 E)).mpr (Ideal.absNorm_mem w.asIdeal)
-  have h2 := HeightOneSpectrum.valuedAdicCompletion_eq_valuation' (K := E) w
-    ((Ideal.absNorm w.asIdeal : ℕ) : E)
+  refine ⟨
+    Ideal.absNorm w.asIdeal,
+    Nat.pos_of_ne_zero fun h => w.ne_bot (Ideal.absNorm_eq_zero_iff.mp h),
+    ?_
+  ⟩
+  have h1 :=
+    (HeightOneSpectrum.valuation_lt_one_iff_mem (K := E) w
+      ((Ideal.absNorm w.asIdeal : ℕ) : 𝓞 E)).mpr (Ideal.absNorm_mem w.asIdeal)
+  have h2 :=
+    HeightOneSpectrum.valuedAdicCompletion_eq_valuation' (K := E) w
+      ((Ideal.absNorm w.asIdeal : ℕ) : E)
   simp only [map_natCast] at h1 h2
   rw [← map_natCast (algebraMap E (w.adicCompletion E))]
   exact (h2.trans_lt h1 : _)
 
-theorem exists_root {d : ℕ} (hd : Valued.v ((d : w.adicCompletion E)) < 1) (t : ℕ) (x : w.adicCompletion E)
-    (hx : Valued.v x ≤ 1) : ∃ y : w.adicCompletion E, y ^ (d * t + 1) = 1 + d * x ^ (d * t + 1) := by
+theorem exists_root
+    {d : ℕ} (hd : Valued.v ((d : w.adicCompletion E)) < 1)
+    (t : ℕ)
+    (x : w.adicCompletion E) (hx : Valued.v x ≤ 1)
+    : ∃ y : w.adicCompletion E, y ^ (d * t + 1) = 1 + d * x ^ (d * t + 1) := by
   let O := Valuation.integer (ValuativeRel.valuation (w.adicCompletion E))
   have hxO : x ∈ O := by
     change ValuativeRel.valuation _ x ≤ 1
@@ -46,9 +56,11 @@ theorem exists_root {d : ℕ} (hd : Valued.v ((d : w.adicCompletion E)) < 1) (t 
     have hb1 : Valued.v (b : w.adicCompletion E) ≤ 1 := ((isEquiv w).le_one_iff_le_one).mp b.2
     have h1 : Valued.v (((d : O) * b : O) : w.adicCompletion E) = 1 := by rw [hb]; simp
     have h2 : Valued.v (((d : O) * b : O) : w.adicCompletion E) < 1 := by
-      have : (((d : O) * b : O) : w.adicCompletion E) = (d : w.adicCompletion E) * b := by push_cast; rfl
+      have : (((d : O) * b : O) : w.adicCompletion E) = (d : w.adicCompletion E) * b := by
+        push_cast; rfl
       rw [this, map_mul]
-      calc Valued.v (d : w.adicCompletion E) * Valued.v (b : w.adicCompletion E)
+      calc
+        Valued.v (d : w.adicCompletion E) * Valued.v (b : w.adicCompletion E)
           ≤ Valued.v (d : w.adicCompletion E) * 1 := by gcongr
         _ < 1 := by rw [mul_one]; exact hd
     exact (ne_of_lt h2) h1
@@ -61,10 +73,12 @@ theorem exists_root {d : ℕ} (hd : Valued.v ((d : w.adicCompletion E)) < 1) (t 
     exact Ideal.mul_mem_left _ _ hdO
   have hf2 : IsUnit (Ideal.Quotient.mk (IsLocalRing.maximalIdeal O) (f.derivative.eval 1)) := by
     have : f.derivative.eval 1 = (d : O) * t + 1 := by
-      simp only [f, derivative_sub, derivative_X_pow, derivative_C, sub_zero, eval_mul, eval_C, eval_pow,
-        eval_X, one_pow, mul_one]
-      push_cast; ring
-    rw [this, map_add (f := _), map_one, Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mul_mem_right _ _ hdO), zero_add]
+      simp only [f, derivative_sub, derivative_X_pow, derivative_C, sub_zero, eval_mul, eval_C,
+        eval_pow, eval_X, one_pow, mul_one]
+      push_cast
+      ring
+    rw [this, map_add (f := _), map_one,
+      Ideal.Quotient.eq_zero_iff_mem.mpr (Ideal.mul_mem_right _ _ hdO), zero_add]
     exact isUnit_one
   obtain ⟨a, ha, -⟩ := HenselianRing.is_henselian (I := IsLocalRing.maximalIdeal O) f hmon 1 hf1 hf2
   refine ⟨(a : w.adicCompletion E), ?_⟩
@@ -75,8 +89,10 @@ theorem exists_root {d : ℕ} (hd : Valued.v ((d : w.adicCompletion E)) < 1) (t 
   have := congrArg (fun z : O => (z : w.adicCompletion E)) ha'
   simpa using this
 
-theorem no_root {d m : ℕ} (a : ℤ) (hda : Valued.v ((d : w.adicCompletion E)) = exp a) (ha : a < 0) (hm : -a < m)
-    (x : w.adicCompletion E) (hx : 1 < Valued.v x) : ¬ ∃ y : w.adicCompletion E, y ^ m = 1 + d * x ^ m := by
+theorem no_root
+    {d m : ℕ} (a : ℤ) (hda : Valued.v ((d : w.adicCompletion E)) = exp a) (ha : a < 0) (hm : -a < m)
+    (x : w.adicCompletion E) (hx : 1 < Valued.v x)
+    : ¬ ∃ y : w.adicCompletion E, y ^ m = 1 + d * x ^ m := by
   have hx0 : Valued.v x ≠ 0 := ne_of_gt (lt_trans zero_lt_one hx)
   set k := log (Valued.v x)
   have hvx : Valued.v x = exp k := (exp_log hx0).symm
@@ -106,9 +122,11 @@ theorem no_root {d m : ℕ} (a : ℤ) (hda : Valued.v ((d : w.adicCompletion E))
   · nlinarith
   · nlinarith
 
-theorem le_one_of_le_one (s : w.adicCompletion E →+* w.adicCompletion E) {d : ℕ} (hd0 : 0 < d)
-    (hd : Valued.v ((d : w.adicCompletion E)) < 1) (x : w.adicCompletion E) (hx : Valued.v x ≤ 1) :
-    Valued.v (s x) ≤ 1 := by
+theorem le_one_of_le_one
+    (s : w.adicCompletion E →+* w.adicCompletion E)
+    {d : ℕ} (hd0 : 0 < d) (hd : Valued.v ((d : w.adicCompletion E)) < 1)
+    (x : w.adicCompletion E) (hx : Valued.v x ≤ 1)
+    : Valued.v (s x) ≤ 1 := by
   have hne : Valued.v ((d : w.adicCompletion E)) ≠ 0 := by
     rw [Valuation.ne_zero_iff, ← map_natCast (algebraMap E (w.adicCompletion E))]
     exact (_root_.map_ne_zero _).mpr (Nat.cast_ne_zero.mpr hd0.ne')
@@ -122,8 +140,10 @@ theorem le_one_of_le_one (s : w.adicCompletion E →+* w.adicCompletion E) {d : 
     have h1 : (1 : ℤ) ≤ d := by exact_mod_cast hd0
     have h2 : (0 : ℤ) ≤ a.natAbs := by positivity
     have h3 : -a ≤ (a.natAbs : ℤ) := by omega
-    have h4 : (1 : ℤ) * (a.natAbs : ℤ) ≤ (d : ℤ) * (a.natAbs : ℤ) := mul_le_mul_of_nonneg_right h1 h2
-    rw [h0]; linarith
+    have h4 : (1 : ℤ) * (a.natAbs : ℤ) ≤ (d : ℤ) * (a.natAbs : ℤ) :=
+      mul_le_mul_of_nonneg_right h1 h2
+    rw [h0]
+    linarith
   by_contra h
   push Not at h
   apply no_root w a hda ha hm (s x) h
@@ -149,8 +169,7 @@ theorem continuous_ringHom (s : w.adicCompletion E →+* w.adicCompletion E) : C
     (IsValuativeTopology.hasBasis_nhds_zero' _)).mpr ?_
   intro γ hγ
   obtain ⟨r, rfl⟩ := ValuativeRel.valuation_surjective γ
-  have hr : Valued.v r ≠ 0 := by
-    rw [Valuation.ne_zero_iff]; exact (Valuation.ne_zero_iff _).mp hγ
+  have hr : Valued.v r ≠ 0 := by rw [Valuation.ne_zero_iff]; exact (Valuation.ne_zero_iff _).mp hγ
   set b := log (Valued.v r)
   have hvr : Valued.v r = exp b := (exp_log hr).symm
   set n := b.natAbs + 1
@@ -171,10 +190,11 @@ theorem continuous_ringHom (s : w.adicCompletion E →+* w.adicCompletion E) : C
     rw [map_div₀]
     exact (div_le_one₀ (by rw [Valuation.pos_iff]; exact hdn)).mpr hx.le
   have hsz := le_one_of_le_one w s hd0 hd _ hz
-  have hx' : x = (d : w.adicCompletion E) ^ n * (x / (d : w.adicCompletion E) ^ n) := by
-    field_simp
+  have hx' : x = (d : w.adicCompletion E) ^ n * (x / (d : w.adicCompletion E) ^ n) := by field_simp
   rw [hx', map_mul, map_pow, map_natCast, map_mul, map_pow, hda, hvr]
-  calc exp a ^ n * Valued.v (s (x / (d : w.adicCompletion E) ^ n)) ≤ exp a ^ n * 1 := by gcongr
+  calc
+    exp a ^ n * Valued.v (s (x / (d : w.adicCompletion E) ^ n))
+      ≤ exp a ^ n * 1 := by gcongr
     _ = exp ((n : ℤ) * a) := by rw [mul_one, ← exp_nsmul, nsmul_eq_mul]
     _ < exp b := exp_lt_exp.mpr hn
 
@@ -183,17 +203,22 @@ end ConjugationUpperEntries
 theorem cjEq : CjEq := by
   intro E _ _ _ w _ s hs
   have hc := ConjugationUpperEntries.continuous_ringHom w s
-  have h : ∃ s' : w.adicCompletion E →+* w.adicCompletion E, Continuous s' ∧
-      ∀ x : E, s' (algebraMap E _ x) = algebraMap E _ (IsCMField.complexConj E x) := ⟨s, hc, hs⟩
+  have h
+      : ∃ s' : w.adicCompletion E →+* w.adicCompletion E,
+        Continuous s'
+          ∧ ∀ x : E, s' (algebraMap E _ x) = algebraMap E _ (IsCMField.complexConj E x) :=
+    ⟨s, hc, hs⟩
   have hcj : GlobalTheory.BCT.cj w = h.choose := by
     unfold GlobalTheory.BCT.cj
     rw [dite_eq_left h]
   rw [hcj]
   have hdense : DenseRange (algebraMap E (w.adicCompletion E)) := by
     apply HeightOneSpectrum.denseRange_algebraMap
-  have := hdense.equalizer hc h.choose_spec.1 (funext fun x => by
-    simp only [Function.comp_apply]
-    rw [hs x, h.choose_spec.2 x])
+  have :=
+    hdense.equalizer hc h.choose_spec.1
+      (funext fun x => by
+        simp only [Function.comp_apply]
+        rw [hs x, h.choose_spec.2 x])
   exact RingHom.ext fun x => congrFun this x
 
 end PositivityTheory.Rg.BcB.F.LemB

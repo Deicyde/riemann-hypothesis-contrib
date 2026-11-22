@@ -15,8 +15,8 @@ namespace GlobalTheory.CompanionTheory.ConvTest
 
 variable (X : Ctx)
 
-theorem support_cv_subset (φ ψ : X.G → ℂ) :
-    Function.support (cv X.μ φ ψ) ⊆ tsupport φ * tsupport ψ := by
+theorem support_cv_subset (φ ψ : X.G → ℂ)
+    : Function.support (cv X.μ φ ψ) ⊆ tsupport φ * tsupport ψ := by
   intro y hy
   by_contra hmem
   apply hy
@@ -38,23 +38,22 @@ theorem continuous_cv {φ ψ : X.G → ℂ} (hφ : Tst φ) (hψ : Tst ψ) : Cont
     intro z hz
     simp [image_eq_zero_of_notMem_tsupport hz]
   rw [hEq]
-  refine continuous_parametric_integral_of_continuous
-    (f := fun (y z : X.G) => φ z * ψ (z⁻¹ * y)) ?_ hK
+  refine
+    continuous_parametric_integral_of_continuous (f := fun (y z : X.G) => φ z * ψ (z⁻¹ * y)) ?_ hK
   have h1 : Continuous fun p : X.G × X.G => φ p.2 := hφ.1.comp continuous_snd
   have h2 : Continuous fun p : X.G × X.G => ψ (p.2⁻¹ * p.1) :=
     hψ.1.comp (continuous_snd.inv.mul continuous_fst)
   exact h1.mul h2
 
-theorem integrable_reflect {ψ : X.G → ℂ} (hψ : Tst ψ) (y : X.G) :
-    Integrable (fun z => ‖ψ (z⁻¹ * y)‖) X.μ := by
-  have hc : Continuous fun z : X.G => ψ (z⁻¹ * y) :=
-    hψ.1.comp (continuous_inv.mul continuous_const)
+theorem integrable_reflect {ψ : X.G → ℂ} (hψ : Tst ψ) (y : X.G)
+    : Integrable (fun z => ‖ψ (z⁻¹ * y)‖) X.μ := by
+  have hc : Continuous fun z : X.G => ψ (z⁻¹ * y) := hψ.1.comp (continuous_inv.mul continuous_const)
   have hs : HasCompactSupport fun z : X.G => ψ (z⁻¹ * y) :=
     hψ.2.comp_homeomorph ((Homeomorph.inv X.G).trans (Homeomorph.mulRight y))
   exact (hc.integrable_of_hasCompactSupport hs).norm
 
-theorem norm_cv_le {φ ψ : X.G → ℂ} (hψ : Tst ψ) (B : ℝ) (hB : ∀ z, ‖φ z‖ ≤ B) (y : X.G) :
-    ‖cv X.μ φ ψ y‖ ≤ B * ∫ z, ‖ψ z⁻¹‖ ∂X.μ := by
+theorem norm_cv_le {φ ψ : X.G → ℂ} (hψ : Tst ψ) (B : ℝ) (hB : ∀ z, ‖φ z‖ ≤ B) (y : X.G)
+    : ‖cv X.μ φ ψ y‖ ≤ B * ∫ z, ‖ψ z⁻¹‖ ∂X.μ := by
   have hB0 : 0 ≤ B := (norm_nonneg _).trans (hB 1)
   have hshift : ∫ z, ‖ψ (z⁻¹ * y)‖ ∂X.μ = ∫ z, ‖ψ z⁻¹‖ ∂X.μ := by
     have h := integral_mul_left_eq_self (μ := X.μ) (fun z => ‖ψ z⁻¹‖) y⁻¹

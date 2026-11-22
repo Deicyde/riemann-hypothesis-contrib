@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.VanishingH1I
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry KaehlerDifferential ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.CechDR
+open CategoryTheory AlgebraicGeometry KaehlerDifferential
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.CechDR
 
 set_option autoImplicit false
 
@@ -14,14 +16,18 @@ noncomputable section
 
 namespace GlobalTheory.CatCoh.CoefMap
 
-theorem restrict_pull1_injective_of_sep_glue {R : Type} [CommRing R] {C : Type} [Category.{0} C]
-    {C' : Type} [Category.{0} C'] (F : C ⥤ CommAlgCat.{0} R) (G : C' ⥤ C)
+theorem restrict_pull1_injective_of_sep_glue
+    {R : Type} [CommRing R]
+    {C : Type} [Category.{0} C]
+    {C' : Type} [Category.{0} C']
+    (F : C ⥤ CommAlgCat.{0} R) (G : C' ⥤ C)
     (hsep : ∀ (T : C) (x : F.obj T), (∀ t (u : T ⟶ G.obj t), mp F u x = 0) → x = 0)
     (hglue : ∀ (T : C) (s : ∀ t, (T ⟶ G.obj t) → F.obj (G.obj t)),
-      (∀ t t' (u : T ⟶ G.obj t) (a : t ⟶ t'), s t' (u ≫ G.map a) = mp F (G.map a) (s t u)) →
-      ∃ x : F.obj T, ∀ t u, mp F u x = s t u) :
-    Function.Injective (CoefMap.restrict F G).pull1 := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+      (∀ t t' (u : T ⟶ G.obj t) (a : t ⟶ t'), s t' (u ≫ G.map a) = mp F (G.map a) (s t u))
+        → ∃ x : F.obj T, ∀ t u, mp F u x = s t u)
+    : Function.Injective (CoefMap.restrict F G).pull1 := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro c hc
   obtain ⟨f, rfl⟩ := H1.mk_surjective F c
   rw [CoefMap.pullCohomologyOne_class, H1.mk_eq_zero] at hc

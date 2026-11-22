@@ -8,14 +8,19 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.GlueApp
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
 
 namespace PositivityTheory.UnitarySelfGeneration
 
-theorem tors_push {S S' U : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G] [GrpObj G'] {f : S' ⟶ S}
-    {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ) (a : U ⟶ S') (b : U ⟶ S) (hb : a ≫ f = b) :
-    ∃ π : (Over.mk a ⟶ G') →* (Over.mk b ⟶ G), Function.Bijective π ∧ ∀ x, (π x).left = x.left ≫ φ := by
+theorem tors_push
+    {S S' U : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G] [GrpObj G']
+    {f : S' ⟶ S} {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ)
+    (a : U ⟶ S') (b : U ⟶ S) (hb : a ≫ f = b)
+    : ∃ π : (Over.mk a ⟶ G') →* (Over.mk b ⟶ G),
+      Function.Bijective π ∧ ∀ x, (π x).left = x.left ≫ φ := by
   subst hb
   have hw : ∀ x : Over.mk a ⟶ G', (x.left ≫ φ) ≫ G.hom = a ≫ f := by
     intro x
@@ -42,18 +47,26 @@ theorem tors_push {S S' U : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G] [
     show (h.1.lift g.left a hg) ≫ φ = g.left
     exact h.1.lift_fst _ _ _
 
-theorem tors_iff {R : Type} [CommRing R] [IsDomain R] {T : Type} [CommGroup T] (Γ : BT.QFGroup R T) {X : Scheme.{0}}
-    {x : Sp R ⟶ X} {G : Over X} [GrpObj G] {G₀ : Over (Sp R)} [GrpObj G₀] {ψ : G₀.left ⟶ G.left} (N : ℕ)
-    (h : IsGrpPullback G₀ G x ψ) (i₀ : Γ.G.left ⟶ G₀.left) (hi : i₀ ≫ G₀.hom = Γ.G.hom) :
-    Γ.IsTorsionAlong G₀ (𝟙 _) N i₀ ↔ Γ.IsTorsionAlong G x N (i₀ ≫ ψ) := by
-  have cancel : ∀ {W : Scheme.{0}} (u v : W ⟶ G₀.left), u ≫ ψ = v ≫ ψ → u ≫ G₀.hom = v ≫ G₀.hom → u = v :=
+theorem tors_iff
+    {R : Type} [CommRing R] [IsDomain R]
+    {T : Type} [CommGroup T]
+    (Γ : BT.QFGroup R T)
+    {X : Scheme.{0}} {x : Sp R ⟶ X} {G : Over X} [GrpObj G]
+    {G₀ : Over (Sp R)} [GrpObj G₀]
+    {ψ : G₀.left ⟶ G.left}
+    (N : ℕ) (h : IsGrpPullback G₀ G x ψ)
+    (i₀ : Γ.G.left ⟶ G₀.left) (hi : i₀ ≫ G₀.hom = Γ.G.hom)
+    : Γ.IsTorsionAlong G₀ (𝟙 _) N i₀ ↔ Γ.IsTorsionAlong G x N (i₀ ≫ ψ) := by
+  have cancel
+      : ∀ {W : Scheme.{0}} (u v : W ⟶ G₀.left), u ≫ ψ = v ≫ ψ → u ≫ G₀.hom = v ≫ G₀.hom → u = v :=
     fun u v e1 e2 => h.1.hom_ext e1 e2
   have base : ∀ (Y : Over (Sp R)) (y : Y ⟶ Γ.G), (y.left ≫ i₀) ≫ G₀.hom = Y.hom := by
     intro Y y
     rw [Category.assoc, hi]
     exact Over.w y
-  have pushY : ∀ (Y : Over (Sp R)), ∃ π : (Over.mk (Y.hom ≫ 𝟙 _) ⟶ G₀) →* (Over.mk (Y.hom ≫ x) ⟶ G),
-      Function.Bijective π ∧ ∀ g, (π g).left = g.left ≫ ψ := by
+  have pushY
+      : ∀ (Y : Over (Sp R)), ∃ π : (Over.mk (Y.hom ≫ 𝟙 _) ⟶ G₀) →* (Over.mk (Y.hom ≫ x) ⟶ G),
+        Function.Bijective π ∧ ∀ g, (π g).left = g.left ≫ ψ := by
     intro Y
     exact tors_push h (Y.hom ≫ 𝟙 _) (Y.hom ≫ x) (by simp)
   have w1 : ∀ (Y : Over (Sp R)) (g : Over.mk (Y.hom ≫ 𝟙 _) ⟶ G₀), g.left ≫ G₀.hom = Y.hom := by
@@ -99,7 +112,8 @@ theorem tors_iff {R : Type} [CommRing R] [IsDomain R] {T : Type} [CommGroup T] (
     · rw [hi, Category.comp_id]
     · intro Y y z y₀ z₀ hy hz
       obtain ⟨π, -, hπ⟩ := pushY Y
-      have m := t.mul Y y z (π y₀) (π z₀) (by rw [hπ, hy, Category.assoc]) (by rw [hπ, hz, Category.assoc])
+      have m :=
+        t.mul Y y z (π y₀) (π z₀) (by rw [hπ, hy, Category.assoc]) (by rw [hπ, hz, Category.assoc])
       rw [← map_mul, hπ] at m
       apply cancel
       · rw [m, Category.assoc]
@@ -117,7 +131,16 @@ theorem tors_iff {R : Type} [CommRing R] [IsDomain R] {T : Type} [CommGroup T] (
       · rintro ⟨y, hy⟩
         exact ⟨y, by rw [← hy, Category.assoc]⟩
 
-theorem isTorsionAlong_iff_of_isGrpPullback : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] (Γ : BT.QFGroup R T) (X : Scheme.{0}) (x : Sp R ⟶ X) (G : Over X) [GrpObj G] (G₀ : Over (Sp R)) [GrpObj G₀] (ψ : G₀.left ⟶ G.left) (N : ℕ), IsGrpPullback G₀ G x ψ → (∀ i : Γ.G.left ⟶ G.left, Γ.IsTorsionAlong G x N i → ∃ i₀ : Γ.G.left ⟶ G₀.left, i₀ ≫ ψ = i ∧ Γ.IsTorsionAlong G₀ (𝟙 _) N i₀) ∧ ∀ i₀ : Γ.G.left ⟶ G₀.left, Γ.IsTorsionAlong G₀ (𝟙 _) N i₀ → Γ.IsTorsionAlong G x N (i₀ ≫ ψ) := by
+theorem isTorsionAlong_iff_of_isGrpPullback
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (T : Type) [CommGroup T] (Γ : BT.QFGroup R T)
+        (X : Scheme.{0}) (x : Sp R ⟶ X) (G : Over X) [GrpObj G] (G₀ : Over (Sp R)) [GrpObj G₀]
+        (ψ : G₀.left ⟶ G.left) (N : ℕ),
+      IsGrpPullback G₀ G x ψ
+        → (∀ i : Γ.G.left ⟶ G.left,
+            Γ.IsTorsionAlong G x N i
+              → ∃ i₀ : Γ.G.left ⟶ G₀.left, i₀ ≫ ψ = i ∧ Γ.IsTorsionAlong G₀ (𝟙 _) N i₀)
+          ∧ ∀ i₀ : Γ.G.left ⟶ G₀.left,
+            Γ.IsTorsionAlong G₀ (𝟙 _) N i₀ → Γ.IsTorsionAlong G x N (i₀ ≫ ψ) := by
   intro R _ _ T _ Γ X x G _ G₀ _ ψ N h
   refine ⟨?_, ?_⟩
   · intro i t

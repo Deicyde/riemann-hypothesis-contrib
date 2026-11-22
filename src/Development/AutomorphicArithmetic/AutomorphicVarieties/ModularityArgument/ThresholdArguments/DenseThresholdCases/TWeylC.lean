@@ -14,13 +14,18 @@ set_option synthInstance.maxHeartbeats 200000
 
 section
 open NumberField GlobalTheory.CuspRep GlobalTheory.GKCoh
-theorem UpperTheory.V.Af.weyl_complex_of_printed_results :
-    _root_.UpperTheory.V.Af.Hypotheses' → UpperTheory.V.Af.WeylC := by
+theorem UpperTheory.V.Af.weyl_complex_of_printed_results
+    : _root_.UpperTheory.V.Af.Hypotheses' → UpperTheory.V.Af.WeylC := by
   intro _ E _ _ _ n
-  refine ⟨((n + 1) ^ 2) ^ (n * n * Fintype.card (E →+* ℂ)), n * n * Fintype.card (E →+* ℂ), fun m hm H hH => ?_⟩
+  refine ⟨
+    ((n + 1) ^ 2) ^ (n * n * Fintype.card (E →+* ℂ)),
+    n * n * Fintype.card (E →+* ℂ),
+    fun m hm H hH => ?_
+  ⟩
   have hb := fun i => abs_le.1 (hH i)
   let ν : Fin n → ℕ := fun k => ((k : ℕ) + 1 + H - m k.rev : ℤ).toNat
-  have hν : ∀ k, (ν k : ℤ) = (k : ℕ) + 1 + H - m k.rev := fun k => Int.toNat_of_nonneg (by have := hb k.rev; omega)
+  have hν : ∀ k, (ν k : ℤ) = (k : ℕ) + 1 + H - m k.rev := fun k =>
+    Int.toNat_of_nonneg (by have := hb k.rev; omega)
   have hanti : Antitone ν := by
     cases n with
     | zero => exact fun i => i.elim0
@@ -38,15 +43,22 @@ theorem UpperTheory.V.Af.weyl_complex_of_printed_results :
     omega
   obtain ⟨P, hP, hd, hw⟩ := UpperTheory.V.Weyl.existsScalar n ν hanti _ hle
   obtain ⟨Ξ, h1, h2⟩ := UpperTheory.V.WeylC.exists_tens (E := E) P hP _ hw (n + H)
-  refine ⟨Ξ, fun τ => (UpperTheory.V.WeylC.algInfChar_iff _ _ _).2 ⟨by simp [UpperTheory.V.Af.infOf], fun u => ?_⟩, ?_⟩
+  refine ⟨
+    Ξ,
+    fun τ =>
+      (UpperTheory.V.WeylC.algInfChar_iff _ _ _).2 ⟨by simp [UpperTheory.V.Af.infOf], fun u => ?_⟩,
+    ?_
+  ⟩
   · rw [h2, UpperTheory.V.Af.infOf, Multiset.map_map, Multiset.map_map]
     congr 1
     refine (Fintype.prod_equiv Fin.revPerm _ _ fun k => ?_)
-    have h3 : ((ν k : ℕ) : ℂ) = (k : ℕ) + 1 + H - m k.rev := by exact_mod_cast congrArg (Int.cast : ℤ → ℂ) (hν k)
+    have h3 : ((ν k : ℕ) : ℂ) = (k : ℕ) + 1 + H - m k.rev := by
+      exact_mod_cast congrArg (Int.cast : ℤ → ℂ) (hν k)
     simp only [Function.comp_apply, Fin.revPerm_apply, h3]
     push_cast
     ring
   · refine h1.trans ((Nat.pow_le_pow_left hd _).trans ?_)
     rw [← pow_mul, ← mul_pow]
-    exact Nat.pow_le_pow_left (by nlinarith [Nat.zero_le (n * n * H), Nat.zero_le H, Nat.zero_le n]) _
+    exact Nat.pow_le_pow_left (by nlinarith [Nat.zero_le (n * n * H), Nat.zero_le H, Nat.zero_le n])
+      _
 end

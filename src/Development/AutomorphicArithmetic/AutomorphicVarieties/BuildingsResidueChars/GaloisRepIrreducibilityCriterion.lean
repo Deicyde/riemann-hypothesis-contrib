@@ -4,12 +4,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc UpperTheory.V.Published
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep
+  GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc
+  UpperTheory.V.Published
 
-theorem UpperTheory.galoisRep_irreducibility_criterion :
-    UpperTheory.V.Af.Bc.IrrBasic := by
-  refine ⟨fun Γ Γ' k _ _ _ n r => ⟨fun φ h => ?_, fun h => ?_, fun δ h => ?_⟩, fun Γ k _ _ _ _ _ n r δ hr hδ => ?_⟩
-  · exact ⟨h.1, fun _ _ _ => Submodule.mem_top, fun W hW hinv => h.2.2 W hW fun g v hv => hinv (φ g) v hv⟩
+theorem UpperTheory.galoisRep_irreducibility_criterion : UpperTheory.V.Af.Bc.IrrBasic := by
+  refine ⟨
+    fun Γ Γ' k _ _ _ n r => ⟨fun φ h => ?_, fun h => ?_, fun δ h => ?_⟩,
+    fun Γ k _ _ _ _ _ n r δ hr hδ => ?_
+  ⟩
+  · exact ⟨
+      h.1,
+      fun _ _ _ => Submodule.mem_top,
+      fun W hW hinv => h.2.2 W hW fun g v hv => hinv (φ g) v hv
+    ⟩
   · intro W hW
     rcases h.2.2 W le_top hW with rfl | rfl
     · exact ⟨⊤, fun _ _ _ => Submodule.mem_top, isCompl_bot_top⟩
@@ -20,7 +29,8 @@ theorem UpperTheory.galoisRep_irreducibility_criterion :
       constructor
       · intro h g v hv
         have := W.smul_mem ((δ g : k)⁻¹) (h g v hv)
-        rwa [tw_val, Matrix.smul_mulVec, smul_smul, inv_mul_cancel₀ (Units.ne_zero _), one_smul] at this
+        rwa [tw_val, Matrix.smul_mulVec, smul_smul, inv_mul_cancel₀ (Units.ne_zero _), one_smul] at
+          this
       · intro h g v hv
         rw [tw_val, Matrix.smul_mulVec]
         exact W.smul_mem _ (h g v hv)

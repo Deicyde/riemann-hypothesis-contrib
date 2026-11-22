@@ -10,8 +10,9 @@ noncomputable section
 
 namespace Formalism.NG
 
-theorem mem_ccIdeal_iff_forall {O : Type*} [CommRing O] {X : Type*} (T : Subalgebra O (X → O))
-    (Z : Set X) (c : T) : c ∈ ccIdeal T Z ↔ ∀ x ∉ Z, (c : X → O) x = 0 := by
+theorem mem_ccIdeal_iff_forall
+    {O : Type*} [CommRing O] {X : Type*} (T : Subalgebra O (X → O)) (Z : Set X) (c : T)
+    : c ∈ ccIdeal T Z ↔ ∀ x ∉ Z, (c : X → O) x = 0 := by
   unfold ccIdeal
   rw [RingHom.mem_ker]
   constructor
@@ -27,8 +28,10 @@ theorem vccBaseChange : StatVccBaseChange := by
   classical
   set b := Module.Free.chooseBasis O O' with hb
   set φ : (X → O) → (X → O') := fun f => algebraMap O O' ∘ f with hφ
-  have hdec : ∀ f ∈ Submodule.span O' (φ '' (T : Set (X → O))),
-      ∃ g : Module.Free.ChooseBasisIndex O O' → (X → O), (∀ j, g j ∈ T) ∧ f = ∑ j, b j • φ (g j) := by
+  have hdec
+      : ∀ f ∈ Submodule.span O' (φ '' (T : Set (X → O))),
+        ∃ g : Module.Free.ChooseBasisIndex O O' → (X → O),
+          (∀ j, g j ∈ T) ∧ f = ∑ j, b j • φ (g j) := by
     intro f hf
     induction hf using Submodule.span_induction with
     | mem f hf =>
@@ -36,13 +39,14 @@ theorem vccBaseChange : StatVccBaseChange := by
       refine ⟨fun j => b.repr 1 j • t, fun j => T.smul_mem ht _, ?_⟩
       funext x'
       simp only [hφ, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Function.comp_apply]
-      calc algebraMap O O' (t x') = algebraMap O O' (t x') * ∑ j, b.repr 1 j • b j := by
-            rw [b.sum_repr, mul_one]
+      calc
+        algebraMap O O' (t x')
+          = algebraMap O O' (t x') * ∑ j, b.repr 1 j • b j := by rw [b.sum_repr, mul_one]
         _ = ∑ j, b j * algebraMap O O' (b.repr 1 j * t x') := by
-            rw [Finset.mul_sum]
-            refine Finset.sum_congr rfl fun j _ => ?_
-            rw [Algebra.smul_def, map_mul]
-            ring
+          rw [Finset.mul_sum]
+          refine Finset.sum_congr rfl fun j _ => ?_
+          rw [Algebra.smul_def, map_mul]
+          ring
     | zero =>
       refine ⟨0, fun j => T.zero_mem, ?_⟩
       funext x'
@@ -52,33 +56,42 @@ theorem vccBaseChange : StatVccBaseChange := by
       obtain ⟨g', hg', rfl⟩ := hf'
       refine ⟨g + g', fun j => T.add_mem (hg j) (hg' j), ?_⟩
       funext x'
-      simp only [hφ, Finset.sum_apply, Pi.add_apply, Pi.smul_apply, smul_eq_mul, Function.comp_apply,
-        map_add, mul_add, Finset.sum_add_distrib]
+      simp only [hφ, Finset.sum_apply, Pi.add_apply, Pi.smul_apply, smul_eq_mul,
+        Function.comp_apply, map_add, mul_add, Finset.sum_add_distrib]
     | smul o f _ hf =>
       obtain ⟨g, hg, rfl⟩ := hf
-      refine ⟨fun k => ∑ j, b.repr (o * b j) k • g j, fun k => T.sum_mem fun j _ => T.smul_mem (hg j) _, ?_⟩
+      refine ⟨
+        fun k => ∑ j, b.repr (o * b j) k • g j,
+        fun k => T.sum_mem fun j _ => T.smul_mem (hg j) _,
+        ?_
+      ⟩
       funext x'
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [hφ, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Function.comp_apply, map_sum, map_mul]
-      calc o * ∑ j, b j * algebraMap O O' (g j x') = ∑ j, (o * b j) * algebraMap O O' (g j x') := by
-            rw [Finset.mul_sum]
-            exact Finset.sum_congr rfl fun j _ => by ring
+        simp only [hφ, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Function.comp_apply, map_sum,
+          map_mul]
+      calc
+        o * ∑ j, b j * algebraMap O O' (g j x') = ∑ j, (o * b j) * algebraMap O O' (g j x') := by
+          rw [Finset.mul_sum]
+          exact Finset.sum_congr rfl fun j _ => by ring
         _ = ∑ j, (∑ k, b.repr (o * b j) k • b k) * algebraMap O O' (g j x') := by
-            simp_rw [b.sum_repr]
+          simp_rw [b.sum_repr]
         _ = ∑ k, b k * ∑ j, algebraMap O O' (b.repr (o * b j) k) * algebraMap O O' (g j x') := by
-            simp only [Finset.sum_mul, Finset.mul_sum, Algebra.smul_def]
-            rw [Finset.sum_comm]
-            exact Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun j _ => by ring
-  have hvan : ∀ (g : Module.Free.ChooseBasisIndex O O' → X → O) (x' : X),
-      ∑ j, b j * algebraMap O O' (g j x') = 0 → ∀ j, g j x' = 0 := by
+          simp only [Finset.sum_mul, Finset.mul_sum, Algebra.smul_def]
+          rw [Finset.sum_comm]
+          exact Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun j _ => by ring
+  have hvan
+      : ∀ (g : Module.Free.ChooseBasisIndex O O' → X → O) (x' : X),
+        ∑ j, b j * algebraMap O O' (g j x') = 0 → ∀ j, g j x' = 0 := by
     intro g x' h
     have h2 : ∑ j, g j x' • b j = 0 := by
       rw [← h]
       exact Finset.sum_congr rfl fun j _ => by rw [Algebra.smul_def, mul_comm]
     exact Fintype.linearIndependent_iff.mp b.linearIndependent _ h2
   apply le_antisymm
-  · have hne : ((fun c : T => IsDiscreteValuationRing.addVal O ((c : X → O) x)) ''
-        (ccIdeal T Z : Set T)).Nonempty := ⟨_, 0, (ccIdeal T Z).zero_mem, rfl⟩
+  · have hne
+        : ((fun c : T => IsDiscreteValuationRing.addVal O ((c : X → O) x))
+          '' (ccIdeal T Z : Set T)).Nonempty :=
+      ⟨_, 0, (ccIdeal T Z).zero_mem, rfl⟩
     obtain ⟨c0, hc0, hc0eq⟩ := csInf_mem hne
     have hvcc : vcc T Z x = IsDiscreteValuationRing.addVal O ((c0 : X → O) x) := by
       rw [show IsDiscreteValuationRing.addVal O ((c0 : X → O) x) = _ from hc0eq, sInf_image]

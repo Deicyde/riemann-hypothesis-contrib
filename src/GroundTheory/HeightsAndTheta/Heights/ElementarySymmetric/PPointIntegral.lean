@@ -17,8 +17,7 @@ namespace PointIntegral
 
 variable {n : ℕ}
 
-theorem zeroSet_ker_eval (p : Fin n → ℂ) :
-    zeroSet (RingHom.ker (MvPolynomial.eval p)) = {p} := by
+theorem zeroSet_ker_eval (p : Fin n → ℂ) : zeroSet (RingHom.ker (MvPolynomial.eval p)) = {p} := by
   ext x
   simp only [zeroSet, Set.mem_ofPred_eq, Set.mem_singleton_iff, RingHom.mem_ker]
   constructor
@@ -29,8 +28,8 @@ theorem zeroSet_ker_eval (p : Fin n → ℂ) :
   · rintro rfl q hq
     exact hq
 
-theorem isFiniteProjection (p : Fin n → ℂ) (A : Matrix (Fin 0) (Fin n) ℂ) :
-    IsFiniteProjection (RingHom.ker (MvPolynomial.eval p)) A := by
+theorem isFiniteProjection (p : Fin n → ℂ) (A : Matrix (Fin 0) (Fin n) ℂ)
+    : IsFiniteProjection (RingHom.ker (MvPolynomial.eval p)) A := by
   have hsurj : Function.Surjective (projHom (RingHom.ker (MvPolynomial.eval p)) A) := by
     intro q
     obtain ⟨q, rfl⟩ := Ideal.Quotient.mk_surjective q
@@ -52,13 +51,21 @@ theorem proof : PointIntegral.Statement := by
   intro n p f φ
   set J := RingHom.ker (MvPolynomial.eval p)
   have hZ : zeroSet J = {p} := zeroSet_ker_eval p
-  have hex : ∃ A : Matrix (Fin 0) (Fin n) ℂ, IsFiniteProjection J A :=
-    ⟨0, isFiniteProjection p 0⟩
+  have hex : ∃ A : Matrix (Fin 0) (Fin n) ℂ, IsFiniteProjection J A := ⟨0, isFiniteProjection p 0⟩
   rw [varInt, dite_eq_left hex]
   set A := hex.choose
   have hsheet : IsSheetAt J A p (fun _ => p) := by
-    refine ⟨Set.univ, isOpen_univ, trivial, differentiableOn_const _, rfl, ?_, Set.univ,
-      Filter.univ_mem, ?_⟩
+    refine ⟨
+      Set.univ,
+      isOpen_univ,
+      trivial,
+      differentiableOn_const _,
+      rfl,
+      ?_,
+      Set.univ,
+      Filter.univ_mem,
+      ?_
+    ⟩
     · intro y _
       exact ⟨Subsingleton.elim _ _, by rw [hZ]; rfl⟩
     · intro x hx _

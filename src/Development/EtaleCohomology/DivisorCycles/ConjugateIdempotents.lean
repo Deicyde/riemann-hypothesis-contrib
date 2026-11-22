@@ -11,17 +11,18 @@ open LateralTheory.DivDb
 
 variable {C : Type} [Field C] {N n : ℕ}
 
-theorem trace_ne_zero [CharZero C] (P : Mat C N) (hP : IsIdempotentElem P) (h0 : P ≠ 0) :
-    P.trace ≠ 0 := by
+theorem trace_ne_zero [CharZero C] (P : Mat C N) (hP : IsIdempotentElem P) (h0 : P ≠ 0)
+    : P.trace ≠ 0 := by
   intro ht
   apply h0
   have hi : IsIdempotentElem (Matrix.toLin' P) := by
     unfold IsIdempotentElem
     rw [Module.End.mul_eq_comp, ← Matrix.toLin'_mul, hP.eq]
-  have h1 := LinearMap.IsIdempotentElem.eq_zero_of_trace_eq_zero hi (by
-    rw [LinearMap.trace_eq_matrix_trace C (Pi.basisFun C (Fin N)), LinearMap.toMatrix_eq_toMatrix',
-      LinearMap.toMatrix'_toLin']
-    exact ht)
+  have h1 :=
+    LinearMap.IsIdempotentElem.eq_zero_of_trace_eq_zero hi (by
+      rw [LinearMap.trace_eq_matrix_trace C (Pi.basisFun C (Fin N)),
+        LinearMap.toMatrix_eq_toMatrix', LinearMap.toMatrix'_toLin']
+      exact ht)
   exact Matrix.toLin'.injective (by rw [h1, map_zero])
 
 def Iso (A : Subalgebra C (Mat C N)) (q p : Mat C N) : Prop :=
@@ -33,13 +34,13 @@ theorem right_p {P Q α : Mat C N} (hP : IsIdempotentElem P) (h : Q * α * P = �
 theorem left_q {P Q α : Mat C N} (hQ : IsIdempotentElem Q) (h : Q * α * P = α) : Q * α = α := by
   rw [← h, ← mul_assoc, ← mul_assoc, hQ.eq]
 
-theorem fin_step {P Q α β : Mat C N} (hP : IsIdempotentElem P) (hQ : IsIdempotentElem Q) (hQ0 : Q ≠ 0)
-    (hα : Q * α * P = α) (hβα : β * α = P) (hd : ∃ d : C, α * β = d • Q) (hα0 : α ≠ 0) :
-    α * β = Q := by
+theorem fin_step
+    {P Q α β : Mat C N} (hP : IsIdempotentElem P) (hQ : IsIdempotentElem Q) (hQ0 : Q ≠ 0)
+    (hα : Q * α * P = α) (hβα : β * α = P) (hd : ∃ d : C, α * β = d • Q) (hα0 : α ≠ 0)
+    : α * β = Q := by
   obtain ⟨d, hd⟩ := hd
   have hαP := right_p hP hα
-  have e : (α * β) * (α * β) = α * β := by
-    rw [mul_assoc, ← mul_assoc β, hβα, ← mul_assoc, hαP]
+  have e : (α * β) * (α * β) = α * β := by rw [mul_assoc, ← mul_assoc β, hβα, ← mul_assoc, hαP]
   rw [hd, smul_mul_smul_comm, hQ.eq] at e
   have hdd : d * d = d := smul_left_injective C hQ0 e
   have hne : d ≠ 0 := by
@@ -52,9 +53,12 @@ theorem fin_step {P Q α β : Mat C N} (hP : IsIdempotentElem P) (hQ : IsIdempot
     exact this
   rw [hd, this, one_smul]
 
-theorem key (A : Subalgebra C (Mat C N)) (p q : Fin n → Mat C N) (hp : Sys p) (hpc : Corner A p)
-    (hq : Sys q) (hqc : Corner A q) (hA : NoNil A) (j k : Fin n) (a : Mat C N) (ha : a ∈ A)
-    (h : q j * a * p k ≠ 0) : Iso A (q j) (p k) := by
+theorem key
+    (A : Subalgebra C (Mat C N)) (p q : Fin n → Mat C N)
+    (hp : Sys p) (hpc : Corner A p) (hq : Sys q) (hqc : Corner A q)
+    (hA : NoNil A)
+    (j k : Fin n) (a : Mat C N) (ha : a ∈ A) (h : q j * a * p k ≠ 0)
+    : Iso A (q j) (p k) := by
   have hpi := hp.1.idem k
   have hqi := hq.1.idem j
   have hαA : q j * a * p k ∈ A := A.mul_mem (A.mul_mem (hqc.1 j) ha) (hpc.1 k)
@@ -68,12 +72,12 @@ theorem key (A : Subalgebra C (Mat C N)) (p q : Fin n → Mat C N) (hp : Sys p) 
     intro b hb
     refine ⟨2, ?_⟩
     rw [pow_two]
-    have : b * (q j * a * p k) * (b * (q j * a * p k)) = b * q j * a * (p k * b * (q j * a * p k)) := by
+    have : b * (q j * a * p k) * (b * (q j * a * p k))
+        = b * q j * a * (p k * b * (q j * a * p k)) := by
       simp only [mul_assoc]
     rw [this, hc b hb, mul_zero]
   obtain ⟨c, hc⟩ := hpc.2 (a' * q j * a) (A.mul_mem (A.mul_mem ha' (hqc.1 j)) ha) k
-  have hpa : p k * a' * (q j * a * p k) = c • p k := by
-    rw [← hc]; simp only [mul_assoc]
+  have hpa : p k * a' * (q j * a * p k) = c • p k := by rw [← hc]; simp only [mul_assoc]
   have hc0 : c ≠ 0 := by rintro rfl; rw [zero_smul] at hpa; exact h' hpa
   set α := q j * a * p k with hαdef
   set β := c⁻¹ • (p k * a' * q j) with hβdef
@@ -90,12 +94,15 @@ theorem key (A : Subalgebra C (Mat C N)) (p q : Fin n → Mat C N) (hp : Sys p) 
   obtain ⟨d, hd⟩ := hqc.2 (α * β) (A.mul_mem hαA hβA) j
   refine ⟨d, ?_⟩
   rw [← hd]
-  calc α * β = (q j * α) * (β * q j) := by rw [left_q hqi hα, right_p hqi hβ]
+  calc
+    α * β
+      = (q j * α) * (β * q j) := by rw [left_q hqi hα, right_p hqi hβ]
     _ = _ := by simp only [mul_assoc]
 
-theorem compose {A : Subalgebra C (Mat C N)} {p q : Fin n → Mat C N} (hp : Sys p) (hq : Sys q)
-    {j j' k k' : Fin n} (h1 : Iso A (q j) (p k)) (h2 : Iso A (q j) (p k')) (h3 : Iso A (q j') (p k)) :
-    Iso A (q j') (p k') := by
+theorem compose
+    {A : Subalgebra C (Mat C N)} {p q : Fin n → Mat C N} (hp : Sys p) (hq : Sys q)
+    {j j' k k' : Fin n} (h1 : Iso A (q j) (p k)) (h2 : Iso A (q j) (p k')) (h3 : Iso A (q j') (p k))
+    : Iso A (q j') (p k') := by
   obtain ⟨α1, hα1, β1, hβ1, e1, f1, g1, k1⟩ := h1
   obtain ⟨α2, hα2, β2, hβ2, e2, f2, g2, k2⟩ := h2
   obtain ⟨α3, hα3, β3, hβ3, e3, f3, g3, k3⟩ := h3
@@ -109,46 +116,59 @@ theorem compose {A : Subalgebra C (Mat C N)} {p q : Fin n → Mat C N} (hp : Sys
   have a2p := right_p (hp.1.idem k') g2
   have pb2 := left_q (hp.1.idem k') k2
   have b3q := right_p (hq.1.idem j') k3
-  refine ⟨α3 * β1 * α2, A.mul_mem (A.mul_mem hα3 hβ1) hα2, β2 * α1 * β3,
-    A.mul_mem (A.mul_mem hβ2 hα1) hβ3, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    α3 * β1 * α2,
+    A.mul_mem (A.mul_mem hα3 hβ1) hα2,
+    β2 * α1 * β3,
+    A.mul_mem (A.mul_mem hβ2 hα1) hβ3,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · simp only [mul_assoc]
-    rw [← mul_assoc α2 β2, e2, ← mul_assoc (q j) α1, qa1, ← mul_assoc β1 α1, f1, ← mul_assoc, a3p, e3]
+    rw [← mul_assoc α2 β2, e2, ← mul_assoc (q j) α1, qa1, ← mul_assoc β1 α1, f1, ← mul_assoc, a3p,
+      e3]
   · simp only [mul_assoc]
     rw [← mul_assoc β3 α3, f3, ← mul_assoc (p k) β1, pb1, ← mul_assoc α1 β1, e1, qa2, f2]
   · rw [← mul_assoc, ← mul_assoc, qa3, mul_assoc, a2p]
   · rw [← mul_assoc, ← mul_assoc, pb2, mul_assoc, b3q]
 
-theorem count (A : Subalgebra C (Mat C N)) [CharZero C] (p q : Fin n → Mat C N) (hp : Sys p) (hq : Sys q)
+theorem count
+    (A : Subalgebra C (Mat C N))
+    [CharZero C]
+    (p q : Fin n → Mat C N) (hp : Sys p) (hq : Sys q)
     (Q : Fin n → Finset (Fin n)) (hQd : ∀ j k, j ∈ Q k ↔ Iso A (q j) (p k))
     (hF1 : ∀ j k, ¬ Iso A (q j) (p k) → q j * p k = 0)
-    (hQ : ∀ j k k', j ∈ Q k → j ∈ Q k' → Q k = Q k') (hne : ∀ k, (Q k).Nonempty) (k0 : Fin n) :
-    (Finset.univ.filter (fun k => Q k = Q k0)).card = (Q k0).card := by
+    (hQ : ∀ j k k', j ∈ Q k → j ∈ Q k' → Q k = Q k') (hne : ∀ k, (Q k).Nonempty) (k0 : Fin n)
+    : (Finset.univ.filter (fun k => Q k = Q k0)).card = (Q k0).card := by
   classical
   have htr : ∀ j k, Iso A (q j) (p k) → (q j).trace = (p k).trace := by
     rintro j k ⟨α, -, β, -, e, f, -, -⟩
     rw [← e, ← f, Matrix.trace_mul_comm]
   have hsum : ∑ k ∈ Finset.univ.filter (fun k => Q k = Q k0), p k = ∑ j ∈ Q k0, q j := by
-    calc ∑ k ∈ Finset.univ.filter (fun k => Q k = Q k0), p k
-        = ∑ j, q j * ∑ k ∈ Finset.univ.filter (fun k => Q k = Q k0), p k := by
-          rw [← Finset.sum_mul, hq.1.complete, one_mul]
+    calc
+      ∑ k ∈ Finset.univ.filter (fun k => Q k = Q k0), p k
+          = ∑ j, q j * ∑ k ∈ Finset.univ.filter (fun k => Q k = Q k0), p k := by
+        rw [← Finset.sum_mul, hq.1.complete, one_mul]
       _ = ∑ j, if j ∈ Q k0 then q j else 0 := by
-          refine Finset.sum_congr rfl (fun j _ => ?_)
-          split_ifs with hj
-          · rw [Finset.mul_sum, Finset.sum_subset (Finset.subset_univ _), ← Finset.mul_sum,
-              hp.1.complete, mul_one]
-            intro k _ hk
-            apply hF1
-            intro hR
-            apply hk
-            simp only [Finset.mem_filter, Finset.mem_univ, true_and]
-            exact hQ j k k0 ((hQd j k).2 hR) hj
-          · rw [Finset.mul_sum]
-            refine Finset.sum_eq_zero (fun k hk => hF1 j k ?_)
-            intro hR
-            simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hk
-            apply hj
-            rw [← hk]
-            exact (hQd j k).2 hR
+        refine Finset.sum_congr rfl (fun j _ => ?_)
+        split_ifs with hj
+        · rw [Finset.mul_sum, Finset.sum_subset (Finset.subset_univ _), ← Finset.mul_sum,
+            hp.1.complete, mul_one]
+          intro k _ hk
+          apply hF1
+          intro hR
+          apply hk
+          simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+          exact hQ j k k0 ((hQd j k).2 hR) hj
+        · rw [Finset.mul_sum]
+          refine Finset.sum_eq_zero (fun k hk => hF1 j k ?_)
+          intro hR
+          simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hk
+          apply hj
+          rw [← hk]
+          exact (hQd j k).2 hR
       _ = ∑ j ∈ Q k0, q j := by rw [Finset.sum_ite_mem, Finset.univ_inter]
   have ht := congrArg Matrix.trace hsum
   rw [Matrix.trace_sum, Matrix.trace_sum] at ht
@@ -160,7 +180,8 @@ theorem count (A : Subalgebra C (Mat C N)) [CharZero C] (p q : Fin n → Mat C N
     rw [← htr j0 k ((hQd j0 k).1 this), htr j0 k0 ((hQd j0 k0).1 hj0)]
   have h2 : ∀ j ∈ Q k0, (q j).trace = (p k0).trace := fun j hj => htr j k0 ((hQd j k0).1 hj)
   rw [Finset.sum_congr rfl h1, Finset.sum_congr rfl h2, Finset.sum_const, Finset.sum_const,
-    nsmul_eq_mul, nsmul_eq_mul] at ht
+      nsmul_eq_mul, nsmul_eq_mul]
+    at ht
   have t0 := trace_ne_zero (p k0) (hp.1.idem k0) (hp.2 k0)
   exact_mod_cast mul_right_cancel₀ t0 ht
 
@@ -195,14 +216,17 @@ theorem IdemConj_of : IdemConj := by
     ⟨fun S => Finset.univ.filter (fun j => j ∈ S ∧ Q j ≠ S), by simp⟩
   have hLM : ∀ k0, (L (Q k0)).card = (M (Q k0)).card := by
     intro k0
-    have e1 := Finset.card_filter_add_card_filter_not
-      (s := Finset.univ.filter (fun k => Q k = Q k0)) (fun k => k ∈ Q k0)
+    have e1 :=
+      Finset.card_filter_add_card_filter_not (s := Finset.univ.filter (fun k => Q k = Q k0))
+        (fun k => k ∈ Q k0)
     have e2 := Finset.card_filter_add_card_filter_not (s := Q k0) (fun j => Q j = Q k0)
     rw [hcard k0] at e1
-    have e3 : (Finset.univ.filter (fun k => Q k = Q k0)).filter (fun k => k ∈ Q k0) =
-        (Q k0).filter (fun j => Q j = Q k0) := by
+    have e3
+        : (Finset.univ.filter (fun k => Q k = Q k0)).filter (fun k => k ∈ Q k0)
+          = (Q k0).filter (fun j => Q j = Q k0) := by
       ext x; simp only [Finset.mem_filter, Finset.mem_univ, true_and]; tauto
-    have e4 : (Finset.univ.filter (fun k => Q k = Q k0)).filter (fun k => ¬ k ∈ Q k0) = L (Q k0) := by
+    have e4
+        : (Finset.univ.filter (fun k => Q k = Q k0)).filter (fun k => ¬ k ∈ Q k0) = L (Q k0) := by
       ext x; simp only [hL, Finset.mem_filter, Finset.mem_univ, true_and]
     have e5 : (Q k0).filter (fun j => ¬ Q j = Q k0) = M (Q k0) := by
       ext x; simp only [hM, Finset.mem_filter]
@@ -211,12 +235,13 @@ theorem IdemConj_of : IdemConj := by
     omega
   let g : Finset (Fin n) → Fin n → Fin n := fun S k =>
     if h : (L S).card = (M S).card ∧ k ∈ L S then ((L S).equivOfCardEq h.1 ⟨k, h.2⟩ : Fin n) else k
-  have hg : ∀ S k (h : (L S).card = (M S).card ∧ k ∈ L S),
-      g S k = ((L S).equivOfCardEq h.1 ⟨k, h.2⟩ : Fin n) := fun S k h => by
+  have hg
+      : ∀ S k (h : (L S).card = (M S).card ∧ k ∈ L S),
+        g S k = ((L S).equivOfCardEq h.1 ⟨k, h.2⟩ : Fin n) := fun S k h => by
     simp only [g, dif_pos h]
   let f : Fin n → Fin n := fun k => if k ∈ Q k then k else g (Q k) k
-  have hkL : ∀ k, k ∉ Q k → (L (Q k)).card = (M (Q k)).card ∧ k ∈ L (Q k) :=
-    fun k hk => ⟨hLM k, (hL _ _).2 ⟨rfl, hk⟩⟩
+  have hkL : ∀ k, k ∉ Q k → (L (Q k)).card = (M (Q k)).card ∧ k ∈ L (Q k) := fun k hk =>
+    ⟨hLM k, (hL _ _).2 ⟨rfl, hk⟩⟩
   have hfM : ∀ k, k ∉ Q k → f k ∈ Q k ∧ Q (f k) ≠ Q k := by
     intro k hk
     have e : f k = g (Q k) k := by simp only [f, if_neg hk]
@@ -258,24 +283,28 @@ theorem IdemConj_of : IdemConj := by
   have hβq : ∀ j, β j * q (f j) = β j := fun j => right_p (hq.1.idem _) (hpb j)
   have hvw : (∑ j, α j) * ∑ j, β j = 1 := by
     rw [Finset.sum_mul_sum]
-    calc ∑ i, ∑ j, α i * β j = ∑ i, q (π i) := Finset.sum_congr rfl (fun i _ => by
-            rw [Finset.sum_eq_single i]
-            · exact hab i
-            · intro j _ hji
-              rw [← hαp i, ← hpβ j, mul_assoc, ← mul_assoc (p i), hp.1.ortho (Ne.symm hji), zero_mul,
-                mul_zero]
-            · simp)
+    calc
+      ∑ i, ∑ j, α i * β j = ∑ i, q (π i) :=
+        Finset.sum_congr rfl (fun i _ => by
+          rw [Finset.sum_eq_single i]
+          · exact hab i
+          · intro j _ hji
+            rw [← hαp i, ← hpβ j, mul_assoc, ← mul_assoc (p i), hp.1.ortho (Ne.symm hji), zero_mul,
+              mul_zero]
+          · simp)
       _ = ∑ i, q i := Equiv.sum_comp π q
       _ = 1 := hq.1.complete
   have hwv : (∑ j, β j) * ∑ j, α j = 1 := by
     rw [Finset.sum_mul_sum]
-    calc ∑ i, ∑ j, β i * α j = ∑ i, p i := Finset.sum_congr rfl (fun i _ => by
-            rw [Finset.sum_eq_single i]
-            · exact hba i
-            · intro j _ hji
-              rw [← hβq i, ← hqα j, mul_assoc, ← mul_assoc (q (f i)),
-                hq.1.ortho (hinj.ne (Ne.symm hji)), zero_mul, mul_zero]
-            · simp)
+    calc
+      ∑ i, ∑ j, β i * α j = ∑ i, p i :=
+        Finset.sum_congr rfl (fun i _ => by
+          rw [Finset.sum_eq_single i]
+          · exact hba i
+          · intro j _ hji
+            rw [← hβq i, ← hqα j, mul_assoc, ← mul_assoc (q (f i)),
+              hq.1.ortho (hinj.ne (Ne.symm hji)), zero_mul, mul_zero]
+          · simp)
       _ = 1 := hp.1.complete
   refine ⟨∑ j, α j, A.sum_mem (fun j _ => hαA j), ⟨⟨_, _, hvw, hwv⟩, rfl⟩, π, ?_, ?_⟩
   · intro j

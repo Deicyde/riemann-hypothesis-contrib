@@ -15,8 +15,12 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Unf
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SplitWeil GlobalTheory.LatPair GlobalTheory.SeeSaw GlobalTheory.FinPl ValuativeRel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory IsDedekindDomain
+  NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SplitWeil
+  GlobalTheory.LatPair GlobalTheory.SeeSaw GlobalTheory.FinPl ValuativeRel
 open scoped TensorProduct nonZeroDivisors
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -28,12 +32,14 @@ namespace GlobalTheory.SeeSaw.YRat
 
 theorem star_eq_conj (D : D7) (x : D.host.E) : star x = D.host.conj x := by
   apply D.host.φ₀.injective
-  have h1 : D.host.φ₀ (D.host.conj x) = starRingEnd ℂ (D.host.φ₀ x) := Formalism.HC.HostAx.conjE_apply _ _ _
+  have h1 : D.host.φ₀ (D.host.conj x) = starRingEnd ℂ (D.host.φ₀ x) :=
+    Formalism.HC.HostAx.conjE_apply _ _ _
   rw [h1]
   haveI := D.host.isCMField_hostE
   exact IsCMField.complexEmbedding_complexConj _ _ _
 
-theorem posDef_of_sig {n : ℕ} (G : Matrix (Fin n) (Fin n) ℂ) (h : Formalism.UG.HasSignature G n 0) : G.PosDef := by
+theorem posDef_of_sig {n : ℕ} (G : Matrix (Fin n) (Fin n) ℂ) (h : Formalism.UG.HasSignature G n 0)
+    : G.PosDef := by
   obtain ⟨e, P, hP⟩ := h
   have hJ : Formalism.UG.Jpq n 0 = 1 := by
     ext i j
@@ -51,8 +57,8 @@ theorem posDef_of_sig {n : ℕ} (G : Matrix (Fin n) (Fin n) ℂ) (h : Formalism.
   rw [h3]
   exact h2.submatrix e.injective
 
-theorem defSpace {D : D7} (hX : ∀ j, j ≤ D.R.m → (D.sp.X j).IsPosDef) {j : ℕ} (hj : j ≤ D.R.m) :
-    (D.sp.X j).SigOK ∧ (∀ τ, (D.sp.X j).sig τ = (D.R.N j, 0)) ∧ CoCpt (D.sp.X j) := by
+theorem defSpace {D : D7} (hX : ∀ j, j ≤ D.R.m → (D.sp.X j).IsPosDef) {j : ℕ} (hj : j ≤ D.R.m)
+    : (D.sp.X j).SigOK ∧ (∀ τ, (D.sp.X j).sig τ = (D.R.N j, 0)) ∧ CoCpt (D.sp.X j) := by
   have hs : (D.sp.X j).SigOK := D.sp.X_sig j
   have hr : (D.sp.X j).rank = D.R.N j := D.sp.X_rank j hj
   refine ⟨hs, fun τ => by rw [hX j hj τ, hr], ?_⟩
@@ -61,7 +67,19 @@ theorem defSpace {D : D7} (hX : ∀ j, j ≤ D.R.m → (D.sp.X j).IsPosDef) {j :
   rw [hX j hj (tauE D τ)] at h1
   exact posDef_of_sig _ h1
 
-theorem spaces_of_index : ∀ (D : D7) (u : D.what₂.Word), (∀ j, j ≤ D.R.m → (D.sp.X j).IsPosDef) → (∀ j ρ, j + 2 * ρ + 2 = D.R.m → ∃ (V : HSp D) (b : BesAt V (D.sp.X j) ρ), V.rank = D.R.rankY j ∧ V.SigOK ∧ (∀ τ, V.sig τ = sigYD D.R j) ∧ (star b.ζ ⬝ᵥ b.L.gram *ᵥ b.ζ) * (D.host.xi0 * star D.host.xi0) ^ (j / 2) = -(((D.mem u).A.T : ℕ) : D.host.E)) ∧ ∀ j ρ, j + 2 * ρ + 2 = D.R.m → ∃ (V : HSp D) (_ : JacAt V (D.sp.X (j + 1)) ρ), V.rank = D.R.rankY (j + 1) ∧ V.SigOK ∧ ∀ τ, V.sig τ = sigYD D.R (j + 1) := by
+theorem spaces_of_index
+    : ∀ (D : D7) (u : D.what₂.Word),
+      (∀ j, j ≤ D.R.m → (D.sp.X j).IsPosDef)
+        → (∀ j ρ,
+            j + 2 * ρ + 2 = D.R.m
+              → ∃ (V : HSp D) (b : BesAt V (D.sp.X j) ρ),
+                V.rank = D.R.rankY j ∧ V.SigOK ∧ (∀ τ, V.sig τ = sigYD D.R j)
+                  ∧ (star b.ζ ⬝ᵥ b.L.gram *ᵥ b.ζ) * (D.host.xi0 * star D.host.xi0) ^ (j / 2)
+                    = -(((D.mem u).A.T : ℕ) : D.host.E))
+          ∧ ∀ j ρ,
+            j + 2 * ρ + 2 = D.R.m
+              → ∃ (V : HSp D) (_ : JacAt V (D.sp.X (j + 1)) ρ),
+                V.rank = D.R.rankY (j + 1) ∧ V.SigOK ∧ ∀ τ, V.sig τ = sigYD D.R (j + 1) := by
   intro D u hX
   have hsum := GlobalTheory.T.exists_orthogonalSum_and_hyperbolicSum_spaces D
   have hvol := GlobalTheory.Unf.VolExist.measures_exist D
@@ -72,15 +90,15 @@ theorem spaces_of_index : ∀ (D : D7) (u : D.what₂.Word), (∀ j, j ≤ D.R.m
   have hT0 : (((D.mem u).A.T : ℕ) : D.host.E) ≠ 0 := by
     have := (D.mem u).A.T_prime.ne_zero
     exact_mod_cast this
-  have hπ0 : (π : D.host.E) ≠ 0 := by
-    intro h0; apply hT0; rw [← hππ, h0, zero_mul]
+  have hπ0 : (π : D.host.E) ≠ 0 := by intro h0; apply hT0; rw [← hππ, h0, zero_mul]
   refine ⟨?_, ?_⟩
   · intro j ρ h
     obtain ⟨hXs, hXsig, hXc⟩ := defSpace hX (j := j) (by omega)
     have hXr : (D.sp.X j).rank = D.R.N j := D.sp.X_rank j (by omega)
     set c : D.host.E := (π : D.host.E) / D.host.xi0 ^ (j / 2) with hc
     have hc0 : c ≠ 0 := div_ne_zero hπ0 (pow_ne_zero _ hxi)
-    obtain ⟨L, ζ, hline, hLs, hLn, hLsig⟩ := GlobalTheory.T.exists_hermitianLine_vector_prescribed_norm D c (-1) hc0
+    obtain ⟨L, ζ, hline, hLs, hLn, hLsig⟩ :=
+      GlobalTheory.T.exists_hermitianLine_vector_prescribed_norm D c (-1) hc0
     obtain ⟨V₀, o, hV₀s, hV₀sig⟩ := hsum.1 (D.sp.X j) L hXs hLs
     obtain ⟨V, d, hVs, hVsig⟩ := hsum.2 V₀ ρ hV₀s
     refine ⟨V, ⟨V₀, L, d, o, ζ, hline, hXc, (hvol.2.1 _ _ _ d).some⟩, ?_, hVs, ?_, ?_⟩

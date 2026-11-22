@@ -10,12 +10,15 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovGeome
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology GlobalTheory.CompanionTheory.Ar.Top
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
+  GlobalTheory.CompanionTheory.Ar.Top
 
 namespace RootFieldNumerics
 
-theorem dominant_of_gaps {Ψ : Type} {N : ℕ} (mu : Wt Ψ N)
-    (h : ∀ τ (i : ℕ), i + 1 < N → 0 ≤ ent mu τ i - ent mu τ (i + 1)) : Dominant mu := by
+theorem dominant_of_gaps
+    {Ψ : Type} {N : ℕ}
+    (mu : Wt Ψ N) (h : ∀ τ (i : ℕ), i + 1 < N → 0 ≤ ent mu τ i - ent mu τ (i + 1))
+    : Dominant mu := by
   intro τ a b hab
   have hab' : (a : ℕ) ≤ b := hab
   have key : ∀ k : ℕ, (a : ℕ) + k < N → ent mu τ ((a : ℕ) + k) ≤ ent mu τ a := by
@@ -32,25 +35,38 @@ theorem dominant_of_gaps {Ψ : Type} {N : ℕ} (mu : Wt Ψ N)
   rw [Nat.add_sub_cancel' hab'] at h3
   simpa [ent, a.isLt, b.isLt] using h3
 
-theorem abs_ent_le {Ψ : Type} [Fintype Ψ] {N : ℕ} (mu : Wt Ψ N) (τ : Ψ) (i : ℕ) : |ent mu τ i| ≤ ‖mu‖ := by
+theorem abs_ent_le {Ψ : Type} [Fintype Ψ] {N : ℕ} (mu : Wt Ψ N) (τ : Ψ) (i : ℕ)
+    : |ent mu τ i| ≤ ‖mu‖ := by
   unfold ent
   split_ifs with h
   · exact (norm_le_pi_norm (mu τ) _).trans (norm_le_pi_norm mu τ)
   · simp
 
-theorem perturbed_weight_wall_bounds : ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (T : RootTower Ψ N) (c₀ θ₀ : ℝ), 0 < c₀ → 0 < θ₀ → ∃ B₁ : ℕ, ∀ B : ℕ, B₁ ≤ B → ∀ (τ₀ : Ψ) (lam₀ : Wt Ψ N), InWall T.j τ₀ c₀ lam₀ → let θ : ℝ := 5 * Fintype.card Ψ / B; let lam : Wt Ψ N := fun τ i => lam₀ τ i + (if τ = τ₀ ∧ (i : ℕ) < T.j then 2 * θ else 0); 3 ≤ B ∧ 0 < θ ∧ θ ≤ θ₀ ∧ θ ≤ 1 ∧ ‖lam‖ ≤ 1 ∧ ‖T.lamS lam (θ ^ 2)‖ ≤ 1 ∧ (∀ τ, θ ≤ gap T.j lam τ) ∧ gap T.j lam τ₀ = 2 * θ ∧ CompactGapsGE T.j c₀ lam ∧ Dominant lam ∧ Dominant (T.lamS lam (θ ^ 2)) ∧ NefThreshold T.j B (T.lamS lam (θ ^ 2)) ∧ ‖T.lamS lam (θ ^ 2) - lam₀‖ ≤ 2 * θ + ‖T.nu‖ * θ ^ 2 := by
+theorem perturbed_weight_wall_bounds
+    : ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (T : RootTower Ψ N) (c₀ θ₀ : ℝ),
+      0 < c₀ → 0 < θ₀
+        → ∃ B₁ : ℕ, ∀ B : ℕ,
+          B₁ ≤ B
+            → ∀ (τ₀ : Ψ) (lam₀ : Wt Ψ N),
+              InWall T.j τ₀ c₀ lam₀
+                → let θ : ℝ := 5 * Fintype.card Ψ / B
+                  let lam : Wt Ψ N := fun τ i =>
+                    lam₀ τ i + (if τ = τ₀ ∧ (i : ℕ) < T.j then 2 * θ else 0)
+                  3 ≤ B ∧ 0 < θ ∧ θ ≤ θ₀ ∧ θ ≤ 1 ∧ ‖lam‖ ≤ 1 ∧ ‖T.lamS lam (θ ^ 2)‖ ≤ 1
+                    ∧ (∀ τ, θ ≤ gap T.j lam τ) ∧ gap T.j lam τ₀ = 2 * θ ∧ CompactGapsGE T.j c₀ lam
+                    ∧ Dominant lam ∧ Dominant (T.lamS lam (θ ^ 2))
+                    ∧ NefThreshold T.j B (T.lamS lam (θ ^ 2))
+                    ∧ ‖T.lamS lam (θ ^ 2) - lam₀‖ ≤ 2 * θ + ‖T.nu‖ * θ ^ 2 := by
   intro Ψ _ _ N T c₀ θ₀ hc₀ hθ₀
   set R := ‖T.nu‖ with hR
   have hR0 : 0 ≤ R := norm_nonneg _
   set δ : ℝ := min (min θ₀ (1 / 8)) (min (c₀ / 2) (1 / (4 * (R + 1)))) with hδ
-  have hδpos : 0 < δ :=
-    lt_min (lt_min hθ₀ (by norm_num)) (lt_min (by linarith) (by positivity))
+  have hδpos : 0 < δ := lt_min (lt_min hθ₀ (by norm_num)) (lt_min (by linarith) (by positivity))
   refine ⟨max 10 ⌈5 * (Fintype.card Ψ : ℝ) / δ⌉₊, ?_⟩
   intro B hB τ₀ lam₀ hW
   intro θ lam
   obtain ⟨hn0, hg0, hgo, hcg⟩ := hW
-  have hcard : (1 : ℝ) ≤ Fintype.card Ψ := by
-    exact_mod_cast Fintype.card_pos_iff.mpr ⟨τ₀⟩
+  have hcard : (1 : ℝ) ≤ Fintype.card Ψ := by exact_mod_cast Fintype.card_pos_iff.mpr ⟨τ₀⟩
   have hB10 : (10 : ℝ) ≤ B := by exact_mod_cast (le_max_left _ _).trans hB
   have hBpos : (0 : ℝ) < B := by linarith
   have hBc : 5 * (Fintype.card Ψ : ℝ) / δ ≤ B :=
@@ -68,8 +84,7 @@ theorem perturbed_weight_wall_bounds : ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq
   have hθR : θ * R ≤ 1 / 4 := by
     rw [le_div_iff₀ (by positivity)] at hθR'
     nlinarith
-  have hθB : θ * B = 5 * (Fintype.card Ψ : ℝ) := by
-    rw [hθdef]; field_simp
+  have hθB : θ * B = 5 * (Fintype.card Ψ : ℝ) := by rw [hθdef]; field_simp
   let D : Wt Ψ N := fun τ i => if τ = τ₀ ∧ (i : ℕ) < T.j then 2 * θ else 0
   have hD : ‖D‖ ≤ 2 * θ := by
     refine (pi_norm_le_iff_of_nonneg (by positivity)).mpr (fun τ => ?_)
@@ -79,8 +94,7 @@ theorem perturbed_weight_wall_bounds : ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq
     · rw [Real.norm_eq_abs, abs_of_pos (by positivity)]
     · simp; positivity
   have hlamD : lam = lam₀ + D := by funext τ i; rfl
-  have hnlam : ‖lam‖ ≤ 1 / 2 + 2 * θ := by
-    rw [hlamD]; exact (norm_add_le _ _).trans (by linarith)
+  have hnlam : ‖lam‖ ≤ 1 / 2 + 2 * θ := by rw [hlamD]; exact (norm_add_le _ _).trans (by linarith)
   have hnmu : ‖T.lamS lam (θ ^ 2)‖ ≤ 1 / 2 + 2 * θ + θ ^ 2 * R := by
     show ‖lam - θ ^ 2 • T.nu‖ ≤ _
     refine (norm_sub_le _ _).trans ?_
@@ -96,10 +110,10 @@ theorem perturbed_weight_wall_bounds : ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq
     intro τ i
     by_cases hi : i < N
     · simp [ent, hi, lam]
-    · have : ¬ (i < T.j) := by have := T.j_lt; omega
+    · have : ¬(i < T.j) := by have := T.j_lt; omega
       simp [ent, hi, this]
-  have hentS : ∀ (mu : Wt Ψ N) (s : ℝ) τ i,
-      ent (T.lamS mu s) τ i = ent mu τ i - s * ent T.nu τ i := by
+  have hentS
+      : ∀ (mu : Wt Ψ N) (s : ℝ) τ i, ent (T.lamS mu s) τ i = ent mu τ i - s * ent T.nu τ i := by
     intro mu s τ i
     by_cases hi : i < N <;> simp [ent, hi, RootTower.lamS]
   have hnuD : ∀ τ i, ent T.nu τ i - ent T.nu τ (i + 1) ≤ 2 * R := by

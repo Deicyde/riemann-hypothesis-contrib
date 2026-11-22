@@ -12,8 +12,8 @@ open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym UpperTheory.V.Z.Ka
 
 attribute [local instance] algMdl
 
-private theorem val_lt_one_iff {K : Type} [Field K] (B : ValuationSubring K) (x : K) :
-    B.valuation x < 1 ↔ x = 0 ∨ x⁻¹ ∉ B := by
+private theorem val_lt_one_iff {K : Type} [Field K] (B : ValuationSubring K) (x : K)
+    : B.valuation x < 1 ↔ x = 0 ∨ x⁻¹ ∉ B := by
   rcases eq_or_ne x 0 with rfl | hx
   · simp
   · have h0 : 0 < B.valuation x := by
@@ -22,8 +22,10 @@ private theorem val_lt_one_iff {K : Type} [Field K] (B : ValuationSubring K) (x 
     rw [← one_lt_inv₀ h0, ← map_inv₀, ← not_le, B.valuation_le_one_iff]
     simp [hx]
 
-private theorem val_comap_lt_one {K L : Type} [Field K] [Field L] (B : ValuationSubring L) (e : K →+* L) (x : K)
-    (h : B.valuation (e x) < 1) : (B.comap e).valuation x < 1 := by
+private theorem val_comap_lt_one
+    {K L : Type} [Field K] [Field L]
+    (B : ValuationSubring L) (e : K →+* L) (x : K) (h : B.valuation (e x) < 1)
+    : (B.comap e).valuation x < 1 := by
   rw [val_lt_one_iff] at h ⊢
   rcases h with h | h
   · exact Or.inl ((map_eq_zero e).1 h)
@@ -31,8 +33,7 @@ private theorem val_comap_lt_one {K L : Type} [Field K] [Field L] (B : Valuation
     rw [ValuationSubring.mem_comap, map_inv₀]
     exact h
 
-theorem UpperTheory.V.Z.Kato.Sym.PT.ptIs :
-    UpperTheory.V.Z.Kato.Sym.PT.PtIs := by
+theorem UpperTheory.V.Z.Kato.Sym.PT.ptIs : UpperTheory.V.Z.Kato.Sym.PT.PtIs := by
   intro Ω _ _ _ ε X l n M hl hM hd u v hu hv huF hvF e he η hη
   obtain ⟨hau, hku⟩ := chB Ω ε X l n M hl hM hd u hu.1 huF e he
   obtain ⟨hav, hkv⟩ := chB Ω ε X l n M hl hM hd v hv.1 hvF e he

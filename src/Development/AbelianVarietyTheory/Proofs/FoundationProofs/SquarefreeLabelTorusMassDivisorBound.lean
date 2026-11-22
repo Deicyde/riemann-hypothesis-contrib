@@ -15,8 +15,8 @@ theorem mass_true_le_one (g : ℕ) [Fact g.Prime] (N : ℕ) : (mass g N fun _ =>
   have hN : (N.factorial : ℝ) ≠ 0 := by positivity
   exact div_self hN
 
-theorem mass_dvd_le (g : ℕ) [Fact g.Prime] (N a : ℕ) (h : (ZMod g)[X]) (hh : h ∈ sqSet g a) :
-    (mass g N fun f => h ∣ f) ≤ ((torusCard g h : ℝ))⁻¹ * mass g (N - a) fun _ => True := by
+theorem mass_dvd_le (g : ℕ) [Fact g.Prime] (N a : ℕ) (h : (ZMod g)[X]) (hh : h ∈ sqSet g a)
+    : (mass g N fun f => h ∣ f) ≤ ((torusCard g h : ℝ))⁻¹ * mass g (N - a) fun _ => True := by
   obtain ⟨hmon, hdeg, -, -⟩ := mem_sqSet.1 hh
   have hh0 : h ≠ 0 := hmon.ne_zero
   unfold mass
@@ -43,8 +43,9 @@ theorem mass_dvd_le (g : ℕ) [Fact g.Prime] (N a : ℕ) (h : (ZMod g)[X]) (hh :
     intro f hf f' hf' hq
     rw [← hfac f hf, ← hfac f' hf']
     exact congrArg (h * ·) hq
-  have hterm : ∀ f ∈ S, ((torusCard g f : ℝ))⁻¹ =
-      ((torusCard g h : ℝ))⁻¹ * ((torusCard g (f /ₘ h) : ℝ))⁻¹ := by
+  have hterm
+      : ∀ f ∈ S,
+        ((torusCard g f : ℝ))⁻¹ = ((torusCard g h : ℝ))⁻¹ * ((torusCard g (f /ₘ h) : ℝ))⁻¹ := by
     intro f hf
     have e := hfac f hf
     have hu0 : f /ₘ h ≠ 0 := by
@@ -61,8 +62,10 @@ theorem mass_dvd_le (g : ℕ) [Fact g.Prime] (N a : ℕ) (h : (ZMod g)[X]) (hh :
   obtain ⟨f, hf, rfl⟩ := Finset.mem_image.1 hu
   exact hmem f hf
 
-theorem divisor_bound : ∀ (g : ℕ) [Fact g.Prime], (∀ N : ℕ, (mass g N fun _ => True) ≤ 1) ∧
-    ∀ (N a : ℕ), ∀ h ∈ sqSet g a, (mass g N fun f => h ∣ f) ≤ ((torusCard g h : ℝ))⁻¹ := by
+theorem divisor_bound
+    : ∀ (g : ℕ) [Fact g.Prime],
+      (∀ N : ℕ, (mass g N fun _ => True) ≤ 1)
+        ∧ ∀ (N a : ℕ), ∀ h ∈ sqSet g a, (mass g N fun f => h ∣ f) ≤ ((torusCard g h : ℝ))⁻¹ := by
   intro g _
   refine ⟨mass_true_le_one g, fun N a h hh => ?_⟩
   refine (mass_dvd_le g N a h hh).trans ?_

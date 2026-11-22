@@ -7,14 +7,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConjRelEquiv
 
 noncomputable section
 
-open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep Formalism.UG GlobalTheory.BCT GlobalTheory.KapLat
+open NumberField GlobalTheory.UnitaryBC IsDedekindDomain Matrix Polynomial GlobalTheory.CuspRep
+  Formalism.UG GlobalTheory.BCT GlobalTheory.KapLat
 open scoped Classical
 
 namespace GlobalTheory.KapLat
 
-theorem charpoly_mulLeft_eq_of_gen {F A : Type} [Field F] [CommRing A] [Algebra F A] [Module.Finite F A]
-    (u : A) (Q : F[X]) (hQ : Q.Monic) (hadj : Algebra.adjoin F {u} = ⊤) (hr : aeval u Q = 0)
-    (hd : Module.finrank F A = Q.natDegree) : (LinearMap.mulLeft F u).charpoly = Q := by
+theorem charpoly_mulLeft_eq_of_gen
+    {F A : Type} [Field F] [CommRing A] [Algebra F A] [Module.Finite F A]
+    (u : A)
+    (Q : F[X]) (hQ : Q.Monic)
+    (hadj : Algebra.adjoin F {u} = ⊤) (hr : aeval u Q = 0) (hd : Module.finrank F A = Q.natDegree)
+    : (LinearMap.mulLeft F u).charpoly = Q := by
   set P := (LinearMap.mulLeft F u).charpoly with hPdef
   have hP : P.Monic := LinearMap.charpoly_monic _
   have hPd : P.natDegree = Q.natDegree := by rw [hPdef, LinearMap.charpoly_natDegree, hd]
@@ -32,7 +36,8 @@ theorem charpoly_mulLeft_eq_of_gen {F A : Type} [Field F] [CommRing A] [Algebra 
     show aeval u p ∈ _
     rw [← Polynomial.aeval_modByMonic_eq_self_of_root hr,
       Polynomial.aeval_eq_sum_range' (Polynomial.natDegree_modByMonic_lt p hQ hQ1)]
-    refine Submodule.sum_mem _ fun i hi => Submodule.smul_mem _ _ (Submodule.subset_span ⟨⟨i, Finset.mem_range.1 hi⟩, rfl⟩)
+    refine Submodule.sum_mem _ fun i hi =>
+      Submodule.smul_mem _ _ (Submodule.subset_span ⟨⟨i, Finset.mem_range.1 hi⟩, rfl⟩)
   have hli : LinearIndependent F v :=
     linearIndependent_of_top_le_span_of_card_eq_finrank hsp (by simp [hd, hddef])
   have hPu : aeval u P = 0 := by
@@ -44,8 +49,12 @@ theorem charpoly_mulLeft_eq_of_gen {F A : Type} [Field F] [CommRing A] [Algebra 
   by_contra hne
   have hR : P - Q ≠ 0 := sub_ne_zero.mpr hne
   have hdeg : (P - Q).degree < d := by
-    have := Polynomial.degree_sub_lt (p := P) (q := Q) (by rw [Polynomial.degree_eq_natDegree hP.ne_zero,
-      Polynomial.degree_eq_natDegree hQ.ne_zero, hPd]) hP.ne_zero (by rw [hP.leadingCoeff, hQ.leadingCoeff])
+    have :=
+      Polynomial.degree_sub_lt (p := P) (q := Q)
+        (by
+          rw [Polynomial.degree_eq_natDegree hP.ne_zero, Polynomial.degree_eq_natDegree hQ.ne_zero,
+            hPd])
+        hP.ne_zero (by rw [hP.leadingCoeff, hQ.leadingCoeff])
     rwa [Polynomial.degree_eq_natDegree hP.ne_zero, hPd] at this
   have hRd : (P - Q).natDegree < d := (Polynomial.natDegree_lt_iff_degree_lt hR).2 hdeg
   have hz : aeval u (P - Q) = 0 := by simp [hPu, hr]
@@ -53,10 +62,12 @@ theorem charpoly_mulLeft_eq_of_gen {F A : Type} [Field F] [CommRing A] [Algebra 
   have hc := (Fintype.linearIndependent_iff.1 hli) (fun i => (P - Q).coeff i) hz ⟨_, hRd⟩
   exact hR (Polynomial.leadingCoeff_eq_zero.1 hc)
 
-theorem charpoly_of_semilinear {F L A : Type} [Field F] [Field L] [CommRing A] [Algebra F A] [Module.Finite F A]
-    (e : F ≃+* L) {n : ℕ} (u : A) (g : Matrix (Fin n) (Fin n) L) (ψ : A ≃+ (Fin n → L))
-    (hψ : ∀ (c : F) (y : A), ψ (c • y) = e c • ψ y) (hu : ∀ y, ψ (u * y) = g *ᵥ ψ y) :
-    g.charpoly = (LinearMap.mulLeft F u).charpoly.map (e : F →+* L) := by
+theorem charpoly_of_semilinear
+    {F L A : Type} [Field F] [Field L] [CommRing A] [Algebra F A] [Module.Finite F A]
+    (e : F ≃+* L)
+    {n : ℕ} (u : A) (g : Matrix (Fin n) (Fin n) L) (ψ : A ≃+ (Fin n → L))
+    (hψ : ∀ (c : F) (y : A), ψ (c • y) = e c • ψ y) (hu : ∀ y, ψ (u * y) = g *ᵥ ψ y)
+    : g.charpoly = (LinearMap.mulLeft F u).charpoly.map (e : F →+* L) := by
   let b := Module.finBasis F A
   set d := Module.finrank F A
   let v : Fin d → (Fin n → L) := fun i => ψ (b i)
@@ -96,20 +107,25 @@ theorem charpoly_of_semilinear {F L A : Type} [Field F] [Field L] [CommRing A] [
       rw [hψ, hb']
     rw [h1, b'.repr_sum_self]
     simp [M, LinearMap.toMatrix_apply, Algebra.leftMulMatrix_eq_repr_mul]
-  calc g.charpoly = (Matrix.toLin' g).charpoly := by
-        rw [← LinearMap.charpoly_toMatrix (Matrix.toLin' g) (Pi.basisFun L (Fin n)),
-          LinearMap.toMatrix_eq_toMatrix', LinearMap.toMatrix'_toLin']
+  calc
+    g.charpoly = (Matrix.toLin' g).charpoly := by
+      rw [← LinearMap.charpoly_toMatrix (Matrix.toLin' g) (Pi.basisFun L (Fin n)),
+        LinearMap.toMatrix_eq_toMatrix', LinearMap.toMatrix'_toLin']
     _ = (M.map (e : F →+* L)).charpoly := by rw [← key, LinearMap.charpoly_toMatrix]
     _ = _ := by rw [Matrix.charpoly_map, LinearMap.charpoly_toMatrix]
 
-theorem charpoly_of_model : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (w : Pl E) (K : GlobalTheory.UnitLemma.UQ)
-    (e : K.E ≃+* w.adicCompletion E) (n : ℕ) (Q : (w.adicCompletion E)[X]) (B : GlobalTheory.UnitLemma.InvAlg K)
-    (u x : B.A) (γ : GLw n w), Q.Monic → Fits w e B Q u → IsModel w e B u x γ → γ.val.charpoly = Q := by
+theorem charpoly_of_model
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (w : Pl E)
+        (K : GlobalTheory.UnitLemma.UQ) (e : K.E ≃+* w.adicCompletion E) (n : ℕ)
+        (Q : (w.adicCompletion E)[X]) (B : GlobalTheory.UnitLemma.InvAlg K) (u x : B.A)
+        (γ : GLw n w),
+      Q.Monic → Fits w e B Q u → IsModel w e B u x γ → γ.val.charpoly = Q := by
   intro E _ _ _ w K e n Q B u x γ hQ hfit hmod
   obtain ⟨hadj, hr, hd, -⟩ := hfit
   obtain ⟨ψ, hψ, hu, -⟩ := hmod
   rw [charpoly_of_semilinear e u γ.val ψ hψ hu,
-    charpoly_mulLeft_eq_of_gen u (Q.map e.symm.toRingHom) (hQ.map _) hadj hr (by rw [hd, natDegree_map]),
+    charpoly_mulLeft_eq_of_gen u (Q.map e.symm.toRingHom) (hQ.map _) hadj hr
+      (by rw [hd, natDegree_map]),
     Polynomial.map_map]
   ext i
   simp [Polynomial.coeff_map]

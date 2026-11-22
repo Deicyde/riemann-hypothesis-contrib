@@ -18,7 +18,6 @@ lemma rpow_neg_half_sq {d : ℝ} (hd : 0 < d) : (d ^ (-(1 / 2 : ℝ))) ^ 2 = d�
 
 end PGaussDetFactor
 
-
 open PGaussDetFactor in
 theorem GaussDetFactor.proof : GaussDetFactor.Statement := by
   intro g Y B hY hBY
@@ -26,7 +25,8 @@ theorem GaussDetFactor.proof : GaussDetFactor.Statement := by
   have hsq : B.det ^ 2 = (1 / 2 : ℝ) ^ g * Y.det := by
     have := congrArg Matrix.det hBY
     rw [Matrix.det_mul, Matrix.det_transpose, Matrix.det_smul, Fintype.card_fin] at this
-    rw [sq]; exact this
+    rw [sq]
+    exact this
   have hB0 : 0 < |B.det| := by
     have : B.det ^ 2 ≠ 0 := by rw [hsq]; positivity
     exact abs_pos.mpr (fun h => this (by rw [h]; ring))

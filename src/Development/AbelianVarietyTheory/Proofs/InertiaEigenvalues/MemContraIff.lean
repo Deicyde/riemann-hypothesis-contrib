@@ -19,8 +19,8 @@ theorem invT_val_eq (g : GA E a) : (invT a (Ad E) g).val = (g.valᵀ)⁻¹ := by
   change (g⁻¹).valᵀ = _
   rw [Matrix.coe_units_inv, Matrix.transpose_nonsing_inv]
 
-theorem invT_scalar {R : Type} [CommRing R] (z : Rˣ) :
-    invT a R (GeneralLinearGroup.scalar (Fin a) z) = GeneralLinearGroup.scalar (Fin a) z⁻¹ := by
+theorem invT_scalar {R : Type} [CommRing R] (z : Rˣ)
+    : invT a R (GeneralLinearGroup.scalar (Fin a) z) = GeneralLinearGroup.scalar (Fin a) z⁻¹ := by
   apply Units.ext
   change ((GeneralLinearGroup.scalar (Fin a) z)⁻¹).valᵀ = _
   rw [← map_inv]

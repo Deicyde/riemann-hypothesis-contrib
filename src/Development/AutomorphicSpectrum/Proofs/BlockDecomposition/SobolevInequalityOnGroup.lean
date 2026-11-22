@@ -21,10 +21,14 @@ open PositivityTheory.RgTw (Mat G)
 open PositivityTheory.RgBcC
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-theorem bound_on_cube (n : ℕ) (Q : Set (Idx n → ℝ)) (hQc : IsCompact Q) (hQ : ∀ t ∈ Q, 1 + cm t ∈ GLs n)
-    (L : List (Idx n)) : ∃ (W : Finset (List (Idx n))) (B : ℝ), 0 ≤ B ∧
-      ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℂ V] (f : Mat n → V), ContDiffOn ℝ ∞ f (GLs n) →
-        ∀ t ∈ Q, ‖Dw L f (1 + cm t)‖ ^ 2 ≤ B * ∑ w ∈ W, ‖Rw w f (1 + cm t)‖ ^ 2 := by
+theorem bound_on_cube
+    (n : ℕ) (Q : Set (Idx n → ℝ))
+    (hQc : IsCompact Q) (hQ : ∀ t ∈ Q, 1 + cm t ∈ GLs n) (L : List (Idx n))
+    : ∃ (W : Finset (List (Idx n))) (B : ℝ),
+      0 ≤ B
+        ∧ ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℂ V] (f : Mat n → V),
+          ContDiffOn ℝ ∞ f (GLs n)
+            → ∀ t ∈ Q, ‖Dw L f (1 + cm t)‖ ^ 2 ≤ B * ∑ w ∈ W, ‖Rw w f (1 + cm t)‖ ^ 2 := by
   obtain ⟨m, c, w, hc, hrep⟩ := GlobalTheory.T.derivative_as_right_words n L
   obtain ⟨-, hcm, -, -⟩ := GlobalTheory.T.chart_and_right_words_smooth n
   have hK : IsCompact ((fun t => 1 + cm t) '' Q) := hQc.image (continuous_const.add hcm)
@@ -39,25 +43,31 @@ theorem bound_on_cube (n : ℕ) (Q : Set (Idx n → ℝ)) (hQc : IsCompact Q) (h
   have hy : 1 + cm t ∈ GLs n := hQ t ht
   have hyK : 1 + cm t ∈ (fun t => 1 + cm t) '' Q := ⟨t, ht, rfl⟩
   rw [hrep V f hf _ hy]
-  have h1 : ‖∑ i, c i (1 + cm t) • Rw (w i) f (1 + cm t)‖ ≤
-      ∑ i, M i * ‖Rw (w i) f (1 + cm t)‖ := by
+  have h1 : ‖∑ i, c i (1 + cm t) • Rw (w i) f (1 + cm t)‖ ≤ ∑ i, M i * ‖Rw (w i) f (1 + cm t)‖ := by
     refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun i _ => ?_)
     rw [norm_smul]
     exact mul_le_mul_of_nonneg_right (hM i _ hyK) (norm_nonneg _)
-  have h3 : ∑ i, ‖Rw (w i) f (1 + cm t)‖ ^ 2 ≤
-      (m : ℝ) * ∑ u ∈ Finset.univ.image w, ‖Rw u f (1 + cm t)‖ ^ 2 := by
-    have hi : ∀ i, ‖Rw (w i) f (1 + cm t)‖ ^ 2 ≤ ∑ u ∈ Finset.univ.image w, ‖Rw u f (1 + cm t)‖ ^ 2 :=
-      fun i => Finset.single_le_sum (f := fun u => ‖Rw u f (1 + cm t)‖ ^ 2)
-        (fun u _ => by positivity) (Finset.mem_image_of_mem w (Finset.mem_univ i))
-    calc ∑ i, ‖Rw (w i) f (1 + cm t)‖ ^ 2
-        ≤ ∑ _i : Fin m, ∑ u ∈ Finset.univ.image w, ‖Rw u f (1 + cm t)‖ ^ 2 :=
-          Finset.sum_le_sum fun i _ => hi i
+  have h3
+      : ∑ i, ‖Rw (w i) f (1 + cm t)‖ ^ 2
+        ≤ (m : ℝ) * ∑ u ∈ Finset.univ.image w, ‖Rw u f (1 + cm t)‖ ^ 2 := by
+    have hi
+        : ∀ i, ‖Rw (w i) f (1 + cm t)‖ ^ 2 ≤ ∑ u ∈ Finset.univ.image w, ‖Rw u f (1 + cm t)‖ ^ 2 :=
+      fun i =>
+        Finset.single_le_sum
+          (f := fun u => ‖Rw u f (1 + cm t)‖ ^ 2)
+          (fun u _ => by positivity)
+          (Finset.mem_image_of_mem w (Finset.mem_univ i))
+    calc
+      ∑ i, ‖Rw (w i) f (1 + cm t)‖ ^ 2
+          ≤ ∑ _i : Fin m, ∑ u ∈ Finset.univ.image w, ‖Rw u f (1 + cm t)‖ ^ 2 :=
+        Finset.sum_le_sum fun i _ => hi i
       _ = (m : ℝ) * ∑ u ∈ Finset.univ.image w, ‖Rw u f (1 + cm t)‖ ^ 2 := by simp
-  calc ‖∑ i, c i (1 + cm t) • Rw (w i) f (1 + cm t)‖ ^ 2
+  calc
+    ‖∑ i, c i (1 + cm t) • Rw (w i) f (1 + cm t)‖ ^ 2
       ≤ (∑ i, M i * ‖Rw (w i) f (1 + cm t)‖) ^ 2 := pow_le_pow_left₀ (norm_nonneg _) h1 2
     _ ≤ (∑ i, M i ^ 2) * ∑ i, ‖Rw (w i) f (1 + cm t)‖ ^ 2 := Finset.sum_mul_sq_le_sq_mul_sq _ _ _
     _ ≤ (∑ i, M i ^ 2) * ((m : ℝ) * ∑ u ∈ Finset.univ.image w, ‖Rw u f (1 + cm t)‖ ^ 2) :=
-        mul_le_mul_of_nonneg_left h3 (by positivity)
+      mul_le_mul_of_nonneg_left h3 (by positivity)
     _ = (∑ i, M i ^ 2) * m * ∑ u ∈ Finset.univ.image w, ‖Rw u f (1 + cm t)‖ ^ 2 := by ring
 
 theorem sobG : PositivityTheory.RgBcC.SobG := by
@@ -122,48 +132,56 @@ theorem sobG : PositivityTheory.RgBcC.SobG := by
   have hφ0 : ∀ y, 0 ≤ φ y := fun y => Finset.sum_nonneg fun _ _ => by positivity
   have hmain := hcmp φ hφc hφ0
   have hF := hsob V U0 (fun t => f (x * (1 + cm t))) hU0 hQU hFs
-  have hstep : ∀ L ∈ T, ∫ t in Q, ‖pd L (fun t => f (x * (1 + cm t))) t‖ ^ 2 ≤
-      B L * (C2 * ∫ y in S, φ (y : Mat n) ∂μ) := by
+  have hstep
+      : ∀ L ∈ T,
+        ∫ t in Q, ‖pd L (fun t => f (x * (1 + cm t))) t‖ ^ 2
+          ≤ B L * (C2 * ∫ y in S, φ (y : Mat n) ∂μ) := by
     intro L hL
-    have hcongr : ∫ t in Q, ‖pd L (fun t => f (x * (1 + cm t))) t‖ ^ 2 =
-        ∫ t in Q, ‖Dw L (fun y => f (x * y)) (1 + cm t)‖ ^ 2 :=
+    have hcongr
+        : ∫ t in Q, ‖pd L (fun t => f (x * (1 + cm t))) t‖ ^ 2
+          = ∫ t in Q, ‖Dw L (fun y => f (x * y)) (1 + cm t)‖ ^ 2 :=
       setIntegral_congr_fun measurableSet_Icc (fun t ht => by rw [hpd L t (hQG t ht)])
     rw [hcongr]
     have hle : ∀ t ∈ Q, ‖Dw L (fun y => f (x * y)) (1 + cm t)‖ ^ 2 ≤ B L * φ (1 + cm t) := by
       intro t ht
       refine (hWB L V (fun y => f (x * y)) hgs t ht).trans (mul_le_mul_of_nonneg_left ?_ (hB L))
-      calc ∑ w ∈ W L, ‖Rw w (fun y => f (x * y)) (1 + cm t)‖ ^ 2
-          = ∑ w ∈ W L, ‖Rw w f (x * (1 + cm t))‖ ^ 2 :=
-            Finset.sum_congr rfl fun w _ => by rw [hgR w _ (hQG t ht)]
+      calc
+        ∑ w ∈ W L, ‖Rw w (fun y => f (x * y)) (1 + cm t)‖ ^ 2
+            = ∑ w ∈ W L, ‖Rw w f (x * (1 + cm t))‖ ^ 2 :=
+          Finset.sum_congr rfl fun w _ => by rw [hgR w _ (hQG t ht)]
         _ ≤ φ (1 + cm t) :=
-            Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_biUnion_of_mem W hL)
-              (fun _ _ _ => by positivity)
+          Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_biUnion_of_mem W hL)
+            (fun _ _ _ => by positivity)
     have hint : IntegrableOn (fun t => B L * φ (1 + cm t)) Q volume := by
       refine ContinuousOn.integrableOn_compact hQc ?_
-      exact continuousOn_const.mul
-        (hφc.comp (continuous_const.add hcm).continuousOn (fun t ht => hQG t ht))
-    calc ∫ t in Q, ‖Dw L (fun y => f (x * y)) (1 + cm t)‖ ^ 2
-        ≤ ∫ t in Q, B L * φ (1 + cm t) :=
-          integral_mono_of_nonneg (Filter.Eventually.of_forall fun _ => by positivity) hint
-            ((ae_restrict_iff' measurableSet_Icc).mpr (Filter.Eventually.of_forall hle))
+      exact continuousOn_const.mul (hφc.comp (continuous_const.add hcm).continuousOn
+        (fun t ht => hQG t ht))
+    calc
+      ∫ t in Q, ‖Dw L (fun y => f (x * y)) (1 + cm t)‖ ^ 2 ≤ ∫ t in Q, B L * φ (1 + cm t) :=
+        integral_mono_of_nonneg (Filter.Eventually.of_forall fun _ => by positivity) hint
+          ((ae_restrict_iff' measurableSet_Icc).mpr (Filter.Eventually.of_forall hle))
       _ = B L * ∫ t in Q, φ (1 + cm t) := integral_const_mul _ _
       _ ≤ B L * (C2 * ∫ y in S, φ (y : Mat n) ∂μ) := mul_le_mul_of_nonneg_left hmain (hB L)
-  have hsplit : ∫ y in S, φ (y : Mat n) ∂μ =
-      ∑ w ∈ T.biUnion W, ∫ y in S, ‖Rw w f (x * (y : Mat n))‖ ^ 2 ∂μ := by
+  have hsplit
+      : ∫ y in S, φ (y : Mat n) ∂μ
+        = ∑ w ∈ T.biUnion W, ∫ y in S, ‖Rw w f (x * (y : Mat n))‖ ^ 2 ∂μ := by
     refine integral_finsetSum _ fun w _ => ?_
     refine ContinuousOn.integrableOn_compact hSc (Continuous.continuousOn ?_)
     have hval : ∀ y : G n, x * (y : Mat n) ∈ GLs n := fun y =>
       hxmul _ ((Matrix.isUnit_iff_isUnit_det _).mp y.isUnit).ne_zero
     exact (((hRc w).comp_continuous (continuous_const.mul Units.continuous_val) hval).norm).pow 2
   have hF0 : f (x * (1 + cm 0)) = f x := by rw [hcm0, add_zero, mul_one]
-  calc ‖f x‖ ^ 2 = ‖f (x * (1 + cm 0))‖ ^ 2 := by rw [hF0]
+  calc
+    ‖f x‖ ^ 2
+      = ‖f (x * (1 + cm 0))‖ ^ 2 := by rw [hF0]
     _ ≤ C1 * ∑ L ∈ T, ∫ t in Q, ‖pd L (fun t => f (x * (1 + cm t))) t‖ ^ 2 := hF
     _ ≤ C1 * ∑ L ∈ T, B L * (C2 * ∫ y in S, φ (y : Mat n) ∂μ) :=
-        mul_le_mul_of_nonneg_left (Finset.sum_le_sum hstep) hC1
+      mul_le_mul_of_nonneg_left (Finset.sum_le_sum hstep) hC1
     _ = C1 * C2 * (∑ L ∈ T, B L) * ∫ y in S, φ (y : Mat n) ∂μ := by
-        rw [← Finset.sum_mul]
-        ring
-    _ = C1 * C2 * (∑ L ∈ T, B L) *
-        ∑ w ∈ T.biUnion W, ∫ y in S, ‖Rw w f (x * (y : Mat n))‖ ^ 2 ∂μ := by rw [hsplit]
+      rw [← Finset.sum_mul]
+      ring
+    _ = C1 * C2 * (∑ L ∈ T, B L)
+        * ∑ w ∈ T.biUnion W, ∫ y in S, ‖Rw w f (x * (y : Mat n))‖ ^ 2 ∂μ := by
+      rw [hsplit]
 
 end GlobalTheory.CompanionTheory.SobGL

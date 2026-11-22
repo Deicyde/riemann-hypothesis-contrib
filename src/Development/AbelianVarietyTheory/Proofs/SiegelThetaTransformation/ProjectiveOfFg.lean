@@ -14,7 +14,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField IsDedekindDomain GlobalTheory.AdLat Formalism.L2.Pj GlobalTheory.IndefiniteRowSideFullHecke.UnitaryAdjointCongruence
+open NumberField IsDedekindDomain GlobalTheory.AdLat Formalism.L2.Pj
+  GlobalTheory.IndefiniteRowSideFullHecke.UnitaryAdjointCongruence
 open scoped TensorProduct Matrix nonZeroDivisors
 
 namespace GlobalTheory.RepTrivial
@@ -22,10 +23,13 @@ namespace GlobalTheory.RepTrivial
 variable {E : Type} [Field E] [NumberField E] {n : ℕ}
 
 def red (E : Type) [Field E] (n M : ℕ) : (Fin n → 𝓞 E) →ₗ[𝓞 E] StdMod E n M :=
-  LinearMap.pi fun j => (Ideal.Quotient.mkₐ (𝓞 E) (Ideal.span {(M : 𝓞 E)})).toLinearMap ∘ₗ LinearMap.proj j
+  LinearMap.pi fun j =>
+    (Ideal.Quotient.mkₐ (𝓞 E) (Ideal.span {(M : 𝓞 E)})).toLinearMap ∘ₗ LinearMap.proj j
 
 omit [NumberField E] in
-theorem red_apply (M : ℕ) (x : Fin n → 𝓞 E) (j : Fin n) : red E n M x j = Ideal.Quotient.mk _ (x j) := rfl
+theorem red_apply (M : ℕ) (x : Fin n → 𝓞 E) (j : Fin n)
+    : red E n M x j = Ideal.Quotient.mk _ (x j) :=
+  rfl
 
 omit [NumberField E] in
 theorem red_surjective (M : ℕ) : Function.Surjective (red E n M) := fun y => by
@@ -33,7 +37,8 @@ theorem red_surjective (M : ℕ) : Function.Surjective (red E n M) := fun y => b
   exact ⟨x, funext hx⟩
 
 omit [NumberField E] in
-theorem red_eq_iff (M : ℕ) (x y : Fin n → 𝓞 E) : red E n M x = red E n M y ↔ ∃ z, x = y + M • z := by
+theorem red_eq_iff (M : ℕ) (x y : Fin n → 𝓞 E)
+    : red E n M x = red E n M y ↔ ∃ z, x = y + M • z := by
   constructor
   · intro h
     have h1 : ∀ j, ∃ a : 𝓞 E, a * (M : 𝓞 E) = x j - y j := fun j =>
@@ -62,7 +67,8 @@ theorem inc_surjective : Function.Surjective (inc E n) := fun v => by
   choose x hx using fun j => Submodule.mem_one.1 (v.2 j (Set.mem_univ j))
   exact ⟨x, Subtype.ext (funext hx)⟩
 
-theorem projective_of_fg (L : Submodule (𝓞 E) (Fin n → E)) (hL : L.FG) : Module.Projective (𝓞 E) L := by
+theorem projective_of_fg (L : Submodule (𝓞 E) (Fin n → E)) (hL : L.FG)
+    : Module.Projective (𝓞 E) L := by
   haveI : Module.Finite (𝓞 E) L := Module.Finite.iff_fg.2 hL
   haveI : Module.FinitePresentation (𝓞 E) L := Module.finitePresentation_of_finite _ _
   haveI : Module.Flat (𝓞 E) L := IsDedekindDomain.flat_iff_torsion_eq_bot.2
@@ -81,22 +87,30 @@ theorem std_span : Submodule.span E (stdLat E n : Set (Fin n → E)) = ⊤ := by
 
 variable [IsCMField E]
 
-theorem step (hur : Algebra.Unramified (𝓞 (maximalRealSubfield E)) (𝓞 E)) (Λ : GenLat E n) (hU : Λ.Unimod)
-    {M M' : ℕ} (hM : 0 < M) (hM' : 0 < M') (hd : M ∣ M') (f : Λ.La →ₗ[𝓞 E] (Fin n → 𝓞 E))
-    (hf : IsIsomMod Λ M (red E n M ∘ₗ f)) :
-    ∃ f' : Λ.La →ₗ[𝓞 E] (Fin n → 𝓞 E), IsIsomMod Λ M' (red E n M' ∘ₗ f') ∧ ∀ a, ∃ z, f' a = f a + M • z := by
+theorem step
+    (hur : Algebra.Unramified (𝓞 (maximalRealSubfield E)) (𝓞 E))
+    (Λ : GenLat E n) (hU : Λ.Unimod)
+    {M M' : ℕ} (hM : 0 < M) (hM' : 0 < M') (hd : M ∣ M')
+    (f : Λ.La →ₗ[𝓞 E] (Fin n → 𝓞 E)) (hf : IsIsomMod Λ M (red E n M ∘ₗ f))
+    : ∃ f' : Λ.La →ₗ[𝓞 E] (Fin n → 𝓞 E),
+      IsIsomMod Λ M' (red E n M' ∘ₗ f') ∧ ∀ a, ∃ z, f' a = f a + M • z := by
   obtain ⟨k, rfl⟩ := hd
   haveI := projective_of_fg Λ.La (GlobalTheory.GenusLatCompare.isLat_of_unimod Λ hU).1
-  obtain ⟨io', h1, h2⟩ := GlobalTheory.T.exists_lift_hermitianIsometryModLevel_selfDual E n M hur hM Λ _ hU hf k (Nat.pos_of_mul_pos_left hM')
+  obtain ⟨io', h1, h2⟩ :=
+    GlobalTheory.T.exists_lift_hermitianIsometryModLevel_selfDual E n M hur hM Λ _ hU hf k
+      (Nat.pos_of_mul_pos_left hM')
   obtain ⟨f', hf'⟩ := Module.projective_lifting_property (red E n (M * k)) io' (red_surjective _)
   refine ⟨f', hf' ▸ h1, fun a => (red_eq_iff _ _ _).1 (funext fun j => ?_)⟩
   exact (h2 a (f' a) (fun j => by rw [← hf', LinearMap.comp_apply, red_apply]) j).symm
 
-theorem exists_tower (hur : Algebra.Unramified (𝓞 (maximalRealSubfield E)) (𝓞 E)) (Λ : GenLat E n)
-    (hU : Λ.Unimod) {m : ℕ} (hm : 0 < m) (io : Λ.La →ₗ[𝓞 E] StdMod E n m) (hio : IsIsomMod Λ m io) :
-    ∃ f : ℕ → (Λ.La →ₗ[𝓞 E] (Fin n → 𝓞 E)), red E n m ∘ₗ f 0 = io ∧
-      (∀ j : ℕ, IsIsomMod Λ (m * j.factorial) (red E n (m * j.factorial) ∘ₗ f j)) ∧
-      ∀ i j : ℕ, i ≤ j → ∀ a, ∃ z, f j a = f i a + (m * i.factorial) • z := by
+theorem exists_tower
+    (hur : Algebra.Unramified (𝓞 (maximalRealSubfield E)) (𝓞 E))
+    (Λ : GenLat E n) (hU : Λ.Unimod)
+    {m : ℕ} (hm : 0 < m) (io : Λ.La →ₗ[𝓞 E] StdMod E n m) (hio : IsIsomMod Λ m io)
+    : ∃ f : ℕ → (Λ.La →ₗ[𝓞 E] (Fin n → 𝓞 E)),
+      red E n m ∘ₗ f 0 = io
+        ∧ (∀ j : ℕ, IsIsomMod Λ (m * j.factorial) (red E n (m * j.factorial) ∘ₗ f j))
+        ∧ ∀ i j : ℕ, i ≤ j → ∀ a, ∃ z, f j a = f i a + (m * i.factorial) • z := by
   haveI := projective_of_fg Λ.La (GlobalTheory.GenusLatCompare.isLat_of_unimod Λ hU).1
   obtain ⟨f₀, hf₀⟩ := Module.projective_lifting_property (red E n m) io (red_surjective _)
   have hpos : ∀ j : ℕ, 0 < m * j.factorial := fun j => Nat.mul_pos hm j.factorial_pos
@@ -109,9 +123,11 @@ theorem exists_tower (hur : Algebra.Unramified (𝓞 (maximalRealSubfield E)) (�
     (hf : IsIsomMod Λ (m * j.factorial) (red E n (m * j.factorial) ∘ₗ f)) =>
     step hur Λ hU (hpos j) (hpos (j + 1))
       (Nat.mul_dvd_mul_left m (Nat.factorial_dvd_factorial j.le_succ)) f hf
-  let s : ∀ j : ℕ, {f : Λ.La →ₗ[𝓞 E] (Fin n → 𝓞 E) //
-      IsIsomMod Λ (m * j.factorial) (red E n (m * j.factorial) ∘ₗ f)} :=
-    fun j => Nat.rec ⟨f₀, h0⟩ (fun j p => ⟨st j p.1 p.2, h1 j p.1 p.2⟩) j
+  let s
+      : ∀ j : ℕ,
+        {f : Λ.La →ₗ[𝓞 E] (Fin n → 𝓞 E)
+          // IsIsomMod Λ (m * j.factorial) (red E n (m * j.factorial) ∘ₗ f)} := fun j =>
+    Nat.rec ⟨f₀, h0⟩ (fun j p => ⟨st j p.1 p.2, h1 j p.1 p.2⟩) j
   refine ⟨fun j => (s j).1, hf₀, fun j => (s j).2, fun i j hij a => ?_⟩
   induction j, hij using Nat.le_induction with
   | base => exact ⟨0, by simp⟩
@@ -124,10 +140,11 @@ theorem exists_tower (hur : Algebra.Unramified (𝓞 (maximalRealSubfield E)) (�
     rw [hw, smul_add, smul_smul, mul_assoc, ← hc, ← add_assoc]
     exact congrArg (· + _) hz
 
-theorem iso_mod (Λ : GenLat E n) {N k : ℕ} (f : Λ.La →ₗ[𝓞 E] (Fin n → 𝓞 E))
-    (hf : IsIsomMod Λ (N * k) (red E n (N * k) ∘ₗ f)) :
-    (∀ a, (∃ v, (inc E n ∘ₗ f) a = N • v) ↔ ∃ v, a = N • v) ∧
-      ∀ a', ∃ a v, a' = (inc E n ∘ₗ f) a + N • v := by
+theorem iso_mod
+    (Λ : GenLat E n)
+    {N k : ℕ} (f : Λ.La →ₗ[𝓞 E] (Fin n → 𝓞 E)) (hf : IsIsomMod Λ (N * k) (red E n (N * k) ∘ₗ f))
+    : (∀ a, (∃ v, (inc E n ∘ₗ f) a = N • v) ↔ ∃ v, a = N • v)
+      ∧ ∀ a', ∃ a v, a' = (inc E n ∘ₗ f) a + N • v := by
   obtain ⟨hs, hk, -⟩ := hf
   have hs' : ∀ x, ∃ a z, x = f a + (N * k) • z := fun x => by
     obtain ⟨a, ha⟩ := hs (red E n _ x)
@@ -157,38 +174,49 @@ theorem iso_mod (Λ : GenLat E n) {N k : ℕ} (f : Λ.La →ₗ[𝓞 E] (Fin n �
     rw [e, map_add (f := _), mul_smul, map_nsmul]
     rfl
 
-theorem sum_one (x y : Fin n → E) :
-    ∑ a, ∑ b, x a * (1 : Matrix (Fin n) (Fin n) E) a b * IsCMField.complexConj E (y b) =
-      ∑ a, x a * IsCMField.complexConj E (y a) :=
+theorem sum_one (x y : Fin n → E)
+    : ∑ a, ∑ b, x a * (1 : Matrix (Fin n) (Fin n) E) a b * IsCMField.complexConj E (y b)
+      = ∑ a, x a * IsCMField.complexConj E (y a) :=
   GlobalTheory.UnRep.StdInhab.hermE_one (IsCMField.complexConj E) x y
 
-theorem exists_adelic (hur : Algebra.Unramified (𝓞 (maximalRealSubfield E)) (𝓞 E)) (Λ : GenLat E n)
-    (hU : Λ.Unimod) {m : ℕ} (hm : 0 < m) (io : Λ.La →ₗ[𝓞 E] StdMod E n m) (hio : IsIsomMod Λ m io) :
-    ∃ g : GL (Fin n) (RA (maximalRealSubfield E) E),
-      g.1.mulVec '' (hat (maximalRealSubfield E) (Λ.La : Set (Fin n → E))) =
-        hat (maximalRealSubfield E) (stdLat E n : Set (Fin n → E)) ∧
-      GlobalTheory.UnRep.IsUnA (IsCMField.complexConj E) (1 : Matrix (Fin n) (Fin n) E) g.1 ∧
-      ∀ (v : Λ.La) (x : Fin n → 𝓞 E), io v = red E n m x →
-        ∃ w ∈ hat (maximalRealSubfield E) (stdLat E n : Set (Fin n → E)),
-          g.1 *ᵥ fv (maximalRealSubfield E) (v : Fin n → E) =
-            fv (maximalRealSubfield E) (fun j => (x j : E)) + m • w := by
+theorem exists_adelic
+    (hur : Algebra.Unramified (𝓞 (maximalRealSubfield E)) (𝓞 E))
+    (Λ : GenLat E n) (hU : Λ.Unimod)
+    {m : ℕ} (hm : 0 < m) (io : Λ.La →ₗ[𝓞 E] StdMod E n m) (hio : IsIsomMod Λ m io)
+    : ∃ g : GL (Fin n) (RA (maximalRealSubfield E) E),
+      g.1.mulVec '' (hat (maximalRealSubfield E) (Λ.La : Set (Fin n → E)))
+          = hat (maximalRealSubfield E) (stdLat E n : Set (Fin n → E))
+        ∧ GlobalTheory.UnRep.IsUnA (IsCMField.complexConj E) (1 : Matrix (Fin n) (Fin n) E) g.1
+        ∧ ∀ (v : Λ.La) (x : Fin n → 𝓞 E),
+          io v = red E n m x
+            → ∃ w ∈ hat (maximalRealSubfield E) (stdLat E n : Set (Fin n → E)),
+              g.1 *ᵥ fv (maximalRealSubfield E) (v : Fin n → E)
+                = fv (maximalRealSubfield E) (fun j => (x j : E)) + m • w := by
   obtain ⟨f, h0, hiso, hcomp⟩ := exists_tower hur Λ hU hm io hio
   obtain ⟨hfg, hsp⟩ := GlobalTheory.GenusLatCompare.isLat_of_unimod Λ hU
   have hfac : ∀ N : ℕ, 0 < N → ∃ k, m * N.factorial = N * k := fun N hN =>
     Dvd.dvd.mul_left (Nat.dvd_factorial hN le_rfl) m
-  obtain ⟨g, hg1, hg2, hg3⟩ := exists_adelic_matrix_of_tower (maximalRealSubfield E) E n Λ.La (stdLat E n)
-    (fun N => inc E n ∘ₗ f N) hfg hsp std_fg std_span
-    (fun N k hN hk a => by
-      obtain ⟨z, hz⟩ := hcomp N (N * k) (Nat.le_mul_of_pos_right N hk) a
-      obtain ⟨c, hc⟩ := hfac N hN
-      refine ⟨inc E n (c • z), ?_⟩
-      rw [LinearMap.comp_apply, LinearMap.comp_apply, hz, hc, map_add (f := _), mul_smul, map_nsmul])
-    (fun N hN => by
-      obtain ⟨c, hc⟩ := hfac N hN
-      have := hiso N
-      rw [hc] at this
-      exact iso_mod Λ _ this)
-  refine ⟨g, hg1, hg3 (IsCMField.complexConj E) 1 1 (fun x hx y hy => ?_) fun N hN x y => ?_, fun v x hx => ?_⟩
+  obtain ⟨g, hg1, hg2, hg3⟩ :=
+    exists_adelic_matrix_of_tower (maximalRealSubfield E) E n Λ.La (stdLat E n)
+      (fun N => inc E n ∘ₗ f N)
+      hfg hsp std_fg std_span
+      (fun N k hN hk a => by
+        obtain ⟨z, hz⟩ := hcomp N (N * k) (Nat.le_mul_of_pos_right N hk) a
+        obtain ⟨c, hc⟩ := hfac N hN
+        refine ⟨inc E n (c • z), ?_⟩
+        rw [LinearMap.comp_apply, LinearMap.comp_apply, hz, hc, map_add (f := _), mul_smul,
+          map_nsmul])
+      (fun N hN => by
+        obtain ⟨c, hc⟩ := hfac N hN
+        have := hiso N
+        rw [hc] at this
+        exact iso_mod Λ _ this)
+  refine ⟨
+    g,
+    hg1,
+    hg3 (IsCMField.complexConj E) 1 1 (fun x hx y hy => ?_) fun N hN x y => ?_,
+    fun v x hx => ?_
+  ⟩
   · obtain ⟨x, hx'⟩ := inc_surjective ⟨x, hx⟩
     obtain ⟨y, hy'⟩ := inc_surjective ⟨y, hy⟩
     cases hx'
@@ -210,20 +238,21 @@ theorem exists_adelic (hur : Algebra.Unramified (𝓞 (maximalRealSubfield E)) (
   · obtain ⟨w, hw, e⟩ := hg2 m hm v
     obtain ⟨z, hz⟩ := hcomp 0 m (Nat.zero_le m) v
     obtain ⟨z', hz'⟩ := (red_eq_iff m (f 0 v) x).1 (by rw [← hx, ← h0]; rfl)
-    refine ⟨fv _ (inc E n (z' + z) : Fin n → E) + w, add_mem (cap_fv_mem _ _ _ (inc E n _).2) hw, ?_⟩
+    refine
+      ⟨fv _ (inc E n (z' + z) : Fin n → E) + w, add_mem (cap_fv_mem _ _ _ (inc E n _).2) hw, ?_⟩
     have e1 : f m v = x + m • (z' + z) := by
       rw [hz, hz', smul_add, add_assoc]
       simp
-    rw [e, LinearMap.comp_apply, e1, map_add (f := _), map_nsmul, Submodule.coe_add, AddSubmonoidClass.coe_nsmul,
-      cap_fv_add, cap_fv_nsmul, smul_add, add_assoc]
+    rw [e, LinearMap.comp_apply, e1, map_add (f := _), map_nsmul, Submodule.coe_add,
+      AddSubmonoidClass.coe_nsmul, cap_fv_add, cap_fv_nsmul, smul_add, add_assoc]
     rfl
 
 section Adelic
 
 variable (F : Type) {K : Type} [Field F] [NumberField F] [Field K] [Algebra F K]
 
-theorem fv_mulVec (γ : Matrix (Fin n) (Fin n) K) (v : Fin n → K) :
-    fv F (γ *ᵥ v) = GlobalTheory.UnRep.fm F γ *ᵥ fv F v := by
+theorem fv_mulVec (γ : Matrix (Fin n) (Fin n) K) (v : Fin n → K)
+    : fv F (γ *ᵥ v) = GlobalTheory.UnRep.fm F γ *ᵥ fv F v := by
   funext i
   simp only [fv, GlobalTheory.UnRep.fm, Matrix.mulVec, dotProduct, Matrix.map_apply,
     Algebra.TensorProduct.tmul_mul_tmul, one_mul, TensorProduct.tmul_sum]
@@ -234,26 +263,39 @@ theorem fv_sub (x y : Fin n → K) : fv F (x - y) = fv F x - fv F y := by
 
 end Adelic
 
-theorem repExists : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ), RepExists E n := by
+theorem repExists
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ), RepExists E n := by
   intro E _ _ _ n hur m bad hm hbad Λ io hU hio
   obtain ⟨g, hg1, hg2, hg3⟩ := exists_adelic hur Λ hU hm io hio
   have hinv : ∀ z, (g⁻¹).1 *ᵥ (g.1 *ᵥ z) = z := fun z => by
     rw [Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.one_mulVec]
   have hinv' : ∀ z, g.1 *ᵥ ((g⁻¹).1 *ᵥ z) = z := fun z => by
     rw [Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mulVec]
-  have hherm : GlobalTheory.UnRep.IsHermForm (IsCMField.complexConj E) (1 : Matrix (Fin n) (Fin n) E) :=
-    ⟨IsCMField.complexConj_apply_apply E, IsCMField.complexConj_ne_one E, fun a b => by
-      simp [Matrix.one_apply, eq_comm], by simp⟩
-  obtain ⟨γ, hγ, t, ht, hc⟩ := GlobalTheory.T.unitaryGroup_weak_approximation_at_primes (maximalRealSubfield E) E (IsCMField.complexConj E) n 1 hherm
-    (Algebra.IsQuadraticExtension.finrank_eq_two _ _) (stdLat E n) std_fg std_span g⁻¹ (m * bad) m
-    (fun x y => by rw [← hg2, hinv', hinv']) (Nat.mul_pos hm hbad) hm
-  have hrat := (hat_rational_points_and_approx (maximalRealSubfield E) E n (stdLat E n) std_fg std_span).1
-  have hgv : ∀ v ∈ Λ.La, g.1 *ᵥ fv (maximalRealSubfield E) v ∈
-      hat (maximalRealSubfield E) (stdLat E n : Set (Fin n → E)) := fun v hv => by
+  have hherm
+      : GlobalTheory.UnRep.IsHermForm (IsCMField.complexConj E) (1 : Matrix (Fin n) (Fin n) E) := ⟨
+    IsCMField.complexConj_apply_apply E,
+    IsCMField.complexConj_ne_one E,
+    fun a b => by simp [Matrix.one_apply, eq_comm],
+    by simp
+  ⟩
+  obtain ⟨γ, hγ, t, ht, hc⟩ :=
+    GlobalTheory.T.unitaryGroup_weak_approximation_at_primes (maximalRealSubfield E) E
+      (IsCMField.complexConj E) n 1 hherm (Algebra.IsQuadraticExtension.finrank_eq_two _ _)
+      (stdLat E n) std_fg std_span g⁻¹ (m * bad) m
+      (fun x y => by rw [← hg2, hinv', hinv'])
+      (Nat.mul_pos hm hbad) hm
+  have hrat :=
+    (hat_rational_points_and_approx (maximalRealSubfield E) E n (stdLat E n) std_fg std_span).1
+  have hgv
+      : ∀ v ∈ Λ.La,
+        g.1 *ᵥ fv (maximalRealSubfield E) v
+          ∈ hat (maximalRealSubfield E) (stdLat E n : Set (Fin n → E)) := fun v hv => by
     rw [← SetLike.mem_coe, ← hg1]
     exact ⟨_, cap_fv_mem _ _ v hv, rfl⟩
-  have key : ∀ v ∈ Λ.La, ∃ w ∈ hat (maximalRealSubfield E) (stdLat E n : Set (Fin n → E)),
-      t • fv (maximalRealSubfield E) (γ.1 *ᵥ v) = t • (g.1 *ᵥ fv (maximalRealSubfield E) v) + m • w := by
+  have key
+      : ∀ v ∈ Λ.La, ∃ w ∈ hat (maximalRealSubfield E) (stdLat E n : Set (Fin n → E)),
+        t • fv (maximalRealSubfield E) (γ.1 *ᵥ v)
+          = t • (g.1 *ᵥ fv (maximalRealSubfield E) v) + m • w := by
     intro v hv
     obtain ⟨w, hw, e⟩ := hc _ (hgv v hv)
     refine ⟨w, hw, ?_⟩
@@ -282,13 +324,24 @@ theorem repExists : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : 
     change (a j : E) * ((IsCMField.ringOfIntegersComplexConj E (b j) : 𝓞 E) : E) = _
     rw [IsCMField.coe_ringOfIntegersComplexConj, ha', hb', Pi.smul_apply, map_nsmul, smul_mul_assoc,
       mul_smul_comm]
-  have htriv : ∀ s, t.Coprime s → (actLat γ.1 Λ).TrivAt s := fun s hs =>
-    ⟨t, hs, (GlobalTheory.GenusLatCompare.span_smul_le_iff _ _ _).2 (by
+  have htriv : ∀ s, t.Coprime s → (actLat γ.1 Λ).TrivAt s := fun s hs => ⟨
+    t,
+    hs,
+    (GlobalTheory.GenusLatCompare.span_smul_le_iff _ _ _).2 (by
       rintro _ ⟨v, hv, rfl⟩
-      exact h1 v hv), (GlobalTheory.GenusLatCompare.span_smul_le_iff _ _ _).2 h2⟩
-  refine ⟨γ.1, ?_, htriv _ ht.coprime_mul_left_right, htriv _ ht.coprime_mul_right_right, fun v x hx => ?_⟩
+      exact h1 v hv),
+    (GlobalTheory.GenusLatCompare.span_smul_le_iff _ _ _).2 h2
+  ⟩
+  refine ⟨
+    γ.1,
+    ?_,
+    htriv _ ht.coprime_mul_left_right,
+    htriv _ ht.coprime_mul_right_right,
+    fun v x hx => ?_
+  ⟩
   · ext i j
-    rw [Matrix.mul_apply, Matrix.one_apply, ← (GlobalTheory.UnRep.StdInhab.isUnE_one_iff _ _).1 hγ i j]
+    rw [Matrix.mul_apply, Matrix.one_apply,
+      ← (GlobalTheory.UnRep.StdInhab.isUnE_one_iff _ _).1 hγ i j]
     rfl
   · obtain ⟨w, hw, e⟩ := key v v.2
     obtain ⟨w', hw', e'⟩ := hg3 v x (funext hx)
@@ -298,7 +351,8 @@ theorem repExists : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : 
       rw [hu, ← Nat.cast_smul_eq_nsmul E m, smul_smul, mul_inv_cancel₀ hME, one_smul]
     have e2 : fv (maximalRealSubfield E) u = t • w' + w := by
       refine lim_nsmul_cancel (maximalRealSubfield E) hm ?_
-      rw [← cap_fv_nsmul, hmu, cap_fv_nsmul, fv_sub, smul_sub, e, e', smul_add, smul_add, smul_comm t m]
+      rw [← cap_fv_nsmul, hmu, cap_fv_nsmul, fv_sub, smul_sub, e, e', smul_add, smul_add,
+        smul_comm t m]
       abel
     have hu' : u ∈ stdLat E n := by
       rw [← hrat, e2]

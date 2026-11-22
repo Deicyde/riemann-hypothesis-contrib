@@ -30,9 +30,9 @@ open Reduction
 theorem archPart_infEmb (a : archGroup K n) : archPart (infEmb K n a) = a := by
   simp only [archPart, prodEquiv_infEmb, ContinuousMulEquiv.apply_symm_apply]
 
-theorem archCompact_eq_image :
-    (archCompact K n : Set (archGroup K n)) =
-      archPart '' (maxCompact (K := K) (n := n) : Set (AdelicGLn.AdelicGL K n)) := by
+theorem archCompact_eq_image
+    : (archCompact K n : Set (archGroup K n))
+      = archPart '' (maxCompact (K := K) (n := n) : Set (AdelicGLn.AdelicGL K n)) := by
   ext a
   constructor
   · intro ha
@@ -40,15 +40,14 @@ theorem archCompact_eq_image :
   · rintro ⟨k, hk, rfl⟩
     exact archPart_mem_archCompact hk
 
-
 variable (K n) in
 theorem isCompact_archCompact : IsCompact (archCompact K n : Set (archGroup K n)) := by
   rw [archCompact_eq_image]
   exact isCompact_maxCompact.image ((archEquiv K n).continuous.comp
     (continuous_fst.comp (AdelicGLn.prodEquiv K n).continuous))
 
-theorem unipMeasure_unipFundamentalDomain (r : ℕ) :
-    unipMeasure K n r (unipFundamentalDomain K n r) = 1 := by
+theorem unipMeasure_unipFundamentalDomain (r : ℕ)
+    : unipMeasure K n r (unipFundamentalDomain K n r) = 1 := by
   rw [unipMeasure, unipFundamentalDomain, Measure.pi_pi]
   simp [GroundTheory.Global.adeleMeasure_fundamentalSet]
 

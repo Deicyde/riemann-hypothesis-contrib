@@ -7,7 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Spheric
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 noncomputable section
@@ -16,13 +19,17 @@ namespace GlobalTheory.PtLocalPin
 
 section Gen
 
-variable {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} {W : Type} [AddCommGroup W] [Module ℂ W]
+variable
+  {L : Type} [Field L] [NumberField L] [IsCMField L]
+  {n : ℕ} {W : Type} [AddCommGroup W] [Module ℂ W]
 
-theorem exists_fixed_of_finset {ρ : Representation ℂ (GQ L n) W} {S : Submodule ℂ (GAf L n → W)}
-    (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (t : Finset (Submodule ℂ (GAf L n → W))) :
-    (↑t ⊆ {S' | NG.IsIrrRep ρ S' ∧ NG.IsoRep S S'}) → ∀ f ∈ (⨆ i ∈ t, i), f ≠ 0 →
-      (∀ κ ∈ Umax L n, TrivOutside {v} κ → NG.rt L n κ f = f) →
-      ∃ S' ∈ t, ∃ g ∈ S', g ≠ 0 ∧ ∀ κ ∈ Umax L n, TrivOutside {v} κ → NG.rt L n κ g = g := by
+theorem exists_fixed_of_finset
+    {ρ : Representation ℂ (GQ L n) W} {S : Submodule ℂ (GAf L n → W)}
+    (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (t : Finset (Submodule ℂ (GAf L n → W)))
+    : (↑t ⊆ {S' | NG.IsIrrRep ρ S' ∧ NG.IsoRep S S'})
+      → ∀ f ∈ (⨆ i ∈ t, i),
+        f ≠ 0 → (∀ κ ∈ Umax L n, TrivOutside {v} κ → NG.rt L n κ f = f)
+          → ∃ S' ∈ t, ∃ g ∈ S', g ≠ 0 ∧ ∀ κ ∈ Umax L n, TrivOutside {v} κ → NG.rt L n κ g = g := by
   classical
   induction t using Finset.induction_on with
   | empty =>
@@ -32,8 +39,8 @@ theorem exists_fixed_of_finset {ρ : Representation ℂ (GQ L n) W} {S : Submodu
   | insert a t ha ih =>
     intro hsub f hf hf0 hfix
     have haF : NG.IsIrrRep ρ a ∧ NG.IsoRep S a := hsub (Finset.mem_insert_self a t)
-    have htF : (↑t : Set _) ⊆ {S' | NG.IsIrrRep ρ S' ∧ NG.IsoRep S S'} :=
-      fun x hx => hsub (Finset.mem_insert_of_mem hx)
+    have htF : (↑t : Set _) ⊆ {S' | NG.IsIrrRep ρ S' ∧ NG.IsoRep S S'} := fun x hx =>
+      hsub (Finset.mem_insert_of_mem hx)
     rw [Finset.iSup_insert] at hf
     have hMst : ∀ h, ∀ g ∈ (⨆ i ∈ t, i), NG.rt L n h g ∈ (⨆ i ∈ t, i) :=
       GlobalTheory.HeckeScalarAll.iSup_finset_stable' t (fun i hi => (htF hi).1.1.stable)
@@ -69,10 +76,12 @@ theorem exists_fixed_of_finset {ρ : Representation ℂ (GQ L n) W} {S : Submodu
       obtain ⟨S', hS', g, hg, hg0, hgf⟩ := ih htF f ((sup_le hle le_rfl) hf) hf0 hfix
       exact ⟨S', Finset.mem_insert_of_mem hS', g, hg, hg0, hgf⟩
 
-theorem fixed_of_iso {ρ : Representation ℂ (GQ L n) W} {S S' : Submodule ℂ (GAf L n → W)} (hS : NG.IsSubrep ρ S)
-    (hiso : NG.IsoRep S S') (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (g' : GAf L n → W)
-    (hg' : g' ∈ S') (hg0 : g' ≠ 0) (hfix : ∀ κ ∈ Umax L n, TrivOutside {v} κ → NG.rt L n κ g' = g') :
-    ∃ g ∈ S, g ≠ 0 ∧ ∀ κ ∈ Umax L n, TrivOutside {v} κ → NG.rt L n κ g = g := by
+theorem fixed_of_iso
+    {ρ : Representation ℂ (GQ L n) W} {S S' : Submodule ℂ (GAf L n → W)}
+    (hS : NG.IsSubrep ρ S) (hiso : NG.IsoRep S S')
+    (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (g' : GAf L n → W)
+    (hg' : g' ∈ S') (hg0 : g' ≠ 0) (hfix : ∀ κ ∈ Umax L n, TrivOutside {v} κ → NG.rt L n κ g' = g')
+    : ∃ g ∈ S, g ≠ 0 ∧ ∀ κ ∈ Umax L n, TrivOutside {v} κ → NG.rt L n κ g = g := by
   obtain ⟨T, hT⟩ := hiso
   set g : S := T.symm ⟨g', hg'⟩ with hgdef
   have hTg : T g = ⟨g', hg'⟩ := T.apply_symm_apply _
@@ -87,25 +96,36 @@ theorem fixed_of_iso {ρ : Representation ℂ (GQ L n) W} {S S' : Submodule ℂ 
       exact Subtype.ext (e.trans (hfix κ hκ ht))
     exact congrArg Subtype.val (T.injective e')
 
-theorem exists_fixed_of_isoTyp {ρ : Representation ℂ (GQ L n) W} {S : Submodule ℂ (GAf L n → W)}
-    (hS : NG.IsIrrRep ρ S) (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (f : GAf L n → W)
-    (hf : f ∈ NG.isoTyp ρ S) (hf0 : f ≠ 0) (hfix : ∀ κ ∈ Umax L n, TrivOutside {v} κ → NG.rt L n κ f = f) :
-    ∃ g ∈ S, g ≠ 0 ∧ ∀ κ ∈ Umax L n, TrivOutside {v} κ → NG.rt L n κ g = g := by
+theorem exists_fixed_of_isoTyp
+    {ρ : Representation ℂ (GQ L n) W} {S : Submodule ℂ (GAf L n → W)} (hS : NG.IsIrrRep ρ S)
+    (v : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) (f : GAf L n → W) (hf : f ∈ NG.isoTyp ρ S)
+    (hf0 : f ≠ 0) (hfix : ∀ κ ∈ Umax L n, TrivOutside {v} κ → NG.rt L n κ f = f)
+    : ∃ g ∈ S, g ≠ 0 ∧ ∀ κ ∈ Umax L n, TrivOutside {v} κ → NG.rt L n κ g = g := by
   obtain ⟨t, ht, hft⟩ := Submodule.mem_sSup_iff_exists_finset.1 hf
   obtain ⟨S', hS', g', hg', hg0, hgf⟩ := exists_fixed_of_finset v t ht f hft hf0 hfix
   exact fixed_of_iso hS.1 (ht hS').2 v g' hg' hg0 hgf
 
 end Gen
 
-theorem coeff_eq {N n : ℕ} (hN : N ≠ 0) {c c' : ℕ → ℂ}
-    (h : (X ^ n + ∑ k ∈ Finset.Icc 1 n, C ((-1 : ℂ) ^ k * ((N : ℂ)) ^ (k * (k - 1) / 2) * c k) * X ^ (n - k) : ℂ[X]) =
-      X ^ n + ∑ k ∈ Finset.Icc 1 n, C ((-1 : ℂ) ^ k * ((N : ℂ)) ^ (k * (k - 1) / 2) * c' k) * X ^ (n - k))
-    {k : ℕ} (h1 : 1 ≤ k) (h2 : k ≤ n) : c k = c' k := by
-  have key : ∀ d : ℕ → ℂ, (X ^ n + ∑ j ∈ Finset.Icc 1 n,
-      C ((-1 : ℂ) ^ j * ((N : ℂ)) ^ (j * (j - 1) / 2) * d j) * X ^ (n - j) : ℂ[X]).coeff (n - k) =
-        (-1 : ℂ) ^ k * ((N : ℂ)) ^ (k * (k - 1) / 2) * d k := by
+theorem coeff_eq
+    {N n : ℕ} (hN : N ≠ 0)
+    {c c' : ℕ → ℂ}
+    (h : (X ^ n
+          + ∑ k ∈ Finset.Icc 1 n, C ((-1 : ℂ) ^ k * ((N : ℂ)) ^ (k * (k - 1) / 2) * c k) * X ^ (n - k)
+        : ℂ[X])
+      = X ^ n
+        + ∑ k ∈ Finset.Icc 1 n, C ((-1 : ℂ) ^ k * ((N : ℂ)) ^ (k * (k - 1) / 2) * c' k) * X ^ (n - k))
+    {k : ℕ} (h1 : 1 ≤ k) (h2 : k ≤ n)
+    : c k = c' k := by
+  have key
+      : ∀ d : ℕ → ℂ,
+        (X ^ n + ∑ j ∈ Finset.Icc 1 n,
+                C ((-1 : ℂ) ^ j * ((N : ℂ)) ^ (j * (j - 1) / 2) * d j) * X ^ (n - j)
+              : ℂ[X]).coeff (n - k)
+          = (-1 : ℂ) ^ k * ((N : ℂ)) ^ (k * (k - 1) / 2) * d k := by
     intro d
-    rw [coeff_add, coeff_X_pow, if_neg (by omega), zero_add, finsetSum_coeff, Finset.sum_eq_single k]
+    rw [coeff_add, coeff_X_pow, if_neg (by omega), zero_add, finsetSum_coeff,
+      Finset.sum_eq_single k]
     · rw [coeff_C_mul_X_pow, if_pos rfl]
     · intro j hj hjk
       rw [Finset.mem_Icc] at hj

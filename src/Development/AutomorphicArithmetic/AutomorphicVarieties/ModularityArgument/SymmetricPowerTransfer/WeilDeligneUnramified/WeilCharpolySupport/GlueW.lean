@@ -10,11 +10,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsRe
 
 @[expose] public section
 
-theorem UpperTheory.V.Z.Sym.W.glueW :
-    UpperTheory.V.Z.Sym.W.GlueW := by
+theorem UpperTheory.V.Z.Sym.W.glueW : UpperTheory.V.Z.Sym.W.GlueW := by
   intro L Ω _ _ _ _ _ _ l _ ι R h π _ hπ
-  obtain ⟨t, ht⟩ := UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.winOfP_of UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.plainIff UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.winOf UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.sphUnl
-    L 3 (by norm_num) π
+  obtain ⟨t, ht⟩ :=
+    UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.winOfP_of
+      UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.plainIff
+      UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.winOf
+      UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.sphUnl L 3 (by norm_num) π
   refine ⟨t, fun w => ?_⟩
   obtain ⟨π', hπ', hc⟩ := h w
   have e : π' = π := by
@@ -23,7 +25,11 @@ theorem UpperTheory.V.Z.Sym.W.glueW :
     obtain ⟨B, hB, hE⟩ := h1
     obtain ⟨B', hB', hE'⟩ := h2
     have e : B = B' := (UpperTheory.hecke_eigenvalue_basic_properties L Ω l ι v).2.2 3 R B B' hE hE'
-    exact ⟨B, (GlobalTheory.CuspRep.CG.hasSat_mk π' v B).1 hB, (GlobalTheory.CuspRep.CG.hasSat_mk π v B).1 (e ▸ hB')⟩
+    exact ⟨
+      B,
+      (GlobalTheory.CuspRep.CG.hasSat_mk π' v B).1 hB,
+      (GlobalTheory.CuspRep.CG.hasSat_mk π v B).1 (e ▸ hB')
+    ⟩
   subst e
   rcases hc with ⟨B, hB⟩ | hp
   · exact (ht w).2 B hB

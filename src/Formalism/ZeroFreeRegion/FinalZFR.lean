@@ -16,10 +16,11 @@ noncomputable section
 
 namespace Formalism.ZF
 
-theorem landauLocal : LandauLocal := localZeroExpansionOfFactorization zeroFactorization logDerivBoundOnBall
+theorem landauLocal : LandauLocal :=
+  localZeroExpansionOfFactorization zeroFactorization logDerivBoundOnBall
 
 theorem zeroFreeRegion : ZeroFreeRegion :=
-  classicalZeroFreeRegionOfBounds mertensInequality logDerivBoundRightHalfPlane growthBound zetaInvBound_statement
-    zeroFreeBoundedHeight landauLocal
+  classicalZeroFreeRegionOfBounds mertensInequality logDerivBoundRightHalfPlane growthBound
+    zetaInvBound_statement zeroFreeBoundedHeight landauLocal
 
 end Formalism.ZF

@@ -14,18 +14,21 @@ public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.SetUni
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.GlobalTheoryTheory GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem NumberField
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab
+  Formalism.L2.GlobalTheoryTheory GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem NumberField
 
 namespace GlobalTheory.EX.OB
 
-theorem mem_span_of_semilinear {B K O Kf V W ι : Type*} [CommRing B] [IsDomain B] [IsPrincipalIdealRing B] [Field K]
-    [Algebra B K] [IsFractionRing B K] [CommRing O] [Field Kf] [Algebra O Kf]
-    [AddCommGroup V] [Module K V] [Module B V] [IsScalarTower B K V]
-    [AddCommGroup W] [Module Kf W] [Module O W] [IsScalarTower O Kf W]
+theorem mem_span_of_semilinear
+    {B K O Kf V W ι : Type*}
+    [CommRing B] [IsDomain B] [IsPrincipalIdealRing B] [Field K] [Algebra B K] [IsFractionRing B K]
+    [CommRing O] [Field Kf] [Algebra O Kf] [AddCommGroup V] [Module K V] [Module B V]
+    [IsScalarTower B K V] [AddCommGroup W] [Module Kf W] [Module O W] [IsScalarTower O Kf W]
     (σ : K →+* Kf) (hσ : ∀ k, σ k ∈ Set.range (algebraMap O Kf) ↔ k ∈ Set.range (algebraMap B K))
-    (φ : V →+ W) (hφ : ∀ (a : K) x, φ (a • x) = σ a • φ x) (b : Module.Basis ι K V)
-    (hb : LinearIndependent Kf (φ ∘ b)) (S : Set V) (x : V) (hx : φ x ∈ Submodule.span O (φ '' S)) :
-    x ∈ Submodule.span B S := by
+    (φ : V →+ W) (hφ : ∀ (a : K) x, φ (a • x) = σ a • φ x)
+    (b : Module.Basis ι K V) (hb : LinearIndependent Kf (φ ∘ b))
+    (S : Set V) (x : V) (hx : φ x ∈ Submodule.span O (φ '' S))
+    : x ∈ Submodule.span B S := by
   classical
   obtain ⟨T, hTS, hxT⟩ := Submodule.mem_span_finite_of_mem_span hx
   obtain ⟨T', hT'S, rfl⟩ := Finset.subset_set_image_iff.1 hTS
@@ -82,11 +85,15 @@ theorem mem_span_of_semilinear {B K O Kf V W ι : Type*} [CommRing B] [IsDomain 
   rw [← ha, algebraMap_smul]
   exact Submodule.smul_mem _ _ (e0 i).2
 
-theorem NP_full (D : D7) (L : SizeData₂ D) (X : G.Inst D L) (Y : G.LatInst D) (K : G.Consts) (c : LatCmp D)
-    (hv : c.VramDef Y) (u : D.what₂.Word) (w : D.what₂.places.Pl)
-    (hg : GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w)) :
-    (∀ x, c.cmp u w hg (D.nuIn u x) ∈ G.NP X Y K u w hg → InLoc (D.plEq w) (DV.MramL D u) x) ∧
-      ∃ n : ℕ, n ≠ 0 ∧ ∀ x ∈ DV.MramL D u, c.cmp u w hg (D.nuIn u (n • x)) ∈ G.NP X Y K u w hg := by
+theorem NP_full
+    (D : D7) (L : SizeData₂ D) (X : G.Inst D L) (Y : G.LatInst D)
+    (K : G.Consts)
+    (c : LatCmp D) (hv : c.VramDef Y)
+    (u : D.what₂.Word) (w : D.what₂.places.Pl)
+    (hg : GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w))
+    : (∀ x, c.cmp u w hg (D.nuIn u x) ∈ G.NP X Y K u w hg → InLoc (D.plEq w) (DV.MramL D u) x)
+      ∧ ∃ n : ℕ,
+        n ≠ 0 ∧ ∀ x ∈ DV.MramL D u, c.cmp u w hg (D.nuIn u (n • x)) ∈ G.NP X Y K u w hg := by
   constructor
   · intro x hx
     have hM : c.cmp u w hg (D.nuIn u x) ∈ (D.gat u w hg).M := by
@@ -96,9 +103,12 @@ theorem NP_full (D : D7) (L : SizeData₂ D) (X : G.Inst D L) (Y : G.LatInst D) 
     rw [← c.cmp_M u w hg] at hM
     have := D.intW_dvr w
     have := D.intW_frac w
-    have h1 : D.nuIn u x ∈ Submodule.span (intW D.what₂.places w) (((D.fm u).lat 0).L : Set ((D.fm u).lat 0).V) := by
-      refine mem_span_of_semilinear (c.embW u w hg) (fun k => ?_) (c.cmp u w hg) (c.cmp_smul u w hg)
-        ((D.fm u).lat 0).b (c.cmp_li u w hg) _ _ hM
+    have h1
+        : D.nuIn u x ∈ Submodule.span (intW D.what₂.places w)
+          (((D.fm u).lat 0).L : Set ((D.fm u).lat 0).V) := by
+      refine mem_span_of_semilinear (c.embW u w hg)
+        (fun k => ?_)
+        (c.cmp u w hg) (c.cmp_smul u w hg) ((D.fm u).lat 0).b (c.cmp_li u w hg) _ _ hM
       rw [← c.embW_int u w hg k]
       exact ⟨fun h => ⟨⟨k, h⟩, rfl⟩, by rintro ⟨a, rfl⟩; exact a.2⟩
     obtain ⟨s, hs, hsx⟩ := (D.mem_locW_iff w ((D.fm u).lat 0).L (D.nuIn u x)).1 h1
@@ -109,7 +119,11 @@ theorem NP_full (D : D7) (L : SizeData₂ D) (X : G.Inst D L) (Y : G.LatInst D) 
   · set a : ℕ := ∑ t0 ∈ G.VV X K (G.aL L) (G.bL L) (D.what₂.places.resChar w),
       ⌈G.Sv X K (G.aL L) (G.bL L) (D.what₂.places.resChar w) t0⌉.toNat with ha
     set b : ℕ := ⌈G.tauP X K (G.aL L) (G.bL L) (D.what₂.places.resChar w)⌉.toNat with hb
-    refine ⟨D.what₂.places.resChar w ^ (b + a), pow_ne_zero _ (D.what₂.places.resChar_prime w).ne_zero, fun x hx => ?_⟩
+    refine ⟨
+      D.what₂.places.resChar w ^ (b + a),
+      pow_ne_zero _ (D.what₂.places.resChar_prime w).ne_zero,
+      fun x hx => ?_
+    ⟩
     have hF1 : c.cmp u w hg (D.nuIn u x) ∈ (D.gat u w hg).M := by
       rw [← c.cmp_M u w hg]
       exact Submodule.subset_span ⟨D.nuIn u x, hx, rfl⟩
@@ -127,7 +141,11 @@ theorem NP_full (D : D7) (L : SizeData₂ D) (X : G.Inst D L) (Y : G.LatInst D) 
       apply Submodule.subset_span
       refine ⟨∅, Finset.empty_subset _, F, hF1, ?_⟩
       simp [G.yProd, ha]
-    · refine ⟨((D.what₂.places.resChar w : ℕ) : (D.gat u w hg).O) ^ a • F, Submodule.smul_mem _ _ hF1, ?_⟩
+    · refine ⟨
+        ((D.what₂.places.resChar w : ℕ) : (D.gat u w hg).O) ^ a • F,
+        Submodule.smul_mem _ _ hF1,
+        ?_
+      ⟩
       rw [pow_add, mul_smul]
       rfl
 

@@ -16,14 +16,14 @@ section Gen
 
 variable {k : ℕ} {B R : Type} [CommRing B] [CommRing R] [Algebra B R]
 
-theorem ev_shift {p : Deg k → Prop} (d : Deg k) (h : ∀ᶠ m in atTop, p m) :
-    ∀ᶠ m in atTop, p (m - d) := by
+theorem ev_shift {p : Deg k → Prop} (d : Deg k) (h : ∀ᶠ m in atTop, p m)
+    : ∀ᶠ m in atTop, p (m - d) := by
   rw [eventually_atTop] at h ⊢
   obtain ⟨a, ha⟩ := h
   exact ⟨a + d, fun b hb => ha _ (le_sub_iff_add_le.mpr hb)⟩
 
-theorem chi_ev_zero (ts : List (Deg k × R)) : ∀ (F : GMod B R k),
-    (∀ᶠ m in atTop, F.gr m = ⊥) → ∀ᶠ m in atTop, chi ts F m = 0 := by
+theorem chi_ev_zero (ts : List (Deg k × R))
+    : ∀ (F : GMod B R k), (∀ᶠ m in atTop, F.gr m = ⊥) → ∀ᶠ m in atTop, chi ts F m = 0 := by
   induction ts with
   | nil =>
     intro F h
@@ -82,10 +82,11 @@ def isoTop (F : GMod B R k) (N : Submodule R F.M) (h : N = ⊤) : GIso (F.sub N)
     · intro hx
       exact ⟨⟨x, h ▸ Submodule.mem_top⟩, hx, rfl⟩
 
-def isoAnn (F : GMod B R k) (s : R) (d : Deg k) (h : ∀ x : F.M, s • x = 0) :
-    GIso (F.ann s d) (F.shift d) where
-  e := LinearEquiv.ofTop (LinearMap.ker (LinearMap.lsmul R F.M s))
-    (by rw [eq_top_iff]; intro x _; exact h x)
+def isoAnn (F : GMod B R k) (s : R) (d : Deg k) (h : ∀ x : F.M, s • x = 0)
+    : GIso (F.ann s d) (F.shift d) where
+  e :=
+    LinearEquiv.ofTop (LinearMap.ker (LinearMap.lsmul R F.M s))
+      (by rw [eq_top_iff]; intro x _; exact h x)
   map_gr m := by
     ext x
     constructor
@@ -95,8 +96,9 @@ def isoAnn (F : GMod B R k) (s : R) (d : Deg k) (h : ∀ x : F.M, s • x = 0) :
       exact ⟨⟨x, h x⟩, hx, rfl⟩
 
 def isoQuot (F : GMod B R k) (s : R) (h : ∀ x : F.M, s • x = 0) : GIso F (F.quot s) where
-  e := (Submodule.quotEquivOfEqBot (LinearMap.range (LinearMap.lsmul R F.M s))
-    (by rw [eq_bot_iff]; rintro _ ⟨x, rfl⟩; exact h x)).symm
+  e :=
+    (Submodule.quotEquivOfEqBot (LinearMap.range (LinearMap.lsmul R F.M s))
+      (by rw [eq_bot_iff]; rintro _ ⟨x, rfl⟩; exact h x)).symm
   map_gr m := by
     ext x
     constructor
@@ -105,8 +107,8 @@ def isoQuot (F : GMod B R k) (s : R) (h : ∀ x : F.M, s • x = 0) : GIso F (F.
     · rintro ⟨y, hy, rfl⟩
       exact ⟨y, hy, rfl⟩
 
-theorem secs_cons_le (d : Deg k) (s : R) (ts : List (Deg k × R)) :
-    secs ((d, s) :: ts) ≤ Ideal.span {s} ⊔ secs ts := by
+theorem secs_cons_le (d : Deg k) (s : R) (ts : List (Deg k × R))
+    : secs ((d, s) :: ts) ≤ Ideal.span {s} ⊔ secs ts := by
   refine Ideal.span_le.mpr ?_
   rintro x ⟨d', hx⟩
   rcases List.mem_cons.mp hx with h | h
@@ -122,13 +124,16 @@ section Graded
 variable {k : ℕ} {B R : Type} [CommRing B] [CommRing R] [Algebra B R]
 variable (𝒜 : Deg k → Submodule B R)
 
-theorem admissible_mono_ideal [IsLocalRing B] {ts : List (Deg k × R)} {J J' : Ideal R} (h : J ≤ J')
-    (hA : admitted 𝒜 ts J) : admitted 𝒜 ts J' := by
+theorem admissible_mono_ideal
+    [IsLocalRing B] {ts : List (Deg k × R)} {J J' : Ideal R} (h : J ≤ J') (hA : admitted 𝒜 ts J)
+    : admitted 𝒜 ts J' := by
   obtain ⟨N, hN⟩ := hA
   exact ⟨N, hN.trans (sup_le_sup_right h _)⟩
 
-theorem admissible_tail_of_cons_mem [IsLocalRing B] {d : Deg k} {s : R} {ts : List (Deg k × R)} {J : Ideal R}
-    (hA : admitted 𝒜 ((d, s) :: ts) J) : admitted 𝒜 ts (J ⊔ Ideal.span {s}) := by
+theorem admissible_tail_of_cons_mem
+    [IsLocalRing B]
+    {d : Deg k} {s : R} {ts : List (Deg k × R)} {J : Ideal R} (hA : admitted 𝒜 ((d, s) :: ts) J)
+    : admitted 𝒜 ts (J ⊔ Ideal.span {s}) := by
   obtain ⟨N, hN⟩ := hA
   refine ⟨N, hN.trans ?_⟩
   rw [sup_assoc]
@@ -163,8 +168,11 @@ theorem le_ann_quo (𝔮 : Ideal R) : 𝔮 ≤ ((GMod.self 𝒜).quo 𝔮).Ann :
 theorem zero_on_quo {𝔮 : Ideal R} {s : R} (hs : s ∈ 𝔮) (x : ((GMod.self 𝒜).quo 𝔮).M) : s • x = 0 :=
   Module.mem_annihilator.mp (le_ann_quo 𝒜 𝔮 hs) x
 
-theorem nzd_on_quo {𝔮 : Ideal R} (hp : 𝔮.IsPrime) {σ : R} (hn : σ ∉ 𝔮)
-    (x : ((GMod.self 𝒜).quo 𝔮).M) (h : σ • x = 0) : x = 0 := by
+theorem nzd_on_quo
+    {𝔮 : Ideal R} (hp : 𝔮.IsPrime)
+    {σ : R} (hn : σ ∉ 𝔮)
+    (x : ((GMod.self 𝒜).quo 𝔮).M) (h : σ • x = 0)
+    : x = 0 := by
   have hx : ∀ x : R ⧸ (𝔮 : Submodule R R), σ • x = 0 → x = 0 := by
     intro x
     obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective _ x
@@ -178,13 +186,18 @@ theorem exists_sec {𝔮 : Ideal R} (h : IsRel 𝒜 𝔮) {d : Deg k} (hd : 0 �
     by_contra hc
     push Not at hc
     apply h.rel
-    calc Irr 𝒜 ≤ Ideal.span (𝒜 (e i) : Set R) :=
-          Ideal.prod_le_inf.trans (Finset.inf_le (Finset.mem_univ i))
+    calc
+      Irr 𝒜 ≤ Ideal.span (𝒜 (e i) : Set R) :=
+        Ideal.prod_le_inf.trans (Finset.inf_le (Finset.mem_univ i))
       _ ≤ 𝔮 := Ideal.span_le.mpr hc
   choose τ hτ hτn using h1
   refine ⟨∏ i, τ i ^ (d i).toNat, ?_, ?_⟩
-  · have h2 := SetLike.prod_mem_graded 𝒜 (fun i => (d i).toNat • e i) (fun i => τ i ^ (d i).toNat)
-      (F := Finset.univ) (fun i _ => SetLike.pow_mem_graded _ (hτ i))
+  · have h2 :=
+      SetLike.prod_mem_graded 𝒜
+        (fun i => (d i).toNat • e i)
+        (fun i => τ i ^ (d i).toNat)
+        (F := Finset.univ)
+        (fun i _ => SetLike.pow_mem_graded _ (hτ i))
     have h3 : ∑ i, (d i).toNat • (e i : Deg k) = d := by
       ext j
       simp [e, Finset.sum_apply, Pi.single_apply]
@@ -194,9 +207,11 @@ theorem exists_sec {𝔮 : Ideal R} (h : IsRel 𝒜 𝔮) {d : Deg k} (hd : 0 �
     obtain ⟨i, _, hi⟩ := (h.prime.prod_mem_iff).mp hc
     exact hτn i (h.prime.mem_of_pow_mem _ hi)
 
-theorem comp_of_mul {𝔮 : Ideal R} (hp : 𝔮.IsPrime) (hh : 𝔮.IsHomogeneous 𝒜) {d : Deg k} {σ : R}
-    (hσ : σ ∈ 𝒜 d) (hn : σ ∉ 𝔮) (m : Deg k) (r a : R) (ha : a ∈ 𝒜 m) (h : σ * r - a ∈ 𝔮) :
-    r - (DirectSum.decompose 𝒜 r (m - d) : R) ∈ 𝔮 := by
+theorem comp_of_mul
+    {𝔮 : Ideal R} (hp : 𝔮.IsPrime) (hh : 𝔮.IsHomogeneous 𝒜)
+    {d : Deg k} {σ : R} (hσ : σ ∈ 𝒜 d) (hn : σ ∉ 𝔮)
+    (m : Deg k) (r a : R) (ha : a ∈ 𝒜 m) (h : σ * r - a ∈ 𝔮)
+    : r - (DirectSum.decompose 𝒜 r (m - d) : R) ∈ 𝔮 := by
   classical
   have key : ∀ j, j ≠ m - d → (DirectSum.decompose 𝒜 r j : R) ∈ 𝔮 := by
     intro j hj
@@ -207,8 +222,9 @@ theorem comp_of_mul {𝔮 : Ideal R} (hp : 𝔮.IsPrime) (hh : 𝔮.IsHomogeneou
       rw [hc]
       abel
     rw [DirectSum.decompose_sub, DirectSum.sub_apply, Submodule.coe_sub,
-      DirectSum.coe_decompose_mul_add_of_left_mem 𝒜 hσ, DirectSum.decompose_of_mem_ne 𝒜 ha hne,
-      sub_zero] at h1
+        DirectSum.coe_decompose_mul_add_of_left_mem 𝒜 hσ, DirectSum.decompose_of_mem_ne 𝒜 ha hne,
+        sub_zero]
+      at h1
     exact (hp.mem_or_mem h1).resolve_left hn
   rw [← DirectSum.sum_support_decompose 𝒜 (r - (DirectSum.decompose 𝒜 r (m - d) : R))]
   refine Ideal.sum_mem _ fun j _ => ?_
@@ -220,9 +236,10 @@ theorem comp_of_mul {𝔮 : Ideal R} (hp : 𝔮.IsPrime) (hh : 𝔮.IsHomogeneou
   · rw [DirectSum.of_eq_of_ne _ _ _ hj, Submodule.coe_zero, sub_zero]
     exact key j hj
 
-def sesMul {𝔮 : Ideal R} (hp : 𝔮.IsPrime) (hh : 𝔮.IsHomogeneous 𝒜) {d : Deg k} {σ : R}
-    (hσ : σ ∈ 𝒜 d) (hn : σ ∉ 𝔮) :
-    SES (((GMod.self 𝒜).quo 𝔮).shift d) ((GMod.self 𝒜).quo 𝔮) (((GMod.self 𝒜).quo 𝔮).quot σ) where
+def sesMul
+    {𝔮 : Ideal R} (hp : 𝔮.IsPrime) (hh : 𝔮.IsHomogeneous 𝒜)
+    {d : Deg k} {σ : R} (hσ : σ ∈ 𝒜 d) (hn : σ ∉ 𝔮)
+    : SES (((GMod.self 𝒜).quo 𝔮).shift d) ((GMod.self 𝒜).quo 𝔮) (((GMod.self 𝒜).quo 𝔮).quot σ) where
   f := LinearMap.lsmul R ((GMod.self 𝒜).quo 𝔮).M σ
   g := (LinearMap.range (LinearMap.lsmul R ((GMod.self 𝒜).quo 𝔮).M σ)).mkQ
   inj := (injective_iff_map_eq_zero _).mpr fun x hx => nzd_on_quo 𝒜 hp hn x hx
@@ -244,8 +261,10 @@ def sesMul {𝔮 : Ideal R} (hp : 𝔮.IsPrime) (hh : 𝔮.IsHomogeneous 𝒜) {
       have ha : a ∈ 𝒜 m := ha'
       refine ⟨(DirectSum.decompose 𝒜 r (m - d) : R), SetLike.coe_mem _, ?_⟩
       have h1 : σ * r - a ∈ 𝔮 := by
-        have h2 : Submodule.Quotient.mk (p := (𝔮 : Submodule R R)) a
-            = Submodule.Quotient.mk (p := (𝔮 : Submodule R R)) (σ * r) := hax
+        have h2
+            : Submodule.Quotient.mk (p := (𝔮 : Submodule R R)) a
+              = Submodule.Quotient.mk (p := (𝔮 : Submodule R R)) (σ * r) :=
+          hax
         exact (Submodule.Quotient.eq _).mp h2.symm
       exact ((Submodule.Quotient.eq (𝔮 : Submodule R R)).mpr
         (comp_of_mul 𝒜 hp hh hσ hn m r a ha h1)).symm
@@ -255,13 +274,15 @@ end Graded
 
 section Main
 
-theorem dev_reduce (hGr : RuleGr) (hIrr : RuleIrr) (hIso : RuleIso) (hShift : RuleShift)
-    (hE1 : EulerAdditivityExactSequence) (hDev : RuleDev) {P : ℤ → Prop} (h0 : P 0)
-    (hadd : ∀ a b, P a → P b → P (a + b)) {k : ℕ} (X : HidaSetting k) (ts : List (Deg k × X.R))
-    (F : X.Mod) (hv : Valid X.𝒜 ts) (hF : F.IsGr X.𝒜) (hA : admitted X.𝒜 ts F.Ann)
-    (H : ∀ 𝔮 : Ideal X.R, IsRel X.𝒜 𝔮 → F.Ann ≤ 𝔮 →
-      ∀ᶠ m in atTop, P (chi ts ((GMod.self X.𝒜).quo 𝔮) m)) :
-    ∀ᶠ m in atTop, P (chi ts F m) := by
+theorem dev_reduce
+    (hGr : RuleGr) (hIrr : RuleIrr) (hIso : RuleIso) (hShift : RuleShift)
+    (hE1 : EulerAdditivityExactSequence) (hDev : RuleDev)
+    {P : ℤ → Prop} (h0 : P 0) (hadd : ∀ a b, P a → P b → P (a + b))
+    {k : ℕ} (X : HidaSetting k) (ts : List (Deg k × X.R)) (F : X.Mod) (hv : Valid X.𝒜 ts)
+    (hF : F.IsGr X.𝒜) (hA : admitted X.𝒜 ts F.Ann)
+    (H : ∀ 𝔮 : Ideal X.R,
+      IsRel X.𝒜 𝔮 → F.Ann ≤ 𝔮 → ∀ᶠ m in atTop, P (chi ts ((GMod.self X.𝒜).quo 𝔮) m))
+    : ∀ᶠ m in atTop, P (chi ts F m) := by
   obtain ⟨t, N, 𝔮, d, hN0, hNt, hhom, -, hstep⟩ := hDev k X F hF
   have key : ∀ i, i ≤ t → ∀ᶠ m in atTop, P (chi ts (F.sub (N i)) m) := by
     intro i
@@ -273,8 +294,8 @@ theorem dev_reduce (hGr : RuleGr) (hIrr : RuleIrr) (hIso : RuleIso) (hShift : Ru
         refine Eventually.of_forall fun m => ?_
         rw [hN0, Submodule.eq_bot_iff]
         intro x _
-        have hx : ∀ x : (⊥ : Submodule X.R F.M), x = 0 :=
-          fun x => Subtype.ext ((Submodule.mem_bot _).mp x.2)
+        have hx : ∀ x : (⊥ : Submodule X.R F.M), x = 0 := fun x =>
+          Subtype.ext ((Submodule.mem_bot _).mp x.2)
         exact hx x
       filter_upwards [h1] with m hm
       rw [hm]
@@ -290,8 +311,9 @@ theorem dev_reduce (hGr : RuleGr) (hIrr : RuleIrr) (hIso : RuleIso) (hShift : Ru
       have hs := hE1 k X ts _ _ _ hv g1 g2 g3 ses (admissible_mono_ideal X.𝒜 (ann_le_sub F _) hA)
       have hq : ∀ᶠ m in atTop, P (chi ts ((GMod.self X.𝒜).quo (𝔮 i)) m) := by
         by_cases hrel : Irr X.𝒜 ≤ 𝔮 i
-        · have hz := chi_ev_zero ts _ (hIrr k X _ g0
-            ⟨1, by rw [pow_one]; exact hrel.trans (le_ann_quo X.𝒜 (𝔮 i))⟩)
+        · have hz :=
+            chi_ev_zero ts _
+              (hIrr k X _ g0 ⟨1, by rw [pow_one]; exact hrel.trans (le_ann_quo X.𝒜 (𝔮 i))⟩)
           filter_upwards [hz] with m hm
           rw [hm]
           exact h0
@@ -304,12 +326,14 @@ theorem dev_reduce (hGr : RuleGr) (hIrr : RuleIrr) (hIso : RuleIso) (hShift : Ru
   filter_upwards [key t le_rfl] with m hm
   rwa [hIso k X ts _ _ (isoTop F (N t) hNt) m] at hm
 
-theorem prime_step (hGr : RuleGr) (hIso : RuleIso) (hNzd : RuleNzd) (hE1 : EulerAdditivityExactSequence) {k : ℕ}
-    (X : HidaSetting k) (𝔮 : Ideal X.R) (hq : IsRel X.𝒜 𝔮) (d : Deg k) (s : X.R)
-    (ts : List (Deg k × X.R)) (hv : Valid X.𝒜 ((d, s) :: ts)) (hA : admitted X.𝒜 ((d, s) :: ts) 𝔮) :
-    ∃ σ ∈ X.𝒜 d, σ ∉ 𝔮 ∧ admitted X.𝒜 ts (𝔮 ⊔ Ideal.span {σ}) ∧
-      ∀ᶠ m in atTop, chi ((d, s) :: ts) ((GMod.self X.𝒜).quo 𝔮) m
-        = chi ts (((GMod.self X.𝒜).quo 𝔮).quot σ) m := by
+theorem prime_step
+    (hGr : RuleGr) (hIso : RuleIso) (hNzd : RuleNzd) (hE1 : EulerAdditivityExactSequence)
+    {k : ℕ} (X : HidaSetting k) (𝔮 : Ideal X.R) (hq : IsRel X.𝒜 𝔮) (d : Deg k) (s : X.R)
+    (ts : List (Deg k × X.R)) (hv : Valid X.𝒜 ((d, s) :: ts)) (hA : admitted X.𝒜 ((d, s) :: ts) 𝔮)
+    : ∃ σ ∈ X.𝒜 d,
+      σ ∉ 𝔮 ∧ admitted X.𝒜 ts (𝔮 ⊔ Ideal.span {σ})
+        ∧ ∀ᶠ m in atTop, chi ((d, s) :: ts) ((GMod.self X.𝒜).quo 𝔮) m
+            = chi ts (((GMod.self X.𝒜).quo 𝔮).quot σ) m := by
   obtain ⟨hd, hs⟩ := hv (d, s) List.mem_cons_self
   have hv' : Valid X.𝒜 ts := fun p hp => hv p (List.mem_cons_of_mem _ hp)
   by_cases hsq : s ∈ 𝔮
@@ -322,8 +346,9 @@ theorem prime_step (hGr : RuleGr) (hIso : RuleIso) (hNzd : RuleNzd) (hE1 : Euler
       ((hGr k X _ (self_isGr X.𝒜)).1 𝔮 (isHomSub_of_hom X.𝒜 hq.hom)).2
     have g1 := (hGr k X _ g0).2.1 d
     have g2 := ((hGr k X _ g0).2.2 d σ hσ).1
-    have hs := hE1 k X ts _ _ _ hv' g1 g0 g2 (sesMul X.𝒜 hq.prime hq.hom hσ hn)
-      (admissible_mono_ideal X.𝒜 (le_ann_quo X.𝒜 𝔮) hA')
+    have hs :=
+      hE1 k X ts _ _ _ hv' g1 g0 g2 (sesMul X.𝒜 hq.prime hq.hom hσ hn)
+        (admissible_mono_ideal X.𝒜 (le_ann_quo X.𝒜 𝔮) hA')
     filter_upwards [hs] with m hm
     have e1 := hIso k X ts _ _ (isoQuot ((GMod.self X.𝒜).quo 𝔮) s (zero_on_quo X.𝒜 hsq)) m
     have e2 := hIso k X ts _ _ (isoAnn ((GMod.self X.𝒜).quo 𝔮) s d (zero_on_quo X.𝒜 hsq)) m

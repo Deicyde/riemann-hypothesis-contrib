@@ -4,8 +4,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 open UpperTheory.Gal.W2
@@ -101,12 +104,20 @@ private lemma archPlace_core {C : Type} [Ring C] {n : ℕ} (hn : 0 < n)
   · exact eq_neg_of_add_eq_zero_left h
   · exact absurd h hg0
 
-theorem UpperTheory.exists_hermitian_diagonalization_at_infinitePlace_of_skewHermitian :
-    ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (σ : G.C ≃ₐ[G.F] Matrix (Fin G.n) (Fin G.n) G.F) (A : Matrix (Fin G.n) (Fin G.n) G.F), UpperTheory.Gal.W2.SN → A.det ≠ 0 → (A.map (IsCMField.complexConj G.F))ᵀ = -A → (∀ c, A * σ (sh G c) = ((σ c).map (IsCMField.complexConj G.F))ᵀ * A) → ∀ v : InfinitePlace G.F, ∃ (S : Matrix (Fin G.n) (Fin G.n) ℂ) (lam : ℂ), S.det ≠ 0 ∧ (∀ c, G.psi v c * S = S * (σ c).map v.embedding) ∧ (starRingEnd ℂ) lam = -lam ∧ (S⁻¹)ᴴ * A.map v.embedding * S⁻¹ = lam • G.gram v := by
+theorem UpperTheory.exists_hermitian_diagonalization_at_infinitePlace_of_skewHermitian
+    : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (σ : G.C ≃ₐ[G.F] Matrix (Fin G.n) (Fin G.n) G.F)
+        (A : Matrix (Fin G.n) (Fin G.n) G.F),
+      UpperTheory.Gal.W2.SN → A.det ≠ 0 → (A.map (IsCMField.complexConj G.F))ᵀ = -A
+        → (∀ c, A * σ (sh G c) = ((σ c).map (IsCMField.complexConj G.F))ᵀ * A)
+        → ∀ v : InfinitePlace G.F, ∃ (S : Matrix (Fin G.n) (Fin G.n) ℂ) (lam : ℂ),
+          S.det ≠ 0 ∧ (∀ c, G.psi v c * S = S * (σ c).map v.embedding) ∧ (starRingEnd ℂ) lam = -lam
+            ∧ (S⁻¹)ᴴ * A.map v.embedding * S⁻¹ = lam • G.gram v := by
   intro p _ G σ A hSN _ hskew hrel v
   let ψ : Matrix (Fin G.n) (Fin G.n) G.F →+* Matrix (Fin G.n) (Fin G.n) ℂ :=
     (G.psi v).comp (σ.symm : Matrix (Fin G.n) (Fin G.n) G.F →ₐ[G.F] G.C).toRingHom
-  have hψ : ∀ x : G.F, ψ (Matrix.scalar (Fin G.n) x) = Matrix.scalar (Fin G.n) (v.embedding x) := fun x => by
+  have hψ
+      : ∀ x : G.F,
+        ψ (Matrix.scalar (Fin G.n) x) = Matrix.scalar (Fin G.n) (v.embedding x) := fun x => by
     have e : Matrix.scalar (Fin G.n) x = algebraMap G.F (Matrix (Fin G.n) (Fin G.n) G.F) x := by
       rw [Matrix.algebraMap_eq_diagonal]; rfl
     change G.psi v (σ.symm (Matrix.scalar (Fin G.n) x)) = _
@@ -118,22 +129,33 @@ theorem UpperTheory.exists_hermitian_diagonalization_at_infinitePlace_of_skewHer
       change G.psi v (σ.symm (σ c)) = _
       rw [AlgEquiv.symm_apply_apply]
     rwa [e] at this
-  have hconj : ∀ M : Matrix (Fin G.n) (Fin G.n) G.F,
-      ((M.map (IsCMField.complexConj G.F))ᵀ).map v.embedding = (M.map v.embedding)ᴴ := fun M => by
+  have hconj
+      : ∀ M : Matrix (Fin G.n) (Fin G.n) G.F,
+        ((M.map (IsCMField.complexConj G.F))ᵀ).map v.embedding = (M.map v.embedding)ᴴ := fun M => by
     ext i j
     simp [Matrix.conjTranspose_apply, IsCMField.complexEmbedding_complexConj]
-  have hrel' : ∀ c, A.map v.embedding * (σ (sh G c)).map v.embedding
-      = ((σ c).map v.embedding)ᴴ * A.map v.embedding := fun c => by
+  have hrel'
+      : ∀ c,
+        A.map v.embedding * (σ (sh G c)).map v.embedding
+          = ((σ c).map v.embedding)ᴴ * A.map v.embedding := fun c => by
     have := congrArg (fun M => M.map v.embedding) (hrel c)
     simpa only [Matrix.map_mul, hconj] using this
-  have hskew' : (A.map v.embedding)ᴴ = -A.map v.embedding := by
+  have hskew' : (A.map v.embedding)ᴴ = - A.map v.embedding := by
     rw [← hconj, hskew]
     ext i j
     simp
-  obtain ⟨lam, h1, h2⟩ := archPlace_core G.n_pos (G.psi v) (fun c => (σ c).map v.embedding) (sh G)
-    (fun c => ⟨sh G c, by simp [sh, G.star_star]⟩) S (G.gram v) (A.map v.embedding) hS
-    (G.gram_herm v) (G.gram_det v) hpsi (fun c => G.psi_star v c) hrel' hskew'
-    (fun i j => ⟨σ.symm (Matrix.single i j 1), by
-      ext a b
-      simp [Matrix.single_apply]⟩)
+  obtain ⟨lam, h1, h2⟩ :=
+    archPlace_core G.n_pos (G.psi v)
+      (fun c => (σ c).map v.embedding)
+      (sh G)
+      (fun c => ⟨sh G c, by simp [sh, G.star_star]⟩)
+      S (G.gram v) (A.map v.embedding) hS (G.gram_herm v) (G.gram_det v) hpsi
+      (fun c => G.psi_star v c)
+      hrel' hskew'
+      (fun i j => ⟨
+        σ.symm (Matrix.single i j 1),
+        by
+          ext a b
+          simp [Matrix.single_apply]
+      ⟩)
   exact ⟨S, lam, hS, hpsi, h1, h2⟩

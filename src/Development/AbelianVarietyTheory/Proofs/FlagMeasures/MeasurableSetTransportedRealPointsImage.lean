@@ -6,7 +6,9 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.Poinc
 @[expose] public section
 
 open scoped Classical ENNReal
-open Matrix MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.LocWSOf Formalism.L2.SG.PoincareInHH.PoincareSetting GlobalTheory.CovDom
+open Matrix MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.LocWSOf Formalism.L2.SG.PoincareInHH.PoincareSetting
+  GlobalTheory.CovDom
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
@@ -25,12 +27,15 @@ theorem measCont_trX (X : HidaSetting D) {θ : ℝ} (C : Choice X θ) : Continuo
   refine (continuous_const.matrix_mul ?_).matrix_mul continuous_const
   exact (Units.continuous_val.comp continuous_subtype_val).comp (continuous_apply _)
 
-theorem measInj_trX (X : HidaSetting D) {θ : ℝ} (C : Choice X θ) : Function.Injective (trX X C) := by
+theorem measInj_trX (X : HidaSetting D) {θ : ℝ} (C : Choice X θ)
+    : Function.Injective (trX X C) := by
   intro x y h
   funext v
   obtain ⟨τ, rfl⟩ : ∃ τ, vOf X τ = v := ⟨X.pl v, by simp [vOf]⟩
-  have h2 : C.Qi τ * Formalism.MainNotions.S.uMat (x (vOf X τ)) * C.Q τ =
-      C.Qi τ * Formalism.MainNotions.S.uMat (y (vOf X τ)) * C.Q τ := congrFun h τ
+  have h2
+      : C.Qi τ * Formalism.MainNotions.S.uMat (x (vOf X τ)) * C.Q τ
+        = C.Qi τ * Formalism.MainNotions.S.uMat (y (vOf X τ)) * C.Q τ :=
+    congrFun h τ
   obtain ⟨-, h1, -⟩ := C.isT τ
   have h3 := congrArg (fun M => C.Q τ * M * C.Qi τ) h2
   simp only [Matrix.mul_assoc, h1, Matrix.mul_one] at h3
@@ -55,8 +60,10 @@ theorem measCont_Gm (D : D7) : Continuous (Gm D) := by
   · simp only [Gm, cjw, hw, if_true]
     exact continuous_apply _
   · simp only [Gm, cjw, hw, if_false]
-    exact continuous_pi fun i => continuous_pi fun j =>
-      continuous_star.comp ((continuous_apply j).comp ((continuous_apply i).comp (continuous_apply _)))
+    exact continuous_pi fun i =>
+      continuous_pi fun j =>
+        continuous_star.comp ((continuous_apply j).comp
+          ((continuous_apply i).comp (continuous_apply _)))
 
 theorem measInj_Gm (D : D7) : Function.Injective (Gm D) := by
   intro y z h
@@ -65,8 +72,9 @@ theorem measInj_Gm (D : D7) : Function.Injective (Gm D) := by
   simp only [Gm, measTauOf_mk] at this
   exact measInj_cjw D _ this
 
-theorem measurableSet_Gm_trX_image : ∀ (D : D7) (X : HidaSetting D) (θ : ℝ) (C : Choice X θ) (S : Set X.B.I.Ginf),
-    MeasurableSet S → MeasurableSet (Gm D '' (trX X C '' S)) := by
+theorem measurableSet_Gm_trX_image
+    : ∀ (D : D7) (X : HidaSetting D) (θ : ℝ) (C : Choice X θ) (S : Set X.B.I.Ginf),
+      MeasurableSet S → MeasurableSet (Gm D '' (trX X C '' S)) := by
   intro D X θ C S hS
   haveI : ∀ v, PolishSpace (Formalism.REAL.UJ (X.B.I.ε v)) := fun v => measPolish_UJ _ _
   rw [Set.image_image]

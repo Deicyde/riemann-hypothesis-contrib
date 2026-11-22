@@ -14,8 +14,8 @@ namespace UpperTheory.V.Z.Sym.Glob
 private def val {K : Type} [Field K] (d : K) : Subgroup Kˣ :=
   (Units.map (QuadraticAlgebra.norm : QuadraticAlgebra K d 0 →* K)).range
 
-private theorem mem_val {K : Type} [Field K] (d : K) (u : Kˣ) :
-    u ∈ val d ↔ ∃ a b : K, a ^ 2 - d * b ^ 2 = u := by
+private theorem mem_val {K : Type} [Field K] (d : K) (u : Kˣ)
+    : u ∈ val d ↔ ∃ a b : K, a ^ 2 - d * b ^ 2 = u := by
   constructor
   · rintro ⟨w, rfl⟩
     refine ⟨(w : QuadraticAlgebra K d 0).re, (w : QuadraticAlgebra K d 0).im, ?_⟩
@@ -31,13 +31,16 @@ private theorem mem_val {K : Type} [Field K] (d : K) (u : Kˣ) :
     refine ⟨hw.unit, Units.ext ?_⟩
     simp [hn]
 
-private theorem algNorm {K : Type} [Field K] (d : K) (z : QuadraticAlgebra K d 0) :
-    Algebra.norm K z = QuadraticAlgebra.norm z := by
+private theorem algNorm {K : Type} [Field K] (d : K) (z : QuadraticAlgebra K d 0)
+    : Algebra.norm K z = QuadraticAlgebra.norm z := by
   rw [Algebra.norm_apply, ← QuadraticAlgebra.det_toLinearMap_eq_norm]
   rfl
 
-private theorem index_val {K : Type} [Field K] [CharZero K] [ValuativeRel K] [TopologicalSpace K]
-    [IsNonarchimedeanLocalField K] (d : K) (hd : ¬ IsSquare d) : (val d).index = 2 := by
+private theorem index_val
+    {K : Type}
+    [Field K] [CharZero K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+    (d : K) (hd : ¬ IsSquare d)
+    : (val d).index = 2 := by
   classical
   haveI : IsSepClosure K (AlgebraicClosure K) :=
     IsSepClosure.of_isAlgClosure_of_perfectField K (AlgebraicClosure K)
@@ -57,34 +60,37 @@ private theorem index_val {K : Type} [Field K] [CharZero K] [ValuativeRel K] [To
   haveI : FiniteDimensional K L := Module.finite_of_finrank_eq_succ hrank
   haveI : Algebra.IsQuadraticExtension K L := ⟨hrank⟩
   haveI : IsAbelianGalois K L := IsAbelianGalois.of_isCyclic K L
-  have key := GroundTheory.LocalField.index_range_normUnits_of_isAbelianGalois
-    (K := K) (Ω := AlgebraicClosure K) L
+  have key :=
+    GroundTheory.LocalField.index_range_normUnits_of_isAbelianGalois (K := K)
+      (Ω := AlgebraicClosure K) L
   rw [hrank] at key
   rw [← key]
   congr 1
   let β : L := ⟨α, IntermediateField.mem_adjoin_simple_self K α⟩
   have hβ : β ^ 2 = algebraMap K L d := Subtype.ext (by simpa using hα)
-  let φ : QuadraticAlgebra K d 0 →ₐ[K] L :=
-    { toFun := fun z => algebraMap K L z.re + algebraMap K L z.im * β
-      map_one' := by
-        show algebraMap K L (1 : QuadraticAlgebra K d 0).re +
-          algebraMap K L (1 : QuadraticAlgebra K d 0).im * β = 1
-        rw [show (1 : QuadraticAlgebra K d 0).re = 1 from rfl,
-          show (1 : QuadraticAlgebra K d 0).im = 0 from rfl]
-        simp
-      map_mul' := by
-        intro z w
-        simp only [QuadraticAlgebra.re_mul, QuadraticAlgebra.im_mul, map_add (f := _), map_mul,
-          map_zero, zero_mul, add_zero]
-        linear_combination (-(algebraMap K L z.im * algebraMap K L w.im)) * hβ
-      map_zero' := by simp
-      map_add' := by
-        intro z w
-        simp only [QuadraticAlgebra.re_add, QuadraticAlgebra.im_add, map_add (f := _)]
-        ring
-      commutes' := by intro r; simp }
+  let φ : QuadraticAlgebra K d 0 →ₐ[K] L := {
+    toFun := fun z => algebraMap K L z.re + algebraMap K L z.im * β
+    map_one' := by
+      show algebraMap K L (1 : QuadraticAlgebra K d 0).re +
+        algebraMap K L (1 : QuadraticAlgebra K d 0).im * β = 1
+      rw [show (1 : QuadraticAlgebra K d 0).re = 1 from rfl,
+        show (1 : QuadraticAlgebra K d 0).im = 0 from rfl]
+      simp
+    map_mul' := by
+      intro z w
+      simp only [QuadraticAlgebra.re_mul, QuadraticAlgebra.im_mul, map_add (f := _), map_mul,
+        map_zero, zero_mul, add_zero]
+      linear_combination (-(algebraMap K L z.im * algebraMap K L w.im)) * hβ
+    map_zero' := by simp
+    map_add' := by
+      intro z w
+      simp only [QuadraticAlgebra.re_add, QuadraticAlgebra.im_add, map_add (f := _)]
+      ring
+    commutes' := by intro r; simp
+  }
   have hφ : Function.Injective φ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro z hz
     have hz' : algebraMap K L z.re + algebraMap K L z.im * β = 0 := hz
     have him : z.im = 0 := by
@@ -124,9 +130,11 @@ private theorem index_val {K : Type} [Field K] [CharZero K] [ValuativeRel K] [To
     simp only [Units.coe_map, MonoidHom.coe_coe]
     rw [← hnorm, hx']
 
-private theorem hs_mul {K : Type} [Field K] [CharZero K] [ValuativeRel K] [TopologicalSpace K]
-    [IsNonarchimedeanLocalField K] (d x y : K) (hd : d ≠ 0) (hx : x ≠ 0) (hy : y ≠ 0) :
-    hs d (x * y) = hs d x * hs d y := by
+private theorem hs_mul
+    {K : Type}
+    [Field K] [CharZero K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+    (d x y : K) (hd : d ≠ 0) (hx : x ≠ 0) (hy : y ≠ 0)
+    : hs d (x * y) = hs d x * hs d y := by
   classical
   by_cases hsq : IsSquare d
   · obtain ⟨r, rfl⟩ := hsq
@@ -142,8 +150,7 @@ private theorem hs_mul {K : Type} [Field K] [CharZero K] [ValuativeRel K] [Topol
       ring
     rw [all, all, all, one_mul]
   · have hidx := index_val d hsq
-    have key : ∀ (z : K) (hz : z ≠ 0),
-        hs d z = if Units.mk0 z hz ∈ val d then (1 : ℂ) else -1 := by
+    have key : ∀ (z : K) (hz : z ≠ 0), hs d z = if Units.mk0 z hz ∈ val d then (1 : ℂ) else -1 := by
       intro z hz
       simp only [hs, mem_val, Units.val_mk0]
     rw [key _ (mul_ne_zero hx hy), key _ hx, key _ hy]
@@ -154,8 +161,7 @@ private theorem hs_mul {K : Type} [Field K] [CharZero K] [ValuativeRel K] [Topol
 
 end UpperTheory.V.Z.Sym.Glob
 
-theorem UpperTheory.V.Z.Sym.Glob.hsMul :
-    UpperTheory.V.Z.Sym.Glob.HsMul := by
+theorem UpperTheory.V.Z.Sym.Glob.hsMul : UpperTheory.V.Z.Sym.Glob.HsMul := by
   intro F _ _ v d x y hd hx hy
   haveI : CharZero (Kv v) := charZero_of_injective_algebraMap (algebraMap F (Kv v)).injective
   exact hs_mul d x y hd hx hy

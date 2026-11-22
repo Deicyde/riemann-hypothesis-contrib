@@ -8,20 +8,21 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SpanRangeInf
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.DivisionValues Formalism.L2.DIV Formalism.L2.Indef
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.DivisionValues Formalism.L2.DIV Formalism.L2.Indef
 
 namespace GlobalTheory
 
-theorem perCol_base_smul_form (D : D7) (u : D.what₂.Word) (φ : D.what₂.Mu u) (c : ℂ)
-    (F : D.what₂.Amb D.what₂.mu0) :
-    D.what₂.perCol u D.what₂.mu0 φ (c • F) = c * D.what₂.perCol u D.what₂.mu0 φ F := by
+theorem perCol_base_smul_form
+    (D : D7) (u : D.what₂.Word) (φ : D.what₂.Mu u) (c : ℂ) (F : D.what₂.Amb D.what₂.mu0)
+    : D.what₂.perCol u D.what₂.mu0 φ (c • F) = c * D.what₂.perCol u D.what₂.mu0 φ F := by
   simp only [D.perCol_base_eq_PtilCol, PeriodMap.PtilCol, PeriodMap.Ptil, map_smul, smul_eq_mul]
 
-theorem perCol_eq_pairing_of_kills (D : D7) (h : Formalism.BasicNotions.Rows.BuDefQ D.what₂) (u : D.what₂.Word)
-    (φ : D.what₂.Mu u)
+theorem perCol_eq_pairing_of_kills
+    (D : D7) (h : Formalism.BasicNotions.Rows.BuDefQ D.what₂) (u : D.what₂.Word) (φ : D.what₂.Mu u)
     (hK : ∀ F ∈ D.what₂.Usp D.what₂.mu0, D.what₂.perCol u D.what₂.mu0 φ F = 0)
-    (F : D.what₂.Amb D.what₂.mu0) (hF : F ∈ D.what₂.V0 D.what₂.mu0) :
-    D.what₂.perCol u D.what₂.mu0 φ F = D.what₂.Bu u φ (D.what₂.iota D.what₂.mu0 F) := by
+    (F : D.what₂.Amb D.what₂.mu0) (hF : F ∈ D.what₂.V0 D.what₂.mu0)
+    : D.what₂.perCol u D.what₂.mu0 φ F = D.what₂.Bu u φ (D.what₂.iota D.what₂.mu0 F) := by
   set n : D.what₂.Amb D.what₂.mu0 := (D.what₂.Usp D.what₂.mu0).starProjection F with hn
   have hnU : n ∈ D.what₂.Usp D.what₂.mu0 := Submodule.starProjection_apply_mem _ _
   have hq : F - n ∈ D.what₂.Qsp D.what₂.mu0 :=
@@ -34,12 +35,16 @@ theorem perCol_eq_pairing_of_kills (D : D7) (h : Formalism.BasicNotions.Rows.BuD
   conv_lhs => rw [hF']
   rw [D.perCol_add, hK n hnU, add_zero]
 
-theorem span_range_inf_ker_le_of_basis {K : Type} [Field K] (σ : K →+* ℂ) {W E A I : Type}
-    [AddCommGroup W] [Module ℂ W] [AddCommGroup E] [Module ℂ E] [AddCommGroup A] [Module K A]
-    [Finite I] {n : ℕ} (b : Module.Basis I K A)
-    (j : (Fin n → K) →ₛₗ[σ] W) (j' : A →ₛₗ[σ] E) (f : W →ₗ[ℂ] E) (g : (Fin n → K) →ₗ[K] A)
-    (hli : LinearIndependent ℂ (fun i => j' (b i))) (hf : ∀ x, f (j x) = j' (g x)) :
-    Submodule.span ℂ (Set.range j) ⊓ LinearMap.ker f = Submodule.span ℂ (j '' {x | g x = 0}) := by
+theorem span_range_inf_ker_le_of_basis
+    {K : Type} [Field K]
+    (σ : K →+* ℂ)
+    {W E A I : Type} [AddCommGroup W] [Module ℂ W] [AddCommGroup E] [Module ℂ E] [AddCommGroup A]
+    [Module K A] [Finite I]
+    {n : ℕ}
+    (b : Module.Basis I K A) (j : (Fin n → K) →ₛₗ[σ] W) (j' : A →ₛₗ[σ] E) (f : W →ₗ[ℂ] E)
+    (g : (Fin n → K) →ₗ[K] A)
+    (hli : LinearIndependent ℂ (fun i => j' (b i))) (hf : ∀ x, f (j x) = j' (g x))
+    : Submodule.span ℂ (Set.range j) ⊓ LinearMap.ker f = Submodule.span ℂ (j '' {x | g x = 0}) := by
   classical
   obtain ⟨m, ⟨e⟩⟩ := Finite.exists_equiv_fin I
   let b' := b.reindex e
@@ -47,14 +52,15 @@ theorem span_range_inf_ker_le_of_basis {K : Type} [Field K] (σ : K →+* ℂ) {
   have hM : ∀ x, M.mulVec x = b'.equivFun (g x) := fun x => by
     rw [← Matrix.toLin'_apply, Matrix.toLin'_toMatrix']
     rfl
-  have key := span_range_inf_ker_eq_span_rational_ker σ j
-    (j'.comp b'.equivFun.symm.toLinearMap) f M ?_ ?_
+  have key :=
+    span_range_inf_ker_eq_span_rational_ker σ j (j'.comp b'.equivFun.symm.toLinearMap) f M ?_ ?_
   · rw [key]
     congr 2
     ext x
     simp only [Set.mem_setOf_eq, hM, EmbeddingLike.map_eq_zero_iff]
-  · have h1 : (fun l => (j'.comp b'.equivFun.symm.toLinearMap) (Pi.single l 1))
-        = (fun i => j' (b i)) ∘ e.symm := by
+  · have h1
+        : (fun l => (j'.comp b'.equivFun.symm.toLinearMap) (Pi.single l 1))
+          = (fun i => j' (b i)) ∘ e.symm := by
       funext l
       simp [b', Pi.single_apply]
     rw [h1]

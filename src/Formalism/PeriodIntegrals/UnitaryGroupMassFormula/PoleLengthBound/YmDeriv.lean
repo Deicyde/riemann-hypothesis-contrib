@@ -7,31 +7,34 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.BaseLengthBound.
 
 noncomputable section
 
-open Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions NumberField IsDedekindDomain Module Formalism.MainNotions.Gaps.EtaleWeightGaps Finset.HasAntidiagonal
+open Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.BasicNotions NumberField
+  IsDedekindDomain Module Formalism.MainNotions.Gaps.EtaleWeightGaps Finset.HasAntidiagonal
 
 namespace PI.PoleLengthCount
 
 variable {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ}
 
 section
-variable (X : PJ D B P j) (la : HeightOneSpectrum (𝓞 B.KO)) {N : ℕ} {wL : WeightFamilies.Wt D j} (w : Fin N → B.Cusp j wL)
+variable
+  (X : PJ D B P j) (la : HeightOneSpectrum (𝓞 B.KO))
+  {N : ℕ} {wL : WeightFamilies.Wt D j} (w : Fin N → B.Cusp j wL)
 
 def w0c : Lc X la w := w0inv X la w
 
 def NoRow0 (β : Idx D j N →₀ ℕ) : Prop := ∀ k, β (0, k) = 0
 
-theorem section_mul_inverse_completion :
-    algebraMap (Rp X la N) (Lc X la w) (sec X la w 0) * w0c X la w = 1 :=
+theorem section_mul_inverse_completion
+    : algebraMap (Rp X la N) (Lc X la w) (sec X la w 0) * w0c X la w = 1 :=
   section_mul_inverse_eq_one X la w
 
-theorem coe_sfr_Lc (i : Fin (WeightFamilies.dimY D j + 1)) :
-    ((sfr X la w i : ↥(Frac0 X la w)) : Lw X la w) =
-      algebraMap (Rp X la N) (Lc X la w) (sec X la w i) * w0c X la w := by
+theorem coe_sfr_Lc (i : Fin (WeightFamilies.dimY D j + 1))
+    : ((sfr X la w i : ↥(Frac0 X la w)) : Lw X la w)
+      = algebraMap (Rp X la N) (Lc X la w) (sec X la w i) * w0c X la w := by
   rw [coe_sfr, frac_apply, pow_one]
   rfl
 
-theorem hasse_section_eq_zero {β : Idx D j N →₀ ℕ} (hβ : NoRow0 β) (h0 : β ≠ 0) :
-    hasseRp X la N β (sec X la w 0) = 0 := by
+theorem hasse_section_eq_zero {β : Idx D j N →₀ ℕ} (hβ : NoRow0 β) (h0 : β ≠ 0)
+    : hasseRp X la N β (sec X la w 0) = 0 := by
   rw [hasseRp_sec]
   refine Finset.sum_eq_zero fun k _ => ?_
   rw [hasseOp_Tv, if_neg h0, if_neg, map_zero, zero_smul]
@@ -40,22 +43,24 @@ theorem hasse_section_eq_zero {β : Idx D j N →₀ ℕ} (hβ : NoRow0 β) (h0 
   rw [e, Finsupp.single_eq_same] at this
   exact one_ne_zero this
 
-theorem hasse_sfr {β : Idx D j N →₀ ℕ} (hβ : NoRow0 β) (i : Fin (WeightFamilies.dimY D j + 1)) :
-    hasse X la w β ((sfr X la w i : ↥(Frac0 X la w)) : Lw X la w) =
-      algebraMap (Rp X la N) (Lc X la w) (hasseRp X la N β (sec X la w i)) * w0c X la w := by
+theorem hasse_sfr {β : Idx D j N →₀ ℕ} (hβ : NoRow0 β) (i : Fin (WeightFamilies.dimY D j + 1))
+    : hasse X la w β ((sfr X la w i : ↥(Frac0 X la w)) : Lw X la w)
+      = algebraMap (Rp X la N) (Lc X la w) (hasseRp X la N β (sec X la w i)) * w0c X la w := by
   rw [coe_sfr_Lc]
-  have hy : algebraMap (Rp X la N) (Lc X la w) (sec X la w 0) *
-      (algebraMap (Rp X la N) (Lc X la w) (sec X la w i) * w0c X la w) =
-      algebraMap (Rp X la N) (Lc X la w) (sec X la w i) := by
+  have hy
+      : algebraMap (Rp X la N) (Lc X la w) (sec X la w 0)
+          * (algebraMap (Rp X la N) (Lc X la w) (sec X la w i) * w0c X la w)
+        = algebraMap (Rp X la N) (Lc X la w) (sec X la w i) := by
     rw [mul_left_comm, section_mul_inverse_completion, mul_one]
   have h := hasse_of_mul_eq X la w β hy
   rw [Finset.sum_eq_single ((0 : Idx D j N →₀ ℕ), β)] at h
   · rw [hasseRp_zero] at h
     dsimp only at h
-    calc hasse X la w β (algebraMap (Rp X la N) (Lc X la w) (sec X la w i) * w0c X la w)
-        = (algebraMap (Rp X la N) (Lc X la w) (sec X la w 0) * w0c X la w) *
-            hasse X la w β (algebraMap (Rp X la N) (Lc X la w) (sec X la w i) * w0c X la w) := by
-          rw [section_mul_inverse_completion, one_mul]
+    calc
+      hasse X la w β (algebraMap (Rp X la N) (Lc X la w) (sec X la w i) * w0c X la w)
+          = (algebraMap (Rp X la N) (Lc X la w) (sec X la w 0) * w0c X la w)
+            * hasse X la w β (algebraMap (Rp X la N) (Lc X la w) (sec X la w i) * w0c X la w) := by
+        rw [section_mul_inverse_completion, one_mul]
       _ = _ := by rw [mul_comm (algebraMap _ _ _) (w0c X la w), mul_assoc, h, mul_comm]
   · rintro ⟨q1, q2⟩ hq hne
     rw [mem_antidiagonal] at hq
@@ -78,15 +83,20 @@ end
 
 variable {X : PJ D B P j} {ka wL wF : WeightFamilies.Wt D j}
 
-theorem bcol_apply {N : ℕ} (jj : Fin N) (α : Fin (WeightFamilies.dimY D j) → ℕ) (p : Idx D j N) :
-    PoleLengthBounds.bcol jj α p = if p.2 = jj then Fin.cases (motive := fun _ => ℕ) 0 α p.1 else 0 := rfl
+theorem bcol_apply {N : ℕ} (jj : Fin N) (α : Fin (WeightFamilies.dimY D j) → ℕ) (p : Idx D j N)
+    : PoleLengthBounds.bcol jj α p
+      = if p.2 = jj then Fin.cases (motive := fun _ => ℕ) 0 α p.1 else 0 :=
+  rfl
 
-theorem bcol_noRow0 {N : ℕ} (jj : Fin N) (α : Fin (WeightFamilies.dimY D j) → ℕ) : NoRow0 (PoleLengthBounds.bcol jj α) := fun k => by
+theorem bcol_noRow0 {N : ℕ} (jj : Fin N) (α : Fin (WeightFamilies.dimY D j) → ℕ)
+    : NoRow0 (PoleLengthBounds.bcol jj α) := fun k => by
   rw [bcol_apply]
   split_ifs <;> rfl
 
-theorem bcol_sub_single {N : ℕ} (jj : Fin N) (α : Fin (WeightFamilies.dimY D j) → ℕ) (l : Fin (WeightFamilies.dimY D j)) :
-    PoleLengthBounds.bcol jj α - Finsupp.single (l.succ, jj) 1 = PoleLengthBounds.bcol jj (α - Pi.single l 1) := by
+theorem bcol_sub_single
+    {N : ℕ} (jj : Fin N) (α : Fin (WeightFamilies.dimY D j) → ℕ) (l : Fin (WeightFamilies.dimY D j))
+    : PoleLengthBounds.bcol jj α - Finsupp.single (l.succ, jj) 1
+      = PoleLengthBounds.bcol jj (α - Pi.single l 1) := by
   ext ⟨i, k⟩
   rw [Finsupp.tsub_apply, bcol_apply, bcol_apply, Finsupp.single_apply]
   refine Fin.cases ?_ (fun i => ?_) i
@@ -96,47 +106,55 @@ theorem bcol_sub_single {N : ℕ} (jj : Fin N) (α : Fin (WeightFamilies.dimY D 
     · subst hk
       by_cases hi : i = l
       · subst hi; simp
-      · have : ((l.succ, k) : Idx D j N) ≠ (i.succ, k) := fun e => hi (Fin.succ_injective _ (congrArg Prod.fst e)).symm
+      · have : ((l.succ, k) : Idx D j N) ≠ (i.succ, k) := fun e =>
+          hi (Fin.succ_injective _ (congrArg Prod.fst e)).symm
         simp [this, Pi.single_apply, hi]
     · have : ((l.succ, jj) : Idx D j N) ≠ (i.succ, k) := fun e => hk (congrArg Prod.snd e).symm
       simp [this, hk]
 
-theorem sum_add_single {d : ℕ} (δ : Fin d → ℕ) (l : Fin d) :
-    ∑ i, (δ + Pi.single l 1 : Fin d → ℕ) i = ∑ i, δ i + 1 := by
+theorem sum_add_single {d : ℕ} (δ : Fin d → ℕ) (l : Fin d)
+    : ∑ i, (δ + Pi.single l 1 : Fin d → ℕ) i = ∑ i, δ i + 1 := by
   simp only [Pi.add_apply, Finset.sum_add_distrib, Finset.sum_pi_single', Finset.mem_univ, if_true]
 
-theorem eq_sub_add_single {d : ℕ} (δ : Fin d → ℕ) (l : Fin d) (h : 1 ≤ δ l) :
-    δ = (δ - Pi.single l 1) + Pi.single l 1 := by
+theorem eq_sub_add_single {d : ℕ} (δ : Fin d → ℕ) (l : Fin d) (h : 1 ≤ δ l)
+    : δ = (δ - Pi.single l 1) + Pi.single l 1 := by
   funext i
   by_cases hi : i = l
   · subst hi; simp; omega
   · simp [Pi.single_apply, hi]
 
-theorem sub_single_of_zero {d : ℕ} (δ : Fin d → ℕ) (l : Fin d) (h : δ l = 0) : δ - Pi.single l 1 = δ := by
+theorem sub_single_of_zero {d : ℕ} (δ : Fin d → ℕ) (l : Fin d) (h : δ l = 0)
+    : δ - Pi.single l 1 = δ := by
   funext i
   by_cases hi : i = l
   · subst hi; simp [h]
   · simp [Pi.single_apply, hi]
 
-theorem coe_wfr_Lc (G : GlobalFamilyData X ka wL wF) (la : HeightOneSpectrum (𝓞 B.KO)) (jj : Fin G.N) :
-    ((PoleLengthBounds.wfr G la jj : ↥(Frac0 X la G.w)) : Lw X la G.w) =
-      algebraMap (Rp X la G.N) (Lc X la G.w) (emb X la G.N (X.inc wL (G.w jj))) * w0c X la G.w := by
+theorem coe_wfr_Lc
+    (G : GlobalFamilyData X ka wL wF) (la : HeightOneSpectrum (𝓞 B.KO)) (jj : Fin G.N)
+    : ((PoleLengthBounds.wfr G la jj : ↥(Frac0 X la G.w)) : Lw X la G.w)
+      = algebraMap (Rp X la G.N) (Lc X la G.w) (emb X la G.N (X.inc wL (G.w jj)))
+        * w0c X la G.w := by
   simp only [PoleLengthBounds.wfr, coe_weightZeroFraction, frac_apply, pow_one] <;> rfl
 
-theorem hasse_single_sfr (G : GlobalFamilyData X ka wL wF) (la : HeightOneSpectrum (𝓞 B.KO)) (jj : Fin G.N)
-    (l : Fin (WeightFamilies.dimY D j)) :
-    hasse X la G.w (Finsupp.single ((l.succ, jj) : Idx D j G.N) 1)
-        ((sfr X la G.w l.succ : ↥(Frac0 X la G.w)) : Lw X la G.w) =
-      ((PoleLengthBounds.wfr G la jj : ↥(Frac0 X la G.w)) : Lw X la G.w) := by
+theorem hasse_single_sfr
+    (G : GlobalFamilyData X ka wL wF)
+    (la : HeightOneSpectrum (𝓞 B.KO)) (jj : Fin G.N) (l : Fin (WeightFamilies.dimY D j))
+    : hasse X la G.w (Finsupp.single ((l.succ, jj) : Idx D j G.N) 1)
+        ((sfr X la G.w l.succ : ↥(Frac0 X la G.w)) : Lw X la G.w)
+      = ((PoleLengthBounds.wfr G la jj : ↥(Frac0 X la G.w)) : Lw X la G.w) := by
   have hn : NoRow0 (Finsupp.single ((l.succ, jj) : Idx D j G.N) 1) := fun k => by
     rw [Finsupp.single_apply, if_neg]
     exact fun e => Fin.succ_ne_zero l (congrArg Prod.fst e)
   rw [hasse_sfr X la G.w hn, hasseRp_single, pdRp_sec, if_pos rfl, coe_wfr_Lc]
 
-theorem hasse_sfr_eq_zero (G : GlobalFamilyData X ka wL wF) (la : HeightOneSpectrum (𝓞 B.KO)) (jj : Fin G.N)
-    (α : Fin (WeightFamilies.dimY D j) → ℕ) (l : Fin (WeightFamilies.dimY D j)) {c : Idx D j G.N →₀ ℕ}
-    (hc : ∀ p, c p ≤ PoleLengthBounds.bcol jj α p) (h0 : c ≠ 0) (he : c ≠ Finsupp.single (l.succ, jj) 1) :
-    hasse X la G.w c ((sfr X la G.w l.succ : ↥(Frac0 X la G.w)) : Lw X la G.w) = 0 := by
+theorem hasse_sfr_eq_zero
+    (G : GlobalFamilyData X ka wL wF)
+    (la : HeightOneSpectrum (𝓞 B.KO))
+    (jj : Fin G.N) (α : Fin (WeightFamilies.dimY D j) → ℕ) (l : Fin (WeightFamilies.dimY D j))
+    {c : Idx D j G.N →₀ ℕ} (hc : ∀ p, c p ≤ PoleLengthBounds.bcol jj α p) (h0 : c ≠ 0)
+    (he : c ≠ Finsupp.single (l.succ, jj) 1)
+    : hasse X la G.w c ((sfr X la G.w l.succ : ↥(Frac0 X la G.w)) : Lw X la G.w) = 0 := by
   have hn : NoRow0 c := fun k => by
     have := hc (0, k)
     rw [bcol_noRow0 jj α k] at this
@@ -159,10 +177,16 @@ theorem hasse_sfr_eq_zero (G : GlobalFamilyData X ka wL wF) (la : HeightOneSpect
 
 theorem ymDeriv : PoleLengthBounds.YmDeriv := by
   intro D B P j X ka wL wF G la jj
-  suffices H : ∀ (s : ℕ) (γ α : Fin (WeightFamilies.dimY D j) → ℕ), ∑ i, γ i = s → s ≤ ∑ i, α i →
-      hasse X la G.w (PoleLengthBounds.bcol jj α) ((PoleLengthBounds.ym G la γ : ↥(Frac0 X la G.w)) : Lw X la G.w) =
-        if γ = α then ((PoleLengthBounds.wfr G la jj : ↥(Frac0 X la G.w)) : Lw X la G.w) ^ (∑ i, α i) else 0 from
-    fun γ α h => H _ γ α rfl h
+  suffices H
+      : ∀ (s : ℕ) (γ α : Fin (WeightFamilies.dimY D j) → ℕ),
+        ∑ i, γ i = s → s ≤ ∑ i, α i
+          → hasse X la G.w (PoleLengthBounds.bcol jj α)
+              ((PoleLengthBounds.ym G la γ : ↥(Frac0 X la G.w)) : Lw X la G.w)
+            = if γ = α then
+                ((PoleLengthBounds.wfr G la jj : ↥(Frac0 X la G.w)) : Lw X la G.w) ^ (∑ i, α i)
+              else
+                0 from fun γ α h =>
+    H _ γ α rfl h
   intro s
   induction s with
   | zero =>
@@ -200,30 +224,43 @@ theorem ymDeriv : PoleLengthBounds.YmDeriv := by
       push Not at hc
       have : ∑ i, γ i = 0 := Finset.sum_eq_zero fun i _ => by have := hc i; omega
       omega
-    obtain ⟨γ', rfl⟩ : ∃ γ' : Fin (WeightFamilies.dimY D j) → ℕ, γ = γ' + Pi.single l 1 := ⟨_, eq_sub_add_single γ l hl⟩
+    obtain ⟨γ', rfl⟩ : ∃ γ' : Fin (WeightFamilies.dimY D j) → ℕ, γ = γ' + Pi.single l 1 :=
+      ⟨_, eq_sub_add_single γ l hl⟩
     have hγ's : ∑ i, γ' i = s := by
       have := sum_add_single γ' l
       omega
-    have hym : PoleLengthBounds.ym G la (γ' + Pi.single l 1) = sfr X la G.w l.succ * PoleLengthBounds.ym G la γ' :=
+    have hym
+        : PoleLengthBounds.ym G la (γ' + Pi.single l 1)
+          = sfr X la G.w l.succ * PoleLengthBounds.ym G la γ' :=
       PoleLengthBounds.prod_pow_add_single (fun i => sfr X la G.w i.succ) γ' l
     rw [hym, MulMemClass.coe_mul]
     refine (hasse_mul X la G.w (PoleLengthBounds.bcol jj α) _ _).trans ?_
-    have hIHa : hasse X la G.w (PoleLengthBounds.bcol jj α) ((PoleLengthBounds.ym G la γ' : ↥(Frac0 X la G.w)) : Lw X la G.w) = 0 := by
+    have hIHa
+        : hasse X la G.w (PoleLengthBounds.bcol jj α)
+            ((PoleLengthBounds.ym G la γ' : ↥(Frac0 X la G.w)) : Lw X la G.w)
+          = 0 := by
       rw [ih γ' α hγ's (by omega), if_neg]
       · rfl
       · rintro rfl
         omega
     have hsα : s ≤ ∑ i, (α - Pi.single l 1 : Fin (WeightFamilies.dimY D j) → ℕ) i := by
-      have h1 : ∑ i, α i ≤ ∑ i, ((α - Pi.single l 1) + Pi.single l 1 : Fin (WeightFamilies.dimY D j) → ℕ) i :=
+      have h1
+          : ∑ i, α i
+            ≤ ∑ i, ((α - Pi.single l 1) + Pi.single l 1 : Fin (WeightFamilies.dimY D j) → ℕ) i :=
         Finset.sum_le_sum fun i _ => le_tsub_add
       rw [sum_add_single] at h1
       omega
     have hIHb := ih γ' (α - Pi.single l 1) hγ's hsα
-    have tb : hasse X la G.w (Finsupp.single ((l.succ, jj) : Idx D j G.N) 1)
-          ((sfr X la G.w l.succ : ↥(Frac0 X la G.w)) : Lw X la G.w) *
-        hasse X la G.w (PoleLengthBounds.bcol jj α - Finsupp.single ((l.succ, jj) : Idx D j G.N) 1)
-          ((PoleLengthBounds.ym G la γ' : ↥(Frac0 X la G.w)) : Lw X la G.w) =
-        if γ' + Pi.single l 1 = α then ((PoleLengthBounds.wfr G la jj : ↥(Frac0 X la G.w)) : Lw X la G.w) ^ (∑ i, α i) else 0 := by
+    have tb
+        : hasse X la G.w (Finsupp.single ((l.succ, jj) : Idx D j G.N) 1)
+              ((sfr X la G.w l.succ : ↥(Frac0 X la G.w)) : Lw X la G.w)
+            * hasse X la G.w
+              (PoleLengthBounds.bcol jj α - Finsupp.single ((l.succ, jj) : Idx D j G.N) 1)
+              ((PoleLengthBounds.ym G la γ' : ↥(Frac0 X la G.w)) : Lw X la G.w)
+          = if γ' + Pi.single l 1 = α then
+              ((PoleLengthBounds.wfr G la jj : ↥(Frac0 X la G.w)) : Lw X la G.w) ^ (∑ i, α i)
+            else
+              0 := by
       rw [hasse_single_sfr, bcol_sub_single, hIHb]
       by_cases hγα : γ' + Pi.single l 1 = α
       · have hγ'α : γ' = α - Pi.single l 1 := by
@@ -243,9 +280,13 @@ theorem ymDeriv : PoleLengthBounds.YmDeriv := by
           rw [sub_single_of_zero α l hα0] at h
           subst h
           omega
-    have hne : (((0 : Idx D j G.N →₀ ℕ), PoleLengthBounds.bcol jj α) : (Idx D j G.N →₀ ℕ) × (Idx D j G.N →₀ ℕ)) ≠
-        (Finsupp.single ((l.succ, jj) : Idx D j G.N) 1,
-          PoleLengthBounds.bcol jj α - Finsupp.single ((l.succ, jj) : Idx D j G.N) 1) := fun h =>
+    have hne
+        : (((0 : Idx D j G.N →₀ ℕ), PoleLengthBounds.bcol jj α)
+            : (Idx D j G.N →₀ ℕ) × (Idx D j G.N →₀ ℕ))
+          ≠ (
+            Finsupp.single ((l.succ, jj) : Idx D j G.N) 1,
+            PoleLengthBounds.bcol jj α - Finsupp.single ((l.succ, jj) : Idx D j G.N) 1
+          ) := fun h =>
       (Finsupp.single_ne_zero.2 one_ne_zero) (congrArg Prod.fst h).symm
     rw [Finset.sum_eq_add _ _ hne]
     · dsimp only

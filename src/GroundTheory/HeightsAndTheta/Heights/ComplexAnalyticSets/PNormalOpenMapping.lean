@@ -15,27 +15,36 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open MvPolynomial Topology Metric Matrix
 
-theorem eval_pullback_eq {n k : ℕ} (A : Matrix (Fin k) (Fin n) ℂ) (P : MvPolynomial (Fin k) ℂ)
-    (z : Fin n → ℂ) : eval z (GroundTheory.Heights₂.Heights.ComplexSets.pullback A P) = eval (A *ᵥ z) P := by
+theorem eval_pullback_eq
+    {n k : ℕ} (A : Matrix (Fin k) (Fin n) ℂ) (P : MvPolynomial (Fin k) ℂ) (z : Fin n → ℂ)
+    : eval z (GroundTheory.Heights₂.Heights.ComplexSets.pullback A P) = eval (A *ᵥ z) P := by
   unfold GroundTheory.Heights₂.Heights.ComplexSets.pullback
-  change (aeval z : MvPolynomial (Fin n) ℂ →ₐ[ℂ] ℂ) (aeval (GroundTheory.Heights₂.Heights.ComplexSets.linPoly A) P) = _
+  change (aeval z : MvPolynomial (Fin n) ℂ →ₐ[ℂ] ℂ) (aeval
+      (GroundTheory.Heights₂.Heights.ComplexSets.linPoly A) P)
+    = _
   rw [← AlgHom.comp_apply, MvPolynomial.comp_aeval]
-  have hlin : (fun i => (aeval z : MvPolynomial (Fin n) ℂ →ₐ[ℂ] ℂ) (GroundTheory.Heights₂.Heights.ComplexSets.linPoly A i))
-      = A *ᵥ z := by
+  have hlin
+      : (fun i =>
+          (aeval z : MvPolynomial (Fin n) ℂ →ₐ[ℂ] ℂ)
+            (GroundTheory.Heights₂.Heights.ComplexSets.linPoly A i))
+        = A *ᵥ z := by
     funext i
     simp [GroundTheory.Heights₂.Heights.ComplexSets.linPoly, Matrix.mulVec, dotProduct]
   rw [hlin]
   rfl
 
-theorem exists_eval_ne_zero_of_mem_nhds {k : ℕ} {P : MvPolynomial (Fin k) ℂ} (hP : P ≠ 0)
-    {a : Fin k → ℂ} {N : Set (Fin k → ℂ)} (hN : N ∈ 𝓝 a) : ∃ y ∈ N, eval y P ≠ 0 := by
+theorem exists_eval_ne_zero_of_mem_nhds
+    {k : ℕ} {P : MvPolynomial (Fin k) ℂ} (hP : P ≠ 0)
+    {a : Fin k → ℂ} {N : Set (Fin k → ℂ)} (hN : N ∈ 𝓝 a)
+    : ∃ y ∈ N, eval y P ≠ 0 := by
   by_contra! h
   apply hP
   have han : AnalyticOnNhd ℂ (fun y : Fin k → ℂ => eval y P) Set.univ :=
     AnalyticOnNhd.eval_mvPolynomial P
   have hz : (fun y : Fin k → ℂ => eval y P) =ᶠ[𝓝 a] 0 :=
     Filter.mem_of_superset hN (fun y hy => h y hy)
-  have h0 := han.eqOn_zero_of_preconnected_of_eventuallyEq_zero isPreconnected_univ (Set.mem_univ a) hz
+  have h0 :=
+    han.eqOn_zero_of_preconnected_of_eventuallyEq_zero isPreconnected_univ (Set.mem_univ a) hz
   apply MvPolynomial.funext
   intro y
   simpa using h0 (Set.mem_univ y)
@@ -46,14 +55,14 @@ theorem normalOpenMapping_local_fin
     (hFB : GroundTheory.Heights₂.Heights.ComplexSets.FibreBound.Statement)
     (hDC : GroundTheory.Heights₂.Heights.ComplexSets.DiscriminantCover.Statement)
     (hIFO : HolomorphicIsolatedFibreOpen.Statement)
-    {n k : ℕ} (I : Ideal (MvPolynomial (Fin n) ℂ)) (U : Set (Fin k → ℂ)) (φ : (Fin k → ℂ) → Fin n → ℂ)
+    {n k : ℕ}
+    (I : Ideal (MvPolynomial (Fin n) ℂ)) (U : Set (Fin k → ℂ)) (φ : (Fin k → ℂ) → Fin n → ℂ)
     (hI : I.IsPrime) (hic : IsIntegrallyClosed (MvPolynomial (Fin n) ℂ ⧸ I))
     (hdim : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ I) = (k : ℕ)) (hU : IsOpen U)
     (hφ : DifferentiableOn ℂ φ U) (hinj : Set.InjOn φ U) (hmaps : Set.MapsTo φ U (zeroSetIn I))
-    (u₀ : Fin k → ℂ) (hu₀ : u₀ ∈ U) :
-    ∃ B : Set (Fin n → ℂ), IsOpen B ∧ φ u₀ ∈ B ∧ zeroSetIn I ∩ B ⊆ φ '' U := by
+    (u₀ : Fin k → ℂ) (hu₀ : u₀ ∈ U)
+    : ∃ B : Set (Fin n → ℂ), IsOpen B ∧ φ u₀ ∈ B ∧ zeroSetIn I ∩ B ⊆ φ '' U := by
   classical
-
   obtain ⟨A, hA⟩ := hLNN n k I hdim
   obtain ⟨P, hP0, hPcov⟩ := hDC n k I A hI hdim hA
   set X := zeroSetIn I with hXdef
@@ -65,15 +74,16 @@ theorem normalOpenMapping_local_fin
   have hgd : DifferentiableOn ℂ g U := Lc.differentiable.comp_differentiableOn hφ
   have hw₀X : w₀ ∈ X := hmaps hu₀
 
-  have hfin : (GroundTheory.Heights₂.Heights.ComplexSets.fibre I A a₀).Finite := (hFB n k I A hI hdim hA a₀).2.1
+  have hfin : (GroundTheory.Heights₂.Heights.ComplexSets.fibre I A a₀).Finite :=
+    (hFB n k I A hI hdim hA a₀).2.1
   set W₀ : Set (Fin n → ℂ) := ((GroundTheory.Heights₂.Heights.ComplexSets.fibre I A a₀) \ {w₀})ᶜ with hW₀
   have hW₀o : IsOpen W₀ := (hfin.subset Set.sdiff_subset).isClosed.isOpen_compl
   have hw₀W₀ : w₀ ∈ W₀ := fun h => h.2 rfl
   have hφc : ContinuousAt φ u₀ := (hφ.differentiableAt (hU.mem_nhds hu₀)).continuousAt
 
   obtain ⟨r, hr0, hrU⟩ : ∃ r > 0, closedBall u₀ r ⊆ U ∩ φ ⁻¹' W₀ :=
-    Metric.nhds_basis_closedBall.mem_iff.1
-      (Filter.inter_mem (hU.mem_nhds hu₀) (hφc.preimage_mem_nhds (hW₀o.mem_nhds hw₀W₀)))
+    Metric.nhds_basis_closedBall.mem_iff.1 (Filter.inter_mem (hU.mem_nhds hu₀)
+      (hφc.preimage_mem_nhds (hW₀o.mem_nhds hw₀W₀)))
   set K := closedBall u₀ r with hK
   set V := ball u₀ r with hV
   have hKU : K ⊆ U := fun v hv => (hrU hv).1
@@ -90,7 +100,8 @@ theorem normalOpenMapping_local_fin
     exact hinj (hKU hv) hu₀ h3
 
   have hSK : sphere u₀ r ⊆ K := sphere_subset_closedBall
-  have hgS : IsCompact (g '' sphere u₀ r) := (isCompact_sphere u₀ r).image_of_continuousOn (hgK.mono hSK)
+  have hgS : IsCompact (g '' sphere u₀ r) :=
+    (isCompact_sphere u₀ r).image_of_continuousOn (hgK.mono hSK)
   have ha₀S : a₀ ∉ g '' sphere u₀ r := by
     rintro ⟨v, hv, hgv⟩
     have h := hiso v (hSK hv) hgv
@@ -128,8 +139,9 @@ theorem normalOpenMapping_local_fin
   obtain ⟨B, hBo, hw₀B, hBD, hconn, hdense⟩ := hNLI (Fin n) I h w₀ hI hic hhI hw₀X _ hND
   set C := (X ∩ B) \ {z | eval z h = 0} with hC
 
-  have hop : ∀ v ∈ V, eval (g v) P ≠ 0 →
-      ∃ W' : Set (Fin n → ℂ), IsOpen W' ∧ φ v ∈ W' ∧ X ∩ W' ⊆ φ '' V := by
+  have hop
+      : ∀ v ∈ V,
+        eval (g v) P ≠ 0 → ∃ W' : Set (Fin n → ℂ), IsOpen W' ∧ φ v ∈ W' ∧ X ∩ W' ⊆ φ '' V := by
     intro v hv hPv
     have hvU : v ∈ U := hKU (hVK hv)
     have hfib : φ v ∈ GroundTheory.Heights₂.Heights.ComplexSets.fibre I A (g v) := ⟨hmaps hvU, rfl⟩
@@ -160,10 +172,14 @@ theorem normalOpenMapping_local_fin
     have himo : IsOpen (g '' V1) := by
       rw [isOpen_iff_mem_nhds]
       rintro _ ⟨v', hv', rfl⟩
-      exact hIFO k V1 g v' hV1o hv' hgV1d
-        ⟨V1, hV1o.mem_nhds hv', fun x _ hx he => hginj hx hv' he⟩ V1 (hV1o.mem_nhds hv')
-    refine ⟨W ∩ (fun z => A *ᵥ z) ⁻¹' (g '' V1), hWo.inter (himo.preimage Lc.continuous),
-      ⟨hvW, v, hv1, rfl⟩, ?_⟩
+      exact hIFO k V1 g v' hV1o hv' hgV1d ⟨V1, hV1o.mem_nhds hv', fun x _ hx he => hginj hx hv' he⟩
+        V1 (hV1o.mem_nhds hv')
+    refine ⟨
+      W ∩ (fun z => A *ᵥ z) ⁻¹' (g '' V1),
+      hWo.inter (himo.preimage Lc.continuous),
+      ⟨hvW, v, hv1, rfl⟩,
+      ?_
+    ⟩
     rintro z ⟨hzX, hzW, v', hv', hv'z⟩
     have hmem : z ∈ GroundTheory.Heights₂.Heights.ComplexSets.zeroSet I ∩ W := ⟨hzX, hzW⟩
     rw [hXW] at hmem
@@ -176,8 +192,8 @@ theorem normalOpenMapping_local_fin
   have hUoX : X ∩ Uo ⊆ φ '' V := by
     rintro z ⟨hzX, W, hW, hzW⟩
     exact hW.2 ⟨hzX, hzW⟩
-  have hCX : ∀ z ∈ C, z ∈ X ∧ z ∈ B ∧ eval (A *ᵥ z) P ≠ 0 :=
-    fun z hz => ⟨hz.1.1, hz.1.2, fun h0 => hz.2 ((hevh z).trans h0)⟩
+  have hCX : ∀ z ∈ C, z ∈ X ∧ z ∈ B ∧ eval (A *ᵥ z) P ≠ 0 := fun z hz =>
+    ⟨hz.1.1, hz.1.2, fun h0 => hz.2 ((hevh z).trans h0)⟩
   have hCin : ∀ z ∈ C, z ∈ φ '' V → z ∈ Uo := by
     rintro z hz ⟨v, hv, rfl⟩
     obtain ⟨W', hW'o, hvW', hW'⟩ := hop v hv (hCX _ hz).2.2
@@ -189,7 +205,8 @@ theorem normalOpenMapping_local_fin
     have himg : g '' (V ∩ φ ⁻¹' B) ∈ 𝓝 a₀ :=
       hIFO k U g u₀ hU hu₀ hgd ⟨K, closedBall_mem_nhds u₀ hr0, fun v hv _ he => hiso v hv he⟩ _ hV2
     obtain ⟨y, ⟨v, hv, rfl⟩, hy⟩ := exists_eval_ne_zero_of_mem_nhds hP0 himg
-    exact ⟨φ v, ⟨⟨hmaps (hKU (hVK hv.1)), hv.2⟩, fun h0 => hy ((hevh _).symm.trans h0)⟩, v, hv.1, rfl⟩
+    exact
+      ⟨φ v, ⟨⟨hmaps (hKU (hVK hv.1)), hv.2⟩, fun h0 => hy ((hevh _).symm.trans h0)⟩, v, hv.1, rfl⟩
 
   have hCsub : C ⊆ Uo := by
     have hsplit : C ⊆ Uo ∪ (closure (φ '' V))ᶜ := by
@@ -199,8 +216,9 @@ theorem normalOpenMapping_local_fin
       · exact Or.inr hzc
     by_contra hns
     obtain ⟨z, hzC, hzU⟩ := Set.not_subset.1 hns
-    obtain ⟨z', hz'C, hz'U, hz'c⟩ := hconn Uo (closure (φ '' V))ᶜ hUoo isClosed_closure.isOpen_compl hsplit
-      ⟨z₁, hz₁C, hCin z₁ hz₁C hz₁V⟩ ⟨z, hzC, (hsplit hzC).resolve_left hzU⟩
+    obtain ⟨z', hz'C, hz'U, hz'c⟩ :=
+      hconn Uo (closure (φ '' V))ᶜ hUoo isClosed_closure.isOpen_compl hsplit
+        ⟨z₁, hz₁C, hCin z₁ hz₁C hz₁V⟩ ⟨z, hzC, (hsplit hzC).resolve_left hzU⟩
     exact hz'c (subset_closure (hUoX ⟨(hCX z' hz'C).1, hz'U⟩))
 
   refine ⟨B, hBo, hw₀B, ?_⟩
@@ -215,11 +233,10 @@ theorem NormalOpenMapping.proof
     (hLNN : GroundTheory.Heights₂.Heights.ComplexSets.LinearNoetherNormalization.Statement)
     (hFB : GroundTheory.Heights₂.Heights.ComplexSets.FibreBound.Statement)
     (hDC : GroundTheory.Heights₂.Heights.ComplexSets.DiscriminantCover.Statement)
-    (hIFO : HolomorphicIsolatedFibreOpen.Statement) :
-    NormalOpenMapping.Statement := by
+    (hIFO : HolomorphicIsolatedFibreOpen.Statement)
+    : NormalOpenMapping.Statement := by
   intro σ _ I k U φ hI hic hdim hU hφ hinj hmaps
   classical
-
   set n := Fintype.card σ
   let e : σ ≃ Fin n := Fintype.equivFin σ
   let R : MvPolynomial σ ℂ ≃+* MvPolynomial (Fin n) ℂ := (MvPolynomial.renameEquiv ℂ e).toRingEquiv
@@ -260,8 +277,9 @@ theorem NormalOpenMapping.proof
     rw [hmem, hφ'e]
     exact hmaps ht
   have key : ∀ u ∈ U, ∃ B : Set (Fin n → ℂ), IsOpen B ∧ φ' u ∈ B ∧ zeroSetIn I' ∩ B ⊆ φ' '' U :=
-    fun u hu => normalOpenMapping_local_fin hNLI hLNN hFB hDC hIFO I' U φ' hI' hic' hdim' hU hφ'd hinj'
-      hmaps' u hu
+    fun u hu =>
+      normalOpenMapping_local_fin hNLI hLNN hFB hDC hIFO I' U φ' hI' hic' hdim' hU hφ'd hinj' hmaps'
+        u hu
   choose! Bf hBo hBm hBs using key
 
   let T : (σ → ℂ) → Fin n → ℂ := fun z j => z (e.symm j)

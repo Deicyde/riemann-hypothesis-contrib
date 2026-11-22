@@ -8,20 +8,26 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.TypeN
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.L2.Host GlobalTheory.NT GlobalTheory.Published GlobalTheory.Mem GlobalTheory.Mem.Fld
+open NumberField IsDedekindDomain Formalism.L2.Host GlobalTheory.NT GlobalTheory.Published
+  GlobalTheory.Mem GlobalTheory.Mem.Fld
 open scoped nonZeroDivisors IntermediateField
 
 namespace GlobalTheory.Mem.FieldsEx
 
-theorem exists_unif_one_mod {R : Type} [CommRing R] [IsDedekindDomain R] (𝔮 : Ideal R) (h𝔮 : 𝔮 ≠ ⊥)
-    (v : HeightOneSpectrum R) : ∃ c : R, c ∈ v.asIdeal ∧ c ∉ v.asIdeal ^ 2 ∧
-      ∀ w : HeightOneSpectrum R, w ≠ v → w.asIdeal ∣ 𝔮 → c - 1 ∈ w.asIdeal := by
+theorem exists_unif_one_mod
+    {R : Type} [CommRing R] [IsDedekindDomain R]
+    (𝔮 : Ideal R) (h𝔮 : 𝔮 ≠ ⊥)
+    (v : HeightOneSpectrum R)
+    : ∃ c : R,
+      c ∈ v.asIdeal ∧ c ∉ v.asIdeal ^ 2
+        ∧ ∀ w : HeightOneSpectrum R, w ≠ v → w.asIdeal ∣ 𝔮 → c - 1 ∈ w.asIdeal := by
   classical
   have hfin := Ideal.finite_factors h𝔮
   let S : Finset (HeightOneSpectrum R) := hfin.toFinset.erase v
   have hcop : IsCoprime (v.asIdeal ^ 2) (∏ w ∈ S, w.asIdeal) := by
     refine IsCoprime.pow_left (IsCoprime.prod_right fun w hw => ?_)
-    have hne : v.asIdeal ≠ w.asIdeal := fun h => (Finset.ne_of_mem_erase hw) (HeightOneSpectrum.ext h).symm
+    have hne : v.asIdeal ≠ w.asIdeal := fun h =>
+      (Finset.ne_of_mem_erase hw) (HeightOneSpectrum.ext h).symm
     exact Ideal.isCoprime_iff_sup_eq.2 (v.isMaximal.coprime_of_ne w.isMaximal hne)
   obtain ⟨a, ha, b, hb, hab⟩ := Ideal.isCoprime_iff_exists.1 hcop
   obtain ⟨π, hπ1, hπ2⟩ := Ideal.exists_mem_pow_notMem_pow_succ v.asIdeal v.ne_bot v.isPrime.ne_top 1
@@ -39,12 +45,17 @@ theorem exists_unif_one_mod {R : Type} [CommRing R] [IsDedekindDomain R] (𝔮 :
     rw [this]
     exact Ideal.mul_mem_right _ _ hb'
 
-theorem exists_gen_pow_prime_one_mod (L : Type) [Field L] [NumberField L] (𝔮 : Ideal (𝓞 L)) (h : ℕ) (h𝔮 : 𝔮 ≠ ⊥)
-    (H : ∀ I : Ideal (𝓞 L), I ≠ ⊥ → IsCoprime I 𝔮 →
-      ∃ α β : 𝓞 L, RayPair 𝔮 α β ∧ I ^ h * Ideal.span {β} = Ideal.span {α})
-    (v : HeightOneSpectrum (𝓞 L)) : ∃ k : Lˣ,
-      FractionalIdeal.spanSingleton (𝓞 L)⁰ (k : L) = (v.asIdeal : FractionalIdeal (𝓞 L)⁰ L) ^ h ∧
-      ∀ w : HeightOneSpectrum (𝓞 L), w ≠ v → w.asIdeal ∣ 𝔮 → w.valuation L ((k : L) - 1) < 1 := by
+theorem exists_gen_pow_prime_one_mod
+    (L : Type) [Field L] [NumberField L]
+    (𝔮 : Ideal (𝓞 L)) (h : ℕ)
+    (h𝔮 : 𝔮 ≠ ⊥)
+    (H : ∀ I : Ideal (𝓞 L),
+      I ≠ ⊥ → IsCoprime I 𝔮 → ∃ α β : 𝓞 L, RayPair 𝔮 α β ∧ I ^ h * Ideal.span {β} = Ideal.span {α})
+    (v : HeightOneSpectrum (𝓞 L))
+    : ∃ k : Lˣ,
+      FractionalIdeal.spanSingleton (𝓞 L)⁰ (k : L) = (v.asIdeal : FractionalIdeal (𝓞 L)⁰ L) ^ h
+        ∧ ∀ w : HeightOneSpectrum (𝓞 L),
+          w ≠ v → w.asIdeal ∣ 𝔮 → w.valuation L ((k : L) - 1) < 1 := by
   obtain ⟨c, hc1, hc2, hc3⟩ := exists_unif_one_mod 𝔮 h𝔮 v
   have hc0 : c ≠ 0 := by rintro rfl; exact hc2 (Ideal.zero_mem _)
   obtain ⟨J, hJ⟩ : v.asIdeal ∣ Ideal.span {c} :=
@@ -73,10 +84,15 @@ theorem exists_gen_pow_prime_one_mod (L : Type) [Field L] [NumberField L] (𝔮 
   have hαL : algebraMap (𝓞 L) L α ≠ 0 := by simpa using hα0
   have hβL : algebraMap (𝓞 L) L β ≠ 0 := by simpa using hβ0
   have hcL : algebraMap (𝓞 L) L c ≠ 0 := by simpa using hc0
-  refine ⟨Units.mk0 (algebraMap (𝓞 L) L (c ^ h * β) / algebraMap (𝓞 L) L α)
-    (div_ne_zero (by rw [map_mul, map_pow]; exact mul_ne_zero (pow_ne_zero _ hcL) hβL) hαL), ?_, fun w hw hd => ?_⟩
+  refine ⟨
+    Units.mk0 (algebraMap (𝓞 L) L (c ^ h * β) / algebraMap (𝓞 L) L α)
+      (div_ne_zero (by rw [map_mul, map_pow]; exact mul_ne_zero (pow_ne_zero _ hcL) hβL) hαL),
+    ?_,
+    fun w hw hd => ?_
+  ⟩
   · have hI : Ideal.span {c ^ h * β} = v.asIdeal ^ h * Ideal.span {α} := by
-      rw [← Ideal.span_singleton_mul_span_singleton, ← Ideal.span_singleton_pow, hJ, mul_pow, mul_assoc, hE]
+      rw [← Ideal.span_singleton_mul_span_singleton, ← Ideal.span_singleton_pow, hJ, mul_pow,
+        mul_assoc, hE]
     have hne : FractionalIdeal.spanSingleton (𝓞 L)⁰ (algebraMap (𝓞 L) L α) ≠ 0 :=
       FractionalIdeal.spanSingleton_ne_zero_iff.2 hαL
     apply mul_right_cancel₀ hne
@@ -84,9 +100,10 @@ theorem exists_gen_pow_prime_one_mod (L : Type) [Field L] [NumberField L] (𝔮 
       ← FractionalIdeal.coeIdeal_span_singleton, ← FractionalIdeal.coeIdeal_span_singleton, hI,
       FractionalIdeal.coeIdeal_mul, FractionalIdeal.coeIdeal_pow]
   · have hle : 𝔮 ≤ w.asIdeal := Ideal.le_of_dvd hd
-    have hαw : α ∉ w.asIdeal := fun hm => w.isPrime.ne_top (top_le_iff.1 (by
-      rw [← Ideal.isCoprime_iff_sup_eq.1 hα]
-      exact sup_le ((Ideal.span_singleton_le_iff_mem _).2 hm) hle))
+    have hαw : α ∉ w.asIdeal := fun hm =>
+      w.isPrime.ne_top (top_le_iff.1 (by
+        rw [← Ideal.isCoprime_iff_sup_eq.1 hα]
+        exact sup_le ((Ideal.span_singleton_le_iff_mem _).2 hm) hle))
     have hp : c ^ h - 1 ∈ w.asIdeal := by
       have := sub_dvd_pow_sub_pow c 1 h
       rw [one_pow] at this

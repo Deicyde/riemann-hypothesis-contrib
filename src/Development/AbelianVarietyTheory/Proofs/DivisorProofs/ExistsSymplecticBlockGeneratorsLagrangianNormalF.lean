@@ -6,20 +6,23 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RealisedOne
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.AdelicSvN
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.AdelicSvN
 open scoped Matrix
 
 namespace GlobalTheory.AdelicSvN.LagrangianNormalForm
 
 variable {F : Type} [Field F] {κ : Type} [Fintype κ] [DecidableEq κ]
 
-theorem exists_ginv_form (X : Matrix κ κ F) :
-    ∃ G C : Matrix κ κ F, X * G * X = X ∧ Cᵀ = C ∧ ∀ v, (Xᵀ * C * X) *ᵥ v = 0 → X *ᵥ v = 0 := by
+theorem exists_ginv_form (X : Matrix κ κ F)
+    : ∃ G C : Matrix κ κ F, X * G * X = X ∧ Cᵀ = C ∧ ∀ v, (Xᵀ * C * X) *ᵥ v = 0 → X *ᵥ v = 0 := by
   obtain ⟨L, L', d, h⟩ := Matrix.Pivot.exists_list_transvec_mul_mul_list_transvec_eq_diagonal X
   set P := (L.map Matrix.TransvectionStruct.toMatrix).prod with hP
   set Q := (L'.map Matrix.TransvectionStruct.toMatrix).prod with hQ
-  have dP : IsUnit P.det := by rw [hP, Matrix.TransvectionStruct.det_toMatrix_prod]; exact isUnit_one
-  have dQ : IsUnit Q.det := by rw [hQ, Matrix.TransvectionStruct.det_toMatrix_prod]; exact isUnit_one
+  have dP : IsUnit P.det := by
+    rw [hP, Matrix.TransvectionStruct.det_toMatrix_prod]; exact isUnit_one
+  have dQ : IsUnit Q.det := by
+    rw [hQ, Matrix.TransvectionStruct.det_toMatrix_prod]; exact isUnit_one
   have hX : X = P⁻¹ * Matrix.diagonal d * Q⁻¹ := by
     rw [← h]
     simp only [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ dQ, Matrix.mul_one,
@@ -27,9 +30,12 @@ theorem exists_ginv_form (X : Matrix κ κ F) :
   have hPX : P * X = Matrix.diagonal d * Q⁻¹ := by
     rw [← h]; simp only [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ dQ, Matrix.mul_one]
   refine ⟨Q * Matrix.diagonal (fun i => (d i)⁻¹) * P, Pᵀ * P, ?_, ?_, ?_⟩
-  · have e : Matrix.diagonal d * (Matrix.diagonal (fun i => (d i)⁻¹) * Matrix.diagonal d) = Matrix.diagonal d := by
+  · have e
+        : Matrix.diagonal d * (Matrix.diagonal (fun i => (d i)⁻¹) * Matrix.diagonal d)
+          = Matrix.diagonal d := by
       rw [Matrix.diagonal_mul_diagonal, Matrix.diagonal_mul_diagonal]
-      congr 1; funext i
+      congr 1
+      funext i
       by_cases hi : d i = 0
       · simp [hi]
       · simp [hi]
@@ -46,8 +52,9 @@ theorem exists_ginv_form (X : Matrix κ κ F) :
     rw [e] at hv
     have h2 := congrArg (fun w => Qᵀ *ᵥ w) hv
     simp only [Matrix.mulVec_mulVec, Matrix.mulVec_zero] at h2
-    rw [← Matrix.mul_assoc, ← Matrix.transpose_mul, Matrix.nonsing_inv_mul _ dQ, Matrix.transpose_one,
-      Matrix.one_mul, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec] at h2
+    rw [← Matrix.mul_assoc, ← Matrix.transpose_mul, Matrix.nonsing_inv_mul _ dQ,
+        Matrix.transpose_one, Matrix.one_mul, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec]
+      at h2
     have h3 : Matrix.diagonal d *ᵥ (Q⁻¹ *ᵥ v) = 0 := by
       funext i
       have := congrFun h2 i
@@ -55,11 +62,12 @@ theorem exists_ginv_form (X : Matrix κ κ F) :
       rcases mul_eq_zero.mp this with h0 | h0
       · simp [h0]
       · exact h0
-    rw [hX, Matrix.mul_assoc, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, h3, Matrix.mulVec_zero]
+    rw [hX, Matrix.mul_assoc, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, h3,
+      Matrix.mulVec_zero]
 
-theorem exists_symm_isUnit (X Y : Matrix κ κ F) (hs : Xᵀ * Y = Yᵀ * X)
-    (hi : ∀ v, X *ᵥ v = 0 → Y *ᵥ v = 0 → v = 0) :
-    ∃ C : Matrix κ κ F, Cᵀ = C ∧ IsUnit (Y + C * X).det := by
+theorem exists_symm_isUnit
+    (X Y : Matrix κ κ F) (hs : Xᵀ * Y = Yᵀ * X) (hi : ∀ v, X *ᵥ v = 0 → Y *ᵥ v = 0 → v = 0)
+    : ∃ C : Matrix κ κ F, Cᵀ = C ∧ IsUnit (Y + C * X).det := by
   obtain ⟨G, C, hG, hC, hv⟩ := exists_ginv_form X
   refine ⟨C - Gᵀ * (Xᵀ * Y) * G, ?_, ?_⟩
   · rw [Matrix.transpose_sub, hC]
@@ -83,21 +91,29 @@ theorem exists_symm_isUnit (X Y : Matrix κ κ F) (hs : Xᵀ * Y = Yᵀ * X)
     apply hi v hX
     rwa [Matrix.add_mulVec, ← Matrix.mulVec_mulVec, hX, Matrix.mulVec_zero, add_zero] at hv1
 
-theorem upper_mem (S : Matrix κ κ F) (hS : Sᵀ = S) :
-    Matrix.fromBlocks 1 S 0 1 ∈ Submonoid.closure (gens F κ) := by
-  have hJ : Matrix.fromBlocks (0 : Matrix κ κ F) (1 : Matrix κ κ F) (-1 : Matrix κ κ F) (0 : Matrix κ κ F)
-      ∈ Submonoid.closure (gens F κ) := Submonoid.subset_closure (Or.inr rfl)
-  have hn : Matrix.fromBlocks (1 : Matrix κ κ F) (0 : Matrix κ κ F) (-S) (1 : Matrix κ κ F)
-      ∈ Submonoid.closure (gens F κ) := Submonoid.subset_closure (Or.inl (Or.inr ⟨S, hS, rfl⟩))
+theorem upper_mem (S : Matrix κ κ F) (hS : Sᵀ = S)
+    : Matrix.fromBlocks 1 S 0 1 ∈ Submonoid.closure (gens F κ) := by
+  have hJ
+      : Matrix.fromBlocks (0 : Matrix κ κ F) (1 : Matrix κ κ F) (-1 : Matrix κ κ F)
+          (0 : Matrix κ κ F)
+        ∈ Submonoid.closure (gens F κ) :=
+    Submonoid.subset_closure (Or.inr rfl)
+  have hn
+      : Matrix.fromBlocks (1 : Matrix κ κ F) (0 : Matrix κ κ F) (-S) (1 : Matrix κ κ F)
+        ∈ Submonoid.closure (gens F κ) :=
+    Submonoid.subset_closure (Or.inl (Or.inr ⟨S, hS, rfl⟩))
   have := mul_mem (mul_mem (mul_mem (mul_mem hJ hn) hJ) hJ) hJ
   simpa [Matrix.fromBlocks_multiply] using this
 
-theorem exists_mem_closure (F : Type) [Field F] (κ : Type) [Fintype κ] [DecidableEq κ]
+theorem exists_mem_closure
+    (F : Type) [Field F]
+    (κ : Type) [Fintype κ] [DecidableEq κ]
     (L : Submodule F ((κ → F) × (κ → F)))
-    (hL : ∀ a ∈ L, ∀ b ∈ L, a.1 ⬝ᵥ b.2 = b.1 ⬝ᵥ a.2) (hd : Module.finrank F L = Fintype.card κ) :
-    ∃ g ∈ Submonoid.closure (gens F κ), ∀ y : κ → F,
+    (hL : ∀ a ∈ L, ∀ b ∈ L, a.1 ⬝ᵥ b.2 = b.1 ⬝ᵥ a.2) (hd : Module.finrank F L = Fintype.card κ)
+    : ∃ g ∈ Submonoid.closure (gens F κ), ∀ y : κ → F,
       ((g *ᵥ Sum.elim 0 y) ∘ Sum.inl, (g *ᵥ Sum.elim 0 y) ∘ Sum.inr) ∈ L := by
-  let b : Module.Basis κ F L := (Module.finBasisOfFinrankEq F L hd).reindex (Fintype.equivFin κ).symm
+  let b : Module.Basis κ F L :=
+    (Module.finBasisOfFinrankEq F L hd).reindex (Fintype.equivFin κ).symm
   let X : Matrix κ κ F := Matrix.of fun i j => (b j).1.1 i
   let Y : Matrix κ κ F := Matrix.of fun i j => (b j).1.2 i
   have key : ∀ v : κ → F, (X *ᵥ v, Y *ᵥ v) = ((∑ j, v j • b j : L) : (κ → F) × (κ → F)) := by
@@ -127,11 +143,15 @@ theorem exists_mem_closure (F : Type) [Field F] (κ : Type) [Fintype κ] [Decida
   have hS : (X * M⁻¹)ᵀ = X * M⁻¹ := by
     have h1 : (M⁻¹)ᵀ * Mᵀ = 1 := by
       rw [← Matrix.transpose_mul, Matrix.mul_nonsing_inv _ hM, Matrix.transpose_one]
-    calc (X * M⁻¹)ᵀ = (M⁻¹)ᵀ * (Xᵀ * M) * M⁻¹ := by
-          simp only [Matrix.transpose_mul, Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hM, Matrix.mul_one]
+    calc
+      (X * M⁻¹)ᵀ = (M⁻¹)ᵀ * (Xᵀ * M) * M⁻¹ := by
+        simp only [Matrix.transpose_mul, Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hM,
+          Matrix.mul_one]
       _ = X * M⁻¹ := by rw [hXM, ← Matrix.mul_assoc, h1, Matrix.one_mul]
-  have hn : Matrix.fromBlocks (1 : Matrix κ κ F) (0 : Matrix κ κ F) (-C) (1 : Matrix κ κ F)
-      ∈ Submonoid.closure (gens F κ) := Submonoid.subset_closure (Or.inl (Or.inr ⟨C, hC, rfl⟩))
+  have hn
+      : Matrix.fromBlocks (1 : Matrix κ κ F) (0 : Matrix κ κ F) (-C) (1 : Matrix κ κ F)
+        ∈ Submonoid.closure (gens F κ) :=
+    Submonoid.subset_closure (Or.inl (Or.inr ⟨C, hC, rfl⟩))
   refine ⟨_, mul_mem hn (upper_mem _ hS), fun y => ?_⟩
   have hy : Y *ᵥ (M⁻¹ *ᵥ y) = -(C *ᵥ (X *ᵥ (M⁻¹ *ᵥ y))) + y := by
     have : M *ᵥ (M⁻¹ *ᵥ y) = y := by

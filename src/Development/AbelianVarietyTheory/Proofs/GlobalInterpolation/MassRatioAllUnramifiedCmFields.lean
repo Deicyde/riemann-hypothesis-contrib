@@ -11,6 +11,7 @@ open Formalism.MainNotions
 namespace GlobalTheory.Mass
 
 theorem massRatio_all_unramified_cmFields : StandardLattice.SiegelMassRatioCM :=
-  Formalism.MainNotions.StandardLattice.standardMassRatio_of_modelMassRatio GlobalTheory.Mass.siegelMassRatio_holds
+  Formalism.MainNotions.StandardLattice.standardMassRatio_of_modelMassRatio
+    GlobalTheory.Mass.siegelMassRatio_holds
 
 end GlobalTheory.Mass

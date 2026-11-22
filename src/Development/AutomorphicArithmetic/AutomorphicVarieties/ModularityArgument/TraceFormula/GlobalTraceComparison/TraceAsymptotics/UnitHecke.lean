@@ -10,7 +10,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsCompac
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix Polynomial Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
 open PositivityTheory.Rg.BcB.G8
 open scoped Classical
 
@@ -18,7 +19,9 @@ namespace UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm
 
 theorem unitHecke : UnitHecke := by
   intro E _ _ _ n a b w
-  have hG : ∀ m : ℕ, IsOpen (KGL w (n := m) : Set (GLw m w)) ∧ IsCompact (KGL w (n := m) : Set (GLw m w)) :=
+  have hG
+      : ∀ m : ℕ,
+        IsOpen (KGL w (n := m) : Set (GLw m w)) ∧ IsCompact (KGL w (n := m) : Set (GLw m w)) :=
     fun m => GlobalTheory.LFun.SatCompare.isOpen_isCompact_KGL w m
   have hKLo : IsOpen (KL n w : Set (UL n w)) := (hG n).1.preimage continuous_subtype_val
   have hKLc : IsCompact (KL n w : Set (UL n w)) := GlobalTheory.LocFinU.isCompact_KL n w

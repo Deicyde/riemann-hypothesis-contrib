@@ -4,12 +4,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Bor
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af
+  UpperTheory.V.AlgRepEndIrreducible UpperTheory.V.Lit UpperTheory.V.Lit.Bor
 open MeasureTheory
 open scoped TensorProduct ComplexOrder
 
-theorem UpperTheory.V.Lit.Bor.avgPos :
-    UpperTheory.V.Lit.Bor.AvgPos := by
+theorem UpperTheory.V.Lit.Bor.avgPos : UpperTheory.V.Lit.Bor.AvgPos := by
   intro K _ _ _ _ _ d ρ hρ
   classical
   letI : MeasurableSpace K := borel K
@@ -23,8 +23,9 @@ theorem UpperTheory.V.Lit.Bor.avgPos :
     intro a b
     simp only [F, Matrix.mul_apply, Matrix.conjTranspose_apply]
     exact continuous_finsetSum _ fun l _ => (continuous_star.comp (hc l a)).mul (hc l b)
-  have hlin : ∀ (A C : Matrix (Fin d) (Fin d) ℂ) (i j : Fin d),
-      (A * Matrix.of (fun a b => ∫ h, F h a b ∂μ) * C) i j = ∫ h, (A * F h * C) i j ∂μ := by
+  have hlin
+      : ∀ (A C : Matrix (Fin d) (Fin d) ℂ) (i j : Fin d),
+        (A * Matrix.of (fun a b => ∫ h, F h a b ∂μ) * C) i j = ∫ h, (A * F h * C) i j ∂μ := by
     intro A C i j
     simp only [Matrix.mul_apply, Matrix.of_apply]
     rw [integral_finsetSum]
@@ -36,8 +37,8 @@ theorem UpperTheory.V.Lit.Bor.avgPos :
       · intro a _
         exact hint _ (continuous_const.mul (hFc a b))
     · intro b _
-      exact hint _ ((continuous_finsetSum _ fun a _ => continuous_const.mul (hFc a b)).mul
-        continuous_const)
+      exact hint _
+        ((continuous_finsetSum _ fun a _ => continuous_const.mul (hFc a b)).mul continuous_const)
   refine ⟨Matrix.of fun a b => ∫ h, F h a b ∂μ, ?_, ?_⟩
   · rw [Matrix.posDef_iff_dotProduct_mulVec]
     refine ⟨?_, ?_⟩
@@ -51,8 +52,9 @@ theorem UpperTheory.V.Lit.Bor.avgPos :
       have hq : ∀ h, star x ⬝ᵥ (F h *ᵥ x) = star (ρ h⁻¹ *ᵥ x) ⬝ᵥ (ρ h⁻¹ *ᵥ x) := by
         intro h
         rw [Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec]
-      have hdot : star x ⬝ᵥ (Matrix.of (fun a b => ∫ h, F h a b ∂μ) *ᵥ x) =
-          ∫ h, star x ⬝ᵥ (F h *ᵥ x) ∂μ := by
+      have hdot
+          : star x ⬝ᵥ (Matrix.of (fun a b => ∫ h, F h a b ∂μ) *ᵥ x)
+            = ∫ h, star x ⬝ᵥ (F h *ᵥ x) ∂μ := by
         simp only [dotProduct, Matrix.mulVec, Matrix.of_apply, Finset.mul_sum]
         rw [integral_finsetSum]
         · refine Finset.sum_congr rfl fun i _ => ?_
@@ -62,10 +64,12 @@ theorem UpperTheory.V.Lit.Bor.avgPos :
           · intro j _
             exact hint _ (continuous_const.mul ((hFc i j).mul continuous_const))
         · intro i _
-          exact hint _ (continuous_finsetSum _ fun j _ =>
-            continuous_const.mul ((hFc i j).mul continuous_const))
-      have hre : ∀ h, star (ρ h⁻¹ *ᵥ x) ⬝ᵥ (ρ h⁻¹ *ᵥ x) =
-          ((star (ρ h⁻¹ *ᵥ x) ⬝ᵥ (ρ h⁻¹ *ᵥ x)).re : ℂ) := by
+          exact hint _
+            (continuous_finsetSum _ fun j _ =>
+              continuous_const.mul ((hFc i j).mul continuous_const))
+      have hre
+          : ∀ h,
+            star (ρ h⁻¹ *ᵥ x) ⬝ᵥ (ρ h⁻¹ *ᵥ x) = ((star (ρ h⁻¹ *ᵥ x) ⬝ᵥ (ρ h⁻¹ *ᵥ x)).re : ℂ) := by
         intro h
         have h0 := (Complex.le_def.mp (dotProduct_star_self_nonneg (ρ h⁻¹ *ᵥ x))).2
         rw [Complex.zero_im] at h0
@@ -84,13 +88,12 @@ theorem UpperTheory.V.Lit.Bor.avgPos :
       simp only [hq]
       rw [congrArg (integral μ) (funext hre), integral_complex_ofReal, Complex.zero_lt_real]
       rw [integral_pos_iff_support_of_nonneg]
-      · have hsupp : Function.support (fun h => (star (ρ h⁻¹ *ᵥ x) ⬝ᵥ (ρ h⁻¹ *ᵥ x)).re) =
-            Set.univ := by
+      · have hsupp
+            : Function.support (fun h => (star (ρ h⁻¹ *ᵥ x) ⬝ᵥ (ρ h⁻¹ *ᵥ x)).re) = Set.univ := by
           ext h
           simp only [Function.mem_support, Set.mem_univ, iff_true]
           intro h0
-          have hz : star (ρ h⁻¹ *ᵥ x) ⬝ᵥ (ρ h⁻¹ *ᵥ x) = 0 := by
-            rw [hre h, h0, Complex.ofReal_zero]
+          have hz : star (ρ h⁻¹ *ᵥ x) ⬝ᵥ (ρ h⁻¹ *ᵥ x) = 0 := by rw [hre h, h0, Complex.ofReal_zero]
           rw [dotProduct_star_self_eq_zero] at hz
           apply hx
           have e : ρ h *ᵥ (ρ h⁻¹ *ᵥ x) = x := by
@@ -108,6 +111,7 @@ theorem UpperTheory.V.Lit.Bor.avgPos :
     rw [hlin]
     have hF : ∀ h, (ρ k)ᴴ * F h * ρ k = F (k⁻¹ * h) := by
       intro h
-      simp only [F, _root_.mul_inv_rev, inv_inv, map_mul, Matrix.conjTranspose_mul, Matrix.mul_assoc]
+      simp only [F, _root_.mul_inv_rev, inv_inv, map_mul, Matrix.conjTranspose_mul,
+        Matrix.mul_assoc]
     simp only [hF]
     exact integral_mul_left_eq_self (fun h => F h i j) k⁻¹

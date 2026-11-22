@@ -17,8 +17,7 @@ theorem blocks_form_cycle : BlocksCycle := by
     induction i with
     | zero => intro y; simp
     | succ i ih => intro y; simp [pow_succ, mul_smul, ih]
-  have hord : orderOf (MulAction.toPerm g₀ : Equiv.Perm Ω) = p := by
-    rw [hcyc.orderOf, hsupp]
+  have hord : orderOf (MulAction.toPerm g₀ : Equiv.Perm Ω) = p := by rw [hcyc.orderOf, hsupp]
   have hfix : ∀ y : Ω, g₀ ^ p • y = y := by
     intro y
     have h1 := pow_orderOf_eq_one (MulAction.toPerm g₀ : Equiv.Perm Ω)
@@ -57,16 +56,17 @@ theorem blocks_form_cycle : BlocksCycle := by
       simp only [Finset.mem_biUnion, Finset.mem_univ, iff_true]
       obtain ⟨c, hc, hyc⟩ := hcover y
       exact ⟨c, hc, hyc⟩
-    rw [← Finset.card_univ, ← hU, Finset.card_biUnion (fun c hc c' hc' hne => hdisj c hc c' hc' hne)]
+    rw [← Finset.card_univ, ← hU,
+      Finset.card_biUnion (fun c hc c' hc' hne => hdisj c hc c' hc' hne)]
     exact Finset.sum_const_nat hsize
-  have hmp : Function.minimalPeriod φ b ∣ p :=
-    Function.IsPeriodicPt.minimalPeriod_dvd (hper b)
+  have hmp : Function.minimalPeriod φ b ∣ p := Function.IsPeriodicPt.minimalPeriod_dvd (hper b)
   rcases (Nat.dvd_prime hp).1 hmp with h1 | hpp
   · left
     have hfixb : φ b = b := Function.minimalPeriod_eq_one_iff_isFixedPt.1 h1
     have hsub : (MulAction.toPerm g₀ : Equiv.Perm Ω).support ⊆ b := by
       intro y hy
-      obtain ⟨i, hi⟩ := hcyc.exists_pow_eq (Equiv.Perm.mem_support.1 hx) (Equiv.Perm.mem_support.1 hy)
+      obtain ⟨i, hi⟩ :=
+        hcyc.exists_pow_eq (Equiv.Perm.mem_support.1 hx) (Equiv.Perm.mem_support.1 hy)
       have hib : φ^[i] b = b := Function.iterate_fixed hfixb i
       rw [← hi, hpow, ← hib, hφ]
       exact Finset.mem_image_of_mem _ hxb
@@ -120,6 +120,7 @@ theorem jordan_transitivity : JordanTransitive := by
   have hns : ¬ Group.IsSolvable K :=
     Formalism.GaloisIrreducibility.noSolvableTransitive Ω K σ p hp hσK hpc hlt hle htrK
   intro hG
-  exact hns (Group.isSolvable_of_surjective (MonoidHom.rangeRestrict_surjective (MulAction.toPermHom G Ω)))
+  exact hns (Group.isSolvable_of_surjective (MonoidHom.rangeRestrict_surjective (MulAction.toPermHom
+    G Ω)))
 
 end Formalism.CyclotomicNorms

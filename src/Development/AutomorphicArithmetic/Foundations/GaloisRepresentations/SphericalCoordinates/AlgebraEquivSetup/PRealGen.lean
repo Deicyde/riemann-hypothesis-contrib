@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
+open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip
+  GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
 open scoped TensorProduct
 
 private lemma traceCM_conj {E : Type} [Field E] [NumberField E] [IsCMField E] (z : E) :
@@ -46,8 +47,7 @@ private lemma inCodiff_add {E : Type} [Field E] [NumberField E] {y z : E} (hy : 
   push_cast
   rfl
 
-theorem UpperTheory.Gal.W2.Seed.pRealGen :
-    CodiffGen → CodiffUnit → RealGen := by
+theorem UpperTheory.Gal.W2.Seed.pRealGen : CodiffGen → CodiffUnit → RealGen := by
   intro hgen hunit E _ _ _ bar hbar M hM ε hε
   obtain ⟨y, hy⟩ := hgen E M hM
   by_cases hy0 : y = 0
@@ -63,7 +63,9 @@ theorem UpperTheory.Gal.W2.Seed.pRealGen :
   have hnorm : x0 * bar x0 = (e : 𝓞 E) ^ 2 := by
     apply RingOfIntegers.ext
     have h1 : y * ((e : E) ^ 2) = y * ((x0 : E) * ((bar x0 : 𝓞 E) : E)) := by
-      calc y * ((e : E) ^ 2) = (e : E) * ((e : E) * y) := by ring
+      calc
+        y * ((e : E) ^ 2)
+          = (e : E) * ((e : E) * y) := by ring
         _ = (e : E) * IsCMField.complexConj E y * ((bar x0 : 𝓞 E) : E) := by rw [hx0']; ring
         _ = y * (x0 : E) * ((bar x0 : 𝓞 E) : E) := by rw [hx0]
         _ = _ := by ring
@@ -99,7 +101,8 @@ theorem UpperTheory.Gal.W2.Seed.pRealGen :
         rw [h5]
         exact P.sub_mem (P.sub_mem hu (P.mul_mem_left _ hεP)) (P.mul_mem_left _ h1)
       · apply heP
-        have h5 : (e : 𝓞 E) = (e * ε + x0 * bar ε) - e * (ε + bar ε - 1) + (e - x0) * bar ε := by ring
+        have h5 : (e : 𝓞 E) = (e * ε + x0 * bar ε) - e * (ε + bar ε - 1) + (e - x0) * bar ε := by
+          ring
         rw [h5]
         exact P.add_mem (P.sub_mem hu (P.mul_mem_left _ h1)) (P.mul_mem_left _ hεP)
     · rw [ht, map_mul, ← hbar]

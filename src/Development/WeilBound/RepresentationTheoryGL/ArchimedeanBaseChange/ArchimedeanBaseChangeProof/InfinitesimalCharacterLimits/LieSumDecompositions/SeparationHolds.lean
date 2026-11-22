@@ -14,6 +14,7 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 namespace PositivityTheory.Rg.BcB.SpectralAccumulation.Cz
 
 theorem separation_holds : Sep4 :=
-  separation_of_six_inputs (SliceUniqueness.sliceU_of_noLog2 noLog_holds) blocks_holds leaf_holds2 node_holds types_holds twConc_holds
+  separation_of_six_inputs (SliceUniqueness.sliceU_of_noLog2 noLog_holds) blocks_holds leaf_holds2
+    node_holds types_holds twConc_holds
 
 end PositivityTheory.Rg.BcB.SpectralAccumulation.Cz

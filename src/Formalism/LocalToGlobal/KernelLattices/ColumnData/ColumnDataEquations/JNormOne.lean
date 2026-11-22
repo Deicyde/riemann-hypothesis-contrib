@@ -9,7 +9,8 @@ open Classical Polynomial
 
 namespace Formalism.L2.Ker.Cd.PairingIndexBounds.Eq.J
 
-open Formalism.L2.PairingIndexBounds.Eq.J Formalism.L2.PairingIndexBounds.Eq Formalism.L2.PairingIndexBounds
+open Formalism.L2.PairingIndexBounds.Eq.J Formalism.L2.PairingIndexBounds.Eq
+  Formalism.L2.PairingIndexBounds
 
 section Abstract
 
@@ -17,18 +18,18 @@ variable {E : Type} [Field E] [CharZero E] [StarRing E]
 
 theorem one_add_ne (s : E) (hs : star s = -s) (t : ℕ) : (1 : E) + t * s ≠ 0 := by
   intro h
-  have e : star ((1:E) + t * s) = 1 - t * s := by
+  have e : star ((1 : E) + t * s) = 1 - t * s := by
     rw [star_add, star_one, star_mul, hs, star_natCast]; ring
-  have h2 : (1:E) - t * s = 0 := by rw [← e, h, star_zero]
-  have h3 : (2:E) = 0 := by linear_combination h + h2
+  have h2 : (1 : E) - t * s = 0 := by rw [← e, h, star_zero]
+  have h3 : (2 : E) = 0 := by linear_combination h + h2
   exact two_ne_zero h3
 
 theorem one_sub_ne (s : E) (hs : star s = -s) (t : ℕ) : (1 : E) - t * s ≠ 0 := by
   intro h
-  have e : star ((1:E) - t * s) = 1 + t * s := by
+  have e : star ((1 : E) - t * s) = 1 + t * s := by
     rw [star_sub, star_one, star_mul, hs, star_natCast]; ring
-  have h2 : (1:E) + t * s = 0 := by rw [← e, h, star_zero]
-  have h3 : (2:E) = 0 := by linear_combination h + h2
+  have h2 : (1 : E) + t * s = 0 := by rw [← e, h, star_zero]
+  have h3 : (2 : E) = 0 := by linear_combination h + h2
   exact two_ne_zero h3
 
 def cay (s : E) (t : ℕ) : E := (1 + t * s) / (1 - t * s)
@@ -37,9 +38,9 @@ theorem cay_norm (s : E) (hs : star s = -s) (t : ℕ) : star (cay s t) * cay s t
   unfold cay
   have h1 := one_add_ne s hs t
   have h2 := one_sub_ne s hs t
-  have e1 : star ((1:E) + t * s) = 1 - t * s := by
+  have e1 : star ((1 : E) + t * s) = 1 - t * s := by
     rw [star_add, star_one, star_mul, hs, star_natCast]; ring
-  have e2 : star ((1:E) - t * s) = 1 + t * s := by
+  have e2 : star ((1 : E) - t * s) = 1 + t * s := by
     rw [star_sub, star_one, star_mul, hs, star_natCast]; ring
   rw [star_div₀, e1, e2, div_mul_div_comm, div_eq_one_iff_eq (mul_ne_zero h1 h2)]
   ring
@@ -50,8 +51,8 @@ theorem cay_inj (s : E) (hs : star s = -s) (hs0 : s ≠ 0) : Function.Injective 
   have ha1 := one_sub_ne s hs a
   have hb1 := one_sub_ne s hs b
   rw [div_eq_div_iff ha1 hb1] at hab
-  have h0 : ((a:E) - b) * s * 2 = 0 := by linear_combination hab
-  have hab' : ((a:E) - b) = 0 := by
+  have h0 : ((a : E) - b) * s * 2 = 0 := by linear_combination hab
+  have hab' : ((a : E) - b) = 0 := by
     rcases mul_eq_zero.mp h0 with h | h
     · rcases mul_eq_zero.mp h with h | h
       · exact h
@@ -59,12 +60,11 @@ theorem cay_inj (s : E) (hs : star s = -s) (hs0 : s ≠ 0) : Function.Injective 
     · exact absurd h two_ne_zero
   exact_mod_cast sub_eq_zero.mp hab'
 
-theorem exists_norm_one (s : E) (hs : star s = -s) (hs0 : s ≠ 0) (p : E[X]) (hp : p ≠ 0) :
-    ∃ z : E, star z * z = 1 ∧ z ≠ 1 ∧ p.eval z ≠ 0 := by
+theorem exists_norm_one (s : E) (hs : star s = -s) (hs0 : s ≠ 0) (p : E[X]) (hp : p ≠ 0)
+    : ∃ z : E, star z * z = 1 ∧ z ≠ 1 ∧ p.eval z ≠ 0 := by
   classical
   let S : Finset E := insert 1 p.roots.toFinset
-  have hfin : (cay s ⁻¹' (S : Set E)).Finite :=
-    S.finite_toSet.preimage (cay_inj s hs hs0).injOn
+  have hfin : (cay s ⁻¹' (S : Set E)).Finite := S.finite_toSet.preimage (cay_inj s hs hs0).injOn
   obtain ⟨t, ht⟩ := hfin.infinite_compl.nonempty
   simp only [Set.mem_compl_iff] at ht
   refine ⟨cay s t, cay_norm s hs t, ?_, ?_⟩
@@ -75,17 +75,19 @@ theorem exists_norm_one (s : E) (hs : star s = -s) (hs0 : s ≠ 0) (p : E[X]) (h
     apply ht
     simp [S, Polynomial.mem_roots', hp, h]
 
-theorem eval_charpolyRev' {n : ℕ} (M : Matrix (Fin n) (Fin n) E) (z : E) :
-    M.charpolyRev.eval z = (1 - z • M).det := by
+theorem eval_charpolyRev' {n : ℕ} (M : Matrix (Fin n) (Fin n) E) (z : E)
+    : M.charpolyRev.eval z = (1 - z • M).det := by
   rw [Matrix.charpolyRev, ← coe_evalRingHom, RingHom.map_det]
   congr 1
   ext i j
   simp [Matrix.one_apply, apply_ite]
   exact mul_comm _ _
 
-theorem split_unitary (s : E) (hs : star s = -s) (hs0 : s ≠ 0) {n : ℕ} (γ : Matrix.unitaryGroup (Fin n) E) :
-    ∃ γ₁ γ₂ : Matrix.unitaryGroup (Fin n) E, γ = γ₁ * γ₂ ∧
-      (1 - (γ₁ : Matrix (Fin n) (Fin n) E)).det ≠ 0 ∧ (1 - (γ₂ : Matrix (Fin n) (Fin n) E)).det ≠ 0 := by
+theorem split_unitary
+    (s : E) (hs : star s = -s) (hs0 : s ≠ 0) {n : ℕ} (γ : Matrix.unitaryGroup (Fin n) E)
+    : ∃ γ₁ γ₂ : Matrix.unitaryGroup (Fin n) E,
+      γ = γ₁ * γ₂ ∧ (1 - (γ₁ : Matrix (Fin n) (Fin n) E)).det ≠ 0
+        ∧ (1 - (γ₂ : Matrix (Fin n) (Fin n) E)).det ≠ 0 := by
   classical
   have hp : (γ : Matrix (Fin n) (Fin n) E).charpolyRev ≠ 0 := by
     intro h
@@ -95,8 +97,8 @@ theorem split_unitary (s : E) (hs : star s = -s) (hs0 : s ≠ 0) {n : ℕ} (γ :
   obtain ⟨z, hz, hz1, hev⟩ := exists_norm_one s hs hs0 _ hp
   rw [eval_charpolyRev'] at hev
   have hu : (z • (1 : Matrix (Fin n) (Fin n) E)) ∈ Matrix.unitaryGroup (Fin n) E := by
-    rw [Matrix.mem_unitaryGroup_iff, star_smul, star_one, smul_mul_smul_comm, one_mul,
-      mul_comm z, hz, one_smul]
+    rw [Matrix.mem_unitaryGroup_iff, star_smul, star_one, smul_mul_smul_comm, one_mul, mul_comm z,
+      hz, one_smul]
   have hv : (star z • (1 : Matrix (Fin n) (Fin n) E)) ∈ Matrix.unitaryGroup (Fin n) E := by
     rw [Matrix.mem_unitaryGroup_iff, star_smul, star_one, star_star, smul_mul_smul_comm, one_mul,
       hz, one_smul]
@@ -132,11 +134,11 @@ theorem exists_skew (D : Car) : letI := D.host.cmStar; ∃ s : D.host.E, star s 
   have h := hno (x - star x) (by rw [star_sub, star_star]; ring)
   exact (sub_eq_zero.mp h).symm
 
-theorem split_host (D : Car) {n : ℕ} :
-    letI := D.host.cmStar
-    ∀ γ : Matrix.unitaryGroup (Fin n) D.host.E,
-    ∃ γ₁ γ₂ : Matrix.unitaryGroup (Fin n) D.host.E, γ = γ₁ * γ₂ ∧
-      (1 - (γ₁ : Matrix (Fin n) (Fin n) D.host.E)).det ≠ 0 ∧ (1 - (γ₂ : Matrix (Fin n) (Fin n) D.host.E)).det ≠ 0 := by
+theorem split_host (D : Car) {n : ℕ}
+    : letI := D.host.cmStar
+      ∀ γ : Matrix.unitaryGroup (Fin n) D.host.E, ∃ γ₁ γ₂ : Matrix.unitaryGroup (Fin n) D.host.E,
+        γ = γ₁ * γ₂ ∧ (1 - (γ₁ : Matrix (Fin n) (Fin n) D.host.E)).det ≠ 0
+          ∧ (1 - (γ₂ : Matrix (Fin n) (Fin n) D.host.E)).det ≠ 0 := by
   letI := D.host.cmStar
   intro γ
   obtain ⟨s, hs, hs0⟩ := exists_skew D

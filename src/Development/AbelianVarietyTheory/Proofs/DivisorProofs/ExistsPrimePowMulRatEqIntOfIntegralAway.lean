@@ -5,31 +5,37 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.PointsNonemp
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount GlobalTheory.LKCx
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount GlobalTheory.LKCx
 open scoped TensorProduct Classical
 
 namespace GlobalTheory
 
 open IsDedekindDomain
 
-theorem ratint_away : ∀ (p : ℕ) [Fact p.Prime] (q : ℚ),
-    (∀ v : AwayP p, algebraMap ℚ (v.1.adicCompletion ℚ) q ∈ v.1.adicCompletionIntegers ℚ) →
-    ∃ m : ℕ, ∃ z : ℤ, (p : ℚ) ^ m * q = z := by
+theorem ratint_away
+    : ∀ (p : ℕ) [Fact p.Prime] (q : ℚ),
+      (∀ v : AwayP p, algebraMap ℚ (v.1.adicCompletion ℚ) q ∈ v.1.adicCompletionIntegers ℚ)
+        → ∃ m : ℕ, ∃ z : ℤ, (p : ℚ) ^ m * q = z := by
   intro p hp q h
   have hp' : p.Prime := hp.out
   have key : ∀ {l : ℕ}, l.Prime → l ∣ q.den → l = p := by
     intro l hl hld
     by_contra hne
     have hlI : Prime (l : ℤ) := Nat.prime_iff_prime_int.1 hl
-    let v : HeightOneSpectrum ℤ :=
-      ⟨Ideal.span {(l : ℤ)}, (Ideal.span_singleton_prime hlI.ne_zero).2 hlI, by simpa using hl.ne_zero⟩
+    let v : HeightOneSpectrum ℤ := ⟨
+      Ideal.span {(l : ℤ)},
+      (Ideal.span_singleton_prime hlI.ne_zero).2 hlI,
+      by simpa using hl.ne_zero
+    ⟩
     have hv : v.asIdeal ≠ Ideal.span {(p : ℤ)} := by
       intro e
-      have h1 : (l : ℤ) ∣ (p : ℤ) := Ideal.mem_span_singleton.1 (by
-        have : (p : ℤ) ∈ Ideal.span {(p : ℤ)} := Ideal.mem_span_singleton_self _
-        rw [← e] at this
-        exact Ideal.mem_span_singleton.1 this |>.elim (fun c hc => by
-          exact Ideal.mem_span_singleton.2 ⟨c, hc⟩))
+      have h1 : (l : ℤ) ∣ (p : ℤ) :=
+        Ideal.mem_span_singleton.1 (by
+          have : (p : ℤ) ∈ Ideal.span {(p : ℤ)} := Ideal.mem_span_singleton_self _
+          rw [← e] at this
+          exact Ideal.mem_span_singleton.1 this
+            |>.elim (fun c hc => by exact Ideal.mem_span_singleton.2 ⟨c, hc⟩))
       have h2 : l ∣ p := Int.natCast_dvd_natCast.1 h1
       exact hne ((Nat.prime_dvd_prime_iff_eq hl hp').1 h2)
     have hq := h ⟨v, hv⟩
@@ -55,7 +61,8 @@ theorem ratint_away : ∀ (p : ℕ) [Fact p.Prime] (q : ℚ),
   refine ⟨q.den.primeFactorsList.length, q.num, ?_⟩
   have : ((p : ℚ) ^ q.den.primeFactorsList.length) = (q.den : ℚ) := by
     conv_rhs => rw [hden]
-    push_cast; rfl
+    push_cast
+    rfl
   rw [this, Rat.den_mul_eq_num]
 
 end GlobalTheory

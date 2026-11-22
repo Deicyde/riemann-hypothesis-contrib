@@ -46,14 +46,17 @@ lemma exists_fine_prod {A : AddSubgroup W} {A' : AddSubgroup W'} {φ : W × W' �
   · rw [relIndex_prod]
     exact mul_ne_zero i1 i2
 
-theorem cint_prod (A : AddSubgroup W) (A' : AddSubgroup W') (φ : W × W' → ℂ)
-    (h : Nice (A.prod A') φ) :
-    (∀ w, Nice A' (fun w' => φ (w, w'))) ∧ Nice A (fun w => cint A' (fun w' => φ (w, w'))) ∧
-      cint (A.prod A') φ = cint A (fun w => cint A' (fun w' => φ (w, w'))) := by
+theorem cint_prod
+    (A : AddSubgroup W) (A' : AddSubgroup W') (φ : W × W' → ℂ) (h : Nice (A.prod A') φ)
+    : (∀ w, Nice A' (fun w' => φ (w, w'))) ∧ Nice A (fun w => cint A' (fun w' => φ (w, w')))
+      ∧ cint (A.prod A') φ = cint A (fun w => cint A' (fun w' => φ (w, w'))) := by
   obtain ⟨B, B', hB, hB', i1, i2, hF⟩ := exists_fine_prod h
   let e := QuotientAddGroup.prodEquiv B B'
-  have he : ∀ p : W × W', e (QuotientAddGroup.mk p) =
-      ((QuotientAddGroup.mk p.1 : W ⧸ B), (QuotientAddGroup.mk p.2 : W' ⧸ B')) := fun _ => rfl
+  have he
+      : ∀ p : W × W',
+        e (QuotientAddGroup.mk p)
+          = ((QuotientAddGroup.mk p.1 : W ⧸ B), (QuotientAddGroup.mk p.2 : W' ⧸ B')) := fun _ =>
+    rfl
   have hS := hF.2.2.2.image e
   have f1 : ∀ w, Fine A' (fun w' => φ (w, w')) B' := by
     intro w
@@ -92,9 +95,11 @@ theorem cint_prod (A : AddSubgroup W) (A' : AddSubgroup W') (φ : W × W' → �
     refine hS.subset ?_
     intro p hp
     refine ⟨_, ⟨(p.1.out, p.2.out), hp, rfl⟩, ?_⟩
-    rw [he]; simp
-  have h2 : (∑ᶠ c : (W × W') ⧸ B.prod B', φ c.out) =
-      ∑ᶠ (a : W ⧸ B) (b : W' ⧸ B'), φ (a.out, b.out) := by
+    rw [he]
+    simp
+  have h2
+      : (∑ᶠ c : (W × W') ⧸ B.prod B', φ c.out)
+        = ∑ᶠ (a : W ⧸ B) (b : W' ⧸ B'), φ (a.out, b.out) := by
     rw [← finsum_comp_equiv e.symm, finsum_congr h1, finsum_curry _ hfin]
   rw [h2]
   simp only [div_eq_mul_inv]

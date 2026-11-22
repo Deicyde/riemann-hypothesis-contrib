@@ -4,7 +4,8 @@ public import Development.EtaleCohomology.TateTwists.EtaleTensorPairingSectionsL
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 noncomputable section
 
@@ -14,22 +15,28 @@ def LateralTheory.EtaleFoundations.EtaleTateTwistSectionsLocallyMultiplesOfGener
 
 def LateralTheory.EtaleFoundations.EtaleTateTwistGeneratorRestrictionAndRootChange : Prop :=
   ∀ (q : ℕ) [NeZero q] (j : ℤ),
-    (∀ (V U : Scheme.{0}) (g : V ⟶ U) (ζ : Prim q Γ(U, ⊤)), Sec.res g (twGen j ζ) = twGen j (ζ.map g.appTop.hom)) ∧
-    ∀ (U : Scheme.{0}) (ζ ξ : Prim q Γ(U, ⊤)), Loc U fun _ g => ∃ c : ℕ, Sec.res g (twGen j ξ) = c • twGen j (ζ.map g.appTop.hom)
+    (∀ (V U : Scheme.{0}) (g : V ⟶ U) (ζ : Prim q Γ(U, ⊤)),
+        Sec.res g (twGen j ζ) = twGen j (ζ.map g.appTop.hom))
+      ∧ ∀ (U : Scheme.{0}) (ζ ξ : Prim q Γ(U, ⊤)),
+        Loc U fun _ g => ∃ c : ℕ, Sec.res g (twGen j ξ) = c • twGen j (ζ.map g.appTop.hom)
 
 namespace LateralTheory.EtaleFoundations.GenIsoSurjPf
-theorem res_nsmul {R : Type} [CommRing R] {F : Shv R} {V U : Scheme.{0}} (g : V ⟶ U) (c : ℕ) (x : Sec F U) :
-    Sec.res g (c • x) = c • Sec.res g x := by
+theorem res_nsmul
+    {R : Type} [CommRing R] {F : Shv R} {V U : Scheme.{0}} (g : V ⟶ U) (c : ℕ) (x : Sec F U)
+    : Sec.res g (c • x) = c • Sec.res g x := by
   simp [Sec.res]
 
-theorem map_nsmul' {R : Type} [CommRing R] {F G : Shv R} (φ : F ⟶ G) {U : Scheme.{0}} (c : ℕ) (x : Sec F U) :
-    Sec.map φ (c • x) = c • Sec.map φ x := by
+theorem map_nsmul'
+    {R : Type} [CommRing R] {F G : Shv R} (φ : F ⟶ G) {U : Scheme.{0}} (c : ℕ) (x : Sec F U)
+    : Sec.map φ (c • x) = c • Sec.map φ x := by
   simp [Sec.map]
 end LateralTheory.EtaleFoundations.GenIsoSurjPf
 
 open LateralTheory.EtaleFoundations.GenIsoSurjPf in
-theorem LateralTheory.EtaleFoundations.etale_tate_twist_generator_map_hits_products_locally (hl : LateralTheory.EtaleFoundations.EtaleTateTwistSectionsLocallyMultiplesOfGenerator)
-    (hr : LateralTheory.EtaleFoundations.EtaleTateTwistGeneratorRestrictionAndRootChange) : LateralTheory.EtaleFoundations.EtaleTateTwistGeneratorMapHitsProductsLocally := by
+theorem LateralTheory.EtaleFoundations.etale_tate_twist_generator_map_hits_products_locally
+    (hl : LateralTheory.EtaleFoundations.EtaleTateTwistSectionsLocallyMultiplesOfGenerator)
+    (hr : LateralTheory.EtaleFoundations.EtaleTateTwistGeneratorRestrictionAndRootChange)
+    : LateralTheory.EtaleFoundations.EtaleTateTwistGeneratorMapHitsProductsLocally := by
   intro q _ i j k T μ hk φ hφ U a b
   refine loc_bind' (loc_mono' (loc_and' (hl q i U a) (hl q j U b)) fun V g hab => ?_)
   rcases hab with ⟨ha | ⟨ζ, c, ha⟩, hb | ⟨ξ, d, hb⟩⟩
@@ -43,6 +50,9 @@ theorem LateralTheory.EtaleFoundations.etale_tate_twist_generator_map_hits_produ
     simp only [map_nsmul, LinearMap.smul_apply, smul_smul]
     ring_nf
 
-theorem LateralTheory.EtaleFoundations.etale_tate_twist_generator_map_surjective_of_local_and_root (hl : LateralTheory.EtaleFoundations.EtaleTateTwistSectionsLocallyMultiplesOfGenerator)
-    (hr : LateralTheory.EtaleFoundations.EtaleTateTwistGeneratorRestrictionAndRootChange) : LateralTheory.EtaleFoundations.EtaleTateTwistGeneratorMapLocallySurjective :=
-  LateralTheory.EtaleFoundations.etale_tate_twist_generator_map_locally_surjective_of_pairs (LateralTheory.EtaleFoundations.etale_tate_twist_generator_map_hits_products_locally hl hr)
+theorem LateralTheory.EtaleFoundations.etale_tate_twist_generator_map_surjective_of_local_and_root
+    (hl : LateralTheory.EtaleFoundations.EtaleTateTwistSectionsLocallyMultiplesOfGenerator)
+    (hr : LateralTheory.EtaleFoundations.EtaleTateTwistGeneratorRestrictionAndRootChange)
+    : LateralTheory.EtaleFoundations.EtaleTateTwistGeneratorMapLocallySurjective :=
+  LateralTheory.EtaleFoundations.etale_tate_twist_generator_map_locally_surjective_of_pairs
+    (LateralTheory.EtaleFoundations.etale_tate_twist_generator_map_hits_products_locally hl hr)

@@ -13,9 +13,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.Geometricall
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS GlobalTheory.CovTop GlobalTheory.HSApp GlobalTheory.Cartier
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS
+  GlobalTheory.CovTop GlobalTheory.HSApp GlobalTheory.Cartier
 open GlobalTheory.AllWt (Psi wtOf cuspOn cuspW secZ ptF LiesOn)
 open GlobalTheory.FlagMod (FlagCover)
 open GlobalTheory.CompHt (hodgeWt)
@@ -27,8 +29,9 @@ noncomputable section
 
 namespace GlobalTheory.QuotSetup
 
-theorem geometricallyConnected_of_surjective {X Y Z : Scheme.{0}} (p : X ⟶ Y) (f : Y ⟶ Z)
-    [Surjective p] [GeometricallyConnected (p ≫ f)] : GeometricallyConnected f := by
+theorem geometricallyConnected_of_surjective
+    {X Y Z : Scheme.{0}} (p : X ⟶ Y) (f : Y ⟶ Z) [Surjective p] [GeometricallyConnected (p ≫ f)]
+    : GeometricallyConnected f := by
   refine ⟨geometrically_iff_of_isClosedUnderIsomorphisms.mpr fun K _ x => ?_⟩
   have : ConnectedSpace ↥(pullback (p ≫ f) x) :=
     GeometricallyConnected.geometrically_connectedSpace _ _ _ (.of_hasPullback _ _)
@@ -36,19 +39,23 @@ theorem geometricallyConnected_of_surjective {X Y Z : Scheme.{0}} (p : X ⟶ Y) 
   have : Surjective q := inferInstance
   exact q.surjective.connectedSpace q.continuous
 
-theorem genericPoint_mem {X : Scheme.{0}} [IsIntegral X] (U : X.Opens) (hU : (U : Set X).Nonempty) :
-    genericPoint X ∈ U :=
+theorem genericPoint_mem {X : Scheme.{0}} [IsIntegral X] (U : X.Opens) (hU : (U : Set X).Nonempty)
+    : genericPoint X ∈ U :=
   ((genericPoint_spec X).mem_open_set_iff U.isOpen).2 (by simpa using hU)
 
-theorem map_genericPoint {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y] (f : X ⟶ Y) [IsDominant f] :
-    f (genericPoint X) = genericPoint Y := by
+theorem map_genericPoint {X Y : Scheme.{0}} [IsIntegral X] [IsIntegral Y] (f : X ⟶ Y) [IsDominant f]
+    : f (genericPoint X) = genericPoint Y := by
   have := (genericPoint_spec X).image f.continuous
   rw [Set.image_univ, f.denseRange.closure_range] at this
   exact this.eq (genericPoint_spec Y)
 
-theorem surjective_of_isProjOver {F : Type} [Field F] {Y Z : Scheme.{0}} [IsIntegral Z] (p : Y ⟶ Sp F)
-    (pZ : Z ⟶ Sp F) (f : Y ⟶ Z) (hf : f ≫ pZ = p) (hp : IsProjOver p) (hZ : IsProjOver pZ) (y : Y)
-    (hy : f y = genericPoint Z) : Surjective f := by
+theorem surjective_of_isProjOver
+    {F : Type} [Field F]
+    {Y Z : Scheme.{0}} [IsIntegral Z]
+    (p : Y ⟶ Sp F) (pZ : Z ⟶ Sp F) (f : Y ⟶ Z) (hf : f ≫ pZ = p)
+    (hp : IsProjOver p) (hZ : IsProjOver pZ)
+    (y : Y) (hy : f y = genericPoint Z)
+    : Surjective f := by
   have h₁ : IsProper (f ≫ pZ) := hf ▸ ((isProjOver_iff_isProper_and_exists_isAmpleLB p).1 hp).1
   have : IsProper pZ := ((isProjOver_iff_isProper_and_exists_isAmpleLB pZ).1 hZ).1
   have : IsProper f := IsProper.of_comp f pZ
@@ -60,8 +67,29 @@ end GlobalTheory.QuotSetup
 
 namespace GlobalTheory.QuotSetup
 
-theorem exists_resolved_modification : GlobalTheory.Published.Principalisation → ∀ (F : Type) [Field F] [CharZero F] (X X' W V : Scheme.{0}) [IsIntegral X] [IsIntegral X'] [IsIntegral W] (sX : X ⟶ Sp F) (n : ℕ) [SmoothOfRelativeDimension n sX] (φ : X' ⟶ X) (q : X' ⟶ W) (sW : W ⟶ Sp F) (i : V ⟶ X) (ℓ : V ⟶ X'), IsProjOver sX → GeometricallyConnected sX → IsProjOver (φ ≫ sX) → IsProjOver sW → IsFinite q → Surjective q → q ≫ sW = φ ≫ sX → IsOpenImmersion i → IsOpenImmersion ℓ → ℓ ≫ φ = i → ∀ (δ : LB X) (hδ : δ.IsLB) (N : LB W) (hN : N.IsLB), CechPic.pull q (cls N hN) = CechPic.pull φ (cls δ hδ) → ∀ (J : Type) (v : J → (Sp ℂ ⟶ V)), (∀ j j', v j ≫ ℓ ≫ q = v j' ≫ ℓ ≫ q) → (∃ j, ∀ s, (v j ≫ i) s = genericPoint X) → ∃ (W' : Scheme.{0}) (_ : IsIntegral W') (pW : W' ⟶ Sp F) (U : X.Opens) (M : Modif sX U n) (f : M.X ⟶ W') (NW : LB W') (hNW : NW.IsLB), IsIntegral M.X ∧ SmoothOfRelativeDimension n pW ∧ IsProjOver pW ∧ GeometricallyConnected pW ∧ f ≫ pW = M.str ∧ Surjective f ∧ (U : Set X).Nonempty ∧ CechPic.pull f (cls NW hNW) = CechPic.pull M.σ (cls δ hδ) ∧ ∃ z : J → (Sp ℂ ⟶ M.X), (∀ j, ⊤ ≤ z j ⁻¹ᵁ M.opn) ∧ (∀ j, z j ≫ M.σ = v j ≫ i) ∧ (∀ j j', z j ≫ f = z j' ≫ f) ∧ (∀ j s, (z j ≫ f) s = genericPoint W') := by
-  intro hP F _ _ X X' W V _ _ _ sX n _ φ q sW i ℓ hsX hgc hφ hsW hqf hqs hw hi hℓ hℓi δ hδ N hN hNδ J v hv hgen
+theorem exists_resolved_modification
+    : GlobalTheory.Published.Principalisation
+      → ∀ (F : Type) [Field F] [CharZero F] (X X' W V : Scheme.{0}) [IsIntegral X] [IsIntegral X']
+          [IsIntegral W] (sX : X ⟶ Sp F) (n : ℕ) [SmoothOfRelativeDimension n sX] (φ : X' ⟶ X)
+          (q : X' ⟶ W) (sW : W ⟶ Sp F) (i : V ⟶ X) (ℓ : V ⟶ X'),
+        IsProjOver sX → GeometricallyConnected sX → IsProjOver (φ ≫ sX) → IsProjOver sW → IsFinite q
+          → Surjective q → q ≫ sW = φ ≫ sX → IsOpenImmersion i → IsOpenImmersion ℓ → ℓ ≫ φ = i
+          → ∀ (δ : LB X) (hδ : δ.IsLB) (N : LB W) (hN : N.IsLB),
+            CechPic.pull q (cls N hN) = CechPic.pull φ (cls δ hδ)
+              → ∀ (J : Type) (v : J → (Sp ℂ ⟶ V)),
+                (∀ j j', v j ≫ ℓ ≫ q = v j' ≫ ℓ ≫ q) → (∃ j, ∀ s, (v j ≫ i) s = genericPoint X)
+                  → ∃ (W' : Scheme.{0}) (_ : IsIntegral W') (pW : W' ⟶ Sp F) (U : X.Opens)
+                      (M : Modif sX U n) (f : M.X ⟶ W') (NW : LB W') (hNW : NW.IsLB),
+                    IsIntegral M.X ∧ SmoothOfRelativeDimension n pW ∧ IsProjOver pW
+                      ∧ GeometricallyConnected pW ∧ f ≫ pW = M.str ∧ Surjective f
+                      ∧ (U : Set X).Nonempty
+                      ∧ CechPic.pull f (cls NW hNW) = CechPic.pull M.σ (cls δ hδ)
+                      ∧ ∃ z : J → (Sp ℂ ⟶ M.X),
+                        (∀ j, ⊤ ≤ z j ⁻¹ᵁ M.opn) ∧ (∀ j, z j ≫ M.σ = v j ≫ i)
+                          ∧ (∀ j j', z j ≫ f = z j' ≫ f)
+                          ∧ (∀ j s, (z j ≫ f) s = genericPoint W') := by
+  intro hP F _ _ X X' W V _ _ _ sX n _ φ q sW i ℓ hsX hgc hφ hsW hqf hqs hw hi hℓ hℓi δ hδ N hN hNδ
+    J v hv hgen
   obtain ⟨j₀, hj₀⟩ := hgen
   obtain ⟨o₀⟩ : Nonempty (Sp ℂ) := inferInstance
   haveI : Nonempty V := ⟨v j₀ o₀⟩
@@ -79,15 +107,18 @@ theorem exists_resolved_modification : GlobalTheory.Published.Principalisation �
     rw [h₁, genericPoint_eq_of_isOpenImmersion ℓ, map_genericPoint q]
 
   have hdW : topologicalKrullDim W = n := by
-    have hdX : topologicalKrullDim X = n := GlobalTheory.HSCore.VanishNumberField.topologicalKrullDim_eq_of_smooth sX n inferInstance
+    have hdX : topologicalKrullDim X = n :=
+      GlobalTheory.HSCore.VanishNumberField.topologicalKrullDim_eq_of_smooth sX n inferInstance
     have hdV := GlobalTheory.T.topologicalKrullDim_eq_of_openImmersion_integral_scheme F X V sX i
-    have hdV' := GlobalTheory.T.topologicalKrullDim_eq_of_openImmersion_integral_scheme F X' V (φ ≫ sX) ℓ
+    have hdV' :=
+      GlobalTheory.T.topologicalKrullDim_eq_of_openImmersion_integral_scheme F X' V (φ ≫ sX) ℓ
     have h₁ := PosBaseChange.dim_le_of_isClosedMap q.isClosedMap q.surjective
     have h₂ := PosBaseChange.dim_le_of_isDiscrete q.continuous q.isDiscrete_preimage_singleton
     rw [← hdX, ← hdV, hdV']
     exact le_antisymm h₁ h₂
 
-  obtain ⟨W', s, UW, hW', hsm, hpj, hUW, hiso⟩ := GlobalTheory.T.weak_resolution_of_principalisation hP F W sW n hsW hdW
+  obtain ⟨W', s, UW, hW', hsm, hpj, hUW, hiso⟩ :=
+    GlobalTheory.T.weak_resolution_of_principalisation hP F W sW n hsW hdW
   haveI := hW'
   haveI := hiso
   have hηUW : genericPoint W ∈ UW := genericPoint_mem UW hUW
@@ -123,7 +154,8 @@ theorem exists_resolved_modification : GlobalTheory.Published.Principalisation �
     simp only [r₀, pullback.lift_snd_assoc, Category.assoc]
     rw [reassoc_of% hb, reassoc_of% hcf, hw, reassoc_of% hℓi, reassoc_of% he]
   obtain ⟨M, r, hMi, hrt, hrM⟩ :=
-    GlobalTheory.T.exists_modification_extending_map_from_open hP F X (pullback q s) sX n (pullback.snd q s ≫ s ≫ sW) U r₀ inferInstance hsX ht hUne hr₀
+    GlobalTheory.T.exists_modification_extending_map_from_open hP F X (pullback q s) sX n
+      (pullback.snd q s ≫ s ≫ sW) U r₀ inferInstance hsX ht hUne hr₀
   haveI := hMi
   have hsep : IsSeparated sX := inferInstance
   haveI : IsDominant M.opn.ι := ⟨show Dense (Set.range M.opn.ι) by rw [Scheme.Opens.range_ι]; exact M.dense⟩
@@ -138,8 +170,7 @@ theorem exists_resolved_modification : GlobalTheory.Published.Principalisation �
   let f : M.X ⟶ W' := r ≫ pullback.snd q s
   have hfs : f ≫ s = (r ≫ pullback.fst q s) ≫ q := by
     simp only [f, Category.assoc, pullback.condition]
-  have hfp : f ≫ s ≫ sW = M.str := by
-    simp only [f, Category.assoc]; exact hrt
+  have hfp : f ≫ s ≫ sW = M.str := by simp only [f, Category.assoc]; exact hrt
 
   have hvU : ∀ j, ⊤ ≤ (v j ≫ i) ⁻¹ᵁ U := fun j o _ => by
     show (v j ≫ i) o ∈ U
@@ -158,7 +189,8 @@ theorem exists_resolved_modification : GlobalTheory.Published.Principalisation �
     let w := IsOpenImmersion.lift M.opn.ι (z j) hr
     have hw' : w ≫ M.opn.ι = z j := IsOpenImmersion.lift_fac _ _ _
     have hwe : w ≫ (M.σ ∣_ U) ≫ e = v j := by
-      rw [← cancel_mono i, Category.assoc, Category.assoc, he, morphismRestrict_ι, reassoc_of% hw', hz j]
+      rw [← cancel_mono i, Category.assoc, Category.assoc, he, morphismRestrict_ι, reassoc_of% hw',
+        hz j]
     refine ⟨w ≫ (M.σ ∣_ U) ≫ c, ?_, ?_⟩
     · rw [Category.assoc, Category.assoc, hcf, ← reassoc_of% hwe]
     · simp only [f, ← hw', Category.assoc]
@@ -174,13 +206,36 @@ theorem exists_resolved_modification : GlobalTheory.Published.Principalisation �
     rw [hzd j, Scheme.Hom.comp_apply, h₁]
     exact genericPoint_eq_of_isOpenImmersion b
   have hfsurj : Surjective f :=
-    surjective_of_isProjOver M.str (s ≫ sW) f hfp M.proj hpj (z j₀ o₀) (by rw [← Scheme.Hom.comp_apply]; exact hgen' j₀ o₀)
-  have hgcM : GeometricallyConnected M.str := GlobalTheory.T.geometricallyConnected_smoothProjModification_offOpen F X sX n U M hUne
+    surjective_of_isProjOver M.str (s ≫ sW) f hfp M.proj hpj (z j₀ o₀)
+      (by rw [← Scheme.Hom.comp_apply]; exact hgen' j₀ o₀)
+  have hgcM : GeometricallyConnected M.str :=
+    GlobalTheory.T.geometricallyConnected_smoothProjModification_offOpen F X sX n U M hUne
   have hgcW : GeometricallyConnected (s ≫ sW) := by
     rw [← hfp] at hgcM
     exact geometricallyConnected_of_surjective f (s ≫ sW)
-  refine ⟨W', hW', s ≫ sW, U, M, f, N.pull s, LB.isLB_pull hN s, hMi, hsm, hpj, hgcW, hfp, hfsurj, hUne, ?_,
-    z, hzU, hz, fun j j' => ?_, hgen'⟩
+  refine ⟨
+    W',
+    hW',
+    s ≫ sW,
+    U,
+    M,
+    f,
+    N.pull s,
+    LB.isLB_pull hN s,
+    hMi,
+    hsm,
+    hpj,
+    hgcW,
+    hfp,
+    hfsurj,
+    hUne,
+    ?_,
+    z,
+    hzU,
+    hz,
+    fun j j' => ?_,
+    hgen'
+  ⟩
   · rw [cls_pull hN s, ← pull_comp, hfs, pull_comp, hNδ, ← pull_comp, Category.assoc, hσ]
   · rw [hzd j, hzd j']
     congr 1

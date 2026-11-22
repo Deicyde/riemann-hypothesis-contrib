@@ -13,18 +13,21 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.SelmerGr
 
 noncomputable section
 
-open NumberField IsDedekindDomain Representation Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.Published GlobalTheory.Published.PoitouTate
-  PositivityTheory.PoitouTateConclusion GroundTheory.ProfCoh GroundTheory.Global CategoryTheory
+open NumberField IsDedekindDomain Representation Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.Published GlobalTheory.Published.PoitouTate PositivityTheory.PoitouTateConclusion
+  GroundTheory.ProfCoh GroundTheory.Global CategoryTheory
 
 namespace PositivityTheory.Lit1.PTN
 
-abbrev toFS (K : IntermediateField ℚ (AlgebraicClosure ℚ)) [FiniteDimensional ℚ K] : FiniteSubfield :=
+abbrev toFS (K : IntermediateField ℚ (AlgebraicClosure ℚ)) [FiniteDimensional ℚ K]
+    : FiniteSubfield :=
   ⟨K, inferInstance⟩
 
 section
 attribute [local instance 2000] Rep.hV2
-theorem finite_dualRep' {G : Type} [Group G] (D A : Rep.{0} (ULift.{0} ℤ) G) [Finite D] [Finite A] :
-    Finite (dualRep D A) := inferInstance
+theorem finite_dualRep' {G : Type} [Group G] (D A : Rep.{0} (ULift.{0} ℤ) G) [Finite D] [Finite A]
+    : Finite (dualRep D A) :=
+  inferInstance
 end
 
 set_option maxHeartbeats 0 in

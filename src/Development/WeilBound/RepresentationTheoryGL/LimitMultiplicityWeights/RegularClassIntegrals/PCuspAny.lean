@@ -7,11 +7,13 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.TypeHypot
 @[expose] public section
 
 open MeasureTheory Set Filter NumberField IsDedekindDomain
-open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary
+  GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult
 open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots (IsTestData NoFixed)
 open GlobalTheory.TrMult GlobalTheory.TruncKer
-open GlobalTheory.IndefiniteRowSideFullHecke.ConstantTermVanishing GlobalTheory.Proof.parabolic_and_constant_term
+open GlobalTheory.IndefiniteRowSideFullHecke.ConstantTermVanishing
+  GlobalTheory.Proof.parabolic_and_constant_term
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
@@ -25,8 +27,9 @@ theorem MainStatements.WeightKernel.cuspAny : MainStatements.WeightKernel.CuspAn
   obtain ⟨h, hh, e⟩ := hff.2.1 v
   have hF := hff.isFinFamily
   have he := (T.frame v).idem_mem (μf v.1) (T.τ v)
-  refine GlobalTheory.T.unipotentIntegrals_pureTensor_vanish_of_local D V 𝔉 fa ff hA hF v.1 fun ν _ x y => ?_
-  exact (GlobalTheory.T.typeIdempotent_unipotentIntegral_vanish_splitPlace D V T v a ha0 (by omega) hv 𝔉 (hpar v).1 (μf v.1) _ (conv_mem_SB he hh) (ff v.1) (Or.inr e)
-    ν x y).2
+  refine GlobalTheory.T.unipotentIntegrals_pureTensor_vanish_of_local D V 𝔉 fa ff hA hF v.1
+    fun ν _ x y => ?_
+  exact (GlobalTheory.T.typeIdempotent_unipotentIntegral_vanish_splitPlace D V T v a ha0 (by omega)
+    hv 𝔉 (hpar v).1 (μf v.1) _ (conv_mem_SB he hh) (ff v.1) (Or.inr e) ν x y).2
 
 end

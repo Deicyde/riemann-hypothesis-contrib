@@ -10,22 +10,27 @@ open MvPowerSeries ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.S
 
 namespace GlobalTheory
 
-theorem sumMvList_eq_ptSumL {C : Type} [Field C] {v : AddValuation C (WithTop ℝ)} {d : ℕ}
-    (G : LogFGL v d) {τ : Type} (l : List (Fin d → MvPowerSeries τ C)) :
-    sumMvList G l = ptSumL G l := by
+theorem sumMvList_eq_ptSumL
+    {C : Type} [Field C]
+    {v : AddValuation C (WithTop ℝ)} {d : ℕ} (G : LogFGL v d)
+    {τ : Type} (l : List (Fin d → MvPowerSeries τ C))
+    : sumMvList G l = ptSumL G l := by
   induction l with
   | nil => rfl
   | cons x l ih => simp only [sumMvList, ptSumL, ih]; rfl
 
-theorem basisMap_eq_ptBasisMap {C : Type} [Field C] {v : AddValuation C (WithTop ℝ)} {d : ℕ}
-    (G : LogFGL v d) (γ : Fin d → Fin d → PowerSeries C) : basisMap G γ = ptBasisMap G γ :=
+theorem basisMap_eq_ptBasisMap
+    {C : Type} [Field C]
+    {v : AddValuation C (WithTop ℝ)} {d : ℕ} (G : LogFGL v d) (γ : Fin d → Fin d → PowerSeries C)
+    : basisMap G γ = ptBasisMap G γ :=
   sumMvList_eq_ptSumL G _
 
 theorem typicalBasis_coordinates : TypicalCurveEigenspace → TypicalCurveBasisExists := by
   intro h2 C _ _ _ v p hp hvp d h hh ty G μ
   refine ⟨?_, fun γ hγ => ?_⟩
-  · have key : ∀ a : Fin d, ∃ γ : Fin d → PowerSeries C,
-        IsCurve v γ ∧ G.IsOfType p ty (ty a) γ ∧ tangent γ = Pi.single a 1 := by
+  · have key
+        : ∀ a : Fin d, ∃ γ : Fin d → PowerSeries C,
+          IsCurve v γ ∧ G.IsOfType p ty (ty a) γ ∧ tangent γ = Pi.single a 1 := by
       intro a
       refine h2 C v p hp hvp d h hh ty G μ (ty a) (Pi.single a 1) (fun b => ?_) (fun b hb => ?_)
       · unfold IsIntV

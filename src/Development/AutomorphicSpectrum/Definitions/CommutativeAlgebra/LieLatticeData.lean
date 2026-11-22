@@ -10,21 +10,13 @@ noncomputable section
 namespace GlobalTheory.CompanionTheory.Ar.Num
 
 structure LieLatticeData (Ω F : Type) [Field Ω] (n : ℕ) (Sg : Type) (r s : Sg → ℕ) where
-
   M : AddSubgroup ((Fin n → F) → Ω)
-
   lie : ∀ τ, AddSubgroup (Fin (r τ) → Ω)
-
   W : ∀ τ, AddSubgroup (Fin (r τ) → Ω)
-
   om : ∀ τ, AddSubgroup (Fin (s τ) → Ω)
-
   omHT : ∀ τ, AddSubgroup (Fin (s τ) → Ω)
-
   Gam : ∀ τ, AddSubgroup ((Fin (r τ) → Ω) × (Fin n → Ω))
-
   Del : ∀ τ, AddSubgroup ((Fin n → Ω) × (Fin (s τ) → Ω))
-
   Th : ∀ τ, AddSubgroup (((Fin n → F) → Ω) × (Fin (r τ) → Ω))
 
 variable {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω]
@@ -42,7 +34,8 @@ def dotDual (R : Subalgebra o Ω) {m : ℕ} (L : AddSubgroup (Fin m → Ω)) : A
   ⨅ l ∈ L, R.toSubring.toAddSubgroup.comap
     (AddMonoidHom.mk' (fun v : Fin m → Ω => l ⬝ᵥ v) fun a b => dotProduct_add l a b)
 
-def Summand {V : Type} [AddCommGroup V] [Module Ω V] (L : AddSubgroup V) (U : Submodule Ω V) : Prop :=
+def Summand {V : Type} [AddCommGroup V] [Module Ω V] (L : AddSubgroup V) (U : Submodule Ω V)
+    : Prop :=
   ∃ ρ : V →ₗ[Ω] V, (∀ v, ρ v ∈ U) ∧ (∀ u ∈ U, ρ u = u) ∧ ∀ v ∈ L, ρ v ∈ L
 
 def powSpan (R : Subalgebra o Ω) (p : ℕ) (X : AddSubgroup Ω) : AddSubgroup Ω :=
@@ -69,7 +62,8 @@ namespace LieLatticeData
 
 variable {Sg : Type} {r s : Sg → ℕ} (D : LieLatticeData Ω F n Sg r s) (R : Subalgebra o Ω) (p : ℕ)
 
-def bc {C : Type} [Field C] [Algebra o C] [Algebra Ω C] (RC : Subalgebra o C) : LieLatticeData C F n Sg r s where
+def bc {C : Type} [Field C] [Algebra o C] [Algebra Ω C] (RC : Subalgebra o C)
+    : LieLatticeData C F n Sg r s where
   M := spanOver RC (bcMap Ω C _ '' D.M)
   lie τ := spanOver RC (bcMap Ω C _ '' D.lie τ)
   W τ := spanOver RC (bcMap Ω C _ '' D.W τ)
@@ -113,20 +107,32 @@ structure Base : Prop where
   M_le : D.M ≤ stdLat R _
   le_M : ∃ m : ℕ, mulLat ((p : Ω) ^ m) (stdLat R _) ≤ D.M
   one_mem : (1 : (Fin n → F) → Ω) ∈ D.M
-  free : ∀ τ, LocFree R (r τ) (D.lie τ) ∧ LocFree R (r τ) (D.W τ) ∧ LocFree R (s τ) (D.om τ) ∧
-    LocFree R (s τ) (D.omHT τ)
-  incl : ∀ τ, D.lie τ ≤ D.W τ ∧ D.W τ ≤ divLat w (D.lie τ) ∧ D.omHT τ ≤ D.om τ ∧
-    D.om τ ≤ divLat w (D.omHT τ)
-  stable : ∀ τ, ∀ a ∈ R, (∀ v ∈ D.Gam τ, a • v ∈ D.Gam τ) ∧ (∀ v ∈ D.Del τ, a • v ∈ D.Del τ) ∧
-    ∀ v ∈ D.Th τ, a • v ∈ D.Th τ
-  gam : ∀ τ, (∀ a, (∃ b, (a, b) ∈ D.Gam τ) ↔ w • a ∈ D.W τ) ∧ (∀ b, (0, b) ∈ D.Gam τ ↔ b ∈ stdLat R _) ∧
-    ∀ a, (a, 0) ∈ D.Gam τ ↔ a ∈ D.W τ
-  del : ∀ τ, (∀ b, (∃ c, (b, c) ∈ D.Del τ) ↔ w • b ∈ stdLat R _) ∧
-    (∀ c, (∃ b, (b, c) ∈ D.Del τ) ↔ w • c ∈ D.omHT τ) ∧ (∀ c, (0, c) ∈ D.Del τ ↔ c ∈ D.omHT τ) ∧
-    ∀ b, (b, 0) ∈ D.Del τ ↔ ∃ a, (a, b) ∈ D.Gam τ
-  th : ∀ τ, (∀ g, (∃ m, (g, m) ∈ D.Th τ) ↔ g ∈ D.M ∧ g 0 = 0) ∧
-    (∀ m, (∃ g, (g, m) ∈ D.Th τ) ↔ m ∈ dotDual R (D.lie τ)) ∧
-    ∀ m, (0, m) ∈ D.Th τ ↔ m ∈ mulLat (p : Ω) (dotDual R (D.lie τ))
+  free
+    : ∀ τ,
+      LocFree R (r τ) (D.lie τ) ∧ LocFree R (r τ) (D.W τ) ∧ LocFree R (s τ) (D.om τ)
+        ∧ LocFree R (s τ) (D.omHT τ)
+  incl
+    : ∀ τ,
+      D.lie τ ≤ D.W τ ∧ D.W τ ≤ divLat w (D.lie τ) ∧ D.omHT τ ≤ D.om τ
+        ∧ D.om τ ≤ divLat w (D.omHT τ)
+  stable
+    : ∀ τ, ∀ a ∈ R,
+      (∀ v ∈ D.Gam τ, a • v ∈ D.Gam τ) ∧ (∀ v ∈ D.Del τ, a • v ∈ D.Del τ)
+        ∧ ∀ v ∈ D.Th τ, a • v ∈ D.Th τ
+  gam
+    : ∀ τ,
+      (∀ a, (∃ b, (a, b) ∈ D.Gam τ) ↔ w • a ∈ D.W τ) ∧ (∀ b, (0, b) ∈ D.Gam τ ↔ b ∈ stdLat R _)
+        ∧ ∀ a, (a, 0) ∈ D.Gam τ ↔ a ∈ D.W τ
+  del
+    : ∀ τ,
+      (∀ b, (∃ c, (b, c) ∈ D.Del τ) ↔ w • b ∈ stdLat R _)
+        ∧ (∀ c, (∃ b, (b, c) ∈ D.Del τ) ↔ w • c ∈ D.omHT τ) ∧ (∀ c, (0, c) ∈ D.Del τ ↔ c ∈ D.omHT τ)
+        ∧ ∀ b, (b, 0) ∈ D.Del τ ↔ ∃ a, (a, b) ∈ D.Gam τ
+  th
+    : ∀ τ,
+      (∀ g, (∃ m, (g, m) ∈ D.Th τ) ↔ g ∈ D.M ∧ g 0 = 0)
+        ∧ (∀ m, (∃ g, (g, m) ∈ D.Th τ) ↔ m ∈ dotDual R (D.lie τ))
+        ∧ ∀ m, (0, m) ∈ D.Th τ ↔ m ∈ mulLat (p : Ω) (dotDual R (D.lie τ))
 
 structure Good₁ : Prop where
   l1 : LocFree R (Fintype.card F ^ n) (D.l1 R p)
@@ -146,24 +152,30 @@ structure Facts : Prop where
   ker : ∀ τ, D.kerH R p τ (χ τ) = divLat w (D.lie τ)
   dx : ∀ τ i, D.dId R p (χ τ) i = D.xId (χ τ) i
   onto : ∀ τ (i : Fin n), (D.stepGraph τ (χ τ) i).map (AddMonoidHom.snd _ _) = D.kk τ i
-  inj : ∀ τ i, (D.stepGraph (φ τ) (χ (φ τ)) i).comap (AddMonoidHom.inl _ _) =
-    powSpan R p (D.xId (χ τ) i)
+  inj
+    : ∀ τ i,
+      (D.stepGraph (φ τ) (χ (φ τ)) i).comap (AddMonoidHom.inl _ _) = powSpan R p (D.xId (χ τ) i)
 
 end LieLatticeData
 
-def IsTestPt (p : ℕ) (R : Subalgebra o Ω) {C : Type} [Field C] [Algebra o C] [Algebra Ω C]
-    (RC : Subalgebra o C) : Prop :=
-  IsAlgClosed C ∧ (∃ v : Valuation C NNReal, (∀ c, c ∈ RC ↔ v c ≤ 1) ∧ v (p : C) < 1) ∧
-    IsAdicComplete (Ideal.span {(p : RC)}) RC ∧ ∀ a ∈ R, algebraMap Ω C a ∈ RC
+def IsTestPt
+    (p : ℕ) (R : Subalgebra o Ω)
+    {C : Type} [Field C] [Algebra o C] [Algebra Ω C]
+    (RC : Subalgebra o C)
+    : Prop :=
+  IsAlgClosed C ∧ (∃ v : Valuation C NNReal, (∀ c, c ∈ RC ↔ v c ≤ 1) ∧ v (p : C) < 1)
+    ∧ IsAdicComplete (Ideal.span {(p : RC)}) RC ∧ ∀ a ∈ R, algebraMap Ω C a ∈ RC
 
-def LieLatticeData.TestFacts {Sg : Type} {r s : Sg → ℕ} [Fintype F] (D : LieLatticeData Ω F n Sg r s) (R : Subalgebra o Ω)
-    (p : ℕ) (w : Ω) (χ : Sg → F → Ω) (φ : Equiv.Perm Sg) : Prop :=
+def LieLatticeData.TestFacts
+    {Sg : Type} {r s : Sg → ℕ} [Fintype F]
+    (D : LieLatticeData Ω F n Sg r s) (R : Subalgebra o Ω) (p : ℕ) (w : Ω) (χ : Sg → F → Ω)
+    (φ : Equiv.Perm Sg)
+    : Prop :=
   ∀ (C : Type) [Field C] [Algebra o C] [Algebra Ω C] [IsScalarTower o Ω C] (RC : Subalgebra o C),
-    IsTestPt p R RC →
-      (D.bc RC).Facts RC p (algebraMap Ω C w) (fun τ a => algebraMap Ω C (χ τ a)) φ
+    IsTestPt p R RC → (D.bc RC).Facts RC p (algebraMap Ω C w) (fun τ a => algebraMap Ω C (χ τ a)) φ
 
 def CharData [One F] {Sg : Type} (R : Subalgebra o Ω) (p : ℕ) (w : Ω) (χ : Sg → F → Ω) : Prop :=
-  (p : Ω) ≠ 0 ∧ w ∈ R ∧ (∃ c ∈ R, (p : Ω) = c * w) ∧ (0 : F) ≠ 1 ∧
-    ∀ τ, χ τ 0 = 0 ∧ χ τ 1 = 1 ∧ ∀ a, χ τ a ∈ R
+  (p : Ω) ≠ 0 ∧ w ∈ R ∧ (∃ c ∈ R, (p : Ω) = c * w) ∧ (0 : F) ≠ 1
+    ∧ ∀ τ, χ τ 0 = 0 ∧ χ τ 1 = 1 ∧ ∀ a, χ τ a ∈ R
 
 end GlobalTheory.CompanionTheory.Ar.Num

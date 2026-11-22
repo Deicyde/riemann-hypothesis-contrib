@@ -10,9 +10,12 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.Valuati
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc GlobalTheory.Ex.OneGen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc
+  GlobalTheory.Ex.OneGen
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -20,7 +23,18 @@ namespace GlobalTheory.IntOverCdvr
 
 open IsLocalRing
 
-theorem isIntegralElem_of_val_nonneg : ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V], GlobalTheory.LN.CDvr V → ∀ (ϖ : V), Irreducible ϖ → ∀ (F : Type) [Field F] [Algebra (FractionRing V) F] [Algebra.IsAlgebraic (FractionRing V) F] (v : AddValuation F (WithTop ℚ)), ReciprocityTheory.ChartRestriction.G.DVR.ValOver ϖ F v → ∀ z : F, 0 ≤ v z → ((algebraMap (FractionRing V) F).comp (algebraMap V (FractionRing V))).IsIntegralElem z := by
+theorem isIntegralElem_of_val_nonneg
+    : ∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V],
+      GlobalTheory.LN.CDvr V
+        → ∀ (ϖ : V),
+          Irreducible ϖ
+            → ∀ (F : Type) [Field F] [Algebra (FractionRing V) F]
+                [Algebra.IsAlgebraic (FractionRing V) F] (v : AddValuation F (WithTop ℚ)),
+              ReciprocityTheory.ChartRestriction.G.DVR.ValOver ϖ F v
+                → ∀ z : F,
+                  0 ≤ v z
+                    → ((algebraMap (FractionRing V) F).comp
+                      (algebraMap V (FractionRing V))).IsIntegralElem z := by
   intro V _ _ _ hV ϖ hϖ F _ _ _ v hv z hz
   obtain ⟨hdvr, hcomp, hchar⟩ := hV
   let K := FractionRing V
@@ -30,7 +44,8 @@ theorem isIntegralElem_of_val_nonneg : ∀ (V : Type) [CommRing V] [IsDomain V] 
     ((algebraMap K F).injective.comp (IsFractionRing.injective V K))
   haveI : Algebra.IsAlgebraic V F :=
     (IsFractionRing.comap_isAlgebraic_iff (A := V) (K := K) (C := F)).mpr inferInstance
-  obtain ⟨W, hW, -, -, hfin, -, hloc, hs, -⟩ := GlobalTheory.exists_complete_dvr_finite_subalgebra V F {z}
+  obtain ⟨W, hW, -, -, hfin, -, hloc, hs, -⟩ :=
+    GlobalTheory.exists_complete_dvr_finite_subalgebra V F {z}
   haveI := hfin
 
   have hVnn : ∀ r : V, 0 ≤ v (algebraMap V F r) := fun r =>
@@ -72,7 +87,9 @@ theorem isIntegralElem_of_val_nonneg : ∀ (V : Type) [CommRing V] [IsDomain V] 
       exact fun h => hnu (IsDiscreteValuationRing.addVal_eq_zero_iff.1 h)
     have hdvd : ϖW ∣ c ^ N := by
       rw [← IsDiscreteValuationRing.addVal_le_iff_dvd, AddValuation.map_pow, hN]
-      calc (N : ℕ∞) = N • (1 : ℕ∞) := by simp
+      calc
+        (N : ℕ∞)
+          = N • (1 : ℕ∞) := by simp
         _ ≤ N • IsDiscreteValuationRing.addVal W c := nsmul_le_nsmul_right hc1 N
     obtain ⟨d, hd⟩ := hdvd
     have h1 : v ((c : F) ^ N) = 0 := by rw [AddValuation.map_pow, hc, nsmul_zero]
@@ -92,13 +109,15 @@ theorem isIntegralElem_of_val_nonneg : ∀ (V : Type) [CommRing V] [IsDomain V] 
   have hzW : z ∈ W := by
     let a' : W := ⟨a, ha⟩
     let b' : W := ⟨b, hb⟩
-    rcases le_total (IsDiscreteValuationRing.addVal W b') (IsDiscreteValuationRing.addVal W a') with h | h
+    rcases le_total (IsDiscreteValuationRing.addVal W b') (IsDiscreteValuationRing.addVal W a') with
+      h | h
     · obtain ⟨c, hc⟩ := IsDiscreteValuationRing.addVal_le_iff_dvd.1 h
       have hc' : a = b * c := congrArg Subtype.val hc
       have : z = c := by
         apply mul_left_cancel₀ hb0
         rw [mul_comm, hab, hc']
-      rw [this]; exact c.2
+      rw [this]
+      exact c.2
     · obtain ⟨c, hc⟩ := IsDiscreteValuationRing.addVal_le_iff_dvd.1 h
       have hc' : b = a * c := congrArg Subtype.val hc
       have ha0 : a ≠ 0 := by
@@ -106,14 +125,18 @@ theorem isIntegralElem_of_val_nonneg : ∀ (V : Type) [CommRing V] [IsDomain V] 
         exact hb0 (by simpa using hc')
       have hzc : z * c = 1 := by
         apply mul_left_cancel₀ ha0
-        calc a * (z * c) = z * (a * c) := by ring
+        calc
+          a * (z * c)
+            = z * (a * c) := by ring
           _ = a * 1 := by rw [← hc', hab, _root_.mul_one]
       have hz0 : z ≠ 0 := left_ne_zero_of_mul_eq_one hzc
       have hvc : v (c : F) = 0 := by
         have hsum : v z + v (c : F) = 0 := by rw [← AddValuation.map_mul, hzc, AddValuation.map_one]
         have hc0 := hWnn c c.2
         refine le_antisymm ?_ hc0
-        calc v (c : F) = 0 + v (c : F) := (zero_add _).symm
+        calc
+          v (c : F)
+            = 0 + v (c : F) := (zero_add _).symm
           _ ≤ v z + v (c : F) := by gcongr
           _ = 0 := hsum
       obtain ⟨u, hu⟩ := hunit c hvc
@@ -121,10 +144,12 @@ theorem isIntegralElem_of_val_nonneg : ∀ (V : Type) [CommRing V] [IsDomain V] 
         have h1 : ((u : W) : F) * (((u⁻¹ : Wˣ) : W) : F) = 1 := by
           rw [← Subalgebra.coe_mul, Units.mul_inv]; rfl
         rw [hu] at h1
-        calc z = z * ((c : F) * (((u⁻¹ : Wˣ) : W) : F)) := by rw [h1, _root_.mul_one]
+        calc
+          z = z * ((c : F) * (((u⁻¹ : Wˣ) : W) : F)) := by rw [h1, _root_.mul_one]
           _ = (z * c) * (((u⁻¹ : Wˣ) : W) : F) := by ring
           _ = _ := by rw [hzc, _root_.one_mul]
-      rw [this]; exact Subtype.property _
+      rw [this]
+      exact Subtype.property _
 
   exact (Algebra.IsIntegral.isIntegral (R := V) (⟨z, hzW⟩ : W)).map W.val
 

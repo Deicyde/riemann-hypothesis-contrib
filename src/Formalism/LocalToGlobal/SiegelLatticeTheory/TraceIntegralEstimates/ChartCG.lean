@@ -7,18 +7,21 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.TraceIntegralEstimates
 noncomputable section
 
 open scoped Matrix Classical
-open MeasureTheory Finset NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.ThB Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj
+open MeasureTheory Finset NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.ThB Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj
   Formalism.L2.SG.LocWSOf
 
 namespace Formalism.L2.S.Pv.Chart
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem isClosed_inN {n r : ℕ} (ε : Fin n → Bool) (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) :
-    IsClosed {g : Matrix (Fin n) (Fin n) ℂ | InN ε e z g} := by
-  have hS : ∀ (S : Submodule ℂ (Fin n → ℂ)) (x : Fin n → ℂ),
-      IsClosed {g : Matrix (Fin n) (Fin n) ℂ | (g - 1) *ᵥ x ∈ S} := fun S x =>
-    S.closed_of_finiteDimensional.preimage ((continuous_id.sub continuous_const).matrix_mulVec continuous_const)
+theorem isClosed_inN {n r : ℕ} (ε : Fin n → Bool) (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ)
+    : IsClosed {g : Matrix (Fin n) (Fin n) ℂ | InN ε e z g} := by
+  have hS
+      : ∀ (S : Submodule ℂ (Fin n → ℂ)) (x : Fin n → ℂ),
+        IsClosed {g : Matrix (Fin n) (Fin n) ℂ | (g - 1) *ᵥ x ∈ S} := fun S x =>
+    S.closed_of_finiteDimensional.preimage ((continuous_id.sub continuous_const).matrix_mulVec
+      continuous_const)
   unfold InN InS
   simp only [Set.setOf_and, Set.setOf_forall]
   exact ((isClosed_iInter fun a => hS _ _).inter (hS _ _)).inter
@@ -26,8 +29,9 @@ theorem isClosed_inN {n r : ℕ} (ε : Fin n → Bool) (e : Fin r → Fin n → 
 
 variable {D : D7}
 
-theorem isClosed_stV (X : HidaSetting D) (u u' : D.what₂.Word) (γ : X.B.I.Ginf) (v : InfinitePlace X.B.I.F) :
-    IsClosed (Formalism.L2.SG.NGPin.StV X u u' γ v) := by
+theorem isClosed_stV
+    (X : HidaSetting D) (u u' : D.what₂.Word) (γ : X.B.I.Ginf) (v : InfinitePlace X.B.I.F)
+    : IsClosed (Formalism.L2.SG.NGPin.StV X u u' γ v) := by
   have hu : Continuous fun y : Formalism.REAL.UJ (X.B.I.ε v) => uMat y :=
     Units.continuous_val.comp continuous_subtype_val
   have hc : Continuous fun y : Formalism.REAL.UJ (X.B.I.ε v) => uMat ((γ v)⁻¹ * y * γ v) :=
@@ -38,13 +42,24 @@ theorem chartC_holds : Formalism.L2.SG.NGCut.StabilizerCovolume.ChartC := by
   intro D X Y u u' t hrel hG w hw γw s s' hrep hs hs' hpt
   have : Nonempty D.what₂.Word := ⟨u⟩
   obtain ⟨C⟩ := Formalism.L2.SG.Pf.choiceExists X 1 one_pos
-  have hτ : ∀ v : InfinitePlace X.B.I.F, ∃ τ, vOf X τ = v := fun v => ⟨X.pl v, X.pl.symm_apply_apply v⟩
+  have hτ : ∀ v : InfinitePlace X.B.I.F, ∃ τ, vOf X τ = v := fun v =>
+    ⟨X.pl v, X.pl.symm_apply_apply v⟩
   have hpl : ∀ z ∈ StInf X u u' γw, ∀ v, z v ∈ Formalism.L2.SG.NGPin.StV X u u' γw v := by
     intro z hz v
     rw [Formalism.L2.SG.NGPin.stInf_eq_pi] at hz
     exact hz v (Set.mem_univ _)
-  refine ⟨BX, fun p => BX_measurable p, fun p x x' y y' h => BX_lower p x x' y y' h, fun p x => BX_zero p x,
-    ?_, ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    BX,
+    fun p => BX_measurable p,
+    fun p x x' y y' h => BX_lower p x x' y y' h,
+    fun p x => BX_zero p x,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [Formalism.L2.SG.NGPin.stCoord_eq]
     refine Measurable.of_eval fun v => ?_
     obtain ⟨τ, rfl⟩ := hτ v
@@ -57,8 +72,9 @@ theorem chartC_holds : Formalism.L2.SG.NGCut.StabilizerCovolume.ChartC := by
     obtain ⟨τ, rfl⟩ := hτ v
     exact stCoordV_inj C u u' w γw τ hrep (hpl z₁ h₁ _) (hpl z₂ h₂ _) (congrFun heq (vOf X τ))
   · intro x
-    have hex : ∀ v, ∃ y ∈ Formalism.L2.SG.NGPin.StV X u u' γw v,
-        Formalism.L2.SG.NGPin.stCoordV X u' w γw v y = x v := by
+    have hex
+        : ∀ v, ∃ y ∈ Formalism.L2.SG.NGPin.StV X u u' γw v,
+          Formalism.L2.SG.NGPin.stCoordV X u' w γw v y = x v := by
       intro v
       obtain ⟨τ, rfl⟩ := hτ v
       exact stCoordV_surj C u u' w γw τ hrep (x (vOf X τ))
@@ -80,10 +96,14 @@ theorem chartC_holds : Formalism.L2.SG.NGCut.StabilizerCovolume.ChartC := by
   · intro r hr
     obtain ⟨hr1, hr2⟩ := hr
     refine ⟨?_, ?_⟩
-    · have := Formalism.L2.SG.Pf.FormTranspose.sinf_conj X u (Formalism.L2.SG.Pf.Sinf.sinf_inv' X u hs) hr1
+    · have :=
+        Formalism.L2.SG.Pf.FormTranspose.sinf_conj X u (Formalism.L2.SG.Pf.Sinf.sinf_inv' X u hs)
+          hr1
       simpa only [inv_inv] using this
     · have hγ : γw = s⁻¹ * t.pt.1 * s' := by rw [hpt]; group
-      have := Formalism.L2.SG.Pf.FormTranspose.sinf_conj X u' (Formalism.L2.SG.Pf.Sinf.sinf_inv' X u' hs') hr2
+      have :=
+        Formalism.L2.SG.Pf.FormTranspose.sinf_conj X u' (Formalism.L2.SG.Pf.Sinf.sinf_inv' X u' hs')
+          hr2
       rw [hγ]
       convert this using 1
       group

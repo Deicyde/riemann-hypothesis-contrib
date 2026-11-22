@@ -60,17 +60,22 @@ lemma coe_eq_monomial {n : ℕ} {f : rees o x} (hf : f ∈ grading o x n) :
   · rw [h]
   · exact hf i (Ne.symm h)
 
-def comp (i : ℕ) (f : rees o x) : grading o x i :=
-  ⟨⟨Polynomial.monomial i ((f : (Polynomial Ω)).coeff i), by
+def comp (i : ℕ) (f : rees o x) : grading o x i := ⟨
+  ⟨
+    Polynomial.monomial i ((f : (Polynomial Ω)).coeff i),
+    by
       intro k
       rw [Polynomial.coeff_monomial_apply]
       split_ifs with h
       · rw [← h]
         exact f.2 _
-      · exact Submodule.zero_mem _⟩, by
+      · exact Submodule.zero_mem _
+  ⟩,
+  by
     intro k hk
     change (Polynomial.monomial i ((f : (Polynomial Ω)).coeff i)).coeff k = 0
-    exact Polynomial.coeff_monomial_of_ne _ hk⟩
+    exact Polynomial.coeff_monomial_of_ne _ hk
+⟩
 
 lemma coeff_coeAddMonoidHom (y : DirectSum ℕ fun i => grading o x i) (n : ℕ) :
     ((DirectSum.coeAddMonoidHom (grading o x) y : rees o x) : (Polynomial Ω)).coeff n =
@@ -134,8 +139,7 @@ open Polynomial HomogeneousLocalization
 
 variable {Ω : Type} [Field Ω] {o : Type} [CommRing o] [Algebra o Ω] {κ : Type} {x : κ → Ω}
 
-def ev : rees o x →+* Ω :=
-  (Polynomial.evalRingHom (1 : Ω)).comp (rees o x).val.toRingHom
+def ev : rees o x →+* Ω := (Polynomial.evalRingHom (1 : Ω)).comp (rees o x).val.toRingHom
 
 lemma ev_apply (f : rees o x) : ev f = (f : Polynomial Ω).eval 1 := rfl
 
@@ -150,15 +154,17 @@ lemma eq_zero_of_ev {n : ℕ} {f : rees o x} (hf : f ∈ grading o x n) (h : ev 
   rw [coe_eq_monomial hf, h]
   simp
 
-def coord (c : κ) : rees o x :=
-  ⟨Polynomial.monomial 1 (x c), by
+def coord (c : κ) : rees o x := ⟨
+  Polynomial.monomial 1 (x c),
+  by
     intro k
     rw [Polynomial.coeff_monomial_apply]
     split_ifs with h
     · subst h
       rw [pow_one]
       exact Submodule.subset_span ⟨c, rfl⟩
-    · exact Submodule.zero_mem _⟩
+    · exact Submodule.zero_mem _
+⟩
 
 lemma coord_mem (c : κ) : coord (o := o) (x := x) c ∈ grading o x 1 := by
   intro i hi
@@ -396,44 +402,58 @@ open AlgebraicGeometry CategoryTheory
 
 variable {Ω : Type} [Field Ω] {X : Scheme.{0}}
 
-theorem genMap_toStalk {B : Type} [CommRing B] (θ : B →+* Ω) (p : Spec (.of B))
-    (h : genPt (Spec.map (CommRingCat.ofHom θ)) ⤳ p) (b : B) :
-    genMap (Spec.map (CommRingCat.ofHom θ)) ⟨p, h⟩ ((StructureSheaf.toStalk B p).hom b) = θ b := by
+theorem genMap_toStalk
+    {B : Type} [CommRing B]
+    (θ : B →+* Ω) (p : Spec (.of B)) (h : genPt (Spec.map (CommRingCat.ofHom θ)) ⤳ p)
+    (b : B)
+    : genMap (Spec.map (CommRingCat.ofHom θ)) ⟨p, h⟩ ((StructureSheaf.toStalk B p).hom b)
+      = θ b := by
   have h1 := Scheme.germ_stalkClosedPointTo_Spec (R := .of B) (S := .of Ω) (CommRingCat.ofHom θ)
-  have h4 : (Spec (.of B)).presheaf.germ ⊤ p trivial ≫ (Spec (.of B)).presheaf.stalkSpecializes h ≫
-      Scheme.stalkClosedPointTo (Spec.map (CommRingCat.ofHom θ)) =
-      (Scheme.ΓSpecIso (.of B)).hom ≫ CommRingCat.ofHom θ := by
+  have h4
+      : (Spec (.of B)).presheaf.germ ⊤ p trivial ≫ (Spec (.of B)).presheaf.stalkSpecializes h
+          ≫ Scheme.stalkClosedPointTo (Spec.map (CommRingCat.ofHom θ))
+        = (Scheme.ΓSpecIso (.of B)).hom ≫ CommRingCat.ofHom θ := by
     refine Eq.trans ?_ h1
-    exact TopCat.Presheaf.germ_stalkSpecializes_assoc (Spec (.of B)).presheaf (U := ⊤) (y := p) trivial h _
+    exact TopCat.Presheaf.germ_stalkSpecializes_assoc (Spec (.of B)).presheaf (U := ⊤) (y := p)
+      trivial h _
   have h5 := congrArg (fun k => k.hom ((Scheme.ΓSpecIso (.of B)).inv.hom b)) h4
-  have h6 : ((Scheme.ΓSpecIso (.of B)).hom ≫ CommRingCat.ofHom θ).hom
-      ((Scheme.ΓSpecIso (.of B)).inv.hom b) = θ b := by
+  have h6
+      : ((Scheme.ΓSpecIso (.of B)).hom ≫ CommRingCat.ofHom θ).hom
+          ((Scheme.ΓSpecIso (.of B)).inv.hom b)
+        = θ b := by
     simp
   exact h5.trans h6
 
-theorem chart_stalk {B : Type} [CommRing B] (θ : B →+* Ω) (j : Spec (.of B) ⟶ X) [IsOpenImmersion j]
+theorem chart_stalk
+    {B : Type} [CommRing B]
+    (θ : B →+* Ω)
+    (j : Spec (.of B) ⟶ X) [IsOpenImmersion j]
     (ξ : Spec (CommRingCat.of Ω) ⟶ X) (hξ : ξ = Spec.map (CommRingCat.ofHom θ) ≫ j)
-    (p : Spec (.of B)) (h : genPt ξ ⤳ j p) :
-    ∃ φ : B →+* X.presheaf.stalk (j p),
-      (∀ b, genMap ξ ⟨j p, h⟩ (φ b) = θ b) ∧ (∀ s, s ∉ p.asIdeal → IsUnit (φ s)) ∧
-      ∀ t, ∃ a s, s ∉ p.asIdeal ∧ t * φ s = φ a := by
+    (p : Spec (.of B)) (h : genPt ξ ⤳ j p)
+    : ∃ φ : B →+* X.presheaf.stalk (j p),
+      (∀ b, genMap ξ ⟨j p, h⟩ (φ b) = θ b) ∧ (∀ s, s ∉ p.asIdeal → IsUnit (φ s))
+        ∧ ∀ t, ∃ a s, s ∉ p.asIdeal ∧ t * φ s = φ a := by
   subst hξ
   have h' : genPt (Spec.map (CommRingCat.ofHom θ)) ⤳ p :=
     (j.isOpenEmbedding.isInducing.specializes_iff).1 h
   let e : X.presheaf.stalk (j p) ≅ (Spec (.of B)).presheaf.stalk p := asIso (j.stalkMap p)
-  have key : X.presheaf.stalkSpecializes h ≫
-      Scheme.stalkClosedPointTo (Spec.map (CommRingCat.ofHom θ) ≫ j) =
-      j.stalkMap p ≫ (Spec (.of B)).presheaf.stalkSpecializes h' ≫
-        Scheme.stalkClosedPointTo (Spec.map (CommRingCat.ofHom θ)) := by
+  have key
+      : X.presheaf.stalkSpecializes h
+          ≫ Scheme.stalkClosedPointTo (Spec.map (CommRingCat.ofHom θ) ≫ j)
+        = j.stalkMap p ≫ (Spec (.of B)).presheaf.stalkSpecializes h'
+          ≫ Scheme.stalkClosedPointTo (Spec.map (CommRingCat.ofHom θ)) := by
     rw [Scheme.stalkClosedPointTo_comp]
     exact Scheme.Hom.stalkSpecializes_stalkMap_assoc j _ _ h' _
-  have hg : ∀ t, genMap (Spec.map (CommRingCat.ofHom θ) ≫ j) ⟨j p, h⟩ (e.inv.hom t) =
-      genMap (Spec.map (CommRingCat.ofHom θ)) ⟨p, h'⟩ t := by
+  have hg
+      : ∀ t,
+        genMap (Spec.map (CommRingCat.ofHom θ) ≫ j) ⟨j p, h⟩ (e.inv.hom t)
+          = genMap (Spec.map (CommRingCat.ofHom θ)) ⟨p, h'⟩ t := by
     intro t
-    have h5 : genMap (Spec.map (CommRingCat.ofHom θ) ≫ j) ⟨j p, h⟩ (e.inv.hom t) =
-        ((Spec (.of B)).presheaf.stalkSpecializes h' ≫
-        Scheme.stalkClosedPointTo (Spec.map (CommRingCat.ofHom θ))).hom
-          ((j.stalkMap p).hom (e.inv.hom t)) := congrArg (fun k => k.hom (e.inv.hom t)) key
+    have h5
+        : genMap (Spec.map (CommRingCat.ofHom θ) ≫ j) ⟨j p, h⟩ (e.inv.hom t)
+          = ((Spec (.of B)).presheaf.stalkSpecializes h' ≫ Scheme.stalkClosedPointTo (Spec.map
+            (CommRingCat.ofHom θ))).hom ((j.stalkMap p).hom (e.inv.hom t)) :=
+      congrArg (fun k => k.hom (e.inv.hom t)) key
     have h6 : (j.stalkMap p).hom (e.inv.hom t) = t := by
       change (e.hom).hom (e.inv.hom t) = t
       simp
@@ -447,19 +467,23 @@ theorem chart_stalk {B : Type} [CommRing B] (θ : B →+* Ω) (j : Spec (.of B) 
   · intro b
     exact (hg _).trans (genMap_toStalk θ p h' b)
   · intro s hs
-    have h1 := IsLocalization.map_units (M := p'.asIdeal.primeCompl)
-      ((structurePresheafInCommRingCat B).stalk p') (⟨s, hs⟩ : p'.asIdeal.primeCompl)
+    have h1 :=
+      IsLocalization.map_units (M := p'.asIdeal.primeCompl)
+        ((structurePresheafInCommRingCat B).stalk p') (⟨s, hs⟩ : p'.asIdeal.primeCompl)
     exact h1.map e.inv.hom
   · intro t
-    obtain ⟨⟨a, s⟩, hs⟩ := IsLocalization.surj (M := p'.asIdeal.primeCompl)
-      (S := (structurePresheafInCommRingCat B).stalk p') ((j.stalkMap p).hom t)
+    obtain ⟨⟨a, s⟩, hs⟩ :=
+      IsLocalization.surj (M := p'.asIdeal.primeCompl)
+        (S := (structurePresheafInCommRingCat B).stalk p') ((j.stalkMap p).hom t)
     refine ⟨a, s.1, s.2, ?_⟩
     have h7 := congrArg e.inv.hom hs
     have h8 : e.inv.hom ((j.stalkMap p).hom t) = t := by
       change (e.inv).hom ((e.hom).hom t) = t
       simp
-    have h9 : e.inv.hom ((j.stalkMap p).hom t) * e.inv.hom ((StructureSheaf.toStalk B p).hom s.1) =
-        e.inv.hom ((StructureSheaf.toStalk B p).hom a) := (map_mul e.inv.hom _ _).symm.trans h7
+    have h9
+        : e.inv.hom ((j.stalkMap p).hom t) * e.inv.hom ((StructureSheaf.toStalk B p).hom s.1)
+          = e.inv.hom ((StructureSheaf.toStalk B p).hom a) :=
+      (map_mul e.inv.hom _ _).symm.trans h7
     rw [h8] at h9
     exact h9
 
@@ -482,21 +506,24 @@ lemma spec_of_injective {B : Type} [CommRing B] (θ : B →+* Ω) (hθ : Functio
   rw [(map_eq_zero_iff θ hθ).1 h2]
   exact Ideal.zero_mem _
 
-theorem tie_of_charts (o : Type) [CommRing o] [Algebra o Ω] {κ : Type} (x : κ → Ω)
+theorem tie_of_charts
+    (o : Type) [CommRing o] [Algebra o Ω]
+    {κ : Type} (x : κ → Ω)
     (ξ : Spec (CommRingCat.of Ω) ⟶ X)
-    (B : {c // x c ≠ 0} → Type) [∀ c, CommRing (B c)] (θ : ∀ c, B c →+* Ω)
+    (B : {c // x c ≠ 0} → Type) [∀ c, CommRing (B c)]
+    (θ : ∀ c, B c →+* Ω)
     (j : ∀ c, Spec (.of (B c)) ⟶ X) [∀ c, IsOpenImmersion (j c)]
     (hinj : ∀ c, Function.Injective (θ c))
     (hrange : ∀ (c : {c // x c ≠ 0}) (a : Ω),
       a ∈ Algebra.adjoin o (Set.range fun i => x i / x c) ↔ a ∈ (θ c).range)
-    (hξ : ∀ c, ξ = Spec.map (CommRingCat.ofHom (θ c)) ≫ j c)
-    (hcover : ∀ q : X, ∃ c p, j c p = q)
+    (hξ : ∀ c, ξ = Spec.map (CommRingCat.ofHom (θ c)) ≫ j c) (hcover : ∀ q : X, ∃ c p, j c p = q)
     (hover : ∀ (c d : {c // x c ≠ 0}) (p : Spec (.of (B d))) (s : B d),
       θ d s = x c / x d → s ∉ p.asIdeal → ∃ p', j c p' = j d p)
     (c₀ : {c // x c ≠ 0})
     (hfrac : ∀ a : Ω, ∃ g ∈ Algebra.adjoin o (Set.range fun i => x i / x c₀),
-      ∃ h ∈ Algebra.adjoin o (Set.range fun i => x i / x c₀), h ≠ 0 ∧ a = g / h) :
-    CoordTie o ξ x ∧ (∀ q : X, genPt ξ ⤳ q) ∧ IsIntegral X := by
+      ∃ h ∈ Algebra.adjoin o (Set.range fun i => x i / x c₀),
+        h ≠ 0 ∧ a = g / h)
+    : CoordTie o ξ x ∧ (∀ q : X, genPt ξ ⤳ q) ∧ IsIntegral X := by
   have spec : ∀ c (p : Spec (.of (B c))), genPt ξ ⤳ j c p := by
     intro c p
     have h1 := spec_of_injective (θ c) (hinj c) p
@@ -511,8 +538,8 @@ theorem tie_of_charts (o : Type) [CommRing o] [Algebra o Ω] {κ : Type} (x : κ
     intro c p b
     obtain ⟨φ, h1, -, -⟩ := chart_stalk (θ c) (j c) ξ (hξ c) p (spec c p)
     exact ⟨φ b, h1 b⟩
-  have reg2 : ∀ c p a, a ∈ regAt ξ ⟨j c p, spec c p⟩ →
-      ∃ u s, s ∉ p.asIdeal ∧ a * θ c s = θ c u := by
+  have reg2
+      : ∀ c p a, a ∈ regAt ξ ⟨j c p, spec c p⟩ → ∃ u s, s ∉ p.asIdeal ∧ a * θ c s = θ c u := by
     intro c p a ha
     obtain ⟨φ, h1, -, h3⟩ := chart_stalk (θ c) (j c) ξ (hξ c) p (spec c p)
     obtain ⟨t, rfl⟩ := ha
@@ -523,7 +550,8 @@ theorem tie_of_charts (o : Type) [CommRing o] [Algebra o Ω] {κ : Type} (x : κ
     rintro ⟨q, hq⟩
     obtain ⟨c, p, rfl⟩ := hcover q
     obtain ⟨φ, h1, h2, h3⟩ := chart_stalk (θ c) (j c) ξ (hξ c) p hq
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro t ht
     obtain ⟨u, s, hs, hts⟩ := h3 t
     have h4 := congrArg (genMap ξ ⟨j c p, hq⟩) hts
@@ -534,16 +562,21 @@ theorem tie_of_charts (o : Type) [CommRing o] [Algebra o Ω] {κ : Type} (x : κ
   have chart1 : ∀ (c : {c // x c ≠ 0}) p, InChart ξ x c.1 ⟨j c p, spec c p⟩ := by
     intro c p
     refine ⟨c.2, fun c' => ?_⟩
-    obtain ⟨b, hb⟩ := (hrange c _).1 (Algebra.subset_adjoin ⟨c', rfl⟩ :
-      x c' / x c ∈ Algebra.adjoin o (Set.range fun i => x i / x c))
+    obtain ⟨b, hb⟩ :=
+      (hrange c _).1
+        (Algebra.subset_adjoin ⟨c', rfl⟩
+          : x c' / x c ∈ Algebra.adjoin o (Set.range fun i => x i / x c))
     rw [← hb]
     exact reg1 c p b
-  have chart2 : ∀ (c : {c // x c ≠ 0}) (q : X) (hq : genPt ξ ⤳ q), InChart ξ x c.1 ⟨q, hq⟩ →
-      ∃ p, j c p = q := by
+  have chart2
+      : ∀ (c : {c // x c ≠ 0}) (q : X) (hq : genPt ξ ⤳ q),
+        InChart ξ x c.1 ⟨q, hq⟩ → ∃ p, j c p = q := by
     intro c q hq hch
     obtain ⟨d, p, rfl⟩ := hcover q
-    obtain ⟨s, hs⟩ := (hrange d _).1 (Algebra.subset_adjoin ⟨c.1, rfl⟩ :
-      x c / x d ∈ Algebra.adjoin o (Set.range fun i => x i / x d))
+    obtain ⟨s, hs⟩ :=
+      (hrange d _).1
+        (Algebra.subset_adjoin ⟨c.1, rfl⟩
+          : x c / x d ∈ Algebra.adjoin o (Set.range fun i => x i / x d))
     refine hover c d p s hs ?_
     obtain ⟨u, s', hs', hu⟩ := reg2 d p _ (hch.2 d.1)
     intro hsp
@@ -557,8 +590,10 @@ theorem tie_of_charts (o : Type) [CommRing o] [Algebra o Ω] {κ : Type} (x : κ
     exact Ideal.mul_mem_right _ _ hsp
   have gen : IsCptGen ξ := by
     have h0 : genMap ξ ⟨genPt ξ, specializes_rfl⟩ = (Scheme.stalkClosedPointTo ξ).hom := by
-      have h01 : X.presheaf.stalkSpecializes (specializes_rfl : genPt ξ ⤳ genPt ξ) ≫
-          Scheme.stalkClosedPointTo ξ = Scheme.stalkClosedPointTo ξ :=
+      have h01
+          : X.presheaf.stalkSpecializes (specializes_rfl : genPt ξ ⤳ genPt ξ)
+              ≫ Scheme.stalkClosedPointTo ξ
+            = Scheme.stalkClosedPointTo ξ :=
         (congrArg (· ≫ Scheme.stalkClosedPointTo ξ)
           (TopCat.Presheaf.stalkSpecializes_refl X.presheaf (genPt ξ))).trans (Category.id_comp _)
       exact congrArg (fun k => k.hom) h01
@@ -571,8 +606,8 @@ theorem tie_of_charts (o : Type) [CommRing o] [Algebra o Ω] {κ : Type} (x : κ
       obtain ⟨h', rfl⟩ := (hrange c₀ _).1 hh
       let p : Spec (.of (B c₀)) := Spec.map (CommRingCat.ofHom (θ c₀)) (IsLocalRing.closedPoint Ω)
       obtain ⟨φ, h1, -, -⟩ := chart_stalk (θ c₀) (j c₀) ξ (hξ c₀) p (spec c₀ p)
-      let w : B c₀ → X.presheaf.stalk (genPt ξ) :=
-        fun b => (X.presheaf.stalkSpecializes (spec c₀ p)).hom (φ b)
+      let w : B c₀ → X.presheaf.stalk (genPt ξ) := fun b =>
+        (X.presheaf.stalkSpecializes (spec c₀ p)).hom (φ b)
       let f : X.presheaf.stalk (genPt ξ) →+* Ω := (Scheme.stalkClosedPointTo ξ).hom
       haveI : IsLocalHom f := Scheme.isLocalHom_stalkClosedPointTo' ξ
       have hw : ∀ b, f (w b) = θ c₀ b := h1
@@ -604,19 +639,20 @@ theorem tie_of_charts (o : Type) [CommRing o] [Algebra o Ω] {κ : Type} (x : κ
       exact reg1 ⟨c, hc⟩ p b
     · intro ha
       refine (hrange ⟨c, hc⟩ a).2 ?_
-      let J : Ideal (B ⟨c, hc⟩) :=
-        { carrier := {b | θ ⟨c, hc⟩ b * a ∈ (θ ⟨c, hc⟩).range}
-          add_mem' := by
-            intro b b' hb hb'
-            rw [Set.mem_setOf_eq, map_add (f := _), add_mul]
-            exact add_mem hb hb'
-          zero_mem' := by
-            rw [Set.mem_setOf_eq, map_zero, zero_mul]
-            exact zero_mem _
-          smul_mem' := by
-            intro r b hb
-            rw [Set.mem_setOf_eq, smul_eq_mul, map_mul, mul_assoc]
-            exact mul_mem ⟨r, rfl⟩ hb }
+      let J : Ideal (B ⟨c, hc⟩) := {
+        carrier := {b | θ ⟨c, hc⟩ b * a ∈ (θ ⟨c, hc⟩).range}
+        add_mem' := by
+          intro b b' hb hb'
+          rw [Set.mem_setOf_eq, map_add (f := _), add_mul]
+          exact add_mem hb hb'
+        zero_mem' := by
+          rw [Set.mem_setOf_eq, map_zero, zero_mul]
+          exact zero_mem _
+        smul_mem' := by
+          intro r b hb
+          rw [Set.mem_setOf_eq, smul_eq_mul, map_mul, mul_assoc]
+          exact mul_mem ⟨r, rfl⟩ hb
+      }
       have hJ : J = ⊤ := by
         by_contra hne
         obtain ⟨m, hm, hJm⟩ := Ideal.exists_le_maximal J hne
@@ -739,32 +775,51 @@ namespace GlobalTheory.CompanionTheory.Ar
 
 open AlgebraicGeometry CategoryTheory Limits ClSch HomogeneousLocalization
 
-theorem exists_cl_scheme : ∀ (Ω : Type) [Field Ω] (o : Type) [CommRing o] [Algebra o Ω] (κ : Type) [Finite κ] (x : κ → Ω) (c₀ : κ), x c₀ ≠ 0 → (∀ a : Ω, ∃ g ∈ Algebra.adjoin o (Set.range fun j => x j / x c₀), ∃ h ∈ Algebra.adjoin o (Set.range fun j => x j / x c₀), h ≠ 0 ∧ a = g / h) → ∃ (X : Scheme.{0}) (ξ : Spec (CommRingCat.of Ω) ⟶ X) (s : X ⟶ Spec (CommRingCat.of o)), CoordTie o ξ x ∧ (∀ q : X, genPt ξ ⤳ q) ∧ IsIntegral X ∧ IsProper s ∧ ξ ≫ s = Spec.map (CommRingCat.ofHom (algebraMap o Ω)) := by
+theorem exists_cl_scheme
+    : ∀ (Ω : Type) [Field Ω] (o : Type) [CommRing o] [Algebra o Ω] (κ : Type) [Finite κ] (x : κ → Ω)
+        (c₀ : κ),
+      x c₀ ≠ 0
+        → (∀ a : Ω, ∃ g ∈ Algebra.adjoin o (Set.range fun j => x j / x c₀),
+          ∃ h ∈ Algebra.adjoin o (Set.range fun j => x j / x c₀),
+            h ≠ 0 ∧ a = g / h)
+        → ∃ (X : Scheme.{0}) (ξ : Spec (CommRingCat.of Ω) ⟶ X) (s : X ⟶ Spec (CommRingCat.of o)),
+          CoordTie o ξ x ∧ (∀ q : X, genPt ξ ⤳ q) ∧ IsIntegral X ∧ IsProper s
+            ∧ ξ ≫ s = Spec.map (CommRingCat.ofHom (algebraMap o Ω)) := by
   intro Ω _ o _ _ κ _ x c₀ hc₀ hfrac
   let B : {c // x c ≠ 0} → Type := fun c => Away (grading o x) (coord (o := o) (x := x) c.1)
   let θ : ∀ c : {c // x c ≠ 0}, B c →+* Ω := fun c => chartVal (coord c.1) (unit_coord c.2)
-  let j : ∀ c : {c // x c ≠ 0}, Spec (.of (B c)) ⟶ Proj (grading o x) :=
-    fun c => Proj.awayι (grading o x) (coord c.1) (coord_mem c.1) one_pos
+  let j : ∀ c : {c // x c ≠ 0}, Spec (.of (B c)) ⟶ Proj (grading o x) := fun c =>
+    Proj.awayι (grading o x) (coord c.1) (coord_mem c.1) one_pos
   haveI : ∀ c, IsOpenImmersion (j c) := fun c => by dsimp only [j]; infer_instance
   let ξ : Spec (CommRingCat.of Ω) ⟶ Proj (grading o x) :=
     Spec.map (CommRingCat.ofHom (θ ⟨c₀, hc₀⟩)) ≫ j ⟨c₀, hc₀⟩
   have hξ : ∀ c, ξ = Spec.map (CommRingCat.ofHom (θ c)) ≫ j c := fun c => chart_compat hc₀ c.2
-  obtain ⟨h1, h2, h3⟩ := tie_of_charts o x ξ B θ j
-    (fun c => chartVal_injective _ (coord_mem c.1))
-    (fun c a => mem_adjoin_iff_mem_range c.2 a) hξ
-    (fun q => by
-      obtain ⟨c, hc, p, hp⟩ := exists_chart_point q
-      exact ⟨⟨c, hc⟩, p, hp⟩)
-    (fun c d p s hs hp => chart_overlap c.2 d.2 p s hs hp)
-    ⟨c₀, hc₀⟩ hfrac
+  obtain ⟨h1, h2, h3⟩ :=
+    tie_of_charts o x ξ B θ j
+      (fun c => chartVal_injective _ (coord_mem c.1))
+      (fun c a => mem_adjoin_iff_mem_range c.2 a)
+      hξ
+      (fun q => by
+        obtain ⟨c, hc, p, hp⟩ := exists_chart_point q
+        exact ⟨⟨c, hc⟩, p, hp⟩)
+      (fun c d p s hs hp => chart_overlap c.2 d.2 p s hs hp)
+      ⟨c₀, hc₀⟩ hfrac
   haveI : IsClosedImmersion (Spec.map (CommRingCat.ofHom (zeroMap (o := o) (x := x)))) :=
     IsClosedImmersion.spec_of_surjective _ zeroMap_surjective
-  refine ⟨Proj (grading o x), ξ,
+  refine ⟨
+    Proj (grading o x),
+    ξ,
     Proj.toSpecZero (grading o x) ≫ Spec.map (CommRingCat.ofHom (zeroMap (o := o) (x := x))),
-    h1, h2, h3, inferInstance, ?_⟩
-  have h4 : ξ ≫ Proj.toSpecZero (grading o x) =
-      Spec.map (CommRingCat.ofHom (θ ⟨c₀, hc₀⟩)) ≫
-        Spec.map (CommRingCat.ofHom (fromZeroRingHom (grading o x) _)) := by
+    h1,
+    h2,
+    h3,
+    inferInstance,
+    ?_
+  ⟩
+  have h4
+      : ξ ≫ Proj.toSpecZero (grading o x)
+        = Spec.map (CommRingCat.ofHom (θ ⟨c₀, hc₀⟩))
+          ≫ Spec.map (CommRingCat.ofHom (fromZeroRingHom (grading o x) _)) := by
     simp only [ξ, j, Category.assoc, Proj.awayι_toSpecZero]
   rw [← Category.assoc, h4, ← Spec.map_comp, ← Spec.map_comp, ← CommRingCat.ofHom_comp,
     ← CommRingCat.ofHom_comp]

@@ -13,29 +13,40 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.AlgOver
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.SS
 open GlobalTheory.SS.ArcInf
 namespace GlobalTheory.SS.ArcInf
 
-theorem exists_factor_of_range_subset {k : Type} [CommRing k] {G : Over (Sp k)} {A B : Type} [CommRing A]
-    [Algebra k A] [CommRing B] [Algebra k B] (j : algOver k A ⟶ G) (hj : IsOpenImmersion j.left)
-    (a : algOver k B ⟶ G) (hr : Set.range a.left ⊆ Set.range j.left) :
-    ∃ χ : A →ₐ[k] B, algOverHom χ ≫ j = a := by
+theorem exists_factor_of_range_subset
+    {k : Type} [CommRing k]
+    {G : Over (Sp k)} {A B : Type} [CommRing A] [Algebra k A] [CommRing B] [Algebra k B]
+    (j : algOver k A ⟶ G) (hj : IsOpenImmersion j.left)
+    (a : algOver k B ⟶ G) (hr : Set.range a.left ⊆ Set.range j.left)
+    : ∃ χ : A →ₐ[k] B, algOverHom χ ≫ j = a := by
   have hf := IsOpenImmersion.lift_fac j.left a.left hr
-  let l : algOver k B ⟶ algOver k A := Over.homMk (IsOpenImmersion.lift j.left a.left hr) (by
-    rw [← Over.w j, ← Category.assoc, hf, Over.w a])
+  let l : algOver k B ⟶ algOver k A :=
+    Over.homMk (IsOpenImmersion.lift j.left a.left hr)
+      (by rw [← Over.w j, ← Category.assoc, hf, Over.w a])
   obtain ⟨χ, hχ⟩ := algOverHom_surjective l
   refine ⟨χ, ?_⟩
   rw [hχ]
   ext1
   exact hf
 
-theorem exists_extend_of_localSubring : ∀ (k : Type) [CommRing k] (G : Over (Sp k)) (O K F : Type) [CommRing O] [Algebra k O] [Field K] [Algebra k K] [Field F] [Algebra k F] (em : O →ₐ[k] K) (σ : K →ₐ[k] F) (L : Subalgebra k F), IsLocalRing L → Function.Injective em → (∀ x, σ x ∈ L → x ∈ Set.range em) → ∀ (a : algOver k K ⟶ G) (b' : algOver k L ⟶ G), algOverHom σ ≫ a = algOverHom L.val ≫ b' → ∃ b : algOver k O ⟶ G, algOverHom em ≫ b = a := by
+theorem exists_extend_of_localSubring
+    : ∀ (k : Type) [CommRing k] (G : Over (Sp k)) (O K F : Type) [CommRing O] [Algebra k O]
+        [Field K] [Algebra k K] [Field F] [Algebra k F] (em : O →ₐ[k] K) (σ : K →ₐ[k] F)
+        (L : Subalgebra k F),
+      IsLocalRing L → Function.Injective em → (∀ x, σ x ∈ L → x ∈ Set.range em)
+        → ∀ (a : algOver k K ⟶ G) (b' : algOver k L ⟶ G),
+          algOverHom σ ≫ a = algOverHom L.val ≫ b'
+            → ∃ b : algOver k O ⟶ G, algOverHom em ≫ b = a := by
   intro k _ G O K F _ _ _ _ _ _ em σ L hL hem hsub a b' hab
   let x0 : (Sp L) := IsLocalRing.closedPoint L
-  obtain ⟨R, i, hi, hx, -⟩ := Scheme.exists_affine_mem_range_and_range_subset (X := G.left)
-    (x := b'.left x0) (U := ⊤) trivial
+  obtain ⟨R, i, hi, hx, -⟩ :=
+    Scheme.exists_affine_mem_range_and_range_subset (X := G.left) (x := b'.left x0) (U := ⊤) trivial
   obtain ⟨φ, hφ⟩ := Spec.map_surjective (i ≫ G.hom : Spec R ⟶ Spec (CommRingCat.of k))
   letI : Algebra k R := φ.hom.toAlgebra
   let j : algOver k R ⟶ G := Over.homMk i hφ.symm

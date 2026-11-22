@@ -12,18 +12,26 @@ noncomputable section
 
 namespace GlobalTheory.Cusp.Shear
 
-theorem isHaarMeasure_map_prodHomeo : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [SecondCountableTopology G] [T2Space G]
-    [MeasurableSpace G] [BorelSpace G] (Γ N N' : Subgroup G) [DiscreteTopology Γ] [LocallyCompactSpace N]
-    [LocallyCompactSpace N'] (hle : N' ≤ N), (∀ p ∈ N, ∀ m ∈ N', p * m * p⁻¹ ∈ N') →
-    GlobalTheory.Cusp.Cocompact Γ N → GlobalTheory.Cusp.Cocompact Γ N' →
-    ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [LocallyCompactSpace V]
-      [SecondCountableTopology V] [T2Space V] [MeasurableSpace V] [BorelSpace V] (s : V → G) (π : N → V)
-      (hs : ∀ v, s v ∈ N) (hsc : Continuous s) (hπc : Continuous π) (hπmul : ∀ a b : N, π (a * b) = π a + π b)
-      (hπs : ∀ (a : N) (v : V), (a : G) = s v → π a = v) (hker : ∀ a : N, π a = 0 ↔ (a : G) ∈ N'),
-      (∀ v w, s (v + w) = s v * s w) → ∀ (μ : MeasureTheory.Measure V), μ.IsAddHaarMeasure →
-      (((MeasureTheory.Measure.haar : MeasureTheory.Measure N').prod μ).map
-        (GlobalTheory.Cusp.Shear.prodHomeo hle hs hsc hπc hπmul hπs hker)).IsHaarMeasure := by
-  intro G _ _ _ _ _ _ _ Γ N N' _ _ _ hle hn hc hc' V _ _ _ _ _ _ _ _ s π hs hsc hπc hπmul hπs hker hsmul μ hμ
+theorem isHaarMeasure_map_prodHomeo
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [SecondCountableTopology G]
+        [T2Space G] [MeasurableSpace G] [BorelSpace G] (Γ N N' : Subgroup G) [DiscreteTopology Γ]
+        [LocallyCompactSpace N] [LocallyCompactSpace N'] (hle : N' ≤ N),
+      (∀ p ∈ N, ∀ m ∈ N', p * m * p⁻¹ ∈ N') → GlobalTheory.Cusp.Cocompact Γ N
+        → GlobalTheory.Cusp.Cocompact Γ N'
+        → ∀ (V : Type) [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
+            [LocallyCompactSpace V] [SecondCountableTopology V] [T2Space V] [MeasurableSpace V]
+            [BorelSpace V] (s : V → G) (π : N → V) (hs : ∀ v, s v ∈ N) (hsc : Continuous s)
+            (hπc : Continuous π) (hπmul : ∀ a b : N, π (a * b) = π a + π b)
+            (hπs : ∀ (a : N) (v : V), (a : G) = s v → π a = v)
+            (hker : ∀ a : N, π a = 0 ↔ (a : G) ∈ N'),
+          (∀ v w, s (v + w) = s v * s w)
+            → ∀ (μ : MeasureTheory.Measure V),
+              μ.IsAddHaarMeasure
+                → (((MeasureTheory.Measure.haar : MeasureTheory.Measure N').prod μ).map
+                  (GlobalTheory.Cusp.Shear.prodHomeo hle hs hsc hπc hπmul hπs
+                    hker)).IsHaarMeasure := by
+  intro G _ _ _ _ _ _ _ Γ N N' _ _ _ hle hn hc hc' V _ _ _ _ _ _ _ _ s π hs hsc hπc hπmul hπs hker
+    hsmul μ hμ
   set e := prodHomeo hle hs hsc hπc hπmul hπs hker with he_def
   set P : Measure (N' × V) := (Measure.haar : Measure N').prod μ with hP
   set ν : Measure N := P.map e with hν

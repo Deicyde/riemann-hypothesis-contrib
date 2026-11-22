@@ -15,8 +15,8 @@ open PowerSeries
 
 variable {K : Type} [Field K] [CharZero K]
 
-theorem rescale_fExp (a : K) {f : PowerSeries K} (hf : constantCoeff f = 0) :
-    rescale a (fExp f) = fExp (rescale a f) := by
+theorem rescale_fExp (a : K) {f : PowerSeries K} (hf : constantCoeff f = 0)
+    : rescale a (fExp f) = fExp (rescale a f) := by
   rw [PowerSeries.rescale_eq_subst, PowerSeries.rescale_eq_subst]
   have hφ : ∀ _ : Unit, MvPowerSeries.constantCoeff (a • (PowerSeries.X : PowerSeries K)) = 0 := by
     intro _
@@ -25,8 +25,8 @@ theorem rescale_fExp (a : K) {f : PowerSeries K} (hf : constantCoeff f = 0) :
     simp
   exact subst_fExp (φ := fun _ => (a • PowerSeries.X : PowerSeries K)) hφ hf
 
-theorem coeff_prim_succ (f : PowerSeries K) (n : ℕ) :
-    coeff (n + 1) (prim f) = coeff n f / ((n + 1 : ℕ) : K) := by
+theorem coeff_prim_succ (f : PowerSeries K) (n : ℕ)
+    : coeff (n + 1) (prim f) = coeff n f / ((n + 1 : ℕ) : K) := by
   simp [prim, PowerSeries.coeff_mk]
 
 theorem coeff_zero_prim (f : PowerSeries K) : coeff 0 (prim f) = 0 := by
@@ -35,16 +35,16 @@ theorem coeff_zero_prim (f : PowerSeries K) : coeff 0 (prim f) = 0 := by
 theorem constantCoeff_sigS (P : PowerSeries K) : constantCoeff (sigS P) = 0 := by
   rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, sigS, map_neg, coeff_zero_prim, neg_zero]
 
-theorem constantCoeff_sig1S (e1 kap : K) (w : PowerSeries K) :
-    constantCoeff (sigmaOneSeries e1 kap w) = 0 := by
-  rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, sigmaOneSeries, map_neg, coeff_zero_prim, neg_zero]
+theorem constantCoeff_sig1S (e1 kap : K) (w : PowerSeries K)
+    : constantCoeff (sigmaOneSeries e1 kap w) = 0 := by
+  rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, sigmaOneSeries, map_neg, coeff_zero_prim,
+    neg_zero]
 
 private theorem pd_unit_eq_dz (f : PowerSeries K) : pd () f = dz f := by
   ext n
-  rw [PowerSeries.coeff_derivative,
-    PowerSeries.coeff_def (s := Finsupp.single () n) (by simp), MvPowerSeries.coeff_pderiv,
-    PowerSeries.coeff_def (s := Finsupp.single () (n + 1)) (by simp), ← Finsupp.single_add,
-    Finsupp.single_eq_same]
+  rw [PowerSeries.coeff_derivative, PowerSeries.coeff_def (s := Finsupp.single () n) (by simp),
+    MvPowerSeries.coeff_pderiv, PowerSeries.coeff_def (s := Finsupp.single () (n + 1)) (by simp),
+    ← Finsupp.single_add, Finsupp.single_eq_same]
 
 theorem mul_dz_fLog {g : PowerSeries K} (hg : constantCoeff g = 1) : g * dz (fLog g) = dz g := by
   have h := mul_pd_fLog (ι := Unit) () (g := g) hg
@@ -56,11 +56,13 @@ private theorem dz_prim_eq_self (f : PowerSeries K) : dz (prim f) = f := by
   push_cast
   exact div_mul_cancel₀ _ (Nat.cast_add_one_ne_zero n)
 
-private theorem eq_of_constantCoeff_eq_of_dz_eq {F G : PowerSeries K} (h0 : constantCoeff F = constantCoeff G)
-    (hd : dz F = dz G) : F = G := by
+private theorem eq_of_constantCoeff_eq_of_dz_eq
+    {F G : PowerSeries K} (h0 : constantCoeff F = constantCoeff G) (hd : dz F = dz G)
+    : F = G := by
   ext n
   rcases n with _ | m
-  · rw [PowerSeries.coeff_zero_eq_constantCoeff_apply, PowerSeries.coeff_zero_eq_constantCoeff_apply]
+  · rw [PowerSeries.coeff_zero_eq_constantCoeff_apply,
+      PowerSeries.coeff_zero_eq_constantCoeff_apply]
     exact h0
   · have h := congrArg (coeff m) hd
     rw [PowerSeries.coeff_derivative, PowerSeries.coeff_derivative] at h
@@ -85,12 +87,17 @@ theorem sigmaOneSquare : Sigma1Sq := by
   set L : PowerSeries K := fLog u with hLdef
   have hL0 : constantCoeff L = 0 := constantCoeff_fLog hu0
   have huL : u * dz L = dz u := mul_dz_fLog hu0
-  have hdu : dz u = 2 * PowerSeries.X * P + PowerSeries.X ^ 2 * dz P - 2 * PowerSeries.C e1 * PowerSeries.X := by
+  have hdu
+      : dz u
+        = 2 * PowerSeries.X * P + PowerSeries.X ^ 2 * dz P
+          - 2 * PowerSeries.C e1 * PowerSeries.X := by
     simp [hudef, Derivation.leibniz, Derivation.leibniz_pow, PowerSeries.derivative_X,
       PowerSeries.derivative_C]
     ring
-  have hddu : dz (dz u) = 2 * P + 4 * PowerSeries.X * dz P + PowerSeries.X ^ 2 * dz (dz P) -
-      2 * PowerSeries.C e1 := by
+  have hddu
+      : dz (dz u)
+        = 2 * P + 4 * PowerSeries.X * dz P + PowerSeries.X ^ 2 * dz (dz P)
+          - 2 * PowerSeries.C e1 := by
     have hd2 : PowerSeries.derivative (R := K) (2 : PowerSeries K) = 0 := by
       rw [show (2 : PowerSeries K) = PowerSeries.C 2 from (map_ofNat _ 2).symm]
       exact PowerSeries.derivative_C
@@ -98,9 +105,10 @@ theorem sigmaOneSquare : Sigma1Sq := by
     simp [Derivation.leibniz, Derivation.leibniz_pow, PowerSeries.derivative_X,
       PowerSeries.derivative_C, hd2]
     ring
-  have hT : u * dz (dz u) - dz u ^ 2 =
-      u ^ 2 * (2 * P - 2 * PowerSeries.C e1) -
-        2 * (3 * PowerSeries.C e1 ^ 2 - PowerSeries.C q) * PowerSeries.X ^ 2 * u := by
+  have hT
+      : u * dz (dz u) - dz u ^ 2
+        = u ^ 2 * (2 * P - 2 * PowerSeries.C e1)
+          - 2 * (3 * PowerSeries.C e1 ^ 2 - PowerSeries.C q) * PowerSeries.X ^ 2 * u := by
     rw [hddu, hdu, hudef]
     linear_combination (1 + PowerSeries.X ^ 2 * P - PowerSeries.C e1 * PowerSeries.X ^ 2) * hR2 - hR1 -
       PowerSeries.X ^ 4 * hcC
@@ -108,7 +116,8 @@ theorem sigmaOneSquare : Sigma1Sq := by
     have h := congrArg (PowerSeries.derivative (R := K)) huL
     rwa [Derivation.leibniz, smul_eq_mul, smul_eq_mul] at h
   have hu2 : u ^ 2 ≠ 0 := pow_ne_zero 2 (fun h => by rw [h] at hu0; simp at hu0)
-  have hLdd : dz (dz L) = 2 * P - 2 * PowerSeries.C e1 - 2 * PowerSeries.C (3 * e1 ^ 2 - q) * w := by
+  have hLdd
+      : dz (dz L) = 2 * P - 2 * PowerSeries.C e1 - 2 * PowerSeries.C (3 * e1 ^ 2 - q) * w := by
     apply mul_left_cancel₀ hu2
     simp only [map_sub, map_mul, map_pow, map_ofNat]
     linear_combination u * hB - dz u * huL + hT + 2 * (3 * PowerSeries.C e1 ^ 2 - PowerSeries.C q) * u * hwu
@@ -120,7 +129,9 @@ theorem sigmaOneSquare : Sigma1Sq := by
     simpa using h
   have hs0 := constantCoeff_sigS P
   have hs10 := constantCoeff_sig1S e1 (3 * e1 ^ 2 - q) w
-  have hkey : sigmaOneSeries e1 (3 * e1 ^ 2 - q) w + sigmaOneSeries e1 (3 * e1 ^ 2 - q) w = sigS P + sigS P + L := by
+  have hkey
+      : sigmaOneSeries e1 (3 * e1 ^ 2 - q) w + sigmaOneSeries e1 (3 * e1 ^ 2 - q) w
+        = sigS P + sigS P + L := by
     apply eq_of_constantCoeff_eq_of_dz_eq
     · rw [map_add (f := _), map_add (f := _), map_add (f := _), hs0, hs10, hL0]; ring
     · apply eq_of_constantCoeff_eq_of_dz_eq

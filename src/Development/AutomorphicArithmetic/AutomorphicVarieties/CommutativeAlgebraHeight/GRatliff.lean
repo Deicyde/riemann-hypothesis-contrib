@@ -7,10 +7,12 @@ public import ReciprocityTheory.CommutativeAlgebra.SaturatedChains.IsSaturatedCh
 
 open IsLocalRing
 
-theorem UpperTheory.V.CA.g_ratliff :
-    ∀ (P Q : Type) [CommRing P] [CommRing Q] [IsNoetherianRing P] [IsNoetherianRing Q] [Algebra P Q] [Module.Flat P Q] (n : ℕ),
-      ReciprocityTheory.CA.DimFormula P → ReciprocityTheory.CA.DimFormula Q → ringKrullDim P = n → ringKrullDim Q = n →
-        ∀ (q : Ideal P) [q.IsPrime], ∀ Q' ∈ (q.map (algebraMap P Q)).minimalPrimes,
+theorem UpperTheory.V.CA.g_ratliff
+    : ∀ (P Q : Type) [CommRing P] [CommRing Q] [IsNoetherianRing P] [IsNoetherianRing Q]
+        [Algebra P Q] [Module.Flat P Q] (n : ℕ),
+      ReciprocityTheory.CA.DimFormula P → ReciprocityTheory.CA.DimFormula Q → ringKrullDim P = n
+        → ringKrullDim Q = n
+        → ∀ (q : Ideal P) [q.IsPrime], ∀ Q' ∈ (q.map (algebraMap P Q)).minimalPrimes,
           Q'.comap (algebraMap P Q) = q ∧ ringKrullDim (Q ⧸ Q') = ringKrullDim (P ⧸ q) := by
   intro P Q _ _ _ _ _ _ n hP hQ dP dQ q _ Q' hQ'
   have hprime : Q'.IsPrime := hQ'.1.1
@@ -26,8 +28,9 @@ theorem UpperTheory.V.CA.g_ratliff :
     Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective (by simpa using h4)
   have h0 : (P₁.map (Ideal.Quotient.mk (q.map (algebraMap P Q)))).height = 0 := by
     rw [Ideal.height_eq_zero_iff]
-    have := Ideal.minimalPrimes_map_of_surjective
-      (f := Ideal.Quotient.mk (q.map (algebraMap P Q))) Ideal.Quotient.mk_surjective ⊥
+    have :=
+      Ideal.minimalPrimes_map_of_surjective (f := Ideal.Quotient.mk (q.map (algebraMap P Q)))
+        Ideal.Quotient.mk_surjective ⊥
     rw [Ideal.map_bot, bot_sup_eq, Ideal.mk_ker] at this
     change _ ∈ (⊥ : Ideal _).minimalPrimes
     rw [this]

@@ -16,8 +16,10 @@ theorem datum_bound_holds : DatumBd := datumBd_of_chain SSn.ChainPf.chain_bound_
 theorem jABddKapQQ_of_leaves (hG : SSn.SSnGeom) (hP : TypeProj) : JABddKapQQ :=
   jABddKapQQ_of_typeProj datum_bound_holds hG hP
 
-theorem jABddKapQQ_of_cut (hG : SSn.SSnGeom) (hPE : PRho.PRhoExists) (hGL : PRho.GaugeLines)
-    (hDU : SSn.Rep.DatumUnit) (hNW : NrmWFacts) : JABddKapQQ :=
+theorem jABddKapQQ_of_cut
+    (hG : SSn.SSnGeom) (hPE : PRho.PRhoExists) (hGL : PRho.GaugeLines) (hDU : SSn.Rep.DatumUnit)
+    (hNW : NrmWFacts)
+    : JABddKapQQ :=
   jABddKapQQ_of_leaves hG (typeProj_of hPE hGL hDU hNW)
 
 end Formalism.FourierDecayAlt.P.CutMP.JA

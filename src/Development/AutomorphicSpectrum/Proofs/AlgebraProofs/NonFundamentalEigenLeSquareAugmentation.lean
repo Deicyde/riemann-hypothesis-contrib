@@ -16,18 +16,21 @@ open scoped Matrix
 
 namespace GlobalTheory.CompanionTheory.Ar.GR.NonFund
 
-variable {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C]
-  {N : Type} [AddCommGroup N] [Fintype N] [DecidableEq N] (AA : HopfOrder (C := C) R N)
+variable
+  {C : Type} [Field C]
+  {R : Type} [CommRing R] [Algebra R C]
+  {N : Type} [AddCommGroup N] [Fintype N] [DecidableEq N]
+  (AA : HopfOrder (C := C) R N)
 
-theorem aug_mul {g h : N → C} (hg : g ∈ augIdeal AA.carrier) (hh : h ∈ AA.carrier) :
-    g * h ∈ augIdeal AA.carrier := by
+theorem aug_mul {g h : N → C} (hg : g ∈ augIdeal AA.carrier) (hh : h ∈ AA.carrier)
+    : g * h ∈ augIdeal AA.carrier := by
   refine ⟨AA.mul_mem _ _ hg.1 hh, ?_⟩
   have h0 : g 0 = 0 := hg.2
   change g 0 * h 0 = 0
   rw [h0, zero_mul]
 
-theorem sq_mul {g h : N → C} (hg : g ∈ sqIdeal (augIdeal AA.carrier)) (hh : h ∈ AA.carrier) :
-    g * h ∈ sqIdeal (augIdeal AA.carrier) := by
+theorem sq_mul {g h : N → C} (hg : g ∈ sqIdeal (augIdeal AA.carrier)) (hh : h ∈ AA.carrier)
+    : g * h ∈ sqIdeal (augIdeal AA.carrier) := by
   unfold sqIdeal at hg
   induction hg using Submodule.span_induction with
   | mem x hx =>
@@ -38,14 +41,13 @@ theorem sq_mul {g h : N → C} (hg : g ∈ sqIdeal (augIdeal AA.carrier)) (hh : 
   | smul c x _ hx => rw [smul_mul_assoc]; exact Submodule.smul_mem _ c hx
 
 def Lev (k : ℕ) (g : N → C) : Prop :=
-  g ∈ AA.carrier ∧ (1 ≤ k → g ∈ augIdeal AA.carrier) ∧
-    (2 ≤ k → g ∈ sqIdeal (augIdeal AA.carrier))
+  g ∈ AA.carrier ∧ (1 ≤ k → g ∈ augIdeal AA.carrier) ∧ (2 ≤ k → g ∈ sqIdeal (augIdeal AA.carrier))
 
 theorem lev_one : Lev AA 0 1 :=
   ⟨AA.one_mem, fun h => absurd h (by omega), fun h => absurd h (by omega)⟩
 
-theorem lev_mul {k l : ℕ} {g h : N → C} (hg : Lev AA k g) (hh : Lev AA l h) :
-    Lev AA (k + l) (g * h) := by
+theorem lev_mul {k l : ℕ} {g h : N → C} (hg : Lev AA k g) (hh : Lev AA l h)
+    : Lev AA (k + l) (g * h) := by
   refine ⟨AA.mul_mem _ _ hg.1 hh.1, fun hk => ?_, fun hk => ?_⟩
   · by_cases h1 : 1 ≤ k
     · exact aug_mul AA (hg.2.1 h1) hh.1
@@ -63,8 +65,9 @@ theorem lev_pow {g : N → C} (hg : g ∈ augIdeal AA.carrier) (k : ℕ) : Lev A
     rw [pow_succ]
     exact lev_mul AA ih ⟨hg.1, fun _ => hg, fun h => absurd h (by omega)⟩
 
-theorem lev_prod {ι : Type} (s : Finset ι) (u : ι → N → C) (hu : ∀ i, u i ∈ augIdeal AA.carrier)
-    (d : ι → ℕ) : Lev AA (∑ i ∈ s, d i) (∏ i ∈ s, u i ^ d i) := by
+theorem lev_prod
+    {ι : Type} (s : Finset ι) (u : ι → N → C) (hu : ∀ i, u i ∈ augIdeal AA.carrier) (d : ι → ℕ)
+    : Lev AA (∑ i ∈ s, d i) (∏ i ∈ s, u i ^ d i) := by
   classical
   induction s using Finset.induction_on with
   | empty => rw [Finset.sum_empty, Finset.prod_empty]; exact lev_one AA
@@ -72,8 +75,8 @@ theorem lev_prod {ι : Type} (s : Finset ι) (u : ι → N → C) (hu : ∀ i, u
     rw [Finset.sum_insert ha, Finset.prod_insert ha]
     exact lev_mul AA (lev_pow AA (hu a) _) ih
 
-theorem digits_single {f p : ℕ} (d : Fin f → ℕ) (n : Fin f) (hn : d n ≠ 0)
-    (hs : ¬ 2 ≤ ∑ i, d i) : ∑ i : Fin f, d i * p ^ (i : ℕ) = p ^ (n : ℕ) := by
+theorem digits_single {f p : ℕ} (d : Fin f → ℕ) (n : Fin f) (hn : d n ≠ 0) (hs : ¬ 2 ≤ ∑ i, d i)
+    : ∑ i : Fin f, d i * p ^ (i : ℕ) = p ^ (n : ℕ) := by
   have h := Finset.add_sum_erase Finset.univ d (Finset.mem_univ n)
   have h1 : d n = 1 := by omega
   have h0 : ∑ i ∈ Finset.univ.erase n, d i = 0 := by omega
@@ -86,7 +89,16 @@ theorem digits_single {f p : ℕ} (d : Fin f → ℕ) (n : Fin f) (hn : d n ≠ 
 end GlobalTheory.CompanionTheory.Ar.GR.NonFund
 
 open GlobalTheory.CompanionTheory.Ar.GR.NonFund in
-theorem _root_.GlobalTheory.CompanionTheory.Relay.non_fundamental_eigen_le_square_augmentation : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ), Fintype.card F = p ^ f → ∀ (AA : HopfOrder (C := C) R F), FStable F AA.carrier → ∀ χ : MulChar F R, ¬ IsFund p χ → eig AA.carrier χ ≤ sqIdeal (augIdeal AA.carrier) := by
+theorem _root_.GlobalTheory.CompanionTheory.Relay.non_fundamental_eigen_le_square_augmentation
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ),
+          Fintype.card F = p ^ f
+            → ∀ (AA : HopfOrder (C := C) R F),
+              FStable F AA.carrier
+                → ∀ χ : MulChar F R,
+                  ¬ IsFund p χ → eig AA.carrier χ ≤ sqIdeal (augIdeal AA.carrier) := by
   intro p hpp C _ _ _ v R _ _ hv hp F _ _ _ _ f hc AA hA χ hχ g hg
   obtain ⟨σ, hσ⟩ := fund_ex_relay p C v R hv hp F f hc
   obtain ⟨-, hgen, hfund, -, -⟩ := FundGen.main p C v R hv hp F f hc σ hσ
@@ -102,11 +114,12 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.non_fundamental_eigen_le_squar
     rw [← finFunctionFinEquiv_apply, Equiv.apply_symm_apply]
   have hne : ∃ n, (d n : ℕ) ≠ 0 := by
     by_contra hcon
-    have h0 : ∀ n, (d n : ℕ) = 0 := fun n => by
-      by_contra h; exact hcon ⟨n, h⟩
+    have h0 : ∀ n, (d n : ℕ) = 0 := fun n => by by_contra h; exact hcon ⟨n, h⟩
     simp only [h0, zero_mul, Finset.sum_const_zero] at hd
     omega
-  have hx := (GlobalTheory.T.fundamental_ideal_frobenius_powers p C v R hv hp F f hc AA hA σ hσ c hcx).2 d hne
+  have hx :=
+    (GlobalTheory.T.fundamental_ideal_frobenius_powers p C v R hv hp F f hc AA hA σ hσ c hcx).2 d
+      hne
   rw [hd] at hx
   have hs : 2 ≤ ∑ n, (d n : ℕ) := by
     by_contra hs
@@ -133,7 +146,7 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.non_fundamental_eigen_le_squar
     rw [MulChar.pow_apply' _ (by omega), ← hd, ← Finset.prod_pow_eq_pow_sum]
     refine Finset.prod_congr rfl fun n _ => ?_
     rw [MulChar.pow_apply' _ (pow_pos hp0 _).ne', ← pow_mul, mul_comm]
-  rw [ha, mul_assoc, ← Finset.prod_mul_distrib, map_mul, map_prod, Pi.smul_apply,
-    Algebra.smul_def, Finset.prod_apply]
+  rw [ha, mul_assoc, ← Finset.prod_mul_distrib, map_mul, map_prod, Pi.smul_apply, Algebra.smul_def,
+    Finset.prod_apply]
   refine congrArg _ (Finset.prod_congr rfl fun n _ => ?_)
   rw [← mul_pow, map_pow, Pi.pow_apply]

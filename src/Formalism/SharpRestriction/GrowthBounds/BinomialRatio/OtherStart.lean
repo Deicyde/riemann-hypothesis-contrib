@@ -14,8 +14,8 @@ variable {n' : ℕ}
 
 def rot (n : ℕ) (j : Fin n) : Fin n := ⟨(j.val + 1) % n, Nat.mod_lt _ j.pos⟩
 
-theorem rot_val (n : ℕ) (j : Fin n) :
-    (j.val + 1 < n ∧ (rot n j).val = j.val + 1) ∨ (j.val + 1 = n ∧ (rot n j).val = 0) := by
+theorem rot_val (n : ℕ) (j : Fin n)
+    : (j.val + 1 < n ∧ (rot n j).val = j.val + 1) ∨ (j.val + 1 = n ∧ (rot n j).val = 0) := by
   have hj := j.isLt
   by_cases h : j.val + 1 < n
   · left
@@ -34,16 +34,19 @@ theorem rot_inj (n : ℕ) : Function.Injective (rot n) := by
   apply Fin.ext
   omega
 
-theorem rot_bij (n : ℕ) : Function.Bijective (rot n) := Finite.injective_iff_bijective.mp (rot_inj n)
+theorem rot_bij (n : ℕ) : Function.Bijective (rot n) :=
+  Finite.injective_iff_bijective.mp (rot_inj n)
 
-theorem next_eq (TT : Finset (Fin n')) (j : Fin (numSeg TT)) : segNext TT j = segStart TT (rot _ j) := rfl
+theorem next_eq (TT : Finset (Fin n')) (j : Fin (numSeg TT))
+    : segNext TT j = segStart TT (rot _ j) :=
+  rfl
 
-theorem prod_next (TT : Finset (Fin n')) (h : Fin n' → ℝ) :
-    ∏ j, h (segNext TT j) = ∏ j, h (segStart TT j) :=
+theorem prod_next (TT : Finset (Fin n')) (h : Fin n' → ℝ)
+    : ∏ j, h (segNext TT j) = ∏ j, h (segStart TT j) :=
   (rot_bij (numSeg TT)).prod_comp (fun j => h (segStart TT j))
 
-theorem other_start (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT) (j : Fin (numSeg TT)) :
-    ∃ e, e ∈ TT ∧ Even e.val ∧ e ≠ segStart TT j := by
+theorem other_start (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT) (j : Fin (numSeg TT))
+    : ∃ e, e ∈ TT ∧ Even e.val ∧ e ≠ segStart TT j := by
   by_cases h0 : j.val = 0
   · refine ⟨segStart TT ⟨1, by omega⟩, (start_mem TT _).1, (start_mem TT _).2, fun e => ?_⟩
     have := congrArg Fin.val ((ev_mono TT).injective e)
@@ -54,8 +57,9 @@ theorem other_start (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT) (j : Fin (numS
     simp at this
     omega
 
-theorem segG_eq (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT) (j : Fin (numSeg TT)) :
-    segG TT j = cdist (segStart TT j) (segNext TT j) ∧ 0 < cdist (segStart TT j) (segNext TT j) := by
+theorem segG_eq (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT) (j : Fin (numSeg TT))
+    : segG TT j = cdist (segStart TT j) (segNext TT j)
+      ∧ 0 < cdist (segStart TT j) (segNext TT j) := by
   obtain ⟨e, he, hev, hne⟩ := other_start TT h2 j
   obtain ⟨m1, -⟩ := next_min TT j e he hev hne
   refine ⟨?_, m1⟩
@@ -63,9 +67,11 @@ theorem segG_eq (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT) (j : Fin (numSeg T
   rw [if_neg (by omega)]
 
 theorem sum_segG (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT) : ∑ j, segG TT j = n' := by
-  have key : ∀ j : Fin (numSeg TT), (segG TT j : ℤ) =
-      ((segStart TT (rot _ j)).val : ℤ) - ((segStart TT j).val : ℤ) +
-        (if j = ⟨numSeg TT - 1, by omega⟩ then (n' : ℤ) else 0) := by
+  have key
+      : ∀ j : Fin (numSeg TT),
+        (segG TT j : ℤ)
+          = ((segStart TT (rot _ j)).val : ℤ) - ((segStart TT j).val : ℤ)
+            + (if j = ⟨numSeg TT - 1, by omega⟩ then (n' : ℤ) else 0) := by
     intro j
     obtain ⟨g, g0⟩ := segG_eq TT h2 j
     rw [g, next_eq] at *
@@ -98,8 +104,8 @@ theorem sum_segG (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT) : ∑ j, segG TT 
     simp
   exact_mod_cast this
 
-theorem prod_starts (TT : Finset (Fin n')) (h : Fin n' → ℝ) :
-    ∏ j, h (segStart TT j) = ∏ s ∈ TT.filter (fun s => Even s.val), h s := by
+theorem prod_starts (TT : Finset (Fin n')) (h : Fin n' → ℝ)
+    : ∏ j, h (segStart TT j) = ∏ s ∈ TT.filter (fun s => Even s.val), h s := by
   refine Finset.prod_nbij (fun j => segStart TT j) ?_ ?_ ?_ (fun _ _ => rfl)
   · intro j _
     exact Finset.mem_filter.mpr (start_mem TT j)
@@ -110,8 +116,9 @@ theorem prod_starts (TT : Finset (Fin n')) (h : Fin n' → ℝ) :
     obtain ⟨k, hk⟩ := List.mem_iff_get.mp ((ev_mem TT s).mpr hs')
     exact ⟨k, Finset.mem_coe.mpr (Finset.mem_univ _), hk⟩
 
-theorem pos_spec (TT : Finset (Fin n')) (j : Fin (numSeg TT)) (i : Fin (segS TT j)) :
-    segPos TT j i ∈ oddSet TT j ∧ cdist (segStart TT j) (segPos TT j i) = (segDists TT j).get i := by
+theorem pos_spec (TT : Finset (Fin n')) (j : Fin (numSeg TT)) (i : Fin (segS TT j))
+    : segPos TT j i ∈ oddSet TT j
+      ∧ cdist (segStart TT j) (segPos TT j i) = (segDists TT j).get i := by
   obtain ⟨s, hs, h5⟩ := get_spec TT j i
   have : segPos TT j i = s := by
     unfold segPos
@@ -119,8 +126,8 @@ theorem pos_spec (TT : Finset (Fin n')) (j : Fin (numSeg TT)) (i : Fin (segS TT 
   rw [this]
   exact ⟨Finset.mem_filter.mpr hs, h5⟩
 
-theorem prod_pos (TT : Finset (Fin n')) (j : Fin (numSeg TT)) (h : Fin n' → ℝ) :
-    ∏ i, h (segPos TT j i) = ∏ s ∈ oddSet TT j, h s := by
+theorem prod_pos (TT : Finset (Fin n')) (j : Fin (numSeg TT)) (h : Fin n' → ℝ)
+    : ∏ i, h (segPos TT j i) = ∏ s ∈ oddSet TT j, h s := by
   refine Finset.prod_nbij (fun i => segPos TT j i) ?_ ?_ ?_ (fun _ _ => rfl)
   · intro i _
     exact (pos_spec TT j i).1
@@ -139,11 +146,13 @@ theorem prod_pos (TT : Finset (Fin n')) (j : Fin (numSeg TT)) (h : Fin n' → �
     unfold segPos
     rw [hi, posAdd_cdist]
 
-theorem odd_covered (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT) (s : Fin n') (hs : s ∈ TT) (ho : ¬ Even s.val) :
-    ∃ j, s ∈ oddSet TT j := by
+theorem odd_covered
+    (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT) (s : Fin n') (hs : s ∈ TT) (ho : ¬ Even s.val)
+    : ∃ j, s ∈ oddSet TT j := by
   have hne : (TT.filter (fun x => Even x.val)).Nonempty :=
     ⟨segStart TT ⟨0, by omega⟩, Finset.mem_filter.mpr (start_mem TT _)⟩
-  obtain ⟨x, hx, hmin⟩ := Finset.exists_min_image (TT.filter (fun x => Even x.val)) (fun x => cdist x s) hne
+  obtain ⟨x, hx, hmin⟩ :=
+    Finset.exists_min_image (TT.filter (fun x => Even x.val)) (fun x => cdist x s) hne
   have hx' := Finset.mem_filter.mp hx
   obtain ⟨j, hj⟩ := List.mem_iff_get.mp ((ev_mem TT x).mpr hx')
   have hj' : segStart TT j = x := hj
@@ -170,8 +179,8 @@ theorem odd_covered (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT) (s : Fin n') (
     have l3 := (segNext TT j).isLt
     omega
 
-theorem biUnion_odd (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT) :
-    Finset.univ.biUnion (oddSet TT) = TT.filter (fun s => ¬ Even s.val) := by
+theorem biUnion_odd (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT)
+    : Finset.univ.biUnion (oddSet TT) = TT.filter (fun s => ¬ Even s.val) := by
   ext s
   constructor
   · intro hs
@@ -183,8 +192,8 @@ theorem biUnion_odd (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT) :
     obtain ⟨j, hj⟩ := odd_covered TT h2 s a0 a1
     exact Finset.mem_biUnion.mpr ⟨j, Finset.mem_univ _, hj⟩
 
-theorem prod_tops (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT) (h : Fin n' → ℝ) :
-    ∏ s ∈ TT, h s = ∏ j, (h (segStart TT j) * ∏ i, h (segPos TT j i)) := by
+theorem prod_tops (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT) (h : Fin n' → ℝ)
+    : ∏ s ∈ TT, h s = ∏ j, (h (segStart TT j) * ∏ i, h (segPos TT j i)) := by
   rw [Finset.prod_mul_distrib, prod_starts, Finset.prod_congr rfl fun j _ => prod_pos TT j h,
     ← Finset.prod_biUnion (fun j _ j' _ hjj => oddSet_disj TT j j' hjj), biUnion_odd TT h2,
     Finset.prod_filter_mul_prod_filter_not]

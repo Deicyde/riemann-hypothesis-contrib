@@ -15,7 +15,22 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 namespace GlobalTheory.CompanionTheory.ConeHaar
 
-theorem leftInvariant_of_section : ∀ {Γ K X : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [T2Space Γ] [LocallyCompactSpace Γ] [SecondCountableTopology Γ] [MeasurableSpace Γ] [BorelSpace Γ] [Group K] [TopologicalSpace K] [IsTopologicalGroup K] [T2Space K] [CompactSpace K] [SecondCountableTopology K] [MeasurableSpace K] [BorelSpace K] (e : K →* Γ) (_ : Continuous e) [MeasurableSpace X] (ρ : Measure X) [SFinite ρ] (s : X → Γ) (_ : Measurable s) (_ : ρ ≠ 0) (_ : ∀ g : Γ, ∃ a : X → X, Measurable a ∧ Measure.map a ρ = ρ ∧ ∀ᵐ x ∂ρ, ∃ k, g * s x = s (a x) * e k) (_ : ∀ A : Set Γ, IsCompact A → ρ (s ⁻¹' (A * Set.range e)) < ⊤) (μ : Measure Γ) [μ.IsHaarMeasure], ∃ c : ℝ, 0 < c ∧ ∀ F : Γ → ℂ, Continuous F → HasCompactSupport F → (∀ y k, F (y * e k) = F y) → ∫ y, F y ∂μ = c * ∫ x, F (s x) ∂ρ := by
+theorem leftInvariant_of_section
+    : ∀ {Γ K X : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [T2Space Γ]
+        [LocallyCompactSpace Γ] [SecondCountableTopology Γ] [MeasurableSpace Γ] [BorelSpace Γ]
+        [Group K] [TopologicalSpace K] [IsTopologicalGroup K] [T2Space K] [CompactSpace K]
+        [SecondCountableTopology K] [MeasurableSpace K] [BorelSpace K] (e : K →* Γ)
+        (_ : Continuous e) [MeasurableSpace X] (ρ : Measure X) [SFinite ρ] (s : X → Γ)
+        (_ : Measurable s) (_ : ρ ≠ 0)
+        (_ : ∀ g : Γ, ∃ a : X → X,
+          Measurable a ∧ Measure.map a ρ = ρ ∧ ∀ᵐ x ∂ρ, ∃ k, g * s x = s (a x) * e k)
+        (_ : ∀ A : Set Γ, IsCompact A → ρ (s ⁻¹' (A * Set.range e)) < ⊤) (μ : Measure Γ)
+        [μ.IsHaarMeasure],
+      ∃ c : ℝ,
+        0 < c
+          ∧ ∀ F : Γ → ℂ,
+            Continuous F → HasCompactSupport F → (∀ y k, F (y * e k) = F y)
+              → ∫ y, F y ∂μ = c * ∫ x, F (s x) ∂ρ := by
   intro Γ K X _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ e he _ ρ _ s hs hρ hinv hfin μ _
   obtain ⟨m, hmH, hm1⟩ : ∃ m : Measure K, m.IsHaarMeasure ∧ m Set.univ = 1 := by
     refine ⟨Measure.haarMeasure (⊤ : TopologicalSpace.PositiveCompacts K), inferInstance, ?_⟩
@@ -26,19 +41,21 @@ theorem leftInvariant_of_section : ∀ {Γ K X : Type} [Group Γ] [TopologicalSp
   set φ : X × K → Γ := fun p => s p.1 * e p.2 with hφ_def
   have hφ : Measurable φ := (hs.comp measurable_fst).mul (he.measurable.comp measurable_snd)
   set ν : Measure Γ := Measure.map φ (ρ.prod m) with hν_def
-  have key : ∀ (B : Set Γ) (y : Γ) (k : K),
-      m ((fun k' => y * e k * e k') ⁻¹' B) = m ((fun k' => y * e k') ⁻¹' B) := by
+  have key
+      : ∀ (B : Set Γ) (y : Γ) (k : K),
+        m ((fun k' => y * e k * e k') ⁻¹' B) = m ((fun k' => y * e k') ⁻¹' B) := by
     intro B y k
-    have h : (fun k' => y * e k * e k') ⁻¹' B = (fun k' => k * k') ⁻¹' ((fun k' => y * e k') ⁻¹' B) := by
+    have h
+        : (fun k' => y * e k * e k') ⁻¹' B
+          = (fun k' => k * k') ⁻¹' ((fun k' => y * e k') ⁻¹' B) := by
       ext k'; simp [map_mul, mul_assoc]
     rw [h, measure_preimage_mul]
-  have hνapp : ∀ B : Set Γ, MeasurableSet B →
-      ν B = ∫⁻ x, m ((fun k => s x * e k) ⁻¹' B) ∂ρ := by
+  have hνapp : ∀ B : Set Γ, MeasurableSet B → ν B = ∫⁻ x, m ((fun k => s x * e k) ⁻¹' B) ∂ρ := by
     intro B hB
     rw [hν_def, Measure.map_apply hφ hB, Measure.prod_apply (hφ hB)]
     rfl
-  have hmeasψ : ∀ B : Set Γ, MeasurableSet B →
-      Measurable (fun x => m ((fun k => s x * e k) ⁻¹' B)) := by
+  have hmeasψ
+      : ∀ B : Set Γ, MeasurableSet B → Measurable (fun x => m ((fun k => s x * e k) ⁻¹' B)) := by
     intro B hB
     exact measurable_measure_prodMk_left (hφ hB)
   haveI : ν.IsMulLeftInvariant := by
@@ -86,8 +103,7 @@ theorem leftInvariant_of_section : ∀ {Γ K X : Type} [Group Γ] [TopologicalSp
   intro F hF _ hFK
   have h1 : ∫ y, F y ∂ν = ∫ x, F (s x) ∂ρ := by
     rw [hν_def, integral_map hφ.aemeasurable hF.aestronglyMeasurable]
-    have h : (fun p : X × K => F (φ p)) = fun p => F (s p.1) := by
-      funext p; exact hFK (s p.1) p.2
+    have h : (fun p : X × K => F (φ p)) = fun p => F (s p.1) := by funext p; exact hFK (s p.1) p.2
     have hf := integral_fun_fst (μ := ρ) (ν := m) (fun x => F (s x))
     rw [h, hf, measureReal_def, hm1]
     simp

@@ -10,11 +10,13 @@ noncomputable section
 namespace GlobalTheory.CompanionTheory.Ar.PB.FMX.Blocks
 
 open AlgebraicGeometry CategoryTheory NumberField Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.PB GlobalTheory.CompanionTheory.Ar.PB.FMX GlobalTheory.CompanionTheory.Ar.FlagBun
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.PB
+  GlobalTheory.CompanionTheory.Ar.PB.FMX GlobalTheory.CompanionTheory.Ar.FlagBun
 
-theorem blkF_eq_none_iff (Ψ : Type) (p q : ℕ) (K₀ : Type) (r : Ψ × Fin (p + q)) :
-    blkF (Ψ := Ψ) (p := p) (q := q) K₀ r = none ↔ ¬ IsProperStep (p + q) p r.2 := by
+theorem blkF_eq_none_iff (Ψ : Type) (p q : ℕ) (K₀ : Type) (r : Ψ × Fin (p + q))
+    : blkF (Ψ := Ψ) (p := p) (q := q) K₀ r = none ↔ ¬ IsProperStep (p + q) p r.2 := by
   unfold blkF
   split_ifs with h <;> simp [h]
 
@@ -36,18 +38,21 @@ theorem stepOf_injective (Ψ : Type) (p q : ℕ) : Function.Injective (stepOf Ψ
     have e₂ : (i : ℕ) - p = (i' : ℕ) - p := congrArg (fun t : StepIx Ψ p q => (t.2 : ℕ)) h
     exact Prod.ext e₁ (Fin.ext (by show (i : ℕ) = (i' : ℕ); omega))
 
-theorem blkF_inj (Ψ : Type) (p q : ℕ) (K₀ : Type) (r r' : Ψ × Fin (p + q)) (k : K₀ ⊕ StepIx Ψ p q)
+theorem blkF_inj
+    (Ψ : Type) (p q : ℕ) (K₀ : Type) (r r' : Ψ × Fin (p + q)) (k : K₀ ⊕ StepIx Ψ p q)
     (h : blkF (Ψ := Ψ) (p := p) (q := q) K₀ r = some k)
-    (h' : blkF (Ψ := Ψ) (p := p) (q := q) K₀ r' = some k) : r = r' := by
+    (h' : blkF (Ψ := Ψ) (p := p) (q := q) K₀ r' = some k)
+    : r = r' := by
   unfold blkF at h h'
   split_ifs at h h'
   apply stepOf_injective Ψ p q
   have e := (Option.some.inj h).trans (Option.some.inj h').symm
   exact Sum.inr.inj e
 
-theorem fromBlocks_isBlockDiag {R : Type} [CommRing R] (p q : ℕ) (A : Matrix (Fin q) (Fin q) R)
-    (B : Matrix (Fin p) (Fin p) R) :
-    IsBlockDiag p ((Matrix.fromBlocks A 0 0 B).submatrix (blockEquiv p q).symm (blockEquiv p q).symm) := by
+theorem fromBlocks_isBlockDiag
+    {R : Type} [CommRing R] (p q : ℕ) (A : Matrix (Fin q) (Fin q) R) (B : Matrix (Fin p) (Fin p) R)
+    : IsBlockDiag p
+      ((Matrix.fromBlocks A 0 0 B).submatrix (blockEquiv p q).symm (blockEquiv p q).symm) := by
   intro a b hab
   obtain ⟨x, rfl⟩ := (blockEquiv p q).surjective a
   obtain ⟨y, rfl⟩ := (blockEquiv p q).surjective b
@@ -66,15 +71,18 @@ theorem fromBlocks_isBlockDiag {R : Type} [CommRing R] (p q : ℕ) (A : Matrix (
     show (q + (x : ℕ) < _ ↔ q + (y : ℕ) < _)
     omega
 
-theorem gMat_isBlockDiag (Ψ : Type) (p q : ℕ) (Ω : Type) [Field Ω] (τ : Ψ) :
-    IsBlockDiag p (gMat p q Ω τ) :=
+theorem gMat_isBlockDiag (Ψ : Type) (p q : ℕ) (Ω : Type) [Field Ω] (τ : Ψ)
+    : IsBlockDiag p (gMat p q Ω τ) :=
   fromBlocks_isBlockDiag p q (genU Ω (rk Ψ p q) (.inr τ)) (genU Ω (rk Ψ p q) (.inl τ))
 
-theorem blocks_main : ∀ (Ψ : Type) [Fintype Ψ] (p q : ℕ) (Ω : Type) [Field Ω] (K₀ : Type),
-    (∀ r, blkF (Ψ := Ψ) (p := p) (q := q) K₀ r = none ↔ ¬ IsProperStep (p + q) p r.2) ∧
-    (∀ r r' k, blkF (Ψ := Ψ) (p := p) (q := q) K₀ r = some k →
-      blkF (Ψ := Ψ) (p := p) (q := q) K₀ r' = some k → r = r') ∧
-    ∀ τ : Ψ, IsBlockDiag p (gMat p q Ω τ) :=
-  fun Ψ _ p q Ω _ K₀ => ⟨blkF_eq_none_iff Ψ p q K₀, blkF_inj Ψ p q K₀, gMat_isBlockDiag Ψ p q Ω⟩
+theorem blocks_main
+    : ∀ (Ψ : Type) [Fintype Ψ] (p q : ℕ) (Ω : Type) [Field Ω] (K₀ : Type),
+      (∀ r, blkF (Ψ := Ψ) (p := p) (q := q) K₀ r = none ↔ ¬ IsProperStep (p + q) p r.2)
+        ∧ (∀ r r' k,
+          blkF (Ψ := Ψ) (p := p) (q := q) K₀ r = some k
+            → blkF (Ψ := Ψ) (p := p) (q := q) K₀ r' = some k
+            → r = r')
+        ∧ ∀ τ : Ψ, IsBlockDiag p (gMat p q Ω τ) := fun Ψ _ p q Ω _ K₀ =>
+  ⟨blkF_eq_none_iff Ψ p q K₀, blkF_inj Ψ p q K₀, gMat_isBlockDiag Ψ p q Ω⟩
 
 end GlobalTheory.CompanionTheory.Ar.PB.FMX.Blocks

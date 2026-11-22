@@ -10,32 +10,31 @@ open Finset
 
 namespace ReciprocityTheory.ChartRestriction.TR.Weyl
 
-theorem bp_filter_eq_map {n : ℕ} (ε : Fin n → Bool) (b : Bool) :
-    (univ.filter fun i : Fin n => ε i = b) =
-      univ.map ((univ.filter fun i : Fin n => ε i = b).orderEmbOfFin rfl).toEmbedding := by
+theorem bp_filter_eq_map {n : ℕ} (ε : Fin n → Bool) (b : Bool)
+    : (univ.filter fun i : Fin n => ε i = b)
+      = univ.map ((univ.filter fun i : Fin n => ε i = b).orderEmbOfFin rfl).toEmbedding := by
   exact (Finset.map_orderEmbOfFin_univ _ rfl).symm
 
-theorem bp_prod_blk {M : Type*} [CommMonoid M] {n : ℕ} (ε : Fin n → Bool) (b : Bool)
-    (g : Fin n → M) :
-    ∏ i ∈ univ.filter (fun i : Fin n => ε i = b), g i = ∏ r, g (blk ε b r) := by
+theorem bp_prod_blk {M : Type*} [CommMonoid M] {n : ℕ} (ε : Fin n → Bool) (b : Bool) (g : Fin n → M)
+    : ∏ i ∈ univ.filter (fun i : Fin n => ε i = b), g i = ∏ r, g (blk ε b r) := by
   rw [bp_filter_eq_map, Finset.prod_map]
   rfl
 
-theorem bp_split {M : Type*} [CommMonoid M] {n : ℕ} (ε : Fin n → Bool) (F : Fin n → M) :
-    ∏ i, F i = (∏ r, F (blk ε true r)) * ∏ r, F (blk ε false r) := by
+theorem bp_split {M : Type*} [CommMonoid M] {n : ℕ} (ε : Fin n → Bool) (F : Fin n → M)
+    : ∏ i, F i = (∏ r, F (blk ε true r)) * ∏ r, F (blk ε false r) := by
   rw [← bp_prod_blk ε true F, ← bp_prod_blk ε false F,
     ← Finset.prod_filter_mul_prod_filter_not Finset.univ (fun i : Fin n => ε i = true)]
   congr 2
 
-theorem bp_blk_surj {n : ℕ} (ε : Fin n → Bool) (b : Bool) (i : Fin n) (h : ε i = b) :
-    ∃ r, blk ε b r = i := by
+theorem bp_blk_surj {n : ℕ} (ε : Fin n → Bool) (b : Bool) (i : Fin n) (h : ε i = b)
+    : ∃ r, blk ε b r = i := by
   have hi : i ∈ univ.filter fun i : Fin n => ε i = b := by simp [h]
   rw [bp_filter_eq_map] at hi
   obtain ⟨r, _, hr⟩ := Finset.mem_map.mp hi
   exact ⟨r, hr⟩
 
-theorem bp_blk_disj {n : ℕ} (ε : Fin n → Bool) (r : Fin (cnt ε true)) (s : Fin (cnt ε false)) :
-    blk ε true r ≠ blk ε false s := by
+theorem bp_blk_disj {n : ℕ} (ε : Fin n → Bool) (r : Fin (cnt ε true)) (s : Fin (cnt ε false))
+    : blk ε true r ≠ blk ε false s := by
   intro h
   have h1 : ε (blk ε true r) = true := by
     have := Finset.orderEmbOfFin_mem (univ.filter fun i : Fin n => ε i = true) rfl r
@@ -46,19 +45,30 @@ theorem bp_blk_disj {n : ℕ} (ε : Fin n → Bool) (r : Fin (cnt ε true)) (s :
   rw [h, h2] at h1
   exact Bool.false_ne_true h1
 
-theorem bp_wden {K : Type*} [Field K] {n : ℕ} (ε : Fin n → Bool) (t : Fin n → K) :
-    wdenK ε t = wden (cnt ε true) (t ∘ blk ε true) * wden (cnt ε false) (t ∘ blk ε false) := by
+theorem bp_wden {K : Type*} [Field K] {n : ℕ} (ε : Fin n → Bool) (t : Fin n → K)
+    : wdenK ε t = wden (cnt ε true) (t ∘ blk ε true) * wden (cnt ε false) (t ∘ blk ε false) := by
   have hmem : ∀ (b : Bool) (s : Fin (cnt ε b)), ε (blk ε b s) = b := fun b s => by
     have := Finset.orderEmbOfFin_mem (univ.filter fun i : Fin n => ε i = b) rfl s
     simpa [blk] using this
-  have hsame : ∀ (b : Bool) (r r' : Fin (cnt ε b)),
-      (if blk ε b r < blk ε b r' ∧ ε (blk ε b r) = ε (blk ε b r') then t (blk ε b r) - t (blk ε b r') else 1) =
-        (if r < r' then (t ∘ blk ε b) r - (t ∘ blk ε b) r' else 1) := by
+  have hsame
+      : ∀ (b : Bool) (r r' : Fin (cnt ε b)),
+        (if blk ε b r < blk ε b r' ∧ ε (blk ε b r) = ε (blk ε b r') then
+           t (blk ε b r) - t (blk ε b r')
+         else
+           1)
+          = (if r < r' then (t ∘ blk ε b) r - (t ∘ blk ε b) r' else 1) := by
     intro b r r'
     rw [hmem b r, hmem b r']
     simp only [and_true, Function.comp_apply, (blk_strictMono ε b).lt_iff_lt]
-  have hother : ∀ (b b' : Bool), b ≠ b' → ∀ (r : Fin (cnt ε b)) (s : Fin (cnt ε b')),
-      (if blk ε b r < blk ε b' s ∧ ε (blk ε b r) = ε (blk ε b' s) then t (blk ε b r) - t (blk ε b' s) else 1) = 1 := by
+  have hother
+      : ∀ (b b' : Bool),
+        b ≠ b'
+          → ∀ (r : Fin (cnt ε b)) (s : Fin (cnt ε b')),
+            (if blk ε b r < blk ε b' s ∧ ε (blk ε b r) = ε (blk ε b' s) then
+               t (blk ε b r) - t (blk ε b' s)
+             else
+               1)
+              = 1 := by
     intro b b' hbb r s
     rw [if_neg]
     rintro ⟨_, h⟩
@@ -82,8 +92,9 @@ theorem bp_rho {n : ℕ} (ε : Fin n → Bool) (b : Bool) : rhoK ε ∘ blk ε b
     simpa [blk] using this
   funext r
   simp only [Function.comp_apply, rhoK, delta, hmem r]
-  have hset : (univ.filter fun j : Fin n => blk ε b r < j ∧ ε j = b) =
-      (Finset.Ioi r).map ⟨blk ε b, (blk_strictMono ε b).injective⟩ := by
+  have hset
+      : (univ.filter fun j : Fin n => blk ε b r < j ∧ ε j = b)
+        = (Finset.Ioi r).map ⟨blk ε b, (blk_strictMono ε b).injective⟩ := by
     ext j
     simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_map, Finset.mem_Ioi,
       Function.Embedding.coeFn_mk]
@@ -98,8 +109,8 @@ theorem bp_rho {n : ℕ} (ε : Fin n → Bool) (b : Bool) : rhoK ε ∘ blk ε b
   have := r.isLt
   omega
 
-theorem bp_alt_eq_sum {K : Type*} [Field K] (n : ℕ) (a : Fin n → ℤ) (t : Fin n → K) :
-    alt n a t = ∑ σ : Equiv.Perm (Fin n), ((Equiv.Perm.sign σ : ℤ) : K) * ∏ i, t (σ i) ^ a i := by
+theorem bp_alt_eq_sum {K : Type*} [Field K] (n : ℕ) (a : Fin n → ℤ) (t : Fin n → K)
+    : alt n a t = ∑ σ : Equiv.Perm (Fin n), ((Equiv.Perm.sign σ : ℤ) : K) * ∏ i, t (σ i) ^ a i := by
   unfold alt
   rw [Matrix.det_apply]
   refine Finset.sum_congr rfl fun σ _ => ?_
@@ -121,27 +132,32 @@ def bp_e {n : ℕ} (ε : Fin n → Bool) : Fin (cnt ε true) ⊕ Fin (cnt ε fal
       · obtain ⟨r, hr⟩ := bp_blk_surj ε true i hb
         exact ⟨Sum.inl r, hr⟩)
 
-theorem bp_e_inl {n : ℕ} (ε : Fin n → Bool) (r : Fin (cnt ε true)) :
-    bp_e ε (Sum.inl r) = blk ε true r := rfl
+theorem bp_e_inl {n : ℕ} (ε : Fin n → Bool) (r : Fin (cnt ε true))
+    : bp_e ε (Sum.inl r) = blk ε true r :=
+  rfl
 
-theorem bp_e_inr {n : ℕ} (ε : Fin n → Bool) (r : Fin (cnt ε false)) :
-    bp_e ε (Sum.inr r) = blk ε false r := rfl
+theorem bp_e_inr {n : ℕ} (ε : Fin n → Bool) (r : Fin (cnt ε false))
+    : bp_e ε (Sum.inr r) = blk ε false r :=
+  rfl
 
-theorem bp_phi_inl {n : ℕ} (ε : Fin n → Bool) (α : Equiv.Perm (Fin (cnt ε true)))
-    (β : Equiv.Perm (Fin (cnt ε false))) (r : Fin (cnt ε true)) :
-    (bp_e ε).permCongr (Equiv.Perm.sumCongr α β) (blk ε true r) = blk ε true (α r) := by
+theorem bp_phi_inl
+    {n : ℕ} (ε : Fin n → Bool) (α : Equiv.Perm (Fin (cnt ε true)))
+    (β : Equiv.Perm (Fin (cnt ε false))) (r : Fin (cnt ε true))
+    : (bp_e ε).permCongr (Equiv.Perm.sumCongr α β) (blk ε true r) = blk ε true (α r) := by
   rw [Equiv.permCongr_apply, ← bp_e_inl ε r, Equiv.symm_apply_apply, Equiv.Perm.sumCongr_apply,
     Sum.map_inl, bp_e_inl]
 
-theorem bp_phi_inr {n : ℕ} (ε : Fin n → Bool) (α : Equiv.Perm (Fin (cnt ε true)))
-    (β : Equiv.Perm (Fin (cnt ε false))) (r : Fin (cnt ε false)) :
-    (bp_e ε).permCongr (Equiv.Perm.sumCongr α β) (blk ε false r) = blk ε false (β r) := by
+theorem bp_phi_inr
+    {n : ℕ} (ε : Fin n → Bool) (α : Equiv.Perm (Fin (cnt ε true)))
+    (β : Equiv.Perm (Fin (cnt ε false))) (r : Fin (cnt ε false))
+    : (bp_e ε).permCongr (Equiv.Perm.sumCongr α β) (blk ε false r) = blk ε false (β r) := by
   rw [Equiv.permCongr_apply, ← bp_e_inr ε r, Equiv.symm_apply_apply, Equiv.Perm.sumCongr_apply,
     Sum.map_inr, bp_e_inr]
 
-theorem bp_num {K : Type*} [Field K] {n : ℕ} (ε : Fin n → Bool) (a : Fin n → ℤ) (t : Fin n → K) :
-    numK ε a t = alt (cnt ε true) (a ∘ blk ε true) (t ∘ blk ε true) *
-      alt (cnt ε false) (a ∘ blk ε false) (t ∘ blk ε false) := by
+theorem bp_num {K : Type*} [Field K] {n : ℕ} (ε : Fin n → Bool) (a : Fin n → ℤ) (t : Fin n → K)
+    : numK ε a t
+      = alt (cnt ε true) (a ∘ blk ε true) (t ∘ blk ε true)
+        * alt (cnt ε false) (a ∘ blk ε false) (t ∘ blk ε false) := by
   classical
   have hmem : ∀ (b : Bool) (s : Fin (cnt ε b)), ε (blk ε b s) = b := fun b s => by
     have := Finset.orderEmbOfFin_mem (univ.filter fun i : Fin n => ε i = b) rfl s
@@ -161,11 +177,13 @@ theorem bp_num {K : Type*} [Field K] {n : ℕ} (ε : Fin n → Bool) (a : Fin n 
     exact Equiv.Perm.sumCongrHom_injective ((Equiv.permCongr (bp_e ε)).injective h)
   · intro σ hσ
     simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hσ
-    have hmaps : Set.MapsTo ((bp_e ε).symm.permCongr σ) (Set.range Sum.inl) (Set.range Sum.inl) := by
+    have hmaps
+        : Set.MapsTo ((bp_e ε).symm.permCongr σ) (Set.range Sum.inl) (Set.range Sum.inl) := by
       rintro _ ⟨r, rfl⟩
       obtain ⟨r', hr'⟩ := bp_blk_surj ε true (σ (blk ε true r)) (by rw [hσ, hmem])
       refine ⟨r', ?_⟩
-      rw [Equiv.permCongr_apply, Equiv.symm_symm, bp_e_inl, ← hr', ← bp_e_inl, Equiv.symm_apply_apply]
+      rw [Equiv.permCongr_apply, Equiv.symm_symm, bp_e_inl, ← hr', ← bp_e_inl,
+        Equiv.symm_apply_apply]
     obtain ⟨q, hq⟩ := Equiv.Perm.mem_sumCongrHom_range_of_perm_mapsTo_inl hmaps
     refine ⟨q, Finset.mem_product.2 ⟨Finset.mem_univ _, Finset.mem_univ _⟩, ?_⟩
     have hq' : Equiv.Perm.sumCongr q.1 q.2 = (bp_e ε).symm.permCongr σ := hq

@@ -12,10 +12,12 @@ open scoped ENNReal NNReal
 
 namespace Formalism.L2.SG.Pf.BH.Sw
 
-open Formalism.QuantumDeterminants Formalism.L2.SG.Pf Formalism.L2.SG.Pf.BH Formalism.MainNotions.BridgeCSB Formalism.QuantumDeterminants.WeylGroupFacts
+open Formalism.QuantumDeterminants Formalism.L2.SG.Pf Formalism.L2.SG.Pf.BH
+  Formalism.MainNotions.BridgeCSB Formalism.QuantumDeterminants.WeylGroupFacts
 
-attribute [local instance] Matrix.frobeniusNormedAddCommGroup Matrix.frobeniusNormedSpace
-  Matrix.frobeniusNormedRing Matrix.frobeniusNormedAlgebra
+attribute [local instance]
+  Matrix.frobeniusNormedAddCommGroup Matrix.frobeniusNormedSpace Matrix.frobeniusNormedRing
+  Matrix.frobeniusNormedAlgebra
 
 variable {k r : ℕ}
 

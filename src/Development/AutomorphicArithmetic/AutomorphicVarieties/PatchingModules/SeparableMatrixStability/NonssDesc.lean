@@ -8,10 +8,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa
 
-private theorem md_surj {R G G' : Type} [CommRing R] [Group G] [Group G'] (p : G →* G') (hp : Function.Surjective p) :
-    Function.Surjective (MonoidAlgebra.mapDomainRingHom R p) := by
+private theorem md_surj
+    {R G G' : Type} [CommRing R] [Group G] [Group G'] (p : G →* G') (hp : Function.Surjective p)
+    : Function.Surjective (MonoidAlgebra.mapDomainRingHom R p) := by
   intro x
   induction x using MonoidAlgebra.induction_linear with
   | zero => exact ⟨0, map_zero _⟩
@@ -23,12 +25,16 @@ private theorem md_surj {R G G' : Type} [CommRing R] [Group G] [Group G'] (p : G
     obtain ⟨g', rfl⟩ := hp g
     exact ⟨MonoidAlgebra.single g' c, by simp⟩
 
-private theorem md_ker {R G G' : Type} [CommRing R] [Group G] [Group G'] (p : G →* G') (hp : Function.Surjective p)
+private theorem md_ker
+    {R G G' : Type} [CommRing R] [Group G] [Group G']
+    (p : G →* G') (hp : Function.Surjective p)
     (J : TwoSidedIdeal (MonoidAlgebra R G)) (hJ : ∀ k, p k = 1 → MonoidAlgebra.single k 1 - 1 ∈ J)
-    (z : MonoidAlgebra R G) (hz : MonoidAlgebra.mapDomainRingHom R p z = 0) : z ∈ J := by
+    (z : MonoidAlgebra R G) (hz : MonoidAlgebra.mapDomainRingHom R p z = 0)
+    : z ∈ J := by
   choose s hs using hp
-  have key : ∀ z : MonoidAlgebra R G,
-      z - MonoidAlgebra.mapDomain s (MonoidAlgebra.mapDomainRingHom R p z) ∈ J := by
+  have key
+      : ∀ z : MonoidAlgebra R G,
+        z - MonoidAlgebra.mapDomain s (MonoidAlgebra.mapDomainRingHom R p z) ∈ J := by
     intro z
     induction z using MonoidAlgebra.induction_linear with
     | zero => simp
@@ -36,17 +42,21 @@ private theorem md_ker {R G G' : Type} [CommRing R] [Group G] [Group G'] (p : G 
       rw [map_add (f := _), MonoidAlgebra.mapDomain_add, add_sub_add_comm]
       exact J.add_mem ha hb
     | single g c =>
-      have h := J.mul_mem_left (MonoidAlgebra.single (s (p g)) c) _ (hJ ((s (p g))⁻¹ * g) (by simp [hs]))
+      have h :=
+        J.mul_mem_left (MonoidAlgebra.single (s (p g)) c) _ (hJ ((s (p g))⁻¹ * g) (by simp [hs]))
       rw [mul_sub, MonoidAlgebra.single_mul_single, mul_one, mul_one, mul_inv_cancel_left] at h
       simpa using h
   have := key z
   rw [hz] at this
   simpa using this
 
-private theorem md_span {R G G' : Type} [CommRing R] [Group G] [Group G'] (p : G →* G') (hp : Function.Surjective p)
+private theorem md_span
+    {R G G' : Type} [CommRing R] [Group G] [Group G']
+    (p : G →* G') (hp : Function.Surjective p)
     (J : TwoSidedIdeal (MonoidAlgebra R G)) (hJ : ∀ k, p k = 1 → MonoidAlgebra.single k 1 - 1 ∈ J)
     (S : Set (MonoidAlgebra R G')) (hS : ∀ y ∈ S, ∃ x ∈ J, MonoidAlgebra.mapDomainRingHom R p x = y)
-    (z : MonoidAlgebra R G) (hz : MonoidAlgebra.mapDomainRingHom R p z ∈ TwoSidedIdeal.span S) : z ∈ J := by
+    (z : MonoidAlgebra R G) (hz : MonoidAlgebra.mapDomainRingHom R p z ∈ TwoSidedIdeal.span S)
+    : z ∈ J := by
   have key : ∀ y ∈ TwoSidedIdeal.span S, ∃ x ∈ J, MonoidAlgebra.mapDomainRingHom R p x = y := by
     intro y hy
     induction hy using TwoSidedIdeal.span_induction with
@@ -71,26 +81,30 @@ private theorem md_span {R G G' : Type} [CommRing R] [Group G] [Group G'] (p : G
   have := J.add_mem (md_ker p hp J hJ (z - x) (by rw [map_sub, e, sub_self])) hx
   rwa [sub_add_cancel] at this
 
-private theorem nonSS_down {R G G' : Type} [CommRing R] [Group G] [Group G'] (p : G →* G') (hp : Function.Surjective p)
+private theorem nonSS_down
+    {R G G' : Type} [CommRing R] [Group G] [Group G']
+    (p : G →* G') (hp : Function.Surjective p)
     (I : Set (MonoidAlgebra R G)) (I' : Set (MonoidAlgebra R G'))
     (hk : ∀ k, p k = 1 → MonoidAlgebra.single k 1 - 1 ∈ I)
-    (hI : ∀ z, MonoidAlgebra.mapDomainRingHom R p z ∈ I' → z ∈ I) (Q : Ideal R) :
-    NonSS I (RingHom.id R) Q → NonSS I' (RingHom.id R) Q := by
+    (hI : ∀ z, MonoidAlgebra.mapDomainRingHom R p z ∈ I' → z ∈ I) (Q : Ideal R)
+    : NonSS I (RingHom.id R) Q → NonSS I' (RingHom.id R) Q := by
   rintro ⟨κ, hκ, f, hf, hn⟩
   refine ⟨κ, hκ, f, hf, fun hs => hn ?_⟩
   rw [RingHom.comp_id] at hs ⊢
   set J := TwoSidedIdeal.span (MonoidAlgebra.mapRingHom G f '' I) with hJ
   set J' := TwoSidedIdeal.span (MonoidAlgebra.mapRingHom G' f '' I') with hJ'
-  have hcomm : ∀ w : MonoidAlgebra R G,
-      MonoidAlgebra.mapDomainRingHom κ p (MonoidAlgebra.mapRingHom G f w) =
-        MonoidAlgebra.mapRingHom G' f (MonoidAlgebra.mapDomainRingHom R p w) := by
+  have hcomm
+      : ∀ w : MonoidAlgebra R G,
+        MonoidAlgebra.mapDomainRingHom κ p (MonoidAlgebra.mapRingHom G f w)
+          = MonoidAlgebra.mapRingHom G' f (MonoidAlgebra.mapDomainRingHom R p w) := by
     intro w
     induction w using MonoidAlgebra.induction_linear with
     | zero => simp
     | add a b ha hb => simp only [map_add (f := _), ha, hb]
     | single g c => simp
   have hkJ : ∀ k, p k = 1 → MonoidAlgebra.single k 1 - 1 ∈ J := fun k h =>
-    TwoSidedIdeal.subset_span ⟨_, hk k h, by rw [map_sub, map_one, MonoidAlgebra.mapRingHom_single, map_one]⟩
+    TwoSidedIdeal.subset_span
+      ⟨_, hk k h, by rw [map_sub, map_one, MonoidAlgebra.mapRingHom_single, map_one]⟩
   have hpre : ∀ z, MonoidAlgebra.mapDomainRingHom κ p z ∈ J' → z ∈ J := by
     refine md_span p hp J hkJ _ ?_
     rintro _ ⟨y, hy, rfl⟩
@@ -120,33 +134,52 @@ private theorem nonSS_down {R G G' : Type} [CommRing R] [Group G] [Group G'] (p 
   obtain ⟨x, rfl⟩ := RingCon.mk'_surjective _ y
   exact ⟨((MonoidAlgebra.mapDomainRingHom κ p x : MonoidAlgebra κ G') : J'.ringCon.Quotient), hψ x⟩
 
-private theorem closure_down {R G G' : Type} [CommRing R] [Group G] [Group G'] [TopologicalSpace G] [TopologicalSpace G']
-    (p : G →* G') (hp : Function.Surjective p) (ho : IsOpenMap p) (m : Ideal R)
-    (S : Set (MonoidAlgebra R G)) (S' : Set (MonoidAlgebra R G'))
+private theorem closure_down
+    {R G G' : Type} [CommRing R] [Group G] [Group G'] [TopologicalSpace G] [TopologicalSpace G']
+    (p : G →* G') (hp : Function.Surjective p) (ho : IsOpenMap p)
+    (m : Ideal R)
+    (S : Set (MonoidAlgebra R G))
+    (S' : Set (MonoidAlgebra R G'))
     (hk : ∀ k, p k = 1 → MonoidAlgebra.single k 1 - 1 ∈ closureIdeal m S)
     (hS : ∀ y ∈ S', ∃ x ∈ S, MonoidAlgebra.mapDomainRingHom R p x = y)
-    (z : MonoidAlgebra R G) (hz : MonoidAlgebra.mapDomainRingHom R p z ∈ closureIdeal m S') : z ∈ closureIdeal m S := by
+    (z : MonoidAlgebra R G) (hz : MonoidAlgebra.mapDomainRingHom R p z ∈ closureIdeal m S')
+    : z ∈ closureIdeal m S := by
   simp only [closureIdeal, TwoSidedIdeal.mem_iInf] at hk hz ⊢
   intro N V
-  let V' : OpenNormalSubgroup G' :=
-    { toSubgroup := V.toSubgroup.map p
-      isOpen' := ho _ V.isOpen'
-      isNormal' := V.isNormal'.map p hp }
+  let V' : OpenNormalSubgroup G' := {
+    toSubgroup := V.toSubgroup.map p
+    isOpen' := ho _ V.isOpen'
+    isNormal' := V.isNormal'.map p hp
+  }
   refine md_span p hp _ (fun k h => hk k h N V) _ ?_ z (hz N V')
   rintro y ((hy | ⟨a, ha, rfl⟩) | ⟨_, ⟨h, hh, rfl⟩, rfl⟩)
   · obtain ⟨x, hx, e⟩ := hS y hy
     exact ⟨x, TwoSidedIdeal.subset_span (Or.inl (Or.inl hx)), e⟩
-  · exact ⟨MonoidAlgebra.single 1 a, TwoSidedIdeal.subset_span (Or.inl (Or.inr ⟨a, ha, rfl⟩)), by simp⟩
-  · exact ⟨MonoidAlgebra.single h 1 - 1, TwoSidedIdeal.subset_span (Or.inr ⟨h, hh, rfl⟩), by
-      rw [map_sub, map_one]; simp⟩
+  · exact
+      ⟨MonoidAlgebra.single 1 a, TwoSidedIdeal.subset_span (Or.inl (Or.inr ⟨a, ha, rfl⟩)), by simp⟩
+  · exact ⟨
+      MonoidAlgebra.single h 1 - 1,
+      TwoSidedIdeal.subset_span (Or.inr ⟨h, hh, rfl⟩),
+      by rw [map_sub, map_one]; simp
+    ⟩
 
-theorem UpperTheory.V.Pa.nonss_desc :
-    ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G G' : Glob l L) (g : G.Hom G') (n : ℕ) (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] [Algebra ℤ_[l] O] (r : Resid G.frame O n) (r' : Resid G'.frame O n) (B : Type) [CommRing B] [Algebra O B] [IsCO O B] (u : Pair r B) (u' : Pair r' B) (H : Subgroup G.Γ) [H.Normal], IsOpen (H : Set G.Γ) → H ≤ G.η.ker → (∀ a : G.G₀, (a : G.Γ) ∈ H → ∀ i, r.chib i a = 1) → g.p.ker = PL l H → Glob.Compat g r r' → u'.D.comap g.p₀ = u.D → u'.ψ = u.ψ → ∀ q : Ideal B, (NonSS (augmentationIdealKernel u) (RingHom.id B) q → NonSS (augmentationIdealKernel u') (RingHom.id B) q) ∧ (DiscSt u.D q ↔ DiscSt u'.D q) := by
+theorem UpperTheory.V.Pa.nonss_desc
+    : ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G G' : Glob l L) (g : G.Hom G') (n : ℕ) (O : Type)
+        [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] [Algebra ℤ_[l] O]
+        (r : Resid G.frame O n) (r' : Resid G'.frame O n) (B : Type) [CommRing B] [Algebra O B]
+        [IsCO O B] (u : Pair r B) (u' : Pair r' B) (H : Subgroup G.Γ) [H.Normal],
+      IsOpen (H : Set G.Γ) → H ≤ G.η.ker → (∀ a : G.G₀, (a : G.Γ) ∈ H → ∀ i, r.chib i a = 1)
+        → g.p.ker = PL l H → Glob.Compat g r r' → u'.D.comap g.p₀ = u.D → u'.ψ = u.ψ
+        → ∀ q : Ideal B,
+          (NonSS (augmentationIdealKernel u) (RingHom.id B) q
+              → NonSS (augmentationIdealKernel u') (RingHom.id B) q)
+            ∧ (DiscSt u.D q ↔ DiscSt u'.D q) := by
   intro l _ L G G' g n O _ _ _ _ _ r r' B _ _ _ u u' H _ hHo hHle hHchi hker hcomp hD hψ q
   refine ⟨?_, ?_⟩
-  · have hk : ∀ k : G.G₀, g.p₀ k = 1 → MonoidAlgebra.single k 1 - 1 ∈ u.D.chBar (pairGens u) := fun k h =>
-      pl_chBar l L G n O r B u H hHo hHle hHchi _ k (by
-        rw [← hker, MonoidHom.mem_ker]; exact congrArg Subtype.val h)
+  · have hk : ∀ k : G.G₀, g.p₀ k = 1 → MonoidAlgebra.single k 1 - 1 ∈ u.D.chBar (pairGens u) :=
+      fun k h =>
+        pl_chBar l L G n O r B u H hHo hHle hHchi _ k
+          (by rw [← hker, MonoidHom.mem_ker]; exact congrArg Subtype.val h)
     have ho : IsOpenMap g.p₀ := (MonoidHom.isOpenQuotientMap_of_isQuotientMap g.p₀_quot).isOpenMap
     obtain ⟨hst, hoel, -⟩ := map_star l L G G' g n O B
     have hCH := ((comap_lam n B _ _ g.p₀ u'.D).2.2.2.2.2 g.p₀_surj).2
@@ -164,11 +197,13 @@ theorem UpperTheory.V.Pa.nonss_desc :
     · have hm : G.φu w a ∈ r.Ip w := by
         refine ⟨⟨a, ha, rfl⟩, Subgroup.mem_iInf.2 fun i => ?_⟩
         have hb' : r'.chib i (G'.φu w a) = 1 := Subgroup.mem_iInf.1 hb i
-        have e1 : r.chib i (G.φu w a) = r'.chib i (g.p₀ (G.φu w a)) := DFunLike.congr_fun (hcomp.1 i) _
+        have e1 : r.chib i (G.φu w a) = r'.chib i (g.p₀ (G.φu w a)) :=
+          DFunLike.congr_fun (hcomp.1 i) _
         rw [g.p₀_φu] at e1
         exact e1.trans hb'
-      have e : MonoidAlgebra.mapDomainRingHom B g.p₀ (MonoidAlgebra.single (G.φu w a) 1) =
-          MonoidAlgebra.single (G'.φu w a) 1 := by
+      have e
+          : MonoidAlgebra.mapDomainRingHom B g.p₀ (MonoidAlgebra.single (G.φu w a) 1)
+            = MonoidAlgebra.single (G'.φu w a) 1 := by
         rw [← g.p₀_φu]; simp
       rcases h with rfl | rfl
       · exact ⟨_, Or.inr (Or.inr ⟨w, _, hm, Or.inl rfl⟩), by rw [map_sub, map_one, e]⟩

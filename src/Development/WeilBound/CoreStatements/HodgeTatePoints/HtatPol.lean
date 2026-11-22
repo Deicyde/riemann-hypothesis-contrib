@@ -12,11 +12,13 @@ noncomputable section
 
 namespace PositivityTheory.HtPt.Htat
 
-open NumberField GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.HT ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open NumberField GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.HT
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
-theorem finrank_int_eq {E : Type} [Field E] [NumberField E] (M : Type) [AddCommGroup M] [Module (𝓞 E) M]
-    [Module.Finite (𝓞 E) M] :
-    Module.finrank ℤ M = Module.finrank (𝓞 E) M * Module.finrank ℚ E := by
+theorem finrank_int_eq
+    {E : Type} [Field E] [NumberField E]
+    (M : Type) [AddCommGroup M] [Module (𝓞 E) M] [Module.Finite (𝓞 E) M]
+    : Module.finrank ℤ M = Module.finrank (𝓞 E) M * Module.finrank ℚ E := by
   set S := Algebra.algebraMapSubmonoid (𝓞 E) (nonZeroDivisors ℤ)
   have hS : S ≤ nonZeroDivisors (𝓞 E) := by
     rintro _ ⟨n, hn, rfl⟩
@@ -34,9 +36,11 @@ theorem finrank_int_eq {E : Type} [Field E] [NumberField E] (M : Type) [AddCommG
   have h5 := Module.finrank_mul_finrank ℚ E (TensorProduct (𝓞 E) E M)
   rw [← h1, ← h4, ← h5, h3, h2, mul_comm]
 
-private theorem exists_span_sup_maximal_smul_eq_top {R : Type} [CommRing R] [IsDomain R] (P : Ideal R) [hP : P.IsMaximal]
-    (M : Type) [AddCommGroup M] [Module R M] [Module.Finite R M] [Module.Projective R M] :
-    ∃ m : Fin (Module.finrank R M) → M, Submodule.span R (Set.range m) ⊔ P • ⊤ = ⊤ := by
+private theorem exists_span_sup_maximal_smul_eq_top
+    {R : Type} [CommRing R] [IsDomain R]
+    (P : Ideal R) [hP : P.IsMaximal]
+    (M : Type) [AddCommGroup M] [Module R M] [Module.Finite R M] [Module.Projective R M]
+    : ∃ m : Fin (Module.finrank R M) → M, Submodule.span R (Set.range m) ⊔ P • ⊤ = ⊤ := by
   classical
   let Rp := Localization.AtPrime P
   let f := TensorProduct.mk R Rp M 1
@@ -45,7 +49,8 @@ private theorem exists_span_sup_maximal_smul_eq_top {R : Type} [CommRing R] [IsD
   have hle : P.primeCompl ≤ nonZeroDivisors R := fun s hs =>
     mem_nonZeroDivisors_of_ne_zero (fun h => hs (h ▸ P.zero_mem))
   have hrank : Module.finrank Rp (TensorProduct R Rp M) = Module.finrank R M :=
-    (IsLocalization.finrank_eq Rp P.primeCompl hle).trans (IsLocalizedModule.finrank_eq P.primeCompl f hle)
+    (IsLocalization.finrank_eq Rp P.primeCompl hle).trans
+      (IsLocalizedModule.finrank_eq P.primeCompl f hle)
   haveI : Module.Free Rp (TensorProduct R Rp M) := Module.free_of_flat_of_isLocalRing
   let b := Module.finBasisOfFinrankEq Rp (TensorProduct R Rp M) hrank
   choose ms hms using fun i => IsLocalizedModule.mk'_surjective P.primeCompl f (b i)
@@ -58,7 +63,8 @@ private theorem exists_span_sup_maximal_smul_eq_top {R : Type} [CommRing R] [IsD
       ⟨(ms i).1, Submodule.subset_span ⟨i, rfl⟩, (ms i).2, hms i⟩
   rw [eq_top_iff]
   intro x _
-  obtain ⟨y, hy, t, hyt⟩ := (Submodule.mem_localized' Rp P.primeCompl f N (f x)).mp (htop ▸ Submodule.mem_top)
+  obtain ⟨y, hy, t, hyt⟩ :=
+    (Submodule.mem_localized' Rp P.primeCompl f N (f x)).mp (htop ▸ Submodule.mem_top)
   rw [IsLocalizedModule.mk'_eq_iff, Submonoid.smul_def, ← map_smul] at hyt
   obtain ⟨c, hc⟩ := IsLocalizedModule.exists_of_eq (S := P.primeCompl) hyt
   have hmem : ((c : R) * t) • x ∈ N := by
@@ -71,17 +77,20 @@ private theorem exists_span_sup_maximal_smul_eq_top {R : Type} [CommRing R] [IsD
   exact Submodule.add_mem _ (Submodule.mem_sup_left (by rw [mul_smul]; exact N.smul_mem r hmem))
     (Submodule.mem_sup_right (Submodule.smul_mem_smul hi Submodule.mem_top))
 
-private theorem exists_finrank_family_mod_smul {R : Type} [CommRing R] [IsDedekindDomain R]
+private theorem exists_finrank_family_mod_smul
+    {R : Type} [CommRing R] [IsDedekindDomain R]
     (M : Type) [AddCommGroup M] [Module R M] [Module.Finite R M] [Module.Projective R M]
-    (n : ℕ) (hn : Module.finrank R M = n) (a : R) (ha : a ≠ 0) :
-    ∃ u : Fin n → M, ∀ x : M, ∃ (c : Fin n → R) (x' : M), x = ∑ i, c i • u i + a • x' := by
+    (n : ℕ) (hn : Module.finrank R M = n)
+    (a : R) (ha : a ≠ 0)
+    : ∃ u : Fin n → M, ∀ x : M, ∃ (c : Fin n → R) (x' : M), x = ∑ i, c i • u i + a • x' := by
   classical
   subst hn
   set F := (UniqueFactorizationMonoid.normalizedFactors (Ideal.span {a})).toFinset
   have hprime : ∀ P ∈ F, Prime P := fun P hP =>
     UniqueFactorizationMonoid.prime_of_normalized_factor P (Multiset.mem_toFinset.mp hP)
-  have hm : ∀ P ∈ F, ∃ m : Fin (Module.finrank R M) → M,
-      Submodule.span R (Set.range m) ⊔ P • (⊤ : Submodule R M) = ⊤ := by
+  have hm
+      : ∀ P ∈ F, ∃ m : Fin (Module.finrank R M) → M,
+        Submodule.span R (Set.range m) ⊔ P • (⊤ : Submodule R M) = ⊤ := by
     intro P hP
     haveI : P.IsMaximal := Ideal.IsPrime.isMaximal (Ideal.isPrime_of_prime (hprime P hP))
       (by rw [← Ideal.zero_eq_bot]; exact (hprime P hP).ne_zero)
@@ -89,8 +98,12 @@ private theorem exists_finrank_family_mod_smul {R : Type} [CommRing R] [IsDedeki
   choose! m hm using hm
   have he : ∀ Q ∈ F, ∃ e : R, ∀ P ∈ F, e - (if P = Q then 1 else 0) ∈ P := by
     intro Q _
-    obtain ⟨y, hy⟩ := IsDedekindDomain.exists_forall_sub_mem_ideal (s := F) id (fun _ => 1)
-      (fun i hi => hprime i hi) (fun i _ j _ h => h) (fun P => if P.1 = Q then 1 else 0)
+    obtain ⟨y, hy⟩ :=
+      IsDedekindDomain.exists_forall_sub_mem_ideal (s := F) id
+        (fun _ => 1)
+        (fun i hi => hprime i hi)
+        (fun i _ j _ h => h)
+        (fun P => if P.1 = Q then 1 else 0)
     exact ⟨y, fun P hP => by simpa using hy P hP⟩
   choose! e he using he
   let u : Fin (Module.finrank R M) → M := fun i => ∑ Q ∈ F, e Q • m Q i
@@ -112,15 +125,20 @@ private theorem exists_finrank_family_mod_smul {R : Type} [CommRing R] [IsDedeki
     exact Submodule.sub_mem _
       (Submodule.mem_sup_left (Submodule.mem_sup_left (Submodule.subset_span ⟨i, rfl⟩)))
       (Submodule.mem_sup_right (hdiff P hP i))
-  have key : ∀ I J : Ideal R, N ⊔ I • (⊤ : Submodule R M) = ⊤ → N ⊔ J • (⊤ : Submodule R M) = ⊤ →
-      N ⊔ (I * J) • (⊤ : Submodule R M) = ⊤ := by
+  have key
+      : ∀ I J : Ideal R,
+        N ⊔ I • (⊤ : Submodule R M) = ⊤ → N ⊔ J • (⊤ : Submodule R M) = ⊤
+          → N ⊔ (I * J) • (⊤ : Submodule R M) = ⊤ := by
     intro I J hI hJ
     refine eq_top_iff.mpr (hI.symm.le.trans (sup_le le_sup_left ?_))
     rw [Submodule.mul_smul]
-    calc I • (⊤ : Submodule R M) = I • (N ⊔ J • ⊤) := by rw [hJ]
+    calc
+      I • (⊤ : Submodule R M)
+        = I • (N ⊔ J • ⊤) := by rw [hJ]
       _ = I • N ⊔ I • J • ⊤ := Submodule.smul_sup _ _ _
       _ ≤ N ⊔ I • J • ⊤ := sup_le_sup_right (Submodule.smul_le_right) _
-  have hfac : ∀ s : Multiset (Ideal R), (∀ P ∈ s, P ∈ F) → N ⊔ s.prod • (⊤ : Submodule R M) = ⊤ := by
+  have hfac
+      : ∀ s : Multiset (Ideal R), (∀ P ∈ s, P ∈ F) → N ⊔ s.prod • (⊤ : Submodule R M) = ⊤ := by
     intro s
     induction s using Multiset.induction_on with
     | empty => intro _; simp
@@ -130,9 +148,11 @@ private theorem exists_finrank_family_mod_smul {R : Type} [CommRing R] [IsDedeki
       exact key _ _ (hcov P (h P (Multiset.mem_cons_self _ _)))
         (ih fun Q hQ => h Q (Multiset.mem_cons_of_mem hQ))
   have hN : N = ⊤ := by
-    have := hfac (UniqueFactorizationMonoid.normalizedFactors (Ideal.span {a}))
-      (fun P hP => Multiset.mem_toFinset.mpr hP)
-    rwa [Ideal.prod_normalizedFactors_eq_self (by simpa using ha), sup_eq_left.mpr le_sup_right] at this
+    have :=
+      hfac (UniqueFactorizationMonoid.normalizedFactors (Ideal.span {a}))
+        (fun P hP => Multiset.mem_toFinset.mpr hP)
+    rwa [Ideal.prod_normalizedFactors_eq_self (by simpa using ha), sup_eq_left.mpr le_sup_right] at
+      this
   refine ⟨u, fun x => ?_⟩
   have hx : x ∈ N := hN ▸ Submodule.mem_top
   obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.mp hx
@@ -141,16 +161,24 @@ private theorem exists_finrank_family_mod_smul {R : Type} [CommRing R] [IsDedeki
   obtain ⟨x', _, rfl⟩ := hz
   exact ⟨c, x', rfl⟩
 
-open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct NumberField GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.BT GlobalTheory.CompanionTheory.Ar.HT ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor in
-theorem pol_lattice : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (p : ℕ) [Fact p.Prime], ∃ u : Fin (D.p + D.q) → D.La, IsPolLattice (IsCMField.complexConj E).toRingEquiv p D.EF u := by
+open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+  TensorProduct NumberField GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.BT
+  GlobalTheory.CompanionTheory.Ar.HT ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor in
+theorem pol_lattice
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (p : ℕ)
+        [Fact p.Prime],
+      ∃ u : Fin (D.p + D.q) → D.La,
+        IsPolLattice (IsCMField.complexConj E).toRingEquiv p D.EF u := by
   intro E _ _ _ H D p _
   haveI := D.fin
   haveI := D.proj
   have hfinZ : Module.Finite ℤ D.La := Module.Finite.trans (𝓞 E) D.La
   haveI : Module.IsTorsionFree (𝓞 E) D.La := inferInstance
   haveI : Module.IsTorsionFree ℤ D.La := Module.IsTorsionFree.trans (𝓞 E)
-  obtain ⟨u, hu⟩ := exists_finrank_family_mod_smul D.La (D.p + D.q) D.rank (p : 𝓞 E)
-    (Nat.cast_ne_zero.mpr (Fact.out : p.Prime).ne_zero)
+  obtain ⟨u, hu⟩ :=
+    exists_finrank_family_mod_smul D.La (D.p + D.q) D.rank (p : 𝓞 E)
+      (Nat.cast_ne_zero.mpr (Fact.out : p.Prime).ne_zero)
   refine ⟨u, ⟨inferInstance, hfinZ, D.alt, D.unimod, ?_, ?_, ?_⟩⟩
   · intro a x y
     rw [D.adj]

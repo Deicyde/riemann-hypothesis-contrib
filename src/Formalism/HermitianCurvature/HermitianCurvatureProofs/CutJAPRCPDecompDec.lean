@@ -5,12 +5,14 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutJAPRCPDec
 
 @[expose] public section
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q NumberField
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q NumberField
 open scoped ComplexConjugate Matrix
 
 namespace Formalism.FourierDecayAlt.P.CutMP.JA.SSn.Rep.Core.TC.PR.CP.Dc
 
-open Formalism.FourierDecayAlt.P.B2x3 Formalism.FourierDecayAlt.P.SettingConstruction Formalism.FourierDecayAlt.P.TheSec Formalism.FourierDecayAlt.B2
+open Formalism.FourierDecayAlt.P.B2x3 Formalism.FourierDecayAlt.P.SettingConstruction
+  Formalism.FourierDecayAlt.P.TheSec Formalism.FourierDecayAlt.B2
 
 noncomputable section
 
@@ -63,7 +65,8 @@ lemma nuI_mul (h0 : (0 : Fin (k + 1)) ≠ Fin.last k) (hT : 0 < T) (hT' : 0 < T'
 
 end ann
 
-def PSL (k : ℕ) (TT : ℝ) (C : ℂ → Mb k) : Prop := (∀ i j, PS TT (fun ζ => C ζ i j)) ∧ ∀ ζ, InL k (C ζ)
+def PSL (k : ℕ) (TT : ℝ) (C : ℂ → Mb k) : Prop :=
+  (∀ i j, PS TT (fun ζ => C ζ i j)) ∧ ∀ ζ, InL k (C ζ)
 
 lemma psl_smul {TT : ℝ} {f : ℂ → ℂ} (hf : PS TT f) {A : Mb k} (hA : InL k A) : PSL k TT (fun ζ => f ζ • A) := by
   refine ⟨fun i j => ?_, fun ζ i => ⟨?_, ?_⟩⟩
@@ -88,9 +91,13 @@ lemma psl_csmul {TT : ℝ} (c : ℂ) {C : ℂ → Mb k} (hC : PSL k TT C) : PSL 
     rw [(hC.2 ζ i).2, mul_zero]
 
 def Dec (k : ℕ) (T T' : ℝ) (M : Mb k) : Prop :=
-  ∃ (C₁ C₂ : ℂ → Mb k) (β₁ β₂ : ℂ → ℂ), PSL k (T * T') C₁ ∧ PSL k (T * T') C₂ ∧ PS (T * T') β₁ ∧ PS (T * T') β₂ ∧
-    ∀ ζ : ℂ, T * T' < Complex.normSq ζ →
-      M = C₁ ζ + nuI k T T' ζ * C₂ ζ * nu k (wZ T T' ζ) (sZ T T' ζ) + β₁ ζ • H1 k T T' ζ + β₂ ζ • H2 k T T' ζ
+  ∃ (C₁ C₂ : ℂ → Mb k) (β₁ β₂ : ℂ → ℂ),
+    PSL k (T * T') C₁ ∧ PSL k (T * T') C₂ ∧ PS (T * T') β₁ ∧ PS (T * T') β₂
+      ∧ ∀ ζ : ℂ,
+        T * T' < Complex.normSq ζ
+          → M
+            = C₁ ζ + nuI k T T' ζ * C₂ ζ * nu k (wZ T T' ζ) (sZ T T' ζ) + β₁ ζ • H1 k T T' ζ
+              + β₂ ζ • H2 k T T' ζ
 
 variable {T T' : ℝ}
 

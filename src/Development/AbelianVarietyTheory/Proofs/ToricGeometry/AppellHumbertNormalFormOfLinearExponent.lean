@@ -10,19 +10,20 @@ open scoped BigOperators Real
 namespace GlobalTheory
 namespace AppellHumbert
 
-
 open Complex Matrix Filter Topology in
 open scoped BigOperators Real in
-theorem _root_.GlobalTheory.AppellHumbert.exists_real_extension {g : ℕ} (Λ : Submodule ℤ (Fin g → ℂ))
-    [DiscreteTopology Λ]
-    (hΛ : Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤) {W : Type*} [AddCommGroup W] [Module ℝ W]
-    (f : Λ →+ W) : ∃ F : (Fin g → ℂ) →ₗ[ℝ] W, ∀ l : Λ, F l = f l := by
+theorem _root_.GlobalTheory.AppellHumbert.exists_real_extension
+    {g : ℕ} (Λ : Submodule ℤ (Fin g → ℂ)) [DiscreteTopology Λ]
+    (hΛ : Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤)
+    {W : Type*} [AddCommGroup W] [Module ℝ W]
+    (f : Λ →+ W)
+    : ∃ F : (Fin g → ℂ) →ₗ[ℝ] W, ∀ l : Λ, F l = f l := by
   haveI : IsZLattice ℝ Λ := ⟨hΛ⟩
   let b := Module.Free.chooseBasis ℤ Λ
   let bR := Module.Basis.ofZLatticeBasis ℝ Λ b
   refine ⟨bR.constr ℝ (fun i => f (b i)), fun l => ?_⟩
-  have key : ((bR.constr ℝ (fun i => f (b i))).restrictScalars ℤ ∘ₗ Λ.subtype) =
-      f.toIntLinearMap := by
+  have key
+      : ((bR.constr ℝ (fun i => f (b i))).restrictScalars ℤ ∘ₗ Λ.subtype) = f.toIntLinearMap := by
     refine b.ext fun i => ?_
     show bR.constr ℝ (fun i => f (b i)) (b i : Fin g → ℂ) = f (b i)
     rw [← Module.Basis.ofZLatticeBasis_apply ℝ Λ b i, Module.Basis.constr_basis]
@@ -30,40 +31,58 @@ theorem _root_.GlobalTheory.AppellHumbert.exists_real_extension {g : ℕ} (Λ : 
 
 open Complex Matrix Filter Topology in
 open scoped BigOperators Real in
-theorem _root_.GlobalTheory.AppellHumbert.eq_sum_re_im {g : ℕ} (u : Fin g → ℂ) :
-    u = ∑ j, ((u j).re • (Pi.single j (1 : ℂ) : Fin g → ℂ)
-      + (u j).im • (Pi.single j I : Fin g → ℂ)) := by
+theorem _root_.GlobalTheory.AppellHumbert.eq_sum_re_im {g : ℕ} (u : Fin g → ℂ)
+    : u
+      = ∑ j, ((u j).re • (Pi.single j (1 : ℂ) : Fin g → ℂ)
+        + (u j).im • (Pi.single j I : Fin g → ℂ)) := by
   ext i
   simp [Finset.sum_apply, Finset.sum_add_distrib, Pi.single_apply, Complex.re_add_im]
 
 end AppellHumbert
 
-
 open Complex Matrix Filter Topology in
 open scoped BigOperators Real in
-theorem _root_.GlobalTheory.appellHumbert_normal_form_of_linear_exponent :
-    (∀ (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)), DiscreteTopology Λ → Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤ → ∀ (a : Λ → ℂ) (B : Λ →+ ((Fin g → ℂ) →ₗ[ℂ] ℂ)), (∀ l, a l ≠ 0) → (∀ l m : Λ, a (l + m) = a l * a m * cexp (B l m)) → ∃ (Hm : Matrix (Fin g) (Fin g) ℂ) (χ : Λ → ℂ) (Ef : LinearMap.BilinForm ℤ Λ) (Q : (Fin g → ℂ) → ℂ), Hm.IsHermitian ∧ (∀ l, ‖χ l‖ = 1) ∧ (∀ l m : Λ, (Ef l m : ℝ) = ((l : Fin g → ℂ) ⬝ᵥ Hm.mulVec (star (m : Fin g → ℂ))).im) ∧ Differentiable ℂ Q ∧ Q 0 = 0 ∧ ∀ (l : Λ) z, a l * cexp (B l z) * cexp (Q z - Q (z + l)) = (χ l * cexp (Real.pi * (z ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ))) + Real.pi / 2 * ((l : Fin g → ℂ) ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ)))))) := by
+theorem _root_.GlobalTheory.appellHumbert_normal_form_of_linear_exponent
+    : (∀ (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)),
+      DiscreteTopology Λ → Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤
+        → ∀ (a : Λ → ℂ) (B : Λ →+ ((Fin g → ℂ) →ₗ[ℂ] ℂ)),
+          (∀ l, a l ≠ 0) → (∀ l m : Λ, a (l + m) = a l * a m * cexp (B l m))
+            → ∃ (Hm : Matrix (Fin g) (Fin g) ℂ) (χ : Λ → ℂ) (Ef : LinearMap.BilinForm ℤ Λ)
+                (Q : (Fin g → ℂ) → ℂ),
+              Hm.IsHermitian ∧ (∀ l, ‖χ l‖ = 1)
+                ∧ (∀ l m : Λ,
+                  (Ef l m : ℝ) = ((l : Fin g → ℂ) ⬝ᵥ Hm.mulVec (star (m : Fin g → ℂ))).im)
+                ∧ Differentiable ℂ Q ∧ Q 0 = 0
+                ∧ ∀ (l : Λ) z,
+                  a l * cexp (B l z) * cexp (Q z - Q (z + l))
+                    = (χ l * cexp
+                      (Real.pi * (z ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ)))
+                        + Real.pi / 2
+                          * ((l : Fin g → ℂ) ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ)))))) := by
   intro g Λ hdisc hΛ a B ha hcoc
   classical
   haveI := hdisc
-  let b : Λ →+ (Fin g → ℂ) :=
-    { toFun := fun l j => B l (Pi.single j 1)
-      map_zero' := by ext j; simp
-      map_add' := fun l m => by ext j; simp }
+  let b : Λ →+ (Fin g → ℂ) := {
+    toFun := fun l j => B l (Pi.single j 1)
+    map_zero' := by ext j; simp
+    map_add' := fun l m => by ext j; simp
+  }
   obtain ⟨F, hF0⟩ := _root_.GlobalTheory.AppellHumbert.exists_real_extension Λ hΛ b
   have hF : ∀ (l : Λ) z, B l z = F l ⬝ᵥ z := by
     intro l z
     rw [hF0]
     conv_lhs => rw [show z = ∑ j, z j • (Pi.single j (1 : ℂ) : Fin g → ℂ) by ext i; simp [Pi.single_apply]]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, dotProduct, b, mul_comm]
+    simp [map_sum, dotProduct, b, mul_comm]
   have hskew : ∀ l m : Λ, ∃ n : ℤ, B l m = B m l + n * (2 * π * I) := by
     intro l m
     have h := hcoc l m
     rw [add_comm, hcoc m l, mul_comm (a m) (a l)] at h
     exact Complex.exp_eq_exp_iff_exists_int.mp (mul_left_cancel₀ (mul_ne_zero (ha l) (ha m)) h).symm
-  have hlin : ∀ (P : (Fin g → ℂ) → Prop), P 0 → (∀ x y, P x → P y → P (x + y)) →
-      (∀ (c : ℝ) x, P x → P (c • x)) → (∀ l : Λ, P l) → ∀ x, P x := by
+  have hlin
+      : ∀ (P : (Fin g → ℂ) → Prop),
+        P 0 → (∀ x y, P x → P y → P (x + y)) → (∀ (c : ℝ) x, P x → P (c • x)) → (∀ l : Λ, P l)
+          → ∀ x, P x := by
     intro P h0 hadd hsmul hl x
     have hx : x ∈ Submodule.span ℝ (Λ : Set (Fin g → ℂ)) := by rw [hΛ]; trivial
     induction hx using Submodule.span_induction with
@@ -73,44 +92,64 @@ theorem _root_.GlobalTheory.appellHumbert_normal_form_of_linear_exponent :
     | smul c y _ hy => exact hsmul c y hy
   have hD1 : ∀ u (m : Λ), (F u ⬝ᵥ m - F m ⬝ᵥ u).re = 0 := by
     intro u m
-    refine hlin (fun u => (F u ⬝ᵥ m - F m ⬝ᵥ u).re = 0) (by simp) (fun x y hx hy => ?_)
-      (fun c x hx => ?_) (fun l => ?_) u
-    · simp only [map_add (f := _), add_dotProduct, dotProduct_add, Complex.sub_re, Complex.add_re] at hx hy ⊢
+    refine hlin
+      (fun u => (F u ⬝ᵥ m - F m ⬝ᵥ u).re = 0)
+      (by simp)
+      (fun x y hx hy => ?_)
+      (fun c x hx => ?_)
+      (fun l => ?_)
+      u
+    · simp only [map_add (f := _), add_dotProduct, dotProduct_add, Complex.sub_re, Complex.add_re]
+        at hx hy ⊢
       linarith
     · simp only [map_smul, smul_dotProduct, dotProduct_smul, Complex.sub_re, Complex.smul_re,
-        smul_eq_mul] at hx ⊢
+          smul_eq_mul]
+        at hx ⊢
       rw [← mul_sub, hx, mul_zero]
     · obtain ⟨n, hn⟩ := hskew l m
-      rw [← hF, ← hF, hn]; simp
+      rw [← hF, ← hF, hn]
+      simp
   have hD : ∀ u v, (F u ⬝ᵥ v - F v ⬝ᵥ u).re = 0 := by
     intro u v
-    refine hlin (fun v => (F u ⬝ᵥ v - F v ⬝ᵥ u).re = 0) (by simp) (fun x y hx hy => ?_)
-      (fun c x hx => ?_) (fun m => hD1 u m) v
-    · simp only [map_add (f := _), add_dotProduct, dotProduct_add, Complex.sub_re, Complex.add_re] at hx hy ⊢
+    refine hlin
+      (fun v => (F u ⬝ᵥ v - F v ⬝ᵥ u).re = 0)
+      (by simp)
+      (fun x y hx hy => ?_)
+      (fun c x hx => ?_)
+      (fun m => hD1 u m)
+      v
+    · simp only [map_add (f := _), add_dotProduct, dotProduct_add, Complex.sub_re, Complex.add_re]
+        at hx hy ⊢
       linarith
     · simp only [map_smul, smul_dotProduct, dotProduct_smul, Complex.sub_re, Complex.smul_re,
-        smul_eq_mul] at hx ⊢
+          smul_eq_mul]
+        at hx ⊢
       rw [← mul_sub, hx, mul_zero]
   let M : Matrix (Fin g) (Fin g) ℂ := fun k j =>
-    (1/2 : ℝ) • (F (Pi.single k 1) j - I * F (Pi.single k I) j)
+    (1 / 2 : ℝ) • (F (Pi.single k 1) j - I * F (Pi.single k I) j)
   let N : Matrix (Fin g) (Fin g) ℂ := fun k j =>
-    (1/2 : ℝ) • (F (Pi.single k 1) j + I * F (Pi.single k I) j)
+    (1 / 2 : ℝ) • (F (Pi.single k 1) j + I * F (Pi.single k I) j)
   have hFMN : ∀ u, F u = u ᵥ* M + star u ᵥ* N := by
-    intro u; ext j
+    intro u
+    ext j
     conv_lhs => rw [_root_.GlobalTheory.AppellHumbert.eq_sum_re_im u]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_add (f := _), map_smul, Finset.sum_apply, Pi.add_apply, Pi.smul_apply, vecMul,
-      dotProduct, ← Finset.sum_add_distrib]
+      simp only [map_sum, map_add (f := _), map_smul, Finset.sum_apply, Pi.add_apply, Pi.smul_apply,
+        vecMul, dotProduct, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun k _ => ?_
     apply Complex.ext <;> simp [M, N, Complex.mul_re, Complex.mul_im] <;> ring
-  have hsym : ∀ k j, (F (Pi.single k 1) j).re = (F (Pi.single j 1) k).re ∧
-      (F (Pi.single k I) j).im = (F (Pi.single j I) k).im ∧
-      (F (Pi.single k I) j).re = -(F (Pi.single j 1) k).im := by
+  have hsym
+      : ∀ k j,
+        (F (Pi.single k 1) j).re = (F (Pi.single j 1) k).re
+          ∧ (F (Pi.single k I) j).im = (F (Pi.single j I) k).im
+          ∧ (F (Pi.single k I) j).re = -(F (Pi.single j 1) k).im := by
     intro k j
     have h1 := hD (Pi.single k 1) (Pi.single j 1)
     have h2 := hD (Pi.single k I) (Pi.single j I)
     have h3 := hD (Pi.single k I) (Pi.single j 1)
-    simp only [dotProduct_single, mul_one, Complex.sub_re, Complex.mul_re, Complex.I_re, Complex.I_im, mul_zero, zero_sub, sub_zero] at h1 h2 h3
+    simp only [dotProduct_single, mul_one, Complex.sub_re, Complex.mul_re, Complex.I_re,
+        Complex.I_im, mul_zero, zero_sub, sub_zero]
+      at h1 h2 h3
     refine ⟨by linarith, by linarith, by linarith⟩
   have hMsym : Mᵀ = M := by
     ext k j
@@ -139,7 +178,7 @@ theorem _root_.GlobalTheory.appellHumbert_normal_form_of_linear_exponent :
     intro u v
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [K, dotProduct, mulVec, transpose_apply, map_sum, map_mul, Pi.star_apply,
-      Complex.star_def, Complex.conj_conj, hNherm, Finset.mul_sum]
+        Complex.star_def, Complex.conj_conj, hNherm, Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     ring
@@ -147,7 +186,8 @@ theorem _root_.GlobalTheory.appellHumbert_normal_form_of_linear_exponent :
     intro u v
     have := hAsym v u
     simp only [A, mulVec_add, dotProduct_add, add_dotProduct] at this ⊢
-    rw [this]; ring
+    rw [this]
+    ring
   have hKadd : ∀ u v, K (u + v) (u + v) = K u u + K u v + K v u + K v v := by
     intro u v
     simp only [K, star_add, mulVec_add, dotProduct_add, add_dotProduct]
@@ -173,7 +213,8 @@ theorem _root_.GlobalTheory.appellHumbert_normal_form_of_linear_exponent :
     refine ⟨-n, ?_⟩
     push_cast
     apply mul_left_cancel₀ Real.pi_pos.ne'
-    rw [h1]; linarith
+    rw [h1]
+    linarith
   choose e he using hint
   have headd1 : ∀ l l' m, e (l + l') m = e l m + e l' m := by
     intro l l' m
@@ -187,25 +228,27 @@ theorem _root_.GlobalTheory.appellHumbert_normal_form_of_linear_exponent :
     push_cast
     rw [← he, ← he, ← he]
     simp only [Submodule.coe_add, star_add, mulVec_add, dotProduct_add, Complex.add_im]
-  let Ef : LinearMap.BilinForm ℤ Λ := LinearMap.mk₂ ℤ e headd1
-    (fun c l m => map_zsmul (AddMonoidHom.mk' (fun l => e l m) (fun l l' => headd1 l l' m)) c l)
-    headd2
-    (fun c l m => map_zsmul (AddMonoidHom.mk' (fun m => e l m) (fun m m' => headd2 l m m')) c m)
+  let Ef : LinearMap.BilinForm ℤ Λ :=
+    LinearMap.mk₂ ℤ e headd1
+      (fun c l m => map_zsmul (AddMonoidHom.mk' (fun l => e l m) (fun l l' => headd1 l l' m)) c l)
+      headd2
+      (fun c l m => map_zsmul (AddMonoidHom.mk' (fun m => e l m) (fun m m' => headd2 l m m')) c m)
   have ha0 : a 0 = 1 := by
     have h := hcoc 0 0
     rw [add_zero, map_zero, LinearMap.zero_apply, Complex.exp_zero, mul_one] at h
     exact mul_left_cancel₀ (ha 0) (h.symm.trans (mul_one (a 0)).symm)
-  let φ0 : Λ →+ ℝ :=
-    { toFun := fun l => Real.log ‖a l‖ - (A l l).re / 2 - (K l l).re / 2
-      map_zero' := by simp [ha0, A, K]
-      map_add' := fun l m => by
-        rw [hcoc, norm_mul, norm_mul, Complex.norm_exp,
-          Real.log_mul (mul_ne_zero (norm_ne_zero_iff.mpr (ha l)) (norm_ne_zero_iff.mpr (ha m)))
-            (Real.exp_pos _).ne',
-          Real.log_mul (norm_ne_zero_iff.mpr (ha l)) (norm_ne_zero_iff.mpr (ha m)), Real.log_exp,
-          Submodule.coe_add, hAadd, hKadd, hBF, hKherm (l : Fin g → ℂ) m]
-        simp only [Complex.add_re, Complex.conj_re]
-        ring }
+  let φ0 : Λ →+ ℝ := {
+    toFun := fun l => Real.log ‖a l‖ - (A l l).re / 2 - (K l l).re / 2
+    map_zero' := by simp [ha0, A, K]
+    map_add' := fun l m => by
+      rw [hcoc, norm_mul, norm_mul, Complex.norm_exp,
+        Real.log_mul (mul_ne_zero (norm_ne_zero_iff.mpr (ha l)) (norm_ne_zero_iff.mpr (ha m)))
+          (Real.exp_pos _).ne',
+        Real.log_mul (norm_ne_zero_iff.mpr (ha l)) (norm_ne_zero_iff.mpr (ha m)), Real.log_exp,
+        Submodule.coe_add, hAadd, hKadd, hBF, hKherm (l : Fin g → ℂ) m]
+      simp only [Complex.add_re, Complex.conj_re]
+      ring
+  }
   obtain ⟨φ, hφ⟩ := _root_.GlobalTheory.AppellHumbert.exists_real_extension Λ hΛ φ0
   let c : Fin g → ℂ := fun j => (φ (Pi.single j 1) : ℂ) - I * φ (Pi.single j I)
   have hc : ∀ u, (c ⬝ᵥ u).re = φ u := by
@@ -223,8 +266,10 @@ theorem _root_.GlobalTheory.appellHumbert_normal_form_of_linear_exponent :
       rw [hc, hφ]; rfl
     simp only [χ, norm_mul, Complex.norm_exp, Complex.neg_re, Complex.sub_re, Complex.div_ofNat_re,
       h1, mul_assoc, ← Real.exp_add]
-    rw [show -(A ↑l ↑l).re / 2 - (K ↑l ↑l).re / 2 +
-        -(Real.log ‖a l‖ - (A ↑l ↑l).re / 2 - (K ↑l ↑l).re / 2) = -Real.log ‖a l‖ by ring,
+    rw [show -(A ↑l ↑l).re / 2 - (K ↑l ↑l).re / 2
+            + -(Real.log ‖a l‖ - (A ↑l ↑l).re / 2 - (K ↑l ↑l).re / 2)
+          = - Real.log ‖a l‖ by
+        ring,
       Real.exp_neg, Real.exp_log (norm_pos_iff.mpr (ha l))]
     exact mul_inv_cancel₀ (norm_ne_zero_iff.mpr (ha l))
   let Q : (Fin g → ℂ) → ℂ := fun z => A z z / 2 + c ⬝ᵥ z
@@ -232,9 +277,10 @@ theorem _root_.GlobalTheory.appellHumbert_normal_form_of_linear_exponent :
   · simp only [Q, A, dotProduct, mulVec]
     fun_prop
   · intro l z
-    have hQ : Q z - Q (z + l) = -A l z - A l l / 2 - c ⬝ᵥ l := by
+    have hQ : Q z - Q (z + l) = - A l z - A l l / 2 - c ⬝ᵥ l := by
       simp only [Q, dotProduct_add]
-      rw [hAadd, hAsym z l]; ring
+      rw [hAadd, hAsym z l]
+      ring
     have h2 : (Real.pi : ℂ) / 2 * ((l : Fin g → ℂ) ⬝ᵥ Hm *ᵥ star (l : Fin g → ℂ)) = K l l / 2 := by
       rw [← hHmK]; ring
     rw [hHmK, h2, mul_assoc, ← Complex.exp_add, hBF, hQ]

@@ -13,12 +13,12 @@ namespace GlobalTheory.SeqCxLow
 noncomputable def emb (R : Type) [CommRing R] (m : ℕ) : (Fin m → R) →ₗ[R] (ℕ →₀ R) :=
   Finsupp.lmapDomain R R Fin.val ∘ₗ (Finsupp.linearEquivFunOnFinite R R (Fin m)).symm.toLinearMap
 
-theorem emb_apply_val {R : Type} [CommRing R] {m : ℕ} (v : Fin m → R) (k : Fin m) :
-    emb R m v (k : ℕ) = v k := by
+theorem emb_apply_val {R : Type} [CommRing R] {m : ℕ} (v : Fin m → R) (k : Fin m)
+    : emb R m v (k : ℕ) = v k := by
   simp [emb, Finsupp.mapDomain_apply_of_injective Fin.val_injective]
 
-theorem emb_apply_of_le {R : Type} [CommRing R] {m : ℕ} (v : Fin m → R) (n : ℕ) (h : m ≤ n) :
-    emb R m v n = 0 := by
+theorem emb_apply_of_le {R : Type} [CommRing R] {m : ℕ} (v : Fin m → R) (n : ℕ) (h : m ≤ n)
+    : emb R m v n = 0 := by
   simp only [emb, LinearMap.comp_apply, Finsupp.lmapDomain_apply, LinearEquiv.coe_coe]
   apply Finsupp.mapDomain_of_notMem_range
   rintro ⟨k, hk⟩
@@ -34,8 +34,8 @@ theorem emb_injective (R : Type) [CommRing R] (m : ℕ) : Function.Injective (em
 theorem emb_mem_low {R : Type} [CommRing R] {m : ℕ} (v : Fin m → R) : emb R m v ∈ low R m :=
   fun n h => emb_apply_of_le v n h
 
-theorem emb_restrict {R : Type} [CommRing R] {m : ℕ} (x : ℕ →₀ R) (hx : x ∈ low R m) :
-    emb R m (fun k : Fin m => x k) = x := by
+theorem emb_restrict {R : Type} [CommRing R] {m : ℕ} (x : ℕ →₀ R) (hx : x ∈ low R m)
+    : emb R m (fun k : Fin m => x k) = x := by
   ext n
   by_cases h : n < m
   · have e := emb_apply_val (fun k : Fin m => x k) ⟨n, h⟩
@@ -43,12 +43,12 @@ theorem emb_restrict {R : Type} [CommRing R] {m : ℕ} (x : ℕ →₀ R) (hx : 
   · rw [emb_apply_of_le _ n (not_lt.mp h)]
     exact (hx n (not_lt.mp h)).symm
 
-theorem form_emb {R : Type} [CommRing R] {m : ℕ} (g : Fin m → R) (v : Fin m → R) :
-    (∑ k : Fin m, g k • Finsupp.lapply (R := R) (M := R) (k : ℕ)) (emb R m v) = g ⬝ᵥ v := by
+theorem form_emb {R : Type} [CommRing R] {m : ℕ} (g : Fin m → R) (v : Fin m → R)
+    : (∑ k : Fin m, g k • Finsupp.lapply (R := R) (M := R) (k : ℕ)) (emb R m v) = g ⬝ᵥ v := by
   simp [dotProduct, emb_apply_val]
 
-theorem emb_form {R : Type} [CommRing R] {m : ℕ} (f : (ℕ →₀ R) →ₗ[R] R) (v : Fin m → R) :
-    (fun k => f (emb R m (Pi.single k 1))) ⬝ᵥ v = f (emb R m v) := by
+theorem emb_form {R : Type} [CommRing R] {m : ℕ} (f : (ℕ →₀ R) →ₗ[R] R) (v : Fin m → R)
+    : (fun k => f (emb R m (Pi.single k 1))) ⬝ᵥ v = f (emb R m v) := by
   have hs : ∀ k, (Pi.single k (v k) : Fin m → R) = v k • (Pi.single k 1 : Fin m → R) := by
     intro k
     ext j
@@ -63,13 +63,17 @@ theorem emb_form {R : Type} [CommRing R] {m : ℕ} (f : (ℕ →₀ R) →ₗ[R]
   intro k _
   ring
 
-theorem link_eq (R : Type) [CommRing R] (m : ℕ) :
-    linkIn (uniM R (ℕ →₀ R)) (low R m) [] = List.map (emb R m) '' uniSeq R m := by
+theorem link_eq (R : Type) [CommRing R] (m : ℕ)
+    : linkIn (uniM R (ℕ →₀ R)) (low R m) [] = List.map (emb R m) '' uniSeq R m := by
   ext w
   simp only [linkIn, Set.mem_ofPred_eq, List.nil_append, Set.mem_image]
   constructor
   · rintro ⟨hw, f, hf⟩
-    refine ⟨w.map (fun x (k : Fin m) => x k), ⟨fun i k => f (Fin.cast (by simp) i) (emb R m (Pi.single k 1)), ?_⟩, ?_⟩
+    refine ⟨
+      w.map (fun x (k : Fin m) => x k),
+      ⟨fun i k => f (Fin.cast (by simp) i) (emb R m (Pi.single k 1)), ?_⟩,
+      ?_
+    ⟩
     · intro i j
       simp only [List.get_eq_getElem, List.getElem_map]
       rw [emb_form, emb_restrict _ (hw _ (List.getElem_mem _))]
@@ -84,7 +88,10 @@ theorem link_eq (R : Type) [CommRing R] (m : ℕ) :
     · intro x hx
       obtain ⟨y, _, rfl⟩ := List.mem_map.mp hx
       exact emb_mem_low y
-    · refine ⟨fun i => ∑ k : Fin m, g (Fin.cast (by simp) i) k • Finsupp.lapply (R := R) (M := R) (k : ℕ), ?_⟩
+    · refine ⟨
+        fun i => ∑ k : Fin m, g (Fin.cast (by simp) i) k • Finsupp.lapply (R := R) (M := R) (k : ℕ),
+        ?_
+      ⟩
       intro i j
       simp only [List.get_eq_getElem, List.getElem_map]
       rw [form_emb]
@@ -93,17 +100,23 @@ theorem link_eq (R : Type) [CommRing R] (m : ℕ) :
 
 end GlobalTheory.SeqCxLow
 
-private theorem exactAt_of_exactAt_image_injective {V U : Type} (e : V → U) (he : Function.Injective e)
-    (F : Set (List V)) (q : ℕ) (h : ExactAt (List.map e '' F) q) : ExactAt F q := by
+private theorem exactAt_of_exactAt_image_injective
+    {V U : Type} (e : V → U) (he : Function.Injective e) (F : Set (List V))
+    (q : ℕ) (h : ExactAt (List.map e '' F) q)
+    : ExactAt F q := by
   classical
   have hM : Function.Injective (List.map e) := List.map_injective_iff.mpr he
-  have comm : ∀ c, bd U (Finsupp.mapDomain (List.map e) c) = Finsupp.mapDomain (List.map e) (bd V c) := by
+  have comm
+      : ∀ c, bd U (Finsupp.mapDomain (List.map e) c) = Finsupp.mapDomain (List.map e) (bd V c) := by
     intro c
-    have E : (bd U).comp (Finsupp.lmapDomain ℤ ℤ (List.map e)) = (Finsupp.lmapDomain ℤ ℤ (List.map e)).comp (bd V) := by
+    have E
+        : (bd U).comp (Finsupp.lmapDomain ℤ ℤ (List.map e))
+          = (Finsupp.lmapDomain ℤ ℤ (List.map e)).comp (bd V) := by
       apply Finsupp.lhom_ext'
       intro l
       apply LinearMap.ext_ring
-      simp [bd, map_sum, Finsupp.lmapDomain_apply, Finsupp.mapDomain_smul, Finsupp.mapDomain_single, List.eraseIdx_map]
+      simp [bd, map_sum, Finsupp.lmapDomain_apply, Finsupp.mapDomain_smul, Finsupp.mapDomain_single,
+        List.eraseIdx_map]
     exact LinearMap.congr_fun E c
   intro c hc hbc
   have hc' : Finsupp.mapDomain (List.map e) c ∈ chains (List.map e '' F) q := by
@@ -131,7 +144,9 @@ private theorem exactAt_of_exactAt_image_injective {V U : Type} (e : V → U) (h
 
 section
 open GlobalTheory.SeqCx Matrix
-theorem _root_.GlobalTheory.T.exactAt_unimodularSeqs_of_link_nil_coordSubspace : ∀ (R : Type) [CommRing R] (m q : ℕ), ExactAt (linkIn (uniM R (ℕ →₀ R)) (low R m) []) q → ExactAt (uniSeq R m) q := by
+theorem _root_.GlobalTheory.T.exactAt_unimodularSeqs_of_link_nil_coordSubspace
+    : ∀ (R : Type) [CommRing R] (m q : ℕ),
+      ExactAt (linkIn (uniM R (ℕ →₀ R)) (low R m) []) q → ExactAt (uniSeq R m) q := by
   intro R _ m q h
   rw [GlobalTheory.SeqCxLow.link_eq] at h
   exact exactAt_of_exactAt_image_injective _ (GlobalTheory.SeqCxLow.emb_injective R m) _ _ h

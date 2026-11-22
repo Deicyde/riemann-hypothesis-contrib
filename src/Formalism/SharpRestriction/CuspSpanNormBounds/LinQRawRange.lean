@@ -45,15 +45,16 @@ def smulLat (_H : HermSp M V) (c : E) (abelian₂ : Submodule M.L.O V) : Submodu
   Submodule.span M.L.O ((fun v => c • v) '' (abelian₂ : Set V))
 
 def IsSelfDual (abelian₂ : Submodule M.L.O V) : Prop :=
-  abelian₂.FG ∧ Submodule.span E (abelian₂ : Set V) = ⊤ ∧ ∀ x : V, x ∈ abelian₂ ↔ ∀ y ∈ abelian₂, H.h x y ∈ M.L.O
+  abelian₂.FG ∧ Submodule.span E (abelian₂ : Set V) = ⊤
+    ∧ ∀ x : V, x ∈ abelian₂ ↔ ∀ y ∈ abelian₂, H.h x y ∈ M.L.O
 
 def Prim (_H : HermSp M V) (abelian₂ : Submodule M.L.O V) {ι : Type} (v : ι → V) : Prop :=
-  (∀ a, v a ∈ abelian₂) ∧ LinearIndependent E v ∧
-    ∀ x ∈ abelian₂, x ∈ Submodule.span E (Set.range v) → x ∈ Submodule.span M.L.O (Set.range v)
+  (∀ a, v a ∈ abelian₂) ∧ LinearIndependent E v
+    ∧ ∀ x ∈ abelian₂, x ∈ Submodule.span E (Set.range v) → x ∈ Submodule.span M.L.O (Set.range v)
 
 def IsFrame (abelian₂ : Submodule M.L.O V) (r : ℕ) (f : Fin (r + 1) → V) (T : F) : Prop :=
-  H.Prim abelian₂ f ∧ (∀ a b : Fin (r + 1), (a ≠ Fin.last r ∨ b ≠ Fin.last r) → H.h (f a) (f b) = 0) ∧
-    H.h (f (Fin.last r)) (f (Fin.last r)) = - algebraMap F E T ∧ T ∈ 𝒪[F] ∧ T ≠ 0
+  H.Prim abelian₂ f ∧ (∀ a b : Fin (r + 1), (a ≠ Fin.last r ∨ b ≠ Fin.last r) → H.h (f a) (f b) = 0)
+    ∧ H.h (f (Fin.last r)) (f (Fin.last r)) = - algebraMap F E T ∧ T ∈ 𝒪[F] ∧ T ≠ 0
 
 def Zhat {r : ℕ} (f f' : Fin (r + 1) → V) : Matrix (Fin (r + 1)) (Fin (r + 1)) E :=
   Matrix.of fun a b => H.h (f' b) (f a)
@@ -69,7 +70,8 @@ def Gdet {r : ℕ} (f f' : Fin (r + 1) → V) (T T' : F) : E :=
 def X (_H : HermSp M V) {r : ℕ} (f : Fin (r + 1) → V) : Submodule E V :=
   Submodule.span E (Set.range fun a : Fin r => f a.castSucc)
 
-def Xp (_H : HermSp M V) {r : ℕ} (f : Fin (r + 1) → V) : Submodule E V := Submodule.span E (Set.range f)
+def Xp (_H : HermSp M V) {r : ℕ} (f : Fin (r + 1) → V) : Submodule E V :=
+  Submodule.span E (Set.range f)
 
 def W0 {r : ℕ} (f f' : Fin (r + 1) → V) : Submodule E V := H.perp (H.Xp f ⊔ H.Xp f')
 
@@ -81,8 +83,7 @@ def mkW {r : ℕ} (f : Fin (r + 1) → V) : ↥(H.perp (H.X f)) →ₗ[E] H.Wb f
 def Lset (abelian₂ : Submodule M.L.O V) {r : ℕ} (f : Fin (r + 1) → V) : Set (H.Wb f) :=
   {w | ∃ x : ↥(H.perp (H.X f)), (x : V) ∈ abelian₂ ∧ H.mkW f x = w}
 
-def om' {r : ℕ} (f f' : Fin (r + 1) → V) : V :=
-  ∑ b, (H.Zhat f f').adjugate b (Fin.last r) • f' b
+def om' {r : ℕ} (f f' : Fin (r + 1) → V) : V := ∑ b, (H.Zhat f f').adjugate b (Fin.last r) • f' b
 
 def om {r : ℕ} (f f' : Fin (r + 1) → V) : V :=
   ∑ a, M.L.cj ((H.Zhat f f').adjugate (Fin.last r) a) • f a
@@ -115,21 +116,23 @@ def MMfam (_H : HermSp M V) {r : ℕ} (t : Term V M r) : Fin (r + 1) ⊕ Fin (r 
   | some g => Sum.elim t.f (fun a => algebraMap F E ((g.q : F)⁻¹) • (t.f' a - t.f a))
 
 def IsTerm {r : ℕ} (t : Term V M r) : Prop :=
-  H.IsSelfDual t.abelian₂ ∧ H.IsFrame t.abelian₂ r t.f t.T ∧ H.IsFrame t.abelian₂ r t.f' t.T' ∧
-    IsUnit (H.Dl t.f t.f' (r + 1)) ∧ H.Gdet t.f t.f' t.T t.T' ≠ 0 ∧
-    ∀ g, M.split = some g →
-      (∃ u v : 𝒪[F], (u : F) * t.T = 1 ∧ (v : F) * t.T' = 1) ∧
-      (∃ c : 𝒪[F], t.T - t.T' = (g.q : F) ^ 2 * c) ∧ H.Admissible g t
+  H.IsSelfDual t.abelian₂ ∧ H.IsFrame t.abelian₂ r t.f t.T ∧ H.IsFrame t.abelian₂ r t.f' t.T'
+    ∧ IsUnit (H.Dl t.f t.f' (r + 1)) ∧ H.Gdet t.f t.f' t.T t.T' ≠ 0
+    ∧ ∀ g,
+      M.split = some g
+        → (∃ u v : 𝒪[F], (u : F) * t.T = 1 ∧ (v : F) * t.T' = 1)
+          ∧ (∃ c : 𝒪[F], t.T - t.T' = (g.q : F) ^ 2 * c) ∧ H.Admissible g t
 
 def IsGeneric {r : ℕ} (t : Term V M r) : Prop := H.IsTerm t ∧ H.Prim t.abelian₂ (H.MMfam t)
 
-def ZZplusOf (M : Model F E) {r : ℕ} (Zh : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : F) :
-    Matrix (Fin (r + 1)) (Fin (r + 1)) E :=
+def ZZplusOf (M : Model F E) {r : ℕ} (Zh : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : F)
+    : Matrix (Fin (r + 1)) (Fin (r + 1)) E :=
   match M.split with
   | none => Zh
-  | some g => Matrix.of fun a b =>
-      g.e.symm ((g.e (Zh a b)).1 / (g.q : F), -((g.e (Zh b a)).2 / (g.q : F))) -
-      (if a = Fin.last r ∧ b = Fin.last r then g.e.symm (-T / (g.q : F), T' / (g.q : F)) else 0)
+  | some g =>
+    Matrix.of fun a b =>
+      g.e.symm ((g.e (Zh a b)).1 / (g.q : F), -((g.e (Zh b a)).2 / (g.q : F)))
+        - (if a = Fin.last r ∧ b = Fin.last r then g.e.symm (-T / (g.q : F), T' / (g.q : F)) else 0)
 
 def ZZplus {r : ℕ} (t : Term V M r) : Matrix (Fin (r + 1)) (Fin (r + 1)) E :=
   ZZplusOf M (H.Zhat t.f t.f') t.T t.T'
@@ -142,38 +145,44 @@ def IsIsomW {r : ℕ} {f₁ f₂ : Fin (r + 1) → V} (φ : H.Wb f₁ ≃ₗ[E] 
   ∀ (x y : ↥(H.perp (H.X f₁))) (x₂ y₂ : ↥(H.perp (H.X f₂))),
     φ (H.mkW f₁ x) = H.mkW f₂ x₂ → φ (H.mkW f₁ y) = H.mkW f₂ y₂ → H.h x₂ y₂ = H.h x y
 
-def SendsTo {r : ℕ} {f₁ f₂ : Fin (r + 1) → V} (φ : H.Wb f₁ →ₗ[E] H.Wb f₂) (c₁ c₂ : E)
-    (v₁ v₂ : V) : Prop :=
-  ∀ (x : ↥(H.perp (H.X f₁))) (x₂ : ↥(H.perp (H.X f₂))), (x : V) = v₁ → (x₂ : V) = v₂ →
-    c₁ • φ (H.mkW f₁ x) = c₂ • H.mkW f₂ x₂
+def SendsTo {r : ℕ} {f₁ f₂ : Fin (r + 1) → V} (φ : H.Wb f₁ →ₗ[E] H.Wb f₂) (c₁ c₂ : E) (v₁ v₂ : V)
+    : Prop :=
+  ∀ (x : ↥(H.perp (H.X f₁))) (x₂ : ↥(H.perp (H.X f₂))),
+    (x : V) = v₁ → (x₂ : V) = v₂ → c₁ • φ (H.mkW f₁ x) = c₂ • H.mkW f₂ x₂
 
-def Ident {r : ℕ} (t₁ t₂ : Term V M r) (φ : H.Wb t₁.f ≃ₗ[E] H.Wb t₂.f)
-    (φ' : H.Wb t₁.f' ≃ₗ[E] H.Wb t₂.f') : Prop :=
-  H.IsIsomW φ ∧ H.IsIsomW φ' ∧
-  (∀ w ∈ H.W0 t₁.f t₁.f', ∃ w₂ ∈ H.W0 t₂.f t₂.f',
-    H.SendsTo φ.toLinearMap 1 1 w w₂ ∧ H.SendsTo φ'.toLinearMap 1 1 w w₂) ∧
-  H.SendsTo φ.toLinearMap (H.Dl t₂.f t₂.f' (r + 1)) (H.Dl t₁.f t₁.f' (r + 1))
-    (H.om' t₁.f t₁.f') (H.om' t₂.f t₂.f') ∧
-  H.SendsTo φ'.toLinearMap (M.L.cj (H.Dl t₂.f t₂.f' (r + 1))) (M.L.cj (H.Dl t₁.f t₁.f' (r + 1)))
-    (H.om t₁.f t₁.f') (H.om t₂.f t₂.f') ∧
-  H.Dl t₁.f t₁.f' r * H.Dl t₂.f t₂.f' (r + 1) = H.Dl t₂.f t₂.f' r * H.Dl t₁.f t₁.f' (r + 1)
+def Ident
+    {r : ℕ} (t₁ t₂ : Term V M r) (φ : H.Wb t₁.f ≃ₗ[E] H.Wb t₂.f) (φ' : H.Wb t₁.f' ≃ₗ[E] H.Wb t₂.f')
+    : Prop :=
+  H.IsIsomW φ ∧ H.IsIsomW φ'
+    ∧ (∀ w ∈ H.W0 t₁.f t₁.f', ∃ w₂ ∈ H.W0 t₂.f t₂.f',
+      H.SendsTo φ.toLinearMap 1 1 w w₂ ∧ H.SendsTo φ'.toLinearMap 1 1 w w₂)
+    ∧ H.SendsTo φ.toLinearMap (H.Dl t₂.f t₂.f' (r + 1)) (H.Dl t₁.f t₁.f' (r + 1)) (H.om' t₁.f t₁.f')
+      (H.om' t₂.f t₂.f')
+    ∧ H.SendsTo φ'.toLinearMap (M.L.cj (H.Dl t₂.f t₂.f' (r + 1))) (M.L.cj (H.Dl t₁.f t₁.f' (r + 1)))
+      (H.om t₁.f t₁.f') (H.om t₂.f t₂.f')
+    ∧ H.Dl t₁.f t₁.f' r * H.Dl t₂.f t₂.f' (r + 1) = H.Dl t₂.f t₂.f' r * H.Dl t₁.f t₁.f' (r + 1)
 
-def Respects {r : ℕ} (t₁ t₂ : Term V M r) (φ : H.Wb t₁.f ≃ₗ[E] H.Wb t₂.f)
-    (φ' : H.Wb t₁.f' ≃ₗ[E] H.Wb t₂.f') : Prop :=
-  φ '' H.Lset t₁.abelian₂ t₁.f = H.Lset t₂.abelian₂ t₂.f ∧
-  H.SendsTo φ.toLinearMap 1 1 (t₁.f (Fin.last r)) (t₂.f (Fin.last r)) ∧
-  φ' '' H.Lset t₁.abelian₂ t₁.f' = H.Lset t₂.abelian₂ t₂.f' ∧
-  H.SendsTo φ'.toLinearMap 1 1 (t₁.f' (Fin.last r)) (t₂.f' (Fin.last r)) ∧
-  ∀ g, M.split = some g → Prod.map φ' φ '' H.iotaGraph g t₁ = H.iotaGraph g t₂
+def Respects
+    {r : ℕ} (t₁ t₂ : Term V M r) (φ : H.Wb t₁.f ≃ₗ[E] H.Wb t₂.f) (φ' : H.Wb t₁.f' ≃ₗ[E] H.Wb t₂.f')
+    : Prop :=
+  φ '' H.Lset t₁.abelian₂ t₁.f = H.Lset t₂.abelian₂ t₂.f
+    ∧ H.SendsTo φ.toLinearMap 1 1 (t₁.f (Fin.last r)) (t₂.f (Fin.last r))
+    ∧ φ' '' H.Lset t₁.abelian₂ t₁.f' = H.Lset t₂.abelian₂ t₂.f'
+    ∧ H.SendsTo φ'.toLinearMap 1 1 (t₁.f' (Fin.last r)) (t₂.f' (Fin.last r))
+    ∧ ∀ g, M.split = some g → Prod.map φ' φ '' H.iotaGraph g t₁ = H.iotaGraph g t₂
 
 def IsScalarPair {r : ℕ} (t₁ t₂ : Term V M r) : Prop :=
   ∃ φ φ', H.Ident t₁ t₂ φ φ' ∧ H.Respects t₁ t₂ φ φ'
 
 def dens (ϖ : 𝒪[F]) (abelian₂ : Submodule M.L.O V) {ι : Type} [Fintype ι] (G₀ : Matrix ι ι E) : ℝ :=
-  (Nat.card (Set.range fun v : {v : ι → V // H.Prim abelian₂ v ∧ ∀ a b,
-      H.h (v b) (v a) - G₀ a b ∈ Submodule.span M.L.O {algebraMap F E (ϖ : F)}} =>
-      fun a => Submodule.Quotient.mk (p := H.smulLat (algebraMap F E (ϖ : F)) abelian₂) (v.1 a)) : ℝ) /
-    (Nat.card 𝓀[F] : ℝ) ^ ((2 * Module.finrank E V * Fintype.card ι : ℤ) - (Fintype.card ι : ℤ) ^ 2)
+  (Nat.card (Set.range
+        fun v
+            : {v : ι → V // H.Prim abelian₂ v
+              ∧ ∀ a b, H.h (v b) (v a) - G₀ a b ∈ Submodule.span M.L.O {algebraMap F E (ϖ : F)}} =>
+          fun a => Submodule.Quotient.mk (p := H.smulLat (algebraMap F E (ϖ : F)) abelian₂) (v.1 a))
+      : ℝ)
+    / (Nat.card 𝓀[F] : ℝ)
+      ^ ((2 * Module.finrank E V * Fintype.card ι : ℤ) - (Fintype.card ι : ℤ) ^ 2)
 
 def gram {ι : Type} (v : ι → V) : Matrix ι ι E := Matrix.of fun a b => H.h (v b) (v a)
 
@@ -184,10 +193,11 @@ namespace Model
 variable (M : Model F E)
 
 def linQRaw {m : ℕ} (ZZ : M.Mat m) (row : Fin m → M.R) : (Fin m → M.R) →ₗ[M.R] E ⧸ M.Rsub :=
-  M.Rsub.mkQ ∘ₗ
-    ((Matrix.of fun (_ : Fin 1) (j : Fin m) => ((row j : M.R) : E)).mulVecLin.restrictScalars M.R |>.comp
-      ((ZZ.Z.map M.R.subtype)⁻¹.mulVecLin.restrictScalars M.R) |> (LinearMap.proj (0 : Fin 1)).comp) ∘ₗ
-    (LinearMap.compLeft (Algebra.linearMap M.R E) (Fin m))
+  M.Rsub.mkQ
+    ∘ₗ ((Matrix.of fun (_ : Fin 1) (j : Fin m) => ((row j : M.R) : E)).mulVecLin.restrictScalars M.R
+      |>.comp ((ZZ.Z.map M.R.subtype)⁻¹.mulVecLin.restrictScalars M.R)
+      |> (LinearMap.proj (0 : Fin 1)).comp)
+    ∘ₗ (LinearMap.compLeft (Algebra.linearMap M.R E) (Fin m))
 
 lemma linQRaw_range {m : ℕ} (ZZ : M.Mat m) (row : Fin m → M.R) :
     LinearMap.range ZZ.Z.mulVecLin ≤ LinearMap.ker (M.linQRaw ZZ row) := by
@@ -217,9 +227,9 @@ def linQ {m : ℕ} (ZZ : M.Mat m) (row : Fin m → M.R) : M.Cok ZZ →ₗ[M.R] E
   Submodule.liftQ _ (M.linQRaw ZZ row) (M.linQRaw_range ZZ row)
 
 def nIsoBA {m : ℕ} (Z₁ Z₂ : M.Mat m) (be₁ be₂ al₁ al₂ : Fin m → M.R) : ℕ :=
-  Nat.card {φ : M.Cok Z₁ ≃ₗ[M.R] M.Cok Z₂ //
-    φ (Submodule.Quotient.mk be₁) = Submodule.Quotient.mk be₂ ∧
-      ∀ v, M.linQ Z₂ al₂ (φ v) = M.linQ Z₁ al₁ v}
+  Nat.card
+    {φ : M.Cok Z₁ ≃ₗ[M.R] M.Cok Z₂ // φ (Submodule.Quotient.mk be₁) = Submodule.Quotient.mk be₂
+      ∧ ∀ v, M.linQ Z₂ al₂ (φ v) = M.linQ Z₁ al₁ v}
 
 end Model
 

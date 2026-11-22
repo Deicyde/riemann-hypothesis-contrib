@@ -19,22 +19,28 @@ namespace ReciprocityTheory.ChartRestriction.DS
 
 variable {n : ℕ}
 
-theorem psi_eq_PsiM {ε : Fin n → Bool} {lam : Fin n → ℝ} {T : S7.KType ε (lowK ε lam)}
+theorem psi_eq_PsiM
+    {ε : Fin n → Bool} {lam : Fin n → ℝ} {T : S7.KType ε (lowK ε lam)}
     {Ψ : Matrix (Fin n) (Fin n) ℂ → (T.V →L[ℂ] T.V)}
-    (hK : ∀ (k₁ k₂ : S7.KG ε) (g : Matrix (Fin n) (Fin n) ℂ), inUJ ε g →
-      Ψ (S7.toMK k₁ * g * S7.toMK k₂) = T.op k₁ * Ψ g * T.op k₂)
+    (hK : ∀ (k₁ k₂ : S7.KG ε) (g : Matrix (Fin n) (Fin n) ℂ),
+      inUJ ε g → Ψ (S7.toMK k₁ * g * S7.toMK k₂) = T.op k₁ * Ψ g * T.op k₂)
     {μ : Fin n → ℤ} (hμ : S7.IsMu lam μ)
-    (hF : ∀ X : Matrix (Fin n) (Fin n) ℂ, inP ε X →
-      Ψ (NormedSpace.exp X) =
-        ((Module.finrank ℂ T.V : ℂ) / ((S7.muK ε Set.univ).toReal : ℂ)) •
-          ∫ k, S7.PhiM μ (S7.toMK k⁻¹ * NormedSpace.exp X * S7.toMK k)⁻¹ •
-            (T.op k * S7.projW T * T.op k⁻¹) ∂(S7.muK ε)) :
-    ∀ g ∈ UJset ε, Ψ g = S7.PsiM T μ g := by
+    (hF : ∀ X : Matrix (Fin n) (Fin n) ℂ,
+      inP ε X
+        → Ψ (NormedSpace.exp X)
+          = ((Module.finrank ℂ T.V : ℂ) / ((S7.muK ε Set.univ).toReal : ℂ))
+            • ∫ k, S7.PhiM μ (S7.toMK k⁻¹ * NormedSpace.exp X * S7.toMK k)⁻¹ •
+                (T.op k * S7.projW T * T.op k⁻¹) ∂(S7.muK ε))
+    : ∀ g ∈ UJset ε, Ψ g = S7.PsiM T μ g := by
   intro g hg
-  have hex : ∃ (k : S7.KG ε) (X : Matrix (Fin n) (Fin n) ℂ), inP ε X ∧ g = S7.toMK k * NormedSpace.exp X :=
+  have hex
+      : ∃ (k : S7.KG ε) (X : Matrix (Fin n) (Fin n) ℂ),
+        inP ε X ∧ g = S7.toMK k * NormedSpace.exp X :=
     S7.polar_exists hg
-  have key : ∀ (kc : S7.KG ε) (Xc : Matrix (Fin n) (Fin n) ℂ), inP ε Xc → g = S7.toMK kc * NormedSpace.exp Xc →
-      Ψ g = T.op kc * S7.psM T μ (NormedSpace.exp Xc) := by
+  have key
+      : ∀ (kc : S7.KG ε) (Xc : Matrix (Fin n) (Fin n) ℂ),
+        inP ε Xc → g = S7.toMK kc * NormedSpace.exp Xc
+          → Ψ g = T.op kc * S7.psM T μ (NormedSpace.exp Xc) := by
     intro kc Xc hXc hgc
     have hu : inUJ ε (NormedSpace.exp Xc) := by
       have := S7.inUJ_kexp (1 : S7.KG ε) hXc
@@ -53,7 +59,8 @@ theorem psi_eq_PsiM {ε : Fin n → Bool} {lam : Fin n → ℝ} {T : S7.KType ε
 theorem sigZero (hAll : ∀ m : ℕ, S7.PsiAllStatement m) : Lap.SigZeroStatement := by
   intro k r z c u v b h hS
   obtain ⟨hk, -, -, -, -, -, hlamR, -, -, -, hGL⟩ := hS
-  have hqOf : qOf (Formalism.MainNotions.CayleySignature.eps48 k r) = r + 1 := Lap.noncompactCount_parabolicSign k r hk
+  have hqOf : qOf (Formalism.MainNotions.CayleySignature.eps48 k r) = r + 1 :=
+    Lap.noncompactCount_parabolicSign k r hk
   have hpOf : pOf (Formalism.MainNotions.CayleySignature.eps48 k r) = k + r := by
     rw [Lap.compactCount_parabolicSign k r hk]; omega
   obtain ⟨P, hPc⟩ := exists_cayley_unitary k r hk
@@ -80,7 +87,8 @@ theorem sigZero (hAll : ∀ m : ℕ, S7.PsiAllStatement m) : Lap.SigZeroStatemen
   have hNQ : (0 : ℝ) ≤ ((2 * r + k + 1 : ℕ) : ℝ) * (S7.q0 ε : ℝ) := mul_nonneg hNn (by linarith)
   have hsq0 : (0 : ℝ) ≤ Real.sqrt (2 * (S7.q0 ε : ℝ)) := Real.sqrt_nonneg _
   have h8 : 8 * ((2 * r + k + 1 : ℕ) : ℝ) * (S7.q0 ε : ℝ) < h := by linarith
-  have hthr : 4 * max (Lap.S0.bG k r) (Lap.S0.bS k r) < h / (8 * Real.sqrt (2 * (S7.q0 ε : ℝ))) - 1 := by
+  have hthr
+      : 4 * max (Lap.S0.bG k r) (Lap.S0.bS k r) < h / (8 * Real.sqrt (2 * (S7.q0 ε : ℝ))) - 1 := by
     have hbG : Lap.S0.bG k r = 2 * ((2 * r + k + 1 : ℕ) : ℝ) * (S7.q0 ε : ℝ) := by
       unfold Lap.S0.bG Lap.S0.nS Lap.S0.q0S; rw [← hq0]
     have hbS : Lap.S0.bS k r = 2 * ((r : ℝ) + 1 - 1) * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2 := by
@@ -112,15 +120,24 @@ theorem sigZero (hAll : ∀ m : ℕ, S7.PsiAllStatement m) : Lap.SigZeroStatemen
     exact zero_ne_one h1
   have hPsi := psi_eq_PsiM ha hμ (hF μ hμ)
   have hDS := isDS_sigLam hgap hP hv₀
-  refine ⟨↥(Hlam ε Ψ T.w), inferInstance, inferInstance, inferInstance,
-    fun g => sigLam ε Ψ T.w (P * g * P⁻¹), isDSHpk_of_isDS hPc hDS, isURepOn_UH_of hPc hDS.2.2.1, ?_⟩
+  refine ⟨
+    ↥(Hlam ε Ψ T.w),
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    fun g => sigLam ε Ψ T.w (P * g * P⁻¹),
+    isDSHpk_of_isDS hPc hDS,
+    isURepOn_UH_of hPc hDS.2.2.1,
+    ?_
+  ⟩
   intro w₀ hw₀
   have hlow := isLowUnit_of_isLowUnitH hPc hDS hw₀
   have hlowK : Formalism.MainNotions.S.lowKSub ε lam (sigLam ε Ψ T.w) = lowKSubLam ε Ψ T.w := by
     obtain ⟨h1, h2⟩ := sigLam_lowK hgap hP hv₀
     unfold Formalism.MainNotions.S.lowKSub
-    have hset : {S | Formalism.MainNotions.S.IsKTypeOf ε (sigLam ε Ψ T.w) (Formalism.QuantumDeterminants.lowK ε lam) S} =
-        {lowKSubLam ε Ψ T.w} :=
+    have hset
+        : {S | Formalism.MainNotions.S.IsKTypeOf ε (sigLam ε Ψ T.w) (Formalism.QuantumDeterminants.lowK ε lam) S}
+          = {lowKSubLam ε Ψ T.w} :=
       Set.ext fun S => ⟨fun hS => h2 S hS, fun hS => by rw [Set.mem_singleton_iff.1 hS]; exact h1⟩
     rw [hset, sSup_singleton]
   have hmem : w₀ ∈ lowKSubLam ε Ψ T.w := hlowK ▸ hlow.2
@@ -139,16 +156,29 @@ theorem sigZero (hAll : ∀ m : ℕ, S7.PsiAllStatement m) : Lap.SigZeroStatemen
     rw [hz, norm_zero] at h1
     exact zero_ne_one h1
   have hc1 : ((‖uniformisationL2 ε Ψ T.w T.w‖ ^ 2 : ℝ) : ℂ) ≠ 0 :=
-    Complex.ofReal_ne_zero.2 (pow_ne_zero 2 (norm_ne_zero_iff.2 (datumEmbedding_highest_ne_zero hgap hP hv₀)))
+    Complex.ofReal_ne_zero.2 (pow_ne_zero 2
+      (norm_ne_zero_iff.2 (datumEmbedding_highest_ne_zero hgap hP hv₀)))
   obtain ⟨C, hC⟩ := dec_gN_sigLam hgap hP hv₀ hq1 hdec v₁ v₁
-  refine ⟨fun μG hμG => fdegB_of_isDS hPc hDS μG hμG,
+  refine ⟨
+    fun μG hμG => fdegB_of_isDS hPc hDS μG hμG,
     ⟨h / (8 * Real.sqrt (2 * (S7.q0 ε : ℝ))), C, hthr, fun g hg => ?_⟩,
-    T, μ, P, v₁, _, hv1, hc1, hμ, hPc.1, fun g hg => ?_⟩
+    T,
+    μ,
+    P,
+    v₁,
+    _,
+    hv1,
+    hc1,
+    hμ,
+    hPc.1,
+    fun g hg => ?_
+  ⟩
   · have hgJ := szt_conj_mem hPc hg
     show ‖inner ℂ w₀ (sigLam ε Ψ T.w (P * g * P⁻¹) w₀)‖ ≤ _
     rw [Submodule.coe_inner, sigLam_coe hgap hP hv₀ hgJ, hw0L]
-    calc _ ≤ C * Real.sqrt (S7.hs (P * g * P⁻¹)) ^ (-(h / (8 * Real.sqrt (2 * (S7.q0 ε : ℝ))))) :=
-          hC _ hgJ
+    calc
+      _ ≤ C * Real.sqrt (S7.hs (P * g * P⁻¹)) ^ (-(h / (8 * Real.sqrt (2 * (S7.q0 ε : ℝ))))) :=
+        hC _ hgJ
       _ = _ := by rw [szt_hs_conj hPc, szt_gN_eq]
   · have hgJ := szt_conj_mem hPc hg
     show inner ℂ w₀ (sigLam ε Ψ T.w (P * g * P⁻¹) w₀) = _

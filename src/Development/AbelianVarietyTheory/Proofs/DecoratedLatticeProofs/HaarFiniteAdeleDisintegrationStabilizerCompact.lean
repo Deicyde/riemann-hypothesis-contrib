@@ -15,7 +15,14 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.Core.Rk GlobalTheory.Core.Mi
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory IsDedekindDomain
+  NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum
+  Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.RowDict
+  Formalism.L2.SG.RowsJoinPinned GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf
+  GlobalTheory.Core.Rk GlobalTheory.Core.Mi
 open scoped TensorProduct InnerProductSpace Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 noncomputable section
@@ -24,20 +31,25 @@ namespace GlobalTheory.SfinHaar
 
 open Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH Topology
 
-theorem exists_idem_of_subspace {E : Type} [Field E] {n : ℕ} (W : Submodule E (Fin n → E)) :
-    ∃ e : Matrix (Fin n) (Fin n) E, e * e = e ∧ ∀ x, x ∈ W ↔ e *ᵥ x = x := by
+theorem exists_idem_of_subspace {E : Type} [Field E] {n : ℕ} (W : Submodule E (Fin n → E))
+    : ∃ e : Matrix (Fin n) (Fin n) E, e * e = e ∧ ∀ x, x ∈ W ↔ e *ᵥ x = x := by
   obtain ⟨W', hc⟩ := W.exists_isCompl
   obtain ⟨p, hp⟩ : ∃ p : Matrix (Fin n) (Fin n) E, ∀ x, p *ᵥ x = Submodule.projection W W' hc x :=
     ⟨LinearMap.toMatrix' _, fun x => LinearMap.toMatrix'_mulVec _ x⟩
   have h1 : ∀ x, p *ᵥ x ∈ W := fun x => hp x ▸ Submodule.projection_apply_mem hc x
-  have h2 : ∀ x ∈ W, p *ᵥ x = x := fun x hx => (hp x).trans (Submodule.projection_apply_of_mem_left hc hx)
-  refine ⟨p, Matrix.ext_iff_mulVec.2 fun y => by rw [← Matrix.mulVec_mulVec, h2 _ (h1 y)], fun x =>
-    ⟨fun hx => h2 x hx, fun hx => hx ▸ h1 x⟩⟩
+  have h2 : ∀ x ∈ W, p *ᵥ x = x := fun x hx =>
+    (hp x).trans (Submodule.projection_apply_of_mem_left hc hx)
+  refine ⟨
+    p,
+    Matrix.ext_iff_mulVec.2 fun y => by rw [← Matrix.mulVec_mulVec, h2 _ (h1 y)],
+    fun x => ⟨fun hx => h2 x hx, fun hx => hx ▸ h1 x⟩
+  ⟩
 
-theorem span_incl_eq (I : AutInst) (T : Set (Fin I.n → I.E)) :
-    Submodule.span (I.E ⊗[I.F] Formalism.MainNotions.S.Af I.F) (incl I '' T) =
-      Submodule.span (I.E ⊗[I.F] Formalism.MainNotions.S.Af I.F)
-        ((fun w i => GlobalTheory.UnipApprox.inc I (w i)) '' (Submodule.span I.E T : Set (Fin I.n → I.E))) := by
+theorem span_incl_eq (I : AutInst) (T : Set (Fin I.n → I.E))
+    : Submodule.span (I.E ⊗[I.F] Formalism.MainNotions.S.Af I.F) (incl I '' T)
+      = Submodule.span (I.E ⊗[I.F] Formalism.MainNotions.S.Af I.F)
+        ((fun w i => GlobalTheory.UnipApprox.inc I (w i))
+          '' (Submodule.span I.E T : Set (Fin I.n → I.E))) := by
   apply le_antisymm
   · exact Submodule.span_mono (Set.image_mono Submodule.subset_span)
   · rw [Submodule.span_le]
@@ -46,43 +58,63 @@ theorem span_incl_eq (I : AutInst) (T : Set (Fin I.n → I.E)) :
     | mem x hx => exact Submodule.subset_span ⟨x, hx, rfl⟩
     | zero =>
       have : (fun i => GlobalTheory.UnipApprox.inc I ((0 : Fin I.n → I.E) i)) = 0 := by ext; simp
-      beta_reduce; rw [this]; exact zero_mem _
+      beta_reduce
+      rw [this]
+      exact zero_mem _
     | add x y _ _ hx hy =>
-      have : (fun i => GlobalTheory.UnipApprox.inc I ((x + y) i)) =
-          (fun i => GlobalTheory.UnipApprox.inc I (x i)) + fun i => GlobalTheory.UnipApprox.inc I (y i) := by ext; simp
-      rw [SetLike.mem_coe] at hx hy; beta_reduce at hx hy ⊢; rw [this]; exact add_mem hx hy
+      have : (fun i => GlobalTheory.UnipApprox.inc I ((x + y) i))
+          = (fun i => GlobalTheory.UnipApprox.inc I (x i))
+            + fun i => GlobalTheory.UnipApprox.inc I (y i) := by
+        ext; simp
+      rw [SetLike.mem_coe] at hx hy
+      beta_reduce at hx hy ⊢
+      rw [this]
+      exact add_mem hx hy
     | smul a x _ hx =>
-      have : (fun i => GlobalTheory.UnipApprox.inc I ((a • x) i)) =
-          GlobalTheory.UnipApprox.inc I a • fun i => GlobalTheory.UnipApprox.inc I (x i) := by ext; simp
-      rw [SetLike.mem_coe] at hx; beta_reduce at hx ⊢; rw [this]; exact Submodule.smul_mem _ _ hx
+      have : (fun i => GlobalTheory.UnipApprox.inc I ((a • x) i))
+          = GlobalTheory.UnipApprox.inc I a • fun i => GlobalTheory.UnipApprox.inc I (x i) := by
+        ext; simp
+      rw [SetLike.mem_coe] at hx
+      beta_reduce at hx ⊢
+      rw [this]
+      exact Submodule.smul_mem _ _ hx
 
-theorem isClosed_cond (I : AutInst) (v : Fin I.n → I.E) (T : Set (Fin I.n → I.E)) :
-    IsClosed {x : I.Gf | (I.fmat x - 1) *ᵥ incl I v ∈ Submodule.span (I.E ⊗[I.F] Formalism.MainNotions.S.Af I.F) (incl I '' T)} := by
+theorem isClosed_cond (I : AutInst) (v : Fin I.n → I.E) (T : Set (Fin I.n → I.E))
+    : IsClosed
+      {x : I.Gf | (I.fmat x - 1) *ᵥ incl I v ∈ Submodule.span (I.E ⊗[I.F] Formalism.MainNotions.S.Af I.F) (incl I '' T)} := by
   obtain ⟨t, hr, h2, -, -, -, hind⟩ := GlobalTheory.UnipApprox.exists_top I
   obtain ⟨e, he, hW⟩ := exists_idem_of_subspace (Submodule.span I.E T)
-  have hset : {x : I.Gf | (I.fmat x - 1) *ᵥ incl I v ∈ Submodule.span (I.E ⊗[I.F] Formalism.MainNotions.S.Af I.F) (incl I '' T)} =
-      {x | e.map (GlobalTheory.UnipApprox.inc I) *ᵥ ((I.fmat x - 1) *ᵥ incl I v) = (I.fmat x - 1) *ᵥ incl I v} := by
-    ext x
-    simp only [Set.mem_setOf_eq]
-    rw [span_incl_eq]
-    exact GlobalTheory.UnipApprox.mem_span_iff (GlobalTheory.UnipApprox.inc I) he _ hW _
+  have hset
+      : {x : I.Gf | (I.fmat x - 1) *ᵥ incl I v ∈ Submodule.span (I.E ⊗[I.F] Formalism.MainNotions.S.Af I.F) (incl I '' T)}
+        = {x | e.map (GlobalTheory.UnipApprox.inc I) *ᵥ ((I.fmat x - 1) *ᵥ incl I v) = (I.fmat x - 1) *ᵥ incl I v} :=
+    by
+      ext x
+      simp only [Set.mem_setOf_eq]
+      rw [span_incl_eq]
+      exact GlobalTheory.UnipApprox.mem_span_iff (GlobalTheory.UnipApprox.inc I) he _ hW _
   rw [hset]
   have hc : Continuous fun x : I.Gf => I.fmat x := Units.continuous_val.comp hind.continuous
   have hc2 : Continuous fun x : I.Gf => (I.fmat x - 1) *ᵥ incl I v :=
     (hc.sub continuous_const).matrix_mulVec continuous_const
   exact isClosed_eq (continuous_const.matrix_mulVec hc2) hc2
 
-theorem isClosed_sfin (I : AutInst) {r : ℕ} (e : Fin r → Fin I.n → I.E) (z : Fin I.n → I.E) :
-    IsClosed (Sfin I e z) := by
-  have h1 : ∀ a : Fin r, IsClosed {x : I.Gf | (I.fmat x - 1) *ᵥ incl I (e a) ∈
-      Submodule.span (I.E ⊗[I.F] Formalism.MainNotions.S.Af I.F) ((fun b => incl I (e b)) '' {b | b.1 < a.1})} := by
-    intro a
-    have := isClosed_cond I (e a) (e '' {b : Fin r | b.1 < a.1})
-    rwa [Set.image_image] at this
-  have h2 : IsClosed {x : I.Gf | (I.fmat x - 1) *ᵥ incl I z ∈
-      Submodule.span (I.E ⊗[I.F] Formalism.MainNotions.S.Af I.F) (Set.range fun b => incl I (e b))} := by
-    have := isClosed_cond I z (Set.range e)
-    rwa [← Set.range_comp] at this
+theorem isClosed_sfin (I : AutInst) {r : ℕ} (e : Fin r → Fin I.n → I.E) (z : Fin I.n → I.E)
+    : IsClosed (Sfin I e z) := by
+  have h1
+      : ∀ a : Fin r,
+        IsClosed
+          {x : I.Gf | (I.fmat x - 1) *ᵥ incl I (e a) ∈
+            Submodule.span (I.E ⊗[I.F] Formalism.MainNotions.S.Af I.F) ((fun b => incl I (e b)) '' {b | b.1 < a.1})} :=
+    by
+      intro a
+      have := isClosed_cond I (e a) (e '' {b : Fin r | b.1 < a.1})
+      rwa [Set.image_image] at this
+  have h2 : IsClosed
+      {x : I.Gf | (I.fmat x - 1) *ᵥ incl I z ∈
+        Submodule.span (I.E ⊗[I.F] Formalism.MainNotions.S.Af I.F) (Set.range fun b => incl I (e b))} :=
+    by
+      have := isClosed_cond I z (Set.range e)
+      rwa [← Set.range_comp] at this
   unfold Sfin
   rw [Set.setOf_and, Set.setOf_forall]
   exact (isClosed_iInter h1).inter h2
@@ -91,13 +123,19 @@ end GlobalTheory.SfinHaar
 
 namespace GlobalTheory.SfinHaar
 
-open Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH Topology MeasureTheory
+open Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH Topology
+  MeasureTheory
 
-theorem disint_finPart : ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u : D.what₂.Word),
-    ∃ μSf : Measure (Formalism.L2.SG.Pf.SfinSub X.B.I X.eR (X.zR u)), μSf.IsHaarMeasure ∧ SigmaFinite μSf ∧
-      ∃ c : ℝ, 0 < c ∧ ∀ φ : X.B.I.Gf → ENNReal, Measurable φ →
-        (∀ x, φ x ≠ 0 → ∃ s ∈ SfinU X u, ∃ k ∈ X.K2, x = s * X.xu u * k) →
-        ∫⁻ x, φ x ∂X.B.μf = ENNReal.ofReal c * ∫⁻ t, ∫⁻ k in X.K2, φ (t.1 * X.xu u * k) ∂X.B.μf ∂μSf := by
+theorem disint_finPart
+    : ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (u : D.what₂.Word),
+      ∃ μSf : Measure (Formalism.L2.SG.Pf.SfinSub X.B.I X.eR (X.zR u)),
+        μSf.IsHaarMeasure ∧ SigmaFinite μSf
+          ∧ ∃ c : ℝ,
+            0 < c
+              ∧ ∀ φ : X.B.I.Gf → ENNReal,
+                Measurable φ → (∀ x, φ x ≠ 0 → ∃ s ∈ SfinU X u, ∃ k ∈ X.K2, x = s * X.xu u * k)
+                  → ∫⁻ x, φ x ∂X.B.μf
+                    = ENNReal.ofReal c * ∫⁻ t, ∫⁻ k in X.K2, φ (t.1 * X.xu u * k) ∂X.B.μf ∂μSf := by
   intro D X u
   set G := X.B.I.Gf
   set S := Formalism.L2.SG.Pf.SfinSub X.B.I X.eR (X.zR u) with hSdef
@@ -132,7 +170,8 @@ theorem disint_finPart : ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetti
     show x⁻¹ * ((1 : S) : G) * x ∈ K
     simpa using hK1
   haveI : LocallyCompactSpace S := hHc.locallyCompactSpace_of_mem_nhds_of_group (hHo.mem_nhds hH1)
-  let K₀ : TopologicalSpace.PositiveCompacts S := ⟨⟨H, hHc⟩, ⟨1, hHo.subset_interior_iff.2 le_rfl hH1⟩⟩
+  let K₀ : TopologicalSpace.PositiveCompacts S :=
+    ⟨⟨H, hHc⟩, ⟨1, hHo.subset_interior_iff.2 le_rfl hH1⟩⟩
   set ν : Measure S := Measure.haarMeasure K₀ with hνdef
   haveI : ν.IsHaarMeasure := Measure.isHaarMeasure_haarMeasure K₀
   have hνH : ν H = 1 := Measure.haarMeasure_self
@@ -140,8 +179,9 @@ theorem disint_finPart : ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetti
   rw [ENNReal.ofReal_one, one_mul]
 
   set Z : Set (S × G) := {p | x⁻¹ * ((p.1 : G)⁻¹ * p.2) ∈ K} with hZdef
-  have hZo : IsOpen Z := hKo.preimage
-    (continuous_const.mul ((continuous_subtype_val.comp continuous_fst).inv.mul continuous_snd))
+  have hZo : IsOpen Z :=
+    hKo.preimage (continuous_const.mul ((continuous_subtype_val.comp continuous_fst).inv.mul
+      continuous_snd))
   have hZm : MeasurableSet Z := hZo.measurableSet
   have hKm : MeasurableSet K := hKo.measurableSet
   let F : S → G → ENNReal := fun t g => φ g * Z.indicator 1 (t, g)
@@ -154,10 +194,12 @@ theorem disint_finPart : ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetti
     refine lintegral_congr fun k => ?_
     have e : x⁻¹ * ((t : G)⁻¹ * ((t : G) * x * k)) = k := by group
     by_cases hk : k ∈ K
-    · have : ((t, (t : G) * x * k) : S × G) ∈ Z := by show x⁻¹ * ((t : G)⁻¹ * ((t : G) * x * k)) ∈ K; rw [e]; exact hk
+    · have : ((t, (t : G) * x * k) : S × G) ∈ Z := by
+        show x⁻¹ * ((t : G)⁻¹ * ((t : G) * x * k)) ∈ K; rw [e]; exact hk
       simp only [F]
       rw [Set.indicator_of_mem this, Set.indicator_of_mem hk, Pi.one_apply, mul_one]
-    · have : ((t, (t : G) * x * k) : S × G) ∉ Z := by show ¬ x⁻¹ * ((t : G)⁻¹ * ((t : G) * x * k)) ∈ K; rw [e]; exact hk
+    · have : ((t, (t : G) * x * k) : S × G) ∉ Z := by
+        show ¬ x⁻¹ * ((t : G)⁻¹ * ((t : G) * x * k)) ∈ K; rw [e]; exact hk
       simp only [F]
       rw [Set.indicator_of_notMem this, Set.indicator_of_notMem hk, mul_zero]
 
@@ -180,15 +222,18 @@ theorem disint_finPart : ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetti
         exact hKmul _ (hKinv _ h) _ hk
     have hmeas : MeasurableSet {t : S | (t, s * x * k) ∈ Z} :=
       hZm.preimage (measurable_id.prodMk measurable_const)
-    calc ∫⁻ t, F t (s * x * k) ∂ν = ∫⁻ t, φ (s * x * k) * {t : S | (t, s * x * k) ∈ Z}.indicator 1 t ∂ν := by
-          refine lintegral_congr fun t => ?_
-          simp only [F]
-          congr 1
+    calc
+      ∫⁻ t, F t (s * x * k) ∂ν
+          = ∫⁻ t, φ (s * x * k) * {t : S | (t, s * x * k) ∈ Z}.indicator 1 t ∂ν := by
+        refine lintegral_congr fun t => ?_
+        simp only [F]
+        congr 1
       _ = φ (s * x * k) * ν {t : S | (t, s * x * k) ∈ Z} := by
-          rw [lintegral_const_mul _ (measurable_one.indicator hmeas), lintegral_indicator_one hmeas]
-      _ = φ (s * x * k) := by
-          rw [hset, measure_preimage_mul, hνH, mul_one]
-  calc ∫⁻ g, φ g ∂X.B.μf = ∫⁻ g, ∫⁻ t, F t g ∂ν ∂X.B.μf := lintegral_congr fun g => (hC' g).symm
+        rw [lintegral_const_mul _ (measurable_one.indicator hmeas), lintegral_indicator_one hmeas]
+      _ = φ (s * x * k) := by rw [hset, measure_preimage_mul, hνH, mul_one]
+  calc
+    ∫⁻ g, φ g ∂X.B.μf
+      = ∫⁻ g, ∫⁻ t, F t g ∂ν ∂X.B.μf := lintegral_congr fun g => (hC' g).symm
     _ = ∫⁻ t, ∫⁻ g, F t g ∂X.B.μf ∂ν := (lintegral_lintegral_swap hF.aemeasurable).symm
     _ = ∫⁻ t, ∫⁻ k in K, φ ((t : G) * x * k) ∂X.B.μf ∂ν := lintegral_congr fun t => hA t
 

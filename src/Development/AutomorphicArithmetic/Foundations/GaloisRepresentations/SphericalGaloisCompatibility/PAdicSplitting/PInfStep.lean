@@ -9,14 +9,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PublishedTh
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.GLq
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.GalCut GlobalTheory.RoadU GlobalTheory.AboveL GlobalTheory.DeRhamOfPlainTorus ValuativeRel
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.GLq
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.GalCut
+  GlobalTheory.RoadU GlobalTheory.AboveL GlobalTheory.DeRhamOfPlainTorus ValuativeRel
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open UpperTheory.Gal.ToralGalois.R2
 
-theorem UpperTheory.Gal.ToralGalois.R2.infStep :
-    UpperTheory.Gal.InertialTypesAlt.StableOf → InfStep := by
+theorem UpperTheory.Gal.ToralGalois.R2.infStep
+    : UpperTheory.Gal.InertialTypesAlt.StableOf → InfStep := by
   intro hS K M _ _ _ _ _ _ _ _ hp n hn π P hw τ
   obtain ⟨hconj, -⟩ := hS K M hp n hn π P hw
   have hK : IsTotallyComplex K := inferInstance
@@ -31,8 +35,9 @@ theorem UpperTheory.Gal.ToralGalois.R2.infStep :
     have h3 : (CG.mk π₁).infChar (τ.comp (algebraMap K M)) = (CG.mk P).infChar τ :=
       CG.HasInfChar.infChar_eq h2
     have h4 : CG.mk (π.twist η) = CG.mk π₁ := Quotient.sound hi
-    have h5 : (CG.mk (π.twist η)).infChar (τ.comp (algebraMap K M)) =
-        (CG.mk π).infChar (τ.comp (algebraMap K M)) := by
+    have h5
+        : (CG.mk (π.twist η)).infChar (τ.comp (algebraMap K M))
+          = (CG.mk π).infChar (τ.comp (algebraMap K M)) := by
       rcases hη with rfl | hη
       · exact GlobalTheory.RoadU.FinTwist.infChar_twist π
           (GlobalTheory.RoadU.FinTwist.isAlg_zero (m := 1) one_pos (pow_one _)) _

@@ -16,9 +16,9 @@ noncomputable section
 
 variable {P X Y Z : Scheme.{u}} {fst : P ⟶ X} {snd : P ⟶ Y} {f : X ⟶ Z} {g : Y ⟶ Z}
 
-theorem isPushout_app_of_isPullback (H : IsPullback fst snd f g) [IsAffine Y] [IsAffine Z]
-    {V : X.Opens} (hV : IsAffineOpen V) :
-    IsPushout (f.appLE ⊤ V le_top) g.appTop (fst.app V) (snd.appLE ⊤ (fst ⁻¹ᵁ V) le_top) := by
+theorem isPushout_app_of_isPullback
+    (H : IsPullback fst snd f g) [IsAffine Y] [IsAffine Z] {V : X.Opens} (hV : IsAffineOpen V)
+    : IsPushout (f.appLE ⊤ V le_top) g.appTop (fst.app V) (snd.appLE ⊤ (fst ⁻¹ᵁ V) le_top) := by
   have : IsAffine V.toScheme := hV
   have hP := (isPullback_morphismRestrict fst V).paste_vert H
   have hA := isPushout_appTop_of_isPullback hP

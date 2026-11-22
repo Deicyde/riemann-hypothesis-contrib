@@ -9,16 +9,27 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.IsMonHomIffOf
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
 open scoped CategoryTheory.Obj BigOperators
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.DVR ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.DVR
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
 open ArcPull PsiEvenPull
 
-theorem exists_oAct_of_field_extension : GlobalFnsSt → ∀ (K₀ K : Type) [Field K₀] [Field K] (i : K₀ →+* K) (D : DegPre K₀) (D' : DegPre K) (hD : IsPullDeg i D D') (O : Type) [CommRing O] [StarRing O] [Module O D.X] [Module O D'.X] (oB : D.P.OAct O) (oa' : D'.OAct O), (∀ (a : O) (y : D'.X), hD.xe (a • y) = a • hD.xe y) → (∀ a, (oa'.onB.act a).left ≫ PsiEvenPull.proj hD = PsiEvenPull.proj hD ≫ (oB.act a).left) → ∃ oa : D.OAct O, oa.onB = oB := by
+theorem exists_oAct_of_field_extension
+    : GlobalFnsSt
+      → ∀ (K₀ K : Type) [Field K₀] [Field K] (i : K₀ →+* K) (D : DegPre K₀) (D' : DegPre K)
+          (hD : IsPullDeg i D D') (O : Type) [CommRing O] [StarRing O] [Module O D.X]
+          [Module O D'.X] (oB : D.P.OAct O) (oa' : D'.OAct O),
+        (∀ (a : O) (y : D'.X), hD.xe (a • y) = a • hD.xe y)
+          → (∀ a,
+            (oa'.onB.act a).left ≫ PsiEvenPull.proj hD = PsiEvenPull.proj hD ≫ (oB.act a).left)
+          → ∃ oa : D.OAct O, oa.onB = oB := by
   intro hG K₀ K _ _ i D D' hD O _ _ _ _ oB oa' hx ho
   have gp := pull_grp hD
   have hφ : Function.Injective i := i.injective
@@ -46,12 +57,14 @@ theorem exists_oAct_of_field_extension : GlobalFnsSt → ∀ (K₀ K : Type) [Fi
   have sq := fracMap_sq hφ
   have hh : (TK K).hom ≫ spMap i = genMap hφ ≫ (TK K₀).hom := (Category.id_comp _).symm.trans sq
   have e := val_corr hJ' (oa'.tau_bal a u' hu' h₀ y y') (𝟙 (TK K).left)
-  have v := ros_val hG gp D'.P.isAb D.P.isLB D'.P.isLB hD.w_gen (ho a) (ho (star a)) ⟨hu, u₀⟩ ⟨hu', h₀⟩
-    (cP D' (TK K) y) (cP D' (TK K) y') (genMap hφ ≫ D.pt2 (hD.xe y) (hD.xe y'))
-    ((cPoint_proj hD _ hh y).trans (by
-      rw [Category.assoc, DegPre.pt2, ← Over.comp_left, lift_fst]; rfl))
-    ((cPoint_proj hD _ hh y').trans (by
-      rw [Category.assoc, DegPre.pt2, ← Over.comp_left, lift_snd]; rfl)) hJ hJ'
+  have v :=
+    ros_val hG gp D'.P.isAb D.P.isLB D'.P.isLB hD.w_gen (ho a) (ho (star a)) ⟨hu, u₀⟩ ⟨hu', h₀⟩
+      (cP D' (TK K) y) (cP D' (TK K) y') (genMap hφ ≫ D.pt2 (hD.xe y) (hD.xe y'))
+      ((cPoint_proj hD _ hh y).trans
+        (by rw [Category.assoc, DegPre.pt2, ← Over.comp_left, lift_fst]; rfl))
+      ((cPoint_proj hD _ hh y').trans
+        (by rw [Category.assoc, DegPre.pt2, ← Over.comp_left, lift_snd]; rfl))
+      hJ hJ'
   have cs : ∀ (a : O) y, cP D' (TK K) y ≫ oa'.onB.act a = cP D' (TK K) (a • y) := fun a y => by
     rw [cP, cP, oa'.c_lin, Category.assoc]
   rw [cs, cs, ← cPoint_add, ← cPoint_add] at v

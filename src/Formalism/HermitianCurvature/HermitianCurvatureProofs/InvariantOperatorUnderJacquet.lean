@@ -50,39 +50,46 @@ theorem casimir_under_jacquet_integral : Formalism.FourierDecayAlt.JF.CVUnderInt
   capelli_under_integral_of_parts jacquet_derivative_formula capelli_word_sum rewrite_rho_action
 
 theorem right_transfer_upper_levels : Formalism.FourierDecayAlt.Q.RTTUpper :=
-  rtt_upper_relations_from_descent chain_descent_relation resSurj_statement capelli_commutation operator_preserves_fusion_forms
-    transfer_triples rtt_sandwich rtt_independence leading_term_alt transfer_linear_local
+  rtt_upper_relations_from_descent chain_descent_relation resSurj_statement capelli_commutation
+    operator_preserves_fusion_forms transfer_triples rtt_sandwich rtt_independence leading_term_alt
+    transfer_linear_local
 
 theorem right_transfer_all_levels : Formalism.FourierDecayAlt.Q.RTTLevel :=
-  rtt_level_from_upper right_transfer_upper_levels level_transfer level_group_image flag_frame_transfer
-    transfer_linear_local
+  rtt_level_from_upper right_transfer_upper_levels level_transfer level_group_image
+    flag_frame_transfer transfer_linear_local
 
 namespace JacquetIntegral
 
 theorem detCore : Formalism.FourierDecayAlt.Q.DetAt fun P => Fin.last P.r :=
-  determinant_capelli_from_descent right_transfer_all_levels quantum_determinant_from_rtt determinant_hat right_type_action
-    left_type_action operator_preserves_fusion_forms transfer_linear_local
+  determinant_capelli_from_descent right_transfer_all_levels quantum_determinant_from_rtt
+    determinant_hat right_type_action left_type_action operator_preserves_fusion_forms
+    transfer_linear_local
 
 end JacquetIntegral
 
 theorem actual_operators_exist : Formalism.FourierDecayAlt.Q.ActualOpsExist :=
-  actual_operators_from_parts operator_preserves_fusion_forms transfer_linear_local transfer_joint_smooth radial_operators
+  actual_operators_from_parts operator_preserves_fusion_forms transfer_linear_local
+    transfer_joint_smooth radial_operators
 
 theorem actual_adjointness : Formalism.FourierDecayAlt.Q.ActualAdjoint :=
   actual_adjointness_from_hermitian hermitian_haar_invariance
 
 theorem actual_start : Formalism.FourierDecayAlt.Q.ActualStart :=
-  actual_start_from_level_starts right_transfer_all_levels JacquetIntegral.detCore transfer_linear_local
+  actual_start_from_level_starts right_transfer_all_levels JacquetIntegral.detCore
+    transfer_linear_local
 
 namespace JacquetIntegral
 
-theorem normalFormActual_of_fromModule (h : Formalism.FourierDecayAlt.Q.NormalFormFromModule) : Formalism.FourierDecayAlt.Q.NormalFormActual :=
+theorem normalFormActual_of_fromModule (h : Formalism.FourierDecayAlt.Q.NormalFormFromModule)
+    : Formalism.FourierDecayAlt.Q.NormalFormActual :=
   h actual_start zeta_commutes leading_term_alt spectral_two_by_two actual_operators_exist
 
-theorem levelStartActual_of_normalForm (h : Formalism.FourierDecayAlt.Q.NormalFormActual) : Formalism.FourierDecayAlt.Q.LevelStartActual :=
+theorem levelStartActual_of_normalForm (h : Formalism.FourierDecayAlt.Q.NormalFormActual)
+    : Formalism.FourierDecayAlt.Q.LevelStartActual :=
   level_start_from_normal_form h actual_start model_is_normal_form interlace_sign_two
 
-theorem levelStartActual_of_fromModule (h : Formalism.FourierDecayAlt.Q.NormalFormFromModule) : Formalism.FourierDecayAlt.Q.LevelStartActual :=
+theorem levelStartActual_of_fromModule (h : Formalism.FourierDecayAlt.Q.NormalFormFromModule)
+    : Formalism.FourierDecayAlt.Q.LevelStartActual :=
   levelStartActual_of_normalForm (normalFormActual_of_fromModule h)
 
 end JacquetIntegral

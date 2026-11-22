@@ -12,28 +12,38 @@ noncomputable section
 
 namespace GlobalTheory.Idele
 
-variable {R K : Type*} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K]
-  [IsFractionRing R K]
+variable
+  {R K : Type*} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
 
-theorem valuation_eq_exp_neg_count (v : HeightOneSpectrum R) {x : K} (hx : x ≠ 0) :
-    v.valuation K x = exp (-FractionalIdeal.count K v (FractionalIdeal.spanSingleton R⁰ x)) := by
+theorem valuation_eq_exp_neg_count (v : HeightOneSpectrum R) {x : K} (hx : x ≠ 0)
+    : v.valuation K x = exp (- FractionalIdeal.count K v (FractionalIdeal.spanSingleton R⁰ x)) := by
   first
   | exact @_root_.GlobalTheory.AdicValuationCountFactors.valuation_eq_exp_neg_count
   | exact _root_.GlobalTheory.AdicValuationCountFactors.valuation_eq_exp_neg_count
   | (apply _root_.GlobalTheory.AdicValuationCountFactors.valuation_eq_exp_neg_count <;> assumption)
-  | (intros; apply _root_.GlobalTheory.AdicValuationCountFactors.valuation_eq_exp_neg_count <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.AdicValuationCountFactors.valuation_eq_exp_neg_count <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply _root_.GlobalTheory.AdicValuationCountFactors.valuation_eq_exp_neg_count <;> assumption
+    )
+  | (
+      intros
+      apply @_root_.GlobalTheory.AdicValuationCountFactors.valuation_eq_exp_neg_count
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.AdicValuationCountFactors.valuation_eq_exp_neg_count ..)
 
-theorem le_of_count_le {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0) (hJ : J ≠ 0)
-    (h : ∀ v : HeightOneSpectrum R, FractionalIdeal.count K v J ≤ FractionalIdeal.count K v I) :
-    I ≤ J := by
+theorem le_of_count_le
+    {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0) (hJ : J ≠ 0)
+    (h : ∀ v : HeightOneSpectrum R, FractionalIdeal.count K v J ≤ FractionalIdeal.count K v I)
+    : I ≤ J := by
   have hIJ : I * J⁻¹ ≠ 0 := mul_ne_zero hI (inv_ne_zero hJ)
   have h1 : I * J⁻¹ ≤ 1 := by
     rw [← FractionalIdeal.finprod_heightOneSpectrum_factorization' K hIJ]
     refine finprod_induction (fun L : FractionalIdeal R⁰ K => L ≤ 1) le_rfl ?_ ?_
     · intro a b ha hb
-      calc a * b ≤ 1 * b := by gcongr
+      calc
+        a * b
+          ≤ 1 * b := by gcongr
         _ ≤ 1 := by simpa using hb
     · intro v
       have h0 : 0 ≤ FractionalIdeal.count K v (I * J⁻¹) := by
@@ -42,28 +52,29 @@ theorem le_of_count_le {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0) (hJ : J ≠
       obtain ⟨n, hn⟩ := Int.eq_ofNat_of_zero_le h0
       rw [hn, zpow_natCast, ← FractionalIdeal.coeIdeal_pow]
       exact FractionalIdeal.coeIdeal_le_one
-  calc I = I * J⁻¹ * J := by rw [mul_assoc, inv_mul_cancel₀ hJ, mul_one]
+  calc
+    I = I * J⁻¹ * J := by rw [mul_assoc, inv_mul_cancel₀ hJ, mul_one]
     _ ≤ 1 * J := by gcongr
     _ = J := one_mul J
 
-theorem eq_of_count_eq {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0) (hJ : J ≠ 0)
-    (h : ∀ v : HeightOneSpectrum R, FractionalIdeal.count K v I = FractionalIdeal.count K v J) :
-    I = J :=
+theorem eq_of_count_eq
+    {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0) (hJ : J ≠ 0)
+    (h : ∀ v : HeightOneSpectrum R, FractionalIdeal.count K v I = FractionalIdeal.count K v J)
+    : I = J :=
   le_antisymm (le_of_count_le hI hJ fun v => (h v).ge) (le_of_count_le hJ hI fun v => (h v).le)
 
-theorem mem_iff_valuation_le {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) (x : K) :
-    x ∈ I ↔ ∀ v : HeightOneSpectrum R,
-      v.valuation K x ≤ exp (-FractionalIdeal.count K v I) := by
+theorem mem_iff_valuation_le {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) (x : K)
+    : x ∈ I ↔ ∀ v : HeightOneSpectrum R, v.valuation K x ≤ exp (- FractionalIdeal.count K v I) := by
   rcases eq_or_ne x 0 with rfl | hx
   · simp [FractionalIdeal.zero_mem]
-  have hx' : FractionalIdeal.spanSingleton R⁰ x ≠ 0 := FractionalIdeal.spanSingleton_ne_zero_iff.2 hx
+  have hx' : FractionalIdeal.spanSingleton R⁰ x ≠ 0 :=
+    FractionalIdeal.spanSingleton_ne_zero_iff.2 hx
   rw [← FractionalIdeal.spanSingleton_le_iff_mem]
   simp_rw [fun v : HeightOneSpectrum R => valuation_eq_exp_neg_count v hx, exp_le_exp, neg_le_neg_iff]
   exact ⟨fun h v => FractionalIdeal.count_mono K v hx' h, le_of_count_le hx' hI⟩
 
-theorem exists_mem_valuation_eq {I : FractionalIdeal R⁰ K} (hI : I ≠ 0)
-    (v : HeightOneSpectrum R) :
-    ∃ y ∈ I, v.valuation K y = exp (-FractionalIdeal.count K v I) := by
+theorem exists_mem_valuation_eq {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) (v : HeightOneSpectrum R)
+    : ∃ y ∈ I, v.valuation K y = exp (- FractionalIdeal.count K v I) := by
   classical
   by_contra hne
   push Not at hne
@@ -86,17 +97,17 @@ theorem exists_mem_valuation_eq {I : FractionalIdeal R⁰ K} (hI : I ≠ 0)
   rw [FractionalIdeal.count_mul K v hv hI, FractionalIdeal.count_self] at this
   omega
 
-def localIdeal (v : HeightOneSpectrum R) (I : FractionalIdeal R⁰ K) :
-    Submodule (v.adicCompletionIntegers K) (v.adicCompletion K) :=
+def localIdeal (v : HeightOneSpectrum R) (I : FractionalIdeal R⁰ K)
+    : Submodule (v.adicCompletionIntegers K) (v.adicCompletion K) :=
   Submodule.span _ (algebraMap K (v.adicCompletion K) '' (I : Set K))
 
-theorem valued_algebraMap (v : HeightOneSpectrum R) (x : K) :
-    Valued.v (algebraMap K (v.adicCompletion K) x) = v.valuation K x :=
+theorem valued_algebraMap (v : HeightOneSpectrum R) (x : K)
+    : Valued.v (algebraMap K (v.adicCompletion K) x) = v.valuation K x :=
   valuedAdicCompletion_eq_valuation' v x
 
-theorem mem_localIdeal_iff {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) (v : HeightOneSpectrum R)
-    (x : v.adicCompletion K) :
-    x ∈ localIdeal v I ↔ Valued.v x ≤ exp (-FractionalIdeal.count K v I) := by
+theorem mem_localIdeal_iff
+    {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) (v : HeightOneSpectrum R) (x : v.adicCompletion K)
+    : x ∈ localIdeal v I ↔ Valued.v x ≤ exp (- FractionalIdeal.count K v I) := by
   constructor
   · intro hx
     induction hx using Submodule.span_induction with
@@ -104,8 +115,10 @@ theorem mem_localIdeal_iff {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) (v : Heig
       obtain ⟨y, hy, rfl⟩ := hx
       rw [valued_algebraMap]
       exact (mem_iff_valuation_le hI y).1 hy v
-    | zero => simp
-    | add x y _ _ hx hy => exact (Valuation.map_add _ x y).trans (max_le hx hy)
+    | zero =>
+      simp
+    | add x y _ _ hx hy =>
+      exact (Valuation.map_add _ x y).trans (max_le hx hy)
     | smul a x _ hx =>
       have ha : Valued.v (a : v.adicCompletion K) ≤ 1 := a.2
       change Valued.v ((a : v.adicCompletion K) * x) ≤ _
@@ -115,8 +128,7 @@ theorem mem_localIdeal_iff {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) (v : Heig
     obtain ⟨y, hy, hvy⟩ := exists_mem_valuation_eq hI v
     rw [← valued_algebraMap] at hvy
     have hy0 : Valued.v (algebraMap K (v.adicCompletion K) y) ≠ 0 := by rw [hvy]; exact exp_ne_zero
-    have hy1 : algebraMap K (v.adicCompletion K) y ≠ 0 := by
-      intro h; rw [h] at hy0; simp at hy0
+    have hy1 : algebraMap K (v.adicCompletion K) y ≠ 0 := by intro h; rw [h] at hy0; simp at hy0
     have hm : x / algebraMap K (v.adicCompletion K) y ∈ v.adicCompletionIntegers K := by
       rw [mem_adicCompletionIntegers, map_div₀, div_le_one₀ (zero_lt_iff.2 hy0), hvy]
       exact hx
@@ -126,30 +138,33 @@ theorem mem_localIdeal_iff {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) (v : Heig
     rw [this]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨y, hy, rfl⟩)
 
-theorem localIdeal_zero (v : HeightOneSpectrum R) :
-    localIdeal v (0 : FractionalIdeal R⁰ K) = ⊥ := by
+theorem localIdeal_zero (v : HeightOneSpectrum R)
+    : localIdeal v (0 : FractionalIdeal R⁰ K) = ⊥ := by
   rw [localIdeal, Submodule.span_eq_bot]
   rintro _ ⟨y, hy, rfl⟩
   rw [(FractionalIdeal.mem_zero_iff R⁰).1 hy, map_zero]
 
-theorem mem_localIdeal_one_iff (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
-    x ∈ localIdeal v (1 : FractionalIdeal R⁰ K) ↔ x ∈ v.adicCompletionIntegers K := by
-  rw [mem_localIdeal_iff (one_ne_zero (α := FractionalIdeal R⁰ K)), FractionalIdeal.count_one, mem_adicCompletionIntegers]
+theorem mem_localIdeal_one_iff (v : HeightOneSpectrum R) (x : v.adicCompletion K)
+    : x ∈ localIdeal v (1 : FractionalIdeal R⁰ K) ↔ x ∈ v.adicCompletionIntegers K := by
+  rw [mem_localIdeal_iff (one_ne_zero (α := FractionalIdeal R⁰ K)), FractionalIdeal.count_one,
+    mem_adicCompletionIntegers]
   simp
 
-@[simp] theorem adele_mul_apply (a b : 𝔸ᶠ[R, K]) (v : HeightOneSpectrum R) :
-    (a * b) v = a v * b v := rfl
+@[simp]
+theorem adele_mul_apply (a b : 𝔸ᶠ[R, K]) (v : HeightOneSpectrum R) : (a * b) v = a v * b v := rfl
 
-@[simp] theorem adele_sub_apply (a b : 𝔸ᶠ[R, K]) (v : HeightOneSpectrum R) :
-    (a - b) v = a v - b v := rfl
+@[simp]
+theorem adele_sub_apply (a b : 𝔸ᶠ[R, K]) (v : HeightOneSpectrum R) : (a - b) v = a v - b v := rfl
 
-@[simp] theorem adele_one_apply (v : HeightOneSpectrum R) : (1 : 𝔸ᶠ[R, K]) v = 1 := rfl
+@[simp]
+theorem adele_one_apply (v : HeightOneSpectrum R) : (1 : 𝔸ᶠ[R, K]) v = 1 := rfl
 
-theorem adele_algebraMap_apply (x : K) (v : HeightOneSpectrum R) :
-    algebraMap K 𝔸ᶠ[R, K] x v = algebraMap K (v.adicCompletion K) x := rfl
+theorem adele_algebraMap_apply (x : K) (v : HeightOneSpectrum R)
+    : algebraMap K 𝔸ᶠ[R, K] x v = algebraMap K (v.adicCompletion K) x :=
+  rfl
 
-theorem adele_smul_apply (r : R) (a : 𝔸ᶠ[R, K]) (v : HeightOneSpectrum R) :
-    (r • a) v = algebraMap K (v.adicCompletion K) (algebraMap R K r) * a v := by
+theorem adele_smul_apply (r : R) (a : 𝔸ᶠ[R, K]) (v : HeightOneSpectrum R)
+    : (r • a) v = algebraMap K (v.adicCompletion K) (algebraMap R K r) * a v := by
   rw [Algebra.smul_def]; rfl
 
 def adelicIdeal (I : FractionalIdeal R⁰ K) : Submodule R 𝔸ᶠ[R, K] where
@@ -160,37 +175,38 @@ def adelicIdeal (I : FractionalIdeal R⁰ K) : Submodule R 𝔸ᶠ[R, K] where
     rw [adele_smul_apply]
     exact (localIdeal v I).smul_mem (algebraMap R (v.adicCompletionIntegers K) r) (ha v)
 
-theorem mem_adelicIdeal {I : FractionalIdeal R⁰ K} {a : 𝔸ᶠ[R, K]} :
-    a ∈ adelicIdeal I ↔ ∀ v, a v ∈ localIdeal v I := Iff.rfl
+theorem mem_adelicIdeal {I : FractionalIdeal R⁰ K} {a : 𝔸ᶠ[R, K]}
+    : a ∈ adelicIdeal I ↔ ∀ v, a v ∈ localIdeal v I :=
+  Iff.rfl
 
-theorem mem_adelicIdeal_iff {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) {a : 𝔸ᶠ[R, K]} :
-    a ∈ adelicIdeal I ↔ ∀ v, Valued.v (a v) ≤ exp (-FractionalIdeal.count K v I) := by
+theorem mem_adelicIdeal_iff {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) {a : 𝔸ᶠ[R, K]}
+    : a ∈ adelicIdeal I ↔ ∀ v, Valued.v (a v) ≤ exp (- FractionalIdeal.count K v I) := by
   simp_rw [mem_adelicIdeal, mem_localIdeal_iff hI]
 
-theorem algebraMap_mem_adelicIdeal {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) (x : K) :
-    algebraMap K 𝔸ᶠ[R, K] x ∈ adelicIdeal I ↔ x ∈ I := by
+theorem algebraMap_mem_adelicIdeal {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) (x : K)
+    : algebraMap K 𝔸ᶠ[R, K] x ∈ adelicIdeal I ↔ x ∈ I := by
   simp_rw [mem_adelicIdeal_iff hI, mem_iff_valuation_le hI, adele_algebraMap_apply,
     valued_algebraMap]
 
-theorem idele_apply_mul_inv (t : 𝔸ᶠ[R, K]ˣ) (v : HeightOneSpectrum R) :
-    (t : 𝔸ᶠ[R, K]) v * ((t⁻¹ : 𝔸ᶠ[R, K]ˣ) : 𝔸ᶠ[R, K]) v = 1 := by
+theorem idele_apply_mul_inv (t : 𝔸ᶠ[R, K]ˣ) (v : HeightOneSpectrum R)
+    : (t : 𝔸ᶠ[R, K]) v * ((t⁻¹ : 𝔸ᶠ[R, K]ˣ) : 𝔸ᶠ[R, K]) v = 1 := by
   rw [← adele_mul_apply, Units.mul_inv, adele_one_apply]
 
-theorem idele_apply_ne_zero (t : 𝔸ᶠ[R, K]ˣ) (v : HeightOneSpectrum R) :
-    (t : 𝔸ᶠ[R, K]) v ≠ 0 := left_ne_zero_of_mul_eq_one (idele_apply_mul_inv t v)
+theorem idele_apply_ne_zero (t : 𝔸ᶠ[R, K]ˣ) (v : HeightOneSpectrum R) : (t : 𝔸ᶠ[R, K]) v ≠ 0 :=
+  left_ne_zero_of_mul_eq_one (idele_apply_mul_inv t v)
 
-def ord_vw (t : 𝔸ᶠ[R, K]ˣ) (v : HeightOneSpectrum R) : ℤ := -log (Valued.v ((t : 𝔸ᶠ[R, K]) v))
+def ord_vw (t : 𝔸ᶠ[R, K]ˣ) (v : HeightOneSpectrum R) : ℤ := - log (Valued.v ((t : 𝔸ᶠ[R, K]) v))
 
-theorem valued_idele (t : 𝔸ᶠ[R, K]ˣ) (v : HeightOneSpectrum R) :
-    Valued.v ((t : 𝔸ᶠ[R, K]) v) = exp (-ord_vw t v) := by
+theorem valued_idele (t : 𝔸ᶠ[R, K]ˣ) (v : HeightOneSpectrum R)
+    : Valued.v ((t : 𝔸ᶠ[R, K]) v) = exp (- ord_vw t v) := by
   rw [ord_vw, neg_neg, exp_log]
   simpa using idele_apply_ne_zero t v
 
-theorem ord_vw_mul (t s : 𝔸ᶠ[R, K]ˣ) (v : HeightOneSpectrum R) :
-    ord_vw (t * s) v = ord_vw t v + ord_vw s v := by
+theorem ord_vw_mul (t s : 𝔸ᶠ[R, K]ˣ) (v : HeightOneSpectrum R)
+    : ord_vw (t * s) v = ord_vw t v + ord_vw s v := by
   have := valued_idele (t * s) v
-  rw [Units.val_mul, adele_mul_apply, map_mul, valued_idele, valued_idele, ← exp_add,
-    exp_inj] at this
+  rw [Units.val_mul, adele_mul_apply, map_mul, valued_idele, valued_idele, ← exp_add, exp_inj]
+    at this
   omega
 
 theorem ord_vw_one (v : HeightOneSpectrum R) : ord_vw (1 : 𝔸ᶠ[R, K]ˣ) v = 0 := by
@@ -198,7 +214,7 @@ theorem ord_vw_one (v : HeightOneSpectrum R) : ord_vw (1 : 𝔸ᶠ[R, K]ˣ) v = 
   rw [one_mul] at this
   omega
 
-theorem ord_vw_inv (t : 𝔸ᶠ[R, K]ˣ) (v : HeightOneSpectrum R) : ord_vw t⁻¹ v = -ord_vw t v := by
+theorem ord_vw_inv (t : 𝔸ᶠ[R, K]ˣ) (v : HeightOneSpectrum R) : ord_vw t⁻¹ v = - ord_vw t v := by
   have := ord_vw_mul t t⁻¹ v
   rw [mul_inv_cancel, ord_vw_one] at this
   omega
@@ -211,12 +227,15 @@ def idealOf (t : 𝔸ᶠ[R, K]ˣ) : FractionalIdeal R⁰ K :=
   ∏ᶠ v : HeightOneSpectrum R, (v.asIdeal : FractionalIdeal R⁰ K) ^ ord_vw t v
 
 theorem idealOf_ne_zero (t : 𝔸ᶠ[R, K]ˣ) : idealOf t ≠ 0 := by
-  refine finprod_induction (fun L : FractionalIdeal R⁰ K => L ≠ 0) one_ne_zero
-    (fun _ _ => mul_ne_zero) fun v => zpow_ne_zero _ ?_
+  refine finprod_induction
+    (fun L : FractionalIdeal R⁰ K => L ≠ 0)
+    one_ne_zero
+    (fun _ _ => mul_ne_zero)
+    fun v => zpow_ne_zero _ ?_
   simpa using v.ne_bot
 
-theorem count_idealOf (t : 𝔸ᶠ[R, K]ˣ) (v : HeightOneSpectrum R) :
-    FractionalIdeal.count K v (idealOf t) = ord_vw t v :=
+theorem count_idealOf (t : 𝔸ᶠ[R, K]ˣ) (v : HeightOneSpectrum R)
+    : FractionalIdeal.count K v (idealOf t) = ord_vw t v :=
   FractionalIdeal.count_finprod K v _ (ord_vw_eventually_zero t)
 
 theorem idealOf_one : idealOf (1 : 𝔸ᶠ[R, K]ˣ) = 1 :=
@@ -224,8 +243,8 @@ theorem idealOf_one : idealOf (1 : 𝔸ᶠ[R, K]ˣ) = 1 :=
     rw [count_idealOf, ord_vw_one, FractionalIdeal.count_one]
 
 theorem idealOf_mul (t s : 𝔸ᶠ[R, K]ˣ) : idealOf (t * s) = idealOf t * idealOf s :=
-  eq_of_count_eq (idealOf_ne_zero _) (mul_ne_zero (idealOf_ne_zero _) (idealOf_ne_zero _))
-    fun v => by
+  eq_of_count_eq (idealOf_ne_zero _) (mul_ne_zero (idealOf_ne_zero _) (idealOf_ne_zero _)) fun v =>
+    by
       rw [FractionalIdeal.count_mul K v (idealOf_ne_zero _) (idealOf_ne_zero _), count_idealOf,
         count_idealOf, count_idealOf, ord_vw_mul]
 
@@ -245,35 +264,35 @@ theorem smul_one_eq (t : 𝔸ᶠ[R, K]ˣ) : t • (1 : FractionalIdeal R⁰ K) =
 theorem smul_ne_zero (t : 𝔸ᶠ[R, K]ˣ) {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) : t • I ≠ 0 :=
   mul_ne_zero (idealOf_ne_zero t) hI
 
-theorem count_smul (t : 𝔸ᶠ[R, K]ˣ) {I : FractionalIdeal R⁰ K} (hI : I ≠ 0)
-    (v : HeightOneSpectrum R) :
-    FractionalIdeal.count K v (t • I) = ord_vw t v + FractionalIdeal.count K v I := by
+theorem count_smul (t : 𝔸ᶠ[R, K]ˣ) {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) (v : HeightOneSpectrum R)
+    : FractionalIdeal.count K v (t • I) = ord_vw t v + FractionalIdeal.count K v I := by
   rw [smul_def, FractionalIdeal.count_mul K v (idealOf_ne_zero _) hI, count_idealOf]
 
-theorem mul_mem_localIdeal_smul (t : 𝔸ᶠ[R, K]ˣ) (I : FractionalIdeal R⁰ K)
-    (v : HeightOneSpectrum R) (x : v.adicCompletion K) :
-    (t : 𝔸ᶠ[R, K]) v * x ∈ localIdeal v (t • I) ↔ x ∈ localIdeal v I := by
+theorem mul_mem_localIdeal_smul
+    (t : 𝔸ᶠ[R, K]ˣ) (I : FractionalIdeal R⁰ K) (v : HeightOneSpectrum R) (x : v.adicCompletion K)
+    : (t : 𝔸ᶠ[R, K]) v * x ∈ localIdeal v (t • I) ↔ x ∈ localIdeal v I := by
   rcases eq_or_ne I 0 with rfl | hI
   · simp [smul_def, localIdeal_zero, idele_apply_ne_zero]
   rw [mem_localIdeal_iff hI, mem_localIdeal_iff (smul_ne_zero t hI), count_smul t hI, map_mul,
     valued_idele, neg_add, exp_add, mul_le_mul_iff_right₀ (zero_lt_iff.2 exp_ne_zero)]
 
-theorem mul_mem_adelicIdeal_smul (t : 𝔸ᶠ[R, K]ˣ) (I : FractionalIdeal R⁰ K) (a : 𝔸ᶠ[R, K]) :
-    (t : 𝔸ᶠ[R, K]) * a ∈ adelicIdeal (t • I) ↔ a ∈ adelicIdeal I := by
+theorem mul_mem_adelicIdeal_smul (t : 𝔸ᶠ[R, K]ˣ) (I : FractionalIdeal R⁰ K) (a : 𝔸ᶠ[R, K])
+    : (t : 𝔸ᶠ[R, K]) * a ∈ adelicIdeal (t • I) ↔ a ∈ adelicIdeal I := by
   simp_rw [mem_adelicIdeal, adele_mul_apply, mul_mem_localIdeal_smul]
 
-theorem idealOf_unitEmbedding (x : Kˣ) :
-    idealOf (FiniteAdeleRing.unitEmbedding R K x) = FractionalIdeal.spanSingleton R⁰ (x : K) :=
+theorem idealOf_unitEmbedding (x : Kˣ)
+    : idealOf (FiniteAdeleRing.unitEmbedding R K x) = FractionalIdeal.spanSingleton R⁰ (x : K) :=
   eq_of_count_eq (idealOf_ne_zero _) (FractionalIdeal.spanSingleton_ne_zero_iff.2 x.ne_zero)
     fun v => by
       have := valued_idele (FiniteAdeleRing.unitEmbedding R K x) v
       rw [FiniteAdeleRing.unitEmbedding_apply, adele_algebraMap_apply, valued_algebraMap,
-        valuation_eq_exp_neg_count v x.ne_zero, exp_inj] at this
+          valuation_eq_exp_neg_count v x.ne_zero, exp_inj]
+        at this
       rw [count_idealOf]
       omega
 
-theorem smul_eq_self_iff (t : 𝔸ᶠ[R, K]ˣ) {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) :
-    t • I = I ↔ ∀ v, Valued.v ((t : 𝔸ᶠ[R, K]) v) = 1 := by
+theorem smul_eq_self_iff (t : 𝔸ᶠ[R, K]ˣ) {I : FractionalIdeal R⁰ K} (hI : I ≠ 0)
+    : t • I = I ↔ ∀ v, Valued.v ((t : 𝔸ᶠ[R, K]) v) = 1 := by
   constructor
   · intro h v
     have := count_smul t hI v
@@ -285,13 +304,14 @@ theorem smul_eq_self_iff (t : 𝔸ᶠ[R, K]ˣ) {I : FractionalIdeal R⁰ K} (hI 
     rw [count_smul t hI, ord_vw, h v]
     simp
 
-theorem exists_idealOf_eq {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) :
-    ∃ t : 𝔸ᶠ[R, K]ˣ, idealOf t = I := by
+theorem exists_idealOf_eq {I : FractionalIdeal R⁰ K} (hI : I ≠ 0)
+    : ∃ t : 𝔸ᶠ[R, K]ˣ, idealOf t = I := by
   choose f hf using fun v : HeightOneSpectrum R =>
     valuedAdicCompletion_surjective K v (exp (-FractionalIdeal.count K v I))
   have h1 : ∀ᶠ v in Filter.cofinite, Valued.v (f v) = 1 := by
     filter_upwards [FractionalIdeal.finite_factors I] with v hv
-    rw [hf, hv]; simp
+    rw [hf, hv]
+    simp
   let a : 𝔸ᶠ[R, K] := ⟨f, h1.mono fun v hv => hv.le⟩
   have ha : IsUnit a := by
     refine FiniteAdeleRing.isUnit_iff.2 ⟨fun v h => ?_, h1⟩
@@ -306,15 +326,16 @@ theorem exists_idealOf_eq {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) :
   rw [hf, exp_inj] at this
   omega
 
-theorem exists_smul_eq {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0) (hJ : J ≠ 0) :
-    ∃ t : 𝔸ᶠ[R, K]ˣ, J = t • I := by
+theorem exists_smul_eq {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0) (hJ : J ≠ 0)
+    : ∃ t : 𝔸ᶠ[R, K]ˣ, J = t • I := by
   obtain ⟨t, ht⟩ := exists_idealOf_eq (mul_ne_zero hJ (inv_ne_zero hI))
   exact ⟨t, by rw [smul_def, ht, mul_assoc, inv_mul_cancel₀ hI, mul_one]⟩
 
-theorem setOf_valued_le_eq (v : HeightOneSpectrum R) (n : ℤ) :
-    ∃ c : v.adicCompletion K, Valued.v.restrict c ≠ 0 ∧
-      {y : v.adicCompletion K | Valued.v y ≤ exp n} =
-        {y | Valued.v.restrict y ≤ Valued.v.restrict c} := by
+theorem setOf_valued_le_eq (v : HeightOneSpectrum R) (n : ℤ)
+    : ∃ c : v.adicCompletion K,
+      Valued.v.restrict c ≠ 0
+        ∧ {y : v.adicCompletion K | Valued.v y ≤ exp n}
+          = {y | Valued.v.restrict y ≤ Valued.v.restrict c} := by
   obtain ⟨c, hc⟩ := valuedAdicCompletion_surjective K v (exp n)
   have hc0 : c ≠ 0 := by
     rintro rfl
@@ -324,15 +345,17 @@ theorem setOf_valued_le_eq (v : HeightOneSpectrum R) (n : ℤ) :
   ext y
   simp only [Set.mem_setOf_eq, Valuation.restrict_le_iff, hc]
 
-theorem isOpen_valued_le (v : HeightOneSpectrum R) (n : ℤ) :
-    IsOpen {y : v.adicCompletion K | Valued.v y ≤ exp n} := by
+theorem isOpen_valued_le (v : HeightOneSpectrum R) (n : ℤ)
+    : IsOpen {y : v.adicCompletion K | Valued.v y ≤ exp n} := by
   obtain ⟨c, hc, h⟩ := setOf_valued_le_eq (K := K) v n
-  rw [h]; exact Valued.isOpen_closedBall _ hc
+  rw [h]
+  exact Valued.isOpen_closedBall _ hc
 
-theorem isClosed_valued_le (v : HeightOneSpectrum R) (n : ℤ) :
-    IsClosed {y : v.adicCompletion K | Valued.v y ≤ exp n} := by
+theorem isClosed_valued_le (v : HeightOneSpectrum R) (n : ℤ)
+    : IsClosed {y : v.adicCompletion K | Valued.v y ≤ exp n} := by
   obtain ⟨c, hc, h⟩ := setOf_valued_le_eq (K := K) v n
-  rw [h]; exact Valued.isClosed_closedBall _ _
+  rw [h]
+  exact Valued.isClosed_closedBall _ _
 
 theorem exists_exp_neg_lt {γ : ℤᵐ⁰} (hγ : γ ≠ 0) : ∃ n : ℕ, exp (-(n : ℤ)) < γ := by
   refine ⟨(log γ).natAbs + 1, ?_⟩
@@ -340,14 +363,14 @@ theorem exists_exp_neg_lt {γ : ℤᵐ⁰} (hγ : γ ≠ 0) : ∃ n : ℕ, exp (
   rw [exp_lt_exp]
   omega
 
-theorem exists_limit (v : HeightOneSpectrum R) (u : ℕ → v.adicCompletion K)
-    (hu : ∀ m n : ℕ, n ≤ m → Valued.v (u m - u n) ≤ exp (-(n : ℤ))) :
-    ∃ t : v.adicCompletion K, ∀ n : ℕ, Valued.v (t - u n) ≤ exp (-(n : ℤ)) := by
+theorem exists_limit
+    (v : HeightOneSpectrum R) (u : ℕ → v.adicCompletion K)
+    (hu : ∀ m n : ℕ, n ≤ m → Valued.v (u m - u n) ≤ exp (-(n : ℤ)))
+    : ∃ t : v.adicCompletion K, ∀ n : ℕ, Valued.v (t - u n) ≤ exp (-(n : ℤ)) := by
   have hc : CauchySeq u := by
     rw [(Valued.hasBasis_uniformity (v.adicCompletion K) ℤᵐ⁰).cauchySeq_iff']
     intro γ _
-    obtain ⟨n, hn⟩ := exists_exp_neg_lt
-      (γ := MonoidWithZeroHom.ValueGroup₀.embedding γ.1) (by simp)
+    obtain ⟨n, hn⟩ := exists_exp_neg_lt (γ := MonoidWithZeroHom.ValueGroup₀.embedding γ.1) (by simp)
     refine ⟨n, fun m hm => ?_⟩
     simp only [Set.mem_setOf_eq, Valuation.restrict_lt_iff_lt_embedding]
     rw [Valuation.map_sub_swap]
@@ -357,10 +380,10 @@ theorem exists_limit (v : HeightOneSpectrum R) (u : ℕ → v.adicCompletion K)
   refine (isClosed_valued_le (K := K) v (-(n : ℤ))).mem_of_tendsto (ht.sub_const (u n)) ?_
   filter_upwards [Filter.eventually_ge_atTop n] with m hm using hu m n hm
 
-theorem exists_valued_sub_le (v : HeightOneSpectrum R) {a : v.adicCompletion K}
-    (ha : Valued.v a ≤ 1) (n : ℕ) :
-    ∃ r : R, Valued.v (a - algebraMap K (v.adicCompletion K) (algebraMap R K r)) ≤
-      exp (-(n : ℤ)) := by
+theorem exists_valued_sub_le
+    (v : HeightOneSpectrum R) {a : v.adicCompletion K} (ha : Valued.v a ≤ 1) (n : ℕ)
+    : ∃ r : R,
+      Valued.v (a - algebraMap K (v.adicCompletion K) (algebraMap R K r)) ≤ exp (-(n : ℤ)) := by
   have ho : IsOpen {y : v.adicCompletion K | Valued.v (a - y) ≤ exp (-(n : ℤ))} :=
     (isOpen_valued_le (K := K) v (-(n : ℤ))).preimage (continuous_const.sub continuous_id)
   obtain ⟨x, hx⟩ := (denseRange_algebraMap K v).exists_mem_open ho ⟨a, by simp⟩
@@ -369,22 +392,27 @@ theorem exists_valued_sub_le (v : HeightOneSpectrum R) {a : v.adicCompletion K}
   have hx1 : v.valuation K x ≤ 1 := by
     rw [← valued_algebraMap, ← sub_sub_cancel a (algebraMap K (v.adicCompletion K) x)]
     exact (Valuation.map_sub _ _ _).trans (max_le ha (hx.trans h1))
-  obtain ⟨r, hr⟩ := v.exists_valuation_sub_lt_of_integer hx1 (Units.mk0 _ (exp_ne_zero (a := -(n : ℤ))))
+  obtain ⟨r, hr⟩ :=
+    v.exists_valuation_sub_lt_of_integer hx1 (Units.mk0 _ (exp_ne_zero (a := -(n : ℤ))))
   refine ⟨r, ?_⟩
   rw [← valued_algebraMap, map_sub, Valuation.map_sub_swap] at hr
   rw [← sub_add_sub_cancel a (algebraMap K (v.adicCompletion K) x)]
   exact (Valuation.map_add _ _ _).trans (max_le hx hr.le)
 
-theorem exists_sub_mem_adelicIdeal_of_integral {I : FractionalIdeal R⁰ K} (hI : I ≠ 0)
-    {a : 𝔸ᶠ[R, K]} (ha : ∀ v, Valued.v (a v) ≤ 1) :
-    ∃ r : R, a - algebraMap K 𝔸ᶠ[R, K] (algebraMap R K r) ∈ adelicIdeal I := by
+theorem exists_sub_mem_adelicIdeal_of_integral
+    {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) {a : 𝔸ᶠ[R, K]} (ha : ∀ v, Valued.v (a v) ≤ 1)
+    : ∃ r : R, a - algebraMap K 𝔸ᶠ[R, K] (algebraMap R K r) ∈ adelicIdeal I := by
   classical
   have hfin := Filter.eventually_cofinite.1 (FractionalIdeal.finite_factors I)
   let e : HeightOneSpectrum R → ℕ := fun v => (FractionalIdeal.count K v I).toNat
   choose x hx using fun v => exists_valued_sub_le v (ha v) (e v)
-  obtain ⟨r, hr⟩ := IsDedekindDomain.exists_forall_sub_mem_ideal (s := hfin.toFinset)
-    (fun v => v.asIdeal) e (fun v _ => v.prime)
-    (fun v _ w _ h h' => h (HeightOneSpectrum.ext h')) (fun v => x v)
+  obtain ⟨r, hr⟩ :=
+    IsDedekindDomain.exists_forall_sub_mem_ideal (s := hfin.toFinset)
+      (fun v => v.asIdeal)
+      e
+      (fun v _ => v.prime)
+      (fun v _ w _ h h' => h (HeightOneSpectrum.ext h'))
+      (fun v => x v)
   refine ⟨r, (mem_adelicIdeal_iff hI).2 fun v => ?_⟩
   rw [adele_sub_apply, adele_algebraMap_apply]
   have hr1 : Valued.v (algebraMap K (v.adicCompletion K) (algebraMap R K r)) ≤ 1 := by
@@ -403,17 +431,21 @@ theorem exists_sub_mem_adelicIdeal_of_integral {I : FractionalIdeal R⁰ K} (hI 
     rw [this]
     exact (Valuation.map_sub _ _ _).trans (max_le (ha v) hr1)
 
-theorem exists_mul_integral (a : 𝔸ᶠ[R, K]) :
-    ∃ b : R, b ≠ 0 ∧ ∀ v, Valued.v ((algebraMap K 𝔸ᶠ[R, K] (algebraMap R K b) * a) v) ≤ 1 := by
+theorem exists_mul_integral (a : 𝔸ᶠ[R, K])
+    : ∃ b : R, b ≠ 0 ∧ ∀ v, Valued.v ((algebraMap K 𝔸ᶠ[R, K] (algebraMap R K b) * a) v) ≤ 1 := by
   classical
   have hfin := Filter.eventually_cofinite.1 a.2
   choose b hb0 hb using fun v : HeightOneSpectrum R =>
     adicCompletion.mul_nonZeroDivisor_mem_adicCompletionIntegers v (a v)
-  have hle : ∀ (v : HeightOneSpectrum R) (r : R),
-      Valued.v (algebraMap K (v.adicCompletion K) (algebraMap R K r)) ≤ 1 := fun v r => by
+  have hle
+      : ∀ (v : HeightOneSpectrum R) (r : R),
+        Valued.v (algebraMap K (v.adicCompletion K) (algebraMap R K r)) ≤ 1 := fun v r => by
     rw [valued_algebraMap]; exact v.valuation_le_one r
-  refine ⟨∏ v ∈ hfin.toFinset, b v,
-    Finset.prod_ne_zero_iff.2 fun v _ => nonZeroDivisors.ne_zero (hb0 v), fun v => ?_⟩
+  refine ⟨
+    ∏ v ∈ hfin.toFinset, b v,
+    Finset.prod_ne_zero_iff.2 fun v _ => nonZeroDivisors.ne_zero (hb0 v),
+    fun v => ?_
+  ⟩
   rw [adele_mul_apply, adele_algebraMap_apply]
   by_cases hv : v ∈ hfin.toFinset
   · rw [← Finset.prod_erase_mul _ _ hv, map_mul (algebraMap R K),
@@ -425,8 +457,8 @@ theorem exists_mul_integral (a : 𝔸ᶠ[R, K]) :
     rw [map_mul]
     exact mul_le_one' (hle v _) (show Valued.v (a v) ≤ 1 from this)
 
-theorem exists_sub_mem_adelicIdeal {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) (a : 𝔸ᶠ[R, K]) :
-    ∃ x : K, a - algebraMap K 𝔸ᶠ[R, K] x ∈ adelicIdeal I := by
+theorem exists_sub_mem_adelicIdeal {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) (a : 𝔸ᶠ[R, K])
+    : ∃ x : K, a - algebraMap K 𝔸ᶠ[R, K] x ∈ adelicIdeal I := by
   obtain ⟨b, hb0, hb⟩ := exists_mul_integral a
   have hb1 : algebraMap R K b ≠ 0 := by simpa using hb0
   let t := FiniteAdeleRing.unitEmbedding R K (Units.mk0 _ hb1)
@@ -437,30 +469,32 @@ theorem exists_sub_mem_adelicIdeal {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) (
   simp only [t, FiniteAdeleRing.unitEmbedding_apply, Units.val_mk0]
   rw [mul_sub, ← map_mul, mul_div_cancel₀ _ hb1]
 
-def quotEquivAdelic {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) :
-    (K ⧸ (I : Submodule R K)) ≃ₗ[R] (𝔸ᶠ[R, K] ⧸ adelicIdeal I) :=
-  LinearEquiv.ofBijective
-    (Submodule.mapQ (I : Submodule R K) (adelicIdeal I)
+def quotEquivAdelic {I : FractionalIdeal R⁰ K} (hI : I ≠ 0)
+    : (K ⧸ (I : Submodule R K)) ≃ₗ[R] (𝔸ᶠ[R, K] ⧸ adelicIdeal I) :=
+  LinearEquiv.ofBijective (Submodule.mapQ (I : Submodule R K) (adelicIdeal I)
       ((Algebra.linearMap K 𝔸ᶠ[R, K]).restrictScalars R)
-      fun x hx => (algebraMap_mem_adelicIdeal hI x).2 hx) <| by
-    constructor
-    · rw [injective_iff_map_eq_zero]
-      intro q hq
-      obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ q
-      rw [Submodule.Quotient.mk_eq_zero]
-      exact (algebraMap_mem_adelicIdeal hI x).1 ((Submodule.Quotient.mk_eq_zero _).1 hq)
-    · intro q
-      obtain ⟨a, rfl⟩ := Submodule.Quotient.mk_surjective _ q
-      obtain ⟨x, hx⟩ := exists_sub_mem_adelicIdeal hI a
-      refine ⟨Submodule.Quotient.mk x, ?_⟩
-      exact ((Submodule.Quotient.eq _).2 hx).symm
+      fun x hx => (algebraMap_mem_adelicIdeal hI x).2 hx) <|
+    by
+      constructor
+      · rw [injective_iff_map_eq_zero]
+        intro q hq
+        obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ q
+        rw [Submodule.Quotient.mk_eq_zero]
+        exact (algebraMap_mem_adelicIdeal hI x).1 ((Submodule.Quotient.mk_eq_zero _).1 hq)
+      · intro q
+        obtain ⟨a, rfl⟩ := Submodule.Quotient.mk_surjective _ q
+        obtain ⟨x, hx⟩ := exists_sub_mem_adelicIdeal hI a
+        refine ⟨Submodule.Quotient.mk x, ?_⟩
+        exact ((Submodule.Quotient.eq _).2 hx).symm
 
-@[simp] theorem quotEquivAdelic_mk {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) (x : K) :
-    quotEquivAdelic hI (Submodule.Quotient.mk x) =
-      Submodule.Quotient.mk (algebraMap K 𝔸ᶠ[R, K] x) := rfl
+@[simp]
+theorem quotEquivAdelic_mk {I : FractionalIdeal R⁰ K} (hI : I ≠ 0) (x : K)
+    : quotEquivAdelic hI (Submodule.Quotient.mk x)
+      = Submodule.Quotient.mk (algebraMap K 𝔸ᶠ[R, K] x) :=
+  rfl
 
-def adelicMulEquiv (t : 𝔸ᶠ[R, K]ˣ) {I J : FractionalIdeal R⁰ K} (h : J = t • I) :
-    (𝔸ᶠ[R, K] ⧸ adelicIdeal I) ≃ₗ[R] (𝔸ᶠ[R, K] ⧸ adelicIdeal J) :=
+def adelicMulEquiv (t : 𝔸ᶠ[R, K]ˣ) {I J : FractionalIdeal R⁰ K} (h : J = t • I)
+    : (𝔸ᶠ[R, K] ⧸ adelicIdeal I) ≃ₗ[R] (𝔸ᶠ[R, K] ⧸ adelicIdeal J) :=
   Submodule.Quotient.equiv _ _ (Units.mulLeftLinearEquiv R 𝔸ᶠ[R, K] t) <| by
     subst h
     ext a
@@ -473,50 +507,56 @@ def adelicMulEquiv (t : 𝔸ᶠ[R, K]ˣ) {I J : FractionalIdeal R⁰ K} (h : J =
       rw [← mul_mem_adelicIdeal_smul t]
       simpa using ha
 
-@[simp] theorem adelicMulEquiv_mk (t : 𝔸ᶠ[R, K]ˣ) {I J : FractionalIdeal R⁰ K} (h : J = t • I)
-    (a : 𝔸ᶠ[R, K]) :
-    adelicMulEquiv t h (Submodule.Quotient.mk a) = Submodule.Quotient.mk ((t : 𝔸ᶠ[R, K]) * a) :=
+@[simp]
+theorem adelicMulEquiv_mk
+    (t : 𝔸ᶠ[R, K]ˣ) {I J : FractionalIdeal R⁰ K} (h : J = t • I) (a : 𝔸ᶠ[R, K])
+    : adelicMulEquiv t h (Submodule.Quotient.mk a) = Submodule.Quotient.mk ((t : 𝔸ᶠ[R, K]) * a) :=
   rfl
 
-def mulEquiv (t : 𝔸ᶠ[R, K]ˣ) {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0) (h : J = t • I) :
-    (K ⧸ (I : Submodule R K)) ≃ₗ[R] (K ⧸ (J : Submodule R K)) :=
-  (quotEquivAdelic hI).trans <| (adelicMulEquiv t h).trans
-    (quotEquivAdelic (h ▸ smul_ne_zero t hI)).symm
+def mulEquiv (t : 𝔸ᶠ[R, K]ˣ) {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0) (h : J = t • I)
+    : (K ⧸ (I : Submodule R K)) ≃ₗ[R] (K ⧸ (J : Submodule R K)) :=
+  (quotEquivAdelic hI).trans <|
+    (adelicMulEquiv t h).trans (quotEquivAdelic (h ▸ smul_ne_zero t hI)).symm
 
-theorem quotEquivAdelic_mulEquiv (t : 𝔸ᶠ[R, K]ˣ) {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0)
-    (hJ : J ≠ 0) (h : J = t • I) (q : K ⧸ (I : Submodule R K)) :
-    quotEquivAdelic hJ (mulEquiv t hI h q) = adelicMulEquiv t h (quotEquivAdelic hI q) := by
+theorem quotEquivAdelic_mulEquiv
+    (t : 𝔸ᶠ[R, K]ˣ)
+    {I J : FractionalIdeal R⁰ K}
+    (hI : I ≠ 0) (hJ : J ≠ 0) (h : J = t • I) (q : K ⧸ (I : Submodule R K))
+    : quotEquivAdelic hJ (mulEquiv t hI h q) = adelicMulEquiv t h (quotEquivAdelic hI q) := by
   simp [mulEquiv]
 
-theorem mulEquiv_mk_eq_mk_iff_adelic (t : 𝔸ᶠ[R, K]ˣ) {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0)
-    (h : J = t • I) (x y : K) :
-    mulEquiv t hI h (Submodule.Quotient.mk x) = Submodule.Quotient.mk y ↔
-      (t : 𝔸ᶠ[R, K]) * algebraMap K _ x - algebraMap K _ y ∈ adelicIdeal J := by
+theorem mulEquiv_mk_eq_mk_iff_adelic
+    (t : 𝔸ᶠ[R, K]ˣ) {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0) (h : J = t • I) (x y : K)
+    : mulEquiv t hI h (Submodule.Quotient.mk x) = Submodule.Quotient.mk y
+      ↔ (t : 𝔸ᶠ[R, K]) * algebraMap K _ x - algebraMap K _ y ∈ adelicIdeal J := by
   have hJ : J ≠ 0 := h ▸ smul_ne_zero t hI
   rw [← (quotEquivAdelic hJ).injective.eq_iff, quotEquivAdelic_mulEquiv, quotEquivAdelic_mk,
     quotEquivAdelic_mk, adelicMulEquiv_mk, Submodule.Quotient.eq]
 
-theorem mulEquiv_mk_eq_mk_iff (t : 𝔸ᶠ[R, K]ˣ) {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0)
-    (h : J = t • I) (x y : K) :
-    mulEquiv t hI h (Submodule.Quotient.mk x) = Submodule.Quotient.mk y ↔
-      ∀ v : HeightOneSpectrum R, (t : 𝔸ᶠ[R, K]) v * algebraMap K (v.adicCompletion K) x -
-        algebraMap K (v.adicCompletion K) y ∈ localIdeal v J :=
+theorem mulEquiv_mk_eq_mk_iff
+    (t : 𝔸ᶠ[R, K]ˣ) {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0) (h : J = t • I) (x y : K)
+    : mulEquiv t hI h (Submodule.Quotient.mk x) = Submodule.Quotient.mk y
+      ↔ ∀ v : HeightOneSpectrum R,
+        (t : 𝔸ᶠ[R, K]) v * algebraMap K (v.adicCompletion K) x - algebraMap K (v.adicCompletion K) y
+          ∈ localIdeal v J :=
   mulEquiv_mk_eq_mk_iff_adelic t hI h x y
 
-theorem mem_adelicIdeal_one_iff {a : 𝔸ᶠ[R, K]} :
-    a ∈ adelicIdeal (1 : FractionalIdeal R⁰ K) ↔ ∀ v, Valued.v (a v) ≤ 1 := by
+theorem mem_adelicIdeal_one_iff {a : 𝔸ᶠ[R, K]}
+    : a ∈ adelicIdeal (1 : FractionalIdeal R⁰ K) ↔ ∀ v, Valued.v (a v) ≤ 1 := by
   simp_rw [mem_adelicIdeal, mem_localIdeal_one_iff, mem_adicCompletionIntegers]
 
 theorem exists_adele_of_end_one
-    (ψ : (𝔸ᶠ[R, K] ⧸ adelicIdeal (1 : FractionalIdeal R⁰ K)) →ₗ[R]
-      (𝔸ᶠ[R, K] ⧸ adelicIdeal (1 : FractionalIdeal R⁰ K))) :
-    ∃ t : 𝔸ᶠ[R, K], ∀ a, ψ (Submodule.Quotient.mk a) = Submodule.Quotient.mk (t * a) := by
+    (ψ
+      : (𝔸ᶠ[R, K] ⧸ adelicIdeal (1 : FractionalIdeal R⁰ K)) →ₗ[R]
+        (𝔸ᶠ[R, K] ⧸ adelicIdeal (1 : FractionalIdeal R⁰ K)))
+    : ∃ t : 𝔸ᶠ[R, K], ∀ a, ψ (Submodule.Quotient.mk a) = Submodule.Quotient.mk (t * a) := by
   choose y hy using fun b : R => Submodule.Quotient.mk_surjective _
     (ψ (Submodule.Quotient.mk (algebraMap K 𝔸ᶠ[R, K] (algebraMap R K b)⁻¹)))
-  let ι : ∀ v : HeightOneSpectrum R, R → v.adicCompletion K :=
-    fun v b => algebraMap K (v.adicCompletion K) (algebraMap R K b)
-  have hsm : ∀ (r : R) (x : K), r • algebraMap K 𝔸ᶠ[R, K] x =
-      algebraMap K 𝔸ᶠ[R, K] (algebraMap R K r * x) := fun r x => by
+  let ι : ∀ v : HeightOneSpectrum R, R → v.adicCompletion K := fun v b =>
+    algebraMap K (v.adicCompletion K) (algebraMap R K b)
+  have hsm
+      : ∀ (r : R) (x : K),
+        r • algebraMap K 𝔸ᶠ[R, K] x = algebraMap K 𝔸ᶠ[R, K] (algebraMap R K r * x) := fun r x => by
     rw [Algebra.smul_def, map_mul]; rfl
 
   have hint : ∀ b v, Valued.v (ι v b * y b v) ≤ 1 := by
@@ -531,17 +571,19 @@ theorem exists_adele_of_end_one
     have := mem_adelicIdeal_one_iff.1 this v
     rwa [adele_smul_apply] at this
 
-  have hcomp : ∀ b c, c ≠ 0 → ∀ v,
-      Valued.v (ι v (b * c) * y (b * c) v - ι v b * y b v) ≤ Valued.v (ι v b) := by
+  have hcomp
+      : ∀ b c,
+        c ≠ 0 → ∀ v, Valued.v (ι v (b * c) * y (b * c) v - ι v b * y b v) ≤ Valued.v (ι v b) := by
     intro b c hc v
     have hc1 : algebraMap R K c ≠ 0 := by simpa using hc
     have : c • y (b * c) - y b ∈ adelicIdeal (1 : FractionalIdeal R⁰ K) := by
       rw [← Submodule.Quotient.eq, Submodule.Quotient.mk_smul, hy, hy, ← map_smul,
-        ← Submodule.Quotient.mk_smul, hsm, map_mul (algebraMap R K), mul_inv, mul_comm,
-        mul_assoc, inv_mul_cancel₀ hc1, mul_one]
+        ← Submodule.Quotient.mk_smul, hsm, map_mul (algebraMap R K), mul_inv, mul_comm, mul_assoc,
+        inv_mul_cancel₀ hc1, mul_one]
     have := mem_adelicIdeal_one_iff.1 this v
     rw [adele_sub_apply, adele_smul_apply] at this
-    have h2 : ι v (b * c) * y (b * c) v - ι v b * y b v = ι v b * (ι v c * y (b * c) v - y b v) := by
+    have h2
+        : ι v (b * c) * y (b * c) v - ι v b * y b v = ι v b * (ι v c * y (b * c) v - y b v) := by
       simp only [ι, map_mul]; ring
     rw [h2, map_mul]
     exact mul_le_of_le_one_right' this
@@ -558,8 +600,9 @@ theorem exists_adele_of_end_one
     rw [h] at this
     simp only [ι, map_zero] at this
     exact exp_ne_zero this.symm
-  have hlim : ∀ v, ∃ t : v.adicCompletion K, ∀ n : ℕ,
-      Valued.v (t - ι v (π v ^ n) * y (π v ^ n) v) ≤ exp (-(n : ℤ)) := by
+  have hlim
+      : ∀ v, ∃ t : v.adicCompletion K, ∀ n : ℕ,
+        Valued.v (t - ι v (π v ^ n) * y (π v ^ n) v) ≤ exp (-(n : ℤ)) := by
     intro v
     refine exists_limit v _ fun m n hnm => ?_
     obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hnm
@@ -575,10 +618,9 @@ theorem exists_adele_of_end_one
     have h3 := hcomp (π v ^ n) b hb v
     rw [hπn, mul_comm (π v ^ n) b, Valuation.map_sub_swap] at h3
     rw [← sub_add_sub_cancel (t v) (ι v (π v ^ n) * y (π v ^ n) v),
-      ← sub_add_sub_cancel (ι v (π v ^ n) * y (π v ^ n) v)
-        (ι v (b * π v ^ n) * y (b * π v ^ n) v)]
-    exact (Valuation.map_add _ _ _).trans (max_le h1
-      ((Valuation.map_add _ _ _).trans (max_le (h3.trans hn.le) h2)))
+      ← sub_add_sub_cancel (ι v (π v ^ n) * y (π v ^ n) v) (ι v (b * π v ^ n) * y (b * π v ^ n) v)]
+    exact (Valuation.map_add _ _ _).trans
+      (max_le h1 ((Valuation.map_add _ _ _).trans (max_le (h3.trans hn.le) h2)))
   have ht1 : ∀ v, Valued.v (t v) ≤ 1 := by
     intro v
     have h1 := ht v 0
@@ -597,8 +639,9 @@ theorem exists_adele_of_end_one
   rw [adele_sub_apply, adele_algebraMap_apply, map_div₀] at hx'
   have hb1 : ι v b ≠ 0 := by simpa [ι] using hb0
   have hb2 : Valued.v (ι v b) ≠ 0 := by simpa using hb1
-  have h2 : (T * a - r • y b) v =
-      t v * (a v - ι v r / ι v b) + ι v r * ((t v - ι v b * y b v) / ι v b) := by
+  have h2
+      : (T * a - r • y b) v
+        = t v * (a v - ι v r / ι v b) + ι v r * ((t v - ι v b * y b v) / ι v b) := by
     rw [adele_sub_apply, adele_mul_apply, adele_smul_apply, hT]
     change t v * a v - ι v r * y b v = _
     field_simp
@@ -609,42 +652,53 @@ theorem exists_adele_of_end_one
   · rw [map_mul, map_div₀]
     refine mul_le_one' ?_ ((div_le_one₀ (zero_lt_iff.2 hb2)).2 (htb b hb0 v))
     simp only [ι]
-    rw [valued_algebraMap]; exact v.valuation_le_one r
+    rw [valued_algebraMap]
+    exact v.valuation_le_one r
 
-theorem exists_adele_of_linearMap {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0) (hJ : J ≠ 0)
-    (ψ : (𝔸ᶠ[R, K] ⧸ adelicIdeal I) →ₗ[R] (𝔸ᶠ[R, K] ⧸ adelicIdeal J)) :
-    ∃ t : 𝔸ᶠ[R, K], ∀ a, ψ (Submodule.Quotient.mk a) = Submodule.Quotient.mk (t * a) := by
+theorem exists_adele_of_linearMap
+    {I J : FractionalIdeal R⁰ K}
+    (hI : I ≠ 0) (hJ : J ≠ 0) (ψ : (𝔸ᶠ[R, K] ⧸ adelicIdeal I) →ₗ[R] (𝔸ᶠ[R, K] ⧸ adelicIdeal J))
+    : ∃ t : 𝔸ᶠ[R, K], ∀ a, ψ (Submodule.Quotient.mk a) = Submodule.Quotient.mk (t * a) := by
   obtain ⟨s, hs⟩ := exists_smul_eq (one_ne_zero (α := FractionalIdeal R⁰ K)) hI
   obtain ⟨u, hu⟩ := exists_smul_eq (one_ne_zero (α := FractionalIdeal R⁰ K)) hJ
-  obtain ⟨t, ht⟩ := exists_adele_of_end_one
-    ((adelicMulEquiv u hu).symm.toLinearMap ∘ₗ ψ ∘ₗ (adelicMulEquiv s hs).toLinearMap)
+  obtain ⟨t, ht⟩ :=
+    exists_adele_of_end_one
+      ((adelicMulEquiv u hu).symm.toLinearMap ∘ₗ ψ ∘ₗ (adelicMulEquiv s hs).toLinearMap)
   refine ⟨u * t * (s⁻¹ : 𝔸ᶠ[R, K]ˣ), fun a => ?_⟩
   have := ht ((s⁻¹ : 𝔸ᶠ[R, K]ˣ) * a)
   simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, adelicMulEquiv_mk,
-    LinearEquiv.symm_apply_eq, Units.mul_inv_cancel_left] at this
+      LinearEquiv.symm_apply_eq, Units.mul_inv_cancel_left]
+    at this
   rw [this, mul_assoc, mul_assoc]
 
-theorem eq_zero_of_forall_mul_mem {J : FractionalIdeal R⁰ K} (hJ : J ≠ 0) {t : 𝔸ᶠ[R, K]}
-    (h : ∀ x : K, t * algebraMap K 𝔸ᶠ[R, K] x ∈ adelicIdeal J) : t = 0 := by
+theorem eq_zero_of_forall_mul_mem
+    {J : FractionalIdeal R⁰ K} (hJ : J ≠ 0)
+    {t : 𝔸ᶠ[R, K]} (h : ∀ x : K, t * algebraMap K 𝔸ᶠ[R, K] x ∈ adelicIdeal J)
+    : t = 0 := by
   ext1 v
   change t v = 0
   by_contra hv
   have hv' : Valued.v (t v) ≠ 0 := by simpa using hv
-  obtain ⟨x, hx⟩ := v.valuation_surjective K
-    (exp (1 - FractionalIdeal.count K v J - log (Valued.v (t v))))
+  obtain ⟨x, hx⟩ :=
+    v.valuation_surjective K (exp (1 - FractionalIdeal.count K v J - log (Valued.v (t v))))
   have := (mem_adelicIdeal_iff hJ).1 (h x) v
-  rw [adele_mul_apply, adele_algebraMap_apply, map_mul, valued_algebraMap, hx,
-    ← exp_log hv', ← exp_add, exp_le_exp, log_exp] at this
+  rw [adele_mul_apply, adele_algebraMap_apply, map_mul, valued_algebraMap, hx, ← exp_log hv',
+      ← exp_add, exp_le_exp, log_exp]
+    at this
   omega
 
-theorem existsUnique_adele_of_linearMap {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0) (hJ : J ≠ 0)
-    (φ : (K ⧸ (I : Submodule R K)) →ₗ[R] (K ⧸ (J : Submodule R K))) :
-    ∃! t : 𝔸ᶠ[R, K], ∀ x : K, quotEquivAdelic hJ (φ (Submodule.Quotient.mk x)) =
-      Submodule.Quotient.mk (t * algebraMap K 𝔸ᶠ[R, K] x) := by
-  obtain ⟨t, ht⟩ := exists_adele_of_linearMap hI hJ
-    ((quotEquivAdelic hJ).toLinearMap ∘ₗ φ ∘ₗ (quotEquivAdelic hI).symm.toLinearMap)
-  have ht' : ∀ x : K, quotEquivAdelic hJ (φ (Submodule.Quotient.mk x)) =
-      Submodule.Quotient.mk (t * algebraMap K 𝔸ᶠ[R, K] x) := fun x => by
+theorem existsUnique_adele_of_linearMap
+    {I J : FractionalIdeal R⁰ K}
+    (hI : I ≠ 0) (hJ : J ≠ 0) (φ : (K ⧸ (I : Submodule R K)) →ₗ[R] (K ⧸ (J : Submodule R K)))
+    : ∃! t : 𝔸ᶠ[R, K], ∀ x : K, quotEquivAdelic hJ (φ (Submodule.Quotient.mk x)) =
+        Submodule.Quotient.mk (t * algebraMap K 𝔸ᶠ[R, K] x) := by
+  obtain ⟨t, ht⟩ :=
+    exists_adele_of_linearMap hI hJ
+      ((quotEquivAdelic hJ).toLinearMap ∘ₗ φ ∘ₗ (quotEquivAdelic hI).symm.toLinearMap)
+  have ht'
+      : ∀ x : K,
+        quotEquivAdelic hJ (φ (Submodule.Quotient.mk x))
+          = Submodule.Quotient.mk (t * algebraMap K 𝔸ᶠ[R, K] x) := fun x => by
     rw [← ht, ← quotEquivAdelic_mk hI]
     simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.symm_apply_apply]
   refine ⟨t, ht', fun s hs => ?_⟩
@@ -652,16 +706,21 @@ theorem existsUnique_adele_of_linearMap {I J : FractionalIdeal R⁰ K} (hI : I �
   refine eq_zero_of_forall_mul_mem hJ fun x => ?_
   rw [sub_mul, ← Submodule.Quotient.eq, ← hs, ← ht']
 
-theorem mulEquiv_injective {t s : 𝔸ᶠ[R, K]ˣ} {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0)
-    (h : J = t • I) (h' : J = s • I) (e : mulEquiv t hI h = mulEquiv s hI h') : t = s := by
+theorem mulEquiv_injective
+    {t s : 𝔸ᶠ[R, K]ˣ} {I J : FractionalIdeal R⁰ K}
+    (hI : I ≠ 0) (h : J = t • I) (h' : J = s • I) (e : mulEquiv t hI h = mulEquiv s hI h')
+    : t = s := by
   have hJ : J ≠ 0 := h ▸ smul_ne_zero t hI
   refine Units.ext ((existsUnique_adele_of_linearMap hI hJ (mulEquiv t hI h).toLinearMap).unique
-    (fun x => ?_) fun x => ?_)
+    (fun x => ?_)
+    fun x => ?_)
   · simp [quotEquivAdelic_mulEquiv]
   · simp [e, quotEquivAdelic_mulEquiv]
 
-theorem ne_zero_of_linearEquiv {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0)
-    (φ : (K ⧸ (I : Submodule R K)) ≃ₗ[R] (K ⧸ (J : Submodule R K))) : J ≠ 0 := by
+theorem ne_zero_of_linearEquiv
+    {I J : FractionalIdeal R⁰ K}
+    (hI : I ≠ 0) (φ : (K ⧸ (I : Submodule R K)) ≃ₗ[R] (K ⧸ (J : Submodule R K)))
+    : J ≠ 0 := by
   rintro rfl
   obtain ⟨q, hq⟩ := φ.surjective (Submodule.Quotient.mk 1)
   obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ q
@@ -669,20 +728,24 @@ theorem ne_zero_of_linearEquiv {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0)
   obtain ⟨r, b, hb, rfl⟩ := IsFractionRing.div_surjective (A := R) x
   have hb0 : b ≠ 0 := nonZeroDivisors.ne_zero hb
   have hb1 : algebraMap R K b ≠ 0 := by simpa using hb0
-  have h0 : (b * c) • (Submodule.Quotient.mk (algebraMap R K r / algebraMap R K b) :
-      K ⧸ (I : Submodule R K)) = 0 := by
+  have h0
+      : (b * c)
+          • (Submodule.Quotient.mk (algebraMap R K r / algebraMap R K b) : K ⧸ (I : Submodule R K))
+        = 0 := by
     rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero]
     convert (I : Submodule R K).smul_mem r hc using 1
     simp only [Algebra.smul_def, map_mul]
     field_simp
   have h1 := congrArg φ h0
   rw [map_smul, hq, map_zero, ← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero,
-    FractionalIdeal.mem_coe, FractionalIdeal.mem_zero_iff] at h1
+      FractionalIdeal.mem_coe, FractionalIdeal.mem_zero_iff]
+    at h1
   simp [Algebra.smul_def, hb0, hc0] at h1
 
-theorem existsUnique_mulEquiv {I J : FractionalIdeal R⁰ K} (hI : I ≠ 0)
-    (φ : (K ⧸ (I : Submodule R K)) ≃ₗ[R] (K ⧸ (J : Submodule R K))) :
-    ∃! t : 𝔸ᶠ[R, K]ˣ, ∃ h : J = t • I, φ = mulEquiv t hI h := by
+theorem existsUnique_mulEquiv
+    {I J : FractionalIdeal R⁰ K}
+    (hI : I ≠ 0) (φ : (K ⧸ (I : Submodule R K)) ≃ₗ[R] (K ⧸ (J : Submodule R K)))
+    : ∃! t : 𝔸ᶠ[R, K]ˣ, ∃ h : J = t • I, φ = mulEquiv t hI h := by
   have hJ : J ≠ 0 := ne_zero_of_linearEquiv hI φ
   let ψ := (quotEquivAdelic hI).symm.trans (φ.trans (quotEquivAdelic hJ))
   obtain ⟨t, ht⟩ := exists_adele_of_linearMap hI hJ ψ.toLinearMap

@@ -20,17 +20,21 @@ open Matrix Iwasawa GLnLocal Topology
 
 section Transport
 
-variable {G H : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group H]
-  [TopologicalSpace H] [IsTopologicalGroup H] (e : G ≃ₜ* H)
-  {V : Type*} [AddCommGroup V] [Module ℂ V] (σ : Representation ℂ H V)
+variable
+  {G H : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group H] [TopologicalSpace H]
+  [IsTopologicalGroup H]
+  (e : G ≃ₜ* H)
+  {V : Type*} [AddCommGroup V] [Module ℂ V]
+  (σ : Representation ℂ H V)
 
-theorem stabilizerOf_comp (v : V) :
-    (stabilizerOf (σ.comp e.toMulEquiv.toMonoidHom) v : Set G) = e ⁻¹' (stabilizerOf σ v : Set H) :=
+theorem stabilizerOf_comp (v : V)
+    : (stabilizerOf (σ.comp e.toMulEquiv.toMonoidHom) v : Set G)
+      = e ⁻¹' (stabilizerOf σ v : Set H) :=
   rfl
 
-theorem fixedVectors_comp (K : Subgroup G) :
-    fixedVectors (σ.comp e.toMulEquiv.toMonoidHom) K =
-      fixedVectors σ (K.map e.toMulEquiv.toMonoidHom) := by
+theorem fixedVectors_comp (K : Subgroup G)
+    : fixedVectors (σ.comp e.toMulEquiv.toMonoidHom) K
+      = fixedVectors σ (K.map e.toMulEquiv.toMonoidHom) := by
   ext v
   simp only [mem_fixedVectors, Subgroup.mem_map]
   constructor
@@ -44,16 +48,16 @@ theorem isSmooth_comp_iff : IsSmooth (σ.comp e.toMulEquiv.toMonoidHom) ↔ IsSm
   rw [stabilizerOf_comp]
   exact e.toHomeomorph.isOpen_preimage
 
-theorem coe_map_eq_image (K : Subgroup G) :
-    ((K.map e.toMulEquiv.toMonoidHom : Subgroup H) : Set H) = e '' (K : Set G) :=
+theorem coe_map_eq_image (K : Subgroup G)
+    : ((K.map e.toMulEquiv.toMonoidHom : Subgroup H) : Set H) = e '' (K : Set G) :=
   Subgroup.coe_map _ _
 
-theorem map_comap_eq (K : Subgroup H) :
-    (K.comap e.toMulEquiv.toMonoidHom).map e.toMulEquiv.toMonoidHom = K :=
+theorem map_comap_eq (K : Subgroup H)
+    : (K.comap e.toMulEquiv.toMonoidHom).map e.toMulEquiv.toMonoidHom = K :=
   Subgroup.map_comap_eq_self_of_surjective e.toMulEquiv.surjective K
 
-theorem isAdmissible_comp_iff :
-    IsAdmissible (σ.comp e.toMulEquiv.toMonoidHom) ↔ IsAdmissible σ := by
+theorem isAdmissible_comp_iff
+    : IsAdmissible (σ.comp e.toMulEquiv.toMonoidHom) ↔ IsAdmissible σ := by
   refine and_congr (isSmooth_comp_iff e σ) ⟨fun h K hKc hKo => ?_, fun h K hKc hKo => ?_⟩
   · have hc : IsCompact ((K.comap e.toMulEquiv.toMonoidHom : Subgroup G) : Set G) := by
       rw [Subgroup.coe_comap]
@@ -71,27 +75,34 @@ theorem isAdmissible_comp_iff :
     · rw [coe_map_eq_image]
       exact e.toHomeomorph.isOpenMap _ hKo
 
-def subrepresentationCompOrderIso {G H : Type*} [Group G] [Group H] (f : G →* H)
-    (hf : Function.Surjective f) (σ : Representation ℂ H V) :
-    Subrepresentation (σ.comp f) ≃o Subrepresentation σ where
-  toFun S := ⟨S.toSubmodule, fun h v hv => by
-    obtain ⟨g, rfl⟩ := hf h
-    exact S.apply_mem_toSubmodule g hv⟩
+def subrepresentationCompOrderIso
+    {G H : Type*} [Group G] [Group H]
+    (f : G →* H) (hf : Function.Surjective f)
+    (σ : Representation ℂ H V)
+    : Subrepresentation (σ.comp f) ≃o Subrepresentation σ where
+  toFun S := ⟨
+    S.toSubmodule,
+    fun h v hv => by
+      obtain ⟨g, rfl⟩ := hf h
+      exact S.apply_mem_toSubmodule g hv
+  ⟩
   invFun S := ⟨S.toSubmodule, fun g v hv => S.apply_mem_toSubmodule (f g) hv⟩
   left_inv S := rfl
   right_inv S := rfl
   map_rel_iff' := Iff.rfl
 
-theorem isIrreducible_comp_iff :
-    Representation.IsIrreducible (σ.comp e.toMulEquiv.toMonoidHom) ↔ σ.IsIrreducible :=
+theorem isIrreducible_comp_iff
+    : Representation.IsIrreducible (σ.comp e.toMulEquiv.toMonoidHom) ↔ σ.IsIrreducible :=
   OrderIso.isSimpleOrder_iff (subrepresentationCompOrderIso _ e.toMulEquiv.surjective σ)
 
 end Transport
 
 section Blocks
 
-variable {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-  {n : ℕ} {α : Type*} [LinearOrder α] {β : Fin n → α}
+variable
+  {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+  {n : ℕ} {α : Type*} [LinearOrder α]
+  {β : Fin n → α}
 
 theorem blocks_one (a : Set.range β) : blocks β F (1 : Matrix (Fin n) (Fin n) F) a = 1 := by
   ext i j
@@ -101,16 +112,17 @@ theorem blocks_one (a : Set.range β) : blocks β F (1 : Matrix (Fin n) (Fin n) 
     simp
   · rw [if_neg (fun e => h (Subtype.ext e)), if_neg h]
 
-theorem blocks_mul_apply {X Y : Matrix (Fin n) (Fin n) F} (hX : ∀ i j, β i ≠ β j → X i j = 0)
-    (hY : ∀ i j, β i ≠ β j → Y i j = 0) (a : Set.range β) :
-    blocks β F (X * Y) a = blocks β F X a * blocks β F Y a := by
+theorem blocks_mul_apply
+    {X Y : Matrix (Fin n) (Fin n) F}
+    (hX : ∀ i j, β i ≠ β j → X i j = 0) (hY : ∀ i j, β i ≠ β j → Y i j = 0)
+    (a : Set.range β)
+    : blocks β F (X * Y) a = blocks β F X a * blocks β F Y a := by
   rw [blocks_mul hX hY]
   rfl
 
-theorem levi_blockDiag {m : GL (Fin n) F} (hm : m ∈ levi F n β) :
-    ∀ i j, β i ≠ β j → (m : Matrix (Fin n) (Fin n) F) i j = 0 :=
+theorem levi_blockDiag {m : GL (Fin n) F} (hm : m ∈ levi F n β)
+    : ∀ i j, β i ≠ β j → (m : Matrix (Fin n) (Fin n) F) i j = 0 :=
   mem_levi.1 hm
-
 
 variable (F) in
 def leviBlock (m : levi F n β) (a : Set.range β) : GL (Fiber β a) F where
@@ -123,36 +135,39 @@ def leviBlock (m : levi F n β) (a : Set.range β) : GL (Fiber β a) F where
     rw [← blocks_mul_apply (levi_blockDiag (m⁻¹).2) (levi_blockDiag m.2), ← Units.val_mul,
       ← Subgroup.coe_mul, inv_mul_cancel, Subgroup.coe_one, Units.val_one, blocks_one]
 
-theorem coe_leviBlock (m : levi F n β) (a : Set.range β) :
-    ((leviBlock F m a : GL (Fiber β a) F) : Matrix (Fiber β a) (Fiber β a) F) =
-      blocks β F ((m : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) a := rfl
-
+theorem coe_leviBlock (m : levi F n β) (a : Set.range β)
+    : ((leviBlock F m a : GL (Fiber β a) F) : Matrix (Fiber β a) (Fiber β a) F)
+      = blocks β F ((m : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) a :=
+  rfl
 
 variable (F) in
-def leviAssemble (x : ∀ a : Set.range β, GL (Fiber β a) F) : levi F n β :=
-  ⟨⟨blockAssemble β F fun a => (x a : Matrix (Fiber β a) (Fiber β a) F),
-      blockAssemble β F fun a => (((x a)⁻¹ : GL (Fiber β a) F) : Matrix (Fiber β a) (Fiber β a) F),
-      by
-        rw [← map_mul, ← map_one (blockAssemble β F)]
-        congr 1
-        funext a
-        exact Units.mul_inv (x a),
-      by
-        rw [← map_mul, ← map_one (blockAssemble β F)]
-        congr 1
-        funext a
-        exact Units.inv_mul (x a)⟩,
-    mem_levi.2 fun _ _ h => blockAssemble_apply_of_ne _ h⟩
+def leviAssemble (x : ∀ a : Set.range β, GL (Fiber β a) F) : levi F n β := ⟨
+  ⟨
+    blockAssemble β F fun a => (x a : Matrix (Fiber β a) (Fiber β a) F),
+    blockAssemble β F fun a => (((x a)⁻¹ : GL (Fiber β a) F) : Matrix (Fiber β a) (Fiber β a) F),
+    by
+      rw [← map_mul, ← map_one (blockAssemble β F)]
+      congr 1
+      funext a
+      exact Units.mul_inv (x a),
+    by
+      rw [← map_mul, ← map_one (blockAssemble β F)]
+      congr 1
+      funext a
+      exact Units.inv_mul (x a)
+  ⟩,
+  mem_levi.2 fun _ _ h => blockAssemble_apply_of_ne _ h
+⟩
 
-theorem continuous_blockAssemble_apply {X : Type*} [TopologicalSpace X]
+theorem continuous_blockAssemble_apply
+    {X : Type*} [TopologicalSpace X]
     {f : X → ∀ a : Set.range β, Matrix (Fiber β a) (Fiber β a) F}
-    (hf : ∀ a i j, Continuous fun x => f x a i j) :
-    Continuous fun x => blockAssemble β F (f x) := by
+    (hf : ∀ a i j, Continuous fun x => f x a i j)
+    : Continuous fun x => blockAssemble β F (f x) := by
   refine continuous_matrix fun i j => ?_
   by_cases h : β i = β j
   · have hj : blockOf β j = blockOf β i := Subtype.ext h.symm
-    have e : (fun x => blockAssemble β F (f x) i j) =
-        fun x => f x (blockOf β i) ⟨i, rfl⟩ ⟨j, hj⟩ :=
+    have e : (fun x => blockAssemble β F (f x) i j) = fun x => f x (blockOf β i) ⟨i, rfl⟩ ⟨j, hj⟩ :=
       funext fun x => blockAssemble_apply_of_eq _ rfl hj
     rw [e]
     exact hf _ _ _
@@ -161,28 +176,35 @@ theorem continuous_blockAssemble_apply {X : Type*} [TopologicalSpace X]
     rw [e]
     exact continuous_const
 
-
 variable (F β) in
 def leviEquivBlocks : levi F n β ≃ₜ* (∀ a : Set.range β, GL (Fiber β a) F) where
   toFun m a := leviBlock F m a
   invFun := leviAssemble F
   left_inv m := Subtype.ext (Units.ext (blockAssemble_blocks (levi_blockDiag m.2)))
   right_inv x := funext fun a => Units.ext (congrFun (blocks_blockAssemble _) a)
-  map_mul' m m' := funext fun a => Units.ext (by
-    show blocks β F (((m * m' : levi F n β) : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) a = _
-    rw [Subgroup.coe_mul, Units.val_mul, blocks_mul_apply (levi_blockDiag m.2)
-      (levi_blockDiag m'.2)]
-    rfl)
-  continuous_toFun := continuous_pi fun a => Units.continuous_iff.2
-    ⟨continuous_matrix fun i j =>
-        (continuous_entry F n i.1 j.1).comp continuous_subtype_val,
-      continuous_matrix fun i j =>
-        (continuous_entry F n i.1 j.1).comp (continuous_subtype_val.comp continuous_inv)⟩
-  continuous_invFun := Continuous.subtype_mk (Units.continuous_iff.2
-    ⟨continuous_blockAssemble_apply fun a i j =>
-        (Units.continuous_val.matrix_elem i j).comp (continuous_apply a),
-      continuous_blockAssemble_apply fun a i j =>
-        (Units.continuous_coe_inv.matrix_elem i j).comp (continuous_apply a)⟩) _
+  map_mul' m m' :=
+    funext fun a =>
+      Units.ext (by
+        show blocks β F (((m * m' : levi F n β) : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) a = _
+        rw [Subgroup.coe_mul, Units.val_mul,
+          blocks_mul_apply (levi_blockDiag m.2) (levi_blockDiag m'.2)]
+        rfl)
+  continuous_toFun :=
+    continuous_pi fun a =>
+      Units.continuous_iff.2 ⟨
+        continuous_matrix fun i j => (continuous_entry F n i.1 j.1).comp continuous_subtype_val,
+        continuous_matrix fun i j =>
+          (continuous_entry F n i.1 j.1).comp (continuous_subtype_val.comp continuous_inv)
+      ⟩
+  continuous_invFun :=
+    Continuous.subtype_mk
+      (Units.continuous_iff.2 ⟨
+        continuous_blockAssemble_apply fun a i j =>
+          (Units.continuous_val.matrix_elem i j).comp (continuous_apply a),
+        continuous_blockAssemble_apply fun a i j =>
+          (Units.continuous_coe_inv.matrix_elem i j).comp (continuous_apply a)
+      ⟩)
+      _
 
 end Blocks
 
@@ -190,15 +212,19 @@ section Numbering
 
 variable {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
 
-def glReindex {ι κ : Type*} [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
-    (e : ι ≃ κ) : GL ι F ≃ₜ* GL κ F where
+def glReindex {ι κ : Type*} [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ] (e : ι ≃ κ)
+    : GL ι F ≃ₜ* GL κ F where
   toMulEquiv := Units.mapEquiv (reindexAlgEquiv F F e).toMulEquiv
-  continuous_toFun := Units.continuous_iff.2
-    ⟨continuous_matrix fun i j => Units.continuous_val.matrix_elem (e.symm i) (e.symm j),
-      continuous_matrix fun i j => Units.continuous_coe_inv.matrix_elem (e.symm i) (e.symm j)⟩
-  continuous_invFun := Units.continuous_iff.2
-    ⟨continuous_matrix fun i j => Units.continuous_val.matrix_elem (e i) (e j),
-      continuous_matrix fun i j => Units.continuous_coe_inv.matrix_elem (e i) (e j)⟩
+  continuous_toFun :=
+    Units.continuous_iff.2 ⟨
+      continuous_matrix fun i j => Units.continuous_val.matrix_elem (e.symm i) (e.symm j),
+      continuous_matrix fun i j => Units.continuous_coe_inv.matrix_elem (e.symm i) (e.symm j)
+    ⟩
+  continuous_invFun :=
+    Units.continuous_iff.2 ⟨
+      continuous_matrix fun i j => Units.continuous_val.matrix_elem (e i) (e j),
+      continuous_matrix fun i j => Units.continuous_coe_inv.matrix_elem (e i) (e j)
+    ⟩
 
 variable {n : ℕ} {α : Type*} [LinearOrder α] (β : Fin n → α)
 
@@ -208,25 +234,33 @@ theorem blockSize_pos (a : Set.range β) : 0 < blockSize β a := by
   obtain ⟨i, hi⟩ := a.2
   exact Fintype.card_pos_iff.2 ⟨⟨i, Subtype.ext hi⟩⟩
 
-
 variable (F) in
 def leviEquivPi : levi F n β ≃ₜ* (∀ a : Set.range β, GL (Fin (blockSize β a)) F) :=
-  (leviEquivBlocks F β).trans
-    { toMulEquiv := MulEquiv.piCongrRight fun a =>
-        (glReindex (F := F) (Fintype.equivFinOfCardEq rfl : Fiber β a ≃ Fin (blockSize β a))).toMulEquiv
-      continuous_toFun := continuous_pi fun a =>
-        (glReindex (F := F) (Fintype.equivFinOfCardEq rfl : Fiber β a ≃ Fin (blockSize β a))).continuous.comp
+  (leviEquivBlocks F β).trans {
+    toMulEquiv :=
+      MulEquiv.piCongrRight fun a =>
+        (glReindex (F := F)
+          (Fintype.equivFinOfCardEq rfl : Fiber β a ≃ Fin (blockSize β a))).toMulEquiv
+    continuous_toFun :=
+      continuous_pi fun a =>
+        (glReindex (F := F)
+            (Fintype.equivFinOfCardEq rfl : Fiber β a ≃ Fin (blockSize β a))).continuous.comp
           (continuous_apply a)
-      continuous_invFun := continuous_pi fun a =>
-        (glReindex (F := F) (Fintype.equivFinOfCardEq rfl : Fiber β a ≃ Fin (blockSize β a))).symm.continuous.comp
-          (continuous_apply a) }
+    continuous_invFun :=
+      continuous_pi fun a =>
+        (glReindex (F := F)
+            (Fintype.equivFinOfCardEq rfl : Fiber β a ≃ Fin (blockSize β a))).symm.continuous.comp
+          (continuous_apply a)
+  }
 
 end Numbering
 
 section Restrict
 
-variable {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-  {n : ℕ} {α : Type*} [LinearOrder α] (β : Fin n → α)
+variable
+  {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+  {n : ℕ} {α : Type*} [LinearOrder α]
+  (β : Fin n → α)
 
 def fiberFin (a : Set.range β) : Fin (blockSize β a) ≃ Fiber β a :=
   (Fintype.equivFinOfCardEq rfl : Fiber β a ≃ Fin (blockSize β a)).symm
@@ -236,14 +270,15 @@ def restrictFun {α' : Type*} (γ : Fin n → α') (a : Set.range β) : Fin (blo
 
 variable {β}
 
-theorem leviEquivPi_apply (m : levi F n β) (a : Set.range β) (k l : Fin (blockSize β a)) :
-    ((leviEquivPi F β m a : GL (Fin (blockSize β a)) F) : Matrix _ _ F) k l =
-      (m : GL (Fin n) F) (fiberFin β a k).1 (fiberFin β a l).1 := rfl
+theorem leviEquivPi_apply (m : levi F n β) (a : Set.range β) (k l : Fin (blockSize β a))
+    : ((leviEquivPi F β m a : GL (Fin (blockSize β a)) F) : Matrix _ _ F) k l
+      = (m : GL (Fin n) F) (fiberFin β a k).1 (fiberFin β a l).1 :=
+  rfl
 
-theorem mem_blockUpper_iff_leviEquivPi {α' : Type*} [LinearOrder α'] (γ : Fin n → α')
-    (m : levi F n β) :
-    (m : GL (Fin n) F) ∈ blockUpper F n γ ↔
-      ∀ a, leviEquivPi F β m a ∈ blockUpper F (blockSize β a) (restrictFun β γ a) := by
+theorem mem_blockUpper_iff_leviEquivPi
+    {α' : Type*} [LinearOrder α'] (γ : Fin n → α') (m : levi F n β)
+    : (m : GL (Fin n) F) ∈ blockUpper F n γ
+      ↔ ∀ a, leviEquivPi F β m a ∈ blockUpper F (blockSize β a) (restrictFun β γ a) := by
   constructor
   · intro hm a k l hkl
     rw [leviEquivPi_apply]
@@ -264,10 +299,10 @@ theorem mem_blockUpper_iff_leviEquivPi {α' : Type*} [LinearOrder α'] (γ : Fin
       exact this
     · exact mem_levi.1 m.2 i j hb
 
-theorem mem_unipotentRadical_iff_leviEquivPi {α' : Type*} [LinearOrder α'] (γ : Fin n → α')
-    (m : levi F n β) :
-    (m : GL (Fin n) F) ∈ unipotentRadical F n γ ↔
-      ∀ a, leviEquivPi F β m a ∈ unipotentRadical F (blockSize β a) (restrictFun β γ a) := by
+theorem mem_unipotentRadical_iff_leviEquivPi
+    {α' : Type*} [LinearOrder α'] (γ : Fin n → α') (m : levi F n β)
+    : (m : GL (Fin n) F) ∈ unipotentRadical F n γ
+      ↔ ∀ a, leviEquivPi F β m a ∈ unipotentRadical F (blockSize β a) (restrictFun β γ a) := by
   rw [mem_unipotentRadical, mem_blockUpper_iff_leviEquivPi]
   simp only [mem_unipotentRadical]
   constructor

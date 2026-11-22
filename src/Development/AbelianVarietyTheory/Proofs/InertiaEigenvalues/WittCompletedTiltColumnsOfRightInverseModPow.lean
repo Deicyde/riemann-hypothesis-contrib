@@ -10,20 +10,25 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Integra
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries
+  GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc
+  GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
 open scoped Formalism.Per NNReal
 
 namespace GlobalTheory.CardJ
 
 variable {R : Type*} [CommRing R] [IsLocalRing R]
 
-theorem isUnit_of_mul_eq_one_add_pow (p : R) (hp : ¬ IsUnit p) {n : ℕ} (hn : 1 ≤ n) {x y z : R}
-    (h : x * y = 1 + p ^ n * z) : IsUnit x := by
+theorem isUnit_of_mul_eq_one_add_pow
+    (p : R) (hp : ¬ IsUnit p) {n : ℕ} (hn : 1 ≤ n) {x y z : R} (h : x * y = 1 + p ^ n * z)
+    : IsUnit x := by
   have hpm : p ∈ IsLocalRing.maximalIdeal R := (IsLocalRing.mem_maximalIdeal _).2 hp
   have hmem : p ^ n * z ∈ IsLocalRing.maximalIdeal R := by
     apply Ideal.mul_mem_right
     obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 := ⟨n - 1, by omega⟩
-    rw [pow_succ]; exact Ideal.mul_mem_left _ _ hpm
+    rw [pow_succ]
+    exact Ideal.mul_mem_left _ _ hpm
   have hu : IsUnit (1 + p ^ n * z) := by
     by_contra hc
     have h1 : (1 + p ^ n * z) ∈ IsLocalRing.maximalIdeal R := (IsLocalRing.mem_maximalIdeal _).2 hc
@@ -40,15 +45,21 @@ namespace GlobalTheory.CardJ
 
 variable {R : Type*} [CommRing R] [IsLocalRing R]
 
-theorem exists_cols_of_rightInv (p : R) (hp : ¬ IsUnit p) (d d' n : ℕ)
-    (Q : Matrix (Fin d) (Fin d') R) (S : Matrix (Fin d') (Fin d) R)
-    (U Uinv : Matrix (Fin d') (Fin d') R) (J : Finset (Fin d')) (hn : 1 ≤ n)
-    (hQS : ∀ i j, p ^ n ∣ (Q * S - (1 : Matrix (Fin d) (Fin d) R)) i j) (hUU : Uinv * U = 1) (hUU' : U * Uinv = 1)
-    (hJ : ∀ j ∉ J, ∀ i, p ^ n ∣ (Q * U) i j)
-    (hker : ∀ v : Fin d' → R, (∀ i, p ^ n ∣ (Q *ᵥ v) i) → ∀ j ∈ J, p ∣ (Uinv *ᵥ v) j) :
-    ∃ e : Fin d ≃ J, IsUnit (Q * U.submatrix id (fun k => (e k : Fin d'))) ∧
-      ∀ i j, p ^ n ∣ (Q - (Q * U.submatrix id (fun k => (e k : Fin d'))) *
-        Uinv.submatrix (fun k => (e k : Fin d')) id) i j := by
+theorem exists_cols_of_rightInv
+    (p : R) (hp : ¬ IsUnit p)
+    (d d' n : ℕ) (Q : Matrix (Fin d) (Fin d') R) (S : Matrix (Fin d') (Fin d) R)
+    (U Uinv : Matrix (Fin d') (Fin d') R) (J : Finset (Fin d'))
+    (hn : 1 ≤ n) (hQS : ∀ i j, p ^ n ∣ (Q * S - (1 : Matrix (Fin d) (Fin d) R)) i j)
+    (hUU : Uinv * U = 1) (hUU' : U * Uinv = 1) (hJ : ∀ j ∉ J, ∀ i, p ^ n ∣ (Q * U) i j)
+    (hker : ∀ v : Fin d' → R, (∀ i, p ^ n ∣ (Q *ᵥ v) i) → ∀ j ∈ J, p ∣ (Uinv *ᵥ v) j)
+    : ∃ e : Fin d ≃ J,
+      IsUnit (Q * U.submatrix id (fun k => (e k : Fin d')))
+        ∧ ∀ i j,
+          p ^ n
+            ∣ (Q
+                - (Q * U.submatrix id (fun k => (e k : Fin d')))
+                  * Uinv.submatrix (fun k => (e k : Fin d')) id)
+              i j := by
   classical
   set I : Ideal R := Ideal.span {p ^ n} with hI
   set π : R →+* R ⧸ I := Ideal.Quotient.mk I with hπ
@@ -72,14 +83,16 @@ theorem exists_cols_of_rightInv (p : R) (hp : ¬ IsUnit p) (d d' n : ℕ)
     rw [this, Matrix.one_apply, Matrix.one_apply]
     split_ifs <;> simp
   have hoff : ∀ j ∉ J, ∀ i, π (M i j) = 0 := fun j hj i => (hdvd _).1 (hJ j hj i)
-  have hsum : ∀ (i : Fin d) (x : Fin d' → R ⧸ I),
-      ∑ j, π (M i j) * x j = ∑ j : J, π (M i (j : Fin d')) * x j := by
+  have hsum
+      : ∀ (i : Fin d) (x : Fin d' → R ⧸ I),
+        ∑ j, π (M i j) * x j = ∑ j : J, π (M i (j : Fin d')) * x j := by
     intro i x
     have h1 := Finset.sum_coe_sort J (fun j => π (M i j) * x j)
     rw [h1]
     symm
     apply Finset.sum_subset (Finset.subset_univ J)
-    intro j _ hj; rw [hoff j hj i, zero_mul]
+    intro j _ hj
+    rw [hoff j hj i, zero_mul]
 
   set MJ : Matrix (Fin d) J R := M.submatrix id (fun j : J => (j : Fin d')) with hMJ
   set SJ : Matrix J (Fin d) R := S'.submatrix (fun j : J => (j : Fin d')) id with hSJ
@@ -90,19 +103,21 @@ theorem exists_cols_of_rightInv (p : R) (hp : ¬ IsUnit p) (d d' n : ℕ)
       simp only [Matrix.mul_apply, map_sum, map_mul, hMJ, hSJ, Matrix.submatrix_apply, id]
     exact (hsum i (fun j => π (S' j k))).symm
 
-  have hE : ∀ j j0 : J, IsLocalRing.residue R ((SJ * MJ) j j0) = (1 : Matrix J J (IsLocalRing.ResidueField R)) j j0 := by
+  have hE
+      : ∀ j j0 : J,
+        IsLocalRing.residue R ((SJ * MJ) j j0)
+          = (1 : Matrix J J (IsLocalRing.ResidueField R)) j j0 := by
     intro j j0
     set c : Fin d' → R := fun j' => if h : j' ∈ J then (SJ * MJ - (1 : Matrix J J R)) ⟨j', h⟩ j0 else 0 with hc
-    have hUc : Uinv *ᵥ (U *ᵥ c) = c := by
-      rw [Matrix.mulVec_mulVec, hUU, Matrix.one_mulVec]
+    have hUc : Uinv *ᵥ (U *ᵥ c) = c := by rw [Matrix.mulVec_mulVec, hUU, Matrix.one_mulVec]
     have hQc : ∀ i, p ^ n ∣ (Q *ᵥ (U *ᵥ c)) i := by
       intro i
       rw [Matrix.mulVec_mulVec, ← hM, hdvd]
       have hA : (MJ.map π) * ((SJ * MJ - (1 : Matrix J J R)).map π) = 0 := by
-        have h1 : (MJ.map π) * (SJ.map π) = 1 := by
-          ext i k; rw [← Matrix.map_mul]; exact hMJS i k
-        rw [Matrix.map_sub _ (fun a b => map_sub π a b), Matrix.map_mul, Matrix.map_one _ (map_zero π) (map_one π), Matrix.mul_sub,
-          ← Matrix.mul_assoc, h1, Matrix.one_mul, Matrix.mul_one, sub_self]
+        have h1 : (MJ.map π) * (SJ.map π) = 1 := by ext i k; rw [← Matrix.map_mul]; exact hMJS i k
+        rw [Matrix.map_sub _ (fun a b => map_sub π a b), Matrix.map_mul,
+          Matrix.map_one _ (map_zero π) (map_one π), Matrix.mul_sub, ← Matrix.mul_assoc, h1,
+          Matrix.one_mul, Matrix.mul_one, sub_self]
       have h2 := congrFun (congrFun hA i) j0
       rw [Matrix.zero_apply, Matrix.mul_apply] at h2
       rw [← h2]
@@ -132,7 +147,8 @@ theorem exists_cols_of_rightInv (p : R) (hp : ¬ IsUnit p) (d d' n : ℕ)
         rw [Matrix.sub_apply, map_sub, h, Matrix.one_apply, Matrix.one_apply]; split_ifs <;> simp
       have := hres _ h0
       rw [Matrix.sub_apply, map_sub, sub_eq_zero] at this
-      rw [this, Matrix.one_apply, Matrix.one_apply]; split_ifs <;> simp
+      rw [this, Matrix.one_apply, Matrix.one_apply]
+      split_ifs <;> simp
     have hBA : (SJ.map ρ) * (MJ.map ρ) = 1 := by
       ext j j0; rw [← Matrix.map_mul, Matrix.map_apply]; exact hE j j0
     have h1 : d ≤ Fintype.card J := by
@@ -149,8 +165,7 @@ theorem exists_cols_of_rightInv (p : R) (hp : ¬ IsUnit p) (d d' n : ℕ)
   refine ⟨e, ?_, ?_⟩
   · set T := Q * U.submatrix id (fun k => (e k : Fin d')) with hT
     set B := S'.submatrix (fun k => (e k : Fin d')) id with hB
-    have hTe : ∀ i k, T i k = M i (e k) := by
-      intro i k; simp [hT, hM, Matrix.mul_apply]
+    have hTe : ∀ i k, T i k = M i (e k) := by intro i k; simp [hT, hM, Matrix.mul_apply]
     have hTB : ∀ i k, π ((T * B) i k) = (1 : Matrix (Fin d) (Fin d) (R ⧸ I)) i k := by
       intro i k
       rw [← hQS1, ← hMS]
@@ -166,7 +181,8 @@ theorem exists_cols_of_rightInv (p : R) (hp : ¬ IsUnit p) (d d' n : ℕ)
     have h0 : π (T.det * B.det - 1) = 0 := by rw [map_sub, hdet, map_one, sub_self]
     obtain ⟨z, hz⟩ := (hdvd _).2 h0
     rw [Matrix.isUnit_iff_isUnit_det]
-    exact GlobalTheory.CardJ.isUnit_of_mul_eq_one_add_pow p hp hn (y := B.det) (z := z) (by rw [← hz]; ring)
+    exact GlobalTheory.CardJ.isUnit_of_mul_eq_one_add_pow p hp hn (y := B.det) (z := z)
+      (by rw [← hz]; ring)
   · intro i k
     rw [hdvd, Matrix.sub_apply, map_sub, sub_eq_zero]
     have hQ : Q = M * Uinv := by rw [hM, Matrix.mul_assoc, hUU', Matrix.mul_one]
@@ -182,10 +198,25 @@ end GlobalTheory.CardJ
 
 namespace GlobalTheory.CardJ
 
-theorem exists_cols_of_rightInv_WCb : ∀ (l : ℕ) [Fact l.Prime] (d d' n : ℕ) (Q : Matrix (Fin d) (Fin d') (WCb l)) (S : Matrix (Fin d') (Fin d) (WCb l)) (U Uinv : Matrix (Fin d') (Fin d') (WCb l)) (J : Finset (Fin d')), 1 ≤ n → (∀ i j, (l : WCb l) ^ n ∣ (Q * S - (1 : Matrix (Fin d) (Fin d) (WCb l))) i j) → Uinv * U = 1 → U * Uinv = 1 → (∀ j ∉ J, ∀ i, (l : WCb l) ^ n ∣ (Q * U) i j) → (∀ v : Fin d' → WCb l, (∀ i, (l : WCb l) ^ n ∣ (Q *ᵥ v) i) → ∀ j ∈ J, (l : WCb l) ∣ (Uinv *ᵥ v) j) → ∃ e : Fin d ≃ J, IsUnit (Q * U.submatrix id (fun k => (e k : Fin d'))) ∧ ∀ i j, (l : WCb l) ^ n ∣ (Q - (Q * U.submatrix id (fun k => (e k : Fin d'))) * Uinv.submatrix (fun k => (e k : Fin d')) id) i j := by
+theorem exists_cols_of_rightInv_WCb
+    : ∀ (l : ℕ) [Fact l.Prime] (d d' n : ℕ) (Q : Matrix (Fin d) (Fin d') (WCb l))
+        (S : Matrix (Fin d') (Fin d) (WCb l)) (U Uinv : Matrix (Fin d') (Fin d') (WCb l))
+        (J : Finset (Fin d')),
+      1 ≤ n → (∀ i j, (l : WCb l) ^ n ∣ (Q * S - (1 : Matrix (Fin d) (Fin d) (WCb l))) i j)
+        → Uinv * U = 1 → U * Uinv = 1 → (∀ j ∉ J, ∀ i, (l : WCb l) ^ n ∣ (Q * U) i j)
+        → (∀ v : Fin d' → WCb l,
+          (∀ i, (l : WCb l) ^ n ∣ (Q *ᵥ v) i) → ∀ j ∈ J, (l : WCb l) ∣ (Uinv *ᵥ v) j)
+        → ∃ e : Fin d ≃ J,
+          IsUnit (Q * U.submatrix id (fun k => (e k : Fin d')))
+            ∧ ∀ i j,
+              (l : WCb l) ^ n
+                ∣ (Q
+                    - (Q * U.submatrix id (fun k => (e k : Fin d')))
+                      * Uinv.submatrix (fun k => (e k : Fin d')) id)
+                  i j := by
   intro l _ d d' n Q S U Uinv J hn hQS hUU hUU' hJ hker
   haveI : PerfectRing (Cb l) l := GlobalTheory.OEDvr.perfectRing_Cb
-  exact exists_cols_of_rightInv (l : WCb l) (WittVector.irreducible l).not_isUnit d d' n Q S U Uinv J
-    hn hQS hUU hUU' hJ hker
+  exact exists_cols_of_rightInv (l : WCb l) (WittVector.irreducible l).not_isUnit d d' n Q S U Uinv
+    J hn hQS hUU hUU' hJ hker
 
 end GlobalTheory.CardJ

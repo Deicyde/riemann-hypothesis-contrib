@@ -12,17 +12,22 @@ open GlobalTheory.SplitWeil (SB nabs)
 
 namespace GlobalTheory.KSp
 
-theorem inCell_iff_det_ne_zero : ∀ (F : Type) [Field F] [CharZero F] (E : Type) [Field E] [Algebra F E]
-    (c : E →ₐ[F] E) (δ : E) (hE : IsQuad c δ) (ν : Type) [Fintype ν] [DecidableEq ν] (g : UG c (stdJ ν E)),
-    InCell c g ↔ ((mat c g).toBlocks₂₁).det ≠ 0 := by
+theorem inCell_iff_det_ne_zero
+    : ∀ (F : Type) [Field F] [CharZero F] (E : Type) [Field E] [Algebra F E] (c : E →ₐ[F] E) (δ : E)
+        (hE : IsQuad c δ) (ν : Type) [Fintype ν] [DecidableEq ν] (g : UG c (stdJ ν E)),
+      InCell c g ↔ ((mat c g).toBlocks₂₁).det ≠ 0 := by
   intro F _ _ E _ _ c δ hE ν _ _ g
   constructor
   · rintro ⟨p, hp, q, hq, rfl⟩
     have hdet : ∀ x : UG c (stdJ ν E), (mat c x).det ≠ 0 := fun x =>
       ((Matrix.isUnit_iff_isUnit_det _).1 (Units.isUnit (x : GL (ν ⊕ ν) E))).ne_zero
-    have hp0 : mat c p = fromBlocks (mat c p).toBlocks₁₁ (mat c p).toBlocks₁₂ 0 (mat c p).toBlocks₂₂ := by
+    have hp0
+        : mat c p
+          = fromBlocks (mat c p).toBlocks₁₁ (mat c p).toBlocks₁₂ 0 (mat c p).toBlocks₂₂ := by
       rw [← (mem_sieg c).1 hp, fromBlocks_toBlocks]
-    have hq0 : mat c q = fromBlocks (mat c q).toBlocks₁₁ (mat c q).toBlocks₁₂ 0 (mat c q).toBlocks₂₂ := by
+    have hq0
+        : mat c q
+          = fromBlocks (mat c q).toBlocks₁₁ (mat c q).toBlocks₁₂ 0 (mat c q).toBlocks₂₂ := by
       rw [← (mem_sieg c).1 hq, fromBlocks_toBlocks]
     have hpd := hdet p
     have hqd := hdet q
@@ -45,7 +50,9 @@ theorem inCell_iff_det_ne_zero : ∀ (F : Type) [Field F] [CharZero F] (E : Type
     have hkey : C * (D.map c)ᵀ = D * (C.map c)ᵀ := by
       have h := congrArg Matrix.toBlocks₂₂ hrel
       rw [hg0] at h
-      simp only [stdJ, fromBlocks_map, fromBlocks_transpose, fromBlocks_multiply, toBlocks_fromBlocks₂₂] at h
+      simp only [stdJ, fromBlocks_map, fromBlocks_transpose, fromBlocks_multiply,
+          toBlocks_fromBlocks₂₂]
+        at h
       simp at h
       exact (neg_add_eq_zero.1 h).symm
     have hCu : IsUnit C := (Matrix.isUnit_iff_isUnit_det C).2 (isUnit_iff_ne_zero.2 hC)
@@ -58,8 +65,8 @@ theorem inCell_iff_det_ne_zero : ∀ (F : Type) [Field F] [CharZero F] (E : Type
       apply hCu.mul_left_cancel
       apply hCs.mul_right_cancel
       have e1 : ((v.map c)ᵀ) * (C.map c)ᵀ = (D.map c)ᵀ := by
-        rw [hv, Matrix.map_mul, transpose_mul, Matrix.mul_assoc, ← transpose_mul, ← Matrix.map_mul, hCC,
-          Matrix.map_one _ (map_zero c) (map_one c), transpose_one, Matrix.mul_one]
+        rw [hv, Matrix.map_mul, transpose_mul, Matrix.mul_assoc, ← transpose_mul, ← Matrix.map_mul,
+          hCC, Matrix.map_one _ (map_zero c) (map_one c), transpose_one, Matrix.mul_one]
       rw [Matrix.mul_assoc, e1, hkey, hv, ← Matrix.mul_assoc, hCC, Matrix.one_mul]
     let q := unip c v hvh
     have hq : q ∈ sieg c ν := by
@@ -67,7 +74,7 @@ theorem inCell_iff_det_ne_zero : ∀ (F : Type) [Field F] [CharZero F] (E : Type
       rw [toBlocks_fromBlocks₂₁]
     refine ⟨g * q⁻¹ * (weyl c ν)⁻¹, ?_, q, hq, by group⟩
     rw [mem_sieg]
-    change (mat c g * fromBlocks 1 (-v) 0 1 * -stdJ ν E).toBlocks₂₁ = 0
+    change (mat c g * fromBlocks 1 (-v) 0 1 * - stdJ ν E).toBlocks₂₁ = 0
     rw [hg0]
     simp only [stdJ, fromBlocks_neg, fromBlocks_multiply, toBlocks_fromBlocks₂₁]
     simp

@@ -17,27 +17,40 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AlphaDivBeta
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links
 open IsDedekindDomain NumberField MeasureTheory Matrix
 open Classical
 open scoped TensorProduct ComplexConjugate GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
-open GlobalTheory.FunObj GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheory.SplitWeil GlobalTheory.StdFrames Formalism.L2.DIV
-open GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation (spV spW spW₁ spV₁ alpha beta Num skewGram blk conjU)
-open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels (Base Spc Model HasExp SplitsFully Chars)
+open GlobalTheory.FunObj GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheory.SplitWeil
+  GlobalTheory.StdFrames Formalism.L2.DIV
+open GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation
+  (spV spW spW₁ spV₁ alpha beta Num skewGram blk conjU)
+open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  (Base Spc Model HasExp SplitsFully Chars)
 
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 
 noncomputable section
 
 namespace GlobalTheory.FunObj
 
-theorem squareChars_isGood : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {μ₀ : T} (_hL : L.Is μ₀) (t : T)
-    (i j : Fin D.R.m), SquareStanding G t → ∃ S₀ Q : Finset (HeightOneSpectrum (𝓞 D.host.F)),
-      (∀ v ∈ S₀ ∪ Q, (∃ w ∈ locPl G t, w.under (𝓞 D.host.F) = v) ∧
-        Nonempty (D.host.E →ₐ[D.host.F] Fv D.host.F v)) ∧
-      ∀ B : Base D.host.F D.host.E, S₀ ∪ Q ⊆ B.P → B.v₁ ∉ S₀ ∪ Q → SplitsFully D.host.E B.v₁ →
-        HasExp B.emb (alpha G t i j) B.mα → HasExp B.emb (beta G i j) B.mβ →
-        Chars.IsGood B ⟨alpha G t i j, beta G i j, S₀, Q⟩ (spW G i j).rank (spW₁ G i j).rank := by
+theorem squareChars_isGood
+    : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {μ₀ : T}
+        (_hL : L.Is μ₀) (t : T) (i j : Fin D.R.m),
+      SquareStanding G t
+        → ∃ S₀ Q : Finset (HeightOneSpectrum (𝓞 D.host.F)),
+          (∀ v ∈ S₀ ∪ Q,
+              (∃ w ∈ locPl G t, w.under (𝓞 D.host.F) = v)
+                ∧ Nonempty (D.host.E →ₐ[D.host.F] Fv D.host.F v))
+            ∧ ∀ B : Base D.host.F D.host.E,
+              S₀ ∪ Q ⊆ B.P → B.v₁ ∉ S₀ ∪ Q → SplitsFully D.host.E B.v₁
+                → HasExp B.emb (alpha G t i j) B.mα → HasExp B.emb (beta G i j) B.mβ
+                → Chars.IsGood B ⟨alpha G t i j, beta G i j, S₀, Q⟩ (spW G i j).rank
+                  (spW₁ G i j).rank := by
   intro D T L sc G μ₀ hL t i j _hst
   refine ⟨G.pl.S0, (L.Q t).image (fun P => P.under (𝓞 D.host.F)) \ G.pl.S0, ?_, ?_⟩
   · intro v hv
@@ -51,7 +64,20 @@ theorem squareChars_isGood : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Const
   · intro B hsub hv₁ hsp hα hβ
     have h2 : Module.finrank D.host.F D.host.E = 2 := D.sp.cm.deg2
     obtain ⟨rα, rβ⟩ := GlobalTheory.T.thetaGrid_alpha_beta_restrict_quadratic_pow_rank hL t i j
-    refine ⟨?_, ?_, GlobalTheory.T.restrictsToQuadraticSignPow_of_restrictsToQuadraticCharPow _ _ h2 _ _ rα, GlobalTheory.T.restrictsToQuadraticSignPow_of_restrictsToQuadraticCharPow _ _ h2 _ _ rβ, hα, hβ, ?_, hsub, ?_, ?_, ?_, ⟨hv₁, hsp⟩⟩
+    refine ⟨
+      ?_,
+      ?_,
+      GlobalTheory.T.restrictsToQuadraticSignPow_of_restrictsToQuadraticCharPow _ _ h2 _ _ rα,
+      GlobalTheory.T.restrictsToQuadraticSignPow_of_restrictsToQuadraticCharPow _ _ h2 _ _ rβ,
+      hα,
+      hβ,
+      ?_,
+      hsub,
+      ?_,
+      ?_,
+      ?_,
+      ⟨hv₁, hsp⟩
+    ⟩
     · have hm := (hL.mu0 j).1
       have hx := (hL.xi t).1
       have he := hL.eta.1
@@ -81,14 +107,23 @@ theorem squareChars_isGood : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Const
         obtain ⟨P, hP, e⟩ := Finset.mem_image.1 h1
         exact GlobalTheory.T.alpha_div_beta_ramified_at_level hL t i j w P hP e h2
     · intro w hw
-      have hw' : w.under (𝓞 D.host.F) ∉ G.pl.S0 ∪ ((L.Q t).image (fun P => P.under (𝓞 D.host.F)) \ G.pl.S0) := hw
-      refine GlobalTheory.T.alpha_unramified_outside hL t i j w (fun h => hw' (Finset.mem_union_left _ h)) fun P hP e => hw' ?_
+      have hw'
+          : w.under (𝓞 D.host.F)
+            ∉ G.pl.S0 ∪ ((L.Q t).image (fun P => P.under (𝓞 D.host.F)) \ G.pl.S0) :=
+        hw
+      refine GlobalTheory.T.alpha_unramified_outside hL t i j w
+        (fun h => hw' (Finset.mem_union_left _ h))
+        fun P hP e => hw' ?_
       by_cases h : w.under (𝓞 D.host.F) ∈ G.pl.S0
       · exact Finset.mem_union_left _ h
       · exact Finset.mem_union_right _ (Finset.mem_sdiff.2 ⟨Finset.mem_image.2 ⟨P, hP, e⟩, h⟩)
     · intro w hw
-      have hw' : w.under (𝓞 D.host.F) ∉ G.pl.S0 ∪ ((L.Q t).image (fun P => P.under (𝓞 D.host.F)) \ G.pl.S0) := hw
-      exact GlobalTheory.T.beta_unramified_outside hL i j w (fun h => hw' (Finset.mem_union_left _ h))
+      have hw'
+          : w.under (𝓞 D.host.F)
+            ∉ G.pl.S0 ∪ ((L.Q t).image (fun P => P.under (𝓞 D.host.F)) \ G.pl.S0) :=
+        hw
+      exact GlobalTheory.T.beta_unramified_outside hL i j w
+        (fun h => hw' (Finset.mem_union_left _ h))
 
 end GlobalTheory.FunObj
 

@@ -15,13 +15,16 @@ set_option synthInstance.maxHeartbeats 200000
 
 section
 noncomputable section
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst
+  GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+  UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published
 open UpperTheory.Zero.LLC UpperTheory.V.Z.Win
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 namespace UpperTheory.Gal.SV
-theorem exRS_alt :
-    _root_.UpperTheory.V.Af.Hypotheses' → ExRS := by
+theorem exRS_alt : _root_.UpperTheory.V.Af.Hypotheses' → ExRS := by
   intro P F Ω _ _ _ _ _ _ l _ ι n _ hn π χ hreg hpol
   obtain ⟨r, wt, HT, H⟩ := _root_.UpperTheory.Gal.SV.gr2S' P.galR F Ω l ι n hn π χ hreg hpol
   have key := H.frob
@@ -35,7 +38,8 @@ theorem exRS_alt :
       let ⟨⟨σ, hσ⟩, hiso⟩ := _root_.UpperTheory.V.Af.local_comp_real_of_printed_results P F n π w
       ⟨σ, hiso σ hσ⟩, eventually_not_mem F l] with w ⟨B, hB⟩ hw
     exact ⟨B, hB, key w hw B hB⟩
-  · refine _root_.UpperTheory.V.Af.iso_of_frobenius_of_printed_results P F Ω l ι n r r' H.cont hr' H.ss ha.1 ?_
+  · refine _root_.UpperTheory.V.Af.iso_of_frobenius_of_printed_results P F Ω l ι n r r' H.cont hr'
+      H.ss ha.1 ?_
     filter_upwards [ha.2, eventually_not_mem F l] with w ⟨B, hB, hf⟩ hw
     exact ⟨_, key w hw B hB, hf⟩
 end UpperTheory.Gal.SV

@@ -5,16 +5,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc UpperTheory.V.Published UpperTheory.V.Af.Sol
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep
+  GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc
+  UpperTheory.V.Published UpperTheory.V.Af.Sol
 
-private noncomputable def linRep {Γ k : Type} [Group Γ] [Field k] {n : ℕ} (r : Γ →* GL (Fin n) k) :
-    Representation k Γ (Fin n → k) where
+private noncomputable def linRep {Γ k : Type} [Group Γ] [Field k] {n : ℕ} (r : Γ →* GL (Fin n) k)
+    : Representation k Γ (Fin n → k) where
   toFun g := Matrix.toLin' (r g : Matrix (Fin n) (Fin n) k)
   map_one' := by simp [Module.End.one_eq_id]
   map_mul' g h := by simp [Matrix.toLin'_mul, Module.End.mul_eq_comp]
 
-private theorem isIrr_iff {Γ k : Type} [Group Γ] [Field k] {n : ℕ} (r : Γ →* GL (Fin n) k) :
-    IsIrr r ↔ (linRep r).IsIrreducible := by
+private theorem isIrr_iff {Γ k : Type} [Group Γ] [Field k] {n : ℕ} (r : Γ →* GL (Fin n) k)
+    : IsIrr r ↔ (linRep r).IsIrreducible := by
   constructor
   · rintro ⟨h0, -, h⟩
     haveI : Nontrivial (Subrepresentation (linRep r)) := ⟨⊤, ⊥, fun h' =>
@@ -25,20 +28,25 @@ private theorem isIrr_iff {Γ k : Type} [Group Γ] [Field k] {n : ℕ} (r : Γ �
     · right; exact Subrepresentation.toSubmodule_injective h1
   · intro h
     refine ⟨fun h0 => ?_, fun _ _ _ => Submodule.mem_top, fun W _ hW => ?_⟩
-    · exact bot_ne_top (α := Subrepresentation (linRep r)) (Subrepresentation.toSubmodule_injective h0.symm)
-    · rcases h.eq_bot_or_eq_top (⟨W, fun g v hv => hW g v hv⟩ : Subrepresentation (linRep r)) with h1 | h1
+    · exact bot_ne_top (α := Subrepresentation (linRep r))
+        (Subrepresentation.toSubmodule_injective h0.symm)
+    · rcases h.eq_bot_or_eq_top (⟨W, fun g v hv => hW g v hv⟩ : Subrepresentation (linRep r)) with
+        h1 | h1
       · left; exact congrArg Subrepresentation.toSubmodule h1
       · right; exact congrArg Subrepresentation.toSubmodule h1
 
-private theorem isIrr_comp_of_range {Γ Γ' k : Type} [Group Γ] [Group Γ'] [Field k] {n : ℕ} (r : Γ →* GL (Fin n) k)
-    (φ : Γ' →* Γ) (h : IsIrr (r.comp φ.range.subtype)) : IsIrr (r.comp φ) := by
+private theorem isIrr_comp_of_range
+    {Γ Γ' k : Type} [Group Γ] [Group Γ'] [Field k]
+    {n : ℕ} (r : Γ →* GL (Fin n) k)
+    (φ : Γ' →* Γ) (h : IsIrr (r.comp φ.range.subtype))
+    : IsIrr (r.comp φ) := by
   obtain ⟨h0, -, h⟩ := h
   refine ⟨h0, fun _ _ _ => Submodule.mem_top, fun W hle hW => h W hle ?_⟩
   rintro ⟨_, g, rfl⟩ v hv
   exact hW g v hv
 
-theorem UpperTheory.galois_representation_irreducible_prime_dimension :
-    UpperTheory.V.Af.Sol.IrrPrime := by
+theorem UpperTheory.galois_representation_irreducible_prime_dimension
+    : UpperTheory.V.Af.Sol.IrrPrime := by
   intro Γ Γ' k _ _ _ _ _ n r φ hN hp hn hr
   apply isIrr_comp_of_range
   rw [isIrr_iff]
@@ -53,21 +61,24 @@ theorem UpperTheory.galois_representation_irreducible_prime_dimension :
     rw [← QuotientGroup.mk'_apply, map_commutatorElement, commutatorElement_eq_one_iff_mul_comm]
     letI := IsCyclic.commGroup (α := Γ ⧸ φ.range)
     exact mul_comm _ _
-  obtain ⟨η, hη, hker, e, he⟩ := UpperTheory.V.AlgebraTools.twistOfRed k Γ (Fin n → k) (linRep r) φ.range
-    (Nat.cast_ne_zero.mpr hp.ne_zero) hcomm ((isIrr_iff r).mp hr) hred
+  obtain ⟨η, hη, hker, e, he⟩ :=
+    UpperTheory.V.AlgebraTools.twistOfRed k Γ (Fin n → k) (linRep r) φ.range
+      (Nat.cast_ne_zero.mpr hp.ne_zero) hcomm ((isIrr_iff r).mp hr) hred
   have hn0 : n ≠ 0 := by
     rintro rfl
     exact hr.1 (Subsingleton.elim _ _)
   apply hη
   ext g
-  have h1 : η g ^ φ.range.index = 1 := by
-    rw [← map_pow]; exact hker (Subgroup.pow_index_mem _ g)
+  have h1 : η g ^ φ.range.index = 1 := by rw [← map_pow]; exact hker (Subgroup.pow_index_mem _ g)
   have h2 : η g ^ n = 1 := by
-    have hl : linRep r g ∘ₗ (e : (Fin n → k) →ₗ[k] (Fin n → k)) =
-        (η g : k) • ((e : (Fin n → k) →ₗ[k] (Fin n → k)) ∘ₗ linRep r g) := LinearMap.ext fun v => he g v
+    have hl
+        : linRep r g ∘ₗ (e : (Fin n → k) →ₗ[k] (Fin n → k))
+          = (η g : k) • ((e : (Fin n → k) →ₗ[k] (Fin n → k)) ∘ₗ linRep r g) :=
+      LinearMap.ext fun v => he g v
     have hd := congrArg LinearMap.det hl
     rw [LinearMap.det_smul, LinearMap.det_comp, LinearMap.det_comp, Module.finrank_fin_fun] at hd
-    have hu : IsUnit (LinearMap.det (linRep r g)) := ((Group.isUnit g).map (linRep r)).map LinearMap.det
+    have hu : IsUnit (LinearMap.det (linRep r g)) :=
+      ((Group.isUnit g).map (linRep r)).map LinearMap.det
     have hue : IsUnit (LinearMap.det (e : (Fin n → k) →ₗ[k] (Fin n → k))) := e.isUnit_det'
     have hne := mul_ne_zero hue.ne_zero hu.ne_zero
     apply Units.ext

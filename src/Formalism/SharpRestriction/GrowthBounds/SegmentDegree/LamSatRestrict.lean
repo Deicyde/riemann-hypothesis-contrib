@@ -11,10 +11,13 @@ open MvPolynomial
 
 namespace Formalism.MainNotions.SelectionLemmas.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas Formalism.MainNotions.G.Joints.StandardMonomialSpace
+open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas
+  Formalism.MainNotions.G.Joints.StandardMonomialSpace
 
-theorem lam_sat_restrict {O σ : Type} [CommRing O] [IsDomain O] (s : Set (σ →₀ ℕ)) (f : MvPolynomial σ O) (a : O)
-    (ha : a ≠ 0) (h : a • f ∈ restrictSupport O s) : f ∈ restrictSupport O s := by
+theorem lam_sat_restrict
+    {O σ : Type} [CommRing O] [IsDomain O]
+    (s : Set (σ →₀ ℕ)) (f : MvPolynomial σ O) (a : O) (ha : a ≠ 0) (h : a • f ∈ restrictSupport O s)
+    : f ∈ restrictSupport O s := by
   rw [MvPolynomial.mem_restrictSupport_iff] at h ⊢
   intro m hm
   apply h
@@ -23,17 +26,20 @@ theorem lam_sat_restrict {O σ : Type} [CommRing O] [IsDomain O] (s : Set (σ �
   rw [coeff_smul, smul_eq_mul]
   exact mul_ne_zero ha hm'
 
-theorem lam_dvd_of_res {O σ : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {ϖ : O}
-    (hϖ : Irreducible ϖ) (P : MvPolynomial σ O) (h : MvPolynomial.map (IsLocalRing.residue O) P = 0) :
-    ∃ z : MvPolynomial σ O, P = ϖ • z := by
+theorem lam_dvd_of_res
+    {O σ : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    (P : MvPolynomial σ O) (h : MvPolynomial.map (IsLocalRing.residue O) P = 0)
+    : ∃ z : MvPolynomial σ O, P = ϖ • z := by
   have hd : C ϖ ∣ P := by
     rw [MvPolynomial.C_dvd_iff_dvd_coeff]
     intro m
     have h1 : IsLocalRing.residue O (AddMonoidAlgebra.coeff P m) = 0 := by
       rw [← MvPolynomial.coeff_map, h]
       simp
-    rw [IsLocalRing.residue_eq_zero_iff, (IsDiscreteValuationRing.irreducible_iff_uniformizer ϖ).mp hϖ,
-      Ideal.mem_span_singleton] at h1
+    rw [IsLocalRing.residue_eq_zero_iff,
+        (IsDiscreteValuationRing.irreducible_iff_uniformizer ϖ).mp hϖ, Ideal.mem_span_singleton]
+      at h1
     exact h1
   obtain ⟨z, hz⟩ := hd
   exact ⟨z, by rw [hz, smul_eq_C_mul]⟩
@@ -44,9 +50,13 @@ theorem restLamA_of (D : Formalism.BasicNotions.D7) (hAdm : AdmB D) : RestLamA :
   have : Fact p.Prime := ⟨hX.prime⟩
   have hNK : segN X.F j + r ≤ K := le_trans (Nat.add_le_add_right (hX.card j) r) hX.NsK
   have h12 : NestedTypeBound D := hAdm.2.2.2.2.2.2.2.2.2.2.2.1
-  have hsatX := (h12 p O Sd n' r K X.F X.L₁ X.N₁ j (fun _ => (X.m0 K : ℤ)) (X.thc p K j b) (X.oc p K j) hX.valid hNK
-    (fun _ => by positivity)).2.2.1
-  have hsat : ∀ (f : SegRing O r K) (a : O), a ≠ 0 → a • f ∈ X.Mj p K O j b → f ∈ X.Mj p K O j b := by
+  have hsatX :=
+    (h12 p O Sd n' r K X.F X.L₁ X.N₁ j
+      (fun _ => (X.m0 K : ℤ))
+      (X.thc p K j b) (X.oc p K j) hX.valid hNK
+      (fun _ => by positivity)).2.2.1
+  have hsat
+      : ∀ (f : SegRing O r K) (a : O), a ≠ 0 → a • f ∈ X.Mj p K O j b → f ∈ X.Mj p K O j b := by
     intro f a ha h
     obtain ⟨⟨h1, h2⟩, h3⟩ := h
     exact ⟨⟨hsatX f a ha h1, lam_sat_restrict _ f a ha h2⟩, lam_sat_restrict _ f a ha h3⟩

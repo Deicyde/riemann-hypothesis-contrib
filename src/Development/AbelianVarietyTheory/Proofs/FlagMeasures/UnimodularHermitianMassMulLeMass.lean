@@ -133,11 +133,32 @@ lemma cmp_base (v : ℝ) (hv : 1 ≤ v) (i t : ℕ) (ht : 1 ≤ t) :
         gcongr
     _ = _ := by rw [mul_pow, pow_add]; ring
 
-theorem mass_mul_mass_le : Formalism.HermitianLatticesTheory.SiegelMassRatio → ∀ (K : Type) [Field K] [NumberField K] [StarRing K], Formalism.HermitianLatticesTheory.IsCMUnram K → 1 ≤ Formalism.HermitianLatticesTheory.vInv K → ∀ (k s : ℕ) (Mb : ℝ) (ms : ℕ → ℝ), 3 ≤ k → 1 ≤ s → s < k → (∀ (n : ℕ) (W : Type) [AddCommGroup W] [Module K W] [Module (𝓞 K) W] [IsScalarTower (𝓞 K) K W] (h : W →ₗ⋆[K] W →ₗ[K] K) (I : Submodule (𝓞 K) W), h.IsSymm → Formalism.HermitianLatticesTheory.IsOrthoLattice h I n → Formalism.HermitianLatticesTheory.mass h I = ms n) → ms 1 ≤ Mb → ms 2 ≤ Mb → 1 ≤ Mb → ms s * ms (k - s) ≤ ms k * (Mb * (2 * Formalism.HermitianLatticesTheory.vInv K) ^ (Formalism.HermitianLatticesTheory.fDeg K) * 16 ^ (s * k * (Formalism.HermitianLatticesTheory.fDeg K))) := by
+theorem mass_mul_mass_le
+    : Formalism.HermitianLatticesTheory.SiegelMassRatio
+      → ∀ (K : Type) [Field K] [NumberField K] [StarRing K],
+        Formalism.HermitianLatticesTheory.IsCMUnram K → 1 ≤ Formalism.HermitianLatticesTheory.vInv K
+          → ∀ (k s : ℕ) (Mb : ℝ) (ms : ℕ → ℝ),
+            3 ≤ k → 1 ≤ s → s < k
+              → (∀ (n : ℕ) (W : Type) [AddCommGroup W] [Module K W] [Module (𝓞 K) W]
+                  [IsScalarTower (𝓞 K) K W] (h : W →ₗ⋆[K] W →ₗ[K] K) (I : Submodule (𝓞 K) W),
+                h.IsSymm → Formalism.HermitianLatticesTheory.IsOrthoLattice h I n
+                  → Formalism.HermitianLatticesTheory.mass h I = ms n)
+              → ms 1 ≤ Mb → ms 2 ≤ Mb → 1 ≤ Mb
+              → ms s * ms (k - s)
+                ≤ ms k
+                  * (Mb
+                    * (2 * Formalism.HermitianLatticesTheory.vInv K)
+                      ^ (Formalism.HermitianLatticesTheory.fDeg K)
+                    * 16 ^ (s * k * (Formalism.HermitianLatticesTheory.fDeg K))) := by
   intro hS K _ _ _ hCM hv k s Mb ms hk hs hsk hms h1 h2 _
-  have hstd : ∀ n, Formalism.HermitianLatticesTheory.mass (Formalism.HermitianLatticesTheory.massTelescope_form K n)
-      (Formalism.HermitianLatticesTheory.massTelescope_lat K n) = ms n := fun n =>
-    hms n _ _ _ (Formalism.HermitianLatticesTheory.massTelescope_symm K n) (Formalism.HermitianLatticesTheory.massTelescope_ortho K n)
+  have hstd
+      : ∀ n,
+        Formalism.HermitianLatticesTheory.mass
+            (Formalism.HermitianLatticesTheory.massTelescope_form K n)
+            (Formalism.HermitianLatticesTheory.massTelescope_lat K n)
+          = ms n := fun n =>
+    hms n _ _ _ (Formalism.HermitianLatticesTheory.massTelescope_symm K n)
+      (Formalism.HermitianLatticesTheory.massTelescope_ortho K n)
   have hL := GlobalTheory.T.lValEta_mem_Icc_two_pow_fDeg K hCM
   set v := Formalism.HermitianLatticesTheory.vInv K with hvdef
   set f := Formalism.HermitianLatticesTheory.fDeg K with hfdef
@@ -147,12 +168,14 @@ theorem mass_mul_mass_le : Formalism.HermitianLatticesTheory.SiegelMassRatio →
     Real.mul_self_sqrt (by linarith)
   have hv0 : 0 < v := by linarith
   have hp := Real.pi_pos
-  have key := core ms (Formalism.HermitianLatticesTheory.massRatioRightSide K) (Real.sqrt ((2 * v) ^ f)) (16 ^ f) Mb hD
-    (one_le_pow₀ (by norm_num))
-    (fun n => hstd n ▸ Formalism.HermitianLatticesTheory.massTelescope_std_pos K hCM n)
-    (fun n hn => by
-      rw [← hstd, ← hstd]; exact Formalism.HermitianLatticesTheory.massTelescope_step K hS hCM n hn)
-    ?_ ?_ h1 h2 k s hk hs hsk
+  have key :=
+    core ms (Formalism.HermitianLatticesTheory.massRatioRightSide K) (Real.sqrt ((2 * v) ^ f))
+      (16 ^ f) Mb hD (one_le_pow₀ (by norm_num))
+      (fun n => hstd n ▸ Formalism.HermitianLatticesTheory.massTelescope_std_pos K hCM n)
+      (fun n hn => by
+        rw [← hstd, ← hstd]
+        exact Formalism.HermitianLatticesTheory.massTelescope_step K hS hCM n hn)
+      ?_ ?_ h1 h2 k s hk hs hsk
   · rw [hDD, ← pow_mul, mul_comm f] at key
     exact key
   · intro i hi
@@ -163,13 +186,15 @@ theorem mass_mul_mass_le : Formalism.HermitianLatticesTheory.SiegelMassRatio →
     set D := Real.sqrt ((2 * v) ^ f)
     have hD0 : 0 < D := by linarith
     set A := ((Nat.factorial (i - 1) : ℕ) : ℝ) * (v / Real.pi) ^ i
-    have e : A ^ f / D * Formalism.HermitianLatticesTheory.lValEta K i * D * (16 ^ f) ^ i
-        = (A * 16 ^ i) ^ f * Formalism.HermitianLatticesTheory.lValEta K i := by
+    have e
+        : A ^ f / D * Formalism.HermitianLatticesTheory.lValEta K i * D * (16 ^ f) ^ i
+          = (A * 16 ^ i) ^ f * Formalism.HermitianLatticesTheory.lValEta K i := by
       rw [mul_pow A, ← pow_mul, ← pow_mul, mul_comm f i]; field_simp
     rw [e]
-    calc (1 : ℝ) = 2 ^ f * (2 ^ f)⁻¹ := by field_simp
-      _ ≤ _ := by
-        refine mul_le_mul a b (by positivity) (le_trans (by positivity) a)
+    calc
+      (1 : ℝ)
+        = 2 ^ f * (2 ^ f)⁻¹ := by field_simp
+      _ ≤ _ := by refine mul_le_mul a b (by positivity) (le_trans (by positivity) a)
   · intro i t hi ht
     have a := pow_le_pow_left₀ (by positivity) (cmp_base v hv i t ht) f
     have b := (hL i (by omega)).2
@@ -183,7 +208,9 @@ theorem mass_mul_mass_le : Formalism.HermitianLatticesTheory.SiegelMassRatio →
     set A := ((Nat.factorial (i - 1) : ℕ) : ℝ) * (v / Real.pi) ^ i
     set A' := ((Nat.factorial (i + t - 1) : ℕ) : ℝ) * (v / Real.pi) ^ (i + t)
     have e4 : (4 : ℝ) ^ f = 2 ^ f * 2 ^ f := by rw [← mul_pow]; norm_num
-    calc A ^ f / D * Formalism.HermitianLatticesTheory.lValEta K i ≤ A ^ f / D * 2 ^ f := by gcongr
+    calc
+      A ^ f / D * Formalism.HermitianLatticesTheory.lValEta K i
+        ≤ A ^ f / D * 2 ^ f := by gcongr
       _ = (A * 4) ^ f / D * (2 ^ f)⁻¹ := by rw [mul_pow A, e4]; field_simp
       _ ≤ (A' * 16 ^ t) ^ f / D * Formalism.HermitianLatticesTheory.lValEta K (i + t) := by gcongr
       _ = _ := by rw [mul_pow A', ← pow_mul, ← pow_mul, mul_comm f t]; ring

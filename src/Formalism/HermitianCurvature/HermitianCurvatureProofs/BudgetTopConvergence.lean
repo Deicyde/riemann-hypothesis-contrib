@@ -5,7 +5,8 @@ public import Formalism.HermitianCurvature.StatementU
 @[expose] public section
 
 open Matrix MeasureTheory
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.U Formalism.REAL Formalism.QuantumDeterminants
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.U Formalism.REAL
+  Formalism.QuantumDeterminants
 
 noncomputable section
 
@@ -18,9 +19,7 @@ theorem decayMin : DecayMin := by
   · rw [Real.rpow_neg (by linarith), Real.rpow_neg hx.le]
     have h1 : 0 < x ^ A := Real.rpow_pos_of_pos hx A
     have h2 : x ^ A ≤ (1 + x) ^ A := Real.rpow_le_rpow hx.le (by linarith) hA
-    first
-      | exact inv_anti₀ h1 h2
-      | exact inv_le_inv_of_le h1 h2
+    first | exact inv_anti₀ h1 h2 | exact inv_le_inv_of_le h1 h2
 
 theorem scaleMatch : ScaleMatch := by
   have e1 : ∀ x : ℂ, (cStd * (starRingEnd ℂ) x).re = (betaU * x).re := by
@@ -57,31 +56,36 @@ theorem budget_second_corollary_holds : DerivativeBudgetCount := by
   have p1 := mul_le_mul_of_nonneg_left hXR (show (0 : ℝ) ≤ 2 * ((r : ℝ) + 1) by linarith)
   have p2 := mul_le_mul_of_nonneg_left hmR (show (0 : ℝ) ≤ 5 * (r : ℝ) by linarith)
   have p3 := mul_le_mul_of_nonneg_left hmmR (show (0 : ℝ) ≤ 2 * (r : ℝ) by linarith)
-  have h2 : A₀ - (As : ℝ) - 6 * ((r : ℝ) + 1) * (As : ℝ) ≤
-      A₀ - (κjo : ℝ) - 2 * ((r : ℝ) + 1) * ((((m + 1 + mmB) + o : ℕ)) : ℝ) := by nlinarith
-  have h3' : A₀ - (13 * (r : ℝ) + 7) * (As : ℝ) ≤
-      A₀ - (κjo : ℝ) - 2 * ((r : ℝ) + 1) * ((((m + 1 + mmB) + o : ℕ)) : ℝ) - 5 * r * ((m : ℝ) + 1) -
-        2 * r * mmB := by nlinarith
+  have h2
+      : A₀ - (As : ℝ) - 6 * ((r : ℝ) + 1) * (As : ℝ)
+        ≤ A₀ - (κjo : ℝ) - 2 * ((r : ℝ) + 1) * ((((m + 1 + mmB) + o : ℕ)) : ℝ) := by
+    nlinarith
+  have h3'
+      : A₀ - (13 * (r : ℝ) + 7) * (As : ℝ)
+        ≤ A₀ - (κjo : ℝ) - 2 * ((r : ℝ) + 1) * ((((m + 1 + mmB) + o : ℕ)) : ℝ)
+          - 5 * r * ((m : ℝ) + 1) - 2 * r * mmB := by
+    nlinarith
   have hden : (0 : ℝ) < 8 * (2 * (r : ℝ) + 1) := by linarith
-  have ha1 : 8 * (2 * (r : ℝ) + 1) *
-      a1 r (A₀ - (κjo : ℝ) - 2 * ((r : ℝ) + 1) * ((((m + 1 + mmB) + o : ℕ)) : ℝ)) m mmB =
-      A₀ - (κjo : ℝ) - 2 * ((r : ℝ) + 1) * ((((m + 1 + mmB) + o : ℕ)) : ℝ) - 5 * r * ((m : ℝ) + 1) -
-        2 * r * mmB := by
+  have ha1
+      : 8 * (2 * (r : ℝ) + 1)
+          * a1 r (A₀ - (κjo : ℝ) - 2 * ((r : ℝ) + 1) * ((((m + 1 + mmB) + o : ℕ)) : ℝ)) m mmB
+        = A₀ - (κjo : ℝ) - 2 * ((r : ℝ) + 1) * ((((m + 1 + mmB) + o : ℕ)) : ℝ)
+          - 5 * r * ((m : ℝ) + 1) - 2 * r * mmB := by
     unfold a1
     field_simp
   have hrA : (0 : ℝ) ≤ r * As := mul_nonneg hr0 hAs0
   refine ⟨h2, by rw [ha1]; exact h3', by nlinarith, ?_⟩
   apply le_of_mul_le_mul_left _ hden
   rw [ha1]
-  have hQ : 0 ≤ (Cc - 20) * (((r : ℝ) + 1) ^ 3 * As) :=
-    mul_nonneg (by linarith) (by positivity)
+  have hQ : 0 ≤ (Cc - 20) * (((r : ℝ) + 1) ^ 3 * As) := mul_nonneg (by linarith) (by positivity)
   have h4 : 1 + 4 * (r : ℝ) ≤ ((r : ℝ) + 1) ^ 4 := by
     nlinarith [pow_nonneg hr0 2, pow_nonneg hr0 3, pow_nonneg hr0 4]
   have h5 := mul_le_mul_of_nonneg_right h4 hAs0
-  calc 8 * (2 * (r : ℝ) + 1) * ((Cc - 20) / 16 * ((r : ℝ) + 1) ^ 3 * (As : ℝ))
+  calc
+    8 * (2 * (r : ℝ) + 1) * ((Cc - 20) / 16 * ((r : ℝ) + 1) ^ 3 * (As : ℝ))
       = (2 * (r : ℝ) + 1) / 2 * ((Cc - 20) * (((r : ℝ) + 1) ^ 3 * As)) := by ring
     _ ≤ ((r : ℝ) + 1) * ((Cc - 20) * (((r : ℝ) + 1) ^ 3 * As)) :=
-        mul_le_mul_of_nonneg_right (by linarith) hQ
+      mul_le_mul_of_nonneg_right (by linarith) hQ
     _ = Cc * (((r : ℝ) + 1) ^ 4 * As) - 20 * (((r : ℝ) + 1) ^ 4 * As) := by ring
     _ ≤ Cc * (((r : ℝ) + 1) ^ 4 * As) - (13 * (r : ℝ) + 7) * As := by nlinarith
     _ ≤ A₀ - (13 * (r : ℝ) + 7) * (As : ℝ) := by nlinarith
@@ -94,15 +98,13 @@ theorem thresholds_second_corollary_holds : GermThresholds := by
   have hsR : (s : ℝ) ≤ r := by exact_mod_cast hs
   have hr0 : (0 : ℝ) ≤ r := Nat.cast_nonneg r
   have hs0 : (0 : ℝ) ≤ s := Nat.cast_nonneg s
-  have hn3 : (n : ℝ) ≤ (n : ℝ) ^ 3 := by
-    simpa using pow_le_pow_right₀ hnR (show 1 ≤ 3 by norm_num)
+  have hn3 : (n : ℝ) ≤ (n : ℝ) ^ 3 := by simpa using pow_le_pow_right₀ hnR (show 1 ≤ 3 by norm_num)
   have hAs1 : (1 : ℝ) ≤ As := by nlinarith
   have hnA : (n : ℝ) ≤ As := by linarith
   have hR : (1 : ℝ) + 3 * r ≤ ((r : ℝ) + 1) ^ 3 := by nlinarith [sq_nonneg (r : ℝ)]
   have hP : (1 : ℝ) ≤ ((r : ℝ) + 1) ^ 3 := by linarith
   have hPA : 0 ≤ ((r : ℝ) + 1) ^ 3 * (As : ℝ) := by positivity
-  have key : ((r : ℝ) + 1) ^ 3 * (As : ℝ) ≤ c * ((r : ℝ) + 1) ^ 3 * (As : ℝ) := by
-    nlinarith
+  have key : ((r : ℝ) + 1) ^ 3 * (As : ℝ) ≤ c * ((r : ℝ) + 1) ^ 3 * (As : ℝ) := by nlinarith
   refine ⟨?_, ?_, ?_⟩
   · have e1 : 2 * (r : ℝ) * n ≤ 2 * r * As := by nlinarith
     have e2 : 2 * (r : ℝ) * As < (1 + 3 * r) * As := by nlinarith
@@ -114,7 +116,9 @@ theorem thresholds_second_corollary_holds : GermThresholds := by
   · have e1 : (s : ℝ) ^ 2 ≤ ((r : ℝ) + 1) ^ 3 := by nlinarith [mul_le_mul hsR hsR hs0 hr0]
     have hC0 : (0 : ℝ) ≤ C₁ := Nat.cast_nonneg _
     have e2 : (C₁ : ℝ) * s ^ 2 ≤ c * ((r : ℝ) + 1) ^ 3 :=
-      calc (C₁ : ℝ) * s ^ 2 ≤ c * s ^ 2 := mul_le_mul_of_nonneg_right hC (by positivity)
+      calc
+        (C₁ : ℝ) * s ^ 2
+          ≤ c * s ^ 2 := mul_le_mul_of_nonneg_right hC (by positivity)
         _ ≤ c * ((r : ℝ) + 1) ^ 3 := mul_le_mul_of_nonneg_left e1 (by linarith)
     have hcP : 0 ≤ c * ((r : ℝ) + 1) ^ 3 := mul_nonneg (by linarith) (by positivity)
     have e3 : c * ((r : ℝ) + 1) ^ 3 ≤ c * ((r : ℝ) + 1) ^ 3 * As := by nlinarith
@@ -124,8 +128,9 @@ theorem powerMatch : PowerMatch := by
   intro m M β t D V _ _ Φ hM ht
   obtain ⟨M', rfl⟩ : ∃ M', M = M' + 2 := ⟨M - 2, by omega⟩
   have hnt : ‖t‖ ≠ 0 := norm_ne_zero_iff.mpr ht
-  have key : ((‖t‖ ^ (m + 1))⁻¹ * ‖t‖ ^ ((m + 1) * (M' + 2 + m)) * ‖D / t ^ (m + 1)‖ ^ M' : ℝ) =
-      ‖D‖ ^ M' * ‖t‖ ^ ((m + 1) ^ 2) := by
+  have key
+      : ((‖t‖ ^ (m + 1))⁻¹ * ‖t‖ ^ ((m + 1) * (M' + 2 + m)) * ‖D / t ^ (m + 1)‖ ^ M' : ℝ)
+        = ‖D‖ ^ M' * ‖t‖ ^ ((m + 1) ^ 2) := by
     rw [norm_div, norm_pow, div_pow]
     field_simp
     ring
@@ -151,10 +156,12 @@ end Formalism.FourierDecayAlt.P.Ux7
 open Formalism.FourierDecayAlt.P.Ux7 in
 open Formalism.FourierDecayAlt.P.Ux7 in
 open Formalism.FourierDecayAlt.P.Ux7 in
-theorem Formalism.FourierDecayAlt.P.budget_second_corollary : Formalism.FourierDecayAlt.U.DerivativeBudgetCount := by
+theorem Formalism.FourierDecayAlt.P.budget_second_corollary
+    : Formalism.FourierDecayAlt.U.DerivativeBudgetCount := by
   exact budget_second_corollary_holds
 open Formalism.FourierDecayAlt.P.Ux7 in
-theorem Formalism.FourierDecayAlt.P.thresholds_second_corollary : Formalism.FourierDecayAlt.U.GermThresholds := by
+theorem Formalism.FourierDecayAlt.P.thresholds_second_corollary
+    : Formalism.FourierDecayAlt.U.GermThresholds := by
   exact thresholds_second_corollary_holds
 open Formalism.FourierDecayAlt.P.Ux7 in
 open Formalism.FourierDecayAlt.P.Ux7 in
@@ -166,5 +173,6 @@ open Formalism.FourierDecayAlt.P.Ux7 in
 theorem Formalism.FourierDecayAlt.P.power_matching : Formalism.FourierDecayAlt.U.PowerMatch := by
   exact powerMatch
 open Formalism.FourierDecayAlt.P.Ux7 in
-theorem Formalism.FourierDecayAlt.P.derivative_bound_of_decay : Formalism.FourierDecayAlt.U.DerivBoundOfDecay := by
+theorem Formalism.FourierDecayAlt.P.derivative_bound_of_decay
+    : Formalism.FourierDecayAlt.U.DerivBoundOfDecay := by
   exact derivBoundOfDecay

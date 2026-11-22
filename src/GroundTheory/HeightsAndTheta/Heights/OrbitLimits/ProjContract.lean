@@ -21,8 +21,8 @@ universe u
 
 namespace ProjContract
 
-theorem finsum_mul_eq_sum {α : Type*} (D : α →₀ ℤ) (J : α → ℤ) :
-    ∑ᶠ W, D W * J W = D.sum fun W m => m * J W := by
+theorem finsum_mul_eq_sum {α : Type*} (D : α →₀ ℤ) (J : α → ℤ)
+    : ∑ᶠ W, D W * J W = D.sum fun W m => m * J W := by
   classical
   rw [Finsupp.sum, finsum_eq_sum_of_support_subset]
   intro W hW
@@ -33,19 +33,19 @@ theorem finsum_mul_eq_sum {α : Type*} (D : α →₀ ℤ) (J : α → ℤ) :
 
 section Theory
 
-variable {F : Type u} [Field F] {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type}
-  [∀ k, Fintype (ι k)]
-
+variable
+  {F : Type u} [Field F] {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
 omit [DecidableEq K] in
-theorem ratDiv_eq (P : Ideal (NumbersDVR.MRing ι F)) (f g : NumbersDVR.MRing ι F)
-    (W : Ideal (NumbersDVR.MRing ι F)) :
-    NumbersDVR.ratDiv P f g W = AI.I1.ratDiv P f g W := by
+theorem ratDiv_eq
+    (P : Ideal (NumbersDVR.MRing ι F)) (f g : NumbersDVR.MRing ι F)
+    (W : Ideal (NumbersDVR.MRing ι F))
+    : NumbersDVR.ratDiv P f g W = AI.I1.ratDiv P f g W := by
   simp only [NumbersDVR.ratDiv, AI.I1.ratDiv, Finsupp.sub_apply, Finsupp.mapRange_apply]
   rw [Bridge.divCycle_eq, Bridge.divCycle_eq]
 
-theorem isIntersectionTheory (I : AI.I1.IFamily F ι) (hI : AI.I1.IsFieldIntersection I) :
-    FieldNumbers.IsIntersectionTheory F I := by
+theorem isIntersectionTheory (I : AI.I1.IFamily F ι) (hI : AI.I1.IsFieldIntersection I)
+    : FieldNumbers.IsIntersectionTheory F I := by
   constructor
   · intro P hP h0
     choose i hi using hP.relevant
@@ -54,15 +54,22 @@ theorem isIntersectionTheory (I : AI.I1.IFamily F ι) (hI : AI.I1.IsFieldInterse
     have h1 := hI.1 P ![] i hV hi
     have h2 := NumbersDVR.IntNumPoint.proof FieldNumbers.IntNumBase.full F K ι P i hP hd hi
     have h3 := (FieldNumbers.IntNumBase.full F K ι P hP h0).2
-    have h4 : FieldNumbers.resDeg P = Module.finrank F
-        (@FieldNumbers.homFracDegZero _ _ _ _ _ P hP.isPrime) := by
+    have h4
+        : FieldNumbers.resDeg P
+          = Module.finrank F (@FieldNumbers.homFracDegZero _ _ _ _ _ P hP.isPrime) := by
       rw [FieldNumbers.resDeg, dite_eq_left hP.isPrime]
     rw [h1, ← h2, h3, h4]
   · intro P n hP hn bf bg f g hf hg hfP hgP bs
     have hd := (FieldNumbers.relDim_eq_iff_hasRelDim P (n + 1)).mp hn
-    rw [hI.2 P n bs _ f g ⟨(Bridge.isMultiProjPrime_iff P).mp hP, hd⟩
-      ⟨bf, bg, (Bridge.isMultiHomog_iff f bf).mp hf, (Bridge.isMultiHomog_iff g bg).mp hg, hfP, hgP,
-        fun k => rfl⟩]
+    rw [hI.2 P n bs _ f g ⟨(Bridge.isMultiProjPrime_iff P).mp hP, hd⟩ ⟨
+      bf,
+      bg,
+      (Bridge.isMultiHomog_iff f bf).mp hf,
+      (Bridge.isMultiHomog_iff g bg).mp hg,
+      hfP,
+      hgP,
+      fun k => rfl
+    ⟩]
     simp only [NumbersDVR.cycEval, AI.I1.cycEval, ratDiv_eq]
     exact (finsum_mul_eq_sum _ _).symm
 
@@ -70,13 +77,15 @@ end Theory
 
 section Image
 
-variable {F : Type u} [Field F] {K : Type} {ι : K → Type} {K' : Type} {ι' : K' → Type}
+variable
+  {F : Type u} [Field F]
+  {K : Type} {ι : K → Type} {K' : Type} {ι' : K' → Type}
   {κ : K → K'} {v : (Σ k, ι k) → (Σ k', ι' k')}
 
 def emb (hv : AI.I1.IsBlockMap κ v) : K ↪ K' := ⟨κ, hv.1⟩
 
-theorem range_eq (hv : AI.I1.IsBlockMap κ v) :
-    Set.range v = Set.range (FieldNumbers.blockIncl (emb hv) ι') := by
+theorem range_eq (hv : AI.I1.IsBlockMap κ v)
+    : Set.range v = Set.range (FieldNumbers.blockIncl (emb hv) ι') := by
   ext q
   constructor
   · rintro ⟨p, rfl⟩
@@ -90,26 +99,31 @@ theorem range_eq (hv : AI.I1.IsBlockMap κ v) :
     exact hv.2.2.2 _ ⟨k, rfl⟩
 
 def blockEquiv (hv : AI.I1.IsBlockMap κ v) : (Σ k, ι k) ≃ (Σ k, ι' (emb hv k)) :=
-  (Equiv.ofInjective v hv.2.1).trans ((Set.equivOfEq (range_eq hv)).trans
-    (Equiv.ofInjective _ (FieldNumbers.PFContracted.blockIncl_injective_of_embedding (emb hv) ι')).symm)
+  (Equiv.ofInjective v hv.2.1).trans
+    ((Set.equivOfEq (range_eq hv)).trans
+      (Equiv.ofInjective _
+        (FieldNumbers.PFContracted.blockIncl_injective_of_embedding (emb hv) ι')).symm)
 
-theorem blockIncl_blockEquiv (hv : AI.I1.IsBlockMap κ v) (p : Σ k, ι k) :
-    FieldNumbers.blockIncl (emb hv) ι' (blockEquiv hv p) = v p := by
+theorem blockIncl_blockEquiv (hv : AI.I1.IsBlockMap κ v) (p : Σ k, ι k)
+    : FieldNumbers.blockIncl (emb hv) ι' (blockEquiv hv p) = v p := by
   simp [blockEquiv, Equiv.apply_ofInjective_symm]
 
-theorem imageVar_eq (hv : AI.I1.IsBlockMap κ v) (V' : Ideal (Geo.MRingOver F ι')) :
-    AI.I1.imageVar F v V' = (FieldNumbers.contractPrime (emb hv) V').comap
-      (rename (blockEquiv hv) : Geo.MRingOver F ι →ₐ[F] _).toRingHom := by
+theorem imageVar_eq (hv : AI.I1.IsBlockMap κ v) (V' : Ideal (Geo.MRingOver F ι'))
+    : AI.I1.imageVar F v V'
+      = (FieldNumbers.contractPrime (emb hv) V').comap
+        (rename (blockEquiv hv) : Geo.MRingOver F ι →ₐ[F] _).toRingHom := by
   ext x
   simp only [AI.I1.imageVar, FieldNumbers.contractPrime, Ideal.mem_comap, AlgHom.toRingHom_eq_coe,
     RingHom.coe_coe, rename_rename]
-  have : (FieldNumbers.blockIncl (emb hv) ι' ∘ blockEquiv hv) = v := funext (blockIncl_blockEquiv hv)
+  have : (FieldNumbers.blockIncl (emb hv) ι' ∘ blockEquiv hv) = v :=
+    funext (blockIncl_blockEquiv hv)
   rw [this]
 
-theorem ringKrullDim_imageVar (hv : AI.I1.IsBlockMap κ v) (V' : Ideal (Geo.MRingOver F ι')) :
-    ringKrullDim (Geo.MRingOver F ι ⧸ AI.I1.imageVar F v V') =
-      ringKrullDim (NumbersDVR.MRing (fun k => ι' (emb hv k)) F ⧸
-        FieldNumbers.contractPrime (emb hv) V') := by
+theorem ringKrullDim_imageVar (hv : AI.I1.IsBlockMap κ v) (V' : Ideal (Geo.MRingOver F ι'))
+    : ringKrullDim (Geo.MRingOver F ι ⧸ AI.I1.imageVar F v V')
+      = ringKrullDim
+        (NumbersDVR.MRing (fun k => ι' (emb hv k)) F ⧸
+          FieldNumbers.contractPrime (emb hv) V') := by
   rw [imageVar_eq hv]
   set J := FieldNumbers.contractPrime (emb hv) V'
   let e := (renameEquiv F (blockEquiv hv)).toRingEquiv
@@ -120,11 +134,10 @@ end Image
 
 end ProjContract
 
-
 open ProjContract in
-theorem ProjContract.full :
-    ∀ (F : Type u) [Field F] (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)]
-      (K' : Type) [Fintype K'] (ι' : K' → Type) [∀ k, Fintype (ι' k)],
+theorem ProjContract.full
+    : ∀ (F : Type u) [Field F] (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)]
+        (K' : Type) [Fintype K'] (ι' : K' → Type) [∀ k, Fintype (ι' k)],
       ReciprocityTheory.ChartRestriction.G.AI.I1.ProjContractStatement F ι ι' := by
   intro F _ K _ ι _ K' _ ι' _
   classical

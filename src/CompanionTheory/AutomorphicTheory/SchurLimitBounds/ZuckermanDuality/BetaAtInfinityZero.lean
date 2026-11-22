@@ -30,14 +30,17 @@ theorem beta_at_infinity_zero : BetaInfZero := by
     · simp [h1]
     by_cases h2 : D.χ t₂ = 0
     · simp [h2]
-    rw [h (B.dilation₂ (t₁, t₂) p) ⟨hp.1, P.B5.dil_mem_N t₁ (hχ _ h1) hp.2.1, hp.2.2.1,
-      P.B5.dil_mem_N t₂ (hχ _ h2) hp.2.2.2⟩, mul_zero]
+    rw [h (B.dilation₂ (t₁, t₂) p)
+        ⟨hp.1, P.B5.dil_mem_N t₁ (hχ _ h1) hp.2.1, hp.2.2.1, P.B5.dil_mem_N t₂ (hχ _ h2) hp.2.2.2⟩,
+      mul_zero]
   simp [h0, B.oneMinusDD]
 
-theorem inner_translate {k r : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    {σ : B.Mat k r → (H →L[ℂ] H)} (hσ : IsURepOn (UH (Hpk k r)) σ) {a g b : B.Mat k r} (ha : a ∈ UH (Hpk k r))
-    (hg : g ∈ UH (Hpk k r)) (hb : b ∈ UH (Hpk k r)) (v w : H) :
-    ⟪w, σ (a * g * b) v⟫_ℂ = ⟪σ a⁻¹ w, σ g (σ b v)⟫_ℂ := by
+theorem inner_translate
+    {k r : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    {σ : B.Mat k r → (H →L[ℂ] H)} (hσ : IsURepOn (UH (Hpk k r)) σ)
+    {a g b : B.Mat k r} (ha : a ∈ UH (Hpk k r)) (hg : g ∈ UH (Hpk k r)) (hb : b ∈ UH (Hpk k r))
+    (v w : H)
+    : ⟪w, σ (a * g * b) v⟫_ℂ = ⟪σ a⁻¹ w, σ g (σ b v)⟫_ℂ := by
   obtain ⟨hu, hai, hm⟩ := PI.UnitaryGroupMassFormula.CapelliEig.unitary_Hecke_group k r a ha
   let L : H →ₗᵢ[ℂ] H := ⟨(σ a : H →ₗ[ℂ] H), hσ.2.1 a ha⟩
   have e : σ a (σ a⁻¹ w) = w := by
@@ -59,10 +62,12 @@ theorem phase_zero_alt : PhZero := by
   set b : B.Mat k r := Matrix.of p.2.2 * Matrix.of p.2.1 with hb'
   have ha : a ∈ UH (Hpk k r) := (grp _ (grp _ hp.1.1).2.1).2.2 _ (grp _ hp.2.1.1).2.1
   have hb : b ∈ UH (Hpk k r) := (grp _ hp.2.2.2.1).2.2 _ hp.2.2.1.1
-  have hμG : PI.BesselPeriodGGP.IsHaarOn (Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r)) D.μG :=
+  have hμG : PI.BesselPeriodGGP.IsHaarOn
+      (Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r)) D.μG :=
     ⟨P.B5.haar_sigmaFinite D.haarG, D.haarG.ne_zero, D.haarG.conc, D.haarG.left⟩
-  have hz := (schur_inequiv hσ hσ' (capelli_inequivalence hE k r ε ε μ μ' H H' σ σ' hμ hμ' hσ hσ' hne) hμG
-    (σ b v) (σ a⁻¹ w) v' w').2
+  have hz :=
+    (schur_inequiv hσ hσ' (capelli_inequivalence hE k r ε ε μ μ' H H' σ σ' hμ hμ' hσ hσ' hne) hμG
+      (σ b v) (σ a⁻¹ w) v' w').2
   set S : Wq →L[ℂ] Wp := (D.π (Matrix.of p.1.1)).comp (T.comp (D.π' (Matrix.of p.2.1)⁻¹))
   unfold B.Ph
   rw [← zero_mul (B.hsInner S T'), ← hz, ← integral_mul_const]
@@ -74,8 +79,8 @@ theorem phase_zero_alt : PhZero := by
   have hm : a * Matrix.of g * b ∈ UH (Hpk k r) := (grp _ ((grp _ ha).2.2 _ hg)).2.2 _ hb
   have e2 : B.rho D p (fun g => φ g • T) (Matrix.of g) = φ (a * Matrix.of g * b) • S := by
     simp only [B.rho, e1, S, ContinuousLinearMap.comp_smul, ContinuousLinearMap.smul_comp]
-  rw [e2, P.B6.hsInner_smul_left, P.B6.hsInner_smul_right, hφG _ hm, hφG' _ hg, inner_translate hR ha hg hb,
-    ← mul_assoc]
+  rw [e2, P.B6.hsInner_smul_left, P.B6.hsInner_smul_right, hφG _ hm, hφG' _ hg,
+    inner_translate hR ha hg hb, ← mul_assoc]
   rfl
 
 end CompanionTheory.LimBd.Main

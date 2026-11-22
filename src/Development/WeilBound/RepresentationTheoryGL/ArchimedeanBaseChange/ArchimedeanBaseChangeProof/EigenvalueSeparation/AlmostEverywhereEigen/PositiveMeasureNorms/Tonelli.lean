@@ -10,8 +10,8 @@ open PositivityTheory.Rg.BcB.E1 PositivityTheory.Rg.BcB.E2
 
 namespace PositivityTheory.Rg.BcB.E2.P.Tonelli
 
-theorem enorm_sq {S : Type} [MeasurableSpace S] {ν : Measure S} (g : Lp ℂ 2 ν) :
-    ‖g‖ₑ ^ 2 = ∫⁻ s, ‖(g : S → ℂ) s‖ₑ ^ 2 ∂ν := by
+theorem enorm_sq {S : Type} [MeasurableSpace S] {ν : Measure S} (g : Lp ℂ 2 ν)
+    : ‖g‖ₑ ^ 2 = ∫⁻ s, ‖(g : S → ℂ) s‖ₑ ^ 2 ∂ν := by
   rw [Lp.enorm_def, eLpNorm_eq_lintegral_rpow_enorm_toReal two_ne_zero ENNReal.ofNat_ne_top,
     ← ENNReal.rpow_two, ← ENNReal.rpow_mul]
   · norm_num

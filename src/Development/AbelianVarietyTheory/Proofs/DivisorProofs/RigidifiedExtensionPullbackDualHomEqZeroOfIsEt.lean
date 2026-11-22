@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RigToLieBije
 
 @[expose] public section
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Dieu
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Dieu
 
 set_option autoImplicit false
 
@@ -16,10 +17,10 @@ namespace GlobalTheory
 
 namespace PDivGroup
 
-theorem rigExtMap_dualHom_eq_zero_of_isEt :
-    ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p]
-      (G H : PDivGroup p k) (f : G ⟶ H), G.IsEt → H.IsEt → rigExtMap f = 0 →
-      rigExtMap (dualHom G H f) = 0 := by
+theorem rigExtMap_dualHom_eq_zero_of_isEt
+    : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p]
+        (G H : PDivGroup p k) (f : G ⟶ H),
+      G.IsEt → H.IsEt → rigExtMap f = 0 → rigExtMap (dualHom G H f) = 0 := by
   intro p _ k _ _ _ G H f hG hH hf
   have hp : (p : k) = 0 := CharP.cast_eq_zero k p
   obtain ⟨hH1, -⟩ := rigToLie_bijective_and_dual_rigOfOmega_bijective_of_isEt p k hp H hH

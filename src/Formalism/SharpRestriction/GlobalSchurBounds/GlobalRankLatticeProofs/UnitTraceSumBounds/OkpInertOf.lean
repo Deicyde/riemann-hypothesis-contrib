@@ -8,13 +8,16 @@ public import Formalism.SharpRestriction.GlobalSchurBounds.GlobalRankLatticeProo
 
 @[expose] public section
 
-open Formalism.MainNotions.GL3Theta Formalism.MainNotions.TaylorLogMetric Formalism.BasicNotions NumberField
+open Formalism.MainNotions.GL3Theta Formalism.MainNotions.TaylorLogMetric Formalism.BasicNotions
+  NumberField
 
 namespace Formalism.MainNotions.Ext
 
 def InertPrime : Prop :=
-  ∀ (K : Type) [Field K] [NumberField K], Module.finrank ℚ K = 2 → ∀ (b : K) (d p : ℕ), b ^ 2 = -(d : K) → p.Prime →
-    jacobiSym (-(d : ℤ)) p = -1 → (Ideal.span {(p : 𝓞 K)}).IsPrime
+  ∀ (K : Type) [Field K] [NumberField K],
+    Module.finrank ℚ K = 2
+      → ∀ (b : K) (d p : ℕ),
+        b ^ 2 = -(d : K) → p.Prime → jacobiSym (-(d : ℤ)) p = -1 → (Ideal.span {(p : 𝓞 K)}).IsPrime
 
 theorem okpInert_of (HO : OkpInertG) (HI : InertPrime) (D : D7) : okpInert D := by
   intro p _ lam h2 hin
@@ -24,8 +27,10 @@ theorem okpInert_of (HO : OkpInertG) (HI : InertPrime) (D : D7) : okpInert D := 
   have hpr := HI D.host.K (finrank_K D.host) b D.host.d p hb' (Fact.out) hin
 
   let φK : D.host.K →+* Qbar :=
-    (D.host.φ₀.comp (algebraMap D.host.K D.host.E)).codRestrict Qbar.toSubring (fun x => test_vector_mem_schwartz_bruhat D _)
-  let c : D.host.K →+* D.host.K := (AlgEquiv.restrictNormal D.host.conj D.host.K : D.host.K →+* D.host.K)
+    (D.host.φ₀.comp (algebraMap D.host.K D.host.E)).codRestrict Qbar.toSubring
+      (fun x => test_vector_mem_schwartz_bruhat D _)
+  let c : D.host.K →+* D.host.K :=
+    (AlgEquiv.restrictNormal D.host.conj D.host.K : D.host.K →+* D.host.K)
   have hc : ∀ x : D.host.K, ((c x : D.host.K) : D.host.E) = D.host.conj (x : D.host.E) := fun x =>
     AlgEquiv.restrictNormal_commutes D.host.conj D.host.K x
   have hne : ∃ x, c x ≠ x := by
@@ -38,8 +43,7 @@ theorem okpInert_of (HO : OkpInertG) (HI : InertPrime) (D : D7) : okpInert D := 
 
     have h3 := Formalism.BasicNotions.Examples₂.emb_conj D.host D.host.φ₀ (b : D.host.E)
     rw [← h1] at h3
-    have h4 : (D.host.φ₀ (b : D.host.E)) ^ 2 = -(D.host.d : ℂ) := by
-      rw [← map_pow, hbE]; simp
+    have h4 : (D.host.φ₀ (b : D.host.E)) ^ 2 = -(D.host.d : ℂ) := by rw [← map_pow, hbE]; simp
     obtain ⟨r, hr⟩ := Complex.conj_eq_iff_real.1 h3.symm
     rw [hr] at h4
     have h5 : ((r ^ 2 : ℝ) : ℂ) = ((-(D.host.d : ℝ) : ℝ) : ℂ) := by push_cast; exact h4
@@ -55,13 +59,15 @@ theorem okpInert_of (HO : OkpInertG) (HI : InertPrime) (D : D7) : okpInert D := 
   · rintro ⟨a, rfl⟩
     refine ⟨a, ?_⟩
     simp only [tauK, tauKc, RingHom.comp_apply]
-    rw [lamC_mem' lam (test_vector_mem_schwartz_bruhat D _), lamC_mem' lam (test_vector_mem_schwartz_bruhat D _)]
+    rw [lamC_mem' lam (test_vector_mem_schwartz_bruhat D _),
+      lamC_mem' lam (test_vector_mem_schwartz_bruhat D _)]
     congr 2
     exact Subtype.ext (congrArg D.host.φ₀ (hc _))
   · rintro ⟨a, rfl⟩
     refine ⟨a, ?_⟩
     simp only [tauK, tauKc, RingHom.comp_apply]
-    rw [lamC_mem' lam (test_vector_mem_schwartz_bruhat D _), lamC_mem' lam (test_vector_mem_schwartz_bruhat D _)]
+    rw [lamC_mem' lam (test_vector_mem_schwartz_bruhat D _),
+      lamC_mem' lam (test_vector_mem_schwartz_bruhat D _)]
     congr 2
     exact Subtype.ext (congrArg D.host.φ₀ (hc _)).symm
 

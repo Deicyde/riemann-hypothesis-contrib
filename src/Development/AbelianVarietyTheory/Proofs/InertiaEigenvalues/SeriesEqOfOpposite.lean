@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Intertw
 
 @[expose] public section
 
-open Polynomial GlobalTheory.GLq GlobalTheory.GLp GlobalTheory.GLp.Supp GlobalTheory.SerSys GlobalTheory.TypeLeaf Formalism.BasicNotions Formalism.MainNotions.N Formalism.MainNotions.ArithmeticCylinders
+open Polynomial GlobalTheory.GLq GlobalTheory.GLp GlobalTheory.GLp.Supp GlobalTheory.SerSys
+  GlobalTheory.TypeLeaf Formalism.BasicNotions Formalism.MainNotions.N
+  Formalism.MainNotions.ArithmeticCylinders
 open scoped Classical
 
 noncomputable section
@@ -16,14 +18,18 @@ namespace GlobalTheory.SerSys.Opp
 
 open GlobalTheory.GLq.Opp
 
-
-
 variable {g : ℕ} [Fact g.Prime] {k l n : ℕ}
 
 theorem blk_eq (x : Gn g k) (y : Gn g l) : blk k l (k + l) x y = par finSumFinEquiv x 0 y := by
-  have h : (fun i j : Fin (k + l) => if (i : ℕ) < k ∧ (j : ℕ) < k then entN (x : Mt g k) i j
-      else if k ≤ (i : ℕ) ∧ k ≤ (j : ℕ) then entN (y : Mt g l) (i - k) (j - k) else 0) =
-      ((par finSumFinEquiv x 0 y : Gn g (k + l)) : Mt g (k + l)) := by
+  have h
+      : (fun i j : Fin (k + l) =>
+          if (i : ℕ) < k ∧ (j : ℕ) < k then
+            entN (x : Mt g k) i j
+          else if k ≤ (i : ℕ) ∧ k ≤ (j : ℕ) then
+            entN (y : Mt g l) (i - k) (j - k)
+          else
+            0)
+        = ((par finSumFinEquiv x 0 y : Gn g (k + l)) : Mt g (k + l)) := by
     funext i j
     obtain ⟨i, rfl⟩ := finSumFinEquiv.surjective i
     obtain ⟨j, rfl⟩ := finSumFinEquiv.surjective j
@@ -38,21 +44,30 @@ theorem blk_eq (x : Gn g k) (y : Gn g l) : blk k l (k + l) x y = par finSumFinEq
   unfold blk
   rw [h, toG, dite_eq_left (Units.isUnit _), IsUnit.unit_of_val_units]
 
-theorem eq_par (z : Gn g (k + l)) (h0 : InPar k (z : Mt g (k + l))) (h1 : tl k (z : Mt g (k + l)) = 1)
-    (h2 : br k l (z : Mt g (k + l)) = 1) : ∃ B, z = par finSumFinEquiv 1 B 1 := by
-  have e1 : ∀ (M : Mt g (k + l)) (i j : Fin k), tl k M i j = M (finSumFinEquiv (.inl i)) (finSumFinEquiv (.inl j)) := by
+theorem eq_par
+    (z : Gn g (k + l)) (h0 : InPar k (z : Mt g (k + l))) (h1 : tl k (z : Mt g (k + l)) = 1)
+    (h2 : br k l (z : Mt g (k + l)) = 1)
+    : ∃ B, z = par finSumFinEquiv 1 B 1 := by
+  have e1
+      : ∀ (M : Mt g (k + l)) (i j : Fin k),
+        tl k M i j = M (finSumFinEquiv (.inl i)) (finSumFinEquiv (.inl j)) := by
     intro M i j
     have hi := i.2
     have hj := j.2
     rw [tl, entN, dite_eq_left ⟨by omega, by omega⟩]
     rfl
-  have e2 : ∀ (M : Mt g (k + l)) (i j : Fin l), br k l M i j = M (finSumFinEquiv (.inr i)) (finSumFinEquiv (.inr j)) := by
+  have e2
+      : ∀ (M : Mt g (k + l)) (i j : Fin l),
+        br k l M i j = M (finSumFinEquiv (.inr i)) (finSumFinEquiv (.inr j)) := by
     intro M i j
     have hi := i.2
     have hj := j.2
     rw [br, entN, dite_eq_left ⟨by omega, by omega⟩]
     rfl
-  refine ⟨Matrix.of fun i j => (z : Mt g (k + l)) (finSumFinEquiv (.inl i)) (finSumFinEquiv (.inr j)), ?_⟩
+  refine ⟨
+    Matrix.of fun i j => (z : Mt g (k + l)) (finSumFinEquiv (.inl i)) (finSumFinEquiv (.inr j)),
+    ?_
+  ⟩
   apply Units.ext
   ext i j
   obtain ⟨i, rfl⟩ := finSumFinEquiv.surjective i

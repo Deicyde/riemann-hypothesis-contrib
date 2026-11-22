@@ -16,27 +16,37 @@ namespace PositivityTheory.PfBern.Assembly
 
 section Deriv
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-  {N : ℕ} {X Y Z : Type} [AddCommGroup X] [Module ℂ X] [AddCommGroup Y] [Module ℂ Y] [AddCommGroup Z] [Module ℂ Z]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  {N : ℕ} {X Y Z : Type}
+  [AddCommGroup X] [Module ℂ X] [AddCommGroup Y] [Module ℂ Y] [AddCommGroup Z] [Module ℂ Z]
 
-def jacMap₂ {n h : ℕ} (hn : n + h = N) {ρ : Representation ℂ (GL (Fin N) k) X}
-    {σ : Representation ℂ (GL (Fin N) k) Y} (f : ρ.IntertwiningMap σ) :
-    Jacquet ρ (unipRad k (two (stdSum hn))) →ₗ[ℂ] Jacquet σ (unipRad k (two (stdSum hn))) :=
-  twMap ρ σ (unipRad k (two (stdSum hn))) 1 f.toLinearMap (fun g v => LinearMap.congr_fun (f.isIntertwining' g) v)
+def jacMap₂
+    {n h : ℕ} (hn : n + h = N)
+    {ρ : Representation ℂ (GL (Fin N) k) X} {σ : Representation ℂ (GL (Fin N) k) Y}
+    (f : ρ.IntertwiningMap σ)
+    : Jacquet ρ (unipRad k (two (stdSum hn))) →ₗ[ℂ] Jacquet σ (unipRad k (two (stdSum hn))) :=
+  twMap ρ σ (unipRad k (two (stdSum hn))) 1 f.toLinearMap
+    (fun g v => LinearMap.congr_fun (f.isIntertwining' g) v)
 
 end Deriv
 
 section Sub
 
-variable {G : Type} [Group G] {X D A B Z : Type} [AddCommGroup X] [Module ℂ X] [AddCommGroup D] [Module ℂ D]
-  [AddCommGroup A] [Module ℂ A] [AddCommGroup B] [Module ℂ B] [AddCommGroup Z] [Module ℂ Z]
+variable
+  {G : Type} [Group G]
+  {X D A B Z : Type} [AddCommGroup X] [Module ℂ X] [AddCommGroup D] [Module ℂ D] [AddCommGroup A]
+  [Module ℂ A] [AddCommGroup B] [Module ℂ B] [AddCommGroup Z] [Module ℂ Z]
 
-def subIncl {ρ : Representation ℂ G X} (S : Subrepresentation ρ) : S.toRepresentation.IntertwiningMap ρ where
+def subIncl {ρ : Representation ℂ G X} (S : Subrepresentation ρ)
+    : S.toRepresentation.IntertwiningMap ρ where
   toLinearMap := S.toSubmodule.subtype
   isIntertwining' _ := by ext; rfl
 
-def subProj {ρ : Representation ℂ G X} (S T : Subrepresentation ρ) (hc : IsCompl S.toSubmodule T.toSubmodule) :
-    ρ.IntertwiningMap T.toRepresentation where
+def subProj
+    {ρ : Representation ℂ G X}
+    (S T : Subrepresentation ρ) (hc : IsCompl S.toSubmodule T.toSubmodule)
+    : ρ.IntertwiningMap T.toRepresentation where
   toLinearMap := T.toSubmodule.projectionOnto S.toSubmodule hc.symm
   isIntertwining' g := by
     ext x
@@ -51,32 +61,37 @@ def subProj {ρ : Representation ℂ G X} (S T : Subrepresentation ρ) (hc : IsC
       Submodule.projectionOnto_apply_of_mem_left hc.symm ht', zero_add, map_zero]
     rfl
 
-theorem subProj_subIncl_left {ρ : Representation ℂ G X} (S T : Subrepresentation ρ)
-    (hc : IsCompl S.toSubmodule T.toSubmodule) (x : S.toSubmodule) : subProj S T hc (subIncl S x) = 0 :=
+theorem subProj_subIncl_left
+    {ρ : Representation ℂ G X}
+    (S T : Subrepresentation ρ) (hc : IsCompl S.toSubmodule T.toSubmodule) (x : S.toSubmodule)
+    : subProj S T hc (subIncl S x) = 0 :=
   Submodule.projectionOnto_apply_of_mem_right hc.symm x.2
 
-theorem subProj_subIncl_right {ρ : Representation ℂ G X} (S T : Subrepresentation ρ)
-    (hc : IsCompl S.toSubmodule T.toSubmodule) (x : T.toSubmodule) : subProj S T hc (subIncl T x) = x :=
+theorem subProj_subIncl_right
+    {ρ : Representation ℂ G X}
+    (S T : Subrepresentation ρ) (hc : IsCompl S.toSubmodule T.toSubmodule) (x : T.toSubmodule)
+    : subProj S T hc (subIncl T x) = x :=
   Submodule.projectionOnto_apply_of_mem_left hc.symm x.2
 
 variable [TopologicalSpace G]
 
-theorem isSmooth_sub {ρ : Representation ℂ G X} (hρ : IsSmooth ρ) (S : Subrepresentation ρ) :
-    IsSmooth S.toRepresentation := by
+theorem isSmooth_sub {ρ : Representation ℂ G X} (hρ : IsSmooth ρ) (S : Subrepresentation ρ)
+    : IsSmooth S.toRepresentation := by
   intro v
   convert hρ (v : X) using 1
   ext g
   simp only [Set.mem_setOf_eq]
   exact Subtype.ext_iff
 
-
 omit [TopologicalSpace G] in
-theorem eq_bot_or_eq_top_of_equiv_twist {σ : Representation ℂ G D} {τ : Representation ℂ G Z} {χ : G →* ℂˣ}
-    (e : σ.Equiv (twist τ χ)) (hτ : τ.IsIrreducible) (I : Submodule ℂ D) (hI : ∀ g, ∀ y ∈ I, σ g y ∈ I) :
-    I = ⊥ ∨ I = ⊤ := by
+theorem eq_bot_or_eq_top_of_equiv_twist
+    {σ : Representation ℂ G D} {τ : Representation ℂ G Z} {χ : G →* ℂˣ}
+    (e : σ.Equiv (twist τ χ)) (hτ : τ.IsIrreducible)
+    (I : Submodule ℂ D) (hI : ∀ g, ∀ y ∈ I, σ g y ∈ I)
+    : I = ⊥ ∨ I = ⊤ := by
   let f : D →ₗ[ℂ] Z := e.toLinearEquiv.toLinearMap
-  have key : ∀ g y, f (σ g y) = twist τ χ g (f y) :=
-    fun g y => LinearMap.congr_fun (e.isIntertwining' g) y
+  have key : ∀ g y, f (σ g y) = twist τ χ g (f y) := fun g y =>
+    LinearMap.congr_fun (e.isIntertwining' g) y
   have hinv : ∀ g, ∀ z ∈ I.map f, τ g z ∈ I.map f := by
     intro g z hz
     obtain ⟨y, hy, rfl⟩ := Submodule.mem_map.1 hz
@@ -97,11 +112,14 @@ theorem eq_bot_or_eq_top_of_equiv_twist {σ : Representation ℂ G D} {τ : Repr
     rw [Submodule.map_top, LinearMap.range_eq_top.2 e.toLinearEquiv.surjective]
     exact congrArg Subrepresentation.toSubmodule hS
 
-
 omit [TopologicalSpace G] in
-theorem range_ne_bot_ne_top (DS : A →ₗ[ℂ] D) (DT : B →ₗ[ℂ] D) (Dp : D →ₗ[ℂ] B) (hinj : Function.Injective DS)
-    [Nontrivial A] [Nontrivial B] (h0 : ∀ a, Dp (DS a) = 0) (h1 : ∀ b, Dp (DT b) = b) :
-    LinearMap.range DS ≠ ⊥ ∧ LinearMap.range DS ≠ ⊤ := by
+theorem range_ne_bot_ne_top
+    (DS : A →ₗ[ℂ] D)
+    (DT : B →ₗ[ℂ] D) (Dp : D →ₗ[ℂ] B)
+    (hinj : Function.Injective DS)
+    [Nontrivial A] [Nontrivial B]
+    (h0 : ∀ a, Dp (DS a) = 0) (h1 : ∀ b, Dp (DT b) = b)
+    : LinearMap.range DS ≠ ⊥ ∧ LinearMap.range DS ≠ ⊤ := by
   refine ⟨?_, ?_⟩
   · intro h
     obtain ⟨a, ha⟩ := exists_ne (0 : A)
@@ -120,14 +138,18 @@ end Sub
 section Props
 
 def ExistsAddChar : Prop :=
-  ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k], ∃ ψ : AddChar k Circle, Continuous ψ ∧ ψ ≠ 1
+  ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k],
+    ∃ ψ : AddChar k Circle,
+      Continuous ψ ∧ ψ ≠ 1
 
 def IrrSmoothAdmissible : Prop :=
-  ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (N : ℕ) (X : Type) [AddCommGroup X] [Module ℂ X]
-    (π : Representation ℂ (GL (Fin N) k) X), IsSmooth π → π.IsIrreducible → IsAdmissible π
+  ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+      (N : ℕ) (X : Type) [AddCommGroup X] [Module ℂ X] (π : Representation ℂ (GL (Fin N) k) X),
+    IsSmooth π → π.IsIrreducible → IsAdmissible π
 
 def AdmissibleProd : Prop :=
-  ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (r t : ℕ) (V W : Type) [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+  ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+      (r t : ℕ) (V W : Type) [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
       (π₁ : Representation ℂ (GL (Fin r) k) V) (π₂ : Representation ℂ (GL (Fin t) k) W),
     IsAdmissible π₁ → IsAdmissible π₂ → IsAdmissible (prod₂ π₁ π₂)
 

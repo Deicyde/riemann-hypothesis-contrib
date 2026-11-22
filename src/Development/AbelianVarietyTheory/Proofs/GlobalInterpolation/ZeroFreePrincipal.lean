@@ -280,12 +280,14 @@ private lemma exists_riemannZeta_ne_zero_near_one_of_abs_im_le_one :
   simp only [g, Function.update_of_ne hs] at hgs
   exact right_ne_zero_of_mul hgs
 
-
 open Complex DirichletCharacter ArithmeticFunction MeasureTheory in
 open Filter Topology in
-theorem _root_.GlobalTheory.ZeroFreePrincipal.zero_free : ∃ c : ℝ, 0 < c ∧ ∀ (q : ℕ) [NeZero q] (s : ℂ),
-    s ≠ 1 → LFunction (1 : DirichletCharacter ℂ q) s = 0 →
-    s.re < 1 - c / Real.log (q * (|s.im| + 2)) := by
+theorem _root_.GlobalTheory.ZeroFreePrincipal.zero_free
+    : ∃ c : ℝ,
+      0 < c
+        ∧ ∀ (q : ℕ) [NeZero q] (s : ℂ),
+          s ≠ 1 → LFunction (1 : DirichletCharacter ℂ q) s = 0
+            → s.re < 1 - c / Real.log (q * (|s.im| + 2)) := by
   obtain ⟨c1, hc1, h1⟩ := exists_re_lt_one_sub_div_log_of_riemannZeta_eq_zero
   obtain ⟨η, hη, h2⟩ := exists_riemannZeta_ne_zero_near_one_of_abs_im_le_one
   refine ⟨min (min c1 (η / 2)) (1 / 2), by positivity, fun q _ s hs hL => ?_⟩
@@ -297,18 +299,16 @@ theorem _root_.GlobalTheory.ZeroFreePrincipal.zero_free : ∃ c : ℝ, 0 < c ∧
   have hq : (1 : ℝ) ≤ q := Nat.one_le_cast.2 (Nat.pos_of_ne_zero (NeZero.ne q))
   have habs := abs_nonneg s.im
   have hln2 : 1 / 2 < Real.log 2 := by have := Real.log_two_gt_d9; linarith
-  have hlog2 : Real.log 2 ≤ Real.log (|s.im| + 2) :=
-    Real.log_le_log (by norm_num) (by linarith)
+  have hlog2 : Real.log 2 ≤ Real.log (|s.im| + 2) := Real.log_le_log (by norm_num) (by linarith)
   have hL2 : Real.log (|s.im| + 2) ≤ Real.log (q * (|s.im| + 2)) :=
     Real.log_le_log (by positivity) (by nlinarith)
   set L := Real.log (q * (|s.im| + 2)) with hLdef
   have hLpos : 1 / 2 < L := by linarith
-  have hcL : c / L < 1 := by
-    rw [div_lt_one (by linarith)]; linarith
-  have hcLη : c / L < η := by
-    rw [div_lt_iff₀ (by linarith)]; nlinarith
-  have he : LFunction (1 : DirichletCharacter ℂ q) s =
-      (∏ p ∈ q.primeFactors, (1 - (p : ℂ) ^ (-s))) * riemannZeta s :=
+  have hcL : c / L < 1 := by rw [div_lt_one (by linarith)]; linarith
+  have hcLη : c / L < η := by rw [div_lt_iff₀ (by linarith)]; nlinarith
+  have he
+      : LFunction (1 : DirichletCharacter ℂ q) s
+        = (∏ p ∈ q.primeFactors, (1 - (p : ℂ) ^ (-s))) * riemannZeta s :=
     LFunctionTrivChar_eq_mul_riemannZeta hs
   rw [he] at hL
   rcases mul_eq_zero.1 hL with hp | hz
@@ -317,18 +317,19 @@ theorem _root_.GlobalTheory.ZeroFreePrincipal.zero_free : ∃ c : ℝ, 0 < c ∧
     have h1p : (p : ℂ) ^ (-s) = 1 := (sub_eq_zero.1 hp0).symm
     have hnorm := congrArg norm h1p
     rw [norm_natCast_cpow_of_pos hpp.pos, norm_one, neg_re,
-      Real.rpow_def_of_pos (by exact_mod_cast hpp.pos), Real.exp_eq_one_iff] at hnorm
+        Real.rpow_def_of_pos (by exact_mod_cast hpp.pos), Real.exp_eq_one_iff]
+      at hnorm
     have hlogp : 0 < Real.log p := Real.log_pos (by exact_mod_cast hpp.one_lt)
     have hre : s.re = 0 := by
       rcases mul_eq_zero.1 hnorm with h | h
       · linarith
       · linarith
-    rw [hre]; linarith
+    rw [hre]
+    linarith
   · by_cases hγ : 1 ≤ |s.im|
     · have h := h1 s hz hγ
       have hlogpos : 0 < Real.log (|s.im| + 2) := by linarith
-      have : c / L ≤ c1 / Real.log (|s.im| + 2) :=
-        div_le_div₀ hc1.le hcc1 hlogpos hL2
+      have : c / L ≤ c1 / Real.log (|s.im| + 2) := div_le_div₀ hc1.le hcc1 hlogpos hL2
       linarith
     · have hre : s.re ≤ 1 - η := by
         by_contra h

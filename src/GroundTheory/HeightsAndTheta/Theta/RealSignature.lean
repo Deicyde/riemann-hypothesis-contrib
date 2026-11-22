@@ -12,15 +12,14 @@ open Matrix GroundTheory.Automorphic
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι] {H : Matrix ι ι ℂ}
 
-
 omit [Fintype ι] [DecidableEq ι] in
 theorem map_starRingEnd_transpose (M : Matrix ι ι ℂ) : (M.map (starRingEnd ℂ))ᵀ = Mᴴ := by
   ext i j
   simp
 
-theorem mem_unitaryGroupMatrix_star_iff {g : GL ι ℂ} :
-    g ∈ unitaryGroupMatrix (starRingEnd ℂ) H ↔
-      (g : Matrix ι ι ℂ)ᴴ * H * (g : Matrix ι ι ℂ) = H := by
+theorem mem_unitaryGroupMatrix_star_iff {g : GL ι ℂ}
+    : g ∈ unitaryGroupMatrix (starRingEnd ℂ) H
+      ↔ (g : Matrix ι ι ℂ)ᴴ * H * (g : Matrix ι ι ℂ) = H := by
   rw [mem_unitaryGroupMatrix, map_starRingEnd_transpose]
 
 variable (hH : H.IsHermitian)
@@ -37,18 +36,20 @@ theorem eigenvalues_ne_zero (hu : IsUnit H.det) (i : ι) : hH.eigenvalues i ≠ 
   apply hu.ne_zero
   exact Finset.prod_eq_zero (Finset.mem_univ i) (by simp [h0])
 
-noncomputable def signEquiv (hu : IsUnit H.det) : ι ≃ Fin (posEigenCount hH) ⊕ Fin (negEigenCount hH) :=
+noncomputable def signEquiv (hu : IsUnit H.det)
+    : ι ≃ Fin (posEigenCount hH) ⊕ Fin (negEigenCount hH) :=
   (Equiv.sumCompl (fun i => 0 < hH.eigenvalues i)).symm.trans
     (Equiv.sumCongr (Fintype.equivFin _)
       ((Equiv.subtypeEquivRight fun i => by
-          have := eigenvalues_ne_zero (hH := hH) hu i
-          constructor
-          · intro h; exact lt_of_le_of_ne (not_lt.1 h) this
-          · intro h; exact not_lt.2 h.le).trans (Fintype.equivFin _)))
+        have := eigenvalues_ne_zero (hH := hH) hu i
+        constructor
+        · intro h; exact lt_of_le_of_ne (not_lt.1 h) this
+        · intro h; exact not_lt.2 h.le).trans (Fintype.equivFin _)))
 
-theorem sign_eigenvalues_signEquiv_symm (hu : IsUnit H.det) (k : Fin (posEigenCount hH) ⊕ Fin (negEigenCount hH)) :
-    (hH.eigenvalues ((signEquiv hu).symm k) / |hH.eigenvalues ((signEquiv hu).symm k)| : ℝ) =
-      Sum.elim (fun _ => (1 : ℝ)) (fun _ => -1) k := by
+theorem sign_eigenvalues_signEquiv_symm
+    (hu : IsUnit H.det) (k : Fin (posEigenCount hH) ⊕ Fin (negEigenCount hH))
+    : (hH.eigenvalues ((signEquiv hu).symm k) / |hH.eigenvalues ((signEquiv hu).symm k)| : ℝ)
+      = Sum.elim (fun _ => (1 : ℝ)) (fun _ => -1) k := by
   rcases k with a | b
   · have h : 0 < hH.eigenvalues ((signEquiv hu).symm (Sum.inl a)) := by
       simp only [signEquiv, Equiv.symm_trans_apply]
@@ -61,21 +62,22 @@ theorem sign_eigenvalues_signEquiv_symm (hu : IsUnit H.det) (k : Fin (posEigenCo
     rw [abs_of_neg h, div_neg, div_self h.ne]
     rfl
 
-theorem star_eigenvectorUnitary_mul_mul (hH : H.IsHermitian) :
-    star (hH.eigenvectorUnitary : Matrix ι ι ℂ) * H * (hH.eigenvectorUnitary : Matrix ι ι ℂ) =
-      diagonal (fun i => (hH.eigenvalues i : ℂ)) := by
+theorem star_eigenvectorUnitary_mul_mul (hH : H.IsHermitian)
+    : star (hH.eigenvectorUnitary : Matrix ι ι ℂ) * H * (hH.eigenvectorUnitary : Matrix ι ι ℂ)
+      = diagonal (fun i => (hH.eigenvalues i : ℂ)) := by
   set U := (hH.eigenvectorUnitary : Matrix ι ι ℂ)
   have h1 : star U * U = 1 := Unitary.coe_star_mul_self _
   conv_lhs => rw [hH.spectral_theorem, Unitary.conjStarAlgAut_apply]
   change star U * (U * _ * star U) * U = _
-  calc star U * (U * diagonal (RCLike.ofReal ∘ hH.eigenvalues) * star U) * U
-      = (star U * U) * diagonal (RCLike.ofReal ∘ hH.eigenvalues) * (star U * U) := by
-        simp only [Matrix.mul_assoc]
+  calc
+    star U * (U * diagonal (RCLike.ofReal ∘ hH.eigenvalues) * star U) * U
+        = (star U * U) * diagonal (RCLike.ofReal ∘ hH.eigenvalues) * (star U * U) := by
+      simp only [Matrix.mul_assoc]
     _ = _ := by rw [h1, Matrix.one_mul, Matrix.mul_one]; rfl
 
-theorem exists_congr_indefJ (hu : IsUnit H.det) :
-    ∃ (P : Matrix ι (Fin (posEigenCount hH) ⊕ Fin (negEigenCount hH)) ℂ)
-      (Q : Matrix (Fin (posEigenCount hH) ⊕ Fin (negEigenCount hH)) ι ℂ),
+theorem exists_congr_indefJ (hu : IsUnit H.det)
+    : ∃ (P : Matrix ι (Fin (posEigenCount hH) ⊕ Fin (negEigenCount hH)) ℂ)
+        (Q : Matrix (Fin (posEigenCount hH) ⊕ Fin (negEigenCount hH)) ι ℂ),
       Q * P = 1 ∧ P * Q = 1 ∧ Pᴴ * H * P = indefJ (posEigenCount hH) (negEigenCount hH) := by
   set U := (hH.eigenvectorUnitary : Matrix ι ι ℂ)
   set lam := hH.eigenvalues
@@ -92,10 +94,18 @@ theorem exists_congr_indefJ (hu : IsUnit H.det) :
   set P0 := U * diagonal d
   set Q0 := diagonal d' * star U
   have hQP : Q0 * P0 = 1 := by
-    calc Q0 * P0 = diagonal d' * (star U * U) * diagonal d := by simp only [Q0, P0, Matrix.mul_assoc]
-      _ = 1 := by rw [h1, Matrix.mul_one, diagonal_mul_diagonal, ← diagonal_one]; congr 1; funext i; exact hdd i
+    calc
+      Q0 * P0
+        = diagonal d' * (star U * U) * diagonal d := by simp only [Q0, P0, Matrix.mul_assoc]
+      _ = 1 := by
+        rw [h1, Matrix.mul_one, diagonal_mul_diagonal, ← diagonal_one]
+        congr 1
+        funext i
+        exact hdd i
   have hPQ : P0 * Q0 = 1 := by
-    calc P0 * Q0 = U * (diagonal d * diagonal d') * star U := by simp only [Q0, P0, Matrix.mul_assoc]
+    calc
+      P0 * Q0
+        = U * (diagonal d * diagonal d') * star U := by simp only [Q0, P0, Matrix.mul_assoc]
       _ = 1 := by
         rw [diagonal_mul_diagonal]
         have : (fun i => d i * d' i) = fun _ => 1 := funext hdd'
@@ -106,20 +116,22 @@ theorem exists_congr_indefJ (hu : IsUnit H.det) :
       congr 1
       funext i
       simp [d]
-    calc P0ᴴ * H * P0 = diagonal d * (star U * H * U) * diagonal d := by
-          simp only [P0, conjTranspose_mul, hdh, star_eq_conjTranspose, Matrix.mul_assoc]
+    calc
+      P0ᴴ * H * P0 = diagonal d * (star U * H * U) * diagonal d := by
+        simp only [P0, conjTranspose_mul, hdh, star_eq_conjTranspose, Matrix.mul_assoc]
       _ = _ := by
-          rw [star_eigenvectorUnitary_mul_mul, diagonal_mul_diagonal, diagonal_mul_diagonal]
-          congr 1
-          funext i
-          have hsq : Real.sqrt |lam i| * Real.sqrt |lam i| = |lam i| :=
-            Real.mul_self_sqrt (abs_nonneg _)
-          simp only [d, ← Complex.ofReal_mul]
-          congr 1
-          calc (Real.sqrt |lam i|)⁻¹ * lam i * (Real.sqrt |lam i|)⁻¹
-              = lam i * ((Real.sqrt |lam i|)⁻¹ * (Real.sqrt |lam i|)⁻¹) := by ring
-            _ = lam i * (Real.sqrt |lam i| * Real.sqrt |lam i|)⁻¹ := by rw [mul_inv]
-            _ = lam i / |lam i| := by rw [hsq, div_eq_mul_inv]
+        rw [star_eigenvectorUnitary_mul_mul, diagonal_mul_diagonal, diagonal_mul_diagonal]
+        congr 1
+        funext i
+        have hsq : Real.sqrt |lam i| * Real.sqrt |lam i| = |lam i| :=
+          Real.mul_self_sqrt (abs_nonneg _)
+        simp only [d, ← Complex.ofReal_mul]
+        congr 1
+        calc
+          (Real.sqrt |lam i|)⁻¹ * lam i * (Real.sqrt |lam i|)⁻¹
+            = lam i * ((Real.sqrt |lam i|)⁻¹ * (Real.sqrt |lam i|)⁻¹) := by ring
+          _ = lam i * (Real.sqrt |lam i| * Real.sqrt |lam i|)⁻¹ := by rw [mul_inv]
+          _ = lam i / |lam i| := by rw [hsq, div_eq_mul_inv]
   refine ⟨P0.submatrix id e.symm, Q0.submatrix e.symm id, ?_, ?_, ?_⟩
   · rw [← submatrix_mul Q0 P0 e.symm id e.symm Function.bijective_id, hQP, submatrix_one_equiv]
   · rw [submatrix_mul_equiv P0 Q0 id e.symm id, hPQ, submatrix_id_id]
@@ -136,47 +148,66 @@ theorem exists_congr_indefJ (hu : IsUnit H.det) :
 
 section Congr
 
-variable {κ : Type*} [Fintype κ] [DecidableEq κ] {P : Matrix ι κ ℂ} {Q : Matrix κ ι ℂ}
-  {H' : Matrix κ κ ℂ}
+variable
+  {κ : Type*} [Fintype κ] [DecidableEq κ] {P : Matrix ι κ ℂ} {Q : Matrix κ ι ℂ} {H' : Matrix κ κ ℂ}
 
-def congrUnitary (hQP : Q * P = 1) (hPQ : P * Q = 1) (hH' : Pᴴ * H * P = H')
-    (g : unitaryGroupMatrix (starRingEnd ℂ) H) : unitaryGroupMatrix (starRingEnd ℂ) H' :=
-  ⟨⟨Q * ((g : GL ι ℂ) : Matrix ι ι ℂ) * P, Q * (((g : GL ι ℂ)⁻¹ : GL ι ℂ) : Matrix ι ι ℂ) * P,
+def congrUnitary
+    (hQP : Q * P = 1) (hPQ : P * Q = 1) (hH' : Pᴴ * H * P = H')
+    (g : unitaryGroupMatrix (starRingEnd ℂ) H)
+    : unitaryGroupMatrix (starRingEnd ℂ) H' := ⟨
+  ⟨
+    Q * ((g : GL ι ℂ) : Matrix ι ι ℂ) * P,
+    Q * (((g : GL ι ℂ)⁻¹ : GL ι ℂ) : Matrix ι ι ℂ) * P,
     by
-      calc Q * ((g : GL ι ℂ) : Matrix ι ι ℂ) * P * (Q * (((g : GL ι ℂ)⁻¹ : GL ι ℂ) : Matrix ι ι ℂ) * P)
-          = Q * (((g : GL ι ℂ) : Matrix ι ι ℂ) * (P * Q) *
-              (((g : GL ι ℂ)⁻¹ : GL ι ℂ) : Matrix ι ι ℂ)) * P := by simp only [Matrix.mul_assoc]
-        _ = 1 := by rw [hPQ, Matrix.mul_one, ← Units.val_mul, mul_inv_cancel, Units.val_one,
-              Matrix.mul_one, hQP],
+      calc
+        Q * ((g : GL ι ℂ) : Matrix ι ι ℂ) * P * (Q * (((g : GL ι ℂ)⁻¹ : GL ι ℂ) : Matrix ι ι ℂ) * P)
+            = Q
+              * (((g : GL ι ℂ) : Matrix ι ι ℂ) * (P * Q)
+                * (((g : GL ι ℂ)⁻¹ : GL ι ℂ) : Matrix ι ι ℂ))
+              * P := by
+          simp only [Matrix.mul_assoc]
+        _ = 1 := by
+          rw [hPQ, Matrix.mul_one, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.mul_one,
+            hQP],
     by
-      calc Q * (((g : GL ι ℂ)⁻¹ : GL ι ℂ) : Matrix ι ι ℂ) * P * (Q * ((g : GL ι ℂ) : Matrix ι ι ℂ) * P)
-          = Q * ((((g : GL ι ℂ)⁻¹ : GL ι ℂ) : Matrix ι ι ℂ) * (P * Q) *
-              ((g : GL ι ℂ) : Matrix ι ι ℂ)) * P := by simp only [Matrix.mul_assoc]
-        _ = 1 := by rw [hPQ, Matrix.mul_one, ← Units.val_mul, inv_mul_cancel, Units.val_one,
-              Matrix.mul_one, hQP]⟩,
-    by
-      rw [mem_unitaryGroupMatrix_star_iff]
-      have hg := mem_unitaryGroupMatrix_star_iff.1 g.2
-      have hPQh : Qᴴ * Pᴴ = 1 := by rw [← conjTranspose_mul, hPQ, conjTranspose_one]
-      change (Q * ((g : GL ι ℂ) : Matrix ι ι ℂ) * P)ᴴ * H' * (Q * ((g : GL ι ℂ) : Matrix ι ι ℂ) * P) = H'
-      set m := ((g : GL ι ℂ) : Matrix ι ι ℂ)
-      rw [← hH']
-      calc (Q * m * P)ᴴ * (Pᴴ * H * P) * (Q * m * P)
-          = Pᴴ * mᴴ * (Qᴴ * Pᴴ) * H * (P * Q) * m * P := by
-            simp only [conjTranspose_mul, Matrix.mul_assoc]
-        _ = Pᴴ * H * P := by
-            rw [hPQh, hPQ, Matrix.mul_one, Matrix.mul_one]
-            simp only [Matrix.mul_assoc]
-            rw [← Matrix.mul_assoc H m P, ← Matrix.mul_assoc mᴴ (H * m) P, ← Matrix.mul_assoc mᴴ H m,
-              hg]⟩
+      calc
+        Q * (((g : GL ι ℂ)⁻¹ : GL ι ℂ) : Matrix ι ι ℂ) * P * (Q * ((g : GL ι ℂ) : Matrix ι ι ℂ) * P)
+            = Q
+              * ((((g : GL ι ℂ)⁻¹ : GL ι ℂ) : Matrix ι ι ℂ) * (P * Q)
+                * ((g : GL ι ℂ) : Matrix ι ι ℂ))
+              * P := by
+          simp only [Matrix.mul_assoc]
+        _ = 1 := by
+          rw [hPQ, Matrix.mul_one, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.mul_one,
+            hQP]
+  ⟩,
+  by
+    rw [mem_unitaryGroupMatrix_star_iff]
+    have hg := mem_unitaryGroupMatrix_star_iff.1 g.2
+    have hPQh : Qᴴ * Pᴴ = 1 := by rw [← conjTranspose_mul, hPQ, conjTranspose_one]
+    change (Q * ((g : GL ι ℂ) : Matrix ι ι ℂ) * P)ᴴ * H' * (Q * ((g : GL ι ℂ) : Matrix ι ι ℂ) * P)
+      = H'
+    set m := ((g : GL ι ℂ) : Matrix ι ι ℂ)
+    rw [← hH']
+    calc
+      (Q * m * P)ᴴ * (Pᴴ * H * P) * (Q * m * P) = Pᴴ * mᴴ * (Qᴴ * Pᴴ) * H * (P * Q) * m * P := by
+        simp only [conjTranspose_mul, Matrix.mul_assoc]
+      _ = Pᴴ * H * P := by
+        rw [hPQh, hPQ, Matrix.mul_one, Matrix.mul_one]
+        simp only [Matrix.mul_assoc]
+        rw [← Matrix.mul_assoc H m P, ← Matrix.mul_assoc mᴴ (H * m) P, ← Matrix.mul_assoc mᴴ H m,
+          hg]
+⟩
 
-theorem coe_congrUnitary (hQP : Q * P = 1) (hPQ : P * Q = 1) (hH' : Pᴴ * H * P = H')
-    (g : unitaryGroupMatrix (starRingEnd ℂ) H) :
-    ((congrUnitary hQP hPQ hH' g : GL κ ℂ) : Matrix κ κ ℂ) = Q * ((g : GL ι ℂ) : Matrix ι ι ℂ) * P :=
+theorem coe_congrUnitary
+    (hQP : Q * P = 1) (hPQ : P * Q = 1) (hH' : Pᴴ * H * P = H')
+    (g : unitaryGroupMatrix (starRingEnd ℂ) H)
+    : ((congrUnitary hQP hPQ hH' g : GL κ ℂ) : Matrix κ κ ℂ)
+      = Q * ((g : GL ι ℂ) : Matrix ι ι ℂ) * P :=
   rfl
 
-theorem continuous_congrUnitary (hQP : Q * P = 1) (hPQ : P * Q = 1) (hH' : Pᴴ * H * P = H') :
-    Continuous (congrUnitary hQP hPQ hH') := by
+theorem continuous_congrUnitary (hQP : Q * P = 1) (hPQ : P * Q = 1) (hH' : Pᴴ * H * P = H')
+    : Continuous (congrUnitary hQP hPQ hH') := by
   have h1 : Continuous fun x : unitaryGroupMatrix (starRingEnd ℂ) H =>
       Q * ((x : GL ι ℂ) : Matrix ι ι ℂ) * P :=
     (continuous_const.matrix_mul (Units.continuous_val.comp continuous_subtype_val)).matrix_mul
@@ -187,46 +218,54 @@ theorem continuous_congrUnitary (hQP : Q * P = 1) (hPQ : P * Q = 1) (hH' : Pᴴ 
       continuous_const
   exact Continuous.subtype_mk (Units.continuous_iff.2 ⟨h1, h2⟩) _
 
-def congrUnitaryEquiv (hQP : Q * P = 1) (hPQ : P * Q = 1) (hH' : Pᴴ * H * P = H') :
-    unitaryGroupMatrix (starRingEnd ℂ) H ≃ₜ* unitaryGroupMatrix (starRingEnd ℂ) H' :=
+def congrUnitaryEquiv (hQP : Q * P = 1) (hPQ : P * Q = 1) (hH' : Pᴴ * H * P = H')
+    : unitaryGroupMatrix (starRingEnd ℂ) H ≃ₜ* unitaryGroupMatrix (starRingEnd ℂ) H' :=
   have hH : Qᴴ * H' * Q = H := by
     rw [← hH']
-    calc Qᴴ * (Pᴴ * H * P) * Q = (P * Q)ᴴ * H * (P * Q) := by
-          simp only [conjTranspose_mul, Matrix.mul_assoc]
+    calc
+      Qᴴ * (Pᴴ * H * P) * Q
+        = (P * Q)ᴴ * H * (P * Q) := by simp only [conjTranspose_mul, Matrix.mul_assoc]
       _ = H := by rw [hPQ, conjTranspose_one, Matrix.one_mul, Matrix.mul_one]
-  { toFun := congrUnitary hQP hPQ hH'
+  {
+    toFun := congrUnitary hQP hPQ hH'
     invFun := congrUnitary hPQ hQP hH
     left_inv := fun g => by
-      apply Subtype.ext; apply Units.ext
+      apply Subtype.ext
+      apply Units.ext
       rw [coe_congrUnitary, coe_congrUnitary]
       simp only [← Matrix.mul_assoc]
       rw [hPQ, Matrix.one_mul, Matrix.mul_assoc, hPQ, Matrix.mul_one]
     right_inv := fun g => by
-      apply Subtype.ext; apply Units.ext
+      apply Subtype.ext
+      apply Units.ext
       rw [coe_congrUnitary, coe_congrUnitary]
       simp only [← Matrix.mul_assoc]
       rw [hQP, Matrix.one_mul, Matrix.mul_assoc, hQP, Matrix.mul_one]
     map_mul' := fun g h => by
-      apply Subtype.ext; apply Units.ext
+      apply Subtype.ext
+      apply Units.ext
       rw [Subgroup.coe_mul, Units.val_mul, coe_congrUnitary, coe_congrUnitary, coe_congrUnitary,
         Subgroup.coe_mul, Units.val_mul]
-      calc Q * (((g : GL ι ℂ) : Matrix ι ι ℂ) * ((h : GL ι ℂ) : Matrix ι ι ℂ)) * P
-          = Q * ((g : GL ι ℂ) : Matrix ι ι ℂ) * (P * Q) * ((h : GL ι ℂ) : Matrix ι ι ℂ) * P := by
-            rw [hPQ, Matrix.mul_one]
-            simp only [Matrix.mul_assoc]
+      calc
+        Q * (((g : GL ι ℂ) : Matrix ι ι ℂ) * ((h : GL ι ℂ) : Matrix ι ι ℂ)) * P
+            = Q * ((g : GL ι ℂ) : Matrix ι ι ℂ) * (P * Q) * ((h : GL ι ℂ) : Matrix ι ι ℂ) * P := by
+          rw [hPQ, Matrix.mul_one]
+          simp only [Matrix.mul_assoc]
         _ = _ := by simp only [Matrix.mul_assoc]
     continuous_toFun := continuous_congrUnitary hQP hPQ hH'
-    continuous_invFun := continuous_congrUnitary hPQ hQP hH }
+    continuous_invFun := continuous_congrUnitary hPQ hQP hH
+  }
 
 end Congr
 
-theorem unitaryGroupMatrix_indefJ (p q : ℕ) :
-    unitaryGroupMatrix (starRingEnd ℂ) (indefJ p q) = indefiniteUnitaryGroup p q := by
+theorem unitaryGroupMatrix_indefJ (p q : ℕ)
+    : unitaryGroupMatrix (starRingEnd ℂ) (indefJ p q) = indefiniteUnitaryGroup p q := by
   ext g
   rw [mem_unitaryGroupMatrix_star_iff, mem_indefiniteUnitaryGroup_iff]
 
-def subgroupCongrHomeomorph {n : Type*} [Fintype n] [DecidableEq n] {A B : Subgroup (GL n ℂ)}
-    (h : A = B) : A ≃ₜ* B where
+def subgroupCongrHomeomorph
+    {n : Type*} [Fintype n] [DecidableEq n] {A B : Subgroup (GL n ℂ)} (h : A = B)
+    : A ≃ₜ* B where
   toFun g := ⟨g.1, h ▸ g.2⟩
   invFun g := ⟨g.1, h ▸ g.2⟩
   left_inv _ := rfl
@@ -239,27 +278,27 @@ section Equiv
 
 variable (hH)
 
-noncomputable def sylvesterP (hu : IsUnit H.det) :
-    Matrix ι (Fin (posEigenCount hH) ⊕ Fin (negEigenCount hH)) ℂ :=
+noncomputable def sylvesterP (hu : IsUnit H.det)
+    : Matrix ι (Fin (posEigenCount hH) ⊕ Fin (negEigenCount hH)) ℂ :=
   (exists_congr_indefJ (hH := hH) hu).choose
 
-noncomputable def sylvesterQ (hu : IsUnit H.det) :
-    Matrix (Fin (posEigenCount hH) ⊕ Fin (negEigenCount hH)) ι ℂ :=
+noncomputable def sylvesterQ (hu : IsUnit H.det)
+    : Matrix (Fin (posEigenCount hH) ⊕ Fin (negEigenCount hH)) ι ℂ :=
   (exists_congr_indefJ (hH := hH) hu).choose_spec.choose
 
 variable {hH}
 
-theorem sylvester_spec (hu : IsUnit H.det) :
-    sylvesterQ hH hu * sylvesterP hH hu = 1 ∧ sylvesterP hH hu * sylvesterQ hH hu = 1 ∧
-      (sylvesterP hH hu)ᴴ * H * sylvesterP hH hu =
-        indefJ (posEigenCount hH) (negEigenCount hH) :=
+theorem sylvester_spec (hu : IsUnit H.det)
+    : sylvesterQ hH hu * sylvesterP hH hu = 1 ∧ sylvesterP hH hu * sylvesterQ hH hu = 1
+      ∧ (sylvesterP hH hu)ᴴ * H * sylvesterP hH hu = indefJ (posEigenCount hH) (negEigenCount hH) :=
   (exists_congr_indefJ (hH := hH) hu).choose_spec.choose_spec
 
-noncomputable def unitaryHermitianEquiv (hu : IsUnit H.det) :
-    unitaryGroupMatrix (starRingEnd ℂ) H ≃ₜ*
-      indefiniteUnitaryGroup (posEigenCount hH) (negEigenCount hH) :=
+noncomputable def unitaryHermitianEquiv (hu : IsUnit H.det)
+    : unitaryGroupMatrix (starRingEnd ℂ) H
+      ≃ₜ* indefiniteUnitaryGroup (posEigenCount hH) (negEigenCount hH) :=
   (congrUnitaryEquiv (sylvester_spec (hH := hH) hu).1 (sylvester_spec (hH := hH) hu).2.1
-    (sylvester_spec (hH := hH) hu).2.2).trans (subgroupCongrHomeomorph (unitaryGroupMatrix_indefJ _ _))
+      (sylvester_spec (hH := hH) hu).2.2).trans
+    (subgroupCongrHomeomorph (unitaryGroupMatrix_indefJ _ _))
 
 end Equiv
 

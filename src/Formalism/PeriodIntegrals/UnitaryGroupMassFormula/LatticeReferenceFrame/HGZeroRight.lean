@@ -26,8 +26,8 @@ theorem hG_smul_right (c : I.E) (x y : Fin I.n → I.E) : hG I x (c • y) = c *
 
 theorem hG_zero_right (x : Fin I.n → I.E) : hG I x 0 = 0 := by simp [hG_def]
 
-theorem hG_sum_right {ι : Type*} (s : Finset ι) (x : Fin I.n → I.E) (y : ι → Fin I.n → I.E) :
-    hG I x (∑ t ∈ s, y t) = ∑ t ∈ s, hG I x (y t) := by
+theorem hG_sum_right {ι : Type*} (s : Finset ι) (x : Fin I.n → I.E) (y : ι → Fin I.n → I.E)
+    : hG I x (∑ t ∈ s, y t) = ∑ t ∈ s, hG I x (y t) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [hG_zero_right]

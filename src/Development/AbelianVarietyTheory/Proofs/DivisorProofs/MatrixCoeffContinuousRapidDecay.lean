@@ -24,8 +24,8 @@ theorem norm_le_max_parts (n : ℕ) (w : Fin n ⊕ Fin n → ℝ) : ‖w‖ ≤ 
       have := PiLp.norm_apply_le (qPart w) j
       simpa [qPart] using this)
 
-theorem one_add_norm_pow_le_parts (n N : ℕ) (w : Fin n ⊕ Fin n → ℝ) :
-    (1 + ‖w‖) ^ N ≤ (1 + ‖pPart w‖) ^ N + (1 + ‖qPart w‖) ^ N := by
+theorem one_add_norm_pow_le_parts (n N : ℕ) (w : Fin n ⊕ Fin n → ℝ)
+    : (1 + ‖w‖) ^ N ≤ (1 + ‖pPart w‖) ^ N + (1 + ‖qPart w‖) ^ N := by
   have h := norm_le_max_parts n w
   rcases le_total ‖pPart w‖ ‖qPart w‖ with h' | h'
   · rw [max_eq_right h'] at h
@@ -39,9 +39,11 @@ end MatrixCoeff
 
 open MatrixCoeff
 
-theorem matrixCoeff_continuous_rapidDecay : ∀ (n : ℕ) (g g' : Sch (Fin n)),
-    Continuous (fun w : Fin n ⊕ Fin n → ℝ => ∫ x, rhoFun w ⇑g x * starRingEnd ℂ (g' x)) ∧
-    ∀ N : ℕ, ∃ C : ℝ, ∀ w : Fin n ⊕ Fin n → ℝ, ‖∫ x, rhoFun w ⇑g x * starRingEnd ℂ (g' x)‖ * (1 + ‖w‖) ^ N ≤ C := by
+theorem matrixCoeff_continuous_rapidDecay
+    : ∀ (n : ℕ) (g g' : Sch (Fin n)),
+      Continuous (fun w : Fin n ⊕ Fin n → ℝ => ∫ x, rhoFun w ⇑g x * starRingEnd ℂ (g' x))
+        ∧ ∀ N : ℕ, ∃ C : ℝ, ∀ w : Fin n ⊕ Fin n → ℝ,
+          ‖∫ x, rhoFun w ⇑g x * starRingEnd ℂ (g' x)‖ * (1 + ‖w‖) ^ N ≤ C := by
   intro n g g'
   refine ⟨GlobalTheory.T.continuous_matrix_coefficient n g g', fun N => ?_⟩
   obtain ⟨C1, h1⟩ := GlobalTheory.T.matrix_coeff_decay_first_part n g g' N
@@ -49,8 +51,9 @@ theorem matrixCoeff_continuous_rapidDecay : ∀ (n : ℕ) (g g' : Sch (Fin n)),
   refine ⟨C1 + C2, fun w => ?_⟩
   have := one_add_norm_pow_le_parts n N w
   have hn : 0 ≤ ‖∫ x, rhoFun w ⇑g x * starRingEnd ℂ (g' x)‖ := norm_nonneg _
-  calc _ ≤ ‖∫ x, rhoFun w ⇑g x * starRingEnd ℂ (g' x)‖ * ((1 + ‖pPart w‖) ^ N + (1 + ‖qPart w‖) ^ N) :=
-        mul_le_mul_of_nonneg_left this hn
+  calc
+    _ ≤ ‖∫ x, rhoFun w ⇑g x * starRingEnd ℂ (g' x)‖ * ((1 + ‖pPart w‖) ^ N + (1 + ‖qPart w‖) ^ N) :=
+      mul_le_mul_of_nonneg_left this hn
     _ ≤ C1 + C2 := by rw [mul_add]; exact add_le_add (h1 w) (h2 w)
 
 end GlobalTheory

@@ -17,8 +17,8 @@ theorem noRoot (m : ℕ) (hm : 1 ≤ m) : ∀ r : ℚ, r ^ 2 ≠ -(m : ℚ) + 1 
   have hm' : (1 : ℚ) ≤ m := by exact_mod_cast hm
   nlinarith [sq_nonneg (r - 1 / 2)]
 
-theorem sqfree_rat (d : ℕ) (hd : Squarefree d) (q : ℚ) (k : ℤ) (h : (d : ℚ) * q ^ 2 = k) :
-    ∃ y : ℤ, q = y := by
+theorem sqfree_rat (d : ℕ) (hd : Squarefree d) (q : ℚ) (k : ℤ) (h : (d : ℚ) * q ^ 2 = k)
+    : ∃ y : ℤ, q = y := by
   have h1 : ((d : ℤ) * q.num ^ 2 : ℚ) = ((k * (q.den : ℤ) ^ 2 : ℤ) : ℚ) := by
     rw [← Rat.mul_den_eq_num]
     push_cast
@@ -43,7 +43,8 @@ variable (m : ℕ) [Fact (∀ r : ℚ, r ^ 2 ≠ -(m : ℚ) + 1 * r)]
 instance : NumberField (Kq m) := {}
 
 theorem isIntegral_omega : IsIntegral ℤ (ω : Kq m) := by
-  refine ⟨Polynomial.X ^ 2 + (Polynomial.C (m : ℤ) - Polynomial.X), Polynomial.monic_X_pow_add ?_, ?_⟩
+  refine
+    ⟨Polynomial.X ^ 2 + (Polynomial.C (m : ℤ) - Polynomial.X), Polynomial.monic_X_pow_add ?_, ?_⟩
   · exact lt_of_le_of_lt (Polynomial.degree_le_of_natDegree_le (by compute_degree!)) (by norm_num)
   · simp [QuadraticAlgebra.ext_iff, sq]
 
@@ -53,8 +54,8 @@ theorem isIntegral_mk (x y : ℤ) : IsIntegral ℤ (⟨x, y⟩ : Kq m) := by
   rw [QuadraticAlgebra.mk_eq_add_smul_omega, Algebra.smul_def, map_intCast, map_intCast]
   exact (hint x).add ((hint y).mul (isIntegral_omega m))
 
-theorem repr_int (d : ℕ) (hd : Squarefree d) (hdm : d + 1 = 4 * m) (z : Kq m)
-    (hz : IsIntegral ℤ z) : ∃ x y : ℤ, z = ⟨x, y⟩ := by
+theorem repr_int (d : ℕ) (hd : Squarefree d) (hdm : d + 1 = 4 * m) (z : Kq m) (hz : IsIntegral ℤ z)
+    : ∃ x y : ℤ, z = ⟨x, y⟩ := by
   obtain ⟨a, b⟩ := z
   have hstar : IsIntegral ℤ (star (⟨a, b⟩ : Kq m)) := hz.map (starRingEnd (Kq m)).toIntAlgHom
   have hinj : Function.Injective (algebraMap ℚ (Kq m)) := (algebraMap ℚ (Kq m)).injective
@@ -63,7 +64,7 @@ theorem repr_int (d : ℕ) (hd : Squarefree d) (hdm : d + 1 = 4 * m) (z : Kq m)
     have e : (⟨a, b⟩ : Kq m) + star ⟨a, b⟩ = algebraMap ℚ (Kq m) (2 * a + b) := by
       ext <;> simp [QuadraticAlgebra.star_mk] <;> ring_nf
     rw [e] at h
-    exact (isIntegral_algebraMap_iff ).1 h
+    exact (isIntegral_algebraMap_iff).1 h
   have hn : IsIntegral ℤ (a ^ 2 + a * b + m * b ^ 2) := by
     have h := hz.mul hstar
     have e : (⟨a, b⟩ : Kq m) * star ⟨a, b⟩ = algebraMap ℚ (Kq m) (a ^ 2 + a * b + m * b ^ 2) := by
@@ -72,16 +73,17 @@ theorem repr_int (d : ℕ) (hd : Squarefree d) (hdm : d + 1 = 4 * m) (z : Kq m)
       congr 1
       ring
     rw [e] at h
-    exact (isIntegral_algebraMap_iff ).1 h
+    exact (isIntegral_algebraMap_iff).1 h
   obtain ⟨T, hT⟩ := rat_int_of_integral _ ht
   obtain ⟨N, hN⟩ := rat_int_of_integral _ hn
   have hd' : (d : ℚ) = 4 * m - 1 := by
     have h1 : (d : ℚ) + 1 = 4 * m := by exact_mod_cast hdm
     linarith
-  obtain ⟨B, hB⟩ := sqfree_rat d hd b (4 * N - T ^ 2) (by
-    push_cast
-    rw [← hT, ← hN, hd']
-    ring)
+  obtain ⟨B, hB⟩ :=
+    sqfree_rat d hd b (4 * N - T ^ 2) (by
+      push_cast
+      rw [← hT, ← hN, hd']
+      ring)
   have hZ : (4 * N : ℤ) = T ^ 2 + (4 * m - 1) * B ^ 2 := by
     have h1 : ((4 * N : ℤ) : ℚ) = ((T ^ 2 + (4 * m - 1) * B ^ 2 : ℤ) : ℚ) := by
       push_cast

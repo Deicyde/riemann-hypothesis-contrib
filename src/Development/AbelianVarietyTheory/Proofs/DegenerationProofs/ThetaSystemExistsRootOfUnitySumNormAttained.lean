@@ -17,16 +17,26 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ThetaSy
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
 open Classical
-open ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.DVR GlobalTheory.UT
+open ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.DVR
+  GlobalTheory.UT
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.TestFibre
 
 namespace GlobalTheory
 
-theorem thetaSys_exists_norm_FF_eq :
-    ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (S : ThetaSys o Ω) (p : ℕ) [Fact p.Prime] (y₀ : S.R →+* PadicAlgCl p), (∀ a : o, ‖y₀ (algebraMap o S.R a)‖ ≤ 1) → ∀ (T : AddSubgroup S.Gam) (c : T →+ ZMod S.N) (B : ℝ), (∀ (t : T) i, ‖∑ j, y₀ (algebraMap o S.R (S.proj T c j i)) * y₀ ⟨S.ev t j, S.ev_mem t j⟩‖ ≤ B) → (∃ (t : T) (i : S.J), B ≤ ‖∑ j, y₀ (algebraMap o S.R (S.proj T c j i)) * y₀ ⟨S.ev t j, S.ev_mem t j⟩‖) → ∃ (k : _) (hk : S.FF T c k ∈ S.R), ‖y₀ ⟨S.FF T c k, hk⟩‖ = B := by
+theorem thetaSys_exists_norm_FF_eq
+    : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] [ArithBase o Ω] (S : ThetaSys o Ω) (p : ℕ)
+        [Fact p.Prime] (y₀ : S.R →+* PadicAlgCl p),
+      (∀ a : o, ‖y₀ (algebraMap o S.R a)‖ ≤ 1)
+        → ∀ (T : AddSubgroup S.Gam) (c : T →+ ZMod S.N) (B : ℝ),
+          (∀ (t : T) i,
+              ‖∑ j, y₀ (algebraMap o S.R (S.proj T c j i)) * y₀ ⟨S.ev t j, S.ev_mem t j⟩‖ ≤ B)
+            → (∃ (t : T) (i : S.J),
+              B ≤ ‖∑ j, y₀ (algebraMap o S.R (S.proj T c j i)) * y₀ ⟨S.ev t j, S.ev_mem t j⟩‖)
+            → ∃ (k : _) (hk : S.FF T c k ∈ S.R), ‖y₀ ⟨S.FF T c k, hk⟩‖ = B := by
   intro o Ω _ _ _ hA S p _ y₀ hy T c B hle ⟨t, i, hge⟩
   have hN := S.N_ge
   have hr := S.r_pos
@@ -39,15 +49,18 @@ theorem thetaSys_exists_norm_FF_eq :
   have hmem := (thetaSys_FF_mem_finite_perp_proj o Ω S).1 T c
   set E : T → PadicAlgCl p := fun s =>
     ∑ j, y₀ (algebraMap o S.R (S.proj T c j i)) * y₀ ⟨S.ev s j, S.ev_mem s j⟩ with hE
-  have hval : ∀ k : T → ZMod ((S.r * S.N) ^ 2), y₀ ⟨S.FF T c (i, k), hmem _⟩
-      = ∑ s, y₀ (algebraMap o S.R S.ζ) ^ (k s).val * E s := fun k => by
-    have : (⟨S.FF T c (i, k), hmem _⟩ : S.R) = ∑ s : T, algebraMap o S.R S.ζ ^ (k s).val *
-        ∑ j, algebraMap o S.R (S.proj T c j i) * ⟨S.ev s j, S.ev_mem s j⟩ := by
+  have hval
+      : ∀ k : T → ZMod ((S.r * S.N) ^ 2),
+        y₀ ⟨S.FF T c (i, k), hmem _⟩
+          = ∑ s, y₀ (algebraMap o S.R S.ζ) ^ (k s).val * E s := fun k => by
+    have : (⟨S.FF T c (i, k), hmem _⟩ : S.R)
+        = ∑ s : T, algebraMap o S.R S.ζ ^ (k s).val *
+          ∑ j, algebraMap o S.R (S.proj T c j i) * ⟨S.ev s j, S.ev_mem s j⟩ := by
       apply Subtype.ext
       simp [ThetaSys.FF, finsum_eq_sum_of_fintype]
     rw [this]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [hE, map_sum]
+    simp [hE, map_sum]
   have hB : ‖E t‖ = B := le_antisymm (hle t i) hge
   have hB0 : 0 ≤ B := hB ▸ norm_nonneg _
   have h0 : ‖∑ s, E s‖ ≤ B :=
@@ -61,8 +74,7 @@ theorem thetaSys_exists_norm_FF_eq :
       have hp := S.prim
       rw [hm] at hp
       have h1 := hp.prod_one_sub_pow_eq_order
-      have h2 : IsUnit ((((S.r * S.N) ^ 2 : ℕ)) : o) := by
-        rw [Nat.cast_pow]; exact S.unit.pow _
+      have h2 : IsUnit ((((S.r * S.N) ^ 2 : ℕ)) : o) := by rw [Nat.cast_pow]; exact S.unit.pow _
       rw [hm, Nat.cast_succ, ← h1, Finset.prod_range_succ'] at h2
       simpa using isUnit_of_mul_isUnit_right h2
     have hone : ‖1 - y₀ (algebraMap o S.R S.ζ)‖ = 1 := by
@@ -73,11 +85,14 @@ theorem thetaSys_exists_norm_FF_eq :
         rw [← norm_mul, ← map_mul, ← map_mul, hv, map_one, map_one, norm_one]
       rw [map_sub, map_sub, map_one, map_one] at h1 h3
       refine le_antisymm h1 ?_
-      calc (1 : ℝ) = _ := h3.symm
+      calc
+        (1 : ℝ)
+          = _ := h3.symm
         _ ≤ _ := mul_le_of_le_one_right (norm_nonneg _) h2
     refine ⟨(i, Pi.single t 1), hmem _, ?_⟩
-    have hs : ∑ s, y₀ (algebraMap o S.R S.ζ) ^ ((Pi.single t 1 : T → ZMod ((S.r * S.N) ^ 2)) s).val * E s
-        = ∑ s, E s + -((1 - y₀ (algebraMap o S.R S.ζ)) * E t) := by
+    have hs
+        : ∑ s, y₀ (algebraMap o S.R S.ζ) ^ ((Pi.single t 1 : T → ZMod ((S.r * S.N) ^ 2)) s).val * E s
+          = ∑ s, E s + -((1 - y₀ (algebraMap o S.R S.ζ)) * E t) := by
       rw [← Finset.add_sum_erase _ _ (Finset.mem_univ t),
         ← Finset.add_sum_erase _ E (Finset.mem_univ t),
         Finset.sum_congr rfl (g := E) fun s hs => by
@@ -87,7 +102,7 @@ theorem thetaSys_exists_norm_FF_eq :
       ring
     have hn' : ‖-((1 - y₀ (algebraMap o S.R S.ζ)) * E t)‖ = B := by
       rw [norm_neg, norm_mul, hone, _root_.one_mul, hB]
-    rw [hval, hs, IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (by rw [hn']; exact h0.ne),
-      hn', max_eq_right h0.le]
+    rw [hval, hs, IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (by rw [hn']; exact h0.ne), hn',
+      max_eq_right h0.le]
 
 end GlobalTheory

@@ -12,9 +12,12 @@ namespace GlobalTheory.BK
 
 open PowerSeries Filter Topology Matrix
 
-theorem exists_eq_mul_add_of_isAdicComplete {R : Type} [CommRing R] (t : R)
-    [IsAdicComplete (Ideal.span {t}) R] (T : R →+ R) (hT : ∀ x, T (t * x) = t * T x) (w : R) :
-    ∃ x, x = t * T x + w := by
+theorem exists_eq_mul_add_of_isAdicComplete
+    {R : Type} [CommRing R]
+    (t : R) [IsAdicComplete (Ideal.span {t}) R]
+    (T : R →+ R) (hT : ∀ x, T (t * x) = t * T x)
+    (w : R)
+    : ∃ x, x = t * T x + w := by
   have hS (n : ℕ) (x y : R) : x ≡ y [SMOD (Ideal.span {t} ^ n • ⊤ : Ideal R)] ↔ t ^ n ∣ x - y := by
     simp [SModEq.sub_mem, Ideal.span_singleton_pow, Ideal.mem_span_singleton]
   have hd (n : ℕ) (x : R) (h : t ^ n ∣ x) : t ^ (n + 1) ∣ t * T x := by
@@ -32,14 +35,15 @@ theorem exists_eq_mul_add_of_isAdicComplete {R : Type} [CommRing R] (t : R)
     | succ n ih =>
       rw [hf (n + 1), hf n, add_sub_add_right_eq_sub, ← mul_sub, ← map_sub, ← hf]
       exact hd _ _ ih
-  obtain ⟨x, hx⟩ := IsPrecomplete.prec' (I := Ideal.span {t}) f (fun {m n} hmn => by
-    rw [hS]
-    induction hmn with
-    | refl => simp
-    | step h ih =>
-      have := dvd_sub ih ((pow_dvd_pow t h).trans (h1 _))
-      convert this using 1
-      simp)
+  obtain ⟨x, hx⟩ :=
+    IsPrecomplete.prec' (I := Ideal.span {t}) f (fun {m n} hmn => by
+      rw [hS]
+      induction hmn with
+      | refl => simp
+      | step h ih =>
+        have := dvd_sub ih ((pow_dvd_pow t h).trans (h1 _))
+        convert this using 1
+        simp)
   refine ⟨x, sub_eq_zero.1 (IsHausdorff.haus' (I := Ideal.span {t}) _ fun n => ?_)⟩
   rw [hS, sub_zero]
   have := dvd_sub (hd n _ ((hS _ _ _).1 (hx n))) ((hS _ _ _).1 (hx (n + 1)))
@@ -52,16 +56,21 @@ theorem pow_mul_factorial_dvd (l k : ℕ) (hl : 0 < l) : l ^ k * k.factorial ∣
   induction k with
   | zero => simp
   | succ k ih =>
-    obtain ⟨m, hm⟩ : ∃ m, l * (k + 1) = m + 1 := ⟨l * (k + 1) - 1, by
-      have : 0 < l * (k + 1) := by positivity
-      omega⟩
+    obtain ⟨m, hm⟩ : ∃ m, l * (k + 1) = m + 1 := ⟨
+      l * (k + 1) - 1,
+      by
+        have : 0 < l * (k + 1) := by positivity
+        omega
+    ⟩
     have h : (l * k).factorial ∣ m.factorial := Nat.factorial_dvd_factorial (by nlinarith)
     rw [hm, Nat.factorial_succ m, ← hm, Nat.factorial_succ, pow_succ]
     refine Dvd.dvd.trans (dvd_of_eq ?_) (mul_dvd_mul_left (l * (k + 1)) (ih.trans h))
     ring
 
-variable {O K : Type} [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K]
-  [IsUnitBall O K] (l e : ℕ) {a : ℕ} [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e]
+variable
+  {O K : Type} [CommRing O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K]
+  (l e : ℕ)
+  {a : ℕ} [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e]
 
 theorem exists_mul_frob_E : ∃ c ∈ S O K e, c * frob K l (E K l e) = l := by
   have hl := (Fact.out : l.Prime).pos
@@ -78,10 +87,18 @@ theorem exists_mul_frob_E : ∃ c ∈ S O K e, c * frob K l (E K l e) = l := by
         ← norm_pow, ← norm_mul]
       exact_mod_cast norm_natCast_le_of_dvd (K := K) (pow_mul_factorial_dvd l k hl)
     · simpa using wS_nonneg _ _
-  refine ⟨c, ⟨fun n => (hc n).trans (wS_le_one _ _), squeeze_zero
-    (fun n => mul_nonneg (norm_nonneg _) (wS_nonneg e n)) hc (tendsto_wS l (e * l))⟩, ?_⟩
-  have h := congrArg (fun f => expand (e * l) (NeZero.ne _) (rescale (-(l : K)⁻¹) f))
-    (mk_one_mul_one_sub_eq_one K)
+  refine ⟨
+    c,
+    ⟨
+      fun n => (hc n).trans (wS_le_one _ _),
+      squeeze_zero (fun n => mul_nonneg (norm_nonneg _) (wS_nonneg e n)) hc (tendsto_wS l (e * l))
+    ⟩,
+    ?_
+  ⟩
+  have h :=
+    congrArg
+      (fun f => expand (e * l) (NeZero.ne _) (rescale (-(l : K)⁻¹) f))
+      (mk_one_mul_one_sub_eq_one K)
   simp only [map_mul, map_sub, map_one, rescale_X, expand_X, expand_C, map_neg] at h
   have h2 : (C (l : K)⁻¹ : K⟦X⟧) * l = 1 := by
     rw [← map_natCast (C : K →+* K⟦X⟧), ← map_mul, inv_mul_cancel₀ hl0, map_one]
@@ -89,13 +106,13 @@ theorem exists_mul_frob_E : ∃ c ∈ S O K e, c * frob K l (E K l e) = l := by
   linear_combination (l : K⟦X⟧) * h - c * X ^ (e * l) * h2
 
 omit [IsUltrametricDist K] in
-theorem E_mul_N_Ezpow (j : ℤ) :
-    E K l e * N K (Ezpow (K := K) l e j) =
-      (j : K⟦X⟧) * N K (E K l e) * Ezpow (K := K) l e j := by
+theorem E_mul_N_Ezpow (j : ℤ)
+    : E K l e * N K (Ezpow (K := K) l e j) = (j : K⟦X⟧) * N K (E K l e) * Ezpow (K := K) l e j := by
   have h1 (i : ℤ) : Ezpow (K := K) l e (i + 1) = Ezpow (K := K) l e i * E K l e := by
     simp [Ezpow, _root_.zpow_add]
-  have key (i : ℤ) : N K (Ezpow (K := K) l e (i + 1)) =
-      Ezpow (K := K) l e i * N K (E K l e) + E K l e * N K (Ezpow (K := K) l e i) := by
+  have key (i : ℤ)
+      : N K (Ezpow (K := K) l e (i + 1))
+        = Ezpow (K := K) l e i * N K (E K l e) + E K l e * N K (Ezpow (K := K) l e i) := by
     rw [h1, Derivation.leibniz]
     rfl
   induction j using Int.induction_on with
@@ -114,8 +131,8 @@ theorem E_mul_N_Ezpow (j : ℤ) :
     linear_combination ih
 
 omit [IsUltrametricDist K] in
-theorem map_Ezpow (f : K⟦X⟧ →+* K⟦X⟧) (hf : f (E K l e) = E K l e) (j : ℤ) :
-    f (Ezpow (K := K) l e j) = Ezpow (K := K) l e j := by
+theorem map_Ezpow (f : K⟦X⟧ →+* K⟦X⟧) (hf : f (E K l e) = E K l e) (j : ℤ)
+    : f (Ezpow (K := K) l e j) = Ezpow (K := K) l e j := by
   have h : Units.map (f : K⟦X⟧ →* K⟦X⟧) (isUnit_E (K := K) l e).unit = (isUnit_E l e).unit :=
     Units.ext hf
   conv_rhs => rw [Ezpow, ← h, ← map_zpow]
@@ -128,35 +145,40 @@ theorem Ezpow_neg_mul (j : ℤ) : Ezpow (K := K) l e (-j) * Ezpow (K := K) l e j
 
 variable {l e}
 
-theorem mx_rankOne_eq (j : ZMod a → ℤ) (τ : ZMod a) (i k : Unit) :
-    (rankOne O K l e j).mx τ i k = Ezpow (K := K) l e (j τ) := by
-  have h : Units.map ((invE l e (A O K)).val : invE l e (A O K) →* K⟦X⟧) (Eunit O K l e) =
-      (isUnit_E l e).unit := Units.ext rfl
+theorem mx_rankOne_eq (j : ZMod a → ℤ) (τ : ZMod a) (i k : Unit)
+    : (rankOne O K l e j).mx τ i k = Ezpow (K := K) l e (j τ) := by
+  have h
+      : Units.map ((invE l e (A O K)).val : invE l e (A O K) →* K⟦X⟧) (Eunit O K l e)
+        = (isUnit_E l e).unit :=
+    Units.ext rfl
   rw [Ezpow, ← h, ← map_zpow]
   rw [PhiMod.mx, rankOne]
   dsimp only
   generalize Eunit O K l e ^ j τ = u
   simp
 
-theorem mxInv_rankOne_eq (j : ZMod a → ℤ) (τ : ZMod a) (i k : Unit) :
-    (rankOne O K l e j).mxInv τ i k = Ezpow (K := K) l e (-j τ) := by
+theorem mxInv_rankOne_eq (j : ZMod a → ℤ) (τ : ZMod a) (i k : Unit)
+    : (rankOne O K l e j).mxInv τ i k = Ezpow (K := K) l e (- j τ) := by
   have h := congrFun (congrFun ((rankOne O K l e j).mxInv_mul_mx τ) ()) ()
   rw [Matrix.mul_apply, Fintype.sum_unique, mx_rankOne_eq, Matrix.one_apply_eq,
-    ← Ezpow_neg_mul l e (j τ)] at h
+      ← Ezpow_neg_mul l e (j τ)]
+    at h
   exact mul_right_cancel₀ (Units.ne_zero _) h
 
-theorem phi_bas_rankOne (j : ℤ) : (rankOne O K l e fun _ : ZMod a => j).phi (bas ()) =
-    Ezpow (K := K) l e j • bas () := by
+theorem phi_bas_rankOne (j : ℤ)
+    : (rankOne O K l e fun _ : ZMod a => j).phi (bas ()) = Ezpow (K := K) l e j • bas () := by
   ext τ i : 2
   simp [PhiMod.phi_bas, mx_rankOne_eq, bas]
 
-theorem mem_ext_rankOne (j : ℤ) {B : Subalgebra O K⟦X⟧} {v : Vec K a Unit} :
-    v ∈ (rankOne O K l e fun _ : ZMod a => j).ext B ↔ ∀ τ, Ezpow (K := K) l e (-j) * v τ () ∈ B := by
+theorem mem_ext_rankOne (j : ℤ) {B : Subalgebra O K⟦X⟧} {v : Vec K a Unit}
+    : v ∈ (rankOne O K l e fun _ : ZMod a => j).ext B
+      ↔ ∀ τ, Ezpow (K := K) l e (-j) * v τ () ∈ B := by
   rw [PhiMod.ext, mem_tot]
   refine forall_congr' fun τ => ?_
   rw [PhiMod.extc, Set.range_unique, Submodule.mem_span_singleton]
-  have h (c : B) : c • ((rankOne O K l e fun _ : ZMod a => j).mx τ).col () = v τ ↔
-      (c : K⟦X⟧) = Ezpow (K := K) l e (-j) * v τ () := by
+  have h (c : B)
+      : c • ((rankOne O K l e fun _ : ZMod a => j).mx τ).col () = v τ
+        ↔ (c : K⟦X⟧) = Ezpow (K := K) l e (-j) * v τ () := by
     simp only [funext_iff, Unique.forall_iff, Pi.smul_apply, Subalgebra.smul_def, smul_eq_mul,
       Matrix.col_apply, mx_rankOne_eq]
     constructor <;> intro hc
@@ -166,28 +188,36 @@ theorem mem_ext_rankOne (j : ℤ) {B : Subalgebra O K⟦X⟧} {v : Vec K a Unit}
 
 variable [CompleteSpace K]
 
-theorem exists_nabla_rankOne (j : ℤ) : ∃ γ ∈ S O K e,
-    (rankOne O K l e fun _ : ZMod a => j).nabla (Ezpow (K := K) l e j • bas ()) =
-      γ • Ezpow (K := K) l e j • bas () := by
+theorem exists_nabla_rankOne (j : ℤ)
+    : ∃ γ ∈ S O K e,
+      (rankOne O K l e fun _ : ZMod a => j).nabla (Ezpow (K := K) l e j • bas ())
+        = γ • Ezpow (K := K) l e j • bas () := by
   set P := rankOne O K l e fun _ : ZMod a => j
   obtain ⟨c, hc, hcE⟩ := exists_mul_frob_E (O := O) (K := K) l e
   obtain ⟨m, hm⟩ : ∃ m, l = m + 1 := Nat.exists_eq_succ_of_ne_zero (Fact.out : l.Prime).ne_zero
   obtain ⟨n, hn⟩ : ∃ n, l * e = n + 1 :=
     Nat.exists_eq_succ_of_ne_zero (mul_ne_zero (Fact.out : l.Prime).ne_zero (NeZero.ne e))
   have := isAdicComplete_S O K l e
-  obtain ⟨γ, hγ⟩ := exists_eq_mul_add_of_isAdicComplete (l : S O K e)
-    { toFun := fun x => uIn _ ^ m * ⟨_, frob_mem_S l x.2⟩
-      map_zero' := Subtype.ext (by simp)
-      map_add' := fun x y => Subtype.ext (by simp [mul_add]) }
-    (fun x => Subtype.ext (by simp [mul_left_comm])) (-((j : S O K e) * (e : S O K e) * uIn (S O K e) ^ n * (⟨c, hc⟩ : S O K e)))
-  have hγ' : (γ : K⟦X⟧) = (l : K⟦X⟧) * (X ^ m * frob K l γ) +
-      -((j : K⟦X⟧) * (e : K⟦X⟧) * (X : K⟦X⟧) ^ n * c) := by
+  obtain ⟨γ, hγ⟩ :=
+    exists_eq_mul_add_of_isAdicComplete (l : S O K e)
+      {
+        toFun := fun x => uIn _ ^ m * ⟨_, frob_mem_S l x.2⟩
+        map_zero' := Subtype.ext (by simp)
+        map_add' := fun x y => Subtype.ext (by simp [mul_add])
+      }
+      (fun x => Subtype.ext (by simp [mul_left_comm]))
+      (-((j : S O K e) * (e : S O K e) * uIn (S O K e) ^ n * (⟨c, hc⟩ : S O K e)))
+  have hγ'
+      : (γ : K⟦X⟧)
+        = (l : K⟦X⟧) * (X ^ m * frob K l γ) + -((j : K⟦X⟧) * (e : K⟦X⟧) * (X : K⟦X⟧) ^ n * c) := by
     simpa using congrArg Subtype.val hγ
   refine ⟨γ, γ.2, smul_right_injective _ (X_ne_zero (R := K)) ?_⟩
-  have hq : (l : K⟦X⟧) * frob K l (N K (Ezpow (K := K) l e (-j)) * Ezpow (K := K) l e j) =
-      -((j : K⟦X⟧) * (e : K⟦X⟧) * (X : K⟦X⟧) ^ (n + 1) * c) := by
-    have h1 : E K l e * (N K (Ezpow (K := K) l e (-j)) * Ezpow (K := K) l e j) =
-        -((j : K⟦X⟧) * (e : K⟦X⟧) * (X : K⟦X⟧) ^ e) := by
+  have hq
+      : (l : K⟦X⟧) * frob K l (N K (Ezpow (K := K) l e (-j)) * Ezpow (K := K) l e j)
+        = -((j : K⟦X⟧) * (e : K⟦X⟧) * (X : K⟦X⟧) ^ (n + 1) * c) := by
+    have h1
+        : E K l e * (N K (Ezpow (K := K) l e (-j)) * Ezpow (K := K) l e j)
+          = -((j : K⟦X⟧) * (e : K⟦X⟧) * (X : K⟦X⟧) ^ e) := by
       rw [← mul_assoc, E_mul_N_Ezpow, mul_assoc, Ezpow_neg_mul, N_E]
       push_cast
       ring
@@ -205,19 +235,20 @@ theorem exists_nabla_rankOne (j : ℤ) : ∃ γ ∈ S O K e,
   rw [← sub_eq_zero, smul_smul X]
   refine hR.eq_zero (σ := (id : Unit → Unit)) Function.surjective_id
     (δ := fun _ =>
-      P.conn (Ezpow (K := K) l e j • bas ()) -
-        (X * (γ : K⟦X⟧)) • Ezpow (K := K) l e j • bas ())
+      P.conn (Ezpow (K := K) l e j • bas ()) - (X * (γ : K⟦X⟧)) • Ezpow (K := K) l e j • bas ())
     (fun _ => sub_mem (P.conn_mem_uPow _) (by rw [mul_smul]; exact X_smul_mem_uPow _))
-    (fun _ => ?_) ()
-  have h3 : Ezpow (K := K) l e (-j) • P.conn (Ezpow (K := K) l e j • bas ()) =
-      P.conn (bas ()) - (N K (Ezpow (K := K) l e (-j)) * Ezpow (K := K) l e j) • bas () := by
+    (fun _ => ?_)
+    ()
+  have h3
+      : Ezpow (K := K) l e (-j) • P.conn (Ezpow (K := K) l e j • bas ())
+        = P.conn (bas ()) - (N K (Ezpow (K := K) l e (-j)) * Ezpow (K := K) l e j) • bas () := by
     conv_rhs => rw [hb, P.conn_smul, ← hb, mul_smul, add_sub_cancel_left]
-  have hmulV (v : Vec K a Unit) :
-      mulV K a Unit (Ezpow (K := K) l e (-j)) v = Ezpow (K := K) l e (-j) • v := rfl
-  rw [mul_apply_eq_comp, hmulV, smul_sub, h3, smul_comm _ (X * (γ : K⟦X⟧)), ← hb, map_sub,
-    map_sub, P.lphi_apply, ← P.conn_phi, P.lphi_apply, P.lphi_apply, P.phi_smul, P.phi_smul,
-    phi_bas_rankOne, hl, hl, smul_smul (l : K⟦X⟧), smul_smul (l : K⟦X⟧), hq, sub_sub, ← add_smul,
-    map_mul, frob_X]
+  have hmulV (v : Vec K a Unit)
+      : mulV K a Unit (Ezpow (K := K) l e (-j)) v = Ezpow (K := K) l e (-j) • v :=
+    rfl
+  rw [mul_apply_eq_comp, hmulV, smul_sub, h3, smul_comm _ (X * (γ : K⟦X⟧)), ← hb, map_sub, map_sub,
+    P.lphi_apply, ← P.conn_phi, P.lphi_apply, P.lphi_apply, P.phi_smul, P.phi_smul, phi_bas_rankOne,
+    hl, hl, smul_smul (l : K⟦X⟧), smul_smul (l : K⟦X⟧), hq, sub_sub, ← add_smul, map_mul, frob_X]
   congr 2
   have hX : (X : K⟦X⟧) ^ l = X ^ (m + 1) := by rw [← hm]
   linear_combination X * hγ' - l * frob K l γ * hX

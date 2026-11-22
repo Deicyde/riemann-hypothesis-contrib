@@ -14,8 +14,8 @@ namespace GlobalTheory.MomN
 open GlobalTheory.MomOne PowerSeries
 open scoped ComplexConjugate
 
-theorem exists_padicInt_inv {q : ℕ} [Fact q.Prime] {s : ℕ} (h : Nat.Coprime s q) :
-    ∃ u : ℤ_[q], (s : ℤ_[q]) * u = 1 := by
+theorem exists_padicInt_inv {q : ℕ} [Fact q.Prime] {s : ℕ} (h : Nat.Coprime s q)
+    : ∃ u : ℤ_[q], (s : ℤ_[q]) * u = 1 := by
   have h1 : IsUnit (s : ℤ_[q]) := by
     rw [PadicInt.isUnit_iff]
     have hq : ¬ (q : ℤ) ∣ (s : ℤ) := by
@@ -32,7 +32,14 @@ theorem exists_padicInt_inv {q : ℕ} [Fact q.Prime] {s : ℕ} (h : Nat.Coprime 
   obtain ⟨u, hu⟩ := h1
   exact ⟨((u⁻¹ : ℤ_[q]ˣ) : ℤ_[q]), by rw [← hu]; simp⟩
 
-theorem latInt_of_span : ∀ (q : ℕ) [Fact q.Prime] (ι : ℂ ≃+* ℂ_[q]) (V : Type) [NormedAddCommGroup V] [NormedSpace ℂ V] (d : ℕ) (ω : ℂ_[q]) (Λ : AddSubgroup V) (κ : Type) [Fintype κ] (b : κ → V) (G : V → ℂ), d.Prime → d % 16 = 7 → Split d q → (∀ x ∈ Λ, ∃ s : ℕ, Nat.Coprime s q ∧ ∃ c : κ → ℂ, (∀ i, InOK d (c i)) ∧ (s : ℂ) • x = ∑ i, c i • b i) → MomInt ι (fun i => ι.symm ω • b i) G → LatInt ι ω Λ G := by
+theorem latInt_of_span
+    : ∀ (q : ℕ) [Fact q.Prime] (ι : ℂ ≃+* ℂ_[q]) (V : Type) [NormedAddCommGroup V] [NormedSpace ℂ V]
+        (d : ℕ) (ω : ℂ_[q]) (Λ : AddSubgroup V) (κ : Type) [Fintype κ] (b : κ → V) (G : V → ℂ),
+      d.Prime → d % 16 = 7 → Split d q
+        → (∀ x ∈ Λ, ∃ s : ℕ,
+          Nat.Coprime s q ∧ ∃ c : κ → ℂ, (∀ i, InOK d (c i)) ∧ (s : ℂ) • x = ∑ i, c i • b i)
+        → MomInt ι (fun i => ι.symm ω • b i) G
+        → LatInt ι ω Λ G := by
   intro q _ ι V _ _ d ω Λ κ _ b G hd h16 hS hspan hM κ' _ v hv
   have hOK := GlobalTheory.MomOne.okArith d q ι hd h16 hS
   choose s hs c hc hx using fun i => hspan (v i) (hv i)
@@ -49,8 +56,12 @@ theorem latInt_of_span : ∀ (q : ℕ) [Fact q.Prime] (ι : ℂ ≃+* ℂ_[q]) (
     intro i
     have := congrArg (zc (q := q)) (hu i)
     simpa [zc] using this
-  refine GlobalTheory.T.jetsAreBoundedMeasureMoments_padicInt_matrix_change q ι V κ κ' (fun i => ι.symm ω • b i) (fun i => ι.symm ω • v i)
-    (fun i j => c i j / s i) (fun i j => a i j * u i) G ?_ ?_ hM
+  refine GlobalTheory.T.jetsAreBoundedMeasureMoments_padicInt_matrix_change q ι V κ κ'
+    (fun i => ι.symm ω • b i)
+    (fun i => ι.symm ω • v i)
+    (fun i j => c i j / s i)
+    (fun i j => a i j * u i)
+    G ?_ ?_ hM
   · intro i j
     have hsq : (s i : ℂ_[q]) ≠ 0 := fun h0 => by
       have := hzu i

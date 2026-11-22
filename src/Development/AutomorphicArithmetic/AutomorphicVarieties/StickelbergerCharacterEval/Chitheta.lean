@@ -7,12 +7,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open Finset UpperTheory.V.Bern UpperTheory.V.B4 UpperTheory.V.B5
 
-theorem UpperTheory.V.B5.groupRingCharEval_stickelbergerTheta_eq_neg_genBernoulli :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] {N : ℕ} [NeZero N] {Γ : Type} [CommGroup Γ] (π : (ZMod N)ˣ →* Γ) (χ : Γ →* Ωˣ) (k : ℕ), 2 ≤ N → ev ℚ χ (thetaEl k π) = -genB k (dirOf π χ) / k := by
+theorem UpperTheory.V.B5.groupRingCharEval_stickelbergerTheta_eq_neg_genBernoulli
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] {N : ℕ} [NeZero N] {Γ : Type} [CommGroup Γ]
+        (π : (ZMod N)ˣ →* Γ) (χ : Γ →* Ωˣ) (k : ℕ),
+      2 ≤ N → ev ℚ χ (thetaEl k π) = - genB k (dirOf π χ) / k := by
   intro Ω _ _ N _ Γ _ π χ k hN
   haveI : Fact (1 < N) := ⟨hN⟩
-  have hsum : ∀ f : ZMod N → Ω, (∀ x, ¬ IsUnit x → f x = 0) →
-      ∑ x, f x = ∑ u : (ZMod N)ˣ, f u := by
+  have hsum : ∀ f : ZMod N → Ω, (∀ x, ¬ IsUnit x → f x = 0) → ∑ x, f x = ∑ u : (ZMod N)ˣ, f u := by
     intro f hf
     symm
     rw [show ∑ u : (ZMod N)ˣ, f u = ∑ x ∈ Finset.univ.map ⟨Units.val, Units.val_injective⟩, f x by
@@ -22,8 +23,9 @@ theorem UpperTheory.V.B5.groupRingCharEval_stickelbergerTheta_eq_neg_genBernoull
     apply hf
     rintro ⟨u, rfl⟩
     exact hx (Finset.mem_map.2 ⟨u, Finset.mem_univ _, rfl⟩)
-  have h1 : ∑ a ∈ Icc 1 N, dirOf π χ (a : ZMod N) * algebraMap ℚ Ω (bcoef N k a) =
-      ∑ a ∈ Icc 1 N, dirOf π χ (a : ZMod N) * algebraMap ℚ Ω (bcoef N k (a : ZMod N).val) := by
+  have h1
+      : ∑ a ∈ Icc 1 N, dirOf π χ (a : ZMod N) * algebraMap ℚ Ω (bcoef N k a)
+        = ∑ a ∈ Icc 1 N, dirOf π χ (a : ZMod N) * algebraMap ℚ Ω (bcoef N k (a : ZMod N).val) := by
     refine Finset.sum_congr rfl fun a ha => ?_
     obtain ⟨_, h2⟩ := Finset.mem_Icc.1 ha
     rcases h2.lt_or_eq with h | rfl

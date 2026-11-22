@@ -16,12 +16,13 @@ section Lin
 
 variable {V : Type} [AddCommGroup V] [Module ℝ V] [FiniteDimensional ℝ V]
 
-theorem _root_.GlobalTheory.DatumSign.trace_eq :
-    ∀ {V : Type} [AddCommGroup V] [Module ℝ V] [FiniteDimensional ℝ V] (T : V →ₗ[ℝ] V) (s : ℝ),
+theorem _root_.GlobalTheory.DatumSign.trace_eq
+    : ∀ {V : Type} [AddCommGroup V] [Module ℝ V] [FiniteDimensional ℝ V] (T : V →ₗ[ℝ] V) (s : ℝ),
       ∀ (hs : (0 : ℝ) < s) (hT : ∀ (x : V), T (T x) = (s * s) • x),
-        LinearMap.trace ℝ V T =
-          s * ((2 : ℝ) * (Module.finrank ℝ (T - s • LinearMap.id).ker : ℝ) -
-            (Module.finrank ℝ V : ℝ)) := by
+        LinearMap.trace ℝ V T
+          = s
+            * ((2 : ℝ) * (Module.finrank ℝ (T - s • LinearMap.id).ker : ℝ)
+              - (Module.finrank ℝ V : ℝ)) := by
   intro V _ _ _ T s hs hT
   set P : V →ₗ[ℝ] V := (2 * s)⁻¹ • (T + s • LinearMap.id) with hP
   have hproj : LinearMap.IsProj (T - s • LinearMap.id).ker P := by

@@ -20,7 +20,8 @@ def l1 (p : MvPolynomial ι ℂ) : ℝ := ∑ α ∈ p.support, ‖p.coeff α‖
 
 def lin [Fintype ι] (v : ι → ℝ) : MvPolynomial ι ℂ := ∑ i, C (v i : ℂ) * X i
 
-def lift {A : Type} [CommRing A] [Algebra ℂ A] (x : ι → A) (τ : Multiplicative (ι → ℝ) →* A) : EP ι →+* A :=
+def lift {A : Type} [CommRing A] [Algebra ℂ A] (x : ι → A) (τ : Multiplicative (ι → ℝ) →* A)
+    : EP ι →+* A :=
   AddMonoidAlgebra.liftNCRingHom (aeval x).toRingHom τ fun _ _ => Commute.all _ _
 
 def expChar [Fintype ι] (Λ : ι → ℂ) : Multiplicative (ι → ℝ) →* ℂ where
@@ -33,8 +34,9 @@ def ev [Fintype ι] (Λ : ι → ℂ) : EP ι →+* ℂ := lift Λ (expChar Λ)
 def evK [Fintype ι] (Λ : ι → ℂ) (h : κ → ℂ) : KF ι κ →+* ℂ := eval₂Hom (ev Λ) h
 
 def piece [Fintype ι] (k : ℕ) (f : EP ι) : MvPolynomial ι ℂ :=
-  f.coeff.sum fun v p => ∑ b ∈ Finset.range (k + 1),
-    homogeneousComponent (k - b) p * (C ((b.factorial : ℂ)⁻¹) * lin v ^ b)
+  f.coeff.sum fun v p =>
+    ∑ b ∈ Finset.range (k + 1),
+      homogeneousComponent (k - b) p * (C ((b.factorial : ℂ)⁻¹) * lin v ^ b)
 
 def pieceK [Fintype ι] (k : ℕ) (F : KF ι κ) : MvPolynomial κ (MvPolynomial ι ℂ) :=
   ∑ β ∈ F.support, monomial β (piece k (F.coeff β))

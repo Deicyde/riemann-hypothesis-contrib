@@ -15,10 +15,11 @@ namespace GlobalTheory.BorelModulus
 
 abbrev Pos (n : ℕ) : Type := {p : Fin n × Fin n // p.1 < p.2}
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
 
-theorem mem_U_iff (g : GL (Fin n) k) :
-    g ∈ (borelGL k (Fin n)).U ↔ (∀ i j, j < i → g.val i j = 0) ∧ ∀ i, g.val i i = 1 := by
+theorem mem_U_iff (g : GL (Fin n) k)
+    : g ∈ (borelGL k (Fin n)).U ↔ (∀ i j, j < i → g.val i j = 0) ∧ ∀ i, g.val i i = 1 := by
   rw [LeviDatum.mem_U]
   constructor
   · rintro ⟨h, e⟩
@@ -26,16 +27,20 @@ theorem mem_U_iff (g : GL (Fin n) k) :
   · rintro ⟨h, e⟩
     exact ⟨fun _ _ hij => h _ _ hij, funext fun i => Units.ext (e i)⟩
 
-def uniMat (x : Pos n → k) : Matrix (Fin n) (Fin n) k :=
-  fun i j => if h : i < j then x ⟨(i, j), h⟩ else if i = j then 1 else 0
+def uniMat (x : Pos n → k) : Matrix (Fin n) (Fin n) k := fun i j =>
+  if h : i < j then
+    x ⟨(i, j), h⟩
+  else if i = j then
+    1
+  else
+    0
 
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
 theorem uniMat_low (x : Pos n → k) (i j : Fin n) (h : j < i) : uniMat x i j = 0 := by
   simp [uniMat, h.not_gt, h.ne']
 
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
-theorem uniMat_diag (x : Pos n → k) (i : Fin n) : uniMat x i i = 1 := by
-  simp [uniMat]
+theorem uniMat_diag (x : Pos n → k) (i : Fin n) : uniMat x i i = 1 := by simp [uniMat]
 
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
 theorem uniMat_det (x : Pos n → k) : (uniMat x).det = 1 := by
@@ -50,15 +55,20 @@ theorem continuous_uniMat : Continuous (uniMat : (Pos n → k) → _) := by
   · exact continuous_const
   · exact continuous_const
 
-def uniGL (x : Pos n → k) : GL (Fin n) k :=
-  ⟨uniMat x, (uniMat x).adjugate, by rw [mul_adjugate, uniMat_det, one_smul],
-    by rw [adjugate_mul, uniMat_det, one_smul]⟩
+def uniGL (x : Pos n → k) : GL (Fin n) k := ⟨
+  uniMat x,
+  (uniMat x).adjugate,
+  by rw [mul_adjugate, uniMat_det, one_smul],
+  by rw [adjugate_mul, uniMat_det, one_smul]
+⟩
 
 theorem continuous_uniGL : Continuous (uniGL : (Pos n → k) → _) :=
   Units.continuous_iff.2 ⟨continuous_uniMat, continuous_uniMat.matrix_adjugate⟩
 
-def coord (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ) :
-    (borelGL k (Fin n)).U ≃ₜ (Pos n → k) where
+def coord
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (n : ℕ)
+    : (borelGL k (Fin n)).U ≃ₜ (Pos n → k) where
   toFun u p := u.1.val p.1.1 p.1.2
   invFun x := ⟨uniGL x, (mem_U_iff _).2 ⟨uniMat_low x, uniMat_diag x⟩⟩
   left_inv u := by
@@ -76,10 +86,11 @@ def coord (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchi
   continuous_toFun := continuous_pi fun p => (continuous_entry _ _).comp continuous_subtype_val
   continuous_invFun := continuous_uniGL.subtype_mk _
 
-theorem coord_apply (u : (borelGL k (Fin n)).U) (p : Pos n) : coord k n u p = u.1.val p.1.1 p.1.2 := rfl
+theorem coord_apply (u : (borelGL k (Fin n)).U) (p : Pos n) : coord k n u p = u.1.val p.1.1 p.1.2 :=
+  rfl
 
-def leftMat (A : Matrix (Fin n) (Fin n) k) : Matrix (Pos n) (Pos n) k :=
-  fun p q => if q.1.2 = p.1.2 then A p.1.1 q.1.1 else 0
+def leftMat (A : Matrix (Fin n) (Fin n) k) : Matrix (Pos n) (Pos n) k := fun p q =>
+  if q.1.2 = p.1.2 then A p.1.1 q.1.1 else 0
 
 theorem leftMat_det (u : (borelGL k (Fin n)).U) : (leftMat u.1.val).det = 1 := by
   obtain ⟨h1, h2⟩ := (mem_U_iff _).1 u.2
@@ -93,14 +104,14 @@ theorem leftMat_det (u : (borelGL k (Fin n)).U) : (leftMat u.1.val).det = 1 := b
     simp [toSquareBlock_def, leftMat, h2, Matrix.one_apply, eq_comm]
   rw [this, det_one]
 
-theorem coord_mul (u x : (borelGL k (Fin n)).U) :
-    coord k n (u * x) = (leftMat u.1.val).mulVec (coord k n x) + coord k n u := by
+theorem coord_mul (u x : (borelGL k (Fin n)).U)
+    : coord k n (u * x) = (leftMat u.1.val).mulVec (coord k n x) + coord k n u := by
   obtain ⟨h1, h2⟩ := (mem_U_iff _).1 x.2
   funext ⟨⟨i, j⟩, hp⟩
   show (u.1.val * x.1.val) i j = ∑ q : Pos n, (if q.1.2 = j then u.1.val i q.1.1 else 0) * x.1.val q.1.1 q.1.2 +
     u.1.val i j
   rw [← Finset.sum_subtype (Finset.univ.filter fun p : Fin n × Fin n => p.1 < p.2) (by simp)
-    (fun q : Fin n × Fin n => (if q.2 = j then u.1.val i q.1 else 0) * x.1.val q.1 q.2),
+      (fun q : Fin n × Fin n => (if q.2 = j then u.1.val i q.1 else 0) * x.1.val q.1 q.2),
     Finset.sum_filter, Fintype.sum_prod_type, Matrix.mul_apply]
   have : u.1.val i j = ∑ l, if l = j then u.1.val i l else 0 := by simp
   rw [this, ← Finset.sum_add_distrib]
@@ -111,9 +122,9 @@ theorem coord_mul (u x : (borelGL k (Fin n)).U) :
   · simp [h2]
   · simp [h.not_gt, h.ne', h1 _ _ h]
 
-theorem coord_conj (t : Fin n → kˣ) (ht) (x : (borelGL k (Fin n)).U) :
-    coord k n (conjAut _ ⟨(borelGL k (Fin n)).s t, ht⟩ x) =
-      (diagonal fun p : Pos n => ((t p.1.1 * (t p.1.2)⁻¹ : kˣ) : k)).mulVec (coord k n x) := by
+theorem coord_conj (t : Fin n → kˣ) (ht) (x : (borelGL k (Fin n)).U)
+    : coord k n (conjAut _ ⟨(borelGL k (Fin n)).s t, ht⟩ x)
+      = (diagonal fun p : Pos n => ((t p.1.1 * (t p.1.2)⁻¹ : kˣ) : k)).mulVec (coord k n x) := by
   funext p
   rw [mulVec_diagonal, coord_apply, conjAut_coe, coord_apply]
   show ((diagHom k (Fin n) t) * x.1 * (diagHom k (Fin n) t)⁻¹).val _ _ = _
@@ -121,22 +132,25 @@ theorem coord_conj (t : Fin n → kˣ) (ht) (x : (borelGL k (Fin n)).U) :
   simp only [Pi.inv_apply, Units.val_mul]
   ring
 
-theorem prod_pos_eq {G : Type} [CommGroup G] (t : Fin n → G) :
-    ∏ p : Pos n, (t p.1.1 * (t p.1.2)⁻¹) = ∏ i : Fin n, t i ^ ((n : ℤ) - 1 - 2 * (i.val : ℤ)) := by
+theorem prod_pos_eq {G : Type} [CommGroup G] (t : Fin n → G)
+    : ∏ p : Pos n, (t p.1.1 * (t p.1.2)⁻¹)
+      = ∏ i : Fin n, t i ^ ((n : ℤ) - 1 - 2 * (i.val : ℤ)) := by
   rw [← Finset.prod_subtype (Finset.univ.filter fun p : Fin n × Fin n => p.1 < p.2) (by simp)
-    (fun q : Fin n × Fin n => t q.1 * (t q.2)⁻¹), Finset.prod_mul_distrib, Finset.prod_filter, Finset.prod_filter,
-    Fintype.prod_prod_type, Fintype.prod_prod_type_right, ← Finset.prod_mul_distrib]
+      (fun q : Fin n × Fin n => t q.1 * (t q.2)⁻¹),
+    Finset.prod_mul_distrib, Finset.prod_filter, Finset.prod_filter, Fintype.prod_prod_type,
+    Fintype.prod_prod_type_right, ← Finset.prod_mul_distrib]
   refine Finset.prod_congr rfl fun i _ => ?_
   simp only [← Finset.prod_filter, Finset.prod_const]
-  rw [Finset.filter_lt_eq_Ioi, Finset.filter_gt_eq_Iio, Fin.card_Ioi, Fin.card_Iio, inv_pow, ← zpow_natCast,
-    ← zpow_natCast, ← _root_.zpow_sub]
+  rw [Finset.filter_lt_eq_Ioi, Finset.filter_gt_eq_Iio, Fin.card_Ioi, Fin.card_Iio, inv_pow,
+    ← zpow_natCast, ← zpow_natCast, ← _root_.zpow_sub]
   congr 1
   have := i.2
   omega
 
-theorem delta_eq (q : (borelGL k (Fin n)).Q) :
-    (borelGL k (Fin n)).delta q =
-      distribHaarChar k (∏ p : Pos n, ((borelGL k (Fin n)).p q p.1.1 * ((borelGL k (Fin n)).p q p.1.2)⁻¹)) := by
+theorem delta_eq (q : (borelGL k (Fin n)).Q)
+    : (borelGL k (Fin n)).delta q
+      = distribHaarChar k
+        (∏ p : Pos n, ((borelGL k (Fin n)).p q p.1.1 * ((borelGL k (Fin n)).p q p.1.2)⁻¹)) := by
   haveI := SplitWeil.secondCountable k
   borelize k
   borelize ↥(borelGL k (Fin n)).U
@@ -168,38 +182,43 @@ theorem delta_eq (q : (borelGL k (Fin n)).Q) :
   set c := distribHaarChar k (∏ p : Pos n, (t p.1.1 * (t p.1.2)⁻¹))
   have hc : Continuous (conjAut (borelGL k (Fin n)).U g) := (conjAut _ g).continuous
   have h3 : (c : ENNReal) • Measure.map (conjAut _ g) μ = μ := by
-    have h1 : (conjAut _ g) ∘ e.symm =
-        e.symm ∘ (diagonal fun p : Pos n => ((t p.1.1 * (t p.1.2)⁻¹ : kˣ) : k)).mulVec := by
+    have h1
+        : (conjAut _ g) ∘ e.symm
+          = e.symm ∘ (diagonal fun p : Pos n => ((t p.1.1 * (t p.1.2)⁻¹ : kˣ) : k)).mulVec := by
       funext y
       apply e.injective
       simp only [Function.comp_apply, Homeomorph.apply_symm_apply]
       rw [coord_conj, Homeomorph.apply_symm_apply]
-    have h2 := WeilM.smul_map_mulVec_pi ν (diagonal fun p : Pos n => ((t p.1.1 * (t p.1.2)⁻¹ : kˣ) : k))
-      (∏ p : Pos n, (t p.1.1 * (t p.1.2)⁻¹)) (by rw [det_diagonal, Units.coe_prod])
-    rw [Measure.map_map hc.measurable hes, h1, ← Measure.map_map hes (hm _),
-      ← Measure.map_smul, h2]
+    have h2 :=
+      WeilM.smul_map_mulVec_pi ν (diagonal fun p : Pos n => ((t p.1.1 * (t p.1.2)⁻¹ : kˣ) : k))
+        (∏ p : Pos n, (t p.1.1 * (t p.1.2)⁻¹)) (by rw [det_diagonal, Units.coe_prod])
+    rw [Measure.map_map hc.measurable hes, h1, ← Measure.map_map hes (hm _), ← Measure.map_smul, h2]
     exact hes.aemeasurable
   haveI : LocallyCompactSpace (borelGL k (Fin n)).U := (borelGL k (Fin n)).closed_U.locallyCompactSpace
   obtain ⟨K, hK, hK1⟩ := exists_compact_mem_nhds (1 : (borelGL k (Fin n)).U)
   have h4 := modulus_measure _ (borelGL k (Fin n)).closed_U μ g K
   have h5 := congrArg (fun m : Measure _ => m (conjAut _ g '' K)) h3
   simp only [Measure.smul_apply, smul_eq_mul] at h5
-  rw [Measure.map_apply hc.measurable
-    (hK.image hc).isClosed.measurableSet,
-    Set.preimage_image_eq _ (conjAut _ g).injective, h4] at h5
-  exact (ENNReal.coe_injective ((ENNReal.mul_left_inj (Measure.measure_pos_of_mem_nhds μ hK1).ne'
-    hK.measure_lt_top.ne).1 h5)).symm
+  rw [Measure.map_apply hc.measurable (hK.image hc).isClosed.measurableSet,
+      Set.preimage_image_eq _ (conjAut _ g).injective, h4]
+    at h5
+  exact (ENNReal.coe_injective
+    ((ENNReal.mul_left_inj (Measure.measure_pos_of_mem_nhds μ hK1).ne' hK.measure_lt_top.ne).1
+      h5)).symm
 
-theorem delta_borelGL : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (n : ℕ) (q : (borelGL k (Fin n)).Q), (((borelGL k (Fin n)).delta q : ℝ≥0) : ℝ) =
-      ∏ i : Fin n, GlobalTheory.SplitWeil.nabs k ((borelGL k (Fin n)).p q i) ^ ((n : ℤ) - 1 - 2 * (i.val : ℤ)) := by
-  intro k _ _ _ _ n q
-  rw [delta_eq, prod_pos_eq, map_prod, NNReal.coe_prod]
-  refine Finset.prod_congr rfl fun i _ => ?_
-  have h : ∀ (x : kˣ) (m : ℤ), distribHaarChar k (x ^ m) = distribHaarChar k x ^ m := fun x m =>
-    (congrArg Units.val (map_zpow (distribHaarChar k (G := kˣ)).toHomUnits x m)).trans
-      (Units.val_zpow_eq_zpow_val _ _)
-  rw [h, NNReal.coe_zpow]
-  rfl
+theorem delta_borelGL
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : ℕ) (q : (borelGL k (Fin n)).Q),
+      (((borelGL k (Fin n)).delta q : ℝ≥0) : ℝ)
+        = ∏ i : Fin n, GlobalTheory.SplitWeil.nabs k ((borelGL k (Fin n)).p q i) ^ ((n : ℤ) - 1 - 2 * (i.val : ℤ)) :=
+  by
+    intro k _ _ _ _ n q
+    rw [delta_eq, prod_pos_eq, map_prod, NNReal.coe_prod]
+    refine Finset.prod_congr rfl fun i _ => ?_
+    have h : ∀ (x : kˣ) (m : ℤ), distribHaarChar k (x ^ m) = distribHaarChar k x ^ m := fun x m =>
+      (congrArg Units.val (map_zpow (distribHaarChar k (G := kˣ)).toHomUnits x m)).trans
+        (Units.val_zpow_eq_zpow_val _ _)
+    rw [h, NNReal.coe_zpow]
+    rfl
 
 end GlobalTheory.BorelModulus

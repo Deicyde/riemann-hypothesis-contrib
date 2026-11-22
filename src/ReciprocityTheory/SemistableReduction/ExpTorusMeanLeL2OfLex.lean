@@ -8,11 +8,12 @@ namespace ReciprocityTheory.MultiplicativeHeights
 
 open Finset
 
-theorem exp_torus_mean_le_l2_of_lex {ι : Type} [Fintype ι] [LinearOrder ι]
-    (hBasic : TorusMeanBasicStatement) (hLex : TorusLexStatement)
-    (hL2 : TorusL2Cauchy) (F : MvPolynomial ι ℂ) (hF : F ≠ 0) (s : ι →₀ ℕ)
-    (Q : MvPolynomial ι ℂ) (hQ : ∀ t ∈ Q.support, toLex s < toLex t) :
-    Real.exp (torusMean F) ≤ polyL2 (F * (MvPolynomial.monomial s 1 - Q)) := by
+theorem exp_torus_mean_le_l2_of_lex
+    {ι : Type} [Fintype ι] [LinearOrder ι]
+    (hBasic : TorusMeanBasicStatement) (hLex : TorusLexStatement) (hL2 : TorusL2Cauchy)
+    (F : MvPolynomial ι ℂ) (hF : F ≠ 0)
+    (s : ι →₀ ℕ) (Q : MvPolynomial ι ℂ) (hQ : ∀ t ∈ Q.support, toLex s < toLex t)
+    : Real.exp (torusMean F) ≤ polyL2 (F * (MvPolynomial.monomial s 1 - Q)) := by
   classical
   set P := MvPolynomial.monomial s (1 : ℂ) - Q with hPdef
   have hsQ : s ∉ Q.support := fun h => lt_irrefl _ (hQ s h)
@@ -41,42 +42,47 @@ theorem exp_torus_mean_le_l2_of_lex {ι : Type} [Fintype ι] [LinearOrder ι]
     apply Real.sqrt_pos.mpr
     obtain ⟨t, hne⟩ := MvPolynomial.ne_zero_iff.mp hFP
     have ht : t ∈ (F * P).support := MvPolynomial.mem_support_iff.mpr hne
-    calc (0 : ℝ) < ‖(F * P).coeff t‖ ^ 2 := pow_pos (norm_pos_iff.mpr hne) 2
-      _ ≤ _ := Finset.single_le_sum (f := fun s => ‖(F * P).coeff s‖ ^ 2)
-          (fun _ _ => by positivity) ht
-  calc Real.exp (torusMean F) ≤ Real.exp (torusMean (F * P)) := Real.exp_le_exp.mpr (by linarith)
-    _ ≤ polyL2 (F * P) := by
-      rw [← Real.exp_log hpos]; exact Real.exp_le_exp.mpr hL
+    calc
+      (0 : ℝ)
+        < ‖(F * P).coeff t‖ ^ 2 := pow_pos (norm_pos_iff.mpr hne) 2
+      _ ≤ _ :=
+        Finset.single_le_sum (f := fun s => ‖(F * P).coeff s‖ ^ 2) (fun _ _ => by positivity) ht
+  calc
+    Real.exp (torusMean F)
+      ≤ Real.exp (torusMean (F * P)) := Real.exp_le_exp.mpr (by linarith)
+    _ ≤ polyL2 (F * P) := by rw [← Real.exp_log hpos]; exact Real.exp_le_exp.mpr hL
 
 def coeffVec {ι : Type*} (T : Finset (ι →₀ ℕ)) : MvPolynomial ι ℂ →ₗ[ℂ] EuclideanSpace ℂ T where
   toFun P := WithLp.toLp 2 fun t : T => P.coeff t
   map_add' P Q := by ext t; simp
   map_smul' c P := by ext t; simp
 
-theorem coeffVec_apply {ι : Type*} (T : Finset (ι →₀ ℕ)) (P : MvPolynomial ι ℂ) (t : T) :
-    coeffVec T P t = P.coeff t := rfl
+theorem coeffVec_apply {ι : Type*} (T : Finset (ι →₀ ℕ)) (P : MvPolynomial ι ℂ) (t : T)
+    : coeffVec T P t = P.coeff t :=
+  rfl
 
-theorem norm_coeffVec {ι : Type*} (T : Finset (ι →₀ ℕ)) (P : MvPolynomial ι ℂ)
-    (hP : P.support ⊆ T) : ‖coeffVec T P‖ = polyL2 P := by
+theorem norm_coeffVec {ι : Type*} (T : Finset (ι →₀ ℕ)) (P : MvPolynomial ι ℂ) (hP : P.support ⊆ T)
+    : ‖coeffVec T P‖ = polyL2 P := by
   classical
   rw [EuclideanSpace.norm_eq, polyL2]
   congr 1
   simp only [coeffVec_apply]
   rw [Finset.sum_coe_sort T (fun t => ‖P.coeff t‖ ^ 2)]
-  exact (Finset.sum_subset hP (fun t _ ht => by
-    rw [MvPolynomial.notMem_support_iff.mp ht, norm_zero]; ring)).symm
+  exact (Finset.sum_subset hP
+    (fun t _ ht => by rw [MvPolynomial.notMem_support_iff.mp ht, norm_zero]; ring)).symm
 
-theorem polyInner_eq_inner {ι : Type*} (T : Finset (ι →₀ ℕ)) (P Q : MvPolynomial ι ℂ)
-    (hP : P.support ⊆ T) : polyInner P Q = inner ℂ (coeffVec T Q) (coeffVec T P) := by
+theorem polyInner_eq_inner
+    {ι : Type*} (T : Finset (ι →₀ ℕ)) (P Q : MvPolynomial ι ℂ) (hP : P.support ⊆ T)
+    : polyInner P Q = inner ℂ (coeffVec T Q) (coeffVec T P) := by
   classical
   rw [PiLp.inner_apply]
   simp only [coeffVec_apply, RCLike.inner_apply, polyInner]
   rw [Finset.sum_coe_sort T (fun t => P.coeff t * (starRingEnd ℂ) (Q.coeff t))]
   exact Finset.sum_subset hP (fun t _ ht => by rw [MvPolynomial.notMem_support_iff.mp ht, zero_mul])
 
-theorem exists_lex_enum {ι : Type*} [LinearOrder ι] (S : Finset (ι →₀ ℕ)) :
-    ∃ m : Fin S.card → (ι →₀ ℕ), (∀ k, m k ∈ S) ∧ Function.Injective m ∧
-      ∀ j k, j < k → toLex (m k) < toLex (m j) := by
+theorem exists_lex_enum {ι : Type*} [LinearOrder ι] (S : Finset (ι →₀ ℕ))
+    : ∃ m : Fin S.card → (ι →₀ ℕ),
+      (∀ k, m k ∈ S) ∧ Function.Injective m ∧ ∀ j k, j < k → toLex (m k) < toLex (m j) := by
   classical
   let S' : Finset (Lex (ι →₀ ℕ)) := S.map toLex.toEmbedding
   have hc : S'.card = S.card := Finset.card_map _
@@ -86,7 +92,8 @@ theorem exists_lex_enum {ι : Type*} [LinearOrder ι] (S : Finset (ι →₀ ℕ
     obtain ⟨a, ha, he⟩ := Finset.mem_map.mp (S'.orderEmbOfFin_mem hc (Fin.rev k))
     have : ofLex (f (Fin.rev k)) = a := by rw [← he]; rfl
     show ofLex (f (Fin.rev k)) ∈ S
-    rw [this]; exact ha
+    rw [this]
+    exact ha
   · intro a b h
     exact Fin.rev_injective (f.injective h)
   · intro j k hjk

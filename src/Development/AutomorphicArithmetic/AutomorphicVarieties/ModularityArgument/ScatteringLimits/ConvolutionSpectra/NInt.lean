@@ -11,12 +11,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open MeasureTheory GroundTheory.Automorphic PositivityTheory.Rg.Tf.IntegralApplyAeEq Set Filter Topology UpperTheory.V.Z.IntegralApplyAeEq
+open MeasureTheory GroundTheory.Automorphic PositivityTheory.Rg.Tf.IntegralApplyAeEq Set Filter
+  Topology UpperTheory.V.Z.IntegralApplyAeEq
 open scoped InnerProductSpace FourierTransform ComplexConjugate
 
-theorem UpperTheory.V.Z.IntegralApplyAeEq.nInt :
-    ∀ {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V] [CompleteSpace V] {W : Type} [NormedAddCommGroup W] [InnerProductSpace ℂ W] [FiniteDimensional ℂ W] [CompleteSpace W] (M : Sc H V W) (N : W →ₗ[ℂ] V), M.IsN N → ∀ (Y : H →L[ℂ] H) (β : ℝ → V →L[ℂ] V) (β' : ℝ → W →L[ℂ] W), Ker β → Ker β' → M.Acts Y β β' →
-      ∀ w, N (symb β' 0 w) = symb β 0 (N w) := by
+theorem UpperTheory.V.Z.IntegralApplyAeEq.nInt
+    : ∀ {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] {V : Type}
+        [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V] [CompleteSpace V]
+        {W : Type} [NormedAddCommGroup W] [InnerProductSpace ℂ W] [FiniteDimensional ℂ W]
+        [CompleteSpace W] (M : Sc H V W) (N : W →ₗ[ℂ] V),
+      M.IsN N
+        → ∀ (Y : H →L[ℂ] H) (β : ℝ → V →L[ℂ] V) (β' : ℝ → W →L[ℂ] W),
+          Ker β → Ker β' → M.Acts Y β β' → ∀ w, N (symb β' 0 w) = symb β 0 (N w) := by
   intro H _ _ _ V _ _ _ _ W _ _ _ _ M N hN Y β β' k1 k2 ha w
   obtain ⟨-, cadd, -, -, -, -, -, cmap⟩ := cobLaws M.F
   have hY : ∀ t h, Y (M.F.U t h) = M.F.U t (Y h) := fun t h => by
@@ -33,7 +39,10 @@ theorem UpperTheory.V.Z.IntegralApplyAeEq.nInt :
   rw [s3, s1] at h2
   have h3 := ((cobTail _).2 ((cobTail _).1 b4)).2
   rw [s4, s2] at h3
-  have h4 := (cobLaws (shF V)).2.2.2.2.2.2.2 M.F (M.J.toContinuousLinearEquiv : L V →L[ℂ] H) (fun t h => (M.hJ t h).symm) _ h3
+  have h4 :=
+    (cobLaws (shF V)).2.2.2.2.2.2.2 M.F (M.J.toContinuousLinearEquiv : L V →L[ℂ] H)
+      (fun t h => (M.hJ t h).symm)
+      _ h3
   have h5 := (cadd _ _ (cadd _ _ h1 h2).2 h4).1
   have h6 : M.F.Cob (M.J (one V (N (symb β' 0 w) - symb β 0 (N w)))) := by
     convert h5 using 1

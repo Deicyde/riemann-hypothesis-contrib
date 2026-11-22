@@ -11,7 +11,8 @@ noncomputable section
 namespace PositivityTheory.ThKCT
 
 open scoped Matrix
-open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 
 variable {F : Type} [Field F] [NumberField F]
 
@@ -21,24 +22,31 @@ theorem std_ne_one {ψ : AddChar (AF F) ℂ} (h : IsStd ψ) : ψ ≠ 1 := by
   let m : NumberField.mixedEmbedding.mixedSpace F :=
     algebraMap ℝ (NumberField.mixedEmbedding.mixedSpace F) (1 / (2 * (Module.finrank ℚ F : ℝ)))
   let a : AF F := ((NumberField.InfiniteAdeleRing.ringEquiv_mixedSpace F).symm m, 0)
-  have hAt : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.At (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) a := by
+  have hAt : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.At
+      (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F) a := by
     intro u hu
     have hu1 : u.1 = 0 := by
       have h2 : NumberField.InfiniteAdeleRing.ringEquiv_mixedSpace F u.1 = 0 := hu
-      exact (NumberField.InfiniteAdeleRing.ringEquiv_mixedSpace F).injective (h2.trans (map_zero _).symm)
+      exact (NumberField.InfiniteAdeleRing.ringEquiv_mixedSpace F).injective
+        (h2.trans (map_zero _).symm)
     show u * a = 0
     exact Prod.ext (by show u.1 * _ = 0; rw [hu1, zero_mul]) (by show u.2 * 0 = 0; rw [mul_zero])
   have hψa := h.2.2 a hAt
   rw [h1, AddChar.one_apply] at hψa
-  have htr : Algebra.trace ℝ (NumberField.mixedEmbedding.mixedSpace F) (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F a) = 1 / 2 := by
+  have htr
+      : Algebra.trace ℝ (NumberField.mixedEmbedding.mixedSpace F)
+          (GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.evI F a)
+        = 1 / 2 := by
     show Algebra.trace ℝ _ (NumberField.InfiniteAdeleRing.ringEquiv_mixedSpace F
       ((NumberField.InfiniteAdeleRing.ringEquiv_mixedSpace F).symm m)) = 1 / 2
-    rw [RingEquiv.apply_symm_apply, Algebra.trace_algebraMap, NumberField.mixedEmbedding.finrank, nsmul_eq_mul]
+    rw [RingEquiv.apply_symm_apply, Algebra.trace_algebraMap, NumberField.mixedEmbedding.finrank,
+      nsmul_eq_mul]
     have : (Module.finrank ℚ F : ℝ) ≠ 0 := by exact_mod_cast hn.ne'
     field_simp
   rw [htr] at hψa
   have he : Complex.exp (-(2 * ↑Real.pi * Complex.I) * (((1 / 2 : ℝ)) : ℂ)) = -1 := by
-    rw [show -(2 * ↑Real.pi * Complex.I) * (((1 / 2 : ℝ)) : ℂ) = -(↑Real.pi * Complex.I) by push_cast; ring]
+    rw [show -(2 * ↑Real.pi * Complex.I) * (((1 / 2 : ℝ)) : ℂ) = -(↑Real.pi * Complex.I) by
+      push_cast; ring]
     rw [Complex.exp_neg, Complex.exp_pi_mul_I]
     norm_num
   rw [he] at hψa
@@ -55,14 +63,20 @@ theorem std_ne_zero {ψ : AddChar (AF F) ℂ} (h : IsStd ψ) (x : AF F) : ψ x �
 
 theorem thetaUniq_of : ThetaUniq := by
   intro F _ _ κ _ ψ hψ l hl hinv
-  exact GlobalTheory.CompanionTheory.ThetaUniq.theta_unique F κ ψ hψ.1 (std_ne_one hψ) hψ.2.1 l hl (fun w Φ hΦ => hinv w.1 w.2 Φ hΦ)
+  exact GlobalTheory.CompanionTheory.ThetaUniq.theta_unique F κ ψ hψ.1 (std_ne_one hψ) hψ.2.1 l hl
+    (fun w Φ hΦ => hinv w.1 w.2 Φ hΦ)
 
 theorem thetaInj_of : ThetaInj := by
   intro F _ _ κ _ ψ hψ Φ hΦ h0
   exact GlobalTheory.CompanionTheory.ThetaInj.theta_inj F κ ψ hψ.1 (std_ne_one hψ) hψ.2.1 Φ hΦ h0
 
-theorem fourier_uniq {κ : Type} [Fintype κ] {ψ : AddChar (AF F) ℂ} (h : IsStd ψ) (a : (κ → F) → ℂ) (hs : Summable a)
-    (h0 : ∀ t : κ → AF F, ∑' y, a y * ψ ((fun i => algebraMap F (AF F) (y i)) ⬝ᵥ t) = 0) (y₀ : κ → F) : a y₀ = 0 := by
+theorem fourier_uniq
+    {κ : Type} [Fintype κ]
+    {ψ : AddChar (AF F) ℂ} (h : IsStd ψ)
+    (a : (κ → F) → ℂ) (hs : Summable a)
+    (h0 : ∀ t : κ → AF F, ∑' y, a y * ψ ((fun i => algebraMap F (AF F) (y i)) ⬝ᵥ t) = 0)
+    (y₀ : κ → F)
+    : a y₀ = 0 := by
   classical
   let e : (κ → F) → (κ → AF F) → ℂ := fun y t => ψ ((fun i => algebraMap F (AF F) (y i)) ⬝ᵥ t)
   let c : (κ → F) → ℂ := fun y => a (y + y₀)
@@ -104,7 +118,8 @@ theorem fourier_uniq {κ : Type} [Fintype κ] {ψ : AddChar (AF F) ℂ} (h : IsS
     have := h0 t
     simp only [e] at this ⊢
     rw [this, mul_zero]
-  have := GlobalTheory.CompanionTheory.ThetaInj.charSeries_coeff_eq_zero e c 0 hmul hle h00 hne hcs hF
+  have :=
+    GlobalTheory.CompanionTheory.ThetaInj.charSeries_coeff_eq_zero e c 0 hmul hle h00 hne hcs hF
   simpa [c] using this
 
 end PositivityTheory.ThKCT

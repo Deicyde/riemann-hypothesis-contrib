@@ -33,8 +33,9 @@ def stabAdd (M : AddSubgroup (Fin n → A)) : Subgroup (GL (Fin n) A) where
     exact this.symm
 
 def unip (M M' : AddSubgroup (Fin n → A)) : Subgroup (GL (Fin n) A) where
-  carrier := {g | g ∈ stabAdd M ∧ g ∈ stabAdd M' ∧
-    ∀ v ∈ M, (g : Matrix (Fin n) (Fin n) A) *ᵥ v - v ∈ M'}
+  carrier :=
+    {g | g ∈ stabAdd M ∧ g ∈ stabAdd M' ∧
+      ∀ v ∈ M, (g : Matrix (Fin n) (Fin n) A) *ᵥ v - v ∈ M'}
   one_mem' := ⟨Subgroup.one_mem _, Subgroup.one_mem _, fun v _ => by simp⟩
   mul_mem' := by
     rintro a b ⟨ha1, ha2, ha3⟩ ⟨hb1, hb2, hb3⟩
@@ -53,8 +54,8 @@ end Unip
 section Groups
 
 variable {F E : Type} [Field F] [Field E] [Algebra F E]
-variable (R : Type) [CommRing R] [Algebra F R] (σ : E →ₐ[F] E) {n r : ℕ}
-  (J : Matrix (Fin n) (Fin n) E)
+variable
+  (R : Type) [CommRing R] [Algebra F R] (σ : E →ₐ[F] E) {n r : ℕ} (J : Matrix (Fin n) (Fin n) E)
 
 end Groups
 
@@ -76,8 +77,8 @@ section Levels
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 variable (σ : E →ₐ[F] E) {n r k : ℕ} (J : Matrix (Fin n) (Fin n) E)
 
-
-variable (P : Matrix (Fin n) (Fin (r + 1)) E) (f : Matrix (Fin n) (Fin r) E)
+variable
+  (P : Matrix (Fin n) (Fin (r + 1)) E) (f : Matrix (Fin n) (Fin r) E)
   (L : Submodule (𝓞 E) (Fin n → E)) (SG : Finset (HeightOneSpectrum (𝓞 E)))
   (ε : HeightOneSpectrum (𝓞 E) → Fin k → Fin n → E)
 

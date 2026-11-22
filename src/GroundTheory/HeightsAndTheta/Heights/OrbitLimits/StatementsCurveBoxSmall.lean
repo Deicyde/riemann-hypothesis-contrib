@@ -13,10 +13,11 @@ open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo GroundTheory.Heights�
 
 def CurveBoxSmall.Statement : Prop :=
   ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω]
-    (y : (Σ k, ι k) → Ω) (A : ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι) (c : ∀ k, ι k),
-    IsArithVar (mCoordIdeal y) 1 → Birational y → (∀ k, y ⟨k, c k⟩ ≠ 0) →
-    ∀ (τ : ℕ) (s : Ω), IsSmallH (mCoordIdeal y) y A τ s ↔
-      ∀ σ : Ω →+* ℂ, ‖σ (s / chartUnit y c A.a τ)‖ ≤ chartRadius A c (fun p => σ (y p)) ^ τ
+      (y : (Σ k, ι k) → Ω) (A : ReciprocityTheory.ChartRestriction.G.Geo.HermLine ι) (c : ∀ k, ι k),
+    IsArithVar (mCoordIdeal y) 1 → Birational y → (∀ k, y ⟨k, c k⟩ ≠ 0)
+      → ∀ (τ : ℕ) (s : Ω),
+        IsSmallH (mCoordIdeal y) y A τ s
+          ↔ ∀ σ : Ω →+* ℂ, ‖σ (s / chartUnit y c A.a τ)‖ ≤ chartRadius A c (fun p => σ (y p)) ^ τ
 
 namespace CurveBoxSmall
 

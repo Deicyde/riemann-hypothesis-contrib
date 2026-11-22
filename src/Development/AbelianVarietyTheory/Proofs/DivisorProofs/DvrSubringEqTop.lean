@@ -8,11 +8,13 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem dvrSubring_eq_pow_mul_nonmem_of_not_mem_pow {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+theorem dvrSubring_eq_pow_mul_nonmem_of_not_mem_pow
+    {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
     (S : Subring V) (π : V) (hπm : π ∈ IsLocalRing.maximalIdeal V)
-    (hdiv : ∀ s ∈ S, s ∈ IsLocalRing.maximalIdeal V → ∃ t ∈ S, s = π * t) :
-    ∀ N : ℕ, ∀ s ∈ S, s ∉ (IsLocalRing.maximalIdeal V) ^ N →
-      ∃ k : ℕ, ∃ u ∈ S, u ∉ IsLocalRing.maximalIdeal V ∧ s = π ^ k * u := by
+    (hdiv : ∀ s ∈ S, s ∈ IsLocalRing.maximalIdeal V → ∃ t ∈ S, s = π * t)
+    : ∀ N : ℕ, ∀ s ∈ S,
+      s ∉ (IsLocalRing.maximalIdeal V) ^ N
+        → ∃ k : ℕ, ∃ u ∈ S, u ∉ IsLocalRing.maximalIdeal V ∧ s = π ^ k * u := by
   intro N
   induction N with
   | zero => intro s _ hs; simp at hs
@@ -29,13 +31,14 @@ theorem dvrSubring_eq_pow_mul_nonmem_of_not_mem_pow {V : Type} [CommRing V] [IsD
       exact ⟨k + 1, u, huS, hum, by ring⟩
     · exact ⟨0, s, hs, hm, by simp⟩
 
-theorem dvrSubring_factor {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+theorem dvrSubring_factor
+    {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
     (S : Subring V) (π : V) (hπm : π ∈ IsLocalRing.maximalIdeal V)
     (hdiv : ∀ s ∈ S, s ∈ IsLocalRing.maximalIdeal V → ∃ t ∈ S, s = π * t)
-    (s : V) (hs : s ∈ S) (h0 : s ≠ 0) :
-    ∃ k : ℕ, ∃ u ∈ S, u ∉ IsLocalRing.maximalIdeal V ∧ s = π ^ k * u := by
-  have hinf := Ideal.iInf_pow_eq_bot_of_isLocalRing (maximalIdeal V)
-    (maximalIdeal.isMaximal V).ne_top
+    (s : V) (hs : s ∈ S) (h0 : s ≠ 0)
+    : ∃ k : ℕ, ∃ u ∈ S, u ∉ IsLocalRing.maximalIdeal V ∧ s = π ^ k * u := by
+  have hinf :=
+    Ideal.iInf_pow_eq_bot_of_isLocalRing (maximalIdeal V) (maximalIdeal.isMaximal V).ne_top
   have : ∃ N : ℕ, s ∉ (maximalIdeal V) ^ N := by
     by_contra hc
     push_neg at hc
@@ -45,18 +48,20 @@ theorem dvrSubring_factor {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuat
   obtain ⟨N, hN⟩ := this
   exact dvrSubring_eq_pow_mul_nonmem_of_not_mem_pow S π hπm hdiv N s hs hN
 
-theorem dvrSubring_eq_top (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
-    (S : Subring V) (π : V) (hπS : π ∈ S) (hπ0 : π ≠ 0)
-    (hπm : π ∈ IsLocalRing.maximalIdeal V)
+theorem dvrSubring_eq_top
+    (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+    (S : Subring V) (π : V) (hπS : π ∈ S) (hπ0 : π ≠ 0) (hπm : π ∈ IsLocalRing.maximalIdeal V)
     (hinv : ∀ s ∈ S, s ∉ IsLocalRing.maximalIdeal V → ∃ t ∈ S, s * t = 1)
     (hdiv : ∀ s ∈ S, s ∈ IsLocalRing.maximalIdeal V → ∃ t ∈ S, s = π * t)
-    (hfrac : ∀ v : V, ∃ a ∈ S, ∃ b ∈ S, b ≠ 0 ∧ v * b = a) : S = ⊤ := by
+    (hfrac : ∀ v : V, ∃ a ∈ S, ∃ b ∈ S, b ≠ 0 ∧ v * b = a)
+    : S = ⊤ := by
   refine eq_top_iff.2 fun v _ => ?_
   obtain ⟨a, haS, b, hbS, hb0, hvb⟩ := hfrac v
   by_cases ha0 : a = 0
   · subst ha0
     have : v = 0 := (mul_eq_zero.1 hvb).resolve_right hb0
-    rw [this]; exact S.zero_mem
+    rw [this]
+    exact S.zero_mem
   obtain ⟨k, u, huS, hum, rfl⟩ := dvrSubring_factor S π hπm hdiv a haS ha0
   obtain ⟨l, u', hu'S, hu'm, rfl⟩ := dvrSubring_factor S π hπm hdiv b hbS hb0
   obtain ⟨t', ht'S, ht'⟩ := hinv u' hu'S hu'm
@@ -67,8 +72,7 @@ theorem dvrSubring_eq_top (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuat
       apply mul_left_cancel₀ hπl
       rw [pow_add] at hvb
       linear_combination hvb
-    have h2 : v = π ^ d * u * t' := by
-      linear_combination t' * h1 - v * ht'
+    have h2 : v = π ^ d * u * t' := by linear_combination t' * h1 - v * ht'
     rw [h2]
     exact S.mul_mem (S.mul_mem (S.pow_mem hπS _) huS) ht'S
   · push_neg at hkl

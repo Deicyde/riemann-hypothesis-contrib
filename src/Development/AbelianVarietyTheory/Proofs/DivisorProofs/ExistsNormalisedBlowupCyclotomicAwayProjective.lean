@@ -12,16 +12,20 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteTypeCy
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory Limits IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R GlobalTheory GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.ZH GlobalTheory.Poinc
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R GlobalTheory GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.ZH
+  GlobalTheory.Poinc
 open GlobalTheory.SiegelTor
 
 namespace GlobalTheory.NormBlowupInt
 
-theorem isFinite_fromNormalization_int_of_isReduced {X Y : Scheme.{0}} {o : CommRingCat.{0}}
-    [Algebra.FiniteType ℤ o] (f : X ⟶ Y) [QuasiCompact f] [QuasiSeparated f] (g : Y ⟶ Spec o)
-    [LocallyOfFiniteType g] [IsReduced X] [IsLocallyNoetherian X]
-    (hess : ∀ x ∈ genericPoints X, (f.residueFieldMap x).hom.EssFiniteType) :
-    IsFinite f.fromNormalization := by
+theorem isFinite_fromNormalization_int_of_isReduced
+    {X Y : Scheme.{0}} {o : CommRingCat.{0}} [Algebra.FiniteType ℤ o]
+    (f : X ⟶ Y) [QuasiCompact f] [QuasiSeparated f]
+    (g : Y ⟶ Spec o) [LocallyOfFiniteType g] [IsReduced X] [IsLocallyNoetherian X]
+    (hess : ∀ x ∈ genericPoints X, (f.residueFieldMap x).hom.EssFiniteType)
+    : IsFinite f.fromNormalization := by
   refine ⟨fun U hU => ?_⟩
   letI := (f.app U).hom.toAlgebra
   letI : Algebra o Γ(Y, U) := ((Scheme.ΓSpecIso o).inv ≫ g.appLE ⊤ U le_top).hom.toAlgebra
@@ -56,9 +60,11 @@ theorem isFinite_fromNormalization_int_of_isReduced {X Y : Scheme.{0}} {o : Comm
     (.of_surjective _ (ConcreteCategory.bijective_of_isIso (f.normalizationObjIso hU).inv).2)
     (RingHom.finite_algebraMap.mpr this)
 
-theorem dense_preimage_of_blowup {Z X' : Scheme.{0}} (J : Z.IdealSheafData) (b : X' ⟶ Z)
-    (hb : FinalTheorems.Blowup b J) (hiso : ∀ V : Z.Opens, (∀ x ∈ V, x ∉ J.support) → IsIso (b ∣_ V))
-    (W : Z.Opens) (hWd : Dense (W : Set Z)) : Dense ((b ⁻¹ᵁ W : X'.Opens) : Set X') := by
+theorem dense_preimage_of_blowup
+    {Z X' : Scheme.{0}} (J : Z.IdealSheafData) (b : X' ⟶ Z) (hb : FinalTheorems.Blowup b J)
+    (hiso : ∀ V : Z.Opens, (∀ x ∈ V, x ∉ J.support) → IsIso (b ∣_ V)) (W : Z.Opens)
+    (hWd : Dense (W : Set Z))
+    : Dense ((b ⁻¹ᵁ W : X'.Opens) : Set X') := by
   obtain ⟨D, hD⟩ := EffCartierData.exists_idealSheaf_eq hb.1
   have hD' : Dense (((J.comap b).support : Set X')ᶜ) := by
     rw [← hD, ← D.coe_nonzeroLocus_canonical]
@@ -86,11 +92,14 @@ end GlobalTheory.NormBlowupInt
 
 namespace GlobalTheory.NormBlowupInt
 
-theorem exists_normBl : ∀ (n : ℕ) (Z : Scheme.{0}) (z : Z ⟶ Sp (cycAway n)), IsProjOver z →
-    ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme Z → ∀ (J : Z.IdealSheafData) (W : Z.Opens),
-    Dense (W : Set Z) → (∀ x ∈ J.support, x ∉ W) → ∃ (S : Scheme.{0}) (π : S ⟶ Z)
-    (BD : EffCartierData S), IsNormBl π J ∧ IsProjOver (π ≫ z) ∧ BD.idealSheaf = J.comap π ∧
-    IsIso (π ∣_ W) ∧ Dense (π ⁻¹' W : Set S) := by
+theorem exists_normBl
+    : ∀ (n : ℕ) (Z : Scheme.{0}) (z : Z ⟶ Sp (cycAway n)),
+      IsProjOver z → ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme Z
+        → ∀ (J : Z.IdealSheafData) (W : Z.Opens),
+          Dense (W : Set Z) → (∀ x ∈ J.support, x ∉ W)
+            → ∃ (S : Scheme.{0}) (π : S ⟶ Z) (BD : EffCartierData S),
+              IsNormBl π J ∧ IsProjOver (π ≫ z) ∧ BD.idealSheaf = J.comap π ∧ IsIso (π ∣_ W)
+                ∧ Dense (π ⁻¹' W : Set S) := by
   intro n Z z hz hZ J W hWd hWJ
   haveI : Algebra.FiniteType ℤ (cycAway n) := finiteType_cycAway n
   haveI : Algebra.FiniteType ℤ (CommRingCat.of (cycAway n)) := ‹Algebra.FiniteType ℤ (cycAway n)›
@@ -113,10 +122,13 @@ theorem exists_normBl : ∀ (n : ℕ) (Z : Scheme.{0}) (z : Z ⟶ Sp (cycAway n)
     isFinite_fromNormalization_int_of_isReduced (o := CommRingCat.of (cycAway n)) V.ι (b ≫ z)
       fun x _ => (LocallyOfFiniteType.stalkMap V.ι x).residueFieldMap
   let ν := V.ι.fromNormalization
-  have hS : ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme V.ι.normalization := IsNormalScheme.pred _
+  have hS : ReciprocityTheory.ChartRestriction.G.Geo.Tor.IsNormalScheme V.ι.normalization :=
+    IsNormalScheme.pred _
   have hν : IsIso (ν ∣_ V) := by
     have H := isPullback_toNormalization_of_mono (𝟙 _) V.ι V.ι (Category.id_comp _).symm
-    have e := IsPullback.isoIsPullback_hom_fst _ _ (isPullback_morphismRestrict V.ι.fromNormalization V) H.flip
+    have e :=
+      IsPullback.isoIsPullback_hom_fst _ _ (isPullback_morphismRestrict V.ι.fromNormalization V)
+        H.flip
     rw [← e]
     infer_instance
   have hd : Dense ((ν ⁻¹ᵁ V : V.ι.normalization.Opens) : Set V.ι.normalization) := by
@@ -132,8 +144,16 @@ theorem exists_normBl : ∀ (n : ℕ) (Z : Scheme.{0}) (z : Z ⟶ Sp (cycAway n)
     show ν t ∉ D.idealSheaf.support
     rw [hD, GlobalTheory.ProjBlowup.mem_support_comap]
     exact fun h => hWJ _ h ht
-  refine ⟨V.ι.normalization, ν ≫ b, D.pull ν hK,
-    ⟨inferInstance, X', b, ν, V, hb, rfl, hfin, hVd, hd, hν⟩, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    V.ι.normalization,
+    ν ≫ b,
+    D.pull ν hK,
+    ⟨inferInstance, X', b, ν, V, hb, rfl, hfin, hVd, hd, hν⟩,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [Category.assoc]; exact isProjOver_comp_of_isFinite ν hbs
   · rw [EffCartierData.idealSheaf_pull, hD, Scheme.IdealSheafData.comap_comp]
   · rw [morphismRestrict_comp]; exact IsIso.comp_isIso' hν hbW

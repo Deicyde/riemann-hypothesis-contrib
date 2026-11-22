@@ -5,10 +5,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-private theorem odd_pow_ne {k : Type} [Field k] {x : k} {n : ℕ} (hn : x ^ 2 ^ n = 1) (h4 : x ^ 4 ≠ 1) {m : ℤ} (hm : Odd m) :
-    x ^ m ≠ 1 := by
+private theorem odd_pow_ne
+    {k : Type} [Field k] {x : k} {n : ℕ} (hn : x ^ 2 ^ n = 1) (h4 : x ^ 4 ≠ 1) {m : ℤ} (hm : Odd m)
+    : x ^ m ≠ 1 := by
   intro hxm
   have hx0 : x ≠ 0 := by
     rintro rfl
@@ -31,15 +34,16 @@ private theorem odd_pow_ne {k : Type} [Field k] {x : k} {n : ℕ} (hn : x ^ 2 ^ 
       exact_mod_cast dvd_pow_self 2 (Nat.succ_ne_zero j)
     exact (Int.not_even_iff_odd.mpr hm) (even_iff_two_dvd.mpr h2)
 
-private theorem dist4 {k : Type} [Field k] {x : k} (h1 : (-1 : k) ≠ 1) (h0 : x ≠ 0) (hx : x ^ 2 ≠ 1) :
-    Function.Injective (![x * -1, -1, x, 1] : Fin 4 → k) := by
+private theorem dist4 {k : Type} [Field k] {x : k} (h1 : (-1 : k) ≠ 1) (h0 : x ≠ 0) (hx : x ^ 2 ≠ 1)
+    : Function.Injective (![x * -1, -1, x, 1] : Fin 4 → k) := by
   have h2 : (2 : k) ≠ 0 := by
     intro h
     apply h1
     linear_combination -h
   intro i j h
   fin_cases i <;> fin_cases j <;> simp at h ⊢
-  all_goals first
+  all_goals
+    first
     | exact absurd (by linear_combination h * h) hx
     | exact absurd (by linear_combination (-x - 1) * h) hx
     | exact absurd (by linear_combination (x - 1) * h) hx
@@ -50,14 +54,32 @@ private theorem dist4 {k : Type} [Field k] {x : k} (h1 : (-1 : k) ≠ 1) (h0 : x
     | exact h0 ((mul_eq_zero.mp (by linear_combination -h : (2 : k) * x = 0)).resolve_left h2)
     | exact h0 ((mul_eq_zero.mp (by linear_combination h : (2 : k) * x = 0)).resolve_left h2)
 
-private theorem lab_inj (pr : Bool) : Function.Injective (lab pr) := by
-  cases pr <;> decide
+private theorem lab_inj (pr : Bool) : Function.Injective (lab pr) := by cases pr <;> decide
 
-private theorem lab_surj (pr : Bool) : ∃ i, lab pr i = 3 := by
-  cases pr <;> decide
+private theorem lab_surj (pr : Bool) : ∃ i, lab pr i = 3 := by cases pr <;> decide
 
-theorem UpperTheory.V.Ws.ok2A :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), D.Good → ∀ (X : Set2 D) (T : Tower D), X.On T → ∀ a u t, X.Elts a u t → (∀ w, ∃ g ∈ T.GalL, T.rb w g ≠ Raw.bar D.om (resQ T.F g)) ∧ (∀ w ∈ roots, ∃ g ∈ T.GalL, T.rb w g ≠ 1) ∧ (∀ η : T.GalL →* (ResidueField c.O)ˣ, η ^ 2 = 1 → (∀ g : T.GalL, D.om (resQ T.F g) = 1 → η g = 1) → (∀ i, ∃ j, ∀ g : T.GalL, η g * Raw.bar (chi D T.pr i) (resQ T.F g) = Raw.bar (chi D T.pr j) (resQ T.F g)) → η = 1) ∧ (∃ w ∈ roots, ∀ n : ℕ, 0 < n → n ≤ 4 → ∃ g ∈ T.GalL, T.rb w g ^ n ≠ 1) ∧ (resQ T.F T.g0 = t → ∀ i j, i ≠ j → Raw.bar (chi D T.pr i) (resQ T.F T.g0) ≠ Raw.bar (chi D T.pr j) (resQ T.F T.g0)) := by
+theorem UpperTheory.V.Ws.ok2A
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        (D : Raw Ω c),
+      D.Good
+        → ∀ (X : Set2 D) (T : Tower D),
+          X.On T
+            → ∀ a u t,
+              X.Elts a u t
+                → (∀ w, ∃ g ∈ T.GalL, T.rb w g ≠ Raw.bar D.om (resQ T.F g))
+                  ∧ (∀ w ∈ roots, ∃ g ∈ T.GalL, T.rb w g ≠ 1)
+                  ∧ (∀ η : T.GalL →* (ResidueField c.O)ˣ,
+                    η ^ 2 = 1 → (∀ g : T.GalL, D.om (resQ T.F g) = 1 → η g = 1)
+                      → (∀ i, ∃ j, ∀ g : T.GalL,
+                        η g * Raw.bar (chi D T.pr i) (resQ T.F g)
+                          = Raw.bar (chi D T.pr j) (resQ T.F g))
+                      → η = 1)
+                  ∧ (∃ w ∈ roots, ∀ n : ℕ, 0 < n → n ≤ 4 → ∃ g ∈ T.GalL, T.rb w g ^ n ≠ 1)
+                  ∧ (resQ T.F T.g0 = t
+                    → ∀ i j,
+                      i ≠ j
+                        → Raw.bar (chi D T.pr i) (resQ T.F T.g0)
+                          ≠ Raw.bar (chi D T.pr j) (resQ T.F T.g0)) := by
   intro Ω _ _ _ l _ c D hD X T hOn a u t hE
   obtain ⟨h1, -, hal, hth, -, -, hrb, -, -⟩ := barFacts D hD
   obtain ⟨n, hn⟩ := X.ord
@@ -101,14 +123,21 @@ theorem UpperTheory.V.Ws.ok2A :
       obtain ⟨s, hsG, hs⟩ := lift t hE.t_mem
       refine ⟨s, hsG, ?_⟩
       rw [hrb, hs, hE.t_psi]
-      rcases hw with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
-      all_goals first
-        | exact absurd (by decide) ho
-        | (split_ifs <;> simpa using h1)
+      rcases hw with
+        ⟨rfl, rfl⟩
+          | ⟨rfl, rfl⟩
+          | ⟨rfl, rfl⟩
+          | ⟨rfl, rfl⟩
+          | ⟨rfl, rfl⟩
+          | ⟨rfl, rfl⟩
+          | ⟨rfl, rfl⟩
+          | ⟨rfl, rfl⟩
+      all_goals first | exact absurd (by decide) ho | (split_ifs <;> simpa using h1)
   · intro η hη2 hηom hperm
     obtain ⟨i0, hi0⟩ := lab_surj T.pr
     obtain ⟨j, hj⟩ := hperm i0
-    have key : ∀ s : T.GalL, (η s : ResidueField c.O) = Raw.bar (D.ps (lab T.pr j)) (resQ T.F s) := by
+    have key
+        : ∀ s : T.GalL, (η s : ResidueField c.O) = Raw.bar (D.ps (lab T.pr j)) (resQ T.F s) := by
       intro s
       have h := hj s
       rw [hchi, hchi, hi0] at h

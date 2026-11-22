@@ -7,15 +7,17 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Gka4.diag_hermitian :
-    ∀ (F E : Type) [inst : Field F] [inst_1 : NumberField F] [inst_2 : Field E] [inst_3 : NumberField E]
-      [inst_4 : Algebra F E] (σ : E →ₐ[F] E),
-      HeckeCharacterZeroLocus.SiegelWeilU.IsCMExt F E σ →
-        ∀ (n : ℕ) (T : Matrix (Fin n) (Fin n) E),
-          HeckeCharacterZeroLocus.SiegelWeilU.IsHermND σ T →
-            ∃ (g : GL (Fin n) E) (D : Fin n → Fˣ),
-              HeckeCharacterZeroLocus.SiegelWeilU.cT (↑σ : E →+* E) (↑g : Matrix (Fin n) (Fin n) E) * T * (↑g : Matrix (Fin n) (Fin n) E) =
-                Matrix.diagonal fun (i : Fin n) ↦ (Algebra.algebraMap F E : F → E) (↑(D i) : F) := by
+theorem UpperTheory.Reformulated.B.Gka4.diag_hermitian
+    : ∀ (F E : Type) [inst : Field F] [inst_1 : NumberField F] [inst_2 : Field E]
+        [inst_3 : NumberField E] [inst_4 : Algebra F E] (σ : E →ₐ[F] E),
+      HeckeCharacterZeroLocus.SiegelWeilU.IsCMExt F E σ
+        → ∀ (n : ℕ) (T : Matrix (Fin n) (Fin n) E),
+          HeckeCharacterZeroLocus.SiegelWeilU.IsHermND σ T
+            → ∃ (g : GL (Fin n) E) (D : Fin n → Fˣ),
+              HeckeCharacterZeroLocus.SiegelWeilU.cT (↑σ : E →+* E) (↑g : Matrix (Fin n) (Fin n) E)
+                  * T * (↑g : Matrix (Fin n) (Fin n) E)
+                = Matrix.diagonal fun (i : Fin n) ↦
+                  (Algebra.algebraMap F E : F → E) (↑(D i) : F) := by
   intro F E _ _ _ _ _ σ hCM n T hT
   obtain ⟨-, hC, h2, hτ⟩ := hCM
   obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance

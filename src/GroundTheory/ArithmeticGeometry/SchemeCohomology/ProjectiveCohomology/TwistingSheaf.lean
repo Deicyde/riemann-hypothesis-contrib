@@ -23,8 +23,8 @@ noncomputable section
 def IsCoherent {X : Scheme.{u}} (F : X.Modules) : Prop :=
   F.IsQuasicoherent ∧ ∀ U : X.Opens, IsAffineOpen U → Module.Finite Γ(X, U) Γ(F, U)
 
-abbrev algebraOfOver (X : Scheme.{u}) (A : Type u) [CommRing A] [X.Over (Spec (.of A))] :
-    Algebra A Γ(X, ⊤) :=
+abbrev algebraOfOver (X : Scheme.{u}) (A : Type u) [CommRing A] [X.Over (Spec (.of A))]
+    : Algebra A Γ(X, ⊤) :=
   overAlgebra (CommRingCat.of A)
 
 namespace ProjSpace
@@ -32,8 +32,7 @@ namespace ProjSpace
 variable (A : Type u) [CommRing A] (n : ℕ)
 
 def toSpecBase : projectiveSpace A n ⟶ Spec (.of A) :=
-  Proj.toSpecZero (grading A n) ≫
-    Spec.map (CommRingCat.ofHom (algebraMap A (grading A n 0)))
+  Proj.toSpecZero (grading A n) ≫ Spec.map (CommRingCat.ofHom (algebraMap A (grading A n 0)))
 
 instance overSpec : (projectiveSpace A n).Over (Spec (.of A)) := ⟨toSpecBase A n⟩
 
@@ -51,8 +50,7 @@ variable {A : Type u} [CommRing A] {n : ℕ} {X : Scheme.{u}} (i : X ⟶ project
 def twistingSheaf (k : ℤ) : X.Modules :=
   (Scheme.Modules.pullback i).obj (SchemeCoh.twistingSheaf (ProjSpace.grading A n) k)
 
-def twist (F : X.Modules) (k : ℤ) : X.Modules :=
-  F ⊗ twistingSheaf i k
+def twist (F : X.Modules) (k : ℤ) : X.Modules := F ⊗ twistingSheaf i k
 
 end ProjScheme
 

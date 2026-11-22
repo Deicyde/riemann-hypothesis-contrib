@@ -275,53 +275,100 @@ public import GroundTheory.HeightsAndTheta.Heights.VerticalDivisors.PNormFormIrr
 
 set_option maxSynthPendingDepth 1
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.Inter_ChartSpecCount : GroundTheory.Heights₂.Heights.Inter.ChartSpecCount.Statement :=
-  @GroundTheory.Heights₂.Heights.Inter.ChartSpecCount.proof GroundTheory.Heights₂.Heights.Inter.ChartPrimElt.proof GroundTheory.Heights₂.Heights.Inter.LocAwaySpec.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.Inter_ChartSpecCount
+    : GroundTheory.Heights₂.Heights.Inter.ChartSpecCount.Statement :=
+  @GroundTheory.Heights₂.Heights.Inter.ChartSpecCount.proof
+    GroundTheory.Heights₂.Heights.Inter.ChartPrimElt.proof
+    GroundTheory.Heights₂.Heights.Inter.LocAwaySpec.proof
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.Inter_R1RegMaxSurj : GroundTheory.Heights₂.Heights.Inter.RegularityMaximalSurjective.Statement :=
-  @GroundTheory.Heights₂.Heights.Inter.RegularityMaximalSurjective.proof GroundTheory.Heights₂.Heights.Inter.RegularityOrder.full GroundTheory.Heights₂.Heights.Inter.RegularityLocalPrime.full
+theorem GroundTheory.Heights₂.Heights.AutoClose.Inter_R1RegMaxSurj
+    : GroundTheory.Heights₂.Heights.Inter.RegularityMaximalSurjective.Statement :=
+  @GroundTheory.Heights₂.Heights.Inter.RegularityMaximalSurjective.proof
+    GroundTheory.Heights₂.Heights.Inter.RegularityOrder.full
+    GroundTheory.Heights₂.Heights.Inter.RegularityLocalPrime.full
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.FieldNumbers_MChartLocDim.{u} : GroundTheory.Heights₂.Heights.FieldNumbers.MChartLocDim.Statement.{u} :=
-  @GroundTheory.Heights₂.Heights.FieldNumbers.MChartLocDim.proof.{u} GroundTheory.Heights₂.Heights.FieldNumbers.DegZeroLocQuot.proof GroundTheory.Heights₂.Heights.FieldNumbers.MChartDehomog.proof GroundTheory.Heights₂.Heights.FieldNumbers.MChartHomog.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.FieldNumbers_MChartLocDim.{u}
+    : GroundTheory.Heights₂.Heights.FieldNumbers.MChartLocDim.Statement.{u} :=
+  @GroundTheory.Heights₂.Heights.FieldNumbers.MChartLocDim.proof.{u}
+    GroundTheory.Heights₂.Heights.FieldNumbers.DegZeroLocQuot.proof
+    GroundTheory.Heights₂.Heights.FieldNumbers.MChartDehomog.proof
+    GroundTheory.Heights₂.Heights.FieldNumbers.MChartHomog.proof
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.FieldNumbers_DegZeroLocNoetherian.{u} : GroundTheory.Heights₂.Heights.FieldNumbers.DegZeroLocNoetherian.Statement.{u} :=
-  @GroundTheory.Heights₂.Heights.FieldNumbers.DegZeroLocNoetherian.proof.{u} GroundTheory.Heights₂.Heights.FieldNumbers.DegZeroLocQuot.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.FieldNumbers_DegZeroLocNoetherian.{u}
+    : GroundTheory.Heights₂.Heights.FieldNumbers.DegZeroLocNoetherian.Statement.{u} :=
+  @GroundTheory.Heights₂.Heights.FieldNumbers.DegZeroLocNoetherian.proof.{u}
+    GroundTheory.Heights₂.Heights.FieldNumbers.DegZeroLocQuot.proof
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.FieldNumbers_ConeVarNumerator.{u} : GroundTheory.Heights₂.Heights.FieldNumbers.ConeVarNumerator.Statement.{u} :=
-  @GroundTheory.Heights₂.Heights.FieldNumbers.ConeVarNumerator.proof.{u} GroundTheory.Heights₂.Heights.FieldNumbers.DegZeroLocQuot.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.FieldNumbers_ConeVarNumerator.{u}
+    : GroundTheory.Heights₂.Heights.FieldNumbers.ConeVarNumerator.Statement.{u} :=
+  @GroundTheory.Heights₂.Heights.FieldNumbers.ConeVarNumerator.proof.{u}
+    GroundTheory.Heights₂.Heights.FieldNumbers.DegZeroLocQuot.proof
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.FieldNumbers_MChartTrdeg.{u} : GroundTheory.Heights₂.Heights.FieldNumbers.MChartTrdeg.Statement.{u} :=
-  @GroundTheory.Heights₂.Heights.FieldNumbers.MChartTrdeg.proof.{u} GroundTheory.Heights₂.Heights.FieldNumbers.MChartHomog.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.FieldNumbers_MChartTrdeg.{u}
+    : GroundTheory.Heights₂.Heights.FieldNumbers.MChartTrdeg.Statement.{u} :=
+  @GroundTheory.Heights₂.Heights.FieldNumbers.MChartTrdeg.proof.{u}
+    GroundTheory.Heights₂.Heights.FieldNumbers.MChartHomog.proof
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.FieldNumbers_DegZeroLocLocal.{u} : GroundTheory.Heights₂.Heights.FieldNumbers.DegZeroLocLocal.Statement.{u} :=
-  @GroundTheory.Heights₂.Heights.FieldNumbers.DegZeroLocLocal.proof.{u} GroundTheory.Heights₂.Heights.FieldNumbers.DegZeroLocQuot.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.FieldNumbers_DegZeroLocLocal.{u}
+    : GroundTheory.Heights₂.Heights.FieldNumbers.DegZeroLocLocal.Statement.{u} :=
+  @GroundTheory.Heights₂.Heights.FieldNumbers.DegZeroLocLocal.proof.{u}
+    GroundTheory.Heights₂.Heights.FieldNumbers.DegZeroLocQuot.proof
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.FieldNumbers_SemilocalIntegral.{u} : GroundTheory.Heights₂.Heights.FieldNumbers.SemilocalIntegral.Statement.{u} :=
-  @GroundTheory.Heights₂.Heights.FieldNumbers.SemilocalIntegral.proof.{u} GroundTheory.Heights₂.Heights.FieldNumbers.ValuativeCentre.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.FieldNumbers_SemilocalIntegral.{u}
+    : GroundTheory.Heights₂.Heights.FieldNumbers.SemilocalIntegral.Statement.{u} :=
+  @GroundTheory.Heights₂.Heights.FieldNumbers.SemilocalIntegral.proof.{u}
+    GroundTheory.Heights₂.Heights.FieldNumbers.ValuativeCentre.proof
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.NumbersDVR_HomLocRingIsLocal.{u} : GroundTheory.Heights₂.Heights.NumbersDVR.HomLocRingIsLocal.Statement.{u} :=
-  @GroundTheory.Heights₂.Heights.NumbersDVR.HomLocRingIsLocal.proof.{u} GroundTheory.Heights₂.Heights.NumbersDVR.HomLocRingMem.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.NumbersDVR_HomLocRingIsLocal.{u}
+    : GroundTheory.Heights₂.Heights.NumbersDVR.HomLocRingIsLocal.Statement.{u} :=
+  @GroundTheory.Heights₂.Heights.NumbersDVR.HomLocRingIsLocal.proof.{u}
+    GroundTheory.Heights₂.Heights.NumbersDVR.HomLocRingMem.proof
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.NumbersDVR_LocalCoeffLocal.{u} : GroundTheory.Heights₂.Heights.NumbersDVR.LocalCoeffLocal.Statement.{u} :=
-  @GroundTheory.Heights₂.Heights.NumbersDVR.LocalCoeffLocal.proof.{u} GroundTheory.Heights₂.Heights.NumbersDVR.LocCycleSpanMul.proof GroundTheory.Heights₂.Heights.NumbersDVR.LocCyclePos.proof GroundTheory.Heights₂.Heights.NumbersDVR.MinimalPrimesSpanSingleton.proof GroundTheory.Heights₂.Heights.NumbersDVR.LocalDomainDimTwo.proof GroundTheory.Heights₂.Heights.NumbersDVR.DimTwoSumReading.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.NumbersDVR_LocalCoeffLocal.{u}
+    : GroundTheory.Heights₂.Heights.NumbersDVR.LocalCoeffLocal.Statement.{u} :=
+  @GroundTheory.Heights₂.Heights.NumbersDVR.LocalCoeffLocal.proof.{u}
+    GroundTheory.Heights₂.Heights.NumbersDVR.LocCycleSpanMul.proof
+    GroundTheory.Heights₂.Heights.NumbersDVR.LocCyclePos.proof
+    GroundTheory.Heights₂.Heights.NumbersDVR.MinimalPrimesSpanSingleton.proof
+    GroundTheory.Heights₂.Heights.NumbersDVR.LocalDomainDimTwo.proof
+    GroundTheory.Heights₂.Heights.NumbersDVR.DimTwoSumReading.proof
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.NumbersDVR_SegreFlagClosureTrdeg : GroundTheory.Heights₂.Heights.NumbersDVR.SegreFlagClosureTrdeg.Statement :=
-  @GroundTheory.Heights₂.Heights.NumbersDVR.SegreFlagClosureTrdeg.proof GroundTheory.Heights₂.Heights.NumbersDVR.SegreFlagConeAlg.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.NumbersDVR_SegreFlagClosureTrdeg
+    : GroundTheory.Heights₂.Heights.NumbersDVR.SegreFlagClosureTrdeg.Statement :=
+  @GroundTheory.Heights₂.Heights.NumbersDVR.SegreFlagClosureTrdeg.proof
+    GroundTheory.Heights₂.Heights.NumbersDVR.SegreFlagConeAlg.proof
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.NumbersDVR_HomLocRingNoetherian.{u} : GroundTheory.Heights₂.Heights.NumbersDVR.HomLocRingNoetherian.Statement.{u} :=
-  @GroundTheory.Heights₂.Heights.NumbersDVR.HomLocRingNoetherian.proof.{u} GroundTheory.Heights₂.Heights.NumbersDVR.HomLocRingMem.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.NumbersDVR_HomLocRingNoetherian.{u}
+    : GroundTheory.Heights₂.Heights.NumbersDVR.HomLocRingNoetherian.Statement.{u} :=
+  @GroundTheory.Heights₂.Heights.NumbersDVR.HomLocRingNoetherian.proof.{u}
+    GroundTheory.Heights₂.Heights.NumbersDVR.HomLocRingMem.proof
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.NumbersDVR_LocCycleLocalQuot.{u} : GroundTheory.Heights₂.Heights.NumbersDVR.LocCycleLocalQuot.Statement.{u} :=
-  @GroundTheory.Heights₂.Heights.NumbersDVR.LocCycleLocalQuot.proof.{u} GroundTheory.Heights₂.Heights.NumbersDVR.LocalQuotPrimes.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.NumbersDVR_LocCycleLocalQuot.{u}
+    : GroundTheory.Heights₂.Heights.NumbersDVR.LocCycleLocalQuot.Statement.{u} :=
+  @GroundTheory.Heights₂.Heights.NumbersDVR.LocCycleLocalQuot.proof.{u}
+    GroundTheory.Heights₂.Heights.NumbersDVR.LocalQuotPrimes.proof
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.NumbersDVR_C3BlowUpPieces.{u} : GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpDecomposition.Statement.{u} :=
-  @GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpDecomposition.proof.{u} GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpModel.full GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpStrictTransform.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.NumbersDVR_C3BlowUpPieces.{u}
+    : GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpDecomposition.Statement.{u} :=
+  @GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpDecomposition.proof.{u}
+    GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpModel.full
+    GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpStrictTransform.proof
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.NumbersDVR_BlowUpOrderLe.{u} : GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpOrderLe.Statement.{u} :=
-  @GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpOrderLe.proof.{u} GroundTheory.Heights₂.Heights.NumbersDVR.LocalizedQuotLength.proof GroundTheory.Heights₂.Heights.NumbersDVR.LengthMapIdealLe.proof GroundTheory.Heights₂.Heights.NumbersDVR.IntermediateRingQuotLength.proof GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpLocalChart.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.NumbersDVR_BlowUpOrderLe.{u}
+    : GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpOrderLe.Statement.{u} :=
+  @GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpOrderLe.proof.{u}
+    GroundTheory.Heights₂.Heights.NumbersDVR.LocalizedQuotLength.proof
+    GroundTheory.Heights₂.Heights.NumbersDVR.LengthMapIdealLe.proof
+    GroundTheory.Heights₂.Heights.NumbersDVR.IntermediateRingQuotLength.proof
+    GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpLocalChart.proof
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.NumbersDVR_BlowUpHorizontalMult.{u} : GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpHorizontalMult.Statement.{u} :=
-  @GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpHorizontalMult.proof.{u} GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpHorizontalMinimal.full GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpHorizontalChartLength.full
+theorem GroundTheory.Heights₂.Heights.AutoClose.NumbersDVR_BlowUpHorizontalMult.{u}
+    : GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpHorizontalMult.Statement.{u} :=
+  @GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpHorizontalMult.proof.{u}
+    GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpHorizontalMinimal.full
+    GroundTheory.Heights₂.Heights.NumbersDVR.BlowUpHorizontalChartLength.full
 
-theorem GroundTheory.Heights₂.Heights.AutoClose.NumbersDVR_LocalQuotFinsum.{u} : GroundTheory.Heights₂.Heights.NumbersDVR.LocalQuotFinsum.Statement.{u} :=
-  @GroundTheory.Heights₂.Heights.NumbersDVR.LocalQuotFinsum.proof.{u} GroundTheory.Heights₂.Heights.NumbersDVR.LocalQuotPrimes.proof
+theorem GroundTheory.Heights₂.Heights.AutoClose.NumbersDVR_LocalQuotFinsum.{u}
+    : GroundTheory.Heights₂.Heights.NumbersDVR.LocalQuotFinsum.Statement.{u} :=
+  @GroundTheory.Heights₂.Heights.NumbersDVR.LocalQuotFinsum.proof.{u}
+    GroundTheory.Heights₂.Heights.NumbersDVR.LocalQuotPrimes.proof

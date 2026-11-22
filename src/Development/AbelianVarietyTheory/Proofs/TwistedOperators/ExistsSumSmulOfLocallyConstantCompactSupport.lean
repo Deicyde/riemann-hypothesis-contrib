@@ -5,14 +5,17 @@ public import Development.AbelianVarietyTheory.BlockTheory.TwistedDiscreteSeries
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.IndefiniteRowSideFullHecke.FourierJacobiAverage
+open MeasureTheory ValuativeRel Matrix GlobalTheory.SplitWeil GlobalTheory.RootEx
+  GlobalTheory.IndefiniteRowSideFullHecke.FourierJacobiAverage
 
 namespace GlobalTheory.LocConstTensor
 
-theorem exists_sum (Z : Type) [TopologicalSpace Z] [T2Space Z] (V : Type) [AddCommGroup V]
-    [Module ℂ V] (T : Z → V) (hT : IsLocallyConstant T) (K : Set Z) (hK : IsCompact K)
-    (h0 : ∀ y, y ∉ K → T y = 0) :
-    ∃ (m : ℕ) (v : Fin m → V) (Φ : Fin m → SB Z), ∀ y, T y = ∑ i, (Φ i).1 y • v i := by
+theorem exists_sum
+    (Z : Type) [TopologicalSpace Z] [T2Space Z]
+    (V : Type) [AddCommGroup V] [Module ℂ V]
+    (T : Z → V) (hT : IsLocallyConstant T)
+    (K : Set Z) (hK : IsCompact K) (h0 : ∀ y, y ∉ K → T y = 0)
+    : ∃ (m : ℕ) (v : Fin m → V) (Φ : Fin m → SB Z), ∀ y, T y = ∑ i, (Φ i).1 y • v i := by
   classical
   have hfin : (T '' K).Finite := by
     letI : TopologicalSpace V := ⊥
@@ -26,10 +29,15 @@ theorem exists_sum (Z : Type) [TopologicalSpace Z] [T2Space Z] (V : Type) [AddCo
     refine HasCompactSupport.intro hK ?_
     intro y hy
     rw [h0 y hy, if_neg (Ne.symm hw)]
-  refine ⟨S.card, fun i => (e i : V),
-    fun i => ⟨_, hmem (e i) (Finset.ne_of_mem_erase (e i).2)⟩, fun y => ?_⟩
-  have h1 : ∑ i, (if T y = (e i : V) then (1 : ℂ) else 0) • (e i : V)
-      = ∑ w ∈ S, (if T y = w then (1 : ℂ) else 0) • w := by
+  refine ⟨
+    S.card,
+    fun i => (e i : V),
+    fun i => ⟨_, hmem (e i) (Finset.ne_of_mem_erase (e i).2)⟩,
+    fun y => ?_
+  ⟩
+  have h1
+      : ∑ i, (if T y = (e i : V) then (1 : ℂ) else 0) • (e i : V)
+        = ∑ w ∈ S, (if T y = w then (1 : ℂ) else 0) • w := by
     rw [← Finset.sum_coe_sort S]
     exact Equiv.sum_comp e (fun w : S => (if T y = (w : V) then (1 : ℂ) else 0) • (w : V))
   change T y = ∑ i, (if T y = (e i : V) then (1 : ℂ) else 0) • (e i : V)

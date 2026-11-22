@@ -6,13 +6,15 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 open scoped TensorProduct
 
 namespace UpperTheory.Gal.TranscendenceTraces.FiniteSectionsSeparable
 
-private theorem sepClosed_of_isAlgebraic (K L : Type) [Field K] [Field L] [Algebra K L]
-    [Algebra.IsAlgebraic K L] [IsSepClosed K] : IsSepClosed L := by
+private theorem sepClosed_of_isAlgebraic
+    (K L : Type) [Field K] [Field L] [Algebra K L] [Algebra.IsAlgebraic K L] [IsSepClosed K]
+    : IsSepClosed L := by
   refine IsSepClosed.of_exists_root _ fun p hm hirr hsep => ?_
   have hdeg : p.degree ≠ 0 := fun h => hirr.not_isUnit (Polynomial.isUnit_iff_degree_eq_zero.2 h)
   obtain ⟨r, hr⟩ := IsAlgClosed.exists_aeval_eq_zero (AlgebraicClosure L) p hdeg
@@ -24,8 +26,10 @@ private theorem sepClosed_of_isAlgebraic (K L : Type) [Field K] [Field L] [Algeb
   refine ⟨x, (algebraMap L (AlgebraicClosure L)).injective ?_⟩
   rw [map_zero, ← hr, Polynomial.aeval_algebraMap_apply_eq_algebraMap_eval]
 
-private theorem sh_of_finite (O T : Type) [CommRing O] [CommRing T] [Algebra O T]
-    [Module.Finite O T] (hO : SH O) (hT : HenselianLocalRing T) : SH T := by
+private theorem sh_of_finite
+    (O T : Type) [CommRing O] [CommRing T] [Algebra O T] [Module.Finite O T]
+    (hO : SH O) (hT : HenselianLocalRing T)
+    : SH T := by
   obtain ⟨hH, hS⟩ := hO
   haveI := hH
   haveI := hT
@@ -48,13 +52,20 @@ private theorem sh_of_finite (O T : Type) [CommRing O] [CommRing T] [Algebra O T
     rw [h2, ← Polynomial.hom_eval₂, h0, map_zero]
   exact sepClosed_of_isAlgebraic (IsLocalRing.ResidueField O) _
 
-private theorem exists_ringHom (hS : SHSec) (B C T : Type) [CommRing B] [CommRing C] [CommRing T]
-    [Algebra B C] [Algebra.Etale B C] [Module.FaithfullyFlat B C] [Algebra B T] (hT : SH T) :
-    ∃ f : C →+* T, ∀ b, f (algebraMap B C b) = algebraMap B T b := by
+private theorem exists_ringHom
+    (hS : SHSec)
+    (B C T : Type) [CommRing B] [CommRing C] [CommRing T] [Algebra B C] [Algebra.Etale B C]
+    [Module.FaithfullyFlat B C] [Algebra B T]
+    (hT : SH T)
+    : ∃ f : C →+* T, ∀ b, f (algebraMap B C b) = algebraMap B T b := by
   obtain ⟨s⟩ := hS T (T ⊗[B] C) hT
-  refine ⟨s.toRingHom.comp (Algebra.TensorProduct.includeRight : C →ₐ[B] T ⊗[B] C).toRingHom, fun b => ?_⟩
-  have h1 : (Algebra.TensorProduct.includeRight : C →ₐ[B] T ⊗[B] C) (algebraMap B C b) =
-      algebraMap T (T ⊗[B] C) (algebraMap B T b) := by
+  refine ⟨
+    s.toRingHom.comp (Algebra.TensorProduct.includeRight : C →ₐ[B] T ⊗[B] C).toRingHom,
+    fun b => ?_
+  ⟩
+  have h1
+      : (Algebra.TensorProduct.includeRight : C →ₐ[B] T ⊗[B] C) (algebraMap B C b)
+        = algebraMap T (T ⊗[B] C) (algebraMap B T b) := by
     rw [AlgHom.commutes, IsScalarTower.algebraMap_apply B T (T ⊗[B] C)]
   change s ((Algebra.TensorProduct.includeRight : C →ₐ[B] T ⊗[B] C) (algebraMap B C b)) = _
   rw [h1]
@@ -63,8 +74,7 @@ private theorem exists_ringHom (hS : SHSec) (B C T : Type) [CommRing B] [CommRin
 end UpperTheory.Gal.TranscendenceTraces.FiniteSectionsSeparable
 
 open UpperTheory.Gal.TranscendenceTraces.FiniteSectionsSeparable in
-theorem UpperTheory.Gal.TranscendenceTraces.finSec_of :
-    SHSec → FinSec := by
+theorem UpperTheory.Gal.TranscendenceTraces.finSec_of : SHSec → FinSec := by
   intro hS O B C _ _ _ _ _ _ _ _ hO
   obtain ⟨hH, -⟩ := id hO
   haveI := hH
@@ -76,7 +86,8 @@ theorem UpperTheory.Gal.TranscendenceTraces.finSec_of :
     letI : Algebra B (T i) := ((Pi.evalRingHom T i).comp (e : B →+* Π i, T i)).toAlgebra
     exact exists_ringHom hS B C (T i) hs
   choose f hf using key
-  refine ⟨{ toRingHom := (e.symm : (Π i, T i) →+* B).comp (Pi.ringHom f), commutes' := fun b => ?_ }⟩
+  refine
+    ⟨{ toRingHom := (e.symm : (Π i, T i) →+* B).comp (Pi.ringHom f), commutes' := fun b => ?_ }⟩
   have h : Pi.ringHom f (algebraMap B C b) = e b := funext fun i => hf i b
   change e.symm (Pi.ringHom f (algebraMap B C b)) = b
   rw [h]

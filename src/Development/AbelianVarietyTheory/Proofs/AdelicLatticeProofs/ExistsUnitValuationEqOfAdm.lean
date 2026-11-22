@@ -10,15 +10,19 @@ open scoped WithZero
 
 namespace GlobalTheory.QNorm
 
-theorem exists_unit_valuation_eq_of_adm :
-    ∀ (F : Type) [Field F] [NumberField F] (S T : Finset (HeightOneSpectrum (𝓞 F)))
-      (n : HeightOneSpectrum (𝓞 F) → ℤ), admitted F S → (∀ v, v ∉ T → n v = 0) →
-      ∃ a : Fˣ, ∀ v, v ∉ S → v.valuation F (a : F) = WithZero.exp (n v) := by
+theorem exists_unit_valuation_eq_of_adm
+    : ∀ (F : Type) [Field F] [NumberField F] (S T : Finset (HeightOneSpectrum (𝓞 F)))
+        (n : HeightOneSpectrum (𝓞 F) → ℤ),
+      admitted F S → (∀ v, v ∉ T → n v = 0)
+        → ∃ a : Fˣ, ∀ v, v ∉ S → v.valuation F (a : F) = WithZero.exp (n v) := by
   intro F _ _ S T n hS hT
   classical
-  have key : ∀ v : HeightOneSpectrum (𝓞 F), v ∉ S → ∃ π : Fˣ,
-      v.valuation F (π : F) = WithZero.exp (-1) ∧
-        ∀ w : HeightOneSpectrum (𝓞 F), w ∉ S → w ≠ v → w.valuation F (π : F) = 1 := by
+  have key
+      : ∀ v : HeightOneSpectrum (𝓞 F),
+        v ∉ S
+          → ∃ π : Fˣ,
+            v.valuation F (π : F) = WithZero.exp (-1)
+              ∧ ∀ w : HeightOneSpectrum (𝓞 F), w ∉ S → w ≠ v → w.valuation F (π : F) = 1 := by
     intro v hv
     obtain ⟨-, π, h1, h2⟩ := hS v hv
     have hπ0 : π ≠ 0 := by

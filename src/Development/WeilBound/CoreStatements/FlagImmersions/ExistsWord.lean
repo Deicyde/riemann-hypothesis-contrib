@@ -8,14 +8,15 @@ public import GroundTheory.HeightsAndTheta.Heights.HodgeLowerBound.PHFlProdLinea
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
 
 noncomputable section
 
 namespace RootFieldNumerics.HH
 
-theorem exists_word {J : Type} : ∀ (d : ℕ) (m : J →₀ ℕ), m.degree = d →
-    ∃ w : Fin d → J, m = ∑ k, Finsupp.single (w k) 1 := by
+theorem exists_word {J : Type}
+    : ∀ (d : ℕ) (m : J →₀ ℕ), m.degree = d → ∃ w : Fin d → J, m = ∑ k, Finsupp.single (w k) 1 := by
   intro d
   induction d with
   | zero =>
@@ -48,19 +49,23 @@ theorem exists_word {J : Type} : ∀ (d : ℕ) (m : J →₀ ℕ), m.degree = d 
 
 variable {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ] {N : ℕ}
 
-theorem hhFl_word (II : IntersectionSystem) (hII : IsIntersectionSystem II)
+theorem hhFl_word
+    (II : IntersectionSystem) (hII : IsIntersectionSystem II)
     (hP : IsArithVar (GroundTheory.Heights₂.Heights.LowerBoundFree.PFl Ψ N) (dimFl Ψ N + 1))
-    (w : Fin (dimFl Ψ N + 1) → Ψ × Fin N) (c : ℝ) :
-    hhFl Ψ N II (monomial (∑ k, Finsupp.single (w k) 1) c) = c * ((-1) ^ (dimFl Ψ N + 1) *
-      II (GroundTheory.Heights₂.Heights.LowerBoundFree.FlBlock Ψ N) (GroundTheory.Heights₂.Heights.LowerBoundFree.FlIdx Ψ N)
-        (GroundTheory.Heights₂.Heights.LowerBoundFree.PFl Ψ N) (dimFl Ψ N + 1)
-        (fun k => GroundTheory.Heights₂.Heights.LowerBoundFree.xLine Ψ N (w k))) := by
+    (w : Fin (dimFl Ψ N + 1) → Ψ × Fin N) (c : ℝ)
+    : hhFl Ψ N II (monomial (∑ k, Finsupp.single (w k) 1) c)
+      = c
+        * ((-1) ^ (dimFl Ψ N + 1) * II (GroundTheory.Heights₂.Heights.LowerBoundFree.FlBlock Ψ N)
+          (GroundTheory.Heights₂.Heights.LowerBoundFree.FlIdx Ψ N)
+          (GroundTheory.Heights₂.Heights.LowerBoundFree.PFl Ψ N) (dimFl Ψ N + 1)
+          (fun k => GroundTheory.Heights₂.Heights.LowerBoundFree.xLine Ψ N (w k))) := by
   have hdeg : (∑ i, Finsupp.single (w i) (1 : ℕ)).degree = dimFl Ψ N + 1 := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     simp [Finsupp.degree_single]
   rw [HhModel.hhFl_monomial, hdeg]
   congr 2
-  exact GroundTheory.Heights₂.Heights.LowerBoundFree.FlagHeightMultilinear.hFlMono_sum_single Ψ N II hII hP w
+  exact GroundTheory.Heights₂.Heights.LowerBoundFree.FlagHeightMultilinear.hFlMono_sum_single Ψ N II
+    hII hP w
 
 end RootFieldNumerics.HH

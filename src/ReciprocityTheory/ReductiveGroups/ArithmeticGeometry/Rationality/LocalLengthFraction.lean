@@ -7,25 +7,32 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.Rationality.F
 
 namespace ReciprocityTheory.ChartRestriction.G.FreeQuotientRank.LocalLengthFraction
 
-open NumberField IsDedekindDomain Module ReciprocityTheory.ChartRestriction.G.FreeQuotientRank ReciprocityTheory.ChartRestriction.G.FreeQuotientRank.QuotShiftPfH
+open NumberField IsDedekindDomain Module ReciprocityTheory.ChartRestriction.G.FreeQuotientRank
+  ReciprocityTheory.ChartRestriction.G.FreeQuotientRank.QuotShiftPfH
 
 variable {K₁ : Type} [Field K₁] [NumberField K₁] (w : HeightOneSpectrum (𝓞 K₁))
 
 instance isFractionRing_Rv : IsFractionRing (Rv K₁ w) K₁ :=
   (inferInstance : IsFractionRing (w.valuationSubringAtPrime K₁) K₁)
 
-variable {U : Type} [AddCommGroup U] [Module K₁ U] [FiniteDimensional K₁ U]
-  [Module (Rv K₁ w) U] [IsScalarTower (Rv K₁ w) K₁ U]
+variable
+  {U : Type} [AddCommGroup U] [Module K₁ U] [FiniteDimensional K₁ U] [Module (Rv K₁ w) U]
+  [IsScalarTower (Rv K₁ w) K₁ U]
 
-theorem local_len (hL : QuotLocalStatement) (P : Submodule K₁ U) (Mw : Submodule (Rv K₁ w) U)
-    (hMw : Mw.FG) (hMspan : Submodule.span K₁ (Mw : Set U) = ⊤) {ρ : ℕ}
-    (hρ : finrank K₁ (U ⧸ P) = ρ) (e : Fin ρ → U) (he : ∀ j, e j ∈ Mw)
-    (c : Fin ρ → U →ₗ[K₁] K₁) (hcP : ∀ i, ∀ x ∈ P, c i x = 0) (s : Fin ρ → ℝ) (β : ℝ)
-    (hint : ∀ i, ∀ y ∈ Mw, c i y ≠ 0 → -β ≤ (ordAt w (c i y) : ℝ) + s i)
-    (hdet : (Matrix.of fun i j => c i (e j)).det ≠ 0) :
-    ∃ n : ℕ, Module.length (Rv K₁ w) (Mw ⧸ ((Submodule.span (Rv K₁ w) (P : Set U) ⊓ Mw) ⊔
-        Submodule.span (Rv K₁ w) (Set.range e)).comap Mw.subtype) = n ∧
-      (n : ℝ) ≤ (ordAt w (Matrix.of fun i j => c i (e j)).det : ℝ) + ∑ i, s i + ρ * β := by
+theorem local_len
+    (hL : QuotLocalStatement)
+    (P : Submodule K₁ U)
+    (Mw : Submodule (Rv K₁ w) U) (hMw : Mw.FG) (hMspan : Submodule.span K₁ (Mw : Set U) = ⊤)
+    {ρ : ℕ} (hρ : finrank K₁ (U ⧸ P) = ρ) (e : Fin ρ → U) (he : ∀ j, e j ∈ Mw)
+    (c : Fin ρ → U →ₗ[K₁] K₁) (hcP : ∀ i, ∀ x ∈ P, c i x = 0) (s : Fin ρ → ℝ)
+    (β : ℝ) (hint : ∀ i, ∀ y ∈ Mw, c i y ≠ 0 → -β ≤ (ordAt w (c i y) : ℝ) + s i)
+    (hdet : (Matrix.of fun i j => c i (e j)).det ≠ 0)
+    : ∃ n : ℕ,
+      Module.length (Rv K₁ w)
+            (Mw ⧸ ((Submodule.span (Rv K₁ w) (P : Set U) ⊓ Mw) ⊔
+              Submodule.span (Rv K₁ w) (Set.range e)).comap Mw.subtype)
+          = n
+        ∧ (n : ℝ) ≤ (ordAt w (Matrix.of fun i j => c i (e j)).det : ℝ) + ∑ i, s i + ρ * β := by
   classical
   set N : Submodule (Rv K₁ w) Mw := (Submodule.span (Rv K₁ w) (P : Set U) ⊓ Mw).comap Mw.subtype
     with hN
@@ -85,11 +92,10 @@ theorem local_len (hL : QuotLocalStatement) (P : Submodule K₁ U) (Mw : Submodu
   have hthli : LinearIndependent (Rv K₁ w) th := by
     apply LinearIndependent.of_comp (LinearMap.pi fun i => cQ i)
     have hK : LinearIndependent K₁ (fun j => Matrix.transpose (Matrix.of fun i j => c i (e j)) j) :=
-      Matrix.linearIndependent_cols_of_isUnit
-        ((Matrix.isUnit_iff_isUnit_det _).mpr (isUnit_iff_ne_zero.mpr hdet))
+      Matrix.linearIndependent_cols_of_isUnit ((Matrix.isUnit_iff_isUnit_det _).mpr
+        (isUnit_iff_ne_zero.mpr hdet))
     exact (LinearIndependent.iff_fractionRing (Rv K₁ w) K₁).mpr hK
-  have hle1 : ρ ≤ Module.finrank (Rv K₁ w) (Mw ⧸ N) := by
-    simpa using hthli.fintype_card_le_finrank
+  have hle1 : ρ ≤ Module.finrank (Rv K₁ w) (Mw ⧸ N) := by simpa using hthli.fintype_card_le_finrank
   have hle2 : Module.finrank (Rv K₁ w) (Mw ⧸ N) ≤ ρ := by
     let b := Module.Free.chooseBasis (Rv K₁ w) (Mw ⧸ N)
     have hli : LinearIndependent (Rv K₁ w) (ι ∘ b) :=
@@ -102,12 +108,14 @@ theorem local_len (hL : QuotLocalStatement) (P : Submodule K₁ U) (Mw : Submodu
     ⟨Module.finBasisOfFinrankEq _ _ (le_antisymm hle2 hle1)⟩
   obtain ⟨n, hn, hle⟩ := exists_length_quotient_span_le hL w (Mw ⧸ N) ρ hb cQ s β th hc' hdet'
 
-  have hmapE : (Submodule.span (Rv K₁ w) (Set.range e')).map Mw.subtype =
-      Submodule.span (Rv K₁ w) (Set.range e) := by
+  have hmapE
+      : (Submodule.span (Rv K₁ w) (Set.range e')).map Mw.subtype
+        = Submodule.span (Rv K₁ w) (Set.range e) := by
     rw [Submodule.map_span, ← Set.range_comp]
     rfl
-  have hmapTh : (Submodule.span (Rv K₁ w) (Set.range e')).map N.mkQ =
-      Submodule.span (Rv K₁ w) (Set.range th) := by
+  have hmapTh
+      : (Submodule.span (Rv K₁ w) (Set.range e')).map N.mkQ
+        = Submodule.span (Rv K₁ w) (Set.range th) := by
     rw [Submodule.map_span, ← Set.range_comp]
     rfl
   have hNT : N ≤ T := Submodule.comap_mono le_sup_left
@@ -116,8 +124,11 @@ theorem local_len (hL : QuotLocalStatement) (P : Submodule K₁ U) (Mw : Submodu
     · rw [Submodule.map_le_iff_le_comap]
       intro y hy
       rw [Submodule.mem_comap]
-      have hy' : (y : U) ∈ (Submodule.span (Rv K₁ w) (P : Set U) ⊓ Mw) ⊔
-          Submodule.span (Rv K₁ w) (Set.range e) := hy
+      have hy'
+          : (y : U)
+            ∈ (Submodule.span (Rv K₁ w) (P : Set U) ⊓ Mw)
+              ⊔ Submodule.span (Rv K₁ w) (Set.range e) :=
+        hy
       obtain ⟨a, ha, b, hb, hab⟩ := Submodule.mem_sup.mp hy'
       rw [← hmapE] at hb
       obtain ⟨b', hb', rfl⟩ := hb
@@ -129,8 +140,11 @@ theorem local_len (hL : QuotLocalStatement) (P : Submodule K₁ U) (Mw : Submodu
       exact Submodule.mem_map_of_mem hb'
     · rw [Submodule.span_le]
       rintro _ ⟨j, rfl⟩
-      exact ⟨e' j, Submodule.mem_comap.mpr
-        (Submodule.mem_sup_right (Submodule.subset_span ⟨j, rfl⟩)), rfl⟩
+      exact ⟨
+        e' j,
+        Submodule.mem_comap.mpr (Submodule.mem_sup_right (Submodule.subset_span ⟨j, rfl⟩)),
+        rfl
+      ⟩
   let E : ((Mw ⧸ N) ⧸ Submodule.span (Rv K₁ w) (Set.range th)) ≃ₗ[Rv K₁ w] (Mw ⧸ T) :=
     (Submodule.quotEquivOfEq _ _ hspan.symm).trans (Submodule.quotientQuotientEquivQuotient N T hNT)
   exact ⟨n, (LinearEquiv.length_eq E).symm.trans hn, hle⟩

@@ -26,21 +26,29 @@ section Lie
 open ReciprocityTheory.ChartRestriction.G.Chart
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor hiding spMap spMap_comp
 
-theorem algChart_of_etale {R : Type} [CommRing R] {B : Type} [CommRing B] [Algebra R B] {n : ℕ}
-    (g : MvPolynomial (Fin n) R →ₐ[R] B) (hg : g.toRingHom.Etale) (ε' : B →ₐ[R] R) :
-    ∃ π : ∀ m : ℕ, B →ₐ[R] JetR R (Fin n) m,
-      (∀ m, (jetTruncR R (Fin n) m).comp (π (m + 1)) = π m) ∧
-      (∀ m, (jetZeroR R (Fin n) m).comp (π m) = (Algebra.ofId R _).comp ε') ∧
-      ∀ (A : Type) [CommRing A] [Algebra R A] (aug : A →ₐ[R] R) (m : ℕ), (RingHom.ker aug) ^ (m + 1) = ⊥ →
-        ∀ φ : B →ₐ[R] A, aug.comp φ = ε' →
-          ∃! ψ : JetR R (Fin n) m →ₐ[R] A, aug.comp ψ = jetAug R (Fin n) m ∧ ψ.comp (π m) = φ := by
+theorem algChart_of_etale
+    {R : Type} [CommRing R]
+    {B : Type} [CommRing B] [Algebra R B]
+    {n : ℕ} (g : MvPolynomial (Fin n) R →ₐ[R] B) (hg : g.toRingHom.Etale)
+    (ε' : B →ₐ[R] R)
+    : ∃ π : ∀ m : ℕ, B →ₐ[R] JetR R (Fin n) m,
+      (∀ m, (jetTruncR R (Fin n) m).comp (π (m + 1)) = π m)
+        ∧ (∀ m, (jetZeroR R (Fin n) m).comp (π m) = (Algebra.ofId R _).comp ε')
+        ∧ ∀ (A : Type) [CommRing A] [Algebra R A] (aug : A →ₐ[R] R) (m : ℕ),
+          (RingHom.ker aug) ^ (m + 1) = ⊥
+            → ∀ φ : B →ₐ[R] A,
+              aug.comp φ = ε'
+                → ∃! ψ : JetR R (Fin n) m →ₐ[R] A, aug.comp ψ = jetAug R (Fin n) m ∧ ψ.comp (π m) = φ := by
   letI : Algebra (MvPolynomial (Fin n) R) B := g.toRingHom.toAlgebra
   haveI : IsScalarTower R (MvPolynomial (Fin n) R) B := IsScalarTower.of_algebraMap_eq fun r => (g.commutes r).symm
   haveI : Algebra.Etale (MvPolynomial (Fin n) R) B := hg
-  have hπ : ∀ m : ℕ, ∃ π : B →ₐ[R] JetR R (Fin n) m, (jetAug R (Fin n) m).comp π = ε' ∧
-      ∀ j, π (sX R j) = algebraMap R _ (ε' (sX R j)) + zR m j := fun m =>
+  have hπ
+      : ∀ m : ℕ, ∃ π : B →ₐ[R] JetR R (Fin n) m,
+        (jetAug R (Fin n) m).comp π = ε'
+          ∧ ∀ j, π (sX R j) = algebraMap R _ (ε' (sX R j)) + zR m j := fun m =>
     etale_exists (n := n) ε' (jetAug R (Fin n) m) (ker_jetAug_nil (Fin n) m) _ (fun j => by
-      rw [map_add (f := _), AlgHom.commutes, Algebra.algebraMap_self, RingHom.id_apply, jetAug_zR, add_zero])
+      rw [map_add (f := _), AlgHom.commutes, Algebra.algebraMap_self, RingHom.id_apply, jetAug_zR,
+        add_zero])
   choose π hπaug hπX using hπ
   refine ⟨π, ?_, ?_, ?_⟩
   · intro m
@@ -58,19 +66,23 @@ theorem algChart_of_etale {R : Type} [CommRing R] {B : Type} [CommRing B] [Algeb
     · ext s
       simp
     · intro j
-      rw [AlgHom.comp_apply, hπX, map_add (f := _), AlgHom.commutes, AlgHom.comp_apply, jetZero_zR, add_zero]
+      rw [AlgHom.comp_apply, hπX, map_add (f := _), AlgHom.commutes, AlgHom.comp_apply, jetZero_zR,
+        add_zero]
       rfl
   · intro A _ _ aug m hJ φ' hφ'aug
     have hJn := nil_of_pow _ hJ
-    have hmem : ∀ j : Fin n, φ' (sX (S := B) R j) -
-        algebraMap R A (ε' (sX (S := B) R j)) ∈ RingHom.ker aug := by
+    have hmem
+        : ∀ j : Fin n,
+          φ' (sX (S := B) R j) - algebraMap R A (ε' (sX (S := B) R j)) ∈ RingHom.ker aug := by
       intro j
       rw [RingHom.mem_ker, map_sub, AlgHom.commutes, Algebra.algebraMap_self, RingHom.id_apply,
         ← AlgHom.comp_apply, hφ'aug, sub_self]
-    let ψ := jetLift R (RingHom.ker aug) hJ
-      (fun j : Fin n => φ' (sX (S := B) R j) - algebraMap R A (ε' (sX (S := B) R j))) hmem
-    have hψaug : aug.comp ψ = jetAug R (Fin n) m := jet_ext fun j => by
-      rw [AlgHom.comp_apply, jetLift_zR, jetAug_zR]; exact hmem j
+    let ψ :=
+      jetLift R (RingHom.ker aug) hJ
+        (fun j : Fin n => φ' (sX (S := B) R j) - algebraMap R A (ε' (sX (S := B) R j)))
+        hmem
+    have hψaug : aug.comp ψ = jetAug R (Fin n) m :=
+      jet_ext fun j => by rw [AlgHom.comp_apply, jetLift_zR, jetAug_zR]; exact hmem j
     have hψπ : ψ.comp (π m) = φ' := by
       refine etale_ext (n := n) ε' aug hJn _ _ ?_ ?_ ?_
       · rw [← AlgHom.comp_assoc, hψaug]
@@ -87,9 +99,11 @@ theorem algChart_of_etale {R : Type} [CommRing R] {B : Type} [CommRing B] [Algeb
     rw [AlgHom.comp_apply, hπX, map_add (f := _), AlgHom.commutes] at this
     rw [← this, add_sub_cancel_left]
 
-theorem exists_isUnivChart {R : Type} [CommRing R] [IsLocalRing R] (G : Over (Spec (CommRingCat.of R))) [GrpObj G] {n : ℕ}
-    (hG : SmoothOfRelativeDimension n G.hom) :
-    ∃ x : ∀ m : ℕ, sp (R₀ := R) (JetR R (Fin n) m) ⟶ G, IsUnivChart G n x := by
+theorem exists_isUnivChart
+    {R : Type} [CommRing R] [IsLocalRing R]
+    (G : Over (Spec (CommRingCat.of R))) [GrpObj G]
+    {n : ℕ} (hG : SmoothOfRelativeDimension n G.hom)
+    : ∃ x : ∀ m : ℕ, sp (R₀ := R) (JetR R (Fin n) m) ⟶ G, IsUnivChart G n x := by
   obtain ⟨C, g, hg⟩ := NilCoord.exists_etale_chart G n hG
   obtain ⟨π, htr, hze, huniv⟩ := algChart_of_etale g hg (eps C)
   refine ⟨fun m => pt C (π m), fun m => ?_, fun m => ?_, ?_⟩
@@ -98,7 +112,8 @@ theorem exists_isUnivChart {R : Type} [CommRing R] [IsLocalRing R] (G : Over (Sp
   · intro A _ _ aug m hJ y hy
     have hJn := nil_of_pow _ hJ
     have hy' : spMap aug ≫ y = pt C ((Algebra.ofId R R).comp (eps C)) := by rw [pt_eps]; exact hy
-    obtain ⟨φ, rfl⟩ := exists_pt C y (le_preimage_of_nil C aug (aug_surj aug) (elt_nil _ hJn) y _ hy')
+    obtain ⟨φ, rfl⟩ :=
+      exists_pt C y (le_preimage_of_nil C aug (aug_surj aug) (elt_nil _ hJn) y _ hy')
     have hφ : aug.comp φ = eps C := by
       have := pt_injective C ((spMap_pt C aug φ).symm.trans hy')
       rw [this]
@@ -110,19 +125,24 @@ theorem exists_isUnivChart {R : Type} [CommRing R] [IsLocalRing R] (G : Over (Sp
     rw [spMap_pt] at h2
     exact hψu ψ₂ ⟨h1, (pt_injective C h2).symm⟩
 
-theorem exists_isLieBasis {R : Type} [CommRing R] [IsLocalRing R] (G : Over (Sp R)) [GrpObj G] {n : ℕ}
-    (hG : SmoothOfRelativeDimension n G.hom) : ∃ v : Fin n → (epsR R ⟶ G), IsLieBasis v := by
+theorem exists_isLieBasis
+    {R : Type} [CommRing R] [IsLocalRing R]
+    (G : Over (Sp R)) [GrpObj G]
+    {n : ℕ} (hG : SmoothOfRelativeDimension n G.hom)
+    : ∃ v : Fin n → (epsR R ⟶ G), IsLieBasis v := by
   obtain ⟨x, hx⟩ := exists_isUnivChart G hG
   exact ⟨_, basis_of_chart hx⟩
 
 end Lie
 
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 variable {K : Type} [Field K]
 
-theorem exists_mem_nonzeroLocus (P : Out.PolAV (Sp K)) (th : P.L.Sec) (h : ∃ i, th.f i ≠ 0) (s : Sp K) :
-    ∃ z : P.A.left, P.A.hom z = s ∧ z ∈ Out.nonzeroLocus th := by
+theorem exists_mem_nonzeroLocus
+    (P : Out.PolAV (Sp K)) (th : P.L.Sec) (h : ∃ i, th.f i ≠ 0) (s : Sp K)
+    : ∃ z : P.A.left, P.A.hom z = s ∧ z ∈ Out.nonzeroLocus th := by
   obtain ⟨i, hi⟩ := h
   have := P.isAb.smooth
   have := isReduced_scheme_of_smooth_of_isIntegrallyClosed K P.A.hom
@@ -136,10 +156,11 @@ theorem keyPB_refl {R : Type} [CommRing R] (x : KeyIn R) : KeyPB x x (RingHom.id
   have e' : spMap (RingHom.id (DualNumber R)) = 𝟙 (Sp (DualNumber R)) := Spec.map_id _
   let L : RigLB x.P.A := ⟨x.P.L, x.rig, x.P.isLB, x.rig_gen⟩
   have : IsMonHom (Iso.refl x.P.A).hom := inferInstanceAs (IsMonHom (𝟙 _))
-  have heval {Y : Scheme.{0}} (f : Y ⟶ x.P.A.left) (y : Y)
-      (j k : x.P.L.ι) (hj : f y ∈ x.P.L.U j) (hk : f y ∈ x.P.L.U k) :
-      gw (isoPullId (idIso x.P.L) (rfl : 𝟙 x.P.A.left = 𝟙 _)) f y j k =
-        gm f y _ ((idIso x.P.L).s (j, k)) := by
+  have heval
+      {Y : Scheme.{0}} (f : Y ⟶ x.P.A.left) (y : Y)
+      (j k : x.P.L.ι) (hj : f y ∈ x.P.L.U j) (hk : f y ∈ x.P.L.U k)
+      : gw (isoPullId (idIso x.P.L) (rfl : 𝟙 x.P.A.left = 𝟙 _)) f y j k
+        = gm f y _ ((idIso x.P.L).s (j, k)) := by
     have hmem : f y ∈ (x.P.L.pull (𝟙 _)).U (fun _ => j) ⊓ x.P.L.U k := ⟨mem_pull.2 hj, hk⟩
     exact gm_res f y _ hmem ((idIso x.P.L).s (j, k))
   have hgen : PGen (isoPullId (idIso x.P.L) (rfl : 𝟙 x.P.A.left = 𝟙 _)) := by
@@ -147,72 +168,121 @@ theorem keyPB_refl {R : Type} [CommRing R] (x : KeyIn R) : KeyPB x x (RingHom.id
     rw [heval f y j k hj hk, heval f y j' k' hj' hk', Category.comp_id]
     have hV : f y ∈ (x.P.L.U j ⊓ x.P.L.U k) ⊓ (x.P.L.U j' ⊓ x.P.L.U k') := ⟨⟨hj, hk⟩, ⟨hj', hk'⟩⟩
     have hw := idIso_isGen x.P.isLB
-    have hw' : res (inf_le_left : (x.P.L.U j ⊓ x.P.L.U k) ⊓ (x.P.L.U j' ⊓ x.P.L.U k') ≤ x.P.L.U j ⊓ x.P.L.U k) ((idIso x.P.L).s (j, k)) =
-        res (le_inf (inf_le_left.trans inf_le_left) (inf_le_right.trans inf_le_left)) (x.P.L.g j j') *
-        (res (le_inf (inf_le_left.trans inf_le_right) (inf_le_right.trans inf_le_right)) (x.P.L.g k k'))⁻¹ *
-        res (inf_le_right : (x.P.L.U j ⊓ x.P.L.U k) ⊓ (x.P.L.U j' ⊓ x.P.L.U k') ≤ x.P.L.U j' ⊓ x.P.L.U k') ((idIso x.P.L).s (j', k')) := hw (j, k) (j', k')
+    have hw'
+        : res
+            (inf_le_left
+              : (x.P.L.U j ⊓ x.P.L.U k) ⊓ (x.P.L.U j' ⊓ x.P.L.U k') ≤ x.P.L.U j ⊓ x.P.L.U k)
+            ((idIso x.P.L).s (j, k))
+          = res (le_inf (inf_le_left.trans inf_le_left) (inf_le_right.trans inf_le_left))
+              (x.P.L.g j j')
+            * (res (le_inf (inf_le_left.trans inf_le_right) (inf_le_right.trans inf_le_right))
+              (x.P.L.g k k'))⁻¹
+            * res
+              (inf_le_right
+                : (x.P.L.U j ⊓ x.P.L.U k) ⊓ (x.P.L.U j' ⊓ x.P.L.U k') ≤ x.P.L.U j' ⊓ x.P.L.U k')
+              ((idIso x.P.L).s (j', k')) :=
+      hw (j, k) (j', k')
     have key := congrArg (gm f y ((x.P.L.U j ⊓ x.P.L.U k) ⊓ (x.P.L.U j' ⊓ x.P.L.U k'))) hw'
     simp only [map_mul, map_inv, gm_res f y _ hV] at key
     rw [gm_res f y (U := x.P.L.U j ⊓ x.P.L.U k) _ hV ((idIso x.P.L).s (j, k)),
-      gm_res f y (U := x.P.L.U j' ⊓ x.P.L.U k') _ hV ((idIso x.P.L).s (j', k'))] at key
+        gm_res f y (U := x.P.L.U j' ⊓ x.P.L.U k') _ hV ((idIso x.P.L).s (j', k'))]
+      at key
     exact key
-  refine ⟨𝟙 _, by rw [e]; exact (Category.comp_id _).trans (Category.id_comp _).symm, isoPullId (idIso x.P.L) rfl, rfl,
-    RingHom.id _, (isGrpPullback_of_iso (Iso.refl x.P.A)).congr e.symm rfl,
-    (isGen_iff _).2 (hgen), isoPullId_maps (idIso_maps L) rfl e _,
-    fun j i h => fn_ext fun y hy => ?_, fun _ => rfl, rfl,
-    fun i => by rw [e']; exact (Category.comp_id _).trans (Category.id_comp _).symm⟩
+  refine ⟨
+    𝟙 _,
+    by rw [e]; exact (Category.comp_id _).trans (Category.id_comp _).symm,
+    isoPullId (idIso x.P.L) rfl,
+    rfl,
+    RingHom.id _,
+    (isGrpPullback_of_iso (Iso.refl x.P.A)).congr e.symm rfl,
+    (isGen_iff _).2 (hgen),
+    isoPullId_maps (idIso_maps L) rfl e _,
+    fun j i h => fn_ext fun y hy => ?_,
+    fun _ => rfl,
+    rfl,
+    fun i => by rw [e']; exact (Category.comp_id _).trans (Category.id_comp _).symm
+  ⟩
   have hj : y ∈ x.P.L.U (j PUnit.unit) := mem_pull.1 hy.1
   refine (gs_appLE (𝟙 _) _ _ h (𝟙 _) y hy _).trans ?_
   rw [Category.id_comp, gs_compat x.th (𝟙 _) y hj hy.2, gs_mul _ y _ hy, gs_res _ y _ hy]
-  exact congrArg (· * _) ((gs_unit _ y _ hy _).trans
-    (congrArg Units.val (heval (𝟙 _) y _ i hj hy.2))).symm
+  exact congrArg (· * _)
+    ((gs_unit _ y _ hy _).trans (congrArg Units.val (heval (𝟙 _) y _ i hj hy.2))).symm
 
-theorem appLE_eq_of_stalk {X X' : Scheme.{0}} {L : LB X} {L' : LB X'} {F : X' ⟶ X} (w : LB.Iso L' (L.pull F)) (s : L.Sec)
-    (s' : L'.Sec) (h : ∀ (z : X') j k, F z ∈ L.U j → z ∈ L'.U k →
-      gs (𝟙 X' ≫ F) z _ (s.f j) = (gw w (𝟙 X') z j k).val * gs (𝟙 X') z _ (s'.f k))
-    (j : (L.pull F).ι) (i : L'.ι) (hle : (L.pull F).U j ⊓ L'.U i ≤ F ⁻¹ᵁ L.U (j PUnit.unit)) :
-    (F.appLE _ _ hle).hom (s.f (j PUnit.unit)) =
-      (show Γ(X', (L.pull F).U j ⊓ L'.U i) from (w.s (j, i)).val) * resG _ inf_le_right (s'.f i) :=
+theorem appLE_eq_of_stalk
+    {X X' : Scheme.{0}} {L : LB X} {L' : LB X'} {F : X' ⟶ X}
+    (w : LB.Iso L' (L.pull F)) (s : L.Sec) (s' : L'.Sec)
+    (h : ∀ (z : X') j k,
+      F z ∈ L.U j → z ∈ L'.U k
+        → gs (𝟙 X' ≫ F) z _ (s.f j) = (gw w (𝟙 X') z j k).val * gs (𝟙 X') z _ (s'.f k))
+    (j : (L.pull F).ι) (i : L'.ι) (hle : (L.pull F).U j ⊓ L'.U i ≤ F ⁻¹ᵁ L.U (j PUnit.unit))
+    : (F.appLE _ _ hle).hom (s.f (j PUnit.unit))
+      = (show Γ(X', (L.pull F).U j ⊓ L'.U i) from (w.s (j, i)).val)
+        * resG _ inf_le_right (s'.f i) :=
   fn_ext fun y hy => by
     refine (gs_appLE F _ _ hle (𝟙 _) y hy _).trans ((h y _ i (mem_pull.1 hy.1) hy.2).trans ?_)
     rw [gs_mul _ y _ hy, gs_res _ y _ hy]
     exact congrArg (· * _) (gs_unit _ y _ hy _).symm
 
-theorem exists_keyPB {R R' : Type} [CommRing R] [IsLocalRing R] [CommRing R'] (x : KeyIn R) (f : R →+* R') :
-    ∃ x' : KeyIn R', KeyPB x' x f := by
+theorem exists_keyPB
+    {R R' : Type} [CommRing R] [IsLocalRing R] [CommRing R'] (x : KeyIn R) (f : R →+* R')
+    : ∃ x' : KeyIn R', KeyPB x' x f := by
   have h := isGrpPullback_pullback x.P.A (spMap f)
-  let φ : ((Over.pullback (spMap f)).obj x.P.A).left ⟶ x.P.A.left := pullback.fst x.P.A.hom (spMap f)
+  let φ : ((Over.pullback (spMap f)).obj x.P.A).left ⟶ x.P.A.left :=
+    pullback.fst x.P.A.hom (spMap f)
   change IsGrpPullback _ _ _ φ at h
   have hL' := pull_isLB x.P.isLB φ
   have hw := (isGen_iff _).1 (idIso_isGen hL')
-  let P' : Out.PolAV (Sp R') :=
-    { A := (Over.pullback (spMap f)).obj x.P.A
-      isAb := Out.TLinPf.isAb_pullback (spMap f) x.P.A x.P.isAb
-      g := x.P.g
-      smoothDim := (smoothOfRelativeDimension_isStableUnderBaseChange _).of_isPullback h.1 x.P.smoothDim
-      L := x.P.L.pull φ
-      isLB := hL'
-      rigid := PolBaseChange.rigidified_pull h x.P.rigid
-      sym := PolBaseChange.sym_pull h x.P.sym
-      ample := relAmple_pull h.1 x.P.isLB hL' hw ⊤ (isAffineOpen_top _) (fun _ => trivial) x.P.ample
-      ktriv := kTriv_pull h x.P.isLB hL' hw x.P.ktriv }
+  let P' : Out.PolAV (Sp R') := {
+    A := (Over.pullback (spMap f)).obj x.P.A
+    isAb := Out.TLinPf.isAb_pullback (spMap f) x.P.A x.P.isAb
+    g := x.P.g
+    smoothDim :=
+      (smoothOfRelativeDimension_isStableUnderBaseChange _).of_isPullback h.1 x.P.smoothDim
+    L := x.P.L.pull φ
+    isLB := hL'
+    rigid := PolBaseChange.rigidified_pull h x.P.rigid
+    sym := PolBaseChange.sym_pull h x.P.sym
+    ample := relAmple_pull h.1 x.P.isLB hL' hw ⊤ (isAffineOpen_top _) (fun _ => trivial) x.P.ample
+    ktriv := kTriv_pull h x.P.isLB hL' hw x.P.ktriv
+  }
   have he : eSec P'.A ≫ φ = spMap f ≫ eSec x.P.A := PolBaseChange.eSec_comm h
   have hr : (rigPullOf φ (spMap f) he x.P.L x.rig).IsGen :=
-    Out.LBxP.isGen_pullAlong x.P.L φ (spMap f) (fun _ : PUnit => eSec x.P.A) (fun _ => 1) (fun _ => eSec P'.A)
-      (fun _ => he) x.rig x.rig_gen
+    Out.LBxP.isGen_pullAlong x.P.L φ (spMap f)
+      (fun _ : PUnit => eSec x.P.A)
+      (fun _ => 1)
+      (fun _ => eSec P'.A)
+      (fun _ => he)
+      x.rig x.rig_gen
   obtain ⟨th', hth'⟩ := sec_pull_down hw x.P.isLB hL' x.th
-  have sq : ∀ i, (spMap (Chart.dualMapR f) ≫ (x.v i).left) ≫ x.P.A.hom = (epsR R').hom ≫ spMap f := fun i => by
+  have sq
+      : ∀ i,
+        (spMap (Chart.dualMapR f) ≫ (x.v i).left) ≫ x.P.A.hom
+          = (epsR R').hom ≫ spMap f := fun i => by
     rw [Category.assoc, Over.w]
     show Spec.map _ ≫ Spec.map _ = Spec.map _ ≫ Spec.map _
     rw [← Spec.map_comp, ← Spec.map_comp, ← CommRingCat.ofHom_comp, ← CommRingCat.ofHom_comp]
     congr 2
     ext a <;> simp [Chart.dualMapR, TrivSqZeroExt.algebraMap_eq_inl]
-  let v' : Fin x.P.g → (epsR R' ⟶ P'.A) := fun i => Over.homMk (h.1.lift _ _ (sq i)) (h.1.lift_snd _ _ _)
-  have hv' : ∀ i, (v' i).left ≫ φ = spMap (Chart.dualMapR f) ≫ (x.v i).left := fun i => h.1.lift_fst _ _ _
+  let v' : Fin x.P.g → (epsR R' ⟶ P'.A) := fun i =>
+    Over.homMk (h.1.lift _ _ (sq i)) (h.1.lift_snd _ _ _)
+  have hv' : ∀ i, (v' i).left ≫ φ = spMap (Chart.dualMapR f) ≫ (x.v i).left := fun i =>
+    h.1.lift_fst _ _ _
   have := x.P.isAb.smooth
-  refine ⟨⟨P', x.g_pos, _, hr, th', fun s => ?_, v', Chart.isLieBasis_baseChange f h x.basis hv'⟩,
-    φ, he, idIso _, rfl, Chart.dualMapR f, h, idIso_isGen hL', fun p => hr p.1 p.2,
-    appLE_eq_of_stalk _ x.th th' (hth' _ (𝟙 _)), fun a => ?_, ?_, hv'⟩
+  refine ⟨
+    ⟨P', x.g_pos, _, hr, th', fun s => ?_, v', Chart.isLieBasis_baseChange f h x.basis hv'⟩,
+    φ,
+    he,
+    idIso _,
+    rfl,
+    Chart.dualMapR f,
+    h,
+    idIso_isGen hL',
+    fun p => hr p.1 p.2,
+    appLE_eq_of_stalk _ x.th th' (hth' _ (𝟙 _)),
+    fun a => ?_,
+    ?_,
+    hv'
+  ⟩
   · obtain ⟨z, hz, hz'⟩ := x.th_ne (spMap f s)
     obtain ⟨y, rfl, hy⟩ := Scheme.exists_preimage_of_isPullback h.1 z s hz
     obtain ⟨k, hk, u⟩ := (mem_nonzeroLocus _ _).1 hz'
@@ -224,8 +294,12 @@ theorem exists_keyPB {R R' : Type} [CommRing R] [IsLocalRing R] [CommRing R'] (x
   · ext <;> simp [Chart.dualMapR, TrivSqZeroExt.algebraMap_eq_inl]
   · ext <;> simp [Chart.dualMapR]
 
-theorem exists_isFn {A : Over (Sp ℂ)} [GrpObj A] {L : LB A.left} (hL : L.IsLB) {g : ℕ} (u : HolUnif A L g) (s : L.Sec) :
-    ∃ θ, u.IsFn s θ := by
+theorem exists_isFn
+    {A : Over (Sp ℂ)} [GrpObj A]
+    {L : LB A.left} (hL : L.IsLB)
+    {g : ℕ} (u : HolUnif A L g)
+    (s : L.Sec)
+    : ∃ θ, u.IsFn s θ := by
   choose c hc using fun z => exists_chart hL ((u.ex z).left (default : PrimeSpectrum ℂ))
   have hc' := fun z => (top_le_preimage_iff_mem _ _).2 (hc z)
   refine ⟨fun z => valAt' (u.ex z).left _ (s.f (c z)) / u.fr (c z) z, fun i z hi => ?_⟩
@@ -236,8 +310,11 @@ theorem exists_isFn {A : Over (Sp ℂ)} [GrpObj A] {L : LB A.left} (hL : L.IsLB)
   rw [e, u.fr_compat i (c z) z hm]
   field_simp
 
-theorem exists_isAddFundamentalDomain {A : Over (Sp ℂ)} [GrpObj A] {L : LB A.left} {g : ℕ} (u : HolUnif A L g) :
-    ∃ Fd, MeasureTheory.IsAddFundamentalDomain u.Λ Fd (MeasureTheory.volume : MeasureTheory.Measure (Fin g → ℂ)) := by
+theorem exists_isAddFundamentalDomain
+    {A : Over (Sp ℂ)} [GrpObj A] {L : LB A.left} {g : ℕ} (u : HolUnif A L g)
+    : ∃ Fd,
+      MeasureTheory.IsAddFundamentalDomain u.Λ Fd
+        (MeasureTheory.volume : MeasureTheory.Measure (Fin g → ℂ)) := by
   have := u.discrete
   have : IsZLattice ℝ u.Λ := ⟨u.full⟩
   exact ⟨_, ZLattice.isAddFundamentalDomain (Module.Free.chooseBasis ℤ u.Λ) _⟩

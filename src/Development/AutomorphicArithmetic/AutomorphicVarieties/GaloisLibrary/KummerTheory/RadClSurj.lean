@@ -5,36 +5,47 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum
 
-private theorem exists_frac_of_mem {K : Type} [Field K] [NumberField K] (S : Set (HeightOneSpectrum (𝓞 K)))
-    (c : ClassGroup (𝓞 K)) (hc : c ∈ clSub S) :
-    ∃ J : (FractionalIdeal (nonZeroDivisors (𝓞 K)) K)ˣ, ClassGroup.mk K J = c ∧
-      ∀ v ∉ S, FractionalIdeal.count K v J.1 = 0 := by
+private theorem exists_frac_of_mem
+    {K : Type} [Field K] [NumberField K]
+    (S : Set (HeightOneSpectrum (𝓞 K))) (c : ClassGroup (𝓞 K)) (hc : c ∈ clSub S)
+    : ∃ J : (FractionalIdeal (nonZeroDivisors (𝓞 K)) K)ˣ,
+      ClassGroup.mk K J = c ∧ ∀ v ∉ S, FractionalIdeal.count K v J.1 = 0 := by
   induction hc using Subgroup.closure_induction with
   | mem x hx =>
     obtain ⟨w, hw, rfl⟩ := hx
-    refine ⟨FractionalIdeal.mk0 K ⟨w.asIdeal, mem_nonZeroDivisors_of_ne_zero w.ne_bot⟩,
-      ClassGroup.mk_mk0 _ _, fun v hv => ?_⟩
+    refine ⟨
+      FractionalIdeal.mk0 K ⟨w.asIdeal, mem_nonZeroDivisors_of_ne_zero w.ne_bot⟩,
+      ClassGroup.mk_mk0 _ _,
+      fun v hv => ?_
+    ⟩
     rw [FractionalIdeal.coe_mk0]
     exact FractionalIdeal.count_maximal_coprime K v (fun h : w = v => hv (h ▸ hw))
-  | one => exact ⟨1, map_one _, fun v _ => FractionalIdeal.count_one K v⟩
+  | one =>
+    exact ⟨1, map_one _, fun v _ => FractionalIdeal.count_one K v⟩
   | mul x y _ _ hx hy =>
     obtain ⟨I, rfl, hI⟩ := hx
     obtain ⟨J, rfl, hJ⟩ := hy
     refine ⟨I * J, map_mul _ _ _, fun v hv => ?_⟩
-    rw [Units.val_mul, FractionalIdeal.count_mul K v I.ne_zero J.ne_zero, hI v hv, hJ v hv, add_zero]
+    rw [Units.val_mul, FractionalIdeal.count_mul K v I.ne_zero J.ne_zero, hI v hv, hJ v hv,
+      add_zero]
   | inv x _ hx =>
     obtain ⟨I, rfl, hI⟩ := hx
     refine ⟨I⁻¹, map_inv _ _, fun v hv => ?_⟩
     rw [Units.val_inv_eq_inv_val, FractionalIdeal.count_inv, hI v hv, neg_zero]
 
-private theorem mk_finprod_congr {K : Type} [Field K] [NumberField K] (S : Set (HeightOneSpectrum (𝓞 K)))
-    (f g : HeightOneSpectrum (𝓞 K) → ℤ) (hf : {v | f v ≠ 0}.Finite) (hg : {v | g v ≠ 0}.Finite)
-    (h : ∀ v ∉ S, f v = g v) :
-    (QuotientGroup.mk (∏ᶠ v, primeCl v ^ f v) : ClS S) = QuotientGroup.mk (∏ᶠ v, primeCl v ^ g v) := by
-  have hfm : ∀ f : HeightOneSpectrum (𝓞 K) → ℤ, {v | f v ≠ 0}.Finite →
-      Function.HasFiniteMulSupport (fun v => primeCl v ^ f v) := by
+private theorem mk_finprod_congr
+    {K : Type} [Field K] [NumberField K]
+    (S : Set (HeightOneSpectrum (𝓞 K))) (f g : HeightOneSpectrum (𝓞 K) → ℤ)
+    (hf : {v | f v ≠ 0}.Finite) (hg : {v | g v ≠ 0}.Finite) (h : ∀ v ∉ S, f v = g v)
+    : (QuotientGroup.mk (∏ᶠ v, primeCl v ^ f v) : ClS S)
+      = QuotientGroup.mk (∏ᶠ v, primeCl v ^ g v) := by
+  have hfm
+      : ∀ f : HeightOneSpectrum (𝓞 K) → ℤ,
+        {v | f v ≠ 0}.Finite → Function.HasFiniteMulSupport (fun v => primeCl v ^ f v) := by
     intro f hf
     unfold Function.HasFiniteMulSupport
     apply hf.subset
@@ -54,8 +65,9 @@ private theorem mk_finprod_congr {K : Type} [Field K] [NumberField K] (S : Set (
     simp [QuotientGroup.mk_zpow, h1]
   · rw [h v hv]
 
-theorem UpperTheory.V.Kum.radClSurj :
-    ∀ (K : Type) [Field K] [NumberField K] (S : Set (HeightOneSpectrum (𝓞 K))) (n : ℕ), n ≠ 0 → ∀ c : ClS S, c ^ n = 1 → ∃ a ∈ SelK S n, QuotientGroup.mk (radCl n a) = c := by
+theorem UpperTheory.V.Kum.radClSurj
+    : ∀ (K : Type) [Field K] [NumberField K] (S : Set (HeightOneSpectrum (𝓞 K))) (n : ℕ),
+      n ≠ 0 → ∀ c : ClS S, c ^ n = 1 → ∃ a ∈ SelK S n, QuotientGroup.mk (radCl n a) = c := by
   intro K _ _ S n hn c hc
   obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective c
   obtain ⟨I, rfl⟩ : ∃ I : (FractionalIdeal (nonZeroDivisors (𝓞 K)) K)ˣ, ClassGroup.mk K I = x :=
@@ -66,8 +78,10 @@ theorem UpperTheory.V.Kum.radClSurj :
     rw [map_mul, map_pow, map_inv, hJ, mul_inv_cancel]
   rw [ClassGroup.mk_eq_one_iff] at hP
   obtain ⟨y, hy⟩ := @Submodule.IsPrincipal.principal _ _ _ _ _ _ hP
-  have hx' : ((I ^ n * J⁻¹ : (FractionalIdeal (nonZeroDivisors (𝓞 K)) K)ˣ) :
-      FractionalIdeal (nonZeroDivisors (𝓞 K)) K) = FractionalIdeal.spanSingleton _ y :=
+  have hx'
+      : ((I ^ n * J⁻¹ : (FractionalIdeal (nonZeroDivisors (𝓞 K)) K)ˣ)
+          : FractionalIdeal (nonZeroDivisors (𝓞 K)) K)
+        = FractionalIdeal.spanSingleton _ y :=
     FractionalIdeal.coeToSubmodule_injective (hy.trans (FractionalIdeal.coe_spanSingleton _ y).symm)
   have hy0 : y ≠ 0 := by
     intro h0

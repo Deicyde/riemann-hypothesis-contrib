@@ -11,12 +11,14 @@ noncomputable section
 
 namespace GlobalTheory.HTRho
 
-theorem finrank_ksSub_map_cls_eq_homO {k O H : Type*} [Field k] [AddCommGroup H] [Module k H]
-    [FiniteDimensional k H] [Ring O] (σ : O →+* Module.End k H) (G Z : Submodule k H)
-    (hG : ∀ a, ∀ x ∈ G, σ a x ∈ G) (hZ : ∀ a, ∀ x ∈ Z, σ a x ∈ Z) (hZG : Z ≤ G) :
-    finrank k ((ksSub σ 0 G Z).map (cls G)) =
-      finrank k (homO (qAct (rAct σ G hG) (Z.comap G.subtype) (fun a x hx => hZ a x hx))
-        (qAct σ G hG)) := by
+theorem finrank_ksSub_map_cls_eq_homO
+    {k O H : Type*} [Field k] [AddCommGroup H] [Module k H] [FiniteDimensional k H] [Ring O]
+    (σ : O →+* Module.End k H) (G Z : Submodule k H)
+    (hG : ∀ a, ∀ x ∈ G, σ a x ∈ G) (hZ : ∀ a, ∀ x ∈ Z, σ a x ∈ Z) (hZG : Z ≤ G)
+    : finrank k ((ksSub σ 0 G Z).map (cls G))
+      = finrank k
+        (homO (qAct (rAct σ G hG) (Z.comap G.subtype) (fun a x hx => hZ a x hx))
+          (qAct σ G hG)) := by
   set Zc := Z.comap G.subtype
   set hom := homO (qAct (rAct σ G hG) Zc (fun a x hx => hZ a x hx)) (qAct σ G hG)
   let Ψ : hom →ₗ[k] (G →ₗ[k] H ⧸ G) := (LinearMap.lcomp k (H ⧸ G) Zc.mkQ) ∘ₗ hom.subtype

@@ -8,7 +8,8 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.GoodReductio
 
 namespace UpperTheory.Lit
 
-theorem neronOggShafarevich : GlobalTheory.Published.NeronOggShafarevichSt := UpperTheory.Lit.Nos.Nos.neronOggShafarevich
+theorem neronOggShafarevich : GlobalTheory.Published.NeronOggShafarevichSt :=
+  UpperTheory.Lit.Nos.Nos.neronOggShafarevich
 
 theorem potentialGoodReduction : GlobalTheory.Published.PotentialGoodReductionSt :=
   GlobalTheory.potentialGoodReduction_of_neronOggShafarevich neronOggShafarevich

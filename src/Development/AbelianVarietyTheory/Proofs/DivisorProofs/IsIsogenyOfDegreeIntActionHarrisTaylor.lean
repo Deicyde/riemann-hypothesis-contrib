@@ -17,23 +17,38 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped NumberField CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.HTTors
 
-theorem isIsogDeg_of_geomFibres (S : Scheme.{0}) (A : Over S) [GrpObj A] (hA : IsAbelianScheme A) (φ : A ⟶ A)
-    (d : ℕ) (h : ∀ (k : Type) [Field k] [IsAlgClosed k] (t : Sp k ⟶ S),
-      GlobalTheory.IwLevel.IsIsogDeg ((Over.pullback t).map φ) d) : GlobalTheory.IwLevel.IsIsogDeg φ d := by
+theorem isIsogDeg_of_geomFibres
+    (S : Scheme.{0}) (A : Over S) [GrpObj A]
+    (hA : IsAbelianScheme A)
+    (φ : A ⟶ A) (d : ℕ)
+    (h : ∀ (k : Type) [Field k] [IsAlgClosed k] (t : Sp k ⟶ S),
+      GlobalTheory.IwLevel.IsIsogDeg ((Over.pullback t).map φ) d)
+    : GlobalTheory.IwLevel.IsIsogDeg φ d := by
   have := hA.smooth
-  have hfin : IsFinite φ.left := GlobalTheory.T.abelianScheme_endomorphism_finite_of_geometric_fibres S A hA φ fun k _ _ t => (h k t).fin
+  have hfin : IsFinite φ.left :=
+    GlobalTheory.T.abelianScheme_endomorphism_finite_of_geometric_fibres S A hA φ fun k _ _ t =>
+      (h k t).fin
   have hflat : Flat φ.left :=
-    GlobalTheory.T.flat_of_finite_flat_geometric_fibres_over_base S A A φ inferInstance inferInstance inferInstance hfin fun k _ _ t => (h k t).flat
-  refine ⟨hfin, hflat, GlobalTheory.AbLaw.MulN.surjective_of_geomFibres φ fun k _ _ t => (h k t).surj, fun y => ?_⟩
+    GlobalTheory.T.flat_of_finite_flat_geometric_fibres_over_base S A A φ inferInstance
+      inferInstance inferInstance hfin fun k _ _ t => (h k t).flat
+  refine ⟨
+    hfin,
+    hflat,
+    GlobalTheory.AbLaw.MulN.surjective_of_geomFibres φ fun k _ _ t => (h k t).surj,
+    fun y => ?_
+  ⟩
   let K := AlgebraicClosure (A.left.residueField y)
-  let u : Sp K ⟶ A.left := spMap (algebraMap (A.left.residueField y) K) ≫ A.left.fromSpecResidueField y
+  let u : Sp K ⟶ A.left :=
+    spMap (algebraMap (A.left.residueField y) K) ≫ A.left.fromSpecResidueField y
   let t := u ≫ A.hom
   let q : Sp K := (⊥ : PrimeSpectrum K)
   let v : Sp K ⟶ pullback A.hom t := pullback.lift u (𝟙 _) (by simp [t])
@@ -48,16 +63,26 @@ theorem isIsogDeg_of_geomFibres (S : Scheme.{0}) (A : Over S) [GrpObj A] (hA : I
   rw [← e]
   exact (h K t).rank _
 
-theorem isIsogDeg_fibre (k : Type) [Field k] [IsAlgClosed k] (A : Over (Sp k)) [GrpObj A] (hA : IsAbelianScheme A)
-    (F : Type) [Field F] [NumberField F] (ρ : OAct (𝓞 F) A) (l d : ℕ) (hl : l.Prime) (hl0 : (l : k) ≠ 0)
+theorem isIsogDeg_fibre
+    (k : Type) [Field k] [IsAlgClosed k]
+    (A : Over (Sp k)) [GrpObj A]
+    (hA : IsAbelianScheme A)
+    (F : Type) [Field F] [NumberField F]
+    (ρ : OAct (𝓞 F) A)
+    (l d : ℕ) (hl : l.Prime) (hl0 : (l : k) ≠ 0)
     (hcard : Nat.card {x : 𝟙_ (Over (Sp k)) ⟶ A // x ^ l = 1} = l ^ (d * Module.finrank ℚ F))
-    (c : 𝓞 F) (hc : c ≠ 0) : GlobalTheory.IwLevel.IsIsogDeg (ρ.act c) ((Algebra.norm ℤ c).natAbs ^ d) := by
-  obtain ⟨h1, h2⟩ := GlobalTheory.T.isFinite_and_finrank_act_eq_norm_pow k A hA F ρ l d hl hl0 hcard c hc
+    (c : 𝓞 F) (hc : c ≠ 0)
+    : GlobalTheory.IwLevel.IsIsogDeg (ρ.act c) ((Algebra.norm ℤ c).natAbs ^ d) := by
+  obtain ⟨h1, h2⟩ :=
+    GlobalTheory.T.isFinite_and_finrank_act_eq_norm_pow k A hA F ρ l d hl hl0 hcard c hc
   exact GlobalTheory.T.isogeny_degree_of_fibre_rank k A hA _ (ρ.hom c) h1 _ h2
 
-def pullAct {p : ℕ} [Fact p.Prime] {D : GlobalTheory.UPel.HT.Datum p} {S : Scheme.{0}} {A : Over S} [GrpObj A]
-    [IsCommMonObj A] (act : GlobalTheory.UPel.HT.OActN D.O A) {T : Scheme.{0}} (t : T ⟶ S) :
-    OAct (𝓞 D.F) ((Over.pullback t).obj A) where
+def pullAct
+    {p : ℕ} [Fact p.Prime]
+    {D : GlobalTheory.UPel.HT.Datum p} {S : Scheme.{0}} {A : Over S} [GrpObj A] [IsCommMonObj A]
+    (act : GlobalTheory.UPel.HT.OActN D.O A)
+    {T : Scheme.{0}} (t : T ⟶ S)
+    : OAct (𝓞 D.F) ((Over.pullback t).obj A) where
   act c := (Over.pullback t).map (act.act (algebraMap (𝓞 D.F) D.O c))
   hom c := by have := act.hom (algebraMap (𝓞 D.F) D.O c); infer_instance
   one := by rw [map_one, act.one, CategoryTheory.Functor.map_id]
@@ -66,9 +91,13 @@ def pullAct {p : ℕ} [Fact p.Prime] {D : GlobalTheory.UPel.HT.Datum p} {S : Sch
     rw [map_add (f := _), act.add]
     exact map_mul (Over.pullback t).homMonoidHom _ _
 
-theorem isIsogDeg_intAct : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Datum p) (R : Type) [CommRing R]
-    (b : GlobalTheory.UPel.HT.Base D R) (N : ℕ) (S : Scheme.{0}) (s : S ⟶ Sp R) (o : GlobalTheory.UPel.HT.Obj b N s) (c : 𝓞 D.F),
-    c ≠ 0 → GlobalTheory.IwLevel.IsIsogDeg (o.act.act (algebraMap (𝓞 D.F) D.O c)) ((Algebra.norm ℤ c).natAbs ^ (D.m * D.n)) := by
+theorem isIsogDeg_intAct
+    : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Datum p) (R : Type) [CommRing R]
+        (b : GlobalTheory.UPel.HT.Base D R) (N : ℕ) (S : Scheme.{0}) (s : S ⟶ Sp R)
+        (o : GlobalTheory.UPel.HT.Obj b N s) (c : 𝓞 D.F),
+      c ≠ 0
+        → GlobalTheory.IwLevel.IsIsogDeg (o.act.act (algebraMap (𝓞 D.F) D.O c))
+          ((Algebra.norm ℤ c).natAbs ^ (D.m * D.n)) := by
   intro p _ D R _ b N S s o c hc
   refine isIsogDeg_of_geomFibres S o.A o.ab _ _ fun k _ _ t => ?_
   obtain ⟨φ, hφ⟩ := Spec.map_surjective (t ≫ s)
@@ -83,12 +112,14 @@ theorem isIsogDeg_intAct : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.H
     exact this.ne_zero
   have hcount := GlobalTheory.T.card_lTorsion_eq_pow_of_tateSimilitude p D k _ _ _ I l hl hlp'
   let e := GlobalTheory.TorsionLift.ptsEquiv t o.A (𝟙_ (Over (Sp k))) t (Category.id_comp t)
-  have hc2 : Nat.card {x : 𝟙_ (Over (Sp k)) ⟶ (Over.pullback t).obj o.A // x ^ l = 1} =
-      l ^ ((D.m * D.n) * Module.finrank ℚ D.F) := by
+  have hc2
+      : Nat.card {x : 𝟙_ (Over (Sp k)) ⟶ (Over.pullback t).obj o.A // x ^ l = 1}
+        = l ^ ((D.m * D.n) * Module.finrank ℚ D.F) := by
     rw [← hcount]
     refine Nat.card_congr (e.toEquiv.subtypeEquiv fun x => ?_)
     show x ^ l = 1 ↔ e x ^ l = 1
     rw [← map_pow, map_eq_one_iff e e.injective]
-  exact isIsogDeg_fibre k _ (GlobalTheory.isAbelianScheme_pullback_obj t o.A o.ab) D.F (pullAct o.act t) l _ hl hl0 hc2 c hc
+  exact isIsogDeg_fibre k _ (GlobalTheory.isAbelianScheme_pullback_obj t o.A o.ab) D.F
+    (pullAct o.act t) l _ hl hl0 hc2 c hc
 
 end GlobalTheory.HTTors

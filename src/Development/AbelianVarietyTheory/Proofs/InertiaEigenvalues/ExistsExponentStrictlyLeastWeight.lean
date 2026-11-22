@@ -8,12 +8,13 @@ open scoped BigOperators
 
 namespace GlobalTheory
 
-
 open scoped BigOperators in
-theorem _root_.GlobalTheory.exists_exponent_strictly_least_weight :
-    ∀ (ρ : ℕ) (S : Set (Fin ρ → ℕ)), S.Nonempty → ∃ m ∈ S, ∀ c : Fin ρ → ℕ,
-      (∀ i, ∑ i' ∈ Finset.Iio i, m i' * c i' < c i) →
-        ∀ a ∈ S, a ≠ m → ∑ i, m i * c i < ∑ i, a i * c i := by
+theorem _root_.GlobalTheory.exists_exponent_strictly_least_weight
+    : ∀ (ρ : ℕ) (S : Set (Fin ρ → ℕ)),
+      S.Nonempty
+        → ∃ m ∈ S, ∀ c : Fin ρ → ℕ,
+          (∀ i, ∑ i' ∈ Finset.Iio i, m i' * c i' < c i)
+            → ∀ a ∈ S, a ≠ m → ∑ i, m i * c i < ∑ i, a i * c i := by
   intro ρ S hS
   have hwf : WellFounded (Pi.Lex (fun i j : Fin ρ => j < i) (fun {_} (x y : ℕ) => x < y)) :=
     Pi.Lex.wellFounded _
@@ -33,8 +34,9 @@ theorem _root_.GlobalTheory.exists_exponent_strictly_least_weight :
     rcases lt_or_gt_of_ne hk with h | h
     · exact absurd ⟨k, fun j hj => hgt j hj, h⟩ hnl
     · exact h
-  have key : ∀ i, m i * c i + (if i = k then c k else 0) ≤
-      a i * c i + (if i < k then m i * c i else 0) := by
+  have key
+      : ∀ i,
+        m i * c i + (if i = k then c k else 0) ≤ a i * c i + (if i < k then m i * c i else 0) := by
     intro i
     rcases lt_trichotomy i k with h | h | h
     · simp [h, h.ne]
@@ -43,7 +45,8 @@ theorem _root_.GlobalTheory.exists_exponent_strictly_least_weight :
       nlinarith
     · simp [h.ne', not_lt.2 h.le, hgt i h]
   have hsum := Finset.sum_le_sum fun i (_ : i ∈ Finset.univ) => key i
-  rw [Finset.sum_add_distrib, Finset.sum_add_distrib, Finset.sum_ite_eq', ← Finset.sum_filter] at hsum
+  rw [Finset.sum_add_distrib, Finset.sum_add_distrib, Finset.sum_ite_eq', ← Finset.sum_filter]
+    at hsum
   simp only [Finset.mem_univ, if_true] at hsum
   have hI : Finset.univ.filter (fun i => i < k) = Finset.Iio k := by ext; simp
   rw [hI] at hsum

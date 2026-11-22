@@ -11,11 +11,12 @@ namespace GlobalTheory.HaarFundDom
 
 open scoped Pointwise
 
-theorem exists_haar_fundDom_mass_one : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [LocallyCompactSpace G] [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G]
-    (Γ : Subgroup G) [Countable Γ] [DiscreteTopology Γ] (K : Set G), IsCompact K →
-    (∀ g : G, ∃ γ : Γ, γ • g ∈ K) →
-    ∃ (μ : Measure G) (𝓕 : Set G), μ.IsHaarMeasure ∧ IsFundamentalDomain Γ 𝓕 μ ∧ μ 𝓕 = 1 := by
+theorem exists_haar_fundDom_mass_one
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+        [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G] (Γ : Subgroup G)
+        [Countable Γ] [DiscreteTopology Γ] (K : Set G),
+      IsCompact K → (∀ g : G, ∃ γ : Γ, γ • g ∈ K)
+        → ∃ (μ : Measure G) (𝓕 : Set G), μ.IsHaarMeasure ∧ IsFundamentalDomain Γ 𝓕 μ ∧ μ 𝓕 = 1 := by
   intro G _ _ _ _ _ _ _ _ Γ _ _ K hK hcov
   let μ₀ : Measure G := Measure.haar
   obtain ⟨𝓕, h𝓕m, h𝓕⟩ := GlobalTheory.FundDomDiscrete.exists_measurable_section Γ
@@ -32,7 +33,9 @@ theorem exists_haar_fundDom_mass_one : ∀ (G : Type) [Group G] [TopologicalSpac
     refine Set.mem_iUnion.2 ⟨γ⁻¹, Set.mem_smul_set.2 ⟨γ • x, hγ, ?_⟩, hx⟩
     simp [Subgroup.smul_def, smul_eq_mul, mul_assoc]
   have hfin : μ₀ 𝓕 < ⊤ :=
-    calc μ₀ 𝓕 ≤ μ₀ (⋃ γ : Γ, γ • K ∩ 𝓕) := measure_mono hsub
+    calc
+      μ₀ 𝓕
+        ≤ μ₀ (⋃ γ : Γ, γ • K ∩ 𝓕) := measure_mono hsub
       _ ≤ ∑' γ : Γ, μ₀ (γ • K ∩ 𝓕) := measure_iUnion_le _
       _ = μ₀ K := (hD.measure_eq_tsum _).symm
       _ < ⊤ := hK.measure_lt_top

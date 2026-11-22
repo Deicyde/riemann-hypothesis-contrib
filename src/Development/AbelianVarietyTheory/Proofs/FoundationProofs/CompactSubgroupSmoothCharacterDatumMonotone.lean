@@ -14,9 +14,9 @@ namespace GlobalTheory.StripGrp
 
 variable {k : Type} [Field k] [ValuativeRel k]
 
-theorem triv_mono {χ : kˣ →* ℂˣ} {x y : k} (h : valuation k y ≤ valuation k x) (hx : Triv χ x) :
-    Triv χ y :=
-  fun u hu h1 => hx u hu (h1.trans h)
+theorem triv_mono {χ : kˣ →* ℂˣ} {x y : k} (h : valuation k y ≤ valuation k x) (hx : Triv χ x)
+    : Triv χ y := fun u hu h1 =>
+  hx u hu (h1.trans h)
 
 theorem triv_add {χ : kˣ →* ℂˣ} {x y : k} (hx : Triv χ x) (hy : Triv χ y) : Triv χ (x + y) := by
   rcases le_total (valuation k x) (valuation k y) with h | h
@@ -33,7 +33,8 @@ theorem triv_zero (χ : kˣ →* ℂˣ) : Triv χ 0 := by
   simp [hu]
 
 theorem le_inv_of_mul_le {a b : ValueGroupWithZero k} (ha : a ≠ 0) (h : a * b ≤ 1) : b ≤ a⁻¹ :=
-  calc b = a⁻¹ * (a * b) := (inv_mul_cancel_left₀ ha b).symm
+  calc
+    b = a⁻¹ * (a * b) := (inv_mul_cancel_left₀ ha b).symm
     _ ≤ a⁻¹ * 1 := by gcongr
     _ = a⁻¹ := mul_one _
 
@@ -45,9 +46,11 @@ theorem ne_of_blk {r : ℕ} {i j : Fin n} (h : (i : ℕ) < r ∧ r ≤ (j : ℕ)
 theorem val_one_apply_le (i j : Fin n) : valuation k ((1 : Matrix (Fin n) (Fin n) k) i j) ≤ 1 := by
   by_cases h : i = j <;> simp [Matrix.one_apply, h]
 
-theorem mul_eq_zero_of_blk {r : ℕ} {A B : Matrix (Fin n) (Fin n) k}
-    (hA : ∀ i j : Fin n, ¬ ((i : ℕ) < r ∧ r ≤ (j : ℕ)) → A i j = 0)
-    (hB : ∀ i j : Fin n, ¬ ((i : ℕ) < r ∧ r ≤ (j : ℕ)) → B i j = 0) : A * B = 0 := by
+theorem mul_eq_zero_of_blk
+    {r : ℕ} {A B : Matrix (Fin n) (Fin n) k}
+    (hA : ∀ i j : Fin n, ¬((i : ℕ) < r ∧ r ≤ (j : ℕ)) → A i j = 0)
+    (hB : ∀ i j : Fin n, ¬((i : ℕ) < r ∧ r ≤ (j : ℕ)) → B i j = 0)
+    : A * B = 0 := by
   ext i j
   simp only [Matrix.mul_apply, Matrix.zero_apply]
   refine Finset.sum_eq_zero fun l _ => ?_
@@ -57,13 +60,18 @@ theorem mul_eq_zero_of_blk {r : ℕ} {A B : Matrix (Fin n) (Fin n) k}
 
 variable {ψ : Fin n → kˣ →* ℂˣ} {r : ℕ} {ϖ : k} {m : ℕ}
 
-theorem mem_strip {g : GL (Fin n) k} : g ∈ strip ψ r ϖ m ↔ ∀ i j : Fin n,
-    if (i : ℕ) < r ∧ r ≤ (j : ℕ) then
-      valuation k (ϖ ^ m * g.val i j) ≤ 1 ∧ Triv (ψ i / ψ j) (ϖ ^ m * g.val i j)
-    else g.val i j = (1 : Matrix (Fin n) (Fin n) k) i j := Iff.rfl
+theorem mem_strip {g : GL (Fin n) k}
+    : g ∈ strip ψ r ϖ m
+      ↔ ∀ i j : Fin n,
+        if (i : ℕ) < r ∧ r ≤ (j : ℕ) then
+          valuation k (ϖ ^ m * g.val i j) ≤ 1 ∧ Triv (ψ i / ψ j) (ϖ ^ m * g.val i j)
+        else
+          g.val i j = (1 : Matrix (Fin n) (Fin n) k) i j :=
+  Iff.rfl
 
-theorem sub_one_of_mem {g : GL (Fin n) k} (hg : g ∈ strip ψ r ϖ m) (i j : Fin n)
-    (h : ¬ ((i : ℕ) < r ∧ r ≤ (j : ℕ))) : (g.val - 1) i j = 0 := by
+theorem sub_one_of_mem
+    {g : GL (Fin n) k} (hg : g ∈ strip ψ r ϖ m) (i j : Fin n) (h : ¬((i : ℕ) < r ∧ r ≤ (j : ℕ)))
+    : (g.val - 1) i j = 0 := by
   have := mem_strip.mp hg i j
   rw [if_neg h] at this
   simp [Matrix.sub_apply, this]
@@ -76,12 +84,14 @@ theorem one_mem : (1 : GL (Fin n) k) ∈ strip ψ r ϖ m := by
     exact triv_zero _
   · rfl
 
-theorem mul_mem {a b : GL (Fin n) k} (ha : a ∈ strip ψ r ϖ m) (hb : b ∈ strip ψ r ϖ m) :
-    a * b ∈ strip ψ r ϖ m := by
+theorem mul_mem {a b : GL (Fin n) k} (ha : a ∈ strip ψ r ϖ m) (hb : b ∈ strip ψ r ϖ m)
+    : a * b ∈ strip ψ r ϖ m := by
   have key : (a * b).val = 1 + (a.val - 1) + (b.val - 1) := by
     have h0 := mul_eq_zero_of_blk (sub_one_of_mem ha) (sub_one_of_mem hb)
     rw [Units.val_mul]
-    calc a.val * b.val = (1 + (a.val - 1)) * (1 + (b.val - 1)) := by simp
+    calc
+      a.val * b.val
+        = (1 + (a.val - 1)) * (1 + (b.val - 1)) := by simp
       _ = 1 + (a.val - 1) + (b.val - 1) + (a.val - 1) * (b.val - 1) := by noncomm_ring
       _ = _ := by rw [h0, add_zero]
   intro i j
@@ -101,7 +111,9 @@ theorem inv_mem {a : GL (Fin n) k} (ha : a ∈ strip ψ r ϖ m) : a⁻¹ ∈ str
   have key : (a⁻¹).val = 1 - (a.val - 1) := by
     apply Units.inv_eq_of_mul_eq_one_right
     have h0 := mul_eq_zero_of_blk (sub_one_of_mem ha) (sub_one_of_mem ha)
-    calc a.val * (1 - (a.val - 1)) = 1 - (a.val - 1) * (a.val - 1) := by noncomm_ring
+    calc
+      a.val * (1 - (a.val - 1))
+        = 1 - (a.val - 1) * (a.val - 1) := by noncomm_ring
       _ = 1 := by rw [h0, sub_zero]
   intro i j
   have hA := mem_strip.mp ha i j
@@ -114,8 +126,8 @@ theorem inv_mem {a : GL (Fin n) k} (ha : a ∈ strip ψ r ϖ m) : a⁻¹ ∈ str
   · rw [if_neg h] at hA
     simp only [Matrix.sub_apply, hA, sub_self, sub_zero]
 
-theorem mono {m m' : ℕ} (hϖ : valuation k ϖ < 1) (hmm : m ≤ m') :
-    strip ψ r ϖ m ⊆ strip ψ r ϖ m' := by
+theorem mono {m m' : ℕ} (hϖ : valuation k ϖ < 1) (hmm : m ≤ m')
+    : strip ψ r ϖ m ⊆ strip ψ r ϖ m' := by
   intro g hg i j
   have hA := mem_strip.mp hg i j
   split_ifs with h
@@ -132,9 +144,11 @@ variable [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 theorem isClosed_triv (χ : kˣ →* ℂˣ) : IsClosed {x : k | Triv χ x} := by
   rw [← isOpen_compl_iff, isOpen_iff_mem_nhds]
   intro x hx
-  have hx0 : valuation k x ≠ 0 := fun h0 => hx (by
-    have : x = 0 := (Valuation.zero_iff _).mp h0
-    rw [this]; exact triv_zero χ)
+  have hx0 : valuation k x ≠ 0 := fun h0 =>
+    hx (by
+      have : x = 0 := (Valuation.zero_iff _).mp h0
+      rw [this]
+      exact triv_zero χ)
   refine Filter.mem_of_superset ((valuation k).locally_const hx0) ?_
   intro y hy hT
   exact hx (triv_mono (le_of_eq hy.symm) hT)
@@ -143,10 +157,11 @@ theorem isClosed_strip : IsClosed (strip ψ r ϖ m) := by
   obtain ⟨_, _⟩ := GlobalTheory.SplitWeil.Model.secondCountable_and_t2_local_field (k := k)
   have hball : IsClosed {z : k | valuation k z ≤ 1} :=
     (IsNonarchimedeanLocalField.isCompact_closedBall k 1).isClosed
-  have hS : IsClosed {A : Matrix (Fin n) (Fin n) k | ∀ i j : Fin n,
-      if (i : ℕ) < r ∧ r ≤ (j : ℕ) then
-        valuation k (ϖ ^ m * A i j) ≤ 1 ∧ Triv (ψ i / ψ j) (ϖ ^ m * A i j)
-      else A i j = (1 : Matrix (Fin n) (Fin n) k) i j} := by
+  have hS : IsClosed
+      {A : Matrix (Fin n) (Fin n) k | ∀ i j : Fin n,
+        if (i : ℕ) < r ∧ r ≤ (j : ℕ) then
+          valuation k (ϖ ^ m * A i j) ≤ 1 ∧ Triv (ψ i / ψ j) (ϖ ^ m * A i j)
+        else A i j = (1 : Matrix (Fin n) (Fin n) k) i j} := by
     simp only [Set.setOf_forall]
     refine isClosed_iInter fun i => isClosed_iInter fun j => ?_
     have hc : Continuous fun A : Matrix (Fin n) (Fin n) k => A i j :=
@@ -169,14 +184,29 @@ theorem isCompact_strip (hϖ0 : ϖ ≠ 0) (hϖ : valuation k ϖ < 1) : IsCompact
     split_ifs at hA with h
     · exact le_inv_of_mul_le ha0 (by rw [ha_def, ← map_mul]; exact hA.1)
     · rw [hA]; exact (val_one_apply_le i j).trans h1t
-  refine (GlobalTheory.PairingOne.isCompact_bounded (m := Fin n) a⁻¹).of_isClosed_subset isClosed_strip ?_
+  refine (GlobalTheory.PairingOne.isCompact_bounded (m := Fin n) a⁻¹).of_isClosed_subset
+    isClosed_strip ?_
   intro g hg
   exact ⟨hbd g hg, hbd g⁻¹ (inv_mem hg)⟩
 
-theorem strip_datum_monotone : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ) (ψ : Fin n → kˣ →* ℂˣ) (r : ℕ) (ϖ : k), (∀ i, IsSmoothChar (ψ i)) → ϖ ≠ 0 → valuation k ϖ < 1 → (∀ x : k, valuation k x < 1 → valuation k x ≤ valuation k ϖ) → (∀ m, Datum (strip ψ r ϖ m) (fun _ => 1)) ∧ Monotone (strip ψ r ϖ) := by
+theorem strip_datum_monotone
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : ℕ) (ψ : Fin n → kˣ →* ℂˣ) (r : ℕ) (ϖ : k),
+      (∀ i, IsSmoothChar (ψ i)) → ϖ ≠ 0 → valuation k ϖ < 1
+        → (∀ x : k, valuation k x < 1 → valuation k x ≤ valuation k ϖ)
+        → (∀ m, Datum (strip ψ r ϖ m) (fun _ => 1)) ∧ Monotone (strip ψ r ϖ) := by
   intro k _ _ _ _ n ψ r ϖ _ hϖ0 hϖ _
-  refine ⟨fun m => ⟨one_mem, fun a ha b hb => mul_mem ha hb, fun a ha => inv_mem ha,
-    isCompact_strip hϖ0 hϖ, rfl, fun _ _ _ _ => (mul_one 1).symm,
-    ⟨Set.univ, Filter.univ_mem, fun _ _ _ => rfl⟩⟩, fun m m' hmm => mono hϖ hmm⟩
+  refine ⟨
+    fun m => ⟨
+      one_mem,
+      fun a ha b hb => mul_mem ha hb,
+      fun a ha => inv_mem ha,
+      isCompact_strip hϖ0 hϖ,
+      rfl,
+      fun _ _ _ _ => (mul_one 1).symm,
+      ⟨Set.univ, Filter.univ_mem, fun _ _ _ => rfl⟩
+    ⟩,
+    fun m m' hmm => mono hϖ hmm
+  ⟩
 
 end GlobalTheory.StripGrp

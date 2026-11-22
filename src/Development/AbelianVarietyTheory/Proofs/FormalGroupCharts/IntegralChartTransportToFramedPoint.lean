@@ -17,20 +17,28 @@ public import Development.AbelianVarietyTheory.Proofs.FormalGroupCharts.Integral
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
 attribute [local instance] Over.cartesianMonoidalCategory
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ (PS Pt ev pt comp1 FGLaw)
 open MvPolynomial (X)
 
 namespace GlobalTheory
 
-theorem chartTransport_holds : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) [StarRing (𝓞 E)], ChartTransportSt Xo c := by
+theorem chartTransport_holds
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l) [StarRing (𝓞 E)],
+      ChartTransportSt Xo c := by
   intro E _ _ _ H Dw l Xo c _
-  have hJ : ChartJetTrSt Xo c := chartJetTr_of Xo c (chartJetTan_holds Xo c)
-    (chartJetBasis_holds Xo c (fun S _ _ y w hw =>
-      FrameTangent.frame_tangent_basis E H Dw l Xo c S y w hw))
-  have hF : ChartFrameTrSt Xo c := GlobalTheory.T.integral_frames_transport_to_framed_point E H Dw l Xo c
+  have hJ : ChartJetTrSt Xo c :=
+    chartJetTr_of Xo c (chartJetTan_holds Xo c)
+      (chartJetBasis_holds Xo c
+        (fun S _ _ y w hw => FrameTangent.frame_tangent_basis E H Dw l Xo c S y w hw))
+  have hF : ChartFrameTrSt Xo c :=
+    GlobalTheory.T.integral_frames_transport_to_framed_point E H Dw l Xo c
   have hM : FBMapSt := fbMap_holds
   intro hstar T io y I d B tgT uvecT xT eT wPT hbas hch hdir hfr hpr htr hrig
   obtain ⟨B', hF1, hA1, hp1, hp2, hsy, had⟩ := hM T.V T.Fr (algebraMap T.V T.Fr) d (𝓞 E) B
@@ -45,7 +53,24 @@ theorem chartTransport_holds : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
       funext fun a => funext (hA1 a)
     rw [eF, eA]
     exact hchx
-  exact ⟨B', fun ℓ i => algebraMap T.V T.Fr (uvecT ℓ i), x, e, wP, h, hchx', hfrx, hprx, hh, hrx,
-    ⟨hF1, hA1, hp1, hp2, hsy, had, fun ℓ i => rfl⟩, x', hj2, hj1, hfe, hwp⟩
+  exact ⟨
+    B',
+    fun ℓ i => algebraMap T.V T.Fr (uvecT ℓ i),
+    x,
+    e,
+    wP,
+    h,
+    hchx',
+    hfrx,
+    hprx,
+    hh,
+    hrx,
+    ⟨hF1, hA1, hp1, hp2, hsy, had, fun ℓ i => rfl⟩,
+    x',
+    hj2,
+    hj1,
+    hfe,
+    hwp
+  ⟩
 
 end GlobalTheory

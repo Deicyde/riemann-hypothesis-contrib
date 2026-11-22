@@ -11,9 +11,9 @@ open Filter Topology
 
 namespace GlobalTheory
 
-theorem hermitian_dotProduct_mulVec_star_swap {g : ℕ} (H : Matrix (Fin g) (Fin g) ℂ)
-    (hH : H.IsHermitian) (x y : Fin g → ℂ) :
-    y ⬝ᵥ H.mulVec (star x) = (starRingEnd ℂ) (x ⬝ᵥ H.mulVec (star y)) := by
+theorem hermitian_dotProduct_mulVec_star_swap
+    {g : ℕ} (H : Matrix (Fin g) (Fin g) ℂ) (hH : H.IsHermitian) (x y : Fin g → ℂ)
+    : y ⬝ᵥ H.mulVec (star x) = (starRingEnd ℂ) (x ⬝ᵥ H.mulVec (star y)) := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [dotProduct, Matrix.mulVec, map_sum, map_mul, Finset.mul_sum, Pi.star_apply]
   rw [Finset.sum_comm]
@@ -23,11 +23,10 @@ theorem hermitian_dotProduct_mulVec_star_swap {g : ℕ} (H : Matrix (Fin g) (Fin
   rw [h]
   ring
 
-theorem pi_mul_hermitian_alternation {g : ℕ} (H : Matrix (Fin g) (Fin g) ℂ)
-    (hH : H.IsHermitian) (x y : Fin g → ℂ) :
-    (Real.pi : ℂ) * (y ⬝ᵥ H.mulVec (star x)) - Real.pi * (x ⬝ᵥ H.mulVec (star y)) =
-      (((-1 : ℤˣ) : ℤ) : ℂ) * (2 * Real.pi * Complex.I) *
-        ((x ⬝ᵥ H.mulVec (star y)).im : ℂ) := by
+theorem pi_mul_hermitian_alternation
+    {g : ℕ} (H : Matrix (Fin g) (Fin g) ℂ) (hH : H.IsHermitian) (x y : Fin g → ℂ)
+    : (Real.pi : ℂ) * (y ⬝ᵥ H.mulVec (star x)) - Real.pi * (x ⬝ᵥ H.mulVec (star y))
+      = (((-1 : ℤˣ) : ℤ) : ℂ) * (2 * Real.pi * Complex.I) * ((x ⬝ᵥ H.mulVec (star y)).im : ℂ) := by
   rw [hermitian_dotProduct_mulVec_star_swap H hH x y]
   set a := x ⬝ᵥ H.mulVec (star y)
   have h := Complex.sub_conj a

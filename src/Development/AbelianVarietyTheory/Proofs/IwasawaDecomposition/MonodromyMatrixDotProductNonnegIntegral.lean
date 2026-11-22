@@ -11,7 +11,23 @@ open scoped Matrix
 
 namespace GlobalTheory
 
-theorem monodromy_dotProduct_nonneg : ∀ (n a g : ℕ) (ha : a ≤ n) (ρ₁ : ℝ) (τ : (Fin n → ℂ) → Matrix (Fin g) (Fin g) ℂ) (B : Fin a → Matrix (Fin g) (Fin g) ℤ), 0 < ρ₁ → ρ₁ ≤ 1 → (∀ i j, DifferentiableOn ℂ (fun s => τ s i j) {s | s ∈ logDom n a ∧ logExp a s ∈ Metric.ball (0 : Fin n → ℂ) ρ₁}) → (∀ s ∈ logDom n a, logExp a s ∈ Metric.ball (0 : Fin n → ℂ) ρ₁ → (τ s).IsSymm ∧ ((τ s).map Complex.im).PosDef) → (∀ s ∈ logDom n a, logExp a s ∈ Metric.ball (0 : Fin n → ℂ) ρ₁ → ∀ k : Fin a, τ (s + Pi.single (Fin.castLE ha k) (2 * Real.pi * Complex.I)) = τ s + (B k).map (Int.cast : ℤ → ℂ)) → ∀ (k : Fin a) (v : Fin g → ℤ), 0 ≤ dotProduct v ((B k).mulVec v) := by
+theorem monodromy_dotProduct_nonneg
+    : ∀ (n a g : ℕ) (ha : a ≤ n) (ρ₁ : ℝ) (τ : (Fin n → ℂ) → Matrix (Fin g) (Fin g) ℂ)
+        (B : Fin a → Matrix (Fin g) (Fin g) ℤ),
+      0 < ρ₁ → ρ₁ ≤ 1
+        → (∀ i j,
+          DifferentiableOn ℂ
+            (fun s => τ s i j)
+            {s | s ∈ logDom n a ∧ logExp a s ∈ Metric.ball (0 : Fin n → ℂ) ρ₁})
+        → (∀ s ∈ logDom n a,
+          logExp a s ∈ Metric.ball (0 : Fin n → ℂ) ρ₁
+            → (τ s).IsSymm ∧ ((τ s).map Complex.im).PosDef)
+        → (∀ s ∈ logDom n a,
+          logExp a s ∈ Metric.ball (0 : Fin n → ℂ) ρ₁
+            → ∀ k : Fin a,
+              τ (s + Pi.single (Fin.castLE ha k) (2 * Real.pi * Complex.I))
+                = τ s + (B k).map (Int.cast : ℤ → ℂ))
+        → ∀ (k : Fin a) (v : Fin g → ℤ), 0 ≤ dotProduct v ((B k).mulVec v) := by
   intro n a g ha ρ₁ τ B hρ0 hρ1 hdiff hpos hmon k v
   by_cases hv : v = 0
   · subst hv; simp
@@ -40,7 +56,9 @@ theorem monodromy_dotProduct_nonneg : ∀ (n a g : ℕ) (ha : a ≤ n) (ρ₁ : 
       by_cases hi : i = j
       · subst hi
         simp only [logExp, u, Function.update_self, hjlt, if_true, Complex.norm_exp]
-        calc Real.exp t.re < Real.exp (Real.log ρ₁) := Real.exp_lt_exp.2 ht
+        calc
+          Real.exp t.re
+            < Real.exp (Real.log ρ₁) := Real.exp_lt_exp.2 ht
           _ = ρ₁ := Real.exp_log hρ0
       · simp only [logExp, u, Function.update_of_ne hi, s₀]
         split_ifs with h
@@ -48,7 +66,8 @@ theorem monodromy_dotProduct_nonneg : ∀ (n a g : ℕ) (ha : a ≤ n) (ρ₁ : 
         · simpa using hρ0
   let v' : Fin g → ℂ := fun i => (v i : ℂ)
   let f : ℂ → ℂ := fun t => v' ⬝ᵥ (τ (u t) *ᵥ v')
-  have hshift : ∀ t : ℂ, u (t + 2 * Real.pi * Complex.I) = u t + Pi.single j (2 * Real.pi * Complex.I) := by
+  have hshift
+      : ∀ t : ℂ, u (t + 2 * Real.pi * Complex.I) = u t + Pi.single j (2 * Real.pi * Complex.I) := by
     intro t
     ext i
     by_cases hi : i = j
@@ -56,7 +75,10 @@ theorem monodromy_dotProduct_nonneg : ∀ (n a g : ℕ) (ha : a ≤ n) (ρ₁ : 
     · simp [u, hi, Function.update_of_ne hi, Pi.single_apply]
   have hcast : v' ⬝ᵥ ((B k).map (Int.cast : ℤ → ℂ) *ᵥ v') = ((v ⬝ᵥ (B k *ᵥ v) : ℤ) : ℂ) := by
     simp [v', dotProduct, Matrix.mulVec, Matrix.map_apply]
-  have hper : ∀ t : ℂ, t.re < Real.log ρ₁ → f (t + 2 * Real.pi * Complex.I) = f t + ((v ⬝ᵥ (B k *ᵥ v) : ℤ) : ℂ) := by
+  have hper
+      : ∀ t : ℂ,
+        t.re < Real.log ρ₁
+          → f (t + 2 * Real.pi * Complex.I) = f t + ((v ⬝ᵥ (B k *ᵥ v) : ℤ) : ℂ) := by
     intro t ht
     have h1 := hmon (u t) (hmem t ht).1 (hmem t ht).2 k
     simp only [f]
@@ -73,7 +95,8 @@ theorem monodromy_dotProduct_nonneg : ∀ (n a g : ℕ) (ha : a ≤ n) (ρ₁ : 
     have hp := ((hpos (u t) (hmem t ht).1 (hmem t ht).2).2).dotProduct_mulVec_pos hv''
     have heq : (f t).im = star v'' ⬝ᵥ (((τ (u t)).map Complex.im) *ᵥ v'') := by
       simp [f, v', v'', dotProduct, Matrix.mulVec, Complex.im_sum, Complex.mul_im, Finset.mul_sum]
-    rw [heq]; exact hp
+    rw [heq]
+    exact hp
   have hu : Differentiable ℂ u := fun t => (hasFDerivAt_update s₀ t).differentiableAt
   have hent : ∀ i l, DifferentiableOn ℂ (fun t => τ (u t) i l) {t : ℂ | t.re < Real.log ρ₁} :=
     fun i l => (hdiff i l).comp hu.differentiableOn (fun t ht => hmem t ht)
@@ -85,6 +108,7 @@ theorem monodromy_dotProduct_nonneg : ∀ (n a g : ℕ) (ha : a ≤ n) (ρ₁ : 
     apply DifferentiableOn.fun_sum
     intro l _
     exact (hent i l).mul_const _
-  exact_mod_cast GlobalTheory.T.periodic_left_halfPlane_shift_nonneg_of_im_pos (Real.log ρ₁) f (v ⬝ᵥ (B k *ᵥ v)) hdf hper him
+  exact_mod_cast GlobalTheory.T.periodic_left_halfPlane_shift_nonneg_of_im_pos (Real.log ρ₁) f
+    (v ⬝ᵥ (B k *ᵥ v)) hdf hper him
 
 end GlobalTheory

@@ -11,20 +11,33 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.Complexified
 open Matrix GlobalTheory.HolDS
 open Formalism.REAL (GlRel IsUnitary IsWeight KHighest root Jm inG)
 open Formalism.QuantumDeterminants (lowK IsHCParam)
-open Formalism.MainNotions.S (IsURepOn IsIrredOn UJset IsKFin IsKTypeOf IsKStableOn IsDS lowKSub vNormSq)
+open Formalism.MainNotions.S
+  (IsURepOn IsIrredOn UJset IsKFin IsKTypeOf IsKStableOn IsDS lowKSub vNormSq)
 open CompanionTheory.D.DSIC (KRel KUnit KStab IsSmMod)
 open CompanionTheory.D.LK (IsKMod IsMin)
 open scoped InnerProductSpace
 
 namespace GlobalTheory.HolDS
 
-theorem raisingSpan_eq_span_words : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (D : Submodule ℂ H) (E : Fin n → Fin n → Module.End ℂ D), IsKMod ε σ D E → ∀ S : Submodule ℂ H, S ≤ D → raisingSpan ε σ S = (Submodule.span ℂ {y : D | ∃ l : List (Fin n × Fin n), (∀ p ∈ l, ε p.1 = true ∧ ε p.2 = false) ∧ ∃ x ∈ S.comap D.subtype, y = (l.map fun p : Fin n × Fin n => E p.1 p.2).prod x}).map D.subtype := by
+theorem raisingSpan_eq_span_words
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+        (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (D : Submodule ℂ H)
+        (E : Fin n → Fin n → Module.End ℂ D),
+      IsKMod ε σ D E
+        → ∀ S : Submodule ℂ H,
+          S ≤ D
+            → raisingSpan ε σ S
+              = (Submodule.span ℂ
+                  {y : D | ∃ l : List (Fin n × Fin n), (∀ p ∈ l, ε p.1 = true ∧ ε p.2 = false) ∧ ∃ x ∈ S.comap D.subtype, y = (l.map fun p : Fin n × Fin n => E p.1 p.2).prod x}).map
+                D.subtype := by
   intro n ε H _ _ σ D E hK S hSD
   set Y : Set D := {y : D | ∃ l : List (Fin n × Fin n), (∀ p ∈ l, ε p.1 = true ∧ ε p.2 = false) ∧
     ∃ x ∈ S.comap D.subtype, y = (l.map fun p : Fin n × Fin n => E p.1 p.2).prod x} with hY
   have hcmp := GlobalTheory.T.complexifiedDerivedAction_eq_sum_kFiniteModule n ε H σ D E hK
 
-  have hstab : ∀ a b, ε a = true → ε b = false → ∀ y ∈ Submodule.span ℂ Y, E a b y ∈ Submodule.span ℂ Y := by
+  have hstab
+      : ∀ a b,
+        ε a = true → ε b = false → ∀ y ∈ Submodule.span ℂ Y, E a b y ∈ Submodule.span ℂ Y := by
     intro a b ha hb y hy
     have hle : Submodule.span ℂ Y ≤ (Submodule.span ℂ Y).comap (E a b) := by
       rw [Submodule.span_le]
@@ -40,8 +53,11 @@ theorem raisingSpan_eq_span_words : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Typ
   apply le_antisymm
   · rw [raisingSpan, Submodule.span_le]
     rintro w ⟨l, hl, v, hv, rfl⟩
-    have key : ∀ l : List (Matrix (Fin n) (Fin n) ℂ), (∀ Z ∈ l, Z ∈ pPlus ε) →
-        ∃ y ∈ Submodule.span ℂ Y, (y : H) = l.foldr (GlobalTheory.SmVec.dRepC (Jm ε) σ) v := by
+    have key
+        : ∀ l : List (Matrix (Fin n) (Fin n) ℂ),
+          (∀ Z ∈ l, Z ∈ pPlus ε)
+            → ∃ y ∈ Submodule.span ℂ Y,
+              (y : H) = l.foldr (GlobalTheory.SmVec.dRepC (Jm ε) σ) v := by
       intro l
       induction l with
       | nil =>
@@ -62,14 +78,17 @@ theorem raisingSpan_eq_span_words : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Typ
     exact ⟨y, hy, hyv⟩
   · rw [Submodule.map_span, Submodule.span_le]
     rintro _ ⟨y, ⟨l, hl, x, hx, rfl⟩, rfl⟩
-    have key : ∀ l : List (Fin n × Fin n),
-        (((l.map fun p : Fin n × Fin n => E p.1 p.2).prod x : D) : H) =
-          (l.map fun p : Fin n × Fin n => Matrix.single p.1 p.2 (1 : ℂ)).foldr (GlobalTheory.SmVec.dRepC (Jm ε) σ) (x : H) := by
+    have key
+        : ∀ l : List (Fin n × Fin n),
+          (((l.map fun p : Fin n × Fin n => E p.1 p.2).prod x : D) : H)
+            = (l.map fun p : Fin n × Fin n => Matrix.single p.1 p.2 (1 : ℂ)).foldr
+              (GlobalTheory.SmVec.dRepC (Jm ε) σ) (x : H) := by
       intro l
       induction l with
       | nil => simp
       | cons p l ih =>
-        rw [List.map_cons, List.map_cons, List.foldr_cons, ← ih, hcmp, List.prod_cons, Module.End.mul_apply]
+        rw [List.map_cons, List.map_cons, List.foldr_cons, ← ih, hcmp, List.prod_cons,
+          Module.End.mul_apply]
         congr 1
         rw [Finset.sum_eq_single p.1, Finset.sum_eq_single p.2]
         · simp
@@ -79,7 +98,8 @@ theorem raisingSpan_eq_span_words : ∀ (n : ℕ) (ε : Fin n → Bool) (H : Typ
           refine Finset.sum_eq_zero fun b _ => ?_
           simp [Matrix.single_apply, Ne.symm ha]
         · simp
-    refine Submodule.subset_span ⟨l.map fun p : Fin n × Fin n => Matrix.single p.1 p.2 (1 : ℂ), ?_, (x : H), hx, key l⟩
+    refine Submodule.subset_span
+      ⟨l.map fun p : Fin n × Fin n => Matrix.single p.1 p.2 (1 : ℂ), ?_, (x : H), hx, key l⟩
     intro Z hZ
     obtain ⟨p, hp, rfl⟩ := List.mem_map.1 hZ
     exact single_mem_pPlus (hl p hp).1 (hl p hp).2 1

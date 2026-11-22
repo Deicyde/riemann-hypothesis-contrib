@@ -8,13 +8,17 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.AddMonoi
 
 @[expose] public section
 
-open NumberField IsDedekindDomain WeierstrassCurve GlobalTheory GlobalTheory.Published GlobalTheory.CMModel Formalism.L2.Th1.F
+open NumberField IsDedekindDomain WeierstrassCurve GlobalTheory GlobalTheory.Published
+  GlobalTheory.CMModel Formalism.L2.Th1.F
 open scoped IntermediateField BigOperators Topology
 
 namespace GlobalTheory
 
-theorem derivWeierstrassP_add_half_period :
-    ∀ (L : PeriodPair) (a t : ℂ), a ∉ L.lattice → 2 * a ∈ L.lattice → t ∉ L.lattice → t + a ∉ L.lattice → L.derivWeierstrassP (t + a) * (L.weierstrassP t - L.weierstrassP a) ^ 2 = -(3 * L.weierstrassP a ^ 2 - L.g₂ / 4) * L.derivWeierstrassP t := by
+theorem derivWeierstrassP_add_half_period
+    : ∀ (L : PeriodPair) (a t : ℂ),
+      a ∉ L.lattice → 2 * a ∈ L.lattice → t ∉ L.lattice → t + a ∉ L.lattice
+        → L.derivWeierstrassP (t + a) * (L.weierstrassP t - L.weierstrassP a) ^ 2
+          = -(3 * L.weierstrassP a ^ 2 - L.g₂ / 4) * L.derivWeierstrassP t := by
   intro L a t ha h2 ht hta
   have hd : L.derivWeierstrassP a = 0 :=
     (GlobalTheory.derivWeierstrassP_eq_zero_iff L ha).2 (by rw [← two_mul]; exact h2)

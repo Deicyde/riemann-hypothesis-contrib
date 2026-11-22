@@ -6,10 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory.DeterminantExpansion
 
-theorem det_mul_expand {V : Type} [inst : CommRing V] {m g : ℕ}
-    (M : Matrix (Fin m) (Fin g) V) (C : Matrix (Fin g) (Fin m) V) :
-    Matrix.det (M * C) =
-      ∑ J : Fin m → Fin g, (∏ i : Fin m, M i (J i)) * Matrix.det (Matrix.submatrix C J id) := by
+theorem det_mul_expand
+    {V : Type} [inst : CommRing V]
+    {m g : ℕ} (M : Matrix (Fin m) (Fin g) V) (C : Matrix (Fin g) (Fin m) V)
+    : Matrix.det (M * C)
+      = ∑ J : Fin m → Fin g, (∏ i : Fin m, M i (J i)) * Matrix.det (Matrix.submatrix C J id) := by
   classical
   have h : (M * C : Matrix (Fin m) (Fin m) V) = fun i => ∑ k : Fin g, M i k • C k := by
     ext i j

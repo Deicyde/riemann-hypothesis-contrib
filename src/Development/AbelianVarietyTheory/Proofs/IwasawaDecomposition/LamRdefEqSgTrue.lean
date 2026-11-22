@@ -8,10 +8,15 @@ public import Formalism.LocalToGlobal.Columns.BaseLemmas
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum Formalism.IndefR.Cx
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open Formalism.IndefR.RecTie Formalism.IndefR.Lev Formalism.L2.Rows GlobalTheory.Mem GlobalTheory.Mem.R3 GlobalTheory.Mem.Col2
+open Formalism.IndefR.RecTie Formalism.IndefR.Lev Formalism.L2.Rows GlobalTheory.Mem
+  GlobalTheory.Mem.R3 GlobalTheory.Mem.Col2
 
 namespace GlobalTheory.Mem.R3.RowWeight
 
@@ -74,19 +79,28 @@ lemma sgHC_strictAnti {R : Ranks} (P : HCParam R) :
   simp only [rhoVec] at h ⊢
   linarith
 
-theorem lamRdef_eq (D : D7) (h : D.sp.X'.rank = D.R.N D.R.m - 1) (τ : D.what₂.Tau) (i : Fin D.sp.X'.rank) :
-    (Bridge.lamRdef (Ptw D) τ).w i = (Formalism.L2.Col.RowPar.of (D.hc τ)).sgTrue.w (Fin.cast h i) := by
+theorem lamRdef_eq
+    (D : D7) (h : D.sp.X'.rank = D.R.N D.R.m - 1) (τ : D.what₂.Tau) (i : Fin D.sp.X'.rank)
+    : (Bridge.lamRdef (Ptw D) τ).w i
+      = (Formalism.L2.Col.RowPar.of (D.hc τ)).sgTrue.w (Fin.cast h i) := by
   have hF := GlobalTheory.ForcedWeights.lamRForced D τ
   rw [GlobalTheory.ForcedWeights.dpar_eq] at hF
-  have h1 := isWtOfPar_eq h hF (fun x hx => by
-      obtain ⟨y, -, rfl⟩ := Finset.mem_image.1 hx
-      rfl) _ (sgHC_strictAnti (D.hc τ)) (fun a => by
-      obtain ⟨x, hx⟩ := sgHC_mem (D.hc τ) a.1 a.2
-      exact Finset.mem_image.2 ⟨x, Finset.mem_univ _, by rw [hx]⟩) i
+  have h1 :=
+    isWtOfPar_eq h hF
+      (fun x hx => by
+        obtain ⟨y, -, rfl⟩ := Finset.mem_image.1 hx
+        rfl)
+      _ (sgHC_strictAnti (D.hc τ))
+      (fun a => by
+        obtain ⟨x, hx⟩ := sgHC_mem (D.hc τ) a.1 a.2
+        exact Finset.mem_image.2 ⟨x, Finset.mem_univ _, by rw [hx]⟩)
+      i
   rw [← Formalism.L2.Col.RowPar.sgTrue_eq] at h1
   exact_mod_cast h1
 
-theorem lamRdef_eq_sgTrue : ∀ (X : Stages) (τ : X.B.fields.Tau) (i : Fin X.toD7.sp.X'.rank), (Bridge.lamRdef (Ptw X.toD7) τ).w i = (X.B.wts.sgTrue τ).w (Fin.cast (RowAd.rank_X' X) i) :=
+theorem lamRdef_eq_sgTrue
+    : ∀ (X : Stages) (τ : X.B.fields.Tau) (i : Fin X.toD7.sp.X'.rank),
+      (Bridge.lamRdef (Ptw X.toD7) τ).w i = (X.B.wts.sgTrue τ).w (Fin.cast (RowAd.rank_X' X) i) :=
   fun X τ i => lamRdef_eq X.toD7 (RowAd.rank_X' X) τ i
 
 end GlobalTheory.Mem.R3.RowWeight

@@ -12,7 +12,9 @@ noncomputable section
 
 namespace GlobalTheory.HeightCounting
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host NumberField IsDedekindDomain
+  Polynomial
 open GlobalTheory.WeilDeligne
 
 section
@@ -23,34 +25,37 @@ abbrev WDAt (N : NData R H what₂) (w : PlE H) : Type :=
   WD (E := H.E) (A := N.plOm.1 w) (w := w) (N.plOm.2 w)
 
 abbrev UnrWDFam (N : NData R H what₂) (a : ℕ) : Type :=
-  {p : (∀ w, WDAt N w) × ((H.E →+* ℂ) → Multiset ℂ) //
-    (∀ w, (p.1 w).unr ∧ (p.1 w).lpDim = a) ∧ ∀ τ, Multiset.card (p.2 τ) = a}
+  {p : (∀ w, WDAt N w) × ((H.E →+* ℂ) → Multiset ℂ)
+    // (∀ w, (p.1 w).unr ∧ (p.1 w).lpDim = a) ∧ ∀ τ, Multiset.card (p.2 τ) = a}
 
-theorem lpUnr_negOne_spec (N : NData R H what₂) (w : PlE H) :
-    (WD.lpUnr (h := N.plOm.2 w) {-1}).unr ∧
-      (WD.lpUnr (h := N.plOm.2 w) {-1}).frobEig = {-1} ∧
-      (WD.lpUnr (h := N.plOm.2 w) {-1}).lpDim = 1 := by
+theorem lpUnr_negOne_spec (N : NData R H what₂) (w : PlE H)
+    : (WD.lpUnr (h := N.plOm.2 w) {-1}).unr ∧ (WD.lpUnr (h := N.plOm.2 w) {-1}).frobEig = {-1}
+      ∧ (WD.lpUnr (h := N.plOm.2 w) {-1}).lpDim = 1 := by
   obtain ⟨hu, he, hd⟩ := WD.lpUnr_spec (h := N.plOm.2 w) ({-1} : Multiset ℂ) (by simp)
   exact ⟨hu, he, hd.trans (Multiset.card_singleton _)⟩
 
-def negOneWDFam (N : NData R H what₂) : UnrWDFam N 1 :=
-  ⟨(fun w => WD.lpUnr (h := N.plOm.2 w) {-1}, fun _ => {0}),
-    fun w => ⟨(lpUnr_negOne_spec N w).1, (lpUnr_negOne_spec N w).2.2⟩, fun _ => rfl⟩
+def negOneWDFam (N : NData R H what₂) : UnrWDFam N 1 := ⟨
+  (fun w => WD.lpUnr (h := N.plOm.2 w) {-1}, fun _ => {0}),
+  fun w => ⟨(lpUnr_negOne_spec N w).1, (lpUnr_negOne_spec N w).2.2⟩,
+  fun _ => rfl
+⟩
 
-theorem UnrWDFam.exists_frobEig {N : NData R H what₂} (χ : UnrWDFam N 1) (w : PlE H) :
-    ∃ c, (χ.1.1 w).frobEig = {c} := by
+theorem UnrWDFam.exists_frobEig {N : NData R H what₂} (χ : UnrWDFam N 1) (w : PlE H)
+    : ∃ c, (χ.1.1 w).frobEig = {c} := by
   have hu : (χ.1.1 w).unr := (χ.2.1 w).1
   have hd : (χ.1.1 w).lpDim = 1 := (χ.2.1 w).2
-  have hc : Multiset.card (χ.1.1 w).frobEig = 1 := ((WD.unramified_laws (N.plOm.2 w)).2.2.2.2.2.2.2.2.2.2.2.2.1 _ hu).trans hd
+  have hc : Multiset.card (χ.1.1 w).frobEig = 1 :=
+    ((WD.unramified_laws (N.plOm.2 w)).2.2.2.2.2.2.2.2.2.2.2.2.1 _ hu).trans hd
   exact Multiset.card_eq_one.mp hc
-
 
 set_option synthInstance.maxHeartbeats 400000 in
 set_option maxHeartbeats 1000000 in
-def nAutWD (N : NData R H what₂) (hE : IsEmpty N.Loc) (pl : ∀ k, N.PlG k → PlE H)
+def nAutWD
+    (N : NData R H what₂) (hE : IsEmpty N.Loc) (pl : ∀ k, N.PlG k → PlE H)
     (h1 : ∀ k v, pl k v ∈ placesOver H.E (H.g k)) (h2 : ∀ k, Function.Injective (pl k))
     (h3 : ∀ k v v', ¬ IsConjPl H (pl k v) (pl k v'))
-    (τ : ∀ k, Fb (H.g k) (H.g_prime k) →* ℂ) (γ : Fin 2 → PlE H → G H.E N.Om) : NAut N where
+    (τ : ∀ k, Fb (H.g k) (H.g_prime k) →* ℂ) (γ : Fin 2 → PlE H → G H.E N.Om)
+    : NAut N where
   LP := WDAt N
   lpDim := WD.lpDim
   lpZero := fun w => WD.lpZero (h := N.plOm.2 w)
@@ -98,16 +103,23 @@ def nAutWD (N : NData R H what₂) (hE : IsEmpty N.Loc) (pl : ∀ k, N.PlG k →
     let : Fact (H.g k).Prime := ⟨H.g_prime k⟩
     have hzero := WD.lpDim_zero (N.plOm.2 w)
     exact WD.lab_of_lpDim_eq_zero (τ k) (γ k w) hzero
-  inertiaCharpoly_add := fun k _ a b => haveI : Fact (H.g k).Prime := ⟨H.g_prime k⟩; WD.lab_lpSum _ _ a b
+  inertiaCharpoly_add := fun k _ a b =>
+    haveI : Fact (H.g k).Prime := ⟨H.g_prime k⟩; WD.lab_lpSum _ _ a b
   CG := UnrWDFam N
   csd := fun π => ∀ w w', IsConjPl H w w' → (π.1.1 w').frobEig = (π.1.1 w).frobEig.map (·⁻¹)
-  ralg := fun {a} π => ∀ τ, (π.1.2 τ).Nodup ∧ ∀ z ∈ π.1.2 τ, ∃ n : ℤ, z = (n : ℂ) + ((a : ℂ) - 1) / 2
+  ralg := fun {a} π =>
+    ∀ τ, (π.1.2 τ).Nodup ∧ ∀ z ∈ π.1.2 τ, ∃ n : ℤ, z = (n : ℂ) + ((a : ℂ) - 1) / 2
   locG := fun π w => π.1.1 w
   locG_dim := fun π w => (π.2.1 w).2
   locG_unr_ae := fun π => Filter.Eventually.of_forall fun w => (π.2.1 w).1
-  tw := fun π χ => ⟨(fun w => (π.1.1 w).lpChar (χ.1.1 w), fun τ => (π.1.2 τ).map (· + (χ.1.2 τ).sum)),
-    fun w => ⟨WD.unr_lpChar _ _ (π.2.1 w).1 (χ.2.1 w).1, (WD.lpDim_char _ _ (χ.2.1 w).2).trans (π.2.1 w).2⟩,
-    fun τ => (Multiset.card_map _ _).trans (π.2.2 τ)⟩
+  tw := fun π χ => ⟨
+    (fun w => (π.1.1 w).lpChar (χ.1.1 w), fun τ => (π.1.2 τ).map (· + (χ.1.2 τ).sum)),
+    fun w => ⟨
+      WD.unr_lpChar _ _ (π.2.1 w).1 (χ.2.1 w).1,
+      (WD.lpDim_char _ _ (χ.2.1 w).2).trans (π.2.1 w).2
+    ⟩,
+    fun τ => (Multiset.card_map _ _).trans (π.2.2 τ)
+  ⟩
   locG_tw := fun _ _ _ => rfl
   infG := fun π τ => π.1.2 τ
   infG_card := fun π τ => π.2.2 τ
@@ -120,19 +132,23 @@ def nAutWD (N : NData R H what₂) (hE : IsEmpty N.Loc) (pl : ∀ k, N.PlG k →
     have hc' := hχ w w' h
     rw [hc, Multiset.map_singleton] at hc'
     show ((π.1.1 w').lpChar (χ.1.1 w')).frobEig = ((π.1.1 w).lpChar (χ.1.1 w)).frobEig.map (·⁻¹)
-    rw [WD.frobEig_char _ _ _ (π.2.1 w').1 (χ.2.1 w').1 hc', WD.frobEig_char _ _ _ (π.2.1 w).1 (χ.2.1 w).1 hc,
-      hπ w w' h, Multiset.map_map, Multiset.map_map]
+    rw [WD.frobEig_char _ _ _ (π.2.1 w').1 (χ.2.1 w').1 hc',
+      WD.frobEig_char _ _ _ (π.2.1 w).1 (χ.2.1 w).1 hc, hπ w w' h, Multiset.map_map,
+      Multiset.map_map]
     exact Multiset.map_congr rfl fun x _ => (mul_inv _ _).symm
   csd_unr := fun π w w' h hc _ => ⟨(π.2.1 w').1, h w w' hc⟩
   etaT := negOneWDFam N
   etaTinv := negOneWDFam N
   etaT_unr := fun w => (lpUnr_negOne_spec N w).1
   etaT_inert := fun w _ => (lpUnr_negOne_spec N w).2.1
-  etaTinv_def := fun w => ⟨(lpUnr_negOne_spec N w).1, by
-    show (WD.lpUnr (h := N.plOm.2 w) {-1}).frobEig =
-      (WD.lpUnr (h := N.plOm.2 w) {-1}).frobEig.map (·⁻¹)
-    rw [(lpUnr_negOne_spec N w).2.1]
-    simp⟩
+  etaTinv_def := fun w => ⟨
+    (lpUnr_negOne_spec N w).1,
+    by
+      show (WD.lpUnr (h := N.plOm.2 w) {-1}).frobEig =
+        (WD.lpUnr (h := N.plOm.2 w) {-1}).frobEig.map (·⁻¹)
+      rw [(lpUnr_negOne_spec N w).2.1]
+      simp
+  ⟩
   etaT_split := fun w w' _ _ a b ha hb => by
     have ha' : (-1 : ℂ) = a := Multiset.singleton_inj.1 ((lpUnr_negOne_spec N w).2.1.symm.trans ha)
     have hb' : (-1 : ℂ) = b := Multiset.singleton_inj.1 ((lpUnr_negOne_spec N w').2.1.symm.trans hb)
@@ -184,13 +200,24 @@ def nAutWD (N : NData R H what₂) (hE : IsEmpty N.Loc) (pl : ∀ k, N.PlG k →
   chi_mu := fun i => hE.elim i
   kFbar := fun i => hE.elim i
 
-def wdTieWD (N : NData R H what₂) (hE : IsEmpty N.Loc) (pl : ∀ k, N.PlG k → PlE H)
+def wdTieWD
+    (N : NData R H what₂) (hE : IsEmpty N.Loc) (pl : ∀ k, N.PlG k → PlE H)
     (h1 : ∀ k v, pl k v ∈ placesOver H.E (H.g k)) (h2 : ∀ k, Function.Injective (pl k))
     (h3 : ∀ k v v', ¬ IsConjPl H (pl k v) (pl k v'))
-    (τ : ∀ k, Fb (H.g k) (H.g_prime k) →* ℂ) (γ : Fin 2 → PlE H → G H.E N.Om) :
-    GlobalTheory.RowTie.WDTie N (nAutWD N hE pl h1 h2 h3 τ γ) :=
-  ⟨fun _ => Equiv.refl _, fun _ _ => rfl, fun _ => rfl, fun _ _ _ => rfl, fun _ _ _ => rfl, fun _ _ _ _ => rfl,
-    fun _ _ => Iff.rfl, fun _ _ => Iff.rfl, fun _ _ _ => rfl, fun _ _ => Iff.rfl, fun _ _ _ _ => rfl⟩
+    (τ : ∀ k, Fb (H.g k) (H.g_prime k) →* ℂ) (γ : Fin 2 → PlE H → G H.E N.Om)
+    : GlobalTheory.RowTie.WDTie N (nAutWD N hE pl h1 h2 h3 τ γ) := ⟨
+  fun _ => Equiv.refl _,
+  fun _ _ => rfl,
+  fun _ => rfl,
+  fun _ _ _ => rfl,
+  fun _ _ _ => rfl,
+  fun _ _ _ _ => rfl,
+  fun _ _ => Iff.rfl,
+  fun _ _ => Iff.rfl,
+  fun _ _ _ => rfl,
+  fun _ _ => Iff.rfl,
+  fun _ _ _ _ => rfl
+⟩
 
 end
 

@@ -9,7 +9,8 @@ public import ReciprocityTheory.DualLattices.PSerFrobStatement
 
 noncomputable section
 
-open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
+open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
 
 namespace GlobalTheory
 
@@ -72,31 +73,59 @@ private lemma comp_app {R S T : LAlg R₀} (f : LHom R S) (f' : LHom S T) (e : L
 
 end BtAssembly
 
-
 open BtAssembly in
-theorem evBt_of_tangent_of_series :
-  (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p} {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe] [Algebra ℤ_[p] Oe] {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)} (D : Dat p g B Tw Dt Oe σ cp), ∀ t : TT p g, ∃ t' : B.G D.wd.W,
-    B.map D.wd.πW t' = B.map (Tw.q 0) (ptOf B D.L.τ (red p g t)) ∧
-    ∃ h : B.map D.wd.ρW (p • t') = 0, ∀ k : Fin g, ∃ w : (D.wd.W : Type),
-      D.wd.πW.1 w = (Tw.q 0).1 ((D.H.Bt *ᵥ (algebraMap ℤ_[p] (Tw.O : Type) ∘ t)) k) ∧
-      ((D.ch.χ D.wd.ρW D.sm.nil ⟨p • t', h⟩ k : maximalIdeal (D.wd.W : Type)) : (D.wd.W : Type)) = p * (D.wd.b : (D.wd.W : Type)) * w) →
-  (∀ {R₀ : Type} [CommRing R₀] (p : ℕ) [Fact p.Prime] {g : ℕ} {B : BX R₀} {K : LAlg R₀} (ch : FormalChartAtZero B K g) (W : Type) [CommRing W] [Algebra R₀ W] (c : Fin g → W),
-    (∀ i, IsNilpotent (c i)) → ∀ N : ℕ, ∃ Γ : Fin g → MvPolynomial (Fin g) W,
-      (∀ k m, (∃ i, ¬ p ∣ m i) → AddMonoidAlgebra.coeff (Γ k) m ∈ Ideal.span {(p : W)}) ∧
-      ∀ y : Fin g → W, (∀ i, y i ^ N = 0) → fAdd ch.F c (nsmulF ch.F y p) = fun k => MvPolynomial.eval y (Γ k)) →
-  (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p} {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe] [Algebra ℤ_[p] Oe] {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)} (D : Dat p g B Tw Dt Oe σ cp), 0 < g → maximalIdeal (D.K : Type) = ⊥ ∧ IsNilOver D.wd.ρ1 ∧ ∀ i : D.fin.ι,
-    ∃ (Λ : LAlg R₀) (μ : LHom (D.fin.AAx i) Λ) (j : LHom (Tw.R 0) Λ) (ρΛ : LHom Λ D.K),
-      IsNilOver ρΛ ∧ Function.Surjective μ.1 ∧ ρΛ.comp j = D.wd.ρ1 ∧ μ.comp (D.fin.sO i) = j.comp (Tw.q 0) ∧
-      ∀ φ : LHom (D.fin.AAx i) Tw.O, φ.comp (D.fin.sO i) = LHom.id Tw.O →
-        ∃ ψ : LHom Λ (Tw.R 0), ψ.comp μ = (Tw.q 0).comp φ ∧ ψ.comp j = LHom.id (Tw.R 0) ∧ D.wd.ρ1.comp ψ = ρΛ) →
-  (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {Tw : ATowerL R₀ p} {K : LAlg R₀} (wd : WData Tw K) (g : ℕ), WFrobStatement wd g) →
-  (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p} {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe] [Algebra ℤ_[p] Oe] {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)} (D : Dat p g B Tw Dt Oe σ cp), EvBtStatement D) := by
+theorem evBt_of_tangent_of_series
+    : (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p}
+          {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe]
+          [Algebra ℤ_[p] Oe] {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)}
+          (D : Dat p g B Tw Dt Oe σ cp),
+        ∀ t : TT p g, ∃ t' : B.G D.wd.W,
+          B.map D.wd.πW t' = B.map (Tw.q 0) (ptOf B D.L.τ (red p g t))
+            ∧ ∃ h : B.map D.wd.ρW (p • t') = 0, ∀ k : Fin g, ∃ w : (D.wd.W : Type),
+              D.wd.πW.1 w = (Tw.q 0).1 ((D.H.Bt *ᵥ (algebraMap ℤ_[p] (Tw.O : Type) ∘ t)) k)
+                ∧ ((D.ch.χ D.wd.ρW D.sm.nil ⟨p • t', h⟩ k : maximalIdeal (D.wd.W : Type))
+                    : (D.wd.W : Type))
+                  = p * (D.wd.b : (D.wd.W : Type)) * w)
+      → (∀ {R₀ : Type} [CommRing R₀] (p : ℕ) [Fact p.Prime] {g : ℕ} {B : BX R₀} {K : LAlg R₀}
+          (ch : FormalChartAtZero B K g) (W : Type) [CommRing W] [Algebra R₀ W] (c : Fin g → W),
+        (∀ i, IsNilpotent (c i))
+          → ∀ N : ℕ, ∃ Γ : Fin g → MvPolynomial (Fin g) W,
+            (∀ k m, (∃ i, ¬ p ∣ m i) → AddMonoidAlgebra.coeff (Γ k) m ∈ Ideal.span {(p : W)})
+              ∧ ∀ y : Fin g → W,
+                (∀ i, y i ^ N = 0)
+                  → fAdd ch.F c (nsmulF ch.F y p) = fun k => MvPolynomial.eval y (Γ k))
+      → (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p}
+          {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe]
+          [Algebra ℤ_[p] Oe] {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)}
+          (D : Dat p g B Tw Dt Oe σ cp),
+        0 < g
+          → maximalIdeal (D.K : Type) = ⊥ ∧ IsNilOver D.wd.ρ1
+            ∧ ∀ i : D.fin.ι,
+              ∃ (Λ : LAlg R₀) (μ : LHom (D.fin.AAx i) Λ) (j : LHom (Tw.R 0) Λ) (ρΛ : LHom Λ D.K),
+                IsNilOver ρΛ ∧ Function.Surjective μ.1 ∧ ρΛ.comp j = D.wd.ρ1
+                  ∧ μ.comp (D.fin.sO i) = j.comp (Tw.q 0)
+                  ∧ ∀ φ : LHom (D.fin.AAx i) Tw.O,
+                    φ.comp (D.fin.sO i) = LHom.id Tw.O
+                      → ∃ ψ : LHom Λ (Tw.R 0),
+                        ψ.comp μ = (Tw.q 0).comp φ ∧ ψ.comp j = LHom.id (Tw.R 0)
+                          ∧ D.wd.ρ1.comp ψ = ρΛ)
+      → (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {Tw : ATowerL R₀ p} {K : LAlg R₀}
+          (wd : WData Tw K) (g : ℕ),
+        WFrobStatement wd g)
+      → (∀ {R₀ : Type} [CommRing R₀] {p : ℕ} [Fact p.Prime] {g : ℕ} {B : BX R₀} {Tw : ATowerL R₀ p}
+          {Dt : DualTower Tw} [Algebra ℤ_[p] (Tw.O : Type)] {Oe : Type} [CommRing Oe]
+          [Algebra ℤ_[p] Oe] {σ : Oe ≃ₐ[ℤ_[p]] Oe} {cp : (Tw.O : Type)}
+          (D : Dat p g B Tw Dt Oe σ cp),
+        EvBtStatement D) := by
   intro hTAN hGAM hLAM hWF R₀ _ p _ g B Tw Dt _ Oe _ _ σ cp D C _ _ k
   obtain ⟨hK, hρ1, hL⟩ := hLAM D (Fin.pos k)
-  have key : ∀ i : D.fin.ι, ∃ F : (D.fin.AAx i : Type), ∀ φ : LHom (D.fin.AAx i) Tw.O,
-      φ.comp (D.fin.sO i) = LHom.id Tw.O → ∀ t : TT p g,
-      B.map φ (D.fin.y i) = ptOf B D.L.τ (red p g t) →
-      (Tw.q 0).1 ((D.H.Bt *ᵥ (algebraMap ℤ_[p] (Tw.O : Type) ∘ t)) k) = (Tw.q 0).1 (φ.1 F) := by
+  have key
+      : ∀ i : D.fin.ι, ∃ F : (D.fin.AAx i : Type), ∀ φ : LHom (D.fin.AAx i) Tw.O,
+        φ.comp (D.fin.sO i) = LHom.id Tw.O
+          → ∀ t : TT p g,
+            B.map φ (D.fin.y i) = ptOf B D.L.τ (red p g t)
+              → (Tw.q 0).1 ((D.H.Bt *ᵥ (algebraMap ℤ_[p] (Tw.O : Type) ∘ t)) k)
+                = (Tw.q 0).1 (φ.1 F) := by
     intro i
     obtain ⟨Λ, μ, j, ρΛ, hΛ, hμ, hj, -, hψ⟩ := hL i
     obtain ⟨x, hx⟩ := D.sm.onto (B.map ρΛ (B.map μ (D.fin.y i)))
@@ -104,16 +133,23 @@ theorem evBt_of_tangent_of_series :
       rw [map_nsmul, hx, ← map_nsmul, ← map_nsmul, D.fin.y_p, map_zero, map_zero]
     have hz : B.map ρΛ (B.map μ (D.fin.y i) - B.map j (B.map D.wd.πW x)) = 0 := by
       rw [map_sub, ← B.map_comp j ρΛ, hj, ← B.map_comp D.wd.πW, D.wd.ρW_eq, hx, sub_self]
-    obtain ⟨N, hN⟩ := exists_pow_zero
-      (fun l => ((D.ch.χ ρΛ hΛ ⟨_, hz⟩ l : maximalIdeal (Λ : Type)) : (Λ : Type)))
-      (fun l => nil_of_mem ρΛ hΛ hK _)
-    obtain ⟨Γ, hΓ, hΓe⟩ := hGAM p D.ch (D.wd.W : Type)
-      (fun l => ((D.ch.χ D.wd.ρW D.sm.nil ⟨_, hc⟩ l : maximalIdeal (D.wd.W : Type)) : (D.wd.W : Type)))
-      (fun l => nil_of_mem D.wd.ρW D.sm.nil hK _) (N * 2)
+    obtain ⟨N, hN⟩ :=
+      exists_pow_zero
+        (fun l => ((D.ch.χ ρΛ hΛ ⟨_, hz⟩ l : maximalIdeal (Λ : Type)) : (Λ : Type)))
+        (fun l => nil_of_mem ρΛ hΛ hK _)
+    obtain ⟨Γ, hΓ, hΓe⟩ :=
+      hGAM p D.ch (D.wd.W : Type)
+        (fun l =>
+          ((D.ch.χ D.wd.ρW D.sm.nil ⟨_, hc⟩ l : maximalIdeal (D.wd.W : Type)) : (D.wd.W : Type)))
+        (fun l => nil_of_mem D.wd.ρW D.sm.nil hK _)
+        (N * 2)
     obtain ⟨Q, hQ⟩ := hWF D.wd g (Γ k) (hΓ k)
-    obtain ⟨F, hF⟩ := hμ (j.1 (D.wd.πW.1 ((D.wd.b⁻¹ : (D.wd.W : Type)ˣ) : (D.wd.W : Type))) *
-      MvPolynomial.eval₂ (j.1 : (Tw.R 0 : Type) →+* (Λ : Type))
-        (fun l => ((D.ch.χ ρΛ hΛ ⟨_, hz⟩ l : maximalIdeal (Λ : Type)) : (Λ : Type))) Q)
+    obtain ⟨F, hF⟩ :=
+      hμ
+        (j.1 (D.wd.πW.1 ((D.wd.b⁻¹ : (D.wd.W : Type)ˣ) : (D.wd.W : Type)))
+          * MvPolynomial.eval₂ (j.1 : (Tw.R 0 : Type) →+* (Λ : Type))
+            (fun l => ((D.ch.χ ρΛ hΛ ⟨_, hz⟩ l : maximalIdeal (Λ : Type)) : (Λ : Type)))
+            Q)
     refine ⟨F, fun φ hφ t ht => ?_⟩
     obtain ⟨ψ, hψμ, hψj, hψρ⟩ := hψ φ hφ
     obtain ⟨t', ht', h, hw⟩ := hTAN D t
@@ -122,21 +158,27 @@ theorem evBt_of_tangent_of_series :
       rw [ht', ← ht, ← B.map_comp, ← B.map_comp, hψμ]
     have hu : B.map D.wd.ρW (t' - x) = 0 := by
       rw [map_sub, hx, ← D.wd.ρW_eq, B.map_comp, e1, ← B.map_comp ψ, hψρ, sub_self]
-    have e2 : B.map D.wd.πW (t' - x) =
-        B.map ψ (B.map μ (D.fin.y i) - B.map j (B.map D.wd.πW x)) := by
+    have e2
+        : B.map D.wd.πW (t' - x) = B.map ψ (B.map μ (D.fin.y i) - B.map j (B.map D.wd.πW x)) := by
       rw [map_sub, map_sub, e1, ← B.map_comp j ψ, hψj, B.map_id]
-    have e3 : ∀ l, D.wd.πW.1
-        ((D.ch.χ D.wd.ρW D.sm.nil ⟨_, hu⟩ l : maximalIdeal (D.wd.W : Type)) : (D.wd.W : Type)) =
-        ψ.1 ((D.ch.χ ρΛ hΛ ⟨_, hz⟩ l : maximalIdeal (Λ : Type)) : (Λ : Type)) := by
+    have e3
+        : ∀ l,
+          D.wd.πW.1
+              ((D.ch.χ D.wd.ρW D.sm.nil ⟨_, hu⟩ l : maximalIdeal (D.wd.W : Type)) : (D.wd.W : Type))
+            = ψ.1 ((D.ch.χ ρΛ hΛ ⟨_, hz⟩ l : maximalIdeal (Λ : Type)) : (Λ : Type)) := by
       intro l
       rw [← D.ch.χ_nat D.wd.ρW D.wd.ρ1 D.sm.nil hρ1 D.wd.πW D.wd.ρW_eq ⟨_, hu⟩ l,
         ← D.ch.χ_nat ρΛ D.wd.ρ1 hΛ hρ1 ψ hψρ ⟨_, hz⟩ l]
       rw [chi_congr D.ch D.wd.ρ1 hρ1 _ _ e2]
-    have e4 : ∀ l, ((D.ch.χ D.wd.ρW D.sm.nil ⟨_, hu⟩ l : maximalIdeal (D.wd.W : Type)) :
-        (D.wd.W : Type)) ^ (N * 2) = 0 := by
+    have e4
+        : ∀ l,
+          ((D.ch.χ D.wd.ρW D.sm.nil ⟨_, hu⟩ l : maximalIdeal (D.wd.W : Type)) : (D.wd.W : Type))
+              ^ (N * 2)
+            = 0 := by
       intro l
-      have : ((D.ch.χ D.wd.ρW D.sm.nil ⟨_, hu⟩ l : maximalIdeal (D.wd.W : Type)) :
-          (D.wd.W : Type)) ^ N ∈ RingHom.ker D.wd.πW.1 := by
+      have : ((D.ch.χ D.wd.ρW D.sm.nil ⟨_, hu⟩ l : maximalIdeal (D.wd.W : Type)) : (D.wd.W : Type))
+            ^ N
+          ∈ RingHom.ker D.wd.πW.1 := by
         rw [RingHom.mem_ker, map_pow, e3, ← map_pow, hN, map_zero]
       rw [D.wd.ker_πW, Ideal.mem_span_singleton'] at this
       obtain ⟨a, ha⟩ := this
@@ -144,28 +186,38 @@ theorem evBt_of_tangent_of_series :
     have hpu : B.map D.wd.ρW (p • (t' - x)) = 0 := by rw [map_nsmul, hu, nsmul_zero]
     have e5 := D.ch.χ_add D.wd.ρW D.sm.nil ⟨_, hc⟩ ⟨_, hpu⟩
     rw [chi_nsmul D.ch D.wd.ρW D.sm.nil _ hu p hpu, hΓe _ e4,
-      chi_congr D.ch D.wd.ρW D.sm.nil _ h
-        (show p • x + p • (t' - x) = p • t' by rw [← nsmul_add, add_sub_cancel])] at e5
+        chi_congr D.ch D.wd.ρW D.sm.nil _ h
+          (show p • x + p • (t' - x) = p • t' by rw [← nsmul_add, add_sub_cancel])]
+      at e5
     have e6 := congrFun e5 k
     rw [hw2] at e6
-    obtain ⟨a, ha⟩ := D.wd.πW_surj (MvPolynomial.eval (fun l => D.wd.πW.1
-      ((D.ch.χ D.wd.ρW D.sm.nil ⟨_, hu⟩ l : maximalIdeal (D.wd.W : Type)) : (D.wd.W : Type))) Q)
-    have e7 := hQ _ (by
-      rw [← e6, mul_assoc]; exact Ideal.mul_mem_right _ _ (Ideal.subset_span rfl)) a ha
+    obtain ⟨a, ha⟩ :=
+      D.wd.πW_surj (MvPolynomial.eval
+        (fun l =>
+          D.wd.πW.1
+            ((D.ch.χ D.wd.ρW D.sm.nil ⟨_, hu⟩ l : maximalIdeal (D.wd.W : Type)) : (D.wd.W : Type)))
+        Q)
+    have e7 :=
+      hQ _ (by rw [← e6, mul_assoc]; exact Ideal.mul_mem_right _ _ (Ideal.subset_span rfl)) a ha
     rw [← e6] at e7
     have e8 : D.wd.πW.1 ((D.wd.b : (D.wd.W : Type)) * w - a) = 0 := by
       rw [← D.wd.ann_p, mul_sub, ← mul_assoc, e7, sub_self]
     rw [map_sub, sub_eq_zero] at e8
-    have e9 : ψ.1 (MvPolynomial.eval₂ (j.1 : (Tw.R 0 : Type) →+* (Λ : Type))
-        (fun l => ((D.ch.χ ρΛ hΛ ⟨_, hz⟩ l : maximalIdeal (Λ : Type)) : (Λ : Type))) Q) =
-        D.wd.πW.1 a := by
+    have e9
+        : ψ.1 (MvPolynomial.eval₂ (j.1 : (Tw.R 0 : Type) →+* (Λ : Type))
+            (fun l => ((D.ch.χ ρΛ hΛ ⟨_, hz⟩ l : maximalIdeal (Λ : Type)) : (Λ : Type)))
+            Q)
+          = D.wd.πW.1 a := by
       rw [ha]
-      have hid : (ψ.1 : (Λ : Type) →+* (Tw.R 0 : Type)).comp
-          (j.1 : (Tw.R 0 : Type) →+* (Λ : Type)) = RingHom.id _ :=
+      have hid
+          : (ψ.1 : (Λ : Type) →+* (Tw.R 0 : Type)).comp (j.1 : (Tw.R 0 : Type) →+* (Λ : Type))
+            = RingHom.id _ :=
         RingHom.ext fun b => comp_app j ψ _ hψj b
-      have := MvPolynomial.eval₂_comp_left (ψ.1 : (Λ : Type) →+* (Tw.R 0 : Type))
-        (j.1 : (Tw.R 0 : Type) →+* (Λ : Type))
-        (fun l => ((D.ch.χ ρΛ hΛ ⟨_, hz⟩ l : maximalIdeal (Λ : Type)) : (Λ : Type))) Q
+      have :=
+        MvPolynomial.eval₂_comp_left (ψ.1 : (Λ : Type) →+* (Tw.R 0 : Type))
+          (j.1 : (Tw.R 0 : Type) →+* (Λ : Type))
+          (fun l => ((D.ch.χ ρΛ hΛ ⟨_, hz⟩ l : maximalIdeal (Λ : Type)) : (Λ : Type)))
+          Q
       rw [hid] at this
       refine this.trans ?_
       rw [MvPolynomial.eval₂_id]
@@ -178,11 +230,14 @@ theorem evBt_of_tangent_of_series :
     rw [← map_mul, ← mul_assoc, Units.inv_mul, one_mul]
   choose F hF using key
   refine ⟨D.evAll C F, Submodule.subset_span ⟨F, rfl⟩, fun t => ?_⟩
-  have hs := Classical.choose_spec (Classical.choose_spec
-    (D.fin.univ Tw.O (LHom.id Tw.O) (ptOf B D.L.τ (red p g t)) (D.pt_p (red p g t))))
+  have hs :=
+    Classical.choose_spec (Classical.choose_spec (D.fin.univ Tw.O (LHom.id Tw.O)
+      (ptOf B D.L.τ (red p g t)) (D.pt_p (red p g t))))
   have h := hF (D.ptIdx (red p g t)) (D.ptMap (red p g t)) hs.1 t hs.2.1
-  have hm : (D.H.Bt *ᵥ (algebraMap ℤ_[p] (Tw.O : Type) ∘ t)) k -
-      (D.ptMap (red p g t)).1 (F (D.ptIdx (red p g t))) ∈ RingHom.ker (Tw.q 0).1 := by
+  have hm
+      : (D.H.Bt *ᵥ (algebraMap ℤ_[p] (Tw.O : Type) ∘ t)) k
+          - (D.ptMap (red p g t)).1 (F (D.ptIdx (red p g t)))
+        ∈ RingHom.ker (Tw.q 0).1 := by
     rw [RingHom.mem_ker, map_sub, h, sub_self]
   rw [D.tower_zero_ker, Ideal.mem_span_singleton'] at hm
   obtain ⟨r, hr⟩ := hm

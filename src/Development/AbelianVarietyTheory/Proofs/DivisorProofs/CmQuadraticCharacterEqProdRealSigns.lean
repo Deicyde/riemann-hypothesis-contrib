@@ -20,8 +20,8 @@ open GlobalTheory.QuadSymbol GlobalTheory.IdeleNormChar GlobalTheory.AdelicU
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem eq_signToCircle [Algebra.IsQuadraticExtension F E] (η : (AF F)ˣ →* Circle) (hη : IsEtaF E η) :
-    η = signToCircle.comp (normSign E) := by
+theorem eq_signToCircle [Algebra.IsQuadraticExtension F E] (η : (AF F)ˣ →* Circle) (hη : IsEtaF E η)
+    : η = signToCircle.comp (normSign E) := by
   obtain ⟨-, h1, h3, h4⟩ := hη
   refine eq_signToCircle_comp _ η (fun a ha => ?_) h4
   obtain ⟨t, x, hx⟩ := (normSign_eq_one_iff E a).1 ha
@@ -29,9 +29,10 @@ theorem eq_signToCircle [Algebra.IsQuadraticExtension F E] (η : (AF F)ˣ →* C
   exact h1 t
 
 theorem finComp_eq_one {a : (AF F)ˣ} (ha : At (evI F) ((a : AF F) - 1)) : finComp a = 1 := by
-  have h := ha ((0 : Ainf F), (1 : Af F)) (by
-    show InfiniteAdeleRing.ringEquiv_mixedSpace F 0 = 0
-    exact map_zero _)
+  have h :=
+    ha ((0 : Ainf F), (1 : Af F)) (by
+      show InfiniteAdeleRing.ringEquiv_mixedSpace F 0 = 0
+      exact map_zero _)
   have h2 : ((a : AF F) - 1).2 = 0 := by
     have := congrArg Prod.snd h
     change (1 : Af F) * ((a : AF F) - 1).2 = 0 at this
@@ -43,17 +44,20 @@ theorem finComp_eq_one {a : (AF F)ˣ} (ha : At (evI F) ((a : AF F) - 1)) : finCo
   rw [h3]
   rfl
 
-theorem normSign_eq_prod [Algebra.IsQuadraticExtension F E] {a : (AF F)ˣ} (ha : finComp a = 1) :
-    normSign E a = ∏ w : InfinitePlace F, eta F E w.Completion (infComp a w) := by
+theorem normSign_eq_prod [Algebra.IsQuadraticExtension F E] {a : (AF F)ˣ} (ha : finComp a = 1)
+    : normSign E a = ∏ w : InfinitePlace F, eta F E w.Completion (infComp a w) := by
   change etaProd F E (finComp a) (infComp a) = _
   rw [etaProd, ha]
   have : ∀ v : HeightOneSpectrum (𝓞 F), eta F E (v.adicCompletion F) ((1 : FinFam F) v) = 1 :=
     fun v => eta_eq_one_iff.2 (one_mem _)
   simp only [this, finprod_one, one_mul]
 
-theorem ringEquivReal_neg {σ : E →ₐ[F] E} (hcm : IsCMExt F E σ) {w : InfinitePlace F} (hw : w.IsReal)
-    (τ : EmbOver E w) {δ : F} (hδ : δ ≠ 0) {θ : E} (hθ : σ θ = -θ) (h1 : θ * θ = algebraMap F E δ) :
-    InfinitePlace.Completion.ringEquivRealOfIsReal hw (algebraMap F w.Completion δ) < 0 := by
+theorem ringEquivReal_neg
+    {σ : E →ₐ[F] E} (hcm : IsCMExt F E σ)
+    {w : InfinitePlace F} (hw : w.IsReal) (τ : EmbOver E w)
+    {δ : F} (hδ : δ ≠ 0)
+    {θ : E} (hθ : σ θ = -θ) (h1 : θ * θ = algebraMap F E δ)
+    : InfinitePlace.Completion.ringEquivRealOfIsReal hw (algebraMap F w.Completion δ) < 0 := by
   set e := InfinitePlace.Completion.ringEquivRealOfIsReal hw
   set z := τ.1 θ
   have hz : star z = -z := by rw [← hcm.2.2.2 τ.1 θ, hθ, map_neg]
@@ -64,7 +68,9 @@ theorem ringEquivReal_neg {σ : E →ₐ[F] E} (hcm : IsCMExt F E σ) {w : Infin
   have hc : ((e (algebraMap F w.Completion δ) : ℝ) : ℂ) = z * z := by
     rw [InfinitePlace.Completion.ringEquivRealOfIsReal_apply,
       InfinitePlace.Completion.extensionEmbeddingOfIsReal_apply]
-    have h5 : InfinitePlace.Completion.extensionEmbedding w (algebraMap F w.Completion δ) = w.embedding δ := by
+    have h5
+        : InfinitePlace.Completion.extensionEmbedding w (algebraMap F w.Completion δ)
+          = w.embedding δ := by
       rw [AbsoluteValue.Completion.algebraMap_def, WithAbs.algebraMap_right_apply,
         Algebra.algebraMap_self_apply, InfinitePlace.Completion.extensionEmbedding_coe]
       rfl
@@ -76,16 +82,18 @@ theorem ringEquivReal_neg {σ : E →ₐ[F] E} (hcm : IsCMExt F E σ) {w : Infin
   rw [hr]
   nlinarith [mul_self_nonneg z.im]
 
-theorem mem_normGroup_iff_pos {σ : E →ₐ[F] E} (hcm : IsCMExt F E σ) {w : InfinitePlace F} (hw : w.IsReal)
-    (τ : EmbOver E w) (x : (w.Completion)ˣ) :
-    x ∈ normGroup F E w.Completion ↔
-      0 < InfinitePlace.Completion.ringEquivRealOfIsReal hw (x : w.Completion) := by
+theorem mem_normGroup_iff_pos
+    {σ : E →ₐ[F] E} (hcm : IsCMExt F E σ)
+    {w : InfinitePlace F} (hw : w.IsReal) (τ : EmbOver E w) (x : (w.Completion)ˣ)
+    : x ∈ normGroup F E w.Completion
+      ↔ 0 < InfinitePlace.Completion.ringEquivRealOfIsReal hw (x : w.Completion) := by
   have hinv : ∀ x, σ (σ x) = x := fun x => τ.1.injective (by rw [hcm.2.2.2, hcm.2.2.2, star_star])
   have hne : ∃ x, σ x ≠ x := by
     by_contra h
     push_neg at h
     haveI := hcm.2.1
-    refine (InfinitePlace.not_isReal_iff_isComplex.2 (IsTotallyComplex.isComplex (InfinitePlace.mk τ.1)))
+    refine (InfinitePlace.not_isReal_iff_isComplex.2 (IsTotallyComplex.isComplex (InfinitePlace.mk
+        τ.1)))
       (InfinitePlace.isReal_mk_iff.2 (ComplexEmbedding.isReal_iff.2 (RingHom.ext fun x => ?_)))
     exact (hcm.2.2.2 τ.1 x).symm.trans (by rw [h x])
   obtain ⟨δ, b, hδ, h0, hσb, h1⟩ := GlobalTheory.QuadNormBase.exists_basis F E σ hcm.2.2.1 hinv hne
@@ -106,9 +114,12 @@ theorem mem_normGroup_iff_pos {σ : E →ₐ[F] E} (hcm : IsCMExt F E σ) {w : I
     apply e.injective
     simp [Real.sq_sqrt hpos.le]
 
-theorem piInf_idFF {w : InfinitePlace F} (hw : w.IsReal) (τ : EmbOver E w) (a : (AF F)ˣ) :
-    piInf τ ((idFF F E a : (AF F ⊗[F] E)ˣ) : AF F ⊗[F] E) =
-      ((InfinitePlace.Completion.ringEquivRealOfIsReal hw ((infComp a w : (w.Completion)ˣ) : w.Completion) : ℝ) : ℂ) := by
+theorem piInf_idFF {w : InfinitePlace F} (hw : w.IsReal) (τ : EmbOver E w) (a : (AF F)ˣ)
+    : piInf τ ((idFF F E a : (AF F ⊗[F] E)ˣ) : AF F ⊗[F] E)
+      = ((InfinitePlace.Completion.ringEquivRealOfIsReal hw
+            ((infComp a w : (w.Completion)ˣ) : w.Completion)
+          : ℝ)
+        : ℂ) := by
   rw [InfinitePlace.Completion.ringEquivRealOfIsReal_apply,
     InfinitePlace.Completion.extensionEmbeddingOfIsReal_apply]
   change infEmb τ (compInf F E w (algebraMap (AF F) (AF F ⊗[F] E) a)) = _
@@ -117,18 +128,24 @@ theorem piInf_idFF {w : InfinitePlace F} (hw : w.IsReal) (τ : EmbOver E w) (a :
   rw [infEmb_tmul, map_one, mul_one]
   rfl
 
-theorem eta_eq_prod_sign : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (B : Base F E),
-    B.IsGood σ → ∀ η : (AF F)ˣ →* Circle, IsEtaF E η → ∀ a : (AF F)ˣ, At (evI F) ((a : AF F) - 1) →
-      (η a : ℂ) = ∏ w, piInf (B.emb w) ((idFF F E a : (AF F ⊗[F] E)ˣ) : AF F ⊗[F] E) /
-        ((‖piInf (B.emb w) ((idFF F E a : (AF F ⊗[F] E)ˣ) : AF F ⊗[F] E)‖ : ℝ) : ℂ) := by
+theorem eta_eq_prod_sign
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E) (B : Base F E),
+      B.IsGood σ
+        → ∀ η : (AF F)ˣ →* Circle,
+          IsEtaF E η
+            → ∀ a : (AF F)ˣ,
+              At (evI F) ((a : AF F) - 1)
+                → (η a : ℂ)
+                  = ∏ w, piInf (B.emb w) ((idFF F E a : (AF F ⊗[F] E)ˣ) : AF F ⊗[F] E) /
+                    ((‖piInf (B.emb w) ((idFF F E a : (AF F ⊗[F] E)ˣ) : AF F ⊗[F] E)‖ : ℝ) : ℂ) := by
   intro F E _ _ _ _ _ σ B hB η hη a ha
   have hcm := hB.cm
   haveI : Algebra.IsQuadraticExtension F E := ⟨hcm.2.2.1⟩
   haveI := hcm.1
   rw [eq_signToCircle η hη, MonoidHom.comp_apply, normSign_eq_prod (finComp_eq_one ha), map_prod]
-  rw [show ((∏ w : InfinitePlace F, signToCircle (eta F E w.Completion (infComp a w)) : Circle) : ℂ) =
-      ∏ w : InfinitePlace F, ((signToCircle (eta F E w.Completion (infComp a w)) : Circle) : ℂ) from
+  rw [show ((∏ w : InfinitePlace F, signToCircle (eta F E w.Completion (infComp a w)) : Circle) : ℂ)
+      = ∏ w : InfinitePlace F, ((signToCircle (eta F E w.Completion (infComp a w)) : Circle) : ℂ) from
     map_prod Circle.coeHom _ _]
   refine Finset.prod_congr rfl fun w _ => ?_
   have hw : w.IsReal := IsTotallyReal.isReal w

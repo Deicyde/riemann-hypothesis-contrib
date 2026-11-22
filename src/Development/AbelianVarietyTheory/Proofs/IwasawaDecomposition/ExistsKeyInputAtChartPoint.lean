@@ -12,8 +12,12 @@ public import Development.AbelianVarietyTheory.Statements.FundamentalDomains.Exi
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ModuliIntegralCharts GlobalTheory.ShFam GlobalTheory.LocM
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField TopologicalSpace
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions
+  Formalism.MainNotions Formalism.MainNotions.ModuliIntegralCharts GlobalTheory.ShFam
+  GlobalTheory.LocM
 open GlobalTheory.FlagMod (GChart ev tau tau_le le_preimage_comp)
 open ReciprocityTheory.ChartRestriction.G.PullbackSections (TanM tv mkT tanM_ext tv_mem)
 open scoped CategoryTheory.Obj
@@ -21,13 +25,18 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.KeyAtEx
 
-theorem nonempty_basis_of_isLieBasis {X : Scheme.{0}} {R : Type} [CommRing R] {x : Sp R ⟶ X} {G : Over X} [GrpObj G]
-    [IsCommMonObj G] {G' : Over (Sp R)} [GrpObj G'] [IsCommMonObj G'] {Φ : G'.left ⟶ G.left}
-    (h : IsGrpPullback G' G x Φ) {n : ℕ} {v : Fin n → (epsR R ⟶ G')} (hb : IsLieBasis v) :
-    Nonempty (Module.Basis (Fin n) R (TanM x G)) := by
-  let u : Fin n → TanM x G := fun j => mkT (pushHom h (epsR R) (v j)) ((PullbackSections.isTangent_iff h _).1 (hb.1 j))
-  have hcomb : ∀ (a : Fin n → R) (w : epsR R ⟶ G'), IsLieComb a v w ↔
-      pushHom h (epsR R) w = tv (∑ i, a i • u i) := fun a w => by
+theorem nonempty_basis_of_isLieBasis
+    {X : Scheme.{0}} {R : Type} [CommRing R]
+    {x : Sp R ⟶ X} {G : Over X} [GrpObj G] [IsCommMonObj G]
+    {G' : Over (Sp R)} [GrpObj G'] [IsCommMonObj G']
+    {Φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G x Φ)
+    {n : ℕ} {v : Fin n → (epsR R ⟶ G')} (hb : IsLieBasis v)
+    : Nonempty (Module.Basis (Fin n) R (TanM x G)) := by
+  let u : Fin n → TanM x G := fun j =>
+    mkT (pushHom h (epsR R) (v j)) ((PullbackSections.isTangent_iff h _).1 (hb.1 j))
+  have hcomb
+      : ∀ (a : Fin n → R) (w : epsR R ⟶ G'),
+        IsLieComb a v w ↔ pushHom h (epsR R) w = tv (∑ i, a i • u i) := fun a w => by
     rw [PullbackSections.isLieComb_iff h, GlobalTheory.FlagMod.tv_sum']
     rfl
   have hbij : Function.Bijective (Fintype.linearCombination R u) := by
@@ -40,13 +49,20 @@ theorem nonempty_basis_of_isLieBasis {X : Scheme.{0}} {R : Type} [CommRing R] {x
     exact ⟨fun e => (tanM_ext e).symm, fun e => by rw [e]⟩
   exact ⟨(Pi.basisFun R (Fin n)).map (LinearEquiv.ofBijective _ hbij)⟩
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {O : Type} [CommRing O] {β : O →+* c.F} {Y : Model Xo c β}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l} {O : Type} [CommRing O]
+  {β : O →+* c.F} {Y : Model Xo c β}
 
-theorem exists_keyAt_of_sabMap (M : GChart Y) {R : Type} [CommRing R] (z : Sp R ⟶ Y.X) (hz : ⊤ ≤ z ⁻¹ᵁ M.U)
+theorem exists_keyAt_of_sabMap
+    (M : GChart Y)
+    {R : Type} [CommRing R]
+    (z : Sp R ⟶ Y.X) (hz : ⊤ ≤ z ⁻¹ᵁ M.U)
     {t : SAB H (Sp R)} (m : SABMap t Y.t z) (hp : IsProper t.G.hom) (hA : Out.RelAmple t.G t.PP.L)
-    (hK : Out.KTriv t.G t.PP.L) (hg : SmoothOfRelativeDimension M.n t.G.hom) (hn : 1 ≤ M.n) :
-    ∃ x : KeyIn R, x.P.g = M.n ∧ KeyAt M z hz x := by
+    (hK : Out.KTriv t.G t.PP.L) (hg : SmoothOfRelativeDimension M.n t.G.hom)
+    (hn : 1 ≤ M.n)
+    : ∃ x : KeyIn R, x.P.g = M.n ∧ KeyAt M z hz x := by
   obtain ⟨w, th, ⟨hw, hr⟩, hth, hne⟩ :=
     GlobalTheory.exists_sec_pull_nonzero_on_fibres E H _ _ Y.t t z m M.U hz M.θ M.θ_mem M.θ_ne
   obtain ⟨m', hm'⟩ : ∃ m' : SABMap t Y.t (spMap (ev z M.U hz) ≫ M.hU.fromSpec), m'.φ = m.φ := by
@@ -55,22 +71,45 @@ theorem exists_keyAt_of_sabMap (M : GChart Y) {R : Type} [CommRing R] (z : Sp R 
   obtain ⟨v, hv, hb, -⟩ := M.lie R (ev z M.U hz) t m'
   have he : eSec t.G ≫ m.φ = z ≫ eSec Y.t.G := m.cm.e_comm.trans (congrArg (· ≫ eSec Y.t.G) m.base)
   have hrig : m.cm.rigPull Y.t.PP.L Y.t.PP.rig = rigPullOf m.φ z he Y.t.PP.L Y.t.PP.rig := by
-    have key : ∀ (a b : Sp R ⟶ Y.X) (_ : a = b) ha hb,
-        rigPullOf (G' := t.G) m.φ a ha Y.t.PP.L Y.t.PP.rig = rigPullOf m.φ b hb Y.t.PP.L Y.t.PP.rig := by
+    have key
+        : ∀ (a b : Sp R ⟶ Y.X) (_ : a = b) ha hb,
+          rigPullOf (G' := t.G) m.φ a ha Y.t.PP.L Y.t.PP.rig
+            = rigPullOf m.φ b hb Y.t.PP.L Y.t.PP.rig := by
       rintro a b rfl _ _
       rfl
     exact key _ _ m.base _ _
-  refine ⟨⟨GlobalTheory.GenericPol.toPolAV t M.n hg hp hA hK, hn, t.PP.rig, t.PP.rigGen, th, fun s => ?_, v, hb⟩, rfl,
-    m.φ, he, w, rfl, m.cart, hw, hrig ▸ hr, fun j i h => ?_, fun i => ?_⟩
+  refine ⟨
+    ⟨
+      GlobalTheory.GenericPol.toPolAV t M.n hg hp hA hK,
+      hn,
+      t.PP.rig,
+      t.PP.rigGen,
+      th,
+      fun s => ?_,
+      v,
+      hb
+    ⟩,
+    rfl,
+    m.φ,
+    he,
+    w,
+    rfl,
+    m.cart,
+    hw,
+    hrig ▸ hr,
+    fun j i h => ?_,
+    fun i => ?_
+  ⟩
   · obtain ⟨g, i, h₁, h₂⟩ := hne s
     exact ⟨g, h₁, Opens.mem_iSup.2 ⟨i, h₂⟩⟩
   · refine (hth (j PUnit.unit) i _ h le_rfl).trans ?_
     exact congrArg (· * _) (GlobalTheory.LB.resG_self _ _)
   · exact hm' ▸ hv i
 
-theorem smoothOfRelativeDimension_fibre {K : Type} [Field K] {z : Sp K ⟶ Y.X} {t : SAB H (Sp K)} (m : SABMap t Y.t z)
-    (h : Set.range z ⊆ Set.range Y.j) :
-    SmoothOfRelativeDimension (Module.finrank ℚ E / 2 * (Dw.p + Dw.q)) t.G.hom := by
+theorem smoothOfRelativeDimension_fibre
+    {K : Type} [Field K]
+    {z : Sp K ⟶ Y.X} {t : SAB H (Sp K)} (m : SABMap t Y.t z) (h : Set.range z ⊆ Set.range Y.j)
+    : SmoothOfRelativeDimension (Module.finrank ℚ E / 2 * (Dw.p + Dw.q)) t.G.hom := by
   obtain ⟨K', _, i, y, e⟩ := GlobalTheory.GenericPol.exists_lift z Y.j h
   obtain ⟨t', ⟨m₁⟩⟩ := GlobalTheory.ModFam.exists_sabPull (Out.specOf i) t
   obtain ⟨n, -⟩ := sabComp pullCubComp E H _ _ _ _ _ _ _ _ m m₁
@@ -89,11 +128,15 @@ theorem smoothOfRelativeDimension_fibre {K : Type} [Field K] {z : Sp K ⟶ Y.X} 
   rw [← H1.dim_unique _ h₂ h₁ (eSec t'.G (default : PrimeSpectrum K'))]
   exact hd
 
-theorem exists_keyAt_model (M : GChart Y) {K : Type} [Field K] (z : Sp K ⟶ Y.X) (hz : ⊤ ≤ z ⁻¹ᵁ M.U)
-    (h : Set.range z ⊆ Set.range Y.j) (hpos : 1 ≤ Module.finrank ℚ E / 2 * (Dw.p + Dw.q)) :
-    ∃ x : KeyIn K, x.P.g = Module.finrank ℚ E / 2 * (Dw.p + Dw.q) ∧ KeyAt M z hz x := by
+theorem exists_keyAt_model
+    (M : GChart Y)
+    {K : Type} [Field K]
+    (z : Sp K ⟶ Y.X) (hz : ⊤ ≤ z ⁻¹ᵁ M.U) (h : Set.range z ⊆ Set.range Y.j)
+    (hpos : 1 ≤ Module.finrank ℚ E / 2 * (Dw.p + Dw.q))
+    : ∃ x : KeyIn K, x.P.g = Module.finrank ℚ E / 2 * (Dw.p + Dw.q) ∧ KeyAt M z hz x := by
   obtain ⟨t, ⟨m⟩⟩ := GlobalTheory.ModFam.exists_sabPull z Y.t
-  obtain ⟨hp, hA, hK⟩ := GlobalTheory.GenericPol.proper_ample_kTriv Y.m Y.oF.proper Y.oF.ample Y.oF.ktriv m h
+  obtain ⟨hp, hA, hK⟩ :=
+    GlobalTheory.GenericPol.proper_ample_kTriv Y.m Y.oF.proper Y.oF.ample Y.oF.ktriv m h
   have hg := smoothOfRelativeDimension_fibre m h
   obtain ⟨v, hv⟩ := GlobalTheory.KeyPow.exists_isLieBasis t.G hg
   obtain ⟨b⟩ := nonempty_basis_of_isLieBasis m.cart hv

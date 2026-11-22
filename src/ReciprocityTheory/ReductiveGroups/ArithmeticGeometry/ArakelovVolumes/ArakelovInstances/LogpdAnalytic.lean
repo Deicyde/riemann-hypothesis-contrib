@@ -23,24 +23,29 @@ theorem fn_zero_ne (hD : ∀ k, D k ≠ 0) : fn hm D Y 0 ≠ 0 := by
     first
     | exact Matrix.submatrix_diagonal _ _ (Fin.castLE_injective hm)
     | simp [Matrix.submatrix_diagonal _ _ (Fin.castLE_injective hm)]
-    | (ext i j
-       simp [Matrix.diagonal_apply, (Fin.castLE_injective hm).eq_iff])
+    | (
+        ext i j
+        simp [Matrix.diagonal_apply, (Fin.castLE_injective hm).eq_iff]
+      )
   rw [h, Matrix.det_diagonal, ← Complex.ofReal_prod, Complex.ofReal_re]
   exact Finset.prod_ne_zero_iff.2 fun a _ => hD _
 
-theorem levi_logfn (hD : ∀ k, D k ≠ 0) :
-    levi (fun v => Real.log |fn hm D Y v|) 0 (fun _ => 1) =
-      levi (fn hm D Y) 0 (fun _ => 1) / fn hm D Y 0 := by
+theorem levi_logfn (hD : ∀ k, D k ≠ 0)
+    : levi (fun v => Real.log |fn hm D Y v|) 0 (fun _ => 1)
+      = levi (fn hm D Y) 0 (fun _ => 1) / fn hm D Y 0 := by
   have hc : ContDiffAt ℝ 2 (fn hm D Y) 0 := (contDiff_fn hm D Y).contDiffAt
   have h0 := fn_zero_ne hm D Y hD
   have h := leviHalfLogAbs (ι := Fin 1) (fn hm D Y) 0 hc h0 (fderiv_fn_zero hm D Y) (fun _ => 1)
   have hL : ContDiffAt ℝ 2 (fun x => (1 / 2 : ℝ) * Real.log |fn hm D Y x|) 0 := by
-    have e : (fun x => (1 / 2 : ℝ) * Real.log |fn hm D Y x|) = fun x => (1 / 2 : ℝ) * Real.log (fn hm D Y x) := by
+    have e
+        : (fun x => (1 / 2 : ℝ) * Real.log |fn hm D Y x|)
+          = fun x => (1 / 2 : ℝ) * Real.log (fn hm D Y x) := by
       funext x; rw [Real.log_abs]
     rw [e]
     exact contDiffAt_const.mul (hc.log h0)
-  have e : (fun v => Real.log |fn hm D Y v|) =
-      fun v => (1 / 2 * Real.log |fn hm D Y v|) + 1 * (1 / 2 * Real.log |fn hm D Y v|) := by
+  have e
+      : (fun v => Real.log |fn hm D Y v|)
+        = fun v => (1 / 2 * Real.log |fn hm D Y v|) + 1 * (1 / 2 * Real.log |fn hm D Y v|) := by
     funext v; ring
   rw [e, levi_add_smul 1 hL hL, h]
   field_simp
@@ -55,11 +60,13 @@ theorem Gz_herm (ζ : ℂ) : (Gz hm D Y ζ)ᴴ = Gz hm D Y ζ := by
   first
   | simp only [Gz, Matrix.conjTranspose_submatrix, Matrix.conjTranspose_mul,
       Matrix.conjTranspose_conjTranspose, hD, Matrix.mul_assoc]
-  | (unfold Gz
-     rw [Matrix.conjTranspose_submatrix, Matrix.conjTranspose_mul, Matrix.conjTranspose_mul,
-       Matrix.conjTranspose_conjTranspose]
-     erw [hD]
-     simp only [Matrix.mul_assoc])
+  | (
+      unfold Gz
+      rw [Matrix.conjTranspose_submatrix, Matrix.conjTranspose_mul, Matrix.conjTranspose_mul,
+        Matrix.conjTranspose_conjTranspose]
+      erw [hD]
+      simp only [Matrix.mul_assoc]
+    )
 
 theorem fn_eq (v : Fin 1 → ℂ) : fn hm D Y v = ‖pd hm Y v‖ ^ 2 * fY hm D Y v := by
   have key : ∀ (p G : ℂ), (star p * (G * p)).re = ‖p‖ ^ 2 * G.re := by
@@ -92,8 +99,7 @@ theorem pd_analytic : AnalyticAt ℂ (pd hm Y) 0 := by
   exact ((lin (-(Ym hm Y))).det.differentiable.analyticAt _).comp
     ((ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin 1 => ℂ) 0).analyticAt _)
 
-theorem pd_zero : pd hm Y 0 = 1 := by
-  simp [pd]
+theorem pd_zero : pd hm Y 0 = 1 := by simp [pd]
 
 theorem logpd_analytic : AnalyticAt ℂ (fun v => 2 * Complex.log (pd hm Y v)) 0 := by
   have h0 : pd hm Y 0 ∈ Complex.slitPlane := by
@@ -101,7 +107,8 @@ theorem logpd_analytic : AnalyticAt ℂ (fun v => 2 * Complex.log (pd hm Y v)) 0
     exact Complex.one_mem_slitPlane
   exact analyticAt_const.mul ((pd_analytic hm Y).clog h0)
 
-theorem logpd_eq (v : Fin 1 → ℂ) : Real.log (‖pd hm Y v‖ ^ 2) = (2 * Complex.log (pd hm Y v)).re := by
+theorem logpd_eq (v : Fin 1 → ℂ)
+    : Real.log (‖pd hm Y v‖ ^ 2) = (2 * Complex.log (pd hm Y v)).re := by
   have h : (2 * Complex.log (pd hm Y v)).re = 2 * (Complex.log (pd hm Y v)).re := by
     simp [Complex.mul_re]
   rw [h, Complex.log_re, Real.log_pow]
@@ -114,16 +121,17 @@ theorem levi_logpd (w : Fin 1 → ℂ) : levi (fun v => Real.log (‖pd hm Y v�
   rw [e]
   exact levi_re_analytic (logpd_analytic hm Y) w
 
-theorem core_levi (hD : ∀ k, D k ≠ 0) :
-    levi (fun v => Real.log |fY hm D Y v|) 0 (fun _ => 1) =
-      ∑ a : Fin m, (D (Fin.castLE hm a))⁻¹ * Sa hm D Y a := by
+theorem core_levi (hD : ∀ k, D k ≠ 0)
+    : levi (fun v => Real.log |fY hm D Y v|) 0 (fun _ => 1)
+      = ∑ a : Fin m, (D (Fin.castLE hm a))⁻¹ * Sa hm D Y a := by
   have hP : (∏ a : Fin m, D (Fin.castLE hm a)) ≠ 0 := Finset.prod_ne_zero_iff.2 fun a _ => hD _
   have hfY0 : fY hm D Y 0 ≠ 0 := by rw [fY_zero]; exact hP
   have h0 := fn_zero_ne hm D Y hD
   have hcont : ContinuousAt (fY hm D Y) 0 := (contDiff_fY hm D Y).continuous.continuousAt
   have hpdc : ContinuousAt (pd hm Y) 0 := (pd_analytic hm Y).continuousAt
-  have hev : (fun v => Real.log |fY hm D Y v|) =ᶠ[𝓝 0]
-      fun v => Real.log |fn hm D Y v| + (-1) * Real.log (‖pd hm Y v‖ ^ 2) := by
+  have hev
+      : (fun v => Real.log |fY hm D Y v|) =ᶠ[𝓝 0]
+        fun v => Real.log |fn hm D Y v| + (-1) * Real.log (‖pd hm Y v‖ ^ 2) := by
     filter_upwards [hcont.eventually_ne hfY0, hpdc.eventually_ne (by rw [pd_zero]; exact one_ne_zero)]
       with v h1 h2
     have hp : ‖pd hm Y v‖ ^ 2 ≠ 0 := pow_ne_zero 2 (norm_ne_zero_iff.2 h2)
@@ -138,7 +146,7 @@ theorem core_levi (hD : ∀ k, D k ≠ 0) :
     rw [funext (logpd_eq hm Y)]
     exact Complex.reCLM.contDiff.contDiffAt.comp _
       ((logpd_analytic hm Y).contDiffAt.restrict_scalars ℝ)
-  rw [levi_congr hev, levi_add_smul (-1) hL1 hL2, levi_logpd, levi_logfn hm D Y hD, levi_fn hm D Y hD,
-    fn_zero, mul_zero, add_zero, mul_div_cancel_left₀ _ hP]
+  rw [levi_congr hev, levi_add_smul (-1) hL1 hL2, levi_logpd, levi_logfn hm D Y hD,
+    levi_fn hm D Y hD, fn_zero, mul_zero, add_zero, mul_div_cancel_left₀ _ hP]
 
 end ReciprocityTheory.ChartRestriction.G.AR.Inst.CurvPf

@@ -15,16 +15,25 @@ namespace LeafFixedPointPairing
 section
 noncomputable section
 open Formalism.BasicNotions Formalism.MainNotions NumberField IsDedekindDomain
-open Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Cx
+open Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Cx
 open GlobalTheory.BigTop GlobalTheory.BigTop.Fun GlobalTheory.SumSize
 open Formalism.DivisionValues (vw lw matLat)
-open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim GlobalTheory.TestLat
-open Formalism.IndefR.Datum Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta
+open GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim
+  GlobalTheory.TestLat
+open Formalism.IndefR.Datum Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta
 namespace GlobalTheory.CompanionTheory.LeafFixedPointPlaceNorm
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 variable {D : D7}
-variable {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L} {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Y : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y cX} {Csz : ℝ}
-theorem fp_tie_alt : _root_.GlobalTheory.BigTop.Fun.SettingAtPoint → FinK → AwayK → _root_.GlobalTheory.BigTop.Fun.LeafFixedPoint @Comparison₂ := by
+variable
+  {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L}
+  {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Y : DivX D}
+  {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y cX} {Csz : ℝ}
+theorem fp_tie_alt
+    : _root_.GlobalTheory.BigTop.Fun.SettingAtPoint → FinK → AwayK
+      → _root_.GlobalTheory.BigTop.Fun.LeafFixedPoint @Comparison₂ := by
   intro hS hF hA
   obtain ⟨c1, hF⟩ := hF
   obtain ⟨c2, hA⟩ := hA
@@ -42,8 +51,10 @@ theorem fp_tie_alt : _root_.GlobalTheory.BigTop.Fun.SettingAtPoint → FinK → 
   refine ⟨max x₁ (max x₂ x₃), fun x hx hle i p hp d hd => ?_⟩
   obtain ⟨-, b, hT⟩ := hd
   have hx₁ : x₁ ≤ x := (le_max_left _ _).trans hle
-  have hx₂ : x₂ ≤ (Fm.L x i).sc.x := ((le_max_left _ _).trans ((le_max_right _ _).trans hle)).trans (Fm.L_x x i hx).ge
-  have hx₃ : x₃ ≤ (Fm.L x i).sc.x := ((le_max_right _ _).trans ((le_max_right _ _).trans hle)).trans (Fm.L_x x i hx).ge
+  have hx₂ : x₂ ≤ (Fm.L x i).sc.x :=
+    ((le_max_left _ _).trans ((le_max_right _ _).trans hle)).trans (Fm.L_x x i hx).ge
+  have hx₃ : x₃ ≤ (Fm.L x i).sc.x :=
+    ((le_max_right _ _).trans ((le_max_right _ _).trans hle)).trans (Fm.L_x x i hx).ge
   have hset := a x hx hx₁ i p hp hT.ok.eser
   exact leaf_at hT hC0 hCF'
     (hF _ (Fm.L x i) (Fm.L_eps x i) hx₂ _ _ _ _ _ _ _ hset b.ch hT.ok.is b.atScale hT.ok.field)
@@ -54,7 +65,19 @@ end
 end LeafFixedPointPairing
 section
 open GlobalTheory.BigTop GlobalTheory.BigTop.Fun GlobalTheory.SumSize
-theorem _root_.GlobalTheory.Adopt.leafFixedPoint_of_finK_awayK : _root_.GlobalTheory.BigTop.Fun.SettingAtPoint → FinK → AwayK → _root_.GlobalTheory.BigTop.Fun.LeafFixedPoint @Comparison₂ := by
-  first | exact @_root_.LeafFixedPointPairing.GlobalTheory.CompanionTheory.LeafFixedPointPlaceNorm.fp_tie_alt | exact _root_.LeafFixedPointPairing.GlobalTheory.CompanionTheory.LeafFixedPointPlaceNorm.fp_tie_alt | (intros; apply _root_.LeafFixedPointPairing.GlobalTheory.CompanionTheory.LeafFixedPointPlaceNorm.fp_tie_alt <;> assumption)
+theorem _root_.GlobalTheory.Adopt.leafFixedPoint_of_finK_awayK
+    : _root_.GlobalTheory.BigTop.Fun.SettingAtPoint → FinK → AwayK
+      → _root_.GlobalTheory.BigTop.Fun.LeafFixedPoint @Comparison₂ := by
+  first
+  | exact
+      @_root_.LeafFixedPointPairing.GlobalTheory.CompanionTheory.LeafFixedPointPlaceNorm.fp_tie_alt
+  | exact
+      _root_.LeafFixedPointPairing.GlobalTheory.CompanionTheory.LeafFixedPointPlaceNorm.fp_tie_alt
+  | (
+      intros
+      apply
+          _root_.LeafFixedPointPairing.GlobalTheory.CompanionTheory.LeafFixedPointPlaceNorm.fp_tie_alt
+        <;> assumption
+    )
 end
 end

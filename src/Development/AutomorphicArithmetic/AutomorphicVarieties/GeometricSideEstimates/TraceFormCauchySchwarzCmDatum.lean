@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 @[expose] public section
 
 open UpperTheory.V.Lit.Geo
-open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af GlobalTheory.UnitaryBC UpperTheory.V.Lit.Dr UpperTheory.V.Lit.Bor
+open NumberField Matrix GlobalTheory.CuspRep GlobalTheory.GKCoh UpperTheory.V.Af
+  GlobalTheory.UnitaryBC UpperTheory.V.Lit.Dr UpperTheory.V.Lit.Bor
 
 private lemma re_mul_conj (z : ℂ) : (z * (starRingEnd ℂ) z).re = ‖z‖ ^ 2 := by
   rw [Complex.mul_conj, Complex.normSq_eq_norm_sq, Complex.ofReal_re]
@@ -43,15 +44,14 @@ private lemma quad_eq (w x : Fin a → Cinf E) :
 
 end
 
-theorem UpperTheory.traceForm_cauchy_schwarz_cmDatum :
-    RankOne := by
+theorem UpperTheory.traceForm_cauchy_schwarz_cmDatum : RankOne := by
   intro E _ _ a w
   refine ⟨?_, fun M => ?_, fun x => ⟨?_, ?_, fun h => ?_⟩⟩
   · rw [qf_eq]
     unfold trF
     refine Finset.sum_congr rfl fun v _ => ?_
-    simp only [Matrix.one_mul, Matrix.trace, Matrix.diag, vecMulVec_apply, Finset.sum_apply, Complex.re_sum,
-      Pi.mul_apply, Pi.star_apply, Complex.star_def, re_mul_conj]
+    simp only [Matrix.one_mul, Matrix.trace, Matrix.diag, vecMulVec_apply, Finset.sum_apply,
+      Complex.re_sum, Pi.mul_apply, Pi.star_apply, Complex.star_def, re_mul_conj]
   · have hM : ∀ i j v, M.1 j i v = (starRingEnd ℂ) (M.1 i j v) := by
       intro i j v
       have h : star M.1 = M.1 := M.2
@@ -61,11 +61,14 @@ theorem UpperTheory.traceForm_cauchy_schwarz_cmDatum :
       rw [trF_eq, Complex.re_sum]
       refine Finset.sum_congr rfl fun p _ => ?_
       rw [hM p.2.1 p.2.2, re_mul_conj]
-    have h2 : ∑ p : InfinitePlace E × Fin a × Fin a, ‖(vecMulVec w (star w)) p.2.2 p.2.1 p.1‖ ^ 2 ≤ qf w ^ 2 := by
+    have h2
+        : ∑ p : InfinitePlace E × Fin a × Fin a, ‖(vecMulVec w (star w)) p.2.2 p.2.1 p.1‖ ^ 2
+          ≤ qf w ^ 2 := by
       rw [qf_eq, sq (∑ v : InfinitePlace E, ∑ i, ‖w i v‖ ^ 2)]
-      refine le_trans (le_of_eq ?_) (sum_mul_le _ _ (fun v => by positivity) (fun v => by positivity))
-      simp only [Fintype.sum_prod_type, Finset.sum_mul_sum, vecMulVec_apply, Pi.mul_apply, Pi.star_apply,
-        norm_mul, norm_star, mul_pow, mul_comm]
+      refine le_trans (le_of_eq ?_)
+        (sum_mul_le _ _ (fun v => by positivity) (fun v => by positivity))
+      simp only [Fintype.sum_prod_type, Finset.sum_mul_sum, vecMulVec_apply, Pi.mul_apply,
+        Pi.star_apply, norm_mul, norm_star, mul_pow, mul_comm]
     rw [h1, trF_eq]
     refine le_trans ?_ ((cs_norm _ _).trans (mul_le_mul_of_nonneg_left h2 (by positivity)))
     exact sq_le_sq' (abs_le.1 (Complex.abs_re_le_norm _)).1 (abs_le.1 (Complex.abs_re_le_norm _)).2
@@ -74,7 +77,10 @@ theorem UpperTheory.traceForm_cauchy_schwarz_cmDatum :
     rw [← Real.le_sqrt (norm_nonneg _) hs]
     refine (pi_norm_le_iff_of_nonneg (Real.sqrt_nonneg _)).2 fun v => ?_
     rw [Real.le_sqrt (norm_nonneg _) hs]
-    exact Finset.single_le_sum (f := fun v => ‖(x ⬝ᵥ w) v‖ ^ 2) (fun j _ => by positivity) (Finset.mem_univ v)
+    exact Finset.single_le_sum
+      (f := fun v => ‖(x ⬝ᵥ w) v‖ ^ 2)
+      (fun j _ => by positivity)
+      (Finset.mem_univ v)
   · rw [quad_eq, qf_eq, qf_eq, mul_comm]
     refine le_trans ?_ (sum_mul_le _ _ (fun v => by positivity) (fun v => by positivity))
     refine Finset.sum_le_sum fun v _ => ?_

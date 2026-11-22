@@ -12,8 +12,11 @@ namespace GroundTheory.Heights₂.Heights.LowerBoundFree
 
 open ReciprocityTheory.ChartRestriction.G.Geo HilbertSamuel.CurvePointsFinite
 
-theorem degC_pos_of_isArithVar_one {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-    {W : Ideal (MRing ι)} (hW : IsArithVar W 1) : 0 < degC W := by
+theorem degC_pos_of_isArithVar_one
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {W : Ideal (MRing ι)} (hW : IsArithVar W 1)
+    : 0 < degC W := by
   have : W.IsPrime := hW.2.1.1
   have := charZero_fractionRing W hW.2.2.1
   have hEq := mCoordIdeal_genericPt W hW.2.1.2.1
@@ -24,12 +27,13 @@ theorem degC_pos_of_isArithVar_one {K : Type} [Fintype K] {ι : K → Type} [∀
   set L := ReciprocityTheory.ChartRestriction.G.AI.I4.blockFnField (genericPt W)
   set S : Set (FractionRing (MRing ι ⧸ W)) :=
     {t | ∃ p q : Σ k, ι k, p.1 = q.1 ∧ t = genericPt W p / genericPt W q}
-  have hSfin : S.Finite := (Set.finite_range fun pq : (Σ k, ι k) × (Σ k, ι k) ↦
-      genericPt W pq.1 / genericPt W pq.2).subset fun t ⟨p, q, _, ht⟩ ↦ ⟨(p, q), ht.symm⟩
+  have hSfin : S.Finite :=
+    (Set.finite_range fun pq : (Σ k, ι k) × (Σ k, ι k) ↦ genericPt W pq.1 / genericPt W pq.2).subset
+      fun t ⟨p, q, _, ht⟩ ↦ ⟨(p, q), ht.symm⟩
   have : Finite S := hSfin.to_subtype
   have hint : ∀ t ∈ S, IsIntegral ℚ t := fun t ht ↦
-    ((Algebra.IsAlgebraic.isAlgebraic (⟨t, IntermediateField.subset_adjoin ℚ S ht⟩ : L)).isIntegral).map
-      L.val
+    ((Algebra.IsAlgebraic.isAlgebraic
+      (⟨t, IntermediateField.subset_adjoin ℚ S ht⟩ : L)).isIntegral).map L.val
   have : FiniteDimensional ℚ L := IntermediateField.finiteDimensional_adjoin hint
   rw [hdeg]
   exact Nat.card_pos_iff.2 ⟨⟨IsAlgClosed.lift⟩, inferInstance⟩

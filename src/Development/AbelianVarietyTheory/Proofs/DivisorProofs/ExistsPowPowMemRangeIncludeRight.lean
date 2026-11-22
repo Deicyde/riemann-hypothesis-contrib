@@ -8,11 +8,14 @@ namespace GlobalTheory.PowerInRangeTensorRight
 
 open TensorProduct
 
-theorem exists_pow_pow_mem_range_includeRight (k K B : Type) [Field k] [Field K] [Algebra k K]
-    [IsPurelyInseparable k K] [CommRing B] [Nontrivial B] [Algebra k B] (q : ℕ) [ExpChar k q]
-    (z : TensorProduct k K B) :
-    ∃ n : ℕ, z ^ q ^ n ∈
-      AlgHom.range (Algebra.TensorProduct.includeRight : B →ₐ[k] TensorProduct k K B) := by
+theorem exists_pow_pow_mem_range_includeRight
+    (k K B : Type) [Field k] [Field K] [Algebra k K] [IsPurelyInseparable k K] [CommRing B]
+    [Nontrivial B] [Algebra k B]
+    (q : ℕ) [ExpChar k q]
+    (z : TensorProduct k K B)
+    : ∃ n : ℕ,
+      z ^ q ^ n
+        ∈ AlgHom.range (Algebra.TensorProduct.includeRight : B →ₐ[k] TensorProduct k K B) := by
   rcases subsingleton_or_nontrivial (TensorProduct k K B) with hs | hnt
   · exact ⟨0, by rw [Subsingleton.elim (z ^ q ^ 0) 0]; exact zero_mem _⟩
   have : ExpChar (TensorProduct k K B) q :=

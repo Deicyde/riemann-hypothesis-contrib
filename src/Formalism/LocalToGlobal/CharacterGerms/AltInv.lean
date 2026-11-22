@@ -53,11 +53,11 @@ theorem intC_intCast (n : ℤ) : IntC v (n : C) := by
   | negSucc n =>
     rw [Int.cast_negSucc]
     exact intC_neg (intC_natCast _)
-theorem intC_sum {ι : Type*} (s : Finset ι) {f : ι → C} (h : ∀ i ∈ s, IntC v (f i)) :
-    IntC v (∑ i ∈ s, f i) :=
+theorem intC_sum {ι : Type*} (s : Finset ι) {f : ι → C} (h : ∀ i ∈ s, IntC v (f i))
+    : IntC v (∑ i ∈ s, f i) :=
   Finset.sum_induction _ (IntC v) (fun _ _ => intC_add) intC_zero h
-theorem intC_prod {ι : Type*} (s : Finset ι) {f : ι → C} (h : ∀ i ∈ s, IntC v (f i)) :
-    IntC v (∏ i ∈ s, f i) :=
+theorem intC_prod {ι : Type*} (s : Finset ι) {f : ι → C} (h : ∀ i ∈ s, IntC v (f i))
+    : IntC v (∏ i ∈ s, f i) :=
   Finset.prod_induction _ (IntC v) (fun _ _ => intC_mul) intC_one h
 theorem intC_finsum {ι : Type*} {f : ι → C} (h : ∀ i, IntC v (f i)) : IntC v (∑ᶠ i, f i) := by
   by_cases hs : (Function.support f).Finite
@@ -89,16 +89,20 @@ theorem intS_pow {f : MvPowerSeries σ C} (hf : IntS v f) (n : ℕ) : IntS v (f 
     rw [pow_succ]
     exact intS_mul ih hf
 
-theorem intS_prod {ι : Type*} (s : Finset ι) {f : ι → MvPowerSeries σ C} (h : ∀ i ∈ s, IntS v (f i)) :
-    IntS v (∏ i ∈ s, f i) :=
+theorem intS_prod {ι : Type*} (s : Finset ι) {f : ι → MvPowerSeries σ C} (h : ∀ i ∈ s, IntS v (f i))
+    : IntS v (∏ i ∈ s, f i) :=
   Finset.prod_induction _ (IntS v) (fun _ _ => intS_mul) intS_one h
 
-private theorem hasSubst_lemma [Finite σ] {a : σ → MvPowerSeries τ C} (ha : ∀ s, constantCoeff (a s) = 0) :
-    HasSubst a :=
+private theorem hasSubst_lemma
+    [Finite σ] {a : σ → MvPowerSeries τ C} (ha : ∀ s, constantCoeff (a s) = 0)
+    : HasSubst a :=
   ⟨fun s => by rw [ha s]; exact IsNilpotent.zero, fun _ => Set.toFinite _⟩
 
-theorem intS_subst [Finite σ] {a : σ → MvPowerSeries τ C} (ha0 : ∀ s, constantCoeff (a s) = 0)
-    (ha : ∀ s, IntS v (a s)) {γ : MvPowerSeries σ C} (hγ : IntS v γ) : IntS v (subst a γ) := by
+theorem intS_subst
+    [Finite σ]
+    {a : σ → MvPowerSeries τ C} (ha0 : ∀ s, constantCoeff (a s) = 0) (ha : ∀ s, IntS v (a s))
+    {γ : MvPowerSeries σ C} (hγ : IntS v γ)
+    : IntS v (subst a γ) := by
   have hsub : HasSubst a := hasSubst_lemma ha0
   intro μ
   rw [coeff_subst hsub]
@@ -117,9 +121,10 @@ private theorem degree_add_lemma_2 (a b : σ →₀ ℕ) : (a + b).degree = a.de
   | exact map_add _ a b
   | exact Finsupp.sum_add_index' (h := fun _ n => n) (fun _ => rfl) (fun _ _ _ => rfl)
 
-theorem low_mul {E D D' : ℕ} {f g : MvPowerSeries σ C} (hf : OrdV D f) (hf' : LowLt (v := v) (E + D) f)
-    (hg : OrdV D' g) (hg' : LowLt (v := v) (E + D') g) :
-    OrdV (D + D') (f * g) ∧ LowLt (v := v) (E + (D + D')) (f * g) := by
+theorem low_mul
+    {E D D' : ℕ} {f g : MvPowerSeries σ C} (hf : OrdV D f) (hf' : LowLt (v := v) (E + D) f)
+    (hg : OrdV D' g) (hg' : LowLt (v := v) (E + D') g)
+    : OrdV (D + D') (f * g) ∧ LowLt (v := v) (E + (D + D')) (f * g) := by
   constructor
   · intro μ hμ
     rw [coeff_mul]
@@ -142,11 +147,13 @@ theorem low_mul {E D D' : ℕ} {f g : MvPowerSeries σ C} (hf : OrdV D f) (hf' :
         exact intC_zero
       · exact intC_mul (hf' p.1 (by omega)) (hg' p.2 (by omega))
 
-theorem low_one (E : ℕ) : OrdV 0 (1 : MvPowerSeries σ C) ∧ LowLt (v := v) E (1 : MvPowerSeries σ C) :=
+theorem low_one (E : ℕ)
+    : OrdV 0 (1 : MvPowerSeries σ C) ∧ LowLt (v := v) E (1 : MvPowerSeries σ C) :=
   ⟨fun _ hμ => absurd hμ (Nat.not_lt_zero _), fun μ _ => intS_one μ⟩
 
-theorem low_pow {E D : ℕ} {f : MvPowerSeries σ C} (hf : OrdV D f) (hf' : LowLt (v := v) (E + D) f) (n : ℕ) :
-    OrdV (n * D) (f ^ n) ∧ LowLt (v := v) (E + n * D) (f ^ n) := by
+theorem low_pow
+    {E D : ℕ} {f : MvPowerSeries σ C} (hf : OrdV D f) (hf' : LowLt (v := v) (E + D) f) (n : ℕ)
+    : OrdV (n * D) (f ^ n) ∧ LowLt (v := v) (E + n * D) (f ^ n) := by
   induction n with
   | zero =>
     rw [pow_zero, Nat.zero_mul, Nat.add_zero]
@@ -155,9 +162,12 @@ theorem low_pow {E D : ℕ} {f : MvPowerSeries σ C} (hf : OrdV D f) (hf' : LowL
     rw [pow_succ, Nat.add_mul, Nat.one_mul]
     exact low_mul ih.1 ih.2 hf hf'
 
-theorem low_prod {E : ℕ} {t : σ → MvPowerSeries σ C} (ht : ∀ s, OrdV 1 (t s))
-    (ht' : ∀ s, LowLt (v := v) (E + 1) (t s)) (S : Finset σ) (d : σ → ℕ) :
-    OrdV (∑ s ∈ S, d s) (∏ s ∈ S, t s ^ d s) ∧ LowLt (v := v) (E + ∑ s ∈ S, d s) (∏ s ∈ S, t s ^ d s) := by
+theorem low_prod
+    {E : ℕ} {t : σ → MvPowerSeries σ C}
+    (ht : ∀ s, OrdV 1 (t s)) (ht' : ∀ s, LowLt (v := v) (E + 1) (t s))
+    (S : Finset σ) (d : σ → ℕ)
+    : OrdV (∑ s ∈ S, d s) (∏ s ∈ S, t s ^ d s)
+      ∧ LowLt (v := v) (E + ∑ s ∈ S, d s) (∏ s ∈ S, t s ^ d s) := by
   refine Finset.induction_on S ?_ ?_
   · rw [Finset.sum_empty, Finset.prod_empty, Nat.add_zero]
     exact low_one E
@@ -191,8 +201,9 @@ theorem deg_one_single (d : σ →₀ ℕ) (h : d.degree = 1) : ∃ y, d = Finsu
       exact hxs (Finsupp.mem_support_iff.2 h')
     rw [hdx, Finsupp.single_apply, if_neg (Ne.symm hx)]
 
-theorem intC_det {n : Type*} [Fintype n] [DecidableEq n] (A : Matrix n n C) (hA : ∀ i j, IntC v (A i j)) :
-    IntC v A.det := by
+theorem intC_det
+    {n : Type*} [Fintype n] [DecidableEq n] (A : Matrix n n C) (hA : ∀ i j, IntC v (A i j))
+    : IntC v A.det := by
   rw [Matrix.det_apply]
   refine intC_sum _ fun s _ => ?_
   rw [Units.smul_def, zsmul_eq_mul]

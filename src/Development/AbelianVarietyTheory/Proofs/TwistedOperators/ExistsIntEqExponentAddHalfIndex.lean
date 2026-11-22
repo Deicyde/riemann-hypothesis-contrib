@@ -20,8 +20,11 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.Exists
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest
+  GlobalTheory.RowClaim
 open Formalism.L2.Host (HChar)
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -32,9 +35,12 @@ open scoped TensorProduct
 
 namespace GlobalTheory.SplitParity
 
-theorem exists_eq_of_sigR_fixed {F E R : Type} [Field F] [CharZero F] [Field E] [Algebra F E] [CommRing R] [Algebra F R]
-    (σ : E →ₐ[F] E) (hr : Module.finrank F E = 2) (hσ : ∀ x, σ (σ x) = x) (hne : ∃ x, σ x ≠ x)
-    (z : R ⊗[F] E) (hz : sigR R σ z = z) : ∃ r : R, algebraMap R (R ⊗[F] E) r = z := by
+theorem exists_eq_of_sigR_fixed
+    {F E R : Type} [Field F] [CharZero F] [Field E] [Algebra F E] [CommRing R] [Algebra F R]
+    (σ : E →ₐ[F] E)
+    (hr : Module.finrank F E = 2) (hσ : ∀ x, σ (σ x) = x) (hne : ∃ x, σ x ≠ x)
+    (z : R ⊗[F] E) (hz : sigR R σ z = z)
+    : ∃ r : R, algebraMap R (R ⊗[F] E) r = z := by
   obtain ⟨δ, b, -, hb0, hb1, -⟩ := GlobalTheory.QuadNormBase.exists_basis F E σ hr hσ hne
   let B := Algebra.TensorProduct.basis R b
   have hB : ∀ i, B i = 1 ⊗ₜ[F] b i := fun i => Algebra.TensorProduct.basis_apply b i
@@ -45,8 +51,8 @@ theorem exists_eq_of_sigR_fixed {F E R : Type} [Field F] [CharZero F] [Field E] 
   set x := B.repr z 0
   set y := B.repr z 1
   have e : sigR R σ (x • B 0 + y • B 1) = x • B 0 - y • B 1 := by
-    rw [map_add (f := _), hB, hB, TensorProduct.smul_tmul', TensorProduct.smul_tmul', hs, hs, hb1, hb0,
-      map_one, TensorProduct.tmul_neg, sub_eq_add_neg]
+    rw [map_add (f := _), hB, hB, TensorProduct.smul_tmul', TensorProduct.smul_tmul', hs, hs, hb1,
+      hb0, map_one, TensorProduct.tmul_neg, sub_eq_add_neg]
   rw [← hz', e] at hz
   have h2 : (2 * y) • B 1 = 0 := by
     have : x • B 0 - y • B 1 - (x • B 0 + y • B 1) = 0 := by rw [hz, sub_self]
@@ -58,7 +64,8 @@ theorem exists_eq_of_sigR_fixed {F E R : Type} [Field F] [CharZero F] [Field E] 
   have h4 : y = 0 := by
     have hu : (2 : R) * algebraMap F R (1 / 2) = 1 := by
       rw [← map_ofNat (algebraMap F R) 2, ← map_mul]; norm_num
-    calc y = algebraMap F R (1 / 2) * (2 * y) := by linear_combination (-y) * hu
+    calc
+      y = algebraMap F R (1 / 2) * (2 * y) := by linear_combination (-y) * hu
       _ = 0 := by rw [h3, mul_zero]
   refine ⟨x, ?_⟩
   rw [← hz', h4, zero_smul, add_zero, h0, Algebra.algebraMap_eq_smul_one]
@@ -67,23 +74,28 @@ end GlobalTheory.SplitParity
 
 namespace GlobalTheory.SplitParity
 
-theorem exists_idF_of_fixed (D : D7) (u : (AE D)ˣ) (hu : cA D (u : AE D) = u) : ∃ y, idF D y = u := by
-  have hfx : ∀ z : AE D, cA D z = z → ∃ r : AF D.host.F, algebraMap (AF D.host.F) (AE D) r = z := fun z hz =>
-    exists_eq_of_sigR_fixed D.sp.cm.sig D.sp.cm.deg2 (fun x => star_star x)
-      (GlobalTheory.VolHeckeCompare.exists_not_fixed D) z hz
+theorem exists_idF_of_fixed (D : D7) (u : (AE D)ˣ) (hu : cA D (u : AE D) = u)
+    : ∃ y, idF D y = u := by
+  have hfx : ∀ z : AE D, cA D z = z → ∃ r : AF D.host.F, algebraMap (AF D.host.F) (AE D) r = z :=
+    fun z hz =>
+      exists_eq_of_sigR_fixed D.sp.cm.sig D.sp.cm.deg2
+        (fun x => star_star x)
+        (GlobalTheory.VolHeckeCompare.exists_not_fixed D) z hz
   obtain ⟨r, hr⟩ := hfx _ hu
   have hu' : cA D ((u⁻¹ : (AE D)ˣ) : AE D) = ((u⁻¹ : (AE D)ˣ) : AE D) := by
     have h1 : (u : AE D) * cA D ((u⁻¹ : (AE D)ˣ) : AE D) = 1 := by
       rw [← hu, ← map_mul, Units.mul_inv, map_one]
     exact (Units.inv_eq_of_mul_eq_one_right h1).symm
   obtain ⟨r', hr'⟩ := hfx _ hu'
-  have m1 : r * r' = 1 := GlobalTheory.VolHeckeCompare.algebraMap_AE_injective D (by
-    rw [map_mul, hr, hr', Units.mul_inv, map_one])
+  have m1 : r * r' = 1 :=
+    GlobalTheory.VolHeckeCompare.algebraMap_AE_injective D
+      (by rw [map_mul, hr, hr', Units.mul_inv, map_one])
   refine ⟨⟨r, r', m1, by rw [mul_comm]; exact m1⟩, Units.ext ?_⟩
   exact hr
 
-theorem exists_int_add_half : ∀ (D : D7) (χ : (AE D)ˣ →* Circle) (n : ℕ) (τ : D.what₂.Tau) (a : ℚ),
-    IsHeckeChar D χ → ResEta D χ n → HasInfExp D χ τ a → ∃ e : ℤ, (e : ℚ) = a + (n : ℚ) / 2 := by
+theorem exists_int_add_half
+    : ∀ (D : D7) (χ : (AE D)ˣ →* Circle) (n : ℕ) (τ : D.what₂.Tau) (a : ℚ),
+      IsHeckeChar D χ → ResEta D χ n → HasInfExp D χ τ a → ∃ e : ℤ, (e : ℚ) = a + (n : ℚ) / 2 := by
   intro D χ n τ a _ hr ha
   classical
   obtain ⟨N, hN, ⟨θ, hθ⟩, hχ⟩ := ha
@@ -111,7 +123,8 @@ theorem exists_int_add_half : ∀ (D : D7) (χ : (AE D)ˣ →* Circle) (n : ℕ)
   have hηc : ((η x : Circle) : ℂ) = -1 := by rw [hηx θ hθ x x1 xo, xτ, hN1']; simp
   have hfix : cA D (x : AE D) = x := by
     refine GlobalTheory.SplitCharExp.ext_of_chart h ?_ fun τ' => ?_
-    · have e3 : finPart D (cA D (x : AE D)) = sigR (Af D.host.F) D.sp.cm.sig (finPart D (x : AE D)) :=
+    · have e3
+          : finPart D (cA D (x : AE D)) = sigR (Af D.host.F) D.sp.cm.sig (finPart D (x : AE D)) :=
         GlobalTheory.FockCompare.LiftUnitary.snd_sigR D.sp.cm.sig (x : AE D)
       rw [e3, x1, RingHom.map_one]
     · rw [GlobalTheory.FockCompare.comp_cA hθ, x2]

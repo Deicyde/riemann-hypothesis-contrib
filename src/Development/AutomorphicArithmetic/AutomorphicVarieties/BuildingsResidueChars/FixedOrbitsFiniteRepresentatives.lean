@@ -4,8 +4,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-private theorem fixOrb_reps {Z T : Type} (f : Z → T) (W : Set Z) (h : (f '' W).Finite) :
-    ∃ B : Set Z, B ⊆ W ∧ B.Finite ∧ ∀ z ∈ W, ∃ z' ∈ B, f z' = f z := by
+private theorem fixOrb_reps {Z T : Type} (f : Z → T) (W : Set Z) (h : (f '' W).Finite)
+    : ∃ B : Set Z, B ⊆ W ∧ B.Finite ∧ ∀ z ∈ W, ∃ z' ∈ B, f z' = f z := by
   classical
   rcases W.eq_empty_or_nonempty with hW | ⟨w, hw⟩
   · exact ⟨∅, by simp, Set.finite_empty, by simp [hW]⟩
@@ -14,11 +14,10 @@ private theorem fixOrb_reps {Z T : Type} (f : Z → T) (W : Set Z) (h : (f '' W)
     · rintro _ ⟨_, ⟨z, hz, rfl⟩, rfl⟩
       exact Function.invFunOn_mem ⟨z, hz, rfl⟩
     · intro z hz
-      exact ⟨Function.invFunOn f W (f z), ⟨f z, ⟨z, hz, rfl⟩, rfl⟩,
-        Function.invFunOn_eq ⟨z, hz, rfl⟩⟩
+      exact
+        ⟨Function.invFunOn f W (f z), ⟨f z, ⟨z, hz, rfl⟩, rfl⟩, Function.invFunOn_eq ⟨z, hz, rfl⟩⟩
 
-theorem UpperTheory.fixedOrbits_finite_representatives :
-    UpperTheory.V.Af.BA.FixOrb := by
+theorem UpperTheory.fixedOrbits_finite_representatives : UpperTheory.V.Af.BA.FixOrb := by
   classical
   intro G Z _ _ σ s hs W hfix hstab ⟨R, hR, hRW⟩
   have himg : ((fun z => MulAction.orbit G z) '' W).Finite := by
@@ -48,7 +47,9 @@ theorem UpperTheory.fixedOrbits_finite_representatives :
     intro z hz
     have hbW : bb z ∈ W := hB1W (bbB z hz)
     rw [MulAction.mem_stabilizer_iff, mul_smul, inv_smul_eq_iff]
-    calc σ (hh z) • bb z = σ (hh z) • s (bb z) := by rw [hfix _ hbW]
+    calc
+      σ (hh z) • bb z
+        = σ (hh z) • s (bb z) := by rw [hfix _ hbW]
       _ = s (hh z • bb z) := (hs _ _).symm
       _ = hh z • bb z := by rw [hhb z hz, hfix z hz]
   let key : Z → Z × G := fun z => (bb z, (hh z)⁻¹ * σ (hh z))
@@ -64,8 +65,7 @@ theorem UpperTheory.fixedOrbits_finite_representatives :
   simp only [key, Prod.mk.injEq] at hk
   obtain ⟨h1, h2⟩ := hk
   refine ⟨hh z' * (hh z)⁻¹, ?_, ?_⟩
-  · have : σ (hh z') = hh z' * ((hh z)⁻¹ * σ (hh z)) := by
-      rw [← h2, mul_inv_cancel_left]
+  · have : σ (hh z') = hh z' * ((hh z)⁻¹ * σ (hh z)) := by rw [← h2, mul_inv_cancel_left]
     rw [map_mul, map_inv, this]
     group
   · rw [mul_smul, inv_smul_eq_iff.mpr (hhb z hz).symm, ← h1, hhb z' hz'W]

@@ -19,8 +19,10 @@ def NQ (x y : ι) (M : Matrix ι ι R) : Prop :=
 def Pad (x y : ι) (J : Matrix ι ι R) : Prop :=
   ∀ r c, (r = x ∨ r = y ∨ c = x ∨ c = y) → J r c = (1 : Matrix ι ι R) r c
 
-theorem NQ.conj {x y : ι} (hxy : x ≠ y) {J J' M : Matrix ι ι R} (hJ : Pad x y J) (hJ' : Pad x y J')
-    (hJJ : J * J' = 1) (hM : NQ x y M) : NQ x y (J * M * J') := by
+theorem NQ.conj
+    {x y : ι} (hxy : x ≠ y)
+    {J J' M : Matrix ι ι R} (hJ : Pad x y J) (hJ' : Pad x y J') (hJJ : J * J' = 1) (hM : NQ x y M)
+    : NQ x y (J * M * J') := by
   have e : J * M * J' - 1 = J * (M - 1) * J' := by
     rw [Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_one, hJJ]
   have hJx : ∀ r, r ≠ x → J r x = 0 := fun r hr => by
@@ -56,15 +58,17 @@ theorem NQ.mul {x y : ι} {M N : Matrix ι ι R} (hM : NQ x y M) (hN : NQ x y N)
   · rw [e, Matrix.add_apply, Matrix.add_apply, hM.1 k, hN.1 k, Matrix.mul_apply]
     simp only [zero_add]
     exact Finset.sum_eq_zero fun m _ => by rw [hN.1 m, mul_zero]
-  · rw [e, Matrix.add_apply, Matrix.add_apply, hM.2 k l hlx hly hkx, hN.2 k l hlx hly hkx, Matrix.mul_apply]
+  · rw [e, Matrix.add_apply, Matrix.add_apply, hM.2 k l hlx hly hkx, hN.2 k l hlx hly hkx,
+      Matrix.mul_apply]
     simp only [zero_add]
     refine Finset.sum_eq_zero fun m _ => ?_
     by_cases hm : m = x
     · subst hm; rw [hM.1 k, zero_mul]
     · rw [hN.2 m l hlx hly hm, mul_zero]
 
-theorem NQ.apply {x y : ι} {M : Matrix ι ι R} (hM : NQ x y M) {k l : ι} (h : l = x ∨ (l ≠ y ∧ k ≠ x)) :
-    M k l = (1 : Matrix ι ι R) k l := by
+theorem NQ.apply
+    {x y : ι} {M : Matrix ι ι R} (hM : NQ x y M) {k l : ι} (h : l = x ∨ (l ≠ y ∧ k ≠ x))
+    : M k l = (1 : Matrix ι ι R) k l := by
   rcases h with rfl | ⟨hly, hkx⟩
   · have := hM.1 k; rwa [Matrix.sub_apply, sub_eq_zero] at this
   · by_cases hlx : l = x
@@ -73,8 +77,10 @@ theorem NQ.apply {x y : ι} {M : Matrix ι ι R} (hM : NQ x y M) {k l : ι} (h :
 
 variable {n : ℕ}
 
-theorem NQ.projected_block_lower_sum {i₀ : Fin n} {M : Matrix (Fin n ⊕ Fin n) (Fin n ⊕ Fin n) R} (hM : NQ (Sum.inl i₀) (Sum.inr i₀) M) :
-    M.toBlocks₂₁ = 0 := by
+theorem NQ.projected_block_lower_sum
+    {i₀ : Fin n} {M : Matrix (Fin n ⊕ Fin n) (Fin n ⊕ Fin n) R}
+    (hM : NQ (Sum.inl i₀) (Sum.inr i₀) M)
+    : M.toBlocks₂₁ = 0 := by
   ext i k
   simp only [Matrix.toBlocks₂₁, Matrix.of_apply, Matrix.zero_apply]
   by_cases hk : k = i₀
@@ -82,11 +88,16 @@ theorem NQ.projected_block_lower_sum {i₀ : Fin n} {M : Matrix (Fin n ⊕ Fin n
   · rw [hM.apply (Or.inr ⟨by simp, by simp⟩)]
     simp [Matrix.one_apply]
 
-theorem NQ.upper_block_rank_one_update {i₀ : Fin n} {M : Matrix (Fin n ⊕ Fin n) (Fin n ⊕ Fin n) R} (hM : NQ (Sum.inl i₀) (Sum.inr i₀) M) :
-    M.toBlocks₁₁ = 1 + replicateCol Unit (Pi.single i₀ (1 : R)) * replicateRow Unit (fun k => (M - 1) (Sum.inl i₀) (Sum.inl k)) := by
+theorem NQ.upper_block_rank_one_update
+    {i₀ : Fin n} {M : Matrix (Fin n ⊕ Fin n) (Fin n ⊕ Fin n) R}
+    (hM : NQ (Sum.inl i₀) (Sum.inr i₀) M)
+    : M.toBlocks₁₁
+      = 1
+        + replicateCol Unit (Pi.single i₀ (1 : R))
+          * replicateRow Unit (fun k => (M - 1) (Sum.inl i₀) (Sum.inl k)) := by
   refine Matrix.ext fun a k => ?_
-  simp only [Matrix.toBlocks₁₁, Matrix.of_apply, Matrix.add_apply, Matrix.mul_apply, replicateCol_apply,
-    replicateRow_apply, Finset.univ_unique, Finset.sum_singleton]
+  simp only [Matrix.toBlocks₁₁, Matrix.of_apply, Matrix.add_apply, Matrix.mul_apply,
+    replicateCol_apply, replicateRow_apply, Finset.univ_unique, Finset.sum_singleton]
   by_cases ha : a = i₀
   · subst ha
     simp only [Pi.single_eq_same, one_mul, Matrix.sub_apply]
@@ -99,17 +110,20 @@ theorem NQ.upper_block_rank_one_update {i₀ : Fin n} {M : Matrix (Fin n ⊕ Fin
     · subst hk; rw [hM.apply (Or.inl rfl)]; simp [Matrix.one_apply]
     · rw [hM.apply (Or.inr ⟨by simp, by simpa using ha⟩)]; simp [Matrix.one_apply]
 
-theorem NQ.upper_block_det_one {i₀ : Fin n} {M : Matrix (Fin n ⊕ Fin n) (Fin n ⊕ Fin n) R} (hM : NQ (Sum.inl i₀) (Sum.inr i₀) M) :
-    M.toBlocks₁₁.det = 1 := by
+theorem NQ.upper_block_det_one
+    {i₀ : Fin n} {M : Matrix (Fin n ⊕ Fin n) (Fin n ⊕ Fin n) R}
+    (hM : NQ (Sum.inl i₀) (Sum.inr i₀) M)
+    : M.toBlocks₁₁.det = 1 := by
   rw [hM.upper_block_rank_one_update, det_one_add_replicateCol_mul_replicateRow]
   have h0 : (M - 1) (Sum.inl i₀) (Sum.inl i₀) = 0 := hM.1 _
   rw [Matrix.sub_apply, sub_eq_zero] at h0
   simp [dotProduct, Pi.single_apply, h0]
 
-theorem NQ.of_blocks {i₀ : Fin n} {A B D : Matrix (Fin n) (Fin n) R}
+theorem NQ.of_blocks
+    {i₀ : Fin n} {A B D : Matrix (Fin n) (Fin n) R}
     (hA0 : ∀ a, (A - 1) a i₀ = 0) (hA : ∀ a k, a ≠ i₀ → (A - 1) a k = 0)
-    (hB : ∀ a k, a ≠ i₀ → k ≠ i₀ → B a k = 0) (hD : ∀ a k, k ≠ i₀ → (D - 1) a k = 0) :
-    NQ (Sum.inl i₀) (Sum.inr i₀) (Matrix.fromBlocks A B 0 D) := by
+    (hB : ∀ a k, a ≠ i₀ → k ≠ i₀ → B a k = 0) (hD : ∀ a k, k ≠ i₀ → (D - 1) a k = 0)
+    : NQ (Sum.inl i₀) (Sum.inr i₀) (Matrix.fromBlocks A B 0 D) := by
   refine ⟨fun k => ?_, fun k l hlx hly hkx => ?_⟩
   · rcases k with a | a
     · have := hA0 a

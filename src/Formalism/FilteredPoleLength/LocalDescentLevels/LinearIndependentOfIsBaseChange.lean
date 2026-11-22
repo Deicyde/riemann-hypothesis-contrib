@@ -10,31 +10,30 @@ namespace Formalism.LatticeBaseChangeAlt
 
 open Module
 
-theorem linearIndependent_of_isBaseChange_alt {K K' V V₁ ι : Type} [Field K] [Field K'] [Algebra K K']
-    [AddCommGroup V] [Module K V] [AddCommGroup V₁] [Module K' V₁] [Module K V₁]
-    [IsScalarTower K K' V₁] (j : V →ₗ[K] V₁) (hj : IsBaseChange K' j) (v : ι → V)
-    (hv : LinearIndependent K v) : LinearIndependent K' (fun i => j (v i)) := by
+theorem linearIndependent_of_isBaseChange_alt
+    {K K' V V₁ ι : Type} [Field K] [Field K'] [Algebra K K'] [AddCommGroup V] [Module K V]
+    [AddCommGroup V₁] [Module K' V₁] [Module K V₁] [IsScalarTower K K' V₁]
+    (j : V →ₗ[K] V₁) (hj : IsBaseChange K' j)
+    (v : ι → V) (hv : LinearIndependent K v)
+    : LinearIndependent K' (fun i => j (v i)) := by
   classical
   have hs : LinearIndepOn K id (Set.range v) := by
-    first
-    | exact hv.linearIndepOn_id_range
-    | exact (linearIndepOn_id_range_iff hv.injective).mpr hv
+    first | exact hv.linearIndepOn_id_range | exact (linearIndepOn_id_range_iff hv.injective).mpr hv
   let B := Basis.extend hs
   have hsub : Set.range v ⊆ hs.extend (Set.subset_univ _) := hs.subset_extend (Set.subset_univ _)
   let g : ι → hs.extend (Set.subset_univ _) := fun i => ⟨v i, hsub (Set.mem_range_self i)⟩
   have hg : Function.Injective g := fun a c h => hv.injective (congrArg Subtype.val h)
   have hB' : (fun i => j (v i)) = (hj.basis B) ∘ g := by
     funext i
-    first
-    | simp [B, g, IsBaseChange.basis_apply, Basis.coe_extend]
-    | simp [B, g, Basis.coe_extend]
+    first | simp [B, g, IsBaseChange.basis_apply, Basis.coe_extend] | simp [B, g, Basis.coe_extend]
   rw [hB']
   exact (hj.basis B).linearIndependent.comp g hg
 
-theorem span_image_span_alt {K K' V V₁ : Type} [Field K] [Field K'] [Algebra K K']
-    [AddCommGroup V] [Module K V] [AddCommGroup V₁] [Module K' V₁] [Module K V₁]
-    [IsScalarTower K K' V₁] (j : V →ₗ[K] V₁) (s : Set V) :
-    Submodule.span K' (j '' (Submodule.span K s : Set V)) = Submodule.span K' (j '' s) := by
+theorem span_image_span_alt
+    {K K' V V₁ : Type} [Field K] [Field K'] [Algebra K K'] [AddCommGroup V] [Module K V]
+    [AddCommGroup V₁] [Module K' V₁] [Module K V₁] [IsScalarTower K K' V₁]
+    (j : V →ₗ[K] V₁) (s : Set V)
+    : Submodule.span K' (j '' (Submodule.span K s : Set V)) = Submodule.span K' (j '' s) := by
   apply le_antisymm
   · rw [Submodule.span_le]
     rintro _ ⟨x, hx, rfl⟩
@@ -53,8 +52,9 @@ theorem finrank_span_image_alt : FinrankSpanImage := by
   have hw : LinearIndependent K w := b.linearIndependent.map' V'.subtype V'.ker_subtype
   have hspan : Submodule.span K (Set.range w) = V' := by
     rw [Set.range_comp, ← Submodule.map_span, b.span_eq, Submodule.map_subtype_top]
-  have h1 : Submodule.span K' (j '' (V' : Set V)) =
-      Submodule.span K' (Set.range (fun i => j (w i))) := by
+  have h1
+      : Submodule.span K' (j '' (V' : Set V))
+        = Submodule.span K' (Set.range (fun i => j (w i))) := by
     have h2 := span_image_span_alt (K' := K') j (Set.range w)
     rw [hspan] at h2
     rw [h2, ← Set.range_comp]
@@ -72,20 +72,21 @@ theorem isLattice_span_image_alt : IsLatticeSpanImage := by
       ← IsScalarTower.algebraMap_apply]
   obtain ⟨⟨S, hS⟩, hM2⟩ := hM
   let P : Submodule O' V₁ := Submodule.span O' (j '' (S : Set V))
-  let Q : Submodule O V :=
-    { carrier := {x | j x ∈ P}
-      add_mem' := fun {a b} ha hb => by
-        show j (a + b) ∈ P
-        rw [map_add (f := _)]
-        exact P.add_mem ha hb
-      zero_mem' := by
-        show j 0 ∈ P
-        rw [map_zero]
-        exact P.zero_mem
-      smul_mem' := fun c x hx => by
-        show j (c • x) ∈ P
-        rw [hsm]
-        exact P.smul_mem _ hx }
+  let Q : Submodule O V := {
+    carrier := {x | j x ∈ P}
+    add_mem' := fun {a b} ha hb => by
+      show j (a + b) ∈ P
+      rw [map_add (f := _)]
+      exact P.add_mem ha hb
+    zero_mem' := by
+      show j 0 ∈ P
+      rw [map_zero]
+      exact P.zero_mem
+    smul_mem' := fun c x hx => by
+      show j (c • x) ∈ P
+      rw [hsm]
+      exact P.smul_mem _ hx
+  }
   have hQ : Submodule.span O (S : Set V) ≤ Q :=
     Submodule.span_le.mpr (fun x hx => Submodule.subset_span ⟨x, hx, rfl⟩)
   have hNP : Submodule.span O' (j '' (M : Set V)) = P := by

@@ -13,27 +13,28 @@ namespace GlobalTheory.Chain.IoLift.TensorFormProof
 
 open GlobalTheory.Chain.IoLift
 
-variable {A V H : Type} [AddCommGroup A] [Module ℂ A] [AddCommGroup V] [Module ℂ V] [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H]
+variable
+  {A V H : Type} [AddCommGroup A] [Module ℂ A] [AddCommGroup V] [Module ℂ V] [NormedAddCommGroup H]
+  [InnerProductSpace ℂ H]
 
-theorem contr_tmul (ι : V →ₗ[ℂ] H) (y : V) (a : A) (v : V) :
-    contr ι y (a ⊗ₜ[ℂ] v) = ⟪ι y, ι v⟫_ℂ • a := by
+theorem contr_tmul (ι : V →ₗ[ℂ] H) (y : V) (a : A) (v : V)
+    : contr ι y (a ⊗ₜ[ℂ] v) = ⟪ι y, ι v⟫_ℂ • a := by
   unfold contr
   rw [LinearMap.comp_apply, LinearMap.lTensor_tmul, LinearMap.comp_apply, innerₛₗ_apply_apply]
   exact TensorProduct.rid_tmul _ _
 
-theorem dual_contr (ι : V →ₗ[ℂ] H) (y : V) (l : A →ₗ[ℂ] ℂ) (t : A ⊗[ℂ] V) :
-    l (contr ι y t) = ⟪ι y, ι (TensorProduct.lid ℂ V (LinearMap.rTensor V l t))⟫_ℂ := by
+theorem dual_contr (ι : V →ₗ[ℂ] H) (y : V) (l : A →ₗ[ℂ] ℂ) (t : A ⊗[ℂ] V)
+    : l (contr ι y t) = ⟪ι y, ι (TensorProduct.lid ℂ V (LinearMap.rTensor V l t))⟫_ℂ := by
   induction t using TensorProduct.induction_on with
   | zero => simp
   | tmul a v =>
-    rw [contr_tmul, map_smul, LinearMap.rTensor_tmul, TensorProduct.lid_tmul, map_smul, inner_smul_right,
-      smul_eq_mul, mul_comm]
+    rw [contr_tmul, map_smul, LinearMap.rTensor_tmul, TensorProduct.lid_tmul, map_smul,
+      inner_smul_right, smul_eq_mul, mul_comm]
   | add s u hs hu => simp only [map_add (f := _), inner_add_right, hs, hu]
 
-theorem eq_zero_of_contr (ι : V →ₗ[ℂ] H) (hι : Function.Injective ι) (t : A ⊗[ℂ] V)
-    (h : ∀ y, contr ι y t = 0) : t = 0 := by
-
+theorem eq_zero_of_contr
+    (ι : V →ₗ[ℂ] H) (hι : Function.Injective ι) (t : A ⊗[ℂ] V) (h : ∀ y, contr ι y t = 0)
+    : t = 0 := by
   have hl : ∀ l : A →ₗ[ℂ] ℂ, LinearMap.rTensor V l t = 0 := by
     intro l
     set w := TensorProduct.lid ℂ V (LinearMap.rTensor V l t) with hw
@@ -52,11 +53,14 @@ theorem eq_zero_of_contr (ι : V →ₗ[ℂ] H) (hι : Function.Injective ι) (t
     rfl
   have h2 : LinearMap.rTensor V e.toLinearMap t = 0 := (LinearEquiv.map_eq_zero_iff _).mp hs
   have h3 := congrArg (LinearMap.rTensor V e.symm.toLinearMap) h2
-  rwa [← LinearMap.rTensor_comp_apply, LinearEquiv.symm_comp, LinearMap.rTensor_id_apply, map_zero] at h3
+  rwa [← LinearMap.rTensor_comp_apply, LinearEquiv.symm_comp, LinearMap.rTensor_id_apply, map_zero]
+    at h3
 
-theorem exists_tensor (ι : V →ₗ[ℂ] H) (β : V →ₛₗ[starRingEnd ℂ] A) (E : Submodule ℂ V) [FiniteDimensional ℂ E]
-    (h : ∀ y, (∀ e ∈ E, ⟪ι y, ι e⟫_ℂ = 0) → β y = 0) : ∃ t : A ⊗[ℂ] V, ∀ y, contr ι y t = β y := by
-
+theorem exists_tensor
+    (ι : V →ₗ[ℂ] H) (β : V →ₛₗ[starRingEnd ℂ] A)
+    (E : Submodule ℂ V) [FiniteDimensional ℂ E]
+    (h : ∀ y, (∀ e ∈ E, ⟪ι y, ι e⟫_ℂ = 0) → β y = 0)
+    : ∃ t : A ⊗[ℂ] V, ∀ y, contr ι y t = β y := by
   set F : Submodule ℂ H := E.map ι with hF
   haveI : FiniteDimensional ℂ F := by rw [hF]; infer_instance
   let b := stdOrthonormalBasis ℂ F
@@ -80,7 +84,8 @@ theorem exists_tensor (ι : V →ₗ[ℂ] H) (β : V →ₛₗ[starRingEnd ℂ] 
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [inner_smul_right, mul_comm]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hz, map_sub, map_sum, map_smul, he, inner_sub_left, sum_inner, inner_smul_left, inner_conj_symm]
+      simp only [hz, map_sub, map_sum, map_smul, he, inner_sub_left, sum_inner, inner_smul_left,
+        inner_conj_symm]
     rw [key, sub_self]
   have hyz := h (y - z) hperp
   rw [map_sub, sub_eq_zero] at hyz
@@ -99,9 +104,14 @@ theorem tensorForm : TensorForm := by
     obtain ⟨E, hE, hk⟩ := hB P
     exact exists_tensor ι (B P) E hk
   choose g hg using hex
-  exact ⟨{ toFun := g
-           map_add' := fun P Q => sep _ _ fun y => by simp [hg]
-           map_smul' := fun c P => sep _ _ fun y => by simp [hg] }, hg⟩
+  exact ⟨
+    {
+      toFun := g
+      map_add' := fun P Q => sep _ _ fun y => by simp [hg]
+      map_smul' := fun c P => sep _ _ fun y => by simp [hg]
+    },
+    hg
+  ⟩
 
 end GlobalTheory.Chain.IoLift.TensorFormProof
 

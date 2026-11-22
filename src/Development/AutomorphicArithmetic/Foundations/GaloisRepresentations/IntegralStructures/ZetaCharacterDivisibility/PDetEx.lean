@@ -10,8 +10,11 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsGoo
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.HeckeGal GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL GlobalTheory.RoadWGeo
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.HeckeGal
+  GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL GlobalTheory.RoadWGeo
 open Formalism.MainNotions.SumRepresentations.At (sumRep)
 open GlobalTheory.TripleGal (rk1)
 open UpperTheory.V.Af (FrobEig algSat RepIso)
@@ -22,18 +25,21 @@ open GlobalTheory.BlockSum (blockRep)
 open PositivityTheory.AutomorphicGaloisHodgeTate.Div (DivWCoreLac SenWLac HTLac IsSSMat)
 open UpperTheory.Gal.Int.Div
 
-private theorem algSat_prod_eq (a q : ℕ) (B : Multiset ℂˣ) (hB : B.card = a) :
-    (algSat a q B).prod = ((B.prod : ℂˣ) : ℂ) * (q : ℂ) ^ (a.choose 2) := by
+private theorem algSat_prod_eq (a q : ℕ) (B : Multiset ℂˣ) (hB : B.card = a)
+    : (algSat a q B).prod = ((B.prod : ℂˣ) : ℂ) * (q : ℂ) ^ (a.choose 2) := by
   have hq : (((q : ℝ) ^ (((a : ℝ) - 1) / 2) : ℝ) ^ a : ℝ) = (q : ℝ) ^ (a.choose 2) := by
-    rw [← Real.rpow_natCast, ← Real.rpow_mul (Nat.cast_nonneg q), ← Real.rpow_natCast (q : ℝ) (a.choose 2),
-      Nat.cast_choose_two]
+    rw [← Real.rpow_natCast, ← Real.rpow_mul (Nat.cast_nonneg q),
+      ← Real.rpow_natCast (q : ℝ) (a.choose 2), Nat.cast_choose_two]
     congr 1
     ring
   have hu : ((B.prod : ℂˣ) : ℂ) = (B.map fun α : ℂˣ => (α : ℂ)).prod :=
     map_multiset_prod (Units.coeHom ℂ) B
-  have hm := Multiset.prod_map_mul (m := B) (f := fun _ : ℂˣ => (((q : ℝ) ^ (((a : ℝ) - 1) / 2) : ℝ) : ℂ))
-    (g := fun α : ℂˣ => (α : ℂ))
-  have hl : algSat a q B = B.map fun α : ℂˣ => (((q : ℝ) ^ (((a : ℝ) - 1) / 2) : ℝ) : ℂ) * (α : ℂ) := by
+  have hm :=
+    Multiset.prod_map_mul (m := B)
+      (f := fun _ : ℂˣ => (((q : ℝ) ^ (((a : ℝ) - 1) / 2) : ℝ) : ℂ))
+      (g := fun α : ℂˣ => (α : ℂ))
+  have hl
+      : algSat a q B = B.map fun α : ℂˣ => (((q : ℝ) ^ (((a : ℝ) - 1) / 2) : ℝ) : ℂ) * (α : ℂ) := by
     unfold algSat
     change Multiset.map _ (Multiset.bind B fun α : ℂˣ => {(α : ℂ)}) = _
     rw [Multiset.bind_singleton, Multiset.map_map]
@@ -42,8 +48,7 @@ private theorem algSat_prod_eq (a q : ℕ) (B : Multiset ℂˣ) (hB : B.card = a
   congr 1
   exact_mod_cast hq
 
-theorem UpperTheory.Gal.Int.Div.detEx_of :
-    CentU → DetEx := by
+theorem UpperTheory.Gal.Int.Div.detEx_of : CentU → DetEx := by
   classical
   intro hC E Ω _ _ _ _ _ _ l _ ι a ha U hU
   obtain ⟨χ, n, hχ, hval⟩ := hC E a ha U hU

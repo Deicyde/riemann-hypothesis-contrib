@@ -23,31 +23,39 @@ theorem normValuation_eq_factorization (hC1 : NormLengthStatement) : NormOrdStat
     have hpr : Prime P := UniqueFactorizationMonoid.prime_of_factor P hP
     exact ⟨(Ideal.isPrime_of_prime hpr).isMaximal hpr.ne_zero, hpr.ne_zero⟩
   let φ := IsDedekindDomain.quotientEquivPiFactors hI
-  let ψ : (B ⧸ I) ≃ₗ[O] ((P : (UniqueFactorizationMonoid.factors I).toFinset) →
-      B ⧸ (P : Ideal B) ^ Multiset.count (P : Ideal B) (UniqueFactorizationMonoid.factors I)) :=
-    { φ with
-      map_smul' := by
-        intro o x
-        obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective x
-        change φ (Ideal.Quotient.mk I (o • b)) = o • φ (Ideal.Quotient.mk I b)
-        rw [IsDedekindDomain.quotientEquivPiFactors_mk, IsDedekindDomain.quotientEquivPiFactors_mk]
-        rfl }
+  let ψ
+      : (B ⧸ I) ≃ₗ[O] ((P : (UniqueFactorizationMonoid.factors I).toFinset) →
+        B ⧸ (P : Ideal B) ^ Multiset.count (P : Ideal B) (UniqueFactorizationMonoid.factors I)) := {
+    φ with
+    map_smul' := by
+      intro o x
+      obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective x
+      change φ (Ideal.Quotient.mk I (o • b)) = o • φ (Ideal.Quotient.mk I b)
+      rw [IsDedekindDomain.quotientEquivPiFactors_mk, IsDedekindDomain.quotientEquivPiFactors_mk]
+      rfl
+  }
   rw [ψ.length_eq, Module.length_pi_of_fintype]
-  have hterm : ∀ P : (UniqueFactorizationMonoid.factors I).toFinset,
-      Module.length O (B ⧸ (P : Ideal B) ^
-        Multiset.count (P : Ideal B) (UniqueFactorizationMonoid.factors I)) =
-      ((Multiset.count (P : Ideal B) (UniqueFactorizationMonoid.factors I) *
-        (P : Ideal B).inertiaDeg O : ℕ) : ℕ∞) := by
+  have hterm
+      : ∀ P : (UniqueFactorizationMonoid.factors I).toFinset,
+        Module.length O
+            (B ⧸ (P : Ideal B) ^
+              Multiset.count (P : Ideal B) (UniqueFactorizationMonoid.factors I))
+          = ((Multiset.count (P : Ideal B) (UniqueFactorizationMonoid.factors I)
+                * (P : Ideal B).inertiaDeg O
+              : ℕ)
+            : ℕ∞) := by
     intro P
     obtain ⟨hPm, hP0⟩ := hmax P (Multiset.mem_toFinset.mp P.2)
     rw [normOrd_length_pow O B _ hP0, normOrd_length_residue O B]
     norm_cast
   rw [Finset.sum_congr rfl (fun P _ => hterm P), ← Nat.cast_sum]
   congr 1
-  rw [← hfac, Finset.sum_coe_sort (UniqueFactorizationMonoid.factors I).toFinset
-    (fun P => Multiset.count P (UniqueFactorizationMonoid.factors I) * P.inertiaDeg O)]
-  rw [finsum_eq_sum_of_support_subset (s := (UniqueFactorizationMonoid.factors I).toFinset.subtype
-    (fun Q : Ideal B => Q.IsMaximal)) _ ?sup]
+  rw [← hfac,
+    Finset.sum_coe_sort (UniqueFactorizationMonoid.factors I).toFinset
+      (fun P => Multiset.count P (UniqueFactorizationMonoid.factors I) * P.inertiaDeg O)]
+  rw [finsum_eq_sum_of_support_subset
+    (s := (UniqueFactorizationMonoid.factors I).toFinset.subtype (fun Q : Ideal B => Q.IsMaximal)) _
+    ?sup]
   · rw [Finset.sum_subtype_eq_sum_filter (fun Q : Ideal B =>
         Q.inertiaDeg O * Multiset.count Q (UniqueFactorizationMonoid.factors I)),
       Finset.filter_true_of_mem]

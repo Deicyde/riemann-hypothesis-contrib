@@ -17,8 +17,8 @@ namespace CechDSq
 
 variable {n : ℕ}
 
-theorem sgn_mul_sgn_of_lt {K : Finset (Fin n)} {j k : Fin n} (hj : j ∈ K) (hjk : j < k) :
-    Cech.sgn K k * Cech.sgn (K.erase k) j = -(Cech.sgn K j * Cech.sgn (K.erase j) k) := by
+theorem sgn_mul_sgn_of_lt {K : Finset (Fin n)} {j k : Fin n} (hj : j ∈ K) (hjk : j < k)
+    : Cech.sgn K k * Cech.sgn (K.erase k) j = -(Cech.sgn K j * Cech.sgn (K.erase j) k) := by
   have h1 : (K.erase k).filter (· < j) = K.filter (· < j) := by
     ext z
     simp only [Finset.mem_filter, Finset.mem_erase]
@@ -32,48 +32,55 @@ theorem sgn_mul_sgn_of_lt {K : Finset (Fin n)} {j k : Fin n} (hj : j ∈ K) (hjk
   rw [h1, ← h2, pow_succ]
   ring
 
-theorem sgn_mul_sgn_swap {K : Finset (Fin n)} {j k : Fin n} (hk : k ∈ K) (hj : j ∈ K) (hne : j ≠ k) :
-    Cech.sgn K k * Cech.sgn (K.erase k) j = -(Cech.sgn K j * Cech.sgn (K.erase j) k) := by
+theorem sgn_mul_sgn_swap {K : Finset (Fin n)} {j k : Fin n} (hk : k ∈ K) (hj : j ∈ K) (hne : j ≠ k)
+    : Cech.sgn K k * Cech.sgn (K.erase k) j = -(Cech.sgn K j * Cech.sgn (K.erase j) k) := by
   rcases lt_or_gt_of_ne hne with h | h
   · exact sgn_mul_sgn_of_lt hj h
   · rw [sgn_mul_sgn_of_lt hk h, neg_neg]
 
-variable {U : Finset (Fin n)} {R : Type u} [CommRing R] {G : Cell U → Type v}
-  [∀ I, AddCommGroup (G I)] [∀ I, Module R (G I)] {ρ : ∀ I J : Cell U, I.1 ⊆ J.1 → G I →ₗ[R] G J}
-
+variable
+  {U : Finset (Fin n)} {R : Type u} [CommRing R]
+  {G : Cell U → Type v} [∀ I, AddCommGroup (G I)] [∀ I, Module R (G I)]
+  {ρ : ∀ I J : Cell U, I.1 ⊆ J.1 → G I →ₗ[R] G J}
 
 open Classical in
 def restrictTo {i : ℕ} (s : Cech.Cochain G i) (K : Cell U) (A : Finset (Fin n)) : G K :=
   if h : ∃ L : Cech.Idx U i, L.1.1 = A ∧ A ⊆ K.1 then
     ρ h.choose.1 K (by rw [h.choose_spec.1]; exact h.choose_spec.2) (s h.choose)
-  else 0
+  else
+    0
 
-theorem restrictTo_eq {i : ℕ} (s : Cech.Cochain G i) (K : Cell U) (L : Cech.Idx U i)
-    (h : L.1.1 ⊆ K.1) : restrictTo (ρ := ρ) s K L.1.1 = ρ L.1 K h (s L) := by
+theorem restrictTo_eq
+    {i : ℕ} (s : Cech.Cochain G i) (K : Cell U) (L : Cech.Idx U i) (h : L.1.1 ⊆ K.1)
+    : restrictTo (ρ := ρ) s K L.1.1 = ρ L.1 K h (s L) := by
   have hex : ∃ L' : Cech.Idx U i, L'.1.1 = L.1.1 ∧ L.1.1 ⊆ K.1 := ⟨L, rfl, h⟩
-  have key : ∀ (L₁ L₂ : Cech.Idx U i) (_ : L₁ = L₂) (h₁ : L₁.1.1 ⊆ K.1) (h₂ : L₂.1.1 ⊆ K.1),
-      ρ L₁.1 K h₁ (s L₁) = ρ L₂.1 K h₂ (s L₂) := by
+  have key
+      : ∀ (L₁ L₂ : Cech.Idx U i) (_ : L₁ = L₂) (h₁ : L₁.1.1 ⊆ K.1) (h₂ : L₂.1.1 ⊆ K.1),
+        ρ L₁.1 K h₁ (s L₁) = ρ L₂.1 K h₂ (s L₂) := by
     rintro _ _ rfl _ _; rfl
   rw [restrictTo, dite_eq_left hex]
   exact key _ _ (Subtype.ext (Subtype.ext hex.choose_spec.1)) _ _
 
 end CechDSq
 
-
 open CechDSq in
 theorem CechDSq.proof : CechDSq.Statement := by
   intro n U R _ G _ _ ρ hρ i s
   classical
   funext K
-  have hcomp : ∀ (I J L : Cell U) (h₁ : I.1 ⊆ J.1) (h₂ : J.1 ⊆ L.1) (x : G I),
-      ρ J L h₂ (ρ I J h₁ x) = ρ I L (h₁.trans h₂) x := fun I J L h₁ h₂ x =>
+  have hcomp
+      : ∀ (I J L : Cell U) (h₁ : I.1 ⊆ J.1) (h₂ : J.1 ⊆ L.1) (x : G I),
+        ρ J L h₂ (ρ I J h₁ x) = ρ I L (h₁.trans h₂) x := fun I J L h₁ h₂ x =>
     LinearMap.congr_fun (hρ I J L h₁ h₂) x
 
   let f : (Σ _ : Fin n, Fin n) → G K.1 := fun p =>
-    (Cech.sgn K.1.1 p.1 * Cech.sgn (K.1.1.erase p.1) p.2) •
-      restrictTo (ρ := ρ) s K.1 ((K.1.1.erase p.1).erase p.2)
-  have step : ∀ k : K.1.1, Cech.sgn K.1.1 k • ρ (Cech.face K k).1 K.1 (Cech.face_subset K k)
-      (Cech.d G ρ i s (Cech.face K k)) = ∑ j ∈ K.1.1.erase k, f ⟨k, j⟩ := by
+    (Cech.sgn K.1.1 p.1 * Cech.sgn (K.1.1.erase p.1) p.2)
+      • restrictTo (ρ := ρ) s K.1 ((K.1.1.erase p.1).erase p.2)
+  have step
+      : ∀ k : K.1.1,
+        Cech.sgn K.1.1 k
+            • ρ (Cech.face K k).1 K.1 (Cech.face_subset K k) (Cech.d G ρ i s (Cech.face K k))
+          = ∑ j ∈ K.1.1.erase k, f ⟨k, j⟩ := by
     intro k
     set_option synthInstance.maxHeartbeats 100000 in
       rw [Cech.d_apply, map_sum, Finset.smul_sum]

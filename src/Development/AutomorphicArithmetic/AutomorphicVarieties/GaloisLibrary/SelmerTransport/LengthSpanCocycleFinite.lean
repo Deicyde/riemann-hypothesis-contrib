@@ -7,18 +7,24 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open ReciprocityTheory.Gal UpperTheory.V.Base
 
-private theorem UpperTheory.V.Base.length_span_cocycle_finite {R N I : Type} [CommRing R] [AddCommGroup N] [Module R N] [Finite I]
-    (hN : ∀ m : N, Module.length R (Submodule.span R {m}) ≠ ⊤) (Z : Submodule R (I → N)) (f : Z) :
-    Module.length R (Submodule.span R {f}) ≠ ⊤ := by
+private theorem UpperTheory.V.Base.length_span_cocycle_finite
+    {R N I : Type} [CommRing R] [AddCommGroup N] [Module R N] [Finite I]
+    (hN : ∀ m : N, Module.length R (Submodule.span R {m}) ≠ ⊤)
+    (Z : Submodule R (I → N)) (f : Z)
+    : Module.length R (Submodule.span R {f}) ≠ ⊤ := by
   classical
   have := Fintype.ofFinite I
-  let φ : Submodule.span R {f} →ₗ[R] (Π i : I, Submodule.span R {(f : I → N) i}) :=
-    { toFun := fun g i => ⟨((g : Z) : I → N) i, by
+  let φ : Submodule.span R {f} →ₗ[R] (Π i : I, Submodule.span R {(f : I → N) i}) := {
+    toFun := fun g i => ⟨
+      ((g : Z) : I → N) i,
+      by
         obtain ⟨r, hr⟩ := Submodule.mem_span_singleton.mp g.2
         rw [← hr]
-        exact Submodule.mem_span_singleton.mpr ⟨r, by simp⟩⟩
-      map_add' := fun g h => by ext i; simp
-      map_smul' := fun r g => by ext i; simp }
+        exact Submodule.mem_span_singleton.mpr ⟨r, by simp⟩
+    ⟩
+    map_add' := fun g h => by ext i; simp
+    map_smul' := fun r g => by ext i; simp
+  }
   have hφ : Function.Injective φ := by
     intro g h e
     apply Subtype.ext
@@ -29,10 +35,14 @@ private theorem UpperTheory.V.Base.length_span_cocycle_finite {R N I : Type} [Co
   rw [Module.length_pi_of_fintype]
   exact (WithTop.sum_lt_top.mpr fun i _ => (hN _).lt_top).ne
 
-theorem UpperTheory.V.Base.h2Ab :
-    ∀ (R Q N : Type) [CommRing R] [TopologicalSpace Q] [DiscreteTopology Q] [Finite Q] [AddCommGroup N] [Module R N]
-      [TopologicalSpace N] [IsTopologicalAddGroup N] [ContinuousConstSMul R N] [DiscreteTopology N] [IsPrincipalIdealRing R] [Group Q] (σ : Representation R Q N), (∀ a b : Q, a * b = b * a) → (∀ m : N, Module.length R (Submodule.span R {m}) ≠ ⊤) →
-      (∀ g, ∃ c : R, ∀ m, σ g m = c • m) → Module.length R (H2 σ) ≤ (Nat.card Q : ℕ∞) ^ 2 * Module.length R (H0 σ) := by
+theorem UpperTheory.V.Base.h2Ab
+    : ∀ (R Q N : Type) [CommRing R] [TopologicalSpace Q] [DiscreteTopology Q] [Finite Q]
+        [AddCommGroup N] [Module R N] [TopologicalSpace N] [IsTopologicalAddGroup N]
+        [ContinuousConstSMul R N] [DiscreteTopology N] [IsPrincipalIdealRing R] [Group Q]
+        (σ : Representation R Q N),
+      (∀ a b : Q, a * b = b * a) → (∀ m : N, Module.length R (Submodule.span R {m}) ≠ ⊤)
+        → (∀ g, ∃ c : R, ∀ m, σ g m = c • m)
+        → Module.length R (H2 σ) ≤ (Nat.card Q : ℕ∞) ^ 2 * Module.length R (H0 σ) := by
   intro R Q N _ _ _ _ _ _ _ _ _ _ _ _ σ hcomm hN hsc
   classical
   choose c hc using hsc
@@ -68,11 +78,12 @@ theorem UpperTheory.V.Base.h2Ab :
       rw [hcomm x g] at e2
       rw [hcomm y g] at e3
       simp only [d1_apply, hc, Pi.smul_apply]
-      have key : c x • (F (g, y) - F (y, g)) - (F (g, x * y) - F (x * y, g)) + (F (g, x) - F (x, g))
-            - (c g - 1) • F (x, y)
-          = -((c g • F (x, y) - F (g * x, y) + F (g, x * y) - F (g, x))
-            - (c x • F (g, y) - F (g * x, y) + F (x, g * y) - F (x, g))
-            + (c x • F (y, g) - F (x * y, g) + F (x, g * y) - F (x, y))) := by
+      have key
+          : c x • (F (g, y) - F (y, g)) - (F (g, x * y) - F (x * y, g)) + (F (g, x) - F (x, g))
+              - (c g - 1) • F (x, y)
+            = -((c g • F (x, y) - F (g * x, y) + F (g, x * y) - F (g, x))
+              - (c x • F (g, y) - F (g * x, y) + F (x, g * y) - F (x, g))
+              + (c x • F (y, g) - F (x * y, g) + F (x, g * y) - F (x, y))) := by
         simp only [smul_sub, sub_smul, one_smul]
         abel
       rw [e1, e2, e3] at key
@@ -88,22 +99,28 @@ theorem UpperTheory.V.Base.h2Ab :
   let Zs := Z2 σ
   let mul : Zs →ₗ[R] Zs := a • LinearMap.id
   have h1 : Module.length R (H2 σ) ≤ Module.length R (Zs ⧸ LinearMap.range mul) := by
-    let q := Submodule.liftQ (LinearMap.range mul) (Submodule.mkQ (Submodule.comap Zs.subtype (B2 σ))) (by
-      rintro _ ⟨z, rfl⟩
-      rw [LinearMap.mem_ker, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero, Submodule.mem_comap]
-      exact hB z)
+    let q :=
+      Submodule.liftQ (LinearMap.range mul) (Submodule.mkQ (Submodule.comap Zs.subtype (B2 σ))) (by
+        rintro _ ⟨z, rfl⟩
+        rw [LinearMap.mem_ker, Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero,
+          Submodule.mem_comap]
+        exact hB z)
     refine Module.length_le_of_surjective q ?_
     intro y
     obtain ⟨z, rfl⟩ := Submodule.mkQ_surjective _ y
     exact ⟨Submodule.mkQ _ z, rfl⟩
   have h2 := lenCokerLe R Zs (UpperTheory.V.Base.length_span_cocycle_finite hN Zs) a
   have h3 : Module.length R (LinearMap.ker mul) ≤ Module.length R (Q × Q → H0 σ) := by
-    let φ : LinearMap.ker mul →ₗ[R] (Q × Q → H0 σ) :=
-      { toFun := fun z p => ⟨((z : Zs) : Q × Q → N) p, hH0 _ (by
-            have hz : mul (z : Zs) = 0 := LinearMap.mem_ker.mp z.2
-            exact congrFun (congrArg Subtype.val hz) p)⟩
-        map_add' := fun _ _ => by ext; simp
-        map_smul' := fun _ _ => by ext; simp }
+    let φ : LinearMap.ker mul →ₗ[R] (Q × Q → H0 σ) := {
+      toFun := fun z p => ⟨
+        ((z : Zs) : Q × Q → N) p,
+        hH0 _ (by
+          have hz : mul (z : Zs) = 0 := LinearMap.mem_ker.mp z.2
+          exact congrFun (congrArg Subtype.val hz) p)
+      ⟩
+      map_add' := fun _ _ => by ext; simp
+      map_smul' := fun _ _ => by ext; simp
+    }
     refine Module.length_le_of_injective φ ?_
     intro z w e
     apply Subtype.ext
@@ -111,7 +128,9 @@ theorem UpperTheory.V.Base.h2Ab :
     funext p
     have hp := congrArg Subtype.val (congrFun e p)
     exact hp
-  calc Module.length R (H2 σ) ≤ _ := h1
+  calc
+    Module.length R (H2 σ)
+      ≤ _ := h1
     _ ≤ _ := h2
     _ ≤ _ := h3
     _ = (Nat.card Q : ℕ∞) ^ 2 * Module.length R (H0 σ) := by

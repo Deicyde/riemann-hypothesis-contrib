@@ -7,12 +7,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeT
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module UpperTheory.V.Loc UpperTheory.V.U3 UpperTheory.V.Alg IsLocalRing Polynomial Topology
+open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module
+  UpperTheory.V.Loc UpperTheory.V.U3 UpperTheory.V.Alg IsLocalRing Polynomial Topology
 
 namespace GlobalTheory.CharCycIdeal
 
-theorem isClosed_ideal {l : ℕ} [Fact l.Prime] {B : Type} [CommRing B] [Algebra ℚ_[l] B] [TopologicalSpace B]
-    [IsModuleTopology ℚ_[l] B] (J : Ideal B) : IsClosed (J : Set B) := by
+theorem isClosed_ideal
+    {l : ℕ} [Fact l.Prime]
+    {B : Type} [CommRing B] [Algebra ℚ_[l] B] [TopologicalSpace B] [IsModuleTopology ℚ_[l] B]
+    (J : Ideal B)
+    : IsClosed (J : Set B) := by
   rw [← isOpen_compl_iff, isOpen_iff_mem_nhds]
   intro x hx
   obtain ⟨f, hf, hJ⟩ := Submodule.exists_le_ker_of_notMem (p := J.restrictScalars ℚ_[l]) (v := x) hx
@@ -20,9 +24,25 @@ theorem isClosed_ideal {l : ℕ} [Fact l.Prime] {B : Type} [CommRing B] [Algebra
   refine Filter.mem_of_superset ((isOpen_ne.preimage hc).mem_nhds (x := x) hf) fun y hy h => hy ?_
   exact hJ (x := y) h
 
-theorem span_range_sub_cyc : ∀ {l : ℕ} [Fact l.Prime] {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (φ : G →* GQ l) (hφ : IsOpenEmbedding φ) {E : Type} [Field E] [Algebra ℚ_[l] E] [FiniteDimensional ℚ_[l] E] [Algebra ℤ_[l] E] [IsScalarTower ℤ_[l] ℚ_[l] E] {B : Type} [CommRing B] [Algebra ℚ_[l] B] [Module.Finite ℚ_[l] B] [TopologicalSpace B] [IsModuleTopology ℚ_[l] B] [IsTopologicalRing B] [Algebra ℤ_[l] B] [IsScalarTower ℤ_[l] ℚ_[l] B] [Algebra E B] [IsScalarTower ℚ_[l] E B] (π : B →ₐ[E] E) (hπ : ∀ a, π a = 0 → IsNilpotent a) (χ : G →* Bˣ), Continuous (fun g => (χ g : B)) → ∀ w : ℤ, 1 ≤ w → (∀ g, φ g ∈ Iq l → χ g = cycA l l B (φ g) ^ w) → ∀ σ : G, ((Iq l).comap φ ⊔ Subgroup.zpowers σ).topologicalClosure = ⊤ → Ideal.span (Set.range fun g => (χ g : B) - (cycA l l B (φ g) : B)) = (if w = 1 then Ideal.span {(χ σ : B) - (cycA l l B (φ σ) : B)} else ⊤) := by
+theorem span_range_sub_cyc
+    : ∀ {l : ℕ} [Fact l.Prime] {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+        (φ : G →* GQ l) (hφ : IsOpenEmbedding φ) {E : Type} [Field E] [Algebra ℚ_[l] E]
+        [FiniteDimensional ℚ_[l] E] [Algebra ℤ_[l] E] [IsScalarTower ℤ_[l] ℚ_[l] E] {B : Type}
+        [CommRing B] [Algebra ℚ_[l] B] [Module.Finite ℚ_[l] B] [TopologicalSpace B]
+        [IsModuleTopology ℚ_[l] B] [IsTopologicalRing B] [Algebra ℤ_[l] B]
+        [IsScalarTower ℤ_[l] ℚ_[l] B] [Algebra E B] [IsScalarTower ℚ_[l] E B] (π : B →ₐ[E] E)
+        (hπ : ∀ a, π a = 0 → IsNilpotent a) (χ : G →* Bˣ),
+      Continuous (fun g => (χ g : B))
+        → ∀ w : ℤ,
+          1 ≤ w → (∀ g, φ g ∈ Iq l → χ g = cycA l l B (φ g) ^ w)
+            → ∀ σ : G,
+              ((Iq l).comap φ ⊔ Subgroup.zpowers σ).topologicalClosure = ⊤
+                → Ideal.span (Set.range fun g => (χ g : B) - (cycA l l B (φ g) : B))
+                  = (if w = 1 then Ideal.span {(χ σ : B) - (cycA l l B (φ σ) : B)} else ⊤) := by
   intro l _ G _ _ _ φ hφ E _ _ _ _ _ B _ _ _ _ _ _ _ _ _ _ π hπ χ hχ w hw hI σ hσ
-  have hA : ∀ g : GQ l, (cycA l l B g : B) = algebraMap ℚ_[l] B (((cyc l l g : ℤ_[l]ˣ) : ℤ_[l]) : ℚ_[l]) := fun g =>
+  have hA
+      : ∀ g : GQ l,
+        (cycA l l B g : B) = algebraMap ℚ_[l] B (((cyc l l g : ℤ_[l]ˣ) : ℤ_[l]) : ℚ_[l]) := fun g =>
     IsScalarTower.algebraMap_apply ℤ_[l] ℚ_[l] B _
   split_ifs with h1
   · subst h1
@@ -33,15 +53,16 @@ theorem span_range_sub_cyc : ∀ {l : ℕ} [Fact l.Prime] {G : Type} [Group G] [
       have h0 : Continuous (algebraMap ℚ_[l] B) :=
         IsModuleTopology.continuous_of_linearMap (Algebra.linearMap ℚ_[l] B)
       have h2 : Continuous fun x : ℤ_[l] => (x : ℚ_[l]) := continuous_subtype_val
-      exact h0.comp (h2.comp (Units.continuous_val.comp
-        ((UpperTheory.V.Loc.cycFacts l l).1.comp hφ.continuous)))
+      exact h0.comp (h2.comp (Units.continuous_val.comp ((UpperTheory.V.Loc.cycFacts l l).1.comp
+        hφ.continuous)))
     let q : Bˣ →* (B ⧸ J)ˣ := Units.map (Ideal.Quotient.mk J : B →* B ⧸ J)
     let H : Subgroup G := (q.comp χ).eqLocus (q.comp ((cycA l l B).comp φ))
     have hH : ∀ g, g ∈ H ↔ (χ g : B) - (cycA l l B (φ g) : B) ∈ J := fun g => by
       rw [← Ideal.Quotient.eq]
       exact Units.ext_iff
     have hcl : IsClosed (H : Set G) := by
-      have : (H : Set G) = (fun g => (χ g : B) - (cycA l l B (φ g) : B)) ⁻¹' (J : Set B) := Set.ext hH
+      have : (H : Set G) = (fun g => (χ g : B) - (cycA l l B (φ g) : B)) ⁻¹' (J : Set B) :=
+        Set.ext hH
       rw [this]
       exact (isClosed_ideal (l := l) J).preimage (hχ.sub hε)
     have hle : (Iq l).comap φ ⊔ Subgroup.zpowers σ ≤ H := by

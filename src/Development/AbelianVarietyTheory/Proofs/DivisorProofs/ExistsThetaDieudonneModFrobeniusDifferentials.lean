@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DieudonneFun
 
 @[expose] public section
 
-open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Dieu
+open CategoryTheory TensorProduct Coalgebra Bialgebra GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Dieu
 
 set_option autoImplicit false
 
@@ -18,29 +19,34 @@ noncomputable section
 
 namespace GlobalTheory.Dieu.Theory
 
-variable {p : ℕ} [Fact p.Prime] (T : GlobalTheory.Dieu.Theory p)
+variable
+  {p : ℕ} [Fact p.Prime]
+  (T : GlobalTheory.Dieu.Theory p)
   {k : Type} [Field k] [CharP k p] [PerfectRing k p]
 
 def redVToRange (G : PDivGroup p k) : T.M G →+ LinearMap.range G.rigOfOmega :=
   AddMonoidHom.codRestrict ((T.red G).toAddMonoidHom.comp (T.V G).toAddMonoidHom)
-    (LinearMap.range G.rigOfOmega) fun m =>
-      ((GlobalTheory.T.dieudonne_hodgeFiltration_perfectField p T k G).1 (T.red G (T.V G m))).1 ⟨m, rfl⟩
+    (LinearMap.range G.rigOfOmega)
+    fun m =>
+      ((GlobalTheory.T.dieudonne_hodgeFiltration_perfectField p T k G).1 (T.red G (T.V G m))).1
+        ⟨m, rfl⟩
 
 def theta (G : PDivGroup p k) : T.M G →+ G.omega :=
-  (LinearEquiv.ofInjective G.rigOfOmega (GlobalTheory.T.dieudonne_hodgeFiltration_perfectField p T k G).2.2.2).symm.toLinearMap.toAddMonoidHom.comp
-    (T.redVToRange G)
+  (LinearEquiv.ofInjective G.rigOfOmega
+    (GlobalTheory.T.dieudonne_hodgeFiltration_perfectField p T k
+      G).2.2.2).symm.toLinearMap.toAddMonoidHom.comp (T.redVToRange G)
 
-theorem rigOfOmega_theta (G : PDivGroup p k) (m : T.M G) :
-    G.rigOfOmega (T.theta G m) = T.red G (T.V G m) := by
+theorem rigOfOmega_theta (G : PDivGroup p k) (m : T.M G)
+    : G.rigOfOmega (T.theta G m) = T.red G (T.V G m) := by
   have inj := (GlobalTheory.T.dieudonne_hodgeFiltration_perfectField p T k G).2.2.2
   exact LinearEquiv.ofInjective_symm_apply G.rigOfOmega (h := inj) (T.redVToRange G m)
 
-theorem theta_spec (G : PDivGroup p k) :
-    (∀ m, G.rigOfOmega (T.theta G m) = T.red G (T.V G m)) ∧ Function.Surjective (T.theta G) ∧
-      (∀ m, T.theta G m = 0 ↔ ∃ n, m = T.F G n) ∧
-      (∀ (a : WittVector p k) (m : T.M G), T.theta G (WittVector.frobenius a • m) =
-        WittVector.constantCoeff a • T.theta G m) ∧
-      ∀ (H : PDivGroup p k) (f : G ⟶ H) (m : T.M H),
+theorem theta_spec (G : PDivGroup p k)
+    : (∀ m, G.rigOfOmega (T.theta G m) = T.red G (T.V G m)) ∧ Function.Surjective (T.theta G)
+      ∧ (∀ m, T.theta G m = 0 ↔ ∃ n, m = T.F G n)
+      ∧ (∀ (a : WittVector p k) (m : T.M G),
+        T.theta G (WittVector.frobenius a • m) = WittVector.constantCoeff a • T.theta G m)
+      ∧ ∀ (H : PDivGroup p k) (f : G ⟶ H) (m : T.M H),
         T.theta G (T.map f m) = omegaMap G H f (T.theta H m) := by
   have hG := GlobalTheory.T.dieudonne_hodgeFiltration_perfectField p T k G
   have inj := hG.2.2.2
@@ -48,9 +54,10 @@ theorem theta_spec (G : PDivGroup p k) :
   · obtain ⟨m, hm⟩ := (hG.1 (G.rigOfOmega w)).2 ⟨w, rfl⟩
     exact ⟨m, inj ((T.rigOfOmega_theta G m).trans hm)⟩
   · calc
-      T.theta G m = 0 ↔ G.rigOfOmega (T.theta G m) = 0 :=
-        ⟨fun h => (congrArg G.rigOfOmega h).trans (map_zero G.rigOfOmega),
-          fun h => inj (h.trans (map_zero G.rigOfOmega).symm)⟩
+      T.theta G m = 0 ↔ G.rigOfOmega (T.theta G m) = 0 := ⟨
+        fun h => (congrArg G.rigOfOmega h).trans (map_zero G.rigOfOmega),
+        fun h => inj (h.trans (map_zero G.rigOfOmega).symm)
+      ⟩
       _ ↔ ∃ n, m = T.F G n := (congrArg (· = 0) (T.rigOfOmega_theta G m)).to_iff.trans (hG.2.1 m)
   · apply inj
     have hV : T.V G (WittVector.frobenius a • m) = a • T.V G m := by
@@ -67,14 +74,14 @@ theorem theta_spec (G : PDivGroup p k) :
 
 end GlobalTheory.Dieu.Theory
 
-theorem GlobalTheory.Dieu.theta_exists :
-    ∀ (p : ℕ) [Fact p.Prime] (T : GlobalTheory.Dieu.Theory p) (k : Type)
-      [Field k] [CharP k p] [PerfectRing k p],
+theorem GlobalTheory.Dieu.theta_exists
+    : ∀ (p : ℕ) [Fact p.Prime] (T : GlobalTheory.Dieu.Theory p) (k : Type) [Field k] [CharP k p]
+        [PerfectRing k p],
       ∃ θ : ∀ G : PDivGroup p k, T.M G →+ G.omega, ∀ G : PDivGroup p k,
-        (∀ m, G.rigOfOmega (θ G m) = T.red G (T.V G m)) ∧ Function.Surjective (θ G) ∧
-        (∀ m, θ G m = 0 ↔ ∃ n, m = T.F G n) ∧
-        (∀ (a : WittVector p k) (m : T.M G),
-          θ G (WittVector.frobenius a • m) = WittVector.constantCoeff a • θ G m) ∧
-        ∀ (H : PDivGroup p k) (f : G ⟶ H) (m : T.M H),
-          θ G (T.map f m) = omegaMap G H f (θ H m) :=
-  fun _ _ T _ _ _ _ => ⟨fun G => T.theta G, fun G => T.theta_spec G⟩
+        (∀ m, G.rigOfOmega (θ G m) = T.red G (T.V G m)) ∧ Function.Surjective (θ G)
+          ∧ (∀ m, θ G m = 0 ↔ ∃ n, m = T.F G n)
+          ∧ (∀ (a : WittVector p k) (m : T.M G),
+            θ G (WittVector.frobenius a • m) = WittVector.constantCoeff a • θ G m)
+          ∧ ∀ (H : PDivGroup p k) (f : G ⟶ H) (m : T.M H),
+            θ G (T.map f m) = omegaMap G H f (θ H m) := fun _ _ T _ _ _ _ =>
+  ⟨fun G => T.theta G, fun G => T.theta_spec G⟩

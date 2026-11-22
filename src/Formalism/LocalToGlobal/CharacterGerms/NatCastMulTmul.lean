@@ -17,26 +17,27 @@ section T
 
 variable {l : ℕ} [Fact l.Prime] {OE : Type} [CommRing OE]
 
-theorem tauX_tmul {R : Type} [CommRing R] [Algebra ℤ_[l] R] (τ : OE →+* R) (z : ℤ_[l]) (x : OE) :
-    tauX τ (z ⊗ₜ x) = algebraMap ℤ_[l] R z * τ x := by
+theorem tauX_tmul {R : Type} [CommRing R] [Algebra ℤ_[l] R] (τ : OE →+* R) (z : ℤ_[l]) (x : OE)
+    : tauX τ (z ⊗ₜ x) = algebraMap ℤ_[l] R z * τ x := by
   simp [tauX]
 
 theorem natCast_eq_tmul (k : ℕ) : ((k : ℕ) : ℤ_[l] ⊗[ℤ] OE) = (k : ℤ_[l]) ⊗ₜ (1 : OE) := by
   induction k with
   | zero => simp
-  | succ k ih => rw [Nat.cast_succ, ih, Nat.cast_succ, TensorProduct.add_tmul, Algebra.TensorProduct.one_def]
+  | succ k ih =>
+    rw [Nat.cast_succ, ih, Nat.cast_succ, TensorProduct.add_tmul, Algebra.TensorProduct.one_def]
 
 theorem natCast_tmul (k : ℕ) (y : OE) : (k : ℤ_[l]) ⊗ₜ[ℤ] y = (1 : ℤ_[l]) ⊗ₜ[ℤ] ((k : OE) * y) := by
   have h1 : (k : ℤ_[l]) = (k : ℤ) • (1 : ℤ_[l]) := by simp
   have h2 : ((k : OE) * y) = (k : ℤ) • y := by simp
   rw [h1, h2, TensorProduct.smul_tmul]
 
-theorem natCast_mul_tmul (k : ℕ) (z : ℤ_[l]) (y : OE) :
-    ((k : ℕ) : ℤ_[l] ⊗[ℤ] OE) * (z ⊗ₜ y) = ((k : ℤ_[l]) * z) ⊗ₜ y := by
+theorem natCast_mul_tmul (k : ℕ) (z : ℤ_[l]) (y : OE)
+    : ((k : ℕ) : ℤ_[l] ⊗[ℤ] OE) * (z ⊗ₜ y) = ((k : ℤ_[l]) * z) ⊗ₜ y := by
   rw [natCast_eq_tmul, Algebra.TensorProduct.tmul_mul_tmul, one_mul]
 
-theorem decomp (s : ℤ_[l] ⊗[ℤ] OE) :
-    ∃ (x : OE) (s' : ℤ_[l] ⊗[ℤ] OE), s = 1 ⊗ₜ x + ((l : ℕ) : ℤ_[l] ⊗[ℤ] OE) * s' := by
+theorem decomp (s : ℤ_[l] ⊗[ℤ] OE)
+    : ∃ (x : OE) (s' : ℤ_[l] ⊗[ℤ] OE), s = 1 ⊗ₜ x + ((l : ℕ) : ℤ_[l] ⊗[ℤ] OE) * s' := by
   induction s using TensorProduct.induction_on with
   | zero => exact ⟨0, 0, by simp⟩
   | tmul z y =>
@@ -54,11 +55,12 @@ theorem decomp (s : ℤ_[l] ⊗[ℤ] OE) :
     rw [hs, ht, TensorProduct.tmul_add]
     ring
 
-theorem completeA [Module.Free ℤ OE] [Module.Finite ℤ OE] :
-    IsAdicComplete (Ideal.span {((l : ℕ) : ℤ_[l] ⊗[ℤ] OE)}) (ℤ_[l] ⊗[ℤ] OE) := by
+theorem completeA [Module.Free ℤ OE] [Module.Finite ℤ OE]
+    : IsAdicComplete (Ideal.span {((l : ℕ) : ℤ_[l] ⊗[ℤ] OE)}) (ℤ_[l] ⊗[ℤ] OE) := by
   classical
-  have key : ∀ (A : Type) [CommRing A] (a x : A) (n : ℕ),
-      x ∈ (Ideal.span {a} ^ n • ⊤ : Submodule A A) ↔ ∃ s, x = a ^ n * s := by
+  have key
+      : ∀ (A : Type) [CommRing A] (a x : A) (n : ℕ),
+        x ∈ (Ideal.span {a} ^ n • ⊤ : Submodule A A) ↔ ∃ s, x = a ^ n * s := by
     intro A _ a x n
     rw [Ideal.span_singleton_pow, Submodule.ideal_span_singleton_smul,
       Submodule.mem_smul_pointwise_iff_exists]
@@ -68,12 +70,15 @@ theorem completeA [Module.Free ℤ OE] [Module.Finite ℤ OE] :
     · rintro ⟨s, hs⟩
       exact ⟨s, Submodule.mem_top, by rw [hs, smul_eq_mul]⟩
   let bR := Algebra.TensorProduct.basis ℤ_[l] (Module.Free.chooseBasis ℤ OE)
-  have hl : ∀ (n : ℕ) (s : ℤ_[l] ⊗[ℤ] OE),
-      ((l : ℕ) : ℤ_[l] ⊗[ℤ] OE) ^ n * s = ((l : ℤ_[l]) ^ n) • s := by
+  have hl
+      : ∀ (n : ℕ) (s : ℤ_[l] ⊗[ℤ] OE),
+        ((l : ℕ) : ℤ_[l] ⊗[ℤ] OE) ^ n * s = ((l : ℤ_[l]) ^ n) • s := by
     intro n s
     rw [Algebra.smul_def, map_pow, map_natCast]
-  have hcoord : ∀ (n : ℕ) (x : ℤ_[l] ⊗[ℤ] OE),
-      (∃ s, x = ((l : ℕ) : ℤ_[l] ⊗[ℤ] OE) ^ n * s) ↔ ∀ i, ∃ c, bR.repr x i = (l : ℤ_[l]) ^ n * c := by
+  have hcoord
+      : ∀ (n : ℕ) (x : ℤ_[l] ⊗[ℤ] OE),
+        (∃ s, x = ((l : ℕ) : ℤ_[l] ⊗[ℤ] OE) ^ n * s)
+          ↔ ∀ i, ∃ c, bR.repr x i = (l : ℤ_[l]) ^ n * c := by
     intro n x
     constructor
     · rintro ⟨s, rfl⟩ i
@@ -89,8 +94,12 @@ theorem completeA [Module.Free ℤ OE] [Module.Finite ℤ OE] :
   have hZ : IsAdicComplete (Ideal.span {((l : ℕ) : ℤ_[l])}) ℤ_[l] := by
     rw [← PadicInt.maximalIdeal_eq_span_p]
     infer_instance
-  have haus : ∀ x : ℤ_[l] ⊗[ℤ] OE, (∀ n : ℕ, x ≡ 0 [SMOD (Ideal.span {((l : ℕ) : ℤ_[l] ⊗[ℤ] OE)} ^ n • ⊤ :
-      Submodule (ℤ_[l] ⊗[ℤ] OE) (ℤ_[l] ⊗[ℤ] OE))]) → x = 0 := by
+  have haus
+      : ∀ x : ℤ_[l] ⊗[ℤ] OE,
+        (∀ n : ℕ,
+            x ≡ 0 [SMOD (Ideal.span {((l : ℕ) : ℤ_[l] ⊗[ℤ] OE)} ^ n • ⊤ :
+              Submodule (ℤ_[l] ⊗[ℤ] OE) (ℤ_[l] ⊗[ℤ] OE))])
+          → x = 0 := by
     intro x hx
     apply bR.repr.injective
     apply Finsupp.ext
@@ -102,13 +111,20 @@ theorem completeA [Module.Free ℤ OE] [Module.Finite ℤ OE] :
     have h := hx n
     rw [SModEq.sub_mem, sub_zero, key, hcoord] at h
     exact h i
-  have prec : ∀ f : ℕ → ℤ_[l] ⊗[ℤ] OE, (∀ {m n : ℕ}, m ≤ n → f m ≡ f n
-      [SMOD (Ideal.span {((l : ℕ) : ℤ_[l] ⊗[ℤ] OE)} ^ m • ⊤ : Submodule (ℤ_[l] ⊗[ℤ] OE) (ℤ_[l] ⊗[ℤ] OE))]) →
-      ∃ L, ∀ n, f n ≡ L [SMOD (Ideal.span {((l : ℕ) : ℤ_[l] ⊗[ℤ] OE)} ^ n • ⊤ :
-        Submodule (ℤ_[l] ⊗[ℤ] OE) (ℤ_[l] ⊗[ℤ] OE))] := by
+  have prec
+      : ∀ f : ℕ → ℤ_[l] ⊗[ℤ] OE,
+        (∀ {m n : ℕ},
+            m ≤ n
+              → f m ≡ f n
+                [SMOD (Ideal.span {((l : ℕ) : ℤ_[l] ⊗[ℤ] OE)} ^ m • ⊤ : Submodule (ℤ_[l] ⊗[ℤ] OE) (ℤ_[l] ⊗[ℤ] OE))])
+          → ∃ L, ∀ n,
+            f n ≡ L [SMOD (Ideal.span {((l : ℕ) : ℤ_[l] ⊗[ℤ] OE)} ^ n • ⊤ :
+              Submodule (ℤ_[l] ⊗[ℤ] OE) (ℤ_[l] ⊗[ℤ] OE))] := by
     intro f hf
-    have hci : ∀ i, ∃ Li : ℤ_[l], ∀ n, bR.repr (f n) i ≡ Li
-        [SMOD (Ideal.span {((l : ℕ) : ℤ_[l])} ^ n • ⊤ : Submodule ℤ_[l] ℤ_[l])] := by
+    have hci
+        : ∀ i, ∃ Li : ℤ_[l], ∀ n,
+          bR.repr (f n) i ≡ Li
+            [SMOD (Ideal.span {((l : ℕ) : ℤ_[l])} ^ n • ⊤ : Submodule ℤ_[l] ℤ_[l])] := by
       intro i
       apply hZ.toIsPrecomplete.prec
       intro m n hmn
@@ -138,46 +154,51 @@ theorem chi_apply (τ : OE →+* R) (s : ℤ_[l] ⊗[ℤ] OE) : chi τ s = resid
 theorem chi_one_tmul (τ : OE →+* R) (x : OE) : chi τ ((1 : ℤ_[l]) ⊗ₜ[ℤ] x) = residue R (τ x) := by
   rw [chi_apply, tauX_tmul, map_one, one_mul]
 
-theorem chi_l (hl : ((l : ℕ) : R) ∈ maximalIdeal R) (τ : OE →+* R) (s : ℤ_[l] ⊗[ℤ] OE) :
-    chi τ (((l : ℕ) : ℤ_[l] ⊗[ℤ] OE) * s) = 0 := by
+theorem chi_l (hl : ((l : ℕ) : R) ∈ maximalIdeal R) (τ : OE →+* R) (s : ℤ_[l] ⊗[ℤ] OE)
+    : chi τ (((l : ℕ) : ℤ_[l] ⊗[ℤ] OE) * s) = 0 := by
   have hl0 : ((l : ℕ) : ResidueField R) = 0 := by
     rw [← map_natCast (residue R), residue_eq_zero_iff]
     exact hl
   rw [map_mul, map_natCast, hl0, zero_mul]
 
-theorem chi_alg (τ : OE →+* R) (r : ℤ_[l]) :
-    chi τ (algebraMap ℤ_[l] (ℤ_[l] ⊗[ℤ] OE) r) = ((residue R).comp (algebraMap ℤ_[l] R)) r := by
+theorem chi_alg (τ : OE →+* R) (r : ℤ_[l])
+    : chi τ (algebraMap ℤ_[l] (ℤ_[l] ⊗[ℤ] OE) r) = ((residue R).comp (algebraMap ℤ_[l] R)) r := by
   rw [chi_apply, AlgHom.commutes]
   rfl
 
 variable {d : ℕ} [NeZero d] (em : ZMod d → OE →+* R)
 
-theorem res_frob (hfrob : ∀ a x, em (a + 1) x - em a x ^ l ∈ maximalIdeal R) (a : ZMod d) (x : OE) :
-    residue R (em (a + 1) x) = residue R (em a x) ^ l := by
+theorem res_frob (hfrob : ∀ a x, em (a + 1) x - em a x ^ l ∈ maximalIdeal R) (a : ZMod d) (x : OE)
+    : residue R (em (a + 1) x) = residue R (em a x) ^ l := by
   have h := (residue_eq_zero_iff _).mpr (hfrob a x)
   rw [map_sub, map_pow, sub_eq_zero] at h
   exact h
 
-theorem res_frob_pow (hfrob : ∀ a x, em (a + 1) x - em a x ^ l ∈ maximalIdeal R) (a : ZMod d) (x : OE) :
-    ∀ k : ℕ, residue R (em (a + (k : ZMod d)) x) = residue R (em a x) ^ (l ^ k) := by
+theorem res_frob_pow
+    (hfrob : ∀ a x, em (a + 1) x - em a x ^ l ∈ maximalIdeal R) (a : ZMod d) (x : OE)
+    : ∀ k : ℕ, residue R (em (a + (k : ZMod d)) x) = residue R (em a x) ^ (l ^ k) := by
   intro k
   induction k with
   | zero => simp
-  | succ k ih =>
-    rw [Nat.cast_succ, ← add_assoc, res_frob em hfrob, ih, ← pow_mul, Nat.pow_succ l k]
+  | succ k ih => rw [Nat.cast_succ, ← add_assoc, res_frob em hfrob, ih, ← pow_mul, Nat.pow_succ l k]
 
-theorem mem_all (hfrob : ∀ a x, em (a + 1) x - em a x ^ l ∈ maximalIdeal R) {x : OE}
-    (h : em 0 x ∈ maximalIdeal R) (a : ZMod d) : em a x ∈ maximalIdeal R := by
+theorem mem_all
+    (hfrob : ∀ a x, em (a + 1) x - em a x ^ l ∈ maximalIdeal R)
+    {x : OE} (h : em 0 x ∈ maximalIdeal R)
+    (a : ZMod d)
+    : em a x ∈ maximalIdeal R := by
   have hk := res_frob_pow em hfrob 0 x a.val
   rw [zero_add, ZMod.natCast_zmod_val] at hk
   rw [← residue_eq_zero_iff, hk, (residue_eq_zero_iff _).mpr h,
     zero_pow (pow_ne_zero _ (Fact.out : l.Prime).ne_zero)]
 
-theorem key (hl : ((l : ℕ) : R) ∈ maximalIdeal R)
-    (hfrob : ∀ a x, em (a + 1) x - em a x ^ l ∈ maximalIdeal R) {ε : OE}
-    (hε : ∀ x : OE, (∀ a, em a x ∈ maximalIdeal R) → ∃ y, ε * x = (l : OE) * y)
-    {e z : ℤ_[l] ⊗[ℤ] OE} (he : e - 1 ⊗ₜ ε = ((l : ℕ) : ℤ_[l] ⊗[ℤ] OE) * z) {s : ℤ_[l] ⊗[ℤ] OE}
-    (hs : e * s = s) (h0 : chi (em 0) s = 0) : ∃ w, s = ((l : ℕ) : ℤ_[l] ⊗[ℤ] OE) * w := by
+theorem key
+    (hl : ((l : ℕ) : R) ∈ maximalIdeal R)
+    (hfrob : ∀ a x, em (a + 1) x - em a x ^ l ∈ maximalIdeal R)
+    {ε : OE} (hε : ∀ x : OE, (∀ a, em a x ∈ maximalIdeal R) → ∃ y, ε * x = (l : OE) * y)
+    {e z : ℤ_[l] ⊗[ℤ] OE} (he : e - 1 ⊗ₜ ε = ((l : ℕ) : ℤ_[l] ⊗[ℤ] OE) * z)
+    {s : ℤ_[l] ⊗[ℤ] OE} (hs : e * s = s) (h0 : chi (em 0) s = 0)
+    : ∃ w, s = ((l : ℕ) : ℤ_[l] ⊗[ℤ] OE) * w := by
   obtain ⟨x, s', hs'⟩ := decomp s
   have hx0 : em 0 x ∈ maximalIdeal R := by
     rw [hs', map_add (f := _), chi_one_tmul, chi_l hl, add_zero, residue_eq_zero_iff] at h0

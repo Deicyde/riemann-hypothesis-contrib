@@ -13,9 +13,13 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Unfolding
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField MeasureTheory Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.RowUnf GlobalTheory.RowChain GlobalTheory.SeeSaw GlobalTheory.RowVal GlobalTheory.RowReal
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField MeasureTheory Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.RowUnf
+  GlobalTheory.RowChain GlobalTheory.SeeSaw GlobalTheory.RowVal GlobalTheory.RowReal
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
@@ -31,18 +35,24 @@ theorem circ_id (A B A' B' : Circle) : A'⁻¹ * B' = (A⁻¹ * B) * ((A' * A⁻
   simp only [Circle.coe_mul, Circle.coe_inv]
   field_simp
 
-
 set_option maxHeartbeats 1600000 in
 theorem vacTw : Big fun ch => VacTw ch := by
-  obtain ⟨C, h⟩ := Big.and (Big.and GlobalTheory.T.exists_vacuumBasePointFamily_every_tuple GlobalTheory.T.vacuumBasePoint_unique_all_tuples) (Big.and GlobalTheory.T.twistCharacter_mem_twistFiniteValueProductSubgroup GlobalTheory.T.unfoldingJointData_twist_ratio_at_detRoots)
+  obtain ⟨C, h⟩ :=
+    Big.and
+      (Big.and GlobalTheory.T.exists_vacuumBasePointFamily_every_tuple
+        GlobalTheory.T.vacuumBasePoint_unique_all_tuples)
+      (Big.and GlobalTheory.T.twistCharacter_mem_twistFiniteValueProductSubgroup
+        GlobalTheory.T.unfoldingJointData_twist_ratio_at_detRoots)
   refine ⟨C, fun ε CF hC => ?_⟩
   obtain ⟨x₀, h⟩ := h ε CF hC
   refine ⟨x₀, fun D large₂ he hx Γ _ _ Pl0 T A Ks _ _ _ R F s ch hi ha => ?_⟩
   obtain ⟨⟨hex, hun⟩, hxv, hcon⟩ := h D large₂ he hx Γ Pl0 T A Ks R F s ch hi ha
   have hL := s.core.lev
   classical
-  let xr : ∀ k, GA D (ch.G.V (.grid D.R.m k)) → (AE D)ˣ := fun k g => (GlobalTheory.RecDict.exists_isDetRoot D _ g).choose
-  have hxr : ∀ k g, IsDetRoot _ g (xr k g) := fun k g => (GlobalTheory.RecDict.exists_isDetRoot D _ g).choose_spec
+  let xr : ∀ k, GA D (ch.G.V (.grid D.R.m k)) → (AE D)ˣ := fun k g =>
+    (GlobalTheory.RecDict.exists_isDetRoot D _ g).choose
+  have hxr : ∀ k g, IsDetRoot _ g (xr k g) := fun k g =>
+    (GlobalTheory.RecDict.exists_isDetRoot D _ g).choose_spec
   let bb : T → Pts ch.G := fun t => (hex t).choose
   have hbb : ∀ t, IsBase t ch.S.B (bb t) := fun t => (hex t).choose_spec
   let w : T → ℕ → Circle := fun t j =>
@@ -70,10 +80,15 @@ theorem vacTw : Big fun ch => VacTw ch := by
   congr 1
   obtain ⟨n, hn0, hn⟩ := hL.xi_fin t
   obtain ⟨n', hn0', hn'⟩ := hL.xi_fin t'
-  have h1 : ∀ k, R.toLevCh.xi t (y k) = 1 := fun k => GlobalTheory.TupRoot.eq_one_of_finPart (hL.xi t) hn0 hn _ (hy1 k)
-  have h1' : ∀ k, R.toLevCh.xi t' (y k) = 1 := fun k => GlobalTheory.TupRoot.eq_one_of_finPart (hL.xi t') hn0' hn' _ (hy1 k)
-  have hw : w t' j = w t j * (((R.toLevCh.xi t' * (R.toLevCh.xi t)⁻¹) (y j * xr j (bb t j)))⁻¹ *
-      (R.toLevCh.xi t' * (R.toLevCh.xi t)⁻¹) (y (j + 2) * xr (j + 2) (bb t (j + 2)))) := by
+  have h1 : ∀ k, R.toLevCh.xi t (y k) = 1 := fun k =>
+    GlobalTheory.TupRoot.eq_one_of_finPart (hL.xi t) hn0 hn _ (hy1 k)
+  have h1' : ∀ k, R.toLevCh.xi t' (y k) = 1 := fun k =>
+    GlobalTheory.TupRoot.eq_one_of_finPart (hL.xi t') hn0' hn' _ (hy1 k)
+  have hw
+      : w t' j
+        = w t j
+          * (((R.toLevCh.xi t' * (R.toLevCh.xi t)⁻¹) (y j * xr j (bb t j)))⁻¹
+            * (R.toLevCh.xi t' * (R.toLevCh.xi t)⁻¹) (y (j + 2) * xr (j + 2) (bb t (j + 2)))) := by
     simp only [w, e3, MonoidHom.mul_apply, MonoidHom.inv_apply, map_mul, h1, h1', inv_one, one_mul]
     exact circ_id _ _ _ _
   show ((Circle.toUnits (w t' j) : ℂˣ) : ℂ) = ((Circle.toUnits (w t j) : ℂˣ) : ℂ) * _

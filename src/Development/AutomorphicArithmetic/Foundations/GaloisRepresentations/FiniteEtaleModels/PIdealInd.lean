@@ -22,8 +22,7 @@ theorem idealInd_holds : IdealInd := by
     rcases Nat.eq_zero_or_pos i with rfl | hi
     · rw [pow_zero, Ideal.one_eq_top]
       exact htop
-    · have hmax : w.IsMaximal :=
-        (Ideal.isPrime_of_prime hp).isMaximal hp.ne_zero
+    · have hmax : w.IsMaximal := (Ideal.isPrime_of_prime hp).isMaximal hp.ne_zero
       exact hpow w i hmax (hQ w hmax (Ideal.pow_le_self hi.ne'))
   | hcp hxy hx hy =>
     rename_i x y
@@ -32,8 +31,7 @@ theorem idealInd_holds : IdealInd := by
     have hy0 : y ≠ ⊥ := fun h => hne (by rw [h]; exact Ideal.mul_bot x)
     have hsup : x ⊔ y = ⊤ :=
       Ideal.isUnit_iff.1 (hxy (Ideal.dvd_iff_le.2 le_sup_left) (Ideal.dvd_iff_le.2 le_sup_right))
-    exact hmul x y hsup
-      (hx hx0 fun w hw hle => hQ w hw (Ideal.mul_le_left.trans hle))
+    exact hmul x y hsup (hx hx0 fun w hw hle => hQ w hw (Ideal.mul_le_left.trans hle))
       (hy hy0 fun w hw hle => hQ w hw (Ideal.mul_le_right.trans hle))
 
 end UpperTheory.Gal.FiniteEtaleModels

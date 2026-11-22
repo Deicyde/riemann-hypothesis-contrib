@@ -6,7 +6,8 @@ public import CompanionTheory.EightfoldTheory.VariationTheory.AutomorphicForms.N
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory.EisM
@@ -60,16 +61,24 @@ theorem repL_LRep : ∀ L q : ℕ, q.Prime → ¬ q ∣ L → LRep L (DT L q) (r
     have e11 := congrFun (congrFun h 1) 1
     have hq0' : q ≠ 0 := hq.ne_zero
     have hq1 : ¬ (q : ℤ) ∣ 1 := hqZ.not_dvd_one
-    rcases i with _ | j <;> rcases i' with _ | j' <;>
-      simp [repL, Matrix.mul_apply, Fin.sum_univ_two, hq0'] at e00 e01 e10 e11
+    rcases i with _ | j <;> rcases i' with _ | j'
+      <;> simp [repL, Matrix.mul_apply, Fin.sum_univ_two, hq0'] at e00 e01 e10 e11
     · refine Prod.ext (Subtype.ext (Matrix.SpecialLinearGroup.ext _ _ fun i j => ?_)) rfl
       fin_cases i <;> fin_cases j <;> simp <;> assumption
-    · exact absurd (Dvd.intro (((γ' : SL(2, ℤ)) : M2) 0 0 * ((γ : SL(2, ℤ)) : M2) 1 1 -
-          ((γ : SL(2, ℤ)) : M2) 0 1 * ((γ' : SL(2, ℤ)) : M2) 1 0)
-        (by linear_combination hd' + ((γ' : SL(2, ℤ)) : M2) 0 0 * e11 - ((γ' : SL(2, ℤ)) : M2) 1 0 * e01)) hq1
-    · exact absurd (Dvd.intro (((γ : SL(2, ℤ)) : M2) 0 0 * ((γ' : SL(2, ℤ)) : M2) 1 1 -
-          ((γ' : SL(2, ℤ)) : M2) 0 1 * ((γ : SL(2, ℤ)) : M2) 1 0)
-        (by linear_combination hd - ((γ : SL(2, ℤ)) : M2) 0 0 * e11 + ((γ : SL(2, ℤ)) : M2) 1 0 * e01)) hq1
+    · exact absurd
+        (Dvd.intro
+          (((γ' : SL(2, ℤ)) : M2) 0 0 * ((γ : SL(2, ℤ)) : M2) 1 1
+            - ((γ : SL(2, ℤ)) : M2) 0 1 * ((γ' : SL(2, ℤ)) : M2) 1 0)
+          (by
+            linear_combination hd' + ((γ' : SL(2, ℤ)) : M2) 0 0 * e11 - ((γ' : SL(2, ℤ)) : M2) 1 0 * e01))
+        hq1
+    · exact absurd
+        (Dvd.intro
+          (((γ : SL(2, ℤ)) : M2) 0 0 * ((γ' : SL(2, ℤ)) : M2) 1 1
+            - ((γ' : SL(2, ℤ)) : M2) 0 1 * ((γ : SL(2, ℤ)) : M2) 1 0)
+          (by
+            linear_combination hd - ((γ : SL(2, ℤ)) : M2) 0 0 * e11 + ((γ : SL(2, ℤ)) : M2) 1 0 * e01))
+        hq1
     · have h0 : (q : ℤ) ∣ (L : ℤ) * ((j : ℕ) - (j' : ℕ) : ℤ) * ((γ : SL(2, ℤ)) : M2) 0 1 :=
         Dvd.intro (((γ' : SL(2, ℤ)) : M2) 0 0 - ((γ : SL(2, ℤ)) : M2) 0 0)
           (by linear_combination -e00 + ((L : ℤ) * ((j' : ℕ) : ℤ)) * e01)
@@ -112,28 +121,35 @@ theorem repL_LRep : ∀ L q : ℕ, q.Prime → ¬ q ∣ L → LRep L (DT L q) (r
         simpa [g] using this
       refine ⟨(⟨g, hg⟩, none), trivial, ?_⟩
       ext i k
-      fin_cases i <;> fin_cases k <;> simp [g, repL, Matrix.mul_apply, Fin.sum_univ_two, hb, hd] <;> ring
-    · have hu : ∃ u : ZMod q, ((δ 0 0 : ℤ) : ZMod q) = (L : ZMod q) * u * ((δ 0 1 : ℤ) : ZMod q) ∧
-          ((δ 1 0 : ℤ) : ZMod q) = (L : ZMod q) * u * ((δ 1 1 : ℤ) : ZMod q) := by
+      fin_cases i <;> fin_cases k <;> simp [g, repL, Matrix.mul_apply, Fin.sum_univ_two, hb, hd]
+        <;> ring
+    · have hu
+          : ∃ u : ZMod q,
+            ((δ 0 0 : ℤ) : ZMod q) = (L : ZMod q) * u * ((δ 0 1 : ℤ) : ZMod q)
+              ∧ ((δ 1 0 : ℤ) : ZMod q) = (L : ZMod q) * u * ((δ 1 1 : ℤ) : ZMod q) := by
         apply exists_kernel_param
         · rw [Ne, ZMod.natCast_eq_zero_iff]; exact hqL
         · have := congrArg (fun x : ℤ => (x : ZMod q)) hdet
           simpa using this
         · by_contra hn
           push_neg at hn
-          exact hbd ⟨(ZMod.intCast_zmod_eq_zero_iff_dvd _ _).mp hn.1,
-            (ZMod.intCast_zmod_eq_zero_iff_dvd _ _).mp hn.2⟩
+          exact hbd ⟨
+            (ZMod.intCast_zmod_eq_zero_iff_dvd _ _).mp hn.1,
+            (ZMod.intCast_zmod_eq_zero_iff_dvd _ _).mp hn.2
+          ⟩
       obtain ⟨u, hu0, hu1⟩ := hu
       set j : Fin q := ⟨u.val, ZMod.val_lt u⟩ with hjdef
       have hju : (((j : ℕ) : ℤ) : ZMod q) = u := by simp [hjdef]
       obtain ⟨x, hx⟩ : (q : ℤ) ∣ δ 0 0 - L * (j : ℕ) * δ 0 1 := by
         rw [← ZMod.intCast_zmod_eq_zero_iff_dvd]
         push_cast at hju ⊢
-        rw [hju, hu0]; ring
+        rw [hju, hu0]
+        ring
       obtain ⟨z, hz⟩ : (q : ℤ) ∣ δ 1 0 - L * (j : ℕ) * δ 1 1 := by
         rw [← ZMod.intCast_zmod_eq_zero_iff_dvd]
         push_cast at hju ⊢
-        rw [hju, hu1]; ring
+        rw [hju, hu1]
+        ring
       have hcop : IsCoprime (L : ℤ) (q : ℤ) :=
         Nat.isCoprime_iff_coprime.mpr ((Nat.Prime.coprime_iff_not_dvd hq).mpr hqL).symm
       have hLz : (L : ℤ) ∣ z := by
@@ -151,7 +167,7 @@ theorem repL_LRep : ∀ L q : ℕ, q.Prime → ¬ q ∣ L → LRep L (DT L q) (r
         simpa [g] using this
       refine ⟨(⟨g, hg⟩, some j), trivial, ?_⟩
       ext i k
-      fin_cases i <;> fin_cases k <;> simp [g, repL, Matrix.mul_apply, Fin.sum_univ_two] <;>
-        first | linear_combination -hx | linear_combination -hz
+      fin_cases i <;> fin_cases k <;> simp [g, repL, Matrix.mul_apply, Fin.sum_univ_two]
+        <;> first | linear_combination -hx | linear_combination -hz
 
 end GlobalTheory.EisM

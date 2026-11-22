@@ -18,8 +18,8 @@ variable {r : ℕ}
 
 instance fact_two_pi : Fact (0 < 2 * π) := ⟨by positivity⟩
 
-def Gm (r : ℕ) (θ : AddCircle (2 * π)) : Mt 0 r :=
-  fun i j => dgl r ((AddCircle.toCircle θ : Circle) : ℂ) i j
+def Gm (r : ℕ) (θ : AddCircle (2 * π)) : Mt 0 r := fun i j =>
+  dgl r ((AddCircle.toCircle θ : Circle) : ℂ) i j
 
 lemma toCircle_coe (s : ℝ) :
     ((AddCircle.toCircle (s : AddCircle (2 * π)) : Circle) : ℂ) = Complex.exp (s * Complex.I) := by

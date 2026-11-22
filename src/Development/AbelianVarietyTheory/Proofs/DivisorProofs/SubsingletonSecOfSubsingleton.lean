@@ -36,8 +36,8 @@ private lemma sec_eq_of_isEmpty' {R : Type} [CommRing R] (F : _root_.GlobalTheor
     ⟨⊥, Scheme.bot_mem_grothendieckTopology U, fun _ _ h => h.elim⟩
 
 open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex in
-theorem _root_.GlobalTheory.EtC.twPair_spec (q : ℕ) (i j : ℤ) :
-    _root_.GlobalTheory.EtC.IsTwPair (_root_.GlobalTheory.EtC.twPair q i j) := by
+theorem _root_.GlobalTheory.EtC.twPair_spec (q : ℕ) (i j : ℤ)
+    : _root_.GlobalTheory.EtC.IsTwPair (_root_.GlobalTheory.EtC.twPair q i j) := by
   by_cases hq : q = 0
   · subst hq
     unfold _root_.GlobalTheory.EtC.IsTwPair
@@ -48,7 +48,8 @@ theorem _root_.GlobalTheory.EtC.twPair_spec (q : ℕ) (i j : ℤ) :
     exact (_root_.GlobalTheory.EtC.TwPairUniq.main q i j).1
 
 open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex in
-theorem _root_.GlobalTheory.EtC.kumT_spec (q : ℕ) : _root_.GlobalTheory.EtC.IsKum q (_root_.GlobalTheory.EtC.kumT q) := by
+theorem _root_.GlobalTheory.EtC.kumT_spec (q : ℕ)
+    : _root_.GlobalTheory.EtC.IsKum q (_root_.GlobalTheory.EtC.kumT q) := by
   by_cases hq : q = 0
   · subst hq
     unfold _root_.GlobalTheory.EtC.IsKum
@@ -62,11 +63,14 @@ theorem _root_.GlobalTheory.EtC.kumT_spec (q : ℕ) : _root_.GlobalTheory.EtC.Is
     exact _root_.GlobalTheory.EtC.KummerSplit.isKum_kumT q
 
 open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex in
-theorem _root_.GlobalTheory.EtC.restrMap_spec {S R : Type} [CommRing S] [CommRing R] (φ : R →+* S)
-    (F : _root_.GlobalTheory.EtC.Shv S) (U : Scheme.{0}) (a : _root_.GlobalTheory.EtC.Sec F U) :
-    (_root_.GlobalTheory.EtC.restrMap φ F).app U 0
-        (_root_.GlobalTheory.EtC.Sec.map (_root_.GlobalTheory.EtC.resι S F) a) =
-      _root_.GlobalTheory.EtC.Sec.map (_root_.GlobalTheory.EtC.resι R ((_root_.GlobalTheory.EtC.restr φ).obj F))
+theorem _root_.GlobalTheory.EtC.restrMap_spec
+    {S R : Type} [CommRing S] [CommRing R]
+    (φ : R →+* S)
+    (F : _root_.GlobalTheory.EtC.Shv S) (U : Scheme.{0}) (a : _root_.GlobalTheory.EtC.Sec F U)
+    : (_root_.GlobalTheory.EtC.restrMap φ F).app U 0
+        (_root_.GlobalTheory.EtC.Sec.map (_root_.GlobalTheory.EtC.resι S F) a)
+      = _root_.GlobalTheory.EtC.Sec.map
+        (_root_.GlobalTheory.EtC.resι R ((_root_.GlobalTheory.EtC.restr φ).obj F))
         (show _root_.GlobalTheory.EtC.Sec ((_root_.GlobalTheory.EtC.restr φ).obj F) U from a) :=
   _root_.GlobalTheory.EtC.restrMap_spec' R S φ F U a
 

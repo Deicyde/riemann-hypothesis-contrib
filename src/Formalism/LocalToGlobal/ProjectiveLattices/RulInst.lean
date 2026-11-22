@@ -26,7 +26,8 @@ end
 
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
-  (Xo : Moduli Dw l) (c : Coeff l)
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {Dw : Datum H} {l : Level H} (Xo : Moduli Dw l) (c : Coeff l)
 
 end Formalism.L2.Pj

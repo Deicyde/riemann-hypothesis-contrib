@@ -10,11 +10,14 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ConsequencesO
 
 namespace GlobalTheory.DiscreteSeriesConsequences
 
-theorem of_classification : GlobalTheory.Published.DiscreteSeriesClassification → GlobalTheory.Dec.LowKMultOne ∧ GlobalTheory.Dec.DSInfChar ∧
-    GlobalTheory.Dec.DSExists ∧ GlobalTheory.Dec.DSUnique ∧ GlobalTheory.Published.DiscreteSeriesUpqExists := by
+theorem of_classification
+    : GlobalTheory.Published.DiscreteSeriesClassification
+      → GlobalTheory.Dec.LowKMultOne ∧ GlobalTheory.Dec.DSInfChar ∧ GlobalTheory.Dec.DSExists
+        ∧ GlobalTheory.Dec.DSUnique ∧ GlobalTheory.Published.DiscreteSeriesUpqExists := by
   intro h
   obtain ⟨hE, -, hU, hI, hM, -, -⟩ :=
-    GlobalTheory.ClassificationConsequences.consequences_of_dsClass (GlobalTheory.Published.discreteSeriesClassification_iff.1 h)
+    GlobalTheory.ClassificationConsequences.consequences_of_dsClass
+      (GlobalTheory.Published.discreteSeriesClassification_iff.1 h)
   exact ⟨hM, hI, hE, hU, GlobalTheory.Published.discreteSeriesUpqExists_iff_dsExists.2 hE⟩
 
 end GlobalTheory.DiscreteSeriesConsequences

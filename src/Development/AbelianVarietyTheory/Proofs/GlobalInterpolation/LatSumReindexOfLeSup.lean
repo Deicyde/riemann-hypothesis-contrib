@@ -7,14 +7,19 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.EmbHIn
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker Formalism.MainNotions Formalism.L2.Th1.H GlobalTheory.ThetaMove GlobalTheory.IndefiniteRowSideFullHecke.IndexExponentDegree
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker Formalism.MainNotions Formalism.L2.Th1.H
+  GlobalTheory.ThetaMove GlobalTheory.IndefiniteRowSideFullHecke.IndexExponentDegree
 
 namespace GlobalTheory
 
-theorem latSum_reindex_of_le_sup (E : Type) [Field E] [NumberField E] (W : Type) [AddCommGroup W] [Module (𝓞 E) W]
-    (D C As B : Submodule (𝓞 E) W) (f g : W → ℂ) (hCD : C ≤ D) (hB : ∀ t ∈ As, t ∈ B ↔ t ∈ C) (hD : D ≤ As ⊔ C)
-    (hfg : ∀ x ∈ D, ∀ t ∈ As, t - x ∈ C → f x = g t) (hg : ∀ t ∈ As, t ∉ D → g t = 0) :
-    latSum D C f = latSum As B g := by
+theorem latSum_reindex_of_le_sup
+    (E : Type) [Field E] [NumberField E]
+    (W : Type) [AddCommGroup W] [Module (𝓞 E) W]
+    (D C As B : Submodule (𝓞 E) W) (f g : W → ℂ)
+    (hCD : C ≤ D) (hB : ∀ t ∈ As, t ∈ B ↔ t ∈ C) (hD : D ≤ As ⊔ C)
+    (hfg : ∀ x ∈ D, ∀ t ∈ As, t - x ∈ C → f x = g t) (hg : ∀ t ∈ As, t ∉ D → g t = 0)
+    : latSum D C f = latSum As B g := by
   classical
   unfold latSum
   set r : (↥D ⧸ C.comap D.subtype) → ↥D :=
@@ -30,15 +35,22 @@ theorem latSum_reindex_of_le_sup (E : Type) [Field E] [NumberField E] (W : Type)
     have : a - (x : W) = -c := by rw [← h]; abel
     simpa [this] using hc
   choose τ hτ using hex
-  have keyA : ∀ t u : ↥As, (Submodule.Quotient.mk t : ↥As ⧸ B.comap As.subtype) = Submodule.Quotient.mk u ↔ (t : W) - u ∈ C := by
+  have keyA
+      : ∀ t u : ↥As,
+        (Submodule.Quotient.mk t : ↥As ⧸ B.comap As.subtype) = Submodule.Quotient.mk u
+          ↔ (t : W) - u ∈ C := by
     intro t u
     rw [Submodule.Quotient.eq, Submodule.mem_comap]
     exact hB _ (t - u).2
-  have keyD : ∀ t u : ↥D, (Submodule.Quotient.mk t : ↥D ⧸ C.comap D.subtype) = Submodule.Quotient.mk u ↔ (t : W) - u ∈ C := by
+  have keyD
+      : ∀ t u : ↥D,
+        (Submodule.Quotient.mk t : ↥D ⧸ C.comap D.subtype) = Submodule.Quotient.mk u
+          ↔ (t : W) - u ∈ C := by
     intro t u
     rw [Submodule.Quotient.eq, Submodule.mem_comap]
     rfl
-  let φ : (↥D ⧸ C.comap D.subtype) → (↥As ⧸ B.comap As.subtype) := fun z => Submodule.Quotient.mk (τ (r z))
+  let φ : (↥D ⧸ C.comap D.subtype) → (↥As ⧸ B.comap As.subtype) := fun z =>
+    Submodule.Quotient.mk (τ (r z))
   have hφ : ∀ z, (s (φ z) : W) - r z ∈ C := by
     intro z
     have h1 : (s (φ z) : W) - τ (r z) ∈ C := (keyA _ _).1 (hs' _)
@@ -54,7 +66,8 @@ theorem latSum_reindex_of_le_sup (E : Type) [Field E] [NumberField E] (W : Type)
     simpa using this
   have e1 : ∑ᶠ z, f (r z : W) = ∑ᶠ z, (fun y => g (s y : W)) (φ z) :=
     finsum_congr fun z => hfg _ (r z).2 _ (s (φ z)).2 (hφ z)
-  rw [e1, ← finsum_mem_range (f := fun y => g (s y : W)) hinj, ← finsum_mem_univ (fun y => g (s y : W))]
+  rw [e1, ← finsum_mem_range (f := fun y => g (s y : W)) hinj,
+    ← finsum_mem_univ (fun y => g (s y : W))]
   apply finsum_mem_inter_support_eq'
   intro y hy
   simp only [Set.mem_univ, iff_true]

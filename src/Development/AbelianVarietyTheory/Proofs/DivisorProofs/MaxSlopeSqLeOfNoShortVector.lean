@@ -12,13 +12,16 @@ noncomputable section
 
 namespace GlobalTheory.SlopeMink
 
-theorem sum_embeddings_eq_two_mul {K : Type} [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
-    (g : (K →+* ℂ) → ℝ) (hg : ∀ σ, g ((starRingEnd ℂ).comp σ) = g σ) :
-    ∑ σ : K →+* ℂ, g σ = 2 * ∑ v : InfinitePlace K, g v.embedding := by
+theorem sum_embeddings_eq_two_mul
+    {K : Type} [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+    (g : (K →+* ℂ) → ℝ) (hg : ∀ σ, g ((starRingEnd ℂ).comp σ) = g σ)
+    : ∑ σ : K →+* ℂ, g σ = 2 * ∑ v : InfinitePlace K, g v.embedding := by
   classical
   rw [← Finset.sum_fiberwise Finset.univ (fun σ => InfinitePlace.mk σ) g, Finset.mul_sum]
   refine Finset.sum_congr rfl fun w _ => ?_
-  have hc : ∀ σ ∈ Finset.univ.filter (fun σ : K →+* ℂ => InfinitePlace.mk σ = w), g σ = g w.embedding := by
+  have hc
+      : ∀ σ ∈ Finset.univ.filter (fun σ : K →+* ℂ => InfinitePlace.mk σ = w),
+        g σ = g w.embedding := by
     intro σ hσ
     rw [Finset.mem_filter] at hσ
     rw [← hσ.2]
@@ -33,12 +36,15 @@ theorem sum_embeddings_eq_two_mul {K : Type} [Field K] [NumberField K] [_root_.N
     (IsTotallyComplex.isComplex w).mult_eq_two, nsmul_eq_mul]
   norm_num
 
-theorem slopeMax_sq_le_of_no_short : ∀ (K V : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] [AddCommGroup V]
-    [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (N : (K →+* ℂ) → V → ℝ) (L : Submodule (𝓞 K) V)
-    (La : ℝ), HasGram N → (∀ σ x, N ((starRingEnd ℂ).comp σ) x = N σ x) → L.FG → L ≠ ⊥ →
-    (∀ x ∈ L, x ≠ 0 → -La ≤ (∑ σ : K →+* ℂ, Real.log (N σ x)) / (Module.finrank ℚ K : ℝ)) →
-    slopeMax_sq N L ≤ 2 * La + Real.log (Module.finrank K V : ℝ) +
-      Real.log |(discr K : ℝ)| / (Module.finrank ℚ K : ℝ) := by
+theorem slopeMax_sq_le_of_no_short
+    : ∀ (K V : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+        [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+        (N : (K →+* ℂ) → V → ℝ) (L : Submodule (𝓞 K) V) (La : ℝ),
+      HasGram N → (∀ σ x, N ((starRingEnd ℂ).comp σ) x = N σ x) → L.FG → L ≠ ⊥
+        → (∀ x ∈ L, x ≠ 0 → -La ≤ (∑ σ : K →+* ℂ, Real.log (N σ x)) / (Module.finrank ℚ K : ℝ))
+        → slopeMax_sq N L
+          ≤ 2 * La + Real.log (Module.finrank K V : ℝ)
+            + Real.log |(discr K : ℝ)| / (Module.finrank ℚ K : ℝ) := by
   intro K V _ _ _ _ _ _ _ N L La hG hconj hfg h0 hshort
   letI : StarRing K := starRingOfComm
   obtain ⟨n, ⟨b, X⟩, hX⟩ := hG.some
@@ -48,19 +54,27 @@ theorem slopeMax_sq_le_of_no_short : ∀ (K V : Type) [Field K] [NumberField K] 
   have hf : (0 : ℝ) < (Formalism.HN.nPl K : ℝ) := by
     have : 0 < Formalism.HN.nPl K := Fintype.card_pos
     exact_mod_cast this
-  have hmink := Formalism.ExtensionFiltration.muMaxMinkowski K V (Fin n) b X hXu L La hfg h0 (by
-    intro x hx hx0
-    have h1 := hshort x hx hx0
-    rw [sum_embeddings_eq_two_mul (fun σ => Real.log (N σ x)) (fun σ => by simp only [hconj])] at h1
-    have e : ∀ v : InfinitePlace K, Real.log (N v.embedding x) = Real.log (Formalism.HermitianLatticesTheory.normAt b X v x) :=
-      fun v => by rw [(hX v).2 x]
-    simp only [e] at h1
-    rw [hnf] at h1
-    push_cast at h1
-    have : (2 * ∑ v : InfinitePlace K, Real.log (Formalism.HermitianLatticesTheory.normAt b X v x)) / (2 * (Formalism.HN.nPl K : ℝ)) =
-        (1 / (Formalism.HN.nPl K : ℝ)) * ∑ v, Real.log (Formalism.HermitianLatticesTheory.normAt b X v x) := by
-      field_simp
-    linarith)
+  have hmink :=
+    Formalism.ExtensionFiltration.muMaxMinkowski K V (Fin n) b X hXu L La hfg h0 (by
+      intro x hx hx0
+      have h1 := hshort x hx hx0
+      rw [sum_embeddings_eq_two_mul (fun σ => Real.log (N σ x)) (fun σ => by simp only [hconj])]
+        at h1
+      have e
+          : ∀ v : InfinitePlace K,
+            Real.log (N v.embedding x)
+              = Real.log (Formalism.HermitianLatticesTheory.normAt b X v x) := fun v => by
+        rw [(hX v).2 x]
+      simp only [e] at h1
+      rw [hnf] at h1
+      push_cast at h1
+      have : (2
+              * ∑ v : InfinitePlace K, Real.log (Formalism.HermitianLatticesTheory.normAt b X v x))
+            / (2 * (Formalism.HN.nPl K : ℝ))
+          = (1 / (Formalism.HN.nPl K : ℝ))
+            * ∑ v, Real.log (Formalism.HermitianLatticesTheory.normAt b X v x) := by
+        field_simp
+      linarith)
   haveI : Module.Finite K V := Module.Finite.of_basis b
   have hj : 0 < Formalism.HN.rkK L := by
     have h : Submodule.span K (L : Set V) ≠ ⊥ := by

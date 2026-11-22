@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.CharacterTheory.ParabolicI
 
 @[expose] public section
 
-open Polynomial GlobalTheory.CuspGL GlobalTheory.BI GlobalTheory.Shin SemidirectProduct GlobalTheory.ParabVirt
+open Polynomial GlobalTheory.CuspGL GlobalTheory.BI GlobalTheory.Shin SemidirectProduct
+  GlobalTheory.ParabVirt
 open scoped Classical
 
 noncomputable section
@@ -21,7 +22,8 @@ def low (a n : ℕ) : Submodule F (Fin n → F) where
   zero_mem' := fun i _ => rfl
   smul_mem' := fun c v hv i hi => by simp [hv i hi]
 
-theorem mem_stab_low_iff (a n : ℕ) (x : GL (Fin n) F) : x ∈ stab (low (F := F) a n) ↔ InPar a x := by
+theorem mem_stab_low_iff (a n : ℕ) (x : GL (Fin n) F)
+    : x ∈ stab (low (F := F) a n) ↔ InPar a x := by
   rw [mem_stab]
   constructor
   · intro h i j hj hi
@@ -54,42 +56,45 @@ def lowEquiv {a n : ℕ} (ha : a ≤ n) : low (F := F) a n ≃ₗ[F] (Fin a → 
     funext i
     simp
 
-theorem resMat_low {a n : ℕ} (ha : a ≤ n) (p : GL (Fin n) F) (hp : p ∈ stab (low (F := F) a n)) :
-    resMat (low a n) (lowEquiv ha) ⟨p, hp⟩ = tl a (p : Matrix (Fin n) (Fin n) F) := by
+theorem resMat_low {a n : ℕ} (ha : a ≤ n) (p : GL (Fin n) F) (hp : p ∈ stab (low (F := F) a n))
+    : resMat (low a n) (lowEquiv ha) ⟨p, hp⟩ = tl a (p : Matrix (Fin n) (Fin n) F) := by
   ext i j
   have hs : ((lowEquiv (F := F) ha).symm (Pi.single j 1)).1 = Pi.single (Fin.castLE ha j) 1 := by
     funext k
     change (if h : (k : ℕ) < a then (Pi.single j 1 : Fin a → F) ⟨k, h⟩ else 0) = _
     split_ifs with h
     · simp only [Pi.single_apply, Fin.ext_iff, Fin.val_castLE]
-    · have : k ≠ Fin.castLE ha j := by
-        intro e; rw [e, Fin.val_castLE] at h; exact h j.2
+    · have : k ≠ Fin.castLE ha j := by intro e; rw [e, Fin.val_castLE] at h; exact h j.2
       simp [Pi.single_apply, this]
-  simp only [resMat, MonoidHom.coe_mk, OneHom.coe_mk, LinearMap.toMatrix'_apply, LinearEquiv.conj_apply_apply]
-  change (Matrix.toLin' (p : Matrix (Fin n) (Fin n) F) ((lowEquiv (F := F) ha).symm (Pi.single j 1)).1)
-    (Fin.castLE ha i) = _
+  simp only [resMat, MonoidHom.coe_mk, OneHom.coe_mk, LinearMap.toMatrix'_apply,
+    LinearEquiv.conj_apply_apply]
+  change (Matrix.toLin' (p : Matrix (Fin n) (Fin n) F)
+        ((lowEquiv (F := F) ha).symm (Pi.single j 1)).1)
+      (Fin.castLE ha i)
+    = _
   rw [hs, Matrix.toLin'_apply, Matrix.mulVec_single_one]
   have hi : (i : ℕ) < n := by omega
   have hj : (j : ℕ) < n := by omega
   simp only [tl, ent, dif_pos (And.intro hi hj), Matrix.transpose_apply]
   rfl
 
-theorem tl_isUnit {a n : ℕ} (ha : a ≤ n) (p : GL (Fin n) F) (hp : InPar a p) :
-    IsUnit (tl a (p : Matrix (Fin n) (Fin n) F)) := by
+theorem tl_isUnit {a n : ℕ} (ha : a ≤ n) (p : GL (Fin n) F) (hp : InPar a p)
+    : IsUnit (tl a (p : Matrix (Fin n) (Fin n) F)) := by
   have hp' := (mem_stab_low_iff a n p).2 hp
   rw [← resMat_low ha p hp']
   exact IsUnit.map (resMat (low a n) (lowEquiv ha)) (Group.isUnit _)
 
-theorem coe_tlG {a n : ℕ} (ha : a ≤ n) (p : GL (Fin n) F) (hp : InPar a p) :
-    ((tlG a p : GL (Fin a) F) : Matrix (Fin a) (Fin a) F) = tl a (p : Matrix (Fin n) (Fin n) F) := by
+theorem coe_tlG {a n : ℕ} (ha : a ≤ n) (p : GL (Fin n) F) (hp : InPar a p)
+    : ((tlG a p : GL (Fin a) F) : Matrix (Fin a) (Fin a) F)
+      = tl a (p : Matrix (Fin n) (Fin n) F) := by
   unfold tlG toG
   rw [dif_pos (tl_isUnit ha p hp)]
   rfl
 
-theorem psi_restrict_low (S : F[X] → ℂ) {a n : ℕ} (ha : a ≤ n) (p : GL (Fin n) F)
-    (hp : p ∈ stab (low (F := F) a n)) :
-    psi S (low (F := F) a n) ((Matrix.toLin' (p : Matrix (Fin n) (Fin n) F)).restrict hp) =
-      psiG S a (tlG a p) := by
+theorem psi_restrict_low
+    (S : F[X] → ℂ) {a n : ℕ} (ha : a ≤ n) (p : GL (Fin n) F) (hp : p ∈ stab (low (F := F) a n))
+    : psi S (low (F := F) a n) ((Matrix.toLin' (p : Matrix (Fin n) (Fin n) F)).restrict hp)
+      = psiG S a (tlG a p) := by
   rw [psiG, coe_tlG ha p ((mem_stab_low_iff a n p).1 hp), ← resMat_low ha p hp]
   simp only [resMat, MonoidHom.coe_mk, OneHom.coe_mk, Matrix.toLin'_toMatrix']
   rw [psi_conj]
@@ -97,9 +102,9 @@ theorem psi_restrict_low (S : F[X] → ℂ) {a n : ℕ} (ha : a ≤ n) (p : GL (
 def resPsi (S : F[X] → ℂ) {n : ℕ} (x : GL (Fin n) F) (W : Submodule F (Fin n → F)) : ℂ :=
   if h : x ∈ stab W then psi S W ((Matrix.toLin' (x : Matrix (Fin n) (Fin n) F)).restrict h) else 0
 
-theorem finsum_rank_eq_hc [Finite F] (S : F[X] → ℂ) {a n : ℕ} (ha : a ≤ n) (x : GL (Fin n) F) :
-    ∑ᶠ W : {W : Submodule F (Fin n → F) // Module.finrank F W = a}, resPsi S x W.1 =
-      hc a (n - a) (psiG S a) (fun _ => 1) n x := by
+theorem finsum_rank_eq_hc [Finite F] (S : F[X] → ℂ) {a n : ℕ} (ha : a ≤ n) (x : GL (Fin n) F)
+    : ∑ᶠ W : {W : Submodule F (Fin n → F) // Module.finrank F W = a}, resPsi S x W.1
+      = hc a (n - a) (psiG S a) (fun _ => 1) n x := by
   classical
   haveI : Finite (Submodule F (Fin n → F)) :=
     Finite.of_injective (fun W : Submodule F (Fin n → F) => (W : Set (Fin n → F))) SetLike.coe_injective
@@ -122,14 +127,19 @@ theorem finsum_rank_eq_hc [Finite F] (S : F[X] → ℂ) {a n : ℕ} (ha : a ≤ 
       rw [hg] at this
       exact this
     · exact (π t).2.trans W.2.symm
-  have hsum := sum_fibres (stab W₀) π hs
-    (fun s t => Subtype.ext_iff.trans (map_eq_map_iff W₀ s t)) (fun W => resPsi S x W.1)
-  have hg : ∀ t : GL (Fin n) F, gal (RingHom.id F) n t = t := by
-    intro t; ext i j; simp [gal]
-  have hterm : ∀ t : GL (Fin n) F, resPsi S x (π t).1 =
-      (if InPar a (t⁻¹ * x * gal (RingHom.id F) n t) then
-        psiG S a (tlG a (t⁻¹ * x * gal (RingHom.id F) n t)) *
-          (fun _ => (1 : ℂ)) (brG a (n - a) (t⁻¹ * x * gal (RingHom.id F) n t)) else 0) := by
+  have hsum :=
+    sum_fibres (stab W₀) π hs
+      (fun s t => Subtype.ext_iff.trans (map_eq_map_iff W₀ s t))
+      (fun W => resPsi S x W.1)
+  have hg : ∀ t : GL (Fin n) F, gal (RingHom.id F) n t = t := by intro t; ext i j; simp [gal]
+  have hterm
+      : ∀ t : GL (Fin n) F,
+        resPsi S x (π t).1
+          = (if InPar a (t⁻¹ * x * gal (RingHom.id F) n t) then
+               psiG S a (tlG a (t⁻¹ * x * gal (RingHom.id F) n t))
+                 * (fun _ => (1 : ℂ)) (brG a (n - a) (t⁻¹ * x * gal (RingHom.id F) n t))
+             else
+               0) := by
     intro t
     rw [hg, mul_one]
     simp only [resPsi, π]
@@ -157,8 +167,8 @@ end GlobalTheory.ShinPsiRec
 
 namespace GlobalTheory.ShinPsiRec
 
-theorem ne_top_iff_finrank_lt {F : Type} [Field F] {n : ℕ} (W : Submodule F (Fin n → F)) :
-    W ≠ ⊤ ↔ Module.finrank F W < n := by
+theorem ne_top_iff_finrank_lt {F : Type} [Field F] {n : ℕ} (W : Submodule F (Fin n → F))
+    : W ≠ ⊤ ↔ Module.finrank F W < n := by
   constructor
   · intro h
     have := Submodule.finrank_lt h
@@ -167,8 +177,8 @@ theorem ne_top_iff_finrank_lt {F : Type} [Field F] {n : ℕ} (W : Submodule F (F
     rw [htop, finrank_top, Module.finrank_fin_fun] at h
     exact lt_irrefl _ h
 
-theorem psiG_eq_chG_sub_hc (F : Type) [Field F] [Finite F] (S : F[X] → ℂ) (n : ℕ) (x : GL (Fin n) F) :
-    psiG S n x = chG S n x - ∑ a ∈ Finset.range n, hc a (n - a) (psiG S a) (fun _ => 1) n x := by
+theorem psiG_eq_chG_sub_hc (F : Type) [Field F] [Finite F] (S : F[X] → ℂ) (n : ℕ) (x : GL (Fin n) F)
+    : psiG S n x = chG S n x - ∑ a ∈ Finset.range n, hc a (n - a) (psiG S a) (fun _ => 1) n x := by
   classical
   haveI : Finite (Submodule F (Fin n → F)) :=
     Finite.of_injective (fun W : Submodule F (Fin n → F) => (W : Set (Fin n → F))) SetLike.coe_injective
@@ -178,8 +188,10 @@ theorem psiG_eq_chG_sub_hc (F : Type) [Field F] [Finite F] (S : F[X] → ℂ) (n
   congr 1
   rw [Finset.sum_congr rfl fun a ha =>
     (finsum_rank_eq_hc S (le_of_lt (Finset.mem_range.1 ha)) x).symm]
-  have step : ∀ a : ℕ, ∑ᶠ W : {W : Submodule F (Fin n → F) // Module.finrank F W = a}, resPsi S x W.1 =
-      ∑ W : Submodule F (Fin n → F), if Module.finrank F W = a then resPsi S x W else 0 := by
+  have step
+      : ∀ a : ℕ,
+        ∑ᶠ W : {W : Submodule F (Fin n → F) // Module.finrank F W = a}, resPsi S x W.1
+          = ∑ W : Submodule F (Fin n → F), if Module.finrank F W = a then resPsi S x W else 0 := by
     intro a
     rw [finsum_eq_sum_of_fintype, ← Finset.sum_filter]
     exact (Finset.sum_subtype _ (by simp) _).symm
@@ -187,10 +199,15 @@ theorem psiG_eq_chG_sub_hc (F : Type) [Field F] [Finite F] (S : F[X] → ℂ) (n
   rw [Finset.sum_comm]
   simp only [Finset.sum_ite_eq]
   rw [finsum_eq_sum_of_fintype]
-  rw [Finset.sum_congr rfl (g := fun W => resPsi S x W.1) fun W _ => by
-    unfold resPsi; rw [dif_pos (show x ∈ stab W.1 from W.2.2)]]
-  rw [← Finset.sum_subtype (Finset.univ.filter fun W : Submodule F (Fin n → F) => W ≠ ⊤ ∧ ∀ v ∈ W, Matrix.toLin' (x : Matrix (Fin n) (Fin n) F) v ∈ W)
-    (fun W => by simp only [Finset.mem_filter, Finset.mem_univ, true_and]) (resPsi S x), Finset.sum_filter]
+  rw [Finset.sum_congr rfl
+    (g := fun W => resPsi S x W.1)
+    fun W _ => by unfold resPsi; rw [dif_pos (show x ∈ stab W.1 from W.2.2)]]
+  rw [← Finset.sum_subtype
+      (Finset.univ.filter fun W : Submodule F (Fin n → F) =>
+        W ≠ ⊤ ∧ ∀ v ∈ W, Matrix.toLin' (x : Matrix (Fin n) (Fin n) F) v ∈ W)
+      (fun W => by simp only [Finset.mem_filter, Finset.mem_univ, true_and])
+      (resPsi S x),
+    Finset.sum_filter]
   refine Finset.sum_congr rfl fun W _ => ?_
   by_cases hx : ∀ v ∈ W, Matrix.toLin' (x : Matrix (Fin n) (Fin n) F) v ∈ W
   · simp only [Finset.mem_range, ne_top_iff_finrank_lt, and_iff_left hx]

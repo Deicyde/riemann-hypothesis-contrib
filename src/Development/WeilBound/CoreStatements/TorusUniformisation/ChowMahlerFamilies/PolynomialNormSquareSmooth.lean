@@ -11,8 +11,8 @@ open MvPolynomial
 
 namespace PositivityTheory.Xgn.SmoothPolynomialNormSquare
 
-theorem contDiff_eval (σ : Type) [Fintype σ] (p : MvPolynomial σ ℂ) :
-    ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun z : σ → ℂ => MvPolynomial.eval z p) := by
+theorem contDiff_eval (σ : Type) [Fintype σ] (p : MvPolynomial σ ℂ)
+    : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun z : σ → ℂ => MvPolynomial.eval z p) := by
   induction p using MvPolynomial.induction_on with
   | C a =>
     simp only [MvPolynomial.eval_C]
@@ -26,6 +26,9 @@ theorem contDiff_eval (σ : Type) [Fintype σ] (p : MvPolynomial σ ℂ) :
 
 end PositivityTheory.Xgn.SmoothPolynomialNormSquare
 
-theorem PositivityTheory.Xgn.polynomial_norm_square_smooth : ∀ (σ : Type) [Fintype σ] (s : MvPolynomial σ ℤ), ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun z : σ → ℂ => ‖eval z (MvPolynomial.map (Int.castRingHom ℂ) s)‖ ^ 2) := by
+theorem PositivityTheory.Xgn.polynomial_norm_square_smooth
+    : ∀ (σ : Type) [Fintype σ] (s : MvPolynomial σ ℤ),
+      ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞)
+        (fun z : σ → ℂ => ‖eval z (MvPolynomial.map (Int.castRingHom ℂ) s)‖ ^ 2) := by
   intro σ _ s
   exact (PositivityTheory.Xgn.SmoothPolynomialNormSquare.contDiff_eval σ _).norm_sq ℝ

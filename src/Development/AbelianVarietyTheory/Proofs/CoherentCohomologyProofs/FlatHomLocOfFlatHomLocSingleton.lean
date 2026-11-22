@@ -9,27 +9,33 @@ open CategoryTheory CategoryTheory.Limits DirectSum MvPolynomial TensorProduct G
 
 namespace GlobalTheory
 
-private theorem flat_loc_over_algebra {A S M N : Type} [CommRing A] [CommRing S] [Algebra A S]
-    [AddCommGroup M] [Module A M] [Module S M] [IsScalarTower A S M] [AddCommGroup N] [Module A N]
-    [Module S N] [IsScalarTower A S N] (T : Submonoid S) (f : M →ₗ[S] N) [IsLocalizedModule T f]
-    (h : Module.Flat A M) : Module.Flat A N := by
+private theorem flat_loc_over_algebra
+    {A S M N : Type}
+    [CommRing A] [CommRing S] [Algebra A S] [AddCommGroup M] [Module A M] [Module S M]
+    [IsScalarTower A S M] [AddCommGroup N] [Module A N] [Module S N] [IsScalarTower A S N]
+    (T : Submonoid S) (f : M →ₗ[S] N) [IsLocalizedModule T f]
+    (h : Module.Flat A M)
+    : Module.Flat A N := by
   rw [Module.Flat.iff_lTensor_injectiveₛ] at h ⊢
   intro P _ _ Q
-  have := IsLocalizedModule.map_injective T (AlgebraTensorModule.rTensor A Q f)
-    (AlgebraTensorModule.rTensor A P f) (AlgebraTensorModule.lTensor S M Q.subtype) (h Q)
+  have :=
+    IsLocalizedModule.map_injective T (AlgebraTensorModule.rTensor A Q f)
+      (AlgebraTensorModule.rTensor A P f) (AlgebraTensorModule.lTensor S M Q.subtype) (h Q)
   rw [IsLocalizedModule.map_lTensor] at this
   exact this
 
-private theorem flat_iff_forall_piece {R M : Type} [CommRing R] [AddCommGroup M] [Module R M]
-    (ℳ : ℤ → Submodule R M) [Decomposition ℳ] :
-    Module.Flat R M ↔ ∀ n, Module.Flat R (ℳ n) :=
+private theorem flat_iff_forall_piece
+    {R M : Type} [CommRing R] [AddCommGroup M] [Module R M]
+    (ℳ : ℤ → Submodule R M) [Decomposition ℳ]
+    : Module.Flat R M ↔ ∀ n, Module.Flat R (ℳ n) :=
   (Module.Flat.equiv_iff (decomposeLinearEquiv ℳ)).trans Module.Flat.directSum_iff
 
-theorem flat_homLoc_of_flat_homLoc_singleton :
-    ∀ (ι : Type) [LinearOrder ι] [Fintype ι] (R : Type) [CommRing R] (M : Type) [AddCommGroup M]
-      [Module R M] [Module (MvPolynomial ι R) M] [IsScalarTower R (MvPolynomial ι R) M]
-      (ℳ : ℤ → Submodule R M) [PolyGradedSMul ι ℳ] [Decomposition ℳ] (i : ι) (s : Finset ι)
-      (n : ℤ), i ∈ s → Module.Flat R (homLoc ℳ {i} 0) → Module.Flat R (homLoc ℳ s n) := by
+theorem flat_homLoc_of_flat_homLoc_singleton
+    : ∀ (ι : Type) [LinearOrder ι] [Fintype ι] (R : Type) [CommRing R] (M : Type) [AddCommGroup M]
+        [Module R M] [Module (MvPolynomial ι R) M] [IsScalarTower R (MvPolynomial ι R) M]
+        (ℳ : ℤ → Submodule R M) [PolyGradedSMul ι ℳ] [Decomposition ℳ] (i : ι) (s : Finset ι)
+        (n : ℤ),
+      i ∈ s → Module.Flat R (homLoc ℳ {i} 0) → Module.Flat R (homLoc ℳ s n) := by
   intro ι _ _ R _ M _ _ _ _ ℳ _ _ i s n hi h0
   have step (t : ℤ) : Module.Flat R (homLoc ℳ {i} t) ↔ Module.Flat R (homLoc ℳ {i} (t + 1)) :=
     Module.Flat.equiv_iff (LinearEquiv.ofBijective _

@@ -18,7 +18,9 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.Rodier GlobalTheory.CompanionTheory.BZPsiPG GlobalTheory.CompanionTheory.BZPsiPG.FibKer
+open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib
+  GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.Rodier GlobalTheory.CompanionTheory.BZPsiPG
+  GlobalTheory.CompanionTheory.BZPsiPG.FibKer
 open scoped TensorProduct
 
 noncomputable section
@@ -27,8 +29,10 @@ namespace GlobalTheory.CompanionTheory.BZPsiPG.FibKer.SmFib
 
 open Topology
 
-theorem range_finite {X W : Type} [TopologicalSpace X] [AddCommGroup W] {φ : X → W}
-    (hl : IsLocallyConstant φ) (hc : HasCompactSupport φ) : (Set.range φ).Finite := by
+theorem range_finite
+    {X W : Type} [TopologicalSpace X] [AddCommGroup W]
+    {φ : X → W} (hl : IsLocallyConstant φ) (hc : HasCompactSupport φ)
+    : (Set.range φ).Finite := by
   have : CompactSpace (tsupport φ) := isCompact_iff_compactSpace.mp hc
   have h1 : (Set.range (φ ∘ ((↑) : tsupport φ → X))).Finite :=
     (hl.comp_continuous continuous_subtype_val).range_finite
@@ -38,9 +42,10 @@ theorem range_finite {X W : Type} [TopologicalSpace X] [AddCommGroup W] {φ : X 
   · exact Or.inr ⟨⟨x, hx⟩, rfl⟩
   · exact Or.inl (image_eq_zero_of_notMem_tsupport hx)
 
-theorem exists_nhds_translation_invariant {A Z : Type} [AddCommGroup A] [TopologicalSpace A]
-    [IsTopologicalAddGroup A] [AddCommGroup Z] {φ : A → Z} (hl : IsLocallyConstant φ)
-    (hc : HasCompactSupport φ) : ∃ N ∈ 𝓝 (0 : A), ∀ w ∈ N, ∀ v, φ (v + w) = φ v := by
+theorem exists_nhds_translation_invariant
+    {A Z : Type} [AddCommGroup A] [TopologicalSpace A] [IsTopologicalAddGroup A] [AddCommGroup Z]
+    {φ : A → Z} (hl : IsLocallyConstant φ) (hc : HasCompactSupport φ)
+    : ∃ N ∈ 𝓝 (0 : A), ∀ w ∈ N, ∀ v, φ (v + w) = φ v := by
   letI := IsTopologicalAddGroup.rightUniformSpace A
   haveI := isUniformAddGroup_of_addCommGroup (G := A)
   letI : UniformSpace Z := ⊥
@@ -59,15 +64,18 @@ theorem exists_nhds_translation_invariant {A Z : Type} [AddCommGroup A] [Topolog
     simpa using hw
   exact (hsub h2).symm
 
-theorem isOpen_stabiliser {G V : Type} [Group G] [TopologicalSpace G] [ContinuousMul G] [AddCommGroup V]
-    [Module ℂ V] (ρ : Representation ℂ G V) (v : V) (h : {g | ρ g v = v} ∈ 𝓝 (1 : G)) :
-    IsOpen {g | ρ g v = v} :=
+theorem isOpen_stabiliser
+    {G V : Type} [Group G] [TopologicalSpace G] [ContinuousMul G] [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V) (v : V) (h : {g | ρ g v = v} ∈ 𝓝 (1 : G))
+    : IsOpen {g | ρ g v = v} :=
   _root_.UpperTheory.Reformulated.B.Yhd4.main ρ v h
 
-theorem isSmooth_fibAct (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (i t : ℕ) {Z : Type} [AddCommGroup Z] [Module ℂ Z]
-    (ρ₀ : Representation ℂ (Multiplicative (Fin i → k)) Z) (hρ : IsSmooth ρ₀) :
-    IsSmooth (fibAct t ρ₀) := by
+theorem isSmooth_fibAct
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (i t : ℕ)
+    {Z : Type} [AddCommGroup Z] [Module ℂ Z]
+    (ρ₀ : Representation ℂ (Multiplicative (Fin i → k)) Z) (hρ : IsSmooth ρ₀)
+    : IsSmooth (fibAct t ρ₀) := by
   intro φ
   refine isOpen_stabiliser (fibAct t ρ₀) φ ?_
   have hU : (⋂ z ∈ Set.range φ.1, {g : Multiplicative (Fin i → k) | ρ₀ g z = z}) ∈ 𝓝 1 :=

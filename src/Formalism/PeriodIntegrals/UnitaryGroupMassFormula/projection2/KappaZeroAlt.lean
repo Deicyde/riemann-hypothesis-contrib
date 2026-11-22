@@ -11,14 +11,18 @@ namespace PI.OneCosetSharp.W
 
 open Loc LocE
 
-private theorem det_eq_det_castLE_of_cols_eq_one {k : Type} [Field k] {a t N : ℕ} (hN : a + t = N)
-    (K : Matrix (Fin N) (Fin N) k) (h0 : ∀ p q : Fin N, a ≤ q.1 → K p q = if p = q then 1 else 0) :
-    K.det = (Matrix.of fun s s' : Fin a =>
-      K (Fin.castLE (Nat.le.intro hN) s) (Fin.castLE (Nat.le.intro hN) s')).det := by
+private theorem det_eq_det_castLE_of_cols_eq_one
+    {k : Type} [Field k]
+    {a t N : ℕ} (hN : a + t = N) (K : Matrix (Fin N) (Fin N) k)
+    (h0 : ∀ p q : Fin N, a ≤ q.1 → K p q = if p = q then 1 else 0)
+    : K.det
+      = (Matrix.of fun s s' : Fin a =>
+        K (Fin.castLE (Nat.le.intro hN) s) (Fin.castLE (Nat.le.intro hN) s')).det := by
   subst hN
-  have hK : Matrix.reindex finSumFinEquiv.symm finSumFinEquiv.symm K =
-      Matrix.fromBlocks (Matrix.of fun s s' : Fin a => K (Fin.castAdd t s) (Fin.castAdd t s'))
-        0 (Matrix.of fun (s : Fin t) (s' : Fin a) => K (Fin.natAdd a s) (Fin.castAdd t s')) 1 := by
+  have hK
+      : Matrix.reindex finSumFinEquiv.symm finSumFinEquiv.symm K
+        = Matrix.fromBlocks (Matrix.of fun s s' : Fin a => K (Fin.castAdd t s) (Fin.castAdd t s')) 0
+          (Matrix.of fun (s : Fin t) (s' : Fin a) => K (Fin.natAdd a s) (Fin.castAdd t s')) 1 := by
     ext (s | s) (s' | s')
     · rfl
     · show K (Fin.castAdd t s) (Fin.natAdd a s') = 0
@@ -43,8 +47,9 @@ private theorem det_eq_det_castLE_of_cols_eq_one {k : Type} [Field k] {a t N : �
     Matrix.det_one, mul_one]
   rfl
 
-private theorem allow_mono {k₀ m t a b p q : ℕ} (hab : a ≤ b) (h : PI.OneCosetSharp.Allow k₀ m t a p q) :
-    PI.OneCosetSharp.Allow k₀ m t b p q := by
+private theorem allow_mono
+    {k₀ m t a b p q : ℕ} (hab : a ≤ b) (h : PI.OneCosetSharp.Allow k₀ m t a p q)
+    : PI.OneCosetSharp.Allow k₀ m t b p q := by
   unfold PI.OneCosetSharp.Allow at h ⊢
   split_ifs at h ⊢
   · exact h
@@ -63,23 +68,43 @@ theorem kappaZero : KappaZero := by
     rw [Nat.add_sub_cancel]
     generalize k₀ + m - 1 = r
     ring
-  have key : (∀ p', p' < k₀ + m - 1 → PI.OneCosetSharp.ent k₀ (c + 1) n' c n y p' p' = 1) ∧
-      (∀ p p', p < n + c → p' < k₀ + m - 1 + (j - 1) * t → p ≠ p' → PI.OneCosetSharp.ent k₀ (c + 1) n' c n y p p' ≠ 0 →
-        PI.OneCosetSharp.Allow k₀ m t (k₀ + m - 1 + (j - 1) * t) p p') ∧
-      (Matrix.of fun s s' : Fin (k₀ + m - 1 + (j - 1) * t) =>
-        PI.OneCosetSharp.ent k₀ (c + 1) n' c n y s.1 s'.1).det ≠ 0 := by
+  have key
+      : (∀ p', p' < k₀ + m - 1 → PI.OneCosetSharp.ent k₀ (c + 1) n' c n y p' p' = 1)
+        ∧ (∀ p p',
+          p < n + c → p' < k₀ + m - 1 + (j - 1) * t → p ≠ p'
+            → PI.OneCosetSharp.ent k₀ (c + 1) n' c n y p p' ≠ 0
+            → PI.OneCosetSharp.Allow k₀ m t (k₀ + m - 1 + (j - 1) * t) p p')
+        ∧ (Matrix.of fun s s' : Fin (k₀ + m - 1 + (j - 1) * t) =>
+            PI.OneCosetSharp.ent k₀ (c + 1) n' c n y s.1 s'.1).det
+          ≠ 0 := by
     simp only [PI.OneCosetSharp.PhiS] at hy
     split_ifs at hy with hcond
     · refine ⟨hcond.1, hcond.2, fun hdet => hy ?_⟩
       rw [hdet]
       simp [PI.OneCosetSharp.chiV]
     · exact absurd rfl hy
-  have hcoord : ∀ (v : Fin (n + c) → k) (l : Fin (n + c)), PI.OneCosetSharp.Loc.atN v l.1 = v l := fun v l => by
+  have hcoord
+      : ∀ (v : Fin (n + c) → k) (l : Fin (n + c)),
+        PI.OneCosetSharp.Loc.atN v l.1 = v l := fun v l => by
     simp only [PI.OneCosetSharp.Loc.atN, dif_pos l.2, Fin.eta]
-  obtain ⟨K, hK⟩ : ∃ K : Matrix (Fin (n + c)) (Fin (n + c)) k, ∀ p q, K p q =
-      if q.1 < k₀ + m - 1 + (j - 1) * t then PI.OneCosetSharp.ent k₀ (c + 1) n' c n y p.1 q.1 else if p = q then 1 else 0 :=
-    ⟨Matrix.of fun p q => if q.1 < k₀ + m - 1 + (j - 1) * t then PI.OneCosetSharp.ent k₀ (c + 1) n' c n y p.1 q.1
-      else if p = q then 1 else 0, fun _ _ => rfl⟩
+  obtain ⟨K, hK⟩
+      : ∃ K : Matrix (Fin (n + c)) (Fin (n + c)) k, ∀ p q,
+        K p q
+          = if q.1 < k₀ + m - 1 + (j - 1) * t then
+              PI.OneCosetSharp.ent k₀ (c + 1) n' c n y p.1 q.1
+            else if p = q then
+              1
+            else
+              0 := ⟨
+    Matrix.of fun p q =>
+      if q.1 < k₀ + m - 1 + (j - 1) * t then
+        PI.OneCosetSharp.ent k₀ (c + 1) n' c n y p.1 q.1
+      else if p = q then
+        1
+      else
+        0,
+    fun _ _ => rfl
+  ⟩
   have hdetK : K.det ≠ 0 := by
     rw [det_eq_det_castLE_of_cols_eq_one hN K (fun p q hq => by rw [hK, if_neg (not_lt.mpr hq)])]
     refine ne_of_eq_of_ne ?_ key.2.2
@@ -91,8 +116,11 @@ theorem kappaZero : KappaZero := by
       (PI.OneCosetSharp.W.P2.fe k₀ c n hk).symm).det := by
     rw [Matrix.det_submatrix_equiv_self]
     exact isUnit_iff_ne_zero.mpr hdetK
-  obtain ⟨κ, hκ⟩ : ∃ κ : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k), κ.toLinearMap =
-      Matrix.toLin' (K.submatrix (PI.OneCosetSharp.W.P2.fe k₀ c n hk).symm (PI.OneCosetSharp.W.P2.fe k₀ c n hk).symm) :=
+  obtain ⟨κ, hκ⟩
+      : ∃ κ : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k),
+        κ.toLinearMap
+          = Matrix.toLin' (K.submatrix (PI.OneCosetSharp.W.P2.fe k₀ c n hk).symm
+            (PI.OneCosetSharp.W.P2.fe k₀ c n hk).symm) :=
     ⟨Matrix.toLinearEquiv' _ (Matrix.invertibleOfIsUnitDet _ hA), rfl⟩
   have hperm : PI.OneCosetSharp.W.P2.Pm k₀ hk κ = K := by
     unfold PI.OneCosetSharp.W.P2.Pm
@@ -118,9 +146,11 @@ theorem kappaZero : KappaZero := by
     have hpa : p < k₀ + m - 1 + (j - 1) * t := by omega
     have hpN : p < n + c := by omega
     funext l
-    have hl : PI.OneCosetSharp.LocE.fIdx k₀ c n ((PI.OneCosetSharp.W.P2.fe k₀ c n hk).symm l).1 = l.1 :=
+    have hl
+        : PI.OneCosetSharp.LocE.fIdx k₀ c n ((PI.OneCosetSharp.W.P2.fe k₀ c n hk).symm l).1 = l.1 :=
       congrArg Fin.val ((PI.OneCosetSharp.W.P2.fe k₀ c n hk).apply_symm_apply l)
-    have e1 := PI.OneCosetSharp.W.P2.ent_eq hk κ ((PI.OneCosetSharp.W.P2.fe k₀ c n hk).symm l) ⟨p, hpN⟩
+    have e1 :=
+      PI.OneCosetSharp.W.P2.ent_eq hk κ ((PI.OneCosetSharp.W.P2.fe k₀ c n hk).symm l) ⟨p, hpN⟩
     rw [hperm, hK, if_pos hpa] at e1
     unfold PI.OneCosetSharp.ent at e1
     rw [hl, hcoord, hcoord] at e1

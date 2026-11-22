@@ -14,8 +14,10 @@ universe u v
 theorem LocalizedQuotientLength.proof : LocalizedQuotientLength.Statement.{u, v} := by
   intro S _ P W _ x R _ _ hR
   let f : S →+* R := (algebraMap (S ⧸ P) R).comp (Ideal.Quotient.mk P)
-  have hu : ∀ t : W.primeCompl, IsUnit (f t) := fun t => IsLocalization.map_units R
-    (⟨Ideal.Quotient.mk P t, Submonoid.mem_map_of_mem _ t.2⟩ : W.primeCompl.map (Ideal.Quotient.mk P))
+  have hu : ∀ t : W.primeCompl, IsUnit (f t) := fun t =>
+    IsLocalization.map_units R
+      (⟨Ideal.Quotient.mk P t, Submonoid.mem_map_of_mem _ t.2⟩
+        : W.primeCompl.map (Ideal.Quotient.mk P))
   let g : Localization.AtPrime W →+* R := IsLocalization.lift (M := W.primeCompl) hu
   have hg : ∀ s, g (algebraMap S (Localization.AtPrime W) s) = f s := IsLocalization.lift_eq hu
   have gsurj : Function.Surjective g := by
@@ -29,7 +31,8 @@ theorem LocalizedQuotientLength.proof : LocalizedQuotientLength.Statement.{u, v}
     rw [hmt, IsLocalization.mk'_spec]
   let _ : Algebra (Localization.AtPrime W) R := g.toAlgebra
   let _ : Algebra S R := f.toAlgebra
-  have _ : IsScalarTower S (Localization.AtPrime W) R := IsScalarTower.of_algebraMap_eq fun s => (hg s).symm
+  have _ : IsScalarTower S (Localization.AtPrime W) R :=
+    IsScalarTower.of_algebraMap_eq fun s => (hg s).symm
   set J := Ideal.span {algebraMap (S ⧸ P) R (Ideal.Quotient.mk P x)}
   rw [← Module.length_eq_of_surjective (S := Localization.AtPrime W) (R := R) (M := R ⧸ J) gsurj]
   have hI : P ⊔ Ideal.span {x} ≤ LinearMap.ker (Algebra.linearMap S (R ⧸ J)) := by
@@ -70,13 +73,15 @@ theorem LocalizedQuotientLength.proof : LocalizedQuotientLength.Statement.{u, v}
       have h2 : f (t * (a1 - a2) - b * x) = 0 := by
         rw [map_sub, map_mul, map_mul, ← hr, ← mul_assoc, e]
         exact sub_self _
-      obtain ⟨⟨m, hm⟩, hm0⟩ := (IsLocalization.map_eq_zero_iff
-        (W.primeCompl.map (Ideal.Quotient.mk P)) R (Ideal.Quotient.mk P _)).1 h2
+      obtain ⟨⟨m, hm⟩, hm0⟩ :=
+        (IsLocalization.map_eq_zero_iff (W.primeCompl.map (Ideal.Quotient.mk P)) R
+          (Ideal.Quotient.mk P _)).1 h2
       obtain ⟨u, hu, rfl⟩ := Submonoid.mem_map.1 hm
       rw [← map_mul, Ideal.Quotient.eq_zero_iff_mem] at hm0
       refine ⟨⟨u, hu⟩ * t, ?_⟩
       show Ideal.Quotient.mk _ ((u * t) * a1) = Ideal.Quotient.mk _ ((u * t) * a2)
-      rw [Ideal.Quotient.eq, show u * t * a1 - u * t * a2 = u * (t * (a1 - a2) - b * x) + u * b * x by ring]
+      rw [Ideal.Quotient.eq,
+        show u * t * a1 - u * t * a2 = u * (t * (a1 - a2) - b * x) + u * b * x by ring]
       exact Ideal.add_mem _ (Ideal.mem_sup_left hm0)
         (Ideal.mem_sup_right (Ideal.mul_mem_left _ _ (Ideal.mem_span_singleton_self x)))
   exact ((IsLocalizedModule.iso W.primeCompl φ).extendScalarsOfIsLocalization W.primeCompl

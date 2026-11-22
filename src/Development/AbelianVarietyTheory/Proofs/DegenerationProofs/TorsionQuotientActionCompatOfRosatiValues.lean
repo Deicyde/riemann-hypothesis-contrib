@@ -7,24 +7,32 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.TorusEx
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
 open scoped CategoryTheory.Obj BigOperators
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory GlobalTheory.Ex GlobalTheory.Relabel
 
 noncomputable section
 namespace GlobalTheory.Relabel
 
-theorem c_smul_val {R : Type} [CommRing R] [IsDomain R] {D : DegPre R} {F : Type} [Field F]
-    [Algebra (FractionRing R) F] {N : NumD F} {O : Type} [CommRing O] [StarRing O] [Module O D.X]
-    (ν : NumOf D F N) (oa : D.OAct O) (x : O) (χ : N.X) :
-    N.c (ν.eX.symm (x • ν.eX χ)) = actV ν oa.onB x (N.c χ) := by
-  rw [actV, ν.eA.eq_symm_apply, ν.c_eq, ν.c_eq, ν.eX.apply_symm_apply, DegPre.cF, oa.c_lin, Category.assoc]
+theorem c_smul_val
+    {R : Type} [CommRing R] [IsDomain R]
+    {D : DegPre R} {F : Type} [Field F] [Algebra (FractionRing R) F]
+    {N : NumD F} {O : Type} [CommRing O] [StarRing O] [Module O D.X]
+    (ν : NumOf D F N) (oa : D.OAct O) (x : O) (χ : N.X)
+    : N.c (ν.eX.symm (x • ν.eX χ)) = actV ν oa.onB x (N.c χ) := by
+  rw [actV, ν.eA.eq_symm_apply, ν.c_eq, ν.c_eq, ν.eX.apply_symm_apply, DegPre.cF, oa.c_lin,
+    Category.assoc]
 
-theorem actq_cancel {F : Type} [Field F] {s s' s₀ s₀' t h₁ h₂ h₃ h₄ h₅ h₆ : Fˣ} {ρ ρ' : F}
+theorem actq_cancel
+    {F : Type} [Field F]
+    {s s' s₀ s₀' t h₁ h₂ h₃ h₄ h₅ h₆ : Fˣ} {ρ ρ' : F}
     (e₁ : (s : F) = s₀ * ρ) (e₂ : s' * h₃ = s * t * h₅ * h₆) (e₃ : s₀' * h₄ = s₀ * t * h₁ * h₂)
-    (e₄ : ρ' * (h₁ * h₂ * h₃ : Fˣ) = ρ * (h₄ * h₅ * h₆ : Fˣ)) : (s' : F) = s₀' * ρ' := by
+    (e₄ : ρ' * (h₁ * h₂ * h₃ : Fˣ) = ρ * (h₄ * h₅ * h₆ : Fˣ))
+    : (s' : F) = s₀' * ρ' := by
   have a := congrArg Units.val e₂
   have b := congrArg Units.val e₃
   simp only [Units.val_mul] at a b e₄
@@ -32,7 +40,31 @@ theorem actq_cancel {F : Type} [Field F] {s s' s₀ s₀' t h₁ h₂ h₃ h₄ 
   rw [e₁] at a
   linear_combination (h₄ : F) * a - ρ' * h₃ * b - (s₀ : F) * t * e₄
 
-theorem actCompat_of_rosV : GlobalFnsSt → BrGtSt → AllD fun {E} _ _ _ {H} D => letI := H.starRing; ∀ (R R' : Type) [CommRing R] [IsDomain R] [CommRing R'] [IsDomain R'] (F : Type) [Field F] [IsAlgClosed F] [Algebra (FractionRing R) F] [Algebra (FractionRing R') F] (A : ArcF D R F) (D' : DegPre R') [Module (𝓞 E) D'.X] (oa' : D'.OAct (𝓞 E)), D'.PsiEven → D'.TauBimult → ∀ (N' : NumD F) (ν' : NumOf D' F N') (k : ℕ) (β : A.N.Form k) (u : Fˣ) (r : ℕ → Fˣ) (J : NumD.Iso (A.N.twist β u) N'), Roots u r → A.Bal β → (∀ (x : 𝓞 E) y, ν'.eX (J.e (A.act x y)) = x • ν'.eX (J.e y)) → (∀ (x : 𝓞 E) b, J.φ (actV (N := A.N) A.ν A.oa.onB x b) = actV ν' oa'.onB x (J.φ b)) → (∀ a : 𝓞 E, ∃ ρ ρ', RosV A.ν A.oa.onB a ρ ∧ RosV ν' oa'.onB a ρ' ∧ ∀ b b' : A.N.A, ρ' (J.φ b) (J.φ b') * (J.h (actV (N := A.N) A.ν A.oa.onB (star a) b) * J.h b' * J.h (b * actV (N := A.N) A.ν A.oa.onB a b') : Fˣ) = ρ b b' * (J.h (actV (N := A.N) A.ν A.oa.onB (star a) b * b') * J.h b * J.h (actV (N := A.N) A.ν A.oa.onB a b') : Fˣ)) → ActCompat A.ν A.oa ν' oa' β u r J := by
+theorem actCompat_of_rosV
+    : GlobalFnsSt → BrGtSt
+      → AllD fun {E} _ _ _ {H} D =>
+        letI := H.starRing
+        ∀ (R R' : Type) [CommRing R] [IsDomain R] [CommRing R'] [IsDomain R'] (F : Type) [Field F]
+            [IsAlgClosed F] [Algebra (FractionRing R) F] [Algebra (FractionRing R') F]
+            (A : ArcF D R F) (D' : DegPre R') [Module (𝓞 E) D'.X] (oa' : D'.OAct (𝓞 E)),
+          D'.PsiEven → D'.TauBimult
+            → ∀ (N' : NumD F) (ν' : NumOf D' F N') (k : ℕ) (β : A.N.Form k) (u : Fˣ) (r : ℕ → Fˣ)
+                (J : NumD.Iso (A.N.twist β u) N'),
+              Roots u r → A.Bal β → (∀ (x : 𝓞 E) y, ν'.eX (J.e (A.act x y)) = x • ν'.eX (J.e y))
+                → (∀ (x : 𝓞 E) b,
+                  J.φ (actV (N := A.N) A.ν A.oa.onB x b) = actV ν' oa'.onB x (J.φ b))
+                → (∀ a : 𝓞 E, ∃ ρ ρ',
+                  RosV A.ν A.oa.onB a ρ ∧ RosV ν' oa'.onB a ρ'
+                    ∧ ∀ b b' : A.N.A,
+                      ρ' (J.φ b) (J.φ b')
+                          * (J.h (actV (N := A.N) A.ν A.oa.onB (star a) b) * J.h b'
+                              * J.h (b * actV (N := A.N) A.ν A.oa.onB a b')
+                            : Fˣ)
+                        = ρ b b'
+                          * (J.h (actV (N := A.N) A.ν A.oa.onB (star a) b * b') * J.h b
+                              * J.h (actV (N := A.N) A.ν A.oa.onB a b')
+                            : Fˣ))
+                → ActCompat A.ν A.oa ν' oa' β u r J := by
   intro hG hB E _ _ _ H D
   letI := H.starRing
   intro R R' _ _ _ _ F _ _ _ _ A D' _ oa' he' hb' N' ν' k β u r J hr hbal hX hA hρ
@@ -44,7 +76,8 @@ theorem actCompat_of_rosV : GlobalFnsSt → BrGtSt → AllD fun {E} _ _ _ {H} D 
   obtain ⟨q', hq'⟩ := (B' j).2.1 (τ qv)
   have tq := (hτ qv _).1 rfl
   obtain ⟨ρ, ρ', hρ₁, hρ₂, hρ₃⟩ := hρ x
-  obtain ⟨vb, vs⟩ := ((gtAct_values hG R A.D₀ F A.N A.ν (𝓞 E)).2 A.oa x ρ hρ₁ _ _ _ _ h₀.2 hqv.2).1 hqg
+  obtain ⟨vb, vs⟩ :=
+    ((gtAct_values hG R A.D₀ F A.N A.ν (𝓞 E)).2 A.oa x ρ hρ₁ _ _ _ _ h₀.2 hqv.2).1 hqg
   have hy : qv.1.1.toAdd = A.act x q₀.1.1.toAdd := by
     rw [ArcF.act, A.ν.eX.eq_symm_apply, hqv.1, h₀.1, hqy]
   obtain ⟨P, ⟨Py, Pb, Ps⟩, Py', Pb', Ps'⟩ := tq
@@ -61,7 +94,9 @@ theorem actCompat_of_rosV : GlobalFnsSt → BrGtSt → AllD fun {E} _ _ _ {H} D 
       have e₂ := Ps' χ
       have e₃ := P₀s' (A.act (star x) χ)
       have e₄ := hρ₃ (A.N.c χ) q₀.1.2.b
-      have c₁ : (A.N.twist β u).c (A.act (star x) χ) = actV (N := A.N) A.ν A.oa.onB (star x) (A.N.c χ) :=
+      have c₁
+          : (A.N.twist β u).c (A.act (star x) χ)
+            = actV (N := A.N) A.ν A.oa.onB (star x) (A.N.c χ) :=
         c_smul_val A.ν A.oa (star x) χ
       rw [Ps, Pb, vb, hy, hbal] at e₂
       rw [P₀s, P₀b, c₁] at e₃

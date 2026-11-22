@@ -7,7 +7,11 @@ public import Formalism.LocalRingCardinality.DataTies
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -17,9 +21,11 @@ open Formalism.L2.Host
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem locK_eq_of_congr (χ : HChar E) (P : HeightOneSpectrum (𝓞 E)) (h : χ.TameAt P)
-    (a b : 𝓞 E) (k l : Eˣ) (hk : (k : E) = a) (hl : (l : E) = b) (hb : b ∉ P.asIdeal)
-    (hab : a - b ∈ P.asIdeal) : χ.locK P k = χ.locK P l := by
+theorem locK_eq_of_congr
+    (χ : HChar E) (P : HeightOneSpectrum (𝓞 E)) (h : χ.TameAt P)
+    (a b : 𝓞 E) (k l : Eˣ) (hk : (k : E) = a) (hl : (l : E) = b)
+    (hb : b ∉ P.asIdeal) (hab : a - b ∈ P.asIdeal)
+    : χ.locK P k = χ.locK P l := by
   have ha : a ∉ P.asIdeal := fun ha => hb (by simpa using P.asIdeal.sub_mem ha hab)
   have hva : P.valuation E (k : E) = 1 := by
     rw [hk]; exact (P.valuation_eq_one_iff_notMem (K := E)).2 ha
@@ -32,11 +38,12 @@ theorem locK_eq_of_congr (χ : HChar E) (P : HeightOneSpectrum (𝓞 E)) (h : χ
   have key : χ.locK P (k * l⁻¹) = 1 := by
     refine h (atFin P (k * l⁻¹)) ?_ ?_
     · show Valued.v ((((k * l⁻¹ : Eˣ) : E)) : P.adicCompletion E) = 1
-      rw [HeightOneSpectrum.valuedAdicCompletion_eq_valuation', Units.val_mul, Units.val_inv_eq_inv_val, map_mul,
-        map_inv₀, hva, hvb]
+      rw [HeightOneSpectrum.valuedAdicCompletion_eq_valuation', Units.val_mul,
+        Units.val_inv_eq_inv_val, map_mul, map_inv₀, hva, hvb]
       simp
-    · have e : ((atFin P (k * l⁻¹) : (P.adicCompletion E)ˣ) : P.adicCompletion E) - 1
-          = algebraMap E (P.adicCompletion E) (((k : E) - l) * (l : E)⁻¹) := by
+    · have e
+          : ((atFin P (k * l⁻¹) : (P.adicCompletion E)ˣ) : P.adicCompletion E) - 1
+            = algebraMap E (P.adicCompletion E) (((k : E) - l) * (l : E)⁻¹) := by
         have e2 : ((k : E) - l) * (l : E)⁻¹ = ((k * l⁻¹ : Eˣ) : E) - 1 := by
           rw [Units.val_mul, Units.val_inv_eq_inv_val, sub_mul, mul_inv_cancel₀ l.ne_zero]
         rw [e2, map_sub, map_one]
@@ -47,23 +54,27 @@ theorem locK_eq_of_congr (χ : HChar E) (P : HeightOneSpectrum (𝓞 E)) (h : χ
       simpa using hvd
   rwa [map_mul, map_inv, mul_inv_eq_one] at key
 
-theorem exists_lift (P : HeightOneSpectrum (𝓞 E)) (u : (𝓞 E ⧸ P.asIdeal)ˣ) :
-    ∃ p : 𝓞 E × Eˣ, (p.2 : E) = p.1 ∧ (u : 𝓞 E ⧸ P.asIdeal) = Ideal.Quotient.mk _ p.1 ∧ p.1 ∉ P.asIdeal := by
+theorem exists_lift (P : HeightOneSpectrum (𝓞 E)) (u : (𝓞 E ⧸ P.asIdeal)ˣ)
+    : ∃ p : 𝓞 E × Eˣ,
+      (p.2 : E) = p.1 ∧ (u : 𝓞 E ⧸ P.asIdeal) = Ideal.Quotient.mk _ p.1 ∧ p.1 ∉ P.asIdeal := by
   obtain ⟨a, ha⟩ := Ideal.Quotient.mk_surjective (u : 𝓞 E ⧸ P.asIdeal)
   haveI : Nontrivial (𝓞 E ⧸ P.asIdeal) := Ideal.Quotient.nontrivial_iff.2 P.isPrime.ne_top
-  have hn : a ∉ P.asIdeal := fun h => u.ne_zero (by rw [← ha]; exact Ideal.Quotient.eq_zero_iff_mem.2 h)
+  have hn : a ∉ P.asIdeal := fun h =>
+    u.ne_zero (by rw [← ha]; exact Ideal.Quotient.eq_zero_iff_mem.2 h)
   have h0 : (a : E) ≠ 0 := by
     intro h
     have : a = 0 := by exact_mod_cast h
     exact hn (this ▸ P.asIdeal.zero_mem)
   exact ⟨(a, Units.mk0 (a : E) h0), rfl, ha.symm, hn⟩
 
-theorem exists_res (χ : HChar E) (P : HeightOneSpectrum (𝓞 E)) (h : χ.TameAt P) :
-    ∃ c : (𝓞 E ⧸ P.asIdeal)ˣ →* ℂˣ, ∀ (a : 𝓞 E) (k : Eˣ) (u : (𝓞 E ⧸ P.asIdeal)ˣ), (k : E) = a →
-      (u : 𝓞 E ⧸ P.asIdeal) = Ideal.Quotient.mk _ a → c u = χ.locK P k := by
+theorem exists_res (χ : HChar E) (P : HeightOneSpectrum (𝓞 E)) (h : χ.TameAt P)
+    : ∃ c : (𝓞 E ⧸ P.asIdeal)ˣ →* ℂˣ, ∀ (a : 𝓞 E) (k : Eˣ) (u : (𝓞 E ⧸ P.asIdeal)ˣ),
+      (k : E) = a → (u : 𝓞 E ⧸ P.asIdeal) = Ideal.Quotient.mk _ a → c u = χ.locK P k := by
   choose f hf1 hf2 hf3 using exists_lift P
-  have main : ∀ (a : 𝓞 E) (k : Eˣ) (u : (𝓞 E ⧸ P.asIdeal)ˣ), (k : E) = a →
-      (u : 𝓞 E ⧸ P.asIdeal) = Ideal.Quotient.mk _ a → χ.locK P (f u).2 = χ.locK P k := by
+  have main
+      : ∀ (a : 𝓞 E) (k : Eˣ) (u : (𝓞 E ⧸ P.asIdeal)ˣ),
+        (k : E) = a → (u : 𝓞 E ⧸ P.asIdeal) = Ideal.Quotient.mk _ a
+          → χ.locK P (f u).2 = χ.locK P k := by
     intro a k u hk hu
     refine (locK_eq_of_congr χ P h a (f u).1 k (f u).2 hk (hf1 u) (hf3 u) ?_).symm
     rw [← Ideal.Quotient.eq, ← hu, ← hf2 u]
@@ -76,6 +87,7 @@ theorem exists_res (χ : HChar E) (P : HeightOneSpectrum (𝓞 E)) (h : χ.TameA
 
 end GlobalTheory.TameResidue
 
-theorem GlobalTheory.exists_isRes_of_tameAt : ∀ (D : D7) (χ : Formalism.L2.Host.HChar D.host.E) (P : Pl D.host.E),
-    χ.TameAt P → ∃ c, IsRes χ P c :=
-  fun _ χ P h => GlobalTheory.TameResidue.exists_res χ P h
+theorem GlobalTheory.exists_isRes_of_tameAt
+    : ∀ (D : D7) (χ : Formalism.L2.Host.HChar D.host.E) (P : Pl D.host.E),
+      χ.TameAt P → ∃ c, IsRes χ P c := fun _ χ P h =>
+  GlobalTheory.TameResidue.exists_res χ P h

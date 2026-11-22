@@ -8,34 +8,46 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Bij
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry KaehlerDifferential MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory AlgebraicGeometry KaehlerDifferential MonoidalCategory CartesianMonoidalCategory
+  MonObj
 open scoped TensorProduct
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.LiftSys GlobalTheory.Obs
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.LiftSys GlobalTheory.Obs
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.Obs.BaseChg
 
-theorem beta_bijective : ∀ (R₀ R₁ : Type) [CommRing R₀] [CommRing R₁] [Algebra R₀ R₁] (X₀ X₁ : Scheme.{0})
-    (s₀ : X₀ ⟶ Sp R₀) (s₁ : X₁ ⟶ Sp R₁) (pr : X₁ ⟶ X₀)
-    (hp : IsPullback pr s₁ s₀ (spMap (algebraMap R₀ R₁))) (U : X₀.affineOpens),
-    Function.Bijective (GlobalTheory.Obs.BaseChg.beta hp U) := by
+theorem beta_bijective
+    : ∀ (R₀ R₁ : Type) [CommRing R₀] [CommRing R₁] [Algebra R₀ R₁] (X₀ X₁ : Scheme.{0})
+        (s₀ : X₀ ⟶ Sp R₀) (s₁ : X₁ ⟶ Sp R₁) (pr : X₁ ⟶ X₀)
+        (hp : IsPullback pr s₁ s₀ (spMap (algebraMap R₀ R₁))) (U : X₀.affineOpens),
+      Function.Bijective (GlobalTheory.Obs.BaseChg.beta hp U) := by
   intro R₀ R₁ _ _ _ X₀ X₁ s₀ s₁ pr hp U
-  have po := (isIso_pushoutSection_iff hp (US := ⊤) (UT := ⊤) (UX := U.1) (UY := pr ⁻¹ᵁ U.1) le_top le_top
-    (by simp)).mp (isIso_pushoutSection_of_isAffineOpen hp _ _ _ (isAffineOpen_top _) (isAffineOpen_top _) U.2)
-  have po' : IsPushout (CommRingCat.ofHom (algebraMap R₀ R₁)) (CommRingCat.ofHom (algebraMap R₀ (Sec s₀ U.1)))
-      (CommRingCat.ofHom (algebraMap R₁ (Sec s₁ (pr ⁻¹ᵁ U.1)))) (pr.appLE U.1 (pr ⁻¹ᵁ U.1) le_rfl) := by
-    refine po.flip.of_iso (Scheme.ΓSpecIso (CommRingCat.of R₀)) (Scheme.ΓSpecIso (CommRingCat.of R₁))
-      (Iso.refl (CommRingCat.of (Sec s₀ U.1))) (Iso.refl (CommRingCat.of (Sec s₁ (pr ⁻¹ᵁ U.1)))) ?_ ?_ ?_ ?_
+  have po :=
+    (isIso_pushoutSection_iff hp (US := ⊤) (UT := ⊤) (UX := U.1) (UY := pr ⁻¹ᵁ U.1) le_top le_top
+        (by simp)).mp
+      (isIso_pushoutSection_of_isAffineOpen hp _ _ _ (isAffineOpen_top _) (isAffineOpen_top _) U.2)
+  have po' : IsPushout (CommRingCat.ofHom (algebraMap R₀ R₁))
+      (CommRingCat.ofHom (algebraMap R₀ (Sec s₀ U.1)))
+      (CommRingCat.ofHom (algebraMap R₁ (Sec s₁ (pr ⁻¹ᵁ U.1))))
+      (pr.appLE U.1 (pr ⁻¹ᵁ U.1) le_rfl) := by
+    refine po.flip.of_iso (Scheme.ΓSpecIso (CommRingCat.of R₀))
+      (Scheme.ΓSpecIso (CommRingCat.of R₁)) (Iso.refl (CommRingCat.of (Sec s₀ U.1)))
+      (Iso.refl (CommRingCat.of (Sec s₁ (pr ⁻¹ᵁ U.1)))) ?_ ?_ ?_ ?_
     · rw [← Scheme.ΓSpecIso_naturality, Scheme.Hom.appTop, Scheme.Hom.app_eq_appLE]
       rfl
     · ext r
-      change (s₀.appLE ⊤ U.1 le_top).hom r = (s₀.appLE ⊤ U.1 le_top).hom
-        ((Scheme.ΓSpecIso (CommRingCat.of R₀)).inv.hom ((Scheme.ΓSpecIso (CommRingCat.of R₀)).hom.hom r))
+      change (s₀.appLE ⊤ U.1 le_top).hom r
+        = (s₀.appLE ⊤ U.1 le_top).hom
+          ((Scheme.ΓSpecIso (CommRingCat.of R₀)).inv.hom
+            ((Scheme.ΓSpecIso (CommRingCat.of R₀)).hom.hom r))
       congr 1
       simp
     · ext r
-      change (s₁.appLE ⊤ (pr ⁻¹ᵁ U.1) _).hom r = (s₁.appLE ⊤ (pr ⁻¹ᵁ U.1) le_top).hom
-        ((Scheme.ΓSpecIso (CommRingCat.of R₁)).inv.hom ((Scheme.ΓSpecIso (CommRingCat.of R₁)).hom.hom r))
+      change (s₁.appLE ⊤ (pr ⁻¹ᵁ U.1) _).hom r
+        = (s₁.appLE ⊤ (pr ⁻¹ᵁ U.1) le_top).hom
+          ((Scheme.ΓSpecIso (CommRingCat.of R₁)).inv.hom
+            ((Scheme.ΓSpecIso (CommRingCat.of R₁)).hom.hom r))
       congr 1
       simp
     · rfl

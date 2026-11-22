@@ -10,8 +10,12 @@ open scoped NNReal
 
 namespace GlobalTheory
 
-theorem exists_algEquiv_apply_eq_of_fixes_preimage_base :
-    ∀ (Ω L K : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] [Field L] [IsAlgClosed L] [Field K] [CharZero K] [Algebra K L] [Algebra.IsAlgebraic K L] (j : Ω →+* L) (s : Ω ≃ₐ[ℚ] Ω), (∀ a : Ω, j a ∈ Set.range (algebraMap K L) → s a = a) → ∀ x : Ω, ∃ g : L ≃ₐ[K] L, g (j x) = j (s x) := by
+theorem exists_algEquiv_apply_eq_of_fixes_preimage_base
+    : ∀ (Ω L K : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] [Field L] [IsAlgClosed L]
+        [Field K] [CharZero K] [Algebra K L] [Algebra.IsAlgebraic K L] (j : Ω →+* L)
+        (s : Ω ≃ₐ[ℚ] Ω),
+      (∀ a : Ω, j a ∈ Set.range (algebraMap K L) → s a = a)
+        → ∀ x : Ω, ∃ g : L ≃ₐ[K] L, g (j x) = j (s x) := by
   intro Ω L K _ _ _ _ _ _ _ _ _ j s hs x
   classical
   haveI : IsAlgClosure K L := ⟨‹_›, ‹_›⟩
@@ -31,8 +35,7 @@ theorem exists_algEquiv_apply_eq_of_fixes_preimage_base :
       minpoly.aeval, map_zero]
   set P : L[X] := (minpoly K (j x)).map (algebraMap K L) with hP
   have hPm : P.Monic := (minpoly.monic hint).map _
-  have hPQ : P ∣ Q.map j := by
-    rw [hQj]; exact Polynomial.map_dvd _ hdvd
+  have hPQ : P ∣ Q.map j := by rw [hQj]; exact Polynomial.map_dvd _ hdvd
   have hroots : ∀ r ∈ P.roots, r ∈ Set.range j := by
     intro r hr
     have h1 : r ∈ (Q.map j).roots :=

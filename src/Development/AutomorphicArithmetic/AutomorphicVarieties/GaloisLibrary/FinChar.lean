@@ -10,8 +10,8 @@ namespace UpperTheory.V.Lib.FinChar
 
 variable {k : Type} [Field k] [IsAlgClosed k] [CharZero k] {n : ℕ}
 
-theorem exists_eigenbasis (f : Module.End k (Fin n → k)) {m : ℕ} (hm : 0 < m) (hfm : f ^ m = 1) :
-    ∃ (b : Module.Basis (Fin n) k (Fin n → k)) (d : Fin n → k), ∀ i, f (b i) = d i • b i := by
+theorem exists_eigenbasis (f : Module.End k (Fin n → k)) {m : ℕ} (hm : 0 < m) (hfm : f ^ m = 1)
+    : ∃ (b : Module.Basis (Fin n) k (Fin n → k)) (d : Fin n → k), ∀ i, f (b i) = d i • b i := by
   classical
   have hmk : ((m : ℕ) : k) ≠ 0 := Nat.cast_ne_zero.mpr hm.ne'
   have hsep : (X ^ m - C (1 : k)).Separable := separable_X_pow_sub_C 1 hmk one_ne_zero
@@ -28,21 +28,25 @@ theorem exists_eigenbasis (f : Module.End k (Fin n → k)) {m : ℕ} (hm : 0 < m
   rw [Module.End.mem_eigenspace_iff] at hmem
   simpa [Module.Basis.reindex_apply, B] using hmem
 
-theorem exists_eigenframe (T : (Matrix (Fin n) (Fin n) k)ˣ) {m : ℕ} (hm : 0 < m) (hT : T ^ m = 1) :
-    ∃ (u : (Matrix (Fin n) (Fin n) k)ˣ) (d : Fin n → k), T.val * u.val = u.val * Matrix.diagonal d := by
+theorem exists_eigenframe (T : (Matrix (Fin n) (Fin n) k)ˣ) {m : ℕ} (hm : 0 < m) (hT : T ^ m = 1)
+    : ∃ (u : (Matrix (Fin n) (Fin n) k)ˣ) (d : Fin n → k),
+      T.val * u.val = u.val * Matrix.diagonal d := by
   classical
-  obtain ⟨b, d, hb⟩ := exists_eigenbasis (Matrix.toLinAlgEquiv' T.val) hm
-    (by rw [← map_pow, ← Units.val_pow_eq_pow_val, hT, Units.val_one, map_one])
+  obtain ⟨b, d, hb⟩ :=
+    exists_eigenbasis (Matrix.toLinAlgEquiv' T.val) hm
+      (by rw [← map_pow, ← Units.val_pow_eq_pow_val, hT, Units.val_one, map_one])
   letI := (Pi.basisFun k (Fin n)).invertibleToMatrix b
   refine ⟨unitOfInvertible ((Pi.basisFun k (Fin n)).toMatrix b), d, ?_⟩
   ext i j
   rw [Matrix.mul_diagonal]
   have hj := congrFun (hb j) i
-  simp only [Matrix.toLinAlgEquiv'_apply, Matrix.mulVec, dotProduct, Pi.smul_apply, smul_eq_mul] at hj
+  simp only [Matrix.toLinAlgEquiv'_apply, Matrix.mulVec, dotProduct, Pi.smul_apply, smul_eq_mul]
+    at hj
   simp [Matrix.mul_apply, Module.Basis.toMatrix_apply, hj, mul_comm]
 
-theorem charpoly_powers (T : (Matrix (Fin n) (Fin n) k)ˣ) {m : ℕ} (hm : 0 < m) (hT : T ^ m = 1) :
-    ∃ d : Fin n → k, (∀ i, d i ^ m = 1) ∧ ∀ a : ℕ, (T ^ a).val.charpoly = ∏ i, (X - C (d i ^ a)) := by
+theorem charpoly_powers (T : (Matrix (Fin n) (Fin n) k)ˣ) {m : ℕ} (hm : 0 < m) (hT : T ^ m = 1)
+    : ∃ d : Fin n → k,
+      (∀ i, d i ^ m = 1) ∧ ∀ a : ℕ, (T ^ a).val.charpoly = ∏ i, (X - C (d i ^ a)) := by
   classical
   obtain ⟨u, d, hu⟩ := exists_eigenframe T hm hT
   have hc : ∀ a : ℕ, T.val ^ a * u.val = u.val * Matrix.diagonal d ^ a := by
@@ -63,9 +67,11 @@ theorem charpoly_powers (T : (Matrix (Fin n) (Fin n) k)ˣ) {m : ℕ} (hm : 0 < m
     rw [h1, Matrix.charpoly_units_conj, Matrix.diagonal_pow, Matrix.charpoly_diagonal]
     simp [Pi.pow_apply]
 
-theorem charpoly_of_ker {Γ : Type} [Group Γ] (r : Γ →* (Matrix (Fin n) (Fin n) k)ˣ) (χ : Γ →* kˣ) (I : Subgroup Γ)
-    (hf : (χ '' (I : Set Γ)).Finite) (hk : ∀ g ∈ I, χ g = 1 → r g = 1) :
-    ∃ j : Fin n → ℕ, ∀ g ∈ I, (r g).val.charpoly = ∏ i, (X - C ((χ g : k) ^ j i)) := by
+theorem charpoly_of_ker
+    {Γ : Type} [Group Γ]
+    (r : Γ →* (Matrix (Fin n) (Fin n) k)ˣ) (χ : Γ →* kˣ) (I : Subgroup Γ)
+    (hf : (χ '' (I : Set Γ)).Finite) (hk : ∀ g ∈ I, χ g = 1 → r g = 1)
+    : ∃ j : Fin n → ℕ, ∀ g ∈ I, (r g).val.charpoly = ∏ i, (X - C ((χ g : k) ^ j i)) := by
   classical
   set S : Subgroup kˣ := I.map χ with hS
   have hSf : (S : Set kˣ).Finite := by rw [hS, Subgroup.coe_map]; exact hf
@@ -91,11 +97,9 @@ theorem charpoly_of_ker {Γ : Type} [Group Γ] (r : Γ →* (Matrix (Fin n) (Fin
   choose j hj using hj
   refine ⟨j, fun g hg => ?_⟩
   obtain ⟨a, ha⟩ := (Submonoid.mem_powers_iff _ _).mp (hx ⟨χ g, Subgroup.mem_map_of_mem χ hg⟩)
-  have hχa : χ g = (x : kˣ) ^ a := by
-    rw [← SubgroupClass.coe_pow, ha]
+  have hχa : χ g = (x : kˣ) ^ a := by rw [← SubgroupClass.coe_pow, ha]
   have hrg : r g = r g0 ^ a := by
-    have h1 : χ (g * (g0 ^ a)⁻¹) = 1 := by
-      rw [map_mul, map_inv, map_pow, hg0, hχa, mul_inv_cancel]
+    have h1 : χ (g * (g0 ^ a)⁻¹) = 1 := by rw [map_mul, map_inv, map_pow, hg0, hχa, mul_inv_cancel]
     have h2 := hk _ (I.mul_mem hg (I.inv_mem (I.pow_mem hg0I a))) h1
     rw [map_mul, map_inv, map_pow, mul_inv_eq_one] at h2
     exact h2

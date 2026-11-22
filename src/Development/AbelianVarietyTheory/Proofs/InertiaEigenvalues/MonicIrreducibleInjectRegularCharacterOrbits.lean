@@ -14,24 +14,28 @@ namespace GlobalTheory.PrimeLabOrbit
 
 variable {g : ℕ} [hg : Fact g.Prime]
 
-theorem aeval_pow_frob {K : Type} [Field K] [Algebra (ZMod g) K] (n : ℕ) (Q : (ZMod g)[X]) (y : K) :
-    aeval (y ^ g ^ n) Q = (aeval y Q) ^ g ^ n := by
+theorem aeval_pow_frob {K : Type} [Field K] [Algebra (ZMod g) K] (n : ℕ) (Q : (ZMod g)[X]) (y : K)
+    : aeval (y ^ g ^ n) Q = (aeval y Q) ^ g ^ n := by
   haveI : CharP K g := (Algebra.charP_iff (ZMod g) K g).1 (ZMod.charP g)
   haveI : ExpChar K g := ExpChar.prime hg.out
-  rw [← iterateFrobenius_def g n y, ← iterateFrobenius_def g n (aeval y Q), aeval_def, aeval_def, hom_eval₂]
+  rw [← iterateFrobenius_def g n y, ← iterateFrobenius_def g n (aeval y Q), aeval_def, aeval_def,
+    hom_eval₂]
   congr 1
   exact Subsingleton.elim _ _
 
-theorem frob_injective {K : Type} [Field K] [Algebra (ZMod g) K] (n : ℕ) :
-    Function.Injective (fun y : K => y ^ g ^ n) := by
+theorem frob_injective {K : Type} [Field K] [Algebra (ZMod g) K] (n : ℕ)
+    : Function.Injective (fun y : K => y ^ g ^ n) := by
   haveI : CharP K g := (Algebra.charP_iff (ZMod g) K g).1 (ZMod.charP g)
   haveI : ExpChar K g := ExpChar.prime hg.out
   intro a b h
   apply (iterateFrobenius K g n).injective
   simpa only [iterateFrobenius_def] using h
 
-theorem card_le_of_gen_fixed {L : Type} [Field L] [Algebra (ZMod g) L] [Fintype L] {k : ℕ} (hk : 0 < k) {x : L}
-    (hgen : ∀ y : L, ∃ Q : (ZMod g)[X], aeval x Q = y) (hx : x ^ g ^ k = x) : Fintype.card L ≤ g ^ k := by
+theorem card_le_of_gen_fixed
+    {L : Type} [Field L] [Algebra (ZMod g) L] [Fintype L]
+    {k : ℕ} (hk : 0 < k)
+    {x : L} (hgen : ∀ y : L, ∃ Q : (ZMod g)[X], aeval x Q = y) (hx : x ^ g ^ k = x)
+    : Fintype.card L ≤ g ^ k := by
   have hq : 1 < g ^ k := Nat.one_lt_pow hk.ne' hg.out.one_lt
   set f : L[X] := X ^ (g ^ k) - X with hf
   have hf0 : f ≠ 0 := FiniteField.X_pow_card_sub_X_ne_zero hq
@@ -41,8 +45,11 @@ theorem card_le_of_gen_fixed {L : Type} [Field L] [Algebra (ZMod g) L] [Fintype 
     rw [← aeval_pow_frob, hx]
   have hsub : (Finset.univ : Finset L) ⊆ f.roots.toFinset := by
     intro y _
-    rw [Multiset.mem_toFinset, mem_roots hf0, IsRoot, hf, eval_sub, eval_pow, eval_X, hfix y, sub_self]
-  calc Fintype.card L = (Finset.univ : Finset L).card := Finset.card_univ.symm
+    rw [Multiset.mem_toFinset, mem_roots hf0, IsRoot, hf, eval_sub, eval_pow, eval_X, hfix y,
+      sub_self]
+  calc
+    Fintype.card L
+      = (Finset.univ : Finset L).card := Finset.card_univ.symm
     _ ≤ f.roots.toFinset.card := Finset.card_le_card hsub
     _ ≤ Multiset.card f.roots := Multiset.toFinset_card_le _
     _ ≤ f.natDegree := card_roots' f
@@ -83,8 +90,10 @@ end adjoin
 
 variable {K : Type} [Field K] [Algebra (ZMod g) K]
 
-theorem exists_unit_root {d : ℕ} (hd : 0 < d) (hK : Module.finrank (ZMod g) K = d) {P : (ZMod g)[X]}
-    (hP : IsPrimeLab d P) : ∃ u : Kˣ, aeval (u : K) P = 0 := by
+theorem exists_unit_root
+    {d : ℕ} (hd : 0 < d) (hK : Module.finrank (ZMod g) K = d)
+    {P : (ZMod g)[X]} (hP : IsPrimeLab d P)
+    : ∃ u : Kˣ, aeval (u : K) P = 0 := by
   haveI := Fact.mk hP.2.1
   haveI : Module.Finite (ZMod g) (AdjoinRoot P) := (AdjoinRoot.powerBasis hP.1.ne_zero).finite
   haveI : Finite (AdjoinRoot P) := Module.finite_of_finite (ZMod g)
@@ -105,8 +114,8 @@ theorem exists_unit_root {d : ℕ} (hd : 0 < d) (hK : Module.finrank (ZMod g) K 
     exact hP.2.2.1 ((algebraMap (ZMod g) K).injective (hr.trans (map_zero _).symm))
   exact ⟨Units.mk0 _ hne, hr⟩
 
-theorem orbit_regular {d : ℕ} {P : (ZMod g)[X]} (hP : IsPrimeLab d P) {u : K} (hu : aeval u P = 0) :
-    ∀ i j, i < d → j < d → u ^ g ^ i = u ^ g ^ j → i = j := by
+theorem orbit_regular {d : ℕ} {P : (ZMod g)[X]} (hP : IsPrimeLab d P) {u : K} (hu : aeval u P = 0)
+    : ∀ i j, i < d → j < d → u ^ g ^ i = u ^ g ^ j → i = j := by
   have key : ∀ i j, i < j → j < d → u ^ g ^ i = u ^ g ^ j → False := by
     intro i j hij hj h
     have hk : 0 < j - i := Nat.sub_pos_of_lt hij
@@ -127,9 +136,15 @@ theorem orbit_regular {d : ℕ} {P : (ZMod g)[X]} (hP : IsPrimeLab d P) {u : K} 
   · exact hij
   · exact (key j i hij hi h.symm).elim
 
-theorem primeLab_to_regularChar : ∀ (g : ℕ) [Fact g.Prime] (d : ℕ), 0 < d → ∀ (K : Type) [Field K] [Algebra (ZMod g) K],
-    Module.finrank (ZMod g) K = d → ∃ c : (ZMod g)[X] → (Kˣ →* ℂˣ), (∀ P, IsPrimeLab d P → IsRegularChar g d (c P)) ∧
-      ∀ P P', IsPrimeLab d P → IsPrimeLab d P' → (∃ i < d, c P' = c P ^ g ^ i) → P = P' := by
+theorem primeLab_to_regularChar
+    : ∀ (g : ℕ) [Fact g.Prime] (d : ℕ),
+      0 < d
+        → ∀ (K : Type) [Field K] [Algebra (ZMod g) K],
+          Module.finrank (ZMod g) K = d
+            → ∃ c : (ZMod g)[X] → (Kˣ →* ℂˣ),
+              (∀ P, IsPrimeLab d P → IsRegularChar g d (c P))
+                ∧ ∀ P P',
+                  IsPrimeLab d P → IsPrimeLab d P' → (∃ i < d, c P' = c P ^ g ^ i) → P = P' := by
   intro g _ d hd K _ _ hK
   haveI : Module.Finite (ZMod g) K := Module.finite_of_finrank_pos (hK ▸ hd)
   haveI : Finite K := Module.finite_of_finite (ZMod g)
@@ -152,8 +167,10 @@ theorem primeLab_to_regularChar : ∀ (g : ℕ) [Fact g.Prime] (d : ℕ), 0 < d 
     rw [hcu, hcu', ← map_pow] at h
     have h' := congrArg Units.val (e.injective h)
     simp only [Units.val_pow_eq_pow_val] at h'
-    have hr : aeval (u' : K) P = 0 := by rw [h', aeval_pow_frob, hu, zero_pow (pow_ne_zero _ (Fact.out : g.Prime).ne_zero)]
-    rw [minpoly.eq_of_irreducible_of_monic hP.2.1 hr hP.1, minpoly.eq_of_irreducible_of_monic hP'.2.1 hu' hP'.1]
+    have hr : aeval (u' : K) P = 0 := by
+      rw [h', aeval_pow_frob, hu, zero_pow (pow_ne_zero _ (Fact.out : g.Prime).ne_zero)]
+    rw [minpoly.eq_of_irreducible_of_monic hP.2.1 hr hP.1,
+      minpoly.eq_of_irreducible_of_monic hP'.2.1 hu' hP'.1]
 
 end GlobalTheory.PrimeLabOrbit
 

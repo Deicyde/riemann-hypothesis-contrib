@@ -13,9 +13,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsStanda
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory Formalism.L2.Pj Formalism.BasicNotions
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+  Formalism.L2.Pj Formalism.BasicNotions
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.HermTools GlobalTheory.Adelic GlobalTheory.CompHS GlobalTheory.CovTop
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.HermTools
+  GlobalTheory.Adelic GlobalTheory.CompHS GlobalTheory.CovTop
 open GlobalTheory.AllWt (Psi wtOf cuspOn latOn normOn petOn GoodOn GoodW bergOn framesOn)
 open GlobalTheory.FlagMod (FlagCover)
 open GlobalTheory.FlagTan (dimFlag)
@@ -31,24 +34,29 @@ noncomputable section
 
 namespace GlobalTheory.AdaptedFrame
 
-
 open ReciprocityTheory.ChartRestriction.G.DVR.FlatBC (algX) in
-theorem exists_basis_dFun {k : Type} [CommRing k] {Y : Scheme.{0}} (p : Y ⟶ Sp k) (D : ℕ)
-    [SmoothOfRelativeDimension D p] {O : Y.Opens} {x : Y} (hxO : x ∈ O) :
-    ∃ (U : Y.Opens) (f : Fin D → Γ(Y, U)) (b : Module.Basis (Fin D) Γ(Y, U) (Omega (algX p U))),
+theorem exists_basis_dFun
+    {k : Type} [CommRing k]
+    {Y : Scheme.{0}} (p : Y ⟶ Sp k)
+    (D : ℕ) [SmoothOfRelativeDimension D p]
+    {O : Y.Opens} {x : Y} (hxO : x ∈ O)
+    : ∃ (U : Y.Opens) (f : Fin D → Γ(Y, U)) (b : Module.Basis (Fin D) Γ(Y, U) (Omega (algX p U))),
       U ≤ O ∧ x ∈ U ∧ IsAffineOpen U ∧ ∀ i, b i = dFun (algX p U) (f i) := by
   classical
   obtain ⟨V, hV, hx, hVO⟩ := Opens.isBasis_iff_nbhd.1 Y.isBasis_affineOpens hxO
-  have h := HasRingHomProperty.appLE (@SmoothOfRelativeDimension D) p ‹_›
-    ⟨⊤, isAffineOpen_top _⟩ ⟨V, hV⟩ le_top
-  obtain ⟨s, hs, h⟩ := (RingHom.locally_iff_isLocalization
-    RingHom.isStandardSmoothOfRelativeDimension_respectsIso _).1 h
+  have h :=
+    HasRingHomProperty.appLE (@SmoothOfRelativeDimension D) p ‹_› ⟨⊤, isAffineOpen_top _⟩ ⟨V, hV⟩
+      le_top
+  obtain ⟨s, hs, h⟩ :=
+    (RingHom.locally_iff_isLocalization RingHom.isStandardSmoothOfRelativeDimension_respectsIso _).1
+      h
   obtain ⟨t, hxt⟩ : ∃ t : (s : Set Γ(Y, V)), x ∈ Y.basicOpen (t : Γ(Y, V)) :=
     Opens.mem_iSup.1 (((IsAffineOpen.iSup_basicOpen_eq_self_iff hV).2 hs).ge hx)
   have := IsAffineOpen.isLocalization_basicOpen hV (t : Γ(Y, V))
-  have h₁ := RingHom.isStandardSmoothOfRelativeDimension_respectsIso.2 _
-    (Scheme.ΓSpecIso (CommRingCat.of k)).symm.commRingCatIsoToRingEquiv
-    (h t t.2 Γ(Y, Y.basicOpen (t : Γ(Y, V))))
+  have h₁ :=
+    RingHom.isStandardSmoothOfRelativeDimension_respectsIso.2 _
+      (Scheme.ΓSpecIso (CommRingCat.of k)).symm.commRingCatIsoToRingEquiv
+      (h t t.2 Γ(Y, Y.basicOpen (t : Γ(Y, V))))
   have h₂ : (algX p (Y.basicOpen (t : Γ(Y, V)))).IsStandardSmoothOfRelativeDimension D := by
     rw [← resG_comp_algX p (Y.basicOpen_le (t : Γ(Y, V)))]
     exact h₁
@@ -62,53 +70,68 @@ theorem exists_basis_dFun {k : Type} [CommRing k] {Y : Scheme.{0}} (p : Y ⟶ Sp
     rw [Fintype.card_compl_set, Set.card_range_of_injective P.map_inj, ← hP]
     simp [Algebra.Presentation.dimension]
   let e := Fintype.equivFinOfCardEq hc
-  exact ⟨_, fun i => P.val (e.symm i), P.basisKaehler.reindex e, (Y.basicOpen_le _).trans hVO, hxt,
-    hV.basicOpen _, fun i => by simp⟩
+  exact ⟨
+    _,
+    fun i => P.val (e.symm i),
+    P.basisKaehler.reindex e,
+    (Y.basicOpen_le _).trans hVO,
+    hxt,
+    hV.basicOpen _,
+    fun i => by simp
+  ⟩
 
-theorem linearIndependent_tmul_D {k A : Type} [CommRing k] [CommRing A] [IsLocalRing A] [Algebra k A]
-    [Algebra.FormallySmooth k (IsLocalRing.ResidueField A)] {J : Type} (f : J → A)
-    (hf : ∀ j, f j ∈ IsLocalRing.maximalIdeal A)
+theorem linearIndependent_tmul_D
+    {k A : Type} [CommRing k] [CommRing A] [IsLocalRing A] [Algebra k A]
+    [Algebra.FormallySmooth k (IsLocalRing.ResidueField A)]
+    {J : Type} (f : J → A) (hf : ∀ j, f j ∈ IsLocalRing.maximalIdeal A)
     (h : LinearIndependent (IsLocalRing.ResidueField A) (fun j =>
-      ((IsLocalRing.maximalIdeal A).toCotangent ⟨f j, hf j⟩ : IsLocalRing.CotangentSpace A))) :
-    LinearIndependent (IsLocalRing.ResidueField A)
+      ((IsLocalRing.maximalIdeal A).toCotangent ⟨f j, hf j⟩ : IsLocalRing.CotangentSpace A)))
+    : LinearIndependent (IsLocalRing.ResidueField A)
       (fun j => (1 : IsLocalRing.ResidueField A) ⊗ₜ[A] KaehlerDifferential.D k A (f j)) := by
   have hs : Function.Surjective (algebraMap A (IsLocalRing.ResidueField A)) :=
     IsLocalRing.residue_surjective
-  have hinj := GlobalTheory.SmoothTangent.kerCotangentToTensor_injective k A (IsLocalRing.ResidueField A) hs
-  have hker : IsLocalRing.maximalIdeal A = RingHom.ker (algebraMap A (IsLocalRing.ResidueField A)) :=
+  have hinj :=
+    GlobalTheory.SmoothTangent.kerCotangentToTensor_injective k A (IsLocalRing.ResidueField A) hs
+  have hker
+      : IsLocalRing.maximalIdeal A = RingHom.ker (algebraMap A (IsLocalRing.ResidueField A)) :=
     IsLocalRing.ker_residue.symm
   let c := Ideal.Cotangent.equivOfEq _ _ hker
   let e : IsLocalRing.CotangentSpace A →ₗ[A] IsLocalRing.ResidueField A ⊗[A] Ω[A⁄k] :=
     KaehlerDifferential.kerCotangentToTensor k A (IsLocalRing.ResidueField A) ∘ₗ c.toLinearMap
   have he : Function.Injective (e.extendScalarsOfSurjective hs) := hinj.comp c.injective
   have := h.map' (e.extendScalarsOfSurjective hs) (LinearMap.ker_eq_bot.2 he)
-  have key : ⇑(e.extendScalarsOfSurjective hs) ∘ (fun j =>
-      ((IsLocalRing.maximalIdeal A).toCotangent ⟨f j, hf j⟩ : IsLocalRing.CotangentSpace A)) =
-      fun j => (1 : IsLocalRing.ResidueField A) ⊗ₜ[A] KaehlerDifferential.D k A (f j) := by
+  have key
+      : ⇑(e.extendScalarsOfSurjective hs) ∘ (fun j =>
+          ((IsLocalRing.maximalIdeal A).toCotangent ⟨f j, hf j⟩ : IsLocalRing.CotangentSpace A))
+        = fun j => (1 : IsLocalRing.ResidueField A) ⊗ₜ[A] KaehlerDifferential.D k A (f j) := by
     funext j
-    simp only [Function.comp_apply, LinearMap.extendScalarsOfSurjective_apply, e, LinearMap.comp_apply,
-    LinearEquiv.coe_coe, c]
+    simp only [Function.comp_apply, LinearMap.extendScalarsOfSurjective_apply, e,
+      LinearMap.comp_apply, LinearEquiv.coe_coe, c]
     rw [Ideal.Cotangent.equivOfEq_toCotangent, KaehlerDifferential.kerCotangentToTensor_toCotangent]
     rfl
   rw [key] at this
   exact this
 
-
 open ReciprocityTheory.ChartRestriction.G.DVR.FlatBC (algX) in
-theorem formallySmooth_residueField {k : Type} [Field k] [PerfectField k] {X : Scheme.{0}}
-    (p : X ⟶ Sp k) {n : ℕ} [SmoothOfRelativeDimension n p] {U : X.Opens} (hU : IsAffineOpen U)
+theorem formallySmooth_residueField
+    {k : Type} [Field k] [PerfectField k]
+    {X : Scheme.{0}} (p : X ⟶ Sp k)
+    {n : ℕ} [SmoothOfRelativeDimension n p]
+    {U : X.Opens} (hU : IsAffineOpen U)
     (y : X) (hy : y ∈ U) [Algebra k (X.presheaf.stalk y)]
-    (h : algebraMap k (X.presheaf.stalk y) = (X.presheaf.germ U y hy).hom.comp (algX p U)) :
-    Algebra.FormallySmooth k (IsLocalRing.ResidueField (X.presheaf.stalk y)) := by
+    (h : algebraMap k (X.presheaf.stalk y) = (X.presheaf.germ U y hy).hom.comp (algX p U))
+    : Algebra.FormallySmooth k (IsLocalRing.ResidueField (X.presheaf.stalk y)) := by
   letI : Algebra Γ(X, U) (X.presheaf.stalk y) := (X.presheaf.germ U y hy).hom.toAlgebra
   letI : Algebra k Γ(X, U) := (algX p U).toAlgebra
   haveI : IsScalarTower k Γ(X, U) (X.presheaf.stalk y) := IsScalarTower.of_algebraMap_eq' h
   haveI : Smooth p := SmoothOfRelativeDimension.smooth n p
   have hft : (algX p U).FiniteType := by
-    have h₀ := HasRingHomProperty.appLE @LocallyOfFiniteType p inferInstance
-      ⟨⊤, isAffineOpen_top _⟩ ⟨U, hU⟩ le_top
+    have h₀ :=
+      HasRingHomProperty.appLE @LocallyOfFiniteType p inferInstance ⟨⊤, isAffineOpen_top _⟩ ⟨U, hU⟩
+        le_top
     exact RingHom.FiniteType.comp h₀
-      (RingHom.FiniteType.of_surjective _ (Scheme.ΓSpecIso (CommRingCat.of k)).commRingCatIsoToRingEquiv.symm.surjective)
+      (RingHom.FiniteType.of_surjective _
+        (Scheme.ΓSpecIso (CommRingCat.of k)).commRingCatIsoToRingEquiv.symm.surjective)
   haveI : Algebra.FiniteType k Γ(X, U) := hft
   haveI : IsLocalization.AtPrime (X.presheaf.stalk y) (hU.primeIdealOf ⟨y, hy⟩).asIdeal :=
     hU.isLocalization_stalk ⟨y, hy⟩
@@ -122,16 +145,17 @@ theorem formallySmooth_residueField {k : Type} [Field k] [PerfectField k] {X : S
     Algebra.EssFiniteType.comp k (X.presheaf.stalk y) _
   exact Algebra.FormallySmooth.of_perfectField
 
-
 open ReciprocityTheory.ChartRestriction.G.DVR.FlatBC (algX) in
-theorem exists_adapted_frame : ∀ {X : Scheme.{0}} {p : X ⟶ Sp ℂ} {n : ℕ} [SmoothOfRelativeDimension n p] (y : X) {J : Type}
-    [Fintype J] (f : J → X.presheaf.stalk y)
-    (hf : ∀ j, f j ∈ IsLocalRing.maximalIdeal (X.presheaf.stalk y)),
-    LinearIndependent (IsLocalRing.ResidueField (X.presheaf.stalk y))
-      (fun j => ((IsLocalRing.maximalIdeal (X.presheaf.stalk y)).toCotangent ⟨f j, hf j⟩ :
-        IsLocalRing.CotangentSpace (X.presheaf.stalk y))) →
-    ∃ (U : X.Opens) (hy : y ∈ U) (z : Fin n → Γ(X, U)) (e : J → Fin n), Function.Injective e ∧
-      (∀ j, X.presheaf.germ U y hy (z (e j)) = f j) ∧ IsFrame (dOn p z) := by
+theorem exists_adapted_frame
+    : ∀ {X : Scheme.{0}} {p : X ⟶ Sp ℂ} {n : ℕ} [SmoothOfRelativeDimension n p] (y : X) {J : Type}
+        [Fintype J] (f : J → X.presheaf.stalk y)
+        (hf : ∀ j, f j ∈ IsLocalRing.maximalIdeal (X.presheaf.stalk y)),
+      LinearIndependent (IsLocalRing.ResidueField (X.presheaf.stalk y)) (fun j =>
+          ((IsLocalRing.maximalIdeal (X.presheaf.stalk y)).toCotangent ⟨f j, hf j⟩
+            : IsLocalRing.CotangentSpace (X.presheaf.stalk y)))
+        → ∃ (U : X.Opens) (hy : y ∈ U) (z : Fin n → Γ(X, U)) (e : J → Fin n),
+          Function.Injective e ∧ (∀ j, X.presheaf.germ U y hy (z (e j)) = f j)
+            ∧ IsFrame (dOn p z) := by
   classical
   intro X p n _ y J _ f hf hli
 
@@ -161,27 +185,36 @@ theorem exists_adapted_frame : ∀ {X : Scheme.{0}} {p : X ⟶ Sp ℂ} {n : ℕ}
     (IsLocalRing.residue (X.presheaf.stalk y)).comp (X.presheaf.germ U y hyU).hom
   let ab : J → Fin n → IsLocalRing.ResidueField (X.presheaf.stalk y) := fun j l => ρ (a j l)
   have hab : LinearIndependent (IsLocalRing.ResidueField (X.presheaf.stalk y)) ab := by
-    let wx : Fin n → IsLocalRing.ResidueField (X.presheaf.stalk y) ⊗[X.presheaf.stalk y]
-        Ω[(X.presheaf.stalk y)⁄ℂ] :=
-      fun l => 1 ⊗ₜ KaehlerDifferential.D ℂ (X.presheaf.stalk y) ((X.presheaf.germ U y hyU).hom (x l))
+    let wx
+        : Fin n
+          → IsLocalRing.ResidueField (X.presheaf.stalk y) ⊗[X.presheaf.stalk y]
+            Ω[(X.presheaf.stalk y)⁄ℂ] := fun l =>
+      1 ⊗ₜ KaehlerDifferential.D ℂ (X.presheaf.stalk y) ((X.presheaf.germ U y hyU).hom (x l))
     refine LinearIndependent.of_comp (Fintype.linearCombination _ wx) ?_
-    have key : ⇑(Fintype.linearCombination (IsLocalRing.ResidueField (X.presheaf.stalk y)) wx) ∘ ab =
-        fun j => (1 : IsLocalRing.ResidueField (X.presheaf.stalk y)) ⊗ₜ[X.presheaf.stalk y]
-          KaehlerDifferential.D ℂ (X.presheaf.stalk y) (f j) := by
+    have key
+        : ⇑(Fintype.linearCombination (IsLocalRing.ResidueField (X.presheaf.stalk y)) wx) ∘ ab
+          = fun j =>
+            (1 : IsLocalRing.ResidueField (X.presheaf.stalk y)) ⊗ₜ[X.presheaf.stalk y]
+              KaehlerDifferential.D ℂ (X.presheaf.stalk y) (f j) := by
       funext j
       rw [Function.comp_apply, Fintype.linearCombination_apply, ← hz₀ j]
       have e1 := congrArg (KaehlerDifferential.map ℂ ℂ Γ(X, U) (X.presheaf.stalk y)) (ha j)
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum] at e1
       change KaehlerDifferential.map ℂ ℂ Γ(X, U) (X.presheaf.stalk y)
-        (KaehlerDifferential.D ℂ Γ(X, U) (z₀ j)) = _ at e1
+            (KaehlerDifferential.D ℂ Γ(X, U) (z₀ j))
+          = _
+        at e1
       rw [KaehlerDifferential.map_D] at e1
-      change KaehlerDifferential.D ℂ (X.presheaf.stalk y) ((X.presheaf.germ U y hyU).hom (z₀ j)) = _ at e1
+      change KaehlerDifferential.D ℂ (X.presheaf.stalk y) ((X.presheaf.germ U y hyU).hom (z₀ j)) = _
+        at e1
       rw [e1, TensorProduct.tmul_sum]
       refine Finset.sum_congr rfl fun l _ => ?_
       rw [map_smul]
-      change _ = 1 ⊗ₜ (a j l • KaehlerDifferential.map ℂ ℂ Γ(X, U) (X.presheaf.stalk y)
-        (KaehlerDifferential.D ℂ Γ(X, U) (x l)))
+      change _
+        = 1
+          ⊗ₜ (a j l • KaehlerDifferential.map ℂ ℂ Γ(X, U) (X.presheaf.stalk y)
+            (KaehlerDifferential.D ℂ Γ(X, U) (x l)))
       rw [KaehlerDifferential.map_D, ← algebraMap_smul (X.presheaf.stalk y) (a j l),
         TensorProduct.tmul_smul, ← algebraMap_smul (IsLocalRing.ResidueField (X.presheaf.stalk y))]
       rfl
@@ -201,8 +234,10 @@ theorem exists_adapted_frame : ∀ {X : Scheme.{0}} {p : X ⟶ Sp ℂ} {n : ℕ}
       simp [Pi.single_apply]
   have hform : dOn p z = c.det • dOn p x := dForm_eq_det_smul z x c hdz
   have hρ : ρ c.det ≠ 0 := by
-    have hm : c.map ρ = Matrix.of (Function.extend e ab
-        (fun i => Pi.single i (1 : IsLocalRing.ResidueField (X.presheaf.stalk y)))) := by
+    have hm
+        : c.map ρ
+          = Matrix.of (Function.extend e ab
+            (fun i => Pi.single i (1 : IsLocalRing.ResidueField (X.presheaf.stalk y)))) := by
       ext i l
       by_cases hi : ∃ j, e j = i
       · obtain ⟨j, rfl⟩ := hi

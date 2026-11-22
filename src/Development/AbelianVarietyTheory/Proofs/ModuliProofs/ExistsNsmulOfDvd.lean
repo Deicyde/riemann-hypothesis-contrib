@@ -10,31 +10,42 @@ public import Development.AbelianVarietyTheory.Counterexamples.ModuliSurvey.Heck
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 namespace GlobalTheory.HeckeKerAll
 
 open GlobalTheory.HeckeTate GlobalTheory.HeckeKerModel
 
-theorem index_ker_le_card {X Y : Type} [AddCommGroup X] [AddCommGroup Y] [Finite Y] {m : ℕ} [NeZero m]
-    (F : X →+ (Y →+ ZMod m)) : F.ker.index ≤ Nat.card Y := by
+theorem index_ker_le_card
+    {X Y : Type} [AddCommGroup X] [AddCommGroup Y] [Finite Y]
+    {m : ℕ} [NeZero m]
+    (F : X →+ (Y →+ ZMod m))
+    : F.ker.index ≤ Nat.card Y := by
   classical
   have : Fintype Y := Fintype.ofFinite Y
-  have hinj : Function.Injective
-      (fun φ : Y →+ ZMod m => (ZMod.stdAddChar (N := m)).compAddMonoidHom φ) := by
+  have hinj : Function.Injective (fun φ : Y →+ ZMod m =>
+      (ZMod.stdAddChar (N := m)).compAddMonoidHom φ) := by
     intro φ ψ h
     ext y
     exact ZMod.injective_stdAddChar (DFunLike.congr_fun h y)
   have : Finite (Y →+ ZMod m) := Finite.of_injective _ hinj
   rw [AddSubgroup.index_ker]
-  calc Nat.card F.range ≤ Nat.card (Y →+ ZMod m) := Nat.card_le_card_of_injective _ Subtype.val_injective
+  calc
+    Nat.card F.range
+      ≤ Nat.card (Y →+ ZMod m) := Nat.card_le_card_of_injective _ Subtype.val_injective
     _ ≤ Nat.card (AddChar Y ℂ) := Nat.card_le_card_of_injective _ hinj
     _ = Nat.card Y := by simp only [Nat.card_eq_fintype_card, AddChar.card_eq]
 
-theorem exists_nsmul_of_dvd {M : Type} [AddCommGroup M] (B : M →+ M →+ ℤ) (hB : Function.Bijective B) {m : ℕ}
-    (hm : m ≠ 0) {x : M} (h1 : ∀ y, (m : ℤ) ∣ B x y) : ∃ z, m • z = x := by
+theorem exists_nsmul_of_dvd
+    {M : Type} [AddCommGroup M]
+    (B : M →+ M →+ ℤ) (hB : Function.Bijective B)
+    {m : ℕ} (hm : m ≠ 0)
+    {x : M} (h1 : ∀ y, (m : ℤ) ∣ B x y)
+    : ∃ z, m • z = x := by
   choose q hq using h1
   have hm' : (m : ℤ) ≠ 0 := by exact_mod_cast hm
   have hadd : ∀ y z, q (y + z) = q y + q z := by
@@ -46,11 +57,15 @@ theorem exists_nsmul_of_dvd {M : Type} [AddCommGroup M] (B : M →+ M →+ ℤ) 
   ext y
   simp [hz, hq]
 
-theorem relIndex_orth {M : Type} [AddCommGroup M] [Module.Free ℤ M] [Module.Finite ℤ M] (B : M →+ M →+ ℤ)
-    (hB : Function.Bijective B) {m : ℕ} (hm : m ≠ 0) (C D : AddSubgroup M)
-    (hC : (nsmulAddMonoidHom (α := M) m).range ≤ C) (hD : ∀ x, x ∈ D ↔ ∀ y ∈ C, (m : ℤ) ∣ B x y) :
-    (nsmulAddMonoidHom (α := M) m).range.relIndex C * (nsmulAddMonoidHom (α := M) m).range.relIndex D =
-      m ^ Module.finrank ℤ M := by
+theorem relIndex_orth
+    {M : Type} [AddCommGroup M] [Module.Free ℤ M] [Module.Finite ℤ M]
+    (B : M →+ M →+ ℤ) (hB : Function.Bijective B)
+    {m : ℕ} (hm : m ≠ 0)
+    (C D : AddSubgroup M)
+    (hC : (nsmulAddMonoidHom (α := M) m).range ≤ C) (hD : ∀ x, x ∈ D ↔ ∀ y ∈ C, (m : ℤ) ∣ B x y)
+    : (nsmulAddMonoidHom (α := M) m).range.relIndex C
+        * (nsmulAddMonoidHom (α := M) m).range.relIndex D
+      = m ^ Module.finrank ℤ M := by
   classical
   have : NeZero m := ⟨hm⟩
   set K := (nsmulAddMonoidHom (α := M) m).range with hK_eq
@@ -94,7 +109,9 @@ theorem relIndex_orth {M : Type} [AddCommGroup M] [Module.Free ℤ M] [Module.Fi
         refine AddMonoidHom.ext fun q => QuotientAddGroup.induction_on q fun c => ?_
         simpa [F1, g, ZMod.intCast_zmod_eq_zero_iff_dvd] using h c c.2
     rw [← hk]
-    calc F1.ker.index ≤ Nat.card (C ⧸ K.addSubgroupOf C) := index_ker_le_card F1
+    calc
+      F1.ker.index
+        ≤ Nat.card (C ⧸ K.addSubgroupOf C) := index_ker_le_card F1
       _ = K.relIndex C := by rw [AddSubgroup.relIndex, AddSubgroup.index_eq_card]
   have i2 : K.relIndex D ≤ C.index := by
     have : C.FiniteIndex := ⟨hC0⟩
@@ -113,9 +130,10 @@ theorem relIndex_orth {M : Type} [AddCommGroup M] [Module.Free ℤ M] [Module.Fi
       rw [AddMonoidHom.mem_ker, AddSubgroup.mem_addSubgroupOf]
       constructor
       · intro h
-        obtain ⟨z, hz⟩ := exists_nsmul_of_dvd B hB hm (x := (d : M)) fun y => by
-          have := DFunLike.congr_fun h (y : M ⧸ C)
-          simpa [F2, g, ZMod.intCast_zmod_eq_zero_iff_dvd] using this
+        obtain ⟨z, hz⟩ :=
+          exists_nsmul_of_dvd B hB hm (x := (d : M)) fun y => by
+            have := DFunLike.congr_fun h (y : M ⧸ C)
+            simpa [F2, g, ZMod.intCast_zmod_eq_zero_iff_dvd] using this
         exact ⟨z, hz⟩
       · rintro ⟨w, hw⟩
         refine AddMonoidHom.ext fun q => QuotientAddGroup.induction_on q fun y => ?_
@@ -123,36 +141,47 @@ theorem relIndex_orth {M : Type} [AddCommGroup M] [Module.Free ℤ M] [Module.Fi
           Int.coe_castAddHom, AddMonoidHom.zero_apply]
         rw [← hw]
         simp [map_nsmul]
-    calc K.relIndex D = F2.ker.index := by rw [hk]; rfl
+    calc
+      K.relIndex D
+        = F2.ker.index := by rw [hk]; rfl
       _ ≤ Nat.card (M ⧸ C) := index_ker_le_card F2
       _ = C.index := (AddSubgroup.index_eq_card _).symm
   apply le_antisymm
-  · calc K.relIndex C * K.relIndex D ≤ K.relIndex C * C.index := Nat.mul_le_mul_left _ i2
+  · calc
+      K.relIndex C * K.relIndex D
+        ≤ K.relIndex C * C.index := Nat.mul_le_mul_left _ i2
       _ = _ := e1
-  · calc m ^ Module.finrank ℤ M = K.relIndex D * D.index := e2.symm
+  · calc
+      m ^ Module.finrank ℤ M
+        = K.relIndex D * D.index := e2.symm
       _ ≤ K.relIndex D * K.relIndex C := Nat.mul_le_mul_left _ i1
       _ = _ := Nat.mul_comm _ _
 
-theorem exists_sublattice {R : Type} [CommRing R] [IsDedekindDomain R] {M : Type} [AddCommGroup M] [Module R M]
-    [Module.Finite R M] [Module.IsTorsionFree R M] (P : Ideal R) (hP : P.IsMaximal) {i : ℕ}
-    (hi : i ≤ Module.finrank R M) :
-    ∃ L : Submodule R M, (∀ a ∈ P, ∀ x, a • x ∈ L) ∧ L.toAddSubgroup.index = Nat.card (R ⧸ P) ^ i := by
+theorem exists_sublattice
+    {R : Type} [CommRing R] [IsDedekindDomain R]
+    {M : Type} [AddCommGroup M] [Module R M] [Module.Finite R M] [Module.IsTorsionFree R M]
+    (P : Ideal R) (hP : P.IsMaximal)
+    {i : ℕ} (hi : i ≤ Module.finrank R M)
+    : ∃ L : Submodule R M,
+      (∀ a ∈ P, ∀ x, a • x ∈ L) ∧ L.toAddSubgroup.index = Nat.card (R ⧸ P) ^ i := by
   classical
   have : P.IsPrime := hP.isPrime
-  obtain ⟨φ, φ', s, hs, -, h2⟩ := GlobalTheory.HeckeTate.exists_local_iso (R := R) (M := M)
-    (M' := Fin (Module.finrank R M) → R) (by simp) P
+  obtain ⟨φ, φ', s, hs, -, h2⟩ :=
+    GlobalTheory.HeckeTate.exists_local_iso (R := R) (M := M) (M' := Fin (Module.finrank R M) → R)
+      (by simp) P
   obtain ⟨u, e, he, hue⟩ := hP.exists_inv hs
-  let gL : M →ₗ[R] (Fin i → R ⧸ P) :=
-    { toFun := fun x j => Ideal.Quotient.mk P (φ x (Fin.castLE hi j))
-      map_add' := by
-        intro x y
-        funext j
-        simp
-      map_smul' := by
-        intro c x
-        funext j
-        simp only [map_smul, Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
-        rfl }
+  let gL : M →ₗ[R] (Fin i → R ⧸ P) := {
+    toFun := fun x j => Ideal.Quotient.mk P (φ x (Fin.castLE hi j))
+    map_add' := by
+      intro x y
+      funext j
+      simp
+    map_smul' := by
+      intro c x
+      funext j
+      simp only [map_smul, Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
+      rfl
+  }
   have hsurj : Function.Surjective gL := by
     intro t
     choose y0 hy0 using fun j => Ideal.Quotient.mk_surjective (I := P) (t j)
@@ -161,11 +190,9 @@ theorem exists_sublattice {R : Type} [CommRing R] [IsDedekindDomain R] {M : Type
     funext j
     change Ideal.Quotient.mk P (φ (u • φ' y) (Fin.castLE hi j)) = t j
     rw [map_smul, h2, smul_smul, Pi.smul_apply, smul_eq_mul]
-    have hyj : y (Fin.castLE hi j) = y0 j := by
-      simp [y, j.2]
+    have hyj : y (Fin.castLE hi j) = y0 j := by simp [y, j.2]
     rw [hyj, ← hy0 j, Ideal.Quotient.eq]
-    have : u * s * y0 j - y0 j = -(e * y0 j) := by
-      linear_combination (y0 j) * hue
+    have : u * s * y0 j - y0 j = -(e * y0 j) := by linear_combination (y0 j) * hue
     rw [this]
     exact P.neg_mem (P.mul_mem_right _ he)
   refine ⟨LinearMap.ker gL, ?_, ?_⟩
@@ -180,13 +207,19 @@ theorem exists_sublattice {R : Type} [CommRing R] [IsDedekindDomain R] {M : Type
       Nat.card_congr (QuotientAddGroup.quotientKerEquivOfSurjective _ hsurj).toEquiv]
     simp [Nat.card_fun]
 
-theorem exists_lagrangian {R : Type} [CommRing R] {M : Type} [AddCommGroup M] [Module R M] [Module.Free ℤ M]
-    [Module.Finite ℤ M] {σ : R ≃+* R} {B : M →+ M →+ ℤ} (h : IsUnimod σ B) (P : Ideal R) {a b : R} (ha : a ∈ P)
-    (hb : b ∈ P) (hab : a + σ b = 1) (hσ : ∀ a, σ (σ a) = a) {p : ℕ} (hp : p ≠ 0) (hpP : (p : R) ∈ P)
-    (L : Submodule R M) (hL : ∀ a ∈ P, ∀ x, a • x ∈ L) :
-    ∃ N : Submodule R M, (∀ z, p • z ∈ N ↔ z ∈ L) ∧ (∀ c ∈ P, ∀ x ∈ N, ∃ z, σ c • x = p • z) ∧
-      (∀ x ∈ N, ∀ y ∈ N, ((p * p : ℕ) : ℤ) ∣ B x y) ∧
-      (nsmulAddMonoidHom (α := M) (p * p)).range.relIndex N.toAddSubgroup = p ^ Module.finrank ℤ M := by
+theorem exists_lagrangian
+    {R : Type} [CommRing R]
+    {M : Type} [AddCommGroup M] [Module R M] [Module.Free ℤ M] [Module.Finite ℤ M]
+    {σ : R ≃+* R} {B : M →+ M →+ ℤ} (h : IsUnimod σ B)
+    (P : Ideal R)
+    {a b : R} (ha : a ∈ P) (hb : b ∈ P) (hab : a + σ b = 1) (hσ : ∀ a, σ (σ a) = a)
+    {p : ℕ} (hp : p ≠ 0) (hpP : (p : R) ∈ P)
+    (L : Submodule R M) (hL : ∀ a ∈ P, ∀ x, a • x ∈ L)
+    : ∃ N : Submodule R M,
+      (∀ z, p • z ∈ N ↔ z ∈ L) ∧ (∀ c ∈ P, ∀ x ∈ N, ∃ z, σ c • x = p • z)
+        ∧ (∀ x ∈ N, ∀ y ∈ N, ((p * p : ℕ) : ℤ) ∣ B x y)
+        ∧ (nsmulAddMonoidHom (α := M) (p * p)).range.relIndex N.toAddSubgroup
+          = p ^ Module.finrank ℤ M := by
   unfold IsUnimod at h
   obtain ⟨halt, hsesq, hbij⟩ := h
   have hp' : (p : ℤ) ≠ 0 := by exact_mod_cast hp
@@ -201,40 +234,49 @@ theorem exists_lagrangian {R : Type} [CommRing R] {M : Type} [AddCommGroup M] [M
   have hpL : ∀ z, p • z ∈ L := fun z => by
     rw [← Nat.cast_smul_eq_nsmul R]
     exact hL _ hpP z
-  let X : Submodule R M :=
-    { carrier := {x | ∀ z ∈ L, (p : ℤ) ∣ B x z}
-      add_mem' := by
-        intro x y hx hy
-        simp only [Set.mem_ofPred_eq] at *
-        intro z hz
-        simpa using dvd_add (hx z hz) (hy z hz)
-      zero_mem' := by
-        simp only [Set.mem_ofPred_eq]
-        intro z _
-        simp
-      smul_mem' := by
-        intro c x hx
-        simp only [Set.mem_ofPred_eq] at *
-        intro z hz
-        rw [hsesq]
-        exact hx _ (L.smul_mem _ hz) }
+  let X : Submodule R M := {
+    carrier := {x | ∀ z ∈ L, (p : ℤ) ∣ B x z}
+    add_mem' := by
+      intro x y hx hy
+      simp only [Set.mem_ofPred_eq] at *
+      intro z hz
+      simpa using dvd_add (hx z hz) (hy z hz)
+    zero_mem' := by
+      simp only [Set.mem_ofPred_eq]
+      intro z _
+      simp
+    smul_mem' := by
+      intro c x hx
+      simp only [Set.mem_ofPred_eq] at *
+      intro z hz
+      rw [hsesq]
+      exact hx _ (L.smul_mem _ hz)
+  }
   have hX : ∀ x, x ∈ X ↔ ∀ z ∈ L, (p : ℤ) ∣ B x z := fun x => Iff.rfl
   have kX : ∀ c ∈ P, ∀ x ∈ X, ∃ w, σ c • x = p • w := by
     intro c hc x hx
-    obtain ⟨w, hw⟩ := exists_nsmul_of_dvd B hbij hp (x := σ c • x) fun y => by
-      rw [hsesq, hσ]
-      exact (hX x).1 hx _ (hL c hc y)
+    obtain ⟨w, hw⟩ :=
+      exists_nsmul_of_dvd B hbij hp (x := σ c • x) fun y => by
+        rw [hsesq, hσ]
+        exact (hX x).1 hx _ (hL c hc y)
     exact ⟨w, hw.symm⟩
-  let N : Submodule R M :=
-    { carrier := {y | ∃ l ∈ L, ∃ x ∈ X, y = p • l + a • x}
-      add_mem' := by
-        rintro _ _ ⟨l1, hl1, x1, hx1, rfl⟩ ⟨l2, hl2, x2, hx2, rfl⟩
-        exact ⟨l1 + l2, L.add_mem hl1 hl2, x1 + x2, X.add_mem hx1 hx2, by rw [smul_add, smul_add]; abel⟩
-      zero_mem' := ⟨0, L.zero_mem, 0, X.zero_mem, by simp⟩
-      smul_mem' := by
-        rintro c _ ⟨l, hl, x, hx, rfl⟩
-        exact ⟨c • l, L.smul_mem c hl, c • x, X.smul_mem c hx, by
-          rw [smul_add, smul_comm c p l, smul_comm c a x]⟩ }
+  let N : Submodule R M := {
+    carrier := {y | ∃ l ∈ L, ∃ x ∈ X, y = p • l + a • x}
+    add_mem' := by
+      rintro _ _ ⟨l1, hl1, x1, hx1, rfl⟩ ⟨l2, hl2, x2, hx2, rfl⟩
+      exact
+        ⟨l1 + l2, L.add_mem hl1 hl2, x1 + x2, X.add_mem hx1 hx2, by rw [smul_add, smul_add]; abel⟩
+    zero_mem' := ⟨0, L.zero_mem, 0, X.zero_mem, by simp⟩
+    smul_mem' := by
+      rintro c _ ⟨l, hl, x, hx, rfl⟩
+      exact ⟨
+        c • l,
+        L.smul_mem c hl,
+        c • x,
+        X.smul_mem c hx,
+        by rw [smul_add, smul_comm c p l, smul_comm c a x]
+      ⟩
+  }
   have hN : ∀ y, y ∈ N ↔ ∃ l ∈ L, ∃ x ∈ X, y = p • l + a • x := fun y => Iff.rfl
   have h1 : ∀ z, p • z ∈ N ↔ z ∈ L := by
     intro z
@@ -257,8 +299,10 @@ theorem exists_lagrangian {R : Type} [CommRing R] {M : Type} [AddCommGroup M] [M
     intro c hc y hy
     obtain ⟨l, hl, x, hx, rfl⟩ := (hN y).1 hy
     obtain ⟨w, hw⟩ := kX c hc x hx
-    exact ⟨σ c • l + a • w, by
-      rw [smul_add, smul_add, smul_comm (σ c) p l, smul_comm (σ c) a x, hw, smul_comm a p w]⟩
+    exact ⟨
+      σ c • l + a • w,
+      by rw [smul_add, smul_add, smul_comm (σ c) p l, smul_comm (σ c) a x, hw, smul_comm a p w]
+    ⟩
   have h3 : ∀ x ∈ N, ∀ y ∈ N, ((p * p : ℕ) : ℤ) ∣ B x y := by
     intro x hx y hy
     obtain ⟨l1, hl1, x1, hx1, rfl⟩ := (hN x).1 hx
@@ -285,27 +329,32 @@ theorem exists_lagrangian {R : Type} [CommRing R] {M : Type} [AddCommGroup M] [M
       intro z _
       rw [hBn]
       exact dvd_mul_right _ _
-    let L2 : AddSubgroup M :=
-      { carrier := {l | ∀ y ∈ X, (p : ℤ) ∣ B l y}
-        add_mem' := by
-          intro u v hu hv
-          simp only [Set.mem_ofPred_eq] at *
-          intro y hy
-          simpa using dvd_add (hu y hy) (hv y hy)
-        zero_mem' := by
-          simp only [Set.mem_ofPred_eq]
-          intro y _
-          simp
-        neg_mem' := by
-          intro u hu
-          simp only [Set.mem_ofPred_eq] at *
-          intro y hy
-          simpa using (hu y hy).neg_right }
-    have o1 : (nsmulAddMonoidHom (α := M) p).range.relIndex L.toAddSubgroup *
-        (nsmulAddMonoidHom (α := M) p).range.relIndex X.toAddSubgroup = p ^ Module.finrank ℤ M :=
+    let L2 : AddSubgroup M := {
+      carrier := {l | ∀ y ∈ X, (p : ℤ) ∣ B l y}
+      add_mem' := by
+        intro u v hu hv
+        simp only [Set.mem_ofPred_eq] at *
+        intro y hy
+        simpa using dvd_add (hu y hy) (hv y hy)
+      zero_mem' := by
+        simp only [Set.mem_ofPred_eq]
+        intro y _
+        simp
+      neg_mem' := by
+        intro u hu
+        simp only [Set.mem_ofPred_eq] at *
+        intro y hy
+        simpa using (hu y hy).neg_right
+    }
+    have o1
+        : (nsmulAddMonoidHom (α := M) p).range.relIndex L.toAddSubgroup
+            * (nsmulAddMonoidHom (α := M) p).range.relIndex X.toAddSubgroup
+          = p ^ Module.finrank ℤ M :=
       relIndex_orth B hbij hp L.toAddSubgroup X.toAddSubgroup hKL (fun x => hX x)
-    have o2 : (nsmulAddMonoidHom (α := M) p).range.relIndex X.toAddSubgroup *
-        (nsmulAddMonoidHom (α := M) p).range.relIndex L2 = p ^ Module.finrank ℤ M :=
+    have o2
+        : (nsmulAddMonoidHom (α := M) p).range.relIndex X.toAddSubgroup
+            * (nsmulAddMonoidHom (α := M) p).range.relIndex L2
+          = p ^ Module.finrank ℤ M :=
       relIndex_orth B hbij hp X.toAddSubgroup L2 hKX (fun x => Iff.rfl)
     have hLL2 : L.toAddSubgroup ≤ L2 := by
       intro l hl
@@ -322,8 +371,9 @@ theorem exists_lagrangian {R : Type} [CommRing R] {M : Type} [AddCommGroup M] [M
       intro h0
       rw [h0, zero_mul] at o1
       exact pow_ne_zero _ hp o1.symm
-    have eq12 : (nsmulAddMonoidHom (α := M) p).range.relIndex L.toAddSubgroup =
-        (nsmulAddMonoidHom (α := M) p).range.relIndex L2 := by
+    have eq12
+        : (nsmulAddMonoidHom (α := M) p).range.relIndex L.toAddSubgroup
+          = (nsmulAddMonoidHom (α := M) p).range.relIndex L2 := by
       apply mul_right_cancel₀ hX0
       rw [o1, mul_comm, o2]
     have hone : L.toAddSubgroup.relIndex L2 = 1 := by
@@ -353,28 +403,42 @@ theorem exists_lagrangian {R : Type} [CommRing R] {M : Type} [AddCommGroup M] [M
         apply hdd
         intro y hy
         obtain ⟨w, hw⟩ := kX b hb y hy
-        have hby : b • y ∈ N := (hN _).2 ⟨b • w, hL b hb w, b • y, X.smul_mem b hy, by
-          calc b • y = a • (b • y) + σ b • (b • y) := by rw [← add_smul, hab, one_smul]
-            _ = p • (b • w) + a • (b • y) := by rw [smul_comm (σ b) b y, hw, smul_comm b p w, add_comm]⟩
-        have e : B x (b • y) = p * B l y := by
-          rw [← hBn, ← hl, hsesq, hσ]
+        have hby : b • y ∈ N :=
+          (hN _).2 ⟨
+            b • w,
+            hL b hb w,
+            b • y,
+            X.smul_mem b hy,
+            by
+              calc
+                b • y
+                  = a • (b • y) + σ b • (b • y) := by rw [← add_smul, hab, one_smul]
+                _ = p • (b • w) + a • (b • y) := by
+                  rw [smul_comm (σ b) b y, hw, smul_comm b p w, add_comm]
+          ⟩
+        have e : B x (b • y) = p * B l y := by rw [← hBn, ← hl, hsesq, hσ]
         have := hx (b • y) hby
         rw [e, Nat.cast_mul] at this
         exact (mul_dvd_mul_iff_left hp').1 this
       show x ∈ N
       refine (hN x).2 ⟨l, hlL, x, hxX, ?_⟩
-      calc x = a • x + σ b • x := by rw [← add_smul, hab, one_smul]
+      calc
+        x = a • x + σ b • x := by rw [← add_smul, hab, one_smul]
         _ = p • l + a • x := by rw [hl, add_comm]
   refine ⟨N, h1, h2, h3, ?_⟩
-  have o := relIndex_orth B hbij (m := p * p) (mul_ne_zero hp hp) N.toAddSubgroup N.toAddSubgroup hKN hself
+  have o :=
+    relIndex_orth B hbij (m := p * p) (mul_ne_zero hp hp) N.toAddSubgroup N.toAddSubgroup hKN hself
   exact Nat.mul_self_inj.1 (o.trans (mul_pow p p _))
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H}
 
-theorem card_image_ev {k : Type} [Field k] {Q : Type} [CommGroup Q] {act : 𝓞 E → Q → Q}
-    {e : ℕ → Q → Q → kˣ → Prop} (I : TateIso D k Q act e) {n : ℕ} (hn : 0 < n) (A : AddSubgroup D.La) (s : Set Q)
-    (hs : ∀ x, x ∈ s ↔ ∃ a ∈ A, I.ev n a = x) :
-    Nat.card s = (nsmulAddMonoidHom (α := D.La) n).range.relIndex A := by
+theorem card_image_ev
+    {k : Type} [Field k]
+    {Q : Type} [CommGroup Q]
+    {act : 𝓞 E → Q → Q} {e : ℕ → Q → Q → kˣ → Prop} (I : TateIso D k Q act e)
+    {n : ℕ} (hn : 0 < n)
+    (A : AddSubgroup D.La) (s : Set Q) (hs : ∀ x, x ∈ s ↔ ∃ a ∈ A, I.ev n a = x)
+    : Nat.card s = (nsmulAddMonoidHom (α := D.La) n).range.relIndex A := by
   classical
   let f : A →+ Additive Q := (GlobalTheory.HeckeTate.evHom I n).comp A.subtype
   have hker : f.ker = (nsmulAddMonoidHom (α := D.La) n).range.addSubgroupOf A := by
@@ -396,10 +460,14 @@ theorem card_image_ev {k : Type} [Field k] {Q : Type} [CommGroup Q] {act : 𝓞 
   · rintro ⟨⟨a, ha⟩, h⟩
     exact ⟨a, ha, Additive.ofMul.injective h⟩
 
-theorem exists_heckeKer_obj {S : Scheme.{0}} {l : Level H} {B : Type} [CommRing B] {b : Base l B} {s : S ⟶ Sp B}
-    (o : Obj D l b s) (k : Type) [Field k] [IsAlgClosed k] (x : Sp k ⟶ S) (β : B →+* k) (hx : x ≫ s = spMap β)
-    (P : Ideal (𝓞 E)) (p i : ℕ) (hP : P.IsMaximal) (hPP : P ⊔ P.map (H.bar : 𝓞 E →+* 𝓞 E) = ⊤) (hp : 0 < p)
-    (hpP : (p : 𝓞 E) ∈ P) (hi : i ≤ D.p + D.q) : ∃ C, o.t.HeckeKer (Over.mk x) D P p i C := by
+theorem exists_heckeKer_obj
+    {S : Scheme.{0}} {l : Level H} {B : Type} [CommRing B]
+    {b : Base l B} {s : S ⟶ Sp B} (o : Obj D l b s)
+    (k : Type) [Field k] [IsAlgClosed k]
+    (x : Sp k ⟶ S) (β : B →+* k) (hx : x ≫ s = spMap β)
+    (P : Ideal (𝓞 E)) (p i : ℕ) (hP : P.IsMaximal) (hPP : P ⊔ P.map (H.bar : 𝓞 E →+* 𝓞 E) = ⊤)
+    (hp : 0 < p) (hpP : (p : 𝓞 E) ∈ P) (hi : i ≤ D.p + D.q)
+    : ∃ C, o.t.HeckeKer (Over.mk x) D P p i C := by
   classical
   obtain ⟨-, I, -, -, -⟩ := o.geom k x β hx
   have : Module.Finite (𝓞 E) D.La := D.fin
@@ -421,26 +489,30 @@ theorem exists_heckeKer_obj {S : Scheme.{0}} {l : Level H} {B : Type} [CommRing 
     apply mul_left_cancel₀ hp'
     have := congrArg (fun z => GlobalTheory.HeckeTate.form D z y) huv
     simpa [map_nsmul] using this
-  obtain ⟨a, ha, c, hc, hac⟩ := Submodule.mem_sup.1
-    (show (1 : 𝓞 E) ∈ P ⊔ Ideal.map (H.bar : 𝓞 E →+* 𝓞 E) P by rw [hPP]; exact Submodule.mem_top)
+  obtain ⟨a, ha, c, hc, hac⟩ :=
+    Submodule.mem_sup.1 (show (1 : 𝓞 E) ∈ P ⊔ Ideal.map (H.bar : 𝓞 E →+* 𝓞 E) P by
+      rw [hPP]; exact Submodule.mem_top)
   rw [Ideal.map_comap_of_equiv] at hc
   have hb : H.bar.symm c ∈ P := hc
   have hab : a + H.bar (H.bar.symm c) = 1 := by rw [RingEquiv.apply_symm_apply]; exact hac
-  obtain ⟨L, hL, hLi⟩ := exists_sublattice (R := 𝓞 E) (M := D.La) P hP (i := i) (by rw [D.rank]; exact hi)
-  obtain ⟨N, hN1, hN2, hN3, hN4⟩ := exists_lagrangian hU P ha hb hab (GlobalTheory.HeckeTate.bar_bar H) hp0 hpP L hL
+  obtain ⟨L, hL, hLi⟩ :=
+    exists_sublattice (R := 𝓞 E) (M := D.La) P hP (i := i) (by rw [D.rank]; exact hi)
+  obtain ⟨N, hN1, hN2, hN3, hN4⟩ :=
+    exists_lagrangian hU P ha hb hab (GlobalTheory.HeckeTate.bar_bar H) hp0 hpP L hL
   have hpL : ∀ z : D.La, p • z ∈ L := fun z => by
     rw [← Nat.cast_smul_eq_nsmul (𝓞 E)]
     exact hL _ hpP z
-  let C : Subgroup (Over.mk x ⟶ o.t.G) :=
-    { carrier := {g | ∃ y ∈ N, I.ev (p * p) y = g}
-      mul_mem' := by
-        rintro _ _ ⟨a1, h1, rfl⟩ ⟨a2, h2, rfl⟩
-        exact ⟨a1 + a2, N.add_mem h1 h2, I.add _ _ _⟩
-      one_mem' := ⟨0, N.zero_mem, GlobalTheory.HeckeTate.ev_zero I _⟩
-      inv_mem' := by
-        rintro _ ⟨a1, h1, rfl⟩
-        refine ⟨-a1, N.neg_mem h1, ?_⟩
-        rw [eq_inv_iff_mul_eq_one, ← I.add, neg_add_cancel, GlobalTheory.HeckeTate.ev_zero] }
+  let C : Subgroup (Over.mk x ⟶ o.t.G) := {
+    carrier := {g | ∃ y ∈ N, I.ev (p * p) y = g}
+    mul_mem' := by
+      rintro _ _ ⟨a1, h1, rfl⟩ ⟨a2, h2, rfl⟩
+      exact ⟨a1 + a2, N.add_mem h1 h2, I.add _ _ _⟩
+    one_mem' := ⟨0, N.zero_mem, GlobalTheory.HeckeTate.ev_zero I _⟩
+    inv_mem' := by
+      rintro _ ⟨a1, h1, rfl⟩
+      refine ⟨-a1, N.neg_mem h1, ?_⟩
+      rw [eq_inv_iff_mul_eq_one, ← I.add, neg_add_cancel, GlobalTheory.HeckeTate.ev_zero]
+  }
   have hC : ∀ g, g ∈ C ↔ ∃ y ∈ N, I.ev (p * p) y = g := fun g => Iff.rfl
   refine ⟨C, ?_⟩
   unfold SAB.HeckeKer
@@ -491,7 +563,9 @@ theorem exists_heckeKer_obj {S : Scheme.{0}} {l : Level H} {B : Type} [CommRing 
       obtain ⟨z, hz⟩ := hN2 _ he' y hy
       rw [RingEquiv.apply_symm_apply] at hz
       refine ⟨t • z, ?_⟩
-      calc (t * ↑p * e) • y = t • ((p : 𝓞 E) • (e • y)) := by rw [mul_smul, mul_smul]
+      calc
+        (t * ↑p * e) • y
+          = t • ((p : 𝓞 E) • (e • y)) := by rw [mul_smul, mul_smul]
         _ = (p * p) • (t • z) := by
           rw [hz, Nat.cast_smul_eq_nsmul, smul_comm t p (p • z), smul_comm t p z, mul_smul]
     · rintro r1 r2 ⟨b1, e1⟩ ⟨b2, e2⟩
@@ -508,13 +582,17 @@ theorem exists_heckeKer_obj {S : Scheme.{0}} {l : Level H} {B : Type} [CommRing 
     convert hw using 1 <;> first | (push_cast; ring) | (symm; exact map_one _)
   · rw [show Nat.card C = Nat.card (C : Set (Over.mk x ⟶ o.t.G)) from rfl,
       card_image_ev I hpp N.toAddSubgroup _ (fun g => hC g), hN4, hrk]
-  · have hT : ∀ g, g ∈ o.t.tors (Over.mk x) (Ideal.span {(p : 𝓞 E)}) ↔
-        ∃ a ∈ (⊤ : AddSubgroup D.La), I.ev p a = g := by
+  · have hT
+        : ∀ g,
+          g ∈ o.t.tors (Over.mk x) (Ideal.span {(p : 𝓞 E)})
+            ↔ ∃ a ∈ (⊤ : AddSubgroup D.La), I.ev p a = g := by
       intro g
       rw [GlobalTheory.HeckeKerModel.mem_tors_span, I.onto p hp]
       simp
-    have hCT : ∀ g, g ∈ (C : Set (Over.mk x ⟶ o.t.G)) ∩ o.t.tors (Over.mk x) (Ideal.span {(p : 𝓞 E)}) ↔
-        ∃ a ∈ L.toAddSubgroup, I.ev p a = g := by
+    have hCT
+        : ∀ g,
+          g ∈ (C : Set (Over.mk x ⟶ o.t.G)) ∩ o.t.tors (Over.mk x) (Ideal.span {(p : 𝓞 E)})
+            ↔ ∃ a ∈ L.toAddSubgroup, I.ev p a = g := by
       intro g
       rw [Set.mem_inter_iff, GlobalTheory.HeckeKerModel.mem_tors_span]
       constructor
@@ -526,7 +604,11 @@ theorem exists_heckeKer_obj {S : Scheme.{0}} {l : Level H} {B : Type} [CommRing 
         subst hyb
         exact ⟨b', (hN1 b').1 hy, by rw [GlobalTheory.HeckeTate.ev_nsmul, I.tower p p hp hp]⟩
       · rintro ⟨z, hz, rfl⟩
-        refine ⟨(hC _).2 ⟨p • z, (hN1 z).2 hz, by rw [GlobalTheory.HeckeTate.ev_nsmul, I.tower p p hp hp]⟩, ?_⟩
+        refine ⟨
+          (hC _).2
+            ⟨p • z, (hN1 z).2 hz, by rw [GlobalTheory.HeckeTate.ev_nsmul, I.tower p p hp hp]⟩,
+          ?_
+        ⟩
         rw [← GlobalTheory.HeckeTate.ev_nsmul, I.ker p hp]
         exact ⟨z, rfl⟩
     have hKL : (nsmulAddMonoidHom (α := D.La) p).range ≤ L.toAddSubgroup := by
@@ -540,11 +622,17 @@ end GlobalTheory.HeckeKerAll
 
 namespace GlobalTheory
 
-theorem exists_heckeKer :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (𝔓 : Ideal (𝓞 E)) (p i : ℕ), 𝔓.IsMaximal → 𝔓 ⊔ 𝔓.map (H.bar : 𝓞 E →+* 𝓞 E) = ⊤ → p.Prime → (p : 𝓞 E) ∈ 𝔓 → i ≤ D.p + D.q → ∀ (k : Type) [Field k] [IsAlgClosed k] (y : Sp k ⟶ Xo.X), ∃ C : Subgroup (Over.mk y ⟶ Xo.univ.t.G), Xo.univ.t.HeckeKer (Over.mk y) D 𝔓 p i C := by
+theorem exists_heckeKer
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (𝔓 : Ideal (𝓞 E)) (p i : ℕ),
+      𝔓.IsMaximal → 𝔓 ⊔ 𝔓.map (H.bar : 𝓞 E →+* 𝓞 E) = ⊤ → p.Prime → (p : 𝓞 E) ∈ 𝔓 → i ≤ D.p + D.q
+        → ∀ (k : Type) [Field k] [IsAlgClosed k] (y : Sp k ⟶ Xo.X),
+          ∃ C : Subgroup (Over.mk y ⟶ Xo.univ.t.G),
+            Xo.univ.t.HeckeKer (Over.mk y) D 𝔓 p i C := by
   intro E _ _ _ H D l Xo 𝔓 p i h1 h2 h3 h4 h5 k _ _ y
-  obtain ⟨C, hC⟩ := GlobalTheory.HeckeKerAll.exists_heckeKer_obj Xo.univ k y (Spec.preimage (y ≫ Xo.s)).hom
-    (Spec.map_preimage _).symm 𝔓 p i h1 h2 h3.pos h4 h5
+  obtain ⟨C, hC⟩ :=
+    GlobalTheory.HeckeKerAll.exists_heckeKer_obj Xo.univ k y (Spec.preimage (y ≫ Xo.s)).hom
+      (Spec.map_preimage _).symm 𝔓 p i h1 h2 h3.pos h4 h5
   exact ⟨C, hC⟩
 
 end GlobalTheory

@@ -9,13 +9,17 @@ public import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.BaseSi
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
 open GlobalTheory.IndefiniteRowSideFullHecke.BaseSizes
 
 namespace GlobalTheory.Survey.CongruenceBoundParameters
 
-theorem window_pos {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (W : ℝ) (hW : W ∈ baseSizes L) (n : ℤ)
-    (hn : n ∈ window L W) : 0 < n := by
+theorem window_pos
+    {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L)
+    (W : ℝ) (hW : W ∈ baseSizes L)
+    (n : ℤ) (hn : n ∈ window L W)
+    : 0 < n := by
   have hm : (2 : ℝ) ≤ D.R.m := by exact_mod_cast D.R.two_le_m
   have ht : (7 : ℝ) ≤ D.R.t := by
     have := D.R.three_m_lt_t; have := D.R.two_le_m; exact_mod_cast (by omega : 7 ≤ D.R.t)
@@ -31,7 +35,8 @@ theorem window_pos {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (W : 
   have hw2 : L.sc.w'' D.R.n ≤ L.sc.b := by
     have : L.sc.w'' D.R.n = L.sc.b / (L.sc.X' * D.R.n) := by
       unfold Scale.w'' Scale.b' Scale.a; field_simp
-    rw [this]; exact div_le_self hb.le (by nlinarith)
+    rw [this]
+    exact div_le_self hb.le (by nlinarith)
   have hWw : L.sc.w'' D.R.n ≤ W := by
     rcases hW with rfl | rfl | ⟨t, rfl⟩
     · exact hw2
@@ -47,12 +52,17 @@ theorem window_pos {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (W : 
     mul_le_mul_of_nonneg_right (by nlinarith) hη.le
   have h5 : (sgPlus L : ℝ) ≤ 2 * L.sc.b / LevelStarExponents.lStar L := Int.floor_le _
   have h6 : 0 < L.sc.b / LevelStarExponents.lStar L := by positivity
-  have h7 : 12 * L.sc.b / LevelStarExponents.lStar L = 12 * (L.sc.b / LevelStarExponents.lStar L) := by ring
-  have h8 : 2 * L.sc.b / LevelStarExponents.lStar L = 2 * (L.sc.b / LevelStarExponents.lStar L) := by ring
+  have h7
+      : 12 * L.sc.b / LevelStarExponents.lStar L = 12 * (L.sc.b / LevelStarExponents.lStar L) := by
+    ring
+  have h8
+      : 2 * L.sc.b / LevelStarExponents.lStar L = 2 * (L.sc.b / LevelStarExponents.lStar L) := by
+    ring
   have : (0 : ℝ) < n := by linarith [hn.1]
   exact_mod_cast this
 
-theorem two_lStar_lt_b {D : D7} (L : SizeData₂ D) : 2 * LevelStarExponents.lStar L < Real.exp L.sc.L := by
+theorem two_lStar_lt_b {D : D7} (L : SizeData₂ D)
+    : 2 * LevelStarExponents.lStar L < Real.exp L.sc.L := by
   have hm : (2 : ℝ) ≤ D.R.m := by exact_mod_cast D.R.two_le_m
   have ht : 3 * (D.R.m : ℝ) < D.R.t := by exact_mod_cast D.R.three_m_lt_t
   have hn1 : (1 : ℝ) ≤ D.R.n := by exact_mod_cast (show 1 ≤ D.R.n from D.R.ord_pos)
@@ -61,10 +71,13 @@ theorem two_lStar_lt_b {D : D7} (L : SizeData₂ D) : 2 * LevelStarExponents.lSt
   have hS := L.Sc_pos
   have hN : (0 : ℝ) ≤ (D.R.N D.R.m : ℝ) := Nat.cast_nonneg _
   have hk : (0 : ℝ) ≤ (D.R.k : ℝ) := Nat.cast_nonneg _
-  have hA : (D.R.t : ℝ) ≤ (D.R.n : ℝ) * (D.R.t : ℝ) ^ 2 * ((D.R.N D.R.m : ℝ) + D.R.t) * L.sc.L ^ 2 := by
-    have a1 : (1 : ℝ) ≤ (D.R.n : ℝ) * (D.R.t : ℝ) ^ 2 := one_le_mul_of_one_le_of_one_le hn1 (by nlinarith)
+  have hA
+      : (D.R.t : ℝ) ≤ (D.R.n : ℝ) * (D.R.t : ℝ) ^ 2 * ((D.R.N D.R.m : ℝ) + D.R.t) * L.sc.L ^ 2 := by
+    have a1 : (1 : ℝ) ≤ (D.R.n : ℝ) * (D.R.t : ℝ) ^ 2 :=
+      one_le_mul_of_one_le_of_one_le hn1 (by nlinarith)
     have a2 : (1 : ℝ) ≤ L.sc.L ^ 2 := by nlinarith
-    have a3 : (D.R.t : ℝ) ≤ (D.R.n : ℝ) * (D.R.t : ℝ) ^ 2 * ((D.R.N D.R.m : ℝ) + D.R.t) := by nlinarith
+    have a3 : (D.R.t : ℝ) ≤ (D.R.n : ℝ) * (D.R.t : ℝ) ^ 2 * ((D.R.N D.R.m : ℝ) + D.R.t) := by
+      nlinarith
     nlinarith
   have hB : (0 : ℝ) ≤ (D.R.k : ℝ) * (D.R.n : ℝ) ^ 2 * (L.Sc + D.R.t + L.sc.L) := by positivity
   change 2 * LevelStarExponents.lStar L < L.sc.b

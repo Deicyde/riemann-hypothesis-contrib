@@ -8,9 +8,9 @@ open AlgebraicGeometry CategoryTheory
 
 namespace GlobalTheory
 
-theorem exists_idempotent_basicOpen_eq_of_isClopen :
-    ∀ (X : Scheme.{0}) (U : Set X), IsClopen U →
-      ∃ e : Γ(X, ⊤), e * e = e ∧ ((X.basicOpen e : X.Opens) : Set X) = U := by
+theorem exists_idempotent_basicOpen_eq_of_isClopen
+    : ∀ (X : Scheme.{0}) (U : Set X),
+      IsClopen U → ∃ e : Γ(X, ⊤), e * e = e ∧ ((X.basicOpen e : X.Opens) : Set X) = U := by
   intro X U hU
   let O : Bool → X.Opens := fun i => bif i then ⟨U, hU.isOpen⟩ else ⟨Uᶜ, hU.isClosed.isOpen_compl⟩
   have hd : O true ⊓ O false = ⊥ := by
@@ -21,8 +21,7 @@ theorem exists_idempotent_basicOpen_eq_of_isClopen :
     · exact TopologicalSpace.Opens.mem_iSup.2 ⟨true, hx⟩
     · exact TopologicalSpace.Opens.mem_iSup.2 ⟨false, hx⟩
   let sf : ∀ i, Γ(X, O i) := fun i => bif i then 1 else 0
-  have sub : ∀ T : X.Opens, T = ⊥ → Subsingleton Γ(X, T) := fun T hT => by
-    subst hT; infer_instance
+  have sub : ∀ T : X.Opens, T = ⊥ → Subsingleton Γ(X, T) := fun T hT => by subst hT; infer_instance
   have hcompat : TopCat.Presheaf.IsCompatible X.sheaf.1 O sf := by
     intro i j
     cases i <;> cases j

@@ -15,29 +15,28 @@ universe u
 
 variable {k G : Type u} [CommRing k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
 
-theorem cochainsMap_zero {A B : Rep.{u} k G} [IsDiscreteRep A] [IsDiscreteRep B] :
-    cochainsMap (0 : A ⟶ B) = 0 := by
+theorem cochainsMap_zero {A B : Rep.{u} k G} [IsDiscreteRep A] [IsDiscreteRep B]
+    : cochainsMap (0 : A ⟶ B) = 0 := by
   ext n c : 3
   rfl
 
-theorem cohomologyMap_zero {A B : Rep.{u} k G} [IsDiscreteRep A] [IsDiscreteRep B] (n : ℕ) :
-    cohomologyMap (0 : A ⟶ B) n = 0 := by
+theorem cohomologyMap_zero {A B : Rep.{u} k G} [IsDiscreteRep A] [IsDiscreteRep B] (n : ℕ)
+    : cohomologyMap (0 : A ⟶ B) n = 0 := by
   rw [cohomologyMap, cochainsMap_zero]
   exact HomologicalComplex.homologyMap_zero _ _ _
 
 section
 
-variable (S : ShortComplex (Rep.{u} k G)) [IsDiscreteRep S.X₁] [IsDiscreteRep S.X₂]
-  [IsDiscreteRep S.X₃]
+variable
+  (S : ShortComplex (Rep.{u} k G)) [IsDiscreteRep S.X₁] [IsDiscreteRep S.X₂] [IsDiscreteRep S.X₃]
 
 noncomputable def cochainsShortComplex : ShortComplex (CochainComplex (ModuleCat k) ℕ) :=
-  ShortComplex.mk (cochainsMap S.f) (cochainsMap S.g) (by
-    rw [← cochainsMap_comp, S.zero, cochainsMap_zero])
+  ShortComplex.mk (cochainsMap S.f) (cochainsMap S.g)
+    (by rw [← cochainsMap_comp, S.zero, cochainsMap_zero])
 
 variable {S}
 
-theorem cochainsShortComplex_shortExact (hS : S.ShortExact) :
-    (cochainsShortComplex S).ShortExact :=
+theorem cochainsShortComplex_shortExact (hS : S.ShortExact) : (cochainsShortComplex S).ShortExact :=
   HomologicalComplex.shortExact_of_degreewise_shortExact _ fun i => {
     exact := by
       rw [ShortComplex.moduleCat_exact_iff]
@@ -50,8 +49,11 @@ theorem cochainsShortComplex_shortExact (hS : S.ShortExact) :
       let t : S.X₂ → S.X₁ := Function.invFun S.f.hom
       have ht : ∀ σ, S.f.hom (t (c.1 σ)) = c.1 σ := fun σ =>
         Function.invFun_eq (hexact (c.1 σ) (hval σ))
-      refine ⟨(⟨t ∘ c.1, (mem_locallyConstantCochains _ _).2 (IsLocallyConstant.comp c.2 t)⟩ :
-        locallyConstantCochains S.X₁ i), ?_⟩
+      refine ⟨
+        (⟨t ∘ c.1, (mem_locallyConstantCochains _ _).2 (IsLocallyConstant.comp c.2 t)⟩
+          : locallyConstantCochains S.X₁ i),
+        ?_
+      ⟩
       apply Subtype.ext
       funext σ
       exact ht σ
@@ -60,7 +62,8 @@ theorem cochainsShortComplex_shortExact (hS : S.ShortExact) :
       exact (inferInstance : Mono ((cochainsMap S.f).f i))
     epi_g := by
       have := hS.epi_g
-      exact (inferInstance : Epi ((cochainsMap S.g).f i)) }
+      exact (inferInstance : Epi ((cochainsMap S.g).f i))
+  }
 
 variable (hS : S.ShortExact)
 
@@ -76,26 +79,26 @@ theorem comp_δ (i j : ℕ) (hij : i + 1 = j) : cohomologyMap S.g i ≫ δ hS i 
 theorem cohomologyMap_f_comp_g (i : ℕ) : cohomologyMap S.f i ≫ cohomologyMap S.g i = 0 := by
   rw [← cohomologyMap_comp, S.zero, cohomologyMap_zero]
 
-theorem cohomology_exact₁ (i j : ℕ) (hij : i + 1 = j) :
-    (ShortComplex.mk (δ hS i j hij) (cohomologyMap S.f j) (δ_comp hS i j hij)).Exact :=
+theorem cohomology_exact₁ (i j : ℕ) (hij : i + 1 = j)
+    : (ShortComplex.mk (δ hS i j hij) (cohomologyMap S.f j) (δ_comp hS i j hij)).Exact :=
   (cochainsShortComplex_shortExact hS).homology_exact₁ i j hij
 
-
 include hS in
-theorem cohomology_exact₂ (i : ℕ) :
-    (ShortComplex.mk (cohomologyMap S.f i) (cohomologyMap S.g i)
+theorem cohomology_exact₂ (i : ℕ)
+    : (ShortComplex.mk (cohomologyMap S.f i) (cohomologyMap S.g i)
       (cohomologyMap_f_comp_g i)).Exact :=
   (cochainsShortComplex_shortExact hS).homology_exact₂ i
 
-theorem cohomology_exact₃ (i j : ℕ) (hij : i + 1 = j) :
-    (ShortComplex.mk (cohomologyMap S.g i) (δ hS i j hij) (comp_δ hS i j hij)).Exact :=
+theorem cohomology_exact₃ (i j : ℕ) (hij : i + 1 = j)
+    : (ShortComplex.mk (cohomologyMap S.g i) (δ hS i j hij) (comp_δ hS i j hij)).Exact :=
   (cochainsShortComplex_shortExact hS).homology_exact₃ i j hij
 
 end
 
 section Naturality
 
-variable {S₁ S₂ : ShortComplex (Rep.{u} k G)} [IsDiscreteRep S₁.X₁] [IsDiscreteRep S₁.X₂]
+variable
+  {S₁ S₂ : ShortComplex (Rep.{u} k G)} [IsDiscreteRep S₁.X₁] [IsDiscreteRep S₁.X₂]
   [IsDiscreteRep S₁.X₃] [IsDiscreteRep S₂.X₁] [IsDiscreteRep S₂.X₂] [IsDiscreteRep S₂.X₃]
 
 end Naturality

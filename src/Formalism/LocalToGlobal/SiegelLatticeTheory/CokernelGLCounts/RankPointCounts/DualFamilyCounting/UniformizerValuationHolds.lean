@@ -14,15 +14,17 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.TemperedBoundGL3
 
-open Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.U0 Formalism.HermitianLattices.Ext.L3.WA Formalism.HermitianLattices.Ext.L3.WCA Formalism.HermitianLattices.Ext.L3.Cell
+open Formalism.HermitianLattices.Ext.L3 Formalism.HermitianLattices.Ext.L3.U0
+  Formalism.HermitianLattices.Ext.L3.WA Formalism.HermitianLattices.Ext.L3.WCA
+  Formalism.HermitianLattices.Ext.L3.Cell
 
 variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
 
 local notation "ι" => algebraMap (𝓞 F) (𝓞 K)
 local notation "κ" => algebraMap (𝓞 K) K
 
-private theorem vF_spec_of_ne_zero {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {a : 𝓞 F} (ha : a ≠ 0) :
-    a ∈ 𝔭 ^ vF 𝔭 a ∧ a ∉ 𝔭 ^ (vF 𝔭 a + 1) := by
+private theorem vF_spec_of_ne_zero {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {a : 𝓞 F} (ha : a ≠ 0)
+    : a ∈ 𝔭 ^ vF 𝔭 a ∧ a ∉ 𝔭 ^ (vF 𝔭 a + 1) := by
   have hbot : ∃ N, a ∉ 𝔭 ^ N := by
     by_contra hcon
     push Not at hcon
@@ -30,10 +32,13 @@ private theorem vF_spec_of_ne_zero {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaxim
     rw [Ideal.iInf_pow_eq_bot_of_isDomain 𝔭 h𝔭.ne_top, Ideal.mem_bot] at hinf
     exact ha hinf
   obtain ⟨N, hN⟩ := hbot
-  have hbdd : BddAbove {e : ℕ | a ∈ 𝔭 ^ e} := ⟨N, fun e he => by
-    by_contra hlt
-    push Not at hlt
-    exact hN (Ideal.pow_le_pow_right hlt.le he)⟩
+  have hbdd : BddAbove {e : ℕ | a ∈ 𝔭 ^ e} := ⟨
+    N,
+    fun e he => by
+      by_contra hlt
+      push Not at hlt
+      exact hN (Ideal.pow_le_pow_right hlt.le he)
+  ⟩
   have hmem : a ∈ 𝔭 ^ vF 𝔭 a := Nat.sSup_mem ⟨0, by simp⟩ hbdd
   refine ⟨hmem, fun h => ?_⟩
   have hle : vF 𝔭 a + 1 ≤ vF 𝔭 a := le_csSup hbdd h
@@ -44,17 +49,18 @@ private theorem jK_iota_ne_zero {a : 𝓞 F} (ha : a ≠ 0) : κ (ι a) ≠ 0 :=
   refine (map_ne_zero (algebraMap F K)).mpr ?_
   exact (map_ne_zero_iff _ (IsFractionRing.injective (𝓞 F) F)).mpr ha
 
-theorem exists_mul_eq_of_mem_pow {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {a a' : 𝓞 F}
-    (ha : a ≠ 0) (ha' : a' ∈ 𝔭 ^ vF 𝔭 a) :
-    ∃ t : 𝓞 F, t ∉ 𝔭 ∧ ∃ c : 𝓞 F, t * a' = c * a := by
+theorem exists_mul_eq_of_mem_pow
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {a a' : 𝓞 F} (ha : a ≠ 0) (ha' : a' ∈ 𝔭 ^ vF 𝔭 a)
+    : ∃ t : 𝓞 F, t ∉ 𝔭 ∧ ∃ c : 𝓞 F, t * a' = c * a := by
   obtain ⟨hmem, hnot⟩ := vF_spec_of_ne_zero h𝔭 ha
   obtain ⟨J, hJ⟩ : 𝔭 ^ vF 𝔭 a ∣ Ideal.span {a} :=
     Ideal.dvd_iff_le.mpr ((Ideal.span_singleton_le_iff_mem _).mpr hmem)
-  have hJp : ¬ J ≤ 𝔭 := fun hle => hnot (by
-    have hs : Ideal.span {a} ≤ 𝔭 ^ (vF 𝔭 a + 1) := by
-      rw [hJ, pow_succ]
-      exact Ideal.mul_mono_right hle
-    exact (Ideal.span_singleton_le_iff_mem _).mp hs)
+  have hJp : ¬ J ≤ 𝔭 := fun hle =>
+    hnot (by
+      have hs : Ideal.span {a} ≤ 𝔭 ^ (vF 𝔭 a + 1) := by
+        rw [hJ, pow_succ]
+        exact Ideal.mul_mono_right hle
+      exact (Ideal.span_singleton_le_iff_mem _).mp hs)
   obtain ⟨t, htJ, htp⟩ := IsConcreteLE.not_le_iff_exists.mp hJp
   have hat : a' * t ∈ Ideal.span {a} := by
     rw [hJ]
@@ -65,9 +71,10 @@ theorem exists_mul_eq_of_mem_pow {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal
 variable (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
 include hK hF
 
-theorem div_mem_locRing_of_mem_pow {P : Ideal (𝓞 K)} (hP : P.IsMaximal) {a a' : 𝓞 F}
-    (ha : a ≠ 0) (ha' : a' ∈ (P.comap ι) ^ vF (P.comap ι) a) :
-    κ (ι a') / κ (ι a) ∈ locRing P := by
+theorem div_mem_locRing_of_mem_pow
+    {P : Ideal (𝓞 K)} (hP : P.IsMaximal)
+    {a a' : 𝓞 F} (ha : a ≠ 0) (ha' : a' ∈ (P.comap ι) ^ vF (P.comap ι) a)
+    : κ (ι a') / κ (ι a) ∈ locRing P := by
   have hPm : (P.comap ι).IsMaximal := Ideal.isMaximal_under_of_isIntegral_of_isMaximal (R := 𝓞 F) P
   obtain ⟨t, ht, c, hc⟩ := exists_mul_eq_of_mem_pow hPm ha ha'
   have hκa : κ (ι a) ≠ 0 := jK_iota_ne_zero ha
@@ -75,8 +82,13 @@ theorem div_mem_locRing_of_mem_pow {P : Ideal (𝓞 K)} (hP : P.IsMaximal) {a a'
     rw [← mul_div_assoc, ← map_mul, ← map_mul, hc, map_mul, map_mul, mul_div_cancel_right₀ _ hκa]
   show κ (ι a') / κ (ι a) ∈ Formalism.HermitianLatticesTheory.locR (K := K) P
   rw [Formalism.HermitianLatticesTheory.locDual_mem_locR]
-  have hfix : star (κ (ι t)) = κ (ι t) := (hF _).mpr ⟨(t : F), by
-    rw [← IsScalarTower.algebraMap_apply (𝓞 F) (𝓞 K) K, IsScalarTower.algebraMap_apply (𝓞 F) F K]⟩
+  have hfix : star (κ (ι t)) = κ (ι t) :=
+    (hF _).mpr ⟨
+      (t : F),
+      by
+        rw [← IsScalarTower.algebraMap_apply (𝓞 F) (𝓞 K) K,
+          IsScalarTower.algebraMap_apply (𝓞 F) F K]
+    ⟩
   have hmem : ι t ∈ Formalism.HermitianLatticesTheory.hcompl (K := K) P := by
     refine Submonoid.subset_closure (And.intro ht fun t' ht' => ?_)
     rw [hfix] at ht'
@@ -87,11 +99,10 @@ theorem div_mem_locRing_of_mem_pow {P : Ideal (𝓞 K)} (hP : P.IsMaximal) {a a'
   rw [e]
   exact Submodule.mem_one.mpr ⟨_, rfl⟩
 
-
 omit hK in
-theorem mul_inv_pow_mem {P : Ideal (𝓞 K)} {π : K}
-    (h1 : ∀ z ∈ extP K (P.comap ι), Dv (locRing P) π (κ z)) (j : ℕ) :
-    ∀ z ∈ extP K (P.comap ι) ^ j, κ z * (π ^ j)⁻¹ ∈ locRing P := by
+theorem mul_inv_pow_mem
+    {P : Ideal (𝓞 K)} {π : K} (h1 : ∀ z ∈ extP K (P.comap ι), Dv (locRing P) π (κ z)) (j : ℕ)
+    : ∀ z ∈ extP K (P.comap ι) ^ j, κ z * (π ^ j)⁻¹ ∈ locRing P := by
   have hz0 : ∀ z : 𝓞 K, κ z ∈ locRing P := by
     intro z
     show κ z ∈ Formalism.HermitianLatticesTheory.locR (K := K) P
@@ -113,9 +124,11 @@ theorem mul_inv_pow_mem {P : Ideal (𝓞 K)} {π : K}
     · rw [map_add (f := _), add_mul]
       exact (locRing P).add_mem hu hw
 
-theorem unifVal_at {P : Ideal (𝓞 K)} (hP : P.IsMaximal) :
-    ∃ π : K, IsUnif (locRing P) π ∧ ∀ a : 𝓞 F, a ≠ 0 →
-      IsUnitIn (locRing P) (algebraMap F K (a : F) * (π ^ vF (P.comap ι) a)⁻¹) := by
+theorem unifVal_at {P : Ideal (𝓞 K)} (hP : P.IsMaximal)
+    : ∃ π : K,
+      IsUnif (locRing P) π
+        ∧ ∀ a : 𝓞 F,
+          a ≠ 0 → IsUnitIn (locRing P) (algebraMap F K (a : F) * (π ^ vF (P.comap ι) a)⁻¹) := by
   obtain ⟨π, hπ, h1, h2⟩ := exists_isUnif hF hP
   have hPm : (P.comap ι).IsMaximal := Ideal.isMaximal_under_of_isIntegral_of_isMaximal (R := 𝓞 F) P
   have hcoe : ∀ c : 𝓞 F, algebraMap F K (c : F) = κ (ι c) := fun c => by
@@ -158,8 +171,7 @@ theorem unifVal_at {P : Ideal (𝓞 K)} (hP : P.IsMaximal) :
       exact hle
     exact hIT (mul_left_cancel₀ hI0 hsq)
   obtain ⟨p0, hp0, hu⟩ := hex
-  have hu' : κ (ι p0) * π⁻¹ ≠ 0 ∧ κ (ι p0) * π⁻¹ ∈ locRing P ∧
-      (κ (ι p0) * π⁻¹)⁻¹ ∈ locRing P := hu
+  have hu' : κ (ι p0) * π⁻¹ ≠ 0 ∧ κ (ι p0) * π⁻¹ ∈ locRing P ∧ (κ (ι p0) * π⁻¹)⁻¹ ∈ locRing P := hu
   have hy : κ (ι p0) ≠ 0 := fun h0 => hu'.1 (by rw [h0, zero_mul])
   refine ⟨π, hπ, fun a ha => ?_⟩
   obtain ⟨hav, -⟩ := vF_spec_of_ne_zero hPm ha
@@ -169,14 +181,13 @@ theorem unifVal_at {P : Ideal (𝓞 K)} (hP : P.IsMaximal) :
     show ι a ∈ (Ideal.map ι (P.comap ι)) ^ _
     rw [← Ideal.map_pow]
     exact Ideal.mem_map_of_mem _ hav
-  have hxR : κ (ι a) * (π ^ vF (P.comap ι) a)⁻¹ ∈ locRing P :=
-    mul_inv_pow_mem hF h1 _ (ι a) hιa
+  have hxR : κ (ι a) * (π ^ vF (P.comap ι) a)⁻¹ ∈ locRing P := mul_inv_pow_mem hF h1 _ (ι a) hιa
   have hb : p0 ^ vF (P.comap ι) a ∈ P.comap ι ^ vF (P.comap ι) a := Ideal.pow_mem_pow hp0 _
   have hdiv := div_mem_locRing_of_mem_pow hK hF hP ha hb
-  have hinvR : ((κ (ι p0) * π⁻¹)⁻¹) ^ vF (P.comap ι) a ∈ locRing P :=
-    (locRing P).pow_mem hu'.2.2 _
-  have e : (κ (ι a) * (π ^ vF (P.comap ι) a)⁻¹)⁻¹ =
-      ((κ (ι p0) * π⁻¹)⁻¹) ^ vF (P.comap ι) a * (κ (ι (p0 ^ vF (P.comap ι) a)) / κ (ι a)) := by
+  have hinvR : ((κ (ι p0) * π⁻¹)⁻¹) ^ vF (P.comap ι) a ∈ locRing P := (locRing P).pow_mem hu'.2.2 _
+  have e
+      : (κ (ι a) * (π ^ vF (P.comap ι) a)⁻¹)⁻¹
+        = ((κ (ι p0) * π⁻¹)⁻¹) ^ vF (P.comap ι) a * (κ (ι (p0 ^ vF (P.comap ι) a)) / κ (ι a)) := by
     rw [map_pow, map_pow, mul_inv, inv_inv, mul_inv, inv_inv, mul_pow, inv_pow, div_eq_mul_inv,
       mul_comm ((κ (ι p0) ^ vF (P.comap ι) a)⁻¹) (π ^ vF (P.comap ι) a), mul_assoc,
       ← mul_assoc ((κ (ι p0) ^ vF (P.comap ι) a)⁻¹), inv_mul_cancel₀ (pow_ne_zero _ hy), one_mul,

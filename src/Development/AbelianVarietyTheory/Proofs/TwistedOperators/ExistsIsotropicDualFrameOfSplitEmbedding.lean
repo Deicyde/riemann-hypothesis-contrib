@@ -5,7 +5,10 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FromColsM
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField
+  Matrix
 open GlobalTheory.IndefiniteRowSideFullHecke.AdjointIsotropicDecomposition
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -17,11 +20,12 @@ theorem adj_eq {m n : ℕ} (A : Matrix (Fin m) (Fin n) D.host.E) : adj D A = A�
   funext i j
   rfl
 
-theorem hT_coord (V : HSp D) (x y : V.V) :
-    V.hT x y = ∑ i, ∑ j, star (V.frame.repr x i) * V.gram i j * V.frame.repr y j := by
+theorem hT_coord (V : HSp D) (x y : V.V)
+    : V.hT x y = ∑ i, ∑ j, star (V.frame.repr x i) * V.gram i j * V.frame.repr y j := by
   conv_lhs => rw [← V.frame.sum_repr x, ← V.frame.sum_repr y]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul, HSpace.gram]
+    simp only [map_sum, LinearMap.sum_apply, map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul,
+      HSpace.gram]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Finset.mul_sum]
@@ -47,10 +51,12 @@ theorem gram_ct (V : HSp D) : V.gramᴴ = V.gram := by
   funext i j
   exact V.herm.eq (V.frame j) (V.frame i)
 
-theorem exists_isotropic_dual : ∀ (D : D7) (V V' : HSp D) (r : ℕ) (C : Matrix (Fin V.rank) (Fin r) D.host.E)
-    (B : Matrix (Fin V.rank) (Fin V'.rank) D.host.E), IsIsoSplit V V' C B →
-    ∃ C' : Matrix (Fin V.rank) (Fin r) D.host.E,
-      adj D C * V.gram * C' = 1 ∧ adj D C' * V.gram * C' = 0 ∧ adj D C' * V.gram * B = 0 := by
+theorem exists_isotropic_dual
+    : ∀ (D : D7) (V V' : HSp D) (r : ℕ) (C : Matrix (Fin V.rank) (Fin r) D.host.E)
+        (B : Matrix (Fin V.rank) (Fin V'.rank) D.host.E),
+      IsIsoSplit V V' C B
+        → ∃ C' : Matrix (Fin V.rank) (Fin r) D.host.E,
+          adj D C * V.gram * C' = 1 ∧ adj D C' * V.gram * C' = 0 ∧ adj D C' * V.gram * B = 0 := by
   intro D V V' r C B hs
   simp only [adj_eq]
   have hCC : Cᴴ * V.gram * C = 0 := by rw [← adj_eq]; exact hs.frame.2.2

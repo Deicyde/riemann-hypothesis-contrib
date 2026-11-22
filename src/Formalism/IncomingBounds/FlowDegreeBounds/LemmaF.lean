@@ -36,14 +36,16 @@ private theorem one_le_pow_of_one_le_real {a : ℝ} (ha : 1 ≤ a) (n : ℕ) : 1
   | zero => simp
   | succ k ih => rw [pow_succ]; nlinarith
 
-private theorem pow_le_pow_right_of_one_le_real {a : ℝ} (ha : 1 ≤ a) {m n : ℕ} (h : m ≤ n) : a ^ m ≤ a ^ n := by
+private theorem pow_le_pow_right_of_one_le_real {a : ℝ} (ha : 1 ≤ a) {m n : ℕ} (h : m ≤ n)
+    : a ^ m ≤ a ^ n := by
   obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le h
   rw [pow_add]
   have h1 := one_le_pow_of_one_le_real ha k
   have h2 : 0 ≤ a ^ m := pow_nonneg (by linarith) m
   nlinarith
 
-private theorem self_le_pow_of_one_le_of_one_le_exp {a : ℝ} (ha : 1 ≤ a) {n : ℕ} (hn : 1 ≤ n) : a ≤ a ^ n := by
+private theorem self_le_pow_of_one_le_of_one_le_exp {a : ℝ} (ha : 1 ≤ a) {n : ℕ} (hn : 1 ≤ n)
+    : a ≤ a ^ n := by
   have h := pow_le_pow_right_of_one_le_real ha hn
   rwa [pow_one] at h
 
@@ -75,7 +77,8 @@ private lemma flowVal_mul_le (hl : 1 ≤ l) {D : ZMod d → ℝ} {x : ZMod d →
   rw [add_mul, one_mul]
   linarith
 
-private theorem le_div_of_mul_le_of_pos_flow_degree_bounds {a b c : ℝ} (hc : 0 < c) (h : a * c ≤ b) : a ≤ b / c := by
+private theorem le_div_of_mul_le_of_pos_flow_degree_bounds {a b c : ℝ} (hc : 0 < c) (h : a * c ≤ b)
+    : a ≤ b / c := by
   have h2 := mul_le_mul_of_nonneg_right h (inv_nonneg.2 hc.le)
   rwa [mul_inv_cancel_right₀ hc.ne', ← div_eq_mul_inv] at h2
 
@@ -139,19 +142,20 @@ private lemma sum_range_two_mul (f : ℕ → ℝ) (m : ℕ) :
     simp only [Finset.sum_range_succ, ih]
     ring
 
-private theorem sum_deficit_le_Fnum_of_isDual (hA : LemmaFa) (hl : 3 ≤ l) (hd : 2 ≤ d) (hev : Even d)
-    {D sig : ZMod d → ℝ} (hD : 0 ≤ D) (hsig : IsDual l d sig) :
-    ∑ s, D s * (gam l - sig s) ≤ Fnum l d D := by
+private theorem sum_deficit_le_Fnum_of_isDual
+    (hA : LemmaFa) (hl : 3 ≤ l) (hd : 2 ≤ d) (hev : Even d)
+    {D sig : ZMod d → ℝ} (hD : 0 ≤ D) (hsig : IsDual l d sig)
+    : ∑ s, D s * (gam l - sig s) ≤ Fnum l d D := by
   have h := (hA l d hl hd hev D hD).2
   exact h.2 ⟨sig, hsig, rfl⟩
 
-private theorem exists_isDual_Fnum_eq_sum_deficit (hA : LemmaFa) (hl : 3 ≤ l) (hd : 2 ≤ d) (hev : Even d)
-    {D : ZMod d → ℝ} (hD : 0 ≤ D) :
-    ∃ sig, IsDual l d sig ∧ Fnum l d D = ∑ s, D s * (gam l - sig s) :=
+private theorem exists_isDual_Fnum_eq_sum_deficit
+    (hA : LemmaFa) (hl : 3 ≤ l) (hd : 2 ≤ d) (hev : Even d) {D : ZMod d → ℝ} (hD : 0 ≤ D)
+    : ∃ sig, IsDual l d sig ∧ Fnum l d D = ∑ s, D s * (gam l - sig s) :=
   (hA l d hl hd hev D hD).2.1
 
-private theorem sum_add_apply_mul (D E f : ZMod d → ℝ) :
-    ∑ s, (D + E) s * f s = ∑ s, D s * f s + ∑ s, E s * f s := by
+private theorem sum_add_apply_mul (D E f : ZMod d → ℝ)
+    : ∑ s, (D + E) s * f s = ∑ s, D s * f s + ∑ s, E s * f s := by
   rw [← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun s _ => ?_
   rw [Pi.add_apply, add_mul]

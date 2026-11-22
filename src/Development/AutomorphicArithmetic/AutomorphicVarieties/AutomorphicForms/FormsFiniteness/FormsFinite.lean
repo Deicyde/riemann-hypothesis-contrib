@@ -19,16 +19,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsRe
 
 noncomputable section
 
-open NumberField NumberField.mixedEmbedding Matrix GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
+open NumberField NumberField.mixedEmbedding Matrix GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm
 
 namespace UpperTheory.V.Af.Fin
 
 variable {K : Type} [Field K] [NumberField K]
 
-private theorem slLeft {a n : ℕ} (e : Fin a ↪ Fin n) (Γ : Set (AdelicGLn.AdelicGL K n))
-    (S : Submodule ℂ (archSmooth K n))
-    (h : ∀ ψ ∈ S, ∀ g ∈ Γ, ∀ γ m, ψ.1 (g * emb e (AdelicGLn.diagonal K a γ * m)) = ψ.1 (g * emb e m)) :
-    ∀ f ∈ slSp e Γ S, IsLeftInvariant f.1 := by
+private theorem slLeft
+    {a n : ℕ}
+    (e : Fin a ↪ Fin n) (Γ : Set (AdelicGLn.AdelicGL K n)) (S : Submodule ℂ (archSmooth K n))
+    (h
+      : ∀ ψ ∈ S, ∀ g ∈ Γ, ∀ γ m, ψ.1 (g * emb e (AdelicGLn.diagonal K a γ * m)) = ψ.1 (g * emb e m))
+    : ∀ f ∈ slSp e Γ S, IsLeftInvariant f.1 := by
   intro f hf
   induction hf using Submodule.span_induction with
   | mem f hf =>
@@ -39,10 +42,13 @@ private theorem slLeft {a n : ℕ} (e : Fin a ↪ Fin n) (Γ : Set (AdelicGLn.Ad
   | add x y _ _ hx hy => exact hx.add hy
   | smul c x _ hx => exact hx.smul c
 
-theorem ctFin {r s : ℕ} (h₁ : FinAt K r) (h₂ : FinAt K s) {S : Submodule ℂ (archSmooth K (r + s))} (hS : Bdd S)
-    (hK : Sat S) : FiniteDimensional ℂ (ctSp r S) := by
+theorem ctFin
+    {r s : ℕ} (h₁ : FinAt K r) (h₂ : FinAt K s)
+    {S : Submodule ℂ (archSmooth K (r + s))} (hS : Bdd S) (hK : Sat S)
+    : FiniteDimensional ℂ (ctSp r S) := by
   obtain ⟨ι, _, ⟨D⟩⟩ := UpperTheory.exists_idempotent_decomposition_mixedSpace K
-  obtain ⟨hN, hG, hL, hSat, hinv⟩ := UpperTheory.constantTermSpace_automorphic_properties K r s S hS hK
+  obtain ⟨hN, hG, hL, hSat, hinv⟩ :=
+    UpperTheory.constantTermSpace_automorphic_properties K r s S hS hK
   have hT := UpperTheory.constantTermSpace_types_of_bdd K (r + s) r S hS
   have hC := UpperTheory.constantTermSpace_centre_of_bdd K (r + s) r S hS
   have hcap := UpperTheory.algebraic_module_of_vanishing_block K r s (ctSp r S) hN hC ι D
@@ -52,30 +58,47 @@ theorem ctFin {r s : ℕ} (h₁ : FinAt K r) (h₂ : FinAt K s) {S : Submodule �
   have hb2 : ∀ γ : GL (Fin s) K, emb (e2 r s) γ = blk (1 : GL (Fin r) K) γ := by
     intro γ
     simp [blk]
-  refine UpperTheory.finiteDimensional_of_finiteDimensional_levi_slices K r s (ctSp r S) hN hSat hL hT ?_ ?_
-  · refine h₁ _ ⟨?_, (UpperTheory.slSp_preserves_growth_and_level K r (r + s) (e1 r s) _ _).1 hG,
-      (UpperTheory.slSp_preserves_growth_and_level K r (r + s) (e1 r s) _ _).2 hL, UpperTheory.finiteDimensional_slSp_reduction K r (r + s) (e1 r s) _ _ hT, ?_⟩
+  refine UpperTheory.finiteDimensional_of_finiteDimensional_levi_slices K r s (ctSp r S) hN hSat hL
+    hT ?_ ?_
+  · refine h₁ _ ⟨
+      ?_,
+      (UpperTheory.slSp_preserves_growth_and_level K r (r + s) (e1 r s) _ _).1 hG,
+      (UpperTheory.slSp_preserves_growth_and_level K r (r + s) (e1 r s) _ _).2 hL,
+      UpperTheory.finiteDimensional_slSp_reduction K r (r + s) (e1 r s) _ _ hT,
+      ?_
+    ⟩
     · apply slLeft
       rintro ψ hψ _ ⟨m₂, rfl⟩ γ m
-      rw [map_mul, ← mul_assoc, ← emb_comm, mul_assoc, (UpperTheory.blockEmbedding_finiteAdelicGL_compat_continuous K r (r + s) (e1 r s)).2.1 γ, hb1,
-        hinv ψ hψ]
-    · refine UpperTheory.siegelLevi_block_aeval_stable K r (r + s) (e1 r s) _ (ctSp r S) (Van K r s) ι D ?_ (fun τ u => (hcap τ u).1)
+      rw [map_mul, ← mul_assoc, ← emb_comm, mul_assoc,
+        (UpperTheory.blockEmbedding_finiteAdelicGL_compat_continuous K r (r + s) (e1 r s)).2.1 γ,
+        hb1, hinv ψ hψ]
+    · refine UpperTheory.siegelLevi_block_aeval_stable K r (r + s) (e1 r s) _ (ctSp r S) (Van K r s)
+        ι D ?_ (fun τ u => (hcap τ u).1)
       rintro ψ hψ _ ⟨m₂, rfl⟩ m
       rw [← emb_comm]
       exact hψ m m₂
-  · refine h₂ _ ⟨?_, (UpperTheory.slSp_preserves_growth_and_level K s (r + s) (e2 r s) _ _).1 hG,
-      (UpperTheory.slSp_preserves_growth_and_level K s (r + s) (e2 r s) _ _).2 hL, UpperTheory.finiteDimensional_slSp_reduction K s (r + s) (e2 r s) _ _ hT, ?_⟩
+  · refine h₂ _ ⟨
+      ?_,
+      (UpperTheory.slSp_preserves_growth_and_level K s (r + s) (e2 r s) _ _).1 hG,
+      (UpperTheory.slSp_preserves_growth_and_level K s (r + s) (e2 r s) _ _).2 hL,
+      UpperTheory.finiteDimensional_slSp_reduction K s (r + s) (e2 r s) _ _ hT,
+      ?_
+    ⟩
     · apply slLeft
       rintro ψ hψ _ ⟨m₁, rfl⟩ γ m
       rw [map_mul, ← mul_assoc, emb_comm m₁ (AdelicGLn.diagonal K s γ), mul_assoc,
-        (UpperTheory.blockEmbedding_finiteAdelicGL_compat_continuous K s (r + s) (e2 r s)).2.1 γ, hb2, hinv ψ hψ]
-    · refine UpperTheory.siegelLevi_block_aeval_stable K s (r + s) (e2 r s) _ (ctSp r S) (Van K r s) ι D ?_ (fun τ u => (hcap τ u).2)
+        (UpperTheory.blockEmbedding_finiteAdelicGL_compat_continuous K s (r + s) (e2 r s)).2.1 γ,
+        hb2, hinv ψ hψ]
+    · refine UpperTheory.siegelLevi_block_aeval_stable K s (r + s) (e2 r s) _ (ctSp r S) (Van K r s)
+        ι D ?_ (fun τ u => (hcap τ u).2)
       rintro ψ hψ _ ⟨m₁, rfl⟩ m
       exact hψ m₁ m
 
-private theorem fin_of_ker {M N : Type} [AddCommGroup M] [Module ℂ M] [AddCommGroup N] [Module ℂ N] (f : M →ₗ[ℂ] N)
-    (h1 : FiniteDimensional ℂ (LinearMap.range f)) (h2 : FiniteDimensional ℂ (LinearMap.ker f)) :
-    FiniteDimensional ℂ M := by
+private theorem fin_of_ker
+    {M N : Type} [AddCommGroup M] [Module ℂ M] [AddCommGroup N] [Module ℂ N]
+    (f : M →ₗ[ℂ] N)
+    (h1 : FiniteDimensional ℂ (LinearMap.range f)) (h2 : FiniteDimensional ℂ (LinearMap.ker f))
+    : FiniteDimensional ℂ M := by
   apply Module.rank_lt_aleph0_iff.mp
   rw [← LinearMap.rank_range_add_rank_ker f]
   exact Cardinal.add_lt_aleph0 (Module.rank_lt_aleph0 ℂ _) (Module.rank_lt_aleph0 ℂ _)
@@ -111,6 +134,7 @@ theorem finAt_of {n : ℕ} (ih : ∀ m < n, FinAt K m) : FinAt K n := by
     exact LinearEquiv.finiteDimensional (Submodule.equivMapOfInjective _ S'.injective_subtype _).symm
   exact Submodule.finiteDimensional_of_le hSS'
 
-theorem formsFinite : FormsFinite := fun _ _ _ n => Nat.strong_induction_on n fun _ ih => finAt_of ih
+theorem formsFinite : FormsFinite := fun _ _ _ n =>
+  Nat.strong_induction_on n fun _ ih => finAt_of ih
 
 end UpperTheory.V.Af.Fin

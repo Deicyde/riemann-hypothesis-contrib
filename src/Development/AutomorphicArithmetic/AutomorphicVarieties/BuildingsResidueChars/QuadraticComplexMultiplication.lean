@@ -4,12 +4,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
 open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V.Published
 open UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc
 
-theorem UpperTheory.quadratic_complex_multiplication :
-    UpperTheory.V.Af.Cr.QuadCM := by
+theorem UpperTheory.quadratic_complex_multiplication : UpperTheory.V.Af.Cr.QuadCM := by
   intro F Ω _ _ _ _ _ _ d δ hδ hd
   have halg : Algebra.IsAlgebraic F Ω := IsAlgClosure.isAlgebraic
   have hint : IsIntegral F δ := (halg.isAlgebraic δ).isIntegral
@@ -38,8 +39,7 @@ theorem UpperTheory.quadratic_complex_multiplication :
     exact absurd h3 (not_lt.2 (sq_nonneg _))
   have hpos := minpoly.natDegree_pos hint
   have hdeg : (minpoly F δ).natDegree = 2 := by omega
-  have hrk : Module.finrank F K = 2 := by
-    rw [← hdeg]; exact IntermediateField.adjoin.finrank hint
+  have hrk : Module.finrank F K = 2 := by rw [← hdeg]; exact IntermediateField.adjoin.finrank hint
   haveI : IsTotallyComplex K := by
     refine ⟨fun v => ?_⟩
     rw [← InfinitePlace.not_isReal_iff_isComplex]
@@ -51,8 +51,20 @@ theorem UpperTheory.quadratic_complex_multiplication :
   haveI : IsAlgClosure K Ω :=
     { isAlgClosed := IsAlgClosure.isAlgClosed F
       isAlgebraic := Algebra.IsAlgebraic.tower_top (K := F) K }
-  refine ⟨K, inferInstance, inferInstance, IsCMField.ofCMExtension F K, inferInstance, inferInstance,
-    inferInstance, inferInstance, hrk, y, hy, fun x => ?_⟩
+  refine ⟨
+    K,
+    inferInstance,
+    inferInstance,
+    IsCMField.ofCMExtension F K,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    hrk,
+    y,
+    hy,
+    fun x => ?_
+  ⟩
   obtain ⟨f, hf, hx⟩ := (IntermediateField.adjoin.powerBasis hint).exists_eq_aeval x
   rw [IntermediateField.adjoin.powerBasis_dim, hdeg] at hf
   refine ⟨f.coeff 0, f.coeff 1, ?_⟩

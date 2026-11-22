@@ -12,17 +12,23 @@ public import Formalism.LocalToGlobal.GlobalTheory.GL5.FamilyMassVolumeIdentityO
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum Formalism.IndefR.Cx
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Mem.EasyInputs
 
 theorem smAll (D : D7) : SmAll D := fun V S M τ => by
-  obtain ⟨w, hw, h0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot (GlobalTheory.GardingVec.sm_ne_bot D V S M τ)
+  obtain ⟨w, hw, h0⟩ :=
+    Submodule.exists_mem_ne_zero_of_ne_bot (GlobalTheory.GardingVec.sm_ne_bot D V S M τ)
   exact ⟨⟨w, hw⟩, by simpa using h0⟩
 
-theorem dimOK (D : D7) : DimOK D := fun i σ ρ => GlobalTheory.Mem.WeylDimPos.dimK_kapAt_Wc_pos D i σ ρ
+theorem dimOK (D : D7) : DimOK D := fun i σ ρ =>
+  GlobalTheory.Mem.WeylDimPos.dimK_kapAt_Wc_pos D i σ ρ
 
 theorem cartanOK (D : D7) : CartanOK D := by
   refine ⟨fun V S M _ τ => GlobalTheory.Chain.VacVec.cart_isCartanInv M τ, fun V hs hp τ => ?_⟩
@@ -45,14 +51,14 @@ theorem selfDualOK (D : D7) : SelfDualOK D := by
   rw [← GlobalTheory.PlaceModel.coe_latFrame] at h1 h2
   refine ⟨⟨?_, ?_⟩, fun y => ?_⟩
   · let f : (Fin V.rank → D.host.E) →ₗ[𝓞 D.host.E] (Fin V.rank → D.host.E) :=
-      (LinearMap.lsmul D.host.E (Fin V.rank → D.host.E) (N : D.host.E)⁻¹).restrictScalars (𝓞 D.host.E)
+      (LinearMap.lsmul D.host.E (Fin V.rank → D.host.E) (N : D.host.E)⁻¹).restrictScalars
+        (𝓞 D.host.E)
     refine (hL.fg.map f).of_le fun x hx => ⟨_, h2 x hx, ?_⟩
     change (N : D.host.E)⁻¹ • ((N : D.host.E) • x) = x
     rw [smul_smul, inv_mul_cancel₀ hM0, one_smul]
   · intro s hs hli
     exact (LinearIndependent.iff_fractionRing _ _).mp hli
   · rw [← GlobalTheory.SDFrameLattice.mem_dualL_iff, hd]
-
 
 open scoped Pointwise in
 theorem petAll (D : D7) : PetAll D := by
@@ -61,7 +67,8 @@ theorem petAll (D : D7) : PetAll D := by
   haveI := Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.isTopRing (F := D.host.F) (E := D.host.E)
   haveI : IsTopologicalGroup (GA D V) := inferInstanceAs (IsTopologicalGroup (HR (AF D.host.F) D.sp.cm.sig V.gram))
   haveI : Countable (GQ V) := Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.countableGamma _ _
-  rw [setIntegral_pos_iff_support_of_nonneg_ae (Filter.Eventually.of_forall fun g => by positivity) hi]
+  rw [setIntegral_pos_iff_support_of_nonneg_ae (Filter.Eventually.of_forall fun g => by positivity)
+    hi]
   have hs : Function.support (fun g => ‖F g‖ ^ 2) = Function.support F := by
     ext g
     simp [Function.mem_support]
@@ -75,7 +82,7 @@ theorem petAll (D : D7) : PetAll D := by
   have hzero := h𝓕.measure_zero_of_invariant _ hinv hz
   exact (hc.isOpen_support.measure_pos μ (Function.support_nonempty_iff.2 h0)).ne' hzero
 
-theorem easy_inputs : ∀ D : D7, CartanOK D ∧ SelfDualOK D ∧ SpOK D ∧ DimOK D ∧ PetAll D ∧ SmAll D := fun D =>
-  ⟨cartanOK D, selfDualOK D, spOK D, dimOK D, petAll D, smAll D⟩
+theorem easy_inputs : ∀ D : D7, CartanOK D ∧ SelfDualOK D ∧ SpOK D ∧ DimOK D ∧ PetAll D ∧ SmAll D :=
+  fun D => ⟨cartanOK D, selfDualOK D, spOK D, dimOK D, petAll D, smAll D⟩
 
 end GlobalTheory.Mem.EasyInputs

@@ -10,10 +10,13 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.IsobaricBa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.UnitaryClasses
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+  GlobalTheory.UnitaryClasses
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-open GlobalTheory.IndefiniteRowSideFullHecke.SelfReciprocalLocalField PositivityTheory.BCUSide.HermitianLocalForms
+open GlobalTheory.IndefiniteRowSideFullHecke.SelfReciprocalLocalField
+  PositivityTheory.BCUSide.HermitianLocalForms
 
 noncomputable section
 
@@ -21,29 +24,46 @@ namespace PositivityTheory.BCUSide.HermitianLocalForms
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem sgnOn_mul_self {K : Type} [Field K] [Valued K (WithZero (Multiplicative ℤ))] (σ : K →+* K) {n : ℕ}
-    (H : Matrix (Fin n) (Fin n) K) (Q : K[X]) (A : Matrix (Fin n) (Fin n) K) :
-    sgnOn σ H Q A * sgnOn σ H Q A = 1 := by
+theorem sgnOn_mul_self
+    {K : Type} [Field K] [Valued K (WithZero (Multiplicative ℤ))]
+    (σ : K →+* K)
+    {n : ℕ} (H : Matrix (Fin n) (Fin n) K)
+    (Q : K[X]) (A : Matrix (Fin n) (Fin n) K)
+    : sgnOn σ H Q A * sgnOn σ H Q A = 1 := by
   unfold sgnOn
   rw [← mul_zpow]
   norm_num
 
-
 omit [IsCMField E] in
-theorem sec_eq {S : Set (Pl E)} (hS : IsSection S) {w u : Pl E} (hw : w ∈ S) (hu : u ∈ S)
-    (h : u.under (𝓞 (maximalRealSubfield E)) = w.under (𝓞 (maximalRealSubfield E))) : u = w := by
+theorem sec_eq
+    {S : Set (Pl E)} (hS : IsSection S)
+    {w u : Pl E} (hw : w ∈ S) (hu : u ∈ S)
+    (h : u.under (𝓞 (maximalRealSubfield E)) = w.under (𝓞 (maximalRealSubfield E)))
+    : u = w := by
   obtain ⟨a, -, ha⟩ := hS w
   exact (ha u ⟨hu, h⟩).trans (ha w ⟨hw, rfl⟩).symm
 
-theorem conv_norm {r : ℕ} (Q : SelfRecip E r) {θ : E} (hθ0 : θ ≠ 0) (hθ : IsCMField.complexConj E θ = -θ)
+theorem conv_norm
+    {r : ℕ} (Q : SelfRecip E r)
+    {θ : E} (hθ0 : θ ≠ 0) (hθ : IsCMField.complexConj E θ = -θ)
     {d : plus Q} (hd : (d : Fld Q) = algebraMap E _ θ * algebraMap E _ θ)
-    (k : Type) [Field k] [Algebra (maximalRealSubfield E) k] (a : (k ⊗[(maximalRealSubfield E)] plus Q)ˣ) (t : (plus Q)ˣ)
-    (h : GlobalTheory.TraceClasses.IsValue (1 ⊗ₜ d) ((a : k ⊗[(maximalRealSubfield E)] plus Q) * (1 ⊗ₜ ((t : plus Q))⁻¹))) :
-    ∃ z : (k ⊗[(maximalRealSubfield E)] Fld Q)ˣ, inclPlus Q k (a : k ⊗[(maximalRealSubfield E)] plus Q) *
-      ((z : k ⊗[(maximalRealSubfield E)] Fld Q) * involBase Q k (z : k ⊗[(maximalRealSubfield E)] Fld Q)) = (1 : k) ⊗ₜ (((t : plus Q) : Fld Q)) := by
+    (k : Type) [Field k] [Algebra (maximalRealSubfield E) k]
+    (a : (k ⊗[(maximalRealSubfield E)] plus Q)ˣ) (t : (plus Q)ˣ)
+    (h : GlobalTheory.TraceClasses.IsValue (1 ⊗ₜ d)
+      ((a : k ⊗[(maximalRealSubfield E)] plus Q) * (1 ⊗ₜ ((t : plus Q))⁻¹)))
+    : ∃ z : (k ⊗[(maximalRealSubfield E)] Fld Q)ˣ,
+      inclPlus Q k (a : k ⊗[(maximalRealSubfield E)] plus Q)
+          * ((z : k ⊗[(maximalRealSubfield E)] Fld Q)
+            * involBase Q k (z : k ⊗[(maximalRealSubfield E)] Fld Q))
+        = (1 : k) ⊗ₜ (((t : plus Q) : Fld Q)) := by
   let T : (k ⊗[(maximalRealSubfield E)] plus Q)ˣ :=
-    Units.map (Algebra.TensorProduct.includeRight : plus Q →ₐ[(maximalRealSubfield E)] k ⊗[(maximalRealSubfield E)] plus Q).toMonoidHom t
-  have hT : ((T⁻¹ : (k ⊗[(maximalRealSubfield E)] plus Q)ˣ) : k ⊗[(maximalRealSubfield E)] plus Q) = 1 ⊗ₜ ((t : plus Q))⁻¹ := by
+    Units.map
+      (Algebra.TensorProduct.includeRight
+        : plus Q →ₐ[(maximalRealSubfield E)] k ⊗[(maximalRealSubfield E)] plus Q).toMonoidHom
+      t
+  have hT
+      : ((T⁻¹ : (k ⊗[(maximalRealSubfield E)] plus Q)ˣ) : k ⊗[(maximalRealSubfield E)] plus Q)
+        = 1 ⊗ₜ ((t : plus Q))⁻¹ := by
     rw [← Units.val_inv_eq_inv_val]; rfl
   have hmem : a * T⁻¹ ∈ norms Q k := by
     rw [GlobalTheory.TraceClasses.mem_norms_iff Q hθ0 hθ k hd, Units.val_mul, hT]
@@ -51,13 +71,20 @@ theorem conv_norm {r : ℕ} (Q : SelfRecip E r) {θ : E} (hθ0 : θ ≠ 0) (hθ 
   obtain ⟨c, hc⟩ := hmem
   have hc' : normHom Q k c = Units.map (inclPlus Q k).toMonoidHom (a * T⁻¹) := hc
   refine ⟨c⁻¹, ?_⟩
-  have h4 : (c⁻¹ : (k ⊗[(maximalRealSubfield E)] Fld Q)ˣ).val * involBase Q k (c⁻¹ : (k ⊗[(maximalRealSubfield E)] Fld Q)ˣ).val =
-      (normHom Q k c⁻¹ : k ⊗[(maximalRealSubfield E)] Fld Q) := rfl
-  have h5 : normHom Q k c⁻¹ = (Units.map (inclPlus Q k).toMonoidHom a)⁻¹ *
-      Units.map (inclPlus Q k).toMonoidHom T := by
+  have h4
+      : (c⁻¹ : (k ⊗[(maximalRealSubfield E)] Fld Q)ˣ).val
+          * involBase Q k (c⁻¹ : (k ⊗[(maximalRealSubfield E)] Fld Q)ˣ).val
+        = (normHom Q k c⁻¹ : k ⊗[(maximalRealSubfield E)] Fld Q) :=
+    rfl
+  have h5
+      : normHom Q k c⁻¹
+        = (Units.map (inclPlus Q k).toMonoidHom a)⁻¹ * Units.map (inclPlus Q k).toMonoidHom T := by
     rw [map_inv, hc', map_mul, map_inv, mul_inv, inv_inv]
   rw [h4, h5]
-  have h6 : inclPlus Q k (a : k ⊗[(maximalRealSubfield E)] plus Q) = (Units.map (inclPlus Q k).toMonoidHom a : k ⊗[(maximalRealSubfield E)] Fld Q) := rfl
+  have h6
+      : inclPlus Q k (a : k ⊗[(maximalRealSubfield E)] plus Q)
+        = (Units.map (inclPlus Q k).toMonoidHom a : k ⊗[(maximalRealSubfield E)] Fld Q) :=
+    rfl
   rw [h6, ← Units.val_mul, mul_inv_cancel_left]
   simp [T, inclPlus]
 
@@ -215,18 +242,30 @@ theorem factor_alt (hU : Unr E) {S : Set (Pl E)} (hS : IsSection S) {n : ℕ} {�
     refine ⟨z, ?_⟩
     simpa using hz
 
-theorem transport (hU : Unr E) {w w' : Pl E} (e : w' = w) (hw : ¬ IsSplitAt w) (hw' : ¬ IsSplitAt w')
-    {v : HeightOneSpectrum (𝓞 (maximalRealSubfield E))} (hv : w.under (𝓞 (maximalRealSubfield E)) = v) (hv' : w'.under (𝓞 (maximalRealSubfield E)) = v)
-    (mw : ∀ w : Pl E, (w.adicCompletion E)[X]) {r : ℕ} (Q : SelfRecip E r) (y : v.adicCompletion (maximalRealSubfield E) ⊗[(maximalRealSubfield E)] Fld Q)
-    (h : ∃ z : (v.adicCompletion (maximalRealSubfield E) ⊗[(maximalRealSubfield E)] Fld Q)ˣ, locPhi hU w' hw' v hv' Q (mw w') *
-      ((z : v.adicCompletion (maximalRealSubfield E) ⊗[(maximalRealSubfield E)] Fld Q) * involBase Q _ (z : v.adicCompletion (maximalRealSubfield E) ⊗[(maximalRealSubfield E)] Fld Q)) = y) :
-    ∃ z : (v.adicCompletion (maximalRealSubfield E) ⊗[(maximalRealSubfield E)] Fld Q)ˣ, locPhi hU w hw v hv Q (mw w) *
-      ((z : v.adicCompletion (maximalRealSubfield E) ⊗[(maximalRealSubfield E)] Fld Q) * involBase Q _ (z : v.adicCompletion (maximalRealSubfield E) ⊗[(maximalRealSubfield E)] Fld Q)) = y := by
+theorem transport
+    (hU : Unr E)
+    {w w' : Pl E} (e : w' = w) (hw : ¬ IsSplitAt w) (hw' : ¬ IsSplitAt w')
+    {v : HeightOneSpectrum (𝓞 (maximalRealSubfield E))}
+    (hv : w.under (𝓞 (maximalRealSubfield E)) = v) (hv' : w'.under (𝓞 (maximalRealSubfield E)) = v)
+    (mw : ∀ w : Pl E, (w.adicCompletion E)[X])
+    {r : ℕ} (Q : SelfRecip E r)
+    (y : v.adicCompletion (maximalRealSubfield E) ⊗[(maximalRealSubfield E)] Fld Q)
+    (h : ∃ z : (v.adicCompletion (maximalRealSubfield E) ⊗[(maximalRealSubfield E)] Fld Q)ˣ,
+      locPhi hU w' hw' v hv' Q (mw w')
+          * ((z : v.adicCompletion (maximalRealSubfield E) ⊗[(maximalRealSubfield E)] Fld Q)
+            * involBase Q _
+              (z : v.adicCompletion (maximalRealSubfield E) ⊗[(maximalRealSubfield E)] Fld Q))
+        = y)
+    : ∃ z : (v.adicCompletion (maximalRealSubfield E) ⊗[(maximalRealSubfield E)] Fld Q)ˣ,
+      locPhi hU w hw v hv Q (mw w)
+          * ((z : v.adicCompletion (maximalRealSubfield E) ⊗[(maximalRealSubfield E)] Fld Q)
+            * involBase Q _
+              (z : v.adicCompletion (maximalRealSubfield E) ⊗[(maximalRealSubfield E)] Fld Q))
+        = y := by
   subst e
   exact h
 
 end PositivityTheory.BCUSide.HermitianLocalForms
-
 
 open PositivityTheory.BCUSide.HermitianLocalForms in
 theorem PositivityTheory.BCUSide.L.hermitian_form_local_global : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr E → ∀ S : Set (Pl E), IsSection S → ∀ (n : ℕ) (γ₀ : GL (Fin n) E), γ₀.val.charpoly ∈ Ell E n → ∀ H₀ : Matrix (Fin n) (Fin n) E, IsHerm (IsCMField.complexConj E).toRingEquiv.toRingHom H₀ → H₀.det ≠ 0 → cT (IsCMField.complexConj E).toRingEquiv.toRingHom γ₀.val * H₀ * γ₀.val = H₀ → (∀ τ : E →+* ℂ, ∃ Q : Matrix (Fin n) (Fin n) ℂ, Q.det ≠ 0 ∧ H₀.map τ = cT (starRingEnd ℂ) Q * Q) → (∀ P₁ : E[X], P₁.Monic → P₁ ∣ γ₀.val.charpoly → ∏ᶠ w ∈ S, (if IsSplitAt w then (1 : ℂ) else sgnOn (cj w) (H₀.map (algebraMap E (w.adicCompletion E))) (atPl w P₁) (γ₀.val.map (algebraMap E (w.adicCompletion E)))) = 1) → ∀ H : ∀ w : Pl E, Matrix (Fin n) (Fin n) (w.adicCompletion E), (∀ w, ¬ IsSplitAt w → IsHerm (cj w) (H w) ∧ (H w).det ≠ 0 ∧ cT (cj w) (γ₀.val.map (algebraMap E (w.adicCompletion E))) * H w * γ₀.val.map (algebraMap E (w.adicCompletion E)) = H w) → (∀ᶠ w in cofinite, ¬ IsSplitAt w → ∃ c : GL (Fin n) (w.adicCompletion E), c.val * γ₀.val.map (algebraMap E (w.adicCompletion E)) = γ₀.val.map (algebraMap E (w.adicCompletion E)) * c.val ∧ H w = cT (cj w) c.val * H₀.map (algebraMap E (w.adicCompletion E)) * c.val) → (∀ P₁ : E[X], P₁.Monic → P₁ ∣ γ₀.val.charpoly → ∏ᶠ w ∈ S, (if IsSplitAt w then (1 : ℂ) else sgnOn (cj w) (H w) (atPl w P₁) (γ₀.val.map (algebraMap E (w.adicCompletion E)))) = 1) → ∃ H' : Matrix (Fin n) (Fin n) E, IsHerm (IsCMField.complexConj E).toRingEquiv.toRingHom H' ∧ cT (IsCMField.complexConj E).toRingEquiv.toRingHom γ₀.val * H' * γ₀.val = H' ∧ (∀ τ : E →+* ℂ, ∃ Q : Matrix (Fin n) (Fin n) ℂ, Q.det ≠ 0 ∧ H'.map τ = cT (starRingEnd ℂ) Q * Q) ∧ ∀ w, ¬ IsSplitAt w → ∃ c : GL (Fin n) (w.adicCompletion E), c.val * γ₀.val.map (algebraMap E (w.adicCompletion E)) = γ₀.val.map (algebraMap E (w.adicCompletion E)) * c.val ∧ H'.map (algebraMap E (w.adicCompletion E)) = cT (cj w) c.val * H w * c.val := by

@@ -11,7 +11,9 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.TsumSetIn
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
 open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -21,7 +23,19 @@ open scoped ENNReal Pointwise
 namespace GlobalTheory
 namespace Unf
 
-theorem lintegral_integral_unfold_transitive : ∀ (H : Type) [Group H] [MeasurableSpace H] [MeasurableMul H] (ν : Measure H) [ν.IsMulLeftInvariant] (Γ : Subgroup H) [Countable Γ] (Y : Type) [Countable Y] [MulAction Γ Y] (y₀ : Y), (∀ y, ∃ γ : Γ, γ • y₀ = y) → ∀ (𝓕 𝓖 : Set H), IsFundamentalDomain Γ 𝓕 ν → IsFundamentalDomain ((MulAction.stabilizer Γ y₀).map Γ.subtype) 𝓖 ν → ∀ Φ : Y → H → ℂ, (∀ y, Measurable (Φ y)) → (∀ (γ : Γ) y h, Φ (γ • y) ((γ : H) * h) = Φ y h) → (∫⁻ h in 𝓖, ‖Φ y₀ h‖ₑ ∂ν = ∫⁻ h in 𝓕, ∑' y, ‖Φ y h‖ₑ ∂ν) ∧ (∫⁻ h in 𝓕, ∑' y, ‖Φ y h‖ₑ ∂ν ≠ ⊤ → ∫ h in 𝓖, Φ y₀ h ∂ν = ∫ h in 𝓕, ∑' y, Φ y h ∂ν) := by
+theorem lintegral_integral_unfold_transitive
+    : ∀ (H : Type) [Group H] [MeasurableSpace H] [MeasurableMul H] (ν : Measure H)
+        [ν.IsMulLeftInvariant] (Γ : Subgroup H) [Countable Γ] (Y : Type) [Countable Y]
+        [MulAction Γ Y] (y₀ : Y),
+      (∀ y, ∃ γ : Γ, γ • y₀ = y)
+        → ∀ (𝓕 𝓖 : Set H),
+          IsFundamentalDomain Γ 𝓕 ν
+            → IsFundamentalDomain ((MulAction.stabilizer Γ y₀).map Γ.subtype) 𝓖 ν
+            → ∀ Φ : Y → H → ℂ,
+              (∀ y, Measurable (Φ y)) → (∀ (γ : Γ) y h, Φ (γ • y) ((γ : H) * h) = Φ y h)
+                → (∫⁻ h in 𝓖, ‖Φ y₀ h‖ₑ ∂ν = ∫⁻ h in 𝓕, ∑' y, ‖Φ y h‖ₑ ∂ν)
+                  ∧ (∫⁻ h in 𝓕, ∑' y, ‖Φ y h‖ₑ ∂ν ≠ ⊤
+                    → ∫ h in 𝓖, Φ y₀ h ∂ν = ∫ h in 𝓕, ∑' y, Φ y h ∂ν) := by
   intro H _ _ _ ν _ Γ _ Y _ _ y₀ htr 𝓕 𝓖 hF hG Φ hΦ hinv
   set S : Subgroup H := (MulAction.stabilizer Γ y₀).map Γ.subtype with hSdef
   haveI : Countable S := by
@@ -41,13 +55,16 @@ theorem lintegral_integral_unfold_transitive : ∀ (H : Type) [Group H] [Measura
     · filter_upwards [hF.ae_covers] with x ⟨γ, hγ⟩
       have hs : (σ (γ • y₀))⁻¹ * γ ∈ MulAction.stabilizer Γ y₀ := by
         rw [MulAction.mem_stabilizer_iff, mul_smul, inv_smul_eq_iff, hσ]
-      refine ⟨⟨Γ.subtype ((σ (γ • y₀))⁻¹ * γ), Subgroup.mem_map_of_mem _ hs⟩,
-        Set.mem_iUnion.2 ⟨γ • y₀, ?_⟩⟩
+      refine ⟨
+        ⟨Γ.subtype ((σ (γ • y₀))⁻¹ * γ), Subgroup.mem_map_of_mem _ hs⟩,
+        Set.mem_iUnion.2 ⟨γ • y₀, ?_⟩
+      ⟩
       simpa [pull, Subgroup.smul_def, mul_assoc] using hγ
     · rintro ⟨_, s, hs, rfl⟩ ⟨_, t, ht, rfl⟩ hst
-      have hset : ∀ (u : Γ) (hu : u ∈ MulAction.stabilizer Γ y₀) (a : Y),
-          (⟨Γ.subtype u, Subgroup.mem_map_of_mem _ hu⟩ : S) • pull (σ a : H) =
-            (σ a * u⁻¹)⁻¹ • 𝓕 := by
+      have hset
+          : ∀ (u : Γ) (hu : u ∈ MulAction.stabilizer Γ y₀) (a : Y),
+            (⟨Γ.subtype u, Subgroup.mem_map_of_mem _ hu⟩ : S) • pull (σ a : H)
+              = (σ a * u⁻¹)⁻¹ • 𝓕 := by
         intro u hu a
         ext x
         simp [Set.mem_smul_set_iff_inv_smul_mem, pull, Subgroup.smul_def, mul_assoc]
@@ -71,40 +88,37 @@ theorem lintegral_integral_unfold_transitive : ∀ (H : Type) [Group H] [Measura
   have hfun : ∀ (y : Y) (h : H), Φ y ((σ y : H) * h) = Φ y₀ h := fun y h => by
     have := hinv (σ y) y₀ h
     rwa [hσ y] at this
-  have hlint : ∀ y : Y, ∫⁻ h in pull (σ y : H), ‖Φ y₀ h‖ₑ ∂ν
-      = ∫⁻ h in 𝓕, ‖Φ y h‖ₑ ∂ν := fun y => by
-    rw [← (measurePreserving_mul_left ν (σ y : H)).setLIntegral_comp_preimage_emb (measurableEmbedding_mulLeft (σ y : H)) (fun h => ‖Φ y h‖ₑ) 𝓕]
+  have hlint : ∀ y : Y, ∫⁻ h in pull (σ y : H), ‖Φ y₀ h‖ₑ ∂ν = ∫⁻ h in 𝓕, ‖Φ y h‖ₑ ∂ν := fun y => by
+    rw [← (measurePreserving_mul_left ν (σ y : H)).setLIntegral_comp_preimage_emb
+      (measurableEmbedding_mulLeft (σ y : H))
+      (fun h => ‖Φ y h‖ₑ)
+      𝓕]
     simp only [hfun, pull]
-  have hint : ∀ y : Y, ∫ h in pull (σ y : H), Φ y₀ h ∂ν
-      = ∫ h in 𝓕, Φ y h ∂ν := fun y => by
-    rw [← (measurePreserving_mul_left ν (σ y : H)).setIntegral_preimage_emb (measurableEmbedding_mulLeft (σ y : H)) (Φ y) 𝓕]
+  have hint : ∀ y : Y, ∫ h in pull (σ y : H), Φ y₀ h ∂ν = ∫ h in 𝓕, Φ y h ∂ν := fun y => by
+    rw [← (measurePreserving_mul_left ν (σ y : H)).setIntegral_preimage_emb
+      (measurableEmbedding_mulLeft (σ y : H)) (Φ y) 𝓕]
     simp only [hfun, pull]
-  have hd : Pairwise (Function.onFun (AEDisjoint ν) fun y : Y =>
-      pull (σ y : H)) := by
+  have hd : Pairwise (Function.onFun (AEDisjoint ν) fun y : Y => pull (σ y : H)) := by
     intro a b hab
     dsimp only [Function.onFun]
     rw [hpull, hpull]
     refine hF.aedisjoint (inv_injective.ne fun h => hab ?_)
     rw [← hσ a, ← hσ b, h]
-  have hL1 : ∫⁻ h in 𝓖, ‖Φ y₀ h‖ₑ ∂ν
-      = ∫⁻ h in ⋃ y : Y, pull (σ y : H), ‖Φ y₀ h‖ₑ ∂ν :=
+  have hL1 : ∫⁻ h in 𝓖, ‖Φ y₀ h‖ₑ ∂ν = ∫⁻ h in ⋃ y : Y, pull (σ y : H), ‖Φ y₀ h‖ₑ ∂ν :=
     hG.setLIntegral_eq hG' (fun h => ‖Φ y₀ h‖ₑ) (fun s h => by simp only [hinvS])
-  have hL2 : ∫⁻ h in ⋃ y : Y, pull (σ y : H), ‖Φ y₀ h‖ₑ ∂ν
-      = ∑' y, ∫⁻ h in 𝓕, ‖Φ y h‖ₑ ∂ν := by
+  have hL2 : ∫⁻ h in ⋃ y : Y, pull (σ y : H), ‖Φ y₀ h‖ₑ ∂ν = ∑' y, ∫⁻ h in 𝓕, ‖Φ y h‖ₑ ∂ν := by
     rw [lintegral_iUnion₀ (fun y => hnull _) hd]
     simp only [hlint]
   have hL3 : ∫⁻ h in 𝓕, ∑' y, ‖Φ y h‖ₑ ∂ν = ∑' y, ∫⁻ h in 𝓕, ‖Φ y h‖ₑ ∂ν :=
     lintegral_tsum fun y => (hΦ y).enorm.aemeasurable
-  have hmain : ∫⁻ h in 𝓖, ‖Φ y₀ h‖ₑ ∂ν = ∫⁻ h in 𝓕, ∑' y, ‖Φ y h‖ₑ ∂ν := by
-    rw [hL1, hL2, hL3]
+  have hmain : ∫⁻ h in 𝓖, ‖Φ y₀ h‖ₑ ∂ν = ∫⁻ h in 𝓕, ∑' y, ‖Φ y h‖ₑ ∂ν := by rw [hL1, hL2, hL3]
   refine ⟨hmain, fun hfin => ?_⟩
   have hfin' : ∑' y, ∫⁻ h in 𝓕, ‖Φ y h‖ₑ ∂ν ≠ ⊤ := by rwa [← hL3]
   have hI : IntegrableOn (Φ y₀) (⋃ y : Y, pull (σ y : H)) ν := by
     refine ⟨(hΦ y₀).aestronglyMeasurable, ?_⟩
     rw [HasFiniteIntegral, hL2]
     exact lt_top_iff_ne_top.2 hfin'
-  have hI1 : ∫ h in 𝓖, Φ y₀ h ∂ν
-      = ∫ h in ⋃ y : Y, pull (σ y : H), Φ y₀ h ∂ν :=
+  have hI1 : ∫ h in 𝓖, Φ y₀ h ∂ν = ∫ h in ⋃ y : Y, pull (σ y : H), Φ y₀ h ∂ν :=
     hG.setIntegral_eq hG' (fun s h => hinvS s h)
   rw [hI1, integral_iUnion_ae (fun y => hnull _) hd hI]
   simp only [hint]

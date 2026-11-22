@@ -17,9 +17,12 @@ theorem monic_lprod (L : List ℂ) : (L.map fun c => Polynomial.X - Polynomial.C
     rw [List.map_cons, List.prod_cons]
     exact (Polynomial.monic_X_sub_C c).mul ih
 
-theorem fin_adjoin {A : Type*} [Ring A] [Algebra ℂ A] {ι : Type*} [Finite ι] (x : ι → A)
-    (hc : ∀ i j, Commute (x i) (x j)) (hL : ∀ i, ∃ L : List ℂ, (L.map fun c => x i - algebraMap ℂ A c).prod = 0) :
-    FiniteDimensional ℂ (Subalgebra.toSubmodule (Algebra.adjoin ℂ (Set.range x))) := by
+theorem fin_adjoin
+    {A : Type*} [Ring A] [Algebra ℂ A]
+    {ι : Type*} [Finite ι]
+    (x : ι → A) (hc : ∀ i j, Commute (x i) (x j))
+    (hL : ∀ i, ∃ L : List ℂ, (L.map fun c => x i - algebraMap ℂ A c).prod = 0)
+    : FiniteDimensional ℂ (Subalgebra.toSubmodule (Algebra.adjoin ℂ (Set.range x))) := by
   classical
   have hcomm : (Set.range x).Pairwise Commute := by
     rintro _ ⟨i, rfl⟩ _ ⟨j, rfl⟩ _
@@ -33,8 +36,9 @@ theorem fin_adjoin {A : Type*} [Ring A] [Algebra ℂ A] {ι : Type*} [Finite ι]
     obtain ⟨L, hL⟩ := hL i
     refine ⟨(L.map fun c => Polynomial.X - Polynomial.C c).prod, monic_lprod L, ?_⟩
     rw [← Polynomial.aeval_def, map_list_prod, List.map_map]
-    have hf : (⇑(Polynomial.aeval (x i)) ∘ fun c => Polynomial.X - Polynomial.C c) =
-        fun c => x i - algebraMap ℂ A c := by
+    have hf
+        : (⇑(Polynomial.aeval (x i)) ∘ fun c => Polynomial.X - Polynomial.C c)
+          = fun c => x i - algebraMap ℂ A c := by
       funext c
       simp [Polynomial.aeval_X, Polynomial.aeval_C]
     rw [hf]
@@ -42,7 +46,8 @@ theorem fin_adjoin {A : Type*} [Ring A] [Algebra ℂ A] {ι : Type*} [Finite ι]
   let y : ι → Algebra.adjoin ℂ (Set.range x) := fun i => ⟨x i, Algebra.subset_adjoin ⟨i, rfl⟩⟩
   have hyint : ∀ z ∈ Set.range y, IsIntegral ℂ z := by
     rintro _ ⟨i, rfl⟩
-    exact (isIntegral_algHom_iff (Algebra.adjoin ℂ (Set.range x)).val Subtype.val_injective).1 (hint i)
+    exact (isIntegral_algHom_iff (Algebra.adjoin ℂ (Set.range x)).val Subtype.val_injective).1
+      (hint i)
   have hfin := Algebra.finite_adjoin_of_finite_of_isIntegral (R := ℂ) (Set.finite_range y) hyint
   have hset : Set.range y = Subtype.val ⁻¹' (Set.range x) := by
     ext z

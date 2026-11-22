@@ -5,10 +5,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
 
-theorem UpperTheory.V.HV.thmHV :
-    PointHV → ∀ (K : BConst) (Ct : ℝ), 0 < Ct → ThmHV K Ct := by
+theorem UpperTheory.V.HV.thmHV : PointHV → ∀ (K : BConst) (Ct : ℝ), 0 < Ct → ThmHV K Ct := by
   intro hP K Ct hCt ψ
   obtain ⟨C, r₁, r₂, hr₁, hr₂, hmain⟩ := hP ψ (fun l => Nat.log l (K.Rl l (Lchi ψ l)) + 3)
   refine ⟨(C : ℝ), r₁, r₂, hr₁, hr₂, ?_⟩
@@ -36,9 +36,11 @@ theorem UpperTheory.V.HV.thmHV :
     apply hlist y
     simp only [Host.q, Host.o, List.mem_cons, List.not_mem_nil] at hy ⊢
     tauto
-  have key := hmain ⟨ψ, e x, q, d, he2, hpair⟩ rfl
-    (hlist r₁ (by simp)).1 (hlist r₁ (by simp)).2 (hlist r₂ (by simp)).1 (hlist r₂ (by simp)).2
-    (t x) ht2 hbig (Real.exp (x ^ (4 * eps / 5))) (Real.exp_pos _).le
-    (fun l hl _ => hB.2 l hl) E hE
+  have key :=
+    hmain ⟨ψ, e x, q, d, he2, hpair⟩ rfl (hlist r₁ (by simp)).1 (hlist r₁ (by simp)).2
+      (hlist r₂ (by simp)).1 (hlist r₂ (by simp)).2 (t x) ht2 hbig (Real.exp (x ^ (4 * eps / 5)))
+      (Real.exp_pos _).le
+      (fun l hl _ => hB.2 l hl)
+      E hE
   rw [hostCond ⟨ψ, e x, q, d, he2, hpair⟩ E hE]
   simpa [Real.rpow_natCast] using key

@@ -8,7 +8,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.SymplecticG
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
 namespace UpperTheory.V.Ws
 
@@ -29,9 +31,11 @@ theorem adj_adj (X : M4 R) : adj (adj X) = X := (grp R).2.1 X
 
 theorem adj_one : adj (1 : M4 R) = 1 := (grp R).2.2.2.2.1
 
-theorem adj_map (f : R →+* R') (X : M4 R) : adj (X.map f) = (adj X).map f := (grp R).2.2.2.2.2.1 R' f X
+theorem adj_map (f : R →+* R') (X : M4 R) : adj (X.map f) = (adj X).map f :=
+  (grp R).2.2.2.2.2.1 R' f X
 
-theorem gsp_mul {ν ν' : R} {g g' : M4 R} (h : IsGSp ν g) (h' : IsGSp ν' g') : IsGSp (ν * ν') (g * g') :=
+theorem gsp_mul {ν ν' : R} {g g' : M4 R} (h : IsGSp ν g) (h' : IsGSp ν' g')
+    : IsGSp (ν * ν') (g * g') :=
   (grp R).2.2.2.2.2.2.2.1 ν ν' g g' h h'
 
 theorem sp_mul {g g' : M4 R} (h : IsGSp 1 g) (h' : IsGSp 1 g') : IsGSp 1 (g * g') := by
@@ -44,7 +48,8 @@ theorem sp_mul_adj {g : M4 R} (h : IsGSp 1 g) : g * adj g = 1 := mul_eq_one_comm
 theorem sp_adj {g : M4 R} (h : IsGSp 1 g) : IsGSp 1 (adj g) := by
   rw [IsGSp, adj_adj, sp_mul_adj h, one_smul]
 
-theorem gsp_conj {ν : R} {m g : M4 R} (hm : IsGSp 1 m) (h : IsGSp ν g) : IsGSp ν (adj m * g * m) := by
+theorem gsp_conj {ν : R} {m g : M4 R} (hm : IsGSp 1 m) (h : IsGSp ν g)
+    : IsGSp ν (adj m * g * m) := by
   simpa using gsp_mul (gsp_mul (sp_adj hm) h) hm
 
 theorem gsp_map (f : R →+* R') {ν : R} {g : M4 R} (h : IsGSp ν g) : IsGSp (f ν) (g.map f) := by
@@ -57,7 +62,8 @@ theorem wM_sp (pr : Bool) : IsGSp 1 (wM R pr) := by
   · simp [IsGSp, wM, adj_one]
   · unfold IsGSp
     ext i j
-    fin_cases i <;> fin_cases j <;> simp [wM, adj, sgn, Matrix.mul_apply, Fin.sum_univ_four, Matrix.one_apply, Fin.rev]
+    fin_cases i <;> fin_cases j
+      <;> simp [wM, adj, sgn, Matrix.mul_apply, Fin.sum_univ_four, Matrix.one_apply, Fin.rev]
 
 theorem wM_map (f : R →+* R') (pr : Bool) : (wM R pr).map f = wM R' pr := by
   cases pr
@@ -73,12 +79,13 @@ theorem wM_par (pr : Bool) : Par (wM R pr) := by
   · intro i j hij
     fin_cases i <;> fin_cases j <;> simp_all [wM, lamW]
 
-theorem wM_conj_diagonal (pr : Bool) (d : Fin 4 → R) :
-    adj (wM R pr) * Matrix.diagonal d * wM R pr = Matrix.diagonal fun i => d (lab pr i) := by
+theorem wM_conj_diagonal (pr : Bool) (d : Fin 4 → R)
+    : adj (wM R pr) * Matrix.diagonal d * wM R pr = Matrix.diagonal fun i => d (lab pr i) := by
   cases pr
   · simp [wM, adj_one, lab]
   · ext i j
-    fin_cases i <;> fin_cases j <;> simp [wM, adj, sgn, lab, Matrix.mul_apply, Fin.sum_univ_four, Matrix.diagonal, Fin.rev]
+    fin_cases i <;> fin_cases j
+      <;> simp [wM, adj, sgn, lab, Matrix.mul_apply, Fin.sum_univ_four, Matrix.diagonal, Fin.rev]
 
 theorem wM_false_mul (u : M4 R) : adj (wM R false) * u = u := by simp [wM, adj_one]
 
@@ -105,8 +112,9 @@ theorem Cg.refl (X : M4 R) : Cg I X X := fun i j => by simp
 
 theorem Cg.mul {X Y X' Y' : M4 R} (h : Cg I X Y) (h' : Cg I X' Y') : Cg I (X * X') (Y * Y') := by
   intro i j
-  have e : (X * X') i j - (Y * Y') i j =
-      ∑ k, ((X i k - Y i k) * X' k j + Y i k * (X' k j - Y' k j)) := by
+  have e
+      : (X * X') i j - (Y * Y') i j
+        = ∑ k, ((X i k - Y i k) * X' k j + Y i k * (X' k j - Y' k j)) := by
     simp only [Matrix.mul_apply, ← Finset.sum_sub_distrib]
     apply Finset.sum_congr rfl
     intro k _
@@ -116,12 +124,16 @@ theorem Cg.mul {X Y X' Y' : M4 R} (h : Cg I X Y) (h' : Cg I X' Y') : Cg I (X * X
 
 theorem Cg.adj {X Y : M4 R} (h : Cg I X Y) : Cg I (adj X) (adj Y) := by
   intro i j
-  have e : UpperTheory.V.GradeZeroInterpolatingElement.adj X i j - UpperTheory.V.GradeZeroInterpolatingElement.adj Y i j = (sgn i * sgn j) • (X j.rev i.rev - Y j.rev i.rev) := by
+  have e
+      : UpperTheory.V.GradeZeroInterpolatingElement.adj X i j
+          - UpperTheory.V.GradeZeroInterpolatingElement.adj Y i j
+        = (sgn i * sgn j) • (X j.rev i.rev - Y j.rev i.rev) := by
     simp [UpperTheory.V.GradeZeroInterpolatingElement.adj, smul_sub]
   rw [e]
   exact zsmul_mem (h _ _) _
 
-theorem unit_of_sub_mem [IsLocalRing R] {x y : R} (hy : IsUnit y) (h : x - y ∈ maximalIdeal R) : IsUnit x := by
+theorem unit_of_sub_mem [IsLocalRing R] {x y : R} (hy : IsUnit y) (h : x - y ∈ maximalIdeal R)
+    : IsUnit x := by
   by_contra hx
   have hxm : x ∈ maximalIdeal R := (IsLocalRing.mem_maximalIdeal x).2 hx
   have : y ∈ maximalIdeal R := by
@@ -133,7 +145,8 @@ end Mat
 
 variable {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
 
-theorem Amb.unit_sub (𝔞 : Amb l) {x y : c.O} (h : residue c.O x ≠ residue c.O y) : IsUnit (𝔞.a c x - 𝔞.a c y) := by
+theorem Amb.unit_sub (𝔞 : Amb l) {x y : c.O} (h : residue c.O x ≠ residue c.O y)
+    : IsUnit (𝔞.a c x - 𝔞.a c y) := by
   rw [← map_sub]
   refine IsUnit.map _ ?_
   by_contra hn
@@ -152,21 +165,27 @@ theorem Amb.unit_two (𝔞 : Amb l) (c : Coef l) (hl : l ≠ 2) : IsUnit (2 : �
   have := h2O.map (𝔞.a c)
   rwa [map_ofNat] at this
 
-theorem KPair.cg {D : Raw Ω c} {𝔞 : Amb l} {r u} (h : KPair D 𝔞 r u) (pr : Bool) (g : G ℚ Ω) :
-    Cg (maximalIdeal 𝔞.V) (adj (wM 𝔞.V pr) * r g * wM 𝔞.V pr) (Matrix.diagonal fun i => 𝔞.a c (chi D pr i g)) := by
+theorem KPair.cg {D : Raw Ω c} {𝔞 : Amb l} {r u} (h : KPair D 𝔞 r u) (pr : Bool) (g : G ℚ Ω)
+    : Cg (maximalIdeal 𝔞.V) (adj (wM 𝔞.V pr) * r g * wM 𝔞.V pr)
+      (Matrix.diagonal fun i => 𝔞.a c (chi D pr i g)) := by
   obtain ⟨_, h2, _, _, _, _, _, _, _⟩ := h
   have hr0 : (D.r0 g).map (𝔞.a c) = Matrix.diagonal (fun i => 𝔞.a c (D.ps i g)) := by
     unfold Raw.r0
     simp [diagRep, Matrix.diagonal_map]
-  have hcg : Cg (maximalIdeal 𝔞.V) (r g) ((D.r0 g).map (𝔞.a c)) := fun i j => by simpa using h2 g i j
-  have := Cg.mul (Cg.mul (Cg.refl (I := maximalIdeal 𝔞.V) (adj (wM 𝔞.V pr))) hcg)
-    (Cg.refl (I := maximalIdeal 𝔞.V) (wM 𝔞.V pr))
+  have hcg : Cg (maximalIdeal 𝔞.V) (r g) ((D.r0 g).map (𝔞.a c)) := fun i j => by
+    simpa using h2 g i j
+  have :=
+    Cg.mul (Cg.mul (Cg.refl (I := maximalIdeal 𝔞.V) (adj (wM 𝔞.V pr))) hcg)
+      (Cg.refl (I := maximalIdeal 𝔞.V) (wM 𝔞.V pr))
   rw [hr0, wM_conj_diagonal] at this
   simpa [chi] using this
 
-theorem sg_sep {D : Raw Ω c} (hD : D.Good) (𝔞 : Amb l) (pr : Bool) : D.sg l ∈ D.Gp l ∧ ∀ i j, lamW i ≠ lamW j →
-    IsUnit (𝔞.a c (chi D pr i (D.sg l)) - 𝔞.a c (D.ps j (D.sg l))) := by
-  obtain ⟨-, -, -, -, -, -, -, -, -, -, -, hom, -, -, -, -, -, hfr, hcyc, hsep, -, -, -, -, -, -⟩ := hD
+theorem sg_sep {D : Raw Ω c} (hD : D.Good) (𝔞 : Amb l) (pr : Bool)
+    : D.sg l ∈ D.Gp l
+      ∧ ∀ i j,
+        lamW i ≠ lamW j → IsUnit (𝔞.a c (chi D pr i (D.sg l)) - 𝔞.a c (D.ps j (D.sg l))) := by
+  obtain ⟨-, -, -, -, -, -, -, -, -, -, -, hom, -, -, -, -, -, hfr, hcyc, hsep, -, -, -, -, -, -⟩ :=
+    hD
   have hl : l ∈ D.T := by
     unfold Raw.T
     exact Finset.mem_insert_self _ _
@@ -176,7 +195,8 @@ theorem sg_sep {D : Raw Ω c} (hD : D.Good) (𝔞 : Amb l) (pr : Bool) : D.sg l 
     exact this
   set s := D.sg l with hs
   let U : (c.O)ˣ →* (ResidueField c.O)ˣ := Units.map (residue c.O : c.O →* ResidueField c.O)
-  have hU : ∀ χ : G ℚ Ω →* (c.O)ˣ, Raw.bar χ s = ((U (χ s) : (ResidueField c.O)ˣ) : ResidueField c.O) :=
+  have hU
+      : ∀ χ : G ℚ Ω →* (c.O)ˣ, Raw.bar χ s = ((U (χ s) : (ResidueField c.O)ˣ) : ResidueField c.O) :=
     fun χ => rfl
   have hchi : chiO ℚ Ω l c.O s = 1 := by
     unfold chiO
@@ -187,7 +207,8 @@ theorem sg_sep {D : Raw Ω c} (hD : D.Good) (𝔞 : Amb l) (pr : Bool) : D.sg l 
     exact Units.ext this
   have hal : U (D.al s) = U (D.ξ s) := by
     unfold Raw.al
-    simp only [MonoidHom.mul_apply, MonoidHom.inv_apply, map_mul, map_inv, hchi, hom', map_one, inv_one, one_mul]
+    simp only [MonoidHom.mul_apply, MonoidHom.inv_apply, map_mul, map_inv, hchi, hom', map_one,
+      inv_one, one_mul]
   have hth : U (D.th s) = U (D.ξ s) * U (D.Psi s) := by
     unfold Raw.th
     rw [MonoidHom.mul_apply, map_mul, hal]
@@ -210,11 +231,15 @@ theorem sg_sep {D : Raw Ω c} (hD : D.Good) (𝔞 : Amb l) (pr : Bool) : D.sg l 
   intro he
   have he' := Units.ext he
   clear he hU hsep hfr hom hsp
-  cases pr <;> fin_cases i <;> fin_cases j <;> simp [lamW] at hij <;>
-    simp [chi, lab, Raw.ps, hal, hth] at he' <;>
-    first
-    | exact absurd he' hm | exact absurd he'.symm hm | exact absurd he' h0 | exact absurd he'.symm h0
-    | exact absurd he' h1 | exact absurd he'.symm h1
+  cases pr <;> fin_cases i <;> fin_cases j <;> simp [lamW] at hij
+    <;> simp [chi, lab, Raw.ps, hal, hth] at he'
+    <;> first
+      | exact absurd he' hm
+      | exact absurd he'.symm hm
+      | exact absurd he' h0
+      | exact absurd he'.symm h0
+      | exact absurd he' h1
+      | exact absurd he'.symm h1
 
 end UpperTheory.V.Ws
 

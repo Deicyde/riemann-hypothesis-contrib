@@ -10,16 +10,20 @@ noncomputable section
 
 namespace Formalism.MainNotions.TestSideCounting
 
-open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning Formalism.MainNotions.Pf14 MvPolynomial
+open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.SourceCleaning
+  Formalism.MainNotions.Pf14 MvPolynomial
 open Formalism.MainNotions.G.LatticeSystems (lb_D lb_D_det kp_lamAt_antitone)
 
 section Tensor
 
-variable {R K : Type} [CommRing R] [Field K] [Algebra R K] {S : Type} [Fintype S] [DecidableEq S] {k n : ℕ}
+variable
+  {R K : Type} [CommRing R] [Field K] [Algebra R K] {S : Type} [Fintype S] [DecidableEq S] {k n : ℕ}
 
-theorem tensor_onto (A B M : S → Submodule R (MvPolynomial (Fin k × Fin n) K))
-    (hM : ∀ s, M s ≤ Submodule.span R {X | ∃ F ∈ A s, ∃ G ∈ B s, X = F * G}) :
-    tensorLat R K M ≤ Submodule.span R {X | ∃ P ∈ tensorLat R K A, ∃ Q ∈ tensorLat R K B, X = P * Q} :=
+theorem tensor_onto
+    (A B M : S → Submodule R (MvPolynomial (Fin k × Fin n) K))
+    (hM : ∀ s, M s ≤ Submodule.span R {X | ∃ F ∈ A s, ∃ G ∈ B s, X = F * G})
+    : tensorLat R K M
+      ≤ Submodule.span R {X | ∃ P ∈ tensorLat R K A, ∃ Q ∈ tensorLat R K B, X = P * Q} :=
   _root_.UpperTheory.Reformulated.B.product_first_partition.tensor_onto A B M hM
 
 end Tensor
@@ -83,8 +87,10 @@ theorem ontoAll : OntoAll := by
   obtain ⟨hx, hmem⟩ := key _ hten
   exact hmem
 
-theorem restCloudB_of_two (D : Formalism.BasicNotions.D7) (CLa Ck Crk Cdeg : ℝ) (hop : RestTSOp D CLa Ck Crk Cdeg) (hsz : RestSize) :
-    RestCloudB D CLa Ck Crk Cdeg :=
+theorem restCloudB_of_two
+    (D : Formalism.BasicNotions.D7) (CLa Ck Crk Cdeg : ℝ) (hop : RestTSOp D CLa Ck Crk Cdeg)
+    (hsz : RestSize)
+    : RestCloudB D CLa Ck Crk Cdeg :=
   restCloudB_of_three D CLa Ck Crk Cdeg hop hsz ontoAll
 
 end Formalism.MainNotions.TestSideCounting

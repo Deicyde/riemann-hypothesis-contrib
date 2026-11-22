@@ -10,7 +10,8 @@ open Matrix Polynomial GroundTheory.Automorphic GroundTheory.Automorphic.Whittak
 
 namespace PositivityTheory.RgUd.TP.Desc.Piece.TrI
 
-open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Desc.SLF PositivityTheory.RgUd.TP PositivityTheory.RgUd.TP.Desc.Piece.Tr PositivityTheory.RgUd.TP.Desc.Piece.PTop
+open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Desc.SLF PositivityTheory.RgUd.TP
+  PositivityTheory.RgUd.TP.Desc.Piece.Tr PositivityTheory.RgUd.TP.Desc.Piece.PTop
 open PositivityTheory.PfBern.Loc (SC restr restr_surjective pullL mulInd)
 open PositivityTheory.PfBern.Frob (FrobeniusReciprocity IsUnimod eqvF translF Fib fibSmul)
 
@@ -25,7 +26,9 @@ def actH {N : ℕ} (g : GL (Fin N) k) : Sp k N ≃ₜ Sp k N where
   continuous_invFun := Continuous.actc continuous_const continuous_id
 
 set_option maxHeartbeats 1000000 in
-theorem transfer_of : (PositivityTheory.PfBern.Frob.FrobeniusReciprocity → DoubleTransfer) → OrbHom k → OrbClosed k → Transfer k := by
+theorem transfer_of
+    : (PositivityTheory.PfBern.Frob.FrobeniusReciprocity → DoubleTransfer) → OrbHom k → OrbClosed k
+      → Transfer k := by
   intro hDT hOH hOC hFr p _ _ hU N q Z hZ χ D τ x₀ hx₀ hV ξ hsupp hinv f hf
   haveI : T2Space k := t2k
   haveI : TotallyDisconnectedSpace k := tdk
@@ -46,14 +49,16 @@ theorem transfer_of : (PositivityTheory.PfBern.Frob.FrobeniusReciprocity → Dou
   have hp₁ := oneFormsMapOfFunctorMorphism_smul (τ := τ) he₁
   have hp₂ := second_orbit_map_equivariant (τ := τ) (hOH := hOH) (hZ := hZ) (hx₀ := hx₀) he₂
   let C : Set (Ys D τ) := {y | y.1.2.2 = 0}
-  have hCc : IsClosed C := isClosed_eq (continuous_snd.comp (continuous_snd.comp continuous_subtype_val)) continuous_const
+  have hCc : IsClosed C :=
+    isClosed_eq (continuous_snd.comp (continuous_snd.comp continuous_subtype_val)) continuous_const
   have hCinv : ∀ (g : GL (Fin N) k), ∀ y ∈ C, g • y ∈ C := by
     intro g y hy
     change g.val *ᵥ y.1.2.2 = 0
     rw [show y.1.2.2 = 0 from hy, Matrix.mulVec_zero]
 
-  have hyp : ∀ E ∈ eqvF hp₂ ((1 : GL (Fin N) k →* ℂˣ).comp (GzS (Sx D x₀)).subtype),
-      PositivityTheory.PfBern.Frob.SupportedIn E (Subtype.val ⁻¹' C) := by
+  have hyp
+      : ∀ E ∈ eqvF hp₂ ((1 : GL (Fin N) k →* ℂˣ).comp (GzS (Sx D x₀)).subtype),
+        PositivityTheory.PfBern.Frob.SupportedIn E (Subtype.val ⁻¹' C) := by
     intro E hEeqv φ0 hφ0
     let hY := hY2 (hOH := hOH) (hZ := hZ) (hx₀ := hx₀) he₂
     have hY2c : IsClosed (Ys2 D τ x₀) := isClosed_second_fibre_set hOC hZ x₀
@@ -61,7 +66,8 @@ theorem transfer_of : (PositivityTheory.PfBern.Frob.FrobeniusReciprocity → Dou
     obtain ⟨η, hη⟩ := exists_functional hY2c E'
     have hSη : Supp η (Bz (Sx D x₀) ×ˢ Set.univ) := by
       intro f hf1 hvan
-      have hr : restr hY2c ⟨f, hf1.1⟩ = 0 := Subtype.ext (funext fun y => hvan y.1 (Ys2_sub hB0 hχ0 y.2))
+      have hr : restr hY2c ⟨f, hf1.1⟩ = 0 :=
+        Subtype.ext (funext fun y => hvan y.1 (Ys2_sub hB0 hχ0 y.2))
       have := hη ⟨f, hf1.1⟩
       rw [hr, map_zero] at this
       exact this
@@ -69,7 +75,8 @@ theorem transfer_of : (PositivityTheory.PfBern.Frob.FrobeniusReciprocity → Dou
       intro h hh f hf1
       let hH : GzS (Sx D x₀) := ⟨h, hh⟩
       let f1 : SC (Sp k N) := pullL (actH k h) ⟨f, hf1.1⟩
-      have key : pullL hY (restr hY2c f1) = translF hp₂ hH⁻¹ (pullL hY (restr hY2c ⟨f, hf1.1⟩)) := by
+      have key
+          : pullL hY (restr hY2c f1) = translF hp₂ hH⁻¹ (pullL hY (restr hY2c ⟨f, hf1.1⟩)) := by
         apply Subtype.ext
         funext z
         change f (act h (hY z).1) = f (hY (fibSmul hp₂ hH⁻¹⁻¹ z)).1
@@ -85,7 +92,8 @@ theorem transfer_of : (PositivityTheory.PfBern.Frob.FrobeniusReciprocity → Dou
     have hsupp' : Function.support (φ' : Ys2 D τ x₀ → ℂ) ⊆ {y | y.1.2 ≠ 0} := fun y hy => hφ0 hy
     have hK : IsCompact (Subtype.val '' Function.support (φ' : Ys2 D τ x₀ → ℂ)) :=
       (isCompact_support φ'.2).image continuous_subtype_val
-    have hKsub : Subtype.val '' Function.support (φ' : Ys2 D τ x₀ → ℂ) ⊆ {q : Sp k N | q.2 ≠ 0} := by
+    have hKsub
+        : Subtype.val '' Function.support (φ' : Ys2 D τ x₀ → ℂ) ⊆ {q : Sp k N | q.2 ≠ 0} := by
       rintro _ ⟨y, hy, rfl⟩
       exact hsupp' hy
     have hUo : IsOpen {q : Sp k N | q.2 ≠ 0} := isOpen_ne_fun continuous_snd continuous_const
@@ -95,7 +103,8 @@ theorem transfer_of : (PositivityTheory.PfBern.Frob.FrobeniusReciprocity → Dou
       apply Subtype.ext
       funext y
       change Bc.indicator 1 y.1 * (f0 : Sp k N → ℂ) y.1 = (φ' : Ys2 D τ x₀ → ℂ) y
-      have e0 : (f0 : Sp k N → ℂ) y.1 = (φ' : Ys2 D τ x₀ → ℂ) y := congrFun (congrArg Subtype.val hf0) y
+      have e0 : (f0 : Sp k N → ℂ) y.1 = (φ' : Ys2 D τ x₀ → ℂ) y :=
+        congrFun (congrArg Subtype.val hf0) y
       by_cases hyB : y.1 ∈ Bc
       · simp [hyB, e0]
       · have : (φ' : Ys2 D τ x₀ → ℂ) y = 0 := by
@@ -129,19 +138,23 @@ theorem transfer_of : (PositivityTheory.PfBern.Frob.FrobeniusReciprocity → Dou
     have e1 : pullL hY1'.symm (translF hp₁ h φ) = restr hPc f1 := by
       apply Subtype.ext
       funext y
-      change (φ : Fib (p1 D τ e₁) → ℂ) (fibSmul hp₁ h⁻¹ (hY1'.symm y)) = (f0 : Sp k N → ℂ) (act (h⁻¹).1 y.1)
+      change (φ : Fib (p1 D τ e₁) → ℂ) (fibSmul hp₁ h⁻¹ (hY1'.symm y))
+        = (f0 : Sp k N → ℂ) (act (h⁻¹).1 y.1)
       rw [hφ, first_fibre_homeomorph_smul he₁ hZ, Homeomorph.apply_symm_apply]
     simp only [MonoidHom.comp_apply, MonoidHom.one_apply, Units.val_one, one_mul]
     change Dd (pullL hY1'.symm (translF hp₁ h φ)) = Dd (pullL hY1'.symm φ)
     rw [e1, ← hf0, ← hDd f1, ← hDd f0]
     exact hinv (h⁻¹).1 (h⁻¹).2 f0 ⟨f0.2, Set.subset_univ _⟩
-  have hSupp := hDT hFr (GL (Fin N) k) (GzS Z) (GzS (Sx D x₀)) (isClosed_GzS Z) (isClosed_GzS _) (isUnimod_GL hU)
-    (hU N Z hZ) (hU N _ hCR) (Ys D τ) (p1 D τ e₁) (p2 D τ hOH hZ hx₀ e₂) (continuous_first_orbit_map he₁) continuous_p2 hp₁ hp₂
-    C hCc hCinv hyp E₁ hE₁
-  have hz := hSupp (pullL hY1' (restr hPc ⟨f, hf.1⟩)) fun w hw hwC => hw (by
-    change f w.1.1.2 = 0
-    by_contra hne
-    exact hf.2 hne hwC)
+  have hSupp :=
+    hDT hFr (GL (Fin N) k) (GzS Z) (GzS (Sx D x₀)) (isClosed_GzS Z) (isClosed_GzS _)
+      (isUnimod_GL hU) (hU N Z hZ) (hU N _ hCR) (Ys D τ) (p1 D τ e₁) (p2 D τ hOH hZ hx₀ e₂)
+      (continuous_first_orbit_map he₁) continuous_p2 hp₁ hp₂ C hCc hCinv hyp E₁ hE₁
+  have hz :=
+    hSupp (pullL hY1' (restr hPc ⟨f, hf.1⟩)) fun w hw hwC =>
+      hw (by
+        change f w.1.1.2 = 0
+        by_contra hne
+        exact hf.2 hne hwC)
   rw [show ξ f = Dd (restr hPc ⟨f, hf.1⟩) from hDd ⟨f, hf.1⟩,
     ← PositivityTheory.PfBern.Loc.pullL_pullL_symm hY1'.symm (restr hPc ⟨f, hf.1⟩)]
   exact hz

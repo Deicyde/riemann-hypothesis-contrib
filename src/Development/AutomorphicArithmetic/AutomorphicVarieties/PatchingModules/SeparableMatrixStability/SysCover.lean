@@ -7,10 +7,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa
 
-theorem UpperTheory.V.Pa.sys_cover :
-    ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (T : TWGrp G0), T.ProL → ∃ (Ph : Type) (_ : Group Ph) (_ : TopologicalSpace Ph) (_ : IsTopologicalGroup Ph) (_ : CompactSpace Ph) (_ : TotallyDisconnectedSpace Ph) (π : ∀ N, Ph →* (T.GN N).Γ) (ct : Ph), TopFG Ph ∧ (∀ N, Continuous (π N) ∧ Function.Surjective (π N) ∧ π N ct = (T.GN N).c) ∧ ∀ N N' g, (T.h N).p (π N g) * ((T.h N').p (π N' g))⁻¹ ∈ T.H := by
+theorem UpperTheory.V.Pa.sys_cover
+    : ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (T : TWGrp G0),
+      T.ProL
+        → ∃ (Ph : Type) (_ : Group Ph) (_ : TopologicalSpace Ph) (_ : IsTopologicalGroup Ph)
+            (_ : CompactSpace Ph) (_ : TotallyDisconnectedSpace Ph) (π : ∀ N, Ph →* (T.GN N).Γ)
+            (ct : Ph),
+          TopFG Ph ∧ (∀ N, Continuous (π N) ∧ Function.Surjective (π N) ∧ π N ct = (T.GN N).c)
+            ∧ ∀ N N' g, (T.h N).p (π N g) * ((T.h N').p (π N' g))⁻¹ ∈ T.H := by
   intro l _ L G0 T hT
   classical
   let H0 : Subgroup G0.Γ := (T.H : Subgroup G0.Γ)
@@ -42,9 +49,10 @@ theorem UpperTheory.V.Pa.sys_cover :
   have hnat : ∀ i : Fin T.hb, π0 (x (Fin.natAdd (n + 1) i)) = 1 := by
     intro i
     simp [π0, hf0x, Fin.append_right]
-  have key : ∀ N : ℕ, ∃ f : P →* (T.GN N).Γ, Continuous f ∧ Function.Surjective f ∧
-      ((QuotientGroup.mk' H0).comp (T.h N).p).comp f = π0 ∧
-      f (x (Fin.castAdd T.hb 0)) = (T.GN N).c := by
+  have key
+      : ∀ N : ℕ, ∃ f : P →* (T.GN N).Γ,
+        Continuous f ∧ Function.Surjective f ∧ ((QuotientGroup.mk' H0).comp (T.h N).p).comp f = π0
+          ∧ f (x (Fin.castAdd T.hb 0)) = (T.GN N).c := by
     intro N
     let p := (T.h N).p
     let q : (T.GN N).Γ →* G0.Γ ⧸ H0 := (QuotientGroup.mk' H0).comp p
@@ -72,13 +80,26 @@ theorem UpperTheory.V.Pa.sys_cover :
         (T.GN N).Γ q hqopen g hg hz
     exact ⟨f, hfc, hfs, hfq, by rw [hfx 0]; simp [g]⟩
   choose F hFc hFs hFq hFx using key
-  refine ⟨P, iG, iT, iTG, iC, iTD, F, x (Fin.castAdd T.hb 0), ⟨Set.range x, Set.finite_range x, hx⟩,
-    fun N => ⟨hFc N, hFs N, hFx N⟩, ?_⟩
+  refine ⟨
+    P,
+    iG,
+    iT,
+    iTG,
+    iC,
+    iTD,
+    F,
+    x (Fin.castAdd T.hb 0),
+    ⟨Set.range x, Set.finite_range x, hx⟩,
+    fun N => ⟨hFc N, hFs N, hFx N⟩,
+    ?_
+  ⟩
   intro N N' g
   have h1 := congrArg (fun φ => φ g) (hFq N)
   have h2 := congrArg (fun φ => φ g) (hFq N')
   simp only [MonoidHom.comp_apply, QuotientGroup.mk'_apply] at h1 h2
-  have h3 : (QuotientGroup.mk ((T.h N).p (F N g)) : G0.Γ ⧸ H0) = QuotientGroup.mk ((T.h N').p (F N' g)) := by
+  have h3
+      : (QuotientGroup.mk ((T.h N).p (F N g)) : G0.Γ ⧸ H0)
+        = QuotientGroup.mk ((T.h N').p (F N' g)) := by
     rw [h1, h2]
   rw [QuotientGroup.eq_iff_div_mem, div_eq_mul_inv] at h3
   exact h3

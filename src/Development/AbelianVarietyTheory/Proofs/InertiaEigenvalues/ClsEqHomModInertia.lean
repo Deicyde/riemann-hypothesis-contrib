@@ -12,58 +12,83 @@ noncomputable section
 
 namespace GlobalTheory.TopSteps.ChiOne
 
-open GlobalTheory.PhiGam GlobalTheory.AdmLoc GlobalTheory.Models GlobalTheory.TopSteps Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct
+open GlobalTheory.PhiGam GlobalTheory.AdmLoc GlobalTheory.Models GlobalTheory.TopSteps
+  Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  TensorProduct
 open ReciprocityTheory.Def (Z1 H1)
-open GlobalTheory.IndefiniteRowSideFullHecke.AdmissibleCharUnramified GlobalTheory.IndefiniteRowSideFullHecke.InvariantsVanishing
+open GlobalTheory.IndefiniteRowSideFullHecke.AdmissibleCharUnramified
+  GlobalTheory.IndefiniteRowSideFullHecke.InvariantsVanishing
 
 section Gen
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp LL O : Type} [Field Qp] [Field LL]
-    [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL] (Γ : GalData G Qp LL O)
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp LL O : Type}
+  [Field Qp] [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+  (Γ : GalData G Qp LL O)
 
 def IsLcHom {X : Type} [AddCommGroup X] (f : G → X) : Prop :=
   IsLocallyConstant f ∧ ∀ g h, f (g * h) = f g + f h
 
-def coc {X : Type} [AddCommGroup X] [Module O X] (f : G → X) (hf : IsLcHom f) :
-    ↥(Z1 (twCoef (Γ.Wchi 1) Γ.χ₁ X) ⊤) :=
-  ⟨fun g => (1 : O) ⊗ₜ[O] f g, ⟨hf.1.comp (fun x => (1 : O) ⊗ₜ[O] x), fun _ => Submodule.mem_top⟩, by
+def coc {X : Type} [AddCommGroup X] [Module O X] (f : G → X) (hf : IsLcHom f)
+    : ↥(Z1 (twCoef (Γ.Wchi 1) Γ.χ₁ X) ⊤) := ⟨
+  fun g => (1 : O) ⊗ₜ[O] f g,
+  ⟨hf.1.comp (fun x => (1 : O) ⊗ₜ[O] x), fun _ => Submodule.mem_top⟩,
+  by
     funext x
-    change twCoef (Γ.Wchi 1) Γ.χ₁ X x.1 ((1 : O) ⊗ₜ[O] f x.2) - (1 : O) ⊗ₜ[O] f (x.1 * x.2) + (1 : O) ⊗ₜ[O] f x.1 = 0
+    change twCoef (Γ.Wchi 1) Γ.χ₁ X x.1 ((1 : O) ⊗ₜ[O] f x.2) - (1 : O) ⊗ₜ[O] f (x.1 * x.2)
+        + (1 : O) ⊗ₜ[O] f x.1
+      = 0
     rw [twCoef_chi_one, hf.2, tmul_add]
-    abel⟩
+    abel
+⟩
 
-def cl {X : Type} [AddCommGroup X] [Module O X] (f : G → X) (hf : IsLcHom f) :
-    H1 (twCoef (Γ.Wchi 1) Γ.χ₁ X) ⊤ := Submodule.Quotient.mk (coc Γ f hf)
+def cl {X : Type} [AddCommGroup X] [Module O X] (f : G → X) (hf : IsLcHom f)
+    : H1 (twCoef (Γ.Wchi 1) Γ.χ₁ X) ⊤ :=
+  Submodule.Quotient.mk (coc Γ f hf)
 
 variable {X X' : Type} [AddCommGroup X] [Module O X] [AddCommGroup X'] [Module O X']
 
 theorem exists_cl (c : H1 (twCoef (Γ.Wchi 1) Γ.χ₁ X) ⊤) : ∃ f hf, cl Γ f hf = c := by
   induction c using Submodule.Quotient.induction_on with
   | _ z =>
-  have hlc : IsLocallyConstant (z : G → O ⊗[O] X) := z.2.1.1
-  refine ⟨fun g => TensorProduct.lid O X ((z : G → O ⊗[O] X) g),
-    ⟨hlc.comp _, fun g h => by
-      simp only [GlobalTheory.IndefiniteRowSideFullHecke.AdmissibleCharUnramified.cocycle_add Γ X z g h, map_add (f := _)]⟩, ?_⟩
-  unfold cl
-  congr 1
-  apply Subtype.ext
-  funext g
-  show (1 : O) ⊗ₜ[O] TensorProduct.lid O X ((z : G → O ⊗[O] X) g) = (z : G → O ⊗[O] X) g
-  rw [← TensorProduct.lid_symm_apply, LinearEquiv.symm_apply_apply]
+    have hlc : IsLocallyConstant (z : G → O ⊗[O] X) := z.2.1.1
+    refine ⟨
+      fun g => TensorProduct.lid O X ((z : G → O ⊗[O] X) g),
+      ⟨
+        hlc.comp _,
+        fun g h => by
+          simp only [GlobalTheory.IndefiniteRowSideFullHecke.AdmissibleCharUnramified.cocycle_add Γ
+              X z g h,
+            map_add (f := _)]
+      ⟩,
+      ?_
+    ⟩
+    unfold cl
+    congr 1
+    apply Subtype.ext
+    funext g
+    show (1 : O) ⊗ₜ[O] TensorProduct.lid O X ((z : G → O ⊗[O] X) g) = (z : G → O ⊗[O] X) g
+    rw [← TensorProduct.lid_symm_apply, LinearEquiv.symm_apply_apply]
 
 theorem IsLcHom.map {f : G → X} (hf : IsLcHom f) (φ : X →ₗ[O] X') : IsLcHom (fun g => φ (f g)) :=
   ⟨hf.1.comp φ, fun g h => by simp only [hf.2 g h, map_add (f := _)]⟩
 
-theorem IsLcHom.sub {f f' : G → X} (hf : IsLcHom f) (hf' : IsLcHom f') : IsLcHom (fun g => f g - f' g) :=
-  ⟨hf.1.comp₂ hf'.1 (· - ·), fun g h => by
+theorem IsLcHom.sub {f f' : G → X} (hf : IsLcHom f) (hf' : IsLcHom f')
+    : IsLcHom (fun g => f g - f' g) := ⟨
+  hf.1.comp₂ hf'.1 (· - ·),
+  fun g h => by
     show f (g * h) - f' (g * h) = (f g - f' g) + (f h - f' h)
-    rw [hf.2 g h, hf'.2 g h]; abel⟩
+    rw [hf.2 g h, hf'.2 g h]
+    abel
+⟩
 
-theorem coefH1_cl {f : G → X} (hf : IsLcHom f) (φ : X →ₗ[O] X') :
-    coefH1 (Γ.Wchi 1) Γ.χ₁ φ (cl Γ f hf) = cl Γ _ (hf.map φ) := rfl
+theorem coefH1_cl {f : G → X} (hf : IsLcHom f) (φ : X →ₗ[O] X')
+    : coefH1 (Γ.Wchi 1) Γ.χ₁ φ (cl Γ f hf) = cl Γ _ (hf.map φ) :=
+  rfl
 
-theorem cl_sub {f f' : G → X} (hf : IsLcHom f) (hf' : IsLcHom f') :
-    cl Γ _ (hf.sub hf') = cl Γ f hf - cl Γ f' hf' := by
+theorem cl_sub {f f' : G → X} (hf : IsLcHom f) (hf' : IsLcHom f')
+    : cl Γ _ (hf.sub hf') = cl Γ f hf - cl Γ f' hf' := by
   unfold cl
   rw [← Submodule.Quotient.mk_sub]
   congr 1
@@ -72,13 +97,19 @@ theorem cl_sub {f f' : G → X} (hf : IsLcHom f) (hf' : IsLcHom f') :
   show (1 : O) ⊗ₜ[O] (f g - f' g) = (1 : O) ⊗ₜ[O] f g - (1 : O) ⊗ₜ[O] f' g
   exact TensorProduct.tmul_sub _ _ _
 
-theorem eq_zero_of_comb {f f' : G → X} (hf : IsLcHom f) (hf' : IsLcHom f') (a b : O)
-    (h : a • cl Γ f hf + b • cl Γ f' hf' = 0) (g : G) : a • f g + b • f' g = 0 := by
+theorem eq_zero_of_comb
+    {f f' : G → X} (hf : IsLcHom f) (hf' : IsLcHom f')
+    (a b : O) (h : a • cl Γ f hf + b • cl Γ f' hf' = 0)
+    (g : G)
+    : a • f g + b • f' g = 0 := by
   unfold cl at h
   rw [← Submodule.Quotient.mk_smul, ← Submodule.Quotient.mk_smul, ← Submodule.Quotient.mk_add,
-    Submodule.Quotient.mk_eq_zero] at h
-  have h' : ((a • coc Γ f hf + b • coc Γ f' hf' : ↥(Z1 (twCoef (Γ.Wchi 1) Γ.χ₁ X) ⊤)) : G → O ⊗[O] X) ∈
-      ReciprocityTheory.Def.B1 (twCoef (Γ.Wchi 1) Γ.χ₁ X) ⊤ := h
+      Submodule.Quotient.mk_eq_zero]
+    at h
+  have h'
+      : ((a • coc Γ f hf + b • coc Γ f' hf' : ↥(Z1 (twCoef (Γ.Wchi 1) Γ.χ₁ X) ⊤)) : G → O ⊗[O] X)
+        ∈ ReciprocityTheory.Def.B1 (twCoef (Γ.Wchi 1) Γ.χ₁ X) ⊤ :=
+    h
   obtain ⟨m, -, hm⟩ := Submodule.mem_map.1 h'
   have h1 := congrFun hm g
   have h0 : (ReciprocityTheory.Def.d0 (twCoef (Γ.Wchi 1) Γ.χ₁ X) m) g = 0 := by
@@ -89,18 +120,23 @@ theorem eq_zero_of_comb {f f' : G → X} (hf : IsLcHom f) (hf' : IsLcHom f') (a 
   have h3 := congrArg (TensorProduct.lid O X) h2
   simpa using h3
 
-theorem cl_mem_hom {f : G → X} (hf : IsLcHom f) (I : Subgroup G) (h : ∀ g ∈ I, f g = 0) :
-    cl Γ f hf ∈ homModInertia Γ X I := by
+theorem cl_mem_hom {f : G → X} (hf : IsLcHom f) (I : Subgroup G) (h : ∀ g ∈ I, f g = 0)
+    : cl Γ f hf ∈ homModInertia Γ X I := by
   unfold homModInertia
   refine ⟨coc Γ f hf, rfl, fun g hg => ?_⟩
   show (1 : O) ⊗ₜ[O] f g = 0
   rw [h g hg, TensorProduct.tmul_zero]
 
-theorem isLcHom_unr {l : ℕ} [Fact l.Prime] [Algebra ℤ_[l] O] [Finite X] (ν : G →* Multiplicative ℤ_[l])
-    (hν : Continuous ν) (x : X) : IsLcHom (fun g => algebraMap ℤ_[l] O (Multiplicative.toAdd (ν g)) • x) := by
+theorem isLcHom_unr
+    {l : ℕ} [Fact l.Prime] [Algebra ℤ_[l] O] [Finite X]
+    (ν : G →* Multiplicative ℤ_[l]) (hν : Continuous ν)
+    (x : X)
+    : IsLcHom (fun g => algebraMap ℤ_[l] O (Multiplicative.toAdd (ν g)) • x) := by
   refine ⟨?_, fun g h => by simp only [map_mul, toAdd_mul, map_add (f := _), add_smul]⟩
-  have hadd : ∀ s t : ℤ_[l], algebraMap ℤ_[l] O (s + t) • x =
-      algebraMap ℤ_[l] O s • x + algebraMap ℤ_[l] O t • x := fun s t => by
+  have hadd
+      : ∀ s t : ℤ_[l],
+        algebraMap ℤ_[l] O (s + t) • x
+          = algebraMap ℤ_[l] O s • x + algebraMap ℤ_[l] O t • x := fun s t => by
     rw [map_add (f := _), add_smul]
   have hN0 : Nat.card X ≠ 0 := Nat.card_pos.ne'
   obtain ⟨e, m, hm, hNe⟩ := Nat.exists_eq_pow_mul_and_not_dvd hN0 l (Fact.out : l.Prime).one_lt.ne'
@@ -111,7 +147,8 @@ theorem isLcHom_unr {l : ℕ} [Fact l.Prime] [Algebra ℤ_[l] O] [Finite X] (ν 
   have hkill : ∀ w : ℤ_[l], algebraMap ℤ_[l] O ((l : ℤ_[l]) ^ e * w) • x = 0 := by
     intro w
     have hw : ((l : ℤ_[l]) ^ e * w) = ((Nat.card X : ℕ) : ℤ_[l]) * ((↑u⁻¹ : ℤ_[l]) * w) := by
-      rw [hNe, Nat.cast_mul, Nat.cast_pow, ← hu, mul_assoc, ← mul_assoc (u : ℤ_[l]), Units.mul_inv, one_mul]
+      rw [hNe, Nat.cast_mul, Nat.cast_pow, ← hu, mul_assoc, ← mul_assoc (u : ℤ_[l]), Units.mul_inv,
+        one_mul]
     rw [hw, map_mul, map_natCast, mul_smul, Nat.cast_smul_eq_nsmul, card_nsmul_eq_zero']
   have hlc : IsLocallyConstant (fun t : ℤ_[l] => algebraMap ℤ_[l] O t • x) := by
     rw [IsLocallyConstant.iff_eventually_eq]
@@ -120,21 +157,25 @@ theorem isLcHom_unr {l : ℕ} [Fact l.Prime] [Algebra ℤ_[l] O] [Finite X] (ν 
       zpow_pos (by exact_mod_cast (Fact.out : l.Prime).pos) _
     filter_upwards [Metric.closedBall_mem_nhds t hpos] with s hs
     rw [Metric.mem_closedBall, dist_eq_norm] at hs
-    obtain ⟨w, hw⟩ := Ideal.mem_span_singleton'.1 ((PadicInt.norm_le_pow_iff_mem_span_pow (s - t) e).1 hs)
+    obtain ⟨w, hw⟩ :=
+      Ideal.mem_span_singleton'.1 ((PadicInt.norm_le_pow_iff_mem_span_pow (s - t) e).1 hs)
     have hst : s = t + (l : ℤ_[l]) ^ e * w := by rw [mul_comm, hw]; ring
     show algebraMap ℤ_[l] O s • x = algebraMap ℤ_[l] O t • x
     rw [hst, hadd, hkill, add_zero]
   exact hlc.comp_continuous (continuous_toAdd.comp hν)
 
-theorem exists_map_res [IsLocalRing O] {lam : O} (hm : IsLocalRing.maximalIdeal O = Ideal.span {lam})
-    (Y : Type) [AddCommGroup Y] [Module O Y] [Finite Y] [Nontrivial Y] :
-    ∃ φ : Y →ₗ[O] O ⧸ Ideal.span {lam}, φ ≠ 0 := by
+theorem exists_map_res
+    [IsLocalRing O]
+    {lam : O} (hm : IsLocalRing.maximalIdeal O = Ideal.span {lam})
+    (Y : Type) [AddCommGroup Y] [Module O Y] [Finite Y] [Nontrivial Y]
+    : ∃ φ : Y →ₗ[O] O ⧸ Ideal.span {lam}, φ ≠ 0 := by
   have hmax : (Ideal.span {lam}).IsMaximal := hm ▸ IsLocalRing.maximalIdeal.isMaximal O
   let _ : Field (O ⧸ Ideal.span {lam}) := Ideal.Quotient.field _
   have hne : (Ideal.span {lam} • ⊤ : Submodule O Y) ≠ ⊤ := by
     intro h
-    have hb := Submodule.eq_bot_of_le_smul_of_le_jacobson_bot (Ideal.span {lam}) (⊤ : Submodule O Y)
-      Module.Finite.fg_top h.ge (by rw [← hm]; exact IsLocalRing.maximalIdeal_le_jacobson ⊥)
+    have hb :=
+      Submodule.eq_bot_of_le_smul_of_le_jacobson_bot (Ideal.span {lam}) (⊤ : Submodule O Y)
+        Module.Finite.fg_top h.ge (by rw [← hm]; exact IsLocalRing.maximalIdeal_le_jacobson ⊥)
     exact top_ne_bot hb
   obtain ⟨y, hy⟩ : ∃ y : Y, y ∉ (Ideal.span {lam} • ⊤ : Submodule O Y) := by
     by_contra hc
@@ -147,22 +188,25 @@ theorem exists_map_res [IsLocalRing O] {lam : O} (hm : IsLocalRing.maximalIdeal 
   have := LinearMap.congr_fun h y
   simpa using this
 
-theorem eq_hom_of_res {l : ℕ} [Fact l.Prime] [Algebra ℤ_[l] O] [IsLocalRing O]
-    (hm : IsLocalRing.maximalIdeal O = Ideal.span {Γ.lam}) [Finite (resK Γ)]
-    (I : Subgroup G) (F : G) (ν : G →* Multiplicative ℤ_[l]) (hν : Continuous ν) (hI : ∀ σ ∈ I, ν σ = 1)
-    (hF : ν F = Multiplicative.ofAdd 1)
+theorem eq_hom_of_res
+    {l : ℕ} [Fact l.Prime] [Algebra ℤ_[l] O] [IsLocalRing O]
+    (hm : IsLocalRing.maximalIdeal O = Ideal.span {Γ.lam})
+    [Finite (resK Γ)]
+    (I : Subgroup G) (F : G) (ν : G →* Multiplicative ℤ_[l])
+    (hν : Continuous ν) (hI : ∀ σ ∈ I, ν σ = 1) (hF : ν F = Multiplicative.ofAdd 1)
     (A : ∀ (X : Type) [AddCommGroup X] [Module O X], Set (H1 (twCoef (Γ.Wchi 1) Γ.χ₁ X) ⊤))
     (hsub : ∀ (X : Type) [AddCommGroup X] [Module O X] [Finite X],
-      ∃ B : Submodule O (H1 (twCoef (Γ.Wchi 1) Γ.χ₁ X) ⊤), A X = B)
-    (hmap : ∀ (X : Type) [AddCommGroup X] [Module O X] [Finite X]
-      (X' : Type) [AddCommGroup X'] [Module O X'] [Finite X'] (f : X →ₗ[O] X')
-      (c : H1 (twCoef (Γ.Wchi 1) Γ.χ₁ X) ⊤),
-      (c ∈ A X → coefH1 (Γ.Wchi 1) Γ.χ₁ f c ∈ A X') ∧
-      (Function.Injective f → coefH1 (Γ.Wchi 1) Γ.χ₁ f c ∈ A X' → c ∈ A X))
-    (hres : ∀ (s : ℕ) (c : Fin s → H1 (twCoef (Γ.Wchi 1) Γ.χ₁ (resK Γ)) ⊤), (∀ a, c a ∈ A (resK Γ)) →
-      IndepMod Γ.lam c → s ≤ 1)
+      ∃ B : Submodule O (H1 (twCoef (Γ.Wchi 1) Γ.χ₁ X) ⊤),
+        A X = B)
+    (hmap : ∀ (X : Type) [AddCommGroup X] [Module O X] [Finite X] (X' : Type) [AddCommGroup X']
+        [Module O X'] [Finite X'] (f : X →ₗ[O] X') (c : H1 (twCoef (Γ.Wchi 1) Γ.χ₁ X) ⊤),
+      (c ∈ A X → coefH1 (Γ.Wchi 1) Γ.χ₁ f c ∈ A X')
+        ∧ (Function.Injective f → coefH1 (Γ.Wchi 1) Γ.χ₁ f c ∈ A X' → c ∈ A X))
+    (hres : ∀ (s : ℕ) (c : Fin s → H1 (twCoef (Γ.Wchi 1) Γ.χ₁ (resK Γ)) ⊤),
+      (∀ a, c a ∈ A (resK Γ)) → IndepMod Γ.lam c → s ≤ 1)
     (hunr : ∀ (X : Type) [AddCommGroup X] [Module O X] [Finite X], homModInertia Γ X I ⊆ A X)
-    (X : Type) [AddCommGroup X] [Module O X] [Finite X] : A X = homModInertia Γ X I := by
+    (X : Type) [AddCommGroup X] [Module O X] [Finite X]
+    : A X = homModInertia Γ X I := by
   have hmax : (Ideal.span {Γ.lam}).IsMaximal := hm ▸ IsLocalRing.maximalIdeal.isMaximal O
   refine Set.Subset.antisymm ?_ (hunr X)
   intro c hc
@@ -239,7 +283,8 @@ theorem eq_hom_of_res {l : ℕ} [Fact l.Prime] [Algebra ℤ_[l] O] [IsLocalRing 
         have := hcomb F
         have hYF : hY' F = 0 := Subtype.ext hhF
         simp only [hF, toAdd_ofAdd, map_one, hYF, map_zero, Algebra.smul_def, mul_one, mul_zero,
-          add_zero] at this
+            add_zero]
+          at this
         exact (hmk _).1 this
       have h1 : Γ.lam ∣ x 1 := by
         have := hcomb g₁
@@ -257,9 +302,10 @@ theorem eq_hom_of_res {l : ℕ} [Fact l.Prime] [Algebra ℤ_[l] O] [IsLocalRing 
 
 end Gen
 
-theorem local_res {l : ℕ} [Fact l.Prime] (LL : FinExt l) {lam : ↥(OL LL)} (h : Irreducible lam) :
-    ∃ _ : IsLocalRing ↥(OL LL), IsLocalRing.maximalIdeal ↥(OL LL) = Ideal.span {lam} ∧
-      Finite (↥(OL LL) ⧸ Ideal.span {lam}) := by
+theorem local_res {l : ℕ} [Fact l.Prime] (LL : FinExt l) {lam : ↥(OL LL)} (h : Irreducible lam)
+    : ∃ _ : IsLocalRing ↥(OL LL),
+      IsLocalRing.maximalIdeal ↥(OL LL) = Ideal.span {lam}
+        ∧ Finite (↥(OL LL) ⧸ Ideal.span {lam}) := by
   obtain ⟨⟨⟨hdom, hdvr, -⟩, -⟩, hfin⟩ := GlobalTheory.LocalIntegers.good_integers l LL
   have hloc : IsLocalRing ↥(OL LL) := @IsDiscreteValuationRing.toIsLocalRing _ _ hdom hdvr
   have hmax : IsLocalRing.maximalIdeal ↥(OL LL) = Ideal.span {lam} :=
@@ -268,8 +314,9 @@ theorem local_res {l : ℕ} [Fact l.Prime] (LL : FinExt l) {lam : ↥(OL LL)} (h
   have hl : ((l : ℕ) : ↥(OL LL)) ∈ IsLocalRing.maximalIdeal ↥(OL LL) := by
     have := LL.2
     refine (GlobalTheory.mem_maximalIdeal_integralClosure_iff LL.1 ((l : ℕ) : ↥(OL LL))).2 ?_
-    have hc : ((((l : ℕ) : ↥(OL LL)) : ↥LL.1) : PadicAlgCl l) =
-        algebraMap ℚ_[l] (PadicAlgCl l) (l : ℚ_[l]) := by
+    have hc
+        : ((((l : ℕ) : ↥(OL LL)) : ↥LL.1) : PadicAlgCl l)
+          = algebraMap ℚ_[l] (PadicAlgCl l) (l : ℚ_[l]) := by
       simp
     rw [hc, PadicAlgCl.norm_extends]
     exact Padic.norm_p_lt_one
@@ -279,14 +326,19 @@ theorem local_res {l : ℕ} [Fact l.Prime] (LL : FinExt l) {lam : ↥(OL LL)} (h
   have := hfin 1
   exact Finite.of_surjective _ (Ideal.Quotient.factor_surjective hle)
 
-theorem cls_eq_homModInertia : ∀ {l : ℕ} [Fact l.Prime] {P : LocPrime l} (S : TopSit P), S.Lem0 (S.Γ.Wchi 1) →
-    S.ResBound (S.Γ.Wchi 1) 1 → S.UnrAdm → ∀ (X : Type) [AddCommGroup X] [Module S.O X] [Finite X],
-    S.cls (S.Γ.Wchi 1) X = GlobalTheory.IndefiniteRowSideFullHecke.AdmissibleCharUnramified.homModInertia S.Γ X (IK S.K) := by
+theorem cls_eq_homModInertia
+    : ∀ {l : ℕ} [Fact l.Prime] {P : LocPrime l} (S : TopSit P),
+      S.Lem0 (S.Γ.Wchi 1) → S.ResBound (S.Γ.Wchi 1) 1 → S.UnrAdm
+        → ∀ (X : Type) [AddCommGroup X] [Module S.O X] [Finite X],
+          S.cls (S.Γ.Wchi 1) X
+            = GlobalTheory.IndefiniteRowSideFullHecke.AdmissibleCharUnramified.homModInertia S.Γ X
+              (IK S.K) := by
   intro l _ P S h0 hb hu X _ _ _
   obtain ⟨F, ν, hν, hI, hF, -⟩ := GlobalTheory.T.exists_frobenius_gen_degree_hom_to_Zl S.K
   have hst : Standing P S.K S.LL S.emb S.Γ.lam := S.hyp.1
   obtain ⟨_, hm, hfin⟩ := local_res S.LL hst.2.2.2.2.2
-  refine eq_hom_of_res S.Γ hm (IK S.K) F ν hν hI hF (fun X _ _ => S.cls (S.Γ.Wchi 1) X) ?_ ?_ hb hu X
+  refine
+    eq_hom_of_res S.Γ hm (IK S.K) F ν hν hI hF (fun X _ _ => S.cls (S.Γ.Wchi 1) X) ?_ ?_ hb hu X
   · intro X _ _ _
     exact (h0 X).1
   · intro X _ _ _ X' _ _ _ f c

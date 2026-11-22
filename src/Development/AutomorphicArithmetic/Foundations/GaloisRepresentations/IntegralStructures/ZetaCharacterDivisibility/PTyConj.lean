@@ -5,8 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.HeckeGal GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL GlobalTheory.RoadWGeo
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.HeckeGal
+  GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.CongL GlobalTheory.RoadWGeo
 open Formalism.MainNotions.SumRepresentations.At (sumRep)
 open GlobalTheory.TripleGal (rk1)
 open UpperTheory.V.Af (FrobEig algSat RepIso)
@@ -16,22 +19,30 @@ attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalDat
 open GlobalTheory.PRep Formalism.UG GlobalTheory.DefU
 open UpperTheory.Gal.Int.Div
 
-private def smIrrComap {G H : Type} [Group G] [TopologicalSpace G] [Group H] [TopologicalSpace H]
-    (β : G ≃ₜ* H) (σ : SmIrr G) : SmIrr H :=
-  ⟨σ.V, σ.ρ.comp β.symm.toMulEquiv.toMonoidHom, fun v => (σ.smooth v).preimage β.symm.continuous,
-    (GlobalTheory.SmGL.MultiIrr.isIrreducible_iff_of_linearEquiv (ρ := σ.ρ.comp β.symm.toMulEquiv.toMonoidHom) (σ := σ.ρ)
-      (fun h => β.symm h) β.symm.surjective (LinearEquiv.refl ℂ _) (fun _ _ => rfl)).2 σ.irred⟩
+private def smIrrComap
+    {G H : Type} [Group G] [TopologicalSpace G] [Group H] [TopologicalSpace H]
+    (β : G ≃ₜ* H) (σ : SmIrr G)
+    : SmIrr H := ⟨
+  σ.V,
+  σ.ρ.comp β.symm.toMulEquiv.toMonoidHom,
+  fun v => (σ.smooth v).preimage β.symm.continuous,
+  (GlobalTheory.SmGL.MultiIrr.isIrreducible_iff_of_linearEquiv
+    (ρ := σ.ρ.comp β.symm.toMulEquiv.toMonoidHom) (σ := σ.ρ)
+    (fun h => β.symm h)
+    β.symm.surjective (LinearEquiv.refl ℂ _)
+    (fun _ _ => rfl)).2 σ.irred
+⟩
 
-theorem UpperTheory.Gal.Int.Div.tyConj_of :
-    LocIso → TyConj := by
+theorem UpperTheory.Gal.Int.Div.tyConj_of : LocIso → TyConj := by
   intro hL E _ _ _ l a U w hw hT
   obtain ⟨hU, β, hβ, -, hc⟩ := hL E a w hw
   obtain ⟨m, J, θ, χ, hJo, hJc, hJt, hθ, hχ, hcus, φ, hφU, hφ0, hφ⟩ := hT
   let J' : Subgroup (GL (Fin a) ((cpl w).adicCompletion E)) := J.comap β.toMulEquiv.toMonoidHom
-  let r : J' →* J :=
-    { toFun := fun g => ⟨β g.1, g.2⟩
-      map_one' := Subtype.ext (map_one β)
-      map_mul' := fun x y => Subtype.ext (map_mul β _ _) }
+  let r : J' →* J := {
+    toFun := fun g => ⟨β g.1, g.2⟩
+    map_one' := Subtype.ext (map_one β)
+    map_mul' := fun x y => Subtype.ext (map_mul β _ _)
+  }
   refine ⟨m, J', θ.comp r, χ, ?_, ?_, ?_, ?_, hχ, ?_, φ, hφU, hφ0, ?_⟩
   · exact hJo.preimage β.continuous
   · exact β.toHomeomorph.isCompact_preimage.2 hJc

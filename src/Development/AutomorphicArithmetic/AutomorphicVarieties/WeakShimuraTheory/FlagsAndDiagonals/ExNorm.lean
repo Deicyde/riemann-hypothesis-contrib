@@ -6,19 +6,26 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-theorem UpperTheory.V.Ws.Lab.exNorm :
-    ∀ {l : ℕ} [Fact l.Prime] (𝔞 : Amb l) (Γ : Type) [Group Γ] [TopologicalSpace Γ] (r : Γ →* M4 𝔞.V) (u : M4 𝔞.V) (pr : Bool) (g0 : Γ) (ν : 𝔞.V),
-      𝔞.Small (⟨r, fun _ => u⟩ : PD Unit _ _) → IsUnit (2 : 𝔞.V) → IsUnit ν → IsGSp ν (r g0) → IsGSp 1 u →
-      ∀ X u' : M4 𝔞.V, X = adj (wM 𝔞.V pr) * r g0 * wM 𝔞.V pr → u' = adj (wM 𝔞.V pr) * u →
-      (∀ i j, i ≠ j → X i j ∈ maximalIdeal 𝔞.V) → (∀ i j, i ≠ j → IsUnit (X i i - X j j)) →
-      IsUnit (u' 0 0) → IsUnit (u' 0 0 * u' 1 1 - u' 0 1 * u' 1 0) →
-      ∃ (P : PD Unit Γ 𝔞.V) (v b : M4 𝔞.V), 𝔞.Small P ∧ IsGSp 1 v ∧ Cg (maximalIdeal 𝔞.V) v 1 ∧
-        (∀ g, P.r g = adj (wM 𝔞.V pr * v) * r g * (wM 𝔞.V pr * v)) ∧ (P.r g0).IsDiag ∧ IsLow (P.n ()) ∧ IsGSp 1 b ∧ IsUp b ∧
-        adj (wM 𝔞.V pr * v) * u = P.n () * b := by
+theorem UpperTheory.V.Ws.Lab.exNorm
+    : ∀ {l : ℕ} [Fact l.Prime] (𝔞 : Amb l) (Γ : Type) [Group Γ] [TopologicalSpace Γ]
+        (r : Γ →* M4 𝔞.V) (u : M4 𝔞.V) (pr : Bool) (g0 : Γ) (ν : 𝔞.V),
+      𝔞.Small (⟨r, fun _ => u⟩ : PD Unit _ _) → IsUnit (2 : 𝔞.V) → IsUnit ν → IsGSp ν (r g0)
+        → IsGSp 1 u
+        → ∀ X u' : M4 𝔞.V,
+          X = adj (wM 𝔞.V pr) * r g0 * wM 𝔞.V pr → u' = adj (wM 𝔞.V pr) * u
+            → (∀ i j, i ≠ j → X i j ∈ maximalIdeal 𝔞.V) → (∀ i j, i ≠ j → IsUnit (X i i - X j j))
+            → IsUnit (u' 0 0) → IsUnit (u' 0 0 * u' 1 1 - u' 0 1 * u' 1 0)
+            → ∃ (P : PD Unit Γ 𝔞.V) (v b : M4 𝔞.V),
+              𝔞.Small P ∧ IsGSp 1 v ∧ Cg (maximalIdeal 𝔞.V) v 1
+                ∧ (∀ g, P.r g = adj (wM 𝔞.V pr * v) * r g * (wM 𝔞.V pr * v)) ∧ (P.r g0).IsDiag
+                ∧ IsLow (P.n ()) ∧ IsGSp 1 b ∧ IsUp b ∧ adj (wM 𝔞.V pr * v) * u = P.n () * b := by
   intro l _ 𝔞 Γ _ _ r u pr g0 ν hs h2 hν hr hu X u' hX hu' hoff hdiag h00 hdet
-  have gspAdj : ∀ {R : Type} [CommRing R] (μ : R) (g : M4 R), IsUnit μ → IsGSp μ g → IsGSp μ (adj g) := by
+  have gspAdj
+      : ∀ {R : Type} [CommRing R] (μ : R) (g : M4 R), IsUnit μ → IsGSp μ g → IsGSp μ (adj g) := by
     intro R _ μ g hμ hg
     obtain ⟨c, rfl⟩ := hμ
     have hg' : adj g * g = (c : R) • (1 : M4 R) := hg
@@ -27,8 +34,9 @@ theorem UpperTheory.V.Ws.Lab.exNorm :
     have h2 : g * (((c⁻¹ : Rˣ) : R) • adj g) = 1 := mul_eq_one_comm.mp h1
     show adj (adj g) * adj g = (c : R) • (1 : M4 R)
     rw [adj_adj]
-    calc g * adj g = (c : R) • (g * (((c⁻¹ : Rˣ) : R) • adj g)) := by
-          rw [Matrix.mul_smul, smul_smul, Units.mul_inv, one_smul]
+    calc
+      g * adj g = (c : R) • (g * (((c⁻¹ : Rˣ) : R) • adj g)) := by
+        rw [Matrix.mul_smul, smul_smul, Units.mul_inv, one_smul]
       _ = (c : R) • (1 : M4 R) := by rw [h2]
   obtain ⟨S, _, _, _, f, P₁, hf, hc, hmap⟩ := hs
   haveI := hf.complete
@@ -36,7 +44,8 @@ theorem UpperTheory.V.Ws.Lab.exNorm :
   have unitS : ∀ x : S, IsUnit (f x) ↔ IsUnit x := fun x => isUnit_map_iff f x
   have memS : ∀ x : S, x ∈ maximalIdeal S ↔ f x ∈ maximalIdeal 𝔞.V := by
     intro x
-    rw [IsLocalRing.mem_maximalIdeal, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, mem_nonunits_iff, unitS]
+    rw [IsLocalRing.mem_maximalIdeal, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff,
+      mem_nonunits_iff, unitS]
   have hr_eq : ∀ g, r g = (P₁.r g).map f := by
     intro g
     have := congrArg (fun P : PD Unit Γ 𝔞.V => P.r g) hmap
@@ -60,8 +69,7 @@ theorem UpperTheory.V.Ws.Lab.exNorm :
   have hwmap : wM 𝔞.V pr = w₁.map f := (wM_map f pr).symm
   have hXmap : X = (adj w₁ * r₀ * w₁).map f := by
     rw [hX, hr_eq, hwmap, adj_map, Matrix.map_mul, Matrix.map_mul]
-  have hu'map : u' = (adj w₁ * u₁).map f := by
-    rw [hu', hu_eq, hwmap, adj_map, Matrix.map_mul]
+  have hu'map : u' = (adj w₁ * u₁).map f := by rw [hu', hu_eq, hwmap, adj_map, Matrix.map_mul]
   set ν₁ := (adj r₀ * r₀) 0 0 with hν₁def
   have hE : (adj r₀ * r₀).map f = ν • (1 : M4 𝔞.V) := by
     rw [Matrix.map_mul, ← adj_map, ← hr_eq]
@@ -106,9 +114,15 @@ theorem UpperTheory.V.Ws.Lab.exNorm :
   have hcgu : Cg (maximalIdeal S) (adj v₁ * (adj w₁ * u₁)) (adj w₁ * u₁) := by
     have := Cg.mul hadjv (Cg.refl (adj w₁ * u₁))
     rwa [one_mul] at this
-  have hq : ∀ i j, Ideal.Quotient.mk (maximalIdeal S) ((adj v₁ * (adj w₁ * u₁)) i j) = Ideal.Quotient.mk (maximalIdeal S) ((adj w₁ * u₁) i j) :=
-    fun i j => Ideal.Quotient.eq.mpr (hcgu i j)
-  have unitOf : ∀ a b : S, Ideal.Quotient.mk (maximalIdeal S) a = Ideal.Quotient.mk (maximalIdeal S) b → IsUnit b → IsUnit a := by
+  have hq
+      : ∀ i j,
+        Ideal.Quotient.mk (maximalIdeal S) ((adj v₁ * (adj w₁ * u₁)) i j)
+          = Ideal.Quotient.mk (maximalIdeal S) ((adj w₁ * u₁) i j) := fun i j =>
+    Ideal.Quotient.eq.mpr (hcgu i j)
+  have unitOf
+      : ∀ a b : S,
+        Ideal.Quotient.mk (maximalIdeal S) a = Ideal.Quotient.mk (maximalIdeal S) b → IsUnit b
+          → IsUnit a := by
     intro a b hab hb
     by_contra ha
     have ha' : a ∈ maximalIdeal S := (IsLocalRing.mem_maximalIdeal a).mpr ha
@@ -121,12 +135,15 @@ theorem UpperTheory.V.Ws.Lab.exNorm :
     rw [← unitS]
     rw [hu'map] at h00
     exact h00
-  have hdet₁ : IsUnit ((adj w₁ * u₁) 0 0 * (adj w₁ * u₁) 1 1 - (adj w₁ * u₁) 0 1 * (adj w₁ * u₁) 1 0) := by
+  have hdet₁
+      : IsUnit ((adj w₁ * u₁) 0 0 * (adj w₁ * u₁) 1 1 - (adj w₁ * u₁) 0 1 * (adj w₁ * u₁) 1 0) := by
     rw [← unitS]
     rw [hu'map] at hdet
     simpa using hdet
   have h00'' : IsUnit ((adj v₁ * (adj w₁ * u₁)) 0 0) := unitOf _ _ (hq 0 0) h00₁
-  have hdet'' : IsUnit ((adj v₁ * (adj w₁ * u₁)) 0 0 * (adj v₁ * (adj w₁ * u₁)) 1 1 - (adj v₁ * (adj w₁ * u₁)) 0 1 * (adj v₁ * (adj w₁ * u₁)) 1 0) := by
+  have hdet'' : IsUnit
+      ((adj v₁ * (adj w₁ * u₁)) 0 0 * (adj v₁ * (adj w₁ * u₁)) 1 1
+        - (adj v₁ * (adj w₁ * u₁)) 0 1 * (adj v₁ * (adj w₁ * u₁)) 1 0) := by
     refine unitOf _ _ ?_ hdet₁
     simp only [map_sub, map_mul, hq]
   have hg'' : IsGSp 1 (adj v₁ * (adj w₁ * u₁)) := by
@@ -144,24 +161,40 @@ theorem UpperTheory.V.Ws.Lab.exNorm :
     have h : adj (adj p₁) * adj p₁ = (1 : S) • (1 : M4 S) := gspAdj 1 p₁ isUnit_one hp₁
     rw [adj_adj, one_smul] at h
     exact h
-  let r₂ : Γ →* M4 S :=
-    { toFun := fun g => adj p₁ * P₁.r g * p₁
-      map_one' := by
-        simp only [map_one, mul_one]
-        exact hleft
-      map_mul' := by
-        intro a b
-        simp only [map_mul]
-        calc adj p₁ * (P₁.r a * P₁.r b) * p₁ = adj p₁ * P₁.r a * (p₁ * adj p₁) * P₁.r b * p₁ := by
-              rw [hright, mul_one]
-              simp only [mul_assoc]
-          _ = adj p₁ * P₁.r a * p₁ * (adj p₁ * P₁.r b * p₁) := by simp only [mul_assoc] }
+  let r₂ : Γ →* M4 S := {
+    toFun := fun g => adj p₁ * P₁.r g * p₁
+    map_one' := by
+      simp only [map_one, mul_one]
+      exact hleft
+    map_mul' := by
+      intro a b
+      simp only [map_mul]
+      calc
+        adj p₁ * (P₁.r a * P₁.r b) * p₁ = adj p₁ * P₁.r a * (p₁ * adj p₁) * P₁.r b * p₁ := by
+          rw [hright, mul_one]
+          simp only [mul_assoc]
+        _ = adj p₁ * P₁.r a * p₁ * (adj p₁ * P₁.r b * p₁) := by simp only [mul_assoc]
+  }
   let P₂ : PD Unit Γ S := ⟨r₂, fun _ => n₁⟩
-  have hcont : P₂.Cont (maximalIdeal S) := Lab.contConj Γ S (maximalIdeal S) (fun g => P₁.r g) (adj p₁) p₁ hc
+  have hcont : P₂.Cont (maximalIdeal S) :=
+    Lab.contConj Γ S (maximalIdeal S) (fun g => P₁.r g) (adj p₁) p₁ hc
   have hone : ∀ i j, (1 : M4 𝔞.V) i j = f ((1 : M4 S) i j) := by
     intro i j
     by_cases hij : i = j <;> simp [Matrix.one_apply, hij]
-  refine ⟨P₂.map f, v₁.map f, b₁.map f, ⟨S, _, _, _, f, P₂, hf, hcont, rfl⟩, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨
+    P₂.map f,
+    v₁.map f,
+    b₁.map f,
+    ⟨S, _, _, _, f, P₂, hf, hcont, rfl⟩,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · have := gsp_map f hv₁
     rwa [map_one] at this
   · intro i j

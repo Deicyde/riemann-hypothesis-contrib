@@ -20,8 +20,7 @@ def unitsLevel : ℕ := if ℓ = 2 then 3 else 1
 def torsionExponent : ℕ := if ℓ = 2 then 2 else ℓ - 1
 
 omit hℓ in
-theorem unitsLevel_ne_zero : unitsLevel ℓ ≠ 0 := by
-  unfold unitsLevel; split_ifs <;> norm_num
+theorem unitsLevel_ne_zero : unitsLevel ℓ ≠ 0 := by unfold unitsLevel; split_ifs <;> norm_num
 
 theorem unitsLevel_add_two_le : unitsLevel ℓ + 2 ≤ ℓ * unitsLevel ℓ := by
   unfold unitsLevel
@@ -61,17 +60,18 @@ theorem card_unitsKer (n : ℕ) : Nat.card (unitsKer ℓ n) = ℓ ^ n := by
   have : NeZero ℓ := ⟨hℓ.out.ne_zero⟩
   have h1 := Subgroup.card_mul_index (unitsKer ℓ n)
   rw [unitsKer, Subgroup.index_ker, MonoidHom.range_eq_top.2 (ZMod.unitsMap_surjective _),
-    Subgroup.card_top, Nat.card_eq_fintype_card (α := (ZMod (ℓ ^ unitsLevel ℓ))ˣ),
-    Nat.card_eq_fintype_card (α := (ZMod (ℓ ^ (n + unitsLevel ℓ)))ˣ), ZMod.card_units_eq_totient,
-    ZMod.card_units_eq_totient, Nat.totient_prime_pow hℓ.out (Nat.pos_of_ne_zero
-      (unitsLevel_ne_zero ℓ)), Nat.totient_prime_pow hℓ.out (by
-        have := unitsLevel_ne_zero ℓ; omega)] at h1
-  have hr : n + unitsLevel ℓ - 1 = n + (unitsLevel ℓ - 1) := by
-    have := unitsLevel_ne_zero ℓ; omega
+      Subgroup.card_top, Nat.card_eq_fintype_card (α := (ZMod (ℓ ^ unitsLevel ℓ))ˣ),
+      Nat.card_eq_fintype_card (α := (ZMod (ℓ ^ (n + unitsLevel ℓ)))ˣ), ZMod.card_units_eq_totient,
+      ZMod.card_units_eq_totient,
+      Nat.totient_prime_pow hℓ.out (Nat.pos_of_ne_zero (unitsLevel_ne_zero ℓ)),
+      Nat.totient_prime_pow hℓ.out (by have := unitsLevel_ne_zero ℓ; omega)]
+    at h1
+  have hr : n + unitsLevel ℓ - 1 = n + (unitsLevel ℓ - 1) := by have := unitsLevel_ne_zero ℓ; omega
   have hpos : 0 < ℓ ^ (unitsLevel ℓ - 1) * (ℓ - 1) :=
     Nat.mul_pos (pow_pos hℓ.out.pos _) (by have := hℓ.out.two_le; omega)
-  have h2 : Nat.card (unitsKer ℓ n) * (ℓ ^ (unitsLevel ℓ - 1) * (ℓ - 1)) =
-      ℓ ^ n * (ℓ ^ (unitsLevel ℓ - 1) * (ℓ - 1)) := by
+  have h2
+      : Nat.card (unitsKer ℓ n) * (ℓ ^ (unitsLevel ℓ - 1) * (ℓ - 1))
+        = ℓ ^ n * (ℓ ^ (unitsLevel ℓ - 1) * (ℓ - 1)) := by
     rw [← mul_assoc (ℓ ^ n), ← pow_add, ← hr]
     exact h1
   exact Nat.eq_of_mul_eq_mul_right hpos h2
@@ -81,20 +81,21 @@ theorem coprime_one_add_pow (k : ℕ) : Nat.Coprime (1 + ℓ ^ unitsLevel ℓ) (
   rw [Nat.coprime_comm, Nat.Prime.coprime_iff_not_dvd hℓ.out]
   intro h
   rw [add_comm] at h
-  exact hℓ.out.not_dvd_one
-    ((Nat.dvd_add_right (dvd_pow_self ℓ (unitsLevel_ne_zero ℓ))).1 h)
+  exact hℓ.out.not_dvd_one ((Nat.dvd_add_right (dvd_pow_self ℓ (unitsLevel_ne_zero ℓ))).1 h)
 
 def genUnit (n : ℕ) : (ZMod (ℓ ^ (n + unitsLevel ℓ)))ˣ :=
   ZMod.unitOfCoprime (1 + ℓ ^ unitsLevel ℓ) (coprime_one_add_pow ℓ _)
 
-@[simp] theorem coe_genUnit (n : ℕ) :
-    (genUnit ℓ n : ZMod (ℓ ^ (n + unitsLevel ℓ))) = 1 + (ℓ : ZMod _) ^ unitsLevel ℓ := by
+@[simp]
+theorem coe_genUnit (n : ℕ)
+    : (genUnit ℓ n : ZMod (ℓ ^ (n + unitsLevel ℓ))) = 1 + (ℓ : ZMod _) ^ unitsLevel ℓ := by
   simp [genUnit]
 
 theorem orderOf_genUnit (n : ℕ) : orderOf (genUnit ℓ n) = ℓ ^ n := by
   rw [← orderOf_units, coe_genUnit]
-  have := ZMod.orderOf_one_add_mul_prime_pow hℓ.out (unitsLevel ℓ)
-    (unitsLevel_add_two_le ℓ) 1 (by norm_cast; exact hℓ.out.not_dvd_one) n
+  have :=
+    ZMod.orderOf_one_add_mul_prime_pow hℓ.out (unitsLevel ℓ) (unitsLevel_add_two_le ℓ) 1
+      (by norm_cast; exact hℓ.out.not_dvd_one) n
   simpa using this
 
 theorem genUnit_pow_eq_one (n : ℕ) : genUnit ℓ n ^ (ℓ ^ n) = 1 := by
@@ -104,16 +105,16 @@ theorem genUnit_pow_eq_one (n : ℕ) : genUnit ℓ n ^ (ℓ ^ n) = 1 := by
 theorem genUnit_mem_unitsKer (n : ℕ) : genUnit ℓ n ∈ unitsKer ℓ n := by
   rw [unitsKer, MonoidHom.mem_ker]
   refine Units.ext ?_
-  simp only [ZMod.unitsMap_def, Units.coe_map, MonoidHom.coe_coe, coe_genUnit, map_add (f := _), map_one,
-    map_pow, map_natCast, Units.val_one]
+  simp only [ZMod.unitsMap_def, Units.coe_map, MonoidHom.coe_coe, coe_genUnit, map_add (f := _),
+    map_one, map_pow, map_natCast, Units.val_one]
   rw [← Nat.cast_pow, ZMod.natCast_self, add_zero]
 
 theorem zpowers_genUnit (n : ℕ) : Subgroup.zpowers (genUnit ℓ n) = unitsKer ℓ n :=
   Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.2 (genUnit_mem_unitsKer ℓ n))
     (by rw [card_unitsKer, Nat.card_zpowers, orderOf_genUnit])
 
-theorem genUnit_pow_val_eq (n : ℕ) {a b : ℕ} (h : a ≡ b [MOD ℓ ^ n]) :
-    genUnit ℓ n ^ a = genUnit ℓ n ^ b := by
+theorem genUnit_pow_val_eq (n : ℕ) {a b : ℕ} (h : a ≡ b [MOD ℓ ^ n])
+    : genUnit ℓ n ^ a = genUnit ℓ n ^ b := by
   rw [pow_eq_pow_iff_modEq, orderOf_genUnit]
   exact h
 
@@ -125,8 +126,8 @@ def expHom (n : ℕ) : Multiplicative (ZMod (ℓ ^ n)) →* (ZMod (ℓ ^ (n + un
     rw [← pow_add, toAdd_mul]
     exact genUnit_pow_val_eq ℓ n (by rw [ZMod.val_add]; exact Nat.mod_modEq _ _)
 
-theorem expHom_apply (n : ℕ) (a : Multiplicative (ZMod (ℓ ^ n))) :
-    expHom ℓ n a = genUnit ℓ n ^ (Multiplicative.toAdd a).val :=
+theorem expHom_apply (n : ℕ) (a : Multiplicative (ZMod (ℓ ^ n)))
+    : expHom ℓ n a = genUnit ℓ n ^ (Multiplicative.toAdd a).val :=
   rfl
 
 theorem expHom_injective (n : ℕ) : Function.Injective (expHom ℓ n) := by
@@ -151,45 +152,46 @@ theorem range_expHom (n : ℕ) : (expHom ℓ n).range = unitsKer ℓ n := by
 noncomputable def expEquiv (n : ℕ) : Multiplicative (ZMod (ℓ ^ n)) ≃* unitsKer ℓ n :=
   (MonoidHom.ofInjective (expHom_injective ℓ n)).trans (MulEquiv.subgroupCongr (range_expHom ℓ n))
 
-theorem coe_expEquiv (n : ℕ) (a : Multiplicative (ZMod (ℓ ^ n))) :
-    (expEquiv ℓ n a : (ZMod (ℓ ^ (n + unitsLevel ℓ)))ˣ) = expHom ℓ n a :=
+theorem coe_expEquiv (n : ℕ) (a : Multiplicative (ZMod (ℓ ^ n)))
+    : (expEquiv ℓ n a : (ZMod (ℓ ^ (n + unitsLevel ℓ)))ˣ) = expHom ℓ n a :=
   rfl
 
 def powKer (n : ℕ) : (ZMod (ℓ ^ (n + unitsLevel ℓ)))ˣ →* unitsKer ℓ n :=
   (powMonoidHom (torsionExponent ℓ)).codRestrict (unitsKer ℓ n) fun x => by
     rw [unitsKer, MonoidHom.mem_ker, powMonoidHom_apply, map_pow, pow_torsionExponent]
 
-noncomputable def logMod (n : ℕ) : (ZMod (ℓ ^ (n + unitsLevel ℓ)))ˣ →* Multiplicative (ZMod (ℓ ^ n)) :=
+noncomputable def logMod (n : ℕ)
+    : (ZMod (ℓ ^ (n + unitsLevel ℓ)))ˣ →* Multiplicative (ZMod (ℓ ^ n)) :=
   (expEquiv ℓ n).symm.toMonoidHom.comp (powKer ℓ n)
 
-theorem expHom_logMod (n : ℕ) (x : (ZMod (ℓ ^ (n + unitsLevel ℓ)))ˣ) :
-    expHom ℓ n (logMod ℓ n x) = x ^ torsionExponent ℓ := by
+theorem expHom_logMod (n : ℕ) (x : (ZMod (ℓ ^ (n + unitsLevel ℓ)))ˣ)
+    : expHom ℓ n (logMod ℓ n x) = x ^ torsionExponent ℓ := by
   have := congrArg Subtype.val ((expEquiv ℓ n).apply_symm_apply (powKer ℓ n x))
   rw [coe_expEquiv] at this
   exact this
 
-theorem logMod_eq_iff (n : ℕ) (x : (ZMod (ℓ ^ (n + unitsLevel ℓ)))ˣ)
-    (a : Multiplicative (ZMod (ℓ ^ n))) :
-    logMod ℓ n x = a ↔ expHom ℓ n a = x ^ torsionExponent ℓ :=
-  ⟨fun h => h ▸ expHom_logMod ℓ n x,
-    fun h => expHom_injective ℓ n (by rw [expHom_logMod, h])⟩
+theorem logMod_eq_iff
+    (n : ℕ) (x : (ZMod (ℓ ^ (n + unitsLevel ℓ)))ˣ) (a : Multiplicative (ZMod (ℓ ^ n)))
+    : logMod ℓ n x = a ↔ expHom ℓ n a = x ^ torsionExponent ℓ :=
+  ⟨fun h => h ▸ expHom_logMod ℓ n x, fun h => expHom_injective ℓ n (by rw [expHom_logMod, h])⟩
 
-theorem unitsMap_genUnit {m n : ℕ} (h : m ≤ n) :
-    ZMod.unitsMap (pow_dvd_pow ℓ (by omega : m + unitsLevel ℓ ≤ n + unitsLevel ℓ)) (genUnit ℓ n) =
-      genUnit ℓ m := by
+theorem unitsMap_genUnit {m n : ℕ} (h : m ≤ n)
+    : ZMod.unitsMap (pow_dvd_pow ℓ (by omega : m + unitsLevel ℓ ≤ n + unitsLevel ℓ)) (genUnit ℓ n)
+      = genUnit ℓ m := by
   refine Units.ext ?_
-  simp only [ZMod.unitsMap_def, Units.coe_map, MonoidHom.coe_coe, coe_genUnit, map_add (f := _), map_one,
-    map_pow, map_natCast]
+  simp only [ZMod.unitsMap_def, Units.coe_map, MonoidHom.coe_coe, coe_genUnit, map_add (f := _),
+    map_one, map_pow, map_natCast]
 
-theorem castHom_logMod {m n : ℕ} (h : m ≤ n) (x : (ZMod (ℓ ^ (n + unitsLevel ℓ)))ˣ) :
-    ZMod.castHom (pow_dvd_pow ℓ h) (ZMod (ℓ ^ m)) (Multiplicative.toAdd (logMod ℓ n x)) =
-      Multiplicative.toAdd (logMod ℓ m
+theorem castHom_logMod {m n : ℕ} (h : m ≤ n) (x : (ZMod (ℓ ^ (n + unitsLevel ℓ)))ˣ)
+    : ZMod.castHom (pow_dvd_pow ℓ h) (ZMod (ℓ ^ m)) (Multiplicative.toAdd (logMod ℓ n x))
+      = Multiplicative.toAdd (logMod ℓ m
         (ZMod.unitsMap (pow_dvd_pow ℓ (by omega : m + unitsLevel ℓ ≤ n + unitsLevel ℓ)) x)) := by
   have : NeZero ℓ := ⟨hℓ.out.ne_zero⟩
   set a := Multiplicative.toAdd (logMod ℓ n x) with ha
-  have key : logMod ℓ m
-      (ZMod.unitsMap (pow_dvd_pow ℓ (by omega : m + unitsLevel ℓ ≤ n + unitsLevel ℓ)) x) =
-        Multiplicative.ofAdd (ZMod.castHom (pow_dvd_pow ℓ h) (ZMod (ℓ ^ m)) a) := by
+  have key
+      : logMod ℓ m
+          (ZMod.unitsMap (pow_dvd_pow ℓ (by omega : m + unitsLevel ℓ ≤ n + unitsLevel ℓ)) x)
+        = Multiplicative.ofAdd (ZMod.castHom (pow_dvd_pow ℓ h) (ZMod (ℓ ^ m)) a) := by
     rw [logMod_eq_iff, expHom_apply, toAdd_ofAdd, ← map_pow, ← expHom_logMod ℓ n x, expHom_apply,
       map_pow, unitsMap_genUnit ℓ h, ← ha]
     refine genUnit_pow_val_eq ℓ m ?_
@@ -209,38 +211,39 @@ def compatibleFamilies : Subring (∀ n : ℕ, ZMod (ℓ ^ n)) :=
       (Pi.evalRingHom (fun k => ZMod (ℓ ^ k)) n)) (Pi.evalRingHom (fun k => ZMod (ℓ ^ k)) m)
 
 omit hℓ in
-theorem mem_compatibleFamilies {x : ∀ n : ℕ, ZMod (ℓ ^ n)} :
-    x ∈ compatibleFamilies ℓ ↔
-      ∀ (m n : ℕ) (h : m ≤ n), ZMod.castHom (pow_dvd_pow ℓ h) (ZMod (ℓ ^ m)) (x n) = x m := by
+theorem mem_compatibleFamilies {x : ∀ n : ℕ, ZMod (ℓ ^ n)}
+    : x ∈ compatibleFamilies ℓ
+      ↔ ∀ (m n : ℕ) (h : m ≤ n), ZMod.castHom (pow_dvd_pow ℓ h) (ZMod (ℓ ^ m)) (x n) = x m := by
   simp [compatibleFamilies, Subring.mem_iInf, RingHom.mem_eqLocus]
 
 noncomputable def limFamilies : compatibleFamilies ℓ →+* ℤ_[ℓ] :=
-  PadicInt.lift (f := fun n => (Pi.evalRingHom (fun k => ZMod (ℓ ^ k)) n).comp
-    (compatibleFamilies ℓ).subtype) fun m n h => by
+  PadicInt.lift
+    (f := fun n => (Pi.evalRingHom (fun k => ZMod (ℓ ^ k)) n).comp (compatibleFamilies ℓ).subtype)
+    fun m n h => by
       ext x
       exact (mem_compatibleFamilies ℓ).1 x.2 m n h
 
-theorem toZModPow_limFamilies (x : compatibleFamilies ℓ) (n : ℕ) :
-    PadicInt.toZModPow n (limFamilies ℓ x) = (x : ∀ n : ℕ, ZMod (ℓ ^ n)) n :=
+theorem toZModPow_limFamilies (x : compatibleFamilies ℓ) (n : ℕ)
+    : PadicInt.toZModPow n (limFamilies ℓ x) = (x : ∀ n : ℕ, ZMod (ℓ ^ n)) n :=
   RingHom.congr_fun (PadicInt.lift_spec _ n) x
 
 noncomputable def redUnits (k : ℕ) : ℤ_[ℓ]ˣ →* (ZMod (ℓ ^ k))ˣ :=
   Units.map (PadicInt.toZModPow k).toMonoidHom
 
-@[simp] theorem coe_redUnits (k : ℕ) (u : ℤ_[ℓ]ˣ) :
-    (redUnits ℓ k u : ZMod (ℓ ^ k)) = PadicInt.toZModPow k (u : ℤ_[ℓ]) :=
+@[simp]
+theorem coe_redUnits (k : ℕ) (u : ℤ_[ℓ]ˣ)
+    : (redUnits ℓ k u : ZMod (ℓ ^ k)) = PadicInt.toZModPow k (u : ℤ_[ℓ]) :=
   rfl
 
-theorem unitsMap_redUnits {k k' : ℕ} (h : k ≤ k') (u : ℤ_[ℓ]ˣ) :
-    ZMod.unitsMap (pow_dvd_pow ℓ h) (redUnits ℓ k' u) = redUnits ℓ k u := by
+theorem unitsMap_redUnits {k k' : ℕ} (h : k ≤ k') (u : ℤ_[ℓ]ˣ)
+    : ZMod.unitsMap (pow_dvd_pow ℓ h) (redUnits ℓ k' u) = redUnits ℓ k u := by
   refine Units.ext ?_
-  simp only [ZMod.unitsMap_def, Units.coe_map, MonoidHom.coe_coe, coe_redUnits,
-    ZMod.castHom_apply]
+  simp only [ZMod.unitsMap_def, Units.coe_map, MonoidHom.coe_coe, coe_redUnits, ZMod.castHom_apply]
   exact PadicInt.cast_toZModPow _ _ h _
 
-theorem logFamily_mem (u : ℤ_[ℓ]ˣ) :
-    (fun n => Multiplicative.toAdd (logMod ℓ n (redUnits ℓ (n + unitsLevel ℓ) u))) ∈
-      compatibleFamilies ℓ := by
+theorem logFamily_mem (u : ℤ_[ℓ]ˣ)
+    : (fun n => Multiplicative.toAdd (logMod ℓ n (redUnits ℓ (n + unitsLevel ℓ) u)))
+      ∈ compatibleFamilies ℓ := by
   rw [mem_compatibleFamilies]
   intro m n h
   rw [castHom_logMod ℓ h,
@@ -258,16 +261,16 @@ noncomputable def padicUnitsLog : ℤ_[ℓ]ˣ →* Multiplicative ℤ_[ℓ] wher
     rw [map_add (f := _), toZModPow_limFamilies, toZModPow_limFamilies, toZModPow_limFamilies]
     simp
 
-theorem toZModPow_padicUnitsLog (u : ℤ_[ℓ]ˣ) (n : ℕ) :
-    PadicInt.toZModPow n (Multiplicative.toAdd (padicUnitsLog ℓ u)) =
-      Multiplicative.toAdd (logMod ℓ n (redUnits ℓ (n + unitsLevel ℓ) u)) :=
+theorem toZModPow_padicUnitsLog (u : ℤ_[ℓ]ˣ) (n : ℕ)
+    : PadicInt.toZModPow n (Multiplicative.toAdd (padicUnitsLog ℓ u))
+      = Multiplicative.toAdd (logMod ℓ n (redUnits ℓ (n + unitsLevel ℓ) u)) :=
   toZModPow_limFamilies ℓ _ n
 
 theorem continuous_redUnits (k : ℕ) : Continuous (redUnits ℓ k) := by
   rw [Units.continuous_iff]
   refine ⟨(continuous_toZModPow k).comp Units.continuous_val, ?_⟩
-  have : (fun u : ℤ_[ℓ]ˣ => ((redUnits ℓ k u)⁻¹ : (ZMod (ℓ ^ k))ˣ).val) =
-      fun u => PadicInt.toZModPow k ((u⁻¹ : ℤ_[ℓ]ˣ) : ℤ_[ℓ]) := by
+  have : (fun u : ℤ_[ℓ]ˣ => ((redUnits ℓ k u)⁻¹ : (ZMod (ℓ ^ k))ˣ).val)
+      = fun u => PadicInt.toZModPow k ((u⁻¹ : ℤ_[ℓ]ˣ) : ℤ_[ℓ]) := by
     funext u; rw [← map_inv]; rfl
   rw [this]
   exact (continuous_toZModPow k).comp (Units.continuous_val.comp continuous_inv)
@@ -275,9 +278,10 @@ theorem continuous_redUnits (k : ℕ) : Continuous (redUnits ℓ k) := by
 theorem continuous_padicUnitsLog : Continuous (padicUnitsLog ℓ) := by
   have hc : Continuous fun u : ℤ_[ℓ]ˣ => Multiplicative.toAdd (padicUnitsLog ℓ u) :=
     continuous_of_continuous_toZModPow fun n =>
-      ((continuous_of_discreteTopology (f := fun v : (ZMod (ℓ ^ (n + unitsLevel ℓ)))ˣ =>
-        Multiplicative.toAdd (logMod ℓ n v))).comp (continuous_redUnits ℓ _)).congr fun u =>
-          (toZModPow_padicUnitsLog ℓ u n).symm
+      ((continuous_of_discreteTopology
+          (f := fun v : (ZMod (ℓ ^ (n + unitsLevel ℓ)))ˣ =>
+            Multiplicative.toAdd (logMod ℓ n v))).comp (continuous_redUnits ℓ _)).congr fun u =>
+        (toZModPow_padicUnitsLog ℓ u n).symm
   exact continuous_ofAdd.comp hc
 
 def genNat : ℕ := if ℓ = 2 then 3 else ℓ + 1
@@ -311,16 +315,16 @@ theorem isUnit_natCast_of_coprime {k : ℕ} (hk : Nat.Coprime ℓ k) : IsUnit (k
 
 noncomputable def genPadicUnit : ℤ_[ℓ]ˣ := (isUnit_natCast_of_coprime ℓ (coprime_genNat ℓ)).unit
 
-theorem padicUnitsLog_genPadicUnit :
-    Multiplicative.toAdd (padicUnitsLog ℓ (genPadicUnit ℓ)) = (genLog ℓ : ℤ_[ℓ]) := by
+theorem padicUnitsLog_genPadicUnit
+    : Multiplicative.toAdd (padicUnitsLog ℓ (genPadicUnit ℓ)) = (genLog ℓ : ℤ_[ℓ]) := by
   refine PadicInt.ext_of_toZModPow.mp fun n => ?_
   rw [toZModPow_padicUnitsLog, map_natCast]
-  have : logMod ℓ n (redUnits ℓ (n + unitsLevel ℓ) (genPadicUnit ℓ)) =
-      Multiplicative.ofAdd ((genLog ℓ : ℕ) : ZMod (ℓ ^ n)) := by
+  have : logMod ℓ n (redUnits ℓ (n + unitsLevel ℓ) (genPadicUnit ℓ))
+      = Multiplicative.ofAdd ((genLog ℓ : ℕ) : ZMod (ℓ ^ n)) := by
     rw [logMod_eq_iff, expHom_apply, toAdd_ofAdd, pow_val_natCast (genUnit_pow_eq_one ℓ n)]
     refine Units.ext ?_
-    simp only [Units.val_pow_eq_pow_val, coe_genUnit, coe_redUnits, genPadicUnit,
-      IsUnit.unit_spec, map_natCast]
+    simp only [Units.val_pow_eq_pow_val, coe_genUnit, coe_redUnits, genPadicUnit, IsUnit.unit_spec,
+      map_natCast]
     rw [← Nat.cast_pow (genNat ℓ), genNat_pow]
     push_cast
     ring
@@ -334,11 +338,13 @@ theorem padicUnitsLog_surjective : Function.Surjective (padicUnitsLog ℓ) := by
   set R : Set ℤ_[ℓ] := Set.range fun u : ℤ_[ℓ]ˣ => Multiplicative.toAdd (padicUnitsLog ℓ u)
   have hR : IsClosed R := (isCompact_range hc).isClosed
   have hmem : ∀ t : ℤ_[ℓ], s * t ∈ R := fun t =>
-    PadicInt.denseRange_natCast.induction_on t
-      (hR.preimage (continuous_const.mul continuous_id)) fun k =>
-        ⟨genPadicUnit ℓ ^ k, by
+    PadicInt.denseRange_natCast.induction_on t (hR.preimage (continuous_const.mul continuous_id))
+      fun k => ⟨
+        genPadicUnit ℓ ^ k,
+        by
           show Multiplicative.toAdd (padicUnitsLog ℓ (genPadicUnit ℓ ^ k)) = s * k
-          rw [map_pow, toAdd_pow, padicUnitsLog_genPadicUnit, nsmul_eq_mul, mul_comm]⟩
+          rw [map_pow, toAdd_pow, padicUnitsLog_genPadicUnit, nsmul_eq_mul, mul_comm]
+      ⟩
   intro y
   obtain ⟨u, hu⟩ := hmem (↑hs.unit⁻¹ * Multiplicative.toAdd y)
   have hu : Multiplicative.toAdd (padicUnitsLog ℓ u) = s * (↑hs.unit⁻¹ * Multiplicative.toAdd y) :=
@@ -347,19 +353,21 @@ theorem padicUnitsLog_surjective : Function.Surjective (padicUnitsLog ℓ) := by
   apply Multiplicative.toAdd.injective
   rw [hu, ← mul_assoc, IsUnit.mul_val_inv, one_mul]
 
-theorem padicUnitsLog_eq_one_of_pow_eq_one {u : ℤ_[ℓ]ˣ} {k : ℕ} (hk : 0 < k) (h : u ^ k = 1) :
-    padicUnitsLog ℓ u = 1 := by
+theorem padicUnitsLog_eq_one_of_pow_eq_one {u : ℤ_[ℓ]ˣ} {k : ℕ} (hk : 0 < k) (h : u ^ k = 1)
+    : padicUnitsLog ℓ u = 1 := by
   have h1 := congrArg (fun v => Multiplicative.toAdd (padicUnitsLog ℓ v)) h
   simp only [map_pow, toAdd_pow, map_one, toAdd_one, nsmul_eq_mul] at h1
   rcases mul_eq_zero.1 h1 with h2 | h2
   · exact absurd h2 (Nat.cast_ne_zero.2 hk.ne')
   · exact congrArg Multiplicative.ofAdd h2
 
-theorem padicUnitsLog_eq_one_iff (u : ℤ_[ℓ]ˣ) :
-    padicUnitsLog ℓ u = 1 ↔ u ^ torsionExponent ℓ = 1 := by
+theorem padicUnitsLog_eq_one_iff (u : ℤ_[ℓ]ˣ)
+    : padicUnitsLog ℓ u = 1 ↔ u ^ torsionExponent ℓ = 1 := by
   refine ⟨fun h => ?_, padicUnitsLog_eq_one_of_pow_eq_one ℓ (torsionExponent_pos ℓ)⟩
-  have hk : ∀ k, PadicInt.toZModPow (k + unitsLevel ℓ) ((u ^ torsionExponent ℓ : ℤ_[ℓ]ˣ) : ℤ_[ℓ]) =
-      1 := fun k => by
+  have hk
+      : ∀ k,
+        PadicInt.toZModPow (k + unitsLevel ℓ) ((u ^ torsionExponent ℓ : ℤ_[ℓ]ˣ) : ℤ_[ℓ])
+          = 1 := fun k => by
     have h1 := toZModPow_padicUnitsLog ℓ u k
     rw [h, toAdd_one, map_zero] at h1
     have h2 : logMod ℓ k (redUnits ℓ (k + unitsLevel ℓ) u) = 1 :=
@@ -383,12 +391,11 @@ theorem ker_padicUnitsLog : (padicUnitsLog ℓ).ker = CommGroup.torsion ℤ_[ℓ
   · rintro ⟨k, hk, h⟩
     exact padicUnitsLog_eq_one_of_pow_eq_one ℓ hk h
 
-theorem mem_torsion_iff (u : ℤ_[ℓ]ˣ) :
-    u ∈ CommGroup.torsion ℤ_[ℓ]ˣ ↔ u ^ torsionExponent ℓ = 1 := by
+theorem mem_torsion_iff (u : ℤ_[ℓ]ˣ)
+    : u ∈ CommGroup.torsion ℤ_[ℓ]ˣ ↔ u ^ torsionExponent ℓ = 1 := by
   rw [← ker_padicUnitsLog, MonoidHom.mem_ker, padicUnitsLog_eq_one_iff]
 
-theorem mem_torsion_two_iff (u : ℤ_[2]ˣ) :
-    u ∈ CommGroup.torsion ℤ_[2]ˣ ↔ u = 1 ∨ u = -1 := by
+theorem mem_torsion_two_iff (u : ℤ_[2]ˣ) : u ∈ CommGroup.torsion ℤ_[2]ˣ ↔ u = 1 ∨ u = -1 := by
   rw [mem_torsion_iff, torsionExponent, if_pos rfl]
   constructor
   · intro h

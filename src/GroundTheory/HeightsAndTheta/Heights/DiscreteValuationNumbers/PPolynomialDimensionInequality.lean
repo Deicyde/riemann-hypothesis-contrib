@@ -13,15 +13,15 @@ universe u
 
 open Polynomial
 
-theorem PolynomialDimensionInequality.proof (h : PolynomialPrimeOverZeroHeight.Statement.{u}) :
-    PolynomialDimensionInequality.Statement.{u} := by
+theorem PolynomialDimensionInequality.proof (h : PolynomialPrimeOverZeroHeight.Statement.{u})
+    : PolynomialDimensionInequality.Statement.{u} := by
   intro A _ _ _ P _
   set p := P.under A with hp
   let I : Ideal A[X] := p.map (algebraMap A A[X])
   let Pb : Ideal (A[X] ⧸ I) := P.map (Ideal.Quotient.mk I)
   have hIP : I ≤ P := Ideal.map_comap_le
-  have hPb : Pb.IsPrime := Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective
-    (by rw [Ideal.mk_ker]; exact hIP)
+  have hPb : Pb.IsPrime :=
+    Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective (by rw [Ideal.mk_ker]; exact hIP)
 
   let x : A[X] ⧸ P := Ideal.Quotient.mk P X
   have key : ∀ f : A[X], aeval x (f.map (Ideal.Quotient.mk p)) = Ideal.Quotient.mk P f := by
@@ -44,8 +44,9 @@ theorem PolynomialDimensionInequality.proof (h : PolynomialPrimeOverZeroHeight.S
       obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective a
       rw [Ideal.mem_comap] at ha
       have he : C (Ideal.Quotient.mk p b) = e (Ideal.Quotient.mk I (C b)) := by
-        change _ = (Ideal.polynomialQuotientEquivQuotientPolynomial p).symm
-          (Ideal.Quotient.mk (p.map C) (C b))
+        change _
+          = (Ideal.polynomialQuotientEquivQuotientPolynomial p).symm
+            (Ideal.Quotient.mk (p.map C) (C b))
         rw [Ideal.polynomialQuotientEquivQuotientPolynomial_symm_mk, Polynomial.map_C]
       rw [he] at ha
       obtain ⟨y, hy, hye⟩ := (Ideal.mem_map_of_equiv e _).mp ha
@@ -57,15 +58,14 @@ theorem PolynomialDimensionInequality.proof (h : PolynomialPrimeOverZeroHeight.S
     rwa [RingEquiv.height_map] at this
   have hht : P.height ≤ p.height + Pb.height := Ideal.height_le_height_add_of_liesOver p P
   by_cases hb : Pb = ⊥
-  ·
-    have : Nontrivial (A[X] ⧸ I) := Ideal.Quotient.nontrivial_iff.mpr
-      (ne_top_of_le_ne_top (Ideal.IsPrime.ne_top inferInstance) hIP)
+  · have : Nontrivial (A[X] ⧸ I) :=
+      Ideal.Quotient.nontrivial_iff.mpr (ne_top_of_le_ne_top (Ideal.IsPrime.ne_top inferInstance)
+        hIP)
     rw [hb, Ideal.height_bot, add_zero] at hht
     have htr : Algebra.trdeg (A ⧸ p) (A[X] ⧸ P) ≤ 1 :=
       (trdeg_le_of_surjective _ hsurj).trans (Polynomial.trdeg_of_isDomain).le
     exact add_le_add (Cardinal.ofENat_le_ofENat.mpr hht) htr
-  ·
-    obtain ⟨y, hyPb, hy0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hb
+  · obtain ⟨y, hyPb, hy0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hb
     obtain ⟨f, hfP, rfl⟩ := (Ideal.mem_map_iff_of_surjective _ Ideal.Quotient.mk_surjective).mp hyPb
     have hfI : f ∉ I := fun hf => hy0 (Ideal.Quotient.eq_zero_iff_mem.mpr hf)
     have hg : f.map (Ideal.Quotient.mk p) ≠ 0 := by

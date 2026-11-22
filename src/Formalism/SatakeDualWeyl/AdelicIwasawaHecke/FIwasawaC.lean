@@ -17,11 +17,12 @@ def fIwasawaTri (r : ℕ) (M : Matrix (Fin n) (Fin n) L) : Prop :=
 
 def fIwasawaKm (M : Matrix (Fin n) (Fin n) L) : Prop := fIwasawaUn σ M ∧ fIwasawaInt M
 
-private theorem antiJ_apply_adelic_iwasawa_hecke (i j : Fin n) :
-    antiJ L n i j = if (i : ℕ) + j + 1 = n then 1 else 0 := rfl
+private theorem antiJ_apply_adelic_iwasawa_hecke (i j : Fin n)
+    : antiJ L n i j = if (i : ℕ) + j + 1 = n then 1 else 0 :=
+  rfl
 
-private theorem mul_antiJ_apply' (N : Matrix (Fin n) (Fin n) L) (i j : Fin n) :
-    (N * antiJ L n) i j = N i (Fin.rev j) := by
+private theorem mul_antiJ_apply' (N : Matrix (Fin n) (Fin n) L) (i j : Fin n)
+    : (N * antiJ L n) i j = N i (Fin.rev j) := by
   have hj := j.isLt
   rw [Matrix.mul_apply, Finset.sum_eq_single (Fin.rev j)]
   · rw [antiJ_apply_adelic_iwasawa_hecke, if_pos (by rw [Fin.val_rev]; omega), mul_one]
@@ -36,11 +37,12 @@ private theorem mul_antiJ_apply' (N : Matrix (Fin n) (Fin n) L) (i j : Fin n) :
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-private theorem cT_apply_eq_sigma_transpose (N : Matrix (Fin n) (Fin n) L) (i j : Fin n) :
-    cT σ N i j = σ (N j i) := rfl
+private theorem cT_apply_eq_sigma_transpose (N : Matrix (Fin n) (Fin n) L) (i j : Fin n)
+    : cT σ N i j = σ (N j i) :=
+  rfl
 
-private theorem cT_mul_reverse (A B : Matrix (Fin n) (Fin n) L) :
-    cT σ (A * B) = cT σ B * cT σ A := by
+private theorem cT_mul_reverse (A B : Matrix (Fin n) (Fin n) L)
+    : cT σ (A * B) = cT σ B * cT σ A := by
   unfold cT
   rw [Matrix.map_mul, Matrix.transpose_mul]
 
@@ -52,15 +54,16 @@ private theorem cT_one_eq_one : cT σ (1 : Matrix (Fin n) (Fin n) L) = 1 := by
     simp
   · rw [Matrix.one_apply_ne h, Matrix.one_apply_ne (Ne.symm h), map_zero]
 
-theorem fIwasawa_Km_mul {A B : Matrix (Fin n) (Fin n) L} (hA : fIwasawaKm σ A) (hB : fIwasawaKm σ B) :
-    fIwasawaKm σ (A * B) := by
+theorem fIwasawa_Km_mul {A B : Matrix (Fin n) (Fin n) L} (hA : fIwasawaKm σ A) (hB : fIwasawaKm σ B)
+    : fIwasawaKm σ (A * B) := by
   unfold fIwasawaKm fIwasawaUn fIwasawaInt at *
   obtain ⟨hAu, hAi⟩ := hA
   obtain ⟨hBu, hBi⟩ := hB
   refine ⟨?_, fun i j => ?_⟩
-  · calc cT σ (A * B) * antiJ L n * (A * B) = cT σ B * (cT σ A * antiJ L n * A) * B := by
-          rw [cT_mul_reverse]
-          simp only [Matrix.mul_assoc]
+  · calc
+      cT σ (A * B) * antiJ L n * (A * B) = cT σ B * (cT σ A * antiJ L n * A) * B := by
+        rw [cT_mul_reverse]
+        simp only [Matrix.mul_assoc]
       _ = antiJ L n := by rw [hAu, hBu]
   · rw [Matrix.mul_apply]
     apply Valuation.map_sum_le
@@ -77,8 +80,8 @@ theorem fIwasawa_Km_one : fIwasawaKm σ (1 : Matrix (Fin n) (Fin n) L) := by
   · rw [Matrix.one_apply_ne h, map_zero]
     exact zero_le'
 
-theorem fIwasawa_gram_un (M : Matrix (Fin n) (Fin n) L) (hM : fIwasawaUn σ M) (a b : Fin n) :
-    ∑ j, σ (M (Fin.rev j) a) * M j b = if b = Fin.rev a then 1 else 0 := by
+theorem fIwasawa_gram_un (M : Matrix (Fin n) (Fin n) L) (hM : fIwasawaUn σ M) (a b : Fin n)
+    : ∑ j, σ (M (Fin.rev j) a) * M j b = if b = Fin.rev a then 1 else 0 := by
   unfold fIwasawaUn at hM
   have h := congrFun (congrFun hM a) b
   rw [Matrix.mul_apply] at h
@@ -97,15 +100,18 @@ theorem fIwasawa_gram_un (M : Matrix (Fin n) (Fin n) L) (hM : fIwasawaUn σ M) (
     rw [Fin.val_rev]
     omega
 
-private theorem sigma_diag_mul_rev_diag_and_rev_entries_zero (M : Matrix (Fin n) (Fin n) L) (hM : fIwasawaUn σ M) (r : ℕ)
-    (hT : fIwasawaTri r M) (m : ℕ) : ∀ s : Fin n, s.val = m → s.val < r →
-      σ (M s s) * M (Fin.rev s) (Fin.rev s) = 1 ∧
-        ∀ b : Fin n, b < Fin.rev s → M (Fin.rev s) b = 0 := by
+private theorem sigma_diag_mul_rev_diag_and_rev_entries_zero
+    (M : Matrix (Fin n) (Fin n) L) (hM : fIwasawaUn σ M) (r : ℕ) (hT : fIwasawaTri r M) (m : ℕ)
+    : ∀ s : Fin n,
+      s.val = m → s.val < r
+        → σ (M s s) * M (Fin.rev s) (Fin.rev s) = 1
+          ∧ ∀ b : Fin n, b < Fin.rev s → M (Fin.rev s) b = 0 := by
   induction m using Nat.strong_induction_on with
   | _ m ih =>
     intro s hsm hs
-    have key : ∀ b : Fin n, b ≤ Fin.rev s →
-        σ (M s s) * M (Fin.rev s) b = if b = Fin.rev s then 1 else 0 := by
+    have key
+        : ∀ b : Fin n,
+          b ≤ Fin.rev s → σ (M s s) * M (Fin.rev s) b = if b = Fin.rev s then 1 else 0 := by
       intro b hb
       rw [← fIwasawa_gram_un σ M hM s b, Finset.sum_eq_single (Fin.rev s)]
       · rw [Fin.rev_rev]
@@ -138,15 +144,19 @@ private theorem sigma_diag_mul_rev_diag_and_rev_entries_zero (M : Matrix (Fin n)
     rw [if_neg (ne_of_lt hb)] at h2
     exact (mul_eq_zero.mp h2).resolve_left (left_ne_zero_of_mul_eq_one h1)
 
-theorem fIwasawa_rows (M : Matrix (Fin n) (Fin n) L) (hM : fIwasawaUn σ M) (r : ℕ)
-    (hT : fIwasawaTri r M) (s : Fin n) (hs : s.val < r) :
-    σ (M s s) * M (Fin.rev s) (Fin.rev s) = 1 ∧
-      ∀ b : Fin n, b < Fin.rev s → M (Fin.rev s) b = 0 := by
+theorem fIwasawa_rows
+    (M : Matrix (Fin n) (Fin n) L) (hM : fIwasawaUn σ M)
+    (r : ℕ) (hT : fIwasawaTri r M)
+    (s : Fin n) (hs : s.val < r)
+    : σ (M s s) * M (Fin.rev s) (Fin.rev s) = 1
+      ∧ ∀ b : Fin n, b < Fin.rev s → M (Fin.rev s) b = 0 := by
   exact sigma_diag_mul_rev_diag_and_rev_entries_zero σ M hM r hT s.val s rfl hs
 
-theorem fIwasawa_col_zero (M : Matrix (Fin n) (Fin n) L) (hM : fIwasawaUn σ M) (r : ℕ)
-    (hT : fIwasawaTri r M) (ρ : Fin n) (hρr : ρ.val = r) (hρ : ρ < Fin.rev ρ) :
-    ∀ i, Fin.rev ρ < i → M i ρ = 0 := by
+theorem fIwasawa_col_zero
+    (M : Matrix (Fin n) (Fin n) L) (hM : fIwasawaUn σ M)
+    (r : ℕ) (hT : fIwasawaTri r M)
+    (ρ : Fin n) (hρr : ρ.val = r) (hρ : ρ < Fin.rev ρ)
+    : ∀ i, Fin.rev ρ < i → M i ρ = 0 := by
   intro i hi
   have hi' := i.isLt
   have hρ' := ρ.isLt
@@ -154,17 +164,20 @@ theorem fIwasawa_col_zero (M : Matrix (Fin n) (Fin n) L) (hM : fIwasawaUn σ M) 
     rw [Fin.val_rev, ← hρr]
     rw [Fin.lt_def, Fin.val_rev] at hi
     omega
-  have h := (fIwasawa_rows σ M hM r hT (Fin.rev i) hs).2 ρ (by rw [Fin.rev_rev]; exact lt_trans hρ hi)
+  have h :=
+    (fIwasawa_rows σ M hM r hT (Fin.rev i) hs).2 ρ (by rw [Fin.rev_rev]; exact lt_trans hρ hi)
   rwa [Fin.rev_rev] at h
 
-theorem fIwasawa_iso (M : Matrix (Fin n) (Fin n) L) (hM : fIwasawaUn σ M) (ρ : Fin n)
-    (hρ : ρ < Fin.rev ρ) : ∑ j, σ (M (Fin.rev j) ρ) * M j ρ = 0 := by
+theorem fIwasawa_iso
+    (M : Matrix (Fin n) (Fin n) L) (hM : fIwasawaUn σ M) (ρ : Fin n) (hρ : ρ < Fin.rev ρ)
+    : ∑ j, σ (M (Fin.rev j) ρ) * M j ρ = 0 := by
   rw [fIwasawa_gram_un σ M hM ρ ρ, if_neg (ne_of_lt hρ)]
 
-theorem fIwasawa_perm (ρ a : Fin n) (hρ : ρ < Fin.rev ρ) (ha1 : ρ ≤ a) (ha2 : a ≤ Fin.rev ρ)
-    (haa : a ≠ Fin.rev a) :
-    ∃ π : Equiv.Perm (Fin n), π ρ = a ∧ (∀ i, π (Fin.rev i) = Fin.rev (π i)) ∧
-      (∀ i, (i < ρ ∨ Fin.rev ρ < i) → π i = i) := by
+theorem fIwasawa_perm
+    (ρ a : Fin n) (hρ : ρ < Fin.rev ρ) (ha1 : ρ ≤ a) (ha2 : a ≤ Fin.rev ρ) (haa : a ≠ Fin.rev a)
+    : ∃ π : Equiv.Perm (Fin n),
+      π ρ = a ∧ (∀ i, π (Fin.rev i) = Fin.rev (π i))
+        ∧ (∀ i, (i < ρ ∨ Fin.rev ρ < i) → π i = i) := by
   have hρn := ρ.isLt
   have han := a.isLt
   have haa' : a.val ≠ (Fin.rev a).val := fun h => haa (Fin.ext h)
@@ -175,19 +188,30 @@ theorem fIwasawa_perm (ρ a : Fin n) (hρ : ρ < Fin.rev ρ) (ha1 : ρ ≤ a) (h
     refine ⟨Equiv.swap ρ (Fin.rev ρ), Equiv.swap_apply_left _ _, fun i => ?_, fun i hi => ?_⟩
     · have hin := i.isLt
       simp only [Equiv.swap_apply_def]
-      split_ifs <;> (simp only [Fin.rev_rev, Fin.ext_iff, Fin.val_rev, Fin.lt_def, Fin.le_def] at * <;> omega)
+      split_ifs <;> (
+        simp only [Fin.rev_rev, Fin.ext_iff, Fin.val_rev, Fin.lt_def, Fin.le_def] at * <;> omega
+      )
     · have hin := i.isLt
       simp only [Equiv.swap_apply_def]
-      split_ifs <;> (simp only [Fin.rev_rev, Fin.ext_iff, Fin.val_rev, Fin.lt_def, Fin.le_def] at * <;> omega)
+      split_ifs <;> (
+        simp only [Fin.rev_rev, Fin.ext_iff, Fin.val_rev, Fin.lt_def, Fin.le_def] at * <;> omega
+      )
   · refine ⟨Equiv.swap ρ a * Equiv.swap (Fin.rev ρ) (Fin.rev a), ?_, fun i => ?_, fun i hi => ?_⟩
     · simp only [Equiv.Perm.mul_apply, Equiv.swap_apply_def]
-      split_ifs <;> (simp only [Fin.rev_rev, Fin.ext_iff, Fin.val_rev, Fin.lt_def, Fin.le_def] at * <;> (try simp only [not_true_eq_false] at *) <;> omega)
+      split_ifs <;> (
+        simp only [Fin.rev_rev, Fin.ext_iff, Fin.val_rev, Fin.lt_def, Fin.le_def] at *
+          <;> (try simp only [not_true_eq_false] at *) <;> omega
+      )
     · have hin := i.isLt
       simp only [Equiv.Perm.mul_apply, Equiv.swap_apply_def]
-      split_ifs <;> (simp only [Fin.rev_rev, Fin.ext_iff, Fin.val_rev, Fin.lt_def, Fin.le_def] at * <;> omega)
+      split_ifs <;> (
+        simp only [Fin.rev_rev, Fin.ext_iff, Fin.val_rev, Fin.lt_def, Fin.le_def] at * <;> omega
+      )
     · have hin := i.isLt
       simp only [Equiv.Perm.mul_apply, Equiv.swap_apply_def]
-      split_ifs <;> (simp only [Fin.rev_rev, Fin.ext_iff, Fin.val_rev, Fin.lt_def, Fin.le_def] at * <;> omega)
+      split_ifs <;> (
+        simp only [Fin.rev_rev, Fin.ext_iff, Fin.val_rev, Fin.lt_def, Fin.le_def] at * <;> omega
+      )
 
 end FIwasawaRed
 

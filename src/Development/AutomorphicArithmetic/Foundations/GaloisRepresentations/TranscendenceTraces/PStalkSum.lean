@@ -5,20 +5,21 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-private theorem length_congr {R S : Type} [CommRing R] [CommRing S] (e : R ≃+* S) :
-    Module.length R R = Module.length S S := by
+private theorem length_congr {R S : Type} [CommRing R] [CommRing S] (e : R ≃+* S)
+    : Module.length R R = Module.length S S := by
   have : RingHomSurjective (e : R →+* S) := ⟨e.surjective⟩
-  let f : R →ₛₗ[(e : R →+* S)] S :=
-    { toFun := e
-      map_add' := e.map_add
-      map_smul' := fun a b => by simp [smul_eq_mul] }
+  let f : R →ₛₗ[(e : R →+* S)] S := {
+    toFun := e
+    map_add' := e.map_add
+    map_smul' := fun a b => by simp [smul_eq_mul]
+  }
   rw [Module.length, Module.length, WithBot.unbot_inj]
   exact Order.krullDim_eq_of_orderIso (Submodule.orderIsoMapComapOfBijective f e.bijective)
 
-theorem UpperTheory.Gal.TranscendenceTraces.stalkSum_of :
-    Chart → ArtSum → StalkSum := by
+theorem UpperTheory.Gal.TranscendenceTraces.stalkSum_of : Chart → ArtSum → StalkSum := by
   intro hC hA V Ω _ _ r _
   obtain ⟨B, _, _, v, hfin, hpb⟩ := hC r Ω (𝟙 (gp Ω))
   have hv : IsIso v := hpb.isIso_fst_of_isIso
@@ -36,8 +37,8 @@ theorem UpperTheory.Gal.TranscendenceTraces.stalkSum_of :
     rfl
   have hs : ∀ P : PrimeSpectrum B, IsIso (v.stalkMap P) :=
     (IsOpenImmersion.iff_isIso_stalkMap (f := v)).mp inferInstance |>.2
-  have e2 : ∀ P : PrimeSpectrum B,
-      V.presheaf.stalk (v P) ≃+* Localization.AtPrime P.asIdeal := fun P =>
+  have e2
+      : ∀ P : PrimeSpectrum B, V.presheaf.stalk (v P) ≃+* Localization.AtPrime P.asIdeal := fun P =>
     ((asIso (v.stalkMap P)) ≪≫ Spec.stalkIso (CommRingCat.of B) P).commRingCatIsoToRingEquiv
   rw [hR, ← hA Ω B, ← finsum_comp_equiv v.homeomorph.toEquiv]
   refine finsum_congr fun P => ?_

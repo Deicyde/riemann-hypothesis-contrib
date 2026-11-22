@@ -86,7 +86,8 @@ lemma eta_six_slash_root_of_unity (γ : SL(2, ℤ)) : ∃ c : ℂ, c ^ 4 = 1 ∧
     conv_rhs => rw [this]
     rw [smul_smul, inv_mul_cancel₀ ha0, one_smul]
 
-def eta6MultiplierFunction (γ : SL(2, ℤ)) : ℂ := (eta6 ∣[(3 : ℤ)] γ) UpperHalfPlane.I / eta6 UpperHalfPlane.I
+def eta6MultiplierFunction (γ : SL(2, ℤ)) : ℂ :=
+  (eta6 ∣[(3 : ℤ)] γ) UpperHalfPlane.I / eta6 UpperHalfPlane.I
 
 lemma eta6Mult0_eq {γ : SL(2, ℤ)} {c : ℂ} (h : eta6 ∣[(3 : ℤ)] γ = c • eta6) : eta6MultiplierFunction γ = c := by
   simp [eta6MultiplierFunction, h, eta_six_ne_zero]
@@ -98,8 +99,10 @@ lemma eta_six_slash_multiplier (γ : SL(2, ℤ)) : eta6 ∣[(3 : ℤ)] γ = eta6
 def eta6Mult : SL(2, ℤ) →* ℂ where
   toFun := eta6MultiplierFunction
   map_one' := eta6Mult0_eq (by simp)
-  map_mul' x y := eta6Mult0_eq (by
-    rw [SlashAction.slash_mul, eta_six_slash_multiplier, SL_smul_slash, eta_six_slash_multiplier, smul_smul])
+  map_mul' x y :=
+    eta6Mult0_eq (by
+      rw [SlashAction.slash_mul, eta_six_slash_multiplier, SL_smul_slash, eta_six_slash_multiplier,
+        smul_smul])
 
 lemma eta6Mult_T_eq_I : eta6Mult ModularGroup.T = Complex.I := eta6Mult0_eq eta6_slash_three_T_eq_I_smul
 

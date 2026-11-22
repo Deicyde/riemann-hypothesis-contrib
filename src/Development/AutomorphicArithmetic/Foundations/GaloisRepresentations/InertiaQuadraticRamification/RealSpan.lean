@@ -5,11 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published
+open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published
 open UpperTheory.Gal.UnramifiedFromSplittingCriterion
 
-theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.realSpan :
-    RealSpan := by
+theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.realSpan : RealSpan := by
   intro E M Ω F _ _ _ _ _ _ _ _ _ _ _ _ _ g hE hR
   have hnot : ∃ e : E, algebraMap E M e ∉ maximalRealSubfield M := by
     by_contra h
@@ -25,8 +25,9 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.realSpan :
   have h2 : Module.finrank (maximalRealSubfield M) M = 2 :=
     Algebra.IsQuadraticExtension.finrank_eq_two _ _
   have htop : IntermediateField.adjoin (maximalRealSubfield M) {α} = ⊤ := by
-    have hd := IntermediateField.finrank_dvd_of_le_right
-      (le_top : IntermediateField.adjoin (maximalRealSubfield M) {α} ≤ ⊤)
+    have hd :=
+      IntermediateField.finrank_dvd_of_le_right
+        (le_top : IntermediateField.adjoin (maximalRealSubfield M) {α} ≤ ⊤)
     rw [IntermediateField.finrank_top', h2, Nat.dvd_prime Nat.prime_two] at hd
     rcases hd with hd | hd
     · rw [IntermediateField.finrank_eq_one_iff] at hd
@@ -42,8 +43,9 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.realSpan :
     exact IntermediateField.mem_top
   have hx' : x ∈ (IntermediateField.adjoin (maximalRealSubfield M) {α}).toSubfield := hx
   rw [IntermediateField.adjoin_toSubfield] at hx'
-  have hle : Subfield.closure (Set.range (algebraMap (maximalRealSubfield M) M) ∪ {α}) ≤
-      RingHom.eqLocusField ((g : Ω →+* Ω).comp (algebraMap M Ω)) (algebraMap M Ω) := by
+  have hle
+      : Subfield.closure (Set.range (algebraMap (maximalRealSubfield M) M) ∪ {α})
+        ≤ RingHom.eqLocusField ((g : Ω →+* Ω).comp (algebraMap M Ω)) (algebraMap M Ω) := by
     rw [Subfield.closure_le]
     rintro y (⟨z, rfl⟩ | hy)
     · exact hR z

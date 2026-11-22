@@ -25,12 +25,11 @@ section Reduction
 variable {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)]
 variable (p : ℕ) [Fact p.Prime]
 
-
-theorem map_red {W : Ideal (Geo.MRing ι)} (hW : Geo.IsMultiProjPrime W)
-    (hpW : (C (p : ℤ) : Geo.MRing ι) ∈ W) (n : ℕ)
-    (hdim : ringKrullDim (Geo.MRing ι ⧸ W) = ((n + Fintype.card K : ℕ) : WithBot ℕ∞)) :
-    NumbersDVR.IsMultiProjPrime (W.map (Bridge.GeoNum.red p)) ∧
-      FieldNumbers.relDim (W.map (Bridge.GeoNum.red p)) = ((n : ℕ) : WithBot (WithTop ℤ)) := by
+theorem map_red
+    {W : Ideal (Geo.MRing ι)} (hW : Geo.IsMultiProjPrime W) (hpW : (C (p : ℤ) : Geo.MRing ι) ∈ W)
+    (n : ℕ) (hdim : ringKrullDim (Geo.MRing ι ⧸ W) = ((n + Fintype.card K : ℕ) : WithBot ℕ∞))
+    : NumbersDVR.IsMultiProjPrime (W.map (Bridge.GeoNum.red p))
+      ∧ FieldNumbers.relDim (W.map (Bridge.GeoNum.red p)) = ((n : ℕ) : WithBot (WithTop ℤ)) := by
   have hker : RingHom.ker (Bridge.GeoNum.red (ι := ι) p) ≤ W := by
     rw [Bridge.GeoNum.ker_red, Ideal.span_le, Set.singleton_subset_iff]
     exact hpW

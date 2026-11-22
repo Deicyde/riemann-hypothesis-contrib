@@ -11,16 +11,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CharacterLe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Matrix IsLocalRing
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Matrix
+  IsLocalRing
 open UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.Alg UpperTheory.V.U3
 
-private theorem place_uniq {l : ℕ} (hl : l.Prime) (v w : HeightOneSpectrum (𝓞 ℚ)) (hv : (l : 𝓞 ℚ) ∈ v.asIdeal)
-    (hw : (l : 𝓞 ℚ) ∈ w.asIdeal) : v = w := by
+private theorem place_uniq
+    {l : ℕ} (hl : l.Prime)
+    (v w : HeightOneSpectrum (𝓞 ℚ)) (hv : (l : 𝓞 ℚ) ∈ v.asIdeal) (hw : (l : 𝓞 ℚ) ∈ w.asIdeal)
+    : v = w := by
   let e : 𝓞 ℚ ≃+* ℤ := Rat.ringOfIntegersEquiv
   have hmax : (Ideal.span {(l : ℤ)}).IsMaximal :=
     PrincipalIdealRing.isMaximal_of_irreducible (Nat.prime_iff_prime_int.mp hl).irreducible
-  have key : ∀ u : HeightOneSpectrum (𝓞 ℚ), (l : 𝓞 ℚ) ∈ u.asIdeal →
-      Ideal.span {(l : ℤ)} = u.asIdeal.map (e : 𝓞 ℚ →+* ℤ) := by
+  have key
+      : ∀ u : HeightOneSpectrum (𝓞 ℚ),
+        (l : 𝓞 ℚ) ∈ u.asIdeal → Ideal.span {(l : ℤ)} = u.asIdeal.map (e : 𝓞 ℚ →+* ℤ) := by
     intro u hu
     apply hmax.eq_of_le
     · rw [Ideal.map_comap_of_equiv]
@@ -30,14 +34,19 @@ private theorem place_uniq {l : ℕ} (hl : l.Prime) (v w : HeightOneSpectrum (�
       rw [← hel]
       exact Ideal.mem_map_of_mem _ hu
   apply HeightOneSpectrum.ext
-  rw [← Ideal.map_of_equiv (I := v.asIdeal) e, ← Ideal.map_of_equiv (I := w.asIdeal) e, ← key v hv, ← key w hw]
+  rw [← Ideal.map_of_equiv (I := v.asIdeal) e, ← Ideal.map_of_equiv (I := w.asIdeal) e, ← key v hv,
+    ← key w hw]
 
-theorem UpperTheory.exists_finite_place_set_factoring_through_GS :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K] [Algebra K Ω]
-          {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ} {ψ : DirichletCharacter c.O N} (D : Dat Ω K c e ψ),
-          ∃ (S : Finset (HeightOneSpectrum (𝓞 ℚ))) (A : S → ValuationSubring Ω) (v₀ : S) (η' : GS Ω (S : Set (HeightOneSpectrum (𝓞 ℚ))) →* ℤˣ) (Ψ' : GS Ω (S : Set (HeightOneSpectrum (𝓞 ℚ))) →* c.Oˣ),
-            ContainsAbove S l ∧ (∀ v, IsPlaceOver (A v) v.1) ∧ D.ι.range = Dec (F := ℚ) (A v₀) ∧ (∀ v : S, ((l : ℕ) : 𝓞 ℚ) ∈ v.1.asIdeal ↔ v = v₀) ∧
-            η'.comp (toGS Ω _) = D.η ∧ Ψ'.comp (toGS Ω _) = D.Ψ := by
+theorem UpperTheory.exists_finite_place_set_factoring_through_GS
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K]
+        [Algebra K Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ}
+        {ψ : DirichletCharacter c.O N} (D : Dat Ω K c e ψ),
+      ∃ (S : Finset (HeightOneSpectrum (𝓞 ℚ))) (A : S → ValuationSubring Ω) (v₀ : S)
+          (η' : GS Ω (S : Set (HeightOneSpectrum (𝓞 ℚ))) →* ℤˣ)
+          (Ψ' : GS Ω (S : Set (HeightOneSpectrum (𝓞 ℚ))) →* c.Oˣ),
+        ContainsAbove S l ∧ (∀ v, IsPlaceOver (A v) v.1) ∧ D.ι.range = Dec (F := ℚ) (A v₀)
+          ∧ (∀ v : S, ((l : ℕ) : 𝓞 ℚ) ∈ v.1.asIdeal ↔ v = v₀) ∧ η'.comp (toGS Ω _) = D.η
+          ∧ Ψ'.comp (toGS Ω _) = D.Ψ := by
   intro Ω _ _ _ K _ _ _ l _ c N _ e ψ D
   classical
   have hlp : l.Prime := Fact.out
@@ -46,15 +55,19 @@ theorem UpperTheory.exists_finite_place_set_factoring_through_GS :
   have hηopen : IsOpen (D.η.ker : Set (G ℚ Ω)) := by
     rw [D.η_ker]
     let b := Module.finBasis ℚ K
-    have heq : (galOf ℚ K Ω : Set (G ℚ Ω)) = ⋂ i, {σ : G ℚ Ω | σ (algebraMap K Ω (b i)) = algebraMap K Ω (b i)} := by
+    have heq
+        : (galOf ℚ K Ω : Set (G ℚ Ω))
+          = ⋂ i, {σ : G ℚ Ω | σ (algebraMap K Ω (b i)) = algebraMap K Ω (b i)} := by
       ext σ
       simp only [Set.mem_iInter, Set.mem_setOf_eq, SetLike.mem_coe, mem_galOf]
       refine ⟨fun h i => h _, fun h x => ?_⟩
-      have h' := b.ext (f₁ := σ.toLinearMap ∘ₗ (IsScalarTower.toAlgHom ℚ K Ω).toLinearMap)
-        (f₂ := (IsScalarTower.toAlgHom ℚ K Ω).toLinearMap) h
+      have h' :=
+        b.ext (f₁ := σ.toLinearMap ∘ₗ (IsScalarTower.toAlgHom ℚ K Ω).toLinearMap)
+          (f₂ := (IsScalarTower.toAlgHom ℚ K Ω).toLinearMap) h
       exact LinearMap.congr_fun h' x
     rw [heq]
-    exact isOpen_iInter_of_finite fun i => isOpen_setOf_apply (F := ℚ) _ (fun t => t = algebraMap K Ω (b i))
+    exact isOpen_iInter_of_finite fun i =>
+      isOpen_setOf_apply (F := ℚ) _ (fun t => t = algebraMap K Ω (b i))
   obtain ⟨⟨T, hT⟩, -⟩ := ramFinite ℚ ℚ K Ω
   have hlN0 : ((l * N : ℕ) : 𝓞 ℚ) ≠ 0 :=
     Nat.cast_ne_zero.mpr (Nat.mul_ne_zero hlp.ne_zero (NeZero.ne N))
@@ -64,14 +77,19 @@ theorem UpperTheory.exists_finite_place_set_factoring_through_GS :
   have hmemS : ∀ v : HeightOneSpectrum (𝓞 ℚ), ((l * N : ℕ) : 𝓞 ℚ) ∈ v.asIdeal → v ∈ S := by
     intro v hv
     apply Finset.mem_union_right
-    rw [Set.Finite.mem_toFinset, Set.mem_setOf_eq, Ideal.dvd_iff_le, Ideal.span_singleton_le_iff_mem]
+    rw [Set.Finite.mem_toFinset, Set.mem_setOf_eq, Ideal.dvd_iff_le,
+      Ideal.span_singleton_le_iff_mem]
     exact hv
   have hcast : ∀ n : ℕ, algebraMap ℚ Ω (((n : 𝓞 ℚ)) : ℚ) = (n : Ω) := fun n => by simp
-  have hlv : ∀ v : HeightOneSpectrum (𝓞 ℚ), ((l : ℕ) : 𝓞 ℚ) ∈ v.asIdeal → ((l * N : ℕ) : 𝓞 ℚ) ∈ v.asIdeal := by
+  have hlv
+      : ∀ v : HeightOneSpectrum (𝓞 ℚ),
+        ((l : ℕ) : 𝓞 ℚ) ∈ v.asIdeal → ((l * N : ℕ) : 𝓞 ℚ) ∈ v.asIdeal := by
     intro v hv
     rw [Nat.cast_mul]
     exact Ideal.mul_mem_right _ _ hv
-  have hNv : ∀ v : HeightOneSpectrum (𝓞 ℚ), ((N : ℕ) : 𝓞 ℚ) ∈ v.asIdeal → ((l * N : ℕ) : 𝓞 ℚ) ∈ v.asIdeal := by
+  have hNv
+      : ∀ v : HeightOneSpectrum (𝓞 ℚ),
+        ((N : ℕ) : 𝓞 ℚ) ∈ v.asIdeal → ((l * N : ℕ) : 𝓞 ℚ) ∈ v.asIdeal := by
     intro v hv
     rw [Nat.cast_mul]
     exact Ideal.mul_mem_left _ _ hv
@@ -123,7 +141,8 @@ theorem UpperTheory.exists_finite_place_set_factoring_through_GS :
     have h2 : Chr.cls ℚ Ω N g = 1 := hH.1.2
     rw [MonoidHom.mem_ker]
     simp [Dat.Ψ, Chr.Psi, chiO, Chr.dirG, h1, h2]
-  refine ⟨S, A, v₀', QuotientGroup.lift _ D.η hηk, QuotientGroup.lift _ D.Ψ hΨk, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  refine
+    ⟨S, A, v₀', QuotientGroup.lift _ D.η hηk, QuotientGroup.lift _ D.Ψ hΨk, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · intro v hv
     exact hmemS v (hlv v hv)
   · intro v

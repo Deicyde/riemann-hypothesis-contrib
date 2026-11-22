@@ -15,11 +15,12 @@ open MvPolynomial MeasureTheory
 
 noncomputable section
 
-theorem ConeMeetNull.null_of_mem_not_mem (hZ : ZeroLocusDimH.Statement) {n e : ℕ} (h : HermNorm n)
-    (W W' : Ideal (MvPolynomial (Fin n) ℂ)) [W.IsPrime]
+theorem ConeMeetNull.null_of_mem_not_mem
+    (hZ : ZeroLocusDimH.Statement)
+    {n e : ℕ} (h : HermNorm n) (W W' : Ideal (MvPolynomial (Fin n) ℂ)) [W.IsPrime]
     (hW : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ W) ≤ ((e + 1 : ℕ) : WithBot ℕ∞))
-    (g : MvPolynomial (Fin n) ℂ) (hgW' : g ∈ W') (hgW : g ∉ W) :
-    Measure.hausdorffMeasure ((2 * (e + 1) : ℕ) : ℝ) (coneBall h W ∩ coneBall h W') = 0 := by
+    (g : MvPolynomial (Fin n) ℂ) (hgW' : g ∈ W') (hgW : g ∉ W)
+    : Measure.hausdorffMeasure ((2 * (e + 1) : ℕ) : ℝ) (coneBall h W ∩ coneBall h W') = 0 := by
   set J : Ideal (MvPolynomial (Fin n) ℂ) := W ⊔ Ideal.span {g} with hJ
 
   have hdim : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) ≤ (e : ℕ) :=
@@ -58,8 +59,7 @@ theorem ConeMeetNull.null_of_mem_not_mem (hZ : ZeroLocusDimH.Statement) {n e : �
 theorem ConeMeetNull.proof (hZ : ZeroLocusDimH.Statement) : ConeMeetNull.Statement := by
   intro n e h W W' hWp hW'p hne hW hW'
   by_cases hle : W' ≤ W
-  ·
-    have hnle : ¬ W ≤ W' := fun h' => hne (le_antisymm h' hle)
+  · have hnle : ¬ W ≤ W' := fun h' => hne (le_antisymm h' hle)
     obtain ⟨g, hgW, hgW'⟩ := Set.not_subset.mp hnle
     rw [Set.inter_comm]
     exact ConeMeetNull.null_of_mem_not_mem hZ h W' W hW' g hgW hgW'

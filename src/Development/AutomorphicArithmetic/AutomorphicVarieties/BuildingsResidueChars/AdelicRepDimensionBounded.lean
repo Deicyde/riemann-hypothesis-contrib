@@ -5,22 +5,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 @[expose] public section
 
 open UpperTheory.V.Af.BA in
-theorem UpperTheory.adelic_rep_dimension_bounded :
-    UpperTheory.V.Af.BA.DimBdd := by
+theorem UpperTheory.adelic_rep_dimension_bounded : UpperTheory.V.Af.BA.DimBdd := by
   classical
   unfold UpperTheory.V.Af.BA.DimBdd
   intro Γ I _ _ K hfin hstab0
-  have hre : ∀ {p q : ℕ} (f : Fin (p+1) → Fin (q+1)) (t : K.Tup q) (g : Γ),
-      g • t = t → g • K.re f t = K.re f t := by
+  have hre
+      : ∀ {p q : ℕ} (f : Fin (p + 1) → Fin (q + 1)) (t : K.Tup q) (g : Γ),
+        g • t = t → g • K.re f t = K.re f t := by
     intro p q f t g hg
     show K.re f (g • t) = K.re f t
     rw [hg]
   have hst : ∀ (p : ℕ) (t : K.Tup p), Finite ↥(MulAction.stabilizer Γ t) := by
     intro p t
     haveI := hstab0 (K.re (fun _ : Fin 1 => (0 : Fin (p+1))) t)
-    have hle : MulAction.stabilizer Γ t ≤
-        MulAction.stabilizer Γ (K.re (fun _ : Fin 1 => (0 : Fin (p+1))) t) :=
-      fun g hg => hre _ t g hg
+    have hle
+        : MulAction.stabilizer Γ t
+          ≤ MulAction.stabilizer Γ (K.re (fun _ : Fin 1 => (0 : Fin (p + 1))) t) := fun g hg =>
+      hre _ t g hg
     exact Finite.of_injective _ (Subgroup.inclusion_injective hle)
   refine ⟨hst, ?_⟩
   obtain ⟨R, hRfin, hR⟩ := hfin
@@ -29,13 +30,13 @@ theorem UpperTheory.adelic_rep_dimension_bounded :
   haveI : ∀ r : ↥R, Finite ↥(MulAction.stabilizer Γ (V r.1)) := fun r => hstab0 _
   refine ⟨Nat.card (Σ r : ↥R, ↥(MulAction.stabilizer Γ (V r.1))), ?_⟩
   intro p hp t ht
-  let v : K.Tup 0 := K.re (fun _ : Fin 1 => (0 : Fin (p+1))) t
-  let e : Fin (p+1) → K.Tup 1 := fun j => K.re (![0, j] : Fin 2 → Fin (p+1)) t
+  let v : K.Tup 0 := K.re (fun _ : Fin 1 => (0 : Fin (p + 1))) t
+  let e : Fin (p + 1) → K.Tup 1 := fun j => K.re (![0, j] : Fin 2 → Fin (p + 1)) t
   have hev : ∀ j, V (e j) = v := fun j => Subtype.ext (funext fun _ => rfl)
   let k : ↥R → Γ := fun r => if h : ∃ g : Γ, g • v = V r.1 then Classical.choose h else 1
-  let gsel : Fin (p+1) → Γ := fun j => Classical.choose (hR (e j))
+  let gsel : Fin (p + 1) → Γ := fun j => Classical.choose (hR (e j))
   have hgsel : ∀ j, gsel j • e j ∈ R := fun j => Classical.choose_spec (hR (e j))
-  let rsel : Fin (p+1) → ↥R := fun j => ⟨gsel j • e j, hgsel j⟩
+  let rsel : Fin (p + 1) → ↥R := fun j => ⟨gsel j • e j, hgsel j⟩
   have hgv : ∀ j, gsel j • v = V (rsel j).1 := by
     intro j
     show gsel j • v = gsel j • V (e j)
@@ -53,10 +54,10 @@ theorem UpperTheory.adelic_rep_dimension_bounded :
       rw [inv_smul_eq_iff]
       exact (hk j).symm
     rw [h1, hgv j]
-  let φ : Fin (p+1) → Σ r : ↥R, ↥(MulAction.stabilizer Γ (V r.1)) :=
-    fun j => ⟨rsel j, ⟨gsel j * (k (rsel j))⁻¹, hmem j⟩⟩
-  let ψ : (Σ r : ↥R, ↥(MulAction.stabilizer Γ (V r.1))) → K.Tup 1 :=
-    fun x => ((x.2 : Γ) * k x.1)⁻¹ • x.1.1
+  let φ : Fin (p + 1) → Σ r : ↥R, ↥(MulAction.stabilizer Γ (V r.1)) := fun j =>
+    ⟨rsel j, ⟨gsel j * (k (rsel j))⁻¹, hmem j⟩⟩
+  let ψ : (Σ r : ↥R, ↥(MulAction.stabilizer Γ (V r.1))) → K.Tup 1 := fun x =>
+    ((x.2 : Γ) * k x.1)⁻¹ • x.1.1
   have hψ : ∀ j, ψ (φ j) = e j := by
     intro j
     show ((gsel j * (k (rsel j))⁻¹) * k (rsel j))⁻¹ • (gsel j • e j) = e j

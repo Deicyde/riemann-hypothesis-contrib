@@ -6,16 +6,16 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem card_le_of_double_annihilator (O : Type) [CommRing O] (X Y E : Type) [AddCommGroup X]
-    [Module O X] [AddCommGroup Y] [Module O Y] [AddCommGroup E] [Module O E] [Finite X]
+theorem card_le_of_double_annihilator
+    (O : Type) [CommRing O]
+    (X Y E : Type) [AddCommGroup X] [Module O X] [AddCommGroup Y] [Module O Y] [AddCommGroup E]
+    [Module O E] [Finite X]
     (β : Y →ₗ[O] X →ₗ[O] E) (S : Submodule O X) (F : Finset Y) (Es : Finset E) (a : O)
     (h1 : ∀ c, (∀ y, (∀ s ∈ S, β y s = 0) → β y c = 0) → c ∈ S)
-    (h2 : ∀ y, (∀ s ∈ S, β y s = 0) → y ∈ F ∧ a • y = 0)
-    (h3 : ∀ e : E, a • e = 0 → e ∈ Es) :
-    Nat.card X ≤ Es.card ^ F.card * Nat.card S := by
+    (h2 : ∀ y, (∀ s ∈ S, β y s = 0) → y ∈ F ∧ a • y = 0) (h3 : ∀ e : E, a • e = 0 → e ∈ Es)
+    : Nat.card X ≤ Es.card ^ F.card * Nat.card S := by
   classical
-  let L : X →ₗ[O] (F → E) :=
-    LinearMap.pi fun y => if (∀ s ∈ S, β (y : Y) s = 0) then β y else 0
+  let L : X →ₗ[O] (F → E) := LinearMap.pi fun y => if (∀ s ∈ S, β (y : Y) s = 0) then β y else 0
   have hL : ∀ x (y : F), L x y = if (∀ s ∈ S, β (y : Y) s = 0) then β y x else 0 := by
     intro x y
     simp only [L, LinearMap.pi_apply]
@@ -43,10 +43,12 @@ theorem card_le_of_double_annihilator (O : Type) [CommRing O] (X Y E : Type) [Ad
     split_ifs with h
     · rw [← LinearMap.smul_apply, ← map_smul, (h2 y h).2, map_zero, LinearMap.zero_apply]
     · exact smul_zero a
-  let g : X ⧸ S → (F → Es) := fun q y =>
-    ⟨S.liftQ L hS q y, by
+  let g : X ⧸ S → (F → Es) := fun q y => ⟨
+    S.liftQ L hS q y,
+    by
       induction q using Submodule.Quotient.induction_on with
-      | H x => simpa using hmem x y⟩
+      | H x => simpa using hmem x y
+  ⟩
   have hinj : Function.Injective g := by
     intro q r hqr
     have h' : S.liftQ L hS q = S.liftQ L hS r := by

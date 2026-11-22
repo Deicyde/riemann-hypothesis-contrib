@@ -14,10 +14,11 @@ open Formalism.L2.Th1.CM Formalism.ELL WeierstrassCurve
 open Formalism.L2.Th1.E (px py IntCurve)
 open Formalism.L2.Th1.A (shortW)
 
-theorem chord_identity {C : Type} [Field C] (W : WeierstrassCurve C) (h1 : W.a₁ = 0) (h2 : W.a₂ = 0)
-    (h3 : W.a₃ = 0) (A B : W.toAffine.Point) (hA : A ≠ 0) (hB : B ≠ 0) (hs : A + B ≠ 0)
-    (hd : A - B ≠ 0) :
-    (px W A - px W B) ^ 2 * (px W (A + B) - px W (A - B)) = -4 * py W A * py W B := by
+theorem chord_identity
+    {C : Type} [Field C]
+    (W : WeierstrassCurve C) (h1 : W.a₁ = 0) (h2 : W.a₂ = 0) (h3 : W.a₃ = 0)
+    (A B : W.toAffine.Point) (hA : A ≠ 0) (hB : B ≠ 0) (hs : A + B ≠ 0) (hd : A - B ≠ 0)
+    : (px W A - px W B) ^ 2 * (px W (A + B) - px W (A - B)) = -4 * py W A * py W B := by
   rw [sub_eq_add_neg A B]
   rcases A with _ | ⟨xA, yA, hA'⟩
   · exact absurd rfl hA
@@ -48,10 +49,11 @@ theorem chord_identity {C : Type} [Field C] (W : WeierstrassCurve C) (h1 : W.a�
 
 variable {C : Type} [NormedField C] [IsUltrametricDist C]
 
-theorem norm_x_sub_le_of_formalGroup (W : WeierstrassCurve C) (h1 : W.a₁ = 0) (h2 : W.a₂ = 0) (h3 : W.a₃ = 0)
-    (hW : IntegralModel W) (A B : W.toAffine.Point) (hA : A ≠ 0) (hB : B ≠ 0)
-    (hAy : ‖py W A‖ ≤ 1) (hBy : ‖py W B‖ ≤ 1) (hs : A + B ≠ 0) (hsx : ‖px W (A + B)‖ ≤ 1)
-    (hd : A - B ≠ 0) (hdx : InFormalGroupPoints (A - B)) : ‖px W A - px W B‖ ≤ ‖uOf (A - B)‖ := by
+theorem norm_x_sub_le_of_formalGroup
+    (W : WeierstrassCurve C) (h1 : W.a₁ = 0) (h2 : W.a₂ = 0) (h3 : W.a₃ = 0) (hW : IntegralModel W)
+    (A B : W.toAffine.Point) (hA : A ≠ 0) (hB : B ≠ 0) (hAy : ‖py W A‖ ≤ 1) (hBy : ‖py W B‖ ≤ 1)
+    (hs : A + B ≠ 0) (hsx : ‖px W (A + B)‖ ≤ 1) (hd : A - B ≠ 0) (hdx : InFormalGroupPoints (A - B))
+    : ‖px W A - px W B‖ ≤ ‖uOf (A - B)‖ := by
   obtain ⟨-, -, -, h4, h6⟩ := hW
   have hc := chord_identity W h1 h2 h3 A B hA hB hs hd
   generalize A - B = D at hc hd hdx ⊢
@@ -109,9 +111,7 @@ theorem norm_x_sub_le_of_formalGroup (W : WeierstrassCurve C) (h1 : W.a₁ = 0) 
   rw [norm_div, norm_neg]
   have hq : (‖xd‖ / ‖yd‖) ^ 2 * ‖xd‖ = 1 := by
     rw [div_pow, hY]
-    first
-      | (field_simp; ring)
-      | field_simp
+    first | (field_simp; ring) | field_simp
   have hs0 := norm_nonneg (px W A - px W B)
   have hq0 : 0 ≤ ‖xd‖ / ‖yd‖ := div_nonneg (norm_nonneg _) (norm_nonneg _)
   by_contra hlt

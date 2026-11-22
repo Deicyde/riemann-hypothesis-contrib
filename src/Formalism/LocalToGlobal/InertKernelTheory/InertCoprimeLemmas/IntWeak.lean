@@ -12,27 +12,36 @@ namespace Formalism.L2.KerInert
 open NumberField
 
 def WAPlaces : Prop :=
-  ∀ (E : Type) [Field E] [NumberField E] [StarRing E], PI.UG.IsCMUnram E →
-    ∀ (p : ℕ), p.Prime → ∀ (n : ℕ) (L : Submodule (𝓞 E) (PI.UG.Sp E n)),
-      (∀ P : Ideal (𝓞 E), P.IsMaximal → (p : 𝓞 E) ∈ P →
-        ∃ g ∈ PI.UG.isom (PI.UG.hStd E n),
-          PI.UG.gmap g (PI.UG.loc (K := E) P (PI.UG.stdLat E n)) = PI.UG.loc (K := E) P L) →
-      ∃ γ ∈ PI.UG.isom (PI.UG.hStd E n), ∀ P : Ideal (𝓞 E), P.IsMaximal → (p : 𝓞 E) ∈ P →
-        PI.UG.gmap γ (PI.UG.loc (K := E) P (PI.UG.stdLat E n)) = PI.UG.loc (K := E) P L
+  ∀ (E : Type) [Field E] [NumberField E] [StarRing E],
+    PI.UG.IsCMUnram E
+      → ∀ (p : ℕ),
+        p.Prime
+          → ∀ (n : ℕ) (L : Submodule (𝓞 E) (PI.UG.Sp E n)),
+            (∀ P : Ideal (𝓞 E),
+                P.IsMaximal → (p : 𝓞 E) ∈ P
+                  → ∃ g ∈ PI.UG.isom (PI.UG.hStd E n),
+                    PI.UG.gmap g (PI.UG.loc (K := E) P (PI.UG.stdLat E n)) = PI.UG.loc (K := E) P L)
+              → ∃ γ ∈ PI.UG.isom (PI.UG.hStd E n), ∀ P : Ideal (𝓞 E),
+                P.IsMaximal → (p : 𝓞 E) ∈ P
+                  → PI.UG.gmap γ (PI.UG.loc (K := E) P (PI.UG.stdLat E n)) = PI.UG.loc (K := E) P L
 
 section Gen
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E]
 
-theorem wa_hStd_apply {n : ℕ} (x y : PI.UG.Sp E n) : PI.UG.hStd E n x y = Formalism.BasicNotions.stdH E n x y := rfl
+theorem wa_hStd_apply {n : ℕ} (x y : PI.UG.Sp E n)
+    : PI.UG.hStd E n x y = Formalism.BasicNotions.stdH E n x y :=
+  rfl
 
-theorem wa_mem_std {n : ℕ} (x : PI.UG.Sp E n) :
-    x ∈ PI.UG.stdLat E n ↔ ∀ i, ∃ r : 𝓞 E, algebraMap (𝓞 E) E r = x i := by
+theorem wa_mem_std {n : ℕ} (x : PI.UG.Sp E n)
+    : x ∈ PI.UG.stdLat E n ↔ ∀ i, ∃ r : 𝓞 E, algebraMap (𝓞 E) E r = x i := by
   simp only [PI.UG.stdLat, Submodule.mem_pi, Set.mem_univ, true_imp_iff, Submodule.mem_one]
 
 theorem wa_std_fg (n : ℕ) : (PI.UG.stdLat E n).FG := by
-  have h : PI.UG.stdLat E n =
-      Submodule.span (𝓞 E) (Set.range fun i : Fin n => (Pi.single i (1 : E) : PI.UG.Sp E n)) := by
+  have h
+      : PI.UG.stdLat E n
+        = Submodule.span (𝓞 E)
+          (Set.range fun i : Fin n => (Pi.single i (1 : E) : PI.UG.Sp E n)) := by
     apply le_antisymm
     · intro x hx
       rw [wa_mem_std] at hx
@@ -53,11 +62,13 @@ theorem wa_std_fg (n : ℕ) : (PI.UG.stdLat E n).FG := by
   rw [h]
   exact Submodule.fg_span (Set.finite_range _)
 
-theorem wa_le_loc (P : Ideal (𝓞 E)) {n : ℕ} (N : Submodule (𝓞 E) (PI.UG.Sp E n)) : N ≤ PI.UG.loc (K := E) P N :=
-  fun x hx => ⟨1, Submonoid.one_mem _, by rwa [one_smul]⟩
+theorem wa_le_loc (P : Ideal (𝓞 E)) {n : ℕ} (N : Submodule (𝓞 E) (PI.UG.Sp E n))
+    : N ≤ PI.UG.loc (K := E) P N := fun x hx =>
+  ⟨1, Submonoid.one_mem _, by rwa [one_smul]⟩
 
-theorem wa_hcompl_not_mem (P : Ideal (𝓞 E)) (hP : P.IsPrime) {s : 𝓞 E}
-    (hs : s ∈ PI.UG.hcompl (K := E) P) : s ∉ P := by
+theorem wa_hcompl_not_mem
+    (P : Ideal (𝓞 E)) (hP : P.IsPrime) {s : 𝓞 E} (hs : s ∈ PI.UG.hcompl (K := E) P)
+    : s ∉ P := by
   induction hs using Submonoid.closure_induction with
   | mem x hx => exact hx.1
   | one => exact (Ideal.ne_top_iff_one P).1 hP.ne_top
@@ -73,14 +84,17 @@ theorem wa_not_isUnit (p : ℕ) (hp : p.Prime) : ¬ IsUnit (p : 𝓞 E) := by
   have := hp.two_le
   omega
 
-theorem wa_natCast_smul_mem {n : ℕ} (N : Submodule (𝓞 E) (PI.UG.Sp E n)) (d : ℕ) {z : PI.UG.Sp E n} (hz : z ∈ N) :
-    (d : E) • z ∈ N := by
+theorem wa_natCast_smul_mem
+    {n : ℕ} (N : Submodule (𝓞 E) (PI.UG.Sp E n)) (d : ℕ) {z : PI.UG.Sp E n} (hz : z ∈ N)
+    : (d : E) • z ∈ N := by
   rw [Nat.cast_smul_eq_nsmul]
   exact N.nsmul_mem hz d
 
-theorem wa_denom (p : ℕ) (hp : p.Prime) {n : ℕ} (M₁ M₂ : Submodule (𝓞 E) (PI.UG.Sp E n)) (h1 : M₁.FG)
-    (h : ∀ P : Ideal (𝓞 E), P.IsMaximal → (p : 𝓞 E) ∈ P → M₁ ≤ PI.UG.loc (K := E) P M₂) :
-    ∃ s : ℕ, Nat.Coprime s p ∧ ∀ x ∈ M₁, (s : E) • x ∈ M₂ := by
+theorem wa_denom
+    (p : ℕ) (hp : p.Prime)
+    {n : ℕ} (M₁ M₂ : Submodule (𝓞 E) (PI.UG.Sp E n)) (h1 : M₁.FG)
+    (h : ∀ P : Ideal (𝓞 E), P.IsMaximal → (p : 𝓞 E) ∈ P → M₁ ≤ PI.UG.loc (K := E) P M₂)
+    : ∃ s : ℕ, Nat.Coprime s p ∧ ∀ x ∈ M₁, (s : E) • x ∈ M₂ := by
   obtain ⟨T, hT⟩ := h1
   set I : Ideal (𝓞 E) := M₂.colon (M₁ : Set (PI.UG.Sp E n)) with hIdef
   have hI : ∀ P : Ideal (𝓞 E), P.IsMaximal → (p : 𝓞 E) ∈ P → ¬ I ≤ P := by
@@ -90,7 +104,8 @@ theorem wa_denom (p : ℕ) (hp : p.Prime) {n : ℕ} (M₁ M₂ : Submodule (𝓞
       have ht1 : t ∈ M₁ := hT ▸ Submodule.subset_span ht
       exact h P hPm hpP ht1
     choose! s hs hsM using hloc
-    have hprod : (∏ t ∈ T, s t) ∈ PI.UG.hcompl (K := E) P := Submonoid.prod_mem _ (fun t ht => hs t ht)
+    have hprod : (∏ t ∈ T, s t) ∈ PI.UG.hcompl (K := E) P :=
+      Submonoid.prod_mem _ (fun t ht => hs t ht)
     apply wa_hcompl_not_mem P hPm.isPrime hprod
     apply hIP
     rw [Submodule.mem_colon]
@@ -101,7 +116,8 @@ theorem wa_denom (p : ℕ) (hp : p.Prime) {n : ℕ} (M₁ M₂ : Submodule (𝓞
       obtain ⟨c, hc⟩ := Finset.dvd_prod_of_mem s ht
       rw [hc, mul_comm, mul_smul]
       exact M₂.smul_mem _ (hsM t ht)
-    | zero => simp
+    | zero =>
+      simp
     | add x y _ _ hx hy =>
       rw [smul_add]
       exact M₂.add_mem hx hy
@@ -111,7 +127,8 @@ theorem wa_denom (p : ℕ) (hp : p.Prime) {n : ℕ} (M₁ M₂ : Submodule (𝓞
   have hsup : Ideal.span {(p : 𝓞 E)} ⊔ I = ⊤ := by
     by_contra hne
     obtain ⟨Q, hQm, hQ⟩ := Ideal.exists_le_maximal _ hne
-    exact hI Q hQm (hQ (Ideal.mem_sup_left (Ideal.mem_span_singleton_self _))) (le_sup_right.trans hQ)
+    exact hI Q hQm (hQ (Ideal.mem_sup_left (Ideal.mem_span_singleton_self _)))
+      (le_sup_right.trans hQ)
   have h1 : (1 : 𝓞 E) ∈ Ideal.span {(p : 𝓞 E)} ⊔ I := hsup ▸ Submodule.mem_top
   obtain ⟨c, a, haI, hca⟩ := Ideal.mem_span_singleton_sup.1 h1
   have hI0 : I ≠ ⊥ := by
@@ -127,15 +144,15 @@ theorem wa_denom (p : ℕ) (hp : p.Prime) {n : ℕ} (M₁ M₂ : Submodule (𝓞
     have : Finite (𝓞 E ⧸ I) := Nat.finite_of_card_ne_zero (hcard ▸ hne)
     have : Fact p.Prime := ⟨hp⟩
     obtain ⟨x, hx⟩ := exists_prime_addOrderOf_dvd_card' (G := 𝓞 E ⧸ I) p (hcard ▸ hdvd)
-    have hpx : (p : 𝓞 E ⧸ I) * x = 0 := by
-      rw [← nsmul_eq_mul, ← hx, addOrderOf_nsmul_eq_zero]
+    have hpx : (p : 𝓞 E ⧸ I) * x = 0 := by rw [← nsmul_eq_mul, ← hx, addOrderOf_nsmul_eq_zero]
     have ha0 : Ideal.Quotient.mk I a = 0 := Ideal.Quotient.eq_zero_iff_mem.2 haI
     have h1' : Ideal.Quotient.mk I c * (p : 𝓞 E ⧸ I) = 1 := by
       have := congrArg (Ideal.Quotient.mk I) hca
       rw [map_add (f := _), map_mul, ha0, add_zero, map_one, map_natCast] at this
       exact this
     have hx0 : x = 0 := by
-      calc x = (Ideal.Quotient.mk I c * (p : 𝓞 E ⧸ I)) * x := by rw [h1', one_mul]
+      calc
+        x = (Ideal.Quotient.mk I c * (p : 𝓞 E ⧸ I)) * x := by rw [h1', one_mul]
         _ = Ideal.Quotient.mk I c * ((p : 𝓞 E ⧸ I) * x) := by ring
         _ = 0 := by rw [hpx, mul_zero]
     rw [hx0, addOrderOf_zero] at hx
@@ -145,8 +162,9 @@ theorem wa_denom (p : ℕ) (hp : p.Prime) {n : ℕ} (M₁ M₂ : Submodule (𝓞
     have := (Submodule.mem_colon.1 hmem) x hx
     rwa [Nat.cast_smul_eq_nsmul, ← Nat.cast_smul_eq_nsmul E] at this
 
-theorem wa_unimod {n : ℕ} {L : Submodule (𝓞 E) (Fin n → E)} (hL : Formalism.BasicNotions.IsSDLat E n L) :
-    PI.UG.IsUnimodular (PI.UG.hStd E n) L := by
+theorem wa_unimod
+    {n : ℕ} {L : Submodule (𝓞 E) (Fin n → E)} (hL : Formalism.BasicNotions.IsSDLat E n L)
+    : PI.UG.IsUnimodular (PI.UG.hStd E n) L := by
   unfold PI.UG.IsUnimodular PI.UG.dual
   ext y
   simp only [Submodule.mem_iInf, Submodule.mem_comap, LinearMap.coe_restrictScalars]
@@ -155,8 +173,10 @@ theorem wa_unimod {n : ℕ} {L : Submodule (𝓞 E) (Fin n → E)} (hL : Formali
   rw [Submodule.mem_one, RingHom.mem_range]
   exact Iff.rfl
 
-theorem wa_unitary {n : ℕ} (g : PI.UG.Sp E n ≃ₗ[E] PI.UG.Sp E n) (hg : g ∈ PI.UG.isom (PI.UG.hStd E n)) :
-    LinearMap.toMatrix' (g : PI.UG.Sp E n →ₗ[E] PI.UG.Sp E n) ∈ Matrix.unitaryGroup (Fin n) E := by
+theorem wa_unitary
+    {n : ℕ} (g : PI.UG.Sp E n ≃ₗ[E] PI.UG.Sp E n) (hg : g ∈ PI.UG.isom (PI.UG.hStd E n))
+    : LinearMap.toMatrix' (g : PI.UG.Sp E n →ₗ[E] PI.UG.Sp E n)
+      ∈ Matrix.unitaryGroup (Fin n) E := by
   have hg' : ∀ x y, PI.UG.hStd E n (g x) (g y) = PI.UG.hStd E n x y := hg
   rw [Matrix.mem_unitaryGroup_iff']
   ext i j
@@ -166,25 +186,30 @@ theorem wa_unitary {n : ℕ} (g : PI.UG.Sp E n ≃ₗ[E] PI.UG.Sp E n) (hg : g �
   rw [Matrix.mul_apply, Matrix.one_apply]
   simp only [Matrix.star_apply, LinearMap.toMatrix'_apply, LinearEquiv.coe_coe]
   rw [hij]
-  simp only [Pi.single_apply, apply_ite star, star_one, star_zero, mul_ite, ite_mul, one_mul, zero_mul, mul_zero,
-    Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, if_true]
+  simp only [Pi.single_apply, apply_ite star, star_one, star_zero, mul_ite, ite_mul, one_mul,
+    zero_mul, mul_zero, Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, if_true]
   by_cases h : i = j
   · simp [h]
   · simp [h, Ne.symm h]
 
-theorem wa_main (hWA : WAPlaces) (hCM : PI.UG.IsCMUnram E) (p : ℕ) (hp : p.Prime) (n : ℕ)
-    (L : Submodule (𝓞 E) (Fin n → E)) (hL : Formalism.BasicNotions.IsSDLat E n L) :
-    ∃ (γ : Matrix.unitaryGroup (Fin n) E) (M : Submodule (𝓞 E) (Fin n → E)),
-      Formalism.BasicNotions.IsSDLat E n M ∧
-      (∃ s : ℕ, Nat.Coprime s p ∧ (∀ x ∈ PI.UG.stdLat E n, (s : E) • x ∈ M) ∧
-        ∀ x ∈ M, (s : E) • x ∈ PI.UG.stdLat E n) ∧
-      L = Formalism.BasicNotions.SDLat.smulLat (γ : Matrix (Fin n) (Fin n) E) M := by
+theorem wa_main
+    (hWA : WAPlaces) (hCM : PI.UG.IsCMUnram E)
+    (p : ℕ) (hp : p.Prime)
+    (n : ℕ) (L : Submodule (𝓞 E) (Fin n → E)) (hL : Formalism.BasicNotions.IsSDLat E n L)
+    : ∃ (γ : Matrix.unitaryGroup (Fin n) E) (M : Submodule (𝓞 E) (Fin n → E)),
+      Formalism.BasicNotions.IsSDLat E n M
+        ∧ (∃ s : ℕ,
+          Nat.Coprime s p ∧ (∀ x ∈ PI.UG.stdLat E n, (s : E) • x ∈ M)
+            ∧ ∀ x ∈ M, (s : E) • x ∈ PI.UG.stdLat E n)
+        ∧ L = Formalism.BasicNotions.SDLat.smulLat (γ : Matrix (Fin n) (Fin n) E) M := by
   have hLat : Submodule.IsLattice E L := Submodule.IsLattice.of_fg E hL.1
   have hUni : PI.UG.IsUnimodular (PI.UG.hStd E n) L := wa_unimod hL
   have hGen := unimodular_genus_unique E n hCM L hLat hUni
   obtain ⟨γ, hγ, hγP⟩ := hWA E hCM p hp n L (fun P hP _ => hGen P hP)
   have hγ' : ∀ x y, PI.UG.hStd E n (γ x) (γ y) = PI.UG.hStd E n x y := hγ
-  have e : ∀ x y, Formalism.BasicNotions.stdH E n (γ x) (γ y) = Formalism.BasicNotions.stdH E n x y := hγ'
+  have e
+      : ∀ x y, Formalism.BasicNotions.stdH E n (γ x) (γ y) = Formalism.BasicNotions.stdH E n x y :=
+    hγ'
   set M : Submodule (𝓞 E) (Fin n → E) :=
     L.comap ((γ : (Fin n → E) →ₗ[E] (Fin n → E)).restrictScalars (𝓞 E)) with hMdef
   have hMmem : ∀ x, x ∈ M ↔ γ x ∈ L := fun x => Iff.rfl
@@ -209,8 +234,9 @@ theorem wa_main (hWA : WAPlaces) (hCM : PI.UG.IsCMUnram E) (p : ℕ) (hp : p.Pri
       have hv : γ v ∈ Submodule.span E (L : Set (Fin n → E)) := by
         rw [hL.2.1]
         trivial
-      have h2 : γ.symm (γ v) ∈
-          (Submodule.span E (L : Set (Fin n → E))).map (γ.symm : (Fin n → E) →ₗ[E] (Fin n → E)) :=
+      have h2
+          : γ.symm (γ v) ∈ (Submodule.span E (L : Set (Fin n → E))).map
+            (γ.symm : (Fin n → E) →ₗ[E] (Fin n → E)) :=
         Submodule.mem_map_of_mem hv
       rw [Submodule.map_span] at h2
       simp only [LinearEquiv.symm_apply_apply] at h2
@@ -231,20 +257,23 @@ theorem wa_main (hWA : WAPlaces) (hCM : PI.UG.IsCMUnram E) (p : ℕ) (hp : p.Pri
         have := h _ hm
         rw [← e, LinearEquiv.apply_symm_apply] at this
         exact this
-  · have hstd : ∀ P : Ideal (𝓞 E), P.IsMaximal → (p : 𝓞 E) ∈ P →
-        PI.UG.stdLat E n ≤ PI.UG.loc (K := E) P M := by
+  · have hstd
+        : ∀ P : Ideal (𝓞 E),
+          P.IsMaximal → (p : 𝓞 E) ∈ P → PI.UG.stdLat E n ≤ PI.UG.loc (K := E) P M := by
       intro P hP hpP x hx
       have hx1 : x ∈ PI.UG.loc (K := E) P (PI.UG.stdLat E n) := wa_le_loc P _ hx
       have hx2 : γ x ∈ PI.UG.gmap γ (PI.UG.loc (K := E) P (PI.UG.stdLat E n)) :=
-        Submodule.mem_map_of_mem (f := (γ : (Fin n → E) →ₗ[E] (Fin n → E)).restrictScalars (𝓞 E)) hx1
+        Submodule.mem_map_of_mem (f := (γ : (Fin n → E) →ₗ[E] (Fin n → E)).restrictScalars (𝓞 E))
+          hx1
       rw [hγP P hP hpP] at hx2
       obtain ⟨s, hs, hsx⟩ := hx2
       refine ⟨s, hs, ?_⟩
       show γ (s • x) ∈ L
       rw [hγs]
       exact hsx
-    have hM : ∀ P : Ideal (𝓞 E), P.IsMaximal → (p : 𝓞 E) ∈ P →
-        M ≤ PI.UG.loc (K := E) P (PI.UG.stdLat E n) := by
+    have hM
+        : ∀ P : Ideal (𝓞 E),
+          P.IsMaximal → (p : 𝓞 E) ∈ P → M ≤ PI.UG.loc (K := E) P (PI.UG.stdLat E n) := by
       intro P hP hpP x hx
       have hx1 : γ x ∈ PI.UG.loc (K := E) P L := wa_le_loc P L hx
       rw [← hγP P hP hpP] at hx1

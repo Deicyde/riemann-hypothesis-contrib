@@ -16,14 +16,11 @@ theorem RegRCont.proof : RegRCont.Statement := by
   intro X _ D A R y hy
   set j := bdIdx R y
   have hyU : y ∈ bdDom R j := mem_bdDom_bdIdx R y
-  let g : (Fin D → ℂ) → ℝ := fun z =>
-    Real.exp 1 + R.f j z - ∑ i ∈ R.S j, Real.log (‖z i‖ ^ 2)
-  have key : ∀ y' ∈ bdDom R j ∩ R.Yo,
-      R.ψ j y' ∉ coordDiv (R.S j) ∧ R.r y' = g (R.ψ j y') := by
+  let g : (Fin D → ℂ) → ℝ := fun z => Real.exp 1 + R.f j z - ∑ i ∈ R.S j, Real.log (‖z i‖ ^ 2)
+  have key : ∀ y' ∈ bdDom R j ∩ R.Yo, R.ψ j y' ∉ coordDiv (R.S j) ∧ R.r y' = g (R.ψ j y') := by
     rintro y' ⟨⟨hs, hW⟩, hY⟩
     have hinv : (R.ψ j).symm (R.ψ j y') = y' := (R.ψ j).left_inv hs
-    have hnot : R.ψ j y' ∉ coordDiv (R.S j) :=
-      (R.mem_Yo_iff j _ hW).1 (by rw [hinv]; exact hY)
+    have hnot : R.ψ j y' ∉ coordDiv (R.S j) := (R.mem_Yo_iff j _ hW).1 (by rw [hinv]; exact hY)
     refine ⟨hnot, ?_⟩
     have h := R.r_chart j (R.ψ j y') ⟨hW, hnot⟩
     rw [hinv] at h

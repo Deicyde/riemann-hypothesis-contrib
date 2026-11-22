@@ -11,11 +11,13 @@ namespace GlobalTheory.CompanionTheory.Ar.Frames
 
 open GlobalTheory.CompanionTheory.Ar
 
-variable {Ω Ω₀ : Type} [Field Ω] [Field Ω₀] {i : Ω₀ →+* Ω} {Li Li₀ : Type} [AddCommGroup Li] [Module Ω Li]
-  [AddCommGroup Li₀] [Module Ω₀ Li₀] {ι : Li₀ →+ Li}
+variable
+  {Ω Ω₀ : Type} [Field Ω] [Field Ω₀]
+  {i : Ω₀ →+* Ω} {Li Li₀ : Type} [AddCommGroup Li] [Module Ω Li] [AddCommGroup Li₀] [Module Ω₀ Li₀]
+  {ι : Li₀ →+ Li}
 
-theorem linearIndependent_comp_basis (h : IsExtOver i ι) {K : Type} (B : Module.Basis K Ω₀ Li₀) :
-    LinearIndependent Ω fun k => ι (B k) := by
+theorem linearIndependent_comp_basis (h : IsExtOver i ι) {K : Type} (B : Module.Basis K Ω₀ Li₀)
+    : LinearIndependent Ω fun k => ι (B k) := by
   classical
   rw [linearIndependent_iff_finset_linearIndependent]
   intro s
@@ -27,8 +29,9 @@ theorem linearIndependent_comp_basis (h : IsExtOver i ι) {K : Type} (B : Module
   funext k
   simp
 
-theorem exists_dual_ext (h : IsExtOver i ι) (hs : Submodule.span Ω (Set.range ι) = ⊤)
-    (φ : Module.Dual Ω₀ Li₀) : ∃ φ' : Module.Dual Ω Li, ∀ e, φ' (ι e) = i (φ e) := by
+theorem exists_dual_ext
+    (h : IsExtOver i ι) (hs : Submodule.span Ω (Set.range ι) = ⊤) (φ : Module.Dual Ω₀ Li₀)
+    : ∃ φ' : Module.Dual Ω Li, ∀ e, φ' (ι e) = i (φ e) := by
   classical
   let B := Module.Basis.ofVectorSpace Ω₀ Li₀
   have hli : LinearIndependent Ω fun k => ι (B k) := linearIndependent_comp_basis h B
@@ -54,23 +57,29 @@ theorem exists_dual_ext (h : IsExtOver i ι) (hs : Submodule.span Ω (Set.range 
     obtain ⟨k, rfl⟩ := hx
     have hk : ι (B k) = B' k := (Module.Basis.mk_apply hli hsp k).symm
     rw [hk, Module.Basis.constr_basis]
-  | zero => simp
-  | add x y _ _ hx hy => simp only [map_add (f := _), hx, hy]
+  | zero =>
+    simp
+  | add x y _ _ hx hy =>
+    simp only [map_add (f := _), hx, hy]
   | smul a x _ hx =>
     rw [h.1]
     simp only [map_smul, hx, smul_eq_mul, map_mul]
 
-theorem two_frames (Ω Ω₀ : Type) [Field Ω] [Field Ω₀] (i : Ω₀ →+* Ω) (Li Li₀ : Type) [AddCommGroup Li] [Module Ω Li]
-    [AddCommGroup Li₀] [Module Ω₀ Li₀] (ι : Li₀ →+ Li) (hext : IsExtOver i ι)
-    (hs : Submodule.span Ω (Set.range ι) = ⊤) (W : Subring Ω) (L₀ : Set Li₀) (L : Set Li) (r : ℕ)
-    (b : Fin r → Li) (b₀ : Fin r → Li₀) (π₀ : Fin r → Module.Dual Ω₀ Li₀) (T : Module.End Ω Li) (Dn κ : Ω)
-    (m : Ω₀) (hL : Submodule.span W L = Submodule.span W (ι '' L₀))
+theorem two_frames
+    (Ω Ω₀ : Type) [Field Ω] [Field Ω₀]
+    (i : Ω₀ →+* Ω)
+    (Li Li₀ : Type) [AddCommGroup Li] [Module Ω Li] [AddCommGroup Li₀] [Module Ω₀ Li₀]
+    (ι : Li₀ →+ Li) (hext : IsExtOver i ι) (hs : Submodule.span Ω (Set.range ι) = ⊤)
+    (W : Subring Ω) (L₀ : Set Li₀) (L : Set Li)
+    (r : ℕ) (b : Fin r → Li) (b₀ : Fin r → Li₀) (π₀ : Fin r → Module.Dual Ω₀ Li₀)
+    (T : Module.End Ω Li) (Dn κ : Ω) (m : Ω₀)
+    (hL : Submodule.span W L = Submodule.span W (ι '' L₀))
     (hT : ∀ e ∈ L, T e ∈ Submodule.span W (Set.range b)) (hTb : ∀ j, T (ι (b₀ j)) = Dn • ι (b₀ j))
     (hm : ∀ j, m • b₀ j ∈ L₀) (hπ : ∀ a j, π₀ a (b₀ j) = if a = j then 1 else 0)
     (hint : ∀ a, ∀ e ∈ L₀, i (m * π₀ a e) ∈ W) (hκ : ∀ j, κ • b j ∈ L)
-    (hb : ∀ j, b j ∈ Submodule.span Ω (Set.range fun a => ι (b₀ a))) :
-    (∀ j, (Dn * i m) • ι (b₀ j) ∈ Submodule.span W (Set.range b)) ∧
-      ∀ j, (i m * κ) • b j ∈ Submodule.span W (Set.range fun a => ι (b₀ a)) := by
+    (hb : ∀ j, b j ∈ Submodule.span Ω (Set.range fun a => ι (b₀ a)))
+    : (∀ j, (Dn * i m) • ι (b₀ j) ∈ Submodule.span W (Set.range b))
+      ∧ ∀ j, (i m * κ) • b j ∈ Submodule.span W (Set.range fun a => ι (b₀ a)) := by
   classical
   refine ⟨fun j => ?_, fun j => ?_⟩
   · have hin : ι (m • b₀ j) ∈ Submodule.span W L := by
@@ -107,18 +116,23 @@ theorem two_frames (Ω Ω₀ : Type) [Field Ω] [Field Ω₀] (i : Ω₀ →+* �
         induction hx using Submodule.span_induction with
         | mem y hy =>
           obtain ⟨e, he, rfl⟩ := hy
-          rw [hψ, ← map_mul]; exact hint a e he
-        | zero => simp
-        | add y z _ _ hy hz => rw [map_add (f := _), mul_add]; exact W.add_mem hy hz
+          rw [hψ, ← map_mul]
+          exact hint a e he
+        | zero =>
+          simp
+        | add y z _ _ hy hz =>
+          rw [map_add (f := _), mul_add]; exact W.add_mem hy hz
         | smul w y _ hy =>
           rw [Subring.smul_def, map_smul, smul_eq_mul, mul_left_comm]
           exact W.mul_mem w.2 hy
-      rw [← hψv]; exact key _ hspan
+      rw [← hψv]
+      exact key _ hspan
     rw [mul_smul, ← hc, Finset.smul_sum]
     refine Submodule.sum_mem _ fun a _ => ?_
     rw [smul_smul]
-    have ha := Submodule.smul_mem (Submodule.span W (Set.range fun a => ι (b₀ a))) (⟨_, hcW a⟩ : W)
-      (Submodule.subset_span ⟨a, rfl⟩)
+    have ha :=
+      Submodule.smul_mem (Submodule.span W (Set.range fun a => ι (b₀ a))) (⟨_, hcW a⟩ : W)
+        (Submodule.subset_span ⟨a, rfl⟩)
     rwa [Subring.smul_def] at ha
 
 end GlobalTheory.CompanionTheory.Ar.Frames

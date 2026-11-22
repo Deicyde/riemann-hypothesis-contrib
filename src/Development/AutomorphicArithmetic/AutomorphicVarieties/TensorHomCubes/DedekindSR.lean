@@ -6,19 +6,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.TensorHomCu
 
 open UpperTheory.V.KL
 
-private theorem exists_crt_indicator {R : Type} [CommRing R] [IsDedekindDomain R] (a : R) (ha : a ≠ 0)
-    (c : Ideal R → Prop) :
-    ∃ t : R, ∀ P : Ideal R, P.IsMaximal → a ∈ P → (c P → t - 1 ∈ P) ∧ (¬ c P → t ∈ P) := by
+private theorem exists_crt_indicator
+    {R : Type} [CommRing R] [IsDedekindDomain R] (a : R) (ha : a ≠ 0) (c : Ideal R → Prop)
+    : ∃ t : R, ∀ P : Ideal R, P.IsMaximal → a ∈ P → (c P → t - 1 ∈ P) ∧ (¬ c P → t ∈ P) := by
   classical
   have hI : Ideal.span {a} ≠ 0 := by
     rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]
     exact ha
-  obtain ⟨y, hy⟩ := IsDedekindDomain.exists_forall_sub_mem_ideal
-    (s := (Ideal.finite_factors hI).toFinset)
-    (fun v => v.asIdeal) (fun _ => 1)
-    (fun v _ => Ideal.prime_of_isPrime v.ne_bot v.isPrime)
-    (fun v _ w _ hvw h => hvw (IsDedekindDomain.HeightOneSpectrum.ext h))
-    (fun v => if c v.1.asIdeal then 1 else 0)
+  obtain ⟨y, hy⟩ :=
+    IsDedekindDomain.exists_forall_sub_mem_ideal (s := (Ideal.finite_factors hI).toFinset)
+      (fun v => v.asIdeal)
+      (fun _ => 1)
+      (fun v _ => Ideal.prime_of_isPrime v.ne_bot v.isPrime)
+      (fun v _ w _ hvw h => hvw (IsDedekindDomain.HeightOneSpectrum.ext h))
+      (fun v => if c v.1.asIdeal then 1 else 0)
   refine ⟨y, fun P hP haP => ?_⟩
   have hPb : P ≠ ⊥ := by
     intro h
@@ -37,8 +38,8 @@ private theorem exists_crt_indicator {R : Type} [CommRing R] [IsDedekindDomain R
   · intro hc
     simpa [v, hc] using h
 
-private theorem unimod_iff {R : Type} [CommRing R] {n : ℕ} (v : Fin n → R) :
-    Unimodular R v ↔ ∀ P : Ideal R, P.IsMaximal → ¬ ∀ i, v i ∈ P := by
+private theorem unimod_iff {R : Type} [CommRing R] {n : ℕ} (v : Fin n → R)
+    : Unimodular R v ↔ ∀ P : Ideal R, P.IsMaximal → ¬ ∀ i, v i ∈ P := by
   unfold Unimodular
   constructor
   · intro h P hP hv
@@ -51,8 +52,8 @@ private theorem unimod_iff {R : Type} [CommRing R] {n : ℕ} (v : Fin n → R) :
     obtain ⟨P, hP, hle⟩ := Ideal.exists_le_maximal _ hne
     exact h P hP fun i => hle (Ideal.subset_span ⟨i, rfl⟩)
 
-theorem UpperTheory.V.KL.dedekindSR :
-    ∀ (R : Type) [CommRing R] [IsDedekindDomain R], StableRangeLe R 2 := by
+theorem UpperTheory.V.KL.dedekindSR
+    : ∀ (R : Type) [CommRing R] [IsDedekindDomain R], StableRangeLe R 2 := by
   intro R _ _ n hn r hr
   rw [unimod_iff] at hr
   by_cases hz : ∀ i : Fin n, r i.castSucc = 0
@@ -84,10 +85,8 @@ theorem UpperTheory.V.KL.dedekindSR :
     rw [unimod_iff]
     intro P hP hall
     by_cases haP : r j.castSucc ∈ P
-    · have hother : ∀ i : Fin n, i ≠ k → r i.castSucc ∈ P := fun i hi => by
-        simpa [hi] using hall i
-      have hk : r k.castSucc + t * r (Fin.last n) ∈ P := by
-        simpa using hall k
+    · have hother : ∀ i : Fin n, i ≠ k → r i.castSucc ∈ P := fun i hi => by simpa [hi] using hall i
+      have hk : r k.castSucc + t * r (Fin.last n) ∈ P := by simpa using hall k
       obtain ⟨h1, h2⟩ := ht P hP haP
       by_cases hc : r k.castSucc ∈ P
       · have htr : t * r (Fin.last n) ∈ P := by

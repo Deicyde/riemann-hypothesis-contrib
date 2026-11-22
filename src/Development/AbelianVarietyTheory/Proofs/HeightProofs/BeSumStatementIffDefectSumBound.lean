@@ -7,13 +7,15 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSecti
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Pointwise Formalism.L2.Pj.QAt GlobalTheory.IndefiniteRowSideFullHecke.DifferentConjugateDefects
+open NumberField IsDedekindDomain Pointwise Formalism.L2.Pj.QAt
+  GlobalTheory.IndefiniteRowSideFullHecke.DifferentConjugateDefects
 
 namespace GlobalTheory.DefectSumCompare
 
-theorem pow_finrank_eq_span_absNorm {E : Type} [Field E] [NumberField E] [IsGalois ℚ E]
-    (I : Ideal (𝓞 E)) (hI : I ≠ ⊥) (hfix : ∀ σ : E ≃ₐ[ℚ] E, σ • I = I) :
-    I ^ Module.finrank ℚ E = Ideal.span {((Ideal.absNorm I : ℕ) : 𝓞 E)} := by
+theorem pow_finrank_eq_span_absNorm
+    {E : Type} [Field E] [NumberField E] [IsGalois ℚ E]
+    (I : Ideal (𝓞 E)) (hI : I ≠ ⊥) (hfix : ∀ σ : E ≃ₐ[ℚ] E, σ • I = I)
+    : I ^ Module.finrank ℚ E = Ideal.span {((Ideal.absNorm I : ℕ) : 𝓞 E)} := by
   classical
   have hI0 : I ∈ nonZeroDivisors (Ideal (𝓞 E)) := mem_nonZeroDivisors_of_ne_zero hI
   set h := Fintype.card (ClassGroup (𝓞 E)) with hh
@@ -38,8 +40,9 @@ theorem pow_finrank_eq_span_absNorm {E : Type} [Field E] [NumberField E] [IsGalo
     exact h1
   have h2 : Ideal.span {((Ideal.absNorm I : ℕ) : 𝓞 E)} ^ h = (I ^ Module.finrank ℚ E) ^ h := by
     rw [Ideal.span_singleton_pow, ← Nat.cast_pow, ← map_pow, hx', Ideal.absNorm_span_singleton]
-    have h3 : Ideal.span {(((Algebra.norm ℤ x).natAbs : ℕ) : 𝓞 E)} =
-        Ideal.span {((Algebra.norm ℤ x : ℤ) : 𝓞 E)} := by
+    have h3
+        : Ideal.span {(((Algebra.norm ℤ x).natAbs : ℕ) : 𝓞 E)}
+          = Ideal.span {((Algebra.norm ℤ x : ℤ) : 𝓞 E)} := by
       rcases Int.natAbs_eq (Algebra.norm ℤ x) with h4 | h4
       · conv_rhs => rw [h4]
         rw [Int.cast_natCast]
@@ -47,12 +50,15 @@ theorem pow_finrank_eq_span_absNorm {E : Type} [Field E] [NumberField E] [IsGalo
         rw [Int.cast_neg, Ideal.span_singleton_neg, Int.cast_natCast]
     rw [h3, hnorm, ← Ideal.prod_span_singleton]
     simp only [hσ]
-    rw [Finset.prod_const, Finset.card_univ, ← Nat.card_eq_fintype_card, IsGalois.card_aut_eq_finrank,
-      ← pow_mul, ← pow_mul, mul_comm]
+    rw [Finset.prod_const, Finset.card_univ, ← Nat.card_eq_fintype_card,
+      IsGalois.card_aut_eq_finrank, ← pow_mul, ← pow_mul, mul_comm]
   exact (pow_left_injective hpos h2).symm
 
-theorem ord_vw_eq_vla {K : Type} [Field K] [NumberField K] (la : HeightOneSpectrum (𝓞 K))
-    {I : Ideal (𝓞 K)} (hI : I ≠ ⊥) : ord_vw la I = vla la I := by
+theorem ord_vw_eq_vla
+    {K : Type} [Field K] [NumberField K]
+    (la : HeightOneSpectrum (𝓞 K))
+    {I : Ideal (𝓞 K)} (hI : I ≠ ⊥)
+    : ord_vw la I = vla la I := by
   classical
   unfold ord_vw vla
   rw [Ideal.count_associates_factors_eq hI la.isPrime la.ne_bot,
@@ -62,8 +68,8 @@ theorem lrd_eq_lrdOf (E : Type) [Field E] [NumberField E] : lrd E = lrdOf E := b
   unfold lrd lrdOf
   rw [rootDiscr_def, one_div, Int.cast_abs]
 
-theorem log_discr_eq (E : Type) [Field E] [NumberField E] :
-    Real.log |((discr E : ℤ) : ℝ)| = (Module.finrank ℚ E : ℝ) * lrd E := by
+theorem log_discr_eq (E : Type) [Field E] [NumberField E]
+    : Real.log |((discr E : ℤ) : ℝ)| = (Module.finrank ℚ E : ℝ) * lrd E := by
   have hd : (0 : ℝ) < |((discr E : ℤ) : ℝ)| := abs_pos.mpr (Int.cast_ne_zero.mpr (discr_ne_zero E))
   have hn : (Module.finrank ℚ E : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr Module.finrank_pos.ne'
   rw [lrd_eq_lrdOf]
@@ -71,25 +77,33 @@ theorem log_discr_eq (E : Type) [Field E] [NumberField E] :
   rw [Real.log_rpow hd]
   field_simp
 
-theorem conjDifferent_pow {E K : Type} [Field E] [NumberField E] [IsGalois ℚ E] [Field K] [NumberField K]
-    (σ : E →+* K) : conjDifferent σ ^ Module.finrank ℚ E = discAt E K := by
+theorem conjDifferent_pow
+    {E K : Type} [Field E] [NumberField E] [IsGalois ℚ E] [Field K] [NumberField K] (σ : E →+* K)
+    : conjDifferent σ ^ Module.finrank ℚ E = discAt E K := by
   unfold conjDifferent discAt
-  rw [← Ideal.map_pow, pow_finrank_eq_span_absNorm _ differentIdeal_ne_bot
-    ReciprocityTheory.ChartRestriction.G.PullbackSections.Pf.smul_differentIdeal, absNorm_differentIdeal E, Ideal.map_span,
-    Set.image_singleton, map_natCast]
+  rw [← Ideal.map_pow,
+    pow_finrank_eq_span_absNorm _ differentIdeal_ne_bot
+      ReciprocityTheory.ChartRestriction.G.PullbackSections.Pf.smul_differentIdeal,
+    absNorm_differentIdeal E, Ideal.map_span, Set.image_singleton, map_natCast]
 
-theorem vla_pow {K : Type} [Field K] [NumberField K] (la : HeightOneSpectrum (𝓞 K))
-    {I : Ideal (𝓞 K)} (hI : I ≠ ⊥) (k : ℕ) : vla la (I ^ k) = k * vla la I := by
+theorem vla_pow
+    {K : Type} [Field K] [NumberField K]
+    (la : HeightOneSpectrum (𝓞 K))
+    {I : Ideal (𝓞 K)} (hI : I ≠ ⊥)
+    (k : ℕ)
+    : vla la (I ^ k) = k * vla la I := by
   unfold vla
-  rw [Associates.mk_pow, Associates.count_pow (Associates.mk_ne_zero.mpr hI) la.associates_irreducible]
+  rw [Associates.mk_pow,
+    Associates.count_pow (Associates.mk_ne_zero.mpr hI) la.associates_irreducible]
 
 section Galois
 
 variable {E K : Type} [Field E] [NumberField E] [IsGalois ℚ E] [Field K] [NumberField K]
 
-theorem vla_discAt (σ : E →+* K) (la : HeightOneSpectrum (𝓞 K)) :
-    vla la (discAt E K) = Module.finrank ℚ E * ord_vw la (conjDifferent σ) := by
-  rw [← conjDifferent_pow σ, vla_pow la (conjDifferent_ne_bot σ), ord_vw_eq_vla la (conjDifferent_ne_bot σ)]
+theorem vla_discAt (σ : E →+* K) (la : HeightOneSpectrum (𝓞 K))
+    : vla la (discAt E K) = Module.finrank ℚ E * ord_vw la (conjDifferent σ) := by
+  rw [← conjDifferent_pow σ, vla_pow la (conjDifferent_ne_bot σ),
+    ord_vw_eq_vla la (conjDifferent_ne_bot σ)]
 
 end Galois
 

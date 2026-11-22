@@ -10,18 +10,24 @@ public import ReciprocityTheory.DualLattices.MemAugIdeal
 
 @[expose] public section
 
-open GlobalTheory.CompanionTheory.Ar.Num GlobalTheory.CompanionTheory.Ar.GR ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Up
+open GlobalTheory.CompanionTheory.Ar.Num GlobalTheory.CompanionTheory.Ar.GR
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Up
 
 noncomputable section
 namespace GlobalTheory.CompanionTheory.Ar.Num.PtInj
 
-
 open Matrix in
-theorem val_mul_le_of_cyclic_ker {C : Type} [Field C] {v : Valuation C NNReal} {R : Type} [CommRing R]
-    [Algebra R C] (hv : v.Integers R) {B D : Type} [AddCommGroup B] [Module R B] [AddCommGroup D]
-    [Module R D] (π : B →ₗ[R] D) (a : B) (hs : Function.Surjective π)
-    (hk : ∀ b, π b = 0 → ∃ r : R, b = r • a) {x y : NNReal} (hB : HasLen v R B x)
-    (hD : HasLen v R D y) (k : R) (hka : k • a = 0) : v (algebraMap R C k) * y ≤ x := by
+theorem val_mul_le_of_cyclic_ker
+    {C : Type} [Field C]
+    {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C]
+    (hv : v.Integers R)
+    {B D : Type} [AddCommGroup B] [Module R B] [AddCommGroup D] [Module R D]
+    (π : B →ₗ[R] D)
+    (a : B)
+    (hs : Function.Surjective π) (hk : ∀ b, π b = 0 → ∃ r : R, b = r • a)
+    {x y : NNReal} (hB : HasLen v R B x) (hD : HasLen v R D y)
+    (k : R) (hka : k • a = 0)
+    : v (algebraMap R C k) * y ≤ x := by
   obtain ⟨m, d, ⟨e⟩, rfl⟩ := hD
   let ε : Fin m → D := fun j => e.symm (Pi.single j 1)
   choose b hb using fun j => hs (ε j)
@@ -64,8 +70,7 @@ theorem val_mul_le_of_cyclic_ker {C : Type} [Field C] {v : Valuation C NNReal} {
   let X : Matrix (Unit ⊕ Fin m) (Unit ⊕ Fin m) R :=
     Matrix.fromBlocks (Matrix.of fun (_ _ : Unit) => k) (Matrix.of fun (_ : Unit) j => - t j) 0
       (Matrix.diagonal d)
-  have hdet : X.det = k * ∏ j, d j := by
-    simp [X, Matrix.det_fromBlocks_zero₂₁, Matrix.det_diagonal]
+  have hdet : X.det = k * ∏ j, d j := by simp [X, Matrix.det_fromBlocks_zero₂₁, Matrix.det_diagonal]
   have hqX : ∀ u, q (X *ᵥ u) = 0 := by
     intro u
     rw [hq]
@@ -83,57 +88,70 @@ theorem val_mul_le_of_cyclic_ker {C : Type} [Field C] {v : Valuation C NNReal} {
     rintro _ ⟨u, rfl⟩
     exact hqX u
   have hlen := hasLen_coker_det' v R hv (Unit ⊕ Fin m) X
-  have := GlobalTheory.AvChartCompare.hasLen_le_of_surjective hv
-    ((LinearMap.range X.mulVecLin).liftQ q hle)
-    (by
-      intro z
-      obtain ⟨u, rfl⟩ := hqs z
-      exact ⟨Submodule.Quotient.mk u, by simp⟩) hlen hB
+  have :=
+    GlobalTheory.AvChartCompare.hasLen_le_of_surjective hv
+      ((LinearMap.range X.mulVecLin).liftQ q hle)
+      (by
+        intro z
+        obtain ⟨u, rfl⟩ := hqs z
+        exact ⟨Submodule.Quotient.mk u, by simp⟩)
+      hlen hB
   rw [hdet, map_mul, map_mul, map_prod, map_prod] at this
   exact this
 
 section Proj
 
-variable {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C] {F : Type} [Field F]
-  [Fintype F] [DecidableEq F] {N : Type} [AddCommGroup N] [Module F N]
+variable
+  {C : Type} [Field C]
+  {R : Type} [CommRing R] [Algebra R C]
+  {F : Type} [Field F] [Fintype F] [DecidableEq F]
+  {N : Type} [AddCommGroup N] [Module F N]
 
-theorem proj_eq_sum (χ : MulChar F R) {u : R} (hu : algebraMap R C u = (Fintype.card Fˣ : C)⁻¹)
-    (g : N → C) :
-    proj χ g = ∑ a : Fˣ, fun x => algebraMap R C (u * χ⁻¹ (a : F)) * g ((a : F) • x) := by
+theorem proj_eq_sum
+    (χ : MulChar F R) {u : R} (hu : algebraMap R C u = (Fintype.card Fˣ : C)⁻¹) (g : N → C)
+    : proj χ g = ∑ a : Fˣ, fun x => algebraMap R C (u * χ⁻¹ (a : F)) * g ((a : F) • x) := by
   funext x
   simp only [proj, Finset.sum_apply, Finset.mul_sum, map_mul, hu, mul_assoc]
 
-theorem proj_mem (T : AddSubgroup (N → C)) (χ : MulChar F R) {u : R}
-    (hu : algebraMap R C u = (Fintype.card Fˣ : C)⁻¹)
+theorem proj_mem
+    (T : AddSubgroup (N → C))
+    (χ : MulChar F R)
+    {u : R} (hu : algebraMap R C u = (Fintype.card Fˣ : C)⁻¹)
     (hR : ∀ r : R, ∀ g ∈ T, (fun x => algebraMap R C r * g x) ∈ T)
-    (hF : ∀ a : F, ∀ g ∈ T, (fun x => g (a • x)) ∈ T) {g : N → C} (hg : g ∈ T) : proj χ g ∈ T := by
+    (hF : ∀ a : F, ∀ g ∈ T, (fun x => g (a • x)) ∈ T)
+    {g : N → C} (hg : g ∈ T)
+    : proj χ g ∈ T := by
   rw [proj_eq_sum χ hu]
   exact T.sum_mem fun a _ => hR _ _ (hF _ _ hg)
 
-theorem proj_sub (χ : MulChar F R) (g h : N → C) (x : N) :
-    proj χ (g - h) x = proj χ g x - proj χ h x := by
+theorem proj_sub (χ : MulChar F R) (g h : N → C) (x : N)
+    : proj χ (g - h) x = proj χ g x - proj χ h x := by
   simp only [proj, Pi.sub_apply, mul_sub, Finset.sum_sub_distrib]
 
 theorem inv_mul_self (χ : MulChar F R) (a : Fˣ) : χ⁻¹ (a : F) * χ (a : F) = 1 := by
   rw [MulChar.inv_apply', ← map_mul, inv_mul_cancel₀ a.ne_zero, map_one]
 
-theorem proj_eig (χ : MulChar F R) {g : N → C} (h0 : g 0 = 0) (a : F) (x : N) :
-    proj χ g (a • x) = algebraMap R C (χ a) * proj χ g x := by
+theorem proj_eig (χ : MulChar F R) {g : N → C} (h0 : g 0 = 0) (a : F) (x : N)
+    : proj χ g (a • x) = algebraMap R C (χ a) * proj χ g x := by
   by_cases ha : a = 0
   · subst ha
     have : χ 0 = 0 := χ.map_nonunit not_isUnit_zero
     simp [proj, this, h0]
   · let a' : Fˣ := Units.mk0 a ha
-    have e : ∑ b : Fˣ, algebraMap R C (χ⁻¹ (b : F)) * g ((b : F) • a • x) =
-        algebraMap R C (χ a) * ∑ b : Fˣ, algebraMap R C (χ⁻¹ (b : F)) * g ((b : F) • x) := by
-      rw [Finset.mul_sum, ← Equiv.sum_comp (Equiv.mulRight a')
-        (fun b : Fˣ => algebraMap R C (χ a) * (algebraMap R C (χ⁻¹ (b : F)) * g ((b : F) • x)))]
+    have e
+        : ∑ b : Fˣ, algebraMap R C (χ⁻¹ (b : F)) * g ((b : F) • a • x)
+          = algebraMap R C (χ a) * ∑ b : Fˣ, algebraMap R C (χ⁻¹ (b : F)) * g ((b : F) • x) := by
+      rw [Finset.mul_sum,
+        ← Equiv.sum_comp (Equiv.mulRight a')
+          (fun b : Fˣ => algebraMap R C (χ a) * (algebraMap R C (χ⁻¹ (b : F)) * g ((b : F) • x)))]
       refine Finset.sum_congr rfl fun b _ => ?_
       have h1 : χ⁻¹ (b : F) = χ a * χ⁻¹ ((b * a' : Fˣ) : F) := by
         have h2 := inv_mul_self χ a'
         simp only [a', Units.val_mk0] at h2
         simp only [Units.val_mul, a', Units.val_mk0, map_mul]
-        calc χ⁻¹ (b : F) = χ⁻¹ (b : F) * (χ⁻¹ a * χ a) := by rw [h2, mul_one]
+        calc
+          χ⁻¹ (b : F)
+            = χ⁻¹ (b : F) * (χ⁻¹ a * χ a) := by rw [h2, mul_one]
           _ = _ := by ring
       simp only [Equiv.coe_mulRight, Units.val_mul, a', Units.val_mk0, mul_smul]
       rw [h1, map_mul, mul_assoc]
@@ -141,9 +159,13 @@ theorem proj_eig (χ : MulChar F R) {g : N → C} (h0 : g 0 = 0) (a : F) (x : N)
     simp only [proj, e]
     ring
 
-theorem proj_on (χ : MulChar F R) (hc : (Fintype.card Fˣ : C) ≠ 0) (S : Set N) {g : N → C}
-    (hg : ∀ (a : Fˣ), ∀ x ∈ S, g ((a : F) • x) = algebraMap R C (χ a) * g x) {x : N} (hx : x ∈ S) :
-    proj χ g x = g x := by
+theorem proj_on
+    (χ : MulChar F R)
+    (hc : (Fintype.card Fˣ : C) ≠ 0)
+    (S : Set N)
+    {g : N → C} (hg : ∀ (a : Fˣ), ∀ x ∈ S, g ((a : F) • x) = algebraMap R C (χ a) * g x)
+    {x : N} (hx : x ∈ S)
+    : proj χ g x = g x := by
   have : ∀ a : Fˣ, algebraMap R C (χ⁻¹ (a : F)) * g ((a : F) • x) = g x := by
     intro a
     rw [hg a x hx, ← mul_assoc, ← map_mul, inv_mul_self, map_one, one_mul]
@@ -156,12 +178,15 @@ section Sq
 
 variable {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C]
 
-theorem sq_lift {X Y : Type} [AddCommGroup X] [AddCommGroup Y] (ψ : Y → X) (h0 : ψ 0 = 0)
-    (M : Submodule R (X → C)) {f : Y → C}
-    (hf : f ∈ sqIdeal (augIdeal (M.map (LinearMap.funLeft R C ψ)))) :
-    ∃ g ∈ sqIdeal (augIdeal M), LinearMap.funLeft R C ψ g = f := by
-  have hlift : ∀ f ∈ augIdeal (M.map (LinearMap.funLeft R C ψ)),
-      ∃ g ∈ augIdeal M, LinearMap.funLeft R C ψ g = f := by
+theorem sq_lift
+    {X Y : Type} [AddCommGroup X] [AddCommGroup Y]
+    (ψ : Y → X) (h0 : ψ 0 = 0)
+    (M : Submodule R (X → C))
+    {f : Y → C} (hf : f ∈ sqIdeal (augIdeal (M.map (LinearMap.funLeft R C ψ))))
+    : ∃ g ∈ sqIdeal (augIdeal M), LinearMap.funLeft R C ψ g = f := by
+  have hlift
+      : ∀ f ∈ augIdeal (M.map (LinearMap.funLeft R C ψ)), ∃ g ∈ augIdeal M,
+        LinearMap.funLeft R C ψ g = f := by
     rintro f ⟨⟨g, hg, rfl⟩, hf0⟩
     refine ⟨g, ⟨hg, ?_⟩, rfl⟩
     have : g (ψ 0) = 0 := hf0
@@ -173,7 +198,8 @@ theorem sq_lift {X Y : Type} [AddCommGroup X] [AddCommGroup Y] (ψ : Y → X) (h
     obtain ⟨g, hg, rfl⟩ := hlift f hf
     obtain ⟨g', hg', rfl⟩ := hlift f' hf'
     exact ⟨g * g', Submodule.subset_span ⟨g, hg, g', hg', rfl⟩, rfl⟩
-  | zero => exact ⟨0, Submodule.zero_mem _, map_zero _⟩
+  | zero =>
+    exact ⟨0, Submodule.zero_mem _, map_zero _⟩
   | add a b _ _ ha hb =>
     obtain ⟨g, hg, rfl⟩ := ha
     obtain ⟨g', hg', rfl⟩ := hb
@@ -182,9 +208,12 @@ theorem sq_lift {X Y : Type} [AddCommGroup X] [AddCommGroup Y] (ψ : Y → X) (h
     obtain ⟨g, hg, rfl⟩ := ha
     exact ⟨r • g, Submodule.smul_mem _ r hg, map_smul _ _ _⟩
 
-theorem sq_res {X Y : Type} [AddCommGroup X] [AddCommGroup Y] (ψ : Y → X) (h0 : ψ 0 = 0)
-    (M : Submodule R (X → C)) {g : X → C} (hg : g ∈ sqIdeal (augIdeal M)) :
-    LinearMap.funLeft R C ψ g ∈ sqIdeal (augIdeal (M.map (LinearMap.funLeft R C ψ))) := by
+theorem sq_res
+    {X Y : Type} [AddCommGroup X] [AddCommGroup Y]
+    (ψ : Y → X) (h0 : ψ 0 = 0)
+    (M : Submodule R (X → C))
+    {g : X → C} (hg : g ∈ sqIdeal (augIdeal M))
+    : LinearMap.funLeft R C ψ g ∈ sqIdeal (augIdeal (M.map (LinearMap.funLeft R C ψ))) := by
   refine PullbackHopfOrder.sqIdeal_le (LinearMap.funLeft R C ψ) (fun _ _ => rfl) ?_ hg
   rintro f ⟨hf, hf0⟩
   refine ⟨⟨f, hf, rfl⟩, ?_⟩
@@ -194,9 +223,11 @@ theorem sq_res {X Y : Type} [AddCommGroup X] [AddCommGroup Y] (ψ : Y → X) (h0
 
 variable {F : Type} [Field F] {N : Type} [AddCommGroup N] [Module F N]
 
-theorem sq_stable {M : Submodule R (N → C)} (hF : FStable F M) (a : F) {g : N → C}
-    (hg : g ∈ sqIdeal (augIdeal M)) : (fun x => g (a • x)) ∈ sqIdeal (augIdeal M) := by
-  refine PullbackHopfOrder.sqIdeal_le (LinearMap.funLeft R C fun x : N => a • x) (fun _ _ => rfl) ?_ hg
+theorem sq_stable
+    {M : Submodule R (N → C)} (hF : FStable F M) (a : F) {g : N → C} (hg : g ∈ sqIdeal (augIdeal M))
+    : (fun x => g (a • x)) ∈ sqIdeal (augIdeal M) := by
+  refine
+    PullbackHopfOrder.sqIdeal_le (LinearMap.funLeft R C fun x : N => a • x) (fun _ _ => rfl) ?_ hg
   rintro f ⟨hf, hf0⟩
   refine ⟨hF a f hf, ?_⟩
   show f (a • 0) = 0
@@ -207,61 +238,72 @@ end Sq
 
 section Step
 
-variable {C : Type} [Field C] {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C]
-  {F : Type} [Field F] [Fintype F] [DecidableEq F] {N : Type} [AddCommGroup N] [Module F N]
+variable
+  {C : Type} [Field C]
+  {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C]
+  {F : Type} [Field F] [Fintype F] [DecidableEq F]
+  {N : Type} [AddCommGroup N] [Module F N]
 
 theorem smul_fun (r : R) (g : N → C) : (fun x => algebraMap R C r * g x) = r • g := by
   funext x
   simp [Algebra.smul_def]
 
-theorem sq_le_aug {M : Submodule R (N → C)} (hmul : ∀ f g, f ∈ M → g ∈ M → f * g ∈ M) :
-    sqIdeal (augIdeal M) ≤ augIdeal M := by
+theorem sq_le_aug {M : Submodule R (N → C)} (hmul : ∀ f g, f ∈ M → g ∈ M → f * g ∈ M)
+    : sqIdeal (augIdeal M) ≤ augIdeal M := by
   refine Submodule.span_le.2 ?_
   rintro h ⟨f, hf, f', hf', rfl⟩
   obtain ⟨h1, h2⟩ := PullbackHopfOrder.mem_augIdeal.1 hf
   obtain ⟨h3, _⟩ := PullbackHopfOrder.mem_augIdeal.1 hf'
   exact PullbackHopfOrder.mem_augIdeal.2 ⟨hmul _ _ h1 h3, by simp [h2]⟩
 
-theorem eig_zero {M : Submodule R (N → C)} {χ : MulChar F R} {h : N → C} (hh : h ∈ eig M χ) :
-    h 0 = 0 := by
+theorem eig_zero {M : Submodule R (N → C)} {χ : MulChar F R} {h : N → C} (hh : h ∈ eig M χ)
+    : h 0 = 0 := by
   have := hh.2 0 0
   have h0 : χ 0 = 0 := χ.map_nonunit not_isUnit_zero
   simpa [h0] using this
 
-theorem step_bound (hv : v.Integers R) {M : Submodule R (N → C)} (hF : FStable F M)
-    (hmul : ∀ f g, f ∈ M → g ∈ M → f * g ∈ M) (χ : MulChar F R) {u : R}
-    (hu : algebraMap R C u = (Fintype.card Fˣ : C)⁻¹) (hc : (Fintype.card Fˣ : C) ≠ 0)
+theorem step_bound
+    (hv : v.Integers R)
+    {M : Submodule R (N → C)} (hF : FStable F M) (hmul : ∀ f g, f ∈ M → g ∈ M → f * g ∈ M)
+    (χ : MulChar F R)
+    {u : R} (hu : algebraMap R C u = (Fintype.card Fˣ : C)⁻¹)
+    (hc : (Fintype.card Fˣ : C) ≠ 0)
     {K₀ K₁ : Submodule F N} (h01 : K₀ ≤ K₁) (a₁ : K₁ → C)
     (ha₁ : a₁ ∈ eig (M.map (LinearMap.funLeft R C (Subtype.val : K₁ → N))) χ)
-    (hker : ∀ g ∈ augIdeal M, (∀ x ∈ K₀, g x = 0) →
-      ∃ r : R, ∃ g' ∈ sqIdeal (augIdeal M), ∀ x : K₁,
-        proj χ g (x : N) = algebraMap R C r * a₁ x + g' (x : N))
+    (hker : ∀ g ∈ augIdeal M,
+      (∀ x ∈ K₀, g x = 0)
+        → ∃ r : R, ∃ g' ∈ sqIdeal (augIdeal M), ∀ x : K₁,
+          proj χ g (x : N) = algebraMap R C r * a₁ x + g' (x : N))
     {x y : NNReal}
     (hB : HasLen v R (OmType (M.map (LinearMap.funLeft R C (Subtype.val : K₁ → N))) χ) x)
     (hD : HasLen v R (OmType (M.map (LinearMap.funLeft R C (Subtype.val : K₀ → N))) χ) y)
     (k : R)
-    (hk : k • a₁ ∈ sqIdeal (augIdeal (M.map (LinearMap.funLeft R C (Subtype.val : K₁ → N))))) :
-    v (algebraMap R C k) * y ≤ x := by
-  have hMR : ∀ r : R, ∀ g ∈ M.toAddSubgroup, (fun x => algebraMap R C r * g x) ∈ M.toAddSubgroup := by
+    (hk : k • a₁ ∈ sqIdeal (augIdeal (M.map (LinearMap.funLeft R C (Subtype.val : K₁ → N)))))
+    : v (algebraMap R C k) * y ≤ x := by
+  have hMR
+      : ∀ r : R, ∀ g ∈ M.toAddSubgroup, (fun x => algebraMap R C r * g x) ∈ M.toAddSubgroup := by
     intro r g hg
     rw [smul_fun]
     exact M.smul_mem r hg
-  have hSR : ∀ r : R, ∀ g ∈ (sqIdeal (augIdeal M)).toAddSubgroup,
-      (fun x => algebraMap R C r * g x) ∈ (sqIdeal (augIdeal M)).toAddSubgroup := by
+  have hSR
+      : ∀ r : R, ∀ g ∈ (sqIdeal (augIdeal M)).toAddSubgroup,
+        (fun x => algebraMap R C r * g x) ∈ (sqIdeal (augIdeal M)).toAddSubgroup := by
     intro r g hg
     rw [smul_fun]
     exact Submodule.smul_mem _ r hg
   let ι : K₀ → K₁ := Submodule.inclusion h01
   let ρ : (K₁ → C) →ₗ[R] (K₀ → C) := LinearMap.funLeft R C ι
-  have hρ : ∀ h ∈ eig (M.map (LinearMap.funLeft R C (Subtype.val : K₁ → N))) χ,
-      ρ h ∈ eig (M.map (LinearMap.funLeft R C (Subtype.val : K₀ → N))) χ := by
+  have hρ
+      : ∀ h ∈ eig (M.map (LinearMap.funLeft R C (Subtype.val : K₁ → N))) χ,
+        ρ h ∈ eig (M.map (LinearMap.funLeft R C (Subtype.val : K₀ → N))) χ := by
     rintro h ⟨⟨g, hg, rfl⟩, he⟩
     exact ⟨⟨g, hg, rfl⟩, fun a x => he a (ι x)⟩
   let E := ρ.restrict hρ
-  have hS : ((sqIdeal (augIdeal (M.map (LinearMap.funLeft R C (Subtype.val : K₁ → N))))).comap
-        (eig (M.map (LinearMap.funLeft R C (Subtype.val : K₁ → N))) χ).subtype) ≤
-      ((sqIdeal (augIdeal (M.map (LinearMap.funLeft R C (Subtype.val : K₀ → N))))).comap
-        (eig (M.map (LinearMap.funLeft R C (Subtype.val : K₀ → N))) χ).subtype).comap E := by
+  have hS
+      : ((sqIdeal (augIdeal (M.map (LinearMap.funLeft R C (Subtype.val : K₁ → N))))).comap
+          (eig (M.map (LinearMap.funLeft R C (Subtype.val : K₁ → N))) χ).subtype)
+        ≤ ((sqIdeal (augIdeal (M.map (LinearMap.funLeft R C (Subtype.val : K₀ → N))))).comap
+          (eig (M.map (LinearMap.funLeft R C (Subtype.val : K₀ → N))) χ).subtype).comap E := by
     intro z hz
     refine PullbackHopfOrder.sqIdeal_le ρ (fun _ _ => rfl) ?_ hz
     rintro f hf
@@ -275,8 +317,9 @@ theorem step_bound (hv : v.Integers R) {M : Submodule R (N → C)} (hF : FStable
     obtain ⟨⟨g, hg, rfl⟩, he⟩ := hh
     have g0 : g 0 = 0 := h0
     have hg' : proj χ g ∈ M := proj_mem M.toAddSubgroup χ hu hMR hF hg
-    have hmem : LinearMap.funLeft R C (Subtype.val : K₁ → N) (proj χ g) ∈
-        eig (M.map (LinearMap.funLeft R C (Subtype.val : K₁ → N))) χ :=
+    have hmem
+        : LinearMap.funLeft R C (Subtype.val : K₁ → N) (proj χ g)
+          ∈ eig (M.map (LinearMap.funLeft R C (Subtype.val : K₁ → N))) χ :=
       ⟨⟨_, hg', rfl⟩, fun a x => proj_eig χ g0 a x⟩
     refine ⟨Submodule.Quotient.mk ⟨_, hmem⟩, ?_⟩
     refine congrArg (Submodule.Quotient.mk (p := _)) (Subtype.ext ?_)
@@ -284,9 +327,10 @@ theorem step_bound (hv : v.Integers R) {M : Submodule R (N → C)} (hF : FStable
     exact proj_on χ hc (K₀ : Set N) (fun a x hx => he a ⟨x, hx⟩) x.2
   · intro b hb
     obtain ⟨⟨h, hh⟩, rfl⟩ := Submodule.Quotient.mk_surjective _ b
-    have hb2 : E ⟨h, hh⟩ ∈ (sqIdeal (augIdeal
-        (M.map (LinearMap.funLeft R C (Subtype.val : K₀ → N))))).comap
-        (eig (M.map (LinearMap.funLeft R C (Subtype.val : K₀ → N))) χ).subtype :=
+    have hb2
+        : E ⟨h, hh⟩
+          ∈ (sqIdeal (augIdeal (M.map (LinearMap.funLeft R C (Subtype.val : K₀ → N))))).comap
+            (eig (M.map (LinearMap.funLeft R C (Subtype.val : K₀ → N))) χ).subtype :=
       (Submodule.Quotient.mk_eq_zero _).1 hb
     have hb' : ρ h ∈ sqIdeal (augIdeal (M.map (LinearMap.funLeft R C (Subtype.val : K₀ → N)))) :=
       hb2
@@ -295,22 +339,23 @@ theorem step_bound (hv : v.Integers R) {M : Submodule R (N → C)} (hF : FStable
     obtain ⟨⟨g, hg, rfl⟩, he⟩ := hh
     have g0 : g 0 = 0 := h0
     obtain ⟨hg2M, hg20⟩ := PullbackHopfOrder.mem_augIdeal.1 (sq_le_aug hmul hg2)
-    obtain ⟨r, g', hg', hr⟩ := hker (g - g2)
-      (PullbackHopfOrder.mem_augIdeal.2 ⟨M.sub_mem hg hg2M, by simp [g0, hg20]⟩) (fun x hx => by
-        have := congrFun e2 ⟨x, hx⟩
-        have h3 : g2 x = g x := this
-        simp [h3])
+    obtain ⟨r, g', hg', hr⟩ :=
+      hker (g - g2) (PullbackHopfOrder.mem_augIdeal.2 ⟨M.sub_mem hg hg2M, by simp [g0, hg20]⟩)
+        (fun x hx => by
+          have := congrFun e2 ⟨x, hx⟩
+          have h3 : g2 x = g x := this
+          simp [h3])
     refine ⟨r, ?_⟩
     rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.eq]
     have hp2 : proj χ g2 ∈ sqIdeal (augIdeal M) :=
       proj_mem (sqIdeal (augIdeal M)).toAddSubgroup χ hu hSR (fun a g hg => sq_stable hF a hg) hg2
-    have e3 : LinearMap.funLeft R C (Subtype.val : K₁ → N) g - r • a₁ =
-        LinearMap.funLeft R C (Subtype.val : K₁ → N) (g' + proj χ g2) := by
+    have e3
+        : LinearMap.funLeft R C (Subtype.val : K₁ → N) g - r • a₁
+          = LinearMap.funLeft R C (Subtype.val : K₁ → N) (g' + proj χ g2) := by
       funext x
       have h4 := hr x
       rw [proj_sub, proj_on χ hc (K₁ : Set N) (fun a x hx => he a ⟨x, hx⟩) x.2] at h4
-      have h7 : (r • a₁) x = algebraMap R C r * a₁ x := by
-        rw [Pi.smul_apply, Algebra.smul_def]
+      have h7 : (r • a₁) x = algebraMap R C r * a₁ x := by rw [Pi.smul_apply, Algebra.smul_def]
       show g x - (r • a₁) x = g' x + proj χ g2 x
       rw [h7]
       linear_combination h4
@@ -327,14 +372,13 @@ section Flag
 
 variable {F : Type} [Field F] {n : ℕ}
 
-theorem mem_flagSub {j : ℕ} {x : Fin n → F} :
-    x ∈ flagSub (Pi.basisFun F (Fin n)) j ↔ ∀ k : Fin n, j ≤ (k : ℕ) → x k = 0 := by
+theorem mem_flagSub {j : ℕ} {x : Fin n → F}
+    : x ∈ flagSub (Pi.basisFun F (Fin n)) j ↔ ∀ k : Fin n, j ≤ (k : ℕ) → x k = 0 := by
   rw [flagSub, Module.Basis.mem_span_image]
   constructor
   · intro h k hk
     by_contra hx
-    have hm : k ∈ ((Pi.basisFun F (Fin n)).repr x).support := by
-      simpa using hx
+    have hm : k ∈ ((Pi.basisFun F (Fin n)).repr x).support := by simpa using hx
     have := h hm
     simp only [Set.mem_setOf_eq] at this
     omega
@@ -345,9 +389,9 @@ theorem mem_flagSub {j : ℕ} {x : Fin n → F} :
 
 variable {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C]
 
-theorem mem_xIdeal_res (M : Submodule R ((Fin n → F) → C)) (i : Fin n) (σ₁ : MulChar F R) (t : R) :
-    t ∈ xIdeal (stepOrderRes M (flagSub (Pi.basisFun F (Fin n)) i) (Pi.basisFun F (Fin n) i)) σ₁ ↔
-      ∃ g ∈ M, ∀ x ∈ flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1),
+theorem mem_xIdeal_res (M : Submodule R ((Fin n → F) → C)) (i : Fin n) (σ₁ : MulChar F R) (t : R)
+    : t ∈ xIdeal (stepOrderRes M (flagSub (Pi.basisFun F (Fin n)) i) (Pi.basisFun F (Fin n) i)) σ₁
+      ↔ ∃ g ∈ M, ∀ x ∈ flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1),
         g x = algebraMap R C t * algebraMap R C (σ₁ (x i)) := by
   constructor
   · rintro ⟨g, hg, h⟩
@@ -375,15 +419,15 @@ theorem mem_xIdeal_res (M : Submodule R ((Fin n → F) → C)) (i : Fin n) (σ�
     rw [h _ hx]
     simp [hki, Algebra.smul_def]
 
-theorem mem_vanSub {j : ℕ} {h : (Fin n → F) → C} :
-    h ∈ vanSub C F n j ↔ ∀ x ∈ flagSub (Pi.basisFun F (Fin n)) j, h x = 0 := by
+theorem mem_vanSub {j : ℕ} {h : (Fin n → F) → C}
+    : h ∈ vanSub C F n j ↔ ∀ x ∈ flagSub (Pi.basisFun F (Fin n)) j, h x = 0 := by
   simp only [vanSub, Submodule.mem_pi, Submodule.mem_bot, mem_flagSub, Set.mem_setOf_eq]
 
 variable {Sg : Type} {r s : Sg → ℕ} (D : LieLatticeData C F n Sg r s)
 
-theorem mem_xId (χ₁ : F → C) (i : Fin n) (t : C) :
-    t ∈ D.xId χ₁ i ↔ ∃ g ∈ D.M, ∀ x ∈ flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1),
-      g x = t * χ₁ (x i) := by
+theorem mem_xId (χ₁ : F → C) (i : Fin n) (t : C)
+    : t ∈ D.xId χ₁ i
+      ↔ ∃ g ∈ D.M, ∀ x ∈ flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1), g x = t * χ₁ (x i) := by
   simp only [LieLatticeData.xId, AddSubgroup.mem_comap]
   constructor
   · intro h
@@ -397,9 +441,11 @@ theorem mem_xId (χ₁ : F → C) (i : Fin n) (t : C) :
     refine mem_vanSub.2 fun x hx => ?_
     simp [h x hx]
 
-theorem mem_stepGraph (τ : Sg) (χ₁ : F → C) (i : Fin n) (t : C) (m : Fin (r τ) → C) :
-    (t, m) ∈ D.stepGraph τ χ₁ i ↔ ∃ g, (g, m) ∈ D.Th τ ∧
-      ∀ x ∈ flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1), g x = t * χ₁ (x i) := by
+theorem mem_stepGraph (τ : Sg) (χ₁ : F → C) (i : Fin n) (t : C) (m : Fin (r τ) → C)
+    : (t, m) ∈ D.stepGraph τ χ₁ i
+      ↔ ∃ g,
+        (g, m) ∈ D.Th τ
+          ∧ ∀ x ∈ flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1), g x = t * χ₁ (x i) := by
   simp only [LieLatticeData.stepGraph, AddSubgroup.mem_comap]
   constructor
   · intro h
@@ -425,19 +471,24 @@ end Flag
 
 section Main
 
-theorem exists_unit {o C : Type} [CommRing o] [Field C] [Algebra o C] (RC : Subalgebra o C)
-    (v : Valuation C NNReal) (hRC : ∀ c, c ∈ RC ↔ v c ≤ 1) (p : ℕ) (hp1 : v (p : C) < 1)
-    (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] :
-    ∃ u : RC, algebraMap RC C u = (Fintype.card Fˣ : C)⁻¹ ∧ (Fintype.card Fˣ : C) ≠ 0 := by
+theorem exists_unit
+    {o C : Type} [CommRing o] [Field C] [Algebra o C]
+    (RC : Subalgebra o C) (v : Valuation C NNReal) (hRC : ∀ c, c ∈ RC ↔ v c ≤ 1)
+    (p : ℕ) (hp1 : v (p : C) < 1)
+    (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p]
+    : ∃ u : RC, algebraMap RC C u = (Fintype.card Fˣ : C)⁻¹ ∧ (Fintype.card Fˣ : C) ≠ 0 := by
   have hnat : ∀ m : ℕ, v (m : C) ≤ 1 := fun m => (hRC _).1 (natCast_mem RC m)
   have hc : Fintype.card Fˣ + 1 = Fintype.card F := by
     rw [Fintype.card_units]
     exact Nat.sub_add_cancel Fintype.card_pos
-  have hcC : (Fintype.card Fˣ : C) + 1 = (Fintype.card F : C) := by exact_mod_cast congrArg (Nat.cast : ℕ → C) hc
+  have hcC : (Fintype.card Fˣ : C) + 1 = (Fintype.card F : C) := by
+    exact_mod_cast congrArg (Nat.cast : ℕ → C) hc
   obtain ⟨m, hm⟩ : p ∣ Fintype.card F := (CharP.cast_eq_zero_iff F p _).1 (Nat.cast_card_eq_zero F)
   have hq : v (Fintype.card F : C) < 1 := by
     rw [hm, Nat.cast_mul, map_mul]
-    calc v (p : C) * v (m : C) ≤ v (p : C) * 1 := by gcongr; exact hnat m
+    calc
+      v (p : C) * v (m : C)
+        ≤ v (p : C) * 1 := by gcongr; exact hnat m
       _ < 1 := by rwa [mul_one]
   have h1 : v (Fintype.card Fˣ : C) = 1 := by
     refine le_antisymm (hnat _) (not_lt.1 fun hlt => ?_)
@@ -451,14 +502,19 @@ theorem exists_unit {o C : Type} [CommRing o] [Field C] [Algebra o C] (RC : Suba
     exact zero_ne_one h1
   exact ⟨⟨(Fintype.card Fˣ : C)⁻¹, (hRC _).2 (by rw [map_inv₀, h1, inv_one])⟩, rfl, hne⟩
 
-theorem xId_iff {o C : Type} [CommRing o] [Field C] [Algebra o C] (RC : Subalgebra o C)
-    {F : Type} [Field F] {n : ℕ} {Sg : Type} {r s : Sg → ℕ} (D : LieLatticeData C F n Sg r s)
-    (hle : ∀ g ∈ D.M, ∀ x, g x ∈ RC) (M : Submodule RC ((Fin n → F) → C))
-    (hMD : ∀ g, g ∈ D.M ↔ g ∈ M) (i : Fin n) (σ₁ : MulChar F RC) (χ₁ : F → C)
-    (hχ₁ : ∀ a, χ₁ a = (σ₁ a : RC)) (c₁ : RC)
-    (hX : xIdeal (stepOrderRes M (flagSub (Pi.basisFun F (Fin n)) i)
-      (Pi.basisFun F (Fin n) i)) σ₁ = Ideal.span {c₁}) (t : C) :
-    t ∈ D.xId χ₁ i ↔ ∃ r : RC, t = r * c₁ := by
+theorem xId_iff
+    {o C : Type} [CommRing o] [Field C] [Algebra o C]
+    (RC : Subalgebra o C)
+    {F : Type} [Field F]
+    {n : ℕ} {Sg : Type} {r s : Sg → ℕ}
+    (D : LieLatticeData C F n Sg r s) (hle : ∀ g ∈ D.M, ∀ x, g x ∈ RC)
+    (M : Submodule RC ((Fin n → F) → C)) (hMD : ∀ g, g ∈ D.M ↔ g ∈ M) (i : Fin n)
+    (σ₁ : MulChar F RC) (χ₁ : F → C) (hχ₁ : ∀ a, χ₁ a = (σ₁ a : RC))
+    (c₁ : RC)
+    (hX : xIdeal (stepOrderRes M (flagSub (Pi.basisFun F (Fin n)) i) (Pi.basisFun F (Fin n) i)) σ₁
+      = Ideal.span {c₁})
+    (t : C)
+    : t ∈ D.xId χ₁ i ↔ ∃ r : RC, t = r * c₁ := by
   rw [mem_xId]
   constructor
   · rintro ⟨g, hg, h⟩
@@ -480,8 +536,9 @@ theorem xId_iff {o C : Type} [CommRing o] [Field C] [Algebra o C] (RC : Subalgeb
     obtain ⟨a, ha⟩ := Ideal.mem_span_singleton'.1 h3
     exact ⟨a, by simpa using (congrArg Subtype.val ha).symm⟩
   · rintro ⟨a, rfl⟩
-    have h3 : c₁ ∈ xIdeal (stepOrderRes M (flagSub (Pi.basisFun F (Fin n)) i)
-        (Pi.basisFun F (Fin n) i)) σ₁ := by
+    have h3
+        : c₁ ∈ xIdeal (stepOrderRes M (flagSub (Pi.basisFun F (Fin n)) i) (Pi.basisFun F (Fin n) i))
+          σ₁ := by
       rw [hX]
       exact Ideal.mem_span_singleton_self _
     obtain ⟨g, hg, h⟩ := (mem_xIdeal_res M i σ₁ c₁).1 h3
@@ -491,9 +548,37 @@ theorem xId_iff {o C : Type} [CommRing o] [Field C] [Algebra o C] (RC : Subalgeb
     simp only [mul_assoc]
     rfl
 
-theorem kernel_stepGraph : ∀ {o C : Type} [CommRing o] [Field C] [Algebra o C] [IsAlgClosed C] [CharZero C] (RC : Subalgebra o C) (v : Valuation C NNReal), (∀ c, c ∈ RC ↔ v c ≤ 1) → ∀ (p : ℕ) [Fact p.Prime], v (p : C) < 1 → ∀ {F : Type} [Field F] [Fintype F] [DecidableEq F] [CharP F p] {n : ℕ} {Sg : Type} {r s : Sg → ℕ} (D : LieLatticeData C F n Sg r s) (w : C) (χ : Sg → F → C) (φ : Equiv.Perm Sg), D.Base RC p w → ∀ AA : HopfOrder (C := C) RC (Fin n → F), AA.carrier.toAddSubgroup = D.M → FStable F AA.carrier → ∀ (σ : MulChar F RC), IsFund p σ → FlagConcl v p AA.carrier (Pi.basisFun F (Fin n)) σ → ∀ e : Sg → ℕ, (∀ τ a, χ τ a = ((σ ^ p ^ e τ) a : RC)) → (∀ τ, σ ^ p ^ e (φ τ) = σ ^ p ^ (e τ + 1)) → (∀ τ, (∀ g ∈ sqIdeal (augIdeal AA.carrier), (g, 0) ∈ D.Th τ) ∧ (∀ (a : F) g m, (g, m) ∈ D.Th τ → ((fun x => g (a • x)), χ τ a • m) ∈ D.Th τ) ∧ ∀ g ∈ eig AA.carrier (σ ^ p ^ e τ), (g, 0) ∈ D.Th τ → g ∈ sqIdeal (augIdeal AA.carrier)) → ∀ τ i, (D.stepGraph (φ τ) (χ (φ τ)) i).comap (AddMonoidHom.inl _ _) = powSpan RC p (D.xId (χ τ) i) := by
-  intro o C _ _ _ _ _ RC v hRC p _ hp1 F _ _ _ _ n Sg r s D w χ φ hB AA hM hFs σ hσ hfl e hχ hφ hTh τ i
-  have hpt := GlobalTheory.T.hopf_order_lattice_base RC v hRC p hp1 D w χ φ hB AA hM hFs σ hσ hfl e hχ hφ hTh (φ τ) i
+theorem kernel_stepGraph
+    : ∀ {o C : Type} [CommRing o] [Field C] [Algebra o C] [IsAlgClosed C] [CharZero C]
+        (RC : Subalgebra o C) (v : Valuation C NNReal),
+      (∀ c, c ∈ RC ↔ v c ≤ 1)
+        → ∀ (p : ℕ) [Fact p.Prime],
+          v (p : C) < 1
+            → ∀ {F : Type} [Field F] [Fintype F] [DecidableEq F] [CharP F p] {n : ℕ} {Sg : Type}
+                {r s : Sg → ℕ} (D : LieLatticeData C F n Sg r s) (w : C) (χ : Sg → F → C)
+                (φ : Equiv.Perm Sg),
+              D.Base RC p w
+                → ∀ AA : HopfOrder (C := C) RC (Fin n → F),
+                  AA.carrier.toAddSubgroup = D.M → FStable F AA.carrier
+                    → ∀ (σ : MulChar F RC),
+                      IsFund p σ → FlagConcl v p AA.carrier (Pi.basisFun F (Fin n)) σ
+                        → ∀ e : Sg → ℕ,
+                          (∀ τ a, χ τ a = ((σ ^ p ^ e τ) a : RC))
+                            → (∀ τ, σ ^ p ^ e (φ τ) = σ ^ p ^ (e τ + 1))
+                            → (∀ τ,
+                              (∀ g ∈ sqIdeal (augIdeal AA.carrier), (g, 0) ∈ D.Th τ)
+                                ∧ (∀ (a : F) g m,
+                                  (g, m) ∈ D.Th τ → ((fun x => g (a • x)), χ τ a • m) ∈ D.Th τ)
+                                ∧ ∀ g ∈ eig AA.carrier (σ ^ p ^ e τ),
+                                  (g, 0) ∈ D.Th τ → g ∈ sqIdeal (augIdeal AA.carrier))
+                            → ∀ τ i,
+                              (D.stepGraph (φ τ) (χ (φ τ)) i).comap (AddMonoidHom.inl _ _)
+                                = powSpan RC p (D.xId (χ τ) i) := by
+  intro o C _ _ _ _ _ RC v hRC p _ hp1 F _ _ _ _ n Sg r s D w χ φ hB AA hM hFs σ hσ hfl e hχ hφ hTh
+    τ i
+  have hpt :=
+    GlobalTheory.T.hopf_order_lattice_base RC v hRC p hp1 D w χ φ hB AA hM hFs σ hσ hfl e hχ hφ hTh
+      (φ τ) i
   obtain ⟨c, δ, hc, -, hlen⟩ := hfl
   have hv : v.Integers RC :=
     ⟨Subtype.val_injective, fun x => (hRC _).1 x.2, fun {c} hc => ⟨⟨c, (hRC c).2 hc⟩, rfl⟩⟩
@@ -516,14 +601,16 @@ theorem kernel_stepGraph : ∀ {o C : Type} [CommRing o] [Field C] [Algebra o C]
   obtain ⟨hH1, hH2, hH3⟩ := hTh (φ τ)
   rw [hφ τ] at hH3
   obtain ⟨hth1, -, -⟩ := hB.th (φ τ)
-  have hTproj : ∀ g, (g, (0 : Fin (r (φ τ)) → C)) ∈ D.Th (φ τ) →
-      (proj σ' g, (0 : Fin (r (φ τ)) → C)) ∈ D.Th (φ τ) := by
+  have hTproj
+      : ∀ g,
+        (g, (0 : Fin (r (φ τ)) → C)) ∈ D.Th (φ τ)
+          → (proj σ' g, (0 : Fin (r (φ τ)) → C)) ∈ D.Th (φ τ) := by
     intro g hg
     refine proj_mem ((D.Th (φ τ)).comap (AddMonoidHom.inl _ _)) σ' hu ?_ ?_ hg
     · intro a g hg
       have := ((hB.stable (φ τ) a a.2).2.2) (g, 0) hg
-      have e1 : (a : C) • (g, (0 : Fin (r (φ τ)) → C)) =
-          ((fun x => algebraMap RC C a * g x), 0) := by
+      have e1
+          : (a : C) • (g, (0 : Fin (r (φ τ)) → C)) = ((fun x => algebraMap RC C a * g x), 0) := by
         ext <;> simp [Algebra.smul_def]
       rw [e1] at this
       exact this
@@ -532,11 +619,13 @@ theorem kernel_stepGraph : ∀ {o C : Type} [CommRing o] [Field C] [Algebra o C]
       rw [smul_zero] at this
       exact this
   have hMproj : ∀ g ∈ AA.carrier, proj σ' g ∈ AA.carrier := fun g hg =>
-    proj_mem AA.carrier.toAddSubgroup σ' hu (fun a g hg => by
-      rw [smul_fun]; exact AA.carrier.smul_mem a hg) hFs hg
-  have hxid := fun (s' : ℕ) (σ₁ : MulChar F RC) (χ₁ : F → C) (h₁ : ∀ a, χ₁ a = (σ₁ a : RC))
-    (h₂ : σ₁ = σ ^ p ^ s') (t : C) =>
-    xId_iff RC D hle AA.carrier hMD i σ₁ χ₁ h₁ (c i s') (by rw [h₂]; exact (hc i s').2.2.1) t
+    proj_mem AA.carrier.toAddSubgroup σ' hu
+      (fun a g hg => by rw [smul_fun]; exact AA.carrier.smul_mem a hg)
+      hFs hg
+  have hxid :=
+    fun (s' : ℕ) (σ₁ : MulChar F RC) (χ₁ : F → C) (h₁ : ∀ a, χ₁ a = (σ₁ a : RC))
+        (h₂ : σ₁ = σ ^ p ^ s') (t : C) =>
+      xId_iff RC D hle AA.carrier hMD i σ₁ χ₁ h₁ (c i s') (by rw [h₂]; exact (hc i s').2.2.1) t
   have hxid' := hxid (s₀ + 1) σ' (χ (φ τ)) hχ' rfl
   have hxid₀ := hxid s₀ (σ ^ p ^ s₀) (χ τ) hχ0 rfl
   apply le_antisymm
@@ -546,14 +635,19 @@ theorem kernel_stepGraph : ∀ {o C : Type} [CommRing o] [Field C] [Algebra o C]
     obtain ⟨hgM, hg0⟩ := (hth1 g).1 ⟨0, hgTh⟩
     obtain ⟨k, rfl⟩ := (hxid' t).1 ((mem_xId D _ _ _).2 ⟨g, hgM, hgx⟩)
     set c' := c i (s₀ + 1) with hc'
-    let a₁ : flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1) → C :=
-      fun x => (c' : C) * ((σ' ((x : Fin n → F) i) : RC) : C)
-    have hx1 : c' ∈ xIdeal (stepOrderRes AA.carrier (flagSub (Pi.basisFun F (Fin n)) i)
-        (Pi.basisFun F (Fin n) i)) σ' := by
+    let a₁ : flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1) → C := fun x =>
+      (c' : C) * ((σ' ((x : Fin n → F) i) : RC) : C)
+    have hx1
+        : c' ∈ xIdeal
+          (stepOrderRes AA.carrier (flagSub (Pi.basisFun F (Fin n)) i) (Pi.basisFun F (Fin n) i))
+          σ' := by
       rw [(hc i (s₀ + 1)).2.2.1]
       exact Ideal.mem_span_singleton_self _
-    have ha₁ : a₁ ∈ eig (AA.carrier.map (LinearMap.funLeft RC C (Subtype.val :
-        flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1) → (Fin n → F)))) σ' := by
+    have ha₁
+        : a₁ ∈ eig
+          (AA.carrier.map (LinearMap.funLeft RC C
+            (Subtype.val : flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1) → (Fin n → F))))
+          σ' := by
       obtain ⟨g', hg', h'⟩ := (mem_xIdeal_res AA.carrier i σ' c').1 hx1
       refine ⟨⟨g', hg', funext fun x => h' x.1 x.2⟩, fun a x => ?_⟩
       show (c' : C) * ((σ' (a * (x : Fin n → F) i) : RC) : C) = _
@@ -561,18 +655,23 @@ theorem kernel_stepGraph : ∀ {o C : Type} [CommRing o] [Field C] [Algebra o C]
       show _ = ((σ' a : RC) : C) * ((c' : C) * ((σ' ((x : Fin n → F) i) : RC) : C))
       push_cast
       ring
-    have h01 : flagSub (Pi.basisFun F (Fin n)) i ≤ flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1) := by
+    have h01
+        : flagSub (Pi.basisFun F (Fin n)) i ≤ flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1) := by
       intro x hx
       exact mem_flagSub.2 fun l hl => mem_flagSub.1 hx l (by omega)
-    have hprojS : ∀ g, (g, (0 : Fin (r (φ τ)) → C)) ∈ D.Th (φ τ) →
-        proj σ' g ∈ sqIdeal (augIdeal AA.carrier) := by
+    have hprojS
+        : ∀ g,
+          (g, (0 : Fin (r (φ τ)) → C)) ∈ D.Th (φ τ)
+            → proj σ' g ∈ sqIdeal (augIdeal AA.carrier) := by
       intro g hg
       obtain ⟨hgM, hg0⟩ := (hth1 g).1 ⟨0, hg⟩
       exact hH3 _ ⟨hMproj g ((hMD g).1 hgM), proj_eig σ' hg0⟩ (hTproj g hg)
-    have hker : ∀ g ∈ augIdeal AA.carrier, (∀ x ∈ flagSub (Pi.basisFun F (Fin n)) i, g x = 0) →
-        ∃ r : RC, ∃ g' ∈ sqIdeal (augIdeal AA.carrier),
-          ∀ x : flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1),
-            proj σ' g (x : Fin n → F) = algebraMap RC C r * a₁ x + g' (x : Fin n → F) := by
+    have hker
+        : ∀ g ∈ augIdeal AA.carrier,
+          (∀ x ∈ flagSub (Pi.basisFun F (Fin n)) i, g x = 0)
+            → ∃ r : RC, ∃ g' ∈ sqIdeal (augIdeal AA.carrier),
+              ∀ x : flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1),
+                proj σ' g (x : Fin n → F) = algebraMap RC C r * a₁ x + g' (x : Fin n → F) := by
       intro g hg hgv
       obtain ⟨hgA, hgA0⟩ := PullbackHopfOrder.mem_augIdeal.1 hg
       obtain ⟨m, hm⟩ := (hth1 g).2 ⟨(hMD g).2 hgA, hgA0⟩
@@ -587,8 +686,9 @@ theorem kernel_stepGraph : ∀ {o C : Type} [CommRing o] [Field C] [Algebra o C]
         simpa using this
       refine ⟨r₁, proj σ' (g - g3), hprojS _ hd, fun x => ?_⟩
       have e1 : proj σ' g3 (x : Fin n → F) = g3 x := by
-        refine proj_on σ' hcard
-          (flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1) : Set (Fin n → F)) (fun a y hy => ?_) x.2
+        refine proj_on σ' hcard (flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1) : Set (Fin n → F))
+          (fun a y hy => ?_)
+          x.2
         have hy' : (a : F) • y ∈ flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1) :=
           Submodule.smul_mem _ _ hy
         rw [hg3x _ hy', hg3x y hy, hχ', hχ']
@@ -602,12 +702,16 @@ theorem kernel_stepGraph : ∀ {o C : Type} [CommRing o] [Field C] [Algebra o C]
       push_cast
       ring
     have hS₁ : proj σ' g ∈ sqIdeal (augIdeal AA.carrier) := hprojS g hgTh
-    have hres : k • a₁ = LinearMap.funLeft RC C (Subtype.val :
-        flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1) → (Fin n → F)) (proj σ' g) := by
+    have hres
+        : k • a₁
+          = LinearMap.funLeft RC C
+            (Subtype.val : flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1) → (Fin n → F))
+            (proj σ' g) := by
       funext x
       have e1 : proj σ' g (x : Fin n → F) = g x := by
-        refine proj_on σ' hcard
-          (flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1) : Set (Fin n → F)) (fun a y hy => ?_) x.2
+        refine proj_on σ' hcard (flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1) : Set (Fin n → F))
+          (fun a y hy => ?_)
+          x.2
         have hy' : (a : F) • y ∈ flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1) :=
           Submodule.smul_mem _ _ hy
         rw [hgx _ hy', hgx y hy, hχ', hχ']
@@ -619,8 +723,9 @@ theorem kernel_stepGraph : ∀ {o C : Type} [CommRing o] [Field C] [Algebra o C]
       show (k : C) * ((c' : C) * ((σ' ((x : Fin n → F) i) : RC) : C)) = proj σ' g (x : Fin n → F)
       rw [e1, hgx x.1 x.2, hχ']
       ring
-    have hbound := step_bound hv hFs AA.mul_mem σ' hu hcard h01 a₁ ha₁ hker
-      (hlen ((i : ℕ) + 1) s₀) (hlen i s₀) k (by rw [hres]; exact sq_res _ rfl _ hS₁)
+    have hbound :=
+      step_bound hv hFs AA.mul_mem σ' hu hcard h01 a₁ ha₁ hker (hlen ((i : ℕ) + 1) s₀) (hlen i s₀) k
+        (by rw [hres]; exact sq_res _ rfl _ hS₁)
     have hδ : ∀ (l : Fin n), δ l s₀ ≠ 0 := by
       intro l h0
       have h1 := (hc l s₀).2.2.2.2.1
@@ -628,14 +733,18 @@ theorem kernel_stepGraph : ∀ {o C : Type} [CommRing o] [Field C] [Algebra o C]
       exact (hc l s₀).1 (pow_eq_zero_iff hp0 |>.1 h1)
     have hvδ : ∀ l, v (algebraMap RC C (δ l s₀)) ≠ 0 := fun l =>
       (Valuation.ne_zero_iff v).2 (fun h => hδ l (Subtype.ext h))
-    have hfilter : Finset.univ.filter (fun l : Fin n => (l : ℕ) < (i : ℕ) + 1) =
-        insert i (Finset.univ.filter (fun l : Fin n => (l : ℕ) < (i : ℕ))) := by
+    have hfilter
+        : Finset.univ.filter (fun l : Fin n => (l : ℕ) < (i : ℕ) + 1)
+          = insert i (Finset.univ.filter (fun l : Fin n => (l : ℕ) < (i : ℕ))) := by
       ext l
       simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_insert, Fin.ext_iff]
       omega
     rw [hfilter, Finset.prod_insert (by simp)] at hbound
-    have hY : (∏ l ∈ Finset.univ.filter (fun l : Fin n => (l : ℕ) < (i : ℕ)),
-        v (algebraMap RC C (δ l s₀))) ≠ 0 := Finset.prod_ne_zero_iff.2 fun l _ => hvδ l
+    have hY
+        : (∏ l ∈ Finset.univ.filter (fun l : Fin n => (l : ℕ) < (i : ℕ)),
+            v (algebraMap RC C (δ l s₀)))
+          ≠ 0 :=
+      Finset.prod_ne_zero_iff.2 fun l _ => hvδ l
     have hkle : v (algebraMap RC C k) ≤ v (algebraMap RC C (δ i s₀)) :=
       le_of_mul_le_mul_right hbound (pos_iff_ne_zero.2 hY)
     have hδC : ((δ i s₀ : RC) : C) ≠ 0 := fun h => hδ i (Subtype.ext h)
@@ -654,7 +763,8 @@ theorem kernel_stepGraph : ∀ {o C : Type} [CommRing o] [Field C] [Algebra o C]
   · refine (AddSubgroup.closure_le _).2 ?_
     rintro _ ⟨a, ha, _, ⟨y, hy, rfl⟩, rfl⟩
     obtain ⟨g, hgM, hg⟩ := (mem_xId D _ _ _).1 hy
-    have hz : (0 : Fin n → F) ∈ flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1) := Submodule.zero_mem _
+    have hz : (0 : Fin n → F) ∈ flagSub (Pi.basisFun F (Fin n)) ((i : ℕ) + 1) :=
+      Submodule.zero_mem _
     have hχz : χ τ 0 = 0 := by
       rw [hχ0, MulChar.map_nonunit _ not_isUnit_zero]
       rfl

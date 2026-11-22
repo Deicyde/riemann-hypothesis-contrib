@@ -7,11 +7,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Two
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Two
 open scoped Pointwise
 
-private theorem gen_of_dvd_two {Q : Type} [Group Q] (H : Subgroup Q) (h : H.index ∣ 2) :
-    H.Normal ∧ ∃ γ : Q, ∀ u : Q, u ∈ H ∨ u * γ ∈ H := by
+private theorem gen_of_dvd_two {Q : Type} [Group Q] (H : Subgroup Q) (h : H.index ∣ 2)
+    : H.Normal ∧ ∃ γ : Q, ∀ u : Q, u ∈ H ∨ u * γ ∈ H := by
   rcases (Nat.dvd_prime Nat.prime_two).1 h with h1 | h2
   · rw [Subgroup.index_eq_one] at h1
     subst h1
@@ -19,8 +21,10 @@ private theorem gen_of_dvd_two {Q : Type} [Group Q] (H : Subgroup Q) (h : H.inde
   · obtain ⟨a, ha⟩ := Subgroup.index_eq_two_iff.1 h2
     exact ⟨Subgroup.normal_of_index_eq_two h2, a, fun u => (ha u).or.symm⟩
 
-theorem UpperTheory.V.Two.kerTwo :
-    ∀ (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] (ρ : Representation ℤ_[2] Γ (QZ 2)) (U' U : Subgroup Γ) (h : U' ≤ U), ContAction ρ → U'.relIndex U ∣ 2 → Module.length ℤ_[2] (LinearMap.ker (resU ρ h)) ≤ 1 := by
+theorem UpperTheory.V.Two.kerTwo
+    : ∀ (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+        (ρ : Representation ℤ_[2] Γ (QZ 2)) (U' U : Subgroup Γ) (h : U' ≤ U),
+      ContAction ρ → U'.relIndex U ∣ 2 → Module.length ℤ_[2] (LinearMap.ker (resU ρ h)) ≤ 1 := by
   intro Γ _ _ _ ρ U' U h hρ hd
   obtain ⟨hN, γ, hγ⟩ := gen_of_dvd_two (U'.subgroupOf U) hd
   have hcl : U ≤ (Subgroup.zpowers γ.1 ⊔ U').topologicalClosure := by
@@ -41,9 +45,11 @@ theorem UpperTheory.V.Two.kerTwo :
     conv_rhs => rw [← h3]
     rw [← Module.End.mul_apply, ← map_mul, ← Module.End.mul_apply, ← map_mul]
     simp [mul_assoc]
-  let T : H0U ρ U' →ₗ[ℤ_[2]] H0U ρ U' := (ρ γ - LinearMap.id).restrict (p := H0U ρ U') (q := H0U ρ U') hstab
+  let T : H0U ρ U' →ₗ[ℤ_[2]] H0U ρ U' :=
+    (ρ γ - LinearMap.id).restrict (p := H0U ρ U') (q := H0U ρ U') hstab
   obtain ⟨φ, hφ⟩ := kerResGen1 _ Γ _ ρ hρ U' U h γ γ.2 hcl T fun _ => rfl
-  refine subqLen 2 (H0U ρ U') _ _ (LinearMap.range T).mkQ φ (Submodule.mkQ_surjective _) hφ fun x => ?_
+  refine subqLen 2 (H0U ρ U') _ _ (LinearMap.range T).mkQ φ (Submodule.mkQ_surjective _) hφ fun x =>
+    ?_
   obtain ⟨k, hk⟩ := hd
   have h1 := kerResSmul _ Γ _ ρ U' U h x.1 x.2
   refine Subtype.ext ?_

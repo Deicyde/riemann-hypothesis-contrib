@@ -48,23 +48,21 @@ private lemma isDomain_away {A L B : Type*} [CommRing A] [CommRing L] [IsDomain 
     exact (hmu.mul_left_eq_zero).mp hm
   exact hinj.isDomain φ
 
-theorem UpperTheory.Reformulated.B.DYde8.main :
-    ∀ {X : AlgebraicGeometry.Scheme} {V : X.Opens},
-      AlgebraicGeometry.IsAffineOpen V →
-        ∀ [IsNoetherianRing (↑(X.presheaf.obj (Opposite.op V)) : Type)],
-          ∀ ξ ∈ V,
-            ∀ [IsDomain (↑(X.presheaf.stalk ξ) : Type)],
-              ∃ (f : (↑(X.presheaf.obj (Opposite.op V)) : Type)),
-                ξ ∈ X.basicOpen f ∧ IsDomain (↑(X.presheaf.obj (Opposite.op (X.basicOpen f))) : Type) := by
+theorem UpperTheory.Reformulated.B.DYde8.main
+    : ∀ {X : AlgebraicGeometry.Scheme} {V : X.Opens},
+      AlgebraicGeometry.IsAffineOpen V
+        → ∀ [IsNoetherianRing (↑(X.presheaf.obj (Opposite.op V)) : Type)], ∀ ξ ∈ V,
+          ∀ [IsDomain (↑(X.presheaf.stalk ξ) : Type)],
+            ∃ (f : (↑(X.presheaf.obj (Opposite.op V)) : Type)),
+              ξ ∈ X.basicOpen f
+                ∧ IsDomain (↑(X.presheaf.obj (Opposite.op (X.basicOpen f))) : Type) := by
   intro X V hV _ ξ hξ _
   letI alg : Algebra Γ(X, V) (X.presheaf.stalk ξ) :=
     X.presheaf.algebra_section_stalk (⟨ξ, hξ⟩ : V)
   let P := (hV.primeIdealOf ⟨ξ, hξ⟩).asIdeal
-  have hloc : IsLocalization P.primeCompl (X.presheaf.stalk ξ) :=
-    hV.isLocalization_stalk ⟨ξ, hξ⟩
-  obtain ⟨s, hs, hk⟩ := exists_kill P.primeCompl
-    (RingHom.ker (algebraMap Γ(X, V) (X.presheaf.stalk ξ)))
-    (fun a ha => by
+  have hloc : IsLocalization P.primeCompl (X.presheaf.stalk ξ) := hV.isLocalization_stalk ⟨ξ, hξ⟩
+  obtain ⟨s, hs, hk⟩ :=
+    exists_kill P.primeCompl (RingHom.ker (algebraMap Γ(X, V) (X.presheaf.stalk ξ))) (fun a ha => by
       obtain ⟨m, hm⟩ := (IsLocalization.map_eq_zero_iff P.primeCompl (X.presheaf.stalk ξ) a).mp ha
       exact ⟨m, m.2, hm⟩)
   refine ⟨s, ?_, ?_⟩

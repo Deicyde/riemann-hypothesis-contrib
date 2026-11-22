@@ -5,9 +5,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.StarRingEndRootEqNeg.rt0_conj_neg_ne_zero :
-    ∀ {E : Type} [inst : Field E] [inst_1 : NumberField E] [inst_2 : NumberField.IsCMField E]
-      (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E), (starRingEnd ℂ : ℂ → ℂ) H.rt0 = -H.rt0 := by
+theorem UpperTheory.Reformulated.B.StarRingEndRootEqNeg.rt0_conj_neg_ne_zero
+    : ∀ {E : Type} [inst : Field E] [inst_1 : NumberField E] [inst_2 : NumberField.IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E),
+      (starRingEnd ℂ : ℂ → ℂ) H.rt0 = -H.rt0 := by
   intro E _ _ _ H
   have hd : (0 : ℝ) < (H.d : ℝ) := by exact_mod_cast H.d_prime.pos
   have h := H.sqrt_neg_disc_sq

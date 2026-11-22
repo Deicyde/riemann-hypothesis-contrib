@@ -10,20 +10,24 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 open UpperTheory.V.Lit.Geo.Cs UpperTheory.V.Lit.Dr
 
-theorem UpperTheory.V.Lit.Geo.Cs.geoRet :
-    GeoRet := by
+theorem UpperTheory.V.Lit.Geo.Cs.geoRet : GeoRet := by
   intro Γ V S _ _ _ _ d G hc l hl Φ hΦ R q w z hw hb hz h
   have hB := fun s => pullB V (Fin d → ℂ) G.Y G.isOpen hc (l s) (hl.1 s) q (z.1 s) (z.2 s).1
   have hA := fun s => pullA V (Fin d → ℂ) G.Y G.isOpen hc (l s) (hl.1 s)
   have hs : ∀ s, ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (pull (l s) (z.1 s)) G.Y := fun s => (hB s).1
   have hv := fun s p (hp : p ∈ G.Y) => UpperTheory.V.Lit.Geo.toOm_apply G hs s hp
-  have hd : ∀ s, ∀ p ∈ G.Y, (G.dOm q (UpperTheory.V.Lit.Geo.toOm G fun s => pull (l s) (z.1 s))).1 s p =
-      pull (l s) (extDeriv (z.1 s)) p := fun s p hp => by
+  have hd
+      : ∀ s, ∀ p ∈ G.Y,
+        (G.dOm q (UpperTheory.V.Lit.Geo.toOm G fun s => pull (l s) (z.1 s))).1 s p
+          = pull (l s) (extDeriv (z.1 s)) p := fun s p hp => by
     rw [G.dOm_apply _ s hp, ← (hB s).2 p hp]
     refine Filter.EventuallyEq.extDeriv_eq ?_
     filter_upwards [G.isOpen.mem_nhds hp] with y hy using hv s y hy
-  refine ⟨UpperTheory.V.Lit.Geo.toOm G fun s => pull (l s) (z.1 s), ⟨fun γ => ?_, fun s p hp v i hi => ?_,
-    fun s p hp v i hi => ?_⟩, fun s p hp hR => ?_⟩
+  refine ⟨
+    UpperTheory.V.Lit.Geo.toOm G fun s => pull (l s) (z.1 s),
+    ⟨fun γ => ?_, fun s p hp v i hi => ?_, fun s p hp v i hi => ?_⟩,
+    fun s p hp hR => ?_
+  ⟩
   · refine Subtype.ext (funext fun s => funext fun p => ?_)
     by_cases hp : p ∈ G.Y
     · rw [hv s p hp, ← pullEquiv Γ V S d G hc l hl q z hz γ s p hp, ← hv _ _ (G.maps _ _ hp)]

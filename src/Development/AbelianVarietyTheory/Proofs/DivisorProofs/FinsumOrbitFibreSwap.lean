@@ -11,8 +11,8 @@ namespace OrbitFibre
 
 open MulAction Function
 
-theorem finsum_sigma_iter {ι : Type} {κ : ι → Type} (f : (Σ i, κ i) → ℂ)
-    (hf : (support f).Finite) : ∑ᶠ p, f p = ∑ᶠ i, ∑ᶠ k, f ⟨i, k⟩ := by
+theorem finsum_sigma_iter {ι : Type} {κ : ι → Type} (f : (Σ i, κ i) → ℂ) (hf : (support f).Finite)
+    : ∑ᶠ p, f p = ∑ᶠ i, ∑ᶠ k, f ⟨i, k⟩ := by
   classical
   set s := hf.toFinset with hs
   let t : Finset ι := s.image Sigma.fst
@@ -42,7 +42,6 @@ theorem finsum_sigma_iter {ι : Type} {κ : ι → Type} (f : (Σ i, κ i) → �
     simpa [hs] using hp
 
 variable {Γ A B J : Type} [Group Γ] [MulAction Γ A] [MulAction Γ B]
-
 
 end OrbitFibre
 

@@ -10,13 +10,17 @@ set_option autoImplicit false
 
 noncomputable section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell GlobalTheory.CompanionTheory.Ar.Fan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan GlobalTheory.PolCell
+  GlobalTheory.CompanionTheory.Ar.Fan
 
 namespace GlobalTheory.CompanionTheory.Ar.Fan
 
-theorem exists_nat_comb_of_toReal_mem_rcone (X : Type) [AddCommGroup X] (m : ℕ)
-    (γ : Fin m → LinearMap.BilinForm ℤ X) (β : LinearMap.BilinForm ℤ X) (hβ : toReal β ∈ rcone γ) :
-    ∃ (k : ℕ) (c : Fin m → ℕ), 0 < k ∧ k • β = ∑ i, c i • γ i := by
+theorem exists_nat_comb_of_toReal_mem_rcone
+    (X : Type) [AddCommGroup X]
+    (m : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X)
+    (β : LinearMap.BilinForm ℤ X) (hβ : toReal β ∈ rcone γ)
+    : ∃ (k : ℕ) (c : Fin m → ℕ), 0 < k ∧ k • β = ∑ i, c i • γ i := by
   obtain ⟨t, ht0, ht⟩ := hβ
   let vec : X × X → Fin (m + 1) → ℤ := fun p =>
     Fin.snoc (α := fun _ => ℤ) (fun i => γ i p.1 p.2) (-(β p.1 p.2))
@@ -27,8 +31,9 @@ theorem exists_nat_comb_of_toReal_mem_rcone (X : Type) [AddCommGroup X] (m : ℕ
     intro y z
     have h := LinearMap.congr_fun (LinearMap.congr_fun ht y) z
     simpa [toReal, LinearMap.sum_apply] using h
-  have hT : (∀ i, 0 ≤ T i) ∧ (∀ a ∈ (∅ : Set (Fin (m + 1) → ℤ)), ∑ i, (a i : ℝ) * T i ≤ 0) ∧
-      (∀ b ∈ Set.range vec, ∑ i, (b i : ℝ) * T i = 0) := by
+  have hT
+      : (∀ i, 0 ≤ T i) ∧ (∀ a ∈ (∅ : Set (Fin (m + 1) → ℤ)), ∑ i, (a i : ℝ) * T i ≤ 0)
+        ∧ (∀ b ∈ Set.range vec, ∑ i, (b i : ℝ) * T i = 0) := by
     refine ⟨fun i => ?_, fun a ha => absurd ha (Set.notMem_empty a), ?_⟩
     · refine Fin.lastCases ?_ (fun j => ?_) i
       · simp [T]
@@ -55,13 +60,17 @@ theorem exists_nat_comb_of_toReal_mem_rcone (X : Type) [AddCommGroup X] (m : ℕ
     rw [this] at hlast
     exact one_ne_zero hlast
   obtain ⟨k, hk⟩ := hex
-  have hv := (hreal (fun i => (v k i : ℝ))).2
-    ⟨Pi.single k 1, fun j => by
-      by_cases h : j = k
-      · subst h; simp
-      · simp [Pi.single_eq_of_ne h], by
-      rw [Finset.sum_eq_single k (fun b _ hb => by simp [Pi.single_eq_of_ne hb]) (by simp)]
-      simp⟩
+  have hv :=
+    (hreal (fun i => (v k i : ℝ))).2 ⟨
+      Pi.single k 1,
+      fun j => by
+        by_cases h : j = k
+        · subst h; simp
+        · simp [Pi.single_eq_of_ne h],
+      by
+        rw [Finset.sum_eq_single k (fun b _ hb => by simp [Pi.single_eq_of_ne hb]) (by simp)]
+        simp
+    ⟩
   refine ⟨v k (Fin.last m), fun i => v k i.castSucc, hk, ?_⟩
   refine LinearMap.ext₂ fun y z => ?_
   have h := hv.2.2 (vec (y, z)) ⟨(y, z), rfl⟩

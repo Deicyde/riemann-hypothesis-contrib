@@ -25,11 +25,11 @@ namespace Formalism.FourierDecayAlt.P.Topx2
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-
 section helpers
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-  [InnerProductSpace ℂ Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type}
+  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq]
 
 def chi0 (x : ℝ) : ℝ := Real.smoothTransition (2 * x - 1)
 
@@ -44,7 +44,8 @@ end helpers
 
 section diff
 
-variable {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+variable
+  {k r : ℕ} {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
 end diff

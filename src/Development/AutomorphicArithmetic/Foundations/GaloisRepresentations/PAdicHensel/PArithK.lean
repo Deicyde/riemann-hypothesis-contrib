@@ -6,7 +6,9 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC UpperTheory.Gal.W2.Seed UpperTheory.Gal.G1 UpperTheory.Gal.Int.Geo GlobalTheory.CongL
+open NumberField IsDedekindDomain Matrix GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid
+  GlobalTheory.LKDef GlobalTheory.CuspRep GlobalTheory.UnitaryBC UpperTheory.Gal.W2.Seed
+  UpperTheory.Gal.G1 UpperTheory.Gal.Int.Geo GlobalTheory.CongL
 open scoped TensorProduct
 
 private lemma conj_sqrt_neg {E : Type} [Field E] [NumberField E] [IsCMField E] (d : ℕ) (x : E)
@@ -55,8 +57,10 @@ private lemma omega_at {E : Type} [Field E] [NumberField E] [IsCMField E] (bar :
     simp only [map_mul, map_intCast, hω', hbω, hprod]
   · rw [hω', hw]; ring
 
-theorem UpperTheory.Gal.G1.pArithK :
-    BarEx → QuadEx → CEx → UnitMod → CodiffGen → CodiffUnit → IdemEx → RealGen → PosGen → DeltaEx → PerfOf → ArithK := by
+theorem UpperTheory.Gal.G1.pArithK
+    : BarEx → QuadEx → CEx → UnitMod → CodiffGen → CodiffUnit → IdemEx → RealGen → PosGen → DeltaEx
+      → PerfOf
+      → ArithK := by
   intro hBar hQuad hC hUnit _ _ hIdem hReal hPos hDelta hPerf E _ _ _ d hd x hx τ₀ Q hQ
   obtain ⟨M, hMdef⟩ : ∃ M : ℕ, M = ∏ q ∈ Q, q := ⟨_, rfl⟩
   have hprime : ∀ q ∈ Q, q.Prime := fun q hq => (hQ q hq).1.out
@@ -86,8 +90,7 @@ theorem UpperTheory.Gal.G1.pArithK :
     intro q hq
     obtain ⟨hF, hs⟩ := hQ q hq
     exact hsplit q hs
-  obtain ⟨ε, hε⟩ := hIdem E bar ω tr nm hbb htr hnm M hM
-    (fun q hq hqM => hsp q (hmem q hq hqM))
+  obtain ⟨ε, hε⟩ := hIdem E bar ω tr nm hbb htr hnm M hM (fun q hq hqM => hsp q (hmem q hq hqM))
   obtain ⟨t, ht1, ht2⟩ := hReal E bar hbar M hM ε hε
   obtain ⟨t', ht1', ht2', ht3'⟩ := hPos E M hM t ht1 ht2
   have hcop : IsCoprime (tr ^ 2 - 4 * nm) (M : ℤ) := by
@@ -98,10 +101,25 @@ theorem UpperTheory.Gal.G1.pArithK :
   have hc0 : c ≠ 0 := by
     rintro rfl
     simp at hc2
-  let A : Arith E :=
-    { bar := bar, bar_eq := hbar, ω := ω, tr := tr, nm := nm, tr_eq := htr, nm_eq := hnm, disc_neg := hneg,
-      τ₀ := τ₀, c := c, c_real := Subtype.ext ((hbar c).trans hc1), c_neg := hc2, c_pos := hc3,
-      δ := δ, δ_im := hδ1, δ_int := hδ2.1, δ_sign := hδ3 }
+  let A : Arith E := {
+    bar := bar
+    bar_eq := hbar
+    ω := ω
+    tr := tr
+    nm := nm
+    tr_eq := htr
+    nm_eq := hnm
+    disc_neg := hneg
+    τ₀ := τ₀
+    c := c
+    c_real := Subtype.ext ((hbar c).trans hc1)
+    c_neg := hc2
+    c_pos := hc3
+    δ := δ
+    δ_im := hδ1
+    δ_int := hδ2.1
+    δ_sign := hδ3
+  }
   refine ⟨A, rfl, ⟨f, hf0, hωx⟩, fun q _ hq => hsplit q hq, fun q hq => ⟨hsp q hq, ?_⟩⟩
   have hdvd : q ∣ M := by
     rw [hMdef]

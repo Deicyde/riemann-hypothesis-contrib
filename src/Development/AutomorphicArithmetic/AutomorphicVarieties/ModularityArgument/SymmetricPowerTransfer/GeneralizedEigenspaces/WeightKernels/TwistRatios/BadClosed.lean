@@ -6,16 +6,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil
+open NumberField IsDedekindDomain ValuativeRel Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.N Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL
+  GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil
 open UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict
 open UpperTheory.V.W (Plc Lp)
 open scoped Matrix
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem UpperTheory.V.Z.Sym.Ga.badClosed :
-    ∀ (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ) [Fact l.Prime] (r : G L Ω →* GL (Fin 2) (Qbar l)), Continuous r → (Continuous fun g => Ga.uf (r g)) ∧ (Continuous fun g : G L Ω => Ga.ep l g) ∧ IsClosed (Ga.Bad r) := by
+theorem UpperTheory.V.Z.Sym.Ga.badClosed
+    : ∀ (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ)
+        [Fact l.Prime] (r : G L Ω →* GL (Fin 2) (Qbar l)),
+      Continuous r
+        → (Continuous fun g => Ga.uf (r g)) ∧ (Continuous fun g : G L Ω => Ga.ep l g)
+          ∧ IsClosed (Ga.Bad r) := by
   intro L Ω _ _ _ _ _ l _ r hr
   have hm : Continuous fun g => ((r g : GL (Fin 2) (Qbar l)) : Matrix (Fin 2) (Fin 2) (Qbar l)) :=
     Units.continuous_val.comp hr
@@ -34,8 +40,10 @@ theorem UpperTheory.V.Z.Sym.Ga.badClosed :
     rfl
   have hne : ∀ g : G L Ω, Ga.ep l g ≠ 0 := fun g => (cycBar L Ω l g).ne_zero
   refine ⟨hU, hE, ?_⟩
-  have hset : Ga.Bad r = ⋃ m ∈ Finset.Icc (-2 : ℤ) 2,
-      {g | Ga.uf (r g) ^ 2 - 2 = Ga.ep l g ^ m + Ga.ep l g ^ (-m)} := by
+  have hset
+      : Ga.Bad r
+        = ⋃ m ∈ Finset.Icc (-2 : ℤ) 2,
+          {g | Ga.uf (r g) ^ 2 - 2 = Ga.ep l g ^ m + Ga.ep l g ^ (-m)} := by
     ext g
     simp only [Ga.Bad, Set.mem_setOf_eq, Set.mem_iUnion, Finset.mem_Icc, exists_prop, abs_le]
   rw [hset]

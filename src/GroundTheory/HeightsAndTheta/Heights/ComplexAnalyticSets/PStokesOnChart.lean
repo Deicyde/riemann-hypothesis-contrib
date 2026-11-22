@@ -14,13 +14,16 @@ namespace GroundTheory.Heights₂.Heights
 open MvPolynomial MeasureTheory Filter Topology Matrix ComplexSets
 open scoped ContDiff
 
-theorem StokesOnChart.proof (hD : ComplexSets.DiscriminantCover.Statement) (hL : CutOffLimit.Statement) :
-    StokesOnChart.Statement := by
-  have key : ∀ (n d : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ)) (A : Matrix (Fin (d + 1)) (Fin n) ℂ)
-      (f g : (Fin n → ℂ) → ℝ) (φ : Fin d → (Fin n → ℂ) → ℝ), J.IsPrime →
-      ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = (d + 1 : ℕ) → IsFiniteProjection J A →
-      SmoothNear (zeroSet J) f → SmoothNear (zeroSet J) g → (∀ i, SmoothNear (zeroSet J) (φ i)) →
-      HasCompactSupport f → chartInt J A f (vecCons g φ) = chartInt J A g (vecCons f φ) := by
+theorem StokesOnChart.proof
+    (hD : ComplexSets.DiscriminantCover.Statement) (hL : CutOffLimit.Statement)
+    : StokesOnChart.Statement := by
+  have key
+      : ∀ (n d : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ)) (A : Matrix (Fin (d + 1)) (Fin n) ℂ)
+          (f g : (Fin n → ℂ) → ℝ) (φ : Fin d → (Fin n → ℂ) → ℝ),
+        J.IsPrime → ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = (d + 1 : ℕ) → IsFiniteProjection J A
+          → SmoothNear (zeroSet J) f → SmoothNear (zeroSet J) g
+          → (∀ i, SmoothNear (zeroSet J) (φ i)) → HasCompactSupport f
+          → chartInt J A f (vecCons g φ) = chartInt J A g (vecCons f φ) := by
     intro n d J A f g φ hJ hdim hAf hf hg hφ hc
     obtain ⟨P, hP0, hPcov⟩ := hD n (d + 1) J A hJ hdim hAf
 
@@ -41,8 +44,9 @@ theorem StokesOnChart.proof (hD : ComplexSets.DiscriminantCover.Statement) (hL :
     obtain ⟨U, hU, hDU, hχ0⟩ := hχU k
     obtain ⟨V, hV, hZV, hfV⟩ := hf
     have hcχ : HasCompactSupport (fun x => χ k x * f x) := hc.mul_left (f := χ k)
-    refine (StokesOffDiscriminant.proof n d J A P hJ hdim hAf hP0 hsheet (fun x => χ k x * f x) g φ
-      ⟨V, hV, hZV, (hχs k).contDiffOn.mul hfV⟩ hg hφ hcχ ⟨U, hU, hDU, fun x hx => ?_⟩).symm
+    refine (StokesOffDiscriminant.proof n d J A P hJ hdim hAf hP0 hsheet
+      (fun x => χ k x * f x)
+      g φ ⟨V, hV, hZV, (hχs k).contDiffOn.mul hfV⟩ hg hφ hcχ ⟨U, hU, hDU, fun x hx => ?_⟩).symm
     rw [hχ0 x hx, zero_mul]
   intro n d J A f g φ hJ hdim hAf hf hg hφ hc
   rcases hc with hc | hc

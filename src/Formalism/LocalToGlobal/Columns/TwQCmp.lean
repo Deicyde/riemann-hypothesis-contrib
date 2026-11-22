@@ -13,7 +13,8 @@ namespace Formalism.L2.Col
 
 section Cmp
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {v : HeightOneSpectrum (𝓞 F)} (P : HeightOneSpectrum (𝓞 E)) (φ : E →+* v.adicCompletion F)
   (hint : ∀ r : 𝓞 E, Valued.v (φ (algebraMap (𝓞 E) E r)) ≤ 1)
   (hPv : ∀ r : 𝓞 E, Valued.v (φ (algebraMap (𝓞 E) E r)) < 1 ↔ r ∈ P.asIdeal)
@@ -22,8 +23,8 @@ include hint hPv in
 theorem qsp_val_one (t : 𝓞 E) (ht : t ∉ P.asIdeal) : Valued.v (φ (algebraMap (𝓞 E) E t)) = 1 :=
   le_antisymm (hint t) (not_lt.1 fun h => ht ((hPv t).1 h))
 
-theorem qsp_frac (x : E) (hx : P.valuation E x ≤ 1) :
-    ∃ (a : 𝓞 E) (t : 𝓞 E), t ∉ P.asIdeal ∧ x * algebraMap (𝓞 E) E t = algebraMap (𝓞 E) E a := by
+theorem qsp_frac (x : E) (hx : P.valuation E x ≤ 1)
+    : ∃ (a : 𝓞 E) (t : 𝓞 E), t ∉ P.asIdeal ∧ x * algebraMap (𝓞 E) E t = algebraMap (𝓞 E) E a := by
   obtain ⟨⟨n, d⟩, hnd⟩ := IsLocalization.surj (nonZeroDivisors (𝓞 E)) x
   simp only at hnd
   have hd0 : (d : 𝓞 E) ≠ 0 := nonZeroDivisors.ne_zero d.2
@@ -51,14 +52,13 @@ theorem qsp_frac (x : E) (hx : P.valuation E x ≤ 1) :
     exact Ideal.mul_mem_mul ((P.intValuation_le_pow_iff_mem n e).1 hvn) htJ
   obtain ⟨a, ha⟩ := Ideal.mem_span_singleton'.1 hnt
   refine ⟨a, t, htP, ?_⟩
-  have hD : algebraMap (𝓞 E) E d ≠ 0 :=
-    (map_ne_zero_iff _ (IsFractionRing.injective (𝓞 E) E)).2 hd0
-  have hat : algebraMap (𝓞 E) E a * algebraMap (𝓞 E) E d =
-      algebraMap (𝓞 E) E n * algebraMap (𝓞 E) E t := by
+  have hD : algebraMap (𝓞 E) E d ≠ 0 := (map_ne_zero_iff _ (IsFractionRing.injective (𝓞 E) E)).2 hd0
+  have hat
+      : algebraMap (𝓞 E) E a * algebraMap (𝓞 E) E d
+        = algebraMap (𝓞 E) E n * algebraMap (𝓞 E) E t := by
     rw [← map_mul, ← map_mul, ha]
   apply mul_right_cancel₀ hD
   linear_combination (algebraMap (𝓞 E) E t) * hnd - hat
-
 
 include hint hPv in
 theorem qsp_le_of_val (x : E) (hx : P.valuation E x ≤ 1) : Valued.v (φ x) ≤ 1 := by
@@ -67,7 +67,6 @@ theorem qsp_le_of_val (x : E) (hx : P.valuation E x ≤ 1) : Valued.v (φ x) ≤
   have h2 := hint a
   rw [← hxt, map_mul, Valuation.map_mul, h1, mul_one] at h2
   exact h2
-
 
 include hint hPv in
 theorem qsp_lt_of_val (x : E) (hx : P.valuation E x < 1) : Valued.v (φ x) < 1 := by
@@ -81,7 +80,6 @@ theorem qsp_lt_of_val (x : E) (hx : P.valuation E x < 1) : Valued.v (φ x) < 1 :
   have h2 := (hPv a).2 ha
   rw [← hxt, map_mul, Valuation.map_mul, h1, mul_one] at h2
   exact h2
-
 
 include hint hPv in
 theorem qsp_val_iff (x : E) : Valued.v (φ x) ≤ 1 ↔ P.valuation E x ≤ 1 := by
@@ -97,13 +95,12 @@ theorem qsp_val_iff (x : E) : Valued.v (φ x) ≤ 1 ↔ P.valuation E x ≤ 1 :=
   have hφ : φ x ≠ 0 := (map_ne_zero φ).2 hx0
   exact absurd h (not_le.2 ((Valuation.one_lt_val_iff _ hφ).2 hlt))
 
-
 include hint hPv in
-theorem qsp_mod (x d : E) (hd : d ≠ 0) (z : v.adicCompletion F) (hz : Valued.v z ≤ 1) (hxz : φ x = φ d * z) :
-    P.valuation E x ≤ P.valuation E d := by
+theorem qsp_mod
+    (x d : E) (hd : d ≠ 0) (z : v.adicCompletion F) (hz : Valued.v z ≤ 1) (hxz : φ x = φ d * z)
+    : P.valuation E x ≤ P.valuation E d := by
   have hφd : φ d ≠ 0 := (map_ne_zero φ).2 hd
-  have h1 : φ (x / d) = z := by
-    rw [map_div₀, hxz, mul_div_cancel_left₀ _ hφd]
+  have h1 : φ (x / d) = z := by rw [map_div₀, hxz, mul_div_cancel_left₀ _ hφd]
   have h2 : P.valuation E (x / d) ≤ 1 := (qsp_val_iff P φ hint hPv _).1 (by rw [h1]; exact hz)
   have h3 : x = x / d * d := by rw [div_mul_cancel₀ _ hd]
   rw [h3, map_mul]

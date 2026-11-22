@@ -38,8 +38,9 @@ lemma X_mem_integralSeries : X ∈ integralSeries := fun k ↦ by
   exacts [isIntegral_one, isIntegral_zero]
 
 def HasUnitLeadingExpansion (n : ℝ) (f : ℍ → ℂ) : Prop :=
-  ∃ (e : ℕ) (ψ : ℂ⟦X⟧), ψ ∈ integralSeries ∧ constantCoeff ψ ≠ 0 ∧
-    IsIntegral ℤ (constantCoeff ψ)⁻¹ ∧ HasQExpansion n (fun τ ↦ 𝕢 n τ ^ e * f τ) ψ
+  ∃ (e : ℕ) (ψ : ℂ⟦X⟧),
+    ψ ∈ integralSeries ∧ constantCoeff ψ ≠ 0 ∧ IsIntegral ℤ (constantCoeff ψ)⁻¹
+      ∧ HasQExpansion n (fun τ ↦ 𝕢 n τ ^ e * f τ) ψ
 
 lemma HasUnitLeadingExpansion.one (n : ℝ) : HasUnitLeadingExpansion n 1 :=
   ⟨0, 1, one_mem _, by simp, by simpa using isIntegral_one,
@@ -167,8 +168,8 @@ lemma hasUnitLeadingExpansion_sub {n a d : ℕ} {b : ℤ} (hn : a * d = n) (hn0 
     ring
 
 def fixedDetToGL {n : ℕ} (hn : n ≠ 0) (A : FixedDetMatrix (Fin 2) ℤ n) : GL (Fin 2) ℝ :=
-  Matrix.GeneralLinearGroup.mkOfDetNeZero ((Int.castRingHom ℝ).mapMatrix A.1) (by
-    rw [← RingHom.map_det, A.2]; simpa using hn)
+  Matrix.GeneralLinearGroup.mkOfDetNeZero ((Int.castRingHom ℝ).mapMatrix A.1)
+    (by rw [← RingHom.map_det, A.2]; simpa using hn)
 
 lemma coe_fixedDetToGL_smul {n : ℕ} (hn : n ≠ 0) (A : FixedDetMatrix (Fin 2) ℤ n) (τ : ℍ) :
     ((fixedDetToGL hn A • τ : ℍ) : ℂ) = (A.1 0 0 * τ + A.1 0 1) / (A.1 1 0 * τ + A.1 1 1) := by
@@ -196,10 +197,10 @@ lemma exists_fixedDetToGL_smul_eq {n : ℕ} (hn : n ≠ 0) (γ : SL(2, ℤ))
   rw [this, mul_smul]
   rfl
 
-theorem isIntegral_modularJ_of_fixed {n : ℕ} (hsq : ¬ IsSquare n)
-    (M : FixedDetMatrix (Fin 2) ℤ n) {τ₀ : ℍ}
-    (hM : M.1 0 0 * (τ₀ : ℂ) + M.1 0 1 = (M.1 1 0 * τ₀ + M.1 1 1) * τ₀) :
-    IsIntegral ℤ (modularJ τ₀) := by
+theorem isIntegral_modularJ_of_fixed
+    {n : ℕ} (hsq : ¬ IsSquare n) (M : FixedDetMatrix (Fin 2) ℤ n)
+    {τ₀ : ℍ} (hM : M.1 0 0 * (τ₀ : ℂ) + M.1 0 1 = (M.1 1 0 * τ₀ + M.1 1 1) * τ₀)
+    : IsIntegral ℤ (modularJ τ₀) := by
   classical
   have hn : n ≠ 0 := by rintro rfl; exact hsq IsSquare.zero
   let F : FixedDetMatrix (Fin 2) ℤ n → ℍ → ℂ := fun A τ ↦ modularJ (fixedDetToGL hn A • τ)
@@ -231,15 +232,19 @@ theorem isIntegral_modularJ_of_fixed {n : ℕ} (hsq : ¬ IsSquare n)
     · rw [ha, hd] at hdet
       exact_mod_cast hdet
     · simp [coe_fixedDetToGL_smul, h1, ha, hd]
-  have hmem (γ : SL(2, ℤ)) (G : ℍ → ℂ) (hG : G ∈ hfin.toFinset) :
-      (fun τ ↦ G (γ • τ)) ∈ hfin.toFinset := by
+  have hmem (γ : SL(2, ℤ)) (G : ℍ → ℂ) (hG : G ∈ hfin.toFinset)
+      : (fun τ ↦ G (γ • τ)) ∈ hfin.toFinset := by
     obtain ⟨A, rfl⟩ := hfin.mem_toFinset.mp hG
     obtain ⟨B, hB⟩ := exists_fixedDetToGL_smul_eq hn γ A
     exact hfin.mem_toFinset.mpr ⟨B, funext fun τ ↦ by simp only [F, hB]⟩
   refine hΦ.isIntegral_modularJ hn (fun γ τ ↦ ?_) ?_
   · simp only [Φ, Finset.prod_apply, modularJ_smul]
-    exact Finset.prod_nbij' (fun G τ ↦ G (γ • τ)) (fun G τ ↦ G (γ⁻¹ • τ)) (hmem γ) (hmem γ⁻¹)
-      (fun G _ ↦ by simp only [smul_inv_smul]) (fun G _ ↦ by simp only [inv_smul_smul])
+    exact Finset.prod_nbij'
+      (fun G τ ↦ G (γ • τ))
+      (fun G τ ↦ G (γ⁻¹ • τ))
+      (hmem γ) (hmem γ⁻¹)
+      (fun G _ ↦ by simp only [smul_inv_smul])
+      (fun G _ ↦ by simp only [inv_smul_smul])
       fun _ _ ↦ rfl
   · simp only [Φ, Finset.prod_apply]
     refine Finset.prod_eq_zero (hfin.mem_toFinset.mpr ⟨M, rfl⟩) ?_
@@ -250,8 +255,9 @@ theorem isIntegral_modularJ_of_fixed {n : ℕ} (hsq : ¬ IsSquare n)
       simpa [denom, fixedDetToGL] using h
     simp only [F, this, sub_self]
 
-theorem isIntegral_modularJ_of_quadratic {τ : ℍ} {a b c : ℤ} (ha : a ≠ 0)
-    (h : a * (τ : ℂ) ^ 2 + b * τ + c = 0) : IsIntegral ℤ (modularJ τ) := by
+theorem isIntegral_modularJ_of_quadratic
+    {τ : ℍ} {a b c : ℤ} (ha : a ≠ 0) (h : a * (τ : ℂ) ^ 2 + b * τ + c = 0)
+    : IsIntegral ℤ (modularJ τ) := by
   have hD : 0 < 4 * a * c - b ^ 2 := by
     have h1 := congrArg Complex.re h
     have h2 := congrArg Complex.im h
@@ -274,8 +280,7 @@ theorem isIntegral_modularJ_of_quadratic {τ : ℍ} {a b c : ℤ} (ha : a ≠ 0)
   refine isIntegral_modularJ_of_fixed (n := n) ?_
     ⟨!![k - b, -c; a, k], by rw [← hn, Matrix.det_fin_two_of]; ring⟩ ?_
   · rintro ⟨r, hr⟩
-    have h5 : (2 * r : ℤ) ^ 2 = (2 * k - b) ^ 2 + D := by
-      rw [← h4, hn, hr]; push_cast; ring
+    have h5 : (2 * r : ℤ) ^ 2 = (2 * k - b) ^ 2 + D := by rw [← h4, hn, hr]; push_cast; ring
     generalize 2 * k - b = m at *
     have h6 : m < 2 * r := by nlinarith
     nlinarith
@@ -284,9 +289,10 @@ theorem isIntegral_modularJ_of_quadratic {τ : ℍ} {a b c : ℤ} (ha : a ≠ 0)
     push_cast
     linear_combination -h
 
-theorem isIntegral_modularJ_of_mul_mem {τ : ℍ} {α : ℂ} (hα : ∀ m : ℤ, α ≠ m)
-    (h : ∀ x ∈ Submodule.span ℤ {(τ : ℂ), 1}, α * x ∈ Submodule.span ℤ {(τ : ℂ), 1}) :
-    IsIntegral ℤ (modularJ τ) := by
+theorem isIntegral_modularJ_of_mul_mem
+    {τ : ℍ} {α : ℂ} (hα : ∀ m : ℤ, α ≠ m)
+    (h : ∀ x ∈ Submodule.span ℤ {(τ : ℂ), 1}, α * x ∈ Submodule.span ℤ {(τ : ℂ), 1})
+    : IsIntegral ℤ (modularJ τ) := by
   obtain ⟨p, q, hpq⟩ := Submodule.mem_span_pair.mp (h τ (Submodule.subset_span (by simp)))
   obtain ⟨r, s, hrs⟩ := Submodule.mem_span_pair.mp (h 1 (Submodule.subset_span (by simp)))
   simp only [zsmul_eq_mul, mul_one] at hpq hrs
@@ -296,18 +302,20 @@ theorem isIntegral_modularJ_of_mul_mem {τ : ℍ} {α : ℂ} (hα : ∀ m : ℤ,
   · push_cast
     linear_combination (τ : ℂ) * hrs - hpq
 
-
 open NumberField in
-theorem isIntegral_modularJ_of_ringOfIntegers {K : Type*} [Field K] [NumberField K]
-    (hK : Module.finrank ℚ K = 2) (ι : K →+* ℂ) {τ : ℍ}
-    (h : ∀ α : 𝓞 K, ∀ x ∈ Submodule.span ℤ {(τ : ℂ), 1},
-      ι α * x ∈ Submodule.span ℤ {(τ : ℂ), 1}) :
-    IsIntegral ℤ (modularJ τ) := by
+theorem isIntegral_modularJ_of_ringOfIntegers
+    {K : Type*} [Field K] [NumberField K]
+    (hK : Module.finrank ℚ K = 2)
+    (ι : K →+* ℂ)
+    {τ : ℍ}
+    (h : ∀ α : 𝓞 K, ∀ x ∈ Submodule.span ℤ {(τ : ℂ), 1}, ι α * x ∈ Submodule.span ℤ {(τ : ℂ), 1})
+    : IsIntegral ℤ (modularJ τ) := by
   obtain ⟨α, hα⟩ : ∃ α : 𝓞 K, ∀ m : ℤ, α ≠ m := by
     by_contra! hc
-    have := finrank_le_one (R := ℤ) (1 : 𝓞 K) fun α ↦ by
-      obtain ⟨m, hm⟩ := hc α
-      exact ⟨m, by simp [hm]⟩
+    have :=
+      finrank_le_one (R := ℤ) (1 : 𝓞 K) fun α ↦ by
+        obtain ⟨m, hm⟩ := hc α
+        exact ⟨m, by simp [hm]⟩
     rw [NumberField.RingOfIntegers.rank, hK] at this
     omega
   refine isIntegral_modularJ_of_mul_mem (fun m hm ↦ hα m ?_) (h α)
@@ -315,13 +323,15 @@ theorem isIntegral_modularJ_of_ringOfIntegers {K : Type*} [Field K] [NumberField
   apply ι.injective
   simpa using hm
 
-def halfOneAddSqrtNeg (d : ℕ) (hd : d ≠ 0) : ℍ :=
-  ⟨(1 + √d * Complex.I) / 2, by
+def halfOneAddSqrtNeg (d : ℕ) (hd : d ≠ 0) : ℍ := ⟨
+  (1 + √d * Complex.I) / 2,
+  by
     have : (0 : ℝ) < √d := Real.sqrt_pos.mpr (by positivity)
-    simpa using this⟩
+    simpa using this
+⟩
 
-theorem isIntegral_modularJ_halfOneAddSqrtNeg (d : ℕ) (hd : d ≠ 0) :
-    IsIntegral ℤ (modularJ (halfOneAddSqrtNeg d hd)) := by
+theorem isIntegral_modularJ_halfOneAddSqrtNeg (d : ℕ) (hd : d ≠ 0)
+    : IsIntegral ℤ (modularJ (halfOneAddSqrtNeg d hd)) := by
   refine isIntegral_modularJ_of_quadratic (a := 4) (b := -4) (c := 1 + d) (by norm_num) ?_
   have h1 : ((√d : ℝ) : ℂ) ^ 2 = d := by
     rw [← Complex.ofReal_pow, Real.sq_sqrt (by positivity)]; simp
@@ -329,18 +339,15 @@ theorem isIntegral_modularJ_halfOneAddSqrtNeg (d : ℕ) (hd : d ≠ 0) :
   push_cast
   linear_combination ((√d : ℝ) : ℂ) ^ 2 * Complex.I_sq - h1
 
-theorem exists_hasSum_modularJ_sub_inv : ∃ c : ℕ → ℤ, ∀ τ : ℍ,
-    HasSum (fun n ↦ (c n : ℂ) * 𝕢 1 τ ^ n) (modularJ τ - (𝕢 1 τ)⁻¹) := by
+theorem exists_hasSum_modularJ_sub_inv
+    : ∃ c : ℕ → ℤ, ∀ τ : ℍ, HasSum (fun n ↦ (c n : ℂ) * 𝕢 1 τ ^ n) (modularJ τ - (𝕢 1 τ)⁻¹) := by
   obtain ⟨J, hJ0, hJ⟩ := exists_hasQExpansion_modularJ
-  obtain ⟨K, hK⟩ : X ∣ J - 1 := X_dvd_iff.mpr (by
-    rw [map_sub, map_one, ← coeff_zero_eq_constantCoeff_apply, hJ0, sub_self])
+  obtain ⟨K, hK⟩ : X ∣ J - 1 :=
+    X_dvd_iff.mpr (by rw [map_sub, map_one, ← coeff_zero_eq_constantCoeff_apply, hJ0, sub_self])
   have h1 := hJ.sub (HasQExpansion.const 1 1)
-  rw [map_one, ← map_one (PowerSeries.map (Int.castRingHom ℂ)), ← map_sub, hK, map_mul,
-    map_X] at h1
+  rw [map_one, ← map_one (PowerSeries.map (Int.castRingHom ℂ)), ← map_sub, hK, map_mul, map_X] at h1
   have h2 : HasQExpansion 1 (fun τ ↦ modularJ τ - (𝕢 1 τ)⁻¹) _ :=
-    .of_qParam_mul (h1.congr fun τ ↦ by
-      rw [mul_sub, mul_inv_cancel₀ (Periodic.qParam_ne_zero _)])
+    .of_qParam_mul (h1.congr fun τ ↦ by rw [mul_sub, mul_inv_cancel₀ (Periodic.qParam_ne_zero _)])
   exact ⟨fun n ↦ coeff n K, fun τ ↦ by simpa using h2 τ⟩
-
 
 end GlobalTheory

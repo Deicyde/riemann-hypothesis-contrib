@@ -10,18 +10,26 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AbelianSchem
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.EtLev
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.EtLev
 
 noncomputable section
 namespace GlobalTheory.UPel.HT.EtLev.GeoCard
 
-theorem card_ker_elt {p : ℕ} [Fact p.Prime] {D : Datum p} {R : Type} [CommRing R] {b : Base D R} {N : ℕ}
-    {w0 : Ideal (𝓞 D.F)} (hw : IsEtPlace b w0) {S : Scheme.{0}} {s : S ⟶ Sp R} (o : Obj b N s) (k : Type) [Field k]
-    [IsAlgClosed k] (x : Sp k ⟶ S) (c : 𝓞 D.F) (hc : c ≠ 0)
-    (hcw : ∀ w : Ideal (𝓞 D.F), w.IsMaximal → ((p : ℕ) : 𝓞 D.F) ∈ w → w ≠ w0 → c ∉ w) :
-    Nat.card {g : Over.mk x ⟶ o.A // g ≫ o.act.act (algebraMap (𝓞 D.F) D.O c) = 1} =
-      (Algebra.norm ℤ c).natAbs ^ (D.m * D.n) := by
+theorem card_ker_elt
+    {p : ℕ} [Fact p.Prime]
+    {D : Datum p} {R : Type} [CommRing R]
+    {b : Base D R} {N : ℕ} {w0 : Ideal (𝓞 D.F)} (hw : IsEtPlace b w0)
+    {S : Scheme.{0}} {s : S ⟶ Sp R} (o : Obj b N s)
+    (k : Type) [Field k] [IsAlgClosed k]
+    (x : Sp k ⟶ S)
+    (c : 𝓞 D.F)
+    (hc : c ≠ 0) (hcw : ∀ w : Ideal (𝓞 D.F), w.IsMaximal → ((p : ℕ) : 𝓞 D.F) ∈ w → w ≠ w0 → c ∉ w)
+    : Nat.card {g : Over.mk x ⟶ o.A // g ≫ o.act.act (algebraMap (𝓞 D.F) D.O c) = 1}
+      = (Algebra.norm ℤ c).natAbs ^ (D.m * D.n) := by
   obtain ⟨ℓ, hℓ1, hℓ⟩ := Nat.exists_infinite_primes (p + ringChar k + 1)
   have hℓp : ℓ ≠ p := by omega
   have hℓk : (ℓ : k) ≠ 0 := by
@@ -30,13 +38,20 @@ theorem card_ker_elt {p : ℕ} [Fact p.Prime] {D : Datum p} {R : Type} [CommRing
     rcases (Nat.dvd_prime hℓ).1 hd with h1 | h1
     · exact CharP.ringChar_ne_one (R := k) h1
     · omega
-  exact GlobalTheory.T.abelianScheme_card_kernel_eq_norm_pow S o.A o.ab D.F (o.act.toF D) k x (D.m * D.n) ℓ hℓ hℓk (GlobalTheory.T.exists_level_structure_on_torsion p D R b N S s o k x ℓ hℓ hℓp) c hc
-    (GlobalTheory.T.harrisTaylor_tangent_injective_away_from_etalePlace p D R b N w0 hw S s o k x c hc hcw)
+  exact GlobalTheory.T.abelianScheme_card_kernel_eq_norm_pow S o.A o.ab D.F (o.act.toF D) k x
+    (D.m * D.n) ℓ hℓ hℓk
+    (GlobalTheory.T.exists_level_structure_on_torsion p D R b N S s o k x ℓ hℓ hℓp) c hc
+    (GlobalTheory.T.harrisTaylor_tangent_injective_away_from_etalePlace p D R b N w0 hw S s o k x c
+      hc hcw)
 
-theorem card_ker_place : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (N : ℕ)
-    (w0 : Ideal (𝓞 D.F)), IsEtPlace b w0 → ∀ (S : Scheme.{0}) (s : S ⟶ Sp R) (o : Obj b N s) (k : Type) [Field k]
-    [IsAlgClosed k] (x : Sp k ⟶ S), Nat.card {g : Over.mk x ⟶ o.A // ∀ c ∈ w0,
-      g ≫ o.act.act (algebraMap (𝓞 D.F) D.O c) = 1} = Nat.card (𝓞 D.F ⧸ w0) ^ (D.m * D.n) := by
+theorem card_ker_place
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (N : ℕ)
+        (w0 : Ideal (𝓞 D.F)),
+      IsEtPlace b w0
+        → ∀ (S : Scheme.{0}) (s : S ⟶ Sp R) (o : Obj b N s) (k : Type) [Field k] [IsAlgClosed k]
+            (x : Sp k ⟶ S),
+          Nat.card {g : Over.mk x ⟶ o.A // ∀ c ∈ w0, g ≫ o.act.act (algebraMap (𝓞 D.F) D.O c) = 1}
+            = Nat.card (𝓞 D.F ⧸ w0) ^ (D.m * D.n) := by
   intro p _ D R _ b N w0 hw S s o k _ _ x
   letI : CommGroup (Over.mk x ⟶ o.A) := Hom.commGroup
   have act0 : o.act.act 0 = 1 := by
@@ -70,8 +85,10 @@ theorem card_ker_place : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [
       zero_smul := fun g => by
         show Additive.ofMul (g.toMul ≫ o.act.act (algebraMap (𝓞 D.F) D.O 0)) = Additive.ofMul 1
         rw [map_zero, act0, MonObj.comp_one] }
-  have hsm : ∀ (c : 𝓞 D.F) (g : Additive (Over.mk x ⟶ o.A)),
-      c • g = Additive.ofMul (g.toMul ≫ o.act.act (algebraMap (𝓞 D.F) D.O c)) := fun _ _ => rfl
+  have hsm
+      : ∀ (c : 𝓞 D.F) (g : Additive (Over.mk x ⟶ o.A)),
+        c • g = Additive.ofMul (g.toMul ≫ o.act.act (algebraMap (𝓞 D.F) D.O c)) := fun _ _ =>
+    rfl
   have hmax : w0.IsMaximal := hw.1
   have hne : w0 ≠ ⊥ := by
     intro h0
@@ -79,7 +96,8 @@ theorem card_ker_place : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [
     rw [h0, Ideal.mem_bot] at hp
     exact (Fact.out : p.Prime).ne_zero (by exact_mod_cast hp)
 
-  have hdiv : ∀ c : 𝓞 D.F, c ≠ 0 → Function.Surjective (fun g : Additive (Over.mk x ⟶ o.A) => c • g) := by
+  have hdiv
+      : ∀ c : 𝓞 D.F, c ≠ 0 → Function.Surjective (fun g : Additive (Over.mk x ⟶ o.A) => c • g) := by
     intro c hc g
     set n := Ideal.absNorm (Ideal.span {c}) with hn
     have hn0 : 0 < n := by
@@ -87,15 +105,18 @@ theorem card_ker_place : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [
       exact hc
     have hmem : ((n : ℕ) : 𝓞 D.F) ∈ Ideal.span {c} := Ideal.absNorm_mem _
     obtain ⟨c', hc'⟩ := Ideal.mem_span_singleton'.mp hmem
-    obtain ⟨g', hg'⟩ := GlobalTheory.T.exists_pow_eq_point_of_isAbelianScheme S o.A o.ab k x n hn0 g.toMul
+    obtain ⟨g', hg'⟩ :=
+      GlobalTheory.T.exists_pow_eq_point_of_isAbelianScheme S o.A o.ab k x n hn0 g.toMul
     refine ⟨c' • Additive.ofMul g', ?_⟩
     show c • c' • Additive.ofMul g' = g
     rw [smul_smul, mul_comm, hc', Nat.cast_smul_eq_nsmul, ← ofMul_pow, hg']
     rfl
 
-  have hT : ∀ I : Ideal (𝓞 D.F), Nat.card (Submodule.torsionBySet (𝓞 D.F) (Additive (Over.mk x ⟶ o.A))
-      (I : Set (𝓞 D.F))) = Nat.card {g : Over.mk x ⟶ o.A // ∀ c ∈ I,
-        g ≫ o.act.act (algebraMap (𝓞 D.F) D.O c) = 1} := by
+  have hT
+      : ∀ I : Ideal (𝓞 D.F),
+        Nat.card (Submodule.torsionBySet (𝓞 D.F) (Additive (Over.mk x ⟶ o.A)) (I : Set (𝓞 D.F)))
+          = Nat.card
+            {g : Over.mk x ⟶ o.A // ∀ c ∈ I, g ≫ o.act.act (algebraMap (𝓞 D.F) D.O c) = 1} := by
     intro I
     refine Nat.card_congr (Equiv.subtypeEquiv Additive.toMul (fun g => ?_))
     rw [Submodule.mem_torsionBySet_iff]
@@ -111,7 +132,8 @@ theorem card_ker_place : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [
   have hw0nz : w0 ∈ nonZeroDivisors (Ideal (𝓞 D.F)) := mem_nonZeroDivisors_of_ne_zero hne
   set H := orderOf (ClassGroup.mk0 ⟨w0, hw0nz⟩) with hH
   have hH0 : 0 < H := orderOf_pos _
-  have hpowz : w0 ^ H ∈ nonZeroDivisors (Ideal (𝓞 D.F)) := mem_nonZeroDivisors_of_ne_zero (pow_ne_zero _ hne)
+  have hpowz : w0 ^ H ∈ nonZeroDivisors (Ideal (𝓞 D.F)) :=
+    mem_nonZeroDivisors_of_ne_zero (pow_ne_zero _ hne)
   have hprin : Submodule.IsPrincipal (w0 ^ H) := by
     rw [← ClassGroup.mk0_eq_one_iff hpowz]
     have : (⟨w0 ^ H, hpowz⟩ : nonZeroDivisors (Ideal (𝓞 D.F))) = ⟨w0, hw0nz⟩ ^ H := rfl
@@ -129,10 +151,13 @@ theorem card_ker_place : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [
     exact (hmax.eq_of_le hwm.ne_top (hwm.isPrime.le_of_pow_le h1)).symm
   have hcount := card_ker_elt hw o k x c hc0 hcw
   have hnorm : (Algebra.norm ℤ c).natAbs = Nat.card (𝓞 D.F ⧸ w0) ^ H := by
-    rw [← Ideal.absNorm_span_singleton, ← hspan, map_pow, Ideal.absNorm_apply, Submodule.cardQuot_apply]
+    rw [← Ideal.absNorm_span_singleton, ← hspan, map_pow, Ideal.absNorm_apply,
+      Submodule.cardQuot_apply]
 
-  have hTH : Nat.card (Submodule.torsionBySet (𝓞 D.F) (Additive (Over.mk x ⟶ o.A))
-      ((w0 ^ H : Ideal (𝓞 D.F)) : Set (𝓞 D.F))) = Nat.card (𝓞 D.F ⧸ w0) ^ (H * (D.m * D.n)) := by
+  have hTH
+      : Nat.card (Submodule.torsionBySet (𝓞 D.F) (Additive (Over.mk x ⟶ o.A))
+          ((w0 ^ H : Ideal (𝓞 D.F)) : Set (𝓞 D.F)))
+        = Nat.card (𝓞 D.F ⧸ w0) ^ (H * (D.m * D.n)) := by
     rw [hspan, Submodule.torsionBySet_span_singleton_eq, pow_mul, ← hnorm, ← hcount]
     refine Nat.card_congr (Equiv.subtypeEquiv Additive.toMul (fun g => ?_))
     rw [Submodule.mem_torsionBy_iff, hsm]
@@ -151,10 +176,13 @@ theorem card_ker_place : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [
     apply Nat.finite_of_card_ne_zero
     rw [hTH]
     exact pow_ne_zero _ (by omega)
-  have hsub : Submodule.torsionBySet (𝓞 D.F) (Additive (Over.mk x ⟶ o.A)) (w0 : Set (𝓞 D.F)) ≤
-      Submodule.torsionBySet (𝓞 D.F) (Additive (Over.mk x ⟶ o.A)) ((w0 ^ H : Ideal (𝓞 D.F)) : Set (𝓞 D.F)) :=
+  have hsub
+      : Submodule.torsionBySet (𝓞 D.F) (Additive (Over.mk x ⟶ o.A)) (w0 : Set (𝓞 D.F))
+        ≤ Submodule.torsionBySet (𝓞 D.F) (Additive (Over.mk x ⟶ o.A))
+          ((w0 ^ H : Ideal (𝓞 D.F)) : Set (𝓞 D.F)) :=
     Submodule.torsionBySet_le_torsionBySet_of_subset (Ideal.pow_le_self hH0.ne')
-  have hT1fin : Finite (Submodule.torsionBySet (𝓞 D.F) (Additive (Over.mk x ⟶ o.A)) (w0 : Set (𝓞 D.F))) :=
+  have hT1fin
+      : Finite (Submodule.torsionBySet (𝓞 D.F) (Additive (Over.mk x ⟶ o.A)) (w0 : Set (𝓞 D.F))) :=
     Finite.of_injective _ (Submodule.inclusion_injective hsub)
   letI := Ideal.Quotient.field w0
   haveI : Module.Finite (𝓞 D.F ⧸ w0)
@@ -162,9 +190,12 @@ theorem card_ker_place : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [
     Module.Finite.of_finite
   set h' := Module.finrank (𝓞 D.F ⧸ w0)
       (Submodule.torsionBySet (𝓞 D.F) (Additive (Over.mk x ⟶ o.A)) (w0 : Set (𝓞 D.F))) with hh'
-  have hT1 : Nat.card (Submodule.torsionBySet (𝓞 D.F) (Additive (Over.mk x ⟶ o.A)) (w0 : Set (𝓞 D.F))) =
-      Nat.card (𝓞 D.F ⧸ w0) ^ h' := Module.natCard_eq_pow_finrank
-  have hall := GlobalTheory.T.card_torsionBySet_pow_of_divisible_numberField D.F _ w0 h' hmax hne hdiv hT1 H
+  have hT1
+      : Nat.card (Submodule.torsionBySet (𝓞 D.F) (Additive (Over.mk x ⟶ o.A)) (w0 : Set (𝓞 D.F)))
+        = Nat.card (𝓞 D.F ⧸ w0) ^ h' :=
+    Module.natCard_eq_pow_finrank
+  have hall :=
+    GlobalTheory.T.card_torsionBySet_pow_of_divisible_numberField D.F _ w0 h' hmax hne hdiv hT1 H
   rw [hTH] at hall
   have he : H * (D.m * D.n) = H * h' := Nat.pow_right_injective hq hall
   have he' : h' = D.m * D.n := (Nat.eq_of_mul_eq_mul_left hH0 he).symm

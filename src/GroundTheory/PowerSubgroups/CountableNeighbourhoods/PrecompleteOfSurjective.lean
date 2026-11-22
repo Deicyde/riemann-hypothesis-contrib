@@ -6,14 +6,16 @@ public import Mathlib
 
 namespace GroundTheory.Variant₂.N1
 
-theorem smodEq_span_singleton_pow_iff {R : Type*} [CommRing R] (a : R) (n : ℕ) (x y : R) :
-    x ≡ y [SMOD ((Ideal.span {a}) ^ n • (⊤ : Submodule R R))] ↔ a ^ n ∣ x - y := by
+theorem smodEq_span_singleton_pow_iff {R : Type*} [CommRing R] (a : R) (n : ℕ) (x y : R)
+    : x ≡ y [SMOD ((Ideal.span {a}) ^ n • (⊤ : Submodule R R))] ↔ a ^ n ∣ x - y := by
   rw [SModEq.sub_mem, Ideal.smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
     Ideal.mem_span_singleton]
 
-theorem isPrecomplete_of_surjective {A : Type*} {B : Type*} [CommRing A] [CommRing B]
-    (f : A →+* B) (hf : Function.Surjective f) (a : A) [IsPrecomplete (Ideal.span {a}) A] :
-    IsPrecomplete (Ideal.span {f a}) B := by
+theorem isPrecomplete_of_surjective
+    {A : Type*} {B : Type*} [CommRing A] [CommRing B]
+    (f : A →+* B) (hf : Function.Surjective f)
+    (a : A) [IsPrecomplete (Ideal.span {a}) A]
+    : IsPrecomplete (Ideal.span {f a}) B := by
   refine ⟨fun b hb => ?_⟩
   have hb' : ∀ {m n : ℕ}, m ≤ n → f a ^ m ∣ b m - b n := fun hmn =>
     (smodEq_span_singleton_pow_iff (f a) _ _ _).1 (hb hmn)
@@ -42,8 +44,9 @@ theorem isPrecomplete_of_surjective {A : Type*} {B : Type*} [CommRing A] [CommRi
     | succ n hmn ih =>
       rw [hy_succ, sub_add_eq_sub_sub]
       exact dvd_sub ih (Dvd.dvd.mul_right (pow_dvd_pow a hmn) _)
-  obtain ⟨L, hL⟩ := IsPrecomplete.prec (I := Ideal.span {a}) inferInstance (f := y)
-    (fun {m n} hmn => (smodEq_span_singleton_pow_iff a m _ _).2 (hcauchy hmn))
+  obtain ⟨L, hL⟩ :=
+    IsPrecomplete.prec (I := Ideal.span {a}) inferInstance (f := y)
+      (fun {m n} hmn => (smodEq_span_singleton_pow_iff a m _ _).2 (hcauchy hmn))
   refine ⟨f L, fun n => (smodEq_span_singleton_pow_iff (f a) n _ _).2 ?_⟩
   have h := map_dvd f ((smodEq_span_singleton_pow_iff a n _ _).1 (hL n))
   rwa [map_pow, map_sub, hy] at h

@@ -10,19 +10,18 @@ open Formalism.BasicNotions NumberField
 
 namespace GlobalTheory
 
-theorem unitChain_num_sub_half (R : Ranks) (q : ℚ) (hq : ∃ z : ℤ, q = z) (j : ℕ) :
-    (((q - (R.N j : ℚ) / 2).num : ℤ) : ℚ) = q - (R.N j : ℚ) / 2 := by
+theorem unitChain_num_sub_half (R : Ranks) (q : ℚ) (hq : ∃ z : ℤ, q = z) (j : ℕ)
+    : (((q - (R.N j : ℚ) / 2).num : ℤ) : ℚ) = q - (R.N j : ℚ) / 2 := by
   obtain ⟨z, rfl⟩ := hq
   have hN : Even (R.N j) := by
     unfold Ranks.N
     exact R.k_even.add ((R.t_odd.add_one).mul_left j)
   obtain ⟨a, ha⟩ := hN
-  have h : (z : ℚ) - (R.N j : ℚ) / 2 = ((z - a : ℤ) : ℚ) := by
-    rw [ha]; push_cast; ring
+  have h : (z : ℚ) - (R.N j : ℚ) / 2 = ((z - a : ℤ) : ℚ) := by rw [ha]; push_cast; ring
   rw [h, Rat.num_intCast]
 
-def unitColumnChain (R : Ranks) (ι : Type) [Fintype ι] (hc : ι → HCParam R) :
-    ColumnChain R ι hc where
+def unitColumnChain (R : Ranks) (ι : Type) [Fintype ι] (hc : ι → HCParam R)
+    : ColumnChain R ι hc where
   cls _ := Unit
   stab _ _ := PUnit
   DGam := 1

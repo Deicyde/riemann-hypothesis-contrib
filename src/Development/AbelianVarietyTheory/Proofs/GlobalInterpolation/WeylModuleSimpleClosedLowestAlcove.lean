@@ -13,9 +13,10 @@ open MvPolynomial Formalism.GradedWeylDivisibility Formalism.BasicNotions Global
 
 namespace GlobalTheory.Alc
 
-theorem natW_alcove_bound (p : ℕ) (N : ℕ) (lam : DomWeight N)
-    (hl : ∀ i j : Fin N, i < j → lam.w i - lam.w j + ((j : ℕ) - (i : ℕ) : ℤ) ≤ (p : ℤ)) :
-    ∀ h : 0 < N, lam.natW ⟨N - 1, by omega⟩ = 0 ∧ lam.natW ⟨0, h⟩ + (N - 1) ≤ p := by
+theorem natW_alcove_bound
+    (p : ℕ) (N : ℕ) (lam : DomWeight N)
+    (hl : ∀ i j : Fin N, i < j → lam.w i - lam.w j + ((j : ℕ) - (i : ℕ) : ℤ) ≤ (p : ℤ))
+    : ∀ h : 0 < N, lam.natW ⟨N - 1, by omega⟩ = 0 ∧ lam.natW ⟨0, h⟩ + (N - 1) ≤ p := by
   intro h
   obtain ⟨_, h2, h3⟩ := factNatW N lam
   refine ⟨h3 h, ?_⟩
@@ -45,7 +46,9 @@ theorem inducedSimpleLowestAlcove : GlobalTheory.Published.InducedSimpleLowestAl
   refine ⟨hne, fun M hM hG => ?_⟩
   by_contra hc
   push_neg at hc
-  have key := GlobalTheory.T.highestWeightVector_mem_of_lt_stable_dualWeyl p hp k N lam.natW hN.1 (natW_alcove_bound p N lam hl)
+  have key :=
+    GlobalTheory.T.highestWeightVector_mem_of_lt_stable_dualWeyl p hp k N lam.natW hN.1
+      (natW_alcove_bound p N lam hl)
   have good := GlobalTheory.T.isRowOperatorStable_dualWeyl_and_GLSubmodules k N lam
   have h1 := (key ⊥ M (good_top_bot k N N).2 (good.2 M hG) (bot_lt_iff_ne_bot.2 hc.1) hM).1
   have h2 := (key M (nablaSq k N lam) (good.2 M hG) good.1 (lt_of_le_of_ne hM hc.2) le_rfl).2

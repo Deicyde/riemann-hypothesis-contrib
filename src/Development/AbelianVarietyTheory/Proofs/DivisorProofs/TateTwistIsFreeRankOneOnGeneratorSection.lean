@@ -8,12 +8,13 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TateTwistSec
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex Simplicial TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  Simplicial TensorProduct GlobalTheory.EtC
 
 namespace GlobalTheory.TwistedGenericPoint
 
-theorem loc_point {U : Scheme.{0}} {P : ∀ V : Scheme.{0}, (V ⟶ U) → Prop} (h : Loc U P) (u : U) :
-    ∃ (V : Scheme.{0}) (j : V ⟶ U) (v : V), Etale j ∧ j v = u ∧ P V j := by
+theorem loc_point {U : Scheme.{0}} {P : ∀ V : Scheme.{0}, (V ⟶ U) → Prop} (h : Loc U P) (u : U)
+    : ∃ (V : Scheme.{0}) (j : V ⟶ U) (v : V), Etale j ∧ j v = u ∧ P V j := by
   obtain ⟨S, hS, hP⟩ := h
   obtain ⟨𝒰, h𝒰⟩ := Scheme.exists_cover_of_mem_grothendieckTopology hS
   obtain ⟨hsurj, hprop⟩ := (Scheme.ofArrows_mem_precoverage_iff _).1 𝒰.mem₀
@@ -25,8 +26,9 @@ theorem isEmpty_of_subsingleton (X : Scheme.{0}) [Subsingleton Γ(X, ⊤)] : IsE
   have := (X.presheaf.germ ⊤ x trivial).hom.domain_nontrivial
   exact not_subsingleton Γ(X, ⊤) inferInstance
 
-theorem smul_residue {q : ℕ} {M : Type*} [AddCommGroup M] [Module (ULift.{1} (ZMod q)) M] (n : ℕ) (y : M) :
-    n • y = (ULift.up (n : ZMod q) : ULift.{1} (ZMod q)) • y := by
+theorem smul_residue
+    {q : ℕ} {M : Type*} [AddCommGroup M] [Module (ULift.{1} (ZMod q)) M] (n : ℕ) (y : M)
+    : n • y = (ULift.up (n : ZMod q) : ULift.{1} (ZMod q)) • y := by
   rw [← Nat.cast_smul_eq_nsmul (ULift.{1} (ZMod q))]
   rfl
 
@@ -34,9 +36,9 @@ end GlobalTheory.TwistedGenericPoint
 
 namespace GlobalTheory
 
-
 open GlobalTheory.TwistedGenericPoint in
-theorem twGen_gen : ∀ (q : ℕ) (i : ℤ) (S : Scheme.{0}) (ζ : Prim q Γ(S, ⊤)), Gen (tw q i) S (twGen i ζ) := by
+theorem twGen_gen
+    : ∀ (q : ℕ) (i : ℤ) (S : Scheme.{0}) (ζ : Prim q Γ(S, ⊤)), Gen (tw q i) S (twGen i ζ) := by
   intro q i S ζ U s
   rcases Nat.eq_zero_or_pos q with rfl | hq
   · have : Subsingleton Γ(S, ⊤) := by

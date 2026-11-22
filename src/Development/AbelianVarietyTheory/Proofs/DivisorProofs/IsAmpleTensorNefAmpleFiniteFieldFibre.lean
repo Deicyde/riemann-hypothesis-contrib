@@ -13,15 +13,25 @@ public import Development.AbelianVarietyTheory.Proofs.CovolumeBounds.IsProjOverI
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr GlobalTheory.HSNef
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr
+  GlobalTheory.HSNef
 
 set_option autoImplicit false
 noncomputable section
 
 namespace GlobalTheory.AmpleFibre
 
-theorem isAmpleLB_fibre : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (D : ℕ), IsArithVar p D → ∀ L A : HermLB p, NefFib L → IsAmpleLB A.B → ∀ (l : ℕ) [Fact l.Prime], IsAmpleLB ((L.tens A).B.pull (Limits.pullback.fst (p ≫ spMap (Int.castRingHom k)) (spMap (Int.castRingHom (ZMod l))))) := by
+theorem isAmpleLB_fibre
+    : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (D : ℕ),
+      IsArithVar p D
+        → ∀ L A : HermLB p,
+          NefFib L → IsAmpleLB A.B
+            → ∀ (l : ℕ) [Fact l.Prime],
+              IsAmpleLB ((L.tens A).B.pull
+                (Limits.pullback.fst (p ≫ spMap (Int.castRingHom k))
+                  (spMap (Int.castRingHom (ZMod l))))) := by
   intro k _ X _ p D hX L A hL hA l _
   haveI := hX.finite
   have hc := GlobalTheory.NefFibPrime.isClosedImmersion_spMap_zmod l
@@ -34,7 +44,8 @@ theorem isAmpleLB_fibre : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegr
     have h := GlobalTheory.FibreNef.isProjOver_fibre hX.isProjOver l f
     rwa [GlobalTheory.strHom_eq (f := g) fun _ => rfl] at h
   have hN : IsNef (ZMod l) (L.B.pull f) :=
-    GlobalTheory.FibreNef.isNef_pull_of_nefOver l f L ((GlobalTheory.VertForm.nefFib_iff L).1 hL l Fact.out)
+    GlobalTheory.FibreNef.isNef_pull_of_nefOver l f L
+      ((GlobalTheory.VertForm.nefFib_iff L).1 hL l Fact.out)
   have hAf : IsAmpleLB (A.B.pull f) := hA.pull_of_isClosedImmersion f
   have hK := IsAmpleLB.tens_of_isNef GlobalTheory.nefNumerics_outright (ZMod l) _ g hproj _ _ hAf hN
   refine hK.of_lbIso (LB.isLB_pull (L.tens A).isLB f) ?_

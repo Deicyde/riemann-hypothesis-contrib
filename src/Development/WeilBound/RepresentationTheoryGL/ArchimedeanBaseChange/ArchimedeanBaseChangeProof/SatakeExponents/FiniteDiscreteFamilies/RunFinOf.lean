@@ -10,7 +10,8 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC
 open PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.One PositivityTheory.Rg.Rs
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -22,26 +23,43 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 def PreEquiv (D D' : Pre E n) : Prop :=
   ∃ e : Fin D.c ≃ Fin D'.c, (∀ i w, D.cls i w = D'.cls (e i) w) ∧ ∀ i τ, D.m i τ = D'.m (e i) τ
 
-def IsLevel (K : ∀ w : HeightOneSpectrum (𝓞 E), Subgroup (GL (Fin n) (w.adicCompletion E))) : Prop :=
-  (∀ w, IsOpen (K w : Set (GL (Fin n) (w.adicCompletion E)))) ∧ ∀ᶠ w in Filter.cofinite, GlobalTheory.LFun.KGL w (n := n) ≤ K w
+def IsLevel (K : ∀ w : HeightOneSpectrum (𝓞 E), Subgroup (GL (Fin n) (w.adicCompletion E)))
+    : Prop :=
+  (∀ w, IsOpen (K w : Set (GL (Fin n) (w.adicCompletion E))))
+    ∧ ∀ᶠ w in Filter.cofinite, GlobalTheory.LFun.KGL w (n := n) ≤ K w
 
 def HasKType {N : ℕ} (W : Submodule ℂ (Kinf E N → ℂ)) (V : Submodule ℂ (Sm E N)) : Prop :=
   ∃ φ ∈ V, φ ≠ 0 ∧ ∀ g, (fun k : Kinf E N => φ.1 (g * infGL E N (Unitary.toUnits k))) ∈ W
 
-def FinFam : Prop := ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ)
-  (K : ∀ w : HeightOneSpectrum (𝓞 E), Subgroup (GL (Fin n) (w.adicCompletion E)))
-  (W : ∀ N : ℕ, Submodule ℂ (Kinf E N → ℂ)) (m : (E →+* ℂ) → Multiset ℂ),
-  IsLevel K → (∀ N, FiniteDimensional ℂ (W N)) → ∃ (k : ℕ) (D : Fin k → Pre E n), ∀ D' : Pre E n,
-    (∀ τ, ∑ i, D'.m i τ = m τ) → (∀ w, GlobalTheory.LGrp.IsSpherical (locProd D'.h w (D'.σ · w)) (K w)) →
-    (∀ i, HasKType (W (D'.N i)) (D'.V i)) → ∃ j, PreEquiv (D j) D'
+def FinFam : Prop :=
+  ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ)
+      (K : ∀ w : HeightOneSpectrum (𝓞 E), Subgroup (GL (Fin n) (w.adicCompletion E)))
+      (W : ∀ N : ℕ, Submodule ℂ (Kinf E N → ℂ)) (m : (E →+* ℂ) → Multiset ℂ),
+    IsLevel K → (∀ N, FiniteDimensional ℂ (W N))
+      → ∃ (k : ℕ) (D : Fin k → Pre E n), ∀ D' : Pre E n,
+        (∀ τ, ∑ i, D'.m i τ = m τ)
+          → (∀ w, GlobalTheory.LGrp.IsSpherical (locProd D'.h w (D'.σ · w)) (K w))
+          → (∀ i, HasKType (W (D'.N i)) (D'.V i))
+          → ∃ j, PreEquiv (D j) D'
 
-def RunT : Prop := ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr E → ∀ n : ℕ, 1 ≤ n →
-  ∀ π : Submodule ℂ (UA E n → ℂ), IsAutRepU π → ∀ S : Finset (HeightOneSpectrum (𝓞 E)), S.card ≤ 1 →
-    ∃ (K : ∀ w : HeightOneSpectrum (𝓞 E), Subgroup (GL (Fin n) (w.adicCompletion E)))
-      (W : ∀ N : ℕ, Submodule ℂ (Kinf E N → ℂ)), IsLevel K ∧ (∀ N, FiniteDimensional ℂ (W N)) ∧
-      ∀ T : Finset (HeightOneSpectrum (𝓞 E)), ∃ D : Pre E n, Base π D ∧ (∀ w ∈ S, IsSplitAt w → D.SplitAt π w) ∧
-        (∀ w ∈ T, IsUnramU π w → ¬ IsSplitAt w → InertAt π D w) ∧
-        (∀ w, GlobalTheory.LGrp.IsSpherical (locProd D.h w (D.σ · w)) (K w)) ∧ ∀ i, HasKType (W (D.N i)) (D.V i)
+def RunT : Prop :=
+  ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
+    Unr E
+      → ∀ n : ℕ,
+        1 ≤ n
+          → ∀ π : Submodule ℂ (UA E n → ℂ),
+            IsAutRepU π
+              → ∀ S : Finset (HeightOneSpectrum (𝓞 E)),
+                S.card ≤ 1
+                  → ∃ (K
+                      : ∀ w : HeightOneSpectrum (𝓞 E), Subgroup (GL (Fin n) (w.adicCompletion E)))
+                      (W : ∀ N : ℕ, Submodule ℂ (Kinf E N → ℂ)),
+                    IsLevel K ∧ (∀ N, FiniteDimensional ℂ (W N))
+                      ∧ ∀ T : Finset (HeightOneSpectrum (𝓞 E)), ∃ D : Pre E n,
+                        Base π D ∧ (∀ w ∈ S, IsSplitAt w → D.SplitAt π w)
+                          ∧ (∀ w ∈ T, IsUnramU π w → ¬ IsSplitAt w → InertAt π D w)
+                          ∧ (∀ w, GlobalTheory.LGrp.IsSpherical (locProd D.h w (D.σ · w)) (K w))
+                          ∧ ∀ i, HasKType (W (D.N i)) (D.V i)
 
 theorem runFin_of (hR : RunT) (hF : FinFam) (hW : WeightEx) (hQ : PermSat) : RunFin := by
   classical

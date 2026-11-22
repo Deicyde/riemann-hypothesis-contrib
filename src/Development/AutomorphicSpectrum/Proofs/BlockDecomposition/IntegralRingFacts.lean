@@ -13,7 +13,8 @@ set_option backward.isDefEq.respectTransparency false
 
 noncomputable section
 
-open CategoryTheory GroundTheory.PAdicHodge CrystallineSemistableComparison CrystallineSemistableComparison.PAlg
+open CategoryTheory GroundTheory.PAdicHodge CrystallineSemistableComparison
+  CrystallineSemistableComparison.PAlg
 
 namespace GlobalTheory.CompanionTheory.TiltFacts
 
@@ -34,16 +35,19 @@ theorem norm_pFlat_lt_one : ‖(pFlat l : PreTilt (normInteger ℂ_[l]) l)‖ < 
   exact IsPerfectoidField.norm_natCast_lt_one
 
 theorem rt_pow (k : ℕ) : CrystallineSemistableComparison.D.rt l k ^ l ^ k = pFlat l := by
-  have h := (iterateFrobeniusEquiv (CrystallineSemistableComparison.Ob l) l k).apply_symm_apply (pFlat l)
+  have h :=
+    (iterateFrobeniusEquiv (CrystallineSemistableComparison.Ob l) l k).apply_symm_apply (pFlat l)
   rwa [iterateFrobeniusEquiv_def] at h
 
-theorem exists_dvd_pFlat_pow (a : CrystallineSemistableComparison.Ob l) (ha : a ≠ 0) : ∃ M : ℕ, a ∣ pFlat l ^ M := by
+theorem exists_dvd_pFlat_pow (a : CrystallineSemistableComparison.Ob l) (ha : a ≠ 0)
+    : ∃ M : ℕ, a ∣ pFlat l ^ M := by
   obtain ⟨M, hM⟩ := exists_pow_lt_of_lt_one (norm_pos_iff.2 ha) (norm_pFlat_lt_one l)
   refine ⟨M, preTilt_dvd_iff_norm_le.2 ?_⟩
   rw [norm_pow]
   exact hM.le
 
-theorem exists_rt_dvd (a : CrystallineSemistableComparison.Ob l) (ha : ¬ IsUnit a) : ∃ k : ℕ, CrystallineSemistableComparison.D.rt l k ∣ a := by
+theorem exists_rt_dvd (a : CrystallineSemistableComparison.Ob l) (ha : ¬ IsUnit a)
+    : ∃ k : ℕ, CrystallineSemistableComparison.D.rt l k ∣ a := by
   have hlt : ‖a‖ < 1 := by
     refine lt_of_le_of_ne (preTilt_norm_le_one a) fun h => ha ?_
     exact (IsPerfectoidField.isUnit_iff_norm_untilt l).2 (by rwa [preTilt_norm_def] at h)

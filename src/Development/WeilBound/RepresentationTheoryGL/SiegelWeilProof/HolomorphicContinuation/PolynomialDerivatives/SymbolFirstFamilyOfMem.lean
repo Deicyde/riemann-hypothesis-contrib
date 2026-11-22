@@ -27,7 +27,8 @@ theorem mem_S {N : ℕ} {s : Sym m n} : s ∈ S ε N ↔ ∀ t ∈ s.support, t 
   rw [mem_restrictSupport_iff]
   exact ⟨fun h t ht => h ht, fun h t ht => h t ht⟩
 
-theorem symbol_first_family_of_mem {N : ℕ} {s : Sym m n} (h : s ∈ S ε N) : SymbolInFirstFamily ε s := by
+theorem symbol_first_family_of_mem {N : ℕ} {s : Sym m n} (h : s ∈ S ε N)
+    : SymbolInFirstFamily ε s := by
   intro t ht k hk
   have hU := (mem_S.1 h t ht).2
   rcases hk with hk | hk
@@ -40,7 +41,9 @@ theorem mem_S_of {s : Sym m n} (h : SymbolInFirstFamily ε s) : s ∈ S ε s.tot
   · exact h t ht k (Or.inl (Finsupp.mem_support_iff.1 hv))
   · exact h t ht k (Or.inr (Finsupp.mem_support_iff.1 hv))
 
-theorem S_le (N : ℕ) : S (n := n) ε N ≤ restrictTotalDegree ((Fin m × Fin n × Bool) ⊕ (Fin m × Fin n × Bool)) ℂ N := by
+theorem S_le (N : ℕ)
+    : S (n := n) ε N
+      ≤ restrictTotalDegree ((Fin m × Fin n × Bool) ⊕ (Fin m × Fin n × Bool)) ℂ N := by
   intro s hs
   rw [mem_restrictTotalDegree, totalDegree, Finset.sup_le_iff]
   exact fun t ht => (mem_S.1 hs t ht).1
@@ -48,23 +51,28 @@ theorem S_le (N : ℕ) : S (n := n) ε N ≤ restrictTotalDegree ((Fin m × Fin 
 instance (N : ℕ) : FiniteDimensional ℂ (S (n := n) ε N) :=
   Submodule.finiteDimensional_of_le (S_le N)
 
-theorem symK_X (i j : Fin n) (v : (Fin m × Fin n × Bool) ⊕ (Fin m × Fin n × Bool)) :
-    symK ε i j (X v) = 0 ∨ ∃ v', ∃ c : ℂ, symK ε i j (X v) = c • (X v' : Sym m n) ∧ inF1 ε (Sum.elim id id v') := by
+theorem symK_X (i j : Fin n) (v : (Fin m × Fin n × Bool) ⊕ (Fin m × Fin n × Bool))
+    : symK ε i j (X v) = 0
+      ∨ ∃ v', ∃ c : ℂ, symK ε i j (X v) = c • (X v' : Sym m n) ∧ inF1 ε (Sum.elim id id v') := by
   unfold symK
   rw [mkDerivation_X]
   rcases v with ⟨a, b, e⟩ | ⟨a, b, e⟩ <;> simp only [Sum.elim_inl, Sum.elim_inr]
   · by_cases ha : ε a = true
-    · rw [if_pos ha]; split_ifs with h
+    · rw [if_pos ha]
+      split_ifs with h
       · exact Or.inr ⟨Sum.inl (a, i, false), 1, by simp, by simp [inF1, ha]⟩
       · exact Or.inl rfl
-    · rw [if_neg ha]; split_ifs with h
+    · rw [if_neg ha]
+      split_ifs with h
       · exact Or.inr ⟨Sum.inl (a, j, true), -1, by simp, by simp [inF1]; simpa using ha⟩
       · exact Or.inl rfl
   · by_cases ha : ε a = true
-    · rw [if_pos ha]; split_ifs with h
+    · rw [if_pos ha]
+      split_ifs with h
       · exact Or.inr ⟨Sum.inr (a, j, false), -1, by simp, by simp [inF1, ha]⟩
       · exact Or.inl rfl
-    · rw [if_neg ha]; split_ifs with h
+    · rw [if_neg ha]
+      split_ifs with h
       · exact Or.inr ⟨Sum.inr (a, i, true), 1, by simp, by simp [inF1]; simpa using ha⟩
       · exact Or.inl rfl
 
@@ -74,12 +82,12 @@ theorem monomial_mem_S {N : ℕ} {u} (hu : u ∈ U ε N) (r : ℂ) : monomial u 
   rw [Finset.mem_singleton] at this
   exact this ▸ hu
 
-theorem deg_add (a b : (Fin m × Fin n × Bool) ⊕ (Fin m × Fin n × Bool) →₀ ℕ) :
-    ((a + b).sum fun _ e => e) = (a.sum fun _ e => e) + (b.sum fun _ e => e) :=
+theorem deg_add (a b : (Fin m × Fin n × Bool) ⊕ (Fin m × Fin n × Bool) →₀ ℕ)
+    : ((a + b).sum fun _ e => e) = (a.sum fun _ e => e) + (b.sum fun _ e => e) :=
   Finsupp.sum_add_index' (fun _ => rfl) (fun _ _ _ => rfl)
 
-theorem symK_monomial_mem {N : ℕ} (i j : Fin n) {t} (ht : t ∈ U ε N) (r : ℂ) :
-    symK ε i j (monomial t r) ∈ S (n := n) ε N := by
+theorem symK_monomial_mem {N : ℕ} (i j : Fin n) {t} (ht : t ∈ U ε N) (r : ℂ)
+    : symK ε i j (monomial t r) ∈ S (n := n) ε N := by
   unfold symK
   rw [mkDerivation_monomial]
   refine Submodule.smul_mem _ _ (Submodule.sum_mem _ fun v hv => ?_)
@@ -96,9 +104,11 @@ theorem symK_monomial_mem {N : ℕ} (i j : Fin n) {t} (ht : t ∈ U ε N) (r : �
       have e1 := deg_add (t - Finsupp.single v 1) (Finsupp.single v 1)
       rw [tsub_add_cancel_of_le hle] at e1
       rw [deg_add]
-      have : ((Finsupp.single v' 1 : _ →₀ ℕ).sum fun _ e => e) = ((Finsupp.single v 1 : _ →₀ ℕ).sum fun _ e => e) := by
+      have : ((Finsupp.single v' 1 : _ →₀ ℕ).sum fun _ e => e)
+          = ((Finsupp.single v 1 : _ →₀ ℕ).sum fun _ e => e) := by
         simp [Finsupp.sum_single_index]
-      rw [this, ← e1]; exact ht.1
+      rw [this, ← e1]
+      exact ht.1
     · intro w hw
       rcases Finset.mem_union.1 (Finsupp.support_add hw) with hw | hw
       · exact ht.2 w (Finsupp.support_tsub hw)

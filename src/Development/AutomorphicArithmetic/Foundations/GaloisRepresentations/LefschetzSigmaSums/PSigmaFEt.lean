@@ -9,8 +9,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteEtaleS
 open AlgebraicGeometry CategoryTheory Limits
 open UpperTheory.Gal.LocalSmoothExtension
 
-theorem UpperTheory.Gal.LocalSmoothExtension.sigmaFEt_of :
-    SigmaFEt := by
+theorem UpperTheory.Gal.LocalSmoothExtension.sigmaFEt_of : SigmaFEt := by
   intro Y Z s _ _ I _
   obtain ⟨k, ⟨e⟩⟩ := Finite.exists_equiv_fin I
   have hfold := GlobalTheory.Et.TrivTors.isFinite_sigmaDesc_fin Y k

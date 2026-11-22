@@ -11,11 +11,14 @@ namespace PositivityTheory.ThKF0.Grow
 open scoped Matrix Classical
 open NumberField
 
-theorem exists_trace_ne {F : Type} [Field F] [NumberField F] (x : mixedEmbedding.mixedSpace F) (hx : x ≠ 0) :
-    ∃ y, Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (x * y) ≠ 0 := by
-  obtain ⟨y, hy⟩ : ∃ y : mixedEmbedding.mixedSpace F, x * y * x = x :=
-    ⟨(fun w => (x.1 w)⁻¹, fun w => (x.2 w)⁻¹), Prod.ext (funext fun w => mul_inv_mul_cancel (x.1 w))
-      (funext fun w => mul_inv_mul_cancel (x.2 w))⟩
+theorem exists_trace_ne
+    {F : Type} [Field F] [NumberField F] (x : mixedEmbedding.mixedSpace F) (hx : x ≠ 0)
+    : ∃ y, Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (x * y) ≠ 0 := by
+  obtain ⟨y, hy⟩ : ∃ y : mixedEmbedding.mixedSpace F, x * y * x = x := ⟨
+    (fun w => (x.1 w)⁻¹, fun w => (x.2 w)⁻¹),
+    Prod.ext (funext fun w => mul_inv_mul_cancel (x.1 w))
+      (funext fun w => mul_inv_mul_cancel (x.2 w))
+  ⟩
   refine ⟨y, fun h => hx ?_⟩
   have hi : IsIdempotentElem (LinearMap.mulLeft ℝ (x * y)) := by
     refine LinearMap.ext fun z => ?_
@@ -31,11 +34,15 @@ theorem exists_trace_ne {F : Type} [Field F] [NumberField F] (x : mixedEmbedding
 
 theorem trBd : TrBd := by
   intro F _ _ κ _
-  let B : V F κ →ₗ[ℝ] V F κ →ₗ[ℝ] ℝ := LinearMap.mk₂ ℝ
-    (fun x b => Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (x ⬝ᵥ b))
-    (fun x x' b => by rw [add_dotProduct, map_add (f := _)]) (fun c x b => by rw [smul_dotProduct, map_smul])
-    (fun x b b' => by rw [dotProduct_add, map_add (f := _)]) (fun c x b => by rw [dotProduct_smul, map_smul])
-  let A : V F κ →ₗ[ℝ] V F κ →L[ℝ] ℝ := (LinearMap.toContinuousLinearMap : (V F κ →ₗ[ℝ] ℝ) ≃ₗ[ℝ] _).toLinearMap ∘ₗ B
+  let B : V F κ →ₗ[ℝ] V F κ →ₗ[ℝ] ℝ :=
+    LinearMap.mk₂ ℝ
+      (fun x b => Algebra.trace ℝ (mixedEmbedding.mixedSpace F) (x ⬝ᵥ b))
+      (fun x x' b => by rw [add_dotProduct, map_add (f := _)])
+      (fun c x b => by rw [smul_dotProduct, map_smul])
+      (fun x b b' => by rw [dotProduct_add, map_add (f := _)])
+      (fun c x b => by rw [dotProduct_smul, map_smul])
+  let A : V F κ →ₗ[ℝ] V F κ →L[ℝ] ℝ :=
+    (LinearMap.toContinuousLinearMap : (V F κ →ₗ[ℝ] ℝ) ≃ₗ[ℝ] _).toLinearMap ∘ₗ B
   have hA : LinearMap.ker A = ⊥ := by
     refine LinearMap.ker_eq_bot'.2 fun x hx => funext fun i => ?_
     by_contra hi

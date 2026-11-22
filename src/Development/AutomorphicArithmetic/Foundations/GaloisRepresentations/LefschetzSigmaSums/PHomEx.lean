@@ -6,11 +6,12 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 @[expose] public section
 
 open UpperTheory.Gal.LocalSmoothExtension
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
 
-theorem UpperTheory.Gal.LocalSmoothExtension.homEx_of :
-    HomEx := by
+theorem UpperTheory.Gal.LocalSmoothExtension.homEx_of : HomEx := by
   intro G R _ _ b N N' S S₁ s s₁ f o' o'' o₁' o₁'' m' m''
   have ext'' : ∀ {T : Over S₁} (u v : T ⟶ o₁''.A), u.left ≫ m''.φ = v.left ≫ m''.φ → u = v := by
     intro T u v h
@@ -39,8 +40,7 @@ theorem UpperTheory.Gal.LocalSmoothExtension.homEx_of :
     rw [← p'', ← p'', map_mul, e, e, e, map_mul, mul_comp]
   · intro d
     let e : Over.mk (o₁'.A.hom ≫ f) ⟶ o'.A := pushHom m'.cart o₁'.A (𝟙 o₁'.A)
-    have h1 : (𝟙 o₁'.A ^ d).left ≫ m'.φ = (e ^ d).left := by
-      rw [← p', map_pow]
+    have h1 : (𝟙 o₁'.A ^ d).left ≫ m'.φ = (e ^ d).left := by rw [← p', map_pow]
     have h2 : m'.φ ≫ (𝟙 o'.A ^ d).left = (e ^ d).left := by
       have : e ≫ 𝟙 o'.A ^ d = e ^ d := by rw [comp_pow, Category.comp_id]
       rw [← this, Over.comp_left, p', Over.id_left, Category.id_comp]

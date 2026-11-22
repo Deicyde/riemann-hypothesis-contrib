@@ -11,9 +11,11 @@ noncomputable section
 
 namespace GlobalTheory.LevelPairing
 
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor NumberField Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor NumberField
+  Formalism.L2.Pj
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 
 theorem bar_bar (H : Host E) (a : 𝓞 E) : H.bar (H.bar a) = a := by
   apply Subtype.ext
@@ -24,16 +26,18 @@ theorem bar_bar (H : Host E) (a : 𝓞 E) : H.bar (H.bar a) = a := by
 
 theorem cSep_spec (l : Level H) : cSep l ∈ Mfr l ∧ cSep l - 1 ∈ l.Mb := by
   have h : ∃ c, c ∈ Mfr l ∧ c - 1 ∈ l.Mb := by
-    obtain ⟨m, hm, mb, hmb, hsum⟩ := Submodule.mem_sup.1 (l.coprime ▸ Submodule.mem_top : (1 : 𝓞 E) ∈ l.Mb ⊔ _)
+    obtain ⟨m, hm, mb, hmb, hsum⟩ :=
+      Submodule.mem_sup.1 (l.coprime ▸ Submodule.mem_top : (1 : 𝓞 E) ∈ l.Mb ⊔ _)
     refine ⟨mb, hmb, ?_⟩
     have : mb - 1 = -m := by rw [← hsum]; ring
-    rw [this]; exact neg_mem hm
+    rw [this]
+    exact neg_mem hm
   unfold cSep
   rw [dite_eq_left h]
   exact h.choose_spec
 
-theorem dvd_EF_of_mem (x y : Dw.La) {a : 𝓞 E} (ha : a ∈ Ideal.span {(l.M : 𝓞 E)}) :
-    (l.M : ℤ) ∣ Dw.EF x (a • y) := by
+theorem dvd_EF_of_mem (x y : Dw.La) {a : 𝓞 E} (ha : a ∈ Ideal.span {(l.M : 𝓞 E)})
+    : (l.M : ℤ) ∣ Dw.EF x (a • y) := by
   obtain ⟨b, rfl⟩ := Ideal.mem_span_singleton'.1 ha
   have : (b * (l.M : 𝓞 E)) • y = (l.M : ℤ) • (b • y) := by
     rw [mul_comm, mul_smul, ← Int.cast_smul_eq_zsmul (𝓞 E)]; simp
@@ -44,31 +48,33 @@ theorem mul_mem_M {a b : 𝓞 E} (ha : a ∈ l.Mb) (hb : b ∈ Mfr l) : a * b �
   l.prod ▸ Ideal.mul_mem_mul ha hb
 
 theorem bar_mem_Mb {a : 𝓞 E} (ha : a ∈ Mfr l) : H.bar a ∈ l.Mb := by
-  obtain ⟨b, hb, rfl⟩ := (Ideal.mem_map_iff_of_surjective (H.bar : 𝓞 E →+* 𝓞 E) H.bar.surjective).1 ha
+  obtain ⟨b, hb, rfl⟩ :=
+    (Ideal.mem_map_iff_of_surjective (H.bar : 𝓞 E →+* 𝓞 E) H.bar.surjective).1 ha
   have : H.bar ((H.bar : 𝓞 E →+* 𝓞 E) b) = b := bar_bar H b
   rwa [this]
 
-theorem dvd_right (x : Dw.La) {y : Dw.La} (hy : y ∈ (l.Mb • ⊤ : Submodule (𝓞 E) Dw.La)) :
-    (l.M : ℤ) ∣ Dw.EF x (cSep l • y) := by
+theorem dvd_right (x : Dw.La) {y : Dw.La} (hy : y ∈ (l.Mb • ⊤ : Submodule (𝓞 E) Dw.La))
+    : (l.M : ℤ) ∣ Dw.EF x (cSep l • y) := by
   refine Submodule.smul_induction_on hy (fun a ha z _ => ?_) (fun u v hu hv => ?_)
   · rw [← mul_smul, mul_comm]; exact dvd_EF_of_mem _ _ (mul_mem_M ha (cSep_spec l).1)
   · rw [smul_add, map_add (f := _)]; exact dvd_add hu hv
 
-theorem dvd_left {x : Dw.La} (y : Dw.La) (hx : x ∈ (Mfr l • ⊤ : Submodule (𝓞 E) Dw.La)) :
-    (l.M : ℤ) ∣ Dw.EF x (cSep l • y) := by
+theorem dvd_left {x : Dw.La} (y : Dw.La) (hx : x ∈ (Mfr l • ⊤ : Submodule (𝓞 E) Dw.La))
+    : (l.M : ℤ) ∣ Dw.EF x (cSep l • y) := by
   refine Submodule.smul_induction_on hx (fun a ha z _ => ?_) (fun u v hu hv => ?_)
   · rw [Dw.adj, ← mul_smul]; exact dvd_EF_of_mem _ _ (mul_mem_M (bar_mem_Mb ha) (cSep_spec l).1)
   · rw [map_add (f := _), LinearMap.add_apply]; exact dvd_add hu hv
 
-theorem pairL_congr {n : ℕ} (x0 x0' x x' : Fin n → Dw.La)
-    (h0 : ∀ b, x0 b - x0' b ∈ (Mfr l • ⊤ : Submodule (𝓞 E) Dw.La))
-    (h1 : ∀ b, x b - x' b ∈ (l.Mb • ⊤ : Submodule (𝓞 E) Dw.La)) :
-    (l.M : ℤ) ∣ pairL (l := l) x0 x - pairL (l := l) x0' x' := by
+theorem pairL_congr
+    {n : ℕ}
+    (x0 x0' x x' : Fin n → Dw.La) (h0 : ∀ b, x0 b - x0' b ∈ (Mfr l • ⊤ : Submodule (𝓞 E) Dw.La))
+    (h1 : ∀ b, x b - x' b ∈ (l.Mb • ⊤ : Submodule (𝓞 E) Dw.La))
+    : (l.M : ℤ) ∣ pairL (l := l) x0 x - pairL (l := l) x0' x' := by
   unfold pairL
   rw [← Finset.sum_sub_distrib]
   refine Finset.dvd_sum fun b _ => ?_
-  have : Dw.EF (x0 b) (cSep l • x b) - Dw.EF (x0' b) (cSep l • x' b) =
-      Dw.EF (x0 b - x0' b) (cSep l • x b) + Dw.EF (x0' b) (cSep l • (x b - x' b)) := by
+  have : Dw.EF (x0 b) (cSep l • x b) - Dw.EF (x0' b) (cSep l • x' b)
+      = Dw.EF (x0 b - x0' b) (cSep l • x b) + Dw.EF (x0' b) (cSep l • (x b - x' b)) := by
     simp [smul_sub]
   rw [this]
   exact dvd_add (dvd_left _ (h0 b)) (dvd_right _ (h1 b))
@@ -99,9 +105,11 @@ theorem zetaM_prim (c : Coeff l) : IsPrimitiveRoot (zetaM c) l.M := by
   rw [this]
   exact Complex.isPrimitiveRoot_exp l.M hM
 
-theorem levRep_mk (x : Dw.La) :
-    levRep (Submodule.Quotient.mk x : LevQ Dw l) - x ∈ (l.Mb • ⊤ : Submodule (𝓞 E) Dw.La) :=
-  (Submodule.Quotient.eq _).1 (Classical.choose_spec (Submodule.Quotient.mk_surjective _ (Submodule.Quotient.mk x : LevQ Dw l)))
+theorem levRep_mk (x : Dw.La)
+    : levRep (Submodule.Quotient.mk x : LevQ Dw l) - x ∈ (l.Mb • ⊤ : Submodule (𝓞 E) Dw.La) :=
+  (Submodule.Quotient.eq _).1
+    (Classical.choose_spec (Submodule.Quotient.mk_surjective _
+      (Submodule.Quotient.mk x : LevQ Dw l)))
 
 theorem zpow_congr (c : Coeff l) {a b : ℤ} (h : (l.M : ℤ) ∣ a - b) : zetaM c ^ a = zetaM c ^ b := by
   have hM : l.M ≠ 0 := by have := l.three_le; omega
@@ -110,17 +118,19 @@ theorem zpow_congr (c : Coeff l) {a b : ℤ} (h : (l.M : ℤ) ∣ a - b) : zetaM
   rw [zpow_sub₀ h0, div_eq_one_iff_eq (zpow_ne_zero _ h0)] at this
   exact this
 
-theorem levelFourierDatum_mk (c : Coeff l) {n : ℕ} (x0 x : Fin n → Dw.La) :
-    x0Dat c x0 (fun b => (Submodule.Quotient.mk (x b) : LevQ Dw l)) = zetaM c ^ pairL (l := l) x0 x :=
+theorem levelFourierDatum_mk (c : Coeff l) {n : ℕ} (x0 x : Fin n → Dw.La)
+    : x0Dat c x0 (fun b => (Submodule.Quotient.mk (x b) : LevQ Dw l))
+      = zetaM c ^ pairL (l := l) x0 x :=
   zpow_congr c (pairL_congr _ _ _ _ (fun b => by simp) (fun b => levRep_mk (x b)))
 
-theorem exists_eq_smul_of_dvd (x : Dw.La) (m : ℕ) (hm : m ≠ 0) (h : ∀ y, (m : ℤ) ∣ Dw.EF x y) :
-    ∃ z, x = (m : ℤ) • z := by
-  let f : Dw.La →ₗ[ℤ] ℤ :=
-    { toFun := fun y => Dw.EF x y / m
-      map_add' := fun a b => by rw [map_add (f := _), Int.add_ediv_of_dvd_left (h a)]
-      map_smul' := fun k a => by
-        rw [map_zsmul]; simp only [smul_eq_mul, RingHom.id_apply]; exact Int.mul_ediv_assoc _ (h a) }
+theorem exists_eq_smul_of_dvd (x : Dw.La) (m : ℕ) (hm : m ≠ 0) (h : ∀ y, (m : ℤ) ∣ Dw.EF x y)
+    : ∃ z, x = (m : ℤ) • z := by
+  let f : Dw.La →ₗ[ℤ] ℤ := {
+    toFun := fun y => Dw.EF x y / m
+    map_add' := fun a b => by rw [map_add (f := _), Int.add_ediv_of_dvd_left (h a)]
+    map_smul' := fun k a => by
+      rw [map_zsmul]; simp only [smul_eq_mul, RingHom.id_apply]; exact Int.mul_ediv_assoc _ (h a)
+  }
   obtain ⟨z, hz⟩ := Dw.unimod.2 f
   refine ⟨z, Dw.unimod.1 ?_⟩
   ext y
@@ -128,11 +138,11 @@ theorem exists_eq_smul_of_dvd (x : Dw.La) (m : ℕ) (hm : m ≠ 0) (h : ∀ y, (
   simp only [LinearMap.smul_apply, smul_eq_mul, f, LinearMap.coe_mk, AddHom.coe_mk]
   exact (Int.mul_ediv_cancel' (h y)).symm
 
-theorem mem_of_dvd {x : Dw.La} (h : ∀ y, (l.M : ℤ) ∣ Dw.EF x (cSep l • y)) :
-    x ∈ (Mfr l • ⊤ : Submodule (𝓞 E) Dw.La) := by
+theorem mem_of_dvd {x : Dw.La} (h : ∀ y, (l.M : ℤ) ∣ Dw.EF x (cSep l • y))
+    : x ∈ (Mfr l • ⊤ : Submodule (𝓞 E) Dw.La) := by
   have hM : l.M ≠ 0 := by have := l.three_le; omega
-  obtain ⟨z, hz⟩ := exists_eq_smul_of_dvd (H.bar (cSep l) • x) l.M hM (fun y => by
-    rw [Dw.adj, bar_bar]; exact h y)
+  obtain ⟨z, hz⟩ :=
+    exists_eq_smul_of_dvd (H.bar (cSep l) • x) l.M hM (fun y => by rw [Dw.adj, bar_bar]; exact h y)
   have h1 : H.bar (cSep l - 1) ∈ Mfr l := Ideal.mem_map_of_mem (H.bar : 𝓞 E →+* 𝓞 E) (cSep_spec l).2
   have hMm : (l.M : 𝓞 E) ∈ Mfr l := by
     have : Ideal.span {(l.M : 𝓞 E)} ≤ Mfr l := l.prod ▸ Ideal.mul_le_right
@@ -142,16 +152,18 @@ theorem mem_of_dvd {x : Dw.La} (h : ∀ y, (l.M : ℤ) ∣ Dw.EF x (cSep l • y
   rw [this]
   exact sub_mem (Submodule.smul_mem_smul hMm trivial) (Submodule.smul_mem_smul h1 trivial)
 
-theorem levelFourierDatum_eq_iff (c : Coeff l) {n : ℕ} (x0 x0' : Fin n → Dw.La) :
-    x0Dat c x0 = x0Dat c x0' ↔ ∀ b, x0 b - x0' b ∈ (Mfr l • ⊤ : Submodule (𝓞 E) Dw.La) := by
+theorem levelFourierDatum_eq_iff (c : Coeff l) {n : ℕ} (x0 x0' : Fin n → Dw.La)
+    : x0Dat c x0 = x0Dat c x0' ↔ ∀ b, x0 b - x0' b ∈ (Mfr l • ⊤ : Submodule (𝓞 E) Dw.La) := by
   have hM : l.M ≠ 0 := by have := l.three_le; omega
   constructor
   · intro h b
     refine mem_of_dvd fun y => ?_
-    have h1 := congrFun h (fun i => (Submodule.Quotient.mk ((Pi.single b y : Fin n → Dw.La) i) : LevQ Dw l))
+    have h1 :=
+      congrFun h (fun i => (Submodule.Quotient.mk ((Pi.single b y : Fin n → Dw.La) i) : LevQ Dw l))
     rw [levelFourierDatum_mk, levelFourierDatum_mk] at h1
     have h0 : zetaM c ≠ 0 := (zetaM_prim c).ne_zero hM
-    have h2 : (l.M : ℤ) ∣ pairL (l := l) x0 (Pi.single b y) - pairL (l := l) x0' (Pi.single b y) := by
+    have h2
+        : (l.M : ℤ) ∣ pairL (l := l) x0 (Pi.single b y) - pairL (l := l) x0' (Pi.single b y) := by
       rw [← (zetaM_prim c).zpow_eq_one_iff_dvd, zpow_sub₀ h0, h1, div_self (zpow_ne_zero _ h0)]
     have h3 : ∀ u : Fin n → Dw.La, pairL (l := l) u (Pi.single b y) = Dw.EF (u b) (cSep l • y) := by
       intro u

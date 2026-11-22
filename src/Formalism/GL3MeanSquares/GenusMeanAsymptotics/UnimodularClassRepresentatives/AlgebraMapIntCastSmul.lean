@@ -18,9 +18,9 @@ section Gen
 
 variable {W : Type} [AddCommGroup W] [Module (𝓞 K) W]
 
-theorem mem_closure_iff {𝔭 : Ideal (𝓞 F)} (hp : 𝔭.IsPrime) (s : 𝓞 K) :
-    s ∈ Submonoid.closure {s : 𝓞 K | ∃ t : 𝓞 F, t ∉ 𝔭 ∧ algebraMap (𝓞 F) (𝓞 K) t = s} ↔
-      ∃ t : 𝓞 F, t ∉ 𝔭 ∧ algebraMap (𝓞 F) (𝓞 K) t = s := by
+theorem mem_closure_iff {𝔭 : Ideal (𝓞 F)} (hp : 𝔭.IsPrime) (s : 𝓞 K)
+    : s ∈ Submonoid.closure {s : 𝓞 K | ∃ t : 𝓞 F, t ∉ 𝔭 ∧ algebraMap (𝓞 F) (𝓞 K) t = s}
+      ↔ ∃ t : 𝓞 F, t ∉ 𝔭 ∧ algebraMap (𝓞 F) (𝓞 K) t = s := by
   constructor
   · intro hs
     induction hs using Submonoid.closure_induction with
@@ -33,8 +33,8 @@ theorem mem_closure_iff {𝔭 : Ideal (𝓞 F)} (hp : 𝔭.IsPrime) (s : 𝓞 K)
   · intro hs
     exact Submonoid.subset_closure hs
 
-theorem mem_locF_iff {𝔭 : Ideal (𝓞 F)} (hp : 𝔭.IsPrime) (L : Submodule (𝓞 K) W) (x : W) :
-    x ∈ locF 𝔭 L ↔ ∃ t : 𝓞 F, t ∉ 𝔭 ∧ algebraMap (𝓞 F) (𝓞 K) t • x ∈ L := by
+theorem mem_locF_iff {𝔭 : Ideal (𝓞 F)} (hp : 𝔭.IsPrime) (L : Submodule (𝓞 K) W) (x : W)
+    : x ∈ locF 𝔭 L ↔ ∃ t : 𝓞 F, t ∉ 𝔭 ∧ algebraMap (𝓞 F) (𝓞 K) t • x ∈ L := by
   unfold locF
   rw [Formalism.HermitianLatticesTheory.locBasic_mem_locS]
   constructor
@@ -47,21 +47,19 @@ theorem mem_locF_iff {𝔭 : Ideal (𝓞 F)} (hp : 𝔭.IsPrime) (L : Submodule 
 theorem le_locF (𝔭 : Ideal (𝓞 F)) (L : Submodule (𝓞 K) W) : L ≤ locF 𝔭 L :=
   Formalism.HermitianLatticesTheory.locBasic_le_locS _ L
 
-theorem locF_mono (𝔭 : Ideal (𝓞 F)) {L M : Submodule (𝓞 K) W} (h : L ≤ M) :
-    locF 𝔭 L ≤ locF 𝔭 M :=
+theorem locF_mono (𝔭 : Ideal (𝓞 F)) {L M : Submodule (𝓞 K) W} (h : L ≤ M) : locF 𝔭 L ≤ locF 𝔭 M :=
   Formalism.HermitianLatticesTheory.locBasic_locS_mono _ h
 
-theorem locF_idem (𝔭 : Ideal (𝓞 F)) (L : Submodule (𝓞 K) W) :
-    locF 𝔭 (locF 𝔭 L) = locF 𝔭 L :=
+theorem locF_idem (𝔭 : Ideal (𝓞 F)) (L : Submodule (𝓞 K) W) : locF 𝔭 (locF 𝔭 L) = locF 𝔭 L :=
   Formalism.HermitianLatticesTheory.locBasic_locS_idem _ L
 
-theorem iInf_locF (L : Submodule (𝓞 K) W) :
-    (⨅ 𝔭 : {𝔭 : Ideal (𝓞 F) // 𝔭.IsMaximal}, locF 𝔭.1 L) = L := by
+theorem iInf_locF (L : Submodule (𝓞 K) W)
+    : (⨅ 𝔭 : {𝔭 : Ideal (𝓞 F) // 𝔭.IsMaximal}, locF 𝔭.1 L) = L := by
   apply le_antisymm
   · intro x hx
     by_contra hxL
-    let I : Ideal (𝓞 F) := Ideal.comap (algebraMap (𝓞 F) (𝓞 K))
-      (Submodule.comap (LinearMap.toSpanSingleton (𝓞 K) W x) L)
+    let I : Ideal (𝓞 F) :=
+      Ideal.comap (algebraMap (𝓞 F) (𝓞 K)) (Submodule.comap (LinearMap.toSpanSingleton (𝓞 K) W x) L)
     have hmem : ∀ r : 𝓞 F, r ∈ I ↔ algebraMap (𝓞 F) (𝓞 K) r • x ∈ L := by
       intro r
       simp [I]
@@ -78,10 +76,9 @@ theorem iInf_locF (L : Submodule (𝓞 K) W) :
 
 end Gen
 
-theorem exists_prime_to_part {c : 𝓞 F} (hc : c ≠ 0) {𝔭 : Ideal (𝓞 F)} (hp : 𝔭.IsMaximal) :
-    ∃ t : 𝓞 F, t ∉ 𝔭 ∧ ∀ 𝔮 : Ideal (𝓞 F), 𝔮.IsMaximal → 𝔮 ≠ 𝔭 → ∃ u : 𝓞 F, u ∉ 𝔮 ∧ c ∣ u * t := by
-  have hc' : Ideal.span {c} ≠ (0 : Ideal (𝓞 F)) := by
-    simpa using hc
+theorem exists_prime_to_part {c : 𝓞 F} (hc : c ≠ 0) {𝔭 : Ideal (𝓞 F)} (hp : 𝔭.IsMaximal)
+    : ∃ t : 𝓞 F, t ∉ 𝔭 ∧ ∀ 𝔮 : Ideal (𝓞 F), 𝔮.IsMaximal → 𝔮 ≠ 𝔭 → ∃ u : 𝓞 F, u ∉ 𝔮 ∧ c ∣ u * t := by
+  have hc' : Ideal.span {c} ≠ (0 : Ideal (𝓞 F)) := by simpa using hc
   have hu : ¬ IsUnit 𝔭 := by
     rw [Ideal.isUnit_iff]
     exact hp.ne_top
@@ -99,11 +96,12 @@ theorem exists_prime_to_part {c : 𝓞 F} (hc : c ≠ 0) {𝔭 : Ideal (𝓞 F)}
 
 section Lat
 
-variable [StarRing K] {V : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable
+  [StarRing K] {V : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem exists_zsmul_le {A B : Submodule (𝓞 K) V} (hA : Submodule.IsLattice K A)
-    (hB : Submodule.IsFullLattice K B) : ∃ n : ℤ, n ≠ 0 ∧ ∀ x ∈ A, n • x ∈ B := by
+theorem exists_zsmul_le
+    {A B : Submodule (𝓞 K) V} (hA : Submodule.IsLattice K A) (hB : Submodule.IsFullLattice K B)
+    : ∃ n : ℤ, n ≠ 0 ∧ ∀ x ∈ A, n • x ∈ B := by
   obtain ⟨S, hS⟩ := hA.fg
   choose n hn hnx using fun x : V => Formalism.HermitianLatticesTheory.traceReal_mult B hB x
   refine ⟨∏ x ∈ S, n x, Finset.prod_ne_zero_iff.mpr fun x _ => hn x, fun x hx => ?_⟩
@@ -117,23 +115,27 @@ theorem exists_zsmul_le {A B : Submodule (𝓞 K) V} (hA : Submodule.IsLattice K
   | add y z _ _ hy hz => rw [smul_add]; exact B.add_mem hy hz
   | smul a y _ hy => rw [smul_comm]; exact B.smul_mem a hy
 
-theorem algebraMap_intCast_smul (n : ℤ) (x : V) :
-    algebraMap (𝓞 F) (𝓞 K) (n : 𝓞 F) • x = n • x := by
+theorem algebraMap_intCast_smul (n : ℤ) (x : V) : algebraMap (𝓞 F) (𝓞 K) (n : 𝓞 F) • x = n • x := by
   rw [map_intCast, Int.cast_smul_eq_zsmul]
 
-theorem patch {L₀ : Submodule (𝓞 K) V} (hL₀ : Submodule.IsFullLattice K L₀)
+theorem patch
+    {L₀ : Submodule (𝓞 K) V} (hL₀ : Submodule.IsFullLattice K L₀)
     (s : Finset {𝔭 : Ideal (𝓞 F) // 𝔭.IsMaximal})
     (B : {𝔭 : Ideal (𝓞 F) // 𝔭.IsMaximal} → Submodule (𝓞 K) V)
-    (hB : ∀ 𝔭, Submodule.IsFullLattice K (B 𝔭)) (hBs : ∀ 𝔭 ∉ s, B 𝔭 = L₀) :
-    Submodule.IsLattice K (⨅ 𝔭, locF 𝔭.1 (B 𝔭)) ∧
-      ∀ 𝔭, locF 𝔭.1 (⨅ 𝔮, locF 𝔮.1 (B 𝔮)) = locF 𝔭.1 (B 𝔭) := by
+    (hB : ∀ 𝔭, Submodule.IsFullLattice K (B 𝔭)) (hBs : ∀ 𝔭 ∉ s, B 𝔭 = L₀)
+    : Submodule.IsLattice K (⨅ 𝔭, locF 𝔭.1 (B 𝔭))
+      ∧ ∀ 𝔭, locF 𝔭.1 (⨅ 𝔮, locF 𝔮.1 (B 𝔮)) = locF 𝔭.1 (B 𝔭) := by
   classical
   choose n₁ hn₁ hn₁x using fun 𝔭 => exists_zsmul_le (hB 𝔭).toIsLattice hL₀
   choose n₂ hn₂ hn₂x using fun 𝔭 => exists_zsmul_le hL₀.toIsLattice (hB 𝔭)
-  obtain ⟨N, hN, hN1, hN2⟩ : ∃ N : ℤ, N ≠ 0 ∧ (∀ 𝔭, ∀ x ∈ B 𝔭, N • x ∈ L₀) ∧
-      ∀ 𝔭, ∀ x ∈ L₀, N • x ∈ B 𝔭 := by
-    refine ⟨∏ 𝔭 ∈ s, (n₁ 𝔭 * n₂ 𝔭),
-      Finset.prod_ne_zero_iff.mpr fun 𝔭 _ => mul_ne_zero (hn₁ 𝔭) (hn₂ 𝔭), ?_, ?_⟩
+  obtain ⟨N, hN, hN1, hN2⟩
+      : ∃ N : ℤ, N ≠ 0 ∧ (∀ 𝔭, ∀ x ∈ B 𝔭, N • x ∈ L₀) ∧ ∀ 𝔭, ∀ x ∈ L₀, N • x ∈ B 𝔭 := by
+    refine ⟨
+      ∏ 𝔭 ∈ s, (n₁ 𝔭 * n₂ 𝔭),
+      Finset.prod_ne_zero_iff.mpr fun 𝔭 _ => mul_ne_zero (hn₁ 𝔭) (hn₂ 𝔭),
+      ?_,
+      ?_
+    ⟩
     · intro 𝔭 x hx
       by_cases h𝔭 : 𝔭 ∈ s
       · obtain ⟨m, hm⟩ := Finset.dvd_prod_of_mem (fun 𝔭 => n₁ 𝔭 * n₂ 𝔭) h𝔭
@@ -179,12 +181,13 @@ theorem patch {L₀ : Submodule (𝓞 K) V} (hL₀ : Submodule.IsFullLattice K L
     exact (LinearIndependent.iff_fractionRing _ _).mp hli
   · intro 𝔭
     apply le_antisymm
-    · calc locF 𝔭.1 Λ ≤ locF 𝔭.1 (locF 𝔭.1 (B 𝔭)) := locF_mono _ (hΛle 𝔭)
+    · calc
+        locF 𝔭.1 Λ
+          ≤ locF 𝔭.1 (locF 𝔭.1 (B 𝔭)) := locF_mono _ (hΛle 𝔭)
         _ = _ := locF_idem _ _
     · intro x hx
       obtain ⟨t₀, ht₀, hy⟩ := (mem_locF_iff 𝔭.2.isPrime _ x).mp hx
-      have hc : ((N * N : ℤ) : 𝓞 F) ≠ 0 := by
-        exact_mod_cast mul_ne_zero hN hN
+      have hc : ((N * N : ℤ) : 𝓞 F) ≠ 0 := by exact_mod_cast mul_ne_zero hN hN
       obtain ⟨t, ht, hq⟩ := exists_prime_to_part hc 𝔭.2
       refine (mem_locF_iff 𝔭.2.isPrime _ x).mpr
         ⟨t * t₀, fun h => (𝔭.2.isPrime.mem_or_mem h).elim ht ht₀, ?_⟩

@@ -7,8 +7,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open GlobalTheory.KZ GlobalTheory.K4 Polynomial UpperTheory.V.Z.Kato.Sym UpperTheory.V.Z.Kato.Sym.PE
 
-theorem UpperTheory.V.Z.Kato.Sym.PE.integ :
-    UpperTheory.V.Z.Kato.Sym.PE.Integ := by
+theorem UpperTheory.V.Z.Kato.Sym.PE.integ : UpperTheory.V.Z.Kato.Sym.PE.Integ := by
   intro Ω _ _ _ ε X m hm u z hu hz
   have key : ∀ w : X.K, IsU X w → (pj X).IsIntegralElem (io X w) := by
     intro w hw

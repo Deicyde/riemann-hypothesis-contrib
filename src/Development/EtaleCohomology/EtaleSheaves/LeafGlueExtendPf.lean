@@ -31,24 +31,27 @@ lemma dominant_of_generic {C W : Scheme.{0}} (e : W ⟶ C) [IsOpenImmersion e] (
 theorem LeafGlueExtend_of : LateralTheory.E.LeafExtendCut.LeafGlueExtend := by
   intro C X S _ sC p _ x hx ψ H
   choose U hyU hxU f hf1 hf2 using H
-  let 𝒰 : C.OpenCover := Scheme.Cover.mkOfCovers C (fun y => (U y).toScheme) (fun y => (U y).ι)
-    (fun y => ⟨y, ⟨y, hyU y⟩, rfl⟩)
-  have hcompat0 : ∀ i j : C,
-      pullback.fst (U i).ι (U j).ι ≫ f i = pullback.snd (U i).ι (U j).ι ≫ f j := by
+  let 𝒰 : C.OpenCover :=
+    Scheme.Cover.mkOfCovers C
+      (fun y => (U y).toScheme)
+      (fun y => (U y).ι)
+      (fun y => ⟨y, ⟨y, hyU y⟩, rfl⟩)
+  have hcompat0
+      : ∀ i j : C, pullback.fst (U i).ι (U j).ι ≫ f i = pullback.snd (U i).ι (U j).ι ≫ f j := by
     intro i j
     have : IsReduced (pullback (U i).ι (U j).ι) :=
       isReduced_of_isOpenImmersion (pullback.fst (U i).ι (U j).ι ≫ (U i).ι)
-    let g := pullback.lift ((U i).fromSpecStalkOfMem x (hxU i))
-      ((U j).fromSpecStalkOfMem x (hxU j))
-      (by rw [Scheme.Opens.fromSpecStalkOfMem_ι, Scheme.Opens.fromSpecStalkOfMem_ι])
+    let g :=
+      pullback.lift ((U i).fromSpecStalkOfMem x (hxU i)) ((U j).fromSpecStalkOfMem x (hxU j))
+        (by rw [Scheme.Opens.fromSpecStalkOfMem_ι, Scheme.Opens.fromSpecStalkOfMem_ι])
     have : IsDominant g :=
       dominant_of_generic (pullback.fst (U i).ι (U j).ι ≫ (U i).ι) x hx g
         (by simp only [g, pullback.lift_fst_assoc, Scheme.Opens.fromSpecStalkOfMem_ι])
     refine ext_of_isDominant_of_isSeparated p ?_ g ?_
     · simp only [Category.assoc, hf2]; rw [pullback.condition_assoc]
     · rw [pullback.lift_fst_assoc, pullback.lift_snd_assoc, hf1, hf1]
-  have hcompat : ∀ i j, pullback.fst (𝒰.f i) (𝒰.f j) ≫ f i = pullback.snd _ _ ≫ f j :=
-    fun i j => hcompat0 i j
+  have hcompat : ∀ i j, pullback.fst (𝒰.f i) (𝒰.f j) ≫ f i = pullback.snd _ _ ≫ f j := fun i j =>
+    hcompat0 i j
   refine ⟨𝒰.glueMorphisms f hcompat, ?_, ?_⟩
   · have := 𝒰.ι_glueMorphisms f hcompat x
     rw [← (U x).fromSpecStalkOfMem_ι x (hxU x), Category.assoc]

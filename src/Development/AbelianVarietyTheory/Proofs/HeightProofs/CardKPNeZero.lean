@@ -6,15 +6,18 @@ public import Formalism.LocalToGlobal.Divisibility.DefGroup
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV
+  GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Plug.TwistLevels
 
 open Formalism.L2.Host
 
-theorem not_unrAt_mul {L : Type} [Field L] [NumberField L] {d ψ : HChar L} {v : HeightOneSpectrum (𝓞 L)}
-    (hd : d.UnrAt v) (hψ : ¬ ψ.UnrAt v) : ¬ (d * ψ).UnrAt v := by
+theorem not_unrAt_mul
+    {L : Type} [Field L] [NumberField L]
+    {d ψ : HChar L} {v : HeightOneSpectrum (𝓞 L)} (hd : d.UnrAt v) (hψ : ¬ ψ.UnrAt v)
+    : ¬ (d * ψ).UnrAt v := by
   intro h
   apply hψ
   intro x hx
@@ -23,13 +26,16 @@ theorem not_unrAt_mul {L : Type} [Field L] [NumberField L] {d ψ : HChar L} {v :
   rw [hd x hx, one_mul] at this
   exact this
 
-theorem unrAt_mul {L : Type} [Field L] [NumberField L] {d ψ : HChar L} {v : HeightOneSpectrum (𝓞 L)}
-    (hd : d.UnrAt v) (hψ : ψ.UnrAt v) : (d * ψ).UnrAt v := by
+theorem unrAt_mul
+    {L : Type} [Field L] [NumberField L]
+    {d ψ : HChar L} {v : HeightOneSpectrum (𝓞 L)} (hd : d.UnrAt v) (hψ : ψ.UnrAt v)
+    : (d * ψ).UnrAt v := by
   intro x hx
   change d.loc v x * ψ.loc v x = 1
   rw [hd x hx, hψ x hx, one_mul]
 
-theorem card_residueField_ne_zero {L : Type} [Field L] [NumberField L] (Q : HeightOneSpectrum (𝓞 L)) : Nat.card (kP Q) ≠ 0 := by
+theorem card_residueField_ne_zero {L : Type} [Field L] [NumberField L] (Q : HeightOneSpectrum (𝓞 L))
+    : Nat.card (kP Q) ≠ 0 := by
   have h : Nat.card (kP Q) = Ideal.absNorm Q.asIdeal := by
     rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]
   rw [h, Ne, Ideal.absNorm_eq_zero_iff]
@@ -38,8 +44,10 @@ theorem card_residueField_ne_zero {L : Type} [Field L] [NumberField L] (Q : Heig
 def ramSet (P : Pre) (Ξ : Set (HChar P.host.E)) : Set (HeightOneSpectrum (𝓞 P.host.E)) :=
   {Q | ((P.host.pde * P.host.pde' : ℕ) : 𝓞 P.host.E) ∈ Q.asIdeal ∨ ∃ χ ∈ Ξ, ¬ χ.UnrAt Q}
 
-theorem not_unrAt_xiTw (B : Base) (f : Fr B.toPre) (T : TwDat B) (w : B.places.Pl) (Q : HeightOneSpectrum (𝓞 B.host.E))
-    (hQ : Q ∈ T.Q w) (hn : ((B.host.pde * B.host.pde' : ℕ) : 𝓞 B.host.E) ∉ Q.asIdeal) : ¬ (T.xiTw f w).UnrAt Q := by
+theorem not_unrAt_xiTw
+    (B : Base) (f : Fr B.toPre) (T : TwDat B) (w : B.places.Pl) (Q : HeightOneSpectrum (𝓞 B.host.E))
+    (hQ : Q ∈ T.Q w) (hn : ((B.host.pde * B.host.pde' : ℕ) : 𝓞 B.host.E) ∉ Q.asIdeal)
+    : ¬ (T.xiTw f w).UnrAt Q := by
   have h1 : ((B.host.pde : ℕ) : 𝓞 B.host.E) ∉ Q.asIdeal := fun h =>
     hn (by rw [Nat.cast_mul]; exact Q.asIdeal.mul_mem_right _ h)
   have h2 : ((B.host.pde' : ℕ) : 𝓞 B.host.E) ∉ Q.asIdeal := fun h =>
@@ -50,16 +58,21 @@ theorem not_unrAt_xiTw (B : Base) (f : Fr B.toPre) (T : TwDat B) (w : B.places.P
   · exact not_unrAt_mul (f.isDel'.unr Q h2) hψ
   · exact not_unrAt_mul (f.isDel.unr Q h1) hψ
 
-theorem ram_finite (B : Base) (f : Fr B.toPre) (T : TwDat B) (χ : HChar B.host.E) (hχ : χ ∈ T.set f) :
-    {Q : HeightOneSpectrum (𝓞 B.host.E) | ¬ χ.UnrAt Q}.Finite := by
+theorem ram_finite (B : Base) (f : Fr B.toPre) (T : TwDat B) (χ : HChar B.host.E) (hχ : χ ∈ T.set f)
+    : {Q : HeightOneSpectrum (𝓞 B.host.E) | ¬ χ.UnrAt Q}.Finite := by
   have hpde : B.host.pde * B.host.pde' ≠ 0 :=
-    mul_ne_zero (B.toPre.level_prime _ B.host.pde_level.1).ne_zero (B.toPre.level_prime _ B.host.pde_level.2).ne_zero
+    mul_ne_zero (B.toPre.level_prime _ B.host.pde_level.1).ne_zero
+      (B.toPre.level_prime _ B.host.pde_level.2).ne_zero
   have hZ := GlobalTheory.Mem.Top.TwFin.finite_mem (K := B.host.E) hpde
-  have h1 : ∀ Q : HeightOneSpectrum (𝓞 B.host.E), ((B.host.pde * B.host.pde' : ℕ) : 𝓞 B.host.E) ∉ Q.asIdeal →
-      ((B.host.pde : ℕ) : 𝓞 B.host.E) ∉ Q.asIdeal := fun Q hn h =>
+  have h1
+      : ∀ Q : HeightOneSpectrum (𝓞 B.host.E),
+        ((B.host.pde * B.host.pde' : ℕ) : 𝓞 B.host.E) ∉ Q.asIdeal
+          → ((B.host.pde : ℕ) : 𝓞 B.host.E) ∉ Q.asIdeal := fun Q hn h =>
     hn (by rw [Nat.cast_mul]; exact Q.asIdeal.mul_mem_right _ h)
-  have h2 : ∀ Q : HeightOneSpectrum (𝓞 B.host.E), ((B.host.pde * B.host.pde' : ℕ) : 𝓞 B.host.E) ∉ Q.asIdeal →
-      ((B.host.pde' : ℕ) : 𝓞 B.host.E) ∉ Q.asIdeal := fun Q hn h =>
+  have h2
+      : ∀ Q : HeightOneSpectrum (𝓞 B.host.E),
+        ((B.host.pde * B.host.pde' : ℕ) : 𝓞 B.host.E) ∉ Q.asIdeal
+          → ((B.host.pde' : ℕ) : 𝓞 B.host.E) ∉ Q.asIdeal := fun Q hn h =>
     hn (by rw [Nat.cast_mul]; exact Q.asIdeal.mul_mem_left _ h)
   rcases hχ with hχ | ⟨w, rfl⟩
   · rcases hχ with rfl | rfl | rfl
@@ -80,17 +93,23 @@ theorem ram_finite (B : Base) (f : Fr B.toPre) (T : TwDat B) (χ : HChar B.host.
     · exact unrAt_mul (f.isDel'.unr Q (h2 Q hc.1)) hψ
     · exact unrAt_mul (f.isDel.unr Q (h1 Q hc.1)) hψ
 
-
 open Classical in
-theorem levels_bounded : ∀ (P : Pre) (f : Fr P) (Ξ : Set (Formalism.L2.Host.HChar P.host.E)), ∃ Ms : Finset ℕ, (∀ M ∈ Ms, M ≠ 0) ∧
-    ∀ (B : Base) (hB : B.toPre = P) (T : TwDat B), HEq (T.set (hB ▸ f)) Ξ → ∀ (w : B.places.Pl)
-      (S : Finset (HeightOneSpectrum (𝓞 B.host.E))),
-      (∀ Q ∈ S, ((B.host.pde * B.host.pde' : ℕ) : 𝓞 B.host.E) ∈ Q.asIdeal ∨ Q ∈ T.Q w) →
-      B.host.g 0 * B.host.g 1 * ∏ q ∈ S.image (fun Q => Nat.card (kP Q)), q ∈ Ms := by
+theorem levels_bounded
+    : ∀ (P : Pre) (f : Fr P) (Ξ : Set (Formalism.L2.Host.HChar P.host.E)), ∃ Ms : Finset ℕ,
+      (∀ M ∈ Ms, M ≠ 0)
+        ∧ ∀ (B : Base) (hB : B.toPre = P) (T : TwDat B),
+          HEq (T.set (hB ▸ f)) Ξ
+            → ∀ (w : B.places.Pl) (S : Finset (HeightOneSpectrum (𝓞 B.host.E))),
+              (∀ Q ∈ S, ((B.host.pde * B.host.pde' : ℕ) : 𝓞 B.host.E) ∈ Q.asIdeal ∨ Q ∈ T.Q w)
+                → B.host.g 0 * B.host.g 1 * ∏ q ∈ S.image (fun Q => Nat.card (kP Q)), q ∈ Ms := by
   intro P f Ξ
   by_cases hA : (ramSet P Ξ).Finite
-  · refine ⟨hA.toFinset.powerset.image
-      (fun S => P.host.g 0 * P.host.g 1 * ∏ q ∈ S.image (fun Q => Nat.card (kP Q)), q), ?_, ?_⟩
+  · refine ⟨
+      hA.toFinset.powerset.image (fun S =>
+        P.host.g 0 * P.host.g 1 * ∏ q ∈ S.image (fun Q => Nat.card (kP Q)), q),
+      ?_,
+      ?_
+    ⟩
     · intro M hM
       obtain ⟨S, -, rfl⟩ := Finset.mem_image.1 hM
       refine mul_ne_zero (mul_ne_zero (P.host.g_prime 0).ne_zero (P.host.g_prime 1).ne_zero) ?_
@@ -116,7 +135,8 @@ theorem levels_bounded : ∀ (P : Pre) (f : Fr P) (Ξ : Set (Formalism.L2.Host.H
     apply hA
     have hT' : T.set f = Ξ := eq_of_heq hT
     have hpde : B.host.pde * B.host.pde' ≠ 0 :=
-      mul_ne_zero (B.toPre.level_prime _ B.host.pde_level.1).ne_zero (B.toPre.level_prime _ B.host.pde_level.2).ne_zero
+      mul_ne_zero (B.toPre.level_prime _ B.host.pde_level.1).ne_zero
+        (B.toPre.level_prime _ B.host.pde_level.2).ne_zero
     have hfin := (GlobalTheory.Mem.Top.TwFin.tw_fin B f T).1
     refine ((GlobalTheory.Mem.Top.TwFin.finite_mem (K := B.host.E) hpde).union
       (hfin.biUnion fun χ hχ => ram_finite B f T χ hχ)).subset ?_

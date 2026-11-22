@@ -78,11 +78,11 @@ end GlobalTheory.KZ.JInt
 
 namespace GlobalTheory.KZ.JInt
 
-
 open Polynomial in
-theorem jK_sl_isIntegral : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε),
-    Function.Injective ε → (∃ φ : ℂ → ℂ, DifferentiableOn ℂ φ Hs ∧ X.an X.jK = (φ : Mero)) →
-    ∀ g : GQ, IsIntegral (Algebra.adjoin Ω {X.jK}) (X.sl g X.jK) := by
+theorem jK_sl_isIntegral
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε),
+      Function.Injective ε → (∃ φ : ℂ → ℂ, DifferentiableOn ℂ φ Hs ∧ X.an X.jK = (φ : Mero))
+        → ∀ g : GQ, IsIntegral (Algebra.adjoin Ω {X.jK}) (X.sl g X.jK) := by
   intro Ω _ _ _ ε Tw hε hj g
   set f := Tw.sl g Tw.jK with hf
   obtain ⟨M, hM, hlev⟩ := Tw.level f
@@ -100,7 +100,8 @@ theorem jK_sl_isIntegral : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClo
   let S : Set Tw.K := Set.range fun γ : SL(2, ℤ) => Tw.sl (ofSL γ) f
   have hSfin : S.Finite := by
     classical
-    let F : SL(2, ZMod M) → Tw.K := fun γb => if h : ∃ γ, red γ = γb then Tw.sl (ofSL h.choose) f else 0
+    let F : SL(2, ZMod M) → Tw.K := fun γb =>
+      if h : ∃ γ, red γ = γb then Tw.sl (ofSL h.choose) f else 0
     apply (Set.finite_range F).subset
     rintro _ ⟨γ, rfl⟩
     refine ⟨red γ, ?_⟩
@@ -111,8 +112,7 @@ theorem jK_sl_isIntegral : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClo
   have hT : ∀ y, y ∈ T ↔ y ∈ S := fun y => Set.Finite.mem_toFinset hSfin
   let P : Tw.K[X] := ∏ y ∈ T, (X - C y)
   have hPmon : P.Monic := monic_prod_of_monic _ _ fun y _ => monic_X_sub_C y
-  have hfT : f ∈ T := by
-    rw [hT]; exact ⟨1, by simp [Tw.sl_one]⟩
+  have hfT : f ∈ T := by rw [hT]; exact ⟨1, by simp [Tw.sl_one]⟩
   have hPf : P.eval f = 0 := by
     rw [eval_prod]
     exact Finset.prod_eq_zero hfT (by simp)
@@ -121,7 +121,8 @@ theorem jK_sl_isIntegral : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClo
     intro δ n
     have hmap : P.map ((Tw.sl (ofSL δ) : Tw.K ≃ₐ[Ω] Tw.K) : Tw.K →+* Tw.K) = P := by
       simp only [P, Polynomial.map_prod, Polynomial.map_sub, map_X, map_C]
-      refine Finset.prod_nbij' (fun y => Tw.sl (ofSL δ) y) (fun y => Tw.sl (ofSL δ⁻¹) y) ?_ ?_ ?_ ?_ ?_
+      refine
+        Finset.prod_nbij' (fun y => Tw.sl (ofSL δ) y) (fun y => Tw.sl (ofSL δ⁻¹) y) ?_ ?_ ?_ ?_ ?_
       · intro y hy
         rw [hT] at hy ⊢
         obtain ⟨γ, rfl⟩ := hy
@@ -147,8 +148,11 @@ theorem jK_sl_isIntegral : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClo
     have e : Tw.sl (ofSL γ) f = Tw.sl (g * ofSL γ) Tw.jK := by rw [Tw.sl_mul]
     show Tw.sl (ofSL γ) f ∈ holR Tw
     rw [e]
-    exact ⟨fun z => φ (mob (g * ofSL γ) z),
-      hφ.comp (mob_diff _) (fun z hz => mob_im _ hz), Tw.an_sl _ _ _ hjφ⟩
+    exact ⟨
+      fun z => φ (mob (g * ofSL γ) z),
+      hφ.comp (mob_diff _) (fun z hz => mob_im _ hz),
+      Tw.an_sl _ _ _ hjφ
+    ⟩
   let Q : (holR Tw)[X] := ∏ y ∈ T.attach, (X - C ⟨y.1, hmemS y.1 y.2⟩)
   have hQ : Q.map (holR Tw).subtype = P := by
     simp only [Q, P, Polynomial.map_prod, Polynomial.map_sub, map_X, map_C, Subring.subtype_apply]
@@ -159,7 +163,10 @@ theorem jK_sl_isIntegral : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClo
     exact (Q.coeff n).2
 
   have hA : ∀ n, P.coeff n ∈ Algebra.adjoin Ω {Tw.jK} := fun n =>
-    GlobalTheory.T.slTwo_invariant_holomorphic_mem_adjoin_jInvariant ε Tw hε ⟨φ, hφ, hjφ⟩ (P.coeff n) (fun δ => hinv δ n) (hhol n)
+    GlobalTheory.T.slTwo_invariant_holomorphic_mem_adjoin_jInvariant ε Tw hε ⟨φ, hφ, hjφ⟩
+      (P.coeff n)
+      (fun δ => hinv δ n)
+      (hhol n)
   have hlift : P ∈ lifts (algebraMap (Algebra.adjoin Ω {Tw.jK}) Tw.K) := by
     rw [lifts_iff_coeff_lifts]
     intro n

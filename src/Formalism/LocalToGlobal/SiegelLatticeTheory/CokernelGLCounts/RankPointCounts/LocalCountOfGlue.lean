@@ -18,13 +18,17 @@ section Top2
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
 
-theorem latSide_at' (M : Model F E) (r n : ℕ) (hM : M.OK) (hE : GlueEta M r) (hV : GlueConv M r)
-    (hP : GenOfPrim M r n) (hR : ClaimR M r n) : LatSide M r n :=
+theorem latSide_at'
+    (M : Model F E) (r n : ℕ)
+    (hM : M.OK) (hE : GlueEta M r) (hV : GlueConv M r) (hP : GenOfPrim M r n) (hR : ClaimR M r n)
+    : LatSide M r n :=
   latSide_at M r n hM hE hV hP (gramMM_holds M r n) (thFG_at M r hM) (thSpan_at M r hM) hR
 
-theorem localCount_of_glue (M : Model F E) (r n : ℕ) (hM : M.OK) (hE : GlueEta M r) (hV : GlueConv M r)
-    (hP : GenOfPrim M r n) (hR : ClaimR M r n) (h0 : ModSide0 M r n M.split.isSome)
-    (hU : ModSideU M r n M.split.isSome) : Formalism.MainNotions.ThinScalesBound.FamilyLocalModel M r n := by
+theorem localCount_of_glue
+    (M : Model F E) (r n : ℕ)
+    (hM : M.OK) (hE : GlueEta M r) (hV : GlueConv M r) (hP : GenOfPrim M r n) (hR : ClaimR M r n)
+    (h0 : ModSide0 M r n M.split.isSome) (hU : ModSideU M r n M.split.isSome)
+    : Formalism.MainNotions.ThinScalesBound.FamilyLocalModel M r n := by
   intro V _ _ H hn t₁ hg f₂ f₂' φ φ' hF hF' hI hs hs'
   have hT : LocalCountHypotheses H t₁ f₂ f₂' φ φ' := ⟨hg, hF, hF', hI, hs, hs'⟩
   have hL := latSide_at' M r n hM hE hV hP hR V H hn t₁ f₂ f₂' φ φ' hT

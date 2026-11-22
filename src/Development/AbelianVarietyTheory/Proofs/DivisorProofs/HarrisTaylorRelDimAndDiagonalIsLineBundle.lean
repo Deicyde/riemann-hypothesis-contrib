@@ -12,8 +12,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.PELU
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.PELU
 open scoped Matrix
 open GlobalTheory.UPel.HT
 
@@ -21,17 +23,20 @@ noncomputable section
 
 namespace GlobalTheory.HTDim
 
-theorem card_torsion_of_ev {La Q : Type} [AddCommGroup La] [Module.Free ℤ La] [Module.Finite ℤ La] [Group Q]
-    (ev : La → Q) (ℓ : ℕ) (hℓ : 0 < ℓ) (hadd : ∀ x y, ev (x + y) = ev x * ev y)
-    (hker : ∀ x, ev x = 1 ↔ ∃ y, x = ℓ • y) (honto : ∀ q, q ^ ℓ = 1 ↔ ∃ x, ev x = q) :
-    Nat.card {q : Q // q ^ ℓ = 1} = ℓ ^ Module.finrank ℤ La := by
+theorem card_torsion_of_ev
+    {La Q : Type} [AddCommGroup La] [Module.Free ℤ La] [Module.Finite ℤ La] [Group Q]
+    (ev : La → Q)
+    (ℓ : ℕ) (hℓ : 0 < ℓ)
+    (hadd : ∀ x y, ev (x + y) = ev x * ev y) (hker : ∀ x, ev x = 1 ↔ ∃ y, x = ℓ • y)
+    (honto : ∀ q, q ^ ℓ = 1 ↔ ∃ x, ev x = q)
+    : Nat.card {q : Q // q ^ ℓ = 1} = ℓ ^ Module.finrank ℤ La := by
   haveI : NeZero ℓ := ⟨by omega⟩
-  let f : La →+ Additive Q := AddMonoidHom.mk' (fun x => Additive.ofMul (ev x)) fun x y => by
-    rw [hadd]; rfl
+  let f : La →+ Additive Q :=
+    AddMonoidHom.mk' (fun x => Additive.ofMul (ev x)) fun x y => by rw [hadd]; rfl
   let r := Module.finrank ℤ La
   let b := Module.finBasis ℤ La
-  let g : La →+ (Fin r → ZMod ℓ) := AddMonoidHom.mk' (fun x i => ((b.repr x i : ℤ) : ZMod ℓ)) fun x y => by
-    ext i; simp
+  let g : La →+ (Fin r → ZMod ℓ) :=
+    AddMonoidHom.mk' (fun x i => ((b.repr x i : ℤ) : ZMod ℓ)) fun x y => by ext i; simp
   have hg : Function.Surjective g := by
     intro v
     choose w hw using fun i => ZMod.intCast_surjective (v i)
@@ -67,18 +72,20 @@ theorem card_torsion_of_ev {La Q : Type} [AddCommGroup La] [Module.Free ℤ La] 
 
 variable {p : ℕ} [Fact p.Prime]
 
-theorem relDim {D : Datum p} {R : Type} [CommRing R] {b : Base D R} {N : ℕ} {S : Scheme.{0}} {s : S ⟶ Sp R}
-    (o : Obj b N s) : SmoothOfRelativeDimension D.g o.A.hom := by
+theorem relDim
+    {D : Datum p} {R : Type} [CommRing R]
+    {b : Base D R} {N : ℕ} {S : Scheme.{0}} {s : S ⟶ Sp R} (o : Obj b N s)
+    : SmoothOfRelativeDimension D.g o.A.hom := by
   have := o.ab.smooth
   choose n W hW hd using H1.exists_dim o.A.hom
   have : IsZariskiLocalAtSource (@SmoothOfRelativeDimension D.g) :=
     HasRingHomProperty.instIsZariskiLocalAtSource
-  refine IsZariskiLocalAtSource.of_iSup_eq_top
-    (P := @SmoothOfRelativeDimension D.g) W
+  refine IsZariskiLocalAtSource.of_iSup_eq_top (P := @SmoothOfRelativeDimension D.g) W
     (top_le_iff.1 fun y _ => TopologicalSpace.Opens.mem_iSup.2 ⟨y, hW y⟩) fun y => ?_
   let k := AlgebraicClosure (o.A.left.residueField y)
   let z : Sp k ⟶ o.A.left :=
-    Spec.map (CommRingCat.ofHom (algebraMap (o.A.left.residueField y) k)) ≫ o.A.left.fromSpecResidueField y
+    Spec.map (CommRingCat.ofHom (algebraMap (o.A.left.residueField y) k))
+      ≫ o.A.left.fromSpecResidueField y
   have hz : ∀ u, z u = y := fun u => Scheme.fromSpecResidueField_apply y _
   let x : Sp k ⟶ S := z ≫ o.A.hom
   let β : R →+* k := (Spec.preimage (x ≫ s)).hom
@@ -88,10 +95,12 @@ theorem relDim {D : Datum p} {R : Type} [CommRing R] {b : Base D R} {N : ℕ} {S
   have hB : IsAbelianScheme B := GlobalTheory.isAbelianScheme_pullback_obj x o.A o.ab
   obtain ⟨m, hm⟩ := GlobalTheory.AbVarRelDim.exists_relDim k B hB
   let z' : Sp k ⟶ pullback o.A.hom x := pullback.lift z (𝟙 _) (Category.id_comp _).symm
-  have e₁ : n y = m := H1.dim_base (IsPullback.of_hasPullback _ _) (hd y) hm (z' (default : PrimeSpectrum k)) (by
-    have e : z' ≫ pullback.fst o.A.hom x = z := pullback.lift_fst _ _ _
-    have e' := (congrArg (fun q : Sp k ⟶ o.A.left => q (default : PrimeSpectrum k)) e).trans (hz _)
-    exact (congrArg (fun u => u ∈ W y) e').mpr (hW y))
+  have e₁ : n y = m :=
+    H1.dim_base (IsPullback.of_hasPullback _ _) (hd y) hm (z' (default : PrimeSpectrum k)) (by
+      have e : z' ≫ pullback.fst o.A.hom x = z := pullback.lift_fst _ _ _
+      have e' :=
+        (congrArg (fun q : Sp k ⟶ o.A.left => q (default : PrimeSpectrum k)) e).trans (hz _)
+      exact (congrArg (fun u => u ∈ W y) e').mpr (hW y))
   have hℓp : (p + 1).Coprime p := Nat.coprime_self_add_left.2 (Nat.coprime_one_left p)
   have hℓk : ((p + 1 : ℕ) : k) ≠ 0 := by
     intro h0
@@ -101,13 +110,16 @@ theorem relDim {D : Datum p} {R : Type} [CommRing R] {b : Base D R} {N : ℕ} {S
   haveI := D.freeLa
   haveI := D.finLa
   obtain ⟨I, -⟩ := o.geom k x β hβ
-  have c1 := card_torsion_of_ev (I.ev (p + 1)) (p + 1) (by omega) (I.add (p + 1)) (I.ker (p + 1) (by omega) hℓp)
-    (I.onto (p + 1) (by omega) hℓp)
+  have c1 :=
+    card_torsion_of_ev (I.ev (p + 1)) (p + 1) (by omega) (I.add (p + 1))
+      (I.ker (p + 1) (by omega) hℓp) (I.onto (p + 1) (by omega) hℓp)
   have c2 := GlobalTheory.UU.TorsionCount.card_torsion_points_unconditional k B m (p + 1) hB hm hℓk
-  obtain ⟨e, -⟩ := GlobalTheory.exists_mulEquiv_of_isGrpPullback (isGrpPullback_pullback o.A x) (𝟙 (Sp k)) x
-    (Category.id_comp x).symm
-  have c3 : Nat.card {q : 𝟙_ (Over (Sp k)) ⟶ B // q ^ (p + 1) = 1} =
-      Nat.card {q : Over.mk x ⟶ o.A // q ^ (p + 1) = 1} :=
+  obtain ⟨e, -⟩ :=
+    GlobalTheory.exists_mulEquiv_of_isGrpPullback (isGrpPullback_pullback o.A x) (𝟙 (Sp k)) x
+      (Category.id_comp x).symm
+  have c3
+      : Nat.card {q : 𝟙_ (Over (Sp k)) ⟶ B // q ^ (p + 1) = 1}
+        = Nat.card {q : Over.mk x ⟶ o.A // q ^ (p + 1) = 1} :=
     Nat.card_congr (Equiv.subtypeEquiv e.toEquiv fun q => by
       change q ^ (p + 1) = 1 ↔ e q ^ (p + 1) = 1
       rw [← map_pow, map_eq_one_iff e e.injective])
@@ -122,7 +134,10 @@ theorem relDim {D : Datum p} {R : Type} [CommRing R] {b : Base D R} {N : ℕ} {S
   rw [hg, ← e₁]
   exact hd y
 
-theorem relDim_and_isLB : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (N : ℕ) (S : Scheme.{0}) (s : S ⟶ Sp R) (o : Obj b N s), SmoothOfRelativeDimension D.g o.A.hom ∧ (o.P.pull (lift (𝟙 o.A) (𝟙 o.A)).left).IsLB :=
+theorem relDim_and_isLB
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (N : ℕ)
+        (S : Scheme.{0}) (s : S ⟶ Sp R) (o : Obj b N s),
+      SmoothOfRelativeDimension D.g o.A.hom ∧ (o.P.pull (lift (𝟙 o.A) (𝟙 o.A)).left).IsLB :=
   fun _ _ _ _ _ _ _ _ _ o => ⟨relDim o, LB.isLB_pull o.isLB _⟩
 
 end GlobalTheory.HTDim

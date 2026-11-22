@@ -6,7 +6,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 namespace ReciprocityTheory.ChartRestriction.G.FD.FourierCoefficientLattice
 
-open NumberField Complex ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FD.FourierCoefficientMatrices ReciprocityTheory.ChartRestriction.G.FD.EmbeddingHermitianPairs
+open NumberField Complex ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.FD.FourierCoefficientMatrices
+  ReciprocityTheory.ChartRestriction.G.FD.EmbeddingHermitianPairs
 open scoped ComplexConjugate
 
 noncomputable section
@@ -87,13 +89,17 @@ def LZsub : AddSubgroup (X.Ψ → Fin 2 → Fin 2 → ℂ) where
       obtain ⟨γ', hγi', e'⟩ := hγ' i k
       exact ⟨γ + γ', hγi.add hγi', by simp only [Matrix.add_apply, e, e']; ring⟩
     · funext τ i k; simp [Data.embH]
-  zero_mem' := ⟨0, fun i k => by simp [cc], fun i k => ⟨0, isIntegral_zero, by simp⟩,
-    by funext τ i k; simp [Data.embH]⟩
+  zero_mem' := ⟨
+    0,
+    fun i k => by simp [cc],
+    fun i k => ⟨0, isIntegral_zero, by simp⟩,
+    by funext τ i k; simp [Data.embH]
+  ⟩
   neg_mem' := by
     rintro _ ⟨β, hβ, hγ, rfl⟩
     refine ⟨-β, fun i k => ?_, fun i k => ?_, ?_⟩
     · show cc (-β i k) = -β k i
-      rw [show cc (-β i k) = -cc (β i k) from map_neg _ _, hβ]
+      rw [show cc (- β i k) = - cc (β i k) from map_neg _ _, hβ]
     · obtain ⟨γ, hγi, e⟩ := hγ i k
       exact ⟨-γ, hγi.neg, by simp only [Matrix.neg_apply, e]; ring⟩
     · funext τ i k; simp [Data.embH]

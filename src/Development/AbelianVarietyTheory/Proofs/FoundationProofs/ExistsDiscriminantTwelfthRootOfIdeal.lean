@@ -9,11 +9,11 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.DatumCurv
 
 noncomputable section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric
 
 namespace GlobalTheory.Glob.IntegralWittCoefficients
 
-theorem isCurveIdeal_top (D : D7) : IsCurveIdeal D ⊤ :=
-  ⟨top_ne_bot, by simp⟩
+theorem isCurveIdeal_top (D : D7) : IsCurveIdeal D ⊤ := ⟨top_ne_bot, by simp⟩
 
 end GlobalTheory.Glob.IntegralWittCoefficients

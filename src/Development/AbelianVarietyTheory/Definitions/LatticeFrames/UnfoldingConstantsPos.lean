@@ -26,14 +26,14 @@ def SAbs (Γ₀ : ℝ) : Prop := hsDev D u ≤ Γ₀ * (d0 D u : ℝ) ^ 2 / D.wh
 abbrev Desc : Type := (D.mem u).P.Mt →ₗ⋆[ℂ] D.s.HH
 
 def MIMap (Θ : Desc D u) : Prop :=
-  ∃ (s l : ℂ) (FF : (D.mem u).A.Mram →ₗ[ℂ] D.s.Cu u), l ≠ 0 ∧ Function.Injective FF ∧
-    ∀ (φ : (D.mem u).A.Mram) (F : (D.mem u).P.Mt),
-      s * PhiC (D.mem u).C (D.mem u).A (D.mem u).P φ F = l * ⟪Θ F, D.s.Pu u (FF φ)⟫_ℂ
+  ∃ (s l : ℂ) (FF : (D.mem u).A.Mram →ₗ[ℂ] D.s.Cu u),
+    l ≠ 0 ∧ Function.Injective FF
+      ∧ ∀ (φ : (D.mem u).A.Mram) (F : (D.mem u).P.Mt),
+        s * PhiC (D.mem u).C (D.mem u).A (D.mem u).P φ F = l * ⟪Θ F, D.s.Pu u (FF φ)⟫_ℂ
 
 def OntoAll (Θ : Desc D u) : Prop := Function.Surjective Θ
 
-def RamShare : Prop :=
-  (dU D u : ℝ) = (d0 D u : ℝ) * (1 - 1 / (((D.mem u).A.T : ℝ) - 1)) ^ D.R.f
+def RamShare : Prop := (dU D u : ℝ) = (d0 D u : ℝ) * (1 - 1 / (((D.mem u).A.T : ℝ) - 1)) ^ D.R.f
 
 def RamBig (δ : ℝ) : Prop := 0 < dU D u ∧ (1 - δ) * (d0 D u : ℝ) ≤ (dU D u : ℝ)
 

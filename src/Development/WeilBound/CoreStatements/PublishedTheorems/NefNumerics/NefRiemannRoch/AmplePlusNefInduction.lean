@@ -20,13 +20,15 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsPsEffPullR
 set_option autoImplicit false
 noncomputable section
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter Asymptotics
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.QCoh GlobalTheory.CechPic GlobalTheory.Twist
 
 namespace GlobalTheory
 
-theorem withBot_eq_succ_of_le_of_not_le {t : WithBot ℕ∞} {d : ℕ} (h1 : t ≤ ((d + 1 : ℕ) : WithBot ℕ∞))
-    (h2 : ¬ t ≤ (d : WithBot ℕ∞)) : t = ((d + 1 : ℕ) : WithBot ℕ∞) := by
+theorem withBot_eq_succ_of_le_of_not_le
+    {t : WithBot ℕ∞} {d : ℕ} (h1 : t ≤ ((d + 1 : ℕ) : WithBot ℕ∞)) (h2 : ¬ t ≤ (d : WithBot ℕ∞))
+    : t = ((d + 1 : ℕ) : WithBot ℕ∞) := by
   induction t using WithBot.recBotCoe with
   | bot => exact absurd bot_le h2
   | coe t =>
@@ -38,9 +40,17 @@ theorem withBot_eq_succ_of_le_of_not_le {t : WithBot ℕ∞} {d : ℕ} (h1 : t �
       have h1' : n ≤ d + 1 := by exact_mod_cast h1
       have h2' : ¬ n ≤ d := fun h => h2 (by exact_mod_cast h)
       have : n = d + 1 := by omega
-      subst this; rfl
+      subst this
+      rfl
 
-theorem isAmpleLB_tens_of_isNef_succ : ∀ (k : Type) [Field k] [Infinite k] (d : ℕ), (∀ (Y : Scheme.{0}) [Algebra k Γ(Y, ⊤)], IsProjOver (strHom k (X := Y)) → topologicalKrullDim Y ≤ (d : ℕ) → ∀ A N : LB Y, IsAmpleLB A → IsNef k N → IsAmpleLB (tens A N)) → (∀ (Y : Scheme.{0}) [Algebra k Γ(Y, ⊤)], IsProjOver (strHom k (X := Y)) → topologicalKrullDim Y ≤ (d + 1 : ℕ) → ∀ A N : LB Y, IsAmpleLB A → IsNef k N → IsAmpleLB (tens A N)) := by
+theorem isAmpleLB_tens_of_isNef_succ
+    : ∀ (k : Type) [Field k] [Infinite k] (d : ℕ),
+      (∀ (Y : Scheme.{0}) [Algebra k Γ(Y, ⊤)],
+          IsProjOver (strHom k (X := Y)) → topologicalKrullDim Y ≤ (d : ℕ)
+            → ∀ A N : LB Y, IsAmpleLB A → IsNef k N → IsAmpleLB (tens A N))
+        → (∀ (Y : Scheme.{0}) [Algebra k Γ(Y, ⊤)],
+          IsProjOver (strHom k (X := Y)) → topologicalKrullDim Y ≤ (d + 1 : ℕ)
+            → ∀ A N : LB Y, IsAmpleLB A → IsNef k N → IsAmpleLB (tens A N)) := by
   intro k _ _ d ih Y _ hproj hdimY A N hA hN
   refine IsAmpleLB.tens_of_forall_isPsEff k Y (strHom k Y) hproj A N hA hN.isLB ?_
   intro Z hZ
@@ -81,6 +91,10 @@ theorem isAmpleLB_tens_of_isNef_succ : ∀ (k : Type) [Field k] [Infinite k] (d 
     rw [cls_tens (isLB_lbPow hNZ.isLB m) hAZ.isLB]
     exact add_comm _ _
   obtain ⟨r, hr1, hsec⟩ := IsAmpleLB.exists_hasNonzeroSec hL'amp (isLB_lbPow hL'LB 0)
-  exact ⟨r, hr1, hsec _ (isLB_lbPow hL'LB r) (by rw [cls_lbPow hL'LB, cls_lbPow hL'LB, zero_smul, zero_add])⟩
+  exact ⟨
+    r,
+    hr1,
+    hsec _ (isLB_lbPow hL'LB r) (by rw [cls_lbPow hL'LB, cls_lbPow hL'LB, zero_smul, zero_add])
+  ⟩
 
 end GlobalTheory

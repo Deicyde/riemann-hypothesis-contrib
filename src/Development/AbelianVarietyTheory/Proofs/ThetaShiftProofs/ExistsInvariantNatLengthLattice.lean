@@ -7,9 +7,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 namespace GlobalTheory
 
-theorem exists_nat_length_lattice (Y : Type*) [AddCommGroup Y] [Module.Free ℤ Y] [Module.Finite ℤ Y] :
-    ∃ q : Y → ℕ, (∀ x y, q (x - y) ≤ q x + q y) ∧ (∀ (m : ℕ) y, q (m • y) = m * q y) ∧
-      ∀ y, q y = 0 → y = 0 := by
+theorem exists_nat_length_lattice (Y : Type*) [AddCommGroup Y] [Module.Free ℤ Y] [Module.Finite ℤ Y]
+    : ∃ q : Y → ℕ,
+      (∀ x y, q (x - y) ≤ q x + q y) ∧ (∀ (m : ℕ) y, q (m • y) = m * q y)
+        ∧ ∀ y, q y = 0 → y = 0 := by
   classical
   let b := Module.Free.chooseBasis ℤ Y
   refine ⟨fun y => ∑ i, (b.repr y i).natAbs, ?_, ?_, ?_⟩
@@ -28,10 +29,12 @@ theorem exists_nat_length_lattice (Y : Type*) [AddCommGroup Y] [Module.Free ℤ 
     ext i
     simpa using hy i (Finset.mem_univ i)
 
-theorem exists_invariant_nat_length_lattice (Y : Type*) [AddCommGroup Y] [Module.Free ℤ Y]
-    [Module.Finite ℤ Y] (σ : Module.End ℤ Y) (n : ℕ) (hn : 0 < n) (hσ : σ ^ n = 1) :
-    ∃ p : Y → ℕ, (∀ x y, p (x - y) ≤ p x + p y) ∧ (∀ (m : ℕ) y, p (m • y) = m * p y) ∧
-      (∀ y, p y = 0 → y = 0) ∧ ∀ y, p (σ y) = p y := by
+theorem exists_invariant_nat_length_lattice
+    (Y : Type*) [AddCommGroup Y] [Module.Free ℤ Y] [Module.Finite ℤ Y]
+    (σ : Module.End ℤ Y) (n : ℕ) (hn : 0 < n) (hσ : σ ^ n = 1)
+    : ∃ p : Y → ℕ,
+      (∀ x y, p (x - y) ≤ p x + p y) ∧ (∀ (m : ℕ) y, p (m • y) = m * p y) ∧ (∀ y, p y = 0 → y = 0)
+        ∧ ∀ y, p (σ y) = p y := by
   obtain ⟨q, h1, h2, h3⟩ := exists_nat_length_lattice Y
   refine ⟨fun y => ∑ j ∈ Finset.range n, q ((σ ^ j) y), ?_, ?_, ?_, ?_⟩
   · intro x y
@@ -50,17 +53,18 @@ theorem exists_invariant_nat_length_lattice (Y : Type*) [AddCommGroup Y] [Module
   · intro y
     have e1 := Finset.sum_range_succ (fun j => q ((σ ^ j) y)) n
     have e2 := Finset.sum_range_succ' (fun j => q ((σ ^ j) y)) n
-    have e3 : ∑ j ∈ Finset.range n, q ((σ ^ j) (σ y)) =
-        ∑ j ∈ Finset.range n, q ((σ ^ (j + 1)) y) :=
+    have e3 : ∑ j ∈ Finset.range n, q ((σ ^ j) (σ y)) = ∑ j ∈ Finset.range n, q ((σ ^ (j + 1)) y) :=
       Finset.sum_congr rfl fun j _ => by rw [pow_succ, Module.End.mul_apply]
     rw [hσ] at e1
     rw [pow_zero] at e2
     simp only [e3]
     omega
 
-theorem end_eq_one_of_pow_eq_one_of_congr (Y : Type*) [AddCommGroup Y] [Module.Free ℤ Y]
-    [Module.Finite ℤ Y] (σ : Module.End ℤ Y) (n M : ℕ) (hn : 0 < n) (hσ : σ ^ n = 1) (hM : 3 ≤ M)
-    (h : ∀ y, ∃ z, σ y = y + M • z) : σ = 1 := by
+theorem end_eq_one_of_pow_eq_one_of_congr
+    (Y : Type*) [AddCommGroup Y] [Module.Free ℤ Y] [Module.Finite ℤ Y]
+    (σ : Module.End ℤ Y) (n M : ℕ)
+    (hn : 0 < n) (hσ : σ ^ n = 1) (hM : 3 ≤ M) (h : ∀ y, ∃ z, σ y = y + M • z)
+    : σ = 1 := by
   obtain ⟨p, h1, h2, h3, h4⟩ := exists_invariant_nat_length_lattice Y σ n hn hσ
   have key : ∀ (k : ℕ) (y : Y), p y = k → σ y = y := by
     intro k
@@ -82,8 +86,8 @@ theorem end_eq_one_of_pow_eq_one_of_congr (Y : Type*) [AddCommGroup Y] [Module.F
         induction j with
         | zero => simp
         | succ j ihj =>
-          rw [pow_succ', Module.End.mul_apply, ihj, map_add (f := _), map_nsmul, hzz, hz, add_mul, one_mul,
-            add_smul]
+          rw [pow_succ', Module.End.mul_apply, ihj, map_add (f := _), map_nsmul, hzz, hz, add_mul,
+            one_mul, add_smul]
           abel
       have h0 : (n * M) • z = 0 := by
         have := hj n

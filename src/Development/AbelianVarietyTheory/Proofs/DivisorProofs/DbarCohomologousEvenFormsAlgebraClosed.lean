@@ -8,16 +8,25 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Che
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry MvPolynomial MeasureTheory Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.L2DbarEstimates (V)
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts GlobalTheory.FlagBundle GlobalTheory.HermFrame GlobalTheory.GoodMetric GlobalTheory.CxForm GlobalTheory.LineForm GlobalTheory.ChernCalc
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts
+  GlobalTheory.FlagBundle GlobalTheory.HermFrame GlobalTheory.GoodMetric GlobalTheory.CxForm
+  GlobalTheory.LineForm GlobalTheory.ChernCalc
 open scoped Matrix ContDiff ComplexOrder
 
 set_option autoImplicit false
 
 namespace GlobalTheory.ChernCalc
 
-theorem dbarCoh_algebra : ∀ (M : Type) [TopologicalSpace M] (n : ℕ) (A : HolAtlas M n) , DbarCoh A 1 1 ∧ (∀ w : A.Pt → Ev n, A.IsForm (fld A w) → A.dbar (fld A w) = 0 → DbarCoh A w w) ∧ ∀ (c : ℂ) (w w' z z' : A.Pt → Ev n), DbarCoh A w w' → DbarCoh A z z' → DbarCoh A (c • w) (c • w') ∧ DbarCoh A (w + z) (w' + z') ∧ DbarCoh A (w * z) (w' * z') := by
+theorem dbarCoh_algebra
+    : ∀ (M : Type) [TopologicalSpace M] (n : ℕ) (A : HolAtlas M n),
+      DbarCoh A 1 1 ∧ (∀ w : A.Pt → Ev n, A.IsForm (fld A w) → A.dbar (fld A w) = 0 → DbarCoh A w w)
+        ∧ ∀ (c : ℂ) (w w' z z' : A.Pt → Ev n),
+          DbarCoh A w w' → DbarCoh A z z'
+            → DbarCoh A (c • w) (c • w') ∧ DbarCoh A (w + z) (w' + z')
+              ∧ DbarCoh A (w * z) (w' * z') := by
   intro M _ n A
   obtain ⟨h1, hc, hl, -, -⟩ := GlobalTheory.formCalculus M n A
   have h0 : A.IsForm 0 := by simpa using (hc 0 1 1 h1 h1).2.2.1
@@ -34,15 +43,26 @@ theorem dbarCoh_algebra : ∀ (M : Type) [TopologicalSpace M] (n : ℕ) (A : Hol
   have es (x : A.Pt → Ev n) : fld A (c • x) = c • fld A x := rfl
   have ea (x y : A.Pt → Ev n) : fld A (x + y) = fld A x + fld A y := rfl
   have em (x y : A.Pt → Ev n) : fld A (x * y) = fld A x * fld A y := rfl
-  have ecomm (x y : A.Pt → Ev n) : fld A x * fld A y = fld A y * fld A x := by rw [← em, ← em, mul_comm]
+  have ecomm (x y : A.Pt → Ev n) : fld A x * fld A y = fld A y * fld A x := by
+    rw [← em, ← em, mul_comm]
   have hs (α : A.Fld) (h : A.IsForm α) := (hc c α α h h).2.2.1
   have ds (α : A.Fld) (h : A.IsForm α) := (hc c α α h h).2.2.2.2.2.2.2.2
   have ha (α β : A.Fld) (h : A.IsForm α) (h' : A.IsForm β) := (hc c α β h h').1
   have hm (α β : A.Fld) (h : A.IsForm α) (h' : A.IsForm β) := (hc c α β h h').2.1
   have da (α β : A.Fld) (h : A.IsForm α) (h' : A.IsForm β) := (hc c α β h h').2.2.2.2.2.2.1
-  refine ⟨⟨hs _ hw, hs _ hw', ?_, ?_, c • u, hs _ hu, ?_⟩,
+  refine ⟨
+    ⟨hs _ hw, hs _ hw', ?_, ?_, c • u, hs _ hu, ?_⟩,
     ⟨ha _ _ hw hz, ha _ _ hw' hz', ?_, ?_, u + v, ha _ _ hu hv, ?_⟩,
-    ⟨hm _ _ hw hz, hm _ _ hw' hz', ?_, ?_, fld A w * v + fld A z' * u, ha _ _ (hm _ _ hw hv) (hm _ _ hz' hu), ?_⟩⟩
+    ⟨
+      hm _ _ hw hz,
+      hm _ _ hw' hz',
+      ?_,
+      ?_,
+      fld A w * v + fld A z' * u,
+      ha _ _ (hm _ _ hw hv) (hm _ _ hz' hu),
+      ?_
+    ⟩
+  ⟩
   · rw [es, ds _ hw, dw, smul_zero]
   · rw [es, ds _ hw', dw', smul_zero]
   · rw [es, es, ds _ hu, ← eu, smul_sub]
@@ -52,8 +72,9 @@ theorem dbarCoh_algebra : ∀ (M : Type) [TopologicalSpace M] (n : ℕ) (A : Hol
     abel
   · rw [em, (hl w _ hw hz).2, dw, dz, zero_mul, mul_zero, add_zero]
   · rw [em, (hl w' _ hw' hz').2, dw', dz', zero_mul, mul_zero, add_zero]
-  · rw [em, em, da _ _ (hm _ _ hw hv) (hm _ _ hz' hu), (hl w _ hw hv).2, (hl z' _ hz' hu).2, dw, dz', ← eu, ← ev,
-      zero_mul, zero_mul, zero_add, zero_add, mul_sub, mul_sub, ecomm z' w, ecomm z' w']
+  · rw [em, em, da _ _ (hm _ _ hw hv) (hm _ _ hz' hu), (hl w _ hw hv).2, (hl z' _ hz' hu).2, dw,
+      dz', ← eu, ← ev, zero_mul, zero_mul, zero_add, zero_add, mul_sub, mul_sub, ecomm z' w,
+      ecomm z' w']
     abel
 
 end GlobalTheory.ChernCalc

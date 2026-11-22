@@ -21,10 +21,8 @@ namespace ProjSpace
 
 variable {A : Type u} [CommRing A] {n : ℕ}
 
-
 variable (A n) in
 abbrev Laurent (A : Type u) [CommRing A] (n : ℕ) : Type u := AddMonoidAlgebra A (Fin (n + 1) → ℤ)
-
 
 variable (n) in
 def expHom (n : ℕ) : (Fin (n + 1) →₀ ℕ) →+ (Fin (n + 1) → ℤ) where
@@ -42,7 +40,6 @@ lemma sum_expHom (e : Fin (n + 1) →₀ ℕ) : ∑ j, expHom n e j = (e.degree 
   rw [Finsupp.degree_eq_sum]
   push_cast
   rfl
-
 
 variable (A n) in
 def toLaurent : MvPolynomial (Fin (n + 1)) A →+* Laurent A n :=
@@ -112,8 +109,8 @@ lemma isUnit_toLaurent_xprod {p : ℕ} (i : Fin p → Fin (n + 1)) :
   rw [toLaurent_xprod]
   exact isUnit_single _
 
-def awayToLaurent {p : ℕ} (i : Fin p → Fin (n + 1)) :
-    Localization.Away (xprod (A := A) i) →+* Laurent A n :=
+def awayToLaurent {p : ℕ} (i : Fin p → Fin (n + 1))
+    : Localization.Away (xprod (A := A) i) →+* Laurent A n :=
   IsLocalization.Away.lift (xprod i) (isUnit_toLaurent_xprod i)
 
 lemma awayToLaurent_algebraMap {p : ℕ} (i : Fin p → Fin (n + 1)) (a : MvPolynomial (Fin (n + 1)) A) :
@@ -160,7 +157,6 @@ lemma Allowed.mono {s t : Set (Fin (n + 1))} {k : ℤ} {m : Fin (n + 1) → ℤ}
     (hst : s ⊆ t) : Allowed t k m :=
   ⟨h.1, fun j hj => h.2 j fun hs => hj (hst hs)⟩
 
-
 variable (A) in
 def LDeg (s : Set (Fin (n + 1))) (k : ℤ) : AddSubgroup (Laurent A n) where
   carrier := {ℓ | ∀ m, ℓ.coeff m ≠ 0 → Allowed s k m}
@@ -192,15 +188,16 @@ lemma coeff_toLaurent_expHom (a : MvPolynomial (Fin (n + 1)) A) (e : Fin (n + 1)
     (toLaurent (A := A) (n := n) a).coeff (expHom n e) = a.coeff e :=
   Finsupp.mapDomain_apply_of_injective expHom_injective _ _
 
-theorem mem_LDeg_iff {p : ℕ} (i : Fin (p + 1) → Fin (n + 1)) (k : ℤ) (ℓ : Laurent A n) :
-    ℓ ∈ LDeg (A := A) (n := n) (Set.range i) k ↔
-      ∃ z ∈ ProjTwist.awayDeg (grading A n) (xprod_mem i) (Nat.succ_pos p) k,
+theorem mem_LDeg_iff {p : ℕ} (i : Fin (p + 1) → Fin (n + 1)) (k : ℤ) (ℓ : Laurent A n)
+    : ℓ ∈ LDeg (A := A) (n := n) (Set.range i) k
+      ↔ ∃ z ∈ ProjTwist.awayDeg (grading A n) (xprod_mem i) (Nat.succ_pos p) k,
         awayToLaurent (n := n) i z = ℓ := by
   classical
   constructor
   · intro hℓ
-    let G := (ProjTwist.awayDeg (grading A n) (xprod_mem (A := A) i) (Nat.succ_pos p) k).map
-      (awayToLaurent (n := n) i).toAddMonoidHom
+    let G :=
+      (ProjTwist.awayDeg (grading A n) (xprod_mem (A := A) i) (Nat.succ_pos p) k).map
+        (awayToLaurent (n := n) i).toAddMonoidHom
     suffices h : ∀ ℓ ∈ LDeg (A := A) (n := n) (Set.range i) k, ℓ ∈ G by
       obtain ⟨z, hz, rfl⟩ := h ℓ hℓ
       exact ⟨z, hz, rfl⟩
@@ -216,7 +213,9 @@ theorem mem_LDeg_iff {p : ℕ} (i : Fin (p + 1) → Fin (n + 1)) (k : ℤ) (ℓ 
     set c := ℓ.coeff m
     set N : ℕ := ∑ j, (m j).natAbs
     have hN : ∀ j, ((m j).natAbs : ℤ) ≤ N := fun j => by
-      exact_mod_cast Finset.single_le_sum (f := fun j => (m j).natAbs) (fun _ _ => Nat.zero_le _)
+      exact_mod_cast Finset.single_le_sum
+        (f := fun j => (m j).natAbs)
+        (fun _ _ => Nat.zero_le _)
         (Finset.mem_univ j)
     have hpos : ∀ j, 0 ≤ m j + N * mult i j := fun j => by
       by_cases hj : j ∈ Set.range i
@@ -236,8 +235,11 @@ theorem mem_LDeg_iff {p : ℕ} (i : Fin (p + 1) → Fin (n + 1)) (k : ℤ) (ℓ 
       rw [← sum_expHom, hexp]
       simp only [Pi.add_apply, Finset.sum_add_distrib, sum_nsmul_mult, hA.1]
       ring
-    refine ⟨Localization.mk (monomial e c) (ProjTwist.fpow (xprod i) N),
-      ProjTwist.mk_mem_awayDeg _ _ (isHomogeneous_monomial c rfl) hdeg, ?_⟩
+    refine ⟨
+      Localization.mk (monomial e c) (ProjTwist.fpow (xprod i) N),
+      ProjTwist.mk_mem_awayDeg _ _ (isHomogeneous_monomial c rfl) hdeg,
+      ?_
+    ⟩
     change awayToLaurent (n := n) i _ = _
     rw [awayToLaurent_mk, toLaurent_monomial, AddMonoidAlgebra.single_mul_single, hexp, mul_one,
       add_neg_cancel_right]

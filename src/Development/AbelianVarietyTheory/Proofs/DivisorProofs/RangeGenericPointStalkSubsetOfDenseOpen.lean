@@ -11,10 +11,13 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.G
 
 namespace GlobalTheory
 
-theorem range_jK_fromSpecStalk_subset_of_dense_range {U S : Scheme.{0}} [GlobalTheory.IsNormalScheme S]
-    [IsLocallyNoetherian S] (j : U ⟶ S) [IsOpenImmersion j] (hj : Dense (Set.range j)) (s : S) :
-    Set.range (ReciprocityTheory.ChartRestriction.G.Out.jK (S.presheaf.stalk s) ≫ S.fromSpecStalk s) ⊆
-      Set.range j := by
+theorem range_jK_fromSpecStalk_subset_of_dense_range
+    {U S : Scheme.{0}} [GlobalTheory.IsNormalScheme S] [IsLocallyNoetherian S]
+    (j : U ⟶ S) [IsOpenImmersion j]
+    (hj : Dense (Set.range j)) (s : S)
+    : Set.range
+        (ReciprocityTheory.ChartRestriction.G.Out.jK (S.presheaf.stalk s) ≫ S.fromSpecStalk s)
+      ⊆ Set.range j := by
   rintro _ ⟨x, rfl⟩
   have hZ : irreducibleComponent s ∈ irreducibleComponents S :=
     irreducibleComponent_mem_irreducibleComponents s
@@ -38,8 +41,9 @@ theorem range_jK_fromSpecStalk_subset_of_dense_range {U S : Scheme.{0}} [GlobalT
         (by simpa using ha)
     rw [ha0]
     exact Ideal.zero_mem _
-  have h1 : (ReciprocityTheory.ChartRestriction.G.Out.jK (S.presheaf.stalk s) ≫ S.fromSpecStalk s) x ⤳
-      hZ.1.genericPoint := by
+  have h1
+      : (ReciprocityTheory.ChartRestriction.G.Out.jK (S.presheaf.stalk s) ≫ S.fromSpecStalk s) x
+        ⤳ hZ.1.genericPoint := by
     rw [Scheme.Hom.comp_apply, ← hp]
     exact hxp.map (S.fromSpecStalk s).continuous
   have h2 : hZ.1.genericPoint ⤳ j u := hg.specializes hu

@@ -8,8 +8,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeckeAlgebr
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil
+open NumberField IsDedekindDomain ValuativeRel Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.N Polynomial
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL
+  GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.SplitWeil
 open UpperTheory.V UpperTheory.V.Af UpperTheory.V.Sd UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Dict
 open UpperTheory.V.W (Plc Lp)
 open scoped Matrix
@@ -31,15 +33,20 @@ abbrev ep (l : ℕ) [Fact l.Prime] (g : G L Ω) : Qbar l := (cycBar L Ω l g : Q
 def Bad (r : G L Ω →* GL (Fin 2) (Qbar l)) : Set (G L Ω) :=
   {g | ∃ m : ℤ, |m| ≤ 2 ∧ uf (r g) ^ 2 - 2 = ep l g ^ m + ep l g ^ (-m)}
 
-def FrobAt (w : Plc L) (s : G L Ω) : Prop := ∃ A : ValuationSubring Ω, IsPlaceOver A w ∧ IsFrob A (normV w) s
+def FrobAt (w : Plc L) (s : G L Ω) : Prop :=
+  ∃ A : ValuationSubring Ω, IsPlaceOver A w ∧ IsFrob A (normV w) s
 
 variable [IsCMField L] [IsAlgClosure L Ω]
 
-structure GoodSet (ι : Qbar l ≃+* ℂ) (M : ℕ) (r : G L Ω →* GL (Fin 2) (Qbar l)) (σ : Submodule ℂ (UA L 2 → ℂ)) (P : Set (Plc L))
-    (ψ : ∀ w : Plc L, Fin 2 → (Kw w)ˣ →* ℂˣ) : Prop where
+structure GoodSet
+    (ι : Qbar l ≃+* ℂ) (M : ℕ) (r : G L Ω →* GL (Fin 2) (Qbar l)) (σ : Submodule ℂ (UA L 2 → ℂ))
+    (P : Set (Plc L)) (ψ : ∀ w : Plc L, Fin 2 → (Kw w)ˣ →* ℂˣ)
+    : Prop where
   mem : ∀ w ∈ P, IsSplitAt w ∧ ((l : ℕ) : 𝓞 L) ∉ w.asIdeal ∧ CompEq σ w (ψ w)
-  meets : ∀ w, IsSplitAt w → (M : 𝓞 L) ∉ w.asIdeal → (∃ s, FrobAt w s ∧ s ∉ Bad r) →
-    ∃ w' ∈ P, w'.under (𝓞 (Lp L)) = w.under (𝓞 (Lp L))
+  meets
+    : ∀ w,
+      IsSplitAt w → (M : 𝓞 L) ∉ w.asIdeal → (∃ s, FrobAt w s ∧ s ∉ Bad r)
+        → ∃ w' ∈ P, w'.under (𝓞 (Lp L)) = w.under (𝓞 (Lp L))
 
 end UpperTheory.V.Z.Sym.Ga
 

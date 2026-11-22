@@ -9,7 +9,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open TensorProduct Coalgebra Bialgebra CategoryTheory WithConv GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup
+open TensorProduct Coalgebra Bialgebra CategoryTheory WithConv GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup
 
 namespace GlobalTheory.PDivGroup
 
@@ -18,11 +19,10 @@ variable {p : ℕ} {R : Type} [CommRing R] (G : PDivGroup p R)
 set_option autoImplicit false in
 open TensorProduct Coalgebra Bialgebra CategoryTheory WithConv in
 variable {p : ℕ} {R : Type} [CommRing R] (G : _root_.GlobalTheory.PDivGroup p R) in
-private theorem exists_mulBy_pow_eq_comp_resOne' {p : ℕ} {R : Type} [CommRing R]
-    (G : _root_.GlobalTheory.PDivGroup p R) (n : ℕ) :
-    ∃ M : G.A 1 →ₐc[R] G.A (n + 1),
-      ∀ a : G.A (n + 1),
-        _root_.GlobalTheory.PDiv.mulBy R (G.A (n + 1)) (p ^ n) a = M (G.resOne n a) := by
+private theorem exists_mulBy_pow_eq_comp_resOne'
+    {p : ℕ} {R : Type} [CommRing R] (G : _root_.GlobalTheory.PDivGroup p R) (n : ℕ)
+    : ∃ M : G.A 1 →ₐc[R] G.A (n + 1), ∀ a : G.A (n + 1),
+      _root_.GlobalTheory.PDiv.mulBy R (G.A (n + 1)) (p ^ n) a = M (G.resOne n a) := by
   induction n with
   | zero =>
     refine ⟨BialgHom.id R (G.A 1), fun a => ?_⟩
@@ -34,67 +34,74 @@ private theorem exists_mulBy_pow_eq_comp_resOne' {p : ℕ} {R : Type} [CommRing 
     obtain ⟨M, hM⟩ := ih
     refine ⟨(G.mulP (n + 1)).comp M, fun a => ?_⟩
     rw [pow_succ, ← _root_.GlobalTheory.PDiv.mulBy_mulBy, ← _root_.GlobalTheory.PDivGroup.mulP_res,
-      ← _root_.GlobalTheory.PDiv.map_mulBy, hM, _root_.GlobalTheory.PDivGroup.resOne_succ, BialgHom.comp_apply]
-
+      ← _root_.GlobalTheory.PDiv.map_mulBy, hM, _root_.GlobalTheory.PDivGroup.resOne_succ,
+      BialgHom.comp_apply]
 
 set_option autoImplicit false in
 open TensorProduct Coalgebra Bialgebra CategoryTheory WithConv in
 variable {p : ℕ} {R : Type} [CommRing R] (G : _root_.GlobalTheory.PDivGroup p R) in
-theorem _root_.GlobalTheory.PDivGroup.exists_mulP_eq_of_transl_eq {p : ℕ} {R : Type} [CommRing R] (G : _root_.GlobalTheory.PDivGroup p R)
-    (n : ℕ) (a : G.A (n + 1))
-    (ha : G.transl n a = a ⊗ₜ[R] 1) :
-    ∃ e : G.A n, G.mulP n e = a := by
+theorem _root_.GlobalTheory.PDivGroup.exists_mulP_eq_of_transl_eq
+    {p : ℕ} {R : Type} [CommRing R]
+    (G : _root_.GlobalTheory.PDivGroup p R) (n : ℕ)
+    (a : G.A (n + 1)) (ha : G.transl n a = a ⊗ₜ[R] 1)
+    : ∃ e : G.A n, G.mulP n e = a := by
   obtain ⟨M, hM⟩ := exists_mulBy_pow_eq_comp_resOne' G n
-  have key : ∀ χ φ : _root_.GlobalTheory.CartierDual R (G.A (n + 1)),
-      (χ * _root_.GlobalTheory.CartierDual.map
-        (_root_.GlobalTheory.PDiv.mulBy R (G.A (n + 1)) (p ^ n)) φ).ofConv a =
-        χ.ofConv a * φ.ofConv 1 := by
+  have key
+      : ∀ χ φ : _root_.GlobalTheory.CartierDual R (G.A (n + 1)),
+        (χ * _root_.GlobalTheory.CartierDual.map
+            (_root_.GlobalTheory.PDiv.mulBy R (G.A (n + 1)) (p ^ n)) φ).ofConv a
+          = χ.ofConv a * φ.ofConv 1 := by
     intro χ φ
-    have h1 : (_root_.GlobalTheory.CartierDual.map
-        (_root_.GlobalTheory.PDiv.mulBy R (G.A (n + 1)) (p ^ n)) φ).ofConv =
-        (φ.ofConv ∘ₗ (M : G.A 1 →ₗ[R] G.A (n + 1))) ∘ₗ
-          (G.resOne n : G.A (n + 1) →ₗ[R] G.A 1) := by
+    have h1
+        : (_root_.GlobalTheory.CartierDual.map
+            (_root_.GlobalTheory.PDiv.mulBy R (G.A (n + 1)) (p ^ n)) φ).ofConv
+          = (φ.ofConv ∘ₗ (M : G.A 1 →ₗ[R] G.A (n + 1)))
+            ∘ₗ (G.resOne n : G.A (n + 1) →ₗ[R] G.A 1) := by
       ext x
       simp [_root_.GlobalTheory.CartierDual.map_apply, hM]
     rw [_root_.GlobalTheory.CartierDual.mul_apply, _root_.GlobalTheory.CartierDual.pair_tmul, h1]
-    have h2 : ∀ t, TensorProduct.map χ.ofConv
-        ((φ.ofConv ∘ₗ (M : G.A 1 →ₗ[R] G.A (n + 1))) ∘ₗ
-          (G.resOne n : G.A (n + 1) →ₗ[R] G.A 1)) t =
-        TensorProduct.map χ.ofConv
-          (φ.ofConv ∘ₗ (M : G.A 1 →ₗ[R] G.A (n + 1)))
-          (LinearMap.lTensor _
-            (G.resOne n : G.A (n + 1) →ₗ[R] G.A 1) t) := by
+    have h2
+        : ∀ t,
+          TensorProduct.map χ.ofConv
+              ((φ.ofConv ∘ₗ (M : G.A 1 →ₗ[R] G.A (n + 1)))
+                ∘ₗ (G.resOne n : G.A (n + 1) →ₗ[R] G.A 1))
+              t
+            = TensorProduct.map χ.ofConv (φ.ofConv ∘ₗ (M : G.A 1 →ₗ[R] G.A (n + 1)))
+              (LinearMap.lTensor _ (G.resOne n : G.A (n + 1) →ₗ[R] G.A 1) t) := by
       intro t
       rw [LinearMap.lTensor, ← LinearMap.comp_apply, ← TensorProduct.map_comp, LinearMap.comp_id]
     rw [h2, ← _root_.GlobalTheory.PDivGroup.transl_apply, ha]
     simp
-  let K : Ideal (_root_.GlobalTheory.CartierDual R (G.A (n + 1))) :=
-    { carrier := {ψ | ∀ χ : _root_.GlobalTheory.CartierDual R (G.A (n + 1)), (χ * ψ).ofConv a = 0}
-      add_mem' := by
-        intro x y hx hy χ
-        simp only [Set.mem_setOf_eq] at hx hy ⊢
-        rw [mul_add, ofConv_add, LinearMap.add_apply, hx, hy, add_zero]
-      zero_mem' := by
-        intro χ
-        simp
-      smul_mem' := by
-        intro c x hx χ
-        simp only [Set.mem_setOf_eq, smul_eq_mul] at hx ⊢
-        rw [← mul_assoc]
-        exact hx _ }
-  have hK : _root_.GlobalTheory.PDiv.torsionIdeal (R := R) (A := _root_.GlobalTheory.CartierDual R (G.A (n + 1))) (p ^ n) ≤
-      RingHom.ker (Ideal.Quotient.mkₐ R K) := by
+  let K : Ideal (_root_.GlobalTheory.CartierDual R (G.A (n + 1))) := {
+    carrier := {ψ | ∀ χ : _root_.GlobalTheory.CartierDual R (G.A (n + 1)), (χ * ψ).ofConv a = 0}
+    add_mem' := by
+      intro x y hx hy χ
+      simp only [Set.mem_setOf_eq] at hx hy ⊢
+      rw [mul_add, ofConv_add, LinearMap.add_apply, hx, hy, add_zero]
+    zero_mem' := by
+      intro χ
+      simp
+    smul_mem' := by
+      intro c x hx χ
+      simp only [Set.mem_setOf_eq, smul_eq_mul] at hx ⊢
+      rw [← mul_assoc]
+      exact hx _
+  }
+  have hK
+      : _root_.GlobalTheory.PDiv.torsionIdeal (R := R)
+          (A := _root_.GlobalTheory.CartierDual R (G.A (n + 1))) (p ^ n)
+        ≤ RingHom.ker (Ideal.Quotient.mkₐ R K) := by
     change _root_.GlobalTheory.PDiv.kerIdeal (_root_.GlobalTheory.PDiv.mulBy R _ (p ^ n)) ≤ _
     rw [Ideal.map_le_iff_le_comap]
     intro φ hφ
     have hφ₀ : CoalgebraStruct.counit (R := R) φ = 0 := hφ
     rw [Ideal.mem_comap, RingHom.mem_ker]
     change Ideal.Quotient.mkₐ R K (_root_.GlobalTheory.PDiv.mulBy R _ (p ^ n) φ) = 0
-    rw [← _root_.GlobalTheory.PDiv.dual_mulBy, Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.eq_zero_iff_mem]
+    rw [← _root_.GlobalTheory.PDiv.dual_mulBy, Ideal.Quotient.mkₐ_eq_mk,
+      Ideal.Quotient.eq_zero_iff_mem]
     intro χ
     rw [key, ← _root_.GlobalTheory.CartierDual.counit_apply, hφ₀, mul_zero]
-  have hker : ∀ ψ, _root_.GlobalTheory.CartierDual.map (G.mulP n) ψ = 0 →
-      ψ.ofConv a = 0 := by
+  have hker : ∀ ψ, _root_.GlobalTheory.CartierDual.map (G.mulP n) ψ = 0 → ψ.ofConv a = 0 := by
     intro ψ hψ
     have h3 : ψ ∈ RingHom.ker (Ideal.Quotient.mkₐ R K) := by
       apply hK
@@ -127,8 +134,7 @@ theorem _root_.GlobalTheory.PDivGroup.exists_mulP_eq_of_transl_eq {p : ℕ} {R :
   ext ψ
   show ψ.ofConv (G.mulP n e) = ψ.ofConv a
   rw [← _root_.GlobalTheory.CartierDual.map_apply]
-  have h5 := congrArg
-    (fun x => x.ofConv (_root_.GlobalTheory.CartierDual.map (G.mulP n) ψ)) he
+  have h5 := congrArg (fun x => x.ofConv (_root_.GlobalTheory.CartierDual.map (G.mulP n) ψ)) he
   simp only [ofConv_toConv] at h5
   rw [← hL ψ]
   exact h5

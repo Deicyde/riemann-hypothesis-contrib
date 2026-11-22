@@ -25,8 +25,7 @@ section host
 
 variable {R : Ranks} (H : Host R)
 
-theorem conjugate_emb (g : R.GG) :
-    ComplexEmbedding.conjugate (H.emb g) = H.emb (g * R.cc) := by
+theorem conjugate_emb (g : R.GG) : ComplexEmbedding.conjugate (H.emb g) = H.emb (g * R.cc) := by
   rw [Formalism.L2.Geo.emb_mul_cc_comp]
   refine RingHom.ext fun x => ?_
   have hcm := H.isCMField_hostE
@@ -36,18 +35,19 @@ theorem conjugate_emb (g : R.GG) :
   show starRingEnd ℂ (H.emb g x) = H.emb g (H.conj x)
   rw [← h, IsCMField.complexEmbedding_complexConj]
 
-theorem ex_emb_iff (g : R.GG) :
-    (∃ t : Tau R, H.emb t = H.emb g) ↔ g ∈ R.Psi :=
+theorem ex_emb_iff (g : R.GG) : (∃ t : Tau R, H.emb t = H.emb g) ↔ g ∈ R.Psi :=
   ⟨fun ⟨t, ht⟩ => (factEmb R H).1.1 ht ▸ t.2, fun h => ⟨⟨g, h⟩, rfl⟩⟩
 
-theorem emb_cm (σ : H.E →+* ℂ) :
-    (∃ t : Tau R, H.emb t = σ) ↔ ¬ ∃ t : Tau R, H.emb t = ComplexEmbedding.conjugate σ := by
+theorem emb_cm (σ : H.E →+* ℂ)
+    : (∃ t : Tau R, H.emb t = σ) ↔ ¬ ∃ t : Tau R, H.emb t = ComplexEmbedding.conjugate σ := by
   obtain ⟨g, rfl⟩ := (factEmb R H).1.2 σ
   rw [conjugate_emb, ex_emb_iff, ex_emb_iff]
   exact Formalism.L2.Geo.mem_Psi_iff_mul_cc_notMem g
 
-theorem sum_emb_bijective : Function.Bijective
-    (Sum.elim (fun t : Tau R => H.emb t) fun t : Tau R => ComplexEmbedding.conjugate (H.emb t)) := by
+theorem sum_emb_bijective
+    : Function.Bijective (Sum.elim
+      (fun t : Tau R => H.emb t)
+      fun t : Tau R => ComplexEmbedding.conjugate (H.emb t)) := by
   have hc : ∀ σ : H.E →+* ℂ, ComplexEmbedding.conjugate (ComplexEmbedding.conjugate σ) = σ :=
     fun σ => star_star σ
   have hi : ∀ {a b : Tau R}, H.emb a = H.emb b → a = b := fun h => Subtype.ext ((factEmb R H).1.1 h)
@@ -65,7 +65,6 @@ theorem sum_emb_bijective : Function.Bijective
       exact ⟨Sum.inr t, by simp only [Sum.elim_inr]; rw [ht, hc]⟩
     · obtain ⟨t, ht⟩ := (emb_cm H σ).2 h
       exact ⟨Sum.inl t, ht⟩
-
 
 end host
 

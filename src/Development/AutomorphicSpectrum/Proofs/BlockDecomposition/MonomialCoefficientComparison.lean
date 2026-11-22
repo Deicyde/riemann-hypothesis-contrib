@@ -10,7 +10,8 @@ open Finset GlobalTheory.CompanionTheory.CoefId
 namespace GlobalTheory.CompanionTheory.CoefId
 
 theorem unitCircle_infinite : {z : ℂ | ‖z‖ = 1}.Infinite := by
-  have hinj : Function.Injective (fun k : ℕ => ((1 + (k : ℂ) * Complex.I) / (1 - (k : ℂ) * Complex.I))) := by
+  have hinj : Function.Injective (fun k : ℕ =>
+      ((1 + (k : ℂ) * Complex.I) / (1 - (k : ℂ) * Complex.I))) := by
     intro s t hst
     have h1 : ∀ k : ℕ, (1 - (k : ℂ) * Complex.I) ≠ 0 := by
       intro k h0
@@ -33,9 +34,11 @@ theorem unitCircle_infinite : {z : ℂ | ‖z‖ = 1}.Infinite := by
   simp only [Set.mem_ofPred_eq, norm_div, h5]
   exact div_self h6
 
-theorem poly_zero_of_torus {n : ℕ} (p : MvPolynomial (Fin n) ℂ)
-    (h : ∀ z : Fin n → ℂ, (∀ a, ‖z a‖ = 1) → Function.Injective (fun a => z a ^ 2) →
-      MvPolynomial.eval z p = 0) : p = 0 := by
+theorem poly_zero_of_torus
+    {n : ℕ} (p : MvPolynomial (Fin n) ℂ)
+    (h : ∀ z : Fin n → ℂ,
+      (∀ a, ‖z a‖ = 1) → Function.Injective (fun a => z a ^ 2) → MvPolynomial.eval z p = 0)
+    : p = 0 := by
   classical
   set D : MvPolynomial (Fin n) ℂ :=
     ∏ q ∈ prs n, (MvPolynomial.X q.1 ^ 2 - MvPolynomial.X q.2 ^ 2) with hD
@@ -64,9 +67,11 @@ theorem poly_zero_of_torus {n : ℕ} (p : MvPolynomial (Fin n) ℂ)
       rw [this, mul_zero]
   exact (mul_eq_zero.mp hz).resolve_right hD0
 
-theorem coeff_zero_of_torus {n : ℕ} (S : Finset (Fin n → ℤ)) (h : (Fin n → ℤ) → ℂ)
-    (H : ∀ z : Fin n → ℂ, (∀ a, ‖z a‖ = 1) → Function.Injective (fun a => z a ^ 2) →
-      ∑ m ∈ S, h m * mon m z = 0) : ∀ m ∈ S, h m = 0 := by
+theorem coeff_zero_of_torus
+    {n : ℕ} (S : Finset (Fin n → ℤ)) (h : (Fin n → ℤ) → ℂ)
+    (H : ∀ z : Fin n → ℂ,
+      (∀ a, ‖z a‖ = 1) → Function.Injective (fun a => z a ^ 2) → ∑ m ∈ S, h m * mon m z = 0)
+    : ∀ m ∈ S, h m = 0 := by
   classical
   set N : ℕ := ∑ m ∈ S, ∑ a, (m a).natAbs with hNdef
   have hN : ∀ m ∈ S, ∀ a, 0 ≤ m a + (N : ℤ) := by
@@ -74,8 +79,10 @@ theorem coeff_zero_of_torus {n : ℕ} (S : Finset (Fin n → ℤ)) (h : (Fin n �
     have h1 : (m a).natAbs ≤ ∑ a, (m a).natAbs :=
       Finset.single_le_sum (f := fun a => (m a).natAbs) (fun _ _ => Nat.zero_le _) (mem_univ a)
     have h2 : ∑ a, (m a).natAbs ≤ N :=
-      Finset.single_le_sum (f := fun m : Fin n → ℤ => ∑ a, (m a).natAbs)
-        (fun _ _ => Nat.zero_le _) hm
+      Finset.single_le_sum
+        (f := fun m : Fin n → ℤ => ∑ a, (m a).natAbs)
+        (fun _ _ => Nat.zero_le _)
+        hm
     have h3 : ((m a).natAbs : ℤ) ≤ N := by exact_mod_cast h1.trans h2
     have h4 : -((m a).natAbs : ℤ) ≤ m a := by
       have := abs_nonneg (m a)
@@ -101,8 +108,10 @@ theorem coeff_zero_of_torus {n : ℕ} (S : Finset (Fin n → ℤ)) (h : (Fin n �
       intro a h0
       have := hz a
       simp [h0] at this
-    have hterm : ∀ m ∈ S, MvPolynomial.eval z (MvPolynomial.monomial (s m) (h m)) =
-        (∏ a, z a ^ N) * (h m * mon m z) := by
+    have hterm
+        : ∀ m ∈ S,
+          MvPolynomial.eval z (MvPolynomial.monomial (s m) (h m))
+            = (∏ a, z a ^ N) * (h m * mon m z) := by
       intro m hm
       rw [MvPolynomial.eval_monomial, Finsupp.prod_fintype _ _ (fun _ => pow_zero _), mon]
       have : ∀ a, z a ^ (s m a) = z a ^ N * z a ^ (m a) := by
@@ -111,7 +120,7 @@ theorem coeff_zero_of_torus {n : ℕ} (S : Finset (Fin n → ℤ)) (h : (Fin n �
       simp only [this, Finset.prod_mul_distrib]
       ring
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_congr rfl hterm, ← Finset.mul_sum, H z hz hi, mul_zero]
+    rw [map_sum, Finset.sum_congr rfl hterm, ← Finset.mul_sum, H z hz hi, mul_zero]
   intro m hm
   have h1 := congrArg (AddMonoidAlgebra.coeff · (s m)) hp
   rw [MvPolynomial.coeff_sum, Finset.sum_eq_single m] at h1
@@ -120,11 +129,14 @@ theorem coeff_zero_of_torus {n : ℕ} (S : Finset (Fin n → ℤ)) (h : (Fin n �
     rw [MvPolynomial.coeff_monomial, if_neg fun e => hne (hinj b hb m hm e)]
   · exact fun h' => absurd hm h'
 
-theorem laurent_indep_torus {n : ℕ} {ι κ : Type} (I : Finset ι) (J : Finset κ) (f : ι → ℂ)
-    (g : κ → ℂ) (e : ι → Fin n → ℤ) (e' : κ → Fin n → ℤ)
-    (H : ∀ z : Fin n → ℂ, (∀ a, ‖z a‖ = 1) → Function.Injective (fun a => z a ^ 2) →
-      ∑ i ∈ I, f i * mon (e i) z = ∑ j ∈ J, g j * mon (e' j) z) (m : Fin n → ℤ) :
-    ∑ i ∈ I.filter (fun i => e i = m), f i = ∑ j ∈ J.filter (fun j => e' j = m), g j := by
+theorem laurent_indep_torus
+    {n : ℕ} {ι κ : Type}
+    (I : Finset ι) (J : Finset κ) (f : ι → ℂ) (g : κ → ℂ) (e : ι → Fin n → ℤ) (e' : κ → Fin n → ℤ)
+    (H : ∀ z : Fin n → ℂ,
+      (∀ a, ‖z a‖ = 1) → Function.Injective (fun a => z a ^ 2)
+        → ∑ i ∈ I, f i * mon (e i) z = ∑ j ∈ J, g j * mon (e' j) z)
+    (m : Fin n → ℤ)
+    : ∑ i ∈ I.filter (fun i => e i = m), f i = ∑ j ∈ J.filter (fun j => e' j = m), g j := by
   classical
   set S : Finset (Fin n → ℤ) := insert m (I.image e ∪ J.image e') with hS
   set h : (Fin n → ℤ) → ℂ := fun m => ∑ i ∈ I.filter (fun i => e i = m), f i -
@@ -133,23 +145,28 @@ theorem laurent_indep_torus {n : ℕ} {ι κ : Type} (I : Finset ι) (J : Finset
     mem_insert_of_mem (mem_union_left _ (mem_image_of_mem e hi))
   have hJ : ∀ j ∈ J, e' j ∈ S := fun j hj =>
     mem_insert_of_mem (mem_union_right _ (mem_image_of_mem e' hj))
-  have key := coeff_zero_of_torus S h (fun z hz hi => by
-    have h1 : ∑ i ∈ I, f i * mon (e i) z =
-        ∑ m ∈ S, (∑ i ∈ I.filter (fun i => e i = m), f i) * mon m z := by
-      rw [← Finset.sum_fiberwise_of_maps_to hI]
-      refine Finset.sum_congr rfl fun m _ => ?_
-      rw [Finset.sum_mul]
-      refine Finset.sum_congr rfl fun i hi => ?_
-      rw [(mem_filter.mp hi).2]
-    have h2 : ∑ j ∈ J, g j * mon (e' j) z =
-        ∑ m ∈ S, (∑ j ∈ J.filter (fun j => e' j = m), g j) * mon m z := by
-      rw [← Finset.sum_fiberwise_of_maps_to hJ]
-      refine Finset.sum_congr rfl fun m _ => ?_
-      rw [Finset.sum_mul]
-      refine Finset.sum_congr rfl fun j hj => ?_
-      rw [(mem_filter.mp hj).2]
-    simp only [hh, sub_mul, Finset.sum_sub_distrib]
-    rw [← h1, ← h2, H z hz hi, sub_self]) m (mem_insert_self _ _)
+  have key :=
+    coeff_zero_of_torus S h
+      (fun z hz hi => by
+        have h1
+            : ∑ i ∈ I, f i * mon (e i) z
+              = ∑ m ∈ S, (∑ i ∈ I.filter (fun i => e i = m), f i) * mon m z := by
+          rw [← Finset.sum_fiberwise_of_maps_to hI]
+          refine Finset.sum_congr rfl fun m _ => ?_
+          rw [Finset.sum_mul]
+          refine Finset.sum_congr rfl fun i hi => ?_
+          rw [(mem_filter.mp hi).2]
+        have h2
+            : ∑ j ∈ J, g j * mon (e' j) z
+              = ∑ m ∈ S, (∑ j ∈ J.filter (fun j => e' j = m), g j) * mon m z := by
+          rw [← Finset.sum_fiberwise_of_maps_to hJ]
+          refine Finset.sum_congr rfl fun m _ => ?_
+          rw [Finset.sum_mul]
+          refine Finset.sum_congr rfl fun j hj => ?_
+          rw [(mem_filter.mp hj).2]
+        simp only [hh, sub_mul, Finset.sum_sub_distrib]
+        rw [← h1, ← h2, H z hz hi, sub_self])
+      m (mem_insert_self _ _)
   exact sub_eq_zero.mp key
 
 end GlobalTheory.CompanionTheory.CoefId

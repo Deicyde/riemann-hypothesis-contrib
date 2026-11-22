@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 
 noncomputable section
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes IsDedekindDomain NumberField GlobalTheory.Published
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes IsDedekindDomain NumberField
+  GlobalTheory.Published
 open scoped TensorProduct Quaternion
 
 namespace GlobalTheory.CompanionTheory.PlaneSA
@@ -19,7 +20,6 @@ variable (F : Type) [Field F] [NumberField F]
 abbrev Pl : Type := InfinitePlace F ⊕ HeightOneSpectrum (𝓞 F)
 
 variable {F}
-
 
 end Places
 

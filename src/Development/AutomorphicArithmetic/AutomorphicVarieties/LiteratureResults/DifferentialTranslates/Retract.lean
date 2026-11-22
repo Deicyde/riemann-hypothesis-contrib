@@ -11,18 +11,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 open UpperTheory.V.Lit.Dr
 open scoped ContDiff
 
-theorem UpperTheory.V.Lit.Dr.retract :
-    Retract := by
+theorem UpperTheory.V.Lit.Dr.retract : Retract := by
   intro Γ V S _ _ _ _ d G hY l hl q η hη hd
   classical
   obtain ⟨hgauge, hinv⟩ := hl
-  have hmem : ∀ s, ContDiffOn ℝ ∞ ((η : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s) G.Y ∧
-      ∀ p ∉ G.Y, (η : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s p = 0 := η.2
-  have hmem' : ∀ s, ContDiffOn ℝ ∞ (((G.dOm q) η : S → V → V [⋀^Fin (q + 1)]→L[ℝ] (Fin d → ℂ)) s) G.Y ∧
-      ∀ p ∉ G.Y, ((G.dOm q) η : S → V → V [⋀^Fin (q + 1)]→L[ℝ] (Fin d → ℂ)) s p = 0 :=
+  have hmem
+      : ∀ s,
+        ContDiffOn ℝ ∞ ((η : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s) G.Y
+          ∧ ∀ p ∉ G.Y, (η : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s p = 0 :=
+    η.2
+  have hmem'
+      : ∀ s,
+        ContDiffOn ℝ ∞ (((G.dOm q) η : S → V → V [⋀^Fin (q + 1)]→L[ℝ] (Fin d → ℂ)) s) G.Y
+          ∧ ∀ p ∉ G.Y, ((G.dOm q) η : S → V → V [⋀^Fin (q + 1)]→L[ℝ] (Fin d → ℂ)) s p = 0 :=
     ((G.dOm q) η).2
-  let w : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ) :=
-    fun s => G.Y.indicator (pull (l s) ((η : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s))
+  let w : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ) := fun s =>
+    G.Y.indicator (pull (l s) ((η : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s))
   have hwmem : w ∈ G.Om q := by
     show ∀ s, ContDiffOn ℝ ∞ (w s) G.Y ∧ ∀ p ∉ G.Y, w s p = 0
     intro s
@@ -63,10 +67,12 @@ theorem UpperTheory.V.Lit.Dr.retract :
       have hev : w s =ᶠ[nhds p] pull (l s) ((η : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s) := by
         filter_upwards [G.isOpen.mem_nhds hp] with x hx
         simp only [w, Set.indicator_of_mem hx]
-      rw [hev.extDeriv_eq, (pullB V (Fin d → ℂ) G.Y G.isOpen hY (l s) (hgauge s) q _ (hmem s).1).2 p hp]
+      rw [hev.extDeriv_eq,
+        (pullB V (Fin d → ℂ) G.Y G.isOpen hY (l s) (hgauge s) q _ (hmem s).1).2 p hp]
       have hq : l s p • p ∈ G.Y := hY _ ((hgauge s).2.1 p hp) p hp
-      have hpu : pull (l s) (extDeriv ((η : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s)) p =
-          pull (l s) u p := by
+      have hpu
+          : pull (l s) (extDeriv ((η : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s)) p
+            = pull (l s) u p := by
         simp only [pull, hu, Set.indicator_of_mem hq]
       have hsm : minSmoothness ℝ 2 ≤ (∞ : WithTop ℕ∞) := by
         simp only [minSmoothness_of_isRCLikeNormedField]

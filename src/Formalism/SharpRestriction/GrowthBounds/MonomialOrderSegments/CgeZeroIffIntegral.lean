@@ -59,8 +59,9 @@ theorem vge_sub {a : ℝ} {x y : K} (hx : vge v a x) (hy : vge v a y) : vge v a 
   rw [sub_eq_add_neg]
   exact vge_add v hx (vge_neg v hy)
 
-theorem vge_sum {ι : Type*} {a : ℝ} (s : Finset ι) (f : ι → K) (h : ∀ i ∈ s, vge v a (f i)) :
-    vge v a (∑ i ∈ s, f i) := Finset.sum_induction f (vge v a) (fun _ _ => vge_add v) (vge_zero v a) h
+theorem vge_sum {ι : Type*} {a : ℝ} (s : Finset ι) (f : ι → K) (h : ∀ i ∈ s, vge v a (f i))
+    : vge v a (∑ i ∈ s, f i) :=
+  Finset.sum_induction f (vge v a) (fun _ _ => vge_add v) (vge_zero v a) h
 
 theorem vR_mul (x y : K) : vR v (x * y) = vR v x + vR v y := by
   unfold vR
@@ -86,13 +87,11 @@ theorem vge_one : vge v 0 (1 : K) := by
   unfold vge vR
   simp
 
-theorem vle_add_of_lt {a b : ℝ} {x y : K} (hx : vle v a x) (hy : vge v b y) (hab : a < b) :
-    vle v a (x + y) := by
+theorem vle_add_of_lt {a b : ℝ} {x y : K} (hx : vle v a x) (hy : vge v b y) (hab : a < b)
+    : vle v a (x + y) := by
   unfold vle vge at *
-  have hlt : vR v x < vR v y :=
-    lt_of_le_of_lt hx (lt_of_lt_of_le (WithTop.coe_lt_coe.mpr hab) hy)
-  have hlt' : v x < v y :=
-    not_le.mp fun h => absurd ((vR_le_vR_iff v).mpr h) (not_le.mpr hlt)
+  have hlt : vR v x < vR v y := lt_of_le_of_lt hx (lt_of_lt_of_le (WithTop.coe_lt_coe.mpr hab) hy)
+  have hlt' : v x < v y := not_le.mp fun h => absurd ((vR_le_vR_iff v).mpr h) (not_le.mpr hlt)
   have e : vR v (x + y) = vR v x := by
     unfold vR
     rw [AddValuation.map_add_eq_of_lt_left v hlt']
@@ -104,29 +103,32 @@ theorem cge_zero {σ : Type} (a : ℝ) : cge v a (0 : MvPolynomial σ K) := by
   rw [MvPolynomial.coeff_zero]
   exact vge_zero v a
 
-theorem cge_mono {σ : Type} {a b : ℝ} {F : MvPolynomial σ K} (h : b ≤ a) (hF : cge v a F) :
-    cge v b F := fun α => vge_mono v h (hF α)
+theorem cge_mono {σ : Type} {a b : ℝ} {F : MvPolynomial σ K} (h : b ≤ a) (hF : cge v a F)
+    : cge v b F := fun α =>
+  vge_mono v h (hF α)
 
-theorem cge_add {σ : Type} {a : ℝ} {F G : MvPolynomial σ K} (hF : cge v a F) (hG : cge v a G) :
-    cge v a (F + G) := by
+theorem cge_add {σ : Type} {a : ℝ} {F G : MvPolynomial σ K} (hF : cge v a F) (hG : cge v a G)
+    : cge v a (F + G) := by
   intro α
   rw [MvPolynomial.coeff_add]
   exact vge_add v (hF α) (hG α)
 
-theorem cge_sum {σ ι : Type} {a : ℝ} (s : Finset ι) (f : ι → MvPolynomial σ K)
-    (h : ∀ i ∈ s, cge v a (f i)) : cge v a (∑ i ∈ s, f i) := by
+theorem cge_sum
+    {σ ι : Type} {a : ℝ} (s : Finset ι) (f : ι → MvPolynomial σ K) (h : ∀ i ∈ s, cge v a (f i))
+    : cge v a (∑ i ∈ s, f i) := by
   intro α
   rw [MvPolynomial.coeff_sum]
   exact vge_sum v s _ fun i hi => h i hi α
 
-theorem cge_smul {σ : Type} {a b : ℝ} {c : K} {F : MvPolynomial σ K} (hc : vge v a c)
-    (hF : cge v b F) : cge v (a + b) (c • F) := by
+theorem cge_smul
+    {σ : Type} {a b : ℝ} {c : K} {F : MvPolynomial σ K} (hc : vge v a c) (hF : cge v b F)
+    : cge v (a + b) (c • F) := by
   intro α
   rw [MvPolynomial.coeff_smul, smul_eq_mul]
   exact vge_mul v hc (hF α)
 
-theorem cge_monomial {σ : Type} {a : ℝ} {c : K} (α : σ →₀ ℕ) (hc : vge v a c) :
-    cge v a (monomial α c) := by
+theorem cge_monomial {σ : Type} {a : ℝ} {c : K} (α : σ →₀ ℕ) (hc : vge v a c)
+    : cge v a (monomial α c) := by
   classical
   intro β
   rw [MvPolynomial.coeff_monomial]
@@ -134,7 +136,8 @@ theorem cge_monomial {σ : Type} {a : ℝ} {c : K} (α : σ →₀ ℕ) (hc : vg
   · exact hc
   · exact vge_zero v a
 
-theorem cge_zero_iff_Integral {σ : Type} (F : MvPolynomial σ K) : cge v 0 F ↔ Integral v F := forall_congr' fun α => vge_zero_iff v _
+theorem cge_zero_iff_Integral {σ : Type} (F : MvPolynomial σ K) : cge v 0 F ↔ Integral v F :=
+  forall_congr' fun α => vge_zero_iff v _
 
 private lemma coeff_dg_eq_mul_coeff {σ : Type} (f : (σ →₀ ℕ) → K) (F : MvPolynomial σ K) (β : σ →₀ ℕ) :
     (dg f F).coeff β = f β * F.coeff β := by
@@ -152,14 +155,16 @@ private lemma coeff_dg_eq_mul_coeff {σ : Type} (f : (σ →₀ ℕ) → K) (F :
     · simp
   | add F G hF hG => rw [map_add (f := _), MvPolynomial.coeff_add, MvPolynomial.coeff_add, hF, hG, mul_add]
 
-theorem cge_dg {σ : Type} {a b : ℝ} {f : (σ →₀ ℕ) → K} {F : MvPolynomial σ K}
-    (hf : ∀ α, vge v a (f α)) (hF : cge v b F) : cge v (a + b) (dg f F) := by
+theorem cge_dg
+    {σ : Type} {a b : ℝ} {f : (σ →₀ ℕ) → K} {F : MvPolynomial σ K}
+    (hf : ∀ α, vge v a (f α)) (hF : cge v b F)
+    : cge v (a + b) (dg f F) := by
   intro β
   rw [coeff_dg_eq_mul_coeff]
   exact vge_mul v (hf β) (hF β)
 
-theorem cge_mul {σ : Type} {a b : ℝ} {F G : MvPolynomial σ K} (hF : cge v a F) (hG : cge v b G) :
-    cge v (a + b) (F * G) := by
+theorem cge_mul {σ : Type} {a b : ℝ} {F G : MvPolynomial σ K} (hF : cge v a F) (hG : cge v b G)
+    : cge v (a + b) (F * G) := by
   classical
   intro α
   rw [MvPolynomial.coeff_mul]
@@ -211,9 +216,11 @@ theorem v_unit_zpow {x : K} (h : v x = 0) (ε : ℤ) : v (x ^ ε) = 0 := by
 theorem v_unit_mul {x y : K} (hx : v x = 0) (hy : v y = 0) : v (x * y) = 0 := by
   rw [v.map_mul, hx, hy, add_zero]
 
-theorem vge_unit {x : K} (h : v x = 0) :
-    vge v 0 x ∧ vge v 0 x⁻¹ ∧ ∀ ε : ℤ, vge v 0 (x ^ ε) := ⟨(vge_zero_iff v _).mpr h.ge, (vge_zero_iff v _).mpr (v_unit_inv v h).ge,
-    fun ε => (vge_zero_iff v _).mpr (v_unit_zpow v h ε).ge⟩
+theorem vge_unit {x : K} (h : v x = 0) : vge v 0 x ∧ vge v 0 x⁻¹ ∧ ∀ ε : ℤ, vge v 0 (x ^ ε) := ⟨
+  (vge_zero_iff v _).mpr h.ge,
+  (vge_zero_iff v _).mpr (v_unit_inv v h).ge,
+  fun ε => (vge_zero_iff v _).mpr (v_unit_zpow v h ε).ge
+⟩
 
 section DVR
 
@@ -243,16 +250,21 @@ theorem v_natCast_of_not_dvd (hD : DVRHyp v p) {m : ℕ} (h : ¬ p ∣ m) : v (m
 theorem v_p_pow (hD : DVRHyp v p) (n : ℕ) : v ((p : K) ^ n) = ((n : ℚ) : WithTop ℚ) := by
   rw [AddValuation.map_pow, hD.vp, nsmul_one_withTop]
 
-theorem v_natCast (hD : DVRHyp v p) {n : ℕ} (hn : n ≠ 0) :
-    v (n : K) = ((padicValNat p n : ℚ) : WithTop ℚ) := by
+theorem v_natCast (hD : DVRHyp v p) {n : ℕ} (hn : n ≠ 0)
+    : v (n : K) = ((padicValNat p n : ℚ) : WithTop ℚ) := by
   haveI := Fact.mk hD.prime
   obtain ⟨e, m, hm, rfl⟩ := Nat.exists_eq_pow_mul_and_not_dvd hn p hD.prime.ne_one
   have hm0 : m ≠ 0 := by
     rintro rfl
     exact hm (dvd_zero p)
-  rw [(show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)], a ≠ 0 → b ≠ 0 → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul) (pow_ne_zero _ hD.prime.ne_zero) hm0, Nat.padicValNat_def, padicValNat.prime_pow,
-    Nat.padicValNat_def, padicValNat.eq_zero_of_not_dvd hm, add_zero, Nat.cast_mul, Nat.cast_pow, v.map_mul,
-    v_p_pow hD, v_natCast_of_not_dvd hD hm, add_zero]
+  rw [(show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)],
+          a ≠ 0 → b ≠ 0
+            → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by
+        simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul)
+      (pow_ne_zero _ hD.prime.ne_zero) hm0,
+    Nat.padicValNat_def, padicValNat.prime_pow, Nat.padicValNat_def,
+    padicValNat.eq_zero_of_not_dvd hm, add_zero, Nat.cast_mul, Nat.cast_pow, v.map_mul, v_p_pow hD,
+    v_natCast_of_not_dvd hD hm, add_zero]
 
 theorem vN_eq (hD : DVRHyp v p) (n : ℕ) : vN v n = padicValNat p n := by
   rcases eq_or_ne n 0 with rfl | hn
@@ -276,15 +288,20 @@ theorem vN_one (hD : DVRHyp v p) : vN v 1 = 0 := by
   rw [vN_eq hD, Nat.padicValNat_def]
   simp
 
-theorem vN_mul (hD : DVRHyp v p) {m n : ℕ} (hm : m ≠ 0) (hn : n ≠ 0) :
-    vN v (m * n) = vN v m + vN v n := by
+theorem vN_mul (hD : DVRHyp v p) {m n : ℕ} (hm : m ≠ 0) (hn : n ≠ 0)
+    : vN v (m * n) = vN v m + vN v n := by
   haveI := Fact.mk hD.prime
-  rw [vN_eq hD, vN_eq hD, vN_eq hD, (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)], a ≠ 0 → b ≠ 0 → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul) hm hn]
+  rw [vN_eq hD, vN_eq hD, vN_eq hD,
+    (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)],
+          a ≠ 0 → b ≠ 0
+            → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by
+        simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul)
+      hm hn]
   push_cast
   ring
 
-theorem vN_prod (hD : DVRHyp v p) {ι : Type*} (s : Finset ι) (f : ι → ℕ) (hf : ∀ i ∈ s, f i ≠ 0) :
-    vN v (∏ i ∈ s, f i) = ∑ i ∈ s, vN v (f i) := by
+theorem vN_prod (hD : DVRHyp v p) {ι : Type*} (s : Finset ι) (f : ι → ℕ) (hf : ∀ i ∈ s, f i ≠ 0)
+    : vN v (∏ i ∈ s, f i) = ∑ i ∈ s, vN v (f i) := by
   induction s using Finset.cons_induction with
   | empty => simp [vN_one hD]
   | cons i s hi ih =>
@@ -301,8 +318,8 @@ theorem vle_p_pow (hD : DVRHyp v p) (n : ℕ) : vle v (n : ℝ) ((p : K) ^ n) :=
   rw [v_p_pow hD]
   simp
 
-theorem vle_pow_p (hD : DVRHyp v p) {a : ℝ} {x : K} (n : ℕ) (hx : vle v a x) :
-    vle v (a + n) ((p : K) ^ n * x) := by
+theorem vle_pow_p (hD : DVRHyp v p) {a : ℝ} {x : K} (n : ℕ) (hx : vle v a x)
+    : vle v (a + n) ((p : K) ^ n * x) := by
   rw [add_comm]
   exact vle_mul v (vle_p_pow hD n) hx
 
@@ -319,8 +336,8 @@ theorem fact_ne_zero {σ : Type} (α : σ →₀ ℕ) : fact α ≠ 0 := by
   unfold fact Finsupp.prod
   exact Finset.prod_ne_zero_iff.mpr fun _ _ => Nat.factorial_ne_zero _
 
-theorem fact_add_of_disjoint {σ : Type} {α β : σ →₀ ℕ} (h : Disjoint α.support β.support) :
-    fact (α + β) = fact α * fact β := by
+theorem fact_add_of_disjoint {σ : Type} {α β : σ →₀ ℕ} (h : Disjoint α.support β.support)
+    : fact (α + β) = fact α * fact β := by
   unfold fact
   exact Finsupp.prod_add_index_of_disjoint h _
 
@@ -328,54 +345,57 @@ theorem fact_eq_prod {σ : Type} [Fintype σ] (α : σ →₀ ℕ) : fact α = �
   unfold fact
   exact Finsupp.prod_fintype _ _ (fun _ => Nat.factorial_zero)
 
-theorem eOut_add_eIn_n {L : Type} {r : ℕ} (out : L → Prop) [DecidablePred out] (α : L × Fin r →₀ ℕ) :
-    eOut out α + eIn out α = α := by
+theorem eOut_add_eIn_n {L : Type} {r : ℕ} (out : L → Prop) [DecidablePred out] (α : L × Fin r →₀ ℕ)
+    : eOut out α + eIn out α = α := by
   unfold eOut eIn
   exact Finsupp.filter_pos_add_filter_neg α _
 
-theorem disjoint_eOut_eIn {L : Type} {r : ℕ} (out : L → Prop) [DecidablePred out]
-    (α β : L × Fin r →₀ ℕ) : Disjoint (eOut out α).support (eIn out β).support := by
+theorem disjoint_eOut_eIn
+    {L : Type} {r : ℕ} (out : L → Prop) [DecidablePred out] (α β : L × Fin r →₀ ℕ)
+    : Disjoint (eOut out α).support (eIn out β).support := by
   unfold eOut eIn
   rw [Finset.disjoint_left]
   intro x h1 h2
   rw [Finsupp.support_filter, Finset.mem_filter] at h1 h2
   exact h2.2 h1.2
 
-theorem fact_eq_out_mul_in {L : Type} {r : ℕ} (out : L → Prop) [DecidablePred out]
-    (α : L × Fin r →₀ ℕ) : fact α = fact (eOut out α) * fact (eIn out α) := by
+theorem fact_eq_out_mul_in
+    {L : Type} {r : ℕ} (out : L → Prop) [DecidablePred out] (α : L × Fin r →₀ ℕ)
+    : fact α = fact (eOut out α) * fact (eIn out α) := by
   conv_lhs => rw [← eOut_add_eIn_n out α]
   exact fact_add_of_disjoint (disjoint_eOut_eIn out α α)
 
-theorem fact_eq_prod_letters {L : Type} [Fintype L] {r : ℕ} (α : L × Fin r →₀ ℕ) :
-    fact α = ∏ i : L, ∏ a : Fin r, (α (i, a)).factorial := by
+theorem fact_eq_prod_letters {L : Type} [Fintype L] {r : ℕ} (α : L × Fin r →₀ ℕ)
+    : fact α = ∏ i : L, ∏ a : Fin r, (α (i, a)).factorial := by
   rw [fact_eq_prod, Fintype.prod_prod_type]
 
-theorem prod_factorial_eq {L : Type} [Fintype L] {r : ℕ} {α : L × Fin r →₀ ℕ} {d : L → ℕ}
-    (h : ∀ i, ldeg α i = d i) :
-    ∏ i, (d i).factorial = fact α * ∏ i : L, Nat.multinomial univ fun a : Fin r => α (i, a) := by
+theorem prod_factorial_eq
+    {L : Type} [Fintype L] {r : ℕ} {α : L × Fin r →₀ ℕ} {d : L → ℕ} (h : ∀ i, ldeg α i = d i)
+    : ∏ i, (d i).factorial = fact α * ∏ i : L, Nat.multinomial univ fun a : Fin r => α (i, a) := by
   rw [fact_eq_prod_letters, ← Finset.prod_mul_distrib]
   refine Finset.prod_congr rfl fun i _ => ?_
   rw [← h i]
   simp only [ldeg]
   exact (Nat.multinomial_spec _ _).symm
 
-theorem fact_add_eq {σ : Type} [Fintype σ] (α α' : σ →₀ ℕ) :
-    fact (α + α') = (∏ x, (α x + α' x).choose (α' x)) * fact α * fact α' := by
-  rw [fact_eq_prod, fact_eq_prod, fact_eq_prod, ← Finset.prod_mul_distrib, ← Finset.prod_mul_distrib]
+theorem fact_add_eq {σ : Type} [Fintype σ] (α α' : σ →₀ ℕ)
+    : fact (α + α') = (∏ x, (α x + α' x).choose (α' x)) * fact α * fact α' := by
+  rw [fact_eq_prod, fact_eq_prod, fact_eq_prod, ← Finset.prod_mul_distrib,
+    ← Finset.prod_mul_distrib]
   refine Finset.prod_congr rfl fun x _ => ?_
   rw [Finsupp.add_apply, Nat.add_choose_mul_factorial_mul_factorial]
 
 def kapL (p r : ℕ) {L : Type} [Fintype L] (d : L → ℕ) : ℝ :=
   ∑ i, if d i = 0 then 0 else (r : ℝ) * Real.logb p ((d i : ℝ) + r)
 
-theorem logb_add_nonneg {p : ℕ} (hp : 2 ≤ p) (r a : ℕ) (h : 1 ≤ a + r) :
-    0 ≤ Real.logb p ((a : ℝ) + r) := by
+theorem logb_add_nonneg {p : ℕ} (hp : 2 ≤ p) (r a : ℕ) (h : 1 ≤ a + r)
+    : 0 ≤ Real.logb p ((a : ℝ) + r) := by
   apply Real.logb_nonneg
   · exact_mod_cast (by omega : 1 < p)
   · exact_mod_cast h
 
-theorem logb_add_mono {p : ℕ} (hp : 2 ≤ p) (r : ℕ) {a b : ℕ} (h : 1 ≤ a + r) (hab : a ≤ b) :
-    Real.logb p ((a : ℝ) + r) ≤ Real.logb p ((b : ℝ) + r) := by
+theorem logb_add_mono {p : ℕ} (hp : 2 ≤ p) (r : ℕ) {a b : ℕ} (h : 1 ≤ a + r) (hab : a ≤ b)
+    : Real.logb p ((a : ℝ) + r) ≤ Real.logb p ((b : ℝ) + r) := by
   apply Real.logb_le_logb_of_le
   · exact_mod_cast (by omega : 1 < p)
   · have : (1 : ℝ) ≤ a + r := by exact_mod_cast h
@@ -383,17 +403,19 @@ theorem logb_add_mono {p : ℕ} (hp : 2 ≤ p) (r : ℕ) {a b : ℕ} (h : 1 ≤ 
   · have : (a : ℝ) ≤ b := by exact_mod_cast hab
     linarith
 
-theorem kapL_term_nonneg {p : ℕ} (hp : 2 ≤ p) (r a : ℕ) :
-    0 ≤ (if a = 0 then 0 else (r : ℝ) * Real.logb p ((a : ℝ) + r)) := by
+theorem kapL_term_nonneg {p : ℕ} (hp : 2 ≤ p) (r a : ℕ)
+    : 0 ≤ (if a = 0 then 0 else (r : ℝ) * Real.logb p ((a : ℝ) + r)) := by
   split_ifs with ha
   · exact le_refl 0
   · exact mul_nonneg (Nat.cast_nonneg r) (logb_add_nonneg hp r a (by omega))
 
-theorem kapL_nonneg {p : ℕ} (hp : 2 ≤ p) (r : ℕ) {L : Type} [Fintype L] (d : L → ℕ) :
-    0 ≤ kapL p r d := Finset.sum_nonneg fun i _ => kapL_term_nonneg hp r (d i)
+theorem kapL_nonneg {p : ℕ} (hp : 2 ≤ p) (r : ℕ) {L : Type} [Fintype L] (d : L → ℕ)
+    : 0 ≤ kapL p r d :=
+  Finset.sum_nonneg fun i _ => kapL_term_nonneg hp r (d i)
 
-theorem kapL_mono {p : ℕ} (hp : 2 ≤ p) (r : ℕ) {L : Type} [Fintype L] {d d' : L → ℕ}
-    (h : ∀ i, d i ≤ d' i) : kapL p r d ≤ kapL p r d' := by
+theorem kapL_mono
+    {p : ℕ} (hp : 2 ≤ p) (r : ℕ) {L : Type} [Fintype L] {d d' : L → ℕ} (h : ∀ i, d i ≤ d' i)
+    : kapL p r d ≤ kapL p r d' := by
   unfold kapL
   apply Finset.sum_le_sum
   intro i _
@@ -406,8 +428,8 @@ theorem kapL_mono {p : ℕ} (hp : 2 ≤ p) (r : ℕ) {L : Type} [Fintype L] {d d
     rw [if_neg h0, if_neg h1]
     exact mul_le_mul_of_nonneg_left (logb_add_mono hp r (by omega) (h i)) (Nat.cast_nonneg r)
 
-theorem kapL_le_kap {p : ℕ} (hp : 2 ≤ p) {r : ℕ} (hr : 1 ≤ r) {L : Type} [Fintype L] (d : L → ℕ) :
-    kapL p r d + (Fintype.card L : ℝ) * r ≤ kap p r d := by
+theorem kapL_le_kap {p : ℕ} (hp : 2 ≤ p) {r : ℕ} (hr : 1 ≤ r) {L : Type} [Fintype L] (d : L → ℕ)
+    : kapL p r d + (Fintype.card L : ℝ) * r ≤ kap p r d := by
   unfold kapL kap lg
   have e : (Fintype.card L : ℝ) * r = ∑ _i : L, (r : ℝ) := by simp
   rw [e, ← Finset.sum_add_distrib]
@@ -420,18 +442,20 @@ theorem kapL_le_kap {p : ℕ} (hp : 2 ≤ p) {r : ℕ} (hr : 1 ≤ r) {L : Type}
   · apply le_of_eq
     ring
 
-theorem kapL_le_kap' {p : ℕ} (hp : 2 ≤ p) {r : ℕ} (hr : 1 ≤ r) {L : Type} [Fintype L] (d : L → ℕ) :
-    kapL p r d ≤ kap p r d := le_trans (le_add_of_nonneg_right (by positivity)) (kapL_le_kap hp hr d)
+theorem kapL_le_kap' {p : ℕ} (hp : 2 ≤ p) {r : ℕ} (hr : 1 ≤ r) {L : Type} [Fintype L] (d : L → ℕ)
+    : kapL p r d ≤ kap p r d :=
+  le_trans (le_add_of_nonneg_right (by positivity)) (kapL_le_kap hp hr d)
 
 theorem lg_ge_one {p : ℕ} (hp : 2 ≤ p) {r : ℕ} (hr : 1 ≤ r) (a : ℕ) : 1 ≤ lg p r a := by
   unfold lg
   linarith [logb_add_nonneg hp r a (by omega)]
 
-theorem kap_ge_card {p : ℕ} (hp : 2 ≤ p) {r : ℕ} (hr : 1 ≤ r) {L : Type} [Fintype L] (d : L → ℕ) :
-    (Fintype.card L : ℝ) * r ≤ kap p r d := le_trans (le_add_of_nonneg_left (kapL_nonneg hp r d)) (kapL_le_kap hp hr d)
+theorem kap_ge_card {p : ℕ} (hp : 2 ≤ p) {r : ℕ} (hr : 1 ≤ r) {L : Type} [Fintype L] (d : L → ℕ)
+    : (Fintype.card L : ℝ) * r ≤ kap p r d :=
+  le_trans (le_add_of_nonneg_left (kapL_nonneg hp r d)) (kapL_le_kap hp hr d)
 
-theorem natLog_le_term {p : ℕ} (hp : 2 ≤ p) (r a : ℕ) :
-    (r : ℝ) * (Nat.log p a : ℝ) ≤ (if a = 0 then 0 else (r : ℝ) * Real.logb p ((a : ℝ) + r)) := by
+theorem natLog_le_term {p : ℕ} (hp : 2 ≤ p) (r a : ℕ)
+    : (r : ℝ) * (Nat.log p a : ℝ) ≤ (if a = 0 then 0 else (r : ℝ) * Real.logb p ((a : ℝ) + r)) := by
   split_ifs with ha
   · rw [ha, Nat.log_zero_right]
     simp
@@ -448,8 +472,8 @@ section DVR2
 
 variable {v} {p : ℕ} [CharZero K]
 
-theorem multinomial_fact_le {ι : Type*} (q : ℕ) (f : ι → ℕ) (s : Finset ι) :
-    (Nat.multinomial s f).factorization q ≤ s.card * Nat.log q (∑ i ∈ s, f i) := by
+theorem multinomial_fact_le {ι : Type*} (q : ℕ) (f : ι → ℕ) (s : Finset ι)
+    : (Nat.multinomial s f).factorization q ≤ s.card * Nat.log q (∑ i ∈ s, f i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
@@ -460,12 +484,13 @@ theorem multinomial_fact_le {ι : Type*} (q : ℕ) (f : ι → ℕ) (s : Finset 
     have h1 := @Nat.factorization_choose_le_log q (f a + ∑ i ∈ s, f i) (f a)
     have h2 : Nat.log q (∑ i ∈ s, f i) ≤ Nat.log q (f a + ∑ i ∈ s, f i) :=
       Nat.log_mono_right (by omega)
-    calc _ ≤ Nat.log q (f a + ∑ i ∈ s, f i) + s.card * Nat.log q (∑ i ∈ s, f i) := add_le_add h1 ih
+    calc
+      _ ≤ Nat.log q (f a + ∑ i ∈ s, f i) + s.card * Nat.log q (∑ i ∈ s, f i) := add_le_add h1 ih
       _ ≤ Nat.log q (f a + ∑ i ∈ s, f i) + s.card * Nat.log q (f a + ∑ i ∈ s, f i) := by gcongr
       _ = (s.card + 1) * Nat.log q (f a + ∑ i ∈ s, f i) := by ring
 
-theorem vN_multinomial_le (hD : DVRHyp v p) {r : ℕ} (f : Fin r → ℕ) :
-    vN v (Nat.multinomial univ f) ≤ (r : ℝ) * (Nat.log p (∑ a, f a) : ℝ) := by
+theorem vN_multinomial_le (hD : DVRHyp v p) {r : ℕ} (f : Fin r → ℕ)
+    : vN v (Nat.multinomial univ f) ≤ (r : ℝ) * (Nat.log p (∑ a, f a) : ℝ) := by
   rw [vN_eq hD, Nat.padicValNat_def, ← Nat.factorization_def _ hD.prime]
   have := multinomial_fact_le p f Finset.univ
   rw [Finset.card_univ, Fintype.card_fin] at this
@@ -473,23 +498,30 @@ theorem vN_multinomial_le (hD : DVRHyp v p) {r : ℕ} (f : Fin r → ℕ) :
 
 theorem two_le_p (hD : DVRHyp v p) : 2 ≤ p := hD.prime.two_le
 
-theorem vN_prod_factorial_eq (hD : DVRHyp v p) {L : Type} [Fintype L] {r : ℕ}
-    {α : L × Fin r →₀ ℕ} {d : L → ℕ} (h : ∀ i, ldeg α i = d i) :
-    vN v (∏ i, (d i).factorial) =
-      vN v (fact α) + ∑ i : L, vN v (Nat.multinomial univ fun a : Fin r => α (i, a)) := by
+theorem vN_prod_factorial_eq
+    (hD : DVRHyp v p)
+    {L : Type} [Fintype L]
+    {r : ℕ} {α : L × Fin r →₀ ℕ} {d : L → ℕ} (h : ∀ i, ldeg α i = d i)
+    : vN v (∏ i, (d i).factorial)
+      = vN v (fact α) + ∑ i : L, vN v (Nat.multinomial univ fun a : Fin r => α (i, a)) := by
   rw [prod_factorial_eq h,
-    vN_mul hD (fact_ne_zero α) (Finset.prod_ne_zero_iff.mpr fun i _ => (Nat.multinomial_pos _ _).ne'),
+    vN_mul hD (fact_ne_zero α)
+      (Finset.prod_ne_zero_iff.mpr fun i _ => (Nat.multinomial_pos _ _).ne'),
     vN_prod hD _ _ (fun i _ => (Nat.multinomial_pos _ _).ne')]
 
-theorem fact_upper (hD : DVRHyp v p) {L : Type} [Fintype L] {r : ℕ}
-    {α : L × Fin r →₀ ℕ} {d : L → ℕ} (h : ∀ i, ldeg α i = d i) :
-    vN v (fact α) ≤ vN v (∏ i, (d i).factorial) := by
+theorem fact_upper
+    (hD : DVRHyp v p)
+    {L : Type} [Fintype L]
+    {r : ℕ} {α : L × Fin r →₀ ℕ} {d : L → ℕ} (h : ∀ i, ldeg α i = d i)
+    : vN v (fact α) ≤ vN v (∏ i, (d i).factorial) := by
   rw [vN_prod_factorial_eq hD h]
   exact le_add_of_nonneg_right (Finset.sum_nonneg fun i _ => vN_nonneg hD _)
 
-theorem fact_lower (hD : DVRHyp v p) {L : Type} [Fintype L] {r : ℕ}
-    {α : L × Fin r →₀ ℕ} {d : L → ℕ} (h : ∀ i, ldeg α i = d i) :
-    vN v (∏ i, (d i).factorial) - kapL p r d ≤ vN v (fact α) := by
+theorem fact_lower
+    (hD : DVRHyp v p)
+    {L : Type} [Fintype L]
+    {r : ℕ} {α : L × Fin r →₀ ℕ} {d : L → ℕ} (h : ∀ i, ldeg α i = d i)
+    : vN v (∏ i, (d i).factorial) - kapL p r d ≤ vN v (fact α) := by
   rw [vN_prod_factorial_eq hD h]
   have hs : ∑ i : L, vN v (Nat.multinomial univ fun a : Fin r => α (i, a)) ≤ kapL p r d := by
     unfold kapL
@@ -501,14 +533,17 @@ theorem fact_lower (hD : DVRHyp v p) {L : Type} [Fintype L] {r : ℕ}
     exact this.trans (natLog_le_term (two_le_p hD) r (d i))
   linarith
 
-theorem fact_add_lower (hD : DVRHyp v p) {L : Type} [Fintype L] {r : ℕ}
-    {α α' : L × Fin r →₀ ℕ} {d : L → ℕ} (h : ∀ i, ldeg (α + α') i = d i) :
-    vN v (∏ i, (d i).factorial) - 2 * kapL p r d ≤ vN v (fact α) + vN v (fact α') := by
+theorem fact_add_lower
+    (hD : DVRHyp v p)
+    {L : Type} [Fintype L]
+    {r : ℕ} {α α' : L × Fin r →₀ ℕ} {d : L → ℕ} (h : ∀ i, ldeg (α + α') i = d i)
+    : vN v (∏ i, (d i).factorial) - 2 * kapL p r d ≤ vN v (fact α) + vN v (fact α') := by
   have hf := fact_add_eq α α'
   have hne : ∏ x, (α x + α' x).choose (α' x) ≠ 0 :=
     Finset.prod_ne_zero_iff.mpr fun x _ => (Nat.choose_pos (by omega)).ne'
-  have hv : vN v (fact (α + α')) =
-      vN v (∏ x, (α x + α' x).choose (α' x)) + vN v (fact α) + vN v (fact α') := by
+  have hv
+      : vN v (fact (α + α'))
+        = vN v (∏ x, (α x + α' x).choose (α' x)) + vN v (fact α) + vN v (fact α') := by
     rw [hf, vN_mul hD (mul_ne_zero hne (fact_ne_zero α)) (fact_ne_zero α'),
       vN_mul hD hne (fact_ne_zero α)]
   have hl := fact_lower hD h
@@ -521,15 +556,19 @@ theorem fact_add_lower (hD : DVRHyp v p) {L : Type} [Fintype L] {r : ℕ}
       intro a
       rw [← h i]
       unfold ldeg
-      have := Finset.single_le_sum (f := fun b : Fin r => (α + α') (i, b))
-        (fun _ _ => Nat.zero_le _) (Finset.mem_univ a)
+      have :=
+        Finset.single_le_sum
+          (f := fun b : Fin r => (α + α') (i, b))
+          (fun _ _ => Nat.zero_le _)
+          (Finset.mem_univ a)
       simpa using this
-    calc ∑ a : Fin r, vN v ((α (i, a) + α' (i, a)).choose (α' (i, a)))
-        ≤ ∑ _a : Fin r, (Nat.log p (d i) : ℝ) := by
-          apply Finset.sum_le_sum
-          intro a _
-          refine (vN_choose_le hD _ _).trans ?_
-          exact_mod_cast Nat.log_mono_right (hb a)
+    calc
+      ∑ a : Fin r, vN v ((α (i, a) + α' (i, a)).choose (α' (i, a)))
+          ≤ ∑ _a : Fin r, (Nat.log p (d i) : ℝ) := by
+        apply Finset.sum_le_sum
+        intro a _
+        refine (vN_choose_le hD _ _).trans ?_
+        exact_mod_cast Nat.log_mono_right (hb a)
       _ = (r : ℝ) * (Nat.log p (d i) : ℝ) := by simp
       _ ≤ _ := natLog_le_term (two_le_p hD) r (d i)
   linarith
@@ -540,9 +579,12 @@ section Star
 
 variable {v} {p : ℕ} [CharZero K]
 
-theorem bge_of_cge (hD : DVRHyp v p) {L : Type} [Fintype L] {r : ℕ} {d : L → ℕ} {a : ℝ}
-    {F : MvPolynomial (L × Fin r) K} (hF : F ∈ PolK K r d) (h : cge v a F) :
-    bge v (a + (vN v (∏ i, (d i).factorial) - kapL p r d) / 2) F := by
+theorem bge_of_cge
+    (hD : DVRHyp v p)
+    {L : Type} [Fintype L]
+    {r : ℕ} {d : L → ℕ} {a : ℝ} {F : MvPolynomial (L × Fin r) K}
+    (hF : F ∈ PolK K r d) (h : cge v a F)
+    : bge v (a + (vN v (∏ i, (d i).factorial) - kapL p r d) / 2) F := by
   intro α
   by_cases h0 : F.coeff α = 0
   · rw [h0]
@@ -555,9 +597,12 @@ theorem bge_of_cge (hD : DVRHyp v p) {L : Type} [Fintype L] {r : ℕ} {d : L →
     refine vge_mono v ?_ (h α)
     linarith
 
-theorem cge_of_bge (hD : DVRHyp v p) {L : Type} [Fintype L] {r : ℕ} {d : L → ℕ} {a : ℝ}
-    {F : MvPolynomial (L × Fin r) K} (hF : F ∈ PolK K r d) (h : bge v a F) :
-    cge v (a - vN v (∏ i, (d i).factorial) / 2) F := by
+theorem cge_of_bge
+    (hD : DVRHyp v p)
+    {L : Type} [Fintype L]
+    {r : ℕ} {d : L → ℕ} {a : ℝ} {F : MvPolynomial (L × Fin r) K}
+    (hF : F ∈ PolK K r d) (h : bge v a F)
+    : cge v (a - vN v (∏ i, (d i).factorial) / 2) F := by
   intro α
   by_cases h0 : F.coeff α = 0
   · rw [h0]

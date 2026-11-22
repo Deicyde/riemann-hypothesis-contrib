@@ -12,8 +12,10 @@ namespace GlobalTheory.PeriodTests
 open AlgebraicGeometry CategoryTheory Limits NumberField
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
 
-theorem isHolTo_const {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] {X : Scheme.{0}} {B : Set V}
-    (hB : IsOpen B) (x : Sp ℂ ⟶ X) : IsHolTo B (fun _ => x) := by
+theorem isHolTo_const
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V]
+    {X : Scheme.{0}} {B : Set V} (hB : IsOpen B) (x : Sp ℂ ⟶ X)
+    : IsHolTo B (fun _ => x) := by
   intro U f
   refine ⟨?_, differentiableOn_const _⟩
   by_cases h : ⊤ ≤ x ⁻¹ᵁ U

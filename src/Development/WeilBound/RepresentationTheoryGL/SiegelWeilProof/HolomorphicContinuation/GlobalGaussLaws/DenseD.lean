@@ -26,8 +26,15 @@ theorem isUnit_det_of_inG {g : M2 n} (hg : InG g) : IsUnit g.det := by
   rw [h0, mul_zero] at e
   exact e.symm
 
-def mkGR (g : M2 n) (hg : InG g) : GR n :=
-  ⟨⟨g, g⁻¹, Matrix.mul_nonsing_inv g (isUnit_det_of_inG hg), Matrix.nonsing_inv_mul g (isUnit_det_of_inG hg)⟩, hg⟩
+def mkGR (g : M2 n) (hg : InG g) : GR n := ⟨
+  ⟨
+    g,
+    g⁻¹,
+    Matrix.mul_nonsing_inv g (isUnit_det_of_inG hg),
+    Matrix.nonsing_inv_mul g (isUnit_det_of_inG hg)
+  ⟩,
+  hg
+⟩
 
 def IsNElt (g : GR n) : Prop := ∃ b : Matrix (Fin n) (Fin n) ℂ, bᴴ = b ∧ mR g = nU b
 

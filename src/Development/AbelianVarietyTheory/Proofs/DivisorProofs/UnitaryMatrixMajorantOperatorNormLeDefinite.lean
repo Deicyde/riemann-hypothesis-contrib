@@ -7,22 +7,26 @@ public import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.MajLactRm
 
 @[expose] public section
 
-open NumberField Module ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up GlobalTheory.IndefiniteRowSideFullHecke.FrameWeightGapBounds GlobalTheory.ShareOn
+open NumberField Module ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  GlobalTheory.IndefiniteRowSideFullHecke.FrameWeightGapBounds GlobalTheory.ShareOn
 
 namespace GlobalTheory.DefiniteOpNorm
 
-theorem span_colP {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r)
-    (hp : X.p0 = r) (x : Frame X.Ψ r) (τ : X.Ψ) (A : Matrix (Fin r) (Fin r) ℂ)
-    (hA : (A * mat x τ).det ≠ 0) (w : Fin r → ℂ) :
-    ∃ K : Fin X.p0 → ℂ, w = ∑ a, K a • Matrix.mulVec A (X.colP x τ a) := by
+theorem span_colP
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {r : ℕ} (X : Data E r) (hp : X.p0 = r) (x : Frame X.Ψ r) (τ : X.Ψ)
+    (A : Matrix (Fin r) (Fin r) ℂ) (hA : (A * mat x τ).det ≠ 0) (w : Fin r → ℂ)
+    : ∃ K : Fin X.p0 → ℂ, w = ∑ a, K a • Matrix.mulVec A (X.colP x τ a) := by
   classical
   set M := A * mat x τ with hM
   set c := M⁻¹.mulVec w with hc
   have hw : w = M.mulVec c := by
-    rw [hc, Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ (isUnit_iff_ne_zero.mpr hA), Matrix.one_mulVec]
+    rw [hc, Matrix.mulVec_mulVec, Matrix.mul_nonsing_inv _ (isUnit_iff_ne_zero.mpr hA),
+      Matrix.one_mulVec]
   refine ⟨fun a => c (Fin.castLE X.p0_le a), ?_⟩
-  have hsum : ∀ f : Fin r → Fin r → ℂ,
-      ∑ a : Fin X.p0, f (Fin.castLE X.p0_le a) = ∑ j : Fin r, f j := by
+  have hsum
+      : ∀ f : Fin r → Fin r → ℂ, ∑ a : Fin X.p0, f (Fin.castLE X.p0_le a) = ∑ j : Fin r, f j := by
     intro f
     exact Fintype.sum_equiv (finCongr hp) _ _ (fun a => by congr 1)
   show w = ∑ a : Fin X.p0, (fun j => c j • A.mulVec (ReciprocityTheory.ChartRestriction.G.FD.col (mat x τ) j)) (Fin.castLE X.p0_le a)
@@ -30,16 +34,21 @@ theorem span_colP {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (
   conv_lhs => rw [hw]
   funext k
   rw [Finset.sum_apply]
-  simp only [Pi.smul_apply, smul_eq_mul, ReciprocityTheory.ChartRestriction.G.FD.col, hM, Matrix.mulVec, dotProduct,
-    Matrix.mul_apply, Finset.mul_sum, Finset.sum_mul]
+  simp only [Pi.smul_apply, smul_eq_mul, ReciprocityTheory.ChartRestriction.G.FD.col, hM,
+    Matrix.mulVec, dotProduct, Matrix.mul_apply, Finset.mul_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
-theorem opNormLe_definite : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r),
-    (X.p0 = 0 ∨ X.p0 = r) → ∀ x ∈ X.dom, ∀ β : GL (Fin r) E,
-    (∀ v w, herm X.Gm (Matrix.mulVec (β : Matrix (Fin r) (Fin r) E) v)
-      (Matrix.mulVec (β : Matrix (Fin r) (Fin r) E) w) = herm X.Gm v w) →
-    ∀ τ : X.Ψ, GlobalTheory.IndefiniteRowSideFullHecke.SmallUnipotentElements.OpNormLe X x τ (β : Matrix (Fin r) (Fin r) E)
-      (Real.exp (1 / (3 * (r : ℝ)))) := by
+theorem opNormLe_definite
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r),
+      (X.p0 = 0 ∨ X.p0 = r)
+        → ∀ x ∈ X.dom, ∀ β : GL (Fin r) E,
+          (∀ v w,
+              herm X.Gm (Matrix.mulVec (β : Matrix (Fin r) (Fin r) E) v)
+                  (Matrix.mulVec (β : Matrix (Fin r) (Fin r) E) w)
+                = herm X.Gm v w)
+            → ∀ τ : X.Ψ,
+              GlobalTheory.IndefiniteRowSideFullHecke.SmallUnipotentElements.OpNormLe X x τ
+                (β : Matrix (Fin r) (Fin r) E) (Real.exp (1 / (3 * (r : ℝ)))) := by
   intro E _ _ _ r X hp x hx β hβ τ u
   set g : Matrix (Fin r) (Fin r) ℂ := (β : Matrix (Fin r) (Fin r) E).map τ.1 with hg
   set g' : Matrix (Fin r) (Fin r) ℂ := ((β⁻¹ : GL (Fin r) E) : Matrix (Fin r) (Fin r) E).map τ.1 with hg'
@@ -61,8 +70,8 @@ theorem opNormLe_definite : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
     intro c
     rcases hp with hp | hp
     · exact absurd c.isLt (by omega)
-    · obtain ⟨K, hK⟩ := span_colP X hp x τ 1 (by rw [Matrix.one_mul]; exact hdetx)
-        (Matrix.mulVec g (X.colP x τ c))
+    · obtain ⟨K, hK⟩ :=
+        span_colP X hp x τ 1 (by rw [Matrix.one_mul]; exact hdetx) (Matrix.mulVec g (X.colP x τ c))
       exact ⟨K, by simpa only [Matrix.one_mulVec] using hK⟩
   have H2 : ∀ a, ∃ L : Fin X.p0 → ℂ, X.colP x τ a = ∑ c, L c • Matrix.mulVec g (X.colP x τ c) := by
     intro a
@@ -70,8 +79,10 @@ theorem opNormLe_definite : ∀ (E : Type) [Field E] [NumberField E] [IsCMField 
     · exact absurd a.isLt (by omega)
     · exact span_colP X hp x τ g (by rw [Matrix.det_mul]; exact mul_ne_zero hdetg hdetx) _
   have key : X.maj x τ (Matrix.mulVec g u) = X.maj x τ u := by
-    have h := ReciprocityTheory.ChartRestriction.G.FD.MajorantConjugateTransfer.maj_transfer X hx hx τ g g'
-      (fun w => by rw [Matrix.mulVec_mulVec, hgg, Matrix.one_mulVec]) hiso H1 H2 (Matrix.mulVec g u)
+    have h :=
+      ReciprocityTheory.ChartRestriction.G.FD.MajorantConjugateTransfer.maj_transfer X hx hx τ g g'
+        (fun w => by rw [Matrix.mulVec_mulVec, hgg, Matrix.one_mulVec])
+        hiso H1 H2 (Matrix.mulVec g u)
     rwa [Matrix.mulVec_mulVec, hg'g, Matrix.one_mulVec] at h
   rw [key]
   have h0 := ReciprocityTheory.ChartRestriction.G.FD.MajorantConjugateTransfer.maj_nonneg X hx τ u

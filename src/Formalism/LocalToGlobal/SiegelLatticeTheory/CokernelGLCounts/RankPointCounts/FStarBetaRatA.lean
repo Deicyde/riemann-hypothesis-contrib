@@ -29,23 +29,28 @@ def moveL {ι : Type*} [Fintype ι] [DecidableEq ι] (u u' : ι → S.V) : S.V �
   map_add' x y := by rw [pc_add, lin_add]
   map_smul' t x := by rw [pc_smul, lin_smul, RingHom.id_apply]
 
-theorem pc_of_orth {ι : Type*} [Fintype ι] [DecidableEq ι] (u : ι → S.V) {y : S.V} (hy : ∀ k, S.hT (u k) y = 0) :
-    pc u y = 0 := by
+theorem pc_of_orth
+    {ι : Type*} [Fintype ι] [DecidableEq ι] (u : ι → S.V) {y : S.V} (hy : ∀ k, S.hT (u k) y = 0)
+    : pc u y = 0 := by
   have h0 : (fun k => S.hT (u k) y) = 0 := funext fun k => hy k
   rw [pc, h0, Matrix.mulVec_zero]
 
 theorem lin_zero {ι : Type*} [Fintype ι] (u : ι → S.V) : lin u 0 = 0 := by simp [lin]
 
-theorem isometry_extension_two {ι κ : Type*} [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
+theorem isometry_extension_two
+    {ι κ : Type*} [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
     (u u' : ι → S.V) (w : κ → S.V) (hG : gram S u' u' = gram S u u) (hdet : (gram S u u).det ≠ 0)
     (hdetw : (gram S w w).det ≠ 0) (hsp : ∀ i, u' i ∈ Submodule.span E (Set.range w))
-    (hkey : ∀ y y', (∀ k, S.hT (u k) y = 0) → (∀ k, S.hT (u k) y' = 0) →
-      S.hT (lin w (pc w y)) (lin w (pc w y')) = 0) :
-    ∃ g : S.V ≃ₗ[E] S.V, (∀ x y, S.hT (g x) (g y) = S.hT x y) ∧ (∀ i, g (u i) = u' i) ∧
-      (∀ y, (∀ k, S.hT (u k) y = 0) → g y = y - lin w (pc w y)) := by
+    (hkey : ∀ y y',
+      (∀ k, S.hT (u k) y = 0) → (∀ k, S.hT (u k) y' = 0)
+        → S.hT (lin w (pc w y)) (lin w (pc w y')) = 0)
+    : ∃ g : S.V ≃ₗ[E] S.V,
+      (∀ x y, S.hT (g x) (g y) = S.hT x y) ∧ (∀ i, g (u i) = u' i)
+        ∧ (∀ y, (∀ k, S.hT (u k) y = 0) → g y = y - lin w (pc w y)) := by
   let P : S.V →ₗ[E] S.V := LinearMap.id - projL u
   let β : S.V →ₗ[E] S.V := (LinearMap.id - projL w) ∘ₗ P + moveL u u'
-  have hβ : ∀ v, β v = ((v - lin u (pc u v)) - lin w (pc w (v - lin u (pc u v)))) + lin u' (pc u v) :=
+  have hβ
+      : ∀ v, β v = ((v - lin u (pc u v)) - lin w (pc w (v - lin u (pc u v)))) + lin u' (pc u v) :=
     fun v => rfl
   have hsp' : ∀ c, lin u' c ∈ Submodule.span E (Set.range w) := fun c =>
     Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (hsp i)
@@ -59,17 +64,21 @@ theorem isometry_extension_two {ι κ : Type*} [Fintype ι] [DecidableEq ι] [Fi
     have hk := hkey x' y' hx'u hy'u
     rw [hβ, hβ]
 
-    have t1 : S.hT (x' - lin w (pc w x')) (lin u' (pc u y)) = 0 := (hT_span_rem w hdetw x' _ (hsp' _)).2
-    have t2 : S.hT (lin u' (pc u x)) (y' - lin w (pc w y')) = 0 := (hT_span_rem w hdetw y' _ (hsp' _)).1
-    have t3 : S.hT (lin u' (pc u x)) (lin u' (pc u y)) = S.hT (lin u (pc u x)) (lin u (pc u y)) := by
+    have t1 : S.hT (x' - lin w (pc w x')) (lin u' (pc u y)) = 0 :=
+      (hT_span_rem w hdetw x' _ (hsp' _)).2
+    have t2 : S.hT (lin u' (pc u x)) (y' - lin w (pc w y')) = 0 :=
+      (hT_span_rem w hdetw y' _ (hsp' _)).1
+    have t3
+        : S.hT (lin u' (pc u x)) (lin u' (pc u y)) = S.hT (lin u (pc u x)) (lin u (pc u y)) := by
       rw [hT_lin_lin, hT_lin_lin]; simp only [hGe]
     have t4 : S.hT (x' - lin w (pc w x')) (lin w (pc w y')) = 0 :=
       (hT_span_rem w hdetw x' _ (lin_sub w _)).2
     have t5 : S.hT (lin w (pc w x')) (y' - lin w (pc w y')) = 0 :=
       (hT_span_rem w hdetw y' _ (lin_sub w _)).1
     have t6 : S.hT (x' - lin w (pc w x')) (y' - lin w (pc w y')) = S.hT x' y' := by
-      have e1 : S.hT (x' - lin w (pc w x')) (y' - lin w (pc w y')) =
-          S.hT (x' - lin w (pc w x')) y' := by
+      have e1
+          : S.hT (x' - lin w (pc w x')) (y' - lin w (pc w y'))
+            = S.hT (x' - lin w (pc w x')) y' := by
         rw [map_sub, t4, sub_zero]
       have e2 : S.hT (lin w (pc w x')) y' = 0 := by
         have := t5
@@ -106,8 +115,11 @@ theorem isometry_extension_two {ι κ : Type*} [Fintype ι] [DecidableEq ι] [Fi
 
 variable {r : ℕ}
 
-theorem norm_om_ne {TA TB : E} (A : FlagG S r TA) (B : FlagG S r TB) (hdet : (Zhat A B).det ≠ 0) {Ω : S.V}
-    (hΩ : OmV A B Ω) (hG : Gflag A B ≠ 0) : 1 + TA * S.hT Ω Ω ≠ 0 := by
+theorem norm_om_ne
+    {TA TB : E} (A : FlagG S r TA) (B : FlagG S r TB) (hdet : (Zhat A B).det ≠ 0)
+    {Ω : S.V} (hΩ : OmV A B Ω)
+    (hG : Gflag A B ≠ 0)
+    : 1 + TA * S.hT Ω Ω ≠ 0 := by
   have hx := om_zcoef A B hdet hΩ
   set c := (Zhat A B)⁻¹ (Fin.last r) (Fin.last r) with hc
   set x := Ω - c • B.z with hxd
@@ -122,8 +134,9 @@ theorem norm_om_ne {TA TB : E} (A : FlagG S r TA) (B : FlagG S r TB) (hdet : (Zh
     rwa [NMoveP.fvecL] at h
   have hnorm : S.hT Ω Ω = star c * c * (-TB) := by
     rw [hΩe]
-    simp only [map_add (f := _), LinearMap.add_apply, LinearMap.map_smulₛₗ, map_smul, LinearMap.smul_apply, hxx, hxz, hzx,
-      B.z_norm, smul_eq_mul, starRingEnd_apply, mul_zero, zero_add, add_zero]
+    simp only [map_add (f := _), LinearMap.add_apply, LinearMap.map_smulₛₗ, map_smul,
+      LinearMap.smul_apply, hxx, hxz, hzx, B.z_norm, smul_eq_mul, starRingEnd_apply, mul_zero,
+      zero_add, add_zero]
     ring
   have hcl : c = leadMinorE (Zhat A B) r / (Zhat A B).det := inv_last _
   intro h0
@@ -135,15 +148,19 @@ theorem norm_om_ne {TA TB : E} (A : FlagG S r TA) (B : FlagG S r TB) (hdet : (Zh
   field_simp at h0
   linear_combination h0
 
-theorem key_X {TA TB : E} (A : FlagG S r TA) (B : FlagG S r TB) (hdet : (Zhat A B).det ≠ 0) {Ω : S.V}
-    (hΩ : OmV A B Ω) (hG : Gflag A B ≠ 0) {q : S.V}
-    (hq : q ∈ Submodule.span E (Set.range (Sum.elim A.fvec B.fvec))) (hqA : ∀ a, S.hT (A.fvec a) q = 0)
-    (hqΩ : S.hT Ω q = 0) : q ∈ A.X := by
+theorem key_X
+    {TA TB : E} (A : FlagG S r TA) (B : FlagG S r TB) (hdet : (Zhat A B).det ≠ 0)
+    {Ω : S.V} (hΩ : OmV A B Ω)
+    (hG : Gflag A B ≠ 0)
+    {q : S.V} (hq : q ∈ Submodule.span E (Set.range (Sum.elim A.fvec B.fvec)))
+    (hqA : ∀ a, S.hT (A.fvec a) q = 0) (hqΩ : S.hT Ω q = 0)
+    : q ∈ A.X := by
   obtain ⟨x, hx, c, rfl⟩ := dec A B hdet hΩ hq hqA
   have hΩx : S.hT Ω x = 0 := by
     rw [BwdNA.hsw S x Ω]
     have : x ∈ A.X := hx
-    have h := (PI.UnitaryGroupMassFormula.BetaLUniq.mem_orth S).1 (show Ω ∈ orth S A.X from ?_) x this
+    have h :=
+      (PI.UnitaryGroupMassFormula.BetaLUniq.mem_orth S).1 (show Ω ∈ orth S A.X from ?_) x this
     · rw [h, star_zero]
     · refine (PI.UnitaryGroupMassFormula.BetaLUniq.mem_orth S).2 fun y hy => ?_
       change y ∈ Submodule.span E (Set.range A.e) at hy
@@ -159,7 +176,8 @@ theorem key_X {TA TB : E} (A : FlagG S r TA) (B : FlagG S r TB) (hdet : (Zhat A 
     rw [BwdNA.hsw S A.z Ω, ← fvec_last, hΩ.2]
     simp
   have h1 : S.hT Ω (x + c • (A.z + TA • Ω)) = c * (1 + TA * S.hT Ω Ω) := by
-    rw [map_add (f := _), hΩx, zero_add, map_smul, map_add (f := _), map_smul, hΩz, smul_eq_mul, smul_eq_mul]
+    rw [map_add (f := _), hΩx, zero_add, map_smul, map_add (f := _), map_smul, hΩz, smul_eq_mul,
+      smul_eq_mul]
   rw [h1] at hqΩ
   have hc : c = 0 := (mul_eq_zero.1 hqΩ).resolve_right (norm_om_ne A B hdet hΩ hG)
   rw [hc, zero_smul, add_zero]

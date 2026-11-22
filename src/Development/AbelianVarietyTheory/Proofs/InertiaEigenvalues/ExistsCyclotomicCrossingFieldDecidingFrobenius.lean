@@ -11,8 +11,9 @@ namespace GlobalTheory.ChebCross
 
 variable {F Ω : Type} [Field F] [Field Ω] [Algebra F Ω]
 
-theorem autToPow_eq_iff {m : ℕ} [NeZero m] {ζ : Ω} (hζ : IsPrimitiveRoot ζ m) (f : Ω ≃ₐ[F] Ω)
-    (j : (ZMod m)ˣ) : hζ.autToPow F f = j ↔ f ζ = ζ ^ (j : ZMod m).val := by
+theorem autToPow_eq_iff
+    {m : ℕ} [NeZero m] {ζ : Ω} (hζ : IsPrimitiveRoot ζ m) (f : Ω ≃ₐ[F] Ω) (j : (ZMod m)ˣ)
+    : hζ.autToPow F f = j ↔ f ζ = ζ ^ (j : ZMod m).val := by
   constructor
   · rintro rfl
     exact (hζ.autToPow_spec F f).symm
@@ -21,9 +22,13 @@ theorem autToPow_eq_iff {m : ℕ} [NeZero m] {ζ : Ω} (hζ : IsPrimitiveRoot ζ
     have := hζ.pow_inj (ZMod.val_lt _) (ZMod.val_lt _) h
     exact Units.ext (ZMod.val_injective m this)
 
-theorem exists_fixing [CharZero Ω] [IsAlgClosure F Ω] (L : IntermediateField F Ω) {m : ℕ}
-    [NeZero m] {ζ : Ω} (hζ : IsPrimitiveRoot ζ m) (hirr : Irreducible (cyclotomic m L))
-    (j : (ZMod m)ˣ) : ∃ u : Ω ≃ₐ[F] Ω, u ∈ L.fixingSubgroup ∧ hζ.autToPow F u = j := by
+theorem exists_fixing
+    [CharZero Ω] [IsAlgClosure F Ω]
+    (L : IntermediateField F Ω)
+    {m : ℕ} [NeZero m]
+    {ζ : Ω} (hζ : IsPrimitiveRoot ζ m)
+    (hirr : Irreducible (cyclotomic m L)) (j : (ZMod m)ˣ)
+    : ∃ u : Ω ≃ₐ[F] Ω, u ∈ L.fixingSubgroup ∧ hζ.autToPow F u = j := by
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed F
   haveI : Algebra.IsAlgebraic L Ω := Algebra.IsAlgebraic.tower_top (K := F) L
   haveI : IsAlgClosure L Ω := ⟨inferInstance, inferInstance⟩
@@ -41,10 +46,13 @@ theorem exists_fixing [CharZero Ω] [IsAlgClosure F Ω] (L : IntermediateField F
   · rw [autToPow_eq_iff]
     exact hu
 
-theorem irreducible_of_onto [CharZero Ω] (Z : IntermediateField F Ω) {m : ℕ}
-    [NeZero m] {ζ : Ω} (hζ : IsPrimitiveRoot ζ m)
-    (h : ∀ j : (ZMod m)ˣ, ∃ u : Ω ≃ₐ[F] Ω, u ∈ Z.fixingSubgroup ∧ hζ.autToPow F u = j) :
-    Irreducible (cyclotomic m Z) := by
+theorem irreducible_of_onto
+    [CharZero Ω]
+    (Z : IntermediateField F Ω)
+    {m : ℕ} [NeZero m]
+    {ζ : Ω} (hζ : IsPrimitiveRoot ζ m)
+    (h : ∀ j : (ZMod m)ˣ, ∃ u : Ω ≃ₐ[F] Ω, u ∈ Z.fixingSubgroup ∧ hζ.autToPow F u = j)
+    : Irreducible (cyclotomic m Z) := by
   classical
   haveI : CharZero Z := (algebraMap Z Ω).charZero
   have hm : 0 < m := NeZero.pos m
@@ -73,10 +81,11 @@ theorem irreducible_of_onto [CharZero Ω] (Z : IntermediateField F Ω) {m : ℕ}
   rw [this]
   exact minpoly.irreducible hint
 
-theorem exists_pow_eq_on (M : IntermediateField F Ω) [FiniteDimensional F M] [IsGalois F M]
+theorem exists_pow_eq_on
+    (M : IntermediateField F Ω) [FiniteDimensional F M] [IsGalois F M]
     (h σ : Ω ≃ₐ[F] Ω)
-    (hσ : σ ∈ (M ⊓ IntermediateField.fixedField (Subgroup.zpowers h)).fixingSubgroup) :
-    ∃ k : ℕ, ∀ x ∈ M, σ x = (h ^ k) x := by
+    (hσ : σ ∈ (M ⊓ IntermediateField.fixedField (Subgroup.zpowers h)).fixingSubgroup)
+    : ∃ k : ℕ, ∀ x ∈ M, σ x = (h ^ k) x := by
   let ρ := AlgEquiv.restrictNormalHom (F := F) (K₁ := Ω) M
   have hρ : ∀ (f : Ω ≃ₐ[F] Ω) (x : M), ((ρ f x : M) : Ω) = f x := fun f x =>
     AlgEquiv.restrictNormal_commutes f M x
@@ -103,7 +112,15 @@ theorem exists_pow_eq_on (M : IntermediateField F Ω) [FiniteDimensional F M] [I
   rw [hρ] at this
   exact this.symm
 
-theorem cross : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (L : IntermediateField F Ω) [FiniteDimensional F L] [IsGalois F L] (g : G F Ω) (m : ℕ), m.Prime → Module.finrank F L ∣ m - 1 → Irreducible (cyclotomic m L) → ∃ (Z : IntermediateField F Ω) (τ : (ZMod m)ˣ), FiniteDimensional F Z ∧ Irreducible (cyclotomic m Z) ∧ ∀ σ : G F Ω, σ ∈ Z.fixingSubgroup → (∀ ζ : Ω, ζ ^ m = 1 → σ ζ = ζ ^ (τ : ZMod m).val) → σ * g⁻¹ ∈ L.fixingSubgroup := by
+theorem cross
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+        (L : IntermediateField F Ω) [FiniteDimensional F L] [IsGalois F L] (g : G F Ω) (m : ℕ),
+      m.Prime → Module.finrank F L ∣ m - 1 → Irreducible (cyclotomic m L)
+        → ∃ (Z : IntermediateField F Ω) (τ : (ZMod m)ˣ),
+          FiniteDimensional F Z ∧ Irreducible (cyclotomic m Z)
+            ∧ ∀ σ : G F Ω,
+              σ ∈ Z.fixingSubgroup → (∀ ζ : Ω, ζ ^ m = 1 → σ ζ = ζ ^ (τ : ZMod m).val)
+                → σ * g⁻¹ ∈ L.fixingSubgroup := by
   intro F Ω _ _ _ _ _ L _ _ g m hm hdiv hirr
   haveI : Fact m.Prime := ⟨hm⟩
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed F
@@ -123,8 +140,7 @@ theorem cross : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra 
   haveI : IsGalois F M := { }
   have hζM : ζ ∈ M := (le_sup_right : _ ≤ M) (IntermediateField.mem_adjoin_simple_self F ζ)
   refine ⟨M ⊓ IntermediateField.fixedField (Subgroup.zpowers h), τ, ?_, ?_, ?_⟩
-  · exact Module.Finite.of_injective
-      (IntermediateField.inclusion (inf_le_left : _ ≤ M)).toLinearMap
+  · exact Module.Finite.of_injective (IntermediateField.inclusion (inf_le_left : _ ≤ M)).toLinearMap
       (IntermediateField.inclusion_injective inf_le_left)
   · refine irreducible_of_onto _ hζ fun j => ?_
     obtain ⟨n, rfl⟩ := hτ j
@@ -140,8 +156,7 @@ theorem cross : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra 
     rw [map_pow, hχ] at h1
     have hord : orderOf τ = m - 1 := by
       rw [orderOf_eq_card_of_forall_mem_zpowers hτ, Nat.card_eq_fintype_card, ZMod.card_units]
-    have hmod : k ≡ 1 [MOD m - 1] := by
-      rw [← hord, ← pow_eq_pow_iff_modEq, h1, pow_one]
+    have hmod : k ≡ 1 [MOD m - 1] := by rw [← hord, ← pow_eq_pow_iff_modEq, h1, pow_one]
     let ρ := AlgEquiv.restrictNormalHom (F := F) (K₁ := Ω) L
     have hρ : ∀ (f : Ω ≃ₐ[F] Ω) (x : L), ((ρ f x : L) : Ω) = f x := fun f x =>
       AlgEquiv.restrictNormal_commutes f L x

@@ -12,8 +12,8 @@ namespace GlobalTheory
 
 namespace OrderNorm
 
-theorem length_quot_ringEquiv {T U : Type*} [CommRing T] [CommRing U] (e : T ≃+* U) (x : T) :
-    Module.length T (T ⧸ Ideal.span {x}) = Module.length U (U ⧸ Ideal.span {e x}) := by
+theorem length_quot_ringEquiv {T U : Type*} [CommRing T] [CommRing U] (e : T ≃+* U) (x : T)
+    : Module.length T (T ⧸ Ideal.span {x}) = Module.length U (U ⧸ Ideal.span {e x}) := by
   let _ : Algebra T U := e.toRingHom.toAlgebra
   let f : T ≃ₐ[T] U := AlgEquiv.ofRingEquiv (f := e) (fun _ => rfl)
   have hI : Ideal.span {e x} = (Ideal.span {x}).map (f : T →+* U) := by

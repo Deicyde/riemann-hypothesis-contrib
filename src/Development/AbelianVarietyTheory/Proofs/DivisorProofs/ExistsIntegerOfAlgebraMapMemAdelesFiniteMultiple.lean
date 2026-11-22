@@ -12,8 +12,9 @@ open Formalism.IndefR.DatumF GlobalTheory.HeckeExtend
 
 namespace GlobalTheory.HeckeExtend
 
-theorem exists_int_of_mem_intF : ∀ (F : Type) [Field F] [NumberField F] (y : F) (m : ℕ), 0 < m →
-    algebraMap F (AF F) y ∈ intF F m → ∃ r : 𝓞 F, y = m * r := by
+theorem exists_int_of_mem_intF
+    : ∀ (F : Type) [Field F] [NumberField F] (y : F) (m : ℕ),
+      0 < m → algebraMap F (AF F) y ∈ intF F m → ∃ r : 𝓞 F, y = m * r := by
   intro F _ _ y m hm hy
   obtain ⟨c, hc, e⟩ := hy
   have hmF : (m : F) ≠ 0 := Nat.cast_ne_zero.2 hm.ne'
@@ -35,7 +36,8 @@ theorem exists_int_of_mem_intF : ∀ (F : Type) [Field F] [NumberField F] (y : F
     have hv0 : v.valuation F (m : F) ≠ 0 := (Valuation.ne_zero_iff _).2 hmF
     rw [map_div₀, h2, mul_div_cancel_left₀ _ hv0]
     exact (HeightOneSpectrum.mem_adicCompletionIntegers (𝓞 F) F v).1 (hc v)
-  obtain ⟨r, hr⟩ := HeightOneSpectrum.mem_integers_of_valuation_le_one (R := 𝓞 F) F (y / (m : F)) key
+  obtain ⟨r, hr⟩ :=
+    HeightOneSpectrum.mem_integers_of_valuation_le_one (R := 𝓞 F) F (y / (m : F)) key
   refine ⟨r, ?_⟩
   have : ((r : 𝓞 F) : F) = y / m := hr
   rw [this, mul_div_cancel₀ _ hmF]

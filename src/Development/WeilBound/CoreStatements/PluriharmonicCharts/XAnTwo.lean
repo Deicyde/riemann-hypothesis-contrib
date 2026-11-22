@@ -9,14 +9,19 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.AnalyticSystem
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights
 open scoped ComplexOrder
 
 namespace PositivityTheory.Xgp.an_two
 
-theorem locUnif {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X) (s : X → X → ℂ)
-    (hO : IsOpen (bdry s)ᶜ) (ph : X → ℝ) (phT : ℝ → X → ℝ) (h : IsRegFamilyC2 A s ph phT) :
-    TendstoLocallyUniformlyOn phT ph (𝓝[>] 0) (bdry s)ᶜ := by
+theorem locUnif
+    {e : ℕ} {X : Type} [TopologicalSpace X]
+    (A : FinHolAtlas e X)
+    (s : X → X → ℂ) (hO : IsOpen (bdry s)ᶜ)
+    (ph : X → ℝ) (phT : ℝ → X → ℝ) (h : IsRegFamilyC2 A s ph phT)
+    : TendstoLocallyUniformlyOn phT ph (𝓝[>] 0) (bdry s)ᶜ := by
   intro u hu x hx
   obtain ⟨j, hj⟩ := A.cover x
   set c := A.chart j with hc
@@ -41,8 +46,9 @@ theorem locUnif {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X) 
     rw [← hc, e] at this
     exact this
 
-theorem mInt_zero {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X) (Φ : Fin e → LocPot X) :
-    mInt A Φ (fun _ => 0) = 0 := by
+theorem mInt_zero
+    {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X) (Φ : Fin e → LocPot X)
+    : mInt A Φ (fun _ => 0) = 0 := by
   unfold mInt
   split_ifs
   · simp [integralWith]
@@ -50,15 +56,27 @@ theorem mInt_zero {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X
 
 end PositivityTheory.Xgp.an_two
 
-theorem PositivityTheory.Xgp.t_an_two : ConvergenceSignedStatement → ∀ (e : ℕ) (σ : Type) (S : AnSys e (σ ⊕ σ)) (d : σ → S.X → ℝ), (∀ a, S.A.Smooth (d a)) → (∀ a, ∀ y ∈ S.open', S.ph (Sum.inl a) y = S.ph (Sum.inr a) y + d a y) → ∀ (a : σ) (w : Fin e → σ ⊕ σ), Tendsto (fun t => mInt S.A (fun i => S.potT (w i) t) (fun x => S.phT (Sum.inl a) t x - S.phT (Sum.inr a) t x - d a x)) (𝓝[>] 0) (𝓝 0) := by
+theorem PositivityTheory.Xgp.t_an_two
+    : ConvergenceSignedStatement
+      → ∀ (e : ℕ) (σ : Type) (S : AnSys e (σ ⊕ σ)) (d : σ → S.X → ℝ),
+        (∀ a, S.A.Smooth (d a))
+          → (∀ a, ∀ y ∈ S.open', S.ph (Sum.inl a) y = S.ph (Sum.inr a) y + d a y)
+          → ∀ (a : σ) (w : Fin e → σ ⊕ σ),
+            Tendsto
+              (fun t =>
+                mInt S.A
+                  (fun i => S.potT (w i) t)
+                  (fun x => S.phT (Sum.inl a) t x - S.phT (Sum.inr a) t x - d a x))
+              (𝓝[>] 0) (𝓝 0) := by
   intro hC e σ S d hd hdiff a w
   letI : MeasurableSpace S.X := borel S.X
   haveI : BorelSpace S.X := ⟨rfl⟩
   have ht0 : 0 < S.t₀ := (S.reg (Sum.inl a)).1
   let f : ℝ → S.X → ℝ := fun t x => S.phT (Sum.inl a) t x - S.phT (Sum.inr a) t x - d a x
   let gT : ℝ → S.X → ℝ := fun t => if 0 < t ∧ t ≤ S.t₀ then f t else 0
-  obtain ⟨M, hM⟩ := (isCompact_univ (X := S.X)).exists_bound_of_continuousOn
-    (projLine_continuous_of_smooth S.A (hd a)).continuousOn
+  obtain ⟨M, hM⟩ :=
+    (isCompact_univ (X := S.X)).exists_bound_of_continuousOn
+      (projLine_continuous_of_smooth S.A (hd a)).continuousOn
   set L : S.X → ℝ := fun y => Real.log (rW S.L S.s y) with hL
   have hL1 : ∀ y, 1 ≤ L y := by
     intro y
@@ -67,8 +85,8 @@ theorem PositivityTheory.Xgp.t_an_two : ConvergenceSignedStatement → ∀ (e : 
       simp only [rW]
       linarith
     exact (Real.le_log_iff_exp_le ((Real.exp_pos 1).trans_le h1)).mpr h1
-  have hphT : ∀ b, ∀ t, 0 < t → t ≤ S.t₀ → ∀ y ∉ bdry S.s,
-      |S.phT b t y| ≤ |S.C| + |S.C₅| * L y := by
+  have hphT
+      : ∀ b, ∀ t, 0 < t → t ≤ S.t₀ → ∀ y ∉ bdry S.s, |S.phT b t y| ≤ |S.C| + |S.C₅| * L y := by
     intro b t ht ht' y hy
     obtain ⟨-, -, hr⟩ := S.reg b
     obtain ⟨-, hup, hlow, -⟩ := hr t ht ht'
@@ -132,15 +150,21 @@ theorem PositivityTheory.Xgp.t_an_two : ConvergenceSignedStatement → ∀ (e : 
     · have e1 : gT t = 0 := if_neg hp
       rw [e1, Pi.zero_apply, abs_zero]
       exact mul_nonneg hC6 (zero_le_one.trans hLy)
-  have hO : IsOpen (bdry S.s)ᶜ := (ReciprocityTheory.AnForm.P.LeviFormBoundaryTopology.isClosed_bdry S.sec).isOpen_compl
+  have hO : IsOpen (bdry S.s)ᶜ :=
+    (ReciprocityTheory.AnForm.P.LeviFormBoundaryTopology.isClosed_bdry S.sec).isOpen_compl
   have hlim : TendstoLocallyUniformlyOn gT 0 (𝓝[>] 0) (bdry S.s)ᶜ := by
     rw [Metric.tendstoLocallyUniformlyOn_iff]
     intro ε hε x hx
-    obtain ⟨t1, ht1, ev1⟩ := Metric.tendstoLocallyUniformlyOn_iff.mp
-      (PositivityTheory.Xgp.an_two.locUnif S.A S.s hO _ _ (S.c2 (Sum.inl a))) (ε / 2) (half_pos hε) x hx
-    obtain ⟨t2, ht2, ev2⟩ := Metric.tendstoLocallyUniformlyOn_iff.mp
-      (PositivityTheory.Xgp.an_two.locUnif S.A S.s hO _ _ (S.c2 (Sum.inr a))) (ε / 2) (half_pos hε) x hx
-    refine ⟨t1 ∩ t2 ∩ (bdry S.s)ᶜ, Filter.inter_mem (Filter.inter_mem ht1 ht2) self_mem_nhdsWithin, ?_⟩
+    obtain ⟨t1, ht1, ev1⟩ :=
+      Metric.tendstoLocallyUniformlyOn_iff.mp
+        (PositivityTheory.Xgp.an_two.locUnif S.A S.s hO _ _ (S.c2 (Sum.inl a))) (ε / 2)
+        (half_pos hε) x hx
+    obtain ⟨t2, ht2, ev2⟩ :=
+      Metric.tendstoLocallyUniformlyOn_iff.mp
+        (PositivityTheory.Xgp.an_two.locUnif S.A S.s hO _ _ (S.c2 (Sum.inr a))) (ε / 2)
+        (half_pos hε) x hx
+    refine
+      ⟨t1 ∩ t2 ∩ (bdry S.s)ᶜ, Filter.inter_mem (Filter.inter_mem ht1 ht2) self_mem_nhdsWithin, ?_⟩
     filter_upwards [ev1, ev2, Ioo_mem_nhdsGT ht0] with t e1 e2 htt y hy
     have e3 : gT t = f t := if_pos ⟨htt.1, htt.2.le⟩
     have hdy := hdiff a y hy.2
@@ -156,9 +180,16 @@ theorem PositivityTheory.Xgp.t_an_two : ConvergenceSignedStatement → ∀ (e : 
       linarith
     · show 0 - (S.phT (Sum.inl a) t y - S.phT (Sum.inr a) t y - d a y) < ε
       linarith
-  have key := (hC S.A S.Θ S.L S.s S.m S.W S.potΘ S.posΘ S.potL S.sec S.snc S.norm_le
-    (fun i => S.th (w i)) (fun i => S.ph (w i)) (fun i => S.phT (w i)) S.C₅ S.C S.t₀
-    (fun i => S.sing (w i)) (fun i => S.reg (w i)) (fun i => S.c2 (w i)) 0 gT C₆ hcont hbound hlim).2
+  have key :=
+    (hC S.A S.Θ S.L S.s S.m S.W S.potΘ S.posΘ S.potL S.sec S.snc S.norm_le
+      (fun i => S.th (w i))
+      (fun i => S.ph (w i))
+      (fun i => S.phT (w i))
+      S.C₅ S.C S.t₀
+      (fun i => S.sing (w i))
+      (fun i => S.reg (w i))
+      (fun i => S.c2 (w i))
+      0 gT C₆ hcont hbound hlim).2
   have hz : mInt S.A (fun i => S.th (w i) + LocPot.ofFun (S.ph (w i))) 0 = 0 :=
     PositivityTheory.Xgp.an_two.mInt_zero _ _
   rw [hz] at key

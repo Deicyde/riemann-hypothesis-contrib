@@ -17,15 +17,19 @@ variable {n : ℕ}
 
 section LayerWeight
 
-variable {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M] {ε : Fin n → Bool}
-  {E : Fin n → Fin n → Module.End ℂ M} {V : Submodule ℂ M} {lam : Fin n → ℝ}
+variable
+  {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
+  {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} {V : Submodule ℂ M} {lam : Fin n → ℝ}
 
-theorem lift_layer (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hVfd : FiniteDimensional ℂ V)
-    (hVk : IsKStableSub ε E V) {k : ℕ} {w : M} (hw : w ∈ layer ε E V (k + 1))
-    (hperp : ∀ u ∈ layer ε E V k, inner ℂ u w = 0) {μ : Fin n → ℝ} (hμ : IsKHWVec ε E μ w)
-    (hw0 : w ≠ 0) :
-    ∃ P ∈ ncV ε V (k + 1), P ≠ 0 ∧ IsKHWVec ε (bAct E (k + 1)) μ P ∧
-      ∀ F ∈ ncV ε V (k + 1), phi E (k + 1) F ∈ layer ε E V k → inner ℂ F P = 0 := by
+theorem lift_layer
+    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hVfd : FiniteDimensional ℂ V)
+    (hVk : IsKStableSub ε E V)
+    {k : ℕ} {w : M} (hw : w ∈ layer ε E V (k + 1)) (hperp : ∀ u ∈ layer ε E V k, inner ℂ u w = 0)
+    {μ : Fin n → ℝ} (hμ : IsKHWVec ε E μ w)
+    (hw0 : w ≠ 0)
+    : ∃ P ∈ ncV ε V (k + 1),
+      P ≠ 0 ∧ IsKHWVec ε (bAct E (k + 1)) μ P
+        ∧ ∀ F ∈ ncV ε V (k + 1), phi E (k + 1) F ∈ layer ε E V k → inner ℂ F P = 0 := by
   classical
   set Lk := layer ε E V k with hLk
   haveI : FiniteDimensional ℂ Lk := finiteDimensional_layer (ε := ε) (E := E) hVfd k
@@ -77,10 +81,12 @@ theorem lift_layer (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hVfd : FiniteDimen
     rw [← sub_eq_zero]
     apply hzero
     · rw [hΨ, hΨ, wordContraction_tensorAction hE, map_sub]
-      have e : E a b (phi E (k + 1) H) - Lk.starProjection (E a b (phi E (k + 1) H)) -
-          (E a b (phi E (k + 1) H) - E a b (Lk.starProjection (phi E (k + 1) H))) =
-          E a b (Lk.starProjection (phi E (k + 1) H)) -
-            Lk.starProjection (E a b (phi E (k + 1) H)) := by abel
+      have e
+          : E a b (phi E (k + 1) H) - Lk.starProjection (E a b (phi E (k + 1) H))
+              - (E a b (phi E (k + 1) H) - E a b (Lk.starProjection (phi E (k + 1) H)))
+            = E a b (Lk.starProjection (phi E (k + 1) H))
+              - Lk.starProjection (E a b (phi E (k + 1) H)) := by
+        abel
       rw [e]
       exact Lk.sub_mem (hLkK a b hab _ (hPmem _)) (hPmem _)
     · exact Lkᗮ.sub_mem (hΨo _) (hLkoK a b hab _ (hΨo _))
@@ -88,7 +94,8 @@ theorem lift_layer (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hVfd : FiniteDimen
     intro H hHo hHN h0
     have hphi : phi E (k + 1) H ∈ Lk := by
       rw [hΨ, sub_eq_zero] at h0
-      rw [h0]; exact hPmem _
+      rw [h0]
+      exact hPmem _
     have hm : H ∈ U ⊓ Uᗮ := ⟨⟨hHN, hphi⟩, hHo⟩
     rw [Submodule.inf_orthogonal_eq_bot, Submodule.mem_bot] at hm
     exact hm
@@ -106,11 +113,12 @@ theorem lift_layer (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hVfd : FiniteDimen
     apply hzero
     · rw [hΨ, hG, map_sub, ← hly]
       have hpu : phi E (k + 1) (U.starProjection G0) ∈ Lk := hUmem.2
-      have e : phi E (k + 1) G0 - phi E (k + 1) (U.starProjection G0) -
-          Lk.starProjection (phi E (k + 1) G0 - phi E (k + 1) (U.starProjection G0)) -
-          (l + phi E (k + 1) G0) =
-          -(phi E (k + 1) (U.starProjection G0)) -
-            Lk.starProjection (phi E (k + 1) G0 - phi E (k + 1) (U.starProjection G0)) - l := by
+      have e
+          : phi E (k + 1) G0 - phi E (k + 1) (U.starProjection G0)
+              - Lk.starProjection (phi E (k + 1) G0 - phi E (k + 1) (U.starProjection G0))
+              - (l + phi E (k + 1) G0)
+            = -(phi E (k + 1) (U.starProjection G0))
+              - Lk.starProjection (phi E (k + 1) G0 - phi E (k + 1) (U.starProjection G0)) - l := by
         abel
       rw [e]
       exact Lk.sub_mem (Lk.sub_mem (Lk.neg_mem hpu) (hPmem _)) hl
@@ -134,10 +142,11 @@ theorem lift_layer (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hVfd : FiniteDimen
     rw [Submodule.mem_orthogonal] at hGo
     exact hGo F ⟨hF, hphi⟩
 
-theorem khw_layer_weight (hE : IsGlRep E) (hU : IsInfUnitary ε E)
-    (hV : IsKIrrHW ε E (lowK ε lam) V) (k : ℕ) {μ : Fin n → ℝ} {w : M}
-    (hw : w ∈ layer ε E V k) (hw0 : w ≠ 0) (hμ : IsKHWVec ε E μ w) :
-    ∃ j ≤ k, IsNCSum ε j (μ - lowK ε lam) := by
+theorem khw_layer_weight
+    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
+    (k : ℕ)
+    {μ : Fin n → ℝ} {w : M} (hw : w ∈ layer ε E V k) (hw0 : w ≠ 0) (hμ : IsKHWVec ε E μ w)
+    : ∃ j ≤ k, IsNCSum ε j (μ - lowK ε lam) := by
   classical
   obtain ⟨w₀, hw₀V, hw₀, ws, hsum, hws⟩ := layer_khw_decomp hE hU hV.1 hV.2.1 hw hμ
   by_cases h0 : w₀ = 0
@@ -151,8 +160,7 @@ theorem khw_layer_weight (hE : IsGlRep E) (hU : IsInfUnitary ε E)
     obtain ⟨hj1, hj2, hj3⟩ := hws j
     obtain ⟨P, hPN, hP0, hPk, -⟩ := lift_layer hE hU hV.1 hV.2.1 hj1 hj2 hj3 hj
     exact ⟨(j : ℕ) + 1, by omega, khw_big_weight hE hV hPN hP0 hPk⟩
-  ·
-    let F : Big n 0 M := WithLp.toLp 2 (fun _ => w₀)
+  · let F : Big n 0 M := WithLp.toLp 2 (fun _ => w₀)
     have hF : ∀ κ, F κ = w₀ := fun κ => rfl
     have hFN : F ∈ ncV ε V 0 := by
       rw [mem_ncV_iff]

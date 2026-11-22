@@ -7,7 +7,9 @@ public import ReciprocityTheory.L2DbarEstimates.NormFibrations.MvBlowup
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.Up.ExtFPf
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory Topology Metric
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory
+  Topology Metric
 open scoped ENNReal Matrix
 
 noncomputable section
@@ -24,39 +26,55 @@ theorem haar_frame (X : Data E r) : (volume : Measure (Frame X.Ψ r)).IsAddHaarM
     rw [volume_pi]; exact Measure.pi.isAddHaarMeasure _
   haveI h2 : (volume : Measure (Fin r → Fin r → ℂ)).IsAddHaarMeasure := by
     rw [volume_pi]; exact Measure.pi.isAddHaarMeasure _
-  rw [volume_pi]; exact Measure.pi.isAddHaarMeasure _
+  rw [volume_pi]
+  exact Measure.pi.isAddHaarMeasure _
 
-theorem vol_eq (X : Data E r) :
-    ∃ c : ℝ≥0∞, c < ⊤ ∧ (volume : Measure (V (Module.finrank ℂ (Frame X.Ψ r)))) =
-      c • Measure.map (chartE X).toHomeomorph.toMeasurableEquiv volume := by
+theorem vol_eq (X : Data E r)
+    : ∃ c : ℝ≥0∞,
+      c < ⊤
+        ∧ (volume : Measure (V (Module.finrank ℂ (Frame X.Ψ r))))
+          = c • Measure.map (chartE X).toHomeomorph.toMeasurableEquiv volume := by
   haveI := haar_frame X
   haveI : (Measure.map (chartE X) (volume : Measure (Frame X.Ψ r))).IsAddHaarMeasure :=
     (chartE X).isAddHaarMeasure_map volume
-  have h := Measure.isAddLeftInvariant_eq_smul (volume : Measure (V (Module.finrank ℂ (Frame X.Ψ r))))
-    (Measure.map (chartE X) (volume : Measure (Frame X.Ψ r)))
-  refine ⟨(volume : Measure (V (Module.finrank ℂ (Frame X.Ψ r)))).addHaarScalarFactor
-    (Measure.map (chartE X) volume), ENNReal.coe_lt_top, ?_⟩
-  calc (volume : Measure (V (Module.finrank ℂ (Frame X.Ψ r)))) = _ := h
+  have h :=
+    Measure.isAddLeftInvariant_eq_smul (volume : Measure (V (Module.finrank ℂ (Frame X.Ψ r))))
+      (Measure.map (chartE X) (volume : Measure (Frame X.Ψ r)))
+  refine ⟨
+    (volume : Measure (V (Module.finrank ℂ (Frame X.Ψ r)))).addHaarScalarFactor
+      (Measure.map (chartE X) volume),
+    ENNReal.coe_lt_top,
+    ?_
+  ⟩
+  calc
+    (volume : Measure (V (Module.finrank ℂ (Frame X.Ψ r))))
+      = _ := h
     _ = _ := by rw [ENNReal.smul_def]; rfl
 
-theorem lint_transfer (X : Data E r) (S : Set (V (Module.finrank ℂ (Frame X.Ψ r))))
-    (g : V (Module.finrank ℂ (Frame X.Ψ r)) → ℝ≥0∞) :
-    ∃ c : ℝ≥0∞, c < ⊤ ∧ ∫⁻ y in S, g y = c * ∫⁻ x in (chartE X) ⁻¹' S, g (chartE X x) := by
+theorem lint_transfer
+    (X : Data E r)
+    (S : Set (V (Module.finrank ℂ (Frame X.Ψ r)))) (g : V (Module.finrank ℂ (Frame X.Ψ r)) → ℝ≥0∞)
+    : ∃ c : ℝ≥0∞, c < ⊤ ∧ ∫⁻ y in S, g y = c * ∫⁻ x in (chartE X) ⁻¹' S, g (chartE X x) := by
   obtain ⟨c, hc, hv⟩ := vol_eq X
   refine ⟨c, hc, ?_⟩
-  rw [hv, Measure.restrict_smul, lintegral_smul_measure, MeasurableEquiv.restrict_map, lintegral_map_equiv]
+  rw [hv, Measure.restrict_smul, lintegral_smul_measure, MeasurableEquiv.restrict_map,
+    lintegral_map_equiv]
   rfl
 
 variable {x0 : Frame X.Ψ r} (D : LUData X x0) (la : Wt X.Ψ r) (F : V (nd X) → ℂ)
 
-theorem local_ext (hM : FrameMeasStatement (E := E)) (hx0 : IsOrth X x0)
-    (hF : DifferentiableOn ℂ F (OmF X x0))
-    (hL2 : ∀ C : Set (Frame X.Ψ r), IsCompact C → C ⊆ X.dom →
-      ∫⁻ z in sat X x0 C, ENNReal.ofReal (‖F z‖ ^ 2 * Real.exp (-phla X la (cpt X x0 z))) ∂muF X x0 < ⊤)
-    {x : Frame X.Ψ r} (hx : x ∈ X.dom) :
-    ∃ ρ > 0, (∀ y, chartE X y ∈ closedBall (chartE X x) ρ → y ∈ X.dom) ∧
-      ∃ U : V (Module.finrank ℂ (Frame X.Ψ r)) → ℂ, DifferentiableOn ℂ U (ball (chartE X x) ρ) ∧
-        ∀ y, chartE X y ∈ ball (chartE X x) ρ → D.Δ y ≠ 0 → U (chartE X y) = P0 D la F y := by
+theorem local_ext
+    (hM : FrameMeasStatement (E := E)) (hx0 : IsOrth X x0) (hF : DifferentiableOn ℂ F (OmF X x0))
+    (hL2 : ∀ C : Set (Frame X.Ψ r),
+      IsCompact C → C ⊆ X.dom
+        → ∫⁻ z in sat X x0 C, ENNReal.ofReal (‖F z‖ ^ 2 * Real.exp (-phla X la (cpt X x0 z))) ∂muF X x0
+          < ⊤)
+    {x : Frame X.Ψ r} (hx : x ∈ X.dom)
+    : ∃ ρ > 0,
+      (∀ y, chartE X y ∈ closedBall (chartE X x) ρ → y ∈ X.dom)
+        ∧ ∃ U : V (Module.finrank ℂ (Frame X.Ψ r)) → ℂ,
+          DifferentiableOn ℂ U (ball (chartE X x) ρ)
+            ∧ ∀ y, chartE X y ∈ ball (chartE X x) ρ → D.Δ y ≠ 0 → U (chartE X y) = P0 D la F y := by
   have hO : IsOpen ((chartE X).symm ⁻¹' X.dom) :=
     (FourierCoefficientDomain.isOpen_dom X).preimage (chartE X).symm.continuous
   obtain ⟨ε, hε, hball⟩ := Metric.isOpen_iff.mp hO (chartE X x) (by simpa using hx)
@@ -68,38 +86,47 @@ theorem local_ext (hM : FrameMeasStatement (E := E)) (hx0 : IsOrth X x0)
     (chartE X).toHomeomorph.isCompact_preimage.mpr (isCompact_closedBall _ _)
   have hCd : (chartE X) ⁻¹' closedBall (chartE X x) (ε / 2) ⊆ X.dom := fun y hy => hsub y hy
   have hint := poincareLift_locally_squareIntegrable D la F hM hx0 hF hL2 hC hCd
-  obtain ⟨c, hc, htr⟩ := lint_transfer X (closedBall (chartE X x) (ε / 2))
-    (fun w => ENNReal.ofReal (‖P0 D la F ((chartE X).symm w)‖ ^ 2))
-  have hfin : ∫⁻ w in ball (chartE X x) (ε / 2) \ {w | D.Δ ((chartE X).symm w) = 0},
-      ENNReal.ofReal (‖P0 D la F ((chartE X).symm w)‖ ^ 2) < ⊤ := by
+  obtain ⟨c, hc, htr⟩ :=
+    lint_transfer X (closedBall (chartE X x) (ε / 2))
+      (fun w => ENNReal.ofReal (‖P0 D la F ((chartE X).symm w)‖ ^ 2))
+  have hfin
+      : ∫⁻ w in ball (chartE X x) (ε / 2) \ {w | D.Δ ((chartE X).symm w) = 0},
+          ENNReal.ofReal (‖P0 D la F ((chartE X).symm w)‖ ^ 2)
+        < ⊤ := by
     refine lt_of_le_of_lt (lintegral_mono_set (Set.sdiff_subset.trans ball_subset_closedBall)) ?_
     rw [htr]
     simp only [ContinuousLinearEquiv.symm_apply_apply]
     exact ENNReal.mul_lt_top hc hint
   have hΔd : DifferentiableOn ℂ (fun w => D.Δ ((chartE X).symm w)) (ball (chartE X x) (ε / 2)) :=
     (D.hΔ.comp (chartE X).symm.differentiable).differentiableOn
-  have hud : DifferentiableOn ℂ (fun w => P0 D la F ((chartE X).symm w))
+  have hud : DifferentiableOn ℂ
+      (fun w => P0 D la F ((chartE X).symm w))
       (ball (chartE X x) (ε / 2) \ {w | D.Δ ((chartE X).symm w) = 0}) := by
-    refine (poincareLift_differentiableOn D la F hF).comp (chartE X).symm.differentiable.differentiableOn fun w hw => ?_
+    refine (poincareLift_differentiableOn D la F hF).comp
+      (chartE X).symm.differentiable.differentiableOn fun w hw => ?_
     refine ⟨hsub _ ?_, hw.2⟩
     simpa using ball_subset_closedBall hw.1
-  obtain ⟨U, hU, hUe⟩ := ReciprocityTheory.L2DbarEstimates.ext _ (chartE X x) (ε / 2) _ _ hΔd hud hfin
+  obtain ⟨U, hU, hUe⟩ :=
+    ReciprocityTheory.L2DbarEstimates.ext _ (chartE X x) (ε / 2) _ _ hΔd hud hfin
   refine ⟨U, hU, fun y hy hΔ => ?_⟩
   have := hUe ⟨hy, by simpa using hΔ⟩
   simpa using this
 
 theorem dense_cell {x : Frame X.Ψ r} (hx : x ∈ X.dom) : x ∈ closure (cell D) := by
   have hmat : ∀ τ : X.Ψ, Continuous fun x : Frame X.Ψ r => mat x τ := fun τ =>
-    continuous_pi fun i => continuous_pi fun j =>
-      (continuous_apply j).comp ((continuous_apply i).comp (continuous_apply τ))
+    continuous_pi fun i =>
+      continuous_pi fun j =>
+        (continuous_apply j).comp ((continuous_apply i).comp (continuous_apply τ))
   have hgram : ∀ τ : X.Ψ, Continuous fun x : Frame X.Ψ r => gram τ.1 X.Gm (mat x τ) := by
     intro τ
     refine continuous_pi fun a => continuous_pi fun b => ?_
     simp only [gram, Matrix.of_apply, hermC, col, mat, starRingEnd_apply]
     fun_prop
   have hopen : IsOpen X.dom := by
-    have e : X.dom = ⋂ τ : X.Ψ, ({x | (mat x τ).det ≠ 0} ∩
-        ⋂ i : Fin (r + 1), {x | 0 < psgn X.p0 i * (dmin X.Gm x τ i).re}) := by
+    have e
+        : X.dom
+          = ⋂ τ : X.Ψ, ({x | (mat x τ).det ≠ 0} ∩
+            ⋂ i : Fin (r + 1), {x | 0 < psgn X.p0 i * (dmin X.Gm x τ i).re}) := by
       ext x; simp [Data.dom, GG]
     rw [e]
     refine isOpen_iInter_of_finite fun τ => IsOpen.inter ?_ (isOpen_iInter_of_finite fun i => ?_)
@@ -110,7 +137,11 @@ theorem dense_cell {x : Frame X.Ψ r} (hx : x ∈ X.dom) : x ∈ closure (cell D
   intro ε hε
   obtain ⟨δ, hδ, hball⟩ := Metric.isOpen_iff.1 hopen x hx
   obtain ⟨y, hy, hΔ⟩ := D.dense x hx (min ε δ) (lt_min hε hδ)
-  refine ⟨y, (show y ∈ X.dom ∧ D.Δ y ≠ 0 from ⟨hball (Metric.ball_subset_ball (min_le_right _ _) hy), hΔ⟩), ?_⟩
+  refine ⟨
+    y,
+    (show y ∈ X.dom ∧ D.Δ y ≠ 0 from ⟨hball (Metric.ball_subset_ball (min_le_right _ _) hy), hΔ⟩),
+    ?_
+  ⟩
   rw [dist_comm]
   exact lt_of_lt_of_le (Metric.mem_ball.1 hy) (min_le_left _ _)
 
@@ -125,22 +156,23 @@ end ReciprocityTheory.ChartRestriction.G.AR.Up.ExtFPf
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.Up
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory Topology Metric
-  ReciprocityTheory.ChartRestriction.G.AR.Up.ExtFPf
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates MeasureTheory
+  Topology Metric ReciprocityTheory.ChartRestriction.G.AR.Up.ExtFPf
 open scoped ENNReal Matrix
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem extF_of (hLU : LUStatement (E := E)) (hM : FrameMeasStatement (E := E)) :
-    ExtFStatement (E := E) := by
+theorem extF_of (hLU : LUStatement (E := E)) (hM : FrameMeasStatement (E := E))
+    : ExtFStatement (E := E) := by
   intro r X x0 hx0 la F hF hL2
   obtain ⟨D⟩ := luData_of hLU X x0 hx0
   have hloc := fun (x : Frame X.Ψ r) (hx : x ∈ X.dom) => local_ext D la F hM hx0 hF hL2 hx
   choose ρ hρ hsub U hU hUeq using hloc
   classical
-
-  have hagree : ∀ x (hx : x ∈ X.dom) y (hy : y ∈ X.dom) w, w ∈ ball (chartE X x) (ρ x hx) →
-      w ∈ ball (chartE X y) (ρ y hy) → U x hx w = U y hy w := by
+  have hagree
+      : ∀ x (hx : x ∈ X.dom) y (hy : y ∈ X.dom) w,
+        w ∈ ball (chartE X x) (ρ x hx) → w ∈ ball (chartE X y) (ρ y hy) → U x hx w = U y hy w := by
     intro x hx y hy w hwx hwy
     set T := ball (chartE X x) (ρ x hx) ∩ ball (chartE X y) (ρ y hy) with hT
     set s := T ∩ {w | D.Δ ((chartE X).symm w) ≠ 0} with hs
@@ -165,23 +197,32 @@ theorem extF_of (hLU : LUStatement (E := E)) (hM : FrameMeasStatement (E := E)) 
         have h1 : dist w' (chartE X y') = ‖(chartE X) ((chartE X).symm w' - y')‖ := by
           rw [map_sub, ContinuousLinearEquiv.apply_symm_apply, dist_eq_norm]
         rw [h1]
-        calc ‖(chartE X) ((chartE X).symm w' - y')‖
-            ≤ ‖((chartE X) : Frame X.Ψ r →L[ℂ] V (Module.finrank ℂ (Frame X.Ψ r)))‖ *
-                ‖(chartE X).symm w' - y'‖ :=
-              ((chartE X) : Frame X.Ψ r →L[ℂ] V (Module.finrank ℂ (Frame X.Ψ r))).le_opNorm _
-          _ ≤ ‖((chartE X) : Frame X.Ψ r →L[ℂ] V (Module.finrank ℂ (Frame X.Ψ r)))‖ *
-                (min δ δ0 / κ) := by
-              gcongr
-              rw [← dist_eq_norm, dist_comm]
-              exact (mem_ball.mp hy').le
+        calc
+          ‖(chartE X) ((chartE X).symm w' - y')‖
+              ≤ ‖((chartE X) : Frame X.Ψ r →L[ℂ] V (Module.finrank ℂ (Frame X.Ψ r)))‖
+                * ‖(chartE X).symm w' - y'‖ :=
+            ((chartE X) : Frame X.Ψ r →L[ℂ] V (Module.finrank ℂ (Frame X.Ψ r))).le_opNorm _
+          _ ≤ ‖((chartE X) : Frame X.Ψ r →L[ℂ] V (Module.finrank ℂ (Frame X.Ψ r)))‖
+              * (min δ δ0 / κ) := by
+            gcongr
+            rw [← dist_eq_norm, dist_comm]
+            exact (mem_ball.mp hy').le
           _ < κ * (min δ δ0 / κ) := by
-              gcongr
-              rw [hκ]; linarith
+            gcongr
+            rw [hκ]
+            linarith
           _ = min δ δ0 := by field_simp
-      refine ⟨chartE X y', ⟨hb0 (mem_ball.mpr (by rw [dist_comm]; exact lt_of_lt_of_le hd (min_le_right _ _))),
-        by simpa using hΔ'⟩, lt_of_lt_of_le hd (min_le_left _ _)⟩
-    have := Set.EqOn.of_subset_closure heq ((hU x hx).continuousOn.mono Set.inter_subset_left)
-      ((hU y hy).continuousOn.mono Set.inter_subset_right) Set.inter_subset_left hcl
+      refine ⟨
+        chartE X y',
+        ⟨
+          hb0 (mem_ball.mpr (by rw [dist_comm]; exact lt_of_lt_of_le hd (min_le_right _ _))),
+          by simpa using hΔ'
+        ⟩,
+        lt_of_lt_of_le hd (min_le_left _ _)
+      ⟩
+    have :=
+      Set.EqOn.of_subset_closure heq ((hU x hx).continuousOn.mono Set.inter_subset_left)
+        ((hU y hy).continuousOn.mono Set.inter_subset_right) Set.inter_subset_left hcl
     exact this ⟨hwx, hwy⟩
   set P : Frame X.Ψ r → ℂ := fun x => if hx : x ∈ X.dom then U x hx (chartE X x) else 0 with hP
 
@@ -213,8 +254,10 @@ theorem extF_of (hLU : LUStatement (E := E)) (hM : FrameMeasStatement (E := E)) 
       simp only
       rw [hPcell _ hyb, hPcell _ hy, poincareLift_borel_equivariant D la F hy.1 hb]
     have hc1 : ContinuousOn (fun x => P (rmul x b)) X.dom :=
-      hPd.continuousOn.comp (rmul_cont b).continuousOn fun y hy => OrthogonalFrameDomain.rmul_mem_dom X hy hb
-    have hc2 : ContinuousOn (fun x => bchar la b * P x) X.dom := continuousOn_const.mul hPd.continuousOn
+      hPd.continuousOn.comp (rmul_cont b).continuousOn fun y hy =>
+        OrthogonalFrameDomain.rmul_mem_dom X hy hb
+    have hc2 : ContinuousOn (fun x => bchar la b * P x) X.dom :=
+      continuousOn_const.mul hPd.continuousOn
     exact Set.EqOn.of_subset_closure heq hc1 hc2 (fun y hy => hy.1) (fun y hy => dense_cell D hy) hx
   · obtain ⟨h1, -, -⟩ := cpt_cell D hz
     rw [hPcell _ ⟨hz, h1⟩, poincareLift_on_chart D la F hz]

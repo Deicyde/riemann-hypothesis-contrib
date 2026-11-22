@@ -11,30 +11,45 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GramChartSub
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
 open scoped ContDiff ENNReal Matrix
 
 namespace GlobalTheory.LeviWeightChart
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
-theorem nmat_hasDerivAt (X : Data E r) {f : ℂ → V (nd X)} {f' : V (nd X)} {t : ℂ}
-    (hf : HasDerivAt f f' t) (τ : X.Ψ) (a c : Fin r) :
-    HasDerivAt (fun s => nmat X (f s) τ a c) (nmat X f' τ a c - if a = c then 1 else 0) t := by
+theorem nmat_hasDerivAt
+    (X : Data E r)
+    {f : ℂ → V (nd X)} {f' : V (nd X)} {t : ℂ} (hf : HasDerivAt f f' t)
+    (τ : X.Ψ) (a c : Fin r)
+    : HasDerivAt (fun s => nmat X (f s) τ a c) (nmat X f' τ a c - if a = c then 1 else 0) t := by
   unfold nmat
   by_cases h : c < a
   · simp only [h, dif_pos, h.ne', if_false, sub_zero]
-    exact
-      ((PiLp.proj 2 (fun _ : Fin (nd X) => ℂ) ((Fintype.equivFin (Ent X)) ⟨τ, ⟨(a, c), h⟩⟩)).hasFDerivAt).comp_hasDerivAt t hf
+    exact ((PiLp.proj 2
+      (fun _ : Fin (nd X) => ℂ)
+      ((Fintype.equivFin (Ent X)) ⟨τ, ⟨(a, c), h⟩⟩)).hasFDerivAt).comp_hasDerivAt t hf
   · simp only [h, dif_neg, not_false_eq_true, sub_self]
     exact hasDerivAt_const _ _
 
-theorem nmat_zero_apply (X : Data E r) (τ : X.Ψ) (a c : Fin r) :
-    nmat X 0 τ a c = if a = c then 1 else 0 := by
+theorem nmat_zero_apply (X : Data E r) (τ : X.Ψ) (a c : Fin r)
+    : nmat X 0 τ a c = if a = c then 1 else 0 := by
   have := congrFun (congrFun (IW.nmat_zero X τ) a) c
   simpa [mat, Matrix.one_apply] using this
 
-theorem levi_transport_origin : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (x0 x1 b : Frame X.Ψ r) (z : V (nd X)), IsOrth X x1 → z ∈ OmF X x0 → b ∈ Bor X.Ψ r → cpt X x0 z = rmul x1 b → ∀ ξ : Fin (nd X) → ℂ, ∃ ξ' : Fin (nd X) → ℂ, (∀ la : Wt X.Ψ r, leviM X (phla X la) x0 z ξ = leviM X (phla X la) x1 0 ξ') ∧ ∃ B : Frame X.Ψ r, (∀ τ (a c : Fin r), c < a → B τ a c = 0) ∧ ∀ τ, mat x0 τ * (mat (nmat X (WithLp.toLp 2 ξ)) τ - 1) = mat x1 τ * ((mat (nmat X (WithLp.toLp 2 ξ')) τ - 1) * mat b τ + mat B τ) := by
+theorem levi_transport_origin
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r)
+        (x0 x1 b : Frame X.Ψ r) (z : V (nd X)),
+      IsOrth X x1 → z ∈ OmF X x0 → b ∈ Bor X.Ψ r → cpt X x0 z = rmul x1 b
+        → ∀ ξ : Fin (nd X) → ℂ, ∃ ξ' : Fin (nd X) → ℂ,
+          (∀ la : Wt X.Ψ r, leviM X (phla X la) x0 z ξ = leviM X (phla X la) x1 0 ξ')
+            ∧ ∃ B : Frame X.Ψ r,
+              (∀ τ (a c : Fin r), c < a → B τ a c = 0)
+                ∧ ∀ τ,
+                  mat x0 τ * (mat (nmat X (WithLp.toLp 2 ξ)) τ - 1)
+                    = mat x1 τ * ((mat (nmat X (WithLp.toLp 2 ξ')) τ - 1) * mat b τ + mat B τ) := by
   intro E _ _ _ r X x0 x1 b z ho hz hb hxb ξ
   have hz1 : (0 : V (nd X)) ∈ OmF X x1 := IW.zero_mem_OmF X x1 ho
   have hxb' : cpt X x0 z = rmul (cpt X x1 0) b := by rw [IW.cpt_zero]; exact hxb
@@ -76,25 +91,29 @@ theorem levi_transport_origin : ∀ (E : Type) [Field E] [NumberField E] [IsCMFi
       intro w hw
       unfold bchar
       refine DifferentiableAt.differentiableWithinAt ?_
-      refine (HasFDerivAt.finsetProd (g' := fun τ => fderiv ℂ (fun w => ∏ i, bf w τ i i ^ la τ i) w)
+      refine (HasFDerivAt.finsetProd
+        (g' := fun τ => fderiv ℂ (fun w => ∏ i, bf w τ i i ^ la τ i) w)
         fun τ _ => DifferentiableAt.hasFDerivAt ?_).differentiableAt
-      refine (HasFDerivAt.finsetProd (g' := fun i => fderiv ℂ (fun w => bf w τ i i ^ la τ i) w)
+      refine (HasFDerivAt.finsetProd
+        (g' := fun i => fderiv ℂ (fun w => bf w τ i i ^ la τ i) w)
         fun i _ => DifferentiableAt.hasFDerivAt ?_).differentiableAt
       have hw' : DifferentiableAt ℂ bf w := hbf.differentiableAt (hU.mem_nhds hw)
       have hi : DifferentiableAt ℂ (fun w => bf w τ i i) w :=
         differentiableAt_pi.1 (differentiableAt_pi.1 (differentiableAt_pi.1 hw' τ) i) i
       have hzp : DifferentiableAt ℂ (fun t : ℂ => t ^ la τ i) (bf w τ i i) :=
-        differentiableAt_zpow.2
-          (Or.inl (GlobalTheory.LeviTransfer.borel_diag_ne_zero (hsplit _ hw.1 hw.2).2.1 τ i))
+        differentiableAt_zpow.2 (Or.inl (GlobalTheory.LeviTransfer.borel_diag_ne_zero
+          (hsplit _ hw.1 hw.2).2.1 τ i))
       exact DifferentiableAt.comp (g := fun t : ℂ => t ^ la τ i) w hzp hi
     have hchz : ContDiffAt ℂ 2 (fun w => bchar la (bf w)) z :=
       (HE.contDiffAt_of_punct hU hch hzU).of_le HE.two_le_inf
     have hne : bchar la (bf z) ≠ 0 := IW.bchar_ne_zero X (hsplit _ hz h0.1).2.1 _
-    have hev : (fun w => ((phla X la (cpt X x0 w) : ℝ) : ℂ)) =ᶠ[𝓝 z]
-        fun w => ((phla X la (cpt X x1 (Φ w)) + Real.log (Complex.normSq (bchar la (bf w))) : ℝ) : ℂ) := by
-      filter_upwards [hU.mem_nhds hzU] with w hw
-      obtain ⟨h1, h2, h3⟩ := hsplit _ hw.1 hw.2
-      rw [← GlobalTheory.LeviTransfer.metric_rmul normFactor_rightBorel_holds X la h1 h2, ← h3]
+    have hev
+        : (fun w => ((phla X la (cpt X x0 w) : ℝ) : ℂ)) =ᶠ[𝓝 z]
+          fun w => ((phla X la (cpt X x1 (Φ w)) + Real.log (Complex.normSq (bchar la (bf w))) : ℝ) : ℂ) :=
+      by
+        filter_upwards [hU.mem_nhds hzU] with w hw
+        obtain ⟨h1, h2, h3⟩ := hsplit _ hw.1 hw.2
+        rw [← GlobalTheory.LeviTransfer.metric_rmul normFactor_rightBorel_holds X la h1 h2, ← h3]
     have hg : ContDiffAt ℝ 2 (fun w => phla X la (cpt X x1 w)) (Φ z) := by
       rw [hΦz]
       exact (IW.phla_cpt_cdAt X x1 hz1 la).of_le HE.two_le_inf
@@ -117,26 +136,32 @@ theorem levi_transport_origin : ∀ (E : Type) [Field E] [NumberField E] [IsCMFi
     exact (hbfE τ a c).unique ((hasDerivAt_const (0 : ℂ) (0 : ℂ)).congr_of_eventuallyEq hev)
   · intro τ
     ext a c
-    have hL : HasDerivAt (fun t : ℂ => ∑ k, x0 τ a k * nmat X (z + t • v) τ k c)
+    have hL : HasDerivAt
+        (fun t : ℂ => ∑ k, x0 τ a k * nmat X (z + t • v) τ k c)
         (∑ k, x0 τ a k * (nmat X v τ k c - if k = c then 1 else 0)) 0 :=
       HasDerivAt.fun_sum fun k _ => (nmat_hasDerivAt X hγ τ k c).const_mul _
-    have hR : HasDerivAt (fun t : ℂ => ∑ k, (∑ l, x1 τ a l * nmat X (Φ (z + t • v)) τ l k) * bf (z + t • v) τ k c)
+    have hR : HasDerivAt
+        (fun t : ℂ => ∑ k, (∑ l, x1 τ a l * nmat X (Φ (z + t • v)) τ l k) * bf (z + t • v) τ k c)
         (∑ k, ((∑ l, x1 τ a l * (nmat X (fderiv ℂ Φ z v) τ l k - if l = k then 1 else 0)) * bf (z + (0:ℂ) • v) τ k c
-          + (∑ l, x1 τ a l * nmat X (Φ (z + (0:ℂ) • v)) τ l k) * fderiv ℂ bf z v τ k c)) 0 :=
+          + (∑ l, x1 τ a l * nmat X (Φ (z + (0:ℂ) • v)) τ l k) * fderiv ℂ bf z v τ k c))
+        0 :=
       HasDerivAt.fun_sum fun k _ =>
-        (HasDerivAt.fun_sum fun l _ => (nmat_hasDerivAt X hΦD τ l k).const_mul _).fun_mul (hbfE τ k c)
-    have hev : (fun t : ℂ => ∑ k, x0 τ a k * nmat X (z + t • v) τ k c) =ᶠ[𝓝 0]
-        fun t : ℂ => ∑ k, (∑ l, x1 τ a l * nmat X (Φ (z + t • v)) τ l k) * bf (z + t • v) τ k c := by
-      filter_upwards [hγU] with t ht
-      have e0 : cpt X x0 (z + t • v) = rmul (cpt X x1 (Φ (z + t • v))) (bf (z + t • v)) :=
-        (hsplit _ ht.1 ht.2).2.2
-      have e := congrFun (congrFun (congrFun e0 τ) a) c
-      simp only [cpt, rmul, mat, Matrix.mul_apply, Matrix.of_apply] at e
-      exact e
+        (HasDerivAt.fun_sum fun l _ => (nmat_hasDerivAt X hΦD τ l k).const_mul _).fun_mul
+          (hbfE τ k c)
+    have hev
+        : (fun t : ℂ => ∑ k, x0 τ a k * nmat X (z + t • v) τ k c) =ᶠ[𝓝 0]
+          fun t : ℂ => ∑ k, (∑ l, x1 τ a l * nmat X (Φ (z + t • v)) τ l k) * bf (z + t • v) τ k c :=
+      by
+        filter_upwards [hγU] with t ht
+        have e0 : cpt X x0 (z + t • v) = rmul (cpt X x1 (Φ (z + t • v))) (bf (z + t • v)) :=
+          (hsplit _ ht.1 ht.2).2.2
+        have e := congrFun (congrFun (congrFun e0 τ) a) c
+        simp only [cpt, rmul, mat, Matrix.mul_apply, Matrix.of_apply] at e
+        exact e
     have heq := hL.unique (hR.congr_of_eventuallyEq hev)
     simp only [zero_smul, add_zero, hΦz, hbz, nmat_zero_apply] at heq
-    simp only [Matrix.mul_apply, Matrix.sub_apply, Matrix.add_apply, Matrix.one_apply, mat, Matrix.of_apply,
-      WithLp.toLp_ofLp]
+    simp only [Matrix.mul_apply, Matrix.sub_apply, Matrix.add_apply, Matrix.one_apply, mat,
+      Matrix.of_apply, WithLp.toLp_ofLp]
     rw [heq]
     simp only [mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true, mul_add,
       Finset.sum_add_distrib, Finset.mul_sum, Finset.sum_mul, mul_assoc]

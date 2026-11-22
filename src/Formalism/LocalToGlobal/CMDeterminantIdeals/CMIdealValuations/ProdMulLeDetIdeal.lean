@@ -16,19 +16,21 @@ namespace A2
 variable {K : Type} [Field K] [NumberField K]
 
 theorem absNorm_pos' {I : FractionalIdeal (𝓞 K)⁰ K} (h : I ≠ 0) : 0 < FractionalIdeal.absNorm I :=
-  lt_of_le_of_ne (FractionalIdeal.absNorm_nonneg I) (fun e => h (FractionalIdeal.absNorm_eq_zero_iff.1 e.symm))
+  lt_of_le_of_ne (FractionalIdeal.absNorm_nonneg I)
+    (fun e => h (FractionalIdeal.absNorm_eq_zero_iff.1 e.symm))
 
-theorem absNorm_anti' {I J : FractionalIdeal (𝓞 K)⁰ K} (hIJ : I ≤ J) (hI : I ≠ 0) :
-    FractionalIdeal.absNorm J ≤ FractionalIdeal.absNorm I := by
+theorem absNorm_anti' {I J : FractionalIdeal (𝓞 K)⁰ K} (hIJ : I ≤ J) (hI : I ≠ 0)
+    : FractionalIdeal.absNorm J ≤ FractionalIdeal.absNorm I := by
   have hJ : J ≠ 0 := by
     rintro rfl
     exact hI (FractionalIdeal.le_zero_iff.1 hIJ)
   have hX : I * J⁻¹ ≤ 1 := by
-    calc I * J⁻¹ ≤ J * J⁻¹ := mul_le_mul' hIJ le_rfl
+    calc
+      I * J⁻¹
+        ≤ J * J⁻¹ := mul_le_mul' hIJ le_rfl
       _ = 1 := mul_inv_cancel₀ hJ
   obtain ⟨X, hX'⟩ := FractionalIdeal.le_one_iff_exists_coeIdeal.1 hX
-  have hdec : I = J * (I * J⁻¹) := by
-    rw [mul_comm I, ← mul_assoc, mul_inv_cancel₀ hJ, one_mul]
+  have hdec : I = J * (I * J⁻¹) := by rw [mul_comm I, ← mul_assoc, mul_inv_cancel₀ hJ, one_mul]
   have hIJ0 : I * J⁻¹ ≠ 0 := mul_ne_zero hI (inv_ne_zero hJ)
   have hX0 : X ≠ ⊥ := by
     rintro rfl
@@ -39,37 +41,47 @@ theorem absNorm_anti' {I J : FractionalIdeal (𝓞 K)⁰ K} (hIJ : I ≤ J) (hI 
     rw [← hX', FractionalIdeal.coeIdeal_absNorm]
     have : Ideal.absNorm X ≠ 0 := fun e => hX0 (Ideal.absNorm_eq_zero_iff.1 e)
     exact_mod_cast Nat.one_le_iff_ne_zero.2 this
-  calc FractionalIdeal.absNorm J = FractionalIdeal.absNorm J * 1 := (mul_one _).symm
+  calc
+    FractionalIdeal.absNorm J
+      = FractionalIdeal.absNorm J * 1 := (mul_one _).symm
     _ ≤ FractionalIdeal.absNorm J * FractionalIdeal.absNorm (I * J⁻¹) :=
-        mul_le_mul_of_nonneg_left hN (FractionalIdeal.absNorm_nonneg _)
+      mul_le_mul_of_nonneg_left hN (FractionalIdeal.absNorm_nonneg _)
     _ = FractionalIdeal.absNorm I := by rw [← map_mul, ← hdec]
 
 theorem abs_norm_eq_prod (x : K) : ((|Algebra.norm ℚ x| : ℚ) : ℝ) = ∏ σ : K →+* ℂ, ‖σ x‖ := by
   have h2 := congrArg (fun z : ℂ => ‖z‖) (Algebra.norm_eq_prod_embeddings ℚ ℂ x)
   simp only [norm_prod] at h2
-  rw [Fintype.prod_equiv (RingHom.equivRatAlgHom K ℂ) (fun σ => ‖σ x‖) (fun τ => ‖τ x‖) (fun _ => rfl), ← h2]
+  rw [Fintype.prod_equiv (RingHom.equivRatAlgHom K ℂ)
+      (fun σ => ‖σ x‖)
+      (fun τ => ‖τ x‖)
+      (fun _ => rfl),
+    ← h2]
   simp
 
-theorem absNorm_span_real (x : K) :
-    ((FractionalIdeal.absNorm (FractionalIdeal.spanSingleton (𝓞 K)⁰ x) : ℚ) : ℝ) = ∏ σ : K →+* ℂ, ‖σ x‖ := by
+theorem absNorm_span_real (x : K)
+    : ((FractionalIdeal.absNorm (FractionalIdeal.spanSingleton (𝓞 K)⁰ x) : ℚ) : ℝ)
+      = ∏ σ : K →+* ℂ, ‖σ x‖ := by
   rw [FractionalIdeal.absNorm_span_singleton (𝓞 K), abs_norm_eq_prod]
 
 theorem det_re_pos {n : ℕ} {A : Matrix (Fin n) (Fin n) ℂ} (h : A.PosDef) : 0 < A.det.re := by
   simpa using (Complex.lt_def.1 h.det_pos).1
 
-theorem exists_den {m : ℕ} (M : Submodule (𝓞 K) (Fin m → K)) (hM : M.FG) :
-    ∃ a ∈ (𝓞 K)⁰, ∀ x ∈ M, ∀ i, IsLocalization.IsInteger (𝓞 K) (a • x i) := by
-  have hc : ∀ i : Fin m, ∃ a ∈ (𝓞 K)⁰, ∀ b ∈ M.map (LinearMap.proj i : (Fin m → K) →ₗ[𝓞 K] K),
-      IsLocalization.IsInteger (𝓞 K) (a • b) :=
-    fun i => FractionalIdeal.isFractional_of_fg (hM.map _)
+theorem exists_den {m : ℕ} (M : Submodule (𝓞 K) (Fin m → K)) (hM : M.FG)
+    : ∃ a ∈ (𝓞 K)⁰, ∀ x ∈ M, ∀ i, IsLocalization.IsInteger (𝓞 K) (a • x i) := by
+  have hc
+      : ∀ i : Fin m, ∃ a ∈ (𝓞 K)⁰, ∀ b ∈ M.map (LinearMap.proj i : (Fin m → K) →ₗ[𝓞 K] K),
+        IsLocalization.IsInteger (𝓞 K) (a • b) := fun i =>
+    FractionalIdeal.isFractional_of_fg (hM.map _)
   choose a ha hb using hc
   refine ⟨∏ i, a i, prod_mem fun i _ => ha i, fun x hx i => ?_⟩
-  have hxi := hb i (x i) (Submodule.mem_map_of_mem (f := (LinearMap.proj i : (Fin m → K) →ₗ[𝓞 K] K)) hx)
+  have hxi :=
+    hb i (x i) (Submodule.mem_map_of_mem (f := (LinearMap.proj i : (Fin m → K) →ₗ[𝓞 K] K)) hx)
   rw [← Finset.prod_erase_mul _ _ (Finset.mem_univ i), mul_smul]
   exact IsLocalization.isInteger_smul hxi
 
-theorem isInteger_det {m : ℕ} (x : Fin m → Fin m → K) (hx : ∀ i j, IsLocalization.IsInteger (𝓞 K) (x i j)) :
-    IsLocalization.IsInteger (𝓞 K) (Matrix.of x).det := by
+theorem isInteger_det
+    {m : ℕ} (x : Fin m → Fin m → K) (hx : ∀ i j, IsLocalization.IsInteger (𝓞 K) (x i j))
+    : IsLocalization.IsInteger (𝓞 K) (Matrix.of x).det := by
   have hx' : ∀ i j, ∃ y : 𝓞 K, algebraMap (𝓞 K) K y = x i j := fun i j => hx i j
   choose y hy using hx'
   refine ⟨(Matrix.of y).det, ?_⟩
@@ -78,7 +90,8 @@ theorem isInteger_det {m : ℕ} (x : Fin m → Fin m → K) (hx : ∀ i j, IsLoc
   ext i j
   simp [hy]
 
-theorem detSub_isFractional {m : ℕ} (L : MLat K m) (hM : L.M.FG) : IsFractional (𝓞 K)⁰ L.detSub := by
+theorem detSub_isFractional {m : ℕ} (L : MLat K m) (hM : L.M.FG)
+    : IsFractional (𝓞 K)⁰ L.detSub := by
   obtain ⟨a, ha, hint⟩ := exists_den L.M hM
   refine ⟨a ^ m, pow_mem ha m, fun b hb => ?_⟩
   induction hb using Submodule.span_induction with
@@ -94,19 +107,19 @@ theorem detSub_isFractional {m : ℕ} (L : MLat K m) (hM : L.M.FG) : IsFractiona
   | add x y _ _ hx hy => rw [smul_add]; exact IsLocalization.isInteger_add hx hy
   | smul r x _ hx => rw [smul_comm]; exact IsLocalization.isInteger_smul hx
 
-theorem detIdeal_coe {m : ℕ} (L : MLat K m) (h : IsFractional (𝓞 K)⁰ L.detSub) :
-    (L.detIdeal : Submodule (𝓞 K) K) = L.detSub := by
+theorem detIdeal_coe {m : ℕ} (L : MLat K m) (h : IsFractional (𝓞 K)⁰ L.detSub)
+    : (L.detIdeal : Submodule (𝓞 K) K) = L.detSub := by
   have e : L.detIdeal = ⟨L.detSub, h⟩ := dif_pos h
   rw [e]
   rfl
 
-theorem det_mem {m : ℕ} (L : MLat K m) (x : Fin m → Fin m → K) (hx : ∀ i, x i ∈ L.M) :
-    (Matrix.of x).det ∈ L.detSub :=
+theorem det_mem {m : ℕ} (L : MLat K m) (x : Fin m → Fin m → K) (hx : ∀ i, x i ∈ L.M)
+    : (Matrix.of x).det ∈ L.detSub :=
   Submodule.subset_span ⟨x, hx, rfl⟩
 
-theorem exists_det_ne {m : ℕ} (M : Submodule (𝓞 K) (Fin m → K))
-    (hM : Submodule.span K (M : Set (Fin m → K)) = ⊤) :
-    ∃ x : Fin m → Fin m → K, (∀ i, x i ∈ M) ∧ (Matrix.of x).det ≠ 0 := by
+theorem exists_det_ne
+    {m : ℕ} (M : Submodule (𝓞 K) (Fin m → K)) (hM : Submodule.span K (M : Set (Fin m → K)) = ⊤)
+    : ∃ x : Fin m → Fin m → K, (∀ i, x i ∈ M) ∧ (Matrix.of x).det ≠ 0 := by
   obtain ⟨s, hs, hspan, hli⟩ := exists_linearIndependent K (M : Set (Fin m → K))
   let B := Module.Basis.mk hli (le_of_eq (by rw [Subtype.range_coe, hspan, hM]))
   let e := B.indexEquiv (Pi.basisFun K (Fin m))
@@ -118,19 +131,17 @@ theorem exists_det_ne {m : ℕ} (M : Submodule (𝓞 K) (Fin m → K))
 
 end A2
 
-
 namespace A2
 variable {K : Type} [Field K] [NumberField K]
 
 end A2
 
-
 namespace A2
 variable {K : Type} [Field K] [NumberField K]
 
-theorem detSub_free {m : ℕ} (L : MLat K m) (b : Fin m → Fin m → K)
-    (hb : L.M = Submodule.span (𝓞 K) (Set.range b)) :
-    L.detSub = Submodule.span (𝓞 K) {(Matrix.of b).det} := by
+theorem detSub_free
+    {m : ℕ} (L : MLat K m) (b : Fin m → Fin m → K) (hb : L.M = Submodule.span (𝓞 K) (Set.range b))
+    : L.detSub = Submodule.span (𝓞 K) {(Matrix.of b).det} := by
   apply le_antisymm
   · apply Submodule.span_le.2
     rintro d ⟨x, hx, rfl⟩
@@ -153,23 +164,25 @@ theorem detSub_free {m : ℕ} (L : MLat K m) (b : Fin m → Fin m → K)
     rw [hb]
     exact Submodule.subset_span ⟨i, rfl⟩
 
-theorem gramC_eq {n : ℕ} (H : Matrix (Fin n) (Fin n) ℂ) (σ : K →+* ℂ) (b : Fin n → Fin n → K) :
-    ReciprocityTheory.MultiplicativeHeights.gramC H σ b = ((Matrix.of b).map σ).transpose.conjTranspose * H * ((Matrix.of b).map σ).transpose := by
+theorem gramC_eq {n : ℕ} (H : Matrix (Fin n) (Fin n) ℂ) (σ : K →+* ℂ) (b : Fin n → Fin n → K)
+    : ReciprocityTheory.MultiplicativeHeights.gramC H σ b
+      = ((Matrix.of b).map σ).transpose.conjTranspose * H * ((Matrix.of b).map σ).transpose := by
   ext i j
-  simp only [ReciprocityTheory.MultiplicativeHeights.gramC, ReciprocityTheory.MultiplicativeHeights.embVec, Matrix.of_apply, Matrix.mul_apply, dotProduct,
-    Matrix.mulVec, Matrix.conjTranspose_apply, Matrix.transpose_apply, Matrix.map_apply, Pi.star_apply,
-    Finset.mul_sum, Finset.sum_mul, mul_assoc]
+  simp only [ReciprocityTheory.MultiplicativeHeights.gramC,
+    ReciprocityTheory.MultiplicativeHeights.embVec, Matrix.of_apply, Matrix.mul_apply, dotProduct,
+    Matrix.mulVec, Matrix.conjTranspose_apply, Matrix.transpose_apply, Matrix.map_apply,
+    Pi.star_apply, Finset.mul_sum, Finset.sum_mul, mul_assoc]
   exact Finset.sum_comm
 
-theorem gramC_det {n : ℕ} (H : Matrix (Fin n) (Fin n) ℂ) (σ : K →+* ℂ) (b : Fin n → Fin n → K) :
-    (ReciprocityTheory.MultiplicativeHeights.gramC H σ b).det = (Complex.normSq (σ (Matrix.of b).det) : ℂ) * H.det := by
+theorem gramC_det {n : ℕ} (H : Matrix (Fin n) (Fin n) ℂ) (σ : K →+* ℂ) (b : Fin n → Fin n → K)
+    : (ReciprocityTheory.MultiplicativeHeights.gramC H σ b).det
+      = (Complex.normSq (σ (Matrix.of b).det) : ℂ) * H.det := by
   rw [gramC_eq, Matrix.det_mul, Matrix.det_mul, Matrix.det_conjTranspose, Matrix.det_transpose,
     RingHom.map_det σ (Matrix.of b), Complex.normSq_eq_conj_mul_self]
   simp only [RingHom.mapMatrix_apply, Complex.star_def]
   ring
 
 end A2
-
 
 theorem hadamardInequality : HadamardPD := by
   intro m A hA
@@ -179,7 +192,8 @@ theorem hadamardInequality : HadamardPD := by
   set s : Fin m → ℝ := fun i => (Real.sqrt (A i i).re)⁻¹ with hs
   have hspos : ∀ i, 0 < s i := fun i => inv_pos.2 (Real.sqrt_pos.2 (hdpos i))
   have hs2 : ∀ i, s i ^ 2 * (A i i).re = 1 := fun i => by
-    rw [hs]; simp only
+    rw [hs]
+    simp only
     rw [inv_pow, Real.sq_sqrt (hdpos i).le, inv_mul_cancel₀ (hdpos i).ne']
   set D : Matrix (Fin m) (Fin m) ℂ := Matrix.diagonal fun i => (s i : ℂ) with hD
   have hDh : D.conjTranspose = D := by
@@ -191,13 +205,16 @@ theorem hadamardInequality : HadamardPD := by
   have hDu : IsUnit D := by
     rw [Matrix.isUnit_iff_isUnit_det, hDdet]
     exact IsUnit.mk0 _ (Finset.prod_ne_zero_iff.2 fun i _ => by exact_mod_cast (hspos i).ne')
-  have hC : (D.conjTranspose * A * D).PosDef := hA.conjTranspose_mul_mul_same (Matrix.mulVec_injective_iff_isUnit.2 hDu)
+  have hC : (D.conjTranspose * A * D).PosDef :=
+    hA.conjTranspose_mul_mul_same (Matrix.mulVec_injective_iff_isUnit.2 hDu)
   set C := D.conjTranspose * A * D with hCdef
   have hCii : ∀ i, C i i = 1 := fun i => by
     rw [hCdef, hDh, hD]
     simp only [Matrix.mul_diagonal, Matrix.diagonal_mul]
     rw [hdiag i]
-    rw [show (s i : ℂ) * ((A i i).re : ℂ) * (s i : ℂ) = ((s i ^ 2 * (A i i).re : ℝ) : ℂ) by push_cast; ring, hs2 i]
+    rw [show (s i : ℂ) * ((A i i).re : ℂ) * (s i : ℂ) = ((s i ^ 2 * (A i i).re : ℝ) : ℂ) by
+        push_cast; ring,
+      hs2 i]
     simp
   have hCdet : C.det = A.det * ∏ i, ((s i ^ 2 : ℝ) : ℂ) := by
     rw [hCdef, Matrix.det_mul, Matrix.det_mul, hDh, hDdet]
@@ -209,8 +226,7 @@ theorem hadamardInequality : HadamardPD := by
   set ev := hC.isHermitian.eigenvalues with hev_def
   have hevpos : ∀ i, 0 < ev i := hC.eigenvalues_pos
   have hsum : ∑ i, ev i = m := by
-    have : C.trace = (m : ℂ) := by
-      simp [Matrix.trace, hCii]
+    have : C.trace = (m : ℂ) := by simp [Matrix.trace, hCii]
     rw [this] at htr
     apply Complex.ofReal_injective
     push_cast
@@ -219,10 +235,16 @@ theorem hadamardInequality : HadamardPD := by
     rcases Nat.eq_zero_or_pos m with hm | hm
     · subst hm; simp
     have hmR : (0 : ℝ) < m := by exact_mod_cast hm
-    have amgm := Real.geom_mean_le_arith_mean Finset.univ (fun _ => (1 : ℝ)) ev
-      (fun _ _ => zero_le_one) (by simp [hmR]) (fun i _ => (hevpos i).le)
-    simp only [Real.rpow_one, one_mul, Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul,
-      mul_one, hsum, div_self hmR.ne'] at amgm
+    have amgm :=
+      Real.geom_mean_le_arith_mean Finset.univ
+        (fun _ => (1 : ℝ))
+        ev
+        (fun _ _ => zero_le_one)
+        (by simp [hmR])
+        (fun i _ => (hevpos i).le)
+    simp only [Real.rpow_one, one_mul, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
+        nsmul_eq_mul, mul_one, hsum, div_self hmR.ne']
+      at amgm
     by_contra hlt
     push Not at hlt
     have := Real.one_lt_rpow hlt (inv_pos.2 hmR)
@@ -234,12 +256,15 @@ theorem hadamardInequality : HadamardPD := by
       apply Finset.prod_eq_one
       intro i _
       rw [← Complex.ofReal_mul, hs2 i, Complex.ofReal_one]
-    calc A.det = A.det * ((∏ i, ((s i ^ 2 : ℝ) : ℂ)) * ∏ i, (((A i i).re : ℝ) : ℂ)) := by rw [h2, mul_one]
+    calc
+      A.det
+        = A.det * ((∏ i, ((s i ^ 2 : ℝ) : ℂ)) * ∏ i, (((A i i).re : ℝ) : ℂ)) := by rw [h2, mul_one]
       _ = C.det * ∏ i, (((A i i).re : ℝ) : ℂ) := by rw [hCdet]; ring
       _ = _ := by rw [h1]
   rw [hA', ← Complex.ofReal_prod, ← Complex.ofReal_mul, Complex.ofReal_re]
-  calc (∏ i, ev i) * ∏ i, (A i i).re ≤ 1 * ∏ i, (A i i).re :=
-        mul_le_mul_of_nonneg_right hprod (Finset.prod_nonneg fun i _ => (hdpos i).le)
+  calc
+    (∏ i, ev i) * ∏ i, (A i i).re ≤ 1 * ∏ i, (A i i).re :=
+      mul_le_mul_of_nonneg_right hprod (Finset.prod_nonneg fun i _ => (hdpos i).le)
     _ = _ := one_mul _
 
 namespace A2
@@ -247,6 +272,5 @@ variable {K : Type} [Field K] [NumberField K]
 open scoped Pointwise
 
 end A2
-
 
 end Formalism.L2.LamCM

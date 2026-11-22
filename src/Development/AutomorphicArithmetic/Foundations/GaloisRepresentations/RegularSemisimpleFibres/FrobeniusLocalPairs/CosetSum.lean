@@ -8,21 +8,26 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open MeasureTheory PositivityTheory.Rg.Tf.Loc
 
-private theorem exists_reps {G ι : Type} [Group G] (H U : Subgroup G) (R : Finset ι) (x : ι → G)
-    (hd : ∀ i ∈ R, ∀ j ∈ R, (∃ h ∈ H, ∃ u ∈ U, x i = h * x j * u) → i = j) :
-    ∃ r : G → G, (∀ g, ∃ h ∈ H, ∃ u ∈ U, g = h * r g * u) ∧ (∀ g, ∀ h ∈ H, ∀ u ∈ U, r (h * g * u) = r g) ∧
-      ∀ i ∈ R, r (x i) = x i := by
+private theorem exists_reps
+    {G ι : Type} [Group G]
+    (H U : Subgroup G) (R : Finset ι) (x : ι → G)
+    (hd : ∀ i ∈ R, ∀ j ∈ R, (∃ h ∈ H, ∃ u ∈ U, x i = h * x j * u) → i = j)
+    : ∃ r : G → G,
+      (∀ g, ∃ h ∈ H, ∃ u ∈ U, g = h * r g * u) ∧ (∀ g, ∀ h ∈ H, ∀ u ∈ U, r (h * g * u) = r g)
+        ∧ ∀ i ∈ R, r (x i) = x i := by
   classical
-  let S : Setoid G :=
-    { r := fun g g' => ∃ h ∈ H, ∃ u ∈ U, g = h * g' * u
-      iseqv :=
-        { refl := fun g => ⟨1, H.one_mem, 1, U.one_mem, by simp⟩
-          symm := by
-            rintro g g' ⟨h, hh, u, hu, rfl⟩
-            exact ⟨h⁻¹, H.inv_mem hh, u⁻¹, U.inv_mem hu, by group⟩
-          trans := by
-            rintro g g' g'' ⟨h₁, hh₁, u₁, hu₁, rfl⟩ ⟨h₂, hh₂, u₂, hu₂, rfl⟩
-            exact ⟨h₁ * h₂, H.mul_mem hh₁ hh₂, u₂ * u₁, U.mul_mem hu₂ hu₁, by group⟩ } }
+  let S : Setoid G := {
+    r := fun g g' => ∃ h ∈ H, ∃ u ∈ U, g = h * g' * u
+    iseqv := {
+      refl := fun g => ⟨1, H.one_mem, 1, U.one_mem, by simp⟩
+      symm := by
+        rintro g g' ⟨h, hh, u, hu, rfl⟩
+        exact ⟨h⁻¹, H.inv_mem hh, u⁻¹, U.inv_mem hu, by group⟩
+      trans := by
+        rintro g g' g'' ⟨h₁, hh₁, u₁, hu₁, rfl⟩ ⟨h₂, hh₂, u₂, hu₂, rfl⟩
+        exact ⟨h₁ * h₂, H.mul_mem hh₁ hh₂, u₂ * u₁, U.mul_mem hu₂ hu₁, by group⟩
+    }
+  }
   let f : Quotient S → G := fun q =>
     if hq : ∃ i ∈ R, Quotient.mk S (x i) = q then x hq.choose else q.out
   have hf : ∀ g, S.r g (f (Quotient.mk S g)) := by
@@ -41,8 +46,8 @@ private theorem exists_reps {G ι : Type} [Group G] (H U : Subgroup G) (R : Fins
     simp only [f, dif_pos hq]
     rw [hd _ hq.choose_spec.1 i hi (Quotient.exact hq.choose_spec.2)]
 
-theorem UpperTheory.Gal.InertialTypesAlt.L.cosetSum :
-    UpperTheory.Gal.InertialTypesAlt.L.CosetSum := by
+theorem UpperTheory.Gal.InertialTypesAlt.L.cosetSum
+    : UpperTheory.Gal.InertialTypesAlt.L.CosetSum := by
   intro G _ _ _ _ _ _ _ _ μ hμ K H hKo hKc hHc hcomm ν hν ι R x V S hV hS hd
   classical
   haveI : SFinite μ := inferInstance
@@ -151,8 +156,10 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.cosetSum :
     · simp [F, hg, mt (hSH g h hh).1 hg]
   have hex : ∃ ρ, IsQuotNormaliser H ν ρ := ⟨ρ, hρn⟩
   have hswap := lintegral_normaliser_eq (μG := μ) hFm hFH hex.choose_spec hρn
-  have hpt : ∀ g, F g * ρ g =
-      ∑ i ∈ R, ((fun z => (x i)⁻¹ * z) ⁻¹' (K : Set G)).indicator (fun _ => (ν V)⁻¹) g := by
+  have hpt
+      : ∀ g,
+        F g * ρ g
+          = ∑ i ∈ R, ((fun z => (x i)⁻¹ * z) ⁻¹' (K : Set G)).indicator (fun _ => (ν V)⁻¹) g := by
     intro g
     by_cases hg : g ∈ S
     · obtain ⟨i, hi, h, hh, κ, hκ, rfl⟩ := (hS _).1 hg
@@ -163,7 +170,8 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.cosetSum :
         rw [Set.indicator_of_notMem]
         intro hm
         apply hji
-        refine hd j hj i hi ⟨h, hh, κ * ((x j)⁻¹ * (h * x i * κ))⁻¹, K.mul_mem hκ (K.inv_mem hm), ?_⟩
+        refine hd j hj i hi
+          ⟨h, hh, κ * ((x j)⁻¹ * (h * x i * κ))⁻¹, K.mul_mem hκ (K.inv_mem hm), ?_⟩
         group
     · have hF0 : F g = 0 := Set.indicator_of_notMem hg _
       rw [hF0, zero_mul]
@@ -185,8 +193,10 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.cosetSum :
   have hfin : (R.card : ENNReal) * ((ν V)⁻¹ * μ K) ≠ ⊤ :=
     ENNReal.mul_ne_top (ENNReal.natCast_ne_top _)
       (ENNReal.mul_ne_top (ENNReal.inv_ne_top.2 hV0) hKc.measure_lt_top.ne)
-  have hpt2 : ∀ g, (S.indicator 1 g : ℂ) * (((hex.choose g).toReal : ℝ) : ℂ)
-      = (((F g * hex.choose g).toReal : ℝ) : ℂ) := by
+  have hpt2
+      : ∀ g,
+        (S.indicator 1 g : ℂ) * (((hex.choose g).toReal : ℝ) : ℂ)
+          = (((F g * hex.choose g).toReal : ℝ) : ℂ) := by
     intro g
     by_cases hg : g ∈ S <;> simp [F, hg]
   unfold quotIntegral

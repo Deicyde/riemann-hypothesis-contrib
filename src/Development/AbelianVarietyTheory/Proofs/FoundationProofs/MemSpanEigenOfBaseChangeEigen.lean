@@ -8,14 +8,18 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem mem_span_eigen_of_baseChange_eigen (l : ℕ) [Fact l.Prime] (M S : Type) [AddCommGroup M]
-    [Module ℤ_[l] M] (B : Submodule ℤ_[l] M) [Module.Free ℤ_[l] B]
-    (g : S → Module.End ℤ_[l] M) (χ : S → ℤ_[l]) (hB : ∀ s, ∀ b ∈ B, g s b ∈ B)
+theorem mem_span_eigen_of_baseChange_eigen
+    (l : ℕ) [Fact l.Prime]
+    (M S : Type) [AddCommGroup M] [Module ℤ_[l] M]
+    (B : Submodule ℤ_[l] M) [Module.Free ℤ_[l] B]
+    (g : S → Module.End ℤ_[l] M)
+    (χ : S → ℤ_[l])
+    (hB : ∀ s, ∀ b ∈ B, g s b ∈ B)
     (x : PadicAlgCl l ⊗[ℤ_[l]] M)
     (hx : x ∈ LinearMap.range (LinearMap.baseChange (PadicAlgCl l) B.subtype))
-    (he : ∀ s, LinearMap.baseChange (PadicAlgCl l) (g s) x
-      = algebraMap ℤ_[l] (PadicAlgCl l) (χ s) • x) :
-    x ∈ Submodule.span (PadicAlgCl l)
+    (he : ∀ s,
+      LinearMap.baseChange (PadicAlgCl l) (g s) x = algebraMap ℤ_[l] (PadicAlgCl l) (χ s) • x)
+    : x ∈ Submodule.span (PadicAlgCl l)
       {y | ∃ b ∈ B, (∀ s, g s b = χ s • b) ∧ y = (1 : PadicAlgCl l) ⊗ₜ[ℤ_[l]] b} := by
   classical
   obtain ⟨x', rfl⟩ := hx
@@ -39,8 +43,9 @@ theorem mem_span_eigen_of_baseChange_eigen (l : ℕ) [Fact l.Prime] (M S : Type)
   have hΦt : ∀ (a : P) (b : B), Φ (a ⊗ₜ b) = (a : PadicAlgCl l) ⊗ₜ (b : M) := fun a b => rfl
   rw [hΦz] at he ⊢
   let h : S → Module.End ℤ_[l] B := fun s => (g s).restrict (hB s) - χ s • LinearMap.id
-  have hcomm : ∀ s w, Φ ((h s).lTensor P w)
-      = LinearMap.baseChange (PadicAlgCl l) (g s) (Φ w) - χ s • Φ w := by
+  have hcomm
+      : ∀ s w,
+        Φ ((h s).lTensor P w) = LinearMap.baseChange (PadicAlgCl l) (g s) (Φ w) - χ s • Φ w := by
     intro s w
     induction w using TensorProduct.induction_on with
     | zero => simp
@@ -56,9 +61,10 @@ theorem mem_span_eigen_of_baseChange_eigen (l : ℕ) [Fact l.Prime] (M S : Type)
   obtain ⟨c, rfl⟩ := (TensorProduct.equivFinsuppOfBasisLeft (N := B) ω).symm.surjective z
   have hc : ∀ s i, h s (c i) = 0 := by
     intro s i
-    have e : (h s).lTensor P ((TensorProduct.equivFinsuppOfBasisLeft (N := B) ω).symm c)
-        = (TensorProduct.equivFinsuppOfBasisLeft (N := B) ω).symm
-          (c.mapRange (h s) (map_zero _)) := by
+    have e
+        : (h s).lTensor P ((TensorProduct.equivFinsuppOfBasisLeft (N := B) ω).symm c)
+          = (TensorProduct.equivFinsuppOfBasisLeft (N := B) ω).symm
+            (c.mapRange (h s) (map_zero _)) := by
       rw [TensorProduct.equivFinsuppOfBasisLeft_symm_apply,
         TensorProduct.equivFinsuppOfBasisLeft_symm_apply,
         Finsupp.sum_mapRange_index (fun _ => TensorProduct.tmul_zero _ _), map_finsuppSum]

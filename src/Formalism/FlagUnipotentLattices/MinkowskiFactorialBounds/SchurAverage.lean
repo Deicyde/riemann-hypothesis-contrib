@@ -91,23 +91,31 @@ theorem packing_bound : Packing := by
   intro S hS
   classical
   let emb : E ↪ (Unit → E) := ⟨fun x _ => x, fun x y h => congrFun h ()⟩
-  have := card_separated_set_le_prod (S.map emb) (fun _ => l₀ / 2) (fun _ => R) (fun _ => by positivity)
-    (fun _ => hR) (by
-      intro c hc v
-      obtain ⟨x, hx, rfl⟩ := Finset.mem_map.1 hc
-      exact (hS hx).2) (by
-      intro c hc d hd hcd
-      obtain ⟨x, hx, rfl⟩ := Finset.mem_map.1 hc
-      obtain ⟨y, hy, rfl⟩ := Finset.mem_map.1 hd
-      refine ⟨(), ?_⟩
-      have hxy : x - y ≠ 0 := fun h => hcd (by rw [sub_eq_zero.mp h])
-      have := hΛ (x - y) (Λ.sub_mem (hS hx).1 (hS hy).1) hxy
-      show 2 * (l₀ / 2) ≤ ‖x - y‖
-      linarith)
+  have :=
+    card_separated_set_le_prod (S.map emb)
+      (fun _ => l₀ / 2)
+      (fun _ => R)
+      (fun _ => by positivity)
+      (fun _ => hR)
+      (by
+        intro c hc v
+        obtain ⟨x, hx, rfl⟩ := Finset.mem_map.1 hc
+        exact (hS hx).2)
+      (by
+        intro c hc d hd hcd
+        obtain ⟨x, hx, rfl⟩ := Finset.mem_map.1 hc
+        obtain ⟨y, hy, rfl⟩ := Finset.mem_map.1 hd
+        refine ⟨(), ?_⟩
+        have hxy : x - y ≠ 0 := fun h => hcd (by rw [sub_eq_zero.mp h])
+        have := hΛ (x - y) (Λ.sub_mem (hS hx).1 (hS hy).1) hxy
+        show 2 * (l₀ / 2) ≤ ‖x - y‖
+        linarith)
   rw [Finset.card_map] at this
   refine this.trans (le_of_eq ?_)
   simp only [Finset.univ_unique, Finset.prod_singleton]
-  congr 1; field_simp; ring
+  congr 1
+  field_simp
+  ring
 
 lemma prod_lt_one_of_lt_one {ι : Type*} [Fintype ι] (a : ι → ℝ) (h0 : ∀ v, 0 ≤ a v) (h1 : ∀ v, a v < 1)
     (v₀ : ι) : ∏ v, a v < 1 := by
@@ -120,29 +128,42 @@ lemma prod_lt_one_of_lt_one {ι : Type*} [Fintype ι] (a : ι → ℝ) (h0 : ∀
 
 theorem box_count_big_O : BoxCountO := by
   intro ι _ Λ B hB hΛ
-  have h12 : {x | x ∈ Λ ∧ ∀ v, ‖x v‖ ≤ B v}.Finite ∧
-      ({x | x ∈ Λ ∧ ∀ v, ‖x v‖ ≤ B v}.ncard : ℝ) ≤ ∏ v, (1 + 2 * B v) ^ 2 := by
+  have h12
+      : {x | x ∈ Λ ∧ ∀ v, ‖x v‖ ≤ B v}.Finite
+        ∧ ({x | x ∈ Λ ∧ ∀ v, ‖x v‖ ≤ B v}.ncard : ℝ) ≤ ∏ v, (1 + 2 * B v) ^ 2 := by
     apply finite_of_finset_card_bound
     intro S hS
-    have := card_separated_set_le_prod S (fun _ => 1 / 2) B (fun _ => by norm_num) (fun v => (hB v).le)
-      (fun c hc => (hS hc).2) (by
-        intro c hc d hd hcd
-        by_contra hcon
-        push_neg at hcon
-        have hne : c - d ≠ 0 := sub_ne_zero.mpr hcd
-        obtain ⟨v₀, -⟩ : ∃ v, c v ≠ d v := Function.ne_iff.mp hcd
-        have h1 := hΛ (c - d) (Λ.sub_mem (hS hc).1 (hS hd).1) hne
-        have h2 := prod_lt_one_of_lt_one (fun v => ‖(c - d) v‖) (fun v => norm_nonneg _)
-          (fun v => by have := hcon v; simp only [Pi.sub_apply]; linarith) v₀
-        linarith)
+    have :=
+      card_separated_set_le_prod S
+        (fun _ => 1 / 2)
+        B
+        (fun _ => by norm_num)
+        (fun v => (hB v).le)
+        (fun c hc => (hS hc).2)
+        (by
+          intro c hc d hd hcd
+          by_contra hcon
+          push_neg at hcon
+          have hne : c - d ≠ 0 := sub_ne_zero.mpr hcd
+          obtain ⟨v₀, -⟩ : ∃ v, c v ≠ d v := Function.ne_iff.mp hcd
+          have h1 := hΛ (c - d) (Λ.sub_mem (hS hc).1 (hS hd).1) hne
+          have h2 :=
+            prod_lt_one_of_lt_one
+              (fun v => ‖(c - d) v‖)
+              (fun v => norm_nonneg _)
+              (fun v => by have := hcon v; simp only [Pi.sub_apply]; linarith)
+              v₀
+          linarith)
     refine this.trans (le_of_eq ?_)
     rw [Complex.finrank_real_complex]
     refine Finset.prod_congr rfl fun v _ => ?_
-    congr 1; field_simp; ring
+    congr 1
+    field_simp
+    ring
   refine ⟨h12.1, h12.2, ?_⟩
   rw [Fintype.card, ← Finset.prod_const, ← Finset.prod_mul_distrib]
   refine Finset.prod_le_prod₀ (fun v _ => by positivity) fun v _ => ?_
-  have a1 : (1:ℝ) ≤ max 1 (B v) := le_max_left _ _
+  have a1 : (1 : ℝ) ≤ max 1 (B v) := le_max_left _ _
   have a2 : B v ≤ max 1 (B v) := le_max_right _ _
   have := hB v
   nlinarith
@@ -158,19 +179,19 @@ theorem box_count_alt : BoxCount := by
   have hPB : 0 < ∏ v, B v ^ 2 := Finset.prod_pos fun v _ => pow_pos (hB v) 2
   rcases isEmpty_or_nonempty ι with hι | hι
   · have h1 : S.card ≤ 1 := Finset.card_le_one.mpr fun a _ b _ => Subsingleton.elim a b
-    have h2 : (1:ℝ) ≤ 9 ^ (s * Fintype.card ι) * M ^ s :=
+    have h2 : (1 : ℝ) ≤ 9 ^ (s * Fintype.card ι) * M ^ s :=
       one_le_mul_of_one_le_of_one_le (one_le_pow₀ (by norm_num)) (one_le_pow₀ hM1)
     have h3 : (S.card : ℝ) ≤ 1 := by exact_mod_cast h1
     linarith
   · set f := Fintype.card ι with hf
     have hf0 : 0 < f := Fintype.card_pos
-    have hfR : (0:ℝ) < f := by exact_mod_cast hf0
+    have hfR : (0 : ℝ) < f := by exact_mod_cast hf0
     set τ := M ^ (1 / (2 * (f:ℝ))) with hτ
     have hτ1 : 1 ≤ τ := Real.one_le_rpow hM1 (by positivity)
     have hτ0 : 0 < τ := by linarith
     have hτpow : τ ^ (2 * f) = M := by
       rw [hτ, ← Real.rpow_natCast, ← Real.rpow_mul hM0.le]
-      have : 1 / (2 * (f:ℝ)) * ((2 * f : ℕ) : ℝ) = 1 := by push_cast; field_simp
+      have : 1 / (2 * (f : ℝ)) * ((2 * f : ℕ) : ℝ) = 1 := by push_cast; field_simp
       rw [this, Real.rpow_one]
     have hprod : ∏ v, (2 * (B v / (2 * τ))) ^ 2 ≤ ν := by
       have e : ∀ v, (2 * (B v / (2 * τ))) ^ 2 = B v ^ 2 / τ ^ 2 := fun v => by field_simp
@@ -180,38 +201,46 @@ theorem box_count_alt : BoxCount := by
       have : Q ≤ M := le_max_right _ _
       rw [hQ, div_le_iff₀ hν] at this
       linarith
-    have := card_separated_set_le_prod S (fun v => B v / (2 * τ)) B (fun v => by have := hB v; positivity)
-      (fun v => (hB v).le) (fun c hc => (hS hc).2) (by
-        intro c hc d hd hcd
-        by_contra hcon
-        push_neg at hcon
-        have hne : c - d ≠ 0 := sub_ne_zero.mpr hcd
-        have h1 := hΛ (c - d) (Λ.sub_mem (hS hc).1 (hS hd).1) hne
-        have hpos : ∀ v ∈ Finset.univ, 0 < ‖(c - d) v‖ ^ 2 := by
-          intro v _
-          by_contra h0
-          have hz : ‖(c - d) v‖ ^ 2 = 0 := le_antisymm (not_lt.mp h0) (by positivity)
-          have : ∏ v, ‖(c - d) v‖ ^ 2 = 0 := Finset.prod_eq_zero (Finset.mem_univ v) hz
-          linarith
-        have h2 : ∏ v, ‖(c - d) v‖ ^ 2 < ∏ v, (2 * (B v / (2 * τ))) ^ 2 :=
-          Finset.prod_lt_prod_of_nonempty₀ hpos (fun v _ =>
-            pow_lt_pow_left₀ (hcon v) (norm_nonneg _) (by norm_num)) Finset.univ_nonempty
-        linarith)
+    have :=
+      card_separated_set_le_prod S
+        (fun v => B v / (2 * τ))
+        B
+        (fun v => by have := hB v; positivity)
+        (fun v => (hB v).le)
+        (fun c hc => (hS hc).2)
+        (by
+          intro c hc d hd hcd
+          by_contra hcon
+          push_neg at hcon
+          have hne : c - d ≠ 0 := sub_ne_zero.mpr hcd
+          have h1 := hΛ (c - d) (Λ.sub_mem (hS hc).1 (hS hd).1) hne
+          have hpos : ∀ v ∈ Finset.univ, 0 < ‖(c - d) v‖ ^ 2 := by
+            intro v _
+            by_contra h0
+            have hz : ‖(c - d) v‖ ^ 2 = 0 := le_antisymm (not_lt.mp h0) (by positivity)
+            have : ∏ v, ‖(c - d) v‖ ^ 2 = 0 := Finset.prod_eq_zero (Finset.mem_univ v) hz
+            linarith
+          have h2 : ∏ v, ‖(c - d) v‖ ^ 2 < ∏ v, (2 * (B v / (2 * τ))) ^ 2 :=
+            Finset.prod_lt_prod_of_nonempty₀ hpos
+              (fun v _ => pow_lt_pow_left₀ (hcon v) (norm_nonneg _) (by norm_num))
+              Finset.univ_nonempty
+          linarith)
     refine this.trans ?_
     have hdim : finrank ℝ (EuclideanSpace ℂ (Fin s)) = 2 * s := by
       rw [← Module.finrank_mul_finrank ℝ ℂ (EuclideanSpace ℂ (Fin s)), Complex.finrank_real_complex,
         finrank_euclideanSpace, Fintype.card_fin]
     rw [hdim]
-    calc ∏ v, ((B v + B v / (2 * τ)) / (B v / (2 * τ))) ^ (2 * s) ≤ ∏ _v : ι, (3 * τ) ^ (2 * s) := by
-          refine Finset.prod_le_prod₀ (fun v _ => by have := hB v; positivity) fun v _ => ?_
-          have hb := hB v
-          have e : (B v + B v / (2 * τ)) / (B v / (2 * τ)) = 2 * τ + 1 := by field_simp
-          rw [e]
-          exact pow_le_pow_left₀ (by positivity) (by linarith) _
+    calc
+      ∏ v, ((B v + B v / (2 * τ)) / (B v / (2 * τ))) ^ (2 * s) ≤ ∏ _v : ι, (3 * τ) ^ (2 * s) := by
+        refine Finset.prod_le_prod₀ (fun v _ => by have := hB v; positivity) fun v _ => ?_
+        have hb := hB v
+        have e : (B v + B v / (2 * τ)) / (B v / (2 * τ)) = 2 * τ + 1 := by field_simp
+        rw [e]
+        exact pow_le_pow_left₀ (by positivity) (by linarith) _
       _ = 9 ^ (s * f) * (τ ^ (2 * f)) ^ s := by
-          rw [Finset.prod_const, Finset.card_univ, ← hf, ← pow_mul, mul_pow, ← pow_mul,
-            show (9:ℝ) = 3 ^ 2 by norm_num, ← pow_mul]
-          congr 2 <;> ring
+        rw [Finset.prod_const, Finset.card_univ, ← hf, ← pow_mul, mul_pow, ← pow_mul,
+          show (9 : ℝ) = 3 ^ 2 by norm_num, ← pow_mul]
+        congr 2 <;> ring
       _ = _ := by rw [hτpow]
 
 open InnerProductSpace
@@ -222,8 +251,12 @@ variable {U : Type*} [NormedAddCommGroup U] [InnerProductSpace ℂ U]
 
 noncomputable def s5bL {r : ℕ} (a : Fin r → U) : Matrix (Fin r) (Fin r) ℂ :=
   Matrix.of fun n i =>
-    if i < n then inner ℂ (gramSchmidt ℂ a i) (a n) / ((‖gramSchmidt ℂ a i‖ : ℂ) ^ 2)
-    else if i = n then 1 else 0
+    if i < n then
+      inner ℂ (gramSchmidt ℂ a i) (a n) / ((‖gramSchmidt ℂ a i‖ : ℂ) ^ 2)
+    else if i = n then
+      1
+    else
+      0
 
 lemma det_gramSchmidt_coeff_eq_one {r : ℕ} (a : Fin r → U) : (s5bL a).det = 1 := by
   rw [Matrix.det_of_lowerTriangular]
@@ -308,7 +341,9 @@ theorem gram_hadamard_inequality : GramHadamard := by
     rw [sqrt_det_gram_eq_prod_norm]
     exact Finset.prod_le_prod₀ (fun _ _ => norm_nonneg _) fun i _ => norm_gramSchmidt_le a i
   refine ⟨h1, fun R hR => h1.trans ?_⟩
-  calc ∏ b, ‖a b‖ ≤ ∏ _b : Fin r, R := Finset.prod_le_prod₀ (fun _ _ => norm_nonneg _) fun b _ => hR b
+  calc
+    ∏ b, ‖a b‖
+      ≤ ∏ _b : Fin r, R := Finset.prod_le_prod₀ (fun _ _ => norm_nonneg _) fun b _ => hR b
     _ = R ^ r := by simp
 
 lemma norm_det_le_prod_row_norms {j : ℕ} (N : Matrix (Fin j) (Fin j) ℂ) :
@@ -416,7 +451,10 @@ lemma norm_det_sesquilinear_le_gramSchmidt {V₁ V₂ : Type*} [NormedAddCommGro
 
 theorem wedge_hadamard_inequality : WedgeHadamard := by
   intro V₁ V₂ _ _ _ _ B hB j y y'
-  have := norm_det_sesquilinear_le_gramSchmidt B 1 zero_le_one (fun x y => by rw [one_mul]; exact hB x y) y y'
+  have :=
+    norm_det_sesquilinear_le_gramSchmidt B 1 zero_le_one
+      (fun x y => by rw [one_mul]; exact hB x y)
+      y y'
   rw [one_pow, one_mul] at this
   refine this.trans ?_
   apply mul_le_mul
@@ -427,27 +465,39 @@ theorem wedge_hadamard_inequality : WedgeHadamard := by
 
 theorem absolute_value_bound : AbsA := by
   intro U₁ U₂ _ _ _ _ r u u' Z hZ
-  let B : U₁ →ₗ[ℂ] U₂ →ₗ⋆[ℂ] ℂ := LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ)
-    (fun w₁ w₂ => ∑ a, ∑ b, inner ℂ (u a) w₁ * conj (inner ℂ (u' b) w₂) * Z a b)
-    (by intro x x' y; simp only [inner_add_right, add_mul, Finset.sum_add_distrib])
-    (by intro c x y; simp only [inner_smul_right, RingHom.id_apply, smul_eq_mul, Finset.mul_sum]
+  let B : U₁ →ₗ[ℂ] U₂ →ₗ⋆[ℂ] ℂ :=
+    LinearMap.mk₂'ₛₗ (RingHom.id ℂ) (starRingEnd ℂ)
+      (fun w₁ w₂ => ∑ a, ∑ b, inner ℂ (u a) w₁ * conj (inner ℂ (u' b) w₂) * Z a b)
+      (by intro x x' y; simp only [inner_add_right, add_mul, Finset.sum_add_distrib])
+      (by
+        intro c x y
+        simp only [inner_smul_right, RingHom.id_apply, smul_eq_mul, Finset.mul_sum]
         refine Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring)
-    (by intro x y y'; simp only [inner_add_right, map_add (f := _), mul_add, add_mul, Finset.sum_add_distrib])
-    (by intro c x y; simp only [inner_smul_right, map_mul, smul_eq_mul, Finset.mul_sum]
+      (by
+        intro x y y'
+        simp only [inner_add_right, map_add (f := _), mul_add, add_mul, Finset.sum_add_distrib])
+      (by
+        intro c x y
+        simp only [inner_smul_right, map_mul, smul_eq_mul, Finset.mul_sum]
         refine Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring)
-  have hBapp : ∀ w₁ w₂, B w₁ w₂ =
-      ∑ a, ∑ b, inner ℂ (u a) w₁ * conj (inner ℂ (u' b) w₂) * Z a b := fun _ _ => rfl
-  have hW := norm_det_sesquilinear_le_gramSchmidt B 2 (by norm_num) (fun x y => by rw [hBapp]; exact hZ x y) u u'
+  have hBapp : ∀ w₁ w₂, B w₁ w₂ = ∑ a, ∑ b, inner ℂ (u a) w₁ * conj (inner ℂ (u' b) w₂) * Z a b :=
+    fun _ _ => rfl
+  have hW :=
+    norm_det_sesquilinear_le_gramSchmidt B 2 (by norm_num)
+      (fun x y => by rw [hBapp]; exact hZ x y)
+      u u'
   rw [← sqrt_det_gram_eq_prod_norm, ← sqrt_det_gram_eq_prod_norm] at hW
-  have hM : (Matrix.of fun c d => B (u c) (u' d)) =
-      (Matrix.gram ℂ u)ᵀ * Z * ((starRingEnd ℂ).mapMatrix (Matrix.gram ℂ u')) := by
+  have hM
+      : (Matrix.of fun c d => B (u c) (u' d))
+        = (Matrix.gram ℂ u)ᵀ * Z * ((starRingEnd ℂ).mapMatrix (Matrix.gram ℂ u')) := by
     ext c d
     simp only [Matrix.of_apply, hBapp, Matrix.mul_apply, Matrix.transpose_apply, Matrix.gram_apply,
       RingHom.mapMatrix_apply, Matrix.map_apply, Finset.sum_mul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
-  rw [hM, Matrix.det_mul, Matrix.det_mul, Matrix.det_transpose, ← RingHom.map_det, norm_mul, norm_mul,
-    RCLike.norm_conj] at hW
+  rw [hM, Matrix.det_mul, Matrix.det_mul, Matrix.det_transpose, ← RingHom.map_det, norm_mul,
+      norm_mul, RCLike.norm_conj]
+    at hW
   set X := Real.sqrt ‖(Matrix.gram ℂ u).det‖ with hX
   set X' := Real.sqrt ‖(Matrix.gram ℂ u').det‖ with hX'
   have hX2 : ‖(Matrix.gram ℂ u).det‖ = X * X := (Real.mul_self_sqrt (norm_nonneg _)).symm
@@ -524,7 +574,8 @@ theorem lattice_sum_alt : LatticeSum := by
     Integrable.fintype_prod (f := fun _ => w₁) (μ := fun _ => volume) (fun _ => hw1i)
   have hWv : ∫ x, W x = (3 * Real.pi * H ^ 2) ^ f := by
     have := integral_fintype_prod_volume_eq_pow (ι := ι) w₁
-    rw [hw1v] at this; exact this
+    rw [hw1v] at this
+    exact this
   have hw10 : ∀ z, 0 < w₁ z := fun z => by simp only [w₁]; positivity
   have hW0 : ∀ x, 0 ≤ W x := fun x => Finset.prod_nonneg fun v _ => (hw10 _).le
   let P : (ι → ℂ) → Set (ι → ℂ) := fun c => Set.pi Set.univ fun v => ball (c v) (1 / 2)
@@ -538,7 +589,9 @@ theorem lattice_sum_alt : LatticeSum := by
     congr 1
     rw [← ENNReal.ofReal_pow (by norm_num), ← NNReal.coe_real_pi, ← ENNReal.ofReal_coe_nnreal,
       ← ENNReal.ofReal_mul (by positivity)]
-    congr 1; simp; ring
+    congr 1
+    simp
+    ring
   have hPvol : ∀ c, (volume : Measure (ι → ℂ)).real (P c) = (Real.pi / 4) ^ f := by
     intro c; rw [measureReal_def, hPvol', ENNReal.toReal_ofReal (by positivity)]
   have hcomp : ∀ c y, y ∈ P c → W c ≤ (27 / 8) ^ f * W y := by
@@ -561,11 +614,14 @@ theorem lattice_sum_alt : LatticeSum := by
       have h4 : ‖y v‖ / H ≤ ‖c v‖ / H + 1 / 2 := by
         rw [div_le_iff₀ hH0]
         have : (‖c v‖ / H + 1 / 2) * H = ‖c v‖ + H / 2 := by field_simp
-        rw [this]; linarith
+        rw [this]
+        linarith
       linarith
     show (a ^ 3)⁻¹ ≤ 27 / 8 * (b ^ 3)⁻¹
     have h5 : b ^ 3 ≤ 27 / 8 * a ^ 3 := by
-      calc b ^ 3 ≤ (3 / 2 * a) ^ 3 := pow_le_pow_left₀ (by linarith) hba 3
+      calc
+        b ^ 3
+          ≤ (3 / 2 * a) ^ 3 := pow_le_pow_left₀ (by linarith) hba 3
         _ = _ := by ring
     rw [← div_eq_mul_inv, le_div_iff₀ (by positivity), inv_mul_eq_div, div_le_iff₀ (by positivity)]
     exact h5
@@ -579,38 +635,52 @@ theorem lattice_sum_alt : LatticeSum := by
       obtain ⟨v₀, -⟩ : ∃ v, (c : ι → ℂ) v ≠ (d : ι → ℂ) v :=
         Function.ne_iff.mp fun h => hcd (Subtype.ext h)
       have h1 := hΛ _ (Λ.sub_mem c.2 d.2) hne
-      have h2 := prod_lt_one_of_lt_one (fun v => ‖((c : ι → ℂ) - d) v‖) (fun v => norm_nonneg _)
-        (fun v => by
-          have a1 := hx v (Set.mem_univ v)
-          have a2 := hx' v (Set.mem_univ v)
-          rw [mem_ball, dist_eq_norm] at a1 a2
-          have : ‖(c : ι → ℂ) v - (d : ι → ℂ) v‖ ≤ ‖x v - (d : ι → ℂ) v‖ + ‖x v - (c : ι → ℂ) v‖ := by
-            have e : (c : ι → ℂ) v - (d : ι → ℂ) v = (x v - (d : ι → ℂ) v) - (x v - (c : ι → ℂ) v) := by
-              abel
-            rw [e]; exact norm_sub_le _ _
-          simp only [Pi.sub_apply]; linarith) v₀
+      have h2 :=
+        prod_lt_one_of_lt_one
+          (fun v => ‖((c : ι → ℂ) - d) v‖)
+          (fun v => norm_nonneg _)
+          (fun v => by
+            have a1 := hx v (Set.mem_univ v)
+            have a2 := hx' v (Set.mem_univ v)
+            rw [mem_ball, dist_eq_norm] at a1 a2
+            have : ‖(c : ι → ℂ) v - (d : ι → ℂ) v‖
+                ≤ ‖x v - (d : ι → ℂ) v‖ + ‖x v - (c : ι → ℂ) v‖ := by
+              have e
+                  : (c : ι → ℂ) v - (d : ι → ℂ) v
+                    = (x v - (d : ι → ℂ) v) - (x v - (c : ι → ℂ) v) := by
+                abel
+              rw [e]
+              exact norm_sub_le _ _
+            simp only [Pi.sub_apply]
+            linarith)
+          v₀
       linarith
     have hgi : Integrable fun y => (27 / 8 : ℝ) ^ f * W y := hWi.const_mul _
     have h1 : ∀ D ∈ S, W D * (Real.pi / 4) ^ f ≤ ∫ y in P D, (27 / 8 : ℝ) ^ f * W y := by
       intro D _
       rw [← hPvol D, mul_comm, ← smul_eq_mul]
       exact setIntegral_ge_of_const_le (hPm D) (by rw [hPvol']; exact ENNReal.ofReal_ne_top)
-        (fun y hy => hcomp D y hy) hgi.integrableOn
-    have h2 : ∑ D ∈ S, ∫ y in P D, (27 / 8 : ℝ) ^ f * W y =
-        ∫ y in ⋃ D ∈ S, P D, (27 / 8 : ℝ) ^ f * W y :=
+        (fun y hy => hcomp D y hy)
+        hgi.integrableOn
+    have h2
+        : ∑ D ∈ S, ∫ y in P D, (27 / 8 : ℝ) ^ f * W y
+          = ∫ y in ⋃ D ∈ S, P D, (27 / 8 : ℝ) ^ f * W y :=
       (integral_biUnion_finset S (fun D _ => hPm D) D (fun D _ => hgi.integrableOn)).symm
     have h3 : ∫ y in ⋃ D ∈ S, P D, (27 / 8 : ℝ) ^ f * W y ≤ ∫ y, (27 / 8 : ℝ) ^ f * W y :=
-      setIntegral_le_integral hgi (Filter.Eventually.of_forall fun y => by
-        have := hW0 y; positivity)
+      setIntegral_le_integral hgi
+        (Filter.Eventually.of_forall fun y => by have := hW0 y; positivity)
     have h4 : ∫ y, (27 / 8 : ℝ) ^ f * W y = (27 / 8 : ℝ) ^ f * (3 * Real.pi * H ^ 2) ^ f := by
       rw [integral_const_mul, hWv]
-    have h5 : (∑ D ∈ S, W D) * (Real.pi / 4) ^ f ≤ (27 / 8 : ℝ) ^ f * (3 * Real.pi * H ^ 2) ^ f := by
+    have h5
+        : (∑ D ∈ S, W D) * (Real.pi / 4) ^ f ≤ (27 / 8 : ℝ) ^ f * (3 * Real.pi * H ^ 2) ^ f := by
       rw [Finset.sum_mul]
-      calc _ ≤ ∑ D ∈ S, ∫ y in P D, (27 / 8 : ℝ) ^ f * W y := Finset.sum_le_sum h1
+      calc
+        _ ≤ ∑ D ∈ S, ∫ y in P D, (27 / 8 : ℝ) ^ f * W y := Finset.sum_le_sum h1
         _ = _ := h2
         _ ≤ _ := h3
         _ = _ := h4
-    have h6 : (27 / 8 : ℝ) ^ f * (3 * Real.pi * H ^ 2) ^ f ≤ (41 * H ^ 2) ^ f * (Real.pi / 4) ^ f := by
+    have h6
+        : (27 / 8 : ℝ) ^ f * (3 * Real.pi * H ^ 2) ^ f ≤ (41 * H ^ 2) ^ f * (Real.pi / 4) ^ f := by
       rw [← mul_pow, ← mul_pow]
       apply pow_le_pow_left₀ (by positivity)
       nlinarith [mul_pos hpi (pow_pos hH0 2)]

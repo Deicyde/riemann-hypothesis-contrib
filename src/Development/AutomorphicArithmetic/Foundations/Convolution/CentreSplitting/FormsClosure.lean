@@ -5,17 +5,20 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.CentreSp
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
 open GlobalTheory.CuspRep (CuspSub GA Af Ad finGL locGL)
 open UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.Dp UpperTheory.V
 
-theorem UpperTheory.ConvolutionTheory.Dp.formsClosure :
-    UpperTheory.ConvolutionTheory.Dp.FormsClosure := by
+theorem UpperTheory.ConvolutionTheory.Dp.formsClosure
+    : UpperTheory.ConvolutionTheory.Dp.FormsClosure := by
   intro K _ _ n μ _ U hU hs
   have hsup := sup_orthRel_centralCuspForms μ U hU hs.ρ hs.τ
-  have hin : ∀ a b : cuspForms K n, inner ℂ (clsL μ a) (clsL μ b) = inner ℂ (cuspToL2 μ a) (cuspToL2 μ b) :=
-    fun _ _ => rfl
+  have hin
+      : ∀ a b : cuspForms K n,
+        inner ℂ (clsL μ a) (clsL μ b) = inner ℂ (cuspToL2 μ a) (cuspToL2 μ b) := fun _ _ =>
+    rfl
   apply le_antisymm
   · rintro φ ⟨hφc, hφV⟩
     have hφc' := hφc

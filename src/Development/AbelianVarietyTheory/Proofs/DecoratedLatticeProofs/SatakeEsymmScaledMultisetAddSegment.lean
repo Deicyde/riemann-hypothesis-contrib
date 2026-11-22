@@ -7,8 +7,11 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.IndefR.Datum
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 open GlobalTheory.ChainOnto GlobalTheory.LFun GlobalTheory.AdelicU GlobalTheory.PRep
 open GlobalTheory.FinZeta (Gv embV Kv VacFin IsLocKer KerU)
@@ -21,12 +24,13 @@ noncomputable section
 
 namespace GlobalTheory.ChainOnto
 
-theorem esymm_cons_succ_C (a : ℂ) (s : Multiset ℂ) (n : ℕ) :
-    (a ::ₘ s).esymm (n + 1) = s.esymm (n + 1) + a * s.esymm n := by
+theorem esymm_cons_succ_C (a : ℂ) (s : Multiset ℂ) (n : ℕ)
+    : (a ::ₘ s).esymm (n + 1) = s.esymm (n + 1) + a * s.esymm n := by
   simp [Multiset.esymm, Multiset.powersetCard_cons, Multiset.map_map, Multiset.sum_map_mul_left]
 
-theorem coeff_prod_one_add_C (s : Multiset ℂ) (n : ℕ) :
-    ((s.map fun a => (1 + Polynomial.C a * Polynomial.X : Polynomial ℂ)).prod).coeff n = s.esymm n := by
+theorem coeff_prod_one_add_C (s : Multiset ℂ) (n : ℕ)
+    : ((s.map fun a => (1 + Polynomial.C a * Polynomial.X : Polynomial ℂ)).prod).coeff n
+      = s.esymm n := by
   induction s using Multiset.induction_on generalizing n with
   | empty =>
     cases n with
@@ -39,22 +43,22 @@ theorem coeff_prod_one_add_C (s : Multiset ℂ) (n : ℕ) :
     | zero => simp [ih, Multiset.esymm]
     | succ n => rw [Polynomial.coeff_X_mul, ih, ih, esymm_cons_succ_C]
 
-theorem esymm_add_C (s t : Multiset ℂ) (n : ℕ) :
-    (s + t).esymm n = ∑ i ∈ Finset.range (n + 1), s.esymm i * t.esymm (n - i) := by
+theorem esymm_add_C (s t : Multiset ℂ) (n : ℕ)
+    : (s + t).esymm n = ∑ i ∈ Finset.range (n + 1), s.esymm i * t.esymm (n - i) := by
   rw [← coeff_prod_one_add_C, Multiset.map_add (f := _), Multiset.prod_add, Polynomial.coeff_mul,
     Finset.Nat.sum_antidiagonal_eq_sum_range_succ_mk]
   simp only [coeff_prod_one_add_C]
 
-theorem esymm_map_mul_C (c : ℂ) (s : Multiset ℂ) (k : ℕ) :
-    (s.map (fun x => c * x)).esymm k = c ^ k * s.esymm k := by
+theorem esymm_map_mul_C (c : ℂ) (s : Multiset ℂ) (k : ℕ)
+    : (s.map (fun x => c * x)).esymm k = c ^ k * s.esymm k := by
   have h := Multiset.pow_smul_esymm c k s
   simpa [smul_eq_mul] using h.symm
 
 theorem esymm_eq_zero_of_lt (s : Multiset ℂ) {k : ℕ} (h : s.card < k) : s.esymm k = 0 := by
   simp [Multiset.esymm, Multiset.powersetCard_eq_empty k h]
 
-theorem natCast_cpow_half (Q : ℕ) (m : ℤ) :
-    (Q : ℂ) ^ ((m : ℂ) / 2) = ((Real.sqrt Q : ℝ) : ℂ) ^ m := by
+theorem natCast_cpow_half (Q : ℕ) (m : ℤ)
+    : (Q : ℂ) ^ ((m : ℂ) / 2) = ((Real.sqrt Q : ℝ) : ℂ) ^ m := by
   have h1 : ((Real.sqrt Q : ℝ) : ℂ) = (Q : ℂ) ^ ((1 / 2 : ℂ)) := by
     rw [Real.sqrt_eq_rpow, Complex.ofReal_cpow (Nat.cast_nonneg _)]
     push_cast
@@ -68,9 +72,10 @@ theorem sqrt_sq_C (Q : ℕ) : ((Real.sqrt Q : ℝ) : ℂ) ^ 2 = (Q : ℂ) := by
   push_cast
   rfl
 
-theorem esymm_string (Q : ℕ) (s z : ℂ) (hs : s ≠ 0) (hQ : s ^ 2 = (Q : ℂ)) (t : ℕ) :
-    ∀ l : ℕ, ((Finset.range t).val.map fun i : ℕ => z * s ^ ((t : ℤ) - 1 - 2 * i)).esymm l =
-      z ^ l * s ^ (-((l : ℤ) * ((t : ℤ) - l))) * (Formalism.L2.Col.gaussBin Q t l : ℂ) := by
+theorem esymm_string (Q : ℕ) (s z : ℂ) (hs : s ≠ 0) (hQ : s ^ 2 = (Q : ℂ)) (t : ℕ)
+    : ∀ l : ℕ,
+      ((Finset.range t).val.map fun i : ℕ => z * s ^ ((t : ℤ) - 1 - 2 * i)).esymm l
+        = z ^ l * s ^ (-((l : ℤ) * ((t : ℤ) - l))) * (Formalism.L2.Col.gaussBin Q t l : ℂ) := by
   induction t with
   | zero =>
     intro l
@@ -79,10 +84,13 @@ theorem esymm_string (Q : ℕ) (s z : ℂ) (hs : s ≠ 0) (hQ : s ^ 2 = (Q : ℂ
     | succ l => simp [Multiset.esymm, Formalism.L2.Col.gaussBin, Multiset.powersetCard_zero_right]
   | succ t ih =>
     intro l
-    have hm : ((Finset.range (t + 1)).val.map fun i : ℕ => z * s ^ (((t + 1 : ℕ) : ℤ) - 1 - 2 * i)) =
-        (z * s ^ (-(t : ℤ))) ::ₘ (((Finset.range t).val.map fun i : ℕ => z * s ^ ((t : ℤ) - 1 - 2 * i)).map
-          fun x => s * x) := by
-      rw [Finset.range_val, Finset.range_val, Multiset.range_succ, Multiset.map_cons, Multiset.map_map]
+    have hm
+        : ((Finset.range (t + 1)).val.map fun i : ℕ => z * s ^ (((t + 1 : ℕ) : ℤ) - 1 - 2 * i))
+          = (z * s ^ (-(t : ℤ)))
+            ::ₘ (((Finset.range t).val.map fun i : ℕ => z * s ^ ((t : ℤ) - 1 - 2 * i)).map fun x =>
+              s * x) := by
+      rw [Finset.range_val, Finset.range_val, Multiset.range_succ, Multiset.map_cons,
+        Multiset.map_map]
       congr 1
       · congr 1; congr 1; push_cast; ring
       · refine Multiset.map_congr rfl fun i _ => ?_
@@ -98,20 +106,28 @@ theorem esymm_string (Q : ℕ) (s z : ℂ) (hs : s ≠ 0) (hQ : s ^ 2 = (Q : ℂ
       rw [esymm_cons_succ_C, esymm_map_mul_C, esymm_map_mul_C, ih, ih, Formalism.L2.Col.gaussBin]
       push_cast
       rw [← hQ]
-      have h1 : s ^ (l + 1) * s ^ (-(((l : ℤ) + 1) * ((t : ℤ) - ((l : ℤ) + 1)))) =
-          s ^ (-(((l : ℤ) + 1) * ((t : ℤ) + 1 - ((l : ℤ) + 1)))) * (s ^ 2) ^ (l + 1) := by
+      have h1
+          : s ^ (l + 1) * s ^ (-(((l : ℤ) + 1) * ((t : ℤ) - ((l : ℤ) + 1))))
+            = s ^ (-(((l : ℤ) + 1) * ((t : ℤ) + 1 - ((l : ℤ) + 1)))) * (s ^ 2) ^ (l + 1) := by
         rw [← pow_mul, ← zpow_natCast, ← zpow_natCast, ← zpow_add₀ hs, ← zpow_add₀ hs]
-        congr 1; push_cast; ring
-      have h2 : s ^ (-(t : ℤ)) * s ^ l * s ^ (-((l : ℤ) * ((t : ℤ) - l))) =
-          s ^ (-(((l : ℤ) + 1) * ((t : ℤ) + 1 - ((l : ℤ) + 1)))) := by
+        congr 1
+        push_cast
+        ring
+      have h2
+          : s ^ (-(t : ℤ)) * s ^ l * s ^ (-((l : ℤ) * ((t : ℤ) - l)))
+            = s ^ (-(((l : ℤ) + 1) * ((t : ℤ) + 1 - ((l : ℤ) + 1)))) := by
         rw [← zpow_natCast, ← zpow_add₀ hs, ← zpow_add₀ hs]
-        congr 1; push_cast; ring
+        congr 1
+        push_cast
+        ring
       linear_combination (z ^ (l + 1) * (Formalism.L2.Col.gaussBin Q t (l + 1) : ℂ)) * h1 +
         (z ^ (l + 1) * (Formalism.L2.Col.gaussBin Q t l : ℂ)) * h2
 
-theorem map_coe_seg (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) (z : ℂˣ) (t : ℕ) :
-    (seg w z t).map (fun b : ℂˣ => (b : ℂ)) =
-      (Finset.range t).val.map fun i : ℕ => (z : ℂ) * ((Real.sqrt (qV E w) : ℝ) : ℂ) ^ ((t : ℤ) - 1 - 2 * i) := by
+theorem map_coe_seg
+    (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) (z : ℂˣ) (t : ℕ)
+    : (seg w z t).map (fun b : ℂˣ => (b : ℂ))
+      = (Finset.range t).val.map fun i : ℕ =>
+        (z : ℂ) * ((Real.sqrt (qV E w) : ℝ) : ℂ) ^ ((t : ℤ) - 1 - 2 * i) := by
   rw [seg, Multiset.map_map]
   refine Multiset.map_congr rfl fun i _ => ?_
   simp only [Function.comp_apply, Units.val_mul, coe_npowU, npow]

@@ -8,11 +8,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CurveDVRSpe
 
 @[expose] public section
 
-theorem UpperTheory.V.Pr.niceOf :
-    ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [UpperTheory.V.Fr.IsCoef l O] [Algebra ℤ_[l] O] (F : UpperTheory.V.Fr.Frame l (IsLocalRing.ResidueField O)) (n : ℕ) (T : UpperTheory.V.Pr.Setup F n), T.NiceOf := by
+theorem UpperTheory.V.Pr.niceOf
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [UpperTheory.V.Fr.IsCoef l O] [Algebra ℤ_[l] O]
+        (F : UpperTheory.V.Fr.Frame l (IsLocalRing.ResidueField O)) (n : ℕ)
+        (T : UpperTheory.V.Pr.Setup F n),
+      T.NiceOf := by
   intro l _ O _ _ _ _ _ F n T x L y j hj hp h1 h2
-  refine ⟨UpperTheory.V.Pr.nice_specialization_twist_satisfies_first_condition l O F n T x L y j hj hp h1 h2, UpperTheory.V.Pr.nice_specialization_twist_satisfies_third_condition l O F n T x L y j hj hp h1 h2,
-    fun hI => ?_, fun hE => ?_⟩
+  refine ⟨
+    UpperTheory.V.Pr.nice_specialization_twist_satisfies_first_condition l O F n T x L y j hj hp h1
+      h2,
+    UpperTheory.V.Pr.nice_specialization_twist_satisfies_third_condition l O F n T x L y j hj hp h1
+      h2,
+    fun hI => ?_,
+    fun hE => ?_
+  ⟩
   · have h := UpperTheory.V.Pr.niceIrr l O F n T x L y j hj hp h1 h2 hI ⊤ (by simp)
     rw [top_inf_eq] at h
     exact h

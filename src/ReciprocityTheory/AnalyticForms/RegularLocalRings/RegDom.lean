@@ -14,10 +14,10 @@ variable {R : Type*} [CommRing R]
 theorem isDomain_of_isRegularLocalRing [IsRegularLocalRing R] : IsDomain R :=
   ReciprocityTheory.CA.AB.RegA.IsRegularLocalRing.isDomain R
 
-theorem isRegularLocalRing_quotient_of_not_mem_sq [IsRegularLocalRing R] {x : R}
-    (hx : x ∈ maximalIdeal R) (hx2 : x ∉ maximalIdeal R ^ 2) :
-    IsRegularLocalRing (R ⧸ Ideal.span {x}) ∧
-      ringKrullDim (R ⧸ Ideal.span {x}) + 1 = ringKrullDim R := by
+theorem isRegularLocalRing_quotient_of_not_mem_sq
+    [IsRegularLocalRing R] {x : R} (hx : x ∈ maximalIdeal R) (hx2 : x ∉ maximalIdeal R ^ 2)
+    : IsRegularLocalRing (R ⧸ Ideal.span {x})
+      ∧ ringKrullDim (R ⧸ Ideal.span {x}) + 1 = ringKrullDim R := by
   classical
   have hreg : ((Submodule.spanFinrank (maximalIdeal R) : ℕ) : WithBot ℕ∞) = ringKrullDim R := by
     obtain ⟨h⟩ := ‹IsRegularLocalRing R›
@@ -55,15 +55,18 @@ theorem isRegularLocalRing_quotient_of_not_mem_sq [IsRegularLocalRing R] {x : R}
     rw [← hc, sq]
     refine Submodule.sum_mem _ (fun i _ => ?_)
     rw [smul_eq_mul]
-    refine Ideal.mul_mem_mul ((IsLocalRing.mem_maximalIdeal _).mpr (mem_nonunits_iff.mpr (hcon i))) ?_
+    refine Ideal.mul_mem_mul ((IsLocalRing.mem_maximalIdeal _).mpr (mem_nonunits_iff.mpr (hcon i)))
+      ?_
     rw [← hs_span]
     exact Submodule.subset_span i.2
   have hi0mem : i0 ∈ c.support := Finsupp.mem_support_iff.mpr hi0.ne_zero
 
-  have hrest : ∑ i ∈ c.support.erase i0, c i • (i : R) ∈
-      Ideal.span (s \ {(i0 : R)}) ⊔ Ideal.span {x} := by
-    refine Submodule.sum_mem _ (fun i hi => Submodule.smul_mem _ _ (Submodule.mem_sup_left
-      (Ideal.subset_span ⟨i.2, fun h => Finset.ne_of_mem_erase hi (Subtype.ext h)⟩)))
+  have hrest
+      : ∑ i ∈ c.support.erase i0, c i • (i : R) ∈ Ideal.span (s \ {(i0 : R)}) ⊔ Ideal.span {x} := by
+    refine Submodule.sum_mem _ (fun i hi =>
+      Submodule.smul_mem _ _
+        (Submodule.mem_sup_left (Ideal.subset_span
+          ⟨i.2, fun h => Finset.ne_of_mem_erase hi (Subtype.ext h)⟩)))
   have hsplit : c i0 • (i0 : R) + ∑ i ∈ c.support.erase i0, c i • (i : R) = x :=
     (Finset.add_sum_erase _ (fun i => c i • (i : R)) hi0mem).trans hc
   have hi0J : (i0 : R) ∈ Ideal.span (s \ {(i0 : R)}) ⊔ Ideal.span {x} := by
@@ -84,12 +87,14 @@ theorem isRegularLocalRing_quotient_of_not_mem_sq [IsRegularLocalRing R] {x : R}
       exact hi0J
     · exact Submodule.mem_sup_left (Ideal.subset_span ⟨hy, hyi⟩)
 
-  have hmap : Ideal.map (Ideal.Quotient.mk (Ideal.span {x}))
-      (Ideal.span (s \ {(i0 : R)}) ⊔ Ideal.span {x}) =
-      Ideal.span ((Ideal.Quotient.mk (Ideal.span {x})) '' (s \ {(i0 : R)})) := by
+  have hmap
+      : Ideal.map (Ideal.Quotient.mk (Ideal.span {x}))
+          (Ideal.span (s \ {(i0 : R)}) ⊔ Ideal.span {x})
+        = Ideal.span ((Ideal.Quotient.mk (Ideal.span {x})) '' (s \ {(i0 : R)})) := by
     rw [Ideal.map_sup, Ideal.map_quotient_self, sup_bot_eq, Ideal.map_span]
-  have hmQ : maximalIdeal (R ⧸ Ideal.span {x}) =
-      Ideal.span ((Ideal.Quotient.mk (Ideal.span {x})) '' (s \ {(i0 : R)})) := by
+  have hmQ
+      : maximalIdeal (R ⧸ Ideal.span {x})
+        = Ideal.span ((Ideal.Quotient.mk (Ideal.span {x})) '' (s \ {(i0 : R)})) := by
     apply le_antisymm
     · intro y hy
       obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective y
@@ -120,8 +125,9 @@ theorem isRegularLocalRing_quotient_of_not_mem_sq [IsRegularLocalRing R] {x : R}
   have hk : Submodule.spanFinrank (maximalIdeal (R ⧸ Ideal.span {x})) ≤ n - 1 := by
     have hfin : (s \ {(i0 : R)}).Finite := hs_fin.subset Set.diff_subset
     rw [hmQ]
-    calc _ ≤ ((Ideal.Quotient.mk (Ideal.span {x})) '' (s \ {(i0 : R)})).ncard :=
-          Submodule.spanFinrank_span_le_ncard_of_finite (hfin.image _)
+    calc
+      _ ≤ ((Ideal.Quotient.mk (Ideal.span {x})) '' (s \ {(i0 : R)})).ncard :=
+        Submodule.spanFinrank_span_le_ncard_of_finite (hfin.image _)
       _ ≤ (s \ {(i0 : R)}).ncard := Set.ncard_image_le hfin
       _ = s.ncard - 1 := Set.ncard_diff_singleton_of_mem i0.2
       _ = n - 1 := by rw [hs_ncard]
@@ -158,9 +164,9 @@ theorem isRegularLocalRing_quotient_of_not_mem_sq [IsRegularLocalRing R] {x : R}
     exact le_antisymm hle2 hdimQ
   · exact (add_le_add hdimQ le_rfl).trans hle1
 
-theorem prime_of_not_mem_sq [IsRegularLocalRing R] {x : R}
-    (hx : x ∈ maximalIdeal R) (hx2 : x ∉ maximalIdeal R ^ 2) : Prime x := by
-
+theorem prime_of_not_mem_sq
+    [IsRegularLocalRing R] {x : R} (hx : x ∈ maximalIdeal R) (hx2 : x ∉ maximalIdeal R ^ 2)
+    : Prime x := by
   haveI hreg : IsRegularLocalRing (R ⧸ Ideal.span {x}) :=
     (isRegularLocalRing_quotient_of_not_mem_sq hx hx2).1
   have hdom : IsDomain (R ⧸ Ideal.span {x}) := isDomain_of_isRegularLocalRing
@@ -170,11 +176,12 @@ theorem prime_of_not_mem_sq [IsRegularLocalRing R] {x : R}
     exact hx2 (Submodule.zero_mem _)
   exact (Ideal.span_singleton_prime hx0).mp hprime
 
-theorem regular_params_spec [IsRegularLocalRing R] {n : ℕ} (f : Fin n → R)
-    (hspan : Ideal.span (Set.range f) = maximalIdeal R) (hdim : (n : WithBot ℕ∞) = ringKrullDim R) :
-    (∀ i, f i ∉ maximalIdeal R ^ 2) ∧ ∀ i j, i ≠ j → ¬ Associated (f i) (f j) := by
+theorem regular_params_spec
+    [IsRegularLocalRing R]
+    {n : ℕ} (f : Fin n → R) (hspan : Ideal.span (Set.range f) = maximalIdeal R)
+    (hdim : (n : WithBot ℕ∞) = ringKrullDim R)
+    : (∀ i, f i ∉ maximalIdeal R ^ 2) ∧ ∀ i j, i ≠ j → ¬ Associated (f i) (f j) := by
   classical
-
   have key : Submodule.spanFinrank (maximalIdeal R) = n := by
     have h : (Submodule.spanFinrank (maximalIdeal R) : WithBot ℕ∞) = ringKrullDim R := by
       obtain ⟨h⟩ := ‹IsRegularLocalRing R›
@@ -182,8 +189,10 @@ theorem regular_params_spec [IsRegularLocalRing R] {n : ℕ} (f : Fin n → R)
     rw [← hdim] at h
     exact_mod_cast h
 
-  have main : ∀ j, f j ∈ Ideal.span (↑((Finset.univ.erase j).image f) : Set R) ⊔
-      maximalIdeal R ^ 2 → False := by
+  have main
+      : ∀ j,
+        f j ∈ Ideal.span (↑((Finset.univ.erase j).image f) : Set R) ⊔ maximalIdeal R ^ 2
+          → False := by
     intro j hj
     generalize hS : Ideal.span (↑((Finset.univ.erase j).image f) : Set R) = S at hj
     have hle : maximalIdeal R ≤ S ⊔ maximalIdeal R • maximalIdeal R := by
@@ -195,8 +204,8 @@ theorem regular_params_spec [IsRegularLocalRing R] {n : ℕ} (f : Fin n → R)
         exact hj
       · apply Submodule.mem_sup_left
         rw [← hS]
-        exact Ideal.subset_span (Finset.mem_coe.mpr
-          (Finset.mem_image_of_mem f (Finset.mem_erase.mpr ⟨hk, Finset.mem_univ k⟩)))
+        exact Ideal.subset_span (Finset.mem_coe.mpr (Finset.mem_image_of_mem f
+          (Finset.mem_erase.mpr ⟨hk, Finset.mem_univ k⟩)))
     have hFG : (maximalIdeal R).FG := IsNoetherian.noetherian _
     have hJ : maximalIdeal R ≤ Ideal.jacobson ⊥ :=
       (IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top).ge
@@ -210,9 +219,10 @@ theorem regular_params_spec [IsRegularLocalRing R] {n : ℕ} (f : Fin n → R)
     have heq : maximalIdeal R = S := le_antisymm hmS hSm
     have hcard : Submodule.spanFinrank (maximalIdeal R) ≤ n - 1 := by
       rw [heq, ← hS]
-      calc Submodule.spanFinrank (Ideal.span (↑((Finset.univ.erase j).image f) : Set R))
-          ≤ (↑((Finset.univ.erase j).image f) : Set R).ncard :=
-            Submodule.spanFinrank_span_le_ncard_of_finite (Finset.finite_toSet _)
+      calc
+        Submodule.spanFinrank (Ideal.span (↑((Finset.univ.erase j).image f) : Set R))
+            ≤ (↑((Finset.univ.erase j).image f) : Set R).ncard :=
+          Submodule.spanFinrank_span_le_ncard_of_finite (Finset.finite_toSet _)
         _ = ((Finset.univ.erase j).image f).card := Set.ncard_coe_finset _
         _ ≤ (Finset.univ.erase j).card := Finset.card_image_le
         _ = n - 1 := by
@@ -224,7 +234,8 @@ theorem regular_params_spec [IsRegularLocalRing R] {n : ℕ} (f : Fin n → R)
   apply main j
   apply Submodule.mem_sup_left
   rw [← hu]
-  exact Ideal.mul_mem_right _ _ (Ideal.subset_span (Finset.mem_coe.mpr
-    (Finset.mem_image_of_mem f (Finset.mem_erase.mpr ⟨hij, Finset.mem_univ i⟩))))
+  exact Ideal.mul_mem_right _ _
+    (Ideal.subset_span (Finset.mem_coe.mpr (Finset.mem_image_of_mem f
+      (Finset.mem_erase.mpr ⟨hij, Finset.mem_univ i⟩))))
 
 end ReciprocityTheory.AnForm.R

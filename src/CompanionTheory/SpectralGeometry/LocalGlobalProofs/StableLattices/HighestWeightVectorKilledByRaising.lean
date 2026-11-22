@@ -16,9 +16,11 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.RgExh
 
-theorem adC_mem_omU {n : ℕ} {ε : Fin n → Bool} {lev : Fin n → ℕ} {p q : Fin n} (hpq : p < q) (hε : ε p = ε q)
-    (hl : lev p = lev q) {i k : Pos n} (hc : adC p q i k ≠ 0) (hi : i ∈ omU ε lev) :
-    k ∈ omU ε lev ∧ k ≠ i := by
+theorem adC_mem_omU
+    {n : ℕ} {ε : Fin n → Bool} {lev : Fin n → ℕ} {p q : Fin n}
+    (hpq : p < q) (hε : ε p = ε q) (hl : lev p = lev q)
+    {i k : Pos n} (hc : adC p q i k ≠ 0) (hi : i ∈ omU ε lev)
+    : k ∈ omU ε lev ∧ k ≠ i := by
   have hcase : (q = i.1.1 ∧ k.1 = (p, i.1.2)) ∨ (i.1.2 = p ∧ k.1 = (i.1.1, q)) := by
     by_contra hn
     rw [not_or] at hn
@@ -35,10 +37,12 @@ theorem adC_mem_omU {n : ℕ} {ε : Fin n → Bool} {lev : Fin n → ℕ} {p q :
     · rw [e2]; show lev i.1.1 < lev q; rw [← hl, ← e1]; exact h2
     · rw [e] at e2; exact hne (e1.symm.trans (congrArg Prod.snd e2))
 
-theorem lF_single_omU : ∀ (n : ℕ) (ε : Fin n → Bool) (lev : Fin n → ℕ) (V : Type) [AddCommGroup V] [Module ℂ V]
-    (E : Fin n → Fin n → Module.End ℂ V) (γ : Fin n → ℝ) (u : V), KHighest ε E γ u →
-    ∀ p q : Fin n, p < q → ε p = ε q → lev p = lev q →
-      lF E p q (Pi.single (omU ε lev) u : Cn n V) = 0 := by
+theorem lF_single_omU
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (lev : Fin n → ℕ) (V : Type) [AddCommGroup V] [Module ℂ V]
+        (E : Fin n → Fin n → Module.End ℂ V) (γ : Fin n → ℝ) (u : V),
+      KHighest ε E γ u
+        → ∀ p q : Fin n,
+          p < q → ε p = ε q → lev p = lev q → lF E p q (Pi.single (omU ε lev) u : Cn n V) = 0 := by
   intro n ε lev V _ _ E γ u hu p q hpq hε hl
   have hE : E p q u = 0 := hu.2 p q hpq hε
   have h1 : lift n (E p q) (Pi.single (omU ε lev) u : Cn n V) = 0 := by

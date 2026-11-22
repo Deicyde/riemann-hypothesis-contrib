@@ -6,8 +6,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 open Matrix IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-theorem UpperTheory.V.Pa.Det.eigen :
-    ∀ {F G : Type} [Field F] [Group G] {n : ℕ} (D : DetFr F G n) (κ la : G → Matrix (Fin n) (Fin n) F) (Y : Matrix (Fin n) (Fin n) F), TwCoc (fun _ => 1) D.r Set.univ κ → TwCoc D.χF D.r Set.univ la → (∀ g ∈ D.G', κ g + la g = dTw (fun _ => 1) D.r Y g) → (∃ Y₁, ∀ g ∈ D.G', κ g = dTw (fun _ => 1) D.r Y₁ g) ∧ ∃ Y₂, ∀ g ∈ D.G', la g = dTw (fun _ => 1) D.r Y₂ g := by
+theorem UpperTheory.V.Pa.Det.eigen
+    : ∀ {F G : Type} [Field F] [Group G] {n : ℕ} (D : DetFr F G n)
+        (κ la : G → Matrix (Fin n) (Fin n) F) (Y : Matrix (Fin n) (Fin n) F),
+      TwCoc (fun _ => 1) D.r Set.univ κ → TwCoc D.χF D.r Set.univ la
+        → (∀ g ∈ D.G', κ g + la g = dTw (fun _ => 1) D.r Y g)
+        → (∃ Y₁, ∀ g ∈ D.G', κ g = dTw (fun _ => 1) D.r Y₁ g)
+          ∧ ∃ Y₂, ∀ g ∈ D.G', la g = dTw (fun _ => 1) D.r Y₂ g := by
   intro F G _ _ n D κ la Y hκ hla hY
   set c : F := D.χF D.g₀ with hc
   have hc1 : c - 1 ≠ 0 := by
@@ -32,11 +37,13 @@ theorem UpperTheory.V.Pa.Det.eigen :
     have hχ : D.χF g = 1 := by simp [DetFr.χF, D.χ_triv g hg]
     rw [hχ, ← hc] at h2
     have h3 := hY g hg
-    have h4 : D.r D.g₀ * κ g' * D.r D.g₀⁻¹ + D.r D.g₀ * la g' * D.r D.g₀⁻¹
-        = D.r g * Z * D.r g⁻¹ - Z := by
+    have h4
+        : D.r D.g₀ * κ g' * D.r D.g₀⁻¹ + D.r D.g₀ * la g' * D.r D.g₀⁻¹
+          = D.r g * Z * D.r g⁻¹ - Z := by
       rw [← add_mul, ← mul_add, hY g' hg', dTw, one_smul, mul_sub, sub_mul, hZ]
       congr 1
-      calc D.r D.g₀ * (D.r g' * Y * D.r g'⁻¹) * D.r D.g₀⁻¹
+      calc
+        D.r D.g₀ * (D.r g' * Y * D.r g'⁻¹) * D.r D.g₀⁻¹
           = (D.r D.g₀ * D.r g') * Y * (D.r g'⁻¹ * D.r D.g₀⁻¹) := by simp only [mul_assoc]
         _ = (D.r g * D.r D.g₀) * Y * (D.r D.g₀⁻¹ * D.r g⁻¹) := by
           rw [← map_mul, ← map_mul, ← map_mul, ← map_mul, e, e']
@@ -52,4 +59,5 @@ theorem UpperTheory.V.Pa.Det.eigen :
   rw [key g hg] at h3
   simp only [dTw, one_smul, mul_sub, sub_mul] at h3 ⊢
   rw [← sub_eq_zero] at h3 ⊢
-  rw [← h3]; abel
+  rw [← h3]
+  abel

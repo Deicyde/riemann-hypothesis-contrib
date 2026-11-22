@@ -4,10 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qk12.list_eig :
-    ∀ {M ι : Type} [inst : AddCommGroup M]
-    [inst_1 : _root_.Module ℂ M] (L : ι → Module.End ℂ M) (c : ι → ℂ) (x : M) (l : List ι),
-    (∀ i ∈ l, (L i : M → M) x = c i • x) → ((List.map L l).prod : M → M) x = (List.map c l).prod • x := by
+theorem UpperTheory.Reformulated.B.Qk12.list_eig
+    : ∀ {M ι : Type} [inst : AddCommGroup M] [inst_1 : _root_.Module ℂ M] (L : ι → Module.End ℂ M)
+        (c : ι → ℂ) (x : M) (l : List ι),
+      (∀ i ∈ l, (L i : M → M) x = c i • x)
+        → ((List.map L l).prod : M → M) x = (List.map c l).prod • x := by
   intro M ι _ _ L c x l
   induction l with
   | nil => intro _; simp

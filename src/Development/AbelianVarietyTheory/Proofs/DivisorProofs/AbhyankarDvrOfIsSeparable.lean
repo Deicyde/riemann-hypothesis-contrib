@@ -15,14 +15,16 @@ set_option maxHeartbeats 1000000
 
 namespace GlobalTheory
 
-theorem isUnramifiedAt_of_ramificationIdx_eq_one_of_isSeparable {R S : Type*} [CommRing R]
-    [CommRing S] [Algebra R S] (p : Ideal R) [p.IsMaximal] (q : Ideal S) [q.IsMaximal]
-    [q.LiesOver p] [Algebra.EssFiniteType R S] (h : q.ramificationIdx R = 1)
-    (hs : Algebra.IsSeparable (R ⧸ p) (S ⧸ q)) :
-    Algebra.IsUnramifiedAt R q := by
+theorem isUnramifiedAt_of_ramificationIdx_eq_one_of_isSeparable
+    {R S : Type*} [CommRing R] [CommRing S] [Algebra R S]
+    (p : Ideal R) [p.IsMaximal]
+    (q : Ideal S) [q.IsMaximal] [q.LiesOver p] [Algebra.EssFiniteType R S]
+    (h : q.ramificationIdx R = 1) (hs : Algebra.IsSeparable (R ⧸ p) (S ⧸ q))
+    : Algebra.IsUnramifiedAt R q := by
   rw [Ideal.ramificationIdx_eq p q, ENat.toNat_eq_iff_eq_natCast, Nat.cast_one,
-    Module.length_eq_one_iff, isSimpleModule_iff_isCoatom, ← Ideal.isMaximal_def,
-    IsLocalRing.isMaximal_iff] at h
+      Module.length_eq_one_iff, isSimpleModule_iff_isCoatom, ← Ideal.isMaximal_def,
+      IsLocalRing.isMaximal_iff]
+    at h
   let Rp := Localization.AtPrime p
   let Sq := Localization.AtPrime q
   let := Localization.AtPrime.algebraOfLiesOver p q
@@ -33,14 +35,19 @@ theorem isUnramifiedAt_of_ramificationIdx_eq_one_of_isSeparable {R S : Type*} [C
   have : Algebra.IsSeparable p.ResidueField q.ResidueField := inferInstance
   exact ⟨this, h⟩
 
-theorem abhyankar_dvr_of_isSeparable : ∀ (S K L : Type) [CommRing S] [IsDomain S] [IsDiscreteValuationRing S]
-    [Field K] [Algebra S K] [IsFractionRing S K] [Field L] [Algebra K L] [Algebra S L] [IsScalarTower S K L]
-    [FiniteDimensional K L] [Algebra.IsSeparable K L] (π : S) (e : ℕ) (D : Type) [CommRing D] [Algebra S D],
-    Nonempty (D ≃ₐ[S] AdjoinRoot (Polynomial.X ^ e - Polynomial.C π)) → Irreducible π → IsUnit (e : S) →
-    (∀ P : Ideal (integralClosure S L), P.IsMaximal → P.ramificationIdx S ∣ e) →
-    (∀ P : Ideal (integralClosure S L), P.IsMaximal → ∀ [P.LiesOver (maximalIdeal S)],
-      Algebra.IsSeparable (S ⧸ maximalIdeal S) (integralClosure S L ⧸ P)) →
-    Algebra.Etale D (integralClosure D (TensorProduct S D L)) := by
+theorem abhyankar_dvr_of_isSeparable
+    : ∀ (S K L : Type) [CommRing S] [IsDomain S] [IsDiscreteValuationRing S] [Field K] [Algebra S K]
+        [IsFractionRing S K] [Field L] [Algebra K L] [Algebra S L] [IsScalarTower S K L]
+        [FiniteDimensional K L] [Algebra.IsSeparable K L] (π : S) (e : ℕ) (D : Type) [CommRing D]
+        [Algebra S D],
+      Nonempty (D ≃ₐ[S] AdjoinRoot (Polynomial.X ^ e - Polynomial.C π)) → Irreducible π
+        → IsUnit (e : S)
+        → (∀ P : Ideal (integralClosure S L), P.IsMaximal → P.ramificationIdx S ∣ e)
+        → (∀ P : Ideal (integralClosure S L),
+          P.IsMaximal
+            → ∀ [P.LiesOver (maximalIdeal S)],
+              Algebra.IsSeparable (S ⧸ maximalIdeal S) (integralClosure S L ⧸ P))
+        → Algebra.Etale D (integralClosure D (TensorProduct S D L)) := by
   intro S K L _ _ _ _ _ _ _ _ _ _ _ _ π e D _ _ hD hπ he hram hsep
   obtain ⟨φ⟩ := hD
   have he0 : 0 < e := by
@@ -101,17 +108,18 @@ theorem abhyankar_dvr_of_isSeparable : ∀ (S K L : Type) [CommRing S] [IsDomain
     exact Subtype.ext (hinj h1)
   haveI : Algebra.FinitePresentation D (integralClosure D (TensorProduct S D L)) :=
     Algebra.FinitePresentation.of_finiteType.mp inferInstance
-  have hmax : ∀ (Q : Ideal (integralClosure D (TensorProduct S D L))) [Q.IsMaximal],
-      Algebra.IsUnramifiedAt D Q := by
+  have hmax
+      : ∀ (Q : Ideal (integralClosure D (TensorProduct S D L))) [Q.IsMaximal],
+        Algebra.IsUnramifiedAt D Q := by
     intro Q hQ
     have hQu : Q.under D = maximalIdeal D :=
-      IsLocalRing.eq_maximalIdeal
-        (Ideal.isMaximal_comap_of_isIntegral_of_isMaximal (algebraMap D
-          (integralClosure D (TensorProduct S D L)))
-          (algebraMap_isIntegral_iff.mpr inferInstance) Q)
+      IsLocalRing.eq_maximalIdeal (Ideal.isMaximal_comap_of_isIntegral_of_isMaximal
+        (algebraMap D (integralClosure D (TensorProduct S D L)))
+        (algebraMap_isIntegral_iff.mpr inferInstance) Q)
     haveI : Q.LiesOver (maximalIdeal D) := ⟨hQu.symm⟩
     exact isUnramifiedAt_of_ramificationIdx_eq_one_of_isSeparable (maximalIdeal D) Q
-      (GlobalTheory.T.abhyankar_ramificationIdx_eq_one_alt S K L π e D ⟨φ⟩ hπ he hram hsep Q) (GlobalTheory.T.abhyankar_residueField_isSeparable_alt S K L π e D ⟨φ⟩ hπ he hram hsep Q)
+      (GlobalTheory.T.abhyankar_ramificationIdx_eq_one_alt S K L π e D ⟨φ⟩ hπ he hram hsep Q)
+      (GlobalTheory.T.abhyankar_residueField_isSeparable_alt S K L π e D ⟨φ⟩ hπ he hram hsep Q)
   haveI : Algebra.FormallyUnramified D (integralClosure D (TensorProduct S D L)) := by
     rw [Algebra.formallyUnramified_iff_forall]
     intro q

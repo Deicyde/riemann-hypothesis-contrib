@@ -13,18 +13,22 @@ namespace GlobalTheory.CompanionTheory.HeckeCapelli
 open CompanionTheory.RgExh CompanionTheory.RgExh.Hk
 open ReciprocityTheory.ChartRestriction.DS.Lap.Capelli (cminor capelliC capEntry capelliExpand)
 
-theorem capelli_entry_apply {n : ℕ} (X : GMod n) (x : ℂ) (d b : Fin n) (v : X.V) :
-    capEntry X.E x d b v = X.E d b v + if d = b then x • v else 0 := by
+theorem capelli_entry_apply {n : ℕ} (X : GMod n) (x : ℂ) (d b : Fin n) (v : X.V)
+    : capEntry X.E x d b v = X.E d b v + if d = b then x • v else 0 := by
   unfold capEntry
   split_ifs <;> simp [Module.algebraMap_end_apply]
 
-theorem capelli_component {m : ℕ} (X : GMod (m + 1)) (x : ℂ) (f : Fin (m + 1) → X.V) (b : Fin (m + 1)) :
-    ∑ c : Fin (m + 1), ∑ d : Fin (m + 1), ((-1 : ℂ) ^ ((d : ℕ) + (c : ℕ))) •
-        capEntry X.E x d b (cminor X.E d.succAbove c.succAbove (x - 1) (f c)) = capelliC X.E x (f b) := by
+theorem capelli_component
+    {m : ℕ} (X : GMod (m + 1)) (x : ℂ) (f : Fin (m + 1) → X.V) (b : Fin (m + 1))
+    : ∑ c : Fin (m + 1), ∑ d : Fin (m + 1), ((-1 : ℂ) ^ ((d : ℕ) + (c : ℕ))) •
+          capEntry X.E x d b (cminor X.E d.succAbove c.succAbove (x - 1) (f c))
+      = capelliC X.E x (f b) := by
   have key := (capelliExpand (Module.End ℂ X.V) m X.E x X.gl).1 b
-  have h : ∀ c : Fin (m + 1), ∑ d : Fin (m + 1), ((-1 : ℂ) ^ ((d : ℕ) + (c : ℕ))) •
-        capEntry X.E x d b (cminor X.E d.succAbove c.succAbove (x - 1) (f c)) =
-      if b = c then capelliC X.E x (f c) else 0 := by
+  have h
+      : ∀ c : Fin (m + 1),
+        ∑ d : Fin (m + 1), ((-1 : ℂ) ^ ((d : ℕ) + (c : ℕ))) •
+            capEntry X.E x d b (cminor X.E d.succAbove c.succAbove (x - 1) (f c))
+          = if b = c then capelliC X.E x (f c) else 0 := by
     intro c
     have := LinearMap.congr_fun (key c) (f c)
     simp only [LinearMap.sum_apply, LinearMap.smul_apply, Module.End.mul_apply] at this

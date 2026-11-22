@@ -15,8 +15,12 @@ public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.L2.Pj MeasureTheory IsDedekindDomain NumberField Matrix Complex
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr GlobalTheory.Ker
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.L2.Pj MeasureTheory IsDedekindDomain
+  NumberField Matrix Complex
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
+  GlobalTheory.ThFr GlobalTheory.Ker
 open GlobalTheory.SW hiding Level
 open GlobalTheory.Dict (hx pv)
 open ReciprocityTheory.ChartRestriction.G.I2 (polyDeriv)
@@ -25,25 +29,47 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Ker
 
-theorem ipO_Th_self_eq (D : D7) (S T : HSp D) (C : Ctx S T) (μ : Measure (WO S T)) (𝓕 : Set (WO S T))
+theorem ipO_Th_self_eq
+    (D : D7) (S T : HSp D) (C : Ctx S T) (μ : Measure (WO S T)) (𝓕 : Set (WO S T))
     (hμ : IsCovolOne (ratL T S) μ 𝓕) (x : Frame C.X.Ψ T.rank) (hx : x ∈ C.X.dom)
-    (v v' : TF S.rank C.g) (hv : SW.IsSB v) (hv' : SW.IsSB v') (h : SW.ip v v = SW.ip v' v') :
-    ipO μ 𝓕 (C.Th x v) (C.Th x v) = ipO μ 𝓕 (C.Th x v') (C.Th x v') := by
-
+    (v v' : TF S.rank C.g) (hv : SW.IsSB v) (hv' : SW.IsSB v') (h : SW.ip v v = SW.ip v' v')
+    : ipO μ 𝓕 (C.Th x v) (C.Th x v) = ipO μ 𝓕 (C.Th x v') (C.Th x v') := by
   have hR : IsRealPt (0 : WO S T) := by simp [IsRealPt]
   obtain ⟨a, -, b, -, hab⟩ :=
     GlobalTheory.SW.dbl_zero_and_norm D.host.E T.rank C.X C.g C.bas C.idx S.rank C.sympl C.even
   have hip := (ScalarProduct.ip_basic D S T C).2 μ 𝓕 hμ
-  have key : ∀ φ : TF S.rank C.g, SW.IsSB φ → ipO μ 𝓕 (C.Th x φ) (C.Th x φ) =
-      a * SW.ip φ φ * (gaussR C.X C.bas C.idx x (C.zOf x 0) * conj (gaussR C.X C.bas C.idx x (C.zOf x 0)) *
-        kZero C.X C.idx x x (C.zOf x 0) (fun k i => conj (C.zOf x 0 k i))) := by
+  have key
+      : ∀ φ : TF S.rank C.g,
+        SW.IsSB φ
+          → ipO μ 𝓕 (C.Th x φ) (C.Th x φ)
+            = a * SW.ip φ φ
+              * (gaussR C.X C.bas C.idx x (C.zOf x 0) * conj (gaussR C.X C.bas C.idx x (C.zOf x 0))
+                * kZero C.X C.idx x x (C.zOf x 0) (fun k i => conj (C.zOf x 0 k i))) := by
     intro φ hφ
-    have hT : C.IsTh (C.Th x φ) := (GlobalTheory.T.adelicZakTheta_exists_unique D S T C x hx φ hφ).1.1
+    have hT : C.IsTh (C.Th x φ) :=
+      (GlobalTheory.T.adelicZakTheta_exists_unique D S T C x hx φ hφ).1.1
     rw [← ((hip _ hT).2.2.2 _ hT).2.2.2.2.1 0,
-      GlobalTheory.T.innerProduct_translated_vacua_eq_gaussianKernel D S T C μ 𝓕 hμ x hx x hx φ φ hφ hφ 0 0 hR hR, (hab φ φ hφ hφ).1]
+      GlobalTheory.T.innerProduct_translated_vacua_eq_gaussianKernel D S T C μ 𝓕 hμ x hx x hx φ φ hφ
+        hφ 0 0 hR hR,
+      (hab φ φ hφ hφ).1]
   rw [key v hv, key v' hv', h]
 
-theorem om_Th_vac : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∀ om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ), IsWeak C.ψ S T om → ∀ w : D.host.E, IsIntegral ℤ w → w + cc w = 1 → IdemTwo w → ∀ (M : ℕ), ∀ Λ ∈ Vset D.host.E S.rank M, ∀ Λ' ∈ Vset D.host.E S.rank M, ∀ L L' : Lt D.host.E T.rank, SelfD C.X L → SelfD C.X L' → ∀ h ∈ GfC S, ∀ g ∈ GfC T, IsMov (fmtC S h) Λ Λ' → IsMov (fmt T g) L L' → ∀ v v', IsVac C.X C.bas w (tens Λ L) v → IsVac C.X C.bas w (tens Λ' L') v' → ∀ B, C.IsB B → ∃ c : ℂ, ‖c‖ = 1 ∧ om (h, g) (C.Th (C.xB B) v) = c • (C.Th (C.xB B) v') := by
+theorem om_Th_vac
+    : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∀ om : GA D S × GA D T →* Module.End ℂ (WO S T → ℂ),
+      IsWeak C.ψ S T om
+        → ∀ w : D.host.E,
+          IsIntegral ℤ w → w + cc w = 1 → IdemTwo w
+            → ∀ (M : ℕ), ∀ Λ ∈ Vset D.host.E S.rank M, ∀ Λ' ∈ Vset D.host.E S.rank M,
+              ∀ L L' : Lt D.host.E T.rank,
+                SelfD C.X L → SelfD C.X L'
+                  → ∀ h ∈ GfC S, ∀ g ∈ GfC T,
+                    IsMov (fmtC S h) Λ Λ' → IsMov (fmt T g) L L'
+                      → ∀ v v',
+                        IsVac C.X C.bas w (tens Λ L) v → IsVac C.X C.bas w (tens Λ' L') v'
+                          → ∀ B,
+                            C.IsB B
+                              → ∃ c : ℂ,
+                                ‖c‖ = 1 ∧ om (h, g) (C.Th (C.xB B) v) = c • (C.Th (C.xB B) v') := by
   intro D S T C om hom w hwi hw1 hw2 M Λ hΛ Λ' hΛ' L L' hL hL' h hh g hg hmS hmT v v' hv hv' B hB
   have hBB := (GlobalTheory.T.thetaKernel_orthonormalFrame_inDomain_periodLinear D S T C).2 B hB
   have hx : C.xB B ∈ C.X.dom := hBB.2.1
@@ -54,16 +80,22 @@ theorem om_Th_vac : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∀ om : GA D S ×
   have hfT' : C.IsTh f' := (GlobalTheory.T.adelicZakTheta_exists_unique D S T C _ hx v' hv'.1).1.1
 
   have hLat : IsLatVac (heisO C.ψ S T) (hatA S T (tens Λ L)) f :=
-    ((GlobalTheory.T.latticeVacua_tensor_correspond_line D S T C w hwi hw1 hw2 M Λ hΛ L hL).1 _ hx v hv.1).2 hv.2.2
+    ((GlobalTheory.T.latticeVacua_tensor_correspond_line D S T C w hwi hw1 hw2 M Λ hΛ L hL).1 _ hx v
+      hv.1).2 hv.2.2
   have hLat' : IsLatVac (heisO C.ψ S T) (hatA S T (tens Λ' L')) (om (h, g) f) :=
-    (GlobalTheory.T.completedTensorLattice_lattice_vacuum_transport D S T C h g Λ Λ' L L' hmS hmT).2 om hom f hfT hLat
+    (GlobalTheory.T.completedTensorLattice_lattice_vacuum_transport D S T C h g Λ Λ' L L' hmS hmT).2
+      om hom f hfT hLat
   have hTh : C.IsTh (om (h, g) f) := hom.om_pres (h, g) f hfT
   have hFock : C.IsFock B (om (h, g) f) := by
-    have h1 := ((GlobalTheory.T.weakWeilRep_carries_derivatives_vacua_fockVectors D S T C om hom h g f hfT).2 B hB).1
-      ((GlobalTheory.T.fockPolynomialVector_testTheta_zero_eq_thetaSeries D S T C).2 B hB v hv.1).1
+    have h1 :=
+      ((GlobalTheory.T.weakWeilRep_carries_derivatives_vacua_fockVectors D S T C om hom h g f hfT).2
+          B hB).1
+        ((GlobalTheory.T.fockPolynomialVector_testTheta_zero_eq_thetaSeries D S T C).2 B hB v
+          hv.1).1
     rwa [hfix] at h1
   obtain ⟨t, ht⟩ :=
-    (GlobalTheory.T.latticeVacua_tensor_correspond_line D S T C w hwi hw1 hw2 M Λ' hΛ' L' hL').2 B hB v' hv' _ hTh hFock hLat'
+    (GlobalTheory.T.latticeVacua_tensor_correspond_line D S T C w hwi hw1 hw2 M Λ' hΛ' L' hL').2 B
+      hB v' hv' _ hTh hFock hLat'
 
   obtain ⟨⟨μ, 𝓕, hμ⟩, hip⟩ := ScalarProduct.ip_basic D S T C
   have hsame : ipO μ 𝓕 f f = ipO μ 𝓕 f' f' :=

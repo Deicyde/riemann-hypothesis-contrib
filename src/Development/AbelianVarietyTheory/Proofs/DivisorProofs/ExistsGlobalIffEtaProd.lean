@@ -15,36 +15,43 @@ namespace GlobalTheory.QuadRecip
 
 open GlobalTheory.QuadSymbol
 
-theorem exists_global_iff_etaProd (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L]
-    [Algebra K L] [Algebra.IsQuadraticExtension K L] (x : FinFam K) (y : InfFam K)
-    (hx : AlmostNorm K L x) :
-    (∃ t : Kˣ, (∀ v, x v / finDiag K t v ∈ normGroup K L (v.adicCompletion K)) ∧
-        ∀ w, y w / infDiag K t w ∈ normGroup K L w.Completion) ↔
-      etaProd K L x y = 1 :=
+theorem exists_global_iff_etaProd
+    (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
+    [Algebra.IsQuadraticExtension K L]
+    (x : FinFam K)
+    (y : InfFam K) (hx : AlmostNorm K L x)
+    : (∃ t : Kˣ,
+        (∀ v, x v / finDiag K t v ∈ normGroup K L (v.adicCompletion K))
+          ∧ ∀ w, y w / infDiag K t w ∈ normGroup K L w.Completion)
+      ↔ etaProd K L x y = 1 :=
   (exactSequence K L).2.2.1 x y hx
 
-theorem ringEquivReal_infDiag {K : Type} [Field K] [NumberField K] {w : InfinitePlace K}
-    (hw : w.IsReal) (t : Kˣ) :
-    InfinitePlace.Completion.ringEquivRealOfIsReal hw ((infDiag K t w : (w.Completion)ˣ) : w.Completion) =
-      InfinitePlace.embedding_of_isReal hw (t : K) :=
-  by
-    simp [infDiag, QuadSymbol.toUnits, InfinitePlace.Completion.algebraMap_apply]
+theorem ringEquivReal_infDiag
+    {K : Type} [Field K] [NumberField K] {w : InfinitePlace K} (hw : w.IsReal) (t : Kˣ)
+    : InfinitePlace.Completion.ringEquivRealOfIsReal hw
+        ((infDiag K t w : (w.Completion)ˣ) : w.Completion)
+      = InfinitePlace.embedding_of_isReal hw (t : K) := by
+  simp [infDiag, QuadSymbol.toUnits, InfinitePlace.Completion.algebraMap_apply]
 
-theorem mem_normGroup_of_pos {K L : Type} [Field K] [NumberField K] [Field L] [Algebra K L]
-    [Algebra.IsQuadraticExtension K L] {w : InfinitePlace K} (hw : w.IsReal) (z : (w.Completion)ˣ)
-    (hz : 0 < InfinitePlace.Completion.ringEquivRealOfIsReal hw (z : w.Completion)) :
-    z ∈ normGroup K L w.Completion := by
+theorem mem_normGroup_of_pos
+    {K L : Type}
+    [Field K] [NumberField K] [Field L] [Algebra K L] [Algebra.IsQuadraticExtension K L]
+    {w : InfinitePlace K} (hw : w.IsReal) (z : (w.Completion)ˣ)
+    (hz : 0 < InfinitePlace.Completion.ringEquivRealOfIsReal hw (z : w.Completion))
+    : z ∈ normGroup K L w.Completion := by
   obtain ⟨δ, b, -, h0, h1⟩ := AlmostNorm.exists_basis_sq K L
   rw [mem_normGroup_iff_form b h0 h1]
   set e := InfinitePlace.Completion.ringEquivRealOfIsReal hw
   refine ⟨e.symm (Real.sqrt (e z)), 0, e.injective ?_⟩
   simp [Real.sq_sqrt hz.le]
 
-theorem mem_normGroup_iff_pos {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L]
-    [Algebra K L] [Algebra.IsQuadraticExtension K L] (hL : IsTotallyComplex L)
-    {w : InfinitePlace K} (hw : w.IsReal) (z : (w.Completion)ˣ) :
-    z ∈ normGroup K L w.Completion ↔
-      0 < InfinitePlace.Completion.ringEquivRealOfIsReal hw (z : w.Completion) := by
+theorem mem_normGroup_iff_pos
+    {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
+    [Algebra.IsQuadraticExtension K L]
+    (hL : IsTotallyComplex L)
+    {w : InfinitePlace K} (hw : w.IsReal) (z : (w.Completion)ˣ)
+    : z ∈ normGroup K L w.Completion
+      ↔ 0 < InfinitePlace.Completion.ringEquivRealOfIsReal hw (z : w.Completion) := by
   set e := InfinitePlace.Completion.ringEquivRealOfIsReal hw
   refine ⟨fun hz => ?_, mem_normGroup_of_pos hw z⟩
   have hne : e (z : w.Completion) ≠ 0 := (map_ne_zero e).2 z.ne_zero
@@ -60,19 +67,20 @@ namespace GlobalTheory.QuadRecip
 
 open GlobalTheory.QuadSymbol
 
-
 open Classical in
-theorem prod_sign_eq {K : Type} [Field K] [NumberField K] (S : Finset {w : InfinitePlace K // w.IsReal})
-    (f : InfinitePlace K → ℤˣ)
-    (hf : ∀ w, f w = if (∃ hw : w.IsReal, (⟨w, hw⟩ : {w : InfinitePlace K // w.IsReal}) ∈ S) then -1 else 1) :
-    ∏ w, f w = (-1) ^ S.card := by
+theorem prod_sign_eq
+    {K : Type} [Field K] [NumberField K]
+    (S : Finset {w : InfinitePlace K // w.IsReal}) (f : InfinitePlace K → ℤˣ)
+    (hf : ∀ w,
+      f w = if (∃ hw : w.IsReal, (⟨w, hw⟩ : {w : InfinitePlace K // w.IsReal}) ∈ S) then -1 else 1)
+    : ∏ w, f w = (-1) ^ S.card := by
   classical
   simp_rw [hf]
   rw [Finset.prod_ite, Finset.prod_const, Finset.prod_const_one, mul_one]
   congr 1
   have : (Finset.univ.filter fun w : InfinitePlace K =>
-      ∃ hw : w.IsReal, (⟨w, hw⟩ : {w : InfinitePlace K // w.IsReal}) ∈ S) =
-      S.map (Function.Embedding.subtype _) := by
+        ∃ hw : w.IsReal, (⟨w, hw⟩ : {w : InfinitePlace K // w.IsReal}) ∈ S)
+      = S.map (Function.Embedding.subtype _) := by
     ext w
     simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_map,
       Function.Embedding.subtype_apply]
@@ -83,16 +91,17 @@ theorem prod_sign_eq {K : Type} [Field K] [NumberField K] (S : Finset {w : Infin
       exact ⟨u.2, hu⟩
   rw [this, Finset.card_map]
 
-
 open Classical in
-theorem exists_signs_iff_even (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L]
-    [Algebra K L] [Algebra.IsQuadraticExtension K L] (hL : IsTotallyComplex L)
-    (S : Finset {w : InfinitePlace K // w.IsReal}) :
-    (∃ h : Kˣ, (∀ w : {w : InfinitePlace K // w.IsReal},
-        (w ∈ S → InfinitePlace.embedding_of_isReal w.2 (h : K) < 0) ∧
-        (w ∉ S → 0 < InfinitePlace.embedding_of_isReal w.2 (h : K))) ∧
-      ∀ v : HeightOneSpectrum (𝓞 K), finDiag K h v ∈ normGroup K L (v.adicCompletion K)) ↔
-      Even S.card := by
+theorem exists_signs_iff_even
+    (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
+    [Algebra.IsQuadraticExtension K L]
+    (hL : IsTotallyComplex L) (S : Finset {w : InfinitePlace K // w.IsReal})
+    : (∃ h : Kˣ,
+        (∀ w : {w : InfinitePlace K // w.IsReal},
+            (w ∈ S → InfinitePlace.embedding_of_isReal w.2 (h : K) < 0)
+              ∧ (w ∉ S → 0 < InfinitePlace.embedding_of_isReal w.2 (h : K)))
+          ∧ ∀ v : HeightOneSpectrum (𝓞 K), finDiag K h v ∈ normGroup K L (v.adicCompletion K))
+      ↔ Even S.card := by
   classical
   obtain ⟨δ, b, -, h0, h1⟩ := AlmostNorm.exists_basis_sq K L
   have hneg1 : ((-1 : ℤˣ) ≠ 1) := by decide
@@ -114,7 +123,8 @@ theorem exists_signs_iff_even (K L : Type) [Field K] [NumberField K] [Field L] [
         · rw [if_neg (by rintro ⟨hw', h'⟩; exact hS h'), eta_eq_one_iff, key]
           exact (hsgn ⟨w, hw⟩).2 hS
       · rw [if_neg (by rintro ⟨hw', _⟩; exact hw hw'), eta_eq_one_iff]
-        exact Converse.mem_normGroup_of_isComplex b h0 h1 (InfinitePlace.not_isReal_iff_isComplex.1 hw) _
+        exact Converse.mem_normGroup_of_isComplex b h0 h1
+          (InfinitePlace.not_isReal_iff_isComplex.1 hw) _
   · intro hS
     let P : InfinitePlace K → Prop := fun w =>
       ∃ hw : w.IsReal, (⟨w, hw⟩ : {w : InfinitePlace K // w.IsReal}) ∈ S
@@ -131,8 +141,9 @@ theorem exists_signs_iff_even (K L : Type) [Field K] [NumberField K] [Field L] [
       exact one_mem _
     have hprod : etaProd K L 1 y = 1 := by
       unfold etaProd
-      have hf1 : ∀ v : HeightOneSpectrum (𝓞 K),
-          eta K L (v.adicCompletion K) ((1 : FinFam K) v) = 1 := fun v => eta_eq_one_iff.2 (one_mem _)
+      have hf1
+          : ∀ v : HeightOneSpectrum (𝓞 K), eta K L (v.adicCompletion K) ((1 : FinFam K) v) = 1 :=
+        fun v => eta_eq_one_iff.2 (one_mem _)
       simp only [hf1, finprod_one, one_mul]
       rw [prod_sign_eq S _ hy]
       exact hS.neg_one_pow
@@ -157,12 +168,15 @@ theorem exists_signs_iff_even (K L : Type) [Field K] [NumberField K] [Field L] [
       rw [Pi.one_apply, one_div, inv_mem_iff] at this
       exact this
 
-theorem exists_signs_of_even (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L]
-    [Algebra K L] [Algebra.IsQuadraticExtension K L] (hK : IsTotallyReal K) (hL : IsTotallyComplex L)
-    (S : Finset (InfinitePlace K)) (hS : Even S.card) :
-    ∃ h : Kˣ, (∀ w (hw : w ∈ S), InfinitePlace.embedding_of_isReal (hK.isReal w) (h : K) < 0) ∧
-      (∀ w (hw : w ∉ S), 0 < InfinitePlace.embedding_of_isReal (hK.isReal w) (h : K)) ∧
-      ∀ v : HeightOneSpectrum (𝓞 K), finDiag K h v ∈ normGroup K L (v.adicCompletion K) := by
+theorem exists_signs_of_even
+    (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
+    [Algebra.IsQuadraticExtension K L]
+    (hK : IsTotallyReal K) (hL : IsTotallyComplex L)
+    (S : Finset (InfinitePlace K)) (hS : Even S.card)
+    : ∃ h : Kˣ,
+      (∀ w (hw : w ∈ S), InfinitePlace.embedding_of_isReal (hK.isReal w) (h : K) < 0)
+        ∧ (∀ w (hw : w ∉ S), 0 < InfinitePlace.embedding_of_isReal (hK.isReal w) (h : K))
+        ∧ ∀ v : HeightOneSpectrum (𝓞 K), finDiag K h v ∈ normGroup K L (v.adicCompletion K) := by
   classical
   let S' : Finset {w : InfinitePlace K // w.IsReal} := S.subtype _
   have hc : S'.card = S.card := by
@@ -170,7 +184,8 @@ theorem exists_signs_of_even (K L : Type) [Field K] [NumberField K] [Field L] [N
     congr 1
     exact Finset.filter_true_of_mem fun w _ => hK.isReal w
   obtain ⟨h, hsgn, hfin⟩ := (exists_signs_iff_even K L hL S').2 (hc ▸ hS)
-  refine ⟨h, fun w hw => (hsgn ⟨w, hK.isReal w⟩).1 ?_, fun w hw => (hsgn ⟨w, hK.isReal w⟩).2 ?_, hfin⟩
+  refine
+    ⟨h, fun w hw => (hsgn ⟨w, hK.isReal w⟩).1 ?_, fun w hw => (hsgn ⟨w, hK.isReal w⟩).2 ?_, hfin⟩
   · simpa [S'] using hw
   · simpa [S'] using hw
 

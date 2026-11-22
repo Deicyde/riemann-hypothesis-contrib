@@ -7,7 +7,8 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.JacquetShal
 
 noncomputable section
 
-open Matrix GroundTheory.Automorphic GroundTheory.Automorphic.Iwasawa PositivityTheory.JacquetShalikaLocal
+open Matrix GroundTheory.Automorphic GroundTheory.Automorphic.Iwasawa
+  PositivityTheory.JacquetShalikaLocal
 open scoped ValuativeRel
 
 namespace GlobalTheory.CompanionTheory.JSBound
@@ -16,18 +17,19 @@ section Algebra
 
 variable {F : Type} [Field F] {n : ℕ}
 
-theorem cM_apply_pos (k : ℕ) (x : Fin (k + 1) → F) {i j : Fin n} (hj : (j : ℕ) = k + 1)
-    (hi : (i : ℕ) < k + 1) : cM n k x i j = x ⟨i, hi⟩ := by
+theorem cM_apply_pos
+    (k : ℕ) (x : Fin (k + 1) → F) {i j : Fin n} (hj : (j : ℕ) = k + 1) (hi : (i : ℕ) < k + 1)
+    : cM n k x i j = x ⟨i, hi⟩ := by
   simp only [cM, Matrix.of_apply]
   rw [dite_eq_left ⟨hj, hi⟩]
 
-theorem cM_apply_neg (k : ℕ) (x : Fin (k + 1) → F) {i j : Fin n}
-    (h : ¬((j : ℕ) = k + 1 ∧ (i : ℕ) < k + 1)) : cM n k x i j = 0 := by
+theorem cM_apply_neg
+    (k : ℕ) (x : Fin (k + 1) → F) {i j : Fin n} (h : ¬((j : ℕ) = k + 1 ∧ (i : ℕ) < k + 1))
+    : cM n k x i j = 0 := by
   simp only [cM, Matrix.of_apply]
   rw [dite_eq_right h]
 
-theorem cM_add (k : ℕ) (x y : Fin (k + 1) → F) :
-    cM n k (x + y) = cM n k x + cM n k y := by
+theorem cM_add (k : ℕ) (x y : Fin (k + 1) → F) : cM n k (x + y) = cM n k x + cM n k y := by
   ext i j
   rw [Matrix.add_apply]
   by_cases h : (j : ℕ) = k + 1 ∧ (i : ℕ) < k + 1
@@ -41,11 +43,11 @@ theorem cM_zero (k : ℕ) : cM n k (0 : Fin (k + 1) → F) = 0 := by
   · rw [cM_apply_pos k _ h.1 h.2, Pi.zero_apply]
   · rw [cM_apply_neg k _ h]
 
-theorem col_coe (k : ℕ) (x : Fin (k + 1) → F) :
-    ((col n k x : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) = 1 + cM n k x := rfl
+theorem col_coe (k : ℕ) (x : Fin (k + 1) → F)
+    : ((col n k x : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) = 1 + cM n k x :=
+  rfl
 
-private theorem cM_mul_cM_eq_zero (k : ℕ) (x y : Fin (k + 1) → F) :
-    cM n k x * cM n k y = 0 := by
+private theorem cM_mul_cM_eq_zero (k : ℕ) (x y : Fin (k + 1) → F) : cM n k x * cM n k y = 0 := by
   ext i j
   rw [Matrix.mul_apply, Matrix.zero_apply]
   apply Finset.sum_eq_zero
@@ -54,8 +56,7 @@ private theorem cM_mul_cM_eq_zero (k : ℕ) (x y : Fin (k + 1) → F) :
   · rw [cM_apply_neg k y (fun h => absurd h.2 (by omega)), mul_zero]
   · rw [cM_apply_neg k x (fun h => hl h.1), zero_mul]
 
-theorem col_add (k : ℕ) (x y : Fin (k + 1) → F) :
-    col n k (x + y) = col n k x * col n k y := by
+theorem col_add (k : ℕ) (x y : Fin (k + 1) → F) : col n k (x + y) = col n k x * col n k y := by
   apply Units.ext
   rw [Units.val_mul, col_coe, col_coe, col_coe, cM_add, add_mul, one_mul, mul_add, mul_one,
     cM_mul_cM_eq_zero, add_zero]
@@ -76,8 +77,8 @@ theorem inP_succ {k : ℕ} {g : GL (Fin n) F} (h : inP k g) : inP (k + 1) g := b
   obtain ⟨h1, h2⟩ := h
   exact ⟨fun i j hi => h1 i j (by omega), fun i j hj => h2 i j (by omega)⟩
 
-theorem col_upper (k : ℕ) (x : Fin (k + 1) → F) {i j : Fin n} (hij : j < i) :
-    (1 + cM n k x) i j = 0 := by
+theorem col_upper (k : ℕ) (x : Fin (k + 1) → F) {i j : Fin n} (hij : j < i)
+    : (1 + cM n k x) i j = 0 := by
   have hij' : (j : ℕ) < i := hij
   rw [Matrix.add_apply, Matrix.one_apply_ne (Fin.ne_of_val_ne (by omega)),
     cM_apply_neg k x (fun h => by obtain ⟨h1, h2⟩ := h; omega), add_zero]
@@ -86,14 +87,14 @@ theorem col_diag (k : ℕ) (x : Fin (k + 1) → F) (i : Fin n) : (1 + cM n k x) 
   rw [Matrix.add_apply, Matrix.one_apply_eq,
     cM_apply_neg k x (fun h => by obtain ⟨h1, h2⟩ := h; omega), add_zero]
 
-theorem det_col (k : ℕ) (x : Fin (k + 1) → F) :
-    ((col n k x : GL (Fin n) F) : Matrix (Fin n) (Fin n) F).det = 1 := by
+theorem det_col (k : ℕ) (x : Fin (k + 1) → F)
+    : ((col n k x : GL (Fin n) F) : Matrix (Fin n) (Fin n) F).det = 1 := by
   rw [col_coe]
   exact (Matrix.det_of_isUpperTriangular (fun i j hij => col_upper k x hij)).trans
     (Finset.prod_eq_one (fun i _ => col_diag k x i))
 
-theorem superdiagSum_col {k : ℕ} (hk : k + 1 < n) (x : Fin (k + 1) → F) :
-    Whittaker.superdiagSum (1 + cM n k x) = x (Fin.last k) := by
+theorem superdiagSum_col {k : ℕ} (hk : k + 1 < n) (x : Fin (k + 1) → F)
+    : Whittaker.superdiagSum (1 + cM n k x) = x (Fin.last k) := by
   unfold Whittaker.superdiagSum
   rw [Finset.sum_eq_single (⟨k, by omega⟩ : Fin n)]
   · rw [Finset.sum_eq_single (⟨k + 1, hk⟩ : Fin n)]
@@ -119,27 +120,29 @@ theorem superdiagSum_col {k : ℕ} (hk : k + 1 < n) (x : Fin (k + 1) → F) :
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem psiN_col {k : ℕ} (hk : k + 1 < n) (ψ : AddChar F ℂ) (x : Fin (k + 1) → F) :
-    Whittaker.psiN ψ (col n k x) = ψ (x (Fin.last k)) := by
+theorem psiN_col {k : ℕ} (hk : k + 1 < n) (ψ : AddChar F ℂ) (x : Fin (k + 1) → F)
+    : Whittaker.psiN ψ (col n k x) = ψ (x (Fin.last k)) := by
   unfold Whittaker.psiN
   rw [col_coe, superdiagSum_col hk x]
 
-theorem one_castLE {k : ℕ} (hk : k + 1 ≤ n) (i j : Fin (k + 1)) :
-    (1 : Matrix (Fin n) (Fin n) F) (Fin.castLE hk i) (Fin.castLE hk j) =
-      (1 : Matrix (Fin (k + 1)) (Fin (k + 1)) F) i j := by
+theorem one_castLE {k : ℕ} (hk : k + 1 ≤ n) (i j : Fin (k + 1))
+    : (1 : Matrix (Fin n) (Fin n) F) (Fin.castLE hk i) (Fin.castLE hk j)
+      = (1 : Matrix (Fin (k + 1)) (Fin (k + 1)) F) i j := by
   by_cases h : i = j
   · subst h
     rw [Matrix.one_apply_eq, Matrix.one_apply_eq]
   · rw [Matrix.one_apply_ne h, Matrix.one_apply_ne (fun e => h (Fin.castLE_injective hk e))]
 
-theorem det_eq_submatrix {k : ℕ} (hk : k + 1 ≤ n) (M : Matrix (Fin n) (Fin n) F)
-    (hM : ∀ i j : Fin n, k + 1 ≤ (i : ℕ) → M i j = (1 : Matrix (Fin n) (Fin n) F) i j) :
-    M.det = (M.submatrix (Fin.castLE hk) (Fin.castLE hk)).det := by
-  have hblk : ∀ i, ¬((i : Fin n) : ℕ) < k + 1 → ∀ j, ((j : Fin n) : ℕ) < k + 1 → M i j = 0 := by
+theorem det_eq_submatrix
+    {k : ℕ} (hk : k + 1 ≤ n)
+    (M : Matrix (Fin n) (Fin n) F)
+    (hM : ∀ i j : Fin n, k + 1 ≤ (i : ℕ) → M i j = (1 : Matrix (Fin n) (Fin n) F) i j)
+    : M.det = (M.submatrix (Fin.castLE hk) (Fin.castLE hk)).det := by
+  have hblk : ∀ i, ¬ ((i : Fin n) : ℕ) < k + 1 → ∀ j, ((j : Fin n) : ℕ) < k + 1 → M i j = 0 := by
     intro i hi j hj
     rw [hM i j (by omega), Matrix.one_apply_ne (Fin.ne_of_val_ne (by omega))]
   rw [Matrix.twoBlockTriangular_det M (fun i => (i : ℕ) < k + 1) hblk]
-  have hone : Matrix.toSquareBlockProp M (fun i => ¬((i : Fin n) : ℕ) < k + 1) = 1 := by
+  have hone : Matrix.toSquareBlockProp M (fun i => ¬ ((i : Fin n) : ℕ) < k + 1) = 1 := by
     ext ⟨i, hi⟩ ⟨j, hj⟩
     rw [Matrix.toSquareBlockProp, Matrix.toBlock_apply, hM i j (by omega)]
     by_cases h : i = j
@@ -147,19 +150,23 @@ theorem det_eq_submatrix {k : ℕ} (hk : k + 1 ≤ n) (M : Matrix (Fin n) (Fin n
       rw [Matrix.one_apply_eq, Matrix.one_apply_eq]
     · rw [Matrix.one_apply_ne h, Matrix.one_apply_ne (fun e => h (congrArg Subtype.val e))]
   rw [hone, Matrix.det_one, mul_one]
-  let e : Fin (k + 1) ≃ {i : Fin n // (i : ℕ) < k + 1} :=
-    { toFun := fun i => ⟨Fin.castLE hk i, i.2⟩
-      invFun := fun i => ⟨i.1, i.2⟩
-      left_inv := fun i => rfl
-      right_inv := fun i => rfl }
+  let e : Fin (k + 1) ≃ {i : Fin n // (i : ℕ) < k + 1} := {
+    toFun := fun i => ⟨Fin.castLE hk i, i.2⟩
+    invFun := fun i => ⟨i.1, i.2⟩
+    left_inv := fun i => rfl
+    right_inv := fun i => rfl
+  }
   rw [← Matrix.det_submatrix_equiv_self e]
   rfl
 
-theorem sum_castLE {k : ℕ} (hk : k + 1 ≤ n) (f : Fin n → F)
-    (hf : ∀ l : Fin n, ¬(l : ℕ) < k + 1 → f l = 0) :
-    ∑ l, f l = ∑ l : Fin (k + 1), f (Fin.castLE hk l) := by
-  have hmap : ∑ l ∈ Finset.univ.map (⟨Fin.castLE hk, Fin.castLE_injective hk⟩ : Fin (k + 1) ↪ Fin n),
-      f l = ∑ l : Fin (k + 1), f (Fin.castLE hk l) := Finset.sum_map _ _ _
+theorem sum_castLE
+    {k : ℕ} (hk : k + 1 ≤ n) (f : Fin n → F) (hf : ∀ l : Fin n, ¬ (l : ℕ) < k + 1 → f l = 0)
+    : ∑ l, f l = ∑ l : Fin (k + 1), f (Fin.castLE hk l) := by
+  have hmap
+      : ∑ l ∈ Finset.univ.map (⟨Fin.castLE hk, Fin.castLE_injective hk⟩ : Fin (k + 1) ↪ Fin n),
+          f l
+        = ∑ l : Fin (k + 1), f (Fin.castLE hk l) :=
+    Finset.sum_map _ _ _
   rw [← hmap]
   symm
   apply Finset.sum_subset (Finset.subset_univ _)
@@ -170,16 +177,19 @@ theorem sum_castLE {k : ℕ} (hk : k + 1 ≤ n) (f : Fin n → F)
   rw [Finset.mem_map]
   exact ⟨⟨l, hlt⟩, Finset.mem_univ _, Fin.ext rfl⟩
 
-theorem mul_cM {k : ℕ} (hk : k + 1 ≤ n) (g : Matrix (Fin n) (Fin n) F)
+theorem mul_cM
+    {k : ℕ} (hk : k + 1 ≤ n)
+    (g : Matrix (Fin n) (Fin n) F)
     (hM : ∀ i j : Fin n, k + 1 ≤ (i : ℕ) → g i j = (1 : Matrix (Fin n) (Fin n) F) i j)
-    (x : Fin (k + 1) → F) :
-    g * cM n k x = cM n k ((g.submatrix (Fin.castLE hk) (Fin.castLE hk)) *ᵥ x) := by
+    (x : Fin (k + 1) → F)
+    : g * cM n k x = cM n k ((g.submatrix (Fin.castLE hk) (Fin.castLE hk)) *ᵥ x) := by
   ext i j
   rw [Matrix.mul_apply]
   by_cases hj : (j : ℕ) = k + 1
   · by_cases hi : (i : ℕ) < k + 1
     · rw [cM_apply_pos k _ hj hi,
-        sum_castLE hk (fun l => g i l * cM n k x l j)
+        sum_castLE hk
+          (fun l => g i l * cM n k x l j)
           (fun l hl => by rw [cM_apply_neg k x (fun h => hl h.2), mul_zero])]
       simp only [Matrix.mulVec, dotProduct, Matrix.submatrix_apply]
       apply Finset.sum_congr rfl
@@ -197,108 +207,134 @@ theorem mul_cM {k : ℕ} (hk : k + 1 ≤ n) (g : Matrix (Fin n) (Fin n) F)
     intro l _
     rw [cM_apply_neg k x (fun h => hj h.1), mul_zero]
 
-theorem cM_mul_row {k : ℕ} (hk : k + 1 < n) (g : Matrix (Fin n) (Fin n) F)
+theorem cM_mul_row
+    {k : ℕ} (hk : k + 1 < n)
+    (g : Matrix (Fin n) (Fin n) F)
     (hM : ∀ i j : Fin n, k + 1 ≤ (i : ℕ) → g i j = (1 : Matrix (Fin n) (Fin n) F) i j)
-    (y : Fin (k + 1) → F) : cM n k y * g = cM n k y := by
+    (y : Fin (k + 1) → F)
+    : cM n k y * g = cM n k y := by
   ext i j
   rw [Matrix.mul_apply, Finset.sum_eq_single (⟨k + 1, hk⟩ : Fin n)]
   · rw [hM _ j (le_refl _)]
     by_cases hj : j = ⟨k + 1, hk⟩
     · subst hj
       rw [Matrix.one_apply_eq, mul_one]
-    · rw [Matrix.one_apply_ne (Ne.symm hj), mul_zero,
-        cM_apply_neg k y (fun h => hj (Fin.ext h.1))]
+    · rw [Matrix.one_apply_ne (Ne.symm hj), mul_zero, cM_apply_neg k y (fun h => hj (Fin.ext h.1))]
   · intro l _ hl
     rw [cM_apply_neg k y (fun h => hl (Fin.ext h.1)), zero_mul]
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem conj_col {k : ℕ} (hk : k + 1 < n) (g : GL (Fin n) F)
-    (hM : ∀ i j : Fin n, k + 1 ≤ (i : ℕ) →
-      (g : Matrix (Fin n) (Fin n) F) i j = (1 : Matrix (Fin n) (Fin n) F) i j)
+theorem conj_col
+    {k : ℕ} (hk : k + 1 < n)
+    (g : GL (Fin n) F)
+    (hM : ∀ i j : Fin n,
+      k + 1 ≤ (i : ℕ) → (g : Matrix (Fin n) (Fin n) F) i j = (1 : Matrix (Fin n) (Fin n) F) i j)
     (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F)
     (ht : t = (g : Matrix (Fin n) (Fin n) F).submatrix (Fin.castLE hk.le) (Fin.castLE hk.le))
-    (x : Fin (k + 1) → F) : g * col n k x = col n k (t *ᵥ x) * g := by
+    (x : Fin (k + 1) → F)
+    : g * col n k x = col n k (t *ᵥ x) * g := by
   subst ht
   apply Units.ext
   rw [Units.val_mul, Units.val_mul, col_coe, col_coe, mul_add, add_mul, mul_one, one_mul,
     mul_cM hk.le _ hM x, cM_mul_row hk _ hM]
 
 def extM {k : ℕ} (n : ℕ) (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F) : Matrix (Fin n) (Fin n) F :=
-  Matrix.of fun i j => if h : (i : ℕ) < k + 1 ∧ (j : ℕ) < k + 1 then t ⟨i, h.1⟩ ⟨j, h.2⟩
-    else (1 : Matrix (Fin n) (Fin n) F) i j
+  Matrix.of fun i j =>
+    if h : (i : ℕ) < k + 1 ∧ (j : ℕ) < k + 1 then
+      t ⟨i, h.1⟩ ⟨j, h.2⟩
+    else
+      (1 : Matrix (Fin n) (Fin n) F) i j
 
-theorem extM_pos {k : ℕ} (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F) {i j : Fin n}
-    (h : (i : ℕ) < k + 1 ∧ (j : ℕ) < k + 1) : extM n t i j = t ⟨i, h.1⟩ ⟨j, h.2⟩ := by
+theorem extM_pos
+    {k : ℕ} (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F)
+    {i j : Fin n} (h : (i : ℕ) < k + 1 ∧ (j : ℕ) < k + 1)
+    : extM n t i j = t ⟨i, h.1⟩ ⟨j, h.2⟩ := by
   rw [extM, Matrix.of_apply, dite_eq_left h]
 
-theorem extM_neg {k : ℕ} (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F) {i j : Fin n}
-    (h : ¬((i : ℕ) < k + 1 ∧ (j : ℕ) < k + 1)) :
-    extM n t i j = (1 : Matrix (Fin n) (Fin n) F) i j := by
+theorem extM_neg
+    {k : ℕ} (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F)
+    {i j : Fin n} (h : ¬((i : ℕ) < k + 1 ∧ (j : ℕ) < k + 1))
+    : extM n t i j = (1 : Matrix (Fin n) (Fin n) F) i j := by
   rw [extM, Matrix.of_apply, dite_eq_right h]
 
-theorem extM_submatrix {k : ℕ} (hk : k + 1 ≤ n) (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F) :
-    (extM n t).submatrix (Fin.castLE hk) (Fin.castLE hk) = t := by
+theorem extM_submatrix {k : ℕ} (hk : k + 1 ≤ n) (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F)
+    : (extM n t).submatrix (Fin.castLE hk) (Fin.castLE hk) = t := by
   ext i j
   rw [Matrix.submatrix_apply, extM_pos t (i := Fin.castLE hk i) (j := Fin.castLE hk j) ⟨i.2, j.2⟩]
   rfl
 
-theorem extM_row {k : ℕ} (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F) (i j : Fin n)
-    (hi : k + 1 ≤ (i : ℕ)) : extM n t i j = (1 : Matrix (Fin n) (Fin n) F) i j := by
+theorem extM_row
+    {k : ℕ} (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F) (i j : Fin n) (hi : k + 1 ≤ (i : ℕ))
+    : extM n t i j = (1 : Matrix (Fin n) (Fin n) F) i j := by
   exact extM_neg t (fun h => by obtain ⟨h1, h2⟩ := h; omega)
 
-theorem det_extM {k : ℕ} (hk : k + 1 ≤ n) (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F) :
-    (extM n t).det = t.det := by
+theorem det_extM {k : ℕ} (hk : k + 1 ≤ n) (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F)
+    : (extM n t).det = t.det := by
   rw [det_eq_submatrix hk (extM n t) (fun i j hi => extM_row t i j hi), extM_submatrix hk]
 
-theorem exists_block {k : ℕ} (hk : k + 1 < n) (g : GL (Fin n) F) (hg : inP (k + 1) g) :
-    ∃ t : GL (Fin (k + 1)) F, (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F) =
-        (g : Matrix (Fin n) (Fin n) F).submatrix (Fin.castLE hk.le) (Fin.castLE hk.le) ∧
-      (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F).det = (g : Matrix (Fin n) (Fin n) F).det := by
+theorem exists_block {k : ℕ} (hk : k + 1 < n) (g : GL (Fin n) F) (hg : inP (k + 1) g)
+    : ∃ t : GL (Fin (k + 1)) F,
+      (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F)
+          = (g : Matrix (Fin n) (Fin n) F).submatrix (Fin.castLE hk.le) (Fin.castLE hk.le)
+        ∧ (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F).det = (g : Matrix (Fin n) (Fin n) F).det := by
   obtain ⟨hg1, hg2⟩ := hg
   have hd := det_eq_submatrix hk.le (g : Matrix (Fin n) (Fin n) F) hg1
   have hdet : (g : Matrix (Fin n) (Fin n) F).det ≠ 0 := by
     rw [← Matrix.GeneralLinearGroup.val_det_apply]
     exact Units.ne_zero _
-  have hdet' : ((g : Matrix (Fin n) (Fin n) F).submatrix (Fin.castLE hk.le)
-      (Fin.castLE hk.le)).det ≠ 0 := by
+  have hdet'
+      : ((g : Matrix (Fin n) (Fin n) F).submatrix (Fin.castLE hk.le) (Fin.castLE hk.le)).det
+        ≠ 0 := by
     rw [← hd]
     exact hdet
-  exact ⟨Matrix.nonsingInvUnit ((g : Matrix (Fin n) (Fin n) F).submatrix (Fin.castLE hk.le)
-    (Fin.castLE hk.le)) (isUnit_iff_ne_zero.mpr hdet'), rfl, hd.symm⟩
+  exact ⟨
+    Matrix.nonsingInvUnit
+      ((g : Matrix (Fin n) (Fin n) F).submatrix (Fin.castLE hk.le) (Fin.castLE hk.le))
+      (isUnit_iff_ne_zero.mpr hdet'),
+    rfl,
+    hd.symm
+  ⟩
 
-theorem last_mulVec {k : ℕ} (hk : k + 1 < n) (g : GL (Fin n) F) (hg : inP k g)
+theorem last_mulVec
+    {k : ℕ} (hk : k + 1 < n)
+    (g : GL (Fin n) F) (hg : inP k g)
     (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F)
     (ht : t = (g : Matrix (Fin n) (Fin n) F).submatrix (Fin.castLE hk.le) (Fin.castLE hk.le))
-    (x : Fin (k + 1) → F) : (t *ᵥ x) (Fin.last k) = x (Fin.last k) := by
+    (x : Fin (k + 1) → F)
+    : (t *ᵥ x) (Fin.last k) = x (Fin.last k) := by
   subst ht
   obtain ⟨h1, _⟩ := hg
   simp only [Matrix.mulVec, dotProduct, Matrix.submatrix_apply]
   rw [Finset.sum_eq_single (Fin.last k)]
   · rw [h1 _ _ (by simp), Matrix.one_apply_eq, one_mul]
   · intro l _ hl
-    rw [h1 _ _ (by simp), Matrix.one_apply_ne (fun e => hl (Fin.castLE_injective _ e).symm), zero_mul]
+    rw [h1 _ _ (by simp), Matrix.one_apply_ne (fun e => hl (Fin.castLE_injective _ e).symm),
+      zero_mul]
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem exists_ext {k : ℕ} (hk : k + 1 < n) (t : GL (Fin (k + 1)) F) :
-    ∃ g : GL (Fin n) F, (g : Matrix (Fin n) (Fin n) F) =
-      extM n (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F) := by
+theorem exists_ext {k : ℕ} (hk : k + 1 < n) (t : GL (Fin (k + 1)) F)
+    : ∃ g : GL (Fin n) F,
+      (g : Matrix (Fin n) (Fin n) F) = extM n (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F) := by
   have hdet : (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F).det ≠ 0 := by
     rw [← Matrix.GeneralLinearGroup.val_det_apply]
     exact Units.ne_zero _
   have hdet' : (extM n (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F)).det ≠ 0 := by
     rw [det_extM hk.le]
     exact hdet
-  exact ⟨Matrix.nonsingInvUnit (extM n (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F))
-    (isUnit_iff_ne_zero.mpr hdet'), rfl⟩
+  exact ⟨
+    Matrix.nonsingInvUnit (extM n (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F))
+      (isUnit_iff_ne_zero.mpr hdet'),
+    rfl
+  ⟩
 
 end Algebra
 
 section Local
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-  {n : ℕ}
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] {n : ℕ}
 
 theorem inU_col (k : ℕ) (x : Fin (k + 1) → F) : inU k (col n k x) := by
   unfold inU
@@ -310,8 +346,9 @@ theorem inU_col (k : ℕ) (x : Fin (k + 1) → F) : inU k (col n k x) := by
   · rw [col_coe, Matrix.add_apply, cM_apply_neg k x (fun h => by obtain ⟨h1, h2⟩ := h; omega),
       add_zero]
 
-theorem div_extM {k : ℕ} (c : ℕ) (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F)
-    (hk : k + 1 ≤ n) (h : Div c (t - 1)) : Div c (extM n t - 1) := by
+theorem div_extM
+    {k : ℕ} (c : ℕ) (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F) (hk : k + 1 ≤ n) (h : Div c (t - 1))
+    : Div c (extM n t - 1) := by
   unfold PositivityTheory.JacquetShalikaLocal.Div at h ⊢
   intro i j
   by_cases h' : (i : ℕ) < k + 1 ∧ (j : ℕ) < k + 1
@@ -328,19 +365,30 @@ end Local
 theorem column_mirabolic_holds : ColumnsMirabolic := by
   unfold ColumnsMirabolic ForF
   intro F _ _ _ _ _ _ μ _ ψ _ n k hk
-  refine ⟨fun x y => col_add k x y, col_zero k,
+  refine ⟨
+    fun x y => col_add k x y,
+    col_zero k,
     fun x => ⟨inP_col k x, inU_col k x, det_col k x, psiN_col hk ψ x⟩,
-    fun g hg => inP_succ hg, fun g hg => ?_, fun t => ?_⟩
-  · have hg1 : ∀ i j : Fin n, k + 1 ≤ (i : ℕ) →
-        (g : Matrix (Fin n) (Fin n) F) i j = (1 : Matrix (Fin n) (Fin n) F) i j := hg.1
+    fun g hg => inP_succ hg,
+    fun g hg => ?_,
+    fun t => ?_
+  ⟩
+  · have hg1
+        : ∀ i j : Fin n,
+          k + 1 ≤ (i : ℕ)
+            → (g : Matrix (Fin n) (Fin n) F) i j = (1 : Matrix (Fin n) (Fin n) F) i j :=
+      hg.1
     obtain ⟨t, ht, hdt⟩ := exists_block hk g hg
     exact ⟨t, hdt, fun x => conj_col hk g hg1 _ ht x, fun hgk x => last_mulVec hk g hgk _ ht x⟩
   · obtain ⟨g, hg⟩ := exists_ext hk t
-    have hsub : (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F) =
-        (g : Matrix (Fin n) (Fin n) F).submatrix (Fin.castLE hk.le) (Fin.castLE hk.le) := by
+    have hsub
+        : (t : Matrix (Fin (k + 1)) (Fin (k + 1)) F)
+          = (g : Matrix (Fin n) (Fin n) F).submatrix (Fin.castLE hk.le) (Fin.castLE hk.le) := by
       rw [hg, extM_submatrix]
-    have hrow : ∀ i j : Fin n, k + 1 ≤ (i : ℕ) →
-        (g : Matrix (Fin n) (Fin n) F) i j = (1 : Matrix (Fin n) (Fin n) F) i j := by
+    have hrow
+        : ∀ i j : Fin n,
+          k + 1 ≤ (i : ℕ)
+            → (g : Matrix (Fin n) (Fin n) F) i j = (1 : Matrix (Fin n) (Fin n) F) i j := by
       intro i j hi
       rw [hg]
       exact extM_row _ i j hi

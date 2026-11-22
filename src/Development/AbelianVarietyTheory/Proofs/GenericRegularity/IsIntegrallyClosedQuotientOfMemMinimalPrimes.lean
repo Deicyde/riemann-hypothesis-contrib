@@ -7,10 +7,14 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.IsDomain
 
 namespace GlobalTheory
 
-theorem exists_mul_eq_zero_of_mem_minimalPrimes_of_isDomain_atPrime {S : Type*} [CommRing S]
-    {q : Ideal S} (hq : q ∈ minimalPrimes S) (m : Ideal S) [m.IsPrime] (hqm : q ≤ m)
-    [IsDomain (Localization.AtPrime m)] {x : S} (hx : x ∈ q) :
-    ∃ s : m.primeCompl, (s : S) * x = 0 := by
+theorem exists_mul_eq_zero_of_mem_minimalPrimes_of_isDomain_atPrime
+    {S : Type*} [CommRing S]
+    {q : Ideal S} (hq : q ∈ minimalPrimes S)
+    (m : Ideal S) [m.IsPrime]
+    (hqm : q ≤ m)
+    [IsDomain (Localization.AtPrime m)]
+    {x : S} (hx : x ∈ q)
+    : ∃ s : m.primeCompl, (s : S) * x = 0 := by
   have hPq : (⊥ : Ideal (Localization.AtPrime m)).comap (algebraMap S _) ≤ q := by
     intro y hy
     have hy0 : algebraMap S (Localization.AtPrime m) y = 0 := hy
@@ -25,10 +29,12 @@ theorem exists_mul_eq_zero_of_mem_minimalPrimes_of_isDomain_atPrime {S : Type*} 
   have hx0 : algebraMap S (Localization.AtPrime m) x = 0 := hqP hx
   exact (IsLocalization.map_eq_zero_iff m.primeCompl _ x).1 hx0
 
-theorem isIntegrallyClosed_quotient_of_mem_minimalPrimes {S : Type*} [CommRing S]
+theorem isIntegrallyClosed_quotient_of_mem_minimalPrimes
+    {S : Type*} [CommRing S]
     (hS : ∀ (m : Ideal S) [m.IsPrime],
       IsDomain (Localization.AtPrime m) ∧ IsIntegrallyClosed (Localization.AtPrime m))
-    {q : Ideal S} (hq : q ∈ minimalPrimes S) : IsIntegrallyClosed (S ⧸ q) := by
+    {q : Ideal S} (hq : q ∈ minimalPrimes S)
+    : IsIntegrallyClosed (S ⧸ q) := by
   have : q.IsPrime := hq.1.1
   refine IsIntegrallyClosed.of_localization_maximal (fun M _ _ => ?_)
   let m : Ideal S := M.comap (Ideal.Quotient.mk q)
@@ -45,8 +51,11 @@ theorem isIntegrallyClosed_quotient_of_mem_minimalPrimes {S : Type*} [CommRing S
     exact (IsLocalization.map_eq_zero_iff m.primeCompl _ x).2 ⟨s, hs⟩
   let : Algebra (S ⧸ q) (Localization.AtPrime m) :=
     (Ideal.Quotient.lift q (algebraMap S (Localization.AtPrime m)) hker).toAlgebra
-  have hmk : ∀ a : S, algebraMap (S ⧸ q) (Localization.AtPrime m) (Ideal.Quotient.mk q a) =
-      algebraMap S (Localization.AtPrime m) a := fun a => Ideal.Quotient.lift_mk _ _ _
+  have hmk
+      : ∀ a : S,
+        algebraMap (S ⧸ q) (Localization.AtPrime m) (Ideal.Quotient.mk q a)
+          = algebraMap S (Localization.AtPrime m) a := fun a =>
+    Ideal.Quotient.lift_mk _ _ _
   have : IsLocalization M.primeCompl (Localization.AtPrime m) := by
     refine (isLocalization_iff _ _).2 ⟨?_, ?_, ?_⟩
     · rintro ⟨y, hy⟩
@@ -73,8 +82,8 @@ theorem isIntegrallyClosed_quotient_of_mem_minimalPrimes {S : Type*} [CommRing S
   exact hic.of_equiv (IsLocalization.algEquiv M.primeCompl (Localization.AtPrime M)
     (Localization.AtPrime m)).toRingEquiv.symm
 
-theorem isIntegrallyClosed_quotient_minimalPrime_of_smooth :
-    ∀ (F S : Type) [Field F] [CommRing S] [Algebra F S] [Algebra.Smooth F S] (q : Ideal S),
+theorem isIntegrallyClosed_quotient_minimalPrime_of_smooth
+    : ∀ (F S : Type) [Field F] [CommRing S] [Algebra F S] [Algebra.Smooth F S] (q : Ideal S),
       q ∈ minimalPrimes S → IsIntegrallyClosed (S ⧸ q) := by
   intro F S _ _ _ _ q hq
   refine isIntegrallyClosed_quotient_of_mem_minimalPrimes (fun m _ => ?_) hq

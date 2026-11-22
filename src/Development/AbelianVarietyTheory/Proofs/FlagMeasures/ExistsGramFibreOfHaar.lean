@@ -8,16 +8,19 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.LcscAdeli
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.SgAlg GlobalTheory.IndefiniteRowSideFullHecke
+open NumberField IsDedekindDomain MeasureTheory Matrix
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.SgAlg
+  GlobalTheory.IndefiniteRowSideFullHecke
 open scoped TensorProduct ENNReal NNReal
 
 namespace GlobalTheory.GramFibreRescale
 
-theorem isFibreFamily_smul {V X Y : Type} [TopologicalSpace V] [MeasurableSpace V]
-    [TopologicalSpace X] [MeasurableSpace X] {μ : Measure V} {f : V → Y} {ι : X → Y} {U : Set V}
-    {ν : Measure X} {B : Set X} {fib : X → Measure V} (h : IsFibreFamily μ f ι U ν B fib)
-    (c d : ℝ≥0) (hd : d ≠ 0) :
-    IsFibreFamily (c • μ) f ι U (d • ν) B (fun b => (c / d) • fib b) := by
+theorem isFibreFamily_smul
+    {V X Y : Type} [TopologicalSpace V] [MeasurableSpace V] [TopologicalSpace X] [MeasurableSpace X]
+    {μ : Measure V} {f : V → Y} {ι : X → Y} {U : Set V} {ν : Measure X} {B : Set X}
+    {fib : X → Measure V} (h : IsFibreFamily μ f ι U ν B fib)
+    (c d : ℝ≥0) (hd : d ≠ 0)
+    : IsFibreFamily (c • μ) f ι U (d • ν) B (fun b => (c / d) • fib b) := by
   obtain ⟨h1, h2, h3⟩ := h
   refine ⟨fun b => ?_, fun φ hφ => ?_, fun φ hφ hc hU => ⟨fun b hb => ?_, ?_⟩⟩
   · rw [Measure.smul_apply, h1 b, smul_zero]

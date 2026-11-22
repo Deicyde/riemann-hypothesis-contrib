@@ -216,9 +216,23 @@ private lemma isClosedEmbedding_uHom {F E : Type} [NontriviallyNormedField F]
     (isClosed_unitary (R := Matrix (Fin r) (Fin r) E)).isClosedEmbedding_subtypeVal
   exact (IsClosedEmbedding.of_comp_iff hval).1 ⟨hemb, hclosed⟩
 
-
 open Matrix MeasureTheory Filter Topology in
-theorem _root_.GlobalTheory.JR.TorusCutOff.exists_unitary_cutoff : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [_root_.GlobalTheory.JR.Unram F E] (A : _root_.GlobalTheory.JR.Et F E) (r : ℕ) (τ : A.K) (p : Fin r → F), A.IsGen τ p → ∀ (x : A.K) (j : A.L ≃ₗ[E] (Fin r → E)) (hx : A.IsIsom x j) (Ax : selfAdjoint (Matrix (Fin r) (Fin r) E)), (∀ z, j (algebraMap A.K A.L τ * z) = Ax.1 *ᵥ j z) → ∀ (ν : Measure (unitary A.L)), ν.IsHaarMeasure → ∀ Z : Set (Matrix (Fin r) (Fin r) E), IsCompact Z → ∃ α : Matrix.unitaryGroup (Fin r) E → ℝ, IsLocallyConstant α ∧ HasCompactSupport α ∧ (∀ g, 0 ≤ α g) ∧ ∀ g : Matrix.unitaryGroup (Fin r) E, g.1 * Ax.1 * star g.1 ∈ Z → ∫ t, α (g * (A.uHom hx t)⁻¹) ∂ν = 1 := by
+theorem _root_.GlobalTheory.JR.TorusCutOff.exists_unitary_cutoff
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [_root_.GlobalTheory.JR.Unram F E] (A : _root_.GlobalTheory.JR.Et F E) (r : ℕ)
+        (τ : A.K) (p : Fin r → F),
+      A.IsGen τ p
+        → ∀ (x : A.K) (j : A.L ≃ₗ[E] (Fin r → E)) (hx : A.IsIsom x j)
+            (Ax : selfAdjoint (Matrix (Fin r) (Fin r) E)),
+          (∀ z, j (algebraMap A.K A.L τ * z) = Ax.1 *ᵥ j z)
+            → ∀ (ν : Measure (unitary A.L)),
+              ν.IsHaarMeasure
+                → ∀ Z : Set (Matrix (Fin r) (Fin r) E),
+                  IsCompact Z
+                    → ∃ α : Matrix.unitaryGroup (Fin r) E → ℝ,
+                      IsLocallyConstant α ∧ HasCompactSupport α ∧ (∀ g, 0 ≤ α g)
+                        ∧ ∀ g : Matrix.unitaryGroup (Fin r) E,
+                          g.1 * Ax.1 * star g.1 ∈ Z → ∫ t, α (g * (A.uHom hx t)⁻¹) ∂ν = 1 := by
   intro F E _ _ _ _ _ A r τ p hτ x j hx Ax hAx ν _ Z hZ
   haveI : LocallyCompactSpace E :=
     _root_.GlobalTheory.JR.Unram.lcE F
@@ -249,35 +263,28 @@ theorem _root_.GlobalTheory.JR.TorusCutOff.exists_unitary_cutoff : ∀ (F E : Ty
     (inferInstance : TotallyDisconnectedSpace (Fin r → Fin r → E))
   haveI : LocallyCompactSpace (Matrix.unitaryGroup (Fin r) E) :=
     (isClosed_unitary (R := Matrix (Fin r) (Fin r) E)).isClosedEmbedding_subtypeVal.locallyCompactSpace
-  have hsep : Ax.1.charpoly.Separable :=
-    charpoly_separable_of_isGen A r τ p hτ j Ax.1 hAx
-  have hcent : ∀ t : Matrix.unitaryGroup (Fin r) E, t.1 * Ax.1 = Ax.1 * t.1 →
-      ∃ s, A.uHom hx s = t := by
+  have hsep : Ax.1.charpoly.Separable := charpoly_separable_of_isGen A r τ p hτ j Ax.1 hAx
+  have hcent
+      : ∀ t : Matrix.unitaryGroup (Fin r) E, t.1 * Ax.1 = Ax.1 * t.1 → ∃ s, A.uHom hx s = t := by
     intro t ht
-    let φ : A.L →ₗ[E] A.L :=
-      j.symm.toLinearMap ∘ₗ Matrix.toLin' t.1 ∘ₗ j.toLinearMap
-    have hφ : ∀ w, φ (algebraMap A.K A.L τ * w) =
-        algebraMap A.K A.L τ * φ w := by
+    let φ : A.L →ₗ[E] A.L := j.symm.toLinearMap ∘ₗ Matrix.toLin' t.1 ∘ₗ j.toLinearMap
+    have hφ : ∀ w, φ (algebraMap A.K A.L τ * w) = algebraMap A.K A.L τ * φ w := by
       intro w
       apply j.injective
       simp only [φ, LinearMap.comp_apply, LinearEquiv.coe_coe, Matrix.toLin'_apply,
         LinearEquiv.apply_symm_apply]
-      rw [hAx, hAx, LinearEquiv.apply_symm_apply, Matrix.mulVec_mulVec, ht,
-        ← Matrix.mulVec_mulVec]
-    have hmul := map_mul_of_commute_generator A τ
-      (adjoin_eq_whole_of_isGen A r τ p hτ) φ hφ
+      rw [hAx, hAx, LinearEquiv.apply_symm_apply, Matrix.mulVec_mulVec, ht, ← Matrix.mulVec_mulVec]
+    have hmul := map_mul_of_commute_generator A τ (adjoin_eq_whole_of_isGen A r τ p hτ) φ hφ
     refine exists_uHom_eq_of_mulVec_eq A r x j hx t (φ 1) (fun z => ?_)
     have h1 : j (φ z) = t.1 *ᵥ j z := by simp [φ]
     rw [← h1, mul_comm, ← hmul, mul_one]
-  have hemb : IsClosedEmbedding (A.uHom hx) :=
-    isClosedEmbedding_uHom A r x j hx
-  obtain ⟨C, hC, hCg⟩ :=
-    (_root_.GlobalTheory.OrbCpt.orbit_cpt F E r).2 Ax.1 Ax.2 hsep Z hZ
-  let i : unitary A.L →* Matrix.unitaryGroup (Fin r) E :=
-    (A.uHom hx).comp invMonoidHom
+  have hemb : IsClosedEmbedding (A.uHom hx) := isClosedEmbedding_uHom A r x j hx
+  obtain ⟨C, hC, hCg⟩ := (_root_.GlobalTheory.OrbCpt.orbit_cpt F E r).2 Ax.1 Ax.2 hsep Z hZ
+  let i : unitary A.L →* Matrix.unitaryGroup (Fin r) E := (A.uHom hx).comp invMonoidHom
   have hi : IsClosedEmbedding i := hemb.comp (Homeomorph.inv _).isClosedEmbedding
-  obtain ⟨α, h₁, h₂, h₃, h₄⟩ := _root_.GlobalTheory.CutOff.exists_cutoff
-    (Matrix.unitaryGroup (Fin r) E) (unitary A.L) i hi ν C hC
+  obtain ⟨α, h₁, h₂, h₃, h₄⟩ :=
+    _root_.GlobalTheory.CutOff.exists_cutoff (Matrix.unitaryGroup (Fin r) E) (unitary A.L) i hi ν C
+      hC
   refine ⟨α, h₁, h₂, h₃, fun g hg => ?_⟩
   obtain ⟨c, hc, t, ht, rfl⟩ := hCg g hg
   obtain ⟨s, rfl⟩ := hcent t ht

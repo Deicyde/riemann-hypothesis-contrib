@@ -4,19 +4,19 @@ public import Mathlib
 
 @[expose] public section
 
-@[reducible] noncomputable def UpperTheory.Reformulated.B.TotalDegreeLinear.PV :
-    Type → Type → Type → Type :=
-    fun (ι A B : Type) ↦ MvPolynomial (ι × A ⊕ ι × B) ℂ
+@[reducible]
+noncomputable def UpperTheory.Reformulated.B.TotalDegreeLinear.PV : Type → Type → Type → Type :=
+  fun (ι A B : Type) ↦ MvPolynomial (ι × A ⊕ ι × B) ℂ
 
-noncomputable def UpperTheory.Reformulated.B.TotalDegreeLinear.sub :
-    {ι A B : Type} → [Fintype ι] → Matrix ι ι ℂ → Matrix ι ι ℂ → UpperTheory.Reformulated.B.TotalDegreeLinear.PV ι A B →ₐ[ℂ] UpperTheory.Reformulated.B.TotalDegreeLinear.PV ι A B :=
-    fun {ι A B : Type} [Fintype ι] (g h : Matrix ι ι ℂ) ↦
-      MvPolynomial.aeval
-        (Sum.elim
-          (fun (x : ι × A) ↦
-            ∑ j : ι, (MvPolynomial.C : ℂ → MvPolynomial (ι × A ⊕ ι × B) ℂ) (g x.1 j) * MvPolynomial.X (Sum.inl (j, x.2)))
-          fun (y : ι × B) ↦
-          ∑ j : ι, (MvPolynomial.C : ℂ → MvPolynomial (ι × A ⊕ ι × B) ℂ) (h y.1 j) * MvPolynomial.X (Sum.inr (j, y.2)))
+noncomputable def UpperTheory.Reformulated.B.TotalDegreeLinear.sub
+    : {ι A B : Type} → [Fintype ι] → Matrix ι ι ℂ → Matrix ι ι ℂ
+      → UpperTheory.Reformulated.B.TotalDegreeLinear.PV ι A B →ₐ[ℂ] UpperTheory.Reformulated.B.TotalDegreeLinear.PV ι A B :=
+  fun {ι A B : Type} [Fintype ι] (g h : Matrix ι ι ℂ) ↦
+    MvPolynomial.aeval (Sum.elim
+      (fun (x : ι × A) ↦
+        ∑ j : ι, (MvPolynomial.C : ℂ → MvPolynomial (ι × A ⊕ ι × B) ℂ) (g x.1 j) * MvPolynomial.X (Sum.inl (j, x.2)))
+      fun (y : ι × B) ↦
+        ∑ j : ι, (MvPolynomial.C : ℂ → MvPolynomial (ι × A ⊕ ι × B) ℂ) (h y.1 j) * MvPolynomial.X (Sum.inr (j, y.2)))
 
 private lemma UpperTheory.Reformulated.B.TotalDegreeLinear.totalDegree_aeval_le {σ τ : Type}
     (f : σ → MvPolynomial τ ℂ) (hf : ∀ i, (f i).totalDegree ≤ 1) (p : MvPolynomial σ ℂ) :
@@ -39,10 +39,15 @@ private lemma UpperTheory.Reformulated.B.TotalDegreeLinear.totalDegree_linear_le
   rw [MvPolynomial.totalDegree_C, zero_add]
   exact (MvPolynomial.totalDegree_X _).le
 
-theorem UpperTheory.Reformulated.B.TotalDegreeLinear.main :
-    ∀ {ι A B : Type} [inst : Fintype ι] (g h : Matrix ι ι ℂ) (p : UpperTheory.Reformulated.B.TotalDegreeLinear.PV ι A B),
-      MvPolynomial.totalDegree ((UpperTheory.Reformulated.B.TotalDegreeLinear.sub g h : UpperTheory.Reformulated.B.TotalDegreeLinear.PV ι A B → UpperTheory.Reformulated.B.TotalDegreeLinear.PV ι A B) p) ≤
-        MvPolynomial.totalDegree p := by
+theorem UpperTheory.Reformulated.B.TotalDegreeLinear.main
+    : ∀ {ι A B : Type} [inst : Fintype ι] (g h : Matrix ι ι ℂ)
+        (p : UpperTheory.Reformulated.B.TotalDegreeLinear.PV ι A B),
+      MvPolynomial.totalDegree
+          ((UpperTheory.Reformulated.B.TotalDegreeLinear.sub g h
+              : UpperTheory.Reformulated.B.TotalDegreeLinear.PV ι A B
+                → UpperTheory.Reformulated.B.TotalDegreeLinear.PV ι A B)
+            p)
+        ≤ MvPolynomial.totalDegree p := by
   intro ι A B _ g h p
   refine UpperTheory.Reformulated.B.TotalDegreeLinear.totalDegree_aeval_le _ ?_ p
   rintro (x | y)

@@ -9,17 +9,38 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.MemHomLat
 
 @[expose] public section
 
-open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions Formalism.MainNotions.G Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Matrix GlobalTheory.VolAt
+open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions
+  Formalism.MainNotions.G Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Matrix
+  GlobalTheory.VolAt
 
 noncomputable section
 
 namespace GlobalTheory.TwU
 
-theorem map_mem_homLat_of_mem_YYl : ∀ (D : D7) (P : HeightOneSpectrum (𝓞 D.host.E)) {W Qq : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Qq] [Algebra W Qq] [IsFractionRing W Qq] (p : ℕ) (hp : Irreducible (p : W)) (ρ : D.host.E →+* Qq) (hA : Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (D.host.AA0 : Submodule (𝓞 D.host.E) D.host.E) = Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (1 : Submodule (𝓞 D.host.E) D.host.E)) (h1 : ∀ x : 𝓞 D.host.E, ∃ y : W, ρ x = algebraMap W Qq y ∧ (x ∈ P.asIdeal ↔ (p : W) ∣ y)) {k k' : ℕ} (N : Submodule (𝓞 D.host.E) (Fin k → D.host.E)) (N' : Submodule (𝓞 D.host.E) (Fin k' → D.host.E)) (a : Matrix (Fin k) (Fin k) Qq) (b : Matrix (Fin k') (Fin k') Qq) (hNa : Submodule.span W ((fun x i => ρ (x i)) '' (N : Set (Fin k → D.host.E))) = colSpan W a) (hNb : Submodule.span W ((fun x i => ρ (x i)) '' (N' : Set (Fin k' → D.host.E))) = colSpan W b), ∀ A ∈ TaylorLogMetric.YYl D N N', A.map ρ ∈ homLat W (colSpan W a) (colSpan W b) := by
+theorem map_mem_homLat_of_mem_YYl
+    : ∀ (D : D7) (P : HeightOneSpectrum (𝓞 D.host.E)) {W Qq : Type} [CommRing W] [IsDomain W]
+        [IsDiscreteValuationRing W] [Field Qq] [Algebra W Qq] [IsFractionRing W Qq] (p : ℕ)
+        (hp : Irreducible (p : W)) (ρ : D.host.E →+* Qq)
+        (hA : Formalism.HermitianLatticesTheory.localization₂ P.asIdeal
+            (D.host.AA0 : Submodule (𝓞 D.host.E) D.host.E)
+          = Formalism.HermitianLatticesTheory.localization₂ P.asIdeal
+            (1 : Submodule (𝓞 D.host.E) D.host.E))
+        (h1 : ∀ x : 𝓞 D.host.E, ∃ y : W, ρ x = algebraMap W Qq y ∧ (x ∈ P.asIdeal ↔ (p : W) ∣ y))
+        {k k' : ℕ} (N : Submodule (𝓞 D.host.E) (Fin k → D.host.E))
+        (N' : Submodule (𝓞 D.host.E) (Fin k' → D.host.E)) (a : Matrix (Fin k) (Fin k) Qq)
+        (b : Matrix (Fin k') (Fin k') Qq)
+        (hNa
+          : Submodule.span W ((fun x i => ρ (x i)) '' (N : Set (Fin k → D.host.E))) = colSpan W a)
+        (hNb : Submodule.span W ((fun x i => ρ (x i)) '' (N' : Set (Fin k' → D.host.E)))
+          = colSpan W b),
+      ∀ A ∈ TaylorLogMetric.YYl D N N',
+        A.map ρ ∈ homLat W (colSpan W a) (colSpan W b) := by
   intro D P W Qq _ _ _ _ _ _ p hp ρ hA h1 k k' N N' a b hNa hNb
 
-  have hsc : ∀ (c : D.host.E) (M : Matrix (Fin k') (Fin k) D.host.E), (∃ y : W, ρ c = algebraMap W Qq y) →
-      M.map ρ ∈ homLat W (colSpan W a) (colSpan W b) → (c • M).map ρ ∈ homLat W (colSpan W a) (colSpan W b) := by
+  have hsc
+      : ∀ (c : D.host.E) (M : Matrix (Fin k') (Fin k) D.host.E),
+        (∃ y : W, ρ c = algebraMap W Qq y) → M.map ρ ∈ homLat W (colSpan W a) (colSpan W b)
+          → (c • M).map ρ ∈ homLat W (colSpan W a) (colSpan W b) := by
     rintro c M ⟨y, hy⟩ hM z hz
     have e : (c • M).map ρ = y • M.map ρ := by
       ext i j
@@ -29,9 +50,12 @@ theorem map_mem_homLat_of_mem_YYl : ∀ (D : D7) (P : HeightOneSpectrum (𝓞 D.
   have hO : ∀ c : 𝓞 D.host.E, ∃ y : W, ρ (c : D.host.E) = algebraMap W Qq y := fun c =>
     (h1 c).imp fun y hy => hy.1
 
-  have hAA : ∀ x ∈ (D.host.AA0 : Submodule (𝓞 D.host.E) D.host.E), ∃ y : W, ρ x = algebraMap W Qq y := by
+  have hAA
+      : ∀ x ∈ (D.host.AA0 : Submodule (𝓞 D.host.E) D.host.E), ∃ y : W, ρ x = algebraMap W Qq y := by
     intro x hx
-    have hx' : x ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (D.host.AA0 : Submodule (𝓞 D.host.E) D.host.E) :=
+    have hx'
+        : x ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal
+          (D.host.AA0 : Submodule (𝓞 D.host.E) D.host.E) :=
       ⟨1, P.asIdeal.primeCompl.one_mem, by simpa using hx⟩
     rw [hA] at hx'
     obtain ⟨s, hs, hsx⟩ := hx'
@@ -53,10 +77,11 @@ theorem map_mem_homLat_of_mem_YYl : ∀ (D : D7) (P : HeightOneSpectrum (𝓞 D.
       exact hu.ne_zero
     rw [map_mul, ← hyt]
     change _ = _ * ρ (t : D.host.E)
-    rw [show ((t : D.host.E)) = algebraMap (𝓞 D.host.E) D.host.E t from rfl, e1, hys, ← mul_assoc, ← map_mul,
-      IsUnit.val_inv_mul, map_one, one_mul]
+    rw [show ((t : D.host.E)) = algebraMap (𝓞 D.host.E) D.host.E t from rfl, e1, hys, ← mul_assoc,
+      ← map_mul, IsUnit.val_inv_mul, map_one, one_mul]
 
-  have hHom : ∀ A ∈ TaylorLogMetric.homL D N N', A.map ρ ∈ homLat W (colSpan W a) (colSpan W b) := by
+  have hHom
+      : ∀ A ∈ TaylorLogMetric.homL D N N', A.map ρ ∈ homLat W (colSpan W a) (colSpan W b) := by
     intro A hA'
     induction hA' using Submodule.span_induction with
     | mem A hA0 =>
@@ -69,7 +94,7 @@ theorem map_mem_homLat_of_mem_YYl : ∀ (D : D7) (P : HeightOneSpectrum (𝓞 D.
         refine Submodule.subset_span ⟨A *ᵥ x, hA0 x hx, ?_⟩
         funext i
         set_option synthInstance.maxHeartbeats 100000 in
-          simp [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul]
+        simp [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul]
       | zero => rw [Matrix.mulVec_zero]; exact Submodule.zero_mem _
       | add z z' _ _ hz hz' => rw [Matrix.mulVec_add]; exact Submodule.add_mem _ hz hz'
       | smul c z _ hz => rw [Matrix.mulVec_smul]; exact Submodule.smul_mem _ c hz

@@ -7,8 +7,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open NumberField IsDedekindDomain Polynomial Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.HenQ UpperTheory.V.Z.Bc UpperTheory.V.Published
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL UpperTheory.Zero.LLC UpperTheory.V.Z.Inf UpperTheory.V.Z.Gam
+open NumberField IsDedekindDomain Polynomial Formalism.L2.Host Formalism.ConjugateSelfDual
+  GlobalTheory.CuspRep GlobalTheory.HenQ UpperTheory.V.Z.Bc UpperTheory.V.Published
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  UpperTheory.Zero.LLC UpperTheory.V.Z.Inf UpperTheory.V.Z.Gam
 open scoped Classical
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -20,8 +22,8 @@ section Loc
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-private theorem tw_eq_iff (y : IrrGL (k := k)) (χ ζ : kˣ →* ℂˣ) (hχ : IsSmoothChar χ) :
-    (∃ hζ, y.tw χ hχ = IrrGL.ofChar ζ hζ) ↔ ∃ ξ hξ, y = IrrGL.ofChar ξ hξ ∧ ζ = ξ * χ := by
+private theorem tw_eq_iff (y : IrrGL (k := k)) (χ ζ : kˣ →* ℂˣ) (hχ : IsSmoothChar χ)
+    : (∃ hζ, y.tw χ hχ = IrrGL.ofChar ζ hζ) ↔ ∃ ξ hξ, y = IrrGL.ofChar ξ hξ ∧ ζ = ξ * χ := by
   constructor
   · rintro ⟨hζ, e⟩
     refine ⟨ζ * χ⁻¹, hζ.mul hχ.inv, ?_, ?_⟩
@@ -30,8 +32,8 @@ private theorem tw_eq_iff (y : IrrGL (k := k)) (χ ζ : kˣ →* ℂˣ) (hχ : I
   · rintro ⟨ξ, hξ, rfl, rfl⟩
     exact ⟨hξ.mul hχ, IrrGL.tw_ofChar _ _ _ _⟩
 
-private theorem pol_tw (s : Multiset (IrrGL (k := k))) (χ θ : kˣ →* ℂˣ) (hχ : IsSmoothChar χ) :
-    pol (s.map (·.tw χ hχ)) θ = pol s (χ * θ) := by
+private theorem pol_tw (s : Multiset (IrrGL (k := k))) (χ θ : kˣ →* ℂˣ) (hχ : IsSmoothChar χ)
+    : pol (s.map (·.tw χ hχ)) θ = pol s (χ * θ) := by
   unfold pol
   rw [Multiset.map_map]
   refine congrArg Multiset.prod (Multiset.map_congr rfl fun y _ => ?_)
@@ -51,8 +53,8 @@ private theorem pol_tw (s : Multiset (IrrGL (k := k))) (χ θ : kˣ →* ℂˣ) 
       exact h ⟨ξ, ⟨hξ, e⟩, by rwa [← mul_assoc]⟩
     rw [dite_eq_right h, dite_eq_right h']
 
-private theorem chars_tw (s : Multiset (IrrGL (k := k))) (χ ζ : kˣ →* ℂˣ) (hχ : IsSmoothChar χ) :
-    ζ ∈ chars (s.map (·.tw χ hχ)) ↔ ∃ ξ ∈ chars s, ζ = ξ * χ := by
+private theorem chars_tw (s : Multiset (IrrGL (k := k))) (χ ζ : kˣ →* ℂˣ) (hχ : IsSmoothChar χ)
+    : ζ ∈ chars (s.map (·.tw χ hχ)) ↔ ∃ ξ ∈ chars s, ζ = ξ * χ := by
   constructor
   · rintro ⟨hζ, hm⟩
     obtain ⟨y, hy, e⟩ := Multiset.mem_map.1 hm
@@ -70,9 +72,12 @@ variable {K : Type} [Field K] [NumberField K] {n : ℕ}
 private theorem smooth_loc (χ : HChar K) (v : HeightOneSpectrum (𝓞 K)) : IsSmoothChar (χ.loc v) :=
   GlobalTheory.HeckeComp.smooth_loc χ v
 
-private theorem supp_twist [_root_.NumberField.IsTotallyComplex K] {v : HeightOneSpectrum (𝓞 K)} {σ : SmIrr (GL (Fin n) (v.adicCompletion K))} (χ : HChar K)
-    {s : Multiset (IrrGL (k := v.adicCompletion K))} (h : HasSupport σ.ρ s) :
-    HasSupport (σ.twist (CuspSub.locDet n χ v) (CuspSub.isOpen_ker_locDet χ v)).ρ
+private theorem supp_twist
+    [_root_.NumberField.IsTotallyComplex K]
+    {v : HeightOneSpectrum (𝓞 K)} {σ : SmIrr (GL (Fin n) (v.adicCompletion K))}
+    (χ : HChar K)
+    {s : Multiset (IrrGL (k := v.adicCompletion K))} (h : HasSupport σ.ρ s)
+    : HasSupport (σ.twist (CuspSub.locDet n χ v) (CuspSub.isOpen_ker_locDet χ v)).ρ
       (s.map (·.tw (χ.loc v) (smooth_loc χ v))) :=
   h.tw (χ.loc v) (smooth_loc χ v)
 
@@ -81,9 +86,10 @@ end Glob
 end UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter
 
 open UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter in
-theorem UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.suppTw :
-    UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.SuppTw := by
+theorem UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.suppTw
+    : UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.SuppTw := by
   rintro K _ _ _ n _ π v χ s ⟨σ, hσ, hs⟩
-  refine ⟨_, ⟨_, hσ.twist χ, supp_twist χ hs⟩, fun θ => pol_tw s _ θ _, fun ζ => chars_tw s _ ζ _, ?_⟩
+  refine
+    ⟨_, ⟨_, hσ.twist χ, supp_twist χ hs⟩, fun θ => pol_tw s _ θ _, fun ζ => chars_tw s _ ζ _, ?_⟩
   rw [Multiset.map_map]
   rfl

@@ -10,13 +10,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
+open Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
 section Abs
 
-variable {K R M : Type} [Group K] [CommRing R] [Ring M] [Module R M] (ρ z : K → M) (χ : K → R)
-  (h1 : ρ 1 = 1) (hm : ∀ g h, ρ (g * h) = ρ g * ρ h) (c1 : χ 1 = 1) (cm : ∀ g h, χ (g * h) = χ g * χ h)
-  (hz : ∀ g h, z (g * h) = z g + χ g • (ρ g * z h * ρ g⁻¹))
+variable
+  {K R M : Type} [Group K] [CommRing R] [Ring M] [Module R M]
+  (ρ z : K → M) (χ : K → R) (h1 : ρ 1 = 1) (hm : ∀ g h, ρ (g * h) = ρ g * ρ h) (c1 : χ 1 = 1)
+  (cm : ∀ g h, χ (g * h) = χ g * χ h) (hz : ∀ g h, z (g * h) = z g + χ g • (ρ g * z h * ρ g⁻¹))
 
 include h1 c1 hz in
 private theorem twisted_cocycle_apply_one : z 1 = 0 := by
@@ -24,8 +26,11 @@ private theorem twisted_cocycle_apply_one : z 1 = 0 := by
   simp only [mul_one, inv_one, h1, c1, one_smul, one_mul] at h
   simpa using h
 
-private theorem tw_inv {N : Type} [Monoid N] (ρ : K → N) (h1 : ρ 1 = 1) (hm : ∀ g h, ρ (g * h) = ρ g * ρ h)
-    {g : K} (hg : ρ g = 1) : ρ g⁻¹ = 1 := by
+private theorem tw_inv
+    {N : Type} [Monoid N]
+    (ρ : K → N) (h1 : ρ 1 = 1) (hm : ∀ g h, ρ (g * h) = ρ g * ρ h)
+    {g : K} (hg : ρ g = 1)
+    : ρ g⁻¹ = 1 := by
   have := hm g g⁻¹
   rw [mul_inv_cancel, h1, hg, one_mul] at this
   exact this.symm
@@ -35,9 +40,14 @@ private theorem tw_add {g : K} (hg : ρ g = 1) (hc : χ g = 1) (h : K) : z (g * 
   rw [hz, hg, hc, tw_inv ρ h1 hm hg, one_smul, one_mul, mul_one]
 
 include h1 hm c1 hz in
-private theorem tw_pow {g : K} (hg : ρ g = 1) (hc : χ g = 1) (k : ℕ) : ρ (g ^ k) = 1 ∧ z (g ^ k) = k • z g := by
+private theorem tw_pow {g : K} (hg : ρ g = 1) (hc : χ g = 1) (k : ℕ)
+    : ρ (g ^ k) = 1 ∧ z (g ^ k) = k • z g := by
   induction k with
-  | zero => exact ⟨by simpa using h1, by simpa using twisted_cocycle_apply_one (ρ := ρ) (z := z) (χ := χ) h1 c1 hz⟩
+  | zero =>
+    exact ⟨
+      by simpa using h1,
+      by simpa using twisted_cocycle_apply_one (ρ := ρ) (z := z) (χ := χ) h1 c1 hz
+    ⟩
   | succ k ih =>
     obtain ⟨h1', h2'⟩ := ih
     refine ⟨?_, ?_⟩
@@ -45,25 +55,29 @@ private theorem tw_pow {g : K} (hg : ρ g = 1) (hc : χ g = 1) (k : ℕ) : ρ (g
     · rw [pow_succ', tw_add (ρ := ρ) (z := z) (χ := χ) h1 hm hz hg hc, h2', succ_nsmul, add_comm]
 
 include h1 hm c1 cm hz in
-private theorem tw_U [TopologicalSpace K] (cρ : IsLocallyConstant ρ) (cχ : IsLocallyConstant χ)
-    (cz : IsLocallyConstant z) :
-    ∃ U : OpenNormalSubgroup K, ∀ g, g ∈ U ↔ ρ g = 1 ∧ χ g = 1 ∧ z g = 0 := by
-  let S : Subgroup K :=
-    { carrier := {g | ρ g = 1 ∧ χ g = 1 ∧ z g = 0}
-      mul_mem' := by
-        intro a b ha hb
-        obtain ⟨ha1, ha2, ha3⟩ := ha
-        obtain ⟨hb1, hb2, hb3⟩ := hb
-        refine ⟨by rw [hm, ha1, hb1, one_mul], by rw [cm, ha2, hb2, one_mul], ?_⟩
-        rw [tw_add (ρ := ρ) (z := z) (χ := χ) h1 hm hz ha1 ha2, ha3, hb3, add_zero]
-      one_mem' := ⟨h1, c1, twisted_cocycle_apply_one (ρ := ρ) (z := z) (χ := χ) h1 c1 hz⟩
-      inv_mem' := by
-        intro a ha
-        obtain ⟨ha1, ha2, ha3⟩ := ha
-        refine ⟨tw_inv ρ h1 hm ha1, tw_inv χ c1 cm ha2, ?_⟩
-        have e := tw_add (ρ := ρ) (z := z) (χ := χ) h1 hm hz ha1 ha2 a⁻¹
-        rw [mul_inv_cancel, twisted_cocycle_apply_one (ρ := ρ) (z := z) (χ := χ) h1 c1 hz, ha3, zero_add] at e
-        exact e.symm }
+private theorem tw_U
+    [TopologicalSpace K]
+    (cρ : IsLocallyConstant ρ) (cχ : IsLocallyConstant χ) (cz : IsLocallyConstant z)
+    : ∃ U : OpenNormalSubgroup K, ∀ g, g ∈ U ↔ ρ g = 1 ∧ χ g = 1 ∧ z g = 0 := by
+  let S : Subgroup K := {
+    carrier := {g | ρ g = 1 ∧ χ g = 1 ∧ z g = 0}
+    mul_mem' := by
+      intro a b ha hb
+      obtain ⟨ha1, ha2, ha3⟩ := ha
+      obtain ⟨hb1, hb2, hb3⟩ := hb
+      refine ⟨by rw [hm, ha1, hb1, one_mul], by rw [cm, ha2, hb2, one_mul], ?_⟩
+      rw [tw_add (ρ := ρ) (z := z) (χ := χ) h1 hm hz ha1 ha2, ha3, hb3, add_zero]
+    one_mem' := ⟨h1, c1, twisted_cocycle_apply_one (ρ := ρ) (z := z) (χ := χ) h1 c1 hz⟩
+    inv_mem' := by
+      intro a ha
+      obtain ⟨ha1, ha2, ha3⟩ := ha
+      refine ⟨tw_inv ρ h1 hm ha1, tw_inv χ c1 cm ha2, ?_⟩
+      have e := tw_add (ρ := ρ) (z := z) (χ := χ) h1 hm hz ha1 ha2 a⁻¹
+      rw [mul_inv_cancel, twisted_cocycle_apply_one (ρ := ρ) (z := z) (χ := χ) h1 c1 hz, ha3,
+          zero_add]
+        at e
+      exact e.symm
+  }
   have hSo : IsOpen (S : Set K) :=
     (cρ.isOpen_fiber 1).inter ((cχ.isOpen_fiber 1).inter (cz.isOpen_fiber 0))
   have hSn : S.Normal := by
@@ -74,13 +88,16 @@ private theorem tw_U [TopologicalSpace K] (cρ : IsLocallyConstant ρ) (cχ : Is
     refine ⟨r1, r2, ?_⟩
     have e1 : z (a * b⁻¹) = z b⁻¹ := by
       rw [tw_add (ρ := ρ) (z := z) (χ := χ) h1 hm hz ha1 ha2, ha3, zero_add]
-    rw [mul_assoc, hz, e1, ← hz, mul_inv_cancel, twisted_cocycle_apply_one (ρ := ρ) (z := z) (χ := χ) h1 c1 hz]
+    rw [mul_assoc, hz, e1, ← hz, mul_inv_cancel,
+      twisted_cocycle_apply_one (ρ := ρ) (z := z) (χ := χ) h1 c1 hz]
   exact ⟨⟨⟨S, hSo⟩, hSn⟩, fun g => Iff.rfl⟩
 
 end Abs
 
-private theorem tw_lc {Γ R : Type} [TopologicalSpace Γ] {n : ℕ} (f : Γ → Matrix (Fin n) (Fin n) R)
-    (h : ∀ i j, IsLocallyConstant fun g => f g i j) : IsLocallyConstant f := by
+private theorem tw_lc
+    {Γ R : Type} [TopologicalSpace Γ]
+    {n : ℕ} (f : Γ → Matrix (Fin n) (Fin n) R) (h : ∀ i j, IsLocallyConstant fun g => f g i j)
+    : IsLocallyConstant f := by
   rw [IsLocallyConstant.iff_eventually_eq]
   intro x
   have hx : ∀ᶠ y in nhds x, ∀ i j, f y i j = f x i j := by
@@ -92,9 +109,11 @@ private theorem tw_lc {Γ R : Type} [TopologicalSpace Γ] {n : ℕ} (f : Γ → 
   filter_upwards [hx] with y hy
   exact Matrix.ext hy
 
-private theorem tw_core {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
-    (K P : Subgroup Γ) [P.Normal] (hK : IsOpen (K : Set Γ)) (hP : P ≤ K) :
-    ∃ U : OpenNormalSubgroup Γ, P ≤ U.toSubgroup ∧ U.toSubgroup ≤ K := by
+private theorem tw_core
+    {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
+    (K P : Subgroup Γ) [P.Normal]
+    (hK : IsOpen (K : Set Γ)) (hP : P ≤ K)
+    : ∃ U : OpenNormalSubgroup Γ, P ≤ U.toSubgroup ∧ U.toSubgroup ≤ K := by
   have hKc : IsClosed (K : Set Γ) := K.isClosed_of_isOpen hK
   haveI : Finite (Γ ⧸ K) := K.quotient_finite_of_isOpen hK
   haveI : K.FiniteIndex := Subgroup.finiteIndex_of_finite_quotient
@@ -104,23 +123,30 @@ private theorem tw_core {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologi
   · exact Subgroup.normal_le_normalCore.mpr hP
   · exact K.normalCore_le
 
-private theorem pow_mem_of_PL (l : ℕ) {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
-    (H : Subgroup Γ) (V : Set Γ) (hV : IsOpen V) (hle : (PL l H : Set Γ) ⊆ V) : ∀ h ∈ H, ∃ e : ℕ, h ^ l ^ e ∈ V := by
+private theorem pow_mem_of_PL
+    (l : ℕ)
+    {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
+    (H : Subgroup Γ) (V : Set Γ) (hV : IsOpen V) (hle : (PL l H : Set Γ) ⊆ V)
+    : ∀ h ∈ H, ∃ e : ℕ, h ^ l ^ e ∈ V := by
   classical
   intro h hh
   have hc : IsCompact (Vᶜ) := hV.isClosed_compl.isCompact
-  obtain ⟨u, hu⟩ := hc.elim_finite_subfamily_closed
-    (fun i : {U : OpenNormalSubgroup Γ // ∀ h ∈ H, ∃ e : ℕ, h ^ l ^ e ∈ U} => (i.1.toSubgroup : Set Γ))
-    (fun i => Subgroup.isClosed_of_isOpen _ i.1.isOpen') (by
-      apply Set.disjoint_left.mpr
-      simp only [Set.mem_compl_iff, Set.mem_iInter]
-      intro y hy hall
-      apply hy
-      apply hle
-      simp only [PL, SetLike.mem_coe, Subgroup.mem_iInf]
-      intro U hU
-      exact hall ⟨U, hU⟩)
-  let e : {U : OpenNormalSubgroup Γ // ∀ h ∈ H, ∃ e : ℕ, h ^ l ^ e ∈ U} → ℕ := fun i => (i.2 h hh).choose
+  obtain ⟨u, hu⟩ :=
+    hc.elim_finite_subfamily_closed
+      (fun i : {U : OpenNormalSubgroup Γ // ∀ h ∈ H, ∃ e : ℕ, h ^ l ^ e ∈ U} =>
+        (i.1.toSubgroup : Set Γ))
+      (fun i => Subgroup.isClosed_of_isOpen _ i.1.isOpen')
+      (by
+        apply Set.disjoint_left.mpr
+        simp only [Set.mem_compl_iff, Set.mem_iInter]
+        intro y hy hall
+        apply hy
+        apply hle
+        simp only [PL, SetLike.mem_coe, Subgroup.mem_iInf]
+        intro U hU
+        exact hall ⟨U, hU⟩)
+  let e : {U : OpenNormalSubgroup Γ // ∀ h ∈ H, ∃ e : ℕ, h ^ l ^ e ∈ U} → ℕ := fun i =>
+    (i.2 h hh).choose
   refine ⟨u.sup e, ?_⟩
   by_contra hn
   have hmem : h ^ l ^ u.sup e ∈ Vᶜ ∩ ⋂ i ∈ u, (i.1.toSubgroup : Set Γ) := by
@@ -128,19 +154,21 @@ private theorem pow_mem_of_PL (l : ℕ) {Γ : Type} [Group Γ] [TopologicalSpace
     simp only [Set.mem_iInter]
     intro i hi
     have hle' : e i ≤ u.sup e := Finset.le_sup hi
-    have hpow : l ^ u.sup e = l ^ e i * l ^ (u.sup e - e i) := by rw [← pow_add, Nat.add_sub_cancel' hle']
+    have hpow : l ^ u.sup e = l ^ e i * l ^ (u.sup e - e i) := by
+      rw [← pow_add, Nat.add_sub_cancel' hle']
     rw [SetLike.mem_coe, hpow, pow_mul]
     exact Subgroup.pow_mem _ (i.2 h hh).choose_spec _
   exact Set.disjoint_left.mp hu hmem.1 hmem.2
 
-private theorem epM_mul {X : Type} [CommRing X] {g n : ℕ} (Z : Fin g → Matrix (Fin n) (Fin n) X) :
-    DD.epM Z * DD.epM Z = 0 := by
+private theorem epM_mul {X : Type} [CommRing X] {g n : ℕ} (Z : Fin g → Matrix (Fin n) (Fin n) X)
+    : DD.epM Z * DD.epM Z = 0 := by
   refine Matrix.ext fun a b => ?_
   rw [Matrix.mul_apply, Matrix.zero_apply]
   refine Finset.sum_eq_zero fun c _ => ?_
   ext <;> simp [DD.epM]
 
-private theorem one_add_pow {S : Type} [Ring S] (E : S) (h : E * E = 0) (k : ℕ) : (1 + E) ^ k = 1 + k • E := by
+private theorem one_add_pow {S : Type} [Ring S] (E : S) (h : E * E = 0) (k : ℕ)
+    : (1 + E) ^ k = 1 + k • E := by
   induction k with
   | zero => simp
   | succ k ih =>
@@ -148,10 +176,15 @@ private theorem one_add_pow {S : Type} [Ring S] (E : S) (h : E * E = 0) (k : ℕ
     simp only [smul_mul_assoc, h, smul_zero, mul_one, one_mul, add_zero, succ_nsmul]
     abel
 
-private theorem rho1_pow_eq_one_pro_l (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (T : TWGrp G0) (n : ℕ) (x : NP G0.frame n)
-    (k : Kap x) (m : ℕ) (hPL : ∀ g : G0.G₀, (g : G0.Γ) ∈ PL l T.H.toSubgroup → x.ρ g = 1) (g : G0.G₀)
-    (hg : (g : G0.Γ) ∈ T.H) : ∃ e : ℕ, k.ρ1 (x.Am m) (g ^ l ^ e) = 1 := by
-  have hlc : IsLocallyConstant fun g : G0.G₀ => k.ρ1 (x.Am m) g := (lc1 l L G0 G0 (Glob.Hom.refl G0) n x k m).1
+private theorem rho1_pow_eq_one_pro_l
+    (l : ℕ) [Fact l.Prime]
+    (L : Loc) (G0 : Glob l L) (T : TWGrp G0)
+    (n : ℕ) (x : NP G0.frame n) (k : Kap x)
+    (m : ℕ) (hPL : ∀ g : G0.G₀, (g : G0.Γ) ∈ PL l T.H.toSubgroup → x.ρ g = 1)
+    (g : G0.G₀) (hg : (g : G0.Γ) ∈ T.H)
+    : ∃ e : ℕ, k.ρ1 (x.Am m) (g ^ l ^ e) = 1 := by
+  have hlc : IsLocallyConstant fun g : G0.G₀ => k.ρ1 (x.Am m) g :=
+    (lc1 l L G0 G0 (Glob.Hom.refl G0) n x k m).1
   have hr := rho1 l G0.frame n x k (x.Am m)
   have hpow : ∀ (g : G0.G₀) (j : ℕ), k.ρ1 (x.Am m) (g ^ j) = k.ρ1 (x.Am m) g ^ j := by
     intro g j
@@ -161,7 +194,8 @@ private theorem rho1_pow_eq_one_pro_l (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : G
   have hlD : ∀ w : DD (x.Am m) k.g, l • w = 0 := (finAm l G0.frame n x m k.g).2.2.2.2.1
   have hkey : ∀ g0 : G0.G₀, x.ρ g0 = 1 → k.ρ1 (x.Am m) (g0 ^ l) = 1 := by
     intro g0 hρ
-    have hρ1 : k.ρ1 (x.Am m) g0 = 1 + DD.epM (fun j => (k.κ j g0).map ⇑(algebraMap x.A (x.Am m))) := by
+    have hρ1
+        : k.ρ1 (x.Am m) g0 = 1 + DD.epM (fun j => (k.κ j g0).map ⇑(algebraMap x.A (x.Am m))) := by
       simp [Kap.ρ1, NP.ρX, mat, hρ]
     rw [hpow, hρ1, one_add_pow _ (epM_mul _) l]
     have hz : l • DD.epM (fun j => (k.κ j g0).map ⇑(algebraMap x.A (x.Am m))) = 0 := by
@@ -169,8 +203,8 @@ private theorem rho1_pow_eq_one_pro_l (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : G
       rw [Matrix.smul_apply, hlD, Matrix.zero_apply]
     rw [hz, add_zero]
   let V : Set G0.Γ := Subtype.val '' {g : G0.G₀ | k.ρ1 (x.Am m) (g ^ l) = 1}
-  have hVo : IsOpen V := G0.η_open.isOpenMap_subtype_val _
-    ((hlc.comp_continuous (continuous_pow l)).isOpen_fiber 1)
+  have hVo : IsOpen V :=
+    G0.η_open.isOpenMap_subtype_val _ ((hlc.comp_continuous (continuous_pow l)).isOpen_fiber 1)
   have hsub : (PL l T.H.toSubgroup : Set G0.Γ) ⊆ V := by
     intro γ hγ
     have hγH : γ ∈ T.H := (pl_props l G0.Γ T.H.toSubgroup T.H.isOpen').2.2.1 hγ
@@ -183,8 +217,12 @@ private theorem rho1_pow_eq_one_pro_l (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : G
   rw [pow_succ, pow_mul, ← hgg]
   exact hg'1
 
-private theorem epsD_one (l : ℕ) [Fact l.Prime] (F : GFrame l) (n : ℕ) (x : NP F n)
-    (k : Kap x) (m : ℕ) (g : F.Γ) (hg : PadicInt.toZMod ((F.ε g : ℤ_[l]ˣ) : ℤ_[l]) = 1) : epsD k (x.Am m) g = 1 := by
+private theorem epsD_one
+    (l : ℕ) [Fact l.Prime]
+    (F : GFrame l) (n : ℕ) (x : NP F n) (k : Kap x)
+    (m : ℕ)
+    (g : F.Γ) (hg : PadicInt.toZMod ((F.ε g : ℤ_[l]ˣ) : ℤ_[l]) = 1)
+    : epsD k (x.Am m) g = 1 := by
   set y : ℤ_[l] := ((F.ε g : ℤ_[l]ˣ) : ℤ_[l]) with hyd
   have hy : y - 1 ∈ RingHom.ker (PadicInt.toZMod (p := l)) := by
     rw [RingHom.mem_ker, RingHom.map_sub, hg, map_one, sub_self]
@@ -193,19 +231,30 @@ private theorem epsD_one (l : ℕ) [Fact l.Prime] (F : GFrame l) (n : ℕ) (x : 
   have hl : ∀ w : DD (x.Am m) k.g, l • w = 0 := (finAm l F n x m k.g).2.2.2.2.1
   have hy1 : y = 1 + u * l := by rw [hu]; ring
   unfold epsD
-  rw [← hyd, hy1, map_add (f := _), map_one, map_add (f := _), map_one, map_mul, map_mul, map_natCast, map_natCast,
-    ← nsmul_eq_mul', hl, add_zero]
+  rw [← hyd, hy1, map_add (f := _), map_one, map_add (f := _), map_one, map_mul, map_mul,
+    map_natCast, map_natCast, ← nsmul_eq_mul', hl, add_zero]
 
-private theorem epsD_am_eq_one_of_mem_frame_g' (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (n : ℕ) (x : NP G0.frame n)
-    (k : Kap x) (m : ℕ) (s : G0.G₀) (hs : s ∈ G0.frame.G') : epsD k (x.Am m) (s : G0.Γ) = 1 := by
+private theorem epsD_am_eq_one_of_mem_frame_g'
+    (l : ℕ) [Fact l.Prime]
+    (L : Loc) (G0 : Glob l L)
+    (n : ℕ) (x : NP G0.frame n) (k : Kap x)
+    (m : ℕ)
+    (s : G0.G₀) (hs : s ∈ G0.frame.G')
+    : epsD k (x.Am m) (s : G0.Γ) = 1 := by
   have hs' : G0.frame.ε (s : G0.Γ) = 1 := MonoidHom.mem_ker.mp hs
   exact epsD_one l G0.frame n x k m (s : G0.Γ) (by rw [hs']; simp)
 
-private theorem phEq_one (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (T : TWGrp G0) (n : ℕ) (x : NP G0.frame n)
-    (k : Kap x) (m : ℕ) (hPL : ∀ g : G0.G₀, (g : G0.Γ) ∈ PL l T.H.toSubgroup → x.ρ g = 1)
+private theorem phEq_one
+    (l : ℕ) [Fact l.Prime]
+    (L : Loc) (G0 : Glob l L) (T : TWGrp G0)
+    (n : ℕ) (x : NP G0.frame n) (k : Kap x)
+    (m : ℕ)
+    (hPL : ∀ g : G0.G₀, (g : G0.Γ) ∈ PL l T.H.toSubgroup → x.ρ g = 1)
     (z : G0.G₀ → Matrix (Fin n) (Fin n) (DD (x.Am m) k.g)) (cz : IsLocallyConstant z)
-    (hz : ∀ g h : G0.G₀, z (g * h) = z g + epsD k (x.Am m) g • (k.ρ1 (x.Am m) g * z h * k.ρ1 (x.Am m) g⁻¹))
-    (j : Fin T.q) : ∀ᶠ N in atTop, k.ρ1 (x.Am m) ((T.h N).p₀ (T.ph N j)) = k.ρ1 (x.Am m) (T.sg j) ∧
+    (hz : ∀ g h : G0.G₀,
+      z (g * h) = z g + epsD k (x.Am m) g • (k.ρ1 (x.Am m) g * z h * k.ρ1 (x.Am m) g⁻¹))
+    (j : Fin T.q)
+    : ∀ᶠ N in atTop, k.ρ1 (x.Am m) ((T.h N).p₀ (T.ph N j)) = k.ρ1 (x.Am m) (T.sg j) ∧
       epsD k (x.Am m) ((T.h N).p (T.ph N j)) = 1 ∧ z ((T.h N).p₀ (T.ph N j)) = z (T.sg j) := by
   have hr := rho1 l G0.frame n x k (x.Am m)
   have hlD : ∀ w : DD (x.Am m) k.g, l • w = 0 := (finAm l G0.frame n x m k.g).2.2.2.2.1

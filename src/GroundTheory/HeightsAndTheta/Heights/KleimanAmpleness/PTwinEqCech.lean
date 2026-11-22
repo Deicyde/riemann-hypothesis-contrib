@@ -17,9 +17,9 @@ namespace GradedCech
 
 variable (S : Type) [CommRing S] (N : ℕ)
 
-theorem exists_monomial_of_mem_monos {I : Finset (Fin (N + 1))} {s : Poly S N}
-    (hs : s ∈ Kleiman.monos (S := S) I) :
-    ∃ k : Fin (N + 1) →₀ ℕ, k.support ⊆ I ∧ s = monomial k 1 := by
+theorem exists_monomial_of_mem_monos
+    {I : Finset (Fin (N + 1))} {s : Poly S N} (hs : s ∈ Kleiman.monos (S := S) I)
+    : ∃ k : Fin (N + 1) →₀ ℕ, k.support ⊆ I ∧ s = monomial k 1 := by
   classical
   induction hs using Submonoid.closure_induction with
   | mem x hx =>
@@ -29,33 +29,44 @@ theorem exists_monomial_of_mem_monos {I : Finset (Fin (N + 1))} {s : Poly S N}
     rw [Finsupp.support_single _ one_ne_zero, Finset.mem_singleton] at hj
     subst hj
     exact_mod_cast hi
-  | one => exact ⟨0, by simp, by simp⟩
+  | one =>
+    exact ⟨0, by simp, by simp⟩
   | mul x y _ _ hx hy =>
     obtain ⟨a, ha, rfl⟩ := hx
     obtain ⟨b, hb, rfl⟩ := hy
-    exact ⟨a + b, Finsupp.support_add.trans (Finset.union_subset ha hb), by rw [monomial_mul, one_mul]⟩
+    exact
+      ⟨a + b, Finsupp.support_add.trans (Finset.union_subset ha hb), by rw [monomial_mul, one_mul]⟩
 
-theorem isHomogeneous_Xprod_pow (I : Finset (Fin (N + 1))) (n : ℕ) :
-    (IndefiniteRowSideFullHecke.Kleiman.Xprod S N I ^ n).IsHomogeneous (I.card * n) := by
-  have h := IsHomogeneous.prod (R := S) I (fun i => (X i : Poly S N)) (fun _ => 1)
-    (fun i _ => isHomogeneous_X S i)
+theorem isHomogeneous_Xprod_pow (I : Finset (Fin (N + 1))) (n : ℕ)
+    : (IndefiniteRowSideFullHecke.Kleiman.Xprod S N I ^ n).IsHomogeneous (I.card * n) := by
+  have h :=
+    IsHomogeneous.prod (R := S) I
+      (fun i => (X i : Poly S N))
+      (fun _ => 1)
+      (fun i _ => isHomogeneous_X S i)
   rw [Finset.sum_const, smul_eq_mul, mul_one] at h
   exact h.pow n
 
-theorem exists_mul_eq_Xprod_pow [Nontrivial S] {I : Finset (Fin (N + 1))} {s : Poly S N}
-    (hs : s ∈ Kleiman.monos (S := S) I) {e : ℕ} (he : s.IsHomogeneous e) :
-    ∃ (n : ℕ) (t : Poly S N) (d : ℕ), t.IsHomogeneous d ∧ e + d = I.card * n ∧
-      s * t = IndefiniteRowSideFullHecke.Kleiman.Xprod S N I ^ n := by
+theorem exists_mul_eq_Xprod_pow
+    [Nontrivial S]
+    {I : Finset (Fin (N + 1))} {s : Poly S N} (hs : s ∈ Kleiman.monos (S := S) I)
+    {e : ℕ} (he : s.IsHomogeneous e)
+    : ∃ (n : ℕ) (t : Poly S N) (d : ℕ),
+      t.IsHomogeneous d ∧ e + d = I.card * n
+        ∧ s * t = IndefiniteRowSideFullHecke.Kleiman.Xprod S N I ^ n := by
   classical
   obtain ⟨k, hk, rfl⟩ := exists_monomial_of_mem_monos S N hs
   have hke : k.degree = e :=
-    (isHomogeneous_monomial (1 : S) rfl).inj_right he (by rw [Ne, monomial_eq_zero]; exact one_ne_zero)
+    (isHomogeneous_monomial (1 : S) rfl).inj_right he
+      (by rw [Ne, monomial_eq_zero]; exact one_ne_zero)
   set D : Fin (N + 1) →₀ ℕ := ∑ i ∈ I, Finsupp.single i e with hD
   have hkD : k ≤ D := by
     intro j
     rw [hD, Finsupp.finsetSum_apply]
     by_cases hj : j ∈ I
-    · rw [Finset.sum_eq_single j (fun b _ hb => Finsupp.single_eq_of_ne hb.symm) (fun h => (h hj).elim),
+    · rw [Finset.sum_eq_single j
+          (fun b _ hb => Finsupp.single_eq_of_ne hb.symm)
+          (fun h => (h hj).elim),
         Finsupp.single_eq_same, ← hke]
       exact Finsupp.le_degree j k
     · have : k j = 0 := Finsupp.notMem_support_iff.mp (fun h => hj (hk h))
@@ -64,7 +75,9 @@ theorem exists_mul_eq_Xprod_pow [Nontrivial S] {I : Finset (Fin (N + 1))} {s : P
   have hprod : IndefiniteRowSideFullHecke.Kleiman.Xprod S N I ^ e = monomial D 1 := by
     rw [IndefiniteRowSideFullHecke.Kleiman.Xprod, ← Finset.prod_pow, hD, monomial_sum_one]
     exact Finset.prod_congr rfl fun i _ => X_pow_eq_monomial
-  have hst : monomial k (1 : S) * monomial (D - k) 1 = IndefiniteRowSideFullHecke.Kleiman.Xprod S N I ^ e := by
+  have hst
+      : monomial k (1 : S) * monomial (D - k) 1
+        = IndefiniteRowSideFullHecke.Kleiman.Xprod S N I ^ e := by
     rw [monomial_mul, one_mul, add_tsub_cancel_of_le hkD, hprod]
   refine ⟨e, monomial (D - k) 1, (D - k).degree, isHomogeneous_monomial 1 rfl, ?_, hst⟩
   have h1 := (he.mul (isHomogeneous_monomial (1 : S) (d := D - k) rfl))
@@ -73,9 +86,11 @@ theorem exists_mul_eq_Xprod_pow [Nontrivial S] {I : Finset (Fin (N + 1))} {s : P
   rw [hprod, Ne, monomial_eq_zero]
   exact one_ne_zero
 
-variable (M : Type) [AddCommGroup M] [Module (Poly S N) M] [Module S M] [IsScalarTower S (Poly S N) M]
+variable
+  (M : Type) [AddCommGroup M] [Module (Poly S N) M] [Module S M] [IsScalarTower S (Poly S N) M]
 
-def locEquiv (I : Finset (Fin (N + 1))) : IndefiniteRowSideFullHecke.Kleiman.LocM S N M I ≃ₗ[S] Kleiman.LocMod S N M I where
+def locEquiv (I : Finset (Fin (N + 1)))
+    : IndefiniteRowSideFullHecke.Kleiman.LocM S N M I ≃ₗ[S] Kleiman.LocMod S N M I where
   toFun x := x
   invFun x := x
   map_add' _ _ := rfl
@@ -83,19 +98,32 @@ def locEquiv (I : Finset (Fin (N + 1))) : IndefiniteRowSideFullHecke.Kleiman.Loc
   left_inv _ := rfl
   right_inv _ := rfl
 
-theorem mem_locPiece_iff (G : IndefiniteRowSideFullHecke.Kleiman.GradedMod S N M) (c : ℤ) (I : Kleiman.StdCell N)
-    (x : IndefiniteRowSideFullHecke.Kleiman.LocM S N M I.1) :
-    x ∈ IndefiniteRowSideFullHecke.Kleiman.locPiece S N M G I.1 c ↔
-      locEquiv S N M I.1 x ∈ Kleiman.degLoc (gradedEquiv S N M G) c I := by
-  have key : (IndefiniteRowSideFullHecke.Kleiman.locPiece S N M G I.1 c).map (locEquiv S N M I.1 : _ →ₗ[S] _) =
-      Kleiman.degLoc (gradedEquiv S N M G) c I := by
+theorem mem_locPiece_iff
+    (G : IndefiniteRowSideFullHecke.Kleiman.GradedMod S N M) (c : ℤ)
+    (I : Kleiman.StdCell N) (x : IndefiniteRowSideFullHecke.Kleiman.LocM S N M I.1)
+    : x ∈ IndefiniteRowSideFullHecke.Kleiman.locPiece S N M G I.1 c
+      ↔ locEquiv S N M I.1 x ∈ Kleiman.degLoc (gradedEquiv S N M G) c I := by
+  have key
+      : (IndefiniteRowSideFullHecke.Kleiman.locPiece S N M G I.1 c).map
+          (locEquiv S N M I.1 : _ →ₗ[S] _)
+        = Kleiman.degLoc (gradedEquiv S N M G) c I := by
     rw [IndefiniteRowSideFullHecke.Kleiman.locPiece, Submodule.map_span, Kleiman.degLoc]
     apply le_antisymm
     · rw [Submodule.span_le]
       rintro _ ⟨_, ⟨n, m, hm, rfl⟩, rfl⟩
-      refine Submodule.subset_span ⟨m, ⟨IndefiniteRowSideFullHecke.Kleiman.Xprod S N I.1 ^ n,
-        pow_mem (IndefiniteRowSideFullHecke.Kleiman.Xprod_mem_denoms S N I.1) n⟩, c + n * I.1.card, I.1.card * n, hm,
-        isHomogeneous_Xprod_pow S N I.1 n, by push_cast; ring, rfl⟩
+      refine Submodule.subset_span ⟨
+        m,
+        ⟨
+          IndefiniteRowSideFullHecke.Kleiman.Xprod S N I.1 ^ n,
+          pow_mem (IndefiniteRowSideFullHecke.Kleiman.Xprod_mem_denoms S N I.1) n
+        ⟩,
+        c + n * I.1.card,
+        I.1.card * n,
+        hm,
+        isHomogeneous_Xprod_pow S N I.1 n,
+        by push_cast; ring,
+        rfl
+      ⟩
     · rw [Submodule.span_le]
       rintro _ ⟨m, s, a, e, hm, hs, hae, rfl⟩
       rcases subsingleton_or_nontrivial S with hS | hS
@@ -114,69 +142,93 @@ theorem mem_locPiece_iff (G : IndefiniteRowSideFullHecke.Kleiman.GradedMod S N M
         have htm : t • m ∈ G.piece (c + n * I.1.card) := by
           rw [← hdeg]
           exact (gradedEquiv S N M G).smul_mem d a t m ht hm
-        refine Submodule.subset_span ⟨IndefiniteRowSideFullHecke.Kleiman.locFrac S N M I.1 (t • m) n, ⟨n, t • m, htm, rfl⟩, ?_⟩
-        change (LocalizedModule.mk (t • m) ⟨IndefiniteRowSideFullHecke.Kleiman.Xprod S N I.1 ^ n,
-          pow_mem (IndefiniteRowSideFullHecke.Kleiman.Xprod_mem_denoms S N I.1) n⟩ : LocalizedModule (Kleiman.monos (S := S) I.1) M) =
-          LocalizedModule.mk m s
+        refine Submodule.subset_span
+          ⟨IndefiniteRowSideFullHecke.Kleiman.locFrac S N M I.1 (t • m) n, ⟨n, t • m, htm, rfl⟩, ?_⟩
+        change (LocalizedModule.mk (t • m) ⟨
+              IndefiniteRowSideFullHecke.Kleiman.Xprod S N I.1 ^ n,
+              pow_mem (IndefiniteRowSideFullHecke.Kleiman.Xprod_mem_denoms S N I.1) n
+            ⟩
+            : LocalizedModule (Kleiman.monos (S := S) I.1) M)
+          = LocalizedModule.mk m s
         refine LocalizedModule.mk_eq.2 ⟨1, ?_⟩
         simp only [one_smul, Submonoid.smul_def]
         rw [← mul_smul, hst]
   rw [← key, Submodule.mem_map_equiv]
   rfl
 
-theorem cechD_apply_pos {ι k : Type} [CommRing k] [LinearOrder ι] (C : IndefiniteRowSideFullHecke.Kleiman.CechSystem ι k)
-    (v : ∀ I, C.V I) (J : Finset ι) (h : C.good J) :
-    IndefiniteRowSideFullHecke.Kleiman.cechD C v J =
-      ∑ j ∈ J, IndefiniteRowSideFullHecke.Kleiman.cechSign J j • C.res (Finset.erase_subset j J) (v (J.erase j)) := by
-  simp only [IndefiniteRowSideFullHecke.Kleiman.cechD, LinearMap.pi_apply, if_pos h, LinearMap.sum_apply]
-  rfl
+theorem cechD_apply_pos
+    {ι k : Type} [CommRing k] [LinearOrder ι]
+    (C : IndefiniteRowSideFullHecke.Kleiman.CechSystem ι k) (v : ∀ I, C.V I)
+    (J : Finset ι) (h : C.good J)
+    : IndefiniteRowSideFullHecke.Kleiman.cechD C v J
+      = ∑ j ∈ J, IndefiniteRowSideFullHecke.Kleiman.cechSign J j • C.res (Finset.erase_subset j J) (v (J.erase j)) :=
+  by
+    simp only [IndefiniteRowSideFullHecke.Kleiman.cechD, LinearMap.pi_apply, if_pos h,
+      LinearMap.sum_apply]
+    rfl
 
-theorem cechD_apply_neg {ι k : Type} [CommRing k] [LinearOrder ι] (C : IndefiniteRowSideFullHecke.Kleiman.CechSystem ι k)
-    (v : ∀ I, C.V I) (J : Finset ι) (h : ¬ C.good J) : IndefiniteRowSideFullHecke.Kleiman.cechD C v J = 0 := by
+theorem cechD_apply_neg
+    {ι k : Type} [CommRing k] [LinearOrder ι]
+    (C : IndefiniteRowSideFullHecke.Kleiman.CechSystem ι k) (v : ∀ I, C.V I)
+    (J : Finset ι) (h : ¬ C.good J)
+    : IndefiniteRowSideFullHecke.Kleiman.cechD C v J = 0 := by
   simp only [IndefiniteRowSideFullHecke.Kleiman.cechD, LinearMap.pi_apply, if_neg h]
   rfl
 
 variable {S N M}
 
-def extC (G : IndefiniteRowSideFullHecke.Kleiman.GradedMod S N M) (c : ℤ) (i : ℕ) :
-    Kleiman.Cech.Cochain (Kleiman.locSys S N M) i →ₗ[S] (∀ I, (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c).V I) :=
-  LinearMap.pi fun I => if h : I.Nonempty ∧ I.card = i + 1 then
-      (locEquiv S N M I).symm.toLinearMap ∘ₗ
-        LinearMap.proj (R := S) (φ := fun J : Kleiman.Cech.Idx (Finset.univ : Finset (Fin (N + 1))) i =>
-          Kleiman.LocMod S N M J.1.1) ⟨⟨I, h.1, Finset.subset_univ I⟩, h.2⟩
-    else 0
+def extC (G : IndefiniteRowSideFullHecke.Kleiman.GradedMod S N M) (c : ℤ) (i : ℕ)
+    : Kleiman.Cech.Cochain (Kleiman.locSys S N M) i →ₗ[S] (∀ I, (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c).V I) :=
+  LinearMap.pi fun I =>
+    if h : I.Nonempty ∧ I.card = i + 1 then
+      (locEquiv S N M I).symm.toLinearMap ∘ₗ LinearMap.proj (R := S)
+        (φ := fun J : Kleiman.Cech.Idx (Finset.univ : Finset (Fin (N + 1))) i =>
+          Kleiman.LocMod S N M J.1.1)
+        ⟨⟨I, h.1, Finset.subset_univ I⟩, h.2⟩
+    else
+      0
 
-def resC (G : IndefiniteRowSideFullHecke.Kleiman.GradedMod S N M) (c : ℤ) (i : ℕ) :
-    (∀ I, (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c).V I) →ₗ[S] Kleiman.Cech.Cochain (Kleiman.locSys S N M) i :=
+def resC (G : IndefiniteRowSideFullHecke.Kleiman.GradedMod S N M) (c : ℤ) (i : ℕ)
+    : (∀ I, (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c).V I) →ₗ[S] Kleiman.Cech.Cochain (Kleiman.locSys S N M) i :=
   LinearMap.pi fun J => (locEquiv S N M J.1.1).toLinearMap ∘ₗ LinearMap.proj J.1.1
 
 variable (G : IndefiniteRowSideFullHecke.Kleiman.GradedMod S N M) (c : ℤ)
 
-theorem extC_apply_pos {i : ℕ} (v : Kleiman.Cech.Cochain (Kleiman.locSys S N M) i)
-    (I : Finset (Fin (N + 1))) (h : I.Nonempty ∧ I.card = i + 1) :
-    extC G c i v I = (locEquiv S N M I).symm (v ⟨⟨I, h.1, Finset.subset_univ I⟩, h.2⟩) := by
+theorem extC_apply_pos
+    {i : ℕ} (v : Kleiman.Cech.Cochain (Kleiman.locSys S N M) i)
+    (I : Finset (Fin (N + 1))) (h : I.Nonempty ∧ I.card = i + 1)
+    : extC G c i v I = (locEquiv S N M I).symm (v ⟨⟨I, h.1, Finset.subset_univ I⟩, h.2⟩) := by
   simp only [extC, LinearMap.pi_apply, dif_pos h]
   rfl
 
-theorem extC_apply_neg {i : ℕ} (v : Kleiman.Cech.Cochain (Kleiman.locSys S N M) i)
-    (I : Finset (Fin (N + 1))) (h : ¬ (I.Nonempty ∧ I.card = i + 1)) : extC G c i v I = 0 := by
+theorem extC_apply_neg
+    {i : ℕ} (v : Kleiman.Cech.Cochain (Kleiman.locSys S N M) i)
+    (I : Finset (Fin (N + 1))) (h : ¬(I.Nonempty ∧ I.card = i + 1))
+    : extC G c i v I = 0 := by
   simp only [extC, LinearMap.pi_apply, dif_neg h]
   rfl
 
-theorem resC_apply {i : ℕ} (w : ∀ I, (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c).V I)
-    (J : Kleiman.Cech.Idx (Finset.univ : Finset (Fin (N + 1))) i) :
-    resC G c i w J = locEquiv S N M J.1.1 (w J.1.1) := rfl
+theorem resC_apply
+    {i : ℕ}
+    (w : ∀ I, (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c).V I)
+    (J : Kleiman.Cech.Idx (Finset.univ : Finset (Fin (N + 1))) i)
+    : resC G c i w J = locEquiv S N M J.1.1 (w J.1.1) :=
+  rfl
 
-theorem resC_extC {i : ℕ} (v : Kleiman.Cech.Cochain (Kleiman.locSys S N M) i) :
-    resC G c i (extC G c i v) = v := by
+theorem resC_extC {i : ℕ} (v : Kleiman.Cech.Cochain (Kleiman.locSys S N M) i)
+    : resC G c i (extC G c i v) = v := by
   funext J
   rw [resC_apply G c, extC_apply_pos G c v J.1.1 ⟨J.1.2.1, J.2⟩]
   rfl
 
-theorem mem_cechC_iff {i : ℕ} (w : ∀ I, (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c).V I) :
-    w ∈ IndefiniteRowSideFullHecke.Kleiman.cechC (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c) i ↔
-      ∀ I, (I.Nonempty ∧ I.card = i + 1 → w I ∈ (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c).piece I) ∧
-        (¬ (I.Nonempty ∧ I.card = i + 1) → w I = 0) := by
+theorem mem_cechC_iff
+    {i : ℕ} (w : ∀ I, (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c).V I)
+    : w ∈ IndefiniteRowSideFullHecke.Kleiman.cechC
+        (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c) i
+      ↔ ∀ I,
+        (I.Nonempty ∧ I.card = i + 1
+            → w I ∈ (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c).piece I)
+          ∧ (¬(I.Nonempty ∧ I.card = i + 1) → w I = 0) := by
   constructor
   · intro hw I
     have hI := hw I (Set.mem_univ I)
@@ -191,18 +243,22 @@ theorem mem_cechC_iff {i : ℕ} (w : ∀ I, (IndefiniteRowSideFullHecke.Kleiman.
     · exact (hw I).1 h
     · exact (Submodule.mem_bot S).2 ((hw I).2 h)
 
-theorem extC_resC {i : ℕ} (w : ∀ I, (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c).V I)
-    (hw : w ∈ IndefiniteRowSideFullHecke.Kleiman.cechC (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c) i) :
-    extC G c i (resC G c i w) = w := by
+theorem extC_resC
+    {i : ℕ} (w : ∀ I, (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c).V I)
+    (hw : w ∈ IndefiniteRowSideFullHecke.Kleiman.cechC
+      (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c) i)
+    : extC G c i (resC G c i w) = w := by
   funext I
   by_cases h : I.Nonempty ∧ I.card = i + 1
   · rw [extC_apply_pos G c _ I h]
     rfl
   · rw [extC_apply_neg G c _ I h, (((mem_cechC_iff G c w).1 hw I).2 h)]
 
-theorem extC_mem {i : ℕ} (v : Kleiman.Cech.Cochain (Kleiman.locSys S N M) i)
-    (hv : v ∈ Kleiman.Cech.Cdeg (Kleiman.locSys S N M) (Kleiman.degLoc (gradedEquiv S N M G) c) i) :
-    extC G c i v ∈ IndefiniteRowSideFullHecke.Kleiman.cechC (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c) i := by
+theorem extC_mem
+    {i : ℕ} (v : Kleiman.Cech.Cochain (Kleiman.locSys S N M) i)
+    (hv : v ∈ Kleiman.Cech.Cdeg (Kleiman.locSys S N M) (Kleiman.degLoc (gradedEquiv S N M G) c) i)
+    : extC G c i v ∈ IndefiniteRowSideFullHecke.Kleiman.cechC
+      (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c) i := by
   rw [mem_cechC_iff]
   intro I
   refine ⟨fun h => ?_, fun h => extC_apply_neg G c v I h⟩
@@ -210,14 +266,18 @@ theorem extC_mem {i : ℕ} (v : Kleiman.Cech.Cochain (Kleiman.locSys S N M) i)
   exact (mem_locPiece_iff S N M G c ⟨I, h.1, Finset.subset_univ I⟩ _).2
     (hv ⟨⟨I, h.1, Finset.subset_univ I⟩, h.2⟩ (Set.mem_univ _))
 
-theorem resC_mem {i : ℕ} (w : ∀ I, (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c).V I)
-    (hw : w ∈ IndefiniteRowSideFullHecke.Kleiman.cechC (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c) i) :
-    resC G c i w ∈ Kleiman.Cech.Cdeg (Kleiman.locSys S N M) (Kleiman.degLoc (gradedEquiv S N M G) c) i :=
-  fun J _ => (mem_locPiece_iff S N M G c J.1 _).1 (((mem_cechC_iff G c w).1 hw J.1.1).1 ⟨J.1.2.1, J.2⟩)
+theorem resC_mem
+    {i : ℕ} (w : ∀ I, (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c).V I)
+    (hw : w ∈ IndefiniteRowSideFullHecke.Kleiman.cechC
+      (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c) i)
+    : resC G c i w ∈ Kleiman.Cech.Cdeg (Kleiman.locSys S N M)
+      (Kleiman.degLoc (gradedEquiv S N M G) c) i := fun J _ =>
+  (mem_locPiece_iff S N M G c J.1 _).1 (((mem_cechC_iff G c w).1 hw J.1.1).1 ⟨J.1.2.1, J.2⟩)
 
-theorem cechD_extC {i : ℕ} (v : Kleiman.Cech.Cochain (Kleiman.locSys S N M) i) :
-    IndefiniteRowSideFullHecke.Kleiman.cechD (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c) (extC G c i v) =
-      extC G c (i + 1) (Kleiman.Cech.d (Kleiman.locSys S N M) Kleiman.locResS i v) := by
+theorem cechD_extC {i : ℕ} (v : Kleiman.Cech.Cochain (Kleiman.locSys S N M) i)
+    : IndefiniteRowSideFullHecke.Kleiman.cechD
+        (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c) (extC G c i v)
+      = extC G c (i + 1) (Kleiman.Cech.d (Kleiman.locSys S N M) Kleiman.locResS i v) := by
   funext J
   by_cases hJ : J.Nonempty
   · have hg : (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c).good J := hJ
@@ -235,7 +295,7 @@ theorem cechD_extC {i : ℕ} (v : Kleiman.Cech.Cochain (Kleiman.locSys S N M) i)
         rfl
     · rw [extC_apply_neg G c _ J (fun h => hc h.2)]
       refine Finset.sum_eq_zero fun j hj => ?_
-      have hne : ¬ ((J.erase j).Nonempty ∧ (J.erase j).card = i + 1) := by
+      have hne : ¬((J.erase j).Nonempty ∧ (J.erase j).card = i + 1) := by
         rintro ⟨-, h⟩
         have h1 := Finset.card_erase_of_mem hj
         have h2 := Finset.card_pos.mpr hJ
@@ -244,36 +304,45 @@ theorem cechD_extC {i : ℕ} (v : Kleiman.Cech.Cochain (Kleiman.locSys S N M) i)
   · have hg : ¬ (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c).good J := hJ
     rw [cechD_apply_neg _ _ J hg, extC_apply_neg G c _ J (fun h => hJ h.1)]
 
-def zEquiv (i : ℕ) :
-    IndefiniteRowSideFullHecke.Kleiman.gradedZ S N M G i c ≃ₗ[S]
-      Kleiman.Cech.cocyDeg (Kleiman.locSys S N M) (Kleiman.degLoc (gradedEquiv S N M G) c)
-        Kleiman.locResS i where
-  toFun w := ⟨resC G c i w.1, by
-    refine ⟨LinearMap.mem_ker.2 ?_, resC_mem G c w.1 w.2.1⟩
-    have h := cechD_extC G c (resC G c i w.1)
-    rw [extC_resC G c w.1 w.2.1, LinearMap.mem_ker.mp w.2.2] at h
-    have h' := congrArg (resC G c (i + 1)) h
-    rw [resC_extC G c, map_zero] at h'
-    exact h'.symm⟩
-  invFun v := ⟨extC G c i v.1, extC_mem G c v.1 v.2.2,
-    LinearMap.mem_ker.2 (by rw [cechD_extC G c, LinearMap.mem_ker.mp v.2.1, map_zero])⟩
+def zEquiv (i : ℕ)
+    : IndefiniteRowSideFullHecke.Kleiman.gradedZ S N M G i c ≃ₗ[S]
+        Kleiman.Cech.cocyDeg (Kleiman.locSys S N M) (Kleiman.degLoc (gradedEquiv S N M G) c)
+          Kleiman.locResS i where
+  toFun w := ⟨
+    resC G c i w.1,
+    by
+      refine ⟨LinearMap.mem_ker.2 ?_, resC_mem G c w.1 w.2.1⟩
+      have h := cechD_extC G c (resC G c i w.1)
+      rw [extC_resC G c w.1 w.2.1, LinearMap.mem_ker.mp w.2.2] at h
+      have h' := congrArg (resC G c (i + 1)) h
+      rw [resC_extC G c, map_zero] at h'
+      exact h'.symm
+  ⟩
+  invFun v := ⟨
+    extC G c i v.1,
+    extC_mem G c v.1 v.2.2,
+    LinearMap.mem_ker.2 (by rw [cechD_extC G c, LinearMap.mem_ker.mp v.2.1, map_zero])
+  ⟩
   map_add' x y := Subtype.ext (map_add (resC G c i) x.1 y.1)
   map_smul' a x := Subtype.ext (map_smul (resC G c i) a x.1)
   left_inv w := Subtype.ext (extC_resC G c w.1 w.2.1)
   right_inv v := Subtype.ext (resC_extC G c v.1)
 
-theorem zEquiv_map_bdry (i : ℕ) :
-    ((IndefiniteRowSideFullHecke.Kleiman.cechB (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c) i).comap
-        (IndefiniteRowSideFullHecke.Kleiman.cechZ (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c) i).subtype).map
-        (zEquiv G c i : IndefiniteRowSideFullHecke.Kleiman.gradedZ S N M G i c →ₗ[S] _) =
-      (Kleiman.Cech.bdryDeg (Kleiman.locSys S N M) (Kleiman.degLoc (gradedEquiv S N M G) c)
-        Kleiman.locResS i).comap
+theorem zEquiv_map_bdry (i : ℕ)
+    : ((IndefiniteRowSideFullHecke.Kleiman.cechB
+            (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c) i).comap
+          (IndefiniteRowSideFullHecke.Kleiman.cechZ
+            (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c) i).subtype).map
+        (zEquiv G c i : IndefiniteRowSideFullHecke.Kleiman.gradedZ S N M G i c →ₗ[S] _)
+      = (Kleiman.Cech.bdryDeg (Kleiman.locSys S N M) (Kleiman.degLoc (gradedEquiv S N M G) c)
+          Kleiman.locResS i).comap
         (Kleiman.Cech.cocyDeg (Kleiman.locSys S N M) (Kleiman.degLoc (gradedEquiv S N M G) c)
           Kleiman.locResS i).subtype := by
   ext y
   rw [Submodule.mem_map_equiv, Submodule.mem_comap, Submodule.mem_comap]
-  change extC G c i y.1 ∈ IndefiniteRowSideFullHecke.Kleiman.cechB (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c) i ↔
-    y.1 ∈ Kleiman.Cech.bdryDeg (Kleiman.locSys S N M) (Kleiman.degLoc (gradedEquiv S N M G) c)
+  change extC G c i y.1 ∈ IndefiniteRowSideFullHecke.Kleiman.cechB
+      (IndefiniteRowSideFullHecke.Kleiman.gradedSys S N M G c) i
+    ↔ y.1 ∈ Kleiman.Cech.bdryDeg (Kleiman.locSys S N M) (Kleiman.degLoc (gradedEquiv S N M G) c)
       Kleiman.locResS i
   cases i with
   | zero =>
@@ -297,15 +366,15 @@ theorem zEquiv_map_bdry (i : ℕ) :
     · rintro ⟨t, ht, hty⟩
       exact ⟨extC G c i t, extC_mem G c t ht, by rw [cechD_extC G c, hty]⟩
 
-def hEquiv (i : ℕ) :
-    IndefiniteRowSideFullHecke.Kleiman.gradedH S N M G i c ≃ₗ[S] Kleiman.cohom (gradedEquiv S N M G) i c :=
+def hEquiv (i : ℕ)
+    : IndefiniteRowSideFullHecke.Kleiman.gradedH S N M G i c ≃ₗ[S] Kleiman.cohom (gradedEquiv S N M G) i c :=
   Submodule.Quotient.equiv _ _ (zEquiv G c i) (zEquiv_map_bdry G c i)
 
-theorem hEquiv_mk (i : ℕ) (w : IndefiniteRowSideFullHecke.Kleiman.gradedZ S N M G i c) :
-    hEquiv G c i (Submodule.Quotient.mk w) = Submodule.Quotient.mk (zEquiv G c i w) := rfl
+theorem hEquiv_mk (i : ℕ) (w : IndefiniteRowSideFullHecke.Kleiman.gradedZ S N M G i c)
+    : hEquiv G c i (Submodule.Quotient.mk w) = Submodule.Quotient.mk (zEquiv G c i w) :=
+  rfl
 
 end GradedCech
-
 
 open GradedCech in
 theorem GradedCech.proof : GradedCech.Statement := by
@@ -315,8 +384,9 @@ theorem GradedCech.proof : GradedCech.Statement := by
     induction z using Submodule.Quotient.induction_on with
     | H w =>
       rw [hEquiv_mk]
-      change hEquiv G' c i (Submodule.Quotient.mk ((IndefiniteRowSideFullHecke.Kleiman.gradedHom S N hf c).Zmap i w)) =
-        Submodule.Quotient.mk _
+      change hEquiv G' c i
+          (Submodule.Quotient.mk ((IndefiniteRowSideFullHecke.Kleiman.gradedHom S N hf c).Zmap i w))
+        = Submodule.Quotient.mk _
       rw [hEquiv_mk]
       congr 1
   · intro M _ _ _ _ G c m hm z hz
@@ -325,11 +395,12 @@ theorem GradedCech.proof : GradedCech.Statement := by
     congr 1
     apply Subtype.ext
     funext J
-    change locEquiv S N M J.1.1 (z.1 J.1.1) =
-      (LocalizedModule.mk m 1 : LocalizedModule (Kleiman.monos (S := S) J.1.1) M)
+    change locEquiv S N M J.1.1 (z.1 J.1.1)
+      = (LocalizedModule.mk m 1 : LocalizedModule (Kleiman.monos (S := S) J.1.1) M)
     rw [hz, IndefiniteRowSideFullHecke.Kleiman.unitCochain, if_pos (show J.1.1.card = 1 from J.2)]
-    change (LocalizedModule.mk m ⟨IndefiniteRowSideFullHecke.Kleiman.Xprod S N J.1.1 ^ 0, _⟩ :
-      LocalizedModule (Kleiman.monos (S := S) J.1.1) M) = LocalizedModule.mk m 1
+    change (LocalizedModule.mk m ⟨IndefiniteRowSideFullHecke.Kleiman.Xprod S N J.1.1 ^ 0, _⟩
+        : LocalizedModule (Kleiman.monos (S := S) J.1.1) M)
+      = LocalizedModule.mk m 1
     congr 1
 
 end

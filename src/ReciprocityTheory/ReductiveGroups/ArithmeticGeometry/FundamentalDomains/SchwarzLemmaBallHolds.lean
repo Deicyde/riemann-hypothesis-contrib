@@ -32,7 +32,9 @@ theorem schwarzLemmaBall_holds : SchwarzLemmaBall := by
   have hmaps : MapsTo γ (ball 0 ρ) (closedBall (γ 0) ((Real.exp (9 / 4) + 1) * S)) := by
     intro z hz
     rw [mem_closedBall, dist_eq_norm]
-    calc ‖γ z - γ 0‖ ≤ ‖γ z‖ + ‖γ 0‖ := norm_sub_le _ _
+    calc
+      ‖γ z - γ 0‖
+        ≤ ‖γ z‖ + ‖γ 0‖ := norm_sub_le _ _
       _ ≤ Real.exp (9 / 4) * S + S := add_le_add (hb z (ball_subset_closedBall hz)) h2
       _ = (Real.exp (9 / 4) + 1) * S := by ring
   have hZρ : Z ∈ ball (0 : V) ρ := ball_subset_ball (by linarith) hZ
@@ -43,8 +45,9 @@ theorem schwarzLemmaBall_holds : SchwarzLemmaBall := by
   rw [h0, dist_comm, dist_zero_right] at key
   have hexp := exp_nine_quarters_lt
   have : (Real.exp (9 / 4) + 1) * S / ρ * ‖Z‖ < S / 2 := by
-    calc (Real.exp (9 / 4) + 1) * S / ρ * ‖Z‖ ≤ (Real.exp (9 / 4) + 1) * S / ρ * (ρ / 21) := by
-          gcongr
+    calc
+      (Real.exp (9 / 4) + 1) * S / ρ * ‖Z‖
+        ≤ (Real.exp (9 / 4) + 1) * S / ρ * (ρ / 21) := by gcongr
       _ = (Real.exp (9 / 4) + 1) * S / 21 := by field_simp
       _ < S / 2 := by nlinarith
   linarith

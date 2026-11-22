@@ -28,10 +28,12 @@ lemma sum_Icc_inv_add_eq_cotTerm (w : ℂ) (N : ℕ) :
     · simp only [Finset.mem_Icc]; omega
     · simp only [Finset.mem_Icc, Finset.mem_insert]; omega
 
-theorem tendsto_sum_Icc_inv_residue_cot :
-    ∀ (L : ℕ) (z : ℂ) (r : ℕ), 0 < L → 0 < z.im →
-      Tendsto (fun N : ℕ => ∑ n ∈ Finset.Icc (-(N:ℤ)) N, (z + r + n * L)⁻¹) atTop
-        (𝓝 (π / L * Complex.cot (π * ((z + r) / L)))) := by
+theorem tendsto_sum_Icc_inv_residue_cot
+    : ∀ (L : ℕ) (z : ℂ) (r : ℕ),
+      0 < L → 0 < z.im
+        → Tendsto
+          (fun N : ℕ => ∑ n ∈ Finset.Icc (-(N:ℤ)) N, (z + r + n * L)⁻¹)
+          atTop (𝓝 (π / L * Complex.cot (π * ((z + r) / L)))) := by
   intro L z r hL hz
   have hL0 : (L : ℂ) ≠ 0 := by exact_mod_cast hL.ne'
   set w : ℂ := (z + r) / L with hw
@@ -43,8 +45,9 @@ theorem tendsto_sum_Icc_inv_residue_cot :
     simp at this
     linarith
   have h1 := ((tendsto_logDeriv_euler_cot_sub hmem).const_add (1 / w)).const_mul (L : ℂ)⁻¹
-  have hlim : (L : ℂ)⁻¹ * (1 / w + (π * Complex.cot (π * w) - 1 / w)) =
-      π / L * Complex.cot (π * w) := by ring
+  have hlim
+      : (L : ℂ)⁻¹ * (1 / w + (π * Complex.cot (π * w) - 1 / w)) = π / L * Complex.cot (π * w) := by
+    ring
   rw [hlim] at h1
   refine h1.congr fun N => ?_
   have := sum_Icc_inv_add_eq_cotTerm w N

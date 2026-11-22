@@ -22,42 +22,49 @@ namespace Reduction
 
 variable {K : Type*} [Field K] [NumberField K] {n : ℕ}
 
-theorem exists_pos_bounds {X : Type*} [TopologicalSpace X] {C : Set X} (hC : IsCompact C)
-    {f : X → ℝ} (hf : Continuous f) (hpos : ∀ x ∈ C, 0 < f x) :
-    ∃ m M : ℝ, 0 < m ∧ m ≤ M ∧ ∀ x ∈ C, m ≤ f x ∧ f x ≤ M := by
+theorem exists_pos_bounds
+    {X : Type*} [TopologicalSpace X]
+    {C : Set X} (hC : IsCompact C)
+    {f : X → ℝ} (hf : Continuous f) (hpos : ∀ x ∈ C, 0 < f x)
+    : ∃ m M : ℝ, 0 < m ∧ m ≤ M ∧ ∀ x ∈ C, m ≤ f x ∧ f x ≤ M := by
   rcases C.eq_empty_or_nonempty with he | hne
   · exact ⟨1, 1, one_pos, le_rfl, fun x hx => by rw [he] at hx; exact hx.elim⟩
   obtain ⟨x₀, hx₀, hmin⟩ := hC.exists_isMinOn hne hf.continuousOn
   obtain ⟨x₁, hx₁, hmax⟩ := hC.exists_isMaxOn hne hf.continuousOn
   exact ⟨f x₀, f x₁, hpos x₀ hx₀, hmin hx₁, fun x hx => ⟨hmin hx, hmax hx⟩⟩
 
-theorem det_mul_mul (b a k : AdelicGLn.AdelicGL K n) :
-    (ideleModule K (AdelicGLn.det K n (b * a * k)) : ℝ) =
-      (ideleModule K (AdelicGLn.det K n b) : ℝ) * (ideleModule K (AdelicGLn.det K n a) : ℝ) *
-        (ideleModule K (AdelicGLn.det K n k) : ℝ) := by
+theorem det_mul_mul (b a k : AdelicGLn.AdelicGL K n)
+    : (ideleModule K (AdelicGLn.det K n (b * a * k)) : ℝ)
+      = (ideleModule K (AdelicGLn.det K n b) : ℝ) * (ideleModule K (AdelicGLn.det K n a) : ℝ)
+        * (ideleModule K (AdelicGLn.det K n k) : ℝ) := by
   rw [map_mul, map_mul, map_mul, map_mul, Positive.val_mul, Positive.val_mul]
 
-theorem ideleModule_det_diagUnits_posIdele (r : Fin n → ℝ) (hr : ∀ i, 0 < r i) :
-    (ideleModule K (AdelicGLn.det K n (diagUnits n fun i => posIdele (K := K) (r i) (hr i))) : ℝ) =
-      (∏ i, r i) ^ Module.finrank ℚ K := by
+theorem ideleModule_det_diagUnits_posIdele (r : Fin n → ℝ) (hr : ∀ i, 0 < r i)
+    : (ideleModule K (AdelicGLn.det K n (diagUnits n fun i => posIdele (K := K) (r i) (hr i))) : ℝ)
+      = (∏ i, r i) ^ Module.finrank ℚ K := by
   rw [det_diagUnits, map_prod, coe_finset_prod_pos]
   simp only [ideleModule_posIdele]
   rw [Finset.prod_pow]
 
-theorem exists_norm_det_infAt_bounds {ω : Set (AdelicGLn.AdelicGL K n)} (hω : IsCompact ω)
-    (t : ℝ) (w : InfinitePlace K) :
-    ∃ c₁ c₂ : ℝ, 0 < c₁ ∧ ∀ g ∈ siegelSet n ω t,
-      1 ≤ (ideleModule K (AdelicGLn.det K n g) : ℝ) →
-        (ideleModule K (AdelicGLn.det K n g) : ℝ) ≤ Real.exp 1 →
-          c₁ ≤ ‖(infAt w g : Matrix (Fin n) (Fin n) w.Completion).det‖ ∧
-            ‖(infAt w g : Matrix (Fin n) (Fin n) w.Completion).det‖ ≤ c₂ := by
-  obtain ⟨B₁, B₂, hB₁, hB₁₂, hB⟩ := exists_pos_bounds hω (f := fun b => (ideleModule K (AdelicGLn.det K n b) : ℝ))
-    (continuous_subtype_val.comp (continuous_ideleModule.comp (AdelicGLn.continuous_det K n)))
-    (fun b _ => (ideleModule K (AdelicGLn.det K n b)).2)
-  obtain ⟨m, M, hm, hmM', hmM⟩ := exists_pos_bounds hω
-    (f := fun b => ‖(infAt w b : Matrix (Fin n) (Fin n) w.Completion).det‖)
-    ((continuous_normDet w).comp (continuous_infAt w))
-    (fun b _ => (normDet w (infAt w b)).2)
+theorem exists_norm_det_infAt_bounds
+    {ω : Set (AdelicGLn.AdelicGL K n)} (hω : IsCompact ω) (t : ℝ) (w : InfinitePlace K)
+    : ∃ c₁ c₂ : ℝ,
+      0 < c₁
+        ∧ ∀ g ∈ siegelSet n ω t,
+          1 ≤ (ideleModule K (AdelicGLn.det K n g) : ℝ)
+            → (ideleModule K (AdelicGLn.det K n g) : ℝ) ≤ Real.exp 1
+            → c₁ ≤ ‖(infAt w g : Matrix (Fin n) (Fin n) w.Completion).det‖
+              ∧ ‖(infAt w g : Matrix (Fin n) (Fin n) w.Completion).det‖ ≤ c₂ := by
+  obtain ⟨B₁, B₂, hB₁, hB₁₂, hB⟩ :=
+    exists_pos_bounds hω
+      (f := fun b => (ideleModule K (AdelicGLn.det K n b) : ℝ))
+      (continuous_subtype_val.comp (continuous_ideleModule.comp (AdelicGLn.continuous_det K n)))
+      (fun b _ => (ideleModule K (AdelicGLn.det K n b)).2)
+  obtain ⟨m, M, hm, hmM', hmM⟩ :=
+    exists_pos_bounds hω
+      (f := fun b => ‖(infAt w b : Matrix (Fin n) (Fin n) w.Completion).det‖)
+      ((continuous_normDet w).comp (continuous_infAt w))
+      (fun b _ => (normDet w (infAt w b)).2)
   set d := Module.finrank ℚ K
   have hd0 : 0 < d := Module.finrank_pos
   set X₁ : ℝ := min 1 B₂⁻¹
@@ -68,19 +75,23 @@ theorem exists_norm_det_infAt_bounds {ω : Set (AdelicGLn.AdelicGL K n)} (hω : 
   rintro _ ⟨b, hbω, _, ⟨r, hr, -, rfl⟩, k, hk, rfl⟩ h1 h2
   have hdet := det_mul_mul b (diagUnits n fun i => posIdele (K := K) (r i) (hr i)) k
   rw [ideleModule_det_diagUnits_posIdele r hr, mem_normOneGL.1 (maxCompact_le_normOneGL hk),
-    mul_one] at hdet
+      mul_one]
+    at hdet
   set X : ℝ := ∏ i, r i with hX
   have hXpos : 0 < X := Finset.prod_pos fun i _ => hr i
   have hb := hB b hbω
   have hXd1 : X ^ d ≤ Real.exp 1 / B₁ := by
     rw [le_div_iff₀ hB₁]
-    calc X ^ d * B₁ ≤ X ^ d * (ideleModule K (AdelicGLn.det K n b) : ℝ) :=
-          mul_le_mul_of_nonneg_left hb.1 (pow_nonneg hXpos.le _)
+    calc
+      X ^ d * B₁ ≤ X ^ d * (ideleModule K (AdelicGLn.det K n b) : ℝ) :=
+        mul_le_mul_of_nonneg_left hb.1 (pow_nonneg hXpos.le _)
       _ = _ := by rw [mul_comm, ← hdet]
       _ ≤ Real.exp 1 := h2
   have hXd2 : B₂⁻¹ ≤ X ^ d := by
     rw [inv_le_iff_one_le_mul₀' hB₂]
-    calc (1 : ℝ) ≤ _ := h1
+    calc
+      (1 : ℝ)
+        ≤ _ := h1
       _ = (ideleModule K (AdelicGLn.det K n b) : ℝ) * X ^ d := hdet
       _ ≤ B₂ * X ^ d := mul_le_mul_of_nonneg_right hb.2 (pow_nonneg hXpos.le _)
   have hXlow : X₁ ≤ X := by
@@ -91,31 +102,43 @@ theorem exists_norm_det_infAt_bounds {ω : Set (AdelicGLn.AdelicGL K n)} (hω : 
     rcases le_or_gt X 1 with h | h
     · exact h.trans (le_max_left _ _)
     · exact (le_self_pow₀ h.le hd0.ne').trans (hXd1.trans (le_max_right _ _))
-  have hloc : ‖(infAt w (b * diagUnits n (fun i => posIdele (K := K) (r i) (hr i)) * k) :
-      Matrix (Fin n) (Fin n) w.Completion).det‖ =
-      ‖(infAt w b : Matrix (Fin n) (Fin n) w.Completion).det‖ * X := by
+  have hloc
+      : ‖(infAt w (b * diagUnits n (fun i => posIdele (K := K) (r i) (hr i)) * k) :
+          Matrix (Fin n) (Fin n) w.Completion).det‖
+        = ‖(infAt w b : Matrix (Fin n) (Fin n) w.Completion).det‖ * X := by
     rw [infAt_mul, infAt_mul, Units.val_mul, Units.val_mul, det_mul, det_mul, norm_mul, norm_mul,
       infAt_diagUnits_posIdele w r hr, norm_det_diagUnits_posRealToUnits w r hr,
       norm_det_infAt_of_mem_maxCompact hk, mul_one]
   rw [hloc]
   have hbw := hmM b hbω
-  exact ⟨mul_le_mul hbw.1 hXlow hX₁.le (hm.le.trans hbw.1),
-    mul_le_mul hbw.2 hXup hXpos.le (hm.le.trans hmM')⟩
+  exact ⟨
+    mul_le_mul hbw.1 hXlow hX₁.le (hm.le.trans hbw.1),
+    mul_le_mul hbw.2 hXup hXpos.le (hm.le.trans hmM')
+  ⟩
 
-theorem posIdele_mul {r ρ : ℝ} (hr : 0 < r) (hρ : 0 < ρ) :
-    posIdele (K := K) r hr * posIdele ρ hρ = posIdele (r * ρ) (mul_pos hr hρ) := by
+theorem posIdele_mul {r ρ : ℝ} (hr : 0 < r) (hρ : 0 < ρ)
+    : posIdele (K := K) r hr * posIdele ρ hρ = posIdele (r * ρ) (mul_pos hr hρ) := by
   have h := map_mul (posIdeleHom K) ⟨r, hr⟩ ⟨ρ, hρ⟩
   rw [posIdeleHom_apply, posIdeleHom_apply, posIdeleHom_apply] at h
   exact h.symm
 
-theorem mul_centralSection_mem_siegelSet {ω : Set (AdelicGLn.AdelicGL K n)} {t : ℝ}
-    {g : AdelicGLn.AdelicGL K n} (hg : g ∈ siegelSet n ω t) (s : {r : ℝ // 0 < r}) :
-    g * centralSection K n s ∈ siegelSet n ω t := by
+theorem mul_centralSection_mem_siegelSet
+    {ω : Set (AdelicGLn.AdelicGL K n)} {t : ℝ} {g : AdelicGLn.AdelicGL K n}
+    (hg : g ∈ siegelSet n ω t)
+    (s : {r : ℝ // 0 < r})
+    : g * centralSection K n s ∈ siegelSet n ω t := by
   obtain ⟨b, hb, _, ⟨r, hr, hratio, rfl⟩, k, hk, rfl⟩ := hg
   set ρ : {r : ℝ // 0 < r} := rpowHom ((n * Module.finrank ℚ K : ℝ))⁻¹ s with hρ
   have hz : centralSection K n s = diagUnits n fun _ => posIdele (K := K) ρ.1 ρ.2 := rfl
-  refine ⟨b, hb, diagUnits n (fun i => posIdele (K := K) (r i * ρ.1) (mul_pos (hr i) ρ.2)),
-    ⟨fun i => r i * ρ.1, fun i => mul_pos (hr i) ρ.2, fun i j hij => ?_, rfl⟩, k, hk, ?_⟩
+  refine ⟨
+    b,
+    hb,
+    diagUnits n (fun i => posIdele (K := K) (r i * ρ.1) (mul_pos (hr i) ρ.2)),
+    ⟨fun i => r i * ρ.1, fun i => mul_pos (hr i) ρ.2, fun i j hij => ?_, rfl⟩,
+    k,
+    hk,
+    ?_
+  ⟩
   · rw [← mul_assoc]
     exact mul_le_mul_of_nonneg_right (hratio i j hij) ρ.2.le
   · rw [mul_assoc _ k, ← centralSection_mul_comm s k, ← mul_assoc, mul_assoc b, hz, ← map_mul]
@@ -124,53 +147,69 @@ theorem mul_centralSection_mem_siegelSet {ω : Set (AdelicGLn.AdelicGL K n)} {t 
     rw [Pi.mul_apply]
     exact posIdele_mul (hr i) ρ.2
 
-theorem isCompact_siegelSet_part {ω : Set (AdelicGLn.AdelicGL K n)} (hω : IsCompact ω) (t : ℝ)
-    (N : ℕ) :
-    IsCompact ((fun p : AdelicGLn.AdelicGL K n × (Fin n → {r : ℝ // 0 < r}) × AdelicGLn.AdelicGL K n =>
-      p.1 * diagUnits n (fun i => posIdele (K := K) (p.2.1 i).1 (p.2.1 i).2) * p.2.2) ''
-        (ω ×ˢ ({r | (∀ i j : Fin n, (j : ℕ) = i + 1 → t * (r j).1 ≤ (r i).1)} ∩
-          Set.pi univ fun _ => {r : {r : ℝ // 0 < r} | r.1 ∈ Icc ((N : ℝ) + 1)⁻¹ ((N : ℝ) + 1)}) ×ˢ
-            (maxCompact (K := K) (n := n) : Set (AdelicGLn.AdelicGL K n)))) := by
+theorem isCompact_siegelSet_part
+    {ω : Set (AdelicGLn.AdelicGL K n)} (hω : IsCompact ω) (t : ℝ) (N : ℕ)
+    : IsCompact
+      ((fun p : AdelicGLn.AdelicGL K n × (Fin n → {r : ℝ // 0 < r}) × AdelicGLn.AdelicGL K n =>
+          p.1 * diagUnits n (fun i => posIdele (K := K) (p.2.1 i).1 (p.2.1 i).2) * p.2.2)
+        '' (ω
+          ×ˢ ({r | (∀ i j : Fin n, (j : ℕ) = i + 1 → t * (r j).1 ≤ (r i).1)}
+            ∩ Set.pi univ fun _ => {r : {r : ℝ // 0 < r} | r.1 ∈ Icc ((N : ℝ) + 1)⁻¹ ((N : ℝ) + 1)})
+          ×ˢ (maxCompact (K := K) (n := n) : Set (AdelicGLn.AdelicGL K n)))) := by
   refine IsCompact.image (hω.prod (IsCompact.prod ?_ isCompact_maxCompact)) ?_
   · refine IsCompact.inter_left (isCompact_univ_pi fun _ => ?_) ?_
     · rw [Subtype.isCompact_iff]
-      have : Subtype.val '' {r : {r : ℝ // 0 < r} | r.1 ∈ Icc ((N : ℝ) + 1)⁻¹ ((N : ℝ) + 1)} =
-          Icc ((N : ℝ) + 1)⁻¹ ((N : ℝ) + 1) := by
+      have : Subtype.val '' {r : {r : ℝ // 0 < r} | r.1 ∈ Icc ((N : ℝ) + 1)⁻¹ ((N : ℝ) + 1)}
+          = Icc ((N : ℝ) + 1)⁻¹ ((N : ℝ) + 1) := by
         ext x
-        exact ⟨fun ⟨y, hy, hyx⟩ => hyx ▸ hy,
-          fun hx => ⟨⟨x, lt_of_lt_of_le (by positivity) hx.1⟩, hx, rfl⟩⟩
+        exact ⟨
+          fun ⟨y, hy, hyx⟩ => hyx ▸ hy,
+          fun hx => ⟨⟨x, lt_of_lt_of_le (by positivity) hx.1⟩, hx, rfl⟩
+        ⟩
       rw [this]
       exact isCompact_Icc
     · simp only [Set.ofPred_forall]
-      exact isClosed_iInter fun i => isClosed_iInter fun j => isClosed_iInter fun _ =>
-        isClosed_le (continuous_const.mul (continuous_subtype_val.comp (continuous_apply j)))
-          (continuous_subtype_val.comp (continuous_apply i))
-  · exact (continuous_fst.mul ((continuous_diagUnits n).comp (continuous_pi fun i =>
-      continuous_posIdele_subtype.comp ((continuous_apply i).comp (continuous_fst.comp continuous_snd))))).mul
-      (continuous_snd.comp continuous_snd)
+      exact isClosed_iInter fun i =>
+        isClosed_iInter fun j =>
+          isClosed_iInter fun _ =>
+            isClosed_le (continuous_const.mul (continuous_subtype_val.comp (continuous_apply j)))
+              (continuous_subtype_val.comp (continuous_apply i))
+  · exact (continuous_fst.mul ((continuous_diagUnits n).comp
+      (continuous_pi fun i =>
+        continuous_posIdele_subtype.comp ((continuous_apply i).comp
+          (continuous_fst.comp continuous_snd))))).mul (continuous_snd.comp continuous_snd)
 
-theorem measurableSet_siegelSet {ω : Set (AdelicGLn.AdelicGL K n)} (hω : IsCompact ω) (t : ℝ) :
-    MeasurableSet (siegelSet n ω t) := by
-  have h : siegelSet n ω t = ⋃ N : ℕ,
-      (fun p : AdelicGLn.AdelicGL K n × (Fin n → {r : ℝ // 0 < r}) × AdelicGLn.AdelicGL K n =>
-        p.1 * diagUnits n (fun i => posIdele (K := K) (p.2.1 i).1 (p.2.1 i).2) * p.2.2) ''
-        (ω ×ˢ ({r | (∀ i j : Fin n, (j : ℕ) = i + 1 → t * (r j).1 ≤ (r i).1)} ∩
-          Set.pi univ fun _ => {r : {r : ℝ // 0 < r} | r.1 ∈ Icc ((N : ℝ) + 1)⁻¹ ((N : ℝ) + 1)}) ×ˢ
-            (maxCompact (K := K) (n := n) : Set (AdelicGLn.AdelicGL K n))) := by
+theorem measurableSet_siegelSet {ω : Set (AdelicGLn.AdelicGL K n)} (hω : IsCompact ω) (t : ℝ)
+    : MeasurableSet (siegelSet n ω t) := by
+  have h
+      : siegelSet n ω t
+        = ⋃ N : ℕ,
+          (fun p : AdelicGLn.AdelicGL K n × (Fin n → {r : ℝ // 0 < r}) × AdelicGLn.AdelicGL K n =>
+            p.1 * diagUnits n (fun i => posIdele (K := K) (p.2.1 i).1 (p.2.1 i).2) * p.2.2) ''
+            (ω ×ˢ ({r | (∀ i j : Fin n, (j : ℕ) = i + 1 → t * (r j).1 ≤ (r i).1)} ∩
+              Set.pi univ fun _ => {r : {r : ℝ // 0 < r} | r.1 ∈ Icc ((N : ℝ) + 1)⁻¹ ((N : ℝ) + 1)}) ×ˢ
+                (maxCompact (K := K) (n := n) : Set (AdelicGLn.AdelicGL K n))) := by
     ext g
     constructor
     · rintro ⟨b, hb, _, ⟨r, hr, hratio, rfl⟩, k, hk, rfl⟩
 
       obtain ⟨N, hN⟩ := exists_nat_ge (∑ i, (r i + (r i)⁻¹))
-      refine mem_iUnion.2 ⟨N, (b, fun i => ⟨r i, hr i⟩, k), ⟨hb, ⟨hratio, fun i _ => ⟨?_, ?_⟩⟩, hk⟩, rfl⟩
-      · have h1 : (r i)⁻¹ ≤ N := le_trans (le_add_of_nonneg_left (hr i).le)
-          ((Finset.single_le_sum (f := fun i => r i + (r i)⁻¹)
-            (fun j _ => add_nonneg (hr j).le (inv_pos.2 (hr j)).le) (Finset.mem_univ i)).trans hN)
+      refine mem_iUnion.2
+        ⟨N, (b, fun i => ⟨r i, hr i⟩, k), ⟨hb, ⟨hratio, fun i _ => ⟨?_, ?_⟩⟩, hk⟩, rfl⟩
+      · have h1 : (r i)⁻¹ ≤ N :=
+          le_trans (le_add_of_nonneg_left (hr i).le)
+            ((Finset.single_le_sum
+              (f := fun i => r i + (r i)⁻¹)
+              (fun j _ => add_nonneg (hr j).le (inv_pos.2 (hr j)).le)
+              (Finset.mem_univ i)).trans hN)
         rw [inv_le_comm₀ (by positivity) (hr i)]
         linarith
-      · have h1 : r i ≤ N := le_trans (le_add_of_nonneg_right (inv_pos.2 (hr i)).le)
-          ((Finset.single_le_sum (f := fun i => r i + (r i)⁻¹)
-            (fun j _ => add_nonneg (hr j).le (inv_pos.2 (hr j)).le) (Finset.mem_univ i)).trans hN)
+      · have h1 : r i ≤ N :=
+          le_trans (le_add_of_nonneg_right (inv_pos.2 (hr i)).le)
+            ((Finset.single_le_sum
+              (f := fun i => r i + (r i)⁻¹)
+              (fun j _ => add_nonneg (hr j).le (inv_pos.2 (hr j)).le)
+              (Finset.mem_univ i)).trans hN)
         show r i ≤ (N : ℝ) + 1
         linarith
     · intro hg
@@ -179,17 +218,19 @@ theorem measurableSet_siegelSet {ω : Set (AdelicGLn.AdelicGL K n)} (hω : IsCom
   rw [h]
   exact MeasurableSet.iUnion fun N => (isCompact_siegelSet_part hω t N).isClosed.measurableSet
 
-instance secondCountableTopology_normOneGL : SecondCountableTopology (normOneGL (K := K) (n := n)) :=
+instance secondCountableTopology_normOneGL
+    : SecondCountableTopology (normOneGL (K := K) (n := n)) :=
   TopologicalSpace.Subtype.secondCountableTopology _
 
-theorem infAt_isUpperTriangular {w : InfinitePlace K} {b : AdelicGLn.AdelicGL K n}
-    (hb : b ∈ adelicBorel) : (infAt w b : Matrix (Fin n) (Fin n) w.Completion).IsUpperTriangular :=
-  fun i j hij => by
-    rw [infAt_apply, show (b : Matrix (Fin n) (Fin n) 𝔸[K]) i j = 0 from hb hij]
-    rfl
+theorem infAt_isUpperTriangular
+    {w : InfinitePlace K} {b : AdelicGLn.AdelicGL K n} (hb : b ∈ adelicBorel)
+    : (infAt w b : Matrix (Fin n) (Fin n) w.Completion).IsUpperTriangular := fun i j hij => by
+  rw [infAt_apply, show (b : Matrix (Fin n) (Fin n) 𝔸[K]) i j = 0 from hb hij]
+  rfl
 
-theorem isFiniteMeasure_quotientMeasure (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure] :
-    IsFiniteMeasure (RightCosetSpace.quotientMeasure (rationalGLOne (K := K) (n := n)) μ) := by
+theorem isFiniteMeasure_quotientMeasure
+    (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure]
+    : IsFiniteMeasure (RightCosetSpace.quotientMeasure (rationalGLOne (K := K) (n := n)) μ) := by
   classical
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · have : Subsingleton (normOneGL (K := K) (n := 0)) :=
@@ -208,11 +249,11 @@ theorem isFiniteMeasure_quotientMeasure (μ : Measure (normOneGL (K := K) (n := 
     refine eq_univ_of_forall fun q => ?_
     obtain ⟨x, rfl⟩ := RightCosetSpace.mk_surjective _ q
     obtain ⟨γ, hγ⟩ := hsieg x
-    have hγ1 : AdelicGLn.diagonal K n γ ∈ normOneGL (K := K) (n := n) := rationalGL_le_normOneGL ⟨γ, rfl⟩
-    exact ⟨⟨_, mul_mem hγ1 x.2⟩, hγ,
-      (RightCosetSpace.mk_eq_mk_iff).2 ⟨⟨⟨_, hγ1⟩, ⟨γ, rfl⟩⟩, rfl⟩⟩
-  obtain ⟨c, hc, hμ⟩ := exists_measure_eq_mul_measure_image hn μ
-    (Measure.haar : Measure (AdelicGLn.AdelicGL K n))
+    have hγ1 : AdelicGLn.diagonal K n γ ∈ normOneGL (K := K) (n := n) :=
+      rationalGL_le_normOneGL ⟨γ, rfl⟩
+    exact ⟨⟨_, mul_mem hγ1 x.2⟩, hγ, (RightCosetSpace.mk_eq_mk_iff).2 ⟨⟨⟨_, hγ1⟩, ⟨γ, rfl⟩⟩, rfl⟩⟩
+  obtain ⟨c, hc, hμ⟩ :=
+    exists_measure_eq_mul_measure_image hn μ (Measure.haar : Measure (AdelicGLn.AdelicGL K n))
   choose c₁ c₂ hc₁ hbd using fun w => exists_norm_det_infAt_bounds (K := K) hω t w
   set S : ∀ w : InfinitePlace K, Set (GL (Fin n) w.Completion) :=
     fun w => localSiegel w (infAt w '' ω) t (c₁ w) (c₂ w) with hSdef
@@ -238,12 +279,17 @@ theorem isFiniteMeasure_quotientMeasure (μ : Measure (normOneGL (K := K) (n := 
     · obtain ⟨⟨b, hbω, _, ⟨r, hr, -, rfl⟩, k, hk, rfl⟩, -, -⟩ := hg
       refine ⟨p2 b, ⟨b, hbω, rfl⟩, p2 k, ⟨k, hk, rfl⟩, ?_⟩
       simp only [hp2, map_mul, Prod.snd_mul, prodEquiv_diagUnits_posIdele_snd r hr, mul_one]
-  have himage : (fun p : normOneGL (K := K) (n := n) × {r : ℝ // 0 < r} =>
-      (p.1 : AdelicGLn.AdelicGL K n) * centralSection K n p.2) '' (D ×ˢ posRealUnitInterval) ⊆ E := by
+  have himage
+      : (fun p : normOneGL (K := K) (n := n) × {r : ℝ // 0 < r} =>
+            (p.1 : AdelicGLn.AdelicGL K n) * centralSection K n p.2)
+          '' (D ×ˢ posRealUnitInterval)
+        ⊆ E := by
     rintro _ ⟨⟨x, s⟩, ⟨hx, hs⟩, rfl⟩
     refine ⟨mul_centralSection_mem_siegelSet hx s, ?_⟩
-    have hdet : (ideleModule K (AdelicGLn.det K n ((x : AdelicGLn.AdelicGL K n) *
-        centralSection K n s)) : ℝ) = s := by
+    have hdet
+        : (ideleModule K (AdelicGLn.det K n ((x : AdelicGLn.AdelicGL K n) * centralSection K n s))
+            : ℝ)
+          = s := by
       have h1 := detModule_centralSection (K := K) hn s
       have h2 := (mem_normOneGL_iff_detModule (K := K) (n := n)).1 x.2
       change (detModule K n ((x : AdelicGLn.AdelicGL K n) * centralSection K n s) : ℝ) = s
@@ -252,12 +298,13 @@ theorem isFiniteMeasure_quotientMeasure (μ : Measure (normOneGL (K := K) (n := 
     exact hs
   refine ⟨?_⟩
   rw [← hcover]
-  calc RightCosetSpace.quotientMeasure (rationalGLOne (K := K) (n := n)) μ
-        (RightCosetSpace.mk (rationalGLOne (K := K) (n := n)) '' D)
-      ≤ μ D := RightCosetSpace.quotientMeasure_mk_image_le μ (by rw [hcover]; exact MeasurableSet.univ)
+  calc
+    RightCosetSpace.quotientMeasure (rationalGLOne (K := K) (n := n)) μ
+          (RightCosetSpace.mk (rationalGLOne (K := K) (n := n)) '' D)
+        ≤ μ D :=
+      RightCosetSpace.quotientMeasure_mk_image_le μ (by rw [hcover]; exact MeasurableSet.univ)
     _ = c * (Measure.haar : Measure (AdelicGLn.AdelicGL K n)) _ := hμ D hDm
-    _ ≤ c * (Measure.haar : Measure (AdelicGLn.AdelicGL K n)) E := by
-        gcongr
+    _ ≤ c * (Measure.haar : Measure (AdelicGLn.AdelicGL K n)) E := by gcongr
     _ < ⊤ := ENNReal.mul_lt_top (lt_top_iff_ne_top.2 hc) hE
 
 end Reduction

@@ -6,9 +6,16 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.RootExcha
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory ValuativeRel Matrix Formalism.L2.Col GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.VolBridge
+open NumberField IsDedekindDomain MeasureTheory ValuativeRel Matrix Formalism.L2.Col
+  GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.VolBridge
 
-theorem GlobalTheory.denseGL_completion : ∀ {E k : Type} [Field E] [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (ι : E →+* k), DenseRange ι → ∀ {A : Type} [Fintype A] [DecidableEq A] {M : ℕ} (e : A ≃ Fin M) (y : GL A k) (V : Set (GL A k)), IsOpen V → y ∈ V → ∃ x : Sp E M ≃ₗ[E] Sp E M, locHom ι e x ∈ V := by
+theorem GlobalTheory.denseGL_completion
+    : ∀ {E k : Type} [Field E] [Field k] [ValuativeRel k] [TopologicalSpace k]
+        [IsNonarchimedeanLocalField k] (ι : E →+* k),
+      DenseRange ι
+        → ∀ {A : Type} [Fintype A] [DecidableEq A] {M : ℕ} (e : A ≃ Fin M) (y : GL A k)
+            (V : Set (GL A k)),
+          IsOpen V → y ∈ V → ∃ x : Sp E M ≃ₗ[E] Sp E M, locHom ι e x ∈ V := by
   intro E k _ _ _ _ _ ι hι A _ _ M e y V hV hy
   haveI : T2Space k := by
     rw [t2Space_iff_disjoint_nhds]
@@ -54,15 +61,16 @@ theorem GlobalTheory.denseGL_completion : ∀ {E k : Type} [Field E] [Field k] [
     show (m'.map ι).det = 0
     rw [← RingHom.mapMatrix_apply, ← RingHom.map_det, h0, map_zero]
   let n : Matrix (Fin M) (Fin M) E := m'.submatrix e.symm e.symm
-  have hn : IsUnit n.det := by
-    simpa [n, Matrix.det_submatrix_equiv_self] using hm'u
+  have hn : IsUnit n.det := by simpa [n, Matrix.det_submatrix_equiv_self] using hm'u
   refine ⟨Matrix.toLinearEquiv' n (Matrix.invertibleOfIsUnitDet n hn), ?_⟩
   show Units.embedProduct _ _ ∈ W
   rw [← hφ, locHom_val, GlobalTheory.SymBridge.toLoc_eq_map_toMatrix']
-  have h2 : LinearMap.toMatrix' (Matrix.toLinearEquiv' n (Matrix.invertibleOfIsUnitDet n hn)).toLinearMap = n := by
+  have h2
+      : LinearMap.toMatrix' (Matrix.toLinearEquiv' n
+          (Matrix.invertibleOfIsUnitDet n hn)).toLinearMap
+        = n := by
     exact LinearMap.toMatrix'_toLin' n
   rw [h2]
-  have h3 : n.submatrix e e = m' := by
-    ext i j; simp [n]
+  have h3 : n.submatrix e e = m' := by ext i j; simp [n]
   rw [h3]
   exact hm'W

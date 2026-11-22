@@ -17,7 +17,9 @@ noncomputable section
 
 namespace GlobalTheory.SmallJumpExample
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Formalism.FrobeniusOrbits GlobalTheory.HTW GlobalTheory.IndefiniteRowSideFullHecke
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations Formalism.FrobeniusOrbits GlobalTheory.HTW
+  GlobalTheory.IndefiniteRowSideFullHecke
 open scoped Formalism.Per
 
 theorem isField_bdR (D : D7) (l : ℕ) [Fact l.Prime] : IsField (D.loc l).R.BdR :=

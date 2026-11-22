@@ -5,7 +5,9 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FactTypeP
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S IsDedekindDomain NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S IsDedekindDomain NumberField
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
 open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Cx Formalism.IndefR.Links
 open Formalism.IndefR.Datum (InfFam)
@@ -15,7 +17,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.TypePrimeSize
 
-theorem k_pow_le_g {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (i : Fin 2) : D.R.k ^ 8 ≤ D.host.g i := by
+theorem k_pow_le_g {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (i : Fin 2)
+    : D.R.k ^ 8 ≤ D.host.g i := by
   obtain ⟨Y, h1, -, -, h4⟩ := P.g_Y
   have hL : 0 ≤ L.sc.L := by
     unfold Scale.L; exact Real.rpow_nonneg (by linarith [L.sc.one_lt_alt]) _
@@ -26,9 +29,12 @@ theorem k_pow_le_g {D : D7} {L : SizeData₂ D} (P : ParameterChoice' D L) (i : 
   have : (D.R.k : ℝ) ^ 8 ≤ D.host.g i := h3.trans (h1.trans (h4 i).1)
   exact_mod_cast this
 
-theorem typePrime_large_and_ok : ∀ (D : D7) (L : SizeData₂ D), ParameterChoice' D L → ∀ k : Fin 2,
-    Module.finrank ℚ D.host.E * D.R.r + 1 < D.host.g k ∧
-      GlobalTheory.BadShare.PrimeOK (D.host.g k) D.host.q D.host.d := by
+theorem typePrime_large_and_ok
+    : ∀ (D : D7) (L : SizeData₂ D),
+      ParameterChoice' D L
+        → ∀ k : Fin 2,
+          Module.finrank ℚ D.host.E * D.R.r + 1 < D.host.g k
+            ∧ GlobalTheory.BadShare.PrimeOK (D.host.g k) D.host.q D.host.d := by
   intro D L P i
   have hg := k_pow_le_g P i
   have hE : Module.finrank ℚ D.host.E = 4 * D.R.ord := D.host.finrank_cmField
@@ -50,10 +56,14 @@ theorem typePrime_large_and_ok : ∀ (D : D7) (L : SizeData₂ D), ParameterChoi
   have hk6 : 8 ^ 6 ≤ D.R.k ^ 6 := Nat.pow_le_pow_left hk8 6
   have hk2 : 8 ^ 2 ≤ D.R.k ^ 2 := Nat.pow_le_pow_left hk8 2
   have hpow : 8 ^ 6 * D.R.k ^ 2 ≤ D.R.k ^ 8 := by
-    calc 8 ^ 6 * D.R.k ^ 2 ≤ D.R.k ^ 6 * D.R.k ^ 2 := Nat.mul_le_mul_right _ hk6
+    calc
+      8 ^ 6 * D.R.k ^ 2
+        ≤ D.R.k ^ 6 * D.R.k ^ 2 := Nat.mul_le_mul_right _ hk6
       _ = D.R.k ^ 8 := by ring
   have hprod : Module.finrank ℚ D.host.E * D.R.r ≤ 4 * D.R.k ^ 2 := by
-    calc Module.finrank ℚ D.host.E * D.R.r ≤ (2 * D.R.k) * (2 * D.R.k) := Nat.mul_le_mul hE' hr
+    calc
+      Module.finrank ℚ D.host.E * D.R.r
+        ≤ (2 * D.R.k) * (2 * D.R.k) := Nat.mul_le_mul hE' hr
       _ = 4 * D.R.k ^ 2 := by ring
   obtain ⟨hq, hd, hq8, hd16, -⟩ := D.host.hyp
   have hb := D.host.qd_big.1

@@ -11,28 +11,30 @@ public import Development.DiscreteGroups.GlobalIrreducibility.ExistsUniformizerV
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal ValuativeRel GlobalTheory.SplitWeil
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal ValuativeRel
+  GlobalTheory.SplitWeil
 
 namespace DiscreteGroups.sglob.DzType
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-
 section Ring
 
 variable {Ω : Type} [Field Ω]
 
-def kappaToA {F : Type} [Field F] [NumberField F] [Algebra F Ω] (A : ValuationSubring Ω) : 𝓞 F →+* A :=
+def kappaToA {F : Type} [Field F] [NumberField F] [Algebra F Ω] (A : ValuationSubring Ω)
+    : 𝓞 F →+* A :=
   ((algebraMap F Ω).comp (algebraMap (𝓞 F) F)).codRestrict A fun x =>
     mem_of_isIntegral_int A (NumberField.RingOfIntegers.isIntegral_coe x).algebraMap
 
-def kappaQ {F : Type} [Field F] [NumberField F] [Algebra F Ω] (A : ValuationSubring Ω) :
-    𝓞 F →+* IsLocalRing.ResidueField A :=
+def kappaQ {F : Type} [Field F] [NumberField F] [Algebra F Ω] (A : ValuationSubring Ω)
+    : 𝓞 F →+* IsLocalRing.ResidueField A :=
   (IsLocalRing.residue A).comp (kappaToA A)
 
-theorem kappa_ker_A {F : Type} [Field F] [NumberField F] [Algebra F Ω] (A : ValuationSubring Ω)
-    (v : HeightOneSpectrum (𝓞 F)) (hv : IsPlaceOver A v) :
-    RingHom.ker (kappaQ A : 𝓞 F →+* IsLocalRing.ResidueField A) = v.asIdeal := by
+theorem kappa_ker_A
+    {F : Type} [Field F] [NumberField F] [Algebra F Ω]
+    (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 F)) (hv : IsPlaceOver A v)
+    : RingHom.ker (kappaQ A : 𝓞 F →+* IsLocalRing.ResidueField A) = v.asIdeal := by
   ext y
   rw [RingHom.mem_ker, kappaQ, RingHom.comp_apply, IsLocalRing.residue_eq_zero_iff,
     ValuationSubring.valuation_lt_one_iff, ← hv y]
@@ -44,31 +46,35 @@ section Compl
 
 variable {L : Type} [Field L] [NumberField L] (v : HeightOneSpectrum (𝓞 L))
 
-theorem kappa_val_le_iff (y : v.adicCompletion L) :
-    valuation (v.adicCompletion L) y ≤ 1 ↔ Valued.v y ≤ 1 :=
+theorem kappa_val_le_iff (y : v.adicCompletion L)
+    : valuation (v.adicCompletion L) y ≤ 1 ↔ Valued.v y ≤ 1 :=
   (DiscreteGroups.sglob.DzIso.val_le_iff y).trans Valued.toNormedField.norm_le_one_iff
 
-theorem kappa_val_lt_iff (y : v.adicCompletion L) :
-    valuation (v.adicCompletion L) y < 1 ↔ Valued.v y < 1 :=
+theorem kappa_val_lt_iff (y : v.adicCompletion L)
+    : valuation (v.adicCompletion L) y < 1 ↔ Valued.v y < 1 :=
   (DiscreteGroups.sglob.DzIso.val_lt_iff y).trans Valued.toNormedField.norm_lt_one_iff
 
-theorem kappa_v_int (y : 𝓞 L) :
-    Valued.v (algebraMap L (v.adicCompletion L) (y : L)) = v.valuation L (y : L) :=
+theorem kappa_v_int (y : 𝓞 L)
+    : Valued.v (algebraMap L (v.adicCompletion L) (y : L)) = v.valuation L (y : L) :=
   HeightOneSpectrum.valuedAdicCompletion_eq_valuation' (R := 𝓞 L) v (y : L)
 
 def kappaToO : 𝓞 L →+* 𝒪[v.adicCompletion L] :=
-  ((algebraMap L (v.adicCompletion L)).comp (algebraMap (𝓞 L) L)).codRestrict 𝒪[v.adicCompletion L] fun y =>
-    (Valuation.mem_integer_iff _ _).2 ((kappa_val_le_iff v _).2
-      ((kappa_v_int v y).trans_le (v.valuation_le_one y)))
+  ((algebraMap L (v.adicCompletion L)).comp (algebraMap (𝓞 L) L)).codRestrict 𝒪[v.adicCompletion L]
+    fun y =>
+      (Valuation.mem_integer_iff _ _).2
+        ((kappa_val_le_iff v _).2 ((kappa_v_int v y).trans_le (v.valuation_le_one y)))
 
-def kappaP : 𝓞 L →+* 𝓀[v.adicCompletion L] := (IsLocalRing.residue 𝒪[v.adicCompletion L]).comp (kappaToO v)
+def kappaP : 𝓞 L →+* 𝓀[v.adicCompletion L] :=
+  (IsLocalRing.residue 𝒪[v.adicCompletion L]).comp (kappaToO v)
 
 theorem kappa_ker_O : RingHom.ker (kappaP v) = v.asIdeal := by
   ext y
-  rw [RingHom.mem_ker, kappaP, RingHom.comp_apply, ← map_zero (IsLocalRing.residue 𝒪[v.adicCompletion L]),
-    residue_eq_iff_valuation_lt]
-  have e1 : ((kappaToO v y : 𝒪[v.adicCompletion L]) : v.adicCompletion L) -
-      ((0 : 𝒪[v.adicCompletion L]) : v.adicCompletion L) = algebraMap L (v.adicCompletion L) (y : L) := by
+  rw [RingHom.mem_ker, kappaP, RingHom.comp_apply,
+    ← map_zero (IsLocalRing.residue 𝒪[v.adicCompletion L]), residue_eq_iff_valuation_lt]
+  have e1
+      : ((kappaToO v y : 𝒪[v.adicCompletion L]) : v.adicCompletion L)
+          - ((0 : 𝒪[v.adicCompletion L]) : v.adicCompletion L)
+        = algebraMap L (v.adicCompletion L) (y : L) := by
     rw [ZeroMemClass.coe_zero, sub_zero]
     rfl
   rw [e1, kappa_val_lt_iff v, kappa_v_int v y]

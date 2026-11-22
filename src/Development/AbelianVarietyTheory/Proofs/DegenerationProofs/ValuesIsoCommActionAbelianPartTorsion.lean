@@ -8,38 +8,43 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.Relations
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
 open scoped CategoryTheory.Obj BigOperators
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory GlobalTheory.Ex GlobalTheory.Ex.Trait
 noncomputable section
 namespace GlobalTheory.Ex.ActPt
 
 section
-variable {R : Type} [CommRing R] [IsDomain R] {D : DegPre R} {F : Type} [Field F] [Algebra (FractionRing R) F]
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {D : DegPre R} {F : Type} [Field F] [Algebra (FractionRing R) F]
 
-theorem equiv_parts {k : ℕ} {p p' : QkPt D F k} (h : QkPt.Equiv D F p p') :
-    ∃ z : D.X, p'.y = p.y + k • z ∧ p'.g.b = p.g.b * DegPre.cF D F z := by
+theorem equiv_parts {k : ℕ} {p p' : QkPt D F k} (h : QkPt.Equiv D F p p')
+    : ∃ z : D.X, p'.y = p.y + k • z ∧ p'.g.b = p.g.b * DegPre.cF D F z := by
   obtain ⟨z, h₁, g, h₂, h₃⟩ := h
   exact ⟨z, h₁, by rw [h₃.1, h₂.1]; rfl⟩
 
 variable {O : Type} [CommRing O] [StarRing O] [Module O D.X] (oa : D.OAct O)
 
-theorem mul_cF_act (x : O) (b : TF (R := R) F ⟶ D.P.A) (z : D.X) :
-    (b * DegPre.cF D F z) ≫ oa.onB.act x = (b ≫ oa.onB.act x) * DegPre.cF D F (x • z) := by
+theorem mul_cF_act (x : O) (b : TF (R := R) F ⟶ D.P.A) (z : D.X)
+    : (b * DegPre.cF D F z) ≫ oa.onB.act x = (b ≫ oa.onB.act x) * DegPre.cF D F (x • z) := by
   have := oa.onB.hom x
   rw [MonObj.mul_comp, DegPre.cF, DegPre.cF, oa.c_lin, Category.assoc]
 
-theorem act_parts {k : ℕ} {x : O} {p p' : QkPt D F k} (h : QkAct oa x p p') :
-    ∃ z : D.X, p'.y = x • p.y + k • z ∧ p'.g.b = (p.g.b ≫ oa.onB.act x) * DegPre.cF D F z := by
+theorem act_parts {k : ℕ} {x : O} {p p' : QkPt D F k} (h : QkAct oa x p p')
+    : ∃ z : D.X, p'.y = x • p.y + k • z ∧ p'.g.b = (p.g.b ≫ oa.onB.act x) * DegPre.cF D F z := by
   obtain ⟨q, h₁, h₂, h₃⟩ := h
   obtain ⟨z, e₁, e₂⟩ := equiv_parts h₃
   exact ⟨z, by rw [e₁, h₁], by rw [e₂, h₂.1]⟩
 end
 
-theorem exists_image {C : Type} [CommRing C] {N N' : NumD C} (J : NumD.Iso N N') {k : ℕ} (p : N.QT k) :
-    ∃ q : N'.QT k, q.1.1.toAdd = J.e p.1.1.toAdd ∧ J.Rel p.1.2 q.1.2 := by
+theorem exists_image
+    {C : Type} [CommRing C] {N N' : NumD C} (J : NumD.Iso N N') {k : ℕ} (p : N.QT k)
+    : ∃ q : N'.QT k, q.1.1.toAdd = J.e p.1.1.toAdd ∧ J.Rel p.1.2 q.1.2 := by
   obtain ⟨h₁, h₂, h₃, -⟩ := NumD.hom_transport C C (RingHom.id C) N N' (TateInh.homOfIso J)
   obtain ⟨g, hg, -⟩ := h₁ p.1.2
   have hp : ∀ n : ℕ, (TateInh.homOfIso J).Rel (p.1.2 ^ n) (g ^ n) := fun n => by
@@ -50,20 +55,35 @@ theorem exists_image {C : Type} [CommRing C] {N N' : NumD C} (J : NumD.Iso N N')
   rw [N.mem_QT.1 p.2] at e
   exact ⟨⟨(Multiplicative.ofAdd (J.e p.1.1.toAdd), g), (h₁ _).unique e (h₃ _)⟩, rfl, hg⟩
 
-theorem main : GlobalTheory.UT.LL → BrGtSt → AllS fun {E} _ _ _ {H} {_} {_} {_} {_} _ {_} {_} _ _ {_} a {_} _ _ A u r {_} M _ {_} ν' J => M.P.TorsionIso → ∀ k : ℕ, 0 < k → Labels A u r M ν' J k → (∀ (x : 𝓞 E) y, ν'.eX (J.e (A.arc.act x y)) = x • ν'.eX (J.e y)) → ∀ (x : 𝓞 E) (y y' : A.N.A), y ^ k = 1 → (letI := H.starRing; A.ν.eA y' = A.ν.eA y ≫ a.oa.onB.act x → ν'.eA (J.φ y') = ν'.eA (J.φ y) ≫ M.P.oD.onB.act x) := by
-  intro hL hB E _ _ _ H D l c O _ β O' _ _ _ b a C _ _ _ _ _ _ A u r o M f N' ν' J hr _ hT k hk hlab hlin x y y' hy hy'
+theorem main
+    : GlobalTheory.UT.LL → BrGtSt
+      → AllS fun {E} _ _ _ {H} {_} {_} {_} {_} _ {_} {_} _ _ {_} a {_} _ _ A u r {_} M _ {_} ν' J =>
+        M.P.TorsionIso
+          → ∀ k : ℕ,
+            0 < k → Labels A u r M ν' J k
+              → (∀ (x : 𝓞 E) y, ν'.eX (J.e (A.arc.act x y)) = x • ν'.eX (J.e y))
+              → ∀ (x : 𝓞 E) (y y' : A.N.A),
+                y ^ k = 1
+                  → (letI := H.starRing
+                     A.ν.eA y' = A.ν.eA y ≫ a.oa.onB.act x
+                       → ν'.eA (J.φ y') = ν'.eA (J.φ y) ≫ M.P.oD.onB.act x) := by
+  intro hL hB E _ _ _ H D l c O _ β O' _ _ _ b a C _ _ _ _ _ _ A u r o M f N' ν' J hr _ hT k hk hlab
+    hlin x y y' hy hy'
   letI := H.starRing
   obtain ⟨-, -, -, -, B⟩ := hB O' a.D₀ a.even a.bimult C A.N A.ν
   obtain ⟨-, -, -, -, B'⟩ := hB M.W M.P.D.toPre M.P.D.psi_even M.P.D.tau_bimult C N' ν'
   obtain ⟨t, t₁, -, t₃, -, t₅, -⟩ := hT C k hk
-  have im : ∀ w : D.La, ∃ p' : QkPt M.P.D.toPre C k, (t p').left = (o.I.ev k w).left ≫ M.φ ∧
-      p'.y = ν'.eX (J.e (A.q k w).1.1.toAdd) ∧ p'.g.b = ν'.eA (J.φ (A.q k w).1.2.b) := fun w => by
+  have im
+      : ∀ w : D.La, ∃ p' : QkPt M.P.D.toPre C k,
+        (t p').left = (o.I.ev k w).left ≫ M.φ ∧ p'.y = ν'.eX (J.e (A.q k w).1.1.toAdd)
+          ∧ p'.g.b = ν'.eA (J.φ (A.q k w).1.2.b) := fun w => by
     obtain ⟨p, hp, -⟩ := existsUnique_twRel A.be u (r k) (hr.pow hk) (A.q k w)
     obtain ⟨q, q₁, q₂⟩ := exists_image J p
     obtain ⟨p', hp'⟩ := (B' k).2.1 q
-    let z : TFK (R := M.W) C ⟶ M.P.A.A := Over.homMk ((o.I.ev k w).left ≫ M.φ) (by
-      rw [Category.assoc, M.cart.1.w, ← Category.assoc, Over.w]
-      exact Category.id_comp _)
+    let z : TFK (R := M.W) C ⟶ M.P.A.A :=
+      Over.homMk ((o.I.ev k w).left ≫ M.φ) (by
+        rw [Category.assoc, M.cart.1.w, ← Category.assoc, Over.w]
+        exact Category.id_comp _)
     have hz := (t₁ _ _).1 (hlab w p q p' z hp q₁ q₂ hp' rfl)
     refine ⟨p', by rw [← hz]; rfl, ?_, ?_⟩
     · rw [← hp'.1, q₁, hp.1]; rfl
@@ -82,8 +102,7 @@ theorem main : GlobalTheory.UT.LL → BrGtSt → AllS fun {E} _ _ _ {H} {_} {_} 
     rw [a₂, o.I.lin, Over.comp_left, Over.comp_left, a₁, Category.assoc, Category.assoc, M.act]
   have h₂ : QkAct M.P.oD x p₁ p₂ :=
     (TorusExt.qkAct_iff_of_equiv M.P.D.tau_bimult hL.1.globalFns M.P.oD
-      (qk_equiv_refl M.P.D.tau_bimult p₁) h₃).2
-      ((t₃ _ _).1 e₃)
+      (qk_equiv_refl M.P.D.tau_bimult p₁) h₃).2 ((t₃ _ _).1 e₃)
   obtain ⟨z₂, d₂, e₂⟩ := act_parts M.P.oD h₂
   obtain ⟨w₀, rfl⟩ := A.ν.eX.surjective z₀
   obtain ⟨w₁, rfl⟩ := A.ν.eX.surjective z₁
@@ -107,11 +126,15 @@ theorem main : GlobalTheory.UT.LL → BrGtSt → AllS fun {E} _ _ _ {H} {_} {_} 
   change ν'.eA (φ y') = ν'.eA (φ y) ≫ _
   have g₁ : s₂ = act s₁ + k • w₁ := A.ν.eX.injective (by rw [d₁, map_add (f := _), map_nsmul, ha])
   have g₂ : z₂ = ν'.eX (e w₁) := by
-    rw [g₁, map_add (f := _), map_add (f := _), map_nsmul, map_nsmul, hl, add_right_inj, ← natCast_zsmul, ← natCast_zsmul] at d₂
+    rw [g₁, map_add (f := _), map_add (f := _), map_nsmul, map_nsmul, hl, add_right_inj,
+        ← natCast_zsmul, ← natCast_zsmul]
+      at d₂
     exact (smul_right_injective _ (Int.natCast_ne_zero.2 hk.ne') d₂).symm
   have g₀ : y = β₁ * A.N.c w₀ := A.ν.eA.injective (by rw [map_mul, A.ν.c_eq, ← e₀, hγ])
-  have g₃ : y' * A.N.c w₁ = β₂ * A.N.c (act w₀) := A.ν.eA.injective (by
-    rw [map_mul, map_mul, hy', g₀, map_mul, A.ν.c_eq, A.ν.c_eq, A.ν.c_eq, mul_cF_act, e₁, ha, mul_right_comm])
+  have g₃ : y' * A.N.c w₁ = β₂ * A.N.c (act w₀) :=
+    A.ν.eA.injective (by
+      rw [map_mul, map_mul, hy', g₀, map_mul, A.ν.c_eq, A.ν.c_eq, A.ν.c_eq, mul_cF_act, e₁, ha,
+        mul_right_comm])
   have g₄ := congrArg (fun s => ν'.eA (φ s)) g₃
   simp only [map_mul, ← hc, ν'.c_eq, hl, e₂, ← g₂] at g₄
   rw [mul_right_comm, mul_left_inj] at g₄

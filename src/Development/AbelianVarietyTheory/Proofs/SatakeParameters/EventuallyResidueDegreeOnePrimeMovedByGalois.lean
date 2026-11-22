@@ -9,8 +9,10 @@ open NumberField IsDedekindDomain HeckeValGen GlobalTheory.HeckeSplit
 
 namespace GlobalTheory.HeckeSplit
 
-theorem exists_int_moved (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] (c : E ≃ₐ[F] E) (hc : c ≠ 1) : ∃ θ : 𝓞 E, c (θ : E) ≠ (θ : E) := by
+theorem exists_int_moved
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (c : E ≃ₐ[F] E) (hc : c ≠ 1)
+    : ∃ θ : 𝓞 E, c (θ : E) ≠ (θ : E) := by
   by_contra h
   push_neg at h
   apply hc
@@ -19,17 +21,20 @@ theorem exists_int_moved (F E : Type) [Field F] [NumberField F] [Field E] [Numbe
   simp only [map_div₀, AlgEquiv.one_apply]
   exact congrArg₂ (· / ·) (h a) (h b)
 
-theorem finite_setOf_mem_asIdeal (E : Type) [Field E] [NumberField E] (δ : 𝓞 E) (h : δ ≠ 0) :
-    {w : HeightOneSpectrum (𝓞 E) | δ ∈ w.asIdeal}.Finite := by
+theorem finite_setOf_mem_asIdeal (E : Type) [Field E] [NumberField E] (δ : 𝓞 E) (h : δ ≠ 0)
+    : {w : HeightOneSpectrum (𝓞 E) | δ ∈ w.asIdeal}.Finite := by
   have := Ideal.finite_factors (R := 𝓞 E) (I := Ideal.span {δ}) (by simpa using h)
   refine this.subset fun w hw => ?_
   simp only [Set.mem_setOf_eq] at hw ⊢
-  rw [Ideal.dvd_iff_le, Ideal.span_singleton_le_iff_mem]; exact hw
+  rw [Ideal.dvd_iff_le, Ideal.span_singleton_le_iff_mem]
+  exact hw
 
-theorem eventually_degOne_moved : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] [Algebra.IsQuadraticExtension F E] (c : E ≃ₐ[F] E), c ≠ 1 →
-    ∀ᶠ w : HeightOneSpectrum (𝓞 E) in Filter.cofinite, DegOne F w →
-      ∃ x : 𝓞 E, x ∈ w.asIdeal ∧ ∀ y : 𝓞 E, (y : E) = c (x : E) → y ∉ w.asIdeal := by
+theorem eventually_degOne_moved
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        [Algebra.IsQuadraticExtension F E] (c : E ≃ₐ[F] E),
+      c ≠ 1
+        → ∀ᶠ w : HeightOneSpectrum (𝓞 E) in Filter.cofinite, DegOne F w →
+            ∃ x : 𝓞 E, x ∈ w.asIdeal ∧ ∀ y : 𝓞 E, (y : E) = c (x : E) → y ∉ w.asIdeal := by
   intro F E _ _ _ _ _ _ c hc
   obtain ⟨θ, hθ⟩ := exists_int_moved F E c hc
   have hint : IsIntegral ℤ (c (θ : E)) := θ.isIntegral_coe.map c.toRingHom.toIntAlgHom

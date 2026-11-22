@@ -4,9 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.DYdc6.main :
-    ∀ {X : ℕ → Type} [∀ (n : ℕ), Finite (X n)] [∀ (n : ℕ), Nonempty (X n)] (f : (n : ℕ) → X (n + (1 : ℕ)) → X n),
-      ∃ (x : (n : ℕ) → X n), ∀ (n : ℕ), f n (x (n + (1 : ℕ))) = x n := by
+theorem UpperTheory.Reformulated.B.DYdc6.main
+    : ∀ {X : ℕ → Type} [∀ (n : ℕ), Finite (X n)] [∀ (n : ℕ), Nonempty (X n)]
+        (f : (n : ℕ) → X (n + (1 : ℕ)) → X n),
+      ∃ (x : (n : ℕ) → X n), ∀ (n : ℕ),
+        f n (x (n + (1 : ℕ))) = x n := by
   intro X _ _ f
   let F : CategoryTheory.Functor ℕᵒᵖ Type :=
     CategoryTheory.Functor.ofOpSequence (X := X) (fun n => TypeCat.ofHom (f n))

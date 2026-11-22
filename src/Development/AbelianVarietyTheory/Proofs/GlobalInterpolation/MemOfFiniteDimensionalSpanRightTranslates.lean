@@ -9,14 +9,14 @@ open MeasureTheory
 
 namespace GlobalTheory.UnitaryBC
 
-theorem exists_finset_detecting_of_finiteDimensional {X : Type} (W : Submodule ℂ (X → ℂ))
-    [FiniteDimensional ℂ W] :
-    ∃ s : Finset X, ∀ v : W, (∀ x ∈ s, (v : X → ℂ) x = 0) → v = 0 := by
+theorem exists_finset_detecting_of_finiteDimensional
+    {X : Type} (W : Submodule ℂ (X → ℂ)) [FiniteDimensional ℂ W]
+    : ∃ s : Finset X, ∀ v : W, (∀ x ∈ s, (v : X → ℂ) x = 0) → v = 0 := by
   apply _root_.GlobalTheory.FinitePointsDetect.finite_points_detect
 
-theorem exists_interpolation_of_finiteDimensional {X : Type} (W : Submodule ℂ (X → ℂ))
-    [FiniteDimensional ℂ W] :
-    ∃ (s : Finset X) (w : s → X → ℂ), ∀ v ∈ W, ∀ y, v y = ∑ x : s, v x * w x y := by
+theorem exists_interpolation_of_finiteDimensional
+    {X : Type} (W : Submodule ℂ (X → ℂ)) [FiniteDimensional ℂ W]
+    : ∃ (s : Finset X) (w : s → X → ℂ), ∀ v ∈ W, ∀ y, v y = ∑ x : s, v x * w x y := by
   classical
   obtain ⟨s, hs⟩ := exists_finset_detecting_of_finiteDimensional W
   let r : W →ₗ[ℂ] (s → ℂ) := LinearMap.pi fun x : s => (LinearMap.proj (x : X)) ∘ₗ W.subtype
@@ -29,22 +29,24 @@ theorem exists_interpolation_of_finiteDimensional {X : Type} (W : Submodule ℂ 
   have h1 : L (r ⟨v, hv⟩) = ⟨v, hv⟩ := LinearMap.congr_fun hL ⟨v, hv⟩
   rw [LinearMap.pi_apply_eq_sum_univ] at h1
   have h2 := congrFun (congrArg Subtype.val h1) y
-  simp only [Submodule.coe_sum, Finset.sum_apply, Submodule.coe_smul, Pi.smul_apply,
-    smul_eq_mul] at h2
+  simp only [Submodule.coe_sum, Finset.sum_apply, Submodule.coe_smul, Pi.smul_apply, smul_eq_mul]
+    at h2
   exact h2.symm
 
-theorem eq_zero_of_integral_mul_eq_zero_of_separating {K : Type} [TopologicalSpace K]
-    [CompactSpace K] [T2Space K] [MeasurableSpace K] [BorelSpace K] (μ : Measure K)
-    [IsFiniteMeasure μ] [μ.IsOpenPosMeasure] (R : Subalgebra ℂ (K → ℂ))
-    (hc : ∀ p ∈ R, Continuous p) (hs : ∀ p ∈ R, star p ∈ R)
-    (hsep : ∀ x y : K, x ≠ y → ∃ p ∈ R, p x ≠ p y) (g : K → ℂ) (hg : Continuous g)
-    (h0 : ∀ p ∈ R, ∫ k, g k * p k ∂μ = 0) : g = 0 := by
-  let A : StarSubalgebra ℂ C(K, ℂ) :=
-    { carrier := {φ | (φ : K → ℂ) ∈ R}
-      mul_mem' := fun ha hb => R.mul_mem ha hb
-      add_mem' := fun ha hb => R.add_mem ha hb
-      algebraMap_mem' := fun c => R.algebraMap_mem c
-      star_mem' := fun ha => hs _ ha }
+theorem eq_zero_of_integral_mul_eq_zero_of_separating
+    {K : Type} [TopologicalSpace K] [CompactSpace K] [T2Space K] [MeasurableSpace K] [BorelSpace K]
+    (μ : Measure K) [IsFiniteMeasure μ] [μ.IsOpenPosMeasure]
+    (R : Subalgebra ℂ (K → ℂ)) (hc : ∀ p ∈ R, Continuous p) (hs : ∀ p ∈ R, star p ∈ R)
+    (hsep : ∀ x y : K, x ≠ y → ∃ p ∈ R, p x ≠ p y)
+    (g : K → ℂ) (hg : Continuous g) (h0 : ∀ p ∈ R, ∫ k, g k * p k ∂μ = 0)
+    : g = 0 := by
+  let A : StarSubalgebra ℂ C(K, ℂ) := {
+    carrier := {φ | (φ : K → ℂ) ∈ R}
+    mul_mem' := fun ha hb => R.mul_mem ha hb
+    add_mem' := fun ha hb => R.add_mem ha hb
+    algebraMap_mem' := fun c => R.algebraMap_mem c
+    star_mem' := fun ha => hs _ ha
+  }
   have hA : A.SeparatesPoints := by
     intro x y hxy
     obtain ⟨p, hp, hne⟩ := hsep x y hxy
@@ -52,31 +54,39 @@ theorem eq_zero_of_integral_mul_eq_zero_of_separating {K : Type} [TopologicalSpa
   have htop := ContinuousMap.starSubalgebra_topologicalClosure_eq_top_of_separatesPoints A hA
   let G : C(K, ℂ) := ⟨g, hg⟩
   have hcont : Continuous fun φ : C(K, ℂ) => ∫ k, g k * φ k ∂μ := by
-    have h1 : Continuous fun φ : C(K, ℂ) =>
-        ∫ k, (ContinuousMap.toLp (E := ℂ) 1 μ ℂ (G * φ)) k ∂μ :=
-      MeasureTheory.continuous_integral.comp
-        ((ContinuousMap.toLp (E := ℂ) 1 μ ℂ).continuous.comp (continuous_const.mul continuous_id))
+    have h1 : Continuous fun φ : C(K, ℂ) => ∫ k, (ContinuousMap.toLp (E := ℂ) 1 μ ℂ (G * φ)) k ∂μ :=
+      MeasureTheory.continuous_integral.comp ((ContinuousMap.toLp (E := ℂ) 1 μ ℂ).continuous.comp
+        (continuous_const.mul continuous_id))
     convert h1 using 2 with φ
     exact (integral_congr_ae (ContinuousMap.coeFn_toLp (E := ℂ) (p := 1) (𝕜 := ℂ) μ (G * φ))).symm
   have hcl : IsClosed {φ : C(K, ℂ) | ∫ k, g k * φ k ∂μ = 0} := isClosed_eq hcont continuous_const
   have hmem : star G ∈ closure (A : Set C(K, ℂ)) := by
     have : star G ∈ A.topologicalClosure := htop ▸ StarSubalgebra.mem_top
     exact this
-  have hsub : (A : Set C(K, ℂ)) ⊆ {φ : C(K, ℂ) | ∫ k, g k * φ k ∂μ = 0} :=
-    fun φ hφ => h0 _ hφ
+  have hsub : (A : Set C(K, ℂ)) ⊆ {φ : C(K, ℂ) | ∫ k, g k * φ k ∂μ = 0} := fun φ hφ => h0 _ hφ
   have hz : ∫ k, g k * (starRingEnd ℂ) (g k) ∂μ = 0 := closure_minimal hsub hcl hmem
   simp only [Complex.mul_conj] at hz
   rw [integral_complex_ofReal] at hz
   have hz' : ∫ k, Complex.normSq (g k) ∂μ = 0 := by exact_mod_cast hz
   have hcn : Continuous fun k => Complex.normSq (g k) := Complex.continuous_normSq.comp hg
-  have hae := (integral_eq_zero_iff_of_nonneg (fun k => Complex.normSq_nonneg (g k))
-    (hcn.integrable_of_hasCompactSupport (HasCompactSupport.of_compactSpace _))).1 hz'
+  have hae :=
+    (integral_eq_zero_iff_of_nonneg
+      (fun k => Complex.normSq_nonneg (g k))
+      (hcn.integrable_of_hasCompactSupport (HasCompactSupport.of_compactSpace _))).1 hz'
   have := (Continuous.ae_eq_iff_eq μ hcn continuous_zero).1 hae
   funext k
   exact Complex.normSq_eq_zero.1 (congrFun this k)
 
-theorem mem_of_finiteDimensional_span_rightTranslates :
-    ∀ (K : Type) [Group K] [TopologicalSpace K] [IsTopologicalGroup K] [CompactSpace K] [T2Space K] (R : Subalgebra ℂ (K → ℂ)), (∀ p ∈ R, Continuous p) → (∀ p ∈ R, star p ∈ R) → (∀ x y : K, x ≠ y → ∃ p ∈ R, p x ≠ p y) → (∀ p ∈ R, ∃ (m : ℕ) (a b : Fin m → K → ℂ), (∀ i, a i ∈ R ∧ Continuous (b i)) ∧ ∀ x k, p (x⁻¹ * k) = ∑ i, a i x * b i k) → ∀ f : K → ℂ, Continuous f → FiniteDimensional ℂ (Submodule.span ℂ (Set.range fun k : K => fun x : K => f (x * k))) → f ∈ R := by
+theorem mem_of_finiteDimensional_span_rightTranslates
+    : ∀ (K : Type) [Group K] [TopologicalSpace K] [IsTopologicalGroup K] [CompactSpace K]
+        [T2Space K] (R : Subalgebra ℂ (K → ℂ)),
+      (∀ p ∈ R, Continuous p) → (∀ p ∈ R, star p ∈ R) → (∀ x y : K, x ≠ y → ∃ p ∈ R, p x ≠ p y)
+        → (∀ p ∈ R, ∃ (m : ℕ) (a b : Fin m → K → ℂ),
+          (∀ i, a i ∈ R ∧ Continuous (b i)) ∧ ∀ x k, p (x⁻¹ * k) = ∑ i, a i x * b i k)
+        → ∀ f : K → ℂ,
+          Continuous f
+            → FiniteDimensional ℂ (Submodule.span ℂ (Set.range fun k : K => fun x : K => f (x * k)))
+            → f ∈ R := by
   intro K _ _ _ _ _ R hc hs hsep hsplit f hf hfd
   classical
   borelize K
@@ -85,8 +95,9 @@ theorem mem_of_finiteDimensional_span_rightTranslates :
     hu.integrable_of_hasCompactSupport (HasCompactSupport.of_compactSpace _)
   have hfx : ∀ x : K, Continuous fun k => f (x * k) := fun x =>
     hf.comp (continuous_const.mul continuous_id)
-  obtain ⟨s, w, hw⟩ := exists_interpolation_of_finiteDimensional
-    (Submodule.span ℂ (Set.range fun k : K => fun x : K => f (x * k)))
+  obtain ⟨s, w, hw⟩ :=
+    exists_interpolation_of_finiteDimensional (Submodule.span ℂ
+      (Set.range fun k : K => fun x : K => f (x * k)))
   have hdec : ∀ y k, f (y * k) = ∑ x : s, f (x * k) * w x y := fun y k =>
     hw _ (Submodule.subset_span ⟨k, rfl⟩) y
 
@@ -109,19 +120,20 @@ theorem mem_of_finiteDimensional_span_rightTranslates :
         exact hint _ (hf.mul (continuous_const.mul (hab i).2))
     rw [this]
     exact R.sum_mem fun i _ => R.smul_mem (hab i).1 _
-  let T : R →ₗ[ℂ] (s → ℂ) :=
-    { toFun := fun p x => ∫ k, f (x * k) * (p : K → ℂ) k ∂μ
-      map_add' := fun p q => by
-        funext x
-        simp only [Subalgebra.coe_add, Pi.add_apply, mul_add]
-        exact integral_add (hint _ ((hfx x).mul (hc _ p.2))) (hint _ ((hfx x).mul (hc _ q.2)))
-      map_smul' := fun c p => by
-        funext x
-        simp only [Subalgebra.coe_smul, Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
-        rw [← integral_const_mul]
-        congr 1
-        funext k
-        ring }
+  let T : R →ₗ[ℂ] (s → ℂ) := {
+    toFun := fun p x => ∫ k, f (x * k) * (p : K → ℂ) k ∂μ
+    map_add' := fun p q => by
+      funext x
+      simp only [Subalgebra.coe_add, Pi.add_apply, mul_add]
+      exact integral_add (hint _ ((hfx x).mul (hc _ p.2))) (hint _ ((hfx x).mul (hc _ q.2)))
+    map_smul' := fun c p => by
+      funext x
+      simp only [Subalgebra.coe_smul, Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
+      rw [← integral_const_mul]
+      congr 1
+      funext k
+      ring
+  }
   have hmem : (fun x : s => f x) ∈ LinearMap.range T := by
     by_contra hne
     obtain ⟨l, hl1, hl0⟩ := Submodule.exists_dual_map_eq_bot_of_notMem hne inferInstance

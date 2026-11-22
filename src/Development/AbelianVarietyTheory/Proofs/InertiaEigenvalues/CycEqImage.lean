@@ -9,13 +9,27 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FactorM
 
 @[expose] public section
 
-open ReciprocityTheory.Gal Formalism.RepresentationBoundsCohomology.LOC ReciprocityTheory.ChartRestriction.T2 GlobalTheory.LocDualInt
+open ReciprocityTheory.Gal Formalism.RepresentationBoundsCohomology.LOC
+  ReciprocityTheory.ChartRestriction.T2 GlobalTheory.LocDualInt
 
 noncomputable section
 
 namespace GlobalTheory.CycImage
 
-theorem cyc_eq_image : ∀ {p : ℕ} [Fact p.Prime] {K : IntermediateField ℚ_[p] (PadicAlgCl p)} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [TopologicalSpace O] {G : Type} [Group G] [TopologicalSpace G], PadicCoeff p O → ∀ (φ : ℤ_[p] →+* O) (i : G ≃ₜ* GK p K) {ε : G →* Oˣ}, IsCyc p K (carry i ε) → ∀ g : G, ((ε g : Oˣ) : O) = φ ((cyclotomicCharacter (PadicAlgCl p) p (MulSemiringAction.toRingAut (GK p K) (PadicAlgCl p) (i g)) : ℤ_[p]ˣ) : ℤ_[p]) := by
+theorem cyc_eq_image
+    : ∀ {p : ℕ} [Fact p.Prime] {K : IntermediateField ℚ_[p] (PadicAlgCl p)} {O : Type} [CommRing O]
+        [IsDomain O] [IsDiscreteValuationRing O] [TopologicalSpace O] {G : Type} [Group G]
+        [TopologicalSpace G],
+      PadicCoeff p O
+        → ∀ (φ : ℤ_[p] →+* O) (i : G ≃ₜ* GK p K) {ε : G →* Oˣ},
+          IsCyc p K (carry i ε)
+            → ∀ g : G,
+              ((ε g : Oˣ) : O)
+                = φ
+                  ((cyclotomicCharacter (PadicAlgCl p) p
+                        (MulSemiringAction.toRingAut (GK p K) (PadicAlgCl p) (i g))
+                      : ℤ_[p]ˣ)
+                    : ℤ_[p]) := by
   intro p _ K O _ _ _ _ G _ _ hO φ i ε hε g
   set c : ℤ_[p] := ((cyclotomicCharacter (PadicAlgCl p) p
     (MulSemiringAction.toRingAut (GK p K) (PadicAlgCl p) (i g)) : ℤ_[p]ˣ) : ℤ_[p]) with hcdef
@@ -29,8 +43,9 @@ theorem cyc_eq_image : ∀ {p : ℕ} [Fact p.Prime] {K : IntermediateField ℚ_[
       congr 2
       exact i.symm_apply_apply g
     rw [hcar] at hmem
-    have hsp := cyclotomicCharacter.spec (L := PadicAlgCl p) p (n := n)
-      (MulSemiringAction.toRingAut (GK p K) (PadicAlgCl p) (i g)) ζ hζ.pow_eq_one
+    have hsp :=
+      cyclotomicCharacter.spec (L := PadicAlgCl p) p (n := n)
+        (MulSemiringAction.toRingAut (GK p K) (PadicAlgCl p) (i g)) ζ hζ.pow_eq_one
     have h1 : (MulSemiringAction.toRingAut (GK p K) (PadicAlgCl p) (i g)) ζ = (i g) ζ := rfl
     rw [h1, ha] at hsp
     set v : ℕ := (PadicInt.toZModPow n c).val with hv
@@ -58,8 +73,8 @@ theorem cyc_eq_image : ∀ {p : ℕ} [Fact p.Prime] {K : IntermediateField ℚ_[
         rw [← Int.cast_sub, hk, Int.cast_mul]
       push_cast at hk'
       linear_combination -hk'
-    have hsum : ((ε g : Oˣ) : O) - φ c =
-        ((((ε g : Oˣ) : O) - a) + ((a : O) - v)) - (φ c - v) := by ring
+    have hsum : ((ε g : Oˣ) : O) - φ c = ((((ε g : Oˣ) : O) - a) + ((a : O) - v)) - (φ c - v) := by
+      ring
     rw [hsum]
     exact Ideal.sub_mem _ (Ideal.add_mem _ hmem hav) hφ
   have hbot : ((ε g : Oˣ) : O) - φ c ∈ ⨅ n : ℕ, (IsLocalRing.maximalIdeal O) ^ n := by
@@ -69,7 +84,9 @@ theorem cyc_eq_image : ∀ {p : ℕ} [Fact p.Prime] {K : IntermediateField ℚ_[
       rw [← Ideal.span_singleton_pow]
       exact Ideal.pow_right_mono ((Ideal.span_singleton_le_iff_mem _).2 hO.p_mem) n
     exact hle h
-  rw [Ideal.iInf_pow_eq_bot_of_isLocalRing _ (IsLocalRing.maximalIdeal.isMaximal O).ne_top, Ideal.mem_bot] at hbot
+  rw [Ideal.iInf_pow_eq_bot_of_isLocalRing _ (IsLocalRing.maximalIdeal.isMaximal O).ne_top,
+      Ideal.mem_bot]
+    at hbot
   exact sub_eq_zero.1 hbot
 
 end GlobalTheory.CycImage

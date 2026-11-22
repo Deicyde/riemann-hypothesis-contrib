@@ -75,7 +75,9 @@ open UpperTheory.V.Z.J.D
 namespace UpperTheory.V.Z.Desc.V0
 
 theorem flathE : Flath :=
-  flath (isotS secSp schurGL (boxIsot step) (piIsot (boxIsot step) (piIrr boxIrr)) (piIrr boxIrr) boxIrr) step boxIrr (piIrr boxIrr)
-    schurGL infDim wtEx secSp
+  flath
+    (isotS secSp schurGL (boxIsot step) (piIsot (boxIsot step) (piIrr boxIrr)) (piIrr boxIrr)
+      boxIrr)
+    step boxIrr (piIrr boxIrr) schurGL infDim wtEx secSp
 
 end UpperTheory.V.Z.Desc.V0

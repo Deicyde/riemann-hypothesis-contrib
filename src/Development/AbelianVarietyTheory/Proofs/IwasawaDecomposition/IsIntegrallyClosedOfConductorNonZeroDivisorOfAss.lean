@@ -10,12 +10,15 @@ open IsLocalRing
 namespace GlobalTheory
 
 theorem isIntegrallyClosed_of_conductor_nonZeroDivisor_of_associatedPrimes
-    (R : Type) [CommRing R] [IsNoetherianRing R] (x : R) (hx : x ∈ nonZeroDivisors R)
-    (hloc : ∀ (P : Ideal R) [P.IsPrime], P ∈ associatedPrimes R (R ⧸ Ideal.span {x}) →
-      ∃ _ : IsDomain (Localization.AtPrime P), IsIntegrallyClosed (Localization.AtPrime P))
-    (hcond : ∀ c : FractionRing R, IsIntegral R c →
-      ∃ s : R, algebraMap R (FractionRing R) s = algebraMap R (FractionRing R) x * c) :
-    IsIntegrallyClosed R := by
+    (R : Type) [CommRing R] [IsNoetherianRing R]
+    (x : R) (hx : x ∈ nonZeroDivisors R)
+    (hloc : ∀ (P : Ideal R) [P.IsPrime],
+      P ∈ associatedPrimes R (R ⧸ Ideal.span {x})
+        → ∃ _ : IsDomain (Localization.AtPrime P), IsIntegrallyClosed (Localization.AtPrime P))
+    (hcond : ∀ c : FractionRing R,
+      IsIntegral R c
+        → ∃ s : R, algebraMap R (FractionRing R) s = algebraMap R (FractionRing R) x * c)
+    : IsIntegrallyClosed R := by
   rw [isIntegrallyClosed_iff (FractionRing R)]
   intro c hc
   obtain ⟨s, hs⟩ := hcond c hc
@@ -28,8 +31,9 @@ theorem isIntegrallyClosed_of_conductor_nonZeroDivisor_of_associatedPrimes
       IsLocalization.map_units (FractionRing R) ⟨x, hx⟩
     apply hu.mul_left_cancel
     rw [← hs, map_mul, mul_comm]
-  have key := eq_zero_of_forall_associatedPrimes_exists_smul_eq_zero
-    (A := R) (M := R ⧸ Ideal.span {x}) (x := Ideal.Quotient.mk (Ideal.span {x}) s)
+  have key :=
+    eq_zero_of_forall_associatedPrimes_exists_smul_eq_zero (A := R) (M := R ⧸ Ideal.span {x})
+      (x := Ideal.Quotient.mk (Ideal.span {x}) s)
   apply key
   intro P hP
   haveI hPp : P.IsPrime := hP.isPrime
@@ -47,9 +51,10 @@ theorem isIntegrallyClosed_of_conductor_nonZeroDivisor_of_associatedPrimes
     exact t.2 (this ▸ P.zero_mem)
   let φ : FractionRing R →+* K :=
     IsLocalization.lift (M := nonZeroDivisors R) (g := algebraMap R K) fun b ↦ hreg b b.2
-  have hφ : ∀ r : R, φ (algebraMap R (FractionRing R) r) = algebraMap RP K (algebraMap R RP r) :=
-    fun r ↦ by
-      rw [IsLocalization.lift_eq, IsScalarTower.algebraMap_apply R RP K]
+  have hφ
+      : ∀ r : R,
+        φ (algebraMap R (FractionRing R) r) = algebraMap RP K (algebraMap R RP r) := fun r ↦ by
+    rw [IsLocalization.lift_eq, IsScalarTower.algebraMap_apply R RP K]
   have hint : IsIntegral RP (φ c) := by
     refine IsIntegral.map_of_comp_eq (algebraMap R RP) φ ?_ hc
     ext r

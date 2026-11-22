@@ -10,7 +10,8 @@ set_option autoImplicit false
 noncomputable section
 
 open NumberField IsDedekindDomain
-open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Indef Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Cx
+open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.L2.Indef
+  Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Cx
 open Formalism.L2.Pj GlobalTheory.BigTop GlobalTheory.BigOn
 open Formalism.CohomologicalDescent.LogSmallConstantBounds (Par)
 open Formalism.CohomologicalDescent.ShortWeightBounds (Wts)

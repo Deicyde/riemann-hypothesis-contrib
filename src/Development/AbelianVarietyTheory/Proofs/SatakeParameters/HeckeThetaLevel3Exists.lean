@@ -24,30 +24,41 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ZeroEigen
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues Polynomial
-open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult
+  Formalism.IndefR.Datum Formalism.IndefR.Cx
 open scoped TensorProduct InnerProductSpace
 open GlobalTheory.Hk3
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Hk3
 
-theorem tw_cut_eig (s : Bool) {E I C : Type} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
+theorem tw_cut_eig
+    (s : Bool)
+    {E I C : Type} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
     (h : I → Module.End ℂ E) (e : Module.End ℂ E) (Ec : C → Submodule ℂ E) (lab : C → I → ℂ)
-    (he : e * e = e) (hs : (⨆ c, Ec c) = LinearMap.range e) (hl : ∀ c, ∀ w ∈ Ec c, ∀ i, h i w = lab c i • w) :
-    Formalism.L2.Col.PairComm (fun i => (Tw.map s (h i * e) : Module.End ℂ (Tw s E))) ∧
-      ∀ Q : (I → ℂ) → Prop, ¬ Q 0 →
-        Formalism.L2.Col.eigSum (fun i => (Tw.map s (h i * e) : Module.End ℂ (Tw s E))) Q =
-          Tw.sub s (⨆ (c : C) (_ : Q (fun i => cj s (lab c i))), Ec c) := by
+    (he : e * e = e) (hs : (⨆ c, Ec c) = LinearMap.range e)
+    (hl : ∀ c, ∀ w ∈ Ec c, ∀ i, h i w = lab c i • w)
+    : Formalism.L2.Col.PairComm (fun i => (Tw.map s (h i * e) : Module.End ℂ (Tw s E)))
+      ∧ ∀ Q : (I → ℂ) → Prop,
+        ¬ Q 0
+          → Formalism.L2.Col.eigSum (fun i => (Tw.map s (h i * e) : Module.End ℂ (Tw s E))) Q
+            = Tw.sub s (⨆ (c : C) (_ : Q (fun i => cj s (lab c i))), Ec c) := by
   obtain ⟨hc, hq⟩ := GlobalTheory.Hk3.eigSum_mul_proj_eq h e Ec lab he hs hl
-  obtain ⟨a, b, -⟩ := GlobalTheory.T.conjugateSpace_jointEigenspaces_pairComm_iSup s (fun i => h i * e)
+  obtain ⟨a, b, -⟩ :=
+    GlobalTheory.T.conjugateSpace_jointEigenspaces_pairComm_iSup s (fun i => h i * e)
   refine ⟨a hc, fun Q hQ => ?_⟩
   have h0 : (fun i => cj s ((0 : I → ℂ) i)) = 0 := by funext i; simp
   rw [b Q, hq _ (by rw [h0]; exact hQ)]
 
-theorem cxSys_cj_iff {K I : Type} [Field K] {σ τ : K →+* ℂ} {s : Bool} (h : ∀ a, σ a = cj s (τ a)) (H : (I → K) → Prop) (y : I → ℂ) :
-    cxSys σ H (fun i => cj s (y i)) ↔ cxSys τ H y := by
+theorem cxSys_cj_iff
+    {K I : Type} [Field K]
+    {σ τ : K →+* ℂ} {s : Bool} (h : ∀ a, σ a = cj s (τ a))
+    (H : (I → K) → Prop) (y : I → ℂ)
+    : cxSys σ H (fun i => cj s (y i)) ↔ cxSys τ H y := by
   constructor
   · rintro ⟨x, hx, e⟩
     refine ⟨x, hx, funext fun i => ?_⟩

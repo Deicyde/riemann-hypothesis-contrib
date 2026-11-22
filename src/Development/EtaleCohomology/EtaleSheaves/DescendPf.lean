@@ -9,11 +9,14 @@ open CategoryTheory Limits LateralTheory.E.t_E3Cut
 
 namespace LateralTheory.E.DescendPf
 
-def Spread : Prop := ∀ (A O : CommRingCat.{0}) (f : A ⟶ O), IE f →
-  ∀ (C : Type) [CommRing C] [Algebra O C] [Algebra.Etale O C],
-  ∃ (B : CommRingCat.{0}) (g : A ⟶ B) (d : B ⟶ O) (C' : CommRingCat.{0}) (e : B ⟶ C') (c : C' →+* C),
-    Et g ∧ Et e ∧ g ≫ d = f ∧
-    IsPushout e d (CommRingCat.ofHom c) (CommRingCat.ofHom (algebraMap O C))
+def Spread : Prop :=
+  ∀ (A O : CommRingCat.{0}) (f : A ⟶ O),
+    IE f
+      → ∀ (C : Type) [CommRing C] [Algebra O C] [Algebra.Etale O C],
+        ∃ (B : CommRingCat.{0}) (g : A ⟶ B) (d : B ⟶ O) (C' : CommRingCat.{0}) (e : B ⟶ C')
+            (c : C' →+* C),
+          Et g ∧ Et e ∧ g ≫ d = f
+            ∧ IsPushout e d (CommRingCat.ofHom c) (CommRingCat.ofHom (algebraMap O C))
 
 theorem Descend_of (hS : Spread) : LateralTheory.E.ColimPf.Descend := by
   intro A O f hf C _ _ _
@@ -35,7 +38,8 @@ theorem Descend_of (hS : Spread) : LateralTheory.E.ColimPf.Descend := by
       have := congrArg (fun φ => φ.hom y) h1
       simpa using this
   · intro R _ α β h1 h2
-    have := hP.hom_ext (W := CommRingCat.of R) (k := CommRingCat.ofHom α) (l := CommRingCat.ofHom β) ?_ ?_
+    have :=
+      hP.hom_ext (W := CommRingCat.of R) (k := CommRingCat.ofHom α) (l := CommRingCat.ofHom β) ?_ ?_
     · exact congrArg CommRingCat.Hom.hom this
     · ext y
       exact DFunLike.congr_fun h2 y

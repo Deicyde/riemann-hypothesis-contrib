@@ -29,15 +29,15 @@ theorem LocalMultComap.proof : LocalMultComap.Statement := by
     · intro hy
       obtain ⟨x, rfl⟩ := hσ y
       exact ⟨x, hy, rfl⟩
-  have : IsLocalization (P.primeCompl.map σ) (Localization.AtPrime W) := by
-    rw [hM]; infer_instance
+  have : IsLocalization (P.primeCompl.map σ) (Localization.AtPrime W) := by rw [hM]; infer_instance
   let φ : Localization.AtPrime P →+* Localization.AtPrime W := Localization.localRingHom P W σ hPW
   have hφ : Function.Surjective φ := IsLocalization.map_surjective_of_surjective _ _ _ hσ
   let _ : Algebra (Localization.AtPrime P) (Localization.AtPrime W) := φ.toAlgebra
   set J : Ideal (Localization.AtPrime P) := (I.comap σ).map (algebraMap R (Localization.AtPrime P))
   set I' : Ideal (Localization.AtPrime W) := I.map (algebraMap S (Localization.AtPrime W))
-  have hcomp : φ.comp (algebraMap R (Localization.AtPrime P)) =
-      (algebraMap S (Localization.AtPrime W)).comp σ :=
+  have hcomp
+      : φ.comp (algebraMap R (Localization.AtPrime P))
+        = (algebraMap S (Localization.AtPrime W)).comp σ :=
     RingHom.ext fun x => Localization.localRingHom_to_map P W σ hPW x
   have hJ : J.map φ = I' := by
     simp only [J, I', Ideal.map_map, hcomp]
@@ -51,7 +51,8 @@ theorem LocalMultComap.proof : LocalMultComap.Statement := by
     obtain ⟨t', rfl⟩ := hσ t
     have hmem : t' * r ∈ I.comap σ := by
       simp only [Ideal.mem_comap, map_mul]
-      rw [htr]; exact I.zero_mem
+      rw [htr]
+      exact I.zero_mem
     have ht' : t' ∈ P.primeCompl := ht
     rw [IsLocalization.mk'_mem_iff]
     have h1 : algebraMap R (Localization.AtPrime P) (t' * r) ∈ J := Ideal.mem_map_of_mem _ hmem
@@ -71,8 +72,9 @@ theorem LocalMultComap.proof : LocalMultComap.Statement := by
         Algebra.ofId_apply]
       exact Ideal.Quotient.eq_zero_iff_mem
     rw [this, ← hJ, Ideal.comap_map_of_surjective' φ hφ, sup_eq_left.mpr hker]
-  have e := (Submodule.quotEquivOfEq J (RingHom.ker ψ) hkerψ.symm).trans
-    (Ideal.quotientKerAlgEquivOfSurjective hψ).toLinearEquiv
+  have e :=
+    (Submodule.quotEquivOfEq J (RingHom.ker ψ) hkerψ.symm).trans
+      (Ideal.quotientKerAlgEquivOfSurjective hψ).toLinearEquiv
   rw [e.length_eq, Module.length_eq_of_surjective hφ]
 
 end GroundTheory.Heights₂.Heights.Targets

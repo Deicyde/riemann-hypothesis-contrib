@@ -27,8 +27,8 @@ private lemma Icc_one_eq_Ioc_zero (N : ℕ) : Icc 1 N = Ioc 0 N := by
   simp only [Finset.mem_Icc, Finset.mem_Ioc]
   omega
 
-private theorem continuousOn_inv_sq_Icc_of_pos {y U : ℝ} (hy : 0 < y) :
-    ContinuousOn (fun t : ℝ => ((t : 𝕜) ^ 2)⁻¹) (Set.Icc y U) := by
+private theorem continuousOn_inv_sq_Icc_of_pos {y U : ℝ} (hy : 0 < y)
+    : ContinuousOn (fun t : ℝ => ((t : 𝕜) ^ 2)⁻¹) (Set.Icc y U) := by
   refine ContinuousOn.inv₀ ((RCLike.continuous_ofReal (K := 𝕜)).pow 2).continuousOn ?_
   intro t ht
   have : (t : 𝕜) ≠ 0 := by
@@ -44,10 +44,10 @@ private lemma integrableOn_partial_sum_div_sq (c : ℕ → 𝕜) {y U : ℝ} (hy
   refine this.congr_fun (fun t _ => ?_) measurableSet_Icc
   simp only [div_eq_inv_mul]
 
-private theorem sum_Icc_zero_ite_eq_sum_Icc_one (c : ℕ → 𝕜) (N : ℕ) :
-    ∑ k ∈ Icc 0 N, (if k = 0 then (0 : 𝕜) else c k) = ∑ k ∈ Icc 1 N, c k := by
+private theorem sum_Icc_zero_ite_eq_sum_Icc_one (c : ℕ → 𝕜) (N : ℕ)
+    : ∑ k ∈ Icc 0 N, (if k = 0 then (0 : 𝕜) else c k) = ∑ k ∈ Icc 1 N, c k := by
   rw [Finset.Icc_eq_cons_Ioc (Nat.zero_le N), Finset.sum_cons, Icc_one_eq_Ioc_zero]
-  simp only [↓reduceIte, zero_add]
+  simp only [↓ reduceIte, zero_add]
   exact Finset.sum_congr rfl fun k hk => if_neg (Finset.mem_Ioc.mp hk).1.ne'
 
 private lemma integral_partial_sum_div_sq (c : ℕ → 𝕜) {y U : ℝ} (hy : 1 ≤ y) (hU : y ≤ U) :
@@ -93,14 +93,14 @@ private lemma integral_partial_sum_div_sq (c : ℕ → 𝕜) {y U : ℝ} (hy : 1
 
 end abel
 
-private theorem sum_Icc_eq_mul_sum_div_sub_sum_partial (c : ℕ → ℂ) (N : ℕ) :
-    ∑ n ∈ Icc 1 N, c n = (N : ℂ) * (∑ n ∈ Icc 1 N, c n / (n : ℂ))
-      - ∑ k ∈ range N, ∑ n ∈ Icc 1 k, c n / (n : ℂ) := by
+private theorem sum_Icc_eq_mul_sum_div_sub_sum_partial (c : ℕ → ℂ) (N : ℕ)
+    : ∑ n ∈ Icc 1 N, c n
+      = (N : ℂ) * (∑ n ∈ Icc 1 N, c n / (n : ℂ)) - ∑ k ∈ range N, ∑ n ∈ Icc 1 k, c n / (n : ℂ) := by
   induction N with
   | zero => simp
   | succ N ih =>
-    rw [Finset.sum_Icc_succ_top (Nat.le_add_left 1 N), Finset.sum_Icc_succ_top (Nat.le_add_left 1 N),
-      Finset.sum_range_succ, ih]
+    rw [Finset.sum_Icc_succ_top (Nat.le_add_left 1 N),
+      Finset.sum_Icc_succ_top (Nat.le_add_left 1 N), Finset.sum_range_succ, ih]
     have hN : ((N : ℂ) + 1) ≠ 0 := by exact_mod_cast Nat.succ_ne_zero N
     have e : ((N : ℂ) + 1) * (c (N + 1) / ((N : ℂ) + 1)) = c (N + 1) := by field_simp
     push_cast
@@ -143,10 +143,11 @@ private lemma kronecker_tendsto_zero_real (c : ℕ → ℂ) (S : ℂ)
 theorem smoothedRemainderIntegralFormula : SmoothedRemainderIntegralFormula := by
   intro a S h y hy
   refine ⟨S - ∑ n ∈ Icc 1 ⌊y⌋₊, a n / (n : ℂ) + (∑ n ∈ Icc 1 ⌊y⌋₊, a n) / (y : ℂ), ?_, ?_⟩
-  · have hlim : Tendsto (fun U : ℝ => (∑ n ∈ Icc 1 ⌊U⌋₊, a n / (n : ℂ))
-          - ∑ n ∈ Icc 1 ⌊y⌋₊, a n / (n : ℂ) - (∑ n ∈ Icc 1 ⌊U⌋₊, a n) / (U : ℂ)
-          + (∑ n ∈ Icc 1 ⌊y⌋₊, a n) / (y : ℂ)) atTop
-        (𝓝 (S - ∑ n ∈ Icc 1 ⌊y⌋₊, a n / (n : ℂ) - 0 + (∑ n ∈ Icc 1 ⌊y⌋₊, a n) / (y : ℂ))) :=
+  · have hlim : Tendsto
+        (fun U : ℝ =>
+          (∑ n ∈ Icc 1 ⌊U⌋₊, a n / (n : ℂ)) - ∑ n ∈ Icc 1 ⌊y⌋₊, a n / (n : ℂ)
+            - (∑ n ∈ Icc 1 ⌊U⌋₊, a n) / (U : ℂ) + (∑ n ∈ Icc 1 ⌊y⌋₊, a n) / (y : ℂ))
+        atTop (𝓝 (S - ∑ n ∈ Icc 1 ⌊y⌋₊, a n / (n : ℂ) - 0 + (∑ n ∈ Icc 1 ⌊y⌋₊, a n) / (y : ℂ))) :=
       (((h.comp (tendsto_nat_floor_atTop (α := ℝ))).sub_const _).sub
         (kronecker_tendsto_zero_real a S h)).add_const _
     rw [sub_zero] at hlim
@@ -154,27 +155,29 @@ theorem smoothedRemainderIntegralFormula : SmoothedRemainderIntegralFormula := b
     filter_upwards [eventually_ge_atTop y] with U hU
     exact (integral_partial_sum_div_sq a hy hU).symm
   · have hy0 : (y : ℂ) ≠ 0 := Complex.ofReal_ne_zero.mpr (show (0 : ℝ) < y by linarith).ne'
-    have hsum : ∑ n ∈ Icc 1 ⌊y⌋₊, a n * ((y / (n : ℝ) - 1 : ℝ) : ℂ) =
-        (y : ℂ) * (∑ n ∈ Icc 1 ⌊y⌋₊, a n / (n : ℂ)) - ∑ n ∈ Icc 1 ⌊y⌋₊, a n := by
+    have hsum
+        : ∑ n ∈ Icc 1 ⌊y⌋₊, a n * ((y / (n : ℝ) - 1 : ℝ) : ℂ)
+          = (y : ℂ) * (∑ n ∈ Icc 1 ⌊y⌋₊, a n / (n : ℂ)) - ∑ n ∈ Icc 1 ⌊y⌋₊, a n := by
       rw [Finset.mul_sum, ← Finset.sum_sub_distrib]
       refine Finset.sum_congr rfl fun n _ => ?_
       push_cast
       ring
-    have e : (y : ℂ) * ((∑ n ∈ Icc 1 ⌊y⌋₊, a n) / (y : ℂ)) = ∑ n ∈ Icc 1 ⌊y⌋₊, a n := by
-      field_simp
+    have e : (y : ℂ) * ((∑ n ∈ Icc 1 ⌊y⌋₊, a n) / (y : ℂ)) = ∑ n ∈ Icc 1 ⌊y⌋₊, a n := by field_simp
     unfold Gchi
     rw [hsum]
     linear_combination e
 
-private theorem integral_psumR_sub_div_sq_eq_partial_sums (a : ℕ → ℝ) {y U : ℝ} (hy : 1 ≤ y) (hU : y ≤ U) :
-    ∫ u in y..U, (psumR a u - u) / u ^ 2 =
-      (∑ n ∈ Icc 1 ⌊U⌋₊, a n / (n : ℝ)) - (∑ n ∈ Icc 1 ⌊y⌋₊, a n / (n : ℝ))
+private theorem integral_psumR_sub_div_sq_eq_partial_sums
+    (a : ℕ → ℝ) {y U : ℝ} (hy : 1 ≤ y) (hU : y ≤ U)
+    : ∫ u in y..U, (psumR a u - u) / u ^ 2
+      = (∑ n ∈ Icc 1 ⌊U⌋₊, a n / (n : ℝ)) - (∑ n ∈ Icc 1 ⌊y⌋₊, a n / (n : ℝ))
         - (∑ n ∈ Icc 1 ⌊U⌋₊, a n) / U + (∑ n ∈ Icc 1 ⌊y⌋₊, a n) / y
         - (Real.log U - Real.log y) := by
   have hy0 : 0 < y := by linarith
   have hU0 : 0 < U := by linarith
-  have hsplit : (fun u : ℝ => (psumR a u - u) / u ^ 2) =
-      fun u : ℝ => (∑ n ∈ Icc 1 ⌊u⌋₊, a n) / u ^ 2 - u⁻¹ := by
+  have hsplit
+      : (fun u : ℝ => (psumR a u - u) / u ^ 2)
+        = fun u : ℝ => (∑ n ∈ Icc 1 ⌊u⌋₊, a n) / u ^ 2 - u⁻¹ := by
     funext u
     rw [sub_div, psumR]
     congr 1
@@ -188,30 +191,36 @@ private theorem integral_psumR_sub_div_sq_eq_partial_sums (a : ℕ → ℝ) {y U
     refine ContinuousOn.intervalIntegrable (continuousOn_inv₀.mono fun x hx => ?_)
     rw [Set.uIcc_of_le hU] at hx
     exact (show (0 : ℝ) < x by linarith [hx.1]).ne'
-  have hA_eq : ∫ u in y..U, (∑ n ∈ Icc 1 ⌊u⌋₊, a n) / u ^ 2 =
-      (∑ n ∈ Icc 1 ⌊U⌋₊, a n / (n : ℝ)) - (∑ n ∈ Icc 1 ⌊y⌋₊, a n / (n : ℝ))
-        - (∑ n ∈ Icc 1 ⌊U⌋₊, a n) / U + (∑ n ∈ Icc 1 ⌊y⌋₊, a n) / y :=
+  have hA_eq
+      : ∫ u in y..U, (∑ n ∈ Icc 1 ⌊u⌋₊, a n) / u ^ 2
+        = (∑ n ∈ Icc 1 ⌊U⌋₊, a n / (n : ℝ)) - (∑ n ∈ Icc 1 ⌊y⌋₊, a n / (n : ℝ))
+          - (∑ n ∈ Icc 1 ⌊U⌋₊, a n) / U + (∑ n ∈ Icc 1 ⌊y⌋₊, a n) / y :=
     integral_partial_sum_div_sq (𝕜 := ℝ) a hy hU
   rw [hsplit, intervalIntegral.integral_sub hA hinv, integral_inv_of_pos hy0 hU0,
     Real.log_div hU0.ne' hy0.ne', hA_eq]
 
 theorem smoothedRemainderRealIntegralFormula : SmoothedRemainderRealIntegralFormula := by
   intro a h y hy
-  refine ⟨-1 - Real.eulerMascheroniConstant + (-(∑ n ∈ Icc 1 ⌊y⌋₊, a n / (n : ℝ))
-    + (∑ n ∈ Icc 1 ⌊y⌋₊, a n) / y + Real.log y), (h.add_const _).congr' ?_, ?_⟩
+  refine ⟨
+    -1 - Real.eulerMascheroniConstant
+      + (-(∑ n ∈ Icc 1 ⌊y⌋₊, a n / (n : ℝ)) + (∑ n ∈ Icc 1 ⌊y⌋₊, a n) / y + Real.log y),
+    (h.add_const _).congr' ?_,
+    ?_
+  ⟩
   · filter_upwards [eventually_ge_atTop y] with U hU
-    rw [integral_psumR_sub_div_sq_eq_partial_sums a hy hU, integral_psumR_sub_div_sq_eq_partial_sums a le_rfl (hy.trans hU)]
+    rw [integral_psumR_sub_div_sq_eq_partial_sums a hy hU,
+      integral_psumR_sub_div_sq_eq_partial_sums a le_rfl (hy.trans hU)]
     simp only [Nat.floor_one, Finset.Icc_self, Finset.sum_singleton, Nat.cast_one, div_one,
       Real.log_one]
     ring
   · have hy0 : y ≠ 0 := (show (0 : ℝ) < y by linarith).ne'
-    have hsum : ∑ n ∈ Icc 1 ⌊y⌋₊, a n * (y / (n : ℝ) - 1) =
-        y * (∑ n ∈ Icc 1 ⌊y⌋₊, a n / (n : ℝ)) - ∑ n ∈ Icc 1 ⌊y⌋₊, a n := by
+    have hsum
+        : ∑ n ∈ Icc 1 ⌊y⌋₊, a n * (y / (n : ℝ) - 1)
+          = y * (∑ n ∈ Icc 1 ⌊y⌋₊, a n / (n : ℝ)) - ∑ n ∈ Icc 1 ⌊y⌋₊, a n := by
       rw [Finset.mul_sum, ← Finset.sum_sub_distrib]
       refine Finset.sum_congr rfl fun n _ => ?_
       ring
-    have e : y * ((∑ n ∈ Icc 1 ⌊y⌋₊, a n) / y) = ∑ n ∈ Icc 1 ⌊y⌋₊, a n := by
-      field_simp
+    have e : y * ((∑ n ∈ Icc 1 ⌊y⌋₊, a n) / y) = ∑ n ∈ Icc 1 ⌊y⌋₊, a n := by field_simp
     unfold Gone
     rw [hsum]
     linear_combination e

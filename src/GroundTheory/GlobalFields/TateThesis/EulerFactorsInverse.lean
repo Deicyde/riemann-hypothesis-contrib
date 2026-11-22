@@ -15,21 +15,22 @@ noncomputable section
 
 variable {K : Type*} [Field K] [NumberField K]
 
-theorem eq_of_forall_exp_mul_I {a b : ℝ}
-    (h : ∀ t : ℝ, Complex.exp (a * t * I) = Complex.exp (b * t * I)) : a = b := by
+theorem eq_of_forall_exp_mul_I
+    {a b : ℝ} (h : ∀ t : ℝ, Complex.exp (a * t * I) = Complex.exp (b * t * I))
+    : a = b := by
   by_contra hab
   have hne : a - b ≠ 0 := sub_ne_zero.2 hab
   set t : ℝ := π / (a - b)
   have ht : (a - b) * t = π := by simp only [t]; field_simp
   have h1 : Complex.exp ((((a - b) * t : ℝ) : ℂ) * I) = 1 := by
-    have e : ((((a - b) * t : ℝ) : ℂ) * I) = (a : ℂ) * t * I - (b : ℂ) * t * I := by
-      push_cast; ring
+    have e : ((((a - b) * t : ℝ) : ℂ) * I) = (a : ℂ) * t * I - (b : ℂ) * t * I := by push_cast; ring
     rw [e, Complex.exp_sub, h t, div_self (Complex.exp_ne_zero _)]
   rw [ht, Complex.exp_eq_one_iff] at h1
   obtain ⟨n, hn⟩ := h1
   have h2 : (π : ℂ) = ((n * (2 * π) : ℝ) : ℂ) := by
     refine mul_right_cancel₀ I_ne_zero (hn.trans ?_)
-    push_cast; ring
+    push_cast
+    ring
   have h3 : π = n * (2 * π) := by exact_mod_cast h2
   have h4 : (1 : ℝ) = 2 * n := by
     have hπ : π ≠ 0 := Real.pi_ne_zero
@@ -38,48 +39,51 @@ theorem eq_of_forall_exp_mul_I {a b : ℝ}
   have h5 : (1 : ℤ) = 2 * n := by exact_mod_cast h4
   omega
 
-
 omit [NumberField K] in
-theorem exists_extensionEmbedding_eq_ofReal (w : InfinitePlace K) (r : ℝ) :
-    ∃ a : w.Completion, extensionEmbedding w a = r := by
+theorem exists_extensionEmbedding_eq_ofReal (w : InfinitePlace K) (r : ℝ)
+    : ∃ a : w.Completion, extensionEmbedding w a = r := by
   by_cases hw : w.IsReal
   · obtain ⟨a, ha⟩ := surjective_extensionEmbeddingOfIsReal hw r
     exact ⟨a, by rw [← extensionEmbeddingOfIsReal_apply hw, ha]⟩
   · exact surjective_extensionEmbedding_of_isComplex (not_isReal_iff_isComplex.1 hw) (r : ℂ)
 
 omit [NumberField K] in
-theorem norm_extensionEmbedding' (w : InfinitePlace K) (a : w.Completion) :
-    ‖extensionEmbedding w a‖ = ‖a‖ :=
+theorem norm_extensionEmbedding' (w : InfinitePlace K) (a : w.Completion)
+    : ‖extensionEmbedding w a‖ = ‖a‖ :=
   (isometry_extensionEmbedding w).norm_map_of_map_zero (map_zero _) a
 
 theorem ofReal_exp_cpow (t : ℝ) (c : ℂ) : ((Real.exp t : ℝ) : ℂ) ^ c = Complex.exp (t * c) := by
-  rw [cpow_def_of_ne_zero (by exact_mod_cast (Real.exp_pos t).ne'), ← ofReal_log
-    (Real.exp_pos t).le, Real.log_exp]
+  rw [cpow_def_of_ne_zero (by exact_mod_cast (Real.exp_pos t).ne'),
+    ← ofReal_log (Real.exp_pos t).le, Real.log_exp]
 
 namespace HeckeCharacter
 
 variable (χ : HeckeCharacter K)
 
-theorem infiniteParams_unique (w : InfinitePlace K) {p : ℤ × ℝ}
-    (hp1 : w.IsReal → 0 ≤ p.1 ∧ p.1 < 2)
-    (hp2 : ∀ a : (w.Completion)ˣ, (χ.infiniteComponent w a : ℂ) =
-      (extensionEmbedding w (a : w.Completion) / (‖(a : w.Completion)‖ : ℂ)) ^ p.1 *
-        ((‖(a : w.Completion)‖ ^ w.mult : ℝ) : ℂ) ^ ((p.2 : ℂ) * I)) :
-    p = χ.infiniteParams w := by
+theorem infiniteParams_unique
+    (w : InfinitePlace K)
+    {p : ℤ × ℝ} (hp1 : w.IsReal → 0 ≤ p.1 ∧ p.1 < 2)
+    (hp2 : ∀ a : (w.Completion)ˣ,
+      (χ.infiniteComponent w a : ℂ)
+        = (extensionEmbedding w (a : w.Completion) / (‖(a : w.Completion)‖ : ℂ)) ^ p.1
+          * ((‖(a : w.Completion)‖ ^ w.mult : ℝ) : ℂ) ^ ((p.2 : ℂ) * I))
+    : p = χ.infiniteParams w := by
   set q := χ.infiniteParams w
   have hq1 : w.IsReal → 0 ≤ q.1 ∧ q.1 < 2 := (χ.exists_infiniteParams w).choose_spec.1
   have hq2 := (χ.exists_infiniteParams w).choose_spec.2
-  have heq : ∀ a : (w.Completion)ˣ,
-      (extensionEmbedding w (a : w.Completion) / (‖(a : w.Completion)‖ : ℂ)) ^ p.1 *
-        ((‖(a : w.Completion)‖ ^ w.mult : ℝ) : ℂ) ^ ((p.2 : ℂ) * I) =
-      (extensionEmbedding w (a : w.Completion) / (‖(a : w.Completion)‖ : ℂ)) ^ q.1 *
-        ((‖(a : w.Completion)‖ ^ w.mult : ℝ) : ℂ) ^ ((q.2 : ℂ) * I) :=
-    fun a ↦ (hp2 a).symm.trans (hq2 a)
+  have heq
+      : ∀ a : (w.Completion)ˣ,
+        (extensionEmbedding w (a : w.Completion) / (‖(a : w.Completion)‖ : ℂ)) ^ p.1
+            * ((‖(a : w.Completion)‖ ^ w.mult : ℝ) : ℂ) ^ ((p.2 : ℂ) * I)
+          = (extensionEmbedding w (a : w.Completion) / (‖(a : w.Completion)‖ : ℂ)) ^ q.1
+            * ((‖(a : w.Completion)‖ ^ w.mult : ℝ) : ℂ) ^ ((q.2 : ℂ) * I) := fun a ↦
+    (hp2 a).symm.trans (hq2 a)
   have hM : (1 : ℝ) ≤ w.mult := by exact_mod_cast InfinitePlace.one_le_mult
 
   have hτ : p.2 = q.2 := by
-    have key : ∀ t : ℝ, Complex.exp ((w.mult * p.2 : ℝ) * t * I) =
-        Complex.exp ((w.mult * q.2 : ℝ) * t * I) := by
+    have key
+        : ∀ t : ℝ,
+          Complex.exp ((w.mult * p.2 : ℝ) * t * I) = Complex.exp ((w.mult * q.2 : ℝ) * t * I) := by
       intro t
       obtain ⟨a, ha⟩ := exists_extensionEmbedding_eq_ofReal w (Real.exp t)
       have ha0 : a ≠ 0 := fun h0 ↦ by
@@ -89,17 +93,19 @@ theorem infiniteParams_unique (w : InfinitePlace K) {p : ℤ × ℝ}
         rw [← norm_extensionEmbedding', ha, Complex.norm_real, Real.norm_eq_abs,
           abs_of_pos (Real.exp_pos t)]
       have h := heq (Units.mk0 a ha0)
-      simp only [Units.val_mk0, ha, hn, div_self (by exact_mod_cast (Real.exp_pos t).ne' :
-        ((Real.exp t : ℝ) : ℂ) ≠ 0), one_zpow, one_mul, ← Real.exp_nat_mul,
-        ofReal_exp_cpow] at h
+      simp only [Units.val_mk0, ha, hn,
+          div_self (by exact_mod_cast (Real.exp_pos t).ne' : ((Real.exp t : ℝ) : ℂ) ≠ 0), one_zpow,
+          one_mul, ← Real.exp_nat_mul, ofReal_exp_cpow]
+        at h
       convert h using 2 <;> push_cast <;> ring
     have := eq_of_forall_exp_mul_I key
     have hM0 : (w.mult : ℝ) ≠ 0 := by positivity
     exact mul_left_cancel₀ hM0 this
 
-  have hm : ∀ a : (w.Completion)ˣ,
-      (extensionEmbedding w (a : w.Completion) / (‖(a : w.Completion)‖ : ℂ)) ^ p.1 =
-      (extensionEmbedding w (a : w.Completion) / (‖(a : w.Completion)‖ : ℂ)) ^ q.1 := by
+  have hm
+      : ∀ a : (w.Completion)ˣ,
+        (extensionEmbedding w (a : w.Completion) / (‖(a : w.Completion)‖ : ℂ)) ^ p.1
+          = (extensionEmbedding w (a : w.Completion) / (‖(a : w.Completion)‖ : ℂ)) ^ q.1 := by
     intro a
     have h := heq a
     rw [hτ] at h
@@ -117,9 +123,9 @@ theorem infiniteParams_unique (w : InfinitePlace K) {p : ℤ × ℝ}
     have hn : ‖a‖ = 1 := by rw [← norm_extensionEmbedding', ha]; simp
     have h := hm (Units.mk0 a ha0)
     simp only [Units.val_mk0, ha, hn, ofReal_one, div_one, ofReal_neg] at h
-    rcases (show p.1 = 0 ∨ p.1 = 1 by omega) with h1 | h1 <;>
-      rcases (show q.1 = 0 ∨ q.1 = 1 by omega) with h2 | h2 <;> rw [h1, h2] at h ⊢ <;>
-      norm_num at h
+    rcases (show p.1 = 0 ∨ p.1 = 1 by omega) with h1 | h1
+      <;> rcases (show q.1 = 0 ∨ q.1 = 1 by omega) with h2 | h2 <;> rw [h1, h2] at h ⊢
+      <;> norm_num at h
   · have hc := not_isReal_iff_isComplex.1 hw
     have key : ∀ θ : ℝ, Complex.exp ((p.1 : ℝ) * θ * I) = Complex.exp ((q.1 : ℝ) * θ * I) := by
       intro θ
@@ -127,8 +133,7 @@ theorem infiniteParams_unique (w : InfinitePlace K) {p : ℤ × ℝ}
       have ha0 : a ≠ 0 := fun h0 ↦ by
         rw [h0, map_zero] at ha
         exact Complex.exp_ne_zero _ ha.symm
-      have hn : ‖a‖ = 1 := by
-        rw [← norm_extensionEmbedding', ha, Complex.norm_exp_ofReal_mul_I]
+      have hn : ‖a‖ = 1 := by rw [← norm_extensionEmbedding', ha, Complex.norm_exp_ofReal_mul_I]
       have h := hm (Units.mk0 a ha0)
       simp only [Units.val_mk0, ha, hn, ofReal_one, div_one, ← Complex.exp_int_mul] at h
       convert h using 2 <;> push_cast <;> ring
@@ -136,11 +141,14 @@ theorem infiniteParams_unique (w : InfinitePlace K) {p : ℤ × ℝ}
 
 theorem inv_toIdele (x : IdeleGroup K) : (χ⁻¹).toIdele x = (χ.toIdele x)⁻¹ := rfl
 
-theorem localComponent_inv (v : IsDedekindDomain.HeightOneSpectrum (𝓞 K))
-    (a : (v.adicCompletion K)ˣ) : (χ⁻¹).localComponent v a = (χ.localComponent v a)⁻¹ := rfl
+theorem localComponent_inv
+    (v : IsDedekindDomain.HeightOneSpectrum (𝓞 K)) (a : (v.adicCompletion K)ˣ)
+    : (χ⁻¹).localComponent v a = (χ.localComponent v a)⁻¹ :=
+  rfl
 
-theorem infiniteComponent_inv (w : InfinitePlace K) (a : (w.Completion)ˣ) :
-    (χ⁻¹).infiniteComponent w a = (χ.infiniteComponent w a)⁻¹ := rfl
+theorem infiniteComponent_inv (w : InfinitePlace K) (a : (w.Completion)ˣ)
+    : (χ⁻¹).infiniteComponent w a = (χ.infiniteComponent w a)⁻¹ :=
+  rfl
 
 theorem conductor_inv : χ⁻¹.conductor = χ.conductor := by
   have hker : (χ⁻¹).toIdele.ker = χ.toIdele.ker := by
@@ -154,11 +162,10 @@ theorem conductor_inv : χ⁻¹.conductor = χ.conductor := by
     exact (χ⁻¹).map_idealLevel_conductor_le_ker
   exact le_antisymm (Ideal.le_of_dvd h2) (Ideal.le_of_dvd h1)
 
-
 open Classical in
-theorem infiniteParams_inv (w : InfinitePlace K) :
-    (χ⁻¹).infiniteParams w =
-      (if w.IsReal then χ.infiniteWeight w else -χ.infiniteWeight w, -χ.infiniteTau w) := by
+theorem infiniteParams_inv (w : InfinitePlace K)
+    : (χ⁻¹).infiniteParams w
+      = (if w.IsReal then χ.infiniteWeight w else - χ.infiniteWeight w, - χ.infiniteTau w) := by
   symm
   refine (χ⁻¹).infiniteParams_unique w ?_ fun a ↦ ?_
   · intro hw
@@ -169,9 +176,9 @@ theorem infiniteParams_inv (w : InfinitePlace K) :
     rw [mul_inv, ofReal_neg, neg_mul, cpow_neg]
     congr 1
     split_ifs with hw
-    ·
-      have hι : extensionEmbedding w (a : w.Completion) =
-          ((extensionEmbeddingOfIsReal hw (a : w.Completion) : ℝ) : ℂ) :=
+    · have hι
+          : extensionEmbedding w (a : w.Completion)
+            = ((extensionEmbeddingOfIsReal hw (a : w.Completion) : ℝ) : ℂ) :=
         (extensionEmbeddingOfIsReal_apply hw _).symm
       have hn : ‖(a : w.Completion)‖ = |extensionEmbeddingOfIsReal hw (a : w.Completion)| := by
         rw [← Real.norm_eq_abs]
@@ -185,12 +192,12 @@ theorem infiniteParams_inv (w : InfinitePlace K) :
       · rw [Real.sign_of_pos h]; push_cast; norm_num
     · rw [zpow_neg]
 
-theorem infiniteWeight_inv_of_isReal {w : InfinitePlace K} (hw : w.IsReal) :
-    (χ⁻¹).infiniteWeight w = χ.infiniteWeight w := by
+theorem infiniteWeight_inv_of_isReal {w : InfinitePlace K} (hw : w.IsReal)
+    : (χ⁻¹).infiniteWeight w = χ.infiniteWeight w := by
   rw [infiniteWeight, infiniteParams_inv, if_pos hw]
 
-theorem infiniteWeight_inv_of_isComplex {w : InfinitePlace K} (hw : w.IsComplex) :
-    (χ⁻¹).infiniteWeight w = -χ.infiniteWeight w := by
+theorem infiniteWeight_inv_of_isComplex {w : InfinitePlace K} (hw : w.IsComplex)
+    : (χ⁻¹).infiniteWeight w = - χ.infiniteWeight w := by
   rw [infiniteWeight, infiniteParams_inv, if_neg (not_isReal_iff_isComplex.2 hw)]
 
 end HeckeCharacter

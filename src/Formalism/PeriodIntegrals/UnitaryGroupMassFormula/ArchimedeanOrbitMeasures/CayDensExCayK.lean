@@ -24,9 +24,11 @@ def cayInv (g : UpqT P Q) : lieU P Q :=
 
 def CayInvMeas : Prop := ∀ P Q : ℕ, Measurable (cayInv P Q)
 
-def CayInvIff : Prop := ∀ (P Q : ℕ) (g : UpqT P Q) (X : lieU P Q),
-  UpqT.mat g * ((1 + 1) - ((X : lieU P Q) : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ)) =
-    (1 + 1) + ((X : lieU P Q) : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ) → cayInv P Q g = X
+def CayInvIff : Prop :=
+  ∀ (P Q : ℕ) (g : UpqT P Q) (X : lieU P Q),
+    UpqT.mat g * ((1 + 1) - ((X : lieU P Q) : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ))
+        = (1 + 1) + ((X : lieU P Q) : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ)
+      → cayInv P Q g = X
 
 end Chart
 

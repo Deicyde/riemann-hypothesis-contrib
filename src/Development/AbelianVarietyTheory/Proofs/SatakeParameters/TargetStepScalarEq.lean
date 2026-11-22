@@ -10,7 +10,15 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.StepChara
 
 @[expose] public section
 
-open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Formalism.MainNotions Formalism.L2.Ker Formalism.L2.PairingIndexBounds.F Formalism.L2.KerInert Formalism.UG Formalism.L2.G.Cmp Formalism.L2.Forms Formalism.L2.KerInert.SecondKernelProjection Formalism.L2.KerInert.QuadraticBaseChangeGL3 Formalism.L2.KerInert.SecondKernelDifference Formalism.L2.KerInert.SecondKernelHermitian Formalism.MainNotions.G.KAat Formalism.MainNotions.G.CmpJ Formalism.L2.KerInert.SecondKernelInstances Formalism.L2.KerInert.SecondKernelSeries GlobalTheory.TwV GlobalTheory.TwV.DelB GlobalTheory.TwV.DelA
+open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G
+  Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Formalism.MainNotions Formalism.L2.Ker
+  Formalism.L2.PairingIndexBounds.F Formalism.L2.KerInert Formalism.UG Formalism.L2.G.Cmp
+  Formalism.L2.Forms Formalism.L2.KerInert.SecondKernelProjection
+  Formalism.L2.KerInert.QuadraticBaseChangeGL3 Formalism.L2.KerInert.SecondKernelDifference
+  Formalism.L2.KerInert.SecondKernelHermitian Formalism.MainNotions.G.KAat
+  Formalism.MainNotions.G.CmpJ Formalism.L2.KerInert.SecondKernelInstances
+  Formalism.L2.KerInert.SecondKernelSeries GlobalTheory.TwV GlobalTheory.TwV.DelB
+  GlobalTheory.TwV.DelA
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.TwV.DelA
@@ -22,10 +30,13 @@ theorem half_rank_cast (R : Ranks) (j : ℕ) : (((R.N j / 2 : ℕ) : ℤ) : ℚ)
   push_cast
   ring
 
-theorem target_scalar : AllSites (fun {D L hT Gi Gl Kc Dx cX ex u μ w hg Lv I H X} [Fact (D.what₂.places.resChar w).Prime] {std t J} S =>
-    ∀ (d : Dec J std) j (hj : j + 1 ≤ D.R.m) (La' : (sysS H X std).Lt (j + 1)),
-      dPow (mM d (j + 1) hj La').1 (fun τ => -(wT (sysS H X std) D (hT.gat_pos u w hg) j τ)) * sPt d (j + 1) hj La' =
-        d.uT S j La' * kT J j hj La'.1) := by
+theorem target_scalar
+    : AllSites (fun {D L hT Gi Gl Kc Dx cX ex u μ w hg Lv I H X}
+        [Fact (D.what₂.places.resChar w).Prime] {std t J} S =>
+      ∀ (d : Dec J std) j (hj : j + 1 ≤ D.R.m) (La' : (sysS H X std).Lt (j + 1)),
+        dPow (mM d (j + 1) hj La').1 (fun τ => -(wT (sysS H X std) D (hT.gat_pos u w hg) j τ))
+            * sPt d (j + 1) hj La'
+          = d.uT S j La' * kT J j hj La'.1) := by
   intro D L hT Gi Gl Kc Dx cX ex u μ w hg Lv I H X _ std t J S d j hj La'
   have hjm : j < D.R.m := hj
   have hW := (GlobalTheory.T.kernelSite_modelStageWeights_eq_chainWeights S j hjm ⟨La'.1⟩).dv
@@ -59,19 +70,27 @@ theorem target_scalar : AllSites (fun {D L hT Gi Gl Kc Dx cX ex u μ w hg Lv I H
   have hq : ∀ τ, embT D τ (gMat J (j + 1) hj 1).det ≠ 0 := fun τ => by
     rw [map_ne_zero]
     exact hq0
-  have hm : ∀ τ, embT D τ (mM d (j + 1) hj La').1.det = embT D τ (uB J (j + 1) hj La'.1).1.det / embT D τ γ.1.det := fun τ => by
+  have hm
+      : ∀ τ,
+        embT D τ (mM d (j + 1) hj La').1.det
+          = embT D τ (uB J (j + 1) hj La'.1).1.det / embT D τ γ.1.det := fun τ => by
     rw [eq_div_iff (hg0 τ), ← map_mul, hdm]
   simp only [hm]
   set n : ℤ := ((D.R.N j / 2 : ℕ) : ℤ)
   set c : ℤ := cTw D (j + 1)
-  have key : ∀ τ, (embT D τ (uB J (j + 1) hj La'.1).1.det / embT D τ γ.1.det) ^ (-(e τ - n - c)) *
-      embT D τ (uB J (j + 1) hj La'.1).1.det ^ (-c) =
-      embT D τ γ.1.det ^ e τ * (embT D τ γ.1.det * embT D τ (gMat J (j + 1) hj 1).det) ^ (-(n + c)) *
-        (embT D τ (uB J (j + 1) hj La'.1).1.det ^ (-(e τ - n)) * embT D τ (gMat J (j + 1) hj 1).det ^ (n + c)) := fun τ => by
+  have key
+      : ∀ τ,
+        (embT D τ (uB J (j + 1) hj La'.1).1.det / embT D τ γ.1.det) ^ (-(e τ - n - c))
+            * embT D τ (uB J (j + 1) hj La'.1).1.det ^ (-c)
+          = embT D τ γ.1.det ^ e τ
+            * (embT D τ γ.1.det * embT D τ (gMat J (j + 1) hj 1).det) ^ (-(n + c))
+            * (embT D τ (uB J (j + 1) hj La'.1).1.det ^ (-(e τ - n))
+              * embT D τ (gMat J (j + 1) hj 1).det ^ (n + c)) := fun τ => by
     have h1 := hb τ
     have h2 := hg0 τ
     have h3 := hq τ
-    simp only [div_zpow, mul_zpow, zpow_neg, zpow_sub₀ h1, zpow_sub₀ h2, zpow_add₀ h1, zpow_add₀ h2, zpow_add₀ h3]
+    simp only [div_zpow, mul_zpow, zpow_neg, zpow_sub₀ h1, zpow_sub₀ h2, zpow_add₀ h1, zpow_add₀ h2,
+      zpow_add₀ h3]
     field_simp
   have hprod := Finset.prod_congr rfl (fun τ (_ : τ ∈ Finset.univ) => key τ)
   simp only [Finset.prod_mul_distrib] at hprod

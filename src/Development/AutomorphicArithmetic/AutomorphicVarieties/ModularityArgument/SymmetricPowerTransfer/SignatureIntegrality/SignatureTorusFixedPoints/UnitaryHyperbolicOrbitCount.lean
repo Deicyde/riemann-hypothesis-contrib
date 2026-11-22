@@ -9,17 +9,24 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig
+open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig
 
 namespace UpperTheory.V.Z.Sym.Sig
 
 open MulAction
 
-private theorem wcount_of {T Y A : Type} [Group T] [MulAction T Y] [Finite A] (C : Subgroup T) (f : Y → ℂ) (n : ℕ)
-    (Ψ : A → orbitRel.Quotient T Y) (inj : Function.Injective Ψ)
-    (hr : ∀ o : orbitRel.Quotient T Y, f o.out ≠ 0 ↔ o ∈ Set.range Ψ)
-    (h1 : ∀ o : orbitRel.Quotient T Y, f o.out ≠ 0 → f o.out = 1 ∧ (stabilizer T o.out).relIndex C = n) :
-    {o : orbitRel.Quotient T Y | f o.out ≠ 0}.Finite ∧ wcount C f = (n : ℂ) * (Nat.card A : ℂ) := by
+private theorem wcount_of
+    {T Y A : Type} [Group T] [MulAction T Y] [Finite A]
+    (C : Subgroup T)
+    (f : Y → ℂ)
+    (n : ℕ)
+    (Ψ : A → orbitRel.Quotient T Y)
+    (inj : Function.Injective Ψ) (hr : ∀ o : orbitRel.Quotient T Y, f o.out ≠ 0 ↔ o ∈ Set.range Ψ)
+    (h1 : ∀ o : orbitRel.Quotient T Y,
+      f o.out ≠ 0 → f o.out = 1 ∧ (stabilizer T o.out).relIndex C = n)
+    : {o : orbitRel.Quotient T Y | f o.out ≠ 0}.Finite
+      ∧ wcount C f = (n : ℂ) * (Nat.card A : ℂ) := by
   classical
   have hs : {o : orbitRel.Quotient T Y | f o.out ≠ 0} = Set.range Ψ := Set.ext fun o => hr o
   have : Fintype A := Fintype.ofFinite A
@@ -49,25 +56,34 @@ private theorem dg_mem (V : Lev k) (w : Fin 3 → kˣ) : dg w ∈ V.J 3 ↔ ∀ 
   have hu' : u = w i := Units.ext (by rw [he]; simp [dg, val_diagT])
   exact hu' ▸ hu
 
-private theorem mk_eq (V : Lev k) (g₀ : GL (Fin 3) k) (u u' : Fin 3 → kˣ) :
-    ((g₀ * dg u : GL (Fin 3) k) : GL (Fin 3) k ⧸ V.J 3) = ((g₀ * dg u' : GL (Fin 3) k) : GL (Fin 3) k ⧸ V.J 3) ↔
-      ∀ i, (u i)⁻¹ * u' i ∈ V.H := by
+private theorem mk_eq (V : Lev k) (g₀ : GL (Fin 3) k) (u u' : Fin 3 → kˣ)
+    : ((g₀ * dg u : GL (Fin 3) k) : GL (Fin 3) k ⧸ V.J 3)
+        = ((g₀ * dg u' : GL (Fin 3) k) : GL (Fin 3) k ⧸ V.J 3)
+      ↔ ∀ i, (u i)⁻¹ * u' i ∈ V.H := by
   rw [QuotientGroup.eq, _root_.mul_inv_rev, mul_assoc, inv_mul_cancel_left, ← map_inv, ← map_mul]
   exact (dg_mem V _).trans (by simp [Pi.mul_apply, Pi.inv_apply])
 
 private def Cd (V : Lev k) (d : Fin 3 → kˣ) (x y z : kˣ) (u : Fin 3 → kˣ) : Prop :=
   x / (u 0 * u 2) / d 0 ∈ V.H ∧ y / u 1 ^ 2 / d 1 ∈ V.H ∧ z / (u 0 * u 2) / d 2 ∈ V.H
 
-private theorem supp_iff (V : Lev k) (d : Fin 3 → kˣ) (hd : SDom d) (x y z : kˣ) (hv : valuation k ((x / z : kˣ) : k) < 1)
-    (g₀ w : GL (Fin 3) k) :
-    V.unitaryDoubleCosetIndicator d (w⁻¹ * (g₀ * dg ![x, y, z] * Phi k * (th k 3 g₀)⁻¹) * th k 3 w) ≠ 0 ↔
-      ∃ u, (w : GL (Fin 3) k ⧸ V.J 3) = ((g₀ * dg u : GL (Fin 3) k) : GL (Fin 3) k ⧸ V.J 3) ∧ Cd V d x y z u := by
+private theorem supp_iff
+    (V : Lev k)
+    (d : Fin 3 → kˣ) (hd : SDom d)
+    (x y z : kˣ) (hv : valuation k ((x / z : kˣ) : k) < 1)
+    (g₀ w : GL (Fin 3) k)
+    : V.unitaryDoubleCosetIndicator d
+          (w⁻¹ * (g₀ * dg ![x, y, z] * Phi k * (th k 3 g₀)⁻¹) * th k 3 w)
+        ≠ 0
+      ↔ ∃ u,
+        (w : GL (Fin 3) k ⧸ V.J 3) = ((g₀ * dg u : GL (Fin 3) k) : GL (Fin 3) k ⧸ V.J 3)
+          ∧ Cd V d x y z u := by
   have hf : ∀ g : GL (Fin 3) k, V.unitaryDoubleCosetIndicator d g ≠ 0 ↔ g * (Phi k)⁻¹ ∈ V.DC d := by
     intro g
     unfold Lev.unitaryDoubleCosetIndicator
     split_ifs <;> simp_all
-  have hM : w⁻¹ * (g₀ * dg ![x, y, z] * Phi k * (th k 3 g₀)⁻¹) * th k 3 w =
-      (g₀⁻¹ * w)⁻¹ * (dg ![x, y, z] * Phi k) * th k 3 (g₀⁻¹ * w) := by
+  have hM
+      : w⁻¹ * (g₀ * dg ![x, y, z] * Phi k * (th k 3 g₀)⁻¹) * th k 3 w
+        = (g₀⁻¹ * w)⁻¹ * (dg ![x, y, z] * Phi k) * th k 3 (g₀⁻¹ * w) := by
     simp only [map_mul, map_inv, _root_.mul_inv_rev, inv_inv, mul_assoc]
   rw [hf, hM, fixG k V d hd x y z hv]
   constructor
@@ -94,15 +110,18 @@ section
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-private theorem gl3_spherical_value_one (V : Lev k) (d : Fin 3 → kˣ) (g : GL (Fin 3) k) (h : V.unitaryDoubleCosetIndicator d g ≠ 0) : V.unitaryDoubleCosetIndicator d g = 1 := by
+private theorem gl3_spherical_value_one
+    (V : Lev k) (d : Fin 3 → kˣ) (g : GL (Fin 3) k) (h : V.unitaryDoubleCosetIndicator d g ≠ 0)
+    : V.unitaryDoubleCosetIndicator d g = 1 := by
   classical
   unfold Lev.unitaryDoubleCosetIndicator at h ⊢
   split_ifs at h ⊢ with h'
   · rfl
   · exact absurd rfl h
 
-private theorem cd_act (V : Lev k) (d : Fin 3 → kˣ) (x y z a : kˣ) (u : Fin 3 → kˣ) (h : Cd V d x y z u) :
-    Cd V d x y z (![a, 1, a⁻¹] * u) := by
+private theorem cd_act
+    (V : Lev k) (d : Fin 3 → kˣ) (x y z a : kˣ) (u : Fin 3 → kˣ) (h : Cd V d x y z u)
+    : Cd V d x y z (![a, 1, a⁻¹] * u) := by
   have e0 : (![a, 1, a⁻¹] * u) 0 * (![a, 1, a⁻¹] * u) 2 = u 0 * u 2 := by
     simp [Pi.mul_apply, mul_mul_mul_comm]
   have e1 : (![a, 1, a⁻¹] * u) 1 = u 1 := by simp [Pi.mul_apply]
@@ -117,20 +136,26 @@ theorem orbital_integral_over_base_group : UnitaryHyperbolicOrbitCount := by
   intro k _ _ _ _ V T _ r hr g₀ ι hι d hd x₁ y₁ z₁ hv
   letI : MulAction T (GL (Fin 3) k ⧸ V.J 3) := MulAction.compHom _ ι
   set δ := g₀ * dg ![x₁, y₁, z₁] * Phi k * (th k 3 g₀)⁻¹ with hδ
-  have hF : ∀ q : GL (Fin 3) k ⧸ V.J 3, V.unitaryDoubleCosetIndicator d (q.out⁻¹ * δ * th k 3 q.out) ≠ 0 ↔
-      ∃ u, q = ((g₀ * dg u : GL (Fin 3) k) : GL (Fin 3) k ⧸ V.J 3) ∧ Cd V d x₁ y₁ z₁ u := by
+  have hF
+      : ∀ q : GL (Fin 3) k ⧸ V.J 3,
+        V.unitaryDoubleCosetIndicator d (q.out⁻¹ * δ * th k 3 q.out) ≠ 0
+          ↔ ∃ u, q = ((g₀ * dg u : GL (Fin 3) k) : GL (Fin 3) k ⧸ V.J 3) ∧ Cd V d x₁ y₁ z₁ u := by
     intro q
     have h := supp_iff V d hd x₁ y₁ z₁ hv g₀ q.out
     rw [QuotientGroup.out_eq'] at h
     exact h
-  have hact : ∀ (s : T) (u : Fin 3 → kˣ), s • ((g₀ * dg u : GL (Fin 3) k) : GL (Fin 3) k ⧸ V.J 3) =
-      ((g₀ * dg (![r s, 1, (r s)⁻¹] * u) : GL (Fin 3) k) : GL (Fin 3) k ⧸ V.J 3) := by
+  have hact
+      : ∀ (s : T) (u : Fin 3 → kˣ),
+        s • ((g₀ * dg u : GL (Fin 3) k) : GL (Fin 3) k ⧸ V.J 3)
+          = ((g₀ * dg (![r s, 1, (r s)⁻¹] * u) : GL (Fin 3) k) : GL (Fin 3) k ⧸ V.J 3) := by
     intro s u
     show ((ι s * (g₀ * dg u) : GL (Fin 3) k) : GL (Fin 3) k ⧸ V.J 3) = _
     rw [hι, show dg (![r s, 1, (r s)⁻¹] * u) = dg ![r s, 1, (r s)⁻¹] * dg u from map_mul _ _ _]
     simp only [mul_assoc, inv_mul_cancel_left]
-  have hstab : ∀ u : Fin 3 → kˣ, stabilizer T ((g₀ * dg u : GL (Fin 3) k) : GL (Fin 3) k ⧸ V.J 3) =
-      Subgroup.comap r V.H := by
+  have hstab
+      : ∀ u : Fin 3 → kˣ,
+        stabilizer T ((g₀ * dg u : GL (Fin 3) k) : GL (Fin 3) k ⧸ V.J 3)
+          = Subgroup.comap r V.H := by
     intro u
     ext s
     rw [mem_stabilizer_iff, hact, mk_eq, Subgroup.mem_comap]
@@ -156,29 +181,34 @@ theorem orbital_integral_over_base_group : UnitaryHyperbolicOrbitCount := by
     obtain ⟨hxz, s0, hs0⟩ := hc
     haveI : (V.H.subgroupOf V.H2).FiniteIndex := ⟨hne⟩
     let U : ↥V.H2 → Fin 3 → kˣ := fun v => ![x₁ / d 0, s0 * (v : kˣ), 1]
-    let q : ↥V.H2 → GL (Fin 3) k ⧸ V.J 3 := fun v => ((g₀ * dg (U v) : GL (Fin 3) k) : GL (Fin 3) k ⧸ V.J 3)
+    let q : ↥V.H2 → GL (Fin 3) k ⧸ V.J 3 := fun v =>
+      ((g₀ * dg (U v) : GL (Fin 3) k) : GL (Fin 3) k ⧸ V.J 3)
     let Ψ : ↥V.H2 ⧸ V.H.subgroupOf V.H2 → orbitRel.Quotient T (GL (Fin 3) k ⧸ V.J 3) :=
       Quotient.lift (s := QuotientGroup.leftRel (V.H.subgroupOf V.H2))
-        (fun v => (Quotient.mk'' (q v) : orbitRel.Quotient T (GL (Fin 3) k ⧸ V.J 3))) (by
-        intro a b hab
-        have hab' : a⁻¹ * b ∈ V.H.subgroupOf V.H2 := QuotientGroup.leftRel_apply.mp hab
-        rw [Subgroup.mem_subgroupOf] at hab'
-        apply congrArg
-        simp only [q]
-        rw [mk_eq]
-        intro i
-        rcases (by decide : ∀ j : Fin 3, j = 0 ∨ j = 1 ∨ j = 2) i with rfl | rfl | rfl
-        · convert one_mem V.H using 1
-          ext
-          simp [U] <;> field_simp
-        · convert hab' using 1
-          ext
-          simp [U] <;> field_simp
-        · convert one_mem V.H using 1
-          ext
-          simp [U])
-    have hΨ : ∀ v : ↥V.H2, Ψ (v : ↥V.H2 ⧸ V.H.subgroupOf V.H2) =
-        (Quotient.mk'' (q v) : orbitRel.Quotient T (GL (Fin 3) k ⧸ V.J 3)) := fun v => rfl
+        (fun v => (Quotient.mk'' (q v) : orbitRel.Quotient T (GL (Fin 3) k ⧸ V.J 3)))
+        (by
+          intro a b hab
+          have hab' : a⁻¹ * b ∈ V.H.subgroupOf V.H2 := QuotientGroup.leftRel_apply.mp hab
+          rw [Subgroup.mem_subgroupOf] at hab'
+          apply congrArg
+          simp only [q]
+          rw [mk_eq]
+          intro i
+          rcases (by decide : ∀ j : Fin 3, j = 0 ∨ j = 1 ∨ j = 2) i with rfl | rfl | rfl
+          · convert one_mem V.H using 1
+            ext
+            simp [U] <;> field_simp
+          · convert hab' using 1
+            ext
+            simp [U] <;> field_simp
+          · convert one_mem V.H using 1
+            ext
+            simp [U])
+    have hΨ
+        : ∀ v : ↥V.H2,
+          Ψ (v : ↥V.H2 ⧸ V.H.subgroupOf V.H2)
+            = (Quotient.mk'' (q v) : orbitRel.Quotient T (GL (Fin 3) k ⧸ V.J 3)) := fun v =>
+      rfl
     have hinj : Function.Injective Ψ := by
       intro a b hab
       obtain ⟨v, rfl⟩ := QuotientGroup.mk_surjective a
@@ -194,8 +224,10 @@ theorem orbital_integral_over_base_group : UnitaryHyperbolicOrbitCount := by
       convert h1 using 1
       ext
       simp [U, Pi.mul_apply] <;> field_simp
-    have hrng : ∀ o : orbitRel.Quotient T (GL (Fin 3) k ⧸ V.J 3),
-        V.unitaryDoubleCosetIndicator d (o.out.out⁻¹ * δ * th k 3 o.out.out) ≠ 0 ↔ o ∈ Set.range Ψ := by
+    have hrng
+        : ∀ o : orbitRel.Quotient T (GL (Fin 3) k ⧸ V.J 3),
+          V.unitaryDoubleCosetIndicator d (o.out.out⁻¹ * δ * th k 3 o.out.out) ≠ 0
+            ↔ o ∈ Set.range Ψ := by
       intro o
       rw [hF]
       constructor
@@ -233,7 +265,11 @@ theorem orbital_integral_over_base_group : UnitaryHyperbolicOrbitCount := by
         have hm := Quotient.mk_out' (s₁ := orbitRel T (GL (Fin 3) k ⧸ V.J 3)) (q v)
         rw [MulAction.orbitRel_apply, MulAction.mem_orbit_iff] at hm
         obtain ⟨s, hs⟩ := hm
-        refine ⟨![r s, 1, (r s)⁻¹] * U v, hs.symm.trans (hact s (U v)), cd_act V d x₁ y₁ z₁ (r s) (U v) ?_⟩
+        refine ⟨
+          ![r s, 1, (r s)⁻¹] * U v,
+          hs.symm.trans (hact s (U v)),
+          cd_act V d x₁ y₁ z₁ (r s) (U v) ?_
+        ⟩
         have hv2 : (v : kˣ) ^ 2 ∈ V.H := v.2
         refine ⟨?_, ?_, ?_⟩
         · convert one_mem V.H using 1
@@ -245,20 +281,25 @@ theorem orbital_integral_over_base_group : UnitaryHyperbolicOrbitCount := by
         · convert inv_mem hxz using 1
           ext
           simp [U] <;> field_simp
-    have hone : ∀ o : orbitRel.Quotient T (GL (Fin 3) k ⧸ V.J 3),
-        V.unitaryDoubleCosetIndicator d (o.out.out⁻¹ * δ * th k 3 o.out.out) ≠ 0 →
-          V.unitaryDoubleCosetIndicator d (o.out.out⁻¹ * δ * th k 3 o.out.out) = 1 ∧
-            (stabilizer T o.out).relIndex (Subgroup.comap r (Uo k)) = V.H.relIndex (Uo k) := by
+    have hone
+        : ∀ o : orbitRel.Quotient T (GL (Fin 3) k ⧸ V.J 3),
+          V.unitaryDoubleCosetIndicator d (o.out.out⁻¹ * δ * th k 3 o.out.out) ≠ 0
+            → V.unitaryDoubleCosetIndicator d (o.out.out⁻¹ * δ * th k 3 o.out.out) = 1
+              ∧ (stabilizer T o.out).relIndex (Subgroup.comap r (Uo k)) = V.H.relIndex (Uo k) := by
       intro o h
       refine ⟨gl3_spherical_value_one V d _ h, ?_⟩
       obtain ⟨u, hu, -⟩ := (hF _).1 h
       rw [hu, hstab, Subgroup.relIndex_comap, Subgroup.map_comap_eq_self_of_surjective hr]
-    obtain ⟨hfin, hsum⟩ := wcount_of (C := Subgroup.comap r (Uo k))
-      (f := fun q : GL (Fin 3) k ⧸ V.J 3 => V.unitaryDoubleCosetIndicator d (q.out⁻¹ * δ * th k 3 q.out))
-      (n := V.H.relIndex (Uo k)) Ψ hinj hrng hone
+    obtain ⟨hfin, hsum⟩ :=
+      wcount_of (C := Subgroup.comap r (Uo k))
+        (f := fun q : GL (Fin 3) k ⧸ V.J 3 =>
+          V.unitaryDoubleCosetIndicator d (q.out⁻¹ * δ * th k 3 q.out))
+        (n := V.H.relIndex (Uo k)) Ψ hinj hrng hone
     exact ⟨hfin, hsum.trans rfl⟩
   · rw [if_neg hc]
-    have hzero : ∀ q : GL (Fin 3) k ⧸ V.J 3, V.unitaryDoubleCosetIndicator d (q.out⁻¹ * δ * th k 3 q.out) = 0 := by
+    have hzero
+        : ∀ q : GL (Fin 3) k ⧸ V.J 3,
+          V.unitaryDoubleCosetIndicator d (q.out⁻¹ * δ * th k 3 q.out) = 0 := by
       intro q
       by_contra h
       obtain ⟨u, -, h1, h2, h3⟩ := (hF q).1 h
@@ -269,10 +310,15 @@ theorem orbital_integral_over_base_group : UnitaryHyperbolicOrbitCount := by
       · convert h2 using 1
         ext
         simp <;> field_simp
-    obtain ⟨hfin, hsum⟩ := wcount_of (A := Empty) (C := Subgroup.comap r (Uo k))
-      (f := fun q : GL (Fin 3) k ⧸ V.J 3 => V.unitaryDoubleCosetIndicator d (q.out⁻¹ * δ * th k 3 q.out))
-      (n := 0) (fun e => e.elim) (fun e => e.elim) (fun o => by simp [hzero])
-      (fun o h => absurd (hzero _) h)
+    obtain ⟨hfin, hsum⟩ :=
+      wcount_of (A := Empty) (C := Subgroup.comap r (Uo k))
+        (f := fun q : GL (Fin 3) k ⧸ V.J 3 =>
+          V.unitaryDoubleCosetIndicator d (q.out⁻¹ * δ * th k 3 q.out))
+        (n := 0)
+        (fun e => e.elim)
+        (fun e => e.elim)
+        (fun o => by simp [hzero])
+        (fun o h => absurd (hzero _) h)
     exact ⟨hfin, hsum.trans (by simp)⟩
 
 end UpperTheory.V.Z.Sym.Sig

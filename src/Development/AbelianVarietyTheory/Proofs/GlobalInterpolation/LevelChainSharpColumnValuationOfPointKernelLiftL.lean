@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.WtBoun
 @[expose] public section
 
 open Formalism.BasicNotions Classical NumberField GlobalTheory.LvT
-open Formalism.MainNotions.product_first_zeroth_parts (Ow tops wsum ten blk nfAll CSpan IntSpan Nm_succ wSh cTw)
+open Formalism.MainNotions.product_first_zeroth_parts
+  (Ow tops wsum ten blk nfAll CSpan IntSpan Nm_succ wSh cTw)
 
 noncomputable section
 namespace GlobalTheory.LvT.TwColumn

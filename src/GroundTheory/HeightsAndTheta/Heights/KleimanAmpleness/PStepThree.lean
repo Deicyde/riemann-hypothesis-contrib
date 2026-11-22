@@ -23,40 +23,48 @@ variable {k : Type u} [Field k] {Ω : Type w} [Field Ω] [Algebra k Ω] {N : ℕ
 abbrev idealChart (J : Ideal (Poly k N)) (I : Chart x) : Ideal (chartRing k x I) :=
   (idealMod (x := x) J I).comap (Algebra.linearMap (chartRing k x I) Ω)
 
-theorem idealMod_le_range (J : Ideal (Poly k N)) (I : Chart x) :
-    idealMod (x := x) J I ≤ LinearMap.range (Algebra.linearMap (chartRing k x I) Ω) := by
+theorem idealMod_le_range (J : Ideal (Poly k N)) (I : Chart x)
+    : idealMod (x := x) J I ≤ LinearMap.range (Algebra.linearMap (chartRing k x I) Ω) := by
   rw [idealMod, Submodule.span_le]
   rintro _ ⟨f, s, e, -, hs, hf, hse, rfl⟩
   exact ⟨⟨_, f, s, e, hs, hf, hse, rfl⟩, rfl⟩
 
-theorem idealMod_mono {J J' : Ideal (Poly k N)} (h : J ≤ J') (I : Chart x) :
-    idealMod (x := x) J I ≤ idealMod (x := x) J' I := by
+theorem idealMod_mono {J J' : Ideal (Poly k N)} (h : J ≤ J') (I : Chart x)
+    : idealMod (x := x) J I ≤ idealMod (x := x) J' I := by
   refine Submodule.span_mono ?_
   rintro _ ⟨f, s, e, hf, hs, hfe, hse, rfl⟩
   exact ⟨f, s, e, h hf, hs, hfe, hse, rfl⟩
 
-theorem idealMod_mul_le (J J' : Ideal (Poly k N)) (I : Chart x) :
-    idealMod (x := x) J I * idealMod (x := x) J' I ≤ idealMod (x := x) (J * J') I := by
+theorem idealMod_mul_le (J J' : Ideal (Poly k N)) (I : Chart x)
+    : idealMod (x := x) J I * idealMod (x := x) J' I ≤ idealMod (x := x) (J * J') I := by
   rw [idealMod, idealMod, Submodule.span_mul_span, Submodule.span_le]
   rintro _ ⟨_, ⟨f, s, e, hf, hs, hfe, hse, rfl⟩, _, ⟨f', s', e', hf', hs', hfe', hse', rfl⟩, rfl⟩
-  refine Submodule.subset_span ⟨f * f', s * s', e + e', Ideal.mul_mem_mul hf hf', mul_mem hs hs',
-    hfe.mul hfe', hse.mul hse', ?_⟩
+  refine Submodule.subset_span ⟨
+    f * f',
+    s * s',
+    e + e',
+    Ideal.mul_mem_mul hf hf',
+    mul_mem hs hs',
+    hfe.mul hfe',
+    hse.mul hse',
+    ?_
+  ⟩
   simp only [map_mul, div_mul_div_comm]
 
-theorem idealChart_mul_le (J J' : Ideal (Poly k N)) (I : Chart x) :
-    idealChart J I * idealChart J' I ≤ idealChart (x := x) (J * J') I :=
+theorem idealChart_mul_le (J J' : Ideal (Poly k N)) (I : Chart x)
+    : idealChart J I * idealChart J' I ≤ idealChart (x := x) (J * J') I :=
   Ideal.mul_le.mpr fun a ha b hb => by
     have := idealMod_mul_le (x := x) J J' I (Submodule.mul_mem_mul ha hb)
     simpa using this
 
 theorem idealChart_top (I : Chart x) : idealChart (x := x) (⊤ : Ideal (Poly k N)) I = ⊤ := by
   refine (Ideal.eq_top_iff_one _).mpr ?_
-  refine Submodule.subset_span ⟨1, 1, 0, Submodule.mem_top, one_mem _, isHomogeneous_one _ _,
-    isHomogeneous_one _ _, ?_⟩
+  refine Submodule.subset_span
+    ⟨1, 1, 0, Submodule.mem_top, one_mem _, isHomogeneous_one _ _, isHomogeneous_one _ _, ?_⟩
   simp
 
-theorem idealChart_prod_le {ι : Type*} (s : Finset ι) (P : ι → Ideal (Poly k N)) (I : Chart x) :
-    ∏ i ∈ s, idealChart (P i) I ≤ idealChart (x := x) (∏ i ∈ s, P i) I := by
+theorem idealChart_prod_le {ι : Type*} (s : Finset ι) (P : ι → Ideal (Poly k N)) (I : Chart x)
+    : ∏ i ∈ s, idealChart (P i) I ≤ idealChart (x := x) (∏ i ∈ s, P i) I := by
   classical
   induction s using Finset.induction_on with
   | empty => simp only [Finset.prod_empty, Ideal.one_eq_top, idealChart_top, le_refl]
@@ -64,16 +72,16 @@ theorem idealChart_prod_le {ι : Type*} (s : Finset ι) (P : ι → Ideal (Poly 
     rw [Finset.prod_insert ha, Finset.prod_insert ha]
     exact (Ideal.mul_mono_right ih).trans (idealChart_mul_le _ _ I)
 
-theorem idealChart_pow_le (P : Ideal (Poly k N)) (I : Chart x) (n : ℕ) :
-    idealChart P I ^ n ≤ idealChart (x := x) (P ^ n) I := by
+theorem idealChart_pow_le (P : Ideal (Poly k N)) (I : Chart x) (n : ℕ)
+    : idealChart P I ^ n ≤ idealChart (x := x) (P ^ n) I := by
   induction n with
   | zero => simp only [pow_zero, Ideal.one_eq_top, idealChart_top, le_refl]
   | succ n ih =>
     rw [pow_succ, pow_succ]
     exact (Ideal.mul_mono_left ih).trans (idealChart_mul_le _ _ I)
 
-theorem twist_idealSys_le (F : SubSystem k x Ω) (pp : Ideal (Poly k N)) (I : Chart x) :
-    (F.twist (idealSys x pp)).sub I ≤ idealChart pp I • F.sub I := by
+theorem twist_idealSys_le (F : SubSystem k x Ω) (pp : Ideal (Poly k N)) (I : Chart x)
+    : (F.twist (idealSys x pp)).sub I ≤ idealChart pp I • F.sub I := by
   refine Submodule.span_le.mpr ?_
   rintro _ ⟨q, hq, y, hy, rfl⟩
   obtain ⟨a, rfl⟩ := idealMod_le_range pp I hq
@@ -85,16 +93,20 @@ section Algebra
 
 variable {A M : Type*} [CommRing A] [AddCommGroup M] [Module A M]
 
-theorem le_sup_mul_smul {G F : Submodule A M} {P Q : Ideal A} (hP : F ≤ G ⊔ P • F)
-    (hQ : F ≤ G ⊔ Q • F) : F ≤ G ⊔ (P * Q) • F := by
-  calc F ≤ G ⊔ P • F := hP
+theorem le_sup_mul_smul
+    {G F : Submodule A M} {P Q : Ideal A} (hP : F ≤ G ⊔ P • F) (hQ : F ≤ G ⊔ Q • F)
+    : F ≤ G ⊔ (P * Q) • F := by
+  calc
+    F ≤ G ⊔ P • F := hP
     _ ≤ G ⊔ P • (G ⊔ Q • F) := sup_le_sup_left (Submodule.smul_mono le_rfl hQ) _
     _ ≤ G ⊔ (P * Q) • F := by
       rw [Submodule.smul_sup, Submodule.mul_smul, ← sup_assoc]
       exact sup_le_sup_right (sup_le le_rfl Submodule.smul_le_right) _
 
-theorem le_sup_prod_smul {ι : Type*} {G F : Submodule A M} (s : Finset ι) (P : ι → Ideal A)
-    (h : ∀ i ∈ s, F ≤ G ⊔ P i • F) : F ≤ G ⊔ (∏ i ∈ s, P i) • F := by
+theorem le_sup_prod_smul
+    {ι : Type*} {G F : Submodule A M}
+    (s : Finset ι) (P : ι → Ideal A) (h : ∀ i ∈ s, F ≤ G ⊔ P i • F)
+    : F ≤ G ⊔ (∏ i ∈ s, P i) • F := by
   classical
   induction s using Finset.induction_on with
   | empty => rw [Finset.prod_empty, Ideal.one_eq_top, Submodule.top_smul]; exact le_sup_right
@@ -103,16 +115,17 @@ theorem le_sup_prod_smul {ι : Type*} {G F : Submodule A M} (s : Finset ι) (P :
     exact le_sup_mul_smul (h a (Finset.mem_insert_self a s))
       (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
 
-theorem le_sup_pow_smul {G F : Submodule A M} {P : Ideal A} (h : F ≤ G ⊔ P • F) (n : ℕ) :
-    F ≤ G ⊔ (P ^ n) • F := by
+theorem le_sup_pow_smul {G F : Submodule A M} {P : Ideal A} (h : F ≤ G ⊔ P • F) (n : ℕ)
+    : F ≤ G ⊔ (P ^ n) • F := by
   induction n with
   | zero => rw [pow_zero, Ideal.one_eq_top, Submodule.top_smul]; exact le_sup_right
   | succ n ih => rw [pow_succ]; exact le_sup_mul_smul ih h
 
 end Algebra
 
-theorem StepThree.proof (hAway : StepThree.Away.Statement.{u, w})
-    (hOnW : StepThree.OnW.Statement.{u, w}) : StepThree.Statement.{u, w} := by
+theorem StepThree.proof
+    (hAway : StepThree.Away.Statement.{u, w}) (hOnW : StepThree.OnW.Statement.{u, w})
+    : StepThree.Statement.{u, w} := by
   intro k _ Ω _ _ N x T hK
   classical
   have hfin := Ideal.finite_minimalPrimes_of_isNoetherianRing (Poly k N) T.J

@@ -13,8 +13,11 @@ public import Development.AbelianVarietyTheory.Proofs.ToricGeometry.AdditionLeve
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField Matrix Complex
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField Matrix Complex
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
+  GlobalTheory.ThFr
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor hiding Level
 open GlobalTheory.SW hiding Level
 open Formalism.L2.Pj Formalism.L2.PjFree
@@ -24,11 +27,15 @@ open GlobalTheory.Dict
 
 namespace GlobalTheory.Dict.ThetaEig
 
-theorem mem_of_eigen_mem {A W : Type} [AddCommGroup A] [AddCommGroup W] [Module ℂ W] (N : AddSubgroup A)
-    [Finite (A ⧸ N)] (S : A → W →ₗ[ℂ] W) (hS : ∀ u v f, S u (S v f) = S (u + v) f)
+theorem mem_of_eigen_mem
+    {A W : Type} [AddCommGroup A] [AddCommGroup W] [Module ℂ W]
+    (N : AddSubgroup A) [Finite (A ⧸ N)]
+    (S : A → W →ₗ[ℂ] W) (hS : ∀ u v f, S u (S v f) = S (u + v) f)
     (H : AddSubgroup (AddChar (A ⧸ N) ℂ)) (hH : ∀ q ≠ 0, ∃ ψ ∈ H, ψ q ≠ 1)
-    (f : W) (hf : ∀ u ∈ N, S u f = f) (U V : Submodule ℂ W) (hU : ∀ u, S u f ∈ U)
-    (hV : ∀ ψ ∈ H, ∀ h ∈ U, (∀ u : A, S u h = ψ (u : A ⧸ N) • h) → h ∈ V) : f ∈ V := by
+    (f : W) (hf : ∀ u ∈ N, S u f = f)
+    (U V : Submodule ℂ W)
+    (hU : ∀ u, S u f ∈ U) (hV : ∀ ψ ∈ H, ∀ h ∈ U, (∀ u : A, S u h = ψ (u : A ⧸ N) • h) → h ∈ V)
+    : f ∈ V := by
   haveI := Fintype.ofFinite (A ⧸ N)
   haveI := Fintype.ofFinite H
   let T : A ⧸ N → W := fun q => S q.out f
@@ -52,10 +59,11 @@ theorem mem_of_eigen_mem {A W : Type} [AddCommGroup A] [AddCommGroup W] [Module 
   have h2 : ∀ q : A ⧸ N, q ≠ 0 → ∑ ψ : H, ψ.1 (-q) = 0 := by
     intro q hq
     obtain ⟨ψ, hψ, hne⟩ := hH (-q) (neg_ne_zero.2 hq)
-    let ev : AddChar H ℂ :=
-      { toFun := fun ψ => ψ.1 (-q)
-        map_zero_eq_one' := by simp
-        map_add_eq_mul' := fun a b => by simp }
+    let ev : AddChar H ℂ := {
+      toFun := fun ψ => ψ.1 (-q)
+      map_zero_eq_one' := by simp
+      map_add_eq_mul' := fun a b => by simp
+    }
     refine (AddChar.sum_eq_zero_iff_ne_zero (ψ := ev)).2 fun h => hne ?_
     exact DFunLike.congr_fun h ⟨ψ, hψ⟩
   have h3 : ∑ ψ : H, ∑ q, ψ.1 (-q) • T q = (Fintype.card H : ℂ) • f := by
@@ -69,9 +77,11 @@ theorem mem_of_eigen_mem {A W : Type} [AddCommGroup A] [AddCommGroup W] [Module 
   rw [← V.smul_mem_iff h4, ← h3]
   exact V.sum_mem fun ψ _ => h1 ψ
 
-theorem mem_span_prod {Z J : Type} (φ : J → Z → ℂ) (Y : Set J) (hY : Y.Finite) : ∀ (n : ℕ)
-    (F : (Fin n → Z) → ℂ), (∀ b z, (fun t => F (Function.update z b t)) ∈ Submodule.span ℂ (φ '' Y)) →
-    F ∈ Submodule.span ℂ ((fun (y : Fin n → J) (z : Fin n → Z) => ∏ b, φ (y b) (z b)) '' {y | ∀ b, y b ∈ Y}) := by
+theorem mem_span_prod {Z J : Type} (φ : J → Z → ℂ) (Y : Set J) (hY : Y.Finite)
+    : ∀ (n : ℕ) (F : (Fin n → Z) → ℂ),
+      (∀ b z, (fun t => F (Function.update z b t)) ∈ Submodule.span ℂ (φ '' Y))
+        → F ∈ Submodule.span ℂ
+          ((fun (y : Fin n → J) (z : Fin n → Z) => ∏ b, φ (y b) (z b)) '' {y | ∀ b, y b ∈ Y}) := by
   haveI : FiniteDimensional ℂ (Submodule.span ℂ (φ '' Y)) := FiniteDimensional.span_of_finite ℂ (hY.image φ)
   intro n
   induction n with
@@ -84,13 +94,14 @@ theorem mem_span_prod {Z J : Type} (φ : J → Z → ℂ) (Y : Set J) (hY : Y.Fi
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨default, fun b => b.elim0, rfl⟩)
   | succ n ih =>
     intro F hF
-    obtain ⟨m, h, k, hhk, hF'⟩ := ThetaAddition.exists_sum_mul (Submodule.span ℂ (φ '' Y)) _
-      (fun t (z : Fin n → Z) => F (Fin.cons t z))
-      (fun z => by
-        rcases isEmpty_or_nonempty Z with hZ | ⟨⟨t⟩⟩
-        · rw [Subsingleton.elim (fun t => F (Fin.cons t z)) 0]; exact Submodule.zero_mem _
-        · simpa only [Fin.update_cons_zero] using hF 0 (Fin.cons t z))
-      (fun t => ih _ fun b z => by simpa only [Fin.cons_update] using hF b.succ (Fin.cons t z))
+    obtain ⟨m, h, k, hhk, hF'⟩ :=
+      ThetaAddition.exists_sum_mul (Submodule.span ℂ (φ '' Y)) _
+        (fun t (z : Fin n → Z) => F (Fin.cons t z))
+        (fun z => by
+          rcases isEmpty_or_nonempty Z with hZ | ⟨⟨t⟩⟩
+          · rw [Subsingleton.elim (fun t => F (Fin.cons t z)) 0]; exact Submodule.zero_mem _
+          · simpa only [Fin.update_cons_zero] using hF 0 (Fin.cons t z))
+        (fun t => ih _ fun b z => by simpa only [Fin.cons_update] using hF b.succ (Fin.cons t z))
     have : F = ∑ i, fun z : Fin (n + 1) → Z => h i (z 0) * k i (Fin.tail z) := by
       funext z
       rw [Finset.sum_apply, ← hF', Fin.cons_self_tail]
@@ -106,10 +117,14 @@ theorem mem_span_prod {Z J : Type} (φ : J → Z → ℂ) (Y : Set J) (hY : Y.Fi
       refine Submodule.subset_span ⟨Fin.cons j y, fun b => Fin.cases hj hy b, ?_⟩
       funext z
       simp [Fin.prod_univ_succ, Fin.tail]
-    | zero_left c _ => simp only [Pi.zero_apply, zero_mul]; exact Submodule.zero_mem _
-    | zero_right c _ => simp only [Pi.zero_apply, mul_zero]; exact Submodule.zero_mem _
-    | add_left a a' c _ _ _ h1 h2 => simp only [Pi.add_apply, add_mul]; exact Submodule.add_mem _ h1 h2
-    | add_right a c c' _ _ _ h1 h2 => simp only [Pi.add_apply, mul_add]; exact Submodule.add_mem _ h1 h2
+    | zero_left c _ =>
+      simp only [Pi.zero_apply, zero_mul]; exact Submodule.zero_mem _
+    | zero_right c _ =>
+      simp only [Pi.zero_apply, mul_zero]; exact Submodule.zero_mem _
+    | add_left a a' c _ _ _ h1 h2 =>
+      simp only [Pi.add_apply, add_mul]; exact Submodule.add_mem _ h1 h2
+    | add_right a c c' _ _ _ h1 h2 =>
+      simp only [Pi.add_apply, mul_add]; exact Submodule.add_mem _ h1 h2
     | smul_left t a c _ _ h1 =>
       simp only [Pi.smul_apply, smul_mul_assoc]; exact Submodule.smul_mem _ t h1
     | smul_right t a c _ _ h1 =>
@@ -117,23 +132,30 @@ theorem mem_span_prod {Z J : Type} (φ : J → Z → ℂ) (Y : Set J) (hY : Y.Fi
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r g : ℕ} {X : Data E r}
 
-theorem thetaSignExpEF_add_selfDual_lattice {L : Lt E r} (hL : SelfD X L) {w : E} (hw : IsIntegral ℤ w) (hw1 : w + cc w = 1)
-    {u v : Fin r → E} (hu : u ∈ L) (hv : v ∈ L) :
-    eps1 X w (u + v) = eps1 X w u * eps1 X w v * cexp (-(Real.pi * I * ((EF X u v : ℚ) : ℂ))) := by
-  have h := (TensLat.epsW_semichar (Base.stdL_mem_Vset 1 1) hL hw hw1 (y := fun _ => u)
-    ((TensLat.mem_tens_stdL L _).2 fun _ => hu)).2 (fun _ => v) ((TensLat.mem_tens_stdL L _).2 fun _ => hv)
+theorem thetaSignExpEF_add_selfDual_lattice
+    {L : Lt E r} (hL : SelfD X L)
+    {w : E} (hw : IsIntegral ℤ w) (hw1 : w + cc w = 1)
+    {u v : Fin r → E} (hu : u ∈ L) (hv : v ∈ L)
+    : eps1 X w (u + v)
+      = eps1 X w u * eps1 X w v * cexp (-(Real.pi * I * ((EF X u v : ℚ) : ℂ))) := by
+  have h :=
+    (TensLat.epsW_semichar (Base.stdL_mem_Vset 1 1) hL hw hw1
+      (y := fun _ => u)
+      ((TensLat.mem_tens_stdL L _).2 fun _ =>
+        hu)).2 (fun _ => v) ((TensLat.mem_tens_stdL L _).2 fun _ => hv)
   simp only [epsW, Finset.univ_unique, Finset.sum_singleton] at h
   exact h
 
 theorem EF_zero_left (u : Fin r → E) : EF X 0 u = 0 := by
   rw [TensLat.EF_eq_bilin, map_zero, LinearMap.zero_apply]
 
-theorem EF_zero_right (u : Fin r → E) : EF X u 0 = 0 := by
-  rw [TensLat.EF_eq_bilin, map_zero]
+theorem EF_zero_right (u : Fin r → E) : EF X u 0 = 0 := by rw [TensLat.EF_eq_bilin, map_zero]
 
-theorem EF_int_of_mem {L : Lt E r} (hL : SelfD X L) {𝔐 : Ideal (𝓞 E)} {M : ℕ} (hM : M ≠ 0)
-    (h𝔐 : 𝔐 * conjI 𝔐 = Ideal.span {(M : 𝓞 E)}) {y u : Fin r → E} (hy : (M : E) • y ∈ 𝔐 • L)
-    (hu : u ∈ 𝔐 • L) : ∃ k : ℤ, EF X y u = k := by
+theorem EF_int_of_mem
+    {L : Lt E r} (hL : SelfD X L)
+    {𝔐 : Ideal (𝓞 E)} {M : ℕ} (hM : M ≠ 0) (h𝔐 : 𝔐 * conjI 𝔐 = Ideal.span {(M : 𝓞 E)})
+    {y u : Fin r → E} (hy : (M : E) • y ∈ 𝔐 • L) (hu : u ∈ 𝔐 • L)
+    : ∃ k : ℤ, EF X y u = k := by
   have hM' : (M : E) ≠ 0 := Nat.cast_ne_zero.2 hM
   refine Submodule.smul_induction_on hu (fun a ha l hl => ?_) ?_
   · have h1 : Lev.bar a • ((M : E) • y) ∈ (Ideal.span {(M : 𝓞 E)}) • L := by
@@ -153,16 +175,19 @@ theorem EF_int_of_mem {L : Lt E r} (hL : SelfD X L) {𝔐 : Ideal (𝓞 E)} {M :
   · rintro u v ⟨k, hk⟩ ⟨k', hk'⟩
     exact ⟨k + k', by rw [Lev.EF_add_right, hk, hk', Int.cast_add]⟩
 
-theorem mem_of_EF_int {L : Lt E r} (hL : SelfD X L) {𝔐 : Ideal (𝓞 E)} {M : ℕ} (hM : M ≠ 0)
-    (h𝔐 : 𝔐 * conjI 𝔐 = Ideal.span {(M : 𝓞 E)}) {u : Fin r → E}
-    (h : ∀ y : Fin r → E, (M : E) • y ∈ 𝔐 • L → ∃ k : ℤ, EF X y u = k) : u ∈ 𝔐 • L := by
+theorem mem_of_EF_int
+    {L : Lt E r} (hL : SelfD X L)
+    {𝔐 : Ideal (𝓞 E)} {M : ℕ} (hM : M ≠ 0) (h𝔐 : 𝔐 * conjI 𝔐 = Ideal.span {(M : 𝓞 E)})
+    {u : Fin r → E} (h : ∀ y : Fin r → E, (M : E) • y ∈ 𝔐 • L → ∃ k : ℤ, EF X y u = k)
+    : u ∈ 𝔐 • L := by
   have hM' : (M : E) ≠ 0 := Nat.cast_ne_zero.2 hM
   have h1 : ∀ b ∈ conjI 𝔐, b • ((M : E)⁻¹ • u) ∈ L := by
     intro b hb
     refine (hL.2 _).2 fun l hl => ?_
-    obtain ⟨k, hk⟩ := h ((M : E)⁻¹ • (Lev.bar b • l)) (by
-      rw [smul_inv_smul₀ hM']
-      exact Submodule.smul_mem_smul (Lev.mem_conjI.1 hb) hl)
+    obtain ⟨k, hk⟩ :=
+      h ((M : E)⁻¹ • (Lev.bar b • l)) (by
+        rw [smul_inv_smul₀ hM']
+        exact Submodule.smul_mem_smul (Lev.mem_conjI.1 hb) hl)
     rw [Lev.EF_smulE, Lev.EF_smul, Lev.bar_bar] at hk
     refine ⟨-k, ?_⟩
     rw [TensLat.EF_swap, Int.cast_neg, ← hk]
@@ -188,25 +213,30 @@ noncomputable def fockL (a : Fin g → ℂ) : ((Fin g → ℂ) → ℂ) →ₗ[�
 theorem pv_add (u v : Fin r → E) : pv X idx x (u + v) = pv X idx x u + pv X idx x v := by
   unfold pv; rw [per_add]; rfl
 
-theorem pv_zero : pv X idx x 0 = 0 := by
-  unfold pv; rw [per_zero]; rfl
+theorem pv_zero : pv X idx x 0 = 0 := by unfold pv; rw [per_zero]; rfl
 
 variable {X bas idx x}
 
-theorem fockL_fockL (hs : IsSympl X bas) (hd : x ∈ X.dom) (u v : Fin r → E) (f : (Fin g → ℂ) → ℂ) :
-    fockL X bas idx x (pv X idx x u) (fockL X bas idx x (pv X idx x v) f) =
-      cexp (-(Real.pi * I * ((EF X u v : ℚ) : ℂ))) • fockL X bas idx x (pv X idx x (u + v)) f := by
+theorem fockL_fockL (hs : IsSympl X bas) (hd : x ∈ X.dom) (u v : Fin r → E) (f : (Fin g → ℂ) → ℂ)
+    : fockL X bas idx x (pv X idx x u) (fockL X bas idx x (pv X idx x v) f)
+      = cexp (-(Real.pi * I * ((EF X u v : ℚ) : ℂ)))
+        • fockL X bas idx x (pv X idx x (u + v)) f := by
   have h := (fock_laws E r X g bas idx 0 hs Even.zero x hd 1 f).1 (pv X idx x u) (pv X idx x v)
   rw [(hx_laws E r X g bas idx 0 hs Even.zero x hd).2.2.1, ← pv_add] at h
   simp only [Nat.cast_one, _root_.one_mul, ofReal_ratCast] at h
   exact h
 
-theorem exists_span_one (hs : IsSympl X bas) (hd : x ∈ X.dom) {w : E} (hw : IsIntegral ℤ w)
-    (hw1 : w + cc w = 1) {L : Lt E r} (hL : SelfD X L) {𝔐 : Ideal (𝓞 E)} {M : ℕ} (hM : M ≠ 0)
-    (h𝔐 : 𝔐 * conjI 𝔐 = Ideal.span {(M : 𝓞 E)}) {θ : (Fin g → ℂ) → ℂ} (hθ : IsTheta1 X bas idx w x L θ)
-    (h0 : θ ≠ 0) : ∃ Y : Set (Fin r → E), Y.Finite ∧ (∀ y ∈ Y, (M : E) • y ∈ 𝔐 • L) ∧
-      ∀ f, IsTheta1 X bas idx w x (𝔐 • L) f →
-        f ∈ Submodule.span ℂ ((fun y => fock X bas idx x 1 (pv X idx x y) θ) '' Y) := by
+theorem exists_span_one
+    (hs : IsSympl X bas) (hd : x ∈ X.dom)
+    {w : E} (hw : IsIntegral ℤ w) (hw1 : w + cc w = 1)
+    {L : Lt E r} (hL : SelfD X L)
+    {𝔐 : Ideal (𝓞 E)} {M : ℕ} (hM : M ≠ 0) (h𝔐 : 𝔐 * conjI 𝔐 = Ideal.span {(M : 𝓞 E)})
+    {θ : (Fin g → ℂ) → ℂ} (hθ : IsTheta1 X bas idx w x L θ) (h0 : θ ≠ 0)
+    : ∃ Y : Set (Fin r → E),
+      Y.Finite ∧ (∀ y ∈ Y, (M : E) • y ∈ 𝔐 • L)
+        ∧ ∀ f,
+          IsTheta1 X bas idx w x (𝔐 • L) f
+            → f ∈ Submodule.span ℂ ((fun y => fock X bas idx x 1 (pv X idx x y) θ) '' Y) := by
   let N : AddSubgroup L := (𝔐 • L).toAddSubgroup.comap L.subtype.toAddMonoidHom
   have hN : ∀ u : L, u ∈ N ↔ (u : Fin r → E) ∈ 𝔐 • L := fun _ => Iff.rfl
   haveI : Finite (L ⧸ N) := by
@@ -235,41 +265,56 @@ theorem exists_span_one (hs : IsSympl X bas) (hd : x ∈ X.dom) {w : E} (hw : Is
   have hen : ∀ y u, e (-y) u = e y (-u) := by
     intro y u
     simp only [e, TensLat.EF_eq_bilin, map_neg, LinearMap.neg_apply]
-  let H : AddSubgroup (AddChar (L ⧸ N) ℂ) :=
-    { carrier := {ψ | ∃ y : Fin r → E, (M : E) • y ∈ 𝔐 • L ∧ ∀ u : L, ψ (u : L ⧸ N) = e y u}
-      zero_mem' := ⟨0, by simp, fun u => by simp [e, EF_zero_left]⟩
-      add_mem' := by
-        rintro ψ ψ' ⟨y, hy, h⟩ ⟨y', hy', h'⟩
-        exact ⟨y + y', by rw [smul_add]; exact add_mem hy hy', fun u => by
-          rw [AddChar.add_apply, h, h', hel]⟩
-      neg_mem' := by
-        rintro ψ ⟨y, hy, h⟩
-        exact ⟨-y, by rw [smul_neg]; exact neg_mem hy, fun u => by
-          rw [AddChar.neg_apply, ← QuotientAddGroup.mk_neg, h, hen]; rfl⟩ }
+  let H : AddSubgroup (AddChar (L ⧸ N) ℂ) := {
+    carrier := {ψ | ∃ y : Fin r → E, (M : E) • y ∈ 𝔐 • L ∧ ∀ u : L, ψ (u : L ⧸ N) = e y u}
+    zero_mem' := ⟨0, by simp, fun u => by simp [e, EF_zero_left]⟩
+    add_mem' := by
+      rintro ψ ψ' ⟨y, hy, h⟩ ⟨y', hy', h'⟩
+      exact ⟨
+        y + y',
+        by rw [smul_add]; exact add_mem hy hy',
+        fun u => by rw [AddChar.add_apply, h, h', hel]
+      ⟩
+    neg_mem' := by
+      rintro ψ ⟨y, hy, h⟩
+      exact ⟨
+        -y,
+        by rw [smul_neg]; exact neg_mem hy,
+        fun u => by rw [AddChar.neg_apply, ← QuotientAddGroup.mk_neg, h, hen]; rfl
+      ⟩
+  }
   have hH : ∀ q ≠ 0, ∃ ψ ∈ H, ψ q ≠ 1 := by
     intro q hq
     obtain ⟨u, rfl⟩ := QuotientAddGroup.mk_surjective q
     by_contra hcon
     push Not at hcon
     refine hq ((QuotientAddGroup.eq_zero_iff _).2 (mem_of_EF_int hL hM h𝔐 fun y hy => ?_))
-    let χ : L →+ Additive ℂ :=
-      { toFun := fun u => Additive.ofMul (e y u)
-        map_zero' := by simp [e, EF_zero_right]
-        map_add' := fun a b => by rw [Submodule.coe_add, her, ofMul_mul] }
+    let χ : L →+ Additive ℂ := {
+      toFun := fun u => Additive.ofMul (e y u)
+      map_zero' := by simp [e, EF_zero_right]
+      map_add' := fun a b => by rw [Submodule.coe_add, her, ofMul_mul]
+    }
     have hχ : N ≤ χ.ker := fun a ha =>
       congrArg Additive.ofMul ((he1 y a).2 (EF_int_of_mem hL hM h𝔐 hy ha))
     exact (he1 y u).1
       (hcon (AddChar.toAddMonoidHomEquiv.symm (QuotientAddGroup.lift N χ hχ)) ⟨y, hy, fun _ => rfl⟩)
   choose yy hyy hyy' using fun ψ : H => ψ.2
   refine ⟨Set.range yy, Set.finite_range _, by rintro _ ⟨ψ, rfl⟩; exact hyy ψ, fun f hf => ?_⟩
-  let U : Submodule ℂ ((Fin g → ℂ) → ℂ) :=
-    { carrier := {f | Differentiable ℂ f}
-      zero_mem' := differentiable_const 0
-      add_mem' := fun h h' => h.add h'
-      smul_mem' := fun c _ h => h.const_smul c }
+  let U : Submodule ℂ ((Fin g → ℂ) → ℂ) := {
+    carrier := {f | Differentiable ℂ f}
+    zero_mem' := differentiable_const 0
+    add_mem' := fun h h' => h.add h'
+    smul_mem' := fun c _ h => h.const_smul c
+  }
   have hdiff := fun f => (fock_laws E r X g bas idx 0 hs Even.zero x hd 1 f).2.2.2.1
-  refine mem_of_eigen_mem N (fun u : L => eps1 X w u • fockL X bas idx x (pv X idx x u)) (fun u v f => ?_) H hH
-    f (fun u hu => hf.2 u hu) U _ (fun u => U.smul_mem _ (hdiff f hf.1 _)) fun ψ hψ h hU hh => ?_
+  refine mem_of_eigen_mem N
+    (fun u : L => eps1 X w u • fockL X bas idx x (pv X idx x u))
+    (fun u v f => ?_)
+    H hH f
+    (fun u hu => hf.2 u hu)
+    U _
+    (fun u => U.smul_mem _ (hdiff f hf.1 _))
+    fun ψ hψ h hU hh => ?_
   · obtain ⟨k, hk⟩ := (hL.2 u).1 u.2 v v.2
     simp only [LinearMap.smul_apply, map_smul, fockL_fockL hs hd, smul_smul, Submodule.coe_add,
       thetaSignExpEF_add_selfDual_lattice hL hw hw1 u.2 v.2]
@@ -284,15 +329,17 @@ theorem exists_span_one (hs : IsSympl X bas) (hd : x ∈ X.dom) {w : E} (hw : Is
       refine smul_right_injective _ (show e y u ≠ 0 from Complex.exp_ne_zero _) ?_
       simp only []
       rw [← h2, fockL_fockL hs hd, smul_comm (e y u), smul_smul (e y u), ← Complex.exp_add]
-      have e1 : EF X u (-y) = -EF X y u * -1 := by
+      have e1 : EF X u (-y) = - EF X y u * -1 := by
         rw [← TensLat.EF_swap]; simp only [TensLat.EF_eq_bilin, map_neg, mul_neg, _root_.mul_one]
-      have e2 : EF X (-y) u = -EF X y u := by simp only [TensLat.EF_eq_bilin, map_neg, LinearMap.neg_apply]
+      have e2 : EF X (-y) u = - EF X y u := by
+        simp only [TensLat.EF_eq_bilin, map_neg, LinearMap.neg_apply]
       rw [e1, e2]
       congr 3
       push_cast
       ring
-    obtain ⟨a, ha⟩ := ThetaOne.exists_eq_smul_of_isTheta1 E r X g bas idx 0 hs Even.zero w hw hw1 L hL x hd
-      _ θ h1 hθ h0
+    obtain ⟨a, ha⟩ :=
+      ThetaOne.exists_eq_smul_of_isTheta1 E r X g bas idx 0 hs Even.zero w hw hw1 L hL x hd _ θ h1
+        hθ h0
     have h3 := congrArg (fockL X bas idx x (pv X idx x y)) ha
     have h4 : EF X y (-y) = 0 := by
       have := TensLat.EF_swap X y y
@@ -304,40 +351,87 @@ theorem exists_span_one (hs : IsSympl X bas) (hd : x ∈ X.dom) {w : E} (hw : Is
     rw [h3]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨y, ⟨_, rfl⟩, rfl⟩)
 
-theorem theta_eq_sum_translates : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g q0 : ℕ) (hr : X.p0 + q0 = r) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r) (n : ℕ), IsSympl X bas → Even n → ∀ w : 𝓞 E, (w : E) + cc (w : E) = 1 → ∀ L : Lt E r, SelfD X L → ∀ x ∈ X.dom, X.IsOrtho x → ∀ t : ℝ, 0 < t → (∀ τ, X.c τ = t) → ∀ (𝔐 : Ideal (𝓞 E)) (M : ℕ), Odd M → 𝔐 * conjI 𝔐 = Ideal.span {(M : 𝓞 E)} → ∀ v : TF n g, IsVac X bas (w : E) (tens (stdL E n) L) v → ∀ (θ : (Fin g → ℂ) → ℂ) (κ : ℂ), IsTheta1 X bas idx (w : E) x L θ → MeanOne X bas idx x L θ → (∀ z : Fin n → Fin g → ℂ, ∏ b, θ (z b) = κ * thA X bas idx v x z) → ∀ F : (Fin n → Fin g → ℂ) → ℂ, Differentiable ℂ F → (∀ u : Matrix (Fin n) (Fin r) E, (∀ b, u b ∈ 𝔐 • L) → ∀ z, F z = epsW X (w : E) u * cexp (-(Real.pi * ∑ b, hx X bas idx x (z b + (1 / 2 : ℂ) • pv X idx x (u b)) (pv X idx x (u b)))) * F (fun b => z b + pv X idx x (u b))) → ∃ (s : Finset (Matrix (Fin n) (Fin r) E)) (cf : Matrix (Fin n) (Fin r) E → ℂ), (∀ y ∈ s, ∀ b, (M : E) • y b ∈ 𝔐 • L) ∧ ∀ z, F z = ∑ y ∈ s, cf y * (κ * thA X bas idx (heisG X bas y v) x z) := by
-  intro E _ _ _ r X g q0 _ bas idx n hs hn w hw L hL x hd _ t _ _ 𝔐 M hM h𝔐 v hv θ κ hθ hmean hκ F hF hlaw
-  have h0 : θ ≠ 0 := by
-    rintro rfl
-    obtain ⟨_, _, -, -, h⟩ := hmean
-    simp at h
-  obtain ⟨Y, hY, hYM, hspan⟩ := exists_span_one hs hd w.2 hw hL hM.pos.ne' h𝔐 hθ h0
-  have h1 := mem_span_prod (fun y => fock X bas idx x 1 (pv X idx x y) θ) Y hY n F fun b z => by
-    refine hspan _ ⟨hF.comp (fun s => (hasFDerivAt_update z s).differentiableAt), fun u hu => ?_⟩
-    funext s
-    have h := hlaw (Pi.single b u) (fun b' => by
-      rcases eq_or_ne b' b with rfl | hb
-      · simpa using hu
-      · simp [Pi.single_eq_of_ne hb]) (Function.update z b s)
-    rw [h]
-    simp only [Pi.smul_apply, smul_eq_mul, fock, epsW, eps1]
-    rw [Finset.sum_eq_single b, Finset.sum_eq_single b]
-    · simp only [Pi.single_eq_same, Function.update_self, Nat.cast_one, _root_.one_mul, _root_.mul_assoc]
-      congr 3
-      funext b'
-      rcases eq_or_ne b' b with rfl | hb
-      · simp
-      · simp [Pi.single_eq_of_ne hb, pv_zero, hb]
-    · intro b' _ hb
-      simp [Pi.single_eq_of_ne hb, pv_zero, fock_hx_zero_right]
-    · simp
-    · intro b' _ hb
-      simp [Pi.single_eq_of_ne hb, EF_zero_left]
-    · simp
-  obtain ⟨l, hl, e⟩ := (Finsupp.mem_span_image_iff_linearCombination ℂ).1 h1
-  refine ⟨l.support, l, fun y hy b => hYM _ (hl hy b), fun z => ?_⟩
-  rw [← e, Finsupp.linearCombination_apply, Finsupp.sum, Finset.sum_apply]
-  refine Finset.sum_congr rfl fun y _ => ?_
-  rw [Pi.smul_apply, smul_eq_mul,
-    (fock_laws E r X g bas idx n hs hn x hd 1 θ).2.2.2.2 (fun _ => θ) κ v hv.1 hκ y z]
+theorem theta_eq_sum_translates
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g q0 : ℕ)
+        (hr : X.p0 + q0 = r) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r)
+        (n : ℕ),
+      IsSympl X bas → Even n
+        → ∀ w : 𝓞 E,
+          (w : E) + cc (w : E) = 1
+            → ∀ L : Lt E r,
+              SelfD X L
+                → ∀ x ∈ X.dom,
+                  X.IsOrtho x
+                    → ∀ t : ℝ,
+                      0 < t → (∀ τ, X.c τ = t)
+                        → ∀ (𝔐 : Ideal (𝓞 E)) (M : ℕ),
+                          Odd M → 𝔐 * conjI 𝔐 = Ideal.span {(M : 𝓞 E)}
+                            → ∀ v : TF n g,
+                              IsVac X bas (w : E) (tens (stdL E n) L) v
+                                → ∀ (θ : (Fin g → ℂ) → ℂ) (κ : ℂ),
+                                  IsTheta1 X bas idx (w : E) x L θ → MeanOne X bas idx x L θ
+                                    → (∀ z : Fin n → Fin g → ℂ,
+                                      ∏ b, θ (z b) = κ * thA X bas idx v x z)
+                                    → ∀ F : (Fin n → Fin g → ℂ) → ℂ,
+                                      Differentiable ℂ F
+                                        → (∀ u : Matrix (Fin n) (Fin r) E,
+                                          (∀ b, u b ∈ 𝔐 • L)
+                                            → ∀ z,
+                                              F z
+                                                = epsW X (w : E) u
+                                                  * cexp (-(Real.pi
+                                                    * ∑ b, hx X bas idx x (z b + (1 / 2 : ℂ) • pv X idx x (u b)) (pv X idx x (u b))))
+                                                  * F (fun b => z b + pv X idx x (u b)))
+                                        → ∃ (s : Finset (Matrix (Fin n) (Fin r) E))
+                                            (cf : Matrix (Fin n) (Fin r) E → ℂ),
+                                          (∀ y ∈ s, ∀ b, (M : E) • y b ∈ 𝔐 • L)
+                                            ∧ ∀ z,
+                                              F z
+                                                = ∑ y ∈ s, cf y * (κ * thA X bas idx (heisG X bas y v) x z) :=
+  by
+    intro E _ _ _ r X g q0 _ bas idx n hs hn w hw L hL x hd _ t _ _ 𝔐 M hM h𝔐 v hv θ κ hθ hmean hκ F
+      hF hlaw
+    have h0 : θ ≠ 0 := by
+      rintro rfl
+      obtain ⟨_, _, -, -, h⟩ := hmean
+      simp at h
+    obtain ⟨Y, hY, hYM, hspan⟩ := exists_span_one hs hd w.2 hw hL hM.pos.ne' h𝔐 hθ h0
+    have h1 :=
+      mem_span_prod
+        (fun y => fock X bas idx x 1 (pv X idx x y) θ)
+        Y hY n F
+        fun b z => by
+          refine hspan _
+            ⟨hF.comp (fun s => (hasFDerivAt_update z s).differentiableAt), fun u hu => ?_⟩
+          funext s
+          have h :=
+            hlaw (Pi.single b u)
+              (fun b' => by
+                rcases eq_or_ne b' b with rfl | hb
+                · simpa using hu
+                · simp [Pi.single_eq_of_ne hb])
+              (Function.update z b s)
+          rw [h]
+          simp only [Pi.smul_apply, smul_eq_mul, fock, epsW, eps1]
+          rw [Finset.sum_eq_single b, Finset.sum_eq_single b]
+          · simp only [Pi.single_eq_same, Function.update_self, Nat.cast_one, _root_.one_mul,
+              _root_.mul_assoc]
+            congr 3
+            funext b'
+            rcases eq_or_ne b' b with rfl | hb
+            · simp
+            · simp [Pi.single_eq_of_ne hb, pv_zero, hb]
+          · intro b' _ hb
+            simp [Pi.single_eq_of_ne hb, pv_zero, fock_hx_zero_right]
+          · simp
+          · intro b' _ hb
+            simp [Pi.single_eq_of_ne hb, EF_zero_left]
+          · simp
+    obtain ⟨l, hl, e⟩ := (Finsupp.mem_span_image_iff_linearCombination ℂ).1 h1
+    refine ⟨l.support, l, fun y hy b => hYM _ (hl hy b), fun z => ?_⟩
+    rw [← e, Finsupp.linearCombination_apply, Finsupp.sum, Finset.sum_apply]
+    refine Finset.sum_congr rfl fun y _ => ?_
+    rw [Pi.smul_apply, smul_eq_mul,
+      (fock_laws E r X g bas idx n hs hn x hd 1 θ).2.2.2.2 (fun _ => θ) κ v hv.1 hκ y z]
 
 end GlobalTheory.Dict.ThetaEig

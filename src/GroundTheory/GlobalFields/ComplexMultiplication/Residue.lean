@@ -11,8 +11,7 @@ noncomputable section
 namespace GroundTheory.Global
 namespace Elliptic
 
-def dslopeIter (p : ℂ) (k : ℕ) (g : ℂ → ℂ) : ℂ → ℂ :=
-  (Function.swap dslope p)^[k] g
+def dslopeIter (p : ℂ) (k : ℕ) (g : ℂ → ℂ) : ℂ → ℂ := (Function.swap dslope p)^[k] g
 
 lemma dslopeIter_zero (p : ℂ) (g : ℂ → ℂ) : dslopeIter p 0 g = g := rfl
 
@@ -88,7 +87,6 @@ lemma dslopeIter_congr {p : ℂ} {g₁ g₂ : ℂ → ℂ} (h : g₁ =ᶠ[𝓝 p
     · rw [dslope_same, dslope_same, ih.deriv_eq]
     · rw [dslope_of_ne _ hzp, dslope_of_ne _ hzp, slope_def_field, slope_def_field, hz, hp]
 
-
 open Classical in
 def meromorphicShift (f : ℂ → ℂ) (p : ℂ) : ℕ := by
   classical
@@ -121,18 +119,16 @@ lemma analyticAt_pow_mul_of_meromorphicShift_le {f : ℂ → ℂ} {p : ℂ} (hf 
     rw [e]
     exact (analyticAt_id.sub analyticAt_const).mul ih
 
-def laurentNumerator (f : ℂ → ℂ) (p : ℂ) : ℂ → ℂ :=
-  fun z ↦ (z - p) ^ (meromorphicShift f p + 1) * f z
+def laurentNumerator (f : ℂ → ℂ) (p : ℂ) : ℂ → ℂ := fun z ↦
+  (z - p) ^ (meromorphicShift f p + 1) * f z
 
 lemma analyticAt_laurentNumerator {f : ℂ → ℂ} {p : ℂ} (hf : MeromorphicAt f p) :
     AnalyticAt ℂ (laurentNumerator f p) p :=
   analyticAt_pow_mul_of_meromorphicShift_le hf (Nat.le_succ _)
 
-def laurentCoeff (f : ℂ → ℂ) (p : ℂ) (j : ℕ) : ℂ :=
-  dslopeIter p j (laurentNumerator f p) p
+def laurentCoeff (f : ℂ → ℂ) (p : ℂ) (j : ℕ) : ℂ := dslopeIter p j (laurentNumerator f p) p
 
-def residue (f : ℂ → ℂ) (p : ℂ) : ℂ :=
-  laurentCoeff f p (meromorphicShift f p)
+def residue (f : ℂ → ℂ) (p : ℂ) : ℂ := laurentCoeff f p (meromorphicShift f p)
 
 def principalPart (f : ℂ → ℂ) (p : ℂ) (z : ℂ) : ℂ :=
   ∑ j ∈ Finset.range (meromorphicShift f p + 1),
@@ -145,8 +141,8 @@ lemma analyticAt_regularPart {f : ℂ → ℂ} {p : ℂ} (hf : MeromorphicAt f p
     AnalyticAt ℂ (regularPart f p) p :=
   analyticAt_dslopeIter (analyticAt_laurentNumerator hf) _
 
-theorem eq_principalPart_add_regularPart (f : ℂ → ℂ) (p : ℂ) {z : ℂ} (hz : z ≠ p) :
-    f z = principalPart f p z + regularPart f p z := by
+theorem eq_principalPart_add_regularPart (f : ℂ → ℂ) (p : ℂ) {z : ℂ} (hz : z ≠ p)
+    : f z = principalPart f p z + regularPart f p z := by
   set n := meromorphicShift f p
   have h := eq_sum_add_dslopeIter p (laurentNumerator f p) (n + 1) z
   have hzp : z - p ≠ 0 := sub_ne_zero.2 hz
@@ -165,24 +161,25 @@ theorem eq_principalPart_add_regularPart (f : ℂ → ℂ) (p : ℂ) {z : ℂ} (
   field_simp
   rfl
 
-theorem residue_eq_dslopeIter {f : ℂ → ℂ} {p : ℂ} {n : ℕ}
-    (hn : AnalyticAt ℂ (fun z ↦ (z - p) ^ (n + 1) * f z) p) :
-    residue f p = dslopeIter p n (fun z ↦ (z - p) ^ (n + 1) * f z) p := by
+theorem residue_eq_dslopeIter
+    {f : ℂ → ℂ} {p : ℂ} {n : ℕ} (hn : AnalyticAt ℂ (fun z ↦ (z - p) ^ (n + 1) * f z) p)
+    : residue f p = dslopeIter p n (fun z ↦ (z - p) ^ (n + 1) * f z) p := by
   have hf : MeromorphicAt f p := ⟨n + 1, by simpa [smul_eq_mul] using hn⟩
   set m := meromorphicShift f p with hm
-  have step : ∀ j, m ≤ j + 1 →
-      dslopeIter p (j + 1) (fun z ↦ (z - p) ^ (j + 1 + 1) * f z) p =
-        dslopeIter p j (fun z ↦ (z - p) ^ (j + 1) * f z) p := by
+  have step
+      : ∀ j,
+        m ≤ j + 1
+          → dslopeIter p (j + 1) (fun z ↦ (z - p) ^ (j + 1 + 1) * f z) p
+            = dslopeIter p j (fun z ↦ (z - p) ^ (j + 1) * f z) p := by
     intro j hj
     have hd : DifferentiableAt ℂ (fun z ↦ (z - p) ^ (j + 1) * f z) p :=
       (analyticAt_pow_mul_of_meromorphicShift_le hf hj).differentiableAt
     rw [dslopeIter_succ]
-    have e : (fun z ↦ (z - p) ^ (j + 1 + 1) * f z) =
-        fun z ↦ (z - p) * ((z - p) ^ (j + 1) * f z) := by
+    have e
+        : (fun z ↦ (z - p) ^ (j + 1 + 1) * f z) = fun z ↦ (z - p) * ((z - p) ^ (j + 1) * f z) := by
       funext z; ring
     rw [e, swap_dslope_sub_mul hd]
-  have up : ∀ j, m ≤ j →
-      dslopeIter p j (fun z ↦ (z - p) ^ (j + 1) * f z) p = residue f p := by
+  have up : ∀ j, m ≤ j → dslopeIter p j (fun z ↦ (z - p) ^ (j + 1) * f z) p = residue f p := by
     intro j hj
     induction j, hj using Nat.le_induction with
     | base => rfl
@@ -192,8 +189,8 @@ theorem residue_eq_dslopeIter {f : ℂ → ℂ} {p : ℂ} {n : ℕ}
   · rw [← step n (by omega), up (n + 1) (by omega)]
   · exact (up n h).symm
 
-theorem residue_congr {f₁ f₂ : ℂ → ℂ} {p : ℂ} (hf₁ : MeromorphicAt f₁ p)
-    (h : f₁ =ᶠ[𝓝[≠] p] f₂) : residue f₁ p = residue f₂ p := by
+theorem residue_congr {f₁ f₂ : ℂ → ℂ} {p : ℂ} (hf₁ : MeromorphicAt f₁ p) (h : f₁ =ᶠ[𝓝[≠] p] f₂)
+    : residue f₁ p = residue f₂ p := by
   set n := meromorphicShift f₁ p + 1
   have h₁ : AnalyticAt ℂ (fun z ↦ (z - p) ^ (n + 1) * f₁ z) p :=
     analyticAt_pow_mul_of_meromorphicShift_le hf₁ (by omega)
@@ -206,11 +203,13 @@ theorem residue_congr {f₁ f₂ : ℂ → ℂ} {p : ℂ} (hf₁ : MeromorphicAt
   rw [residue_eq_dslopeIter h₁, residue_eq_dslopeIter (h₁.congr heq)]
   exact (dslopeIter_congr heq n).eq_of_nhds
 
-theorem residue_eq_of_eventuallyEq {f u : ℂ → ℂ} {p c : ℂ} (hu : AnalyticAt ℂ u p)
-    (h : f =ᶠ[𝓝[≠] p] fun z ↦ c * (z - p)⁻¹ + u z) : residue f p = c := by
+theorem residue_eq_of_eventuallyEq
+    {f u : ℂ → ℂ} {p c : ℂ} (hu : AnalyticAt ℂ u p) (h : f =ᶠ[𝓝[≠] p] fun z ↦ c * (z - p)⁻¹ + u z)
+    : residue f p = c := by
   have hG : AnalyticAt ℂ (fun z ↦ c * (z - p) + (z - p) ^ 2 * u z) p := by fun_prop
-  have heq : (fun z ↦ (z - p) ^ (1 + 1) * f z) =ᶠ[𝓝 p]
-      fun z ↦ c * (z - p) + (z - p) ^ 2 * u z := by
+  have heq
+      : (fun z ↦ (z - p) ^ (1 + 1) * f z) =ᶠ[𝓝 p]
+        fun z ↦ c * (z - p) + (z - p) ^ 2 * u z := by
     rw [EventuallyEq, eventually_nhdsWithin_iff] at h
     filter_upwards [h] with z hz
     rcases eq_or_ne z p with rfl | hzp
@@ -221,12 +220,13 @@ theorem residue_eq_of_eventuallyEq {f u : ℂ → ℂ} {p c : ℂ} (hu : Analyti
   rw [residue_eq_dslopeIter (n := 1) (hG.congr heq.symm), dslopeIter_succ, dslopeIter_zero]
   show dslope _ p p = c
   rw [dslope_same, heq.deriv_eq]
-  have hd := (((hasDerivAt_id p).sub_const p).const_mul c).add
-    ((((hasDerivAt_id p).sub_const p).pow 2).mul hu.differentiableAt.hasDerivAt)
+  have hd :=
+    (((hasDerivAt_id p).sub_const p).const_mul c).add
+      ((((hasDerivAt_id p).sub_const p).pow 2).mul hu.differentiableAt.hasDerivAt)
   exact hd.deriv.trans (by simp)
 
-theorem residue_eq_zero_of_analyticAt {f : ℂ → ℂ} {p : ℂ} (hf : AnalyticAt ℂ f p) :
-    residue f p = 0 :=
+theorem residue_eq_zero_of_analyticAt {f : ℂ → ℂ} {p : ℂ} (hf : AnalyticAt ℂ f p)
+    : residue f p = 0 :=
   residue_eq_of_eventuallyEq hf (Eventually.of_forall fun z ↦ by simp)
 
 lemma swap_dslope_comp_mul {G : ℂ → ℂ} {c w₀ : ℂ} (hc : c ≠ 0)
@@ -259,8 +259,8 @@ lemma dslopeIter_comp_mul {G : ℂ → ℂ} {c w₀ : ℂ} (hc : c ≠ 0) (hG : 
     rw [dslopeIter_succ']
     ring
 
-theorem residue_comp_mul {f : ℂ → ℂ} {c w₀ : ℂ} (hc : c ≠ 0) (hf : MeromorphicAt f (c * w₀)) :
-    residue (fun w ↦ f (c * w)) w₀ = c⁻¹ * residue f (c * w₀) := by
+theorem residue_comp_mul {f : ℂ → ℂ} {c w₀ : ℂ} (hc : c ≠ 0) (hf : MeromorphicAt f (c * w₀))
+    : residue (fun w ↦ f (c * w)) w₀ = c⁻¹ * residue f (c * w₀) := by
   set n := meromorphicShift f (c * w₀)
   set G : ℂ → ℂ := fun z ↦ (z - c * w₀) ^ (n + 1) * f z with hGdef
   have hG : AnalyticAt ℂ G (c * w₀) := analyticAt_pow_mul_of_meromorphicShift_le hf (Nat.le_succ n)
@@ -281,8 +281,9 @@ theorem residue_comp_mul {f : ℂ → ℂ} {c w₀ : ℂ} (hc : c ≠ 0) (hf : M
   rw [this, inv_pow, pow_succ]
   field_simp
 
-theorem residue_logDeriv {f : ℂ → ℂ} {p : ℂ} (hf : MeromorphicAt f p) {n : ℤ}
-    (hn : meromorphicOrderAt f p = n) : residue (logDeriv f) p = n := by
+theorem residue_logDeriv
+    {f : ℂ → ℂ} {p : ℂ} (hf : MeromorphicAt f p) {n : ℤ} (hn : meromorphicOrderAt f p = n)
+    : residue (logDeriv f) p = n := by
   obtain ⟨g, hg, hgp, hfg⟩ := (meromorphicOrderAt_eq_int_iff hf).1 hn
   simp only [smul_eq_mul] at hfg
   have hu : AnalyticAt ℂ (fun z ↦ deriv g z / g z) p := hg.deriv.div hg hgp
@@ -291,24 +292,25 @@ theorem residue_logDeriv {f : ℂ → ℂ} {p : ℂ} (hf : MeromorphicAt f p) {n
     have := eventually_eventually_nhdsWithin.2 hfg
     filter_upwards [this, self_mem_nhdsWithin] with z hz hzp
     rwa [nhdsWithin_eq_nhds.2 (isOpen_compl_singleton.mem_nhds hzp)] at hz
-  have h3 : ∀ᶠ z in 𝓝[≠] p, g z ≠ 0 :=
-    nhdsWithin_le_nhds (hg.continuousAt.eventually_ne hgp)
+  have h3 : ∀ᶠ z in 𝓝[≠] p, g z ≠ 0 := nhdsWithin_le_nhds (hg.continuousAt.eventually_ne hgp)
   have h4 : ∀ᶠ z in 𝓝[≠] p, AnalyticAt ℂ g z := nhdsWithin_le_nhds hg.eventually_analyticAt
   filter_upwards [h2, h3, h4, self_mem_nhdsWithin] with z hz hgz hga hzp
   have hzp' : z - p ≠ 0 := sub_ne_zero.2 hzp
   have h1 : HasDerivAt (fun w ↦ (w - p) ^ n) ((n : ℂ) * (z - p) ^ (n - 1) * 1) z := by
     have := (hasDerivAt_zpow n (z - p) (Or.inl hzp')).comp z ((hasDerivAt_id z).sub_const p)
     exact this
-  have hd : HasDerivAt (fun w ↦ (w - p) ^ n * g w)
+  have hd : HasDerivAt
+      (fun w ↦ (w - p) ^ n * g w)
       ((n : ℂ) * (z - p) ^ (n - 1) * 1 * g z + (z - p) ^ n * deriv g z) z :=
     h1.mul hga.differentiableAt.hasDerivAt
   rw [logDeriv_apply, hz.deriv_eq, hz.eq_of_nhds, hd.deriv, zpow_sub_one₀ hzp']
   have hzn : (z - p) ^ n ≠ 0 := zpow_ne_zero n hzp'
   field_simp
 
-theorem residue_ne_zero_of_meromorphicOrderAt_eq_neg_one {f : ℂ → ℂ} {p : ℂ}
-    (hf : MeromorphicAt f p) (h : meromorphicOrderAt f p = ((-1 : ℤ) : WithTop ℤ)) :
-    residue f p ≠ 0 := by
+theorem residue_ne_zero_of_meromorphicOrderAt_eq_neg_one
+    {f : ℂ → ℂ} {p : ℂ}
+    (hf : MeromorphicAt f p) (h : meromorphicOrderAt f p = ((-1 : ℤ) : WithTop ℤ))
+    : residue f p ≠ 0 := by
   obtain ⟨g, hg, hgp, hfg⟩ := (meromorphicOrderAt_eq_int_iff hf).1 h
   simp only [smul_eq_mul] at hfg
   obtain ⟨q, hq⟩ := hg

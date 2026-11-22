@@ -12,8 +12,7 @@ namespace Formalism.IndefR.Tow.OrbStPf
 
 variable {N : ℕ} {H : Type*} [NormedAddCommGroup H] [NormedSpace ℝ H]
 
-def pd (i : Fin N) (f : (Fin N → ℝ) → H) : (Fin N → ℝ) → H :=
-  fun p => fderiv ℝ f p (Pi.single i 1)
+def pd (i : Fin N) (f : (Fin N → ℝ) → H) : (Fin N → ℝ) → H := fun p => fderiv ℝ f p (Pi.single i 1)
 
 def pds (L : List (Fin N)) (f : (Fin N → ℝ) → H) : (Fin N → ℝ) → H := L.foldr pd f
 

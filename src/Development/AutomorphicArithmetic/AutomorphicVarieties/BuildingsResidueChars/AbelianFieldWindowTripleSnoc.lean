@@ -5,8 +5,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 @[expose] public section
 
 open Module in
-theorem UpperTheory.abelianField_window_triple_snoc :
-    UpperTheory.V.Af.Wd.TriSnoc := by
+theorem UpperTheory.abelianField_window_triple_snoc : UpperTheory.V.Af.Wd.TriSnoc := by
   unfold UpperTheory.V.Af.Wd.TriSnoc
   intro k W' W W'' ι _ _ _ _ _ _ _ n T' T T'' f p hf hp hex h1 hT' hT'' d hd hd''
   unfold UpperTheory.V.Af.Wd.IsTri at hd ⊢
@@ -24,14 +23,16 @@ theorem UpperTheory.abelianField_window_triple_snoc :
     have h0 : p s = 0 := LinearMap.mem_ker.1 (hrange hmem)
     rw [hs] at h0
     exact hy0 h0
-  have hsp : ⊤ ≤ Submodule.span k (Set.range (Fin.snoc (fun i => f (b' i)) s : Fin (n + 1) → W)) := by
+  have hsp
+      : ⊤ ≤ Submodule.span k (Set.range (Fin.snoc (fun i => f (b' i)) s : Fin (n + 1) → W)) := by
     intro w _
     obtain ⟨c, hc⟩ := hyspan (p w)
     have hker : p (w - c • s) = 0 := by rw [map_sub, map_smul, hs, hc, sub_self]
     obtain ⟨x, hx⟩ := (hex _).1 hker
     have hw : w = f x + c • s := by rw [hx]; abel
     rw [hw]
-    refine Submodule.add_mem _ ?_ (Submodule.smul_mem _ _ (Submodule.subset_span ⟨Fin.last n, by simp⟩))
+    refine Submodule.add_mem _ ?_
+      (Submodule.smul_mem _ _ (Submodule.subset_span ⟨Fin.last n, by simp⟩))
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← b'.sum_repr x, map_sum]
     refine Submodule.sum_mem _ fun i _ => ?_
@@ -50,12 +51,12 @@ theorem UpperTheory.abelianField_window_triple_snoc :
     intro x i
     rw [hfx]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, Finsupp.single_apply, Fin.castSucc_inj]
+    simp [map_sum, Finsupp.single_apply, Fin.castSucc_inj]
   have hrepr2 : ∀ x : W', b.repr (f x) (Fin.last n) = 0 := by
     intro x
     rw [hfx]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum]
+    simp [map_sum]
   refine ⟨b, fun a => ⟨?_, ?_⟩⟩
   · intro i j hji
     rw [LinearMap.toMatrix_apply]
@@ -78,7 +79,8 @@ theorem UpperTheory.abelianField_window_triple_snoc :
         rw [map_sub, map_smul, hT'', hs, hd'', sub_self]
       obtain ⟨x, hx⟩ := (hex _).1 hker
       have hTs : T a s = f x + d a (Fin.last n) • s := by rw [hx]; abel
-      rw [hTs, map_add (f := _), map_smul, Finsupp.add_apply, Finsupp.smul_apply, hrepr2, ← hbl, b.repr_self]
+      rw [hTs, map_add (f := _), map_smul, Finsupp.add_apply, Finsupp.smul_apply, hrepr2, ← hbl,
+        b.repr_self]
       simp
     | cast i =>
       rw [hbc, ← hT', hrepr1]

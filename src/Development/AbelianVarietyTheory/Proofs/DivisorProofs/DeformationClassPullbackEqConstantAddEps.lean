@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.KodairaSpenc
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
 open GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.CechKS
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -18,10 +19,13 @@ namespace GlobalTheory.CechKS
 
 open GlobalTheory.Published GlobalTheory.Published.AbelianDeRham
 
-theorem exists_const_add_eps_const {K : Type} [Field K] {A : Over (Sp K)} [GrpObj A]
-    (z : TensorProduct K (DualNumber K) (primDR A)) :
-    ∃ a b : primDR A, liftSemi (constMor A).pull z =
-      (constMor A).pull a + (DualNumber.eps : DualNumber K) • (constMor A).pull b := by
+theorem exists_const_add_eps_const
+    {K : Type} [Field K]
+    {A : Over (Sp K)} [GrpObj A]
+    (z : TensorProduct K (DualNumber K) (primDR A))
+    : ∃ a b : primDR A,
+      liftSemi (constMor A).pull z
+        = (constMor A).pull a + (DualNumber.eps : DualNumber K) • (constMor A).pull b := by
   induction z with
   | add x y hx hy =>
     obtain ⟨a, b, e⟩ := hx
@@ -33,19 +37,28 @@ theorem exists_const_add_eps_const {K : Type} [Field K] {A : Over (Sp K)} [GrpOb
     refine ⟨r.fst • c, r.snd • c, ?_⟩
     rw [liftSemi_tmul, LinearMap.map_smulₛₗ, LinearMap.map_smulₛₗ, smul_smul]
     have e1 : (TrivSqZeroExt.inl r.fst : DualNumber K) = algebraMap K (DualNumber K) r.fst := rfl
-    have e2 : (TrivSqZeroExt.inr r.snd : DualNumber K) = DualNumber.eps * algebraMap K (DualNumber K) r.snd := by
+    have e2
+        : (TrivSqZeroExt.inr r.snd : DualNumber K)
+          = DualNumber.eps * algebraMap K (DualNumber K) r.snd := by
       rw [DualNumber.inr_eq_smul_eps, Algebra.smul_def, mul_comm]
-    have er : r = algebraMap K (DualNumber K) r.fst + DualNumber.eps * algebraMap K (DualNumber K) r.snd := by
+    have er
+        : r
+          = algebraMap K (DualNumber K) r.fst
+            + DualNumber.eps * algebraMap K (DualNumber K) r.snd := by
       rw [← e1, ← e2, TrivSqZeroExt.inl_fst_add_inr_snd_eq]
     conv_lhs => rw [er]
     exact add_smul _ _ _
 
-theorem liftMor_pull_eq_const_add_eps : GlobalTheory.Published.AbelianDeRham → ∀ (K : Type) [Field K] (A : Over (Sp K)) [GrpObj A]
-    (A' : Over (Sp (DualNumber K))) [GrpObj A'] (i : A.left ⟶ A'.left)
-    (h : IsGrpPullback A A' (GlobalTheory.DeRham.epsRed K) i) (g : ℕ), IsAbelianScheme A' →
-    SmoothOfRelativeDimension g A'.hom → ∀ x : primDR A', ∃ b : primDR A,
-      (liftMor (epsDP K) h).pull x = (constMor A).pull ((fibMor h).pull x) +
-        (DualNumber.eps : DualNumber K) • (constMor A).pull b := by
+theorem liftMor_pull_eq_const_add_eps
+    : GlobalTheory.Published.AbelianDeRham
+      → ∀ (K : Type) [Field K] (A : Over (Sp K)) [GrpObj A] (A' : Over (Sp (DualNumber K)))
+          [GrpObj A'] (i : A.left ⟶ A'.left)
+          (h : IsGrpPullback A A' (GlobalTheory.DeRham.epsRed K) i) (g : ℕ),
+        IsAbelianScheme A' → SmoothOfRelativeDimension g A'.hom
+          → ∀ x : primDR A', ∃ b : primDR A,
+            (liftMor (epsDP K) h).pull x
+              = (constMor A).pull ((fibMor h).pull x)
+                + (DualNumber.eps : DualNumber K) • (constMor A).pull b := by
   intro P K _ A _ A' _ i h g hA hg x
   have a₀ : IsAbelianScheme A := by
     haveI := hA.comm
@@ -55,9 +68,12 @@ theorem liftMor_pull_eq_const_add_eps : GlobalTheory.Published.AbelianDeRham →
       refine ⟨⟨fun x y => Over.OverMorphism.ext (h.1.hom_ext ?_ (by rw [Over.w, Over.w]))⟩⟩
       rw [← h.2 T x y (pushPt h.1.w x) (pushPt h.1.w y) rfl rfl,
         ← h.2 T y x (pushPt h.1.w y) (pushPt h.1.w x) rfl rfl, _root_.mul_comm]
-    exact ⟨inferInstance, MorphismProperty.of_isPullback (P := @Smooth) h.1 hA.smooth,
+    exact ⟨
+      inferInstance,
+      MorphismProperty.of_isPullback (P := @Smooth) h.1 hA.smooth,
       MorphismProperty.of_isPullback (P := @IsProper) h.1 hA.proper,
-      MorphismProperty.of_isPullback (P := @GeometricallyConnected) h.1 hA.geomConnected⟩
+      MorphismProperty.of_isPullback (P := @GeometricallyConnected) h.1 hA.geomConnected
+    ⟩
   have g₀ := (smoothOfRelativeDimension_isStableUnderBaseChange g).of_isPullback h.1 hg
   obtain ⟨z, hz⟩ := constMor_surjective P a₀ g₀ ((liftMor (epsDP K) h).pull x)
   obtain ⟨a, b, e⟩ := exists_const_add_eps_const z

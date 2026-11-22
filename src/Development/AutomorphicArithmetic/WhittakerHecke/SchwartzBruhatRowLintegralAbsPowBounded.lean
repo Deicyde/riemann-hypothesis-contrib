@@ -7,20 +7,20 @@ public import GroundTheory.AutomorphicForms.GL2.GJGlobalLattice
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent
 open scoped Classical ENNReal NNReal
 open UpperTheory.ConvolutionTheory.R2.G (FS2 Rw nE row)
 
 private theorem abs_re (x : A ℚ) : |re x| = ‖x.1 Rat.infinitePlace‖ :=
-  (InfinitePlace.Completion.isometry_extensionEmbeddingOfIsReal
-    (IsTotallyReal.isReal Rat.infinitePlace)).norm_map_of_map_zero (map_zero _) (x.1 Rat.infinitePlace)
+  (InfinitePlace.Completion.isometry_extensionEmbeddingOfIsReal (IsTotallyReal.isReal
+    Rat.infinitePlace)).norm_map_of_map_zero (map_zero _) (x.1 Rat.infinitePlace)
 
-private theorem re_mul (x y : A ℚ) : re (x * y) = re x * re y := by
-  simp [re]
+private theorem re_mul (x y : A ℚ) : re (x * y) = re x * re y := by simp [re]
 
-private theorem re_add (x y : A ℚ) : re (x + y) = re x + re y := by
-  simp [re]
+private theorem re_add (x y : A ℚ) : re (x + y) = re x + re y := by simp [re]
 
 private theorem re_congr {x y : A ℚ} (h : x.1 = y.1) : re x = re y := by
   unfold re
@@ -29,11 +29,9 @@ private theorem re_congr {x y : A ℚ} (h : x.1 = y.1) : re x = re y := by
     rw [h]
   rw [this]
 
-private theorem re_one : re (1 : A ℚ) = 1 := by
-  simp [re]
+private theorem re_one : re (1 : A ℚ) = 1 := by simp [re]
 
-private theorem row_sq {k : G1 ℚ} (hk : InfOrth k) :
-    re (k 1 0) ^ 2 + re (k 1 1) ^ 2 = 1 := by
+private theorem row_sq {k : G1 ℚ} (hk : InfOrth k) : re (k 1 0) ^ 2 + re (k 1 1) ^ 2 = 1 := by
   have h := re_congr (hk 1 1)
   simp only [Matrix.mul_apply, Fin.sum_univ_two, Matrix.transpose_apply, Matrix.one_apply_eq] at h
   rw [re_add, re_mul, re_mul, re_one] at h
@@ -44,8 +42,8 @@ private theorem abs_re_le_infPart (x : Fin 2 → A ℚ) (j : Fin 2) : |re (x j)|
   exact (GroundTheory.Automorphic.GJGlobal.norm_apply_le_norm_homeomorphMixedSpace _ _).trans
     (norm_le_pi_norm (infPartPi x) j)
 
-private theorem abs_re_le {k : G1 ℚ} (hk : InfOrth k) (z : A ℚ) :
-    |re z| ≤ 2 * ‖infPartPi fun j => z * row k j‖ := by
+private theorem abs_re_le {k : G1 ℚ} (hk : InfOrth k) (z : A ℚ)
+    : |re z| ≤ 2 * ‖infPartPi fun j => z * row k j‖ := by
   set N := ‖infPartPi fun j => z * row k j‖ with hN
   have h0 : |re z| * |re (k 1 0)| ≤ N := by
     have h : |re (z * k 1 0)| ≤ N := abs_re_le_infPart (fun j => z * row k j) 0
@@ -63,17 +61,20 @@ private theorem abs_re_le {k : G1 ℚ} (hk : InfOrth k) (z : A ℚ) :
   have hlt : |re (k 1 0)| + |re (k 1 1)| ≥ 1 := by nlinarith
   nlinarith
 
-private theorem fin_eq {k : G1 ℚ} (z : A ℚ) :
-    z.2 = (z * row k 0).2 * (-(k 0 1).2) + (z * row k 1).2 * (k 0 0).2 := by
+private theorem fin_eq {k : G1 ℚ} (z : A ℚ)
+    : z.2 = (z * row k 0).2 * (-(k 0 1).2) + (z * row k 1).2 * (k 0 0).2 := by
   have hd := congrArg Prod.snd k.det_coe
   rw [Matrix.det_fin_two] at hd
   have hd' : (k 0 0).2 * (k 1 1).2 - (k 0 1).2 * (k 1 0).2 = 1 := hd
   change z.2 = (z.2 * (k 1 0).2) * (-(k 0 1).2) + (z.2 * (k 1 1).2) * (k 0 0).2
   linear_combination (-z.2) * hd'
 
-theorem UpperTheory.schwartzBruhat_row_lintegral_abs_pow_bounded :
-    ∀ Φ ∈ schwartzBruhatPi (K := ℚ) (ι := Fin 2), ∀ e : ℝ, 1 < e → ∃ C : ℝ≥0, ∀ k ∈ KK ℚ,
-        ∫⁻ z : IdeleGroup ℚ, ‖Φ fun j => ((z : (A ℚ)ˣ) : A ℚ) * row k j‖ₑ * ENNReal.ofReal (ab z ^ e) ∂(ideleMeasure ℚ) ≤ C := by
+theorem UpperTheory.schwartzBruhat_row_lintegral_abs_pow_bounded
+    : ∀ Φ ∈ schwartzBruhatPi (K := ℚ) (ι := Fin 2), ∀ e : ℝ,
+      1 < e
+        → ∃ C : ℝ≥0, ∀ k ∈ KK ℚ,
+          ∫⁻ z : IdeleGroup ℚ, ‖Φ fun j => ((z : (A ℚ)ˣ) : A ℚ) * row k j‖ₑ * ENNReal.ofReal (ab z ^ e) ∂(ideleMeasure ℚ)
+            ≤ C := by
   intro Φ hΦ e he
   obtain ⟨M, hM⟩ := exists_nat_gt e
   obtain ⟨C₀, hC₀, L, hL, hmaj⟩ := GroundTheory.Automorphic.GJGlobal.exists_majorant_pi hΦ M
@@ -111,12 +112,14 @@ theorem UpperTheory.schwartzBruhat_row_lintegral_abs_pow_bounded :
       rw [← mul_pow]
       exact pow_le_pow_left₀ (by positivity) (by linarith) M
     have hinv : ((1 + N) ^ M)⁻¹ ≤ 2 ^ M * ((1 + |re ((z : (A ℚ)ˣ) : A ℚ)|) ^ M)⁻¹ := by
-      rw [inv_le_comm₀ (by positivity) (by positivity), mul_inv, inv_inv, inv_mul_le_iff₀ (by positivity)]
+      rw [inv_le_comm₀ (by positivity) (by positivity), mul_inv, inv_inv,
+        inv_mul_le_iff₀ (by positivity)]
       exact hpow
-    calc ‖Φ x‖ * ab z ^ e ≤ (C₀ * ((1 + N) ^ M)⁻¹) * ab z ^ e :=
-          mul_le_mul_of_nonneg_right hm hab
+    calc
+      ‖Φ x‖ * ab z ^ e
+        ≤ (C₀ * ((1 + N) ^ M)⁻¹) * ab z ^ e := mul_le_mul_of_nonneg_right hm hab
       _ ≤ (C₀ * (2 ^ M * ((1 + |re ((z : (A ℚ)ˣ) : A ℚ)|) ^ M)⁻¹)) * ab z ^ e :=
-          mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hinv hC₀) hab
+        mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left hinv hC₀) hab
       _ = C₀ * 2 ^ M * (((1 + |re ((z : (A ℚ)ˣ) : A ℚ)|) ^ M)⁻¹ * ab z ^ e) := by ring
   · rw [Set.indicator_of_notMem hxL, mul_zero] at hm
     have h0 : Φ x = 0 := norm_le_zero_iff.1 hm

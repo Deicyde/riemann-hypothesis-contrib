@@ -18,8 +18,9 @@ theorem jCh : StdGood → BdetLaw → JTop → JCh := by
   have hL : (adStd F).GoodL := hS F
   obtain ⟨-, -, -, -, hk, hd⟩ := hB F 𝔸[F] (adStd F) hL (ι ⊕ ι) Set.univ
   have hdet : Continuous (Matrix.GeneralLinearGroup.det : GL (ι ⊕ ι) 𝔸[F] → 𝔸[F]ˣ) := by
-    have h := Continuous.units_map (Matrix.detMonoidHom (n := ι ⊕ ι) (R := 𝔸[F]))
-      (Continuous.matrix_det continuous_id)
+    have h :=
+      Continuous.units_map (Matrix.detMonoidHom (n := ι ⊕ ι) (R := 𝔸[F]))
+        (Continuous.matrix_det continuous_id)
     convert h using 1
     funext x
     apply Units.ext
@@ -59,7 +60,9 @@ theorem jCh : StdGood → BdetLaw → JTop → JCh := by
     rw [hadd, hK k hk', add_zero]
   · intro γ hγ _
     obtain ⟨-, ⟨g, hg⟩⟩ := hγ
-    have e : Matrix.GeneralLinearGroup.det (prj A ν ι γ) = Units.map (adStd F).i.toMonoidHom (Matrix.GeneralLinearGroup.det g) := by
+    have e
+        : Matrix.GeneralLinearGroup.det (prj A ν ι γ)
+          = Units.map (adStd F).i.toMonoidHom (Matrix.GeneralLinearGroup.det g) := by
       have hg' : Matrix.GeneralLinearGroup.map (adStd F).i g = γ.1.2 := hg
       show Matrix.GeneralLinearGroup.det γ.1.2 = _
       rw [← hg']

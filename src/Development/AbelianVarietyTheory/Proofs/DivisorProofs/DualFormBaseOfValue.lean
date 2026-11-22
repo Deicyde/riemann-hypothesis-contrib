@@ -5,12 +5,15 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DTermOrigin
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.CMVal GlobalTheory.IndefiniteRowSideFullHecke.DefiningCoordinates GlobalTheory.DeformedSum
+open NumberField IsDedekindDomain GlobalTheory.CMVal
+  GlobalTheory.IndefiniteRowSideFullHecke.DefiningCoordinates GlobalTheory.DeformedSum
 
 namespace GlobalTheory.DualBase
 
-theorem dualFormBase_of_value : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (I : Type) [Fintype I] [DecidableEq I]
-    (φ : I → E →+* ℂ), IsCMType φ → DualFormValue φ → DualFormBase φ := by
+theorem dualFormBase_of_value
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (I : Type) [Fintype I] [DecidableEq I]
+        (φ : I → E →+* ℂ),
+      IsCMType φ → DualFormValue φ → DualFormBase φ := by
   intro E _ _ _ I _ _ φ hcm hval d δ hd hδ hφ η
   have hδ0 : δ ≠ 0 := by
     rintro rfl
@@ -34,8 +37,8 @@ theorem dualFormBase_of_value : ∀ (E : Type) [Field E] [NumberField E] [IsCMFi
     have : 0 < Real.sqrt d := Real.sqrt_pos.2 (by exact_mod_cast hd)
     exact_mod_cast this.ne'
   have hpi : (Real.pi : ℂ) ≠ 0 := by exact_mod_cast Real.pi_ne_zero
-  rcases Int.units_eq_one_or η with rfl | rfl <;> rcases Int.units_eq_one_or ε with rfl | rfl <;>
-    · push_cast
-      field_simp
+  rcases Int.units_eq_one_or η with rfl | rfl <;> rcases Int.units_eq_one_or ε with rfl | rfl
+    <;> · push_cast
+          field_simp
 
 end GlobalTheory.DualBase

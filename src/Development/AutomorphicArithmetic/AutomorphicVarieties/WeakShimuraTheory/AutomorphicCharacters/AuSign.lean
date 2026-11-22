@@ -4,10 +4,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
 
-theorem UpperTheory.V.Ws.auSign :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {C : Type} [CommGroup C] (μ : G ℚ Ω →* C) (c c' : G ℚ Ω), Af.IsConjEl c → Af.IsConjEl c' → μ c = μ c' := by
+theorem UpperTheory.V.Ws.auSign
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {C : Type} [CommGroup C]
+        (μ : G ℚ Ω →* C) (c c' : G ℚ Ω),
+      Af.IsConjEl c → Af.IsConjEl c' → μ c = μ c' := by
   intro Ω _ _ _ C _ μ c c' hc hc'
   obtain ⟨j, hj⟩ := hc
   obtain ⟨j', hj'⟩ := hc'
@@ -18,7 +22,8 @@ theorem UpperTheory.V.Ws.auSign :
   have hσ : ∀ x, j (σ x) = j' x := fun x => by
     have h := AlgHom.restrictNormal_commutes j'.toRatAlgHom Ω x
     simp only [RingHom.algebraMap_toAlgebra, Algebra.algebraMap_self, RingHom.id_apply,
-      RingHom.toRatAlgHom_apply] at h
+        RingHom.toRatAlgHom_apply]
+      at h
     exact h
   have key : σ * c' = c * σ := by
     ext x

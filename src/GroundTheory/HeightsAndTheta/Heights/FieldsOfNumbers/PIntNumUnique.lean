@@ -16,9 +16,10 @@ noncomputable section
 
 universe u
 
-theorem IntNumUnique.proof (h1 : CutRational.Statement.{u}) (h2 : IntNumBase.Statement.{u})
-    (h3 : ExistsForm.Statement.{u}) (h4 : DivCycleSupport.Statement.{u}) :
-    IntNumUnique.Statement.{u} := by
+theorem IntNumUnique.proof
+    (h1 : CutRational.Statement.{u}) (h2 : IntNumBase.Statement.{u}) (h3 : ExistsForm.Statement.{u})
+    (h4 : DivCycleSupport.Statement.{u})
+    : IntNumUnique.Statement.{u} := by
   intro F _ K _ _ ι _ N hN P hP n
   induction n generalizing P with
   | zero =>

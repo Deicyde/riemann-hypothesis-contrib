@@ -15,8 +15,8 @@ open scoped ComplexOrder
 noncomputable section
 
 def ChartDensityIntegrable.Statement : Prop :=
-  ∀ (e : ℕ) (M : Matrix (Fin (e + 1)) (Fin (e + 1)) ℂ), M.PosDef →
-    Integrable (fun y : Fin e → ℂ => maDensity (fun _ : Fin e => hermChartPot M) y)
+  ∀ (e : ℕ) (M : Matrix (Fin (e + 1)) (Fin (e + 1)) ℂ),
+    M.PosDef → Integrable (fun y : Fin e → ℂ => maDensity (fun _ : Fin e => hermChartPot M) y)
 
 end
 

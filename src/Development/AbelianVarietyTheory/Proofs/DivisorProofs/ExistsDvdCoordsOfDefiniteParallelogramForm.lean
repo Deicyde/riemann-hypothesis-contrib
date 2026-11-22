@@ -6,9 +6,11 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem parallelogram_zsmul {E : Type} [AddCommGroup E] (Q : E → ℤ)
-    (hQ : ∀ f g, Q (f + g) + Q (f - g) = 2 * Q f + 2 * Q g) (k : ℤ) (f : E) :
-    Q (k • f) = k ^ 2 * Q f := by
+theorem parallelogram_zsmul
+    {E : Type} [AddCommGroup E]
+    (Q : E → ℤ) (hQ : ∀ f g, Q (f + g) + Q (f - g) = 2 * Q f + 2 * Q g)
+    (k : ℤ) (f : E)
+    : Q (k • f) = k ^ 2 * Q f := by
   have h0 : Q 0 = 0 := by
     have := hQ 0 0
     simp only [add_zero, sub_zero] at this
@@ -18,16 +20,16 @@ theorem parallelogram_zsmul {E : Type} [AddCommGroup E] (Q : E → ℤ)
     have := hQ 0 g
     simp only [zero_add, zero_sub, h0] at this
     omega
-  have hnat : ∀ n : ℕ, Q ((n : ℤ) • f) = (n : ℤ) ^ 2 * Q f ∧
-      Q (((n : ℤ) + 1) • f) = ((n : ℤ) + 1) ^ 2 * Q f := by
+  have hnat
+      : ∀ n : ℕ,
+        Q ((n : ℤ) • f) = (n : ℤ) ^ 2 * Q f ∧ Q (((n : ℤ) + 1) • f) = ((n : ℤ) + 1) ^ 2 * Q f := by
     intro n
     induction n with
     | zero => simp [h0]
     | succ n ih =>
       refine ⟨by push_cast; exact ih.2, ?_⟩
       have h := hQ (((n : ℤ) + 1) • f) f
-      have e1 : ((n : ℤ) + 1) • f + f = (((n + 1 : ℕ) : ℤ) + 1) • f := by
-        push_cast; module
+      have e1 : ((n : ℤ) + 1) • f + f = (((n + 1 : ℕ) : ℤ) + 1) • f := by push_cast; module
       have e2 : ((n : ℤ) + 1) • f - f = (n : ℤ) • f := by module
       rw [e1, e2, ih.1, ih.2] at h
       push_cast at h ⊢
@@ -36,11 +38,11 @@ theorem parallelogram_zsmul {E : Type} [AddCommGroup E] (Q : E → ℤ)
   · exact (hnat n).1
   · rw [neg_smul, hneg, (hnat n).1]; ring
 
-theorem parallelogram_sum_le {E ι : Type} [AddCommGroup E] (Q : E → ℤ)
-    (hQ : ∀ f g, Q (f + g) + Q (f - g) = 2 * Q f + 2 * Q g) (hpos : ∀ f, 0 ≤ Q f)
-    (u : ι → E) (s : Finset ι) :
-    ∃ C : ℕ, ∀ (z : ι → ℤ) (M : ℤ), (∀ i, |z i| ≤ M) →
-      Q (∑ i ∈ s, z i • u i) ≤ C * M ^ 2 := by
+theorem parallelogram_sum_le
+    {E ι : Type} [AddCommGroup E]
+    (Q : E → ℤ) (hQ : ∀ f g, Q (f + g) + Q (f - g) = 2 * Q f + 2 * Q g) (hpos : ∀ f, 0 ≤ Q f)
+    (u : ι → E) (s : Finset ι)
+    : ∃ C : ℕ, ∀ (z : ι → ℤ) (M : ℤ), (∀ i, |z i| ≤ M) → Q (∑ i ∈ s, z i • u i) ≤ C * M ^ 2 := by
   classical
   induction s using Finset.induction_on with
   | empty =>
@@ -64,8 +66,16 @@ theorem parallelogram_sum_le {E ι : Type} [AddCommGroup E] (Q : E → ℤ)
     rw [Int.toNat_of_nonneg (hpos (u a))]
     nlinarith
 
-theorem exists_dvd_coords_of_definite_form :
-    ∀ (E : Type) [AddCommGroup E] (H : AddSubgroup E) (Q : E → ℤ), (∀ f g, Q (f + g) + Q (f - g) = 2 * Q f + 2 * Q g) → (∀ f, 0 ≤ Q f) → (∀ f ∈ H, Q f = 0 → f = 0) → ∀ (n : ℕ) (u : Fin n → E), (∀ i, u i ∈ H) → LinearIndependent ℤ u → ∃ e : ℕ, 0 < e ∧ ∀ (k : ℕ) (m : Fin n → ℤ) (h : E), h ∈ H → k • h = ∑ i, m i • u i → ∀ i, (k : ℤ) ∣ e * m i := by
+theorem exists_dvd_coords_of_definite_form
+    : ∀ (E : Type) [AddCommGroup E] (H : AddSubgroup E) (Q : E → ℤ),
+      (∀ f g, Q (f + g) + Q (f - g) = 2 * Q f + 2 * Q g) → (∀ f, 0 ≤ Q f)
+        → (∀ f ∈ H, Q f = 0 → f = 0)
+        → ∀ (n : ℕ) (u : Fin n → E),
+          (∀ i, u i ∈ H) → LinearIndependent ℤ u
+            → ∃ e : ℕ,
+              0 < e
+                ∧ ∀ (k : ℕ) (m : Fin n → ℤ) (h : E),
+                  h ∈ H → k • h = ∑ i, m i • u i → ∀ i, (k : ℤ) ∣ e * m i := by
   intro E _ H Q hQ hpos hdef n u hu hli
   obtain ⟨C, hC⟩ := parallelogram_sum_le Q hQ hpos u Finset.univ
   rw [Fintype.linearIndependent_iff] at hli
@@ -77,20 +87,20 @@ theorem exists_dvd_coords_of_definite_form :
     simp [this]
   have hk0 : (0 : ℤ) < k := by exact_mod_cast hkpos
   have hR0 : (0 : ℤ) < R := by positivity
-  obtain ⟨a, ha, b, hb, hab, hf⟩ := Finset.exists_ne_map_eq_of_card_lt_of_maps_to
-    (s := Finset.range (R ^ n + 1))
-    (t := Fintype.piFinset (fun _ : Fin n => Finset.Ico (0 : ℤ) R))
-    (f := fun (j : ℕ) (i : Fin n) => ((R : ℤ) * (((j : ℤ) * m i) % k)) / k)
-    (by simp [Fintype.card_piFinset])
-    (by
-      intro j _
-      simp only [Finset.mem_coe, Fintype.mem_piFinset, Finset.mem_Ico]
-      intro i
-      have h1 := Int.emod_nonneg ((j : ℤ) * m i) hk0.ne'
-      have h2 := Int.emod_lt_of_pos ((j : ℤ) * m i) hk0
-      refine ⟨Int.ediv_nonneg (by positivity) hk0.le, ?_⟩
-      apply Int.ediv_lt_of_lt_mul hk0
-      exact mul_lt_mul_of_pos_left h2 hR0)
+  obtain ⟨a, ha, b, hb, hab, hf⟩ :=
+    Finset.exists_ne_map_eq_of_card_lt_of_maps_to (s := Finset.range (R ^ n + 1))
+      (t := Fintype.piFinset (fun _ : Fin n => Finset.Ico (0 : ℤ) R))
+      (f := fun (j : ℕ) (i : Fin n) => ((R : ℤ) * (((j : ℤ) * m i) % k)) / k)
+      (by simp [Fintype.card_piFinset])
+      (by
+        intro j _
+        simp only [Finset.mem_coe, Fintype.mem_piFinset, Finset.mem_Ico]
+        intro i
+        have h1 := Int.emod_nonneg ((j : ℤ) * m i) hk0.ne'
+        have h2 := Int.emod_lt_of_pos ((j : ℤ) * m i) hk0
+        refine ⟨Int.ediv_nonneg (by positivity) hk0.le, ?_⟩
+        apply Int.ediv_lt_of_lt_mul hk0
+        exact mul_lt_mul_of_pos_left h2 hR0)
   set y : Fin n → ℤ := fun i => ((a : ℤ) * m i) % k - ((b : ℤ) * m i) % k with hy
   set q : Fin n → ℤ := fun i => ((a : ℤ) * m i) / k - ((b : ℤ) * m i) / k with hq
   have hyq : ∀ i, y i = ((a : ℤ) - b) * m i - k * q i := by
@@ -125,9 +135,9 @@ theorem exists_dvd_coords_of_definite_form :
   have hQw : Q w = 0 := by
     by_contra hne
     have h1 : 1 ≤ Q w := by have := hpos w; omega
-    have h2 : ((R : ℤ) * k) ^ 2 ≤ ((R : ℤ) * k) ^ 2 * Q w := le_mul_of_one_le_right (by positivity) h1
-    have h3 : (C : ℤ) < (R : ℤ) ^ 2 := by
-      rw [hR]; push_cast; nlinarith [Int.natCast_nonneg C]
+    have h2 : ((R : ℤ) * k) ^ 2 ≤ ((R : ℤ) * k) ^ 2 * Q w :=
+      le_mul_of_one_le_right (by positivity) h1
+    have h3 : (C : ℤ) < (R : ℤ) ^ 2 := by rw [hR]; push_cast; nlinarith [Int.natCast_nonneg C]
     have h4 := mul_lt_mul_of_pos_right h3 (show (0 : ℤ) < (k : ℤ) ^ 2 by positivity)
     rw [mul_pow] at h2 hle
     linarith

@@ -7,10 +7,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 open IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 open scoped TensorProduct
 
-theorem UpperTheory.V.Pa.BC.gen_bc :
-    ∀ (O O' : Type) [CommRing O] [IsLocalRing O] [CommRing O'] [IsLocalRing O'] [Algebra O O'] [IsLocalHom (algebraMap O O')] [Module.Finite O O'] (B : Type) [CommRing B] [Algebra O B] [IsCO O B] [IsCO O' (Til O O' B)] (S : Set B) (S' : Set (Til O O' B)), IsLocalHom (Til.ι O O' B) → Til.s O O' B ∈ maximalIdeal (Til O O' B) → (∀ a ∈ S, Til.ι O O' B a ∈ S') → Til.s O O' B ∈ S' → GenBy O S → GenBy O' S' := by
+theorem UpperTheory.V.Pa.BC.gen_bc
+    : ∀ (O O' : Type) [CommRing O] [IsLocalRing O] [CommRing O'] [IsLocalRing O'] [Algebra O O']
+        [IsLocalHom (algebraMap O O')] [Module.Finite O O'] (B : Type) [CommRing B] [Algebra O B]
+        [IsCO O B] [IsCO O' (Til O O' B)] (S : Set B) (S' : Set (Til O O' B)),
+      IsLocalHom (Til.ι O O' B) → Til.s O O' B ∈ maximalIdeal (Til O O' B)
+        → (∀ a ∈ S, Til.ι O O' B a ∈ S') → Til.s O O' B ∈ S' → GenBy O S
+        → GenBy O' S' := by
   intro O O' _ _ _ _ _ _ _ B _ _ _ _ S S' hloc hs hS hsS hgen N
-  let P : Til O O' B → Prop := fun x => ∃ a ∈ Algebra.adjoin O' S', x - a ∈ maximalIdeal (Til O O' B) ^ N
+  let P : Til O O' B → Prop := fun x =>
+    ∃ a ∈ Algebra.adjoin O' S', x - a ∈ maximalIdeal (Til O O' B) ^ N
   have Pmem : ∀ x ∈ Algebra.adjoin O' S', P x := fun x hx => ⟨x, hx, by simp⟩
   have Padd : ∀ x y, P x → P y → P (x + y) := by
     rintro x y ⟨a, ha, hx⟩ ⟨b, hb, hy⟩
@@ -59,8 +65,10 @@ theorem UpperTheory.V.Pa.BC.gen_bc :
       rw [e]
       exact Pmul _ _ (Pmem _ (Subalgebra.algebraMap_mem _ _)) (Pι b)
   have hsA : Til.s O O' B ∈ Algebra.adjoin O' S' := Algebra.subset_adjoin hsS
-  have hdec : ∀ f : Til O O' B, ∃ (g : Til O O' B) (c : O' ⊗[O] B), f = Til.s O O' B * g + Til.C O O' B c :=
-    fun f => ⟨_, _, PowerSeries.eq_X_mul_shift_add_const (R := O' ⊗[O] B) f⟩
+  have hdec
+      : ∀ f : Til O O' B, ∃ (g : Til O O' B) (c : O' ⊗[O] B),
+        f = Til.s O O' B * g + Til.C O O' B c := fun f =>
+    ⟨_, _, PowerSeries.eq_X_mul_shift_add_const (R := O' ⊗[O] B) f⟩
   have key : ∀ (k : ℕ) (f : Til O O' B), ∃ g h, P g ∧ f = g + Til.s O O' B ^ k * h := by
     intro k f
     induction k with
@@ -68,8 +76,12 @@ theorem UpperTheory.V.Pa.BC.gen_bc :
     | succ k ih =>
       obtain ⟨g, h, hg, e⟩ := ih
       obtain ⟨h', c, e'⟩ := hdec h
-      refine ⟨g + Til.s O O' B ^ k * Til.C O O' B c, h',
-        Padd _ _ hg (Pmul _ _ (Pmem _ (pow_mem hsA k)) (PC c)), ?_⟩
+      refine ⟨
+        g + Til.s O O' B ^ k * Til.C O O' B c,
+        h',
+        Padd _ _ hg (Pmul _ _ (Pmem _ (pow_mem hsA k)) (PC c)),
+        ?_
+      ⟩
       rw [e, e']
       ring
   intro f

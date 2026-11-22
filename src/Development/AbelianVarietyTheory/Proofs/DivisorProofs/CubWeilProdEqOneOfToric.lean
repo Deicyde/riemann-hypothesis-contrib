@@ -13,9 +13,12 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Geometric
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.AbLaw GlobalTheory.UU GlobalTheory.LN GlobalTheory.Raynaud IsLocalRing
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.AbLaw GlobalTheory.UU GlobalTheory.LN GlobalTheory.Raynaud
+  IsLocalRing
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -25,12 +28,12 @@ noncomputable section
 
 namespace GlobalTheory.Raynaud.ProdToric
 
-theorem isMonHom_lift_id_one {S : Scheme.{0}} (G G' : Over S) [GrpObj G] [GrpObj G'] :
-    IsMonHom (lift (𝟙 G) (1 : G ⟶ G')) := by
+theorem isMonHom_lift_id_one {S : Scheme.{0}} (G G' : Over S) [GrpObj G] [GrpObj G']
+    : IsMonHom (lift (𝟙 G) (1 : G ⟶ G')) := by
   rw [Hom.one_def]; infer_instance
 
-theorem isMonHom_lift_one_id {S : Scheme.{0}} (G G' : Over S) [GrpObj G] [GrpObj G'] :
-    IsMonHom (lift (1 : G' ⟶ G) (𝟙 G')) := by
+theorem isMonHom_lift_one_id {S : Scheme.{0}} (G G' : Over S) [GrpObj G] [GrpObj G']
+    : IsMonHom (lift (1 : G' ⟶ G) (𝟙 G')) := by
   rw [Hom.one_def]; infer_instance
 
 end GlobalTheory.Raynaud.ProdToric

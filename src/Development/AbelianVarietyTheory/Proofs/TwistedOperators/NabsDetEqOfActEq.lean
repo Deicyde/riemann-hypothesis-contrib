@@ -10,7 +10,9 @@ public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.
 @[expose] public section
 
 open MeasureTheory ValuativeRel Matrix
-open GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.IndefiniteRowSideFullHecke.HalfPowerSpherical GlobalTheory.LatPair GlobalTheory.StepData
+open GlobalTheory.SplitWeil GlobalTheory.RootEx
+  GlobalTheory.IndefiniteRowSideFullHecke.HalfPowerSpherical GlobalTheory.LatPair
+  GlobalTheory.StepData
 open scoped Pointwise
 
 noncomputable section
@@ -18,18 +20,8 @@ namespace GlobalTheory.IdealChain
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-
-
-
-
-
 section Act
 variable {ι ι' : Type} [Fintype ι] [DecidableEq ι] [Fintype ι'] [DecidableEq ι']
-
-
-
-
-
 
 end Act
 

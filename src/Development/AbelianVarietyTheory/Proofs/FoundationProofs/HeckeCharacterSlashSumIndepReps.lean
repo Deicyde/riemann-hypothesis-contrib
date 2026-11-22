@@ -8,15 +8,18 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SlashIntM
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory.EisM.RepInd
 
-theorem exists_inj (L : ℕ) (Δ : Set M2) {ι κ : Type} (β : ι → M2) (β' : κ → M2)
-    (hβ : LRep L Δ β) (hβ' : LRep L Δ β') :
-    ∃ σ : κ → ι, Function.Injective σ ∧ ∃ g : κ → Gamma0 L,
-      ∀ j, β' j = (((g j : SL(2, ℤ)) : M2)) * β (σ j) := by
+theorem exists_inj
+    (L : ℕ) (Δ : Set M2)
+    {ι κ : Type} (β : ι → M2) (β' : κ → M2) (hβ : LRep L Δ β) (hβ' : LRep L Δ β')
+    : ∃ σ : κ → ι,
+      Function.Injective σ
+        ∧ ∃ g : κ → Gamma0 L, ∀ j, β' j = (((g j : SL(2, ℤ)) : M2)) * β (σ j) := by
   have hmem : ∀ j, ∃ p : Gamma0 L × ι, ((p.1 : SL(2, ℤ)) : M2) * β p.2 = β' j := by
     intro j
     have h1 : β' j ∈ Δ := by
@@ -27,24 +30,32 @@ theorem exists_inj (L : ℕ) (Δ : Set M2) {ι κ : Type} (β : ι → M2) (β' 
   choose p hp using hmem
   refine ⟨fun j => (p j).2, ?_, fun j => (p j).1, fun j => (hp j).symm⟩
   intro j j' hjj
-  have key : (((((p j).1 * ((p j').1)⁻¹ : Gamma0 L) : SL(2, ℤ)) : M2)) * β' j'
-      = (((1 : Gamma0 L) : SL(2, ℤ)) : M2) * β' j := by
+  have key
+      : (((((p j).1 * ((p j').1)⁻¹ : Gamma0 L) : SL(2, ℤ)) : M2)) * β' j'
+        = (((1 : Gamma0 L) : SL(2, ℤ)) : M2) * β' j := by
     rw [← hp j', ← hp j]
     simp only [Subgroup.coe_mul, Subgroup.coe_inv, Matrix.SpecialLinearGroup.coe_mul,
       Subgroup.coe_one, Matrix.SpecialLinearGroup.coe_one, one_mul]
     simp only at hjj
     rw [hjj, ← mul_assoc, mul_assoc (((p j).1 : SL(2, ℤ)) : M2)]
-    rw [← Matrix.SpecialLinearGroup.coe_mul, inv_mul_cancel, Matrix.SpecialLinearGroup.coe_one, mul_one]
-  have := hβ'.injOn (Set.mem_univ (((p j).1 * ((p j').1)⁻¹), j')) (Set.mem_univ ((1 : Gamma0 L), j)) key
+    rw [← Matrix.SpecialLinearGroup.coe_mul, inv_mul_cancel, Matrix.SpecialLinearGroup.coe_one,
+      mul_one]
+  have :=
+    hβ'.injOn (Set.mem_univ (((p j).1 * ((p j').1)⁻¹), j')) (Set.mem_univ ((1 : Gamma0 L), j)) key
   exact (congrArg Prod.snd this).symm
 
 end GlobalTheory.EisM.RepInd
 
 namespace GlobalTheory.EisM.RepInd
 
-theorem term_eq (k L N : ℕ) (ε : DirichletCharacter ℂ N) (β : M2) (γ : Gamma0 L) (f : ℍ → ℂ)
-    (hk : 1 ≤ k) (hNL : N ∣ L) (hdet : 0 < β.det) (hN : (N : ℤ) ∣ β 1 0) (hf : Inv k L (ch ε) f) (τ : ℍ) :
-    ch ε (((((γ : SL(2, ℤ)) : M2)) * β) 0 0) * slz k ((((γ : SL(2, ℤ)) : M2)) * β) f τ
+theorem term_eq
+    (k L N : ℕ) (ε : DirichletCharacter ℂ N)
+    (β : M2)
+    (γ : Gamma0 L)
+    (f : ℍ → ℂ)
+    (hk : 1 ≤ k) (hNL : N ∣ L) (hdet : 0 < β.det) (hN : (N : ℤ) ∣ β 1 0) (hf : Inv k L (ch ε) f)
+    (τ : ℍ)
+    : ch ε (((((γ : SL(2, ℤ)) : M2)) * β) 0 0) * slz k ((((γ : SL(2, ℤ)) : M2)) * β) f τ
       = ch ε (β 0 0) * slz k β f τ := by
   obtain ⟨hc, -, hinv, -, -⟩ := GlobalTheory.T.slashIntMatrixPosDet_properties k f hk
   set g : SL(2, ℤ) := (γ : SL(2, ℤ)) with hg
@@ -65,7 +76,8 @@ theorem term_eq (k L N : ℕ) (ε : DirichletCharacter ℂ N) (β : M2) (γ : Ga
     rw [Matrix.mul_apply, Fin.sum_univ_two]
     have : ((β 1 0 : ℤ) : ZMod N) = 0 := (ZMod.intCast_zmod_eq_zero_iff_dvd _ _).2 hN
     push_cast
-    rw [this]; simp
+    rw [this]
+    simp
   have h1 : (g 0 0 : ZMod N) * (g 1 1 : ZMod N) = 1 := by
     have : ((g 1 0 : ℤ) : ZMod N) = 0 := (ZMod.intCast_zmod_eq_zero_iff_dvd _ _).2 hgN
     have h2 : ((g 0 0 * g 1 1 - g 0 1 * g 1 0 : ℤ) : ZMod N) = 1 := by rw [hdetg]; simp
@@ -75,11 +87,17 @@ theorem term_eq (k L N : ℕ) (ε : DirichletCharacter ℂ N) (β : M2) (γ : Ga
   simp only [ch]
   rw [h00, map_mul]
   have : ε (g 0 0 : ZMod N) * ε (g 1 1 : ZMod N) = 1 := by rw [← map_mul, h1, map_one]
-  calc ε (g 0 0 : ZMod N) * ε (β 0 0 : ZMod N) * (ε (g 1 1 : ZMod N) * slz k β f τ)
+  calc
+    ε (g 0 0 : ZMod N) * ε (β 0 0 : ZMod N) * (ε (g 1 1 : ZMod N) * slz k β f τ)
       = (ε (g 0 0 : ZMod N) * ε (g 1 1 : ZMod N)) * (ε (β 0 0 : ZMod N) * slz k β f τ) := by ring
     _ = ε (β 0 0 : ZMod N) * slz k β f τ := by rw [this, one_mul]
 
-theorem hsum_indep : ∀ (k L N : ℕ) (ε : DirichletCharacter ℂ N) (Δ : Set M2) (ι κ : Type) [Fintype ι] [Fintype κ] (β : ι → M2) (β' : κ → M2) (f : ℍ → ℂ), 1 ≤ k → N ∣ L → (∀ δ ∈ Δ, 0 < δ.det ∧ (N : ℤ) ∣ δ 1 0) → LRep L Δ β → LRep L Δ β' → Inv k L (ch ε) f → hsum k (ch ε) β f = hsum k (ch ε) β' f := by
+theorem hsum_indep
+    : ∀ (k L N : ℕ) (ε : DirichletCharacter ℂ N) (Δ : Set M2) (ι κ : Type) [Fintype ι] [Fintype κ]
+        (β : ι → M2) (β' : κ → M2) (f : ℍ → ℂ),
+      1 ≤ k → N ∣ L → (∀ δ ∈ Δ, 0 < δ.det ∧ (N : ℤ) ∣ δ 1 0) → LRep L Δ β → LRep L Δ β'
+        → Inv k L (ch ε) f
+        → hsum k (ch ε) β f = hsum k (ch ε) β' f := by
   intro k L N ε Δ ι κ _ _ β β' f hk hNL hΔ hβ hβ' hf
   obtain ⟨σ, hσ, g, hg⟩ := exists_inj L Δ β β' hβ hβ'
   obtain ⟨σ', hσ', -, -⟩ := exists_inj L Δ β' β hβ' hβ

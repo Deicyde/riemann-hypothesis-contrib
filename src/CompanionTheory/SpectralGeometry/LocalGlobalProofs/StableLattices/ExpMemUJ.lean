@@ -15,11 +15,13 @@ namespace GlobalTheory.CompanionTheory.DSStabLink
 
 open PI.UpqRep CompanionTheory.D.DSIC
 
-theorem flow_mem {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] (W : Submodule ℂ H)
-    [FiniteDimensional ℂ W] (T : ℝ → (H →L[ℂ] H)) (h0 : ∀ v, T 0 v = v)
-    (hadd : ∀ s t v, T (s + t) v = T s (T t v)) (hiso : ∀ t v, ‖T t v‖ = ‖v‖)
-    (hder : ∀ w ∈ W, ∃ z ∈ W, HasDerivAt (fun t => T t w) z 0) (u : H) (hu : u ∈ W) :
-    T 1 u ∈ W := by
+theorem flow_mem
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (W : Submodule ℂ H) [FiniteDimensional ℂ W]
+    (T : ℝ → (H →L[ℂ] H)) (h0 : ∀ v, T 0 v = v) (hadd : ∀ s t v, T (s + t) v = T s (T t v))
+    (hiso : ∀ t v, ‖T t v‖ = ‖v‖) (hder : ∀ w ∈ W, ∃ z ∈ W, HasDerivAt (fun t => T t w) z 0)
+    (u : H) (hu : u ∈ W)
+    : T 1 u ∈ W := by
   set Q : H →L[ℂ] H := Wᗮ.starProjection with hQ
   have hQW : ∀ w ∈ W, Q w = 0 := fun w hw => Submodule.starProjection_orthogonal_apply_eq_zero hw
   have hQs : ∀ x, x - Q x ∈ W := fun x => by
@@ -36,11 +38,16 @@ theorem flow_mem {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] (W 
     have h3 : ContinuousAt (fun s : ℝ => T t (T (s - t) u)) t :=
       (T t).continuous.continuousAt.comp h1
     convert h3 using 2 with s
-    rw [← hadd]; simp
+    rw [← hadd]
+    simp
   have key : ∀ ⦃x⦄, x ∈ Icc (0 : ℝ) 1 → ‖Q (T x u)‖ ≤ 0 := by
-    refine image_le_of_liminf_slope_right_le_deriv_boundary (f := fun t => ‖Q (T t u)‖)
-      (B := fun _ => 0) (B' := fun _ => 0) ?_ ?_ continuousOn_const
-      (fun x _ => hasDerivWithinAt_const _ _ _) ?_
+    refine image_le_of_liminf_slope_right_le_deriv_boundary
+      (f := fun t => ‖Q (T t u)‖)
+      (B := fun _ => 0)
+      (B' := fun _ => 0)
+      ?_ ?_ continuousOn_const
+      (fun x _ => hasDerivWithinAt_const _ _ _)
+      ?_
     · exact ((Q.continuous.comp hcont).norm).continuousOn
     · simp [h0, hQW u hu]
     · intro x _ r hr
@@ -73,9 +80,11 @@ theorem flow_mem {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] (W 
   have h1 := norm_le_zero_iff.1 (key (x := 1) ⟨zero_le_one, le_rfl⟩)
   simpa [h1] using hQs (T 1 u)
 
-theorem deriv_mem {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] (W : Submodule ℂ H)
-    [FiniteDimensional ℂ W] (c : ℝ → H) (z : H) (hc : ∀ t, c t ∈ W) (hz : HasDerivAt c z 0) :
-    z ∈ W := by
+theorem deriv_mem
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (W : Submodule ℂ H) [FiniteDimensional ℂ W]
+    (c : ℝ → H) (z : H) (hc : ∀ t, c t ∈ W) (hz : HasDerivAt c z 0)
+    : z ∈ W := by
   set Q : H →L[ℂ] H := Wᗮ.starProjection with hQ
   have hQW : ∀ w ∈ W, Q w = 0 := fun w hw => Submodule.starProjection_orthogonal_apply_eq_zero hw
   have hQs : ∀ x, x - Q x ∈ W := fun x => by
@@ -90,8 +99,8 @@ theorem deriv_mem {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] (W
 
 variable {n : ℕ}
 
-theorem inK_iff (ε : Fin n → Bool) (X : Matrix (Fin n) (Fin n) ℂ) :
-    inK ε X ↔ (∀ c d, ε c ≠ ε d → X c d = 0) ∧ ∀ c d, star (X d c) = -X c d := by
+theorem inK_iff (ε : Fin n → Bool) (X : Matrix (Fin n) (Fin n) ℂ)
+    : inK ε X ↔ (∀ c d, ε c ≠ ε d → X c d = 0) ∧ ∀ c d, star (X d c) = - X c d := by
   unfold inK inG Jm
   simp only [← Matrix.ext_iff, Matrix.add_apply, Matrix.mul_diagonal, Matrix.diagonal_mul,
     Matrix.conjTranspose_apply, Matrix.zero_apply]
@@ -100,13 +109,13 @@ theorem inK_iff (ε : Fin n → Bool) (X : Matrix (Fin n) (Fin n) ℂ) :
     have h3 : ∀ c d, ε c ≠ ε d → X c d = 0 := by
       intro c d h
       have := h2 c d
-      cases hc : ε c <;> cases hd : ε d <;> simp [hc, hd] at h this <;>
-        first | linear_combination this / 2 | linear_combination -this / 2
+      cases hc : ε c <;> cases hd : ε d <;> simp [hc, hd] at h this
+        <;> first | linear_combination this / 2 | linear_combination -this / 2
     refine ⟨h3, fun c d => ?_⟩
     have := h1 c d
     by_cases h : ε c = ε d
-    · cases hc : ε c <;> cases hd : ε d <;> simp [hc, hd] at h this ⊢ <;>
-        first | linear_combination this | linear_combination -this
+    · cases hc : ε c <;> cases hd : ε d <;> simp [hc, hd] at h this ⊢
+        <;> first | linear_combination this | linear_combination -this
     · simp [h3 c d h, h3 d c (Ne.symm h)]
   · rintro ⟨h1, h2⟩
     constructor
@@ -119,20 +128,20 @@ theorem inK_iff (ε : Fin n → Bool) (X : Matrix (Fin n) (Fin n) ℂ) :
       · rw [h]; ring
       · simp [h1 c d h]
 
-theorem inK_smul (ε : Fin n → Bool) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X) (t : ℝ) :
-    inK ε ((t : ℂ) • X) := by
+theorem inK_smul (ε : Fin n → Bool) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X) (t : ℝ)
+    : inK ε ((t : ℂ) • X) := by
   rw [inK_iff] at hX ⊢
   refine ⟨fun c d h => by simp [hX.1 c d h], fun c d => ?_⟩
   have := hX.2 c d
   simp only [Matrix.smul_apply, smul_eq_mul, star_mul', this]
   simp
 
-theorem exp_mem_K (ε : Fin n → Bool) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X) (t : ℝ) :
-    NormedSpace.exp ((t : ℂ) • X) ∈ Kset ε :=
+theorem exp_mem_K (ε : Fin n → Bool) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X) (t : ℝ)
+    : NormedSpace.exp ((t : ℂ) • X) ∈ Kset ε :=
   (Formalism.REAL.maximal_compact_facts n ε).2.2.2.1 _ (inK_smul ε hX t)
 
-theorem exp_mem_UJ (ε : Fin n → Bool) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inG ε X) (t : ℝ) :
-    NormedSpace.exp ((t : ℂ) • X) ∈ UJset ε :=
+theorem exp_mem_UJ (ε : Fin n → Bool) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inG ε X) (t : ℝ)
+    : NormedSpace.exp ((t : ℂ) • X) ∈ UJset ε :=
   Formalism.REAL.exp_indefinite_unitary_holds n ε X hX t
 
 theorem stabLink : KExp → StabLink := by
@@ -140,16 +149,15 @@ theorem stabLink : KExp → StabLink := by
   constructor
   · intro hst g hg v hv
     obtain ⟨X, hX, rfl⟩ := hK n ε g hg
-    have := flow_mem (U.map S.subtype) (fun t : ℝ => σ (NormedSpace.exp ((t : ℂ) • X)))
-      ?_ ?_ ?_ ?_ v hv
+    have :=
+      flow_mem (U.map S.subtype) (fun t : ℝ => σ (NormedSpace.exp ((t : ℂ) • X))) ?_ ?_ ?_ ?_ v hv
     · simpa using this
     · intro v
       simp [hσ.1.1]
     · intro s t v
       have hc : Commute ((s : ℂ) • X) ((t : ℂ) • X) := ((Commute.refl X).smul_left _).smul_right _
       simp only [Complex.ofReal_add, add_smul]
-      rw [Matrix.exp_add_of_commute _ _ hc,
-        hσ.1.2 _ (exp_mem_UJ ε hX.1 s) _ (exp_mem_UJ ε hX.1 t)]
+      rw [Matrix.exp_add_of_commute _ _ hc, hσ.1.2 _ (exp_mem_UJ ε hX.1 s) _ (exp_mem_UJ ε hX.1 t)]
       rfl
     · intro t v
       exact hσ.2.1 _ (exp_mem_UJ ε hX.1 t) v
@@ -162,12 +170,13 @@ theorem stabLink : KExp → StabLink := by
   · intro hst a b hab v hv
     have hL : ∀ X, inK ε X → ∑ c, ∑ d, X c d • (E c d v : H) ∈ U.map S.subtype := fun X hX =>
       deriv_mem _ _ _ (fun t => hst _ (exp_mem_K ε hX t) _ ⟨v, hv, rfl⟩) (hS.real X hX.1 v)
-    have hs : ∀ (p q : Fin n) (z : ℂ),
-        ∑ c, ∑ d, (Matrix.single p q z) c d • (E c d v : H) = z • (E p q v : H) := by
+    have hs
+        : ∀ (p q : Fin n) (z : ℂ),
+          ∑ c, ∑ d, (Matrix.single p q z) c d • (E c d v : H) = z • (E p q v : H) := by
       intro p q z
       simp [Matrix.single_apply, ite_and]
-    have hoff : ∀ (p q : Fin n) (z : ℂ), ε p = ε q → ∀ c d, ε c ≠ ε d →
-        Matrix.single p q z c d = 0 := by
+    have hoff
+        : ∀ (p q : Fin n) (z : ℂ), ε p = ε q → ∀ c d, ε c ≠ ε d → Matrix.single p q z c d = 0 := by
       intro p q z h c d hcd
       rw [Matrix.single_apply, if_neg]
       rintro ⟨rfl, rfl⟩
@@ -176,18 +185,21 @@ theorem stabLink : KExp → StabLink := by
       intro z
       have hin : inK ε (Matrix.single a b z - Matrix.single b a (star z)) := by
         rw [inK_iff]
-        refine ⟨fun c d h => by simp [hoff a b z hab c d h, hoff b a _ hab.symm c d h], fun c d => ?_⟩
+        refine
+          ⟨fun c d h => by simp [hoff a b z hab c d h, hoff b a _ hab.symm c d h], fun c d => ?_⟩
         simp only [Matrix.sub_apply, Matrix.single_apply, star_sub, apply_ite star, star_star,
           star_zero, neg_sub, and_comm]
       have := hL _ hin
       simpa only [Matrix.sub_apply, sub_smul, Finset.sum_sub_distrib, hs] using this
     have h1 := hZ 1
     have h2 := hZ Complex.I
-    have h3 := Submodule.add_mem _ (Submodule.smul_mem _ (1 / 2 : ℂ) h1)
-      (Submodule.smul_mem _ (-Complex.I / 2 : ℂ) h2)
-    have e : (1 / 2 : ℂ) • ((1 : ℂ) • (E a b v : H) - star (1 : ℂ) • (E b a v : H)) +
-        (-Complex.I / 2 : ℂ) • (Complex.I • (E a b v : H) - star Complex.I • (E b a v : H)) =
-        (E a b v : H) := by
+    have h3 :=
+      Submodule.add_mem _ (Submodule.smul_mem _ (1 / 2 : ℂ) h1)
+        (Submodule.smul_mem _ (-Complex.I / 2 : ℂ) h2)
+    have e
+        : (1 / 2 : ℂ) • ((1 : ℂ) • (E a b v : H) - star (1 : ℂ) • (E b a v : H))
+            + (-Complex.I / 2 : ℂ) • (Complex.I • (E a b v : H) - star Complex.I • (E b a v : H))
+          = (E a b v : H) := by
       simp only [star_one, Complex.star_def, Complex.conj_I]
       match_scalars
       · linear_combination (-1 / 2 : ℂ) * Complex.I_mul_I

@@ -11,9 +11,10 @@ open Formalism.MainNotions Formalism.BasicNotions Formalism.MainNotions.G Classi
 
 namespace GlobalTheory
 
-theorem rank_two_logb_five_sq_le {eps : ℝ} (Fm : FamP eps) :
-    ∃ x0 : ℝ, ∀ x ≥ x0, Fm.x1 < x → ∀ i : Fm.Ix x,
-      2 * Real.logb 5 ((Fm.L x i).sc.a ^ 2) + 2 ≤ ((Fm.D x i).R.k : ℝ) - 1 := by
+theorem rank_two_logb_five_sq_le {eps : ℝ} (Fm : FamP eps)
+    : ∃ x0 : ℝ, ∀ x ≥ x0,
+      Fm.x1 < x
+        → ∀ i : Fm.Ix x, 2 * Real.logb 5 ((Fm.L x i).sc.a ^ 2) + 2 ≤ ((Fm.D x i).R.k : ℝ) - 1 := by
   refine ⟨3, fun x hx hx1 i => ?_⟩
   have hK := (Fm.sizes x hx1 i).2.2.1.1
   have hsx := Fm.L_x x i hx1
@@ -32,8 +33,9 @@ theorem rank_two_logb_five_sq_le {eps : ℝ} (Fm : FamP eps) :
   have hL : (Fm.L x i).sc.L ≤ x := by
     unfold Scale.L
     rw [hsx]
-    calc x ^ (Fm.L x i).sc.eps ≤ x ^ (1 : ℝ) :=
-          Real.rpow_le_rpow_of_exponent_le (by linarith) (by linarith)
+    calc
+      x ^ (Fm.L x i).sc.eps
+        ≤ x ^ (1 : ℝ) := Real.rpow_le_rpow_of_exponent_le (by linarith) (by linarith)
       _ = x := Real.rpow_one x
   have hL0 : 0 ≤ (Fm.L x i).sc.L := by
     unfold Scale.L
@@ -53,10 +55,14 @@ theorem rank_two_logb_five_sq_le {eps : ℝ} (Fm : FamP eps) :
     push_cast
     refine (div_le_self (by linarith) h5).trans (by linarith)
   have h27 : 27 ≤ x ^ 3 := by
-    calc (27 : ℝ) = 3 ^ 3 := by norm_num
+    calc
+      (27 : ℝ)
+        = 3 ^ 3 := by norm_num
       _ ≤ x ^ 3 := pow_le_pow_left₀ (by norm_num) hx3 3
   have : 27 * x ≤ x ^ 4 := by
-    calc 27 * x ≤ x ^ 3 * x := mul_le_mul_of_nonneg_right h27 hx0.le
+    calc
+      27 * x
+        ≤ x ^ 3 * x := mul_le_mul_of_nonneg_right h27 hx0.le
       _ = x ^ 4 := by ring
   linarith
 

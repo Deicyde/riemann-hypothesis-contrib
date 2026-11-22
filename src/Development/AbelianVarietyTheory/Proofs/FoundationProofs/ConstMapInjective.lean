@@ -11,7 +11,9 @@ noncomputable section
 
 namespace GlobalTheory.PrescribedRank
 
-variable (p : ℕ) (O Kf : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
+variable
+  (p : ℕ)
+  (O Kf : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
 
 def noPlaces : Places p O Kf where
   w := 0
@@ -37,18 +39,19 @@ def trivLevel : Level (noPlaces p O Kf) where
 
 theorem tup_eq (L L' : (noPlaces p O Kf).Tup) : L = L' := funext fun v => isEmptyElim v
 
-theorem isLatTup (L : (noPlaces p O Kf).Tup) : (noPlaces p O Kf).IsLatTup L := fun v => isEmptyElim v
+theorem isLatTup (L : (noPlaces p O Kf).Tup) : (noPlaces p O Kf).IsLatTup L := fun v =>
+  isEmptyElim v
 
-theorem actX_apply (γ : (trivLevel p O Kf).Γ) (x : (noPlaces p O Kf).Xsp) :
-    (trivLevel p O Kf).actX γ x = x := by
+theorem actX_apply (γ : (trivLevel p O Kf).Γ) (x : (noPlaces p O Kf).Xsp)
+    : (trivLevel p O Kf).actX γ x = x := by
   have h : ∀ G, (noPlaces p O Kf).subst G = AlgHom.id Kf _ := fun G =>
     MvPolynomial.algHom_ext fun i => isEmptyElim i.1
   unfold Level.actX Places.natAct
   rw [h, Fintype.prod_empty]
   simp
 
-theorem htupW_eq (L : (noPlaces p O Kf).Tup) :
-    (noPlaces p O Kf).HtupW L = Submodule.span O {1} := by
+theorem htupW_eq (L : (noPlaces p O Kf).Tup)
+    : (noPlaces p O Kf).HtupW L = Submodule.span O {1} := by
   unfold Places.HtupW Places.tenV
   congr 1
   ext X
@@ -59,9 +62,10 @@ theorem htupW_eq (L : (noPlaces p O Kf).Tup) :
   · rintro rfl
     exact ⟨fun v => isEmptyElim v, fun v => isEmptyElim v, by rw [Fintype.prod_empty]⟩
 
-theorem mem_funMod (Hv : (noPlaces p O Kf).Tup → Submodule O (noPlaces p O Kf).Xsp)
-    (F : (noPlaces p O Kf).Tup → (noPlaces p O Kf).Xsp) :
-    F ∈ (trivLevel p O Kf).funMod Hv ↔ ∀ L, F L ∈ Hv L := by
+theorem mem_funMod
+    (Hv : (noPlaces p O Kf).Tup → Submodule O (noPlaces p O Kf).Xsp)
+    (F : (noPlaces p O Kf).Tup → (noPlaces p O Kf).Xsp)
+    : F ∈ (trivLevel p O Kf).funMod Hv ↔ ∀ L, F L ∈ Hv L := by
   unfold Level.funMod
   simp only [Submodule.mem_inf, Submodule.mem_iInf, Submodule.mem_comap, LinearMap.mem_ker]
   constructor
@@ -73,9 +77,11 @@ theorem mem_funMod (Hv : (noPlaces p O Kf).Tup → Submodule O (noPlaces p O Kf)
     rw [tup_eq p O Kf ((trivLevel p O Kf).smul γ L) L, hχ]
     simp [actX_apply]
 
-theorem finClasses : (trivLevel p O Kf).FinClasses :=
-  ⟨{fun v => isEmptyElim v}, fun L _ => isLatTup p O Kf L, fun L _ =>
-    ⟨_, Finset.mem_singleton_self _, (1 : (trivLevel p O Kf).Γ), tup_eq p O Kf _ _⟩⟩
+theorem finClasses : (trivLevel p O Kf).FinClasses := ⟨
+  {fun v => isEmptyElim v},
+  fun L _ => isLatTup p O Kf L,
+  fun L _ => ⟨_, Finset.mem_singleton_self _, (1 : (trivLevel p O Kf).Γ), tup_eq p O Kf _ _⟩
+⟩
 
 def gat (d : ℕ) : GAtP p where
   O := O
@@ -85,7 +91,8 @@ def gat (d : ℕ) : GAtP p where
   lev := fun _ => trivLevel p O Kf
   e := 0
 
-def constMap (d : ℕ) : (Fin d → O) →ₗ[O] (Fin d → (noPlaces p O Kf).Tup → (noPlaces p O Kf).Xsp) where
+def constMap (d : ℕ)
+    : (Fin d → O) →ₗ[O] (Fin d → (noPlaces p O Kf).Tup → (noPlaces p O Kf).Xsp) where
   toFun c := fun i _ => c i • (1 : (noPlaces p O Kf).Xsp)
   map_add' a b := by
     funext i L
@@ -94,22 +101,26 @@ def constMap (d : ℕ) : (Fin d → O) →ₗ[O] (Fin d → (noPlaces p O Kf).Tu
     funext i L
     simp [mul_smul]
 
-theorem constMap_injective (d : ℕ) (hinj : Function.Injective (algebraMap O Kf)) :
-    Function.Injective (constMap p O Kf d) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+theorem constMap_injective (d : ℕ) (hinj : Function.Injective (algebraMap O Kf))
+    : Function.Injective (constMap p O Kf d) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro c hc
   funext i
-  have h : c i • (1 : (noPlaces p O Kf).Xsp) = 0 := congrFun (congrFun hc i) (fun v => isEmptyElim v)
+  have h : c i • (1 : (noPlaces p O Kf).Xsp) = 0 :=
+    congrFun (congrFun hc i) (fun v => isEmptyElim v)
   have h2 := congrArg (AddMonoidAlgebra.coeff · 0) h
   rw [MvPolynomial.coeff_smul, MvPolynomial.coeff_zero_one, MvPolynomial.coeff_zero,
-    Algebra.smul_def, mul_one] at h2
+      Algebra.smul_def, mul_one]
+    at h2
   apply hinj
   rw [h2]
   simp
 
-theorem range_constMap (d : ℕ) :
-    LinearMap.range (constMap p O Kf d) =
-      Submodule.pi Set.univ fun _ : Fin d => (trivLevel p O Kf).funMod (noPlaces p O Kf).HtupW := by
+theorem range_constMap (d : ℕ)
+    : LinearMap.range (constMap p O Kf d)
+      = Submodule.pi Set.univ fun _ : Fin d =>
+        (trivLevel p O Kf).funMod (noPlaces p O Kf).HtupW := by
   ext F
   rw [Submodule.mem_pi]
   simp only [Set.mem_univ, true_imp_iff, mem_funMod, htupW_eq, Submodule.mem_span_singleton]
@@ -124,15 +135,22 @@ theorem range_constMap (d : ℕ) :
     exact hc i _
 
 theorem gat_d (d : ℕ) (hinj : Function.Injective (algebraMap O Kf)) : (gat p O Kf d).d = d := by
-  have h : (gat p O Kf d).d = Module.finrank O
-      (Submodule.pi Set.univ fun _ : Fin d => (trivLevel p O Kf).funMod (noPlaces p O Kf).HtupW) := rfl
+  have h
+      : (gat p O Kf d).d
+        = Module.finrank O
+          (Submodule.pi Set.univ fun _ : Fin d =>
+            (trivLevel p O Kf).funMod (noPlaces p O Kf).HtupW) :=
+    rfl
   rw [h, ← range_constMap, LinearMap.finrank_range_of_inj (constMap_injective p O Kf d hinj)]
   simp
 
 theorem GAtP₂ : ∀ (p d : ℕ), p.Prime → ∃ G : GAtP p, G.d = d ∧ G.FinClasses := by
   intro p d hp
   haveI : Fact p.Prime := ⟨hp⟩
-  exact ⟨gat p ℤ_[p] ℚ_[p] d, gat_d p _ _ d (IsFractionRing.injective ℤ_[p] ℚ_[p]),
-    fun _ => finClasses p _ _⟩
+  exact ⟨
+    gat p ℤ_[p] ℚ_[p] d,
+    gat_d p _ _ d (IsFractionRing.injective ℤ_[p] ℚ_[p]),
+    fun _ => finClasses p _ _
+  ⟩
 
 end GlobalTheory.PrescribedRank

@@ -135,20 +135,23 @@ private lemma root_of_local {R : Type*} [CommRing R] [IsLocalRing R]
 
 end UpperTheory.Reformulated.B.AdicCompleteRootExistence
 
-theorem UpperTheory.Reformulated.B.AdicCompleteRootExistence.exists_root_of_dvd.{u_1} :
-    ∀ {K : Type u_1} [inst : Field K] [inst_1 : ValuativeRel K] [inst_2 : TopologicalSpace K] [IsNonarchimedeanLocalField K]
-      {ϖ : ↥(ValuativeRel.valuation K).integer},
-      Irreducible ϖ →
-        ∀ (f : Polynomial ↥(ValuativeRel.valuation K).integer) (a : ↥(ValuativeRel.valuation K).integer) (k : ℕ)
-          (ε : (↥(ValuativeRel.valuation K).integer)ˣ),
+theorem UpperTheory.Reformulated.B.AdicCompleteRootExistence.exists_root_of_dvd.{u_1}
+    : ∀ {K : Type u_1} [inst : Field K] [inst_1 : ValuativeRel K] [inst_2 : TopologicalSpace K]
+        [IsNonarchimedeanLocalField K] {ϖ : ↥(ValuativeRel.valuation K).integer},
+      Irreducible ϖ
+        → ∀ (f : Polynomial ↥(ValuativeRel.valuation K).integer)
+            (a : ↥(ValuativeRel.valuation K).integer) (k : ℕ)
+            (ε : (↥(ValuativeRel.valuation K).integer)ˣ),
           Polynomial.eval a
-                ((Polynomial.derivative :
-                    Polynomial ↥(ValuativeRel.valuation K).integer → Polynomial ↥(ValuativeRel.valuation K).integer)
-                  f) =
-              ϖ ^ k * (↑ε : ↥(ValuativeRel.valuation K).integer) →
-            ϖ ^ ((2 : ℕ) * k + (1 : ℕ)) ∣ Polynomial.eval a f →
-              ∃ (b : ↥(ValuativeRel.valuation K).integer),
-                Polynomial.eval b f = (0 : ↥(ValuativeRel.valuation K).integer) ∧ ϖ ^ (k + (1 : ℕ)) ∣ b - a := by
+                ((Polynomial.derivative
+                    : Polynomial ↥(ValuativeRel.valuation K).integer
+                      → Polynomial ↥(ValuativeRel.valuation K).integer)
+                  f)
+              = ϖ ^ k * (↑ε : ↥(ValuativeRel.valuation K).integer)
+            → ϖ ^ ((2 : ℕ) * k + (1 : ℕ)) ∣ Polynomial.eval a f
+            → ∃ (b : ↥(ValuativeRel.valuation K).integer),
+              Polynomial.eval b f = (0 : ↥(ValuativeRel.valuation K).integer)
+                ∧ ϖ ^ (k + (1 : ℕ)) ∣ b - a := by
   intro K _ _ _ _ ϖ hϖ f a k ε h1 h2
   let := IsTopologicalAddGroup.rightUniformSpace K
   have := isUniformAddGroup_of_addCommGroup (G := K)

@@ -36,8 +36,9 @@ theorem ChartPrimElt.proof : ChartPrimElt.Statement := by
     intro q
     have h1 : (⟨r q, hmemL q⟩ : L) ∈ IntermediateField.adjoin Φ ({α} : Set L) := by rw [hα]; trivial
     rw [← IntermediateField.mem_toSubalgebra,
-      IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic hint.isAlgebraic,
-      Algebra.adjoin_singleton_eq_range_aeval] at h1
+        IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic hint.isAlgebraic,
+        Algebra.adjoin_singleton_eq_range_aeval]
+      at h1
     obtain ⟨p, hp⟩ := h1
     exact ⟨p, hp⟩
   choose g hg using hg
@@ -50,7 +51,8 @@ theorem ChartPrimElt.proof : ChartPrimElt.Statement := by
     exact minpoly.irreducible hint
   refine ⟨τ, g, ?_⟩
   have hsep : IsCoprime (minpoly Φ (MvPolynomial.aeval r τ))
-      (derivative (minpoly Φ (MvPolynomial.aeval r τ))) := hirr.separable
+      (derivative (minpoly Φ (MvPolynomial.aeval r τ))) :=
+    hirr.separable
   obtain ⟨a, b, hab⟩ := hsep
   refine ⟨b, ?_, hgθ, ⟨-a, by linear_combination hab⟩, ?_, ?_⟩
   · rw [hm]

@@ -14,17 +14,21 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsI
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Module GlobalTheory.CompanionTheory.LocDual
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual Formalism.BasicNotions
+  Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations Module GlobalTheory.CompanionTheory.LocDual
 
 namespace GlobalTheory.CompanionTheory.LocDual.Lat
 
 section Basis
 
-variable {LL : Type} [Field LL] {O : Type} [CommRing O] [Algebra O LL]
+variable
+  {LL : Type} [Field LL]
+  {O : Type} [CommRing O] [Algebra O LL]
   {W : Type} [AddCommGroup W] [Module LL W] [Module O W] [IsScalarTower O LL W]
 
-theorem mem_span_basis {ι : Type} [Fintype ι] (b : Basis ι LL W) (y : W) :
-    y ∈ Submodule.span O (Set.range b) ↔ ∀ i, b.repr y i ∈ Set.range (algebraMap O LL) := by
+theorem mem_span_basis {ι : Type} [Fintype ι] (b : Basis ι LL W) (y : W)
+    : y ∈ Submodule.span O (Set.range b) ↔ ∀ i, b.repr y i ∈ Set.range (algebraMap O LL) := by
   constructor
   · intro hy
     induction hy using Submodule.span_induction with
@@ -34,7 +38,8 @@ theorem mem_span_basis {ι : Type} [Fintype ι] (b : Basis ι LL W) (y : W) :
       by_cases h : j = i
       · subst h; exact ⟨1, by simp⟩
       · exact ⟨0, by simp [Finsupp.single_apply, h]⟩
-    | zero => intro i; exact ⟨0, by simp⟩
+    | zero =>
+      intro i; exact ⟨0, by simp⟩
     | add x z _ _ hx hz =>
       intro i
       obtain ⟨a, ha⟩ := hx i
@@ -56,27 +61,30 @@ end Basis
 
 section Dual
 
-variable {LL : Type} [Field LL] {O : Type} [CommRing O] [IsDomain O] [Algebra O LL]
-  [IsFractionRing O LL]
-  {V : Type} [AddCommGroup V] [Module LL V] [Module O V] [IsScalarTower O LL V]
-  [FiniteDimensional LL V]
-  {V' : Type} [AddCommGroup V'] [Module LL V'] [Module O V'] [IsScalarTower O LL V']
-  [FiniteDimensional LL V']
+variable
+  {LL : Type} [Field LL]
+  {O : Type} [CommRing O] [IsDomain O] [Algebra O LL] [IsFractionRing O LL]
+  {V : Type}
+  [AddCommGroup V] [Module LL V] [Module O V] [IsScalarTower O LL V] [FiniteDimensional LL V]
+  {V' : Type}
+  [AddCommGroup V'] [Module LL V'] [Module O V'] [IsScalarTower O LL V'] [FiniteDimensional LL V']
 
-theorem exists_dual (T : Submodule O V) (hfg : T.FG) (hfree : Module.Free O T)
-    (hspan : Submodule.span LL (T : Set V) = ⊤) (P : V →ₗ[LL] V' →ₗ[LL] LL)
-    (hr : ∀ y, (∀ x, P x y = 0) → y = 0) (hd : finrank LL V = finrank LL V') :
-    ∃ T' : Submodule O V', T'.FG ∧ Module.Free O T' ∧ Submodule.span LL (T' : Set V') = ⊤ ∧
-      (∀ y, y ∈ T' ↔ ∀ x ∈ T, ∃ a : O, P x y = algebraMap O LL a) ∧
-      (∀ x, x ∈ T ↔ ∀ y ∈ T', ∃ a : O, P x y = algebraMap O LL a) := by
+theorem exists_dual
+    (T : Submodule O V)
+    (hfg : T.FG) (hfree : Module.Free O T) (hspan : Submodule.span LL (T : Set V) = ⊤)
+    (P : V →ₗ[LL] V' →ₗ[LL] LL) (hr : ∀ y, (∀ x, P x y = 0) → y = 0)
+    (hd : finrank LL V = finrank LL V')
+    : ∃ T' : Submodule O V',
+      T'.FG ∧ Module.Free O T' ∧ Submodule.span LL (T' : Set V') = ⊤
+        ∧ (∀ y, y ∈ T' ↔ ∀ x ∈ T, ∃ a : O, P x y = algebraMap O LL a)
+        ∧ (∀ x, x ∈ T ↔ ∀ y ∈ T', ∃ a : O, P x y = algebraMap O LL a) := by
   classical
   haveI : Module.Finite O T := Module.Finite.iff_fg.2 hfg
   let bT := Module.Free.chooseBasis O T
   let ι := Module.Free.ChooseBasisIndex O T
   haveI : Fintype ι := Module.Free.ChooseBasisIndex.fintype O T
   let e : ι → V := fun i => (bT i : V)
-  have hli : LinearIndependent O e :=
-    bT.linearIndependent.map' T.subtype (Submodule.ker_subtype T)
+  have hli : LinearIndependent O e := bT.linearIndependent.map' T.subtype (Submodule.ker_subtype T)
   have hliL : LinearIndependent LL e := (LinearIndependent.iff_fractionRing O LL).1 hli
   have hTe : T = Submodule.span O (Set.range e) := by
     have h := congrArg (Submodule.map T.subtype) bT.span_eq
@@ -91,27 +99,30 @@ theorem exists_dual (T : Submodule O V) (hfg : T.FG) (hfree : Module.Free O T)
   let bV : Basis ι LL V := Basis.mk hliL hsp
   have hbV : ∀ i, bV i = e i := fun i => Basis.mk_apply hliL hsp i
   have hinj : Function.Injective P.flip := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro y hy
     exact hr y fun x => by simpa using congrArg (fun f => f x) hy
-  let φ : V' ≃ₗ[LL] Dual LL V := LinearMap.linearEquivOfInjective P.flip hinj
-    (by rw [Subspace.dual_finrank_eq, hd])
+  let φ : V' ≃ₗ[LL] Dual LL V :=
+    LinearMap.linearEquivOfInjective P.flip hinj (by rw [Subspace.dual_finrank_eq, hd])
   let bb : Basis ι LL V' := bV.dualBasis.map φ.symm
   have hflip : ∀ j x, P x (bb j) = bV.repr x j := by
     intro j x
     have h1 : φ (bb j) = bV.coord j := by simp [bb]
     have h2 : φ (bb j) x = P x (bb j) := rfl
-    rw [← h2, h1]; rfl
+    rw [← h2, h1]
+    rfl
   have hcoord : ∀ i y, P (e i) y = bb.repr y i := by
     intro i y
     have : (P (e i)) = bb.coord i := by
       refine bb.ext fun j => ?_
       rw [hflip, ← hbV]
       simp [Finsupp.single_apply, eq_comm]
-    rw [this]; rfl
-  have hTV : T = Submodule.span O (Set.range bV) := by
-    rw [hTe]; congr 2; ext x; simp [hbV]
-  have hpair : ∀ x ∈ T, ∀ y ∈ Submodule.span O (Set.range bb), ∃ a : O, P x y = algebraMap O LL a := by
+    rw [this]
+    rfl
+  have hTV : T = Submodule.span O (Set.range bV) := by rw [hTe]; congr 2; ext x; simp [hbV]
+  have hpair
+      : ∀ x ∈ T, ∀ y ∈ Submodule.span O (Set.range bb), ∃ a : O, P x y = algebraMap O LL a := by
     intro x hx y hy
     induction hy using Submodule.span_induction with
     | mem y hy =>
@@ -120,7 +131,8 @@ theorem exists_dual (T : Submodule O V) (hfg : T.FG) (hfree : Module.Free O T)
       rw [hTV] at hx
       obtain ⟨a, ha⟩ := (mem_span_basis bV x).1 hx j
       exact ⟨a, ha.symm⟩
-    | zero => exact ⟨0, by simp⟩
+    | zero =>
+      exact ⟨0, by simp⟩
     | add y z _ _ hy hz =>
       obtain ⟨a, ha⟩ := hy
       obtain ⟨c, hc⟩ := hz
@@ -158,16 +170,17 @@ end Dual
 
 section Stable
 
-variable {G : Type} [Group G] [TopologicalSpace G] [CompactSpace G]
+variable
+  {G : Type} [Group G] [TopologicalSpace G] [CompactSpace G]
   {LL : Type} [Field LL] [TopologicalSpace LL] [IsTopologicalRing LL]
-  {O : Type} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [Algebra O LL]
-  [IsFractionRing O LL]
+  {O : Type} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [Algebra O LL] [IsFractionRing O LL]
   {V : Type} [AddCommGroup V] [Module LL V] [Module O V] [IsScalarTower O LL V]
   [FiniteDimensional LL V] [TopologicalSpace V] [IsModuleTopology LL V]
 
-theorem exists_stable (hO : IsOpen (Set.range (algebraMap O LL)))
-    (ρ : Representation LL G V) (cont : ∀ x, Continuous fun g => ρ g x) :
-    Nonempty (Lattice (O := O) ρ) := by
+theorem exists_stable
+    (hO : IsOpen (Set.range (algebraMap O LL)))
+    (ρ : Representation LL G V) (cont : ∀ x, Continuous fun g => ρ g x)
+    : Nonempty (Lattice (O := O) ρ) := by
   classical
   let b : Basis (Fin (finrank LL V)) LL V := Module.finBasis LL V
   have hinj : Function.Injective (algebraMap O LL) := IsFractionRing.injective O LL
@@ -179,18 +192,21 @@ theorem exists_stable (hO : IsOpen (Set.range (algebraMap O LL)))
     {g | ∀ i j, algebraMap O LL a * b.repr (ρ g (b i)) j ∈ Set.range (algebraMap O LL)}
   have hWo : ∀ a, IsOpen (Wa a) := by
     intro a
-    have h : Wa a = ⋂ i, ⋂ j, (fun g => algebraMap O LL a * b.repr (ρ g (b i)) j) ⁻¹'
-        Set.range (algebraMap O LL) := by
+    have h
+        : Wa a
+          = ⋂ i, ⋂ j, (fun g => algebraMap O LL a * b.repr (ρ g (b i)) j) ⁻¹'
+            Set.range (algebraMap O LL) := by
       ext g
       simp only [Wa, Set.mem_setOf_eq, Set.mem_iInter, Set.mem_preimage]
     rw [h]
-    exact isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j =>
-      hO.preimage (continuous_const.mul (hc i j))
+    exact isOpen_iInter_of_finite fun i =>
+      isOpen_iInter_of_finite fun j => hO.preimage (continuous_const.mul (hc i j))
   have hcov : (Set.univ : Set G) ⊆ ⋃ a, Wa a := by
     intro g _
-    obtain ⟨d, hd⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors O)
-      (Finset.univ : Finset (Fin (finrank LL V) × Fin (finrank LL V)))
-      (fun p => b.repr (ρ g (b p.1)) p.2)
+    obtain ⟨d, hd⟩ :=
+      IsLocalization.exist_integer_multiples (nonZeroDivisors O)
+        (Finset.univ : Finset (Fin (finrank LL V) × Fin (finrank LL V)))
+        (fun p => b.repr (ρ g (b p.1)) p.2)
     refine Set.mem_iUnion.2 ⟨d, fun i j => ?_⟩
     obtain ⟨c, hc'⟩ := hd (i, j) (Finset.mem_univ _)
     refine ⟨c, ?_⟩
@@ -199,8 +215,8 @@ theorem exists_stable (hO : IsOpen (Set.range (algebraMap O LL)))
   obtain ⟨t, ht⟩ := isCompact_univ.elim_finite_subcover Wa hWo hcov
   let a : O := ∏ s ∈ t, (s : O)
   have ha0 : a ≠ 0 := Finset.prod_ne_zero_iff.2 fun s _ => nonZeroDivisors.ne_zero s.2
-  have hbound : ∀ g i j, algebraMap O LL a * b.repr (ρ g (b i)) j ∈
-      Set.range (algebraMap O LL) := by
+  have hbound
+      : ∀ g i j, algebraMap O LL a * b.repr (ρ g (b i)) j ∈ Set.range (algebraMap O LL) := by
     intro g i j
     obtain ⟨s, hs, hg⟩ := Set.mem_iUnion₂.1 (ht (Set.mem_univ g))
     obtain ⟨c, hc'⟩ := hg i j
@@ -210,7 +226,8 @@ theorem exists_stable (hO : IsOpen (Set.range (algebraMap O LL)))
     rw [hq', map_mul, map_mul, hc']
     ring
   let T0 : Submodule O V := Submodule.span O (Set.range b)
-  let T : Submodule O V := Submodule.span O (Set.range fun p : G × Fin (finrank LL V) => ρ p.1 (b p.2))
+  let T : Submodule O V :=
+    Submodule.span O (Set.range fun p : G × Fin (finrank LL V) => ρ p.1 (b p.2))
   have hTa : ∀ x ∈ T, a • x ∈ T0 := by
     intro x hx
     induction hx using Submodule.span_induction with
@@ -224,7 +241,8 @@ theorem exists_stable (hO : IsOpen (Set.range (algebraMap O LL)))
     | smul c x _ hx => rw [smul_comm]; exact T0.smul_mem c hx
   let φ : T →ₗ[O] T0 := (a • (LinearMap.id : V →ₗ[O] V)).restrict hTa
   have hφ : Function.Injective φ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     have h1 : a • (x : V) = 0 := congrArg Subtype.val hx
     rw [← algebraMap_smul LL a, smul_eq_zero] at h1
@@ -237,16 +255,23 @@ theorem exists_stable (hO : IsOpen (Set.range (algebraMap O LL)))
   haveI : Module.Finite O T0 := Module.Finite.span_of_finite O (Set.finite_range _)
   haveI : Module.Finite O T := Module.Finite.of_injective φ hφ
   haveI : Module.Free O (LinearMap.range φ) := Module.free_of_finite_type_torsion_free'
-  refine ⟨{ T := T, stable := ?_, fg := Module.Finite.iff_fg.1 inferInstance,
-            free := Module.Free.of_equiv (LinearEquiv.ofInjective φ hφ).symm, span := ?_ }⟩
+  refine ⟨{
+    T := T
+    stable := ?_
+    fg := Module.Finite.iff_fg.1 inferInstance
+    free := Module.Free.of_equiv (LinearEquiv.ofInjective φ hφ).symm
+    span := ?_
+  }⟩
   · intro h x hx
     induction hx using Submodule.span_induction with
     | mem x hx =>
       obtain ⟨⟨g, i⟩, rfl⟩ := hx
       refine Submodule.subset_span ⟨(h * g, i), ?_⟩
       simp [map_mul, Module.End.mul_apply]
-    | zero => simp
-    | add x z _ _ hx hz => rw [map_add (f := _)]; exact T.add_mem hx hz
+    | zero =>
+      simp
+    | add x z _ _ hx hz =>
+      rw [map_add (f := _)]; exact T.add_mem hx hz
     | smul c x _ hx =>
       rw [LinearMap.map_smul_of_tower]
       exact T.smul_mem c hx

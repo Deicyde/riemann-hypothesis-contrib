@@ -11,8 +11,8 @@ namespace PI.PC
 
 open Real
 
-theorem tst_sound {m c c' : ℕ} (h : tst m c = true) (hc : c' ≤ c) (hm : 1 ≤ m) :
-    (c' : ℝ) * log m < 1.26 * m := by
+theorem tst_sound {m c c' : ℕ} (h : tst m c = true) (hc : c' ≤ c) (hm : 1 ≤ m)
+    : (c' : ℝ) * log m < 1.26 * m := by
   unfold tst at h
   rw [Nat.blt_eq] at h
   obtain ⟨q, hqdef⟩ : ∃ q, q = (3225600000000 * m - 1) / (c * 6931471808) := ⟨_, rfl⟩
@@ -49,13 +49,14 @@ theorem tst_sound {m c c' : ℕ} (h : tst m c = true) (hc : c' ≤ c) (hm : 1 �
   have hqc : (0 : ℝ) ≤ q * c := by positivity
   have h4 : (c : ℝ) * (256 * log m) < c * (q * log 2) := mul_lt_mul_of_pos_left h1 hcR
   have h5 : ((q : ℝ) * c) * log 2 ≤ (q * c) * 0.6931471808 := mul_le_mul_of_nonneg_left h3.le hqc
-  have h6 : (c' : ℝ) * log m ≤ c * log m :=
-    mul_le_mul_of_nonneg_right (by exact_mod_cast hc) hlogm
+  have h6 : (c' : ℝ) * log m ≤ c * log m := mul_le_mul_of_nonneg_right (by exact_mod_cast hc) hlogm
   nlinarith [h4, h5, h6, h2]
 
-theorem loop_sound (B : ℕ) : ∀ k n c Q : ℕ, loop B k n c Q = true → 1 ≤ n →
-    Nat.count Nat.Prime n ≤ c → (∀ p, p.Prime → n ≤ p → Nat.Coprime p Q) →
-    ∀ m, n ≤ m → m < n + k → ∃ c', Nat.count Nat.Prime (m + 1) ≤ c' ∧ tst m c' = true := by
+theorem loop_sound (B : ℕ)
+    : ∀ k n c Q : ℕ,
+      loop B k n c Q = true → 1 ≤ n → Nat.count Nat.Prime n ≤ c
+        → (∀ p, p.Prime → n ≤ p → Nat.Coprime p Q)
+        → ∀ m, n ≤ m → m < n + k → ∃ c', Nat.count Nat.Prime (m + 1) ≤ c' ∧ tst m c' = true := by
   intro k
   induction k with
   | zero =>
@@ -67,8 +68,7 @@ theorem loop_sound (B : ℕ) : ∀ k n c Q : ℕ, loop B k n c Q = true → 1 �
     by_cases hg : Nat.gcd n Q = 1
     · rw [if_pos hg, Bool.and_eq_true] at hrun
       obtain ⟨hb, hrest⟩ := hrun
-      have hc1 : Nat.count Nat.Prime (n + 1) ≤ c + 1 := by
-        rw [Nat.count_succ]; split_ifs <;> omega
+      have hc1 : Nat.count Nat.Prime (n + 1) ≤ c + 1 := by rw [Nat.count_succ]; split_ifs <;> omega
       rcases Nat.eq_or_lt_of_le hnm with rfl | hlt
       · exact ⟨c + 1, hc1, hb⟩
       · refine ih (n + 1) (c + 1) _ hrest (by omega) hc1 ?_ m hlt (by omega)
@@ -79,13 +79,12 @@ theorem loop_sound (B : ℕ) : ∀ k n c Q : ℕ, loop B k n c Q = true → 1 �
         · exact hcop p hp (by omega)
     · rw [if_neg hg, Bool.and_eq_true] at hrun
       obtain ⟨hb, hrest⟩ := hrun
-      have hnp : ¬ n.Prime := fun hp => hg (hcop n hp le_rfl)
-      have hc0 : Nat.count Nat.Prime (n + 1) ≤ c := by
-        rw [Nat.count_succ, if_neg hnp]; omega
+      have hnp : ¬n.Prime := fun hp => hg (hcop n hp le_rfl)
+      have hc0 : Nat.count Nat.Prime (n + 1) ≤ c := by rw [Nat.count_succ, if_neg hnp]; omega
       rcases Nat.eq_or_lt_of_le hnm with rfl | hlt
       · exact ⟨c, hc0, hb⟩
-      · exact ih (n + 1) c Q hrest (by omega) hc0 (fun p hp hnp' => hcop p hp (by omega)) m hlt
-          (by omega)
+      · exact ih (n + 1) c Q hrest (by omega) hc0 (fun p hp hnp' => hcop p hp (by omega)) m hlt (by
+          omega)
 
 theorem count_succ_le (n : ℕ) : Nat.count Nat.Prime (n + 1) ≤ n := by
   induction n with
@@ -94,19 +93,22 @@ theorem count_succ_le (n : ℕ) : Nat.count Nat.Prime (n + 1) ≤ n := by
     rw [Nat.count_succ]
     split_ifs <;> omega
 
-theorem small_nat (m : ℕ) (h1 : 1 ≤ m) (h2 : m < 131072) :
-    (Nat.count Nat.Prime (m + 1) : ℝ) * log m < 1.26 * m := by
+theorem small_nat (m : ℕ) (h1 : 1 ≤ m) (h2 : m < 131072)
+    : (Nat.count Nat.Prime (m + 1) : ℝ) * log m < 1.26 * m := by
   rcases Nat.eq_or_lt_of_le h1 with rfl | h1'
   · norm_num
   · have hc2 : Nat.count Nat.Prime 2 ≤ 0 := by
       show Nat.count Nat.Prime (0 + 1 + 1) ≤ 0
       simp [Nat.count_succ, Nat.not_prime_zero, Nat.not_prime_one]
-    obtain ⟨c', hc', hb⟩ := loop_sound 362 131070 2 0 1 loop_run (by norm_num) hc2
-      (fun p _ _ => Nat.coprime_one_right p) m h1' (by omega)
+    obtain ⟨c', hc', hb⟩ :=
+      loop_sound 362 131070 2 0 1 loop_run (by norm_num) hc2
+        (fun p _ _ => Nat.coprime_one_right p)
+        m h1' (by omega)
     exact tst_sound hb hc' h1
 
-theorem real_of_nat {n k : ℕ} {y : ℝ} (hn : 1 ≤ n) (hk : k ≤ n) (h : (k : ℝ) * log n < 1.26 * n)
-    (hy : (n : ℝ) ≤ y) : (k : ℝ) * log y < 1.26 * y := by
+theorem real_of_nat
+    {n k : ℕ} {y : ℝ} (hn : 1 ≤ n) (hk : k ≤ n) (h : (k : ℝ) * log n < 1.26 * n) (hy : (n : ℝ) ≤ y)
+    : (k : ℝ) * log y < 1.26 * y := by
   have hn' : (0 : ℝ) < n := Nat.cast_pos.mpr (by omega)
   have hy0 : 0 < y := lt_of_lt_of_le hn' hy
   have hkR : (k : ℝ) ≤ n := by exact_mod_cast hk
@@ -115,8 +117,7 @@ theorem real_of_nat {n k : ℕ} {y : ℝ} (hn : 1 ≤ n) (hk : k ≤ n) (h : (k 
     rw [← Real.log_div hy0.ne' hn'.ne']
     exact Real.log_le_sub_one_of_pos (div_pos hy0 hn')
   have ht : 0 ≤ y / n - 1 := sub_nonneg.mpr ((one_le_div hn').mpr hy)
-  have hnt : (n : ℝ) * (y / n - 1) = y - n := by
-    rw [mul_sub, mul_div_cancel₀ y hn'.ne', mul_one]
+  have hnt : (n : ℝ) * (y / n - 1) = y - n := by rw [mul_sub, mul_div_cancel₀ y hn'.ne', mul_one]
   have h1 : (k : ℝ) * (log y - log n) ≤ k * (y / n - 1) := mul_le_mul_of_nonneg_left hlog hk0
   have h2 : (k : ℝ) * (y / n - 1) ≤ n * (y / n - 1) := mul_le_mul_of_nonneg_right hkR ht
   nlinarith [h, h1, h2, hnt, hy]

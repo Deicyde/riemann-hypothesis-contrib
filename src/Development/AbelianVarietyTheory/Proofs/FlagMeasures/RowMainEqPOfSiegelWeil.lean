@@ -11,11 +11,12 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RowMainEqPOfS
 
 namespace GlobalTheory
 
-theorem rowMainEqP_of_siegelWeil :
-    HeckeCharacterZeroLocus.SiegelWeilU.SiegelWeilUnitaryConvergent → Formalism.L2.SG.RowsPos.RowMainEqP :=
-  fun h => GlobalTheory.rowMainEqP_of_siegelWeil_of_stepChoice h
-    (GlobalTheory.St.stepChoiceDataC_of_siegelWeil_inInfinity h
-      (fun _ X u u' hg => Formalism.L2.SG.RealObj.EnergyConvJ.BM.realObj_inInfinityX_jsz
+theorem rowMainEqP_of_siegelWeil
+    : HeckeCharacterZeroLocus.SiegelWeilU.SiegelWeilUnitaryConvergent
+      → Formalism.L2.SG.RowsPos.RowMainEqP := fun h =>
+  GlobalTheory.rowMainEqP_of_siegelWeil_of_stepChoice h
+    (GlobalTheory.St.stepChoiceDataC_of_siegelWeil_inInfinity h (fun _ X u u' hg =>
+      Formalism.L2.SG.RealObj.EnergyConvJ.BM.realObj_inInfinityX_jsz
         CompanionTheory.Lime.BM.uniqGap_holds hg X u u' 1 one_pos))
     Formalism.MainStatements.RowRest.bDat_theoremB_global
 

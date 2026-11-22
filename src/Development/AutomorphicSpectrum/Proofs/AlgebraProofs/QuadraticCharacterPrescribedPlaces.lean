@@ -9,14 +9,17 @@ open NumberField TensorProduct
 
 namespace GlobalTheory.CompanionTheory.HeightOneFrame
 
-theorem integral_of_integral_at_height_one :
-    ∀ (A Ω : Type) [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A] [Field Ω]
-      [Algebra A Ω] [IsFractionRing A Ω] (E : Type) [AddCommGroup E] [Module Ω E] (r : ℕ)
-      (b b' : Fin r → E), LinearIndependent Ω b →
-      (∀ P : PrimeSpectrum A, P.asIdeal.height = 1 → ∀ i, ∃ (s : A) (c : Fin r → A),
-        s ∉ P.asIdeal ∧ algebraMap A Ω s • b' i = ∑ k, algebraMap A Ω (c k) • b k) →
-      (∀ i, b' i ∈ Submodule.span Ω (Set.range b)) →
-      ∀ i, ∃ c : Fin r → A, b' i = ∑ k, algebraMap A Ω (c k) • b k := by
+theorem integral_of_integral_at_height_one
+    : ∀ (A Ω : Type) [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A] [Field Ω]
+        [Algebra A Ω] [IsFractionRing A Ω] (E : Type) [AddCommGroup E] [Module Ω E] (r : ℕ)
+        (b b' : Fin r → E),
+      LinearIndependent Ω b
+        → (∀ P : PrimeSpectrum A,
+          P.asIdeal.height = 1
+            → ∀ i, ∃ (s : A) (c : Fin r → A),
+              s ∉ P.asIdeal ∧ algebraMap A Ω s • b' i = ∑ k, algebraMap A Ω (c k) • b k)
+        → (∀ i, b' i ∈ Submodule.span Ω (Set.range b))
+        → ∀ i, ∃ c : Fin r → A, b' i = ∑ k, algebraMap A Ω (c k) • b k := by
   intro A Ω _ _ _ _ _ _ _ E _ _ r b b' hb hP hspan i
   obtain ⟨x, hx⟩ := (Submodule.mem_span_range_iff_exists_fun Ω).mp (hspan i)
   have key : ∀ k, x k ∈ Set.range (algebraMap A Ω) := by

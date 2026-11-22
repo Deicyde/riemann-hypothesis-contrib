@@ -19,7 +19,8 @@ namespace GlobalTheory.MomOne.JetAlg
 
 variable {p : ℕ} [hp : Fact p.Prime]
 
-def ball (p : ℕ) [Fact p.Prime] : Subring ℂ_[p] := GlobalTheory.ClosedBallValuationSubring.closedBallSubring ℂ_[p]
+def ball (p : ℕ) [Fact p.Prime] : Subring ℂ_[p] :=
+  GlobalTheory.ClosedBallValuationSubring.closedBallSubring ℂ_[p]
 
 theorem norm_p_lt_one : ‖(p : ℂ_[p])‖ < 1 := by
   have h := PadicComplex.norm_extends' p (p : ℚ_[p])
@@ -71,13 +72,13 @@ theorem bd_iterate {f : ℂ_[p]⟦X⟧} (hf : Bd 1 f) (k : ℕ) : Bd 1 (DT^[k] f
   | zero => exact hf
   | succ k ih => rw [Function.iterate_succ_apply']; exact bd_DT ih
 
-theorem differentiable_U1 (d : ℕ) (x : ℂ) {F : ℂ → ℂ} (hF : Differentiable ℂ F) :
-    Differentiable ℂ (U1 d x F) := by
+theorem differentiable_U1 (d : ℕ) (x : ℂ) {F : ℂ → ℂ} (hF : Differentiable ℂ F)
+    : Differentiable ℂ (U1 d x F) := by
   unfold U1 h1
   fun_prop
 
-theorem differentiable_W1 (d : ℕ) (x : ℂ) {F : ℂ → ℂ} (hF : Differentiable ℂ F) :
-    Differentiable ℂ (W1 d x F) := by
+theorem differentiable_W1 (d : ℕ) (x : ℂ) {F : ℂ → ℂ} (hF : Differentiable ℂ F)
+    : Differentiable ℂ (W1 d x F) := by
   have := differentiable_U1 d x hF
   unfold W1
   fun_prop
@@ -87,7 +88,13 @@ end GlobalTheory.MomOne.JetAlg
 namespace GlobalTheory.MomOne
 open JetAlg
 
-theorem jets_algebraic : ∀ (d q : ℕ) [Fact q.Prime] (δ : ℂ) (θ : ℂ → ℂ), d.Prime → d % 16 = 7 → Split d q → IsTh d θ → δ ≠ 0 → (∀ ι : ℂ ≃+* ℂ_[q], ∃ Ω : ℂ_[q], ‖Ω‖ = 1 ∧ ThetaLaws ι d (Ω / ι δ) θ) → ∀ (ι : ℂ ≃+* ℂ_[q]) (t y : ℂ) (n s k : ℕ), Nat.Coprime s q → InOK d ((s : ℂ) * t) → Good ι d n s y → δ⁻¹ ^ k * iteratedDeriv k (W1 d y (U1 d t θ)) 0 ∈ algebraicClosure ℚ ℂ := by
+theorem jets_algebraic
+    : ∀ (d q : ℕ) [Fact q.Prime] (δ : ℂ) (θ : ℂ → ℂ),
+      d.Prime → d % 16 = 7 → Split d q → IsTh d θ → δ ≠ 0
+        → (∀ ι : ℂ ≃+* ℂ_[q], ∃ Ω : ℂ_[q], ‖Ω‖ = 1 ∧ ThetaLaws ι d (Ω / ι δ) θ)
+        → ∀ (ι : ℂ ≃+* ℂ_[q]) (t y : ℂ) (n s k : ℕ),
+          Nat.Coprime s q → InOK d ((s : ℂ) * t) → Good ι d n s y
+            → δ⁻¹ ^ k * iteratedDeriv k (W1 d y (U1 d t θ)) 0 ∈ algebraicClosure ℚ ℂ := by
   intro d q hq δ θ hd hd16 hsp hθ hδ hL ι t y n s k hs ht hy
   refine mem_algebraicClosure_of_norm_le q ι _ 1 ?_
   intro ι' hι'
@@ -99,7 +106,8 @@ theorem jets_algebraic : ∀ (d q : ℕ) [Fact q.Prime] (δ : ℂ) (θ : ℂ →
     have hc : InOK d (conj v) := (hA.2.2 v v hv hv).2.2.2
     have := hι' ⟨conj v, (hB _ hc).2.2⟩
     simp only at this
-    rw [this]; exact hn
+    rw [this]
+    exact hn
   have hs0 : 0 < s := by
     rcases Nat.eq_zero_or_pos s with rfl | h
     · exact absurd (by simpa using hs) hq.out.ne_one
@@ -111,8 +119,9 @@ theorem jets_algebraic : ∀ (d q : ℕ) [Fact q.Prime] (δ : ℂ) (θ : ℂ →
     (differentiable_W1 d y (differentiable_U1 d t hθ.1)).analyticAt 0
   have hk := (hat_multiplicative_chart q ι' (Ω / ι' δ) _ han).2.1 k
   have hc := bd_iterate hb k 0
-  rw [coeff_zero_eq_constantCoeff_apply, hk, div_eq_mul_inv, mul_pow, mul_assoc, norm_mul, norm_pow, hΩ,
-    one_pow, one_mul] at hc
+  rw [coeff_zero_eq_constantCoeff_apply, hk, div_eq_mul_inv, mul_pow, mul_assoc, norm_mul, norm_pow,
+      hΩ, one_pow, one_mul]
+    at hc
   rw [map_mul, map_pow, map_inv₀]
   exact hc
 

@@ -10,38 +10,48 @@ namespace ReciprocityTheory.MultiplicativeHeights
 open Matrix NumberField
 open scoped ComplexOrder
 
-def embCols {K : Type} [Field K] [NumberField K] {r : ℕ} {ι : Type} (σ : K →+* ℂ)
-    (v : ι → Fin r → K) : Matrix (Fin r) ι ℂ :=
+def embCols
+    {K : Type} [Field K] [NumberField K] {r : ℕ} {ι : Type} (σ : K →+* ℂ) (v : ι → Fin r → K)
+    : Matrix (Fin r) ι ℂ :=
   Matrix.of fun a i => σ (v i a)
 
-theorem sc_gramC_eq {K : Type} [Field K] [NumberField K] {r k : ℕ}
-    (H : Matrix (Fin r) (Fin r) ℂ) (σ : K →+* ℂ) (b : Fin k → Fin r → K) :
-    gramC H σ b = (embCols σ b)ᴴ * H * embCols σ b := by
+theorem sc_gramC_eq
+    {K : Type} [Field K] [NumberField K]
+    {r k : ℕ} (H : Matrix (Fin r) (Fin r) ℂ)
+    (σ : K →+* ℂ) (b : Fin k → Fin r → K)
+    : gramC H σ b = (embCols σ b)ᴴ * H * embCols σ b := by
   ext i j
-  simp only [gramC, embCols, embVec, Matrix.of_apply, Matrix.mul_apply, Matrix.conjTranspose_apply, dotProduct,
-    Matrix.mulVec, Pi.star_apply, Finset.mul_sum, Finset.sum_mul]
+  simp only [gramC, embCols, embVec, Matrix.of_apply, Matrix.mul_apply, Matrix.conjTranspose_apply,
+    dotProduct, Matrix.mulVec, Pi.star_apply, Finset.mul_sum, Finset.sum_mul]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl (fun _ _ => Finset.sum_congr rfl (fun _ _ => by ring))
 
-theorem sc_gramX_eq {K : Type} [Field K] [NumberField K] {r k m : ℕ}
-    (H : Matrix (Fin r) (Fin r) ℂ) (σ : K →+* ℂ) (b : Fin k → Fin r → K) (c : Fin m → Fin r → K) :
-    gramX H σ b c = (embCols σ b)ᴴ * H * embCols σ c := by
+theorem sc_gramX_eq
+    {K : Type} [Field K] [NumberField K]
+    {r k m : ℕ} (H : Matrix (Fin r) (Fin r) ℂ)
+    (σ : K →+* ℂ) (b : Fin k → Fin r → K) (c : Fin m → Fin r → K)
+    : gramX H σ b c = (embCols σ b)ᴴ * H * embCols σ c := by
   ext i j
-  simp only [gramX, embCols, embVec, Matrix.of_apply, Matrix.mul_apply, Matrix.conjTranspose_apply, dotProduct,
-    Matrix.mulVec, Pi.star_apply, Finset.mul_sum, Finset.sum_mul]
+  simp only [gramX, embCols, embVec, Matrix.of_apply, Matrix.mul_apply, Matrix.conjTranspose_apply,
+    dotProduct, Matrix.mulVec, Pi.star_apply, Finset.mul_sum, Finset.sum_mul]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl (fun _ _ => Finset.sum_congr rfl (fun _ _ => by ring))
 
-theorem sc_col_mul {K : Type} [Field K] [NumberField K] {r : ℕ} {ι : Type} [Fintype ι]
-    (σ : K →+* ℂ) (N : Matrix (Fin r) (Fin r) K) (c : ι → Fin r → K) :
-    embCols σ (fun j => N *ᵥ c j) = N.map σ * embCols σ c := by
+theorem sc_col_mul
+    {K : Type} [Field K] [NumberField K]
+    {r : ℕ} {ι : Type} [Fintype ι]
+    (σ : K →+* ℂ) (N : Matrix (Fin r) (Fin r) K) (c : ι → Fin r → K)
+    : embCols σ (fun j => N *ᵥ c j) = N.map σ * embCols σ c := by
   ext a j
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [embCols, Matrix.mul_apply, Matrix.mulVec, dotProduct, map_sum, map_mul]
+  simp [embCols, Matrix.mul_apply, Matrix.mulVec, dotProduct, map_sum, map_mul]
 
-theorem sc_col_inj {K : Type} [Field K] [NumberField K] {r : ℕ} {ι : Type} [Fintype ι]
-    [DecidableEq ι] (σ : K →+* ℂ) {v : ι → Fin r → K} (hv : LinearIndependent K v) :
-    Function.Injective (embCols σ v).mulVec := by
+theorem sc_col_inj
+    {K : Type} [Field K] [NumberField K]
+    {r : ℕ} {ι : Type} [Fintype ι] [DecidableEq ι]
+    (σ : K →+* ℂ)
+    {v : ι → Fin r → K} (hv : LinearIndependent K v)
+    : Function.Injective (embCols σ v).mulVec := by
   classical
   let V : Matrix (Fin r) ι K := Matrix.of fun a i => v i a
   have hinj : Function.Injective (Matrix.toLin' V) := by
@@ -53,7 +63,8 @@ theorem sc_col_inj {K : Type} [Field K] [NumberField K] {r : ℕ} {ι : Type} [F
       simpa [V, Matrix.toLin'_apply, Matrix.mulVec, dotProduct, mul_comm] using this
     funext i
     exact Fintype.linearIndependent_iff.mp hv x h0 i
-  obtain ⟨h, hh⟩ := LinearMap.exists_leftInverse_of_injective (Matrix.toLin' V) (LinearMap.ker_eq_bot.mpr hinj)
+  obtain ⟨h, hh⟩ :=
+    LinearMap.exists_leftInverse_of_injective (Matrix.toLin' V) (LinearMap.ker_eq_bot.mpr hinj)
   let W : Matrix ι (Fin r) K := LinearMap.toMatrix' h
   have hWV : W * V = 1 := by
     have := congrArg LinearMap.toMatrix' hh
@@ -66,16 +77,18 @@ theorem sc_col_inj {K : Type} [Field K] [NumberField K] {r : ℕ} {ι : Type} [F
   simp only [hV, Matrix.mulVec_mulVec, hWV', Matrix.one_mulVec] at h2
   exact h2
 
-theorem sc_gram_lt {K : Type} [Field K] [NumberField K] {r k m : ℕ} (hm : 0 < m)
-    (H : Matrix (Fin r) (Fin r) ℂ) (hH : H.PosDef) (σ : K →+* ℂ) (N : Matrix (Fin r) (Fin r) K)
+theorem sc_gram_lt
+    {K : Type} [Field K] [NumberField K]
+    {r k m : ℕ} (hm : 0 < m) (H : Matrix (Fin r) (Fin r) ℂ) (hH : H.PosDef)
+    (σ : K →+* ℂ) (N : Matrix (Fin r) (Fin r) K)
     (hN : ∀ u : Fin r → ℂ, u ≠ 0 → hq H (N.map σ *ᵥ u) < hq H u)
-    (b : Fin k → Fin r → K) (c : Fin m → Fin r → K)
-    (hbc : LinearIndependent K (Fin.append b c)) (hb : ∀ i, N *ᵥ b i = 0)
-    (hc : LinearIndependent K (fun j => N *ᵥ c j)) :
-    0 < (gramC H σ (fun j => N *ᵥ c j)).det.re ∧
-      (gramC H σ (fun j => N *ᵥ c j)).det.re < (quotGramC H σ b c).det.re := by
+    (b : Fin k → Fin r → K) (c : Fin m → Fin r → K) (hbc : LinearIndependent K (Fin.append b c))
+    (hb : ∀ i, N *ᵥ b i = 0) (hc : LinearIndependent K (fun j => N *ᵥ c j))
+    : 0 < (gramC H σ (fun j => N *ᵥ c j)).det.re
+      ∧ (gramC H σ (fun j => N *ᵥ c j)).det.re < (quotGramC H σ b c).det.re := by
   classical
-  have detlt : ∀ P Q : Matrix (Fin m) (Fin m) ℂ, P.PosDef → Q.PosDef → P.det.re < (P + Q).det.re := by
+  have detlt
+      : ∀ P Q : Matrix (Fin m) (Fin m) ℂ, P.PosDef → Q.PosDef → P.det.re < (P + Q).det.re := by
     intro P Q hP hQ
     have hPh := hP.isHermitian
     set U : Matrix (Fin m) (Fin m) ℂ := (hPh.eigenvectorUnitary : Matrix (Fin m) (Fin m) ℂ) with hU
@@ -95,7 +108,9 @@ theorem sc_gram_lt {K : Type} [Field K] [NumberField K] {r k m : ℕ} (hm : 0 < 
     set T := U * Dh with hTdef
     have hTT : T * Tᴴ = P := by
       rw [hTdef, Matrix.conjTranspose_mul, hspec]
-      calc U * Dh * (Dhᴴ * Uᴴ) = U * (Dh * Dhᴴ) * Uᴴ := by simp only [Matrix.mul_assoc]
+      calc
+        U * Dh * (Dhᴴ * Uᴴ)
+          = U * (Dh * Dhᴴ) * Uᴴ := by simp only [Matrix.mul_assoc]
         _ = _ := by rw [hDh]
     have hPdet : P.det ≠ 0 := hP.det_pos.ne'
     have hTdet : IsUnit T.det := by
@@ -107,7 +122,8 @@ theorem sc_gram_lt {K : Type} [Field K] [NumberField K] {r k m : ℕ} (hm : 0 < 
       intro x y hxy
       have h := congrArg (fun z => Tᴴ *ᵥ z) hxy
       simp only [Matrix.mulVec_mulVec, ← Matrix.conjTranspose_mul, Matrix.nonsing_inv_mul _ hTdet,
-        Matrix.conjTranspose_one, Matrix.one_mulVec] at h
+          Matrix.conjTranspose_one, Matrix.one_mulVec]
+        at h
       exact h
     have hF : (T⁻¹ * Q * (T⁻¹)ᴴ).PosDef := by
       have h := hQ.conjTranspose_mul_mul_same hinjT
@@ -115,13 +131,13 @@ theorem sc_gram_lt {K : Type} [Field K] [NumberField K] {r k m : ℕ} (hm : 0 < 
     have hA : P + Q = T * (1 + T⁻¹ * Q * (T⁻¹)ᴴ) * Tᴴ := by
       rw [Matrix.mul_add, Matrix.add_mul, Matrix.mul_one, hTT]
       congr 1
-      rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hTdet, Matrix.one_mul, Matrix.mul_assoc,
-        ← Matrix.conjTranspose_mul, Matrix.mul_nonsing_inv _ hTdet, Matrix.conjTranspose_one, Matrix.mul_one]
+      rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hTdet, Matrix.one_mul,
+        Matrix.mul_assoc, ← Matrix.conjTranspose_mul, Matrix.mul_nonsing_inv _ hTdet,
+        Matrix.conjTranspose_one, Matrix.mul_one]
     have hdet : (P + Q).det = P.det * (1 + T⁻¹ * Q * (T⁻¹)ᴴ).det := by
       have e1 : (P + Q).det = T.det * (1 + T⁻¹ * Q * (T⁻¹)ᴴ).det * Tᴴ.det := by
         rw [hA, Matrix.det_mul, Matrix.det_mul]
-      have e2 : P.det = T.det * Tᴴ.det := by
-        rw [← Matrix.det_mul, hTT]
+      have e2 : P.det = T.det * Tᴴ.det := by rw [← Matrix.det_mul, hTT]
       rw [e1, e2]
       ring
     set F := T⁻¹ * Q * (T⁻¹)ᴴ with hFdef
@@ -132,9 +148,11 @@ theorem sc_gram_lt {K : Type} [Field K] [NumberField K] {r k m : ℕ} (hm : 0 < 
       have h := hFh.spectral_theorem
       rwa [Unitary.conjStarAlgAut_apply] at h
     have h1F : (1 + F).det = ((∏ i, (1 + hFh.eigenvalues i) : ℝ) : ℂ) := by
-      have e : 1 + F = V * Matrix.diagonal (fun i => ((1 + hFh.eigenvalues i : ℝ) : ℂ)) * star V := by
-        have hd : Matrix.diagonal (fun i => ((1 + hFh.eigenvalues i : ℝ) : ℂ)) =
-            1 + Matrix.diagonal (RCLike.ofReal ∘ hFh.eigenvalues) := by
+      have e
+          : 1 + F = V * Matrix.diagonal (fun i => ((1 + hFh.eigenvalues i : ℝ) : ℂ)) * star V := by
+        have hd
+            : Matrix.diagonal (fun i => ((1 + hFh.eigenvalues i : ℝ) : ℂ))
+              = 1 + Matrix.diagonal (RCLike.ofReal ∘ hFh.eigenvalues) := by
           rw [← Matrix.diagonal_one, Matrix.diagonal_add]
           congr 1
           funext i
@@ -142,14 +160,19 @@ theorem sc_gram_lt {K : Type} [Field K] [NumberField K] {r k m : ℕ} (hm : 0 < 
         rw [hd, Matrix.mul_add, Matrix.add_mul, Matrix.mul_one, hVV, ← hFs]
       have hdV : V.det * (star V).det = 1 := by rw [← Matrix.det_mul, hVV, Matrix.det_one]
       rw [e, Matrix.det_mul, Matrix.det_mul, Matrix.det_diagonal]
-      calc V.det * (∏ i, ((1 + hFh.eigenvalues i : ℝ) : ℂ)) * (star V).det
+      calc
+        V.det * (∏ i, ((1 + hFh.eigenvalues i : ℝ) : ℂ)) * (star V).det
           = (∏ i, ((1 + hFh.eigenvalues i : ℝ) : ℂ)) * (V.det * (star V).det) := by ring
         _ = _ := by rw [hdV, mul_one, Complex.ofReal_prod]
     have hμ : ∀ i, 0 < hFh.eigenvalues i := hF.eigenvalues_pos
     have hprod : 1 < ∏ i, (1 + hFh.eigenvalues i) := by
-      have h := Finset.prod_lt_prod_of_nonempty₀ (s := Finset.univ) (f := fun _ => (1 : ℝ))
-        (g := fun i => 1 + hFh.eigenvalues i) (fun i _ => one_pos) (fun i _ => by linarith [hμ i])
-        ⟨⟨0, hm⟩, Finset.mem_univ _⟩
+      have h :=
+        Finset.prod_lt_prod_of_nonempty₀ (s := Finset.univ)
+          (f := fun _ => (1 : ℝ))
+          (g := fun i => 1 + hFh.eigenvalues i)
+          (fun i _ => one_pos)
+          (fun i _ => by linarith [hμ i])
+          ⟨⟨0, hm⟩, Finset.mem_univ _⟩
       simpa using h
     have hPpos : 0 < P.det.re := by
       have h := (Complex.lt_def.mp hP.det_pos).1
@@ -159,12 +182,13 @@ theorem sc_gram_lt {K : Type} [Field K] [NumberField K] {r k m : ℕ} (hm : 0 < 
   set Bm := embCols σ b with hBm
   set Cm := embCols σ c with hCm
   set Nσ := N.map σ with hNσ
-  have hE : ∀ (x : Fin k → ℂ) (z : Fin m → ℂ),
-      embCols σ (Fin.append b c) *ᵥ Fin.append x z = Bm *ᵥ x + Cm *ᵥ z := by
+  have hE
+      : ∀ (x : Fin k → ℂ) (z : Fin m → ℂ),
+        embCols σ (Fin.append b c) *ᵥ Fin.append x z = Bm *ᵥ x + Cm *ᵥ z := by
     intro x z
     funext a
-    simp only [hBm, hCm, Matrix.mulVec, dotProduct, embCols, Matrix.of_apply, Pi.add_apply, Fin.sum_univ_add,
-      Fin.append_left, Fin.append_right]
+    simp only [hBm, hCm, Matrix.mulVec, dotProduct, embCols, Matrix.of_apply, Pi.add_apply,
+      Fin.sum_univ_add, Fin.append_left, Fin.append_right]
   have hEinj := sc_col_inj σ hbc
   have hBinj : Function.Injective Bm.mulVec := by
     intro x y hxy
@@ -187,8 +211,8 @@ theorem sc_gram_lt {K : Type} [Field K] [NumberField K] {r k m : ℕ} (hm : 0 < 
   have hquot : quotGramC H σ b c = C'ᴴ * H * C' := by
     rw [quotGramC, Matrix.mul_assoc (gramX H σ c b), ← hYdef, hCC, hXcb]
     have hY' : Bmᴴ * (H * (Bm * Y)) = Bmᴴ * (H * Cm) := by simpa only [Matrix.mul_assoc] using hY
-    simp only [hC'def, Matrix.conjTranspose_sub, Matrix.conjTranspose_mul, Matrix.sub_mul, Matrix.mul_sub,
-      Matrix.mul_assoc, hY', sub_self, sub_zero]
+    simp only [hC'def, Matrix.conjTranspose_sub, Matrix.conjTranspose_mul, Matrix.sub_mul,
+      Matrix.mul_sub, Matrix.mul_assoc, hY', sub_self, sub_zero]
     abel
   have hC'inj : Function.Injective C'.mulVec := by
     intro x y hxy
@@ -196,9 +220,11 @@ theorem sc_gram_lt {K : Type} [Field K] [NumberField K] {r k m : ℕ} (hm : 0 < 
     have h0' : Cm *ᵥ (x - y) - Bm *ᵥ (Y *ᵥ (x - y)) = 0 := by
       rw [Matrix.mulVec_mulVec, ← Matrix.sub_mulVec]
       exact h0
-    have h1 : embCols σ (Fin.append b c) *ᵥ Fin.append (-(Y *ᵥ (x - y))) (x - y) =
-        embCols σ (Fin.append b c) *ᵥ Fin.append 0 0 := by
-      rw [hE, hE, Matrix.mulVec_neg, Matrix.mulVec_zero, Matrix.mulVec_zero, add_zero, neg_add_eq_sub]
+    have h1
+        : embCols σ (Fin.append b c) *ᵥ Fin.append (-(Y *ᵥ (x - y))) (x - y)
+          = embCols σ (Fin.append b c) *ᵥ Fin.append 0 0 := by
+      rw [hE, hE, Matrix.mulVec_neg, Matrix.mulVec_zero, Matrix.mulVec_zero, add_zero,
+        neg_add_eq_sub]
       exact h0'
     have h2 := hEinj h1
     funext j
@@ -209,7 +235,8 @@ theorem sc_gram_lt {K : Type} [Field K] [NumberField K] {r k m : ℕ} (hm : 0 < 
     ext a j
     simp [embCols, hb j]
   have hNC : Nσ * C' = embCols σ (fun j => N *ᵥ c j) := by
-    rw [hC'def, Matrix.mul_sub, ← Matrix.mul_assoc, hNB, Matrix.zero_mul, sub_zero, hNσ, hCm, sc_col_mul]
+    rw [hC'def, Matrix.mul_sub, ← Matrix.mul_assoc, hNB, Matrix.zero_mul, sub_zero, hNσ, hCm,
+      sc_col_mul]
   set K := Nσᴴ * H * Nσ with hK
   have hPq : gramC H σ (fun j => N *ᵥ c j) = C'ᴴ * K * C' := by
     rw [sc_gramC_eq, ← hNC, Matrix.conjTranspose_mul, hK]
@@ -219,10 +246,10 @@ theorem sc_gram_lt {K : Type} [Field K] [NumberField K] {r k m : ℕ} (hm : 0 < 
     exact hH.conjTranspose_mul_mul_same (sc_col_inj σ hc)
   have hMpd : (H - K).PosDef := by
     refine Matrix.PosDef.of_dotProduct_mulVec_pos ?_ (fun x hx => ?_)
-    · rw [Matrix.IsHermitian, Matrix.conjTranspose_sub, hK, Matrix.conjTranspose_mul, Matrix.conjTranspose_mul,
-        Matrix.conjTranspose_conjTranspose, hH', Matrix.mul_assoc]
-    · have hdot : star x ⬝ᵥ ((H - K) *ᵥ x) =
-          star x ⬝ᵥ (H *ᵥ x) - star (Nσ *ᵥ x) ⬝ᵥ (H *ᵥ (Nσ *ᵥ x)) := by
+    · rw [Matrix.IsHermitian, Matrix.conjTranspose_sub, hK, Matrix.conjTranspose_mul,
+        Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, hH', Matrix.mul_assoc]
+    · have hdot
+          : star x ⬝ᵥ ((H - K) *ᵥ x) = star x ⬝ᵥ (H *ᵥ x) - star (Nσ *ᵥ x) ⬝ᵥ (H *ᵥ (Nσ *ᵥ x)) := by
         rw [Matrix.sub_mulVec, dotProduct_sub, hK, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec,
           Matrix.dotProduct_mulVec (star x) Nσᴴ, ← Matrix.star_mulVec]
       rw [hdot]

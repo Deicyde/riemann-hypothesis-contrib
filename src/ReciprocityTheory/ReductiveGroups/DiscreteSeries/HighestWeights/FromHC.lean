@@ -24,8 +24,8 @@ theorem derivExists_allPos : DerivExistsAllPosStatement := by
   let ε : Fin k → Bool := fun _ => true
   let σ (g : Matrix (Fin k) (Fin k) ℂ) : V →L[ℂ] V :=
     if hg : g ∈ Kset ε then (τ (torepK ε hg)).val else 1
-  have hσ {g : Matrix (Fin k) (Fin k) ℂ} (hg : g ∈ Kset ε) :
-      σ g = (τ (torepK ε hg)).val := dite_eq_left hg
+  have hσ {g : Matrix (Fin k) (Fin k) ℂ} (hg : g ∈ Kset ε) : σ g = (τ (torepK ε hg)).val :=
+    dite_eq_left hg
   have hrep : Formalism.MainNotions.S.IsURepOn (Formalism.REAL.Kset ε) σ := by
     refine ⟨⟨?_, ?_⟩, ?_, ?_⟩
     · have h1 : (1 : Matrix (Fin k) (Fin k) ℂ) ∈ Kset ε :=
@@ -55,7 +55,8 @@ theorem derivExists_allPos : DerivExistsAllPosStatement := by
   let b := stdOrthonormalBasis ℂ V
   have hcoeff (i j : Fin (Module.finrank ℂ V)) :=
     polynomial_coefficients k V σ ⊤ hrep inferInstance
-      (fun _ _ _ _ => Submodule.mem_top) (b j) Submodule.mem_top (b i)
+      (fun _ _ _ _ => Submodule.mem_top)
+      (b j) Submodule.mem_top (b i)
   choose m P hP using hcoeff
   let F (A : Matrix (Fin k) (Fin k) ℂ) : V →L[ℂ] V :=
     ∑ i, ∑ j, (MvPolynomial.eval (fhEnt k A) (P i j) * (A.det ^ m i j)⁻¹) •
@@ -63,9 +64,9 @@ theorem derivExists_allPos : DerivExistsAllPosStatement := by
   have hF (g : KG ε) : F (toMK g) = (τ g).val := by
     have hg : toMK g ∈ Kset ε := g.2
     have hσg : σ (toMK g) = (τ g).val := by rw [hσ hg, torepK_toMK]
-    have hc (i j : Fin (Module.finrank ℂ V)) :
-        MvPolynomial.eval (fhEnt k (toMK g)) (P i j) * ((toMK g).det ^ m i j)⁻¹ =
-          inner ℂ (b i) ((τ g).val (b j)) := by
+    have hc (i j : Fin (Module.finrank ℂ V))
+        : MvPolynomial.eval (fhEnt k (toMK g)) (P i j) * ((toMK g).det ^ m i j)⁻¹
+          = inner ℂ (b i) ((τ g).val (b j)) := by
       rw [← hσg, mul_inv_eq_iff_eq_mul₀ (pow_ne_zero _ (fh_det_ne_zero hg))]
       exact (hP i j _ hg).symm
     ext v
@@ -97,30 +98,33 @@ theorem derivExists_allPos : DerivExistsAllPosStatement := by
   rw [hcurve]
   exact hcomp
 
-theorem kType_of_hcTypeU {k : ℕ} {u : Fin k → ℝ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (π : Matrix (Fin k) (Fin k) ℂ → (H →L[ℂ] H)) (hπ : Formalism.MainNotions.S.IsHCTypeU k u π) :
-    ∃ T : KType (fun _ : Fin k => true) (lowK (fun _ : Fin k => true) u), ∃ U : H ≃ₗᵢ[ℂ] T.V,
-      ∀ (g : KG (fun _ : Fin k => true)) (v : H), U (π (toMK g) v) = T.op g (U v) := by
+theorem kType_of_hcTypeU
+    {k : ℕ} {u : Fin k → ℝ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (π : Matrix (Fin k) (Fin k) ℂ → (H →L[ℂ] H)) (hπ : Formalism.MainNotions.S.IsHCTypeU k u π)
+    : ∃ T : KType (fun _ : Fin k => true) (lowK (fun _ : Fin k => true) u), ∃ U : H ≃ₗᵢ[ℂ] T.V,
+      ∀ (g : KG (fun _ : Fin k => true)) (v : H),
+        U (π (toMK g) v) = T.op g (U v) := by
   obtain ⟨hnt, hfd, hU, hK⟩ := hπ
   haveI := hfd
   haveI : CompleteSpace H := FiniteDimensional.complete ℂ H
   obtain ⟨dτ, hd⟩ := derivExists_allPos k H (fhTau π hU) (fhTau_cont π hU)
-  have hσ : ∀ g, π (toMK g) = ((fhTau π hU g : unitary (H →L[ℂ] H)) : H →L[ℂ] H) :=
-    fun g => (fhTau_coe π hU g).symm
+  have hσ : ∀ g, π (toMK g) = ((fhTau π hU g : unitary (H →L[ℂ] H)) : H →L[ℂ] H) := fun g =>
+    (fhTau_coe π hU g).symm
   obtain ⟨_, _, hirr, ⟨v, -, hv0, hvw⟩, hdom⟩ := hK
   have hwt := fun a => fh_dτ_of_wt (fhTau π hU) dτ hd π hσ hvw a
   have hhw := fun a b hab => fh_hw (fhTau π hU) dτ hd π hσ hdom hvw a b hab
-  let T : KType (fun _ : Fin k => true) (lowK (fun _ : Fin k => true) u) :=
-    { V := H
-      τ := fhTau π hU
-      cont := fhTau_cont π hU
-      irred := ?irr
-      dτ := dτ
-      hasDeriv := hd
-      w := ((‖v‖⁻¹ : ℝ) : ℂ) • v
-      w_norm := ?nrm
-      w_wt := ?wt
-      w_hw := ?hw }
+  let T : KType (fun _ : Fin k => true) (lowK (fun _ : Fin k => true) u) := {
+    V := H
+    τ := fhTau π hU
+    cont := fhTau_cont π hU
+    irred := ?irr
+    dτ := dτ
+    hasDeriv := hd
+    w := ((‖v‖⁻¹ : ℝ) : ℂ) • v
+    w_norm := ?nrm
+    w_wt := ?wt
+    w_hw := ?hw
+  }
   refine ⟨T, LinearIsometryEquiv.refl ℂ H, ?_⟩
   case irr =>
     intro W hW

@@ -9,17 +9,28 @@ open scoped LaurentPolynomial
 
 namespace GlobalTheory.CompanionTheory.SeqColim
 
-theorem map_tr {A : Type} [CommRing A] {G : ℕ → Type} [∀ n, CommRing (G n)] [∀ n, Algebra A (G n)]
-    (f : ∀ n, G n →ₐ[A] G (n + 1)) {L : Type} [CommRing L] [Algebra A L] (ι : ∀ n, G n →ₐ[A] L)
-    (h : IsColim f ι) (n : ℕ) : ∀ (k : ℕ) (x : G n), ι (n + k) (tr f n k x) = ι n x
+theorem map_tr
+    {A : Type} [CommRing A]
+    {G : ℕ → Type} [∀ n, CommRing (G n)] [∀ n, Algebra A (G n)]
+    (f : ∀ n, G n →ₐ[A] G (n + 1))
+    {L : Type} [CommRing L] [Algebra A L]
+    (ι : ∀ n, G n →ₐ[A] L) (h : IsColim f ι)
+    (n : ℕ)
+    : ∀ (k : ℕ) (x : G n), ι (n + k) (tr f n k x) = ι n x
   | 0, x => rfl
   | k + 1, x => by
-      show ι (n + k + 1) (f (n + k) (tr f n k x)) = ι n x
-      rw [h.comm, map_tr f ι h n k x]
+    show ι (n + k + 1) (f (n + k) (tr f n k x)) = ι n x
+    rw [h.comm, map_tr f ι h n k x]
 
-theorem pf_of_stages (p : ℕ) {A : Type} [CommRing A] {G : ℕ → Type} [∀ n, CommRing (G n)] [∀ n, Algebra A (G n)]
-    (f : ∀ n, G n →ₐ[A] G (n + 1)) {L : Type} [CommRing L] [Algebra A L] (ι : ∀ n, G n →ₐ[A] L)
-    (h : IsColim f ι) (hG : ∀ n, Pf p (G n)) : Pf p L := by
+theorem pf_of_stages
+    (p : ℕ)
+    {A : Type} [CommRing A]
+    {G : ℕ → Type} [∀ n, CommRing (G n)] [∀ n, Algebra A (G n)]
+    (f : ∀ n, G n →ₐ[A] G (n + 1))
+    {L : Type} [CommRing L] [Algebra A L]
+    (ι : ∀ n, G n →ₐ[A] L) (h : IsColim f ι)
+    (hG : ∀ n, Pf p (G n))
+    : Pf p L := by
   refine ⟨?_, ?_, ?_⟩
   · have := congrArg (ι 0) (hG 0).char
     simpa using this
@@ -47,16 +58,20 @@ theorem pf_of_stages (p : ℕ) {A : Type} [CommRing A] {G : ℕ → Type} [∀ n
     simp only at hw ⊢
     rw [← map_pow, hw, hz 0]
 
-theorem solv_at_stage {A : Type} [CommRing A] {G : ℕ → Type} [∀ n, CommRing (G n)] [∀ n, Algebra A (G n)]
-    (f : ∀ n, G n →ₐ[A] G (n + 1)) {L : Type} [CommRing L] [Algebra A L] (ι : ∀ n, G n →ₐ[A] L)
-    (h : IsColim f ι) (m n : ℕ) (a : Fin m → Fin n → A) (c : Fin m → A) (hs : Solv L a c) :
-    ∃ N, Solv (G N) a c := by
+theorem solv_at_stage
+    {A : Type} [CommRing A]
+    {G : ℕ → Type} [∀ n, CommRing (G n)] [∀ n, Algebra A (G n)]
+    (f : ∀ n, G n →ₐ[A] G (n + 1))
+    {L : Type} [CommRing L] [Algebra A L]
+    (ι : ∀ n, G n →ₐ[A] L) (h : IsColim f ι)
+    (m n : ℕ) (a : Fin m → Fin n → A) (c : Fin m → A) (hs : Solv L a c)
+    : ∃ N, Solv (G N) a c := by
   obtain ⟨y, hy⟩ := hs
   obtain ⟨N₀, z, hz⟩ := h.surj n y
   have hd : ∀ i, ι N₀ ((∑ j, a i j • z j) - algebraMap A (G N₀) (c i)) = 0 := by
     intro i
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sub, map_sum, map_smul, AlgHom.commutes, hz, hy i, sub_self]
+    simp only [map_sub, map_sum, map_smul, AlgHom.commutes, hz, hy i, sub_self]
   obtain ⟨k, hk⟩ := h.ker N₀ m _ hd
   refine ⟨N₀ + k, fun j => tr f N₀ k (z j), fun i => ?_⟩
   have := hk i
@@ -68,7 +83,14 @@ end GlobalTheory.CompanionTheory.SeqColim
 
 namespace GlobalTheory.CompanionTheory
 
-theorem colim_pf : ∀ (p : ℕ) [Fact p.Prime] (A : Type) [CommRing A](G : ℕ → Type) [∀ n, CommRing (G n)] [∀ n, Algebra A (G n)] (f : ∀ n, G n →ₐ[A] G (n + 1))(L : Type) [CommRing L] [Algebra A L] (ι : ∀ n, G n →ₐ[A] L), IsColim f ι → ((∀ n, Pf p (G n)) → Pf p L) ∧ ∀ (m n : ℕ) (a : Fin m → Fin n → A) (c : Fin m → A), Solv L a c → ∃ N, Solv (G N) a c := by
+theorem colim_pf
+    : ∀ (p : ℕ) [Fact p.Prime] (A : Type) [CommRing A] (G : ℕ → Type) [∀ n, CommRing (G n)]
+        [∀ n, Algebra A (G n)] (f : ∀ n, G n →ₐ[A] G (n + 1)) (L : Type) [CommRing L] [Algebra A L]
+        (ι : ∀ n, G n →ₐ[A] L),
+      IsColim f ι
+        → ((∀ n, Pf p (G n)) → Pf p L)
+          ∧ ∀ (m n : ℕ) (a : Fin m → Fin n → A) (c : Fin m → A),
+            Solv L a c → ∃ N, Solv (G N) a c := by
   intro p _ A _ G _ _ f L _ _ ι h
   exact ⟨SeqColim.pf_of_stages p f ι h, fun m n a c hs => SeqColim.solv_at_stage f ι h m n a c hs⟩
 

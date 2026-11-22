@@ -15,26 +15,31 @@ namespace PositivityTheory.RgUd.T.Nil.Orb.BStep
 
 open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Nil PositivityTheory.RgUd.T.Nil.Orb
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
 
 attribute [local instance] t2Sp lcSp tdSp contSMul lcH tdH scH contSMulH
 
-theorem piece_count (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) {ξ : (Sp k n → ℂ) →ₗ[ℂ] ℂ} (hξ : Inv Z ξ)
-    {C U₁ : Set (Sp k n)} (hC : IsClosed C) (hU₁ : IsOpen U₁) (hU₁UU : U₁ ⊆ UU) {p : Sp k n}
-    (hCinv : ∀ h ∈ Gz Z, ∀ q ∈ C, act h q ∈ C)
-    (hO : U₁ ∩ C = orb Z p) (hξC : SuppU ξ C)
-    {J A : Subgroup (GzS Z)} (hJc : IsCompact (J : Set (GzS Z))) (hAo : IsOpen (A : Set (GzS Z))) (hAJ : A ≤ J)
-    (hn : ∀ j ∈ J, ∀ a ∈ A, j * a * j⁻¹ ∈ A)
+theorem piece_count
+    (Z : Subalgebra k (Matrix (Fin n) (Fin n) k))
+    {ξ : (Sp k n → ℂ) →ₗ[ℂ] ℂ} (hξ : Inv Z ξ)
+    {C U₁ : Set (Sp k n)} (hC : IsClosed C) (hU₁ : IsOpen U₁) (hU₁UU : U₁ ⊆ UU)
+    {p : Sp k n}
+    (hCinv : ∀ h ∈ Gz Z, ∀ q ∈ C, act h q ∈ C) (hO : U₁ ∩ C = orb Z p) (hξC : SuppU ξ C)
+    {J A : Subgroup (GzS Z)} (hJc : IsCompact (J : Set (GzS Z))) (hAo : IsOpen (A : Set (GzS Z)))
+    (hAJ : A ≤ J) (hn : ∀ j ∈ J, ∀ a ∈ A, j * a * j⁻¹ ∈ A)
     {fJ fA : Sp k n → ℂ} (hfJ : fJ ∈ supportedIn U₁) (hfA : fA ∈ supportedIn U₁)
     (hfJO : ∀ x ∈ orb Z p, fJ x = (orbitPiece J (toT p)).indicator 1 (toT x))
-    (hfAO : ∀ x ∈ orb Z p, fA x = (orbitPiece A (toT p)).indicator 1 (toT x)) :
-    ξ fJ * ((A ⊓ stabilizer (GzS Z) (toT p)).relIndex (J ⊓ stabilizer (GzS Z) (toT p)) : ℂ) =
-      (A.relIndex J : ℂ) * ξ fA := by
+    (hfAO : ∀ x ∈ orb Z p, fA x = (orbitPiece A (toT p)).indicator 1 (toT x))
+    : ξ fJ * ((A ⊓ stabilizer (GzS Z) (toT p)).relIndex (J ⊓ stabilizer (GzS Z) (toT p)) : ℂ)
+      = (A.relIndex J : ℂ) * ξ fA := by
   classical
-  have hOorb : orbit (GzS Z) (toT p) = orb Z p := Set.ext fun q => mem_orbit_iff' Z (p := p) (q := q)
+  have hOorb : orbit (GzS Z) (toT p) = orb Z p :=
+    Set.ext fun q => mem_orbit_iff' Z (p := p) (q := q)
   have hO' : ((U₁ : Set (SpT k n)) ∩ C) = orbit (GzS Z) (toT p) := by rw [hOorb]; exact hO
   have hOl : IsLocallyClosed (orbit (GzS Z) (toT p)) := ⟨U₁, C, hU₁, hC, hO'.symm⟩
-  obtain ⟨𝒮, -, h𝒮, hsum⟩ := exists_finset_orbitPiece (X := SpT k n) hOl hJc hAo hAJ hn (mem_orbit_self (toT p))
+  obtain ⟨𝒮, -, h𝒮, hsum⟩ :=
+    exists_finset_orbitPiece (X := SpT k n) hOl hJc hAo hAJ hn (mem_orbit_self (toT p))
   choose! j hjJ hjS using h𝒮
   have hPsub : ∀ B : Subgroup (GzS Z), ∀ x, toT x ∈ orbitPiece B (toT p) → x ∈ orb Z p := by
     intro B x hx
@@ -54,15 +59,17 @@ theorem piece_count (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) {ξ : (Sp k n 
     rw [lift_on_C' hO (hPsub A) hfA hfAO _ hx']
     conv_lhs => rw [hjS S hS]
     by_cases hxS : toT (act (((j S)⁻¹ : GzS Z) : GL (Fin n) k) x) ∈ orbitPiece A (toT p)
-    · rw [Set.indicator_of_mem (Set.mem_smul_set_iff_inv_smul_mem.2 (show (j S)⁻¹ • toT x ∈ _ from hxS)),
+    · rw [Set.indicator_of_mem (Set.mem_smul_set_iff_inv_smul_mem.2 (show (j S)⁻¹ • toT x ∈ _ from
+          hxS)),
         Set.indicator_of_mem hxS]
       rfl
     · rw [Set.indicator_of_notMem (fun h' => hxS (Set.mem_smul_set_iff_inv_smul_mem.1 h')),
         Set.indicator_of_notMem hxS]
   have hcard : ξ fJ = (𝒮.card : ℂ) * ξ fA := by
     rw [hsumξ, Finset.sum_congr rfl htr, Finset.sum_const, nsmul_eq_mul]
-  have hset : ((𝒮 : Set (Set (SpT k n)))) =
-      (fun i : GzS Z => i • orbitPiece A (toT p)) '' (J : Set (GzS Z)) := by
+  have hset
+      : ((𝒮 : Set (Set (SpT k n))))
+        = (fun i : GzS Z => i • orbitPiece A (toT p)) '' (J : Set (GzS Z)) := by
     ext P
     constructor
     · intro hP
@@ -78,8 +85,11 @@ theorem piece_count (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) {ξ : (Sp k n 
         exact one_ne_zero h1
       have e1 : i • orbitPiece A (toT p) = orbitPiece A (i • toT p) :=
         smul_orbitPiece (hn i hi) (fun a ha => by simpa using hn i⁻¹ (J.inv_mem hi) a ha) _
-      have e2 : S = orbitPiece A (j S • toT p) := (hjS S hS).trans
-        (smul_orbitPiece (hn _ (hjJ S hS)) (fun a ha => by simpa using hn _ (J.inv_mem (hjJ S hS)) a ha) _)
+      have e2 : S = orbitPiece A (j S • toT p) :=
+        (hjS S hS).trans
+          (smul_orbitPiece (hn _ (hjJ S hS))
+            (fun a ha => by simpa using hn _ (J.inv_mem (hjJ S hS)) a ha)
+            _)
       have e3 : orbitPiece A (i • toT p) = orbitPiece A (j S • toT p) :=
         orbitPiece_eq_of_mem (e2 ▸ hiS)
       show i • orbitPiece A (toT p) ∈ (𝒮 : Set (Set (SpT k n)))

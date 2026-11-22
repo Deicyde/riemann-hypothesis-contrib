@@ -4,11 +4,12 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.SmulMemOfSpanEqTop.exists_ne_zero_smul_mem_of_span_eq_top :
-    ∀ {A : Type} [inst : CommRing A] [IsDomain A]
-    {K : Type} [inst_2 : Field K] [inst_3 : Algebra A K] [IsFractionRing A K] {V : Type} [inst_5 : AddCommGroup V]
-    [inst_6 : _root_.Module K V] [inst_7 : _root_.Module A V] [IsScalarTower A K V] (M : Submodule A V),
-    Submodule.span K (↑M : Set V) = ⊤ → ∀ (v : V), ∃ (d : A), d ≠ (0 : A) ∧ d • v ∈ M := by
+theorem UpperTheory.Reformulated.B.SmulMemOfSpanEqTop.exists_ne_zero_smul_mem_of_span_eq_top
+    : ∀ {A : Type} [inst : CommRing A] [IsDomain A] {K : Type} [inst_2 : Field K]
+        [inst_3 : Algebra A K] [IsFractionRing A K] {V : Type} [inst_5 : AddCommGroup V]
+        [inst_6 : _root_.Module K V] [inst_7 : _root_.Module A V] [IsScalarTower A K V]
+        (M : Submodule A V),
+      Submodule.span K (↑M : Set V) = ⊤ → ∀ (v : V), ∃ (d : A), d ≠ (0 : A) ∧ d • v ∈ M := by
   intro A _ _ K _ _ _ V _ _ _ _ M hM v
   have hv : v ∈ Submodule.span K (↑M : Set V) := hM ▸ Submodule.mem_top
   induction hv using Submodule.span_induction with
@@ -28,12 +29,11 @@ theorem UpperTheory.Reformulated.B.SmulMemOfSpanEqTop.exists_ne_zero_smul_mem_of
     obtain ⟨a, ha, hax⟩ := ih
     obtain ⟨p, q, hq, rfl⟩ := IsFractionRing.div_surjective (A := A) k
     have hq0 : q ≠ 0 := nonZeroDivisors.ne_zero hq
-    have hqK : algebraMap A K q ≠ 0 :=
-      (map_ne_zero_iff _ (IsFractionRing.injective A K)).mpr hq0
+    have hqK : algebraMap A K q ≠ 0 := (map_ne_zero_iff _ (IsFractionRing.injective A K)).mpr hq0
     refine ⟨a * q, mul_ne_zero ha hq0, ?_⟩
     have key : (a * q) • ((algebraMap A K p / algebraMap A K q) • x) = p • (a • x) := by
-      rw [← algebraMap_smul K (a * q), ← algebraMap_smul K a, ← algebraMap_smul K p,
-        smul_smul, smul_smul, map_mul]
+      rw [← algebraMap_smul K (a * q), ← algebraMap_smul K a, ← algebraMap_smul K p, smul_smul,
+        smul_smul, map_mul]
       congr 1
       field_simp
     rw [key]

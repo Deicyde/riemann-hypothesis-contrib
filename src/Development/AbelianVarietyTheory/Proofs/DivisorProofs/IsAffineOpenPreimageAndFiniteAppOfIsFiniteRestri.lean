@@ -11,9 +11,9 @@ open ReciprocityTheory.ChartRestriction.G.Out GlobalTheory.AbLaw GlobalTheory.Fo
 
 namespace GlobalTheory
 
-theorem isAffineOpen_preimage_and_finite_app_of_isFinite_restrict :
-    ∀ (X Z : Scheme.{0}) (φ : X ⟶ Z) (V : Z.Opens), IsAffineOpen V → IsFinite (φ ∣_ V) →
-      IsAffineOpen (φ ⁻¹ᵁ V) ∧ (φ.app V).hom.Finite := by
+theorem isAffineOpen_preimage_and_finite_app_of_isFinite_restrict
+    : ∀ (X Z : Scheme.{0}) (φ : X ⟶ Z) (V : Z.Opens),
+      IsAffineOpen V → IsFinite (φ ∣_ V) → IsAffineOpen (φ ⁻¹ᵁ V) ∧ (φ.app V).hom.Finite := by
   intro X Z φ V hV hf
   haveI : IsAffine (V : Scheme) := hV
   have h1 : IsAffine (φ ⁻¹ᵁ V : Scheme) := isAffine_of_isAffineHom (φ ∣_ V)

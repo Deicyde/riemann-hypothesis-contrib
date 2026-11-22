@@ -13,26 +13,36 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 set_option backward.isDefEq.respectTransparency false
 set_option maxHeartbeats 1000000
-open CategoryTheory AlgebraicGeometry TensorProduct GroundTheory.PAdicHodge GlobalTheory.LogCris DividedPowers CrystallineSemistableComparison CrystallineSemistableComparison.PAlg CrystallineSemistableComparison.Pb
+open CategoryTheory AlgebraicGeometry TensorProduct GroundTheory.PAdicHodge GlobalTheory.LogCris
+  DividedPowers CrystallineSemistableComparison CrystallineSemistableComparison.PAlg
+  CrystallineSemistableComparison.Pb
 
 noncomputable section
 namespace GlobalTheory.CompanionTheory.BcAcris
 
 universe w w'
 
-theorem adic_ker {R : Type} [CommRing R] (x : R) (n : ℕ) (a : AdicCompletion (Ideal.span {x}) R)
-    (h : AdicCompletion.eval (Ideal.span {x}) R n a = 0) :
-    ∃ b : AdicCompletion (Ideal.span {x}) R, a = algebraMap R _ x ^ n * b := by
-  have key := AdicCompletion.pow_smul_top_eq_ker_eval (I := Ideal.span {x}) (M := R) (n := n) (Submodule.fg_span_singleton _)
+theorem adic_ker
+    {R : Type} [CommRing R]
+    (x : R) (n : ℕ)
+    (a : AdicCompletion (Ideal.span {x}) R) (h : AdicCompletion.eval (Ideal.span {x}) R n a = 0)
+    : ∃ b : AdicCompletion (Ideal.span {x}) R, a = algebraMap R _ x ^ n * b := by
+  have key :=
+    AdicCompletion.pow_smul_top_eq_ker_eval (I := Ideal.span {x}) (M := R) (n := n)
+      (Submodule.fg_span_singleton _)
   have hm : a ∈ (AdicCompletion.eval (Ideal.span {x}) R n).ker := h
   rw [← key, Ideal.span_singleton_pow, Submodule.ideal_span_singleton_smul] at hm
   obtain ⟨b, -, rfl⟩ := (Submodule.mem_smul_pointwise_iff_exists _ _ _).1 hm
   refine ⟨b, ?_⟩
   rw [Algebra.smul_def, map_pow]
 
-theorem adic_ker_of {R S : Type} [CommRing R] [CommRing S] (x : R) (n : ℕ) (f : AdicCompletion (Ideal.span {x}) R →+* S)
-    (hx : f (algebraMap R _ x) ^ n = 0) (hk : ∀ y : R, f (algebraMap R _ y) = 0 → ∃ c, y = c * x ^ n)
-    (a : AdicCompletion (Ideal.span {x}) R) (ha : f a = 0) : ∃ b, a = algebraMap R _ x ^ n * b := by
+theorem adic_ker_of
+    {R S : Type} [CommRing R] [CommRing S]
+    (x : R) (n : ℕ) (f : AdicCompletion (Ideal.span {x}) R →+* S)
+    (hx : f (algebraMap R _ x) ^ n = 0)
+    (hk : ∀ y : R, f (algebraMap R _ y) = 0 → ∃ c, y = c * x ^ n)
+    (a : AdicCompletion (Ideal.span {x}) R) (ha : f a = 0)
+    : ∃ b, a = algebraMap R _ x ^ n * b := by
   obtain ⟨y, hy⟩ := Submodule.mkQ_surjective _ (AdicCompletion.eval (Ideal.span {x}) R n a)
   have e1 : AdicCompletion.eval (Ideal.span {x}) R n (a - algebraMap R _ y) = 0 := by
     rw [map_sub, ← hy, AdicCompletion.algebraMap_apply, AdicCompletion.eval_of]
@@ -79,11 +89,15 @@ theorem cris_surjective (n : ℕ) : Function.Surjective ((base l).cris n) := fun
   obtain ⟨y, rfl⟩ := cris_zero_surjective v
   exact ⟨_, cris_of _ n y⟩
 
-theorem cris_ker (n : ℕ) (a : Acris l) (h : (base l).cris n a = 0) : ∃ b : Acris l, a = (l : Acris l) ^ n * b := by
+theorem cris_ker (n : ℕ) (a : Acris l) (h : (base l).cris n a = 0)
+    : ∃ b : Acris l, a = (l : Acris l) ^ n * b := by
   have hl : algebraMap (Acris0 l) (Acris l) (l : Acris0 l) = (l : Acris l) := map_natCast _ _
   have hx : (base l).cris n (algebraMap (Acris0 l) (Acris l) (l : Acris0 l)) ^ n = 0 := by
     rw [hl, map_natCast, (base l).pow_l_acr]
-  have hk : ∀ y : Acris0 l, (base l).cris n (algebraMap (Acris0 l) (Acris l) y) = 0 → ∃ c, y = c * (l : Acris0 l) ^ n := by
+  have hk
+      : ∀ y : Acris0 l,
+        (base l).cris n (algebraMap (Acris0 l) (Acris l) y) = 0
+          → ∃ c, y = c * (l : Acris0 l) ^ n := by
     intro y hy
     rw [AdicCompletion.algebraMap_apply, cris_of] at hy
     obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.1 (Ideal.Quotient.eq_zero_iff_mem.1 hy)
@@ -94,44 +108,57 @@ theorem cris_ker (n : ℕ) (a : Acris l) (h : (base l).cris n a = 0) : ∃ b : A
 
 end Rings
 
-theorem tens_change {W A R R' : Type} [CommRing W] [CommRing A] [CommRing R] [CommRing R'] [Algebra W A] [Algebra R R']
-    (π : W →+* R) (c : A →+* R') (hc : Function.Surjective c)
-    (hcomp : ∀ w, c (algebraMap W A w) = algebraMap R R' (π w)) (hπ : Function.Surjective π) (t : W) (ht : π t = 0)
-    (hker : ∀ a, c a = 0 → ∃ b, a = algebraMap W A t * b)
-    {B : Type w} [AddCommGroup B] [Module W B] {A₀ : Type w'} [AddCommGroup A₀] [Module R A₀]
+theorem tens_change
+    {W A R R' : Type}
+    [CommRing W] [CommRing A] [CommRing R] [CommRing R'] [Algebra W A] [Algebra R R']
+    (π : W →+* R) (c : A →+* R')
+    (hc : Function.Surjective c) (hcomp : ∀ w, c (algebraMap W A w) = algebraMap R R' (π w))
+    (hπ : Function.Surjective π)
+    (t : W) (ht : π t = 0) (hker : ∀ a, c a = 0 → ∃ b, a = algebraMap W A t * b)
+    {B : Type w} [AddCommGroup B] [Module W B]
+    {A₀ : Type w'} [AddCommGroup A₀] [Module R A₀]
     {M₀ H : Type w'} [AddCommGroup M₀] [AddCommGroup H]
-    (e : B →ₛₗ[π] A₀) (he : Function.Bijective e) (e' : H →+ M₀) (he' : Function.Bijective e')
-    (f : Unit → R' → A₀ → M₀) (f' : Unit → A → B → H) (comm : ∀ a y, e' (f' () a y) = f () (c a) (e y))
-    (T : Tens R (N := fun _ : Unit => R') (M := fun _ => A₀) (M' := M₀) f) :
-    Tens W (N := fun _ : Unit => A) (M := fun _ => B) (M' := H) f' := by
+    (e : B →ₛₗ[π] A₀) (he : Function.Bijective e)
+    (e' : H →+ M₀) (he' : Function.Bijective e')
+    (f : Unit → R' → A₀ → M₀) (f' : Unit → A → B → H)
+    (comm : ∀ a y, e' (f' () a y) = f () (c a) (e y))
+    (T : Tens R (N := fun _ : Unit => R') (M := fun _ => A₀) (M' := M₀) f)
+    : Tens W (N := fun _ : Unit => A) (M := fun _ => B) (M' := H) f' := by
   obtain ⟨g, hg⟩ := T
   let E : B ≃+ A₀ := AddEquiv.ofBijective e.toAddMonoidHom he
   have hE : ∀ y, E y = e y := fun _ => rfl
   have hEs : ∀ (w : W) (v : A₀), E.symm (π w • v) = w • E.symm v := fun w v => by
     apply E.injective
     rw [AddEquiv.apply_symm_apply, hE, LinearMap.map_smulₛₗ, ← hE, AddEquiv.apply_symm_apply]
-  have hkill : ∀ y : B, t • y = 0 := fun y => he.1 (by rw [LinearMap.map_smulₛₗ, ht, zero_smul, map_zero])
+  have hkill : ∀ y : B, t • y = 0 := fun y =>
+    he.1 (by rw [LinearMap.map_smulₛₗ, ht, zero_smul, map_zero])
 
-  let F : A ⊗[W] B →+ R' ⊗[R] A₀ := TensorProduct.liftAddHom
-    { toFun := fun a =>
-        { toFun := fun y => c a ⊗ₜ[R] e y
+  let F : A ⊗[W] B →+ R' ⊗[R] A₀ :=
+    TensorProduct.liftAddHom
+      {
+        toFun := fun a => {
+          toFun := fun y => c a ⊗ₜ[R] e y
           map_zero' := by rw [map_zero, TensorProduct.tmul_zero]
-          map_add' := fun x y => by rw [map_add (f := _), TensorProduct.tmul_add] }
-      map_zero' := by ext y; simp
-      map_add' := fun a b => by ext y; simp [TensorProduct.add_tmul] }
-    (fun w a y => by
-      change c (w • a) ⊗ₜ[R] e y = c a ⊗ₜ[R] e (w • y)
-      rw [Algebra.smul_def, map_mul, hcomp, LinearMap.map_smulₛₗ, TensorProduct.tmul_smul, ← Algebra.smul_def,
-        TensorProduct.smul_tmul'])
+          map_add' := fun x y => by rw [map_add (f := _), TensorProduct.tmul_add]
+        }
+        map_zero' := by ext y; simp
+        map_add' := fun a b => by ext y; simp [TensorProduct.add_tmul]
+      }
+      (fun w a y => by
+        change c (w • a) ⊗ₜ[R] e y = c a ⊗ₜ[R] e (w • y)
+        rw [Algebra.smul_def, map_mul, hcomp, LinearMap.map_smulₛₗ, TensorProduct.tmul_smul,
+          ← Algebra.smul_def, TensorProduct.smul_tmul'])
   have hF : ∀ a y, F (a ⊗ₜ[W] y) = c a ⊗ₜ[R] e y := fun _ _ => rfl
 
-  let f₀ : A →+ (A₀ →+ A ⊗[W] B) :=
-    { toFun := fun a =>
-        { toFun := fun v => a ⊗ₜ[W] E.symm v
-          map_zero' := by rw [map_zero, TensorProduct.tmul_zero]
-          map_add' := fun x y => by rw [map_add (f := _), TensorProduct.tmul_add] }
-      map_zero' := by ext y; simp
-      map_add' := fun a b => by ext y; simp [TensorProduct.add_tmul] }
+  let f₀ : A →+ (A₀ →+ A ⊗[W] B) := {
+    toFun := fun a => {
+      toFun := fun v => a ⊗ₜ[W] E.symm v
+      map_zero' := by rw [map_zero, TensorProduct.tmul_zero]
+      map_add' := fun x y => by rw [map_add (f := _), TensorProduct.tmul_add]
+    }
+    map_zero' := by ext y; simp
+    map_add' := fun a b => by ext y; simp [TensorProduct.add_tmul]
+  }
   have hf₀ : ∀ a v, f₀ a v = a ⊗ₜ[W] E.symm v := fun _ _ => rfl
   have hk₀ : c.toAddMonoidHom.ker ≤ f₀.ker := by
     intro a ha
@@ -143,27 +170,28 @@ theorem tens_change {W A R R' : Type} [CommRing W] [CommRing A] [CommRing R] [Co
   have hf₁ : ∀ a v, f₁ (c a) v = a ⊗ₜ[W] E.symm v := fun a v => by
     have : f₁ (c a) = f₀ a := AddMonoidHom.liftOfRightInverse_comp_apply _ _ _ _ a
     rw [this, hf₀]
-  let Bk : R' ⊗[R] A₀ →+ A ⊗[W] B := TensorProduct.liftAddHom f₁ (fun r r' v => by
-    obtain ⟨w, rfl⟩ := hπ r
-    obtain ⟨a, rfl⟩ := hc r'
-    have e₁ : π w • c a = c (w • a) := by
-      rw [Algebra.smul_def, Algebra.smul_def, map_mul, hcomp]
-    rw [e₁, hf₁, hf₁, hEs, TensorProduct.smul_tmul])
+  let Bk : R' ⊗[R] A₀ →+ A ⊗[W] B :=
+    TensorProduct.liftAddHom f₁ (fun r r' v => by
+      obtain ⟨w, rfl⟩ := hπ r
+      obtain ⟨a, rfl⟩ := hc r'
+      have e₁ : π w • c a = c (w • a) := by rw [Algebra.smul_def, Algebra.smul_def, map_mul, hcomp]
+      rw [e₁, hf₁, hf₁, hEs, TensorProduct.smul_tmul])
   have hB : ∀ a v, Bk (c a ⊗ₜ[R] v) = a ⊗ₜ[W] E.symm v := fun a v => hf₁ a v
-  let Φ : A ⊗[W] B ≃+ R' ⊗[R] A₀ :=
-    { toFun := F
-      invFun := Bk
-      left_inv := fun x => by
-        induction x with
-        | tmul a y => rw [hF, hB, ← hE, AddEquiv.symm_apply_apply]
-        | add x y hx hy => rw [map_add (f := _), map_add (f := _), hx, hy]
-      right_inv := fun x => by
-        induction x with
-        | tmul r v =>
-          obtain ⟨a, rfl⟩ := hc r
-          rw [hB, hF, ← hE, AddEquiv.apply_symm_apply]
-        | add x y hx hy => rw [map_add (f := _), map_add (f := _), hx, hy]
-      map_add' := map_add F }
+  let Φ : A ⊗[W] B ≃+ R' ⊗[R] A₀ := {
+    toFun := F
+    invFun := Bk
+    left_inv := fun x => by
+      induction x with
+      | tmul a y => rw [hF, hB, ← hE, AddEquiv.symm_apply_apply]
+      | add x y hx hy => rw [map_add (f := _), map_add (f := _), hx, hy]
+    right_inv := fun x => by
+      induction x with
+      | tmul r v =>
+        obtain ⟨a, rfl⟩ := hc r
+        rw [hB, hF, ← hE, AddEquiv.apply_symm_apply]
+      | add x y hx hy => rw [map_add (f := _), map_add (f := _), hx, hy]
+    map_add' := map_add F
+  }
   let P : (∀ _ : Unit, A ⊗[W] B) ≃+ (∀ _ : Unit, R' ⊗[R] A₀) := AddEquiv.piCongrRight fun _ => Φ
   let E' : H ≃+ M₀ := AddEquiv.ofBijective e' he'
   refine ⟨(P.trans g).trans E'.symm, fun i a y => ?_⟩
@@ -178,8 +206,12 @@ theorem tens_change {W A R R' : Type} [CommRing W] [CommRing A] [CommRing R] [Co
   rw [hP, hg]
   exact (comm a y).symm
 
-theorem mapH_bijective {R R' : Type} [CommRing R] [CommRing R'] {σ : R →+* R'} {K : Cx.{w} R} {L : Cx.{w'} R'}
-    (φ : Cx.Hom K L σ) (h : ∀ n, Function.Bijective (φ.f n)) (n : ℕ) : Function.Bijective (φ.mapH n) := by
+theorem mapH_bijective
+    {R R' : Type} [CommRing R] [CommRing R']
+    {σ : R →+* R'} {K : Cx.{w} R} {L : Cx.{w'} R'}
+    (φ : Cx.Hom K L σ) (h : ∀ n, Function.Bijective (φ.f n))
+    (n : ℕ)
+    : Function.Bijective (φ.mapH n) := by
   constructor
   · rw [injective_iff_map_eq_zero]
     intro c hc
@@ -202,15 +234,21 @@ theorem mapH_bijective {R R' : Type} [CommRing R] [CommRing R'] {σ : R →+* R'
   · intro c
     obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ c
     obtain ⟨y, hy⟩ := (h n).2 z.1
-    have hd : K.d n y = 0 := (h (n + 1)).1 (by
-      rw [← φ.comm, hy, map_zero]
-      exact z.2)
-    exact ⟨Submodule.Quotient.mk ⟨y, hd⟩, congrArg (Submodule.Quotient.mk (p := _)) (Subtype.ext hy)⟩
+    have hd : K.d n y = 0 :=
+      (h (n + 1)).1 (by
+        rw [← φ.comm, hy, map_zero]
+        exact z.2)
+    exact
+      ⟨Submodule.Quotient.mk ⟨y, hd⟩, congrArg (Submodule.Quotient.mk (p := _)) (Subtype.ext hy)⟩
 
-theorem pullC_bijective {R R' : Type} [CommRing R] [CommRing R'] {σ : R →+* R'} {C : Type 1} [Category.{0} C]
-    (Q : ObjectProperty C) (hQ : ∀ T, Q T) {F : C ⥤ ModuleCat.{w} R} {F' : Q.FullSubcategory ⥤ ModuleCat.{w'} R'}
-    (m : CH.Mor F F' σ) (hG : m.G = Q.ι) (hτ : ∀ T, Function.Bijective (m.τ T)) (n : ℕ) :
-    Function.Bijective (m.pullC n) := by
+theorem pullC_bijective
+    {R R' : Type} [CommRing R] [CommRing R']
+    {σ : R →+* R'} {C : Type 1} [Category.{0} C]
+    (Q : ObjectProperty C) (hQ : ∀ T, Q T)
+    {F : C ⥤ ModuleCat.{w} R} {F' : Q.FullSubcategory ⥤ ModuleCat.{w'} R'}
+    (m : CH.Mor F F' σ) (hG : m.G = Q.ι) (hτ : ∀ T, Function.Bijective (m.τ T))
+    (n : ℕ)
+    : Function.Bijective (m.pullC n) := by
   obtain ⟨G, τ, nat⟩ := m
   obtain rfl : G = Q.ι := hG
   let up : C ⥤ Q.FullSubcategory := Q.lift (𝟭 C) hQ
@@ -220,7 +258,8 @@ theorem pullC_bijective {R R' : Type} [CommRing R] [CommRing R'] {σ : R →+* R
     have h1 := congrFun h (s ⋙ up)
     exact (hτ (up.obj (s.obj (Fin.last n)))).1 h1
   · intro f'
-    refine ⟨fun s => (Equiv.ofBijective _ (hτ (up.obj (s.obj (Fin.last n))))).symm (f' (s ⋙ up)), ?_⟩
+    refine
+      ⟨fun s => (Equiv.ofBijective _ (hτ (up.obj (s.obj (Fin.last n))))).symm (f' (s ⋙ up)), ?_⟩
     funext s
     exact (Equiv.ofBijective _ (hτ (s.obj (Fin.last n)))).apply_symm_apply (f' s)
 
@@ -239,19 +278,25 @@ variable {Λ : Type} [CommRing Λ] (c : Λ →+* b.R)
 
 def toQ : CH.Mor (B.OM L c) (sq (oT Q) (oB Q)) c where
   G := Q.ι
-  τ T :=
-    { toFun := fun x => sqMk (oT Q) (oB Q) (T := T) (show (sP Q).A.obj T from x) (by rw [oT_top]; trivial)
-      map_add' := fun _ _ => rfl
-      map_smul' := fun a x => Subtype.ext (by
-        change Ideal.Quotient.mk _ (T.obj.i (c a) * (show T.obj.B from x)) = Ideal.Quotient.mk _ (c a • (show (sP Q).A.obj T from x))
+  τ T := {
+    toFun := fun x =>
+      sqMk (oT Q) (oB Q) (T := T) (show (sP Q).A.obj T from x) (by rw [oT_top]; trivial)
+    map_add' := fun _ _ => rfl
+    map_smul' := fun a x =>
+      Subtype.ext (by
+        change Ideal.Quotient.mk _ (T.obj.i (c a) * (show T.obj.B from x))
+          = Ideal.Quotient.mk _ (c a • (show (sP Q).A.obj T from x))
         rw [Algebra.smul_def]
-        rfl) }
+        rfl)
+  }
   nat _ _ := rfl
 
 theorem toQ_bijective (T : Q.FullSubcategory) : Function.Bijective ((toQ Q c).τ T) := by
   constructor
   · intro x y h
-    have h1 : Ideal.Quotient.mk ((oB Q).S T) (show (sP Q).A.obj T from x) = Ideal.Quotient.mk _ (show (sP Q).A.obj T from y) :=
+    have h1
+        : Ideal.Quotient.mk ((oB Q).S T) (show (sP Q).A.obj T from x)
+          = Ideal.Quotient.mk _ (show (sP Q).A.obj T from y) :=
       congrArg Subtype.val h
     have h2 := Ideal.Quotient.eq.1 h1
     rw [oB_bot, Ideal.mem_bot] at h2
@@ -266,18 +311,20 @@ theorem toQ_pull_bijective (hQ : ∀ T, Q T) (j : ℕ) : Function.Bijective ((to
 end ToQ
 
 section Compat
-variable {O R R' : Type} [CommRing O] [CommRing R] [CommRing R'] [Algebra R R'] {I : Ideal R} {I' : Ideal R'}
-  {γ : DividedPowers I} {γ' : DividedPowers I'} {p : ℕ} {X : Scheme.{0}} {q : X ⟶ Spec (CommRingCat.of O)}
-  {κ : O →+* R ⧸ I} {κ' : O →+* R' ⧸ I'}
+variable
+  {O R R' : Type} [CommRing O] [CommRing R] [CommRing R'] [Algebra R R']
+  {I : Ideal R} {I' : Ideal R'} {γ : DividedPowers I} {γ' : DividedPowers I'} {p : ℕ}
+  {X : Scheme.{0}} {q : X ⟶ Spec (CommRingCat.of O)} {κ : O →+* R ⧸ I} {κ' : O →+* R' ⧸ I'}
 
-theorem sqC_toQ (m : NMor γ q κ γ' q κ' (algebraMap R R')) (Q : ObjectProperty (Thick (nlFun γ p X q κ)))
+theorem sqC_toQ
+    (m : NMor γ q κ γ' q κ' (algebraMap R R')) (Q : ObjectProperty (Thick (nlFun γ p X q κ)))
     (Q' : ObjectProperty (Thick (nlFun γ' p X q κ'))) (h : ∀ T, Q' T → Q ((m.mor p).functor.obj T))
-    {Λ Λ' : Type} [CommRing Λ] [CommRing Λ'] (c : Λ →+* R) (c' : Λ' →+* R') (σ₀ : Λ →+* Λ')
-    (hσ : ∀ a, algebraMap R R' (c a) = c' (σ₀ a)) (a : R')
-    (ha : (m.smor Q Q' h).LeC a (oT Q) (oT Q')) (hb : (m.smor Q Q' h).LeC a (oB Q) (oB Q')) (j : ℕ)
-    (x : CH.H (B.OM (nlFun γ p X q κ) c) j) :
-    ((m.smor Q Q' h).sqC a ha hb).pull j ((toQ Q c).pull j x) =
-      a • (toQ Q' c').pull j ((B.omMor (m.mor p) σ₀ hσ).pull j x) := by
+    {Λ Λ' : Type} [CommRing Λ] [CommRing Λ']
+    (c : Λ →+* R) (c' : Λ' →+* R') (σ₀ : Λ →+* Λ') (hσ : ∀ a, algebraMap R R' (c a) = c' (σ₀ a))
+    (a : R') (ha : (m.smor Q Q' h).LeC a (oT Q) (oT Q')) (hb : (m.smor Q Q' h).LeC a (oB Q) (oB Q'))
+    (j : ℕ) (x : CH.H (B.OM (nlFun γ p X q κ) c) j)
+    : ((m.smor Q Q' h).sqC a ha hb).pull j ((toQ Q c).pull j x)
+      = a • (toQ Q' c').pull j ((B.omMor (m.mor p) σ₀ hσ).pull j x) := by
   obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ x
   refine congrArg (Submodule.Quotient.mk (p := _)) (Subtype.ext (funext fun s => Subtype.ext ?_))
   exact (congrArg (Ideal.Quotient.mk _) (Algebra.smul_def a _).symm)
@@ -287,50 +334,62 @@ end Compat
 section Main
 variable {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)}
 
-theorem omMor_congr {b b' : Base} {L : b.Fun} {L' : b'.Fun} {σ : b.R →+* b'.R} {m m' : Mor L L' σ} (h : m = m')
-    {Λ Λ' : Type} [CommRing Λ] [CommRing Λ'] {c : Λ →+* b.R} {c' : Λ' →+* b'.R} (σ₀ : Λ →+* Λ')
-    (h₀ : ∀ a, σ (c a) = c' (σ₀ a)) : B.omMor m σ₀ h₀ = B.omMor m' σ₀ h₀ := by
+theorem omMor_congr
+    {b b' : Base} {L : b.Fun} {L' : b'.Fun} {σ : b.R →+* b'.R} {m m' : Mor L L' σ} (h : m = m')
+    {Λ Λ' : Type} [CommRing Λ] [CommRing Λ']
+    {c : Λ →+* b.R} {c' : Λ' →+* b'.R}
+    (σ₀ : Λ →+* Λ') (h₀ : ∀ a, σ (c a) = c' (σ₀ a))
+    : B.omMor m σ₀ h₀ = B.omMor m' σ₀ h₀ := by
   subst h; rfl
 
-def nm (r : Res l K) (M : Model l K) (n : ℕ) :
-    letI := (Mid.wn r n).toAlgebra
-    NMor (Wc.pd l r.k n) M.p ((Wc.res l r.k n).comp r.ρ) (B.DD true (base l) n) M.p (Mid.κm r n)
-      (algebraMap (Wc.Wm l r.k n) ((base l).Acr n)) :=
+def nm (r : Res l K) (M : Model l K) (n : ℕ)
+    : letI := (Mid.wn r n).toAlgebra
+      NMor (Wc.pd l r.k n) M.p ((Wc.res l r.k n).comp r.ρ) (B.DD true (base l) n) M.p (Mid.κm r n)
+        (algebraMap (Wc.Wm l r.k n) ((base l).Acr n)) :=
   letI := (Mid.wn r n).toAlgebra
-  { hI := GlobalTheory.T.witt_to_acris_isDPMorphism r n
+  {
+    hI := GlobalTheory.T.witt_to_acris_isDPMorphism r n
     u := 𝟙 _
     g := RingHom.id _
     hu := by simp
     hκ := fun a x h => by
       change Ideal.quotientMap _ (Mid.wn r n) (Mid.im_le r n) ((Wc.res l r.k n).comp r.ρ a) = _
       rw [h]
-      rfl }
+      rfl
+  }
 
-theorem bWMorL_eq (r : Res l K) (M : Model l K) (n : ℕ) :
-    letI := (Mid.wn r n).toAlgebra
-    bWMorL r M n = B.omMor ((nm r M n).mor l) r.w (Mid.wn_mk r n) := by
+theorem bWMorL_eq (r : Res l K) (M : Model l K) (n : ℕ)
+    : letI := (Mid.wn r n).toAlgebra
+      bWMorL r M n = B.omMor ((nm r M n).mor l) r.w (Mid.wn_mk r n) := by
   letI := (Mid.wn r n).toAlgebra
   unfold bWMorL
   refine omMor_congr ?_ _ _
   unfold B.crMor NMor.mor
   congr 1
 
-theorem st_all {O R : Type} [CommRing O] [CommRing R] {I : Ideal R} {γ : DividedPowers I} {p : ℕ} {X : Scheme.{0}}
-    {q : X ⟶ Spec (CommRingCat.of O)} {κ : O →+* R ⧸ I} (T : Thick (nlFun γ p X q κ)) : St ⊤ {⊤} T :=
+theorem st_all
+    {O R : Type} [CommRing O] [CommRing R]
+    {I : Ideal R} {γ : DividedPowers I} {p : ℕ} {X : Scheme.{0}} {q : X ⟶ Spec (CommRingCat.of O)}
+    {κ : O →+* R ⧸ I} (T : Thick (nlFun γ p X q κ))
+    : St ⊤ {⊤} T :=
   ⟨trivial, ⊤, rfl, fun _ _ => trivial⟩
 
 theorem cov_of_sm (M : Model l K) (hM : M.Sm) : Nonempty (Cov M.p) := by
   obtain ⟨⟨N, i, hi, e⟩, -⟩ := hM.1
-  have h1 : IsProper (ReciprocityTheory.ChartRestriction.G.Geo.Tor.PSpace.str (OK l K) N) := ReciprocityTheory.ChartRestriction.G.Geo.Tor.isProper_str _ N
+  have h1 : IsProper (ReciprocityTheory.ChartRestriction.G.Geo.Tor.PSpace.str (OK l K) N) :=
+    ReciprocityTheory.ChartRestriction.G.Geo.Tor.isProper_str _ N
   have h2 : IsProper M.p := by
-    have h3 : IsProper (i ≫ ReciprocityTheory.ChartRestriction.G.Geo.Tor.PSpace.str (OK l K) N) := inferInstance
+    have h3 : IsProper (i ≫ ReciprocityTheory.ChartRestriction.G.Geo.Tor.PSpace.str (OK l K) N) :=
+      inferInstance
     exact e ▸ h3
   exact (cov_ex M.p).1 hM.2
 
-theorem l_nil (r : Res l K) (n : ℕ) : IsNilpotent (l : Wc.Wm l r.k n) :=
-  ⟨n, by
+theorem l_nil (r : Res l K) (n : ℕ) : IsNilpotent (l : Wc.Wm l r.k n) := ⟨
+  n,
+  by
     rw [← map_natCast (Ideal.Quotient.mk _), ← map_pow]
-    exact Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_span_singleton_self _)⟩
+    exact Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_span_singleton_self _)
+⟩
 
 end Main
 end GlobalTheory.CompanionTheory.BcAcris

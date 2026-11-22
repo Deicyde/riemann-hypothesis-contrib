@@ -63,8 +63,8 @@ abbrev O1 (x : CP N) : Type := Module.Dual ℂ (tautLine x)
 
 def fsNorm (x : CP N) (φ : O1 x) : ℝ := ‖φ ⟨x.rep, rep_mem_tautLine x⟩‖ / norm2 x.rep
 
-theorem fsNorm_eq (x : CP N) (φ : O1 x) (v : Fin (N + 1) → ℂ) (hv : v ∈ tautLine x) (hv0 : v ≠ 0) :
-    fsNorm x φ = ‖φ ⟨v, hv⟩‖ / norm2 v := by
+theorem fsNorm_eq (x : CP N) (φ : O1 x) (v : Fin (N + 1) → ℂ) (hv : v ∈ tautLine x) (hv0 : v ≠ 0)
+    : fsNorm x φ = ‖φ ⟨v, hv⟩‖ / norm2 v := by
   have hv' := hv
   rw [tautLine, Projectivization.submodule_eq, Submodule.mem_span_singleton] at hv'
   obtain ⟨t, rfl⟩ := hv'
@@ -96,14 +96,14 @@ theorem fsNorm_eq_zero_iff (x : CP N) (φ : O1 x) : fsNorm x φ = 0 ↔ φ = 0 :
 
 def restrictForm (ℓ : (Fin (N + 1) → ℂ) →ₗ[ℂ] ℂ) (x : CP N) : O1 x := ℓ.domRestrict (tautLine x)
 
-theorem fsNorm_restrictForm_mk (ℓ : (Fin (N + 1) → ℂ) →ₗ[ℂ] ℂ) (v : Fin (N + 1) → ℂ) (hv : v ≠ 0) :
-    fsNorm (Projectivization.mk ℂ v hv) (restrictForm ℓ _) = ‖ℓ v‖ / norm2 v :=
+theorem fsNorm_restrictForm_mk (ℓ : (Fin (N + 1) → ℂ) →ₗ[ℂ] ℂ) (v : Fin (N + 1) → ℂ) (hv : v ≠ 0)
+    : fsNorm (Projectivization.mk ℂ v hv) (restrictForm ℓ _) = ‖ℓ v‖ / norm2 v :=
   fsNorm_eq _ _ v (mem_tautLine_mk v hv) hv
 
 def coordForm (i : Fin (N + 1)) : (Fin (N + 1) → ℂ) →ₗ[ℂ] ℂ := LinearMap.proj i
 
-theorem restrictForm_coordForm_ne_zero (i : Fin (N + 1)) {x : CP N} (hx : x ∈ chartDomain i) :
-    restrictForm (coordForm i) x ≠ 0 := by
+theorem restrictForm_coordForm_ne_zero (i : Fin (N + 1)) {x : CP N} (hx : x ∈ chartDomain i)
+    : restrictForm (coordForm i) x ≠ 0 := by
   induction x using Projectivization.ind with
   | h v hv =>
     intro h
@@ -113,12 +113,13 @@ theorem restrictForm_coordForm_ne_zero (i : Fin (N + 1)) {x : CP N} (hx : x ∈ 
     · exact hx h1
     · exact (euclideanNorm_pos hv).ne' h1
 
-theorem fsNorm_sq_chartInv (ℓ : (Fin (N + 1) → ℂ) →ₗ[ℂ] ℂ) (i : Fin (N + 1)) (z : Fin N → ℂ) :
-    fsNorm (chartInv i z) (restrictForm ℓ _) ^ 2 = ‖ℓ (chartVec i z)‖ ^ 2 / (1 + ∑ j, ‖z j‖ ^ 2) := by
+theorem fsNorm_sq_chartInv (ℓ : (Fin (N + 1) → ℂ) →ₗ[ℂ] ℂ) (i : Fin (N + 1)) (z : Fin N → ℂ)
+    : fsNorm (chartInv i z) (restrictForm ℓ _) ^ 2
+      = ‖ℓ (chartVec i z)‖ ^ 2 / (1 + ∑ j, ‖z j‖ ^ 2) := by
   rw [chartInv, fsNorm_restrictForm_mk, div_pow, euclideanNorm_sq, normSq2_chartVec]
 
-theorem fsNorm_sq_frame (i : Fin (N + 1)) (z : Fin N → ℂ) :
-    fsNorm (chartInv i z) (restrictForm (coordForm i) _) ^ 2 = 1 / (1 + ∑ j, ‖z j‖ ^ 2) := by
+theorem fsNorm_sq_frame (i : Fin (N + 1)) (z : Fin N → ℂ)
+    : fsNorm (chartInv i z) (restrictForm (coordForm i) _) ^ 2 = 1 / (1 + ∑ j, ‖z j‖ ^ 2) := by
   rw [fsNorm_sq_chartInv]
   simp [coordForm]
 

@@ -10,28 +10,31 @@ public import ReciprocityTheory.Automorphisms.PlaceA
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.FrobeniusOrbits Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host GlobalTheory.Mem.Chr
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.FrobeniusOrbits Neutral.B1
+  ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host GlobalTheory.Mem.Chr
 
 namespace GlobalTheory.Mem.Chr
 
 variable {L : Type} [Field L] [NumberField L] (v : HeightOneSpectrum (𝓞 L))
 
-theorem tame_valued_int (a : 𝓞 L) :
-    Valued.v (algebraMap (𝓞 L) (v.adicCompletion L) a) = v.valuation L (algebraMap (𝓞 L) L a) :=
+theorem tame_valued_int (a : 𝓞 L)
+    : Valued.v (algebraMap (𝓞 L) (v.adicCompletion L) a) = v.valuation L (algebraMap (𝓞 L) L a) :=
   ReciprocityTheory.Aut.adic_valued_algebraMap v (algebraMap (𝓞 L) L a)
 
-theorem tame_valued_lt_one_iff (a : 𝓞 L) :
-    Valued.v (algebraMap (𝓞 L) (v.adicCompletion L) a) < 1 ↔ a ∈ v.asIdeal := by
-  rw [tame_valued_int,
-    HeightOneSpectrum.valuation_lt_one_iff_mem]
+theorem tame_valued_lt_one_iff (a : 𝓞 L)
+    : Valued.v (algebraMap (𝓞 L) (v.adicCompletion L) a) < 1 ↔ a ∈ v.asIdeal := by
+  rw [tame_valued_int, HeightOneSpectrum.valuation_lt_one_iff_mem]
 
-theorem tame_mk_eq {u : v.adicCompletion L} {a b : 𝓞 L}
+theorem tame_mk_eq
+    {u : v.adicCompletion L} {a b : 𝓞 L}
     (ha : Valued.v (u - algebraMap (𝓞 L) (v.adicCompletion L) a) < 1)
-    (hb : Valued.v (u - algebraMap (𝓞 L) (v.adicCompletion L) b) < 1) :
-    Ideal.Quotient.mk v.asIdeal a = Ideal.Quotient.mk v.asIdeal b := by
+    (hb : Valued.v (u - algebraMap (𝓞 L) (v.adicCompletion L) b) < 1)
+    : Ideal.Quotient.mk v.asIdeal a = Ideal.Quotient.mk v.asIdeal b := by
   rw [Ideal.Quotient.eq, ← tame_valued_lt_one_iff, map_sub]
-  have e : algebraMap (𝓞 L) (v.adicCompletion L) a - algebraMap (𝓞 L) (v.adicCompletion L) b =
-      (u - algebraMap (𝓞 L) (v.adicCompletion L) b) - (u - algebraMap (𝓞 L) (v.adicCompletion L) a) := by
+  have e
+      : algebraMap (𝓞 L) (v.adicCompletion L) a - algebraMap (𝓞 L) (v.adicCompletion L) b
+        = (u - algebraMap (𝓞 L) (v.adicCompletion L) b)
+          - (u - algebraMap (𝓞 L) (v.adicCompletion L) a) := by
     ring
   rw [e]
   exact lt_of_le_of_lt (Valuation.map_sub _ _ _) (max_lt hb ha)
@@ -44,8 +47,10 @@ def unitPart : (v.adicCompletion L)ˣ →* (v.adicCompletion L)ˣ where
     exact mul_mul_mul_comm _ _ _ _
 
 theorem isUnitAt_unitPart (x : (v.adicCompletion L)ˣ) : IsUnitAt v (unitPart v x) := by
-  have h : Valued.v ((atFin v (unif v) : (v.adicCompletion L)ˣ) : v.adicCompletion L) =
-      WithZero.exp (-1 : ℤ) := unif_spec v
+  have h
+      : Valued.v ((atFin v (unif v) : (v.adicCompletion L)ˣ) : v.adicCompletion L)
+        = WithZero.exp (-1 : ℤ) :=
+    unif_spec v
   have hx : Valued.v (x : v.adicCompletion L) ≠ 0 := by simp
   show Valued.v ((x * atFin v (unif v) ^ WithZero.log (Valued.v (x : v.adicCompletion L)) :
     (v.adicCompletion L)ˣ) : v.adicCompletion L) = 1
@@ -54,14 +59,17 @@ theorem isUnitAt_unitPart (x : (v.adicCompletion L)ˣ) : IsUnitAt v (unitPart v 
   rw [← WithZero.exp_add]
   simp
 
-theorem unitPart_of_isUnitAt {x : (v.adicCompletion L)ˣ} (hx : IsUnitAt v x) : unitPart v x = x := by
+theorem unitPart_of_isUnitAt {x : (v.adicCompletion L)ˣ} (hx : IsUnitAt v x)
+    : unitPart v x = x := by
   have h : Valued.v (x : v.adicCompletion L) = 1 := hx
   show x * atFin v (unif v) ^ WithZero.log (Valued.v (x : v.adicCompletion L)) = x
   rw [h]
   simp
 
-theorem exists_unitPart_approx (x : (v.adicCompletion L)ˣ) : ∃ a : 𝓞 L,
-    Valued.v ((unitPart v x : v.adicCompletion L) - algebraMap (𝓞 L) (v.adicCompletion L) a) < 1 :=
+theorem exists_unitPart_approx (x : (v.adicCompletion L)ˣ)
+    : ∃ a : 𝓞 L,
+      Valued.v ((unitPart v x : v.adicCompletion L) - algebraMap (𝓞 L) (v.adicCompletion L) a)
+        < 1 :=
   ReciprocityTheory.Aut.adic_exists_approx v _ (le_of_eq (isUnitAt_unitPart v x))
 
 def resPart : (v.adicCompletion L)ˣ →* 𝓞 L ⧸ v.asIdeal where
@@ -80,11 +88,12 @@ def resPart : (v.adicCompletion L)ˣ →* 𝓞 L ⧸ v.asIdeal where
     have hb : Valued.v (algebraMap (𝓞 L) (v.adicCompletion L) b) ≤ 1 := by
       rw [tame_valued_int]
       exact v.valuation_le_one b
-    have e : (unitPart v (x * y) : v.adicCompletion L) - algebraMap (𝓞 L) (v.adicCompletion L) (a * b) =
-        (unitPart v x : v.adicCompletion L) *
-          ((unitPart v y : v.adicCompletion L) - algebraMap (𝓞 L) (v.adicCompletion L) b) +
-        ((unitPart v x : v.adicCompletion L) - algebraMap (𝓞 L) (v.adicCompletion L) a) *
-          algebraMap (𝓞 L) (v.adicCompletion L) b := by
+    have e
+        : (unitPart v (x * y) : v.adicCompletion L) - algebraMap (𝓞 L) (v.adicCompletion L) (a * b)
+          = (unitPart v x : v.adicCompletion L)
+              * ((unitPart v y : v.adicCompletion L) - algebraMap (𝓞 L) (v.adicCompletion L) b)
+            + ((unitPart v x : v.adicCompletion L) - algebraMap (𝓞 L) (v.adicCompletion L) a)
+              * algebraMap (𝓞 L) (v.adicCompletion L) b := by
       rw [map_mul, map_mul, Units.val_mul]
       ring
     rw [e]
@@ -93,19 +102,32 @@ def resPart : (v.adicCompletion L)ˣ →* 𝓞 L ⧸ v.asIdeal where
     · rw [map_mul]
       exact lt_of_le_of_lt (mul_le_of_le_one_right' hb) hx
 
-theorem resPart_eq {x : (v.adicCompletion L)ˣ} (hx : IsUnitAt v x) {a : 𝓞 L}
-    (ha : Valued.v ((x : v.adicCompletion L) - algebraMap (𝓞 L) (v.adicCompletion L) a) < 1) :
-    resPart v x = Ideal.Quotient.mk v.asIdeal a := by
+theorem resPart_eq
+    {x : (v.adicCompletion L)ˣ} (hx : IsUnitAt v x)
+    {a : 𝓞 L}
+    (ha : Valued.v ((x : v.adicCompletion L) - algebraMap (𝓞 L) (v.adicCompletion L) a) < 1)
+    : resPart v x = Ideal.Quotient.mk v.asIdeal a := by
   refine tame_mk_eq v (exists_unitPart_approx v x).choose_spec ?_
   rwa [unitPart_of_isUnitAt v hx]
 
-
 open Classical in
-theorem exists_tameLoc_of_residue : ∀ (L : Type) [Field L] [NumberField L] (v : HeightOneSpectrum (𝓞 L)) (θ0 : (𝓞 L ⧸ v.asIdeal)ˣ →* ℂˣ), ∃ θ : (v.adicCompletion L)ˣ →* ℂˣ, TameLoc v θ ∧ (∀ (k : Lˣ) (y : 𝓞 L) (b : (𝓞 L ⧸ v.asIdeal)ˣ), (k : L) = (y : L) → (b : 𝓞 L ⧸ v.asIdeal) = Ideal.Quotient.mk v.asIdeal y → θ (atFin v k) = θ0 b) ∧ ∀ x, IsUnitAt v x → ∃ b, θ x = θ0 b := by
+theorem exists_tameLoc_of_residue
+    : ∀ (L : Type) [Field L] [NumberField L] (v : HeightOneSpectrum (𝓞 L))
+        (θ0 : (𝓞 L ⧸ v.asIdeal)ˣ →* ℂˣ),
+      ∃ θ : (v.adicCompletion L)ˣ →* ℂˣ,
+        TameLoc v θ
+          ∧ (∀ (k : Lˣ) (y : 𝓞 L) (b : (𝓞 L ⧸ v.asIdeal)ˣ),
+            (k : L) = (y : L) → (b : 𝓞 L ⧸ v.asIdeal) = Ideal.Quotient.mk v.asIdeal y
+              → θ (atFin v k) = θ0 b)
+          ∧ ∀ x, IsUnitAt v x → ∃ b, θ x = θ0 b := by
   intro L _ _ v θ0
   haveI : Finite (𝓞 L ⧸ v.asIdeal) := v.asIdeal.finiteQuotientOfFreeOfNeBot v.ne_bot
-  refine ⟨θ0.comp (resPart v).toHomUnits, ⟨fun x => ?_, fun x hx h1 => ?_⟩, fun k y b hk hb => ?_,
-    fun x _ => ⟨_, rfl⟩⟩
+  refine ⟨
+    θ0.comp (resPart v).toHomUnits,
+    ⟨fun x => ?_, fun x hx h1 => ?_⟩,
+    fun k y b hk hb => ?_,
+    fun x _ => ⟨_, rfl⟩
+  ⟩
   · have hf : IsOfFinOrder ((θ0 ((resPart v).toHomUnits x) : ℂˣ) : ℂ) :=
       ((Units.coeHom ℂ).comp θ0).isOfFinOrder (isOfFinOrder_of_finite _)
     exact hf.norm_eq_one
@@ -118,8 +140,9 @@ theorem exists_tameLoc_of_residue : ∀ (L : Type) [Field L] [NumberField L] (v 
       rw [← WithZero.exp_zero, WithZero.exp_lt_exp]
       norm_num
     rw [MonoidHom.comp_apply, e, map_one]
-  · have ek : ((atFin v k : (v.adicCompletion L)ˣ) : v.adicCompletion L) =
-        algebraMap (𝓞 L) (v.adicCompletion L) y := by
+  · have ek
+        : ((atFin v k : (v.adicCompletion L)ˣ) : v.adicCompletion L)
+          = algebraMap (𝓞 L) (v.adicCompletion L) y := by
       show algebraMap L (v.adicCompletion L) (k : L) = _
       rw [hk]
       rfl

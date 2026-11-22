@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SummableAbsN
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible NumberField IsDedekindDomain MeasureTheory Filter Topology
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible
+  NumberField IsDedekindDomain MeasureTheory Filter Topology
 open scoped InnerProductSpace
 
 namespace GlobalTheory.ThetaInner
@@ -17,12 +18,11 @@ namespace GlobalTheory.ThetaInner
 def LaurentConst (h : ℂ → ℂ) (s₀ c : ℂ) : Prop :=
   ∃ p : Polynomial ℂ, p.coeff 0 = 0 ∧ Tendsto (fun s => h s - p.eval (s - s₀)⁻¹) (𝓝[≠] s₀) (𝓝 c)
 
-
 section Interface
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E]
-  [Algebra F E] {A B : Formalism.BasicNotions.HSpace E} (O : RFObj F E A B)
-
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+  {A B : Formalism.BasicNotions.HSpace E} (O : RFObj F E A B)
 
 variable {O}
 
@@ -39,7 +39,6 @@ variable (T : ThetaX D)
 end Towers
 
 variable (Z : DivX D) (T : ThetaX D) (X : Formalism.MainNotions.InnerProductFormulaField.Loc D)
-
 
 end GlobalTheory.ThetaInner
 

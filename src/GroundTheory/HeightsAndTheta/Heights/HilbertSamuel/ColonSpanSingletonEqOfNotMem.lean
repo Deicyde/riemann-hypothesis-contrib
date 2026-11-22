@@ -11,24 +11,28 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.HilbertSamuel
 
-open MvPolynomial GroundTheory.Heights₂.Heights.NumbersDVR GroundTheory.Heights₂.Heights.FieldNumbers
+open MvPolynomial GroundTheory.Heights₂.Heights.NumbersDVR
+  GroundTheory.Heights₂.Heights.FieldNumbers
 
 noncomputable section
 
 universe u
 
-theorem ringKrullDim_quot_add_one_le {K : Type*} {ι : K → Type*} {F : Type*} [Field F]
-    {P Q : Ideal (MRing ι F)} [P.IsPrime] (hPQ : P ≤ Q)
-    {f : MRing ι F} (hfP : f ∉ P) (hfQ : f ∈ Q) :
-    ringKrullDim (MRing ι F ⧸ Q) + 1 ≤ ringKrullDim (MRing ι F ⧸ P) := by
+theorem ringKrullDim_quot_add_one_le
+    {K : Type*} {ι : K → Type*} {F : Type*} [Field F]
+    {P Q : Ideal (MRing ι F)} [P.IsPrime]
+    (hPQ : P ≤ Q)
+    {f : MRing ι F} (hfP : f ∉ P) (hfQ : f ∈ Q)
+    : ringKrullDim (MRing ι F ⧸ Q) + 1 ≤ ringKrullDim (MRing ι F ⧸ P) := by
   refine ringKrullDim_succ_le_of_surjective (Ideal.Quotient.factor hPQ)
     (Ideal.Quotient.factor_surjective hPQ) (r := Ideal.Quotient.mk P f) ?_ ?_
   · exact mem_nonZeroDivisors_of_ne_zero (by rwa [ne_eq, Ideal.Quotient.eq_zero_iff_mem])
   · rw [Ideal.Quotient.factor_mk, Ideal.Quotient.eq_zero_iff_mem]
     exact hfQ
 
-theorem le_of_add_one_le_natCast_add_one {x : WithBot ℕ∞} {n : ℕ}
-    (h : x + 1 ≤ ((n + 1 : ℕ) : WithBot ℕ∞)) : x ≤ (n : WithBot ℕ∞) := by
+theorem le_of_add_one_le_natCast_add_one
+    {x : WithBot ℕ∞} {n : ℕ} (h : x + 1 ≤ ((n + 1 : ℕ) : WithBot ℕ∞))
+    : x ≤ (n : WithBot ℕ∞) := by
   induction x using WithBot.recBotCoe with
   | bot => exact bot_le
   | coe y =>
@@ -46,8 +50,9 @@ theorem le_of_add_one_le_natCast_add_one {x : WithBot ℕ∞} {n : ℕ}
       have : m ≤ n := by omega
       exact_mod_cast this
 
-theorem colon_span_singleton_eq_of_not_mem {R : Type*} [CommRing R] {q : Ideal R} [q.IsPrime]
-    {s : R} (hs : s ∉ q) : q.colon (Ideal.span {s}) = q := by
+theorem colon_span_singleton_eq_of_not_mem
+    {R : Type*} [CommRing R] {q : Ideal R} [q.IsPrime] {s : R} (hs : s ∉ q)
+    : q.colon (Ideal.span {s}) = q := by
   ext x
   rw [Submodule.mem_colon_span_singleton, smul_eq_mul]
   constructor

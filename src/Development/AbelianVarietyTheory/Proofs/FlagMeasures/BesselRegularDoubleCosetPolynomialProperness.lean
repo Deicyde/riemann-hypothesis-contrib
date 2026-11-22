@@ -29,7 +29,8 @@ theorem inv_mem {g : Mat k r} (hg : g ∈ GG k r) : g⁻¹ ∈ GG k r :=
 theorem det_unit {g : Mat k r} (hg : g ∈ GG k r) : IsUnit g.det :=
   ((unitary_group_holds _ _ gram_det_unit).2.2 g hg).1
 
-theorem mem_of_S {z : Fin (2 * r + k + 1) → ℂ} {s : Mat k r} (hs : s ∈ Sset k r z) : s ∈ GG k r := by
+theorem mem_of_S {z : Fin (2 * r + k + 1) → ℂ} {s : Mat k r} (hs : s ∈ Sset k r z)
+    : s ∈ GG k r := by
   obtain ⟨h, hh, m, hm, rfl⟩ := hs
   exact mul_mem hh.1 hm.1
 
@@ -39,14 +40,15 @@ theorem inv_eq {g : Mat k r} (hg : g ∈ GG k r) : g⁻¹ = Hpk k r * gᴴ * Hpk
   rw [Matrix.mul_assoc (Hpk k r), Matrix.mul_assoc (Hpk k r), h]
   exact (hermitian_pos_facts_hold k r).2.1
 
-theorem left_bound (z z' : Fin (2 * r + k + 1) → ℂ) (C : Set (Mat k r)) (hz : inWb k r z)
-    (hz' : inWb k r z') (hT : 0 < Tz k r z) (hT' : 0 < Tz k r z') (hC : IsCompact C)
-    (hCr : C ⊆ Greg k r z z') :
-    ∃ C0 : ℝ, ∀ γ ∈ C, ∀ s ∈ Sset k r z, ∀ s' ∈ Sset k r z',
+theorem left_bound
+    (z z' : Fin (2 * r + k + 1) → ℂ) (C : Set (Mat k r)) (hz : inWb k r z) (hz' : inWb k r z')
+    (hT : 0 < Tz k r z) (hT' : 0 < Tz k r z') (hC : IsCompact C) (hCr : C ⊆ Greg k r z z')
+    : ∃ C0 : ℝ, ∀ γ ∈ C, ∀ s ∈ Sset k r z, ∀ s' ∈ Sset k r z',
       opn s ≤ C0 * opn (s * γ * s'⁻¹) ^ (2 * (r ^ 2 + r + 1)) := by
   obtain ⟨C1, h1⟩ := GlobalTheory.T.siegel_region_norm_bound k r z z' C hz hz' hT hT' hC hCr
-  obtain ⟨C2, h2⟩ := GlobalTheory.T.isometry_opNorm_bounded_by_two_frames k r z z' C hz hz' hT hT' hC
-    (fun γ hγ => ⟨(hCr hγ).1, (hCr hγ).2.2⟩)
+  obtain ⟨C2, h2⟩ :=
+    GlobalTheory.T.isometry_opNorm_bounded_by_two_frames k r z z' C hz hz' hT hT' hC
+      (fun γ hγ => ⟨(hCr hγ).1, (hCr hγ).2.2⟩)
   obtain ⟨hN1, -, -, -, hN5, -⟩ := GlobalTheory.T.besselModelUnitaryGroup_opNorm_properties k r
   refine ⟨C2 * (max 1 C1) ^ 2, fun γ hγ s hs s' hs' => ?_⟩
   have hsG := mem_of_S hs
@@ -65,19 +67,26 @@ theorem left_bound (z z' : Fin (2 * r + k + 1) → ℂ) (C : Set (Mat k r)) (hz 
     mul_le_mul_of_nonneg_right (le_max_right _ _) (by positivity)
   have hQ1 : 1 ≤ max 1 C1 * X ^ (r * (r + 1)) := one_le_mul_of_one_le_of_one_le hm1 hp1
   have hB : 1 ≤ X * (max 1 C1 * X ^ (r * (r + 1))) := one_le_mul_of_one_le_of_one_le hx1 hQ1
-  have key := h2 γ hγ s hsG (X * (max 1 C1 * X ^ (r * (r + 1)))) hB (by
-    rintro (a | b)
-    · show eucl (s *ᵥ fvec k r z a) ≤ _
-      refine ((h1' a).1.trans hle).trans ?_
-      exact le_mul_of_one_le_left (by linarith) hx1
-    · show eucl (s *ᵥ (γ *ᵥ fvec k r z' b)) ≤ _
-      rw [Matrix.mulVec_mulVec, ← hxs, ← Matrix.mulVec_mulVec]
-      refine (h5 _).trans ?_
-      exact mul_le_mul_of_nonneg_left ((h1' b).2.trans hle) (by linarith))
+  have key :=
+    h2 γ hγ s hsG (X * (max 1 C1 * X ^ (r * (r + 1)))) hB (by
+      rintro (a | b)
+      · show eucl (s *ᵥ fvec k r z a) ≤ _
+        refine ((h1' a).1.trans hle).trans ?_
+        exact le_mul_of_one_le_left (by linarith) hx1
+      · show eucl (s *ᵥ (γ *ᵥ fvec k r z' b)) ≤ _
+        rw [Matrix.mulVec_mulVec, ← hxs, ← Matrix.mulVec_mulVec]
+        refine (h5 _).trans ?_
+        exact mul_le_mul_of_nonneg_left ((h1' b).2.trans hle) (by linarith))
   refine key.trans (le_of_eq ?_)
   ring
 
-theorem poly_proper : ∀ (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (C : Set (Mat k r)), inWb k r z → inWb k r z' → 0 < Tz k r z → 0 < Tz k r z' → IsCompact C → C ⊆ Greg k r z z' → ∃ C0 : ℝ, 1 ≤ C0 ∧ ∀ γ ∈ C, ∀ s ∈ Sset k r z, ∀ s' ∈ Sset k r z', max (opn s) (opn s') ≤ C0 * opn (s * γ * s'⁻¹) ^ (2 * (r ^ 2 + r + 1)) := by
+theorem poly_proper
+    : ∀ (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (C : Set (Mat k r)),
+      inWb k r z → inWb k r z' → 0 < Tz k r z → 0 < Tz k r z' → IsCompact C → C ⊆ Greg k r z z'
+        → ∃ C0 : ℝ,
+          1 ≤ C0
+            ∧ ∀ γ ∈ C, ∀ s ∈ Sset k r z, ∀ s' ∈ Sset k r z',
+              max (opn s) (opn s') ≤ C0 * opn (s * γ * s'⁻¹) ^ (2 * (r ^ 2 + r + 1)) := by
   intro k r z z' C hz hz' hT hT' hC hCr
   obtain ⟨C1, h1⟩ := left_bound z z' C hz hz' hT hT' hC hCr
   have hcont : Continuous fun g : Mat k r => Hpk k r * gᴴ * Hpk k r :=

@@ -8,8 +8,9 @@ open Matrix
 
 namespace GlobalTheory.CompanionTheory.Matrixlemmas
 
-theorem exists_GL_vecMul_eq_single_last {k : Type} [Field k] (n : ℕ) (ξ : Fin (n + 1) → k) (hξ : ξ ≠ 0) :
-    ∃ g : GL (Fin (n + 1)) k,
+theorem exists_GL_vecMul_eq_single_last
+    {k : Type} [Field k] (n : ℕ) (ξ : Fin (n + 1) → k) (hξ : ξ ≠ 0)
+    : ∃ g : GL (Fin (n + 1)) k,
       Matrix.vecMul ξ (g : Matrix (Fin (n + 1)) (Fin (n + 1)) k) = Pi.single (Fin.last n) 1 := by
   classical
   obtain ⟨c, hc⟩ : ∃ c, ξ c ≠ 0 := by
@@ -35,8 +36,10 @@ theorem exists_GL_vecMul_eq_single_last {k : Type} [Field k] (n : ℕ) (ξ : Fin
     funext j
     simp [h, U, σ]
   refine ⟨(Matrix.nonsingInvUnit h hdet)⁻¹, ?_⟩
-  have hinv : h * (((Matrix.nonsingInvUnit h hdet)⁻¹ : GL (Fin (n + 1)) k) :
-      Matrix (Fin (n + 1)) (Fin (n + 1)) k) = 1 :=
+  have hinv
+      : h * (((Matrix.nonsingInvUnit h hdet)⁻¹ : GL (Fin (n + 1)) k)
+          : Matrix (Fin (n + 1)) (Fin (n + 1)) k)
+        = 1 :=
     (Matrix.nonsingInvUnit h hdet).mul_inv
   conv_lhs => rw [← hrow]
   rw [Matrix.vecMul_vecMul, hinv, Matrix.vecMul_one]

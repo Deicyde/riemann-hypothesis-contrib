@@ -10,19 +10,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-attribute [-instance] UpperTheory.V.Pr.IsCD.toIsDomain UpperTheory.V.Pr.IsCD.toIsDiscreteValuationRing UpperTheory.V.Pr.IsCD.complete UpperTheory.V.Pr.IsCD.isLocalHom UpperTheory.V.Pr.IsCD.fin
+attribute [-instance]
+  UpperTheory.V.Pr.IsCD.toIsDomain UpperTheory.V.Pr.IsCD.toIsDiscreteValuationRing
+  UpperTheory.V.Pr.IsCD.complete UpperTheory.V.Pr.IsCD.isLocalHom UpperTheory.V.Pr.IsCD.fin
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.UnitaryBC GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Base UpperTheory.V.Af UpperTheory.V.Sd
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.UnitaryBC GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Base UpperTheory.V.Af
+  UpperTheory.V.Sd
 open UpperTheory.V.W (Plc Lp resP)
 
-private theorem emb_le {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (j j' : Ω →+* ℂ) (x : Ω) : ∃ y, j y = j' x := by
+private theorem emb_le {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (j j' : Ω →+* ℂ) (x : Ω)
+    : ∃ y, j y = j' x := by
   haveI := IsAlgClosure.isAlgClosed (R := ℚ) (K := Ω)
   have hi : IsIntegral ℚ (j' x) := (Algebra.IsIntegral.isIntegral (R := ℚ) x).map j'.toRatAlgHom
-  obtain ⟨y, hy⟩ := hi.mem_range_algHom_of_minpoly_splits (K := Ω) (IsAlgClosed.splits _) j.toRatAlgHom
+  obtain ⟨y, hy⟩ :=
+    hi.mem_range_algHom_of_minpoly_splits (K := Ω) (IsAlgClosed.splits _) j.toRatAlgHom
   exact ⟨y, hy⟩
 
-private theorem emb_eq {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (j j' : Ω →+* ℂ) :
-    ∃ τ : G ℚ Ω, ∀ x, j' (τ x) = j x := by
+private theorem emb_eq {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (j j' : Ω →+* ℂ)
+    : ∃ τ : G ℚ Ω, ∀ x, j' (τ x) = j x := by
   have hr : j.fieldRange = j'.fieldRange := by
     ext z
     simp only [RingHom.mem_fieldRange]
@@ -31,15 +37,20 @@ private theorem emb_eq {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω
       exact emb_le j' j x
     · rintro ⟨x, rfl⟩
       exact emb_le j j' x
-  let e : Ω ≃+* Ω := j.rangeRestrictFieldEquiv.trans
-    ((RingEquiv.subfieldCongr hr).trans j'.rangeRestrictFieldEquiv.symm)
+  let e : Ω ≃+* Ω :=
+    j.rangeRestrictFieldEquiv.trans ((RingEquiv.subfieldCongr hr).trans
+      j'.rangeRestrictFieldEquiv.symm)
   refine ⟨AlgEquiv.ofRingEquiv (f := e) (fun q => by simp), fun x => ?_⟩
-  have h1 := j'.rangeRestrictFieldEquiv.apply_symm_apply
-    (RingEquiv.subfieldCongr hr (j.rangeRestrictFieldEquiv x))
+  have h1 :=
+    j'.rangeRestrictFieldEquiv.apply_symm_apply (RingEquiv.subfieldCongr hr
+      (j.rangeRestrictFieldEquiv x))
   exact congrArg Subtype.val h1
 
-private theorem cc_val {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {χ : G ℚ Ω →* (Qbar l)ˣ} {c c' : G ℚ Ω}
-    (h : Sd.IsCC c) (h' : Sd.IsCC c') : χ c' = χ c := by
+private theorem cc_val
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    {l : ℕ} [Fact l.Prime]
+    {χ : G ℚ Ω →* (Qbar l)ˣ} {c c' : G ℚ Ω} (h : Sd.IsCC c) (h' : Sd.IsCC c')
+    : χ c' = χ c := by
   obtain ⟨j, hj⟩ := h
   obtain ⟨j', hj'⟩ := h'
   obtain ⟨τ, hτ⟩ := emb_eq j j'
@@ -48,24 +59,32 @@ private theorem cc_val {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω
     apply j'.injective
     show j' (c' (τ x)) = j' (τ (c x))
     rw [hj', hτ, hτ, hj]
-  have key : c' = τ * c * τ⁻¹ := by
-    rw [← h1, mul_inv_cancel_right]
+  have key : c' = τ * c * τ⁻¹ := by rw [← h1, mul_inv_cancel_right]
   rw [key, map_mul, map_mul, mul_comm (χ τ), mul_assoc, ← map_mul, mul_inv_cancel, map_one, mul_one]
 
-private theorem cont_cyc (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] (l : ℕ) [Fact l.Prime] :
-    Continuous (cycBar F Ω l) := by
+private theorem cont_cyc
+    (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] (l : ℕ) [Fact l.Prime]
+    : Continuous (cycBar F Ω l) := by
   unfold cycBar
   rw [MonoidHom.coe_comp]
   refine Continuous.comp (Continuous.units_map _ ?_) (continuous_cycZ F Ω l)
   exact (continuous_algebraMap ℚ_[l] (Qbar l)).comp continuous_subtype_val
 
-private theorem cont_of_ker {Γ B : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [Group B] [TopologicalSpace B]
-    (γ : Γ →* B) (h : IsOpen (γ.ker : Set Γ)) : Continuous γ := by
+private theorem cont_of_ker
+    {Γ B : Type}
+    [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [Group B] [TopologicalSpace B]
+    (γ : Γ →* B) (h : IsOpen (γ.ker : Set Γ))
+    : Continuous γ := by
   rw [continuous_def]
   intro U _
   rw [isOpen_iff_forall_mem_open]
   intro x hx
-  refine ⟨(fun y => x⁻¹ * y) ⁻¹' (γ.ker : Set Γ), ?_, h.preimage (continuous_const.mul continuous_id), ?_⟩
+  refine ⟨
+    (fun y => x⁻¹ * y) ⁻¹' (γ.ker : Set Γ),
+    ?_,
+    h.preimage (continuous_const.mul continuous_id),
+    ?_
+  ⟩
   · intro y hy
     have hk : γ (x⁻¹ * y) = 1 := hy
     have : γ y = γ x := by
@@ -77,23 +96,30 @@ private theorem cont_of_ker {Γ B : Type} [Group Γ] [TopologicalSpace Γ] [IsTo
   · show γ (x⁻¹ * x) = 1
     simp
 
-private theorem exists_exp {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] (χ : G ℚ Ω →* (Qbar l)ˣ)
-    (h : IsOpen (χ.ker : Set (G ℚ Ω))) : ∃ n : ℕ, 0 < n ∧ ∀ g, χ g ^ n = 1 := by
+private theorem exists_exp
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    {l : ℕ} [Fact l.Prime]
+    (χ : G ℚ Ω →* (Qbar l)ˣ) (h : IsOpen (χ.ker : Set (G ℚ Ω)))
+    : ∃ n : ℕ, 0 < n ∧ ∀ g, χ g ^ n = 1 := by
   haveI : Finite (G ℚ Ω ⧸ χ.ker) := χ.ker.quotient_finite_of_isOpen h
   haveI : χ.ker.FiniteIndex := Subgroup.finiteIndex_of_finite_quotient
   refine ⟨χ.ker.index, Nat.pos_of_ne_zero Subgroup.FiniteIndex.index_ne_zero, fun g => ?_⟩
   rw [← map_pow]
   exact χ.ker.pow_index_mem g
 
-private theorem val_of_dvd {Ω : Type} [Field Ω] [CharZero Ω] (A : ValuationSubring Ω) {l M : ℕ} (h : l ∣ M)
-    (hl : A.valuation (l : Ω) < 1) : A.valuation (M : Ω) < 1 := by
+private theorem val_of_dvd
+    {Ω : Type} [Field Ω] [CharZero Ω]
+    (A : ValuationSubring Ω)
+    {l M : ℕ} (h : l ∣ M) (hl : A.valuation (l : Ω) < 1)
+    : A.valuation (M : Ω) < 1 := by
   obtain ⟨m, rfl⟩ := h
   push_cast
   rw [map_mul]
   exact mul_lt_one_of_lt_of_le hl ((A.valuation_le_one_iff _).mpr (natCast_mem A m))
 
-private theorem exists_type {L : Type} [Field L] [NumberField L] [IsCMField L] {M : ℕ} (hU : Z.Sym.UnrSplit L M) :
-    ∃ Φ : Set (HeightOneSpectrum (𝓞 L)), Tw.IsType (Lp L) M Φ := by
+private theorem exists_type
+    {L : Type} [Field L] [NumberField L] [IsCMField L] {M : ℕ} (hU : Z.Sym.UnrSplit L M)
+    : ∃ Φ : Set (HeightOneSpectrum (𝓞 L)), Tw.IsType (Lp L) M Φ := by
   let p : HeightOneSpectrum (𝓞 L) → HeightOneSpectrum (𝓞 L) → Prop := fun w u =>
     u.under (𝓞 (Lp L)) = w.under (𝓞 (Lp L))
   let e : HeightOneSpectrum (𝓞 L) → HeightOneSpectrum (𝓞 L) := fun w =>
@@ -118,9 +144,11 @@ private theorem exists_type {L : Type} [Field L] [NumberField L] [IsCMField L] {
     simp only [Set.mem_setOf_eq]
     exact ⟨fun h => absurd h hmem, fun h => absurd (hcongr (e w) w (he w)).symm h⟩
 
-private theorem ine_range {L Ω : Type} [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ) [Fact l.Prime]
-    (hU : ∀ w : Plc L, Algebra.IsUnramifiedAt (𝓞 (Lp L)) w.asIdeal) (A : ValuationSubring Ω) :
-    Ine (F := Lp L) A ≤ (resP L Ω).range := by
+private theorem ine_range
+    {L Ω : Type} [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω]
+    (l : ℕ) [Fact l.Prime]
+    (hU : ∀ w : Plc L, Algebra.IsUnramifiedAt (𝓞 (Lp L)) w.asIdeal) (A : ValuationSubring Ω)
+    : Ine (F := Lp L) A ≤ (resP L Ω).range := by
   intro g hg
   by_cases hA : A = ⊤
   · haveI : IsAlgClosure (Lp L) Ω :=
@@ -140,8 +168,11 @@ private theorem ine_range {L Ω : Type} [Field L] [NumberField L] [IsCMField L] 
     rw [← CF.range_relIncl] at hk
     exact hk
 
-private theorem cc_real {L Ω : Type} [Field L] [NumberField L] [IsCMField L] [Field Ω] [CharZero Ω] [Algebra L Ω] [IsAlgClosure L Ω]
-    {c : G ℚ Ω} (hc : Sd.IsCC c) : c ∈ galOf ℚ (Lp L) Ω := by
+private theorem cc_real
+    {L Ω : Type}
+    [Field L] [NumberField L] [IsCMField L] [Field Ω] [CharZero Ω] [Algebra L Ω] [IsAlgClosure L Ω]
+    {c : G ℚ Ω} (hc : Sd.IsCC c)
+    : c ∈ galOf ℚ (Lp L) Ω := by
   obtain ⟨j, hj⟩ := hc
   show ∀ x : Lp L, c (algebraMap (Lp L) Ω x) = algebraMap (Lp L) Ω x
   intro x
@@ -149,8 +180,10 @@ private theorem cc_real {L Ω : Type} [Field L] [NumberField L] [IsCMField L] [F
   rw [hj]
   exact x.2 (j.comp (algebraMap L Ω))
 
-private theorem cc_not_mem {L Ω : Type} [Field L] [NumberField L] [IsCMField L] [Field Ω] [CharZero Ω] [Algebra L Ω]
-    {c : G ℚ Ω} (hc : Sd.IsCC c) : c ∉ galOf ℚ L Ω := by
+private theorem cc_not_mem
+    {L Ω : Type} [Field L] [NumberField L] [IsCMField L] [Field Ω] [CharZero Ω] [Algebra L Ω]
+    {c : G ℚ Ω} (hc : Sd.IsCC c)
+    : c ∉ galOf ℚ L Ω := by
   obtain ⟨j, hj⟩ := hc
   intro hmem
   have hfix : ∀ x : L, c (algebraMap L Ω x) = algebraMap L Ω x := hmem
@@ -162,8 +195,8 @@ private theorem cc_not_mem {L Ω : Type} [Field L] [NumberField L] [IsCMField L]
   exact (InfinitePlace.not_isReal_iff_isComplex.mpr (IsTotallyComplex.isComplex _))
     (InfinitePlace.isReal_mk_iff.mpr hreal)
 
-theorem UpperTheory.V.Z.Sym.Pl.twEx :
-    UpperTheory.V.Z.Sym.Pl.LemTWM → UpperTheory.V.Af.AlgOfCyc → UpperTheory.V.Z.Sym.TwEx := by
+theorem UpperTheory.V.Z.Sym.Pl.twEx
+    : UpperTheory.V.Z.Sym.Pl.LemTWM → UpperTheory.V.Af.AlgOfCyc → UpperTheory.V.Z.Sym.TwEx := by
   intro hTWM hAlg L Ω _ _ _ _ _ _ _ l _ hl2 ι c hc M hM0 hlM hU χ a hχo hχc hχM
   haveI : IsAlgClosure L Ω :=
     ⟨IsAlgClosure.isAlgClosed ℚ, Algebra.IsAlgebraic.tower_top (K := ℚ) L⟩
@@ -186,16 +219,18 @@ theorem UpperTheory.V.Z.Sym.Pl.twEx :
     obtain ⟨j, hj⟩ := hg
     have hcc : Sd.IsCC (galEmb ℚ (Lp L) Ω g) := ⟨j, hj⟩
     have e1 : χ (galEmb ℚ (Lp L) Ω g) = (-1) ^ a := (cc_val hc hcc).trans hχc
-    have e0 := IsConjOm.cyc (E := Lp L) (Ω := Ω) (l := l)
-      (σ := MulSemiringAction.toRingAut (G (Lp L) Ω) Ω g) ⟨j, hj⟩
+    have e0 :=
+      IsConjOm.cyc (E := Lp L) (Ω := Ω) (l := l) (σ := MulSemiringAction.toRingAut (G (Lp L) Ω) Ω g)
+        ⟨j, hj⟩
     have e2 : cycBar (Lp L) Ω l g = -1 := by
       unfold cycBar cycZ
       rw [MonoidHom.comp_apply, MonoidHom.comp_apply, e0]
       ext
       simp
     rw [hν, e1, e2, ← mul_zpow, neg_one_mul, neg_neg, one_zpow]
-  have hνunr : ∀ (v : HeightOneSpectrum (𝓞 (Lp L))) (A : ValuationSubring Ω),
-      IsPlaceOver A v → ↑M ∉ v.asIdeal → ∀ s ∈ Ine A, ν s = 1 := by
+  have hνunr
+      : ∀ (v : HeightOneSpectrum (𝓞 (Lp L))) (A : ValuationSubring Ω),
+        IsPlaceOver A v → ↑M ∉ v.asIdeal → ∀ s ∈ Ine A, ν s = 1 := by
     intro v A hA hMv s hs
     have hAM : ¬ A.valuation (M : Ω) < 1 := fun h => hMv ((Pr.natCast_place hA M).1 h)
     have hAl : ¬ A.valuation (l : Ω) < 1 := fun h => hAM (val_of_dvd A hlM h)
@@ -207,8 +242,7 @@ theorem UpperTheory.V.Z.Sym.Pl.twEx :
     have ht : t ∈ Ine A := hs
     rw [hν, hcb, one_zpow, one_mul]
     exact hχM A hAM t ht
-  obtain ⟨κ, hκc, hV, k, hk, hκ⟩ :=
-    hTWM (Lp L) L Ω inferInstance h2 l M hM3 Φ hΦ ν hνc hνconj hνunr
+  obtain ⟨κ, hκc, hV, k, hk, hκ⟩ := hTWM (Lp L) L Ω inferInstance h2 l M hM3 Φ hΦ ν hνc hνconj hνunr
   obtain ⟨g, hg⟩ : c ∈ (galEmb ℚ (Lp L) Ω).range := by
     rw [range_galEmb]
     exact cc_real hc
@@ -217,19 +251,22 @@ theorem UpperTheory.V.Z.Sym.Pl.twEx :
     apply cc_not_mem (L := L) hc
     rw [← hg]
     exact galEmb_mem ℚ L Ω t
-  have hinj : ∀ x y : G (Lp L) Ω, galEmb ℚ (Lp L) Ω x = galEmb ℚ (Lp L) Ω y → x = y :=
-    fun x y h => AlgEquiv.ext fun z => DFunLike.congr_fun h z
-  have hconj : ∀ s s' : G L Ω, galEmb ℚ L Ω s' = c * galEmb ℚ L Ω s * c⁻¹ →
-      resG (Lp L) L Ω s' = g * resG (Lp L) L Ω s * g⁻¹ := by
+  have hinj : ∀ x y : G (Lp L) Ω, galEmb ℚ (Lp L) Ω x = galEmb ℚ (Lp L) Ω y → x = y := fun x y h =>
+    AlgEquiv.ext fun z => DFunLike.congr_fun h z
+  have hconj
+      : ∀ s s' : G L Ω,
+        galEmb ℚ L Ω s' = c * galEmb ℚ L Ω s * c⁻¹
+          → resG (Lp L) L Ω s' = g * resG (Lp L) L Ω s * g⁻¹ := by
     intro s s' h
     apply hinj
     rw [map_mul, map_mul, map_inv, hg]
     exact h
   have hnorm : (resG (Lp L) L Ω).range.Normal :=
     Subgroup.normal_of_index_eq_two (by rw [(Tw.resOpen (Lp L) L Ω).2, h2])
-  have hloc : ∀ (w : HeightOneSpectrum (𝓞 L)) (A : ValuationSubring Ω), IsPlaceOver A w →
-      (M : 𝓞 L) ∈ w.asIdeal → ∃ b : ℤ, ∀ s ∈ Ine A,
-        κ s ^ (k * n) = (cycBar L Ω l s ^ b) ^ (k * n) := by
+  have hloc
+      : ∀ (w : HeightOneSpectrum (𝓞 L)) (A : ValuationSubring Ω),
+        IsPlaceOver A w → (M : 𝓞 L) ∈ w.asIdeal
+          → ∃ b : ℤ, ∀ s ∈ Ine A, κ s ^ (k * n) = (cycBar L Ω l s ^ b) ^ (k * n) := by
     intro w A hA hMw
     by_cases hw : w ∈ Φ
     · refine ⟨a, fun s hs => ?_⟩
@@ -241,8 +278,7 @@ theorem UpperTheory.V.Z.Sym.Pl.twEx :
       have hs'I : s' ∈ Ine A' := (hcA s s' hs').1 hs
       have e1 : κ s' ^ k = 1 := (hκ w' A' hA' s' hs'I).2 hw'
       have e2 : κ s * κ s' = cycBar L Ω l s ^ a * χ (galEmb ℚ L Ω s) := (hV g hgn).1 s s' hs'
-      have e3 : κ s = cycBar L Ω l s ^ a * χ (galEmb ℚ L Ω s) * (κ s')⁻¹ :=
-        eq_mul_inv_of_mul_eq e2
+      have e3 : κ s = cycBar L Ω l s ^ a * χ (galEmb ℚ L Ω s) * (κ s')⁻¹ := eq_mul_inv_of_mul_eq e2
       have e4 : χ (galEmb ℚ L Ω s) ^ n = 1 := hχn _
       rw [e3, mul_pow, mul_pow, inv_pow, pow_mul (κ s') k n, e1, one_pow, inv_one, mul_one,
         mul_comm k n, pow_mul (χ _) n k, e4, one_pow, mul_one]
@@ -255,12 +291,13 @@ theorem UpperTheory.V.Z.Sym.Pl.twEx :
     rw [hm, Nat.cast_mul]
     exact Ideal.mul_mem_right _ _ hlw
   refine ⟨κ, ?_, fun s s' h => (hV g hgn).1 s s' (hconj s s' h), ?_, ?_⟩
-  · obtain ⟨χ', hc', art, a', e1, e2, e3⟩ := (hAlg L Ω l ι).1 κ hκc (by
-      intro w hlw
-      obtain ⟨A, hA⟩ := ReciprocityTheory.Gal.exists_isPlaceOver Ω w
-      obtain ⟨b, hb⟩ := hloc w A hA (hMl w hlw)
-      refine ⟨A, hA, b, k * n, Nat.mul_pos hk hn, fun s hs => ?_⟩
-      rw [mul_pow, hb s hs, ← mul_pow, zpow_neg, mul_inv_cancel, one_pow])
+  · obtain ⟨χ', hc', art, a', e1, e2, e3⟩ :=
+      (hAlg L Ω l ι).1 κ hκc (by
+        intro w hlw
+        obtain ⟨A, hA⟩ := ReciprocityTheory.Gal.exists_isPlaceOver Ω w
+        obtain ⟨b, hb⟩ := hloc w A hA (hMl w hlw)
+        refine ⟨A, hA, b, k * n, Nat.mul_pos hk hn, fun s hs => ?_⟩
+        rw [mul_pow, hb s hs, ← mul_pow, zpow_neg, mul_inv_cancel, one_pow])
     exact ⟨hc', art, χ', a', e1, e2, e3⟩
   · intro A hAM s hs
     by_cases hAt : A = ⊤

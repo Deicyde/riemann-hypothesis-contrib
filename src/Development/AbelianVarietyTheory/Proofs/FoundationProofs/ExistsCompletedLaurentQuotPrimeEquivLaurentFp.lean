@@ -16,12 +16,14 @@ noncomputable def lauRed (p : ℕ) [Fact p.Prime] : Lau p →+* LaurentSeries (Z
   map_zero' := by ext n; simp
   map_add' x y := by ext n; simp
 
-theorem lauRed_coeff (p : ℕ) [Fact p.Prime] (x : Lau p) (n : ℤ) :
-    (lauRed p x).coeff n = PadicInt.toZMod (x.coeff n) := rfl
+theorem lauRed_coeff (p : ℕ) [Fact p.Prime] (x : Lau p) (n : ℤ)
+    : (lauRed p x).coeff n = PadicInt.toZMod (x.coeff n) :=
+  rfl
 
 theorem lauRed_surjective (p : ℕ) [Fact p.Prime] : Function.Surjective (lauRed p) := by
   intro y
-  refine ⟨HahnSeries.map y (⟨fun a => ((ZMod.val a : ℕ) : ℤ_[p]), by simp⟩ : ZeroHom (ZMod p) ℤ_[p]), ?_⟩
+  refine
+    ⟨HahnSeries.map y (⟨fun a => ((ZMod.val a : ℕ) : ℤ_[p]), by simp⟩ : ZeroHom (ZMod p) ℤ_[p]), ?_⟩
   ext n
   rw [lauRed_coeff]
   show PadicInt.toZMod ((ZMod.val (y.coeff n) : ℕ) : ℤ_[p]) = _
@@ -53,8 +55,9 @@ theorem ker_lauRed (p : ℕ) [Fact p.Prime] : RingHom.ker (lauRed p) = pI p := b
     rw [← Nat.smul_one_eq_cast, HahnSeries.coeff_nsmul]
     simp
 
-theorem exists_completedLaurent_quot_prime_equiv_laurentFp (p : ℕ) [Fact p.Prime] : ∃ e : (O0 p ⧸ Ideal.span {(p : O0 p)}) ≃+* LaurentSeries (ZMod p),
-    e (Ideal.Quotient.mk _ (qO p)) = HahnSeries.single (1 : ℤ) (1 : ZMod p) := by
+theorem exists_completedLaurent_quot_prime_equiv_laurentFp (p : ℕ) [Fact p.Prime]
+    : ∃ e : (O0 p ⧸ Ideal.span {(p : O0 p)}) ≃+* LaurentSeries (ZMod p),
+      e (Ideal.Quotient.mk _ (qO p)) = HahnSeries.single (1 : ℤ) (1 : ZMod p) := by
   have fg : (pI p).FG := Submodule.fg_span_singleton _
   have hker := AdicCompletion.ker_evalOneₐ_eq_map (pI p) fg
   have hsurj : Function.Surjective (AdicCompletion.evalOneₐ (pI p)) := by
@@ -65,13 +68,19 @@ theorem exists_completedLaurent_quot_prime_equiv_laurentFp (p : ℕ) [Fact p.Pri
     rw [Ideal.map_span, Set.image_singleton, map_natCast]
   have h1 : Ideal.span {(p : O0 p)} = RingHom.ker (AdicCompletion.evalOneₐ (pI p)).toRingHom := by
     rw [← hmap]; exact hker.symm
-  refine ⟨(Ideal.quotEquivOfEq h1).trans
-    ((RingHom.quotientKerEquivOfSurjective (f := (AdicCompletion.evalOneₐ (pI p)).toRingHom) hsurj).trans
-      ((Ideal.quotEquivOfEq (ker_lauRed p).symm).trans
-        (RingHom.quotientKerEquivOfSurjective (lauRed_surjective p)))), ?_⟩
-  simp only [RingEquiv.trans_apply, Ideal.quotEquivOfEq_mk, RingHom.quotientKerEquivOfSurjective_apply_mk]
-  have hq : (AdicCompletion.evalOneₐ (pI p)).toRingHom (qO p) =
-      Ideal.Quotient.mk (pI p) (HahnSeries.single (1 : ℤ) (1 : ℤ_[p])) :=
+  refine ⟨
+    (Ideal.quotEquivOfEq h1).trans
+      ((RingHom.quotientKerEquivOfSurjective (f := (AdicCompletion.evalOneₐ (pI p)).toRingHom)
+          hsurj).trans
+        ((Ideal.quotEquivOfEq (ker_lauRed p).symm).trans
+          (RingHom.quotientKerEquivOfSurjective (lauRed_surjective p)))),
+    ?_
+  ⟩
+  simp only [RingEquiv.trans_apply, Ideal.quotEquivOfEq_mk,
+    RingHom.quotientKerEquivOfSurjective_apply_mk]
+  have hq
+      : (AdicCompletion.evalOneₐ (pI p)).toRingHom (qO p)
+        = Ideal.Quotient.mk (pI p) (HahnSeries.single (1 : ℤ) (1 : ℤ_[p])) :=
     (AdicCompletion.evalOneₐ (pI p)).commutes _
   rw [hq, Ideal.quotEquivOfEq_mk, RingHom.quotientKerEquivOfSurjective_apply_mk]
   ext n

@@ -10,7 +10,8 @@ public import Formalism.SharpRestriction.CuspSpanNormBounds.LocalGroupInFamilyNo
 
 noncomputable section
 
-open NumberField Matrix GlobalTheory.SgAlg GlobalTheory.SgGlob GlobalTheory.IntPair GlobalTheory.IntTerm Formalism.BasicNotions
+open NumberField Matrix GlobalTheory.SgAlg GlobalTheory.SgGlob GlobalTheory.IntPair
+  GlobalTheory.IntTerm Formalism.BasicNotions
 open Formalism.MainNotions.S (FlagG LieU perpS)
 
 namespace GlobalTheory.RelFlag

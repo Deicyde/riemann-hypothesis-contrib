@@ -9,12 +9,13 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.AbsNormPr
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.N Formalism.ConjugateSelfDual
 
 namespace GlobalTheory.FrobDense
 
-theorem conj_ne {R : Ranks} (H : Host R) :
-    starRingEnd ℂ (Complex.I * (Real.sqrt H.d : ℂ)) ≠ Complex.I * (Real.sqrt H.d : ℂ) := by
+theorem conj_ne {R : Ranks} (H : Host R)
+    : starRingEnd ℂ (Complex.I * (Real.sqrt H.d : ℂ)) ≠ Complex.I * (Real.sqrt H.d : ℂ) := by
   intro h
   have h1 := congrArg Complex.im h
   have : 0 < Real.sqrt H.d := Real.sqrt_pos.2 (by exact_mod_cast H.hyp.2.1.pos)
@@ -30,9 +31,9 @@ theorem sqrt_sq {R : Ranks} (H : Host R) : H.sqrtMinusD ^ 2 = -(H.d : H.E) := by
   rw [map_pow, h3, h0]
   simp
 
-theorem exists_finite_split {R : Ranks} (H : Host R) :
-    ∃ A : Set (HeightOneSpectrum (𝓞 H.E)), A.Finite ∧
-    ∀ v, v ∉ A → v.asIdeal.inertiaDeg ℤ = 1 → IsSplitPl H v := by
+theorem exists_finite_split {R : Ranks} (H : Host R)
+    : ∃ A : Set (HeightOneSpectrum (𝓞 H.E)),
+      A.Finite ∧ ∀ v, v ∉ A → v.asIdeal.inertiaDeg ℤ = 1 → IsSplitPl H v := by
   have hint : IsIntegral ℤ H.sqrtMinusD := by
     apply IsIntegral.of_pow (n := 2) (by norm_num)
     rw [sqrt_sq]
@@ -42,14 +43,18 @@ theorem exists_finite_split {R : Ranks} (H : Host R) :
   let b : 𝓞 H.E := ⟨_, hint⟩
   have hb : c b - b ≠ 0 := by
     intro h
-    have h1 : H.conj H.sqrtMinusD = H.sqrtMinusD := congrArg (fun y : 𝓞 H.E => (y : H.E)) (sub_eq_zero.1 h)
+    have h1 : H.conj H.sqrtMinusD = H.sqrtMinusD :=
+      congrArg (fun y : 𝓞 H.E => (y : H.E)) (sub_eq_zero.1 h)
     have h2 := H.conjE_apply H.φ₀ H.sqrtMinusD
     have h3 : H.φ₀ H.sqrtMinusD = Complex.I * (Real.sqrt H.d : ℂ) := H.φ₀_mem
     have h4 : H.φ₀ (H.conj H.sqrtMinusD) = starRingEnd ℂ (H.φ₀ H.sqrtMinusD) := h2
     rw [h1, h3] at h4
     exact conj_ne H h4.symm
-  refine ⟨{v | v.asIdeal ∣ Ideal.span {c b - b}},
-    Ideal.finite_factors (by simpa [Ideal.span_singleton_eq_bot] using hb), fun v hv hd => ?_⟩
+  refine ⟨
+    {v | v.asIdeal ∣ Ideal.span {c b - b}},
+    Ideal.finite_factors (by simpa [Ideal.span_singleton_eq_bot] using hb),
+    fun v hv hd => ?_
+  ⟩
   by_contra hs
   apply hv
   have hp := ((GlobalTheory.absNorm_prime_iff_inertiaDeg_eq_one_and_finite_ramified H.E).1 v).2 hd
@@ -68,8 +73,7 @@ theorem exists_finite_split {R : Ranks} (H : Host R) :
   have hmem : Ideal.Quotient.mk v.asIdeal b ∈ AddSubgroup.zmultiples (1 : 𝓞 H.E ⧸ v.asIdeal) := by
     rw [htop]; trivial
   obtain ⟨n, hn⟩ := AddSubgroup.mem_zmultiples_iff.1 hmem
-  have h1 : b - (n : 𝓞 H.E) ∈ v.asIdeal := by
-    rw [← Ideal.Quotient.eq, ← hn]; simp
+  have h1 : b - (n : 𝓞 H.E) ∈ v.asIdeal := by rw [← Ideal.Quotient.eq, ← hn]; simp
   have h2 := hst _ h1
   rw [map_sub, map_intCast] at h2
   show v.asIdeal ∣ _

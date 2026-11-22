@@ -102,9 +102,9 @@ private lemma card_submodule_finrank_eq_gaussBinom (k : Type) [Field k] [Finite 
       ⟨fun ⟨L, hL⟩ => by have := Submodule.finrank_le L; omega⟩
     exact Nat.card_of_isEmpty
 
-
 open Module in
-theorem _root_.GlobalTheory.GaussCount.subspaceCount : _root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.SubspaceCount := by
+theorem _root_.GlobalTheory.GaussCount.subspaceCount
+    : _root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.SubspaceCount := by
   unfold _root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.SubspaceCount
   intro k _ _ V _ _ _ j
   exact card_submodule_finrank_eq_gaussBinom k V j
@@ -134,67 +134,103 @@ private lemma gaussBinom_sub_eq_gaussBinom {q : ℕ} (hq : 1 < q) (n a : ℕ) (h
     linear_combination h2 - h1
   exact_mod_cast this
 
-
 open Module in
-theorem _root_.GlobalTheory.GaussCount.card_codim (k : Type) [Field k] [Finite k] (V : Type) [AddCommGroup V] [Module k V]
-    [FiniteDimensional k V] (j : ℕ) :
-    Nat.card {L : Submodule k V // finrank k (V ⧸ L) = j} =
-      _root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom (Nat.card k) (finrank k V) j := by
+theorem _root_.GlobalTheory.GaussCount.card_codim
+    (k : Type) [Field k] [Finite k]
+    (V : Type) [AddCommGroup V] [Module k V] [FiniteDimensional k V]
+    (j : ℕ)
+    : Nat.card {L : Submodule k V // finrank k (V ⧸ L) = j}
+      = _root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom
+        (Nat.card k) (finrank k V) j := by
   have hq : 1 < Nat.card k := Finite.one_lt_card
   by_cases hj : j ≤ finrank k V
-  · have e : {L : Submodule k V // finrank k (V ⧸ L) = j} ≃
-        {L : Submodule k V // finrank k L = finrank k V - j} :=
+  · have e
+        : {L : Submodule k V // finrank k (V ⧸ L) = j}
+          ≃ {L : Submodule k V // finrank k L = finrank k V - j} :=
       Equiv.subtypeEquivRight fun L => by
         have := L.finrank_quotient_add_finrank
         omega
-    rw [Nat.card_congr e, card_submodule_finrank_eq_gaussBinom k V, gaussBinom_sub_eq_gaussBinom hq _ _ hj]
-  · rw [_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom_eq_zero _ _ _ (by omega)]
+    rw [Nat.card_congr e, card_submodule_finrank_eq_gaussBinom k V,
+      gaussBinom_sub_eq_gaussBinom hq _ _ hj]
+  · rw [_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom_eq_zero _
+      _ _ (by omega)]
     haveI : IsEmpty {L : Submodule k V // finrank k (V ⧸ L) = j} :=
       ⟨fun ⟨L, hL⟩ => by have := L.finrank_quotient_add_finrank; omega⟩
     exact Nat.card_of_isEmpty
 
-
 open Module in
-theorem _root_.GlobalTheory.GaussCount.gauss_formula (q : ℕ) (R : Type) [CommRing R] (Y : R) (m : ℕ) :
-    ∑ j ∈ Finset.range (m + 1),
-        (-1 : R) ^ j * (q : R) ^ (j * (j - 1) / 2) * (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom q m j : R) * Y ^ j =
-      ∏ i ∈ Finset.range m, (1 - (q : R) ^ i * Y) := by
+theorem _root_.GlobalTheory.GaussCount.gauss_formula (q : ℕ) (R : Type) [CommRing R] (Y : R) (m : ℕ)
+    : ∑ j ∈ Finset.range (m + 1),
+          (-1 : R) ^ j * (q : R) ^ (j * (j - 1) / 2) * (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom q m j : R) * Y ^ j
+      = ∏ i ∈ Finset.range m, (1 - (q : R) ^ i * Y) := by
   induction m with
-  | zero => simp [_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom_zero_right]
+  | zero =>
+    simp
+      [_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom_zero_right]
   | succ m ih =>
-    have h0 : ∑ j ∈ Finset.range (m + 1 + 1),
-        (-1 : R) ^ j * (q : R) ^ (j * (j - 1) / 2) * (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom q m j : R) * Y ^ j =
-        ∑ j ∈ Finset.range (m + 1),
-        (-1 : R) ^ j * (q : R) ^ (j * (j - 1) / 2) * (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom q m j : R) * Y ^ j := by
-      rw [Finset.sum_range_succ, _root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom_eq_zero q m (m + 1) (by omega)]
-      simp
-    have h2 := Finset.sum_range_succ' (fun j => (-1 : R) ^ j * (q : R) ^ (j * (j - 1) / 2) *
-      (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom q m j : R) * Y ^ j) (m + 1)
-    have h1 : ∑ j ∈ Finset.range (m + 1), (-1 : R) ^ (j + 1) * (q : R) ^ ((j + 1) * (j + 1 - 1) / 2) *
-        ((q ^ (m - j) * _root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom q m j : ℕ) : R) * Y ^ (j + 1) =
-        -((q : R) ^ m * Y) * ∑ j ∈ Finset.range (m + 1),
-        (-1 : R) ^ j * (q : R) ^ (j * (j - 1) / 2) * (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom q m j : R) * Y ^ j := by
-      rw [Finset.mul_sum]
-      refine Finset.sum_congr rfl fun j hj => ?_
-      have hjm : j ≤ m := by have := Finset.mem_range.mp hj; omega
-      have e : (q : R) ^ m = (q : R) ^ j * (q : R) ^ (m - j) := by
-        rw [← pow_add, Nat.add_sub_cancel' hjm]
-      rw [Nat.triangle_succ, e]
-      push_cast
-      ring
-    have hterm : ∀ j, (-1 : R) ^ (j + 1) * (q : R) ^ ((j + 1) * (j + 1 - 1) / 2) *
-        (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom q (m + 1) (j + 1) : R) * Y ^ (j + 1) =
-        (-1 : R) ^ (j + 1) * (q : R) ^ ((j + 1) * (j + 1 - 1) / 2) *
-          (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom q m (j + 1) : R) * Y ^ (j + 1) +
-        (-1 : R) ^ (j + 1) * (q : R) ^ ((j + 1) * (j + 1 - 1) / 2) *
-          ((q ^ (m - j) * _root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom q m j : ℕ) : R) * Y ^ (j + 1) := by
+    have h0
+        : ∑ j ∈ Finset.range (m + 1 + 1),
+            (-1 : R) ^ j * (q : R) ^ (j * (j - 1) / 2) * (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom q m j : R) * Y ^ j
+          = ∑ j ∈ Finset.range (m + 1),
+            (-1 : R) ^ j * (q : R) ^ (j * (j - 1) / 2) * (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom q m j : R) * Y ^ j :=
+      by
+        rw [Finset.sum_range_succ,
+          _root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom_eq_zero
+            q m (m + 1) (by omega)]
+        simp
+    have h2 :=
+      Finset.sum_range_succ'
+        (fun j =>
+          (-1 : R) ^ j * (q : R) ^ (j * (j - 1) / 2)
+            * (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom q m
+                j
+              : R)
+            * Y ^ j)
+        (m + 1)
+    have h1
+        : ∑ j ∈ Finset.range (m + 1), (-1 : R) ^ (j + 1) * (q : R) ^ ((j + 1) * (j + 1 - 1) / 2) *
+            ((q ^ (m - j) * _root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom q m j : ℕ) : R) * Y ^ (j + 1)
+          = -((q : R) ^ m * Y)
+            * ∑ j ∈ Finset.range (m + 1),
+              (-1 : R) ^ j * (q : R) ^ (j * (j - 1) / 2) * (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom q m j : R) * Y ^ j :=
+      by
+        rw [Finset.mul_sum]
+        refine Finset.sum_congr rfl fun j hj => ?_
+        have hjm : j ≤ m := by have := Finset.mem_range.mp hj; omega
+        have e : (q : R) ^ m = (q : R) ^ j * (q : R) ^ (m - j) := by
+          rw [← pow_add, Nat.add_sub_cancel' hjm]
+        rw [Nat.triangle_succ, e]
+        push_cast
+        ring
+    have hterm
+        : ∀ j,
+          (-1 : R) ^ (j + 1) * (q : R) ^ ((j + 1) * (j + 1 - 1) / 2)
+              * (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom q
+                  (m + 1) (j + 1)
+                : R)
+              * Y ^ (j + 1)
+            = (-1 : R) ^ (j + 1) * (q : R) ^ ((j + 1) * (j + 1 - 1) / 2)
+                * (_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom
+                    q m (j + 1)
+                  : R)
+                * Y ^ (j + 1)
+              + (-1 : R) ^ (j + 1) * (q : R) ^ ((j + 1) * (j + 1 - 1) / 2)
+                * ((q ^ (m - j)
+                      * _root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom
+                        q m j
+                    : ℕ)
+                  : R)
+                * Y ^ (j + 1) := by
       intro j
-      rw [_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom_succ_succ]
+      rw
+        [_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom_succ_succ]
       push_cast
       ring
     rw [Finset.prod_range_succ, ← ih, Finset.sum_range_succ',
       Finset.sum_congr rfl fun j _ => hterm j, Finset.sum_add_distrib, h1]
-    simp only [_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom_zero_right] at h2 ⊢
+    simp
+      only [_root_.GlobalTheory.IndefiniteRowSideFullHecke.GaussianBinomialFormula.gaussBinom_zero_right]
+      at h2 ⊢
     linear_combination h0 - h2
 
 end GlobalTheory.GaussCount

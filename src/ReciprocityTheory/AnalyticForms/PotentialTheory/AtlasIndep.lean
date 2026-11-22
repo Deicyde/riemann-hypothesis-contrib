@@ -33,26 +33,32 @@ def unionAtlas (A B : FinHolAtlas e X) (h : A.Compatible B) : FinHolAtlas e X wh
       | left k => simpa [Fin.append_left, Fin.append_right] using h.2 j k
       | right k => simpa [Fin.append_right] using B.holo j k
 
-@[simp] theorem unionAtlas_chart_castAdd (A B : FinHolAtlas e X) (h : A.Compatible B)
-    (j : Fin A.n) : (unionAtlas A B h).chart (Fin.castAdd B.n j) = A.chart j := by
+@[simp]
+theorem unionAtlas_chart_castAdd (A B : FinHolAtlas e X) (h : A.Compatible B) (j : Fin A.n)
+    : (unionAtlas A B h).chart (Fin.castAdd B.n j) = A.chart j := by
   show Fin.append A.chart B.chart (Fin.castAdd B.n j) = A.chart j
   exact Fin.append_left _ _ _
 
-@[simp] theorem unionAtlas_chart_natAdd (A B : FinHolAtlas e X) (h : A.Compatible B)
-    (k : Fin B.n) : (unionAtlas A B h).chart (Fin.natAdd A.n k) = B.chart k := by
+@[simp]
+theorem unionAtlas_chart_natAdd (A B : FinHolAtlas e X) (h : A.Compatible B) (k : Fin B.n)
+    : (unionAtlas A B h).chart (Fin.natAdd A.n k) = B.chart k := by
   show Fin.append A.chart B.chart (Fin.natAdd A.n k) = B.chart k
   exact Fin.append_right _ _ _
 
-theorem FinHolAtlas.Compatible.symm' {A B : FinHolAtlas e X} (h : A.Compatible B) :
-    B.Compatible A := ⟨h.2, h.1⟩
+theorem FinHolAtlas.Compatible.symm' {A B : FinHolAtlas e X} (h : A.Compatible B)
+    : B.Compatible A :=
+  ⟨h.2, h.1⟩
 
-theorem compat_local {A B : FinHolAtlas e X} (h : A.Compatible B) (j : Fin B.n) {y : Fin e → ℂ}
-    (hy : y ∈ (B.chart j).target) :
-    ∃ k : Fin A.n, AnalyticAt ℂ (A.chart k ∘ (B.chart j).symm) y ∧
-      (A.chart k ((B.chart j).symm y)) ∈ (A.chart k).target ∧
-      (A.chart k).symm (A.chart k ((B.chart j).symm y)) = (B.chart j).symm y ∧
-      ∀ {β : Type} (f : X → β), (f ∘ (B.chart j).symm) =ᶠ[𝓝 y]
-        (f ∘ (A.chart k).symm) ∘ (A.chart k ∘ (B.chart j).symm) := by
+theorem compat_local
+    {A B : FinHolAtlas e X} (h : A.Compatible B) (j : Fin B.n)
+    {y : Fin e → ℂ} (hy : y ∈ (B.chart j).target)
+    : ∃ k : Fin A.n,
+      AnalyticAt ℂ (A.chart k ∘ (B.chart j).symm) y
+        ∧ (A.chart k ((B.chart j).symm y)) ∈ (A.chart k).target
+        ∧ (A.chart k).symm (A.chart k ((B.chart j).symm y)) = (B.chart j).symm y
+        ∧ ∀ {β : Type} (f : X → β),
+          (f ∘ (B.chart j).symm) =ᶠ[𝓝 y]
+            (f ∘ (A.chart k).symm) ∘ (A.chart k ∘ (B.chart j).symm) := by
   obtain ⟨k, hk⟩ := A.cover ((B.chart j).symm y)
   have hmem : y ∈ (B.chart j).target ∩ (B.chart j).symm ⁻¹' (A.chart k).source := ⟨hy, hk⟩
   have hopen : IsOpen ((B.chart j).target ∩ (B.chart j).symm ⁻¹' (A.chart k).source) :=
@@ -61,8 +67,11 @@ theorem compat_local {A B : FinHolAtlas e X} (h : A.Compatible B) (j : Fin B.n) 
   filter_upwards [hopen.mem_nhds hmem] with y' hy'
   simp only [Function.comp_apply, (A.chart k).left_inv hy'.2]
 
-theorem smoothOn_of_compatible {A B : FinHolAtlas e X} (h : A.Compatible B) {U : Set X}
-    (hU : IsOpen U) {f : X → ℝ} (hf : A.SmoothOn U f) : B.SmoothOn U f := by
+theorem smoothOn_of_compatible
+    {A B : FinHolAtlas e X} (h : A.Compatible B)
+    {U : Set X} (hU : IsOpen U)
+    {f : X → ℝ} (hf : A.SmoothOn U f)
+    : B.SmoothOn U f := by
   intro j y hy
   obtain ⟨k, hT, hTt, hTs, hev⟩ := compat_local h j hy.1
   have hTs' : (A.chart k).symm ((A.chart k) ((B.chart j).symm y)) ∈ U := by
@@ -76,8 +85,11 @@ theorem smoothOn_of_compatible {A B : FinHolAtlas e X} (h : A.Compatible B) {U :
     (hT.contDiffAt (n := ∞)).restrict_scalars ℝ
   exact ((h1.comp y h2).congr_of_eventuallyEq (hev f)).contDiffWithinAt
 
-theorem holoOn_of_compatible {A B : FinHolAtlas e X} (h : A.Compatible B) {U : Set X}
-    (hU : IsOpen U) {g : X → ℂ} (hg : A.HoloOn U g) : B.HoloOn U g := by
+theorem holoOn_of_compatible
+    {A B : FinHolAtlas e X} (h : A.Compatible B)
+    {U : Set X} (hU : IsOpen U)
+    {g : X → ℂ} (hg : A.HoloOn U g)
+    : B.HoloOn U g := by
   intro j y hy
   obtain ⟨k, hT, hTt, hTs, hev⟩ := compat_local h j hy.1
   have hTs' : (A.chart k).symm ((A.chart k) ((B.chart j).symm y)) ∈ U := by
@@ -86,14 +98,15 @@ theorem holoOn_of_compatible {A B : FinHolAtlas e X} (h : A.Compatible B) {U : S
   exact (AnalyticAt.comp (g := g ∘ (A.chart k).symm) (f := A.chart k ∘ (B.chart j).symm)
     (hg k _ ⟨hTt, hTs'⟩) hT).congr (hev g).symm
 
-theorem isPotential_of_compatible {A B : FinHolAtlas e X} (h : A.Compatible B) {P : LocPot X}
-    (hP : IsPotential A P) : IsPotential B P := by
+theorem isPotential_of_compatible
+    {A B : FinHolAtlas e X} (h : A.Compatible B) {P : LocPot X} (hP : IsPotential A P)
+    : IsPotential B P := by
   refine ⟨fun x => smoothOn_of_compatible h (P.isOpen_U x) (hP.1 x), fun x x' y hy => ?_⟩
   obtain ⟨W, hW, hyW, G, hG, hφ⟩ := hP.2 x x' y hy
   exact ⟨W, hW, hyW, G, holoOn_of_compatible h hW hG, hφ⟩
 
-theorem compatible_unionAtlas_left (A B : FinHolAtlas e X) (h : A.Compatible B) :
-    A.Compatible (unionAtlas A B h) := by
+theorem compatible_unionAtlas_left (A B : FinHolAtlas e X) (h : A.Compatible B)
+    : A.Compatible (unionAtlas A B h) := by
   refine ⟨fun j k => ?_, fun j k => ?_⟩
   · induction k using Fin.addCases with
     | left k => simpa using A.holo j k
@@ -102,8 +115,8 @@ theorem compatible_unionAtlas_left (A B : FinHolAtlas e X) (h : A.Compatible B) 
     | left j => simpa using A.holo j k
     | right j => simpa using h.2 j k
 
-theorem compatible_unionAtlas_right (A B : FinHolAtlas e X) (h : A.Compatible B) :
-    B.Compatible (unionAtlas A B h) := by
+theorem compatible_unionAtlas_right (A B : FinHolAtlas e X) (h : A.Compatible B)
+    : B.Compatible (unionAtlas A B h) := by
   refine ⟨fun j k => ?_, fun j k => ?_⟩
   · induction k using Fin.addCases with
     | left k => simpa using h.2 j k
@@ -112,21 +125,23 @@ theorem compatible_unionAtlas_right (A B : FinHolAtlas e X) (h : A.Compatible B)
     | left j => simpa using h.1 j k
     | right j => simpa using B.holo j k
 
-theorem locDens_unionAtlas_castAdd (A B : FinHolAtlas e X) (h : A.Compatible B)
-    (Φ : Fin e → LocPot X) (j : Fin A.n) :
-    locDens (unionAtlas A B h) Φ (Fin.castAdd B.n j) = locDens A Φ j := by
+theorem locDens_unionAtlas_castAdd
+    (A B : FinHolAtlas e X) (h : A.Compatible B) (Φ : Fin e → LocPot X) (j : Fin A.n)
+    : locDens (unionAtlas A B h) Φ (Fin.castAdd B.n j) = locDens A Φ j := by
   funext y
   simp only [locDens, unionAtlas_chart_castAdd]
 
-theorem locDens_unionAtlas_natAdd (A B : FinHolAtlas e X) (h : A.Compatible B)
-    (Φ : Fin e → LocPot X) (k : Fin B.n) :
-    locDens (unionAtlas A B h) Φ (Fin.natAdd A.n k) = locDens B Φ k := by
+theorem locDens_unionAtlas_natAdd
+    (A B : FinHolAtlas e X) (h : A.Compatible B) (Φ : Fin e → LocPot X) (k : Fin B.n)
+    : locDens (unionAtlas A B h) Φ (Fin.natAdd A.n k) = locDens B Φ k := by
   funext y
   simp only [locDens, unionAtlas_chart_natAdd]
 
-theorem mIntegrable_of_compatible {A B : FinHolAtlas e X} (h : A.Compatible B)
-    (Φ : Fin e → LocPot X) (hΦ : ∀ i, IsPotential A (Φ i)) {g : X → ℝ}
-    (hg : MIntegrable A Φ g) : MIntegrable B Φ g := by
+theorem mIntegrable_of_compatible
+    {A B : FinHolAtlas e X} (h : A.Compatible B)
+    (Φ : Fin e → LocPot X) (hΦ : ∀ i, IsPotential A (Φ i))
+    {g : X → ℝ} (hg : MIntegrable A Φ g)
+    : MIntegrable B Φ g := by
   have hΦU : ∀ i, IsPotential (unionAtlas A B h) (Φ i) := fun i =>
     isPotential_of_compatible (compatible_unionAtlas_left A B h) (hΦ i)
   intro k K hK hKc
@@ -137,48 +152,58 @@ theorem mIntegrable_of_compatible {A B : FinHolAtlas e X} (h : A.Compatible B)
   have hVo : IsOpen ((B.chart k).target ∩ (B.chart k).symm ⁻¹' (A.chart j).source) :=
     (B.chart k).isOpen_inter_preimage_symm (A.chart j).open_source
   obtain ⟨r, hr, hball⟩ := Metric.isOpen_iff.1 hVo y ⟨hy, hj⟩
-  have hsub : Metric.closedBall y (r / 2) ⊆
-      (B.chart k).target ∩ (B.chart k).symm ⁻¹' (A.chart j).source :=
+  have hsub
+      : Metric.closedBall y (r / 2)
+        ⊆ (B.chart k).target ∩ (B.chart k).symm ⁻¹' (A.chart j).source :=
     (Metric.closedBall_subset_ball (half_lt_self hr)).trans hball
-  have hbV : Metric.ball y (r / 2) ⊆
-      (B.chart k).target ∩ (B.chart k).symm ⁻¹' (A.chart j).source :=
+  have hbV : Metric.ball y (r / 2) ⊆ (B.chart k).target ∩ (B.chart k).symm ⁻¹' (A.chart j).source :=
     Metric.ball_subset_closedBall.trans hsub
 
   have hτa : AnalyticOnNhd ℂ (A.chart j ∘ (B.chart k).symm)
-      ((B.chart k).target ∩ (B.chart k).symm ⁻¹' (A.chart j).source) := h.2 k j
+      ((B.chart k).target ∩ (B.chart k).symm ⁻¹' (A.chart j).source) :=
+    h.2 k j
   have hinj : Set.InjOn (A.chart j ∘ (B.chart k).symm)
       ((B.chart k).target ∩ (B.chart k).symm ⁻¹' (A.chart j).source) := by
     intro a ha b hb hab
     have h1 : (B.chart k).symm a = (B.chart k).symm b := (A.chart j).injOn ha.2 hb.2 hab
     exact (B.chart k).symm.injOn (by simpa using ha.1) (by simpa using hb.1) h1
-  have hmaps : ∀ z ∈ (B.chart k).target ∩ (B.chart k).symm ⁻¹' (A.chart j).source,
-      (A.chart j ∘ (B.chart k).symm) z ∈ (A.chart j).target := fun z hz =>
+  have hmaps
+      : ∀ z ∈ (B.chart k).target ∩ (B.chart k).symm ⁻¹' (A.chart j).source,
+        (A.chart j ∘ (B.chart k).symm) z ∈ (A.chart j).target := fun z hz =>
     (A.chart j).map_source hz.2
 
   have hcpt : IsCompact ((A.chart j ∘ (B.chart k).symm) '' Metric.closedBall y (r / 2)) :=
     (isCompact_closedBall y (r / 2)).image_of_continuousOn (hτa.continuousOn.mono hsub)
-  have hA : IntegrableOn (fun w => g ((A.chart j).symm w) * locDens A Φ j w)
+  have hA : IntegrableOn
+      (fun w => g ((A.chart j).symm w) * locDens A Φ j w)
       ((A.chart j ∘ (B.chart k).symm) '' Metric.ball y (r / 2)) :=
     (hg j _ (by rintro _ ⟨z, hz, rfl⟩; exact hmaps z (hsub hz)) hcpt).mono_set
       (Set.image_mono Metric.ball_subset_closedBall)
-  have hB := (ReciprocityTheory.AnForm.A.integrableOn_image_iff_analytic (A.chart j ∘ (B.chart k).symm)
-    (Metric.ball y (r / 2)) Metric.isOpen_ball (hτa.mono hbV) (hinj.mono hbV)
-    (fun w => g ((A.chart j).symm w) * locDens A Φ j w)).1 hA
-  refine ⟨Metric.ball y (r / 2), mem_nhdsWithin_of_mem_nhds (Metric.ball_mem_nhds y (half_pos hr)),
-    hB.congr_fun (fun z hz => ?_) Metric.isOpen_ball.measurableSet⟩
+  have hB :=
+    (ReciprocityTheory.AnForm.A.integrableOn_image_iff_analytic (A.chart j ∘ (B.chart k).symm)
+      (Metric.ball y (r / 2)) Metric.isOpen_ball (hτa.mono hbV) (hinj.mono hbV)
+      (fun w => g ((A.chart j).symm w) * locDens A Φ j w)).1 hA
+  refine ⟨
+    Metric.ball y (r / 2),
+    mem_nhdsWithin_of_mem_nhds (Metric.ball_mem_nhds y (half_pos hr)),
+    hB.congr_fun (fun z hz => ?_) Metric.isOpen_ball.measurableSet
+  ⟩
   have hzV := hbV hz
-  have key := locDensChart (unionAtlas A B h) Φ hΦU (Fin.natAdd A.n k) (Fin.castAdd B.n j) z
-    (by simpa using hzV.1) (by simpa using hzV.2)
+  have key :=
+    locDensChart (unionAtlas A B h) Φ hΦU (Fin.natAdd A.n k) (Fin.castAdd B.n j) z
+      (by simpa using hzV.1) (by simpa using hzV.2)
   simp only [unionAtlas_chart_natAdd, unionAtlas_chart_castAdd, locDens_unionAtlas_natAdd,
-    locDens_unionAtlas_castAdd] at key
+      locDens_unionAtlas_castAdd]
+    at key
   have hleft : (A.chart j).symm (A.chart j ((B.chart k).symm z)) = (B.chart k).symm z :=
     (A.chart j).left_inv hzV.2
   simp only [smul_eq_mul, ReciprocityTheory.AnForm.A.det_jacC, Complex.normSq_eq_norm_sq, key,
     Function.comp_apply, hleft]
   ring
 
-def ChartPartition.extendLeft [CompactSpace X] [T2Space X] {A B : FinHolAtlas e X}
-    (h : A.Compatible B) (P : ChartPartition A) : ChartPartition (unionAtlas A B h) where
+def ChartPartition.extendLeft
+    [CompactSpace X] [T2Space X] {A B : FinHolAtlas e X} (h : A.Compatible B) (P : ChartPartition A)
+    : ChartPartition (unionAtlas A B h) where
   χ := Fin.append P.χ (fun _ _ => 0)
   smooth j := by
     induction j using Fin.addCases with
@@ -205,8 +230,9 @@ def ChartPartition.extendLeft [CompactSpace X] [T2Space X] {A B : FinHolAtlas e 
     rw [Fin.sum_univ_add]
     simpa using P.sum_eq_one x
 
-def ChartPartition.extendRight [CompactSpace X] [T2Space X] {A B : FinHolAtlas e X}
-    (h : A.Compatible B) (Q : ChartPartition B) : ChartPartition (unionAtlas A B h) where
+def ChartPartition.extendRight
+    [CompactSpace X] [T2Space X] {A B : FinHolAtlas e X} (h : A.Compatible B) (Q : ChartPartition B)
+    : ChartPartition (unionAtlas A B h) where
   χ := Fin.append (fun _ _ => 0) Q.χ
   smooth j := by
     induction j using Fin.addCases with
@@ -233,17 +259,21 @@ def ChartPartition.extendRight [CompactSpace X] [T2Space X] {A B : FinHolAtlas e
     rw [Fin.sum_univ_add]
     simpa using Q.sum_eq_one x
 
-theorem integralWith_extendLeft [CompactSpace X] [T2Space X] {A B : FinHolAtlas e X}
-    (h : A.Compatible B) (P : ChartPartition A) (Φ : Fin e → LocPot X) (g : X → ℝ) :
-    integralWith (unionAtlas A B h) (P.extendLeft h) Φ g = integralWith A P Φ g := by
+theorem integralWith_extendLeft
+    [CompactSpace X] [T2Space X]
+    {A B : FinHolAtlas e X} (h : A.Compatible B) (P : ChartPartition A)
+    (Φ : Fin e → LocPot X) (g : X → ℝ)
+    : integralWith (unionAtlas A B h) (P.extendLeft h) Φ g = integralWith A P Φ g := by
   unfold integralWith
   show ∑ j : Fin (A.n + B.n), _ = _
   rw [Fin.sum_univ_add]
   simp [ChartPartition.extendLeft, Fin.append_left, Fin.append_right, locDens_unionAtlas_castAdd]
 
-theorem integralWith_extendRight [CompactSpace X] [T2Space X] {A B : FinHolAtlas e X}
-    (h : A.Compatible B) (Q : ChartPartition B) (Φ : Fin e → LocPot X) (g : X → ℝ) :
-    integralWith (unionAtlas A B h) (Q.extendRight h) Φ g = integralWith B Q Φ g := by
+theorem integralWith_extendRight
+    [CompactSpace X] [T2Space X]
+    {A B : FinHolAtlas e X} (h : A.Compatible B) (Q : ChartPartition B)
+    (Φ : Fin e → LocPot X) (g : X → ℝ)
+    : integralWith (unionAtlas A B h) (Q.extendRight h) Φ g = integralWith B Q Φ g := by
   unfold integralWith
   show ∑ j : Fin (A.n + B.n), _ = _
   rw [Fin.sum_univ_add]

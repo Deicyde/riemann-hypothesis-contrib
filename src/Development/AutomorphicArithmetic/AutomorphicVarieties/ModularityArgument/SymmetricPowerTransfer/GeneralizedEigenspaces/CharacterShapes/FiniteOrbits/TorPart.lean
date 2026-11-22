@@ -9,8 +9,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi UpperTheory.V.AlgebraTools
-open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.So
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools
+open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig
+  UpperTheory.V.Z.Sym.So
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -24,11 +26,14 @@ private theorem det_dg (d : Fin 2 → kˣ) : GeneralLinearGroup.det (dg d) = d 0
   ext
   simp [dg, val_diagT, Matrix.det_diagonal, Fin.prod_univ_two]
 
-private theorem det_mem (V : Lev k) (g : GL (Fin 2) k) (hg : g ∈ V.J 2) : GeneralLinearGroup.det g ∈ V.H := by
+private theorem det_mem (V : Lev k) (g : GL (Fin 2) k) (hg : g ∈ V.J 2)
+    : GeneralLinearGroup.det g ∈ V.H := by
   obtain ⟨a, ha, s, hs, b, hb, rfl⟩ := (factJ k V 2).1 g hg
   obtain ⟨t, ht, rfl⟩ := Subgroup.mem_map.1 hs
   have hau : a ∈ unipB k (Fin 2) := (glIwa k 2).N_le ha
-  have hb0 : b ∈ Subgroup.comap (GlobalTheory.CuspRep.invT 2 k) (unipB k (Fin 2)) ⊓ Kc k 2 (V.c + 1) := hb
+  have hb0
+      : b ∈ Subgroup.comap (GlobalTheory.CuspRep.invT 2 k) (unipB k (Fin 2)) ⊓ Kc k 2 (V.c + 1) :=
+    hb
   have hbl := GlAx.mem_low.1 (Subgroup.mem_inf.1 hb0).1
   have hal := (mem_unipB k).1 hau
   have da : GeneralLinearGroup.det a = 1 := by
@@ -46,9 +51,13 @@ private theorem det_mem (V : Lev k) (g : GL (Fin 2) k) (hg : g ∈ V.J 2) : Gene
   rw [show diagT k (Fin 2) t = dg t from rfl, det_dg]
   exact V.H.mul_mem (ht' 0) (ht' 1)
 
-private theorem loc {O : Type} [CommRing O] [Algebra O k] (hO : IsInts k O) (h2 : (2 : k) ≠ 0) {Δ s : k} (hs : s * s = Δ)
-    (hs0 : s ≠ 0) (V : Lev k) (u : DX Δ) (hu : eD hs u ∈ V.J 2) :
-    ∃ c : DX Δ, eD hs c ∈ V.J 2 ∧ u * c⁻¹ ∈ SU Δ ∧ c⁻¹ * u ∈ SU Δ ∧ ∃ x : kˣ, eD hs c = dg ![x, 1] := by
+private theorem loc
+    {O : Type} [CommRing O] [Algebra O k]
+    (hO : IsInts k O) (h2 : (2 : k) ≠ 0)
+    {Δ s : k} (hs : s * s = Δ) (hs0 : s ≠ 0)
+    (V : Lev k) (u : DX Δ) (hu : eD hs u ∈ V.J 2)
+    : ∃ c : DX Δ,
+      eD hs c ∈ V.J 2 ∧ u * c⁻¹ ∈ SU Δ ∧ c⁻¹ * u ∈ SU Δ ∧ ∃ x : kˣ, eD hs c = dg ![x, 1] := by
   obtain ⟨hbij, -, -, -, hdet, -⟩ := eD_facts k O hO h2 Δ s hs hs0
   obtain ⟨c, hc⟩ := hbij.2 (dg ![GeneralLinearGroup.det (eD hs u), 1])
   have hxH : GeneralLinearGroup.det (eD hs u) ∈ V.H := det_mem V _ hu
@@ -76,15 +85,15 @@ private theorem loc {O : Type} [CommRing O] [Algebra O k] (hO : IsInts k O) (h2 
 
 end Local
 
-theorem UpperTheory.V.Z.Sym.So.torPart :
-    UpperTheory.V.Z.Sym.So.TorPart := by
+theorem UpperTheory.V.Z.Sym.So.torPart : UpperTheory.V.Z.Sym.So.TorPart := by
   classical
   intro F _ _ Δ A hA u hu
   obtain ⟨-, -, hloc, -, hU2⟩ := datOk F Δ A hA
   obtain ⟨huJ, huK⟩ := (hU2 u).1 hu
-  have hex : ∀ v (h : v ∈ A.Sg), ∃ c : DX ((cv v) Δ), eD (A.hs v h) c ∈ (A.V v).J 2 ∧
-      u.1 v * c⁻¹ ∈ SU ((cv v) Δ) ∧ c⁻¹ * u.1 v ∈ SU ((cv v) Δ) ∧
-      ∃ x : (Kv v)ˣ, eD (A.hs v h) c = dg ![x, 1] := by
+  have hex
+      : ∀ v (h : v ∈ A.Sg), ∃ c : DX ((cv v) Δ),
+        eD (A.hs v h) c ∈ (A.V v).J 2 ∧ u.1 v * c⁻¹ ∈ SU ((cv v) Δ) ∧ c⁻¹ * u.1 v ∈ SU ((cv v) Δ)
+          ∧ ∃ x : (Kv v)ˣ, eD (A.hs v h) c = dg ![x, 1] := by
     intro v h
     obtain ⟨hO, h2, hs0, -, -⟩ := hloc v h
     exact loc hO h2 (A.hs v h) hs0 (A.V v) _ (huJ v h)
@@ -102,8 +111,13 @@ theorem UpperTheory.V.Z.Sym.So.torPart :
   have hSA : ∀ w : DA Δ, (∀ v, w.1 v ∈ SU ((cv v) Δ)) → w ∈ SA Δ := by
     intro w hw
     exact Subgroup.mem_iInf.2 (fun v => hw v)
-  refine ⟨c, (hU2 c).2 ⟨fun v h => ?_, fun v h => ?_⟩, hSA _ (fun v => ?_), hSA _ (fun v => ?_),
-    fun g d hgd => ?_⟩
+  refine ⟨
+    c,
+    (hU2 c).2 ⟨fun v h => ?_, fun v h => ?_⟩,
+    hSA _ (fun v => ?_),
+    hSA _ (fun v => ?_),
+    fun g d hgd => ?_
+  ⟩
   · show eD _ (cf v) ∈ _
     rw [cf_in v h]
     exact (Classical.choose_spec (hex v h)).1

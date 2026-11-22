@@ -9,8 +9,8 @@ open IsLocalRing TensorProduct
 
 namespace GlobalTheory.RegularAscent
 
-theorem height_add_ringKrullDim_quotient_le {R : Type} [CommRing R] (p : Ideal R) [hp : p.IsPrime] :
-    ((p.height : ℕ∞) : WithBot ℕ∞) + ringKrullDim (R ⧸ p) ≤ ringKrullDim R := by
+theorem height_add_ringKrullDim_quotient_le {R : Type} [CommRing R] (p : Ideal R) [hp : p.IsPrime]
+    : ((p.height : ℕ∞) : WithBot ℕ∞) + ringKrullDim (R ⧸ p) ≤ ringKrullDim R := by
   let P : PrimeSpectrum R := ⟨p, hp⟩
   haveI : Nonempty (PrimeSpectrum R) := ⟨P⟩
   have h1 : PrimeSpectrum.zeroLocus (p : Set R) = Set.Ici P := by

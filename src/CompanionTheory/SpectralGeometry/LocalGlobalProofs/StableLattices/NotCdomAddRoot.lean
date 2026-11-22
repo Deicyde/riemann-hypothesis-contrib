@@ -15,18 +15,22 @@ open PI.UpqRep (CDom root)
 
 variable {n : ℕ}
 
-theorem height_root (a b : Fin n) : ∑ i : Fin n, ((i : ℕ) : ℝ) * root a b i = ((a : ℕ) : ℝ) - ((b : ℕ) : ℝ) := by
+theorem height_root (a b : Fin n)
+    : ∑ i : Fin n, ((i : ℕ) : ℝ) * root a b i = ((a : ℕ) : ℝ) - ((b : ℕ) : ℝ) := by
   simp [root, mul_sub, Finset.sum_sub_distrib, Pi.single_apply]
 
-theorem not_cdom_add_root (ε : Fin n → Bool) (μ : Fin n → ℝ) {a b : Fin n} (hab : a < b) :
-    ¬ CDom ε (μ + root a b) μ := by
+theorem not_cdom_add_root (ε : Fin n → Bool) (μ : Fin n → ℝ) {a b : Fin n} (hab : a < b)
+    : ¬ CDom ε (μ + root a b) μ := by
   rintro ⟨c, hc, h⟩
-  have h1 : ∑ i : Fin n, ((i : ℕ) : ℝ) * (μ - (μ + root a b)) i = ((b : ℕ) : ℝ) - ((a : ℕ) : ℝ) := by
+  have h1
+      : ∑ i : Fin n, ((i : ℕ) : ℝ) * (μ - (μ + root a b)) i = ((b : ℕ) : ℝ) - ((a : ℕ) : ℝ) := by
     have : ∀ i : Fin n, ((i : ℕ) : ℝ) * (μ - (μ + root a b)) i = -(((i : ℕ) : ℝ) * root a b i) := by
       intro i; simp
-    simp only [this, Finset.sum_neg_distrib, height_root]; ring
-  have h2 : ∑ i : Fin n, ((i : ℕ) : ℝ) * (∑ x, ∑ y, (c x y : ℝ) • root x y) i
-      = ∑ x, ∑ y, (c x y : ℝ) * (((x : ℕ) : ℝ) - ((y : ℕ) : ℝ)) := by
+    simp only [this, Finset.sum_neg_distrib, height_root]
+    ring
+  have h2
+      : ∑ i : Fin n, ((i : ℕ) : ℝ) * (∑ x, ∑ y, (c x y : ℝ) • root x y) i
+        = ∑ x, ∑ y, (c x y : ℝ) * (((x : ℕ) : ℝ) - ((y : ℕ) : ℝ)) := by
     simp only [← height_root, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun x _ => ?_
@@ -43,9 +47,12 @@ theorem not_cdom_add_root (ε : Fin n → Bool) (μ : Fin n → ℝ) {a b : Fin 
   rw [h, h2] at h1
   linarith
 
-theorem isWeight_apply {V : Type} [AddCommGroup V] [Module ℂ V] {E : Fin n → Fin n → Module.End ℂ V}
-    (hE : GlRel E) {μ : Fin n → ℝ} {v : V} (hv : IsWeight E μ v) (a b : Fin n) :
-    IsWeight E (μ + root a b) (E a b v) := by
+theorem isWeight_apply
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    {E : Fin n → Fin n → Module.End ℂ V} (hE : GlRel E)
+    {μ : Fin n → ℝ} {v : V} (hv : IsWeight E μ v)
+    (a b : Fin n)
+    : IsWeight E (μ + root a b) (E a b v) := by
   intro c
   have h := LinearMap.congr_fun (hE c c a b) v
   simp only [LinearMap.sub_apply, Module.End.mul_apply, hv c, map_smul] at h
@@ -57,7 +64,9 @@ theorem isWeight_apply {V : Type} [AddCommGroup V] [Module ℂ V] {E : Fin n →
   · subst h2; simp [root, h1, add_smul, add_comm]
   · simp [root, h1, h2, Ne.symm h2]
 
-theorem hwOfType : CompanionTheory.D.DSIC.StabLink → CompanionTheory.D.DSIC.WtLink → CompanionTheory.D.DSIC.HWofType := by
+theorem hwOfType
+    : CompanionTheory.D.DSIC.StabLink → CompanionTheory.D.DSIC.WtLink
+      → CompanionTheory.D.DSIC.HWofType := by
   intro hS hW n ε H _ _ σ S E hσ hm μ T hT hTS
   obtain ⟨hfin, hst, -, ⟨v, hvT, hv0, hvw⟩, hdom⟩ := hT
   have hmap : (T.comap S.subtype).map S.subtype = T := by

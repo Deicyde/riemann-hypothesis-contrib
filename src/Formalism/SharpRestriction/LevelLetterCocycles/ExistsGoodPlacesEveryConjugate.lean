@@ -12,17 +12,23 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.EndomorphismIndexBo
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions
 open scoped ENNReal
 
 namespace Formalism.MainNotions.N.TwAll
 
 section Conj
 
-variable {D : Formalism.BasicNotions.D7} {N : NData D.R D.host D.what₂} {X : NTw D.R D.host D.what₂ D.LL0 N}
+variable
+  {D : Formalism.BasicNotions.D7} {N : NData D.R D.host D.what₂}
+  {X : NTw D.R D.host D.what₂ D.LL0 N}
 
-theorem psiAt_side_zpow {Γ A : Type} [Group Γ] [CommGroup A] (b b' : Bool) (ψ : Γ →* A) (a : ℤ) :
-    ∃ a' : ℤ, a'.natAbs = a.natAbs ∧ Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b' (ψ ^ a) = Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (ψ ^ a') := by
+theorem psiAt_side_zpow {Γ A : Type} [Group Γ] [CommGroup A] (b b' : Bool) (ψ : Γ →* A) (a : ℤ)
+    : ∃ a' : ℤ,
+      a'.natAbs = a.natAbs
+        ∧ Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b' (ψ ^ a)
+          = Formalism.MainNotions.BlochKatoReduction.Gen.psiAt b (ψ ^ a') := by
   cases b <;> cases b'
   · exact ⟨a, rfl, rfl⟩
   · refine ⟨-a, Int.natAbs_neg a, ?_⟩
@@ -39,21 +45,35 @@ namespace Formalism.MainNotions
 
 open Formalism.MainNotions.N.TwAll
 
-def TwGoodAll (D : D7) (I : TwIn D) (i : D.ntw.Tw) (b : Bool) (Q : Finset (PlE D.host)) (k' : ℕ)
-    (ψ : D.ntw.RCG i Q →* (D.ntw.Ok i k')ˣ) : Prop :=
+def TwGoodAll
+    (D : D7) (I : TwIn D) (i : D.ntw.Tw)
+    (b : Bool)
+    (Q : Finset (PlE D.host)) (k' : ℕ) (ψ : D.ntw.RCG i Q →* (D.ntw.Ok i k')ˣ)
+    : Prop :=
   ∀ a : ℤ, Nat.Coprime a.natAbs (D.ntw.l i) → TwGoodOne D I i b Q k' (ψ ^ a)
 
-def rawPack {D : D7} (C : NChoice D) (w : D.what₂.places.Pl) : TwPack D := ⟨C.twI w, C.Q w, C.k' w, C.psi' w⟩
+def rawPack {D : D7} (C : NChoice D) (w : D.what₂.places.Pl) : TwPack D :=
+  ⟨C.twI w, C.Q w, C.k' w, C.psi' w⟩
 
-def IntegralHeckeEveryConjugate (D : D7) (bkP : BlochKatoReduction.BK D) (E : IntegralHeckeForms.XD D) (N0 : D.ntw.Tw → ℕ) : Prop :=
-  ∀ i, D.ntw.NonzeroIndexPlace i → BlochKatoReduction.Gen.SetHyp (BlochKatoReduction.pin bkP) i → ∀ eps' : ℝ, 0 < eps' →
-    (∀ j ∈ Finset.Icc 1 D.R.m, ∀ b : Bool, IntegralHeckeForms.FullRk D.nexp E i j b (IntegralHeckeForms.SgJ D.nexp E i j b)) →
-    ∀ S : ∀ (j : ℕ) (b : Bool), Finset (D.nexp.Dat i j b),
-      (∀ j ∈ Finset.Icc 1 D.R.m, ∀ b : Bool, IntegralHeckeForms.BasisOf D.nexp i j b (IntegralHeckeForms.SgJ D.nexp E i j b) (S j b)) →
-    ∀ A : Finset (PlE D.host),
-    ∃ (Q : Finset (PlE D.host)) (k' : ℕ) (ψ' : D.ntw.RCG i Q →* (D.ntw.Ok i k')ˣ),
-      ∀ a : ℤ, Nat.Coprime a.natAbs (D.ntw.l i) →
-        IntegralHeckeForms.GoodTw D.nexp (BlochKatoReduction.pin bkP) E N0 i eps' S A Q k' (ψ' ^ a)
+def IntegralHeckeEveryConjugate
+    (D : D7) (bkP : BlochKatoReduction.BK D) (E : IntegralHeckeForms.XD D) (N0 : D.ntw.Tw → ℕ)
+    : Prop :=
+  ∀ i,
+    D.ntw.NonzeroIndexPlace i → BlochKatoReduction.Gen.SetHyp (BlochKatoReduction.pin bkP) i
+      → ∀ eps' : ℝ,
+        0 < eps'
+          → (∀ j ∈ Finset.Icc 1 D.R.m, ∀ b : Bool,
+            IntegralHeckeForms.FullRk D.nexp E i j b (IntegralHeckeForms.SgJ D.nexp E i j b))
+          → ∀ S : ∀ (j : ℕ) (b : Bool), Finset (D.nexp.Dat i j b),
+            (∀ j ∈ Finset.Icc 1 D.R.m, ∀ b : Bool,
+                IntegralHeckeForms.BasisOf D.nexp i j b (IntegralHeckeForms.SgJ D.nexp E i j b)
+                  (S j b))
+              → ∀ A : Finset (PlE D.host),
+                ∃ (Q : Finset (PlE D.host)) (k' : ℕ) (ψ' : D.ntw.RCG i Q →* (D.ntw.Ok i k')ˣ),
+                  ∀ a : ℤ,
+                    Nat.Coprime a.natAbs (D.ntw.l i)
+                      → IntegralHeckeForms.GoodTw D.nexp (BlochKatoReduction.pin bkP) E N0 i eps' S
+                        A Q k' (ψ' ^ a)
 
 end Formalism.MainNotions
 
@@ -83,17 +103,17 @@ end Formalism.MainNotions.N.KillingConditions
 
 namespace Formalism.MainNotions.LatticeVariant
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions
 open Formalism.MainNotions.IntegralHeckeForms (HkIdx hkO TwOK T3 IsLatIn sIdx specU)
 open Formalism.MainNotions.BlochKatoReduction.Gen (psiAt nval SetHyp PsiOk partA partAT partC partD)
 open scoped TensorProduct
 
 section All
 
-variable {D : Formalism.BasicNotions.D7} {N : NData D.R D.host D.what₂}
+variable
+  {D : Formalism.BasicNotions.D7} {N : NData D.R D.host D.what₂}
   {X : NTw D.R D.host D.what₂ D.LL0 N} {Y : NExp D.R D.host D.what₂ D.LL0 N X}
-
-
 
 end All
 
@@ -101,24 +121,29 @@ end Formalism.MainNotions.LatticeVariant
 
 namespace Formalism.MainNotions.IntegralHeckeForms
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions
 open scoped TensorProduct
 
 section All
 
-variable {D : Formalism.BasicNotions.D7} {N : NData D.R D.host D.what₂}
+variable
+  {D : Formalism.BasicNotions.D7} {N : NData D.R D.host D.what₂}
   {X : NTw D.R D.host D.what₂ D.LL0 N} {Y : NExp D.R D.host D.what₂ D.LL0 N X}
 
-
 variable (Y) in
-def goodTwistExistsAllCoprimePowers (bkP : Formalism.MainNotions.BlochKatoReduction.Gen.BKPh X) (E : ExpDat Y) (N0 : X.Tw → ℕ) (i : X.Tw) : Prop :=
-  Formalism.MainNotions.BlochKatoReduction.Gen.SetHyp bkP i → ∀ eps' : ℝ, 0 < eps' →
-    (∀ j ∈ Finset.Icc 1 D.R.m, ∀ b : Bool, FullRk Y E i j b (SgJ Y E i j b)) →
-  ∀ S : ∀ (j : ℕ) (b : Bool), Finset (Y.Dat i j b),
-    (∀ j ∈ Finset.Icc 1 D.R.m, ∀ b : Bool, BasisOf Y i j b (SgJ Y E i j b) (S j b)) →
-  ∀ A : Finset (PlE D.host),
-  ∃ (Q : Finset (PlE D.host)) (k' : ℕ) (ψ' : X.RCG i Q →* (X.Ok i k')ˣ),
-    ∀ a : ℤ, a.natAbs.Coprime (X.l i) → GoodTw Y bkP E N0 i eps' S A Q k' (ψ' ^ a)
+def goodTwistExistsAllCoprimePowers
+    (bkP : Formalism.MainNotions.BlochKatoReduction.Gen.BKPh X) (E : ExpDat Y) (N0 : X.Tw → ℕ)
+    (i : X.Tw)
+    : Prop :=
+  Formalism.MainNotions.BlochKatoReduction.Gen.SetHyp bkP i
+    → ∀ eps' : ℝ,
+      0 < eps' → (∀ j ∈ Finset.Icc 1 D.R.m, ∀ b : Bool, FullRk Y E i j b (SgJ Y E i j b))
+        → ∀ S : ∀ (j : ℕ) (b : Bool), Finset (Y.Dat i j b),
+          (∀ j ∈ Finset.Icc 1 D.R.m, ∀ b : Bool, BasisOf Y i j b (SgJ Y E i j b) (S j b))
+            → ∀ A : Finset (PlE D.host),
+              ∃ (Q : Finset (PlE D.host)) (k' : ℕ) (ψ' : X.RCG i Q →* (X.Ok i k')ˣ), ∀ a : ℤ,
+                a.natAbs.Coprime (X.l i) → GoodTw Y bkP E N0 i eps' S A Q k' (ψ' ^ a)
 
 end All
 

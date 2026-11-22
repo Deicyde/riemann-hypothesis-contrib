@@ -13,13 +13,16 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.JetKapIff
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim GlobalTheory.TestLat GlobalTheory.SumSize
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.RowClaim GlobalTheory.TestLat GlobalTheory.SumSize
 open Formalism.DivisionValues (vw lw)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-private theorem sum_map_apply {ι σ : Type} [Fintype ι] (m : ι → σ →₀ ℕ) (i : ι) (x : σ) :
-    (∑ j, Finsupp.mapDomain (fun v : σ => (j, v)) (m j)) (i, x) = m i x := by
+private theorem sum_map_apply {ι σ : Type} [Fintype ι] (m : ι → σ →₀ ℕ) (i : ι) (x : σ)
+    : (∑ j, Finsupp.mapDomain (fun v : σ => (j, v)) (m j)) (i, x) = m i x := by
   classical
   rw [Finsupp.finsetSum_apply, Finset.sum_eq_single i]
   · exact Finsupp.mapDomain_apply_of_injective (fun a b h => (Prod.mk.inj h).2) _ _
@@ -30,25 +33,30 @@ private theorem sum_map_apply {ι σ : Type} [Fintype ι] (m : ι → σ →₀ 
   · intro h
     exact absurd (Finset.mem_univ i) h
 
-private theorem coeff_prod' {ι σ C : Type} [DecidableEq ι] [DecidableEq σ] [CommRing C] (f : ι → MvPolynomial σ C)
-    (d : σ →₀ ℕ) (s : Finset ι) :
-    AddMonoidAlgebra.coeff (∏ j ∈ s, f j) d = ∑ l ∈ Finset.finsuppAntidiag s d, ∏ j ∈ s, AddMonoidAlgebra.coeff (f j) (l j) := by
+private theorem coeff_prod'
+    {ι σ C : Type} [DecidableEq ι] [DecidableEq σ] [CommRing C]
+    (f : ι → MvPolynomial σ C) (d : σ →₀ ℕ) (s : Finset ι)
+    : AddMonoidAlgebra.coeff (∏ j ∈ s, f j) d
+      = ∑ l ∈ Finset.finsuppAntidiag s d, ∏ j ∈ s, AddMonoidAlgebra.coeff (f j) (l j) := by
   have h := MvPowerSeries.coeff_prod (fun j => (f j : MvPowerSeries σ C)) d s
-  have hp : ((∏ j ∈ s, f j : MvPolynomial σ C) : MvPowerSeries σ C) = ∏ j ∈ s, (f j : MvPowerSeries σ C) :=
+  have hp
+      : ((∏ j ∈ s, f j : MvPolynomial σ C) : MvPowerSeries σ C)
+        = ∏ j ∈ s, (f j : MvPowerSeries σ C) :=
     map_prod (MvPolynomial.coeToMvPowerSeries.ringHom (σ := σ) (R := C)) f s
   rw [← hp] at h
   simpa only [MvPolynomial.coeff_coe] using h
 
-private theorem coeff_prod_ren {ι σ C : Type} [Fintype ι] [CommRing C] (m : ι → σ →₀ ℕ)
-    (G : ι → MvPolynomial σ C) :
-    AddMonoidAlgebra.coeff (∏ j, MvPolynomial.rename (fun v : σ => (j, v)) (G j))
-        (∑ j, Finsupp.mapDomain (fun v : σ => (j, v)) (m j)) =
-      ∏ j, AddMonoidAlgebra.coeff (G j) (m j) := by
+private theorem coeff_prod_ren
+    {ι σ C : Type} [Fintype ι] [CommRing C] (m : ι → σ →₀ ℕ) (G : ι → MvPolynomial σ C)
+    : AddMonoidAlgebra.coeff (∏ j, MvPolynomial.rename (fun v : σ => (j, v)) (G j))
+        (∑ j, Finsupp.mapDomain (fun v : σ => (j, v)) (m j))
+      = ∏ j, AddMonoidAlgebra.coeff (G j) (m j) := by
   classical
   set D := ∑ j, Finsupp.mapDomain (fun v : σ => (j, v)) (m j) with hD
   have inj : ∀ j : ι, Function.Injective (fun v : σ => (j, v)) := fun j a b h => (Prod.mk.inj h).2
-  rw [coeff_prod', Finset.sum_eq_single
-    (Finsupp.equivFunOnFinite.symm fun j => Finsupp.mapDomain (fun v : σ => (j, v)) (m j))]
+  rw [coeff_prod',
+    Finset.sum_eq_single (Finsupp.equivFunOnFinite.symm fun j =>
+      Finsupp.mapDomain (fun v : σ => (j, v)) (m j))]
   · refine Finset.prod_congr rfl fun j _ => ?_
     exact MvPolynomial.coeff_rename_mapDomain _ (inj j) _ _
   · intro l hl hne
@@ -85,11 +93,17 @@ private theorem coeff_prod_ren {ι σ C : Type} [Fintype ι] [CommRing C] (m : �
     show ∑ k ∈ Finset.univ, Finsupp.mapDomain (fun v : σ => (k, v)) (m k) = D
     rw [hD]
 
-private theorem unitri {I P C : Type} [Fintype I] [PartialOrder P] [CommRing C] (S : Subring C) (e : I → P)
-    (he : Function.Injective e) (A : I → I → C) (c : I → C) (hA : ∀ i j, A i j ∈ S) (h1 : ∀ i, A i i = 1)
-    (hle : ∀ i j, A i j ≠ 0 → e j ≤ e i) (hc : ∀ j, ∑ i, c i * A i j ∈ S) (j : I) : c j ∈ S := by
+private theorem unitri
+    {I P C : Type} [Fintype I] [PartialOrder P] [CommRing C]
+    (S : Subring C)
+    (e : I → P) (he : Function.Injective e)
+    (A : I → I → C) (c : I → C)
+    (hA : ∀ i j, A i j ∈ S) (h1 : ∀ i, A i i = 1) (hle : ∀ i j, A i j ≠ 0 → e j ≤ e i)
+    (hc : ∀ j, ∑ i, c i * A i j ∈ S) (j : I)
+    : c j ∈ S := by
   classical
-  suffices key : ∀ n, ∀ j, (Finset.univ.filter fun i => e j < e i).card = n → c j ∈ S from key _ j rfl
+  suffices key : ∀ n, ∀ j, (Finset.univ.filter fun i => e j < e i).card = n → c j ∈ S from
+    key _ j rfl
   intro n
   refine Nat.strong_induction_on n fun n ih => ?_
   intro j hj
@@ -115,9 +129,10 @@ private theorem unitri {I P C : Type} [Fintype I] [PartialOrder P] [CommRing C] 
   have hfin := S.sub_mem hsum (sum_mem hrest)
   simpa using hfin
 
-theorem UpperTheory.WildA.bvvInt :
-    ∀ {ι : Type} [Fintype ι] {b : ℕ} (lam : ι → DomWeight b) (v : VV ℂ lam),
-      (∀ m, ∃ z : ℤ, AddMonoidAlgebra.coeff (v : Pol ℂ ι b) m = (z : ℂ)) → ∀ i, ∃ z : ℤ, (bVV ℂ lam).repr v i = (z : ℂ) := by
+theorem UpperTheory.WildA.bvvInt
+    : ∀ {ι : Type} [Fintype ι] {b : ℕ} (lam : ι → DomWeight b) (v : VV ℂ lam),
+      (∀ m, ∃ z : ℤ, AddMonoidAlgebra.coeff (v : Pol ℂ ι b) m = (z : ℂ))
+        → ∀ i, ∃ z : ℤ, (bVV ℂ lam).repr v i = (z : ℂ) := by
   intro ι _ b lam v hv i
   classical
   let L : VVIdx lam → (ι × Fin b × Fin b →₀ ℕ) := fun j =>
@@ -125,13 +140,17 @@ theorem UpperTheory.WildA.bvvInt :
   let A : VVIdx lam → VVIdx lam → ℂ := fun i j => AddMonoidAlgebra.coeff (bVVfun ℂ lam i) (L j)
   let e : VVIdx lam → (ι → (Formalism.GradedWeylDivisibility.colLex b b).syn) := fun i τ =>
     (Formalism.GradedWeylDivisibility.colLex b b).toSyn ((i τ : Fin b × Fin b →₀ ℕ))
-  have hspec : ∀ {n : ℕ} (ν : Fin n → ℕ) (m : Formalism.GradedWeylDivisibility.ssIdx n n ν),
-      (Formalism.GradedWeylDivisibility.colLex n n).degree (ssB ℂ ν m) = m ∧ (Formalism.GradedWeylDivisibility.colLex n n).leadingCoeff (ssB ℂ ν m) = 1 := by
+  have hspec
+      : ∀ {n : ℕ} (ν : Fin n → ℕ) (m : Formalism.GradedWeylDivisibility.ssIdx n n ν),
+        (Formalism.GradedWeylDivisibility.colLex n n).degree (ssB ℂ ν m) = m
+          ∧ (Formalism.GradedWeylDivisibility.colLex n n).leadingCoeff (ssB ℂ ν m) = 1 := by
     intro n ν m
     have h := (Formalism.L2.DIV.ssB._proof_1 ℂ ν).choose_spec.2 m
     exact ⟨h.1, h.2.1⟩
-  have hAprod : ∀ i j, A i j =
-      ∏ τ, AddMonoidAlgebra.coeff (ssB ℂ (lam τ).natW (i τ)) (j τ : Fin b × Fin b →₀ ℕ) := by
+  have hAprod
+      : ∀ i j,
+        A i j
+          = ∏ τ, AddMonoidAlgebra.coeff (ssB ℂ (lam τ).natW (i τ)) (j τ : Fin b × Fin b →₀ ℕ) := by
     intro i j
     exact coeff_prod_ren (fun τ => (j τ : Fin b × Fin b →₀ ℕ)) (fun τ => ssB ℂ (lam τ).natW (i τ))
   have hdiag : ∀ i, A i i = 1 := by
@@ -141,8 +160,10 @@ theorem UpperTheory.WildA.bvvInt :
     intro τ _
     have h := hspec (lam τ).natW (i τ)
     simpa [MonomialOrder.leadingCoeff, h.1] using h.2
-  have hexp : (v : Pol ℂ ι b) = ∑ k ∈ ((bVV ℂ lam).repr v).support,
-      ((bVV ℂ lam).repr v k) • bVVfun ℂ lam k := by
+  have hexp
+      : (v : Pol ℂ ι b)
+        = ∑ k ∈ ((bVV ℂ lam).repr v).support,
+          ((bVV ℂ lam).repr v k) • bVVfun ℂ lam k := by
     have h0 := (bVV ℂ lam).linearCombination_repr v
     rw [Finsupp.linearCombination_apply, Finsupp.sum] at h0
     conv_lhs => rw [← h0]
@@ -155,7 +176,11 @@ theorem UpperTheory.WildA.bvvInt :
     exact ⟨0, by simp [hi]⟩
   have key : (bVV ℂ lam).repr v i ∈ (Int.castRingHom ℂ).range := by
     refine unitri (I := {x // x ∈ ((bVV ℂ lam).repr v).support}) (Int.castRingHom ℂ).range
-      (fun x => e x.1) ?_ (fun x y => A x.1 y.1) (fun x => (bVV ℂ lam).repr v x.1) ?_ ?_ ?_ ?_ ⟨i, hi⟩
+      (fun x => e x.1)
+      ?_
+      (fun x y => A x.1 y.1)
+      (fun x => (bVV ℂ lam).repr v x.1)
+      ?_ ?_ ?_ ?_ ⟨i, hi⟩
     · intro x y hxy
       apply Subtype.ext
       funext τ
@@ -169,20 +194,25 @@ theorem UpperTheory.WildA.bvvInt :
     · intro x
       exact hdiag x.1
     · intro x y hxy τ
-      have hne : ∀ τ ∈ Finset.univ,
-          AddMonoidAlgebra.coeff (ssB ℂ (lam τ).natW (x.1 τ)) (y.1 τ : Fin b × Fin b →₀ ℕ) ≠ 0 := by
+      have hne
+          : ∀ τ ∈ Finset.univ,
+            AddMonoidAlgebra.coeff (ssB ℂ (lam τ).natW (x.1 τ)) (y.1 τ : Fin b × Fin b →₀ ℕ)
+              ≠ 0 := by
         rw [← Finset.prod_ne_zero_iff, ← hAprod]
         exact hxy
-      have hd := (Formalism.GradedWeylDivisibility.colLex b b).le_degree
-        (MvPolynomial.mem_support_iff.mpr (hne τ (Finset.mem_univ τ)))
+      have hd :=
+        (Formalism.GradedWeylDivisibility.colLex b b).le_degree
+          (MvPolynomial.mem_support_iff.mpr (hne τ (Finset.mem_univ τ)))
       rw [(hspec (lam τ).natW (x.1 τ)).1] at hd
       exact hd
     · intro j
-      have hcoef : AddMonoidAlgebra.coeff (v : Pol ℂ ι b) (L j.1) =
-          ∑ x : {x // x ∈ ((bVV ℂ lam).repr v).support}, (bVV ℂ lam).repr v x.1 * A x.1 j.1 := by
-        rw [hexp, MvPolynomial.coeff_sum, ← Finset.sum_coe_sort]
-        refine Finset.sum_congr rfl fun x _ => ?_
-        rw [MvPolynomial.coeff_smul, smul_eq_mul] <;> rfl
+      have hcoef
+          : AddMonoidAlgebra.coeff (v : Pol ℂ ι b) (L j.1)
+            = ∑ x : {x // x ∈ ((bVV ℂ lam).repr v).support}, (bVV ℂ lam).repr v x.1 * A x.1 j.1 :=
+        by
+          rw [hexp, MvPolynomial.coeff_sum, ← Finset.sum_coe_sort]
+          refine Finset.sum_congr rfl fun x _ => ?_
+          rw [MvPolynomial.coeff_smul, smul_eq_mul] <;> rfl
       show ∑ x : {x // x ∈ ((bVV ℂ lam).repr v).support}, (bVV ℂ lam).repr v x.1 * A x.1 j.1 ∈ _
       rw [← hcoef]
       obtain ⟨z, hz⟩ := hv (L j.1)

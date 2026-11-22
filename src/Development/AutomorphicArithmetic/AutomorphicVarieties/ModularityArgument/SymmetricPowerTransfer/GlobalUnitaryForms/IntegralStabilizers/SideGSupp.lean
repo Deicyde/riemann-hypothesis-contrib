@@ -8,10 +8,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Loc
 
-theorem UpperTheory.V.Z.Sym.Glob.sideGSupp :
-    ∀ (F : Type) [Field F] [NumberField F] (Δ : F) (D : Dat Δ), D.Ok → ∀ ι, IsIotaG ι → ∀ θ : GA Δ →* GA Δ,
-    (∀ g v, (θ g).1 v = theta _ (g.1 v)) → ∀ t, D.Cone t → ∀ (δ : U3 Δ) (τ : F) (y : GA Δ), HasTau δ τ →
-    D.FG t (y⁻¹ * ι δ * θ y) ≠ 0 → D.admitted t τ ∧ ∀ v ∉ D.Sg, cv v τ ∈ (algebraMap (Ov v) (Kv v)).range := by
+theorem UpperTheory.V.Z.Sym.Glob.sideGSupp
+    : ∀ (F : Type) [Field F] [NumberField F] (Δ : F) (D : Dat Δ),
+      D.Ok
+        → ∀ ι,
+          IsIotaG ι
+            → ∀ θ : GA Δ →* GA Δ,
+              (∀ g v, (θ g).1 v = theta _ (g.1 v))
+                → ∀ t,
+                  D.Cone t
+                    → ∀ (δ : U3 Δ) (τ : F) (y : GA Δ),
+                      HasTau δ τ → D.FG t (y⁻¹ * ι δ * θ y) ≠ 0
+                        → D.admitted t τ
+                          ∧ ∀ v ∉ D.Sg, cv v τ ∈ (algebraMap (Ov v) (Kv v)).range := by
   classical
   intro F _ _ Δ D hD ι hι θ hθ t ht δ τ y hτ hF
   obtain ⟨hc, -, hm, hi⟩ := UpperTheory.V.Z.Sym.Glob.sideGTau
@@ -31,9 +40,9 @@ theorem UpperTheory.V.Z.Sym.Glob.sideGSupp :
     intro v
     have h1 : HasTau ((ι δ).1 v) (cv v τ) := hm _ _ (cv v) Δ δ _ τ (hι δ v) hτ
     have h2 := hc _ (cv v Δ) ((ι δ).1 v) (y.1 v) (cv v τ) h1
-    have e : x.1 v = (y.1 v)⁻¹ * (ι δ).1 v * theta _ (y.1 v) := by
-      rw [← hθ y v]; rfl
-    rw [e]; exact h2
+    have e : x.1 v = (y.1 v)⁻¹ * (ι δ).1 v * theta _ (y.1 v) := by rw [← hθ y v]; rfl
+    rw [e]
+    exact h2
   refine ⟨fun v hv => ?_, fun v hv => ?_⟩
   · have h := hne v
     simp only [Dat.fGv, if_pos hv] at h

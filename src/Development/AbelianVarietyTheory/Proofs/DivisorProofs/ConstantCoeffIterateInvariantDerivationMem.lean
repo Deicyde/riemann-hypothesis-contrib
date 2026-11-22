@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.InvariantDer
 
 @[expose] public section
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat GlobalTheory.LawDer
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat GlobalTheory.LawDer
 
 set_option autoImplicit false
 
@@ -61,11 +63,24 @@ private lemma coeff_mapDomain_subst_X_comp_of_injective {σ τ S : Type} [CommRi
   rw [if_neg]
   exact fun h => he' (Finsupp.mapDomain_injective hg h).symm
 
-
 open MvPowerSeries in
 set_option autoImplicit false in
 variable {R : Type} [CommRing R] {d : ℕ} in
-theorem _root_.GlobalTheory.LawDer.Kernel.constantCoeff_iterate_invDer_mem : ∀ (B Q : Type) [CommRing B] [CommRing Q] [Algebra B Q] (d : ℕ) (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) B), (∀ i, constantCoeff (μ i) = 0) → ∀ (N : Ideal B) (l : MvPowerSeries (Fin d) Q) (j : Fin d), _root_.GlobalTheory.QLog.In N (_root_.GlobalTheory.Katz.cob1 (_root_.GlobalTheory.QLog.up Q μ) l) → _root_.GlobalTheory.Katz.lin l = Pi.single j 1 → ∀ (u : Fin d → B) (n : ℕ), 2 ≤ n → ∃ b ∈ N, constantCoeff ((_root_.GlobalTheory.LawDer.invDer (_root_.GlobalTheory.QLog.up Q μ) (fun i => algebraMap B Q (u i)))^[n] l) = algebraMap B Q b := by
+theorem _root_.GlobalTheory.LawDer.Kernel.constantCoeff_iterate_invDer_mem
+    : ∀ (B Q : Type) [CommRing B] [CommRing Q] [Algebra B Q] (d : ℕ)
+        (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) B),
+      (∀ i, constantCoeff (μ i) = 0)
+        → ∀ (N : Ideal B) (l : MvPowerSeries (Fin d) Q) (j : Fin d),
+          _root_.GlobalTheory.QLog.In N
+              (_root_.GlobalTheory.Katz.cob1 (_root_.GlobalTheory.QLog.up Q μ) l)
+            → _root_.GlobalTheory.Katz.lin l = Pi.single j 1
+            → ∀ (u : Fin d → B) (n : ℕ),
+              2 ≤ n
+                → ∃ b ∈ N,
+                  constantCoeff
+                      ((_root_.GlobalTheory.LawDer.invDer (_root_.GlobalTheory.QLog.up Q μ) (fun i => algebraMap B Q (u i)))^[n]
+                        l)
+                    = algebraMap B Q b := by
   intro B Q _ _ _ d μ hμ N l j hc hl u n hn
   obtain ⟨m, rfl⟩ : ∃ m, n = m + 2 := ⟨n - 2, by omega⟩
   unfold _root_.GlobalTheory.QLog.In at hc
@@ -77,12 +92,15 @@ theorem _root_.GlobalTheory.LawDer.Kernel.constantCoeff_iterate_invDer_mem : ∀
     exact ⟨fun ⟨b, hb, h⟩ => ⟨b, hb, h.symm⟩, fun ⟨b, hb, h⟩ => ⟨b, hb, h.symm⟩⟩
   have hμ0 : ∀ i, constantCoeff (μ' i) = 0 := fun i => by
     simp [μ', _root_.GlobalTheory.QLog.up, constantCoeff_map, hμ i]
-  have hlin := _root_.GlobalTheory.LawDer.Linear.invDer_linear Q d μ' hμ0 (fun i => algebraMap B Q (u i))
+  have hlin :=
+    _root_.GlobalTheory.LawDer.Linear.invDer_linear Q d μ' hμ0 (fun i => algebraMap B Q (u i))
   have hlinD : ∀ F G : MvPowerSeries (Fin d) Q, D (F + G) = D F + D G := hlin.1
-  have hcoeffD : ∀ (F : MvPowerSeries (Fin d) Q) (β : Fin d →₀ ℕ), coeff β (D F) =
-      ∑ i, algebraMap B Q (u i) * (coeff (Finsupp.mapDomain Sum.inl β +
-        Finsupp.single (Sum.inr i) 1) (subst μ' F) *
-          ((Finsupp.mapDomain Sum.inl β (Sum.inr i) : Q) + 1)) := by
+  have hcoeffD
+      : ∀ (F : MvPowerSeries (Fin d) Q) (β : Fin d →₀ ℕ),
+        coeff β (D F)
+          = ∑ i, algebraMap B Q (u i) * (coeff (Finsupp.mapDomain Sum.inl β +
+              Finsupp.single (Sum.inr i) 1) (subst μ' F) *
+                ((Finsupp.mapDomain Sum.inl β (Sum.inr i) : Q) + 1)) := by
     intro F β
     rw [hD]
     unfold _root_.GlobalTheory.LawDer.invDer
@@ -97,10 +115,11 @@ theorem _root_.GlobalTheory.LawDer.Kernel.constantCoeff_iterate_invDer_mem : ∀
     rw [← Algebra.smul_def]
     refine S.smul_mem _ ?_
     rw [← Nat.cast_succ, mul_comm, ← nsmul_eq_mul]
-    exact nsmul_mem (_root_.GlobalTheory.SubstSub.coeff_subst_up_mem B Q (Fin d) (Fin d ⊕ Fin d) S F μ
-      hμ hF _) _
-  have hPit : ∀ (k : ℕ) (F : MvPowerSeries (Fin d) Q), (∀ α, coeff α F ∈ S) →
-      ∀ β, coeff β (D^[k] F) ∈ S := by
+    exact nsmul_mem
+      (_root_.GlobalTheory.SubstSub.coeff_subst_up_mem B Q (Fin d) (Fin d ⊕ Fin d) S F μ hμ hF _) _
+  have hPit
+      : ∀ (k : ℕ) (F : MvPowerSeries (Fin d) Q),
+        (∀ α, coeff α F ∈ S) → ∀ β, coeff β (D^[k] F) ∈ S := by
     intro k
     induction k with
     | zero => intro F hF; simpa using hF
@@ -126,21 +145,28 @@ theorem _root_.GlobalTheory.LawDer.Kernel.constantCoeff_iterate_invDer_mem : ∀
     rw [Function.iterate_succ_apply, hDC, Function.iterate_fixed hD0]
   have hzero : ∀ (β : Fin d →₀ ℕ) (i : Fin d), Finsupp.mapDomain Sum.inl β (Sum.inr i) = 0 :=
     fun β i => Finsupp.mapDomain_notin_range _ _ (by simp)
-  have hsplit : subst μ' l = _root_.GlobalTheory.Katz.cob1 μ' l + _root_.GlobalTheory.Katz.inL l +
-      _root_.GlobalTheory.Katz.inR l := by
+  have hsplit
+      : subst μ' l
+        = _root_.GlobalTheory.Katz.cob1 μ' l + _root_.GlobalTheory.Katz.inL l
+          + _root_.GlobalTheory.Katz.inR l := by
     unfold _root_.GlobalTheory.Katz.cob1
     ring
-  have hleft : ∀ (β : Fin d →₀ ℕ) (i : Fin d), coeff (Finsupp.mapDomain Sum.inl β +
-      Finsupp.single (Sum.inr i) 1) (_root_.GlobalTheory.Katz.inL l) = 0 := by
+  have hleft
+      : ∀ (β : Fin d →₀ ℕ) (i : Fin d),
+        coeff (Finsupp.mapDomain Sum.inl β + Finsupp.single (Sum.inr i) 1)
+            (_root_.GlobalTheory.Katz.inL l)
+          = 0 := by
     intro β i
     unfold _root_.GlobalTheory.Katz.inL
     apply coeff_subst_X_comp_eq_zero_of_not_mem_range
     rintro ⟨e, he⟩
     have h := congrArg (fun x => x (Sum.inr i)) he
     simp [hzero] at h
-  have hright : ∀ (β : Fin d →₀ ℕ) (i : Fin d), coeff (Finsupp.mapDomain Sum.inl β +
-      Finsupp.single (Sum.inr i) 1) (_root_.GlobalTheory.Katz.inR l) =
-        if β = 0 then (Pi.single j 1 : Fin d → Q) i else 0 := by
+  have hright
+      : ∀ (β : Fin d →₀ ℕ) (i : Fin d),
+        coeff (Finsupp.mapDomain Sum.inl β + Finsupp.single (Sum.inr i) 1)
+            (_root_.GlobalTheory.Katz.inR l)
+          = if β = 0 then (Pi.single j 1 : Fin d → Q) i else 0 := by
     intro β i
     unfold _root_.GlobalTheory.Katz.inR
     split_ifs with hβ
@@ -160,9 +186,11 @@ theorem _root_.GlobalTheory.LawDer.Kernel.constantCoeff_iterate_invDer_mem : ∀
       omega
   have hg : ∀ β, coeff β (D l - C (algebraMap B Q (u j))) ∈ S := by
     intro β
-    have hsum : coeff β (D l - C (algebraMap B Q (u j))) = ∑ i, algebraMap B Q (u i) *
-        coeff (Finsupp.mapDomain Sum.inl β + Finsupp.single (Sum.inr i) 1)
-          (_root_.GlobalTheory.Katz.cob1 μ' l) := by
+    have hsum
+        : coeff β (D l - C (algebraMap B Q (u j)))
+          = ∑ i, algebraMap B Q (u i) *
+            coeff (Finsupp.mapDomain Sum.inl β + Finsupp.single (Sum.inr i) 1)
+              (_root_.GlobalTheory.Katz.cob1 μ' l) := by
       rw [map_sub, hcoeffD]
       simp only [hsplit, map_add (f := _), hleft, hright, hzero, Nat.cast_zero, zero_add, add_zero,
         mul_one, mul_add, Finset.sum_add_distrib]

@@ -13,6 +13,7 @@ open BpJoin
 namespace GlobalTheory
 
 theorem discreteSeriesCoef_pointwiseBound : ThmBpDS :=
-  GlobalTheory.T.pointwiseBound_discreteSeries_coefficients GlobalTheory.besselXiIntegrable_holds GlobalTheory.actualClasses_compactSupport
+  GlobalTheory.T.pointwiseBound_discreteSeries_coefficients GlobalTheory.besselXiIntegrable_holds
+    GlobalTheory.actualClasses_compactSupport
 
 end GlobalTheory

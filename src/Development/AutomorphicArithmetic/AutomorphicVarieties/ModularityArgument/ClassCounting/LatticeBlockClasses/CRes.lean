@@ -4,17 +4,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.KL UpperTheory.V.ZK UpperTheory.V.ZK.Cl
+open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.KL UpperTheory.V.ZK
+  UpperTheory.V.ZK.Cl
 
-private theorem exists_pow_mul_isIntegral_of_valuation_le_one_away {F : Type} [Field F] [NumberField F] (c : 𝓞 F) (x : F)
-    (h : ∀ P : HeightOneSpectrum (𝓞 F), c ∉ P.asIdeal → HeightOneSpectrum.valuation F P x ≤ 1) :
-    ∃ n : ℕ, ∃ a : 𝓞 F, (c : F) ^ n * x = a := by
+private theorem exists_pow_mul_isIntegral_of_valuation_le_one_away
+    {F : Type} [Field F] [NumberField F]
+    (c : 𝓞 F) (x : F)
+    (h : ∀ P : HeightOneSpectrum (𝓞 F), c ∉ P.asIdeal → HeightOneSpectrum.valuation F P x ≤ 1)
+    : ∃ n : ℕ, ∃ a : 𝓞 F, (c : F) ^ n * x = a := by
   obtain ⟨p, q, hq, hpq⟩ := IsFractionRing.div_surjective (𝓞 F) x
   have hpq' : (p : F) / q = x := hpq
   have hq0 : q ≠ 0 := nonZeroDivisors.ne_zero hq
   have hq0' : (q : F) ≠ 0 := by exact_mod_cast hq0
-  let T : Ideal (𝓞 F) := (LinearMap.range (Algebra.linearMap (𝓞 F) F)).comap
-    (LinearMap.toSpanSingleton (𝓞 F) F x)
+  let T : Ideal (𝓞 F) :=
+    (LinearMap.range (Algebra.linearMap (𝓞 F) F)).comap (LinearMap.toSpanSingleton (𝓞 F) F x)
   have memT : ∀ y : 𝓞 F, y ∈ T ↔ ∃ a : 𝓞 F, (y : F) * x = a := by
     intro y
     simp only [T, Submodule.mem_comap, LinearMap.mem_range, LinearMap.toSpanSingleton_apply,
@@ -66,8 +69,7 @@ private theorem exists_pow_mul_isIntegral_of_valuation_le_one_away {F : Type} [F
   obtain ⟨a, ha⟩ := (memT _).1 hn
   exact ⟨n, a, by push_cast at ha; exact ha⟩
 
-theorem UpperTheory.V.ZK.Cl.cRes :
-    UpperTheory.V.ZK.Cl.CRes := by
+theorem UpperTheory.V.ZK.Cl.cRes : UpperTheory.V.ZK.Cl.CRes := by
   intro L F _ _ _ _ _ k _ r
   have uniq : ∀ (x : F) (u u' : k), ResF r x u → ResF r x u' → u = u' := by
     rintro x u u' ⟨a, b, hb, hx, hu⟩ ⟨a', b', hb', hx', hu'⟩
@@ -83,11 +85,14 @@ theorem UpperTheory.V.ZK.Cl.cRes :
     · exact sub_eq_zero.1 h
     · exact absurd h (mul_ne_zero hb hb')
   have base : ∀ a : 𝓞 F, ResF r (a : F) (r a) := fun a => ⟨a, 1, by simp, by simp, by simp⟩
-  have arith : ∀ (x y : F) (u w : k), ResF r x u → ResF r y w →
-      ResF r (x + y) (u + w) ∧ ResF r (x * y) (u * w) := by
+  have arith
+      : ∀ (x y : F) (u w : k),
+        ResF r x u → ResF r y w → ResF r (x + y) (u + w) ∧ ResF r (x * y) (u * w) := by
     rintro x y u w ⟨a, b, hb, hx, hu⟩ ⟨a', b', hb', hy, hw⟩
-    refine ⟨⟨a * b' + a' * b, b * b', by simpa using mul_ne_zero hb hb', ?_, ?_⟩,
-      ⟨a * a', b * b', by simpa using mul_ne_zero hb hb', ?_, ?_⟩⟩
+    refine ⟨
+      ⟨a * b' + a' * b, b * b', by simpa using mul_ne_zero hb hb', ?_, ?_⟩,
+      ⟨a * a', b * b', by simpa using mul_ne_zero hb hb', ?_, ?_⟩
+    ⟩
     · have e : ((a * b' + a' * b : 𝓞 F) : F) = (a : F) * b' + a' * b := by push_cast; rfl
       have e' : ((b * b' : 𝓞 F) : F) = (b : F) * b' := by push_cast; rfl
       rw [e, e', ← hx, ← hy]
@@ -100,18 +105,32 @@ theorem UpperTheory.V.ZK.Cl.cRes :
       ring
     · simp only [map_mul, hu, hw]
       ring
-  have integ : ∀ b : 𝓞 L, r (algebraMap (𝓞 L) (𝓞 F) b) ≠ 0 → ∀ x : F,
-      (∀ P : HeightOneSpectrum (𝓞 F), algebraMap (𝓞 L) (𝓞 F) b ∉ P.asIdeal →
-        HeightOneSpectrum.valuation F P x ≤ 1) →
-      (∃ n, ∃ a : 𝓞 F, algebraMap (𝓞 L) F b ^ n * x = a) ∧ ∃ u, ResF r x u := by
+  have integ
+      : ∀ b : 𝓞 L,
+        r (algebraMap (𝓞 L) (𝓞 F) b) ≠ 0
+          → ∀ x : F,
+            (∀ P : HeightOneSpectrum (𝓞 F),
+                algebraMap (𝓞 L) (𝓞 F) b ∉ P.asIdeal → HeightOneSpectrum.valuation F P x ≤ 1)
+              → (∃ n, ∃ a : 𝓞 F, algebraMap (𝓞 L) F b ^ n * x = a) ∧ ∃ u, ResF r x u := by
     intro b hb x hx
     obtain ⟨n, a, ha⟩ := exists_pow_mul_isIntegral_of_valuation_le_one_away _ x hx
     have hcast : algebraMap (𝓞 L) F b = ((algebraMap (𝓞 L) (𝓞 F) b : 𝓞 F) : F) := by
       rw [IsScalarTower.algebraMap_apply (𝓞 L) (𝓞 F) F]
-    refine ⟨⟨n, a, by rw [hcast]; exact ha⟩, ⟨r a / r (algebraMap (𝓞 L) (𝓞 F) b ^ n), a,
-      algebraMap (𝓞 L) (𝓞 F) b ^ n, by rw [map_pow]; exact pow_ne_zero _ hb, ?_, ?_⟩⟩
-    · have e : ((algebraMap (𝓞 L) (𝓞 F) b ^ n : 𝓞 F) : F)
-          = ((algebraMap (𝓞 L) (𝓞 F) b : 𝓞 F) : F) ^ n := by push_cast; rfl
+    refine ⟨
+      ⟨n, a, by rw [hcast]; exact ha⟩,
+      ⟨
+        r a / r (algebraMap (𝓞 L) (𝓞 F) b ^ n),
+        a,
+        algebraMap (𝓞 L) (𝓞 F) b ^ n,
+        by rw [map_pow]; exact pow_ne_zero _ hb,
+        ?_,
+        ?_
+      ⟩
+    ⟩
+    · have e
+          : ((algebraMap (𝓞 L) (𝓞 F) b ^ n : 𝓞 F) : F)
+            = ((algebraMap (𝓞 L) (𝓞 F) b : 𝓞 F) : F) ^ n := by
+        push_cast; rfl
       rw [e, mul_comm]
       exact ha
     · rw [div_mul_cancel₀]
@@ -119,8 +138,9 @@ theorem UpperTheory.V.ZK.Cl.cRes :
       exact pow_ne_zero _ hb
   refine ⟨uniq, base, arith, fun b hb => ⟨integ b hb, ?_⟩⟩
   intro α hα
-  have hval : ∀ P : HeightOneSpectrum (𝓞 F), algebraMap (𝓞 L) (𝓞 F) b ∉ P.asIdeal →
-      HeightOneSpectrum.valuation F P (α : F) = 1 := by
+  have hval
+      : ∀ P : HeightOneSpectrum (𝓞 F),
+        algebraMap (𝓞 L) (𝓞 F) b ∉ P.asIdeal → HeightOneSpectrum.valuation F P (α : F) = 1 := by
     intro P hP
     have h0 := hα P hP
     unfold ordP at h0
@@ -130,8 +150,9 @@ theorem UpperTheory.V.ZK.Cl.cRes :
     rw [this]
     rfl
   obtain ⟨-, u, hu⟩ := integ b hb (α : F) (fun P hP => (hval P hP).le)
-  obtain ⟨-, u', hu'⟩ := integ b hb ((α⁻¹ : Fˣ) : F) (fun P hP => by
-    rw [Units.val_inv_eq_inv_val, map_inv₀, hval P hP, inv_one])
+  obtain ⟨-, u', hu'⟩ :=
+    integ b hb ((α⁻¹ : Fˣ) : F)
+      (fun P hP => by rw [Units.val_inv_eq_inv_val, map_inv₀, hval P hP, inv_one])
   have hmul := (arith _ _ _ _ hu hu').2
   rw [← Units.val_mul, mul_inv_cancel, Units.val_one] at hmul
   have h1 : ResF r (1 : F) 1 := by simpa using base 1

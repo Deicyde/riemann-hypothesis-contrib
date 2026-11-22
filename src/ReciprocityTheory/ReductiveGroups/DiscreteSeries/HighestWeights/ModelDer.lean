@@ -26,7 +26,6 @@ end ExpL
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-
 open Classical in
 def kcurve (ε : Fin n → Bool) (X : Matrix (Fin n) (Fin n) ℂ) : ℝ → KG ε :=
   if h : inK ε X then Classical.choose (exists_curve ε h) else fun _ => 1
@@ -50,9 +49,9 @@ lemma continuous_onepCurve (ε : Fin n → Bool) {X : Matrix (Fin n) (Fin n) ℂ
   rw [this]
   exact mder_exp_cont X
 
-theorem kcurve_spec (ε : Fin n → Bool) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X) :
-    Continuous (kcurve ε X) ∧ (∀ t, toMK (kcurve ε X t) = NormedSpace.exp ((t : ℂ) • X)) ∧
-      ∀ s t, kcurve ε X (s + t) = kcurve ε X s * kcurve ε X t := by
+theorem kcurve_spec (ε : Fin n → Bool) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X)
+    : Continuous (kcurve ε X) ∧ (∀ t, toMK (kcurve ε X t) = NormedSpace.exp ((t : ℂ) • X))
+      ∧ ∀ s t, kcurve ε X (s + t) = kcurve ε X s * kcurve ε X t := by
   rw [kcurve_eq ε hX]
   refine ⟨continuous_onepCurve ε hX, toMK_onepCurve ε hX, ?_⟩
   intro s u
@@ -62,15 +61,19 @@ theorem kcurve_spec (ε : Fin n → Bool) {X : Matrix (Fin n) (Fin n) ℂ} (hX :
     show (((s + u : ℝ) : ℂ) • X) = (s : ℂ) • X + (u : ℂ) • X by push_cast; exact add_smul _ _ _]
   exact Matrix.exp_add_of_commute _ _ (((Commute.refl X).smul_left _).smul_right _)
 
-theorem curve_eq_kcurve (ε : Fin n → Bool) {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X) (γ : ℝ → KG ε)
-    (hγ : ∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X)) : γ = kcurve ε X := by
+theorem curve_eq_kcurve
+    (ε : Fin n → Bool)
+    {X : Matrix (Fin n) (Fin n) ℂ} (hX : inK ε X)
+    (γ : ℝ → KG ε) (hγ : ∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X))
+    : γ = kcurve ε X := by
   funext t
   apply onep_KG_ext
   rw [hγ, (kcurve_spec ε hX).2.1]
 
-theorem differentiableAt_oneParam {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V]
-    (φ : ℝ → (V →L[ℂ] V)) (hc : Continuous φ) (h0 : φ 0 = 1) (hadd : ∀ s t, φ (s + t) = φ s * φ t) :
-    DifferentiableAt ℝ φ 0 := by
+theorem differentiableAt_oneParam
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ V]
+    (φ : ℝ → (V →L[ℂ] V)) (hc : Continuous φ) (h0 : φ 0 = 1) (hadd : ∀ s t, φ (s + t) = φ s * φ t)
+    : DifferentiableAt ℝ φ 0 := by
   have : CompleteSpace V := FiniteDimensional.complete ℂ V
   set Φ : ℝ → (V →L[ℂ] V) := fun x => ∫ s in (0:ℝ)..x, φ s with hΦ
   have hΦd : ∀ x, HasDerivAt Φ (φ x) x := fun x => (hc.integral_hasStrictDerivAt 0 x).hasDerivAt
@@ -83,15 +86,17 @@ theorem differentiableAt_oneParam {V : Type} [NormedAddCommGroup V] [NormedSpace
   obtain ⟨u, hu⟩ := hh
   have key : ∀ t, φ t * Φ h = Φ (t + h) - Φ t := by
     intro t
-    have h1 := (ContinuousLinearMap.mul ℝ (V →L[ℂ] V) (φ t)).intervalIntegral_comp_comm
-      (hc.intervalIntegrable (μ := MeasureTheory.volume) 0 h)
+    have h1 :=
+      (ContinuousLinearMap.mul ℝ (V →L[ℂ] V) (φ t)).intervalIntegral_comp_comm
+        (hc.intervalIntegrable (μ := MeasureTheory.volume) 0 h)
     simp only [ContinuousLinearMap.mul_apply'] at h1
     rw [hΦ]
     dsimp only
     rw [← h1]
     simp_rw [← hadd]
     rw [intervalIntegral.integral_comp_add_left (fun x => φ x) t, add_zero,
-      intervalIntegral.integral_interval_sub_left (hc.intervalIntegrable _ _) (hc.intervalIntegrable _ _)]
+      intervalIntegral.integral_interval_sub_left (hc.intervalIntegrable _ _)
+        (hc.intervalIntegrable _ _)]
   have hrep : φ = fun t => h⁻¹ • (Φ (t + h) - Φ t) * ((u⁻¹ : (V →L[ℂ] V)ˣ) : V →L[ℂ] V) := by
     funext t
     rw [← key, ← mul_smul_comm, ← hu, Units.mul_inv_cancel_right]
@@ -103,13 +108,16 @@ section Op
 
 variable {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [CompleteSpace V]
 
-def derOp (ε : Fin n → Bool) (τ : KG ε →* unitary (V →L[ℂ] V)) (X : Matrix (Fin n) (Fin n) ℂ) : V →L[ℂ] V :=
+def derOp (ε : Fin n → Bool) (τ : KG ε →* unitary (V →L[ℂ] V)) (X : Matrix (Fin n) (Fin n) ℂ)
+    : V →L[ℂ] V :=
   deriv (fun t : ℝ => ((τ (kcurve ε X t) : unitary (V →L[ℂ] V)) : V →L[ℂ] V)) 0
 
-theorem derOp_hasDeriv [FiniteDimensional ℂ V] (ε : Fin n → Bool) (τ : KG ε →* unitary (V →L[ℂ] V))
-    (hcont : Continuous τ) (X : Matrix (Fin n) (Fin n) ℂ) (hX : inK ε X) (γ : ℝ → KG ε)
-    (hγ : ∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X)) :
-    HasDerivAt (fun t => ((τ (γ t) : unitary (V →L[ℂ] V)) : V →L[ℂ] V)) (derOp ε τ X) 0 := by
+theorem derOp_hasDeriv
+    [FiniteDimensional ℂ V]
+    (ε : Fin n → Bool) (τ : KG ε →* unitary (V →L[ℂ] V)) (hcont : Continuous τ)
+    (X : Matrix (Fin n) (Fin n) ℂ) (hX : inK ε X)
+    (γ : ℝ → KG ε) (hγ : ∀ t : ℝ, toMK (γ t) = NormedSpace.exp ((t : ℂ) • X))
+    : HasDerivAt (fun t => ((τ (γ t) : unitary (V →L[ℂ] V)) : V →L[ℂ] V)) (derOp ε τ X) 0 := by
   have hγk := curve_eq_kcurve ε hX γ hγ
   subst hγk
   obtain ⟨hc, -, hmul⟩ := kcurve_spec ε hX
@@ -132,7 +140,7 @@ theorem derOp_hasDeriv [FiniteDimensional ℂ V] (ε : Fin n → Bool) (τ : KG 
 end Op
 
 def rdc (ε : Fin n → Bool) (Z : Matrix (Fin n) (Fin n) ℂ) (f : KG ε → ℂ) (x : KG ε) : ℂ :=
-  deriv (fun t : ℝ => f (x * kcurve ε (cpart1 ε (bdPart ε Z)) t)) 0 +
-    Complex.I * deriv (fun t : ℝ => f (x * kcurve ε (cpart2 ε (bdPart ε Z)) t)) 0
+  deriv (fun t : ℝ => f (x * kcurve ε (cpart1 ε (bdPart ε Z)) t)) 0
+    + Complex.I * deriv (fun t : ℝ => f (x * kcurve ε (cpart2 ε (bdPart ε Z)) t)) 0
 
 end ReciprocityTheory.ChartRestriction.DS.HW

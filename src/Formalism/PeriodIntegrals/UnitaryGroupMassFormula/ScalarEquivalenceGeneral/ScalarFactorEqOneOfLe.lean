@@ -53,8 +53,8 @@ theorem zMemXplusQ {r : ℕ} {T : E} (F : LFlag S r T) : F.fl.z ∈ Xplus F := b
   show F.fl.z ∈ F.fl.X ⊔ Submodule.span E {F.fl.z}
   exact Submodule.mem_sup_right (Submodule.mem_span_singleton_self _)
 
-theorem memOrthXplusQ {r : ℕ} {T : E} (F : LFlag S r T) {v : S.V} :
-    v ∈ orth S (Xplus F) ↔ v ∈ orth S (Xsp F) ∧ S.hT F.fl.z v = 0 := by
+theorem memOrthXplusQ {r : ℕ} {T : E} (F : LFlag S r T) {v : S.V}
+    : v ∈ orth S (Xplus F) ↔ v ∈ orth S (Xsp F) ∧ S.hT F.fl.z v = 0 := by
   constructor
   · intro h
     exact ⟨orthAntiQ (XspLeXplusQ F) h, memOrthQ.mp h _ (zMemXplusQ F)⟩
@@ -65,20 +65,21 @@ theorem memOrthXplusQ {r : ℕ} {T : E} (F : LFlag S r T) {v : S.V} :
     obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.mp hx
     obtain ⟨c, rfl⟩ := Submodule.mem_span_singleton.mp hb
     have ha' : a ∈ Xsp F := ha
-    rw [map_add (f := _), LinearMap.add_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, h2, smul_zero,
-      memOrthQ.mp h1 a ha', add_zero]
+    rw [map_add (f := _), LinearMap.add_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, h2,
+      smul_zero, memOrthQ.mp h1 a ha', add_zero]
 
 section Maps
 
 variable {r : ℕ} {T' : E} {F' F'' : LFlag S r T'} {β : S.V ≃ₗ[E] S.V}
 
-theorem mapXQ (h : ∀ j, (Xflag F' j).map (β : S.V →ₗ[E] S.V) = Xflag F'' j) {x : S.V}
-    (hx : x ∈ Xsp F') : β x ∈ Xsp F'' := by
+theorem mapXQ
+    (h : ∀ j, (Xflag F' j).map (β : S.V →ₗ[E] S.V) = Xflag F'' j) {x : S.V} (hx : x ∈ Xsp F')
+    : β x ∈ Xsp F'' := by
   rw [← XflagTopQ, ← h r]
   exact Submodule.mem_map_of_mem (by rw [XflagTopQ]; exact hx)
 
-theorem XflagSymmQ (h : ∀ j, (Xflag F' j).map (β : S.V →ₗ[E] S.V) = Xflag F'' j) (j : ℕ) :
-    (Xflag F'' j).map (β.symm : S.V →ₗ[E] S.V) = Xflag F' j := by
+theorem XflagSymmQ (h : ∀ j, (Xflag F' j).map (β : S.V →ₗ[E] S.V) = Xflag F'' j) (j : ℕ)
+    : (Xflag F'' j).map (β.symm : S.V →ₗ[E] S.V) = Xflag F' j := by
   ext x
   rw [← h j]
   constructor
@@ -87,22 +88,28 @@ theorem XflagSymmQ (h : ∀ j, (Xflag F' j).map (β : S.V →ₗ[E] S.V) = Xflag
   · intro hx
     exact Submodule.mem_map.mpr ⟨β x, Submodule.mem_map_of_mem hx, by simp⟩
 
-theorem isomSymmQ (hi : β ∈ Formalism.HermitianLatticesTheory.isom S.hT) : β.symm ∈ Formalism.HermitianLatticesTheory.isom S.hT := by
+theorem isomSymmQ (hi : β ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+    : β.symm ∈ Formalism.HermitianLatticesTheory.isom S.hT := by
   show ∀ x y, S.hT (β.symm x) (β.symm y) = S.hT x y
   intro x y
   have := hi (β.symm x) (β.symm y)
   simp only [LinearEquiv.apply_symm_apply] at this
   exact this.symm
 
-theorem isomTransQ {γ : S.V ≃ₗ[E] S.V} (h1 : β ∈ Formalism.HermitianLatticesTheory.isom S.hT) (h2 : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT) :
-    β.trans γ ∈ Formalism.HermitianLatticesTheory.isom S.hT := by
+theorem isomTransQ
+    {γ : S.V ≃ₗ[E] S.V}
+    (h1 : β ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+    (h2 : γ ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+    : β.trans γ ∈ Formalism.HermitianLatticesTheory.isom S.hT := by
   show ∀ x y, S.hT ((β.trans γ) x) ((β.trans γ) y) = S.hT x y
   intro x y
   rw [LinearEquiv.trans_apply, LinearEquiv.trans_apply, h2 (β x) (β y), h1 x y]
 
-theorem mapOrthXQ (hi : β ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+theorem mapOrthXQ
+    (hi : β ∈ Formalism.HermitianLatticesTheory.isom S.hT)
     (h : ∀ j, (Xflag F' j).map (β : S.V →ₗ[E] S.V) = Xflag F'' j)
-    {x : S.V} (hx : x ∈ orth S (Xsp F')) : β x ∈ orth S (Xsp F'') := by
+    {x : S.V} (hx : x ∈ orth S (Xsp F'))
+    : β x ∈ orth S (Xsp F'') := by
   rw [memOrthQ] at hx ⊢
   intro y hy
   have h0 := hx (β.symm y) (mapXQ (XflagSymmQ h) hy)
@@ -111,9 +118,11 @@ theorem mapOrthXQ (hi : β ∈ Formalism.HermitianLatticesTheory.isom S.hT)
   rw [e]
   exact h0
 
-theorem mapOrthXplusQ (hi : β ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+theorem mapOrthXplusQ
+    (hi : β ∈ Formalism.HermitianLatticesTheory.isom S.hT)
     (h : ∀ j, (Xflag F' j).map (β : S.V →ₗ[E] S.V) = Xflag F'' j) (hz : β F'.fl.z = F''.fl.z)
-    {x : S.V} (hx : x ∈ orth S (Xplus F')) : β x ∈ orth S (Xplus F'') := by
+    {x : S.V} (hx : x ∈ orth S (Xplus F'))
+    : β x ∈ orth S (Xplus F'') := by
   rw [memOrthXplusQ] at hx ⊢
   refine ⟨mapOrthXQ hi h hx.1, ?_⟩
   have e : S.hT (β F'.fl.z) (β x) = S.hT F'.fl.z x := hi F'.fl.z x
@@ -135,7 +144,8 @@ theorem bwdMemQ (h : IsAutLam S Λ β) {x : S.V} (hx : x ∈ Λ) : β.symm x ∈
   obtain ⟨y, hy, rfl⟩ := hx
   simpa using hy
 
-theorem gmapOfQ (h1 : ∀ x ∈ Λ, β x ∈ Λ) (h2 : ∀ x ∈ Λ, β.symm x ∈ Λ) : Formalism.HermitianLatticesTheory.gmap β Λ = Λ := by
+theorem gmapOfQ (h1 : ∀ x ∈ Λ, β x ∈ Λ) (h2 : ∀ x ∈ Λ, β.symm x ∈ Λ)
+    : Formalism.HermitianLatticesTheory.gmap β Λ = Λ := by
   unfold Formalism.HermitianLatticesTheory.gmap
   ext x
   constructor
@@ -148,13 +158,18 @@ theorem gmapOfQ (h1 : ∀ x ∈ Λ, β x ∈ Λ) (h2 : ∀ x ∈ Λ, β.symm x �
 theorem autSymmQ (h : IsAutLam S Λ β) : IsAutLam S Λ β.symm :=
   ⟨isomSymmQ h.1, gmapOfQ (fun x hx => bwdMemQ h hx) (fun x hx => by simpa using fwdMemQ h hx)⟩
 
-theorem autTransQ {γ : S.V ≃ₗ[E] S.V} (h1 : IsAutLam S Λ β) (h2 : IsAutLam S Λ γ) :
-    IsAutLam S Λ (β.trans γ) :=
-  ⟨isomTransQ h1.1 h2.1, gmapOfQ (fun x hx => fwdMemQ h2 (fwdMemQ h1 hx))
-    (fun x hx => by rw [LinearEquiv.symm_trans_apply]; exact bwdMemQ h1 (bwdMemQ h2 hx))⟩
+theorem autTransQ {γ : S.V ≃ₗ[E] S.V} (h1 : IsAutLam S Λ β) (h2 : IsAutLam S Λ γ)
+    : IsAutLam S Λ (β.trans γ) := ⟨
+  isomTransQ h1.1 h2.1,
+  gmapOfQ
+    (fun x hx => fwdMemQ h2 (fwdMemQ h1 hx))
+    (fun x hx => by rw [LinearEquiv.symm_trans_apply]; exact bwdMemQ h1 (bwdMemQ h2 hx))
+⟩
 
-theorem lrepMapQ (hA : IsAutLam S Λ β) (h : ∀ j, (Xflag F' j).map (β : S.V →ₗ[E] S.V) = Xflag F'' j)
-    {x : S.V} (hx : x ∈ Lrep Λ F') : β x ∈ Lrep Λ F'' := by
+theorem lrepMapQ
+    (hA : IsAutLam S Λ β) (h : ∀ j, (Xflag F' j).map (β : S.V →ₗ[E] S.V) = Xflag F'' j)
+    {x : S.V} (hx : x ∈ Lrep Λ F')
+    : β x ∈ Lrep Λ F'' := by
   have hx1 : x ∈ Λ := hx.1
   have hx2 : x ∈ orth S (Xsp F') := hx.2
   show β x ∈ Λ ⊓ toO S (orth S (Xsp F''))
@@ -164,19 +179,23 @@ end Maps
 
 section Pairs
 
-variable {Λ : Submodule (𝓞 E) S.V} {r g : ℕ} {T T' : E} {F : LFlag S r T}
-  {F' F'' F''' : LFlag S r T'} {β γ : S.V ≃ₗ[E] S.V}
+variable
+  {Λ : Submodule (𝓞 E) S.V} {r g : ℕ} {T T' : E}
+  {F : LFlag S r T} {F' F'' F''' : LFlag S r T'} {β γ : S.V ≃ₗ[E] S.V}
 
-theorem iotaSymmQ (hA : IsAutLam S Λ β) (hX : ∀ j, (Xflag F' j).map (β : S.V →ₗ[E] S.V) = Xflag F'' j)
-    (hI : IotaCompat Λ F F' F'' β g) : IotaCompat Λ F F'' F' β.symm g := by
+theorem iotaSymmQ
+    (hA : IsAutLam S Λ β) (hX : ∀ j, (Xflag F' j).map (β : S.V →ₗ[E] S.V) = Xflag F'' j)
+    (hI : IotaCompat Λ F F' F'' β g)
+    : IotaCompat Λ F F'' F' β.symm g := by
   intro x hx l hl
   have h0 := hI (β.symm x) (lrepMapQ (autSymmQ hA) (XflagSymmQ hX) hx) l hl
   rw [LinearEquiv.apply_symm_apply] at h0
   exact h0.symm
 
-theorem iotaTransQ (hA : IsAutLam S Λ β) (hX : ∀ j, (Xflag F' j).map (β : S.V →ₗ[E] S.V) = Xflag F'' j)
-    (hI1 : IotaCompat Λ F F' F'' β g) (hI2 : IotaCompat Λ F F'' F''' γ g) :
-    IotaCompat Λ F F' F''' (β.trans γ) g := by
+theorem iotaTransQ
+    (hA : IsAutLam S Λ β) (hX : ∀ j, (Xflag F' j).map (β : S.V →ₗ[E] S.V) = Xflag F'' j)
+    (hI1 : IotaCompat Λ F F' F'' β g) (hI2 : IotaCompat Λ F F'' F''' γ g)
+    : IotaCompat Λ F F' F''' (β.trans γ) g := by
   intro x hx l hl
   exact (hI1 x hx l hl).trans (hI2 (β x) (lrepMapQ hA hX hx) l hl)
 
@@ -187,41 +206,47 @@ theorem pairReflQ : IsPair Λ F F' F' (LinearEquiv.refl E S.V) g := by
   · intro x _ l _
     exact Iff.rfl
 
-theorem pairSymmQ (hP : IsPair Λ F F' F'' β g) : IsPair Λ F F'' F' β.symm g :=
-  ⟨autSymmQ hP.1, XflagSymmQ hP.2.1, by rw [← hP.2.2.1, LinearEquiv.symm_apply_apply],
-    iotaSymmQ hP.1 hP.2.1 hP.2.2.2⟩
+theorem pairSymmQ (hP : IsPair Λ F F' F'' β g) : IsPair Λ F F'' F' β.symm g := ⟨
+  autSymmQ hP.1,
+  XflagSymmQ hP.2.1,
+  by rw [← hP.2.2.1, LinearEquiv.symm_apply_apply],
+  iotaSymmQ hP.1 hP.2.1 hP.2.2.2
+⟩
 
-theorem pairTransQ (hP1 : IsPair Λ F F' F'' β g) (hP2 : IsPair Λ F F'' F''' γ g) :
-    IsPair Λ F F' F''' (β.trans γ) g :=
-  ⟨autTransQ hP1.1 hP2.1,
-    fun j => by rw [LinearEquiv.coe_trans, Submodule.map_comp, hP1.2.1 j, hP2.2.1 j],
-    by rw [LinearEquiv.trans_apply, hP1.2.2.1, hP2.2.2.1],
-    iotaTransQ hP1.1 hP1.2.1 hP1.2.2.2 hP2.2.2.2⟩
+theorem pairTransQ (hP1 : IsPair Λ F F' F'' β g) (hP2 : IsPair Λ F F'' F''' γ g)
+    : IsPair Λ F F' F''' (β.trans γ) g := ⟨
+  autTransQ hP1.1 hP2.1,
+  fun j => by rw [LinearEquiv.coe_trans, Submodule.map_comp, hP1.2.1 j, hP2.2.1 j],
+  by rw [LinearEquiv.trans_apply, hP1.2.2.1, hP2.2.2.1],
+  iotaTransQ hP1.1 hP1.2.1 hP1.2.2.2 hP2.2.2.2
+⟩
 
 end Pairs
 
 section Theta
 
-variable {Λ : Submodule (𝓞 E) S.V} {r k : ℕ} {T T' : E} {F : LFlag S r T}
-  {F' F'' F''' : LFlag S r T'} {β γ : S.V ≃ₗ[E] S.V}
+variable
+  {Λ : Submodule (𝓞 E) S.V} {r k : ℕ} {T T' : E}
+  {F : LFlag S r T} {F' F'' F''' : LFlag S r T'} {β γ : S.V ≃ₗ[E] S.V}
 
 def ND (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) (F' : LFlag S r T') : Prop :=
   finrank E (UUE Λ F F') = 2 * r + 2 ∧ UUE Λ F F' ⊓ orth S (UUE Λ F F') = ⊥
 
-theorem ndOfQ (hΛ : Submodule.IsFullLattice E Λ) (hL : IsLift Λ F) (hL' : IsLift Λ F')
-    (hG : Gval F F' ≠ 0) : ND Λ F F' :=
+theorem ndOfQ
+    (hΛ : Submodule.IsFullLattice E Λ) (hL : IsLift Λ F) (hL' : IsLift Λ F') (hG : Gval F F' ≠ 0)
+    : ND Λ F F' :=
   PI.UnitaryGroupMassFormula.BetaLUniq.gram_matrix_nondegenerate S Λ F F' hΛ hL hL' hG
 
-theorem finrankHpQ (hdim : finrank E S.V = k + 2 * r + 1) (n : ND Λ F F') :
-    finrank E (Hp Λ F F') + 1 = k := by
+theorem finrankHpQ (hdim : finrank E S.V = k + 2 * r + 1) (n : ND Λ F F')
+    : finrank E (Hp Λ F F') + 1 = k := by
   have h0 := PI.UnitaryGroupMassFormula.BetaLUniq.finrank_orth_add S (UUE Λ F F')
   rw [n.1] at h0
   show finrank E (orth S (UUE Λ F F')) + 1 = k
   omega
 
-theorem memThPairsQ {p : S.V × S.V} :
-    p ∈ ThPairs Λ F F' F'' β ↔
-      ((p.1 ∈ Hp Λ F F' ∧ p.2 ∈ Hp Λ F F'') ∧ p.1 - p.2 ∈ Xsp F) ∧ β p.1 - p.2 ∈ Xsp F'' :=
+theorem memThPairsQ {p : S.V × S.V}
+    : p ∈ ThPairs Λ F F' F'' β
+      ↔ ((p.1 ∈ Hp Λ F F' ∧ p.2 ∈ Hp Λ F F'') ∧ p.1 - p.2 ∈ Xsp F) ∧ β p.1 - p.2 ∈ Xsp F'' :=
   Iff.rfl
 
 theorem thLeQ : Th Λ F F' F'' β ≤ Hp Λ F F' := by
@@ -234,60 +259,66 @@ theorem thLe''Q : Th'' Λ F F' F'' β ≤ Hp Λ F F'' := by
   obtain ⟨p, hp, rfl⟩ := Submodule.mem_map.mp hy
   exact (memThPairsQ.mp hp).1.1.2
 
-theorem thEqQ (hdim : finrank E S.V = k + 2 * r + 1) (n : ND Λ F F') (hs : s0 Λ F F' F'' β k = 1) :
-    Th Λ F F' F'' β = Hp Λ F F' := by
+theorem thEqQ (hdim : finrank E S.V = k + 2 * r + 1) (n : ND Λ F F') (hs : s0 Λ F F' F'' β k = 1)
+    : Th Λ F F' F'' β = Hp Λ F F' := by
   apply Submodule.eq_of_le_of_finrank_le thLeQ
   have h0 := finrankHpQ hdim n
   simp only [s0] at hs
   omega
 
-theorem scalar_factor_eq_one_of_le (hdim : finrank E S.V = k + 2 * r + 1) (n : ND Λ F F')
-    (h : Hp Λ F F' ≤ Th Λ F F' F'' β) : s0 Λ F F' F'' β k = 1 := by
+theorem scalar_factor_eq_one_of_le
+    (hdim : finrank E S.V = k + 2 * r + 1) (n : ND Λ F F') (h : Hp Λ F F' ≤ Th Λ F F' F'' β)
+    : s0 Λ F F' F'' β k = 1 := by
   have e := le_antisymm thLeQ h
   have h0 := finrankHpQ hdim n
   simp only [s0]
   rw [e]
   omega
 
-theorem thEq''Q (hΛ : Submodule.IsFullLattice E Λ) (hdim : finrank E S.V = k + 2 * r + 1)
-    (n' : ND Λ F F') (n'' : ND Λ F F'') (hs : s0 Λ F F' F'' β k = 1) :
-    Th'' Λ F F' F'' β = Hp Λ F F'' := by
+theorem thEq''Q
+    (hΛ : Submodule.IsFullLattice E Λ) (hdim : finrank E S.V = k + 2 * r + 1) (n' : ND Λ F F')
+    (n'' : ND Λ F F'') (hs : s0 Λ F F' F'' β k = 1)
+    : Th'' Λ F F' F'' β = Hp Λ F F'' := by
   have hTh := thEqQ hdim n' hs
-  have hfst : Function.Injective
-      ((LinearMap.fst E S.V S.V).comp (ThPairs Λ F F' F'' β).subtype) := by
+  have hfst
+      : Function.Injective ((LinearMap.fst E S.V S.V).comp (ThPairs Λ F F' F'' β).subtype) := by
     apply LinearMap.ker_eq_bot.mp
     rw [LinearMap.ker_eq_bot']
     rintro ⟨p, hp⟩ h0
     change p.1 = 0 at h0
     rw [memThPairsQ] at hp
     have h2 : p.2 ∈ UUE Λ F F'' ⊓ orth S (UUE Λ F F'') := by
-      refine Submodule.mem_inf.mpr ⟨PI.UnitaryGroupMassFormula.BetaLUniq.Xsp_le_UUE S Λ hΛ F F'' ?_, hp.1.1.2⟩
+      refine Submodule.mem_inf.mpr
+        ⟨PI.UnitaryGroupMassFormula.BetaLUniq.Xsp_le_UUE S Λ hΛ F F'' ?_, hp.1.1.2⟩
       have h3 := (Xsp F).neg_mem hp.1.2
       rwa [h0, zero_sub, neg_neg] at h3
     rw [n''.2, Submodule.mem_bot] at h2
     exact Subtype.ext (Prod.ext h0 h2)
-  have hsnd : Function.Injective
-      ((LinearMap.snd E S.V S.V).comp (ThPairs Λ F F' F'' β).subtype) := by
+  have hsnd
+      : Function.Injective ((LinearMap.snd E S.V S.V).comp (ThPairs Λ F F' F'' β).subtype) := by
     apply LinearMap.ker_eq_bot.mp
     rw [LinearMap.ker_eq_bot']
     rintro ⟨p, hp⟩ h0
     change p.2 = 0 at h0
     rw [memThPairsQ] at hp
     have h1 : p.1 ∈ UUE Λ F F' ⊓ orth S (UUE Λ F F') := by
-      refine Submodule.mem_inf.mpr ⟨PI.UnitaryGroupMassFormula.BetaLUniq.Xsp_le_UUE S Λ hΛ F F' ?_, hp.1.1.1⟩
+      refine Submodule.mem_inf.mpr
+        ⟨PI.UnitaryGroupMassFormula.BetaLUniq.Xsp_le_UUE S Λ hΛ F F' ?_, hp.1.1.1⟩
       have h3 := hp.1.2
       rwa [h0, sub_zero] at h3
     rw [n'.2, Submodule.mem_bot] at h1
     exact Subtype.ext (Prod.ext h1 h0)
   have e1 : finrank E (Th Λ F F' F'' β) = finrank E (ThPairs Λ F F' F'' β) := by
-    have e : Th Λ F F' F'' β =
-        LinearMap.range ((LinearMap.fst E S.V S.V).comp (ThPairs Λ F F' F'' β).subtype) := by
+    have e
+        : Th Λ F F' F'' β
+          = LinearMap.range ((LinearMap.fst E S.V S.V).comp (ThPairs Λ F F' F'' β).subtype) := by
       rw [LinearMap.range_comp, Submodule.range_subtype]
       rfl
     rw [e, LinearMap.finrank_range_of_inj hfst]
   have e2 : finrank E (Th'' Λ F F' F'' β) = finrank E (ThPairs Λ F F' F'' β) := by
-    have e : Th'' Λ F F' F'' β =
-        LinearMap.range ((LinearMap.snd E S.V S.V).comp (ThPairs Λ F F' F'' β).subtype) := by
+    have e
+        : Th'' Λ F F' F'' β
+          = LinearMap.range ((LinearMap.snd E S.V S.V).comp (ThPairs Λ F F' F'' β).subtype) := by
       rw [LinearMap.range_comp, Submodule.range_subtype]
       rfl
     rw [e, LinearMap.finrank_range_of_inj hsnd]
@@ -297,8 +328,8 @@ theorem thEq''Q (hΛ : Submodule.IsFullLattice E Λ) (hdim : finrank E S.V = k +
   rw [hTh] at e1
   omega
 
-theorem yliftMemQ (hTh : Th'' Λ F F' F'' β = Hp Λ F F'') {y : S.V} (hy : y ∈ Ylift Λ F F') :
-    y ∈ UUE Λ F F'' := by
+theorem yliftMemQ (hTh : Th'' Λ F F' F'' β = Hp Λ F F'') {y : S.V} (hy : y ∈ Ylift Λ F F')
+    : y ∈ UUE Λ F F'' := by
   rw [← orthOrthQ (UUE Λ F F''), memOrthQ]
   intro h hh
   change h ∈ Hp Λ F F'' at hh
@@ -314,10 +345,12 @@ theorem yliftMemQ (hTh : Th'' Λ F F' F'' β = Hp Λ F F'') {y : S.V} (hy : y �
   have e : p.2 = p.1 - (p.1 - p.2) := by abel
   rw [e, map_sub, LinearMap.sub_apply, e1, e2, sub_zero]
 
-theorem ylift'MemQ (hi : β ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+theorem ylift'MemQ
+    (hi : β ∈ Formalism.HermitianLatticesTheory.isom S.hT)
     (hX : ∀ j, (Xflag F' j).map (β : S.V →ₗ[E] S.V) = Xflag F'' j)
-    (hTh : Th'' Λ F F' F'' β = Hp Λ F F'') {y : S.V} (hy : y ∈ Ylift' Λ F F') :
-    β y ∈ UUE Λ F F'' := by
+    (hTh : Th'' Λ F F' F'' β = Hp Λ F F'')
+    {y : S.V} (hy : y ∈ Ylift' Λ F F')
+    : β y ∈ UUE Λ F F'' := by
   rw [← orthOrthQ (UUE Λ F F''), memOrthQ]
   intro h hh
   change h ∈ Hp Λ F F'' at hh
@@ -341,11 +374,14 @@ end Theta
 
 section Scalar
 
-variable {Λ : Submodule (𝓞 E) S.V} {r : ℕ} {T T' : E} {F : LFlag S r T}
-  {F' F'' : LFlag S r T'} {β : S.V ≃ₗ[E] S.V}
+variable
+  {Λ : Submodule (𝓞 E) S.V} {r : ℕ} {T T' : E}
+  {F : LFlag S r T} {F' F'' : LFlag S r T'} {β : S.V ≃ₗ[E] S.V}
 
-theorem sgShiftQ {y y' u u' : S.V} {al al' : E} (h : SgRel F F' y y' al al') (hu : y - u ∈ Xsp F)
-    (hu' : u' - y' ∈ Xsp F') : SgRel F F' u u' al al' := by
+theorem sgShiftQ
+    {y y' u u' : S.V} {al al' : E}
+    (h : SgRel F F' y y' al al') (hu : y - u ∈ Xsp F) (hu' : u' - y' ∈ Xsp F')
+    : SgRel F F' u u' al al' := by
   obtain ⟨x, hx, x', hx', e⟩ := h
   refine ⟨x - (y - u), (Xsp F).sub_mem hx hu, x' - (u' - y'), (Xsp F').sub_mem hx' hu', ?_⟩
   have e' : u - u' = (y - y') - (y - u) - (u' - y') := by abel
@@ -361,8 +397,9 @@ theorem scalarReflQ : IsScalar Λ F F' F' (LinearEquiv.refl E S.V) := by
   · rw [← neg_sub]
     exact neg_mem h21'
 
-theorem scalarSymmQ (hX : ∀ j, (Xflag F' j).map (β : S.V →ₗ[E] S.V) = Xflag F'' j)
-    (hS : IsScalar Λ F F' F'' β) : IsScalar Λ F F'' F' β.symm := by
+theorem scalarSymmQ
+    (hX : ∀ j, (Xflag F' j).map (β : S.V →ₗ[E] S.V) = Xflag F'' j) (hS : IsScalar Λ F F' F'' β)
+    : IsScalar Λ F F'' F' β.symm := by
   intro y1 hy1 y2 hy2 y1' hy1' y2'' hy2'' h12 h21 al al'
   have a : y2 - y1 ∈ Xsp F := by
     rw [← neg_sub]
@@ -379,12 +416,13 @@ end Scalar
 
 section Rel
 
-variable {Λ : Submodule (𝓞 E) S.V} {r k g : ℕ} {T T' : E} {F : LFlag S r T}
-  {F' F'' F''' : LFlag S r T'}
+variable
+  {Λ : Submodule (𝓞 E) S.V} {r k g : ℕ} {T T' : E} {F : LFlag S r T} {F' F'' F''' : LFlag S r T'}
 
-theorem relReflQ (hΛ : Submodule.IsFullLattice E Λ) (hdim : finrank E S.V = k + 2 * r + 1)
-    (hF : IsLift Λ F) (hL' : IsLift Λ F') (hG' : Gval F F' ≠ 0) :
-    PI.ScalPairs.ScalRel Λ g k F F' F' := by
+theorem relReflQ
+    (hΛ : Submodule.IsFullLattice E Λ) (hdim : finrank E S.V = k + 2 * r + 1) (hF : IsLift Λ F)
+    (hL' : IsLift Λ F') (hG' : Gval F F' ≠ 0)
+    : PI.ScalPairs.ScalRel Λ g k F F' F' := by
   have n' := ndOfQ hΛ hF hL' hG'
   refine ⟨LinearEquiv.refl E S.V, pairReflQ, scalar_factor_eq_one_of_le hdim n' ?_, scalarReflQ⟩
   intro x hx
@@ -392,10 +430,11 @@ theorem relReflQ (hΛ : Submodule.IsFullLattice E Λ) (hdim : finrank E S.V = k 
   · simp
   · simp
 
-theorem relSymmQ (hΛ : Submodule.IsFullLattice E Λ) (hdim : finrank E S.V = k + 2 * r + 1)
-    (hF : IsLift Λ F) (hL' : IsLift Λ F') (hG' : Gval F F' ≠ 0) (hL'' : IsLift Λ F'')
-    (hG'' : Gval F F'' ≠ 0) (h : PI.ScalPairs.ScalRel Λ g k F F' F'') :
-    PI.ScalPairs.ScalRel Λ g k F F'' F' := by
+theorem relSymmQ
+    (hΛ : Submodule.IsFullLattice E Λ) (hdim : finrank E S.V = k + 2 * r + 1) (hF : IsLift Λ F)
+    (hL' : IsLift Λ F') (hG' : Gval F F' ≠ 0) (hL'' : IsLift Λ F'') (hG'' : Gval F F'' ≠ 0)
+    (h : PI.ScalPairs.ScalRel Λ g k F F' F'')
+    : PI.ScalPairs.ScalRel Λ g k F F'' F' := by
   obtain ⟨β, hP, hs, hS⟩ := h
   have n' := ndOfQ hΛ hF hL' hG'
   have n'' := ndOfQ hΛ hF hL'' hG''
@@ -415,11 +454,11 @@ theorem relSymmQ (hΛ : Submodule.IsFullLattice E Λ) (hdim : finrank E S.V = k 
     rw [e]
     exact neg_mem (mapXQ (XflagSymmQ hP.2.1) hp.2)
 
-theorem relTransQ (hΛ : Submodule.IsFullLattice E Λ) (hdim : finrank E S.V = k + 2 * r + 1)
-    (hF : IsLift Λ F) (hL' : IsLift Λ F') (hG' : Gval F F' ≠ 0) (hL'' : IsLift Λ F'')
-    (hG'' : Gval F F'' ≠ 0) (h1 : PI.ScalPairs.ScalRel Λ g k F F' F'')
-    (h2 : PI.ScalPairs.ScalRel Λ g k F F'' F''') :
-    PI.ScalPairs.ScalRel Λ g k F F' F''' := by
+theorem relTransQ
+    (hΛ : Submodule.IsFullLattice E Λ) (hdim : finrank E S.V = k + 2 * r + 1) (hF : IsLift Λ F)
+    (hL' : IsLift Λ F') (hG' : Gval F F' ≠ 0) (hL'' : IsLift Λ F'') (hG'' : Gval F F'' ≠ 0)
+    (h1 : PI.ScalPairs.ScalRel Λ g k F F' F'') (h2 : PI.ScalPairs.ScalRel Λ g k F F'' F''')
+    : PI.ScalPairs.ScalRel Λ g k F F' F''' := by
   obtain ⟨β, hP1, hs1, hS1⟩ := h1
   obtain ⟨γ, hP2, hs2, hS2⟩ := h2
   have n' := ndOfQ hΛ hF hL' hG'
@@ -454,11 +493,10 @@ theorem relTransQ (hΛ : Submodule.IsFullLattice E Λ) (hdim : finrank E S.V = k
   · intro y1 hy1 y3 hy3 y1' hy1' y3' hy3' h13 h31 al al'
     have hy1b : y1 ∈ orth S (Xplus F) := hy1.2
     have hy1'b : y1' ∈ orth S (Xplus F') := hy1'.2
-    have hy2 : y1 ∈ Ylift Λ F F'' :=
-      Submodule.mem_inf.mpr ⟨yliftMemQ hTh1'' hy1, hy1b⟩
+    have hy2 : y1 ∈ Ylift Λ F F'' := Submodule.mem_inf.mpr ⟨yliftMemQ hTh1'' hy1, hy1b⟩
     have hy2' : β y1' ∈ Ylift' Λ F F'' :=
-      Submodule.mem_inf.mpr ⟨ylift'MemQ hP1.1.1 hP1.2.1 hTh1'' hy1',
-        mapOrthXplusQ hP1.1.1 hP1.2.1 hP1.2.2.1 hy1'b⟩
+      Submodule.mem_inf.mpr
+        ⟨ylift'MemQ hP1.1.1 hP1.2.1 hTh1'' hy1', mapOrthXplusQ hP1.1.1 hP1.2.1 hP1.2.2.1 hy1'b⟩
     have a := hS1 y1 hy1 y1 hy2 y1' hy1' (β y1') hy2' (by simp) (by simp) al al'
     have b := hS2 y1 hy2 y3 hy3 (β y1') hy2' y3' hy3' h13 h31 al al'
     exact a.trans b

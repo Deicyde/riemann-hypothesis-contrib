@@ -13,7 +13,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.Ux1
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.B4
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P.B4
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -21,7 +22,8 @@ variable {k r : ℕ}
 
 section abstract
 
-variable {𝔤 E : Type*} [NormedAddCommGroup 𝔤] [NormedSpace ℝ 𝔤] [NormedAddCommGroup E] [NormedSpace ℝ E]
+variable
+  {𝔤 E : Type*} [NormedAddCommGroup 𝔤] [NormedSpace ℝ 𝔤] [NormedAddCommGroup E] [NormedSpace ℝ E]
   {ι : Type*} [Fintype ι]
 
 lemma tuo_smulRight_sum {Ω : Set 𝔤} (a : ι → 𝔤 → (𝔤 →L[ℝ] ℝ)) (B : ℝ) (hB : ∀ i, ∀ Y ∈ Ω, ‖a i Y‖ ≤ B)
@@ -58,14 +60,17 @@ lemma tuo_smulRight_sum {Ω : Set 𝔤} (a : ι → 𝔤 → (𝔤 →L[ℝ] ℝ
     _ < ε := by
         rw [mul_div_assoc', div_lt_iff₀ hN, hNdef]; nlinarith
 
-theorem AL {Ω : Set 𝔤} (hΩ : IsOpen Ω) (a : ι → 𝔤 → (𝔤 →L[ℝ] ℝ))
-    (ha : ∀ i, ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (a i) Ω) (B : ℝ) (hB : ∀ i, ∀ Y ∈ Ω, ‖a i Y‖ ≤ B) :
-    ∀ (m : ℕ) (Ψ : List ι → ℕ → 𝔤 → E) (L : List ι → 𝔤 → E),
-      (∀ w : List ι, w.length ≤ m → ∀ n, ContinuousOn (Ψ w n) Ω) →
-      (∀ w : List ι, w.length < m → ∀ n, ∀ Y ∈ Ω,
-        HasFDerivAt (Ψ w n) (∑ i, (a i Y).smulRight (Ψ (i :: w) n Y)) Y) →
-      (∀ w : List ι, w.length ≤ m → TendstoUniformlyOn (Ψ w) (L w) atTop Ω) →
-      ContDiffOn ℝ (m : WithTop ℕ∞) (L []) Ω := by
+theorem AL
+    {Ω : Set 𝔤} (hΩ : IsOpen Ω)
+    (a : ι → 𝔤 → (𝔤 →L[ℝ] ℝ)) (ha : ∀ i, ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (a i) Ω)
+    (B : ℝ) (hB : ∀ i, ∀ Y ∈ Ω, ‖a i Y‖ ≤ B)
+    : ∀ (m : ℕ) (Ψ : List ι → ℕ → 𝔤 → E) (L : List ι → 𝔤 → E),
+      (∀ w : List ι, w.length ≤ m → ∀ n, ContinuousOn (Ψ w n) Ω)
+        → (∀ w : List ι,
+          w.length < m
+            → ∀ n, ∀ Y ∈ Ω, HasFDerivAt (Ψ w n) (∑ i, (a i Y).smulRight (Ψ (i :: w) n Y)) Y)
+        → (∀ w : List ι, w.length ≤ m → TendstoUniformlyOn (Ψ w) (L w) atTop Ω)
+        → ContDiffOn ℝ (m : WithTop ℕ∞) (L []) Ω := by
   intro m
   induction m with
   | zero =>
@@ -76,16 +81,21 @@ theorem AL {Ω : Set 𝔤} (hΩ : IsOpen Ω) (a : ι → 𝔤 → (𝔤 →L[ℝ
     intro Ψ L hc hd hu
     have hL : ∀ j : ι, ContDiffOn ℝ (m : WithTop ℕ∞) (L [j]) Ω := by
       intro j
-      have := ih (fun w => Ψ (w ++ [j])) (fun w => L (w ++ [j]))
-        (fun w hw n => hc _ (by simp; omega) n)
-        (fun w hw n Y hY => by simpa using hd (w ++ [j]) (by simp; omega) n Y hY)
-        (fun w hw => hu _ (by simp; omega))
+      have :=
+        ih
+          (fun w => Ψ (w ++ [j]))
+          (fun w => L (w ++ [j]))
+          (fun w hw n => hc _ (by simp; omega) n)
+          (fun w hw n Y hY => by simpa using hd (w ++ [j]) (by simp; omega) n Y hY)
+          (fun w hw => hu _ (by simp; omega))
       simpa using this
     have hder : ∀ Y ∈ Ω, HasFDerivAt (L []) (∑ i, (a i Y).smulRight (L [i] Y)) Y := by
       intro Y hY
       exact hasFDerivAt_of_tendstoUniformlyOn hΩ
         (tuo_smulRight_sum a B hB (fun i => Ψ [i]) (fun i => L [i]) (fun i => hu [i] (by simp)))
-        (fun n Y hY => hd [] (by simp) n Y hY) (fun Y hY => (hu [] (by simp)).tendsto_at hY) hY
+        (fun n Y hY => hd [] (by simp) n Y hY)
+        (fun Y hY => (hu [] (by simp)).tendsto_at hY)
+        hY
     rw [show ((m + 1 : ℕ) : WithTop ℕ∞) = (m : WithTop ℕ∞) + 1 by push_cast; rfl,
       contDiffOn_succ_iff_fderiv_of_isOpen hΩ]
     refine ⟨fun Y hY => (hder Y hY).differentiableAt.differentiableWithinAt, fun h => ?_, ?_⟩
@@ -376,22 +386,24 @@ lemma chart_diff (g0 : Mat k r) {Y : J k r → ℝ} (hY : Y ∈ Dom k r) : Diffe
   ((chart_cd g0).differentiableOn (by simp)).differentiableAt (dom_open.mem_nhds hY)
 
 def mulB (k r : ℕ) : Mat k r →L[ℝ] Mat k r →L[ℝ] Mat k r :=
-  LinearMap.toContinuousLinearMap
-    { toFun := fun A => mulL A
-      map_add' := fun A B => by ext g : 1; simp [mulL_apply, Matrix.add_mul]
-      map_smul' := fun c A => by ext g : 1; simp [mulL_apply] }
+  LinearMap.toContinuousLinearMap {
+    toFun := fun A => mulL A
+    map_add' := fun A B => by ext g : 1; simp [mulL_apply, Matrix.add_mul]
+    map_smul' := fun c A => by ext g : 1; simp [mulL_apply]
+  }
 
 lemma mulB_apply (A B : Mat k r) : mulB k r A B = A * B := rfl
 
 def cT (k r : ℕ) : Mat k r →L[ℝ] Mat k r :=
-  LinearMap.toContinuousLinearMap
-    { toFun := fun A => Aᴴ
-      map_add' := fun A B => conjTranspose_add A B
-      map_smul' := fun c A => by
-        simp only [RingHom.id_apply]
-        rw [RCLike.real_smul_eq_coe_smul (K := ℂ), RCLike.real_smul_eq_coe_smul (K := ℂ),
-          conjTranspose_smul]
-        simp only [RCLike.star_def, RCLike.conj_ofReal] }
+  LinearMap.toContinuousLinearMap {
+    toFun := fun A => Aᴴ
+    map_add' := fun A B => conjTranspose_add A B
+    map_smul' := fun c A => by
+      simp only [RingHom.id_apply]
+      rw [RCLike.real_smul_eq_coe_smul (K := ℂ), RCLike.real_smul_eq_coe_smul (K := ℂ),
+        conjTranspose_smul]
+      simp only [RCLike.star_def, RCLike.conj_ofReal]
+  }
 
 lemma cT_apply (A : Mat k r) : cT k r A = Aᴴ := rfl
 
@@ -767,13 +779,13 @@ lemma limit_ck {a : ℝ} {mm : ℕ} (Fs : ℕ → Mat k r → E)
 def Vd (mm : ℕ) (u w : List (Mat k r)) (g : Mat k r) : Prop :=
   (∀ X ∈ u, unitLie k r X) ∧ (∀ X ∈ w, unitLie k r X) ∧ u.length + w.length ≤ mm ∧ g ∈ GV k r
 
-abbrev Idx (k r mm : ℕ) : Type := {p : (List (Mat k r) × List (Mat k r)) × Mat k r // Vd mm p.1.1 p.1.2 p.2}
+abbrev Idx (k r mm : ℕ) : Type :=
+  {p : (List (Mat k r) × List (Mat k r)) × Mat k r // Vd mm p.1.1 p.1.2 p.2}
 
 abbrev Lp (k r mm : ℕ) (E : Type*) [NormedAddCommGroup E] : Type _ := lp (fun _ : Idx k r mm => E) ⊤
 
-def Tf (a : ℝ) (mm : ℕ) (F : Mat k r → E) : Idx k r mm → E :=
-  fun i => ((gN i.1.2 ^ a : ℝ) : ℂ) • dLR i.1.1.1 i.1.1.2 F i.1.2
-
+def Tf (a : ℝ) (mm : ℕ) (F : Mat k r → E) : Idx k r mm → E := fun i =>
+  ((gN i.1.2 ^ a : ℝ) : ℂ) • dLR i.1.1.1 i.1.1.2 F i.1.2
 
 open Classical in
 def Kf (a : ℝ) {mm : ℕ} (x : Idx k r mm → E) (u w : List (Mat k r)) (g : Mat k r) : E :=
@@ -843,21 +855,30 @@ lemma dLR_add' {F F' : Mat k r → E} {A c c' : ℝ} {m : ℕ} (hF : CCle A m F 
   rw [dLR_eq, dLR_eq, dLR_eq]
   exact W_add _ (allLie_lr h.1 h.2.1) (ckOn_mono hl' hF.1) (ckOn_mono hl' hF'.1) g h.2.2.2
 
-def Vs (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] (a : ℝ) (mm : ℕ) (S : Set (Mat k r)) : Submodule ℂ (Lp k r mm E) where
+def Vs (E : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] (a : ℝ) (mm : ℕ) (S : Set (Mat k r))
+    : Submodule ℂ (Lp k r mm E) where
   carrier := {x | ∃ F : Mat k r → E, InCC a mm F ∧ (∀ g ∈ GV k r, g ∉ S → F g = 0) ∧ ⇑x = Tf a mm F}
   zero_mem' := ⟨0, ⟨0, cc_zero a mm⟩, fun _ _ _ => rfl, by funext i; simp [Tf, dLR_zero]⟩
   add_mem' := by
     rintro x y ⟨F, ⟨c, hF⟩, hFS, hx⟩ ⟨F', ⟨c', hF'⟩, hF'S, hy⟩
-    refine ⟨F + F', ⟨c + c', (matrix_coefficient_linear k r E a mm F F' c c' 1 hF hF').1⟩,
-      fun g hg hgS => by simp [hFS g hg hgS, hF'S g hg hgS], ?_⟩
+    refine ⟨
+      F + F',
+      ⟨c + c', (matrix_coefficient_linear k r E a mm F F' c c' 1 hF hF').1⟩,
+      fun g hg hgS => by simp [hFS g hg hgS, hF'S g hg hgS],
+      ?_
+    ⟩
     rw [lp.coeFn_add, hx, hy]
     funext i
     simp only [Pi.add_apply, Tf]
     rw [dLR_add' hF hF' i.2, smul_add]
   smul_mem' := by
     rintro s x ⟨F, ⟨c, hF⟩, hFS, hx⟩
-    refine ⟨s • F, ⟨‖s‖ * c, (matrix_coefficient_linear k r E a mm F F c c s hF hF).2⟩,
-      fun g hg hgS => by simp [hFS g hg hgS], ?_⟩
+    refine ⟨
+      s • F,
+      ⟨‖s‖ * c, (matrix_coefficient_linear k r E a mm F F c c s hF hF).2⟩,
+      fun g hg hgS => by simp [hFS g hg hgS],
+      ?_
+    ⟩
     rw [lp.coeFn_smul, hx]
     funext i
     simp only [Pi.smul_apply, Tf]
@@ -913,8 +934,8 @@ lemma vs_closed {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] (a : ℝ) 
     show v ⟨((u, w), g), h⟩ = ((gN g ^ a : ℝ) : ℂ) • dLR u w (K [] []) g
     rw [hid u w h.1 h.2.1 h.2.2.1 g h.2.2.2, hK, Kf, dite_eq_left h, rsmul_cancel' h.2.2.2]
 
-def evL {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] (a : ℝ) (mm : ℕ) (S : Set (Mat k r)) :
-    Vs E a mm S →ₗ[ℂ] (Mat k r → E) where
+def evL {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] (a : ℝ) (mm : ℕ) (S : Set (Mat k r))
+    : Vs E a mm S →ₗ[ℂ] (Mat k r → E) where
   toFun x := Kf a (⇑(x : Lp k r mm E)) [] []
   map_add' x y := by
     funext g
@@ -930,8 +951,8 @@ lemma mem_vs {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] {a : ℝ} {mm
     (x : Vs E a mm S) : ∃ F : Mat k r → E, InCC a mm F ∧ (∀ g ∈ GV k r, g ∉ S → F g = 0) ∧
       ⇑(x : Lp k r mm E) = Tf a mm F := x.2
 
-def model {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] (a : ℝ) (mm : ℕ) (S : Set (Mat k r)) :
-    Formalism.FourierDecayAlt.U.CCModel k r E a mm S (Vs E a mm S) where
+def model {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] (a : ℝ) (mm : ℕ) (S : Set (Mat k r))
+    : Formalism.FourierDecayAlt.U.CCModel k r E a mm S (Vs E a mm S) where
   ev := evL a mm S
   mem x := by
     obtain ⟨F, ⟨c, hF⟩, -, hx⟩ := mem_vs x
@@ -939,7 +960,8 @@ def model {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] (a : ℝ) (mm : 
     have h : Vd mm u v g := ⟨hu, hv, hl, hg⟩
     have e : ‖(x : Lp k r mm E) ⟨((u, v), g), h⟩‖ = gN g ^ a * ‖dLR u v F g‖ := by
       rw [hx]; exact norm_rsmul _ (Real.rpow_nonneg (gN_pos hg).le _) _
-    rw [← e]; exact lp.norm_apply_le_norm (by simp) _ _
+    rw [← e]
+    exact lp.norm_apply_le_norm (by simp) _ _
   least x c hc := by
     obtain ⟨F, -, -, hx⟩ := mem_vs x
     have hF : CCle a mm F c := cc_congr (fun g hg => Kf_eq hx hg) hc
@@ -952,7 +974,8 @@ def model {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] (a : ℝ) (mm : 
   off x g hg hgS := by
     obtain ⟨F, -, hFS, hx⟩ := mem_vs x
     show Kf a (⇑(x : Lp k r mm E)) [] [] g = 0
-    rw [Kf_eq hx hg]; exact hFS g hg hgS
+    rw [Kf_eq hx hg]
+    exact hFS g hg hgS
   surj F hF hFS := by
     obtain ⟨c, hc⟩ := hF
     have hm : Memℓp (Tf a mm F) ⊤ := by
@@ -971,7 +994,7 @@ namespace Formalism.FourierDecayAlt.P
 theorem compactly_supported_banach_model : Formalism.FourierDecayAlt.U.CCModelExists := by
   intro k ρ E _ _ _ a mm S
   have : IsClosed (Ux1.Vs E a mm S : Set (Ux1.Lp k ρ mm E)) := Ux1.vs_closed a mm S
-  exact ⟨Ux1.Vs E a mm S, inferInstance, inferInstance, IsClosed.completeSpace_coe,
-    ⟨Ux1.model a mm S⟩⟩
+  exact
+    ⟨Ux1.Vs E a mm S, inferInstance, inferInstance, IsClosed.completeSpace_coe, ⟨Ux1.model a mm S⟩⟩
 
 end Formalism.FourierDecayAlt.P

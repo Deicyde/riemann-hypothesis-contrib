@@ -6,14 +6,15 @@ public import Development.EtaleCohomology.EtaleTrace.LFinCut
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry NumberField GlobalTheory.EtC GlobalTheory.Et TensorProduct Polynomial
+open CategoryTheory Limits AlgebraicGeometry NumberField GlobalTheory.EtC GlobalTheory.Et
+  TensorProduct Polynomial
 open GlobalTheory.GalV (HTower Htot hop galV galTot)
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N
 open UpperTheory.Gal UpperTheory.Gal.Int.Geo
 
-theorem UpperTheory.Gal.Int.Geo.compSum_of :
-    CompSum := by
+theorem UpperTheory.Gal.Int.Geo.compSum_of : CompSum := by
   intro k _ X p hs hpr
   haveI := hs
   haveI := hpr
@@ -25,10 +26,15 @@ theorem UpperTheory.Gal.Int.Geo.compSum_of :
   haveI : Finite (irreducibleComponents X) :=
     TopologicalSpace.NoetherianSpace.finite_irreducibleComponents.to_subtype
   let e := Finite.equivFin (irreducibleComponents X)
-  have hopen : ∀ Z : irreducibleComponents X, IsOpen (Z : Set X) :=
-    fun Z => (GlobalTheory.IsNormalScheme.component Z).isOpen
-  refine ⟨Nat.card (irreducibleComponents X), fun s => (GlobalTheory.IsNormalScheme.component (e.symm s) : Scheme),
-    fun s => (GlobalTheory.IsNormalScheme.component (e.symm s)).ι, ⟨fun s => inferInstance, ?_, ?_⟩, ?_⟩
+  have hopen : ∀ Z : irreducibleComponents X, IsOpen (Z : Set X) := fun Z =>
+    (GlobalTheory.IsNormalScheme.component Z).isOpen
+  refine ⟨
+    Nat.card (irreducibleComponents X),
+    fun s => (GlobalTheory.IsNormalScheme.component (e.symm s) : Scheme),
+    fun s => (GlobalTheory.IsNormalScheme.component (e.symm s)).ι,
+    ⟨fun s => inferInstance, ?_, ?_⟩,
+    ?_
+  ⟩
   · intro x
     refine ⟨e ⟨irreducibleComponent x, irreducibleComponent_mem_irreducibleComponents x⟩, ?_⟩
     rw [Scheme.Opens.range_ι, Equiv.symm_apply_apply]
@@ -42,8 +48,9 @@ theorem UpperTheory.Gal.Int.Geo.compSum_of :
     apply hne
     have h12 : ((e.symm s : Set X)) ⊆ (e.symm s' : Set X) :=
       (subset_closure_inter_of_isPreirreducible_of_isOpen (e.symm s).2.1.isPreirreducible
-        (hopen (e.symm s')) hn).trans
-        (closure_minimal Set.inter_subset_right (isClosed_of_mem_irreducibleComponents _ (e.symm s').2))
+          (hopen (e.symm s')) hn).trans
+        (closure_minimal Set.inter_subset_right
+          (isClosed_of_mem_irreducibleComponents _ (e.symm s').2))
     exact Subtype.ext (le_antisymm h12 ((e.symm s).2.2 (e.symm s').2.1 h12))
   · intro s
     haveI : IsReduced X := by

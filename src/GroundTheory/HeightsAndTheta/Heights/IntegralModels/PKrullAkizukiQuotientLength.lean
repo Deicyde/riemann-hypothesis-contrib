@@ -9,8 +9,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.Model
 
-theorem KrullAkizukiQuotientLength.proof (h : TorsionFreeQuotientLength.Statement) :
-    KrullAkizukiQuotientLength.Statement := by
+theorem KrullAkizukiQuotientLength.proof (h : TorsionFreeQuotientLength.Statement)
+    : KrullAkizukiQuotientLength.Statement := by
   intro R _ _ _ hdim K _ _ _ L _ _ _ _ _ S b hb
 
   have hinj : Function.Injective (algebraMap R S) := by
@@ -44,20 +44,22 @@ theorem KrullAkizukiQuotientLength.proof (h : TorsionFreeQuotientLength.Statemen
         have hk : k + 1 ≤ 1 := by exact_mod_cast h3
         obtain rfl : k = 0 := by omega
         simp
-  have : IsArtinianRing (R ⧸ Ideal.span {b}) :=
-    IsNoetherianRing.isArtinianRing_of_krullDimLE_zero
+  have : IsArtinianRing (R ⧸ Ideal.span {b}) := IsNoetherianRing.isArtinianRing_of_krullDimLE_zero
   have hRlen : Module.length R (R ⧸ Ideal.span {b}) ≠ ⊤ := by
     rw [Module.length_ne_top_iff, isFiniteLength_iff_isNoetherian_isArtinian]
-    exact ⟨inferInstance, isArtinian_of_surjective_algebraMap
-      (Ideal.Quotient.mk_surjective (I := Ideal.span {b}))⟩
+    exact ⟨
+      inferInstance,
+      isArtinian_of_surjective_algebraMap (Ideal.Quotient.mk_surjective (I := Ideal.span {b}))
+    ⟩
 
   have hle := h R hdim S r hr b hb
   have hfin : IsFiniteLength R (S ⧸ (Ideal.span {b} • ⊤ : Submodule R S)) :=
-    Module.length_ne_top_iff.mp
-      (ne_top_of_le_ne_top (WithTop.mul_ne_top (ENat.natCast_ne_top r) hRlen) hle)
+    Module.length_ne_top_iff.mp (ne_top_of_le_ne_top
+      (WithTop.mul_ne_top (ENat.natCast_ne_top r) hRlen) hle)
 
-  have heq : (Ideal.span {b} • ⊤ : Submodule R S) =
-      (Ideal.span {algebraMap R S b}).restrictScalars R := by
+  have heq
+      : (Ideal.span {b} • ⊤ : Submodule R S)
+        = (Ideal.span {algebraMap R S b}).restrictScalars R := by
     ext x
     simp only [Submodule.ideal_span_singleton_smul, Submodule.mem_smul_pointwise_iff_exists,
       Submodule.mem_top, true_and, Submodule.restrictScalars_mem, Ideal.mem_span_singleton',

@@ -10,8 +10,9 @@ set_option autoImplicit false
 
 namespace GlobalTheory.LatticeBasisClosedBall
 
-theorem exists_real_coords {g : ℕ} (lam : Fin (2 * g) → Fin g → ℂ) (hli : LinearIndependent ℝ lam)
-    (w : Fin g → ℂ) : ∃ c : Fin (2 * g) → ℝ, ∑ j, c j • lam j = w := by
+theorem exists_real_coords
+    {g : ℕ} (lam : Fin (2 * g) → Fin g → ℂ) (hli : LinearIndependent ℝ lam) (w : Fin g → ℂ)
+    : ∃ c : Fin (2 * g) → ℝ, ∑ j, c j • lam j = w := by
   have hdim : Fintype.card (Fin (2 * g)) = Module.finrank ℝ (Fin g → ℂ) := by
     rw [Module.finrank_pi_fintype]
     simp [Complex.finrank_real_complex, mul_comm]
@@ -19,11 +20,12 @@ theorem exists_real_coords {g : ℕ} (lam : Fin (2 * g) → Fin g → ℂ) (hli 
   have hw : w ∈ Submodule.span ℝ (Set.range lam) := hspan ▸ Submodule.mem_top
   exact (Submodule.mem_span_range_iff_exists_fun ℝ).1 hw
 
-theorem isLatBasis_of_closedBall : ∀ {g : ℕ} (H : AddSubgroup (Fin g → ℂ)) (lam : Fin (2 * g) → Fin g → ℂ)
-    (R : ℝ), LinearIndependent ℝ lam → (∀ j : Fin (2 * g), lam j ∈ H) → ∑ j : Fin (2 * g), ‖lam j‖ ≤ R →
-    (∀ w ∈ Metric.closedBall (0 : Fin g → ℂ) R, w ∈ H →
-      ∃ m : Fin (2 * g) → ℤ, w = ∑ j : Fin (2 * g), m j • lam j) →
-    GlobalTheory.ShFam.Hor.LogCh.IsLatBasis (↑H : Set (Fin g → ℂ)) lam := by
+theorem isLatBasis_of_closedBall
+    : ∀ {g : ℕ} (H : AddSubgroup (Fin g → ℂ)) (lam : Fin (2 * g) → Fin g → ℂ) (R : ℝ),
+      LinearIndependent ℝ lam → (∀ j : Fin (2 * g), lam j ∈ H) → ∑ j : Fin (2 * g), ‖lam j‖ ≤ R
+        → (∀ w ∈ Metric.closedBall (0 : Fin g → ℂ) R,
+          w ∈ H → ∃ m : Fin (2 * g) → ℤ, w = ∑ j : Fin (2 * g), m j • lam j)
+        → GlobalTheory.ShFam.Hor.LogCh.IsLatBasis (↑H : Set (Fin g → ℂ)) lam := by
   intro g H lam R hli hmem hR hball
   have hint : ∀ m : Fin (2 * g) → ℤ, ∑ j, m j • lam j ∈ H := fun m =>
     H.sum_mem fun j _ => H.zsmul_mem (hmem j) (m j)

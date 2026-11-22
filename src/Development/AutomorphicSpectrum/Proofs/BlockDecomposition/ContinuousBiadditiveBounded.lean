@@ -5,17 +5,17 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.UnitarySch
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.Arch
 
-theorem continuous_biadditive_bounded :
-    ∀ (N₁ N₂ N₃ : ℕ) (β : (Fin N₁ → ℝ) → (Fin N₂ → ℝ) → (Fin N₃ → ℝ)),
-      (∀ u u' v, β (u + u') v = β u v + β u' v) →
-      (∀ u v v', β u (v + v') = β u v + β u v') →
-      Continuous (fun p : (Fin N₁ → ℝ) × (Fin N₂ → ℝ) => β p.1 p.2) →
-      ∃ C : ℝ, 0 ≤ C ∧ ∀ u v, ‖β u v‖ ≤ C * ‖u‖ * ‖v‖ := by
+theorem continuous_biadditive_bounded
+    : ∀ (N₁ N₂ N₃ : ℕ) (β : (Fin N₁ → ℝ) → (Fin N₂ → ℝ) → (Fin N₃ → ℝ)),
+      (∀ u u' v, β (u + u') v = β u v + β u' v) → (∀ u v v', β u (v + v') = β u v + β u v')
+        → Continuous (fun p : (Fin N₁ → ℝ) × (Fin N₂ → ℝ) => β p.1 p.2)
+        → ∃ C : ℝ, 0 ≤ C ∧ ∀ u v, ‖β u v‖ ≤ C * ‖u‖ * ‖v‖ := by
   intro N₁ N₂ N₃ β h₁ h₂ hβ
   have smul₁ : ∀ (c : ℝ) u v, β (c • u) v = c • β u v := by
     intro c u v
@@ -50,7 +50,8 @@ theorem continuous_biadditive_bounded :
     field_simp
   have hb := key ((s / ‖u‖) • u) ((s / ‖v‖) • v) (by rw [hnu]; exact hsδ) (by rw [hnv]; exact hsδ)
   rw [smul₁, smul₂, smul_smul, norm_smul,
-    Real.norm_of_nonneg (mul_pos (div_pos hs0 hu') (div_pos hs0 hv')).le] at hb
+      Real.norm_of_nonneg (mul_pos (div_pos hs0 hu') (div_pos hs0 hv')).le]
+    at hb
   have e : s / ‖u‖ * (s / ‖v‖) * ‖β u v‖ = (‖β u v‖ * (s * s)) / (‖u‖ * ‖v‖) := by ring
   rw [e, div_lt_one (mul_pos hu' hv')] at hb
   rw [show 4 / (2 * s) ^ 2 * ‖u‖ * ‖v‖ = (‖u‖ * ‖v‖) / (s * s) by ring,

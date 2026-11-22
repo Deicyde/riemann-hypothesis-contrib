@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 private lemma exists_of_mem_sm_range {S E : Type} [CommRing S] [Algebra ℂ S] [AddCommGroup E] [Module ℂ E]
@@ -30,8 +31,8 @@ private lemma exists_of_mem_sm_range {S E : Type} [CommRing S] [Algebra ℂ S] [
   obtain ⟨v, rfl⟩ := hle hx
   exact ⟨fun j => (v j : E), fun j => (v j).2, hL v⟩
 
-theorem UpperTheory.Gal.productCup_of_system.koszulTwoInjective_of_gl1 :
-    FiltrationBoundaryCriterion → SubQEx → KoszulBoundaryOfComponentMemIdeal := by
+theorem UpperTheory.Gal.productCup_of_system.koszulTwoInjective_of_gl1
+    : FiltrationBoundaryCriterion → SubQEx → KoszulBoundaryOfComponentMemIdeal := by
   intro gl1 subq S E _ _ _ _ act κ _ _ R M r d e hst hr hKE c hc hsm
   classical
   obtain ⟨m, hm, hcm⟩ := exists_of_mem_sm_range act M (fun j => r (e j)) _ hsm
@@ -104,20 +105,23 @@ theorem UpperTheory.Gal.productCup_of_system.koszulTwoInjective_of_gl1 :
           exact_mod_cast hs.ge
         rw [← h1]
         exact Finset.inter_subset_left
-      have hwd : ∀ t : Finset κ, wd (wOn (img e) fun l => act (r l)) y t =
-          ∑ i ∈ t, GlobalTheory.cubeSign t i • (wOn (img e) (fun l => act (r l)) i) (y (t.erase i)) := by
-        intro t
-        simp [wd, LinearMap.sum_apply]
+      have hwd
+          : ∀ t : Finset κ,
+            wd (wOn (img e) fun l => act (r l)) y t
+              = ∑ i ∈ t, GlobalTheory.cubeSign t i • (wOn (img e) (fun l => act (r l)) i) (y (t.erase i)) :=
+        by
+          intro t
+          simp [wd, LinearMap.sum_apply]
       rw [hwd]
       by_cases hsQ : s = img e
       · subst hsQ
         rw [hcm]
-        have hsum : ∀ F : κ → E, ∑ i ∈ img e, F i = ∑ j, F (e j) := fun F =>
-          Finset.sum_map _ _ _
+        have hsum : ∀ F : κ → E, ∑ i ∈ img e, F i = ∑ j, F (e j) := fun F => Finset.sum_map _ _ _
         rw [hsum]
         refine Finset.sum_congr rfl fun j _ => ?_
         have hw : wOn (img e) (fun l => act (r l)) (e j) = act (r (e j)) := if_pos (hmem j)
-        have hsq : GlobalTheory.cubeSign (img e) (e j) * GlobalTheory.cubeSign (img e) (e j) = 1 := by
+        have hsq
+            : GlobalTheory.cubeSign (img e) (e j) * GlobalTheory.cubeSign (img e) (e j) = 1 := by
           rw [GlobalTheory.cubeSign, ← mul_pow]
           simp
         rw [hw, hyv j, map_zsmul, smul_smul, hsq, one_smul]

@@ -29,27 +29,33 @@ variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
 def cvec {d : ℕ} (σ : K →+* ℂ) (x : Fin d → K) : Fin d → ℂ := fun i => σ (x i)
 
-def met {d : ℕ} (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ) (v : InfinitePlace K) :
-    Matrix (Fin d) (Fin d) ℂ :=
+def met {d : ℕ} (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ) (v : InfinitePlace K)
+    : Matrix (Fin d) (Fin d) ℂ :=
   ((X v)⁻¹).conjTranspose * (X v)⁻¹
 
 def fmat {d m : ℕ} (σ : K →+* ℂ) (e : Fin m → Fin d → K) : Matrix (Fin d) (Fin m) ℂ :=
   Matrix.of fun i a => σ (e a i)
 
-theorem majAt_eq {d : ℕ} (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ) (v : InfinitePlace K)
-    (x y : Fin d → K) :
-    Formalism.HermitianLatticesTheory.majAt (Pi.basisFun K (Fin d)) X v x y =
-      star (cvec v.embedding x) ⬝ᵥ (met X v *ᵥ cvec v.embedding y) := by
-  have hv : ∀ z : Fin d → K, Formalism.HermitianLatticesTheory.vecAt (Pi.basisFun K (Fin d)) v z = cvec v.embedding z := by
+theorem majAt_eq
+    {d : ℕ} (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ) (v : InfinitePlace K) (x y : Fin d → K)
+    : Formalism.HermitianLatticesTheory.majAt (Pi.basisFun K (Fin d)) X v x y
+      = star (cvec v.embedding x) ⬝ᵥ (met X v *ᵥ cvec v.embedding y) := by
+  have hv
+      : ∀ z : Fin d → K,
+        Formalism.HermitianLatticesTheory.vecAt (Pi.basisFun K (Fin d)) v z
+          = cvec v.embedding z := by
     intro z; funext i; simp [Formalism.HermitianLatticesTheory.vecAt, cvec]
-  have h1 : Formalism.HermitianLatticesTheory.majAt (Pi.basisFun K (Fin d)) X v x y =
-      star ((X v)⁻¹ *ᵥ cvec v.embedding x) ⬝ᵥ ((X v)⁻¹ *ᵥ cvec v.embedding y) := by
-    simp only [Formalism.HermitianLatticesTheory.majAt, Formalism.HermitianLatticesTheory.fcoord, hv, dotProduct, Pi.star_apply]
+  have h1
+      : Formalism.HermitianLatticesTheory.majAt (Pi.basisFun K (Fin d)) X v x y
+        = star ((X v)⁻¹ *ᵥ cvec v.embedding x) ⬝ᵥ ((X v)⁻¹ *ᵥ cvec v.embedding y) := by
+    simp only [Formalism.HermitianLatticesTheory.majAt, Formalism.HermitianLatticesTheory.fcoord,
+      hv, dotProduct, Pi.star_apply]
   rw [h1, Matrix.star_mulVec, ← Matrix.dotProduct_mulVec, Matrix.mulVec_mulVec, met]
 
-theorem gram_eq_fmat {d m : ℕ} (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ)
-    (v : InfinitePlace K) (e : Fin m → Fin d → K) :
-    gram X v e = (fmat v.embedding e)ᴴ * met X v * fmat v.embedding e := by
+theorem gram_eq_fmat
+    {d m : ℕ} (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ)
+    (v : InfinitePlace K) (e : Fin m → Fin d → K)
+    : gram X v e = (fmat v.embedding e)ᴴ * met X v * fmat v.embedding e := by
   ext a c
   simp only [gram, Formalism.HN.gramPl, Matrix.of_apply, majAt_eq]
   simp only [Matrix.mul_apply, Matrix.conjTranspose_apply, fmat, Matrix.of_apply, dotProduct,
@@ -58,57 +64,66 @@ theorem gram_eq_fmat {d m : ℕ} (X : InfinitePlace K → Matrix (Fin d) (Fin d)
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => ?_
   ring
 
-theorem fmat_change {d m : ℕ} (σ : K →+* ℂ) (e : Fin m → Fin d → K)
-    (γ : Matrix (Fin m) (Fin m) K) :
-    fmat σ (fun i => ∑ k, γ k i • e k) = fmat σ e * γ.map σ := by
+theorem fmat_change {d m : ℕ} (σ : K →+* ℂ) (e : Fin m → Fin d → K) (γ : Matrix (Fin m) (Fin m) K)
+    : fmat σ (fun i => ∑ k, γ k i • e k) = fmat σ e * γ.map σ := by
   ext j i
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [fmat, Matrix.of_apply, Matrix.mul_apply, Matrix.map_apply, Finset.sum_apply,
-    Pi.smul_apply, smul_eq_mul, map_sum, map_mul]
+      Pi.smul_apply, smul_eq_mul, map_sum, map_mul]
   exact Finset.sum_congr rfl fun k _ => mul_comm _ _
 
-theorem gram_change {d m : ℕ} (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ)
-    (v : InfinitePlace K) (e : Fin m → Fin d → K) (γ : Matrix (Fin m) (Fin m) K) :
-    (gram X v (fun i => ∑ k, γ k i • e k)).det =
-      star (v.embedding γ.det) * v.embedding γ.det * (gram X v e).det := by
+theorem gram_change
+    {d m : ℕ} (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ)
+    (v : InfinitePlace K) (e : Fin m → Fin d → K) (γ : Matrix (Fin m) (Fin m) K)
+    : (gram X v (fun i => ∑ k, γ k i • e k)).det
+      = star (v.embedding γ.det) * v.embedding γ.det * (gram X v e).det := by
   have hγ : (γ.map v.embedding).det = v.embedding γ.det := (RingHom.map_det _ _).symm
   rw [gram_eq_fmat, gram_eq_fmat, fmat_change, Matrix.conjTranspose_mul]
-  have : (γ.map v.embedding)ᴴ * (fmat v.embedding e)ᴴ * met X v *
-      (fmat v.embedding e * γ.map v.embedding) =
-      (γ.map v.embedding)ᴴ * ((fmat v.embedding e)ᴴ * met X v * fmat v.embedding e) *
-        γ.map v.embedding := by
+  have : (γ.map v.embedding)ᴴ * (fmat v.embedding e)ᴴ * met X v
+        * (fmat v.embedding e * γ.map v.embedding)
+      = (γ.map v.embedding)ᴴ * ((fmat v.embedding e)ᴴ * met X v * fmat v.embedding e)
+        * γ.map v.embedding := by
     simp only [Matrix.mul_assoc]
   rw [this, Matrix.det_mul, Matrix.det_mul, Matrix.det_conjTranspose, hγ]
   ring
 
-theorem gram_det_real {d m : ℕ} (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ)
-    (v : InfinitePlace K) (e : Fin m → Fin d → K) :
-    (gram X v e).det = (((gram X v e).det.re : ℝ) : ℂ) := by
+theorem gram_det_real
+    {d m : ℕ} (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ)
+    (v : InfinitePlace K) (e : Fin m → Fin d → K)
+    : (gram X v e).det = (((gram X v e).det.re : ℝ) : ℂ) := by
   have h := Formalism.HN.HeightGram.norm_det_gramPl (Pi.basisFun K (Fin d)) X v e
   have hg : gram X v e = Formalism.HN.gramPl (Pi.basisFun K (Fin d)) X v e := rfl
   rw [← hg] at h
   have him : (gram X v e).det.im = 0 := by
     rw [← Complex.abs_re_eq_norm, h, abs_of_nonneg]
-    rw [← h]; exact norm_nonneg _
+    rw [← h]
+    exact norm_nonneg _
   exact Complex.ext (by simp) (by simp [him])
 
-theorem gram_re_ne [_root_.NumberField.IsTotallyComplex K] {d : ℕ}
-    (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ) (hX : ∀ v, IsUnit (X v).det)
-    (e : Fin d → Fin d → K) (he : LinearIndependent K e) (v : InfinitePlace K) :
-    (gram X v e).det.re ≠ 0 := by
-  obtain ⟨h1, -⟩ := Formalism.HN.height_gram_determinant K (Fin d → K) (Fin d) (Pi.basisFun K (Fin d)) X hX d e he
-  obtain ⟨-, -, hpos⟩ := Formalism.HN.place_lattice_structure K (Fin d → K) (Fin d) (Pi.basisFun K (Fin d)) X hX
-    (Submodule.span (𝓞 K) (Set.range e)) (Submodule.fg_span (Set.finite_range e))
+theorem gram_re_ne
+    [_root_.NumberField.IsTotallyComplex K]
+    {d : ℕ} (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ) (hX : ∀ v, IsUnit (X v).det)
+    (e : Fin d → Fin d → K) (he : LinearIndependent K e)
+    (v : InfinitePlace K)
+    : (gram X v e).det.re ≠ 0 := by
+  obtain ⟨h1, -⟩ :=
+    Formalism.HN.height_gram_determinant K (Fin d → K) (Fin d) (Pi.basisFun K (Fin d)) X hX d e he
+  obtain ⟨-, -, hpos⟩ :=
+    Formalism.HN.place_lattice_structure K (Fin d → K) (Fin d) (Pi.basisFun K (Fin d)) X hX
+      (Submodule.span (𝓞 K) (Set.range e)) (Submodule.fg_span (Set.finite_range e))
   rw [h1] at hpos
   exact (Finset.prod_ne_zero_iff.mp hpos.ne') v (Finset.mem_univ v)
 
-theorem gram_ne [_root_.NumberField.IsTotallyComplex K] {d : ℕ}
-    (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ) (hX : ∀ v, IsUnit (X v).det)
-    (e : Fin d → Fin d → K) (he : LinearIndependent K e) (v : InfinitePlace K) :
-    (gram X v e).det ≠ 0 := by
+theorem gram_ne
+    [_root_.NumberField.IsTotallyComplex K]
+    {d : ℕ} (X : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ) (hX : ∀ v, IsUnit (X v).det)
+    (e : Fin d → Fin d → K) (he : LinearIndependent K e)
+    (v : InfinitePlace K)
+    : (gram X v e).det ≠ 0 := by
   intro h
   apply gram_re_ne X hX e he v
-  rw [h]; simp
+  rw [h]
+  simp
 
 theorem std_li (d : ℕ) : LinearIndependent K (fun i => (Pi.single i 1 : Fin d → K)) := by
   have : (fun i => (Pi.single i 1 : Fin d → K)) = ⇑(Pi.basisFun K (Fin d)) := by
@@ -116,9 +131,10 @@ theorem std_li (d : ℕ) : LinearIndependent K (fun i => (Pi.single i 1 : Fin d 
   rw [this]
   exact (Pi.basisFun K (Fin d)).linearIndependent
 
-theorem image_li {d : ℕ} (φ : Matrix (Fin d) (Fin d) K) (hφ : IsUnit φ.det)
-    (e : Fin d → Fin d → K) (he : LinearIndependent K e) :
-    LinearIndependent K (fun i => φ *ᵥ e i) := by
+theorem image_li
+    {d : ℕ} (φ : Matrix (Fin d) (Fin d) K) (hφ : IsUnit φ.det) (e : Fin d → Fin d → K)
+    (he : LinearIndependent K e)
+    : LinearIndependent K (fun i => φ *ᵥ e i) := by
   have hu : IsUnit φ := (Matrix.isUnit_iff_isUnit_det φ).mpr hφ
   have hinj : Function.Injective φ.mulVec := Matrix.mulVec_injective_iff_isUnit.mpr hu
   exact he.map' (Matrix.mulVecLin φ) (LinearMap.ker_eq_bot.mpr hinj)
@@ -127,10 +143,12 @@ theorem vec_expand {d : ℕ} (x : Fin d → K) : x = ∑ k, x k • (Pi.single k
   funext i
   simp [Finset.sum_apply, Pi.single_apply]
 
-theorem gram_image [_root_.NumberField.IsTotallyComplex K] {d : ℕ}
-    (XS XT : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ) (hXS : ∀ v, IsUnit (XS v).det)
-    (φ : Matrix (Fin d) (Fin d) K) (e : Fin d → Fin d → K) (v : InfinitePlace K) :
-    (gram XT v (fun i => φ *ᵥ e i)).det = (detRatio XS XT φ v : ℂ) * (gram XS v e).det := by
+theorem gram_image
+    [_root_.NumberField.IsTotallyComplex K]
+    {d : ℕ} (XS XT : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ) (hXS : ∀ v, IsUnit (XS v).det)
+    (φ : Matrix (Fin d) (Fin d) K) (e : Fin d → Fin d → K)
+    (v : InfinitePlace K)
+    : (gram XT v (fun i => φ *ᵥ e i)).det = (detRatio XS XT φ v : ℂ) * (gram XS v e).det := by
   let γ : Matrix (Fin d) (Fin d) K := Matrix.of fun k i => e i k
   have he : e = fun i => ∑ k, γ k i • (Pi.single k 1 : Fin d → K) := by
     funext i; exact vec_expand (e i)
@@ -155,15 +173,16 @@ section Lat
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
-def matEquiv {d : ℕ} (φ : Matrix (Fin d) (Fin d) K) (hφ : IsUnit φ.det) :
-    (Fin d → K) ≃ₗ[𝓞 K] (Fin d → K) :=
-  LinearEquiv.ofBijective ((Matrix.mulVecLin φ).restrictScalars (𝓞 K))
-    ⟨Matrix.mulVec_injective_iff_isUnit.mpr ((Matrix.isUnit_iff_isUnit_det φ).mpr hφ),
-     Matrix.mulVec_surjective_iff_isUnit.mpr ((Matrix.isUnit_iff_isUnit_det φ).mpr hφ)⟩
+def matEquiv {d : ℕ} (φ : Matrix (Fin d) (Fin d) K) (hφ : IsUnit φ.det)
+    : (Fin d → K) ≃ₗ[𝓞 K] (Fin d → K) :=
+  LinearEquiv.ofBijective ((Matrix.mulVecLin φ).restrictScalars (𝓞 K)) ⟨
+    Matrix.mulVec_injective_iff_isUnit.mpr ((Matrix.isUnit_iff_isUnit_det φ).mpr hφ),
+    Matrix.mulVec_surjective_iff_isUnit.mpr ((Matrix.isUnit_iff_isUnit_det φ).mpr hφ)
+  ⟩
 
-theorem matLat_eq_map {d : ℕ} (φ : Matrix (Fin d) (Fin d) K) (hφ : IsUnit φ.det)
-    (A : Submodule (𝓞 K) (Fin d → K)) :
-    matLat φ A = A.map (matEquiv φ hφ : (Fin d → K) →ₗ[𝓞 K] (Fin d → K)) := by
+theorem matLat_eq_map
+    {d : ℕ} (φ : Matrix (Fin d) (Fin d) K) (hφ : IsUnit φ.det) (A : Submodule (𝓞 K) (Fin d → K))
+    : matLat φ A = A.map (matEquiv φ hφ : (Fin d → K) →ₗ[𝓞 K] (Fin d → K)) := by
   ext x
   rw [matLat, Submodule.mem_map, Submodule.mem_map]
   constructor
@@ -172,16 +191,20 @@ theorem matLat_eq_map {d : ℕ} (φ : Matrix (Fin d) (Fin d) K) (hφ : IsUnit φ
   · rintro ⟨y, hy, rfl⟩
     exact ⟨y, hy, rfl⟩
 
-theorem matLat_lattice {d : ℕ} (φ : Matrix (Fin d) (Fin d) K) (hφ : IsUnit φ.det)
-    (L : Submodule (𝓞 K) (Fin d → K)) (hL : Submodule.IsLattice K L) :
-    Submodule.IsLattice K (matLat φ L) := by
+theorem matLat_lattice
+    {d : ℕ} (φ : Matrix (Fin d) (Fin d) K) (hφ : IsUnit φ.det) (L : Submodule (𝓞 K) (Fin d → K))
+    (hL : Submodule.IsLattice K L)
+    : Submodule.IsLattice K (matLat φ L) := by
   exact Submodule.IsLattice.of_fg K ((Submodule.IsLattice.fg (self := hL)).map _)
 
-theorem locS_map {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W] (S : Submonoid R)
-    (f : W ≃ₗ[R] W) (A : Submodule R W) :
-    Formalism.HermitianLatticesTheory.locS S (A.map (f : W →ₗ[R] W)) = (Formalism.HermitianLatticesTheory.locS S A).map (f : W →ₗ[R] W) := by
+theorem locS_map
+    {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W]
+    (S : Submonoid R) (f : W ≃ₗ[R] W) (A : Submodule R W)
+    : Formalism.HermitianLatticesTheory.locS S (A.map (f : W →ₗ[R] W))
+      = (Formalism.HermitianLatticesTheory.locS S A).map (f : W →ₗ[R] W) := by
   ext x
-  rw [Submodule.mem_map_equiv, Formalism.HermitianLatticesTheory.locBasic_mem_locS, Formalism.HermitianLatticesTheory.locBasic_mem_locS]
+  rw [Submodule.mem_map_equiv, Formalism.HermitianLatticesTheory.locBasic_mem_locS,
+    Formalism.HermitianLatticesTheory.locBasic_mem_locS]
   constructor
   · rintro ⟨s, hs, hx⟩
     refine ⟨s, hs, ?_⟩
@@ -192,32 +215,39 @@ theorem locS_map {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W] (S : S
     rw [Submodule.mem_map_equiv]
     simpa [map_smul] using hx
 
-theorem locS_locS_of_le {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W]
-    {S T : Submonoid R} (hST : S ≤ T) (A : Submodule R W) :
-    Formalism.HermitianLatticesTheory.locS T (Formalism.HermitianLatticesTheory.locS S A) = Formalism.HermitianLatticesTheory.locS T A := by
+theorem locS_locS_of_le
+    {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W]
+    {S T : Submonoid R} (hST : S ≤ T)
+    (A : Submodule R W)
+    : Formalism.HermitianLatticesTheory.locS T (Formalism.HermitianLatticesTheory.locS S A)
+      = Formalism.HermitianLatticesTheory.locS T A := by
   apply le_antisymm
   · intro x hx
     obtain ⟨t, ht, hx⟩ := Formalism.HermitianLatticesTheory.locBasic_mem_locS.mp hx
     obtain ⟨s, hs, hx⟩ := Formalism.HermitianLatticesTheory.locBasic_mem_locS.mp hx
-    exact Formalism.HermitianLatticesTheory.locBasic_mem_locS.mpr ⟨s * t, T.mul_mem (hST hs) ht, by rwa [mul_smul]⟩
-  · exact Formalism.HermitianLatticesTheory.locBasic_locS_mono T (Formalism.HermitianLatticesTheory.locBasic_le_locS S A)
+    exact Formalism.HermitianLatticesTheory.locBasic_mem_locS.mpr
+      ⟨s * t, T.mul_mem (hST hs) ht, by rwa [mul_smul]⟩
+  · exact Formalism.HermitianLatticesTheory.locBasic_locS_mono T
+      (Formalism.HermitianLatticesTheory.locBasic_le_locS S A)
 
-theorem span_image {d : ℕ} (φ : Matrix (Fin d) (Fin d) K) (e : Fin d → Fin d → K) :
-    Submodule.span (𝓞 K) (Set.range fun i => φ *ᵥ e i) =
-      matLat φ (Submodule.span (𝓞 K) (Set.range e)) := by
+theorem span_image {d : ℕ} (φ : Matrix (Fin d) (Fin d) K) (e : Fin d → Fin d → K)
+    : Submodule.span (𝓞 K) (Set.range fun i => φ *ᵥ e i)
+      = matLat φ (Submodule.span (𝓞 K) (Set.range e)) := by
   rw [matLat, Submodule.map_span, ← Set.range_comp]
   rfl
 
-theorem isLocBasis_image {d : ℕ} (φ : Matrix (Fin d) (Fin d) K) (hφ : IsUnit φ.det)
-    (L : Submodule (𝓞 K) (Fin d → K)) (w : HeightOneSpectrum (𝓞 K)) (e : Fin d → Fin d → K)
-    (he : IsLocBasis L w e) : IsLocBasis (matLat φ L) w (fun i => φ *ᵥ e i) := by
+theorem isLocBasis_image
+    {d : ℕ} (φ : Matrix (Fin d) (Fin d) K) (hφ : IsUnit φ.det) (L : Submodule (𝓞 K) (Fin d → K))
+    (w : HeightOneSpectrum (𝓞 K)) (e : Fin d → Fin d → K) (he : IsLocBasis L w e)
+    : IsLocBasis (matLat φ L) w (fun i => φ *ᵥ e i) := by
   refine ⟨image_li φ hφ e he.1, ?_⟩
   have h2 := he.2
   unfold Formalism.HermitianLatticesTheory.loc at h2 ⊢
   rw [span_image, matLat_eq_map φ hφ, matLat_eq_map φ hφ, locS_map, locS_map, h2]
 
-theorem hcompl_le_conj (w : HeightOneSpectrum (𝓞 K)) :
-    Formalism.HermitianLatticesTheory.hcompl (K := K) w.asIdeal ≤ (conjPl w).asIdeal.primeCompl := by
+theorem hcompl_le_conj (w : HeightOneSpectrum (𝓞 K))
+    : Formalism.HermitianLatticesTheory.hcompl (K := K) w.asIdeal
+      ≤ (conjPl w).asIdeal.primeCompl := by
   unfold Formalism.HermitianLatticesTheory.hcompl
   rw [Submonoid.closure_le]
   intro s hs
@@ -229,32 +259,52 @@ theorem hcompl_le_conj (w : HeightOneSpectrum (𝓞 K)) :
   show (u : K) = star (star (u : K))
   rw [star_star]
 
-theorem localization_eq_and_conj_eq_of_semilocalization_eq (w : HeightOneSpectrum (𝓞 K)) {d : ℕ} (A B : Submodule (𝓞 K) (Fin d → K))
-    (h : Formalism.HermitianLatticesTheory.loc (K := K) w.asIdeal A = Formalism.HermitianLatticesTheory.loc (K := K) w.asIdeal B) :
-    Formalism.HermitianLatticesTheory.localization₂ w.asIdeal A = Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B ∧
-      Formalism.HermitianLatticesTheory.localization₂ (conjPl w).asIdeal A = Formalism.HermitianLatticesTheory.localization₂ (conjPl w).asIdeal B := by
-  have key : ∀ T : Submonoid (𝓞 K), Formalism.HermitianLatticesTheory.hcompl (K := K) w.asIdeal ≤ T →
-      Formalism.HermitianLatticesTheory.locS T A = Formalism.HermitianLatticesTheory.locS T B := by
+theorem localization_eq_and_conj_eq_of_semilocalization_eq
+    (w : HeightOneSpectrum (𝓞 K))
+    {d : ℕ} (A B : Submodule (𝓞 K) (Fin d → K))
+    (h : Formalism.HermitianLatticesTheory.loc (K := K) w.asIdeal A
+      = Formalism.HermitianLatticesTheory.loc (K := K) w.asIdeal B)
+    : Formalism.HermitianLatticesTheory.localization₂ w.asIdeal A
+        = Formalism.HermitianLatticesTheory.localization₂ w.asIdeal B
+      ∧ Formalism.HermitianLatticesTheory.localization₂ (conjPl w).asIdeal A
+        = Formalism.HermitianLatticesTheory.localization₂ (conjPl w).asIdeal B := by
+  have key
+      : ∀ T : Submonoid (𝓞 K),
+        Formalism.HermitianLatticesTheory.hcompl (K := K) w.asIdeal ≤ T
+          → Formalism.HermitianLatticesTheory.locS T A
+            = Formalism.HermitianLatticesTheory.locS T B := by
     intro T hT
     rw [← locS_locS_of_le hT A, ← locS_locS_of_le hT B]
     unfold Formalism.HermitianLatticesTheory.loc at h
     rw [h]
-  exact ⟨key _ (Formalism.HermitianLatticesTheory.locBasic_hcompl_le (K := K) w.asIdeal), key _ (hcompl_le_conj w)⟩
+  exact ⟨
+    key _ (Formalism.HermitianLatticesTheory.locBasic_hcompl_le (K := K) w.asIdeal),
+    key _ (hcompl_le_conj w)
+  ⟩
 
-theorem lidx_congr {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W] (p : Ideal R)
-    [p.IsPrime] (A A' B B' : Submodule R W) (hA : Formalism.HermitianLatticesTheory.localization₂ p A = Formalism.HermitianLatticesTheory.localization₂ p A')
-    (hB : Formalism.HermitianLatticesTheory.localization₂ p B = Formalism.HermitianLatticesTheory.localization₂ p B') :
-    Formalism.HermitianLatticesTheory.lidx p A B = Formalism.HermitianLatticesTheory.lidx p A' B' := by
-  have hAB : Formalism.HermitianLatticesTheory.localization₂ p (A ⊓ B) = Formalism.HermitianLatticesTheory.localization₂ p (A' ⊓ B') := by
+theorem lidx_congr
+    {R W : Type*} [CommRing R] [AddCommGroup W] [Module R W]
+    (p : Ideal R) [p.IsPrime]
+    (A A' B B' : Submodule R W)
+    (hA : Formalism.HermitianLatticesTheory.localization₂ p A
+      = Formalism.HermitianLatticesTheory.localization₂ p A')
+    (hB : Formalism.HermitianLatticesTheory.localization₂ p B
+      = Formalism.HermitianLatticesTheory.localization₂ p B')
+    : Formalism.HermitianLatticesTheory.lidx p A B
+      = Formalism.HermitianLatticesTheory.lidx p A' B' := by
+  have hAB
+      : Formalism.HermitianLatticesTheory.localization₂ p (A ⊓ B)
+        = Formalism.HermitianLatticesTheory.localization₂ p (A' ⊓ B') := by
     unfold Formalism.HermitianLatticesTheory.localization₂ at hA hB ⊢
-    rw [Formalism.HermitianLatticesTheory.locBasic_locS_inf, Formalism.HermitianLatticesTheory.locBasic_locS_inf, hA, hB]
+    rw [Formalism.HermitianLatticesTheory.locBasic_locS_inf,
+      Formalism.HermitianLatticesTheory.locBasic_locS_inf, hA, hB]
   unfold Formalism.HermitianLatticesTheory.lidx Formalism.HermitianLatticesTheory.locLen
   rw [hA, hB, hAB]
 
-theorem exists_coords {d : ℕ} (b : Fin d → Fin d → K) (hb : LinearIndependent K b)
-    (f : Fin d → Fin d → K) : ∃ γ : Matrix (Fin d) (Fin d) K, f = fun i => ∑ k, γ k i • b k := by
-  have hsp : Submodule.span K (Set.range b) = ⊤ :=
-    hb.span_eq_top_of_card_eq_finrank' (by simp)
+theorem exists_coords
+    {d : ℕ} (b : Fin d → Fin d → K) (hb : LinearIndependent K b) (f : Fin d → Fin d → K)
+    : ∃ γ : Matrix (Fin d) (Fin d) K, f = fun i => ∑ k, γ k i • b k := by
+  have hsp : Submodule.span K (Set.range b) = ⊤ := hb.span_eq_top_of_card_eq_finrank' (by simp)
   let B := Basis.mk hb (by rw [hsp])
   refine ⟨Matrix.of fun k i => B.repr (f i) k, funext fun i => ?_⟩
   have h := (B.sum_repr (f i)).symm
@@ -266,8 +316,10 @@ section Val
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
-theorem vw_prod (hV : ValBasic) (w : HeightOneSpectrum (𝓞 K)) {J : Type} (s : Finset J)
-    (a : J → K) (ha : ∀ j, a j ≠ 0) : vw w (∏ j ∈ s, a j) = ∑ j ∈ s, vw w (a j) := by
+theorem vw_prod
+    (hV : ValBasic) (w : HeightOneSpectrum (𝓞 K))
+    {J : Type} (s : Finset J) (a : J → K) (ha : ∀ j, a j ≠ 0)
+    : vw w (∏ j ∈ s, a j) = ∑ j ∈ s, vw w (a j) := by
   classical
   obtain ⟨hmul, -, -, -, h1, -, -⟩ := hV K w
   induction s using Finset.induction_on with
@@ -276,20 +328,22 @@ theorem vw_prod (hV : ValBasic) (w : HeightOneSpectrum (𝓞 K)) {J : Type} (s :
     rw [Finset.prod_insert hj, Finset.sum_insert hj,
       hmul _ _ (ha j) (Finset.prod_ne_zero_iff.mpr fun i _ => ha i), ih]
 
-theorem vw_pow (hV : ValBasic) (w : HeightOneSpectrum (𝓞 K)) (a : K) (ha : a ≠ 0) (n : ℕ) :
-    vw w (a ^ n) = n * vw w a := by
+theorem vw_pow (hV : ValBasic) (w : HeightOneSpectrum (𝓞 K)) (a : K) (ha : a ≠ 0) (n : ℕ)
+    : vw w (a ^ n) = n * vw w a := by
   obtain ⟨hmul, -, -, -, h1, -, -⟩ := hV K w
   induction n with
   | zero => simp [h1]
   | succ n ih =>
     rw [pow_succ, hmul _ _ (pow_ne_zero n ha) ha, ih]
-    push_cast; ring
+    push_cast
+    ring
 
-theorem detRatio_ne [_root_.NumberField.IsTotallyComplex K] {d : ℕ}
-    (XS XT : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ)
-    (hXS : ∀ v, IsUnit (XS v).det) (hXT : ∀ v, IsUnit (XT v).det)
-    (φ : Matrix (Fin d) (Fin d) K) (hφ : IsUnit φ.det) (v : InfinitePlace K) :
-    detRatio XS XT φ v ≠ 0 :=
+theorem detRatio_ne
+    [_root_.NumberField.IsTotallyComplex K]
+    {d : ℕ} (XS XT : InfinitePlace K → Matrix (Fin d) (Fin d) ℂ) (hXS : ∀ v, IsUnit (XS v).det)
+    (hXT : ∀ v, IsUnit (XT v).det) (φ : Matrix (Fin d) (Fin d) K) (hφ : IsUnit φ.det)
+    (v : InfinitePlace K)
+    : detRatio XS XT φ v ≠ 0 :=
   div_ne_zero (gram_re_ne XT hXT _ (image_li φ hφ _ (std_li d)) v)
     (gram_re_ne XS hXS _ (std_li d) v)
 
@@ -297,58 +351,75 @@ end Val
 
 section Add
 
-variable {R K V : Type*} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K]
-  [IsFractionRing R K] [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
+variable
+  {R K V : Type*} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+  [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
 
-theorem lidx_add (p : Ideal R) [p.IsPrime] (A B C : Submodule R V)
-    (hA : Submodule.IsFullLattice K A) (hB : Submodule.IsFullLattice K B) (hC : Submodule.IsFullLattice K C) :
-    Formalism.HermitianLatticesTheory.lidx p A C = Formalism.HermitianLatticesTheory.lidx p A B + Formalism.HermitianLatticesTheory.lidx p B C := by
-  have hfin : ∀ X Y : Submodule R V, X.FG → Formalism.HermitianLatticesTheory.locS (nonZeroDivisors R) Y = ⊤ →
-      Module.length R (↥(Formalism.HermitianLatticesTheory.localization₂ p X) ⧸
-        (Formalism.HermitianLatticesTheory.localization₂ p Y).comap (Formalism.HermitianLatticesTheory.localization₂ p X).subtype) ≠ ⊤ := by
+theorem lidx_add
+    (p : Ideal R) [p.IsPrime]
+    (A B C : Submodule R V) (hA : Submodule.IsFullLattice K A) (hB : Submodule.IsFullLattice K B)
+    (hC : Submodule.IsFullLattice K C)
+    : Formalism.HermitianLatticesTheory.lidx p A C
+      = Formalism.HermitianLatticesTheory.lidx p A B
+        + Formalism.HermitianLatticesTheory.lidx p B C := by
+  have hfin
+      : ∀ X Y : Submodule R V,
+        X.FG → Formalism.HermitianLatticesTheory.locS (nonZeroDivisors R) Y = ⊤
+          → Module.length R
+              (↥(Formalism.HermitianLatticesTheory.localization₂ p X) ⧸
+                (Formalism.HermitianLatticesTheory.localization₂ p Y).comap (Formalism.HermitianLatticesTheory.localization₂ p X).subtype)
+            ≠ ⊤ := by
     intro X Y hX hY
     obtain ⟨d, hd, hdY⟩ :=
-      Formalism.HermitianLatticesTheory.indexBasic_denom (nonZeroDivisors R) X Y hX (by rw [hY]; exact le_top)
-    exact Module.length_ne_top_iff.mpr (Formalism.HermitianLatticesTheory.indexBasic_finLen p X Y hX hd hdY)
-  have hAt := Formalism.HermitianLatticesTheory.indexBasic_locS_top (K := K) A
-    (Submodule.IsFullLattice.span_eq_top (self := hA))
-  have hBt := Formalism.HermitianLatticesTheory.indexBasic_locS_top (K := K) B
-    (Submodule.IsFullLattice.span_eq_top (self := hB))
-  have hCt := Formalism.HermitianLatticesTheory.indexBasic_locS_top (K := K) C
-    (Submodule.IsFullLattice.span_eq_top (self := hC))
+      Formalism.HermitianLatticesTheory.indexBasic_denom (nonZeroDivisors R) X Y hX
+        (by rw [hY]; exact le_top)
+    exact Module.length_ne_top_iff.mpr (Formalism.HermitianLatticesTheory.indexBasic_finLen p X Y hX
+      hd hdY)
+  have hAt :=
+    Formalism.HermitianLatticesTheory.indexBasic_locS_top (K := K) A
+      (Submodule.IsFullLattice.span_eq_top (self := hA))
+  have hBt :=
+    Formalism.HermitianLatticesTheory.indexBasic_locS_top (K := K) B
+      (Submodule.IsFullLattice.span_eq_top (self := hB))
+  have hCt :=
+    Formalism.HermitianLatticesTheory.indexBasic_locS_top (K := K) C
+      (Submodule.IsFullLattice.span_eq_top (self := hC))
   have hAfg : A.FG := Submodule.IsLattice.fg (self := hA.toIsLattice)
   have hBfg : B.FG := Submodule.IsLattice.fg (self := hB.toIsLattice)
   have hCfg : C.FG := Submodule.IsLattice.fg (self := hC.toIsLattice)
   have hDt : Formalism.HermitianLatticesTheory.locS (nonZeroDivisors R) (A ⊓ B ⊓ C) = ⊤ := by
-    rw [Formalism.HermitianLatticesTheory.locBasic_locS_inf, Formalism.HermitianLatticesTheory.locBasic_locS_inf, hAt, hBt, hCt]
+    rw [Formalism.HermitianLatticesTheory.locBasic_locS_inf,
+      Formalism.HermitianLatticesTheory.locBasic_locS_inf, hAt, hBt, hCt]
     simp
   have hAD := hfin A _ hAfg hDt
   have hBD := hfin B _ hBfg hDt
   have hCD := hfin C _ hCfg hDt
-  rw [Formalism.HermitianLatticesTheory.indexBasic_lidx_via p A C (A ⊓ B ⊓ C) (le_trans inf_le_left inf_le_left)
-      inf_le_right hAD hCD,
-    Formalism.HermitianLatticesTheory.indexBasic_lidx_via p A B (A ⊓ B ⊓ C) (le_trans inf_le_left inf_le_left)
-      (le_trans inf_le_left inf_le_right) hAD hBD,
-    Formalism.HermitianLatticesTheory.indexBasic_lidx_via p B C (A ⊓ B ⊓ C) (le_trans inf_le_left inf_le_right)
-      inf_le_right hBD hCD]
+  rw [Formalism.HermitianLatticesTheory.indexBasic_lidx_via p A C (A ⊓ B ⊓ C)
+      (le_trans inf_le_left inf_le_left) inf_le_right hAD hCD,
+    Formalism.HermitianLatticesTheory.indexBasic_lidx_via p A B (A ⊓ B ⊓ C)
+      (le_trans inf_le_left inf_le_left) (le_trans inf_le_left inf_le_right) hAD hBD,
+    Formalism.HermitianLatticesTheory.indexBasic_lidx_via p B C (A ⊓ B ⊓ C)
+      (le_trans inf_le_left inf_le_right) inf_le_right hBD hCD]
   ring
 
 end Add
 
-theorem key_alg {J : Type} [Fintype J] (D : ℕ) (gE0 gE1 dR0 dR1 G0 G1 Ny κ ρ : ℂ)
-    (gW0 gW1 dθ0 dθ1 gT0 gT1 Nz : J → ℂ)
+theorem key_alg
+    {J : Type} [Fintype J]
+    (D : ℕ) (gE0 gE1 dR0 dR1 G0 G1 Ny κ ρ : ℂ) (gW0 gW1 dθ0 dθ1 gT0 gT1 Nz : J → ℂ)
     (h1 : gE1 = Ny * gE0) (h21 : gE1 = dR1 * G1) (h20 : gE0 = dR0 * G0)
     (h31 : dR1 = (κ * ρ) ^ D * ∏ j, dθ1 j) (h30 : dR0 = κ ^ D * ∏ j, dθ0 j)
     (h4 : ∀ j, gW1 j = Nz j * gW0 j) (h51 : ∀ j, gW1 j = dθ1 j * gT1 j)
-    (h50 : ∀ j, gW0 j = dθ0 j * gT0 j) (hκ : κ ≠ 0) (hθ : ∀ j, dθ0 j ≠ 0) :
-    ρ ^ D * G1 * ∏ j, (Nz j * gT0 j) = Ny * G0 * ∏ j, gT1 j := by
+    (h50 : ∀ j, gW0 j = dθ0 j * gT0 j) (hκ : κ ≠ 0) (hθ : ∀ j, dθ0 j ≠ 0)
+    : ρ ^ D * G1 * ∏ j, (Nz j * gT0 j) = Ny * G0 * ∏ j, gT1 j := by
   have hP : (∏ j, dθ1 j) * ∏ j, gT1 j = (∏ j, dθ0 j) * ∏ j, (Nz j * gT0 j) := by
     rw [← Finset.prod_mul_distrib, ← Finset.prod_mul_distrib]
     exact Finset.prod_congr rfl fun j _ => by rw [← h51, h4, h50]; ring
   have hne : κ ^ D * ∏ j, dθ0 j ≠ 0 :=
     mul_ne_zero (pow_ne_zero _ hκ) (Finset.prod_ne_zero_iff.mpr fun j _ => hθ j)
   apply mul_right_cancel₀ hne
-  calc (ρ ^ D * G1 * ∏ j, (Nz j * gT0 j)) * (κ ^ D * ∏ j, dθ0 j)
+  calc
+    (ρ ^ D * G1 * ∏ j, (Nz j * gT0 j)) * (κ ^ D * ∏ j, dθ0 j)
       = (κ * ρ) ^ D * G1 * ((∏ j, dθ0 j) * ∏ j, (Nz j * gT0 j)) := by rw [mul_pow]; ring
     _ = (κ * ρ) ^ D * G1 * ((∏ j, dθ1 j) * ∏ j, gT1 j) := by rw [hP]
     _ = gE1 * ∏ j, gT1 j := by rw [h21, h31]; ring
@@ -359,14 +430,16 @@ section Local
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
-theorem idx_change_img (hIC : IdxChange) {d : ℕ} (ι0 ι1 : Matrix (Fin d) (Fin d) K)
-    (hι0 : IsUnit ι0.det) (hι1 : IsUnit ι1.det) (L0 L1 : Submodule (𝓞 K) (Fin d → K))
-    (hL1 : Submodule.IsLattice K L1) (w : HeightOneSpectrum (𝓞 K))
-    (e0 e1 : Fin d → Fin d → K) (he0 : IsLocBasis L0 w e0) (he1 : IsLocBasis L1 w e1) :
-    ∃ γ : Matrix (Fin d) (Fin d) K,
-      (fun i => ι1 *ᵥ e1 i) = (fun i => ∑ k, γ k i • (ι0 *ᵥ e0 k)) ∧
-      idx w (matLat ι0 L0) (matLat ι1 L1) = vw w γ.det ∧
-      idx (conjPl w) (matLat ι0 L0) (matLat ι1 L1) = vw (conjPl w) γ.det := by
+theorem idx_change_img
+    (hIC : IdxChange)
+    {d : ℕ} (ι0 ι1 : Matrix (Fin d) (Fin d) K) (hι0 : IsUnit ι0.det) (hι1 : IsUnit ι1.det)
+    (L0 L1 : Submodule (𝓞 K) (Fin d → K)) (hL1 : Submodule.IsLattice K L1)
+    (w : HeightOneSpectrum (𝓞 K)) (e0 e1 : Fin d → Fin d → K)
+    (he0 : IsLocBasis L0 w e0) (he1 : IsLocBasis L1 w e1)
+    : ∃ γ : Matrix (Fin d) (Fin d) K,
+      (fun i => ι1 *ᵥ e1 i) = (fun i => ∑ k, γ k i • (ι0 *ᵥ e0 k))
+        ∧ idx w (matLat ι0 L0) (matLat ι1 L1) = vw w γ.det
+        ∧ idx (conjPl w) (matLat ι0 L0) (matLat ι1 L1) = vw (conjPl w) γ.det := by
   have li0 := image_li ι0 hι0 e0 he0.1
   obtain ⟨γ, hγ⟩ := exists_coords _ li0 (fun i => ι1 *ᵥ e1 i)
   have hlb0 := isLocBasis_image ι0 hι0 L0 w e0 he0
@@ -386,32 +459,37 @@ section Supp
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
-theorem supp_add {α : Type*} (f g : α → ℝ) (hf : (Function.support f).Finite)
-    (hg : (Function.support g).Finite) : (Function.support fun x => f x + g x).Finite :=
+theorem supp_add
+    {α : Type*} (f g : α → ℝ) (hf : (Function.support f).Finite) (hg : (Function.support g).Finite)
+    : (Function.support fun x => f x + g x).Finite :=
   (hf.union hg).subset (Function.support_add f g)
 
-theorem supp_sum {α J : Type*} [Fintype J] (g : J → α → ℝ)
-    (h : ∀ j, (Function.support (g j)).Finite) :
-    (Function.support fun x => ∑ j, g j x).Finite := by
+theorem supp_sum
+    {α J : Type*} [Fintype J] (g : J → α → ℝ) (h : ∀ j, (Function.support (g j)).Finite)
+    : (Function.support fun x => ∑ j, g j x).Finite := by
   refine (Set.finite_iUnion h).subset ?_
   intro x hx
   by_contra hc
   simp only [Set.mem_iUnion, not_exists, Function.mem_support, not_not] at hc
   exact hx (Finset.sum_eq_zero fun j _ => hc j)
 
-theorem supp_conj (hV : ValBasic) (F : HeightOneSpectrum (𝓞 K) → ℝ)
-    (hF : (Function.support F).Finite) : (Function.support fun w => F (conjPl w)).Finite := by
-  have hinj : Function.Injective (conjPl : HeightOneSpectrum (𝓞 K) → HeightOneSpectrum (𝓞 K)) :=
-    fun a b h => by rw [← (hV K a).2.2.2.1, h, (hV K b).2.2.2.1]
+theorem supp_conj
+    (hV : ValBasic) (F : HeightOneSpectrum (𝓞 K) → ℝ) (hF : (Function.support F).Finite)
+    : (Function.support fun w => F (conjPl w)).Finite := by
+  have hinj : Function.Injective
+      (conjPl : HeightOneSpectrum (𝓞 K) → HeightOneSpectrum (𝓞 K)) := fun a b h => by
+    rw [← (hV K a).2.2.2.1, h, (hV K b).2.2.2.1]
   exact hF.preimage hinj.injOn
 
-theorem G_finite (hV : ValBasic) (hIC : IdxChange) (hLB : LcvBasis) (hPF : ProdFormula)
-    [_root_.NumberField.IsTotallyComplex K] (v0 : InfinitePlace K) (hv0 : IsConjAt v0) (D : ℕ)
-    (XQ : InfinitePlace K → Matrix (Fin D) (Fin D) ℂ) (hXQ : ∀ v, IsUnit (XQ v).det)
+theorem G_finite
+    (hV : ValBasic) (hIC : IdxChange) (hLB : LcvBasis) (hPF : ProdFormula)
+    [_root_.NumberField.IsTotallyComplex K]
+    (v0 : InfinitePlace K) (hv0 : IsConjAt v0)
+    (D : ℕ) (XQ : InfinitePlace K → Matrix (Fin D) (Fin D) ℂ) (hXQ : ∀ v, IsUnit (XQ v).det)
     (abelian₂ : Submodule (𝓞 K) (Fin D → K)) (hLam : Submodule.IsLattice K abelian₂)
     (G : HeightOneSpectrum (𝓞 K) → K) (e : HeightOneSpectrum (𝓞 K) → Fin D → Fin D → K)
-    (he : ∀ w, IsLocBasis abelian₂ w (e w)) (hG : ∀ w, v0.embedding (G w) = (gram XQ v0 (e w)).det) :
-    (Function.support fun w => lw w * (vw w (G w) : ℝ)).Finite := by
+    (he : ∀ w, IsLocBasis abelian₂ w (e w)) (hG : ∀ w, v0.embedding (G w) = (gram XQ v0 (e w)).det)
+    : (Function.support fun w => lw w * (vw w (G w) : ℝ)).Finite := by
   classical
   by_cases hne : Nonempty (HeightOneSpectrum (𝓞 K))
   swap
@@ -437,7 +515,8 @@ theorem G_finite (hV : ValBasic) (hIC : IdxChange) (hLB : LcvBasis) (hPF : ProdF
     exact Submodule.subset_span (by rwa [algebraMap_smul K])
   choose γ hγ using fun w => exists_coords (e w1) hb (e w)
   have hv0' : ∀ a : K, v0.embedding (star a) = starRingEnd ℂ (v0.embedding a) := hv0
-  have hGne : ∀ w, G w ≠ 0 := fun w h => gram_ne XQ hXQ (e w) (he w).1 v0 (by rw [← hG w, h, map_zero])
+  have hGne : ∀ w, G w ≠ 0 := fun w h =>
+    gram_ne XQ hXQ (e w) (he w).1 v0 (by rw [← hG w, h, map_zero])
   have hdet : ∀ w, G w = star (γ w).det * (γ w).det * G w1 := by
     intro w
     apply v0.embedding.injective
@@ -445,9 +524,13 @@ theorem G_finite (hV : ValBasic) (hIC : IdxChange) (hLB : LcvBasis) (hPF : ProdF
   have hγne : ∀ w, (γ w).det ≠ 0 := by
     intro w h
     apply hGne w
-    rw [hdet w, h]; simp
-  have hval : ∀ w, vw w (G w) = idx w (Submodule.span (𝓞 K) (Set.range (e w1))) abelian₂ +
-      idx (conjPl w) (Submodule.span (𝓞 K) (Set.range (e w1))) abelian₂ + vw w (G w1) := by
+    rw [hdet w, h]
+    simp
+  have hval
+      : ∀ w,
+        vw w (G w)
+          = idx w (Submodule.span (𝓞 K) (Set.range (e w1))) abelian₂
+            + idx (conjPl w) (Submodule.span (𝓞 K) (Set.range (e w1))) abelian₂ + vw w (G w1) := by
     intro w
     obtain ⟨hmul, hstar, -, -, -, -, -⟩ := hV K w
     have hloc := he w
@@ -471,6 +554,5 @@ theorem G_finite (hV : ValBasic) (hIC : IdxChange) (hLB : LcvBasis) (hPF : ProdF
 end Supp
 
 end StepBAux
-
 
 end Formalism.DivisionValues

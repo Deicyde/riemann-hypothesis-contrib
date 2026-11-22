@@ -7,7 +7,8 @@ public import ReciprocityTheory.Chebotarev.CyclotomicIrreducibleOfForallIsUnrami
 
 noncomputable section
 
-open NumberField IsDedekindDomain Polynomial GlobalTheory.HenQ Formalism.ConjugateSelfDual GlobalTheory.CuspRep UpperTheory.V.Z.Bc
+open NumberField IsDedekindDomain Polynomial GlobalTheory.HenQ Formalism.ConjugateSelfDual
+  GlobalTheory.CuspRep UpperTheory.V.Z.Bc
 
 namespace UpperTheory.V.Z.Inf
 
@@ -15,8 +16,11 @@ section Primes
 
 variable {K M : Type} [Field K] [NumberField K] [Field M] [NumberField M] [Algebra K M]
 
-private theorem natCast_mem {F : Type} [Field F] [NumberField F] (w : HeightOneSpectrum (𝓞 F)) {q : ℕ}
-    (hq : q.Prime) (hd : q ∣ Ideal.absNorm w.asIdeal) : (q : 𝓞 F) ∈ w.asIdeal := by
+private theorem natCast_mem
+    {F : Type} [Field F] [NumberField F]
+    (w : HeightOneSpectrum (𝓞 F))
+    {q : ℕ} (hq : q.Prime) (hd : q ∣ Ideal.absNorm w.asIdeal)
+    : (q : 𝓞 F) ∈ w.asIdeal := by
   have hne : Ideal.absNorm w.asIdeal ≠ 0 := by rw [Ne, Ideal.absNorm_eq_zero_iff]; exact w.ne_bot
   have hcard : Ideal.absNorm w.asIdeal = Nat.card (𝓞 F ⧸ w.asIdeal) := by
     rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]
@@ -34,51 +38,62 @@ private theorem natCast_mem {F : Type} [Field F] [NumberField F] (w : HeightOneS
   rw [← Ideal.Quotient.eq_zero_iff_mem, map_natCast]
   exact h2
 
-private theorem normV_absNorm {F : Type} [Field F] [NumberField F] (w : HeightOneSpectrum (𝓞 F)) :
-    normV w = Ideal.absNorm w.asIdeal := by
+private theorem normV_absNorm {F : Type} [Field F] [NumberField F] (w : HeightOneSpectrum (𝓞 F))
+    : normV w = Ideal.absNorm w.asIdeal := by
   rw [normV, Ideal.absNorm_apply, Submodule.cardQuot_apply]
 
-private theorem absNorm_pow (w : HeightOneSpectrum (𝓞 M)) :
-    Ideal.absNorm w.asIdeal = Ideal.absNorm (w.under (𝓞 K)).asIdeal ^ (w.under (𝓞 K)).asIdeal.inertiaDeg' w.asIdeal := by
+private theorem absNorm_pow (w : HeightOneSpectrum (𝓞 M))
+    : Ideal.absNorm w.asIdeal
+      = Ideal.absNorm (w.under (𝓞 K)).asIdeal ^ (w.under (𝓞 K)).asIdeal.inertiaDeg' w.asIdeal := by
   have : w.asIdeal.LiesOver (w.under (𝓞 K)).asIdeal := ⟨rfl⟩
   have := w.isMaximal
   have := (w.under (𝓞 K)).isMaximal
   rw [Ideal.inertiaDeg'_eq_inertiaDeg, Ideal.absNorm_pow_inertiaDeg]
 
-private theorem sum_ef (hE : Module.finrank K M = 2) (v : HeightOneSpectrum (𝓞 K)) :
-    ∑ P ∈ IsDedekindDomain.primesOverFinset v.asIdeal (𝓞 M), v.asIdeal.ramificationIdx' P * v.asIdeal.inertiaDeg' P = 2 := by
+private theorem sum_ef (hE : Module.finrank K M = 2) (v : HeightOneSpectrum (𝓞 K))
+    : ∑ P ∈ IsDedekindDomain.primesOverFinset v.asIdeal (𝓞 M), v.asIdeal.ramificationIdx' P * v.asIdeal.inertiaDeg' P
+      = 2 := by
   have := v.isMaximal
   rw [← hE]
   exact Ideal.sum_ramification_inertia (𝓞 M) K M v.ne_bot
 
-private theorem mem_over (w : HeightOneSpectrum (𝓞 M)) :
-    w.asIdeal ∈ IsDedekindDomain.primesOverFinset (w.under (𝓞 K)).asIdeal (𝓞 M) := by
+private theorem mem_over (w : HeightOneSpectrum (𝓞 M))
+    : w.asIdeal ∈ IsDedekindDomain.primesOverFinset (w.under (𝓞 K)).asIdeal (𝓞 M) := by
   rw [IsDedekindDomain.mem_primesOverFinset_iff (w.under (𝓞 K)).ne_bot]
   exact ⟨w.isPrime, ⟨rfl⟩⟩
 
-private theorem e_pos (w : HeightOneSpectrum (𝓞 M)) : 0 < (w.under (𝓞 K)).asIdeal.ramificationIdx' w.asIdeal := by
+private theorem e_pos (w : HeightOneSpectrum (𝓞 M))
+    : 0 < (w.under (𝓞 K)).asIdeal.ramificationIdx' w.asIdeal := by
   have : w.asIdeal.LiesOver (w.under (𝓞 K)).asIdeal := ⟨rfl⟩
-  exact Nat.pos_of_ne_zero (Ideal.IsDedekindDomain.ramificationIdx'_ne_zero_of_liesOver _ (w.under (𝓞 K)).ne_bot)
+  exact Nat.pos_of_ne_zero (Ideal.IsDedekindDomain.ramificationIdx'_ne_zero_of_liesOver _
+    (w.under (𝓞 K)).ne_bot)
 
-private theorem f_pos (w : HeightOneSpectrum (𝓞 M)) : 0 < (w.under (𝓞 K)).asIdeal.inertiaDeg' w.asIdeal := by
+private theorem f_pos (w : HeightOneSpectrum (𝓞 M))
+    : 0 < (w.under (𝓞 K)).asIdeal.inertiaDeg' w.asIdeal := by
   have : w.asIdeal.LiesOver (w.under (𝓞 K)).asIdeal := ⟨rfl⟩
   have := (w.under (𝓞 K)).isMaximal
   exact Nat.pos_of_ne_zero (Ideal.inertiaDeg'_ne_zero _ _)
 
-private theorem f_one (hE : Module.finrank K M = 2) {w w' : HeightOneSpectrum (𝓞 M)} (hne : w' ≠ w)
-    (hu : w'.under (𝓞 K) = w.under (𝓞 K)) : (w.under (𝓞 K)).asIdeal.inertiaDeg' w.asIdeal = 1 := by
+private theorem f_one
+    (hE : Module.finrank K M = 2)
+    {w w' : HeightOneSpectrum (𝓞 M)} (hne : w' ≠ w) (hu : w'.under (𝓞 K) = w.under (𝓞 K))
+    : (w.under (𝓞 K)).asIdeal.inertiaDeg' w.asIdeal = 1 := by
   classical
   have h1 := mem_over (K := K) w
   have h2 := mem_over (K := K) w'
   rw [hu] at h2
   have hne' : w.asIdeal ≠ w'.asIdeal := fun h => hne (HeightOneSpectrum.ext h.symm)
-  have hsub : ({w.asIdeal, w'.asIdeal} : Finset (Ideal (𝓞 M))) ⊆
-      IsDedekindDomain.primesOverFinset (w.under (𝓞 K)).asIdeal (𝓞 M) := by
+  have hsub
+      : ({w.asIdeal, w'.asIdeal} : Finset (Ideal (𝓞 M)))
+        ⊆ IsDedekindDomain.primesOverFinset (w.under (𝓞 K)).asIdeal (𝓞 M) := by
     intro x hx
     rw [Finset.mem_insert, Finset.mem_singleton] at hx
     rcases hx with rfl | rfl <;> assumption
-  have hle := Finset.sum_le_sum_of_subset
-    (f := fun P => (w.under (𝓞 K)).asIdeal.ramificationIdx' P * (w.under (𝓞 K)).asIdeal.inertiaDeg' P) hsub
+  have hle :=
+    Finset.sum_le_sum_of_subset
+      (f := fun P =>
+        (w.under (𝓞 K)).asIdeal.ramificationIdx' P * (w.under (𝓞 K)).asIdeal.inertiaDeg' P)
+      hsub
   rw [Finset.sum_pair hne', sum_ef hE] at hle
   have a := e_pos (K := K) w
   have b := f_pos (K := K) w
@@ -88,10 +103,12 @@ private theorem f_one (hE : Module.finrank K M = 2) {w w' : HeightOneSpectrum (�
   have : (w.under (𝓞 K)).asIdeal.inertiaDeg' w.asIdeal ≤ 1 := by nlinarith
   omega
 
-private theorem f_two (hE : Module.finrank K M = 2) (w : HeightOneSpectrum (𝓞 M))
+private theorem f_two
+    (hE : Module.finrank K M = 2)
+    (w : HeightOneSpectrum (𝓞 M))
     (honly : ∀ w' : HeightOneSpectrum (𝓞 M), w'.under (𝓞 K) = w.under (𝓞 K) → w' = w)
-    (he : (w.under (𝓞 K)).asIdeal.ramificationIdx' w.asIdeal = 1) :
-    (w.under (𝓞 K)).asIdeal.inertiaDeg' w.asIdeal = 2 := by
+    (he : (w.under (𝓞 K)).asIdeal.ramificationIdx' w.asIdeal = 1)
+    : (w.under (𝓞 K)).asIdeal.inertiaDeg' w.asIdeal = 2 := by
   classical
   have h := sum_ef (K := K) (M := M) hE (w.under (𝓞 K))
   rw [Finset.sum_eq_single_of_mem w.asIdeal (mem_over w) (fun Q hQ hQw => ?_), he, one_mul] at h
@@ -108,14 +125,19 @@ private theorem f_two (hE : Module.finrank K M = 2) (w : HeightOneSpectrum (𝓞
     have := honly ⟨Q, hQp, hQ0⟩ (HeightOneSpectrum.ext hQl.over.symm)
     exact congrArg HeightOneSpectrum.asIdeal this
 
-private theorem unram_bound (K M : Type) [Field K] [NumberField K] [Field M] [NumberField M] [Algebra K M] :
-    ∃ N : ℕ, ∀ w : HeightOneSpectrum (𝓞 M),
-    ((N.factorial : ℕ) : 𝓞 K) ∉ (w.under (𝓞 K)).asIdeal → (w.under (𝓞 K)).asIdeal.ramificationIdx' w.asIdeal = 1 := by
+private theorem unram_bound
+    (K M : Type) [Field K] [NumberField K] [Field M] [NumberField M] [Algebra K M]
+    : ∃ N : ℕ, ∀ w : HeightOneSpectrum (𝓞 M),
+      ((N.factorial : ℕ) : 𝓞 K) ∉ (w.under (𝓞 K)).asIdeal
+        → (w.under (𝓞 K)).asIdeal.ramificationIdx' w.asIdeal = 1 := by
   obtain ⟨N, hN⟩ := ReciprocityTheory.Cheb.exists_forall_isUnramifiedAt M
   refine ⟨N, fun w hw => ?_⟩
-  have h1 : 1 < Ideal.absNorm (w.under (𝓞 K)).asIdeal := NumberField.HeightOneSpectrum.one_lt_absNorm _
+  have h1 : 1 < Ideal.absNorm (w.under (𝓞 K)).asIdeal :=
+    NumberField.HeightOneSpectrum.one_lt_absNorm _
   have hq := Nat.minFac_prime h1.ne'
-  have hqv : ((Nat.minFac (Ideal.absNorm (w.under (𝓞 K)).asIdeal) : ℕ) : 𝓞 K) ∈ (w.under (𝓞 K)).asIdeal :=
+  have hqv
+      : ((Nat.minFac (Ideal.absNorm (w.under (𝓞 K)).asIdeal) : ℕ) : 𝓞 K)
+        ∈ (w.under (𝓞 K)).asIdeal :=
     natCast_mem _ hq (Nat.minFac_dvd _)
   have hqN : N < Nat.minFac (Ideal.absNorm (w.under (𝓞 K)).asIdeal) := by
     by_contra hle
@@ -125,7 +147,9 @@ private theorem unram_bound (K M : Type) [Field K] [NumberField K] [Field M] [Nu
     rw [hk, Nat.cast_mul]
     exact Ideal.mul_mem_right _ _ hqv
   have hqw : ((Nat.minFac (Ideal.absNorm (w.under (𝓞 K)).asIdeal) : ℕ) : 𝓞 M) ∈ w.asIdeal := by
-    have : algebraMap (𝓞 K) (𝓞 M) ((Nat.minFac (Ideal.absNorm (w.under (𝓞 K)).asIdeal) : ℕ) : 𝓞 K) ∈ w.asIdeal := hqv
+    have : algebraMap (𝓞 K) (𝓞 M) ((Nat.minFac (Ideal.absNorm (w.under (𝓞 K)).asIdeal) : ℕ) : 𝓞 K)
+        ∈ w.asIdeal :=
+      hqv
     rwa [map_natCast] at this
   haveI := w.isPrime
   haveI := hN _ hq hqN w.asIdeal hqw
@@ -138,8 +162,8 @@ private theorem unram_bound (K M : Type) [Field K] [NumberField K] [Field M] [Nu
     rw [map_natCast] at h3
     exact hsq (by simpa using h3)
 
-private theorem exists_over (p : HeightOneSpectrum (𝓞 K)) :
-    ∃ w : HeightOneSpectrum (𝓞 M), w.under (𝓞 K) = p := by
+private theorem exists_over (p : HeightOneSpectrum (𝓞 K))
+    : ∃ w : HeightOneSpectrum (𝓞 M), w.under (𝓞 K) = p := by
   have := p.isMaximal
   obtain ⟨Q, hQm, hQl⟩ := Ideal.exists_maximal_ideal_liesOver_of_isIntegral (S := 𝓞 M) p.asIdeal
   have hQ0 : Q ≠ ⊥ := by
@@ -149,23 +173,30 @@ private theorem exists_over (p : HeightOneSpectrum (𝓞 K)) :
     exact Ideal.comap_bot_of_injective _ (FaithfulSMul.algebraMap_injective _ _)
   exact ⟨⟨Q, hQm.isPrime, hQ0⟩, HeightOneSpectrum.ext hQl.over.symm⟩
 
-private theorem finite_above (S : Set (HeightOneSpectrum (𝓞 K))) (hS : S.Finite) :
-    {w : HeightOneSpectrum (𝓞 M) | w.under (𝓞 K) ∈ S}.Finite := by
+private theorem finite_above (S : Set (HeightOneSpectrum (𝓞 K))) (hS : S.Finite)
+    : {w : HeightOneSpectrum (𝓞 M) | w.under (𝓞 K) ∈ S}.Finite := by
   classical
-  have : {w : HeightOneSpectrum (𝓞 M) | w.under (𝓞 K) ∈ S} ⊆
-      ⋃ p ∈ S, HeightOneSpectrum.asIdeal ⁻¹' (↑(IsDedekindDomain.primesOverFinset (p : HeightOneSpectrum (𝓞 K)).asIdeal (𝓞 M)) : Set (Ideal (𝓞 M))) := by
-    intro w hw
-    exact Set.mem_biUnion hw (mem_over w)
+  have : {w : HeightOneSpectrum (𝓞 M) | w.under (𝓞 K) ∈ S}
+      ⊆ ⋃ p ∈ S, HeightOneSpectrum.asIdeal ⁻¹' (↑(IsDedekindDomain.primesOverFinset (p : HeightOneSpectrum (𝓞 K)).asIdeal (𝓞 M)) : Set (Ideal (𝓞 M))) :=
+    by
+      intro w hw
+      exact Set.mem_biUnion hw (mem_over w)
   refine (hS.biUnion fun p _ => ?_).subset this
   exact (Finset.finite_toSet _).preimage (fun a _ b _ h => HeightOneSpectrum.ext h)
 
-private theorem ind_key (hE : Module.finrank K M = 2) (sat : HeightOneSpectrum (𝓞 M) → Multiset ℂˣ → Prop)
-    (satP : HeightOneSpectrum (𝓞 K) → Multiset ℂˣ → Prop) (hI : IndSys sat satP) :
-    ∃ S : Finset (HeightOneSpectrum (𝓞 K)), ∀ w : HeightOneSpectrum (𝓞 M), w.under (𝓞 K) ∉ S →
-      (Ideal.absNorm w.asIdeal = Ideal.absNorm (w.under (𝓞 K)).asIdeal ∧ ∃ w' : HeightOneSpectrum (𝓞 M), w' ≠ w ∧
-        w'.under (𝓞 K) = w.under (𝓞 K) ∧ ∃ B B', sat w B ∧ sat w' B' ∧ satP (w.under (𝓞 K)) (B + B')) ∨
-      (Ideal.absNorm w.asIdeal = Ideal.absNorm (w.under (𝓞 K)).asIdeal ^ 2 ∧
-        ∃ B B' : Multiset ℂˣ, sat w (B'.map (· ^ 2)) ∧ B = B' + B'.map (fun b => -b) ∧ satP (w.under (𝓞 K)) B) := by
+private theorem ind_key
+    (hE : Module.finrank K M = 2)
+    (sat : HeightOneSpectrum (𝓞 M) → Multiset ℂˣ → Prop)
+    (satP : HeightOneSpectrum (𝓞 K) → Multiset ℂˣ → Prop) (hI : IndSys sat satP)
+    : ∃ S : Finset (HeightOneSpectrum (𝓞 K)), ∀ w : HeightOneSpectrum (𝓞 M),
+      w.under (𝓞 K) ∉ S
+        → (Ideal.absNorm w.asIdeal = Ideal.absNorm (w.under (𝓞 K)).asIdeal
+            ∧ ∃ w' : HeightOneSpectrum (𝓞 M),
+              w' ≠ w ∧ w'.under (𝓞 K) = w.under (𝓞 K)
+                ∧ ∃ B B', sat w B ∧ sat w' B' ∧ satP (w.under (𝓞 K)) (B + B'))
+          ∨ (Ideal.absNorm w.asIdeal = Ideal.absNorm (w.under (𝓞 K)).asIdeal ^ 2
+            ∧ ∃ B B' : Multiset ℂˣ,
+              sat w (B'.map (· ^ 2)) ∧ B = B' + B'.map (fun b => -b) ∧ satP (w.under (𝓞 K)) B) := by
   classical
   obtain ⟨N, hN⟩ := unram_bound K M
   have hT := Filter.eventually_cofinite.1 hI
@@ -197,29 +228,41 @@ end Primes
 
 section Main
 
-
 open Classical in
 private def pick {X : Type} (sat : X → Multiset ℂˣ → Prop) (w : X) : Multiset ℂˣ :=
   if h : ∃ B, sat w B then h.choose else 0
 
-private theorem pick_spec {X : Type} {sat : X → Multiset ℂˣ → Prop} {w : X} {B : Multiset ℂˣ} (h : sat w B) :
-    sat w (pick sat w) := by
+private theorem pick_spec
+    {X : Type} {sat : X → Multiset ℂˣ → Prop} {w : X} {B : Multiset ℂˣ} (h : sat w B)
+    : sat w (pick sat w) := by
   have h' : ∃ B, sat w B := ⟨B, h⟩
   rw [pick, dite_eq_left h']
   exact h'.choose_spec
 
-private theorem sat_unique {F : Type} [Field F] [NumberField F] [_root_.NumberField.IsTotallyComplex F] {n : ℕ} (σ : CuspSub F n)
-    {w : HeightOneSpectrum (𝓞 F)} {B B' : Multiset ℂˣ} (h : (CG.mk σ).HasSat w B) (h' : (CG.mk σ).HasSat w B') : B = B' :=
+private theorem sat_unique
+    {F : Type} [Field F] [NumberField F] [_root_.NumberField.IsTotallyComplex F]
+    {n : ℕ} (σ : CuspSub F n)
+    {w : HeightOneSpectrum (𝓞 F)} {B B' : Multiset ℂˣ}
+    (h : (CG.mk σ).HasSat w B) (h' : (CG.mk σ).HasSat w B')
+    : B = B' :=
   GlobalTheory.LFun.HasSatGL.unique ((CG.hasSat_mk σ w B).1 h) ((CG.hasSat_mk σ w B').1 h')
 
-private theorem sat_card {F : Type} [Field F] [NumberField F] [_root_.NumberField.IsTotallyComplex F] {n : ℕ} (σ : CuspSub F n)
-    {w : HeightOneSpectrum (𝓞 F)} {B : Multiset ℂˣ} (h : (CG.mk σ).HasSat w B) : Multiset.card B = n :=
+private theorem sat_card
+    {F : Type} [Field F] [NumberField F] [_root_.NumberField.IsTotallyComplex F]
+    {n : ℕ} (σ : CuspSub F n)
+    {w : HeightOneSpectrum (𝓞 F)} {B : Multiset ℂˣ} (h : (CG.mk σ).HasSat w B)
+    : Multiset.card B = n :=
   GlobalTheory.LFun.HasSatGL.card ((CG.hasSat_mk σ w B).1 h)
 
-private theorem bound_cx {F : Type} [Field F] [NumberField F] (w : HeightOneSpectrum (𝓞 F)) {B : Multiset ℂˣ} {c₀ c : ℝ}
-    (hc : c₀ ≤ c) (hb : ∀ b ∈ B, ‖(b : ℂ)‖ ≤ (Ideal.absNorm w.asIdeal : ℝ) ^ c₀ ∧
-      ‖((b⁻¹ : ℂˣ) : ℂ)‖ ≤ (Ideal.absNorm w.asIdeal : ℝ) ^ c₀) :
-    ∀ b ∈ B.map (fun b : ℂˣ => (b : ℂ)), ‖b‖ ≤ (Ideal.absNorm w.asIdeal : ℝ) ^ c ∧ ‖b⁻¹‖ ≤ (Ideal.absNorm w.asIdeal : ℝ) ^ c := by
+private theorem bound_cx
+    {F : Type} [Field F] [NumberField F]
+    (w : HeightOneSpectrum (𝓞 F))
+    {B : Multiset ℂˣ} {c₀ c : ℝ} (hc : c₀ ≤ c)
+    (hb : ∀ b ∈ B,
+      ‖(b : ℂ)‖ ≤ (Ideal.absNorm w.asIdeal : ℝ) ^ c₀
+        ∧ ‖((b⁻¹ : ℂˣ) : ℂ)‖ ≤ (Ideal.absNorm w.asIdeal : ℝ) ^ c₀)
+    : ∀ b ∈ B.map (fun b : ℂˣ => (b : ℂ)),
+      ‖b‖ ≤ (Ideal.absNorm w.asIdeal : ℝ) ^ c ∧ ‖b⁻¹‖ ≤ (Ideal.absNorm w.asIdeal : ℝ) ^ c := by
   have hN : (1 : ℝ) ≤ (Ideal.absNorm w.asIdeal : ℝ) := by
     have : Ideal.absNorm w.asIdeal ≠ 0 := by rw [Ne, Ideal.absNorm_eq_zero_iff]; exact w.ne_bot
     exact_mod_cast Nat.one_le_iff_ne_zero.2 this

@@ -21,18 +21,20 @@ def side (e : ι ≃ Fin a ⊕ Fin b) (i : ι) : Bool := (e i).isRight
 def uMat (e : ι ≃ Fin a ⊕ Fin b) (X : Fin a → Fin b → K) : Matrix ι ι K :=
   Matrix.reindex e.symm e.symm (Matrix.fromBlocks 1 (Matrix.of X) 0 1)
 
-theorem uMat_add (e : ι ≃ Fin a ⊕ Fin b) (X Y : Fin a → Fin b → K) :
-    uMat e (X + Y) = uMat e X * uMat e Y := by
+theorem uMat_add (e : ι ≃ Fin a ⊕ Fin b) (X Y : Fin a → Fin b → K)
+    : uMat e (X + Y) = uMat e X * uMat e Y := by
   simp only [uMat, Matrix.reindex_apply, Matrix.submatrix_mul_equiv, Matrix.fromBlocks_multiply]
   congr 1
   simp [Matrix.of_add_of, add_comm]
 
-theorem uMat_zero (e : ι ≃ Fin a ⊕ Fin b) : uMat e (0 : Fin a → Fin b → K) = 1 := by
-  simp [uMat]
+theorem uMat_zero (e : ι ≃ Fin a ⊕ Fin b) : uMat e (0 : Fin a → Fin b → K) = 1 := by simp [uMat]
 
-def uGL (e : ι ≃ Fin a ⊕ Fin b) (X : Fin a → Fin b → K) : GL ι K :=
-  ⟨uMat e X, uMat e (-X), by rw [← uMat_add, add_neg_cancel, uMat_zero],
-    by rw [← uMat_add, neg_add_cancel, uMat_zero]⟩
+def uGL (e : ι ≃ Fin a ⊕ Fin b) (X : Fin a → Fin b → K) : GL ι K := ⟨
+  uMat e X,
+  uMat e (-X),
+  by rw [← uMat_add, add_neg_cancel, uMat_zero],
+  by rw [← uMat_add, neg_add_cancel, uMat_zero]
+⟩
 
 def uHom (e : ι ≃ Fin a ⊕ Fin b) : Multiplicative (Fin a → Fin b → K) →* GL ι K where
   toFun X := uGL e X.toAdd

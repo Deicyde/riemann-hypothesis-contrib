@@ -13,20 +13,20 @@ noncomputable section
 
 variable {K : Type}
 
-theorem tendsto_sub_const_atTop (s : K → ℤ) :
-    Filter.Tendsto (fun m : K → ℤ => m - s) Filter.atTop Filter.atTop := by
+theorem tendsto_sub_const_atTop (s : K → ℤ)
+    : Filter.Tendsto (fun m : K → ℤ => m - s) Filter.atTop Filter.atTop := by
   simpa [sub_eq_add_neg] using
     Filter.tendsto_atTop_add_const_right Filter.atTop (-s) Filter.tendsto_id
 
-theorem diffStep_eventuallyEq (b : K → ℤ) {F G : (K → ℤ) → ℤ} (h : F =ᶠ[Filter.atTop] G) :
-    diffStep b F =ᶠ[Filter.atTop] diffStep b G := by
+theorem diffStep_eventuallyEq (b : K → ℤ) {F G : (K → ℤ) → ℤ} (h : F =ᶠ[Filter.atTop] G)
+    : diffStep b F =ᶠ[Filter.atTop] diffStep b G := by
   have h' : ∀ᶠ m in Filter.atTop, F (m - b) = G (m - b) := (tendsto_sub_const_atTop b).eventually h
   filter_upwards [h, h'] with m hm hm'
   simp only [diffStep, hm, hm']
 
-theorem foldr_diffStep_eventuallyEq (l : List (K → ℤ)) {F G : (K → ℤ) → ℤ}
-    (h : F =ᶠ[Filter.atTop] G) :
-    l.foldr diffStep F =ᶠ[Filter.atTop] l.foldr diffStep G := by
+theorem foldr_diffStep_eventuallyEq
+    (l : List (K → ℤ)) {F G : (K → ℤ) → ℤ} (h : F =ᶠ[Filter.atTop] G)
+    : l.foldr diffStep F =ᶠ[Filter.atTop] l.foldr diffStep G := by
   induction l with
   | nil => simpa using h
   | cons b l ih =>

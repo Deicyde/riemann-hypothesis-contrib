@@ -8,13 +8,17 @@ open Matrix
 
 namespace GlobalTheory
 
-theorem spectral_parts_of_diag {n : Type} [Fintype n] [DecidableEq n] (Y J U : Matrix n n ℂ)
-    (μ : n → ℝ) (h1 : Uᴴ * U = 1) (h2 : U * Uᴴ = 1)
-    (hY : Y = U * diagonal (fun j => (μ j : ℂ)) * Uᴴ) (hJ : J * Y = -(Y * J)) :
-    ∃ (s : Finset ℝ) (N E : ℝ → Matrix n n ℂ), Y = ∑ ν ∈ s, (ν : ℂ) • N ν ∧
-      (∀ ν, (N ν).IsHermitian ∧ (E ν).IsHermitian ∧ Y * N ν = (ν : ℂ) • E ν ∧
-        N ν * Y = (ν : ℂ) • E ν ∧ Y * E ν = (ν : ℂ) • N ν ∧ E ν * Y = (ν : ℂ) • N ν ∧
-        J * N ν = -(N ν * J) ∧ J * E ν = E ν * J) ∧ ∀ ν ν', E ν * E ν' = E ν' * E ν := by
+theorem spectral_parts_of_diag
+    {n : Type} [Fintype n] [DecidableEq n]
+    (Y J U : Matrix n n ℂ) (μ : n → ℝ) (h1 : Uᴴ * U = 1) (h2 : U * Uᴴ = 1)
+    (hY : Y = U * diagonal (fun j => (μ j : ℂ)) * Uᴴ) (hJ : J * Y = -(Y * J))
+    : ∃ (s : Finset ℝ) (N E : ℝ → Matrix n n ℂ),
+      Y = ∑ ν ∈ s, (ν : ℂ) • N ν
+        ∧ (∀ ν,
+          (N ν).IsHermitian ∧ (E ν).IsHermitian ∧ Y * N ν = (ν : ℂ) • E ν ∧ N ν * Y = (ν : ℂ) • E ν
+            ∧ Y * E ν = (ν : ℂ) • N ν ∧ E ν * Y = (ν : ℂ) • N ν ∧ J * N ν = -(N ν * J)
+            ∧ J * E ν = E ν * J)
+        ∧ ∀ ν ν', E ν * E ν' = E ν' * E ν := by
   classical
   set φ : (ℝ → ℝ) → Matrix n n ℂ := fun f => U * diagonal (fun j => ((f (μ j) : ℝ) : ℂ)) * Uᴴ
     with hφ
@@ -24,10 +28,14 @@ theorem spectral_parts_of_diag {n : Type} [Fintype n] [DecidableEq n] (Y J U : M
   have hmul : ∀ f g : ℝ → ℝ, φ f * φ g = φ (fun x => f x * g x) := by
     intro f g
     simp only [hφ]
-    calc U * diagonal (fun j => ((f (μ j) : ℝ) : ℂ)) * Uᴴ *
-          (U * diagonal (fun j => ((g (μ j) : ℝ) : ℂ)) * Uᴴ)
-        = U * (diagonal (fun j => ((f (μ j) : ℝ) : ℂ)) * (Uᴴ * U) *
-          diagonal (fun j => ((g (μ j) : ℝ) : ℂ))) * Uᴴ := by simp only [Matrix.mul_assoc]
+    calc
+      U * diagonal (fun j => ((f (μ j) : ℝ) : ℂ)) * Uᴴ
+            * (U * diagonal (fun j => ((g (μ j) : ℝ) : ℂ)) * Uᴴ)
+          = U
+            * (diagonal (fun j => ((f (μ j) : ℝ) : ℂ)) * (Uᴴ * U)
+              * diagonal (fun j => ((g (μ j) : ℝ) : ℂ)))
+            * Uᴴ := by
+        simp only [Matrix.mul_assoc]
       _ = _ := by
         rw [h1, Matrix.mul_one, diagonal_mul_diagonal]
         simp only [Complex.ofReal_mul]
@@ -49,23 +57,27 @@ theorem spectral_parts_of_diag {n : Type} [Fintype n] [DecidableEq n] (Y J U : M
   set K := Uᴴ * J * U with hK
   have hJK : J = U * K * Uᴴ := by
     rw [hK]
-    calc J = (U * Uᴴ) * J * (U * Uᴴ) := by rw [h2]; simp
+    calc
+      J = (U * Uᴴ) * J * (U * Uᴴ) := by rw [h2]; simp
       _ = _ := by simp only [Matrix.mul_assoc]
   have hKD : K * diagonal (fun j => (μ j : ℂ)) = -(diagonal (fun j => (μ j : ℂ)) * K) := by
     have e := congrArg (fun M => Uᴴ * M * U) hJ
     simp only [hY] at e
-    have a1 : Uᴴ * (J * (U * diagonal (fun j => (μ j : ℂ)) * Uᴴ)) * U
-        = K * diagonal (fun j => (μ j : ℂ)) * (Uᴴ * U) := by
+    have a1
+        : Uᴴ * (J * (U * diagonal (fun j => (μ j : ℂ)) * Uᴴ)) * U
+          = K * diagonal (fun j => (μ j : ℂ)) * (Uᴴ * U) := by
       simp only [hK, Matrix.mul_assoc]
-    have a2 : Uᴴ * (-(U * diagonal (fun j => (μ j : ℂ)) * Uᴴ * J)) * U
-        = -((Uᴴ * U) * diagonal (fun j => (μ j : ℂ)) * K) := by
+    have a2
+        : Uᴴ * (-(U * diagonal (fun j => (μ j : ℂ)) * Uᴴ * J)) * U
+          = -((Uᴴ * U) * diagonal (fun j => (μ j : ℂ)) * K) := by
       simp only [hK, Matrix.mul_assoc, Matrix.mul_neg, Matrix.neg_mul]
     rw [a1, a2, h1, Matrix.mul_one, Matrix.one_mul] at e
     exact e
   have hkey : ∀ f : ℝ → ℝ, J * φ f = φ (fun x => f (-x)) * J := by
     intro f
-    have hK2 : K * diagonal (fun j => ((f (μ j) : ℝ) : ℂ))
-        = diagonal (fun j => ((f (-μ j) : ℝ) : ℂ)) * K := by
+    have hK2
+        : K * diagonal (fun j => ((f (μ j) : ℝ) : ℂ))
+          = diagonal (fun j => ((f (- μ j) : ℝ) : ℂ)) * K := by
       ext i j
       have e := congrFun (congrFun hKD i) j
       simp only [mul_diagonal, diagonal_mul, Matrix.neg_apply] at e ⊢
@@ -73,16 +85,18 @@ theorem spectral_parts_of_diag {n : Type} [Fintype n] [DecidableEq n] (Y J U : M
       · simp [h0]
       · have : (μ j : ℂ) = -(μ i : ℂ) := by
           apply mul_left_cancel₀ h0
-          rw [e]; ring
-        have h3 : μ j = -μ i := by exact_mod_cast this
+          rw [e]
+          ring
+        have h3 : μ j = - μ i := by exact_mod_cast this
         rw [h3, mul_comm]
     simp only [hφ]
     rw [hJK]
-    calc U * K * Uᴴ * (U * diagonal (fun j => ((f (μ j) : ℝ) : ℂ)) * Uᴴ)
-        = U * (K * (Uᴴ * U) * diagonal (fun j => ((f (μ j) : ℝ) : ℂ))) * Uᴴ := by
-          simp only [Matrix.mul_assoc]
-      _ = U * (diagonal (fun j => ((f (-μ j) : ℝ) : ℂ)) * (Uᴴ * U) * K) * Uᴴ := by
-          rw [h1, Matrix.mul_one, Matrix.mul_one, hK2]
+    calc
+      U * K * Uᴴ * (U * diagonal (fun j => ((f (μ j) : ℝ) : ℂ)) * Uᴴ)
+          = U * (K * (Uᴴ * U) * diagonal (fun j => ((f (μ j) : ℝ) : ℂ))) * Uᴴ := by
+        simp only [Matrix.mul_assoc]
+      _ = U * (diagonal (fun j => ((f (- μ j) : ℝ) : ℂ)) * (Uᴴ * U) * K) * Uᴴ := by
+        rw [h1, Matrix.mul_one, Matrix.mul_one, hK2]
       _ = _ := by simp only [Matrix.mul_assoc]
   have hs1 : ∀ x : ℝ, x * Real.sign x = |x| := by
     intro x
@@ -96,9 +110,14 @@ theorem spectral_parts_of_diag {n : Type} [Fintype n] [DecidableEq n] (Y J U : M
     · rw [Real.sign_of_neg h, abs_of_neg h]; ring
     · simp [h]
     · rw [Real.sign_of_pos h, abs_of_pos h]; ring
-  refine ⟨Finset.univ.image (fun j => |μ j|),
+  refine ⟨
+    Finset.univ.image (fun j => |μ j|),
     fun ν => φ (fun x => if |x| = ν then Real.sign x else 0),
-    fun ν => φ (fun x => if |x| = ν then 1 else 0), ?_, ?_, ?_⟩
+    fun ν => φ (fun x => if |x| = ν then 1 else 0),
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · simp only [hsmul]
     simp only [hφ]
     rw [← Finset.sum_mul, ← Finset.mul_sum, hY]
@@ -121,39 +140,45 @@ theorem spectral_parts_of_diag {n : Type} [Fintype n] [DecidableEq n] (Y J U : M
     beta_reduce
     refine ⟨hherm _, hherm _, ?_, ?_, ?_, ?_, ?_, ?_⟩
     · rw [hsmul, hid, hmul]
-      apply hcongr; intro x
+      apply hcongr
+      intro x
       split_ifs with h
       · rw [hs1, h, mul_one]
       · simp
     · rw [hsmul, hid, hmul]
-      apply hcongr; intro x
+      apply hcongr
+      intro x
       split_ifs with h
       · rw [mul_comm, hs1, h, mul_one]
       · simp
     · rw [hsmul, hid, hmul]
-      apply hcongr; intro x
+      apply hcongr
+      intro x
       split_ifs with h
       · rw [← h, hs2, mul_one]
       · simp
     · rw [hsmul, hid, hmul]
-      apply hcongr; intro x
+      apply hcongr
+      intro x
       split_ifs with h
       · rw [← h, hs2, one_mul]
       · simp
-    · have : ∀ f : ℝ → ℝ, -φ f = φ (fun x => -f x) := by
+    · have : ∀ f : ℝ → ℝ, - φ f = φ (fun x => - f x) := by
         intro f
         have := hsmul (-1) f
         simpa using this
       rw [hkey, ← Matrix.neg_mul, this]
       congr 1
-      apply hcongr; intro x
+      apply hcongr
+      intro x
       rw [abs_neg]
       split_ifs with h
       · exact Real.sign_neg
       · simp
     · rw [hkey]
       congr 1
-      apply hcongr; intro x
+      apply hcongr
+      intro x
       rw [abs_neg]
   · intro ν ν'
     clear hY hK hKD hJK hφ hkey hs1 hs2 hherm hsmul hid
@@ -161,16 +186,19 @@ theorem spectral_parts_of_diag {n : Type} [Fintype n] [DecidableEq n] (Y J U : M
     beta_reduce
     exact (hmul _ _).trans ((hcongr _ _ fun x => mul_comm _ _).trans (hmul _ _).symm)
 
-theorem hermitian_spectral_parts_anticommute :
-    ∀ (n : Type) [Fintype n] [DecidableEq n] (Y J : Matrix n n ℂ), Y.IsHermitian →
-      J * Y = -(Y * J) →
-      ∃ (s : Finset ℝ) (N E : ℝ → Matrix n n ℂ), Y = ∑ ν ∈ s, (ν : ℂ) • N ν ∧
-      (∀ ν, (N ν).IsHermitian ∧ (E ν).IsHermitian ∧ Y * N ν = (ν : ℂ) • E ν ∧
-        N ν * Y = (ν : ℂ) • E ν ∧ Y * E ν = (ν : ℂ) • N ν ∧ E ν * Y = (ν : ℂ) • N ν ∧
-        J * N ν = -(N ν * J) ∧ J * E ν = E ν * J) ∧ ∀ ν ν', E ν * E ν' = E ν' * E ν := by
+theorem hermitian_spectral_parts_anticommute
+    : ∀ (n : Type) [Fintype n] [DecidableEq n] (Y J : Matrix n n ℂ),
+      Y.IsHermitian → J * Y = -(Y * J)
+        → ∃ (s : Finset ℝ) (N E : ℝ → Matrix n n ℂ),
+          Y = ∑ ν ∈ s, (ν : ℂ) • N ν
+            ∧ (∀ ν,
+              (N ν).IsHermitian ∧ (E ν).IsHermitian ∧ Y * N ν = (ν : ℂ) • E ν
+                ∧ N ν * Y = (ν : ℂ) • E ν ∧ Y * E ν = (ν : ℂ) • N ν ∧ E ν * Y = (ν : ℂ) • N ν
+                ∧ J * N ν = -(N ν * J) ∧ J * E ν = E ν * J)
+            ∧ ∀ ν ν', E ν * E ν' = E ν' * E ν := by
   intro n _ _ Y J hY hJ
-  refine spectral_parts_of_diag Y J (hY.eigenvectorUnitary : Matrix n n ℂ) hY.eigenvalues
-    ?_ ?_ ?_ hJ
+  refine spectral_parts_of_diag Y J (hY.eigenvectorUnitary : Matrix n n ℂ) hY.eigenvalues ?_ ?_ ?_
+    hJ
   · exact hY.eigenvectorUnitary.2.1
   · exact hY.eigenvectorUnitary.2.2
   · exact hY.spectral_theorem

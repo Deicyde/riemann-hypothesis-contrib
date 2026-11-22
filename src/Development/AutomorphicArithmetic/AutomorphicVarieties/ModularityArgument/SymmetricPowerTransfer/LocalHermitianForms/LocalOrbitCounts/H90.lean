@@ -6,15 +6,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open QuadraticAlgebra UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc
 
-private theorem UpperTheory.V.Z.Sym.Loc.one_eq_zero_of_products_vanish {A : Type} [CommRing A] (b c d e w u v : A)
-    (hbc : b * c = 1) (hde : d * e = 1) (hwu : w * u = 1) (h2v : 2 * v = 1)
+private theorem UpperTheory.V.Z.Sym.Loc.one_eq_zero_of_products_vanish
+    {A : Type} [CommRing A]
+    (b c d e w u v : A) (hbc : b * c = 1) (hde : d * e = 1) (hwu : w * u = 1) (h2v : 2 * v = 1)
     (E1 : (1 + c) * (1 + b) * (1 + e) * (1 + d) = 0)
     (E2 : (w * (1 - c)) * (-w * (1 - b)) * ((1 - e) * w) * ((1 - d) * -w) = 0)
     (E3 : (1 + c + w * (1 - c)) * (1 + b + -w * (1 - b)) * (1 + e + (1 - e) * w)
-      * (1 + d + (1 - d) * -w) = 0)
+        * (1 + d + (1 - d) * -w)
+      = 0)
     (E4 : (1 + c - w * (1 - c)) * (1 + b - -w * (1 - b)) * (1 + e - (1 - e) * w)
-      * (1 + d - (1 - d) * -w) = 0) :
-    (1 : A) = 0 := by
+        * (1 + d - (1 - d) * -w)
+      = 0)
+    : (1 : A) = 0 := by
   have s1 : (2 + (b + c)) * (2 + (d + e)) = 0 := by
     linear_combination E1 - (2 + (d + e) + (d * e - 1)) * hbc - (2 + (b + c)) * hde
   have t2 : (1 - c) * (1 - b) * (1 - e) * (1 - d) = 0 := by
@@ -26,14 +29,18 @@ private theorem UpperTheory.V.Z.Sym.Loc.one_eq_zero_of_products_vanish {A : Type
     linear_combination v ^ 2 * (s1 - s2) - ((b + c) + (d + e)) * (2 * v + 1) * h2v
   have s4 : (b + c) * (d + e) + 4 = 0 := by
     linear_combination v * (s1 + s2) - ((b + c) * (d + e) + 4) * h2v
-  have t3 : (2 + (b + c) - w ^ 2 * (2 - (b + c)) + 2 * (w * (b - c)))
-      * (2 + (d + e) - w ^ 2 * (2 - (d + e)) + 2 * (w * (d - e))) = 0 := by
+  have t3
+      : (2 + (b + c) - w ^ 2 * (2 - (b + c)) + 2 * (w * (b - c)))
+          * (2 + (d + e) - w ^ 2 * (2 - (d + e)) + 2 * (w * (d - e)))
+        = 0 := by
     linear_combination E3
       - (1 - w ^ 2) * (2 + (d + e) - w ^ 2 * (2 - (d + e)) + 2 * (w * (d - e))
         + (d * e - 1) * (1 - w ^ 2)) * hbc
       - (1 - w ^ 2) * (2 + (b + c) - w ^ 2 * (2 - (b + c)) + 2 * (w * (b - c))) * hde
-  have t4 : (2 + (b + c) - w ^ 2 * (2 - (b + c)) - 2 * (w * (b - c)))
-      * (2 + (d + e) - w ^ 2 * (2 - (d + e)) - 2 * (w * (d - e))) = 0 := by
+  have t4
+      : (2 + (b + c) - w ^ 2 * (2 - (b + c)) - 2 * (w * (b - c)))
+          * (2 + (d + e) - w ^ 2 * (2 - (d + e)) - 2 * (w * (d - e)))
+        = 0 := by
     linear_combination E4
       - (1 - w ^ 2) * (2 + (d + e) - w ^ 2 * (2 - (d + e)) - 2 * (w * (d - e))
         + (d * e - 1) * (1 - w ^ 2)) * hbc
@@ -108,8 +115,9 @@ theorem UpperTheory.V.Z.Sym.Loc.h90 : UpperTheory.V.Z.Sym.Loc.H90 := by
     intro z
     simp only [M, star_mul, star_star]
     ring
-  have key : ∀ z : EL Δ τ, sigL z = β * z → IsUnit (M z) →
-      ∃ y : (EL Δ τ)ˣ, sigL (y : EL Δ τ) = β * (y : EL Δ τ) := by
+  have key
+      : ∀ z : EL Δ τ,
+        sigL z = β * z → IsUnit (M z) → ∃ y : (EL Δ τ)ˣ, sigL (y : EL Δ τ) = β * (y : EL Δ τ) := by
     intro z hz hM
     have hu : IsUnit z := by
       have e : M z = z * (sigL z * star z * star (sigL z)) := by
@@ -142,7 +150,8 @@ theorem UpperTheory.V.Z.Sym.Loc.h90 : UpperTheory.V.Z.Sym.Loc.H90 := by
   · exact key _ g4 h
   exfalso
   apply hne
-  refine UpperTheory.V.Z.Sym.Loc.one_eq_zero_of_products_vanish β (sigL β) (star β) (star (sigL β)) w u v hβ ?_ hwu h2v ?_ ?_ ?_ ?_
+  refine UpperTheory.V.Z.Sym.Loc.one_eq_zero_of_products_vanish β (sigL β) (star β) (star (sigL β))
+    w u v hβ ?_ hwu h2v ?_ ?_ ?_ ?_
   · have h := congrArg star hβ
     simp only [star_mul, star_one] at h
     linear_combination h

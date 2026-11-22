@@ -17,8 +17,8 @@ universe w w' u
 
 noncomputable section
 
-instance isQuasicoherent_unit (X : Scheme.{u}) :
-    (SheafOfModules.unit X.ringCatSheaf).IsQuasicoherent :=
+instance isQuasicoherent_unit (X : Scheme.{u})
+    : (SheafOfModules.unit X.ringCatSheaf).IsQuasicoherent :=
   (SheafOfModules.isQuasicoherent X.ringCatSheaf).prop_of_iso
     (Limits.coproductUniqueIso (fun _ : PUnit.{u + 1} => SheafOfModules.unit X.ringCatSheaf))
     (inferInstanceAs (SheafOfModules.free (R := X.ringCatSheaf) PUnit.{u + 1}).IsQuasicoherent)
@@ -75,8 +75,8 @@ lemma pow_mem_of_mem_one {u : A} (hu : u ∈ 𝒜 1) (m : ℕ) : u ^ m ∈ 𝒜 
 lemma pow_nmem {u : A} {x : ProjectiveSpectrum 𝒜} (hx : u ∉ x.asHomogeneousIdeal) (m : ℕ) :
     u ^ m ∉ x.asHomogeneousIdeal := fun h => hx (x.isPrime.mem_of_pow_mem m h)
 
-def twistFrac (u : A) (k : ℤ) (x : ProjectiveSpectrum 𝒜) (hx : u ∉ x.asHomogeneousIdeal) :
-    Loc 𝒜 x :=
+def twistFrac (u : A) (k : ℤ) (x : ProjectiveSpectrum 𝒜) (hx : u ∉ x.asHomogeneousIdeal)
+    : Loc 𝒜 x :=
   Localization.mk (u ^ k.toNat) ⟨u ^ (-k).toNat, pow_nmem hx _⟩
 
 lemma twistFrac_mul_twistFrac_neg (u : A) (k : ℤ) (x : ProjectiveSpectrum 𝒜)
@@ -101,20 +101,26 @@ lemma isLocallyFraction_val_section {W : Opens (ProjectiveSpectrum.top 𝒜)}
   refine ⟨V, hxV, iV, j, j, by simp, r, s, hr, hs, hsn, fun y => ?_⟩
   exact (congrArg HomogeneousLocalization.val (w y)).trans (HomogeneousLocalization.val_mk _)
 
-def twistMap {u : A} (hu : u ∈ 𝒜 1) (k : ℤ) {W : Opens (ProjectiveSpectrum.top 𝒜)}
-    (hW : ∀ x : W, u ∉ x.1.asHomogeneousIdeal) :
-    (ProjectiveSpectrum.Proj.structureSheaf 𝒜).obj.obj (op W) →+
-      (twistPresheafAb 𝒜 k).obj (op W) where
-  toFun t := ⟨fun x => twistFrac u k x.1 (hW x) * (t.1 x).val,
+def twistMap
+    {u : A} (hu : u ∈ 𝒜 1)
+    (k : ℤ)
+    {W : Opens (ProjectiveSpectrum.top 𝒜)} (hW : ∀ x : W, u ∉ x.1.asHomogeneousIdeal)
+    : (ProjectiveSpectrum.Proj.structureSheaf 𝒜).obj.obj (op W)
+      →+ (twistPresheafAb 𝒜 k).obj (op W) where
+  toFun t := ⟨
+    fun x => twistFrac u k x.1 (hW x) * (t.1 x).val,
     isLocallyFraction_mul (add_zero k) (isLocallyFraction_twistFrac hu k hW)
-      (isLocallyFraction_val_section t)⟩
-  map_zero' := Subtype.ext (funext fun x => by
-    change twistFrac u k x.1 (hW x) * HomogeneousLocalization.val 0 = 0
-    rw [HomogeneousLocalization.val_zero, mul_zero])
-  map_add' t t' := Subtype.ext (funext fun x => by
-    change twistFrac u k x.1 (hW x) * HomogeneousLocalization.val (t.1 x + t'.1 x) =
-      twistFrac u k x.1 (hW x) * (t.1 x).val + twistFrac u k x.1 (hW x) * (t'.1 x).val
-    rw [HomogeneousLocalization.val_add, mul_add])
+      (isLocallyFraction_val_section t)
+  ⟩
+  map_zero' :=
+    Subtype.ext (funext fun x => by
+      change twistFrac u k x.1 (hW x) * HomogeneousLocalization.val 0 = 0
+      rw [HomogeneousLocalization.val_zero, mul_zero])
+  map_add' t t' :=
+    Subtype.ext (funext fun x => by
+      change twistFrac u k x.1 (hW x) * HomogeneousLocalization.val (t.1 x + t'.1 x)
+        = twistFrac u k x.1 (hW x) * (t.1 x).val + twistFrac u k x.1 (hW x) * (t'.1 x).val
+      rw [HomogeneousLocalization.val_add, mul_add])
 
 lemma twistMap_apply {u : A} (hu : u ∈ 𝒜 1) (k : ℤ) {W : Opens (ProjectiveSpectrum.top 𝒜)}
     (hW : ∀ x : W, u ∉ x.1.asHomogeneousIdeal)
@@ -216,18 +222,26 @@ lemma inter_basicOpen_eq {ι : Type w} (v : ι → A) {m : ℕ} (i : Fin (m + 1)
   rw [Ideal.IsPrime.prod_mem_iff]
   simp
 
-theorem nonempty_cechH_equiv_H_twist {ι : Type w} (v : ι → A) (hv : ∀ j, v j ∈ 𝒜 1)
-    (hcov : ⨆ j, Proj.basicOpen 𝒜 (v j) = ⊤) (k : ℤ) (p : ℕ)
-    [HasExt.{w'} (Sheaf (Opens.grothendieckTopology (Proj 𝒜).toTopCat) AddCommGrpCat.{u})] :
-    Nonempty (cechH (modulesAb (twistingSheaf 𝒜 k)).obj
-      (X := (Proj 𝒜).toTopCat) (fun j => Proj.basicOpen 𝒜 (v j)) p ≃+
-        Sheaf.H.{w'} (modulesAb (twistingSheaf 𝒜 k)) p) := by
-  refine nonempty_cechH_equiv (isCoverSystem_affineUnder v) _ hcov (fun {m} i => ⟨?_, ⟨i 0,
-    inter_le _ i 0⟩⟩) p _ (goodAcyclic_twist v hv k)
+theorem nonempty_cechH_equiv_H_twist
+    {ι : Type w} (v : ι → A) (hv : ∀ j, v j ∈ 𝒜 1) (hcov : ⨆ j, Proj.basicOpen 𝒜 (v j) = ⊤)
+    (k : ℤ) (p : ℕ)
+    [HasExt.{w'} (Sheaf (Opens.grothendieckTopology (Proj 𝒜).toTopCat) AddCommGrpCat.{u})]
+    : Nonempty
+      (cechH (modulesAb (twistingSheaf 𝒜 k)).obj (X := (Proj 𝒜).toTopCat)
+          (fun j => Proj.basicOpen 𝒜 (v j))
+          p
+        ≃+ Sheaf.H.{w'} (modulesAb (twistingSheaf 𝒜 k)) p) := by
+  refine nonempty_cechH_equiv (isCoverSystem_affineUnder v) _ hcov
+    (fun {m} i => ⟨?_, ⟨i 0, inter_le _ i 0⟩⟩)
+    p _ (goodAcyclic_twist v hv k)
   rw [inter_basicOpen_eq]
   have hmem : ∏ a, v (i a) ∈ 𝒜 (m + 1) := by
-    have := SetLike.prod_mem_graded 𝒜 (fun _ => 1) (fun a => v (i a))
-      (F := (Finset.univ : Finset (Fin (m + 1)))) (fun a _ => hv (i a))
+    have :=
+      SetLike.prod_mem_graded 𝒜
+        (fun _ => 1)
+        (fun a => v (i a))
+        (F := (Finset.univ : Finset (Fin (m + 1))))
+        (fun a _ => hv (i a))
     simpa using this
   exact Proj.isAffineOpen_basicOpen 𝒜 _ hmem (Nat.succ_pos m)
 
@@ -239,11 +253,13 @@ attribute [local instance] MvPolynomial.gradedAlgebra
 
 variable {A : Type u} [CommRing A] {n : ℕ}
 
-theorem nonempty_cechH_equiv_H (k : ℤ) (p : ℕ)
+theorem nonempty_cechH_equiv_H
+    (k : ℤ) (p : ℕ)
     [HasExt.{w'} (Sheaf (Opens.grothendieckTopology (projectiveSpace A n).toTopCat)
-      AddCommGrpCat.{u})] :
-    Nonempty (cechH (twistAb (A := A) (n := n) k) (cover (A := A) (n := n)) p ≃+
-      Sheaf.H.{w'} (modulesAb (twistingSheaf (grading A n) k)) p) :=
+      AddCommGrpCat.{u})]
+    : Nonempty
+      (cechH (twistAb (A := A) (n := n) k) (cover (A := A) (n := n)) p
+        ≃+ Sheaf.H.{w'} (modulesAb (twistingSheaf (grading A n) k)) p) :=
   nonempty_cechH_equiv_H_twist (fun j => MvPolynomial.X j) (fun j => X_mem j) iSup_stdOpen k p
 
 end ProjSpace

@@ -9,11 +9,12 @@ namespace GlobalTheory.TraceConj
 
 open IsLocalRing
 
-theorem ker_le_ker_of_trace_eq {Γ R : Type} [Monoid Γ] [CommRing R] {n : ℕ}
-    (M N : Γ →* Matrix (Fin n) (Fin n) R) (h : ∀ g, (M g).trace = (N g).trace)
-    (hN : Submodule.span R (Set.range N) = ⊤) :
-    LinearMap.ker (Finsupp.linearCombination R (fun g => M g)) ≤
-      LinearMap.ker (Finsupp.linearCombination R (fun g => N g)) := by
+theorem ker_le_ker_of_trace_eq
+    {Γ R : Type} [Monoid Γ] [CommRing R]
+    {n : ℕ} (M N : Γ →* Matrix (Fin n) (Fin n) R) (h : ∀ g, (M g).trace = (N g).trace)
+    (hN : Submodule.span R (Set.range N) = ⊤)
+    : LinearMap.ker (Finsupp.linearCombination R (fun g => M g))
+      ≤ LinearMap.ker (Finsupp.linearCombination R (fun g => N g)) := by
   classical
   set a := Finsupp.linearCombination R (fun g => M g) with ha
   set b := Finsupp.linearCombination R (fun g => N g) with hb
@@ -21,9 +22,12 @@ theorem ker_le_ker_of_trace_eq {Γ R : Type} [Monoid Γ] [CommRing R] {n : ℕ}
     intro c g
     induction c using Finsupp.induction_linear with
     | zero => simp
-    | add x y hx hy => rw [map_add (f := _), map_add (f := _), add_mul, add_mul, Matrix.trace_add, Matrix.trace_add, hx, hy]
+    | add x y hx hy =>
+      rw [map_add (f := _), map_add (f := _), add_mul, add_mul, Matrix.trace_add, Matrix.trace_add,
+        hx, hy]
     | single x c =>
-      simp only [ha, hb, Finsupp.linearCombination_single, Matrix.smul_mul, Matrix.trace_smul, ← map_mul, h]
+      simp only [ha, hb, Finsupp.linearCombination_single, Matrix.smul_mul, Matrix.trace_smul,
+        ← map_mul, h]
   intro c hc
   rw [LinearMap.mem_ker] at hc ⊢
   have h1 : ∀ Y ∈ Submodule.span R (Set.range N), (b c * Y).trace = 0 := by
@@ -38,9 +42,11 @@ theorem ker_le_ker_of_trace_eq {Γ R : Type} [Monoid Γ] [CommRing R] {n : ℕ}
   rw [Matrix.trace_mul_single] at this
   simpa using this
 
-theorem span_top_of_trace_eq {Γ K : Type} [Monoid Γ] [Field K] {n : ℕ}
-    (M N : Γ →* Matrix (Fin n) (Fin n) K) (h : ∀ g, (M g).trace = (N g).trace)
-    (hN : Submodule.span K (Set.range N) = ⊤) : Submodule.span K (Set.range M) = ⊤ := by
+theorem span_top_of_trace_eq
+    {Γ K : Type} [Monoid Γ] [Field K]
+    {n : ℕ} (M N : Γ →* Matrix (Fin n) (Fin n) K) (h : ∀ g, (M g).trace = (N g).trace)
+    (hN : Submodule.span K (Set.range N) = ⊤)
+    : Submodule.span K (Set.range M) = ⊤ := by
   classical
   let a := Finsupp.linearCombination K (fun g => M g)
   let b := Finsupp.linearCombination K (fun g => N g)
@@ -57,13 +63,16 @@ theorem span_top_of_trace_eq {Γ K : Type} [Monoid Γ] [Field K] {n : ℕ}
   have := Submodule.eq_top_of_finrank_eq (le_antisymm (Submodule.finrank_le _) hle)
   rwa [Finsupp.range_linearCombination] at this
 
-theorem span_top_of_residual {Γ O : Type} [CommRing O] [IsLocalRing O] {n : ℕ}
-    (M : Γ → Matrix (Fin n) (Fin n) O)
-    (h : Submodule.span (ResidueField O) (Set.range fun g => (M g).map (residue O)) = ⊤) :
-    Submodule.span O (Set.range M) = ⊤ := by
+theorem span_top_of_residual
+    {Γ O : Type} [CommRing O] [IsLocalRing O]
+    {n : ℕ} (M : Γ → Matrix (Fin n) (Fin n) O)
+    (h : Submodule.span (ResidueField O) (Set.range fun g => (M g).map (residue O)) = ⊤)
+    : Submodule.span O (Set.range M) = ⊤ := by
   classical
-  have lift : ∀ Z ∈ Submodule.span (ResidueField O) (Set.range fun g => (M g).map (residue O)),
-      ∃ Y ∈ Submodule.span O (Set.range M), Y.map (residue O) = Z := by
+  have lift
+      : ∀ Z ∈ Submodule.span (ResidueField O) (Set.range fun g => (M g).map (residue O)),
+        ∃ Y ∈ Submodule.span O (Set.range M),
+          Y.map (residue O) = Z := by
     intro Z hZ
     induction hZ using Submodule.span_induction with
     | mem Z hZ => obtain ⟨g, rfl⟩ := hZ; exact ⟨M g, Submodule.subset_span ⟨g, rfl⟩, rfl⟩
@@ -91,10 +100,12 @@ theorem span_top_of_residual {Γ O : Type} [CommRing O] [IsLocalRing O] {n : ℕ
   rw [← residue_eq_zero_iff, Matrix.sub_apply, map_sub, sub_eq_zero]
   exact (congrFun (congrFun hYX i) j).symm
 
-theorem exists_linearMap_of_trace_eq {Γ R : Type} [Monoid Γ] [CommRing R] {n : ℕ}
-    (M N : Γ →* Matrix (Fin n) (Fin n) R) (h : ∀ g, (M g).trace = (N g).trace)
-    (hM : Submodule.span R (Set.range M) = ⊤) (hN : Submodule.span R (Set.range N) = ⊤) :
-    ∃ φ : Matrix (Fin n) (Fin n) R →ₗ[R] Matrix (Fin n) (Fin n) R, φ 1 = 1 ∧ ∀ g X, φ (M g * X) = N g * φ X := by
+theorem exists_linearMap_of_trace_eq
+    {Γ R : Type} [Monoid Γ] [CommRing R]
+    {n : ℕ} (M N : Γ →* Matrix (Fin n) (Fin n) R) (h : ∀ g, (M g).trace = (N g).trace)
+    (hM : Submodule.span R (Set.range M) = ⊤) (hN : Submodule.span R (Set.range N) = ⊤)
+    : ∃ φ : Matrix (Fin n) (Fin n) R →ₗ[R] Matrix (Fin n) (Fin n) R,
+      φ 1 = 1 ∧ ∀ g X, φ (M g * X) = N g * φ X := by
   classical
   let a := Finsupp.linearCombination R (fun g => M g)
   let b := Finsupp.linearCombination R (fun g => N g)
@@ -106,9 +117,9 @@ theorem exists_linearMap_of_trace_eq {Γ R : Type} [Monoid Γ] [CommRing R] {n :
   have hφ : ∀ c, φ (a c) = b c := fun c => by
     have : a c = a.quotKerEquivOfSurjective ha (Submodule.Quotient.mk c) := rfl
     rw [this]
-    simp only [φ, LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.symm_apply_apply, Submodule.liftQ_apply]
-  have hφg : ∀ g, φ (M g) = N g := fun g => by
-    simpa [a, b] using hφ (Finsupp.single g 1)
+    simp only [φ, LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.symm_apply_apply,
+      Submodule.liftQ_apply]
+  have hφg : ∀ g, φ (M g) = N g := fun g => by simpa [a, b] using hφ (Finsupp.single g 1)
   refine ⟨φ, by simpa using hφg 1, fun g X => ?_⟩
   have hX : X ∈ Submodule.span R (Set.range M) := hM ▸ Submodule.mem_top
   induction hX using Submodule.span_induction with
@@ -117,27 +128,42 @@ theorem exists_linearMap_of_trace_eq {Γ R : Type} [Monoid Γ] [CommRing R] {n :
   | add x y _ _ hx hy => rw [mul_add, map_add (f := _), map_add (f := _), mul_add, hx, hy]
   | smul t x _ hx => rw [Matrix.mul_smul, map_smul, map_smul, Matrix.mul_smul, hx]
 
-theorem exists_gl_conj_of_trace_eq :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CharZero O] (Γ : Type) [Group Γ] (r : ℕ) (ρ ρ' : Γ →* GL (Fin r) O), Submodule.span (IsLocalRing.ResidueField O) (Set.range fun g => ((ρ g : GL (Fin r) O) : Matrix (Fin r) (Fin r) O).map (IsLocalRing.residue O)) = ⊤ → (∀ g, ((ρ' g : GL (Fin r) O) : Matrix (Fin r) (Fin r) O).trace = ((ρ g : GL (Fin r) O) : Matrix (Fin r) (Fin r) O).trace) → ∃ U : GL (Fin r) O, ∀ g, ρ' g * U = U * ρ g := by
+theorem exists_gl_conj_of_trace_eq
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CharZero O] (Γ : Type)
+        [Group Γ] (r : ℕ) (ρ ρ' : Γ →* GL (Fin r) O),
+      Submodule.span (IsLocalRing.ResidueField O)
+            (Set.range fun g =>
+              ((ρ g : GL (Fin r) O) : Matrix (Fin r) (Fin r) O).map (IsLocalRing.residue O))
+          = ⊤
+        → (∀ g,
+          ((ρ' g : GL (Fin r) O) : Matrix (Fin r) (Fin r) O).trace
+            = ((ρ g : GL (Fin r) O) : Matrix (Fin r) (Fin r) O).trace)
+        → ∃ U : GL (Fin r) O, ∀ g, ρ' g * U = U * ρ g := by
   intro O _ _ _ _ Γ _ r ρ ρ' hspan htr
   classical
   rcases Nat.eq_zero_or_pos r with rfl | hr
   · exact ⟨1, fun g => Units.ext (Subsingleton.elim _ _)⟩
   let M : Γ →* Matrix (Fin r) (Fin r) O := (Units.coeHom _).comp ρ
   let N : Γ →* Matrix (Fin r) (Fin r) O := (Units.coeHom _).comp ρ'
-  let π : Matrix (Fin r) (Fin r) O →* Matrix (Fin r) (Fin r) (ResidueField O) := (residue O).mapMatrix.toMonoidHom
+  let π : Matrix (Fin r) (Fin r) O →* Matrix (Fin r) (Fin r) (ResidueField O) :=
+    (residue O).mapMatrix.toMonoidHom
   have hN' : Submodule.span (ResidueField O) (Set.range (π.comp N)) = ⊤ :=
-    span_top_of_trace_eq (π.comp N) (π.comp M) (fun g => by
-      change ((N g).map (residue O)).trace = ((M g).map (residue O)).trace
-      rw [← AddMonoidHom.map_trace, ← AddMonoidHom.map_trace]
-      exact congrArg _ (htr g)) hspan
-  obtain ⟨φ, h1, hφ⟩ := exists_linearMap_of_trace_eq M N (fun g => (htr g).symm)
-    (span_top_of_residual _ hspan) (span_top_of_residual _ hN')
+    span_top_of_trace_eq (π.comp N) (π.comp M)
+      (fun g => by
+        change ((N g).map (residue O)).trace = ((M g).map (residue O)).trace
+        rw [← AddMonoidHom.map_trace, ← AddMonoidHom.map_trace]
+        exact congrArg _ (htr g))
+      hspan
+  obtain ⟨φ, h1, hφ⟩ :=
+    exists_linearMap_of_trace_eq M N
+      (fun g => (htr g).symm)
+      (span_top_of_residual _ hspan) (span_top_of_residual _ hN')
   let k : Fin r := ⟨0, hr⟩
   obtain ⟨j, hj⟩ : ∃ j, residue O (φ (Matrix.single j j 1) k k) ≠ 0 := by
     by_contra hc
     push Not at hc
-    have e : (1 : Matrix (Fin r) (Fin r) O) = ∑ j, Matrix.single j j 1 := (Matrix.sum_single_one).symm
+    have e : (1 : Matrix (Fin r) (Fin r) O) = ∑ j, Matrix.single j j 1 :=
+      (Matrix.sum_single_one).symm
     have := congrArg (fun X : Matrix (Fin r) (Fin r) O => residue O (X k k)) h1
     set_option synthInstance.maxHeartbeats 100000 in
       rw [e, map_sum, ← e] at this
@@ -158,9 +184,13 @@ theorem exists_gl_conj_of_trace_eq :
     simp only [Matrix.mul_apply, A, Matrix.of_apply]
     rw [← this]
     exact Finset.sum_congr rfl fun t _ => mul_comm _ _
-  refine GlobalTheory.exists_gl_intertwiner_of_residual_span_eq_top O Γ r ρ ρ' hspan ⟨A, fun h0 => ?_, hA⟩
-  refine GlobalTheory.det_ne_zero_of_intertwines_of_span_eq_top _ (fun g => (N g).map (residue O)) hspan
-    (A.map (residue O)) k j hj (fun g => ?_) ?_
+  refine GlobalTheory.exists_gl_intertwiner_of_residual_span_eq_top O Γ r ρ ρ' hspan
+    ⟨A, fun h0 => ?_, hA⟩
+  refine GlobalTheory.det_ne_zero_of_intertwines_of_span_eq_top _
+    (fun g => (N g).map (residue O))
+    hspan (A.map (residue O)) k j hj
+    (fun g => ?_)
+    ?_
   · rw [← Matrix.map_mul, hA, Matrix.map_mul]; rfl
   · rw [← RingHom.mapMatrix_apply, ← RingHom.map_det, h0, map_zero]
 

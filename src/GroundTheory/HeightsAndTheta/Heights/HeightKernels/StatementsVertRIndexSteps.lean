@@ -10,7 +10,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights
 
-open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I2 MvPolynomial NumberField
+open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I2
+  MvPolynomial NumberField
 
 noncomputable section
 
@@ -32,34 +33,35 @@ abbrev sectionQuot (y : (Σ k, ι k) → Ω) (x : Ω) : Type _ :=
   ↥(sectionMod y) ⧸ (Submodule.span (curveRing y) {x}).comap (sectionMod y).subtype
 
 def curvePtIdeal (y : (Σ k, ι k) → Ω) (W : Ideal (MRing ι)) : Ideal (curveRing y) :=
-  Ideal.span {b | ∃ (d : K → ℕ) (g h : MRing ι), IsMultiHomog g d ∧ IsMultiHomog h d ∧ g ∈ W ∧ h ∉ W ∧
-    (b : Ω) * aeval y h = aeval y g}
+  Ideal.span
+    {b | ∃ (d : K → ℕ) (g h : MRing ι), IsMultiHomog g d ∧ IsMultiHomog h d ∧ g ∈ W ∧ h ∉ W ∧
+      (b : Ω) * aeval y h = aeval y g}
 
 end Objects
 
 def SectionQuotFinite.Statement : Prop :=
   ∀ (T : Type) [Fintype T] (K' : Type) [Field K'] [NumberField K'] (y : (Σ _ : Unit, T) → K')
-    (s : MRing (fun _ : Unit => T)),
-    IsArithVar (mCoordIdeal y) 1 → IsMultiHomog s (fun _ => 1) → s ∉ mCoordIdeal y →
-      Finite (sectionQuot y (aeval y s))
+      (s : MRing (fun _ : Unit => T)),
+    IsArithVar (mCoordIdeal y) 1 → IsMultiHomog s (fun _ => 1) → s ∉ mCoordIdeal y
+      → Finite (sectionQuot y (aeval y s))
 
 def VertPointLength.Statement : Prop :=
   ∀ (T : Type) [Fintype T] (K' : Type) [Field K'] [NumberField K'] (y : (Σ _ : Unit, T) → K')
-    (s : MRing (fun _ : Unit => T)),
-    IsArithVar (mCoordIdeal y) 1 → IsMultiHomog s (fun _ => 1) → s ∉ mCoordIdeal y →
-      Set.BijOn (curvePtIdeal y) (divSupp (mCoordIdeal y) s)
-          {m | m.IsMaximal ∧ locLen m (sectionQuot y (aeval y s)) ≠ 0} ∧
-        ∀ W ∈ divSupp (mCoordIdeal y) s,
-          multAt (mCoordIdeal y ⊔ Ideal.span {s}) W =
-            locLen (curvePtIdeal y W) (sectionQuot y (aeval y s))
+      (s : MRing (fun _ : Unit => T)),
+    IsArithVar (mCoordIdeal y) 1 → IsMultiHomog s (fun _ => 1) → s ∉ mCoordIdeal y
+      → Set.BijOn (curvePtIdeal y) (divSupp (mCoordIdeal y) s)
+          {m | m.IsMaximal ∧ locLen m (sectionQuot y (aeval y s)) ≠ 0}
+        ∧ ∀ W ∈ divSupp (mCoordIdeal y) s,
+          multAt (mCoordIdeal y ⊔ Ideal.span {s}) W
+            = locLen (curvePtIdeal y W) (sectionQuot y (aeval y s))
 
 def VertPointResidue.Statement : Prop :=
   ∀ (T : Type) [Fintype T] (K' : Type) [Field K'] [NumberField K'] (y : (Σ _ : Unit, T) → K')
-    (s : MRing (fun _ : Unit => T)),
-    IsArithVar (mCoordIdeal y) 1 → IsMultiHomog s (fun _ => 1) → s ∉ mCoordIdeal y →
-      ∀ W ∈ divSupp (mCoordIdeal y) s,
-        (geoNum 0 W Fin.elim0 : ℝ) * Real.log (charOf W) =
-          Real.log (Nat.card (curveRing y ⧸ curvePtIdeal y W))
+      (s : MRing (fun _ : Unit => T)),
+    IsArithVar (mCoordIdeal y) 1 → IsMultiHomog s (fun _ => 1) → s ∉ mCoordIdeal y
+      → ∀ W ∈ divSupp (mCoordIdeal y) s,
+        (geoNum 0 W Fin.elim0 : ℝ) * Real.log (charOf W)
+          = Real.log (Nat.card (curveRing y ⧸ curvePtIdeal y W))
 
 end
 

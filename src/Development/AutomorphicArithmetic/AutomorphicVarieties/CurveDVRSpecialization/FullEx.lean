@@ -10,12 +10,14 @@ namespace UpperTheory.V.Pr
 
 open Matrix
 
-private theorem comb {G ι : Type} [Group G] [Fintype ι] (R : G → ι → ι → Prop)
-    (h1 : ∀ i, R 1 i i) (hinv : ∀ g i, ∃ k, R g i k ∧ R g⁻¹ k i)
-    (hc : ∀ g h, ∃ x, (∀ i k j, R g i k → R h k j → R x i j) ∧
-      (∀ i k j, R h⁻¹ i k → R g⁻¹ k j → R x⁻¹ i j)) :
-    ∃ b, (∀ i, R b i i) ∧ (∀ i j, R b i j → R b⁻¹ i j) ∧
-      ∀ g i k l j, R g i k → R b k l → R g⁻¹ l j → R b i j := by
+private theorem comb
+    {G ι : Type} [Group G] [Fintype ι]
+    (R : G → ι → ι → Prop) (h1 : ∀ i, R 1 i i) (hinv : ∀ g i, ∃ k, R g i k ∧ R g⁻¹ k i)
+    (hc : ∀ g h, ∃ x,
+      (∀ i k j, R g i k → R h k j → R x i j) ∧ (∀ i k j, R h⁻¹ i k → R g⁻¹ k j → R x⁻¹ i j))
+    : ∃ b,
+      (∀ i, R b i i) ∧ (∀ i j, R b i j → R b⁻¹ i j)
+        ∧ ∀ g i k l j, R g i k → R b k l → R g⁻¹ l j → R b i j := by
   classical
   let T : G → Finset (Bool × ι × ι) := fun g =>
     Finset.univ.filter fun s => if s.1 then R g s.2.1 s.2.2 else R g⁻¹ s.2.1 s.2.2
@@ -35,7 +37,8 @@ private theorem comb {G ι : Type} [Group G] [Fintype ι] (R : G → ι → ι �
     have hsub : T b ⊆ T x := by
       rintro ⟨t, i, j⟩ hs
       cases t
-      · simp only [T, Finset.mem_filter, Finset.mem_univ, true_and, Bool.false_eq_true, if_false] at hs ⊢
+      · simp only [T, Finset.mem_filter, Finset.mem_univ, true_and, Bool.false_eq_true, if_false]
+          at hs ⊢
         exact hx2 i i j (hcP.2 i) hs
       · simp only [T, Finset.mem_filter, Finset.mem_univ, true_and, if_true] at hs ⊢
         exact hx1 i j j hs (hcP.1 j)
@@ -52,7 +55,8 @@ private theorem comb {G ι : Type} [Group G] [Fintype ι] (R : G → ι → ι �
         simp only [T, Finset.mem_filter, Finset.mem_univ, true_and, Bool.false_eq_true, if_false]
         exact hx2 i j j hij (hb.2 j)
       rw [← heq] at this
-      simpa only [T, Finset.mem_filter, Finset.mem_univ, true_and, Bool.false_eq_true, if_false] using this
+      simpa only [T, Finset.mem_filter, Finset.mem_univ, true_and, Bool.false_eq_true, if_false]
+        using this
   refine ⟨b, hb.1, ?_, ?_⟩
   · have := (key b⁻¹ ⟨hb.2, by rw [inv_inv]; exact hb.1⟩).2
     rwa [inv_inv] at this
@@ -73,6 +77,5 @@ private theorem comb {G ι : Type} [Group G] [Fintype ι] (R : G → ι → ι �
 end UpperTheory.V.Pr
 
 open Matrix in
-theorem UpperTheory.V.Pr.fullEx :
-    UpperTheory.V.Pr.FullEx :=
+theorem UpperTheory.V.Pr.fullEx : UpperTheory.V.Pr.FullEx :=
   _root_.UpperTheory.Reformulated.B.StronglyIrreducibleFreeRatios.fullEx

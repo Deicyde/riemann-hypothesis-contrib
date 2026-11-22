@@ -14,8 +14,10 @@ open MvPolynomial
 
 noncomputable section
 
-theorem eq_ker_eval_of_X_sub_C_mem {n : ℕ} (q : Fin n → ℂ) (P : Ideal (MvPolynomial (Fin n) ℂ))
-    (hP : P.IsPrime) (h : ∀ k, X k - C (q k) ∈ P) : P = RingHom.ker (eval q) := by
+theorem eq_ker_eval_of_X_sub_C_mem
+    {n : ℕ} (q : Fin n → ℂ) (P : Ideal (MvPolynomial (Fin n) ℂ)) (hP : P.IsPrime)
+    (h : ∀ k, X k - C (q k) ∈ P)
+    : P = RingHom.ker (eval q) := by
   have hext : Ideal.Quotient.mk P = ((Ideal.Quotient.mk P).comp C).comp (eval q) := by
     refine MvPolynomial.ringHom_ext (fun c => by simp) (fun i => ?_)
     simp only [RingHom.comp_apply, eval_X]
@@ -28,8 +30,9 @@ theorem eq_ker_eval_of_X_sub_C_mem {n : ℕ} (q : Fin n → ℂ) (P : Ideal (MvP
     RingHom.ker_isMaximal_of_surjective _ fun c => ⟨C c, eval_C c⟩
   exact (hmax.eq_of_le hP.ne_top hle).symm
 
-theorem SliceReducedAwayZariski.proof (hG : GenericFibreRadicalAway.Statement)
-    (hB : SliceBundleRadicalAway.Statement) : SliceReducedAwayZariski.Statement := by
+theorem SliceReducedAwayZariski.proof
+    (hG : GenericFibreRadicalAway.Statement) (hB : SliceBundleRadicalAway.Statement)
+    : SliceReducedAwayZariski.Statement := by
   intro n d J q hJ
   choose F hF0 hF using fun k : Fin n =>
     hG (Fin d × Fin n) n (universalSliceIdeal J d q) (X k - C (C (q k))) (hB n d J q hJ k)

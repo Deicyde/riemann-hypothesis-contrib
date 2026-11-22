@@ -10,23 +10,35 @@ open Polynomial
 
 namespace GlobalTheory.InertNorm
 
-theorem isAdicComplete_map_of_finite {O : Type} [CommRing O] [IsNoetherianRing O] (I : Ideal O)
-    [IsAdicComplete I O] (R : Type) [CommRing R] [Algebra O R] [Module.Finite O R] :
-    IsAdicComplete (I.map (algebraMap O R)) R := by
+theorem isAdicComplete_map_of_finite
+    {O : Type} [CommRing O] [IsNoetherianRing O]
+    (I : Ideal O) [IsAdicComplete I O]
+    (R : Type) [CommRing R] [Algebra O R] [Module.Finite O R]
+    : IsAdicComplete (I.map (algebraMap O R)) R := by
   rw [IsAdicComplete.map_algebraMap_iff]
   have : IsHausdorff I R := IsHausdorff.of_le_jacobson I R (IsAdicComplete.le_jacobson I)
-  have : IsPrecomplete I R := ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion.isPrecomplete_finite_module I R
+  have : IsPrecomplete I R :=
+    ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion.isPrecomplete_finite_module
+      I R
   exact ⟨⟩
 
-theorem finite_quotient_map_of_finite {O : Type} [CommRing O] (I : Ideal O) [Finite (O ⧸ I)]
-    (R : Type) [CommRing R] [Algebra O R] [Module.Finite O R] :
-    Finite (R ⧸ I.map (algebraMap O R)) := by
+theorem finite_quotient_map_of_finite
+    {O : Type} [CommRing O]
+    (I : Ideal O) [Finite (O ⧸ I)]
+    (R : Type) [CommRing R] [Algebra O R] [Module.Finite O R]
+    : Finite (R ⧸ I.map (algebraMap O R)) := by
   have : Module.Finite O (R ⧸ I.map (algebraMap O R)) := inferInstance
   have : Module.Finite (O ⧸ I) (R ⧸ I.map (algebraMap O R)) :=
     Module.Finite.of_restrictScalars_finite O (O ⧸ I) _
   exact Module.finite_of_finite (O ⧸ I)
 
-theorem exists_dvd_mul_map_sub_X : ∀ (O : Type) [CommRing O] [IsNoetherianRing O] (I : Ideal O) [IsAdicComplete I O] [Finite (O ⧸ I)] (c : O →+* O), (∀ x, c (c x) = x) → (∀ x ∈ I, c x ∈ I) → (∃ ω, IsUnit (ω - c ω)) → ∀ f : Polynomial O, f.Monic → f.map c = f → IsUnit (f.coeff 0) → ∃ p : Polynomial O, f ∣ p * p.map c - Polynomial.X := by
+theorem exists_dvd_mul_map_sub_X
+    : ∀ (O : Type) [CommRing O] [IsNoetherianRing O] (I : Ideal O) [IsAdicComplete I O]
+        [Finite (O ⧸ I)] (c : O →+* O),
+      (∀ x, c (c x) = x) → (∀ x ∈ I, c x ∈ I) → (∃ ω, IsUnit (ω - c ω))
+        → ∀ f : Polynomial O,
+          f.Monic → f.map c = f → IsUnit (f.coeff 0)
+            → ∃ p : Polynomial O, f ∣ p * p.map c - Polynomial.X := by
   intro O _ _ I _ _ c hcc hcI hω f hf hfc hf0
   have : Module.Finite O (AdjoinRoot f) := (AdjoinRoot.powerBasis' hf).finite
   let J : Ideal (AdjoinRoot f) := I.map (algebraMap O (AdjoinRoot f))
@@ -40,7 +52,8 @@ theorem exists_dvd_mul_map_sub_X : ∀ (O : Type) [CommRing O] [IsNoetherianRing
   have hc'mk : ∀ p : Polynomial O, c' (AdjoinRoot.mk f p) = AdjoinRoot.mk f (p.map c) := by
     intro p
     simp only [c', AdjoinRoot.lift_mk]
-    rw [← Polynomial.eval₂_map, ← AdjoinRoot.aeval_eq, Polynomial.aeval_def, AdjoinRoot.algebraMap_eq]
+    rw [← Polynomial.eval₂_map, ← AdjoinRoot.aeval_eq, Polynomial.aeval_def,
+      AdjoinRoot.algebraMap_eq]
   have hc'of : ∀ x : O, c' (algebraMap O (AdjoinRoot f) x) = algebraMap O (AdjoinRoot f) (c x) := by
     intro x
     simp only [AdjoinRoot.algebraMap_eq, c', AdjoinRoot.lift_of, RingHom.comp_apply]
@@ -66,12 +79,14 @@ theorem exists_dvd_mul_map_sub_X : ∀ (O : Type) [CommRing O] [IsNoetherianRing
   have hunit : IsUnit (AdjoinRoot.root f) := by
     have h0 : (f - Polynomial.C (f.coeff 0)).coeff 0 = 0 := by simp
     obtain ⟨q, hq⟩ := Polynomial.X_dvd_iff.mpr h0
-    have hm : AdjoinRoot.root f * AdjoinRoot.mk f q = -AdjoinRoot.of f (f.coeff 0) := by
+    have hm : AdjoinRoot.root f * AdjoinRoot.mk f q = - AdjoinRoot.of f (f.coeff 0) := by
       have := congrArg (AdjoinRoot.mk f) hq
       rw [map_sub, AdjoinRoot.mk_self, map_mul, AdjoinRoot.mk_X, AdjoinRoot.mk_C, zero_sub] at this
       exact this.symm
     exact isUnit_of_mul_isUnit_left (hm ▸ (hf0.map (AdjoinRoot.of f)).neg)
-  obtain ⟨x, hx⟩ := GlobalTheory.T.exists_norm_eq_fixed_unit_henselian (AdjoinRoot f) J c' hinv hJ hω' (AdjoinRoot.root f) hroot hunit
+  obtain ⟨x, hx⟩ :=
+    GlobalTheory.T.exists_norm_eq_fixed_unit_henselian (AdjoinRoot f) J c' hinv hJ hω'
+      (AdjoinRoot.root f) hroot hunit
   obtain ⟨p, rfl⟩ := AdjoinRoot.mk_surjective x
   refine ⟨p, ?_⟩
   rw [← AdjoinRoot.mk_eq_zero, map_sub, map_mul, ← hc'mk, hx, AdjoinRoot.mk_X, sub_self]

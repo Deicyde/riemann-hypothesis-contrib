@@ -18,17 +18,19 @@ section Straight
 
 variable {M : Type*} [AddCommGroup M] [Module ℂ M] {E : Fin n → Fin n → Module.End ℂ M}
 
-theorem lowerWord_weight (hE : Formalism.REAL.KRel ε E) {μ : Fin n → ℝ} {y : M}
-    (hy : ∀ a, E a a y = (μ a : ℂ) • y) :
-    ∀ (l : List (Fin n × Fin n)), (∀ p ∈ l, IsKLow ε p) → ∀ (a : Fin n),
-      E a a (lowWord E y l) = (lowWt μ l a : ℂ) • lowWord E y l
+theorem lowerWord_weight
+    (hE : Formalism.REAL.KRel ε E) {μ : Fin n → ℝ} {y : M} (hy : ∀ a, E a a y = (μ a : ℂ) • y)
+    : ∀ (l : List (Fin n × Fin n)),
+      (∀ p ∈ l, IsKLow ε p)
+        → ∀ (a : Fin n), E a a (lowWord E y l) = (lowWt μ l a : ℂ) • lowWord E y l
   | [], _, a => by simpa [lowWord, lowWt] using hy a
   | (c, d) :: l, hl, a => by
     have hcd : IsKLow ε (c, d) := hl _ (List.mem_cons_self ..)
     have h := congrArg (fun X : Module.End ℂ M => X (lowWord E y l)) (hE a a c d rfl hcd.2)
     simp only [LinearMap.sub_apply, Module.End.mul_apply] at h
     rw [lowerWord_weight hE hy l (fun q hq => hl q (List.mem_cons_of_mem _ hq)) a, map_smul,
-      sub_eq_iff_eq_add] at h
+        sub_eq_iff_eq_add]
+      at h
     simp only [lowWord, lowWt]
     rw [h]
     simp only [root, Pi.add_apply, Pi.sub_apply, Pi.single_apply]
@@ -44,9 +46,11 @@ theorem lowerWord_weight (hE : Formalism.REAL.KRel ε E) {μ : Fin n → ℝ} {y
       module
     · simp [hac, had, Ne.symm had]
 
-theorem compactLoweringSpan_diag_stable (hE : Formalism.REAL.KRel ε E) {μ : Fin n → ℝ} {y : M}
-    (hy : ∀ a, E a a y = (μ a : ℂ) • y) (a : Fin n) :
-    ∀ x ∈ kLowSpan ε E y, E a a x ∈ kLowSpan ε E y := by
+theorem compactLoweringSpan_diag_stable
+    (hE : Formalism.REAL.KRel ε E)
+    {μ : Fin n → ℝ} {y : M} (hy : ∀ a, E a a y = (μ a : ℂ) • y)
+    (a : Fin n)
+    : ∀ x ∈ kLowSpan ε E y, E a a x ∈ kLowSpan ε E y := by
   have : kLowSpan ε E y ≤ (kLowSpan ε E y).comap (E a a) := by
     refine Submodule.span_le.2 ?_
     rintro x ⟨l, hl, rfl⟩
@@ -55,17 +59,21 @@ theorem compactLoweringSpan_diag_stable (hE : Formalism.REAL.KRel ε E) {μ : Fi
     exact Submodule.smul_mem _ _ (lowWord_mem hl)
   exact fun x hx => this hx
 
-theorem lowerWord_mem_span_of_ge (hE : Formalism.REAL.KRel ε E) {μ : Fin n → ℝ} {y : M}
-    (hy : ∀ a, E a a y = (μ a : ℂ) • y)
-    {l : List (Fin n × Fin n)} (hl : ∀ p ∈ l, IsKLow ε p) {a b : Fin n} (hab : b ≤ a)
-    (hε : ε a = ε b) : E a b (lowWord E y l) ∈ kLowSpan ε E y := by
+theorem lowerWord_mem_span_of_ge
+    (hE : Formalism.REAL.KRel ε E)
+    {μ : Fin n → ℝ} {y : M} (hy : ∀ a, E a a y = (μ a : ℂ) • y)
+    {l : List (Fin n × Fin n)} (hl : ∀ p ∈ l, IsKLow ε p)
+    {a b : Fin n} (hab : b ≤ a) (hε : ε a = ε b)
+    : E a b (lowWord E y l) ∈ kLowSpan ε E y := by
   rcases hab.lt_or_eq with h | rfl
   · exact kLowSpan_low_stable (c := a) (d := b) ⟨h, hε⟩ _ (lowWord_mem hl)
   · exact compactLoweringSpan_diag_stable hE hy b _ (lowWord_mem hl)
 
-theorem lowerWord_raise_mem_span (hE : Formalism.REAL.KRel ε E) {μ : Fin n → ℝ} {y : M} (hy : IsKHWVec ε E μ y) :
-    ∀ (l : List (Fin n × Fin n)), (∀ p ∈ l, IsKLow ε p) → ∀ a b : Fin n, a < b → ε a = ε b →
-      E a b (lowWord E y l) ∈ kLowSpan ε E y
+theorem lowerWord_raise_mem_span
+    (hE : Formalism.REAL.KRel ε E) {μ : Fin n → ℝ} {y : M} (hy : IsKHWVec ε E μ y)
+    : ∀ (l : List (Fin n × Fin n)),
+      (∀ p ∈ l, IsKLow ε p)
+        → ∀ a b : Fin n, a < b → ε a = ε b → E a b (lowWord E y l) ∈ kLowSpan ε E y
   | [], _, a, b, hab, hε => by
     simp only [lowWord]
     rw [hy.2 a b hab hε]
@@ -84,7 +92,8 @@ theorem lowerWord_raise_mem_span (hE : Formalism.REAL.KRel ε E) {μ : Fin n →
     rw [sub_eq_iff_eq_add] at h
     simp only [lowWord]
     rw [h]
-    refine Submodule.add_mem _ (Submodule.sub_mem _ ?_ ?_) (kLowSpan_low_stable hcd _ (ih a b hab hε))
+    refine Submodule.add_mem _ (Submodule.sub_mem _ ?_ ?_)
+      (kLowSpan_low_stable hcd _ (ih a b hab hε))
     · split_ifs with hbc
       · subst hbc; exact key a d (hε.trans hcd.2)
       · simp
@@ -92,8 +101,9 @@ theorem lowerWord_raise_mem_span (hE : Formalism.REAL.KRel ε E) {μ : Fin n →
       · subst hda; exact key c b (hcd.2.trans hε)
       · simp
 
-theorem compactLoweringSpan_kStable (hE : Formalism.REAL.KRel ε E) {μ : Fin n → ℝ} {y : M} (hy : IsKHWVec ε E μ y) :
-    IsKStableSub ε E (kLowSpan ε E y) := by
+theorem compactLoweringSpan_kStable
+    (hE : Formalism.REAL.KRel ε E) {μ : Fin n → ℝ} {y : M} (hy : IsKHWVec ε E μ y)
+    : IsKStableSub ε E (kLowSpan ε E y) := by
   intro a b hab
   rcases lt_or_ge a b with h | h
   · have : kLowSpan ε E y ≤ (kLowSpan ε E y).comap (E a b) := by

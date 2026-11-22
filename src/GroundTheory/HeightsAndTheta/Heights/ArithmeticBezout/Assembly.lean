@@ -202,48 +202,31 @@ set_option maxSynthPendingDepth 1
 namespace GroundTheory.Heights₂.Heights
 
 theorem ChowFormBaseChange.full : ChowFormBaseChange.Statement :=
-  (ChowFormBaseChange.proof
-    RadicalBaseChange.proof
-    (ChowFormExtend.proof RadicalBaseChange.proof)
-    (ChowFormReduced.proof_of_prime_separate
-      IncIdealPrime.full
-      (IncIdealSeparate.proof
-        IncidenceZeroLocus.proof
-        (FormsThroughPoint.proof
-          IncidenceZeroLocus.proof
-          ThroughPointIncIdeal.proof
+  (ChowFormBaseChange.proof RadicalBaseChange.proof (ChowFormExtend.proof RadicalBaseChange.proof)
+    (ChowFormReduced.proof_of_prime_separate IncIdealPrime.full
+      (IncIdealSeparate.proof IncidenceZeroLocus.proof
+        (FormsThroughPoint.proof IncidenceZeroLocus.proof ThroughPointIncIdeal.proof
           (ChartZeroTrdeg.proof AffineChartTrdeg.full)
-          (ThroughTwoPointsTrdeg.proof TrdegAdjoinLe.proof)
-          TrdegBaseAlgebraic.proof)
+          (ThroughTwoPointsTrdeg.proof TrdegAdjoinLe.proof) TrdegBaseAlgebraic.proof)
         (IncIdealNeBotDim.proof IncIdealDim.full))))
 
-theorem BaseChangeAvoid.full : BaseChangeAvoid.Statement :=
-  BaseChangeAvoid.proof
+theorem BaseChangeAvoid.full : BaseChangeAvoid.Statement := BaseChangeAvoid.proof
 
-theorem ProjPrimeHasPoint.full : ProjPrimeHasPoint.Statement :=
-  ProjPrimeHasPoint.proof
+theorem ProjPrimeHasPoint.full : ProjPrimeHasPoint.Statement := ProjPrimeHasPoint.proof
 
 theorem ChowFormSectionVertical.full : ChowFormSectionVertical.Statement :=
   Vertical.ChowFormSectionVertical.full
 
 theorem ConeMassOfFibre.full : ConeMassOfFibre.Statement :=
-  (ConeMassOfFibre.of_open
-    ConeFiniteFibreDim.proof
-    (ConeGraphCover.proof
-      ConeFiniteFibreDim.proof
-      (ConeTangentDim.proof
-        (ConeKrullDimLe.proof ConeFiniteFibreDim.proof)
-        NullSmaller.full
+  (ConeMassOfFibre.of_open ConeFiniteFibreDim.proof
+    (ConeGraphCover.proof ConeFiniteFibreDim.proof
+      (ConeTangentDim.proof (ConeKrullDimLe.proof ConeFiniteFibreDim.proof) NullSmaller.full
         (FrameJacobianGeneric.proof JacobianRankGeneric.proof ConormalGenerationGeneric.proof))
       (ConeSmoothLocalGraph.proof PolyLocalGenerators.proof HolomorphicImplicitGraph.proof))
     (ConeJacMeasurable.proof TangentJacCompress.proof KernelProjMeasurable.proof)
-    (ConeTangentDim.proof
-      (ConeKrullDimLe.proof ConeFiniteFibreDim.proof)
-      NullSmaller.full
+    (ConeTangentDim.proof (ConeKrullDimLe.proof ConeFiniteFibreDim.proof) NullSmaller.full
       (FrameJacobianGeneric.proof JacobianRankGeneric.proof ConormalGenerationGeneric.proof))
-    (GraphAreaFibre.proof
-      (GraphAreaIntegral.proof GraphAreaHolomorphic.full)
-      TangentJacComp.proof
+    (GraphAreaFibre.proof (GraphAreaIntegral.proof GraphAreaHolomorphic.full) TangentJacComp.proof
       AreaMultiplicityWeight.proof)
     TangentGaussInvariant.proof)
 

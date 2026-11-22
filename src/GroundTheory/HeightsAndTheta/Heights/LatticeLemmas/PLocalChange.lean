@@ -19,9 +19,10 @@ noncomputable section
 section Congr
 
 variable {K : Type*} [Field K] [NumberField K]
-variable {E E' : Type*} [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E]
-  [Module.Projective (𝓞 K) E] [AddCommGroup E'] [Module (𝓞 K) E'] [Module.Finite (𝓞 K) E']
-  [Module.Projective (𝓞 K) E']
+variable
+  {E E' : Type*}
+  [AddCommGroup E] [Module (𝓞 K) E] [Module.Finite (𝓞 K) E] [Module.Projective (𝓞 K) E]
+  [AddCommGroup E'] [Module (𝓞 K) E'] [Module.Finite (𝓞 K) E'] [Module.Projective (𝓞 K) E']
 
 end Congr
 
@@ -32,9 +33,10 @@ variable {V : Type*} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalar
 
 end Lattices
 
-theorem finrank_submodule_eq {R M : Type*} [CommRing R] [IsDomain R] [AddCommGroup M] [Module R M]
-    (F : Submodule R M) (hF : ∀ x : M, ∃ a : R, a ≠ 0 ∧ a • x ∈ F) :
-    Module.finrank R F = Module.finrank R M := by
+theorem finrank_submodule_eq
+    {R M : Type*} [CommRing R] [IsDomain R] [AddCommGroup M] [Module R M]
+    (F : Submodule R M) (hF : ∀ x : M, ∃ a : R, a ≠ 0 ∧ a • x ∈ F)
+    : Module.finrank R F = Module.finrank R M := by
   have h0 : Module.rank R (M ⧸ F) = 0 := by
     rw [rank_eq_zero_iff]
     intro x
@@ -51,7 +53,6 @@ section Local
 
 variable {K : Type*} [Field K] [NumberField K]
 variable {V : Type*} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
-
 
 end Local
 

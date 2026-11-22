@@ -21,29 +21,28 @@ variable {G : Type} [Group G] [TopologicalSpace G]
 
 def conjFn (g : G) (f : G → ℂ) : G → ℂ := fun x => f (g⁻¹ * x * g)
 
-
 variable (G) in
 abbrev testFn : Submodule ℂ (G → ℂ) := locallyConstantCompactSupport G ℂ ℂ
 
-
 variable (G) in
 def PInvIsGInv (P : Subgroup G) : Prop :=
-  ∀ D : (G → ℂ) →ₗ[ℂ] ℂ, (∀ p ∈ P, ∀ f ∈ testFn G, D (conjFn p f) = D f) →
-    ∀ (g : G), ∀ f ∈ testFn G, D (conjFn g f) = D f
+  ∀ D : (G → ℂ) →ₗ[ℂ] ℂ,
+    (∀ p ∈ P, ∀ f ∈ testFn G, D (conjFn p f) = D f)
+      → ∀ (g : G), ∀ f ∈ testFn G, D (conjFn g f) = D f
 
 variable {V : Type} [AddCommGroup V] [Module ℂ V]
 
 def HasTraceDistr (ρ : Representation ℂ G V) : Prop :=
   ∃ D : Module.End ℂ V →ₗ[ℂ] (G → ℂ) →ₗ[ℂ] ℂ,
-    (∀ (g : G) (S : Module.End ℂ V), ∀ f ∈ testFn G, D (ρ g⁻¹ * S * ρ g) f = D S (conjFn g f)) ∧
-    (∀ S : Module.End ℂ V, (∀ f ∈ testFn G, D S f = 0) → S = 0)
+    (∀ (g : G) (S : Module.End ℂ V), ∀ f ∈ testFn G, D (ρ g⁻¹ * S * ρ g) f = D S (conjFn g f))
+      ∧ (∀ S : Module.End ℂ V, (∀ f ∈ testFn G, D S f = 0) → S = 0)
 
 abbrev Sesq (V : Type) [AddCommGroup V] [Module ℂ V] : Type := V →ₗ[ℂ] V →ₗ⋆[ℂ] ℂ
 
 def HasFormTraceDistr (ρ : Representation ℂ G V) : Prop :=
   ∃ D : Sesq V →ₗ[ℂ] (G → ℂ) →ₗ[ℂ] ℂ,
-    (∀ (g : G) (B : Sesq V), ∀ f ∈ testFn G, D ((B ∘ₗ ρ g).compl₂ (ρ g)) f = D B (conjFn g f)) ∧
-    (∀ B : Sesq V, (∀ f ∈ testFn G, D B f = 0) → B = 0)
+    (∀ (g : G) (B : Sesq V), ∀ f ∈ testFn G, D ((B ∘ₗ ρ g).compl₂ (ρ g)) f = D B (conjFn g f))
+      ∧ (∀ B : Sesq V, (∀ f ∈ testFn G, D B f = 0) → B = 0)
 
 def InvFormScalar (ρ : Representation ℂ G V) (B₀ : Sesq V) : Prop :=
   ∀ B : Sesq V, (∀ g v w, B (ρ g v) (ρ g w) = B v w) → ∃ c : ℂ, B = c • B₀
@@ -51,9 +50,11 @@ def InvFormScalar (ρ : Representation ℂ G V) (B₀ : Sesq V) : Prop :=
 def PFormScalar (P : Subgroup G) (ρ : Representation ℂ G V) (B₀ : Sesq V) : Prop :=
   ∀ B : Sesq V, (∀ p ∈ P, ∀ v w, B (ρ p v) (ρ p w) = B v w) → ∃ c : ℂ, B = c • B₀
 
-theorem form_inv_of_trace (P : Subgroup G) (ρ : Representation ℂ G V) (hA : PInvIsGInv G P)
-    (hD : HasFormTraceDistr ρ) (B : Sesq V) (hB : ∀ p ∈ P, ∀ v w, B (ρ p v) (ρ p w) = B v w) (g : G) (v w : V) :
-    B (ρ g v) (ρ g w) = B v w := by
+theorem form_inv_of_trace
+    (P : Subgroup G) (ρ : Representation ℂ G V) (hA : PInvIsGInv G P) (hD : HasFormTraceDistr ρ)
+    (B : Sesq V) (hB : ∀ p ∈ P, ∀ v w, B (ρ p v) (ρ p w) = B v w)
+    (g : G) (v w : V)
+    : B (ρ g v) (ρ g w) = B v w := by
   obtain ⟨D, hequiv, hfaith⟩ := hD
   have hP : ∀ p ∈ P, ∀ f ∈ testFn G, D B (conjFn p f) = D B f := by
     intro p hp f hf
@@ -62,41 +63,47 @@ theorem form_inv_of_trace (P : Subgroup G) (ρ : Representation ℂ G V) (hA : P
       exact hB p hp v w
     rw [← hequiv p B f hf, e]
   have hG := hA (D B) hP
-  have h0 : (B ∘ₗ ρ g).compl₂ (ρ g) - B = 0 := hfaith _ fun f hf => by
-    rw [map_sub, LinearMap.sub_apply, hequiv g B f hf, hG g f hf, sub_self]
+  have h0 : (B ∘ₗ ρ g).compl₂ (ρ g) - B = 0 :=
+    hfaith _ fun f hf => by rw [map_sub, LinearMap.sub_apply, hequiv g B f hf, hG g f hf, sub_self]
   have h1 := congrArg (fun C : Sesq V => C v w) (sub_eq_zero.1 h0)
   simpa using h1
 
-theorem pFormScalar_of (P : Subgroup G) (ρ : Representation ℂ G V) (B₀ : Sesq V) (hA : PInvIsGInv G P)
-    (hD : HasFormTraceDistr ρ) (hS : InvFormScalar ρ B₀) : PFormScalar P ρ B₀ :=
-  fun B hB => hS B (form_inv_of_trace P ρ hA hD B hB)
+theorem pFormScalar_of
+    (P : Subgroup G) (ρ : Representation ℂ G V) (B₀ : Sesq V)
+    (hA : PInvIsGInv G P) (hD : HasFormTraceDistr ρ) (hS : InvFormScalar ρ B₀)
+    : PFormScalar P ρ B₀ := fun B hB =>
+  hS B (form_inv_of_trace P ρ hA hD B hB)
 
-private theorem eigen_lemma (W : Submodule ℂ V) [FiniteDimensional ℂ W] [Nontrivial W] (B B₀ : Sesq V)
-    (hpos : ∀ v, v ≠ 0 → 0 < (B₀ v v).re) :
-    ∃ c : ℂ, ∃ x : V, x ∈ W ∧ x ≠ 0 ∧ ∀ y ∈ W, B x y = c * B₀ x y := by
+private theorem eigen_lemma
+    (W : Submodule ℂ V) [FiniteDimensional ℂ W] [Nontrivial W]
+    (B B₀ : Sesq V) (hpos : ∀ v, v ≠ 0 → 0 < (B₀ v v).re)
+    : ∃ c : ℂ, ∃ x : V, x ∈ W ∧ x ≠ 0 ∧ ∀ y ∈ W, B x y = c * B₀ x y := by
   let b := Module.finBasis ℂ W
-  let L0 : W →ₗ[ℂ] (Fin (Module.finrank ℂ W) → ℂ) :=
-    { toFun := fun x j => B₀ (x : V) (b j : V)
-      map_add' := by
-        intro x y
-        ext j
-        simp
-      map_smul' := by
-        intro c x
-        ext j
-        simp }
-  let L : W →ₗ[ℂ] (Fin (Module.finrank ℂ W) → ℂ) :=
-    { toFun := fun x j => B (x : V) (b j : V)
-      map_add' := by
-        intro x y
-        ext j
-        simp
-      map_smul' := by
-        intro c x
-        ext j
-        simp }
-  have hext : ∀ (C : Sesq V) (c : ℂ) (x : V), (∀ j, C x (b j : V) = c * B₀ x (b j : V)) →
-      ∀ y ∈ W, C x y = c * B₀ x y := by
+  let L0 : W →ₗ[ℂ] (Fin (Module.finrank ℂ W) → ℂ) := {
+    toFun := fun x j => B₀ (x : V) (b j : V)
+    map_add' := by
+      intro x y
+      ext j
+      simp
+    map_smul' := by
+      intro c x
+      ext j
+      simp
+  }
+  let L : W →ₗ[ℂ] (Fin (Module.finrank ℂ W) → ℂ) := {
+    toFun := fun x j => B (x : V) (b j : V)
+    map_add' := by
+      intro x y
+      ext j
+      simp
+    map_smul' := by
+      intro c x
+      ext j
+      simp
+  }
+  have hext
+      : ∀ (C : Sesq V) (c : ℂ) (x : V),
+        (∀ j, C x (b j : V) = c * B₀ x (b j : V)) → ∀ y ∈ W, C x y = c * B₀ x y := by
     intro C c x h y hy
     have key : (C x).comp W.subtype = c • ((B₀ x).comp W.subtype) := by
       apply b.ext
@@ -131,14 +138,17 @@ private theorem eigen_lemma (W : Submodule ℂ V) [FiniteDimensional ℂ W] [Non
     have h3 := congrFun h2 j
     simpa [E, L, L0, LinearMap.linearEquivOfInjective_apply] using h3
 
-theorem invFormScalar_of_admissible [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G]
-    [TotallyDisconnectedSpace G] (ρ : Representation ℂ G V) (hadm : GroundTheory.Automorphic.IsAdmissible ρ) [ρ.IsIrreducible]
-    (B₀ : Sesq V) (hpos : ∀ v, v ≠ 0 → 0 < (B₀ v v).re) (hinv : ∀ g v w, B₀ (ρ g v) (ρ g w) = B₀ v w) :
-    InvFormScalar ρ B₀ := by
+theorem invFormScalar_of_admissible
+    [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G] [TotallyDisconnectedSpace G]
+    (ρ : Representation ℂ G V) (hadm : GroundTheory.Automorphic.IsAdmissible ρ) [ρ.IsIrreducible]
+    (B₀ : Sesq V)
+    (hpos : ∀ v, v ≠ 0 → 0 < (B₀ v v).re) (hinv : ∀ g v w, B₀ (ρ g v) (ρ g w) = B₀ v w)
+    : InvFormScalar ρ B₀ := by
   intro B hB
   obtain ⟨v0, hv0⟩ := exists_ne_zero_of_isIrreducible (ρ := ρ)
-  obtain ⟨K, hKc, hKle⟩ := hasBasis_nhds_one_compactOpenSubgroup.mem_iff.1
-    ((hadm.1 v0).mem_nhds (stabilizerOf ρ v0).one_mem)
+  obtain ⟨K, hKc, hKle⟩ :=
+    hasBasis_nhds_one_compactOpenSubgroup.mem_iff.1 ((hadm.1 v0).mem_nhds
+      (stabilizerOf ρ v0).one_mem)
   have hKo : IsOpen ((K : Subgroup G) : Set G) := K.isOpen
   haveI : FiniteDimensional ℂ (fixedVectors ρ (K : Subgroup G)) := hadm.2 _ hKc hKo
   have hv0W : v0 ∈ fixedVectors ρ (K : Subgroup G) := mem_fixedVectors.2 (fun k hk => hKle hk)
@@ -166,13 +176,16 @@ theorem invFormScalar_of_admissible [IsTopologicalGroup G] [LocallyCompactSpace 
     rw [LinearMap.mem_ker, map_sub, sub_eq_zero] at h1
     rw [h1]
     exact hW0 _ (fixedProj ρ hadm.1 hKc hKo y).2
-  let U : Subrepresentation ρ := ⟨LinearMap.ker (B - c • B₀), by
-    intro g v hv
-    rw [LinearMap.mem_ker] at hv ⊢
-    ext w
-    have hw : ρ g (ρ g⁻¹ w) = w := by
-      rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply]
-    rw [LinearMap.zero_apply, ← hw, hB'inv, hv, LinearMap.zero_apply]⟩
+  let U : Subrepresentation ρ := ⟨
+    LinearMap.ker (B - c • B₀),
+    by
+      intro g v hv
+      rw [LinearMap.mem_ker] at hv ⊢
+      ext w
+      have hw : ρ g (ρ g⁻¹ w) = w := by
+        rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply]
+      rw [LinearMap.zero_apply, ← hw, hB'inv, hv, LinearMap.zero_apply]
+  ⟩
   rcases IsSimpleOrder.eq_bot_or_eq_top U with h | h
   · exfalso
     have hmem : x0 ∈ U.toSubmodule := LinearMap.mem_ker.2 (LinearMap.ext hall)
@@ -190,33 +203,59 @@ end General
 
 section GeneralLinearIntegers
 
-def TheoremA (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] : Prop := ∀ n : ℕ, PInvIsGInv (GL (Fin (n + 1)) k) (GlobalTheory.BZMir.Mir k n)
+def TheoremA
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : Prop :=
+  ∀ n : ℕ, PInvIsGInv (GL (Fin (n + 1)) k) (GlobalTheory.BZMir.Mir k n)
 
-def FormTraceDistrGL (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] : Prop :=
+def FormTraceDistrGL
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : Prop :=
   ∀ (n : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin (n + 1)) k) V),
-    GroundTheory.Automorphic.IsAdmissible π → π.IsIrreducible → (∃ B₀ : Sesq V, (∀ v w, B₀ w v = starRingEnd ℂ (B₀ v w)) ∧
-      (∀ v, v ≠ 0 → 0 < (B₀ v v).re) ∧ ∀ g v w, B₀ (π g v) (π g w) = B₀ v w) → HasFormTraceDistr π
+    GroundTheory.Automorphic.IsAdmissible π → π.IsIrreducible
+      → (∃ B₀ : Sesq V,
+        (∀ v w, B₀ w v = starRingEnd ℂ (B₀ v w)) ∧ (∀ v, v ≠ 0 → 0 < (B₀ v v).re)
+          ∧ ∀ g v w, B₀ (π g v) (π g w) = B₀ v w)
+      → HasFormTraceDistr π
 
-def FormSchurGL (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] : Prop :=
+def FormSchurGL
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : Prop :=
   ∀ (n : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin (n + 1)) k) V)
-    (B₀ : Sesq V), GroundTheory.Automorphic.IsAdmissible π → π.IsIrreducible → (∀ v w, B₀ w v = starRingEnd ℂ (B₀ v w)) →
-    (∀ v, v ≠ 0 → 0 < (B₀ v v).re) → (∀ g v w, B₀ (π g v) (π g w) = B₀ v w) → InvFormScalar π B₀
+      (B₀ : Sesq V),
+    GroundTheory.Automorphic.IsAdmissible π → π.IsIrreducible
+      → (∀ v w, B₀ w v = starRingEnd ℂ (B₀ v w)) → (∀ v, v ≠ 0 → 0 < (B₀ v v).re)
+      → (∀ g v w, B₀ (π g v) (π g w) = B₀ v w)
+      → InvFormScalar π B₀
 
-def KirillovForm (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] : Prop :=
+def KirillovForm
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : Prop :=
   ∀ (n : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin (n + 1)) k) V)
-    (B₀ : Sesq V), GroundTheory.Automorphic.IsAdmissible π → π.IsIrreducible → (∀ v w, B₀ w v = starRingEnd ℂ (B₀ v w)) →
-    (∀ v, v ≠ 0 → 0 < (B₀ v v).re) → (∀ g v w, B₀ (π g v) (π g w) = B₀ v w) → PFormScalar (GlobalTheory.BZMir.Mir k n) π B₀
+      (B₀ : Sesq V),
+    GroundTheory.Automorphic.IsAdmissible π → π.IsIrreducible
+      → (∀ v w, B₀ w v = starRingEnd ℂ (B₀ v w)) → (∀ v, v ≠ 0 → 0 < (B₀ v v).re)
+      → (∀ g v w, B₀ (π g v) (π g w) = B₀ v w)
+      → PFormScalar (GlobalTheory.BZMir.Mir k n) π B₀
 
-theorem kirillovForm_of_theoremA (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (hA : TheoremA k) (hD : FormTraceDistrGL k) (hS : FormSchurGL k) :
-    KirillovForm k := by
+theorem kirillovForm_of_theoremA
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (hA : TheoremA k) (hD : FormTraceDistrGL k) (hS : FormSchurGL k)
+    : KirillovForm k := by
   intro n V _ _ π B₀ hadm hirr h1 h2 h3
-  exact pFormScalar_of _ π B₀ (hA n) (hD n V π hadm hirr ⟨B₀, h1, h2, h3⟩) (hS n V π B₀ hadm hirr h1 h2 h3)
+  exact pFormScalar_of _ π B₀ (hA n) (hD n V π hadm hirr ⟨B₀, h1, h2, h3⟩)
+    (hS n V π B₀ hadm hirr h1 h2 h3)
 
-theorem formSchurGL (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] : FormSchurGL k := by
+theorem formSchurGL
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    : FormSchurGL k := by
   intro n V _ _ π B₀ hadm hirr _ h2 h3
   exact invFormScalar_of_admissible π hadm B₀ h2 h3
 
-theorem kirillovForm_of_theoremA' (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (hA : TheoremA k) (hD : FormTraceDistrGL k) : KirillovForm k :=
+theorem kirillovForm_of_theoremA'
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (hA : TheoremA k) (hD : FormTraceDistrGL k)
+    : KirillovForm k :=
   kirillovForm_of_theoremA k hA hD (formSchurGL k)
 
 end GeneralLinearIntegers

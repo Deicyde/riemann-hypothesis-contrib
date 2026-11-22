@@ -4,13 +4,14 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
 open scoped Matrix
 open GlobalTheory.HodgeCoh GlobalTheory.CechDR Polynomial UpperTheory.Gal.W2
 
-theorem UpperTheory.Gal.W2.traceDual_of :
-    UpperTheory.Gal.W2.TraceDual := by
+theorem UpperTheory.Gal.W2.traceDual_of : UpperTheory.Gal.W2.TraceDual := by
   intro F _ _ s hs
   classical
   let e := NumberField.RingOfIntegers.basis F
@@ -31,8 +32,7 @@ theorem UpperTheory.Gal.W2.traceDual_of :
     intro k
     simp only [mul_sub, Finset.sum_sub_distrib, ← map_mul]
     rw [hm k, ← htr, mul_comm (e k : F) b, hb, sub_eq_zero]
-    have he : (e k : F) = NumberField.integralBasis F k := by
-      rw [NumberField.integralBasis_apply]
+    have he : (e k : F) = NumberField.integralBasis F k := by rw [NumberField.integralBasis_apply]
     rw [he, Module.Basis.constr_basis]
     simp
   let P : ((F →+* ℂ) → ℂ) →ₗ[ℂ] ℂ := ∑ τ, (τ b - s τ) • LinearMap.proj τ
@@ -40,8 +40,8 @@ theorem UpperTheory.Gal.W2.traceDual_of :
     apply (NumberField.canonicalEmbedding.latticeBasis F).ext
     intro k
     simp only [P, NumberField.canonicalEmbedding.latticeBasis_apply, LinearMap.sum_apply,
-      LinearMap.smul_apply, LinearMap.proj_apply,
-      NumberField.canonicalEmbedding.apply_at, smul_eq_mul, LinearMap.zero_apply]
+      LinearMap.smul_apply, LinearMap.proj_apply, NumberField.canonicalEmbedding.apply_at,
+      smul_eq_mul, LinearMap.zero_apply]
     rw [← hk k]
     refine Finset.sum_congr rfl fun τ _ => ?_
     rw [mul_comm, NumberField.integralBasis_apply]

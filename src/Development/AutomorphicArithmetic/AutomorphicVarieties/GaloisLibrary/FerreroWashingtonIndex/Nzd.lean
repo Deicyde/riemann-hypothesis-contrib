@@ -6,10 +6,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open UpperTheory.V.FW
 
-theorem UpperTheory.V.FW.nzd :
-    ∀ (k A : Type) [CommRing k] [AddCommGroup A] (a : A) (x : AddMonoidAlgebra k A), (∀ m : ℕ, m • a = 0 → m = 0) → (1 - AddMonoidAlgebra.single a 1) * x = 0 → x = 0 := by
+theorem UpperTheory.V.FW.nzd
+    : ∀ (k A : Type) [CommRing k] [AddCommGroup A] (a : A) (x : AddMonoidAlgebra k A),
+      (∀ m : ℕ, m • a = 0 → m = 0) → (1 - AddMonoidAlgebra.single a 1) * x = 0 → x = 0 := by
   intro k A _ _ a x ha h
-  have hx : AddMonoidAlgebra.single a (1:k) * x = x := by
+  have hx : AddMonoidAlgebra.single a (1 : k) * x = x := by
     rw [sub_mul, one_mul, sub_eq_zero] at h; exact h.symm
   have step : ∀ c, x.coeff (c + a) = x.coeff c := by
     intro c

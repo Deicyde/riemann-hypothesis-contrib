@@ -5,15 +5,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OrdL
 
 @[expose] public section
 
-open GlobalTheory.FunObj GlobalTheory.SplitWeil GlobalTheory.SplitFlip GlobalTheory.RootEx GlobalTheory.DiagVol ValuativeRel Matrix
+open GlobalTheory.FunObj GlobalTheory.SplitWeil GlobalTheory.SplitFlip GlobalTheory.RootEx
+  GlobalTheory.DiagVol ValuativeRel Matrix
 
 namespace GlobalTheory.DiagVol
 
-theorem colE_mem_symN_KO {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] {n : Type} [Fintype n] [DecidableEq n] {c : ℕ}
-    (t : n ⊕ Fin c) (y : n ⊕ Fin c → k) (hy : ∀ r, y r ∈ 𝒪[k])
-    (hz : ∀ r, ¬ ordL c r < ordL c t → y r = 0) :
-    ∃ x ∈ symN k n c ⊓ KO k (n ⊕ Fin c),
+theorem colE_mem_symN_KO
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {n : Type} [Fintype n] [DecidableEq n]
+    {c : ℕ} (t : n ⊕ Fin c) (y : n ⊕ Fin c → k) (hy : ∀ r, y r ∈ 𝒪[k])
+    (hz : ∀ r, ¬ ordL c r < ordL c t → y r = 0)
+    : ∃ x ∈ symN k n c ⊓ KO k (n ⊕ Fin c),
       x.val = 1 + Matrix.of (fun r s => if s = t then y r else 0) := by
   set E : Matrix (n ⊕ Fin c) (n ⊕ Fin c) k := Matrix.of (fun r s => if s = t then y r else 0) with hE
   have hyt : y t = 0 := hz t (lt_irrefl _)
@@ -58,22 +60,22 @@ theorem colE_mem_symN_KO {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace
     cases t with
     | inr j =>
       refine Subgroup.mem_sup_left (Model.mem_N_iff.2 (hInN _ fun r hr => ?_))
-      have hlt : ordL c r < ordL c (Sum.inr j : n ⊕ Fin c) := by
-        by_contra h; exact hr (hz r h)
+      have hlt : ordL c r < ordL c (Sum.inr j : n ⊕ Fin c) := by by_contra h; exact hr (hz r h)
       cases r with
       | inl a => simp [ordL, lev] at hlt ⊢; omega
       | inr i => simp [ordL, lev] at hlt ⊢; omega
     | inl a0 =>
       refine Subgroup.mem_sup_right (Model.mem_N_iff.2 (hInN _ fun r hr => ?_))
-      have hlt : ordL c r < ordL c (Sum.inl a0 : n ⊕ Fin c) := by
-        by_contra h; exact hr (hz r h)
+      have hlt : ordL c r < ordL c (Sum.inl a0 : n ⊕ Fin c) := by by_contra h; exact hr (hz r h)
       cases r with
       | inl a => simp [ordL, lev] at hlt ⊢
       | inr i => simp [ordL, lev] at hlt ⊢; omega
   · refine (mem_KO_iff _).2 ⟨fun i j => ?_, fun i j => ?_⟩
     · show (1 + E) i j ∈ 𝒪[k]
-      rw [Matrix.add_apply]; exact add_mem (hone i j) (hEi i j)
+      rw [Matrix.add_apply]
+      exact add_mem (hone i j) (hEi i j)
     · show (1 - E) i j ∈ 𝒪[k]
-      rw [Matrix.sub_apply]; exact sub_mem (hone i j) (hEi i j)
+      rw [Matrix.sub_apply]
+      exact sub_mem (hone i j) (hEi i j)
 
 end GlobalTheory.DiagVol

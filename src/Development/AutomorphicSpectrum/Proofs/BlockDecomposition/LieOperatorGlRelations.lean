@@ -19,12 +19,15 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LieOpera
 
 @[expose] public section
 
-open NumberField GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL MeasureTheory PositivityTheory.S2.Clozel
+open NumberField GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL MeasureTheory
+  PositivityTheory.S2.Clozel
 
 namespace GlobalTheory.CompanionTheory.Clozel
 
-theorem glRel_EopV : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ) (π : CuspSub E a)
-    (τ : E →+* ℂ), Formalism.REAL.GlRel (EopV π τ) := by
+theorem glRel_EopV
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ)
+        (π : CuspSub E a) (τ : E →+* ℂ),
+      Formalism.REAL.GlRel (EopV π τ) := by
   intro E _ _ _ a π τ i j k l
   have key := GlobalTheory.CompanionTheory.ClozelPurity.EopV_val E a π τ
   apply LinearMap.ext

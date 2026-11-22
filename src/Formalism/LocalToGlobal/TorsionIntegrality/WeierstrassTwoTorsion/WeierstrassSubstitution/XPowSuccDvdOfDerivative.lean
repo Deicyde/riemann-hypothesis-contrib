@@ -20,8 +20,9 @@ section Unique
 variable {R : Type u} [CommRing R]
 
 theorem X_pow_succ_dvd_of_derivative
-    (hR : ∀ (n : ℕ) (r : R), n ≠ 0 → (n : R) * r = 0 → r = 0) {f : R⟦X⟧} {n : ℕ}
-    (h0 : constantCoeff f = 0) (h : X ^ n ∣ derivative f) : X ^ (n + 1) ∣ f := by
+    (hR : ∀ (n : ℕ) (r : R), n ≠ 0 → (n : R) * r = 0 → r = 0)
+    {f : R⟦X⟧} {n : ℕ} (h0 : constantCoeff f = 0) (h : X ^ n ∣ derivative f)
+    : X ^ (n + 1) ∣ f := by
   rw [PowerSeries.X_pow_dvd_iff] at h ⊢
   intro m hm
   rcases m with _ | k
@@ -65,13 +66,12 @@ theorem plusZCleared_of (hZ : PlusZ.{u}) (hT : TInZ.{u}) : PlusZCleared.{u} := b
       derivative_C, Derivation.map_one_eq_zero, smul_eq_mul, nsmul_eq_mul]
     push_cast
     ring
-  have hdg : derivative g = -g ^ 2 * derivative f := by
+  have hdg : derivative g = - g ^ 2 * derivative f := by
     have h := congrArg (derivative) hfg
     rw [Derivation.leibniz, Derivation.map_one_eq_zero, smul_eq_mul, smul_eq_mul] at h
     linear_combination g * h - derivative g * hfg
   have hz : (toL X : LaurentSeries K) * uPow (-1) = 1 := Plus.toL_X_mul
-  have hxZ : xZ W = uPow (-2) + toL P - HahnSeries.C (W.b₂ / 12) := by
-    rw [← hsh, wpL]; ring
+  have hxZ : xZ W = uPow (-2) + toL P - HahnSeries.C (W.b₂ / 12) := by rw [← hsh, wpL]; ring
 
   have hdwp : dL (wpL W) = uPow (-1) ^ 3 * (toL X * toL (derivative f) - 2 * toL f) := by
     have h1 : toL X * toL (derivative f) = 2 * (toL f - 1) + toL X ^ 3 * toL (derivative P) := by
@@ -101,8 +101,8 @@ theorem plusZCleared_of (hZ : PlusZ.{u}) (hT : TInZ.{u}) : PlusZCleared.{u} := b
   have d2 : dL (2 : LaurentSeries K) = 0 := by
     rw [← map_ofNat (HahnSeries.C : K →+* LaurentSeries K) 2, dL_C]
   rw [e2', e1, d2] at hlog
-  have hmain : derivative (g * derivative f) = 2 * P - (xp + C (W.b₂ / 12))
-      - (xm + C (W.b₂ / 12)) := by
+  have hmain
+      : derivative (g * derivative f) = 2 * P - (xp + C (W.b₂ / 12)) - (xm + C (W.b₂ / 12)) := by
     apply toL_injective
     simp only [map_add (f := _), map_sub, map_mul, map_ofNat, toL_C]
     linear_combination hlog

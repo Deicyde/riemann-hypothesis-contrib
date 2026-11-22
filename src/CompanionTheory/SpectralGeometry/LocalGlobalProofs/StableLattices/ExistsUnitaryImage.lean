@@ -13,14 +13,16 @@ open ReciprocityTheory.ChartRestriction.DS
 
 namespace GlobalTheory.CompanionTheory.Unitarize
 
-variable {n : ℕ} {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+variable
+  {n : ℕ} {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {X : Type*} [AddCommGroup X] [Module ℂ X]
 
-theorem injective_of_simple {M : Type*} [AddCommGroup M] [Module ℂ M]
+theorem injective_of_simple
+    {M : Type*} [AddCommGroup M] [Module ℂ M]
     {E : Fin n → Fin n → Module.End ℂ X} {F : Fin n → Fin n → Module.End ℂ M}
     (hS : ∀ W : Submodule ℂ X, (∀ a b, ∀ x ∈ W, E a b x ∈ W) → W = ⊥ ∨ W = ⊤)
-    (c : X →ₗ[ℂ] M) (hc : ∀ a b x, c (E a b x) = F a b (c x)) (h0 : c ≠ 0) :
-    Function.Injective c := by
+    (c : X →ₗ[ℂ] M) (hc : ∀ a b x, c (E a b x) = F a b (c x)) (h0 : c ≠ 0)
+    : Function.Injective c := by
   have hst : ∀ a b, ∀ x ∈ LinearMap.ker c, E a b x ∈ LinearMap.ker c := by
     intro a b x hx
     rw [LinearMap.mem_ker] at hx ⊢
@@ -29,19 +31,19 @@ theorem injective_of_simple {M : Type*} [AddCommGroup M] [Module ℂ M]
   · exact LinearMap.ker_eq_bot.1 h
   · exact absurd (LinearMap.ker_eq_top.1 h) h0
 
-theorem adjSign_eq_sgn (ε : Fin n → Bool) (a b : Fin n) :
-    adjSign ε a b = ((Formalism.REAL.sgn ε a b : ℝ) : ℂ) := by
+theorem adjSign_eq_sgn (ε : Fin n → Bool) (a b : Fin n)
+    : adjSign ε a b = ((Formalism.REAL.sgn ε a b : ℝ) : ℂ) := by
   unfold adjSign Formalism.REAL.sgn
   split_ifs <;> simp
 
-theorem exists_unitary_image {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
-    (hσ : IsURepOn (UJset ε) σ) {E : Fin n → Fin n → Module.End ℂ X}
+theorem exists_unitary_image
+    {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} (hσ : IsURepOn (UJset ε) σ)
+    {E : Fin n → Fin n → Module.End ℂ X}
     (hS : ∀ W : Submodule ℂ X, (∀ a b, ∀ x ∈ W, E a b x ∈ W) → W = ⊥ ∨ W = ⊤)
-    (c : X →ₗ[ℂ] smD ε σ) (hc : ∀ a b x, c (E a b x) = smE ε σ a b (c x)) (h0 : c ≠ 0) :
-    ∃ (V : Submodule ℂ H) (E' : Fin n → Fin n → Module.End ℂ V) (e : X ≃ₗ[ℂ] V),
-      (∀ x, ((e x : V) : H) = ((c x : smD ε σ) : H)) ∧
-      Formalism.REAL.GlRel E' ∧ Formalism.REAL.IsUnitary ε E' ∧
-      ∀ a b x, e (E a b x) = E' a b (e x) := by
+    (c : X →ₗ[ℂ] smD ε σ) (hc : ∀ a b x, c (E a b x) = smE ε σ a b (c x)) (h0 : c ≠ 0)
+    : ∃ (V : Submodule ℂ H) (E' : Fin n → Fin n → Module.End ℂ V) (e : X ≃ₗ[ℂ] V),
+      (∀ x, ((e x : V) : H) = ((c x : smD ε σ) : H)) ∧ Formalism.REAL.GlRel E'
+        ∧ Formalism.REAL.IsUnitary ε E' ∧ ∀ a b x, e (E a b x) = E' a b (e x) := by
   have hinj : Function.Injective c := injective_of_simple hS c hc h0
   set d : X →ₗ[ℂ] H := (smD ε σ).subtype ∘ₗ c with hd
   have hdinj : Function.Injective d := Subtype.val_injective.comp hinj
@@ -52,8 +54,9 @@ theorem exists_unitary_image {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) 
   have hE' : ∀ a b x, E' a b (e x) = e (E a b x) := by
     intro a b x
     simp [E']
-  have hcoe : ∀ a b x, ((E' a b (e x) : LinearMap.range d) : H) =
-      ((smE ε σ a b (c x) : smD ε σ) : H) := by
+  have hcoe
+      : ∀ a b x,
+        ((E' a b (e x) : LinearMap.range d) : H) = ((smE ε σ a b (c x) : smD ε σ) : H) := by
     intro a b x
     rw [hE', he, hc]
   have hgl : IsGlRep (smE ε σ) := (isDerivedOn_smE hσ).glRep
@@ -65,8 +68,10 @@ theorem exists_unitary_image {ε : Fin n → Bool} {σ : Matrix (Fin n) (Fin n) 
     have h := LinearMap.congr_fun (hgl a b c' d') (c x)
     have h' := congrArg (Subtype.val) h
     apply Subtype.ext
-    have hEE : ∀ a b c' d', ((E' a b (E' c' d' (e x)) : LinearMap.range d) : H) =
-        ((smE ε σ a b (smE ε σ c' d' (c x)) : smD ε σ) : H) := by
+    have hEE
+        : ∀ a b c' d',
+          ((E' a b (E' c' d' (e x)) : LinearMap.range d) : H)
+            = ((smE ε σ a b (smE ε σ c' d' (c x)) : smD ε σ) : H) := by
       intro a b c' d'
       rw [hE', hcoe, hc]
     simp only [Module.End.mul_apply, LinearMap.sub_apply, Submodule.coe_sub] at h' ⊢

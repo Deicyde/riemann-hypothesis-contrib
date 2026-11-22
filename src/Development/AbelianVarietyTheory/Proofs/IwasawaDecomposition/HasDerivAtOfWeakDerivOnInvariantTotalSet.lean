@@ -11,12 +11,11 @@ namespace GlobalTheory.Mem.Osc
 
 theorem hasDerivAt_of_weak_on_invariant_total
     (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-    (U : ℝ → H →L[ℂ] H) (D : Set H) (x w : H) (h0 : U 0 = 1)
-    (hadd : ∀ s t, U (s + t) = U s * U t) (hn : ∀ t y, ‖U t y‖ = ‖y‖)
-    (hc : ∀ y, Continuous fun t => U t y) (hD : Dense (Submodule.span ℂ D : Set H))
-    (hinv : ∀ t, ∀ y ∈ D, U t y ∈ D)
-    (hw : ∀ y ∈ D, HasDerivAt (fun t : ℝ => inner ℂ (U t x) y) (inner ℂ w y) 0) :
-    HasDerivAt (fun t : ℝ => U t x) w 0 := by
+    (U : ℝ → H →L[ℂ] H) (D : Set H) (x w : H) (h0 : U 0 = 1) (hadd : ∀ s t, U (s + t) = U s * U t)
+    (hn : ∀ t y, ‖U t y‖ = ‖y‖) (hc : ∀ y, Continuous fun t => U t y)
+    (hD : Dense (Submodule.span ℂ D : Set H)) (hinv : ∀ t, ∀ y ∈ D, U t y ∈ D)
+    (hw : ∀ y ∈ D, HasDerivAt (fun t : ℝ => inner ℂ (U t x) y) (inner ℂ w y) 0)
+    : HasDerivAt (fun t : ℝ => U t x) w 0 := by
   have hiso : ∀ t a b, inner ℂ (U t a) (U t b) = inner ℂ a b := fun t a b =>
     (⟨(U t).toLinearMap, hn t⟩ : H →ₗᵢ[ℂ] H).inner_map_map a b
   have hadj : ∀ t a y, inner ℂ (U t a) y = inner ℂ a (U (-t) y) := by
@@ -27,8 +26,8 @@ theorem hasDerivAt_of_weak_on_invariant_total
     rw [← hiso t a (U (-t) y), this]
   have hI : ∀ t : ℝ, HasDerivAt (fun u : ℝ => ∫ s in (0:ℝ)..u, U s w) (U t w) t := fun t =>
     ((hc w).integral_hasStrictDerivAt 0 t).hasDerivAt
-  have hall : ∀ y ∈ D, ∀ t : ℝ,
-      HasDerivAt (fun u : ℝ => inner ℂ (U u x) y) (inner ℂ (U t w) y) t := by
+  have hall
+      : ∀ y ∈ D, ∀ t : ℝ, HasDerivAt (fun u : ℝ => inner ℂ (U u x) y) (inner ℂ (U t w) y) t := by
     intro y hy t
     have h1 := hw _ (hinv (-t) y hy)
     rw [← hadj] at h1
@@ -43,17 +42,20 @@ theorem hasDerivAt_of_weak_on_invariant_total
     rw [← hadj, ← h4]
   have hz : ∀ y ∈ D, ∀ t : ℝ, inner ℂ (U t x - x - ∫ s in (0:ℝ)..t, U s w) y = 0 := by
     intro y hy t
-    have hd : ∀ u : ℝ, HasDerivAt
-        (fun u : ℝ => inner ℂ (U u x) y - inner ℂ (∫ s in (0:ℝ)..u, U s w) y) (0:ℂ) u := by
+    have hd
+        : ∀ u : ℝ,
+          HasDerivAt
+            (fun u : ℝ => inner ℂ (U u x) y - inner ℂ (∫ s in (0:ℝ)..u, U s w) y)
+            (0 : ℂ) u := by
       intro u
       have h5 := (hI u).inner ℂ (hasDerivAt_const u y)
       have h6 := (hall y hy u).sub h5
       simp only [inner_zero_right, zero_add, sub_self] at h6
       exact h6
-    have h7 := is_const_of_deriv_eq_zero (fun u => (hd u).differentiableAt)
-      (fun u => (hd u).deriv) t 0
-    simp only [h0, intervalIntegral.integral_same, inner_zero_left, sub_zero,
-      one_apply_eq_self] at h7
+    have h7 :=
+      is_const_of_deriv_eq_zero (fun u => (hd u).differentiableAt) (fun u => (hd u).deriv) t 0
+    simp only [h0, intervalIntegral.integral_same, inner_zero_left, sub_zero, one_apply_eq_self]
+      at h7
     rw [inner_sub_left, inner_sub_left, ← h7]
     ring
   have hF : ∀ t : ℝ, U t x = x + ∫ s in (0:ℝ)..t, U s w := by

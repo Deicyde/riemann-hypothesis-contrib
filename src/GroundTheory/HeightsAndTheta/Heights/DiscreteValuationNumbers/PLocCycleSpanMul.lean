@@ -15,18 +15,20 @@ open ReciprocityTheory.ChartRestriction.G.AI ReciprocityTheory.ChartRestriction.
 
 noncomputable section
 
-theorem LocCycleSpanMul.mem_minimalPrimes_iff {A : Type*} [CommRing A] [IsDomain A] [IsNoetherianRing A]
-    {z : A} (hz : z ≠ 0) (W : Ideal A) :
-    W ∈ (Ideal.span {z}).minimalPrimes ↔ W.IsPrime ∧ W.height = 1 ∧ z ∈ W :=
+theorem LocCycleSpanMul.mem_minimalPrimes_iff
+    {A : Type*} [CommRing A] [IsDomain A] [IsNoetherianRing A] {z : A} (hz : z ≠ 0) (W : Ideal A)
+    : W ∈ (Ideal.span {z}).minimalPrimes ↔ W.IsPrime ∧ W.height = 1 ∧ z ∈ W :=
   _root_.UpperTheory.Reformulated.B.Yhd1.mem_minimalPrimes_iff hz W
 
 theorem LocCycleSpanMul.proof : LocCycleSpanMul.Statement := by
   intro A _ _ _ x y hx hy W
   by_cases hP : W.IsPrime ∧ W.height = 1
   · obtain ⟨hp, h1⟩ := hP
-    have key : ∀ z : A, z ≠ 0 →
-        locCycle (Ideal.span {z}) W = ((locLen (A ⧸ Ideal.span {z}) ⟨W, hp⟩).toNat : ℤ) ∧
-          locLen (A ⧸ Ideal.span {z}) ⟨W, hp⟩ ≠ ⊤ := by
+    have key
+        : ∀ z : A,
+          z ≠ 0
+            → locCycle (Ideal.span {z}) W = ((locLen (A ⧸ Ideal.span {z}) ⟨W, hp⟩).toNat : ℤ)
+              ∧ locLen (A ⧸ Ideal.span {z}) ⟨W, hp⟩ ≠ ⊤ := by
       intro z hz
       by_cases hzW : z ∈ W
       · have hm : W ∈ (Ideal.span {z}).minimalPrimes :=
@@ -47,8 +49,9 @@ theorem LocCycleSpanMul.proof : LocCycleSpanMul.Statement := by
     obtain ⟨ex, fx⟩ := key x hx
     obtain ⟨ey, fy⟩ := key y hy
     obtain ⟨exy, -⟩ := key (x * y) (mul_ne_zero hx hy)
-    have hmul := locLen_mul (V := (⊥ : Ideal A)) Ideal.isPrime_bot (f := x)
-      (by rw [Ideal.mem_bot]; exact hx) y ⟨W, hp⟩
+    have hmul :=
+      locLen_mul (V := (⊥ : Ideal A)) Ideal.isPrime_bot (f := x) (by rw [Ideal.mem_bot]; exact hx) y
+        ⟨W, hp⟩
     rw [bot_sup_eq, bot_sup_eq, bot_sup_eq] at hmul
     rw [exy, ex, ey, hmul, ENat.toNat_add fy fx]
     push_cast

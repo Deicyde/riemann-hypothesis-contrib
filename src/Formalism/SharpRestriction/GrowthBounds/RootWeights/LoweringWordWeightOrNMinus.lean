@@ -16,36 +16,42 @@ attribute [local instance 100] LieRing.ofAssociativeRing
 
 variable {n : ℕ} {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
 
-theorem mem_weightSpace_iff_diag_eigen {E : GLOps n K V} {mu : Fin n → ℤ} {x : V} :
-    x ∈ weightSp E mu ↔ ∀ a, E a a x = (mu a : K) • x := by
+theorem mem_weightSpace_iff_diag_eigen {E : GLOps n K V} {mu : Fin n → ℤ} {x : V}
+    : x ∈ weightSp E mu ↔ ∀ a, E a a x = (mu a : K) • x := by
   unfold weightSp
   simp only [Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply, sub_eq_zero]
   all_goals exact Iff.rfl
 
-theorem weight_zero_lowering_kills_raising [CharZero K] [FiniteDimensional K V] {E : GLOps n K V} (hE : IsGLRep E) {v : V}
-    (hv : v ∈ weightSp E 0) (a b : Fin n) (hab : a ≠ b) (he : E a b v = 0) : E b a v = 0 := by
+theorem weight_zero_lowering_kills_raising
+    [CharZero K] [FiniteDimensional K V]
+    {E : GLOps n K V} (hE : IsGLRep E)
+    {v : V} (hv : v ∈ weightSp E 0)
+    (a b : Fin n) (hab : a ≠ b) (he : E a b v = 0)
+    : E b a v = 0 := by
   have hva : E a a v = 0 := by simpa using (mem_weightSpace_iff_diag_eigen.mp hv) a
   have hvb : E b b v = 0 := by simpa using (mem_weightSpace_iff_diag_eigen.mp hv) b
   have rAA : ∀ y, E a a (E b a y) = E b a (E a a y) - E b a y := by
     intro y
     have h := LinearMap.congr_fun (hE.1 a a b a) y
     rw [if_neg hab, if_pos rfl, LinearMap.sub_apply, LinearMap.sub_apply, LinearMap.zero_apply,
-      zero_sub] at h
+        zero_sub]
+      at h
     rw [sub_eq_add_neg]
     exact sub_eq_iff_eq_add'.mp h
   have rBB : ∀ y, E b b (E b a y) = E b a (E b b y) + E b a y := by
     intro y
     have h := LinearMap.congr_fun (hE.1 b b b a) y
     rw [if_pos rfl, if_neg hab, LinearMap.sub_apply, LinearMap.sub_apply, LinearMap.zero_apply,
-      sub_zero] at h
+        sub_zero]
+      at h
     exact sub_eq_iff_eq_add'.mp h
   have rEF : ∀ y, E a b (E b a y) = E b a (E a b y) + (E a a y - E b b y) := by
     intro y
     have h := LinearMap.congr_fun (hE.1 a b b a) y
     rw [if_pos rfl, if_pos rfl, LinearMap.sub_apply, LinearMap.sub_apply] at h
     exact sub_eq_iff_eq_add'.mp h
-  have hstep : ∀ j : ℕ, E b a ((⇑(E b a))^[j] v) = (⇑(E b a))^[j+1] v :=
-    fun j => (Function.iterate_succ_apply' _ j v).symm
+  have hstep : ∀ j : ℕ, E b a ((⇑(E b a))^[j] v) = (⇑(E b a))^[j+1] v := fun j =>
+    (Function.iterate_succ_apply' _ j v).symm
   have hA : ∀ k : ℕ, E a a ((⇑(E b a))^[k] v) = -(k : K) • (⇑(E b a))^[k] v := by
     intro k
     induction k with
@@ -62,14 +68,15 @@ theorem weight_zero_lowering_kills_raising [CharZero K] [FiniteDimensional K V] 
       rw [← hstep k, rBB, ih, map_smul]
       push_cast
       module
-  have hC : ∀ k : ℕ, E a b ((⇑(E b a))^[k+1] v) = -((k : K) * ((k : K) + 1)) • (⇑(E b a))^[k] v := by
+  have hC
+      : ∀ k : ℕ, E a b ((⇑(E b a))^[k+1] v) = -((k : K) * ((k : K) + 1)) • (⇑(E b a))^[k] v := by
     intro k
     induction k with
     | zero =>
       rw [← hstep 0, rEF]
       simp [he, hva, hvb]
     | succ k ih =>
-      rw [← hstep (k+1), rEF, ih, map_smul, hstep k, hA (k+1), hB (k+1)]
+      rw [← hstep (k + 1), rEF, ih, map_smul, hstep k, hA (k + 1), hB (k + 1)]
       push_cast
       module
   have hex : ∃ k : ℕ, (⇑(E b a))^[k+1] v = 0 := by
@@ -77,12 +84,13 @@ theorem weight_zero_lowering_kills_raising [CharZero K] [FiniteDimensional K V] 
     push_neg at hne
     have hli : LinearIndependent K (fun k : ℕ => (⇑(E b a))^[k+1] v) := by
       refine Module.End.eigenvectors_linearIndependent' (E a a)
-        (fun k : ℕ => -(((k+1 : ℕ) : K))) ?_ _ ?_
+        (fun k : ℕ => -(((k + 1 : ℕ) : K)))
+        ?_ _ ?_
       · intro i j hij
         simpa using hij
       · intro k
         rw [Module.End.hasEigenvector_iff, Module.End.mem_eigenspace_iff]
-        exact ⟨hA (k+1), hne k⟩
+        exact ⟨hA (k + 1), hne k⟩
     haveI := hli.finite
     exact not_finite ℕ
   have hdown : ∀ j : ℕ, (⇑(E b a))^[j+1] v = 0 → E b a v = 0 := by
@@ -92,24 +100,25 @@ theorem weight_zero_lowering_kills_raising [CharZero K] [FiniteDimensional K V] 
     | succ j ih =>
       intro h
       apply ih
-      have h2 := hC (j+1)
+      have h2 := hC (j + 1)
       rw [h, map_zero] at h2
-      have hc : -(((j+1 : ℕ) : K) * (((j+1 : ℕ) : K) + 1)) ≠ 0 := by
+      have hc : -(((j + 1 : ℕ) : K) * (((j + 1 : ℕ) : K) + 1)) ≠ 0 := by
         rw [neg_ne_zero]
         refine mul_ne_zero ?_ ?_
         · exact_mod_cast Nat.succ_ne_zero j
-        · exact_mod_cast Nat.succ_ne_zero (j+1)
+        · exact_mod_cast Nat.succ_ne_zero (j + 1)
       exact (smul_eq_zero.mp h2.symm).resolve_left hc
   obtain ⟨k, hk⟩ := hex
   exact hdown k hk
 
 def commonKernelOperators (E : GLOps n K V) : Submodule K V := ⨅ a, ⨅ b, LinearMap.ker (E a b)
 
-theorem mem_common_kernel_iff {E : GLOps n K V} {x : V} : x ∈ commonKernelOperators E ↔ ∀ a b, E a b x = 0 := by
+theorem mem_common_kernel_iff {E : GLOps n K V} {x : V}
+    : x ∈ commonKernelOperators E ↔ ∀ a b, E a b x = 0 := by
   simp only [commonKernelOperators, Submodule.mem_iInf, LinearMap.mem_ker]
 
-theorem enveloping_preserves_common_kernel {E : GLOps n K V} {u : Module.End K V} (hu : u ∈ Umon E) :
-    ∀ y ∈ commonKernelOperators E, u y ∈ commonKernelOperators E := by
+theorem enveloping_preserves_common_kernel {E : GLOps n K V} {u : Module.End K V} (hu : u ∈ Umon E)
+    : ∀ y ∈ commonKernelOperators E, u y ∈ commonKernelOperators E := by
   have hu' : u ∈ Submonoid.closure (Set.range fun ab : Fin n × Fin n => E ab.1 ab.2) := hu
   clear hu
   induction hu' using Submonoid.closure_induction with
@@ -122,7 +131,9 @@ theorem enveloping_preserves_common_kernel {E : GLOps n K V} {u : Module.End K V
   | one => intro y hy; exact hy
   | mul x z _ _ ihx ihz => intro y hy; exact ihx _ (ihz y hy)
 
-theorem trivial_isotypic_invariant_holds [CharZero K] [FiniteDimensional K V] {E : GLOps n K V} (hE : IsGLRep E) : TrivialIsotypicIsInvariant E := by
+theorem trivial_isotypic_invariant_holds
+    [CharZero K] [FiniteDimensional K V] {E : GLOps n K V} (hE : IsGLRep E)
+    : TrivialIsotypicIsInvariant E := by
   have hle : isoSub E 0 ≤ commonKernelOperators E := by
     unfold isoSub
     rw [Submodule.span_le]
@@ -145,22 +156,29 @@ def loweringWordMonoid (E : GLOps n K V) : Submonoid (Module.End K V) :=
 def loweringWordSpan (E : GLOps n K V) (v : V) : Submodule K V :=
   Submodule.span K {x | ∃ u ∈ loweringWordMonoid E, x = u v}
 
-theorem lowering_word_span_lowering_stable {E : GLOps n K V} {v : V} {a b : Fin n} (hab : b < a) :
-    ∀ y ∈ loweringWordSpan E v, E a b y ∈ loweringWordSpan E v := by
+theorem lowering_word_span_lowering_stable {E : GLOps n K V} {v : V} {a b : Fin n} (hab : b < a)
+    : ∀ y ∈ loweringWordSpan E v, E a b y ∈ loweringWordSpan E v := by
   intro y hy
   have key : loweringWordSpan E v ≤ (loweringWordSpan E v).comap (E a b) := by
     unfold loweringWordSpan
     rw [Submodule.span_le]
     rintro x ⟨u, hu, rfl⟩
     rw [SetLike.mem_coe, Submodule.mem_comap]
-    exact Submodule.subset_span ⟨E a b * u, mul_mem (Submonoid.subset_closure ⟨a, b, hab, rfl⟩) hu, rfl⟩
+    exact Submodule.subset_span
+      ⟨E a b * u, mul_mem (Submonoid.subset_closure ⟨a, b, hab, rfl⟩) hu, rfl⟩
   exact key hy
 
-theorem lowering_word_span_operator_mem {E : GLOps n K V} (hE : IsGLRep E) {mu : Fin n → ℤ} {v : V} (hv : IsHWV E mu v)
-    {u : Module.End K V} (hu : u ∈ loweringWordMonoid E) : ∀ c d, E c d (u v) ∈ loweringWordSpan E v := by
-  have hmem : ∀ w ∈ loweringWordMonoid E, w v ∈ loweringWordSpan E v := fun w hw => Submodule.subset_span ⟨w, hw, rfl⟩
-  have main : ∀ w ∈ loweringWordMonoid E, (∀ c d, E c d (w v) ∈ loweringWordSpan E v) →
-      ∀ c d, E c d (u (w v)) ∈ loweringWordSpan E v := by
+theorem lowering_word_span_operator_mem
+    {E : GLOps n K V} (hE : IsGLRep E)
+    {mu : Fin n → ℤ} {v : V} (hv : IsHWV E mu v)
+    {u : Module.End K V} (hu : u ∈ loweringWordMonoid E)
+    : ∀ c d, E c d (u v) ∈ loweringWordSpan E v := by
+  have hmem : ∀ w ∈ loweringWordMonoid E, w v ∈ loweringWordSpan E v := fun w hw =>
+    Submodule.subset_span ⟨w, hw, rfl⟩
+  have main
+      : ∀ w ∈ loweringWordMonoid E,
+        (∀ c d, E c d (w v) ∈ loweringWordSpan E v)
+          → ∀ c d, E c d (u (w v)) ∈ loweringWordSpan E v := by
     have hu' : u ∈ Submonoid.closure {F | ∃ a b : Fin n, b < a ∧ F = E a b} := hu
     clear hu
     induction hu' using Submonoid.closure_induction with
@@ -178,7 +196,8 @@ theorem lowering_word_span_operator_mem {E : GLOps n K V} (hE : IsGLRep E) {mu :
       · split_ifs
         · exact hwY a d
         · rw [LinearMap.zero_apply]; exact zero_mem _
-    | one => intro w hw hwY c d; exact hwY c d
+    | one =>
+      intro w hw hwY c d; exact hwY c d
     | mul x z _ hz ihx ihz =>
       intro w hw hwY c d
       exact ihx (z * w) (mul_mem hz hw) (ihz w hw hwY) c d
@@ -193,8 +212,9 @@ theorem lowering_word_span_operator_mem {E : GLOps n K V} (hE : IsGLRep E) {mu :
   intro c d
   exact main 1 (one_mem _) base c d
 
-theorem lowering_word_span_gl_stable {E : GLOps n K V} (hE : IsGLRep E) {mu : Fin n → ℤ} {v : V} (hv : IsHWV E mu v)
-    (c d : Fin n) : ∀ y ∈ loweringWordSpan E v, E c d y ∈ loweringWordSpan E v := by
+theorem lowering_word_span_gl_stable
+    {E : GLOps n K V} (hE : IsGLRep E) {mu : Fin n → ℤ} {v : V} (hv : IsHWV E mu v) (c d : Fin n)
+    : ∀ y ∈ loweringWordSpan E v, E c d y ∈ loweringWordSpan E v := by
   intro y hy
   have key : loweringWordSpan E v ≤ (loweringWordSpan E v).comap (E c d) := by
     unfold loweringWordSpan
@@ -203,8 +223,11 @@ theorem lowering_word_span_gl_stable {E : GLOps n K V} (hE : IsGLRep E) {mu : Fi
     exact lowering_word_span_operator_mem hE hv hu c d
   exact key hy
 
-theorem lowering_word_span_enveloping_stable {E : GLOps n K V} (hE : IsGLRep E) {mu : Fin n → ℤ} {v : V} (hv : IsHWV E mu v)
-    {u : Module.End K V} (hu : u ∈ Umon E) : ∀ y ∈ loweringWordSpan E v, u y ∈ loweringWordSpan E v := by
+theorem lowering_word_span_enveloping_stable
+    {E : GLOps n K V} (hE : IsGLRep E)
+    {mu : Fin n → ℤ} {v : V} (hv : IsHWV E mu v)
+    {u : Module.End K V} (hu : u ∈ Umon E)
+    : ∀ y ∈ loweringWordSpan E v, u y ∈ loweringWordSpan E v := by
   have hu' : u ∈ Submonoid.closure (Set.range fun ab : Fin n × Fin n => E ab.1 ab.2) := hu
   clear hu
   induction hu' using Submonoid.closure_induction with
@@ -215,9 +238,11 @@ theorem lowering_word_span_enveloping_stable {E : GLOps n K V} (hE : IsGLRep E) 
   | one => intro y hy; exact hy
   | mul x z _ _ ihx ihz => intro y hy; exact ihx _ (ihz y hy)
 
-theorem lowering_word_weight_or_nMinus {E : GLOps n K V} (hs : OperatorsShiftWeightsByRoots E) {mu : Fin n → ℤ} {v : V}
-    (hv : v ∈ weightSp E mu) {u : Module.End K V} (hu : u ∈ loweringWordMonoid E) :
-    (∃ ν, u v ∈ weightSp E ν) ∧ (u v = v ∨ u v ∈ nMinus E) := by
+theorem lowering_word_weight_or_nMinus
+    {E : GLOps n K V} (hs : OperatorsShiftWeightsByRoots E)
+    {mu : Fin n → ℤ} {v : V} (hv : v ∈ weightSp E mu)
+    {u : Module.End K V} (hu : u ∈ loweringWordMonoid E)
+    : (∃ ν, u v ∈ weightSp E ν) ∧ (u v = v ∨ u v ∈ nMinus E) := by
   have hu' : u ∈ Submonoid.closure {F | ∃ a b : Fin n, b < a ∧ F = E a b} := hu
   clear hu
   induction hu' using Submonoid.closure_induction generalizing mu v with
@@ -228,7 +253,8 @@ theorem lowering_word_weight_or_nMinus {E : GLOps n K V} (hs : OperatorsShiftWei
       unfold nMinus
       exact le_iSup_of_le a (le_iSup_of_le b (le_iSup_of_le hab le_rfl))
     exact hle (LinearMap.mem_range_self _ v)
-  | one => exact ⟨⟨mu, hv⟩, Or.inl rfl⟩
+  | one =>
+    exact ⟨⟨mu, hv⟩, Or.inl rfl⟩
   | mul x z _ _ ihx ihz =>
     obtain ⟨⟨ν, hν⟩, h1⟩ := ihz (mu := mu) (v := v) hv
     obtain ⟨⟨ν', hν'⟩, h2⟩ := ihx (mu := ν) (v := z v) hν
@@ -241,7 +267,9 @@ theorem lowering_word_weight_or_nMinus {E : GLOps n K V} (hs : OperatorsShiftWei
         exact h1
     · right; exact h2
 
-theorem nontrivial_isotypic_weight_zero_killed {E : GLOps n K V} (hE : IsGLRep E) (hs : OperatorsShiftWeightsByRoots E) : NontrivialIsotypicWeightZeroKilled E := by
+theorem nontrivial_isotypic_weight_zero_killed
+    {E : GLOps n K V} (hE : IsGLRep E) (hs : OperatorsShiftWeightsByRoots E)
+    : NontrivialIsotypicWeightZeroKilled E := by
   intro P π hπ hP mu hmu x hx
   have hY : ∀ v, IsHWV E mu v → ∀ y ∈ loweringWordSpan E v, P (π y) = 0 := by
     intro v hv
@@ -267,7 +295,8 @@ theorem nontrivial_isotypic_weight_zero_killed {E : GLOps n K V} (hE : IsGLRep E
     rintro y ⟨u, hu, v, hv, rfl⟩
     rw [SetLike.mem_coe, LinearMap.mem_ker]
     show P (π (u v)) = 0
-    exact hY v hv (u v) (lowering_word_span_enveloping_stable hE hv hu v (Submodule.subset_span ⟨1, one_mem _, rfl⟩))
+    exact hY v hv (u v)
+      (lowering_word_span_enveloping_stable hE hv hu v (Submodule.subset_span ⟨1, one_mem _, rfl⟩))
   exact LinearMap.mem_ker.mp (hiso hx)
 
 end Formalism.MainNotions.G.GLWeightTheory

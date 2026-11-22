@@ -10,7 +10,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Out PositivityTheory.FormalThickening
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Out
+  PositivityTheory.FormalThickening
 
 namespace GlobalTheory.CompanionTheory.MorphismAlgebraisation
 
@@ -40,8 +41,8 @@ lemma isPullback_retr (h : IsPullback b y hX t) :
   IsPullback.of_bot (by rw [retr_snd]; exact IsPullback.of_hasPullback _ _)
     (retr_fst hX hZ t h).symm h
 
-def graph (h : IsPullback b y hX t) (f : Y ⟶ Z) (hf : f ≫ hZ = y ≫ t) :
-    Y ⟶ pullback (pullback.fst hX hZ ≫ hX) t :=
+def graph (h : IsPullback b y hX t) (f : Y ⟶ Z) (hf : f ≫ hZ = y ≫ t)
+    : Y ⟶ pullback (pullback.fst hX hZ ≫ hX) t :=
   pullback.lift (pullback.lift b f (by rw [hf, h.w])) y (by rw [pullback.lift_fst_assoc, h.w])
 
 @[reassoc (attr := simp)]
@@ -102,16 +103,18 @@ lemma isPullback_graph [IsSeparated hZ] {Se' Y' : Scheme.{0}} (t' : Se' ⟶ S) {
 
 end Graph
 
-theorem exists_hom_of_thickenings : GEClosed → IsoOfThick →
-  ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (I : Ideal R), IsAdicComplete I R →
-    ∀ (X Z : Over (Spec (CommRingCat.of R))), IsProper X.hom →
-      IsSeparated Z.hom → LocallyOfFiniteType Z.hom → QuasiCompact Z.hom →
-    ∀ (Y : ∀ e : ℕ, Over (Spec (CommRingCat.of (R ⧸ I ^ (e + 1)))))
-      (β : ∀ e, (Y e).left ⟶ (Y (e + 1)).left) (b : ∀ e, (Y e).left ⟶ X.left),
-      (∀ e, IsPullback (b e) (Y e).hom X.hom (thick R I e)) → (∀ e, β e ≫ b (e + 1) = b e) →
-    ∀ f : ∀ e, (Y e).left ⟶ Z.left,
-      (∀ e, f e ≫ Z.hom = (Y e).hom ≫ thick R I e) → (∀ e, β e ≫ f (e + 1) = f e) →
-      ∃ g : X ⟶ Z, ∀ e, b e ≫ g.left = f e := by
+theorem exists_hom_of_thickenings
+    : GEClosed → IsoOfThick
+      → ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (I : Ideal R),
+        IsAdicComplete I R
+          → ∀ (X Z : Over (Spec (CommRingCat.of R))),
+            IsProper X.hom → IsSeparated Z.hom → LocallyOfFiniteType Z.hom → QuasiCompact Z.hom
+              → ∀ (Y : ∀ e : ℕ, Over (Spec (CommRingCat.of (R ⧸ I ^ (e + 1)))))
+                  (β : ∀ e, (Y e).left ⟶ (Y (e + 1)).left) (b : ∀ e, (Y e).left ⟶ X.left),
+                (∀ e, IsPullback (b e) (Y e).hom X.hom (thick R I e)) → (∀ e, β e ≫ b (e + 1) = b e)
+                  → ∀ f : ∀ e, (Y e).left ⟶ Z.left,
+                    (∀ e, f e ≫ Z.hom = (Y e).hom ≫ thick R I e) → (∀ e, β e ≫ f (e + 1) = f e)
+                      → ∃ g : X ⟶ Z, ∀ e, b e ≫ g.left = f e := by
   intro hGE hIso R _ _ I hI X Z hXp hZs hZf hZq Y β b hb hβ f hf hfβ
   let P : Over (Spec (CommRingCat.of R)) := Over.mk (pullback.fst X.hom Z.hom ≫ X.hom)
   have hPs : IsSeparated P.hom := by dsimp only [P, Over.mk_hom]; infer_instance
@@ -144,7 +147,8 @@ theorem exists_hom_of_thickenings : GEClosed → IsoOfThick →
   have hpp : IsProper p.left := by
     have h1 : IsProper (p.left ≫ X.hom) := by
       have h2 : p.left ≫ X.hom = j ≫ P.hom := by simp [hpl, P]
-      rw [h2]; exact hjp
+      rw [h2]
+      exact hjp
     exact IsProper.of_comp _ X.hom
   have hC : ∀ e, IsPullback (b' e) (Y e).hom Co.hom (thick R I e) := fun e => by
     have h1 := (hpb e).paste_vert (IsPullback.of_hasPullback P.hom (thick R I e))
@@ -155,12 +159,17 @@ theorem exists_hom_of_thickenings : GEClosed → IsoOfThick →
     rw [hpl, reassoc_of% h1]
     exact graph_fst_fst X.hom Z.hom (thick R I e) (hb e) (f e) (hf e)
   have hiso : ∀ e, IsIso ((Over.pullback (thick R I e)).map p).left := fun e => by
-    have key : (hC e).isoPullback.hom ≫ ((Over.pullback (thick R I e)).map p).left =
-        (hb e).isoPullback.hom := by
-      have m1 : ((Over.pullback (thick R I e)).map p).left ≫ pullback.fst X.hom (thick R I e) =
-          pullback.fst Co.hom (thick R I e) ≫ p.left := pullback.lift_fst _ _ _
-      have m2 : ((Over.pullback (thick R I e)).map p).left ≫ pullback.snd X.hom (thick R I e) =
-          pullback.snd Co.hom (thick R I e) := pullback.lift_snd _ _ _
+    have key
+        : (hC e).isoPullback.hom ≫ ((Over.pullback (thick R I e)).map p).left
+          = (hb e).isoPullback.hom := by
+      have m1
+          : ((Over.pullback (thick R I e)).map p).left ≫ pullback.fst X.hom (thick R I e)
+            = pullback.fst Co.hom (thick R I e) ≫ p.left :=
+        pullback.lift_fst _ _ _
+      have m2
+          : ((Over.pullback (thick R I e)).map p).left ≫ pullback.snd X.hom (thick R I e)
+            = pullback.snd Co.hom (thick R I e) :=
+        pullback.lift_snd _ _ _
       apply pullback.hom_ext
       · rw [Category.assoc, m1, IsPullback.isoPullback_hom_fst_assoc, hbe,
           IsPullback.isoPullback_hom_fst]

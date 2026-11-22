@@ -11,7 +11,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.ChainRuleSmooth.
 
 noncomputable section
 
-open MeasureTheory Matrix Filter Topology Formalism.QuantumDeterminants Formalism.MainNotions.S GlobalTheory.SgAlg GlobalTheory.SnMass
+open MeasureTheory Matrix Filter Topology Formalism.QuantumDeterminants Formalism.MainNotions.S
+  GlobalTheory.SgAlg GlobalTheory.SnMass
 open scoped ENNReal
 
 namespace GlobalTheory.GramExp
@@ -20,18 +21,19 @@ def Sgn {a : ℕ} (d : Fin a → ℂ) : Prop := ∀ i, d i = 1 ∨ d i = -1
 
 open MeasureTheory Matrix Filter Topology in
 open scoped ENNReal in
-theorem _root_.GlobalTheory.GramExp.diag_sq {a : ℕ} {d : Fin a → ℂ}
-    (hd : _root_.GlobalTheory.GramExp.Sgn d) : Matrix.diagonal d * Matrix.diagonal d = 1 := by
+theorem _root_.GlobalTheory.GramExp.diag_sq
+    {a : ℕ} {d : Fin a → ℂ} (hd : _root_.GlobalTheory.GramExp.Sgn d)
+    : Matrix.diagonal d * Matrix.diagonal d = 1 := by
   rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
   congr 1
   funext i
   rcases hd i with h | h <;> simp [h]
 
-
 open MeasureTheory Matrix Filter Topology in
 open scoped ENNReal in
-theorem _root_.GlobalTheory.GramExp.isMatGroup_UH {N : ℕ} (H : Matrix (Fin N) (Fin N) ℂ)
-    (hH : H * H = 1) : _root_.PI.IsMatGroup (_root_.Formalism.QuantumDeterminants.UH H) := by
+theorem _root_.GlobalTheory.GramExp.isMatGroup_UH
+    {N : ℕ} (H : Matrix (Fin N) (Fin N) ℂ) (hH : H * H = 1)
+    : _root_.PI.IsMatGroup (_root_.Formalism.QuantumDeterminants.UH H) := by
   unfold _root_.PI.IsMatGroup _root_.Formalism.QuantumDeterminants.UH
   have hdetH : H.det ≠ 0 := by
     intro h0
@@ -54,36 +56,39 @@ theorem _root_.GlobalTheory.GramExp.isMatGroup_UH {N : ℕ} (H : Matrix (Fin N) 
   · intro a ha b hb
     simp only [Set.mem_setOf_eq] at ha hb ⊢
     rw [Matrix.conjTranspose_mul]
-    calc bᴴ * aᴴ * H * (a * b) = bᴴ * (aᴴ * H * a) * b := by
-          simp only [Matrix.mul_assoc]
+    calc
+      bᴴ * aᴴ * H * (a * b)
+        = bᴴ * (aᴴ * H * a) * b := by simp only [Matrix.mul_assoc]
       _ = H := by rw [ha, hb]
   · intro a ha
     simp only [Set.mem_setOf_eq] at ha ⊢
     have hu := hunit a ha
     have hr : a * a⁻¹ = 1 := Matrix.mul_nonsing_inv a hu
     refine ⟨?_, hr⟩
-    have hc : (a⁻¹)ᴴ * aᴴ = 1 := by
-      rw [← Matrix.conjTranspose_mul, hr, Matrix.conjTranspose_one]
-    calc (a⁻¹)ᴴ * H * a⁻¹ = (a⁻¹)ᴴ * (aᴴ * H * a) * a⁻¹ := by rw [ha]
+    have hc : (a⁻¹)ᴴ * aᴴ = 1 := by rw [← Matrix.conjTranspose_mul, hr, Matrix.conjTranspose_one]
+    calc
+      (a⁻¹)ᴴ * H * a⁻¹
+        = (a⁻¹)ᴴ * (aᴴ * H * a) * a⁻¹ := by rw [ha]
       _ = ((a⁻¹)ᴴ * aᴴ) * H * (a * a⁻¹) := by simp only [Matrix.mul_assoc]
       _ = H := by rw [hc, hr, Matrix.one_mul, Matrix.mul_one]
 
 open MeasureTheory Matrix Filter Topology in
 open scoped ENNReal in
-theorem _root_.GlobalTheory.GramExp.exp_cont {n : ℕ} :
-    Continuous (NormedSpace.exp : Matrix (Fin n) (Fin n) ℂ → Matrix (Fin n) (Fin n) ℂ) := by
+theorem _root_.GlobalTheory.GramExp.exp_cont {n : ℕ}
+    : Continuous (NormedSpace.exp : Matrix (Fin n) (Fin n) ℂ → Matrix (Fin n) (Fin n) ℂ) := by
   letI : NormedRing (Matrix (Fin n) (Fin n) ℂ) := Matrix.linftyOpNormedRing
   letI : NormedAlgebra ℂ (Matrix (Fin n) (Fin n) ℂ) := Matrix.linftyOpNormedAlgebra
   letI : NormedAlgebra ℚ (Matrix (Fin n) (Fin n) ℂ) := NormedAlgebra.restrictScalars ℚ ℂ _
   exact NormedSpace.exp_continuous
 
-
 open MeasureTheory Matrix Filter Topology in
 open scoped ENNReal in
-theorem _root_.GlobalTheory.GramExp.measurableSet_image_ball {X Y : Type} [PseudoMetricSpace X] [ProperSpace X]
-    [TopologicalSpace Y] [T2Space Y] [MeasurableSpace Y] [OpensMeasurableSpace Y] {f : X → Y}
-    (hf : Continuous f) (x : X) (ρ : ℝ) :
-    MeasurableSet (f '' Metric.ball x ρ) := by
+theorem _root_.GlobalTheory.GramExp.measurableSet_image_ball
+    {X Y : Type} [PseudoMetricSpace X] [ProperSpace X] [TopologicalSpace Y] [T2Space Y]
+    [MeasurableSpace Y] [OpensMeasurableSpace Y]
+    {f : X → Y} (hf : Continuous f)
+    (x : X) (ρ : ℝ)
+    : MeasurableSet (f '' Metric.ball x ρ) := by
   have hb : Metric.ball x ρ = ⋃ k : ℕ, Metric.closedBall x (ρ - 1 / ((k : ℝ) + 1)) := by
     ext y
     simp only [Metric.mem_ball, Set.mem_iUnion, Metric.mem_closedBall]
@@ -95,7 +100,6 @@ theorem _root_.GlobalTheory.GramExp.measurableSet_image_ball {X Y : Type} [Pseud
       have : 0 < 1 / ((k : ℝ) + 1) := by positivity
       linarith
   rw [hb, Set.image_iUnion]
-  exact MeasurableSet.iUnion fun k =>
-    ((isCompact_closedBall x _).image hf).isClosed.measurableSet
+  exact MeasurableSet.iUnion fun k => ((isCompact_closedBall x _).image hf).isClosed.measurableSet
 
 end GlobalTheory.GramExp

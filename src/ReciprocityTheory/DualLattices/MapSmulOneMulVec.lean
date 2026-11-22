@@ -8,8 +8,9 @@ namespace ReciprocityTheory.PGsh
 
 open Matrix
 
-private theorem smul_one_mulVec_dual_lattices {D n : Type*} [CommRing D] [Fintype n] [DecidableEq n] (c : D)
-    (v : n → D) : (c • (1 : Matrix n n D)) *ᵥ v = c • v := by
+private theorem smul_one_mulVec_dual_lattices
+    {D n : Type*} [CommRing D] [Fintype n] [DecidableEq n] (c : D) (v : n → D)
+    : (c • (1 : Matrix n n D)) *ᵥ v = c • v := by
   funext i
   simp [Matrix.mulVec, dotProduct, Matrix.one_apply]
 
@@ -21,32 +22,36 @@ private lemma map_smul_one_mulVec {D K n : Type*} [CommRing D] [Field K] [Algebr
     by_cases hij : i = j <;> simp [hij]
   rw [h, smul_one_mulVec_dual_lattices, algebraMap_smul]
 
-private theorem exists_mulVec_eq_smul_of_mul_eq_smul_one {D p n : Type*} [CommRing D] [Fintype n] [Fintype p]
-    [DecidableEq p] (H : Matrix p n D) (L : Matrix n p D) (c : D) (h : H * L = c • 1) (f : p → D) :
-    ∃ t : n → D, H *ᵥ t = c • f :=
+private theorem exists_mulVec_eq_smul_of_mul_eq_smul_one
+    {D p n : Type*} [CommRing D] [Fintype n] [Fintype p] [DecidableEq p]
+    (H : Matrix p n D) (L : Matrix n p D) (c : D) (h : H * L = c • 1)
+    (f : p → D)
+    : ∃ t : n → D, H *ᵥ t = c • f :=
   ⟨L *ᵥ f, by rw [Matrix.mulVec_mulVec, h, smul_one_mulVec_dual_lattices]⟩
 
-private theorem exists_integral_smul_of_mulVec_integral {D K p n : Type*} [CommRing D] [Field K] [Algebra D K]
-    [Fintype n] [Fintype p] [DecidableEq p] (B : Matrix p n D) (W : Matrix n p D) (c : D)
-    (h : B * W = c • 1) (x : p → K) (w : n → D)
-    (hx : W.map (algebraMap D K) *ᵥ x = algebraMap D K ∘ w) :
-    ∃ y : p → D, c • x = algebraMap D K ∘ y := by
+private theorem exists_integral_smul_of_mulVec_integral
+    {D K p n : Type*} [CommRing D] [Field K] [Algebra D K] [Fintype n] [Fintype p] [DecidableEq p]
+    (B : Matrix p n D) (W : Matrix n p D) (c : D) (h : B * W = c • 1)
+    (x : p → K) (w : n → D) (hx : W.map (algebraMap D K) *ᵥ x = algebraMap D K ∘ w)
+    : ∃ y : p → D, c • x = algebraMap D K ∘ y := by
   refine ⟨B *ᵥ w, ?_⟩
   rw [← map_smul_one_mulVec c x, ← h, Matrix.map_mul, ← Matrix.mulVec_mulVec, hx]
   funext i
   exact (RingHom.map_mulVec (algebraMap D K) B w i).symm
 
-private theorem exists_mulVec_eq_of_mulVec_eq_zero {D K p n : Type*} [CommRing D] [Field K] [Algebra D K]
-    [IsFractionRing D K] [Fintype n] [DecidableEq n] [Fintype p] (H B : Matrix p n D)
-    (L W : Matrix n p D) (c : D) (hc : c ≠ 0) (h : L * H + W * B = c • 1) (t : n → K)
-    (ht : H.map (algebraMap D K) *ᵥ t = 0) :
-    ∃ x : p → K, W.map (algebraMap D K) *ᵥ x = t := by
+private theorem exists_mulVec_eq_of_mulVec_eq_zero
+    {D K p n : Type*} [CommRing D] [Field K] [Algebra D K] [IsFractionRing D K] [Fintype n]
+    [DecidableEq n] [Fintype p]
+    (H B : Matrix p n D) (L W : Matrix n p D) (c : D) (hc : c ≠ 0) (h : L * H + W * B = c • 1)
+    (t : n → K) (ht : H.map (algebraMap D K) *ᵥ t = 0)
+    : ∃ x : p → K, W.map (algebraMap D K) *ᵥ x = t := by
   have hc' : algebraMap D K c ≠ 0 := by
     intro h0
     exact hc (IsFractionRing.injective D K (h0.trans (map_zero _).symm))
-  have hmap : L.map (algebraMap D K) * H.map (algebraMap D K)
-      + W.map (algebraMap D K) * B.map (algebraMap D K)
-      = (c • (1 : Matrix n n D)).map (algebraMap D K) := by
+  have hmap
+      : L.map (algebraMap D K) * H.map (algebraMap D K)
+          + W.map (algebraMap D K) * B.map (algebraMap D K)
+        = (c • (1 : Matrix n n D)).map (algebraMap D K) := by
     rw [← h, Matrix.map_add _ (fun a b => map_add (algebraMap D K) a b), Matrix.map_mul,
       Matrix.map_mul]
   have e1 : (L.map (algebraMap D K) * H.map (algebraMap D K)) *ᵥ t = 0 := by
@@ -54,8 +59,7 @@ private theorem exists_mulVec_eq_of_mulVec_eq_zero {D K p n : Type*} [CommRing D
   have hWB : c • t = (W.map (algebraMap D K) * B.map (algebraMap D K)) *ᵥ t := by
     rw [← map_smul_one_mulVec c t, ← hmap, Matrix.add_mulVec, e1, zero_add]
   refine ⟨(algebraMap D K c)⁻¹ • (B.map (algebraMap D K) *ᵥ t), ?_⟩
-  rw [Matrix.mulVec_smul, Matrix.mulVec_mulVec, ← hWB, ← algebraMap_smul K c t,
-    inv_smul_smul₀ hc']
+  rw [Matrix.mulVec_smul, Matrix.mulVec_mulVec, ← hWB, ← algebraMap_smul K c t, inv_smul_smul₀ hc']
 
 theorem a1 : ExistsPointLeviLogNormSqPos := by
   unfold ExistsPointLeviLogNormSqPos
@@ -92,28 +96,34 @@ theorem a1 : ExistsPointLeviLogNormSqPos := by
   have hG : Φ * E⁻¹ * Φᵀ = -(c • stdJ D g) := by
     have h := congrArg (· * stdJ D g) hΦN
     simp only [hN, Matrix.mul_assoc, hJJ, Matrix.smul_mul, Matrix.one_mul, Matrix.mul_neg,
-      Matrix.mul_one] at h
+        Matrix.mul_one]
+      at h
     rw [← h, neg_neg, Matrix.mul_assoc]
-  have hsub : ∀ r s : Fin g → Fin g ⊕ Fin g,
-      Φ.submatrix r id * E⁻¹ * (Φ.submatrix s id)ᵀ = (-(c • stdJ D g)).submatrix r s := by
+  have hsub
+      : ∀ r s : Fin g → Fin g ⊕ Fin g,
+        Φ.submatrix r id * E⁻¹ * (Φ.submatrix s id)ᵀ = (-(c • stdJ D g)).submatrix r s := by
     intro r s
     rw [← hG]
     ext a b
     rfl
   have hHH : Φ.submatrix Sum.inl id * E⁻¹ * (Φ.submatrix Sum.inl id)ᵀ = 0 := by
     rw [hsub]; ext a b; simp [stdJ]
-  have hBH : Φ.submatrix Sum.inr id * E⁻¹ * (Φ.submatrix Sum.inl id)ᵀ
-      = -(c • (1 : Matrix (Fin g) (Fin g) D)) := by
+  have hBH
+      : Φ.submatrix Sum.inr id * E⁻¹ * (Φ.submatrix Sum.inl id)ᵀ
+        = -(c • (1 : Matrix (Fin g) (Fin g) D)) := by
     rw [hsub]; ext a b; by_cases h : a = b <;> simp [stdJ, h]
-  have hHB : Φ.submatrix Sum.inl id * E⁻¹ * (Φ.submatrix Sum.inr id)ᵀ
-      = c • (1 : Matrix (Fin g) (Fin g) D) := by
+  have hHB
+      : Φ.submatrix Sum.inl id * E⁻¹ * (Φ.submatrix Sum.inr id)ᵀ
+        = c • (1 : Matrix (Fin g) (Fin g) D) := by
     rw [hsub]; ext a b; by_cases h : a = b <;> simp [stdJ, h]
-  have hJΦ1 : ∀ a j, (stdJ D g * Φ) (Sum.inl a) j = -Φ (Sum.inr a) j := by
+  have hJΦ1 : ∀ a j, (stdJ D g * Φ) (Sum.inl a) j = - Φ (Sum.inr a) j := by
     intro a j; simp [stdJ, Matrix.mul_apply, Fintype.sum_sum_type, Matrix.one_apply]
   have hJΦ2 : ∀ a j, (stdJ D g * Φ) (Sum.inr a) j = Φ (Sum.inl a) j := by
     intro a j; simp [stdJ, Matrix.mul_apply, Fintype.sum_sum_type, Matrix.one_apply]
-  have hform : (Φ.submatrix Sum.inr id)ᵀ * Φ.submatrix Sum.inl id
-      - (Φ.submatrix Sum.inl id)ᵀ * Φ.submatrix Sum.inr id = c • E := by
+  have hform
+      : (Φ.submatrix Sum.inr id)ᵀ * Φ.submatrix Sum.inl id
+          - (Φ.submatrix Sum.inl id)ᵀ * Φ.submatrix Sum.inr id
+        = c • E := by
     rw [← hΦ]
     ext i j
     rw [Matrix.mul_assoc Φᵀ, Matrix.mul_apply, Fintype.sum_sum_type]
@@ -121,16 +131,19 @@ theorem a1 : ExistsPointLeviLogNormSqPos := by
     simp only [Matrix.sub_apply, Matrix.mul_apply, Matrix.transpose_apply, Matrix.submatrix_apply,
       id_eq, mul_neg, Finset.sum_neg_distrib]
     ring
-  have hkey : E⁻¹ * (Φ.submatrix Sum.inr id)ᵀ * Φ.submatrix Sum.inl id
-      + (-E⁻¹ * (Φ.submatrix Sum.inl id)ᵀ) * Φ.submatrix Sum.inr id = c • 1 := by
+  have hkey
+      : E⁻¹ * (Φ.submatrix Sum.inr id)ᵀ * Φ.submatrix Sum.inl id
+          + (-E⁻¹ * (Φ.submatrix Sum.inl id)ᵀ) * Φ.submatrix Sum.inr id
+        = c • 1 := by
     have h := congrArg (E⁻¹ * ·) hform
     simp only [Matrix.mul_sub, Matrix.mul_smul, hEinv] at h
     rw [Matrix.neg_mul, Matrix.neg_mul, Matrix.mul_assoc, Matrix.mul_assoc, ← sub_eq_add_neg]
     exact h
   have h2 : Φ.submatrix Sum.inl id * (-E⁻¹ * (Φ.submatrix Sum.inl id)ᵀ) = 0 := by
     rw [Matrix.neg_mul, Matrix.mul_neg, ← Matrix.mul_assoc, hHH, neg_zero]
-  have h3 : Φ.submatrix Sum.inr id * (-E⁻¹ * (Φ.submatrix Sum.inl id)ᵀ)
-      = c • (1 : Matrix (Fin g) (Fin g) D) := by
+  have h3
+      : Φ.submatrix Sum.inr id * (-E⁻¹ * (Φ.submatrix Sum.inl id)ᵀ)
+        = c • (1 : Matrix (Fin g) (Fin g) D) := by
     rw [Matrix.neg_mul, Matrix.mul_neg, ← Matrix.mul_assoc, hBH, neg_neg]
   have hT : (-E⁻¹ * (Φ.submatrix Sum.inl id)ᵀ)ᵀ = Φ.submatrix Sum.inl id * E⁻¹ := by
     rw [Matrix.transpose_mul, Matrix.transpose_transpose, Matrix.transpose_neg,

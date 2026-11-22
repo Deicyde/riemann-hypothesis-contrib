@@ -9,8 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HermLineBund
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr GlobalTheory.HSNef
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr
+  GlobalTheory.HSNef
 
 set_option autoImplicit false
 noncomputable section
@@ -22,10 +24,12 @@ theorem exists_chart (M : HermLB p) (x : X) : ∃ c, x ∈ M.B.U c := by
   have h : x ∈ (⨆ c, M.B.U c) := by rw [M.isLB.cover]; trivial
   exact TopologicalSpace.Opens.mem_iSup.1 h
 
-theorem loc_eq (P : Pair p) (a b a' b' i j : ℤ) (f : X.functionField) (ρ ρ' : X.functionFieldˣ) (e g) :
-    f * (ρ : X.functionField) ^ i * (ρ' : X.functionField) ^ j =
-      P.loc (i * a + j * a') (i * b + j * b') f e g *
-        (((ρ : X.functionField) / P.loc a b 1 e g) ^ i * ((ρ' : X.functionField) / P.loc a' b' 1 e g) ^ j) := by
+theorem loc_eq
+    (P : Pair p) (a b a' b' i j : ℤ) (f : X.functionField) (ρ ρ' : X.functionFieldˣ) (e g)
+    : f * (ρ : X.functionField) ^ i * (ρ' : X.functionField) ^ j
+      = P.loc (i * a + j * a') (i * b + j * b') f e g
+        * (((ρ : X.functionField) / P.loc a b 1 e g) ^ i
+          * ((ρ' : X.functionField) / P.loc a' b' 1 e g) ^ j) := by
   have hs : (P.r e : X.functionField) ≠ 0 := (P.r e).ne_zero
   have ht : (P.r' g : X.functionField) ≠ 0 := (P.r' g).ne_zero
   simp only [Pair.loc, one_mul]
@@ -41,16 +45,24 @@ end GlobalTheory.HSNef.ChangePair
 
 namespace GlobalTheory.HSNef
 
-
 open GlobalTheory.VolBr.NuEq ChangePair in
-theorem change_pair : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k), ∀ (P : Pair p) (a b a' b' : ℤ) (M N : HermLB p), P.Rep a b M → P.Rep a' b' N → ∃ Q : Pair p, Q.L = M ∧ Q.A = N ∧ ∀ (i j : ℤ) (R : ℝ), Q.Bl i j R = P.Bl (i * a + j * a') (i * b + j * b') R := by
+theorem change_pair
+    : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k),
+      ∀ (P : Pair p) (a b a' b' : ℤ) (M N : HermLB p),
+        P.Rep a b M → P.Rep a' b' N
+          → ∃ Q : Pair p,
+            Q.L = M ∧ Q.A = N
+              ∧ ∀ (i j : ℤ) (R : ℝ), Q.Bl i j R = P.Bl (i * a + j * a') (i * b + j * b') R := by
   intro k _ X _ p P a b a' b' M N ⟨ρ, hρ, hu, hn⟩ ⟨ρ', hρ', hu', hn'⟩
   let Q : Pair p := ⟨M, N, ρ, ρ', hρ, hρ'⟩
-  have hw : ∀ (i j : ℤ) (x : X) c d e g, x ∈ M.B.U c → x ∈ N.B.U d → x ∈ P.L.B.U e → x ∈ P.A.B.U g →
-      UnitAt x (((ρ c : X.functionField) / P.loc a b 1 e g) ^ i *
-        ((ρ' d : X.functionField) / P.loc a' b' 1 e g) ^ j) :=
-    fun i j x c d e g hc hd he hg =>
-      (NuEq.unitAt_zpow (hu x c e g hc he hg) i).mul (NuEq.unitAt_zpow (hu' x d e g hd he hg) j)
+  have hw
+      : ∀ (i j : ℤ) (x : X) c d e g,
+        x ∈ M.B.U c → x ∈ N.B.U d → x ∈ P.L.B.U e → x ∈ P.A.B.U g
+          → UnitAt x
+            (((ρ c : X.functionField) / P.loc a b 1 e g) ^ i
+              * ((ρ' d : X.functionField) / P.loc a' b' 1 e g)
+                ^ j) := fun i j x c d e g hc hd he hg =>
+    (NuEq.unitAt_zpow (hu x c e g hc he hg) i).mul (NuEq.unitAt_zpow (hu' x d e g hd he hg) j)
   have hH : ∀ i j : ℤ, Q.H i j = P.H (i * a + j * a') (i * b + j * b') := by
     intro i j
     ext f
@@ -70,8 +82,11 @@ theorem change_pair : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X
       change RegAt x (f * _ ^ i * _ ^ j)
       rw [loc_eq P a b a' b' i j f (ρ c) (ρ' d) e g]
       exact (hf x e g he hg).mul (hw i j x c d e g hc hd he hg).regAt
-  have hnu : ∀ (i j : ℤ) (f : X.functionField), f ∈ P.H (i * a + j * a') (i * b + j * b') →
-      ∀ (σ : k →+* ℂ) (y : CxPts p σ), Q.nu i j σ y f = P.nu (i * a + j * a') (i * b + j * b') σ y f := by
+  have hnu
+      : ∀ (i j : ℤ) (f : X.functionField),
+        f ∈ P.H (i * a + j * a') (i * b + j * b')
+          → ∀ (σ : k →+* ℂ) (y : CxPts p σ),
+            Q.nu i j σ y f = P.nu (i * a + j * a') (i * b + j * b') σ y f := by
     intro i j f hf σ y
     have hc := mem_pick (M.φ σ).isLB y
     have hd := mem_pick (N.φ σ).isLB y
@@ -87,23 +102,25 @@ theorem change_pair : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X
     have hU' := hu' _ d e g (mem_ptsIn.1 hd) (mem_ptsIn.1 he) (mem_ptsIn.1 hg)
     have hreg : RegAt (under y) (P.loc (i * a + j * a') (i * b + j * b') f e g) :=
       hf _ e g (mem_ptsIn.1 he) (mem_ptsIn.1 hg)
-    have eU : ‖ratVal ((ρ c : X.functionField) / P.loc a b 1 e g) y‖ =
-        Real.exp ((M.φ σ).φ c y / 2 - (a * (P.L.φ σ).φ e y + b * (P.A.φ σ).φ g y) / 2) := by
+    have eU
+        : ‖ratVal ((ρ c : X.functionField) / P.loc a b 1 e g) y‖
+          = Real.exp ((M.φ σ).φ c y / 2 - (a * (P.L.φ σ).φ e y + b * (P.A.φ σ).φ g y) / 2) := by
       rw [← Real.exp_log (norm_pos_iff.2 (ratVal_ne_zero hU))]
       congr 1
       linarith [hn σ y c e g hc he hg]
-    have eU' : ‖ratVal ((ρ' d : X.functionField) / P.loc a' b' 1 e g) y‖ =
-        Real.exp ((N.φ σ).φ d y / 2 - (a' * (P.L.φ σ).φ e y + b' * (P.A.φ σ).φ g y) / 2) := by
+    have eU'
+        : ‖ratVal ((ρ' d : X.functionField) / P.loc a' b' 1 e g) y‖
+          = Real.exp ((N.φ σ).φ d y / 2 - (a' * (P.L.φ σ).φ e y + b' * (P.A.φ σ).φ g y) / 2) := by
       rw [← Real.exp_log (norm_pos_iff.2 (ratVal_ne_zero hU'))]
       congr 1
       linarith [hn' σ y d e g hd he hg]
     change ‖ratVal (f * _ ^ i * _ ^ j) y‖ * _ = _
     rw [loc_eq P a b a' b' i j f (ρ c) (ρ' d) e g,
       ratVal_mul hreg ((NuEq.unitAt_zpow hU i).mul (NuEq.unitAt_zpow hU' j)).regAt,
-      ratVal_mul (NuEq.unitAt_zpow hU i).regAt (NuEq.unitAt_zpow hU' j).regAt,
-      ratVal_zpow' hU, ratVal_zpow' hU', norm_mul, norm_mul, norm_zpow, norm_zpow, eU, eU',
-      ← Real.rpow_intCast, ← Real.rpow_intCast, ← Real.exp_mul, ← Real.exp_mul, mul_assoc,
-      ← Real.exp_add, ← Real.exp_add]
+      ratVal_mul (NuEq.unitAt_zpow hU i).regAt (NuEq.unitAt_zpow hU' j).regAt, ratVal_zpow' hU,
+      ratVal_zpow' hU', norm_mul, norm_mul, norm_zpow, norm_zpow, eU, eU', ← Real.rpow_intCast,
+      ← Real.rpow_intCast, ← Real.exp_mul, ← Real.exp_mul, mul_assoc, ← Real.exp_add,
+      ← Real.exp_add]
     congr 2
     push_cast
     ring

@@ -16,8 +16,9 @@ section Fac
 
 variable {ι : Type} [Fintype ι] [DecidableEq ι] {α : ι → Type} [∀ i, MeasurableSpace (α i)]
 
-theorem exists_box_alt (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)] (hne : ∀ i, μ i ≠ 0) :
-    ∃ S : ∀ i, Set (α i), (∀ i, MeasurableSet (S i)) ∧ (∀ i, μ i (S i) ≠ 0) ∧ ∀ i, μ i (S i) ≠ ∞ := by
+theorem exists_box_alt (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)] (hne : ∀ i, μ i ≠ 0)
+    : ∃ S : ∀ i, Set (α i),
+      (∀ i, MeasurableSet (S i)) ∧ (∀ i, μ i (S i) ≠ 0) ∧ ∀ i, μ i (S i) ≠ ∞ := by
   have key : ∀ i, ∃ s : Set (α i), MeasurableSet s ∧ μ i s ≠ 0 ∧ μ i s ≠ ∞ := by
     intro i
     by_contra hc
@@ -31,15 +32,22 @@ theorem exists_box_alt (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)] 
   choose S hS1 hS2 hS3 using key
   exact ⟨S, hS1, hS2, hS3⟩
 
-theorem pi_box_eval (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)] (S : ∀ i, Set (α i)) (v : ι) (A : Set (α v)) :
-    Measure.pi μ (Set.univ.pi (Function.update S v A)) = μ v A * ∏ w ∈ Finset.univ.erase v, μ w (S w) := by
-  rw [Measure.pi_pi, ← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ v), Function.update_self]
+theorem pi_box_eval
+    (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)] (S : ∀ i, Set (α i)) (v : ι) (A : Set (α v))
+    : Measure.pi μ (Set.univ.pi (Function.update S v A))
+      = μ v A * ∏ w ∈ Finset.univ.erase v, μ w (S w) := by
+  rw [Measure.pi_pi, ← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ v),
+    Function.update_self]
   congr 1
   refine Finset.prod_congr rfl fun w hw => ?_
   rw [Function.update_of_ne (Finset.ne_of_mem_erase hw)]
 
-theorem factor_eq (μ μ' : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)] [∀ i, SigmaFinite (μ' i)]
-    (hne : ∀ i, μ i ≠ 0) (v : ι) (hw : ∀ w, w ≠ v → μ' w = μ w) (h : Measure.pi μ' = Measure.pi μ) : μ' v = μ v := by
+theorem factor_eq
+    (μ μ' : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)] [∀ i, SigmaFinite (μ' i)]
+    (hne : ∀ i, μ i ≠ 0)
+    (v : ι) (hw : ∀ w, w ≠ v → μ' w = μ w)
+    (h : Measure.pi μ' = Measure.pi μ)
+    : μ' v = μ v := by
   obtain ⟨S, -, hS0, hSt⟩ := exists_box_alt μ hne
   ext A _
   have h1 := pi_box_eval μ' S v A
@@ -47,14 +55,20 @@ theorem factor_eq (μ μ' : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)] [
   have hP : ∏ w ∈ Finset.univ.erase v, μ' w (S w) = ∏ w ∈ Finset.univ.erase v, μ w (S w) :=
     Finset.prod_congr rfl fun w hm => by rw [hw w (Finset.ne_of_mem_erase hm)]
   rw [h, h2, hP] at h1
-  have hP0 : ∏ w ∈ Finset.univ.erase v, μ w (S w) ≠ 0 := Finset.prod_ne_zero_iff.mpr fun w _ => hS0 w
+  have hP0 : ∏ w ∈ Finset.univ.erase v, μ w (S w) ≠ 0 :=
+    Finset.prod_ne_zero_iff.mpr fun w _ => hS0 w
   have hPt : ∏ w ∈ Finset.univ.erase v, μ w (S w) ≠ ∞ := ENNReal.prod_ne_top fun w _ => hSt w
   exact ((ENNReal.mul_left_inj hP0 hPt).mp h1).symm
 
-theorem factor_conc (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)] (hne : ∀ i, μ i ≠ 0) (N : ∀ i, Set (α i))
-    (hc : Measure.pi μ (Set.univ.pi N)ᶜ = 0) (v : ι) : μ v (N v)ᶜ = 0 := by
-  have hsub : Set.univ.pi (Function.update (fun w => (Set.univ : Set (α w))) v (N v)ᶜ) ⊆
-      (Set.univ.pi N)ᶜ := by
+theorem factor_conc
+    (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)]
+    (hne : ∀ i, μ i ≠ 0)
+    (N : ∀ i, Set (α i)) (hc : Measure.pi μ (Set.univ.pi N)ᶜ = 0)
+    (v : ι)
+    : μ v (N v)ᶜ = 0 := by
+  have hsub
+      : Set.univ.pi (Function.update (fun w => (Set.univ : Set (α w))) v (N v)ᶜ)
+        ⊆ (Set.univ.pi N)ᶜ := by
     intro x hx hxN
     have hv := hx v (Set.mem_univ v)
     rw [Function.update_self] at hv
@@ -67,7 +81,8 @@ theorem factor_conc (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)] (hn
     obtain ⟨w, -, hw⟩ := Finset.prod_eq_zero_iff.mp h
     exact hne w (Measure.measure_univ_eq_zero.mp hw)
 
-theorem factor_ne (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)] (h : Measure.pi μ ≠ 0) (v : ι) : μ v ≠ 0 := by
+theorem factor_ne (μ : ∀ i, Measure (α i)) [∀ i, SigmaFinite (μ i)] (h : Measure.pi μ ≠ 0) (v : ι)
+    : μ v ≠ 0 := by
   intro hv
   apply h
   rw [← Measure.measure_univ_eq_zero, ← Set.pi_univ Set.univ, Measure.pi_pi]
@@ -77,17 +92,22 @@ end Fac
 
 section FacG
 
-variable {ι : Type} [Fintype ι] [DecidableEq ι] {G : ι → Type} [∀ v, Group (G v)] [∀ v, TopologicalSpace (G v)]
-  [∀ v, IsTopologicalGroup (G v)] [∀ v, SecondCountableTopology (G v)] [∀ v, MeasurableSpace (G v)]
-  [∀ v, BorelSpace (G v)]
+variable
+  {ι : Type} [Fintype ι] [DecidableEq ι]
+  {G : ι → Type} [∀ v, Group (G v)] [∀ v, TopologicalSpace (G v)] [∀ v, IsTopologicalGroup (G v)]
+  [∀ v, SecondCountableTopology (G v)] [∀ v, MeasurableSpace (G v)] [∀ v, BorelSpace (G v)]
 
-theorem factor_uniq (μ : ∀ v, Measure (G v)) [∀ v, SigmaFinite (μ v)] (H : ∀ v, Subgroup (G v))
-    (hH : ∀ v, IsClosed (H v : Set (G v))) (ν : ∀ v, Measure (G v)) [∀ v, SigmaFinite (ν v)]
+theorem factor_uniq
+    (μ : ∀ v, Measure (G v)) [∀ v, SigmaFinite (μ v)]
+    (H : ∀ v, Subgroup (G v)) (hH : ∀ v, IsClosed (H v : Set (G v)))
+    (ν : ∀ v, Measure (G v)) [∀ v, SigmaFinite (ν v)]
     (hνc : ∀ v, ν v (H v : Set (G v))ᶜ = 0) (hνi : ∀ v, ∀ h ∈ H v, (ν v).map (fun x => h * x) = ν v)
     (hν0 : ∀ v, ν v ≠ 0) (h0 : Measure.pi μ ≠ 0)
     (hc : Measure.pi μ (Set.univ.pi fun v => (H v : Set (G v)))ᶜ = 0)
-    (hi : ∀ g : (v : ι) → G v, (∀ v, g v ∈ H v) → (Measure.pi μ).map (fun x => g * x) = Measure.pi μ) (v : ι) :
-    ∃ κ : ℝ≥0∞, κ ≠ 0 ∧ κ ≠ ∞ ∧ μ v = κ • ν v := by
+    (hi
+      : ∀ g : (v : ι) → G v, (∀ v, g v ∈ H v) → (Measure.pi μ).map (fun x => g * x) = Measure.pi μ)
+    (v : ι)
+    : ∃ κ : ℝ≥0∞, κ ≠ 0 ∧ κ ≠ ∞ ∧ μ v = κ • ν v := by
   have hne : ∀ w, μ w ≠ 0 := fun w => factor_ne μ h0 w
   have hμc : μ v (H v : Set (G v))ᶜ = 0 := factor_conc μ hne (fun w => (H w : Set (G w))) hc v
   have hμi : ∀ h ∈ H v, (μ v).map (fun x => h * x) = μ v := by

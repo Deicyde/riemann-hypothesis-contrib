@@ -10,9 +10,9 @@ open scoped NNReal
 
 namespace GlobalTheory.AlmostEt
 
-theorem kaehler_D_of_pow_eq {R S : Type*} [CommRing R] [CommRing S] [Algebra R S]
-    (a b : S) (m : ℕ) (h : a ^ m = b) :
-    a • KaehlerDifferential.D R S b = ((m : S) * b) • KaehlerDifferential.D R S a := by
+theorem kaehler_D_of_pow_eq
+    {R S : Type*} [CommRing R] [CommRing S] [Algebra R S] (a b : S) (m : ℕ) (h : a ^ m = b)
+    : a • KaehlerDifferential.D R S b = ((m : S) * b) • KaehlerDifferential.D R S a := by
   subst h
   rw [Derivation.leibniz_pow]
   rcases Nat.eq_zero_or_pos m with rfl | hm
@@ -45,7 +45,14 @@ theorem qS_pow (T : Tower p Ω) (n k : ℕ) : qS T (n + k) ^ (p ^ k) = qS T n :=
     simp only [SubmonoidClass.coe_pow]
     rw [pow_succ', pow_mul, h1, h2]
 
-theorem dlog_transition : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω] (T : Tower p Ω) (n k : ℕ), zS T (n + k) • KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (zS T n) = ((p : (integralClosure (O0 p) Ω)) ^ k * zS T n) • KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (zS T (n + k)) ∧ qS T (n + k) • KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (qS T n) = ((p : (integralClosure (O0 p) Ω)) ^ k * qS T n) • KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (qS T (n + k)) := by
+theorem dlog_transition
+    : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω] (T : Tower p Ω) (n k : ℕ),
+      zS T (n + k) • KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (zS T n)
+          = ((p : (integralClosure (O0 p) Ω)) ^ k * zS T n)
+            • KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (zS T (n + k))
+        ∧ qS T (n + k) • KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (qS T n)
+          = ((p : (integralClosure (O0 p) Ω)) ^ k * qS T n)
+            • KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) (qS T (n + k)) := by
   intro p _ Ω _ _ T n k
   constructor
   · have := kaehler_D_of_pow_eq (R := O0 p) _ _ _ (zS_pow T n k)

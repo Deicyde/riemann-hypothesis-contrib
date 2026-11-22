@@ -5,13 +5,17 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.G
 open scoped Classical ENNReal nonZeroDivisors
 
-theorem UpperTheory.ConvolutionTheory.R2.G.factor :
-    ∀ (X Y : Type) [TopologicalSpace X] [SigmaCompactSpace X] [TopologicalSpace Y] [T2Space Y] [MeasurableSpace Y] [BorelSpace Y]
-    (r : X → Y) (H : X → ℂ), Continuous r → Continuous H → (∀ x x', r x = r x' → H x = H x') → ∃ h : Y → ℂ, Measurable h ∧ ∀ x, h (r x) = H x := by
+theorem UpperTheory.ConvolutionTheory.R2.G.factor
+    : ∀ (X Y : Type) [TopologicalSpace X] [SigmaCompactSpace X] [TopologicalSpace Y] [T2Space Y]
+        [MeasurableSpace Y] [BorelSpace Y] (r : X → Y) (H : X → ℂ),
+      Continuous r → Continuous H → (∀ x x', r x = r x' → H x = H x')
+        → ∃ h : Y → ℂ, Measurable h ∧ ∀ x, h (r x) = H x := by
   intro X Y _ _ _ _ _ _ r H hr hH hf
   have key : ∀ F : Set X, IsClosed F → MeasurableSet (r '' F) := by
     intro F hF

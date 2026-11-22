@@ -11,15 +11,16 @@ noncomputable section
 namespace GroundTheory.Global
 namespace Elliptic
 
-theorem eventuallyEq_zero_codiscrete_iff {f : ℂ → ℂ} :
-    f =ᶠ[codiscrete ℂ] 0 ↔ ∀ x, ∀ᶠ z in 𝓝[≠] x, f z = 0 := by
+theorem eventuallyEq_zero_codiscrete_iff {f : ℂ → ℂ}
+    : f =ᶠ[codiscrete ℂ] 0 ↔ ∀ x, ∀ᶠ z in 𝓝[≠] x, f z = 0 := by
   change {z | f z = (0 : ℂ → ℂ) z} ∈ codiscreteWithin univ ↔ _
   rw [mem_codiscreteWithin_iff_forall_mem_nhdsNE]
   simp only [compl_univ, union_empty, mem_univ, true_implies, Pi.zero_apply]
   rfl
 
-theorem eventuallyEq_zero_codiscrete_of_nhdsNE {f : ℂ → ℂ} (hf : Meromorphic f) {x : ℂ}
-    (h : ∀ᶠ z in 𝓝[≠] x, f z = 0) : f =ᶠ[codiscrete ℂ] 0 := by
+theorem eventuallyEq_zero_codiscrete_of_nhdsNE
+    {f : ℂ → ℂ} (hf : Meromorphic f) {x : ℂ} (h : ∀ᶠ z in 𝓝[≠] x, f z = 0)
+    : f =ᶠ[codiscrete ℂ] 0 := by
   rw [eventuallyEq_zero_codiscrete_iff]
   intro u
   have hx : meromorphicOrderAt f x = ⊤ := meromorphicOrderAt_eq_top_iff.2 h
@@ -28,8 +29,8 @@ theorem eventuallyEq_zero_codiscrete_of_nhdsNE {f : ℂ → ℂ} (hf : Meromorph
   exact (hf.meromorphicOn (s := univ)).meromorphicOrderAt_ne_top_of_isPreconnected
     isPreconnected_univ (mem_univ u) (mem_univ x) hu' hx
 
-theorem eventually_ne_zero_codiscrete {f : ℂ → ℂ} (hf : Meromorphic f)
-    (h : ¬ f =ᶠ[codiscrete ℂ] 0) : ∀ᶠ z in codiscrete ℂ, f z ≠ 0 := by
+theorem eventually_ne_zero_codiscrete {f : ℂ → ℂ} (hf : Meromorphic f) (h : ¬ f =ᶠ[codiscrete ℂ] 0)
+    : ∀ᶠ z in codiscrete ℂ, f z ≠ 0 := by
   have hall : ∀ u ∈ (univ : Set ℂ), meromorphicOrderAt f u ≠ ⊤ := fun u _ ht ↦
     h (eventuallyEq_zero_codiscrete_of_nhdsNE hf (meromorphicOrderAt_eq_top_iff.1 ht))
   exact MeromorphicAt.MeromorphicOn.codiscreteWithin_setOfPred_ne_zero
@@ -43,12 +44,12 @@ theorem nonempty_of_mem_codiscrete {S : Set ℂ} (hS : S ∈ codiscrete ℂ) : S
 theorem isOpen_of_mem_codiscrete {S : Set ℂ} (hS : S ∈ codiscrete ℂ) : IsOpen S :=
   (mem_codiscrete'.1 hS).1
 
-theorem eventually_analyticAt {f : ℂ → ℂ} (hf : Meromorphic f) :
-    ∀ᶠ z in codiscrete ℂ, AnalyticAt ℂ f z :=
+theorem eventually_analyticAt {f : ℂ → ℂ} (hf : Meromorphic f)
+    : ∀ᶠ z in codiscrete ℂ, AnalyticAt ℂ f z :=
   (hf.meromorphicOn (s := univ)).analyticAt_mem_codiscreteWithin
 
-theorem deriv_eventuallyEq_codiscrete {f g : ℂ → ℂ} (h : f =ᶠ[codiscrete ℂ] g) :
-    deriv f =ᶠ[codiscrete ℂ] deriv g := by
+theorem deriv_eventuallyEq_codiscrete {f g : ℂ → ℂ} (h : f =ᶠ[codiscrete ℂ] g)
+    : deriv f =ᶠ[codiscrete ℂ] deriv g := by
   have hS := isOpen_of_mem_codiscrete h
   filter_upwards [h] with z hz
   exact Filter.EventuallyEq.deriv_eq (Filter.mem_of_superset (hS.mem_nhds hz) fun w hw ↦ hw)
@@ -75,8 +76,7 @@ def meroNull : Ideal meroSubalgebra where
     simp only [Pi.zero_apply] at h ⊢
     rw [h, mul_zero]
 
-theorem mem_meroNull {f : meroSubalgebra} : f ∈ meroNull ↔ (f : ℂ → ℂ) =ᶠ[codiscrete ℂ] 0 :=
-  Iff.rfl
+theorem mem_meroNull {f : meroSubalgebra} : f ∈ meroNull ↔ (f : ℂ → ℂ) =ᶠ[codiscrete ℂ] 0 := Iff.rfl
 
 instance meroNull_isMaximal : meroNull.IsMaximal := by
   rw [Ideal.isMaximal_iff]
@@ -103,7 +103,6 @@ noncomputable instance : Field MeroField := Ideal.Quotient.field _
 
 noncomputable instance : DecidableEq MeroField := Classical.decEq _
 
-
 open scoped Classical in
 open Classical in
 def germ (f : ℂ → ℂ) : MeroField :=
@@ -116,35 +115,35 @@ theorem germ_surjective (u : MeroField) : ∃ f : ℂ → ℂ, Meromorphic f ∧
   obtain ⟨⟨f, hf⟩, rfl⟩ := Ideal.Quotient.mk_surjective u
   exact ⟨f, hf, germ_of hf⟩
 
-theorem germ_eq_germ_iff {f g : ℂ → ℂ} (hf : Meromorphic f) (hg : Meromorphic g) :
-    germ f = germ g ↔ f =ᶠ[codiscrete ℂ] g := by
+theorem germ_eq_germ_iff {f g : ℂ → ℂ} (hf : Meromorphic f) (hg : Meromorphic g)
+    : germ f = germ g ↔ f =ᶠ[codiscrete ℂ] g := by
   rw [germ_of hf, germ_of hg, Ideal.Quotient.eq, mem_meroNull]
   change (f - g) =ᶠ[codiscrete ℂ] 0 ↔ _
   exact Filter.eventuallyEq_iff_sub.symm
 
-theorem germ_congr {f g : ℂ → ℂ} (hf : Meromorphic f) (h : f =ᶠ[codiscrete ℂ] g) :
-    germ f = germ g :=
+theorem germ_congr {f g : ℂ → ℂ} (hf : Meromorphic f) (h : f =ᶠ[codiscrete ℂ] g)
+    : germ f = germ g :=
   (germ_eq_germ_iff hf (hf.congr_codiscrete h)).2 h
 
 theorem germ_eq_zero_iff {f : ℂ → ℂ} (hf : Meromorphic f) : germ f = 0 ↔ f =ᶠ[codiscrete ℂ] 0 := by
   rw [germ_of hf, Ideal.Quotient.eq_zero_iff_mem, mem_meroNull]
 
-theorem germ_add {f g : ℂ → ℂ} (hf : Meromorphic f) (hg : Meromorphic g) :
-    germ (f + g) = germ f + germ g := by
+theorem germ_add {f g : ℂ → ℂ} (hf : Meromorphic f) (hg : Meromorphic g)
+    : germ (f + g) = germ f + germ g := by
   rw [germ_of hf, germ_of hg, germ_of (hf.add hg), ← map_add (f := _)]
   rfl
 
-theorem germ_mul {f g : ℂ → ℂ} (hf : Meromorphic f) (hg : Meromorphic g) :
-    germ (f * g) = germ f * germ g := by
+theorem germ_mul {f g : ℂ → ℂ} (hf : Meromorphic f) (hg : Meromorphic g)
+    : germ (f * g) = germ f * germ g := by
   rw [germ_of hf, germ_of hg, germ_of (hf.mul hg), ← map_mul]
   rfl
 
-theorem germ_neg {f : ℂ → ℂ} (hf : Meromorphic f) : germ (-f) = -germ f := by
+theorem germ_neg {f : ℂ → ℂ} (hf : Meromorphic f) : germ (-f) = - germ f := by
   rw [germ_of hf, germ_of hf.neg, ← map_neg]
   rfl
 
-theorem germ_sub {f g : ℂ → ℂ} (hf : Meromorphic f) (hg : Meromorphic g) :
-    germ (f - g) = germ f - germ g := by
+theorem germ_sub {f g : ℂ → ℂ} (hf : Meromorphic f) (hg : Meromorphic g)
+    : germ (f - g) = germ f - germ g := by
   rw [sub_eq_add_neg, germ_add hf hg.neg, germ_neg hg, ← sub_eq_add_neg]
 
 theorem germ_const (c : ℂ) : germ (fun _ ↦ c) = algebraMap ℂ MeroField c := by
@@ -180,22 +179,24 @@ theorem germ_inv {f : ℂ → ℂ} (hf : Meromorphic f) : germ f⁻¹ = (germ f)
       exact mul_inv_cancel₀ hz
     exact (eq_inv_of_mul_eq_one_right h1)
 
-theorem germ_div {f g : ℂ → ℂ} (hf : Meromorphic f) (hg : Meromorphic g) :
-    germ (f / g) = germ f / germ g := by
+theorem germ_div {f g : ℂ → ℂ} (hf : Meromorphic f) (hg : Meromorphic g)
+    : germ (f / g) = germ f / germ g := by
   rw [div_eq_mul_inv, germ_mul hf hg.inv, germ_inv hg, ← div_eq_mul_inv]
 
-theorem comp_affine_eventuallyEq_zero {f : ℂ → ℂ} (h : f =ᶠ[codiscrete ℂ] 0) {t : ℂ} (ht : t ≠ 0)
-    (s : ℂ) : (fun z ↦ f (t * z + s)) =ᶠ[codiscrete ℂ] 0 := by
+theorem comp_affine_eventuallyEq_zero
+    {f : ℂ → ℂ} (h : f =ᶠ[codiscrete ℂ] 0) {t : ℂ} (ht : t ≠ 0) (s : ℂ)
+    : (fun z ↦ f (t * z + s)) =ᶠ[codiscrete ℂ] 0 := by
   rw [eventuallyEq_zero_codiscrete_iff] at h ⊢
   intro x
   have hc : Continuous fun z : ℂ ↦ t * z + s := by fun_prop
-  have hmaps : MapsTo (fun z : ℂ ↦ t * z + s) {x}ᶜ {t * x + s}ᶜ := fun z hz hz' ↦ hz (by
-    simp only [mem_singleton_iff, add_left_inj] at hz' ⊢
-    exact mul_left_cancel₀ ht hz')
+  have hmaps : MapsTo (fun z : ℂ ↦ t * z + s) {x}ᶜ {t * x + s}ᶜ := fun z hz hz' ↦
+    hz (by
+      simp only [mem_singleton_iff, add_left_inj] at hz' ⊢
+      exact mul_left_cancel₀ ht hz')
   exact (hc.continuousAt.continuousWithinAt.tendsto_nhdsWithin hmaps).eventually (h _)
 
-theorem meromorphic_comp_affine {f : ℂ → ℂ} (hf : Meromorphic f) (t s : ℂ) :
-    Meromorphic fun z ↦ f (t * z + s) := fun x ↦
+theorem meromorphic_comp_affine {f : ℂ → ℂ} (hf : Meromorphic f) (t s : ℂ)
+    : Meromorphic fun z ↦ f (t * z + s) := fun x ↦
   (hf (t * x + s)).comp_analyticAt (g := fun z ↦ t * z + s) (by fun_prop)
 
 def compAffineSub (t s : ℂ) : meroSubalgebra →ₐ[ℂ] meroSubalgebra where
@@ -212,8 +213,8 @@ def affineComp (t s : ℂ) (ht : t ≠ 0) : MeroField →ₐ[ℂ] MeroField :=
       rw [AlgHom.comp_apply, Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.eq_zero_iff_mem]
       exact comp_affine_eventuallyEq_zero hf ht s
 
-theorem affineComp_germ (t s : ℂ) (ht : t ≠ 0) {f : ℂ → ℂ} (hf : Meromorphic f) :
-    affineComp t s ht (germ f) = germ fun z ↦ f (t * z + s) := by
+theorem affineComp_germ (t s : ℂ) (ht : t ≠ 0) {f : ℂ → ℂ} (hf : Meromorphic f)
+    : affineComp t s ht (germ f) = germ fun z ↦ f (t * z + s) := by
   rw [germ_of hf, germ_of (meromorphic_comp_affine hf t s)]
   rfl
 
@@ -240,8 +241,7 @@ theorem derivFun_add (u v : MeroField) : derivFun (u + v) = derivFun u + derivFu
   filter_upwards [eventually_analyticAt hf, eventually_analyticAt hg] with z h1 h2
   exact deriv_add h1.differentiableAt h2.differentiableAt
 
-theorem derivFun_mul (u v : MeroField) :
-    derivFun (u * v) = u * derivFun v + v * derivFun u := by
+theorem derivFun_mul (u v : MeroField) : derivFun (u * v) = u * derivFun v + v * derivFun u := by
   obtain ⟨f, hf, rfl⟩ := germ_surjective u
   obtain ⟨g, hg, rfl⟩ := germ_surjective v
   rw [← germ_mul hf hg, derivFun_germ (hf.mul hg), derivFun_germ hf, derivFun_germ hg,
@@ -271,8 +271,8 @@ def germDeriv : Derivation ℂ MeroField MeroField :=
 theorem germDeriv_germ {f : ℂ → ℂ} (hf : Meromorphic f) : germDeriv (germ f) = germ (deriv f) :=
   derivFun_germ hf
 
-theorem exists_eq_algebraMap_of_germDeriv_eq_zero {u : MeroField} (hu : germDeriv u = 0) :
-    ∃ c : ℂ, u = algebraMap ℂ MeroField c := by
+theorem exists_eq_algebraMap_of_germDeriv_eq_zero {u : MeroField} (hu : germDeriv u = 0)
+    : ∃ c : ℂ, u = algebraMap ℂ MeroField c := by
   obtain ⟨f, hf, rfl⟩ := germ_surjective u
   rw [germDeriv_germ hf, germ_eq_zero_iff hf.deriv] at hu
   obtain ⟨x₀, hx₀⟩ := nonempty_of_mem_codiscrete (eventually_analyticAt hf)
@@ -280,17 +280,18 @@ theorem exists_eq_algebraMap_of_germDeriv_eq_zero {u : MeroField} (hu : germDeri
     have hne : ∀ᶠ z in 𝓝[≠] x₀, deriv f z = 0 := eventuallyEq_zero_codiscrete_iff.1 hu x₀
     have hcont : ContinuousAt (deriv f) x₀ := hx₀.deriv.continuousAt
     have h0 : deriv f x₀ = 0 := by
-      have ht : Tendsto (deriv f) (𝓝[≠] x₀) (𝓝 (deriv f x₀)) := hcont.tendsto.mono_left nhdsWithin_le_nhds
+      have ht : Tendsto (deriv f) (𝓝[≠] x₀) (𝓝 (deriv f x₀)) :=
+        hcont.tendsto.mono_left nhdsWithin_le_nhds
       have hne' : deriv f =ᶠ[𝓝[≠] x₀] fun _ ↦ 0 := hne
       exact tendsto_nhds_unique ht (tendsto_const_nhds.congr' hne'.symm)
     rw [← nhdsNE_sup_pure x₀]
     exact ⟨hne, h0⟩
-  obtain ⟨ε, hε, hball⟩ := Metric.eventually_nhds_iff_ball.1
-    ((hx₀.eventually_analyticAt).and hd)
+  obtain ⟨ε, hε, hball⟩ := Metric.eventually_nhds_iff_ball.1 ((hx₀.eventually_analyticAt).and hd)
   have hconst : ∀ y ∈ Metric.ball x₀ ε, f x₀ = f y := fun y hy ↦
     (Metric.isOpen_ball).is_const_of_deriv_eq_zero (convex_ball x₀ ε).isPreconnected
       (fun z hz ↦ (hball z hz).1.differentiableAt.differentiableWithinAt)
-      (fun z hz ↦ (hball z hz).2) (Metric.mem_ball_self hε) hy
+      (fun z hz ↦ (hball z hz).2)
+      (Metric.mem_ball_self hε) hy
   refine ⟨f x₀, ?_⟩
   rw [← germ_const, germ_eq_germ_iff hf (Meromorphic.const _), Filter.eventuallyEq_iff_sub]
   apply eventuallyEq_zero_codiscrete_of_nhdsNE (hf.sub (Meromorphic.const _)) (x := x₀)

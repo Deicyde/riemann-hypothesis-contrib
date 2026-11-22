@@ -7,15 +7,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LagrInt
 @[expose] public section
 
 open scoped TensorProduct Matrix
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  MeasureTheory
 open GlobalTheory.WeilM GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open Formalism.IndefR.DatumF
 
 namespace GlobalTheory
 
-theorem matrix_mem_span_incM : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (m n : ℕ)
-    (u : Matrix (Fin m) (Fin n) (AF F ⊗[F] E)),
-    u ∈ Submodule.span (AF F) (Set.range (incM F : Matrix (Fin m) (Fin n) E → Matrix (Fin m) (Fin n) (AF F ⊗[F] E))) := by
+theorem matrix_mem_span_incM
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (m n : ℕ)
+        (u : Matrix (Fin m) (Fin n) (AF F ⊗[F] E)),
+      u ∈ Submodule.span (AF F)
+        (Set.range (incM F : Matrix (Fin m) (Fin n) E → Matrix (Fin m) (Fin n) (AF F ⊗[F] E))) := by
   intro F E _ _ _ _ _ m n u
   classical
   rw [Matrix.matrix_eq_sum_single u]

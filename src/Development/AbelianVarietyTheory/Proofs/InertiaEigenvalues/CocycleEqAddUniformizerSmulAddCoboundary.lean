@@ -10,13 +10,17 @@ open ReciprocityTheory.Gal
 namespace GlobalTheory
 
 theorem cocycle_lift_mod_uniformizer
-    {O : Type} [CommRing O] {M : Type} [AddCommGroup M] [Module O M] [TopologicalSpace M]
-    [IsTopologicalAddGroup M] [ContinuousConstSMul O M] {G : Type} [Group G] [TopologicalSpace G]
-    (ρ : Representation O G M) (hρ : ContAction ρ) (ϖ : O)
-    (hemb : Topology.IsEmbedding (fun m : M => ϖ • m)) (s : Finset (Z1 ρ))
-    (hs : ∀ c : Z1 ρ, ∃ i ∈ s, ∃ x : M, ∀ g, (c : G → M) g - (i : G → M) g - (ρ g x - x) ∈
-      LinearMap.range (LinearMap.lsmul O M ϖ))
-    (c : Z1 ρ) : ∃ (a : Z1 ρ → O) (c' : Z1 ρ) (x : M),
+    {O : Type} [CommRing O]
+    {M : Type} [AddCommGroup M] [Module O M] [TopologicalSpace M] [IsTopologicalAddGroup M]
+    [ContinuousConstSMul O M]
+    {G : Type} [Group G] [TopologicalSpace G]
+    (ρ : Representation O G M) (hρ : ContAction ρ)
+    (ϖ : O) (hemb : Topology.IsEmbedding (fun m : M => ϖ • m))
+    (s : Finset (Z1 ρ))
+    (hs : ∀ c : Z1 ρ, ∃ i ∈ s, ∃ x : M, ∀ g,
+      (c : G → M) g - (i : G → M) g - (ρ g x - x) ∈ LinearMap.range (LinearMap.lsmul O M ϖ))
+    (c : Z1 ρ)
+    : ∃ (a : Z1 ρ → O) (c' : Z1 ρ) (x : M),
       (c : G → M) = ∑ i ∈ s, a i • (i : G → M) + ϖ • (c' : G → M) + d0 ρ x := by
   classical
   obtain ⟨i, his, x, hx⟩ := hs c

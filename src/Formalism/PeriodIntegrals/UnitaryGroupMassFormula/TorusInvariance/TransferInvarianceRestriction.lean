@@ -11,7 +11,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.Q.TInvW
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.QuantumDeterminants.WeylGroupFacts Formalism.FourierDecayAlt.Q
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.QuantumDeterminants.WeylGroupFacts
+  Formalism.FourierDecayAlt.Q
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -251,38 +252,47 @@ lemma uh_H_inv {s : Mx k r} (hs : s ∈ UH (Hpk k r)) (hu : s * s⁻¹ = 1) :
 
 theorem transfer_invariance_vector : StepVec := by
   intro k r z z' i hz hz'
-  have bo : ∀ (a : Fin (mdim k r i)) q, (∀ c, q ≠ posL k r i c) →
-      bvec q (posL k r i a) = 0 ∧ bvec (posL k r i a) q = 0 :=
+  have bo
+      : ∀ (a : Fin (mdim k r i)) q,
+        (∀ c, q ≠ posL k r i c) → bvec q (posL k r i a) = 0 ∧ bvec (posL k r i a) q = 0 :=
     fun a q hq => bvec_posL_outer a q hq
   have blk_mul : ∀ s t : Mx k r, s ∈ Glev k r i → blk i (s * t) = blk i s * blk i t := by
     intro s t hs
     ext a b
     simp only [blk, Matrix.mul_apply]
-    exact sum_posL (fun q => s (posL k r i a) q * t q (posL k r i b)) (fun q hq => by
-      show s (posL k r i a) q * t q (posL k r i b) = 0
-      rw [glev_col hs (posL k r i a) q hq, (bo a q hq).1, zero_mul])
+    exact sum_posL
+      (fun q => s (posL k r i a) q * t q (posL k r i b))
+      (fun q hq => by
+        show s (posL k r i a) q * t q (posL k r i b) = 0
+        rw [glev_col hs (posL k r i a) q hq, (bo a q hq).1, zero_mul])
   have blk_one : blk i (1 : Mx k r) = 1 := by
     ext a b
     simp only [blk, Matrix.one_apply]
     by_cases h : a = b
     · simp [h]
     · rw [if_neg (fun e => h (posL_inj e)), if_neg h]
-  have mv_blk : ∀ s ∈ Glev k r i, ∀ v : Fin (2 * r + k + 1) → ℂ,
-      (blk i s *ᵥ fun j => v (posL k r i j)) = fun j => (s *ᵥ v) (posL k r i j) := by
+  have mv_blk
+      : ∀ s ∈ Glev k r i, ∀ v : Fin (2 * r + k + 1) → ℂ,
+        (blk i s *ᵥ fun j => v (posL k r i j)) = fun j => (s *ᵥ v) (posL k r i j) := by
     intro s hs v
     funext a
     simp only [blk, Matrix.mulVec, dotProduct]
-    exact (sum_posL (fun q => s (posL k r i a) q * v q) (fun q hq => by
-      show s (posL k r i a) q * v q = 0
-      rw [glev_col hs (posL k r i a) q hq, (bo a q hq).1, zero_mul])).symm
-  have vm_blk : ∀ t ∈ Glev k r i, ∀ x : Fin (2 * r + k + 1) → ℂ,
-      ((fun j => x (posL k r i j)) ᵥ* blk i t) = fun j => (x ᵥ* t) (posL k r i j) := by
+    exact (sum_posL
+      (fun q => s (posL k r i a) q * v q)
+      (fun q hq => by
+        show s (posL k r i a) q * v q = 0
+        rw [glev_col hs (posL k r i a) q hq, (bo a q hq).1, zero_mul])).symm
+  have vm_blk
+      : ∀ t ∈ Glev k r i, ∀ x : Fin (2 * r + k + 1) → ℂ,
+        ((fun j => x (posL k r i j)) ᵥ* blk i t) = fun j => (x ᵥ* t) (posL k r i j) := by
     intro t ht x
     funext b
     simp only [blk, Matrix.vecMul, dotProduct]
-    exact (sum_posL (fun q => x q * t q (posL k r i b)) (fun q hq => by
-      show x q * t q (posL k r i b) = 0
-      rw [glev_row' ht q (posL k r i b) hq, (bo b q hq).2, mul_zero])).symm
+    exact (sum_posL
+      (fun q => x q * t q (posL k r i b))
+      (fun q hq => by
+        show x q * t q (posL k r i b) = 0
+        rw [glev_row' ht q (posL k r i b) hq, (bo b q hq).2, mul_zero])).symm
   have hS := transfer_invariance_smooth k r z i hz
   have hS' := transfer_invariance_smooth k r z' i hz'
   refine ⟨fun s hs g => ?_, fun s' hs' => ?_⟩
@@ -314,7 +324,8 @@ theorem transfer_invariance_vector : StepVec := by
       rw [mv_blk _ hsG, hsf]
     · unfold xbv
       simp only [herm_bv]
-      rw [vm_blk _ hiG, Matrix.vecMul_vecMul, uh_H_inv hsU hu.1, ← Matrix.vecMul_vecMul, ← Matrix.star_mulVec, hsf]
+      rw [vm_blk _ hiG, Matrix.vecMul_vecMul, uh_H_inv hsU hu.1, ← Matrix.vecMul_vecMul,
+        ← Matrix.star_mulVec, hsf]
     · unfold yv
       rw [mv_blk _ hsG]
       funext j
@@ -329,8 +340,14 @@ theorem transfer_invariance_restriction : StepRSm := by
   obtain ⟨U, F, hU, hgU, hF, hfF⟩ := hf (g₀ * s') ⟨glev_mul' hg₀.1 hs', hD g₀ hg₀⟩
   let L : Mx k r →L[ℝ] Mx k r := LinearMap.toContinuousLinearMap (LinearMap.mulRight ℝ s')
   have hL : ∀ x, L x = x * s' := fun _ => rfl
-  refine ⟨L ⁻¹' U, fun x => F (L x), hU.preimage L.continuous, by simpa [hL] using hgU,
-    hF.comp L.contDiff.contDiffOn (fun _ hx => hx), fun x hx hxG => ?_⟩
+  refine ⟨
+    L ⁻¹' U,
+    fun x => F (L x),
+    hU.preimage L.continuous,
+    by simpa [hL] using hgU,
+    hF.comp L.contDiff.contDiffOn (fun _ hx => hx),
+    fun x hx hxG => ?_
+  ⟩
   have hx' : x * s' ∈ U := by rw [← hL]; exact hx
   show f (x * s') = F (L x)
   rw [hL]

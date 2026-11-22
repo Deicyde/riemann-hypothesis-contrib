@@ -8,8 +8,8 @@ open PowerSeries IsLocalRing UpperTheory.V.abelian₂
 open IsDiscreteValuationRing (addVal)
 open scoped Pointwise TensorProduct Topology
 
-private theorem mem_smul_top_pi {R : Type} [CommRing R] (J : Ideal R) {r : ℕ} (x : Fin r → R) :
-    x ∈ J • (⊤ : Submodule R (Fin r → R)) ↔ ∀ i, x i ∈ J := by
+private theorem mem_smul_top_pi {R : Type} [CommRing R] (J : Ideal R) {r : ℕ} (x : Fin r → R)
+    : x ∈ J • (⊤ : Submodule R (Fin r → R)) ↔ ∀ i, x i ∈ J := by
   constructor
   · intro hx
     refine Submodule.smul_induction_on hx (fun a ha y _ i => ?_) (fun a b ha hb i => ?_)
@@ -19,8 +19,8 @@ private theorem mem_smul_top_pi {R : Type} [CommRing R] (J : Ideal R) {r : ℕ} 
     rw [pi_eq_sum_univ x]
     exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem_smul (hx i) Submodule.mem_top
 
-private theorem isPrecomplete_pi {R : Type} [CommRing R] (I : Ideal R) [IsPrecomplete I R] (r : ℕ) :
-    IsPrecomplete I (Fin r → R) := by
+private theorem isPrecomplete_pi {R : Type} [CommRing R] (I : Ideal R) [IsPrecomplete I R] (r : ℕ)
+    : IsPrecomplete I (Fin r → R) := by
   refine ⟨fun {f} hf => ?_⟩
   have hc : ∀ i : Fin r, ∃ L : R, ∀ n, f n i ≡ L [SMOD (I ^ n • ⊤ : Submodule R R)] := by
     intro i
@@ -39,14 +39,18 @@ private theorem isPrecomplete_pi {R : Type} [CommRing R] (I : Ideal R) [IsPrecom
   rw [SModEq.sub_mem] at this
   simpa [smul_eq_mul, Ideal.mul_top] using this
 
-theorem UpperTheory.V.abelian₂.nakayama :
-    ∀ (R : Type) [CommRing R] (I : Ideal R) [IsPrecomplete I R] (M : Type) [AddCommGroup M] [Module R M] [IsHausdorff I M],
-      (∀ (r : ℕ) (s : Fin r → M), Submodule.span R (Set.range s) ⊔ I • (⊤ : Submodule R M) = ⊤ →
-        Submodule.span R (Set.range s) = ⊤) ∧
-      (Module.Finite R (M ⧸ I • (⊤ : Submodule R M)) → Module.Finite R M) := by
+theorem UpperTheory.V.abelian₂.nakayama
+    : ∀ (R : Type) [CommRing R] (I : Ideal R) [IsPrecomplete I R] (M : Type) [AddCommGroup M]
+        [Module R M] [IsHausdorff I M],
+      (∀ (r : ℕ) (s : Fin r → M),
+          Submodule.span R (Set.range s) ⊔ I • (⊤ : Submodule R M) = ⊤
+            → Submodule.span R (Set.range s) = ⊤)
+        ∧ (Module.Finite R (M ⧸ I • (⊤ : Submodule R M)) → Module.Finite R M) := by
   intro R _ I _ M _ _ _
-  have part1 : ∀ (r : ℕ) (s : Fin r → M), Submodule.span R (Set.range s) ⊔ I • (⊤ : Submodule R M) = ⊤ →
-      Submodule.span R (Set.range s) = ⊤ := by
+  have part1
+      : ∀ (r : ℕ) (s : Fin r → M),
+        Submodule.span R (Set.range s) ⊔ I • (⊤ : Submodule R M) = ⊤
+          → Submodule.span R (Set.range s) = ⊤ := by
     intro r s hs
     have hsurj : Function.Surjective (Fintype.linearCombination R s) := by
       haveI := isPrecomplete_pi I r

@@ -13,15 +13,18 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LieSkew
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Formalism.L2.Host GlobalTheory.AutomorphicL2Unitary GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.Published
+open NumberField IsDedekindDomain MeasureTheory Formalism.L2.Host GlobalTheory.AutomorphicL2Unitary
+  GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec
+  GlobalTheory.CuspRep.CuspidalL2GL GlobalTheory.Published
 
 noncomputable section
 
 namespace GlobalTheory.CapOrth
 
-variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {N : ℕ} {μ : Measure (GA E N)}
-  {W : Submodule ℂ (Sm E N)} (h : ∀ φ ∈ W, MemL2Quotient (latticeGL E N) μ φ.1)
-
+variable
+  {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+  {N : ℕ} {μ : Measure (GA E N)} {W : Submodule ℂ (Sm E N)}
+  (h : ∀ φ ∈ W, MemL2Quotient (latticeGL E N) μ φ.1)
 
 open Classical in
 def cls (x : Sm E N) : L2 (latticeGL E N) μ := if hx : x ∈ W then toL2ₗ μ W h ⟨x, hx⟩ else 0

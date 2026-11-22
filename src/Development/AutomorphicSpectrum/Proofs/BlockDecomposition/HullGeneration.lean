@@ -8,14 +8,18 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.RankPosO
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec
+  GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs
 open PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation
 
 namespace GlobalTheory.CompanionTheory.EGlue
 
-theorem typeB_of_mem_span {E : Type} [Field E] [NumberField E] [IsCMField E] {N : ℕ}
-    {K : Subgroup (GL (Fin N) (Af E))} {W : Submodule ℂ (Kinf E N → ℂ)} {S : Set (Sm E N)}
-    (hS : ∀ φ ∈ S, TypeB K W φ) {φ : Sm E N} (hφ : φ ∈ Submodule.span ℂ S) : TypeB K W φ := by
+theorem typeB_of_mem_span
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {N : ℕ} {K : Subgroup (GL (Fin N) (Af E))} {W : Submodule ℂ (Kinf E N → ℂ)} {S : Set (Sm E N)}
+    (hS : ∀ φ ∈ S, TypeB K W φ)
+    {φ : Sm E N} (hφ : φ ∈ Submodule.span ℂ S)
+    : TypeB K W φ := by
   induction hφ using Submodule.span_induction with
   | mem x hx => exact hS x hx
   | zero => exact ⟨fun _ _ _ => rfl, fun _ => W.zero_mem⟩

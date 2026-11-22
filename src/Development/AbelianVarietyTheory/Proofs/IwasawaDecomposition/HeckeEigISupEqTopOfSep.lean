@@ -9,14 +9,19 @@ noncomputable section
 
 namespace GlobalTheory.HeightCounting.Up
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.IndefR.NX ReciprocityTheory.Aut Formalism.AUTREP NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
+  Formalism.L2.Host Formalism.IndefR.NX ReciprocityTheory.Aut Formalism.AUTREP NumberField
+  IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top
+  GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3
+  GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem _root_.GlobalTheory.heckeEig_iSup_eq_top_of_sep {O X M : Type} [CommRing O] [IsDomain O] [AddCommGroup M] [Module O M] [Finite X]
+theorem _root_.GlobalTheory.heckeEig_iSup_eq_top_of_sep
+    {O X M : Type} [CommRing O] [IsDomain O] [AddCommGroup M] [Module O M] [Finite X]
     (T : Subalgebra O (X → O)) (act : T →ₐ[O] Module.End O M)
-    (hsep : ∀ x y : X, x ≠ y → ∃ f ∈ T, (f : X → O) x ≠ (f : X → O) y) :
-    ⨆ x, heckeEig T act x = ⊤ := by
+    (hsep : ∀ x y : X, x ≠ y → ∃ f ∈ T, (f : X → O) x ≠ (f : X → O) y)
+    : ⨆ x, heckeEig T act x = ⊤ := by
   classical
   have := Fintype.ofFinite X
   have hs' : ∀ x y : X, ∃ f : T, x ≠ y → (f : X → O) x ≠ (f : X → O) y := by
@@ -27,14 +32,18 @@ theorem _root_.GlobalTheory.heckeEig_iSup_eq_top_of_sep {O X M : Type} [CommRing
       exact ⟨⟨f, hf⟩, fun _ => hne⟩
   choose s hs using hs'
   let E : X → T := fun x => ∏ y ∈ Finset.univ.erase x, (s x y - algebraMap O T ((s x y : X → O) y))
-  have hE : ∀ x z, ((E x : T) : X → O) z = ∏ y ∈ Finset.univ.erase x, ((s x y : X → O) z - (s x y : X → O) y) := by
+  have hE
+      : ∀ x z,
+        ((E x : T) : X → O) z
+          = ∏ y ∈ Finset.univ.erase x, ((s x y : X → O) z - (s x y : X → O) y) := by
     intro x z
     simp [E, Subalgebra.coe_prod, Finset.prod_apply]
   let d : X → O := fun x => ((E x : T) : X → O) x
   have hd : ∀ x, d x ≠ 0 := by
     intro x
     simp only [d, hE]
-    exact Finset.prod_ne_zero_iff.mpr fun y hy => sub_ne_zero.mpr (hs x y (Ne.symm (Finset.ne_of_mem_erase hy)))
+    exact Finset.prod_ne_zero_iff.mpr fun y hy =>
+      sub_ne_zero.mpr (hs x y (Ne.symm (Finset.ne_of_mem_erase hy)))
   have hE0 : ∀ x z, z ≠ x → ((E x : T) : X → O) z = 0 := by
     intro x z hz
     rw [hE]
@@ -89,8 +98,8 @@ theorem _root_.GlobalTheory.heckeEig_iSup_eq_top_of_sep {O X M : Type} [CommRing
   refine Submodule.smul_mem _ _ (Submodule.sum_mem _ fun x _ => ?_)
   exact Submodule.smul_of_tower_mem _ _ (Submodule.mem_iSup_of_mem x (hmem x m))
 
-theorem eigSpan_of_record (D : D7) : D.nd.EigSpan :=
-  fun i => GlobalTheory.heckeEig_iSup_eq_top_of_sep (D.nd.T i) (D.nd.act i) (D.nd.T_sep i)
+theorem eigSpan_of_record (D : D7) : D.nd.EigSpan := fun i =>
+  GlobalTheory.heckeEig_iSup_eq_top_of_sep (D.nd.T i) (D.nd.act i) (D.nd.T_sep i)
 
 end GlobalTheory.HeightCounting.Up
 

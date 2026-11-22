@@ -124,7 +124,8 @@ variable {n : ℕ} {ε : Fin n → Bool}
 
 def coordC (ab : Fin n × Fin n) : C(KG ε, ℂ) := ⟨fun h => toMK h ab.1 ab.2, coord_mem ab.1 ab.2⟩
 
-def polyAlg (ε : Fin n → Bool) : StarSubalgebra ℂ C(KG ε, ℂ) := StarAlgebra.adjoin ℂ (Set.range coordC)
+def polyAlg (ε : Fin n → Bool) : StarSubalgebra ℂ C(KG ε, ℂ) :=
+  StarAlgebra.adjoin ℂ (Set.range coordC)
 
 lemma polyAlg_poly {φ : C(KG ε, ℂ)} (hφ : φ ∈ polyAlg ε) : ∃ P : Poly n, ∀ h, φ h = ev (toMK h) P := by
   have hφ' : φ ∈ (polyAlg ε).toSubalgebra := hφ

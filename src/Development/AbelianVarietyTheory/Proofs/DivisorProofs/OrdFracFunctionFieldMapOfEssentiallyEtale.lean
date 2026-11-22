@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FunctionFiel
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
 open IsLocalRing
 
@@ -14,7 +15,14 @@ set_option autoImplicit false
 noncomputable section
 namespace GlobalTheory.EtaleKlt
 
-theorem ord_functionFieldMap_of_formallyEtale : ∀ (M W : Scheme.{0}) [IsIntegral M] [IsIntegral W] (p : W ⟶ Sp ℂ) (f : M ⟶ W) [IsDominant f] (E : DivOver p) (E' : DivOver (f ≫ p)) (h : ∀ x ∈ E.ring, functionFieldMap f x ∈ E'.ring), (∀ x, functionFieldMap f x ∈ E'.ring → x ∈ E.ring) → ((functionFieldMap f).restrict E.ring E'.ring h).FormallyEtale → ((functionFieldMap f).restrict E.ring E'.ring h).EssFiniteType → ∀ g : W.functionFieldˣ, E'.ord (Units.map (functionFieldMap f).toMonoidHom g) = E.ord g := by
+theorem ord_functionFieldMap_of_formallyEtale
+    : ∀ (M W : Scheme.{0}) [IsIntegral M] [IsIntegral W] (p : W ⟶ Sp ℂ) (f : M ⟶ W) [IsDominant f]
+        (E : DivOver p) (E' : DivOver (f ≫ p)) (h : ∀ x ∈ E.ring, functionFieldMap f x ∈ E'.ring),
+      (∀ x, functionFieldMap f x ∈ E'.ring → x ∈ E.ring)
+        → ((functionFieldMap f).restrict E.ring E'.ring h).FormallyEtale
+        → ((functionFieldMap f).restrict E.ring E'.ring h).EssFiniteType
+        → ∀ g : W.functionFieldˣ,
+          E'.ord (Units.map (functionFieldMap f).toMonoidHom g) = E.ord g := by
   intro M W _ _ p f _ E E' h htr het hft g
   set φ := functionFieldMap f
   set ρ := φ.restrict E.ring E'.ring h
@@ -37,16 +45,18 @@ theorem ord_functionFieldMap_of_formallyEtale : ∀ (M W : Scheme.{0}) [IsIntegr
   have hm := Algebra.FormallyUnramified.map_maximalIdeal (R := E.ring) (S := E'.ring)
   obtain ⟨t, ht⟩ := IsDiscreteValuationRing.exists_irreducible E.ring
   have ht' : Irreducible (ρ t) := by
-    rw [IsDiscreteValuationRing.irreducible_iff_uniformizer, ← hm, (IsDiscreteValuationRing.irreducible_iff_uniformizer t).1 ht, Ideal.map_span,
+    rw [IsDiscreteValuationRing.irreducible_iff_uniformizer, ← hm,
+      (IsDiscreteValuationRing.irreducible_iff_uniformizer t).1 ht, Ideal.map_span,
       Set.image_singleton]
     rfl
   obtain ⟨m, u, e⟩ := exists_eq_unit_mul_zpow (F := W.functionField) ht g.ne_zero
   have h1 := ordTop_vw_unit_mul_zpow (F := W.functionField) ht u m
   have h2 := ordTop_vw_unit_mul_zpow (F := M.functionField) ht' (Units.map ρ.toMonoidHom u) m
   rw [← e, ordTop_vw_of_ne_zero _ g.ne_zero, WithTop.coe_inj] at h1
-  have e2 : ((Units.map φ.toMonoidHom g : M.functionFieldˣ) : M.functionField) =
-      algebraMap E'.ring M.functionField (Units.map ρ.toMonoidHom u) *
-        algebraMap E'.ring M.functionField (ρ t) ^ m := by
+  have e2
+      : ((Units.map φ.toMonoidHom g : M.functionFieldˣ) : M.functionField)
+        = algebraMap E'.ring M.functionField (Units.map ρ.toMonoidHom u)
+          * algebraMap E'.ring M.functionField (ρ t) ^ m := by
     rw [Units.coe_map, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe, e, map_mul, map_zpow₀]
     rfl
   rw [← e2, ordTop_vw_of_ne_zero _ (Units.ne_zero _), WithTop.coe_inj] at h2

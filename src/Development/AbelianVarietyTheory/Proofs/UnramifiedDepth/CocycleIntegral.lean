@@ -14,7 +14,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.TaylorDiscrim
 noncomputable section
 
 open scoped BigOperators
-open Formalism.IncomingBounds Formalism.L2.FormalSeriesBounds ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.TB.LogPf ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.Nab
+open Formalism.IncomingBounds Formalism.L2.FormalSeriesBounds
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.TB.LogPf
+  ReciprocityTheory.ChartRestriction.G.TB.WickVanishing.Nab
 
 namespace GlobalTheory.GaugeCocycle
 
@@ -30,7 +32,8 @@ def valRing (V : VF C) : Subring C where
   zero_mem' := VF.Ge.zero 0
   neg_mem' := fun ha => VF.Ge.neg ha
 
-theorem intS_iff_ig (V : VF C) {σ : Type} (f : MvPowerSeries σ C) : IntS V f ↔ f ∈ Ig (valRing V) C σ := by
+theorem intS_iff_ig (V : VF C) {σ : Type} (f : MvPowerSeries σ C)
+    : IntS V f ↔ f ∈ Ig (valRing V) C σ := by
   constructor
   · intro hf
     let g : MvPowerSeries σ (valRing V) := fun n => ⟨coeff n f, hf n⟩

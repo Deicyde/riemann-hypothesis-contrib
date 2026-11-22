@@ -7,6 +7,7 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 
 namespace PositivityTheory.Rg.BcB.G8
 
-theorem global_character_holds : G4 := global_character_of_finite_inputs Fin.kfOC_holds Fin.finLevel_holds Fin.finHalf_holds
+theorem global_character_holds : G4 :=
+  global_character_of_finite_inputs Fin.kfOC_holds Fin.finLevel_holds Fin.finHalf_holds
 
 end PositivityTheory.Rg.BcB.G8

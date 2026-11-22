@@ -18,24 +18,28 @@ variable {K : Type} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchim
 variable {E : Type} [AddCommGroup E] [Module K E] [TopologicalSpace E] [IsModuleTopology K E]
 variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
-theorem exists_ball_of_isCompact {C : Set K} (hC : IsCompact C) :
-    ∃ y : K, y ≠ 0 ∧ C ⊆ {x | valuation K x ≤ valuation K y} := by
+theorem exists_ball_of_isCompact {C : Set K} (hC : IsCompact C)
+    : ∃ y : K, y ≠ 0 ∧ C ⊆ {x | valuation K x ≤ valuation K y} := by
   classical
   have hopen : ∀ y : K, y ≠ 0 → IsOpen {x : K | valuation K x ≤ valuation K y} := by
     intro y hy
-    have h := isOpen_box (Basis.singleton Unit K) (fun _ => valuation K y)
-      (fun _ => (Valuation.ne_zero_iff _).mpr hy)
+    have h :=
+      isOpen_box (Basis.singleton Unit K)
+        (fun _ => valuation K y)
+        (fun _ => (Valuation.ne_zero_iff _).mpr hy)
     convert h using 1
     ext x
     simp [box, Basis.singleton_repr]
-  obtain ⟨t, ht⟩ := hC.elim_finite_subcover
-    (fun y : {y : K // y ≠ 0} => {x : K | valuation K x ≤ valuation K y.1})
-    (fun y => hopen y.1 y.2) (by
-      intro x _
-      by_cases hx : x = 0
-      · refine Set.mem_iUnion.mpr ⟨⟨1, one_ne_zero⟩, ?_⟩
-        simp [hx]
-      · exact Set.mem_iUnion.mpr ⟨⟨x, hx⟩, show valuation K x ≤ valuation K x from le_rfl⟩)
+  obtain ⟨t, ht⟩ :=
+    hC.elim_finite_subcover
+      (fun y : {y : K // y ≠ 0} => {x : K | valuation K x ≤ valuation K y.1})
+      (fun y => hopen y.1 y.2)
+      (by
+        intro x _
+        by_cases hx : x = 0
+        · refine Set.mem_iUnion.mpr ⟨⟨1, one_ne_zero⟩, ?_⟩
+          simp [hx]
+        · exact Set.mem_iUnion.mpr ⟨⟨x, hx⟩, show valuation K x ≤ valuation K x from le_rfl⟩)
   rcases t.eq_empty_or_nonempty with h0 | hne
   · refine ⟨1, one_ne_zero, fun x hx => ?_⟩
     have h1 := ht hx
@@ -50,10 +54,10 @@ theorem exists_ball_of_isCompact {C : Set K} (hC : IsCompact C) :
 
 variable [MeasurableSpace E] [BorelSpace E]
 
-theorem scale_box (b : Basis ι K E) (μ : Measure E) [μ.IsAddHaarMeasure] (i : ι) (a : K)
-    (ha : a ≠ 0) :
-    μ (Matrix.toLin b b (Matrix.diagonal (Function.update 1 i a)) '' box b 1) =
-      (distribHaarChar K (Units.mk0 a ha) : ℝ≥0∞) * μ (box b 1) := by
+theorem scale_box
+    (b : Basis ι K E) (μ : Measure E) [μ.IsAddHaarMeasure] (i : ι) (a : K) (ha : a ≠ 0)
+    : μ (Matrix.toLin b b (Matrix.diagonal (Function.update 1 i a)) '' box b 1)
+      = (distribHaarChar K (Units.mk0 a ha) : ℝ≥0∞) * μ (box b 1) := by
   letI : MeasurableSpace K := borel K
   haveI : BorelSpace K := ⟨rfl⟩
   haveI : IsTopologicalAddGroup E := IsModuleTopology.topologicalAddGroup K E
@@ -61,24 +65,26 @@ theorem scale_box (b : Basis ι K E) (μ : Measure E) [μ.IsAddHaarMeasure] (i :
   haveI := secondCountableE b
   haveI := secondCountable K
   obtain ⟨c, hc⟩ : ∃ c : E → K, c = fun x => b.repr x i := ⟨_, rfl⟩
-  obtain ⟨P, hP⟩ : ∃ P : Set E, P = {x | ∀ j, j ≠ i → valuation K (b.repr x j) ≤ 1} :=
-    ⟨_, rfl⟩
+  obtain ⟨P, hP⟩ : ∃ P : Set E, P = {x | ∀ j, j ≠ i → valuation K (b.repr x j) ≤ 1} := ⟨_, rfl⟩
   have hcc : Continuous c := by rw [hc]; exact continuous_coord b i
   have hcm : Measurable c := hcc.measurable
   have hPo : IsOpen P := by
-    have h : P = ⋂ j ∈ (Finset.univ.filter (· ≠ i)),
-        (fun x : E => b.repr x j) ⁻¹' {z : K | valuation K z ≤ 1} := by
+    have h
+        : P
+          = ⋂ j ∈ (Finset.univ.filter (· ≠ i)),
+            (fun x : E => b.repr x j) ⁻¹' {z : K | valuation K z ≤ 1} := by
       rw [hP]; ext x; simp
     rw [h]
-    exact isOpen_biInter_finset
-      (fun j _ => (isOpen_ball 1 one_ne_zero).preimage (continuous_coord b j))
+    exact isOpen_biInter_finset (fun j _ =>
+      (isOpen_ball 1 one_ne_zero).preimage (continuous_coord b j))
   let ν : Measure K := (μ.restrict P).map c
   have hνA : ∀ A : Set K, MeasurableSet A → ν A = μ (P ∩ c ⁻¹' A) := by
     intro A hA
     show ((μ.restrict P).map c) A = _
     rw [Measure.map_apply hcm hA, Measure.restrict_apply (hcm hA), Set.inter_comm]
-  have hrepr_add : ∀ (t : K) (x : E) (j : ι),
-      b.repr (t • b i + x) j = (if i = j then t else 0) + b.repr x j := by
+  have hrepr_add
+      : ∀ (t : K) (x : E) (j : ι),
+        b.repr (t • b i + x) j = (if i = j then t else 0) + b.repr x j := by
     intro t x j
     rw [map_add (f := _), map_smul, Basis.repr_self, Finsupp.add_apply, Finsupp.smul_apply,
       Finsupp.single_apply]
@@ -137,15 +143,18 @@ theorem scale_box (b : Basis ι K E) (μ : Measure E) [μ.IsAddHaarMeasure] (i :
   let g : Kˣ := Units.mk0 a ha
   have hOo : IsOpen {x : K | valuation K x ≤ 1} := isOpen_ball 1 one_ne_zero
   have hgO : IsOpen (g • {x : K | valuation K x ≤ 1}) := hOo.smul g
-  have hscale : ν (g • {x : K | valuation K x ≤ 1}) =
-      (distribHaarChar K g : ℝ≥0∞) * ν {x | valuation K x ≤ 1} := by
-    have h1 : (DomMulAct.mk g • ν) {x : K | valuation K x ≤ 1} =
-        ν (g • {x : K | valuation K x ≤ 1}) := by
+  have hscale
+      : ν (g • {x : K | valuation K x ≤ 1})
+        = (distribHaarChar K g : ℝ≥0∞) * ν {x | valuation K x ≤ 1} := by
+    have h1
+        : (DomMulAct.mk g • ν) {x : K | valuation K x ≤ 1}
+          = ν (g • {x : K | valuation K x ≤ 1}) := by
       simp [domSMul_apply]
     rw [← h1, measure_isAddHaarMeasure_eq_smul_of_isOpen _ ν hOo,
       addHaarScalarFactor_smul_eq_distribHaarChar, ENNReal.smul_def, smul_eq_mul]
-  have hrepr : ∀ (d : ι → K) (x : E) (j : ι),
-      b.repr (Matrix.toLin b b (Matrix.diagonal d) x) j = d j * b.repr x j := by
+  have hrepr
+      : ∀ (d : ι → K) (x : E) (j : ι),
+        b.repr (Matrix.toLin b b (Matrix.diagonal d) x) j = d j * b.repr x j := by
     intro d x j
     rw [Matrix.repr_toLin, Matrix.mulVec_diagonal]
   have hR : box b 1 = P ∩ c ⁻¹' {x : K | valuation K x ≤ 1} := by
@@ -158,8 +167,9 @@ theorem scale_box (b : Basis ι K E) (μ : Measure E) [μ.IsAddHaarMeasure] (i :
       by_cases hj : j = i
       · subst hj; exact h2
       · exact h1 j hj
-  have hL : (Matrix.toLin b b (Matrix.diagonal (Function.update 1 i a))) '' box b 1 =
-      P ∩ c ⁻¹' (g • {x : K | valuation K x ≤ 1}) := by
+  have hL
+      : (Matrix.toLin b b (Matrix.diagonal (Function.update 1 i a))) '' box b 1
+        = P ∩ c ⁻¹' (g • {x : K | valuation K x ≤ 1}) := by
     ext y
     rw [hP, hc]
     constructor
@@ -186,8 +196,9 @@ theorem scale_box (b : Basis ι K E) (μ : Measure E) [μ.IsAddHaarMeasure] (i :
           exact h1 j hj
       · show Matrix.toLin b b _ (Matrix.toLin b b _ y) = y
         rw [← LinearMap.comp_apply, ← Matrix.toLin_mul, Matrix.diagonal_mul_diagonal]
-        have hdd : (fun k => Function.update (1 : ι → K) i a k * Function.update (1 : ι → K) i a⁻¹ k) =
-            (1 : ι → K) := by
+        have hdd
+            : (fun k => Function.update (1 : ι → K) i a k * Function.update (1 : ι → K) i a⁻¹ k)
+              = (1 : ι → K) := by
           funext k
           by_cases hk : k = i
           · subst hk; simp [ha]

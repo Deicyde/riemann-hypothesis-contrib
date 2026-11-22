@@ -36,15 +36,20 @@ theorem far_closed : Far := by
   have hs : SqId := square_identity_holds
   have hadeq : AdEq := adjoint_equation_holds
   have htrial : Trial :=
-    trial_of_inputs discrete_series_data_holds (second_moment_of_bounds (root_bound_of_square_identity hs) matrix_bound_holds hadeq) (approximation_of_square_identity hs)
-      restriction_holds
+    trial_of_inputs discrete_series_data_holds
+      (second_moment_of_bounds (root_bound_of_square_identity hs) matrix_bound_holds hadeq)
+      (approximation_of_square_identity hs) restriction_holds
   have hcore : Core :=
     discrete_series_bound_of_inputs (comp_proof hs) (parts_of_square_identity hs)
-      (casimir_bound_of_inputs hs markov_inequality_holds positive_negative_holds inverse_holds commutant_holds hadeq casimir_adjoint_holds)
-      (ascent_of_square_identity hs) (mem_span_of_frobenius_mem_span hs k_irreducible_existence_holds drop_holds) integral_weight_holds harish_chandra_parameter_holds
-      identity_holds
+      (casimir_bound_of_inputs hs markov_inequality_holds positive_negative_holds inverse_holds
+        commutant_holds hadeq casimir_adjoint_holds)
+      (ascent_of_square_identity hs)
+      (mem_span_of_frobenius_mem_span hs k_irreducible_existence_holds drop_holds)
+      integral_weight_holds harish_chandra_parameter_holds identity_holds
   exact far_of_trial_bound htrial hcore
 
-theorem base : PositivityTheory.RgHe.Models → PositivityTheory.RgHe.Frame → PositivityTheory.RgHe.Base := base_of_far_models_frame far_closed
+theorem base
+    : PositivityTheory.RgHe.Models → PositivityTheory.RgHe.Frame → PositivityTheory.RgHe.Base :=
+  base_of_far_models_frame far_closed
 
 end PositivityTheory.RgHe3

@@ -10,8 +10,9 @@ namespace PI.AmpRootJacW
 
 open Formalism.MainNotions.S PI.AmpRootCommon
 
-theorem blk_lt : ∀ (bs : List (ℂ × ℕ)) (i j : ℕ), i < j → j < (bs.map Prod.snd).sum →
-    blockIdx bs i ≠ blockIdx bs j → pv bs i < pv bs j
+theorem blk_lt
+    : ∀ (bs : List (ℂ × ℕ)) (i j : ℕ),
+      i < j → j < (bs.map Prod.snd).sum → blockIdx bs i ≠ blockIdx bs j → pv bs i < pv bs j
   | [], i, j, _, hj, _ => by simp at hj
   | (t, s) :: bs, i, j, hij, hj, hne => by
     simp only [List.map_cons, List.sum_cons] at hj
