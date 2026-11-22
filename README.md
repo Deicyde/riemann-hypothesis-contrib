@@ -18,9 +18,9 @@ This repository also adds Comparator files and cache infrastructure:
 | File | What it is |
 |---|---|
 | [`src/Challenge.lean`](src/Challenge.lean) | the five theorems, stated in a file that imports only Mathlib |
-| [`comparator.json`](comparator.json) | the Comparator config |
-| [`export-targets.txt`](export-targets.txt) | the declarations to export |
-| [`comparator/`](comparator/) | further Comparator setups; so far one, whose challenge is formal-conjectures' own statement of RH and GRH |
+| [`comparator/main.json`](comparator/main.json) | the Comparator config |
+| [`comparator/main-export-targets.txt`](comparator/main-export-targets.txt) | the declarations to export |
+| [`comparator/formal-conjectures.json`](comparator/formal-conjectures.json) | a [second Comparator setup](#checking-it-against-formal-conjectures), whose challenge is formal-conjectures' own statement of RH and GRH |
 | [`verification/`](verification/NOTES.md) | our notes, and the results once there are some |
 | [`scripts/`](scripts/) | public Lake cache configuration and reproducible bootstrap/publishing tools |
 
@@ -70,17 +70,17 @@ export MATHLIB_CACHE_GET_URL=https://cache.mathlib.org/mathlib4   # Mathlib's cu
 cd "$CLEAN"
 lake exe mathlib/cache get
 lake build Challenge
-lake env lean4export Challenge -- $(cat export-targets.txt) > challenge.export
+lake env lean4export Challenge -- $(cat comparator/main-export-targets.txt) > challenge.export
 
 # 2. Build the solution. Second clone, inside a sandbox with no network. Takes hours.
 lake exe mathlib/cache get      # before entering the sandbox
 lake build Main         # inside the sandbox
 
 # 3. Export the solution. Still inside the sandbox; only solution.export comes out.
-lake env lean4export Main -- $(cat "$CLEAN/export-targets.txt") > solution.export
+lake env lean4export Main -- $(cat "$CLEAN/comparator/main-export-targets.txt") > solution.export
 
 # 4. Judge. Lean v4.36.0, from an empty directory, with the config from the clean clone.
-lake comparator --config "$CLEAN/comparator.json" \
+lake comparator --config "$CLEAN/comparator/main.json" \
   --challenge-from-export "$CLEAN/challenge.export" --solution-from-export solution.export
 ```
 
@@ -98,6 +98,10 @@ What to know before running it:
   for the submission itself, and `lake build Main` then compiles nothing. Steps 1 and 2 use
   `lake exe mathlib/cache get`, which fetches Mathlib only.
 - **Cost.** Hours on a large machine, about 100 GB of disk, and a lot of memory for step 4.
+- **Moved files.** `comparator/main.json` and `comparator/main-export-targets.txt` were
+  `comparator.json` and `export-targets.txt` at the root until
+  [#88](https://github.com/leanprover-community/riemann-hypothesis/pull/88). Their contents are
+  unchanged, so the exports are too.
 
 The [notes](verification/NOTES.md) have the details: where the source came from, the Lean
 version and its known kernel fixes, the tools, the sandboxes, the test of these steps, and the

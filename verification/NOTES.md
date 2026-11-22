@@ -12,11 +12,13 @@ Comparator's output will be added here when the run finishes.
 | Joined archive | `cat lean.tar.gz.part{01..14} > lean.tar.gz`: 239,275,554 bytes, sha256 `9631b4f020199e580ba86178cb56c6e9b09f690c2369a80dc4334aa93f49c7fc` |
 
 The first commit of this repository, `40e56bab`, is the archive's `lean/` directory exactly as
-published. Later commits add `src/Challenge.lean`, `comparator.json`, `export-targets.txt`, the
+published. Later commits add `src/Challenge.lean`, the Comparator config and export targets, the
 README, this folder, the CI workflow and, since
 [#7](https://github.com/leanprover-community/riemann-hypothesis/pull/7), the build cache in
-`scripts/`. The second Comparator setup, in `comparator/`, is described
-[below](#formal-conjectures).
+`scripts/`. The config and the export targets were `comparator.json` and `export-targets.txt`
+at the root until [#88](https://github.com/leanprover-community/riemann-hypothesis/pull/88), which
+moved them unchanged to `comparator/main.json` and `comparator/main-export-targets.txt`. The
+second Comparator setup, in the same folder, is described [below](#formal-conjectures).
 
 Merged pull requests have since changed the submission's own files under `src/`, mainly by
 deleting files the proof does not use and by shortening proofs.
@@ -119,9 +121,9 @@ in google-deepmind/formal-conjectures, at commit `d8d031d4` (2026-11-19). It fol
 [issue #34](https://github.com/leanprover-community/riemann-hypothesis/issues/34), which proved
 the equivalence used here against that commit.
 
-`comparator/` is the place for Comparator setups other than the original one, whose config and
-export targets stay at the root, where the steps in the README have always read them. A setup
-there is a config and a list of export targets, both named after it, and its Lean files.
+`comparator/` holds the Comparator setups. Each is a config and a list of export targets, both
+named after it: `main` for the five theorems of `Challenge.lean`, and `formal-conjectures` for
+this one, whose three Lean files are there too.
 
 **The statements.**
 
@@ -327,7 +329,8 @@ swapped inside the export was rejected by every kernel.
 `lake comparator --paranoid` adds five checkers to Lean's kernel: Lean paranoid, nanoda,
 con-leche, con-ron and lean4lean. Three of them cannot check this project, for reasons that
 have nothing to do with whether the proof is right, and `lake comparator` counts any non-zero
-exit from a checker as a rejection. So `comparator.json` names only Lean paranoid and nanoda.
+exit from a checker as a rejection. So the configs in `comparator/` name only Lean paranoid and
+nanoda.
 
 - **con-leche and con-ron** refuse a mutual inductive block that has a reflexive member. The
   submission has one in the proof's dependencies:
