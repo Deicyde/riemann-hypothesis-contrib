@@ -1,9 +1,57 @@
 module
 
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.ThresholdArguments.DenseThresholdCases.DiscreteSeriesCoefficientsCuspidal
-public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.OrdFlagU
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.ThresholdArguments.DenseThresholdCases.LitAut
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeckeAlgebras.Distinct
+public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.WdPstCycRepNeTrivWD
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.FiniteDimensionalFilDR
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.WdParameterMonodromyZeroIffPotentiallyCrystallin
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsResidueChars.WeilGroupDenseInGaloisGroup
 public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.ThresholdArguments.DenseThresholdCases.LocCharDR
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.DeRhamRationalOfConj
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.DeRhamRationalOfExtensionByCharacter
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.DeRhamRationalTwistByCharacter
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.EqZeroOfTwistedCommuteOfDistinctCharacters
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.ExistsCommonEigenline
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.ExistsCommonEigenvectorOfCharpolySplitCharacters
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.ExistsInvariantOfDpstPhiFixedOfNonnegWeights
+public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.ExistsWeilInvariantInDpstOfWeilDeligneInvariant
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CommuteIsNilpotentOfUnipotent
 
 @[expose] public section
 

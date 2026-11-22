@@ -1,23 +1,66 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.TopLeWchartNsmul
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.HolArcNilpotent
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ArcModelWitnessExtensionStatement
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsNeZeroIff
-public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsIsDerivAt0NotIsDerivAlong
-public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.IsBigOPowIffIteratedFDerivEqZero
+public import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValues.IsThetaL2NormSquared
+public import Formalism.LocalToGlobal.ProjectiveLattices.ArchimedeanQuadraticData.ArchimedeanUniqueness.MetricDef
+public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
 public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.AppellHumbertTrivialOfNowhereVanishing
+public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.IsBigOPowIffIteratedFDerivEqZero
+public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsIsDerivAt0NotIsDerivAlong
+public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ArcModelWitnessExtensionStatement
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsCharacterRatioExpMulStatement
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.TorusCoordinateRatioDifferentiableAtOriginStatement
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.TangentVectorPowScaleInvEqStatement
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.FderivTorusCoordinateRatioEqZeroOfTangentStatement
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.TorusCoordinateRatioEqTorusCoordOverOriginStatement
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsLinearLiftAdditiveHolomorphicAbelianStatement
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsEntireUnitAppellHumbertFrameRatioStatement
+public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsLinearLiftAdditiveHolomorphicAbelianStatement
+public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsNeZeroIff
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.FactorCommutatorEqOfNonvanishingStatement
-public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ThetaCharOffNeZeroDifferentiableQuasiPeriodicStatement
+public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.FderivTorusCoordinateRatioEqZeroOfTangentStatement
+import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.HolArcNilpotent
 public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.MemRealSpanPeriodsOfCharacterKernelStatement
+public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.TangentVectorPowScaleInvEqStatement
+public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ThetaCharOffNeZeroDifferentiableQuasiPeriodicStatement
+public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.TorusCoordinateRatioDifferentiableAtOriginStatement
+public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.TorusCoordinateRatioEqTorusCoordOverOriginStatement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Coalgebra.IsFrobenius
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
 
 @[expose] public section
 

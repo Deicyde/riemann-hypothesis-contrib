@@ -1,35 +1,47 @@
 module
 
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.GaugeLatticeShifts.BruhatHaarProved
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.NcRealXPS
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.GaugeLatticeShifts.SGaugeDensPf
-public import Mathlib
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.DualFamilyCounting.NcSplit
-public import Formalism.PeriodIntegrals.VolFromSW
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.WeilStabilizerVolume.TopoAF
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicLocalCompactness.T2SpaceTensorProductFiniteExtension
-public import ReciprocityTheory.GeneralLinearIntegers.AlgebraMapIntMemOint
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.WeilStabilizerVolume.TensTop
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.AdelicLocalCompactness.AdeleLC
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.WeilStabilizerVolume.TopoPolish
-public import Formalism.PeriodIntegrals.WeilQuotMeas
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.WeilQuotientMeasure.StepBruhat
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.WeilQuotientMeasure.LintegralMulAvgComm
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.WeilQuotientMeasure.Bruhat
-public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.QuotMeasUniq
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.WeightedMeasureSplitting.ContinuousMeasureSplitting
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.WeightedMeasureSplitting.ContinuousHAIff
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.WeightedMeasureSplitting.MemSpanRIffSplit
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.MassComputations.ContinuousCrdAllSymm
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.MassComputations.IsCompactStabGLHat
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.MassComputations.LatHat
-public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LevelStructures.LatStab
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.LocVol
-public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.WittExtensionTheorem
-public import Formalism.SatakeDualWeyl.AdelicIwasawaHecke.Bridge
-public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.AprimeInf
-public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.MassDataXLeaves
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.GaugeLatticeShifts.JacConstWbB
+public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.ArchimedeanOrbitMeasures.BlockGrp
 public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.GaugeLatticeShifts.JacConstFinal
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.GaugeLatticeShifts.SGaugeDensPf
+public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankPointCounts.MassDataXLeaves
+public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.AprimeInf
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 

@@ -1,43 +1,62 @@
 module
 
-public import Mathlib
-public import Formalism.FrobeniusContraction.HighestWeightResidueAvoids
-public import Formalism.FrobeniusContraction.FrobeniusContractionProofs.ContractBij
-public import Formalism.FrobeniusContraction.Statement
-public import Formalism.FrobeniusContraction.StatementTop
-public import Formalism.GaussValuationBounds.GaussValueContraction.TruncationExponentBounds
-public import Formalism.GaussValuationBounds.GaussValueContraction.GaussValueContractionProofFactBis
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.KapWin
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.ColTwoStep
-public import Formalism.TruncatedSeriesCounting.PowMemSpanOfMemSpanLinearDistinguished
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.RrBound
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.ThmEExp
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.AprimeArith
-public import Formalism.TruncatedSeriesCounting.LemmaDetPoly
-public import Formalism.CharacterColumnKernels.IdempotentNormalForms.LengthQuotSmulRangeFree
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.BridgeDet
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.LemmaDetPoly
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.HCoefficientBound
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.ExpBound
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.KappaSecondExponentBound
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.FirstSigmaValuationBound
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.LemmaGVal
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.LemmaGIdeal
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.RamifiedValuationInequality
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.SubSmulOneInjective
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.ColChain
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.SubGen
+public import Formalism.TruncatedSeriesCounting.StatementX
+public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.ArcExp
 public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.ColAssembly
+public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.ColChain
+public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.ExpBound
+public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.FirstSigmaValuationBound
+public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.HCoefficientBound
+public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.KappaSecondExponentBound
+public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.LemmaGIdeal
+public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.LemmaGVal
 public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.QNumericalIdentity
+public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.RamifiedValuationInequality
+public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.SaturationCriterion
+public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.SubGen
+public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.SubSmulOneInjective
 public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.TruncSig
 public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.TruncationRemainderBound
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.ArcExp
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.SaturationCriterion
 public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.UnitCoefficientPowerMod
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.LengthQuotientLeOfPowSMul
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.CancelQ
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.CancelC
-public import Formalism.TruncatedSeriesCounting.TruncatedSeriesProofs.TruncZero
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Topology.Sheaves.Init
 
 @[expose] public section
 

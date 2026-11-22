@@ -1,13 +1,59 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.ExistenceOfLattices.CoeSelfDualLatticeInFrameCoordinatesEq
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UnitaryAdelicCharacterTrivialRatAndSplit
-public import Formalism.LocalToGlobal.BesselHermitianTheta.DefsReal
+import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.ExistsIntegralSplitIdempotentOverTwo
+import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.ExistsRepSuppSplit
+import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.UnitaryMatrixEqProdQuasiReflections
 public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.ExistsIntegralBasisOfLatticeAtPlaceStable
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.CompletedLatticeEqAdelicCompletionAndGram
+import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.SelfDualSplitComponentIsLatticeStabilizerEq
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsRepsOfFiniteIndex
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsSplitAt
 public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.ExistsDvdCoprimeMulPow
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.AdelicUnitaryEqRealMulFiniteSplit
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.CompletedLatticeEqAdelicCompletionAndGram
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.RationalPointsAdelicUnitaryEqUnitary
 public import Formalism.SharpRestriction.CuspSpanNormBounds.JExistsNatSmulMemL
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.LinearAlgebra.FreeModule.IdealQuotient
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Development.AbelianVarietyTheory.Definitions.Divisors.IsUnitaryOnTheta
 
 @[expose] public section
 

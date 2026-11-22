@@ -1,18 +1,72 @@
 module
 
 public import Formalism.SharpRestriction.GrowthBounds.FlipOneThree
-public import Formalism.MahlerMeasure.CoarseLevelSlackInequalities
-public import Formalism.MahlerMeasure.FinalT
-public import Formalism.MahlerMeasure.MahlerMeasureProofs.WeightSpaceDimensionMonotone
-public import Formalism.MahlerMeasure.MahlerMeasureProofs.SmithZp
-public import Formalism.MahlerMeasure.MahlerMeasureProofs.TheoremM
-public import Formalism.PolynomialDimension.MultinomialDepth.MonoCount
-public import Formalism.PolynomialDimension.MultinomialDepth.PartnerM
-public import Formalism.PolynomialDimension.MultinomialDepth.TieOps
-public import Formalism.ThetaLogCoordinates.TraceIsometryWeights.DischargeHeightBound
-public import Formalism.ThetaLogCoordinates.PartnerMeanCoordinates.LatticeTheoremEps28Valid
+public import Formalism.SharpRestriction.GrowthBounds.RootWeights.ContravariantOrthogonalityHolds
+public import Formalism.SharpRestriction.GrowthBounds.RootWeights.ExistsHighestWeightVectorFindim
+public import Formalism.SharpRestriction.GrowthBounds.RootWeights.ExponentFactorialAddSingleOne
+public import Formalism.SharpRestriction.GrowthBounds.RootWeights.FockLatticeFiniteSpanning
 public import Formalism.SharpRestriction.GrowthBounds.GLWeightTheory
+import Formalism.SharpRestriction.GrowthBounds.RootWeights.GlOperatorPreservesMultidegree
+import Formalism.SharpRestriction.GrowthBounds.RootWeights.HighestWeightDominantHolds
+import Formalism.SharpRestriction.GrowthBounds.RootWeights.IntegralPolyLinearMapClosed
+import Formalism.SharpRestriction.GrowthBounds.RootWeights.IntegralPolynomialsEnvelopingStable
+import Formalism.SharpRestriction.GrowthBounds.RootWeights.IsotypicProjectorLatticeScaling
+import Formalism.SharpRestriction.GrowthBounds.RootWeights.IsotypicProjectorSelfAdjoint
+import Formalism.SharpRestriction.GrowthBounds.RootWeights.MemWeightSpaceIffDiagonalRep
+import Formalism.SharpRestriction.GrowthBounds.RootWeights.PolarizationDividedPowerMonomial
+import Formalism.SharpRestriction.GrowthBounds.RootWeights.PolynomialMemWeightSpaceIff
+import Formalism.SharpRestriction.GrowthBounds.RootWeights.ValuationNonnegIffIntegral
+import Formalism.SharpRestriction.GrowthBounds.RootWeights.WeightComponentsMemInvariant
+import Formalism.SharpRestriction.GrowthBounds.RootWeights.WeightConditionFromIntegralForm
+public import Formalism.ThetaLogCoordinates.PartnerMeanCoordinates.LatticeTheoremEps28Valid
+public import Formalism.ThetaLogCoordinates.TraceIsometryWeights.SchurTraceProofs.Discharge
 public import Lemmata.GeneralBFactLeftBisForm.Imports
+import Mathlib.Algebra.AffineMonoid.UniqueSums
+public import Mathlib.Algebra.Order.Antidiag.FinsuppEquiv
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Tactic.TypeStar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
+public import Formalism.MahlerMeasure.QuotientUpperBoundsOfPowerBounds
 
 @[expose] public section
 

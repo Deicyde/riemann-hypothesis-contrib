@@ -1,80 +1,108 @@
 module
 
-public import Mathlib
-public import Development.AutomorphicArithmetic.CommutativeAlgebra.CohomologyContinuityFilteredColimitRings
-public import Development.AutomorphicArithmetic.Foundations.EtaleClopenDescent.StrictHenselizationStalkEquivOfColimitPresentati
-public import Development.AutomorphicArithmetic.Foundations.EtaleClopenDescent.SimplicialChainsDegreeZeroInjective
-public import Development.AutomorphicArithmetic.Foundations.EtaleClopenDescent.CechLevelIsoSigmaIntersectionsOfCoprod
-public import Development.EtaleCohomology.EtaleSheaves.AdjoinRootExtension
-public import Development.EtaleCohomology.EtaleSheaves.AICSHPf
-public import Development.EtaleCohomology.EtaleSheaves.AffinePf
 public import Development.EtaleCohomology.EtaleSheaves.AlgResPropsPf
-public import Development.EtaleCohomology.EtaleSheaves.BasePf
-public import Development.EtaleCohomology.EtaleSheaves.EtaleBaseChangePolynomialInductionOfLimit
 public import Development.EtaleCohomology.EtaleSheaves.CechSigmaOf
-public import Development.EtaleCohomology.EtaleSheaves.CechYoneda
 public import Development.EtaleCohomology.EtaleSheaves.CechSqPf
-public import Development.EtaleCohomology.EtaleSheaves.IntegralSurjectiveRingCechAugmentationEtaleEqv
-public import Development.EtaleCohomology.EtaleSheaves.ChainsDiscCoprodPf
-public import Development.EtaleCohomology.EtaleSheaves.StrictHenselColimits.ColimOf
-public import Development.EtaleCohomology.EtaleSheaves.CompPf
-public import Development.EtaleCohomology.EtaleSheaves.CompositionGoal
 public import Development.EtaleCohomology.EtaleSheaves.CoprodPf
-public import Development.EtaleCohomology.EtaleSheaves.DescIntPf
-public import Development.EtaleCohomology.EtaleSheaves.LocalDescent.DescLocOf
-public import Development.EtaleCohomology.EtaleSheaves.DescendPf
 public import Development.EtaleCohomology.EtaleSheaves.DomCoverPf
+public import Development.EtaleCohomology.EtaleSheaves.GlobalPf
+public import Development.EtaleCohomology.EtaleSheaves.CokernelKilling.KillCokOf
+public import Development.EtaleCohomology.EtaleSheaves.FiltrationLevelBase
+public import Development.EtaleCohomology.EtaleSheaves.PointwisePf
+public import Development.EtaleCohomology.EtaleSheaves.SHEqvPf
+public import Development.EtaleCohomology.EtaleSheaves.SHSectionPf
+public import Development.EtaleCohomology.EtaleSheaves.SHTensorPf
+public import Development.EtaleCohomology.WeilConjectures.AbsorbPf
+public import Development.EtaleCohomology.EtaleSheaves.EtaleSpreading.EtSpreadsOf
+public import Development.EtaleCohomology.EtaleSheaves.StrictLocalStalks
+public import Development.EtaleCohomology.EtaleSheaves.TruncPf
+public import Development.AutomorphicArithmetic.CommutativeAlgebra.CohomologyContinuityFilteredColimitRings
+public import Development.AutomorphicArithmetic.Foundations.EtaleClopenDescent.CechLevelIsoSigmaIntersectionsOfCoprod
+public import Development.AutomorphicArithmetic.Foundations.EtaleClopenDescent.SimplicialChainsDegreeZeroInjective
+public import Development.AutomorphicArithmetic.Foundations.EtaleClopenDescent.StrictHenselizationStalkEquivOfColimitPresentati
+public import Development.EtaleCohomology.EtaleSheaves.AICSHPf
+public import Development.EtaleCohomology.EtaleSheaves.AdjoinRootExtension
+public import Development.EtaleCohomology.EtaleSheaves.AffinePf
 public import Development.EtaleCohomology.EtaleSheaves.ArchimedeanCokernel
 public import Development.EtaleCohomology.EtaleSheaves.ArchimedeanComparison
-public import Development.EtaleCohomology.EtaleSheaves.KerLocOf
+public import Development.EtaleCohomology.EtaleSheaves.BasePf
+public import Development.EtaleCohomology.EtaleSheaves.CechYoneda
+public import Development.EtaleCohomology.EtaleSheaves.ChainsDiscCoprodPf
+public import Development.EtaleCohomology.EtaleSheaves.CompPf
+public import Development.EtaleCohomology.EtaleSheaves.CompositionGoal
 public import Development.EtaleCohomology.EtaleSheaves.EtAffNbhdPf
 public import Development.EtaleCohomology.EtaleSheaves.EtAlgPf
-public import Development.EtaleCohomology.EtaleSheaves.EtStagePf
-public import Development.EtaleCohomology.EtaleSheaves.FiltPf
+import Development.EtaleCohomology.EtaleSheaves.EtStagePf
+public import Development.EtaleCohomology.EtaleSheaves.EtaleBaseChangePolynomialInductionOfLimit
+public import Development.EtaleCohomology.EtaleSheaves.EtaleSpreading.SpreadOf
 public import Development.EtaleCohomology.EtaleSheaves.FracAICPf
 public import Development.EtaleCohomology.EtaleSheaves.FreeCoprodPf
-public import Development.EtaleCohomology.EtaleSheaves.GlobalPf
 public import Development.EtaleCohomology.EtaleSheaves.HKCoprodPf
 public import Development.EtaleCohomology.EtaleSheaves.HensIntPf
 public import Development.EtaleCohomology.EtaleSheaves.IECobPf
 public import Development.EtaleCohomology.EtaleSheaves.IdemCoverPf
 public import Development.EtaleCohomology.EtaleSheaves.IntClosPf
-public import Development.EtaleCohomology.EtaleSheaves.CokernelKilling.KillCokOf
-public import Development.EtaleCohomology.EtaleSheaves.FiltrationLevelInjectivity
-public import Development.EtaleCohomology.EtaleSheaves.FiltrationLevelBase
+public import Development.EtaleCohomology.EtaleSheaves.IntegralSurjectiveRingCechAugmentationEtaleEqv
+public import Development.EtaleCohomology.EtaleSheaves.KerLocOf
 public import Development.EtaleCohomology.EtaleSheaves.LocAtPf
 public import Development.EtaleCohomology.EtaleSheaves.LocEtPf
 public import Development.EtaleCohomology.EtaleSheaves.LocIEPf
 public import Development.EtaleCohomology.EtaleSheaves.LocTensorPf
-public import Development.EtaleCohomology.EtaleSheaves.SimplicialPieceDiscrete
-public import Development.EtaleCohomology.EtaleSheaves.PointwisePf
 public import Development.EtaleCohomology.EtaleSheaves.PushGluePf
 public import Development.EtaleCohomology.EtaleSheaves.PushPf
-public import Development.EtaleCohomology.EtaleSheaves.RelDescPf
 public import Development.EtaleCohomology.EtaleSheaves.RelEqvInjPf
 public import Development.EtaleCohomology.EtaleSheaves.SHAlgSecPf
-public import Development.EtaleCohomology.EtaleSheaves.SHEqvPf
-public import Development.EtaleCohomology.EtaleSheaves.SHExistsPf
-public import Development.EtaleCohomology.EtaleSheaves.SHLocPf
-public import Development.EtaleCohomology.EtaleSheaves.SHSectionPf
-public import Development.EtaleCohomology.EtaleSheaves.SHTensorPf
 public import Development.EtaleCohomology.EtaleSheaves.SecPrePf
 public import Development.EtaleCohomology.EtaleSheaves.SepTensorPf
-public import Development.EtaleCohomology.EtaleSheaves.EtaleSpreading.SpreadOf
-public import Development.EtaleCohomology.EtaleSheaves.StalkCut
+public import Development.EtaleCohomology.EtaleSheaves.SimplicialPieceDiscrete
+public import Development.EtaleCohomology.EtaleSheaves.SpSOfIntegralInjective
+public import Development.EtaleCohomology.EtaleSheaves.StrictHenselColimits.ColimOf
+public import Development.EtaleCohomology.EtaleSheaves.StrictLocalStalks.ULAStalkOf
 public import Development.EtaleCohomology.EtaleSheaves.TowerFinPf
-public import Development.EtaleCohomology.EtaleSheaves.TruncationPieces
 public import Development.EtaleCohomology.EtaleSheaves.TruncBijPf
 public import Development.EtaleCohomology.EtaleSheaves.Truncation
 public import Development.EtaleCohomology.EtaleSheaves.TwFBijPf
-public import Development.EtaleCohomology.EtaleSheaves.SpSOfIntegralInjective
-public import Development.EtaleCohomology.EtaleSheaves.StrictLocalStalks.ULAStalkOf
-public import Development.EtaleCohomology.EtaleSheaves.ZariskiLocalCech
-public import Development.EtaleCohomology.EtaleSheaves.EtaleBaseChangeFractionFieldIndEtaleOverPolynomi
-public import Development.EtaleCohomology.WeilConjectures.AbsorbPf
-public import Development.EtaleCohomology.WeilConjectures.EtaleNeighborhoodsHaveCommonRefinement
 public import Development.EtaleCohomology.WeilConjectures.EtaleAlgebrasHaveSmallModelSet
 public import Development.EtaleCohomology.WeilConjectures.EtaleNeighborhoodsEqualizeParallelMaps
+public import Development.EtaleCohomology.WeilConjectures.EtaleNeighborhoodsHaveCommonRefinement
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Analysis.Complex.UpperHalfPlane.Basic
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Data.Nat.Choose.Multinomial
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
 
 @[expose] public section
 

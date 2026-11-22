@@ -1,17 +1,80 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.TwistSeries
-public import Development.AbelianVarietyTheory.Definitions.ThetaValues.LeCovCoeff
-public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.BddGood
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MemCuspOfVanishOn
-public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.UnfoldedIsSecZeroKeySection
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.IsIntegralDetSubOne
-public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.RelabelEmbeddingsGoodBijectiveConjCompat
-public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HolomorphicCuspSectionsLeSpanAlgebraicCuspForms
+public import Formalism.LocalToGlobal.ProjectiveLattices.CuspFDOf
+public import Formalism.LocalToGlobal.ProjectiveLattices.CuspFormsFiniteDimensionalOf
+public import Formalism.LocalToGlobal.ProjectiveLattices.FamilyUniformisationBasePointOrthogonalBis
+public import Formalism.LocalToGlobal.ProjectiveLattices.ThProps
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.CardLevGrpAndSpan
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ExistsSmallCoeffEtaValAtNeZero
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.FirstMinimumEqZeroOfRankZero
+public import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.IsEtaRuleExistsUniqueMemSec
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LastPosWtAOfPins
+public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MemGroupOfCongruent
 public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RdIndepOfLawsM
-public import Formalism.LocalToGlobal.GlobalTheory.GL3.CubicFields.ComplexMultiplication.ExtEmbEquivComp
+public import Development.AbelianVarietyTheory.Proofs.FormalGroupCharts.ChartIndependenceUnconditional
+public import Development.AbelianVarietyTheory.Proofs.GenericRegularity.BddSecCuspCongr
+public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.MemCuspOfVanishOn
+public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.UnfoldingConstantTermsAgreeAtGoodEmbeddings
+public import Development.AbelianVarietyTheory.Proofs.TorusSplitting.EtaProductRuleValueEqProductFormOfTestRing
+import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.AllUniformizationLawsHold
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FramedPointReducedFromTestRing
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.IsIntegralDetSubOne
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.MemHolSubIff
+import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.RelabelEmbeddingsGoodBijectiveConjCompat
 public import Formalism.LocalRingCardinality.HeightBoundGeFourthPowerRank
+public import Formalism.LocalToGlobal.GlobalTheory.GL3.CubicFields.ComplexMultiplication.ExtEmbEquivComp
+import Formalism.LocalToGlobal.ProjectiveLattices.FamilyUniformisationBasePointOrthogonal
+import Formalism.LocalToGlobal.ProjectiveLattices.FreeBridge
+public import Formalism.LocalToGlobal.ProjectiveLattices.HostSize
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Int
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Etale.Weakly
+import Mathlib.RingTheory.Finiteness.ModuleFinitePresentation
+import Mathlib.RingTheory.PiTensorProduct
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.TotallySplit
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.CoefficientConvolutionHolds
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.ModerateCoefficientPositivityHolds
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDomains.SiegelSpaceAlgebraHolds
+import Std.Tactic.BVDecide.Normalize.Prop
+import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IntFormsSubset
+public import Development.AbelianVarietyTheory.Definitions.ThetaValues.IsNullVal
+import Formalism.LocalToGlobal.Divisibility.CoefMod
+import Formalism.LocalToGlobal.IndefiniteReal.ExistsChosenExtremalVector
+import Formalism.LocalToGlobal.IndefiniteReal.LinksDefs
 
 @[expose] public section
 

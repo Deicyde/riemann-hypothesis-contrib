@@ -1,25 +1,76 @@
 module
 
-public import Mathlib
-public import Development.AbelianVarietyTheory.Definitions.Foundations.ApplyEqOfMemAdjoin
 public import Development.AbelianVarietyTheory.Definitions.Foundations.IsTopWTopWOfExists
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.EdgeCupProps
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsAlgZpMapOfAlgebraic
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsLogDerivQExpansionModPrimePowUnique
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsLogDerivQExpansionModPrimePowOfTranslation
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.EvalSeriesCongIffCoeffAndIsUnit
+public import Development.AbelianVarietyTheory.Definitions.Foundations.Integral
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.AlgebraMapZpInjective
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CupKummerDlogModPrimePowLevelLStatement
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.EdgeClassCupProductGeometricStatement
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.EdgeCupProps
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.EvOfFintype
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.EvalSeriesCongIffCoeffAndIsUnit
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsPrimitiveExpansionQuotientLevelOne
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsReparametrizationByTowerParameter
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Geofix
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsLocalValueOfQuotientAddOfCommonDenominator
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IoConstOfMem
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.GeometricLevelH1Coboundary
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.GnFixZeta
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsReparametrizationByTowerParameter
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IoConstOfMem
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsAlgZpMapOfAlgebraic
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsLocalValueOfQuotientAddOfCommonDenominator
+public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsLogDerivQExpansionModPrimePowUnique
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.KummerCocycleValueExpansionEqLogDerivSmulStatement
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MemTranslationInvariantSubfieldIffExponents
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MulOfIsPrimitiveIntegralHahnGauss
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.PrimitiveHahnSeriesInvertibleModPrimePow
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.PrimitiveHahnSeriesNotZeroDivisorModPrimePow
 public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SiegelLogCoordsStatement
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsPrimitiveExpansionQuotientLevelOne
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.PrimitiveHahnSeriesNotZeroDivisorModPrimePow
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.PrimitiveHahnSeriesInvertibleModPrimePow
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MulOfIsPrimitiveIntegralHahnGauss
-public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.MemTranslationInvariantSubfieldIffExponents
+import Mathlib.Algebra.Order.Floor.Extended
+import Mathlib.Algebra.Order.Floor.Semifield
+import Mathlib.Algebra.Order.Interval.Basic
+import Mathlib.Algebra.Order.Star.Rat
+import Mathlib.Algebra.Ring.IsFormallyReal
+import Mathlib.Analysis.Normed.Algebra.GelfandRadius
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Combinatorics.Enumerative.DyckWord
+import Mathlib.Combinatorics.SimpleGraph.Triangle.Removal
+import Mathlib.Data.NNRat.Floor
+import Mathlib.Geometry.Euclidean.Volume.Basic
+import Mathlib.NumberTheory.Chebyshev
+import Mathlib.NumberTheory.Height.NumberField
+import Mathlib.NumberTheory.Height.Projectivization
+import Mathlib.NumberTheory.LucasLehmer
+import Mathlib.NumberTheory.SelbergSieve
+import Mathlib.RingTheory.Radical.NatInt
+import Mathlib.RingTheory.WittVector.IsPoly
+import Mathlib.Tactic.Basify
+import Mathlib.Tactic.ENatToNat
+import Mathlib.Tactic.Echelon.Zsqrtd
+import Mathlib.Tactic.Inclusion.Extension.Core.Core
+import Mathlib.Tactic.Inclusion.Extension.Interval.BinarySplit
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Exp
+import Mathlib.Tactic.Inclusion.Extension.IntervalDyadicReal.Hypotheses
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Basic
+import Mathlib.Tactic.Inclusion.Extension.IntervalInt.Hypotheses
+import Mathlib.Tactic.Linter.HaveILetI
+import Mathlib.Tactic.Linter.Style
+import Mathlib.Tactic.NormNum.Irrational
+import Mathlib.Tactic.NormNum.IsCoprime
+import Mathlib.Tactic.NormNum.IsSquare
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.NormNum.ModEq
+import Mathlib.Tactic.NormNum.NatFib
+import Mathlib.Tactic.NormNum.NatLog
+import Mathlib.Tactic.NormNum.NatSqrt
+import Mathlib.Tactic.NormNum.Ordinal
+import Mathlib.Tactic.NormNum.Parity
+import Mathlib.Tactic.NormNum.Prime
+import Mathlib.Tactic.NormNum.RealSqrt
+import Mathlib.Tactic.Polynomial.Basic
+import Mathlib.Tactic.ReduceModChar
+import Mathlib.Topology.Sheaves.Init
+import Std.Tactic.BVDecide.Normalize.Prop
 
 @[expose] public section
 
