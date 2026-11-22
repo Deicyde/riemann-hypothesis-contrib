@@ -36,7 +36,7 @@ lemma eq_of_capP {n : ℕ} (mu mu' : Fin n → ℝ) (h : StrictAnti mu) (h' : St
       Finset.prod_eq_zero (Finset.mem_univ s) (by simp)
     obtain ⟨t, -, ht⟩ := Finset.prod_eq_zero_iff.mp ((e _).symm.trans h0)
     exact ⟨t, by exact_mod_cast (by linear_combination ht : (b t : ℂ) = a s)⟩
-  exact (h.range_inj h').mp ((key _ _ e).antisymm (key _ _ fun Y => (e Y).symm))
+  exact (h.range_inj_of_wellFoundedGT h').mp ((key _ _ e).antisymm (key _ _ fun Y => (e Y).symm))
 
 section
 variable {n : ℕ} {ε : Fin n → Bool} {H H' : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
