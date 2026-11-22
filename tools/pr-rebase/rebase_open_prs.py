@@ -99,6 +99,7 @@ def finish_report(results, run_tag):
 
 
 def main():
+    global BASE, TAG
     ROOT.mkdir(parents=True, exist_ok=True)
     OUT.mkdir(parents=True, exist_ok=True)
     run_tag = os.environ.get('GITHUB_RUN_ID', str(int(time.time())))
@@ -111,7 +112,9 @@ def main():
         'refs/heads/main:refs/remotes/upstream/main', timeout=1800)
     actual_base = value('rev-parse', 'refs/remotes/upstream/main')
     if actual_base != BASE:
-        raise RuntimeError('Main advanced before the run: ' + actual_base)
+        print('Using current main at run start: ' + actual_base, flush=True)
+        BASE = actual_base
+        TAG = BASE[:10]
     prs = sorted(SNAPSHOT['prs'], key=lambda p: (p['files'] > 1000, p['files'], p['n']))
     specs = ['refs/pull/' + str(p['n']) + '/head:refs/remotes/pr/' + str(p['n']) for p in prs]
     git('fetch', '--no-tags', UPSTREAM, *specs, timeout=1800)
