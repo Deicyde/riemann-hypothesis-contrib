@@ -1,0 +1,287 @@
+{
+  "number": 10,
+  "title": "simplify generated proof fallbacks",
+  "original_head": "1ccff6869721e3608761372313714f64e59aba57",
+  "original_repo": "deancureton/riemann-hypothesis",
+  "original_branch": "cleanup/proof-fallbacks",
+  "maintainer_can_modify": true,
+  "old_merge_base": "7da4577eb40dd74b09218d111114ca43bc2ad226",
+  "automatic_resolution_count": 10568,
+  "automatic_resolutions": [
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/FamilyFunctionalSpanDualStatement.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/ThetaDilations/HfSubSmul.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/AdelicAnalysis/ExistsNormOneUnitShiftStatement.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/AdelicAnalysis/HermitianFormDiagonalizesOverFieldStatement.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/AdelicAnalysis/PoissonSummationGaussianStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/ConvexCones/BalancedNonnegFormInPsdConeStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/ConvexCones/PsdConeAddMemStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/ConvexCones/PsdConeDescendsAlongSurjectionStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/ConvexCones/PsdConeExistsMaximalSupportStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/ConvexCones/PsdConeFinitelyManyOrbitsStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/AbelianSchemeSpreadsOutStatement.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/EigenvalueGapExistsStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/ExistsGradedMatrixEigenBoundStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FiniteNetOfGradedProjectionsStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FubiniOfParabolicHaarMultipleStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FubiniParabolicMultipleStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/GeometricStatementStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/GrowthStatementStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/HilbertSchmidtProjectionBoundStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/IwasawaParabolicCompactFactorizationStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/LineFormulaOfFubiniAndParabolicStatement.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/PolynomialNilpotentPathStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/ToL2CongrOnUnitaryBisStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/UnitaryMaximalCompactIsCompactStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/ExistsInfiniteAdeleTensorEquivMixedSpaceStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/ExistsPlaceNotPowAdicCompletionStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/ExistsPlacePowAndNotPowStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/ExistsUnitMulSqQuadraticDefectStepStatement.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/FirstInequalitySUnitsPrimeDegreeStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/HermitianLogTraceSqFirstVariationBoundStatement.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/IsSemisimpleRepresentationTprodOfIsIrreducibleAlStatement.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/MemPowsSUnitsChooseTStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/MulLogEqNegLogMulStatement.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/PowCountPlacesNotLocalPowerLeIndexStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/PowOfSUnitLocalPowerAtPlacesStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/RatComponentMemRatPolysVanishingOnMatrixSetStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/SUnitMemKummerNormsOfLocalNormsStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/SUnitsSupLocalKummerNormsNeTopStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/ScaledFiniteMatrixMemLatticeStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/ScaledMatrixMemRationalLatticeStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/AdelicLatticeProofs/UnitsLocalPowersAtPlacesIndexLeStatement.lean",
+      "reason": "replay-restricted-cleanup-preserving-main-proof-repairs"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/CovolumeBounds/FrameIsotropicOrthonormalStatement.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/CovolumeBounds/GramMinorDetTriangularMulStatement.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/CovolumeBounds/GramPositiveVolumeContinuousStatement.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/CovolumeBounds/HalfVolumeEquivariantStatement.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/CovolumeBounds/HalfVolumeLeviRecursionStatement.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/CovolumeBounds/KsetTransitiveStatement.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/CovolumeBounds/LintegralGaussianHyperboloidFiberStatement.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/CovolumeBounds/LintegralHyperboloidFibrationStatement.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/CovolumeBounds/MaximalCompactSubgroupPropertiesStatement.lean",
+      "reason": "retain-main-pruning"
+    }
+  ],
+  "status": "conflict",
+  "conflict_count": 8,
+  "stage_types": {
+    "1,2,3": 8
+  },
+  "conflicts": [
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/HaarExistenceStatement.lean",
+      "stages": {
+        "1": "4093066e9a5ca21f5686dac387541335bceeac3b",
+        "2": "c8e3ae113325c3183988f8c90d1c9749bee3e168",
+        "3": "4025bc87d2dd1315ed0b222dfadcf4345438f852"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/InverseGramEigenvaluesSumHsStatement.lean",
+      "stages": {
+        "1": "8a886717f70b440fbc2ebf854a6278d034a77da7",
+        "2": "ddbd6e312badb4e3b70060afd552494eca9a1dbd",
+        "3": "7ac3d53015dcfb2ce9df30330be80ae23ba2fa6e"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DecoratedLatticeProofs/ExistsConjStabilizersSelfDualLatticesUnramifiedStatement.lean",
+      "stages": {
+        "1": "1337ea44bdae2937e9cba31a42f4355a10e000f6",
+        "2": "3c276313f03d867e068c7b11cc8f74adde87aaa2",
+        "3": "f90d8e220c5ade589be33991dc6f89cd967f8f98"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/PointwiseCocycleLocalSectionsGlueBasicOpenCoverStatement.lean",
+      "stages": {
+        "1": "5caee6e92245cc507333fd48a87f7b049f33a73c",
+        "2": "4274ea26fd4c7059c9a343346110e217cbf3125b",
+        "3": "d7f995c902aa1c87eac55b57b2e7b351653c4193"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/SumTwoPointFunctionMultiplesNaturalCharPStatement.lean",
+      "stages": {
+        "1": "4ef0fe900680b3029a5450ca634b0b12fe6ef1c7",
+        "2": "e062f4af311eb19201839db12b2ffa855a3abc83",
+        "3": "4eeb6abce89a8d3b40b224307f6b8c0f7787247f"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/ConjugatedIntertwinerEquivariantRealPlaceStatement.lean",
+      "stages": {
+        "1": "bede7ce7a4131237baa97c584ce49cdae0fd5a81",
+        "2": "d0e586957d89cbd453ac782c207bd8809de7ffc8",
+        "3": "1596e4ee804485fa63f3d5d65519e9ab3b12b587"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/ConjIntertwinerMapValuesIsCuspFunStatement.lean",
+      "stages": {
+        "1": "f2ba2797fa525c521d037bf9761dd4ec92530e7a",
+        "2": "eea65ca4879a102f1312c2a4d69bce73de3f1130",
+        "3": "6dc3a37838be79b02b60c6477cbb1a3d23834764"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/ThirdPlaceSeries/EigHkDatBackStatement.lean",
+      "stages": {
+        "1": "efa76145cff035495d308eb58406c0efadbaae08",
+        "2": "98c8b8f1aae159590777308264607bd892259279",
+        "3": "0bc4ce198c52de2762fd60b63ff3fc58b06416dc"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "f0f4c3e8e6199874a506950e63f28ea30a529e16",
+  "log_tail": "uto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NadelVanishingPairs/NadelVanishingLemmas/RelativeSncSameDivisor.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NadelVanishingPairs/NadelVanishingLemmas/ResidueFieldFormallySmooth.lean\nCONFLICT (content): Merge conflict in src/Development/WeilBound/CoreStatements/PublishedTheorems/NadelVanishingPairs/NadelVanishingLemmas/ResidueFieldFormallySmooth.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NadelVanishingPairs/NadelVanishingLemmas/RootOfMonomialQuotientIntegral.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NadelVanishingPairs/NadelVanishingLemmas/SameDivisorTrans.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NadelVanishingPairs/NadelVanishingLemmas/SerreVanishingSncAtlasStatement.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NadelVanishingPairs/NadelVanishingLemmas/SncBoundaryAmpleDecompositionStatement.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NadelVanishingPairs/NadelVanishingLemmas/SncChartBaseChange.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NadelVanishingPairs/NadelVanishingLemmas/SncChartDescendsStatement.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NadelVanishingPairs/NadelVanishingLemmas/SncChartDivisorEquationStatement.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NadelVanishingPairs/NadelVanishingLemmas/SncChartEquationsDifferUnit.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NadelVanishingPairs/NadelVanishingLemmas/SplittingIntegralFormsBoundStatement.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NadelVanishingPairs/NadelVanishingLemmas/SplittingLocalIntegralityStatement.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NadelVanishingPairs/NadelVanishingLemmas/SpreadOutLineBundleStatement.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NadelVanishingPairs/NadelVanishingLemmas/SpreadOutMorphismStatement.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NadelVanishingPairs/NadelVanishingLemmas/SpreadOutRelativeSncStatement.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NadelVanishingPairs/NadelVanishingLemmas/SpreadOutSmoothProperStatement.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NadelVanishingPairs/NadelVanishingLemmas/TopLogFormsCanonicalGeneratorStatement.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NadelVanishingPairs/NadelVanishingLemmas/UnitOfHeightOnePrimesStatement.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NefNumerics/NefRiemannRoch/AmplePlusNefInductionStatement.lean\nCONFLICT (content): Merge conflict in src/Development/WeilBound/CoreStatements/PublishedTheorems/NefNumerics/NefRiemannRoch/AmplePlusNefInductionStatement.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NefNumerics/NefRiemannRoch/HigherCohomologyGrowthCoherentStatement.lean\nCONFLICT (content): Merge conflict in src/Development/WeilBound/CoreStatements/PublishedTheorems/NefNumerics/NefRiemannRoch/HigherCohomologyGrowthCoherentStatement.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NefNumerics/NefRiemannRoch/HigherCohomologyGrowthStructureStatement.lean\nCONFLICT (content): Merge conflict in src/Development/WeilBound/CoreStatements/PublishedTheorems/NefNumerics/NefRiemannRoch/HigherCohomologyGrowthStructureStatement.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NefNumerics/NefRiemannRoch/HigherCohomologyGrowthTwist.lean\nCONFLICT (content): Merge conflict in src/Development/WeilBound/CoreStatements/PublishedTheorems/NefNumerics/NefRiemannRoch/HigherCohomologyGrowthTwist.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NefNumerics/NefRiemannRoch/IntersectionNefAmpleNonnegStatement.lean\nCONFLICT (content): Merge conflict in src/Development/WeilBound/CoreStatements/PublishedTheorems/NefNumerics/NefRiemannRoch/IntersectionNefAmpleNonnegStatement.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NefNumerics/NefRiemannRoch/NefIntersectionNonnegAllDimsStatement.lean\nCONFLICT (content): Merge conflict in src/Development/WeilBound/CoreStatements/PublishedTheorems/NefNumerics/NefRiemannRoch/NefIntersectionNonnegAllDimsStatement.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NefNumerics/NefRiemannRoch/NefIntersectionNonnegInductionStatement.lean\nCONFLICT (content): Merge conflict in src/Development/WeilBound/CoreStatements/PublishedTheorems/NefNumerics/NefRiemannRoch/NefIntersectionNonnegInductionStatement.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NefNumerics/NefRiemannRoch/NefProductNonnegStatement.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NefNumerics/NefRiemannRoch/NefRiemannRochStatement.lean\nAuto-merging src/Development/WeilBound/CoreStatements/PublishedTheorems/NefNumerics/NefRiemannRoch/TopIntersectionGrowthBoundStatement.lean\nCONFLICT (content): Merge conflict in src/Development/WeilBound/CoreStatements/PublishedTheorems/NefNumerics/NefRiemannRoch/TopIntersectionGrowthBoundStatement.lean\nAuto-merging src/Development/WeilBound/RepresentationTheoryGL/RegularisedSiegelWeil/ThetaIdempotents/ThetaCoefficients/JacquetPiatetskiBoundHolds.lean\nAuto-merging src/Development/WeilBound/RepresentationTheoryGL/RegularisedSiegelWeil/ThetaIdempotents/ThetaCoefficients/SiegelWeilHermitianCoefficientStatement.lean\nAuto-merging src/Development/WeilBound/RepresentationTheoryGL/RegularisedSiegelWeil/ThetaIdempotents/ThetaCoefficients/SiegelWeilHermitianFormulaStatement.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/AttachedGaloisRepUnique.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/AttachedRepConjugationTrace.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/AttachedRepsAgreeOnIntersection.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/AuxStatement23.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/BaseChangeDualCompatible.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/DecompositionFixesSquareRoot.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/EqOfMultisetSymmetricReflections.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/EventuallyHasSatakeParameters.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/ExistsPlaceCompletionIso.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/GaloisRepPatchingInfiniteFamily.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/GaloisRepRestrictionLocalCompletion.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/GaloisRepTowerRestriction.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/HeckeCharacterEqOfCofinite.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/InertiaMovesSquareRoot.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/InfinitePrimesNegSquarePadic.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/InfiniteQuadraticFieldsSplitInertia.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/IntertwinerZeroOfCharacterTwist.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/IntertwinerZeroOfQuadraticTwists.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/IsomorphismOfFrobeniusTraces.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/LocalEmbeddingAgree.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/LocalEmbeddingCompatibleExtension.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/LocalEmbeddingRestrictExtension.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/LocalFieldEmbeddingMem.lean\nCONFLICT (modify/delete): src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/LocalGlobalCompatibilityComplex.lean deleted in HEAD and modified in f0f4c3e8e6 (simplify generated proof fallbacks).  Version f0f4c3e8e6 (simplify generated proof fallbacks) of src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/LocalGlobalCompatibilityComplex.lean left in tree.\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/LocalGlobalCompatibilityReal.lean\nCONFLICT (modify/delete): src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/QuadraticBaseChangeRegularPolarized.lean deleted in HEAD and modified in f0f4c3e8e6 (simplify generated proof fallbacks).  Version f0f4c3e8e6 (simplify generated proof fallbacks) of src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/QuadraticBaseChangeRegularPolarized.lean left in tree.\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/QuadraticCmCharacterInjective.lean\nCONFLICT (modify/delete): src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/SatakeFrobeniusCompatibility.lean deleted in HEAD and modified in f0f4c3e8e6 (simplify generated proof fallbacks).  Version f0f4c3e8e6 (simplify generated proof fallbacks) of src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/SatakeFrobeniusCompatibility.lean left in tree.\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/SatakeParametersLocal.lean\nAuto-merging src/PositivityTheory/AutomorphicForms/PublishedInputs/RealGaloisRepresentations/IwahoriSphericalTransfer/SemisimpleIsoOfTraceEq.lean\nRebasing (1/1)\nerror: could not apply f0f4c3e8e6... simplify generated proof fallbacks\nhint: Resolve all conflicts manually, mark them as resolved with\nhint: \"git add/rm <conflicted_files>\", then run \"git rebase --continue\".\nhint: You can instead skip this commit: run \"git rebase --skip\".\nhint: To abort and get back to the state before \"git rebase\", run \"git rebase --abort\".\nhint: Disable this message with \"git config set advice.mergeConflict false\"\nCould not apply f0f4c3e8e6... # simplify generated proof fallbacks\n",
+  "checkpoint_head": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7"
+}
