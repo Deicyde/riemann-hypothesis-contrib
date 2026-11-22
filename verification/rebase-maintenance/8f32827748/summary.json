@@ -1,0 +1,29 @@
+{
+  "base": "8f328277481a6178eb0dbbb262b2419a3c8bfe02",
+  "run": "45048636006-remaining-pending-73",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/TsumExpNegAbsIntLtTop.lean",
+          "stages": {
+            "1": "bc5935f782a150aaee5c7c0669fab8bbd3a56d8f",
+            "2": "93115321be0161ad628fa1dbd446392df29cd2f9",
+            "3": "9cd77c2cb59f7f4aed8ef7c93d42451b4d206981"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "f9b39788387822dfba4455faafda0cef77428010",
+      "checkpoint_head": "49ebb55ddf425c5ea41d17513766c8a4a33c54c7",
+      "checkpoint_branch": "maintenance/checkpoint-pr-54-8f32827748-45048636006-remaining-pending-73"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
