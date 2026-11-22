@@ -1,0 +1,35 @@
+{
+  "number": 86,
+  "title": "Report vm.max_map_count at job start, fix the AWS template, clarify doctor output",
+  "original_head": "a2ede518f2051022813ea7502f0d82a0680bbd25",
+  "original_repo": "leanprover-community/riemann-hypothesis",
+  "original_branch": "ci/job-start-map-count-preflight",
+  "maintainer_can_modify": false,
+  "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+  "automatic_resolution_count": 0,
+  "automatic_resolutions": [],
+  "rebased_head": "40758c7d23084783aebf72d7f44d52cf824ef9c8",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "5 files changed, 192 insertions(+), 8 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-86-1334509aa7-45044232327-restack",
+  "status": "rebased",
+  "previous_prepared_head": "0f40afe59bb8d7975198e8e334b2490de4244a09",
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true
+}

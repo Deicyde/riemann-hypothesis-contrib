@@ -1,0 +1,35 @@
+{
+  "number": 84,
+  "title": "Prototype Lean 4.36 cache import from volunteer artifacts",
+  "original_head": "9af1ac74d97bbc410f76332bcb297ade2014a55b",
+  "original_repo": "leanprover-community/riemann-hypothesis",
+  "original_branch": "cache/4.36-native-bootstrap",
+  "maintainer_can_modify": false,
+  "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+  "automatic_resolution_count": 0,
+  "automatic_resolutions": [],
+  "rebased_head": "0cfddc34dc1479ab5463ce6eccf8783bf34a56fc",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "13 files changed, 1375 insertions(+)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-84-1334509aa7-45044232327-restack",
+  "status": "rebased",
+  "previous_prepared_head": "d7373b831b0cfa5bb1ccfa24530550c722b55f00",
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true
+}

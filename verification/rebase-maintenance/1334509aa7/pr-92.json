@@ -1,0 +1,40 @@
+{
+  "number": 92,
+  "title": "Reuse the existing CovNFormula proof",
+  "original_head": "bb1ffc43837cba8e5fad630e6688d45dd818a3ea",
+  "original_repo": "graohene10-spec/riemann-hypothesis",
+  "original_branch": "covn-formula-share-proof",
+  "maintainer_can_modify": true,
+  "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+  "automatic_resolution_count": 1,
+  "automatic_resolutions": [
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/CovolumeUnipotentIntegralNormalisedHaar.lean",
+      "reason": "reuse-reviewed-Lean-4.36-port-from-PR91"
+    }
+  ],
+  "rebased_head": "4df9079596c68c31260c1482147e8c9b97f82510",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "1 file changed, 4 insertions(+), 32 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-92-1334509aa7-45044232327-restack",
+  "status": "rebased",
+  "previous_prepared_head": "bcb083a51640ce02cb089c83f3bf1668a9301ee7",
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true
+}

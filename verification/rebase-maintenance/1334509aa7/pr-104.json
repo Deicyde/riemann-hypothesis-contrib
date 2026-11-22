@@ -1,0 +1,35 @@
+{
+  "number": 104,
+  "title": "Speed up the slowest proofs (stacked on #79)",
+  "original_head": "2ea000c90de863f15260573296e84ca49b578d1f",
+  "original_repo": "Vilin97/rh-lc",
+  "original_branch": "port-lean-4.36-speedups",
+  "maintainer_can_modify": true,
+  "old_merge_base": "507a75d91d131d627b380df4e32f6e9fb21dd067",
+  "automatic_resolution_count": 0,
+  "automatic_resolutions": [],
+  "rebased_head": "27425664ec0de3530a1e1c3f203231e0fe8aec7b",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "57948 files changed, 111983 insertions(+), 110124 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-104-1334509aa7-45044232327-restack",
+  "status": "rebased",
+  "previous_prepared_head": "a22731d5c58dc3d85a128be5e28c75cc4bde5eca",
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true
+}

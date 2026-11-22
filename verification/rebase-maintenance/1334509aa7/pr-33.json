@@ -1,0 +1,267 @@
+{
+  "number": 33,
+  "title": "replace deprecated proof lemmas",
+  "original_head": "ede9888a861a06898e0d6c8632a396a763e496db",
+  "original_repo": "deancureton/riemann-hypothesis",
+  "original_branch": "cleanup/deprecated-proof-lemmas",
+  "maintainer_can_modify": true,
+  "old_merge_base": "7da4577eb40dd74b09218d111114ca43bc2ad226",
+  "automatic_resolution_count": 31,
+  "automatic_resolutions": [
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DecoratedLatticeProofs/SeeSawLastTwoStepsTransportLinearRelations.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "continuous_finset_sum": "continuous_finsetSum",
+        "continuous_mul_right": "continuous_mul_const",
+        "integral_finset_sum": "MeasureTheory.integral_finsetSum"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DecoratedLatticeProofs/TrueGeometryLatticeForward.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "Set.mem_setOf_eq": "Set.mem_ofPred_eq"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ArchimedeanSumSizeBoundLargeDataFromFactors.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "Matrix.toEuclideanLin_apply": "Matrix.toLpLin_apply"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/BottomTriangleNonzeroConstantFirst.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "Set.mem_setOf_eq": "Set.mem_ofPred_eq"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/PartialLFunctionEqNormalizingFactorDefiniteBotto.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "Differentiable.fun_finset_prod": "Differentiable.fun_finsetProd"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/AdjointPairingUnfoldingDownwardLift.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "integral_finset_sum": "MeasureTheory.integral_finsetSum"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/SatakeParameters/SystemWeightsEqShiftedCharacterExponents.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "Fin.coe_cast": "Fin.val_cast"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/LatticeFamilyAdoptionSecond.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "AddSubmonoidClass.coe_finset_sum": "AddSubmonoidClass.coe_finsetSum"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/PureTensorOperatorSplitOneRealPlace.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "ContinuousLinearMap.mul_apply": "mul_apply_eq_comp"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/RealThetaIntertwinerAdjointIsRealThetaIntertwine.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "ContinuousMultilinearMap.smul_apply": "_root_.smul_apply",
+        "continuous_finset_prod": "continuous_finsetProd"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/AutomorphicVarieties/LiteratureResults/KTheoryStability/ReductionBoundsTorsion/ArithmeticGapBounds/PUnfoldB.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "integrable_finset_sum": "MeasureTheory.integrable_finsetSum",
+        "integral_finset_sum": "MeasureTheory.integral_finsetSum"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/RallisInnerProduct/ExistsCommonLevelSobolevBoundWeilCompact.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "continuous_finset_sum": "continuous_finsetSum",
+        "Set.mem_setOf_eq": "Set.mem_ofPred_eq",
+        "tendsto_finset_sum": "tendsto_finsetSum",
+        "ContinuousLinearMap.sum_apply": "sum_apply",
+        "ContinuousLinearMap.smul_apply": "smul_apply",
+        "Seminorm.smul_apply": "smul_apply"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/RallisInnerProduct/GraphRelationExtendsFromFockVectorsToKFinite.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "integral_finset_sum": "MeasureTheory.integral_finsetSum"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/RallisInnerProduct/ThetaFunApproxByFockVectorsOfCartanInvolutions.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "integral_finset_sum": "MeasureTheory.integral_finsetSum"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/DownwardFormApproximationOfDecay.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "integral_finset_sum": "MeasureTheory.integral_finsetSum",
+        "integrable_finset_sum": "MeasureTheory.integrable_finsetSum"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/SmoothOfThetaLiftFiniteSum.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "continuous_finset_sum": "continuous_finsetSum",
+        "integral_finset_sum": "MeasureTheory.integral_finsetSum",
+        "integrable_finset_sum": "MeasureTheory.integrable_finsetSum"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/ThetaLiftApproxOfApproxData.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "integral_finset_sum": "MeasureTheory.integral_finsetSum",
+        "integrable_finset_sum": "MeasureTheory.integrable_finsetSum"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/ThetaLiftsDenseInCuspForms.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "integral_finset_sum": "MeasureTheory.integral_finsetSum",
+        "integrable_finset_sum": "MeasureTheory.integrable_finsetSum"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistDescentApproximation.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "integral_finset_sum": "MeasureTheory.integral_finsetSum",
+        "integrable_finset_sum": "MeasureTheory.integrable_finsetSum"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistDownwardApproxCusp.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "integral_finset_sum": "MeasureTheory.integral_finsetSum",
+        "integrable_finset_sum": "MeasureTheory.integrable_finsetSum"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistUpperArrowApprox.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "integral_finset_sum": "MeasureTheory.integral_finsetSum",
+        "integrable_finset_sum": "MeasureTheory.integrable_finsetSum"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistUpperCuspLiftApproxCusp.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "integral_finset_sum": "MeasureTheory.integral_finsetSum",
+        "integrable_finset_sum": "MeasureTheory.integrable_finsetSum"
+      }
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/TwistedFormDownwardGrowthBound.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "integral_finset_sum": "MeasureTheory.integral_finsetSum",
+        "integrable_finset_sum": "MeasureTheory.integrable_finsetSum"
+      }
+    },
+    {
+      "path": "src/Development/WeilBound/RepresentationTheoryGL/ArchimedeanBaseChange/ArchimedeanBaseChangeProof/SatakeExponents/SphericalEmbeddings/ValuationDetKO.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "MonoidHom.finset_prod_apply": "MonoidHom.finsetProd_apply",
+        "Set.mem_setOf_eq": "Set.mem_ofPred_eq"
+      }
+    },
+    {
+      "path": "src/Development/WeilBound/RepresentationTheoryGL/UnitaryDualProof/HermitianForms/UnitaryLattices/LatticeIndexLifts/MeasurableSpaceSecondLift.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "continuous_add_left": "continuous_const_add"
+      }
+    },
+    {
+      "path": "src/Formalism/SharpRestriction/CuspSpanNormBounds/OscillatoryIntegralBounds.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "Fin.coe_castSucc": "Fin.val_castSucc",
+        "continuous_finset_prod": "continuous_finsetProd",
+        "Finsupp.support_single_ne_zero": "Finsupp.support_single",
+        "continuous_finset_sum": "continuous_finsetSum",
+        "tendsto_finset_prod": "tendsto_finsetProd",
+        "Set.mem_setOf_eq": "Set.mem_ofPred_eq",
+        "Matrix.det_of_upperTriangular": "Matrix.det_of_isUpperTriangular"
+      }
+    },
+    {
+      "path": "src/Formalism/SharpRestriction/Divisibility/GeneratorPowers/PhiCMinI.lean",
+      "reason": "replay-only-deprecated-identifier-renames",
+      "identifier_changes": {
+        "Real.finset_prod_rpow": "Real.finsetProd_rpow"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsSquareCommutativityProjection.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/FlipBoundOfHyp.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/PrincipalSeriesIrreducibleUnram.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/HodgeBundleWeights/ValuationMultiplicityOfConsecutiveRun.lean",
+      "reason": "retain-main-pruning"
+    }
+  ],
+  "rebased_head": "91036e7d33dfcf07a38bd08c268e4be516257e6c",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "75 files changed, 113 insertions(+), 113 deletions(-)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-33-1334509aa7-45044232327-restack",
+  "status": "rebased",
+  "previous_prepared_head": "d69785d5fbf55dab4548d842b072ca4bacbbc358",
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true
+}

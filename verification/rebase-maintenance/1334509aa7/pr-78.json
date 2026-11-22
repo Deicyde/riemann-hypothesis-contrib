@@ -1,0 +1,42 @@
+{
+  "number": 78,
+  "title": "Add `docs/references.bib`, docstring citations and a cross-reference tag for five statements",
+  "original_head": "29c46fdc12c061ca79217724c6bbcf7d1b28f568",
+  "original_repo": "leanprover-community/riemann-hypothesis",
+  "original_branch": "literature/first-references",
+  "maintainer_can_modify": false,
+  "old_merge_base": "2dea99006976a5104032e495d7513dee40fbb5ca",
+  "automatic_resolution_count": 0,
+  "automatic_resolutions": [],
+  "rebased_head": "f96125240b99a308987e234ac11b3e4364d156fd",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "7 files changed, 146 insertions(+)",
+  "imports": {
+    "modules": 149396,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-78-e5ae821a00-45039889610-small-one",
+  "status": "conflict",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "README.md",
+      "stages": {
+        "1": "15480f53618623a8ac4faa9ae5a6eb3478c25653",
+        "2": "e356674139192acb723621308e58d7ffecd23409",
+        "3": "3a5d9f988a44519ddb324875b69de94018c7ea68"
+      }
+    }
+  ],
+  "conflict_list_truncated": false
+}

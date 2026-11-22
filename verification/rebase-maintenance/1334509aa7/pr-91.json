@@ -1,0 +1,37 @@
+{
+  "number": 91,
+  "title": "Combine reviewed proof cleanups on Lean 4.36",
+  "original_head": "c13afbe7095bc59deb73921ea2a262333fd45a05",
+  "original_repo": "Deicyde/riemann-hypothesis-contrib",
+  "original_branch": "cleanup/reviewed-on-4.36",
+  "maintainer_can_modify": true,
+  "old_merge_base": "14f383e5edeae10b9991d9b8aec26b58aabc57eb",
+  "automatic_resolution_count": 0,
+  "automatic_resolutions": [],
+  "rebased_head": "039a209ecb5ccea56449f7ae63289f3b78e53246",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": true
+  },
+  "changes": "132 files changed, 2451 insertions(+), 12142 deletions(-)",
+  "imports": {
+    "modules": 149397,
+    "missing_count": 0,
+    "missing": []
+  },
+  "prepared_branch": "maintenance/rebased-pr-91-1334509aa7-45044232327-restack",
+  "status": "rebased",
+  "initial_head": "d4663eed405af528c67a3b1213021373cf8c0a5c",
+  "applied_before_restack": true,
+  "previous_prepared_head": "c13afbe7095bc59deb73921ea2a262333fd45a05",
+  "restack_source_unchanged": {
+    "src": true,
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "lakefile.toml": true
+  },
+  "author_and_message_metadata_unchanged": true
+}

@@ -1,0 +1,48 @@
+{
+  "number": 88,
+  "title": "Add a formal-conjectures Comparator setup and gather the setups in comparator/",
+  "original_head": "e5956bd05e3f5481a4c5e694e1009d7bb1bd6407",
+  "original_repo": "leanprover-community/riemann-hypothesis",
+  "original_branch": "comparator/formal-conjectures",
+  "maintainer_can_modify": false,
+  "old_merge_base": "e5ae821a00834f8043e987947f8151cc769bafe2",
+  "automatic_resolution_count": 1,
+  "automatic_resolutions": [
+    {
+      "path": "README.md",
+      "reason": "manually-reviewed-Lean-4.36-API-adaptation"
+    }
+  ],
+  "rebased_head": "dcdeccdad2ef217421457e7c6cee06b8a3a1a69d",
+  "diff_check": true,
+  "diff_check_output": "",
+  "protected_files": {
+    "lean-toolchain": true,
+    "lake-manifest.json": true,
+    "src/Challenge.lean": false
+  },
+  "changes": "14 files changed, 975 insertions(+), 33 deletions(-)",
+  "imports": {
+    "modules": 149395,
+    "missing_count": 0,
+    "missing": []
+  },
+  "status": "conflict",
+  "prepared_branch": "maintenance/rebased-pr-88-e5ae821a00-45043356350-remaining",
+  "publication_note": "GitHub Actions token could not publish workflow changes; connector created the preparation ref from the uploaded commit.",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "README.md",
+      "stages": {
+        "1": "15480f53618623a8ac4faa9ae5a6eb3478c25653",
+        "2": "e356674139192acb723621308e58d7ffecd23409",
+        "3": "6310523091434f78358e77084bc7f5b3231868e2"
+      }
+    }
+  ],
+  "conflict_list_truncated": false
+}
