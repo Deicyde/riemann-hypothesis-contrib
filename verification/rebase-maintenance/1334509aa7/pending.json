@@ -1,0 +1,21 @@
+{
+  "number": 54,
+  "status": "awaiting-manual-review",
+  "conflict_count": 1,
+  "stage_types": {
+    "1,2,3": 1
+  },
+  "conflicts": [
+    {
+      "path": "src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/AlgebraMapQuotBijective.lean",
+      "stages": {
+        "1": "d4f2c360ffa81985dd2403b08a9816f4c20b3363",
+        "2": "a620197e983d3f4243d3b6e759f1a9084a4f3958",
+        "3": "a676eca61fcf53427339d37d3ece229958cc3980"
+      }
+    }
+  ],
+  "conflict_list_truncated": false,
+  "rebase_head": "2a9152ecb538487a023803608373b4c64d279811",
+  "checkpoint_head": "104fefeea7f88141654e1b1690c39fafed06c917"
+}
