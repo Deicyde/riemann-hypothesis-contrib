@@ -36,8 +36,8 @@ theorem op_idem {G H : Type} [Group G] [Fintype G] [AddCommGroup H] [Module ℂ 
   have h1 : E u = ∑ g, ∑ h, (a h * a (h⁻¹ * g)) • ρ g u := by
     simp only [← Finset.sum_smul, ha.2, hE, LinearMap.sum_apply, LinearMap.smul_apply]
   have h2 : E (E u) = ∑ h, ∑ g, (a h * a g) • ρ h (ρ g u) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hE, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, Finset.smul_sum, smul_smul]
+
+    simp only [hE, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, Finset.smul_sum, smul_smul]
     rw [Finset.sum_comm]
     simp only [mul_comm]
   rw [h2, h1, Finset.sum_comm (f := fun g h => (a h * a (h⁻¹ * g)) • ρ g u)]
@@ -57,8 +57,8 @@ theorem eC_idem_at (hr : R.grp_record) (σ : D.what₂.LL →+* ℂ) : GlobalThe
   unfold RealDat.eC at h1 h2 ⊢
   refine ⟨fun g k => congrArg σ ((sg0 D A).injective (h1 g k)), fun g => ?_⟩
   have := h2 g
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [← map_mul, ← map_sum] at this ⊢
+
+  simp only [← map_mul, ← map_sum] at this ⊢
   exact congrArg σ ((sg0 D A).injective this)
 
 

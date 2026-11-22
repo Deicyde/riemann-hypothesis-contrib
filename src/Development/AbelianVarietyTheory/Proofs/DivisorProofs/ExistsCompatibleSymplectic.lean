@@ -99,16 +99,16 @@ theorem exists_pairs {n : ℕ} [NeZero n] {g : ℕ}
       intro x j
       rw [hφψ]
       constructor
-      set_option synthInstance.maxHeartbeats 100000 in
-        · simp [map_sum, hv, hvw]
-      set_option synthInstance.maxHeartbeats 100000 in
-        · simp [map_sum, LinearMap.sum_apply, hw, hvw]
+
+      · simp [map_sum, hv, hvw]
+
+      · simp [map_sum, LinearMap.sum_apply, hw, hvw]
     have hKp : ∀ x ∈ K, ∀ y, ω x (y - φ (ψ y)) = ω x y := by
       intro x hx y
       have h1 : ∀ j, ω x (v j) = 0 := fun j => by rw [hsk, (hx j).1, neg_zero]
       rw [hφψ]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [map_sum, h1, fun j => (hx j).2]
+
+      simp [map_sum, h1, fun j => (hx j).2]
     obtain ⟨x, hx⟩ := exists_faithful (n := n) (V := K) (by
       intro c hc
       by_contra hc0
@@ -209,8 +209,8 @@ theorem exists_level {F : Type} [Field F] {ζ : Fˣ} {n : ℕ} (hn : 0 < n)
   change e (Φ.symm (E a)) (Φ.symm (E c)) = _
   rw [← hω, ← χint]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [E, map_sum, LinearMap.sum_apply, hv, hw, hvw, hwv, dotProduct, mul_comm]
+
+  simp [E, map_sum, LinearMap.sum_apply, hv, hw, hvw, hwv, dotProduct, mul_comm]
   ring
 
 theorem ker_and_surj {F : Type} [Field F] {ζ : Fˣ} {n : ℕ} (hn : 0 < n)

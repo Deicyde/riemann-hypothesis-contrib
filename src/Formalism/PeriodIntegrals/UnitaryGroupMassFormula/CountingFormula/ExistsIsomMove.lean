@@ -64,8 +64,8 @@ theorem exists_pair (hS : IsHermSemilocal S) (hM : IsSelfDualMod S h M) {ι : Ty
         Finset.sum_const_zero, sub_zero]
     rw [hα, inv_mul_cancel₀ hα0]
   · intro j
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sub, map_sum]
+
+    rw [map_sub, map_sum]
     simp only [map_smul, smul_eq_mul]
     rw [Finset.sum_eq_single j (fun i _ hij => by rw [hxo j i (Ne.symm hij), mul_zero])
       (by simp), mul_assoc, inv_mul_cancel₀ (hxu j).1, mul_one, sub_self]

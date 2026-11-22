@@ -21,7 +21,7 @@ variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algeb
 
 
 open PositivityTheory.ThKF0.Resc in
-set_option maxHeartbeats 1000000 in
+
 theorem split_core {m n : ℕ} {κ : Type} [Fintype κ] {ψ : AddChar (AF F) ℂ} (hψ : IsStd ψ) {δ : E}
     (hq : IsQuad σ δ) (JA : Matrix (Fin m) (Fin m) E) (JB : Matrix (Fin n) (Fin n) E) (hA : IsHerm σ JA)
     (hB : IsHerm σ JB)
@@ -78,7 +78,7 @@ theorem split_resc {R K : Type} [CommRing R] [CommRing K] [Algebra R K] [Inverti
 
 
 open PositivityTheory.ThKF0.Resc in
-set_option maxHeartbeats 1000000 in
+
 theorem theta_sum_rational_invariant (d : SD σ) (γ : d.G) (hγ : γ ∈ rat2 σ d.Y) (Ψ : d.Fn) (hΨ : Ψ ∈ d.sch) :
     thetaSum F (d.om γ Ψ) = thetaSum F Ψ := by
   have hσ : IsCMExt F E σ := d.cm

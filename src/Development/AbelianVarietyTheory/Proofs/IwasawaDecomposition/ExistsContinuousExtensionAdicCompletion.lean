@@ -26,8 +26,8 @@ theorem _root_.GlobalTheory.exists_continuous_extension_adicCompletion (E : Type
   haveI : CompleteSpace K := FiniteDimensional.complete ℚ_[l] K
   have hmem : ∀ x, τ x ∈ K := by
     intro x
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← b.sum_repr x, map_sum]
+
+    rw [← b.sum_repr x, map_sum]
     refine sum_mem fun i _ => ?_
     rw [Rat.smul_def, map_mul, map_ratCast]
     exact mul_mem (SubfieldClass.ratCast_mem K _)

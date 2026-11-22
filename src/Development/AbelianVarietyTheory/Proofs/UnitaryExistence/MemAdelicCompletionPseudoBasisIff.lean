@@ -28,8 +28,8 @@ theorem _root_.GlobalTheory.AdLat.adCoord_tmul (e : Module.Basis (Fin n) E (Fin 
     _root_.GlobalTheory.AdLat.adCoord F e b (fun i => a ⊗ₜ x i) = a ⊗ₜ e.repr x b := by
   have hx : e.repr x b = ∑ i, x i * e.repr (Pi.single i 1) b := by
     conv_lhs => rw [← Finset.univ_sum_single x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, Finsupp.coe_finsetSum, Finset.sum_apply]
+
+    simp only [map_sum, Finsupp.coe_finsetSum, Finset.sum_apply]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [show Pi.single i (x i) = x i • (Pi.single i 1 : Fin n → E) by
         ext j; by_cases h : j = i <;> simp [Pi.single_apply, h],
@@ -59,9 +59,9 @@ theorem _root_.GlobalTheory.AdLat.adCoord_sum (e : Module.Basis (Fin n) E (Fin n
     unfold _root_.GlobalTheory.AdLat.fv
     rw [this, Module.Basis.repr_self, Finsupp.single_apply]
     split_ifs <;> simp [Algebra.TensorProduct.one_def]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, _root_.GlobalTheory.AdLat.adCoord_smul, h1, mul_ite, mul_one, mul_zero,
-    Finset.sum_ite_eq', Finset.mem_univ, if_true]
+
+  simp only [map_sum, _root_.GlobalTheory.AdLat.adCoord_smul, h1, mul_ite, mul_one, mul_zero,
+  Finset.sum_ite_eq', Finset.mem_univ, if_true]
 
 end
 

@@ -28,8 +28,8 @@ theorem _root_.UpperTheory.KN.filtration_eq_span_of_eisensteinPow_basisChange :
   have hexp : ∀ d : ι → R,
       ∑ i, act (d i) (h i) = act (eD ^ β) (∑ k, act (∑ i, d i * m i k) (b k)) := by
     intro d
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hh, map_sum, AddMonoidHom.finsetSum_apply, ← hmul]
+
+    simp only [hh, map_sum, AddMonoidHom.finsetSum_apply, ← hmul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl (fun k _ => ?_)
     refine Finset.sum_congr rfl (fun i _ => ?_)

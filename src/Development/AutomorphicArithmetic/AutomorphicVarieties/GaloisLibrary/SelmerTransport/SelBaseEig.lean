@@ -25,8 +25,8 @@ variable {b} {J : N →+ N'} {C : ι → N' →+ N}
 private theorem Coords.comm (h : Coords b J C) (f : N → N) (f' : N' →ₗ[O] N') (hf : ∀ x, J (f x) = f' (J x))
     (i : ι) (y : N') : C i (f' y) = f (C i y) := by
   conv_lhs => rw [← h.sum y]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.map_smul, ← hf, h.coord, Module.Basis.repr_self]
+
+  simp only [map_sum, LinearMap.map_smul, ← hf, h.coord, Module.Basis.repr_self]
   rw [Finset.sum_eq_single i]
   · simp
   · intro k _ hk
@@ -66,8 +66,8 @@ private theorem Coords.length [IsLocalRing R] [IsLocalRing O] [IsLocalHom (algeb
       rw [hs, ht]
   have hφψ : ∀ y, φ (ψ y) = y := by
     intro y
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [ψ, map_sum, hφ, h.sum]
+
+    simp only [ψ, map_sum, hφ, h.sum]
   have hφs : ∀ (o : O) t, φ (o • t) = o • φ t := by
     intro o t
     induction t using TensorProduct.induction_on with
@@ -257,7 +257,7 @@ private theorem UpperTheory.V.Base.selBaseEig_lemma_5 {G : Type} [Group G] [Topo
   obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ x
   exact congrArg Submodule.Quotient.mk (Subtype.ext (funext fun w => (hu _ _).symm))
 
-set_option maxHeartbeats 800000 in
+
 open UpperTheory.V.Base.SelmerBaseEigenCoordinates in
 theorem UpperTheory.V.Base.selBaseEig :
     ∀ (R G M : Type) [CommRing R] [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup M] [Module R M]

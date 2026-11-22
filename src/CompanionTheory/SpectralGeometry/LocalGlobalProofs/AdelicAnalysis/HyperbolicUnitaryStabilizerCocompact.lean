@@ -45,8 +45,8 @@ theorem hform_smul_left (s : K →+* K) (L : Matrix (Fin N) (Fin N) K) (c : K) (
 theorem hform_conj (s : K →+* K) (L : Matrix (Fin N) (Fin N) K) (hs : ∀ x, s (s x) = x)
     (hL : ∀ i j, s (L j i) = L i j) (x y : Fin N → K) :
     s (hform s L x y) = hform s L y x := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hform, map_sum, map_mul, hs]
+
+  simp only [hform, map_sum, map_mul, hs]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   rw [hL]; ring
@@ -138,8 +138,8 @@ theorem gramR_ratTup (R : Type) [CommRing R] [Algebra F R] (σ : E →ₐ[F] E) 
     (J : Matrix (Fin N) (Fin N) E) (X : Fin n → Fin N → E) :
     gramR R σ J (ratTup R X) = (gramE σ J X).map (inclR R) := by
   ext a b
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [gramR, hR, hform, ratTup, JR, sigR_incl, Matrix.map_apply, gramE, hE, map_sum, map_mul]
+
+  simp only [gramR, hR, hform, ratTup, JR, sigR_incl, Matrix.map_apply, gramE, hE, map_sum, map_mul]
   rfl
 
 end Tens

@@ -22,9 +22,9 @@ theorem gram_det_isUnit {E : Type} [Field E] [NumberField E] [StarRing E] (S : H
       apply S.nondeg.2
       intro x
       rw [← S.frame.sum_repr x]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
-        RingHom.id_apply, Finset.mul_sum]
+
+      simp only [map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
+      RingHom.id_apply, Finset.mul_sum]
       rw [Finset.sum_comm]
       refine Finset.sum_eq_zero fun i _ => ?_
       have hi := congrFun hv i

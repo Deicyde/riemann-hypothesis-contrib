@@ -33,8 +33,8 @@ theorem sigma_sigma (hcm : IsCMExt F E σ) (x : E) : σ (σ x) = x := by
 
 theorem hE_self_fixed (hcm : IsCMExt F E σ) {M : ℕ} {J : Matrix (Fin M) (Fin M) E} (hJ : IsHermND σ J) (x : Fin M → E) :
     σ (hE σ J x x) = hE σ J x x := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hE, hform, map_sum, map_mul]
+
+  simp only [hE, hform, map_sum, map_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   have h1 : σ ((σ : E →+* E) (x j)) = x j := sigma_sigma hcm _
@@ -92,7 +92,7 @@ theorem thetaMeas_ne (hcm : IsCMExt F E σ) {J : Matrix (Fin 2) (Fin 2) E} (hJ :
 end Alg
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem cnt : TestEx → LSide → RSide → Cnt := by
   intro hTE hL hR F E _ _ _ _ _ σ J d b li lam μ 𝓕 mi m hcm hJ hAn hli hlam hμ h𝓕 hmi hm κ hκ
   obtain ⟨⟨θ, hθ⟩, -⟩ := PositivityTheory.PlacePermOperatorBicommutantSpan.theta_real F hcm.1

@@ -10,7 +10,7 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.Geometric
 @[expose] public section
 
 open GlobalTheory.PRep GlobalTheory.SmGL Matrix GlobalTheory.SplitWeil
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 

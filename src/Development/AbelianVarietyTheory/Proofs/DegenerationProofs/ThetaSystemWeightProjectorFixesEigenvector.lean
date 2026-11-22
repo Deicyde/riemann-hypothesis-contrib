@@ -39,9 +39,9 @@ theorem proj_fixes_eigen : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o 
   have h4 : ∑ i, b i * ∑ j, y (S.proj T c j i) * E j =
       y (Ring.inverse (Nat.card T : o)) * ∑ t : T, y (GlobalGen.chi S (c t)) *
         ∑ j, (∑ i, y (S.ρ t j i) * b i) * E j := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [GlobalGen.proj_eq, Matrix.smul_apply, Matrix.sum_apply, smul_eq_mul, map_mul, map_sum,
-      Finset.mul_sum, Finset.sum_mul]
+
+    simp only [GlobalGen.proj_eq, Matrix.smul_apply, Matrix.sum_apply, smul_eq_mul, map_mul, map_sum,
+    Finset.mul_sum, Finset.sum_mul]
     rw [Finset.sum_comm]
     conv_rhs => rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun j _ => ?_

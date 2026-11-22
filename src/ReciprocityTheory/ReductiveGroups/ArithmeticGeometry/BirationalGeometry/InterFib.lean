@@ -41,11 +41,11 @@ theorem eval_psiPoly (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1)
   have hs : segre z = ∑ i, segre z i • (fun i' => if i = i' then (1 : ℂ) else 0) := by
     funext i'
     simp [Finset.sum_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [psiPoly, map_sum, map_mul, eval_C, eval_segMono]
+
+  simp only [psiPoly, map_sum, map_mul, eval_C, eval_segMono]
   conv_rhs => rw [hs]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_apply]
+
+  rw [map_sum, Finset.sum_apply]
   refine Finset.sum_congr rfl (fun i _ => ?_)
   rw [map_smul, Pi.smul_apply, smul_eq_mul, mul_comm]
 
@@ -139,12 +139,12 @@ theorem segre_rel {P : Ideal (MRing ι)} (hP : IsMultiHomogIdeal P)
     rw [hD]
     exact comp_mul_homog (psiPoly_homog Ψ j) (c j) _
   have heq := congrArg (weightedHomogeneousComponent (blkW ι) (fun _ : K => n + 1)) hga
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hseg, map_add (f := _), ← hc, map_sum] at heq
+
+  rw [hseg, map_add (f := _), ← hc, map_sum] at heq
   simp only [hterm] at heq
   have hev := congrArg (eval z) heq
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_add (f := _), map_sum, eval_idealC hz hgc, zero_add, map_pow, eval_segMono] at hev
+
+  rw [map_add (f := _), map_sum, eval_idealC hz hgc, zero_add, map_pow, eval_segMono] at hev
   rw [← hev]
   refine Finset.sum_congr rfl (fun j _ => ?_)
   rw [map_mul, hG2, eval_psiPoly, mul_comm]

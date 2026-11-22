@@ -114,8 +114,8 @@ theorem key {a b n : ℕ} (α : ⦋n + 1⦌ ⟶ ⦋a⦌) (β : ⦋n + 1⦌ ⟶ �
   rw [cone_bop]
   unfold dD
   rw [ite_eq_left rfl, ite_eq_left rfl]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Preadditive.comp_sum, Preadditive.comp_zsmul, bop_comp, map_sum, map_zsmul, cone_bop]
+
+  simp only [Preadditive.comp_sum, Preadditive.comp_zsmul, bop_comp, map_sum, map_zsmul, cone_bop]
   rw [Finset.sum_range_succ' _ (n + 2)]
   have h0 : fc (n + 2) (n + 1) 0 ≫ cv α = α := face_cone_identity_zero α
   have h0' : fc (n + 2) (n + 1) 0 ≫ cv β = β := face_cone_identity_zero β

@@ -41,7 +41,7 @@ theorem ιMulti_two_swap {K V : Type*} [CommRing K] [AddCommGroup V] [Module K V
   rw [← e, AlternatingMap.map_swap _ _ (by decide)]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem chern_eq_sum_cup_form : GlobalTheory.Published.AbelianDeRham → ∀ (K : Type) [Field K] (A : Over (Sp K)) [GrpObj A] (g : ℕ), IsAbelianScheme A → SmoothOfRelativeDimension g A.hom → ∀ (L : LB A.left), L.IsLB → ∀ ψ : LinearMap.BilinForm K (HdR A), IsPolForm (dp0 K) (𝟙 _) A L ψ → ∃ (I : Type) (_ : Fintype I) (c : I → primDR A) (ω : I → Form (A.hom ≫ 𝟙 (Sp K))) (hω : ∀ k, Form.cl _ (ω k) ∈ primDR A), IsChern (dp0 K) (A.hom ≫ 𝟙 (Sp K)) L (∑ k, cup _ (c k).1 (Form.cl _ (ω k))) ∧ ∀ f ∈ Fil A, ∀ x : HdR A, ψ f x = ∑ k, f (c k) * x ⟨_, hω k⟩ := by
   intro H K _ A _ g hA hg L hL ψ hψ
   obtain ⟨hFree, hHodge, -, -, hDual⟩ := H
@@ -69,8 +69,8 @@ theorem chern_eq_sum_cup_form : GlobalTheory.Published.AbelianDeRham → ∀ (K 
     haveI : FiniteDimensional K (FirstDeRham (A.hom ≫ 𝟙 (Sp K))) := hfin
     apply wedge_two_eq_zero
     intro f
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [pairingDual_ιMulti_two]
     exact hvan (f 0 ∘ₗ (primDR A).subtype) (f 1 ∘ₗ (primDR A).subtype)
 
@@ -93,8 +93,8 @@ theorem chern_eq_sum_cup_form : GlobalTheory.Published.AbelianDeRham → ∀ (K 
     rw [hanti a₁ b₂]
     abel
   have hZ : ∑ k, cup (O (dp0 K) (A.hom ≫ 𝟙 (Sp K))) (pN (a k) : primDR A).1 (pN (b k) : primDR A).1 = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_zero e, ← h0, map_sum]
+
+    rw [← map_zero e, ← h0, map_sum]
     exact Finset.sum_congr rfl fun k _ ↦ (he _ _).symm
   obtain ⟨ω, hωdef⟩ : ∃ ω : Fin n ⊕ Fin n → Form (A.hom ≫ 𝟙 (Sp K)),
       ω = Sum.elim (fun k ↦ form (pF (b k))) (fun k ↦ form (pF (a k))) := ⟨_, rfl⟩

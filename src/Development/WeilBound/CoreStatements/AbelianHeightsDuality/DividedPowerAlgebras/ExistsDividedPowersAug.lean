@@ -87,8 +87,8 @@ private theorem dpowSeries_add_arg_eq_mul {R A : Type} [CommRing R] [CommRing A]
         PowerSeries.mk fun n => y ^ n * algebraMap R A (κ.dpow n r') := by
   ext n
   simp only [PowerSeries.coeff_mk, PowerSeries.coeff_mul]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [κ.dpow_add hr hr', map_sum, Finset.mul_sum]
+
+  rw [κ.dpow_add hr hr', map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun k hk => ?_
   rw [Finset.HasAntidiagonal.mem_antidiagonal] at hk
   rw [← hk, pow_add, map_mul]

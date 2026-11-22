@@ -95,8 +95,8 @@ theorem dvd_coeffs_of_mem_span_distinguished {ϖ : O} (hϖ : Irreducible ϖ) {Xg
   obtain ⟨a, b, hab⟩ := h
   have himg : (∑ i ∈ S, (u i).map f * C (f (c i)) * g ^ i) = a.map f * g ^ y := by
     have h1 := congrArg (PowerSeries.map f) hab
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_add (f := _), map_mul, map_pow, map_sum, map_C, hfϖ, map_zero, mul_zero, add_zero] at h1
+
+    simp only [map_add (f := _), map_mul, map_pow, map_sum, map_C, hfϖ, map_zero, mul_zero, add_zero] at h1
     exact h1.symm
   intro i hi
   by_contra hnd
@@ -122,8 +122,8 @@ theorem dvd_coeffs_of_mem_span_distinguished {ϖ : O} (hϖ : Irreducible ϖ) {Xg
     push_cast
     rfl
   have hR : coeff (i₀ * wdeg Xg) (∑ i ∈ S, (u i).map f * C (f (c i)) * g ^ i) ≠ 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_eq_single i₀]
+
+    rw [map_sum, Finset.sum_eq_single i₀]
     · have ho := hterm i₀ hi₀T.1 hi₀T.2
       have hne : ((u i₀).map f * C (f (c i₀)) * g ^ i₀) ≠ 0 := by
         intro h0

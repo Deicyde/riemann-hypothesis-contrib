@@ -359,8 +359,8 @@ theorem exists_primitive_at {R Ω : Type} (F : Type) [CommRing R] [IsDedekindDom
     have h3 : ∀ k, algebraMap R Ω (c k) = algebraMap R Ω (p.coeff k) * algebraMap F Ω t := by
       intro k
       rw [IsScalarTower.algebraMap_apply R F Ω, hc k, map_mul, ← IsScalarTower.algebraMap_apply R F Ω]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, aeval_C, map_pow, aeval_X, h3]
+
+    simp only [map_sum, map_mul, aeval_C, map_pow, aeval_X, h3]
     have : ∑ k ∈ Finset.range (p.natDegree + 1), algebraMap R Ω (p.coeff k) * algebraMap F Ω t * x ^ k =
         algebraMap F Ω t * ∑ k ∈ Finset.range (p.natDegree + 1), algebraMap R Ω (p.coeff k) * x ^ k := by
       rw [Finset.mul_sum]

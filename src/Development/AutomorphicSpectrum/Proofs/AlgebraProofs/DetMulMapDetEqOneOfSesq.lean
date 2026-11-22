@@ -25,10 +25,10 @@ theorem det_mul_map_det_eq_one_of_sesq {E : Type*} [Field E] {V : Type*} [AddCom
     ext i j
     have h1 : S i j = H (g (b i)) (g (b j)) := (hg _ _).symm
     rw [h1, hgb, hgb]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mul_apply, Matrix.transpose_apply, RingHom.mapMatrix_apply,
-      Matrix.map_apply, map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply,
-      LinearMap.map_smulₛₗ, smul_eq_mul, S, Matrix.of_apply]
+
+    simp only [Matrix.mul_apply, Matrix.transpose_apply, RingHom.mapMatrix_apply,
+    Matrix.map_apply, map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply,
+    LinearMap.map_smulₛₗ, smul_eq_mul, S, Matrix.of_apply]
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [mul_comm]
   have hdet : S.det ≠ 0 := by
@@ -41,8 +41,8 @@ theorem det_mul_map_det_eq_one_of_sesq {E : Type*} [Field E] {V : Type*} [AddCom
         apply b.ext
         intro j
         have := congrFun hvS j
-        set_option synthInstance.maxHeartbeats 100000 in
-          simpa [Matrix.vecMul, dotProduct, S, map_sum, LinearMap.sum_apply] using this
+
+        simpa [Matrix.vecMul, dotProduct, S, map_sum, LinearMap.sum_apply] using this
       intro y
       rw [this]; rfl
     funext i

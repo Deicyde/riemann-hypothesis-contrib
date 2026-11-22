@@ -52,8 +52,8 @@ theorem bwPoly_holds (hH : LemmaHStatement) (hE : ∀ n, ReciprocityTheory.L2Dba
       t ^ j * MvPolynomial.eval z (MvPolynomial.homogeneousComponent j F) := by
     intro t
     conv_lhs => rw [← MvPolynomial.sum_homogeneousComponent F]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl (fun j _ => bwp_eval_smul_of_isHomogeneous
       (MvPolynomial.homogeneousComponent_isHomogeneous j F) t z)
   have hΦ : (∑ j ∈ Finset.range (F.totalDegree + 1),

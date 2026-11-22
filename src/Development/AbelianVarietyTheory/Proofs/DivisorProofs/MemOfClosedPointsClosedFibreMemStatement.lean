@@ -11,6 +11,6 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.mem_of_closedPoints_closedFibre_mem' : ∀ (R : Type) [CommRing R] [IsLocalRing R] (T : Scheme.{0}) (q : T ⟶ Sp R), LocallyOfFiniteType q → ∀ U : T.Opens, (∀ x : T, IsClosed ({x} : Set T) → q x = closedPoint R → x ∈ U) → ∀ x : T, q x = closedPoint R → x ∈ U := by
   first | exact @GlobalTheory.Mum.mem_of_closedPoints_closedFibre_mem | exact GlobalTheory.Mum.mem_of_closedPoints_closedFibre_mem | (intros; apply GlobalTheory.Mum.mem_of_closedPoints_closedFibre_mem <;> assumption)

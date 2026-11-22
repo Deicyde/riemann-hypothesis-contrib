@@ -622,7 +622,7 @@ theorem mem_of_cong (hT : LawsJ T) (hG : Y.Good e o) {σ : Y.d.c₂.F →+* ℂ}
   exact Units.ext he ▸ hγ'
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem laws_good (hT : LawsJ T) (hG : Y.Good e o) : Laws Y.U (xiR D) := by
   have hr : 1 ≤ D.R.r := by have := six_le_rank D; omega
   have hg0 : ∀ p : ℕ, p.Prime → T.Q.l.GoodAt p :=

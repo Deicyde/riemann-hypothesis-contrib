@@ -111,7 +111,7 @@ theorem norm_chi (d : ℕ) (s : ℝ) (g : Levi k fun _ : Fin 2 => Fin d) :
     Complex.norm_cpow_eq_rpow_re_of_pos (nabs_pos' k _)]
   simp
 
-set_option maxHeartbeats 2000000 in
+
 theorem someRed_of (h1 : Complementary) (h2 : Compact k) (h3 : Bound k) (h4 : Herm k) (h5 : ProdModel k) :
     SomeRed k := by
   intro x hx hu

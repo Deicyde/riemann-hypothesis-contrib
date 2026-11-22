@@ -65,7 +65,7 @@ noncomputable def tateOne : tateCohomology (𝟙_ (Rep.{u} k G)) 0 :=
     (Submodule.Quotient.mk ⟨(1 : k), fun _ => rfl⟩)
 
 
-set_option maxHeartbeats 800000 in
+
 theorem leftUnitor_tateCup_tateOne_zero (B : Rep.{u} k G) (b : tateCohomology B 0) :
     ((tateCohomologyFunctor 0).map (λ_ B).hom).hom
       (tateCup 0 0 (𝟙_ (Rep.{u} k G)) B 0 (zero_add 0) (tateOne k G) b) = b := by

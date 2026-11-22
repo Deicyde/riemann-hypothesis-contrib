@@ -158,8 +158,8 @@ private theorem eval_frame_lemma_7 {K : Type} [NormedField K]
     (x : ArcLt Dw → K) :
     eval x (C c * bind₁ (frameLin Bm lam) Q) = c * eval (frameSub Bm lam x) Q := by
   have hfs : ∀ y, eval x (frameLin Bm lam y) = frameSub Bm lam x y := fun y => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [frameLin, frameSub, map_sum, map_mul, eval_X, eval_C, Finset.sum_mul, mul_assoc]
+
+    simp only [frameLin, frameSub, map_sum, map_mul, eval_X, eval_C, Finset.sum_mul, mul_assoc]
   rw [map_mul, eval_C]
   congr 1
   induction Q using MvPolynomial.induction_on <;> simp_all
@@ -179,16 +179,16 @@ private theorem coeff_subst_lemma_8 {K : Type} [NormedField K]
         intro k
         have h := congrFun (congrFun (hAB τ) k) j
         rwa [Matrix.mul_apply, Matrix.one_apply] at h
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [frameLin, map_sum, map_mul, bind₁_X_right, bind₁_C_right, subA_sum, Finset.sum_mul]
+
+      simp only [frameLin, map_sum, map_mul, bind₁_X_right, bind₁_C_right, subA_sum, Finset.sum_mul]
       calc _ = ∑ k : Fin (Dw.mult τ), C ((∑ l, A τ k l * Bm τ l j) * (lam τ j)⁻¹) *
               (X ⟨τ, i, k⟩ : MvPolynomial (ArcLt Dw) K) := by
             show ∑ l : Fin (Dw.mult τ), ∑ k : Fin (Dw.mult τ), C (A τ k l) *
               (X ⟨τ, i, k⟩ : MvPolynomial (ArcLt Dw) K) * (C (Bm τ l j) * C (lam τ j)⁻¹) = _
             rw [Finset.sum_comm]
             refine Finset.sum_congr rfl fun k _ => ?_
-            set_option synthInstance.maxHeartbeats 100000 in
-              simp only [Finset.sum_mul, map_sum, map_mul]
+
+            simp only [Finset.sum_mul, map_sum, map_mul]
             refine Finset.sum_congr rfl fun l _ => ?_
             ring
         _ = C (lam τ j)⁻¹ * X ⟨τ, i, j⟩ := by
@@ -202,7 +202,7 @@ private theorem coeff_subst_lemma_8 {K : Type} [NormedField K]
     coeff_bind_scale_lemma_3]
 
 
-set_option maxHeartbeats 800000 in
+
 theorem coeff_bound (hFC : FinCoreStatement) (hBC : BasisChangeStatement)
     {K₁ : Type} [Field K₁] {K : Type} [NormedField K] [IsUltrametricDist K] [CompleteSpace K]
     (ι : K₁ →+* K) (K₀ : Subfield K) (hres : ReciprocityTheory.MultiplicativeHeights.ResidueFieldInfiniteOn (K₀ : Set K)) (S : Set K)

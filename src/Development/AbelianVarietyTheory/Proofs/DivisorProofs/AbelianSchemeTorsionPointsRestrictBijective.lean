@@ -78,8 +78,8 @@ theorem exists_section_of_point : ∀ (R : Type) [CommRing R] [HenselianLocalRin
   haveI := Fintype.ofFinite J
   let ε : J → B := fun i => e.symm (Pi.single i 1)
   have hεsum : ∑ i, ε i = 1 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [ε, ← map_sum, Finset.univ_sum_single]
+
+    simp only [ε, ← map_sum, Finset.univ_sum_single]
     exact map_one e.symm
   have hεid : ∀ i, IsIdempotentElem (ε i) := fun i => by
     show e.symm _ * e.symm _ = e.symm _
@@ -102,8 +102,8 @@ theorem exists_section_of_point : ∀ (R : Type) [CommRing R] [HenselianLocalRin
     by_contra h
     push_neg at h
     have := congrArg χ hεsum
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, h] at this
+
+    simp [map_sum, h] at this
   have hi1 : χ (ε i) = 1 := (IsIdempotentElem.iff_eq_zero_or_one.1 ((hεid i).map χ)).resolve_left hi
   haveI : IsLocalRing (T i) := inferInstance
   haveI : Module.Finite R (T i) := (hT' i).2

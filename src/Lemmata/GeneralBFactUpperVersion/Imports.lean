@@ -21,7 +21,7 @@ theorem goal1 :
     rw [map_sub, map_one, sub_eq_zero] at hP
     exact hP
   have h3 := congrArg (Ideal.Quotient.mk P) hs
-  set_option synthInstance.maxHeartbeats 100000 in
-    simpa [map_sum, map_pow, h2] using h3
+
+  simpa [map_sum, map_pow, h2] using h3
 
 end Bl.general_b_fact_upper_version

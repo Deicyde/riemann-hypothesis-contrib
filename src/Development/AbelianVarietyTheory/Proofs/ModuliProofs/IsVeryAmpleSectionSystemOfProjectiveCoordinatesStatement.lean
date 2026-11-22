@@ -16,6 +16,6 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.S
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 open GlobalTheory.ZV
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.isVeryAmpleSectionSystem_of_projectiveCoordinates : ∀ (K σ : Type) [Field K] [Finite σ] (I : Ideal (MvPolynomial σ K)) (Z : Scheme.{0}) (p : Z ⟶ Sp K) (M : LB Z) (th : σ → M.Sec), ProjRep I p M th → VAmp p M th := by
   first | exact @GlobalTheory.ZV.CoordEmbed.vAmp_of_projRep | exact GlobalTheory.ZV.CoordEmbed.vAmp_of_projRep | (intros; apply GlobalTheory.ZV.CoordEmbed.vAmp_of_projRep <;> assumption)

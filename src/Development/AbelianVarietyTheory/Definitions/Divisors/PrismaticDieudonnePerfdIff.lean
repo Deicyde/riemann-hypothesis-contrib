@@ -181,8 +181,8 @@ def ofPerfect (t : Fin G.height → G.Tate) (t' : Fin G.height → G.dual.Tate) 
     have h1 : ∑ k, P i k * P⁻¹ k j = if i = j then 1 else 0 := by
       have h2 := congrFun (congrFun P.mul_inv i) j
       rwa [Matrix.mul_apply, Matrix.one_apply] at h2
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, h, smul_smul, mul_comm (P⁻¹ _ j)]
+
+    simp only [map_sum, map_smul, h, smul_smul, mul_comm (P⁻¹ _ j)]
     rw [← Finset.sum_smul, h1]
     split_ifs <;> simp
 

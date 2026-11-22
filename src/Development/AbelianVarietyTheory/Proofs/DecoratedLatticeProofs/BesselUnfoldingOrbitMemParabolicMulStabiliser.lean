@@ -16,7 +16,7 @@ open GlobalTheory.FinPl
 
 noncomputable section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 namespace GlobalTheory.FinPl.OrbitCoset
 

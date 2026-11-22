@@ -258,8 +258,8 @@ theorem expandsG_pull (hG : GlobalFnsSt) {k : ℕ} {v : GroupSec U E k} {s : Fam
       (Eq.trans ?_ (sval_pullOver _ _ _ _ hJ).symm))
     rw [Category.assoc, whisker_snd]
   · refine (congrArg (termPull D.toPre E F k α) (e₂ α)).trans ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun i _ => (map_smulₛₗ _ _ _).trans (congrArg _ ?_)
     refine sec_ext' D.toPre.P.isLB fun y J hJ => (sval_pullOver _ _ _ _ hJ).trans ((sval_pullOver _ _ _ _ hJ).trans
       (Eq.trans ?_ (sval_pullOver _ _ _ _ hJ).symm))

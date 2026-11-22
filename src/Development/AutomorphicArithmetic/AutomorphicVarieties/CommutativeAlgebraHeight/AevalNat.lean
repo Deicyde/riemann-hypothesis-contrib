@@ -19,8 +19,8 @@ private theorem pol_homog (D : GDet n A G) (s : Finset G) : (pol D s).IsHomogene
   have h2 : D.toDet.poly (fun a : s => (MonoidAlgebra.single (a : G) 1 : MonoidAlgebra A G)) = pol D s := by
     change D.D _ (ofT A G _ _) = D.D _ _
     congr 1
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [Det.gen, map_sum, ofT_tmul]
+
+    simp [Det.gen, map_sum, ofT_tmul]
   rwa [h2] at h
 
 private theorem nat' (D : GDet n A G) {A' : Type} [CommRing A'] (f : A →+* A') {S S' : Type} [CommRing S]
@@ -34,8 +34,8 @@ private theorem pol_map (D : GDet n A G) {A' : Type} [CommRing A'] (f : A →+* 
     pol (D.map f) s = MvPolynomial.map f (pol D s) := by
   rw [pol, pol, ← nat' D f (MvPolynomial.map f) (by simp)]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum]
+
+  simp [map_sum]
 
 private theorem sum_single {S : Type} [CommRing S] (s : Finset G) (y : MonoidAlgebra S G)
     (hy : y.coeff.support ⊆ s) : ∑ a : s, MonoidAlgebra.single (a : G) (y.coeff a) = y := by
@@ -53,8 +53,8 @@ private theorem pol_eval (D : GDet n A G) (s : Finset G) {S : Type} [CommRing S]
   rw [pol, ← D.nat]
   congr 1
   conv_lhs => rw [← sum_single s y hy]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum]
+
+  simp [map_sum]
 
 private theorem aeval_nat {σ A' : Type} [CommRing A'] (f : A →+* A') {S S' : Type} [CommRing S]
     [Algebra A S] [CommRing S'] [Algebra A' S'] (φ : S →+* S')
@@ -126,8 +126,8 @@ private theorem lift_ex {S : Type} [CommRing S] [Algebra A S] (y : MonoidAlgebra
     rintro rfl
     exact h a.2
   · conv_rhs => rw [← sum_single _ y le_rfl]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum]
+
+    simp [map_sum]
 
 end
 

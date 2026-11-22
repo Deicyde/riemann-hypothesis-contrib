@@ -72,9 +72,9 @@ theorem core (g : Fin r → MvPolynomial (Fin n) R₀) (a : Fin n → Fin r → 
   have hs0 : ∀ l, r₀' (X (Sum.inl l) - X (Sum.inr l)) = 0 := fun l => by simp [r₀']
   have hrel : ∀ i, r₀' (rel g a i) = 0 := by
     intro i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [rel, map_add (f := _), map_sum, map_mul, hren, hs0, mul_zero, Finset.sum_const_zero,
-      add_zero, hg0]
+
+    simp only [rel, map_add (f := _), map_sum, map_mul, hren, hs0, mul_zero, Finset.sum_const_zero,
+    add_zero, hg0]
   have hKle : K ≤ RingHom.ker r₀' := Ideal.span_le.2 (by rintro _ ⟨i, rfl⟩; exact hrel i)
   let r₀ : (MvPolynomial (Fin n ⊕ Fin n) R₀ ⧸ K) →ₐ[R₀] MvPolynomial (Fin n) R₀ ⧸ J :=
     Ideal.Quotient.liftₐ K r₀' (fun x hx => hKle hx)
@@ -134,14 +134,14 @@ theorem core (g : Fin r → MvPolynomial (Fin n) R₀) (a : Fin n → Fin r → 
     have : Ideal.Quotient.mk K (rel g a i) = 0 :=
       Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.subset_span ⟨i, rfl⟩)
     rw [← this]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [rel, map_add (f := _), map_sum, map_mul, hφ, s]
+
+    simp only [rel, map_add (f := _), map_sum, map_mul, hφ, s]
   have key : ∀ j, G j ∈ L * JD := by
     intro j
     have e1 : φ (g j + ∑ i, pderiv i (g j) * ∑ k, a i k * g k) =
         G j + ∑ i, φ (pderiv i (g j)) * φ (∑ k, a i k * g k) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_add (f := _), map_sum]
+
+      rw [map_add (f := _), map_sum]
       simp only [map_mul, G]
     have hs : ∑ i, φ (pderiv i (g j)) * φ (∑ k, a i k * g k) +
         ∑ i, φ (pderiv i (g j)) * ∑ l, φ (tang g a i l) * s l = 0 := by
@@ -149,8 +149,8 @@ theorem core (g : Fin r → MvPolynomial (Fin n) R₀) (a : Fin n → Fin r → 
       exact Finset.sum_eq_zero fun i _ => by rw [← mul_add, hrelD i, mul_zero]
     have e3 : ∑ l, s l * φ (∑ i, pderiv i (g j) * tang g a i l) =
         ∑ i, φ (pderiv i (g j)) * ∑ l, φ (tang g a i l) * s l := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_mul, Finset.mul_sum]
+
+      simp only [map_sum, map_mul, Finset.mul_sum]
       rw [Finset.sum_comm]
       exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
     have eq : G j = φ (g j + ∑ i, pderiv i (g j) * ∑ k, a i k * g k) +

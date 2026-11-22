@@ -15,8 +15,8 @@ theorem antisymm_rename_sigmaCongrRight : ∀ (ι : Type) [Fintype ι] (m : ι �
   intro ι _ m Q w
   classical
   unfold antisymm
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.smul_sum]
+
+  rw [map_sum, Finset.smul_sum]
   refine Fintype.sum_equiv (Equiv.mulLeft w) _ _ (fun v => ?_)
   rw [map_zsmul, rename_rename, smul_smul]
   have hf : (⇑(Equiv.sigmaCongrRight w) ∘ fun x : Root m => (⟨x.1, v x.1 x.2⟩ : Root m)) =

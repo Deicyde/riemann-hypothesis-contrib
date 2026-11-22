@@ -15,7 +15,7 @@ open UpperTheory.V.HV (Coef)
 open UpperTheory.V.Z.J.D
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 
 section Abs
 variable {G X D Y : Type} [Group G] [AddCommGroup X] [Module ℂ X] [AddCommGroup D] [Module ℂ D] [AddCommGroup Y] [Module ℂ Y]
@@ -36,8 +36,8 @@ private theorem sum_zero {R : Representation ℂ G X} {Gi : Subgroup G} {τ : G 
     | mem a ha =>
       obtain ⟨x, rfl⟩ := ha
       have h1 := congrArg (R x) h
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_zero] at h1
+
+      rw [map_sum, map_zero] at h1
       rw [← h1]
       exact Finset.sum_congr rfl fun i _ => (hΦ i x x.2 _).symm
     | zero => simp
@@ -69,16 +69,16 @@ private theorem sum_ex {R : Representation ℂ G X} {Gi Gf : Subgroup G} {τ : G
   have hval : ∀ Φ ∈ eqv R Gi τ, (∀ v, Φ v ∈ σ) → ∀ v, Φ v ∈ N := fun Φ a1 a2 v =>
     ⟨fun i => b.repr v i • Φ, fun i => Submodule.smul_mem _ _ a1, fun i w => σ.smul_mem _ (a2 w), by
       conv_rhs => rw [← b.sum_repr v]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smul, LinearMap.smul_apply]⟩
+
+      simp only [map_sum, map_smul, LinearMap.smul_apply]⟩
   have hle : N ≤ σ := by
     rintro _ ⟨A, -, a2, rfl⟩
     exact Submodule.sum_mem _ fun i _ => a2 i _
   have hN : ∀ g, ∀ φ ∈ N, R g φ ∈ N := by
     rintro g _ ⟨A, a1, a2, rfl⟩
     obtain ⟨k, hk, x, hx, rfl⟩ := hsp g
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Submodule.sum_mem _ fun i _ => ?_
     rw [map_mul, Module.End.mul_apply, a1 i x hx]
     refine hval (R k ∘ₗ A i) (fun y hy v => ?_) (fun v => hst _ _ (a2 i v)) _

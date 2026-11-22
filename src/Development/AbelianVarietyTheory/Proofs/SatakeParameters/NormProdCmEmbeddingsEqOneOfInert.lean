@@ -365,7 +365,7 @@ open scoped Pointwise
 variable {D : D7}
 
 
-set_option maxHeartbeats 400000 in
+
 theorem frobOut_of_inertK {p : ℕ} [hp : Fact p.Prime] (hp2 : p ≠ 2) (hI : Formalism.MainNotions.GL3Theta.InertK D p) : FrobOut D p := by
   classical
   let G := 𝓞 D.host.E ≃ₐ[ℤ] 𝓞 D.host.E

@@ -54,8 +54,8 @@ theorem exists_forms_of_linear {k R A : Type*} [Field k] [CommRing R] [AddCommGr
     rw [h3]
     exact hwd _ _ (hpre _)
   rw [← h2]
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_rhs => rw [h1, map_sum]
+
+  conv_rhs => rw [h1, map_sum]
   exact Finset.sum_congr rfl fun j _ => by rw [map_smul, hsm]
 
 section Quad
@@ -69,8 +69,8 @@ theorem formCoord_mul_of_quadIdentity {φ₁ φ₂ φ₃ φ₄ : Fin i → K} (h
       (∑ j, C (φ₃ j) * X j) * (∑ j, C (φ₄ j) * X j) := by
     refine MvPolynomial.funext fun x => ?_
     have := h x
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [dotProduct, map_sum] using this
+
+    simpa [dotProduct, map_sum] using this
   simp only [formCoord, AddMonoidHom.mk'_apply, ← map_mul, hp]
 
 theorem graphMap_secondForm {F' : HermLattice K i} (b' : Module.Basis T ℤ (dualLattice F')) (a : T → ℤ) (d : T → ℤ) :
@@ -201,8 +201,8 @@ theorem chartScale_mul_first (ω : 𝓞 K) {c : T → ℤ}
 
 theorem chartMap_firstForm_mul (e : T → ℤ) :
     excChartMap b' a v u (graphFirstForm fun s => e s * a s) = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [graphFirstForm, map_sum]
+
+  rw [graphFirstForm, map_sum]
   refine Finset.sum_eq_zero fun s _ => ?_
   rw [C_mul, mul_assoc, map_mul (excChartMap b' a v u), first_eq_zero, mul_zero]
 

@@ -172,9 +172,9 @@ theorem assemble_bijective : Function.Bijective (OnePlusPowerCharacters.assemble
      Matrix.mulVec_surjective_iff_isUnit.2 ((Matrix.isUnit_iff_isUnit_det T).2 (hdet ▸ isUnit_one))⟩
   have e : OnePlusPowerCharacters.assemble k l = assembleX k l ∘ T.mulVec := by
     funext y
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Function.comp, OnePlusPowerCharacters.assemble, assembleX, Matrix.mulVec, dotProduct, map_sum, map_mul, T,
-      Matrix.of_apply, map_natCast, Finset.mul_sum]
+
+    simp only [Function.comp, OnePlusPowerCharacters.assemble, assembleX, Matrix.mulVec, dotProduct, map_sum, map_mul, T,
+    Matrix.of_apply, map_natCast, Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun j _ => ?_
     simp only [← mul_assoc]

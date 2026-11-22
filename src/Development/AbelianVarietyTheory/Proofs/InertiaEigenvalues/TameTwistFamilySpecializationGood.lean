@@ -15,8 +15,8 @@ open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 noncomputable section
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 400000
+
+
 
 namespace GlobalTheory.ExportSeries.SpecGood
 
@@ -54,8 +54,8 @@ theorem idemAt_mul_idem {Q : Finset (Pl D.host.E)} (h : SplitSet Q) {P : Pl D.ho
 
 theorem idemAt_mul_conj_idem {Q : Finset (Pl D.host.E)} (h : SplitSet Q) {P : Pl D.host.E} (hP : P ∈ Q) :
     idemAt P * cA D (idem Q) = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [idem, map_sum, Finset.mul_sum]
+
+  rw [idem, map_sum, Finset.mul_sum]
   exact Finset.sum_eq_zero fun j hj => h.mul_conj hP hj
 
 theorem delQ_eq_one {u : UnivTwist D C} {Q : Finset (Pl D.host.E)} {x : (AE D)ˣ} (hx : ∀ P ∈ Q, u.del P x = 1) :

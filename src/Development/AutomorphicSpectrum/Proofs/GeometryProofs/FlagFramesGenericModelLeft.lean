@@ -61,8 +61,8 @@ theorem pull_isFlagVB_genB : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : S
       ext j l
       simp only [Matrix.of_apply, Matrix.smul_apply, Matrix.mul_apply, A, Cm, A₀, Matrix.map_apply, smul_eq_mul,
         Finset.mul_sum]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hC l, map_sum, map_sum]
+
+      rw [hC l, map_sum, map_sum]
       refine Finset.sum_congr rfl fun b _ => ?_
       simp only [map_smul, smul_eq_mul, a, ← map_mul]
       congr 1
@@ -92,8 +92,8 @@ theorem pull_isFlagVB_genB : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : S
     simp only [genB, G, Matrix.mul_apply, Cm, Matrix.of_apply, Finset.sum_smul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun l _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hC l, map_sum, Finset.smul_sum]
+
+    rw [hC l, map_sum, Finset.smul_sum]
     refine Finset.sum_congr rfl fun b _ => ?_
     have h1 : TensorProduct.mk Ω (GenField Ω r) E 1 (C l b • β₀ b) = ι (C l b) • β b := hext.1 (C l b) (β₀ b)
     rw [h1, smul_smul, mul_comm]

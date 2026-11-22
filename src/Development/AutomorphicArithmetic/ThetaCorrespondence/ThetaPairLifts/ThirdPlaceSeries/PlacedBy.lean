@@ -13,7 +13,7 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
@@ -51,11 +51,11 @@ structure PlacedByLocalGroups (f : _root_.GlobalTheory.Fam.FamilyCharacter W u) 
   pin : GPin G
   read : _root_.GlobalTheory.Fam.LocalGroupReading f G pl
   bot : _root_.GlobalTheory.MiTop.LocalBottomCompatibility f B v o G
-set_option maxHeartbeats 1000000 in
+
 def frameAtTranslate (f : _root_.GlobalTheory.Fam.FamilyCharacter W u) (B : SBes W.S.X W.Q.instEq u W.Q.Rl.ψ (D.sp.X 0)) (a₀ a : GA D (D.sp.X 0)) :
     GL (Fin (D.sp.Y 0).rank) (Lev.EAf D) :=
   finE (D.sp.Y 0) (_root_.GlobalTheory.MiTop.translationElement f B a₀ a) * (show GL (Fin (D.sp.Y 0).rank) (Lev.EAf D) from (_root_.GlobalTheory.Fam.pk_z W).βY 0)
-set_option maxHeartbeats 1000000 in
+
 def StabiliserCondition (f : _root_.GlobalTheory.Fam.FamilyCharacter W u) (B : SBes W.S.X W.Q.instEq u W.Q.Rl.ψ (D.sp.X 0)) (a₀ a : GA D (D.sp.X 0)) : Prop :=
   ∀ κ : GA D (D.sp.Y 0), (κ ∈ GfC (D.sp.Y 0) ∧ finE (D.sp.Y 0) κ ∈ Formalism.L2.DIV.St (_root_.GlobalTheory.LevZero.frameAtTranslate f B a₀ a)) ↔
     ((iotaX W.S.X W.Q.instEq κ).1 = 1 ∧ (iotaX W.S.X W.Q.instEq κ).2 ∈ W.S.X.B.I.Kset)

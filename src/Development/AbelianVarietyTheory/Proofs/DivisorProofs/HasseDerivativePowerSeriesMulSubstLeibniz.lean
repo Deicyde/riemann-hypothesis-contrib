@@ -48,11 +48,11 @@ theorem hasse_mul (l : ℕ) (φ ψ : PowerSeries R) :
       Finset.Nat.sum_antidiagonal_eq_sum_range_succ
         (fun i j => hasseDeriv i f * hasseDeriv j g) l]
     simp only [hasse_coe]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← Polynomial.coeToPowerSeries.ringHom_apply, map_sum]
+
+    rw [← Polynomial.coeToPowerSeries.ringHom_apply, map_sum]
     simp [Polynomial.coeToPowerSeries.ringHom_apply, Polynomial.coe_mul]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [coeff_hasse_congr (φ' := (f : PowerSeries R) * (g : PowerSeries R)), hpoly, map_sum, map_sum]
+
+  rw [coeff_hasse_congr (φ' := (f : PowerSeries R) * (g : PowerSeries R)), hpoly, map_sum, map_sum]
   · refine Finset.sum_congr rfl fun p hp => ?_
     have hpl : p ≤ l := Nat.lt_succ_iff.mp (Finset.mem_range.mp hp)
     apply coeff_mul_congr
@@ -74,8 +74,8 @@ theorem hasse_mul_subst :
           ((GlobalTheory.PicDiv.hasse p φ).subst a : PowerSeries k) * (GlobalTheory.PicDiv.hasse (l - p) ψ).subst a := by
   intro k _ a φ ψ l ha
   have hs : PowerSeries.HasSubst a := PowerSeries.HasSubst.of_constantCoeff_zero' ha
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [GlobalTheory.PicDiv.hasse_mul, ← PowerSeries.coe_substAlgHom hs, map_sum]
+
+  rw [GlobalTheory.PicDiv.hasse_mul, ← PowerSeries.coe_substAlgHom hs, map_sum]
   refine Finset.sum_congr rfl fun p _ => ?_
   rw [map_mul]
 

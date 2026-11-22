@@ -15,7 +15,7 @@ open GlobalTheory.AnPer
 namespace GlobalTheory.AnPer
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_points_on_DObj : ∀ {I : Type} [Fintype I] {g : ℕ} {Λ : Type} [AddCommGroup Λ] {F : Fam I g Λ} {F₀ : Fam Empty g Λ} (K : Charts F) (K₀ : Charts F₀) {R : Type} [CommRing R] [Algebra ℂ R] (et : Hol F₀.V →ₐ[ℂ] R) (M : Ideal R) (θ : Hol F.V →+* R) (ka : K₀.K → K.K) (hka : ∀ {l k' k}, K₀.le l k' k → K.le l (ka k') (ka k)) (ρ : ∀ k, Hol (K.W (ka k)) →+* R ⊗[ℂ] Hol (K₀.W k)), (∀ k f, ρ k (K.cst (ka k) f) = θ f ⊗ₜ[ℂ] 1) →
     (∀ k a h, ρ k (dw (W := K.W (ka k)) a h) =
       LinearMap.lTensor R (dw (W := K₀.W k) a).toLinearMap (ρ k h)) →

@@ -102,8 +102,8 @@ theorem hat_le_std {D : D7} (S T : HSp D) {A : Submodule (𝓞 D.host.E) (Fin S.
   exact ⟨α, hα, x, Submodule.smul_le_right hx, rfl⟩
 
 
-set_option maxHeartbeats 800000 in
-set_option synthInstance.maxHeartbeats 200000 in
+
+
 theorem act_le_std (D : D7) (S T : HSp D) (g : GA D T) : ∃ N : ℕ, 0 < N ∧
     ∀ u ∈ GlobalTheory.AdForm.stdHom S T, N • actO S T 1 g u ∈ GlobalTheory.AdForm.stdHom S T := by
   obtain ⟨M, hM, hden⟩ := GlobalTheory.PlaceDatum.exists_den_latO (S := S) (T := T)
@@ -120,19 +120,19 @@ theorem act_le_std (D : D7) (S T : HSp D) (g : GA D T) : ∃ N : ℕ, 0 < N ∧
     rw [h1, Matrix.mul_one, Matrix.mul_apply]
   rw [mul_smul]
   refine hKm _ (Matrix.ext fun i j => ?_) fun i j => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    · have hz : ∑ k, (infPart D) (mt T g i k * u k j) = 0 := by
-        apply Finset.sum_eq_zero
-        intro k _
-        rw [RingHom.map_mul, GlobalTheory.LatVac.infPart_of_mem hu k j, mul_zero]
-      rw [Matrix.map_apply, Matrix.smul_apply, nsmul_eq_mul, RingHom.map_mul, hact, map_sum, hz,
-        mul_zero, Matrix.zero_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [Matrix.smul_apply, nsmul_eq_mul, RingHom.map_mul, map_natCast, hact, map_sum, Finset.mul_sum]
-      refine sum_mem fun k _ => ?_
-      have h3 := mul_mem (h' i k) (hden u hu k j)
-      rw [Matrix.map_apply, mul_mul_mul_comm, ← Nat.cast_mul, ← RingHom.map_mul] at h3
-      exact h3
+
+  · have hz : ∑ k, (infPart D) (mt T g i k * u k j) = 0 := by
+      apply Finset.sum_eq_zero
+      intro k _
+      rw [RingHom.map_mul, GlobalTheory.LatVac.infPart_of_mem hu k j, mul_zero]
+    rw [Matrix.map_apply, Matrix.smul_apply, nsmul_eq_mul, RingHom.map_mul, hact, map_sum, hz,
+      mul_zero, Matrix.zero_apply]
+
+  · rw [Matrix.smul_apply, nsmul_eq_mul, RingHom.map_mul, map_natCast, hact, map_sum, Finset.mul_sum]
+    refine sum_mem fun k _ => ?_
+    have h3 := mul_mem (h' i k) (hden u hu k j)
+    rw [Matrix.map_apply, mul_mul_mul_comm, ← Nat.cast_mul, ← RingHom.map_mul] at h3
+    exact h3
 
 end GlobalTheory.AnnSum
 
@@ -168,8 +168,8 @@ theorem nsmul_smul_comm' {m n : ℕ} (k : ℕ) (c : AE D) (v : Mx D m n) : k •
   ring
 
 
-set_option maxHeartbeats 1000000 in
-set_option synthInstance.maxHeartbeats 200000 in
+
+
 theorem ann_sum_gen (ψ : AddChar (AF D.host.F) ℂ) (hψ : IsStdChar D ψ (-1)) (S T : HSp D)
     (Q : Finset (Formalism.L2.DIV.Pl D.host.E)) (e : AE D) (he : IsIdemSum e Q) (g : GA D T) (Mh : AddSubgroup (WO S T))
     (NA NB NC : ℕ) (hNA : 0 < NA) (hNB : 0 < NB) (hNC : 0 < NC)

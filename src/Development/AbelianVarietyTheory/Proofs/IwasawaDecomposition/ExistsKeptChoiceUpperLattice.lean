@@ -15,7 +15,7 @@ open GlobalTheory.HeightCounting GlobalTheory.Mem.R3.Tr
 
 noncomputable section
 namespace GlobalTheory.LayerMove
-set_option maxHeartbeats 4000000
+
 
 theorem tupTied_ext {D : D7} {cf : CharFrame D} {C : NChoice D} {p q : TupTied D cf C} (h1 : p.xi = q.xi) (h2 : p.psi = q.psi) :
     p = q := by

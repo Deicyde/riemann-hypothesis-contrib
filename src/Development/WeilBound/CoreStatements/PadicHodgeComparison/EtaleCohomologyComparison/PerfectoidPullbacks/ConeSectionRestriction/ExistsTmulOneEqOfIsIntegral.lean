@@ -74,9 +74,9 @@ theorem exists_away_isDomain_of_etale {P A : Type} [CommRing P] [IsDomain P] [Is
     have h1 : (∑ i, a i) = 1 := by
       apply hι
       simp only
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [TensorProduct.sum_tmul, Finset.sum_congr rfl (fun i _ => ha i), ← map_sum,
-        Finset.univ_sum_single]
+
+      rw [TensorProduct.sum_tmul, Finset.sum_congr rfl (fun i _ => ha i), ← map_sum,
+      Finset.univ_sum_single]
       exact map_one φ.symm
     exact (Ideal.IsPrime.ne_top inferInstance) ((Ideal.eq_top_iff_one q).2 (h1 ▸ hsum))
   refine ⟨a i₀, hi₀, ?_⟩

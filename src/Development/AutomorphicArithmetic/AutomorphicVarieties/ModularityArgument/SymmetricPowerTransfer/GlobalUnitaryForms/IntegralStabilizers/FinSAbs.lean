@@ -124,8 +124,8 @@ private theorem short_lattice (Λ : Type) [Ring Λ] [IsDomain Λ] [Module.Free �
     have e : b.repr ((AddMonoidHom.mulLeft y).toIntLinearMap (b l)) k = ∑ i, g i * T i k l := by
       show b.repr (y * b l) k = _
       rw [hy, Finset.sum_mul]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [smul_mul_assoc, map_sum, map_zsmul, T]
+
+      simp only [smul_mul_assoc, map_sum, map_zsmul, T]
       change (Finsupp.applyAddHom k) (∑ i, g i • b.repr (b i * b l)) = _
       rw [map_sum]
       simp only [Finsupp.applyAddHom_apply, Finsupp.smul_apply, smul_eq_mul]

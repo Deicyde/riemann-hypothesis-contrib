@@ -37,7 +37,7 @@ theorem mul_e (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k
   · left; rw [← q.sec_pr, h, map_zero]
   · right; rw [← q.sec_pr, h, e_eq]
 
-set_option maxHeartbeats 1600000 in
+
 theorem cases (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
     (q : GlobalTheory.FinPl.SplitPt D k) (e' : Formalism.L2.Theta.AE D) (he' : IsSplitIdem D e') {m n : ℕ} (u : Mx D m n)
     (hsupp : ∀ i j, (q.e + cA D q.e) * u i j = u i j) (hu : IsHalf e' u) :

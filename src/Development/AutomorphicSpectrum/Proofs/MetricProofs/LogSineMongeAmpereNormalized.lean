@@ -174,9 +174,9 @@ theorem fibre_integral_normal : GroundTheory.Heights₂.Heights.Inter.FibreLocal
   have hpush : pushMomentPoly k = -(∑ i, X i ^ 2) ^ (k - 1) := by
     have h2 := h.2.2.2.1 k hk (MvPolynomial (Fin 3) ℝ) X
     rwa [aeval_X_left_apply] at h2
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_congr rfl hword, ← Finset.mul_sum, ← Finset.mul_sum, ← map_sum,
-    DiagFibreMoment.sum_diagWordMomentPoly, hfib]
+
+  rw [Finset.sum_congr rfl hword, ← Finset.mul_sum, ← Finset.mul_sum, ← map_sum,
+  DiagFibreMoment.sum_diagWordMomentPoly, hfib]
   simp_rw [hY]
   rw [integral_const_mul, GlobalTheory.T.sphere_moment_power]
   have hp : (-(2 * (k : ℝ) - 1)) * ℓ (momentPoly sphereMeasure (fun _ => 1) (dotPoly (id : S2 → S2) ^ (2 * k - 2))) =

@@ -18,8 +18,8 @@ variable {p : ℕ} [Fact p.Prime] (X : Sys p) (Y : Pend X)
 
 theorem en_PhAt_const (hbe : BeProp p Y.be) (j : ℕ) (v : X.Pl) : MvPowerSeries.constantCoeff (Y.PhAt j v) = 0 := by
   unfold Pend.PhAt
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   exact Finset.sum_eq_zero fun e _ => by rw [substitution_of_variables]; exact th_ren_const _ (th_be_const hbe)
 
 theorem kernel_product_form (D : Formalism.BasicNotions.D7) : KernelProductForm X Y D := by
@@ -52,8 +52,8 @@ theorem kernel_product_form (D : Formalism.BasicNotions.D7) : KernelProductForm 
       have a1 : expK (∑ v, (-Y.PhAt j v) + -(Ph - ∑ v, Y.PhAt j v)) =
           expK (∑ v, (-Y.PhAt j v)) * expK (-(Ph - ∑ v, Y.PhAt j v)) :=
         expK_add (by
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_sum]
+
+          rw [map_sum]
           exact Finset.sum_eq_zero fun v _ => by rw [map_neg, en_PhAt_const X Y hbe, neg_zero])
           (by rw [map_neg, hc0, neg_zero])
       have a2 : expK (∑ v, (-Y.PhAt j v)) = ∏ v, expK (-Y.PhAt j v) :=

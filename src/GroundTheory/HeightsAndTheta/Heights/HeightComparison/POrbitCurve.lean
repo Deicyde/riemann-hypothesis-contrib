@@ -26,8 +26,8 @@ omit [Fintype ι] in
 theorem isWeightedHomogeneous_mConeMap (x : Cone n (AlgebraicClosure ℚ))
     {f : MvPolynomial (Coord n) ℤ} {b : ι → ℕ} (hf : IsWeightedHomogeneous (coordDeg n) f b) :
     IsWeightedHomogeneous (tDeg ι) (Geo.mConeMap (ι := blockIdx n) (flatCone x) f) b := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [f.as_sum, map_sum]
+
+  rw [f.as_sum, map_sum]
   refine IsWeightedHomogeneous.sum _ _ _ fun m hm ↦ ?_
   rw [Geo.mConeMap, aeval_monomial, Finsupp.prod, MvPolynomial.algebraMap_apply]
   have hb : b = 0 + ∑ p ∈ m.support, m p • tDeg ι p.1 := by
@@ -46,9 +46,9 @@ theorem mConeMap_weightedHomogeneousComponent (x : Cone n (AlgebraicClosure ℚ)
     Geo.mConeMap (ι := blockIdx n) (flatCone x) (weightedHomogeneousComponent (coordDeg n) b f) =
       weightedHomogeneousComponent (tDeg ι) b (Geo.mConeMap (ι := blockIdx n) (flatCone x) f) := by
   classical
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_rhs => rw [← sum_weightedHomogeneousComponent (w := coordDeg n) f,
-    finsum_eq_sum _ (weightedHomogeneousComponent_finsupp f), map_sum, map_sum]
+
+  conv_rhs => rw [← sum_weightedHomogeneousComponent (w := coordDeg n) f,
+  finsum_eq_sum _ (weightedHomogeneousComponent_finsupp f), map_sum, map_sum]
   have hom : ∀ a, IsWeightedHomogeneous (tDeg ι)
       (Geo.mConeMap (ι := blockIdx n) (flatCone x) (weightedHomogeneousComponent (coordDeg n) a f)) a :=
     fun a ↦ isWeightedHomogeneous_mConeMap x (weightedHomogeneousComponent_isWeightedHomogeneous a f)

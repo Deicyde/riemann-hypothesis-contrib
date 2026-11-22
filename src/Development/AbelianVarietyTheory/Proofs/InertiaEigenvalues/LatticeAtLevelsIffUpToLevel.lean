@@ -752,7 +752,7 @@ theorem pt_iff (τ : ↥K.1 →ₐ[ℚ_[l]] ↥LL.1) :
   exact congrArg τs (Subtype.ext hxy.symm)
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem mid_iff (ht : LocTied l P AI) (hT : IsCrys (P.PD K) T.ρ) (τ : ↥K.1 →ₐ[ℚ_[l]] ↥LL.1)
     (hpt : GlobalTheory.NL.Pt H h i ζ τ) : SpanAt (H.W K s LL h) T i ζ τ ↔ CoeffAt (H.W K s LL h) T i ζ τ := by
   have hl : l.Prime := Fact.out
@@ -774,7 +774,7 @@ def UpToLevel : Prop :=
     (∀ τ : ↥(Ks K s) →ₐ[ℚ_[l]] ↥LL.1, H.IsPt h i ζ τ → SpanAt (H.W K s LL h) T i ζ (resEmb h τ))
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem upToLevel_iff (ht : LocTied l P AI) (hT : IsCrys (P.PD K) T.ρ) :
     p4 (H.W K s LL h) (GlobalTheory.NL.Pt H h) T ↔ UpToLevel H h T := by
   haveI : CharZero ↥LL.1 := algebraRat.charZero _
@@ -786,7 +786,7 @@ theorem upToLevel_iff (ht : LocTied l P AI) (hT : IsCrys (P.PD K) T.ρ) :
   exact g τs h1
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem latticeAtLevels_iff_upToLevel {F : LocFon l P AI H} (C : LocCmpT l P AI H F) :
     LatticeAtLevels l P AI H F C ↔ ∀ (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL)
       (T : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL)), IsCrys (P.PD K) T.ρ → UpToLevel H h T := by

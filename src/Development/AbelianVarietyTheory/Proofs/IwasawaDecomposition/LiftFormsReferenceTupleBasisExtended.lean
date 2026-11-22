@@ -63,8 +63,8 @@ theorem gsdbc_lift_li (b : GSDBC ι S S') {κ : Type} [Fintype κ] (v : Module.B
     apply S.bV.ext_elem
     intro i
     have h0 := congrArg (fun x : S'.EqFun => b.bas.repr ((x : S'.D → S'.V) (b.eD.symm d)) i) hc
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Submodule.coe_sum, Finset.sum_apply, map_sum, Finsupp.finsetSum_apply] at h0
+
+    rw [Submodule.coe_sum, Finset.sum_apply, map_sum, Finsupp.finsetSum_apply] at h0
     simp only [Submodule.coe_smul, Pi.smul_apply, map_smul, Finsupp.smul_apply, GSDBC.lift_apply, GSDBC.repr_j,
       Equiv.apply_symm_apply, smul_eq_mul, Submodule.coe_zero, Pi.zero_apply, map_zero, Finsupp.zero_apply] at h0
     have h1 : (∑ k, S.bV.repr ((v k : S.D → S.V) d) i • c k) = 0 := by
@@ -72,11 +72,11 @@ theorem gsdbc_lift_li (b : GSDBC ι S S') {κ : Type} [Fintype κ] (v : Module.B
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [Algebra.smul_def, RingHom.algebraMap_toAlgebra, mul_comm]
     have h2 := congrArg (fun x => e.repr x m) h1
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, Finsupp.finsetSum_apply, Finsupp.smul_apply, smul_eq_mul, map_zero,
-      Finsupp.zero_apply] at h2
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Submodule.coe_sum, Finset.sum_apply, map_sum, Finsupp.finsetSum_apply]
+
+    simp only [map_sum, map_smul, Finsupp.finsetSum_apply, Finsupp.smul_apply, smul_eq_mul, map_zero,
+    Finsupp.zero_apply] at h2
+
+    rw [Submodule.coe_sum, Finset.sum_apply, map_sum, Finsupp.finsetSum_apply]
     simp only [Submodule.coe_smul, Pi.smul_apply, map_smul, Finsupp.smul_apply, smul_eq_mul, Submodule.coe_zero,
       Pi.zero_apply, map_zero, Finsupp.zero_apply]
     rw [← h2]
@@ -104,7 +104,7 @@ end LiftBasis
 end GlobalTheory.Mem.R3.DefLatBC
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem GlobalTheory.Mem.R3.DefLatBC.lift_basis_ext : GlobalTheory.Published.DiscreteSeriesCover → GlobalTheory.Published.HarishChandraModules → GlobalTheory.Published.CuspRapidDecay → GlobalTheory.Published.CasselmanWallach → GlobalTheory.Published.WeilRepresentationUnitaryPair → GlobalTheory.Published.DiscreteSeriesExists → GlobalTheory.Published.HarishChandraFinite → (StepW Pinned fun K B' f' T' w' => ∀ (B : Base) (f : Fr B.toPre) (T : TwDat B) (w : ColW B f T), Enl0 B B' →
   HEq f' f → Pinned K B f T w → HEq w'.px w.px → ∀ (Z : w.Lt) (hX : B.fields.Ok) (Wt : Set B.places.Pl)
     (z : Dat (w.st Z) w.I hX T Wt), GrpTrue Z.N f → GrpAt (w.st Z) w.I → Fine z → HoldsL z.R z.F →

@@ -49,8 +49,8 @@ theorem FBChart.rawCol_sg (v : Fin dd → C) : Y.rawCol.sg v = un1 (Y.sgP v) := 
   show -∑ i, v i * MvPowerSeries.coeff (μ.mapDomain (fun x : Fin dd => ((0 : Fin 2), x)) +
       Finsupp.single ((1 : Fin 2), i) 1) Y.h =
     MvPowerSeries.coeff (μ.mapDomain fun x : Fin dd => ((0 : Fin 1), x)) (Y.sgP v)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [FBChart.sgP, map_neg, map_sum, MvPowerSeries.coeff_C_mul, coeff_eval_second_zero]
+
+  simp only [FBChart.sgP, map_neg, map_sum, MvPowerSeries.coeff_C_mul, coeff_eval_second_zero]
   congr 1
   refine Finset.sum_congr rfl fun i _ => ?_
   congr 1
@@ -185,14 +185,14 @@ theorem coeff_inCol_sg (c : Fin 2) (v : Fin 2 × Fin dd → C) (μ : Fin 2 × Fi
 theorem FBChart.rawSelf_sg (v : Fin 2 × Fin dd → C) :
     (Y.rawSelf p).sg v = ∑ c, inCol c (Y.rawCol.sg fun i => v (c, i)) := by
   ext μ
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   simp only [coeff_inCol_sg, Finset.sum_neg_distrib]
   show -∑ x, v x * MvPowerSeries.coeff (μ.mapDomain (fun x : Fin 2 × Fin dd => ((0 : Fin 2), x)) +
       Finsupp.single ((1 : Fin 2), x) 1) (∑ col, hCol col Y.h) = _
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, Finset.mul_sum]
+
+  simp only [map_sum, Finset.mul_sum]
   exact Finset.sum_comm
 
 theorem addCvSelf_of (hG : GermIAllSt) : AddCvSelfSt := by
@@ -209,8 +209,8 @@ theorem addCvSelf_of (hG : GermIAllSt) : AddCvSelfSt := by
     intro δ hδ f
     have hS := hasSubst_of_constantCoeff_zero fun x => (hδ x).1
     unfold alongCv
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← MvPowerSeries.coe_substAlgHom hS, map_sum, MvPowerSeries.coe_substAlgHom hS]
+
+    rw [← MvPowerSeries.coe_substAlgHom hS, map_sum, MvPowerSeries.coe_substAlgHom hS]
     exact Finset.sum_congr rfl fun c _ => along δ hδ c (f c)
   refine ⟨fun x => G x.1 x.2, hcv, ?_, ?_⟩
   · rintro ⟨c, i⟩

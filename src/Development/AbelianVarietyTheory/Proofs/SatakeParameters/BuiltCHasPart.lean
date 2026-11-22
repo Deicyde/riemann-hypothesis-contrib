@@ -6,7 +6,7 @@ public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.HasPar
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
+
 
 noncomputable section
 

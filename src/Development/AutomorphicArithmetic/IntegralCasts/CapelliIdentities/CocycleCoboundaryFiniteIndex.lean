@@ -36,9 +36,9 @@ theorem UpperTheory.Reformulated.B.CocycleCoboundaryFiniteIndex.coboundary_of_va
     calc ∑ x, F x = ∑ x, F (g • x) := (Equiv.sum_comp (MulAction.toPerm g) F).symm
       _ = ∑ x : Q ⧸ H, (f g + π g (F x)) := Finset.sum_congr rfl fun x _ => hstep g x
       _ = _ := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ, hcard, map_sum,
-          Nat.cast_smul_eq_nsmul]
+
+        rw [Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ, hcard, map_sum,
+        Nat.cast_smul_eq_nsmul]
   obtain ⟨c, hc⟩ := hu.exists_left_inv
   refine ⟨-(c • ∑ x, F x), fun g => ?_⟩
   have h3 : (H.index : R) • f g = ∑ x, F x - π g (∑ x, F x) := eq_sub_of_add_eq (hsum g).symm

@@ -64,8 +64,8 @@ variable {K : Type} [Field K] {d : ℕ} [NeZero d]
 lemma sum_odd (hd : Even d) (σ : K →+* K) {c : K} (hc : σ^[d] c = c) :
     (∑ s : ZMod d, if s.val % 2 = 0 then 0 else σ^[s.val] c) =
       σ (∑ s : ZMod d, if s.val % 2 = 0 then σ^[s.val] c else 0) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Fintype.sum_equiv (Equiv.subRight (1 : ZMod d)) _ _ ?_
   intro s
   simp only [Equiv.subRight_apply]
@@ -175,8 +175,8 @@ lemma comb_zXY [Fintype ι] [DecidableEq ι] (hd : Even d) (l : ℕ) (σ : K →
     (∑ s : ZMod d, C (pXY σ om oms x s) * zXY l σ om oms s) = at1 x (lgF K l) := by
   simp only [zXY_eq, Finset.mul_sum, ← mul_assoc, ← map_mul]
   rw [Finset.sum_comm]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [← Finset.sum_mul, ← map_sum, dual1 hd σ hfix hT]
+
+  simp only [← Finset.sum_mul, ← map_sum, dual1 hd σ hfix hT]
   simp
 
 lemma comb_back [Fintype ι] [DecidableEq ι] (hd : Even d) (σ : K →+* K) {om oms : ι → K}
@@ -185,16 +185,16 @@ lemma comb_back [Fintype ι] [DecidableEq ι] (hd : Even d) (σ : K →+* K) {om
     (∑ x : Bool × ι, C (mXY σ om oms j x) * ∑ s : ZMod d, C (pXY σ om oms x s) * L s) = L j := by
   simp only [Finset.mul_sum, ← mul_assoc, ← map_mul]
   rw [Finset.sum_comm]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [← Finset.sum_mul, ← map_sum, dual2 hd σ hfix hT]
+
+  simp only [← Finset.sum_mul, ← map_sum, dual2 hd σ hfix hT]
   simp
 
 lemma subst_comb {α τ κ : Type} [Fintype α] {φ : τ → MvPowerSeries κ K} (hφ : HasSubst φ)
     (c : α → K) (L : α → MvPowerSeries τ K) :
     subst φ (∑ s, C (c s) * L s) = ∑ s, C (c s) * subst φ (L s) := by
   simp only [← MvPowerSeries.smul_eq_C_mul]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← MvPowerSeries.coe_substAlgHom hφ, map_sum]
+
+  rw [← MvPowerSeries.coe_substAlgHom hφ, map_sum]
   simp only [map_smul]
 
 lemma subst_linE' {τ : Type} (σ : K →+* K) (om oms : ι → K) (r : ι)
@@ -391,7 +391,7 @@ lemma keep_zXY {l d : ℕ} [NeZero d] {ι : Type} [Fintype ι] (σ : K →+* K) 
     simp only [not_forall] at h
     obtain ⟨x, hx, hPx⟩ := h
     unfold zXY
-    set_option synthInstance.maxHeartbeats 100000 in
+
     split_ifs with hj
     · rw [map_sum]
       refine Finset.sum_eq_zero fun r _ => ?_
@@ -457,9 +457,9 @@ lemma zXY_shift [CharZero K] [Fintype ι] {l : ℕ} (hl : l.Prime) (hd : Even d)
     fun x => artin_hasse_log_frobenius_shift hl (σ.comp σ) x
   simp only [frobVar_eq_expand hq] at hA ⊢
   rw [zXY_eq l σ om oms s, zXY_eq l σ om oms (s - 2)]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, MvPowerSeries.map_C, RingHom.coe_comp, Function.comp_apply,
-    mXY_shift hd σ hfix, MvPowerSeries.expand_C]
+
+  simp only [map_sum, map_mul, MvPowerSeries.map_C, RingHom.coe_comp, Function.comp_apply,
+  mXY_shift hd σ hfix, MvPowerSeries.expand_C]
   rw [Finset.mul_sum, ← Finset.sum_sub_distrib]
   refine Finset.sum_congr rfl fun x _ => ?_
   rw [← hA x]
@@ -495,8 +495,8 @@ lemma shiftType_zXY [IsUltrametricDist K] [CharZero K] [Fintype ι] {l : ℕ} (h
   refine ⟨cc_zXY hl.two_le σ om oms s, ?_⟩
   rw [zXY_shift hl hd σ hO.2 s]
   intro n
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg zero_le_one fun x _ => ?_
   rw [MvPowerSeries.coeff_C_mul, MvPowerSeries.coeff_X, norm_mul]
   split_ifs <;> simp [norm_mXY hσ hO.1 s x]
@@ -602,8 +602,8 @@ theorem BMinus1_of' (hE : ExpSpec) : BMinus1 := by
   have hXiS : HasSubst Xi := hasSubst_of_constantCoeff_zero hXi0
   refine ⟨T, Xi, fun s => ⟨hTc0 s, hTI s⟩, fun x => ⟨hXi0 x, hXiI x⟩, hTlog, ?_, ?_, ?_, ?_⟩
   · intro s x
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← coeff_one_subst hid hTc0 s x, hTlog, zXY_eq, map_sum, Finset.sum_eq_single x]
+
+    rw [← coeff_one_subst hid hTc0 s x, hTlog, zXY_eq, map_sum, Finset.sum_eq_single x]
     · rw [coeff_C_mul, artin_hasse_log_eq_generic_log (d := 1) l x 0, coeff_one_gLog hl, if_pos rfl, mul_one]
     · intro y _ hy
       rw [coeff_C_mul, artin_hasse_log_eq_generic_log (d := 1) l y 0, coeff_one_gLog hl, if_neg (Ne.symm hy),

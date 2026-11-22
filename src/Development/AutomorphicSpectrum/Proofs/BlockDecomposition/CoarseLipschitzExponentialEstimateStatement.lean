@@ -7,7 +7,7 @@ public import Development.WeilBound.RepresentationTheoryGL.EisensteinSeries.Sieg
 @[expose] public section
 
 open Filter Topology
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.coarse_lipschitz_exponential_estimate : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
     (X : Type) [NormedAddCommGroup X] [NormedSpace ℂ X] (Γ Δ P P' : Subgroup G) (ξ l₁ l₂ : G → ℝ) (H : ℂ → G → X)
     (a b e₁ e₂ M : ℝ),

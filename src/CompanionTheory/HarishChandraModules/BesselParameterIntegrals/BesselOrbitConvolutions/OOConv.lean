@@ -17,7 +17,7 @@ variable {k r : ℕ}
 
 namespace G
 
-set_option maxHeartbeats 1000000 in
+
 theorem ooConv_of (hSch : SchurH) (hNIs : CompanionTheory.D.Upq.BesselFunctionalConstruction.NormIdSm) (hNI : NormInv) (hGG : GrowthG) (hDD : CompanionTheory.D.Upq.BesselFunctionalConstruction.DecDD)
     (hBC : CompanionTheory.D.Upq.BesselFunctionalConstruction.BeConv) : CompanionTheory.D.Upq.BesselFunctionalConstruction.OOConv := by
   intro hIn k r Wp Wq _ _ _ _ _ _ _ _ D ε lam h H _ _ _ σ w0 u u' νq νq' hS1 hS2 l l' hbe hbe' γ hγ

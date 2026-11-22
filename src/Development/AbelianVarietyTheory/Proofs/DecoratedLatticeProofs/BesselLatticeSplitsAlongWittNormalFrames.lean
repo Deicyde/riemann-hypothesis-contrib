@@ -185,7 +185,7 @@ open GlobalTheory.FinPl GlobalTheory.SeeSaw.SplitLat
 variable {D : D7} {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem intIn_splitL (q : SplitPt D k) {ρ : ℕ} (B : BesLev D ρ) {n : Type} [Fintype n] [DecidableEq n] {c : ℕ} (s : k)
     (FA : GlobalTheory.LocMod.Frame k B.A.rank n) (F₀ : GlobalTheory.LocMod.Frame k B.V₀.rank (n ⊕ Unit))
     (FV : GlobalTheory.LocMod.Frame k B.V.rank (n ⊕ Fin c)) (M : Lat B.V₀)
@@ -213,8 +213,8 @@ theorem intIn_splitL (q : SplitPt D k) {ρ : ℕ} (B : BesLev D ρ) {n : Type} [
     rfl
   have c2 : ∀ r, FV.β r (Sum.inr ⟨ρ, by omega⟩) = (B.d.i₀.map P * F₀.β) r (Sum.inr ()) := by
     intro r
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h3 _ rfl, Matrix.mul_apply, ← hPa, Matrix.mulVec, dotProduct, map_sum, Finset.mul_sum]
+
+    rw [h3 _ rfl, Matrix.mul_apply, ← hPa, Matrix.mulVec, dotProduct, map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun u _ => ?_
     rw [hC.2, map_mul, Matrix.map_apply]
     simp only [hPa]

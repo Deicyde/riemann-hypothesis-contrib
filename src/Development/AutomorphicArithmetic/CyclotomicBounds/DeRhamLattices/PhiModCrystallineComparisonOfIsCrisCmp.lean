@@ -15,8 +15,8 @@ open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.Weakl
 open scoped Formalism.Per
 open GlobalTheory.BKGal.HatVal
 open scoped GlobalTheory.BKGal.HatVal
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
+
+
 
 private theorem twSmul {O R R' G Qp LL : Type} [CommRing O] [CommRing R] [CommRing R'] [Algebra O R] [Algebra O R']
     [Group G] [TopologicalSpace G] [Field Qp] [Field LL] [Algebra Qp LL] [Algebra O LL] [TopologicalSpace LL]
@@ -63,9 +63,9 @@ theorem _root_.UpperTheory.KN.phiMod_crystalline_comparison_of_isCrisCmp :
       rw [Pi.smul_apply, Pi.single_eq_of_ne hj.symm, smul_zero]
     · intro h
       exact absurd (Finset.mem_univ i) h
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [UpperTheory.KN.phiMod_deRham_image_coord_expansion l a e O K t ϖ ι P α hx σ, hσ, map_sum, map_sum, map_sum, map_sum,
-    Finset.smul_sum]
+
+  rw [UpperTheory.KN.phiMod_deRham_image_coord_expansion l a e O K t ϖ ι P α hx σ, hσ, map_sum, map_sum, map_sum, map_sum,
+  Finset.smul_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [jD.map_smul, jB.map_smul, twSmul, twSmul,
     UpperTheory.KN.tame_phiModule_crystalline_basis_compat l a e O K t ϖ ι P T I jB jD C ε hε hB hD α hα hx j,

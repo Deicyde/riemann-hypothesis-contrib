@@ -19,7 +19,7 @@ theorem ht_cancel {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E
   subst e
   exact sabCancel pullCubCancel E H _ _ _ _ _ _ _ _ m n
 
-set_option maxHeartbeats 1000000 in
+
 theorem stHt : SquareStatements.StHt := by
   intro E _ _ _ H D l Xo c Y S Ω Ω' _ _ K K' _ _ J J' _ _ y y' A A' h i j ⟨hdom, hf, hcst, hext, hjo⟩ hR _ hvb
   haveI : CharZero Ω := charZero_of_injective_ringHom A.cst.injective

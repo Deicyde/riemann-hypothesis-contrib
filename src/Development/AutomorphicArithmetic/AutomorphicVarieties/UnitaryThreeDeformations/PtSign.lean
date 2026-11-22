@@ -43,8 +43,8 @@ private theorem wtPart_decomp {O σ : Type} [CommRing O] (wt : σ → ℤ) (j : 
           exact Nat.one_le_iff_ne_zero.mpr h.choose_spec.2
         rw [if_neg hle, if_neg hP]
     ext n
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp_rw [key]
     by_cases h : ∃ k ∈ s, n k ≠ 0
     · have hP : ∀ i, P n i ↔ h.choose = i := fun i => ⟨fun ⟨_, e⟩ => e, fun e => ⟨h, e⟩⟩
@@ -101,10 +101,10 @@ private theorem vanish_of_entries {O : Type} [CommRing O] [IsLocalRing O] {G Γ 
   have hsum : (⟨W.π.toLinearMap f, mem_Sring u (by rw [← hW.part]; exact ⟨f, hf, rfl⟩)⟩ : Sring (O := O) u) =
       ∑ i ∈ s, (⟨W.z i, hmemz i⟩ : Sring (O := O) u) * ⟨W.π (g i), hmemg i⟩ := by
     apply Subtype.ext
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [hfg, map_sum, WPres.z]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hsum, map_sum]
+
+    simp [hfg, map_sum, WPres.z]
+
+  rw [hsum, map_sum]
   refine Finset.sum_eq_zero fun i hi => ?_
   rw [map_mul, hzero i (Finset.mem_filter.mp hi).2, zero_mul]
 

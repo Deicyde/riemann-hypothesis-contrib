@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntIndMemSB
 open MeasureTheory Matrix ValuativeRel
 
 open GlobalTheory GlobalTheory.HeisUnit in
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.normSq_uniformizer_character_mul_residueCard_pow_eq_one : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n d : ℕ},
     ∀ (ι : ((Fin n × Fin d → k) → ℂ) →ₗ[ℂ] (Matrix (Fin n) (Fin d) k → ℂ)),
     Set.InjOn ι (GlobalTheory.WeilM.SB (Fin n × Fin d → k) : Set _) →
@@ -34,8 +34,8 @@ theorem _root_.GlobalTheory.T.normSq_uniformizer_character_mul_residueCard_pow_e
   have hFSB : F ∈ GlobalTheory.WeilM.SB (Fin n × Fin d → k) := Submodule.sum_mem _ fun T _ => (hTr _ φ0 hφ0).1
   have hSg : S (diagAt ϖ i0) φ0 = (χ ϖ : ℂ) • F := by
     apply hinj (hS _ φ0 hφ0) (Submodule.smul_mem _ _ hFSB)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hχ _ φ0 hφ0, map_smul, map_sum, det_diagAt, hι0]
+
+    rw [hχ _ φ0 hφ0, map_smul, map_sum, det_diagAt, hι0]
     funext Y
     simp only [Pi.smul_apply, Finset.sum_apply, smul_eq_mul, (hTr _ φ0 hφ0).2, hι0]
     have hIntInd (M : Matrix (Fin n) (Fin d) k) :
@@ -146,8 +146,8 @@ theorem _root_.GlobalTheory.T.normSq_uniformizer_character_mul_residueCard_pow_e
     have hpt : ∀ y, F y * (starRingEnd ℂ) (F y) = ∑ T : Fin d → SplitFlip.Res (k := k) 1, ∑ T' : Fin d → SplitFlip.Res (k := k) 1,
         Tr (cosetRep ϖ i0 T) φ0 y * (starRingEnd ℂ) (Tr (cosetRep ϖ i0 T') φ0 y) := by
       intro y
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hF, Finset.sum_apply, map_sum, Finset.sum_mul_sum]
+
+      rw [hF, Finset.sum_apply, map_sum, Finset.sum_mul_sum]
     simp_rw [hpt]
     rw [integral_finsetSum _ fun T _ => integrable_finsetSum _ fun T' _ => hint T T']
     simp_rw [integral_finsetSum _ fun T' _ => hint _ T']

@@ -13,7 +13,7 @@ open scoped Formalism.Per
 
 variable (l : ℕ) [Fact l.Prime]
 
-set_option maxHeartbeats 200000 in
+
 theorem zB_eq (z : ℤ_[l]) : Per.zB l z = algebraMap ℚ_[l] (Reformulated.AutPerF.Bcris l (Cmp6.OC l)) (z : ℚ_[l]) := by
   show algebraMap (Reformulated.AutPerF.Acris l (Cmp6.OC l)) (Reformulated.AutPerF.Bcris l (Cmp6.OC l))
       (algebraMap (Reformulated.AutPerF.Ainf l (Cmp6.OC l)) (Reformulated.AutPerF.Acris l (Cmp6.OC l))
@@ -21,7 +21,7 @@ theorem zB_eq (z : ℤ_[l]) : Per.zB l z = algebraMap ℚ_[l] (Reformulated.AutP
   rw [Reformulated.AutPerF.Bcris.algebraMap_padicInt]
   rfl
 
-set_option maxHeartbeats 200000 in
+
 theorem zD_eq (z : ℤ_[l]) : Per.zD l z = algebraMap ℚ_[l] (Reformulated.AutPerF.BdR l (Cmp6.OC l)) (z : ℚ_[l]) := by
   rw [← Reformulated.AutPerF.Bcris.toBdR_algebraMap_padic, ← zB_eq]
   show algebraMap (Reformulated.AutPerF.BdRPlus l (Cmp6.OC l)) (Reformulated.AutPerF.BdR l (Cmp6.OC l))

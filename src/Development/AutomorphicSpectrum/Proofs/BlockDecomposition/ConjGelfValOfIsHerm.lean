@@ -33,8 +33,8 @@ theorem conj_gelfVal {n : ℕ} (c : Fin n → ℂ) (m : ℕ) :
     congr 2
     funext a
     simp [map_ofNat]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [GlobalTheory.Dec.gelfVal, map_sum]
+
+  simp only [GlobalTheory.Dec.gelfVal, map_sum]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   rw [← h]
   rfl

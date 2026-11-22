@@ -236,8 +236,8 @@ theorem range_appLinear_free [Finite ι] (φ : freeModule X ι ⟶ F) (V : X.Ope
   refine le_antisymm ?_ (Submodule.span_le.2 ?_)
   · rintro _ ⟨t, rfl⟩
     obtain ⟨a, rfl⟩ := exists_sum_smul_freeBasis V t
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Submodule.sum_mem _ fun i _ => ?_
     rw [map_smul, appLinear_apply, app_resM]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)

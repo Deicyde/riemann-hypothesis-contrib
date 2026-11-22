@@ -7,7 +7,7 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.CubeResA
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.CompanionTheory.Hodge.Nerve
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.coinduced_cech_acyclic : ∀ {R : Type} [CommRing R] {P : Type} [SemilatticeInf P] {κ : Type} [LinearOrder κ] (e : κ → P),
     Function.Surjective e → ∀ (M : P → ModuleCat.{0} R) (n : ℕ),
     IsZero (((cechOf e).obj (coind M)).homology (n + 1)) := by

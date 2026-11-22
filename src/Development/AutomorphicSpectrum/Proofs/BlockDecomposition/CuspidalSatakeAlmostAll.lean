@@ -142,8 +142,8 @@ theorem rank_cuspSub (π : CuspSub E a) : Module.rank ℂ π.V ≤ Cardinal.alep
     | lie X =>
       change lie E a X x ∈ _
       have e : lie E a X = ∑ i, b.repr X i • lie E a (b i) := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          conv_lhs => rw [← b.sum_repr X, map_sum]
+
+        conv_lhs => rw [← b.sum_repr X, map_sum]
         simp only [map_smul]
       rw [e, LinearMap.sum_apply]
       refine Submodule.sum_mem _ fun i _ => ?_

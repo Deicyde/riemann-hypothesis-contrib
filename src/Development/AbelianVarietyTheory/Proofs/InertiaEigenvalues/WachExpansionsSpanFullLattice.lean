@@ -72,9 +72,9 @@ theorem full_of_det {ι : Type} (D : Submodule L M) {r : ℕ} (d : Module.Basis 
         have := congrArg Subtype.val (d.sum_repr ⟨f ((n : ℤ) - w), hf _⟩)
         simpa only [F, PowerSeries.coeff_mk, AddSubmonoidClass.coe_finsetSum, Submodule.coe_smul] using this.symm
       rw [h1, ← he]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [conv_apply _ _ w (h0 _), hU, Matrix.mulVec, dotProduct, map_sum, Finset.sum_smul,
-        Finset.smul_sum, smul_smul]
+
+      simp only [conv_apply _ _ w (h0 _), hU, Matrix.mulVec, dotProduct, map_sum, Finset.sum_smul,
+      Finset.smul_sum, smul_smul]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [Finset.sum_comm]
@@ -210,8 +210,8 @@ theorem full_of_span {X : Type} (D : Submodule LL (T.V ⊗[Qp] B)) [Module.Finit
     have : Pi.basisFun BdR (Fin r) a = ∑ j, b j • g (x j) := by
       funext a'
       have := form_ker T ι (v.coord a') hx
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sub, sub_eq_zero, map_sum, form_tmul] at this
+
+      rw [map_sub, sub_eq_zero, map_sum, form_tmul] at this
       simp only [form_mul] at this
       simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, g, ← this]
       by_cases h : a' = a
@@ -236,8 +236,8 @@ theorem full_of_span {X : Type} (D : Submodule LL (T.V ⊗[Qp] B)) [Module.Finit
       (fun m n h => antitone_int_of_succ_le PD.Fil_anti h) PD.Fil_mul PD.Fil_exh PD.Fil_sep ι t ev hev
       (fun a => P a a') (U j) _ c fun M => ?_
     have := form_fil PD T ι hι (v.coord a') _ (hc M)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sub, map_sum, form_mul, hU, map_smul, form_smul] at this
+
+    simp only [map_sub, map_sum, form_mul, hU, map_smul, form_smul] at this
     simp only [Finset.mul_sum, mul_left_comm (t ^ _)]
     exact this
   have := congrArg Matrix.det key
@@ -248,7 +248,7 @@ theorem full_of_span {X : Type} (D : Submodule LL (T.V ⊗[Qp] B)) [Module.Finit
 end Comp
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem full_lat : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (Cm : CmpOf D.loc D.locA HW F) (l : ℕ) [Fact l.Prime] (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL), let W := (HW l).W K s LL h; let E := ((F l).E K s LL h).tie; let C := Cm l; ∀ T : Lt K LL, IsCrys ((D.loc l).PD K) T.ρ → ∀ (i : Let K) (ζ : ↥LL.1), IsPrimitiveRoot ζ (l ^ s) → Full (Di (HW l) h T i) (Lat C h T i ζ) := by
   intro D HW F Cm l _ K s LL h W E C T hT i ζ hζ
   obtain ⟨h1, h2, -, -, hc⟩ := Points.points D HW l K s LL h

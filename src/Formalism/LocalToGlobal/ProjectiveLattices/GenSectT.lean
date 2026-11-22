@@ -32,8 +32,8 @@ def tJ (t : Fin (D + 1) × Fin m → K') (v : Fin m → Ω) : Ideal (Localizatio
 
 
 
-set_option maxHeartbeats 1000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem s1T [CharZero K] (hfg : (⊤ : IntermediateField K Ω).FG) (htr : Algebra.trdeg K Ω = D)
     (v : Fin m → Ω) (k₀ : Fin m) (hv₀ : v k₀ ≠ 0)
     (hbig : Algebra.trdeg K (IntermediateField.adjoin K (Set.range fun k => v k / v k₀)) = D)
@@ -81,8 +81,8 @@ theorem s1T [CharZero K] (hfg : (⊤ : IntermediateField K Ω).FG) (htr : Algebr
     exact congrArg (fun f => f q) this
   have he0sec : ∀ i : Fin D, e0 (sec v i) = tsec (K := K) (Ω := Ω) (Kl := Kl) (K' := K') t v i.succ := by
     intro i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [sec, tsec, map_sum, map_mul, e0, MvPolynomial.eval₂Hom_X', MvPolynomial.eval₂Hom_C]
+
+    simp only [sec, tsec, map_sum, map_mul, e0, MvPolynomial.eval₂Hom_X', MvPolynomial.eval₂Hom_C]
     refine Finset.sum_congr rfl fun k _ => ?_
     show (t (i.succ, k) ⊗ₜ[Kl] (1 : Kl ⊗[K] Ω)) * ((1 : K') ⊗ₜ[Kl] ((1 : Kl) ⊗ₜ[K] v k)) = _
     rw [Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul]

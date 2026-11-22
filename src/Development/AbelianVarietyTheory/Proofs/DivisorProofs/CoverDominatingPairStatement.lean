@@ -13,7 +13,7 @@ open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions F
 open scoped ENNReal Classical
 open CategoryTheory AlgebraicGeometry ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory GlobalTheory.ArInt GlobalTheory.ProjVar GlobalTheory.TrueGeo GlobalTheory.ShFam.Pad GlobalTheory.VertForm GlobalTheory.CoverNorm
 open CategoryTheory.Limits TopologicalSpace
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.cover_dominating_pair : ∀ (F : Type) [Field F] [NumberField F] (Y : Var F) (W V : Mean4O.Cover Y) (k : W.G ⟶ V.G),
     k ≫ V.π = W.π →
     ∃ (W' : Mean4O.Cover Y) (a : W'.X ⟶ W.X) (b : W'.X ⟶ V.X), a ≫ W.p = W'.p ∧ b ≫ V.p = W'.p ∧

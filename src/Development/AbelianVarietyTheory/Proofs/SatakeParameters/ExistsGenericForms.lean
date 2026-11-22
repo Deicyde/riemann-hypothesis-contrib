@@ -105,9 +105,9 @@ theorem Lm_apply (hp : ι ≫ PSpace.str ℂ N = p) (c : Fin (N + 1) → ℂ) :
     fRatio_linear X p N ι hp g₀ hg₀ c (lin_mem c)
   rw [hfr]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [vv, smul_sub, Finset.sum_sub_distrib, map_sum, ev₀_smul, map_mul, Algebra.smul_def,
-    ev₀_algebraMap, mul_sub]
+
+  simp only [vv, smul_sub, Finset.sum_sub_distrib, map_sum, ev₀_smul, map_mul, Algebra.smul_def,
+  ev₀_algebraMap, mul_sub]
 
 end Cot
 

@@ -28,8 +28,8 @@ theorem exists_represent {V : Type} [AddCommGroup V] [Module ℂ V]
     have hall : ∀ w : W, Bf (u : V) (w : V) = 0 := by
       intro w
       rw [← b.sum_repr w]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Submodule.coe_sum, Submodule.coe_smul, map_sum, map_smulₛₗ]
+
+      simp only [Submodule.coe_sum, Submodule.coe_smul, map_sum, map_smulₛₗ]
       refine Finset.sum_eq_zero (fun i _ => ?_)
       have h0 := congrFun hu i
       simp only [Φ, LinearMap.coe_mk, AddHom.coe_mk, Pi.zero_apply] at h0
@@ -49,8 +49,8 @@ theorem exists_represent {V : Type} [AddCommGroup V] [Module ℂ V]
     simp only [Submodule.coe_smul] at h2
     exact h2.symm
   rw [hwsum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smulₛₗ]
+
+  simp only [map_sum, map_smulₛₗ]
   refine Finset.sum_congr rfl (fun i _ => ?_)
   have h3 := congrFun hu i
   simp only [Φ, LinearMap.coe_mk, AddHom.coe_mk] at h3

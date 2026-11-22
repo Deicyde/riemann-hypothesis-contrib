@@ -87,8 +87,8 @@ theorem mem_range_of_torsion [Module.Finite R M] [Module.Projective R M] (I J : 
     rw [map_sub, map_smul, ← hm0]; abel
   rw [this]
   refine Submodule.neg_mem _ ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hdec, map_sum]
+
+  rw [hdec, map_sum]
   exact Submodule.sum_mem _ fun j _ => by
     rw [map_smul]; exact Submodule.smul_mem_smul (hr j) trivial
 

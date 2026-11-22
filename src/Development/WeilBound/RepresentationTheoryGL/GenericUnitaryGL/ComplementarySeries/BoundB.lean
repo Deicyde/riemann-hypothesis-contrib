@@ -117,8 +117,8 @@ theorem avL_apply (π : Representation ℂ G V) (K : Subgroup G) (H : Subgroup K
 
 theorem avL_fixed (π : Representation ℂ G V) (K : Subgroup G) (H : Subgroup K) [Fintype (K ⧸ H)] {x : V}
     (hx : ∀ h ∈ H, π ((h : K) : G) x = x) (κ : G) (hκ : κ ∈ K) : π κ (avL π K H x) = avL π K H x := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [avL_apply, map_sum]
+
+  rw [avL_apply, map_sum]
   let κ' : K := ⟨κ, hκ⟩
   refine Fintype.sum_equiv (MulAction.toPerm κ' : K ⧸ H ≃ K ⧸ H) _ _ ?_
   intro q
@@ -161,8 +161,8 @@ theorem ineq (π : Representation ℂ G X) (B : X →ₗ[ℂ] X →ₗ⋆[ℂ] �
   have hA : B w w = B x w := by
     have e0 : B w w = B ((Fintype.card (K ⧸ H) : ℂ)⁻¹ • avL π K H x) w := by rw [hT]
     have e1 : B w w = (Fintype.card (K ⧸ H) : ℂ)⁻¹ * ∑ q : K ⧸ H, B (π ((q.out : K) : G) x) w := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [e0, avL_apply, LinearMap.map_smul, map_sum, LinearMap.smul_apply, LinearMap.sum_apply, smul_eq_mul]
+
+      rw [e0, avL_apply, LinearMap.map_smul, map_sum, LinearMap.smul_apply, LinearMap.sum_apply, smul_eq_mul]
     have e2 : ∀ q : K ⧸ H, B (π ((q.out : K) : G) x) w = B x w := by
       intro q
       conv_lhs => rw [← hKfix q]
@@ -278,7 +278,7 @@ theorem modulus_scalar_block (d : ℕ) (t : kˣ) :
   simp only [modulus, Fin.prod_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, e0, e1, hdet, h1]
   rw [_root_.one_zpow, mul_one, zpow_natCast, ← pow_mul]
 
-set_option maxHeartbeats 1000000 in
+
 theorem bound_main : Bound k := by
   classical
   intro d W _ _ _ τ hsm hadm hunit t c ht hc
@@ -344,8 +344,8 @@ theorem bound_main : Bound k := by
       simp only [evI, LinearMap.coe_mk, AddHom.coe_mk]
       rw [act, one_mul]
       exact this
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [A, LinearMap.smul_apply, LinearMap.comp_apply, avL_apply, map_smul, map_sum]
+
+    simp only [A, LinearMap.smul_apply, LinearMap.comp_apply, avL_apply, map_smul, map_sum]
     rw [Finset.sum_congr rfl (fun q _ => e1 q), Finset.sum_const, Finset.card_univ, ← Nat.cast_smul_eq_nsmul ℂ,
       smul_smul, inv_mul_cancel₀ (Nat.cast_ne_zero.2 Fintype.card_ne_zero), one_smul]
   let S : Module.End ℂ (fixed (parInd (blk2 d) τ) K) := A' - μ • 1

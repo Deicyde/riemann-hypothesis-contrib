@@ -110,8 +110,8 @@ theorem toEAf_prod {n : ℕ} (A B : Matrix (Fin n) (Fin n) (AE D)) (a b : GL (Fi
   rw [← Matrix.map_apply (f := toEAf D), Matrix.map_mul, hA, hB, ← Units.val_mul, hab, Units.val_one,
     ← Matrix.map_apply (f := toEAf D), Matrix.map_one _ (map_zero _) (map_one _)]
 
-set_option maxHeartbeats 2000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem exists_move : ∀ {D : D7} (V : HSp D), V.gram = 1 → ∀ (e : AE D), GlobalTheory.PlaceModelSum.IsOrthSum e → e * cA D e = 0 →
     ∀ (β₀ β₁ : GL (Fin V.rank) (Lev.EAf D)),
     (∀ i j, β₀.val i j ∈ Formalism.L2.Herm.intAf D.host.F D.host.E ∧ (β₀⁻¹).val i j ∈ Formalism.L2.Herm.intAf D.host.F D.host.E) →

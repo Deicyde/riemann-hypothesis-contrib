@@ -237,9 +237,9 @@ theorem laplacian_colSubst (A : T → Matrix κ κ' R) (B : T → Matrix κ' κ 
     (b : Fin q) (P : Poly R T p q κ) :
     laplacian t a b (colSubst A B P) = ∑ k : κ, ∑ k' : κ, (A t * B t) k k' •
       colSubst A B (pderiv (xVar t a k) (pderiv (yVar t b k') P)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [laplacian_apply, pderiv_yVar_colSubst, map_sum, Derivation.map_smul,
-    pderiv_xVar_colSubst, Matrix.mul_apply, Finset.sum_smul, Finset.smul_sum, smul_smul]
+
+  simp only [laplacian_apply, pderiv_yVar_colSubst, map_sum, Derivation.map_smul,
+  pderiv_xVar_colSubst, Matrix.mul_apply, Finset.sum_smul, Finset.smul_sum, smul_smul]
   rw [Finset.sum_comm]
   conv_rhs => rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun k' _ => ?_
@@ -250,8 +250,8 @@ theorem laplacian_colSubst_of_mul_eq_one [DecidableEq κ] (A : T → Matrix κ �
     (B : T → Matrix κ' κ R) {t : T} (h : A t * B t = 1) (a : Fin p) (b : Fin q)
     (P : Poly R T p q κ) :
     laplacian t a b (colSubst A B P) = colSubst A B (laplacian t a b P) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [laplacian_colSubst, h, laplacian_apply, map_sum]
+
+  rw [laplacian_colSubst, h, laplacian_apply, map_sum]
   simp [Matrix.one_apply]
 
 theorem IsHarmonic.colSubst [DecidableEq κ] {A : T → Matrix κ κ' R} {B : T → Matrix κ' κ R}

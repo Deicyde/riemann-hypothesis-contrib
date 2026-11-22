@@ -24,14 +24,14 @@ def mapGl (φ : k →+* k') (Y : Gl r k) : Gl r k' :=
 theorem map_mulVec' (φ : k →+* k') (A : Matrix (Fin r) (Fin r) k) (v : Fin r → k) :
     (fun i => φ ((A *ᵥ v) i)) = A.map φ *ᵥ fun i => φ (v i) := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [Matrix.mulVec, dotProduct, map_sum, map_mul]
+
+  simp [Matrix.mulVec, dotProduct, map_sum, map_mul]
 
 theorem map_vecMul' (φ : k →+* k') (A : Matrix (Fin r) (Fin r) k) (v : Fin r → k) :
     (fun i => φ ((v ᵥ* A) i)) = (fun i => φ (v i)) ᵥ* A.map φ := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [Matrix.vecMul, dotProduct, map_sum, map_mul]
+
+  simp [Matrix.vecMul, dotProduct, map_sum, map_mul]
 
 theorem map_pow' (φ : k →+* k') (A : Matrix (Fin r) (Fin r) k) (i : ℕ) :
     (A ^ i).map φ = (A.map φ) ^ i := by
@@ -52,8 +52,8 @@ theorem mapGl_act (φ : k →+* k') (γ : GL (Fin r) k) (Y : Gl r k) :
 theorem mom_mapGl (φ : k →+* k') (Y : Gl r k) (i : ℕ) : mom (mapGl φ Y) i = φ (mom Y i) := by
   simp only [mom, mapGl]
   rw [← map_pow', ← map_mulVec']
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [dotProduct, map_sum, map_mul]
+
+  simp [dotProduct, map_sum, map_mul]
 
 theorem inv_mapGl (φ : k →+* k') (Y : Gl r k) : inv (mapGl φ Y) = (inv Y).map φ := by
   simp only [JR.inv, Inv.map, mapGl]
@@ -144,16 +144,16 @@ theorem Yb_tw (e : Basis (Fin n) E V) (T : V →ₗ[E] V) (v : V) (l : V →ₗ[
       toMatrix_tw_left, toMatrix_tw_right]
   · exact tw_repr e γ v
   · funext j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [tw_apply, map_sum, Matrix.vecMul, dotProduct, mul_comm]
+
+    simp [tw_apply, map_sum, Matrix.vecMul, dotProduct, mul_comm]
 
 theorem vecMul_pow_Yb (e : Basis (Fin n) E V) (T : V →ₗ[E] V) (l : V →ₗ[E] E) (i : ℕ) (j : Fin n) :
     ((fun j => l (e j)) ᵥ* (LinearMap.toMatrix e e T) ^ i) j = l ((T ^ i) (e j)) := by
   rw [LinearMap.toMatrix_pow]
   simp only [Matrix.vecMul, dotProduct, LinearMap.toMatrix_apply]
   conv_rhs => rw [← e.sum_repr ((T ^ i) (e j))]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_smul, smul_eq_mul, mul_comm]
 
@@ -169,8 +169,8 @@ theorem mom_Yb (e : Basis (Fin n) E V) (T : V →ₗ[E] V) (v : V) (l : V →ₗ
   rw [LinearMap.toMatrix_pow, LinearMap.toMatrix_mulVec_repr]
   conv_rhs => rw [← e.sum_repr ((T ^ i) v)]
   simp only [dotProduct]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_smul, smul_eq_mul, mul_comm]
 
@@ -252,8 +252,8 @@ theorem lat_fun_iff (e : Basis (Fin n) E V) (l : V →ₗ[E] E) :
     exact h _ (by unfold lat; exact Submodule.subset_span ⟨j, rfl⟩)
   · intro h y hy
     rw [mem_lat] at hy
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← e.sum_repr y, map_sum]
+
+    rw [← e.sum_repr y, map_sum]
     refine Subring.sum_mem _ fun i _ => ?_
     rw [map_smul, smul_eq_mul]
     exact Subring.mul_mem _ (hy i) (h i)

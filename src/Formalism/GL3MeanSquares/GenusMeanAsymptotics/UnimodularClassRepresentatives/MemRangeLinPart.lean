@@ -74,8 +74,8 @@ theorem card_lift_pred [Finite A] (hπ : Function.Surjective π) (hστ : ∀ a,
 
   have hnorm : ∀ x : Fin M → A, ∑ i, σ (x i) * x i = n → ∑ i, τ (π (x i)) * π (x i) = π n := by
     intro x hx
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hx, map_sum]
+
+    rw [← hx, map_sum]
     simp only [map_mul, hστ]
   refine card_eq_mul_of_fibers
     (fun x : {x : Fin M → A // p (fun i => π (x i)) ∧ ∑ i, σ (x i) * x i = n} =>
@@ -88,8 +88,8 @@ theorem card_lift_pred [Finite A] (hπ : Function.Surjective π) (hστ : ∀ a,
     rw [h]
     exact y.2.1
   have hNx0 : π (∑ i, σ (x0 i) * x0 i) = π n := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [map_mul, hστ, hx0]
     exact y.2.2
   have ht : n - ∑ i, σ (x0 i) * x0 i ∈ fixSub σ (RingHom.ker π) := by

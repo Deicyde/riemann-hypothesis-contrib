@@ -12,7 +12,7 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.LeOfFiniteSpl
 
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host Formalism.L2.NT Formalism.L2.TwC GlobalTheory.HeightCounting NumberField IsDedekindDomain Polynomial
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.rayClassField_splitsIn_of_isRayPrime : ∀ (D : D7) (jE : D.host.E →+* Qb) (M : Fld) (h : KQbar D jE ≤ M) (hf : FiniteDimensional ℚ M),
     letI := GlobalTheory.ParRay.algK D jE h
     haveI := GlobalTheory.ParRay.nfOf hf

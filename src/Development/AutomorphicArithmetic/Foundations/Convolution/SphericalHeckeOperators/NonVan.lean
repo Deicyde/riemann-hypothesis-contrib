@@ -109,8 +109,8 @@ private lemma evalAt_dPol_ne {t : ℂ} (ht : ‖t‖ < 1) (w : Fin n → ℂˣ)
 private lemma evalAt_term (z : Fin n → ℂˣ) (a : Fin n → ℤ) (t : ℂ) :
     evalAt z (symSum (monomial a * dPol n t)) =
       ∑ σ : Equiv.Perm (Fin n), monomialChar a (z ∘ σ) * evalAt (z ∘ σ) (dPol n t) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [symSum, map_sum]
+
+  rw [symSum, map_sum]
   refine Finset.sum_congr rfl fun σ _ => ?_
   rw [evalAt_permAct, map_mul, evalAt_single, one_mul]
 

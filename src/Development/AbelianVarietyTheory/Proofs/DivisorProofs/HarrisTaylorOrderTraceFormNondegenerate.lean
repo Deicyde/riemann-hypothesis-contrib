@@ -90,9 +90,9 @@ theorem trace_mulLeft_matrix_eq : ∀ (R A : Type) [CommRing R] [CommRing A] [Al
   intro R A _ _ _ _ _ m Z
   classical
   let b := Module.Free.chooseBasis R A
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [LinearMap.trace_eq_matrix_trace R (b.matrix (Fin m) (Fin m)), Matrix.trace, Matrix.trace, map_sum,
-    Finset.mul_sum, Fintype.sum_prod_type]
+
+  rw [LinearMap.trace_eq_matrix_trace R (b.matrix (Fin m) (Fin m)), Matrix.trace, Matrix.trace, map_sum,
+  Finset.mul_sum, Fintype.sum_prod_type]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Fintype.sum_prod_type, Algebra.trace_eq_matrix_trace b, Matrix.trace]
   have key : ∀ j : Fin m, ∑ k, ((LinearMap.toMatrix (b.matrix (Fin m) (Fin m)) (b.matrix (Fin m) (Fin m)))

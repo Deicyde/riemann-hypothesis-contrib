@@ -335,14 +335,14 @@ theorem exists_gelf (R : RealPoints θ V) (τ : D.what₂.Tau) : ∃ c : ℕ →
     refine Subalgebra.sum_mem _ fun l _ => Subalgebra.smul_mem _ (Subalgebra.list_prod_mem _ fun x hx => ?_) _
     obtain ⟨X, -, rfl⟩ := List.mem_map.1 hx
     exact Algebra.span_le_adjoin ℂ _ (h2 X)
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [gelf, gelfA, map_sum, LinearMap.sum_apply, Submodule.coe_sum]
-      refine Finset.sum_congr rfl fun idx _ => ?_
-      rw [map_list_prod, List.map_ofFn]
-      refine foldr_ofFn_eq _ _ _ _ (fun i x => ?_) φ
-      simp only [Function.comp, map_add (f := _), map_smul, envRep_ι]
-      rw [RderC, conjAt, ← (hPQ _ _).1, ← (hPQ _ _).2, Rder_eq R, Rder_eq R]
-      rfl
+
+  · rw [gelf, gelfA, map_sum, LinearMap.sum_apply, Submodule.coe_sum]
+    refine Finset.sum_congr rfl fun idx _ => ?_
+    rw [map_list_prod, List.map_ofFn]
+    refine foldr_ofFn_eq _ _ _ _ (fun i x => ?_) φ
+    simp only [Function.comp, map_add (f := _), map_smul, envRep_ι]
+    rw [RderC, conjAt, ← (hPQ _ _).1, ← (hPQ _ _).2, Rder_eq R, Rder_eq R]
+    rfl
 
 theorem zfin_iff (R : RealPoints θ V) {φ : GA D V → ℂ} (hφ : IsSmoothInf V (expInf θ V) φ) :
     (∃ W : Submodule ℂ (GA D V → ℂ), FiniteDimensional ℂ W ∧ φ ∈ W ∧ ∀ τ k, ∀ f ∈ W, gelf θ V τ k f ∈ W) ↔

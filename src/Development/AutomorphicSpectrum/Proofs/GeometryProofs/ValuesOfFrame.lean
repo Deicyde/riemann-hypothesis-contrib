@@ -78,10 +78,10 @@ theorem values_basis {A Ω L Li V T I : Type} [CommRing A] [Field Ω] [Field L] 
     obtain ⟨r, hr⟩ := hsp _ (hf lab)
     refine ⟨r, fun k => ?_⟩
     have h1 : π (i (∑ j, f j)) = π (i (f lab)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_sum, Finset.sum_eq_single lab (fun j _ hj => hπV j hj _ (hf j)) (by simp)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h1, hr, map_sum, map_sum]
+
+      rw [map_sum, map_sum, Finset.sum_eq_single lab (fun j _ hj => hπV j hj _ (hf j)) (by simp)]
+
+    rw [h1, hr, map_sum, map_sum]
     simp only [hi, map_smul, hπ]
     simp [Finset.sum_apply, Pi.single_apply]
   choose c hc using key
@@ -97,23 +97,23 @@ theorem values_basis {A Ω L Li V T I : Type} [CommRing A] [Field Ω] [Field L] 
   choose F hFβ using hF
   refine ⟨Fintype.linearIndependent_iff.2 fun w hw k => ?_, le_antisymm ?_ fun x hx => ?_⟩
   · have := congrArg (F k) hw
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, hFβ, hcb, map_zero, smul_eq_mul] at this
+
+    simp only [map_sum, map_smul, hFβ, hcb, map_zero, smul_eq_mul] at this
     simpa using this
   · exact Submodule.span_le.2 (by rintro _ ⟨k, rfl⟩; exact hβW _ _ (hbV k))
   · set S := Submodule.span L (Set.range fun k => β (b k)) with hS
     have hSle : S ≤ W lab := Submodule.span_le.2 (by rintro _ ⟨k, rfl⟩; exact hβW _ _ (hbV k))
     have htop : S ⊔ (⨆ j, ⨆ (_ : j ≠ lab), W j) = ⊤ := hgen _ fun t => by
       obtain ⟨f, hf, rfl⟩ := hdec t
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Submodule.sum_mem _ fun j _ => ?_
       by_cases hj : j = lab
       · subst hj
         refine Submodule.mem_sup_left ?_
         obtain ⟨r, hr⟩ := hsp _ (hf j)
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [hr, map_sum]
+
+        rw [hr, map_sum]
         refine Submodule.sum_mem _ fun k _ => ?_
         rw [hβ]
         exact S.smul_mem _ (Submodule.subset_span ⟨k, rfl⟩)
@@ -317,8 +317,8 @@ theorem values_core (𝔐 : HodgeCpt Y S y) {L : Type} [Field L] (z : Sp L ⟶ �
       obtain ⟨cf, hcf⟩ := (Submodule.mem_span_range_iff_exists_fun _).1 hm
       choose r hr using fun k => RingHom.mem_range.1 (cf k).2
       refine ⟨r, hinj ?_⟩
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hcf, map_sum]
+
+      rw [← hcf, map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [hsi, hr, hb]
       rfl)

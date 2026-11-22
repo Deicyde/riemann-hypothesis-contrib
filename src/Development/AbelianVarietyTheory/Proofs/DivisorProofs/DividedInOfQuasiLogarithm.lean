@@ -130,8 +130,8 @@ theorem dIn_of_QL : ∀ (p : ℕ) [Fact p.Prime] (B O Q : Type) [CommRing B] [Co
     intro i
     simp only [g, M]
     have hchain := GlobalTheory.PSChain.pderiv_subst_chain (up Q μ) hμ0 f (Sum.inr i)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hchain, ← substAlgHom_apply hρ, map_sum]
+
+    rw [hchain, ← substAlgHom_apply hρ, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_mul, substAlgHom_apply, substAlgHom_apply, subst_comp_subst_apply haμ hρ, hmapsub]
     have e : (fun s => subst ρ (up Q μ s)) = X := funext hunit

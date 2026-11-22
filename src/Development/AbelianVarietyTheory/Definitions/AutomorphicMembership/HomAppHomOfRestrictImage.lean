@@ -47,8 +47,8 @@ theorem sum_homIns {e : ι → Γ(F, U)} (he : IsFrame e) (h : V ≤ U) (ψ : Γ
     ∑ i, homIns he h i (homApp ψ le_rfl (resM F h (e i))) = ψ := by
   refine VB.hom_ext fun W hW s => ?_
   rw [homApp_sum, LinearMap.sum_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_rhs => rw [← (he.basis (hW.trans h)).sum_repr s, map_sum]
+
+  conv_rhs => rw [← (he.basis (hW.trans h)).sum_repr s, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [homApp_homIns, map_smul, ← homApp_resM, resM_resM, IsFrame.basis_apply]
 
@@ -58,9 +58,9 @@ def homPi {e : ι → Γ(F, U)} (he : IsFrame e) (h : V ≤ U) : Γ(homMod F G, 
     (by
       classical
       refine LinearMap.ext fun n => funext fun j => ?_
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [LinearMap.comp_apply, LinearMap.sum_apply, LinearMap.pi_apply, map_sum, homEval_apply,
-        LinearMap.proj_apply, LinearMap.id_apply, homApp_homIns, resM_self, Finset.sum_apply]
+
+      simp only [LinearMap.comp_apply, LinearMap.sum_apply, LinearMap.pi_apply, map_sum, homEval_apply,
+      LinearMap.proj_apply, LinearMap.id_apply, homApp_homIns, resM_self, Finset.sum_apply]
       simp only [← he.basis_apply, Module.Basis.repr_self]
       simp [Finsupp.single_apply])
     (LinearMap.ext fun ψ => by
@@ -440,8 +440,8 @@ theorem isGreatest_nrmSet_hom [(homMod G F).IsQuasicoherent] {e : ι → Γ(G, U
   · rw [LinearMap.comp_apply, homEval_apply, homApp_res, e₀, ← hm]
     rfl
   · rintro r ⟨Λ, hΛ, rfl⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← sum_homIns he inf_le_left (resM _ inf_le_right ψ), map_sum]
+
+    rw [← sum_homIns he inf_le_left (resM _ inf_le_right ψ), map_sum]
     refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg
       (div_nonneg (hm ▸ norm_nonneg _) hpos.le) fun i _ => ?_
     have hi : IsInt z hp (Λ.comp (homIns he inf_le_left i)) := fun n => by

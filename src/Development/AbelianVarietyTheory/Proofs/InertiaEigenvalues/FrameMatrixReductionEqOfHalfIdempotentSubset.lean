@@ -11,8 +11,8 @@ open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.Glob
 open Formalism.IndefR.Links (PolF)
 open Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 open scoped TensorProduct
 
 namespace GlobalTheory.RedHalfDrop
@@ -102,13 +102,13 @@ theorem redM_drop : ∀ {D : D7} {S T : HSp D} (βS : GL (Fin S.rank) (EAf D)) (
       exact eq_sub_of_add_eq e1.symm
     have hint : toEAf D (cA D (idem (Qa \ Qb))) ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
       unfold idem
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, map_sum]
+
+      rw [map_sum, map_sum]
       exact sum_mem fun P' hP' => int_cA_idemAt hS (hsub P' hP')
     have hz : resS D.host.F PP ⟨_, hint⟩ = 0 := resS_eq_zero_of_mul (hS.isIdemAt (hPg hPP)) hint (by
       unfold idem
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum, Finset.mul_sum]
+
+      rw [map_sum, Finset.mul_sum]
       exact Finset.sum_eq_zero fun P' hP' => hS.mul_conj (hPg hPP) (hsub P' hP'))
     rw [e2, redM_sub_smul PP h1 hint hz]
   · intro PP hPP
@@ -120,8 +120,8 @@ theorem redM_drop : ∀ {D : D7} {S T : HSp D} (βS : GL (Fin S.rank) (EAf D)) (
       exact eq_sub_of_add_eq e1.symm
     have hint : toEAf D (idem (Qa \ Qb)) ∈ Formalism.L2.Herm.intAf D.host.F D.host.E := by
       unfold idem
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       exact sum_mem fun P' hP' => int_idemAt hS (hsub P' hP')
     have hz : resS D.host.F PP ⟨_, hint⟩ = 0 := resS_eq_zero_of_mul (hS.isIdemAt (hQa (hQ hPP))) hint (by
       unfold idem

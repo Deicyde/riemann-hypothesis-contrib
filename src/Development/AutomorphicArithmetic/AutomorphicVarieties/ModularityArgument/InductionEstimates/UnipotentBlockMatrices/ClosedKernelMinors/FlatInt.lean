@@ -84,15 +84,15 @@ private theorem specW [_root_.NumberField.IsTotallyComplex K] (μ : Measure (G1 
   have hT := fun i => thBasic μ _ (hB i).1.cont (hB i).1.rat (hB i).2
   have hR := rep_sum Finset.univ (fun i => A.J (U i)) (fun i => th (bf (fun x => w x i) (A.sec (e i))))
     fun i => ⟨(hT i).2.1, (hT i).2.2.1, A.spec _ _ _ (hc i) (hcc i) (hU i)⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [huU, map_sum]
+
+  rw [huU, map_sum]
   convert hR using 1
   funext x
   simp only [Finset.sum_apply, th]
   rw [← finsum_sum_comm]
   · refine finsum_congr fun q => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hsum (HH _), map_sum]
+
+    rw [hsum (HH _), map_sum]
     simp only [Finset.sum_apply, map_smul, Pi.smul_apply, smul_eq_mul, bf, exp_cast, Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => by ring
   · intro i _

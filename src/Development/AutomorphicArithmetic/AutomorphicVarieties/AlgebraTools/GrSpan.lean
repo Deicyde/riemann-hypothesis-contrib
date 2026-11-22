@@ -64,8 +64,8 @@ private theorem grSpan_small {Λ : Type} [CommRing Λ] {σ : Type} [Fintype σ] 
     MvPowerSeries.coeff n (f - ∑ α : (∀ s, Fin (d s)),
       MvPowerSeries.coeff (Finsupp.equivFunOnFinite.symm fun s => (α s : ℕ)) f •
         (∏ s, MvPowerSeries.X s ^ (α s : ℕ) : MvPowerSeries σ Λ)) = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sub, map_sum, sub_eq_zero]
+
+  rw [map_sub, map_sum, sub_eq_zero]
   simp only [grSpan_prod, map_smul, MvPowerSeries.coeff_monomial, smul_eq_mul, mul_ite, mul_one, mul_zero]
   rw [Finset.sum_eq_single (fun s => ⟨n s, hn s⟩ : ∀ s, Fin (d s))]
   · simp [Finsupp.equivFunOnFinite_symm_coe]

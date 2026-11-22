@@ -394,7 +394,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7}
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem one_mem_KpC (V : HSp D) (N : ℕ) : (1 : GA D V) ∈ Formalism.L2.NTheta.KpC V N := by
   have hf : finMat D.sp.cm.sig V.gram (1 : GA D V) = 1 := by
     show ((1 : Matrix (Fin V.rank) (Fin V.rank) (AF D.host.F ⊗[D.host.F] D.host.E))).map _ = 1

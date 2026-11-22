@@ -76,8 +76,8 @@ theorem cst_spMap {A C : Type} [CommRing A] [CommRing C] {Z : Scheme.{0}} (q : Z
 
 theorem cst_sum {A : Type} [CommRing A] {Z : Scheme.{0}} (q : Z ⟶ Sp A) (z : Z) {n : ℕ} (a : Fin n → A) :
     cst q z (∑ i, a i) = ∑ i, cst q z (a i) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [cst, gs_eq q z ⊤ trivial, map_sum]
+
+  simp only [cst, gs_eq q z ⊤ trivial, map_sum]
 
 theorem coeff_of_jet {V F κ : Type} [CommRing V] [CommRing F] [Fintype κ] [DecidableEq κ] (φ : V →+* F) (m : ℕ)
     (f : MvPowerSeries κ V) (g : MvPowerSeries κ F) (c : F)

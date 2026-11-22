@@ -52,8 +52,8 @@ theorem finrank_ratF_eq_mul_rank (k K : Type) [CommRing k] [IsDomain k] [Module.
     have hcomp : ι.comp (Int.castRingHom k) = Int.castRingHom K := RingHom.ext_int _ _
     have hev : MvPolynomial.eval₂Hom ι y
         (∑ i, MvPolynomial.C (b i) * MvPolynomial.map (Int.castRingHom k) (P i)) = 0 := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_mul, MvPolynomial.eval₂Hom_C, MvPolynomial.eval₂Hom_map_hom, hcomp, hP]
+
+      simp only [map_sum, map_mul, MvPolynomial.eval₂Hom_C, MvPolynomial.eval₂Hom_map_hom, hcomp, hP]
       refine Eq.trans (Finset.sum_congr rfl fun i _ => ?_) hsum
       ring
     have hP0 := hinj (hev.trans (map_zero _).symm)
@@ -87,8 +87,8 @@ theorem finrank_ratF_eq_mul_rank (k K : Type) [CommRing k] [IsDomain k] [Module.
       obtain ⟨a, rfl⟩ := hcl hz
       have hsr := b.sum_repr a
       change ι a ∈ _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hsr, map_sum]
+
+      rw [← hsr, map_sum]
       refine Submodule.sum_mem _ fun i _ => ?_
       rw [map_zsmul]
       exact zsmul_mem (Submodule.subset_span (Set.mem_range_self (f := fun i => ι (b i)) i)) _

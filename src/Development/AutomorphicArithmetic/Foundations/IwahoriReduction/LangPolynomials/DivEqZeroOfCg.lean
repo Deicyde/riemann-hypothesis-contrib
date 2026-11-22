@@ -49,7 +49,7 @@ private theorem eta_one_of_one_le (l : ℕ) [Fact (Nat.Prime l)] (φ : Dirichlet
 private theorem cg_iff_norm_sub_le_norm_pow (l : ℕ) [Fact (Nat.Prime l)] (n : ℕ) (a b : Qbar l) :
     Cg n a b ↔ ‖a - b‖ ≤ ‖(l : Qbar l) ^ n‖ := Iff.rfl
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.Kd.C7.pDiv :
     UpperTheory.Kd.C7.SDiv := by
   intro l _ hl Ω _ _ _ A hA c Z hZ hC φ k hk hS

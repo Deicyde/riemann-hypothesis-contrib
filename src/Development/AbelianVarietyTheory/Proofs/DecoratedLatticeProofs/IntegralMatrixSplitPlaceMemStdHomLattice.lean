@@ -27,7 +27,7 @@ theorem sec_mul' (q : GlobalTheory.FinPl.SplitPt D k) (a : k) (b : AE D) : q.sec
     _ = q.sec (q.pr (q.sec a * b)) := (q.sec_pr _).symm
     _ = q.sec (a * q.pr b) := by rw [map_mul, q.pr_sec]
 
-set_option maxHeartbeats 800000 in
+
 theorem int_up_mem_stdHom : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (q : GlobalTheory.FinPl.SplitPt D k) (S T : HSp D) (a₀ : D.host.E), a₀ ∈ (D.host.AA : Set D.host.E) → q.pr (incA D a₀) ≠ 0 → ∀ (FS : Frame k S.rank (Fin S.rank)) (FT : Frame k T.rank (Fin T.rank)), FT.β = 1 → FT.γ = 1 → FS.γ = q.pr (incA D a₀) • (HSpace.gram S).map (fun a => q.pr (incA D a)) → ∀ t : Matrix (Fin T.rank) (Fin S.rank) k, (∀ r s, t r s ∈ 𝒪[k]) → (Place.ofSplitPt q).up FS FT t ∈ stdHom S T := by
   intro D k _ _ _ _ q S T a₀ ha₀ _ FS FT hβ _ hγ t ht
   obtain ⟨ε, ⟨α, rfl, h1, h0⟩, hsum⟩ := q.above
@@ -71,10 +71,10 @@ theorem int_up_mem_stdHom : ∀ (D : D7) (k : Type) [Field k] [ValuativeRel k] [
     ext i' j
     change q.sec ((FT.β * t * FS.γ) i' j) = _
     rw [hβ, hγ, Matrix.one_mul, Matrix.sum_apply, Finset.sum_eq_single i']
-    set_option synthInstance.maxHeartbeats 100000 in
-      · rw [Matrix.sum_apply, Matrix.mul_apply, map_sum]
-        refine Finset.sum_congr rfl fun l _ => ?_
-        rw [hGapp, htm, hrow, Pi.single_eq_same, mul_one, map_mul (incA D), map_mul q.pr, Matrix.smul_apply, Matrix.map_apply, smul_eq_mul]
+
+    · rw [Matrix.sum_apply, Matrix.mul_apply, map_sum]
+      refine Finset.sum_congr rfl fun l _ => ?_
+      rw [hGapp, htm, hrow, Pi.single_eq_same, mul_one, map_mul (incA D), map_mul q.pr, Matrix.smul_apply, Matrix.map_apply, smul_eq_mul]
     · intro i _ hi
       rw [Matrix.sum_apply]
       refine Finset.sum_eq_zero fun l _ => ?_

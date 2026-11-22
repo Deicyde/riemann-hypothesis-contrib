@@ -19,8 +19,8 @@ namespace GlobalTheory.HeightCounting.Up.SerCp
 open GlobalTheory.Mem.R3.Tr Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
 open GlobalTheory.ExportSeries hiding Base
 
-set_option maxHeartbeats 4000000
-set_option synthInstance.maxHeartbeats 400000
+
+
 set_option linter.unusedVariables false
 
 section L1

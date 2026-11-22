@@ -93,8 +93,8 @@ theorem free_of_X_regular_quotient_torsionFree_scalarTower (O M : Type) [CommRin
     · intro m _
       set c := b.repr (Submodule.Quotient.mk m)
       have h2 : m - ∑ i, c i • e i ∈ p := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [← Submodule.Quotient.eq, ← Submodule.mkQ_apply p (∑ i, c i • e i), map_sum]
+
+        rw [← Submodule.Quotient.eq, ← Submodule.mkQ_apply p (∑ i, c i • e i), map_sum]
         simp only [Submodule.mkQ_apply, Submodule.Quotient.mk_smul, he]
         exact (b.sum_repr _).symm
       rw [Submodule.mem_sup]
@@ -118,8 +118,8 @@ theorem free_of_X_regular_quotient_torsionFree_scalarTower (O M : Type) [CommRin
         have hc : ∀ j, PowerSeries.constantCoeff (g j) = 0 := by
           have h0 : ∑ j, (PowerSeries.constantCoeff (g j)) • b j = 0 := by
             have h1 := congrArg p.mkQ hg
-            set_option synthInstance.maxHeartbeats 100000 in
-              simp only [map_sum, map_smul, Submodule.mkQ_apply, he, hN, map_zero] at h1
+
+            simp only [map_sum, map_smul, Submodule.mkQ_apply, he, hN, map_zero] at h1
             exact h1
           exact (Fintype.linearIndependent_iff.mp b.linearIndependent) _ h0
         have hgX : ∀ j, g j = PowerSeries.X * s j := by

@@ -133,8 +133,8 @@ theorem hensOnto_of (a : ℕ) (Y : TupV (E := E) v n a) (hGI : GramInvO σ J v �
     have e2 : ∑ k, sigR (Fv F v) σ (C k i) * hR (Fv F v) σ J (y k) (y j) = sigR (Fv F v) σ (A j i) := by
       have : (gramR (Fv F v) σ J y * C) j i = A j i := by
         rw [hCdef, ← Matrix.mul_assoc, hGG, Matrix.one_mul]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← this, Matrix.mul_apply, map_sum]
+
+      rw [← this, Matrix.mul_apply, map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [map_mul, mul_comm]
       congr 1

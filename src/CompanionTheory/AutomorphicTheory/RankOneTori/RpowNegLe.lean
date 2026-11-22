@@ -57,7 +57,7 @@ theorem exists_pos (hk : 1 ≤ k) (L : LocBessel k r) (c : Fin r → ℂ) (hc : 
     · subst h; simp [C2.monoP]
     · simp [C2.monoP, h]
 
-set_option maxHeartbeats 800000 in
+
 theorem big_bound (hk : 1 ≤ k) (L : LocBessel k r) (c : Fin r → ℂ) (μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ)
     (hc : ∀ a, c a ≠ 0) (hμ : μᴴ * Hb k * μ = Hb k) (b : ℝ) (hb : 0 ≤ b) :
     ∃ K : ℝ, 0 < K ∧ ∀ x : PairSp k r, Good L x →

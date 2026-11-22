@@ -311,7 +311,7 @@ theorem ns_arith (m C₉ q ny : ℕ) {ε : ℝ} (hε : 0 < ε)
   rw [e]
   linarith
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.Formalism.FourierDecayAlt.P.nonstationary_estimate_of_parts : Formalism.FourierDecayAlt.G.NonStatStepOfParts := by
   intro hNS hGL _hGD hRel _hCC hAF hOm hCut hIn
   obtain ⟨C₉, hAF⟩ := hAF

@@ -198,8 +198,8 @@ lemma coordB_embV (htr : TraceMapNormalisation D) (hb : Orthonormal D b) (i j : 
       if i = j then 1 else 0 := by
     split_ifs <;> simp
   rw [← h3, ← h1]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [coordB, embV, tor0, map_sum, map_mul, WeightFamilies.emb_conj]
+
+  simp only [coordB, embV, tor0, map_sum, map_mul, WeightFamilies.emb_conj]
   rfl
 
 lemma coordB_add (T : Tor D) (j : Fin r) (z x : VC D N N') :
@@ -214,8 +214,8 @@ lemma coordB_sum (htr : TraceMapNormalisation D) (hb : Orthonormal D b) (c : Fin
     coordB D (tor0 D cc δ) b j (∑ i, c i • embV D (tor0 D cc δ) (b i)) = c j := by
   let f : VC D N N' →+ ℂ := AddMonoidHom.mk' (coordB D (tor0 D cc δ) b j) (coordB_add _ j)
   change f _ = _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   change ∑ i, coordB D (tor0 D cc δ) b j _ = _
   simp [coordB_smul, coordB_embV htr hb]
 
@@ -224,9 +224,9 @@ lemma Hf_sum (T : Tor D) (c : Fin r → ℂ) (z : VC D N N') :
       ∑ i, coordB D T b i z * starRingEnd ℂ (c i) / (area T.abelian₂ : ℂ) := by
   rw [Hf, ← Finset.sum_div]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [coordB, embV, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul,
-    Finset.mul_sum, Finset.sum_mul]
+
+  simp only [coordB, embV, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul,
+  Finset.mul_sum, Finset.sum_mul]
   symm
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun τ _ => ?_

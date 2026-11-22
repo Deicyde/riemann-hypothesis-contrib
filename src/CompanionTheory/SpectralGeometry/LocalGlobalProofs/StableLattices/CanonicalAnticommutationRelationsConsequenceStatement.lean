@@ -12,7 +12,7 @@ open CompanionTheory.D.LK (Pos Cn ann cre lift bd om cpt allT LocFin)
 open Formalism.REAL (GlRel KHighest IsWeight)
 open CompanionTheory.D.DSIC (KUnit)
 open scoped InnerProductSpace
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.canonical_anticommutation_relations_consequence : ∀ (n : ℕ) (R : Type) [Ring R] (τ : Fin n → Fin n → Prop) [DecidableRel τ] (c d L : Fin n → Fin n → R) (p q : Fin n),
     (∀ a b a' b', c a b * c a' b' + c a' b' * c a b = 0) →
     (∀ a b a' b', d a b * d a' b' + d a' b' * d a b = 0) →

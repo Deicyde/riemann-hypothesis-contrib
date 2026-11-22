@@ -163,8 +163,8 @@ theorem evalM : EvalMStatement := by
       simp
     rw [← hco]
     show _ = lin _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [map_smul]
     rfl
   rw [hexp, sum_gamma_nnMinus (2 * r + k) E hE Q hQ2 c₀ j₀ om (v : D), Submodule.coe_smul, hsmul]

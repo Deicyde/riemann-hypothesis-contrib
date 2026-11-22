@@ -101,8 +101,8 @@ theorem vFin_seen_le_one (V : HSp D) {a : GA D V} (ha : a ∈ GinfC V) {u : Fin 
   refine Finset.sup_le fun i _ => ?_
   have hx : compFin D.host.F D.host.E v (seen V a u i) = (1 : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv D.host.F v) ⊗ₜ[D.host.F] u i := by
     unfold seen
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [GlobalTheory.SeenSize.mulVec_apply', map_sum]
+
+    rw [GlobalTheory.SeenSize.mulVec_apply', map_sum]
     simp only [map_mul, hent, GlobalTheory.SeenSize.compFin_incA]
     simp [Matrix.one_apply]
   rw [hx]

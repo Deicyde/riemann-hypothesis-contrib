@@ -71,8 +71,8 @@ theorem dof_of_tangent (hJ : JetSer.JetAlgSt) (hRep : JetSer.RepSt) (hSer : JetS
   let φ' : Chart.JetR V (Fin d) 1 →ₐ[V] DualNumber (O ⧸ I) := { φ with commutes' := fun v => RingHom.congr_fun hc v }
   have e₀ : MvPowerSeries.map (Ideal.Quotient.mk I) (∑ i, MvPowerSeries.C (c i) * MvPowerSeries.map β (S i)) =
       ∑ i, MvPowerSeries.C (Ideal.Quotient.mk I (c i)) * MvPowerSeries.map (algebraMap V (O ⧸ I)) (S i) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_mul, MvPowerSeries.map_C]
     congr 1
@@ -96,8 +96,8 @@ theorem dof_of_tangent (hJ : JetSer.JetAlgSt) (hRep : JetSer.RepSt) (hSer : JetS
   have c₃ := fun i => PullGerm.gs_eq_germ_fnVal _ U h₁ (s i) z
   have c₄ := fun i => PullGerm.gs_eq_germ_fnVal _ U h₂ (s i) z
   show Φ _ = Φ _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_mul, map_sum, map_sum, ← c₂]
+
+  rw [map_mul, map_sum, map_sum, ← c₂]
   simp only [map_mul, ← c₁]
   refine Eq.trans (Finset.sum_congr rfl fun i _ => congrArg _ (c₄ i).symm) (H.trans ?_)
   exact congrArg _ (Finset.sum_congr rfl fun i _ => congrArg _ (c₃ i))
@@ -330,14 +330,14 @@ theorem eigen_germ : Laws → Laws4 → TwistBCSpanStatement → JetSer.JetAlgSt
       · rw [← map_mul, hr', map_one]
       · rw [← map_mul, hΨ, hΨ, ← map_mul, hr', map_one, map_one]
       · rw [← map_mul, ← map_mul, Units.mul_inv, map_one, map_one]
-      set_option synthInstance.maxHeartbeats 100000 in
-        · rw [hfe, map_sum, Finset.sum_mul, eV]
-          refine Finset.sum_congr rfl fun i _ => ?_
-          have mm : MvPowerSeries.map (algebraMap (TWO.Ov y.v) F) (MvPowerSeries.map (TWO.fO y.v y.hϖ y.hv) (S i)) =
-              MvPowerSeries.map (algebraMap V F) (S i) := by
-            rw [← hβ]; rfl
-          rw [map_mul, map_mul, map_pow, map_pow, map_mul, MvPowerSeries.map_C, mm, _root_.mul_assoc]
-          rfl) mo
+
+      · rw [hfe, map_sum, Finset.sum_mul, eV]
+        refine Finset.sum_congr rfl fun i _ => ?_
+        have mm : MvPowerSeries.map (algebraMap (TWO.Ov y.v) F) (MvPowerSeries.map (TWO.fO y.v y.hϖ y.hv) (S i)) =
+            MvPowerSeries.map (algebraMap V F) (S i) := by
+          rw [← hβ]; rfl
+        rw [map_mul, map_mul, map_pow, map_pow, map_mul, MvPowerSeries.map_C, mm, _root_.mul_assoc]
+        rfl) mo
   obtain ⟨x', rfl⟩ := Ideal.mem_span_singleton'.1 hx
   refine le_of_le_of_eq ?_ (congrArg y.v hxe).symm
   rw [map_mul, map_natCast (algebraMap (TWO.Ov y.v) F), AddValuation.map_mul]

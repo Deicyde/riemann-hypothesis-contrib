@@ -149,7 +149,7 @@ theorem dn_img (T : Forms0 D u) {v : (D.mem u).A.vT} {c : (D.mem u).C.cls 0}
 
 theorem one_nmem (T : Forms0 D u) {v : (D.mem u).A.vT} : (1 : 𝓞 D.host.E) ∉ T.atT.Pv v := fun h => (Ideal.IsPrime.ne_top inferInstance) ((Ideal.eq_top_iff_one _).2 h)
 
-set_option maxHeartbeats 1000000 in
+
 theorem ptSurj_holds (T : Forms0 D u) : PtSurj T := by
   intro v c g _ γ η κ hD y
   obtain ⟨w0, hw0⟩ := T.lv0.prk_surj v c y

@@ -29,7 +29,7 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FamPSizesReco
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 
@@ -43,7 +43,7 @@ open scoped TensorProduct
 namespace GlobalTheory.NeatOne
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem eq_one_of_lev_cong {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L} {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts}
     {Y0 : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y0 cX} {Csz : ℝ} (p : PtAt ex Csz) (i : Fin D.R.m) (g : p.P.Gp)
     (hg : ∀ x : (p.T.Q.Dw ((i : ℕ) + 1)).La, (p.O i).lev g x - x ∈ p.T.Q.l.Mb • (⊤ : Submodule (𝓞 D.host.E) (p.T.Q.Dw ((i : ℕ) + 1)).La)) :

@@ -19,8 +19,8 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Form
 open scoped TensorProduct Classical ComplexConjugate
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.ExportSeries.LatHalf
 
@@ -59,8 +59,8 @@ theorem conj_placesOK {Pg Q : Finset (Pl D.host.E)} (h : PlacesOK Pg Q) :
   have hc : ∀ PP ∈ Pg, idemAt (Formalism.L2.DIV.conjPl PP) = cA D (idemAt PP) := fun PP hPP =>
     idemAt_eq (isIdemAt_conjPl (hS.isIdemAt hPP))
   have he : idem (Pg.image Formalism.L2.DIV.conjPl) = cA D (idem Pg) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [idem, Finset.sum_image hinj, idem, map_sum]
+
+    rw [idem, Finset.sum_image hinj, idem, map_sum]
     exact Finset.sum_congr rfl hc
   refine ⟨he, ⟨⟨Pg.image Formalism.L2.DIV.conjPl, Finset.empty_subset _, le_rfl,
     ⟨idem (Pg.image Formalism.L2.DIV.conjPl), ⟨idemAt, ?_, rfl⟩, ?_⟩⟩, Finset.disjoint_empty_left _, ?_⟩⟩

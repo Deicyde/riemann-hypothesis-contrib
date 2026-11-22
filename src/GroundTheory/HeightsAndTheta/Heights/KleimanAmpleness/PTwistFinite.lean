@@ -55,9 +55,9 @@ theorem TwistFinite.proof (hE : Extension.Statement.{u, w, w}) (hSF : SerreFinit
     hle (Submodule.subset_span ⟨b, s, hs, rfl⟩)
   obtain ⟨c, -, hc⟩ := Submodule.mem_span_finset.mp hmem
   have hcoef := congrArg (fun a => (toA x η a).coeff ((0 : ℤ), (b : ℤ))) hc
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [AddEquiv.apply_symm_apply, map_sum, toA_smulSy, AddMonoidAlgebra.coeff_sum,
-    Finsupp.finsetSum_apply, coeff_single, Finsupp.single_eq_same] at hcoef
+
+  simp only [AddEquiv.apply_symm_apply, map_sum, toA_smulSy, AddMonoidAlgebra.coeff_sum,
+  Finsupp.finsetSum_apply, coeff_single, Finsupp.single_eq_same] at hcoef
   rw [← hcoef]
   refine Submodule.sum_mem _ fun γ hγ => ?_
   have h1 : toA x η γ = single ((0 : ℤ), ((bT ⟨γ, hγ⟩ : ℕ) : ℤ)) (sT ⟨γ, hγ⟩) := by

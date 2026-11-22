@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.EqZeroOfFora
 @[expose] public section
 
 open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.mvPowerSeries_eval_trunc_subst_eq_sum :
     ∀ (B Q : Type) [CommRing B] [CommRing Q] [Algebra B Q] (σ τ : Type) [Fintype σ] [DecidableEq σ]
       [Fintype τ] [DecidableEq τ] (z : σ → B) (u : τ → MvPowerSeries σ B),
@@ -42,8 +42,8 @@ theorem _root_.GlobalTheory.T.mvPowerSeries_eval_trunc_subst_eq_sum :
   simp_rw [Finset.sum_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun α _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [GlobalTheory.DivSub.eval_trunc'_eq_sum, map_sum, Finset.mul_sum]
+
+  rw [GlobalTheory.DivSub.eval_trunc'_eq_sum, map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun β _ => ?_
   rw [map_mul, map_prod]
   simp_rw [map_pow]

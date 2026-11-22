@@ -19,8 +19,8 @@ theorem aeval_scale_of_isWeightedHomogeneous {σ R A : Type*} [CommSemiring R] [
   classical
   conv_lhs => rw [p.as_sum]
   conv_rhs => rw [p.as_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, map_sum, Finset.mul_sum]
+
+  rw [map_sum, map_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun d hd => ?_
   rw [aeval_monomial, aeval_monomial, Finsupp.prod, Finsupp.prod]
   simp only [mul_pow, Finset.prod_mul_distrib, ← pow_mul]
@@ -57,8 +57,8 @@ theorem component_vanish_incidence {I : Ideal (MvPolynomial (Fin n) F)}
     apply Polynomial.funext
     intro t
     have h1 := hf _ (scale_mem_incidence hu i t)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← sum_weightSet_component (w := w) f, map_sum] at h1
+
+    rw [← sum_weightSet_component (w := w) f, map_sum] at h1
     simp only [hq_def, Polynomial.eval_finsetSum, Polynomial.eval_mul, Polynomial.eval_C,
       Polynomial.eval_pow, Polynomial.eval_X, Polynomial.eval_zero]
     rw [← h1]

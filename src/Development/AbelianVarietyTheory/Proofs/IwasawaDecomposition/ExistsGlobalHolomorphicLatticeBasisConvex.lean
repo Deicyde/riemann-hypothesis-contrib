@@ -55,8 +55,8 @@ theorem det_gram_ne_zero {l : Fin r → Fin g → ℂ} (hl : LinearIndependent �
   have hs : ∀ a, rip (l a) (∑ i, v i • l i) = 0 := by
     intro a
     have := congrFun hv0 a
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa [Matrix.vecMul, dotProduct, gram, map_sum] using this
+
+    simpa [Matrix.vecMul, dotProduct, gram, map_sum] using this
   have hz : (∑ i, v i • l i) = 0 := by
     apply eq_zero_of_rip_self
     calc rip (∑ i, v i • l i) (∑ i, v i • l i) = ∑ a, rip (∑ i, v i • l i) (v a • l a) := map_sum _ _ _
@@ -71,8 +71,8 @@ theorem coord_eq {l y : Fin r → Fin g → ℂ} (hl : LinearIndependent ℝ l) 
     (hy : ∀ j, y j = ∑ i, c j i • l i) : coord l y = c := by
   have : pair l y = c * gram l := by
     ext j a
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [pair, gram, Matrix.mul_apply, hy j, map_sum]
+
+    simp [pair, gram, Matrix.mul_apply, hy j, map_sum]
   rw [coord, this]
   exact Matrix.mul_nonsing_inv_cancel_right _ _ (isUnit_iff_ne_zero.2 (det_gram_ne_zero hl))
 

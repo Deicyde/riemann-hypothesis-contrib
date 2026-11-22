@@ -68,7 +68,7 @@ def localInflHom : ∀ (v : Place K.1) (p : GLevel K),
   | .inr v, p => (localInfl (ι.fin v) p.1 n).hom.toAddMonoidHom
 
 
-set_option maxHeartbeats 8000000 in
+
 def localLimit : LocalLimit (ι.places.levelDecomposition n) where
   T := localGaloisCohomology K n
   infl := ι.localInflHom n

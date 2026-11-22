@@ -110,8 +110,8 @@ theorem cone_segre_rel {e : ℕ} {Q : Ideal (MRingOver ℂ ι)} (hP : Reciprocit
     convert this using 1
     funext k; simp [D]
   have hcomp := congrArg comp hab
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_add (f := _), map_sum, weightedHomogeneousComponent_eq_self hpow] at hcomp
+
+  rw [map_add (f := _), map_sum, weightedHomogeneousComponent_eq_self hpow] at hcomp
   simp only [comp, comp_mul_homog (hpsiPoly _)] at hcomp
   have hcd : ∀ j, ∃ G : MvPolynomial ((k : K) → ι k) ℂ, G.totalDegree ≤ r0 ∧
       ∀ z : (Σ k, ι k) → ℂ, eval z (weightedHomogeneousComponent (blkW ι) D (c j)) =
@@ -120,9 +120,9 @@ theorem cone_segre_rel {e : ℕ} {Q : Ideal (MRingOver ℂ ι)} (hP : Reciprocit
   choose G hG hGz using hcd
   refine ⟨r0 + 1, Nat.succ_pos _, G, fun j => by simpa using hG j, fun z hz => ?_⟩
   have h0 := congrArg (eval z) hcomp
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_add (f := _), hz.2 _ (weightedHomogeneousComponent_mem_of_mem _ _ (cone_homog hP) ha _),
-    zero_add, map_sum, map_pow, eval_segMono] at h0
+
+  rw [map_add (f := _), hz.2 _ (weightedHomogeneousComponent_mem_of_mem _ _ (cone_homog hP) ha _),
+  zero_add, map_sum, map_pow, eval_segMono] at h0
   rw [← h0]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_mul, hGz, eval_psiPoly, mul_comm]
@@ -148,9 +148,9 @@ theorem cone_pow_mem {Q : Ideal (MRingOver ℂ ι)} {e m : ℕ} {σ : Fin m ≃ 
     have h := hrel z hz
     rw [Fin.sum_univ_succ, hz1, one_mul] at h
     change eval (fun a => segre z (σ a)) f = 0
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [f, Gx, map_sub, map_add (f := _), map_pow, map_sum, map_mul, eval_X, eval_rename, hw,
-      eval_linPoly, hA, chartProjMatrix_mulVec]
+
+    simp only [f, Gx, map_sub, map_add (f := _), map_pow, map_sum, map_mul, eval_X, eval_rename, hw,
+    eval_linPoly, hA, chartProjMatrix_mulVec]
     rw [h]
     simp [Equiv.apply_symm_apply, mul_comm]
   have hdeg : f.totalDegree ≤ r := by
@@ -169,9 +169,9 @@ theorem cone_pow_mem {Q : Ideal (MRingOver ℂ ι)} {e m : ℕ} {σ : Fin m ≃ 
     homogeneousComponent_eq_zero (n := r) (φ := Gx 0) (by have := hGx 0; omega)
   have hcomp : homogeneousComponent r f =
       X a ^ r - ∑ j : Fin e, homogeneousComponent (r - 1) (Gx j.succ) * linPoly A j := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [f, map_sub, map_add (f := _), map_sum, hX, h0, zero_add,
-      homogeneousComponent_mul_of_isHomogeneous_right _ _ (isHomogeneous_linPoly A _), h1, if_true]
+
+    simp only [f, map_sub, map_add (f := _), map_sum, hX, h0, zero_add,
+    homogeneousComponent_mul_of_isHomogeneous_right _ _ (isHomogeneous_linPoly A _), h1, if_true]
   have hmem : homogeneousComponent r f + ∑ j : Fin e, homogeneousComponent (r - 1) (Gx j.succ) * linPoly A j ∈
       leadIdeal J ⊔ linIdeal A :=
     add_mem (Ideal.mem_sup_left (homogeneousComponent_mem_leadIdeal hfJ hdeg))

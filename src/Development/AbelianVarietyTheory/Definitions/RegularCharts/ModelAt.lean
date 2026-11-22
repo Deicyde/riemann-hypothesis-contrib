@@ -7,7 +7,7 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.CoreProofs
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 

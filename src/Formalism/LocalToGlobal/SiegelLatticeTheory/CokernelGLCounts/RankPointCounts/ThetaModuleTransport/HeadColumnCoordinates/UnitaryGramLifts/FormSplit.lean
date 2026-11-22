@@ -57,9 +57,9 @@ theorem splitForm_iotaOne_iotaOne (hs : M.split = some g) (Zh : Matrix (Fin (r +
       (iota1 hs l) (iota1 hs w) = 0 := by
   rw [eq_iff_ph (g := g)]
   unfold formG
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, map_zero, firstProj_conj_eq_secondProj, splitSecondProj_conj, splitSecondProj_iotaOne, mul_zero, zero_mul,
-    Finset.sum_const_zero]
+
+  simp only [map_sum, map_mul, map_zero, firstProj_conj_eq_secondProj, splitSecondProj_conj, splitSecondProj_iotaOne, mul_zero, zero_mul,
+  Finset.sum_const_zero]
   simp
 
 theorem splitForm_iotaTwo_iotaTwo (hs : M.split = some g) (Zh : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : F)
@@ -68,9 +68,9 @@ theorem splitForm_iotaTwo_iotaTwo (hs : M.split = some g) (Zh : Matrix (Fin (r +
       (iota2 hs l) (iota2 hs w) = 0 := by
   rw [eq_iff_ph (g := g)]
   unfold formG
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, map_zero, firstProj_conj_eq_secondProj, splitSecondProj_conj, splitFirstProj_iotaTwo, mul_zero, zero_mul,
-    Finset.sum_const_zero]
+
+  simp only [map_sum, map_mul, map_zero, firstProj_conj_eq_secondProj, splitSecondProj_conj, splitFirstProj_iotaTwo, mul_zero, zero_mul,
+  Finset.sum_const_zero]
   simp
 
 theorem fs_map_inv {n : Type} [Fintype n] [DecidableEq n] (f : E →+* E) (A : Matrix n n E) (hA : IsUnit A.det) :
@@ -104,8 +104,8 @@ theorem fs_herm (Zh : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' q : F)
     rw [this, hT, h2, Matrix.transpose_apply]
   have hcc : ∀ x : E, (M.L.cj : E →+* E) ((M.L.cj : E →+* E) x) = x := M.L.cj_cj
   unfold formG
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hGd, map_sum, map_mul, hcc, hinv]
+
+  simp only [hGd, map_sum, map_mul, hcc, hinv]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring

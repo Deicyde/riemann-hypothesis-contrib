@@ -34,8 +34,8 @@ theorem UpperTheory.V.CA.d_poly :
     intro S _ _ f
     rw [Det.poly, ← D.nat]
     congr 1
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [Det.gen, map_sum]
+
+    simp [Det.gen, map_sum]
   refine ⟨?_, fun S _ _ s => by simpa using key S (MvPolynomial.aeval s)⟩
   let g : MvPolynomial ι A →ₐ[A] (MvPolynomial ι A)[X] := MvPolynomial.aeval fun a => X * C (MvPolynomial.X a)
   let t : MvPolynomial ι A →ₐ[A] (MvPolynomial ι A)[X] := IsScalarTower.toAlgHom A (MvPolynomial ι A) (MvPolynomial ι A)[X]

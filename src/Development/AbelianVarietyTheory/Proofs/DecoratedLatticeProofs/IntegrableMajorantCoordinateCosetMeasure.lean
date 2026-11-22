@@ -23,7 +23,7 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Unf
 open scoped ComplexOrder ENNReal NNReal ContDiff
 
-set_option synthInstance.maxHeartbeats 160000
+
 
 namespace GlobalTheory.Unf.MajInt
 

@@ -18,9 +18,9 @@ theorem exists_endomorphism_representing_sesquilinear_form
   let e := stdOrthonormalBasis ℂ W
   refine ⟨∑ j, (B (e j)).smulRight (e j), fun x y => ?_⟩
   conv_lhs => rw [← e.sum_repr' x]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply,
-    LinearMap.smulRight_apply, inner_sum, inner_smul_right, smul_eq_mul, inner_conj_symm]
+
+  simp only [map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply,
+  LinearMap.smulRight_apply, inner_sum, inner_smul_right, smul_eq_mul, inner_conj_symm]
   exact Finset.sum_congr rfl fun j _ => mul_comm _ _
 
 theorem invariant_posDef_form_eq_smul_inner_of_irreducible :

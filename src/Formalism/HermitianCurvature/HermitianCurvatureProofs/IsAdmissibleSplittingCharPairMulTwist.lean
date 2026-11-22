@@ -399,8 +399,8 @@ theorem actS_mul {N : ℕ} (b c : SlopeTestRemainingChoices (Fin N) (A P (DQ P))
   funext p
   show ∑ e', ∑ π', (((b * c) p.1 e') p.2 π').1 (F (e', π')) =
     ∑ e'', ∑ π'', ((b p.1 e'') p.2 π'').1 (∑ e', ∑ π', ((c e'' e') π'' π').1 (F (e', π')))
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [matrix_mul_entry, op_sum_apply, op_mul_apply, map_sum]
+
+  simp only [matrix_mul_entry, op_sum_apply, op_mul_apply, map_sum]
   exact sum4 (fun e' π' e'' π'' => ((b p.1 e'') p.2 π'').1 (((c e'' e') π'' π').1 (F (e', π'))))
 
 theorem apply_matrix_action {N : ℕ} (b : SlopeTestRemainingChoices (Fin N) (A P (DQ P))) (U : Qp P.r P.TT → Iota P N → ℂ)
@@ -1107,8 +1107,8 @@ theorem polyIn_io {S : Type} [Fintype S] [DecidableEq S] {f : ℂ → A P (DQ P)
   dsimp only
   rw [ha]
   unfold io
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   have := io_smul P (S := S) (s ^ k) (a k)
   unfold io at this
@@ -2025,13 +2025,13 @@ def fstH : (DQ P).Pr →+ (DQ P).Op where
 theorem actA_mul (a b : A P (DQ P)) (j : M.Ty P → SmQ P.r P.TT) : actA P (a * b) j = actA P a (actA P b j) := by
   funext π
   have h : ∀ π', ((a * b : Matrix (M.Ty P) (M.Ty P) (DQ P).Pr) π π').1 = ∑ k, (a π k).1 * (b k π').1 := fun π' => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Matrix.mul_apply]; exact map_sum (fstH P) (fun k => a π k * b k π') Finset.univ
+
+    rw [Matrix.mul_apply]; exact map_sum (fstH P) (fun k => a π k * b k π') Finset.univ
   show ∑ π', ((a * b : Matrix (M.Ty P) (M.Ty P) (DQ P).Pr) π π').1 (j π') = ∑ π', (a π π').1 (∑ π'', (b π' π'').1 (j π''))
   have h2 : ∀ x, (∑ k, (a π k).1 * (b k x).1) (j x) = ∑ k, (a π k).1 ((b k x).1 (j x)) := fun x => by
     exact (LinearMap.sum_apply Finset.univ (fun k => (a π k).1 * (b k x).1) (j x)).trans rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [h, map_sum]
+
+  simp only [h, map_sum]
   rw [Finset.sum_congr rfl fun x _ => h2 x]
   exact Finset.sum_comm
 
@@ -2406,7 +2406,7 @@ end S_F_F11
 section S_F_F12
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
+
 
 namespace Formalism.FourierDecayAlt.P.MAx3.F
 
@@ -2465,7 +2465,7 @@ end S_F_F12
 section S_F_F13
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
+
 
 namespace Formalism.FourierDecayAlt.P.MAx3.F
 
@@ -2531,7 +2531,7 @@ end S_F_F13
 section S_F_F14
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
+
 
 namespace Formalism.FourierDecayAlt.P.MAx3.F
 
@@ -2615,7 +2615,7 @@ end S_F_F14
 section S_F_F15
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
+
 
 namespace Formalism.FourierDecayAlt.P.MAx3.F
 
@@ -2711,7 +2711,7 @@ end S_F_F15
 section S_F_F16
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
+
 
 namespace Formalism.FourierDecayAlt.P.MAx3.F
 
@@ -2804,7 +2804,7 @@ end S_F_F16
 section S_F_F17
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
+
 
 namespace Formalism.FourierDecayAlt.P.MAx3.F
 
@@ -2924,7 +2924,7 @@ end S_F_F17
 section S_F_F18
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
+
 
 namespace Formalism.FourierDecayAlt.P.MAx3.F
 
@@ -3003,7 +3003,7 @@ end S_F_F18
 section S_F_F19
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
+
 
 namespace Formalism.FourierDecayAlt.P.MAx3.F
 
@@ -3092,7 +3092,7 @@ end S_F_F19
 section S_F_F20
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
+
 
 namespace Formalism.FourierDecayAlt.P.MAx3.F
 
@@ -3109,8 +3109,8 @@ theorem act_sc (w : (DQ P).Pr) (Mx : A P (DQ P)) (j : M.Ty P → SmQ P.r P.TT) (
     actA P (sc P (DQ P) w * Mx) j π = w.1 (actA P Mx j π) := by
   show ∑ π', ((Matrix.scalar (M.Ty P) w * Mx : Matrix (M.Ty P) (M.Ty P) (DQ P).Pr) π π').1 (j π') =
     w.1 (∑ π', (Mx π π').1 (j π'))
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun π' _ => ?_
   rw [Matrix.scalar_apply, Matrix.diagonal_mul]
   rfl
@@ -3173,7 +3173,7 @@ end S_F_F20
 section S_F_F21
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
+
 
 namespace Formalism.FourierDecayAlt.P.MAx3.F
 
@@ -3248,7 +3248,7 @@ end S_F_F21
 section S_F_F22
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
+
 
 namespace Formalism.FourierDecayAlt.P.MAx3.F
 
@@ -3321,7 +3321,7 @@ end S_F_F22
 section S_F_F23
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 2000000
+
 
 namespace Formalism.FourierDecayAlt.P.MAx3.F
 
@@ -3363,7 +3363,7 @@ end S_F_F23
 section S_F_F24
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
+
 
 namespace Formalism.FourierDecayAlt.P.MAx3.F
 
@@ -3415,7 +3415,7 @@ end S_F_F24
 section S_F_F25
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
+
 
 namespace Formalism.FourierDecayAlt.P.MAx3.F
 
@@ -3486,7 +3486,7 @@ end S_F_F25
 section S_F_F26
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
-set_option maxHeartbeats 1000000
+
 
 namespace Formalism.FourierDecayAlt.P.MAx3.F
 
@@ -5389,8 +5389,8 @@ theorem eeA_split (P : M.Par) (Y : ℂ) :
       (kap P (DQ P) (fun π => if π = π0 then 1 else 0) * SS P (DQ P) ((l' : ℕ) + 1)) =
       (kap P (DQ P) fun π => (Y + (M.rho P π ((l' : ℕ) + 1) : ℂ))⁻¹) * SS P (DQ P) ((l' : ℕ) + 1) := by
     intro l'
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp_rw [← smul_mul_assoc, ← Finset.sum_mul, ← map_smul, ← map_sum]
+
+    simp_rw [← smul_mul_assoc, ← Finset.sum_mul, ← map_smul, ← map_sum]
     congr 2
     funext π
     simp [Finset.sum_apply, Pi.smul_apply, Finset.sum_ite_eq', sub_neg_eq_add]
@@ -7003,7 +7003,7 @@ theorem Ctx.summand_nonneg (h : Ctx P l α β Lb Ntot w Y s) (π : M.Ty P) (m : 
   unfold summand
   exact div_nonneg (mul_nonneg (hf.resA_nonneg h.hOK.k_pos m hm) (abs_nonneg _)) (by positivity)
 
-set_option maxHeartbeats 800000 in
+
 theorem Ctx.ss_bound (h : Ctx P l α β Lb Ntot w Y s) (q : Qp P.r P.TT) (v : Iota P w.length → ℂ) :
     ∑ i, dwW P l (Y :: w) q (true, i) * ‖∑ i', dSS P w Y (Y + s) q (ixOf P w.length i).1 (ixOf P w.length i').1
       (ixOf P w.length i).2 (ixOf P w.length i').2 * v i'‖ ^ 2 ≤
@@ -7109,7 +7109,7 @@ noncomputable section
 section
 variable {P : M.Par} {l : ℕ} {α β Lb : ℝ} {Ntot : ℕ} {w : List ℝ} {Y s : ℝ}
 
-set_option maxHeartbeats 800000 in
+
 theorem Ctx.let_bound (h : Ctx P l α β Lb Ntot w Y s) (q : Qp P.r P.TT) (v : Iota P w.length → ℂ) :
     ∑ i, dwW P l (Y :: w) q (true, i) * ‖∑ i', dL P w Y (Y + s) (ixOf P w.length i).1 (ixOf P w.length i').1
       (ixOf P w.length i).2 (ixOf P w.length i').2 * v i'‖ ^ 2 ≤
@@ -7187,7 +7187,7 @@ theorem norm_sub_sq_le (a b : ℂ) : ‖a - b‖ ^ 2 ≤ 2 * ‖a‖ ^ 2 + 2 * �
   have h0 : 0 ≤ ‖a - b‖ := norm_nonneg _
   nlinarith [sq_nonneg (‖a‖ - ‖b‖), norm_nonneg a, norm_nonneg b]
 
-set_option maxHeartbeats 800000 in
+
 theorem residues : Formalism.FourierDecayAlt.MA.ResiduesQ := by
   refine ⟨Real.sqrt (176 * Real.exp 7 + 2 * Real.exp 14), Real.sqrt_nonneg _, ?_⟩
   intro P l L j lam α β Lb c Ntot hH w hw hl Y s hY hYs (ω : Qp P.r P.TT) (v : Iota P w.length → ℂ)
@@ -8162,8 +8162,8 @@ theorem Bi_mem (hTT : 0 ≤ P.TT) (hL : IsModelLevel P (DQ P) L) : ∀ w : List 
 
 theorem op_sum_smul {ι : Type} (s : Finset ι) (T : (DQ P).Op) (F : ι → (DQ P).R) (a : ι → ℂ) (q : Qp P.r P.TT) :
     evQ P (T (∑ t ∈ s, a t • F t)) q = ∑ t ∈ s, a t * evQ P (T (F t)) q := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine (MAx2.Jet.evQ_sum P _ _ q).trans (Finset.sum_congr rfl fun t _ => ?_)
   rw [map_smul]
   exact G.evQ_smul P _ _ q
@@ -10450,8 +10450,8 @@ theorem eeA_rep : Rep L (Gbase P) (fun Y => (io (eeA P (DQ P) Y) : SlopeTestRema
       have hf : (fun π => (Y + (M.rho P π j : ℂ))⁻¹) = ∑ π : M.Ty P, (Y + (M.rho P π j : ℂ))⁻¹ • Pi.single π (1 : ℂ) := by
         funext π'
         simp [Finset.sum_apply, Pi.single_apply]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hf, map_sum]
+
+      rw [hf, map_sum]
       exact Finset.sum_congr rfl fun π _ => map_smul _ _ _
     rw [hk, Finset.sum_mul, Finset.mul_sum]
     refine Finset.sum_congr rfl fun π _ => ?_
@@ -10462,11 +10462,11 @@ theorem eeA_rep : Rep L (Gbase P) (fun Y => (io (eeA P (DQ P) Y) : SlopeTestRema
     funext Y
     rw [e]
     unfold io
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun π _ => ?_
     have := G.io_smul P (S := S) (Y + (M.rho P π j : ℂ))⁻¹ (L.ζ * L.ζbi * (kap P (DQ P) (Pi.single π 1) * SS P (DQ P) j))
     unfold io at this
@@ -10674,8 +10674,8 @@ theorem part_poly {N : ℕ} (x : ℂ → A P (DQ P)) (d : ℕ) (hx : G.PolyIn (f
   have e2 : (io (x Y) : SlopeTestRemainingChoices (Fin N) (A P (DQ P))) = ∑ k ∈ Finset.range (d + 1), Y ^ k • io (a k) := by
     rw [e1]
     unfold io
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     have := G.io_smul P (S := Fin N) (Y ^ k) (a k)
     unfold io at this
@@ -11451,8 +11451,8 @@ theorem act_leibniz (x : A P (DQ P)) (hx : x ∈ MAx2.Jet.TS P) (d : ℕ) (c : �
       have h1 := congrArg (fun y : A P (DQ P) => MAx2.R2.Phi P (y π π') (f π')) (hconj s)
       simp only [Gs_conj_entry, map_mul, Module.End.mul_apply] at h1
       rw [Matrix.sum_apply] at h1
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, Matrix.smul_apply, map_smul, LinearMap.sum_apply, LinearMap.smul_apply] at h1
+
+      simp only [map_sum, Matrix.smul_apply, map_smul, LinearMap.sum_apply, LinearMap.smul_apply] at h1
       exact h1
     show ∑ π', MAx2.R2.Phi P (x π π') (G.Gpow P s * f π') = ∑ p ∈ Finset.range (d + 1),
       MAx2.Jet.Phi P (fun x : ℝ => x ^ s) p * ∑ π', MAx2.R2.Phi P (c p π π') (f π')
@@ -14453,8 +14453,8 @@ theorem PR_kap {p : M.Ty P → ℝ → ℂ} {d : ℕ} (hp : ∀ π, PR (p π) d)
   dsimp only
   have : (fun π => p π s) = ∑ k ∈ range (d + 1), ((s : ℂ) ^ k) • (fun π => a π k) := by
     funext π; rw [ha π s, Finset.sum_apply]; rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [this, map_sum]
+
+  rw [this, map_sum]
   exact Finset.sum_congr rfl fun k _ => by rw [map_smul]
 
 theorem PR_xC (π : M.Ty P) : PR (fun s : ℝ => M.xC P π (s : ℂ)) (P.k - 1) := by
@@ -14873,8 +14873,8 @@ theorem first_identity_of_integral (h : IntHyp) : EnergyPolynomialInPoints := by
       C0 (startM P (DQ P) l).QQ (sites P (DQ P)) (x.2 : ℂ)).prod = prodC P l Y := by
     simp [prodC, List.map_reverse, List.map_ofFn, Function.comp_def]
   unfold cutoffEnergyForm ipA ip0
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hprod, map_sum]
+
+  rw [hprod, map_sum]
   simp_rw [eval_ex]
   have hI : ∀ π, ∫ q, ((actA P (prodC P l Y) (chiJ P j c ε) π : SmQ P.r P.TT) : Qp P.r P.TT → ℂ) q *
       conj (((chiJ P j c ε π : SmQ P.r P.TT) : Qp P.r P.TT → ℂ) q) ∂mu0 P.r P.TT =
@@ -15357,8 +15357,8 @@ theorem SA_mul {x y : A P (DQ P)} {Mx My : Qp P.r P.TT → Matrix (M.Ty P) (M.Ty
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
   · rw [star_mul, F.actA_mul, hy.2]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp_rw [hx.2, Finset.mul_sum, Matrix.mul_apply, map_sum, Finset.sum_mul]
+
+    simp_rw [hx.2, Finset.mul_sum, Matrix.mul_apply, map_sum, Finset.sum_mul]
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by rw [map_mul]; ring
 
@@ -15746,8 +15746,8 @@ theorem multAdj {m : ℕ} (hD : JDecay P L j m) {a β s : A P (DQ P)} {C : ℝ} 
   refine ⟨int1, int2, ?_⟩
   rw [ipA_eq, ipA_eq, ← integral_finsetSum _ fun π _ => int1 π, ← integral_finsetSum _ fun π _ => int2 π]
   congr 1; funext q
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [e1, e2, map_sum, map_mul, Complex.conj_conj, Finset.mul_sum, Finset.sum_mul]
+
+  simp only [e1, e2, map_sum, map_mul, Complex.conj_conj, Finset.mul_sum, Finset.sum_mul]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
 
@@ -16960,8 +16960,8 @@ theorem int_conj {f : Qp P.r P.TT → ℂ} (hf : Integrable f (mu0 P.r P.TT)) :
     (Filter.Eventually.of_forall fun q => by simp)
 
 theorem ipA_conj (f g : M.Ty P → SmQ P.r P.TT) : ipA P f g = conj (ipA P g f) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [AD.ipA_eq, AD.ipA_eq, map_sum]
+
+  rw [AD.ipA_eq, AD.ipA_eq, map_sum]
   refine Finset.sum_congr rfl fun π _ => ?_
   rw [← integral_conj]
   congr 1; funext q
@@ -17347,8 +17347,8 @@ theorem adjoint_bounded : Formalism.FourierDecayAlt.MA.AdjBQ := by
   have eR : ∀ b e, ipA P (actA P (uv P l L' w Y b e) j) (actA P (yv' P l L' w Y ψ b e) j) =
       conj (ipA P (actA P (star (uv P l L' w Y b e) * yv' P l L' w Y ψ b e) j) j) := fun b e => by
     rw [Formalism.FourierDecayAlt.P.MAx3.AB.ipA_conj, (QR b e).2.2]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [eL, eR, ← map_sum]
+
+  simp only [eL, eR, ← map_sum]
   congr 1
   rw [ipA_sum_j Finset.univ _ j (fun e _ => (QL e).2.1)]
   have inner : ∀ b, ∑ e, ipA P (actA P (star (uv P l L' w Y b e) * yv' P l L' w Y ψ b e) j) j =

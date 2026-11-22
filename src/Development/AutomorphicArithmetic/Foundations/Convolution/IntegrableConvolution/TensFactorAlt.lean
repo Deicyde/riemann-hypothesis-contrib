@@ -372,7 +372,7 @@ end SlopeTestRemainingChoices
 
 end UpperTheory.ConvolutionTheory.L1
 
-set_option maxHeartbeats 2000000 in
+
 theorem UpperTheory.ConvolutionTheory.L1.tensFactor :
     UpperTheory.ConvolutionTheory.L1.TensFactor := by
   intro K _ _ n hn μ _ ν _ J χ hco hcof

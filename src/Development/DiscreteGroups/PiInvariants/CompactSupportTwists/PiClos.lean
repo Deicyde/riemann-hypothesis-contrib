@@ -132,8 +132,8 @@ theorem piClosureInv : PiClosureInv := by
       simp
   have hsum : f = ∑ i, J i (f i) := by
     apply (PiLp.continuousLinearEquiv 2 ℂ (fun _ : ι => Lp ℂ 2 D.ν)).injective
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp only [hJe]
     exact (Finset.univ_sum_single _).symm
   rw [hsum]

@@ -19,7 +19,7 @@ namespace PositivityTheory.Rg.Sw.AbsSt
 
 open PositivityTheory.Rg.Sw
 
-set_option maxHeartbeats 1600000 in
+
 theorem tsGen_of (hD : CayleyBlocksInvertible) (hK : KAK) (hM : Mult) (hS : SecZero) (hDF : DerivativeVacuumDilations)
     (hH : HolParam) (hLC : LC) (hT : TSBFacts) : TSGen := by
   intro m n ε c t p q e sL ρ hL G _ _ _ _ _ _ Pp Γ ι s₀ Ht sec I Λ hG _ _ W hWf hWρ ν κ hν hκ hfix hproj gpt y Q hQW hQ
