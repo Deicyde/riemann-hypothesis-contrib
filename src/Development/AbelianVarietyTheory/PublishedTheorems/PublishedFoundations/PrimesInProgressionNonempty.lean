@@ -10,6 +10,17 @@ def primesInProgression (a q : ℕ) : Set ℕ := {p | p.Prime ∧ p ≡ a [MOD q
 
 noncomputable def leastPrimeMod (a q : ℕ) : ℕ := sInf (primesInProgression a q)
 
+/-- **Linnik's theorem**, in its qualitative form: there are positive constants `C` and `L` such
+that, for all coprime `a, q ≥ 1`, the least prime congruent to `a` modulo `q` is at most
+`C * q ^ L`. No value of `L` and no effectivity of the constants is asserted.
+
+The theorem is due to
+[U. V. Linnik, *On the least prime in an arithmetic progression. I. The basic theorem*][linnik1944].
+It is recalled in this form, with effective constants, in
+[T. Xylouris, *On Linnik's constant* (equation (1.5))][xylouris2009], which proves the bound with
+`L = 5.2` (Theorem 1.1). Linnik's paper was not read in preparing this reference. This reference
+is a reader's proposal and has not been checked by a mathematician. -/
+@[wikidata Q2703389]
 def Linnik : Prop :=
   ∃ C L : ℝ, 0 < C ∧ 0 < L ∧ ∀ a q : ℕ, 1 ≤ a → 1 ≤ q → a.Coprime q →
     (leastPrimeMod a q : ℝ) ≤ C * (q : ℝ) ^ L
