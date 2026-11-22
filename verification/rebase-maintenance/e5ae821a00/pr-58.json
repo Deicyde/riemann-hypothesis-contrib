@@ -1,0 +1,1823 @@
+{
+  "number": 58,
+  "title": "Collapse 24,027 single-declaration thin re-export wrappers (stacked on #55)",
+  "original_head": "7ea35ecdeb780dbd53230d6a99bbfcd1353430b7",
+  "original_repo": "rohanarun/riemann-hypothesis",
+  "original_branch": "collapse-statement-wrappers",
+  "maintainer_can_modify": true,
+  "old_merge_base": "bdda2f0eac48cfc445d43a43f37b50cbb7ab01ef",
+  "automatic_resolution_count": 7384,
+  "automatic_resolutions": [
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/BesselOrbitBounds/BesselMapUniqueness/OrbitMult.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/CoefOfOfWsp.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/KDecayOfGap.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/NormalizedMeasureScaling.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/WaveInputsOfHypothesesGlobal.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/DiscreteGroupWaves/NFCoreC.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/JacobiDiagonalBounds/NFFinal.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/AtFormAdm.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/EClose.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/LocQuad1GHolds.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/WeilPairJ.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PadicUnitaryWeights/CrystallineUnitParts/ConradLocalTiedness.lean",
+      "reason": "retain-main-pruning"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/AemeasurableBesselNormIntegrandBigCellImports.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/BesselCharacterUnipotentRadicalPropertiesImports.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/BesselFunctionLocalityInvariantFactorFiniteSumIm.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/BesselNormSqEqBigCellNormSqAltImports.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/BesselNormSqEqConstMulArchPairingImports.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/BesselSubgroupParameterMeasurePreservingImports.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/BetaInfEqIntegralOfIntegrableCoefficientImports.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/CasimirScalarOfCapelliDeterminantEigenvalueImpor.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/DecayThresholdsOfSpectralGapConditionImports.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/DiscreteSeriesUnitarySmoothBasicImports.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/ExistsLieUnitaryElementSimpleRootImports.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/ExistsRegularRepBesselBigCellVectorEqBesselImpor.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/FactorizationOfConjHomogeneousAndHomogeneous.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/FrameWConjMatrixUnitsImports.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/Imports.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/ImportsBisTer.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/ImportsMore.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/ImportsTer.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/IsFRepDualStandardUnitaryRep.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/IsHaarOnIffGroupsUnitaryUnipotentImports.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/NormSqIntegralInnerWeightLeImports.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/NumericalFamilyProductBoundConstantLeImports.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/NumericalFamilyShapeGaps.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/ProductMomentBoundDensityMassOneImports.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/SumNormSqHermTranslatesOrthonormalImports.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/PieriDegreeBounds/WeilFormulaIntegrableComplexImports.lean",
+      "reason": "retain-PR-deletion"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselCayleySideBound.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselCayleySideBoundStatement.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselFormalDegreeIdentity.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselFormalDegreeIdentityStatement.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselFormalDegreePairing.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselFormalDegreePairingStatement.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselFrameEntryRelation.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselFrameEntryRelationStatement.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapDimensionFormula.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapDimensionFormulaStatement.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapExistsFunctionalStatement.lean",
+      "reason": "three-way-replay-through-module-header"
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapGrowthBound.lean",
+      "reason": "three-way-replay-through-module-header"
+    }
+  ],
+  "status": "conflict",
+  "conflict_count": 25441,
+  "stage_types": {
+    "1,2,3": 25441
+  },
+  "conflicts": [
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/BesselSmoothness/BesselSmoothOf.lean",
+      "stages": {
+        "1": "99244eff4d0b2b62ea3d134dfbe935e7546eae50",
+        "2": "2bcba79f8bea13246c8123dccc7c2d1c32a187d4",
+        "3": "0f749a3fa91bd598384ccfbf84af05f90167c431"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/FamilyThroughDiscreteSeries.lean",
+      "stages": {
+        "1": "81e7a1bbb6a5adfcbb23425b5822c7042e310db8",
+        "2": "f87c1c70e72c3ccd0dacdb1f6a11c664275a541f",
+        "3": "bea425c73d066bd396f9903f21210f02d56401f1"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/NqOfLamData.lean",
+      "stages": {
+        "1": "19b84e4dc1547c41298565d19a2f3932f1c44020",
+        "2": "23ea7a3141328ad862b98dfc667c688f610a0f4f",
+        "3": "df78cdb1fa42983e97559ac9b6630c8a950f9e9c"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/ProductMoment.lean",
+      "stages": {
+        "1": "13026164eafb534e5db69fb67b3331d79df048df",
+        "2": "be1c117704a36f2c99c344e35a852dbc62568e88",
+        "3": "53993c4479c67a5d2a6996b61b015913fda7f8a7"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/TypeHC.lean",
+      "stages": {
+        "1": "0d843b68ddc6ebbfe513fd0e116f580977931f75",
+        "2": "dcf7a01f281560ff9f45a159dd169ac334a45364",
+        "3": "e420dd701dd0b590426628df8547b5b5fe80711d"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/BesselWaveGrids/WaveBallEstimateWeightedDualAlt.lean",
+      "stages": {
+        "1": "999ba981f65fdcad0e94e240d9e1e16d798de7ac",
+        "2": "a84f2e6975ed6512b73a17e64d66b6cee23a88a3",
+        "3": "1edb38365eb8d92bfabb26510c799a773f69cacd"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/CompactTopologicalForms/FinalS.lean",
+      "stages": {
+        "1": "1f4527985636bacdcabe44e1f3d76fbe1d1b3d49",
+        "2": "951a4dd14df50612ad514babdd3284d6bd605b45",
+        "3": "1b818e7244204d7b7202ef6d838a4e5691a4375b"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/HeckeStandardModules/IntegralOfModule.lean",
+      "stages": {
+        "1": "e1a60a88c3f377460953bae491d114c278909aa5",
+        "2": "07672f679ea23b0273fc595fd65190f30bd67418",
+        "3": "1a09571b9e92e7cb2cd99ab5f026e9fcebe8dc91"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/JacobiDiagonalBounds/NfTieHatSOf.lean",
+      "stages": {
+        "1": "5b26d7c0b24e2f83748b9bba397d4e93c97cacb5",
+        "2": "744f7fa56580b854250e6bd198e6c47222195ae0",
+        "3": "e8f2640a1c2329434e3ad927ec93f2e9643147ec"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/AmplitudeOrbitalIntegral.lean",
+      "stages": {
+        "1": "1dd55930e68a3fa05bbe64f92d023ccc0502288f",
+        "2": "dedce73f66373f0691c2c6e151aeb5a49c03ec81",
+        "3": "7aa418fced85f665d498e98c8d1704b94b06768c"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/EFinal.lean",
+      "stages": {
+        "1": "8632716b01581e2167164f639c60202a47f9297a",
+        "2": "eaaf821a8eaa31c29acc7b0ef1ae486c0d8fa244",
+        "3": "8b74e4ba4b272caf84baf52e099f81e1adcbcef2"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/RealObjInInfinityXJsz.lean",
+      "stages": {
+        "1": "2672ce0b6ffcccb8f217755192d7dfe8c5cb4563",
+        "2": "2a0bd1860b7958f55a5147d300ee6ea41260be2d",
+        "3": "5de838af1d81967cef93da59bd6fb17dafdfc417"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/LocalBesselUniqueness/BesselModels/UniqGapOfBmu.lean",
+      "stages": {
+        "1": "cad888f1410d949d0906466f2dd264613fd6e7ff",
+        "2": "e0af2c59442b9d3b97d2a2c5807546eeacc8ffdf",
+        "3": "7b99985a6875f1bfea4db6ae9c7c14c3a6d46445"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/NumberFieldModels/NFTieProv.lean",
+      "stages": {
+        "1": "7bc76b7fbaa247ead21c39c5590161a8573b4e2c",
+        "2": "115a6f149e4e08fec9e397799d319c72bbe2f1b2",
+        "3": "770d8b65bd10dff369be14541c27edd15684cb25"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PadicUnitaryWeights/UnitarySiegelSets/SiegelSetUnitaryHolds.lean",
+      "stages": {
+        "1": "4017f567912b5450b8e8b0b6bedec66d2789a6fe",
+        "2": "712e1d3707523571f86765b6374f3eac22170529",
+        "3": "d0264bae13b0e6efca95ba6e8e7e1d322cda0290"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BaseRepCapelliEigenDual.lean",
+      "stages": {
+        "1": "0763831447a47a0a8fd8c14a422b63b6c9a3cb0c",
+        "2": "82e7a1f701a5f8001410f5f44967b0779063dc05",
+        "3": "80ef926702563fedf5b37a5b4f41e0ad902475ed"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/N1AddEZLe.lean",
+      "stages": {
+        "1": "f2c784296b830fb0abd4ba6bb6c7552f0125ee32",
+        "2": "c6a4a0631cea01c1eedb93b95466019f6eec733f",
+        "3": "b7c91a17aed9abb3234106db367e889ec359d6a8"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/ProductFormulaTheory/CuspidalExhaustion/EquivTripleProductOfIso.lean",
+      "stages": {
+        "1": "6c48f1338287b12d9dc2f0b5329c0844abbc8abf",
+        "2": "98f694f3882ea6d2e4c980cffeeae310374e69f5",
+        "3": "378abafa9296141c8b9d19d69d1ef532846397a8"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/SchurLimitBounds/SchurOrthogonality/URepBasic.lean",
+      "stages": {
+        "1": "a629e7b4f957c2592f466c3c3e9c727d11bcff89",
+        "2": "ca51460f3f5699275058e49606ba39b32c86efb1",
+        "3": "46d5941ffac34d82eec396d2c9d2fdd2fcbe6154"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/SchurLimitBounds/SchurOrthogonality/URepSchur.lean",
+      "stages": {
+        "1": "d7a035ec41acd92cdce1135e3baf5034053b84c3",
+        "2": "f8c21f373e3d01c9d5b4d04a3c7f407018a9e2ee",
+        "3": "d227dec9eae4e741bb94a6b10977115511188309"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/AutomorphicTheory/SegmentRepresentations/IrreducibleSegments/IsIrreduciblePiTensorSegTerm.lean",
+      "stages": {
+        "1": "3e65753308783ef7238a5d0b19af19f6abc1ee36",
+        "2": "c00890b2eee56fb75529a731f312074025a46eba",
+        "3": "e5849180d36062b2d2d775130e6e141fd5ceb04f"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/HarishChandraModules/BesselParameterIntegrals/BesselOrbitConvolutions/BesselNonvanishingL2.lean",
+      "stages": {
+        "1": "9e46a40053d7e3fd708b0dd6c993785186d402e1",
+        "2": "b01f8919ac8d78093dd636629c8aa403f89963bb",
+        "3": "c1edec94145916eb2a18eac4b3154026ee87bac2"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/HarishChandraModules/BesselParameterIntegrals/BesselOrbitConvolutions/BesselNonvanishingReduction.lean",
+      "stages": {
+        "1": "652ba5ccbc0fb2111fb0b76647c83f9c009492e8",
+        "2": "dfdf7909c15ae0cbd91341fe437d36a1a3bc0e5f",
+        "3": "69daeffd3694482deb3148dd52e8390bb4631454"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/HarishChandraModules/BesselParameterIntegrals/BesselOrbitConvolutions/FinalC.lean",
+      "stages": {
+        "1": "d872a9ba0e04332aeaf3237269eb445cc43ef599",
+        "2": "620d357b07c234c81780bc1fc01726fe3c0d66f5",
+        "3": "e06857d96bcbf19cdb73f16c030601078dc36be3"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/HarishChandraModules/BesselParameterIntegrals/BesselOrbitConvolutions/JacquetFunctionalNormalization.lean",
+      "stages": {
+        "1": "69aaa9e4d875c39511f17d1c494b049d157c9fe0",
+        "2": "786e6f0f25050b7b7fda87c5b6dc4514fc609e05",
+        "3": "5b8509aa02fc5bdd77fd1a3065efdbf74799267d"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/HarishChandraModules/BesselParameterIntegrals/ParametricIntegralSmoothness/IntCommute.lean",
+      "stages": {
+        "1": "a66db29853e406254da1fb1676d55c6cb33b0725",
+        "2": "1e09c024e2e5cd5c6ae3a8d0cda69ac5a51ace86",
+        "3": "1c3633d699383e22a0a2cdbd56f6a31edb99721e"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/HarishChandraModules/BesselParameterIntegrals/SecondCountableQuotients/ModExists.lean",
+      "stages": {
+        "1": "8eaac32703f1a20f9afe24cf1e0cff47d8c7cda0",
+        "2": "4ef3d1d859bcca3b5242c8c877be63575fb41618",
+        "3": "222708d99701905f713865acf1eed50f21e33f07"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/HarishChandraModules/BesselParameterIntegrals/SigmaFiniteQuotients/Exists.lean",
+      "stages": {
+        "1": "7a792c35254af676aba0ddbd20e615d2803bb6ba",
+        "2": "05ad5725cbf674200e2d45ec334a8b6acdda4c1e",
+        "3": "2e895aba7e6e04256085f4e6d9e90f4d9a3947e2"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/HarishChandraModules/BesselParameterIntegrals/UniformCoefficientBounds/FromDS.lean",
+      "stages": {
+        "1": "5417ad8f407cd29890bc15a4342fb835e34e333e",
+        "2": "709d727c9b6ded23b6e534ee3837376ba9d9bd34",
+        "3": "031c4e7b6be29144858b1b149c6064d35df8425c"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/HarishChandraModules/KFiniteAnalyticVectors/AnalyticIntertwiners/PCDesc.lean",
+      "stages": {
+        "1": "9d9ac7771f27bee8454ad8894f557806ce98df6c",
+        "2": "4eda71603ab268497ddf346c4a2d2014211b9942",
+        "3": "5d7c80d087a1a4f25ce5a121f02dc1e9ed216dbb"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/HarishChandraModules/KFiniteAnalyticVectors/FundamentalDomainCusps/LogBallEstimates.lean",
+      "stages": {
+        "1": "c244649d1ae078220c44aada249ff0e6996b43d6",
+        "2": "613e56afb96b019f77d7f3ccd5922d088c9893f5",
+        "3": "6f7e13946336bfcbc4cfe8bd2d0d53c29414e185"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/HarishChandraModules/LowKTypeMultiplicity/EigenspaceCyclicDensity/Bridge.lean",
+      "stages": {
+        "1": "7be6ef1a25571e9528225618a733fc8ab0297f6b",
+        "2": "87ab510a58492bf5a85cdd137e021b9596b8efc9",
+        "3": "7fc1ad121f8291cca074c07a20407347211ddc90"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/RealGroups/DiscreteSeries/DiscreteSeriesClassification/DiscreteSeriesExhaustion/DsExhaust.lean",
+      "stages": {
+        "1": "8e9bed4bc6b466d7b0ab00e0fb8533e69c95e26a",
+        "2": "bce36bf1e02d4f1239f13fe0feec6dd12614614a",
+        "3": "788a8f30e92c22be9407b5696591ea9c06c4ab0a"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/RealGroups/DiscreteSeries/DiscreteSeriesClassification/DiscreteSeriesExhaustion/HeckeAlgebraActions/HeckeUnitTensors/OmegaProjectionScalarCharacter.lean",
+      "stages": {
+        "1": "72bc8adf53d21e29abbec88f9e3abfacc36b715e",
+        "2": "7f18999e305f63de9f82520e816eebbee05d6e4d",
+        "3": "b1eb28452144a05904053f0b7b350d3aa468cf03"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/RealGroups/DiscreteSeries/DiscreteSeriesClassification/EquivariantSections/EquivSection.lean",
+      "stages": {
+        "1": "524390ab28acf10c887336c11a231aa58559777d",
+        "2": "d2f13084920913a22e2e62a1234af54e51fd1c32",
+        "3": "19e757721dea7850149c1d27ecdf280be81c84cc"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/RealGroups/DiscreteSeries/DiscreteSeriesClassification/InfinitesimalCharacters/DiscreteSeriesInfinitesimalCharacter.lean",
+      "stages": {
+        "1": "dde6bc45810a5d7d18e5a59e0bc9eac091156d9e",
+        "2": "44f8be50a496d84126c65cc567ab9cfafa246562",
+        "3": "1bdf419cb1f63ae319add1b1533af67bdc4262d7"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/SegmentSubquotients/ExistsPermOfIsSubquotientJac.lean",
+      "stages": {
+        "1": "8805d07bbfd1f8e1da2523005032f29d65043dcf",
+        "2": "8a1907918e69bf923fc75c9b34b6786835a4fcd2",
+        "3": "8a726f83ab2b856f977de24faf81ba996edf4f4b"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/SegmentSubquotients/HasFiniteLengthJacSub.lean",
+      "stages": {
+        "1": "1fbca1bb8902623782760f9177d3cf54e309da62",
+        "2": "f8c05467bdcafd97f477bd74307ace6508a16846",
+        "3": "ca93c9e4931d6f5ad9a225f7a4e1a8e21e03256e"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/RealGroups/GeneralUnitaryRepresentations/ArchimedeanJacquetSegments/SegmentSubquotients/IsSubquotientJacOfLe.lean",
+      "stages": {
+        "1": "30f14f3b83753eaab7b6a0272e6f43a946ca1036",
+        "2": "42490af745d79e8bd25d08f0257383a0ffd3e0e0",
+        "3": "430ed20ace30b25d8a5b59c74f5ec03e050fac64"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/CountingDefinitions/VoronoiMeans/VorFunEvalEqFineMean.lean",
+      "stages": {
+        "1": "92b5a14ee6af604bba46e68f90dbead0e4e19695",
+        "2": "84b1f3a141528c1e60503cf90b4c02530077b717",
+        "3": "1b137e1132fd04ac7411160a996c1b29e7679f3c"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/AdelicAnalysis/TprodComplementSplitFinsetStatement.lean",
+      "stages": {
+        "1": "05952374b9069b264aefa75240942356bf900b62",
+        "2": "4e3ad55c8d0d5140dd50cb01da5c21a53b61dffe",
+        "3": "1f39cd797c9064ad056a35d57ecab55fba2ff7bd"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/HermitianCharacters/CharacteristicIdentity.lean",
+      "stages": {
+        "1": "afb4a74b8bd2b44ca70c711a300b240e85e7fa4a",
+        "2": "1e469f9d4feaf105bcf044859de663ec88c5465b",
+        "3": "ca65a834ab832e1eee9e27fe44b4074ae9167eed"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/NefEffectiveCones/EventuallyEvalNegOfCoeffNeg.lean",
+      "stages": {
+        "1": "4dfed81183f31e59d0052c2c25247faa39c1414b",
+        "2": "0fd0cb6afe364979687eec2bb85f37b17a8dbca8",
+        "3": "318dc5cdf3bae50bdd8707462927fd9991c37e4d"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/AbelianSchemeSpreadsOut.lean",
+      "stages": {
+        "1": "4dccd231b314b4fe54bcd003428f367381d8536a",
+        "2": "0055693e585e7d7df080d5f6c135f66c0b8e3bd6",
+        "3": "343f6c1079649856021c8d78a9f78baa3b1d7f80"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/SmoothMorphisms/ExistsModelAbelianLb.lean",
+      "stages": {
+        "1": "3670f58968195aabfac836706e9394c3595b6770",
+        "2": "4dfbf4c4ac54ceb900db015126cc20e40a679ad2",
+        "3": "01030d7f1248c37be58e0ea65eee8315c7ab78cd"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverOfProductFibres.lean",
+      "stages": {
+        "1": "9c143581d83b10e238d5721aa6eebf6b1233be3c",
+        "2": "2a41f1134ad066a635a2d376cc72124ba0eeb354",
+        "3": "d21c8def20be2a52575718454bf8fd132a4f6ba9"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverOfProductFibresStatement.lean",
+      "stages": {
+        "1": "8e573451bc5fbecda8fe844a4479dc3afd407b4a",
+        "2": "e6982c9b3b23401db80525105212f152d06e27e6",
+        "3": "bc019634d2d6cfe3a5dfe7d4bad99185336bb889"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverSeparatingFiniteClosedPoints.lean",
+      "stages": {
+        "1": "08823abc7f6b9eeddba0bfb39428a01ea46e8100",
+        "2": "1f592b4fc309a0e67ea0cf2943a309533ba9749b",
+        "3": "8983b892d77b0777446e3cc757e813c38ccbb9d9"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AffineCoverSeparatingFiniteClosedPointsStatement.lean",
+      "stages": {
+        "1": "ff44d03ccbcbb12cbf8ef35242651021afd44b1e",
+        "2": "4a3ddf7c79c19db1f46d07edb61989e473b72d9e",
+        "3": "e4ce314f6e6ff50cf1f82a02035339c6b74a15ff"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/AntiInvolutionSwapsUpperLowerStatement.lean",
+      "stages": {
+        "1": "de0b40ced1185322c9dbdca8a3cdd951eb2cf463",
+        "2": "71af9cc072454d41aae3cc88c8969a6c1dd1c932",
+        "3": "46b14dc78f97d0949a8e4637746cc81c6c704070"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CapelliPolynomialPermutationMatchStatement.lean",
+      "stages": {
+        "1": "bf2baf1fcec068e07a5fe85ec1cf808026acefa4",
+        "2": "1c94b011ac1cb9e55f2acb071dc1ad944cc0e485",
+        "3": "83af9bdf5e0337b2dd8447ca422c027a3f8a50ff"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CasimirDiagonalSum.lean",
+      "stages": {
+        "1": "43b36cb2f62b9f531db1b86fe9f58aef79f66dfd",
+        "2": "2dcd30673722b38468f0af2f8853a6798298eef6",
+        "3": "5a33a3ba261ae2f4a386a8da84c378501c588d49"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CasimirDiagonalSumStatement.lean",
+      "stages": {
+        "1": "845aa28147ce0ddf5057ad7ad62e332fa07b1fd0",
+        "2": "d8404f7462f7fab8641bbb15182703aa70bffdda",
+        "3": "5b3378ecc68359234b31b8b353afffeedbc11abe"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechAcyclicityOverAffineBase.lean",
+      "stages": {
+        "1": "03c2db65b65b9ca0ff52d5e9c4dd5a4c5849f0e2",
+        "2": "77bdb94d1134b001159015a33b92e3a0b2772a51",
+        "3": "fa85040a2bd979163109ede734dcdf492bb6f96e"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechAcyclicityOverAffineBaseStatement.lean",
+      "stages": {
+        "1": "62e97707278e3bb618d7e918617d1914d42a1c17",
+        "2": "db605e73154a6b6e49aecefc82a81fe7c81247e8",
+        "3": "f11950051e11654d85c55c13d273ca7e29511620"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechComplexTrivialLineBundleNotAcyclic.lean",
+      "stages": {
+        "1": "878a8faa871ce4bf9f43c036bc370e57653f3ded",
+        "2": "62e4670cbbe0e299065064602e8bd58485f47d90",
+        "3": "45e0b9b931fcc2a24dc82747eb27db668c2f47e6"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechComplexTrivialLineBundleNotAcyclicStatement.lean",
+      "stages": {
+        "1": "e647fe3cda4c876c624f2aa0188bbcf38a423dc2",
+        "2": "ae3c9785076dbb07e13bdafe53e2dc930e321b32",
+        "3": "eb772eeb9476de2c6bc547a679f5940a24b45df5"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechSliceAcyclicOfTruncation.lean",
+      "stages": {
+        "1": "435c9559ffc7637f5ac1606b92d7623a02fedb13",
+        "2": "595b3d85b46a400f0ff9a44f1bc3bbfcc97f359e",
+        "3": "3b585b4fdd907b0b8a5edf871fc1e5a95c45c624"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CechSliceAcyclicOfTruncationStatement.lean",
+      "stages": {
+        "1": "315af0c70c4bef5003065072ed73b533bc0532aa",
+        "2": "9b794316202f7421056219257fc9a8786ab2b6e5",
+        "3": "742ce40254b61eca841607dad3794328fe158e3f"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CenterActionCommutesLeviDifferenceStatement.lean",
+      "stages": {
+        "1": "82a14fb35fbfddf1f00db7a6e844e60763a66aec",
+        "2": "6f0e994f3a54fc6d27d3bb352681094592ed86c6",
+        "3": "f133a95e63e4c8f3dcdd8e575ec88c3701527eeb"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CompactSubgroupFiniteOpenCosetsStatement.lean",
+      "stages": {
+        "1": "ba5f46fa597c4ba29c5fc2cc135acec63277d499",
+        "2": "4db7c1eafa4ec8ca65178318d7ecb8f96256c3f1",
+        "3": "1bd99c97898aad21cc5cae2778ec8a63ab4f3803"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/CongruenceEndomorphismInverseExistsStatement.lean",
+      "stages": {
+        "1": "f89a124463dec6a8a39073150e8c6513069b156e",
+        "2": "60a4d4c9c039209d9e4330ad9df1ccf6abbf2671",
+        "3": "46eae8c1bc5327d2c1e6f54a2cd9175488dadf49"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/ExistsNoethModel.lean",
+      "stages": {
+        "1": "fe22d16ce090f511c298d76485383c86414019ca",
+        "2": "65057f7d0bf5ee9383d5ef0fc690debf5ccb8f00",
+        "3": "8f70da0ac77dca98cdd8955b5db2809693fa9e37"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/ExteriorPowerIntegral.lean",
+      "stages": {
+        "1": "fd46007d20c7f3b1a6d07718de5f8ae42339ff22",
+        "2": "ec7fb2e853c90ec96f9e0c9f026baf4343e5a0ae",
+        "3": "fc816013a4243044a3faa3249d84d8f6b38b4761"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOfSections.lean",
+      "stages": {
+        "1": "5b98cce1b5c46f2873f0c7e39c13cf3f3dd722d6",
+        "2": "344ca155e4ab3c4bdcc3a4e4ed8e1b215e6c4929",
+        "3": "9223dde7a8b2b44a13536817c497c78f0046ccb0"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOfSectionsStatement.lean",
+      "stages": {
+        "1": "861423971201b13c5170d21d60e4cf045ff1b9bd",
+        "2": "7982ba75b13a27c381e32df0b3e6ec49a487097f",
+        "3": "cef42654b437ff7340d5258150e52758b7ff105f"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOutsideFiniteSet.lean",
+      "stages": {
+        "1": "9ccd7fad04eacd53be40ebf60dc25137b41794fa",
+        "2": "d74641eda8134505badf385aed9d09eb09db4a18",
+        "3": "2936633338b3e961d96e42eb621030996f40fd0e"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibreAcyclicityOutsideFiniteSetStatement.lean",
+      "stages": {
+        "1": "237cae6989d8916e7b097f62a9996753dbbdc499",
+        "2": "9d00d04077c11649cc9b96ad8bcf1fc843823b23",
+        "3": "4101f374a9c5c1fe08cde7c25eacb74170fc1e13"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibrewiseAcyclicityBaseChange.lean",
+      "stages": {
+        "1": "3ff912740fac42fc5ccfc166b4878b32344c9d65",
+        "2": "3913a44b6ba372ee8c29c0eadf3876645b5a004c",
+        "3": "c62669af33ea24acae06174f9a794f37f3fe0e3a"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FibrewiseAcyclicityBaseChangeStatement.lean",
+      "stages": {
+        "1": "14eed5087a0039fd1bf80e43b5ae941179f628b9",
+        "2": "e0fcb4e487fc7cfdcfc5901dc897976d8cee5076",
+        "3": "09efc6bd080a9d5d5b1a3f6a6e9e0d2f125f7725"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FiniteGroupHomKernelPullback.lean",
+      "stages": {
+        "1": "baf282fbfe19a827de619d1a4565597e0530ece1",
+        "2": "1ae30ce835c4e6bb0bb3b706b4d752058279755f",
+        "3": "39ffa1ecd17492e4d3f54640148bdc494ea28483"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FiniteTypeAlgebraCommonEigencharacterStatement.lean",
+      "stages": {
+        "1": "95726bf247ae3f51d351c76ef8f44d585f2f3820",
+        "2": "a3d544926149090eb13f6e0dca9c38903e7b4768",
+        "3": "7d6457dde178ea8408f75f87253bac818b0c68b2"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FlatBoundedAcyclicBaseChange.lean",
+      "stages": {
+        "1": "1736d3bc574ae31c1f4dfbbc5c9974eaa587d0b9",
+        "2": "49b0de378417a48bf927650bcafc6add330ec72b",
+        "3": "420ca571dedd3b994a9df984484bf256dda82f16"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FlatBoundedAcyclicBaseChangeStatement.lean",
+      "stages": {
+        "1": "b284347a4029ba59173a9907e86ab073ff188b03",
+        "2": "11c76f1d1bb66df2287367ea0cc178fd74255df1",
+        "3": "395aaf6555eceab9efece657ebb6c55124e3edce"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/FreeAlgebraActionOnSubquotientStatement.lean",
+      "stages": {
+        "1": "6939a58bd892278b04b40a81a801da069a3264ce",
+        "2": "d6239c949750525e50a81d86e872d3b90c8e59c5",
+        "3": "1279175a703d4ba9bc5cf2fdef08595b8db54a64"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/HeckeDualityFacts.lean",
+      "stages": {
+        "1": "db0d27bbcd307f08f27c3b0d29e1c46070309fd2",
+        "2": "ce8b478e51a9491901476fe66c67de451b8242c5",
+        "3": "f8ceb5c7a8f0599a2888065b8bb837a15a126a24"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/HermitianAdjointExistsStatement.lean",
+      "stages": {
+        "1": "e5589d6cc2e227b0ac811d21cf42b66b78f5e129",
+        "2": "38b47dc75c3e76a1b719c74e8ca6e6bcb0d3568c",
+        "3": "6df37787c1c6437b745b58482301aae28efd229c"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/HighestWeightClassBoundaryAndWeightStatement.lean",
+      "stages": {
+        "1": "cc82d90e72b04e203e13de9b76ea5adfcae341e6",
+        "2": "2a9958ed1a7ca08bdab232748faa816a92dcbbed",
+        "3": "56c9ed729698ece78a21660750abd7750ce36c24"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/IwahoriUpperLowerFactorizationStatement.lean",
+      "stages": {
+        "1": "2ca2e8971db5556473dfa1982b1576587d3b87a7",
+        "2": "9e1cfc135c930fca733099879ac77d6213268bfa",
+        "3": "5870632455fc3c47227d146ccb5dcb54d5913a54"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/LevelWeightSumBoundStatement.lean",
+      "stages": {
+        "1": "a9f82dd699b2ada61cb0ce7e78344d58f2558953",
+        "2": "63835ca8004279fa94f738549818a5788283d09d",
+        "3": "5ee5ad928e7792a187b4df9d7d39bd654111a935"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/LeviActionCommutesWithTotalBoundaryStatement.lean",
+      "stages": {
+        "1": "09259c371792692c71e796705caf7a577d9feb1f",
+        "2": "82cd5bda742764a8877c678381663d123855e69b",
+        "3": "6c752ecab8121146742b59ae98240d2ac25b6f52"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/LeviActionIsGlRepresentationStatement.lean",
+      "stages": {
+        "1": "2ca07d107a4be544cd807d9a0607ed679487eae3",
+        "2": "18eecda8eb07a6f3d95b8c906c360239f2ee6218",
+        "3": "b80716464344ab01a70ad17abd349fee67cc957c"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/LeviActionPreservesSupportDegreeStatement.lean",
+      "stages": {
+        "1": "482017ac404c701eb62993e6addbd46e73dcd3e6",
+        "2": "02c416ba0896cd0b1f6c00533d50ac384ee3de6f",
+        "3": "14e27d635a8e580465f15b50180096efc6a9e24f"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/PicardGroupOfFieldTrivial.lean",
+      "stages": {
+        "1": "b9e6f24e5d214fd9102588385c5174c32de39686",
+        "2": "f7579ee6c9ca75e0d907638cd595e18b648219f1",
+        "3": "d37b2b7a65c4a9cad7b3f9ed24e18cdd9a20a231"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/PicardGroupOfFieldTrivialStatement.lean",
+      "stages": {
+        "1": "22fe90d6f1b34a453729ae3f6e877ca78fb3d4ac",
+        "2": "5f4abccf67ae60b3a25df3696fe282402a7f97fd",
+        "3": "c901f12af09465f7f96c42981b6af0acbfd431d2"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/QuantumDeterminantCoefficientsExpansionStatement.lean",
+      "stages": {
+        "1": "26532d98f67f1624c6f16dffbefdf5ea3899240a",
+        "2": "ca5431eeebce9c835b96c7e95a10baecd1225b61",
+        "3": "6bfbf289ab9d1200bc7946694fc7dcb1ce41fed3"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/StandardBlocksLevelSumStatement.lean",
+      "stages": {
+        "1": "1ff6f5fca4b135904a74ed37706b3b9c19af711d",
+        "2": "315c24acb00549590cca3e24fde35198f4affccc",
+        "3": "96d015faca08c3c8fcce5740d43e14292d398ca3"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/SumOfLevelSizesEqStatement.lean",
+      "stages": {
+        "1": "38844abefb6f25e5dc7b4e397a6a11c4601b06ed",
+        "2": "67b6171c199cab4afce86bca787946a28fc08244",
+        "3": "accb3683b95736f588805648dbd5cd5525a28e73"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/TorusConjugationPreservesCongruenceStatement.lean",
+      "stages": {
+        "1": "0796ed690b366342f40a8e8c8d489fe0b7fd816e",
+        "2": "7228e305a85975e1a13d4bf43fee3376807f8798",
+        "3": "8270963abd719dd6976e1e3211b33df6406f03d5"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/SpectralGeometry/LocalGlobalProofs/StableLattices/UpperTriangularInverseIsUpperStatement.lean",
+      "stages": {
+        "1": "f19e349cb3cab09a4f4b498d3fe569561186ed42",
+        "2": "d5536e29336db1da18d1caed848e6e62147b9bd6",
+        "3": "d46466c33f3c75484e432ed104fce007c5350d13"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/ThickeningEstimates/LieGroupReduction/HasDerivAtSchwartzToL2.lean",
+      "stages": {
+        "1": "43fe7f2028815376bd66e4d7cc51781f6e14fa8e",
+        "2": "bd545db4e06dcaefab4c811d1afccca5d266b6ad",
+        "3": "7ce6e550ae8891ac94508aa00577bb7bc1a55bf2"
+      }
+    },
+    {
+      "path": "src/CompanionTheory/ThickeningEstimates/LieGroupReduction/LocalLift.lean",
+      "stages": {
+        "1": "a287b01b7159cb5a97e17afdd0172a812cf4365a",
+        "2": "0a416282e44e319af82e3e0acab1a9f2f9010a7d",
+        "3": "8eb3c5c65d8501794e034bc086b84b0d0909d8c3"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/AbelianSchemeLaw/MultiplicationEtaleTorsion.lean",
+      "stages": {
+        "1": "80f623f3a0779bd18ccffdcb2b8f69979b44aeb3",
+        "2": "e225c933babdcbdd8a150c889c4b63abc2f94144",
+        "3": "24d4df3a217f50ff121157d40cf0de52d7df7161"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/AbelianSchemeLaw/SectionsGroupRank.lean",
+      "stages": {
+        "1": "46c953366edfbaba9640759d9f6f46e208ad1885",
+        "2": "8cd8d347a2090075658632b5c92873c72fb135f9",
+        "3": "5bc923379cec07b36fe6ce8ab2f427aa07b0cd3d"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/AbelianSchemeLaw/TrivialBiextension.lean",
+      "stages": {
+        "1": "5e7362e55efe444c072ea67115d440e9e5e45bdd",
+        "2": "d8b0645195f7bf2656428f28c6240b1f05a6911f",
+        "3": "2e859c38223eb719d9071e3fd9ebfd8819ab0115"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/AbelianSchemeLaw/WeilPairing.lean",
+      "stages": {
+        "1": "4c8648f4d859855b661edaa516100ab91ada1894",
+        "2": "5cbb07ca64a308530dcb1cd8e7e8af61b89eca48",
+        "3": "356b74430d04ff2188fefd9cf132a4944b670236"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/AdelicCMFields/SupportedAtSplit.lean",
+      "stages": {
+        "1": "7093eb4d8f8819d5dbfb74ef2f766aef526723a9",
+        "2": "b679199d0986d8013adf1667c689ceabb7068ba6",
+        "3": "15d53f15f2eff5756f3f9e410306abe8a30698ff"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/AdelicCMFields/UnitaryHeckeCharacterIdele.lean",
+      "stages": {
+        "1": "ed8fbb8b6937abb680a6482f38bfd3e52b895d80",
+        "2": "c68dcad7ce08c59e82808e6242c3aa46f80bc9bd",
+        "3": "8beff48d6669fd97f58258acd97a5538d8405abf"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/CMModuli/AlgebraLevelSetting.lean",
+      "stages": {
+        "1": "24350a4499d05a4a377ba19fa777c281c8d1c684",
+        "2": "ab6d9112d313ae9f10abf816cf3f8642b383cf1d",
+        "3": "fc378b3ebc04b12ca8e3a728234d934852d7ce48"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/CMModuli/CubicalSymmetricTriv.lean",
+      "stages": {
+        "1": "513f3f48e9ba18d351cfd80f22946634021099b0",
+        "2": "0f45a426ba44102b5bf4301212e46372c7bf9631",
+        "3": "d3b9cbd5b12ce039139a6c82d5341ac1ad18611f"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/CMModuli/ExponentialDifferential.lean",
+      "stages": {
+        "1": "140c48902c7b5139fbf59beffffe7839c41e2b7e",
+        "2": "e014b90786ecd9c338ada44f422324f8fc17308a",
+        "3": "403f6d81539d2cbdd01c94cbce5c3a3639e4e2eb"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/CMModuli/FirstOrderRigidityLevel.lean",
+      "stages": {
+        "1": "c2d5d1ca2903bab5396177ec499146b61bb3fc08",
+        "2": "f93a2a4c3b929c78b5a138cfc4c700cbfbf5a7a0",
+        "3": "8c577ab507a561d2bbca4ac6519064589879f294"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/CMModuli/FlatIsoUnitGenerator.lean",
+      "stages": {
+        "1": "477301b1c0a85374098fea19679e951703385348",
+        "2": "3872bbb49cb4267ea73ee6a78c4381dcb1549372",
+        "3": "dfa91f4756827252347ad9e9dda0859e583ea698"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/CMModuli/LocalFramePowerSections.lean",
+      "stages": {
+        "1": "7f54789380b850d1f9b0f17e8d1e088010441510",
+        "2": "0ee4341fa060162ea1b034fdc09ad59497d10cf6",
+        "3": "f4a89aa2f468da8ba13e0aa5a33abd0eee851829"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/CMModuli/ProjectiveSpaceOverSpec.lean",
+      "stages": {
+        "1": "d448ab823ad97d213f6380c33a6a28bc49d20b06",
+        "2": "41e09f88952859ed86c0a9ed9e5b64ecd64c52e7",
+        "3": "e4b7dac267e79de1b63ee97872dad4ef939d6b20"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/CMModuli/SiegelFamilyZetaUnit.lean",
+      "stages": {
+        "1": "fb99278ae7169a0d71228755a21c1083da4bfdc5",
+        "2": "9635039abb684180716514660b8a77b82db2e9a7",
+        "3": "25ac5e2aecf0b791ef80e7624bd317b4706fed03"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/CMModuli/SymplecticBasisLevel.lean",
+      "stages": {
+        "1": "ae3c4706d77000e50b6a5a6694e9f3da4b4d8ac4",
+        "2": "91bb75fbf3af0e4f43fb3ffd5f2073f047020dc8",
+        "3": "c5e3f734e0d0838791d9e23ed3f9a043078cdd18"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/CMModuli/TateUniformizationInput.lean",
+      "stages": {
+        "1": "4b5e9ac26454716fd3982fd01f7cf36ffb1093d0",
+        "2": "91224472351d6a5512d27b8b9c436fbd68af4b61",
+        "3": "7a84f26472bdbe272315862b3deb04afc53163c4"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/CMModuli/ThetaTowerRecognition.lean",
+      "stages": {
+        "1": "f903d6dcd35acd80a99c63abe99a5471078994e9",
+        "2": "970b9ddead1527c0fe12611f11ea10b073528d4e",
+        "3": "3b6b0bc9556c720474fb08bc7ab2f36cf5e43cd5"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/CMModuli/UniformTorsionIsomorphism.lean",
+      "stages": {
+        "1": "c79d8fd799bddc2ec2892a5e57c7fdd6dbf500b7",
+        "2": "50766713669c82ffdb21d3885a3098f92f90484a",
+        "3": "ef3a4b956ac6cbb529da28af1822e2c8d36b0e26"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/AdaptedStandardBasis.lean",
+      "stages": {
+        "1": "2e20ef6ecfdf645dcb4adcc2527dac4faee33d67",
+        "2": "c5af7370854f85ae43bb27626b2b90bd7fe73d94",
+        "3": "76707d2569fad66120ba74c2b7db51c8ce705a8d"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/AdelicDegreeTameRamification.lean",
+      "stages": {
+        "1": "77282af912f94dd05a6aba66a62214b2e8adfc39",
+        "2": "cc7c6f996760438c608619997318180604346a92",
+        "3": "e5af3ed54ee0b6b4172ec8ab44ace03b7070f8fd"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/AdelicScalarMultiplier.lean",
+      "stages": {
+        "1": "ec7ff0d21bfc44f66994d98acc058d3729534cb5",
+        "2": "19690da07cbfd4008b3e1cc33aba6a9a1556d7ef",
+        "3": "35bdd4eb1508392d337ad2c0608af2f10c453fd2"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/AdelicScalarSectionLift.lean",
+      "stages": {
+        "1": "0eb415ec08dc4afbe08a4501471a7becc6e024d6",
+        "2": "4547e5439f8e00ca6208a69a64083748761e57b2",
+        "3": "669db4e98731d15abb7d130b41a853707547a20f"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/BadPlacesGoodCoefficients.lean",
+      "stages": {
+        "1": "56364f4e23bef0c3fce88409e37116a0dc298678",
+        "2": "bdfb9338ceca3f0ea81f3ec37ebbe9fec9f312d1",
+        "3": "e84bddc3d0e50a0ac20e297c0ca68cb03bb527dd"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/BlockProductIsomorphism.lean",
+      "stages": {
+        "1": "7cb5f44b0e2e51ae917df16cfbb2d15a15025230",
+        "2": "e293d5a7c8ba1ad08b17d2d3c6769f60c17dc26e",
+        "3": "58a62884b8078ad9e04aad26e426dba911e04f8b"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/ColumnDataLaws.lean",
+      "stages": {
+        "1": "ed69c49a229bf482e1ae7c1afd1de6d371a1bdd9",
+        "2": "89745514118dcf8c242c88236e3342511c2dbde3",
+        "3": "a5682061036dda53aeb3c88f52a35e4992800e30"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/CuspLatticeAnyLevel.lean",
+      "stages": {
+        "1": "491f0cd8385750dee45412164419db5e8d207582",
+        "2": "971519533a3e168a496d7b391fc21c25767e5b35",
+        "3": "2db53223fb9fd002de45670384e023f477cd827c"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/CuspValueComparison.lean",
+      "stages": {
+        "1": "c408ee9b3a4f70c717ffb0c8cd8ab350ebca130f",
+        "2": "d5297f77e7df99b9c5140a3bebbda6580bf4d9f6",
+        "3": "e2cad9649d1d470635bbfbdcf42f205b093f43ff"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/DescentConstants.lean",
+      "stages": {
+        "1": "5b0eed49d7214513ae52d7eea8f7889a2f58031d",
+        "2": "3c0adbf6b25a4e49d472bda5be776f0e0a8c68cd",
+        "3": "3af719ff18c04479a3b5bddbea6d7c5c0bcb57c9"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/EigenvectorLieDegree.lean",
+      "stages": {
+        "1": "6d58b60b5d07b39d2afbd2b92d235fc279baa39c",
+        "2": "6e4967c06e92acbe2f924606ea199028f19c5b5a",
+        "3": "13b5ea02187c5d5d1b240e7181f66677a2606bf6"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/EpsilonPairingZeta.lean",
+      "stages": {
+        "1": "1c439f16ad8b962b063fa2bedd64a6251f90d885",
+        "2": "034dde12efecfb2dc58781df393eef6d077cd8b8",
+        "3": "85388c81291038bfa25b7bbdc07a880daa507565"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/FactorDepthInertBounds.lean",
+      "stages": {
+        "1": "9da8f6617cf43c544c18e0c0f5159d38a0f33803",
+        "2": "bbf4f7506064222927b1cac89b96d3fe3f345173",
+        "3": "3267eb7eab23121b1cf521c23ffefa303b8508ba"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/GoodIdempotentBadPlaces.lean",
+      "stages": {
+        "1": "b9dfe1d777b0b34e93e0e6ac3eb293660e8aa4da",
+        "2": "e29cc4f4a63f798cbf58d5434d8e20251f26cc1f",
+        "3": "04d2e0807acf0e44043c3e943c57159c9755a433"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/GradedDifferentComparison.lean",
+      "stages": {
+        "1": "37b680936da77d7cc74c61977483ebae7a0b72af",
+        "2": "1cd220dd64d4a57e3f6f11751632d98c535e59c9",
+        "3": "6b12c1f77f72b1b9cce5d2b0447e15c3fccb7096"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/HalfLatticeTypes.lean",
+      "stages": {
+        "1": "9bb82eeb0eef3bc06256c3d1dda7f746a43ff9cb",
+        "2": "a6f25391b3de237860400cb66cb01bf6a08dc07a",
+        "3": "0be81fcb3f86adaf8ac1d486dc6528beb9cd737e"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/IdeleNormTraceForm.lean",
+      "stages": {
+        "1": "45c89e69cd08f0de6e195bd15c1444bc18eb71a3",
+        "2": "a7efa87d0cefefeea97dd9c4e58f19a29ab1331e",
+        "3": "3da923bdfe26aa3ece361d756c7d8c37cd75c9a4"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/KappaLatticeEvaluation.lean",
+      "stages": {
+        "1": "9ecc6a772a7d0efe50c28b539ec56ca58105a3e0",
+        "2": "7f05028ff4feadd2723555d283db34862b3c4272",
+        "3": "5fed0f0699a0291857f9d0f535b4ca89451525f6"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/LevelLiftConditions.lean",
+      "stages": {
+        "1": "f88c8a3505f1ac5e55dc18deda3368bcbe25ee9c",
+        "2": "17d323f2d75a4631e2f5683940e5dc54e9c38392",
+        "3": "e7293b3b4a491a0bfa623b1f4d9dc6edbc64d5c8"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/LevelLossDegreeBounds.lean",
+      "stages": {
+        "1": "a8ef9b142c4e8630fe4c3f741c12409254e408cb",
+        "2": "a68908d7fe7d37870c41f9cf3ac5d8b1d2adc5da",
+        "3": "2e6c405239237bf5d68eb361205a7aff71c566b2"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/LiftFormsMainTerm.lean",
+      "stages": {
+        "1": "dc9ba104d1d2b6f99984db8f3524ac0f1d70fe7f",
+        "2": "3b54482a5abde77b3b5ffd62dfc77eff9cee1f84",
+        "3": "2c4d12eb8ebfe3425b046e1f9890ffc126c9ebb9"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/LiftedCharacterResidue.lean",
+      "stages": {
+        "1": "85cb2a36591b8d2520fc30fe2f15d80b618e9a91",
+        "2": "bbeed90daedf544e9be40a709ec6b00751172c78",
+        "3": "18e60f2556b9e11e304f3e28de081b2eb8b785d2"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/LinearCoefficientData.lean",
+      "stages": {
+        "1": "db7d77030f95ccd20c5e425db2fa3bd29eed8ac8",
+        "2": "26d23ad011ec6fa2f5bee6b2fc6dd0df26ada5e7",
+        "3": "5cac9670826cbb43d9b9428b81c85760d5154f47"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/LocalValuationColumns.lean",
+      "stages": {
+        "1": "6f11c063f33633e8a74625059f758804ea10af88",
+        "2": "8b595cf992ea4b5e4079c8b2df144e1bb644ca03",
+        "3": "b0b33ed2f271245068c1aff6ab45971ebc2f6ac7"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/NormalisedBlowupCone.lean",
+      "stages": {
+        "1": "616ca0a649fee830984c9602a91d27307f43c4ae",
+        "2": "c36f50fa76bf0768078912beb21ae86369b87921",
+        "3": "f8c7efd1d69e55e2117dfcfe0f39afd2f557eeda"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/OneMeasureSizes.lean",
+      "stages": {
+        "1": "9a53d0a5f7dd21ba57af0fcd4d4e8d5253d338e9",
+        "2": "c12bcfcd5041e727bc80e59638895dfb350d23dd",
+        "3": "0a01c7d2b0b814756768765ae6cc7761e7f0056b"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/PolarisedDualSystem.lean",
+      "stages": {
+        "1": "25c380f3221019ac9fa87bdbb98aacb87f88d5ff",
+        "2": "62397080d4b0f5d5b0512a563d1cb04a92b7b5b0",
+        "3": "a2df5dbb10af7710753447bf411a00c23d168972"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/QuotientEigenDifference.lean",
+      "stages": {
+        "1": "01e642062d7e28264febfd08254c2d686f0934d5",
+        "2": "5856eb61684545b77cebd4b0af105f8ecc3d7354",
+        "3": "404ca81c631143b6ae9ab4cf97a9e110169cb039"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/RowsOfLevel.lean",
+      "stages": {
+        "1": "5c9e7400ac9a64af783bbfae9646c812fa475b46",
+        "2": "c65dc235ca87281343ae09a01e6a277481e148e7",
+        "3": "05f665d2e3a0ca58872f588c19716c0a83a535f2"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/SandwichMaps.lean",
+      "stages": {
+        "1": "c1ff3d0e7f4b27ff015c794411d86bdf3f7fd2be",
+        "2": "7bc2c05f919305eb86b88a2f2eb164900b63806a",
+        "3": "a03f86f9dd03d78626e6bd8afa5aab32c961618c"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/ScaledCoisometryNorms.lean",
+      "stages": {
+        "1": "470002e560f7deb1114507038a5b467f6c97d81b",
+        "2": "bc5341522466490d30b3fa652e9602e82a57283c",
+        "3": "09985aaed86e44618d2fc7bb14ed39586d769386"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/ScaledIntegerPeriodic.lean",
+      "stages": {
+        "1": "fe0ae7cb33b8234e945f89a6d60c0fc013bfa79d",
+        "2": "8664519b5115239cddae0b8c5f3f5eca0d1e2e58",
+        "3": "1850c64783afc2434fb8f2ea88b6f2fe679ab600"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/ScaledValuationFormula.lean",
+      "stages": {
+        "1": "8a2443ef57dd6e6dd16061206d9f314a6ef40113",
+        "2": "699e2107d05f86ecda03be182aa6b549d3adabde",
+        "3": "bf0794fdb08dc38f3c87976fd8b8f1068baad76e"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/SiegelReframe.lean",
+      "stages": {
+        "1": "f920e4b95aa449cf8812390fb70fe3405cb4b66d",
+        "2": "c5a71387d9957eb92a01017e43ee367b4738b686",
+        "3": "139a2fa0ba52dbcb8d7f503690e68f7baa30bcec"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/SplitQuadraticMinSums.lean",
+      "stages": {
+        "1": "c1e77514a38e8bfe6b5e109dfcca56f3640d2e39",
+        "2": "05f12a8beaa05d22d571c04f551c4d7a840bf4ce",
+        "3": "0f6a92aafa8386518cc52a951257b9e0daf59504"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/SupremumLattice.lean",
+      "stages": {
+        "1": "93ed2712601ecd7a76101ba994674380228a528a",
+        "2": "12afc1376ce33ca00375bdbf4c288fcdd0ac302c",
+        "3": "d5dfe3e3476cb6a55a418b85edf129208671ecb5"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/TameInvariantLevelAction.lean",
+      "stages": {
+        "1": "ea2f516ec6a8129b7cccbd4c5176e991aa85b6ed",
+        "2": "1b8b29808d97362056eb141aaee83e601f67c258",
+        "3": "969fac1061247040fcd77f925bbe6de8dd4fd955"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/TaylorCoefficientForms.lean",
+      "stages": {
+        "1": "22230106bcb4902064c49c8115aac549ba3a1f77",
+        "2": "454abc9889aaaf7744511255d331a7820aa20ab1",
+        "3": "b5684102b2e7ce68caae7dd8422490876dc7c562"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/TensorCoordinateForms.lean",
+      "stages": {
+        "1": "ab3ae34516940ce06f0aabf7cf812a91275b34cb",
+        "2": "4fa91b010d2916e85d5468823c14a99c86b37b29",
+        "3": "6b1a894c8663c9894386c2e183701d6d2a02fa40"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/TopRankPowers.lean",
+      "stages": {
+        "1": "3e2934f60f10895f8e45158f3d3f7c8786e45d4f",
+        "2": "4e31a617cdba978652a28687d954f784637ed777",
+        "3": "73595ab9e573ac051c14a47330d3af11546014af"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/TraceDualDifferent.lean",
+      "stages": {
+        "1": "ac4df0182be763a2a61bfc3f59f10d9dbe9b3fd5",
+        "2": "9cf03df609f98cebe0c59c7b93d98c1c85a3e0c5",
+        "3": "298a234f9e52d29f90a8882738b80649c3e09300"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/TypedPartSplitPrimes.lean",
+      "stages": {
+        "1": "19c347d69e0e4b7e4d102b8c71074bce6abc6dd2",
+        "2": "992883ff7e7509d2e1bd4c8655bbe3106949870f",
+        "3": "a527c849e3ce0bc5ef08f13162901d30b1105b52"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/UniformLevelMultiplicity.lean",
+      "stages": {
+        "1": "657857deb95f05baa2627a580382864440a72093",
+        "2": "2f16b7e4b045f70bfb681dd37c7cd23f22d0aabc",
+        "3": "e717bc806c6ade41bca13c1389592cd93389cfe8"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/UnipotentLatticeMembership.lean",
+      "stages": {
+        "1": "dbc0177282ac8cc2f7d4f0a50ad47521dce7df21",
+        "2": "d5560806d152d784530542487283582f923abf54",
+        "3": "cc79cee9725722e8607dcf6a95126c9953d9f6c1"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/UnitaryConjugation.lean",
+      "stages": {
+        "1": "85dc3dcd92684e92e7dc77cf8bd7220b848ec9ad",
+        "2": "86718bfa9b3ae599d5d495e81af8770a34356806",
+        "3": "a9fd4e399155f97de85850ea680a683f230f5665"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/VacuumCharacterDeterminant.lean",
+      "stages": {
+        "1": "8eda95bc88b384f0b8eea705ce29082a10fe699b",
+        "2": "3a59f59b44164c249fba391bdaa8f9f62885cb5e",
+        "3": "7155345676a0a43bcfc81cbe737b3836c4c01cf8"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/WeightedNormSquareRows.lean",
+      "stages": {
+        "1": "8a4043515331bcf911f3865ba97819c71f869b76",
+        "2": "c3504c50d7f0f5b42dd79c8db43e9de09cd60bf5",
+        "3": "4408d5807bc276dc2a142afb36ccae6cc5791456"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/WeilGramSignature.lean",
+      "stages": {
+        "1": "9944080ae0947c352d62715b348406996f0b2b39",
+        "2": "50e6a9e4a6ca3a4378e39d36a1f11225d54b2c18",
+        "3": "aef9688d23c432c475655bc30d497e49e4388f4d"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/ZeroSectionBase.lean",
+      "stages": {
+        "1": "fcbaf464a7067d13d83155cca39e61ee8fcbca22",
+        "2": "63ef2d717e2c8ab93cc808a76daafb3bacc4f31d",
+        "3": "7d77d293f2515c4f641dc92e17b18c7d044d94fa"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/ZetaPhiBranchOperator.lean",
+      "stages": {
+        "1": "2381df14f86ac418bd6c308217a4e7c6c5daeb9d",
+        "2": "88fbcb449b4bea226eec45d3475948ef04419c52",
+        "3": "7100e43202f75e5b514f7f8e75f13f734100d941"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/ZetaValueIdeals.lean",
+      "stages": {
+        "1": "320cf51316e01db9911112ca9f62cc8bc2eb5332",
+        "2": "7f4c22921916dc259b911e2eb414b26db4a467be",
+        "3": "f1d72123e6ea89223981472d9500f7b536fddba6"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/AdelicNormWeight.lean",
+      "stages": {
+        "1": "37c840119663d8a14bb84edb8ffcea9fdedf8402",
+        "2": "6fe3859c487a8374a2dbfe3f38732bdf42a67e64",
+        "3": "f80db89e51c73228e680dc2cf04140141e4e0b85"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/AdelicQuotientMeasure.lean",
+      "stages": {
+        "1": "48523ac595dc4203ee02030f1282b7101c83eb6b",
+        "2": "bfc60448c0856f577f8013caa2b0c7b13817db01",
+        "3": "f27cbcfd65e96a853c74998bc4a3ca3bc733eb18"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/AdmissibleHarmonicLattice.lean",
+      "stages": {
+        "1": "d12aadcdfd2a72e811215c2f44fca3d39a19fa2e",
+        "2": "203203c4c7cb716b66fddb76be486255f7e43cb2",
+        "3": "8c7620558968a84c488eb6ccedd861464bca08d2"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/BaseChangeTensorProduct.lean",
+      "stages": {
+        "1": "5555cf45b1818ce495078622af80204885d4d8c1",
+        "2": "0a6c571fa8ff5d51b032148ec0b5b07bd0cabc45",
+        "3": "da1f36cfbba395750076975dab3551f4c1e50b6e"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/CoefficientSpaceWeights.lean",
+      "stages": {
+        "1": "1e8c53fad35a78b5eb720cd2c4718e690db7bde7",
+        "2": "edae262b89e8fcfa7b5ebf09636bf7cd3bbbe41b",
+        "3": "69d3d903bea3dce07c2498a241cb273374f65e7f"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/ComplexResidueRing.lean",
+      "stages": {
+        "1": "91eb7ffb27095d60b75a1500b2b4bdfa538411c3",
+        "2": "07025710d36438be70ec65cbf38530e29fed58fe",
+        "3": "62ba6eed11462dbeb69098ab16354a706bd90460"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/ConjugateFieldNorm.lean",
+      "stages": {
+        "1": "15c8aa112e5599a10f99f09bd97e16c4337b2a30",
+        "2": "0d32c5231a672a1b99974a45c51afd7e38d2f468",
+        "3": "e9a72094f76d6a425d1f6e4628da2f4a6bb4ff56"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/CuspFormLaws.lean",
+      "stages": {
+        "1": "e266aa11d60451ffd9854a34483582b62d7b19b7",
+        "2": "514b277c80d639296172dd7b773ade9e434c1b77",
+        "3": "611d665e66476c3529fac74956c9d3384fa72550"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/DeltaDatumCombinedCoefficient.lean",
+      "stages": {
+        "1": "82c0a673e6a8603bce9e5c8e555f6338e71d64ed",
+        "2": "14ed680cb5e8d7e2d860d5f2700234140bddf6d3",
+        "3": "f49e5ddb00e6a2f73776bab1849e63197a9e15fe"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/DeterminantCharacterIdentity.lean",
+      "stages": {
+        "1": "e5f7b306aa8e5769790aa888cdea89f787b9f734",
+        "2": "b362612a2e6be7dfe53b2842b3a9681debbd854f",
+        "3": "534fe83bd5ad37e8e58bc44003dc06e0a5d3f51f"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/GeneratorValues.lean",
+      "stages": {
+        "1": "a7b7eda6ab11115f454f0869d93d3b570bdeb002",
+        "2": "afcefbe39b0cf71c699656bbe7153ec1788b01d0",
+        "3": "1fa4220a2d1fda540de61f75b16ac1ea5c875708"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/HalfDepthValuations.lean",
+      "stages": {
+        "1": "29aadd08d9f034bd5571aa7f6f07b56ff26eac84",
+        "2": "27693ef09b35b588ff0858ca1014c31faf105079",
+        "3": "79600298bd13816e7c1469c88b24596f6a58d566"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/HalfGeometricCovers.lean",
+      "stages": {
+        "1": "b73846758fcc4a74415d9c80097ed579d96a45ef",
+        "2": "83185bc916aac48fc4ef61970d88f6e4fac53867",
+        "3": "3fafe0d937671c3dcd5a0fa2208ba1406f19d265"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/HalfLevelCoefficients.lean",
+      "stages": {
+        "1": "ab1ad1ee41fa8aa251a6fe75c19ecd2be5abd8b6",
+        "2": "1cd55699b1c6ae24f4c9159aa705477cd1f6cf48",
+        "3": "d4792de418be84c5f594d9836d9582bdcb34bfd4"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/JetChartLaws.lean",
+      "stages": {
+        "1": "e1a579d8f3ec36d4d5a1966b6671d5416c662555",
+        "2": "c1c00d4ac50ac76fc9708d8e85abfe2ee4606729",
+        "3": "a79757ec35017ed896ff80b98da9e63b7b0d3ca9"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/JetRangeLevelFactor.lean",
+      "stages": {
+        "1": "003051377b2e00d83dd02692a03e80251ecc77fc",
+        "2": "2ef43dc97935d48b1f3ad55ef25426b47df4b0dd",
+        "3": "2ab487466d1feaf46b0a15d703646eff930497d7"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/LevelIndexFourierCharacter.lean",
+      "stages": {
+        "1": "785f324cb5d43925112fde32d05a88eda00177e0",
+        "2": "f2f21e07b6f037d23f6c13448eb8592a2dedc631",
+        "3": "ca16416bd7dc839b280f65e8a98b8debe79a84a5"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/ModelFamilies.lean",
+      "stages": {
+        "1": "e68831864fcc3a0353ee310c7f31aaafc175f819",
+        "2": "5ac15609676e3798452b57d698973050b1f1e370",
+        "3": "ff5c04656efa98033b628134b4ca443b90673242"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/PrimitiveGermFrames.lean",
+      "stages": {
+        "1": "ef28d8434ee0d653970bf7b7c79f83678b22fcda",
+        "2": "fcb1b285d4b721a55a8c528d22d19189789cee1e",
+        "3": "a7ee630a2cb150af50a2e7c89b928de8c28e0781"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/ReflexNormIndexIdeal.lean",
+      "stages": {
+        "1": "50ab4512a813c937895112e1b6275fcf7eec200f",
+        "2": "f81d0dc3057e7473b12a41b09528b1f12a8c2582",
+        "3": "5e382394f7960028aa0059de5b444934a926ad31"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/ShortRuleRepresentationChange.lean",
+      "stages": {
+        "1": "43213b7b506d2ab4966610ccb38fba506021f0e0",
+        "2": "f225f38a627144a3713caee1943bfbe89f52ce4c",
+        "3": "13dd22ea8c25427b78122a25f011b61d760e09a3"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/SymmetricAdjointUnits.lean",
+      "stages": {
+        "1": "d81733c7d9f451b41be5933ff84ac3f7d04b0a7e",
+        "2": "7fee95188ef5a8d7ce93b2c03d2b1d71809b6db8",
+        "3": "38acaac2ae491b28329569db9029cc8a50f84568"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/UnitaryDeterminantRoot.lean",
+      "stages": {
+        "1": "3a3aa984cb94f05e2f4edcaa174e99be562daac8",
+        "2": "608b5aedb8c9360f00eced1e3a721ae76d9c4a26",
+        "3": "57c97d5da27982703fdb97c0931b3c05ef476915"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/ExistenceTori/UnitaryHaarVolume.lean",
+      "stages": {
+        "1": "701267abcb696475d3a7419dd8c8195e9257cccd",
+        "2": "cc8a4a8ae4542e11e2f8112102190b9f253b50fb",
+        "3": "b061cf18edb2a1ee7ca02ad1d79b49b0d7f14252"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/GlobalSignature/AbsoluteLogMeanBounds.lean",
+      "stages": {
+        "1": "b40f0dc492e61ab98500fc9e5b98715a2f78ac33",
+        "2": "4a42a320ec4cd7483bb8e474d6781d3a48e7643a",
+        "3": "ac073a69d92822435792db2833db0883b9652ecb"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/GlobalSignature/AdelicUnitaryHaarMeasure.lean",
+      "stages": {
+        "1": "40f943fda5293630727b2740fcda8eecb1c614cc",
+        "2": "bd99dc2000074c72efe1eb95bd466bd2f6239c65",
+        "3": "1f17f788dd5af4f0cf2ecb546298610a84e8fb9c"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/GlobalSignature/FewBadPrimes.lean",
+      "stages": {
+        "1": "ef872429af38e1e1c5187e6f96de5b5903ec2a67",
+        "2": "5647b687629f5e7a46de499c76213619a8e813f2",
+        "3": "9b3ce8b36d255d5b213b6130e343ba28795931ed"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/GlobalSignature/LatticeNormalFormUnipotent.lean",
+      "stages": {
+        "1": "b7ac3a469f4459f33459400b2e4d53617f4c40b1",
+        "2": "5d3d6ea75237cf127c2fc1060083f533f9c7ebdc",
+        "3": "ddf82f9cd2982eac93746928b517e335662ff221"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/GlobalSignature/MassFormulaPositivity.lean",
+      "stages": {
+        "1": "0d7af22cfe98021a042a01ec02b3af18f06251eb",
+        "2": "f8e2cac9d5bc82eee82dd4d4188bd86e9a27d754",
+        "3": "9d1f2f481b9ab6e70b3a96f8797e89946bd6e33f"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/GlobalSignature/MovementLaw.lean",
+      "stages": {
+        "1": "e5edf25e7152156427868dd4e71ca0ee4e82321b",
+        "2": "f9b00aa7c55d88075d1246dfe4a0224689741ec8",
+        "3": "e6dcc3107efd1a19a93911f23e770c1e9391c10c"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/GlobalSignature/SelfDualLatticeActions.lean",
+      "stages": {
+        "1": "99cf1aae5b98ad6f13578c81ff2d2d056b8dfde5",
+        "2": "8bc35d2e6d32ab53bc2e752da7d8f62b2e531179",
+        "3": "ffe6be6422331402187ae9f8e1013553a398c917"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/GlobalSignature/SelfDualUnramifiedPlaces.lean",
+      "stages": {
+        "1": "462160a38902c0ce5e1580b66990ae5cfc93f578",
+        "2": "2d8f0da23a9b4b265f34aa144f7aa958d486725f",
+        "3": "cf8e5a101d62595240bfefd6c1ba833272979aad"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/GlobalSignature/SignatureFrame.lean",
+      "stages": {
+        "1": "30668d679c437a2e82d053574119ace7ede4984d",
+        "2": "c2a3024774d9c2e4a300ce816e409ee89ab5c91f",
+        "3": "4a86e567798c68796437f2561762c5820ba2de0b"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/GlobalSignature/SourceLatticeInvariance.lean",
+      "stages": {
+        "1": "c3e0ace2cd90ce020d7a5e32987866eb09bf60d5",
+        "2": "7aa131f7aa6a0824c234d71bfeff329bf95f0a9b",
+        "3": "a89a5c11b4e8459f0d205f12fabbc02b5b07cff0"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/GlobalSignature/StandardDeterminantUnit.lean",
+      "stages": {
+        "1": "10637b0690d07c72ba7c5f1cfb5fdbb3fa59849f",
+        "2": "a9b6430522e2372bdd26e0676fefa96ba475a04e",
+        "3": "90dec3806c0dd45720a664eb11994235f0782902"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/GlobalSignature/TameGeneratorWindow.lean",
+      "stages": {
+        "1": "516081ee69ed0451cddb5f08aa9bf36f32b204d2",
+        "2": "c9bd489b3c520f4bf63a2515804f89b7cbf9c4c7",
+        "3": "bd77e4087428175cf8e9829431a7b209c27d2219"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/HeightDefect/AdelicUnitaryGroups.lean",
+      "stages": {
+        "1": "5baaef9b245b93c3de204d996e78082a43b4f9e4",
+        "2": "a15dea5fb96f7cc8626b3218099d483040e641d7",
+        "3": "a87b710e6de9460ca1bb84ecbd3e1801aebad63f"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/HeightDefect/CMCurveHermitianForms.lean",
+      "stages": {
+        "1": "fb9354f61de400bc29ecd904bad578ce2a267079",
+        "2": "565b756b12bb7ac84fefb83c31c7734b82242f4e",
+        "3": "cfd0aadf78e8a2d9ec0fd5f3a1043efbccc43f66"
+      }
+    },
+    {
+      "path": "src/Development/AbelianVarietyTheory/BlockTheory/HeightDefect/CurveFormSign.lean",
+      "stages": {
+        "1": "d601ff25a7a20ae178c5314391a96bdb56576150",
+        "2": "08ce20c5e4daded64244ce481c14128c8428455b",
+        "3": "3b813b41e5e28414e5cd50fd09e808a06c1dad69"
+      }
+    }
+  ],
+  "conflict_list_truncated": true,
+  "rebase_head": "a7016a34bb7e84e8f031c2179bd71cb9c20f2517",
+  "log_tail": "procityTheory/ReductiveGroups/DiscreteSeries/MultiplicityOne/MultiplicityDescent/JScaleMoveB.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/MultiplicityOne/MultiplicityDescent/JScaleMoveB.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/MultiplicityOne/PhiIntegrable.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/MultiplicityOne/PhiIntegrable.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/MultiplicityOne/StDefs.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/MultiplicityOne/StDiagExists.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/MultiplicityOne/TheoremMOf.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/MultiplicityOne/TheoremMOf.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/MultiplicityOne/TransposeUnitary.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/MultiplicityOne/WeightedL1OfL2.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TailIntegrals/CriticalExponentSucc.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TailIntegrals/HeisenbergDualBaseVectorFormula.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TailIntegrals/HermExpand.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TailIntegrals/HermMatrixMulVecFirst.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TailIntegrals/IntegrableUnitIndicator.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TailIntegrals/RhoSqInsSucc.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TailIntegrals/RhoSqInsSucc.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TailIntegrals/XiExistsOfIn.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TailIntegrals/XiExistsOfIn.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TailIntegrals/XiIntStepOf.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/AntiEIsGlRep.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/CARSqA.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/CARUnit.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/CARUnit.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/CoefBTensSubKStable.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/CoefBTensSubKStable.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/CoefOfEmb.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/ConsumerA.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/ConsumerA.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/ConsumerB.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/ConsumerB.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/FmFormBAddLeft.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/FmFormBAddLeft.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/GelfandSeries.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/HidaSetting.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/InhabCAR.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/LowFock.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/MomentMatch.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/OccCExistsPs.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/OccDTensKStable.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/Residue.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TensorRepresentations/Resolvent.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TraceGap/CompactLoweringSpanDiagStable.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TraceGap/CoordSpan.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TraceGap/CoordSpan.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TraceGap/FockWeightWedgeLowerModes.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/TraceGap/GsBasisPhys.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/LatticeEmbeddings/IotaPlace.lean\nCONFLICT (modify/delete): src/ReciprocityTheory/ReductiveGroups/LocalHeights/Imports.lean deleted in a7016a34bb (Remove declarations that are unused in the proof) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/ReductiveGroups/LocalHeights/Imports.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/ReductiveGroups/Models/FiniteGeneration/FiniteGenerationProofs/Imports.lean deleted in a7016a34bb (Remove declarations that are unused in the proof) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/ReductiveGroups/Models/FiniteGeneration/FiniteGenerationProofs/Imports.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/ReductiveGroups/Models/FiniteGeneration/FiniteGenerationProofs/SolveV.lean deleted in a7016a34bb (Remove declarations that are unused in the proof) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/ReductiveGroups/Models/FiniteGeneration/FiniteGenerationProofs/SolveV.lean left in tree.\nAuto-merging src/ReciprocityTheory/ReductiveGroups/SymplecticTraces/WeylCharacters/Branch.lean\nCONFLICT (modify/delete): src/ReciprocityTheory/ReductiveGroups/TraceFormulas/GlobAlgGoodO.lean deleted in a7016a34bb (Remove declarations that are unused in the proof) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/ReductiveGroups/TraceFormulas/GlobAlgGoodO.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/ReductiveGroups/TraceFormulas/ImportsAlt.lean deleted in a7016a34bb (Remove declarations that are unused in the proof) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/ReductiveGroups/TraceFormulas/ImportsAlt.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/ReductiveGroups/TraceFormulas/LatClose.lean deleted in a7016a34bb (Remove declarations that are unused in the proof) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/ReductiveGroups/TraceFormulas/LatClose.lean left in tree.\nAuto-merging src/ReciprocityTheory/ReductiveGroups/TraceFormulas/LatDefs.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ReductiveGroups/TraceFormulas/LatDefs.lean\nCONFLICT (modify/delete): src/ReciprocityTheory/ReductiveGroups/TraceFormulas/LatInv.lean deleted in a7016a34bb (Remove declarations that are unused in the proof) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/ReductiveGroups/TraceFormulas/LatInv.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/ReductiveGroups/TraceFormulas/LatIso.lean deleted in a7016a34bb (Remove declarations that are unused in the proof) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/ReductiveGroups/TraceFormulas/LatIso.lean left in tree.\nCONFLICT (modify/delete): src/ReciprocityTheory/ReductiveGroups/TraceFormulas/LatReal.lean deleted in a7016a34bb (Remove declarations that are unused in the proof) and modified in HEAD.  Version HEAD of src/ReciprocityTheory/ReductiveGroups/TraceFormulas/LatReal.lean left in tree.\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/FgHonD.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/FrobFixNegOne.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModBasic.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModFixJ.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/ModGBasic.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/RedHalf.lean\nAuto-merging src/ReciprocityTheory/ReductiveGroups/UnramifiedIntegrals/TorChord.lean\nAuto-merging src/ReciprocityTheory/SemistableReduction/AlgAll.lean\nAuto-merging src/ReciprocityTheory/SemistableReduction/ApproxBasisA.lean\nAuto-merging src/ReciprocityTheory/SemistableReduction/ApproxGraphA.lean\nAuto-merging src/ReciprocityTheory/SemistableReduction/ComapInclusionIsLocalHom.lean\nAuto-merging src/ReciprocityTheory/SemistableReduction/ExistsIntSmulMemSpan.lean\nAuto-merging src/ReciprocityTheory/SemistableReduction/ExpTorusMeanLeL2OfLex.lean\nAuto-merging src/ReciprocityTheory/SemistableReduction/GaussExtensionAndResidueTrdegEq.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/SemistableReduction/GaussExtensionAndResidueTrdegEq.lean\nAuto-merging src/ReciprocityTheory/SemistableReduction/GaussValExists.lean\nAuto-merging src/ReciprocityTheory/SemistableReduction/LatAll.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/SemistableReduction/LatAll.lean\nAuto-merging src/ReciprocityTheory/SemistableReduction/LatTest.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/SemistableReduction/LatTest.lean\nAuto-merging src/ReciprocityTheory/SemistableReduction/LogNormEvalZeroLeCircleAverage.lean\nAuto-merging src/ReciprocityTheory/SemistableReduction/SemiContractA.lean\nAuto-merging src/ReciprocityTheory/SemistableReduction/ShareSt.lean\nAuto-merging src/ReciprocityTheory/SemistableReduction/SphereLogIntegrableStatement.lean\nAuto-merging src/ReciprocityTheory/SemistableReduction/TorsionNonvanishStatement.lean\nAuto-merging src/ReciprocityTheory/SemistableReduction/TorusLexB.lean\nAuto-merging src/ReciprocityTheory/ThetaQuasiPeriods/NormInvSmulMemSphere.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ThetaQuasiPeriods/NormInvSmulMemSphere.lean\nAuto-merging src/ReciprocityTheory/ThetaQuasiPeriods/ThetaQuasiPeriodStatement.lean\nCONFLICT (modify/delete): src/ReciprocityTheory/ThetaSummability/RealCoinvariants/GlRelZero.lean deleted in HEAD and modified in a7016a34bb (Remove declarations that are unused in the proof).  Version a7016a34bb (Remove declarations that are unused in the proof) of src/ReciprocityTheory/ThetaSummability/RealCoinvariants/GlRelZero.lean left in tree.\nAuto-merging src/ReciprocityTheory/ThetaSummability/RealCoinvariants/Numbers.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ThetaSummability/RealCoinvariants/Numbers.lean\nAuto-merging src/ReciprocityTheory/ThetaSummability/TailSumEstimates/ConeChange.lean\nAuto-merging src/ReciprocityTheory/ThetaSummability/TailSumEstimates/ConeDefs.lean\nCONFLICT (content): Merge conflict in src/ReciprocityTheory/ThetaSummability/TailSumEstimates/ConeDefs.lean\nAuto-merging src/ReciprocityTheory/ThetaSummability/TailSumEstimates/ConeExp.lean\nRebasing (1/5)\nerror: could not apply a7016a34bb... Remove declarations that are unused in the proof\nhint: Resolve all conflicts manually, mark them as resolved with\nhint: \"git add/rm <conflicted_files>\", then run \"git rebase --continue\".\nhint: You can instead skip this commit: run \"git rebase --skip\".\nhint: To abort and get back to the state before \"git rebase\", run \"git rebase --abort\".\nhint: Disable this message with \"git config set advice.mergeConflict false\"\nCould not apply a7016a34bb... # Remove declarations that are unused in the proof\n",
+  "checkpoint_head": "e5ae821a00834f8043e987947f8151cc769bafe2"
+}
