@@ -1,0 +1,32 @@
+name: Refresh heartbeat and performance branches on current main
+on:
+  push:
+    branches: [maintenance/rebase-latest-wide-repairs]
+    paths:
+      - tools/pr-rebase/**
+      - .github/workflows/rebase-latest-wide-repairs.yml
+permissions:
+  contents: write
+jobs:
+  remaining:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          persist-credentials: false
+          sparse-checkout: |
+            tools/pr-rebase
+      - name: Replay explicit resolutions and refreshed heads
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_BATCH: repair
+        run: python3 tools/pr-rebase/rebase_prepared_current.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: restack-rebase-reports
+          path: ${{ runner.temp }}/rh-rebase-*/results/
+          if-no-files-found: warn

@@ -1,0 +1,100 @@
+{
+  "prs": {
+    "79": [
+      {
+        "commit": "42d9f80017ca1caadfc824059087378ceed1c0fb",
+        "note": "Retain the eight new main proofs and their current instance budgets where global heartbeat removal overlaps them.",
+        "files": [
+          {
+            "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapDimensionFormula.lean",
+            "ours": "49d41585f994f4a92a0ca09150e7703324b8b7ff",
+            "resolution": "resolutions/current-heartbeat-0.lean"
+          },
+          {
+            "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DiscreteSeriesParameterUnique.lean",
+            "ours": "f85ca6d53f7385532924fa62cca53dd8f6a19b4f",
+            "resolution": "resolutions/current-heartbeat-1.lean"
+          },
+          {
+            "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/GenericIsomorphismProductModelsStatement.lean",
+            "ours": "092c944407f4399b743964f1cd8aedb2beebefe3",
+            "resolution": "resolutions/current-heartbeat-2.lean"
+          },
+          {
+            "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ModelMapGenericallyOpenImmersionCalculusStatement.lean",
+            "ours": "521637452f81b8747eaec6edd345469d1400001f",
+            "resolution": "resolutions/current-heartbeat-3.lean"
+          },
+          {
+            "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ProdIrrAndWeakNeronStatement.lean",
+            "ours": "142ce053f7945a9bf7d786ef758515e352ba8399",
+            "resolution": "resolutions/current-heartbeat-4.lean"
+          },
+          {
+            "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/VectorFieldOrderAddOfProdStrictHenselianStatement.lean",
+            "ours": "1d56d1f2115f0bf092a27a0776a5eb182805e65d",
+            "resolution": "resolutions/current-heartbeat-5.lean"
+          },
+          {
+            "path": "src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/TypeIIOfBlochKatoLocalPoint.lean",
+            "ours": "f68694555586640e3f2b62ad83a72690c8ba170f",
+            "resolution": "resolutions/current-heartbeat-6.lean"
+          },
+          {
+            "path": "src/Development/AutomorphicSpectrum/Proofs/GeometryProofs/BoundaryChartLieMetricBoundStatement.lean",
+            "ours": "b9edf3e2c5955f8ddf8a2323ce8c40ecc6f11ce4",
+            "resolution": "resolutions/current-heartbeat-7.lean"
+          }
+        ]
+      }
+    ],
+    "104": [
+      {
+        "commit": "98c289571c54c43373c69a921a91faee9a2d51f8",
+        "note": "Retain the eight new main proofs and their current instance budgets where global heartbeat removal overlaps them.",
+        "files": [
+          {
+            "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/BesselGapDimensionFormula.lean",
+            "ours": "49d41585f994f4a92a0ca09150e7703324b8b7ff",
+            "resolution": "resolutions/current-heartbeat-0.lean"
+          },
+          {
+            "path": "src/CompanionTheory/AutomorphicTheory/PieriRules/ThetaBesselIsometries/DiscreteSeriesParameterUnique.lean",
+            "ours": "f85ca6d53f7385532924fa62cca53dd8f6a19b4f",
+            "resolution": "resolutions/current-heartbeat-1.lean"
+          },
+          {
+            "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/GenericIsomorphismProductModelsStatement.lean",
+            "ours": "092c944407f4399b743964f1cd8aedb2beebefe3",
+            "resolution": "resolutions/current-heartbeat-2.lean"
+          },
+          {
+            "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ModelMapGenericallyOpenImmersionCalculusStatement.lean",
+            "ours": "521637452f81b8747eaec6edd345469d1400001f",
+            "resolution": "resolutions/current-heartbeat-3.lean"
+          },
+          {
+            "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/ProdIrrAndWeakNeronStatement.lean",
+            "ours": "142ce053f7945a9bf7d786ef758515e352ba8399",
+            "resolution": "resolutions/current-heartbeat-4.lean"
+          },
+          {
+            "path": "src/Development/AbelianVarietyTheory/Proofs/DegenerationProofs/VectorFieldOrderAddOfProdStrictHenselianStatement.lean",
+            "ours": "1d56d1f2115f0bf092a27a0776a5eb182805e65d",
+            "resolution": "resolutions/current-heartbeat-5.lean"
+          },
+          {
+            "path": "src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/TypeIIOfBlochKatoLocalPoint.lean",
+            "ours": "f68694555586640e3f2b62ad83a72690c8ba170f",
+            "resolution": "resolutions/current-heartbeat-6.lean"
+          },
+          {
+            "path": "src/Development/AutomorphicSpectrum/Proofs/GeometryProofs/BoundaryChartLieMetricBoundStatement.lean",
+            "ours": "b9edf3e2c5955f8ddf8a2323ce8c40ecc6f11ce4",
+            "resolution": "resolutions/current-heartbeat-7.lean"
+          }
+        ]
+      }
+    ]
+  }
+}
