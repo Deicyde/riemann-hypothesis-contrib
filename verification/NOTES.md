@@ -12,13 +12,14 @@ Comparator's output will be added here when the run finishes.
 | Joined archive | `cat lean.tar.gz.part{01..14} > lean.tar.gz`: 239,275,554 bytes, sha256 `9631b4f020199e580ba86178cb56c6e9b09f690c2369a80dc4334aa93f49c7fc` |
 
 The first commit of this repository, `40e56bab`, is the archive's `lean/` directory exactly as
-published. Later commits add `src/Challenge.lean`, the Comparator config and export targets, the
-README, this folder, the CI workflow and, since
+published. Later commits add the Comparator challenge, config and export targets, the README,
+this folder, the CI workflow and, since
 [#7](https://github.com/leanprover-community/riemann-hypothesis/pull/7), the build cache in
-`scripts/`. The config and the export targets were `comparator.json` and `export-targets.txt`
-at the root until [#88](https://github.com/leanprover-community/riemann-hypothesis/pull/88), which
-moved them unchanged to `comparator/main.json` and `comparator/main-export-targets.txt`. The
-second Comparator setup, in the same folder, is described [below](#formal-conjectures).
+`scripts/`. Until [#88](https://github.com/leanprover-community/riemann-hypothesis/pull/88) the
+three Comparator files were `src/Challenge.lean`, `comparator.json` and `export-targets.txt`.
+That pull request moved them unchanged to `comparator/Challenge.lean`, `comparator/main.json`
+and `comparator/main-export-targets.txt`. The second Comparator setup, in the same folder, is
+described [below](#formal-conjectures).
 
 Merged pull requests have since changed the submission's own files under `src/`, mainly by
 deleting files the proof does not use and by shortening proofs.
@@ -33,8 +34,11 @@ describe the original 175,187 files, not the current tree.
 `lakefile.toml` is the original with two additions:
 
 - three lines at the top, which set `platformIndependent = true` for the build cache;
-- a marked block at the end, which registers the `Challenge` library, the `cache` executable and
-  the cache server.
+- a marked block at the end, which registers the `cache` executable and the cache server.
+
+Until [#88](https://github.com/leanprover-community/riemann-hypothesis/pull/88) the block also
+registered a `Challenge` library. The challenge is now compiled directly, as step 1 of the
+README shows, so `lakefile.toml` describes the submission and the cache and nothing else.
 
 CI checks that the original file sits unchanged between the two. Neither addition makes Lake
 treat an existing build as out of date; that was tested on a small Lean `v4.33.1` project, not
@@ -218,11 +222,12 @@ Mathlib, and none of the submission's proofs.
 proves the two theorems, under formal-conjectures' names, by applying the bridge to
 `LFunction_eq_zero_re_of_isPrimitive` and by `riemannHypothesis`, both from `Main.lean`.
 
-**Not a Lake library.** The three files are in no library of `lakefile.toml` and not under
-`src/`. The build cache is selected by the Git tree of `src/` and the bytes of `lakefile.toml`
-([CACHE.md](CACHE.md)), so a change to either leaves `lake exe cache get` without a match until
-CI has rebuilt, and the CI build accepts no library outside `src/`. The README compiles the
-files with `lake env lean` after the build, into `.lake/comparator/`.
+**No Lake library.** Nothing in `comparator/` is in a library of `lakefile.toml` or under
+`src/`. The lakefile describes the submission and the cache, and Comparator needs neither to
+know about the other. The README compiles the files with `lake env lean`, into
+`.lake/comparator/`. So the `[leanOptions]` of the lakefile do not apply to them. For
+`Challenge.lean` that changes nothing: compiled this way, its export has the sha256 it had as a
+library, the one in the README, and CI checks that on every push.
 
 **Cost.** The export of `FormalConjecturesSolution` contains the whole proof, as the export of
 `Main` does, plus the bridge. Making it and judging it cost what steps 3 and 4 of the README
@@ -384,7 +389,8 @@ on one thread.
   - The challenge export given to the judge is made in a new folder, created after the
     container has exited, from a fresh clone and a fresh download of Mathlib's official cache.
     A build that altered the compiled Mathlib in its own folder cannot change what the
-    challenge means. CI's `challenge-export` artifact is a second, independent copy.
+    challenge means. CI makes the export again on every push and checks its sha256, as a
+    second, independent copy.
   - The exporter and the other tools in the work directory are rebuilt after the build.
   - Every compiled dependency file in the build folder is compared with a clean official copy.
     A first comparison during the build found all 121,742 files identical.

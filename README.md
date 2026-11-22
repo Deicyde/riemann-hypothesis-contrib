@@ -14,7 +14,7 @@ changed, and
 keeps the original frozen.
 
 **Verification scope:** The cache provides precompiled files for browsing and reuse. The
-`checks` workflow compiles the challenge statements; a separate workflow builds pull requests.
+`checks` workflow checks the challenge statements and comparator configuration; a separate workflow builds pull requests.
 A successful cache download or build does not establish that the proof has passed independent
 checking. Follow [Checking the proof](#checking-the-proof) for the verification procedure, and
 consult the [verification notes](verification/NOTES.md) for recorded results and the source
@@ -32,7 +32,7 @@ revisions they cover.
 | `LFunction_eq_zero_re` | every zero of L(χ, s) with 0 < Re s < 1 has Re s = 1/2 |
 | `LFunction_eq_zero_re_of_isPrimitive` | the same, for primitive characters |
 
-[`src/Challenge.lean`](src/Challenge.lean) states the same five with `sorry` in place of the
+[`comparator/Challenge.lean`](comparator/Challenge.lean) states the same five with `sorry` in place of the
 proofs, in a file that imports only Mathlib. Comparator checks that `Main.lean` proves exactly
 those statements, that it uses no axioms other than `propext`, `Quot.sound` and
 `Classical.choice`, and that Lean's kernel and nanoda both accept the proof.
@@ -61,102 +61,130 @@ uploaded. To check the proof, run Comparator as described below.
 ## Checking the proof
 
 ```bash
-lake exe cache get
-lake comparator --config comparator/main.json
+export LEAN_ABORT_ON_PANIC=1        # stop on an internal error, as Comparator does
+export LAKE_ARTIFACT_CACHE=false    # really rebuild, even if cache-env.sh was sourced earlier
+export MATHLIB_CACHE_GET_URL=https://cache.mathlib.org/mathlib4
+
+# 1. Export the challenge, in a clean clone at $CLEAN.
+cd "$CLEAN"
+lake exe mathlib/cache get
+mkdir -p .lake/comparator
+lake env lean --root=comparator -o .lake/comparator/Challenge.olean comparator/Challenge.lean
+LEAN_PATH="$PWD/.lake/comparator" lake env leanexport Challenge -- \
+  $(cat comparator/main-export-targets.txt) > challenge.export
+
+# 2. Build the solution, in a second clone, inside a sandbox with no network. Takes hours.
+lake exe mathlib/cache get      # before entering the sandbox
+lake build Main                 # inside the sandbox
+
+# 3. Export the solution, still inside the sandbox.
+lake env leanexport Main -- $(cat "$CLEAN/comparator/main-export-targets.txt") > solution.export
+
+# 4. Judge, from an empty directory, with the same Lean release.
+lake comparator --config "$CLEAN/comparator/main.json" \
+  --challenge-from-export "$CLEAN/challenge.export" --solution-from-export solution.export
 ```
 
-The main setup uses `comparator/main.json` and `comparator/main-export-targets.txt`, moved without content changes from the root. A [second setup](#checking-it-against-formal-conjectures) uses `comparator/formal-conjectures.json`.
+Compiling the submission runs its code. That is why the challenge is exported first, in a clone
+where none of the submission has been compiled, and why the build and the second export happen
+in a sandbox that only `solution.export` leaves.
 
-In this repository `lake exe cache get` downloads our compiled copy of the proof along with
-Mathlib's cache. `lake comparator --config comparator/main.json` then checks the proof against `Challenge.lean`, as described
-under [What is claimed](#what-is-claimed). It needs Linux with
-[bubblewrap](https://github.com/containers/bubblewrap), a lot of memory and several hours. To
-have the proof compiled from source as well, start with `lake exe mathlib/cache get`, which
-fetches only Mathlib.
+Steps 1 and 2 use `lake exe mathlib/cache get` on purpose. Plain `lake exe cache get` would also
+download our prebuilt copy of the submission, and `lake build Main` would then compile nothing.
 
-We don't have a complete run on the current source yet. [NOTES.md](verification/NOTES.md) has
-the long version, written for the published source on Lean 4.33.1.
+The challenge, its config and its list of export targets are in [`comparator/`](comparator/).
+None of them is part of the Lake project, which is why step 1 compiles `Challenge.lean`
+directly, and pull requests may not change them. Until
+[#88](https://github.com/leanprover-community/riemann-hypothesis/pull/88) they were
+`src/Challenge.lean`, `comparator.json` and `export-targets.txt`, with the same contents.
 
-## CI
+All four steps use the Lean release in `lean-toolchain`, which comes with both `leanexport` and
+`lake comparator`. The published source was written for Lean 4.33.1, which has neither, so
+checking `40e56bab` itself takes two toolchains.
+[An older version of this README](https://github.com/leanprover-community/riemann-hypothesis/blob/7cce738ba719a32964ca3822d0994f4c6952c7ae/README.md#checking-it)
+has those steps.
 
-Every push and pull request gets a quick check that `Challenge.lean` compiles against Mathlib
-alone. A full build is too big for GitHub's runners, so pull requests are built on machines
-lent by volunteers, and successful builds go into the cache. If you have a Linux machine with
-plenty of memory and disk to spare, [CI-RUNNERS.md](verification/CI-RUNNERS.md) explains how to
-lend it. The scripts behind all this are in [`scripts/`](scripts/) and
-[`tools/ci_native/`](tools/ci_native/README.md).
+We worked these steps out on the published source and don't have a complete run on the current
+source yet. Step 1 has been run on it: with Lean 4.36.0, `challenge.export` has sha256
+`ccaa35047adcb2b493ad0ca36abfdd02633b56f5afad009d027b4570ee0f2194`. On the published source the
+build took hours on a large machine and about 100 GB of disk, and judging needs a lot of memory.
+[NOTES.md](verification/NOTES.md) says where the source came from, how the tools and sandboxes
+are set up and what a passing run does and doesn't show, but it still describes the Lean 4.33.1
+setup, apart from its section on the formal-conjectures statement.
 
-## Checking it against formal-conjectures
+## The formal-conjectures statement
 
 [formal-conjectures](https://github.com/google-deepmind/formal-conjectures) states the Riemann
 Hypothesis and the Generalized Riemann Hypothesis in
 [`FormalConjectures/Millennium/RiemannHypothesis.lean`](https://github.com/google-deepmind/formal-conjectures/blob/d8d031d4998c78575159ccab9a7a9e95ce043883/FormalConjectures/Millennium/RiemannHypothesis.lean).
-Salvatore Mercuri wrote its statement of GRH in November 2025, a year before the announcement,
-and the text has not changed since 2025-11-07. It covers every non-trivial zero in the plane,
-not only the critical strip. A second setup, in [`comparator/`](comparator/), takes that file
-itself as the challenge, so the statement being judged was written by neither the author nor
-us:
+Salvatore Mercuri wrote its statement of GRH in November 2025, a year before the announcement.
+It covers every non-trivial zero in the plane, not only the critical strip. A second Comparator
+setup checks the proof against those statements, which neither the author nor we wrote.
 
-| File | What it is |
-|---|---|
-| [`formal-conjectures.json`](comparator/formal-conjectures.json) | the Comparator config, for `RiemannHypothesis.riemannHypothesis` and `GRH.generalized_riemann_hypothesis` |
-| [`formal-conjectures-export-targets.txt`](comparator/formal-conjectures-export-targets.txt) | the declarations to export |
-| [`FormalConjecturesStatement.lean`](comparator/FormalConjecturesStatement.lean) | the three constants in the GRH statement that Mathlib does not have, copied from formal-conjectures |
-| [`FormalConjecturesBridge.lean`](comparator/FormalConjecturesBridge.lean) | states that GRH and proves `PrimitiveDirichletLZerosOnLine` equivalent to it, from Mathlib and `Statements.lean` alone |
-| [`FormalConjecturesSolution.lean`](comparator/FormalConjecturesSolution.lean) | the two theorems under formal-conjectures' names, proved from `Main.lean` |
+Its challenge is
+[`comparator/FormalConjecturesChallenge.lean`](comparator/FormalConjecturesChallenge.lean), a
+copy of the formal-conjectures declarations in a file that imports only Mathlib. It has to be a
+copy, because Comparator needs the challenge and the solution built against the same Mathlib,
+and formal-conjectures follows its own Lean releases. CI compares the copy with
+formal-conjectures' text at the commit linked above. On formal-conjectures' own Lean release,
+Comparator finds the copy's statements identical to the ones formal-conjectures exports.
 
-It adds three steps to the ones above, with the same environment variables:
+Three more files in `comparator/` connect the proof to that challenge.
+`FormalConjecturesBridge.lean` proves that the fifth theorem above, the one about primitive
+characters, is equivalent to formal-conjectures' GRH, from Mathlib and `src/Statements.lean`
+alone. `FormalConjecturesSolution.lean` then proves the two formal-conjectures theorems from
+`Main.lean`. `FormalConjecturesStatement.lean` holds two definitions that both need.
+
+Checking it adds three steps to the ones above:
 
 ```bash
-# 1b. Export the challenge from formal-conjectures. Clean clone at $FC, Lean v4.33.1.
-git clone https://github.com/google-deepmind/formal-conjectures "$FC" && cd "$FC"
-git checkout d8d031d4998c78575159ccab9a7a9e95ce043883
-lake exe cache get
-lake build FormalConjectures.Millennium.RiemannHypothesis
-lake env lean4export FormalConjectures.Millennium.RiemannHypothesis -- \
-  $(cat "$CLEAN/comparator/formal-conjectures-export-targets.txt") > fc-challenge.export
+# 1b. Export the second challenge, in the clean clone, after step 1.
+lake env lean --root=comparator \
+  -o .lake/comparator/FormalConjecturesChallenge.olean comparator/FormalConjecturesChallenge.lean
+LEAN_PATH="$PWD/.lake/comparator" lake env leanexport FormalConjecturesChallenge -- \
+  $(cat comparator/formal-conjectures-export-targets.txt) > fc-challenge.export
 
-# 3b. Compile the three files on the finished build of step 2 and export. Inside the sandbox.
+# 3b. Compile the three files on the finished build of step 2 and export, inside the sandbox.
 mkdir -p .lake/comparator
 for m in FormalConjecturesStatement FormalConjecturesBridge FormalConjecturesSolution; do
   LEAN_PATH="$PWD/.lake/comparator" lake env lean --root=comparator \
     -o ".lake/comparator/$m.olean" "comparator/$m.lean"
 done
-LEAN_PATH="$PWD/.lake/comparator" lake env lean4export FormalConjecturesSolution -- \
+LEAN_PATH="$PWD/.lake/comparator" lake env leanexport FormalConjecturesSolution -- \
   $(cat "$CLEAN/comparator/formal-conjectures-export-targets.txt") > fc-solution.export
 
 # 4b. Judge, as in step 4.
 lake comparator --config "$CLEAN/comparator/formal-conjectures.json" \
-  --challenge-from-export "$FC/fc-challenge.export" --solution-from-export fc-solution.export
+  --challenge-from-export "$CLEAN/fc-challenge.export" --solution-from-export fc-solution.export
 ```
 
-- **Nothing is retyped in the challenge.** It is exported from formal-conjectures at a pinned
-  commit, which uses the same Lean and the same Mathlib commit as this project. CI checks both
-  and does step 1b on every push. The sha256 of `fc-challenge.export` is
-  `75aa4a26e43ba9ea2998ba28ebdec4d72c43b43944e6c333963c4cfeda08c2c1`.
-- **The solution copies the statement.** Comparator wants the solution to state the theorem,
-  and to define everything the statement uses, as the challenge does and under the same names.
-  So `FormalConjecturesStatement.lean` repeats `GRH.trivialZeros` and a `Decidable` instance
-  from formal-conjectures, and `FormalConjecturesBridge.lean` repeats the GRH statement.
-  Neither imports the submission's proofs, so nothing there can change how Lean reads them.
-  Comparator rejects a copy that differs.
-- **Not a Lake library.** `lakefile.toml` and `src/` are inputs to the build cache, so the three
-  files stay out of both and are compiled by hand.
-- **Cost.** Step 3b takes minutes, but `fc-solution.export` contains the whole proof again, so
-  exporting and judging it cost what steps 3 and 4 do.
+With Lean 4.36.0, `fc-challenge.export` has sha256
+`0977ecc3ea2a1abd7b9b3356a4643574dd65c3b4c8a98ca25b18f5629efe0218`, and CI checks that.
+`fc-solution.export` contains the whole proof again, so steps 3b and 4b cost what steps 3 and 4
+do.
 
-The [notes](verification/NOTES.md#formal-conjectures) credit the formal-conjectures authors
-whose statements these are, say what was copied and why, and report a rehearsal of these steps
-with a placeholder in place of `Main.lean`, which CI repeats.
+We have run these steps with a placeholder standing in for `Main.lean`, and CI repeats that.
+Before the port, ishaan2006 ran them against a real build of the published source.
+[NOTES.md](verification/NOTES.md#formal-conjectures) has the results, says what was copied and
+why, and credits the formal-conjectures authors.
+
+## CI
+
+A pull request that changes a challenge, a config or a list of export targets in `comparator/`
+fails a check. When the formal-conjectures files or anything they depend on changes, CI compares
+that challenge with formal-conjectures' text and rehearses the judge with a placeholder for
+`Main.lean`. A full build is too big for GitHub's runners, so pull requests are built on
+machines lent by volunteers, and successful builds go into the cache. If you have a Linux
+machine with plenty of memory and disk to spare, [CI-RUNNERS.md](verification/CI-RUNNERS.md)
+explains how to lend it. The scripts behind all this are in [`scripts/`](scripts/) and
+[`tools/ci_native/`](tools/ci_native/README.md).
 
 ## License
 
 The submission belongs to its author and was published without a license. It is mirrored here
 so that it can be checked. Commit `40e56bab` is the unmodified copy.
 
-The declarations in
-[`FormalConjecturesStatement.lean`](comparator/FormalConjecturesStatement.lean) and the
-GRH statement in [`FormalConjecturesBridge.lean`](comparator/FormalConjecturesBridge.lean)
-are copied from [formal-conjectures](https://github.com/google-deepmind/formal-conjectures),
-copyright The Formal Conjectures Authors, under the
-[Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+The declarations in `comparator/` that are copied from
+[formal-conjectures](https://github.com/google-deepmind/formal-conjectures) are copyright The Formal
+Conjectures Authors, under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+The files that hold them carry the notice.
