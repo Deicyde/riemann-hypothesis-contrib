@@ -1,0 +1,28 @@
+{
+  "base": "1334509aa7f1548cac4f2e68e9f631ed5ae4d7e7",
+  "run": "45045049636-remaining-pending-64",
+  "results": [
+    {
+      "number": 54,
+      "status": "awaiting-manual-review",
+      "conflict_count": 1,
+      "stage_types": {
+        "1,2,3": 1
+      },
+      "conflicts": [
+        {
+          "path": "src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/ExistsSubringEqOK.lean",
+          "stages": {
+            "1": "77cff8cdc97aafb64c282ac9c6058b6b90bd8ac5",
+            "2": "789b25ce06acf99e2172813d1b6b180c4c8b08f6",
+            "3": "49d7a23db60191ca8fdcb9be305f855f16936979"
+          }
+        }
+      ],
+      "conflict_list_truncated": false,
+      "rebase_head": "87f8d4f93d6eaa4ca59bdc7d792454ff4d1f8e4f",
+      "checkpoint_head": "d840825e52c3d16d2efc9843c102d5b077dbf81d"
+    }
+  ],
+  "validation": "Git replay, diff checks and protected-file checks only; no Lean builds."
+}
